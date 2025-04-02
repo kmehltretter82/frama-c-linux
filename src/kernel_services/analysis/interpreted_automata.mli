@@ -205,58 +205,6 @@ module WTOIndex : sig
   end
 end
 
-
-(** Generic control flow graphs *)
-module type Graph = sig
-  include Graph.Sig.I
-
-  type wto = vertex Wto.partition
-  module WTO : Wto.S with type node = vertex
-
-  val pretty : t Pretty_utils.formatter
-
-  (** Build a wto for the given automaton. The [pref] function is a comparison
-      function used to determine what is the best vertex to use as a Wto component
-      head. See [Wto.Make] for more details. *)
-  val build_wto : pref:WTO.pref -> t -> V.t -> wto
-
-  (** Output the automaton in dot format *)
-  val output_to_dot :
-    ?pp_vertex:(V.t Pretty_utils.formatter) ->
-    ?pp_edge:(E.label Pretty_utils.formatter) ->
-    ?wto:wto ->
-    out_channel -> t -> unit
-
-  (** Extract an exit strategy from a component, i.e. a sub-wto where all
-      vertices lead outside the wto without passing through the head. *)
-  val exit_strategy : t -> V.t Wto.component -> wto
-end
-
-(** This functor can be used to build generic control flow graphs *)
-module MakeGraph (Vertex : Datatype.S_with_hashtbl) (Edge : Datatype.S) : Graph
-  with type V.t = Vertex.t
-   and type E.t = Vertex.t * Edge.t * Vertex.t
-   and type V.label = Vertex.t
-   and type E.label = Edge.t
-
-
-(** Control flow graphs where unnatural loops are modified such that all paths
-    entering a loop enters it by its head. *)
-module UnrollUnnatural : sig
-  module Vertex_Set:
-    Datatype.S_with_collections with type t = Vertex.Set.t
-  module Version:
-    Datatype.S_with_collections with type t = Vertex.t * Vertex.Set.t
-
-  include Graph with type V.t = Version.t
-                 and type E.t = Version.t * Version.t edge * Version.t
-                 and type V.label = Version.t
-                 and type E.label = Version.t edge
-
-  val build : automaton -> G.vertex Wto.partition -> WTOIndex.Table.t -> t
-end
-
-
 (** Dataflow computation: simple data-flow analysis using interpreted automata.
     See tests/misc/interpreted_automata_dataflow.ml for a complete example
     using this dataflow computation. *)
@@ -288,11 +236,11 @@ sig
       This ensures the analysis termination. *)
   val widen : t -> t -> t widening
 
-  (** Transfer function for edges: [transfer v e s] computes the state
+  (** Transfer function for edges: [transfer (u,e,v) s] computes the state
       after the transition [e.edge_transition] from the state [s] before,
-      at vertex [v]. Returns None if the end of the transition is not
-      reachable from the given state. *)
-  val transfer : vertex -> vertex edge -> t -> t option
+      between vertices [u] and [v]. Returns None if the end of the transition is
+      not reachable from the given state. *)
+  val transfer : vertex * vertex edge * vertex -> t -> t option
 end
 
 (** Simple dataflow analysis *)
@@ -360,3 +308,82 @@ module ForwardAnalysis (D : Domain) : DataflowAnalysis
     function that computes the state before a transition from the state after. *)
 module BackwardAnalysis (D : Domain) : DataflowAnalysis
   with type state = D.t
+
+
+(** Generic control flow graphs *)
+module type Graph = sig
+  include Graph.Sig.I
+
+  module VTable : FCHashtbl.S with type key = vertex
+
+  type wto = vertex Wto.partition
+  module WTO : Wto.S with type node = vertex
+
+  val pretty : t Pretty_utils.formatter
+
+  (** Build a wto for the given automaton. The [pref] function is a comparison
+      function used to determine what is the best vertex to use as a Wto component
+      head. See [Wto.Make] for more details. *)
+  val build_wto : pref:WTO.pref -> t -> V.t -> wto
+
+  (** Output the automaton in dot format *)
+  val output_to_dot :
+    ?pp_vertex:(V.t Pretty_utils.formatter) ->
+    ?pp_edge:(E.label Pretty_utils.formatter) ->
+    ?wto:wto ->
+    out_channel -> t -> unit
+
+  (** Extract an exit strategy from a component, i.e. a sub-wto where all
+      vertices lead outside the wto without passing through the head. *)
+  val exit_strategy : t -> V.t Wto.component -> wto
+
+  (** Widening for abstract domains *)
+  type 'a widening = Fixpoint | Widening of 'a
+
+  (** Abstract domains *)
+  module type Domain =
+  sig
+    type t
+    val join : t -> t -> t
+    val widen : t -> t -> t widening
+    val transfer : edge -> t -> t option
+  end
+
+  (** Forward dataflow analysis *)
+  module ForwardAnalysis (D : Domain) :
+  sig
+    val compute : t -> wto -> D.t -> D.t VTable.t
+  end
+
+  (** Forward dataflow analysis *)
+  module BackwardAnalysis (D : Domain) :
+  sig
+    val compute : t -> wto -> D.t -> D.t VTable.t
+  end
+end
+
+(** This functor can be used to build generic control flow graphs *)
+module MakeGraph (Vertex : Datatype.S_with_hashtbl) (Edge : Datatype.S) : Graph
+  with type V.t = Vertex.t
+   and type E.t = Vertex.t * Edge.t * Vertex.t
+   and type V.label = Vertex.t
+   and type E.label = Edge.t
+   and module VTable = Vertex.Hashtbl
+
+
+(** Control flow graphs where unnatural loops are modified such that all paths
+    entering a loop enters it by its head. *)
+module UnrollUnnatural : sig
+  module Vertex_Set:
+    Datatype.S_with_collections with type t = Vertex.Set.t
+  module Version:
+    Datatype.S_with_collections with type t = Vertex.t * Vertex.Set.t
+
+  include Graph with type V.t = Version.t
+                 and type E.t = Version.t * Version.t edge * Version.t
+                 and type V.label = Version.t
+                 and type E.label = Version.t edge
+
+  val build : automaton -> G.vertex Wto.partition -> WTOIndex.Table.t -> t
+end
+

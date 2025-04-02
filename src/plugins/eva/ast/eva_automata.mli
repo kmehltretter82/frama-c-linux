@@ -103,3 +103,32 @@ type loop = {
 
 (** Builds the loop type for the englobing loop of vertex. *)
 val find_loop : automaton -> vertex -> loop option
+
+
+(* ************************************************************************* *)
+(** {2 Dataflow analysis} *)
+(* ************************************************************************* *)
+
+type 'a widening = Fixpoint | Widening of 'a
+
+(** Abstract domain for the dataflow analysis.
+    See [Interpreted_automata.Domain]. *)
+module type Domain =
+sig
+  type t
+  val join : t -> t -> t
+  val widen : t -> t -> t widening
+  val transfer : vertex * edge * vertex -> t -> t option
+end
+
+(** Forward Dataflow analysis. See [Interpreted_automata.ForwardAnalysis]. *)
+module ForwardAnalysis (D : Domain):
+sig
+  val fixpoint : automaton -> D.t -> D.t Vertex.Hashtbl.t
+end
+
+(** Backward Dataflow analysis. See [Interpreted_automata.BackwardAnalysis]. *)
+module BackwardAnalysis (D : Domain):
+sig
+  val fixpoint : automaton -> D.t -> D.t Vertex.Hashtbl.t
+end

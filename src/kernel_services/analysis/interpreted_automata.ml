@@ -196,6 +196,8 @@ module Edge = Datatype.Make_with_collections (struct
 module type Graph = sig
   include Graph.Sig.I
 
+  module VTable : FCHashtbl.S with type key = vertex
+
   type wto = V.t Wto.partition
   module WTO : Wto.S with type node = V.t
 
@@ -207,6 +209,26 @@ module type Graph = sig
     ?wto:wto ->
     out_channel -> t -> unit
   val exit_strategy : t -> V.t Wto.component -> wto
+
+  type 'a widening = Fixpoint | Widening of 'a
+
+  module type Domain =
+  sig
+    type t
+    val join : t -> t -> t
+    val widen : t -> t -> t widening
+    val transfer : edge -> t -> t option
+  end
+
+  module ForwardAnalysis (D : Domain) :
+  sig
+    val compute : t -> wto -> D.t -> D.t VTable.t
+  end
+
+  module BackwardAnalysis (D : Domain) :
+  sig
+    val compute : t -> wto -> D.t -> D.t VTable.t
+  end
 end
 
 module StmtTable = Cil_datatype.Stmt.Hashtbl
@@ -346,6 +368,107 @@ module MakeGraph (Vertex : Datatype.S_with_hashtbl) (Edge : Datatype.S) = struct
           f (Wto.Component (v, w) :: acc) l)
     in
     f [] (List.rev l)
+
+  (* Dataflow analysis *)
+
+  type 'a widening = Fixpoint | Widening of 'a
+
+  module type Domain =
+  sig
+    type t
+
+    val join : t -> t -> t
+    val widen : t -> t -> t widening
+    val transfer : G.edge -> t -> t option
+  end
+
+  module DataflowAnalysis (D : Domain) =
+  struct
+    module States = Vertex.Hashtbl
+
+    let compute ~fold_pred graph wto initial_value  =
+      let results = States.create (nb_vertex graph) in
+
+      let initial_values =
+        match Wto.head wto with
+        | None -> fun _ -> [] (* should not happen *)
+        | Some v -> fun u -> if v == u then [ initial_value ] else []
+      in
+
+      (* Compute the transfer function for the given edge and add the result to
+         acc *)
+      let process_edge (v,_,_ as e) acc =
+        (* Retrieve origin value *)
+        let value = States.find_opt results v in
+        let result = Option.bind (D.transfer e) value in
+        Option.to_list result @ acc
+      in
+
+      (* Compute the abstract value for the given control point ; compute all
+         incoming transfer functions *)
+      let process_vertex v =
+        let incoming = fold_pred process_edge graph v [] in
+        match initial_values v @ incoming with
+        | [] -> (* Zero incoming values -> Bottom *)
+          States.remove results v
+        | v1 :: vl ->
+          (* Join incoming values *)
+          let result = List.fold_left D.join v1 vl in
+          States.replace results v result
+      in
+
+      (* widen returns whether it is necessary to continue to iterate or not *)
+      let widen v previous =
+        let current = States.find_opt results v in
+        match previous, current with
+        | _, None -> false (* Current is bottom, let's quit *)
+        | None, _ -> true (* Previous was bottom *)
+        | Some v1, Some v2 ->
+          match D.widen v1 v2 with
+          | Fixpoint -> false (* End of iteration *)
+          | Widening value -> (* new value *)
+            States.replace results v value;
+            true
+      in
+
+      let rec iterate_list l =
+        List.iter iterate_element l
+      and iterate_element = function
+        | Wto.Node v ->
+          ignore (process_vertex v)
+        | Wto.Component (v, w) ->
+          (* Do at least one iteration *)
+          process_vertex v;
+          iterate_list w;
+          (* Then reach a fixpoint *)
+          while
+            let previous = States.find_opt results v in
+            process_vertex v;
+            widen v previous
+          do
+            iterate_list w;
+          done;
+      in
+      iterate_list wto;
+      results
+  end
+
+  module ForwardAnalysis (D : Domain) =
+  struct
+    module Analysis = DataflowAnalysis (D)
+    let compute =
+      let fold_pred f = fold_pred_e (fun (v,t,u) -> f (v,t,u)) in
+      Analysis.compute ~fold_pred
+  end
+
+  module BackwardAnalysis (D : Domain) =
+  struct
+    module Analysis = DataflowAnalysis (D)
+    let compute =
+      (* reverse order *)
+      let fold_pred f = fold_succ_e (fun (u,t,v) -> f (v,t,u)) in
+      Analysis.compute ~fold_pred
+  end
 end
 
 
@@ -1138,16 +1261,9 @@ end
 (* --- Dataflow computation                                           --- *)
 (* ---------------------------------------------------------------------- *)
 
-type 'a widening = Fixpoint | Widening of 'a
+type 'a widening = 'a G.widening = Fixpoint | Widening of 'a
 
-module type Domain =
-sig
-  type t
-
-  val join : t -> t -> t
-  val widen : t -> t -> t widening
-  val transfer : vertex -> vertex edge ->  t -> t option
-end
+module type Domain = G.Domain
 
 module type DataflowAnalysis =
 sig
@@ -1173,78 +1289,12 @@ sig
   end
 end
 
-module DataflowAnalysis (D : Domain) =
+module AddResult (D : Domain) =
 struct
   type state = D.t
   type result = automaton * wto * D.t Vertex.Hashtbl.t
 
   module States = Vertex.Hashtbl
-
-  let compute ~fold_pred automaton wto initial_value  =
-    let results = States.create (G.nb_vertex automaton.graph) in
-
-    let initial_values =
-      match Wto.head wto with
-      | None -> fun _ -> [] (* should not happen *)
-      | Some v -> fun u -> if v == u then [ initial_value ] else []
-    in
-
-    (* Compute the transfer function for the given edge and add the result to
-       acc *)
-    let process_edge v e acc =
-      (* Retrieve origin value *)
-      let value = States.find_opt results v in
-      let result = Option.bind (D.transfer v e) value in
-      Option.to_list result @ acc
-    in
-
-    (* Compute the abstract value for the given control point ; compute all
-       incoming transfer functions *)
-    let process_vertex v =
-      let incoming = fold_pred process_edge automaton.graph v [] in
-      match initial_values v @ incoming with
-      | [] -> (* Zero incoming values -> Bottom *)
-        States.remove results v
-      | v1 :: vl ->
-        (* Join incoming values *)
-        let result = List.fold_left D.join v1 vl in
-        States.replace results v result
-    in
-
-    (* widen returns whether it is necessary to continue to iterate or not *)
-    let widen v previous =
-      let current = States.find_opt results v in
-      match previous, current with
-      | _, None -> false (* Current is bottom, let's quit *)
-      | None, _ -> true (* Previous was bottom *)
-      | Some v1, Some v2 ->
-        match D.widen v1 v2 with
-        | Fixpoint -> false (* End of iteration *)
-        | Widening value -> (* new value *)
-          States.replace results v value;
-          true
-    in
-
-    let rec iterate_list l =
-      List.iter iterate_element l
-    and iterate_element = function
-      | Wto.Node v ->
-        ignore (process_vertex v)
-      | Wto.Component (v, w) ->
-        (* Do at least one iteration *)
-        process_vertex v;
-        iterate_list w;
-        (* Then reach a fixpoint *)
-        while
-          let previous = States.find_opt results v in
-          process_vertex v;
-          widen v previous
-        do
-          iterate_list w;
-        done;
-    in
-    iterate_list wto;
-    automaton, wto, results
 
   module Result =
   struct
@@ -1309,7 +1359,8 @@ end
 
 module ForwardAnalysis (D : Domain) =
 struct
-  include DataflowAnalysis (D)
+  module Analysis = G.ForwardAnalysis (D)
+  include AddResult (D)
 
   let build_wto automaton =
     let init = automaton.entry_point
@@ -1318,21 +1369,19 @@ struct
     WTO.partition ~pref ~init ~succs
 
   let fixpoint ?wto kf initial_value =
-    let fold_pred f =
-      let f' (v,t,_) = f v t in
-      G.fold_pred_e f'
-    in
     let automaton = get_automaton kf in
     let wto = match wto with
       | Some wto -> wto
       | None -> build_wto automaton
     in
-    compute ~fold_pred automaton wto initial_value
+    let results_table = Analysis.compute automaton.graph wto initial_value in
+    automaton, wto, results_table
 end
 
 module BackwardAnalysis (D : Domain) =
 struct
-  include DataflowAnalysis (D)
+  module Analysis = G.BackwardAnalysis (D)
+  include AddResult (D)
 
   let build_wto automaton =
     let init = automaton.return_point
@@ -1341,14 +1390,11 @@ struct
     WTO.partition ~pref ~init ~succs
 
   let fixpoint ?wto kf initial_value =
-    let fold_pred f =
-      let f' (_,t,v) = f v t in
-      G.fold_succ_e f'
-    in
     let automaton = get_automaton kf in
     let wto = match wto with
       | Some wto -> wto
       | None -> build_wto automaton
     in
-    compute ~fold_pred automaton wto initial_value
+    let results_table = Analysis.compute automaton.graph wto initial_value in
+    automaton, wto, results_table
 end
