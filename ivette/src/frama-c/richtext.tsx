@@ -30,7 +30,9 @@
  */
 
 import React from 'react';
+import * as States from 'frama-c/states';
 import * as KernelData from 'frama-c/kernel/api/data';
+import * as Ast from 'frama-c/kernel/api/ast';
 import { classes } from 'dome/misc/utils';
 
 // --------------------------------------------------------------------------
@@ -225,5 +227,52 @@ export function Text(props: TextProps): JSX.Element {
   };
   return <div className={className}>{makeContents(props.text)}</div>;
 }
+
+// --------------------------------------------------------------------------
+// --- Text for AST markers
+// --------------------------------------------------------------------------
+
+export function selectMarker(marker: Ast.marker, modifier: Modifier): void {
+  switch (modifier) {
+    case 'NORMAL':
+      States.setMarked(marker);
+      break;
+    case 'META':
+      States.setMarked(marker, true);
+      break;
+    case 'DOUBLE':
+      States.setSelected(marker);
+      break;
+  }
+}
+
+export interface MarkerTextProps {
+  text: KernelData.text;
+  onSelected?: (marker: Ast.marker, meta: Modifier) => void;
+  onHovered?: (marker: Ast.marker | undefined) => void;
+  className?: string;
+}
+
+/** Text with AST markers. Markers are automatically hovered on mouseover
+    and selected on click. This behavior can be changed by providing
+    callbacks onSelected and onHovered. */
+export function MarkerText(props: MarkerTextProps): JSX.Element {
+  const onSelected = (m: string, modifier: Modifier): void => {
+    const marker = Ast.jMarker(m);
+    if (props.onSelected)
+      props.onSelected(marker, modifier);
+    else
+      selectMarker(marker, modifier);
+  };
+  const onHovered = (m: string | undefined): void => {
+    const marker = m === undefined ? m : Ast.jMarker(m);
+    if (props.onHovered)
+      props.onHovered(marker);
+    else
+      States.setHovered(marker);
+  };
+  return <Text {...props} onSelected={onSelected} onHovered={onHovered} />;
+}
+
 
 // --------------------------------------------------------------------------

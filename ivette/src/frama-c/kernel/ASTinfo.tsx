@@ -31,7 +31,7 @@ import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
 import * as DATA from 'frama-c/kernel/api/data';
 import * as Ast from 'frama-c/kernel/api/ast';
-import { Text, Modifier } from 'frama-c/richtext';
+import { MarkerText, Modifier, selectMarker } from 'frama-c/richtext';
 import { Icon } from 'dome/controls/icons';
 import { Code } from 'dome/controls/labels';
 import { IconButton } from 'dome/controls/buttons';
@@ -76,20 +76,15 @@ interface FieldInfoProps {
 }
 
 function FieldInfo(props: FieldInfoProps): JSX.Element {
-  const onSelected = (m: string, meta: Modifier): void => {
-    props.onSelected(Ast.jMarker(m), meta);
-  };
-  const onHovered = (m: string | undefined): void => {
-    props.onHovered(m ? Ast.jMarker(m) : undefined);
-  };
-  const { label, descr, title, text } = props.field;
+  const { field, onSelected, onHovered } = props;
+  const { label, descr, title, text } = field;
   return (
     <div className="astinfo-infos" >
       <div className="dome-text-label astinfo-kind" title={title}>
         {label}
       </div>
       <div className="dome-text-cell astinfo-data" title={descr}>
-        <Text onSelected={onSelected} onHovered={onHovered} text={text} />
+        <MarkerText onSelected={onSelected} onHovered={onHovered} text={text} />
       </div>
     </div >
   );
@@ -160,17 +155,7 @@ function MarkInfos(props: InfoSectionProps): JSX.Element {
   };
   const onChildSelected = (m: Ast.marker, modifier: Modifier): void => {
     props.setPinned(marker);
-    switch (modifier) {
-      case 'NORMAL':
-        States.setMarked(m);
-        break;
-      case 'META':
-        States.setMarked(m, m !== marker);
-        break;
-      case 'DOUBLE':
-        States.setSelected(m);
-        break;
-    }
+    selectMarker(m, modifier);
   };
   const onChildHovered = (m: Ast.marker | undefined): void => {
     States.setHovered(m || marker);
@@ -181,8 +166,8 @@ function MarkInfos(props: InfoSectionProps): JSX.Element {
       className={`astinfo-section ${highlight}`}
       onMouseEnter={() => States.setHovered(marker)}
       onMouseLeave={() => States.setHovered(undefined)}
-      onClick={() => onChildSelected(marker, 'NORMAL')}
-      onDoubleClick={() => onChildSelected(marker, 'DOUBLE')}
+      onClick={ () => States.setMarked(marker) }
+      onDoubleClick={ () => States.setSelected(marker) }
     >
       <div
         key="MARKER"

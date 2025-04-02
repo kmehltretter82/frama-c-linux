@@ -39,7 +39,7 @@ import { Icon } from 'dome/controls/icons';
 import { Inset } from 'dome/frame/toolbars';
 import { Cell, Code } from 'dome/controls/labels';
 import { IconButton } from 'dome/controls/buttons';
-import { Text } from 'frama-c/richtext';
+import { MarkerText, Modifier, selectMarker } from 'frama-c/richtext';
 import { Filler, Hpack, Hfill, Vpack, Vfill } from 'dome/layout/boxes';
 
 /* -------------------------------------------------------------------------- */
@@ -439,11 +439,11 @@ interface ProbeValuesProps {
 function ProbeValues(props: ProbeValuesProps): Request<callstack, JSX.Element> {
   const { probe, pinProbe, isSelectedCallstack } = props;
 
-  const selectMarker = (marker: Ast.marker): void => {
+  const onSelected = (marker: Ast.marker, modifier: Modifier): void => {
     /* Pin the current probe so that its column is not removed
        when the selected marker changes. */
     pinProbe(probe.marker, true);
-    States.setSelected(marker);
+    selectMarker(marker, modifier);
   };
 
   // Building common parts
@@ -458,13 +458,11 @@ function ProbeValues(props: ProbeValuesProps): Request<callstack, JSX.Element> {
     pointedVars.forEach((lval) => {
       const [text, lvalMarker] = lval;
       const label = `Display values for ${text}`;
-      const onItemClick = (): void => selectMarker(lvalMarker);
+      const onItemClick = (): void => onSelected(lvalMarker, 'NORMAL');
       items.push({ label, onClick: onItemClick });
     });
     if (items.length > 0) Dome.popupMenu(items);
   };
-
-  const onSelected = (m: string): void => { selectMarker(Ast.jMarker(m)); };
 
   return async (callstack: callstack): Promise<JSX.Element> => {
     const evaluation = await probe.evaluate(callstack);
@@ -485,7 +483,7 @@ function ProbeValues(props: ProbeValuesProps): Request<callstack, JSX.Element> {
       return (
         <td className={c} colSpan={colSpan} onContextMenu={onContextMenu(e)}>
           <TableCell right={warning} align={align}>
-            <Text onSelected={onSelected} text={value} />
+            <MarkerText onSelected={onSelected} text={value} />
           </TableCell>
         </td>
       );
@@ -900,7 +898,6 @@ class ScopesManager {
 interface EvaluationModeProps {
   computationState: Eva.computationStateType | undefined;
   marker: Ast.marker | undefined;
-  scope: Ast.decl | undefined;
   setLocPin: (scope: Ast.decl, loc: Ast.marker, pin: boolean) => void;
 }
 
@@ -926,10 +923,8 @@ Dome.addMenuItem({
 Ivette.registerSearchMode(evalMode);
 
 function useEvaluationMode(props: EvaluationModeProps): void {
-  const { computationState, marker, scope, setLocPin } = props;
-  const enabled =
-    computationState === 'computed'
-    && marker !== undefined && scope !== undefined;
+  const { computationState, marker, setLocPin } = props;
+  const enabled = computationState === 'computed' && marker !== undefined;
   React.useEffect(() => {
     if (enabled) {
       const onEnter = (pattern: string): void => {
@@ -940,9 +935,12 @@ function useEvaluationMode(props: EvaluationModeProps): void {
           Display.showWarning({ label, title });
         };
         const addProbe = (target: Ast.marker): void => {
-          setLocPin(scope, target, true);
-          Display.showMessage('New Probe');
-          Display.alertComponent('fc.eva.values');
+          const scope = States.getMarker(marker).scope;
+          if (scope) {
+            setLocPin(scope, target, true);
+            Display.showMessage('New Probe');
+            Display.alertComponent('fc.eva.values');
+          }
         };
         Server.send(Ast.parseExpr, data).then(addProbe).catch(handleError);
       };
@@ -950,7 +948,7 @@ function useEvaluationMode(props: EvaluationModeProps): void {
     } else {
       Ivette.updateSearchMode({ id: evalMode.id, enabled: false });
     }
-  }, [enabled, marker, scope, setLocPin]);
+  }, [enabled, marker, setLocPin]);
   React.useEffect(
     () => Dome.setMenuItem({ id: evalMode.id, enabled })
     , [enabled]
@@ -977,7 +975,7 @@ function EvaTable(): JSX.Element {
     Dome.useFlipSettings('ivette.eva.showCallstacks', false);
 
   /* Component state */
-  const { marker, scope } = States.useCurrentLocation();
+  const marker = States.useSelected();
   const [cs, setCS] = useGlobalState(CallstackState);
   const [fcts] = useGlobalState(ScopesManagerState);
   const [focus, setFocus] = useGlobalState(FocusState);
@@ -1021,6 +1019,7 @@ function EvaTable(): JSX.Element {
   /* Updated the focused Probe when the selection changes. Also emit on the
    * `locEvent` event. */
   React.useEffect(() => {
+    const scope = States.getMarker(marker).scope;
     fcts.clean(scope);
     const doUpdate = (p: Probe): void => {
       if (!p.evaluable) { setFocus(undefined); return; }
@@ -1030,20 +1029,21 @@ function EvaTable(): JSX.Element {
     };
     if (scope && marker) getProbe([scope, marker]).then(doUpdate);
     else setFocus(undefined);
-  }, [marker, fcts, scope, getProbe, setFocus, locEvt]);
+  }, [marker, fcts, getProbe, setFocus, locEvt]);
 
   /* Callback used to pin or unpin a location */
   const setLocPin = React.useCallback(
-    (scope: Ast.decl, loc: Ast.marker, pin: boolean): void => {
-      if (pin) fcts.pin(scope, loc);
-      else fcts.unpin(scope, loc);
+    (scope: Ast.decl, marker: Ast.marker, pin: boolean): void => {
+      if (pin) fcts.pin(scope, marker);
+      else fcts.unpin(scope, marker);
       setTic(tac + 1);
     }, [fcts, setTic, tac]);
 
   /* On meta-selection, pin the selected location. */
   React.useEffect(() => {
     const pin = (loc: States.Location): void => {
-      const { scope, marker } = loc;
+      const { marker } = loc;
+      const scope = States.getMarker(marker).scope;
       if (scope && marker) setLocPin(scope, marker, true);
     };
     States.MetaSelection.on(pin);
@@ -1135,7 +1135,7 @@ function EvaTable(): JSX.Element {
 
   /* Handle Evaluation mode */
   const computationState = States.useSyncValue(Eva.computationState);
-  useEvaluationMode({ computationState, marker, scope, setLocPin });
+  useEvaluationMode({ computationState, marker, setLocPin });
 
   /* Clear the table when Eva values change. */
   const clear = (): void => {
