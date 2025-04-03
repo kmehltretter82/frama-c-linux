@@ -46,7 +46,7 @@ ALIAS_NAME=ptests
 LOCAL_WP_CACHE=$(pwd -P)/.wp-cache
 FRAMAC_WP_CACHE_GIT=git@git.frama-c.com:frama-c/wp-cache.git
 
-TEST_DIRS="tests/* src/plugins/*/tests/* src/kernel_internals/parsing/tests"
+TEST_DIRS="tests src/plugins/*/tests"
 
 # --------------------------------------------------------------------------
 # ---  Help Message
