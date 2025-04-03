@@ -4,8 +4,8 @@
    MACRO: SRC2 @PTEST_NAME@.1.res.log
    MACRO: DIFF @PTEST_NAME@.variadic.diff
 
-   OPT: @EVA_MTHREAD_TEST@ -variadic-no-translation
-   OPT: @EVA_MTHREAD_TEST@
+   STDOPT: +"-variadic-no-translation"
+   STDOPT:
 
    COMMENT: The two outputs should be identical
    EXECNOW: LOG @DIFF@ diff %{dep:@SRC1@} %{dep:@SRC2@} > @DIFF@
