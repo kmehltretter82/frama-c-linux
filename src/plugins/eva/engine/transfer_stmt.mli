@@ -37,7 +37,7 @@ module type S = sig
 
   val call:
     stmt -> lval option -> exp -> exp list -> state ->
-    (Partition.key * state) list * Eval.cacheable
+    state Engine_sig.call_result
 
   val check_unspecified_sequence:
     Cil_types.stmt ->

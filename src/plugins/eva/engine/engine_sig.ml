@@ -23,13 +23,20 @@
 open Cil_types
 open Eval
 
+(** Kind of function that is evaluated: a body, a specification, a builtin, an
+    internal Frama_C_ (not builtin) function, or nothing. Note that if several
+    functions may be called, preceding values have priority. *)
+type call_kind = [`Body | `Spec | `Builtin | `Internal | `Bottom]
+
 (** Results of the analysis of a function call:
     - the list of computed abstract states at the return statement of the called
       function, associated with their partition key;
-    - whether the results can safely be stored in the memexec cache. *)
+    - whether the results can safely be stored in the memexec cache;
+    - the kind of evaluated function. *)
 type 'state call_result = {
   states: (Partition.key * 'state) list;
   cacheable: cacheable;
+  kind: call_kind;
 }
 
 (** Analysis of functions, built by the functor [Compute_functions.Make]. *)

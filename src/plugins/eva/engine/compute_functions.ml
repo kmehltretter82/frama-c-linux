@@ -226,7 +226,7 @@ module Make (Engine: Engine_sig.S) = struct
           "Reusing old results for call to %a" Kernel_function.pretty call.kf;
       apply_call_results_hooks call init_state (`Reuse i);
       (* call can be cached since it was cached once *)
-      Engine_sig.{ states; cacheable = Cacheable; }
+      Engine_sig.{ states; cacheable = Cacheable; kind = `Body }
 
   (* ----- Body or specification analysis ----------------------------------- *)
 
@@ -281,7 +281,7 @@ module Make (Engine: Engine_sig.S) = struct
     if Parameters.ValShowProgress.get () then
       Self.feedback
         "Done for function %a" Kernel_function.pretty call.kf;
-    Engine_sig.{ states = resulting_states; cacheable; }
+    Engine_sig.{ states = resulting_states; cacheable; kind }
 
   (* ----- Use of cvalue builtins ------------------------------------------- *)
 
@@ -318,7 +318,7 @@ module Make (Engine: Engine_sig.S) = struct
     match final_state with
     | `Bottom ->
       apply_call_results_hooks call state (`Builtin ([], None));
-      Engine_sig.{ states; cacheable = Cacheable; }
+      Engine_sig.{ states; cacheable = Cacheable; kind = `Builtin }
     | `Value final_state ->
       let cvalue_call = get_cvalue_call call in
       let post = get_cvalue_or_top final_state in
@@ -332,7 +332,7 @@ module Make (Engine: Engine_sig.S) = struct
         Engine.Dom.set Cvalue_domain.State.key cvalue_state final_state
       in
       let states = List.mapi insert cvalue_states in
-      Engine_sig.{ states; cacheable; }
+      Engine_sig.{ states; cacheable; kind = `Builtin }
 
   (* Uses cvalue builtin only if the cvalue domain is available. Otherwise, only
      use the called function specification. *)

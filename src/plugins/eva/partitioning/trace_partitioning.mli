@@ -90,7 +90,7 @@ sig
   (** After the analysis of a function call, recombines callee partitioning keys
       with the caller key. *)
   val call_return:
-    caller:Partition.key ->
+    caller:Partition.key -> Engine_sig.call_kind ->
     (Partition.key * state) list -> (Partition.key * state) list
 
   (* --- Operators --- *)

@@ -299,14 +299,12 @@ module Make_Dataflow
 
   let transfer_call (stmt : stmt) (dest : lval option) (callee : exp)
       (args : exp list) (key, state : key * state) : (key * state) list =
-    let result, call_cacheable =
-      Transfer.call stmt dest callee args state
-    in
-    if call_cacheable = Eval.NoCacheCallers then
+    let result = Transfer.call stmt dest callee args state in
+    if result.cacheable = Eval.NoCacheCallers then
       (* Propagate info that the current call cannot be cached either *)
       cacheable := Eval.NoCacheCallers;
     (* Recombine callee partitioning keys with caller key *)
-    Partitioning.call_return ~caller:key result
+    Partitioning.call_return ~caller:key result.kind result.states
 
   let transfer_return (stmt : stmt) (return_exp : exp option)
     : transfer_function =
