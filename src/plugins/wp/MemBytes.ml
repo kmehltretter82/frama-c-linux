@@ -678,6 +678,16 @@ module BASE = WpContext.Generator(Cil_datatype.Varinfo)
           l_cluster = cluster_globals () ;
         }
 
+      let binit prefix x base =
+        if Cvalues.always_initialized x then
+          let name = prefix ^ "_binit" in
+          Definitions.define_lemma {
+            l_kind = Admit ;
+            l_name = name ; l_triggers = [] ; l_forall = [] ;
+            l_lemma = MemAddr.binit base ;
+            l_cluster = cluster_globals () ;
+          }
+
       let sizeof x =
         Warning.handle
           ~handler:(fun _ -> None)
@@ -739,6 +749,7 @@ module BASE = WpContext.Generator(Cil_datatype.Varinfo)
         static_alloc prefix base ;
         region prefix vi base ;
         alloc prefix vi base ;
+        binit prefix vi base ;
         pointer_type prefix base ;
         base
     end)

@@ -39,6 +39,7 @@ val f_eqmem : lfun
 val f_memcpy : lfun
 
 val sconst : term -> pred
+val scinit : term -> pred
 val framed : term -> pred
 
 (* -------------------------------------------------------------------------- *)

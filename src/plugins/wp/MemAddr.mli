@@ -124,9 +124,10 @@ val invalid : term -> term -> term -> pred
 *)
 
 val region : term -> term
-(** [region(base: int) : int]
-    The memory region a base belongs to.
-*)
+(** [region(base: int) : int] The memory region a base belongs to. *)
+
+val binit : term -> pred
+(** [binit (base: int)] The base address is always initialized. *)
 
 val linked : term -> pred
 (** [linked(m: malloc)] *)

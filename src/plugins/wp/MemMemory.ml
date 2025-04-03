@@ -40,6 +40,7 @@ let f_eqmem = Lang.extern_fp ~library "eqmem"
 let f_memcpy = Lang.extern_f ~library ~typecheck:ty_fst_arg "memcpy"
 let p_framed = Lang.extern_fp ~coloring:true ~library "framed" (* ptr-memory -> prop *)
 let p_sconst = Lang.extern_fp ~coloring:true ~library "sconst" (* int-memory -> prop *)
+let p_scinit = Lang.extern_fp ~coloring:true ~library "scinit" (* init-memory -> prop *)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Utilities                                                          --- *)
@@ -50,6 +51,7 @@ let t_mem t = L.Array(MemAddr.t_addr,t)
 let t_init = L.Array(MemAddr.t_addr,L.Bool)
 
 let sconst memory = p_call p_sconst [ memory ]
+let scinit memory = p_call p_scinit [ memory ]
 let framed memory = p_call p_framed [ memory ]
 
 (* -------------------------------------------------------------------------- *)

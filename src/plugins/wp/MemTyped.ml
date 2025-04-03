@@ -575,27 +575,15 @@ module BASE = WpContext.Generator(Varinfo)
             l_cluster = cluster_globals () ;
           }
 
-      (* let initialization prefix x base =
-         match sizeof x with
-         | Some size when Cvalues.always_initialized x ->
-          let a = Lang.freshvar ~basename:"init" t_init in
-          let m = F.e_var a in
-          let init_access =
-            if size = F.e_one then
-              F.p_bool (F.e_get m (MemAddr.mk_addr base F.e_zero))
-            else
-              F.p_call p_is_init_r [ m ; MemAddr.mk_addr base F.e_zero ; size ]
-          in
-          let m_init = MemMemory.minit m in
-          let init_prop = F.p_forall [a] (F.p_imply m_init init_access) in
+      let binit prefix x base =
+        if Cvalues.always_initialized x then
+          let name = prefix ^ "_binit" in
           Definitions.define_lemma {
             l_kind = Admit ;
-            l_name = prefix ^ "_init" ;
-            l_triggers = [] ; l_forall = [] ;
-            l_lemma = init_prop ;
+            l_name = name ; l_triggers = [] ; l_forall = [] ;
+            l_lemma = MemAddr.binit base ;
             l_cluster = cluster_globals () ;
           }
-         | _ -> () *)
 
       let generate x =
         let acs_rd = Ast_types.has_qualifier "const" x.vtype in
@@ -618,7 +606,7 @@ module BASE = WpContext.Generator(Varinfo)
         RegisterBASE.define lfun x ;
         region prefix x base ;
         linked prefix x base ;
-        (* initialization prefix x base ; *)
+        binit prefix x base ;
         base
 
       let compile = Lang.local generate
@@ -990,10 +978,13 @@ module ChunkContent = WpContext.Generator(Chunk)
 
 let is_well_formed sigma =
   let pool = ref [] in
-  Sigma.iter (fun c x ->
+  let have p = pool := p :: !pool in
+  Sigma.iter (fun c m ->
       match Sigma.ckind c with
+      | State.Mu T_init ->
+        have @@ MemMemory.scinit (F.e_var m)
       | State.Mu (M_int _ as chunk) ->
-        pool := F.p_call (ChunkContent.get chunk) [F.e_var x] :: !pool
+        have @@ F.p_call (ChunkContent.get chunk) [F.e_var m]
       | _ -> ()
     ) sigma ;
   F.p_conj !pool

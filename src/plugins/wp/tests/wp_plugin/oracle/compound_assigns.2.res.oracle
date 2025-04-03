@@ -103,6 +103,8 @@ Cluster Globals {
     (statically_allocated P_q_25)
     -> (is_uint64 (int_of_addr (global P_q_25)))
   
+  Axiom P_q_25_binit: (binit P_q_25)
+  
   Axiom P_q_25_linked: forall t_0:int[]. (linked t_0) -> (t_0[P_q_25]=0)
   
   Axiom P_q_25_region: (region P_q_25)=2
@@ -112,6 +114,8 @@ Cluster Globals {
   Axiom P_p_24_is_pointer:
     (statically_allocated P_p_24)
     -> (is_uint64 (int_of_addr (global P_p_24)))
+  
+  Axiom P_p_24_binit: (binit P_p_24)
   
   Axiom P_p_24_linked: forall t_0:int[]. (linked t_0) -> (t_0[P_p_24]=0)
   

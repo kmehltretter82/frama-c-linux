@@ -33,6 +33,10 @@ theory Memory
   predicate framed (m : map addr addr) =
     forall p:addr [m[p]]. region(p.base) <= 0 -> region(m[p].base) <= 0
 
+  predicate scinit (m : map addr bool) =
+    forall b:int [binit b]. binit b ->
+    forall p [m[p]]. p.base = b -> m[p]
+
   predicate eqmem (m1 m2 : map addr 'a) (p:addr) (a:int) =
     forall q:addr [m1[q]|m2[q]]. included q 1 p a -> m1[q] = m2[q]
 
