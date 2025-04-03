@@ -221,12 +221,15 @@ do
             break
             ;;
         *)
-            if [ -f $1 ] || [ -d $1 ]; then
-                TESTS+=" $1"
-            elif [ -d tests/$1 ]; then
-                TESTS+=" tests/$1"
-            elif [ -d src/plugins/$1/tests ]; then
-                TESTS+=" src/plugins/$1/tests"
+            # Dune only accepts relative paths so realpath --relative-path-to is
+            # used to build the path.
+            file=$(realpath --relative-to="$PWD" "$1")
+            if [ -f "$file" ] || [ -d "$file" ]; then
+                TESTS+=" $file"
+            elif [ -d "tests/$file" ]; then
+                TESTS+=" tests/$file"
+            elif [ -d "src/plugins/$file/tests" ]; then
+                TESTS+=" src/plugins/$file/tests"
             else
                 ErrorUsage "'$1' is not a test file or directory"
             fi
@@ -484,11 +487,12 @@ function TestFile
 
 function FindPtestDir
 {
-    # Remove trailing / in folder path
-    local DIR="${1%/}"
+    local DIR="$1"
     if [ "$GENERATE" = "yes" ]; then
-        # Look for the root folder of ptest, which contains ptests_config file
-        while [ -d "$DIR" ] ; do
+        # Look for the root folder of ptests, which contains ptests_config file
+        # Only relative paths are accepted by dune, so the root folder of
+        # every paths is '.'
+        while [ -d "$DIR" ] && [ "$DIR" != "." ]; do
             if [ -f "$DIR/ptests_config" ]; then
                 PTESTS_DIR+=" $DIR"
                 break
