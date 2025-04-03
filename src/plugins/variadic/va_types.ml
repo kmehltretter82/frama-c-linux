@@ -42,6 +42,8 @@ type variadic_class =
   | FormatFun of format_fun
   (** Function from the Frama-C lib for which the argument count and type is
       fixed by a format argument. *)
+  | NoTranslation
+  (** Function that should not be translated. *)
 
 and overload = (typ list * varinfo) list
 

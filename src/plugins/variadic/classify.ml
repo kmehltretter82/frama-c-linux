@@ -125,6 +125,9 @@ let va_builtins = [
 let is_va_builtin s = List.mem s va_builtins
 
 let classify_std env vi = match vi.vname with
+  (* mthread.h *)
+  | "Frama_C_thread_create" -> NoTranslation
+
   (* fcntl.h - Overloads of functions *)
   | "fcntl" -> mk_overload env
                  ["__va_fcntl_void" ; "__va_fcntl_int" ; "__va_fcntl_flock"]

@@ -126,6 +126,8 @@ let translate_variadics (file : file) =
              Self.result ~level:2 ~current:true
                "Variadic builtin %s left untransformed." vi.vname;
              Cil.SkipChildren
+           | Some { vf_class = NoTranslation } ->
+             Cil.SkipChildren
            | Some _ ->
              Generic.add_vpar vi;
              Cil.DoChildren)
@@ -209,6 +211,8 @@ let translate_variadics (file : file) =
         | Builtin ->
           Self.result ~level:2 ~current:true
             "Call to variadic builtin %s left untransformed." f.vname;
+          raise Not_found
+        | NoTranslation ->
           raise Not_found
         | _ ->
           Generic.translate_call (Cil.evar ~loc f)
