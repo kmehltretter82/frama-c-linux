@@ -23,7 +23,7 @@ lemma bar{L}:
    {tmp \with .a = {{tmp.a \with [..] = (int)0} \with [3] = (int)3}})
   ≡
   (\let tmp =
-   \let tmp = foo(x); {tmp \with .a = {tmp.a \with [..] = (int)0}};
+     \let tmp = foo(x); {tmp \with .a = {tmp.a \with [..] = (int)0}};
    {tmp \with .a = {tmp.a \with [3] = (int)3}});
  */
 /*@ lemma bar2{L}: x ≡ {x \with .a = {x.a \with [4] = (int)0}};
@@ -44,8 +44,8 @@ lemma bar4{L}:
 lemma bar5{L}:
   y ≡
   (\let tmp =
-   {y \with .a = {y.a \with [4] = {{y.a[4] \with .a = {y.a[4].a \with [
-   ..] = (int)(x.b + 1)}} \with .v = (int)3}}};
+     {y \with .a = {y.a \with [4] = {{y.a[4] \with .a = {y.a[4].a \with [
+     ..] = (int)(x.b + 1)}} \with .v = (int)3}}};
    {tmp \with .b = {tmp.b \with .v = (int)4}});
  */
 /*@ lemma cast{L}: y.a[0].v ≡ (\let tmp = (struct S)y; tmp.v);

@@ -157,7 +157,7 @@ pthread_mutex_t write_mutex;
 pthread_mutex_t read_mutex;
 /*@ ensures
       \let idx = *((int *)\old(arg));
-        \valid(values[idx]) && \initialized(values[idx]);
+      \valid(values[idx]) && \initialized(values[idx]);
  */
 void *__gen_e_acsl_write_value(void *arg);
 
@@ -212,7 +212,7 @@ void *write_value(void *arg)
 
 /*@ requires
       !(\let idx = *((int *)arg);
-          \valid_read(values[idx]) && \initialized(values[idx]));
+        \valid_read(values[idx]) && \initialized(values[idx]));
  */
 void *__gen_e_acsl_read_value(void *arg);
 
@@ -349,7 +349,7 @@ void *read_value(void *arg)
                                  0,*((int *)arg));
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Precondition";
-    __gen_e_acsl_assert_data.pred_txt = "\\let idx = *((int *)arg);\n  \\valid_read(values[idx]) && \\initialized(values[idx])";
+    __gen_e_acsl_assert_data.pred_txt = "\\let idx = *((int *)arg);\n\\valid_read(values[idx]) && \\initialized(values[idx])";
     __gen_e_acsl_assert_data.file = "parallel_threads.c";
     __gen_e_acsl_assert_data.fct = "read_value";
     __gen_e_acsl_assert_data.line = 81;
@@ -358,7 +358,7 @@ void *read_value(void *arg)
   }
   /*@ requires
         \let idx = *((int *)arg);
-          \valid_read(values[idx]) && \initialized(values[idx]);
+        \valid_read(values[idx]) && \initialized(values[idx]);
   */
   {
     int idx = *((int *)arg);
@@ -480,7 +480,7 @@ void *read_value(void *arg)
 
 /*@ requires
       !(\let idx = *((int *)arg);
-          \valid_read(values[idx]) && \initialized(values[idx]));
+        \valid_read(values[idx]) && \initialized(values[idx]));
  */
 void *__gen_e_acsl_read_value(void *arg)
 {
@@ -589,7 +589,7 @@ void *__gen_e_acsl_read_value(void *arg)
                                  0,*((int *)arg));
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Precondition";
-    __gen_e_acsl_assert_data.pred_txt = "!(\\let idx = *((int *)arg);\n    \\valid_read(values[idx]) && \\initialized(values[idx]))";
+    __gen_e_acsl_assert_data.pred_txt = "!(\\let idx = *((int *)arg);\n  \\valid_read(values[idx]) && \\initialized(values[idx]))";
     __gen_e_acsl_assert_data.file = "parallel_threads.c";
     __gen_e_acsl_assert_data.fct = "read_value";
     __gen_e_acsl_assert_data.line = 60;
@@ -604,7 +604,7 @@ void *__gen_e_acsl_read_value(void *arg)
 
 /*@ ensures
       \let idx = *((int *)\old(arg));
-        \valid(values[idx]) && \initialized(values[idx]);
+      \valid(values[idx]) && \initialized(values[idx]);
  */
 void *__gen_e_acsl_write_value(void *arg)
 {
@@ -717,7 +717,7 @@ void *__gen_e_acsl_write_value(void *arg)
                                  *((int *)__gen_e_acsl_at));
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Postcondition";
-    __gen_e_acsl_assert_data.pred_txt = "\\let idx = *((int *)\\old(arg));\n  \\valid(values[idx]) && \\initialized(values[idx])";
+    __gen_e_acsl_assert_data.pred_txt = "\\let idx = *((int *)\\old(arg));\n\\valid(values[idx]) && \\initialized(values[idx])";
     __gen_e_acsl_assert_data.file = "parallel_threads.c";
     __gen_e_acsl_assert_data.fct = "write_value";
     __gen_e_acsl_assert_data.line = 31;

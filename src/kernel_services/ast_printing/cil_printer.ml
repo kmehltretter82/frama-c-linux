@@ -2622,7 +2622,7 @@ class cil_printer () = object (self)
         | LBreads _ | LBinductive _ ->
           Kernel.fatal "invalid logic local definition"
       in
-      fprintf fmt "@[%a@ %a@ =@ %t%t;@ %a@]"
+      fprintf fmt "@[<hv 0>@[<hov 2>%a %a =@ %t%t;@]@ %a@]"
         self#pp_acsl_keyword "\\let"
         self#logic_var v
         (fun fmt -> if args <> [] then
@@ -2845,7 +2845,7 @@ class cil_printer () = object (self)
           Kernel.fatal "invalid logic local definition"
       in
       Precedence.needIndent current_level p fmt
-        "@[<hov 2>%a@ %a =@ %t%t;@]@ %a"
+        "@[<hv 0>@[<hov 2>%a %a =@ %t%t;@]@ %a@]"
         self#pp_acsl_keyword "\\let"
         self#logic_var v
         (fun fmt ->
@@ -2913,7 +2913,7 @@ class cil_printer () = object (self)
           self#pp_acsl_keyword "\\old"
           self#pred_prec_named (Precedence.upperLevel,p)
       else
-        fprintf fmt "@[%a(@[@[%a@],@,%a@])@]"
+        fprintf fmt "@[%a(@[<hv 0>@[%a@],@,%a@])@]"
           self#pp_acsl_keyword "\\at"
           self#pred_prec_named (Precedence.upperLevel,p)
           self#logic_label lab;

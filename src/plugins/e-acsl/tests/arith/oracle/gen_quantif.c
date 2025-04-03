@@ -550,14 +550,15 @@ int main(void)
     __gen_e_acsl_u = 5;
     __gen_e_acsl_assert_data_14.blocking = 1;
     __gen_e_acsl_assert_data_14.kind = "Assertion";
-    __gen_e_acsl_assert_data_14.pred_txt = "\\let u = 5;\n\\forall integer x, integer y; 0 <= x < 2 && 4 < y < u ==> \\false";
+    __gen_e_acsl_assert_data_14.pred_txt = "\\let u = 5; \\forall integer x, integer y; 0 <= x < 2 && 4 < y < u ==> \\false";
     __gen_e_acsl_assert_data_14.file = "quantif.i";
     __gen_e_acsl_assert_data_14.fct = "main";
     __gen_e_acsl_assert_data_14.line = 54;
     __e_acsl_assert(1,& __gen_e_acsl_assert_data_14);
   }
   /*@
-  assert \let u = 5;
+  assert
+    \let u = 5;
     \forall integer x, integer y; 0 <= x < 2 && 4 < y < u ==> \false;
    */
   ;

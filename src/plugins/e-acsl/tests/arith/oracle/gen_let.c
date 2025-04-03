@@ -54,7 +54,7 @@ int main(void)
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,"n",0,n);
     __gen_e_acsl_assert_data_2.blocking = 1;
     __gen_e_acsl_assert_data_2.kind = "Assertion";
-    __gen_e_acsl_assert_data_2.pred_txt = "\\let u = n * n;\n\\let v = u + 1; u > 0";
+    __gen_e_acsl_assert_data_2.pred_txt = "\\let u = n * n; \\let v = u + 1; u > 0";
     __gen_e_acsl_assert_data_2.file = "let.c";
     __gen_e_acsl_assert_data_2.fct = "main";
     __gen_e_acsl_assert_data_2.line = 9;

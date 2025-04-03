@@ -30,8 +30,7 @@ inductive P(integer x, integer y) {
  */
 /*@
 predicate P(integer x, integer y) =
-  \let b = Q_fun2(0, 0);
-  \let c = Q_fun3(0, 0); y == b + c;
+  \let b = Q_fun2(0, 0); \let c = Q_fun3(0, 0); y == b + c;
 
 */
 int __gen_e_acsl_P(int x, int y);

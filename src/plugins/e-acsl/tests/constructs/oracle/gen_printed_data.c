@@ -364,7 +364,7 @@ int main(void)
                                  (__e_acsl_mpz_struct const *)(__gen_e_acsl_int_mpz));
     __gen_e_acsl_assert_data_13.blocking = 1;
     __gen_e_acsl_assert_data_13.kind = "Assertion";
-    __gen_e_acsl_assert_data_13.pred_txt = "\\let int_mpz = 18446744073709551615ULL + 1;\n  int_mpz != 18446744073709551615ULL";
+    __gen_e_acsl_assert_data_13.pred_txt = "\\let int_mpz = 18446744073709551615ULL + 1;\nint_mpz != 18446744073709551615ULL";
     __gen_e_acsl_assert_data_13.file = "printed_data.c";
     __gen_e_acsl_assert_data_13.fct = "main";
     __gen_e_acsl_assert_data_13.line = 93;
@@ -378,7 +378,7 @@ int main(void)
   /*@
   assert
     \let int_mpz = 18446744073709551615ULL + 1;
-      int_mpz != 18446744073709551615ULL;
+    int_mpz != 18446744073709551615ULL;
    */
   ;
   float real_float = (float)0x1.fffffep+127;

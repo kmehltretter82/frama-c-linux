@@ -62,7 +62,7 @@ printed_data.c:91: Assertion valid:
 printed_data.c: In function 'main'
 printed_data.c:93: Assertion valid:
 	\let int_mpz = (0x7fffffffffffffffLL * 2ULL + 1ULL) + 1;
-  int_mpz != 0x7fffffffffffffffLL * 2ULL + 1ULL.
+int_mpz != 0x7fffffffffffffffLL * 2ULL + 1ULL.
 	With values at failure point:
 	- int_mpz: 18446744073709551616
 printed_data.c: In function 'main'

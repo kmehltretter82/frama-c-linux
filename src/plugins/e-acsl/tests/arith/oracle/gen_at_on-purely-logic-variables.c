@@ -401,7 +401,8 @@ int main(void)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
   }
   /*@
-  assert \let k = -7;
+  assert
+    \let k = -7;
     \exists integer u;
       9 <= u < 21 &&
       (\forall integer v; -5 < v <= 6 ==> \at((u > 0 ? n + k : u + v) > 0,K));

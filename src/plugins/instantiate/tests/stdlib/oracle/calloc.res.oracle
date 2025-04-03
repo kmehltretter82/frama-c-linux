@@ -32,15 +32,15 @@ struct incomplete;
       ensures
         zero_initialization:
           \let __fc_flexlen = (size - 8) / 4;
-            \result->x ≡ 0 ∧
-            \result->c ≡ 0 ∧
-            (∀ ℤ j1; 0 ≤ j1 < __fc_flexlen ⇒ \result->f[j1] ≡ 0);
+          \result->x ≡ 0 ∧
+          \result->c ≡ 0 ∧
+          (∀ ℤ j1; 0 ≤ j1 < __fc_flexlen ⇒ \result->f[j1] ≡ 0);
       ensures
         initialization:
           \let __fc_flexlen = (size - 8) / 4;
-            \initialized(&\result->x) ∧
-            \initialized(&\result->c) ∧
-            (∀ ℤ j1; 0 ≤ j1 < __fc_flexlen ⇒ \initialized(&\result->f[j1]));
+          \initialized(&\result->x) ∧
+          \initialized(&\result->c) ∧
+          (∀ ℤ j1; 0 ≤ j1 < __fc_flexlen ⇒ \initialized(&\result->f[j1]));
       assigns \result, __fc_heap_status;
       assigns \result \from __fc_heap_status, num, size;
       assigns __fc_heap_status \from __fc_heap_status, num, size;
@@ -336,13 +336,13 @@ struct incomplete;
       ensures
         zero_initialization:
           \let __fc_flexlen = (\old(size) - 8) / 4;
-            \result->x ≡ 0 ∧ \result->c ≡ 0 ∧
-            (∀ ℤ j1; 0 ≤ j1 < __fc_flexlen ⇒ \result->f[j1] ≡ 0);
+          \result->x ≡ 0 ∧ \result->c ≡ 0 ∧
+          (∀ ℤ j1; 0 ≤ j1 < __fc_flexlen ⇒ \result->f[j1] ≡ 0);
       ensures
         initialization:
           \let __fc_flexlen = (\old(size) - 8) / 4;
-            \initialized(&\result->x) ∧ \initialized(&\result->c) ∧
-            (∀ ℤ j1; 0 ≤ j1 < __fc_flexlen ⇒ \initialized(&\result->f[j1]));
+          \initialized(&\result->x) ∧ \initialized(&\result->c) ∧
+          (∀ ℤ j1; 0 ≤ j1 < __fc_flexlen ⇒ \initialized(&\result->f[j1]));
       assigns \result, __fc_heap_status;
       assigns \result \from __fc_heap_status, num, size;
       assigns __fc_heap_status \from __fc_heap_status, num, size;

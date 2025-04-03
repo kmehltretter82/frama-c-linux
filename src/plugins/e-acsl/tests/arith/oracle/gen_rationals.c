@@ -7,9 +7,10 @@
 #include "time.h"
 extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 
-/*@ ensures \let delta = 1;
+/*@ ensures
+      \let delta = 1;
       \let avg_real = (\old(a) + \old(b)) / 2;
-        avg_real - delta < \result < avg_real + delta;
+      avg_real - delta < \result < avg_real + delta;
  */
 double __gen_e_acsl_avg(double a, double b);
 
@@ -345,9 +346,10 @@ int main(void)
   return __retres;
 }
 
-/*@ ensures \let delta = 1;
+/*@ ensures
+      \let delta = 1;
       \let avg_real = (\old(a) + \old(b)) / 2;
-        avg_real - delta < \result < avg_real + delta;
+      avg_real - delta < \result < avg_real + delta;
  */
 double __gen_e_acsl_avg(double a, double b)
 {
@@ -445,7 +447,7 @@ double __gen_e_acsl_avg(double a, double b)
                                  (__e_acsl_mpq_struct const *)(__gen_e_acsl_at));
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Postcondition";
-    __gen_e_acsl_assert_data.pred_txt = "\\let delta = 1;\n\\let avg_real = (\\old(a) + \\old(b)) / 2;\n  avg_real - delta < \\result < avg_real + delta";
+    __gen_e_acsl_assert_data.pred_txt = "\\let delta = 1;\n\\let avg_real = (\\old(a) + \\old(b)) / 2;\navg_real - delta < \\result < avg_real + delta";
     __gen_e_acsl_assert_data.file = "rationals.c";
     __gen_e_acsl_assert_data.fct = "avg";
     __gen_e_acsl_assert_data.line = 4;

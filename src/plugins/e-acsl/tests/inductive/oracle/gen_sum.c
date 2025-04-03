@@ -54,7 +54,7 @@ logic integer sum_fun5{L}(int *arr, integer low, integer high, integer len) =
   \at(low > high ? 0 :
         \at(0 <= low <= high < len ?
               (\let lres =
-               __gen_e_acsl_sum_fun5_here(arr, low, high - 1, len);
+                 __gen_e_acsl_sum_fun5_here(arr, low, high - 1, len);
                *(arr + high) + lres)
               : 0,
             L),

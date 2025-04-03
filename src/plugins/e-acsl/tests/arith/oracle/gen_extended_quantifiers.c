@@ -365,7 +365,7 @@ int main(void)
   /*@
   assert
     \let x = 0 == 0 ? 1 : 10;
-      \sum(x, 10, \lambda integer k; -2147483647 - 1) < 0;
+    \sum(x, 10, \lambda integer k; -2147483647 - 1) < 0;
    */
   ;
   {
