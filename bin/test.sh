@@ -183,15 +183,12 @@ do
             PULLCACHE=yes
             ;;
         "-u"|"--update")
-            DUNE_OPT+=" --auto-promote"
             UPDATE=yes
             ;;
         "-g"|"--generate")
             GENERATE=yes
-            [ "$UPDATE" = "yes" ] || DUNE_OPT+=" --auto-promote"
             ;;
         "-v"|"--verbose")
-            DUNE_OPT+=" --display=short --always-show-command-line"
             VERBOSE=yes
             ;;
         "-l"|"--logs")
@@ -237,6 +234,14 @@ do
     esac
     shift
 done
+
+if [ "$UPDATE" = "yes" ] || [ "$GENERATE" = "yes" ]; then
+    DUNE_OPT+=" --auto-promote"
+fi
+
+if [ "$VERBOSE" = "yes" ]; then
+  DUNE_OPT+=" --display=short --always-show-command-line"
+fi
 
 # Pass all the remaining options (after '--') to dune at the end of the command
 DUNE_OPT_POST="$@"
