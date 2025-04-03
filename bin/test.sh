@@ -80,7 +80,7 @@ function Usage
     echo "  -w|--wp-cache       prepare (pull) WP-cache"
     echo "  -l|--logs           print output of tests (single file, no diff)"
     echo "  -u|--update         update oracles (and WP-cache)"
-    echo "  -g|--generate       Generate new oracles"
+    echo "  -g|--generate       Generate new oracles and update oracles"
     echo "  -s|--save           save dune logs into $DUNE_LOG"
     echo "  -v|--verbose        print executed commands"
     echo "  --coverage          compute test coverage in html format"
@@ -188,6 +188,7 @@ do
             ;;
         "-g"|"--generate")
             GENERATE=yes
+            [ "$UPDATE" = "yes" ] || DUNE_OPT+=" --auto-promote"
             ;;
         "-v"|"--verbose")
             DUNE_OPT+=" --display=short --always-show-command-line"
