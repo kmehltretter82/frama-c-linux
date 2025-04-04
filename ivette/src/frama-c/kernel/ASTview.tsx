@@ -414,10 +414,16 @@ const PropertiesStatuses = Editor.createField<Properties.statusData[]>([]);
 // Recovers all the properties nodes in a tree.
 function getPropertiesNodes(tree: Tree): Node[] {
   if (isLeaf(tree)) return [];
+
+  const props = tree.children.map(getPropertiesNodes).flat();
+
   /* Must be consistent with the id chosen by the Frama-C server for property
      markers. Ideally, this test should not depend on markers id syntax. */
-  if (tree.marker.startsWith('#p')) return [tree];
-  return tree.children.map(getPropertiesNodes).flat();
+  if (tree.marker.startsWith('#p')) {
+    props.push(tree);
+  }
+
+  return props;
 }
 
 // This aspect contains all the properties nodes, along with their tags.
