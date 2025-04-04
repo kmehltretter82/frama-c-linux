@@ -141,8 +141,7 @@ FRAMAC_PTESTS:=$(FRAMAC_PTESTS_SRC)/ptests.exe
 FRAMAC_WTESTS:=$(FRAMAC_PTESTS_SRC)/wtests.exe
 
 # Frama-C also has ptest directories in plugins, so we do not use default
-PTEST_ALL_DIRS:=tests $(shell find src/plugins -type d -name tests) \
-  src/kernel_internals/parsing/tests
+PTEST_ALL_DIRS:=tests $(shell find src/plugins -type d -name tests)
 
 # Test aliasing definition allowing ./configure --disable-<plugin>
 PTEST_ALIASES:=@tests/ptests @src/plugins/ptests \
