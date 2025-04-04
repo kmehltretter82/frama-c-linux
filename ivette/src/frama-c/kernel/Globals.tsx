@@ -576,6 +576,25 @@ export function Types(): JSX.Element {
 }
 
 // --------------------------------------------------------------------------
+// --- Global Annotations Section
+// --------------------------------------------------------------------------
+
+const filterGannot = (d: Ast.declAttributesData): boolean => {
+  return d.kind === 'GANNOT';
+};
+
+export function GlobalAnnots(): JSX.Element {
+  return (
+    <Declarations
+      id='global-annots'
+      label='Global Annotations'
+      title='Global Annotations'
+      filter={filterGannot}
+    />
+  );
+}
+
+// --------------------------------------------------------------------------
 // --- Files Section
 // --------------------------------------------------------------------------
 type FilesProps = {
@@ -761,6 +780,7 @@ export function GlobalDeclarations(): JSX.Element {
         <Types />
         <Variables scrollableParent={scrollableArea} />
         <Functions scrollableParent={scrollableArea} />
+        <GlobalAnnots />
       </div>
     </>
   );

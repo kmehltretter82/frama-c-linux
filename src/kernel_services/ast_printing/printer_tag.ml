@@ -33,15 +33,45 @@ type declaration =
   | SType of typeinfo
   | SGlobal of varinfo
   | SFunction of kernel_function
+  | SGAnnot of global_annotation
 
 let pp_declaration fmt = function
-  | SEnum e -> Format.fprintf fmt "enum %s" e.ename
-  | SComp { cstruct = true ; cname } -> Format.fprintf fmt "struct %s" cname
-  | SComp { cstruct = false ; cname } -> Format.fprintf fmt "union %s" cname
-  | SType t -> Format.fprintf fmt "type %s" t.tname
-  | SGlobal v -> Format.fprintf fmt "global %s" v.vname
+  | SEnum e ->
+    Format.fprintf fmt "enum %s" e.ename
+  | SComp { cstruct = true ; cname } ->
+    Format.fprintf fmt "struct %s" cname
+  | SComp { cstruct = false ; cname } ->
+    Format.fprintf fmt "union %s" cname
+  | SType t ->
+    Format.fprintf fmt "type %s" t.tname
+  | SGlobal v ->
+    Format.fprintf fmt "global %s" v.vname
   | SFunction kf ->
     Format.fprintf fmt "function %s" @@ Kernel_function.get_name kf
+  | SGAnnot (Dfun_or_pred (li, _)) when li.l_type = None ->
+    Format.fprintf fmt "predicate %s" li.l_var_info.lv_name
+  | SGAnnot (Dfun_or_pred (li, _)) ->
+    Format.fprintf fmt "logic %s" li.l_var_info.lv_name
+  | SGAnnot (Daxiomatic (name, _, _, _)) ->
+    Format.fprintf fmt "axiomatic %s" name
+  | SGAnnot (Dmodule (name, _, _, _, _)) ->
+    Format.fprintf fmt "module %s" name
+  | SGAnnot (Dlemma(name, _, _, _, _, _)) ->
+    Format.fprintf fmt "lemma %s" name
+  | SGAnnot (Dinvariant (li, _)) ->
+    Format.fprintf fmt "invariant %s" li.l_var_info.lv_name
+  | SGAnnot (Dtype_annot (li, _)) ->
+    Format.fprintf fmt "type invariant %s" li.l_var_info.lv_name
+  | SGAnnot (Dtype(lti, _)) ->
+    Format.fprintf fmt "logic type %s" lti.lt_name
+  | SGAnnot (Dmodel_annot(mi, _)) ->
+    Format.fprintf fmt "model %s" mi.mi_name
+  | SGAnnot(Dvolatile (ts, _, _, _, _)) ->
+    Format.fprintf fmt "volatile %a"
+      (Pretty_utils.pp_list ~sep:"," Identified_term.pretty) ts
+  | SGAnnot(Dextended(ext, _, _)) ->
+    Format.fprintf fmt "%a" Cil_printer.pp_short_extended ext
+
 
 module Declaration =
   Datatype.Make_with_collections
@@ -59,6 +89,7 @@ module Declaration =
         | SType t -> Hashtbl.hash( 2, Typeinfo.hash t )
         | SGlobal g -> Hashtbl.hash( 3, Varinfo.hash g )
         | SFunction kf -> Hashtbl.hash( 4, Kernel_function.hash kf )
+        | SGAnnot a -> Hashtbl.hash (5, Global_annotation.hash a)
 
       let equal a b =
         match a,b with
@@ -67,8 +98,9 @@ module Declaration =
         | SType u, SType v -> Typeinfo.equal u v
         | SGlobal u, SGlobal v -> Varinfo.equal u v
         | SFunction f, SFunction g -> Kernel_function.equal f g
+        | SGAnnot f, SGAnnot g -> Global_annotation.equal f g
         | (SEnum _, _) | (SComp _, _) | (SType _, _) | (SGlobal _, _)
-        | (SFunction _, _) -> false
+        | (SFunction _, _) | (SGAnnot _, _)-> false
 
       let compare a b =
         match a,b with
@@ -85,6 +117,9 @@ module Declaration =
         | SGlobal _, _ -> (-1)
         | _, SGlobal _ -> (+1)
         | SFunction f, SFunction g -> Kernel_function.compare f g
+        | SFunction _, _ -> (-1)
+        | _, SFunction _ -> (+1)
+        | SGAnnot f, SGAnnot g -> Global_annotation.compare f g
 
       let pretty = pp_declaration
     end)
@@ -116,22 +151,52 @@ let declaration = function
   | ( GType _ | GCompTagDecl _ | GEnumTagDecl _
     | GVarDecl _ | GText _ ) as g -> g
 
+let loc_of_global_annotation = function
+  | Dfun_or_pred (_, loc) | Dvolatile (_, _, _, _, loc)
+  | Daxiomatic (_, _, _, loc) | Dmodule (_, _, _, _, loc)
+  | Dtype (_, loc) | Dlemma (_, _, _, _, _, loc)
+  | Dinvariant (_, loc) | Dtype_annot (_, loc)
+  | Dmodel_annot (_, loc) | Dextended (_, _, loc)
+    -> loc
+
 let signature_of_declaration = function
   | SEnum ei -> GEnumTagDecl(ei,Location.unknown)
   | SComp ci -> GCompTagDecl(ci,Location.unknown)
   | SType ti -> GType(ti,Location.unknown)
   | SGlobal vi -> GVarDecl(vi,vi.vdecl)
   | SFunction kf -> let vi = Kernel_function.get_vi kf in GVarDecl(vi,vi.vdecl)
+  | SGAnnot ga ->  GAnnot (ga, loc_of_global_annotation ga)
 
 let definition_of_declaration = function
-  | SEnum ei -> GEnumTag(ei,Location.unknown)
-  | SComp ci -> GCompTag(ci,Location.unknown)
-  | SType ti -> GType(ti,Location.unknown)
   | SGlobal vi -> Ast.def_or_last_decl vi
   | SFunction kf -> Kernel_function.get_global kf
+  | other -> signature_of_declaration other
 
 let pp_signature fmt d = Printer.pp_global fmt @@ signature_of_declaration d
 let pp_definition fmt d = Printer.pp_global fmt @@ definition_of_declaration d
+
+let pp_global_annotation_decl fmt = function
+  | Dfun_or_pred (li, _) | Dinvariant (li, _) | Dtype_annot (li, _) ->
+    Logic_info.pretty fmt { li with l_body = LBnone }
+  | Daxiomatic (name, _, _, _)
+  | Dmodule (name, _, _, _, _)
+  | Dlemma (name, _, _, _, _, _) ->
+    Format.pp_print_string fmt name
+  | Dextended (ext, _, _) ->
+    Cil_printer.pp_short_extended fmt ext
+  | Dvolatile (ts, r, w, _, _) ->
+    let pp name fmt = function
+      | None -> ()
+      | Some vi -> Format.fprintf fmt " %s %a" name Cil_printer.pp_varinfo vi
+    in
+    Format.fprintf fmt "%a%a%a"
+      (Pretty_utils.pp_list ~sep:", " Cil_printer.pp_identified_term) ts
+      (pp "reads") r
+      (pp "writes") w
+  | Dtype (lt, _) ->
+    Logic_type_info.pretty fmt lt
+  | Dmodel_annot (mi, _) ->
+    Model_info.pretty fmt mi
 
 let pp_localizable fmt = function
   | PVDecl (_, _, vi) -> Printer.pp_vdecl fmt vi
@@ -139,6 +204,7 @@ let pp_localizable fmt = function
   | PExp  (_, _, expr) -> Printer.pp_exp fmt expr
   | PTermLval (_, _, _, lv) -> Printer.pp_term_lval fmt lv
   | PIP prop -> Description.pp_local fmt prop
+  | PGlobal (GAnnot(g,_)) -> pp_global_annotation_decl fmt g
   | PGlobal g -> Printer.pp_global fmt (declaration g)
   | PStmt(_,stmt) | PStmtStart (_, stmt) ->
     Printer.(without_annot pp_stmt) fmt stmt
@@ -273,7 +339,8 @@ let declaration_of_global = function
   | GVar(vi, _, _) | GVarDecl(vi, _) -> Some (SGlobal vi)
   | GFun({svar = vi}, _) | GFunDecl(_,vi,_) ->
     Some(SFunction (Globals.Functions.get vi))
-  | GAsm _ | GPragma _ | GText _ | GAnnot _ -> None
+  | GAnnot (ga, _) -> Some (SGAnnot ga)
+  | GAsm _ | GPragma _ | GText _ -> None
 
 let declaration_of_type t =
   match t.tnode with
@@ -327,12 +394,32 @@ let definition_of_localizable = function
   | PExp _ | PLval _ | PTermLval _ | PGlobal _ | PIP _
     -> None
 
+let name_of_global_annotation = function
+  | Dfun_or_pred (li, _)
+  | Dinvariant (li, _)
+  | Dtype_annot (li, _) ->
+    li.l_var_info.lv_name
+  | Dvolatile (ts, _, _, _, _) ->
+    Format.asprintf "%a"
+      (Pretty_utils.pp_list ~sep:", " Identified_term.pretty) ts
+  | Daxiomatic (name, _, _, _)
+  | Dmodule (name, _, _, _,_)
+  | Dlemma (name, _, _, _, _, _) ->
+    name
+  | Dtype (lti, _) ->
+    lti.lt_name
+  | Dmodel_annot (mi, _) ->
+    mi.mi_name
+  | Dextended (ext, _, _) ->
+    Format.asprintf "%a" Cil_printer.pp_short_extended ext
+
 let name_of_declaration = function
   | SEnum ei -> ei.ename
   | SComp ci -> ci.cname
   | SType ti -> ti.tname
   | SGlobal vi -> vi.vname
   | SFunction kf -> Kernel_function.get_name kf
+  | SGAnnot annot -> name_of_global_annotation annot
 
 let name_of_type t =
   match t.tnode with
@@ -366,6 +453,7 @@ let loc_of_declaration = function
   | SType ti -> loc_of_type Typedef ti.tname
   | SGlobal vi -> vi.vdecl
   | SFunction kf -> Kernel_function.get_location kf
+  | SGAnnot annot -> loc_of_global_annotation annot
 
 let kf_of_localizable = function
   | PLval (kf_opt, _, _)
@@ -446,6 +534,7 @@ let localizable_of_declaration = function
   | SComp ci -> PType(Cil_const.mk_tcomp ci)
   | SEnum ei -> PType(Cil_const.mk_tenum ei)
   | SType ti -> PType(Cil_const.mk_tnamed ti)
+  | SGAnnot ga -> PGlobal (GAnnot (ga, loc_of_global_annotation ga))
 
 (* -------------------------------------------------------------------------- *)
 (* --- Find localizable at a Filepath.position                            --- *)
@@ -959,7 +1048,11 @@ struct
 
     method! global_annotation fmt a =
       match Property.ip_of_global_annotation_single a with
-      | None -> super#global_annotation fmt a
+      | None ->
+        let loc = loc_of_global_annotation a in
+        Format.fprintf fmt "@{<%s>%a@}"
+          (Info.tag (PGlobal(GAnnot(a,loc))))
+          super#global_annotation a
       | Some ip ->
         Format.fprintf fmt "@{<%s>%a@}"
           (Info.tag (PIP ip)) super#global_annotation a
