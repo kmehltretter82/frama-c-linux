@@ -576,7 +576,8 @@ struct
     | C_comp _ | C_array _ ->
       let v_src = load_value seq.pre obj src in
       let v_tgt = load_value seq.post obj loc in
-      Set(v_tgt,v_src) :: update seq obj loc ~src ()
+      let src = if Wp_parameters.Havoc.get () then None else Some src in
+      Set(v_tgt,v_src) :: update seq obj loc ?src ()
 
   let copied_init seq obj loc src =
     match obj with

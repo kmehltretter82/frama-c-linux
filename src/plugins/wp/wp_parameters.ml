@@ -411,8 +411,8 @@ module Havoc =
   False(struct
     let option_name = "-wp-havoc"
     let help = "Specify the behavior of copying aggregates (struct/union/arrays):
-                - true (old): keep using havoc functionnality
-                - false (new, default): start using memcpy on aggregates"
+                - true (old): keep using havoc
+                - false (new, default): use memcpy"
   end)
 
 let () = Parameter_customize.set_group wp_strategy
