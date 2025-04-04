@@ -38,7 +38,6 @@ let check_signals () =
     !signal_emitted
 
 let dkey = Self.dkey_iterator
-let stat_iterations = Statistics.register_statement_stat "iterations"
 
 let blocks_share_locals b1 b2 =
   match b1.blocals, b2.blocals with
@@ -575,7 +574,7 @@ module Make_Dataflow
         not (process_vertex ~widening:true v) || !iteration_count = 0
       do
         Self.debug ~dkey "iteration %d" !iteration_count;
-        Option.iter (Statistics.incr stat_iterations) (vertex_stmt v);
+        Option.iter (Statistics.(incr iterations)) (vertex_stmt v);
         iterate_list w;
         incr iteration_count;
       done;

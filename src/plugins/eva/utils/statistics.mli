@@ -23,6 +23,7 @@
 type 'a t
 
 (* Register a statistic class *)
+
 val register_global_stat : string -> unit t
 val register_function_stat : string -> Cil_types.kernel_function t
 val register_statement_stat : string -> Cil_types.stmt t
@@ -41,3 +42,12 @@ val reset_all: unit -> unit
 
 (* Export the computed statistics as CSV *)
 val export_as_csv : ?filename:Filepath.Normalized.t -> unit -> unit
+
+(* Some Eva statistics *)
+val iterations : Cil_types.stmt t
+val memexec_hits : Cil_types.kernel_function t
+val memexec_misses : Cil_types.kernel_function t
+val max_widenings : Cil_types.stmt t
+val partitioning_index_hits : unit t
+val partitioning_index_misses : unit t
+

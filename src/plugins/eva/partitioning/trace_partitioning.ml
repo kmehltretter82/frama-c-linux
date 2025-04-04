@@ -23,8 +23,6 @@
 open Cil_types
 open Partition
 
-let stat_max_widenings = Statistics.register_statement_stat "max-widenings"
-
 let dkey = Self.dkey_partition
 
 module Make
@@ -352,7 +350,7 @@ struct
           w.widened_state <- Some next;
           w.widening_counter <- widening_period - 1;
           w.widening_steps <- w.widening_steps + 1;
-          Statistics.grow stat_max_widenings stmt w.widening_steps;
+          Statistics.(grow max_widenings) stmt w.widening_steps;
           Some next
         end
       with Not_found ->
