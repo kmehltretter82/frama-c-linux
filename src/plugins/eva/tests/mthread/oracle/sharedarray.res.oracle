@@ -24,12 +24,24 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  jobs1: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs2: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs3: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs4: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs5: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs6: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  jobs1:
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+      pthread_create :: sharedarray.c:55 <- main
+  jobs2:
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+      pthread_create :: sharedarray.c:56 <- main
+  jobs3:
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+      pthread_create :: sharedarray.c:57 <- main
+  jobs4:
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+      pthread_create :: sharedarray.c:58 <- main
+  jobs5:
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+      pthread_create :: sharedarray.c:59 <- main
+  jobs6:
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+      pthread_create :: sharedarray.c:60 <- main
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -46,8 +58,8 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  t[1]: write by jobs1 at sharedarray.c:22
-  t[2]: write by jobs1 at sharedarray.c:23
+  t[1]: write by jobs1 at sharedarray.c:22 <- f1
+  t[2]: write by jobs1 at sharedarray.c:23 <- f1
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -63,7 +75,7 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  t[1]: write by jobs2 at sharedarray.c:28
+  t[1]: write by jobs2 at sharedarray.c:28 <- f2
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -79,7 +91,7 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  t[0..3]: write by jobs3 at sharedarray.c:33
+  t[0..3]: write by jobs3 at sharedarray.c:33 <- f3
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -95,7 +107,7 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  tt[0..25]: write by jobs4 at sharedarray.c:39
+  tt[0..25]: write by jobs4 at sharedarray.c:39 <- f4
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -111,7 +123,7 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  tt[0..25]: write by jobs5 at sharedarray.c:45
+  tt[0..25]: write by jobs5 at sharedarray.c:45 <- f5
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:

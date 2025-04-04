@@ -12,7 +12,6 @@
 [mt] New context for <main>, fun main_interrupt_one_shot
 [mt] New context for <interrupt_handler interrupt_oneshot>, fun interrupt_oneshot
 [eva] interrupt.c:18: Frama_C_show_each_locked: {0}
-[eva] interrupt.c:18: Frama_C_show_each_locked: {0}
 [mt] *** First value analysis for main thread done.
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
@@ -35,14 +34,13 @@
 [eva] Initial state supplied by user
 [mt] Thread <main>, fun main_interrupt_one_shot
 [eva] interrupt.c:18: Frama_C_show_each_locked: {0}
-[eva] interrupt.c:18: Frama_C_show_each_locked: {0}
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   interrupt_received:
-    read by <main> at interrupt.c:18
-    read by <main> at interrupt.c:19
+    read by <main> at interrupt.c:18 <- main_interrupt_one_shot
+    read by <main> at interrupt.c:19 <- main_interrupt_one_shot
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -62,7 +60,8 @@
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   interrupt_received:
-    write by <interrupt_handler interrupt_oneshot> at interrupt.c:9
+    write by <interrupt_handler interrupt_oneshot> at interrupt.c:9 <-
+      interrupt_oneshot
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -94,14 +93,13 @@
 [eva] Initial state supplied by user
 [mt] Thread <main>, fun main_interrupt_one_shot
 [eva] interrupt.c:18: Frama_C_show_each_locked: {0}
-[eva] interrupt.c:18: Frama_C_show_each_locked: {0}
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   interrupt_received:
-    read by <main> at interrupt.c:18
-    read by <main> at interrupt.c:19
+    read by <main> at interrupt.c:18 <- main_interrupt_one_shot
+    read by <main> at interrupt.c:19 <- main_interrupt_one_shot
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -122,7 +120,8 @@
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   interrupt_received:
-    write by <interrupt_handler interrupt_oneshot> at interrupt.c:9
+    write by <interrupt_handler interrupt_oneshot> at interrupt.c:9 <-
+      interrupt_oneshot
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -178,43 +177,31 @@
 [eva] Initial state supplied by user
 [mt] Thread <main>, fun main_interrupt_one_shot
 [eva] interrupt.c:18: Frama_C_show_each_locked: {0}
-[eva:interferences] interrupt.c:19: inject threads interferences at this point
-[eva] interrupt.c:18: Frama_C_show_each_locked: {0; 1}
 [eva:interferences] interrupt.c:18: inject threads interferences at this point
+[eva:interferences] interrupt.c:19: inject threads interferences at this point
 [eva] interrupt.c:20: Frama_C_show_each: {1}
 [eva:interferences] interrupt.c:20: inject threads interferences at this point
 [eva:interferences] interrupt.c:21: inject threads interferences at this point
 [eva] interrupt.c:22: Frama_C_show_each: {0; 1}
 [eva:interferences] interrupt.c:22: inject threads interferences at this point
+[eva] interrupt.c:18: Frama_C_show_each_locked: {0; 1}
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   interrupt_received:
-    read by <main> at interrupt.c:18
-    read by <main> at interrupt.c:19
-    read by <main> at interrupt.c:20
-    read by <main> at interrupt.c:22
-    write by <main> at interrupt.c:21
+    read by <main> at interrupt.c:18 <- main_interrupt_one_shot
+    read by <main> at interrupt.c:19 <- main_interrupt_one_shot
+    read by <main> at interrupt.c:20 <- main_interrupt_one_shot
+    read by <main> at interrupt.c:22 <- main_interrupt_one_shot
+    write by <main> at interrupt.c:21 <- main_interrupt_one_shot
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
-    Frama_C_show_each_locked(interrupt_received); interrupt.c:18 <-
-      main_interrupt_one_shot
-    Frama_C_show_each(interrupt_received); interrupt.c:20 <-
-      main_interrupt_one_shot
     interrupt_received = 0; interrupt.c:21 <- main_interrupt_one_shot
-    Frama_C_show_each(interrupt_received); interrupt.c:22 <-
-      main_interrupt_one_shot
   shared bases: {interrupt_received}
   interferences by location:
-    interrupt.c:18:
-      # cvalue: interrupt_received ∈ {0; 1} 
-    interrupt.c:20:
-      # cvalue: interrupt_received ∈ {1} 
     interrupt.c:21:
-      # cvalue: interrupt_received ∈ {0; 1} 
-    interrupt.c:22:
       # cvalue: interrupt_received ∈ {0; 1} 
   interferences by mutexes:
     {  }:
@@ -233,7 +220,8 @@
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   interrupt_received:
-    write by <interrupt_handler interrupt_oneshot> at interrupt.c:9
+    write by <interrupt_handler interrupt_oneshot> at interrupt.c:9 <-
+      interrupt_oneshot
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -297,43 +285,31 @@
 [eva] Initial state supplied by user
 [mt] Thread <main>, fun main_interrupt_one_shot
 [eva] interrupt.c:18: Frama_C_show_each_locked: {0}
-[eva:interferences] interrupt.c:19: inject threads interferences at this point
-[eva] interrupt.c:18: Frama_C_show_each_locked: {0; 1}
 [eva:interferences] interrupt.c:18: inject threads interferences at this point
+[eva:interferences] interrupt.c:19: inject threads interferences at this point
 [eva] interrupt.c:20: Frama_C_show_each: {0; 1}
 [eva:interferences] interrupt.c:20: inject threads interferences at this point
 [eva:interferences] interrupt.c:21: inject threads interferences at this point
 [eva] interrupt.c:22: Frama_C_show_each: {0; 1}
 [eva:interferences] interrupt.c:22: inject threads interferences at this point
+[eva] interrupt.c:18: Frama_C_show_each_locked: {0; 1}
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   interrupt_received:
-    read by <main> at interrupt.c:18
-    read by <main> at interrupt.c:19
-    read by <main> at interrupt.c:20
-    read by <main> at interrupt.c:22
-    write by <main> at interrupt.c:21
+    read by <main> at interrupt.c:18 <- main_interrupt_one_shot
+    read by <main> at interrupt.c:19 <- main_interrupt_one_shot
+    read by <main> at interrupt.c:20 <- main_interrupt_one_shot
+    read by <main> at interrupt.c:22 <- main_interrupt_one_shot
+    write by <main> at interrupt.c:21 <- main_interrupt_one_shot
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
-    Frama_C_show_each_locked(interrupt_received); interrupt.c:18 <-
-      main_interrupt_one_shot
-    Frama_C_show_each(interrupt_received); interrupt.c:20 <-
-      main_interrupt_one_shot
     interrupt_received = 0; interrupt.c:21 <- main_interrupt_one_shot
-    Frama_C_show_each(interrupt_received); interrupt.c:22 <-
-      main_interrupt_one_shot
   shared bases: {interrupt_received}
   interferences by location:
-    interrupt.c:18:
-      # cvalue: interrupt_received ∈ {0; 1} 
-    interrupt.c:20:
-      # cvalue: interrupt_received ∈ {0; 1} 
     interrupt.c:21:
-      # cvalue: interrupt_received ∈ {0; 1} 
-    interrupt.c:22:
       # cvalue: interrupt_received ∈ {0; 1} 
   interferences by mutexes:
     {  }:

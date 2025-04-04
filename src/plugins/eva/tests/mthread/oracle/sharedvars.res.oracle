@@ -24,16 +24,30 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  u2: read by <main> at sharedvars.c:93
-      write by <main> at sharedvars.c:92
-  s4: write by <main> at sharedvars.c:98
-      write by <main> at sharedvars.c:100
-  jobs1: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs2: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs3: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs4: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs5: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs6: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  u2:
+    read by <main> at sharedvars.c:93 <- main
+    write by <main> at sharedvars.c:92 <- main
+  s4:
+    write by <main> at sharedvars.c:98 <- main
+    write by <main> at sharedvars.c:100 <- main
+  jobs1:
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+      pthread_create :: sharedvars.c:90 <- main
+  jobs2:
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+      pthread_create :: sharedvars.c:95 <- main
+  jobs3:
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+      pthread_create :: sharedvars.c:96 <- main
+  jobs4:
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+      pthread_create :: sharedvars.c:99 <- main
+  jobs5:
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+      pthread_create :: sharedvars.c:102 <- main
+  jobs6:
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+      pthread_create :: sharedvars.c:103 <- main
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -51,9 +65,9 @@
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   u1:
-    read by jobs1 at sharedvars.c:30
-    read by jobs1 at sharedvars.c:31
-    write by jobs1 at sharedvars.c:31
+    read by jobs1 at sharedvars.c:30 <- f1
+    read by jobs1 at sharedvars.c:31 <- f1
+    write by jobs1 at sharedvars.c:31 <- f1
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -86,8 +100,10 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  u3: write by jobs3 at sharedvars.c:46
-  jobs31: write by jobs3 at FRAMAC_SHARE/mthread_pthread.c:29
+  u3: write by jobs3 at sharedvars.c:46 <- f3
+  jobs31:
+    write by jobs3 at FRAMAC_SHARE/mthread_pthread.c:29 <-
+      pthread_create :: sharedvars.c:47 <- f3
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -103,10 +119,12 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  s4: read by jobs4 at sharedvars.c:53
-      write by jobs4 at sharedvars.c:54
-  s6: read by jobs4 at sharedvars.c:56
-      write by jobs4 at sharedvars.c:57
+  s4:
+    read by jobs4 at sharedvars.c:53 <- f4
+    write by jobs4 at sharedvars.c:54 <- f4
+  s6:
+    read by jobs4 at sharedvars.c:56 <- f4
+    write by jobs4 at sharedvars.c:57 <- f4
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -124,8 +142,10 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  s5: write by jobs5 at sharedvars.c:69
-  jobs51: write by jobs5 at FRAMAC_SHARE/mthread_pthread.c:29
+  s5: write by jobs5 at sharedvars.c:69 <- f5
+  jobs51:
+    write by jobs5 at FRAMAC_SHARE/mthread_pthread.c:29 <-
+      pthread_create :: sharedvars.c:68 <- f5
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -141,8 +161,9 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  s6: read by jobs6 at sharedvars.c:75
-      write by jobs6 at sharedvars.c:76
+  s6:
+    read by jobs6 at sharedvars.c:75 <- f6
+    write by jobs6 at sharedvars.c:76 <- f6
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -187,16 +208,30 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  u2: read by <main> at sharedvars.c:93
-      write by <main> at sharedvars.c:92
-  s4: write by <main> at sharedvars.c:98
-      write by <main> at sharedvars.c:100
-  jobs1: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs2: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs3: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs4: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs5: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs6: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  u2:
+    read by <main> at sharedvars.c:93 <- main
+    write by <main> at sharedvars.c:92 <- main
+  s4:
+    write by <main> at sharedvars.c:98 <- main
+    write by <main> at sharedvars.c:100 <- main
+  jobs1:
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+      pthread_create :: sharedvars.c:90 <- main
+  jobs2:
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+      pthread_create :: sharedvars.c:95 <- main
+  jobs3:
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+      pthread_create :: sharedvars.c:96 <- main
+  jobs4:
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+      pthread_create :: sharedvars.c:99 <- main
+  jobs5:
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+      pthread_create :: sharedvars.c:102 <- main
+  jobs6:
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+      pthread_create :: sharedvars.c:103 <- main
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -225,9 +260,9 @@
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   u1:
-    read by jobs1 at sharedvars.c:30
-    read by jobs1 at sharedvars.c:31
-    write by jobs1 at sharedvars.c:31
+    read by jobs1 at sharedvars.c:30 <- f1
+    read by jobs1 at sharedvars.c:31 <- f1
+    write by jobs1 at sharedvars.c:31 <- f1
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -261,8 +296,10 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  u3: write by jobs3 at sharedvars.c:46
-  jobs31: write by jobs3 at FRAMAC_SHARE/mthread_pthread.c:29
+  u3: write by jobs3 at sharedvars.c:46 <- f3
+  jobs31:
+    write by jobs3 at FRAMAC_SHARE/mthread_pthread.c:29 <-
+      pthread_create :: sharedvars.c:47 <- f3
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -283,26 +320,20 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  s4: read by jobs4 at sharedvars.c:53
-      write by jobs4 at sharedvars.c:54
-  s6: read by jobs4 at sharedvars.c:56
-      write by jobs4 at sharedvars.c:57
+  s4:
+    read by jobs4 at sharedvars.c:53 <- f4
+    write by jobs4 at sharedvars.c:54 <- f4
+  s6:
+    read by jobs4 at sharedvars.c:56 <- f4
+    write by jobs4 at sharedvars.c:57 <- f4
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
-    int t = s4; sharedvars.c:53 <- f4
     s4 = 4; sharedvars.c:54 <- f4
-    t = s6; sharedvars.c:56 <- f4
     s6 = 4; sharedvars.c:57 <- f4
   shared bases: {s4, s6}
   interferences by location:
-    sharedvars.c:53:
-      # cvalue: s4 ∈ {-1; 1}
-                s6 ∈ {0} 
     sharedvars.c:54:
-      # cvalue: s4 ∈ {-1; 1; 4}
-                s6 ∈ {0} 
-    sharedvars.c:56:
       # cvalue: s4 ∈ {-1; 1; 4}
                 s6 ∈ {0} 
     sharedvars.c:57:
@@ -324,8 +355,10 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  s5: write by jobs5 at sharedvars.c:69
-  jobs51: write by jobs5 at FRAMAC_SHARE/mthread_pthread.c:29
+  s5: write by jobs5 at sharedvars.c:69 <- f5
+  jobs51:
+    write by jobs5 at FRAMAC_SHARE/mthread_pthread.c:29 <-
+      pthread_create :: sharedvars.c:68 <- f5
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -344,18 +377,15 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  s6: read by jobs6 at sharedvars.c:75
-      write by jobs6 at sharedvars.c:76
+  s6:
+    read by jobs6 at sharedvars.c:75 <- f6
+    write by jobs6 at sharedvars.c:76 <- f6
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
-    int t = s6; sharedvars.c:75 <- f6
     s6 = 6; sharedvars.c:76 <- f6
   shared bases: {s4, s6}
   interferences by location:
-    sharedvars.c:75:
-      # cvalue: s4 ∈ {-1; 1; 4}
-                s6 ∈ {0; 4} 
     sharedvars.c:76:
       # cvalue: s4 ∈ {-1; 1; 4}
                 s6 ∈ {0; 4; 6} 
@@ -372,8 +402,9 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  u3: read by jobs31 at sharedvars.c:40
-      write by jobs31 at sharedvars.c:41
+  u3:
+    read by jobs31 at sharedvars.c:40 <- f31
+    write by jobs31 at sharedvars.c:41 <- f31
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -389,8 +420,9 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  s5: read by jobs51 at sharedvars.c:62
-      write by jobs51 at sharedvars.c:63
+  s5:
+    read by jobs51 at sharedvars.c:62 <- f51
+    write by jobs51 at sharedvars.c:63 <- f51
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -476,16 +508,30 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  u2: read by <main> at sharedvars.c:93
-      write by <main> at sharedvars.c:92
-  s4: write by <main> at sharedvars.c:98
-      write by <main> at sharedvars.c:100
-  jobs1: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs2: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs3: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs4: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs5: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs6: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  u2:
+    read by <main> at sharedvars.c:93 <- main
+    write by <main> at sharedvars.c:92 <- main
+  s4:
+    write by <main> at sharedvars.c:98 <- main
+    write by <main> at sharedvars.c:100 <- main
+  jobs1:
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+      pthread_create :: sharedvars.c:90 <- main
+  jobs2:
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+      pthread_create :: sharedvars.c:95 <- main
+  jobs3:
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+      pthread_create :: sharedvars.c:96 <- main
+  jobs4:
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+      pthread_create :: sharedvars.c:99 <- main
+  jobs5:
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+      pthread_create :: sharedvars.c:102 <- main
+  jobs6:
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+      pthread_create :: sharedvars.c:103 <- main
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -526,9 +572,9 @@
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   u1:
-    read by jobs1 at sharedvars.c:30
-    read by jobs1 at sharedvars.c:31
-    write by jobs1 at sharedvars.c:31
+    read by jobs1 at sharedvars.c:30 <- f1
+    read by jobs1 at sharedvars.c:31 <- f1
+    write by jobs1 at sharedvars.c:31 <- f1
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -566,8 +612,10 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  u3: write by jobs3 at sharedvars.c:46
-  jobs31: write by jobs3 at FRAMAC_SHARE/mthread_pthread.c:29
+  u3: write by jobs3 at sharedvars.c:46 <- f3
+  jobs31:
+    write by jobs3 at FRAMAC_SHARE/mthread_pthread.c:29 <-
+      pthread_create :: sharedvars.c:47 <- f3
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -600,30 +648,20 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  s4: read by jobs4 at sharedvars.c:53
-      write by jobs4 at sharedvars.c:54
-  s6: read by jobs4 at sharedvars.c:56
-      write by jobs4 at sharedvars.c:57
+  s4:
+    read by jobs4 at sharedvars.c:53 <- f4
+    write by jobs4 at sharedvars.c:54 <- f4
+  s6:
+    read by jobs4 at sharedvars.c:56 <- f4
+    write by jobs4 at sharedvars.c:57 <- f4
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
-    int t = s4; sharedvars.c:53 <- f4
     s4 = 4; sharedvars.c:54 <- f4
-    t = s6; sharedvars.c:56 <- f4
     s6 = 4; sharedvars.c:57 <- f4
   shared bases: {u3, s4, s5, s6}
   interferences by location:
-    sharedvars.c:53:
-      # cvalue: u3 ∈ {1; 3}
-                s4 ∈ {-1; 0; 1; 4}
-                s5 ∈ {0}
-                s6 ∈ {0; 4; 6} 
     sharedvars.c:54:
-      # cvalue: u3 ∈ {1; 3}
-                s4 ∈ {-1; 0; 1; 4}
-                s5 ∈ {0}
-                s6 ∈ {0; 4; 6} 
-    sharedvars.c:56:
       # cvalue: u3 ∈ {1; 3}
                 s4 ∈ {-1; 0; 1; 4}
                 s5 ∈ {0}
@@ -654,8 +692,10 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  s5: write by jobs5 at sharedvars.c:69
-  jobs51: write by jobs5 at FRAMAC_SHARE/mthread_pthread.c:29
+  s5: write by jobs5 at sharedvars.c:69 <- f5
+  jobs51:
+    write by jobs5 at FRAMAC_SHARE/mthread_pthread.c:29 <-
+      pthread_create :: sharedvars.c:68 <- f5
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -688,21 +728,15 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  s6: read by jobs6 at sharedvars.c:75
-      write by jobs6 at sharedvars.c:76
+  s6:
+    read by jobs6 at sharedvars.c:75 <- f6
+    write by jobs6 at sharedvars.c:76 <- f6
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
-    int t = s6; sharedvars.c:75 <- f6
     s6 = 6; sharedvars.c:76 <- f6
   shared bases: {u3, s4, s5, s6}
   interferences by location:
-    sharedvars.c:75:
-      # cvalue:
-      u3 ∈ {1; 3}
-      s4 ∈ {-1; 0; 1; 4}
-      s5 ∈ {0; 5}
-      s6 ∈ {0; 4; 6} 
     sharedvars.c:76:
       # cvalue:
       u3 ∈ {1; 3}
@@ -729,21 +763,15 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  u3: read by jobs31 at sharedvars.c:40
-      write by jobs31 at sharedvars.c:41
+  u3:
+    read by jobs31 at sharedvars.c:40 <- f31
+    write by jobs31 at sharedvars.c:41 <- f31
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
-    int t = u3; sharedvars.c:40 <- f31
     u3 = 31; sharedvars.c:41 <- f31
   shared bases: {u3, s4, s5, s6}
   interferences by location:
-    sharedvars.c:40:
-      # cvalue:
-      u3 ∈ {1; 3}
-      s4 ∈ {-1; 0; 1; 4}
-      s5 ∈ {0; 5}
-      s6 ∈ {0; 4; 6} 
     sharedvars.c:41:
       # cvalue:
       u3 ∈ {1; 3; 31}
@@ -770,21 +798,15 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  s5: read by jobs51 at sharedvars.c:62
-      write by jobs51 at sharedvars.c:63
+  s5:
+    read by jobs51 at sharedvars.c:62 <- f51
+    write by jobs51 at sharedvars.c:63 <- f51
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
-    int t = s5; sharedvars.c:62 <- f51
     s5 = 51; sharedvars.c:63 <- f51
   shared bases: {u3, s4, s5, s6}
   interferences by location:
-    sharedvars.c:62:
-      # cvalue:
-      u3 ∈ {1; 3; 31}
-      s4 ∈ {-1; 0; 1; 4}
-      s5 ∈ {0; 5}
-      s6 ∈ {0; 4; 6} 
     sharedvars.c:63:
       # cvalue:
       u3 ∈ {1; 3; 31}
@@ -887,16 +909,30 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  u2: read by <main> at sharedvars.c:93
-      write by <main> at sharedvars.c:92
-  s4: write by <main> at sharedvars.c:98
-      write by <main> at sharedvars.c:100
-  jobs1: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs2: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs3: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs4: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs5: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs6: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  u2:
+    read by <main> at sharedvars.c:93 <- main
+    write by <main> at sharedvars.c:92 <- main
+  s4:
+    write by <main> at sharedvars.c:98 <- main
+    write by <main> at sharedvars.c:100 <- main
+  jobs1:
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+      pthread_create :: sharedvars.c:90 <- main
+  jobs2:
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+      pthread_create :: sharedvars.c:95 <- main
+  jobs3:
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+      pthread_create :: sharedvars.c:96 <- main
+  jobs4:
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+      pthread_create :: sharedvars.c:99 <- main
+  jobs5:
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+      pthread_create :: sharedvars.c:102 <- main
+  jobs6:
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+      pthread_create :: sharedvars.c:103 <- main
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -941,9 +977,9 @@
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   u1:
-    read by jobs1 at sharedvars.c:30
-    read by jobs1 at sharedvars.c:31
-    write by jobs1 at sharedvars.c:31
+    read by jobs1 at sharedvars.c:30 <- f1
+    read by jobs1 at sharedvars.c:31 <- f1
+    write by jobs1 at sharedvars.c:31 <- f1
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -980,8 +1016,10 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  u3: write by jobs3 at sharedvars.c:46
-  jobs31: write by jobs3 at FRAMAC_SHARE/mthread_pthread.c:29
+  u3: write by jobs3 at sharedvars.c:46 <- f3
+  jobs31:
+    write by jobs3 at FRAMAC_SHARE/mthread_pthread.c:29 <-
+      pthread_create :: sharedvars.c:47 <- f3
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -1016,32 +1054,20 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  s4: read by jobs4 at sharedvars.c:53
-      write by jobs4 at sharedvars.c:54
-  s6: read by jobs4 at sharedvars.c:56
-      write by jobs4 at sharedvars.c:57
+  s4:
+    read by jobs4 at sharedvars.c:53 <- f4
+    write by jobs4 at sharedvars.c:54 <- f4
+  s6:
+    read by jobs4 at sharedvars.c:56 <- f4
+    write by jobs4 at sharedvars.c:57 <- f4
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
-    int t = s4; sharedvars.c:53 <- f4
     s4 = 4; sharedvars.c:54 <- f4
-    t = s6; sharedvars.c:56 <- f4
     s6 = 4; sharedvars.c:57 <- f4
   shared bases: {u3, s4, s5, s6}
   interferences by location:
-    sharedvars.c:53:
-      # cvalue:
-      u3 ∈ {1; 3; 31}
-      s4 ∈ {-1; 0; 1; 2; 3; 4}
-      s5 ∈ {0; 5; 51}
-      s6 ∈ [0..2147483646],0%2 
     sharedvars.c:54:
-      # cvalue:
-      u3 ∈ {1; 3; 31}
-      s4 ∈ {-1; 0; 1; 2; 3; 4}
-      s5 ∈ {0; 5; 51}
-      s6 ∈ [0..2147483646],0%2 
-    sharedvars.c:56:
       # cvalue:
       u3 ∈ {1; 3; 31}
       s4 ∈ {-1; 0; 1; 2; 3; 4}
@@ -1074,8 +1100,10 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  s5: write by jobs5 at sharedvars.c:69
-  jobs51: write by jobs5 at FRAMAC_SHARE/mthread_pthread.c:29
+  s5: write by jobs5 at sharedvars.c:69 <- f5
+  jobs51:
+    write by jobs5 at FRAMAC_SHARE/mthread_pthread.c:29 <-
+      pthread_create :: sharedvars.c:68 <- f5
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -1108,21 +1136,15 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  s6: read by jobs6 at sharedvars.c:75
-      write by jobs6 at sharedvars.c:76
+  s6:
+    read by jobs6 at sharedvars.c:75 <- f6
+    write by jobs6 at sharedvars.c:76 <- f6
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
-    int t = s6; sharedvars.c:75 <- f6
     s6 = 6; sharedvars.c:76 <- f6
   shared bases: {u3, s4, s5, s6}
   interferences by location:
-    sharedvars.c:75:
-      # cvalue:
-      u3 ∈ {1; 3; 31}
-      s4 ∈ {-1; 0; 1; 2; 3; 4}
-      s5 ∈ {0; 5; 51}
-      s6 ∈ [0..2147483646],0%2 
     sharedvars.c:76:
       # cvalue:
       u3 ∈ {1; 3; 31}
@@ -1148,21 +1170,15 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  u3: read by jobs31 at sharedvars.c:40
-      write by jobs31 at sharedvars.c:41
+  u3:
+    read by jobs31 at sharedvars.c:40 <- f31
+    write by jobs31 at sharedvars.c:41 <- f31
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
-    int t = u3; sharedvars.c:40 <- f31
     u3 = 31; sharedvars.c:41 <- f31
   shared bases: {u3, s4, s5, s6}
   interferences by location:
-    sharedvars.c:40:
-      # cvalue:
-      u3 ∈ {1; 3; 31}
-      s4 ∈ {-1; 0; 1; 2; 3; 4}
-      s5 ∈ {0; 5; 51}
-      s6 ∈ [0..2147483646],0%2 
     sharedvars.c:41:
       # cvalue:
       u3 ∈ {1; 3; 31}
@@ -1189,21 +1205,15 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  s5: read by jobs51 at sharedvars.c:62
-      write by jobs51 at sharedvars.c:63
+  s5:
+    read by jobs51 at sharedvars.c:62 <- f51
+    write by jobs51 at sharedvars.c:63 <- f51
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
-    int t = s5; sharedvars.c:62 <- f51
     s5 = 51; sharedvars.c:63 <- f51
   shared bases: {u3, s4, s5, s6}
   interferences by location:
-    sharedvars.c:62:
-      # cvalue:
-      u3 ∈ {1; 3; 31}
-      s4 ∈ {-1; 0; 1; 2; 3; 4}
-      s5 ∈ {0; 5; 51}
-      s6 ∈ [0..2147483646],0%2 
     sharedvars.c:63:
       # cvalue:
       u3 ∈ {1; 3; 31}
@@ -1302,16 +1312,30 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  u2: read by <main> at sharedvars.c:93
-      write by <main> at sharedvars.c:92
-  s4: write by <main> at sharedvars.c:98
-      write by <main> at sharedvars.c:100
-  jobs1: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs2: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs3: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs4: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs5: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs6: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  u2:
+    read by <main> at sharedvars.c:93 <- main
+    write by <main> at sharedvars.c:92 <- main
+  s4:
+    write by <main> at sharedvars.c:98 <- main
+    write by <main> at sharedvars.c:100 <- main
+  jobs1:
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+      pthread_create :: sharedvars.c:90 <- main
+  jobs2:
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+      pthread_create :: sharedvars.c:95 <- main
+  jobs3:
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+      pthread_create :: sharedvars.c:96 <- main
+  jobs4:
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+      pthread_create :: sharedvars.c:99 <- main
+  jobs5:
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+      pthread_create :: sharedvars.c:102 <- main
+  jobs6:
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+      pthread_create :: sharedvars.c:103 <- main
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -1356,9 +1380,9 @@
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   u1:
-    read by jobs1 at sharedvars.c:30
-    read by jobs1 at sharedvars.c:31
-    write by jobs1 at sharedvars.c:31
+    read by jobs1 at sharedvars.c:30 <- f1
+    read by jobs1 at sharedvars.c:31 <- f1
+    write by jobs1 at sharedvars.c:31 <- f1
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -1395,8 +1419,10 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  u3: write by jobs3 at sharedvars.c:46
-  jobs31: write by jobs3 at FRAMAC_SHARE/mthread_pthread.c:29
+  u3: write by jobs3 at sharedvars.c:46 <- f3
+  jobs31:
+    write by jobs3 at FRAMAC_SHARE/mthread_pthread.c:29 <-
+      pthread_create :: sharedvars.c:47 <- f3
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -1431,32 +1457,20 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  s4: read by jobs4 at sharedvars.c:53
-      write by jobs4 at sharedvars.c:54
-  s6: read by jobs4 at sharedvars.c:56
-      write by jobs4 at sharedvars.c:57
+  s4:
+    read by jobs4 at sharedvars.c:53 <- f4
+    write by jobs4 at sharedvars.c:54 <- f4
+  s6:
+    read by jobs4 at sharedvars.c:56 <- f4
+    write by jobs4 at sharedvars.c:57 <- f4
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
-    int t = s4; sharedvars.c:53 <- f4
     s4 = 4; sharedvars.c:54 <- f4
-    t = s6; sharedvars.c:56 <- f4
     s6 = 4; sharedvars.c:57 <- f4
   shared bases: {u3, s4, s5, s6}
   interferences by location:
-    sharedvars.c:53:
-      # cvalue:
-      u3 ∈ {1; 3; 31}
-      s4 ∈ {-1; 0; 1; 2; 3; 4}
-      s5 ∈ [0..2147483647]
-      s6 ∈ [0..2147483646],0%2 
     sharedvars.c:54:
-      # cvalue:
-      u3 ∈ {1; 3; 31}
-      s4 ∈ {-1; 0; 1; 2; 3; 4}
-      s5 ∈ [0..2147483647]
-      s6 ∈ [0..2147483646],0%2 
-    sharedvars.c:56:
       # cvalue:
       u3 ∈ {1; 3; 31}
       s4 ∈ {-1; 0; 1; 2; 3; 4}
@@ -1489,8 +1503,10 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  s5: write by jobs5 at sharedvars.c:69
-  jobs51: write by jobs5 at FRAMAC_SHARE/mthread_pthread.c:29
+  s5: write by jobs5 at sharedvars.c:69 <- f5
+  jobs51:
+    write by jobs5 at FRAMAC_SHARE/mthread_pthread.c:29 <-
+      pthread_create :: sharedvars.c:68 <- f5
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -1522,21 +1538,15 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  s6: read by jobs6 at sharedvars.c:75
-      write by jobs6 at sharedvars.c:76
+  s6:
+    read by jobs6 at sharedvars.c:75 <- f6
+    write by jobs6 at sharedvars.c:76 <- f6
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
-    int t = s6; sharedvars.c:75 <- f6
     s6 = 6; sharedvars.c:76 <- f6
   shared bases: {u3, s4, s5, s6}
   interferences by location:
-    sharedvars.c:75:
-      # cvalue:
-      u3 ∈ {1; 3; 31}
-      s4 ∈ {-1; 0; 1; 2; 3; 4}
-      s5 ∈ [0..2147483647]
-      s6 ∈ [0..2147483646],0%2 
     sharedvars.c:76:
       # cvalue:
       u3 ∈ {1; 3; 31}
@@ -1562,21 +1572,15 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  u3: read by jobs31 at sharedvars.c:40
-      write by jobs31 at sharedvars.c:41
+  u3:
+    read by jobs31 at sharedvars.c:40 <- f31
+    write by jobs31 at sharedvars.c:41 <- f31
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
-    int t = u3; sharedvars.c:40 <- f31
     u3 = 31; sharedvars.c:41 <- f31
   shared bases: {u3, s4, s5, s6}
   interferences by location:
-    sharedvars.c:40:
-      # cvalue:
-      u3 ∈ {1; 3; 31}
-      s4 ∈ {-1; 0; 1; 2; 3; 4}
-      s5 ∈ [0..2147483647]
-      s6 ∈ [0..2147483646],0%2 
     sharedvars.c:41:
       # cvalue:
       u3 ∈ {1; 3; 31}
@@ -1603,21 +1607,15 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  s5: read by jobs51 at sharedvars.c:62
-      write by jobs51 at sharedvars.c:63
+  s5:
+    read by jobs51 at sharedvars.c:62 <- f51
+    write by jobs51 at sharedvars.c:63 <- f51
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
-    int t = s5; sharedvars.c:62 <- f51
     s5 = 51; sharedvars.c:63 <- f51
   shared bases: {u3, s4, s5, s6}
   interferences by location:
-    sharedvars.c:62:
-      # cvalue:
-      u3 ∈ {1; 3; 31}
-      s4 ∈ {-1; 0; 1; 2; 3; 4}
-      s5 ∈ [0..2147483647]
-      s6 ∈ [0..2147483646],0%2 
     sharedvars.c:63:
       # cvalue:
       u3 ∈ {1; 3; 31}
@@ -1711,16 +1709,30 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  u2: read by <main> at sharedvars.c:93
-      write by <main> at sharedvars.c:92
-  s4: write by <main> at sharedvars.c:98
-      write by <main> at sharedvars.c:100
-  jobs1: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs2: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs3: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs4: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs5: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs6: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  u2:
+    read by <main> at sharedvars.c:93 <- main
+    write by <main> at sharedvars.c:92 <- main
+  s4:
+    write by <main> at sharedvars.c:98 <- main
+    write by <main> at sharedvars.c:100 <- main
+  jobs1:
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+      pthread_create :: sharedvars.c:90 <- main
+  jobs2:
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+      pthread_create :: sharedvars.c:95 <- main
+  jobs3:
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+      pthread_create :: sharedvars.c:96 <- main
+  jobs4:
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+      pthread_create :: sharedvars.c:99 <- main
+  jobs5:
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+      pthread_create :: sharedvars.c:102 <- main
+  jobs6:
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+      pthread_create :: sharedvars.c:103 <- main
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -1765,9 +1777,9 @@
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   u1:
-    read by jobs1 at sharedvars.c:30
-    read by jobs1 at sharedvars.c:31
-    write by jobs1 at sharedvars.c:31
+    read by jobs1 at sharedvars.c:30 <- f1
+    read by jobs1 at sharedvars.c:31 <- f1
+    write by jobs1 at sharedvars.c:31 <- f1
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -1801,8 +1813,10 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  u3: write by jobs3 at sharedvars.c:46
-  jobs31: write by jobs3 at FRAMAC_SHARE/mthread_pthread.c:29
+  u3: write by jobs3 at sharedvars.c:46 <- f3
+  jobs31:
+    write by jobs3 at FRAMAC_SHARE/mthread_pthread.c:29 <-
+      pthread_create :: sharedvars.c:47 <- f3
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -1835,32 +1849,20 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  s4: read by jobs4 at sharedvars.c:53
-      write by jobs4 at sharedvars.c:54
-  s6: read by jobs4 at sharedvars.c:56
-      write by jobs4 at sharedvars.c:57
+  s4:
+    read by jobs4 at sharedvars.c:53 <- f4
+    write by jobs4 at sharedvars.c:54 <- f4
+  s6:
+    read by jobs4 at sharedvars.c:56 <- f4
+    write by jobs4 at sharedvars.c:57 <- f4
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
-    int t = s4; sharedvars.c:53 <- f4
     s4 = 4; sharedvars.c:54 <- f4
-    t = s6; sharedvars.c:56 <- f4
     s6 = 4; sharedvars.c:57 <- f4
   shared bases: {u3, s4, s5, s6}
   interferences by location:
-    sharedvars.c:53:
-      # cvalue:
-      u3 ∈ {1; 3; 31}
-      s4 ∈ {-1; 0; 1; 2; 3; 4}
-      s5 ∈ [0..2147483647]
-      s6 ∈ [0..2147483646],0%2 
     sharedvars.c:54:
-      # cvalue:
-      u3 ∈ {1; 3; 31}
-      s4 ∈ {-1; 0; 1; 2; 3; 4}
-      s5 ∈ [0..2147483647]
-      s6 ∈ [0..2147483646],0%2 
-    sharedvars.c:56:
       # cvalue:
       u3 ∈ {1; 3; 31}
       s4 ∈ {-1; 0; 1; 2; 3; 4}
@@ -1891,8 +1893,10 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  s5: write by jobs5 at sharedvars.c:69
-  jobs51: write by jobs5 at FRAMAC_SHARE/mthread_pthread.c:29
+  s5: write by jobs5 at sharedvars.c:69 <- f5
+  jobs51:
+    write by jobs5 at FRAMAC_SHARE/mthread_pthread.c:29 <-
+      pthread_create :: sharedvars.c:68 <- f5
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -1923,21 +1927,15 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  s6: read by jobs6 at sharedvars.c:75
-      write by jobs6 at sharedvars.c:76
+  s6:
+    read by jobs6 at sharedvars.c:75 <- f6
+    write by jobs6 at sharedvars.c:76 <- f6
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
-    int t = s6; sharedvars.c:75 <- f6
     s6 = 6; sharedvars.c:76 <- f6
   shared bases: {u3, s4, s5, s6}
   interferences by location:
-    sharedvars.c:75:
-      # cvalue:
-      u3 ∈ {1; 3; 31}
-      s4 ∈ {-1; 0; 1; 2; 3; 4}
-      s5 ∈ [0..2147483647]
-      s6 ∈ [0..2147483646],0%2 
     sharedvars.c:76:
       # cvalue:
       u3 ∈ {1; 3; 31}
@@ -1962,21 +1960,15 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  u3: read by jobs31 at sharedvars.c:40
-      write by jobs31 at sharedvars.c:41
+  u3:
+    read by jobs31 at sharedvars.c:40 <- f31
+    write by jobs31 at sharedvars.c:41 <- f31
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
-    int t = u3; sharedvars.c:40 <- f31
     u3 = 31; sharedvars.c:41 <- f31
   shared bases: {u3, s4, s5, s6}
   interferences by location:
-    sharedvars.c:40:
-      # cvalue:
-      u3 ∈ {1; 3; 31}
-      s4 ∈ {-1; 0; 1; 2; 3; 4}
-      s5 ∈ [0..2147483647]
-      s6 ∈ [0..2147483646],0%2 
     sharedvars.c:41:
       # cvalue:
       u3 ∈ {1; 3; 31}

@@ -46,8 +46,10 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  interrupt_received_a: read by <main> at interrupt.c:49
-  interrupt_received_b: read by <main> at interrupt.c:50
+  interrupt_received_a:
+    read by <main> at interrupt.c:49 <- main_interrupt_cross_incr
+  interrupt_received_b:
+    read by <main> at interrupt.c:50 <- main_interrupt_cross_incr
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -67,9 +69,11 @@
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   interrupt_received_a:
-    write by <interrupt_handler interrupt_cross_incr1> at interrupt.c:41
+    write by <interrupt_handler interrupt_cross_incr1> at interrupt.c:41 <-
+      interrupt_cross_incr1
   interrupt_received_b:
-    read by <interrupt_handler interrupt_cross_incr1> at interrupt.c:41
+    read by <interrupt_handler interrupt_cross_incr1> at interrupt.c:41 <-
+      interrupt_cross_incr1
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -89,9 +93,11 @@
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   interrupt_received_a:
-    read by <interrupt_handler interrupt_cross_incr2> at interrupt.c:45
+    read by <interrupt_handler interrupt_cross_incr2> at interrupt.c:45 <-
+      interrupt_cross_incr2
   interrupt_received_b:
-    write by <interrupt_handler interrupt_cross_incr2> at interrupt.c:45
+    write by <interrupt_handler interrupt_cross_incr2> at interrupt.c:45 <-
+      interrupt_cross_incr2
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -128,8 +134,10 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  interrupt_received_a: read by <main> at interrupt.c:49
-  interrupt_received_b: read by <main> at interrupt.c:50
+  interrupt_received_a:
+    read by <main> at interrupt.c:49 <- main_interrupt_cross_incr
+  interrupt_received_b:
+    read by <main> at interrupt.c:50 <- main_interrupt_cross_incr
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -150,9 +158,11 @@
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   interrupt_received_a:
-    write by <interrupt_handler interrupt_cross_incr1> at interrupt.c:41
+    write by <interrupt_handler interrupt_cross_incr1> at interrupt.c:41 <-
+      interrupt_cross_incr1
   interrupt_received_b:
-    read by <interrupt_handler interrupt_cross_incr1> at interrupt.c:41
+    read by <interrupt_handler interrupt_cross_incr1> at interrupt.c:41 <-
+      interrupt_cross_incr1
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -181,9 +191,11 @@
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   interrupt_received_a:
-    read by <interrupt_handler interrupt_cross_incr2> at interrupt.c:45
+    read by <interrupt_handler interrupt_cross_incr2> at interrupt.c:45 <-
+      interrupt_cross_incr2
   interrupt_received_b:
-    write by <interrupt_handler interrupt_cross_incr2> at interrupt.c:45
+    write by <interrupt_handler interrupt_cross_incr2> at interrupt.c:45 <-
+      interrupt_cross_incr2
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -270,13 +282,17 @@
 [eva] Initial state supplied by user
 [mt] Thread <main>, fun main_interrupt_cross_incr
 [eva] interrupt.c:49: Frama_C_show_each_a: {0}
-[eva] interrupt.c:50: Frama_C_show_each_b: {0}
+[eva:interferences] interrupt.c:49: inject threads interferences at this point
+[eva] interrupt.c:50: Frama_C_show_each_b: {0; 1; 2}
+[eva:interferences] interrupt.c:50: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  interrupt_received_a: read by <main> at interrupt.c:49
-  interrupt_received_b: read by <main> at interrupt.c:50
+  interrupt_received_a:
+    read by <main> at interrupt.c:49 <- main_interrupt_cross_incr
+  interrupt_received_b:
+    read by <main> at interrupt.c:50 <- main_interrupt_cross_incr
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -297,9 +313,11 @@
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   interrupt_received_a:
-    write by <interrupt_handler interrupt_cross_incr1> at interrupt.c:41
+    write by <interrupt_handler interrupt_cross_incr1> at interrupt.c:41 <-
+      interrupt_cross_incr1
   interrupt_received_b:
-    read by <interrupt_handler interrupt_cross_incr1> at interrupt.c:41
+    read by <interrupt_handler interrupt_cross_incr1> at interrupt.c:41 <-
+      interrupt_cross_incr1
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -330,9 +348,11 @@
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   interrupt_received_a:
-    read by <interrupt_handler interrupt_cross_incr2> at interrupt.c:45
+    read by <interrupt_handler interrupt_cross_incr2> at interrupt.c:45 <-
+      interrupt_cross_incr2
   interrupt_received_b:
-    write by <interrupt_handler interrupt_cross_incr2> at interrupt.c:45
+    write by <interrupt_handler interrupt_cross_incr2> at interrupt.c:45 <-
+      interrupt_cross_incr2
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -362,7 +382,7 @@
 [mt] <interrupt_handler interrupt_cross_incr2> reads 
   interrupt_received_a ∈ {0; 1; 2; 3}  // interrupt.c:45
   interrupt_cross_incr2
-[mt] <main> reads  interrupt_received_b ∈ {0}  // interrupt.c:50
+[mt] <main> reads  interrupt_received_b ∈ {0; 1; 2}  // interrupt.c:50
   main_interrupt_cross_incr
 [mt] <interrupt_handler interrupt_cross_incr1> reads 
   interrupt_received_b ∈ {0; 1; 2}  // interrupt.c:41 interrupt_cross_incr1
@@ -418,13 +438,17 @@
 [eva] Initial state supplied by user
 [mt] Thread <main>, fun main_interrupt_cross_incr
 [eva] interrupt.c:49: Frama_C_show_each_a: {0}
-[eva] interrupt.c:50: Frama_C_show_each_b: {0}
+[eva:interferences] interrupt.c:49: inject threads interferences at this point
+[eva] interrupt.c:50: Frama_C_show_each_b: {0; 1; 2; 3; 4}
+[eva:interferences] interrupt.c:50: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  interrupt_received_a: read by <main> at interrupt.c:49
-  interrupt_received_b: read by <main> at interrupt.c:50
+  interrupt_received_a:
+    read by <main> at interrupt.c:49 <- main_interrupt_cross_incr
+  interrupt_received_b:
+    read by <main> at interrupt.c:50 <- main_interrupt_cross_incr
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -445,9 +469,11 @@
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   interrupt_received_a:
-    write by <interrupt_handler interrupt_cross_incr1> at interrupt.c:41
+    write by <interrupt_handler interrupt_cross_incr1> at interrupt.c:41 <-
+      interrupt_cross_incr1
   interrupt_received_b:
-    read by <interrupt_handler interrupt_cross_incr1> at interrupt.c:41
+    read by <interrupt_handler interrupt_cross_incr1> at interrupt.c:41 <-
+      interrupt_cross_incr1
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -478,9 +504,11 @@
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   interrupt_received_a:
-    read by <interrupt_handler interrupt_cross_incr2> at interrupt.c:45
+    read by <interrupt_handler interrupt_cross_incr2> at interrupt.c:45 <-
+      interrupt_cross_incr2
   interrupt_received_b:
-    write by <interrupt_handler interrupt_cross_incr2> at interrupt.c:45
+    write by <interrupt_handler interrupt_cross_incr2> at interrupt.c:45 <-
+      interrupt_cross_incr2
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -510,7 +538,7 @@
 [mt] <interrupt_handler interrupt_cross_incr2> reads 
   interrupt_received_a ∈ {0; 1; 2; 3; 4; 5}  // interrupt.c:45
   interrupt_cross_incr2
-[mt] <main> reads  interrupt_received_b ∈ {0}  // interrupt.c:50
+[mt] <main> reads  interrupt_received_b ∈ {0; 1; 2; 3; 4}  // interrupt.c:50
   main_interrupt_cross_incr
 [mt] <interrupt_handler interrupt_cross_incr1> reads 
   interrupt_received_b ∈ {0; 1; 2; 3; 4}  // interrupt.c:41
@@ -567,13 +595,17 @@
 [eva] Initial state supplied by user
 [mt] Thread <main>, fun main_interrupt_cross_incr
 [eva] interrupt.c:49: Frama_C_show_each_a: {0}
-[eva] interrupt.c:50: Frama_C_show_each_b: {0}
+[eva:interferences] interrupt.c:49: inject threads interferences at this point
+[eva] interrupt.c:50: Frama_C_show_each_b: {0; 1; 2; 3; 4; 5; 6}
+[eva:interferences] interrupt.c:50: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  interrupt_received_a: read by <main> at interrupt.c:49
-  interrupt_received_b: read by <main> at interrupt.c:50
+  interrupt_received_a:
+    read by <main> at interrupt.c:49 <- main_interrupt_cross_incr
+  interrupt_received_b:
+    read by <main> at interrupt.c:50 <- main_interrupt_cross_incr
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -594,9 +626,11 @@
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   interrupt_received_a:
-    write by <interrupt_handler interrupt_cross_incr1> at interrupt.c:41
+    write by <interrupt_handler interrupt_cross_incr1> at interrupt.c:41 <-
+      interrupt_cross_incr1
   interrupt_received_b:
-    read by <interrupt_handler interrupt_cross_incr1> at interrupt.c:41
+    read by <interrupt_handler interrupt_cross_incr1> at interrupt.c:41 <-
+      interrupt_cross_incr1
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -629,9 +663,11 @@
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   interrupt_received_a:
-    read by <interrupt_handler interrupt_cross_incr2> at interrupt.c:45
+    read by <interrupt_handler interrupt_cross_incr2> at interrupt.c:45 <-
+      interrupt_cross_incr2
   interrupt_received_b:
-    write by <interrupt_handler interrupt_cross_incr2> at interrupt.c:45
+    write by <interrupt_handler interrupt_cross_incr2> at interrupt.c:45 <-
+      interrupt_cross_incr2
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -663,8 +699,8 @@
 [mt] <interrupt_handler interrupt_cross_incr2> reads 
   interrupt_received_a ∈ [0..2147483647]  // interrupt.c:45
   interrupt_cross_incr2
-[mt] <main> reads  interrupt_received_b ∈ {0}  // interrupt.c:50
-  main_interrupt_cross_incr
+[mt] <main> reads  interrupt_received_b ∈ {0; 1; 2; 3; 4; 5; 6} 
+  // interrupt.c:50 main_interrupt_cross_incr
 [mt] <interrupt_handler interrupt_cross_incr1> reads 
   interrupt_received_b ∈ {0; 1; 2; 3; 4; 5; 6}  // interrupt.c:41
   interrupt_cross_incr1
@@ -719,13 +755,17 @@
 [eva] Initial state supplied by user
 [mt] Thread <main>, fun main_interrupt_cross_incr
 [eva] interrupt.c:49: Frama_C_show_each_a: {0}
-[eva] interrupt.c:50: Frama_C_show_each_b: {0}
+[eva:interferences] interrupt.c:49: inject threads interferences at this point
+[eva] interrupt.c:50: Frama_C_show_each_b: [0..2147483647]
+[eva:interferences] interrupt.c:50: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  interrupt_received_a: read by <main> at interrupt.c:49
-  interrupt_received_b: read by <main> at interrupt.c:50
+  interrupt_received_a:
+    read by <main> at interrupt.c:49 <- main_interrupt_cross_incr
+  interrupt_received_b:
+    read by <main> at interrupt.c:50 <- main_interrupt_cross_incr
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -748,9 +788,11 @@
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   interrupt_received_a:
-    write by <interrupt_handler interrupt_cross_incr1> at interrupt.c:41
+    write by <interrupt_handler interrupt_cross_incr1> at interrupt.c:41 <-
+      interrupt_cross_incr1
   interrupt_received_b:
-    read by <interrupt_handler interrupt_cross_incr1> at interrupt.c:41
+    read by <interrupt_handler interrupt_cross_incr1> at interrupt.c:41 <-
+      interrupt_cross_incr1
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -782,7 +824,7 @@
   interrupt_cross_incr2
 [mt] <main> reads  interrupt_received_a ∈ {0}  // interrupt.c:49
   main_interrupt_cross_incr
-[mt] <main> reads  interrupt_received_b ∈ {0}  // interrupt.c:50
+[mt] <main> reads  interrupt_received_b ∈ [0..2147483647]  // interrupt.c:50
   main_interrupt_cross_incr
 [mt] <interrupt_handler interrupt_cross_incr1> reads 
   interrupt_received_b ∈ [0..2147483647]  // interrupt.c:41

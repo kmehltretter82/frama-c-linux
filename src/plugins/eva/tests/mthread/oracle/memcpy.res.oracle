@@ -18,14 +18,30 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  tjob0: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
-  tjob1: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
-  tjob2: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
-  shared: write by <main> at memcpy.c:40
-  a: write by <main> at memcpy.c:40
-  b: write by <main> at memcpy.c:40
-  c: write by <main> at memcpy.c:40
-  d: write by <main> at memcpy.c:40
+  tjob0:
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+      pthread_create :: memcpy.c:38 <- main
+  tjob1:
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+      pthread_create :: memcpy.c:45 <- main
+  tjob2:
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+      pthread_create :: memcpy.c:46 <- main
+  shared:
+    write by <main> at memcpy.c:40 <- main
+    write by <main> at memcpy.c:41 <- main
+    write by <main> at memcpy.c:42 <- main
+    write by <main> at memcpy.c:43 <- main
+    write by <main> at memcpy.c:48 <- main
+    write by <main> at memcpy.c:49 <- main
+  a:
+    write by <main> at memcpy.c:40 <- main
+    write by <main> at memcpy.c:48 <- main
+  b:
+    write by <main> at memcpy.c:41 <- main
+    write by <main> at memcpy.c:49 <- main
+  c: write by <main> at memcpy.c:42 <- main
+  d: write by <main> at memcpy.c:43 <- main
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -57,8 +73,8 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  a: read by tjob1 at memcpy.c:26
-  c: read by tjob1 at memcpy.c:26
+  a: read by tjob1 at memcpy.c:26 <- job1
+  c: read by tjob1 at memcpy.c:26 <- job1
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -74,8 +90,8 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  b: read by tjob2 at memcpy.c:31
-  d: read by tjob2 at memcpy.c:31
+  b: read by tjob2 at memcpy.c:31 <- job2
+  d: read by tjob2 at memcpy.c:31 <- job2
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -114,20 +130,77 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  tjob0: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
-  tjob1: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
-  tjob2: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
-  shared: write by <main> at memcpy.c:40
-  a: write by <main> at memcpy.c:40
-  b: write by <main> at memcpy.c:40
-  c: write by <main> at memcpy.c:40
-  d: write by <main> at memcpy.c:40
+  tjob0:
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+      pthread_create :: memcpy.c:38 <- main
+  tjob1:
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+      pthread_create :: memcpy.c:45 <- main
+  tjob2:
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+      pthread_create :: memcpy.c:46 <- main
+  shared:
+    write by <main> at memcpy.c:40 <- main
+    write by <main> at memcpy.c:41 <- main
+    write by <main> at memcpy.c:42 <- main
+    write by <main> at memcpy.c:43 <- main
+    write by <main> at memcpy.c:48 <- main
+    write by <main> at memcpy.c:49 <- main
+  a:
+    write by <main> at memcpy.c:40 <- main
+    write by <main> at memcpy.c:48 <- main
+  b:
+    write by <main> at memcpy.c:41 <- main
+    write by <main> at memcpy.c:49 <- main
+  c: write by <main> at memcpy.c:42 <- main
+  d: write by <main> at memcpy.c:43 <- main
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
+    memcpy((void *)(& a),(void *)(& x),sizeof(int)); memcpy.c:40 <- main
+    memcpy((void *)(& b),(void *)(& x),sizeof(int)); memcpy.c:41 <- main
+    memcpy((void *)(& c),(void *)(& x),sizeof(int)); memcpy.c:42 <- main
+    memcpy((void *)(& d),(void *)(& x),sizeof(int)); memcpy.c:43 <- main
+    memcpy((void *)(& a),(void *)(& x),sizeof(int)); memcpy.c:48 <- main
+    memcpy((void *)(& b),(void *)(& x),sizeof(int)); memcpy.c:49 <- main
   shared bases: {a, b, c, d}
   interferences by location:
+    memcpy.c:40:
+      # cvalue: a ∈ {3}
+                b ∈ {0}
+                c ∈ {0}
+                d ∈ {0} 
+    memcpy.c:41:
+      # cvalue: a ∈ {3}
+                b ∈ {3}
+                c ∈ {0}
+                d ∈ {0} 
+    memcpy.c:42:
+      # cvalue: a ∈ {3}
+                b ∈ {3}
+                c ∈ {3}
+                d ∈ {0} 
+    memcpy.c:43:
+      # cvalue: a ∈ {3}
+                b ∈ {3}
+                c ∈ {3}
+                d ∈ {3} 
+    memcpy.c:48:
+      # cvalue: a ∈ {3}
+                b ∈ {3}
+                c ∈ {3}
+                d ∈ {3} 
+    memcpy.c:49:
+      # cvalue: a ∈ {3}
+                b ∈ {3}
+                c ∈ {3}
+                d ∈ {3} 
   interferences by mutexes:
+    {  }:
+      # cvalue: a ∈ {3}
+                b ∈ {0; 3}
+                c ∈ {0; 3}
+                d ∈ {0; 3}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
@@ -154,8 +227,8 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  a: read by tjob1 at memcpy.c:26
-  c: read by tjob1 at memcpy.c:26
+  a: read by tjob1 at memcpy.c:26 <- job1
+  c: read by tjob1 at memcpy.c:26 <- job1
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -173,8 +246,8 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  b: read by tjob2 at memcpy.c:31
-  d: read by tjob2 at memcpy.c:31
+  b: read by tjob2 at memcpy.c:31 <- job2
+  d: read by tjob2 at memcpy.c:31 <- job2
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -227,8 +300,8 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  a: read by tjob1 at memcpy.c:26
-  c: read by tjob1 at memcpy.c:26
+  a: read by tjob1 at memcpy.c:26 <- job1
+  c: read by tjob1 at memcpy.c:26 <- job1
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -245,8 +318,8 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  b: read by tjob2 at memcpy.c:31
-  d: read by tjob2 at memcpy.c:31
+  b: read by tjob2 at memcpy.c:31 <- job2
+  d: read by tjob2 at memcpy.c:31 <- job2
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
