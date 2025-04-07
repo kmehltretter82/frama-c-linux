@@ -203,10 +203,6 @@ val array_size: typ -> Integer.t
 (** {2 Functions} *)
 (* ************************************************************************** *)
 
-val is_function_type : varinfo -> bool
-(** Return [true] iff the type of the given varinfo is a function type. *)
-[@@deprecated "Use Ast_types.is_function_type on the varinfo type instead."]
-
 (** Operations on cil function. *)
 module Function: sig
   val formal_args: varinfo -> (string * typ * attributes) list
@@ -275,6 +271,15 @@ val is_frama_c_builtin: varinfo -> bool
     {!Cil_builtins.has_fc_builtin_attr} are true.
     @before 29.0-Copper Behave like {!start_with_frama_c_builtin}.
 *)
+
+(* ************************************************************************** *)
+(** {2 Deprecated functions} *)
+(* ************************************************************************** *)
+
+val is_function_type : varinfo -> bool
+(** Return [true] iff the type of the given varinfo is a function type. *)
+[@@deprecated "Use Ast_types.is_fun on the varinfo type instead."]
+[@@migrate { repl = (fun vi -> Ast_types.is_fun vi.vtype) } ]
 
 val array_type: ?length:exp -> ?attr:attributes -> typ -> typ
 (** @deprecated Frama-C+dev *)
