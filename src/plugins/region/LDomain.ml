@@ -106,25 +106,22 @@ let get_field f d fd =
   | _ -> get f d
 
 let rec of_typ create ty : 'a t = match ty.tnode with
-  | TVoid | TInt _ | TFloat _ -> pure
-  | TPtr _ -> ptr @@ create ()
+  | TBuiltin_va_list  | TFun _ | TPtr _ -> ptr @@ create ()
   | TArray (ty,_) -> array @@ of_typ create ty
-  | TComp { cstruct = true ; cfields = Some fds } ->
-    let add_field d fd =
-      let abort _ _ = assert false in
-      merge abort d @@ field fd @@ of_typ create fd.ftype
-    in
-    List.fold_left add_field pure fds
-  | TComp _ -> pure
-  | TEnum _ -> Options.abort "LDomain.of_ltype: TEnum"
-  | TBuiltin_va_list -> Options.abort "LDomain.of_ltype: TBuiltin_va_list"
-  | TFun _ -> Options.abort "LDomain.of_ltype: TFun"
+  | TComp { cfields = Some fds } ->
+    let add_field m fd =
+      let v = of_typ create fd.ftype in
+      if is_pure v then m else Fmap.add fd v m in
+    let m = List.fold_left add_field Fmap.empty fds in
+    if Fmap.is_empty m then Pure else Record m
+  | TVoid | TInt _ | TFloat _ | TComp _ | TEnum _ -> pure
   | TNamed { ttype } -> of_typ create ttype
 
-let rec of_ltype create = function
+let rec of_ltype create add_logic_var lt =
+  match Ast_types.unroll_logic ~unroll_typedef:false lt with
   | Ctype ty -> of_typ create ty
-  | Ltype (sym,prms) -> logic sym @@ List.map (of_ltype create) prms
-  | Lvar _v -> Options.abort "LDomain.of_ltype: Lvar"
+  | Ltype (sym,prms) -> logic sym @@ List.map (of_ltype create add_logic_var) prms
+  | Lvar v -> add_logic_var v
   | Lboolean | Linteger | Lreal -> pure
   | Larrow (_prms,_rty) -> Options.abort "LDomain.of_ltype: Larrow"
 

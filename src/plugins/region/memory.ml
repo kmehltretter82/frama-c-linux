@@ -230,8 +230,16 @@ let add_logic_var (m: map) lv =
   try LVmap.find lv m.vroots with Not_found ->
     failwith_locked m "Region.Memory.add_lvroot" ;
     assert (lv.lv_origin = None);
-    let d = LDomain.of_ltype (new_chunk m) lv.lv_type in
+    let d = LDomain.of_ltype (new_chunk m) (fun _ -> assert false) lv.lv_type in
     m.vroots <- LVmap.add lv d m.vroots ; d
+
+let domain_of_typ (m:map) (typ:typ) = LDomain.of_typ (new_chunk m) typ
+
+let domain_of_ltyp (m:map) (lt:logic_type) =
+  let add_logc_var lv = match lv.lv_origin with
+    | None -> add_logic_var m lv
+    | Some v -> add_root m v ; LDomain.pure
+  in LDomain.of_ltype (new_chunk m) add_logic_var lt
 
 (* -------------------------------------------------------------------------- *)
 (* --- Iterator                                                           --- *)
@@ -385,6 +393,8 @@ let merge_all (m:map) = function
 let merge (m: map) (a: node) (b: node) : unit =
   failwith_locked m "Region.Memory.merge" ;
   merge_all m [a;b]
+
+let merge_domain (m:map) = LDomain.merge (fun a b -> merge m a b ; min a b)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Offset                                                             --- *)
