@@ -297,7 +297,6 @@ function PullCache
 {
     if [ "$PULLCACHE" = "yes" ]
     then
-        CloneCache
         Head "Pull WP cache (to $FRAMAC_WP_CACHEDIR)..."
         RequiredTools git
         Run git -C $FRAMAC_WP_CACHEDIR pull --rebase
@@ -421,7 +420,6 @@ function RunAlias
 
 function TestDir
 {
-    CloneCache
     case "$CONFIG" in
         "<all>")
             ALIAS=$1/${ALIAS_NAME}
@@ -449,7 +447,6 @@ function TestDir
 
 function TestFile
 {
-    CloneCache
     DIR=$(dirname $1)
     FILE=$(basename $1)
 
@@ -603,6 +600,7 @@ function Status
 # --------------------------------------------------------------------------
 
 SetEnv
+CloneCache
 PullCache
 PrepareCoverage
 PrepareTests
