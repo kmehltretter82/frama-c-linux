@@ -377,6 +377,7 @@ function CheckDuneFiles
 function PrepareTests
 {
     if [ "$TESTS" = "" ]; then
+        DUNE_ALIAS+=" @runtest"
         for dir in $TEST_DIRS ; do
             if [ -d "$dir" ]; then
                 TESTS+=" $dir"
