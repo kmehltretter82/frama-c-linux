@@ -50,3 +50,4 @@ val get_field : ('a -> 'a -> 'a) -> 'a t -> fieldinfo -> 'a t
 val get_index : ('a -> 'a -> 'a) -> 'a t -> 'a t
 
 val of_ltype : (unit -> 'a) -> logic_type -> 'a t
+val of_typ : (unit -> 'a) -> typ -> 'a t

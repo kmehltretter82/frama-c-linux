@@ -105,28 +105,27 @@ let get_field f d fd =
   | Record mf -> (try Fmap.find fd mf with Not_found -> Pure)
   | _ -> get f d
 
-let of_ltype create lty =
-  let rec of_ltype = function
-    | Ctype ty -> of_typ ty
-    | Ltype (sym,prms) -> logic sym @@ List.map of_ltype prms
-    | Lvar _v -> Options.abort "LDomain.of_ltype: Lvar"
-    | Lboolean | Linteger | Lreal -> pure
-    | Larrow (_prms,_rty) -> Options.abort "LDomain.of_ltype: Larrow"
-  and of_typ ty : 'a t = match ty.tnode with
-    | TVoid | TInt _ | TFloat _ -> pure
-    | TPtr _ -> ptr @@ create ()
-    | TArray (ty,_) -> array @@ of_typ ty
-    | TComp { cstruct = true ; cfields = Some fds } ->
-      let add_field d fd =
-        let abort _ _ = assert false in
-        merge abort d @@ field fd @@ of_typ fd.ftype
-      in
-      List.fold_left add_field pure fds
-    | TComp _ -> pure
-    | TEnum _ -> Options.abort "LDomain.of_ltype: TEnum"
-    | TBuiltin_va_list -> Options.abort "LDomain.of_ltype: TBuiltin_va_list"
-    | TFun _ -> Options.abort "LDomain.of_ltype: TFun"
-    | TNamed { ttype } -> of_typ ttype
-  in of_ltype lty
+let rec of_typ create ty : 'a t = match ty.tnode with
+  | TVoid | TInt _ | TFloat _ -> pure
+  | TPtr _ -> ptr @@ create ()
+  | TArray (ty,_) -> array @@ of_typ create ty
+  | TComp { cstruct = true ; cfields = Some fds } ->
+    let add_field d fd =
+      let abort _ _ = assert false in
+      merge abort d @@ field fd @@ of_typ create fd.ftype
+    in
+    List.fold_left add_field pure fds
+  | TComp _ -> pure
+  | TEnum _ -> Options.abort "LDomain.of_ltype: TEnum"
+  | TBuiltin_va_list -> Options.abort "LDomain.of_ltype: TBuiltin_va_list"
+  | TFun _ -> Options.abort "LDomain.of_ltype: TFun"
+  | TNamed { ttype } -> of_typ create ttype
+
+let rec of_ltype create = function
+  | Ctype ty -> of_typ create ty
+  | Ltype (sym,prms) -> logic sym @@ List.map (of_ltype create) prms
+  | Lvar _v -> Options.abort "LDomain.of_ltype: Lvar"
+  | Lboolean | Linteger | Lreal -> pure
+  | Larrow (_prms,_rty) -> Options.abort "LDomain.of_ltype: Larrow"
 
 (* -------------------------------------------------------------------------- *)
