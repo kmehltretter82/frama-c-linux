@@ -607,7 +607,7 @@ PrepareTests
 CheckDuneFiles
 Register $TESTS
 CreateMissingOracles
-RunAlias ${DUNE_ALIAS}
+RunAlias $(echo "$DUNE_ALIAS" | tr ' ' '\n' | sort -u)
 RemoveMissingOracles
 Status $DUNE_LOG
 GenerateCoverage
