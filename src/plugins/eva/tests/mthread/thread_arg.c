@@ -7,7 +7,7 @@
    OPT: @EVA_MTHREAD_TEST@ -variadic-no-translation
    OPT: @EVA_MTHREAD_TEST@
 
-   COMMMENT: The two outputs should be identical
+   COMMENT: The two outputs should be identical
    EXECNOW: LOG @DIFF@ diff %{dep:@SRC1@} %{dep:@SRC2@} > @DIFF@
 */
 
