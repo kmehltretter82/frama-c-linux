@@ -330,8 +330,6 @@ let is_block_local v b = List.exists (fun vv -> v.vid = vv.vid) b.blocals
 (** {2 Functions} *)
 (* ************************************************************************** *)
 
-let is_function_type vi = Ast_types.is_fun vi.vtype
-
 module Function = struct
 
   let formal_args called_vinfo = match called_vinfo.vtype.tnode with
@@ -472,6 +470,8 @@ let is_frama_c_builtin v =
   Cil_builtins.has_fc_builtin_attr v || start_with_frama_c_builtin v.vname
 
 (* Deprecated *)
+
+let is_function_type vi = Ast_types.is_fun vi.vtype
 
 let array_type ?length ?(attr=[]) ty =
   Cil_const.mk_tarray ~tattr:attr ty length
