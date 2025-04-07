@@ -438,6 +438,17 @@ function TestDir
 
     FindPtestDir "$1"
 
+    # Add cramtests aliases from this folder unless @runtest is positionned,
+    # meaning we're already running all cram tests
+    if [[ ! "$DUNE_ALIAS" =~ "@runtest" ]]; then
+        # Find all files and folders ending with ".t" except run.t files, and
+        # add their respective aliases to DUNE_ALIAS.
+        cramtests=$(find "$1" -name '*.t' ! -name 'run.t')
+        for test in $cramtests ; do
+            DUNE_ALIAS+=" @${test%.*}"
+        done
+    fi
+
     Head "Register test on directory $1 $CFG"
     DUNE_ALIAS+=" @$ALIAS"
 }
