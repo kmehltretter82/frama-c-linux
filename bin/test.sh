@@ -509,12 +509,14 @@ function Register
 {
     while [ "$1" != "" ]
     do
-        if [ -d $1 ]; then
-            TestDir $1
-        elif [ -f $1 ]; then
-            TestFile $1
+        if [ -e "$1" ] && [ "${1##*.}" == "t" ]; then
+            DUNE_ALIAS+=" @${1%.*}"
+        elif [ -d "$1" ]; then
+            TestDir "$1"
+        elif [ -f "$1" ]; then
+            TestFile "$1"
         else
-            case $1 in
+            case "$1" in
                 @*) Head "Register test on alias $1"; DUNE_ALIAS+=" $1";;
                 *) ErrorUsage "ERROR: don't known what to do with '$1'";;
             esac
