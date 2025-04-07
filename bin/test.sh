@@ -438,7 +438,7 @@ function TestDir
     FindPtestDir "$1"
 
     Head "Register test on directory $1 $CFG"
-    DUNE_ALIAS="${DUNE_ALIAS} @$ALIAS"
+    DUNE_ALIAS+=" @$ALIAS"
 }
 
 # --------------------------------------------------------------------------
@@ -480,7 +480,7 @@ function TestFile
     FindPtestDir "$DIR"
 
     Head "Register test on file $1 $CFG"
-    DUNE_ALIAS="${DUNE_ALIAS} $ALIAS"
+    DUNE_ALIAS+=" $ALIAS"
 }
 
 # --------------------------------------------------------------------------
@@ -515,7 +515,7 @@ function Register
             TestFile $1
         else
             case $1 in
-                @*) Head "Register test on alias $1"; DUNE_ALIAS="${DUNE_ALIAS} $1";;
+                @*) Head "Register test on alias $1"; DUNE_ALIAS+=" $1";;
                 *) ErrorUsage "ERROR: don't known what to do with '$1'";;
             esac
         fi
