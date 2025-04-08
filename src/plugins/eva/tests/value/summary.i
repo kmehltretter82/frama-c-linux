@@ -7,11 +7,11 @@
   OPT: -machdep x86_32 @RTE_TEST@ -then @EVA_TEST@ -eva-msg-key=summary -main main -slevel 0
 */
 /* Tests the summary on the smallest possible program. */
-void minimalist ();
-void minimal () {}
+void minimalist (void);
+void minimal (void) {}
 
 /* Sure alarm and non-terminating function. */
-void bottom () {
+void bottom (void) {
   int x = 10 / 0;
 }
 
@@ -19,7 +19,7 @@ volatile int undet;
 volatile double volatile_d;
 
 /* Tests the summary on most kinds of alarms. */
-void alarms () {
+void alarms (void) {
   int x = 0, y = 0;
   int *p, *q;
   int t[10] = {0};

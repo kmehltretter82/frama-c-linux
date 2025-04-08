@@ -21,7 +21,7 @@ struct pair s[N];
 pthread_t        jobs;
 pthread_mutex_t  lock;
 
-int random();
+int random(void);
 
 void *f(void *_) {
   for (int i=0; i<N; i++) {
@@ -36,7 +36,7 @@ void *f(void *_) {
 
 
 
-void main()
+void main(void)
 {
   int t=0;
   pthread_mutex_init( &lock, NULL);

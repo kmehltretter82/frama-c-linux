@@ -38,7 +38,7 @@ void main2(int c) {
   Frama_C_dump_each();  
 }
 
-void main3();
+void main3(void);
 
 void main(int c) {
   main1(c);

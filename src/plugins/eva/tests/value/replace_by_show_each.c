@@ -5,15 +5,15 @@
 #define show_each_1 Frama_C_show_each_1
 #define show_each_2 Frama_C_show_each_2
 
-void show_each_1() {
+void show_each_1(void) {
 }
 
-void show_each_2() {
+void show_each_2(void) {
 }
 
 
 //@ assigns \nothing;
-void Frama_C_show_each_2();
+void Frama_C_show_each_2(void);
 
 int x = 0;
 

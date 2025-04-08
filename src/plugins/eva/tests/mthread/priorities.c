@@ -14,7 +14,7 @@ pthread_mutex_t  m1;
 pthread_mutex_t  m2;
 
 
-int random();
+int random(void);
 
 void *f1(void *_) {
   Frama_C_thread_priority(0);
@@ -46,7 +46,7 @@ void *f4(void *_) {
   return NULL;
 }
 
-int main()
+int main(void)
 {
   pthread_mutex_init( &m1 , NULL );
   pthread_mutex_init( &m2 , NULL );
