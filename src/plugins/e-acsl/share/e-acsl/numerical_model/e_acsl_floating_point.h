@@ -62,7 +62,7 @@ extern double eacsl_math_INFINITY __attribute__((FC_BUILTIN));
    are unsupported Value plug-in analysis who start throwing errors once
    test suite is ran. */
 
-void init_infinity_values();
+void init_infinity_values(void);
 
 void eacsl_floating_point_exception(const char *exp)
     __attribute__((FC_BUILTIN));

@@ -94,7 +94,7 @@ void eacsl_temporal_pull_parameter(void *ptr, unsigned int param, size_t size) {
   }
 }
 
-void eacsl_temporal_reset_parameters() {
+void eacsl_temporal_reset_parameters(void) {
   reset_parameter_referents();
 }
 /* }}} */
@@ -108,7 +108,7 @@ void eacsl_temporal_pull_return(void *ptr) {
   store_temporal_referent(ptr, return_referent);
 }
 
-void eacsl_temporal_reset_return() {
+void eacsl_temporal_reset_return(void) {
   return_referent = 0;
 }
 /* }}} */

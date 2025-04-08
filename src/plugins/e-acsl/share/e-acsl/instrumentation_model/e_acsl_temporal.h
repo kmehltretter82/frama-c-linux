@@ -107,7 +107,7 @@ void eacsl_temporal_pull_parameter(void *ptr, unsigned int param, size_t size)
 
 /*! \brief Nullify global parameter array  */
 /*@ assigns \nothing; */
-void eacsl_temporal_reset_parameters() __attribute__((FC_BUILTIN));
+void eacsl_temporal_reset_parameters(void) __attribute__((FC_BUILTIN));
 /* }}} */
 
 /* Return values {{{ */
@@ -125,7 +125,7 @@ void eacsl_temporal_pull_return(void *ptr) __attribute__((FC_BUILTIN));
 /*! \brief Nullify a placeholder variable tracking the referent number of a
  * function's return. */
 /*@ assigns \nothing; */
-void eacsl_temporal_reset_return() __attribute__((FC_BUILTIN));
+void eacsl_temporal_reset_return(void) __attribute__((FC_BUILTIN));
 /* }}} */
 
 /* Temporal valid {{{ */
