@@ -279,17 +279,6 @@ libc_defined_functions, libc_specified_functions = get_framac_libc_function_stat
     framac, framac_share
 )
 
-with open(framac_share / "compliance" / "c11_functions.json", encoding="utf-8") as f:
-    c11_functions = json.load(f)["data"]
-
-with open(framac_share / "compliance" / "c11_headers.json", encoding="utf-8") as f:
-    c11_headers = json.load(f)["data"]
-
-with open(framac_share / "compliance" / "posix_identifiers.json", encoding="utf-8") as f:
-    all_data = json.load(f)
-    posix_identifiers = all_data["data"]
-    posix_headers = all_data["headers"]
-
 recursive_cycles: list[tuple[tuple[str, int], list[tuple[str, str]]]] = []
 reported_recursive_pairs = set()
 build_callgraph.compute_recursive_cycles(cg, recursive_cycles)
@@ -322,68 +311,63 @@ used_headers = set()
 logging.info("Estimating difficulty for %d function calls...", len(callees))
 warnings = 0
 
+problematic_posix_functions = [
+    "_longjmp",
+    "_setjmp",
+    "longjmp",
+    "setjmp",
+    "siglongjmp",
+    "sigsetjmp",
+]
+
+handled_by_variadic_plugin = [
+    "dprintf",
+    "execl",
+    "execle",
+    "execlp",
+    "fcntl",
+    "fprintf",
+    "fscanf",
+    "fwprintf",
+    "fwscanf",
+    "ioctl",
+    "open",
+    "openat",
+    "printf",
+    "scanf",
+    "snprintf",
+    "sprintf",
+    "sscanf",
+    "swprintf",
+    "swscanf",
+    "syslog",
+    "wprintf",
+    "wscanf",
+]
+
 for callee in sorted(callees):
 
-    def callee_status(status, standard, reason):
+    def callee_status(status, reason):
         global warnings
         if status == "warning":
             warnings += 1
         if status == "warning":
-            logging.warning("%s (%s) %s", callee, standard, reason)
+            logging.warning("%s %s", callee, reason)
         else:
-            logging.log(fclog.VERBOSE, "%s: %s (%s) %s", status, callee, standard, reason)
+            logging.log(fclog.VERBOSE, "%s: %s %s", status, callee, reason)
 
-    try:
-        is_problematic = posix_identifiers[callee]["notes"]["fc-support"] == "problematic"
-    except KeyError:
-        is_problematic = False
-    if callee in posix_identifiers:
-        used_headers.add(posix_identifiers[callee]["header"])
-    status_emitted = False  # to avoid re-emitting a message for functions in both C11 and POSIX
-    if callee in c11_functions:
-        standard = "C11"
-        # check that the callee is not a macro or type (e.g. va_arg);
-        # a few functions, such as strcpy_s, are in C11 but not in POSIX,
-        # so we must test membership before checking the POSIX type
-        if callee in posix_identifiers and posix_identifiers[callee]["id_type"] != "function":
-            continue
-        if (not is_problematic) and callee in libc_specified_functions:
-            callee_status("good", standard, "is specified in Frama-C's libc")
-            status_emitted = True
-        elif (not is_problematic) and callee in libc_defined_functions:
-            callee_status("ok", standard, "is defined in Frama-C's libc")
-            status_emitted = True
-        else:
-            if callee not in posix_identifiers:
-                callee_status("warning", standard, "has neither code nor spec in Frama-C's libc")
-                status_emitted = True
-    if not status_emitted and callee in posix_identifiers:
-        standard = "POSIX"
-        # check that the callee is not a macro or type (e.g. va_arg)
-        if posix_identifiers[callee]["id_type"] != "function":
-            continue
-        if (not is_problematic) and callee in libc_specified_functions:
-            callee_status("good", standard, "specified in Frama-C's libc")
-            status_emitted = True
-        elif (not is_problematic) and callee in libc_defined_functions:
-            callee_status("ok", standard, "defined in Frama-C's libc")
-            status_emitted = True
-        else:
-            # Some functions without specification are actually variadic
-            # (and possibly handled by the Variadic plug-in)
-            if "notes" in posix_identifiers[callee]:
-                if "variadic-plugin" in posix_identifiers[callee]["notes"]:
-                    callee_status("ok", standard, "is handled by the Variadic plug-in")
-                    status_emitted = True
-                elif is_problematic:
-                    callee_status(
-                        "warning",
-                        standard,
-                        "is known to be problematic for code analysis",
-                    )
-                    status_emitted = True
-            if not status_emitted:
-                callee_status("warning", standard, "has neither code nor spec in Frama-C's libc")
+    if callee in problematic_posix_functions:
+        callee_status(
+            "warning",
+            "is known to be problematic for code analysis",
+        )
+    elif callee in libc_specified_functions:
+        callee_status("good", "is specified in Frama-C's libc")
+    elif callee in libc_defined_functions:
+        callee_status("ok", "is defined in Frama-C's libc")
+    else:
+        if callee in handled_by_variadic_plugin:
+            callee_status("ok", "is handled by the Variadic plug-in")
 
 logging.info("Function-related warnings: %d", warnings)
 score["libc"] = warnings
@@ -401,30 +385,117 @@ logging.info(
 )
 non_posix_headers = []
 header_warnings = 0
+
+posix_headers = [
+    "aio.h",
+    "arpa/inet.h",
+    "assert.h",
+    "complex.h",
+    "cpio.h",
+    "ctype.h",
+    "dirent.h",
+    "dlfcn.h",
+    "errno.h",
+    "fcntl.h",
+    "fenv.h",
+    "float.h",
+    "fmtmsg.h",
+    "fnmatch.h",
+    "ftw.h",
+    "glob.h",
+    "grp.h",
+    "iconv.h",
+    "inttypes.h",
+    "iso646.h",
+    "langinfo.h",
+    "libgen.h",
+    "limits.h",
+    "locale.h",
+    "math.h",
+    "monetary.h",
+    "mqueue.h",
+    "ndbm.h",
+    "net/if.h",
+    "netdb.h",
+    "netinet/in.h",
+    "netinet/tcp.h",
+    "nl_types.h",
+    "poll.h",
+    "pthread.h",
+    "pwd.h",
+    "regex.h",
+    "sched.h",
+    "search.h",
+    "semaphore.h",
+    "setjmp.h",
+    "signal.h",
+    "spawn.h",
+    "stdarg.h",
+    "stdbool.h",
+    "stddef.h",
+    "stdint.h",
+    "stdio.h",
+    "stdlib.h",
+    "string.h",
+    "strings.h",
+    "stropts.h",
+    "sys/ipc.h",
+    "sys/mman.h",
+    "sys/msg.h",
+    "sys/resource.h",
+    "sys/select.h",
+    "sys/sem.h",
+    "sys/shm.h",
+    "sys/socket.h",
+    "sys/stat.h",
+    "sys/statvfs.h",
+    "sys/time.h",
+    "sys/times.h",
+    "sys/types.h",
+    "sys/uio.h",
+    "sys/un.h",
+    "sys/utsname.h",
+    "sys/wait.h",
+    "syslog.h",
+    "tar.h",
+    "termios.h",
+    "tgmath.h",
+    "time.h",
+    "trace.h",
+    "ulimit.h",
+    "unistd.h",
+    "utime.h",
+    "utmpx.h",
+    "wchar.h",
+    "wctype.h",
+    "wordexp.h",
+]
+
+unsupported_posix_headers = [
+    "complex.h",
+    "tgmath.h",
+]
+
 for header in sorted(chevron_includes, key=str.casefold):
     if not header.lower().endswith(".h"):
         continue  # ignore included non-header files
-    if header in posix_headers:
-        fc_support = posix_headers[header]["fc-support"]
-        if fc_support == "unsupported":
-            header_warnings += 1
-            logging.warning("included header <%s> is explicitly unsupported by Frama-C", header)
-        else:
-            logging.log(
-                fclog.VERBOSE,
-                "included %s header %s",
-                "C11" if header in c11_headers else "POSIX",
-                header,
-            )
+    if header in unsupported_posix_headers:
+        header_warnings += 1
+        logging.warning("included header <%s> is explicitly unsupported by Frama-C", header)
     else:
-        if is_local_header(local_dirs, header):
-            logging.log(
-                fclog.VERBOSE, "ok: included header <%s> seems to be available locally", header
-            )
-        else:
-            non_posix_headers.append(header)
-            header_warnings += 1
-            logging.warning("included non-POSIX header <%s>", header)
+        logging.log(
+            fclog.VERBOSE,
+            "included header %s",
+            header,
+        )
+    if is_local_header(local_dirs, header):
+        logging.log(fclog.VERBOSE, "ok: included header <%s> seems to be available locally", header)
+    elif header not in posix_headers:
+        non_posix_headers.append(header)
+        header_warnings += 1
+        logging.warning("included non-POSIX header <%s>", header)
+
+
 logging.info("Header-related warnings: %d", header_warnings)
 score["includes"] = header_warnings
 
