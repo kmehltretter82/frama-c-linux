@@ -4342,6 +4342,16 @@ and makeVarInfoCabs
          Hence, at this point only formals can have a VLA type *)
       bt (Cabs.PARENTYPE(attrs, ndt, a))
   in
+  begin
+    match vtype.tnode with
+    | TFun (_, None, _) ->
+      Kernel.warning ~current:true ~once:true ~wkey:Kernel.wkey_no_proto
+        "Function %s is declared without prototype.@ \
+         Its formals will be inferred from actual arguments at first call.@ \
+         Declare it as %s(void) if the function does not take any parameters."
+        n n
+    | _ -> ()
+  end;
   if Ast_attributes.contains "thread" nattr then begin
     let wkey = Kernel.wkey_inconsistent_specifier in
     let source = fst ldecl in
@@ -6377,17 +6387,6 @@ and doExp local_env
             Cil_printer.pp_exp f' Cil_datatype.Typ.pretty x
       in
       let argTypesList = argsToList argTypes in
-      let warn_no_proto f =
-        (* Do not punish twice users of completely undeclared functions. *)
-        if not (Ast_types.has_attribute Ast_attributes.fc_missingproto f.vtype) then
-          Kernel.warning ~source:(fst loc) ~wkey:Kernel.wkey_no_proto
-            "Calling function %a that is declared without prototype.@ \
-             Its formals will be inferred from actual arguments.@ \
-             Declare it as %a(void) if the function does not take any \
-             parameters."
-            Cil_printer.pp_varinfo f
-            Cil_printer.pp_varinfo f
-      in
       (* Drop certain qualifiers from the result type *)
       let resType' = Ast_types.remove_attributes ["warn_unused_result"] resType in
       (* Before we do the arguments we try to intercept a few builtins. For
@@ -6409,7 +6408,6 @@ and doExp local_env
                 Hence, it really has no parameter.
              *)
              if not isSpecialBuiltin && not are_ghost then begin
-               warn_no_proto f;
                let typ = mk_tfun ~tattr resType (Some []) false in
                Cil.update_var_type f typ;
              end
@@ -6540,7 +6538,6 @@ and doExp local_env
                   function, see 6.5.2.2.6 *)
                assert (not isvar);
                (* No nullary variadics see C11:6.7.6 *)
-               warn_no_proto f;
                let (prm_types,args) =
                  List.split
                    (List.mapi default_argument_promotion args)
