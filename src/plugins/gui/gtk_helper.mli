@@ -194,7 +194,7 @@ val spawn_command:
   ?timeout:int ->
   ?stdout:Buffer.t ->
   ?stderr:Buffer.t ->
-  string -> string array ->
+  string -> string list ->
   (Unix.process_status -> unit) ->
   unit
 (** Launches the given command and calls the given

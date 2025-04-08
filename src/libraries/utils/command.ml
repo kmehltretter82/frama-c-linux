@@ -141,7 +141,7 @@ let command_generic ~async ?stdout ?stderr cmd args =
       Extlib.safe_remove errf;
     end in
   let deleted = cancelable_at_exit delete in
-  let pid = Unix.create_process cmd (Array.append [|cmd|] args)
+  let pid = Unix.create_process cmd (Array.of_list (cmd :: args))
       (Unix.descr_of_out_channel inc)
       (Unix.descr_of_out_channel outc)
       (Unix.descr_of_out_channel errc)

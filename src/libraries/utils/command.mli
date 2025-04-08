@@ -123,7 +123,7 @@ val full_command_async :
 val async :
   ?stdout:Buffer.t ->
   ?stderr:Buffer.t ->
-  string -> string array
+  string -> string list
   -> (unit -> process_result)
 (** Same arguments as {!Unix.create_process}.
     @return a function to call to check if the process execution
@@ -137,7 +137,7 @@ val async :
 val command_async :
   ?stdout:Buffer.t ->
   ?stderr:Buffer.t ->
-  string -> string array
+  string -> string list
   -> (unit -> process_result)
 [@@deprecated "Use Command.async instead."]
 [@@migrate { repl = Command.async } ]
@@ -146,7 +146,7 @@ val spawn :
   ?timeout:int ->
   ?stdout:Buffer.t ->
   ?stderr:Buffer.t ->
-  string -> string array
+  string -> string list
   -> Unix.process_status
 (** Same arguments as {!Unix.create_process}.
     When this function returns, the stdout and stderr of the child
@@ -160,7 +160,7 @@ val command :
   ?timeout:int ->
   ?stdout:Buffer.t ->
   ?stderr:Buffer.t ->
-  string -> string array
+  string -> string list
   -> Unix.process_status
 [@@deprecated "Use Command.spawn instead."]
 [@@migrate { repl = Command.spawn } ]

@@ -225,7 +225,7 @@ let start_command ~timeout ?time ?stdout ?stderr cmd args =
     Kernel.debug ~dkey:Kernel.dkey_task "execute task '@[<hov 4>%t'@]"
       (fun fmt ->
          Format.pp_print_string fmt cmd ;
-         Array.iter
+         List.iter
            (fun c -> Format.fprintf fmt "@ %s" c) args) ;
     let timed = timeout > 0.0 || time <> None in
     let time_start = if timed then Unix.gettimeofday () else 0.0 in

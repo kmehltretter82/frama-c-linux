@@ -190,7 +190,7 @@ let launch_client cmd =
   | None ->
     begin
       let url = start_server () in
-      let process = Command.async cmd [| url |] in
+      let process = Command.async cmd [ url ] in
       Senv.debug "%s --connect %s@." cmd url ;
       Senv.feedback "Client launched." ;
       client := Some process ;

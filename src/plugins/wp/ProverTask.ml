@@ -227,10 +227,9 @@ class command name =
     method run ?(echo=false) ?logout ?logerr () : int Task.task =
       assert once ; once <- false ;
       let time = ref 0.0 in
-      let args = Array.of_list param in
       Buffer.clear stdout ;
       Buffer.clear stderr ;
-      Task.command ~timeout ~time ~stdout ~stderr cmd args
+      Task.command ~timeout ~time ~stdout ~stderr cmd param
       >>?
       begin fun st -> (* finally *)
         if Wp_parameters.has_dkey dkey_prover then
