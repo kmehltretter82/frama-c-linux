@@ -106,10 +106,3 @@ module Make (Domain : Abstract.Domain.External)
            Domain.pretty state)
       s
 end
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../../.."
-End:
-*)

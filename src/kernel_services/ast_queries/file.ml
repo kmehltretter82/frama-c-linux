@@ -1964,9 +1964,3 @@ let create_rebuilt_project_from_visitor
     prj
   with Sys_error s ->
     Kernel.abort "cannot create temporary file: %s" s
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

@@ -2410,9 +2410,3 @@ let all_actions_preds start state =
       (treat_current_state pre_state) map acc
   in
   Data_for_aorai.Aorai_state.Map.fold treat_start_state state []
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

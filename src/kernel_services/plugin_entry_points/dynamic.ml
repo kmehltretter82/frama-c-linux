@@ -276,9 +276,3 @@ module Parameter = struct
   end
 
 end
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

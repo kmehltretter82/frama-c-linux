@@ -266,9 +266,3 @@ let clear () =
   Select.WrAccess.clear () ;
   Select.Value.clear () ;
   OptionModified.clear ()
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

@@ -256,9 +256,3 @@ let pretty_history fmt =
     Format.fprintf fmt
       "@[<v 2>Origins of garbled mix generated during analysis:@,%a@]"
       (Pretty_utils.pp_list ~sep:"@," pp_origin) list
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

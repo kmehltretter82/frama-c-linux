@@ -25,9 +25,3 @@
 val inject: unit -> unit
 (** Inject all the necessary pieces of code for monitoring the program
     annotations. *)
-
-(*
-Local Variables:
-compile-command: "make -C ../../../../.."
-End:
-*)

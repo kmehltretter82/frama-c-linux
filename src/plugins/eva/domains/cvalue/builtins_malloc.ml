@@ -929,10 +929,3 @@ let check_leaked_malloced_bases state _ =
 let () =
   Builtins.register_builtin "Frama_C_check_leak" NoCacheCallers
     check_leaked_malloced_bases
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../../../.."
-End:
-*)

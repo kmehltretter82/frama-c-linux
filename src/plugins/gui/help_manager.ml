@@ -140,9 +140,3 @@ let () =
                 (Menu_manager.Unit_callback (fun () -> show window));
             ]);
     )
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

@@ -131,10 +131,3 @@ end
 
 val is_gui: bool
 (** Is the Frama-C GUI running? *)
-
-
-(*
-  Local Variables:
-  compile-command: "make -C ../../.."
-  End:
-*)

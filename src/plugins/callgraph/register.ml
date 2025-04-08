@@ -28,9 +28,3 @@ let main () =
     if not (Cg.is_computed ()) then Cg.dump ()
 
 let () = Boot.Main.extend main
-
-(*
-Local Variables:
-compile-command: "make -C ../.."
-End:
-*)

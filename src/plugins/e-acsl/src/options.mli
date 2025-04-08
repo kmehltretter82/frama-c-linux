@@ -69,9 +69,3 @@ val setup: ?rtl:bool -> unit -> unit
 (** Verify and initialize the options of the current project according to the
     options set by the user.
     If [rtl] is true, then the project being modified is the RTL project. *)
-
-(*
-Local Variables:
-compile-command: "make -C ../../../.."
-End:
-*)

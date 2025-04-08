@@ -27,11 +27,3 @@ include
       let shortname = "studia"
       let help = "Tools for Eva case studies"
     end)
-
-
-
-(*
-Local Variables:
-compile-command: "make"
-End:
-*)

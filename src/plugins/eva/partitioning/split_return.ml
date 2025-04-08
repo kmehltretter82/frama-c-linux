@@ -327,10 +327,3 @@ let pretty_strategies () =
     let dkey = Self.dkey_split_return in
     Self.feedback ~dkey
       "@[<v 2>Splitting return states on:@;%t@]" pretty_strategies
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../../.."
-End:
-*)

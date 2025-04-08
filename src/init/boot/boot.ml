@@ -26,9 +26,3 @@
 
 let () = Frama_c_kernel.Boot.boot ()
 (* Implicit exit 0 if we haven't exited yet *)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

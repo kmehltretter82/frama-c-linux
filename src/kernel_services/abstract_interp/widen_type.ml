@@ -245,9 +245,3 @@ let default () =
   let negatives = List.map (fun x -> -.x) positives in
   let float_default = FloatSet.(union (of_list positives) (of_list negatives)) in
   join (num_hints None None int_default) (float_hints None None float_default)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

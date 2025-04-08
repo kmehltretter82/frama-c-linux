@@ -395,9 +395,3 @@ val zone_of_varinfo : varinfo -> Zone.t
 val loc_of_varinfo : varinfo -> location
 val loc_of_base : Base.t -> location
 val loc_of_typoffset : Base.t -> typ -> offset -> location
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

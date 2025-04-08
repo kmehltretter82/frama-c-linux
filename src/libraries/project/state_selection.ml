@@ -212,9 +212,3 @@ let pretty fmt sel =
 
 let pretty_witness fmt (_, w) =
   pretty_witness fmt w
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

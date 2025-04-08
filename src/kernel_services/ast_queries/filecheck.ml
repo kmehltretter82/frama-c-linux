@@ -1380,9 +1380,3 @@ let check_ast ?is_normalized ?(ast = Ast.get()) what =
     ast;
   Cil.visitCilFileSameGlobals
     (new M.check ?is_normalized what :> Cil.cilVisitor) ast
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

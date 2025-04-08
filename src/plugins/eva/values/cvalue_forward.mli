@@ -56,9 +56,3 @@ val forward_cast:
 val make_volatile: ?typ:typ -> V.t -> V.t
 
 val eval_float_constant: float -> fkind -> string option -> V.t
-
-(*
-Local Variables:
-compile-command: "make -C ../../../.."
-End:
-*)

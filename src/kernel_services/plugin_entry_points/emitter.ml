@@ -654,9 +654,3 @@ struct
 end
 
 include D
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

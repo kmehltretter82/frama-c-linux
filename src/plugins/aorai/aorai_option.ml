@@ -154,10 +154,3 @@ let emitter =
         AddingOperationNameAndStatusInSpecification.parameter;
         InstrumentationHistory.parameter;
         GenerateAnnotations.parameter ]
-
-
-(*
-  Local Variables:
-  compile-command: "make -C ../../.."
-  End:
-*)

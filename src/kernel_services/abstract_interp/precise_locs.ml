@@ -400,9 +400,3 @@ let reduce_by_valid_part access ~bitfield precise_loc size =
 let valid_part access ~bitfield {loc; size} =
   { loc = reduce_by_valid_part ~bitfield access loc size;
     size = size }
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

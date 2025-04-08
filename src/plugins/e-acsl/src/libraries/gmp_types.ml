@@ -123,9 +123,3 @@ let init () =
 
 let is_t ty =
   Z.is_t ty || Q.is_t ty
-
-(*
-Local Variables:
-compile-command: "make -C ../../../../.."
-End:
-*)

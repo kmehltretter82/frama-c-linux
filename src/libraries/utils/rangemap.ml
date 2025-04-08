@@ -543,9 +543,3 @@ module Make(Ord: Datatype.S)(Value: Value) = struct
       end)
 
 end
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

@@ -266,10 +266,3 @@ let pretty_callstack_short fmt cs =
     let list = List.rev (Callstack.to_kf_list q) in
     Pretty_utils.pp_flowlist ~left:"@[" ~sep:" ←@ " ~right:"@]"
       Kernel_function.pretty fmt list
-
-
-(*
-Local Variables:
-compile-command: "make -C ../.."
-End:
-*)

@@ -161,9 +161,3 @@ val load_plugin_path: unit -> unit
     Must be invoked only once from boot during extending stage.
     @since Magnesium-20151001 new API. *)
 (**/**)
-
-(*
-  Local Variables:
-  compile-command: "make -C ../../.."
-  End:
-*)

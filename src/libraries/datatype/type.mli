@@ -344,9 +344,3 @@ end
 (* ****************************************************************************)
 
 val add_abstract_types: (string -> string -> unit) ref
-
-(*
-  Local Variables:
-  compile-command: "make -C ../../.."
-  End:
-*)

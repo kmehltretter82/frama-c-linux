@@ -162,9 +162,3 @@ module Make(P: sig val phase:Options.category end): S =
   Make_with_opt(struct let phase = Some P.phase end)
 
 include Make_with_opt(struct let phase = None end)
-
-(*
-Local Variables:
-compile-command: "make"
-End:
-*)

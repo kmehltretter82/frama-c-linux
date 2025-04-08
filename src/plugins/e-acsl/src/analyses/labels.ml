@@ -563,9 +563,3 @@ let _debug () =
          !ats_ref
     )
     at_data_for_stmts
-
-(*
-Local Variables:
-compile-command: "make -C ../../../../.."
-End:
-*)

@@ -40,9 +40,3 @@ module Services: module type of Services
 
 module Uses: module type of Uses
 (** Several useful functions over the callgraph *)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

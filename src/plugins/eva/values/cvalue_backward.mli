@@ -58,10 +58,3 @@ val backward_cast:
   src_val: V.t ->
   dst_val: V.t ->
   V.t option
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../../.."
-End:
-*)

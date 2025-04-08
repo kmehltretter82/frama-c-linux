@@ -55,9 +55,3 @@ val dnfToCond :
 val simplifyDNFwrtCtx :
   Automaton_ast.typed_condition list list -> Cil_types.kernel_function ->
   Automaton_ast.funcStatus -> Automaton_ast.typed_condition
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

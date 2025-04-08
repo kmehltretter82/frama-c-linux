@@ -250,9 +250,3 @@ val with_params_and_result:
     with the updated environment. *)
 
 val pretty: Format.formatter -> t -> unit
-
-(*
-Local Variables:
-compile-command: "make -C ../.."
-End:
-*)

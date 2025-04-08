@@ -268,9 +268,3 @@ val frama_c_destructor: string
 val fc_local_static: string
 [@@deprecated "use Ast_attributes.fc_local_static instead."]
 [@@migrate { repl = Ast_attributes.fc_local_static }]
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

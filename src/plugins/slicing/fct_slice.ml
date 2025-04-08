@@ -1490,9 +1490,3 @@ let print_ff_sig fmt ff =
   | None -> Format.fprintf fmt "<not computed>"
   | Some s -> SlicingMarks.pretty_sig fmt s
 (*-----------------------------------------------------------------------*)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

@@ -172,9 +172,3 @@ let find_code_annot_nodes pdg stmt annot =
       annot.annot_id;
     raise Not_found (* unreachable statement *)
   end
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

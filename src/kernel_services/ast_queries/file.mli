@@ -240,9 +240,3 @@ val pretty_ast : ?prj:Project.t -> ?fmt:Format.formatter -> unit -> unit
     The default project is the current one.
     The default formatter is [Kernel.CodeOutput.get_fmt ()].
     @raise File_types.Bad_Initialization if the file is not initialized. *)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

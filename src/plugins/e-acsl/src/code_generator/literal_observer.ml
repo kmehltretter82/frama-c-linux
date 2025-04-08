@@ -61,9 +61,3 @@ let subst_all_literals_in_exp env kf e =
   end in
   let e = Cil.visitCilExpr o e in
   e, !env_ref
-
-(*
-Local Variables:
-compile-command: "make -C ../../../../.."
-End:
-*)

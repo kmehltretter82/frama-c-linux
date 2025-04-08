@@ -865,9 +865,3 @@ let inject () =
     Project.pretty current_project;
   inject_in_file ast;
   reset_all ast;
-
-(*
-Local Variables:
-compile-command: "make -C ../../../../.."
-End:
-*)

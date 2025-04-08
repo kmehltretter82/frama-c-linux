@@ -1123,11 +1123,3 @@ module Hashcons
   let id { id } = id
 
 end
-
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

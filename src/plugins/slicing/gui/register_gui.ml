@@ -603,9 +603,3 @@ let main (main_ui:Design.main_window_extension_points) =
 
 let () =
   Design.register_extension main
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

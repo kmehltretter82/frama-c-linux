@@ -137,9 +137,3 @@ module Non_Natural_Loops =
 let get_non_naturals = Non_Natural_Loops.memo get_non_naturals
 
 let is_non_natural kf s = Stmt.Set.mem s (get_non_naturals kf)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

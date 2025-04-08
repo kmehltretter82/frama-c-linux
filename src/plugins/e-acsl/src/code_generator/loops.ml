@@ -433,9 +433,3 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
   | Lvs_global _ :: _ ->
     Error.not_yet
       "creating nested loops from global logic variable"
-
-(*
-Local Variables:
-compile-command: "make -C ../../../../.."
-End:
-*)

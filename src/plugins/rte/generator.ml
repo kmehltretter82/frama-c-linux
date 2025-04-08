@@ -222,9 +222,3 @@ let get_registered_annotations stmt =
     (fun e a acc -> if Emitter.equal e emitter then a ::acc else acc)
     stmt
     []
-
-(*
-  Local Variables:
-  compile-command: "make -C ../../.."
-  End:
- *)

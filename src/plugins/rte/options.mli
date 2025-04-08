@@ -36,9 +36,3 @@ module Warn : Parameter_sig.Bool
 module FunctionSelection: Parameter_sig.Kernel_function_set
 
 val dkey_annot: category
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

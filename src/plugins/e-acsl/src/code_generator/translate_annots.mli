@@ -60,9 +60,3 @@ val post_code_annotation:
     {!pre_code_annotation} is popped from the environment. Some care
     should be taken to call this function at the right time to pop the right
     contract. *)
-
-(*
-Local Variables:
-compile-command: "make -C ../../../../.."
-End:
-*)

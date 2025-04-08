@@ -62,9 +62,3 @@ val trim_by_validity :
       [start_to<min_valid || stop_to > max_sure_valid]. This convention works
       even when [min_valid..max_sure_valid] is not a real interval.
 *)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

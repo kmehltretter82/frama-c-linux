@@ -741,10 +741,3 @@ module Computer
     in
     Eva_utils.protect compute ~cleanup
 end
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../../.."
-End:
-*)

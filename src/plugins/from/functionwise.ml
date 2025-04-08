@@ -109,9 +109,3 @@ let get = To_Use.memo
 
 let pretty fmt v =
   From_memory.pretty_with_type (Kernel_function.get_type v) fmt (get v)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

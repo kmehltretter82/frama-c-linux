@@ -207,9 +207,3 @@ let ival = Abstract_value.Leaf (module Interval)
 
 module Sign = Sign_value
 let sign = Abstract_value.Leaf (module Sign)
-
-(*
-Local Variables:
-compile-command: "make -C ../../../.."
-End:
-*)

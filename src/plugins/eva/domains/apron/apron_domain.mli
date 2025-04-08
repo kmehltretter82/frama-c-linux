@@ -29,9 +29,3 @@ val box: Abstractions.Domain.registered
 val polka_loose: Abstractions.Domain.registered
 val polka_strict: Abstractions.Domain.registered
 val polka_equality: Abstractions.Domain.registered
-
-(*
-Local Variables:
-compile-command: "make -C ../../../.."
-End:
-*)

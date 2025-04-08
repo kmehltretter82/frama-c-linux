@@ -118,9 +118,3 @@ exception NoMatchingOffset
     @raise NoMatchingOffset when no offset matches. *)
 val find_offset:
   typ -> offset:Integer.t -> offset_match -> Cil_types.offset * Cil_types.typ
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

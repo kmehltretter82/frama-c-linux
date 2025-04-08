@@ -66,9 +66,3 @@ let delete_from_set env kf vars =
     env
     kf
     vars
-
-(*
-Local Variables:
-compile-command: "make -C ../../../../.."
-End:
-*)

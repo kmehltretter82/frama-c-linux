@@ -829,9 +829,3 @@ module type Builder = sig
   val parameters: unit -> Typed_parameter.t list
 
 end
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

@@ -435,9 +435,3 @@ let compute ~libc =
 (* Reexport a simpler function *)
 let compute_syntactic ~libc kf =
   fst (compute_syntactic ~libc kf)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

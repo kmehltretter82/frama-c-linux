@@ -222,9 +222,3 @@ val transfer_switch_from_guard:
 (** Same as {!transfer_if_from_guard}, but for a [Switch] statement. The
     same function [transfer_guard] can be used for [transfer_if_from_guard]
     and [transfer_switch_from_guard]. *)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

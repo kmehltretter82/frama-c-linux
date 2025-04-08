@@ -113,9 +113,3 @@ module UsedFiles =
       let option_name = "-metrics-used-files"
       let help = "list files containing global definitions reachable by main"
     end)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

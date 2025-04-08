@@ -508,9 +508,3 @@ module Getters (Dom : Abstract.Domain.External) = struct
     | `Bottom -> Cvalue.Model.bottom
     | `Value state -> get_cvalue_or_top state
 end
-
-(*
-Local Variables:
-compile-command: "make -C ../../../../.."
-End:
-*)

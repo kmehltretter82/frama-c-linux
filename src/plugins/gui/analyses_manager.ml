@@ -91,9 +91,3 @@ let insert (main_ui: Design.main_window_extension_points) =
     ()
 
 let () = Design.register_extension insert
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

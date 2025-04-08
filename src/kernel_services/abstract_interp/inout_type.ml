@@ -149,10 +149,3 @@ let join c1 c2 = {
   under_outputs_if_termination =
     Zone.meet c1.under_outputs_if_termination c2.under_outputs_if_termination;
 }
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

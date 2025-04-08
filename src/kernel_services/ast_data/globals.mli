@@ -346,8 +346,3 @@ val find_first_stmt: (kernel_function -> stmt) ref
 val find_enclosing_block: (stmt -> block) ref
 val find_all_enclosing_blocks: (stmt -> block list) ref
 val find_englobing_kf: (stmt -> kernel_function) ref
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

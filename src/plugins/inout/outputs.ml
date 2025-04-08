@@ -193,9 +193,3 @@ let _stmt_outputs =
     "stmt_outputs"
     Datatype.(func Cil_datatype.Stmt.ty Zone.ty)
     Analysis.statement
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

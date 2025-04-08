@@ -939,9 +939,3 @@ let removeUnused ?(isRoot=isExportedRoot) ast =
       (* take out the trash *)
       removeUnmarked isRoot ast reachable_tbl
     end
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

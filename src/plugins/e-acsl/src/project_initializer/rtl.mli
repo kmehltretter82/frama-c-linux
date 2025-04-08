@@ -44,9 +44,3 @@ module Symbols: sig
       the varinfo of the RTL function that replaces it. The function
       [get_name] is used to find the name of the RTL replacement. *)
 end
-
-(*
-Local Variables:
-compile-command: "make -C ../../../../.."
-End:
-*)

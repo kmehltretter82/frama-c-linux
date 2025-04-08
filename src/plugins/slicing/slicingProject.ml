@@ -387,9 +387,3 @@ let apply_all_actions () =
           ~level:2 "done (applying %d actions." nb_actions
   in
   apply_user 1
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

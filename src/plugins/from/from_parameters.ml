@@ -61,11 +61,3 @@ let () =
   VerifyAssigns.add_set_hook
     (fun _ new_ ->
        if new_ then ForceCallDeps.set true)
-
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

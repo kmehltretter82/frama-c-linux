@@ -689,9 +689,3 @@ let add_persistent_cmdline () =
   end;
   SlicingParameters.feedback ~level:2
     "done (interpreting slicing requests from the command line)."
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

@@ -694,9 +694,3 @@ let get_global =
          Kernel.fatal
            "[Kernel_function.get_global] unknown function %a"
            pretty kf)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

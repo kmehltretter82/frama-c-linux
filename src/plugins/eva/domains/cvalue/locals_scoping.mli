@@ -74,9 +74,3 @@ val substitute:
   Base.substitution -> clobbered_set -> Cvalue.Model.t -> Cvalue.Model.t
 (** [substitute substitution clob state] applies [substitution] to all pointer
     values in the offsetmaps bound to variables in [clob] in [state]. *)
-
-(*
-Local Variables:
-compile-command: "make -C ../../../../.."
-End:
-*)

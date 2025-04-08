@@ -92,9 +92,3 @@ let use state c = State_dependency_graph.add_codependencies ~onto:state c.states
 let get_name c = c.name
 let get_fold c = c.fold
 let get_mem c = c.mem
-
-(*
-  Local Variables:
-  compile-command: "make -C ../../.."
-  End:
- *)

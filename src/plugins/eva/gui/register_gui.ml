@@ -742,9 +742,3 @@ let main (main_ui:main_ui) =
 
 let () = Design.register_extension main
 ;;
-
-(*
-Local Variables:
-compile-command: "make -C ../../../.."
-End:
-*)

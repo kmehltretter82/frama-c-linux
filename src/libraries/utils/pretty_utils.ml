@@ -210,9 +210,3 @@ let pp_items ?align ?margin ?min ?max ~title ~iter ?pp_title ~pp_item fmt =
   iter (fun e -> add_margin m ?margin ?min ?max (title e)) ;
   let pp = pp_margin ?align ?pp:pp_title m in
   iter (pp_item pp fmt)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

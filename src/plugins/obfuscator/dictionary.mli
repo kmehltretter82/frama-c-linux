@@ -32,9 +32,3 @@ val pretty: Format.formatter -> unit
 
 val mark_as_computed: unit -> unit
 val is_computed: unit -> bool
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

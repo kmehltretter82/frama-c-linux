@@ -29,10 +29,3 @@
 
 include Int_Intervals_sig.S
   with type t = Offsetmap.Int_Intervals.t
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../.. byte"
-End:
-*)

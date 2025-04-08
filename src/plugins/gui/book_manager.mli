@@ -65,9 +65,3 @@ val enable_popup : t -> bool -> unit
 val set_scrollable : t -> bool -> unit
 
 val length: t -> int
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

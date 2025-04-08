@@ -763,10 +763,3 @@ let prepareCFG ?(keepSwitch=false) (fd : fundec) : unit =
   ignore (visitCilFunction (new registerLabelsVisitor) fd);
   let b = xform_switch_block ~keepSwitch fd.sbody in
   fd.sbody <- b
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

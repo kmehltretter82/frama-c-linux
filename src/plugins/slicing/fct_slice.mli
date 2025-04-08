@@ -95,9 +95,3 @@ val merge_inputs_m1_mark : fct_slice -> pdg_mark
 val clear_ff : fct_slice -> unit
 
 val print_ff_sig : Format.formatter -> fct_slice -> unit
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

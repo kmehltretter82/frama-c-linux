@@ -32,8 +32,3 @@ val bool3and: t -> t -> t
 val bool3or: t -> t -> t
 val bool3not: t -> t
 val bool3_of_bool: bool -> t
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

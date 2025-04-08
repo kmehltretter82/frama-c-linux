@@ -50,9 +50,3 @@ val get_all: t -> lscope_var list
 val is_used: t -> pred_or_term -> bool
 (* [is_used lscope pot] returns [true] iff [pot] uses a variable from
    [lscope]. *)
-
-(*
-Local Variables:
-compile-command: "make -C ../../../../.."
-End:
-*)

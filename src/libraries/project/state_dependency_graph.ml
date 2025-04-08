@@ -94,9 +94,3 @@ module Dot(A:Attributes) = struct
     close_out cout
 end
 include Dot(Attributes)
-
-(*
-  Local Variables:
-  compile-command: "make -C ../../.."
-  End:
- *)

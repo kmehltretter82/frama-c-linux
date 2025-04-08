@@ -78,9 +78,3 @@ module Make(G: G) = struct
   let iter f g = fold (fun v () -> f v) g ()
 
 end
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

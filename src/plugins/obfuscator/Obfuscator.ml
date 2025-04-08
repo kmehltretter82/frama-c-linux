@@ -24,9 +24,3 @@
 
 (** No function is directly exported: they are registered via
     {!Dynamic.register}. *)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

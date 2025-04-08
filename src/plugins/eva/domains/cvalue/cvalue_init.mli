@@ -23,10 +23,3 @@
 open Cil_types
 
 val initialize_var_using_type: varinfo -> Cvalue.Model.t -> Cvalue.Model.t
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../../../.."
-End:
-*)

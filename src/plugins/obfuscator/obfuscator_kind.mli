@@ -41,9 +41,3 @@ type k =
 
 include Datatype.S_with_collections with type t = k
 val prefix: t -> string
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

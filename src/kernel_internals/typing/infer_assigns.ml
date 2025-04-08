@@ -154,9 +154,3 @@ let from_prototype kf =
     let loc = vi.vdecl in
     let result = Logic_const.(new_identified_term (tresult ~loc rtyp)) in
     (result, From (inputs vi.vghost)):: arguments
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

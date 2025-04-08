@@ -233,9 +233,3 @@ val pp_margin : ?align:align -> ?pp:string formatter -> marger -> string formatt
       end
     ]}
 *)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

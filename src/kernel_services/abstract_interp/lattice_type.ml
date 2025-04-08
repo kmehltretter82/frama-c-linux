@@ -225,9 +225,3 @@ module type Lattice_Set = sig
   val project : t -> O.t
   val mem : O.elt -> t -> bool
 end
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

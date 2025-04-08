@@ -56,9 +56,3 @@ val set_off: unit -> unit
 val clear: unit -> unit
 
 val wkey_cmdline: warn_category
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

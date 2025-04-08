@@ -111,10 +111,3 @@ let main () =
   if not (Report_parameters.CSVFile.is_empty ()) then print_csv ()
 
 let () = Boot.Main.extend main
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

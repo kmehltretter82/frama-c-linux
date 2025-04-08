@@ -287,8 +287,3 @@ type cacheable =
   | NoCacheCallers (** Functions for which neither the call, neither the
                        callers, can be cached. *)
 [@@@ api_end]
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

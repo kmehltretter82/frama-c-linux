@@ -290,9 +290,3 @@ let apply_builtin (builtin:builtin) call ~pre ~post =
   | Outside_builtin_possibilities ->
     Self.fatal ~current:true
       "Call to builtin %a failed" Kernel_function.pretty call.kf
-
-(*
-Local Variables:
-compile-command: "make -C ../../../../.."
-End:
-*)

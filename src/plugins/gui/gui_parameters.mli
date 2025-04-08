@@ -31,9 +31,3 @@ module Project_name: Parameter_sig.String
 
 module Undo: Parameter_sig.Bool
 (** Option -undo. *)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

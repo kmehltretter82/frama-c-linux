@@ -364,9 +364,3 @@ let are_consistent d1 d2 =
   Unmarshal_tbl.clear unmarshal_consistent_visited;
   Tbl.clear consistent_visited;
   b
-
-(*
-  Local Variables:
-  compile-command: "make -C ../../.."
-  End:
- *)

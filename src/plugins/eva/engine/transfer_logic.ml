@@ -692,10 +692,3 @@ module Make
       States.map (interpret_extension extension) states
 
 end
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../../.."
-End:
-*)

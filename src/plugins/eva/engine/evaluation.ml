@@ -1746,9 +1746,3 @@ module Make
       end
     | _ -> assert false
 end
-
-(*
-Local Variables:
-compile-command: "make -C ../../../.."
-End:
-*)

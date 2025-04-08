@@ -1857,9 +1857,3 @@ let code_annot_of_kf kf = match kf.fundec with
 let remove_code_annot e ?kf stmt ca =
   remove_code_annot_internal e ?kf stmt ca;
   Changed.apply()
-
-(*
-  Local Variables:
-  compile-command: "make -C ../../.."
-  End:
-*)

@@ -461,10 +461,3 @@ module Make (Engine: Engine_sig.S) = struct
     Engine.Dom.Store.register_global_state b (`Value init_state);
     compute kf init_state
 end
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../../.."
-End:
-*)

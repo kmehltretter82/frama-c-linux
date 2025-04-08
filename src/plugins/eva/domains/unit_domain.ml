@@ -76,10 +76,3 @@ module Make
 
   let relate _ _ () = Base.SetLattice.empty
 end
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../../.."
-End:
-*)

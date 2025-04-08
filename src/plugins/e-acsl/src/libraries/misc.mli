@@ -93,9 +93,3 @@ val extract_uncoerced_lval: exp -> exp option
 
     If at some point the expression is neither a [CastE] nor an [Lval], then
     return [None]. *)
-
-(*
-Local Variables:
-compile-command: "make -C ../../../../.."
-End:
-*)

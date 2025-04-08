@@ -74,9 +74,3 @@ val localizable_from_locs :
     visible in the current [Locs.state].
     This function is inefficient as it iterates on all the current
     [Locs.state]. *)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

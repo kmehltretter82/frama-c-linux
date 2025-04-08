@@ -242,9 +242,3 @@ let mark_invalid_initializers () =
       | _ -> ()
   in
   Annotations.iter_code_annot do_code_annot first_stmt
-
-(*
-Local Variables:
-compile-command: "make -C ../../../.."
-End:
-*)

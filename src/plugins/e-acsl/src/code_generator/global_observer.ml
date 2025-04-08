@@ -205,9 +205,3 @@ let mk_clean_function () =
     in
     fundec.sbody.bstmts <- stmts;
     Some (vi, fundec)
-
-(*
-Local Variables:
-compile-command: "make -C ../../../../.."
-End:
-*)

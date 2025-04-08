@@ -142,9 +142,3 @@ val pack: 'a t -> Structural_descr.pack
 
 val input_val: in_channel -> 'a t -> 'a
 (** @since Carbon-20101201 *)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

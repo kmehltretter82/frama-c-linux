@@ -82,9 +82,3 @@ let make ~packing ~callback =
 let append t message = t.append message
 
 let clear t = t.clear ()
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

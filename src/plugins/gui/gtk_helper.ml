@@ -1046,9 +1046,3 @@ let image_menu_item ~(image:GObj.widget) ~text ~packing =
   box#pack (GMisc.label ~text ())#coerce;
   packing mi;
   mi
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

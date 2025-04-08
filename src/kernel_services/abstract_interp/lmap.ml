@@ -758,9 +758,3 @@ struct
     List.fold_left cleanup state vars
 
 end
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

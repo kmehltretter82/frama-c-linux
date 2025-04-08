@@ -75,9 +75,3 @@ val pretty_history: Format.formatter -> unit
 (** Clears the history of origins saved by [register_write] and
     [register_read] above. *)
 val clear: unit -> unit
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

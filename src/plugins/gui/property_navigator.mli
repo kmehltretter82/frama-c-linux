@@ -29,9 +29,3 @@ module Rte: sig
     * (Cil_types.kernel_function -> bool)
   val register_get_all_status : (unit -> status_accessor list) -> unit
 end
-
-(*
-  Local Variables:
-  compile-command: "make -C ../../.."
-  End:
-*)

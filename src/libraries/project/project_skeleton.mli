@@ -68,9 +68,3 @@ module Make_setter(_: sig val mem: string -> bool end) : sig
   (** @since Carbon-20101201 *)
 
 end
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

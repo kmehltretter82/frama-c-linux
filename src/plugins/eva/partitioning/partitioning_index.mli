@@ -43,10 +43,3 @@ module Make (Domain: Abstract.Domain.External) : sig
 
   val pretty : Format.formatter -> t -> unit
 end
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../../.."
-End:
-*)

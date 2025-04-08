@@ -1815,10 +1815,3 @@ module List_with_collections(T:S) =
 
 module Array_with_collections(T:S) =
   With_collections (Array(T))
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

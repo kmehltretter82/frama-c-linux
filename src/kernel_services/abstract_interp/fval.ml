@@ -202,9 +202,3 @@ let backward_cast_float_to_double = backward_cast ~src:Single
 let backward_cast_double_to_real t = t
 
 let subdiv_float_interval = subdivide
-
-(*
-Local Variables:
-compile-command: "make -C ../../.. byte"
-End:
-*)

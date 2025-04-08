@@ -142,9 +142,3 @@ struct
   include Make_pp(struct let printer = printer end)
 
 end
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

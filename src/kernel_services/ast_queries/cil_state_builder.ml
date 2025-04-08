@@ -35,9 +35,3 @@ module Lval_hashtbl = Hashtbl(Lval.Hashtbl)
 module Code_annotation_hashtbl =
   State_builder.Hashtbl(Cil_datatype.Code_Annotation)
  *)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

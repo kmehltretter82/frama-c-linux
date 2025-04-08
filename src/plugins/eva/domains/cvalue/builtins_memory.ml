@@ -658,10 +658,3 @@ let frama_c_ungarble _state = function
   | _ -> raise (Builtins.Invalid_nb_of_args 1)
 
 let () = register_builtin "Frama_C_ungarble" frama_c_ungarble
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../../../.."
-End:
-*)

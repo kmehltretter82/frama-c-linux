@@ -236,10 +236,3 @@ end
 type 'v dependencies =
   | Leaf: (module Leaf with type t = 'v) -> 'v dependencies
   | Node: 'l dependencies * 'r dependencies -> ('l * 'r) dependencies
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../../.."
-End:
-*)

@@ -1077,9 +1077,3 @@ let compute () =
   compute_backward ();
   Aorai_option.debug ~dkey:backward_dkey "After backward analysis";
   Data_for_aorai.debug_computed_state ~dkey:backward_dkey();
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

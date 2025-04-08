@@ -42,9 +42,3 @@ module Register: sig
 
   val classify_accesses: kernel_function option * kinstr *lval -> access_type
 end = Register
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

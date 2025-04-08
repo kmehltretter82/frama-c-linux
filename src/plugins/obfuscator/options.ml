@@ -53,9 +53,3 @@ module Literal_string =
     end)
 
 let states = [ Run.self; Dictionary.self; Literal_string.self ]
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

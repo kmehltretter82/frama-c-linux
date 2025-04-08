@@ -1224,9 +1224,3 @@ let explain_cmdline () =
        Format.fprintf fmt "[kernel] Explaining command-line options:@.");
   List.iter pp_option_help (List.rev option_names);
   raise Exit
-
-(*
-  Local Variables:
-  compile-command: "make -C ../../.."
-  End:
-*)

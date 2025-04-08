@@ -250,9 +250,3 @@ let print_all = print_all
 
 let main _fmt = if Print.get () then print_all ()
 let () = Boot.Main.extend main
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

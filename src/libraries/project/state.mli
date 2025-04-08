@@ -184,9 +184,3 @@ val create:
 
 val delete: t -> unit
 (** @since Carbon-20101201 *)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

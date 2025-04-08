@@ -768,9 +768,3 @@ module Pdg = struct
     close_out file
 
 end
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

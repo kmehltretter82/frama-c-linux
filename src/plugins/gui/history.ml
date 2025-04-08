@@ -293,9 +293,3 @@ let translate_history_elt old_helt =
   | Localizable (PLval(None,_,_) | PExp(None,_,_) | PTermLval(None,_,_,_)
                 | PVDecl(None,_,_) | PType _) -> (* no names useful? *) None
   | Localizable (PIP _ ) -> (* no names available *) None
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

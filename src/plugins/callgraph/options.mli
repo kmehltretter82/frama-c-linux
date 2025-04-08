@@ -33,9 +33,3 @@ module Services: Parameter_sig.Bool
 
 val dump: (out_channel -> 'a -> unit) -> 'a -> unit
 (** dump the given value into [Filename.get ()] by using [output] *)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

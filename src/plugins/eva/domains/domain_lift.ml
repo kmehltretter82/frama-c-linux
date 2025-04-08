@@ -170,10 +170,3 @@ module Make
   let post_analysis = Domain.post_analysis
 
 end
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../../.."
-End:
-*)

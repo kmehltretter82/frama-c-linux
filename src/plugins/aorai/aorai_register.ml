@@ -201,9 +201,3 @@ let run, _ =
 
 let main () = if Aorai_option.is_on () then run ()
 let () = Boot.Main.extend main
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

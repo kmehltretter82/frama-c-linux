@@ -333,9 +333,3 @@ module Model: sig
   val cardinal_estimate: t -> CardinalEstimate.t
 
 end
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

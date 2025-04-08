@@ -115,10 +115,3 @@ let warn_unsupported_spec name =
       Printer.pp_varname name Filepath.Normalized.pretty
       (Filepath.Normalized.concat System_config.Share.libc header)
   with Not_found -> ()
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../../.."
-End:
-*)

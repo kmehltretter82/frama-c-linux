@@ -167,9 +167,3 @@ class menu_manager: ?packing:(GObj.widget -> unit) -> Gtk_helper.host ->
     (** Reset the activation state of the buttons
         @since Nitrogen-20111001 *)
   end
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

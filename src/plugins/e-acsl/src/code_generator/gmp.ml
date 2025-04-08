@@ -447,9 +447,3 @@ end
 
 let () =
   Env.gmp_clear_ref := clear
-
-(*
-Local Variables:
-compile-command: "make -C ../../../../.."
-End:
-*)

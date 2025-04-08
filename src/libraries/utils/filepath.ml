@@ -443,9 +443,3 @@ struct
   let (let*) with_open f = with_open f |> Result.join
   let (let$) with_open f = with_open f
 end
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

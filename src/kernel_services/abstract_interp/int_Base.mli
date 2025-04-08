@@ -40,9 +40,3 @@ val project: t -> Integer.t
 (** @raise Error_Top if the argument is {!Top}. *)
 
 val cardinal_zero_or_one: t -> bool
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

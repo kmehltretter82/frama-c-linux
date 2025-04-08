@@ -145,9 +145,3 @@ module Concurrency: sig
   (** Given the name of C library function return the name of the RTL function
       that potentially replaces it. *)
 end (* Concurrency *)
-
-(*
-Local Variables:
-compile-command: "make -C ../../../../.."
-End:
-*)

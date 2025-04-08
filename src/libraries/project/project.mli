@@ -281,9 +281,3 @@ module Undo: sig
   val restore: unit -> unit
   val clear_breakpoint: unit -> unit
 end
-
-(*
-  Local Variables:
-  compile-command: "make -C ../../.."
-  End:
-*)

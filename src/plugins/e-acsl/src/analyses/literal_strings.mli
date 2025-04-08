@@ -33,9 +33,3 @@ val add: string -> varinfo -> unit
 val find: string -> varinfo
 
 val fold: (string -> varinfo -> 'a -> 'a) -> 'a -> 'a
-
-(*
-Local Variables:
-compile-command: "make"
-End:
-*)

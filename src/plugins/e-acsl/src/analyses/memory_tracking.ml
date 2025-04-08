@@ -894,9 +894,3 @@ let found_concurrent_function ~loc vi =
     match !concurrent_function_ref with
     | None -> concurrent_function_ref := Some (loc, vi)
     | Some _ -> ()
-
-(*
-Local Variables:
-compile-command: "make -C ../../../../.."
-End:
-*)

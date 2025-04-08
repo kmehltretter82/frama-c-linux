@@ -61,9 +61,3 @@ module DotBasename =
       let arg_name = "basename"
       let help = "put the PDG of function <f> in basename.f.dot"
     end)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

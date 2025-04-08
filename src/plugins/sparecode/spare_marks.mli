@@ -35,9 +35,3 @@ val key_visible : fct -> PdgIndex.Key.t -> bool
 
 (** Useful mainly if there has been some Pdg.Top *)
 val kf_visible : proj -> kernel_function -> bool
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

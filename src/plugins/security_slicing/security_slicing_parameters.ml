@@ -33,9 +33,3 @@ module Slicing =
       let option_name = "-security-slicing"
       let help = "perform the security slicing analysis"
     end)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

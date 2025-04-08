@@ -1019,9 +1019,3 @@ let make (tree_view:GTree.view) =
   end
   in
   (myself:>t)
-
-(*
-  Local Variables:
-  compile-command: "make -C ../../.."
-  End:
-*)

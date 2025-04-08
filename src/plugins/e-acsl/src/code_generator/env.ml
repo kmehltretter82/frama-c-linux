@@ -647,9 +647,3 @@ let pretty fmt env =
        List.iter
          (fun s -> Printer.pp_stmt fmt s)
          local_env.block_info.new_stmts)
-
-(*
-Local Variables:
-compile-command: "make -C ../../../../.."
-End:
-*)

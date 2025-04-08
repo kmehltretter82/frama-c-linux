@@ -75,9 +75,3 @@ module Upward =
     end)
 
 let is_on () = not (Annot.is_empty ())
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

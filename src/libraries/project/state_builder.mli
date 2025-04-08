@@ -598,9 +598,3 @@ module States: sig
         the given project ([Project.current ()] by default) *)
 
 end
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

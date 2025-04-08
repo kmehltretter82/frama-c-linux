@@ -31,8 +31,3 @@ val impact_analysis: Kernel_function.t -> stmt -> stmt list
 (*
 val slice: bool -> Project.t
 *)
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

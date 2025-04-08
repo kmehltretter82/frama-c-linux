@@ -30,9 +30,3 @@
 open Cil_types
 val pp_exp: Format.formatter -> exp -> unit
 val pp_lval: Format.formatter -> lval -> unit
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

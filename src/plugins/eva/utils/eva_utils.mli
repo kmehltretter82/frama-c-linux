@@ -111,9 +111,3 @@ val height_lval: lval -> int
 val skip_specifications: kernel_function -> bool
 (** Should we skip the specifications of this function, according to
     [-eva-skip-stdlib-specs] *)
-
-(*
-Local Variables:
-compile-command: "make -C ../../../.."
-End:
-*)

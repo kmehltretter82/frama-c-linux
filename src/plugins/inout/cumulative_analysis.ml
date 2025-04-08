@@ -170,9 +170,3 @@ struct
     computer#result
 
 end
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

@@ -25,9 +25,3 @@
 (* -------------------------------------------------------------------------- *)
 
 val print : unit -> unit
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

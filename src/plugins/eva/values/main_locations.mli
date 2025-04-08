@@ -32,9 +32,3 @@ module PLoc : sig
 end
 
 val ploc: PLoc.location Abstract_location.dependencies
-
-(*
-Local Variables:
-compile-command: "make -C ../../../.."
-End:
-*)

@@ -33,9 +33,3 @@ let is_empty () = Datatype.String.Hashtbl.length strings = 0
 let add = Datatype.String.Hashtbl.add strings
 let find = Datatype.String.Hashtbl.find strings
 let fold f = Datatype.String.Hashtbl.fold_sorted f strings
-
-(*
-Local Variables:
-compile-command: "make"
-End:
-*)

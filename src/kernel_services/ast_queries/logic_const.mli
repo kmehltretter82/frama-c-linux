@@ -366,9 +366,3 @@ val addTermOffset:     term_offset -> term_offset -> term_offset
 (** Equivalent to [addOffsetLval] for terms.
         @since Oxygen-20120901 *)
 val addTermOffsetLval: term_offset -> term_lval -> term_lval
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

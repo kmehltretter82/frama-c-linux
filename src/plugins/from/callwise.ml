@@ -171,9 +171,3 @@ let compute_all_calldeps () =
         ();
     Eva.Analysis.compute ()
   end
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

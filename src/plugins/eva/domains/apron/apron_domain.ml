@@ -755,10 +755,3 @@ let reduce_apron_itv cvalue ival =
 let () =
   Abstractions.Reducer.register
     Main_values.CVal.key Main_values.Interval.key reduce_apron_itv
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../../../.. -j"
-End:
-*)

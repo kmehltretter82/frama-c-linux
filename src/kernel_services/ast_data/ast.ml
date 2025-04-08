@@ -216,9 +216,3 @@ let clear_last_decl () =
 let add_hook_on_update f =
   add_hook_on_update (fun _ -> f ())
 let () = add_hook_on_update Cil_datatype.clear_caches
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

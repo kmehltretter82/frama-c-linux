@@ -442,9 +442,3 @@ val get_usedinfo : string -> Cil_types.enuminfo
     @raise Empty_automaton if the simplification result in an empty automaton.
 *)
 val removeUnusedTransitionsAndStates : unit -> unit
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

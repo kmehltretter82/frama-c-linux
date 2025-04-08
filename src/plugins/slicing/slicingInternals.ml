@@ -240,9 +240,3 @@ let dummy_fct_slice = {
 }
 
 let dummy_fct_user_crit = CuTop dummy_pdg_mark
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

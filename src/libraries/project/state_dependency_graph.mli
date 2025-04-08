@@ -73,9 +73,3 @@ val add_state: State.t -> State.t list -> unit
 module Attributes: Attributes
 module Dot(_: Attributes) : sig val dump: string -> unit end
 val dump: string -> unit
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

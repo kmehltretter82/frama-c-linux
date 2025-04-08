@@ -155,9 +155,3 @@ type typed_automaton = (typed_condition, typed_action) automaton
 type funcStatus =
   | Call
   | Return
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

@@ -942,9 +942,3 @@ let get_ival ~logic_env t =
 let clear () =
   Memo.clear();
   LF_env.clear()
-
-(*
-Local Variables:
-compile-command: "make -C ../../../../.."
-End:
- *)

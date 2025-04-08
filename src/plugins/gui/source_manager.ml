@@ -188,9 +188,3 @@ let get_current_source_view w =
   with Not_found ->
     failwith (Printf.sprintf "get_source_view: invalid page %d"
                 w.notebook#current_page)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

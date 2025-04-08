@@ -272,9 +272,3 @@ struct
     Format.pp_set_formatter_out_functions fmt output_functions;
     close_out cout
 end
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

@@ -82,9 +82,3 @@ module type Full_AI_Lattice_with_cardinality = sig
   include With_Diff_One with type t := t
   include With_Enumeration with type t := t
 end
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

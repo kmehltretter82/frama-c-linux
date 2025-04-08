@@ -108,9 +108,3 @@ val initialize: loc:location -> lval -> stmt
 val mark_readonly: varinfo -> stmt
 (** Same as [store_stmt] for [__e_acsl_markreadonly] that observes the
     read-onlyness of the given varinfo. *)
-
-(*
-Local Variables:
-compile-command: "make -C ../../../../.."
-End:
-*)

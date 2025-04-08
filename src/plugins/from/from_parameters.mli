@@ -34,10 +34,3 @@ module ShowIndirectDeps: Parameter_sig.Bool
 
 (** Option -from-verify-assigns. *)
 module VerifyAssigns: Parameter_sig.Bool
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

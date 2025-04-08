@@ -405,9 +405,3 @@ module Operators : sig
 
   val (let$): ('ch,'a) exn_processor -> ('ch -> 'a) -> 'a
 end
-
-(*
-  Local Variables:
-  compile-command: "make -C ../../.."
-  End:
-*)

@@ -187,9 +187,3 @@ let _kf_inputs =
     "kf_inputs"
     Datatype.(func Kernel_function.ty Zone.ty)
     get_internal
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

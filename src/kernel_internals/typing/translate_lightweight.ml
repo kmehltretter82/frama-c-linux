@@ -216,9 +216,3 @@ let lightweight_transform =
 
 let () =
   File.add_code_transformation_after_cleanup lightweight_transform interpret
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

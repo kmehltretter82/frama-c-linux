@@ -1939,9 +1939,3 @@ module Permissive =
       let help =
         "perform less verifications on validity of command-line options"
     end)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

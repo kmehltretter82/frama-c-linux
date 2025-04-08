@@ -847,9 +847,3 @@ let compute_locals_size kf =
     Integer.pretty
     (Integer.add vis#get_max_size_calls_no_temps vis#get_max_size_calls_temps)
 ;;
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

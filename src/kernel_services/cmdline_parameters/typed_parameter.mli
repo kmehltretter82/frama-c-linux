@@ -72,9 +72,3 @@ val create:
   is_set: (unit -> bool) ->
   t
 (**/**)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

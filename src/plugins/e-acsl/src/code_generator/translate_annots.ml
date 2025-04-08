@@ -155,9 +155,3 @@ let post_code_annotation kf stmt env annot =
     | AExtended _ -> env
   in
   Env.handle_error convert env
-
-(*
-Local Variables:
-compile-command: "make -C ../../../../.."
-End:
-*)

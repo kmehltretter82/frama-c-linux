@@ -92,9 +92,3 @@ include Datatype.Make_with_collections
       let mem_project = Datatype.never_any_project
       let pretty fmt k = Format.fprintf fmt "%s" (name_of_kind k)
     end)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

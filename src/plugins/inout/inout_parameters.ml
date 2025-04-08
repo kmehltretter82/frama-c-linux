@@ -92,9 +92,3 @@ module Output =
     let option_name = "-inout-print"
     let help = "print the results of all the analyzes"
   end)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

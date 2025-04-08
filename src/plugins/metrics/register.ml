@@ -77,10 +77,3 @@ let main () =
 
 (* Register main entry points *)
 let () = Boot.Main.extend main
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

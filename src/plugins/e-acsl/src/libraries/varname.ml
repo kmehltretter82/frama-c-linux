@@ -59,9 +59,3 @@ let rec of_exp ?default exp = match exp.enode with
                      to handle enodes like: %a" Cil_types_debug.pp_exp_node e;
       "exp"
     | Some default -> default
-
-(*
-Local Variables:
-compile-command: "make -C ../.."
-End:
-*)

@@ -70,9 +70,3 @@ val translate_rte_exp_ref:
    Env.t ->
    exp ->
    Env.t) ref
-
-(*
-Local Variables:
-compile-command: "make -C ../../../../.."
-End:
-*)

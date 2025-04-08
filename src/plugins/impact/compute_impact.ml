@@ -723,9 +723,3 @@ let skip () =
 
 
 (* TODO: dynamically register more high-level functions *)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

@@ -896,9 +896,3 @@ and annot_one_line_logic = parse
     try initial lexbuf
     with Failure _ -> raise Parsing.Parse_error
 }
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

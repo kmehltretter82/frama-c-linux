@@ -745,9 +745,3 @@ let prepare () =
   Options.feedback ~level:2 "prepare AST for E-ACSL transformations";
   prepare_file (Ast.get ());
   Ast.mark_as_grown ()
-
-(*
-Local Variables:
-compile-command: "make -C ../../../../.."
-End:
-*)

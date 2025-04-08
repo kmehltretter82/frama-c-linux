@@ -67,9 +67,3 @@ let reduce_offset_by_validity origin ival size validity =
 
 let trim_by_validity ?origin ival size validity =
   reduce_offset_by_validity origin ival size validity
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

@@ -268,9 +268,3 @@ type recursion = {
 }
 
 type cacheable = Cacheable | NoCache | NoCacheCallers
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

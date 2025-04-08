@@ -22,9 +22,3 @@
 
 (** Extension of the GUI in order to support the from analysis.
     No function is exported. *)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

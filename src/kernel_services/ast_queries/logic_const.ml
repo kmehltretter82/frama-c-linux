@@ -458,9 +458,3 @@ let pdangling ?(loc=Cil_datatype.Location.unknown) (l,p) =
 
 let pseparated  ?(loc=Cil_datatype.Location.unknown) seps =
   unamed ~loc (Pseparated seps)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

@@ -77,9 +77,3 @@ struct
     | Some g -> g
 
 end
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

@@ -303,9 +303,3 @@ module Rel = struct
   let add_abs = add
   let sub_abs = sub
 end
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

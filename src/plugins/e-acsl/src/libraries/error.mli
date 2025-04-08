@@ -96,9 +96,3 @@ module Make(_: sig val phase:Options.category end): S
 
 (** The [Error] module implements [Error.S] with no phase. *)
 include S
-
-(*
-Local Variables:
-compile-command: "make -C ../../../../.."
-End:
-*)

@@ -151,9 +151,3 @@ module type With_default = sig
 end
 
 module Make_bitwise(V : With_default) : Location_map_bitwise with type v = V.t
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

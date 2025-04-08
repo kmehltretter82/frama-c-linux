@@ -271,9 +271,3 @@ let registered =
   and descr = "Infers the inputs and outputs of each function." in
   Abstractions.Domain.register ~name ~descr ~priority:5 ~experimental:true
     (module Domain)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

@@ -73,9 +73,3 @@ val translate_marks_to_prop :
 module F_Proj (C : Config) :
   Proj with type mark = C.M.t
         and type call_info = C.M.call_info
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

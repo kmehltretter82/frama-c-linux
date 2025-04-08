@@ -444,9 +444,3 @@ val image_menu_item:
   text: string ->
   packing: (GMenu.menu_item -> unit) ->
   GMenu.menu_item
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

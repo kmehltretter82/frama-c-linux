@@ -38,9 +38,3 @@ val delete_from_list: Env.t -> kernel_function -> varinfo list -> Env.t
 
 val delete_from_set: Env.t -> kernel_function -> Varinfo.Set.t -> Env.t
 (** Same as [delete_from_list] with a set of variables instead of a list. *)
-
-(*
-Local Variables:
-compile-command: "make -C ../../../../.."
-End:
-*)

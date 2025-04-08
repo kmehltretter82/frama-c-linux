@@ -32,9 +32,3 @@ val find: string -> Cil_types.varinfo
 val update: string -> Cil_types.varinfo -> unit
 (** If the given name is an E-ACSL built-in, change its old varinfo by the given
     new one. *)
-
-(*
-Local Variables:
-compile-command: "make -C ../../../../.."
-End:
-*)

@@ -27,10 +27,3 @@ module Make
                               and type state = unit
                               and type value = Value.t
                               and type location = Loc.location
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../../.."
-End:
-*)

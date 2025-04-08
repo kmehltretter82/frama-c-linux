@@ -146,9 +146,3 @@ let () = Boot.Main.extend main
    {!module:SlicingTransform} module
    by building a new CIL application.
 *)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

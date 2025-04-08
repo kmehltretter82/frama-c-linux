@@ -553,9 +553,3 @@ parse
       close_out ppfile;
       Datatype.Filepath.of_string ppname
 }
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

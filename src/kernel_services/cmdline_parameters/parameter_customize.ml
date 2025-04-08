@@ -121,9 +121,3 @@ let reset () =
   argument_must_be_existing_fun_ref := false;
   reset_on_copy_ref := true;
   use_category_ref := true
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

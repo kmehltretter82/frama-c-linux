@@ -152,9 +152,3 @@ sig
       table without directly calling the function {!remove}.
       @since Fluorine-20130401 *)
 end
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

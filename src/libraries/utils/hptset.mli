@@ -128,9 +128,3 @@ module Make
                and type 'a map = 'a Hptmap.Shape(X).map
     val self : State.t
   end
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

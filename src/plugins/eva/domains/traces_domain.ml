@@ -1280,11 +1280,3 @@ let registered =
   in
   Abstractions.Domain.register ~name ~descr ~priority:2 ~experimental:true
     (module D)
-
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

@@ -56,10 +56,3 @@ module Make_bitwise(V: sig
 (* This is automatically set by the Value plugin. Do not modify. *)
 val set_plevel: int -> unit
 val get_plevel: unit -> int
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

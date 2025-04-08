@@ -27,9 +27,3 @@ module Dictionary: Parameter_sig.String
 module Literal_string: Parameter_sig.String
 
 val states: State.t list
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

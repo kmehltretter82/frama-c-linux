@@ -223,11 +223,3 @@ module type S = sig
   exception Found_prefix of Hptmap.prefix * subtree * subtree
 
 end
-
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

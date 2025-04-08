@@ -23,9 +23,3 @@
 module Metrics_coverage = Metrics_coverage
 module Metrics_base = Metrics_base
 module Metrics_cilast = Metrics_cilast
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

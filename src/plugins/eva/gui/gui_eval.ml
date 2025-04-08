@@ -621,10 +621,3 @@ module Make (X: Analysis.Engine) = struct
       clear_caches ();
       make_data_all_callstacks_from_states ev ~before ~after:states_after v
 end
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../../.."
-End:
-*)

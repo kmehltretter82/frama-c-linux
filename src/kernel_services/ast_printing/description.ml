@@ -540,15 +540,3 @@ let pp_compare p q = cmp (ip_order p) (ip_order q)
 let full_compare p q =
   let cmp = pp_compare p q in
   if cmp<>0 then cmp else Property.compare p q
-
-
-
-
-
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

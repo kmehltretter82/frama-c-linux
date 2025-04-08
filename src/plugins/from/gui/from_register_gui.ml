@@ -44,10 +44,3 @@ let main (main_ui:Design.main_window_extension_points) =
   main_ui#file_tree#add_select_function filetree_selector
 
 let () = Design.register_extension main
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

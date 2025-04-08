@@ -46,9 +46,3 @@ module GlobDecl =
     let help = ("only remove unused global types and variables "^
                 "(automatically done by -sparecode-analysis)")
   end)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

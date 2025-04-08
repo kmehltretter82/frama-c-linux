@@ -525,9 +525,3 @@ let generate_global_init vi off init =
   if is_enabled () then mk_global_init ~loc:vi.vdecl vi off init
   else None
 (* }}} *)
-
-(*
-Local Variables:
-compile-command: "make -C ../../../../.."
-End:
-*)
