@@ -179,10 +179,10 @@ let command_generic ~async ?stdout ?stderr cmd args =
         end
   end
 
-let command_async ?stdout ?stderr cmd args =
+let async ?stdout ?stderr cmd args =
   command_generic ~async:true ?stdout ?stderr cmd args
 
-let command ?(timeout=0) ?stdout ?stderr cmd args =
+let spawn ?(timeout=0) ?stdout ?stderr cmd args =
   if System_config.is_gui || timeout > 0 then
     let f = command_generic ~async:true ?stdout ?stderr cmd args in
     let res = ref(Unix.WEXITED 99) in
@@ -210,3 +210,6 @@ let command ?(timeout=0) ?stdout ?stderr cmd args =
     match f () with
     | Result r -> r
     | Not_ready _ -> assert false
+
+let command_async = async
+let command = spawn

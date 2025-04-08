@@ -230,7 +230,7 @@ let start_command ~timeout ?time ?stdout ?stderr cmd args =
     let timed = timeout > 0.0 || time <> None in
     let time_start = if timed then Unix.gettimeofday () else 0.0 in
     let time_stop = if timeout > 0.0 then time_start +. timeout else 0.0 in
-    let async = Command.command_async ?stdout ?stderr cmd args in
+    let async = Command.async ?stdout ?stderr cmd args in
     {
       name = cmd ;
       timed = timed ;

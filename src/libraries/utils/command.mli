@@ -25,7 +25,7 @@
 (* ************************************************************************* *)
 (** {2 File Utilities} *)
 (* ************************************************************************* *)
- 
+
 val pp_to_file : Filepath.Normalized.t -> (Format.formatter -> unit) -> unit
 (** [pp_to_file file pp] runs [pp] on a formatter that writes into [file].
     The formatter is always properly flushed and closed on return.
@@ -120,7 +120,7 @@ val full_command_async :
     @raise Sys_error when a system error occurs *)
 [@@deprecated]
 
-val command_async :
+val async :
   ?stdout:Buffer.t ->
   ?stderr:Buffer.t ->
   string -> string array
@@ -134,7 +134,15 @@ val command_async :
     process will be filled into the arguments buffer.
     @raise Sys_error when a system error occurs *)
 
-val command :
+val command_async :
+  ?stdout:Buffer.t ->
+  ?stderr:Buffer.t ->
+  string -> string array
+  -> (unit -> process_result)
+[@@deprecated "Use Command.async instead."]
+[@@migrate { repl = Command.async } ]
+
+val spawn :
   ?timeout:int ->
   ?stdout:Buffer.t ->
   ?stderr:Buffer.t ->
@@ -147,3 +155,12 @@ val command :
     @raise Async.Cancel when the computation is interrupted or on timeout
     @before 29.0-Copper Async.Cancel was Db.Cancel
 *)
+
+val command :
+  ?timeout:int ->
+  ?stdout:Buffer.t ->
+  ?stderr:Buffer.t ->
+  string -> string array
+  -> Unix.process_status
+[@@deprecated "Use Command.spawn instead."]
+[@@migrate { repl = Command.spawn } ]

@@ -1018,7 +1018,7 @@ let select_file ?title ?(dir=default_dir) ?(filename="") () =
   !result
 
 let spawn_command ?(timeout=0) ?stdout ?stderr s args f =
-  let check_result = Command.command_async s ?stdout ?stderr args in
+  let check_result = Command.async s ?stdout ?stderr args in
   let has_timeout = timeout > 0 in
   let hang_on = float_of_int timeout in
   let starting_time = if has_timeout then Unix.time () else 0. in

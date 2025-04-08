@@ -532,7 +532,7 @@ module Html = struct
     in
     begin
       try
-        let ret = Command.command ~timeout:60 "dot" (Array.of_list args) in
+        let ret = Command.spawn ~timeout:60 "dot" (Array.of_list args) in
         match ret with
         | Unix.WEXITED 0 ->
           Mt_options.debug "remove %s\n" tmp_file;
