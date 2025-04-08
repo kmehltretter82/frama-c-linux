@@ -73,6 +73,7 @@
  (section share)
  (files
   (glob_files (machdeps/*.yaml with_prefix share/machdeps))
+  (glob_files (machdeps/*.json with_prefix share/machdeps))
 ))
 
 ; machdep generation script
