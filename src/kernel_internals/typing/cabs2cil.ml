@@ -2860,8 +2860,49 @@ let rec setOneInit this o preinit =
           end
         end;
         pMaxIdx, pArray
-      | SinglePre _ ->
-        Kernel.fatal ~current:true "Index %d is already initialized" idx
+      | SinglePre (e, lvset) ->
+        (* [SinglePre] can happen here when overridding initialization, in
+           particular with structs and unions :
+
+             typedef struct { int a; int b} T;
+             typedef struct { T t } S;
+             T const x = {.a = 1, .b = 2};
+             S const s = {.t = x, .t.b = 3};
+
+           Here we will first initialize [s.t] with [SinglePre (x, _)] and then
+           try to initialize the field [b] of [t], overridding the value [x.b].
+           What we do here is to transform the [SinglePre] into a [CompoundPre]
+           so that we can proceed with [.t.b] initialization. The new
+           [CompoundPre] will be of the form [{.a = x.a, .b = x.b}].
+
+           The final result will be :
+             T const x = {.a = 1, .b = 2};
+             S const s = {.t = {.a = x.a, .b = 3}};
+
+        *)
+        match e.enode, Ast_types.unroll_skel (Cil.typeOf e) with
+        | Lval old_lv, TComp { cfields = Some fields } ->
+          (* To be done, we need to have an lvalue and a Tcomp, otherwise we
+             cannot apply the transformation. *)
+          let pMaxIdx = List.length fields in
+          let pArray = Array.make pMaxIdx NoInitPre in
+          (* The old lvalue (corresponding to [x] in the above example) will be
+             replaced by an lvalue for each field in their corresponding
+             [SinglePre]. *)
+          let lvset = Cil_datatype.Lval.Set.remove old_lv lvset in
+          (* For each field [f], we create the corresponding lvalue/expression
+             [.x.f] and add it to the [CompoundPre]. *)
+          let add_field i f =
+            let oft = Field (f, NoOffset) in
+            let new_lv = Cil.addOffsetLval oft old_lv in
+            let e = Cil.new_exp ~loc:e.eloc (Lval new_lv) in
+            let lvset = Cil_datatype.Lval.Set.add new_lv lvset in
+            pArray.(i) <- SinglePre (e, lvset)
+          in
+          List.iteri add_field fields;
+          ref pMaxIdx, ref pArray
+        | _ ->
+          Kernel.fatal ~current:true "Index %d is already initialized" idx
     in
     assert (idx >= 0 && idx < Array.length !pArray);
     let this' = setOneInit !pArray.(idx) restoff preinit in
