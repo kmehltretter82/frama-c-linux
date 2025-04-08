@@ -17,7 +17,7 @@ verbose output for Make.
   [eva:recursion] make-wrapper.c:17: 
     detected recursive call
     of function large_name_to_force_line_break_in_stack_msg.
-  [eva:assigns:missing] make-wrapper.c:17: Warning: 
+  [eva:assigns:missing] make-wrapper.c:17: User Error: 
     Recursive call to large_name_to_force_line_break_in_stack_msg without assigns clause.
     Generating probably incomplete assigns to interpret the call.
     Try to increase the -eva-unroll-recursive-calls parameter or write a correct specification for function large_name_to_force_line_break_in_stack_msg.
@@ -27,7 +27,7 @@ verbose output for Make.
             main
   [eva] using specification for function large_name_to_force_line_break_in_stack_msg
   [eva] using specification for function specified
-  [kernel:annot:missing-spec] make-wrapper.c:29: Warning: 
+  [kernel:annot:missing-spec] make-wrapper.c:29: Failure: 
     Neither code nor specification for function external,
      generating default assigns. See -generated-spec-* options for more info
   [kernel] User Error: warning annot:missing-spec treated as fatal error.

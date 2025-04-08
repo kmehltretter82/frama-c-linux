@@ -1,6 +1,6 @@
 [kernel] Parsing debug_category.i (no preprocessing)
 [test] Warning: Uncategorized warning
-[test:a] Warning: 
+[test:a] User Error: 
   Warning A
   (warn-error-once: no further messages from category 'a' will be emitted)
 [test] Deferred error: warning as error a:

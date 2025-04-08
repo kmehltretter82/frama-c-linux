@@ -21,7 +21,7 @@
 [eva] using specification for function g
 [eva:assigns:missing-result] read_all.c:16: Warning: 
   no 'assigns \result \from ...' clause specified for function g
-[eva:assigns:missing] read_all.c:15: Warning: 
+[eva:assigns:missing] read_all.c:15: User Error: 
   no \from part for clause 'assigns *p, r;'.
   Assuming \from \nothing so that the analysis can continue, but be aware this is probably incorrect.
 [eva:assigns:invalid-location] read_all.c:29: 
@@ -51,7 +51,7 @@
   read of the whole memory. Ignoring to allow Mthread to continue, but the
   analysis will not be correct.
 [eva] using specification for function g
-[eva:assigns:missing] read_all.c:15: Warning: 
+[eva:assigns:missing] read_all.c:15: User Error: 
   no \from part for clause 'assigns *p, r;'.
   Assuming \from \nothing so that the analysis can continue, but be aware this is probably incorrect.
 [eva:assigns:invalid-location] read_all.c:19: 
@@ -104,7 +104,7 @@
 [eva] using specification for function g
 [eva:assigns:missing-result] read_all.c:16: Warning: 
   no 'assigns \result \from ...' clause specified for function g
-[eva:assigns:missing] read_all.c:15: Warning: 
+[eva:assigns:missing] read_all.c:15: User Error: 
   no \from part for clause 'assigns *p, r;'.
   Assuming \from \nothing so that the analysis can continue, but be aware this is probably incorrect.
 [eva:assigns:invalid-location] read_all.c:29: 
@@ -138,7 +138,7 @@
   read of the whole memory. Ignoring to allow Mthread to continue, but the
   analysis will not be correct.
 [eva] using specification for function g
-[eva:assigns:missing] read_all.c:15: Warning: 
+[eva:assigns:missing] read_all.c:15: User Error: 
   no \from part for clause 'assigns *p, r;'.
   Assuming \from \nothing so that the analysis can continue, but be aware this is probably incorrect.
 [eva:assigns:invalid-location] read_all.c:19: 
@@ -207,7 +207,7 @@
 [eva] using specification for function g
 [eva:assigns:missing-result] read_all.c:16: Warning: 
   no 'assigns \result \from ...' clause specified for function g
-[eva:assigns:missing] read_all.c:15: Warning: 
+[eva:assigns:missing] read_all.c:15: User Error: 
   no \from part for clause 'assigns *p, r;'.
   Assuming \from \nothing so that the analysis can continue, but be aware this is probably incorrect.
 [eva:assigns:invalid-location] read_all.c:29: 

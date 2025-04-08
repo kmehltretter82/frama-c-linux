@@ -1,5 +1,5 @@
 [kernel] Parsing cert_msc_38.c (with preprocessing)
-[kernel:CERT:MSC:38] cert_msc_38.c:26: Warning: 
+[kernel:CERT:MSC:38] cert_msc_38.c:26: User Error: 
   assert is a standard macro. Its definition cannot be suppressed, see CERT C coding rules MSC38-C
 [kernel] cert_msc_38.c:26: User Error: 
   Cannot resolve variable assert

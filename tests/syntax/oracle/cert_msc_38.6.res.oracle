@@ -1,5 +1,5 @@
 [kernel] Parsing cert_msc_38.c (with preprocessing)
-[kernel:CERT:MSC:38] cert_msc_38.c:55: Warning: 
+[kernel:CERT:MSC:38] cert_msc_38.c:55: User Error: 
   va_end is a standard macro. Its definition cannot be suppressed, see CERT C coding rules MSC38-C
 [kernel] cert_msc_38.c:55: User Error: 
   Cannot resolve variable va_end
