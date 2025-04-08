@@ -25,7 +25,7 @@
 __PUSH_FC_STDLIB
 
 //@ assigns \nothing;
-extern void Frama_C_show_each_warning();
+extern void Frama_C_show_each_warning(char const *, ...);
 
 void __FC_assert(int c,const char* file,int line,const char*expr) {
   if (!c) {

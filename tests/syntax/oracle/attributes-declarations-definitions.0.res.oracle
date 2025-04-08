@@ -29,14 +29,26 @@
   Ignoring unknown attribute: tret5
 [kernel:unknown-attribute] attributes-declarations-definitions.c:23: Warning: 
   Ignoring unknown attribute: f5
+[kernel:typing:no-proto] attributes-declarations-definitions.c:23: Warning: 
+  Function f is declared without prototype.
+  Its formals will be inferred from actual arguments at first call.
+  Declare it as f(void) if the function does not take any parameters.
 [kernel:unknown-attribute] attributes-declarations-definitions.c:25: Warning: 
   Ignoring unknown attribute: a1
+[kernel:typing:no-proto] attributes-declarations-definitions.c:27: Warning: 
+  Function g is declared without prototype.
+  Its formals will be inferred from actual arguments at first call.
+  Declare it as g(void) if the function does not take any parameters.
 [kernel:unknown-attribute] attributes-declarations-definitions.c:33: Warning: 
   Ignoring unknown attribute: a2
 [kernel:unknown-attribute] attributes-declarations-definitions.c:38: Warning: 
   Ignoring unknown attribute: p1
 [kernel:unknown-attribute] attributes-declarations-definitions.c:38: Warning: 
   Ignoring unknown attribute: p2
+[kernel:typing:no-proto] attributes-declarations-definitions.c:42: Warning: 
+  Function h is declared without prototype.
+  Its formals will be inferred from actual arguments at first call.
+  Declare it as h(void) if the function does not take any parameters.
 [kernel:unknown-attribute] attributes-declarations-definitions.c:54: Warning: 
   Ignoring unknown attribute: o
 [kernel:unknown-attribute] attributes-declarations-definitions.c:56: Warning: 

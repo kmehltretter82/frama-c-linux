@@ -1,7 +1,7 @@
 /* bts 60: 1 should be lifted to a real number implicitely.  */
 
 /*@ ensures 1.0 == 1; */
-void f();
+void f(void);
 
 /*@ lemma foo: 1.0 == (float)1; */
 
@@ -10,14 +10,14 @@ void f();
   @ predicate foo(real x);
   @ } */
 
-void f() {
+void f(void) {
  double B;
 /*@ assert B==g; */
 }
 
 
 /*@ ensures foo(\result); */
-int g() { return 0; }
+int g(void) { return 0; }
 
 
 typedef int T, T4[4], *T_PTR;

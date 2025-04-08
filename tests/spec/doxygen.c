@@ -10,7 +10,7 @@
 
 //@{ Blu
 
-void doxygen_group () {
+void doxygen_group (void) {
 }
 
 /*@} Bli */
@@ -22,4 +22,4 @@ void doxygen_group () {
 //@} Bly
 
 
-void main();
+void main(void);
