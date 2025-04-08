@@ -17,7 +17,7 @@ val case_globals :
   ?fc_stdlib_generated:(varinfo -> 'a) ->
   ?var_fun_decl:(varinfo -> 'a) ->
   ?var_init:(varinfo -> 'a) ->
-  ?var_def:(varinfo -> init -> 'a) ->
+  ?var_def:(varinfo -> init_or_str -> 'a) ->
   ?glob_annot:(global_annotation -> 'a) ->
   fun_def:(fundec -> 'a) ->
   global -> 'a
@@ -74,7 +74,7 @@ class visitor :
     method fc_stdlib_generated: varinfo -> global list Cil.visitAction
     method var_fun_decl: varinfo -> global list Cil.visitAction
     method var_init: varinfo -> global list Cil.visitAction
-    method var_def: varinfo -> init -> global list Cil.visitAction
+    method var_def: varinfo -> init_or_str -> global list Cil.visitAction
     method glob_annot: global_annotation -> global list Cil.visitAction
     method fun_def: fundec -> global list Cil.visitAction
 

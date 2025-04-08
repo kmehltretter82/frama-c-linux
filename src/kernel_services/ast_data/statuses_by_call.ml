@@ -121,7 +121,7 @@ let replacement_visitor ~arguments = object (self)
     | _ -> Cil.DoChildren
 
   method! vterm_node = function
-    | TConst _ | TSizeOf _ | TSizeOfStr _
+    | TConst _ | TSizeOf _
     | TAlignOf _ | Tnull | Ttype _ | Tempty_set -> Cil.SkipChildren
     | TLval tlval -> self#replace_tlval tlval
     | TAddrOf tlval ->

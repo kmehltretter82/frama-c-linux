@@ -120,8 +120,6 @@ let base_to_predicate ~loc t (b: Base.t) =
     valid_to_predicate_opt ~loc t valid
   | Base.CLogic_Var (_lvi, _typ, _) -> raise (Not_implemented "Base.CLogic_Var")
   | Base.Null -> assert false (*by projecting ival*)
-  | Base.String _ -> raise (Not_implemented "Base.String")
-
 
 let base_offset_to_predicate ~loc t b o =
   if Ival.equal Ival.zero o then

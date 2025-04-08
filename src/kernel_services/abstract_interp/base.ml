@@ -7,7 +7,6 @@
 (**************************************************************************)
 
 open Cil_types
-open Cil
 open Abstract_interp
 
 type variable_validity = {
@@ -89,22 +88,18 @@ module Validity = Datatype.Make
       let copy (x:t) = x
     end)
 
-type cstring = CSString of string | CSWstring of Escape.wstring
-
 type deallocation = Malloc | VLA | Alloca
 
 type base =
   | Var of varinfo * validity
   | CLogic_Var of logic_var * typ * validity
   | Null (** base for addresses like [(int* )0x123] *)
-  | String of int * cstring (** String constants *)
   | Allocated of varinfo * deallocation * validity
 
 let id = function
   | Var (vi,_) | Allocated (vi,_,_) -> vi.vid
   | CLogic_Var (lvi, _, _) -> lvi.lv_id
   | Null -> 0
-  | String (id,_) -> id
 
 let hash = id
 
@@ -114,9 +109,6 @@ let is_null x = match x with Null -> true | _ -> false
 
 let pretty fmt t =
   match t with
-  | String (_, CSString s) -> Format.fprintf fmt "%S" s
-  | String (_, CSWstring s) ->
-    Format.fprintf fmt "L\"%s\"" (Escape.escape_wstring s)
   | Var (t,_) | Allocated (t,_,_) -> Printer.pp_varinfo fmt t
   | CLogic_Var (lvi, _, _) -> Printer.pp_logic_var fmt lvi
   | Null -> Format.pp_print_string fmt "NULL"
@@ -125,7 +117,7 @@ let pretty_addr fmt t =
   (match t with
    | Var _ | CLogic_Var _ | Allocated _ ->
      Format.pp_print_string fmt "&"
-   | String _ | Null -> ()
+   | Null -> ()
   );
   pretty fmt t
 
@@ -133,25 +125,12 @@ let compare v1 v2 = Datatype.Int.compare (id v1) (id v2)
 
 let typeof v =
   match v with
-  | String (_,_) -> Some Cil_const.charConstPtrType
   | CLogic_Var (_, ty, _) -> Some ty
   | Null -> None
   | Var (v,_) | Allocated(v,_,_) -> Some (Ast_types.unroll v.vtype)
 
-let cstring_bitlength s =
-  let u, l =
-    match s with
-    | CSString s ->
-      bitsSizeOf Cil_const.charType, (String.length s)
-    | CSWstring s ->
-      bitsSizeOf (Machine.wchar_type ()), (List.length s)
-  in
-  Int.of_int (u*(succ l))
-
 let bits_sizeof v =
   match v with
-  | String (_,e) ->
-    Int_Base.inject (cstring_bitlength e)
   | Null -> Int_Base.top
   | Var (v,_) | Allocated (v,_,_) ->
     Bit_utils.sizeof_vid v
@@ -220,13 +199,9 @@ let validity b =
       Known (mn, mx)
     else
       Invalid
-  | String _ ->
-    let size = bits_sizeof b in
-    validity_from_known_size size
 
 let is_read_only base =
   match base with
-  | String _ -> true
   | Var (v,_) -> Ast_types.has_qualifier "const" v.vtype
   | _ -> false
 
@@ -334,7 +309,7 @@ let is_valid_offset access base offset =
 
 let is_function base =
   match base with
-  | String _ | Null | CLogic_Var _ | Allocated _ -> false
+  | Null | CLogic_Var _ | Allocated _ -> false
   | Var(v,_) ->
     Ast_types.is_fun v.vtype
 
@@ -351,51 +326,50 @@ let is_aligned_by b alignment =
       | CLogic_Var (_, ty, _) ->
         Int.is_zero (Int.e_rem (Int.of_int (Cil.bytesAlignOf ty)) alignment)
       | Null -> true
-      | String _ -> Int.is_one alignment
     with Cil.SizeOfError _ -> false
 
 let is_any_formal_or_local v =
   match v with
   | Var (v,_) -> v.vsource && not v.vglob
   | Allocated _ | CLogic_Var _ -> false
-  | Null | String _ -> false
+  | Null -> false
 
 let is_any_local v =
   match v with
   | Var (v,_) -> v.vsource && not v.vglob && not v.vformal
   | Allocated _ | CLogic_Var _ -> false
-  | Null | String _ -> false
+  | Null -> false
 
 let is_global v =
   match v with
   | Var (v,_) -> v.vglob
-  | Allocated _ | Null | String _ -> true
+  | Allocated _ | Null -> true
   | CLogic_Var _ -> false
 
 let is_formal_or_local v fundec =
   match v with
   | Var (v,_) -> Ast_info.Function.is_formal_or_local v fundec
-  | Allocated _ | CLogic_Var _ | Null | String _ -> false
+  | Allocated _ | CLogic_Var _ | Null -> false
 
 let is_formal_of_prototype v vi =
   match v with
   | Var (v,_) -> Ast_info.Function.is_formal_of_prototype v vi
-  | Allocated _ | CLogic_Var _ | Null | String _ -> false
+  | Allocated _ | CLogic_Var _ | Null -> false
 
 let is_local v fundec =
   match v with
   | Var (v,_) -> Ast_info.Function.is_local v fundec
-  | Allocated _ | CLogic_Var _ | Null | String _ -> false
+  | Allocated _ | CLogic_Var _ | Null -> false
 
 let is_formal v fundec =
   match v with
   | Var (v,_)  -> Ast_info.Function.is_formal v fundec
-  | Allocated _ | CLogic_Var _ | Null | String _ -> false
+  | Allocated _ | CLogic_Var _ | Null -> false
 
 let is_block_local v block =
   match v with
   | Var (v,_) -> Ast_info.is_block_local v block
-  | Allocated _ | CLogic_Var _ | Null | String _ -> false
+  | Allocated _ | CLogic_Var _ | Null -> false
 
 let validity_from_type v =
   if Ast_types.is_fun v.vtype then Invalid
@@ -524,27 +498,7 @@ exception Not_a_C_variable
 
 let to_varinfo t = match t with
   | Var (t,_) | Allocated (t,_,_) -> t
-  | CLogic_Var _ | Null | String _ -> raise Not_a_C_variable
-
-
-module LiteralStrings =
-  State_builder.Hashtbl
-    (Datatype.Int.Hashtbl)
-    (Base)
-    (struct
-      let name = "literal strings"
-      let dependencies = [ Ast.self ]
-      let size = 17
-    end)
-let () = Ast.add_monotonic_state LiteralStrings.self
-
-let of_string_exp e =
-  let cstring = match e.enode with
-    | Const (CStr s) -> CSString s
-    | Const (CWStr s) -> CSWstring s
-    | _ -> assert false
-  in
-  LiteralStrings.memo (fun _ -> String (Cil_const.new_raw_id (), cstring)) e.eid
+  | CLogic_Var _ | Null -> raise Not_a_C_variable
 
 module SetLattice = Make_Hashconsed_Lattice_Set(Base)(Hptset)
 

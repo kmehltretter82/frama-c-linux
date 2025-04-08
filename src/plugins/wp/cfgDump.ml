@@ -207,7 +207,7 @@ let init _ x init k =
   let u = node () in
   let pp_init fmt = function
     | None -> Format.pp_print_string fmt "<default>"
-    | Some init -> Printer.pp_init fmt init
+    | Some init -> Printer.pp_init_or_str fmt init
   in
   Format.fprintf !out "  %a [ color=orange, label=\"init %a := %a\" ] ;@."
     pretty u Printer.pp_lval (Cil.var x) pp_init init ;

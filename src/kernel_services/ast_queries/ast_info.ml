@@ -15,7 +15,7 @@ open Cil
 
 let is_integral_const = function
   | CInt64 _ | CEnum _ | CChr _ -> true
-  | CStr _ | CWStr _ | CReal _ -> false
+  | CReal _ -> false
 
 let rec possible_value_of_integral_const = function
   | CInt64 (i,_,_) -> Some i

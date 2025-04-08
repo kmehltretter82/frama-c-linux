@@ -1165,7 +1165,7 @@ let rec eval_term ~alarm_mode env t =
     eval_tif eval_term Cvalue.V.join Cvalue.V.meet ~alarm_mode env
       tcond ttrue tfalse
 
-  | TSizeOf _ | TSizeOfE _ | TSizeOfStr _ | TAlignOf _ | TAlignOfE _ ->
+  | TSizeOf _ | TSizeOfE _ | TAlignOf _ | TAlignOfE _ ->
     let e = Cil.constFoldTerm t in
     let v = match e.term_node with
       | TConst (Integer (v, _)) -> Cvalue.V.inject_int v

@@ -11,10 +11,6 @@
 
 open Abstract_interp
 
-type cstring = CSString of string | CSWstring of Escape.wstring
-(** This type abstracts over the two kinds of constant strings present
-    in strings. It is used in a few modules below Base. *)
-
 (** Validity for variables that might change size. *)
 type variable_validity = private {
   mutable weak : bool (** Indicate that the variable is weak, i.e. that
@@ -35,10 +31,6 @@ type base = private
   | CLogic_Var of Cil_types.logic_var * Cil_types.typ * validity
   (** Base for a logic variable that has a C type. *)
   | Null (** Base for an address like [(int* )0x123] *)
-  | String of int * cstring
-  (** [String(id, s)]
-      - [id]: unique id of the constant string (one per code location)
-      - [s]: contents of the constant string *)
   | Allocated of Cil_types.varinfo * deallocation  * validity
   (** Base for a variable dynamically allocated via malloc/calloc/realloc/alloca *)
 
@@ -127,7 +119,6 @@ val update_variable_validity:
 (** {2 Finding bases} *)
 
 val of_varinfo: Cil_types.varinfo -> t
-val of_string_exp: Cil_types.exp -> t
 val of_c_logic_var: Cil_types.logic_var -> t
 (** Must only be called on logic variables that have a C type *)
 

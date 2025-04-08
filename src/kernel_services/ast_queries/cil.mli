@@ -835,8 +835,6 @@ val mkBinOp_safe_ptr_cmp: loc:location -> binop -> exp -> exp -> exp
 (** Equivalent to [mkMem] for terms. *)
 val mkTermMem: addr:term -> off:term_offset -> term_lval
 
-(** Make an expression that is a string constant (of pointer type) *)
-val mkString: loc:location -> string -> exp
 
 (** [true] if both types are not equivalent.
     if [force] is [true], returns [true] whenever both types are not equal
@@ -925,6 +923,16 @@ val stripCasts: exp -> exp
 
 val typeOf: exp -> typ
 (** Compute the type of an expression. *)
+
+val typeOf_string_literal: ?loc:location -> string -> typ
+(** Returns the type (a char array of fixed length) of a string literal
+    @since Frama-C+dev
+*)
+
+val typeOf_wstring_literal: ?loc:location -> int64 list -> typ
+(** Return the type (a wchar_t array of fixed length) of a wide string literal
+    @since Frama-C+dev
+*)
 
 val is_fully_arithmetic: typ -> bool
 (** Returns [true] whenever the type contains only arithmetic types *)
@@ -1340,6 +1348,11 @@ class type cilVisitor = object
   method vinit: varinfo -> offset -> init -> init visitAction
   (** Initializers. Pass the global where this occurs, and the offset *)
 
+  method vinit_or_str: varinfo -> init_or_str -> init_or_str visitAction
+  (** Global Initializers (either normal one or (wide) string)
+      @since Frama-C+dev
+  *)
+
   method vlocal_init: varinfo -> local_init -> local_init visitAction
   (** local initializer. pass the variable under initialization. *)
 
@@ -1633,6 +1646,8 @@ val visitCilVarDecl: cilVisitor -> varinfo -> varinfo
     offset. *)
 val visitCilInit: cilVisitor -> varinfo -> offset -> init -> init
 
+val visitCilInit_or_str: cilVisitor -> varinfo -> init_or_str -> init_or_str
+
 (** Visit a list of attributes *)
 val visitCilAttributes: cilVisitor -> attributes -> attributes
 
@@ -1892,6 +1907,23 @@ val bitsOffset: typ -> offset -> int * int
     the size. This function is architecture dependent, so you should only call
     this after you call {!Machine.init}. *)
 val fieldBitsOffset: fieldinfo -> int * int
+
+val create_string_literal: ?loc:Cil_types.location -> string -> varinfo
+(** creates a new varinfo for holding a string literal
+
+    @since Frama-C+dev
+
+    TODO: properly introduce it in the AST with appropriate initializer.
+*)
+
+val create_wstring_literal: ?loc:Cil_types.location -> int64 list -> varinfo
+(** creates a new varinfo for holding a string literal
+
+    @since Frama-C+dev
+
+    TODO: properly introduce it in the AST with appropriate initializer.
+*)
+
 
 (* ************************************************************************* *)
 (** {2 Misc} *)

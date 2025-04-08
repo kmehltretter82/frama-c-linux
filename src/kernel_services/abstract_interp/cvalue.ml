@@ -919,29 +919,6 @@ module V_Offsetmap = struct
 
   include Offsetmap.Make (V_Or_Uninitialized) (Params)
 
-  let from_string s =
-    (* Iterate on s + null terminator; same signature as List.fold_left *)
-    let fold_string f acc s =
-      let acc = ref acc in
-      for i = 0 to String.length s - 1 do
-        let v = V_Or_Uninitialized.initialized (V.of_char s.[i]) in
-        acc := f !acc v;
-      done;
-      f !acc V_Or_Uninitialized.singleton_zero (* add null terminator *)
-    in
-    let size_char = Integer.of_int (Cil.bitsSizeOfInt IChar) in
-    of_list fold_string s size_char
-
-  let from_wstring s =
-    let conv v = V_Or_Uninitialized.initialized (V.of_int64 v) in
-    let fold f acc l = List.fold_left (fun acc v -> f acc (conv v)) acc l in
-    let size_wchar = Integer.of_int (Cil.bitsSizeOf (Machine.wchar_type ())) in
-    of_list fold (s @ [0L]) size_wchar
-
-  let from_cstring = function
-    | Base.CSWstring w -> from_wstring w
-    | Base.CSString s -> from_string s
-
   (* Note: it may be surprising that an offsetmap of top_ival repeated
      on 32 bits gives a state space of size 3^32. Indeed each bit
      belongs to {-1,0,1}. *)
@@ -1013,13 +990,6 @@ module Default_offsetmap = struct
          practice, because the Null base is always bound to something correct
          in module Value/Initial_state, or is invalid. *)
       aux validity V_Or_Uninitialized.bottom
-    | Base.String (id,lit) ->
-      try
-        `Value (StringOffsetmaps.find id)
-      with Not_found ->
-        let o = V_Offsetmap.from_cstring lit in
-        StringOffsetmaps.add id o;
-        `Value o
 
   let default_contents = Lmap.Bottom
   (* this works because, currently:

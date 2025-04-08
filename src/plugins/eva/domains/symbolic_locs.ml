@@ -218,7 +218,6 @@ module Memory = struct
         | Base.Var (vi, _) -> not vi.vglob
         | Base.Allocated _ -> true (* can be freed. TODO: handle free *)
         | Base.Null | Base.CLogic_Var _ -> false (* does not appear yet *)
-        | Base.String _ -> false (* can be seen as a global*)
       in
       if add then Base.Set.add b acc else acc
     in

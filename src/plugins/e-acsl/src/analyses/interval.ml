@@ -364,7 +364,6 @@ let rec infer ~force ~logic_env t =
     | TSizeOfE t ->
       ignore (recurse t);
       infer_sizeof (get_cty t)
-    | TSizeOfStr str -> singleton_of_int (String.length str + 1 (* '\0' *))
     | TAlignOf ty -> infer_alignof ty
     | TAlignOfE t ->
       ignore (recurse t);

@@ -85,7 +85,6 @@ let rank_term = function
   | TLval _ -> 1
   | TSizeOf _ -> 2
   | TSizeOfE _ -> 3
-  | TSizeOfStr _ -> 4
   | TAlignOf _ -> 5
   | TAlignOfE _ -> 6
   | TUnOp _ -> 7
@@ -632,7 +631,7 @@ struct
       end)
 end
 
-module Typ = struct
+module Typ= struct
   include
     MakeTyp
       (struct
@@ -678,19 +677,19 @@ module Typeinfo = struct
   }
 
   include Make_with_collections
-      (struct
-        include Datatype.Undefined
-        type t = typeinfo
-        let name = "Type_info"
-        let reprs =
-          [ { torig_name = "";
-              tname = "";
+    (struct
+      include Datatype.Undefined
+      type t = typeinfo
+      let name = "Type_info"
+      let reprs =
+        [ { torig_name = "";
+            tname = "";
               ttype = List.hd Typ.reprs;
-              treferenced = false } ]
-        let compare v1 v2 = String.compare v1.tname v2.tname
-        let hash v = Hashtbl.hash v.tname
-        let equal v1 v2 = v1.tname = v2.tname
-      end)
+            treferenced = false } ]
+      let compare v1 v2 = String.compare v1.tname v2.tname
+      let hash v = Hashtbl.hash v.tname
+      let equal v1 v2 = v1.tname = v2.tname
+    end)
 end
 
 module Exp = struct
@@ -752,21 +751,21 @@ module Varinfo_Id = struct
     vname = "@dummy_varinfo@";
     vorig_name = "@dummy_varinfo@";
     vtype    = Typ.dummy;
-    vattr    = [];
-    vstorage = NoStorage;
-    vglob    = false;
-    vdefined = false;
-    vformal  = false;
-    vinline  = false;
+      vattr = [];
+      vstorage = NoStorage;
+      vglob = false;
+      vdefined = false;
+      vformal = false;
+      vinline = false;
     vdecl    = Location.dummy;
-    vid      = -1;
-    vaddrof  = false;
-    vreferenced = false;
-    vtemp    = false;
-    vdescr   = None;
-    vdescrpure = false;
-    vghost   = false;
-    vsource  = false;
+      vid = -1;
+      vaddrof = false;
+      vreferenced = false;
+      vtemp = false;
+      vdescr = None;
+      vdescrpure = false;
+      vghost = false;
+      vsource = false;
     vlogic_var_assoc = None;
   }
 
@@ -832,7 +831,7 @@ module Fieldinfo = struct
     foffset_in_bits = None;
   }
 
-  include Make_with_collections
+  include  Make_with_collections
       (struct
         type t = fieldinfo
         let name = "fieldinfo"
@@ -915,7 +914,7 @@ module Enumitem = struct
                  einame = "";
                  eival  = Exp.dummy;
                  eihost = i;
-                 eiloc  = Location.unknown })
+                 eiloc = Location.unknown })
             Enuminfo.reprs
         let compare v1 v2 = String.compare v1.einame v2.einame
         let hash v = Hashtbl.hash v.einame
@@ -934,8 +933,6 @@ let compare_constant ~strict c1 c2 = match c1, c2 with
     if r = 0 && strict
     then Option.compare Datatype.String.compare s1 s2
     else r
-  | CStr s1, CStr s2 -> Datatype.String.compare s1 s2
-  | CWStr s1, CWStr s2 -> compare_list Datatype.Int64.compare s1 s2
   | CChr c1, CChr c2 -> Datatype.Char.compare c1 c2
   | CReal (f1,k1,s1), CReal(f2,k2,s2) ->
     let r =
@@ -945,17 +942,15 @@ let compare_constant ~strict c1 c2 = match c1, c2 with
     then Option.compare Datatype.String.compare s1 s2
     else r
   | CEnum e1, CEnum e2 -> Enumitem.compare e1 e2
-  | (CInt64 _, (CStr _ | CWStr _ | CChr _ | CReal _ | CEnum _)) -> 1
-  | (CStr _, (CWStr _ | CChr _ | CReal _ | CEnum _)) -> 1
-  | (CWStr _, (CChr _ | CReal _ | CEnum _)) -> 1
+  | (CInt64 _, (CChr _ | CReal _ | CEnum _)) -> 1
   | (CChr _, (CReal _ | CEnum _)) -> 1
   | (CReal _, CEnum _) -> 1
-  | (CStr _ | CWStr _ | CChr _ | CReal _ | CEnum _),
-    (CInt64 _ | CStr _ | CWStr _ | CChr _ | CReal _) -> -1
+  | (CChr _ | CReal _ | CEnum _),
+    (CInt64 _ | CChr _ | CReal _) -> -1
 
 let hash_const c =
   match c with
-  | CStr _ | CWStr _ | CChr _ -> Hashtbl.hash c
+  | CChr _ -> Hashtbl.hash c
   | CReal (fn,fk,_) -> Hashtbl.hash fn + Hashtbl.hash fk
   | CInt64 (n,k,_) -> Integer.hash n + Hashtbl.hash k
   | CEnum ei -> 95 + Enumitem.hash ei
@@ -969,36 +964,36 @@ end
 module Make_compare_non_strict(M: Make_cmp_input) = struct
   let dummy = M.dummy
   include Make_with_collections(struct
-      include M
-      let compare = M.compare ~structural:false ~strict:false
-    end)
+    include M
+    let compare = M.compare ~structural:false ~strict:false
+  end)
 end
 
 module Make_compare_strict(M: Make_cmp_input) = struct
   let dummy = M.dummy
   include Make_with_collections(struct
-      include M
-      let compare = M.compare ~structural:false ~strict:true
-      let name = M.name ^ "Strict"
-    end)
+    include M
+    let compare = M.compare ~structural:false ~strict:true
+    let name = M.name ^ "Strict"
+  end)
 end
 
 module Make_compare_strict_sized(M: Make_cmp_input) = struct
   let dummy = M.dummy
   include Make_with_collections(struct
-      include M
-      let compare = M.compare ~structural:true ~strict:true
-      let name = M.name ^ "StrictSized"
-    end)
+    include M
+    let compare = M.compare ~structural:true ~strict:true
+    let name = M.name ^ "StrictSized"
+  end)
 end
 
 module Make_compare_non_strict_sized(M: Make_cmp_input) = struct
   let dummy = M.dummy
   include Make_with_collections(struct
-      include M
-      let compare = M.compare ~structural:true ~strict:false
-      let name = M.name ^ "Sized"
-    end)
+    include M
+    let compare = M.compare ~structural:true ~strict:false
+    let name = M.name ^ "Sized"
+  end)
 end
 
 module StructEq =
@@ -1050,8 +1045,6 @@ struct
     let compare_exp = compare_exp ~structural ~strict in
     let compare_lval = compare_lval ~structural ~strict in
     match e1.enode, e2.enode with
-    | Const (CStr _), Const (CStr _)
-    | Const (CWStr _), Const (CWStr _) -> compare e1.eid e2.eid
     | Const c1, Const c2 -> compare_constant ~strict c1 c2
     | Const _, _ -> 1
     | _, Const _ -> -1
@@ -1100,13 +1093,6 @@ struct
     | AddrOf lv1, AddrOf lv2 -> compare_lval lv1 lv2
     | AddrOf _, _ -> 1
     | _, AddrOf _ -> -1
-    | AddrOfStr s1, AddrOfStr s2 -> String.compare s1 s2
-    | AddrOfStr _, _ -> 1
-    | _, AddrOfStr _ -> -1
-    | AddrOfWStr l1, AddrOfWStr l2 ->
-      compare_list Int64.compare l1 l2
-    | AddrOfWStr _, _ -> 1
-    | _, AddrOfWStr _ -> -1
     | StartOf lv1, StartOf lv2 -> compare_lval lv1 lv2
 
   and compare_lval ~structural ~strict (h1,o1) (h2,o2) =
@@ -1152,8 +1138,6 @@ struct
       (prime * res) lxor Typ.hash ty
     | CastE(ty,e) -> hash_exp ((prime*acc) lxor Typ.hash ty) e
     | AddrOf lv -> hash_lval (prime*acc lxor 329) lv
-    | AddrOfStr s -> (prime * acc) lxor Hashtbl.hash s
-    | AddrOfWStr l ->  (prime * acc) lxor Hashtbl.hash l
     | StartOf lv -> hash_lval (prime*acc lxor 431) lv
   and hash_lval acc (h,o) =
     hash_offset ((prime * acc) lxor hash_lhost 856 h) o
@@ -1375,7 +1359,7 @@ module Builtin_logic_info = struct
     bl_params  = [];
     bl_type    = None;
     bl_profile = [];
-  }
+            }
 
   include Make_with_collections
       (struct
@@ -1445,7 +1429,7 @@ module Initinfo = struct
         let name = "Initinfo"
         let reprs =
           dummy ::
-          List.map (fun t -> { init = Some (CompoundInit(t, [])) }) Typ.reprs
+          List.map (fun e -> { init = Some (CInit (SingleInit e)) }) Exp.reprs
         let pretty fmt i = !pretty_ref fmt i
       end)
 end
@@ -1694,12 +1678,12 @@ module Model_info = struct
       let equal = Datatype.from_compare
       let hash mi = Hashtbl.hash mi.mi_name + 3 * Typ.hash mi.mi_base_type
       let copy mi = {
-        mi_name = mi.mi_name;
-        mi_base_type = Typ.copy mi.mi_base_type;
-        mi_field_type = Logic_type.copy mi.mi_field_type;
-        mi_decl = Location.copy mi.mi_decl;
-        mi_attr = List.map Attribute.copy mi.mi_attr
-      }
+          mi_name = mi.mi_name;
+          mi_base_type = Typ.copy mi.mi_base_type;
+          mi_field_type = Logic_type.copy mi.mi_field_type;
+          mi_decl = Location.copy mi.mi_decl;
+          mi_attr = List.map Attribute.copy mi.mi_attr
+        }
       let pretty fmt t = !pretty_ref fmt t
     end)
 end
@@ -1757,7 +1741,6 @@ let rec compare_term t1 t2 =
     | TAlignOf ty1 , TAlignOf ty2 -> Typ.compare ty1 ty2
     | TSizeOfE t1 , TSizeOfE t2
     | TAlignOfE t1 , TAlignOfE t2 -> compare_term t1 t2
-    | TSizeOfStr s1 , TSizeOfStr s2 -> String.compare s1 s2
     | TUnOp(op1,t1) , TUnOp(op2,t2) ->
       let c = Extlib.compare_basic op1 op2 in
       if c <> 0 then c else compare_term t1 t2
@@ -1813,7 +1796,7 @@ let rec compare_term t1 t2 =
       else
         let cq = compare_list Logic_var.compare q1 q2 in
         if cq <> 0 then cq else Option.compare compare_predicate p1 p2
-    | (TConst _ | TLval _ | TSizeOf _ | TSizeOfE _ | TSizeOfStr _ | TAlignOf _
+    | (TConst _ | TLval _ | TSizeOf _ | TSizeOfE _ | TAlignOf _
       | TAlignOfE _ | TUnOp _ | TBinOp _ | TCast _ | TAddrOf _ | TStartOf _
       | Tapp _ | Tlambda _ | TDataCons _ | Tif _ | Tat _
       | Tbase_addr _ | Tblock_length _ | Toffset _
@@ -1971,7 +1954,6 @@ let rec hash_term (acc,depth,tot) t =
     | TLval lv -> hash_tlval (acc+2,depth - 1,tot -1) lv
     | TSizeOf t -> (acc + 3 + Typ.hash t, tot - 1)
     | TSizeOfE t -> hash_term (acc+5,depth -1, tot-1) t
-    | TSizeOfStr s -> (acc + 7 + Hashtbl.hash s, tot - 1)
     | TAlignOf t -> (acc + 11 + Typ.hash t, tot - 1)
     | TAlignOfE t -> hash_term (acc+13,depth-1,tot-1) t
     | TUnOp(op,t) -> hash_term (acc+17+Hashtbl.hash op,depth-1,tot-2) t
@@ -2197,7 +2179,7 @@ module Logic_constant = struct
   let pretty_ref = ref (fun _ _ -> assert false)
   let dummy = LStr "@dummy_logic_constant@"
 
-  include Make_with_collections
+  include  Make_with_collections
       (struct
         type t = logic_constant
         let name = "Logic_constant"
@@ -2848,51 +2830,51 @@ module Syntactic_scope = struct
   let dummy = Program
 
   include Make_with_collections
-      (struct
-        include Datatype.Serializable_undefined
-        type t = syntactic_scope
-        let name = "Syntactic_scope"
+    (struct
+      include Datatype.Serializable_undefined
+      type t = syntactic_scope
+      let name = "Syntactic_scope"
         let reprs = [ dummy ]
-        let compare s1 s2 =
-          match s1, s2 with
-          | Global, Global -> 0
-          | Global, _ -> 1
-          | _, Global -> -1
-          | Program, Program -> 0
-          | Program, _ -> 1
-          | _, Program -> -1
-          | Translation_unit s1, Translation_unit s2 ->
-            Filepath.compare s1 s2
-          | Translation_unit _, _ -> 1
-          | _, Translation_unit _ -> -1
-          | Formal kf1, Formal kf2 -> Kf.compare kf1 kf2
-          | Formal _, _ -> 1
-          | _, Formal _ -> -1
-          | Whole_function kf1, Whole_function kf2 -> Kf.compare kf1 kf2
-          | Whole_function _, _ -> 1
-          | _, Whole_function _ -> -1
-          | Block_scope s1, Block_scope s2 -> Stmt_Id.compare s1 s2
-        let equal = Datatype.from_compare
-        let hash s =
-          match s with
-          | Global -> 3
-          | Program -> 5
-          | Translation_unit s -> 7 * Filepath.hash s + 11
-          | Block_scope s -> 13 * Stmt_Id.hash s  + 17
-          | Whole_function kf -> 19 * Kf.hash kf + 23
-          | Formal kf -> 29 * Kf.hash kf + 31
-        let pretty fmt = function
-          | Global | Program -> Format.pp_print_string fmt "<Whole Program>"
-          | Translation_unit s ->
-            Format.fprintf fmt "File %a" Filepath.pretty s
-          | Formal kf ->
-            Format.fprintf fmt "Parameter of %a" Kf.pretty kf
-          | Whole_function kf ->
-            Format.fprintf fmt "Local variable of %a" Kf.pretty kf
-          | Block_scope s ->
-            Format.fprintf fmt "Statement at %a:@\n@[%a@]"
-              Location.pretty (Stmt.loc s) Stmt.pretty s
-      end)
+      let compare s1 s2 =
+        match s1, s2 with
+        | Global, Global -> 0
+        | Global, _ -> 1
+        | _, Global -> -1
+        | Program, Program -> 0
+        | Program, _ -> 1
+        | _, Program -> -1
+        | Translation_unit s1, Translation_unit s2 ->
+          Filepath.compare s1 s2
+        | Translation_unit _, _ -> 1
+        | _, Translation_unit _ -> -1
+        | Formal kf1, Formal kf2 -> Kf.compare kf1 kf2
+        | Formal _, _ -> 1
+        | _, Formal _ -> -1
+        | Whole_function kf1, Whole_function kf2 -> Kf.compare kf1 kf2
+        | Whole_function _, _ -> 1
+        | _, Whole_function _ -> -1
+        | Block_scope s1, Block_scope s2 -> Stmt_Id.compare s1 s2
+      let equal = Datatype.from_compare
+      let hash s =
+        match s with
+        | Global -> 3
+        | Program -> 5
+        | Translation_unit s -> 7 * Filepath.hash s + 11
+        | Block_scope s -> 13 * Stmt_Id.hash s  + 17
+        | Whole_function kf -> 19 * Kf.hash kf + 23
+        | Formal kf -> 29 * Kf.hash kf + 31
+      let pretty fmt = function
+        | Global | Program -> Format.pp_print_string fmt "<Whole Program>"
+        | Translation_unit s ->
+          Format.fprintf fmt "File %a" Filepath.pretty s
+        | Formal kf ->
+          Format.fprintf fmt "Parameter of %a" Kf.pretty kf
+        | Whole_function kf ->
+          Format.fprintf fmt "Local variable of %a" Kf.pretty kf
+        | Block_scope s ->
+          Format.fprintf fmt "Statement at %a:@\n@[%a@]"
+            Location.pretty (Stmt.loc s) Stmt.pretty s
+    end)
 end
 
 (* -------------------------------------------------------------------------- *)

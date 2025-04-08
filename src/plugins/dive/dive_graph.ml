@@ -210,7 +210,7 @@ let output_to_dot out_channel g =
           | Alarm _ ->  [ `Shape `Doubleoctagon ;
                           `Style `Bold ; `Color 0xff0000 ;
                           `Style `Filled ; `Fillcolor 0xff0000 ]
-          | AbsoluteMemory | String _ -> [`Shape `Box3d]
+          | AbsoluteMemory -> [`Shape `Box3d]
           | Const _ -> [`Shape `Ellipse]
           | Error _ -> [`Color 0xff0000]
         and range = match v.node_range with

@@ -300,7 +300,7 @@ module Precedence = struct
     | BinOp((Div|Mod|Mult),_,_,_) -> multiplicativeLevel
     (* Unary *)
     | CastE(_,_)
-    | AddrOf(_) | AddrOfStr _ | AddrOfWStr _
+    | AddrOf(_)
     | StartOf(_)
     | UnOp((Neg|BNot|LNot),_,_) -> unaryLevel
     (* Lvals *)
@@ -338,7 +338,7 @@ module Precedence = struct
     | TLval(TMem _ , _) -> derefStarLevel
     | TLval(TVar _, (TField _|TIndex _|TModel _)) -> indexLevel
     | TLval(TResult _,(TField _|TIndex _|TModel _)) -> indexLevel
-    | TSizeOf _ | TSizeOfE _ | TSizeOfStr _ -> sizeOfLevel
+    | TSizeOf _ | TSizeOfE _ -> sizeOfLevel
     | TAlignOf _ | TAlignOfE _ -> alignOfLevel
     (* VP: I'm not sure I understand why sizeof(x) and f(x) should
        have a separated treatment wrt parentheses. *)
@@ -490,21 +490,18 @@ type annot_ctxt =
   | In_simple_annot  (** in /*@ ... */ annotation *)
   | In_nested_annot  (** in /@ ... @/ annotation *)
 
+let pp_wchar fmt c =
+  if Int64.unsigned_compare c 256L < 0 then
+    Format.pp_print_char fmt (Char.unsafe_chr @@ Int64.to_int c)
+  else if Int64.unsigned_compare c 0x10000L < 0 then
+    Format.fprintf fmt "\\u%04Lx" c
+  else if Int64.unsigned_compare c 0x100000000L < 0 then
+    Format.fprintf fmt "\\U%08Lx" c
+  else (* are there extended character sets of more than 32 bits in the wild? *)
+    Kernel.fatal "Unexpected wide character: %Lx" c
+
 let pp_wstring fmt s =
-  (* text ("L\"" ^ escape_string s ^ "\"")  *)
-  fprintf fmt "L";
-  List.iter
-    (fun elt ->
-       if (elt >= Int64.zero &&
-           elt <= (Int64.of_int 255)) then
-         fprintf fmt "%S"
-           (Escape.escape_char (Char.chr (Int64.to_int elt)))
-       else
-         fprintf fmt "\"\\x%LX\"" elt;
-       fprintf fmt "@ ")
-    s;
-  (* we cannot print L"\xabcd" "feedme" as L"\xabcdfeedme" --
-   * the former has 7 wide characters and the later has 3. *)
+  Format.fprintf fmt "L\"%a\"" (Pretty_utils.pp_list ~sep:"" pp_wchar) s
 
 class cil_printer () = object (self)
 
@@ -648,8 +645,6 @@ class cil_printer () = object (self)
       in
       fprintf fmt "%s%a" prefix (pretty_C_constant suffix ik) i
 
-    | CStr(s) -> fprintf fmt "\"%s\"" (Escape.escape_string s)
-    | CWStr(s) -> pp_wstring fmt s
     | CChr(c) -> fprintf fmt "'%s'" (Escape.escape_char c)
     | CReal(_, _, Some s) -> fprintf fmt "%s" s
     | CReal(f, FFloat, None) ->
@@ -819,8 +814,6 @@ class cil_printer () = object (self)
       when Datatype.String.Hashtbl.mem rename_builtins v.vname ->
       self#varinfo fmt v
     | AddrOf lv -> fprintf fmt "& %a" (self#lval_prec Precedence.addrOfLevel) lv
-    | AddrOfStr s -> fprintf fmt "&%S" s
-    | AddrOfWStr l -> fprintf fmt "&%a" pp_wstring l
     | StartOf(lv) ->
       if state.print_cil_as_is || non_decay then
         fprintf fmt "&(%a[0])" self#lval lv
@@ -921,6 +914,12 @@ class cil_printer () = object (self)
            ignore (List.fold_left print_next_index curr_index tl));
         Format.fprintf fmt "@]}"
       end
+
+  method init_or_str fmt i =
+    match i with
+    | CInit i -> self#init fmt i
+    | StrInit s -> Format.fprintf fmt "%S" s
+    | WStrInit l -> pp_wstring fmt l
 
   (** What terminator to print after an instruction. sometimes we want to
       print sequences of instructions separated by comma *)
@@ -1255,7 +1254,7 @@ class cil_printer () = object (self)
   method initinfo fmt io =
     match io.init with
     | None -> fprintf fmt "{}"
-    | Some i -> fprintf fmt "%a" self#init i
+    | Some i -> fprintf fmt "%a" self#init_or_str i
 
   method fundec fmt fd =  fprintf fmt "%a" self#varinfo fd.svar
 
@@ -1804,7 +1803,7 @@ class cil_printer () = object (self)
               | None -> ()
               | Some i ->
                 fprintf fmt " =@ ";
-                self#init fmt i;
+                self#init_or_str fmt i;
              );
              fprintf fmt ";") ;
         fprintf fmt "@]@\n";
@@ -2154,82 +2153,82 @@ class cil_printer () = object (self)
   (* Print one attribute. Return also an indication whether this attribute
      should be printed inside the __attribute__ list *)
   method attribute fmt (an, args) =
-      (* Recognize and take care of some known cases *)
+    (* Recognize and take care of some known cases *)
     match an, args with
-       | "const", [] -> self#pp_keyword fmt "const"; false
-       (* Put the aconst inside the attribute list *)
-       | "aconst", [] when not (Machine.msvcMode ()) -> fprintf fmt "__const__"; true
-       | "thread", [ ACons ("c11",[]) ]
-         when not state.print_cil_as_is ->
-         fprintf fmt "_Thread_local"; false
-       | "thread", [] when not (Machine.msvcMode ()) -> fprintf fmt "__thread"; false
-       | "volatile", [] -> self#pp_keyword fmt "volatile"; false
-       | "ghost", [] -> self#pp_keyword fmt "\\ghost"; false
-       | "restrict", [] ->
-         if Machine.msvcMode () then
-           fprintf fmt "__restrict"
-         else
-           self#pp_keyword fmt "restrict";
-         false
-       | "missingproto", [] ->
-         if self#display_comment () then fprintf fmt "/* missing proto */";
-         false
-       | "cdecl", [] when Machine.msvcMode () ->
-         fprintf fmt "__cdecl"; false
-       | "stdcall", [] when Machine.msvcMode () ->
-         fprintf fmt "__stdcall"; false
-       | "fastcall", [] when Machine.msvcMode () ->
-         fprintf fmt "__fastcall"; false
-       | "declspec", args when Machine.msvcMode () ->
-         fprintf fmt "__declspec(%a)"
-           (Pretty_utils.pp_list ~sep:"" self#attrparam) args;
-         false
-       | "w64", [] when Machine.msvcMode () ->
-         fprintf fmt "__w64"; false
-       | "asm", args ->
-         fprintf fmt "__asm__(%a)"
-           (Pretty_utils.pp_list ~sep:"" self#attrparam) args;
-         false
+    | "const", [] -> self#pp_keyword fmt "const"; false
+    (* Put the aconst inside the attribute list *)
+    | "aconst", [] when not (Machine.msvcMode ()) -> fprintf fmt "__const__"; true
+    | "thread", [ ACons ("c11",[]) ]
+      when not state.print_cil_as_is ->
+      fprintf fmt "_Thread_local"; false
+    | "thread", [] when not (Machine.msvcMode ()) -> fprintf fmt "__thread"; false
+    | "volatile", [] -> self#pp_keyword fmt "volatile"; false
+    | "ghost", [] -> self#pp_keyword fmt "\\ghost"; false
+    | "restrict", [] ->
+      if Machine.msvcMode () then
+        fprintf fmt "__restrict"
+      else
+        self#pp_keyword fmt "restrict";
+      false
+    | "missingproto", [] ->
+      if self#display_comment () then fprintf fmt "/* missing proto */";
+      false
+    | "cdecl", [] when Machine.msvcMode () ->
+      fprintf fmt "__cdecl"; false
+    | "stdcall", [] when Machine.msvcMode () ->
+      fprintf fmt "__stdcall"; false
+    | "fastcall", [] when Machine.msvcMode () ->
+      fprintf fmt "__fastcall"; false
+    | "declspec", args when Machine.msvcMode () ->
+      fprintf fmt "__declspec(%a)"
+        (Pretty_utils.pp_list ~sep:"" self#attrparam) args;
+      false
+    | "w64", [] when Machine.msvcMode () ->
+      fprintf fmt "__w64"; false
+    | "asm", args ->
+      fprintf fmt "__asm__(%a)"
+        (Pretty_utils.pp_list ~sep:"" self#attrparam) args;
+      false
 
-       (* sm: also suppress "format" because we seem to print it in
-          a way gcc does not like *)
-       | "format", _ ->
-         if self#display_comment () then fprintf fmt "/* format attribute */";
-         false
+    (* sm: also suppress "format" because we seem to print it in
+       a way gcc does not like *)
+    | "format", _ ->
+      if self#display_comment () then fprintf fmt "/* format attribute */";
+      false
 
-       | "hidden", _ -> (* hidden attribute list *)
-         false
-       (* sm: here's another one I don't want to see gcc warnings about.. *)
-       | "mayPointToStack", _ when not state.print_cil_input ->
-         (* [matth: may be inside another comment.]
-            -> text "/*mayPointToStack*/", false *)
-         false
+    | "hidden", _ -> (* hidden attribute list *)
+      false
+    (* sm: here's another one I don't want to see gcc warnings about.. *)
+    | "mayPointToStack", _ when not state.print_cil_input ->
+      (* [matth: may be inside another comment.]
+         -> text "/*mayPointToStack*/", false *)
+      false
 
-       | "arraylen", [a] ->
-         if self#display_comment () then fprintf fmt "/*[%a]*/" self#attrparam a;
-         false
-       | "static",_ ->
-         if self#display_comment () then fprintf fmt "/* static */"; false
-       | "", _ ->
-         fprintf fmt "%a "
-           (Pretty_utils.pp_list ~sep:" " self#attrparam) args;
-         true
-       | s, _ when
+    | "arraylen", [a] ->
+      if self#display_comment () then fprintf fmt "/*[%a]*/" self#attrparam a;
+      false
+    | "static",_ ->
+      if self#display_comment () then fprintf fmt "/* static */"; false
+    | "", _ ->
+      fprintf fmt "%a "
+        (Pretty_utils.pp_list ~sep:" " self#attrparam) args;
+      true
+    | s, _ when
         s = Ast_attributes.bitfield_attribute_name &&
-           not state.print_cil_as_is &&
-           not (Kernel.is_debug_key_enabled Kernel.dkey_print_bitfields) ->
-         false
-       | _ -> (* This is the default case *)
-         (* Add underscores to the name *)
-         let an' =
-           if Machine.msvcMode () then "__" ^ an else "__" ^ an ^ "__"
-         in
-         (match args with
-          | [] -> fprintf fmt "%s" an'
-          | _ :: _ ->
-            fprintf fmt "%s(%a)"
-              an'
-              (Pretty_utils.pp_list ~sep:"," self#attrparam) args);
+        not state.print_cil_as_is &&
+        not (Kernel.is_debug_key_enabled Kernel.dkey_print_bitfields) ->
+      false
+    | _ -> (* This is the default case *)
+      (* Add underscores to the name *)
+      let an' =
+        if Machine.msvcMode () then "__" ^ an else "__" ^ an ^ "__"
+      in
+      (match args with
+       | [] -> fprintf fmt "%s" an'
+       | _ :: _ ->
+         fprintf fmt "%s(%a)"
+           an'
+           (Pretty_utils.pp_list ~sep:"," self#attrparam) args);
       true
 
   method private attribute_prec (contextprec: int) fmt (a: attrparam) =
@@ -2510,7 +2509,6 @@ class cil_printer () = object (self)
       fprintf fmt "%a(%a)" self#pp_acsl_keyword "sizeof" (self#typ None) t
     | TSizeOfE e ->
       fprintf fmt "%a(%a)" self#pp_acsl_keyword "sizeof" self#term e
-    | TSizeOfStr s -> fprintf fmt "%a(%S)" self#pp_acsl_keyword "sizeof" s
     | TAlignOf e ->
       fprintf fmt "%a(%a)" self#pp_acsl_keyword "alignof" (self#typ None) e
     | TAlignOfE e ->

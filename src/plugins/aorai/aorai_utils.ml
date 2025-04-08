@@ -207,7 +207,8 @@ let isCrossableAtInit tr func =
              let init = Globals.Vars.find v in
              let init = match init.Cil_types.init with
                | None -> Cil.makeZeroInit ~loc:v.vdecl v.vtype
-               | Some i -> i
+               | Some (CInit i) -> i
+               | _ -> failwith "writeme"
              in
              aux_init off init
            with Not_found -> None)
@@ -379,8 +380,8 @@ let rec term_to_exp t res =
   let loc = t.term_loc in
   match t.term_node with
   | TConst (Integer (value,repr)) -> Cil.kinteger64 ~loc ?repr value
-  | TConst (LStr str) -> new_exp ~loc (Const (CStr str))
-  | TConst (LWStr l) -> new_exp ~loc (Const (CWStr l))
+  | TConst (LStr _str) -> Aorai_option.not_yet_implemented "term_to_exp str"
+  | TConst (LWStr _l) -> Aorai_option.not_yet_implemented "term_to_exp wstr"
   | TConst (LChr c) -> new_exp ~loc (Const (CChr c))
   | TConst (LReal l_real) ->
     let Parsed (format, _) = Typed_float.parse_exn l_real.r_literal in
@@ -396,7 +397,6 @@ let rec term_to_exp t res =
   | TLval tlval -> new_exp ~loc (Lval (tlval_to_lval tlval res))
   | TSizeOf ty -> new_exp ~loc (SizeOf ty)
   | TSizeOfE t -> new_exp ~loc (SizeOfE(term_to_exp t res))
-  | TSizeOfStr s -> Cil.kinteger ~loc (Machine.sizeof_kind()) (String.length s)
   | TAlignOf ty -> new_exp ~loc (AlignOf ty)
   | TAlignOfE t -> new_exp ~loc (AlignOfE (term_to_exp t res))
   | TUnOp (unop, t) ->
@@ -683,7 +683,7 @@ let add_gvar ?init vi =
   set_varinfo vi.vname vi
 
 let add_gvar_zeroinit vi =
-  add_gvar ~init:(Cil.makeZeroInit ~loc:(Current_loc.get()) vi.vtype) vi
+  add_gvar ~init:(CInit (Cil.makeZeroInit ~loc:(Current_loc.get()) vi.vtype)) vi
 
 let mk_gvar ?init ~ty name =
   (* See if the variable is already declared *)
@@ -702,7 +702,7 @@ let mk_gvar ?init ~ty name =
   add_gvar ?init vi
 
 let mk_gvar_scalar ~init ?(ty = Cil.typeOf init) name =
-  mk_gvar ~init:(SingleInit init) ~ty name
+  mk_gvar ~init:(CInit (SingleInit init)) ~ty name
 
 let mk_integer value =
   Cil.integer ~loc:(Current_loc.get()) value
@@ -902,7 +902,7 @@ let mk_global_states_init root =
        let init =
          if is_possible_init state then mk_int_exp 1 else mk_int_exp 0
        in
-       let init = SingleInit init in
+       let init = CInit (SingleInit init) in
        let var = Data_for_aorai.get_state_var state in
        add_gvar ~init var)
     states

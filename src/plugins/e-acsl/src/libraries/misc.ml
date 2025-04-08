@@ -93,8 +93,6 @@ let rec ptr_base ~loc exp =
   (* AddressOf: if it is an addressof array then replace all trailing offsets
      with zero offsets to get the base. *)
   | AddrOf lv -> Cil.mkAddrOf ~loc (shift_offsets lv loc)
-  (* we already point at the start of the string. *)
-  | AddrOfStr _ | AddrOfWStr _ -> exp
   (* StartOf already points to the start of an array, return exp directly *)
   | StartOf _ -> exp
   (* Cast: strip cast and continue, then recast to original type. *)

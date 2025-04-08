@@ -219,19 +219,12 @@ let extract_int_list ~cardinal value =
   | Z.Overflow ->
     error "Overflow integer value: %a" Cvalue.V.pretty value
 
-let extract_non_wide_string = function
-  | Base.CSString s -> Result.Ok s
-  | Base.CSWstring s ->
-    error "Wide string not supported (string %S)" (Escape.escape_wstring s)
-
 let extract_constant_string value =
   match Location_Bytes.fold_i (fun b i l -> (b,i) :: l) value [] with
-  | [Base.String (_, e), i] when Ival.is_zero i ->
-    extract_non_wide_string e
+  | [Base.Var (vi, _), i] when Ival.is_zero i && Ast_attributes.contains "__str_lit" vi.vattr ->
+    Result.ok "TODO: Retrieve String Literal"
   | _ | exception Abstract_interp.Error_Top ->
     error "When decoding string, incorrect value '%a'" Cvalue.V.pretty value
-
-
 
 (* *)
 

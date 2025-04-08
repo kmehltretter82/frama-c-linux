@@ -737,7 +737,7 @@ let emittedVarDecls: (string, bool) H.t = H.create 113
  * name maps to declaration, location, and semantic checksum *)
 let emittedFunDefn: (string, fundec * location * int) H.t = H.create 113
 (* and same for variable definitions; name maps to GVar fields *)
-let emittedVarDefn: (string, varinfo * init option * location) H.t = H.create 113
+let emittedVarDefn: (string, varinfo * init_or_str option * location) H.t = H.create 113
 
 (** A mapping from the new names to the original names. Used in PASS2 when we
  * rename variables. *)
@@ -2501,13 +2501,19 @@ and equalLvals (x: lval) (y: lval) : bool =
     | _,_ -> false
   end
 
-let equalInitOpts (x: init option) (y: init option) : bool =
-  begin
-    match x,y with
-    | None,None -> true
-    | Some(xi), Some(yi) -> (equalInits xi yi)
-    | _,_ -> false
-  end
+let equal_init_or_str i1 i2 =
+  match i1, i2 with
+  | CInit i1, CInit i2 -> equalInits i1 i2
+  | StrInit s1, StrInit s2 -> String.equal s1 s2
+  | WStrInit l1, WStrInit l2 ->
+    list_compare Int64.compare l1 l2 = 0
+  | (CInit _ | StrInit _ | WStrInit _), _ -> false
+
+let equalInitOpts x y =
+  match x,y with
+  | None,None -> true
+  | Some xi, Some yi -> equal_init_or_str xi yi
+  | _,_ -> false
 
 let update_formals_names merged_vi curr_vi =
   (* if the reference varinfo already has formals, everything

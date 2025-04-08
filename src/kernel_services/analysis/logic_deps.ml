@@ -404,7 +404,7 @@ let populate_zone ctx visit cil_node current_zones =
       | Tat (_, StmtLabel st) -> self#change_label_to_stmt !st t
       | Tat (_, FormalLabel s) ->
         failwith ("unknown logic label" ^ s)
-      | TSizeOf _ | TSizeOfE _ | TSizeOfStr _ | TAlignOf _ | TAlignOfE _ ->
+      | TSizeOf _ | TSizeOfE _ | TAlignOf _ | TAlignOfE _ ->
         (* These are static constructors, there are no dependencies here *)
         SkipChildren
       | _ -> DoChildren

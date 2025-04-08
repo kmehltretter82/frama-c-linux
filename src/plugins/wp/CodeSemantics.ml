@@ -286,9 +286,6 @@ struct
 
   let exp_node env e =
     match e.enode with
-
-    | Const (CStr s)  -> Loc (M.literal ~eid:e.eid (Cstring.C_str s))
-    | Const (CWStr s) -> Loc (M.literal ~eid:e.eid (Cstring.W_str s))
     | Const c -> Val (Cvalues.constant c)
 
     | Lval lv ->
@@ -305,8 +302,6 @@ struct
 
     | AddrOf lv ->
       Loc (lval env lv)
-    | AddrOfStr _ | AddrOfWStr _ ->
-      Wp_parameters.not_yet_implemented "address of string literal"
     | StartOf lv ->
       Loc (Cvalues.startof ~shift:M.shift (lval env lv) (Cil.typeOfLval lv))
 
@@ -582,6 +577,8 @@ struct
 
   let init ~sigma v = function
     | None -> [init_value ~sigma (Cil.var v) v.vtype None]
-    | Some init -> List.rev (init_variable ~sigma (Cil.var v) init [])
+    | Some (CInit init) -> List.rev (init_variable ~sigma (Cil.var v) init [])
+    | Some (StrInit _s) -> Wp_parameters.not_yet_implemented "StrInit"
+    | Some (WStrInit _g) -> Wp_parameters.not_yet_implemented "WStrInit"
 
 end

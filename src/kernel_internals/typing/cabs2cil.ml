@@ -185,8 +185,7 @@ let rec is_dangerous e = match e.enode with
   | Lval lv | AddrOf lv | StartOf lv -> is_dangerous_lval lv
   | UnOp (_,e,_) | CastE(_,e) -> is_dangerous e
   | BinOp(_,e1,e2,_) -> is_dangerous e1 || is_dangerous e2
-  | Const _ | SizeOf _ | SizeOfE _ | AlignOf _ | AlignOfE _
-  | AddrOfStr _ | AddrOfWStr _ ->
+  | Const _ | SizeOf _ | SizeOfE _ | AlignOf _ | AlignOfE _ ->
     false
 and is_dangerous_lval = function
   | Var v,_ when
@@ -213,17 +212,21 @@ class check_no_locals = object
     DoChildren
 end
 
-let rec check_no_locals_in_initializer i =
+let check_no_locals_in_initializer i =
+  let rec aux i =
   match i with
   | SingleInit e ->
     ignore (visitCilExpr (new check_no_locals) e)
   | CompoundInit (ct, initl) ->
     foldLeftCompound ~implicit:false
-      ~doinit:(fun _off' i' _ () ->
-          check_no_locals_in_initializer i')
+        ~doinit:(fun _off' i' _ () -> aux i')
       ~ct:ct
       ~initl:initl
       ~acc:()
+  in
+  match i with
+  | CInit i -> aux i
+  | StrInit _ | WStrInit _ -> ()
 
 
 (* ---------- source error message handling ------------- *)
@@ -1371,7 +1374,6 @@ let rec isConstTrueFalse c: [ `CTrue | `CFalse ] =
     if Integer.equal n Integer.zero then `CFalse else `CTrue
   | CChr c ->
     if Char.code c = 0 then `CFalse else `CTrue
-  | CStr _ | CWStr _ -> `CTrue
   | CReal(f, _, _) ->
     if f = 0.0 then `CFalse else `CTrue
   | CEnum {eival = e} ->
@@ -5305,7 +5307,6 @@ and doExp local_env
       mkStartOfAndMark loc lv, mk_tptr ~tattr:t'.tattr tbase
     | (Lval(lv) | CastE(_, {enode = Lval lv})), TFun _  ->
       mkAddrOfAndMark loc lv, mk_tptr t
-    | (Const (CStr _ | CWStr _)), _ -> e,t
     | _, (TArray _ | TFun _) ->
       Errorloc.abort_context
         "Array or function expression is not lval: %a@\n"
@@ -5360,8 +5361,7 @@ and doExp local_env
     | Cabs.NOTHING when what = ADrop ->
       finishExp [] (unspecified_chunk empty) (integer ~loc 0) intType
     | Cabs.NOTHING ->
-      let res = new_exp ~loc (Const(CStr "exp_nothing")) in
-      finishExp [] (unspecified_chunk empty) res (typeOf res)
+      Errorloc.abort_context "must have a non-void expression here"
     (* Do the potential lvalues first *)
     | Cabs.VARIABLE n -> begin
         if is_stdlib_function_macro n then begin
@@ -5567,11 +5567,10 @@ and doExp local_env
           end
 
         | Cabs.CONST_WSTRING (ws: int64 list) ->
-          let res =
-            new_exp ~loc
-              (Const(CWStr ((* intlist_to_wstring *) ws)))
-          in
-          finishExp [] (unspecified_chunk empty) res (typeOf res)
+          let vi = Cil.create_wstring_literal ~loc ws in
+          cabsPushGlobal (GVar (vi, { init = Some (WStrInit ws) },loc));
+          finishExp [] (unspecified_chunk empty) (Cil.evar vi)
+            (Cil.typeOf_wstring_literal ~loc ws)
 
         | Cabs.CONST_STRING s ->
           (* Maybe we buried __FUNCTION__ in there *)
@@ -5590,8 +5589,10 @@ and doExp local_env
                 s
             with Not_found -> s
           in
-          let res = new_exp ~loc (Const(CStr s')) in
-          finishExp [] (unspecified_chunk empty) res (typeOf res)
+          let vi = Cil.create_string_literal ~loc s' in
+          cabsPushGlobal (GVar (vi, { init = Some (StrInit s')},loc));
+          finishExp [] (unspecified_chunk empty) (Cil.evar vi)
+            (Cil.typeOf_string_literal ~loc s')
 
         | Cabs.CONST_CHAR char_list ->
           let a, b = (interpret_character_constant char_list) in
@@ -5895,9 +5896,6 @@ and doExp local_env
               in
               finishExp reads se (mkAddrOfAndMark loc x) (mk_tptr tres)
 
-            | Const (CStr _ | CWStr _) ->
-              (* string to array *)
-              finishExp r se e' (mk_tptr t)
             (* Function names are converted into pointers to the function.
              * Taking the address-of again does not change things *)
             | AddrOf (Var v, NoOffset) when Ast_types.is_fun v.vtype ->
@@ -6216,7 +6214,6 @@ and doExp local_env
             | Const (CInt64 (v,_,_)) -> not (Z.equal v Z.zero)
             | Const (CReal(v,_,_)) -> Fc_float.compare v 0. <> 0
             | Const (CChr c) -> Char.code c <> 0
-            | Const (CStr _) | Const (CWStr _) -> true
             | _ ->
               Errorloc.abort_context ~loc:cond.eloc
                 "first argument of __builtin_choose_expr should be \
@@ -7826,30 +7823,9 @@ and doInitializer loc local_env (vi: varinfo) (inite: Cabs.init_expression)
    * different for arrays), together with the lvals read during evaluation of
    * the initializer (for local intialization)
   *)
-  : chunk * init * typ * Cil_datatype.Lval.Set.t =
+  : chunk * init_or_str * typ * Cil_datatype.Lval.Set.t =
   let open Current_loc.Operators in
-
-  let checkArrayInit ty init =
-    let init_ok =
-      if Ast_types.is_array ty then
-        match init with
-        | COMPOUND_INIT _ -> true
-        | SINGLE_INIT e ->
-          (match stripParen e with
-             { expr_node =
-                 CONSTANT (CONST_STRING _ | CONST_WSTRING _)} -> true
-           | _ -> false)
-        | _ -> false
-      else true
-    in
-    if not init_ok then
-      Kernel.error ~current:true ~once:true
-        "Array initializer must be an initializer list or string literal";
-  in
-  Kernel.debug ~dkey:Kernel.dkey_typing_init
-    "@\nStarting a new initializer for %s : %a@\n"
-    vi.vname Cil_datatype.Typ.pretty vi.vtype;
-  checkArrayInit vi.vtype inite;
+  let normal_init vi inite =
   let acc, preinit, restl =
     let so = makeSubobj vi vi.vtype NoOffset in
     let asconst = if vi.vglob then CConst else CNoConst in
@@ -7872,7 +7848,27 @@ and doInitializer loc local_env (vi: varinfo) (inite: Cabs.init_expression)
   Kernel.debug ~dkey:Kernel.dkey_typing_init
     "Finished the initializer for %s@\n  init=%a@\n  typ=%a@\n  acc=%a@\n"
     vi.vname Cil_printer.pp_init init Cil_datatype.Typ.pretty typ' d_chunk acc;
-  empty @@@ (acc, local_env.is_ghost), init, typ'', reads
+    empty @@@ (acc, local_env.is_ghost), CInit init, typ'', reads
+  in
+  let array_error () =
+    Kernel.abort ~current:true ~once:true
+      "Array initializer must be an initializer list or string literal";
+  in
+  Kernel.debug ~dkey:Kernel.dkey_typing_init
+    "@\nStarting a new initializer for %s : %a@\n"
+    vi.vname Cil_datatype.Typ.pretty vi.vtype;
+  if Ast_types.is_array vi.vtype then begin
+    match inite with
+    | NO_INIT | COMPOUND_INIT _ -> normal_init vi inite
+    | SINGLE_INIT e ->
+      (match (stripParen e).expr_node with
+       | CONSTANT (CONST_STRING s) ->
+         (* TODO: check type matches and update if needed *)
+         empty, StrInit s, Cil.typeOf_string_literal s, Lval.Set.empty
+       | CONSTANT (CONST_WSTRING l) ->
+         empty, WStrInit l, Cil.typeOf_wstring_literal l, Lval.Set.empty
+       | _ -> array_error ())
+  end else normal_init vi inite
 
 (* Consume some initializers. This is used by both global and local variables
    initialization.
@@ -8430,7 +8426,7 @@ and createGlobal loc ghost logic_spec ((t,s,b,attr_list) : (typ * storage * bool
   in
   let vi, alreadyInEnv = makeGlobalVarinfo isadef vi in
   (* Do the initializer and complete the array type if necessary *)
-  let init : init option =
+  let init =
     if must_ignore_init vi inite then
       None
     else
@@ -8489,7 +8485,8 @@ and createGlobal loc ghost logic_spec ((t,s,b,attr_list) : (typ * storage * bool
       (* Not already defined *)
       Kernel.debug ~dkey:Kernel.dkey_typing_global
         " first definition for %s(%d)\n" vi.vname vi.vid;
-      if init != None then begin
+      match init with
+      | Some i ->
         (* weimer: Sat Dec  8 17:43:34  2001
          * MSVC NT Kernel headers include this lovely line:
          * extern const GUID __declspec(selectany) \
@@ -8509,10 +8506,10 @@ and createGlobal loc ghost logic_spec ((t,s,b,attr_list) : (typ * storage * bool
           vi.vstorage <- NoStorage;     (* equivalent and canonical *)
 
         IH.remove mustTurnIntoDef vi.vid;
-        cabsPushGlobal (GVar(vi, {init = init}, Current_loc.get ()));
+        cabsPushGlobal (GVar(vi, {init = Some i}, Current_loc.get ()));
         H.add alreadyDefined vi.vname (Current_loc.get ());
         vi
-      end else begin
+      | None ->
         if not (Ast_types.is_fun vi.vtype) &&
            (vi.vstorage = NoStorage || vi.vstorage = Static)
            && not (IH.mem mustTurnIntoDef vi.vid) then
@@ -8579,7 +8576,6 @@ and createGlobal loc ghost logic_spec ((t,s,b,attr_list) : (typ * storage * bool
           vi
         end
       end
-    end
     (*
       ignore (E.log "Env after processing global %s is:@\n%t@\n"
       n docEnv);
@@ -8770,7 +8766,7 @@ and createLocal ghost ((_, sto, _, _) as specs)
        Const-fold the type to fix this. *)
     Cil.update_var_type vi (constFoldType vi.vtype);
 
-    let init : init option =
+    let init =
       if must_ignore_init vi inite then
         None
       else begin
@@ -8938,23 +8934,24 @@ and createLocal ghost ((_, sto, _, _) as specs)
       let se4, ie', et, r =
         doInitializer loc (ghost_local_env ghost) vi inite
       in
+      let ie' =
+        match ie' with
+        | CInit i -> i
+        | StrInit s ->
+          let vi = Cil.create_string_literal ~loc s in
+          cabsPushGlobal (GVar (vi, { init = Some ie' }, loc));
+          SingleInit (Cil.evar vi)
+        | WStrInit l ->
+          let vi = Cil.create_wstring_literal ~loc l in
+          cabsPushGlobal (GVar (vi, { init = Some ie' }, loc));
+          SingleInit (Cil.evar vi)
+      in
       let se4 = handle_autoreference vi se4 ie' in
       (* Fix the length *)
       if Ast_types.is_unsized_array vi.vtype && Ast_types.is_sized_array et
       then
         (* We have a length now *)
-        Cil.update_var_type vi et
-      else
-        (match vi.vtype.tnode, ie' with
-         (* Initializing a local array *)
-         | TArray({ tnode = TInt (IChar|IUChar|ISChar) } as bt, None),
-           SingleInit({enode = Const(CStr s);eloc=loc}) ->
-           let t =
-             mk_tarray ~tattr:vi.vtype.tattr bt
-               (Some (integer ~loc (String.length s + 1)))
-           in
-           Cil.update_var_type vi t
-         | _, _ -> ());
+        Cil.update_var_type vi et;
       (* Now create assignments instead of the initialization *)
       let (@@@) s1 s2 = s1 @@@ (s2, ghost) in
       let read = Cil_datatype.Lval.Set.elements r in

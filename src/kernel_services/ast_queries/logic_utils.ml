@@ -306,8 +306,6 @@ let real_of_parsed s p =
 
 let constant_to_lconstant c = match c with
   | CInt64(i,_,s) -> Integer (i,s)
-  | CStr s -> LStr s
-  | CWStr s -> LWStr s
   | CChr s -> LChr s
   | CEnum e -> LEnum e
   | CReal (f,_,Some s) -> LReal (real_of_float s f)
@@ -330,8 +328,9 @@ let lconstant_to_constant c = match c with
           "Cannot represent logical integer in C: %a"
           Integer.pretty i
     end
-  | LStr s -> CStr s
-  | LWStr s -> CWStr s
+  | LStr _ | LWStr _ ->
+    (* TODO: generate globals on the fly? *)
+    Kernel.abort "ACSL (wide) string literals are not representable in C"
   | LChr s -> CChr s
   | LReal r -> CReal (r.r_nearest,FDouble,Some r.r_literal)
   | LEnum e -> CEnum e
@@ -511,8 +510,6 @@ let rec expr_to_term ?(coerce=false) e =
     | Const c -> TConst (constant_to_lconstant c) , coerce_type typ
     | StartOf lv -> TStartOf (lval_to_term_lval lv) , ctyp
     | AddrOf lv -> TAddrOf (lval_to_term_lval lv) , ctyp
-    | AddrOfStr _ | AddrOfWStr _ ->
-      Kernel.not_yet_implemented "address of literal string in logic"
     | BinOp (op, _, _, _) when is_boolean_binop op ->
       let tc = expr_to_boolean e in
       Tif( tc , Cil.lone ~loc () , Cil.lzero ~loc () ),
@@ -967,30 +964,12 @@ let is_same_binop o1 o2 =
     | BAnd | BXor | BOr | LAnd | LOr), _ ->
     false
 
-let _compare_c c1 c2 =
-  match c1, c2 with
-  | CEnum e1, CEnum e2 ->
-    e1.einame = e2.einame && e1.eihost.ename = e2.eihost.ename &&
-    (match constFoldToInt e1.eival, constFoldToInt e2.eival with
-     | Some i1, Some i2 -> Integer.equal i1 i2
-     | _ -> false)
-  | CInt64 (i1,k1,_), CInt64(i2,k2,_) ->
-    k1 = k2 && Integer.equal i1 i2
-  | CStr s1, CStr s2 -> s1 = s2
-  | CWStr l1, CWStr l2 ->
-    (try List.for_all2 (fun x y -> Int64.compare x y = 0) l1 l2
-     with Invalid_argument _ -> false)
-  | CChr c1, CChr c2 -> c1 = c2
-  | CReal(f1,k1,_), CReal(f2,k2,_) -> k1 = k2 && f1 = f2
-  | (CEnum _ | CInt64 _ | CStr _ | CWStr _ | CChr _ | CReal _), _ -> false
-
 let rec is_same_term t1 t2 =
   match t1.term_node, t2.term_node with
     TConst c1, TConst c2 -> Cil_datatype.Logic_constant.equal c1 c2
   | TLval l1, TLval l2 -> is_same_tlval l1 l2
   | TSizeOf t1, TSizeOf t2 -> Cil_datatype.TypByName.equal t1 t2
   | TSizeOfE t1, TSizeOfE t2 -> is_same_term t1 t2
-  | TSizeOfStr s1, TSizeOfStr s2 -> s1 = s2
   | TAlignOf t1, TAlignOf t2 -> Cil_datatype.TypByName.equal t1 t2
   | TAlignOfE t1, TAlignOfE t2 -> is_same_term t1 t2
   | TUnOp (o1,t1), TUnOp(o2,t2) -> o1 = o2 && is_same_term t1 t2
@@ -1035,7 +1014,7 @@ let rec is_same_term t1 t2 =
     is_same_opt is_same_term l1 l2 && is_same_opt is_same_term h1 h2
   | Tlet(d1,b1), Tlet(d2,b2) ->
     is_same_logic_info d1 d2 && is_same_term b1 b2
-  | (TConst _ | TLval _ | TSizeOf _ | TSizeOfE _ | TSizeOfStr _
+  | (TConst _ | TLval _ | TSizeOf _ | TSizeOfE _
     | TAlignOf _ | TAlignOfE _ | TUnOp _ | TBinOp _ | TCast _
     | TAddrOf _ | TStartOf _ | Tapp _ | Tlambda _ | TDataCons _
     | Tif _ | Tat _ | Tbase_addr _ | Tblock_length _ | Toffset _ | Tnull
@@ -1514,7 +1493,6 @@ let rec hash_term (acc,depth,tot) t =
     | TLval lv -> hash_term_lval (acc+19,depth - 1,tot -1) lv
     | TSizeOf t -> (acc + 38 + Cil_datatype.TypByName.hash t, tot - 1)
     | TSizeOfE t -> hash_term (acc+57,depth -1, tot-1) t
-    | TSizeOfStr s -> (acc + 76 + Hashtbl.hash s, tot - 1)
     | TAlignOf t -> (acc + 95 + Cil_datatype.TypByName.hash t, tot - 1)
     | TAlignOfE t -> hash_term (acc+114,depth-1,tot-1) t
     | TUnOp(op,t) -> hash_term (acc+133+Hashtbl.hash op,depth-1,tot-2) t
@@ -1736,9 +1714,6 @@ let rec compare_term t1 t2 =
   | TSizeOfE t1, TSizeOfE t2 -> compare_term t1 t2
   | TSizeOfE _, _ -> 1
   | _, TSizeOfE _ -> -1
-  | TSizeOfStr s1, TSizeOfStr s2 -> String.compare s1 s2
-  | TSizeOfStr _, _ -> 1
-  | _, TSizeOfStr _ -> -1
   | TAlignOf t1, TAlignOf t2 -> Cil_datatype.TypByName.compare t1 t2
   | TAlignOf _, _ -> 1
   | _, TAlignOf _ -> -1
@@ -2432,7 +2407,6 @@ let rec constFoldTermToInt ?(machdep=true) (e: term) : Integer.t option =
       | Ctype typ -> constFoldSizeOfToInt ~machdep typ
       | _ -> None
     end
-  | TSizeOfStr s -> Some (Integer.of_int (1 + String.length s))
   | TAlignOf t -> begin
       try Some (Integer.of_int (Cil.bytesAlignOf t))
       with Cil.SizeOfError _ -> None
@@ -2629,36 +2603,38 @@ let const_fold_trange_bounds typ b e =
   in
   b, e
 
+let extract = function None -> raise CannotSimplify | Some i -> i
+
+let lift_set_index f i typ =
+  let module S = Datatype.Integer.Set in
+  let add_index acc i = S.union acc (f i) in
+  match i.term_node with
+  | Tunion tl ->
+    let conv t = extract (constFoldTermToInt t) in
+    List.fold_left add_index S.empty (List.map conv tl)
+  | Trange (b, e) ->
+    let b, e = const_fold_trange_bounds typ b e in
+    fold_itv add_index b e S.empty
+  | _ ->
+    let i = extract (constFoldTermToInt i) in
+    add_index S.empty i
+
 (** Find the value corresponding to the logic offset [loff] inside the
     initializer [init]. Zero is used as a default value when the initializer is
     incomplete. [loff] must have an integral type. Returns a set of values
     when [loff] contains ranges. *)
 let find_initial_value init loff =
   let module S = Datatype.Integer.Set in
-  let extract = function None -> raise CannotSimplify | Some i -> i in
   let rec aux loff init =
     match loff, init with
     | TNoOffset, SingleInit e -> S.singleton (extract (Cil.constFoldToInt e))
-    | TIndex (i, loff), CompoundInit (typ, l) -> begin
-        (* Add the initializer at offset [Index(i, loff)] to [acc]. *)
-        let add_index acc i =
-          let vi =
-            try aux loff (find_init_by_index l i)
-            with Not_found -> S.singleton Integer.zero
-          in
-          S.union acc vi
-        in
-        match i.term_node with
-        | Tunion tl ->
-          let conv t = extract (constFoldTermToInt t) in
-          List.fold_left add_index S.empty (List.map conv tl)
-        | Trange (b, e) ->
-          let b, e = const_fold_trange_bounds typ b e in
-          fold_itv add_index b e S.empty
-        | _ ->
-          let i = extract (constFoldTermToInt i) in
-          add_index S.empty i
-      end
+    | TIndex (i, loff), CompoundInit (typ, l) ->
+      (* Add the initializer at offset [Index(i, loff)] to [acc]. *)
+      let single_index i =
+        try aux loff (find_init_by_index l i)
+        with Not_found -> S.singleton Integer.zero
+      in
+      lift_set_index single_index i typ
     | TField (f, loff), CompoundInit (_, l) ->
       if f.fcomp.cstruct then
         try aux loff (find_init_by_field l f)
@@ -2672,7 +2648,33 @@ let find_initial_value init loff =
   try
     match init with
     | None -> Some (S.singleton Integer.zero)
-    | Some init -> Some (aux loff init)
+    | Some (CInit init) -> Some (aux loff init)
+    | Some (StrInit s) ->
+      (match loff with
+       | TIndex(t,TNoOffset) ->
+         let len = Z.of_int @@ String.length s in
+         let single_index i =
+           if Z.equal i len then S.singleton Integer.zero
+           else if Z.geq Z.zero i && Z.lt i len then
+             S.singleton (Z.of_int (Char.code s.[Z.to_int i]))
+           else raise CannotSimplify
+         in
+         let typ = Cil.typeOf_string_literal s in
+         Some (lift_set_index single_index t typ)
+       | _ -> None)
+    | Some (WStrInit l) ->
+      (match loff with
+       | TIndex(t,TNoOffset) ->
+         let len = Z.of_int @@ List.length l in
+         let single_index i =
+           if Z.equal i len then S.singleton Integer.zero
+           else if Z.geq Z.zero i && Z.lt i len then
+             S.singleton (Z.of_int64 (List.nth l (Z.to_int i)))
+           else raise CannotSimplify
+         in
+         let typ = Cil.typeOf_wstring_literal l in
+         Some (lift_set_index single_index t typ)
+       | _ -> None)
   with CannotSimplify -> None
 
 (** Evaluate the given term l-value in the initial state *)

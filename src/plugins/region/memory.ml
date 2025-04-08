@@ -527,8 +527,6 @@ and exp (m: map) (e: exp) : node option =
   match e.enode with
   | Const _
   | SizeOf _ | SizeOfE _ | AlignOf _ | AlignOfE _ -> None
-  | AddrOfStr _ | AddrOfWStr _ ->
-    Options.not_yet_implemented "address of string literal"
   | Lval lv -> points_to @@ lval m lv
   | AddrOf lv | StartOf lv -> Some (lval m lv)
   | CastE(_, e) -> exp m e

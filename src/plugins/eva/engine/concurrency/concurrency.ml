@@ -74,10 +74,6 @@ module Name = struct
         with Bit_utils.NoMatchingOffset ->
           Some (RawPointer (vi, i))
       end
-    | Base.String (_, Base.CSString s) when Integer.is_zero i ->
-      Some (String s)
-    | Base.String (_, Base.CSWstring s) when Integer.is_zero i ->
-      Some (String (Escape.escape_wstring s))
     | _ -> None
 
   let of_cvalue cvalue =

@@ -115,7 +115,7 @@ class visitor cat
     method var_init : varinfo -> global list Cil.visitAction =
       fun _ -> self#default ()
 
-    method var_def : varinfo -> init -> global list Cil.visitAction =
+    method var_def : varinfo -> init_or_str -> global list Cil.visitAction =
       fun _ _ -> self#default ()
 
     method glob_annot: global_annotation -> global list Cil.visitAction =

@@ -95,11 +95,6 @@ struct
     let l = M.null in debug_cons "null:@, %a" pretty l;
     M.null
 
-  let literal ~eid cstr =
-    let l = M.literal ~eid cstr in
-    debug_cons "literal ~eid:%d ->@, %a" eid pretty l;
-    l
-
   let cvar x =
     let l = M.cvar x in
     debug_cons "cvar %a ->@, %a" Varinfo.pretty x pretty l;

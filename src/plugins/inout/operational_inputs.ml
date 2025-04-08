@@ -103,7 +103,7 @@ let eval_assigns kf state assigns =
         (function
           | Base.Var (v, _) | Base.Allocated (v, _, _) ->
             not (Kernel_function.is_formal v kf)
-          | Base.CLogic_Var _ | Base.Null | Base.String _ -> true)
+          | Base.CLogic_Var _ | Base.Null -> true)
     in
     let out_term = out.it_content in
     let outputs_under, outputs_over, deps =

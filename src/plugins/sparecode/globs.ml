@@ -67,7 +67,7 @@ class collect_visitor = object (self)
       ignore (visitCilType (self:>Cil.cilVisitor) v.vtype);
       try
         let init = Hashtbl.find var_init v in
-        ignore (visitCilInit (self:>Cil.cilVisitor) v NoOffset init)
+        ignore (visitCilInit_or_str (self:>Cil.cilVisitor) v init)
       with Not_found -> ()
     end;
     DoChildren
@@ -79,14 +79,16 @@ class collect_visitor = object (self)
       Cil.DoChildren
     | GAnnot _ -> Cil.DoChildren
     | GVar (v, init, _) ->
-      let _ = match init.init with | None -> ()
-                                   | Some init ->
-                                     begin
-                                       Hashtbl.add var_init v init;
-                                       if Hashtbl.mem used_variables v then
-                                         (* already used before its initialization (see bug #758) *)
-                                         ignore (visitCilInit (self:>Cil.cilVisitor) v NoOffset init)
-                                     end
+      let _ =
+        match init.init with
+        | None -> ()
+        | Some init ->
+          begin
+            Hashtbl.add var_init v init;
+            if Hashtbl.mem used_variables v then
+              (* already used before its initialization (see bug #758) *)
+              ignore (visitCilInit_or_str (self:>Cil.cilVisitor) v init)
+          end
       in Cil.SkipChildren
     | GFunDecl _ -> DoChildren
     | _ -> Cil.SkipChildren

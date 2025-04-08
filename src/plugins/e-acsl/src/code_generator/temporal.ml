@@ -177,7 +177,7 @@ let assign ?(ltype) lhs rhs loc =
   | TInt _ | TFloat _ | TEnum _ -> None
   | TComp _ ->
     let rhs = match rhs.enode with
-      | AddrOf _ | AddrOfStr _ | AddrOfWStr _ -> rhs
+      | AddrOf _ -> rhs
       | Lval lv -> Cil.mkAddrOf ~loc lv
       | Const _ | SizeOf _ | SizeOfE _ | AlignOf _ | AlignOfE _
       | UnOp _ | BinOp _ | CastE _ | StartOf _ ->
@@ -456,20 +456,6 @@ let mk_global_init ~loc vi off init =
     | SingleInit e -> e
     (* Compound initializers should have been thrown away at this point *)
     | _ -> Options.fatal "Unexpected ComppoundInit in global initializer"
-  in
-  (* Initializer expression can be a literal string, so look up the
-     corresponding variable which that literal string has been converted to *)
-  let exp =
-    try let rec get_string e = match e.enode with
-        | Const(CStr str) -> str
-        | CastE(_, exp) -> get_string exp
-        | _ -> raise Not_found
-      in
-      let str = get_string exp in
-      Cil.evar ~loc (Literal_strings.find str)
-    with
-    (* Not a literal string: just use the expression at hand *)
-      Not_found -> exp
   in
   (* The input [vi] is from the old project, so get the corresponding variable
      from the new one, otherwise AST integrity is violated *)

@@ -108,6 +108,10 @@ type init =
   | SingleInit of (exp * Cil_types.location)
   | CompoundInit of typ * (offset * init) list
 
+type init_or_str =
+  | CInit of init
+  | StrInit of string
+  | WStrInit of int64 list
 
 (* Optimization of comparaison functions on lvalues and expressions. *)
 let compare_exp e1 e2 = if e1 == e2 then 0 else compare_exp e1 e2

@@ -122,10 +122,11 @@ module Make
   (* Applies an initializer. If [top_volatile] is true, sets volatile locations
      to top without applying the initializer. Otherwise, lets the standard
      transfer function on assignments handle volatile locations. *)
-  let rec apply_eva_initializer ~pos ~top_volatile lval init state =
+  let apply_eva_initializer ~pos ~top_volatile lval init state =
     if top_volatile && Ast_types.has_qualifier "volatile" lval.typ
     then initialize_top_volatile lval state
-    else
+    else begin
+      let rec aux lval init state =
       match init with
       | SingleInit (exp, loc) ->
         let source = fst loc in
@@ -133,9 +134,15 @@ module Make
       | CompoundInit (_typ, l) ->
         let doinit state (off, init) =
           let lval = Eva_ast.add_offset lval off in
-          apply_eva_initializer ~pos ~top_volatile lval init state
+          aux lval init state
         in
         List.fold_left doinit state l
+      in
+      match init with
+      | CInit init -> aux lval init state
+      | StrInit _ -> Self.not_yet_implemented "StrInit"
+      | WStrInit _ -> Self.not_yet_implemented "WStrInit"
+    end
 
   (* Field by field initialization of a variable to zero, or top if volatile.
      Very inefficient. *)
@@ -143,7 +150,7 @@ module Make
     let loc = Position.loc pos in
     let init = Eva_ast.translate_init (Cil.makeZeroInit ~loc vi.vtype) in
     let lval = Eva_ast.Build.var vi in
-    apply_eva_initializer ~pos ~top_volatile:true lval init state
+    apply_eva_initializer ~pos ~top_volatile:true lval (CInit init) state
 
   (* ----------------------- Non Lib-entry mode ----------------------------- *)
 
@@ -180,7 +187,8 @@ module Make
 
   (* Special application of an initializer: only non-volatile lval with
      attributes 'const' are initialized. *)
-  let rec apply_cil_const_initializer ~pos state lval = function
+  let apply_cil_const_initializer ~pos state lval i =
+    let rec aux state lval = function
     | Cil_types.SingleInit exp ->
       let typ_lval = Cil.typeOfLval lval in
       if Ast_types.has_qualifier "const" typ_lval &&
@@ -197,10 +205,14 @@ module Make
       then state (* initializer is not useful *)
       else
         let doinit off init _typ state =
-          apply_cil_const_initializer
-            ~pos state (Cil.addOffsetLval off lval) init
+          aux state (Cil.addOffsetLval off lval) init
         in
         Cil.foldLeftCompound ~implicit:true ~doinit ~ct:typ ~initl:l ~acc:state
+    in
+    match i with
+    | Cil_types.CInit i -> aux state lval i
+    | StrInit _ -> Self.not_yet_implemented "StrInit"
+    | WStrInit _ -> Self.not_yet_implemented "WStrInit"
 
   (* Initializes [vi] as if in [-lib-entry] mode. Active when [-lib-entry] is
      set, or when [vi] is extern. [const] initializers, explicit or implicit,
@@ -209,7 +221,7 @@ module Make
     if Ast_types.has_qualifier "const" vi.vtype && not (vi.vstorage = Extern)
        && not (Ast_types.has_attribute_memory_block Ast_attributes.frama_c_mutable vi.vtype)
     then (* Fully const base. Ignore -lib-entry altogether. *)
-      let init = Option.map Eva_ast.translate_init init in
+      let init = Option.map Eva_ast.translate_init_or_str init in
       initialize_var_not_lib_entry ~pos ~local:false vi init state
     else
       let unknown_size =  warn_unknown_size vi in
@@ -235,7 +247,7 @@ module Make
       if Ast_types.is_const vi.vtype && not (vi.vstorage = Extern)
       then
         let init = match init with
-          | None -> Cil.makeZeroInit ~loc:vi.vdecl vi.vtype
+          | None -> Cil_types.CInit (Cil.makeZeroInit ~loc:vi.vdecl vi.vtype)
           | Some init -> init
         in
         apply_cil_const_initializer ~pos state (Cil.var vi) init
@@ -300,7 +312,8 @@ module Make
   let initialize_local_variable ~pos vi init state =
     try
       `Value
-        (initialize_var_not_lib_entry ~pos ~local:true vi (Some init) state)
+        (initialize_var_not_lib_entry
+           ~pos ~local:true vi (Some (CInit init)) state)
     with Initialization_failed -> `Bottom
 
   let initialize_global_variable ~lib_entry vi init state =
@@ -313,7 +326,7 @@ module Make
       then
         initialize_var_lib_entry ~pos vi init.init state
       else
-        let init = Option.map Eva_ast.translate_init init.init in
+        let init = Option.map Eva_ast.translate_init_or_str init.init in
         initialize_var_not_lib_entry ~pos ~local:false vi init state
     else state
 

@@ -35,7 +35,6 @@ let rec constant = function
   | CChr c -> e_int64 (Ctypes.char c)
   | CReal(f,fk,s) -> Cfloat.code_lit (Ctypes.c_float fk) f s
   | CEnum e -> constant_exp e.eival
-  | CStr _ | CWStr _ -> Warning.error "String constants not yet implemented"
 
 and logic_constant = function
   | Boolean true -> e_true

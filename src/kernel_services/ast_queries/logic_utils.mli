@@ -518,7 +518,7 @@ val constFoldTermToInt: ?machdep:bool -> term -> Integer.t option
 
    @since Silicon-20161101
 *)
-class simplify_const_lval: (varinfo -> init option) -> Cil.cilVisitor
+class simplify_const_lval: (varinfo -> init_or_str option) -> Cil.cilVisitor
 
 (** {2 Type-checking hackery} *)
 

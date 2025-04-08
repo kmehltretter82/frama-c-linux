@@ -54,8 +54,6 @@ let translate_binop : Cil_types.binop -> Eva_ast_types.binop = function
 
 let rec translate_exp (e : Cil_types.exp) =
   let node = match e.enode with
-    | Const (CStr _ | CWStr _) ->
-      Const (CString (Base.of_string_exp e))
     | Const cst -> Const (translate_constant cst)
     | Lval lval -> Lval (translate_lval lval)
     | UnOp (unop, expr, typ) ->
@@ -64,8 +62,6 @@ let rec translate_exp (e : Cil_types.exp) =
       BinOp (translate_binop binop, translate_exp e1, translate_exp e2, typ)
     | CastE (typ, expr) -> CastE (typ, translate_exp expr)
     | AddrOf lval -> AddrOf (translate_lval lval)
-    | AddrOfStr _ | AddrOfWStr _ ->
-      Self.not_yet_implemented "address of string literal"
     | StartOf lval -> StartOf (translate_lval lval)
     | SizeOf _ | SizeOfE _ | AlignOf _ | AlignOfE _ ->
       match (Cil.constFold true e).enode with
@@ -90,7 +86,6 @@ and translate_lval (host, offset as lval) =
   mk_lval ~origin:(Lval lval) node
 
 and translate_constant : Cil_types.constant -> Eva_ast_types.constant = function
-  | CStr _ | CWStr _ -> assert false (* Handled at higher level by translate_expr *)
   | CInt64 (cst, ikind, str) -> CInt64 (cst, ikind, str)
   | CChr chr -> CChr chr
   | CReal (float, fkind, str) -> CReal (float, fkind, str)
@@ -104,6 +99,11 @@ let rec translate_init : Cil_types.init -> Eva_ast_types.init = function
     in
     CompoundInit (t, List.map translate_field_init l)
 
+let translate_init_or_str : Cil_types.init_or_str -> Eva_ast_types.init_or_str =
+  function
+  | CInit i -> CInit (translate_init i)
+  | StrInit s -> StrInit s
+  | WStrInit l -> WStrInit l
 
 (* --- Relations --- *)
 

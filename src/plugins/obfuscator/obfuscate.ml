@@ -65,18 +65,6 @@ class visitor = object
     ei.einame <- Dictionary.fresh Obfuscator_kind.Enum ei.einame;
     Cil.DoChildren
 
-  method! vexpr e = match e.enode with
-    | Const(CStr str) ->
-      has_literal_string := true;
-      (* ignore the result: will be handle by hacking the pretty printer *)
-      (try
-         ignore (Dictionary.id_of_literal_string str)
-       with Not_found ->
-         ignore (Dictionary.fresh Obfuscator_kind.Literal_string str));
-      Cil.SkipChildren
-    | _ ->
-      Cil.DoChildren
-
   method! vvdec vi =
     (* Varinfo can be visited (and obfuscated) more than once:
        functions for their declaration and definition, variables
@@ -230,9 +218,6 @@ module UpdatePrinter (X: Printer.PrinterClass) = struct
   (* obfuscated printer *)
   class printer = object
     inherit X.printer as super
-    method! constant fmt = function
-      | CStr str -> Format.fprintf fmt "%s" (Dictionary.id_of_literal_string str)
-      | c -> super#constant fmt c
 
     method! file fmt ast =
       if !has_literal_string then begin

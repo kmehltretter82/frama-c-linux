@@ -95,8 +95,6 @@ and loc_to_exp ?result {term_node = lnode ; term_type = ltype; term_loc = loc} =
       (fun x y -> new_exp ~loc (BinOp (binop, x,y, logic_type_to_typ ltype)))
       (loc_to_exp ?result lexp1)
       (loc_to_exp ?result lexp2)
-  | TSizeOfStr string ->
-    [new_exp ~loc (SizeOfE (new_exp ~loc (Const (CStr string))))]
   | TConst constant ->
     (* TODO: Very likely to fail on large integer and incorrect on reals not
        representable as floats *)
@@ -160,7 +158,7 @@ let rec loc_to_lval ?result t =
     loc_to_lval ?result t
   | Tinter _ -> error_lval() (* TODO *)
   | Tcomprehension _ -> error_lval()
-  | TSizeOfE _ | TAlignOfE _ | TUnOp _ | TBinOp _ | TSizeOfStr _
+  | TSizeOfE _ | TAlignOfE _ | TUnOp _ | TBinOp _
   | TConst _ | TCast _ | TAlignOf _ | TSizeOf _ | Tapp _ | Tif _
   | Tat _ | Toffset _ | Tbase_addr _ | Tblock_length _ | Tnull | Trange _
   | TDataCons _ | TUpdate _ | Tlambda _
@@ -178,12 +176,13 @@ let loc_to_offset ?result loc =
       )
     | Tat ({ term_node = TLval(TResult _,_)} as lv, BuiltinLabel Post) ->
       aux h lv.term_node
-    | Tunion locs -> List.fold_left
-                       (fun (b,l) x ->
-                          let (b,l') = aux b x.term_node in b, l @ l') (h,[]) locs
+    | Tunion locs ->
+      List.fold_left
+        (fun (b,l) x -> let (b,l') = aux b x.term_node in b, l @ l')
+        (h,[]) locs
     | Tempty_set -> h,[]
     | Trange _ | TAddrOf _ | Tat _
-    | TSizeOfE _ | TAlignOfE _ | TUnOp _ | TBinOp _ | TSizeOfStr _
+    | TSizeOfE _ | TAlignOfE _ | TUnOp _ | TBinOp _
     | TConst _ | TCast _ | TAlignOf _ | TSizeOf _ | Tapp _ | Tif _
     | Toffset _ | Tbase_addr _ | Tblock_length _ | Tnull
     | TDataCons _ | TUpdate _ | Tlambda _

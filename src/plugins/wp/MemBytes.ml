@@ -840,11 +840,6 @@ let pretty fmt loc =
 
 let null = MemAddr.null
 
-let literal ~eid cst =
-  Wp_parameters.debug ~level:3 ~dkey:dkey_model
-    "%s.literal %d _" datatype eid ;
-  shift (MemAddr.global (STRING.get (eid,cst))) (C_int (Ctypes.c_char ())) e_zero
-
 let cvar vi =
   Wp_parameters.debug ~level:3 ~dkey:dkey_model
     "%s.cvar %a" datatype Cil_printer.pp_varinfo vi ;

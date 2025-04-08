@@ -383,8 +383,12 @@ let overloaded_call ~builder overload vf args =
 (* --- Specification building --- *)
 
 let rec static_string a = match a.enode with
-  | Const (CStr s) -> Some (Format_string.String s)
-  | Const (CWStr s) -> Some (Format_string.WString s)
+  | StartOf(Var s, NoOffset) ->
+    (match (Globals.Vars.find s).init with
+     | None -> None
+     | Some (StrInit s) -> Some (Format_string.String s)
+     | Some (WStrInit s) -> Some (Format_string.WString s)
+     | _ | exception Not_found -> None)
   | CastE (_, e) -> static_string e
   | _ -> None
 

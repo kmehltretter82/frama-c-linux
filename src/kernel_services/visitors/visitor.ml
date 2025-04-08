@@ -919,6 +919,10 @@ let visitFramacInit vis v o i =
   let i' = visitCilInit (vis:>cilVisitor) v o i in
   vis#fill_global_tables; i'
 
+let visitFramacInit_or_str vis v i =
+  let i' = visitCilInit_or_str (vis:>cilVisitor) v i in
+  vis#fill_global_tables; i'
+
 let visitFramacAttributes vis a =
   let a' = visitCilAttributes (vis:>cilVisitor) a in
   vis#fill_global_tables; a'

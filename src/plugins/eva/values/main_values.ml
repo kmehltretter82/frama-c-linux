@@ -104,7 +104,7 @@ module CVal = struct
   let resolve_functions v =
     let aux base offs (acc, alarm) =
       match base with
-      | Base.String (_,_) | Base.Null | Base.CLogic_Var _ | Base.Allocated _ ->
+      | Base.Null | Base.CLogic_Var _ | Base.Allocated _ ->
         acc, true
       | Base.Var (v,_) ->
         if Ast_types.is_fun v.vtype then

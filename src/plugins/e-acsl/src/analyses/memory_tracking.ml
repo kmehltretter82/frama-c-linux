@@ -268,7 +268,6 @@ module rec Transfer
         base_addr e2
       end
     | CastE(_, e) -> base_addr e
-    | AddrOfStr _ | AddrOfWStr _ -> Options.not_yet_implemented "address of string literal"
     | BinOp((MinusPP | PlusA | MinusA | Mult | Div | Mod |Shiftlt | Shiftrt
             | Lt | Gt | Le | Ge | Eq | Ne | BAnd | BXor | BOr | LAnd | LOr),
             _, _, _)
@@ -371,7 +370,7 @@ module rec Transfer
              register_term kf varinfos t2
            else
              assert false)
-    | TConst _ | TSizeOf _ | TSizeOfE _ | TSizeOfStr _ | TAlignOf _
+    | TConst _ | TSizeOf _ | TSizeOfE _ | TAlignOf _
     | TAlignOfE _ | Tnull | Ttype _ | TUnOp _ | TBinOp _ ->
       varinfos
     | Tlambda(_, _) -> Error.not_yet "lambda function"
@@ -431,7 +430,7 @@ module rec Transfer
       | Tbase_addr(_, t) | Toffset(_, t) | Tblock_length(_, t) | Tlet(_, t) ->
         state_ref := register_term kf !state_ref t;
         Cil.DoChildren
-      | TConst _ | TSizeOf _ | TSizeOfStr _ | TAlignOf _  | Tnull | Ttype _
+      | TConst _ | TSizeOf _ | TAlignOf _  | Tnull | Ttype _
       | Tempty_set ->
         (* no left-value inside inside: skip for efficiency *)
         Cil.SkipChildren
@@ -470,10 +469,17 @@ module rec Transfer
       ();
     !state_ref
 
-  let rec do_init vi init state = match init with
-    | SingleInit e -> handle_assignment state (Var vi, NoOffset) e
-    | CompoundInit(_, l) ->
-      List.fold_left (fun state (_, init) -> do_init vi init state) state l
+  let do_init vi init state =
+    let rec aux init state =
+      match init with
+      | SingleInit e -> handle_assignment state (Var vi, NoOffset) e
+      | CompoundInit(_, l) ->
+        List.fold_left (fun state (_, init) -> aux init state) state l
+    in
+    match init with
+    | CInit i -> aux i state
+    | StrInit _ -> Options.not_yet_implemented "StrInit"
+    | WStrInit _ -> Options.not_yet_implemented "WStrInit"
 
   let register_initializers state =
     let do_one vi init state = match init.init with
@@ -635,7 +641,7 @@ module rec Transfer
       let state = handle_assignment state lv e in
       Dataflow.Done (Some state)
     | Local_init(v,AssignInit i,_) ->
-      let state = do_init v i state in
+      let state = do_init v (CInit i) state in
       Dataflow.Done (Some state)
     | Local_init(v,ConsInit(f,args,Constructor),_) ->
       do_call None f (Cil.mkAddrOfVi v :: args) state
@@ -835,7 +841,6 @@ and apply_on_vi_base_from_exp f ?kf ?stmt e = match e.enode with
   | BinOp((PlusA | MinusA | Mult | Div | Mod |Shiftlt | Shiftrt | Lt | Gt | Le
           | Ge | Eq | Ne | BAnd | BXor | BOr | LAnd | LOr), _, _, _)
   | Const _ -> (* possible in case of static address *) false
-  | AddrOfStr _ | AddrOfWStr _ -> Options.not_yet_implemented "address of string literal"
   | UnOp _ | SizeOf _ | SizeOfE _ | AlignOf _ | AlignOfE _ ->
     Options.fatal "[pre_analysis] unexpected expression %a" Exp.pretty e
 

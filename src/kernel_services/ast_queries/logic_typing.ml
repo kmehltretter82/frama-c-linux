@@ -1120,7 +1120,7 @@ struct
   let mk_at_here idx =
     let rec needs_at idx =
       match idx.term_node with
-      | TConst _ | TSizeOf _ | TSizeOfE _ | TSizeOfStr _
+      | TConst _ | TSizeOf _ | TSizeOfE _
       | TAlignOf _ | TAlignOfE _ | Tat _ | Ttypeof _ | Ttype _
       | Tempty_set | Tbase_addr _ | Toffset _ | Tblock_length _ | Tnull
         -> false
@@ -2141,7 +2141,7 @@ struct
       | TLval(TVar v, TNoOffset) ->
         known_vars, kont (eta_expand term.term_loc term.term_name env v)
       | TConst _ | TLval _ | TSizeOf _ | TSizeOfE _
-      | TSizeOfStr _ | TAlignOf _ | TAlignOfE _
+      | TAlignOf _ | TAlignOfE _
       | TUnOp _ | TBinOp _ | TCast _ | TAddrOf _ | TStartOf _
       | Tapp _  | TDataCons _ | Tbase_addr _ | Toffset _
       | Tblock_length _ | Tnull
@@ -2454,7 +2454,7 @@ struct
       | TCast (true,_,t) | Tat (t, _) | Tcomprehension (t,_,_) | Tlet (_, t)
         -> aux t
 
-      | Trange _ | TConst _ | TSizeOf _ | TSizeOfE _ | TSizeOfStr _ | TAlignOf _
+      | Trange _ | TConst _ | TSizeOf _ | TSizeOfE _ | TAlignOf _
       | TAlignOfE _ | TUnOp (_,_) | TBinOp (_,_,_) | TCast (false,_,_)
       | Tlambda (_,_) | TDataCons (_,_) | Tbase_addr (_,_)
       | Toffset (_,_) | Tblock_length (_,_) | Tnull | Tapp _
@@ -2622,11 +2622,6 @@ struct
          Ctype t -> TSizeOf t,Linteger
        | _ -> if ctxt.silent then raise Backtrack;
          ctxt.error loc "sizeof can only handle C types")
-    (* NB: don't forget to add the case of literal string
-              when they are authorized in the logic *)
-    | PLsizeofE
-        { lexpr_node = PLconstant (StringConstant s | WStringConstant s) } ->
-      TSizeOfStr s, Linteger
     | PLsizeofE lexpr ->
       let t = term (drop_qualifiers env) lexpr in
       (match Logic_const.unroll_ltdef t.term_type with

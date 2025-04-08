@@ -560,9 +560,8 @@ class erase_exn =
           GCompTag (u,loc) ::
           GEnumTag (e,loc) :: new_types;
         exn_var <- Some exn;
-        let exn_init = Cil.makeZeroInit ~loc (Cil_const.mk_tcomp s)
-        in
-        let exn_initinfo = { init = Some exn_init } in
+        let exn_init = Cil.makeZeroInit ~loc (Cil_const.mk_tcomp s) in
+        let exn_initinfo = { init = Some (CInit exn_init) } in
         let gexn_var = GVar(exn, exn_initinfo, loc) in
         Globals.Vars.add exn exn_initinfo;
         ChangeDoChildrenPost(

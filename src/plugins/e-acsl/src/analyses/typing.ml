@@ -351,7 +351,6 @@ let rec type_term
     match t.term_node with
     | TConst (Boolean _ | Integer _ | LChr _ | LEnum _ | LReal _)
     | TSizeOf _
-    | TSizeOfStr _
     | TAlignOf _ ->
       let i = Interval.get_from_profile ~profile t in
       (* a constant or a left value directly under a lambda should be a gmp

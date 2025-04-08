@@ -72,11 +72,18 @@ let do_assignment (lv:lval) (exp:exp) (a:Abstract_state.t) : Abstract_state.t =
     warn_unsupported_explicit_pointer  Printer.pp_exp exp loc;
     a
 
-let rec do_init (lv:lval) (init:init) state =
+let do_init (lv:lval) (init:init_or_str) state =
+  let rec aux lv init state =
+    match init with
+    | SingleInit e -> Option.map (do_assignment lv e) state
+    | CompoundInit (_, l) ->
+      List.fold_left
+        (fun state (o, init) -> aux (Cil.addOffsetLval o lv) init state) state l
+  in
   match init with
-  | SingleInit e -> Option.map (do_assignment lv e) state
-  | CompoundInit (_, l) ->
-    List.fold_left (fun state (o, init) -> do_init (Cil.addOffsetLval o lv) init state) state l
+  | CInit init -> aux lv init state
+  | StrInit _ | WStrInit _ -> state
+(* TODO: consider potential aliases for literal with common suffixes. *)
 
 let pp_abstract_state_opt ?(debug=false) fmt v =
   match v with
@@ -157,7 +164,7 @@ let do_cons_init (s:stmt) (v:varinfo) f arg t loc state =
 let analyse_instr (s:stmt) (i:instr) (a:Abstract_state.t option) : Abstract_state.t option =
   match i with
   | Set (lv,exp,_) -> Option.map (do_assignment lv exp) a
-  | Local_init (v,AssignInit i,_) -> do_init (Var v, NoOffset) i a
+  | Local_init (v,AssignInit i,_) -> do_init (Var v, NoOffset) (CInit i) a
   | Local_init (v,ConsInit (f,arg,t),loc) -> do_cons_init s v f arg t loc a
   | Code_annot _ -> a
   | Skip _ -> a

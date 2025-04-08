@@ -178,7 +178,6 @@ module NodeKind = struct
   let alarm =     tag "alarm"     "an alarm emitted by Frama-C"
   let absolute =  tag "absolute"  "a memory location designated by a range \
                                    of adresses"
-  let string =    tag "string"    "a string literal"
   let error =     tag "error"     "a placeholder node when an error prevented \
                                    the generation process"
   let const =     tag "const"     "a numeric constant literal"
@@ -190,7 +189,6 @@ module NodeKind = struct
     | Unknown _ -> unknown
     | Alarm _ -> alarm
     | AbsoluteMemory -> absolute
-    | String _ -> string
     | Const _ -> const
     | Error _ -> error
 
