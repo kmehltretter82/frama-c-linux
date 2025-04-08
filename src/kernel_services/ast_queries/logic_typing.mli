@@ -51,6 +51,11 @@ val arithmetic_conversion:
 module Lenv : sig
   type t
   val empty : unit -> t
+  (** Note that empty still contains the label Init since it is always
+      available.
+
+      @before Frama-C+dev Init was not available in the environment.
+  *)
 
   val add_var: string -> Cil_types.logic_var -> t -> t
   val add_type_var: string -> Cil_types.logic_type -> t -> t
@@ -269,8 +274,10 @@ val append_pre_label: Lenv.t -> Lenv.t
 
 (** appends the "Init" label in the environment
     @since Sodium-20150201
+    @deprecated Init is in the empty context
 *)
 val append_init_label: Lenv.t -> Lenv.t
+[@@ deprecated "Init is in the empty context"]
 
 (** returns the builtin label corresponding to the given name if it exists
     @since 29.0-Copper

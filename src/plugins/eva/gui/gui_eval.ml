@@ -53,7 +53,7 @@ let gui_loc_logic_env lm =
      but in practice it is parsed *)
   let pre () =
     let e = Logic_typing.Lenv.empty () in
-    Logic_typing.(append_pre_label (append_init_label (append_here_label e)))
+    Logic_typing.(append_pre_label (append_here_label e))
   in
   let stmt () = pre () in (*TODO: add LoopEntry and LoopCurrent when supported*)
   let post () = Logic_typing.append_old_and_post_labels (stmt ()) in
