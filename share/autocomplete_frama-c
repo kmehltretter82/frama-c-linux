@@ -144,8 +144,3 @@ _frama-c ()
 
 complete -o nospace -F _frama-c frama-c
 complete -o nospace -F _frama-c frama-c-gui
-
-# Local Variables:
-# mode: sh
-# sh-shell: bash
-# End:

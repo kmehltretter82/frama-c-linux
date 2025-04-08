@@ -36,9 +36,3 @@ int bsearch(int* t, int n, int v) {
   }
   return -1;
 }
-
-/*
-Local Variables:
-compile-command: "../../bin/toplevel.opt -jessie bsearch.c"
-End:
-*/

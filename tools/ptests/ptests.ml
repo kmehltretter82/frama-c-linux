@@ -2126,9 +2126,3 @@ let () =
     Format.printf "- ignored suites= %d@." !nb_ignores;
     List.iter (Format.printf "  - %s@.") !ignored_suites
   end
-
-(*
-Local Variables:
-compile-command: "LC_ALL=C make -C .. ptests"
-End:
-*)

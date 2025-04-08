@@ -89,9 +89,3 @@ let main () =
     ignore (generate_code "test")
 
 let () = Boot.Main.extend main
-
-(*
-Local Variables:
-compile-command: "make -C ../.. tests/misc/Change_formals.cmo"
-End:
-*)

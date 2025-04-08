@@ -177,8 +177,3 @@ headers.info:
 	echo "HDRCK.HAS_GIT='$(HDRCK.HAS_GIT)'"
 	echo "HDRCK.CMD='$(HDRCK.CMD)'"
 	echo "HDRCK.OPTS='$(HDRCK.OPTS)'"
-
-###############################################################################
-# Local Variables:
-# compile-command: "make"
-# End:

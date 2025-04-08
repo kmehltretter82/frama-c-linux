@@ -100,8 +100,3 @@ lint.info:
 	echo "LINTCK_FILES_INPUT='$(LINTCK_FILES_INPUT)'"
 	echo "LINTCK.HAS_GIT='$(LINTCK.HAS_GIT)'"
 	echo "LINTCK.CMD='$(LINTCK.CMD)'"
-
-##########################################################################
-# Local Variables:
-# compile-command: "make"
-# End:

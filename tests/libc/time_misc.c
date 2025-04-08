@@ -39,10 +39,3 @@ int main(int argc, char **argv)
   test_ctime();
   return 0;
 }
-
-
-/*
-Local Variables:
-compile-command: "cd ../.. && ptests.byte -show -config gcc ./time.c"
-End:
-*/

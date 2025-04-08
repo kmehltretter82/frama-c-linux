@@ -229,8 +229,3 @@ count-tests:
 	@find $(addprefix _build/default/,$(PTEST_DIRS)) \
 	-name \*.res.log -or -name \*.err.log \
         | wc -l
-
-###############################################################################
-# Local Variables:
-# compile-command: "make"
-# End:
