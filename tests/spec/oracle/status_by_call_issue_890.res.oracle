@@ -6,7 +6,7 @@ struct list {
 /*@ axiomatic Ax {
       predicate P(struct list *root) ;
       
-      }
+    }
  */
 /*@ requires P(l); */
 int len(struct list *l)

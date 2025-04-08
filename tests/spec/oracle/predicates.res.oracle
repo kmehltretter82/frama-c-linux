@@ -20,7 +20,7 @@ predicate S{L}(int *p) =
 /*@ axiomatic a {
       predicate P(ℤ v) ;
       
-      }
+    }
  */
 /*@ lemma l: (P(1) ⇒ P(2)) ∧ (¬P(1) ⇒ P(3));
  */

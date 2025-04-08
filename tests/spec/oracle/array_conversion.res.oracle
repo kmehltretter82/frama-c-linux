@@ -34,7 +34,7 @@ int g1(void)
 /*@ axiomatic ax {
       logic 𝔹 p{L}(int *b) ;
       
-      }
+    }
 
 */
 int a[10];

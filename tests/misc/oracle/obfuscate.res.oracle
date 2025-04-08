@@ -177,12 +177,12 @@ void F6(struct T2 *f6)
 /*@ axiomatic A1 {
       predicate LV3(void (*LV4)()) ;
       
-      }
+    }
  */
 /*@ axiomatic A2 {
       predicate LV5(void (*LV6)()) ;
       
-      }
+    }
 
 */
 void F7(void)

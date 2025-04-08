@@ -6,6 +6,6 @@
 /*@ axiomatic A {
       lemma foo: \true;
       
-      }
+    }
  */
 

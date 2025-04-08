@@ -51,7 +51,7 @@ axiomatic a {
   predicate S
     reads \nothing;
   
-  }
+}
  */
 /*@ exits P ∨ Q ∨ R;
     assigns \nothing;

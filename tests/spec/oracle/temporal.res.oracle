@@ -58,7 +58,7 @@ axiomatic aorai_Trans_Start {
   
   axiom aorai_Trans_Start8: aorai_Trans_Start(8) ≡ 4;
   
-  }
+}
  */
 /*@
 axiomatic aorai_Trans_Stop {
@@ -82,7 +82,7 @@ axiomatic aorai_Trans_Stop {
   
   axiom aorai_Trans_Stop8: aorai_Trans_Stop(8) ≡ 2;
   
-  }
+}
  */
 /*@
 predicate aorai_Trans_Cond_param{L}

@@ -11,7 +11,7 @@ axiomatic dynamic_allocation {
   axiom never_allocable{L}:
     ∀ ℤ i; i < 0 ∧ i > 18446744073709551615 ⇒ ¬is_allocable(i);
   
-  }
+}
 
 */
 void *malloc(size_t s);
@@ -137,7 +137,7 @@ axiomatic dynamic_allocation {
   axiom never_allocable{L}:
     ∀ ℤ i; i < 0 ∧ i > 18446744073709551615 ⇒ ¬is_allocable(i);
   
-  }
+}
 
 */
 void *malloc(size_t s);

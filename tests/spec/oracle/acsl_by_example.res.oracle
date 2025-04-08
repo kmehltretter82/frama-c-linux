@@ -254,7 +254,7 @@ axiomatic counting_axioms {
       n ≥ 0 ∧ *(a + n) ≢ val ⇒
       counting(a, n + 1, val) ≡ counting(a, n, val);
   
-  }
+}
 
 */
 /*@ requires is_valid_int_range(a, n);

@@ -42,7 +42,7 @@
 /*@ axiomatic Obs {
       predicate R(integer r) ;
       
-      }
+    }
  */
 /*@ terminates \true;
     exits \false;

@@ -16,7 +16,7 @@ axiomatic IsMax {
     ∀ int t[], ℤ max, ℤ length;
       is_max(max, t, length) ⇒ (∃ ℤ i; t[i] ≡ max);
   
-  }
+}
  */
 /*@ requires \valid(t + (0 .. n - 1));
     

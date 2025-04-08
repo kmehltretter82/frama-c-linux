@@ -65,7 +65,7 @@ predicate Prepeat{L1, L2}(ℤ times, \list<ℤ>  seq) =
       logic \list<ℤ>  ghost_seq{L}
         reads seq;
       
-      }
+    }
  */
 /*@ ensures Padd_id{Here, Pre}(\old(id), ghost_seq);
     assigns seq; */

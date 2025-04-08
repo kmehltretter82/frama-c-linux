@@ -13,7 +13,7 @@ void f(void)
 /*@ axiomatic Ax {
       predicate Q(ℤ v) ;
       
-      }
+    }
  */
 /*@ requires Q: \let v = Q(255); ¬(¬v ∨ v); */
 void g(void);
@@ -46,7 +46,7 @@ void f(void)
 /*@ axiomatic Ax {
       predicate Q(ℤ v) ;
       
-      }
+    }
 
 */
 /*@ requires Q: \let v = Q(255); ¬(¬v ∨ v); */

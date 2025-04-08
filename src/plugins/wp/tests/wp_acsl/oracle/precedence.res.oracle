@@ -542,7 +542,7 @@ axiomatic Pred {
   
   predicate U;
   
-  }
+}
  */
 /*@
 axiomatic PredX {
@@ -552,7 +552,7 @@ axiomatic PredX {
   
   predicate Rx(ℤ x) ;
   
-  }
+}
  */
 /*@
 axiomatic PredXY {
@@ -560,7 +560,7 @@ axiomatic PredXY {
   
   predicate Qxy(ℤ x, ℤ y) ;
   
-  }
+}
  */
 /*@ terminates \true;
     exits \false;

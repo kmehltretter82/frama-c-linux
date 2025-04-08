@@ -22,7 +22,7 @@ module Foo {
   
   logic t opN(t x, ℤ n) = n ≥ 0 ? op(x, opN(x, n - 1)) : e;
   
-  }
+}
  */
 /*@
 module foo::bar {
@@ -35,7 +35,7 @@ module foo::bar {
   logic Foo::t opN(Foo::t x, ℤ n) =
     n ≥ 0 ? Foo::opN(x, n) : opN(inv(x), -n);
   
-  }
+}
  */
 /*@
 module foo::jazz {
@@ -48,7 +48,7 @@ module foo::jazz {
   logic Foo::t opN(Foo::t x, ℤ n) =
     n ≥ 0 ? opN(x, n) : Foo::opN(inv(x), -n);
   
-  }
+}
  */
 /*@
 module priority {
@@ -58,7 +58,7 @@ module priority {
   
   logic foo::bar::a f_bar(foo::bar::a y) = foo::bar::f(y);
   
-  }
+}
  */
 /*@
 module priority_aliased {
@@ -68,7 +68,7 @@ module priority_aliased {
   
   logic foo::bar::a f_bar(foo::bar::a y) = foo::bar::f(y);
   
-  }
+}
  */
 /*@
 lemma AbsOp:
@@ -82,8 +82,8 @@ lemma AbsOp:
       module B {
         logic ℤ b= A::a + 1;
         
-        }
-      
       }
+      
+    }
  */
 

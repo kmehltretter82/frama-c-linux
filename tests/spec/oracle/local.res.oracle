@@ -25,7 +25,7 @@ int g(int x, int y)
 /*@ axiomatic a {
       predicate P(ℤ v) ;
       
-      }
+    }
  */
 /*@ lemma l1: \let p = \lambda ℤ x; P(x); p(1);
  */

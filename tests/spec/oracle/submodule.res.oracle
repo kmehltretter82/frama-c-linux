@@ -16,9 +16,9 @@ module Foo {
       
       predicate test4(Foo::t y) = Foo::Bar::test1(y);
       
-      }
-    
     }
+    
+  }
   
   predicate test5(t y) = Bar::test2(y, y);
   
@@ -26,6 +26,6 @@ module Foo {
   
   predicate test7(t z) = Bar::test1(z);
   
-  }
+}
  */
 

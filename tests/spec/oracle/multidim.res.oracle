@@ -10,7 +10,7 @@ int (*pt)[3][4] = ttt;
       
       predicate Q(int (*pt)[3][4]) ;
       
-      }
+    }
  */
 /*@ requires Q((TT *)ttt); */
 void f(void)

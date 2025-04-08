@@ -13,7 +13,7 @@ void f(void);
       
       predicate foo(ℝ x) ;
       
-      }
+    }
  */
 /*@ ensures 1.0 ≡ 1; */
 void f(void)
@@ -45,7 +45,7 @@ axiomatic useless_logic_cast {
   
   logic T_PTR_T4 * vTab_Ptr{L}= \at((T_PTR_T4 *)(&Tab_Ptr),L);
   
-  }
+}
 
 */
 

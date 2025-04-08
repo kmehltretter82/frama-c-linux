@@ -38,6 +38,6 @@
       
       predicate check(t x, ℤ k) ;
       
-      }
+    }
  */
 

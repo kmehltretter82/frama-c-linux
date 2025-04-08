@@ -4,7 +4,7 @@
 /*@ axiomatic ax {
       logic int Acc(int m) ;
       
-      }
+    }
  */
 /*@ predicate Bnd(ℤ n, int m) = Acc(m) ≤ 9;
  */

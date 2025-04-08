@@ -4,7 +4,7 @@
       predicate P(ℤ x) 
         reads \nothing;
       
-      }
+    }
  */
 /*@ ghost int global_decl; */
 /*@ ghost int global_def = 42; */
@@ -125,7 +125,7 @@ void reference_function(void)
       predicate P(ℤ x) 
         reads \nothing;
       
-      }
+    }
  */
 /*@ ghost int global_decl; */
 /*@ ghost int global_def = 42; */
