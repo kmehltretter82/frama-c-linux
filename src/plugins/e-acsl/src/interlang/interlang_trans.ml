@@ -207,12 +207,11 @@ and compile_div_mod ~origin {ity; binop; op1; op2} =
     match ity with
     | Gmpz ->
       let* {adata} = M.get in
+      let () = Assert.push_pending_register_data () in
       let* adata2 = M.modifying_env (Assert.empty ~loc kf) in
       let* () = M.modify (fun state -> {state with adata = adata2}) in
       let* e2 = compile op2 in
       let* {adata = adata2} = M.get in
-      let* adata = M.modifying_env (fun env -> Assert.merge_right ~loc env adata2 adata) in
-      let* () = M.modify (fun state -> {state with adata}) in
       (* TODO: preventing division by zero should not be required anymore.
          RTE should do this automatically. *)
       let* logic_env = M.get_logic_env in
@@ -254,6 +253,9 @@ and compile_div_mod ~origin {ity; binop; op1; op2} =
           guard
           p
       in
+      let* () = M.modifying_env (fun env -> (), Assert.do_pending_register_data env) in
+      let* adata = M.modifying_env (fun env -> Assert.merge_right ~loc env adata2 adata) in
+      let* () = M.modify (fun state -> {state with adata}) in
       Env.add_assert kf cond p;
       let mk_stmts _v e =
         assert (Gmp_types.Z.is_t ty);

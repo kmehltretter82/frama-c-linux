@@ -370,8 +370,8 @@ void eacsl_assert_free_value(eacsl_assert_data_value_t *value) {
   }
 }
 
-void eacsl_assert_copy_value(eacsl_assert_data_t *dest,
-                             eacsl_assert_data_value_t *value) {
+void eacsl_assert_copy_value_list(eacsl_assert_data_t *dest,
+                                  eacsl_assert_data_value_t *value) {
   if (value != NULL) {
     switch (value->type) {
     case E_ACSL_INT: {
@@ -422,12 +422,13 @@ void eacsl_assert_copy_value(eacsl_assert_data_t *dest,
       break;
     }
     }
+    eacsl_assert_copy_value_list(dest, value->next);
   }
 }
 
 void eacsl_assert_copy_values(eacsl_assert_data_t *dest,
                               eacsl_assert_data_t *src) {
-  eacsl_assert_copy_value(dest, src->values);
+  eacsl_assert_copy_value_list(dest, src->values);
 }
 
 void eacsl_assert_clean(eacsl_assert_data_t *data) {
