@@ -324,6 +324,8 @@ export interface ModalProps {
   title?: string;
   /** custom Classes name */
   className?: string;
+  /** Actions */
+  actions?: React.JSX.Element;
   /** Function onClose */
   onClose?: () => void
   /** Modal content */
@@ -333,7 +335,7 @@ export interface ModalProps {
 export function Modal(
   props: ModalProps
 ): JSX.Element {
-  const { label, title, icon, className, onClose, children } = props;
+  const { label, title, icon, className, actions, onClose, children } = props;
 
   const contentClasses = classes('dome-xModal-content', className);
   const onCloseModal = React.useCallback((): void => {
@@ -358,7 +360,10 @@ export function Modal(
         <Label className='dome-xModal-title'
           label={label} icon={icon} title={title}
         />
-        <IconButton icon='CROSS' size={18} onClick={onCloseModal} />
+        <div className='dome-xModal-acions'>
+          { actions }
+          <IconButton icon='CROSS' size={18} onClick={onCloseModal} />
+        </div>
       </div>
       <div className='dome-xModal-body dome-xBoxes-vbox dome-xBoxes-box'>
         {children}

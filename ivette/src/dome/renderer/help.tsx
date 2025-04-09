@@ -40,12 +40,14 @@ import * as Ivette from 'ivette';
 import { ChapterProps } from 'ivette';
 import { Icon } from './controls/icons';
 import { LED } from './controls/displays';
+import { Button, ButtonGroup } from './frame/toolbars';
 
 /* --------------------------------------------------------------------------*/
 /* --- Help                                                                  */
 /* --------------------------------------------------------------------------*/
 
-const lastDocOpened = new GlobalState<string>('ivette');
+export const docHistory = new GlobalState<string[]>(['']);
+const posHistory = new GlobalState(0);
 
 interface HelpButtonProps {
   /** id */
@@ -56,6 +58,7 @@ interface HelpButtonProps {
 
 export function HelpButton(props: HelpButtonProps): JSX.Element {
   const { id, size } = props;
+  const history = useHelpHistory();
 
   return (
     <IconButton
@@ -63,7 +66,10 @@ export function HelpButton(props: HelpButtonProps): JSX.Element {
       size={size}
       className='dome-xDoc-icon'
       title={'Help'}
-      onClick={() => showModal(<GeneralDocModal id={id} />)
+      onClick={() => {
+          history.addElement(id);
+          showModal(<GeneralDocModal />);
+        }
       }
     />
   );
@@ -181,6 +187,46 @@ function Nodes(props: { tree: HTree }): React.ReactNode {
   );
 }
 
+interface History {
+  current: string;
+  addElement: (id: string) => void;
+  previous: () => void;
+  next: () => void;
+  isFirstpos: () => boolean;
+  isLastpos: () => boolean;
+}
+
+function useHelpHistory(): History {
+  const [ history, setHistory ] = useGlobalState(docHistory);
+  const [ position, setPosition ] = useGlobalState(posHistory);
+  const current = React.useMemo(() => history[position], [history, position]);
+
+  function addElement(id: string): void {
+    if (id === current) return;
+    const newHistory = history.toSpliced(position+1);
+    if(newHistory.push(id) > 20) newHistory.shift();
+    setHistory(newHistory);
+    setPosition(newHistory.length-1);
+  }
+  function previous(): void {
+    setPosition(position > 0 ? position-1 : 0 );
+  }
+  function next(): void {
+    setPosition(position < history.length-1 ? position+1 : position );
+  }
+  function isFirstpos(): boolean { return position === 0; }
+  function isLastpos(): boolean { return position === history.length-1; }
+
+  return {
+    current: current,
+    addElement: addElement,
+    previous: previous,
+    next: next,
+    isFirstpos: isFirstpos,
+    isLastpos: isLastpos
+  };
+}
+
 /**
   * Each chapter must have a unique identifier.
   * If a chapter is saved with an existing identifier, the identifier will be
@@ -191,12 +237,10 @@ function Nodes(props: { tree: HTree }): React.ReactNode {
   * #+ <title> {#<id>-<subid>} with <subid>
   * which can optionally be compounded with - (unrelated to depth level).
 */
-function GeneralDocModal(props: { id?: string }): JSX.Element {
-  const { id } = props;
+function GeneralDocModal(): JSX.Element {
   const [ unfoldAll, setUnfoldAll ] = React.useState<boolean|undefined>(true);
-  const [ lastId, setLastId ] = useGlobalState(lastDocOpened);
-  const selectedIdState = React.useState<string>(id || lastId);
-  const [ selectedId, setSelectedid ] = selectedIdState;
+  const history = useHelpHistory();
+  const selectedId = React.useMemo(() => history.current, [history]);
 
   const index = React.useMemo(() => {
     return Ivette.DOCCHAPTER.getElements()
@@ -222,10 +266,17 @@ function GeneralDocModal(props: { id?: string }): JSX.Element {
     return `Documentation ${chapter} ${section ? "- "+section: ""}`;
   }, [selectedId]);
 
-  React.useEffect(() => { setLastId(selectedId); }, [selectedId, setLastId]);
+  const actionsHeader = <ButtonGroup>
+    <Button icon='ANGLE.LEFT'
+      disabled={history.isFirstpos()}
+      onClick={ history.previous } />
+    <Button icon='ANGLE.RIGHT'
+      disabled={history.isLastpos()}
+      onClick={ history.next } />
+  </ButtonGroup>;
 
   return (
-    <Modal className='modal-framac-doc' label={title}>
+    <Modal className='modal-framac-doc' label={title} actions={actionsHeader}>
       <LSplit settings="frama-c.modal-doc.split">
         <SideBar>
           <SidebarTitle label='Table of contents' >
@@ -251,7 +302,7 @@ function GeneralDocModal(props: { id?: string }): JSX.Element {
             setUnfoldAll={setUnfoldAll}
             foldButtonPosition='right'
             selected={selectedId}
-            onClick={(id) => setSelectedid(id) }
+            onClick={(id) => history.addElement(id) }
           >
             { index.map((tree, i) => <Nodes
                 key={i}
