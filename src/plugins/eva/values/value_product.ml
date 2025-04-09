@@ -167,10 +167,3 @@ module Make
     reduce src_val left right
 
 end
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../../.."
-End:
-*)

@@ -43,9 +43,3 @@ val warn_imprecise_write:
     assigned lvalue, and [prefix] is an optional prefix to the warning. *)
 val warn_imprecise_offsm_write:
   ?prefix:string -> Eva_ast.lval -> Cvalue.V_Offsetmap.t -> unit
-
-(*
-Local Variables:
-compile-command: "make -C ../../../../.."
-End:
-*)

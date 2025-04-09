@@ -388,9 +388,3 @@ val add_loading_failures: string -> unit
     @since Silicon-20161101 *)
 
 (**/**)
-
-(*
-  Local Variables:
-  compile-command: "make -C ../../.."
-  End:
-*)

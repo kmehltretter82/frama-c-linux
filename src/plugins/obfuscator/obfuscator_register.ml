@@ -72,9 +72,3 @@ let run () =
   end
 
 let () = Boot.Main.extend run
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

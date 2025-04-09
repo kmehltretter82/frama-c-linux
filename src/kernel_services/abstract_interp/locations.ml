@@ -729,9 +729,3 @@ module Location =
       let hash = loc_hash
       let pretty = pretty_loc
     end)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

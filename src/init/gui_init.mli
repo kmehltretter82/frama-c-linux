@@ -24,9 +24,3 @@
     if we are in cmdline or gui. *)
 
 val is_gui: bool
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

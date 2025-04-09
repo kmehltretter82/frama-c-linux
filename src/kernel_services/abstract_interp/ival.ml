@@ -1005,9 +1005,3 @@ let bitwise_not ~size ~signed v =
     bitwise_unsigned_not ~size v
 
 let name = "ival"
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

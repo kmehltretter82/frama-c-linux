@@ -45,9 +45,3 @@ val sound_verdict: unit -> varinfo
 (**************************************************************************)
 
 val is_libc_writing_memory_ref: (varinfo -> bool) ref
-
-(*
-Local Variables:
-compile-command: "make -C ../../../../.."
-End:
-*)

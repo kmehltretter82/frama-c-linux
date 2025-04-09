@@ -106,9 +106,3 @@ val emit: Cil_types.kinstr -> t -> unit
 
 val pretty : Format.formatter -> t -> unit
 val pretty_status : Format.formatter -> status -> unit
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

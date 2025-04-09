@@ -54,9 +54,3 @@ val find_fun_postcond_nodes : PdgTypes.Pdg.t -> Cil_types.predicate ->
 
 val find_fun_variant_nodes : PdgTypes.Pdg.t -> Cil_types.term ->
   decl_info * data_info
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

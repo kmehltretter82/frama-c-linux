@@ -42,10 +42,3 @@ module Make
                               and type value = Val.extended
                               and type location = Loc.extended
                               and type origin = Domain.origin
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../../.."
-End:
-*)

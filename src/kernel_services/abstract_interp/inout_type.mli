@@ -42,10 +42,3 @@ val map: (Locations.Zone.t -> Locations.Zone.t) -> t -> t
 
 val bottom: t
 val join: t -> t -> t
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

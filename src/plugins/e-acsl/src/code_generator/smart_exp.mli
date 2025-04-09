@@ -48,8 +48,3 @@ val null: loc:location -> exp
 
 val mem: loc:location -> varinfo -> exp
 (** [mem ~loc v] creates a Mem expression with an explicit index of 0 *)
-(*
-Local Variables:
-compile-command: "make -C ../../../../.."
-End:
-*)

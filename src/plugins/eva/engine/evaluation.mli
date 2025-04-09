@@ -48,9 +48,3 @@ module Make
                       and type value = Value.t
                       and type origin = Domain.origin
                       and type loc = Loc.location
-
-(*
-Local Variables:
-compile-command: "make -C ../../../.."
-End:
-*)

@@ -93,10 +93,3 @@ val useConfigurationString: string -> (string -> unit) -> unit
 
 val findConfigurationList: string -> configData list
 val useConfigurationList: string -> (configData list -> unit) -> unit
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

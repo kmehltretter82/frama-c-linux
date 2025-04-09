@@ -266,9 +266,3 @@ let env_of_li ~adata ~loc kf env li =
     Env.not_yet env "type variable"
   | Larrow _ ->
     Env.not_yet env "lambda-abstraction"
-
-(*
-Local Variables:
-compile-command: "make -C ../../../../.."
-End:
-*)

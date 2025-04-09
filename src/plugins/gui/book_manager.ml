@@ -182,9 +182,3 @@ let append_source_tab w titre =
   (* THIS CALLS THE SWITCH_PAGE CALLBACK IMMEDIATELY! *)
   w.notebook#goto_page last;
   window
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

@@ -691,10 +691,3 @@ let find_stmts (fdec:fundec) : (stmt list * stmt list) =
   and all_stmts = ref [] in
   ignore(visitCilFunction (sinkFinder sink_stmts all_stmts) fdec);
   !all_stmts, !sink_stmts
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

@@ -417,10 +417,3 @@ module Make
     init_state >>-: add_main_formals kf
 
 end
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../../.."
-End:
-*)

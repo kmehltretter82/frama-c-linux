@@ -128,9 +128,3 @@ val command :
     @raise Async.Cancel when the computation is interrupted or on timeout
     @before 29.0-Copper Async.Cancel was Db.Cancel
 *)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

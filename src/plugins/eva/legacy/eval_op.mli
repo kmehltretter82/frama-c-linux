@@ -70,9 +70,3 @@ val pretty_offsetmap: typ -> Format.formatter -> V_Offsetmap.t -> unit
    Returns None if no under-approximation can be computed. *)
 val find_under_approximation:
   Cvalue.Model.t -> Locations.location -> Cvalue.V_Or_Uninitialized.t option
-
-(*
-Local Variables:
-compile-command: "make -C ../../../.."
-End:
-*)

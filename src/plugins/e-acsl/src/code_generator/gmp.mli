@@ -121,9 +121,3 @@ module Q : sig
         logic. *)
 
 end
-
-(*
-Local Variables:
-compile-command: "make -C ../../../../.."
-End:
-*)

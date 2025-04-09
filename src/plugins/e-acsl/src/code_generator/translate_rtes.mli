@@ -33,9 +33,3 @@ val rte_annots:
   Env.t
 (** Translate the given RTE annotations into runtime checks in the given
     environment. *)
-
-(*
-Local Variables:
-compile-command: "make -C ../../../../.."
-End:
-*)

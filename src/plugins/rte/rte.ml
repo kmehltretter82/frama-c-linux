@@ -443,9 +443,3 @@ let bool_value ~remove_trivial ~on_alarm lv =
       (not vi.vaddrof)  (* their address is not taken *)
     -> ()
   | _ -> on_alarm ~invalid:false (Alarms.Invalid_bool lv)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

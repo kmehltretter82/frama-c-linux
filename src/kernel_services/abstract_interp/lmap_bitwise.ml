@@ -355,9 +355,3 @@ struct
   let clear_caches () = LBase.clear_caches () ; LOffset.clear_caches ()
 
 end
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

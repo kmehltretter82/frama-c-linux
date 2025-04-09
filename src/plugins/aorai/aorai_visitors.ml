@@ -1130,9 +1130,3 @@ let add_pre_post_from_buch file treatloops  =
 let add_sync_with_buch file  =
   let visitor = new visit_adding_code_for_synchronisation in
   Cil.visitCilFile (visitor :> Cil.cilVisitor) file
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

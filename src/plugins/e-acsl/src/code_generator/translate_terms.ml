@@ -1058,9 +1058,3 @@ let untyped_to_exp typ t =
   in
   if not (Env.has_no_new_stmt env) then raise (No_simple_translation t);
   e
-
-(*
-Local Variables:
-compile-command: "make -C ../../../../.."
-End:
-*)

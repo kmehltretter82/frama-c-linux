@@ -48,9 +48,3 @@ let main () = if Report_parameters.Print.get () then print ()
 
 let () =
   Boot.Main.extend main;
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

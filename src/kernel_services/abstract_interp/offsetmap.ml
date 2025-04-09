@@ -3117,9 +3117,3 @@ module Aux
 end
 
 [@@@warning "+60"]
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

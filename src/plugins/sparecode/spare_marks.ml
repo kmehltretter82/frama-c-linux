@@ -376,8 +376,3 @@ let select_useful_things ~select_annot ~select_slice_annot kf_entry =
   proj
 
 (*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*)
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

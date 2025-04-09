@@ -304,9 +304,3 @@ let () =
        Project.register_after_load_hook hook;
        Project.register_after_global_load_hook hook;
        recompute window menu)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

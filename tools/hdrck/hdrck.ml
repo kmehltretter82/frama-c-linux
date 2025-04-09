@@ -715,7 +715,3 @@ let _ =
         update_headers ~config_file_opts specified_files;
   end;
   if !exit_on_warning && not !has_no_warning_nor_error then exit 8
-
-(* Local Variables: *)
-(* compile-command: "ocamlc -o hdrck unix.cma str.cma hdrck.ml" *)
-(* End: *)

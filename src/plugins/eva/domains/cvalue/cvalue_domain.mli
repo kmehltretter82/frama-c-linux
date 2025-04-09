@@ -44,10 +44,3 @@ module Getters (Dom : Abstract.Domain.External) : sig
   val get_cvalue_or_top : Dom.t -> Cvalue.Model.t
   val get_cvalue_or_bottom : Dom.t Lattice_bounds.or_bottom -> Cvalue.Model.t
 end
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../../../.."
-End:
-*)

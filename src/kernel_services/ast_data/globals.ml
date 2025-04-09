@@ -978,9 +978,3 @@ let get_comments_stmt s =
     let last = snd (Cil_datatype.Stmt.loc s) in
     Cabshelper.Comments.get (first,last)
   in Comments_stmt_cache.memo add s
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

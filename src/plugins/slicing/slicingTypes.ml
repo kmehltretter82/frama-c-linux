@@ -160,9 +160,3 @@ module Sl_mark =
     end)
 
 let dyn_sl_mark = Sl_mark.ty
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

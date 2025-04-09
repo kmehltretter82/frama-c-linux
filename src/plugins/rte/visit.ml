@@ -484,9 +484,3 @@ let annotate ?flags kf =
       assert(nkf == f);
       List.iter (fun f -> f ()) !to_update;
     end
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

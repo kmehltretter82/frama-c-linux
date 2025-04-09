@@ -50,10 +50,3 @@ module Make
     val reduce_by_enumeration:
       Eva.environment -> Valuation.t -> exp -> bool -> Valuation.t or_bottom
   end
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../../.."
-End:
-*)

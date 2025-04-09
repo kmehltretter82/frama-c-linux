@@ -180,9 +180,3 @@ module D = Datatype.Make(struct
       Format.fprintf fmt "@[[%a]@]"
         (Pretty_utils.pp_list ~sep:",@ " pretty_lscope_var) lscope_vars
   end)
-
-(*
-Local Variables:
-compile-command: "make -C ../../../../.."
-End:
-*)

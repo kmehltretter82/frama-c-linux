@@ -104,9 +104,3 @@ val preprocess_term :
   logic_env:Logic_env.t -> term -> unit
 
 val clear : unit -> unit
-
-(*
-Local Variables:
-compile-command: "make -C ../../../../.."
-End:
-*)

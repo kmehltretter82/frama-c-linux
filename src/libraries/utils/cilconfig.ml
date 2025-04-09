@@ -251,10 +251,3 @@ let loadConfiguration (fname : Datatype.Filepath.t) : unit =
    with _ -> () (* no file, ignore *));
 
   ()
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

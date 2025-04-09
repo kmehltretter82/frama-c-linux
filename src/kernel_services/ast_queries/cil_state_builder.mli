@@ -56,9 +56,3 @@ module Code_annotation_hashtbl
   State_builder.Hashtbl
   with type key = Cil_types.code_annotation and type data = Data.t
  *)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

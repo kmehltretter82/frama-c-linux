@@ -61,9 +61,3 @@ val get_fold: 'a t -> ('a -> 'acc -> 'acc) -> 'acc -> 'acc
 
 val get_mem: 'a t -> 'a -> bool
 (** Is the given element present in the category? *)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

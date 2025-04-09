@@ -46,9 +46,3 @@ val finite_float_assertion: (fkind * exp) alarm_gen
 val pointer_call: (exp * exp list) alarm_gen
 val pointer_value: exp alarm_gen
 val bool_value: lval alarm_gen
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

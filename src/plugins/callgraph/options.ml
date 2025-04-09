@@ -109,9 +109,3 @@ let dump output g =
     error
       "error while dumping the syntactic callgraph: %s"
       (Printexc.to_string e)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

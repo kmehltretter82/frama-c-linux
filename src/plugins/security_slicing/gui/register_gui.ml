@@ -84,9 +84,3 @@ let main main_ui =
   main_ui#register_source_highlighter security_highlighter
 
 let () = Design.register_extension main
-
-(*
-  Local Variables:
-  compile-command: "make -C ../../.."
-  End:
-*)

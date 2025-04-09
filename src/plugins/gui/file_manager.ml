@@ -271,9 +271,3 @@ let insert (host_window: Design.main_window_extension_points) =
 
 (** Register this dialog in main window menu bar *)
 let () = Design.register_extension insert
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

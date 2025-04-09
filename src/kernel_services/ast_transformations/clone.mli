@@ -27,10 +27,3 @@ open Cil_types
 (** Returns a clone of a kernel function and
     adds it into the AST next to the old one *)
 val clone_defined_kernel_function: kernel_function -> kernel_function
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

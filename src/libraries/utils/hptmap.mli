@@ -97,9 +97,3 @@ module Make_with_compositional_bool
                   and type v = V.t
                   and type 'v map = 'v Shape(Key).map
                   and type prefix = prefix
-
-(*
-Local Variables:
-compile-command: "make -C .."
-End:
-*)

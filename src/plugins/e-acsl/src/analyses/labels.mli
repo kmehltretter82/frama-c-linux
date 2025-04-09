@@ -55,9 +55,3 @@ val _debug: unit -> unit
 (**************************************************************************)
 
 val has_empty_quantif_ref: ((term * logic_var * term) list -> bool) ref
-
-(*
-Local Variables:
-compile-command: "make -C ../../../../.."
-End:
-*)

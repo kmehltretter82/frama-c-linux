@@ -28,9 +28,3 @@
 *)
 
 val transform: File.code_transformation_category
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

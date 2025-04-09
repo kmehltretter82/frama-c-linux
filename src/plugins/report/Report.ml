@@ -22,9 +22,3 @@
 
 
 module Register = Register
-
-(*
-Local Variables:
-compile-command: "make -C ../../../.."
-End:
-*)

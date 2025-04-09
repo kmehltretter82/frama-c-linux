@@ -44,10 +44,3 @@ module Make
                           and type loc = Domain.location)
     (_: Transfer_stmt.S with type state = Domain.t)
   : S with type state := Domain.t
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../../.."
-End:
-*)

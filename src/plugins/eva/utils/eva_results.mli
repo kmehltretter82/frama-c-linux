@@ -72,9 +72,3 @@ val change_callstacks:
 val eval_tlval_as_location :
   ?result:Cil_types.varinfo ->
   Cvalue.Model.t ->  Cil_types.term -> Locations.location
-
-(*
-Local Variables:
-compile-command: "make -C ../../../.."
-End:
-*)

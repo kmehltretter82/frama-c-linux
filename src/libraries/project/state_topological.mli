@@ -54,9 +54,3 @@ module Make(G: G) : sig
       The order is the same as for [fold]. *)
 
 end
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

@@ -182,9 +182,3 @@ let quantif_to_exp kf env p =
   | Pexists _ ->
     convert kf env loc ~is_forall:false p
   | _ -> assert false
-
-(*
-Local Variables:
-compile-command: "make -C ../.."
-End:
-*)

@@ -42,9 +42,3 @@ val handle_stmt: stmt -> Env.t -> kernel_function -> Env.t
 val generate_global_init: varinfo -> offset -> init -> stmt option
 (** Generate [Some s], where [s] is a statement tracking global initializer
     or [None] if there is no need to track it *)
-
-(*
-Local Variables:
-compile-command: "make -C ../.."
-End:
-*)

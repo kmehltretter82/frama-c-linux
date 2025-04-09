@@ -34,9 +34,3 @@ module ForceInoutExternalWithFormals: Parameter_sig.Bool
 module ForceDeref: Parameter_sig.Bool
 
 module Output: Parameter_sig.Bool
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

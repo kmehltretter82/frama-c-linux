@@ -3470,9 +3470,3 @@ let register_shallow_attribute name =
   | Some info ->
     Ast_attributes.register_noprint ~ignore:info.attr_ignore
       info.attr_class name
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

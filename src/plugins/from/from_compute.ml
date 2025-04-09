@@ -657,9 +657,3 @@ struct
     ignore (compute_and_return kf)
 
 end
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

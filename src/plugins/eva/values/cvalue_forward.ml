@@ -550,10 +550,3 @@ let eval_float_constant f fkind fstring =
     and fu = Fval.F.of_float fu in
     let af = Fval.inject (Fval.kind fkind) fl fu in
     V.inject_float af
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../../.."
-End:
-*)

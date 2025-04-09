@@ -75,9 +75,3 @@ let mem ~loc vi =
   lval
     ~loc
     (Cil.mkMem ~addr:(Cil.evar ~loc vi) ~off:(Index (Cil.zero ~loc, NoOffset)))
-
-(*
-Local Variables:
-compile-command: "make -C ../../../../.."
-End:
-*)

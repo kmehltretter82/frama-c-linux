@@ -187,9 +187,3 @@ let pack x = x
 let input_val cin = function
   | Nopack | Recursive _ -> invalid_arg "Descr.input_val: unmarshable value"
   | Pack d -> Unmarshal.input_val cin (coerce d)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

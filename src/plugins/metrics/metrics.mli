@@ -62,9 +62,3 @@ module Metrics_cilast : sig
     (Metrics_base.BasicMetrics.t Metrics_base.OptionKf.Map.t)
       Datatype.Filepath.Map.t
 end
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

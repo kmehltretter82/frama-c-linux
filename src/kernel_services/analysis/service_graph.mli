@@ -81,9 +81,3 @@ module Make
        val datatype_name: string
      end) :
   S with type node = G.V.t and type graph = G.t
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

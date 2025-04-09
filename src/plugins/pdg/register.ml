@@ -167,10 +167,3 @@ let () = Boot.Main.extend main
    instance, while a dotted black edge with a triangle arrow represent a address
    dependency.
 *)
-
-
-(*
-  Local Variables:
-  compile-command: "make -C ../../.."
-  End:
-*)

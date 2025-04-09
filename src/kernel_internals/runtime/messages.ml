@@ -101,9 +101,3 @@ let () = Log.check_not_yet := check_not_yet
 let reset_once_flag () = OnceTable.clear ()
 
 let add_global_hook fn = hooks := !hooks @ [fn]
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

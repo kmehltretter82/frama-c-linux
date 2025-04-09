@@ -436,9 +436,3 @@ let some_visible_out = SigMarks.some_visible_out
 let is_topin_visible = SigMarks.is_topin_visible
 let get_marked_out_zone = SigMarks.get_marked_out_zone
 let pretty_sig = SigMarks.pretty
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

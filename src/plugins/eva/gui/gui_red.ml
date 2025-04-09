@@ -201,9 +201,3 @@ let make_panel (main_ui:main_window_extension_points) =
     main_ui#lower_notebook#append_page ~tab_label w.widget#coerce
   in
   main_ui#lower_notebook#get_nth_page n
-
-(*
-  Local Variables:
-  compile-command: "make -C ../../.."
-  End:
-*)

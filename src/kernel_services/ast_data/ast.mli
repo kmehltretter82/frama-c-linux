@@ -142,9 +142,3 @@ val add_hook_on_update: (unit -> unit) -> unit
 
 (**/**)
 val add_linked_state: State.t -> unit
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

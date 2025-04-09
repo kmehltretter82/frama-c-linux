@@ -64,9 +64,3 @@ open Cil_types
 val get_registered_annotations: stmt -> code_annotation list
 
 val self: State.t
-
-(*
-  Local Variables:
-  compile-command: "make -C ../../.."
-  End:
- *)

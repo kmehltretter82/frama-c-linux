@@ -154,9 +154,3 @@ end
 
 val make : GTree.view -> t
 (** Create a file tree packed in the given tree_view. *)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

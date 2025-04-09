@@ -47,9 +47,3 @@ module Undo =
       let option_name = "-gui-undo"
       let help = "possible to click on the `undo' button (set by default)"
     end)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

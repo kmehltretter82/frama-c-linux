@@ -37,9 +37,3 @@ val ival: Interval.t Abstract_value.dependencies
 module Sign: Abstract_value.Leaf
   with type t = Sign_value.t and type context = unit
 val sign: Sign.t Abstract_value.dependencies
-
-(*
-Local Variables:
-compile-command: "make -C ../../../.."
-End:
-*)

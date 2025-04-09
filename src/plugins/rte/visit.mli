@@ -90,9 +90,3 @@ val register :
   Emitter.t ->
   kernel_function -> stmt -> invalid:bool -> Alarms.alarm ->
   code_annotation * bool
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

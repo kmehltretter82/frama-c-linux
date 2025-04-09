@@ -482,9 +482,3 @@ let extract ~f_slice_names new_proj_name =
   SlicingParameters.feedback
     ~level:2 "done (exporting project to '%s')." new_proj_name;
   new_prj
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

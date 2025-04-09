@@ -57,9 +57,3 @@ val impact_in_kf: result -> Cil_types.kernel_function -> nodes
 
 val skip: unit -> Locations.Zone.t
 (** computed from the option [-impact-skip] *)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

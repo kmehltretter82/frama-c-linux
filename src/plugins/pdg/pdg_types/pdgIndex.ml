@@ -632,9 +632,3 @@ module FctIndex = struct
       acc idx.calls
 
 end
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

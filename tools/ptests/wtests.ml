@@ -276,9 +276,3 @@ let () =
     end;
     wrapper ~json
   | _ -> help_msg () ; exit 1
-
-(*
-Local Variables:
-compile-command: "LC_ALL=C make -C .. ptests"
-End:
-*)

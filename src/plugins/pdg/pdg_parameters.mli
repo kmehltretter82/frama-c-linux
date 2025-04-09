@@ -29,9 +29,3 @@ module BuildFct: Parameter_sig.Kernel_function_set
 module PrintBw: Parameter_sig.Bool
 
 module DotBasename: Parameter_sig.String
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

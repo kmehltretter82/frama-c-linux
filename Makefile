@@ -165,8 +165,3 @@ include share/Makefile.linting
 ################################
 
 include share/Makefile.documentation
-
-###############################################################################
-# Local Variables:
-# compile-command: "make"
-# End:

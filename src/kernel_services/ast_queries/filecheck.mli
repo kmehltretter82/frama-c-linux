@@ -45,9 +45,3 @@ end
 *)
 val extend_checker:
   ((module Extensible_checker) -> (module Extensible_checker)) -> unit
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

@@ -191,9 +191,3 @@ val mk_offseted_array_states_as_enum :
 (** Returns a term representing the given logic variable
     (usually a fresh quantified variable). *)
 val mk_term_from_vi : Cil_types.varinfo -> Cil_types.term
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

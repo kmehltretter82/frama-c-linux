@@ -72,10 +72,3 @@ val pp_compare : Property.t -> Property.t -> int
 
 val full_compare : Property.t -> Property.t -> int
 (** Completes [pp_compare] with [Property.compare] *)
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

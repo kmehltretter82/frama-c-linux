@@ -33,9 +33,3 @@ module Print =
       let option_name = "-occurrence"
       let help = "print results of occurrence analysis"
     end)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

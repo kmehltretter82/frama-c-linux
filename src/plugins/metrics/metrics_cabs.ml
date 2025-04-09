@@ -652,9 +652,3 @@ let compute_on_cabs () =
       "@[<v 0> Project has no untyped AST. Only metrics over normalized CIL \
        AST are available. \
        @]@."
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

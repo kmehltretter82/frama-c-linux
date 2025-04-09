@@ -246,9 +246,3 @@ let command ?(timeout=0) ?stdout ?stderr cmd args =
     match f () with
     | Result r -> r
     | Not_ready _ -> assert false
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

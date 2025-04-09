@@ -836,10 +836,3 @@ module Make (Engine: Engine_sig.S) = struct
     in
     List.fold_left initialize_volatile state vars
 end
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../../.."
-End:
-*)

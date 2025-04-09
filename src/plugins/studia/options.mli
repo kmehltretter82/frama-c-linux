@@ -21,10 +21,3 @@
 (**************************************************************************)
 
 include Plugin.General_services
-
-
-(*
-Local Variables:
-compile-command: "make"
-End:
-*)

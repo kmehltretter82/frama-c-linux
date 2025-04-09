@@ -274,10 +274,3 @@ module Make
       Some (call_result, i)
 
 end
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../../.."
-End:
-*)

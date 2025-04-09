@@ -287,10 +287,3 @@ let replace_call_precondition ip stmt ip_at_call =
    with Not_found -> ());
   PreCondAt.replace (ip, stmt) ip_at_call;
   add_call_precondition ip ip_at_call
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

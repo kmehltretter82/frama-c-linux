@@ -103,9 +103,3 @@ let at_most_one_path (states,transitions as auto) st1 st2 =
       ignore (dijkstra (voisins auto) st1 st2);
       false
   with Not_found -> true
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

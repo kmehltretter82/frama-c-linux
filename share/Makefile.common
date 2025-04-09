@@ -138,9 +138,3 @@ else
 # Unix, Cygwin, Win32
 TAR     = tar
 endif
-
-##########################################################################
-# Local Variables:
-# compile-command: "make"
-# mode: makefile
-# End:

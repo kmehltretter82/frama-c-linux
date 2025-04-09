@@ -676,9 +676,3 @@ module String_tbl =
       let equal : string -> string -> bool = (=)
       let to_string x = x
     end)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

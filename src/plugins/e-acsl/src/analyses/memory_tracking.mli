@@ -67,9 +67,3 @@ val found_concurrent_function: loc:location -> varinfo -> unit
     In summary, an analyzed source code can be concurrent with the concurrency
     support of E-ACSL deactivated only if no memory properties are to be
     verified. *)
-
-(*
-  Local Variables:
-  compile-command: "make -C ../../../../.."
-  End:
- *)

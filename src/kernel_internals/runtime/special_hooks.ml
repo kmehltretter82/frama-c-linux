@@ -291,9 +291,3 @@ let on_call_to_undeclared_function vi =
 
 let () =
   Cabs2cil.register_implicit_prototype_hook on_call_to_undeclared_function
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

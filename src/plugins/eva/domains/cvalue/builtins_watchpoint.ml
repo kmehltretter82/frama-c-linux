@@ -133,9 +133,3 @@ let watch_hook _callstack stmt states =
   List.iter treat !watch_table
 
 let () = Cvalue_callbacks.register_statement_hook watch_hook
-
-(*
-Local Variables:
-compile-command: "make -C ../../../../.."
-End:
-*)

@@ -232,9 +232,3 @@ module Make
     replace_key ~decide
 
 end
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

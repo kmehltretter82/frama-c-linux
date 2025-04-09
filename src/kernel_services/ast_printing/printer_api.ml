@@ -577,9 +577,3 @@ module type S = sig
       modification performed through {!update_printer}. *)
 
 end
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

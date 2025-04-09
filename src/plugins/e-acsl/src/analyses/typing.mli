@@ -160,9 +160,3 @@ val preprocess_term:
 (** Compute the type of each subterm of the given term in the given context. If
     [use_gmp_opt] is false, then the conversion to the given context is done
     even if -e-acsl-gmp-only is set. *)
-
-(*
-Local Variables:
-compile-command: "make -C ../../../../.."
-End:
-*)

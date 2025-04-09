@@ -209,9 +209,3 @@ let all_call_out_nodes ~callee ~caller call_stmt =
       "cannot propagate impact into imprecisely analyzed caller function %a"
       Kernel_function.pretty (Kernel_function.find_englobing_kf call_stmt);
     []
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

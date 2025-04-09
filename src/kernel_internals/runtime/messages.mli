@@ -47,9 +47,3 @@ val nb_messages: unit -> int
 
 val add_global_hook: (unit -> unit) -> unit
 (** Register a global hook (not projectified) on message addition. *)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

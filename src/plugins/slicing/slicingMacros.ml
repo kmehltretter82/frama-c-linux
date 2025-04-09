@@ -212,10 +212,3 @@ let fi_has_persistent_selection fi =
 let has_persistent_selection kf =
   let fi = get_kf_fi kf in
   fi_has_persistent_selection fi
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

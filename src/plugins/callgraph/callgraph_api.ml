@@ -64,9 +64,3 @@ module type Services = sig
   val entry_point: unit -> G.V.t option
   val is_root: Kernel_function.t -> bool
 end
-
-(*
-Local Variables:
-compile-command: "make -C ../.."
-End:
-*)

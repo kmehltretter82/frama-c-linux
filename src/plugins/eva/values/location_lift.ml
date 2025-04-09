@@ -64,10 +64,3 @@ module Make
     Loc.backward_index typ ~index ~remaining offset >>-: fun (v, off) ->
     Convert.replace v value, off
 end
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../../.."
-End:
-*)

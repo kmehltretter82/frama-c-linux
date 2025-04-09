@@ -229,9 +229,3 @@ module Make (Ord : Datatype.S) (Value : Value): sig
   val remove_whole : (key -> key -> fuzzy_order) -> key -> t -> t
 
 end
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

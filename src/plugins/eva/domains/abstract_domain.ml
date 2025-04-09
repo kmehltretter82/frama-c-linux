@@ -539,11 +539,3 @@ module type Leaf = sig
       See {!Main_locations} for the abstract location available in Eva. *)
   val location_dependencies: location Abstract_location.dependencies
 end
-
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../../.."
-End:
-*)

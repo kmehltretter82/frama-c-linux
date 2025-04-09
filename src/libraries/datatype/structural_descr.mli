@@ -170,9 +170,3 @@ val cleanup: t -> t
 val are_consistent: t -> t -> bool
 (** Not symmetrical: check that the second argument is a correct refinement of
     the first one. *)
-
-(*
-  Local Variables:
-  compile-command: "make -C ../../.."
-  End:
-*)

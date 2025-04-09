@@ -240,9 +240,3 @@ module PLoc = struct
 end
 
 let ploc = Abstract_location.Leaf (module PLoc)
-
-(*
-Local Variables:
-compile-command: "make -C ../../../.."
-End:
-*)

@@ -340,10 +340,3 @@ let print_fct_stmts fmt kf =
     print_fct_from_pdg fmt pdg;
     Format.pp_print_flush fmt ()
   with Not_found -> ()
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

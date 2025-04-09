@@ -115,9 +115,3 @@ module Make(D: DATA) : sig
       @since Beryllium-20090901 *)
 
 end
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

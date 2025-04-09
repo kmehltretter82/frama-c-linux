@@ -232,9 +232,3 @@ let skip_specifications kf =
   Parameters.SkipLibcSpecs.get () &&
   Kernel_function.is_definition kf &&
   Cil.is_in_libc (Kernel_function.get_vi kf).vattr
-
-(*
-Local Variables:
-compile-command: "make -C ../../../.."
-End:
-*)

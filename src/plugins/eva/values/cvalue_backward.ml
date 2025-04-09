@@ -424,10 +424,3 @@ let backward_cast ~src_typ ~dst_typ ~src_val ~dst_val =
     V.cast_int_to_float_inverse ~single_precision dst_val
 
   | _ -> None
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../../.."
-End:
-*)

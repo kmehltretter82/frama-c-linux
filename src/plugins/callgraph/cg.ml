@@ -280,9 +280,3 @@ let dump () =
   let module GV = Graph.Graphviz.Dot(Graphviz_attributes) in
   let g = Subgraph.get () in
   Options.dump GV.output_graph g
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

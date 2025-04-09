@@ -401,10 +401,3 @@ struct
       Array_Bit.set array_result has r;
       r
 end
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

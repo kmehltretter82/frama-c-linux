@@ -387,10 +387,3 @@ module Make
       Right.post_analysis (`Value right)
 
 end
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../../.."
-End:
-*)

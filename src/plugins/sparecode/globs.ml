@@ -174,9 +174,3 @@ let rm_unused_decl =
        let ctx = Parameter_state.get_selection_context () in
        Project.copy ~selection:ctx new_prj;
        new_prj)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

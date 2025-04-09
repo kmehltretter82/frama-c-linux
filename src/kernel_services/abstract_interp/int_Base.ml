@@ -78,9 +78,3 @@ let project = function
 let cardinal_zero_or_one = function
   | Top -> false
   | Value _ -> true
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

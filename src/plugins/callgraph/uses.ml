@@ -106,9 +106,3 @@ let nb_calls () =
   (* [g] contains bidirectional edges (from caller to callee and
      conversely). Conseqently each function call is counted twice. *)
   Cg.G.nb_edges g / 2
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

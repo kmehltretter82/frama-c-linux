@@ -38,9 +38,3 @@ val of_exp : ?default:string -> Cil_types.exp -> string
 (** Generate a reasonable variable name element from the given expression.
     Note that in order to obtain a fresh name the result still needs to be
     piped through [get]. *)
-
-(*
-Local Variables:
-compile-command: "make -C ../.."
-End:
-*)

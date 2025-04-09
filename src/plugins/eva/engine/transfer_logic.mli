@@ -81,10 +81,3 @@ module Make
     (States: Powerset.S with type state = Domain.t)
   : S with type state = Domain.t
        and type states = States.t
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../../.."
-End:
-*)

@@ -555,9 +555,3 @@ let getWidenHints (kf:kernel_function) (stmt:stmt) =
     | Definition (fdec, _) -> per_function_hints fdec
   in
   Widen_type.hints_from_keys stmt hints
-
-(*
-Local Variables:
-compile-command: "make -C ../../../.."
-End:
-*)

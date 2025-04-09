@@ -27,9 +27,3 @@ module ExpandLogicContext: Parameter_sig.Bool
 module Project_name: Parameter_sig.String
 
 include Log.Messages
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

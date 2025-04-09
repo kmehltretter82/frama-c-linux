@@ -51,10 +51,3 @@ sig
   val print_automata : typed_automaton printer
   val output_dot_automata : typed_automaton -> string -> unit
 end
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

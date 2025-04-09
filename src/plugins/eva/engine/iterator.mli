@@ -57,9 +57,3 @@ module Computer
       (Partition.key * Engine.Dom.t) list * Eval.cacheable
 
   end
-
-(*
-Local Variables:
-compile-command: "make -C ../../../.."
-End:
-*)

@@ -136,9 +136,3 @@ class visitor :
 val must_translate_ppt_ref: (Property.t -> bool) ref
 
 val must_translate_ppt_opt_ref: (Property.t option -> bool) ref
-
-(*
-Local Variables:
-compile-command: "make -C ../../../../.."
-End:
-*)

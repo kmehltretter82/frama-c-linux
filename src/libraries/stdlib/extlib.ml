@@ -421,9 +421,3 @@ let compare_ignore_case s1 s2 =
   String.compare
     (String.lowercase_ascii s1)
     (String.lowercase_ascii s2)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

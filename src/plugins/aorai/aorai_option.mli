@@ -54,9 +54,3 @@ val advance_abstract_interpretation: unit -> bool
 val emitter: Emitter.t
 (** The emitter which emits Aorai annotations.
     @since Oxygen-20120901 *)
-
-(*
-  Local Variables:
-  compile-command: "make -C ../../.."
-  End:
-*)

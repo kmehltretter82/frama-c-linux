@@ -205,9 +205,3 @@ val module_name_ref: string ref
 val use_category_ref: bool ref
 
 (**/**)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

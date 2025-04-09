@@ -342,9 +342,3 @@ class menu_manager ?packing (_:Gtk_helper.host) =
       Boot.Main.extend reset
 
   end
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

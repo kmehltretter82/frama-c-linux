@@ -54,10 +54,3 @@ module Make
       kernel_function -> Domain.t -> Value.t or_bottom list ->
       ((Partition.key * Domain.t) list * int) option
   end
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../../.."
-End:
-*)

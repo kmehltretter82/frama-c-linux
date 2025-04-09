@@ -89,9 +89,3 @@ let pretty_value fmt p = match p.accessor with
   | String(a, _) -> Format.fprintf fmt "%s" (a.get ())
 
 let get_value p = Format.asprintf "%a" pretty_value p
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

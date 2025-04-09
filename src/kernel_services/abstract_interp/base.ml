@@ -574,9 +574,3 @@ type substitution = base Hptshape.map
 let substitution_from_list list =
   let add map (key, elt) = BMap.add key elt map in
   List.fold_left add BMap.empty list
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

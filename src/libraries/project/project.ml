@@ -720,9 +720,3 @@ end
 
 (* Exporting Datatype for an easy external use *)
 module Datatype = D
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

@@ -594,9 +594,3 @@ let find_offset typ ~offset om =
   try
     find_offset typ ~offset om
   with Cil.SizeOfError _ | Cil.Not_representable -> raise NoMatchingOffset
-
-(*
-  Local Variables:
-  compile-command: "make -C ../../.."
-  End:
- *)

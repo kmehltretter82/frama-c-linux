@@ -394,9 +394,3 @@ val punrollLogicType: (logic_type -> logic_type) ref
 val clear_caches: unit -> unit
 
 (**/**)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

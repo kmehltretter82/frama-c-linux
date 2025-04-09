@@ -238,9 +238,3 @@ val visitFramacModelInfo: frama_c_visitor -> model_info -> model_info
 
 val visitFramacExtended:
   frama_c_visitor -> acsl_extension -> acsl_extension
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

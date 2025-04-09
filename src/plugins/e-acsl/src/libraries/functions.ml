@@ -233,9 +233,3 @@ let instrument kf =
       Options.Instrument.mem gen_kf
     with Not_found ->
       false))
-
-(*
-Local Variables:
-compile-command: "make -C ../../../../.."
-End:
-*)

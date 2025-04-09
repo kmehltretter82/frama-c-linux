@@ -163,9 +163,3 @@ let substitute substitution clob state =
   match state with
   | Cvalue.Model.Top | Cvalue.Model.Bottom -> state
   | Cvalue.Model.Map map -> Cvalue.Model.fold replace_offsm map state
-
-(*
-Local Variables:
-compile-command: "make -C ../../../../.."
-End:
-*)

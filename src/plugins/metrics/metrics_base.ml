@@ -376,9 +376,3 @@ let float_to_string f =
   let len = String.length s in
   let plen = pred len in
   if s.[plen] = '.' then String.sub s 0 plen else Format.sprintf "%.2f" f
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

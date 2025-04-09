@@ -334,10 +334,3 @@ val complement_int_under: size:int -> signed:bool -> t -> t Lattice_bounds.or_bo
 
 val rehash: t -> t (* Low-level operation for demarshalling *)
 (**/**)
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

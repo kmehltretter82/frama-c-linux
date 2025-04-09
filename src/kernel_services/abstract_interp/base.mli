@@ -240,9 +240,3 @@ type substitution = base Hptshape.map
 
 val substitution_from_list: (base * base) list -> substitution
 (** Creates a substitution from an association list. *)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

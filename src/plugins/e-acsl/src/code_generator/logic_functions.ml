@@ -589,9 +589,3 @@ let app_to_exp ~adata ~loc ?tapp kf env ?eargs li targs =
       end
   in
   e, adata, env
-
-(*
-Local Variables:
-compile-command: "make -C ../.."
-End:
-*)

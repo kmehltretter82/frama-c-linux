@@ -318,9 +318,3 @@ let eval_tlval_as_location ?result state term =
   let env = Eval_terms.env_post_f ~pre:state ~post:state ~result () in
   try Eval_terms.eval_tlval_as_location ~alarm_mode:Ignore env term
   with Eval_terms.LogicEvalError _ -> raise Logic_to_c.No_conversion
-
-(*
-Local Variables:
-compile-command: "make -C ../../../.."
-End:
-*)

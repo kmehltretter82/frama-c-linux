@@ -414,8 +414,3 @@ type ext_function =
 type ext_module = string option * ext_decl list * ((string * location) option * ext_function list) list
 
 type ext_spec = ext_module list
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

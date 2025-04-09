@@ -21,9 +21,3 @@
 (**************************************************************************)
 
 (** Nothing exported. Automatic registration. *)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

@@ -91,10 +91,3 @@ module Make(H: Hashtbl.HashedType) : S with type key = H.t  = struct
       v
 
 end
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

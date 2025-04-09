@@ -319,9 +319,3 @@ let init =
 
           ]
     end
-
-(*
-Local Variables:
-compile-command: "make -j -C ../../.."
-End:
-*)

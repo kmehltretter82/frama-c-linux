@@ -29,9 +29,3 @@
     Name of the transformation is "lightweight spec"
 *)
 val lightweight_transform: File.code_transformation_category
-
-(*
-  Local Variables:
-  compile-command: "make -C ../../.."
-  End:
- *)

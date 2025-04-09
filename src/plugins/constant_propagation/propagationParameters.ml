@@ -70,9 +70,3 @@ module Project_name =
       let arg_name = ""
       let help = "name of the generated project (default is `propagated`)"
     end)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

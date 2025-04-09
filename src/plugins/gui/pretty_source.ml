@@ -401,9 +401,3 @@ let display_source globals
        Locs.add_finalizer state
          (fun () -> GtkSignal.disconnect event_tag#as_tag id);
     )
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

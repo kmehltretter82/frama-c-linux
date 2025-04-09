@@ -1020,9 +1020,3 @@ let visitFramacModelInfo vis m =
 let visitFramacExtended vis e =
   let e'= visitCilExtended (vis:>cilVisitor) e in
   vis#fill_global_tables; e'
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

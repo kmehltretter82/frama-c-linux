@@ -348,10 +348,3 @@ let initialize_var_using_type varinfo state =
     0
     (Base.of_varinfo varinfo)
     varinfo.vname varinfo.vname varinfo.vtype NoOffset varinfo.vtype state
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../../../.."
-End:
-*)

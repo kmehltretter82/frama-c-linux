@@ -297,11 +297,3 @@ let () = Cil_datatype.Predicate.pretty_ref := pp_predicate
 let () = Cil_datatype.Toplevel_predicate.pretty_ref := pp_toplevel_predicate
 let () = Cil_datatype.Identified_predicate.pretty_ref := pp_identified_predicate
 let () = Cil_datatype.Fundec.pretty_ref := pp_fundec
-
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

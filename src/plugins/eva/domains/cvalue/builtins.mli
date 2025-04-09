@@ -110,10 +110,3 @@ val find_builtin_override:
 (* Applies a cvalue builtin for the given call, in the given cvalue state. *)
 val apply_builtin:
   builtin -> call -> pre:Cvalue.Model.t -> post:Cvalue.Model.t -> result list
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../../../.."
-End:
-*)

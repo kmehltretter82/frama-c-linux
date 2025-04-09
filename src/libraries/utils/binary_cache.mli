@@ -72,10 +72,3 @@ sig
   val clear : unit -> unit
   val merge : (H0.t -> H1.t -> H2.t -> R.t) -> H0.t -> H1.t -> H2.t -> R.t
 end
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

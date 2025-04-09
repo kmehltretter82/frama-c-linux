@@ -26,9 +26,3 @@
 val pretty_strategies: unit -> unit
 
 val kf_strategy: Kernel_function.t -> Split_strategy.t
-
-(*
-Local Variables:
-compile-command: "make -C ../../../.."
-End:
-*)

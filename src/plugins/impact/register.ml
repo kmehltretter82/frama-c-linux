@@ -154,9 +154,3 @@ let main () =
     Options.feedback "analysis done"
   end
 let () = Boot.Main.extend main
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

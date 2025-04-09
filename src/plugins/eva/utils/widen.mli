@@ -32,9 +32,3 @@ val getWidenHints: kernel_function -> stmt ->
 (** Parses all widening hints defined via the widen_hint syntax extension.
     The result is memoized for subsequent calls. *)
 val precompute_widen_hints: unit -> unit
-
-(*
-Local Variables:
-compile-command: "make -C ../../../.."
-End:
-*)

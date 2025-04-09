@@ -642,9 +642,3 @@ let transfer_switch_from_guard transfer_guard stmt state =
   let final_state = List.fold_left do_one_case state cases in
   (default,final_state)::!result
 ;;
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

@@ -163,9 +163,3 @@ module type Config = sig
   val mark_to_prop_to_called_output : M.t call_m2m
 
 end
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

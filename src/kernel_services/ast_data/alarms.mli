@@ -135,9 +135,3 @@ val get_short_name: t -> string
 
 val get_description: t -> string
 (** Long description of the alarm, explaining the UB it guards against. *)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

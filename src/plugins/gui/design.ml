@@ -1941,9 +1941,3 @@ let toplevel play =
   GMain.Main.main ()
 
 let () = Boot.set_toplevel toplevel
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

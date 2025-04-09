@@ -50,9 +50,3 @@ void ko (int z) {
     //@ assert OK: \at(z,LoopCurrent) == \at(z,Pre);
   }
 }
-
-/*
-Local Variables:
-compile-command: "PPCHOME=../.. LC_ALL=C make at"
-End:
-*/

@@ -225,9 +225,3 @@ val find_stmts: Cil_types.fundec -> (Cil_types.stmt list * Cil_types.stmt list)
     in a function, and sink_stmts is a list of the return statements (including
     statements that fall through the end of a void function).  Useful when you
     need an initial set of statements for BackwardsDataFlow.compute. *)
-
-(*
-  Local Variables:
-  compile-command: "make -C ../../.."
-  End:
- *)

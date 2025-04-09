@@ -1540,9 +1540,3 @@ module Consolidation_graph = struct
         (Printexc.to_string exn)
 
 end
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

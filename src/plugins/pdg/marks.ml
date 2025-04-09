@@ -203,9 +203,3 @@ module F_Proj (C : PdgMarks.Config) :
         apply_all new_rqs
     in apply_all [(pdg, PdgMarks.SelList node_marks)]
 end
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

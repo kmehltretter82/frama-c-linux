@@ -502,9 +502,3 @@ let oneret ?(callback: callback option) (f: fundec) : unit =
   f.sbody <- scanBlock true f.sbody ;
   if !haveGoto && !retStmt != dummyStmt then encapsulate_local_vars f;
   Option.iter do_callback callback
-
-(*
-  Local Variables:
-  compile-command: "make -C ../../.."
-  End:
- *)

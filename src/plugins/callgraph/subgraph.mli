@@ -42,9 +42,3 @@ sig
   val get: unit -> G.t
   val self: State.t
 end
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

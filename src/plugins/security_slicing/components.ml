@@ -881,8 +881,3 @@ let slice =
     (Datatype.func Datatype.bool Project.ty)
     slice
 *)
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

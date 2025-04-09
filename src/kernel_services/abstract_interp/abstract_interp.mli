@@ -108,9 +108,3 @@ module Make_Hashconsed_Lattice_Set
     result. It is passed here to avoid having multiple modules calling
     [Hptset.Make] on the same argument (which is forbidden by the datatype
     library, and would cause hashconsing problems) *)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

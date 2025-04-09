@@ -39,9 +39,3 @@ val get_if_controlled_stmts : t -> Cil_types.stmt -> Cil_datatype.Stmt.Hptset.t
 *)
 val get_jump_controlled_stmts : t -> Cil_types.stmt -> Cil_datatype.Stmt.Hptset.t
 val get_loop_controlled_stmts : t -> Cil_types.stmt -> Cil_datatype.Stmt.Hptset.t
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

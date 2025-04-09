@@ -825,9 +825,3 @@ let get_internal_precise = get_internal_aux
 let () =
   ref_get_internal := get_internal;
   ref_get_external := get_external
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

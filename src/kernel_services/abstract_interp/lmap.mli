@@ -79,9 +79,3 @@ module Make_LOffset
   with type v = V.t
    and type widen_hint_base = V.widen_hint
    and type offsetmap = Offsetmap.t
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

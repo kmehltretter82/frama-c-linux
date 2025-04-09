@@ -99,9 +99,3 @@ module type S = sig
       is alwas correct. *)
 
 end
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

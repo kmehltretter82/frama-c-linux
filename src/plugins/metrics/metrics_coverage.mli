@@ -75,10 +75,3 @@ class semantic_printer : libc:bool -> coverage_metrics -> object
 
     method pp_stmts_reached_by_function: Format.formatter -> unit
   end
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

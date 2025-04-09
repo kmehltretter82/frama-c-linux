@@ -299,9 +299,3 @@ external compare_basic: 'a -> 'a -> int = "%compare"
 (** Case-insensitive string comparison. Only ISO-8859-1 accents are handled.
     @since Silicon-20161101 *)
 val compare_ignore_case: string -> string -> int
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

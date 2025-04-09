@@ -332,9 +332,3 @@ and initwhat =
 (* Each attribute has a name and some
  * optional arguments *)
 and attribute = string * expression list
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

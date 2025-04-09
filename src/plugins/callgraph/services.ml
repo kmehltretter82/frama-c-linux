@@ -116,9 +116,3 @@ let dump () =
   let sg = Subgraph.get () in
   Service_graph.frama_c_display false;
   Options.dump S.output_graph sg
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

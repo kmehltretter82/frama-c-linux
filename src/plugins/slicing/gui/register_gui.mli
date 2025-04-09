@@ -22,9 +22,3 @@
 
 (** Extension of the GUI in order to support slicing visualization.
     No function is exported. *)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

@@ -69,9 +69,3 @@ val term_to_exp_ref:
    Env.t ->
    term ->
    exp * Assert.t * Env.t) ref
-
-(*
-Local Variables:
-compile-command: "make -C ../.."
-End:
-*)

@@ -1033,9 +1033,3 @@ let compute_pdg kf =
     (* [JS 2012/08/24] nobody should catch this exception *)
     Pdg_parameters.warning ?source "not implemented by %s yet: %s" who what;
     degenerated true kf
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

@@ -48,9 +48,3 @@ val mk_init_function: unit -> varinfo * fundec
 val mk_clean_function: unit -> (varinfo * fundec) option
 (** Generate a new C function containing the observers for global variable
     de-allocations if there are global variables. *)
-
-(*
-Local Variables:
-compile-command: "make -C ../../../../.."
-End:
-*)

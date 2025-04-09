@@ -232,9 +232,3 @@ let extract_uncoerced_lval e =
     | _ -> None
   in
   aux e
-
-(*
-Local Variables:
-compile-command: "make -C ../../../../.."
-End:
-*)

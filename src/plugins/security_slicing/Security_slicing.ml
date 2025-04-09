@@ -28,9 +28,3 @@
 
 module Components = Components
 module Security_slicing_parameters = Security_slicing_parameters
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

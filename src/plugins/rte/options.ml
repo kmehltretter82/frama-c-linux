@@ -127,9 +127,3 @@ module FunctionSelection =
 
 let dkey_annot = register_category "annot"
 let () = add_debug_keys dkey_annot
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

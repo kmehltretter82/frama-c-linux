@@ -3345,9 +3345,3 @@ let merge (files: file list) (newname: string) : file =
   if Errorloc.had_errors () then
     Kernel.abort "error encountered during linking@." ;
   res
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

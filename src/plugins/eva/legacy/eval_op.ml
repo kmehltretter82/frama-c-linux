@@ -269,9 +269,3 @@ let find_lmap_under state location =
 let find_under_approximation state location =
   try Some (find_lmap_under state location)
   with CannotComputeUnder -> None
-
-(*
-Local Variables:
-compile-command: "make -C ../../../.."
-End:
-*)

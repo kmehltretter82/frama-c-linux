@@ -614,9 +614,3 @@ val register_funspec:
   ?emitter:Emitter.t -> ?force:bool -> kernel_function -> unit
 val remove_alarm_ref:
   (Emitter.Usable_emitter.t -> stmt -> code_annotation -> unit) ref
-
-(*
-  Local Variables:
-  compile-command: "make -C ../../.."
-  End:
-*)

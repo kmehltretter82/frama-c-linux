@@ -91,9 +91,3 @@ val get_all_block_out_edges : block -> (stmt * stmt) list
       first statement.
       @raise Invalid_argument if the statement is not a loop. *)
 val loop_preds : stmt -> stmt list * stmt list
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

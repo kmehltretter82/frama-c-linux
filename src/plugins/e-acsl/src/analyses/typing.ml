@@ -987,9 +987,3 @@ let preprocess_term ~use_gmp_opt ?ctx ~logic_env t =
   ignore (Interval.preprocess_term ~logic_env t);
   let profile = Logic_env.get_profile logic_env in
   ignore (type_term ~use_gmp_opt ?ctx ~profile t);
-
-(*
-Local Variables:
-compile-command: "make -C ../../../../.."
-End:
-*)

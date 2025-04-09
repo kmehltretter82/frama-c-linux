@@ -54,9 +54,3 @@ val var_hints : Cil_types.stmt -> Base.Set.t -> t
 val hints_from_keys :
   Cil_types.stmt -> t ->
   Base.Set.t * (Base.t -> Locations.Location_Bytes.widen_hint)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

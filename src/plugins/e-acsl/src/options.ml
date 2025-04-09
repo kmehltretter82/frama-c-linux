@@ -317,9 +317,3 @@ let setup ?(rtl=false) () =
     Kernel.CppExtraArgs.add
       (Format.asprintf " -DE_ACSL_MACHDEP=%s" (Kernel.Machdep.get ()));
   end
-
-(*
-Local Variables:
-compile-command: "make -C ../../../.."
-End:
-*)

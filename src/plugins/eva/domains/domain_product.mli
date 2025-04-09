@@ -39,10 +39,3 @@ module Make
      and type value = Value.t
      and type location = Location.location
      and type state = Left.state * Right.state
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../../.."
-End:
-*)

@@ -91,9 +91,3 @@ let clone_defined_kernel_function old_kf =
   f.globals <- loop [] f.globals;
   Ast.mark_as_grown();
   new_kf
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

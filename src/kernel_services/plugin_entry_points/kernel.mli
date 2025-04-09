@@ -708,10 +708,3 @@ module Copy: Parameter_sig.Bool
 
 module TypeCheck: Parameter_sig.Bool
 (** Behavior of option "-typecheck" *)
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

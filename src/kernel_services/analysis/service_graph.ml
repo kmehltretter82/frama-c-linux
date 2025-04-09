@@ -350,9 +350,3 @@ struct
   include Graph.Graphviz.Dot(TP)
 
 end (* functor Service *)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

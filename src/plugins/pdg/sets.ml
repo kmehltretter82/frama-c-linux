@@ -394,9 +394,3 @@ let find_in_nodes_to_select_for_this_call
       acc
   in
   PdgIndex.Signature.fold_all_inputs test_in [] sgn
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

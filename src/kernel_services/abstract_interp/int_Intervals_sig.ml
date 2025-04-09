@@ -75,9 +75,3 @@ module type S = sig
   val pretty_debug: t Pretty_utils.formatter
 
 end
-
-(*
-Local Variables:
-compile-command: "make -C ../../.. byte"
-End:
-*)

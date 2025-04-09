@@ -25,9 +25,3 @@
 
 (** Add a tab to the main GUI (for red alarms), and return its widget. *)
 val make_panel: Design.main_window_extension_points -> GObj.widget
-
-(*
-Local Variables:
-compile-command: "make -C ../../../.."
-End:
-*)

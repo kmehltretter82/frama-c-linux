@@ -23,9 +23,3 @@
 (** Extension of the GUI for the security plugin. *)
 
 (** No function is directly exported: this module simply extends the GUI. *)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

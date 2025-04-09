@@ -466,9 +466,3 @@ Simplifications to be done :
 
 
 *)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

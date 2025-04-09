@@ -440,9 +440,3 @@ let loop_preds s = match s.skind with
     invalid_arg "[loop_preds] not a loop"
 
 (* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ *)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

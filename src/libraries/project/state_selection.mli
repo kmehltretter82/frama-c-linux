@@ -170,9 +170,3 @@ val fold_in_order: (State.t -> 'a -> 'a) -> t -> 'a -> 'a
 (** Fold over a selection in a topological ordering compliant with the
     State Dependency Graph. Less efficient that {!iter}.
     @since Carbon-20101201 *)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

@@ -1431,9 +1431,3 @@ module Make
     (Info: Info with type key := Key.t
                  and type v := V.t)
   = Make_with_compositional_bool (Key) (V) (Comp_unused) (Info)
-
-(*
-Local Variables:
-compile-command: "make -C .."
-End:
-*)

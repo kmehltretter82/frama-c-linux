@@ -317,9 +317,3 @@ val register_stmt: t -> stmt -> block list -> unit
     blocks that contain the statement (innermost first). *)
 
 val self: State.t
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

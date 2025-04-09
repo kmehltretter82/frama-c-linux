@@ -539,9 +539,3 @@ let link rtl_prj =
   insert_rtl_globals rtl_prj rtl_globals ast;
   Assocs.clear ();
   Ast.mark_as_grown ()
-
-(*
-Local Variables:
-compile-command: "make -C ../../../../.."
-End:
-*)

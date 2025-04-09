@@ -550,10 +550,3 @@ val complete_types: file -> unit
 val unroll_logic_type : ?unroll_typedef:bool -> logic_type -> logic_type
 [@@deprecated "Use Ast_types.unroll_logic instead."]
 [@@migrate { repl = Ast_types.unroll_logic } ]
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

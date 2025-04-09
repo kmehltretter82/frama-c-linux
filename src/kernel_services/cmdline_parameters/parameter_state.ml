@@ -258,9 +258,3 @@ struct
     Cmdline.print_option_help fmt ~plugin:P.shortname ~group option_name
 
 end
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

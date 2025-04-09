@@ -822,9 +822,3 @@ let () =
          remove ~filter ~kinstr (Emitter.Usable_emitter.get e)
        with Not_found ->
          ())
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

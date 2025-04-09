@@ -198,9 +198,3 @@ let create
   in
   add self;
   self
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

@@ -136,9 +136,3 @@ module F (Info : RemoveInfo) : sig
   val build_cil_file : ?last:bool -> string ->  Info.proj -> Project.t
 
 end
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

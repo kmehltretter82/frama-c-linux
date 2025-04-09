@@ -305,9 +305,3 @@ let show ?height ?width ~(host:basic_main) () =
     List.sort (fun (n1, _) (n2, _) -> compare_plugin_name n1 n2)!plugins;
   listview_plugins ~packing:hbox#pack !plugins;
   dialog#show ()
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

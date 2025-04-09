@@ -80,9 +80,3 @@ let init () =
 (* Initialization of the database must be done before anything else, but parsing
    the command line *)
 let () = Cmdline.run_after_configuring_stage init
-
-(*
-Local Variables:
-compile-command: "make -C ../../../../.."
-End:
-*)

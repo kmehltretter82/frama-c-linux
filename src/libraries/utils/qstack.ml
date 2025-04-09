@@ -134,9 +134,3 @@ module Make(D: DATA) = struct
     with Exit -> !i
 
 end
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

@@ -161,10 +161,3 @@ module BoolInfo = struct
 end
 
 module Info = Filter.F (BoolInfo)
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

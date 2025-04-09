@@ -62,9 +62,3 @@ val replace_call_precondition: Property.t -> stmt -> Property.t -> unit
     is the property corresponding to the status of [pre] at call [stmt].
     The previous property, if any, is removed. Beware that this may also
     remove some already proved statuses *)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

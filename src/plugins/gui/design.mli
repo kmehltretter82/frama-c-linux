@@ -276,9 +276,3 @@ sig
         character. [call_site] is the statement marked, if it is a call. *)
 
 end
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

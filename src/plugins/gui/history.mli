@@ -76,9 +76,3 @@ val translate_history_elt: history_elt -> history_elt option
 (**/**)
 val set_display_elt_callback: (history_elt -> unit) -> unit
 val create_buttons: Menu_manager.menu_manager -> Menu_manager.item array
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

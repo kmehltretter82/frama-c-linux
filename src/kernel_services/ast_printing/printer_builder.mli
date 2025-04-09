@@ -33,9 +33,3 @@ module Make_pp
 module Make
     (_: sig class printer: unit -> Printer_api.extensible_printer_type end):
   Printer_api.S
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

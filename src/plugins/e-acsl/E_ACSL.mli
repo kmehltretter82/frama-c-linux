@@ -63,9 +63,3 @@ module Functions: sig
 end
 
 (** No function is directly exported: they are dynamically registered. *)
-
-(*
-Local Variables:
-compile-command: "make"
-End:
-*)

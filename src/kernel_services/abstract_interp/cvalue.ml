@@ -1102,9 +1102,3 @@ module Model = struct
       iter f m;
       !count
 end
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

@@ -34,9 +34,3 @@ end
 
 val show: ?height:int -> ?width:int -> host:basic_main -> unit -> unit
 (** Display the Frama-C launcher. *)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

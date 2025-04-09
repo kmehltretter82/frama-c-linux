@@ -169,9 +169,3 @@ struct
     let apply_queue (_,q) v = Queue.fold (fun v f -> f v) v q in
     Apply.fold apply_queue hooks v
 end
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

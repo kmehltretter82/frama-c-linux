@@ -30,9 +30,3 @@ module Annot : Parameter_sig.Bool
 
 module GlobDecl : Parameter_sig.Bool
 (** remove unused global types and variables *)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

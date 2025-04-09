@@ -294,9 +294,3 @@ let obfuscate () =
     (new visitor :> Visitor.frama_c_visitor)
     (Ast.get ());
   Printer.update_printer (module UpdatePrinter: Printer.PrinterExtension)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

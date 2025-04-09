@@ -41,10 +41,3 @@ module Make
   : Abstract.Value.Internal
     with type t = Left.t * Right.t
      and type context = Context.t
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../../.."
-End:
-*)

@@ -35,9 +35,3 @@ val append: t -> Log.event -> unit
 
 val clear: t -> unit
 (** Clear all the stored warnings. *)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

@@ -646,9 +646,3 @@ let rm_asserts =
     "rm_asserts"
     Datatype.(func unit unit)
     rm_asserts
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

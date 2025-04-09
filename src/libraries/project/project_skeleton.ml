@@ -58,9 +58,3 @@ module Make_setter(X: sig val mem: string -> bool end) = struct
     p.name <- s
 
 end
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

@@ -425,9 +425,3 @@ let emit kinstr = function
     Self.abort ~current:true ~once:true
       "All alarms may arise: \
        abstract state too imprecise to continue the analysis."
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

@@ -105,9 +105,3 @@ module Make_ordered(P:sig module Id:Comparable end):
 (** @since Neon-20140301 *)
 module Fold_ordered(P: sig module Id:Comparable type t end):
   S_ordered with type key = P.Id.t and type param = P.t and type result = P.t
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

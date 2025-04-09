@@ -32,9 +32,3 @@ val get_non_naturals: kernel_function -> Cil_datatype.Stmt.Set.t
 
 val back_edges : kernel_function -> stmt -> stmt list
 (** Statements that are the origin of a back-edge to a natural loop. *)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

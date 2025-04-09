@@ -32,9 +32,3 @@ void f() {
 
  L1: x = 0;
 }
-
-/*
-Local Variables:
-compile-command: "../../bin/toplevel.opt  -pp-annot -print  logic_labels_wrong.c"
-End:
-*/

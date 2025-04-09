@@ -34,10 +34,3 @@ module Make
   : Abstract.Location.Internal with type location = Loc.location
                                 and type offset = Loc.offset
                                 and type value = Convert.extended
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../../.."
-End:
-*)

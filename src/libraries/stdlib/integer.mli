@@ -219,9 +219,3 @@ val pp_hex : ?nbits:int -> ?sep:string -> t formatter
 
     Positive values are preffixed with ["0x"] and negative values
     are printed as their 2-complement ([lnot]) with prefix ["1x"]. *)
-(*
-
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

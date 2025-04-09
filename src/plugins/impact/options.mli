@@ -41,9 +41,3 @@ module Upward: Parameter_sig.Bool
 (** Also compute impact within callers *)
 
 val is_on: unit -> bool
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

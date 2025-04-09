@@ -68,9 +68,3 @@ end
 (**/**)
 
 val collections: State.Set.t ref
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

@@ -23,9 +23,3 @@
 (** AST's pretty-printer. *)
 
 include Printer_api.S
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

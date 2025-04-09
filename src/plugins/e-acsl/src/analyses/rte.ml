@@ -32,9 +32,3 @@ let exp ?warn:_ kf stmt e =
 
 let get_state_selection_with_dependencies () =
   State_selection.with_dependencies RteGen.Api.self
-
-(*
-Local Variables:
-compile-command: "make -C ../../../../.."
-End:
-*)

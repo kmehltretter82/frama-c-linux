@@ -941,10 +941,3 @@ module Make
       reduce_by_cond_enumerate env valuation expr positive split_on
     else `Value valuation
 end
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../../.."
-End:
-*)

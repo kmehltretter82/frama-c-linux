@@ -263,9 +263,3 @@ let mk_asm_templates =
       else inner res template @@ i + 1
     else res in
   outer []
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

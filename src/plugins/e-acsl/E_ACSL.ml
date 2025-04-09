@@ -32,9 +32,3 @@ module Functions = Functions
 module Interlang = Interlang
 module Interlang_trans = Interlang_trans
 module Interlang_build = Interlang_build
-
-(*
-Local Variables:
-compile-command: "make"
-End:
-*)
