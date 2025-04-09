@@ -98,7 +98,7 @@ val full_command :
 (** Same arguments as {!Unix.create_process} but returns only when
     execution is complete.
     @raise Sys_error when a system error occurs *)
-[@@deprecated]
+[@@deprecated "This unused function was removed from Frama-C."]
 
 type process_result =
   | Not_ready of (unit -> unit)
@@ -118,7 +118,7 @@ val full_command_async :
     You must call this function until it returns a Result
     to prevent Zombie processes.
     @raise Sys_error when a system error occurs *)
-[@@deprecated]
+[@@deprecated "This unused function was removed from Frama-C."]
 
 val async :
   ?stdout:Buffer.t ->
@@ -140,7 +140,7 @@ val command_async :
   string -> string list
   -> (unit -> process_result)
 [@@deprecated "Use Command.async instead."]
-[@@migrate { repl = Command.async } ]
+[@@migrate { repl = Rel.async } ]
 
 val spawn :
   ?timeout:int ->
@@ -163,4 +163,4 @@ val command :
   string -> string list
   -> Unix.process_status
 [@@deprecated "Use Command.spawn instead."]
-[@@migrate { repl = Command.spawn } ]
+[@@migrate { repl = Rel.spawn } ]

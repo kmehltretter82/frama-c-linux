@@ -364,7 +364,7 @@ let basename p = Filename.basename p
 let dirname p = Filename.dirname p
 
 (* -------------------------------------------------------------------------- *)
-(* --- Low leevel Input/Output                                            --- *)
+(* --- Low level Input/Output                                            --- *)
 (* -------------------------------------------------------------------------- *)
 
 type action_if_missing = Create of int | DoNotCreate

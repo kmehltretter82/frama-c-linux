@@ -375,7 +375,7 @@ val with_open_out_exn:
     whenever an exception is thrown by [f].
 
     @return [Ok (f fmt)] if no exceptions are thrown, or [Error s]
-    if a [Sys_error s] is thrown during the execution of [f] or during the
+    if a [Sys_error s] is thrown during the execution of [f] or when
     closing the file.
     @since Frama-C+dev
 *)
