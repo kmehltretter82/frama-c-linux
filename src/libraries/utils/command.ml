@@ -24,7 +24,7 @@
 (* --- Deprecated file Utilities                                          --- *)
 (* -------------------------------------------------------------------------- *)
 
-let bincopy = Filepath.bincopy
+let bincopy = Filepath.bincopy [@alert "-deprecated"]
 let copy = Filepath.copy
 let read_file p = Filepath.with_open_in_exn p
 let read_lines = Filepath.iter_lines

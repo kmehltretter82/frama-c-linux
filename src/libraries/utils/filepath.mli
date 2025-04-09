@@ -271,9 +271,10 @@ val bincopy : bytes -> in_channel -> out_channel -> unit
     [buffer] is a temporary string used during the copy.
     Recommended size is [2048].
 *)
+[@@deprecated "This function is only used locally and is not exported anymore."]
 
 val copy : Normalized.t -> Normalized.t -> unit
-(** [copy source target] copies source file to target file using [bincopy]. *)
+(** [copy source target] copies source file to target file. *)
 
 val iter_lines : Normalized.t -> (string -> unit) -> unit
 (** Iter over all text lines in the file *)
