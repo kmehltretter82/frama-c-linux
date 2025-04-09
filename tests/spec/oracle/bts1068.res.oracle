@@ -96,7 +96,7 @@ axiomatic A {
   
   logic ℤ fi{L}(T *t) = \at(t->a + t->a,L);
   
-  }
+}
  */
 /*@ type List<A> = Nil | Cons(A, List<A> );
  */

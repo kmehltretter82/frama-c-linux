@@ -10,6 +10,6 @@ axiomatic Foo {
   
   axiom foo_test: ∀ foo x; test(x);
   
-  }
+}
  */
 

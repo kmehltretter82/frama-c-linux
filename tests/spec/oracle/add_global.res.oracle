@@ -3,7 +3,7 @@
 /*@ axiomatic MyAxiomatic {
       axiom myaxiom: \true;
       
-      }
+    }
  */
 int main(void)
 {

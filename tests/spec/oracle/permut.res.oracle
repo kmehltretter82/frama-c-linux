@@ -23,6 +23,6 @@ axiomatic Permut {
          \at(t1[k],L1) ≡ \at(t2[k],L2)) ⇒
       permut{L1, L2}(t1, t2, n);
   
-  }
+}
  */
 

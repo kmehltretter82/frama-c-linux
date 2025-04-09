@@ -19,7 +19,7 @@ axiomatic Array_unsigned {
     ∀ unsigned int tab[10], ℤ idx, unsigned int v;
       check(modified(tab, idx, v), idx, v);
   
-  }
+}
  */
 int A[3];
 

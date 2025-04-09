@@ -19,7 +19,7 @@ axiomatic Q {
   
   axiom q_ax: ∀ int t[]; t[0] ≡ 0 ⇒ q(t);
   
-  }
+}
  */
 void f(void)
 {

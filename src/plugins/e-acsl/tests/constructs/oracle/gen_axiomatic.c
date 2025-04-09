@@ -11,7 +11,7 @@ extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 /*@ axiomatic p {
       predicate p(integer s) ;
       
-      }
+    }
 
 */
 /*@ ensures p(\old(s)); */
@@ -36,7 +36,7 @@ int main(void)
       logic integer g(int c) 
         reads c;
       
-      }
+    }
 
 */
 /*@ ensures g(\old(t)) == 0; */

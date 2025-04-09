@@ -37,7 +37,7 @@ axiomatic Test {
   
   axiom i: name: 77 ≡ 76 + 1;
   
-  }
+}
  */
 /*@ predicate R(ℤ i, ℤ j) = (1 ≢ 0 ? i + j : (j: j)) ≡ i + j;
  */
@@ -82,7 +82,7 @@ void f(int G, int *p)
 /*@ axiomatic St {
       logic struct st fl(struct st s) ;
       
-      }
+    }
 
 */
 /*@ ensures (\let tmp = fl(\old(s)); tmp.a) ≡ \result.a; */
@@ -105,7 +105,7 @@ int x = 0;
 /*@ axiomatic Test2 {
       logic ℤ y;
       
-      }
+    }
  */
 /*@ logic ℤ z= \let f = \lambda ℤ a; a + 1; f(12);
  */

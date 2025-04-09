@@ -3,7 +3,7 @@
 /*@ axiomatic Foo {
       predicate p(char *s) ;
       
-      }
+    }
  */
 /*@ requires p(b); */
 void f(char const * __attribute__((__whatever__)) a,

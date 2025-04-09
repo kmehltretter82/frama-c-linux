@@ -68,7 +68,7 @@ inductive model{L}(List<ℤ>  root, List<ℤ>  logic_list) {
       logic ℤ func{L}(ℤ i) 
         reads behavior;
       
-      }
+    }
 
 */
 int volatile assigns;

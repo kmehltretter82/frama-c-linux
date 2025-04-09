@@ -15,7 +15,7 @@ int i = 42;
 /*@ axiomatic Bar {
       logic ℤ li;
       
-      }
+    }
  */
 /*@ ensures i ≡ li; */
 void test(void)
@@ -33,7 +33,7 @@ axiomatic Foo {
   
   axiom fffp{L}: ∀ foo x, char *y; fp(x, ff(x, y)) ∧ *y ≡ 0;
   
-  }
+}
 
 */
 int main(void)

@@ -8,7 +8,7 @@ axiomatic A {
   
   predicate Q{L, L2}(void (*galois_fp_old)()) ;
   
-  }
+}
  */
 /*@ requires P{Pre}((void (*)())\at(fp,Pre));
     ensures Q{Pre, Post}((void (*)())\at(fp,Pre));
@@ -36,7 +36,7 @@ axiomatic A1 {
   
   predicate Q1{L, L2}(void (*galois_fp_old)(void)) ;
   
-  }
+}
 
 */
 /*@ requires P1{Pre}(\at(fp,Pre));

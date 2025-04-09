@@ -3394,9 +3394,9 @@ class cil_printer () = object (self)
         (pp_vol "writes") wvi_opt ;
     | Daxiomatic(id,decls,_attr, _) ->
       (* attributes are meant to be purely internal for now. *)
-      fprintf fmt "@[<v 2>@[%a %s {@]@\n%a}@]@\n"
+      fprintf fmt "@[@[<v 2>@[%a %s {@]@\n%a@]@\n@]}@\n"
         self#pp_acsl_keyword "axiomatic" id
-        (Pretty_utils.pp_list ~pre:"@[<v 0>" ~suf:"@]@\n" ~sep:"@\n"
+        (Pretty_utils.pp_list ~pre:"@[<v 0>" ~suf:"@]" ~sep:"@\n"
            self#global_annotation)
         decls
     | Dmodule(id, _, _, Some loader, _)
@@ -3408,15 +3408,15 @@ class cil_printer () = object (self)
     | Dmodule(id, decls, _attr, loader, _) ->
       begin
         (* attributes are meant to be purely internal for now. *)
-        fprintf fmt "@[<v 2>@[" ;
+        fprintf fmt "@[@[<v 2>@[" ;
         if Kernel.(is_debug_key_enabled dkey_print_imported_modules) then
           Option.iter (fprintf fmt "// import %a:@\n" self#pp_loader) loader ;
         fprintf fmt "%a %a {@]"
           self#pp_acsl_keyword "module" self#logic_name id ;
         try
           Stack.push (id ^ "::") module_stack ;
-          fprintf fmt "@\n%a}@]@\n"
-            (Pretty_utils.pp_list ~pre:"@[<v 0>" ~suf:"@]@\n" ~sep:"@\n"
+          fprintf fmt "@\n%a@]@\n@]}@\n"
+            (Pretty_utils.pp_list ~pre:"@[<v 0>" ~suf:"@]" ~sep:"@\n"
                self#global_annotation)
             decls ;
           ignore @@ Stack.pop module_stack ;

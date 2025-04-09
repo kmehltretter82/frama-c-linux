@@ -11,7 +11,7 @@ axiomatic length {
   axiom length_cons<D>:
     ∀ D a, list<D>  l; length(Cons(a, l)) ≡ length(l) + 1;
   
-  }
+}
  */
 /*@ type my_list = list<ℤ> ;
  */

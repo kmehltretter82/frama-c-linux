@@ -19,7 +19,7 @@ axiomatic A {
   
   axiom idem{L1, L2}: ∀ ℤ i; P{L1, L2}(i) ⇔ Q{L1, L2}(i);
   
-  }
+}
  */
 /*@ ensures x ≡ (2 + \old(x)) + \old(y);
     ensures \at(E(\at((x - 2) - y,Here)),Pre);
