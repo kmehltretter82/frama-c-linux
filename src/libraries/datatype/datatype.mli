@@ -393,7 +393,7 @@ val rational : Rational.t Type.t
     @since 18.0-Argon *)
 module Filepath: sig
   include S_with_collections with type t = Filepath.t
-  val of_string: ?existence:Filepath.existence -> ?base_name:string -> string -> t
+  val of_string: ?existence:Filepath.existence -> ?base_name:t -> string -> t
   val concat: ?existence:Filepath.existence -> t -> string -> t
   val pp_abs: Format.formatter -> t -> unit
   val dummy: t

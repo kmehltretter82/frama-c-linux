@@ -252,13 +252,12 @@ let parse_build_entry jbdb_dir r =
     if Filename.is_relative dirname then Filename.concat jbdb_dir dirname
     else dirname
   in
-  let dirname = (Filepath.of_string dirname :> string) in
+  let dirname = Filepath.of_string dirname in
   let args = List.map to_string (r |> member "arguments" |> to_list) in
   let flags = filter_useful_flags ~requote:true args in
   List.iter (fun filename ->
       let path = Datatype.Filepath.of_string ~base_name:dirname filename in
-      let dirpath = Datatype.Filepath.of_string dirname in
-      update_flags_verbosely path (dirpath, flags)
+      update_flags_verbosely path (dirname, flags)
     ) filenames
 
 let parse_compilation_entry jcdb_dir r =
@@ -269,7 +268,7 @@ let parse_compilation_entry jcdb_dir r =
     if Filename.is_relative dirname then Filename.concat jcdb_dir dirname
     else dirname
   in
-  let dirname = (Filepath.of_string dirname :> string) in
+  let dirname = Filepath.of_string dirname in
   let path = Datatype.Filepath.of_string ~base_name:dirname filename in
 
   (* get the list of arguments, and a flag indicating if the arguments
@@ -293,8 +292,7 @@ let parse_compilation_entry jcdb_dir r =
       Kernel.abort "compilation database: expected 'arguments' or 'command'"
   in
   let flags = filter_useful_flags ~requote string_option_list in
-  let dirpath = Datatype.Filepath.of_string dirname in
-  update_flags_verbosely path (dirpath, flags)
+  update_flags_verbosely path (dirname, flags)
 
 let compute_flags_from_file () =
   let database = Kernel.JsonCompilationDatabase.get () in

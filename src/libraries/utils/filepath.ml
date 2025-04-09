@@ -145,15 +145,15 @@ type existence =
 exception No_file
 exception File_exists
 
-let of_string ?(existence=Indifferent) ?base_name path_name =
+let of_string ?(existence=Indifferent) ?base path_name =
   let path =
     if path_name = ""
     then ""
     else
       let base =
-        match base_name with
+        match base with
         | None -> cwd
-        | Some b -> insert cwd b
+        | Some (b : t) -> insert cwd b
       in
       let norm_path_name = (insert base path_name).path_name in
       if norm_path_name = ""
@@ -491,12 +491,14 @@ let iter_lines p job =
 (* --- Deprecated Normalized module                                       --- *)
 (* -------------------------------------------------------------------------- *)
 
-let normalize = of_string
+let normalize ?existence ?base_name s = of_string ?existence ?base:base_name s
 
-module Normalized =
-struct
+module Normalized = struct
   type nonrec t = t
-  let of_string = of_string
+
+  let of_string ?existence ?base_name s =
+    let base = (base_name : string option :> t option) in
+    of_string ?existence ?base s
   let extend = extend
   let concat = concat
   let concats = concats

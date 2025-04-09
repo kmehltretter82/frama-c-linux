@@ -53,7 +53,7 @@ exception File_exists
     @before 21.0-Scandium no [existence] argument.
     @before Frama-C+dev this function was [normalize]
 *)
-val of_string: ?existence:existence -> ?base_name:string -> string -> t
+val of_string: ?existence:existence -> ?base:t -> string -> t
 
 val normalize: ?existence:existence -> ?base_name:string -> string -> string
 [@@deprecated "Use Command.of_string instead."]

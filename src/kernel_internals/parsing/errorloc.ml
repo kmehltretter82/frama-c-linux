@@ -48,7 +48,7 @@
 type parseinfo = {
   lexbuf : Lexing.lexbuf;
   menhir_pos: (Lexing.position * Lexing.position) MenhirLib.ErrorReports.buffer;
-  mutable current_working_directory : string option;
+  mutable current_working_directory : Filepath.t option;
 }
 
 let current = ref None
@@ -108,7 +108,7 @@ let setCurrentLine (i: int) =
 
 let setCurrentWorkingDirectory s =
   let current = Option.get !current in
-  current.current_working_directory <- Some s
+  current.current_working_directory <- Some (Filepath.of_string s)
 
 (* preprocessors tend to use '<xxx>' filenames in line directives to
    denote special locations, e.g. builtin or command-line-defined macros.
@@ -123,17 +123,18 @@ let is_special_file n =
 
 let setCurrentFile n =
   let current = Option.get !current in
-  let base_name = current.current_working_directory in
-  let norm = (Filepath.of_string ?base_name n :> string) in
-  if not (is_special_file n) && not (Sys.file_exists norm)
+  let base = current.current_working_directory in
+  let norm = Filepath.of_string ?base n in
+  if not (is_special_file n) && not (Filepath.exists norm)
   then begin
     currentLine := None;
     Kernel.warning ~wkey:Kernel.wkey_line_directive ~once:true
-      "ignoring non-existing file '%s', referenced in a line directive" norm
+      "ignoring non-existing file '%a', referenced in a line directive"
+      Filepath.pretty norm
   end else begin
     let pos = current.lexbuf.Lexing.lex_curr_p in
     current.lexbuf.Lexing.lex_curr_p <- {
-      pos with Lexing.pos_fname = norm;
+      pos with Lexing.pos_fname = (norm :> string);
                Lexing.pos_lnum = (Option.get !currentLine);
                Lexing.pos_bol = pos.Lexing.pos_cnum;
     }
