@@ -274,10 +274,16 @@ val bincopy : bytes -> in_channel -> out_channel -> unit
 [@@deprecated "This function is only used locally and is not exported anymore."]
 
 val copy : Normalized.t -> Normalized.t -> unit
-(** [copy source target] copies source file to target file. *)
+(** [copy source target] copies source file to target file.
+    @since Frama-C+dev
+    @before Frama-C+dev this function was [Command.copy]
+*)
 
 val iter_lines : Normalized.t -> (string -> unit) -> unit
-(** Iter over all text lines in the file *)
+(** Iter over all text lines in the file
+    @since Frama-C+dev
+    @before Frama-C+dev this function was [Command.read_lines]
+*)
 
 (** This type defines what action {!with_open_in} and {!with_open_out} must
     perform when the file to open does not exist. *)
@@ -326,6 +332,7 @@ val with_open_in:
 
 (** Same as {!with_open_in} but raises [Sys_error] instead of returning [Error].
     @since Frama-C+dev
+    @before Frama-C+dev this function was [Command.read_file]
 *)
 val with_open_in_exn :
   ?if_missing:action_if_missing ->
@@ -361,6 +368,7 @@ val with_open_out:
 
 (** Same as {!with_open_out} but raises [Sys_error] instead of returning [Error].
     @since Frama-C+dev
+    @before Frama-C+dev this function was [Command.write_file]
 *)
 val with_open_out_exn:
   ?if_missing:action_if_missing ->
@@ -385,6 +393,8 @@ val with_formatter: Normalized.t -> (Format.formatter, 'a) safe_processor
 (** Same as {!with_formatter} but raises [Sys_error] instead of returning
     [Error].
     @since Frama-C+dev
+    @before Frama-C+dev this function was [Command.pp_to_file] and
+    [Command.print_file]
 *)
 val with_formatter_exn: Normalized.t -> (Format.formatter, 'a) exn_processor
 
