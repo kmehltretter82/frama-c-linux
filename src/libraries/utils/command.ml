@@ -21,18 +21,6 @@
 (**************************************************************************)
 
 (* -------------------------------------------------------------------------- *)
-(* --- Deprecated file Utilities                                          --- *)
-(* -------------------------------------------------------------------------- *)
-
-let bincopy = Filepath.bincopy [@alert "-deprecated"]
-let copy = Filepath.copy
-let read_file p = Filepath.with_open_in_exn p
-let read_lines = Filepath.iter_lines
-let write_file p = Filepath.with_open_out_exn p
-let pp_to_file = Filepath.with_formatter_exn
-let print_file = Filepath.with_formatter_exn
-
-(* -------------------------------------------------------------------------- *)
 (* --- Pretty from files                                                  --- *)
 (* -------------------------------------------------------------------------- *)
 
@@ -213,3 +201,15 @@ let spawn ?(timeout=0) ?stdout ?stderr cmd args =
 
 let command_async = async
 let command = spawn
+
+(* -------------------------------------------------------------------------- *)
+(* --- Deprecated file Utilities                                          --- *)
+(* -------------------------------------------------------------------------- *)
+
+let bincopy = Filepath.bincopy [@alert "-deprecated"]
+let copy = Filepath.copy
+let read_file p = Filepath.with_open_in_exn p
+let read_lines = Filepath.iter_lines
+let write_file p = Filepath.with_open_out_exn p
+let pp_to_file = Filepath.with_formatter_exn
+let print_file = Filepath.with_formatter_exn
