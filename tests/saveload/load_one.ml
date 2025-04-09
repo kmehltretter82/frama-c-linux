@@ -6,7 +6,7 @@ let main () =
   let sparecode () =
     Sparecode.Register.get ~select_annot:false ~select_slice_annot:false
   in
-  let fp = Filepath.Normalized.of_string sav_file in
+  let fp = Filepath.of_string sav_file in
   let p = sparecode () in
   Project.save fp;
   Project.remove ~project:p ();

@@ -53,7 +53,7 @@ val pp : Format.formatter -> t -> unit
 
 val pp_dump : Format.formatter -> t -> unit (** without formatting *)
 
-exception Error of Filepath.Normalized.t * int * string
+exception Error of Filepath.t * int * string
 (** file, line, message *)
 
 (** {2 Constructors} *)
@@ -80,7 +80,7 @@ val load_channel : ?file:string -> in_channel -> t
 val load_string : string -> t
 (** Parses the Json in the string. *)
 
-val load_file : Filepath.Normalized.t -> t
+val load_file : Filepath.t -> t
 (** May also raise system exception. *)
 
 (** {2 Printers} *)
@@ -91,7 +91,7 @@ val save_string : ?pretty:bool -> t -> string
 val save_buffer : ?pretty:bool -> Buffer.t -> t -> unit
 val save_channel : ?pretty:bool -> out_channel -> t -> unit
 val save_formatter : ?pretty:bool -> Format.formatter -> t -> unit
-val save_file : ?pretty:bool -> Filepath.Normalized.t -> t -> unit
+val save_file : ?pretty:bool -> Filepath.t -> t -> unit
 
 (** {2 Accessors} *)
 
@@ -178,7 +178,7 @@ exception CannotMerge of string
    the same keys, or if the root JSON element is not an object.
    @since 23.0-Vanadium
 *)
-val merge_object : Filepath.Normalized.t -> t -> unit
+val merge_object : Filepath.t -> t -> unit
 
 (**
    [merge_list path json_array] merges the array [json_array] into the
@@ -189,7 +189,7 @@ val merge_object : Filepath.Normalized.t -> t -> unit
    @raise CannotMerge if the root JSON element is not an array.
    @since 23.0-Vanadium
 *)
-val merge_array : Filepath.Normalized.t -> t -> unit
+val merge_array : Filepath.t -> t -> unit
 
 (**
    [from_file path] opens [path] and stores its JSON object in
@@ -197,7 +197,7 @@ val merge_array : Filepath.Normalized.t -> t -> unit
    @raise Yojson.Json_error if [path] is a malformed JSON file.
    @since 23.0-Vanadium
 *)
-val from_file: Filepath.Normalized.t -> t
+val from_file: Filepath.t -> t
 
 (**
    Flushes the JSON objects in the cache. Returns the names of the written
@@ -205,4 +205,4 @@ val from_file: Filepath.Normalized.t -> t
 
    @since 23.0-Vanadium
 *)
-val flush_cache : unit -> Filepath.Normalized.t list
+val flush_cache : unit -> Filepath.t list

@@ -44,7 +44,7 @@ let parameters_of_json json =
 
 let print_correctness_parameters path =
   let parameters = get_correctness_parameters () in
-  if Filepath.Normalized.is_special_stdout path then begin
+  if Filepath.is_special_stdout path then begin
     Self.feedback "Correctness parameters of the analysis:";
     let print (name, value) = Self.printf "  %s: %s" name value in
     List.iter print parameters
@@ -101,7 +101,7 @@ let enabled_warning_of_json name json =
 
 let print_warning_status path name (module Plugin: Log.Messages) =
   let enabled, disabled = compute_warning_status (module Plugin) in
-  if Filepath.Normalized.is_special_stdout path then
+  if Filepath.is_special_stdout path then
     begin
       let pp_categories =
         Pretty_utils.pp_list ~sep:",@ " Format.pp_print_string
@@ -142,19 +142,19 @@ let check_configuration path =
     check_warning_status json "Eva" (module Self)
   with Yojson.Json_error msg ->
     Kernel.abort "error reading JSON file %a: %s"
-      Filepath.Normalized.pretty path msg
+      Filepath.pretty path msg
 
 let print_configuration path =
   try
     print_correctness_parameters path;
     print_warning_status path "Kernel" (module Kernel);
     print_warning_status path "Eva" (module Self);
-    if not (Filepath.Normalized.is_special_stdout path) then
+    if not (Filepath.is_special_stdout path) then
       Self.feedback "Audit: eva configuration written to: %a"
-        Filepath.Normalized.pretty path;
+        Filepath.pretty path;
   with Json.CannotMerge _ ->
     Kernel.failure "%s: error when writing json file %a."
-      Kernel.AuditPrepare.option_name Filepath.Normalized.pretty path
+      Kernel.AuditPrepare.option_name Filepath.pretty path
 
 let prepare_audit () =
   if not (Kernel.AuditPrepare.is_empty ()) then

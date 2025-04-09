@@ -72,7 +72,7 @@ let record_end_of_thread_analysis analysis =
     let name = Format.sprintf "%s%s_iteration_%d.sav"
         (Mt_options.ToDiskPrefix.get ())
         th analysis.iteration in
-    Project.save (Filepath.Normalized.of_string name)
+    Project.save (Filepath.of_string name)
   else begin
     let p = lazy(
       let pname = Format.asprintf "%a, iteration %d"

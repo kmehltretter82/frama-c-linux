@@ -158,8 +158,8 @@ let command_generic ~async ?stdout ?stderr cmd args =
       else
         begin
           let result = Result status in
-          flush stdout (Filepath.Normalized.of_string outf) ;
-          flush stderr (Filepath.Normalized.of_string errf) ;
+          flush stdout (Filepath.of_string outf) ;
+          flush stderr (Filepath.of_string errf) ;
           delete () ;
           deleted () ;
           killed () ;

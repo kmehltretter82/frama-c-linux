@@ -523,18 +523,18 @@ struct
 
   let normalize_filepath ~existence ~file_kind s =
     try
-      Filepath.Normalized.of_string ~existence s
+      Filepath.of_string ~existence s
     with
     | Filepath.No_file ->
       P.L.abort "%s%sfile '%s' does not exist"
         file_kind
         (if file_kind = "" then "" else " ")
-        (Filepath.Normalized.(to_pretty_string (of_string s)))
+        (Filepath.(to_pretty_string (of_string s)))
     | Filepath.File_exists ->
       P.L.abort "%s%sfile '%s' already exists"
         file_kind
         (if file_kind = "" then "" else " ")
-        (Filepath.Normalized.(to_pretty_string (of_string s)))
+        (Filepath.(to_pretty_string (of_string s)))
 
   module Filepath
       (X: sig
@@ -548,13 +548,13 @@ struct
         (struct
           include Datatype.Filepath
           include X
-          let default () = Filepath.Normalized.empty
+          let default () = Filepath.empty
           let functor_name = "Filepath"
         end)
 
     let convert f oldstr newstr =
-      let oldfp = Filepath.Normalized.to_pretty_string oldstr in
-      let newfp = Filepath.Normalized.to_pretty_string newstr in
+      let oldfp = Filepath.to_pretty_string oldstr in
+      let newfp = Filepath.to_pretty_string newstr in
       f oldfp newfp
 
     let set_str s =
@@ -572,7 +572,7 @@ struct
         stage
         (Cmdline.String set_str)
 
-    let parameter_get fp = Filepath.Normalized.to_pretty_string (get fp)
+    let parameter_get fp = Filepath.to_pretty_string (get fp)
     let parameter_add_set_hook f = add_set_hook (convert f)
     let parameter_add_update_hook f = add_update_hook (convert f)
 
@@ -600,7 +600,7 @@ struct
       else
         p
 
-    let is_empty () = Filepath.Normalized.is_empty (get ())
+    let is_empty () = Filepath.is_empty (get ())
   end
 
   (* ************************************************************************ *)
@@ -649,7 +649,7 @@ struct
        end): Parameter_sig.User_dir_opt
   =
   struct
-    open Fc_Filepath.Normalized
+    open Fc_Filepath
 
     module Dir_name =
       Filepath
@@ -1634,13 +1634,13 @@ struct
         include Datatype.Filepath
         let of_string s =
           try
-            [ Fc_Filepath.Normalized.of_string ~existence:X.existence s ]
+            [ Fc_Filepath.of_string ~existence:X.existence s ]
           with
           | Fc_Filepath.No_file ->
             P.L.abort "file '%s' not found" s
           | Fc_Filepath.File_exists ->
             P.L.abort "file '%s' already exists" s
-        let to_string = Fc_Filepath.Normalized.to_pretty_string
+        let to_string = Fc_Filepath.to_pretty_string
       end)
       (V)
       (struct include X let dependencies = [] end)

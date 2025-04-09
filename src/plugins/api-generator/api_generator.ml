@@ -575,8 +575,8 @@ let generate () =
           let path = pkg_path ~plugin:pkg.p_plugin ~package:pkg.p_package in
           Self.feedback "Package %s" path ;
           let out = OUT.get () in
-          let dir = Filepath.Normalized.concat out path in
-          let file = Filepath.Normalized.concat dir "index.ts" in
+          let dir = Filepath.concat out path in
+          let file = Filepath.concat dir "index.ts" in
           ignore (Extlib.mkdir ~parents:true dir 0o755) ;
           Filepath.with_formatter_exn file (makePackage pkg path) ;
         end

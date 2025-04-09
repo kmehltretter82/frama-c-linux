@@ -88,7 +88,7 @@ let section_stubs env =
     List.concat
       (List.map
          (fun f ->
-            let filename = Filepath.Normalized.of_string f in
+            let filename = Filepath.of_string f in
             Globals.FileIndex.get_functions ~declarations:false filename)
          (Mdr_params.Stubs.get ())
       )
@@ -157,7 +157,7 @@ let section_stubs env =
 let get_files () =
   let dir_table = Datatype.String.Hashtbl.create 17 in
   let add_entry f =
-    let f = Filepath.Normalized.to_pretty_string f in
+    let f = Filepath.to_pretty_string f in
     let dir = Filename.dirname f in
     let base = Filename.basename f in
     let suf =
@@ -565,7 +565,7 @@ let mk_remarks is_draft =
     if Filepath.exists f then begin
       Mdr_params.feedback
         "Re-using pre-existing remarks in draft file %a"
-        Filepath.Normalized.pretty f;
+        Filepath.pretty f;
       Parse_remarks.get_remarks f
     end else Datatype.String.Map.empty
   end else  Datatype.String.Map.empty
@@ -613,7 +613,7 @@ let gen_report ~draft:is_draft () =
   in
   let doc = Markdown.pandoc ~title ~authors ?date elements in
   let file = Mdr_params.Output.get() in
-  if Filepath.Normalized.is_empty file then
+  if Filepath.is_empty file then
     Mdr_params.error "No output file specified (use option %s)."
       Mdr_params.Output.option_name
   else
@@ -625,8 +625,8 @@ let gen_report ~draft:is_draft () =
     in
     match result with
     | Ok () ->
-      Mdr_params.result "Report %a generated" Filepath.Normalized.pretty file
+      Mdr_params.result "Report %a generated" Filepath.pretty file
     | Error s ->
       Mdr_params.warning
         "Unable to open %a for writing (%s). No report generated"
-        Filepath.Normalized.pretty file s
+        Filepath.pretty file s

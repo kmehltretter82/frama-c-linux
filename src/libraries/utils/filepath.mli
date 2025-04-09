@@ -20,12 +20,13 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Functions manipulating filepaths.
+(** Functions manipulating normalized filepaths.
     In these functions, references to the current working directory refer
     to the result given by function Sys.getcwd.
-
-    NOTE: Prefer using the [Normalized] module whenever possible.
 *)
+
+(** A normalized (absolute) path. *)
+type t = private string
 
 (** Existence requirement on a file. *)
 type existence =
@@ -50,8 +51,12 @@ exception File_exists
       but [normalize] may accept them.
 
     @before 21.0-Scandium no [existence] argument.
+    @before Frama-C+dev this function was [normalize]
 *)
+val of_string: ?existence:existence -> ?base_name:string -> string -> t
+
 val normalize: ?existence:existence -> ?base_name:string -> string -> string
+[@@deprecated "Use Command.of_string instead."]
 
 (** [relativize base_name file_name] returns a relative path name of
     [file_name] w.r.t. [base_name], if [base_name] is a prefix of [file];
@@ -60,129 +65,139 @@ val normalize: ?existence:existence -> ?base_name:string -> string -> string
     @since Aluminium-20160501 *)
 val relativize: ?base_name:string -> string -> string
 
+(** [extend ~existence file ext] returns the normalized path to the file
+    [file] ^ [ext]. Note that it does not introduce a dot.
+    The resulting path must respect [existence].
+
+    @since 29.0-Copper
+    @before Frama-C+dev this function was [Normalize.extend]
+*)
+val extend: ?existence:existence -> t -> string -> t
+
+(** [concat ~existence dir file] returns the normalized path
+    resulting from the concatenation of [dir] ^ "/" ^ [file].
+    The resulting path must respect [existence].
+
+    @since 22.0-Titanium
+*)
+val concat: ?existence:existence -> t -> string -> t
+
+(** [concats ~existence dir paths] concatenates a list of paths, as per
+    the [concat] function.
+
+    @since 28.0-Nickel
+*)
+val concats: ?existence:existence -> t -> string list -> t
+
+(** [to_pretty_string p] returns [p] prettified,
+    that is, a relative path-like string.
+    Note that this prettified string may contain symbolic dirs and is thus
+    is not a path.
+    See [pretty] for details about usage. *)
+val to_pretty_string: t -> string
+
+(** [to_string_list l] returns [l] as a list of strings containing the
+    absolute paths to the elements of [l].
+    @since 23.0-Vanadium
+*)
+val to_string_list: t list -> string list
+
+val equal: t -> t -> bool
+
+(** Compares normalized paths *)
+val compare: t -> t -> int
+
+(** Compares prettified (i.e. relative) paths, with or without
+    case sensitivity (by default, [case_sensitive = false]). *)
+val compare_pretty : ?case_sensitive:bool -> t -> t -> int
+
+(** Pretty-print a path according to these rules:
+    - relative filenames are kept, except for leading './',
+      which are stripped;
+    - absolute filenames are relativized if their prefix is included in the
+      current working directory; also, symbolic names are resolved,
+      i.e. the result may be prefixed by known aliases (e.g. FRAMAC_SHARE).
+      See {!add_symbolic_dir} for more details.
+      Therefore, the result of this function may not designate a valid name
+      in the filesystem and must ONLY be used to pretty-print information;
+      it must NEVER to be converted back to a filepath later.
+*)
+val pretty: Format.formatter -> t -> unit
+
+(** Pretty-prints the normalized (absolute) path. *)
+val pp_abs: Format.formatter -> t -> unit
+
+(** Empty filepath, used as 'dummy' for [Datatype.Filepath].
+    @since 23.0-Vanadium.
+*)
+val empty: t
+
+(** @since 23.0-Vanadium *)
+val is_empty: t -> bool
+
+(** [is_special_stdout f] returns [true] iff [f] is '-' (a single dash),
+    which is a special notation for 'stdout'.
+    @since 23.0-Vanadium *)
+val is_special_stdout: t -> bool
+
+(** [is_file f] returns [true] iff [f] points to a regular file
+    (or a symbolic link pointing to a file).
+    Returns [false] if any errors happen when [stat]'ing the file.
+    @since 22.0-Titanium *)
+val is_file: t -> bool
+
+(** [to_base_uri path] returns a pair [prefix, rest], according to the
+    prettified value of [path]:
+    - if it starts with symbolic path SYMB, prefix is Some "SYMB";
+    - if it is a relative path, prefix is Some "PWD";
+    - else (an absolute path), prefix is None.
+      [rest] contains everything after the '/' following the prefix.
+      E.g. for the path "FRAMAC_SHARE/libc/string.h", returns
+      ("FRAMAC_SHARE", "libc/string.h").
+
+    @since 22.0-Titanium
+*)
+val to_base_uri: t -> string option * string
+
 (** The [Normalized] module is simply a wrapper that ensures that paths are
     always normalized. Used by [Datatype.Filepath].
     @since 18.0-Argon *)
 module Normalized: sig
-
-  (** The normalized (absolute) path. *)
-  type t = private string
-
-  (** [of_string s] converts [s] into a normalized path.
-      @raise Invalid_argument if [s] is the empty string.
-      @before 21.0-Scandium no [existence] argument.
-  *)
+  type nonrec t = t
   val of_string: ?existence:existence -> ?base_name:string -> string -> t
-
-  (** [extend ~existence file ext] returns the normalized path to the file
-      [file] ^ [ext]. Note that it does not introduce a dot.
-      The resulting path must respect [existence].
-
-      @since 29.0-Copper
-  *)
   val extend: ?existence:existence -> t -> string -> t
-
-  (** [concat ~existence dir file] returns the normalized path
-      resulting from the concatenation of [dir] ^ "/" ^ [file].
-      The resulting path must respect [existence].
-
-      @since 22.0-Titanium
-  *)
   val concat: ?existence:existence -> t -> string -> t
-
-  (** [concats ~existence dir paths] concatenates a list of paths, as per
-      the [concat] function.
-
-      @since 28.0-Nickel
-  *)
   val concats: ?existence:existence -> t -> string list -> t
-
-  (** [to_pretty_string p] returns [p] prettified,
-      that is, a relative path-like string.
-      Note that this prettified string may contain symbolic dirs and is thus
-      is not a path.
-      See [pretty] for details about usage. *)
   val to_pretty_string: t -> string
-
-  (** [to_string_list l] returns [l] as a list of strings containing the
-      absolute paths to the elements of [l].
-      @since 23.0-Vanadium
-  *)
   val to_string_list: t list -> string list
-
   val equal: t -> t -> bool
-
-  (** Compares normalized paths *)
   val compare: t -> t -> int
-
-  (** Compares prettified (i.e. relative) paths, with or without
-      case sensitivity (by default, [case_sensitive = false]). *)
   val compare_pretty : ?case_sensitive:bool -> t -> t -> int
-
-  (** Pretty-print a path according to these rules:
-      - relative filenames are kept, except for leading './',
-        which are stripped;
-      - absolute filenames are relativized if their prefix is included in the
-        current working directory; also, symbolic names are resolved,
-        i.e. the result may be prefixed by known aliases (e.g. FRAMAC_SHARE).
-        See {!add_symbolic_dir} for more details.
-        Therefore, the result of this function may not designate a valid name
-        in the filesystem and must ONLY be used to pretty-print information;
-        it must NEVER to be converted back to a filepath later.
-  *)
   val pretty: Format.formatter -> t -> unit
-
-  (** Pretty-prints the normalized (absolute) path. *)
   val pp_abs: Format.formatter -> t -> unit
-
-  (** Empty filepath, used as 'dummy' for [Datatype.Filepath].
-      @since 23.0-Vanadium.
-  *)
   val empty: t
-
-  (** @since 23.0-Vanadium *)
   val is_empty: t -> bool
-
-  (** [is_special_stdout f] returns [true] iff [f] is '-' (a single dash),
-      which is a special notation for 'stdout'.
-      @since 23.0-Vanadium *)
   val is_special_stdout: t -> bool
-
-  (** [is_file f] returns [true] iff [f] points to a regular file
-      (or a symbolic link pointing to a file).
-      Returns [false] if any errors happen when [stat]'ing the file.
-      @since 22.0-Titanium *)
   val is_file: t -> bool
-
-  (** [to_base_uri path] returns a pair [prefix, rest], according to the
-      prettified value of [path]:
-      - if it starts with symbolic path SYMB, prefix is Some "SYMB";
-      - if it is a relative path, prefix is Some "PWD";
-      - else (an absolute path), prefix is None.
-        [rest] contains everything after the '/' following the prefix.
-        E.g. for the path "FRAMAC_SHARE/libc/string.h", returns
-        ("FRAMAC_SHARE", "libc/string.h").
-
-      @since 22.0-Titanium
-  *)
   val to_base_uri: t -> string option * string
 end
+[@@deprecated "Use Filepath directly instead."]
 
 (** returns true if the file is relative to [base]
     (that is, it is prefixed by [base_name]), or to the current
     working directory if no base is specified.
     @since Aluminium-20160501
-    @before 23.0-Vanadium argument types were string instead of Normalized.t.
+    @before 23.0-Vanadium argument types were string instead of t.
 *)
-val is_relative: ?base_name:Normalized.t -> Normalized.t -> bool
+val is_relative: ?base_name:t -> t -> bool
 
 (** [add_symbolic_dir name dir] indicates that the (absolute) path [dir] must
     be replaced by [name] when pretty-printing paths.
     This alias ensures that system-dependent paths such as FRAMAC_SHARE are
     printed identically in different machines. *)
-val add_symbolic_dir: string -> Normalized.t -> unit
+val add_symbolic_dir: string -> t -> unit
 
-val add_symbolic_dir_list: string -> Normalized.t list -> unit
+val add_symbolic_dir_list: string -> t list -> unit
 
 (** Remove all symbolic dirs that have been added earlier.
     @since 23.0-Vanadium *)
@@ -193,14 +208,14 @@ val reset_symbolic_dirs: unit -> unit
 
     @since 22.0-Titanium
 *)
-val all_symbolic_dirs: unit -> (string * Normalized.t) list
+val all_symbolic_dirs: unit -> (string * t) list
 
 (** Describes a position in a source file.
     @since 18.0-Argon
 *)
 type position =
   {
-    pos_path : Normalized.t;
+    pos_path : t;
     pos_lnum : int;
     pos_bol : int;
     pos_cnum : int;
@@ -226,44 +241,44 @@ val is_empty_pos : position -> bool
     symbolic links in directory names.
 
     @since 25.0-Manganese
-    @before 28.0-Nickel return type was string instead of Normalized.t.
+    @before 28.0-Nickel return type was string instead of t.
 *)
-val pwd : unit -> Normalized.t
+val pwd : unit -> t
 
 (** Equivalent to [Sys.file_exists].
     @since 28.0-Nickel
 *)
-val exists: Normalized.t -> bool
+val exists: t -> bool
 
 (** Equivalent to [Sys.is_directory].
     @since 28.0-Nickel
 *)
-val is_dir: Normalized.t -> bool
+val is_dir: t -> bool
 
 (** Equivalent to [Sys.readdir].
     @since 28.0-Nickel
 *)
-val readdir: Normalized.t -> string array
+val readdir: t -> string array
 
 (** Equivalent to [Sys.remove].
     @since 28.0-Nickel
 *)
-val remove: Normalized.t -> unit
+val remove: t -> unit
 
 (** Equivalent to [Sys.rename].
     @since 28.0-Nickel
 *)
-val rename: Normalized.t -> Normalized.t -> unit
+val rename: t -> t -> unit
 
 (** Equivalent to [Filename.basename].
     @since 28.0-Nickel
 *)
-val basename: Normalized.t -> string
+val basename: t -> string
 
 (** Equivalent to [Filename.dirname].
     @since 28.0-Nickel
 *)
-val dirname: Normalized.t -> Normalized.t
+val dirname: t -> t
 
 val bincopy : bytes -> in_channel -> out_channel -> unit
 (** [copy buffer cin cout] reads [cin] until end-of-file
@@ -273,13 +288,13 @@ val bincopy : bytes -> in_channel -> out_channel -> unit
 *)
 [@@deprecated "This function is only used locally and is not exported anymore."]
 
-val copy : Normalized.t -> Normalized.t -> unit
+val copy : t -> t -> unit
 (** [copy source target] copies source file to target file.
     @since Frama-C+dev
     @before Frama-C+dev this function was [Command.copy]
 *)
 
-val iter_lines : Normalized.t -> (string -> unit) -> unit
+val iter_lines : t -> (string -> unit) -> unit
 (** Iter over all text lines in the file
     @since Frama-C+dev
     @before Frama-C+dev this function was [Command.read_lines]
@@ -327,7 +342,7 @@ val with_open_in:
   ?if_missing:action_if_missing ->
   ?binary:bool ->
   ?blocking:bool ->
-  Normalized.t ->
+  t ->
   (in_channel, 'a) safe_processor
 
 (** Same as {!with_open_in} but raises [Sys_error] instead of returning [Error].
@@ -338,7 +353,7 @@ val with_open_in_exn :
   ?if_missing:action_if_missing ->
   ?binary:bool ->
   ?blocking:bool ->
-  Normalized.t ->
+  t ->
   (in_channel, 'a) exn_processor
 
 (** [with_open_out path f] calls [f] with a new output channel on the file [path]
@@ -363,7 +378,7 @@ val with_open_out:
   ?if_exists:action_if_exists ->
   ?binary:bool ->
   ?blocking:bool ->
-  Normalized.t ->
+  t ->
   (out_channel, 'a) safe_processor
 
 (** Same as {!with_open_out} but raises [Sys_error] instead of returning [Error].
@@ -375,7 +390,7 @@ val with_open_out_exn:
   ?if_exists:action_if_exists ->
   ?binary:bool ->
   ?blocking:bool ->
-  Normalized.t ->
+  t ->
   (out_channel, 'a) exn_processor
 
 
@@ -388,7 +403,7 @@ val with_open_out_exn:
     closing the file.
     @since Frama-C+dev
 *)
-val with_formatter: Normalized.t -> (Format.formatter, 'a) safe_processor
+val with_formatter: t -> (Format.formatter, 'a) safe_processor
 
 (** Same as {!with_formatter} but raises [Sys_error] instead of returning
     [Error].
@@ -396,7 +411,7 @@ val with_formatter: Normalized.t -> (Format.formatter, 'a) safe_processor
     @before Frama-C+dev this function was [Command.pp_to_file] and
     [Command.print_file]
 *)
-val with_formatter_exn: Normalized.t -> (Format.formatter, 'a) exn_processor
+val with_formatter_exn: t -> (Format.formatter, 'a) exn_processor
 
 (** Opening this module allows to use shorter syntax to deal with files.
 
@@ -410,7 +425,7 @@ val with_formatter_exn: Normalized.t -> (Format.formatter, 'a) exn_processor
       | Ok () -> ()
       | Error error ->
         Format.printf "error writing to file %a: %s"
-          Filepath.Normalized.pretty filepath
+          Filepath.pretty filepath
           error
     ]}
 

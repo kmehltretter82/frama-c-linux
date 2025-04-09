@@ -110,9 +110,9 @@ let extend () =
       Project.copy ~selection my_project;
       Project.set_current my_project;
       Kernel.SymbolicPath.add
-        (Filepath.Normalized.of_string (Filename.get_temp_dir_name ()),
+        (Filepath.of_string (Filename.get_temp_dir_name ()),
          "TMPDIR");
-      Files.append_after [ Filepath.Normalized.of_string tmpfile ];
+      Files.append_after [ Filepath.of_string tmpfile ];
       Kernel.LogicalOperators.on ();
       Constfold.off ();
       Ast.compute();

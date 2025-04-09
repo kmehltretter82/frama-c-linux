@@ -23,10 +23,10 @@
 let home () =
   match Sys.getenv "HOME" with
   | "" -> raise Not_found
-  | s -> Filepath.Normalized.of_string s
+  | s -> Filepath.of_string s
 
 let env_or_default env default =
-  let open Filepath.Normalized in
+  let open Filepath in
   let location =
     match Sys.getenv_opt env with
     | Some env when env <> "" -> of_string env

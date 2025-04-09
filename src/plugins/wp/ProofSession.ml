@@ -24,8 +24,8 @@ open Wpo
 
 type script =
   | NoScript
-  | Script of Filepath.Normalized.t
-  | Deprecated of Filepath.Normalized.t
+  | Script of Filepath.t
+  | Deprecated of Filepath.t
 
 type mode =
   | Batch
@@ -79,10 +79,10 @@ let saving_mode () =
   | Update | Init -> true
   | Batch | Dry -> false
 
-let files : (Filepath.Normalized.t,script) Hashtbl.t = Hashtbl.create 32
+let files : (Filepath.t,script) Hashtbl.t = Hashtbl.create 32
 
 let jsonfile (dir:Datatype.Filepath.t) name =
-  Filepath.Normalized.concat dir (name ^ ".json")
+  Filepath.concat dir (name ^ ".json")
 
 let get_script_dir ~force =
   Wp_parameters.get_session_dir ~force "script"
@@ -114,7 +114,7 @@ let get wpo =
         with Not_found -> NoScript
     in Hashtbl.add files f script ; script
 
-let pp_file fmt s = Filepath.Normalized.(pretty fmt s)
+let pp_file fmt s = Filepath.(pretty fmt s)
 
 let pp_script_for fmt wpo =
   match get wpo with
@@ -220,9 +220,9 @@ let remove_unmarked_files ~dry =
         let orphans = StringSet.diff files marks in
         let orphans = StringSet.remove ".marks" orphans in
         let remove file =
-          let path = Filepath.Normalized.concat dir file in
+          let path = Filepath.concat dir file in
           if dry
-          then Wp_parameters.feedback "[dry] rm %a" Filepath.Normalized.pretty path
+          then Wp_parameters.feedback "[dry] rm %a" Filepath.pretty path
           else Filepath.remove path
         in
         StringSet.iter remove orphans ;

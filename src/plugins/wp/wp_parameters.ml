@@ -1102,21 +1102,21 @@ module CounterExamples =
 
 let dkey = register_category "output"
 
-let has_out () = not @@ Fc_Filepath.Normalized.is_empty (OutputDir.get ())
+let has_out () = not @@ Fc_Filepath.is_empty (OutputDir.get ())
 
 let make_output_dir dir =
   try
     if Extlib.mkdir ~parents:true dir 0o770 then
-      debug ~dkey "Created output directory '%a'" Fc_Filepath.Normalized.pretty dir
+      debug ~dkey "Created output directory '%a'" Fc_Filepath.pretty dir
   with Unix.Unix_error (err,_,_) ->
     let msg = Unix.error_message err in
     abort
       "System Error (%s)@\nCan not create output directory '%a'"
-      msg Fc_Filepath.Normalized.pretty dir
+      msg Fc_Filepath.pretty dir
 
 (*[LC] Do not projectify this reference : it is common to all projects *)
-let unique_tmp : Fc_Filepath.Normalized.t option ref = ref None
-let make_tmp_dir () : Fc_Filepath.Normalized.t =
+let unique_tmp : Fc_Filepath.t option ref = ref None
+let make_tmp_dir () : Fc_Filepath.t =
   match !unique_tmp with
   | None ->
     let tmp =
@@ -1125,7 +1125,7 @@ let make_tmp_dir () : Fc_Filepath.Normalized.t =
         abort "Cannot create temporary file: %s" s
     in
     unique_tmp := Some tmp ;
-    debug ~dkey "Created temporary directory '%a'" Fc_Filepath.Normalized.pretty tmp ;
+    debug ~dkey "Created temporary directory '%a'" Fc_Filepath.pretty tmp ;
     tmp
   | Some tmp -> tmp
 
@@ -1135,7 +1135,7 @@ let make_gui_dir () =
       try Sys.getenv "USERPROFILE" (*Win32*) with Not_found ->
       try Sys.getenv "HOME" (*Unix like*) with Not_found ->
         "." in
-    let dir = Fc_Filepath.Normalized.of_string (home ^ "/" ^ ".frama-c-wp") in
+    let dir = Fc_Filepath.of_string (home ^ "/" ^ ".frama-c-wp") in
     if Fc_Filepath.exists dir && Fc_Filepath.is_dir dir then
       Extlib.safe_remove_dir (dir:>string);
     make_output_dir dir ; dir
@@ -1149,7 +1149,7 @@ let base_output () =
   | None ->
     let output =
       let dir = OutputDir.get () in
-      if Fc_Filepath.Normalized.is_empty dir then
+      if Fc_Filepath.is_empty dir then
         if is_interactive ()
         then make_gui_dir ()
         else make_tmp_dir ()
@@ -1177,7 +1177,7 @@ let get_output_dir d =
 (* --- Session dir                                                        --- *)
 (* -------------------------------------------------------------------------- *)
 
-let default = Fc_Filepath.(Normalized.concat (pwd ()) "/.frama-c")
+let default = Fc_Filepath.(concat (pwd ()) "/.frama-c")
 
 let has_session () =
   Session.is_set () ||
@@ -1207,7 +1207,7 @@ let has_print_generated () = has_dkey cat_print_generated
 
 let print_generated ?header file =
   let header = match header with
-    | None -> Fc_Filepath.Normalized.to_pretty_string file
+    | None -> Fc_Filepath.to_pretty_string file
     | Some head -> head in
   debug ~dkey:cat_print_generated "%S@\n%t@." header
     begin fun fmt ->

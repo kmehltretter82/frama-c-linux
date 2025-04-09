@@ -107,7 +107,7 @@ module ArtifactLocation = struct
   let default = create ~uri:"" ()
 
   let of_loc loc =
-    let uriBaseId, uri = Filepath.(Normalized.to_base_uri (fst loc).pos_path) in
+    let uriBaseId, uri = Filepath.(to_base_uri (fst loc).pos_path) in
     create ~uri ?uriBaseId ()
 end
 

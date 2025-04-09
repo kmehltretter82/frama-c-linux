@@ -186,7 +186,7 @@ let compute_information (kinstr, alarm_or_prop, contexts) =
 let print_information fmt { loc; kf; alarm; kind; text; status; contexts } =
   let pos = fst loc in
   let file =
-    Filepath.Normalized.to_pretty_string pos.Filepath.pos_path
+    Filepath.to_pretty_string pos.Filepath.pos_path
   in
   let dir = Filepath.relativize (Filename.dirname file) in
   let file = Filename.basename file in
@@ -199,7 +199,7 @@ let print_information fmt { loc; kf; alarm; kind; text; status; contexts } =
 
 let output file =
   Self.feedback "Listing red statuses in file %a"
-    Filepath.Normalized.pretty file;
+    Filepath.pretty file;
   let channel = open_out (file:>string) in
   let fmt = Format.formatter_of_out_channel channel in
   Format.pp_set_margin fmt 1000000;

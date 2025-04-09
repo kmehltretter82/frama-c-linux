@@ -112,6 +112,6 @@ let warn_unsupported_spec name =
       ~wkey:Self.wkey_libc_unsupported_spec
       "@[The specification of function '%a' is currently not supported by Eva.@ \
        Consider adding '%a'@ to the analyzed source files.@]"
-      Printer.pp_varname name Filepath.Normalized.pretty
-      (Filepath.Normalized.concat System_config.Share.libc header)
+      Printer.pp_varname name Filepath.pretty
+      (Filepath.concat System_config.Share.libc header)
   with Not_found -> ()

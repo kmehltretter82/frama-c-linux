@@ -30,7 +30,7 @@ type cpp_opt_kind = Gnu | Not_gnu | Unknown
     Note: [string] is used here instead of [Filepath], to preserve
           names given on the command line, without normalization. *)
 type file =
-  | NeedCPP of Filepath.Normalized.t * string * string list * cpp_opt_kind
+  | NeedCPP of Filepath.t * string * string list * cpp_opt_kind
   (** File which needs preprocessing.
       NeedCPP(filepath, cmd, extra, workdir, cpp_opt_kind):
       - filepath: source file to be preprocessed;
@@ -38,9 +38,9 @@ type file =
       - extra: list of extra arguments (e.g. from a JCDB);
       - cpp_opt_kind: whether the preprocessor supports GNU options
         such as -I/-D. *)
-  | NoCPP of Filepath.Normalized.t
+  | NoCPP of Filepath.t
   (** Already preprocessed file [.i] *)
-  | External of Filepath.Normalized.t * string
+  | External of Filepath.t * string
   (** file that can be translated into a Cil AST through an external
       function, together with the recognized suffix. *)
 

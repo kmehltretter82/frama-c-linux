@@ -166,10 +166,10 @@ let print_json fp funinfos_json =
   in
   match result with
   | Ok () ->
-    Self.debug "List written to: %a" Filepath.Normalized.pretty fp
+    Self.debug "List written to: %a" Filepath.pretty fp
   | Error msg ->
     Self.abort "cannot write JSON to %a: %s"
-      Filepath.Normalized.pretty fp msg
+      Filepath.pretty fp msg
 
 let pp_semlocs fmt t =
   Format.fprintf fmt "%a"
@@ -282,7 +282,7 @@ let run () =
       (fun fi1 fi2 -> Extlib.compare_ignore_case fi1.name fi2.name) funinfos
   in
   let outfp = Output.get () in
-  if Filepath.Normalized.is_empty outfp then
+  if Filepath.is_empty outfp then
     print_text funinfos
   else
     let funinfos_json = `List (List.map (fun fi ->

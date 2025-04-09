@@ -598,7 +598,7 @@ let make_panel (main_ui:main_window_extension_points) =
 
   (* Module name column viewer *)
   make_view_column (GTree.cell_renderer_text [top])
-    (function{module_name=m} -> [`TEXT (Filepath.Normalized.to_pretty_string m)])
+    (function{module_name=m} -> [`TEXT (Filepath.to_pretty_string m)])
     ~title:"File";
 
   (* Kind name column viewer *)

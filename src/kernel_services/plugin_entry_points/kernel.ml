@@ -796,7 +796,7 @@ module CodeOutput = struct
 
   let output job =
     let file = get () in
-    if Filepath.Normalized.(is_special_stdout file || is_empty file)
+    if Filepath.(is_special_stdout file || is_empty file)
     then Log.print_delayed job
     else
       try
@@ -812,7 +812,7 @@ module CodeOutput = struct
         warning
           "Fail to open file \"%a\" for code output@\nSystem error: %s.@\n\
            Code is output on stdout instead."
-          Filepath.Normalized.pretty file s ;
+          Filepath.pretty file s ;
         Log.print_delayed job
 
   let close_all () =
@@ -824,7 +824,7 @@ module CodeOutput = struct
          with Sys_error s ->
            failure
              "Fail to close output file \"%a\"@\nSystem error: %s."
-             Filepath.Normalized.pretty file s)
+             Filepath.pretty file s)
       streams
 
   let () = Extlib.safe_at_exit close_all
@@ -1048,12 +1048,12 @@ module Machdep = struct
   let get_dir () = Share.get_dir "machdeps"
   let get_default_file machdep =
     let filename = "machdep_" ^ machdep ^ ".yaml" in
-    Filepath.Normalized.concat (get_dir()) filename
+    Filepath.concat (get_dir()) filename
   let is_default machdep =
-    Filepath.Normalized.is_file (get_default_file machdep)
+    Filepath.is_file (get_default_file machdep)
 
   let normalize name =
-    if is_default name then name else Filepath.normalize name
+    if is_default name then name else (Filepath.of_string name :> string)
 
   let () =
     let set_if_necessary old_name new_name =

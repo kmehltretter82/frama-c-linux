@@ -173,7 +173,7 @@ val make_output_dir : Datatype.Filepath.t -> unit
 (** {2 Debugging Categories} *)
 
 val has_print_generated: unit -> bool
-val print_generated: ?header:string -> Filepath.Normalized.t -> unit
+val print_generated: ?header:string -> Filepath.t -> unit
 (** print the given file if the debugging category
     "print-generated" is set *)
 

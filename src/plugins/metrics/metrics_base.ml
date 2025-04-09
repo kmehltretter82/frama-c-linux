@@ -248,7 +248,7 @@ type output_type =
   | Json
 ;;
 
-let get_file_type (filename : Filepath.Normalized.t) =
+let get_file_type (filename : Filepath.t) =
   try
     match get_suffix (filename:>string) with
     | "html" | "htm" -> Html
@@ -261,7 +261,7 @@ let get_file_type (filename : Filepath.Normalized.t) =
   | No_suffix ->
     Metrics_parameters.abort
       "File %a has no suffix. Cannot produce output.@."
-      Filepath.Normalized.pretty filename
+      Filepath.pretty filename
 
 module VarinfoByName = struct
   type t = Cil_types.varinfo

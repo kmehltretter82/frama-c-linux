@@ -135,6 +135,8 @@ let pwd () = Unix.(realpath (getcwd ()))
 
 let cwd = insert dummy (pwd ())
 
+type t = string
+
 type existence =
   | Must_exist
   | Must_not_exist
@@ -143,7 +145,7 @@ type existence =
 exception No_file
 exception File_exists
 
-let normalize ?(existence=Indifferent) ?base_name path_name =
+let of_string ?(existence=Indifferent) ?base_name path_name =
   let path =
     if path_name = ""
     then ""
@@ -228,7 +230,7 @@ let rec skip_dot file_name =
     skip_dot (String.sub file_name 2 (String.length file_name - 2))
   else file_name
 
-let pretty file_name =
+let to_pretty_string file_name =
   if file_name = "" then
     "<unknown location>"
   else if Filename.is_relative file_name then
@@ -265,76 +267,72 @@ let is_relative ?base_name file_name =
   || String.starts_with ~prefix:(base_name ^ Filename.dir_sep) file_name
 
 (* -------------------------------------------------------------------------- *)
-(* --- Normalized Typed Module                                            --- *)
+(* --- Basic operations                                                   --- *)
 (* -------------------------------------------------------------------------- *)
 
-module Normalized = struct
-  type t = string
+let extend ?existence t ext = of_string ?existence (t ^ ext)
+let concat ?existence t s = of_string ?existence (t ^ "/" ^ s)
+let concats ?existence t sl =
+  let s' = List.fold_left (fun acc s -> acc ^ "/" ^ s) "" sl in
+  of_string ?existence (t ^ s')
 
-  let of_string ?existence ?base_name s = normalize ?existence ?base_name s
-  let extend ?existence t ext = normalize ?existence (t ^ ext)
-  let concat ?existence t s = normalize ?existence (t ^ "/" ^ s)
-  let concats ?existence t sl =
-    let s' = List.fold_left (fun acc s -> acc ^ "/" ^ s) "" sl in
-    normalize ?existence (t ^ s')
-  let to_pretty_string s = pretty s
-  let to_string_list l = l
-  let equal : t -> t -> bool = (=)
-  let compare = String.compare
+let to_string_list l = l
 
-  let compare_pretty ?(case_sensitive=false) s1 s2 =
-    let s1 = pretty s1 in
-    let s2 = pretty s2 in
-    if case_sensitive then String.compare s1 s2
-    else
-      String.compare
-        (String.lowercase_ascii s1)
-        (String.lowercase_ascii s2)
+let equal : t -> t -> bool = (=)
+let compare = String.compare
 
-  let empty = normalize ""
-  let is_empty fp = equal fp empty
-  let special_stdout = normalize "-"
-  let is_special_stdout fp = equal fp special_stdout
+let compare_pretty ?(case_sensitive=false) s1 s2 =
+  let s1 = to_pretty_string s1 in
+  let s2 = to_pretty_string s2 in
+  if case_sensitive then String.compare s1 s2
+  else
+    String.compare
+      (String.lowercase_ascii s1)
+      (String.lowercase_ascii s2)
 
-  let pretty fmt p =
-    if is_special_stdout p then
-      Format.fprintf fmt "<stdout>"
-    else if is_empty p then
-      Format.fprintf fmt "<unknown location>"
-    else
-      Format.fprintf fmt "%s" (pretty p)
-  let pp_abs fmt p = Format.fprintf fmt "%s" p
-  let is_file fp =
+let empty = of_string ""
+let is_empty fp = equal fp empty
+let special_stdout = of_string "-"
+let is_special_stdout fp = equal fp special_stdout
+
+let pretty fmt p =
+  if is_special_stdout p then
+    Format.fprintf fmt "<stdout>"
+  else if is_empty p then
+    Format.fprintf fmt "<unknown location>"
+  else
+    Format.fprintf fmt "%s" (to_pretty_string p)
+let pp_abs fmt p = Format.fprintf fmt "%s" p
+let is_file fp =
+  try
+    (Unix.stat (fp :> string)).Unix.st_kind = Unix.S_REG
+  with _ -> false
+
+let to_base_uri name =
+  let p = insert cwd name in
+  let buf = Buffer.create 80 in
+  let res = add_uri_path buf p in
+  let uri =
+    Buffer.contents buf in
+  let uri =
     try
-      (Unix.stat (fp :> string)).Unix.st_kind = Unix.S_REG
-    with _ -> false
-
-  let to_base_uri name =
-    let p = insert cwd name in
-    let buf = Buffer.create 80 in
-    let res = add_uri_path buf p in
-    let uri =
-      Buffer.contents buf in
-    let uri =
-      try
-        if String.get uri 0 = '/' then
-          String.sub uri 1 (String.length uri - 1)
-        else uri
-      with Invalid_argument _ -> uri
-    in
-    res, uri
-end
+      if String.get uri 0 = '/' then
+        String.sub uri 1 (String.length uri - 1)
+      else uri
+    with Invalid_argument _ -> uri
+  in
+  res, uri
 
 type position =
   {
-    pos_path : Normalized.t;
+    pos_path : t;
     pos_lnum : int;
     pos_bol : int;
     pos_cnum : int;
   }
 
 let empty_pos = {
-  pos_path = Normalized.empty;
+  pos_path = empty;
   pos_lnum = 0;
   pos_bol = 0;
   pos_cnum = -1;
@@ -342,20 +340,20 @@ let empty_pos = {
 
 let pp_pos fmt pos =
   let path = pos.pos_path in
-  if Normalized.(is_empty path || is_special_stdout path) then
-    Format.fprintf fmt "%a" Normalized.pretty path
+  if is_empty path || is_special_stdout path then
+    Format.fprintf fmt "%a" pretty path
   else
-    Format.fprintf fmt "%a:%d" Normalized.pretty path pos.pos_lnum
+    Format.fprintf fmt "%a:%d" pretty path pos.pos_lnum
 
 let is_empty_pos pos = pos == empty_pos
 
-let exists (s : Normalized.t) = Sys.file_exists (s :> string)
+let exists (s : t) = Sys.file_exists (s :> string)
 
-let is_dir (s : Normalized.t) = Sys.is_directory (s :> string)
+let is_dir (s : t) = Sys.is_directory (s :> string)
 
-let readdir (s : Normalized.t) = Sys.readdir (s :> string)
+let readdir (s : t) = Sys.readdir (s :> string)
 
-let remove (s : Normalized.t) = Sys.remove (s :> string)
+let remove (s : t) = Sys.remove (s :> string)
 
 let rename s t = Sys.rename s t
 
@@ -407,14 +405,14 @@ let protect_file_op ~(close: 'ch -> unit) (job: 'ch -> 'a) (channel: 'ch) =
   r
 
 let check_nonempty p =
-  if Normalized.is_empty p then
+  if is_empty p then
     invalid_arg "path should not be empty"
 
 let with_open_in_exn
     ?(if_missing=DoNotCreate)
     ?(binary=false)
     ?(blocking=true)
-    (p: Normalized.t)
+    (p: t)
     (job: in_channel -> 'a): 'a =
   check_nonempty p;
   let flags, perm =
@@ -431,7 +429,7 @@ let with_open_out_exn
     ?(if_exists=Truncate)
     ?(binary=false)
     ?(blocking=true)
-    (p: Normalized.t)
+    (p: t)
     (job: out_channel -> 'a): 'a =
   check_nonempty p;
   let flags, perm =
@@ -487,3 +485,31 @@ let iter_lines p job =
       job (input_line in_channel) ;
     done
   with End_of_file -> ()
+
+
+(* -------------------------------------------------------------------------- *)
+(* --- Deprecated Normalized module                                       --- *)
+(* -------------------------------------------------------------------------- *)
+
+let normalize = of_string
+
+module Normalized =
+struct
+  type nonrec t = t
+  let of_string = of_string
+  let extend = extend
+  let concat = concat
+  let concats = concats
+  let to_pretty_string = to_pretty_string
+  let to_string_list = to_string_list
+  let equal = equal
+  let compare = compare
+  let compare_pretty = compare_pretty
+  let empty = empty
+  let is_empty = is_empty
+  let is_special_stdout = is_special_stdout
+  let pretty = pretty
+  let pp_abs = pp_abs
+  let is_file = is_file
+  let to_base_uri = to_base_uri
+end

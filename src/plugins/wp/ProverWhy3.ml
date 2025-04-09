@@ -823,23 +823,23 @@ class visitor (ctx:context) c =
         then
           let tgtdir = WpContext.directory () in
           let why3src = Filepath.basename source in
-          let target = Filepath.Normalized.concat tgtdir (why3src :> string) in
+          let target = Filepath.concat tgtdir (why3src :> string) in
           Filepath.copy source target
       in
       let iter_file opt =
         match Str.split_delim regexp_col opt with
         | [file] ->
-          let path = Filepath.Normalized.of_string file in
+          let path = Filepath.of_string file in
           let filenoext = filenoext file in
           copy_file path;
           self#add_import_file [filenoext]
             (String.capitalize_ascii filenoext);
         | [file;lib] ->
-          let path = Filepath.Normalized.of_string file in
+          let path = Filepath.of_string file in
           copy_file path;
           self#add_import_file [filenoext file] lib;
         | [file;lib;name] ->
-          let path = Filepath.Normalized.of_string file in
+          let path = Filepath.of_string file in
           copy_file path;
           self#add_import_file_as [filenoext file] lib name;
         | _ -> why3_failure
@@ -1103,7 +1103,7 @@ let add_model_trace (probes: Lang.F.term Probe.Map.t) cnv t =
           ({Filepath.pos_path;pos_lnum=l1;pos_cnum=c1},
            {Filepath.pos_lnum=l2;pos_cnum=c2}) ->
           Why3.Loc.user_position
-            (Filepath.Normalized.to_pretty_string pos_path) l1 c1 l2 c2
+            (Filepath.to_pretty_string pos_path) l1 c1 l2 c2
       in Term.create_lsymbol (Ident.id_fresh ~loc ~attrs p.name) [] ty
     in
     let fold (p:Probe.t) (term:Lang.F.term) task =
@@ -1328,7 +1328,7 @@ let call_prover_task ~timeout ~steps ~config ~probes prover call =
 (* --- Batch Prover                                                       --- *)
 (* -------------------------------------------------------------------------- *)
 
-let output_task wpo drv ?(script : Filepath.Normalized.t option) prover task =
+let output_task wpo drv ?(script : Filepath.t option) prover task =
   let file = Wpo.DISK.file_goal
       ~pid:wpo.Wpo.po_pid
       ~model:wpo.Wpo.po_model
@@ -1347,7 +1347,7 @@ let output_task wpo drv ?(script : Filepath.Normalized.t option) prover task =
   Option.iter close_in old
 
 
-let digest_task wpo drv ?(script : Filepath.Normalized.t option) prover task =
+let digest_task wpo drv ?(script : Filepath.t option) prover task =
   output_task wpo drv ?script prover task;
   let file = Wpo.DISK.file_goal
       ~pid:wpo.Wpo.po_pid
@@ -1358,7 +1358,7 @@ let digest_task wpo drv ?(script : Filepath.Normalized.t option) prover task =
   end
 
 let run_batch pconf driver ~config
-    ?(script : Filepath.Normalized.t option)
+    ?(script : Filepath.t option)
     ~timeout ~steplimit ~memlimit
     ?(probes=Probe.Map.empty)
     prover task =
@@ -1408,11 +1408,11 @@ let editor_command pconf =
 
 let scriptfile ~force ~ext wpo =
   let dir = Wp_parameters.get_session_dir ~force "interactive" in
-  let filenoext = Filepath.Normalized.concat dir wpo.Wpo.po_sid in
-  Filepath.Normalized.extend filenoext ext
+  let filenoext = Filepath.concat dir wpo.Wpo.po_sid in
+  Filepath.extend filenoext ext
 
 let updatescript ~script driver task =
-  let backup = Filepath.Normalized.extend script ".bak" in
+  let backup = Filepath.extend script ".bak" in
   Filepath.rename script backup ;
   let _printing_info =
     let open Filepath.Operators in
@@ -1428,7 +1428,7 @@ let editor ~script ~merge ~config pconf driver task =
   Task.sync editor_mutex
     begin fun () ->
       Wp_parameters.feedback ~ontty:`Transient "Editing %a..."
-        Filepath.Normalized.pretty script ;
+        Filepath.pretty script ;
       if merge then updatescript ~script driver task ;
       let command = editor_command pconf in
       Wp_parameters.debug ~dkey "Editor command %S" command ;

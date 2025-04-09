@@ -59,7 +59,7 @@ let print_config ?(newline=false) get value () =
   end
 
 let print_configl get value () =
-  let value = Filepath.Normalized.to_string_list value in
+  let value = Filepath.to_string_list value in
   if get () then begin
     Log.print_on_output (fun fmt -> (Format.fprintf fmt "%s%!" (String.concat "\n" value))) ;
     raise Cmdline.Exit
@@ -108,7 +108,7 @@ let load_binary () =
       Project.load_all filepath
     with Project.IOError s ->
       Kernel.abort "problem while loading file %a (%s)"
-        Filepath.Normalized.pretty filepath s
+        Filepath.pretty filepath s
   end
 let () = Cmdline.run_after_loading_stage load_binary
 
@@ -155,17 +155,17 @@ let save_binary error_extension =
       match error_extension with
       | None -> path
       | Some err_ext ->
-        let err_path = Filepath.Normalized.extend path err_ext in
+        let err_path = Filepath.extend path err_ext in
         Kernel.warning
           "attempting to save on non-zero exit code: \
-           modifying filename into `%a'." Filepath.Normalized.pretty err_path;
+           modifying filename into `%a'." Filepath.pretty err_path;
         err_path
     in
     try
       Project.save_all realpath
     with Project.IOError s ->
       Kernel.error "problem while saving to file %a (%s)."
-        Filepath.Normalized.pretty realpath s
+        Filepath.pretty realpath s
   end
 let () =
   (* implement a refinement of the behavior described in BTS #1388:
@@ -184,7 +184,7 @@ let () =
 let flush_json_files () =
   let written = Json.flush_cache () in
   List.iter (fun fp ->
-      Kernel.feedback "Wrote: %a" Filepath.Normalized.pretty fp)
+      Kernel.feedback "Wrote: %a" Filepath.pretty fp)
     written
 
 (* Registers an exit hook that flushes Json objects and writes JSON files. This

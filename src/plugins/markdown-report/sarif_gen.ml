@@ -213,7 +213,7 @@ let gen_statuses () =
 
 let gen_artifacts () =
   let add_src_file f =
-    let uriBaseId, uri = Filepath.Normalized.to_base_uri f in
+    let uriBaseId, uri = Filepath.to_base_uri f in
     let location = ArtifactLocation.create ~uri ?uriBaseId () in
     let roles = [ Role.analysisTarget ] in
     let mimeType = "text/x-csrc" in
@@ -247,7 +247,7 @@ let gen_run remarks =
   let results = results @ user_annot_results in
   let artifacts = gen_artifacts () in
   let symbolicDirs =
-    List.map (fun (key, (dir : Filepath.Normalized.t)) ->
+    List.map (fun (key, (dir : Filepath.t)) ->
         (key, (dir :> string))
       ) (Filepath.all_symbolic_dirs ())
   in
@@ -282,9 +282,9 @@ let generate () =
       let$ out = Filepath.with_open_out_exn file in
       Yojson.Safe.pretty_to_channel ~std:true out json;
       output_char out '\n';
-      Mdr_params.result "Report %a generated" Filepath.Normalized.pretty file
+      Mdr_params.result "Report %a generated" Filepath.pretty file
     with Sys_error s ->
       Mdr_params.abort "Unable to generate %a (%s)"
-        Filepath.Normalized.pretty file s
+        Filepath.pretty file s
   else
     Log.print_on_output (fun fmt -> Yojson.Safe.pretty_print fmt json)

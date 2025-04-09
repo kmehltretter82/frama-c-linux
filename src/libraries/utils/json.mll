@@ -125,13 +125,13 @@ let parse_file input =
   if input.token <> EOF then failwith "unexpected end-of-file" ;
   content
 
-exception Error of Filepath.Normalized.t * int * string
+exception Error of Filepath.t * int * string
 
 let error lexbuf msg =
   let open Lexing in
   let position = Lexing.lexeme_start_p lexbuf in
   let token = Lexing.lexeme lexbuf in
-  let path = Filepath.Normalized.of_string position.pos_fname in
+  let path = Filepath.of_string position.pos_fname in
   Error(path,position.pos_lnum,
         Printf.sprintf "%s (at %S)" msg token)
 
@@ -153,7 +153,7 @@ let load_channel ?file inc =
   end ;
   load_lexbuf lexbuf
 
-let load_file (file : Filepath.Normalized.t) =
+let load_file (file : Filepath.t) =
   let inc = open_in (file :> string) in
   try
     let content = load_channel ~file:(file :> string) inc in
@@ -362,7 +362,7 @@ let merge_array path json_root_array =
 
 let flush_cache () =
   let written =
-    Hashtbl.fold (fun (path : Filepath.Normalized.t) json acc ->
+    Hashtbl.fold (fun (path : Filepath.t) json acc ->
         let oc = open_out (path:>string) in
         Yojson.Basic.pretty_to_channel oc json;
         output_char oc '\n'; (* ensure JSON file terminates with a newline *)
@@ -374,7 +374,7 @@ let flush_cache () =
 
 let json_cache = Hashtbl.create 3
 
-let from_file (path : Filepath.Normalized.t) =
+let from_file (path : Filepath.t) =
   try
     Hashtbl.find json_cache path
   with Not_found ->

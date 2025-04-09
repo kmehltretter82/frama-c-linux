@@ -853,7 +853,7 @@ let export gstat specfile =
   | Some report ->
     Wp_parameters.feedback "Report '%s'" report ;
     let open Filepath.Operators in
-    let$ fout = Filepath.(with_formatter_exn (Normalized.of_string report)) in
+    let$ fout = Filepath.(with_formatter_exn (of_string report)) in
     print gstat ~config
       ~head:(Buffer.contents head) ~tail:(Buffer.contents tail)
       ~chap:(Buffer.contents chap)
@@ -879,7 +879,7 @@ let export_json gstat ?jinput ~joutput () =
             Wp_parameters.feedback "Report out: '%s'" joutput ;
             jinput
         in
-        let jpath = Filepath.Normalized.of_string jfile in
+        let jpath = Filepath.of_string jfile in
         if Filepath.exists jpath then
           Json.load_file jpath
         else `Null
@@ -889,7 +889,7 @@ let export_json gstat ?jinput ~joutput () =
         `Null
     in
     rankify_fcstat gstat js ;
-    Json.save_file (Filepath.Normalized.of_string joutput) (json_of_fcstat gstat) ;
+    Json.save_file (Filepath.of_string joutput) (json_of_fcstat gstat) ;
   end
 
 

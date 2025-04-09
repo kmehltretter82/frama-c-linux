@@ -28,7 +28,7 @@ let output format context filename =
     | Dot -> Dive_graph.output_to_dot channel graph
     | Json -> Server_interface.output_to_json channel graph
   in
-  Self.result "output to %a" Filepath.Normalized.pretty filename;
+  Self.result "output to %a" Filepath.pretty filename;
   match Filepath.with_open_out filename output_function with
   | Ok () -> ()
   | Error error ->

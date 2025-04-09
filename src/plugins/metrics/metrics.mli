@@ -38,7 +38,7 @@ module Metrics_base : sig
     Datatype.S_with_collections with type t = Kernel_function.t option
   module BasicMetrics : sig
     type t = {
-      cfile_name : Filepath.Normalized.t;
+      cfile_name : Filepath.t;
       cfunc : Kernel_function.t option;
       cslocs: int;
       cifs: int;

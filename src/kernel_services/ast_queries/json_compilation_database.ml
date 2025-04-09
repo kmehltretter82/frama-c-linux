@@ -252,7 +252,7 @@ let parse_build_entry jbdb_dir r =
     if Filename.is_relative dirname then Filename.concat jbdb_dir dirname
     else dirname
   in
-  let dirname = Filepath.normalize dirname in
+  let dirname = (Filepath.of_string dirname :> string) in
   let args = List.map to_string (r |> member "arguments" |> to_list) in
   let flags = filter_useful_flags ~requote:true args in
   List.iter (fun filename ->
@@ -269,7 +269,7 @@ let parse_compilation_entry jcdb_dir r =
     if Filename.is_relative dirname then Filename.concat jcdb_dir dirname
     else dirname
   in
-  let dirname = Filepath.normalize dirname in
+  let dirname = (Filepath.of_string dirname :> string) in
   let path = Datatype.Filepath.of_string ~base_name:dirname filename in
 
   (* get the list of arguments, and a flag indicating if the arguments
@@ -300,7 +300,7 @@ let compute_flags_from_file () =
   let database = Kernel.JsonCompilationDatabase.get () in
   let jcdb_dir, jcdb_path =
     if Filepath.is_dir database then
-      database, Filepath.Normalized.concat database "compile_commands.json"
+      database, Filepath.concat database "compile_commands.json"
     else Filepath.dirname database, database
   in
   Kernel.feedback ~dkey:Kernel.dkey_compilation_db

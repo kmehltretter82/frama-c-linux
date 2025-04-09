@@ -293,7 +293,7 @@ module MYTREE = struct
     Ast_attributes.contains "FC_BUILTIN" (Cil_datatype.Global.attr g)
 
   let comes_from_share filename =
-    let path = Filepath.Normalized.of_string filename in
+    let path = Filepath.of_string filename in
     Filepath.is_relative ~base_name:System_config.Share.main path
 
   let is_function t = match t with
@@ -362,7 +362,7 @@ module MYTREE = struct
 
   let make_file hide sort_order (path, globs) =
     let storage =
-      default_storage (path : Filepath.Normalized.t :> string) (Array.of_list globs)
+      default_storage (path : Filepath.t :> string) (Array.of_list globs)
     in
     let sons = make_list_globals hide sort_order globs in
     storage, sons
@@ -477,7 +477,7 @@ module State = struct
       else
         let sorted_files = (List.sort (fun (p1, _) (p2, _) ->
             (* invert comparison order due to inversion by fold_left below *)
-            Filepath.Normalized.compare_pretty p2 p1
+            Filepath.compare_pretty p2 p1
           ) files)
         in
         let files = List.fold_left
@@ -947,7 +947,7 @@ let make (tree_view:GTree.view) =
                 true, "Unknown file", strike, false
               else
                 let path = Datatype.Filepath.of_string m in
-                false, Filepath.Normalized.to_pretty_string path, strike, false
+                false, Filepath.to_pretty_string path, strike, false
             | MYTREE.MGlobal ({MYTREE.name=m; strikethrough=strike}) as s ->
               false, m, strike, MYTREE.is_function s
           in

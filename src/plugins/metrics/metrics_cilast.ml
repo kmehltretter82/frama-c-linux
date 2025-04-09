@@ -512,7 +512,7 @@ let pretty_used_files used_files =
   let is_c_file s = String.ends_with ~suffix:".c" s && s <> ".c" in
   let used_included_c_files =
     Datatype.Filepath.Set.filter
-      (fun f -> is_c_file (f : Filepath.Normalized.t :> string))
+      (fun f -> is_c_file (f : Filepath.t :> string))
       used_included_files
   in
   let used_implicitly_included_c_files =
@@ -746,7 +746,7 @@ let compute_on_cilast ~libc =
       close_out oc;
     with Sys_error s ->
       Metrics_parameters.abort "Cannot open file %a (%s)."
-        Filepath.Normalized.pretty out_fname s
+        Filepath.pretty out_fname s
   end
   else Metrics_parameters.result "%a" pp_with_funinfo cil_visitor
 

@@ -21,7 +21,7 @@
 (**************************************************************************)
 
 let env_or_default env default sub =
-  let open Filepath.Normalized in
+  let open Filepath in
   match Sys.getenv_opt env, sub with
   | Some s, _ (* ignored *) when s <> "" -> concat (of_string s) "frama-c"
   | _, Some sub -> concats (of_string default) [ "frama-c" ; sub ]

@@ -290,7 +290,7 @@ end
 
 (** signature for normalized pathnames. *)
 module type Filepath = sig
-  include S with type t = Filepath.Normalized.t
+  include S with type t = Filepath.t
 
   (**
      Whether the Filepath is empty.
@@ -308,7 +308,7 @@ end
     @since 30.0-Zinc
 *)
 module type Site_dir = sig
-  val get_dir: string -> Filepath.Normalized.t
+  val get_dir: string -> Filepath.t
   (** [get_dir name] tries to find the directory named [name] in the
       site. The function aborts if: [name] cannot be found or is a file instead
       of a directory, otherwise it returns the path.
@@ -320,7 +320,7 @@ module type Site_dir = sig
       perform the resolution.
   *)
 
-  val get_file: string -> Filepath.Normalized.t
+  val get_file: string -> Filepath.t
   (** [get_file name] tries to find the file named [name] in the
       site. The function aborts if: [name] cannot be found or is a directory
       instead of a file, otherwise it returns the path.
@@ -332,10 +332,10 @@ end
     @since 30.0-Zinc
 *)
 module type Site_root = sig
-  val set: Filepath.Normalized.t -> unit
+  val set: Filepath.t -> unit
   (** Sets the <dune-site-dir> directory (without creating it). *)
 
-  val get: unit -> Filepath.Normalized.t
+  val get: unit -> Filepath.t
   (** @return the <dune-site-dir> directory (without creating it). *)
 
   val is_set: unit -> bool
@@ -352,7 +352,7 @@ end
     @since 30.0-Zinc
 *)
 module type User_dir = sig
-  val get_dir: ?create_path:bool -> string -> Filepath.Normalized.t
+  val get_dir: ?create_path:bool -> string -> Filepath.t
   (** [get_dir ~create_path name] tries to get the directory [name].
       The function aborts if:
       - a file named [name] exists,
@@ -363,7 +363,7 @@ module type User_dir = sig
       {!Builder.Make_user_dir} and {!Builder.Make_user_dir_opt}.
   *)
 
-  val get_file: ?create_path:bool -> string -> Filepath.Normalized.t
+  val get_file: ?create_path:bool -> string -> Filepath.t
   (** [get_file ~create_path name] tries to get the file [name].
       The function aborts if:
       - a directory named [name] exists,
@@ -382,10 +382,10 @@ end
 module type User_dir_opt = sig
   include User_dir
 
-  val set: Filepath.Normalized.t -> unit
+  val set: Filepath.t -> unit
   (** Sets the <user-dir> directory (without creating it). *)
 
-  val get: unit -> Filepath.Normalized.t
+  val get: unit -> Filepath.t
   (** @return the <user-dir> directory (without creating it). *)
 
   val is_set: unit -> bool
@@ -718,7 +718,7 @@ module type Builder = sig
          val file_kind: string
        end):
     Map
-    with type key = Fc_Filepath.Normalized.t
+    with type key = Fc_Filepath.t
      and type value = V.t
      and type t = V.t Datatype.Filepath.Map.t
 

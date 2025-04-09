@@ -80,4 +80,4 @@ val reset_all: unit -> unit
 (** {2 Export } *)
 
 (** Export the computed statistics as CSV. *)
-val export_as_csv : ?filename:Filepath.Normalized.t -> unit -> unit
+val export_as_csv : ?filename:Filepath.t -> unit -> unit

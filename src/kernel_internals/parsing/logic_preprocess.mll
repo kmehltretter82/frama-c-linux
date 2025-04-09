@@ -546,7 +546,7 @@ parse
         Extlib.temp_file_cleanup_at_exit ~debug
           (Filename.basename filename) ".pp"
       in
-      let fp_of_string = Filepath.Normalized.of_string in
+      let fp_of_string = Filepath.of_string in
       let workdir_opt = Parse_env.get_workdir (fp_of_string filename) in
       Option.iter
         (fun workdir -> Parse_env.set_workdir (fp_of_string ppname) workdir)

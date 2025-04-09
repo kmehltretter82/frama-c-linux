@@ -7,7 +7,7 @@ let check name test =
 let main () =
   ignore (Project.create_by_copy ~last:false "foo");
   ignore (Project.create "foobar");
-  let fp = Filepath.Normalized.of_string "foo.sav" in
+  let fp = Filepath.of_string "foo.sav" in
   Project.save_all fp;
   check "foo" (<>);
   check "foobar" (=);

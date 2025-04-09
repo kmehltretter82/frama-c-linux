@@ -467,12 +467,12 @@ let save_projects selection projects filename =
 
 let save ?(selection=State_selection.full) ?(project=current()) filename =
   guarded_feedback selection 2 "saving project %S into file %a"
-    project.unique_name Filepath.Normalized.pretty filename;
+    project.unique_name Filepath.pretty filename;
   save_projects selection (Q.singleton project) filename
 
 let save_all ?(selection=State_selection.full) filename =
   guarded_feedback selection 2 "saving the current session into file %a"
-    Filepath.Normalized.pretty filename;
+    Filepath.pretty filename;
   save_projects selection projects filename
 
 module Descr = struct
@@ -590,13 +590,13 @@ module Descr = struct
 end
 
 let load_projects ~project_under_copy selection ?name filename =
-  let cin = open_in_bin (filename : Filepath.Normalized.t :> string) in
+  let cin = open_in_bin (filename : Filepath.t :> string) in
   let gen_read f cin =
     try f cin with
     | End_of_file ->
       close_in cin;
       abort "unexpected end of file while loading '%a'"
-        Filepath.Normalized.pretty filename
+        Filepath.pretty filename
     | Failure s -> close_in cin; raise (IOError s)
   in
   let read = gen_read input_value in
@@ -650,7 +650,7 @@ let load_projects ~project_under_copy selection ?name filename =
 let load_with_copy
     ?project_under_copy ?(selection=State_selection.full) ?name filename =
   guarded_feedback selection 2 "loading the project saved in file %a"
-    Filepath.Normalized.pretty filename;
+    Filepath.pretty filename;
   match load_projects ~project_under_copy selection ?name filename with
   | [ p ] -> p
   | [] | _ :: _ :: _ -> assert false
@@ -660,7 +660,7 @@ let load = load_with_copy ?project_under_copy:None
 let load_all ?(selection=State_selection.full) filename =
   remove_all ();
   guarded_feedback selection 2 "loading the session saved in file %a"
-    Filepath.Normalized.pretty filename;
+    Filepath.pretty filename;
   try
     ignore (load_projects ~project_under_copy:None selection filename)
   with IOError _ as e ->
@@ -676,7 +676,7 @@ let create_by_copy
   guarded_feedback selection 2 "creating project %S by copying project %S"
     name (src.unique_name);
   let filename =
-    Filepath.Normalized.of_string (
+    Filepath.of_string (
       try Extlib.temp_file_cleanup_at_exit "frama_c_create_by_copy" ".sav"
       with Extlib.Temp_file_error s -> abort "cannot create temporary file: %s" s)
   in
@@ -698,7 +698,7 @@ let create_by_copy
 module Undo = struct
 
   let short_filename = "frama_c_undo_restore"
-  let filename = ref Filepath.Normalized.empty
+  let filename = ref Filepath.empty
 
   let clear_breakpoint () = Extlib.safe_remove (!filename:>string)
 
@@ -711,7 +711,7 @@ module Undo = struct
 
   let breakpoint () =
     clear_breakpoint ();
-    filename := Filepath.Normalized.of_string
+    filename := Filepath.of_string
         (try Extlib.temp_file_cleanup_at_exit short_filename ".sav"
          with Extlib.Temp_file_error s ->
            abort "cannot create temporary file: %s" s)

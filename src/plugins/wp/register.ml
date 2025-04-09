@@ -347,7 +347,7 @@ let stats_to_json g (s : Stats.stats) : Json.t =
 
 let do_report_json () =
   let file = Wp_parameters.ReportJson.get () in
-  if not (Filepath.Normalized.is_empty file) then
+  if not (Filepath.is_empty file) then
     let json = List.rev @@
       GOALS.fold
         (fun g json ->
@@ -364,9 +364,9 @@ let do_report_json () =
 type stats = {
   proofs: Stats.stats ;
   tactic: Stats.stats ;
-  updated: (Wpo.t * Filepath.Normalized.t * Json.t) list;
-  incomplete: (Wpo.t * Filepath.Normalized.t * Json.t) list;
-  removed: (Wpo.t * Filepath.Normalized.t) list;
+  updated: (Wpo.t * Filepath.t * Json.t) list;
+  incomplete: (Wpo.t * Filepath.t * Json.t) list;
+  removed: (Wpo.t * Filepath.t) list;
 }
 
 let do_wpo_result goal prover res =
@@ -721,7 +721,7 @@ let do_update_session script session =
 let do_show_session updated_session session =
   let show enabled kind dkey file =
     if enabled then
-      Wp_parameters.result ~dkey "[%s] %a" kind Filepath.Normalized.pretty file
+      Wp_parameters.result ~dkey "[%s] %a" kind Filepath.pretty file
   in
   (* Note: we display new (in)valid scripts only when updating *)
   List.iter

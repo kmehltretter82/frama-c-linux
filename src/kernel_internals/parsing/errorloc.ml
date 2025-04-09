@@ -71,11 +71,11 @@ let startParsing fname lexer =
     | Ok in_str ->
       let lexbuf = Lexing.from_string in_str in
       let menhir_pos, lexer = MenhirLib.ErrorReports.wrap lexer in
-      let filename = Filepath.normalize fname in
+      let filename = Filepath.of_string fname in
       let i = { lexbuf; menhir_pos; current_working_directory = None } in
       (* Initialize lexer buffer. *)
       lexbuf.Lexing.lex_curr_p <-
-        { Lexing.pos_fname = filename;
+        { Lexing.pos_fname = (filename :> string);
           Lexing.pos_lnum  = 1;
           Lexing.pos_bol   = 0;
           Lexing.pos_cnum  = 0
@@ -124,7 +124,7 @@ let is_special_file n =
 let setCurrentFile n =
   let current = Option.get !current in
   let base_name = current.current_working_directory in
-  let norm = Filepath.normalize ?base_name n in
+  let norm = (Filepath.of_string ?base_name n :> string) in
   if not (is_special_file n) && not (Sys.file_exists norm)
   then begin
     currentLine := None;
@@ -147,7 +147,7 @@ let pp_context_from_file ?(ctx=2) fmt (start_pos, pos) =
   let open Filepath.Operators in
   let open Filepath in
   let start_pos =
-    if Normalized.equal start_pos.pos_path pos.pos_path then start_pos
+    if equal start_pos.pos_path pos.pos_path then start_pos
     else pos
   in
   try

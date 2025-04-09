@@ -1241,7 +1241,7 @@ let combines = {
            (previous definition was in file %s)."
           Cil_printer.pp_typ t1
           Cil_printer.pp_typ t2
-          (Filepath.Normalized.to_pretty_string old_file)
+          (Filepath.to_pretty_string old_file)
       in
       let emitwith _ =
         if (not !conflict_detected) && oldfidx <> fidx
@@ -1576,7 +1576,7 @@ let oneFilePass1 (f:file) : unit =
   let open Current_loc.Operators in
   H.add fileNames !currentFidx f.fileName;
   Kernel.feedback ~dkey:Kernel.dkey_linker
-    "Pre-merging (%d) %a" !currentFidx Filepath.Normalized.pp_abs f.fileName ;
+    "Pre-merging (%d) %a" !currentFidx Filepath.pp_abs f.fileName ;
   currentDeclIdx := 0;
   if f.globinitcalled || f.globinit <> None then
     Kernel.warning ~current:true
@@ -1708,7 +1708,7 @@ let oneFilePass1 (f:file) : unit =
              Please exchange command-line arguments to put '%a' \
              before '%a'.@."
             Printer.pp_location oldvi.vdecl
-            Normalized.pretty newpath Normalized.pretty oldpath
+            pretty newpath pretty oldpath
         end;
       newrep.ndata.vattr <- Ast_attributes.add_list oldvi.vattr vi.vattr;
       newrep.ndata.vdecl <- newdecl

@@ -33,7 +33,7 @@ class printer : Format.formatter -> string ->
     method printf : 'a. ('a,Format.formatter,unit) format -> 'a
   end
 
-val pp_file : message:string -> file:Filepath.Normalized.t -> unit
+val pp_file : message:string -> file:Filepath.t -> unit
 
 (** never fails *)
 class type pattern =
@@ -81,7 +81,7 @@ class virtual command : string ->
     method validate_time : (float -> unit) -> unit
     method validate_pattern : ?logs:logs -> ?repeat:bool ->
       Str.regexp -> (pattern -> unit) -> unit
-    method run : ?echo:bool -> ?logout:Filepath.Normalized.t -> ?logerr:Filepath.Normalized.t ->
+    method run : ?echo:bool -> ?logout:Filepath.t -> ?logerr:Filepath.t ->
       unit -> int Task.task
 
   end

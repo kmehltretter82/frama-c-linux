@@ -243,7 +243,7 @@ external address_of_value: 'a -> int = "address_of_value" [@@noalloc]
 (** {2 System commands} *)
 (* ************************************************************************* *)
 
-val mkdir : ?parents:bool -> Filepath.Normalized.t -> Unix.file_perm -> bool
+val mkdir : ?parents:bool -> Filepath.t -> Unix.file_perm -> bool
 (** [mkdir ?parents name perm] creates directory [name] with permission
     [perm]. If [parents] is true, recursively create parent directories
     if needed. [parents] defaults to false.
@@ -279,7 +279,7 @@ val temp_file_cleanup_at_exit: ?debug:bool -> string -> string -> string
     @raise Temp_file_error if the temp file cannot be created.
 *)
 
-val temp_dir_cleanup_at_exit: ?debug:bool -> string -> Filepath.Normalized.t
+val temp_dir_cleanup_at_exit: ?debug:bool -> string -> Filepath.t
 (** @raise Temp_file_error if the temp dir cannot be created.
     @since 28.0-Nickel modify return type *)
 

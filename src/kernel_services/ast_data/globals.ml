@@ -94,7 +94,7 @@ module Vars = struct
       iter_glob
         (fun v ->
            v.vname = name &&
-           Filepath.Normalized.equal file (fst v.vdecl).pos_path)
+           Filepath.equal file (fst v.vdecl).pos_path)
     | Whole_function kf ->
       List.find (fun v -> v.vname = name) (get_locals kf @ !get_statics kf)
     | Formal kf ->

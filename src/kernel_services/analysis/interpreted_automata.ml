@@ -1284,7 +1284,7 @@ sig
     val to_dot_output : (Format.formatter -> state -> unit) ->
       result -> out_channel -> unit
     val to_dot_file : (Format.formatter -> state -> unit) ->
-      result -> Filepath.Normalized.t -> unit
+      result -> Filepath.t -> unit
     val as_table : result -> state Vertex.Hashtbl.t
   end
 end
@@ -1350,7 +1350,7 @@ struct
       | Ok () -> ()
       | Error error ->
         Kernel.warning "cannot output automaton to dot file %a: %s"
-          Filepath.Normalized.pretty filepath error
+          Filepath.pretty filepath error
 
     let as_table (_automaton,_wto,states) =
       states

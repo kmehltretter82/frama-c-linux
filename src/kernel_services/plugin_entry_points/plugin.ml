@@ -146,7 +146,7 @@ struct
      E.g. in `frama-c -plugin1-log file.txt -then -plugin2-log file.txt`,
      the formatter avoids Frama-C from opening file.txt a second time, which
      would truncate its contents. *)
-  let file_formatters : (string, Format.formatter) Hashtbl.t =
+  let file_formatters : (Filepath.t, Format.formatter) Hashtbl.t =
     Hashtbl.create 0
 
   (* Opens and returns a new file formatter if the file has not been opened
@@ -155,12 +155,12 @@ struct
     (* Note: normalized paths are not necessarily canonical, so if the
        command-line arguments are unusual, this may fail to detect two
        filenames as referring to the same file. *)
-    let normalized_filename = Filepath.normalize filename in
+    let normalized_filename = Filepath.of_string filename in
     try
       Hashtbl.find file_formatters normalized_filename
     with
     | Not_found ->
-      let oc = open_out normalized_filename in
+      let oc = open_out (normalized_filename :> string)in
       let fmt = Format.formatter_of_out_channel oc in
       Hashtbl.add file_formatters normalized_filename fmt;
       Extlib.safe_at_exit (fun () -> close_out oc);
@@ -312,16 +312,16 @@ struct
 
     let add_plugin path =
       if is_kernel then path
-      else Fc_Filepath.Normalized.concat path plugin_subpath
+      else Fc_Filepath.concat path plugin_subpath
 
     let dirs () =
       if is_visible && is_set () then [ get () ]
       else List.map add_plugin System_config.Share.dirs
 
     let find ~is_dir relative =
-      let exception Found of Fc_Filepath.Normalized.t in
+      let exception Found of Fc_Filepath.t in
       let check_presence dir =
-        let path = Fc_Filepath.Normalized.concat dir relative in
+        let path = Fc_Filepath.concat dir relative in
         if Fc_Filepath.exists path then raise (Found path)
       in
       try
@@ -334,7 +334,7 @@ struct
       with
       | Found path when is_dir <> Fc_Filepath.is_dir path ->
         L.abort "%a is expected to be a %s"
-          Fc_Filepath.Normalized.pretty path
+          Fc_Filepath.pretty path
           (if is_dir then "directory" else "file")
       | Found path -> path
 
@@ -345,13 +345,13 @@ struct
   module Make_user_dir_root
       (D: sig
          val name : string
-         val default_root : unit -> Fc_Filepath.Normalized.t
-         val kernel_get : unit -> Fc_Filepath.Normalized.t
+         val default_root : unit -> Fc_Filepath.t
+         val kernel_get : unit -> Fc_Filepath.t
          val is_visible : bool
        end)
   =
   struct
-    open Fc_Filepath.Normalized
+    open Fc_Filepath
 
     let is_visible = D.is_visible
     let is_kernel = P.name = ""
@@ -423,7 +423,7 @@ struct
   module Session = Make_user_dir_root
       (struct
         let name = "session"
-        let default_root () = Fc_Filepath.Normalized.of_string "./.frama-c"
+        let default_root () = Fc_Filepath.of_string "./.frama-c"
         let kernel_get () = !session_ref ()
         let is_visible = !session_visible_ref
       end)

@@ -81,7 +81,7 @@ let load_file w ?title ~(filename : Datatype.Filepath.t) ?(line=(-1)) ~click_cb 
       try Hashtbl.find w.file_index filename
       with Not_found ->
         let name = match title with
-          | None -> Filepath.Normalized.to_pretty_string filename
+          | None -> Filepath.to_pretty_string filename
           | Some s -> s
         in
         let label = GMisc.label ~text:name () in
@@ -101,7 +101,7 @@ let load_file w ?title ~(filename : Datatype.Filepath.t) ?(line=(-1)) ~click_cb 
         let s =
           match Parse_env.open_source ~scan_references (filename :> string) with
           | Error _msg ->
-            let f = Filepath.Normalized.to_pretty_string filename in
+            let f = Filepath.to_pretty_string filename in
             "Error: cannot open file '" ^ f ^ "'"
           | Ok s -> s
         in

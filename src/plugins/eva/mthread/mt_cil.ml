@@ -28,7 +28,7 @@ let mthread_global_var var_name () =
   with Not_found ->
     Mt_options.fatal
       "Variable@ %s@ not@ found.@ It@ should@ be@ in@ %a."
-      var_name Filepath.Normalized.pretty (Mt_lib.mthread_h ())
+      var_name Filepath.pretty (Mt_lib.mthread_h ())
 
 let is_call_to_sync stmt =
   match stmt.skind with

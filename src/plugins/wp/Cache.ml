@@ -43,7 +43,7 @@ let mark_cache ~mode hash =
 module CACHEDIR = WpContext.StaticGenerator(Datatype.Unit)
     (struct
       type key = unit
-      type data = Filepath.Normalized.t
+      type data = Filepath.t
       let name = "Wp.Cache.dir"
       let compile () =
         try
@@ -51,12 +51,12 @@ module CACHEDIR = WpContext.StaticGenerator(Datatype.Unit)
             raise Not_found ;
           let gdir = Sys.getenv "FRAMAC_WP_CACHEDIR" in
           if gdir = "" then raise Not_found ;
-          Filepath.Normalized.of_string gdir
+          Filepath.of_string gdir
         with Not_found ->
         try
           let gdir = Wp_parameters.CacheDir.get() in
           if gdir = "" then raise Not_found ;
-          Filepath.Normalized.of_string gdir
+          Filepath.of_string gdir
         with Not_found ->
           Wp_parameters.get_session_dir ~force:false "cache"
     end)
@@ -64,7 +64,7 @@ module CACHEDIR = WpContext.StaticGenerator(Datatype.Unit)
 let get_dir () = (CACHEDIR.get () :> string)
 
 let is_session_dir path =
-  0 = Filepath.Normalized.compare
+  0 = Filepath.compare
     path (Wp_parameters.get_session_dir ~force:false "cache")
 
 let get_usable_dir ?(make=false) () =
@@ -75,7 +75,7 @@ let get_usable_dir ?(make=false) () =
   if not (Filepath.is_dir path) then begin
     Wp_parameters.warning ~current:false ~once:true
       "Cache path %a is not a directory"
-      Filepath.Normalized.pretty path;
+      Filepath.pretty path;
     raise Not_found
   end;
   path
@@ -186,7 +186,7 @@ let get_cache_result ~mode hash =
     try
       let hash = Lazy.force hash in
       let file = file_from_hash hash in
-      let path = Filepath.Normalized.of_string file in
+      let path = Filepath.of_string file in
       if not (Filepath.exists path) then VCS.no_result
       else
         try
@@ -205,7 +205,7 @@ let set_cache_result ~mode hash prover result =
     let hash = Lazy.force hash in
     try
       let file = file_from_hash hash in
-      let path = Filepath.Normalized.of_string file in
+      let path = Filepath.of_string file in
       mark_cache ~mode hash ;
       ProofScript.json_of_result (VCS.Why3 prover) result
       |> Json.save_file path

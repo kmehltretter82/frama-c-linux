@@ -474,15 +474,15 @@ and bal = parse
     with exn ->
       Wp_parameters.abort
         ~current:false
-        "Error in driver '%a': %s" Filepath.Normalized.pretty file (Printexc.to_string exn)
+        "Error in driver '%a': %s" Filepath.pretty file (Printexc.to_string exn)
 
-  let loaded : (Filepath.Normalized.t list, driver) Hashtbl.t =Hashtbl.create 10
+  let loaded : (Filepath.t list, driver) Hashtbl.t =Hashtbl.create 10
   let load_driver () =
     let drivers = Wp_parameters.Drivers.get () in
     begin try
         Hashtbl.find loaded drivers
       with Not_found ->
-        let driver_basename (file : Filepath.Normalized.t) =
+        let driver_basename (file : Filepath.t) =
         let base = Filename.basename (file :> string) in
         try Filename.chop_extension base
         with Invalid_argument _ -> base in
@@ -497,7 +497,7 @@ and bal = parse
             Wp_parameters.debug ~dkey "Included directories:%t"
               (fun fmt ->
                  List.iter
-                   (fun d -> Format.fprintf fmt "@\n - '%a'" Filepath.Normalized.pretty d)
+                   (fun d -> Format.fprintf fmt "@\n - '%a'" Filepath.pretty d)
                    directories
               );
           directories

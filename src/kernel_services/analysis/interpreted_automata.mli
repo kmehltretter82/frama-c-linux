@@ -292,7 +292,7 @@ sig
     (** Output result to a file with the given path. Must be supplied with
         pretty printer for abstract values *)
     val to_dot_file : (Format.formatter -> state -> unit) ->
-      result -> Filepath.Normalized.t -> unit
+      result -> Filepath.t -> unit
 
     (** Extract the result as a table from control points to states *)
     val as_table : result -> state Vertex.Hashtbl.t

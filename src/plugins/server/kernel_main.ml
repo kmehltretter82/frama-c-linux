@@ -115,9 +115,9 @@ let () =
       set_version rq System_config.Version.id ;
       set_codename rq System_config.Version.codename ;
       set_version_codename rq System_config.Version.id_and_codename ;
-      set_datadir rq (Filepath.Normalized.to_string_list System_config.Share.dirs);
+      set_datadir rq (Filepath.to_string_list System_config.Share.dirs);
       set_pluginpath rq
-        (Filepath.Normalized.to_string_list System_config.Plugins.dirs) ;
+        (Filepath.to_string_list System_config.Plugins.dirs) ;
     end
 
 (* -------------------------------------------------------------------------- *)

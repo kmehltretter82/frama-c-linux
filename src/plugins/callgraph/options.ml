@@ -100,7 +100,7 @@ module Uncalled_leaf =
 let dump output g =
   let file = Filename.get () in
   feedback ~level:2 "dumping the graph into file %a"
-    Fc_Filepath.Normalized.pretty file;
+    Fc_Filepath.pretty file;
   try
     let cout = open_out (file:>string) in
     output cout g;

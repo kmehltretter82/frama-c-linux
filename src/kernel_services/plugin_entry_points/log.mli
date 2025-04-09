@@ -456,7 +456,7 @@ val kernel_label_name: string
 (** the reserved label name used by the Frama-C kernel.
     @since Beryllium-20090601-beta1 *)
 
-val source : file:Filepath.Normalized.t -> line:int -> Filepath.position
+val source : file:Filepath.t -> line:int -> Filepath.position
 (** @since Chlorine-20180501 *)
 
 val get_current_source : unit -> Filepath.position
