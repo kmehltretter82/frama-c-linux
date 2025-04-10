@@ -824,7 +824,7 @@ class visitor (ctx:context) c =
           let tgtdir = WpContext.directory () in
           let why3src = Filepath.basename source in
           let target = Filepath.Normalized.concat tgtdir (why3src :> string) in
-          Command.copy source target
+          Filepath.copy source target
       in
       let iter_file opt =
         match Str.split_delim regexp_col opt with
@@ -1333,19 +1333,18 @@ let output_task wpo drv ?(script : Filepath.Normalized.t option) prover task =
       ~pid:wpo.Wpo.po_pid
       ~model:wpo.Wpo.po_model
       ~prover:(VCS.Why3 prover) in
-  Command.print_file file
-    begin fun fmt ->
-      Format.fprintf fmt "(* WP Task for Prover %s *)@\n"
-        (Why3Provers.ident_why3 prover) ;
-      let old = Option.map
-          (fun fscript ->
-             let hash = Digest.file fscript |> Digest.to_hex in
-             Format.fprintf fmt "(* WP Script %s *)@\n" hash ;
-             open_in fscript
-          ) (script :> string option) in
-      let _ = Why3.Driver.print_task_prepared ?old drv fmt task in
-      Option.iter close_in old ;
-    end
+  let open Filepath.Operators in
+  let$ fmt = Filepath.with_formatter_exn file in
+  Format.fprintf fmt "(* WP Task for Prover %s *)@\n"
+    (Why3Provers.ident_why3 prover) ;
+  let old = Option.map
+      (fun fscript ->
+         let hash = Digest.file fscript |> Digest.to_hex in
+         Format.fprintf fmt "(* WP Script %s *)@\n" hash ;
+         open_in fscript
+      ) (script :> string option) in
+  let _ = Why3.Driver.print_task_prepared ?old drv fmt task in
+  Option.iter close_in old
 
 
 let digest_task wpo drv ?(script : Filepath.Normalized.t option) prover task =
@@ -1415,12 +1414,12 @@ let scriptfile ~force ~ext wpo =
 let updatescript ~script driver task =
   let backup = Filepath.Normalized.extend script ".bak" in
   Filepath.rename script backup ;
-  let old = open_in (backup :> string) in
-  Command.pp_to_file script
-    (fun fmt ->
-       ignore @@ Why3.Driver.print_task_prepared ~old driver fmt task
-    );
-  close_in old ;
+  let _printing_info =
+    let open Filepath.Operators in
+    let$ old = Filepath.with_open_in_exn backup in
+    let$ fmt = Filepath.with_formatter_exn script in
+    Why3.Driver.print_task_prepared ~old driver fmt task
+  in
   let d_old = Digest.file (backup :> string) in
   let d_new = Digest.file (script :> string) in
   if String.equal d_new d_old then Extlib.safe_remove (backup :> string)
@@ -1449,10 +1448,9 @@ let prepare ~mode wpo driver task =
   if Filepath.exists script then Some (script, true) else
   if force then
     begin
-      Command.pp_to_file script
-        (fun fmt ->
-           ignore @@ Why3.Driver.print_task_prepared driver fmt task
-        );
+      let open Filepath.Operators in
+      let$ fmt = Filepath.with_formatter_exn script in
+      ignore @@ Why3.Driver.print_task_prepared driver fmt task;
       Some (script, false)
     end
   else None

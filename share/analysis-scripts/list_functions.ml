@@ -158,15 +158,16 @@ class fun_cabs_visitor print_libc = object(self)
 
 end
 
-let print_json (fp : Filepath.Normalized.t) funinfos_json =
-  try
-    let oc = open_out (fp:>string) in
-    let fmt = Format.formatter_of_out_channel oc in
-    Json.pp fmt funinfos_json;
-    Format.fprintf fmt "@.";
-    close_out oc;
+let print_json fp funinfos_json =
+  let open Filepath.Operators in
+  let result =
+    let+ fmt = Filepath.with_formatter fp in
+    Format.fprintf fmt "%a@." Json.pp funinfos_json;
+  in
+  match result with
+  | Ok () ->
     Self.debug "List written to: %a" Filepath.Normalized.pretty fp
-  with Sys_error msg ->
+  | Error msg ->
     Self.abort "cannot write JSON to %a: %s"
       Filepath.Normalized.pretty fp msg
 

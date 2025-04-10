@@ -617,13 +617,16 @@ let gen_report ~draft:is_draft () =
     Mdr_params.error "No output file specified (use option %s)."
       Mdr_params.Output.option_name
   else
-    try
-      Command.print_file file
-        (fun fmt ->
-           Markdown.pp_pandoc fmt doc;
-           Format.pp_print_newline fmt ()) ;
+    let open Filepath.Operators in
+    let result =
+      let+ fmt = Filepath.with_formatter file in
+      Markdown.pp_pandoc fmt doc;
+      Format.pp_print_newline fmt ();
+    in
+    match result with
+    | Ok () ->
       Mdr_params.result "Report %a generated" Filepath.Normalized.pretty file
-    with Sys_error s ->
+    | Error s ->
       Mdr_params.warning
         "Unable to open %a for writing (%s). No report generated"
         Filepath.Normalized.pretty file s

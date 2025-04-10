@@ -1016,10 +1016,12 @@ let () = on_reset Print.clear
 let () = Parameter_customize.set_group wp_po
 let () = Parameter_customize.do_not_save ()
 module Report =
-  String_list
+  Filepath_list
     (struct
       let option_name = "-wp-report"
       let arg_name = "report,..."
+      let file_kind = "Report"
+      let existence = Fc_Filepath.Indifferent
       let help = "Report specification file(s)"
     end)
 
@@ -1223,7 +1225,7 @@ let print_generated ?header file =
       if not (Fc_Filepath.exists file) then
         Format.pp_print_string fmt "<missing file>"
       else
-        Command.read_lines file (fun s ->
+        Fc_Filepath.iter_lines file (fun s ->
             Format.pp_print_string fmt s;
             Format.pp_print_newline fmt ())
     end

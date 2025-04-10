@@ -138,7 +138,7 @@ val command :
   ?time:float ref ->
   ?stdout:Buffer.t ->
   ?stderr:Buffer.t ->
-  string -> string array -> int task
+  string -> string list -> int task
 (** Immediately launch a system-process.
     Default timeout is [0], which means no-timeout at all.
     Standard outputs are discarded unless optional buffers are provided.

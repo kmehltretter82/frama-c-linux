@@ -230,13 +230,8 @@ let save_channel ?(pretty=true) out v =
 let save_formatter ?(pretty=true) fmt v =
   if pretty then pp fmt v else pp_dump fmt v
 
-let save_file ?(pretty=true) (file : Filepath.Normalized.t) v =
-  let out = open_out (file :> string) in
-  try
-    save_channel ~pretty out v ;
-    close_out out
-  with e ->
-    close_out out ; raise e
+let save_file ?(pretty=true) file v =
+  Filepath.with_open_out_exn file (fun out -> save_channel ~pretty out v)
 
 let invalid name = raise (Invalid_argument ("Json." ^ name))
 

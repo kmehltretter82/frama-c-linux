@@ -112,7 +112,8 @@ let dump_buffer buffer = function
   | Some log ->
     let n = Buffer.length buffer in
     if n > 0 then
-      Command.write_file log (fun out -> Buffer.output_buffer out buffer)
+      Filepath.with_open_out_exn log
+        (fun out -> Buffer.output_buffer out buffer)
     else if Wp_parameters.has_out () then
       Extlib.safe_remove (log :> string)
 
@@ -226,10 +227,9 @@ class command name =
     method run ?(echo=false) ?logout ?logerr () : int Task.task =
       assert once ; once <- false ;
       let time = ref 0.0 in
-      let args = Array.of_list param in
       Buffer.clear stdout ;
       Buffer.clear stderr ;
-      Task.command ~timeout ~time ~stdout ~stderr cmd args
+      Task.command ~timeout ~time ~stdout ~stderr cmd param
       >>?
       begin fun st -> (* finally *)
         if Wp_parameters.has_dkey dkey_prover then

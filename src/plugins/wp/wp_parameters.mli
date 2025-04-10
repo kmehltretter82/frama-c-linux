@@ -145,7 +145,7 @@ module BackTrack: Parameter_sig.Int
 module TruncPropIdFileName: Parameter_sig.Int
 module Print: Parameter_sig.Bool
 module Status: Parameter_sig.Bool
-module Report: Parameter_sig.String_list
+module Report: Parameter_sig.Filepath_list
 module ReportJson: Parameter_sig.Filepath
 module OldReportJson: Parameter_sig.String
 module ReportName: Parameter_sig.String

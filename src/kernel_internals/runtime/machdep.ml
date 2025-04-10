@@ -641,22 +641,15 @@ let gen_all_defines fmt mach =
     gen_include fmt "__fc_gcc_builtins.h";
   Format.fprintf fmt "#endif // __FC_MACHDEP@\n"
 
-let create_file gen (fp : Filepath.Normalized.t) =
-  let chan = open_out (fp:>string) in
-  let fmt = Format.formatter_of_out_channel chan in
-  gen fmt;
-  flush chan;
-  close_out chan
-
 let generate_machdep_header ?(censored_macros=Datatype.String.Set.empty) mach =
   let debug = Kernel.(is_debug_key_enabled dkey_pp_keep_temp_files) in
   let temp = Extlib.temp_dir_cleanup_at_exit ~debug "__fc_machdep" in
   let fc_machdep = Filepath.Normalized.concat temp "__fc_machdep.h" in
   let gen_machdep = Fun.flip gen_all_defines mach in
-  create_file gen_machdep fc_machdep;
+  Filepath.with_formatter_exn fc_machdep gen_machdep;
   let fc_builtins = Filepath.Normalized.concat temp "__fc_builtin_macros.h" in
   let gen_builtins =
     Fun.(flip (flip gen_define_custom_macros censored_macros) mach)
   in
-  create_file gen_builtins fc_builtins;
+  Filepath.with_formatter_exn fc_builtins gen_builtins ;
   temp

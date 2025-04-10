@@ -71,5 +71,5 @@ include S
 val add_state: State.t -> State.t list -> unit
 
 module Attributes: Attributes
-module Dot(_: Attributes) : sig val dump: string -> unit end
-val dump: string -> unit
+module Dot(_: Attributes) : sig val dump: Filepath.Normalized.t -> unit end
+val dump: Filepath.Normalized.t -> unit

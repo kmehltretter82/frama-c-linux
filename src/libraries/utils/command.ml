@@ -21,23 +21,12 @@
 (**************************************************************************)
 
 (* -------------------------------------------------------------------------- *)
-(* --- File Utilities                                                     --- *)
+(* --- Pretty from files                                                  --- *)
 (* -------------------------------------------------------------------------- *)
 
-let pp_to_file f pp =
+let pp_from_file fmt path =
   let open Filepath.Operators in
-  let$ cout = Filepath.with_open_out_exn f in
-  let fout = Format.formatter_of_out_channel cout in
-  try
-    pp fout ;
-    Format.pp_print_flush fout ()
-  with err ->
-    Format.pp_print_flush fout () ;
-    raise err
-
-let pp_from_file fmt file =
-  let open Filepath.Operators in
-  let$ cin = Filepath.with_open_in_exn file in
+  let$ cin = Filepath.with_open_in_exn path in
   try
     while true do
       Async.yield () ;
@@ -47,43 +36,6 @@ let pp_from_file fmt file =
     done
   with
   | End_of_file -> ()
-
-let rec bincopy buffer cin cout =
-  let s = Bytes.length buffer in
-  let n = input cin buffer 0 s in
-  if n > 0 then
-    ( output cout buffer 0 n ; bincopy buffer cin cout )
-  else
-    ( flush cout )
-
-let copy src tgt =
-  let open Filepath.Operators in
-  let$ inc = Filepath.with_open_in_exn src in
-  let$ out = Filepath.with_open_out_exn tgt in
-  bincopy (Bytes.create 2048) inc out
-
-let read_file file job =
-  Filepath.with_open_in_exn file job
-
-let read_lines file job =
-  let open Filepath.Operators in
-  let$ inc = Filepath.with_open_in_exn file in
-  try
-    while true do
-      job (input_line inc) ;
-    done
-  with End_of_file -> ()
-
-let write_file file job =
-  assert (not (Filepath.Normalized.is_empty file));
-  Filepath.with_open_out_exn file job
-
-let print_file file job =
-  write_file file
-    (fun out ->
-       let fmt = Format.formatter_of_out_channel out in
-       let finally () = Format.pp_print_flush fmt () in
-       Fun.protect ~finally (fun () -> job fmt))
 
 (* -------------------------------------------------------------------------- *)
 (* --- Timing                                                             --- *)
@@ -146,7 +98,7 @@ let flush b f =
   match b with
   | None -> ()
   | Some b ->
-    try read_lines f
+    try Filepath.iter_lines f
           (fun line -> Buffer.add_string b line ; Buffer.add_char b '\n') ;
     with Sys_error _ -> ()
 
@@ -177,7 +129,7 @@ let command_generic ~async ?stdout ?stderr cmd args =
       Extlib.safe_remove errf;
     end in
   let deleted = cancelable_at_exit delete in
-  let pid = Unix.create_process cmd (Array.append [|cmd|] args)
+  let pid = Unix.create_process cmd (Array.of_list (cmd :: args))
       (Unix.descr_of_out_channel inc)
       (Unix.descr_of_out_channel outc)
       (Unix.descr_of_out_channel errc)
@@ -215,10 +167,10 @@ let command_generic ~async ?stdout ?stderr cmd args =
         end
   end
 
-let command_async ?stdout ?stderr cmd args =
+let async ?stdout ?stderr cmd args =
   command_generic ~async:true ?stdout ?stderr cmd args
 
-let command ?(timeout=0) ?stdout ?stderr cmd args =
+let spawn ?(timeout=0) ?stdout ?stderr cmd args =
   if System_config.is_gui || timeout > 0 then
     let f = command_generic ~async:true ?stdout ?stderr cmd args in
     let res = ref(Unix.WEXITED 99) in
@@ -246,3 +198,18 @@ let command ?(timeout=0) ?stdout ?stderr cmd args =
     match f () with
     | Result r -> r
     | Not_ready _ -> assert false
+
+let command_async = async
+let command = spawn
+
+(* -------------------------------------------------------------------------- *)
+(* --- Deprecated file Utilities                                          --- *)
+(* -------------------------------------------------------------------------- *)
+
+let bincopy = Filepath.bincopy [@alert "-deprecated"]
+let copy = Filepath.copy
+let read_file p = Filepath.with_open_in_exn p
+let read_lines = Filepath.iter_lines
+let write_file p = Filepath.with_open_out_exn p
+let pp_to_file = Filepath.with_formatter_exn
+let print_file = Filepath.with_formatter_exn
