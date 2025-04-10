@@ -111,44 +111,43 @@ function Usage
 
 function Head()
 {
-    echo "# $@"
+    echo "# $*"
 }
 
 function Error ()
 {
-    echo "Error: $@"
+    echo "Error: $*"
     exit 1
 }
 
 function ErrorUsage ()
 {
-    echo "Error: $@"
+    echo "Error: $*"
     echo "USAGE: ${THIS_SCRIPT} -h"
     exit 1
 }
 
 function Echo()
 {
-    [ "$VERBOSE" != "yes" ] || echo $@
+    [ "$VERBOSE" != "yes" ] || echo "$@"
 }
 
 function Run
 {
-    Echo "> $@"
-    $@
+    Echo "> $*"
+    "$@"
 }
 
 function Cmd
 {
-    Run $@
-    [ "$?" = "0" ] || Error "(command exits $?): $@"
+    Run "$@" || Error "(command exits $?): $*"
 }
 
 function RequiredTools
 {
     local tool
-    for tool in $@ ; do
-        Where=$(which $tool) || Error "Executable not found: $tool"
+    for tool in "$@" ; do
+        which "$tool" >/dev/null 2>&1 || Error "Executable not found: $tool"
     done
 }
 
@@ -293,7 +292,7 @@ function CloneCache
     if [ ! -d "$FRAMAC_WP_CACHEDIR" ]; then
         Head "Cloning WP cache (from $FRAMAC_WP_CACHE_GIT to $FRAMAC_WP_CACHEDIR)..."
         RequiredTools git
-        Cmd git clone $FRAMAC_WP_CACHE_GIT $FRAMAC_WP_CACHEDIR
+        Cmd git clone "$FRAMAC_WP_CACHE_GIT" "$FRAMAC_WP_CACHEDIR"
     fi
 }
 
@@ -303,7 +302,7 @@ function PullCache
     then
         Head "Pull WP cache (to $FRAMAC_WP_CACHEDIR)..."
         RequiredTools git
-        Run git -C $FRAMAC_WP_CACHEDIR pull --rebase
+        Run git -C "$FRAMAC_WP_CACHEDIR" pull --rebase
     fi
 }
 
@@ -313,7 +312,8 @@ function PullCache
 
 function PrepareCoverage
 {
-    export BISECT_FILE="$(pwd -P)/_bisect/bisect-"
+    BISECT_FILE="$(pwd -P)/_bisect/bisect-"
+    export BISECT_FILE
     if [ "$COVER" = "yes" ] ;
     then
         Cmd rm -rf _coverage
@@ -370,7 +370,7 @@ function CheckDuneFiles
                                     -exec stat --printf "%Y\n" {} \+ | \
                                     sort -n -r | head -n 1)
             DATE_TEST_GENERATION=$(stat $default_file --printf "%Y\n")
-            if [ $DATE_TEST_MODIFICATION -gt $DATE_TEST_GENERATION ] ;
+            if [ "$DATE_TEST_MODIFICATION" -gt "$DATE_TEST_GENERATION" ] ;
             then
                 GenerateDuneFiles
             fi
@@ -417,7 +417,7 @@ function RunAlias
         Run dune build "${commands[@]}"
     else
         # note: the Run function cannot performs redirection
-        echo "> dune build ${commands[@]} 2> >(tee -a $DUNE_LOG >&2)"
+        echo "> dune build ${commands[*]} 2> >(tee -a $DUNE_LOG >&2)"
         dune build "${commands[@]}" 2> >(tee -a "$DUNE_LOG" >&2)
     fi
 }
@@ -467,8 +467,8 @@ function TestDir
 function TestFile
 {
     local dir file alias result cfg res
-    dir=$(dirname $1)
-    file=$(basename $1)
+    dir=$(dirname "$1")
+    file=$(basename "$1")
 
     case "$CONFIG" in
         "<all>")
@@ -552,11 +552,10 @@ function Register
 
 function MissingOracles
 {
-    Run command -v frama-c-ptests 2>&1 >/dev/null
-    if [ $? -eq 0 ] ; then
-        Cmd frama-c-ptests "$1" "${PTESTS_DIR[@]}" 2>&1 >/dev/null
+    if Run which frama-c-ptests >/dev/null 2>&1 ; then
+        Cmd frama-c-ptests "$1" "${PTESTS_DIR[@]}" >/dev/null 2>&1
     else
-        Cmd dune exec -- frama-c-ptests "$1" "${PTESTS_DIR[@]}" 2>&1 >/dev/null
+        Cmd dune exec -- frama-c-ptests "$1" "${PTESTS_DIR[@]}" >/dev/null 2>&1
     fi
 }
 
@@ -601,7 +600,7 @@ function Status
             fi
         fi
         if [ "$SAVE" != "yes" ]; then
-            Cmd rm -f $1
+            Cmd rm -f "$1"
         fi
     fi
 
@@ -609,8 +608,8 @@ function Status
     if [ "$UPDATE" = "yes" ]; then
         Head "Update $FRAMAC_WP_CACHEDIR and check status"
         RequiredTools git
-        Run git -C $FRAMAC_WP_CACHEDIR add -A
-        Run git -C $FRAMAC_WP_CACHEDIR status -s
+        Run git -C "$FRAMAC_WP_CACHEDIR" add -A
+        Run git -C "$FRAMAC_WP_CACHEDIR" status -s
     fi
 }
 
