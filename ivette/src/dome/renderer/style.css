@@ -2,6 +2,10 @@
 /* --- Main Dome Styles                                                   --- */
 /* -------------------------------------------------------------------------- */
 
+:root {
+  --help-modal-fontsize: 13px;
+}
+
 * {
   user-select: none;
   box-sizing: border-box;
