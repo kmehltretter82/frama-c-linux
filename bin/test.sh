@@ -146,6 +146,7 @@ function Cmd
 
 function RequiredTools
 {
+    local tool
     for tool in $@ ; do
         Where=$(which $tool) || Error "Executable not found: $tool"
     done
@@ -355,10 +356,10 @@ function GenerateDuneFiles
 
 function CheckDuneFiles
 {
-    DEFAULT_FILE=tests/syntax/result/dune
+    local default_file="tests/syntax/result/dune"
     if [ "$PREPARE" != "yes" ] ;
     then
-        if [ ! -f "$DEFAULT_FILE" ] ;
+        if [ ! -f "$default_file" ] ;
         then
             GenerateDuneFiles
         else
@@ -367,7 +368,7 @@ function CheckDuneFiles
                                     -not -path "*/oracle*/*" \
                                     -exec stat --printf "%Y\n" {} \+ | \
                                     sort -n -r | head -n 1)
-            DATE_TEST_GENERATION=$(stat $DEFAULT_FILE --printf "%Y\n")
+            DATE_TEST_GENERATION=$(stat $default_file --printf "%Y\n")
             if [ $DATE_TEST_MODIFICATION -gt $DATE_TEST_GENERATION ] ;
             then
                 GenerateDuneFiles
@@ -378,6 +379,7 @@ function CheckDuneFiles
 
 function PrepareTests
 {
+    local dir
     if [ -z "$TESTS" ] && (( ${#DUNE_ALIAS[@]} == 0 )); then
         DUNE_ALIAS+=("@runtest")
         for dir in $TEST_DIRS ; do
@@ -423,19 +425,19 @@ function RunAlias
 
 function TestDir
 {
-    local ALIAS
+    local alias cfg test
     case "$CONFIG" in
         "<all>")
-            ALIAS=$1/${ALIAS_NAME}
-            CFG="(all configs)"
+            alias=$1/${ALIAS_NAME}
+            cfg="(all configs)"
             ;;
         "<default>")
-            ALIAS=$1/${ALIAS_NAME}_config
-            CFG="(default config)"
+            alias=$1/${ALIAS_NAME}_config
+            cfg="(default config)"
             ;;
         *)
-            ALIAS=$1/${ALIAS_NAME}_config_$CONFIG
-            CFG="(config $CONFIG)"
+            alias=$1/${ALIAS_NAME}_config_$CONFIG
+            cfg="(config $CONFIG)"
             ;;
     esac
 
@@ -446,14 +448,13 @@ function TestDir
     if [[ ! "${DUNE_ALIAS[*]}" =~ "@runtest" ]]; then
         # Find all files and folders ending with ".t" except run.t files, and
         # add their respective aliases to DUNE_ALIAS.
-        cramtests=$(find "$1" -name '*.t' ! -name 'run.t')
-        for test in $cramtests ; do
+        for test in $(find "$1" -name '*.t' ! -name 'run.t') ; do
             DUNE_ALIAS+=("@${test%.*}")
         done
     fi
 
-    Head "Register test on directory $1 $CFG"
-    DUNE_ALIAS+=("@$ALIAS")
+    Head "Register test on directory $1 $cfg"
+    DUNE_ALIAS+=("@$alias")
 }
 
 # --------------------------------------------------------------------------
@@ -462,41 +463,41 @@ function TestDir
 
 function TestFile
 {
-    DIR=$(dirname $1)
-    FILE=$(basename $1)
-    local ALIAS
+    local dir file alias result cfg res
+    dir=$(dirname $1)
+    file=$(basename $1)
 
     case "$CONFIG" in
         "<all>")
-            RESULT=result*/
-            CFG="(all config)"
+            result="result*/"
+            cfg="(all config)"
             ;;
         "<default>")
-            RESULT=result
-            CFG="(default config)"
+            result="result/"
+            cfg="(default config)"
             ;;
         *)
-            RESULT=result_$CONFIG
-            CFG="(config $CONFIG)"
+            result="result_$CONFIG/"
+            cfg="(config $CONFIG)"
             ;;
     esac
 
-    RESULTS="$DIR/$RESULT"
-    for res in $RESULTS ; do
+    result="$dir/$result"
+    for res in $result ; do
         # Ignore cases where no result folder is found
         [ -d "$res" ] || break
 
         if [ "$LOGS" = "yes" ]; then
-            ALIAS+=" @$res/$FILE"
+            alias+=" @${res}${file}"
         else
-            ALIAS+=" @$res/${FILE%.*}.diff"
+            alias+=" @${res}${file%.*}.diff"
         fi
     done
 
-    FindPtestDir "$DIR"
+    FindPtestDir "$dir"
 
-    Head "Register test on file $1 $CFG"
-    DUNE_ALIAS+=("$ALIAS")
+    Head "Register test on file $1 $cfg"
+    DUNE_ALIAS+=("$alias")
 }
 
 # --------------------------------------------------------------------------
@@ -505,17 +506,17 @@ function TestFile
 
 function FindPtestDir
 {
-    local DIR="$1"
+    local dir="$1"
     if [ "$GENERATE" = "yes" ]; then
         # Look for the root folder of ptests, which contains ptests_config file
         # Only relative paths are accepted by dune, so the root folder of
         # every paths is '.'
-        while [ -d "$DIR" ] && [ "$DIR" != "." ]; do
-            if [ -f "$DIR/ptests_config" ]; then
-                PTESTS_DIR+=" $DIR"
+        while [ -d "$dir" ] && [ "$dir" != "." ]; do
+            if [ -f "$dir/ptests_config" ]; then
+                PTESTS_DIR+=" $dir"
                 break
             else
-                DIR=$(dirname "$DIR")
+                dir=$(dirname "$dir")
             fi
         done
     fi
@@ -579,19 +580,20 @@ function RemoveMissingOracles
 
 function Status
 {
+    local nb dir
     #-- Count number of executed tests
     if [ "$1" != "" ] && [ -f "$1" ]; then
         if [ "$VERBOSE" = "yes" ] ; then
             #-- Total
-            NB=$(grep -c "^frama-c-wtests " "$1")
-            Head "Number of executed frama-c-wtests= $NB"
+            nb=$(grep -c "^frama-c-wtests " "$1")
+            Head "Number of executed frama-c-wtests= $nb"
             #-- Details
             Head "Details by directory:"
-            if  [ "$NB" != "0" ]; then
+            if  [ "$nb" != "0" ]; then
                 for dir in $TESTS ; do
                     if [ -d "$dir" ]; then
-                        NB=$(grep -c "^frama-c-wtests $dir" "$1")
-                        [ "$NB" = "0" ] || echo "- $dir= $NB"
+                        nb=$(grep -c "^frama-c-wtests $dir" "$1")
+                        [ "$nb" = "0" ] || echo "- $dir= $nb"
                     fi
                 done
             fi
