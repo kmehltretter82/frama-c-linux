@@ -38,7 +38,7 @@ XML=
 JSON=
 
 PTESTS_DIR=
-DUNE_ALIAS=
+DUNE_ALIAS=()
 DUNE_OPT=
 DUNE_OPT_POST=
 DUNE_LOG=./.test-errors.log
@@ -220,7 +220,7 @@ do
         *)
             if [[ "$1" =~ ^@ ]]; then
                 Head "Register test on alias $1"
-                DUNE_ALIAS+=" $1"
+                DUNE_ALIAS+=("$1")
             elif [ "$1" != "${1#/}" ]; then
                 Error "Dune only accepts relative path, $1 is absolute"
             elif [ -f "$1" ] || [ -d "$1" ]; then
@@ -378,8 +378,8 @@ function CheckDuneFiles
 
 function PrepareTests
 {
-    if [ -z "$TESTS" ] && [ -z "$DUNE_ALIAS" ]; then
-        DUNE_ALIAS+=" @runtest"
+    if [ -z "$TESTS" ] && (( ${#DUNE_ALIAS[@]} == 0 )); then
+        DUNE_ALIAS+=("@runtest")
         for dir in $TEST_DIRS ; do
             if [ -d "$dir" ]; then
                 TESTS+=" $dir"
@@ -443,17 +443,17 @@ function TestDir
 
     # Add cramtests aliases from this folder unless @runtest is positionned,
     # meaning we're already running all cram tests
-    if [[ ! "$DUNE_ALIAS" =~ "@runtest" ]]; then
+    if [[ ! "${DUNE_ALIAS[*]}" =~ "@runtest" ]]; then
         # Find all files and folders ending with ".t" except run.t files, and
         # add their respective aliases to DUNE_ALIAS.
         cramtests=$(find "$1" -name '*.t' ! -name 'run.t')
         for test in $cramtests ; do
-            DUNE_ALIAS+=" @${test%.*}"
+            DUNE_ALIAS+=("@${test%.*}")
         done
     fi
 
     Head "Register test on directory $1 $CFG"
-    DUNE_ALIAS+=" @$ALIAS"
+    DUNE_ALIAS+=("@$ALIAS")
 }
 
 # --------------------------------------------------------------------------
@@ -496,7 +496,7 @@ function TestFile
     FindPtestDir "$DIR"
 
     Head "Register test on file $1 $CFG"
-    DUNE_ALIAS+=" $ALIAS"
+    DUNE_ALIAS+=("$ALIAS")
 }
 
 # --------------------------------------------------------------------------
@@ -526,7 +526,7 @@ function Register
     while [ "$1" != "" ]
     do
         if [ -e "$1" ] && [ "${1##*.}" == "t" ]; then
-            DUNE_ALIAS+=" @${1%.*}"
+            DUNE_ALIAS+=("@${1%.*}")
         elif [ -d "$1" ]; then
             TestDir "$1"
         elif [ -f "$1" ]; then
@@ -622,7 +622,7 @@ PrepareTests
 CheckDuneFiles
 Register $TESTS
 CreateMissingOracles
-RunAlias $(echo "$DUNE_ALIAS" | tr ' ' '\n' | sort -u)
+RunAlias $(IFS=$'\n'; sort -u <<<"${DUNE_ALIAS[*]}")
 RemoveMissingOracles
 Status $DUNE_LOG
 GenerateCoverage
