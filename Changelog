@@ -18,6 +18,9 @@
 Open Source Release <next-release>
 ###############################################################################
 
+o!  Kernel    [2025-04-10] Building types via `Cil_const` now uses
+              `Ast_types.add_attributes` and in case of array tries to push
+              qualifiers to the array elements, unless stated otherwise.
 -!  Kernel    [2025-03-21] Change API to register attributes, with now the
               possibility to ignore an attribute when comparing types, and
               to print or not the attribute in the AST. AttrIgnored was replaced
