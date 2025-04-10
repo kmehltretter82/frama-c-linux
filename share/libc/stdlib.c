@@ -193,7 +193,7 @@ unsigned short __fc_random48_counter[3];
 // Note: this implementation does not check the alignment, since it cannot
 //       currently be specified in the memory model of most plug-ins
 int posix_memalign(void **memptr, size_t alignment, size_t size) {
-  if (alignment < sizeof(void*) ||
+  if (alignment < sizeof(void*) || alignment % sizeof(void*) != 0 ||
       ((size_t)alignment & ((size_t)alignment - 1)) != 0) {
     return EINVAL;
   }

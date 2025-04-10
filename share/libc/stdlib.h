@@ -806,6 +806,13 @@ extern size_t wcstombs(char * restrict s,
      const wchar_t * restrict pwcs,
      size_t n);
 
+/*@
+  // Returns true iff n is a suitable alignment according to POSIX, i.e.,
+  // a power of two multiple of sizeof(void *).
+  predicate is_suitable_alignment(integer n) =
+     n > 0 && n % sizeof(void*) == 0 && ((size_t)n & ((size_t)n - 1)) == 0;
+*/
+
 // Note: this specification should ideally use a more specific predicate,
 //       such as 'is_allocable_aligned(alignment, size)'.
 /*@
@@ -814,17 +821,12 @@ extern size_t wcstombs(char * restrict s,
   assigns __fc_heap_status \from indirect:alignment, size, __fc_heap_status;
   assigns \result \from indirect:alignment, indirect:size,
                         indirect:__fc_heap_status;
-
   behavior invalid_alignment:
-    assumes alignment_not_a_suitable_power_of_two:
-      !(alignment >= sizeof(void*) &&
-        ((size_t)alignment & ((size_t)alignment - 1)) == 0);
+    assumes alignment_not_suitable: !is_suitable_alignment(alignment);
     assigns \result \from indirect:alignment;
     ensures result_einval: \result == EINVAL;
   behavior allocation:
-    assumes alignment_is_a_suitable_power_of_two:
-      alignment >= sizeof(void*) &&
-      ((size_t)alignment & ((size_t)alignment - 1)) == 0;
+    assumes alignment_is_suitable: is_suitable_alignment(alignment);
     assumes can_allocate: is_allocable(size);
     assigns __fc_heap_status \from indirect:alignment, size, __fc_heap_status;
     assigns \result \from indirect:alignment, indirect:size,
@@ -832,9 +834,7 @@ extern size_t wcstombs(char * restrict s,
     ensures allocation: \fresh(*memptr,size);
     ensures result_zero: \result == 0;
   behavior no_allocation:
-    assumes alignment_is_a_suitable_power_of_two:
-      alignment >= sizeof(void*) &&
-      ((size_t)alignment & ((size_t)alignment - 1)) == 0;
+    assumes alignment_is_suitable: is_suitable_alignment(alignment);
     assumes cannot_allocate: !is_allocable(size);
     allocates \nothing;
     assigns \result \from indirect:alignment;

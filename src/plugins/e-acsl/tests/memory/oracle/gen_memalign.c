@@ -10,6 +10,8 @@
 #include "time.h"
 extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 
+int __gen_e_acsl_is_suitable_alignment(unsigned long n);
+
 /*@ requires valid_memptr: \valid(memptr);
     assigns __fc_heap_status, \result;
     assigns __fc_heap_status
@@ -20,19 +22,13 @@ extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
     allocates *\old(memptr);
     
     behavior invalid_alignment:
-      assumes
-        alignment_not_a_suitable_power_of_two:
-          !(alignment >= sizeof(void *) &&
-            ((size_t)alignment & (size_t)alignment - 1) == 0);
+      assumes alignment_not_suitable: !is_suitable_alignment(alignment);
       ensures result_einval: \result == 22;
       assigns \result;
       assigns \result \from (indirect: alignment);
     
     behavior allocation:
-      assumes
-        alignment_is_a_suitable_power_of_two:
-          alignment >= sizeof(void *) &&
-          ((size_t)alignment & (size_t)alignment - 1) == 0;
+      assumes alignment_is_suitable: is_suitable_alignment(alignment);
       assumes can_allocate: is_allocable(size);
       ensures allocation: \fresh{Old, Here}(*\old(memptr),\old(size));
       ensures result_zero: \result == 0;
@@ -44,10 +40,7 @@ extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
               (indirect: __fc_heap_status);
     
     behavior no_allocation:
-      assumes
-        alignment_is_a_suitable_power_of_two:
-          alignment >= sizeof(void *) &&
-          ((size_t)alignment & (size_t)alignment - 1) == 0;
+      assumes alignment_is_suitable: is_suitable_alignment(alignment);
       assumes cannot_allocate: !is_allocable(size);
       ensures result_non_zero: \result < 0 || \result > 0;
       assigns \result;
@@ -387,19 +380,13 @@ int main(int argc, char const **argv)
     allocates *\old(memptr);
     
     behavior invalid_alignment:
-      assumes
-        alignment_not_a_suitable_power_of_two:
-          !(alignment >= sizeof(void *) &&
-            ((size_t)alignment & (size_t)alignment - 1) == 0);
+      assumes alignment_not_suitable: !is_suitable_alignment(alignment);
       ensures result_einval: \result == 22;
       assigns \result;
       assigns \result \from (indirect: alignment);
     
     behavior allocation:
-      assumes
-        alignment_is_a_suitable_power_of_two:
-          alignment >= sizeof(void *) &&
-          ((size_t)alignment & (size_t)alignment - 1) == 0;
+      assumes alignment_is_suitable: is_suitable_alignment(alignment);
       assumes can_allocate: is_allocable(size);
       ensures allocation: \fresh{Old, Here}(*\old(memptr),\old(size));
       ensures result_zero: \result == 0;
@@ -411,10 +398,7 @@ int main(int argc, char const **argv)
               (indirect: __fc_heap_status);
     
     behavior no_allocation:
-      assumes
-        alignment_is_a_suitable_power_of_two:
-          alignment >= sizeof(void *) &&
-          ((size_t)alignment & (size_t)alignment - 1) == 0;
+      assumes alignment_is_suitable: is_suitable_alignment(alignment);
       assumes cannot_allocate: !is_allocable(size);
       ensures result_non_zero: \result < 0 || \result > 0;
       assigns \result;
@@ -430,7 +414,7 @@ int __gen_e_acsl_posix_memalign(void **memptr, size_t alignment, size_t size)
   int __retres;
   {
     int __gen_e_acsl_valid;
-    int __gen_e_acsl_and;
+    int __gen_e_acsl_is_suitable_alignment_2;
     __e_acsl_store_block((void *)(& memptr),8UL);
     __gen_e_acsl_contract = __e_acsl_contract_init(3UL);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
@@ -447,36 +431,14 @@ int __gen_e_acsl_posix_memalign(void **memptr, size_t alignment, size_t size)
     __gen_e_acsl_assert_data.pred_txt = "\\valid(memptr)";
     __gen_e_acsl_assert_data.file = "FRAMAC_SHARE/libc/stdlib.h";
     __gen_e_acsl_assert_data.fct = "posix_memalign";
-    __gen_e_acsl_assert_data.line = 812;
+    __gen_e_acsl_assert_data.line = 819;
     __gen_e_acsl_assert_data.name = "valid_memptr";
     __e_acsl_assert(__gen_e_acsl_valid,& __gen_e_acsl_assert_data);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
-    if (alignment >= 8UL) {
-      __e_acsl_mpz_t __gen_e_acsl_;
-      __e_acsl_mpz_t __gen_e_acsl__2;
-      __e_acsl_mpz_t __gen_e_acsl_sub;
-      __e_acsl_mpz_t __gen_e_acsl_band;
-      unsigned long __gen_e_acsl__3;
-      __gmpz_init_set_ui(__gen_e_acsl_,alignment);
-      __gmpz_init_set_si(__gen_e_acsl__2,1L);
-      __gmpz_init(__gen_e_acsl_sub);
-      __gmpz_sub(__gen_e_acsl_sub,
-                 (__e_acsl_mpz_struct const *)(__gen_e_acsl_),
-                 (__e_acsl_mpz_struct const *)(__gen_e_acsl__2));
-      __gmpz_init(__gen_e_acsl_band);
-      __gmpz_and(__gen_e_acsl_band,
-                 (__e_acsl_mpz_struct const *)(__gen_e_acsl_),
-                 (__e_acsl_mpz_struct const *)(__gen_e_acsl_sub));
-      __gen_e_acsl__3 = __gmpz_get_ui((__e_acsl_mpz_struct const *)(__gen_e_acsl_band));
-      __gen_e_acsl_and = __gen_e_acsl__3 == 0UL;
-      __gmpz_clear(__gen_e_acsl_);
-      __gmpz_clear(__gen_e_acsl__2);
-      __gmpz_clear(__gen_e_acsl_sub);
-      __gmpz_clear(__gen_e_acsl_band);
-    }
-    else __gen_e_acsl_and = 0;
+    __gen_e_acsl_is_suitable_alignment_2 = __gen_e_acsl_is_suitable_alignment
+    (alignment);
     __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,0UL,
-                                           ! __gen_e_acsl_and);
+                                           ! __gen_e_acsl_is_suitable_alignment_2);
   }
   __retres = posix_memalign(memptr,alignment,size);
   {
@@ -493,7 +455,7 @@ int __gen_e_acsl_posix_memalign(void **memptr, size_t alignment, size_t size)
       __gen_e_acsl_assert_data_2.pred_txt = "\\result == 22";
       __gen_e_acsl_assert_data_2.file = "FRAMAC_SHARE/libc/stdlib.h";
       __gen_e_acsl_assert_data_2.fct = "posix_memalign";
-      __gen_e_acsl_assert_data_2.line = 823;
+      __gen_e_acsl_assert_data_2.line = 827;
       __gen_e_acsl_assert_data_2.name = "invalid_alignment/result_einval";
       __e_acsl_assert(__retres == 22,& __gen_e_acsl_assert_data_2);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
@@ -510,7 +472,7 @@ int __gen_e_acsl_posix_memalign(void **memptr, size_t alignment, size_t size)
       __gen_e_acsl_assert_data_4.pred_txt = "\\result == 0";
       __gen_e_acsl_assert_data_4.file = "FRAMAC_SHARE/libc/stdlib.h";
       __gen_e_acsl_assert_data_4.fct = "posix_memalign";
-      __gen_e_acsl_assert_data_4.line = 833;
+      __gen_e_acsl_assert_data_4.line = 835;
       __gen_e_acsl_assert_data_4.name = "allocation/result_zero";
       __e_acsl_assert(__retres == 0,& __gen_e_acsl_assert_data_4);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
@@ -543,6 +505,40 @@ int __gen_e_acsl_posix_memalign(void **memptr, size_t alignment, size_t size)
     __e_acsl_delete_block((void *)(& memptr));
     return __retres;
   }
+}
+
+/*@ assigns \result;
+    assigns \result \from n; */
+int __gen_e_acsl_is_suitable_alignment(unsigned long n)
+{
+  int __gen_e_acsl_and;
+  int __gen_e_acsl_and_2;
+  if (n > 0UL) __gen_e_acsl_and = (int)(n % 8UL) == 0;
+  else __gen_e_acsl_and = 0;
+  if (__gen_e_acsl_and) {
+    __e_acsl_mpz_t __gen_e_acsl_;
+    __e_acsl_mpz_t __gen_e_acsl__2;
+    __e_acsl_mpz_t __gen_e_acsl_sub;
+    __e_acsl_mpz_t __gen_e_acsl_band;
+    unsigned long __gen_e_acsl__3;
+    __gmpz_init_set_ui(__gen_e_acsl_,n);
+    __gmpz_init_set_si(__gen_e_acsl__2,1L);
+    __gmpz_init(__gen_e_acsl_sub);
+    __gmpz_sub(__gen_e_acsl_sub,(__e_acsl_mpz_struct const *)(__gen_e_acsl_),
+               (__e_acsl_mpz_struct const *)(__gen_e_acsl__2));
+    __gmpz_init(__gen_e_acsl_band);
+    __gmpz_and(__gen_e_acsl_band,
+               (__e_acsl_mpz_struct const *)(__gen_e_acsl_),
+               (__e_acsl_mpz_struct const *)(__gen_e_acsl_sub));
+    __gen_e_acsl__3 = __gmpz_get_ui((__e_acsl_mpz_struct const *)(__gen_e_acsl_band));
+    __gen_e_acsl_and_2 = __gen_e_acsl__3 == 0UL;
+    __gmpz_clear(__gen_e_acsl_);
+    __gmpz_clear(__gen_e_acsl__2);
+    __gmpz_clear(__gen_e_acsl_sub);
+    __gmpz_clear(__gen_e_acsl_band);
+  }
+  else __gen_e_acsl_and_2 = 0;
+  return __gen_e_acsl_and_2;
 }
 
 
