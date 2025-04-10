@@ -1,2 +1,0 @@
-posix_identifiers.json checked.
-c11_functions.json checked.

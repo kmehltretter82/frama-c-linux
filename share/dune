@@ -23,7 +23,7 @@
 (install
  (package frama-c)
  (section (site (frama-c share)))
- (source_trees compliance emacs theme libc)
+ (source_trees emacs theme libc)
  (files
   ; Auto-Complete
   (autocomplete_frama-c as autocomplete_frama-c)

@@ -12,7 +12,6 @@ RUN wine pyinstaller estimate_difficulty.py \
 	  --distpath . \
 	  --noconfirm \
 	  --add-data "libc_metrics.json;share" \
-	  --add-data "dist-prepare/compliance/*.json;share/compliance" \
 	  --add-binary "dist-prepare/scc.exe;." \
 	  --add-binary "dist-prepare/astyle.exe;."
 RUN wine fc-estimate-difficulty.exe fced-test | \

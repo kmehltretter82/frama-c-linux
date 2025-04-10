@@ -9,8 +9,6 @@
    OPT:
  MODULE: check_libc_anonymous_tags
    OPT:
- MODULE: check_compliance
-   OPT: -kernel-msg-key printer:attrs
  MODULE:
  CMD: %{dep:./check_full_libc.sh} @FRAMAC_SHARE@/libc
    OPT:
@@ -195,6 +193,8 @@
 #include "wchar.h"
 #include "wctype.h"
 #include "wordexp.h"
+
+
 
 
 
