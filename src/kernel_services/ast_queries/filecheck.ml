@@ -467,7 +467,7 @@ module Base_checker = struct
                  (Pretty_utils.pp_list ~sep:"@ " Printer.pp_stmt)
                  (Stmt.Set.elements !calls)
            in Cil.ChangeDoChildrenPost(s,f)
-         | If (_,bt,be,_) -> begin
+         | If (_,bt,be,_) when is_normalized -> begin
              (* Check that we have 2 successors, in the right order (then before
                 else) *)
              match s.succs with
