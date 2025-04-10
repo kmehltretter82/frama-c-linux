@@ -218,10 +218,10 @@ do
             break
             ;;
         *)
-            # Dune only accepts relative paths so realpath --relative-path-to is
-            # used to build the path.
-            file=$(realpath --relative-to="$PWD" "$1")
-            if [ -f "$file" ] || [ -d "$file" ]; then
+            file="$1"
+            if [ "$file" != "${file#/}" ]; then
+                Error "Dune only accepts relative path, $file is absolute"
+            elif [ -f "$file" ] || [ -d "$file" ]; then
                 TESTS+=" $file"
             elif [ -d "tests/$file" ]; then
                 TESTS+=" tests/$file"
