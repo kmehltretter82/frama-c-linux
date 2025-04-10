@@ -92,38 +92,22 @@ let logic_var env lv =
       try VAL (Varinfo.Map.find x env.formal) with Not_found -> VAR x
     else VAR x
 
-let rec load env lv (ty:typ) r : domain =
-  let acs = Access.Term (env.property, lv) in
+let rec load env acs (ty:typ) r : domain =
   match ty.tnode with
-  | TVoid | TInt _ | TFloat _ | TEnum _ | TBuiltin_va_list ->
-    Memory.add_read env.map r acs ; ptr r
-  | TPtr tp ->
-    let _ = Memory.new_chunk env.map ~size:(Cil.bitsSizeOf tp) ~ptr:r () in
-    Memory.add_read env.map r acs ; ptr r
+  | TVoid | TInt _ | TFloat _ | TEnum _ | TBuiltin_va_list | TPtr _ | TFun _ ->
+    Memory.add_read env.map r acs ;
+    LDomain.scalar @@ Memory.add_value env.map r ty
   | TArray(te,_) ->
-    let r' = Memory.new_chunk env.map ~size:(Cil.bitsSizeOf te) () in
-    Memory.merge env.map r r' ; let r = min r r' in
-    Memory.add_read env.map r acs ; array (load env lv te (Memory.index env.map r te))
+    let r' = Memory.add_index env.map r ty in
+    array (load env acs te r')
   | TNamed _ -> Options.abort "logic.load: TNamed not implemented"
-  | TFun _ -> Options.abort "logic.load: TFun not implemented"
-  | TComp { cstruct = true } ->
-    begin match snd lv with
-      | TField(fd,offset) ->
-        Memory.add_read env.map r acs ;
-        load env (fst lv, offset) fd.ftype (Memory.field env.map r fd)
-      | TNoOffset -> Memory.add_read env.map r acs ; ptr r
-      | TModel _ | TIndex _ ->
-        Options.abort "logic.load: TComp record with wrong offset"
-    end
-  | TComp { cstruct = false } ->
-    begin match snd lv with
-      | TField(fd,offset) -> load env (fst lv, offset) fd.ftype r
-      | TNoOffset -> Memory.add_read env.map r acs ; ptr r
-      | TModel _ | TIndex _ ->
-        Options.abort "logic.load: TComp union with wrong offset"
-    end
-(* descente rec sur typ, lire dans la mémoire un type C et on en fait un domaine
-   + add read memory at this point *)
+  | TComp { cfields } ->
+    let add_field d fd =
+      merge_domain env.map d
+      @@ LDomain.field fd
+      @@ load env acs fd.ftype
+      @@ Memory.add_field env.map r fd
+    in List.fold_left add_field pure @@ Option.value ~default:[] cfields
 
 let rterm = ref (fun _ _ -> assert false)
 
@@ -147,19 +131,20 @@ let rec term_offset (env:env) (d:domain) = function
     term_offset env (LDomain.get_index (merge env) d) offset
 
 let add_term_lval (env:env) lv =
+  let acs = Access.Term (env.property, lv) in
   let (lhost,loffset) = lv in
   match lhost with
   | TResult _ -> term_offset env env.result loffset
   | TMem e ->
     let rh = pointer env (!rterm env e) in
     let te = Logic_typing.ctype_of_pointed e.term_type in
-    load env lv te @@ addr_offset env te rh loffset
+    load env acs te @@ addr_offset env te rh loffset
   | TVar lv ->
     begin match logic_var env lv with
       | VAL d -> term_offset env d loffset
       | VAR x ->
         let rh = Memory.add_root env.map x in
-        load env (lhost,loffset) x.vtype @@ addr_offset env x.vtype rh loffset
+        load env acs x.vtype @@ addr_offset env x.vtype rh loffset
     end
 
 let add_addr_lval (env:env) (lhost,loffset) : node =

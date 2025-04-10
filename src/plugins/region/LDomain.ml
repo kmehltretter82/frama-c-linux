@@ -117,11 +117,26 @@ let rec of_typ create ty : 'a t = match ty.tnode with
   | TVoid | TInt _ | TFloat _ | TComp _ | TEnum _ -> pure
   | TNamed { ttype } -> of_typ create ttype
 
-let rec of_ltype create add_logic_var lt =
-  match Ast_types.unroll_logic ~unroll_typedef:false lt with
+module M = Map.Make(String)
+
+type 'a context = 'a t M.t
+
+let empty = M.empty
+
+let rec of_ltype ctxt create = function
+  (* match Ast_types.unroll_logic ~unroll_typedef:false lt with *)
   | Ctype ty -> of_typ create ty
-  | Ltype (sym,prms) -> logic sym @@ List.map (of_ltype create add_logic_var) prms
-  | Lvar v -> add_logic_var v
+  | Lvar v -> (try M.find v ctxt with Not_found -> pure)
+  | Ltype (ti,ts) ->
+    begin
+      let ds = List.map (of_ltype ctxt create) ts in
+      match ti.lt_def with
+      | Some (LTsum _) | None -> logic ti ds
+      | Some (LTsyn def) ->
+        let add_ctxt ctxt a d = M.add a d ctxt in
+        let ctxt = List.fold_left2 add_ctxt M.empty ti.lt_params ds in
+        of_ltype ctxt create def
+    end
   | Lboolean | Linteger | Lreal -> pure
   | Larrow (_prms,_rty) -> Options.abort "LDomain.of_ltype: Larrow"
 

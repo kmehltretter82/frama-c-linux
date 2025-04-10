@@ -56,6 +56,7 @@ type region = {
 }
 
 type domain = node LDomain.t
+type context = node LDomain.context
 
 type map
 
@@ -105,11 +106,11 @@ val add_write : map -> node -> Access.acs -> unit
 val add_shift : map -> node -> Access.acs -> unit
 
 val domain_of_typ : map -> typ -> domain
-val domain_of_ltyp : map -> logic_type -> domain
+val domain_of_ltyp : map -> ?ctxt:context -> logic_type -> domain
 
 val merge : map -> node -> node -> unit
 val merge_all : map -> node list -> unit
-val merge_domain : map -> domain -> domain -> unit
+val merge_domain : map -> domain -> domain -> domain
 
 val cvar : map -> varinfo -> node
 val field : map -> node -> fieldinfo -> node
