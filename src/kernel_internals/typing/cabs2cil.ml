@@ -1802,6 +1802,9 @@ struct
         List.partition (fun x -> Cil.appears_in_expr x e') c.locals
       in
       full_clean_up_chunk_locals {c with locals = thrown_vars};
+      (* These locals are no longer defined since we drop the content of the
+         chunk. *)
+      List.iter (fun vi -> vi.vdefined <- false) kept_vars;
       { empty with locals = kept_vars }
     end else empty
 
