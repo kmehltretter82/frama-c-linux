@@ -754,10 +754,20 @@ input:checked + .dome-xSwitch-slider:before {
     flex-direction: row;
     background-color: inherit;
     justify-content: space-between;
-    flex-wrap: wrap;
-    padding: 2px;
-    margin-top: 5px;
     border-radius: 7px;
+    gap: 10px;
+
+    &>div {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: nowrap;
+
+      &:first-child { min-width: 0; }
+      &:last-child {
+        justify-content: center;
+        flex: 0;
+      }
+    }
 
     &:hover {
       cursor: pointer;
@@ -767,12 +777,6 @@ input:checked + .dome-xSwitch-slider:before {
     &.dome-xTree-selected,
     &.dome-xTree-selected.dome-xTree-show-children {
       background-color: var(--background-interaction);
-    }
-
-    .dome-xTree-node-actions {
-      display: flex;
-      justify-content: center;
-      padding-left: 10px;
     }
 
     &.dome-xTree-show-children {
@@ -785,6 +789,5 @@ input:checked + .dome-xSwitch-slider:before {
         animation: forwards dome-xTree-arrow .3s linear;
       }
     }
-
   }
 }

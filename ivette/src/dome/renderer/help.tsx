@@ -34,7 +34,7 @@ import { Modal, showModal, closeModal } from './dialogs';
 import { Markdown } from './text/markdown';
 import { SideBar, SidebarTitle } from './frame/sidebars';
 import { Tree, Node } from './frame/tree';
-import { LSplit } from './layout/splitters';
+import { LSplit, Direction } from './layout/splitters';
 
 import * as Ivette from 'ivette';
 import { ChapterProps } from 'ivette';
@@ -168,11 +168,11 @@ function getTableOfContents(chapter: ChapterProps): HTree {
   return toTree();
 }
 
-function getSubTree(tree: HTree): React.ReactNode {
-  return tree.length > 0 ? <Nodes tree={tree} /> : null;
+function getSubTree(tree: HTree, path?: string): React.ReactNode {
+  return tree.length > 0 ? <Nodes tree={tree} path={path}/> : null;
 }
 
-function Nodes(props: { tree: HTree }): React.ReactNode {
+function Nodes(props: { tree: HTree, path?: string }): React.ReactNode {
   return props.tree.map(({ id, label, errors, subTree }) => {
     const actions = errors && errors.length > 0 ? (
       <>
@@ -181,8 +181,9 @@ function Nodes(props: { tree: HTree }): React.ReactNode {
         <LED status="negative" blink={true} />
       </>) :
       undefined;
-    return <Node key={id} id={id} label={label} actions={actions}>
-        { getSubTree(subTree) }</Node>;
+    const path = props.path ? props.path+" - "+label : label;
+    return <Node key={id} id={id} label={label} title={path} actions={actions}
+      >{ getSubTree(subTree, path) }</Node>;
   }
   );
 }
@@ -277,7 +278,9 @@ function GeneralDocModal(): JSX.Element {
 
   return (
     <Modal className='modal-framac-doc' label={title} actions={actionsHeader}>
-      <LSplit settings="frama-c.modal-doc.split">
+      <LSplit settings="frama-c.modal-doc.split"
+        defaultPosition={Direction.VERTICAL}
+      >
         <SideBar>
           <SidebarTitle label='Table of contents' >
             <div className='dome-xTree-actions'>
