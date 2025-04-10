@@ -218,17 +218,19 @@ do
             break
             ;;
         *)
-            file="$1"
-            if [ "$file" != "${file#/}" ]; then
-                Error "Dune only accepts relative path, $file is absolute"
-            elif [ -f "$file" ] || [ -d "$file" ]; then
-                TESTS+=" $file"
-            elif [ -d "tests/$file" ]; then
-                TESTS+=" tests/$file"
-            elif [ -d "src/plugins/$file/tests" ]; then
-                TESTS+=" src/plugins/$file/tests"
+            if [[ "$1" =~ ^@ ]]; then
+                Head "Register test on alias $1"
+                DUNE_ALIAS+=" $1"
+            elif [ "$1" != "${1#/}" ]; then
+                Error "Dune only accepts relative path, $1 is absolute"
+            elif [ -f "$1" ] || [ -d "$1" ]; then
+                TESTS+=" $1"
+            elif [ -d "tests/$1" ]; then
+                TESTS+=" tests/$1"
+            elif [ -d "src/plugins/$1/tests" ]; then
+                TESTS+=" src/plugins/$1/tests"
             else
-                ErrorUsage "'$1' is not a test file or directory"
+                ErrorUsage "'$1' is neither a file/directory or a dune alias"
             fi
             ;;
     esac
@@ -376,7 +378,7 @@ function CheckDuneFiles
 
 function PrepareTests
 {
-    if [ "$TESTS" = "" ]; then
+    if [ -z "$TESTS" ] && [ -z "$DUNE_ALIAS" ]; then
         DUNE_ALIAS+=" @runtest"
         for dir in $TEST_DIRS ; do
             if [ -d "$dir" ]; then
@@ -528,10 +530,7 @@ function Register
         elif [ -f "$1" ]; then
             TestFile "$1"
         else
-            case "$1" in
-                @*) Head "Register test on alias $1"; DUNE_ALIAS+=" $1";;
-                *) ErrorUsage "ERROR: don't known what to do with '$1'";;
-            esac
+            Error "$1 is neither a file or a directory"
         fi
         shift
     done
