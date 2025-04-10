@@ -20,9 +20,20 @@ int f(int t[10], int n, int *ptr)
 int main(void)
 {
   int __retres;
+  int *tmp_0;
+  int *tmp_0_0;
   int *p = (int *)0;
   int tmp = *p;
-  int *tmp_3 = ss.s1[2].a;
+  tmp_0 = p;
+  p --;
+  ;
+  int tmp_3 = *tmp_0 / 0;
+  int *tmp_5 = ss.s1[2].a;
+  int tmp_7 = *p / 0;
+  tmp_0_0 = p;
+  p --;
+  int tmp_9 = *tmp_0_0 / 0;
+  int d = *p;
   __retres = 0;
   return __retres;
 }

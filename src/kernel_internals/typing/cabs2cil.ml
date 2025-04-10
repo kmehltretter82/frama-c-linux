@@ -3400,6 +3400,15 @@ let afterConversion ~ghost (c: chunk) : chunk =
   *)
   res
 
+(* Return true if the expression is dangerous and, in case of lvalue, if the
+   chunk is empty. If the chunk is not empty, then the lvalue is probably used
+   or initialized inside it. *)
+let is_dangerous_computation se e =
+  is_dangerous e &&
+  match e.enode with
+  | Lval _ -> isEmpty se
+  | _ -> true
+
 (***** Try to suggest a name for the anonymous structures *)
 let suggestAnonName (nl: Cabs.name list) =
   match nl with
@@ -7025,10 +7034,15 @@ and doExp local_env
           (* Pass on the action *)
           (r, sofar @@@ (se, ghost), e', t')
         | e :: rest ->
-          let (_, se, _, _) =
+          let (_, se, e', _) =
             doExp (no_paren_local_env local_env) CNoConst e ADrop
           in
-          loop (sofar @@@ (se, ghost)) rest
+          let se' =
+            if is_dangerous_computation se e' then
+              se @@@ (keepPureExpr ~ghost e' loc, ghost)
+            else se
+          in
+          loop (sofar @@@ (se', ghost)) rest
         | [] -> Kernel.fatal ~current:true "empty COMMA expression"
       in
       loop empty el
@@ -9870,22 +9884,21 @@ and doStatement local_env (s : Cabs.statement) : chunk =
       let (s', e', t') = doFullExp local_env CNoConst e (AExp None) in
       data := Some (e', t');      (* Record the result *)
       s'
-    end else
+    end
+    else
       let (s', e', _) = doFullExp local_env CNoConst e ADrop in
       (* drop the side-effect free expression unless the whole computation
          is pure and it contains potential threats (i.e. dereference)
       *)
-      if isEmpty s' && is_dangerous e'
-      then
+      if is_dangerous_computation s' e' then
         s' @@@ (keepPureExpr ~ghost e' loc, ghost)
-      else
-        begin
-          if (isEmpty s') then begin
-            let name = !currentFunctionFDEC.svar.vorig_name in
-            IgnorePureExpHook.apply (name, e');
-          end;
-          s'
-        end
+      else begin
+        if (isEmpty s') then begin
+          let name = !currentFunctionFDEC.svar.vorig_name in
+          IgnorePureExpHook.apply (name, e');
+        end;
+        s'
+      end
 
   | Cabs.BLOCK (b, _, _) ->
     let c = doBodyScope local_env b in
