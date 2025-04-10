@@ -423,6 +423,7 @@ function RunAlias
 
 function TestDir
 {
+    local ALIAS
     case "$CONFIG" in
         "<all>")
             ALIAS=$1/${ALIAS_NAME}
@@ -463,6 +464,7 @@ function TestFile
 {
     DIR=$(dirname $1)
     FILE=$(basename $1)
+    local ALIAS
 
     case "$CONFIG" in
         "<all>")
