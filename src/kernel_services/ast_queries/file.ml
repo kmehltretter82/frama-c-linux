@@ -700,6 +700,28 @@ let () =
   new_file_type ".ci" handle
 
 
+module NeverRemoveGlobals =
+  State_builder.Set_ref
+    (Datatype.String.Set)
+    (struct
+      let name = "File.NeverRemoveGlobals"
+      let dependencies = []
+    end)
+
+let never_remove_global globname =
+  NeverRemoveGlobals.add globname
+
+let global_name g = match g with
+  | GFun ({svar = {vorig_name = name}}, _)
+  | GFunDecl(_, {vorig_name = name}, _)
+  | GVar ({vorig_name = name}, _, _)
+  | GVarDecl ({vorig_name = name}, _)
+  | GType ({torig_name = name}, _)
+  | GCompTag ({corig_name = name}, _)
+  | GCompTagDecl ({corig_name = name}, _)
+  | GEnumTag ({eorig_name = name}, _)
+  | GEnumTagDecl ({eorig_name = name}, _) -> Some name
+  | _ -> None
 
 (* Keep defined entry point even if not defined, and possibly
    other unused globals according to relevant command-line parameters.
@@ -708,6 +730,8 @@ let isRoot g =
   let keepFuncs = Kernel.KeepUnusedFunctions.get () in
   let keepTypes = Kernel.Keep_unused_types.get () in
   Rmtmps.isExportedRoot g ||
+  Option.fold ~none:false
+    ~some:(fun n -> NeverRemoveGlobals.mem n) (global_name g) ||
   match g with
   | GFun({svar = v; sspec = spec},_)
   | GFunDecl(spec,v,_) ->
