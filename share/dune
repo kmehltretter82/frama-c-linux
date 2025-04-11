@@ -23,7 +23,7 @@
 (install
  (package frama-c)
  (section (site (frama-c share)))
- (source_trees compliance emacs theme libc)
+ (source_trees emacs theme libc)
  (files
   ; Auto-Complete
   (autocomplete_frama-c as autocomplete_frama-c)
@@ -73,6 +73,7 @@
  (section share)
  (files
   (glob_files (machdeps/*.yaml with_prefix share/machdeps))
+  (glob_files (machdeps/*.json with_prefix share/machdeps))
 ))
 
 ; machdep generation script

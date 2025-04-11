@@ -5,7 +5,6 @@
     %{bin:frama-c}
     %{bin:frama-c-script}
     (glob_files "../../share/analysis-scripts/*")
-    (glob_files "../../share/compliance/*")
     (glob_files "../../share/machdeps/*")
     (glob_files "../../share/machdeps/make_machdep/*")
   )

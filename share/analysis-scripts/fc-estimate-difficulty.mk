@@ -58,9 +58,8 @@ PY_DEPS := \
   function_finder.py \
   source_filter.py \
 
-COMPLIANCE := $(wildcard ../compliance/*.json)
 TOOLS := $(workdir)/scc $(workdir)/astyle
-COMMON_DEPS := $(PY_DEPS) $(COMPLIANCE) libc_metrics.json
+COMMON_DEPS := $(PY_DEPS) libc_metrics.json
 
 fc-estimate-difficulty: $(COMMON_DEPS) $(TOOLS)
 fc-estimate-difficulty.exe: \
@@ -73,7 +72,6 @@ fc-estimate-difficulty:
 	  --distpath $(distdir) \
 	  --noconfirm \
 	  --add-data "libc_metrics.json:share" \
-	  --add-data "../compliance/*.json:share/compliance" \
 	  --add-binary "$(workdir)/scc:." \
 	  --add-binary "$(workdir)/astyle:."
 ifeq ($(os),Linux)
@@ -85,8 +83,6 @@ else
 endif
 
 fc-estimate-difficulty.exe:
-	mkdir -p $(workdir)/compliance
-	cp ../compliance/*.json $(workdir)/compliance
 	$(DOCKER) build . -f fced-win.Dockerfile -t fced-win
 	$(DOCKER) cp $$($(DOCKER) create --rm fced-win):/fced/$@ $@
 

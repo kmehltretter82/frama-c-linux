@@ -6,7 +6,6 @@ mk_tests {
     dune exec -- frama-c-ptests -never-disabled tests
     dune build -j1 \
       @tests/cil/ptests \
-      @tests/compliance/ptests \
       @tests/jcdb/ptests \
       @tests/libc/ptests \
       @tests/misc/ptests \
