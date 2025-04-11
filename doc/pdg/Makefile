@@ -41,7 +41,6 @@ main.pdf: $(FRAMAC_MODERN) $(BIB_FILE) \
 	main.tex pdg.tex macros_pdg.tex \
 	intro.tex conclusion.tex \
 	data.tex ctrl.tex calls.tex utilisation.tex mark.tex impact.tex \
-	../images/cealistlogo.jpg \
 	exple-call.c call-f.pdf call-g.pdf \
 	ctrl-dpds.pdf ex-goto.pdf goto.pdf pdg-call.pdf
 
