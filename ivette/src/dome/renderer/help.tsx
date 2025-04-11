@@ -31,7 +31,7 @@ import { GlobalState, useGlobalState } from 'dome/data/states';
 
 import { IconButton } from './controls/buttons';
 import { Modal, showModal, closeModal } from './dialogs';
-import { Markdown } from './text/markdown';
+import { Markdown, Pattern } from './text/markdown';
 import { SideBar, SidebarTitle } from './frame/sidebars';
 import { Tree, Node } from './frame/tree';
 import { LSplit } from './layout/splitters';
@@ -226,6 +226,26 @@ function useHelpHistory(): History {
     isFirstpos: isFirstpos,
     isLastpos: isLastpos
   };
+}
+
+/**
+ * linkTag allows you to replace the tag by a link.
+ * This link can be use to add element in history.
+ *
+ * `[link-<id>-<label>]`: `-` forbidden in <label>
+ */
+export const helpLinkTag: Pattern = {
+  pattern: /\[link-([^\]]+)-([^\]-]+)\]/g,
+  replace: (key: number, match?: RegExpExecArray) => {
+    if(!match) return null;
+    return <HelpMdLink key={key} id={match[1]} label={match[2]} />;
+  }
+};
+
+function HelpMdLink(props: {id: string, label: string}): React.JSX.Element {
+  const { id, label } = props;
+  const history = useHelpHistory();
+  return <a href="" onClick={() => history.addElement(id)}>{label}</a>;
 }
 
 /**

@@ -69,6 +69,17 @@ Here, `?raw` is used to indicate that we want the raw content of the file.
 
 Typically, the documentation will be displayed in the application's modal.
 
+### link pattern
+
+You can use the special tag `[link-<id>-<label>]` in a markdown file.
+It allows you to use a link to navigate to other pages in the documentation.
+The added link uses the documentation history.
+You can use it to save navigation on the same page.
+
+[icon-WARNING]: `-` prohibited in `<label>`.
+
+example: link to frama-c AST [link-framac-ast-AST]
+
 ### help.tsx
 
 This file contains components that make it easier to display documentation in your components.
