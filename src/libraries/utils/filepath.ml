@@ -190,9 +190,10 @@ let to_string_list l = l
 (* --- Basic datatype functions                                           --- *)
 (* -------------------------------------------------------------------------- *)
 
-let equal : t -> t -> bool = (=)
-
+let equal = String.equal
 let compare = String.compare
+let hash = Hashtbl.hash (* String.hash only introduced in OCaml 5.0 *)
+let copy = Fun.id
 
 
 (* -------------------------------------------------------------------------- *)
@@ -518,7 +519,7 @@ let rec bincopy buffer in_channel out_channel =
   else
     ( flush out_channel )
 
-let copy src tgt =
+let copy_file src tgt =
   let$ in_channel = with_open_in_exn src in
   let$ out_channel = with_open_out_exn tgt in
   bincopy (Bytes.create 2048) in_channel out_channel

@@ -51,7 +51,7 @@ let get_workdir file =
   with Not_found -> None
 
 let store_referenced_source fname =
-  let fp = Datatype.Filepath.of_string fname in
+  let fp = Filepath.of_string fname in
   if not (Hashtbl.mem referenced_files fp) then begin
     try
       let open Filepath.Operators in
@@ -90,7 +90,7 @@ let scan_source_for_references ~workdir contents =
     ) lines
 
 let open_source ~scan_references fname =
-  let fp = Datatype.Filepath.of_string fname in
+  let fp = Filepath.of_string fname in
   try
     let s = SourceFiles.find fp in
     Ok s

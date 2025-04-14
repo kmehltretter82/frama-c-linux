@@ -55,10 +55,10 @@ class type sloc_visitor = object
   (* Get the computed metrics *)
   method get_global_metrics: BasicMetrics.t
 
-  (* Print the metrics of a file [Datatype.Filepath.t] to a formatter
+  (* Print the metrics of a file [Filepath.t] to a formatter
      Yields a fatal error if the file does not exist (or has no metrics).
   *)
-  method pp_file_metrics: Format.formatter -> Datatype.Filepath.t -> unit
+  method pp_file_metrics: Format.formatter -> Filepath.t -> unit
 
   method pp_detailed_text_metrics: Format.formatter -> unit
   (** Print results of all file and functions to the given formatter as text *)
@@ -122,7 +122,7 @@ class slocVisitor ~libc : sloc_visitor = object(self)
     with
     | Not_found ->
       Metrics_parameters.fatal "Metrics for file %a not_found@."
-        Datatype.Filepath.pretty filename
+        Filepath.pretty filename
 
   method pp_file_metrics fmt filename =
     Format.fprintf fmt "@[<v 0>%a@]"
@@ -469,7 +469,7 @@ let get_filenames_in_funspec kf =
             let path = (fst loc).Filepath.pos_path in
             Metrics_parameters.feedback ~dkey ~once:true
               "found annotation in: %a"
-              Datatype.Filepath.pretty path;
+              Filepath.pretty path;
             Datatype.Filepath.Set.add path acc'
           ) locs acc
       ) Datatype.Filepath.Set.empty spec.spec_behavior
@@ -500,7 +500,7 @@ let pretty_used_files used_files =
            but we only want those given on the command line *)
   let cmdline_files = List.fold_left (fun acc file ->
       Datatype.Filepath.Set.add (
-        Datatype.Filepath.of_string (Kernel_file.get_name file)
+        Filepath.of_string (Kernel_file.get_name file)
       ) acc
     ) Datatype.Filepath.Set.empty (Kernel_file.get_all ())
   in
@@ -532,7 +532,7 @@ let pretty_used_files used_files =
          @\n%s\
          @\n%a@\n"
         title n (String.make (title_len + 4) '=')
-        (Pretty_utils.pp_list ~sep:" \\@\n" ~suf:" \\" Datatype.Filepath.pretty)
+        (Pretty_utils.pp_list ~sep:" \\@\n" ~suf:" \\" Filepath.pretty)
         (Datatype.Filepath.Set.elements paths)
   in
   Metrics_parameters.result

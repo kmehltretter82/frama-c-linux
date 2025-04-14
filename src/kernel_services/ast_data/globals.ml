@@ -541,7 +541,7 @@ module FileIndex = struct
         (fun glob ->
            let f = (fst (Global.loc glob)).Filepath.pos_path in
            Kernel.debug ~dkey:Kernel.dkey_globals "Indexing global in file %a@."
-             Datatype.Filepath.pretty f;
+             Filepath.pretty f;
            ignore
              (S.memo
                 ~change:(fun l -> glob :: l) (fun _ -> [ glob ]) f))
@@ -909,7 +909,7 @@ module Comments_stmt_cache =
     end)
 
 let get_comments_global g =
-  let last_pos (f : Datatype.Filepath.t) =
+  let last_pos (f : Filepath.t) =
     { Filepath.pos_path = f;
       Filepath.pos_lnum = max_int;
       Filepath.pos_cnum = max_int;
@@ -932,7 +932,7 @@ let get_comments_global g =
       | [] ->
         Kernel.fatal "Cannot find global %a in file %a"
           Cil_printer.pp_global g
-          Datatype.Filepath.pretty file
+          Filepath.pretty file
       | g' :: l when Cil_datatype.Global.equal g g' ->
         { Filepath.pos_path = file;
           Filepath.pos_lnum = 1;

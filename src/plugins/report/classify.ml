@@ -172,8 +172,8 @@ let add_rule jvalue =
 
 let configure file =
   begin
-    let path = Datatype.Filepath.of_string file in
-    R.feedback "Loading '%a'" Datatype.Filepath.pretty path;
+    let path = Filepath.of_string file in
+    R.feedback "Loading '%a'" Filepath.pretty path;
     try
       match Json.load_file path with
       | `List values -> List.iter add_rule values
@@ -183,7 +183,7 @@ let configure file =
       let source = Log.source ~file ~line in
       R.abort ~source "%s" msg
     | WrongFormat msg ->
-      let file = Datatype.Filepath.of_string file in
+      let file = Filepath.of_string file in
       let source = Log.source ~file ~line:1 in
       R.abort ~source "%s" msg
     | Sys_error msg ->

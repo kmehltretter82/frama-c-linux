@@ -218,7 +218,7 @@ class metricsCabsVisitor = object(self)
     with
     | Not_found ->
       Metrics_parameters.fatal "Metrics for file %a not_found@."
-        Datatype.Filepath.pretty filename
+        Filepath.pretty filename
 
   method pp_file_metrics fmt filename =
     Format.fprintf fmt "@[<v 0>%a@]"

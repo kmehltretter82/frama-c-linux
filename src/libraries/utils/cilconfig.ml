@@ -128,7 +128,7 @@ let useConfigurationList (key: string) (f: configData list -> unit) =
   with Not_found -> ()
 
 
-let saveConfiguration (fname : Datatype.Filepath.t) =
+let saveConfiguration (fname : Filepath.t) =
   (* Convert configuration data to a string, for saving externally *)
   let configToString (c: configData) : string =
     let buff = Buffer.create 80 in
@@ -182,7 +182,7 @@ let floatRegexp = Str.regexp "f\\([^;]+\\);"
 let boolRegexp = Str.regexp "b\\(\\(true\\)\\|\\(false\\)\\);"
 let stringRegexp = Str.regexp "\"\\([^\"]*\\)\""
 
-let loadConfiguration (fname : Datatype.Filepath.t) : unit =
+let loadConfiguration (fname : Filepath.t) : unit =
   H.clear configurationData;
 
   let stringToConfig (s: string) : configData =

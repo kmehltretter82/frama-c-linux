@@ -81,7 +81,7 @@ let saving_mode () =
 
 let files : (Filepath.t,script) Hashtbl.t = Hashtbl.create 32
 
-let jsonfile (dir:Datatype.Filepath.t) name =
+let jsonfile (dir:Filepath.t) name =
   Filepath.concat dir (name ^ ".json")
 
 let get_script_dir ~force =
@@ -179,7 +179,7 @@ let save ~stdout wpo js =
 
 let get_marks_dir ~force =
   let scripts = Wp_parameters.get_session_dir ~force "script" in
-  let path = Datatype.Filepath.concat scripts ".marks" in
+  let path = Filepath.concat scripts ".marks" in
   if force then Wp_parameters.make_output_dir path ;
   path
 
@@ -197,7 +197,7 @@ let reset_marks () =
 let mark goal =
   let marks = get_marks_dir ~force:false in
   if Filepath.exists marks && Filepath.is_dir marks then
-    let mark = Datatype.Filepath.concat marks (goal.po_sid ^ ".json") in
+    let mark = Filepath.concat marks (goal.po_sid ^ ".json") in
     if Filepath.exists mark then ()
     else close_out @@ open_out (mark :> string)
 

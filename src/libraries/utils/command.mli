@@ -44,7 +44,7 @@ val bincopy : bytes -> in_channel -> out_channel -> unit
 val copy : Filepath.t -> Filepath.t -> unit
 (** [copy source target] copies source file to target file using [bincopy]. *)
 [@@deprecated "Use Filepath.copy instead."]
-[@@migrate { repl = Filepath.copy } ]
+[@@migrate { repl = Filepath.copy_file } ]
 
 val read_file : Filepath.t -> (in_channel -> 'a) -> 'a
 (** Properly close the channel and re-raise exceptions *)

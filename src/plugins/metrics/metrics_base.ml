@@ -64,7 +64,7 @@ module BasicMetrics = struct
   (** Record type to compute cyclomatic complexity *)
 
   type t = {
-    cfile_name : Datatype.Filepath.t;
+    cfile_name : Filepath.t;
     cfunc : OptionKf.t;
     cslocs: int;
     cifs: int;
@@ -82,7 +82,7 @@ module BasicMetrics = struct
   ;;
 
   let empty_metrics =
-    { cfile_name = Datatype.Filepath.dummy;
+    { cfile_name = Filepath.empty;
       cfunc = None;
       cslocs = 0;
       cifs = 0;
@@ -162,13 +162,13 @@ module BasicMetrics = struct
   (* Pretty print metrics as text eg. in stdout *)
   let pp_base_metrics fmt metrics =
     let heading =
-      if metrics.cfile_name = Datatype.Filepath.dummy &&
+      if metrics.cfile_name = Filepath.empty &&
          metrics.cfunc = None then
         (* It is a global metrics *)
         "Global metrics"
       else
         Format.asprintf "Stats for function <%a/%a>"
-          Datatype.Filepath.pretty metrics.cfile_name
+          Filepath.pretty metrics.cfile_name
           pp_func_or_none metrics.cfunc
     in
     Format.fprintf fmt "@[<v 0>%a @ %a@]"

@@ -207,7 +207,7 @@ let command = spawn
 (* -------------------------------------------------------------------------- *)
 
 let bincopy = Filepath.bincopy [@alert "-deprecated"]
-let copy = Filepath.copy
+let copy = Filepath.copy_file
 let read_file p = Filepath.with_open_in_exn p
 let read_lines = Filepath.iter_lines
 let write_file p = Filepath.with_open_out_exn p

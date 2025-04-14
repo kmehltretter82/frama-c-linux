@@ -21,7 +21,7 @@
 (**************************************************************************)
 
 type tab = {
-  tab_file : Datatype.Filepath.t ;
+  tab_file : Filepath.t ;
   tab_page : int ;
   tab_select : line:int -> unit ;
   tab_source_view : GSourceView.source_view;
@@ -29,7 +29,7 @@ type tab = {
 
 type t = {
   notebook : GPack.notebook;
-  file_index : (Datatype.Filepath.t,tab) Hashtbl.t;
+  file_index : (Filepath.t,tab) Hashtbl.t;
   name_index : (string,tab) Hashtbl.t;
   page_index : (int,tab) Hashtbl.t;
   mutable pages : int ;
@@ -73,9 +73,9 @@ let select_name w title =
 
 let selection_locked = ref false
 
-let load_file w ?title ~(filename : Datatype.Filepath.t) ?(line=(-1)) ~click_cb () =
+let load_file w ?title ~(filename : Filepath.t) ?(line=(-1)) ~click_cb () =
   Gui_parameters.debug ~level:2 "Opening file \"%a\" line %d"
-    Datatype.Filepath.pretty filename line ;
+    Filepath.pretty filename line ;
   let tab =
     begin
       try Hashtbl.find w.file_index filename

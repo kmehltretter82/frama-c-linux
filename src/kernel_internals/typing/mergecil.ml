@@ -753,7 +753,7 @@ let currentDeclIdx = ref 0 (* The index of the definition in a file. This is
                             * maintained both in pass 1 and in pass 2. Make
                             * sure you count the same things in both passes. *)
 (* Keep here the file names *)
-let fileNames : (int, Datatype.Filepath.t) H.t = H.create 113
+let fileNames : (int, Filepath.t) H.t = H.create 113
 
 
 
@@ -1581,7 +1581,7 @@ let oneFilePass1 (f:file) : unit =
   if f.globinitcalled || f.globinit <> None then
     Kernel.warning ~current:true
       "Merging file %a has global initializer"
-      Datatype.Filepath.pretty f.fileName;
+      Filepath.pretty f.fileName;
 
   (* We scan each file and we look at all global varinfo. We see if globals
    * with the same name have been encountered before and we merge those types
@@ -2560,7 +2560,7 @@ let update_formals_names merged_vi curr_vi =
  * have replaced the names. *)
 let oneFilePass2 (f: file) =
   Kernel.feedback ~level:2 "Final merging phase: %a"
-    Datatype.Filepath.pretty f.fileName;
+    Filepath.pretty f.fileName;
   currentDeclIdx := 0; (* Even though we don't need it anymore *)
   H.clear varUsedAlready;
   H.clear originalVarNames;
@@ -3055,7 +3055,7 @@ let oneFilePass2 (f: file) =
    * remove it *)
   if mergeInlinesWithAlphaConvert() && !repeatPass2 then begin
     Kernel.feedback "Repeat final merging phase: %a"
-      Datatype.Filepath.pretty f.fileName;
+      Filepath.pretty f.fileName;
     (* We are going to rescan the globals we have added while processing this
      * file. *)
     let theseGlobals : global list ref = ref [] in
@@ -3327,7 +3327,7 @@ let merge (files: file list) (newname: string) : file =
       revonto (x :: acc) t
   in
   let res =
-    { fileName = Datatype.Filepath.of_string newname;
+    { fileName = Filepath.of_string newname;
       globals  = revonto (revonto [] !theFile) !theFileTypes;
       globinit = None;
       globinitcalled = false } in

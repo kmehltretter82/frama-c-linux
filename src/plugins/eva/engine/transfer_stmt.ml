@@ -655,7 +655,7 @@ module Make (Engine: Engine_sig.S) = struct
     Self.feedback ~current:true "Dumping state in file '%a'%t"
       Filepath.pretty file Eva_utils.pp_callstack;
     Format.fprintf fmt "DUMPING STATE at file %a line %d@."
-      Datatype.Filepath.pretty l.Filepath.pos_path
+      Filepath.pretty l.Filepath.pos_path
       l.Filepath.pos_lnum;
     let pretty_args = pretty_arguments ~subdivnb state in
     if arguments <> []

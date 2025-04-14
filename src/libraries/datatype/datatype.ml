@@ -1606,19 +1606,10 @@ let integer = Integer.ty
 module Filepath = struct
   include Simple_type
       (struct
-        type t = Filepath.t
+        include Filepath
         let name = "Filepath"
         let reprs = [ Filepath.of_string "/" ]
-        let copy = Fun.id (* immutable strings do not need copy. *)
-        let compare = Filepath.compare
-        let equal : t -> t -> bool = (=)
-        let pretty = Filepath.pretty
       end)
-  let dummy = Filepath.empty
-  let of_string ?existence ?base_name s =
-    Filepath.of_string ?existence ?base:base_name s
-  let concat ?existence t s = Filepath.concat ?existence t s
-  let pp_abs = Filepath.pp_abs
 end
 let filepath = Filepath.ty
 

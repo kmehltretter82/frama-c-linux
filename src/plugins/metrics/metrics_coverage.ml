@@ -318,7 +318,7 @@ class syntactic_printer ~libc reachable = object(self)
     Datatype.Filepath.Map.iter
       (fun path fvinfoset ->
          Format.fprintf fmt "@[<hov 2><%a>:@ %a@]@ "
-           Datatype.Filepath.pretty path
+           Filepath.pretty path
            (fun fmt vinfoset ->
               let vars = Varinfo.Set.elements vinfoset in
               let sorted_vars = List.sort compare_vi_names vars in

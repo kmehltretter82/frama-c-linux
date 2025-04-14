@@ -39,6 +39,12 @@ val equal: t -> t -> bool
 (** Comparison of paths. *)
 val compare: t -> t -> int
 
+(** Hash of paths. **)
+val hash: t -> int
+
+(** Copy of paths. Currently implemented as identity. *)
+val copy: t -> t
+
 (** Compares prettified (i.e. relative) paths, with or without
     case sensitivity (by default, [case_sensitive = false]). *)
 val compare_pretty : ?case_sensitive:bool -> t -> t -> int
@@ -287,7 +293,7 @@ val is_empty_pos : position -> bool
 (** {2 High level Input/Output} *)
 (* ************************************************************************* *)
 
-val copy : t -> t -> unit
+val copy_file : t -> t -> unit
 (** [copy source target] copies source file to target file.
     @since Frama-C+dev
     @before Frama-C+dev this function was [Command.copy]

@@ -120,7 +120,7 @@ let gen_expr =
 
 let gen_cabs typ expr =
   let expr = protected_cast typ expr in
-  (Datatype.Filepath.dummy,
+  (Filepath.empty,
    [ false,
      DECDEF(
        None,

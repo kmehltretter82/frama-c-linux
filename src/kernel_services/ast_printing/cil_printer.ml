@@ -1404,7 +1404,7 @@ class cil_printer () = object (self)
 
   (* Store here the name of the last file printed in a line number. This is
      private to the object *)
-  val mutable lastFileName = Datatype.Filepath.dummy
+  val mutable lastFileName = Filepath.empty
   val mutable lastLineNumber = -1
 
   (* Make sure that you only call self#line_directive on an empty line *)
@@ -1429,7 +1429,7 @@ class cil_printer () = object (self)
         if forcefile || pos.Filepath.pos_path <> lastFileName then begin
           lastFileName <- pos.Filepath.pos_path;
           Format.asprintf " \"%a\""
-            Datatype.Filepath.pretty pos.Filepath.pos_path
+            Filepath.pretty pos.Filepath.pos_path
         end else
           ""
       in

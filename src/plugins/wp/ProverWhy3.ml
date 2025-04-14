@@ -817,14 +817,14 @@ class visitor (ctx:context) c =
 
     method on_library thy =
       let copy_file source =
-        if not (Datatype.Filepath.equal
+        if not (Filepath.equal
                   (Filepath.dirname source)
                   (Wp_parameters.Share.get_dir "."))
         then
           let tgtdir = WpContext.directory () in
           let why3src = Filepath.basename source in
           let target = Filepath.concat tgtdir (why3src :> string) in
-          Filepath.copy source target
+          Filepath.copy_file source target
       in
       let iter_file opt =
         match Str.split_delim regexp_col opt with
@@ -1527,7 +1527,7 @@ let print_debug_task wpo drv prover task =
     let prover = Why3Provers.title prover in
     let goal = Wpo.get_gid wpo ^ "_" ^ prover in
     let filename = Why3.Driver.file_of_task drv "" goal task in
-    let file = Datatype.Filepath.concat out_dir filename in
+    let file = Filepath.concat out_dir filename in
     let out_channel = open_out (file :> string) in
     let fmt = Format.formatter_of_out_channel out_channel in
     Format.fprintf fmt "%a" pp_task task ;

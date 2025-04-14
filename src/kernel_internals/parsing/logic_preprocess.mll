@@ -115,7 +115,7 @@
   let annot_end_comment = "////////////////__ANNOT_END_COMMENT__"
 
   let abort_preprocess reason =
-    let source = {Cil_datatype.Position.unknown with Filepath.pos_path = Datatype.Filepath.of_string !curr_file;
+    let source = {Cil_datatype.Position.unknown with Filepath.pos_path = Filepath.of_string !curr_file;
                   pos_lnum = !curr_line;}
     in
     Kernel.error ~source
@@ -555,5 +555,5 @@ parse
       main lex;
       preprocess_annots suffix cpp ppfile;
       close_out ppfile;
-      Datatype.Filepath.of_string ppname
+      Filepath.of_string ppname
 }

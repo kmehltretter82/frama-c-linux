@@ -8,7 +8,7 @@ let is_header f = Str.string_match header_re f 0
 
 (* Files which are *not* supposed to be parsed *)
 let blacklist libc_dir =
-  List.map (Datatype.Filepath.concat libc_dir) ["tgmath.h"; "complex.h"]
+  List.map (Filepath.concat libc_dir) ["tgmath.h"; "complex.h"]
 
 (* only goes down one level, which is enough for the libc *)
 let collect_headers () =
@@ -32,9 +32,9 @@ let collect_headers () =
   let all_headers = List.sort Extlib.compare_ignore_case all_headers in
   let to_skip = blacklist libc_dir in
   List.iter (fun header ->
-      let header_path = Datatype.Filepath.of_string header in
+      let header_path = Filepath.of_string header in
       if List.mem header_path to_skip then
-        Format.printf "skipping %a@." Datatype.Filepath.pretty header_path
+        Format.printf "skipping %a@." Filepath.pretty header_path
       else begin
         Kernel.Files.clear ();
         Dynamic.Parameter.String.set "" header;

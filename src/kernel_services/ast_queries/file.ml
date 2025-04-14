@@ -400,7 +400,7 @@ let create_temp_file name suffix =
   with Extlib.Temp_file_error s ->
     Kernel.abort "cannot create temporary file: %s" s
 
-let safe_remove_file (f : Datatype.Filepath.t) =
+let safe_remove_file (f : Filepath.t) =
   if not (Kernel.is_debug_key_enabled Kernel.dkey_pp_keep_temp_files) then
     Extlib.safe_remove (f :> string)
 
@@ -578,7 +578,7 @@ let abort_with_detailed_pp_message f cpp_command =
         Format.asprintf "note: %s is set but \
                          contains no entries for '%a'.@ "
           Kernel.JsonCompilationDatabase.option_name
-          Datatype.Filepath.pretty f
+          Filepath.pretty f
       else ""
     else
     if not (Kernel.CppExtraArgs.is_set ()) &&
@@ -604,12 +604,12 @@ let parse_cabs cpp_command = function
       Kernel.abort "preprocessed file %a does not exist"
         Filepath.pretty f;
     Kernel.feedback "Parsing %a (no preprocessing)"
-      Datatype.Filepath.pretty f;
+      Filepath.pretty f;
     Frontc.parse f ()
   | NeedCPP (f, cmdl, _extra_for_this_file, is_gnu_like) ->
     let cpp_command, ppf = Option.get cpp_command in
     Kernel.feedback "Parsing %a (with preprocessing)"
-      Datatype.Filepath.pretty f;
+      Filepath.pretty f;
     if Sys.command cpp_command <> 0 then begin
       safe_remove_file ppf;
       abort_with_detailed_pp_message f cpp_command
@@ -655,7 +655,7 @@ let parse_cabs cpp_command = function
       Kernel.abort "file %a does not exist."
         Filepath.pretty f;
     Kernel.feedback "Parsing %a (external front-end)"
-      Datatype.Filepath.pretty f;
+      Filepath.pretty f;
     (match Hashtbl.find_opt check_suffixes suf with
      | Some parse -> parse (f:>string)
      | None ->
@@ -690,7 +690,7 @@ let () =
         Kernel.abort "preprocessing of annotations failed (%s)"
           (Printexc.to_string e)
     in
-    let path = Datatype.Filepath.of_string f in
+    let path = Filepath.of_string f in
     let (cil,(_,defs)) = Frontc.parse ppf () in
     cil.fileName <- path;
     safe_remove_file ppf;

@@ -876,7 +876,7 @@ let prepare_editor_cmd s line filename =
   (* always start in background, otherwise will freeze the GUI *)
   s ^ " &"
 
-let open_in_external_viewer ?(line=1) (file : Datatype.Filepath.t) =
+let open_in_external_viewer ?(line=1) (file : Filepath.t) =
   let filename = Format.asprintf "%S" (file :> string) in
   let editor = Configuration.find_string ~default:"emacs +%d %s" "editor" in
   if editor = "" then
