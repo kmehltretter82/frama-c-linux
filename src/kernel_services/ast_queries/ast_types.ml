@@ -41,41 +41,42 @@ let rec get_attributes { tnode; tattr } =
   | TFun _   -> tattr
   | TBuiltin_va_list -> tattr
 
-let rec add_attributes ?(push_qualifiers=true) ?(combine=Ast_attributes.add_list) a0 t =
-  begin
-    match a0 with
-    | [] ->
-      (* no attributes, keep same type *)
-      t
-    | _ ->
-      (* anything else: add a0 to existing attributes *)
-      let add (a: attributes) = combine a0 a in
-      match t.tnode with
-      | TVoid
-      | TInt   _
-      | TFloat _
-      | TEnum  _
-      | TPtr   _
-      | TFun   _
-      | TComp  _
-      | TNamed _
-      | TBuiltin_va_list -> {t with tattr = add t.tattr}
-      | TArray (bt, l) ->
-        if not push_qualifiers then {t with tattr = add t.tattr}
-        else
-          let att_elt, att_typ = Ast_attributes.split_array_attributes a0 in
-          let bt' = array_push_attributes att_elt bt in
-          let tattr = Ast_attributes.add_list att_typ t.tattr in
-          Cil_const.mk_tarray ~tattr bt' l
-  end
+let rec add_attributes ?(push_qualifiers=true) a0 t =
+  if a0 = [] then t
+  else
+    let add = Ast_attributes.add_list a0 in
+    match t.tnode with
+    | TVoid
+    | TInt   _
+    | TFloat _
+    | TEnum  _
+    | TPtr   _
+    | TFun   _
+    | TComp  _
+    | TNamed _
+    | TBuiltin_va_list -> {t with tattr = add t.tattr}
+    | TArray (bt, l) ->
+      if not push_qualifiers then {t with tattr = add t.tattr}
+      else
+        let att_elt, att_typ = Ast_attributes.split_array_attributes a0 in
+        let bt' = array_push_attributes att_elt bt in
+        let tattr = Ast_attributes.add_list att_typ t.tattr in
+        (* Push already done here, avoids infinite recursion. *)
+        Cil_const.mk_tarray ~push_qualifiers:false ~tattr bt' l
+
 (* Push attributes that belong to the type of the elements of the array as
-   far as possible *)
+   far as possible. *)
 and array_push_attributes al t =
   match t.tnode with
   | TArray (bt, l) ->
     let bt' = array_push_attributes al bt in
-    Cil_const.mk_tarray ~tattr:t.tattr bt' l
+    (* Push already done here, avoids infinite recursion. *)
+    Cil_const.mk_tarray ~push_qualifiers:false ~tattr:t.tattr bt' l
   | _ -> add_attributes al t
+
+let () =
+  Cil_const.add_attributes_ref := add_attributes
+[@@alert "-add_attributes_ref"]
 
 (**** Look for the presence of an attribute in a type ****)
 

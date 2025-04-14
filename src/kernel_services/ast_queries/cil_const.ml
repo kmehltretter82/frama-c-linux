@@ -46,13 +46,20 @@ open Cil_types
 
 (* Types *)
 
-let mk_typ ?(tattr=[]) tnode = { tnode; tattr }
+let add_attributes_ref =
+  ref (fun ?push_qualifiers:_ tattr t -> { t with tattr } )
+
+let mk_typ ?(push_qualifiers=true) ?(tattr=[]) tnode =
+  if push_qualifiers then
+    !add_attributes_ref ~push_qualifiers tattr { tnode; tattr = [] }
+  else { tnode; tattr }
 
 let mk_tvoid  ?tattr ()    = mk_typ ?tattr TVoid
 let mk_tint   ?tattr ik    = mk_typ ?tattr (TInt   ik)
 let mk_tfloat ?tattr fk    = mk_typ ?tattr (TFloat fk)
 let mk_tptr   ?tattr t     = mk_typ ?tattr (TPtr   t )
-let mk_tarray ?tattr t len = mk_typ ?tattr (TArray (t, len))
+let mk_tarray ?push_qualifiers ?tattr t len =
+  mk_typ ?push_qualifiers ?tattr (TArray (t, len))
 let mk_tfun   ?tattr f args va = mk_typ ?tattr (TFun (f, args, va))
 let mk_tnamed ?tattr ti    = mk_typ ?tattr (TNamed ti)
 let mk_tcomp  ?tattr ci    = mk_typ ?tattr (TComp  ci)
@@ -136,9 +143,9 @@ let mkCompInfo
        * representation of the structure type constructs the type of
        * the fields. The function can ignore this argument if not
        * constructing a recursive type.  *)
-    (mkfspec: compinfo -> (string * typ * int option * attribute list *
+    (mkfspec: compinfo -> (string * typ * int option * attributes *
                            location) list option)
-    (a: attribute list) : compinfo =
+    (a: attributes) : compinfo =
 
   (* make a new name for anonymous structs *)
   if n = "" then Kernel.fatal "mkCompInfo: missing structure name\n" ;

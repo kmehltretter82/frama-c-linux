@@ -428,7 +428,7 @@ class type cilVisitor = object
 
   method venumitem: enumitem -> enumitem visitAction
 
-  method vattr: attribute -> attribute list visitAction
+  method vattr: attribute -> attributes visitAction
   (** Attribute. Each attribute can be replaced by a list *)
 
   method vattrparam: attrparam -> attrparam visitAction
@@ -2075,7 +2075,7 @@ and childrenVarDecl (vis : cilVisitor) (v : varinfo) : varinfo =
 and visitCilVarUse vis v =
   doVisitCil vis (Visitor_behavior.Get.varinfo vis#behavior) vis#vvrbl alphabetabeta v
 
-and visitCilAttributes (vis: cilVisitor) (al: attribute list) : attribute list=
+and visitCilAttributes (vis: cilVisitor) (al: attributes) : attributes =
   let al' =
     Extlib.map_no_copy_list
       (doVisitListCil vis
@@ -5190,6 +5190,11 @@ let combineTypesGen ?emitwith (combF : combineFunction)
     ~strictInteger ~strictReturnTypes
     (what : combineWhat) (oldt : typ) (t : typ) : typ =
   let warning = Kernel.warning ?emitwith in
+  let add_attributes what attrs t =
+    match what with
+    | CombineFunarg _ -> t
+    | _ -> Ast_types.add_attributes attrs t
+  in
   let tattr = combineAttributes what oldt.tattr t.tattr in
   match oldt.tnode, t.tnode with
   | TVoid, TVoid ->
@@ -5379,14 +5384,14 @@ let combineTypesGen ?emitwith (combF : combineFunction)
       combF.typ_combine combF
         ~strictInteger ~strictReturnTypes what oldt ti.ttype
     in
-    Ast_types.add_attributes ~combine:(combineAttributes what) t.tattr res
+    add_attributes what t.tattr res
 
   | TNamed oldti, _ ->
     let res =
       combF.typ_combine combF
         ~strictInteger ~strictReturnTypes what oldti.ttype t
     in
-    Ast_types.add_attributes ~combine:(combineAttributes what) oldt.tattr res
+    add_attributes what t.tattr res
 
   | _ ->
     raise
@@ -6738,7 +6743,8 @@ let separateStorageModifiers = Ast_attributes.split_storage_modifiers
 let typeAttr { tattr } = tattr
 let typeAttrs = Ast_types.get_attributes
 let setTypeAttrs t a = { t with tattr =  a }
-let typeAddAttributes = Ast_types.add_attributes ~push_qualifiers:true
+let typeAddAttributes ?combine:_ =
+  Ast_types.add_attributes ~push_qualifiers:true
 
 let typeHasAttribute = Ast_types.has_attribute
 let typeHasQualifier = Ast_types.has_qualifier

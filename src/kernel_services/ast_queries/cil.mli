@@ -1389,7 +1389,7 @@ class type cilVisitor = object
   method venumitem: enumitem -> enumitem visitAction
   (** visit the declaration of an enumeration item *)
 
-  method vattr: attribute -> attribute list visitAction
+  method vattr: attribute -> attributes visitAction
   (** Attribute. Each attribute can be replaced by a list *)
 
   method vattrparam: attrparam -> attrparam visitAction
@@ -1658,7 +1658,7 @@ val visitCilVarDecl: cilVisitor -> varinfo -> varinfo
 val visitCilInit: cilVisitor -> varinfo -> offset -> init -> init
 
 (** Visit a list of attributes *)
-val visitCilAttributes: cilVisitor -> attribute list -> attribute list
+val visitCilAttributes: cilVisitor -> attributes -> attributes
 
 val visitCilAnnotation: cilVisitor -> global_annotation -> global_annotation
 
@@ -2008,7 +2008,7 @@ val pp_exp_ref: (Format.formatter -> exp -> unit) ref
 val pp_lval_ref: (Format.formatter -> lval -> unit) ref
 val pp_ikind_ref: (Format.formatter -> ikind -> unit) ref
 val pp_attribute_ref: (Format.formatter -> attribute -> unit) ref
-val pp_attributes_ref: (Format.formatter -> attribute list -> unit) ref
+val pp_attributes_ref: (Format.formatter -> attributes -> unit) ref
 val pp_term_ref: (Format.formatter -> term -> unit) ref
 val pp_logic_type_ref: (Format.formatter -> logic_type -> unit) ref
 val pp_identified_term_ref: (Format.formatter -> identified_term -> unit) ref
@@ -2064,7 +2064,7 @@ val addAttribute: attribute -> attributes -> attributes
 
 (** Add a list of attributes. Maintains the attributes in sorted order. The
     second argument must be sorted, but not necessarily the first *)
-val addAttributes: attribute list -> attributes -> attributes
+val addAttributes: attributes -> attributes -> attributes
 [@@deprecated "Use Ast_attributes.add_list instead."]
 [@@migrate { repl = Ast_attributes.add_list } ]
 
@@ -2080,7 +2080,7 @@ val dropAttributes: string list -> attributes -> attributes
 [@@deprecated "Use Ast_attributes.drop_list instead."]
 [@@migrate { repl = Ast_attributes.drop_list } ]
 
-(** True if the named attribute appears in the attribute list. The list of
+(** True if the named attribute appears in the attributes. The list of
     attributes must be sorted.  *)
 val hasAttribute: string -> attributes -> bool
 [@@deprecated "Use Ast_attributes.contains instead."]
@@ -2088,7 +2088,7 @@ val hasAttribute: string -> attributes -> bool
 
 (** Returns the list of parameters associated to an attribute. The list is empty if there
     is no such attribute or it has no parameters at all. *)
-val findAttribute: string -> attribute list -> attrparam list
+val findAttribute: string -> attributes -> attrparam list
 [@@deprecated "Use Ast_attributes.find_params instead."]
 [@@migrate { repl = Ast_attributes.find_params } ]
 
@@ -2135,9 +2135,9 @@ val isKnownAttribute: string -> bool
     @before 30.0-Zinc no [default] argument
 *)
 val partitionAttributes:  default:Ast_attributes.attribute_class ->
-  attributes -> attribute list * (* AttrName *)
-                attribute list * (* AttrFunType *)
-                attribute list   (* AttrType *)
+  attributes -> attributes * (* AttrName *)
+                attributes * (* AttrFunType *)
+                attributes   (* AttrType *)
 [@@deprecated "Use Ast_attributes.partition instead."]
 [@@migrate { repl = Ast_attributes.partition } ]
 
@@ -2151,7 +2151,7 @@ val splitArrayAttributes: attributes -> attributes * attributes
 [@@migrate { repl = Ast_attributes.split_array_attributes } ]
 
 (** Separate out the storage-modifier name attributes *)
-val separateStorageModifiers: attribute list -> attribute list * attribute list
+val separateStorageModifiers: attributes -> attributes * attributes
 [@@deprecated "Use Ast_attributes.split_storage_modifiers instead."]
 [@@migrate { repl = Ast_attributes.split_storage_modifiers } ]
 
@@ -2203,7 +2203,7 @@ val frama_c_inlined: string
 
 (** Returns the attributes of a type.
     @deprecated Frama-C+dev *)
-val typeAttr: typ -> attribute list
+val typeAttr: typ -> attributes
 [@@deprecated "Use [t.tattr] instead."]
 [@@migrate { repl = (fun t -> t.tattr) } ]
 
@@ -2216,17 +2216,18 @@ val setTypeAttrs: typ -> attributes -> typ
 
 (** Returns all the attributes contained in a type. This requires a traversal
     of the type structure, in case of composite, enumeration and named types *)
-val typeAttrs: typ -> attribute list
+val typeAttrs: typ -> attributes
 [@@deprecated "Use Ast_types.get_attributes instead."]
 [@@migrate { repl = Ast_types.get_attributes } ]
 
-(** Add some attributes to a type. [combine] explains how to combine attributes.
-    Default is {!Ast_attributes.add_list}.
+(** Add some attributes to a type. [combine] is now ignored and we always use
+    {!Ast_attributes.add_list} instead.
 
-    @before 28.0-Nickel [combine] does not exist *)
-val typeAddAttributes: ?combine: (attribute list -> attributes -> attributes) ->
-  attribute list -> typ -> typ
-[@@deprecated "Use Ast_types.add_attributes instead."]
+    @before 28.0-Nickel [combine] does not exist. *)
+
+val typeAddAttributes: ?combine:(attribute list -> attributes -> attributes) ->
+  attributes -> typ -> typ
+[@@deprecated "Use Ast_types.add_attributes instead, [combine] is not supported anymore."]
 [@@migrate { repl = Ast_types.add_attributes } ]
 
 (** Remove all attributes with the given names from a type. Note that this
