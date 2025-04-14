@@ -1,3 +1,4 @@
+[kernel] Expanding arguments from mthread_test_options.txt
 [kernel] Parsing FRAMAC_SHARE/mt/mthread.h (with preprocessing)
 [kernel] Parsing sharedarray.c (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/mthread_pthread.c (with preprocessing)
