@@ -200,6 +200,9 @@ let wkey_int_conversion =
 let wkey_merge_conversion =
   register_warn_category "typing:merge-conversion"
 
+let wkey_initializer_overrides =
+  register_warn_category "typing:initializer-overrides"
+
 let wkey_cert_exp_46 = register_warn_category "CERT:EXP:46"
 
 let wkey_cert_msc_37 = register_warn_category "CERT:MSC:37"

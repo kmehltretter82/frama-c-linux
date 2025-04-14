@@ -2880,6 +2880,11 @@ let rec setOneInit this o preinit =
              S const s = {.t = {.a = x.a, .b = 3}};
 
         *)
+        Kernel.warning ~current:true ~once:true
+          ~wkey:Kernel.wkey_initializer_overrides
+          "overriding prior initialization '%a' of the subobject '%a'"
+          Cil_printer.pp_exp e
+          Cil_printer.pp_offset o;
         match e.enode, Ast_types.unroll_skel (Cil.typeOf e) with
         | Lval old_lv, TComp { cfields = Some fields } ->
           (* To be done, we need to have an lvalue and a Tcomp, otherwise we

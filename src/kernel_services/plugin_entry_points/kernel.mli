@@ -190,6 +190,8 @@ val wkey_int_conversion: warn_category
 
 val wkey_merge_conversion: warn_category
 
+val wkey_initializer_overrides: warn_category
+
 val wkey_cert_exp_46: warn_category
 
 val wkey_cert_msc_37: warn_category
