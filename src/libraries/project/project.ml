@@ -590,39 +590,38 @@ module Descr = struct
 end
 
 let load_projects ~project_under_copy selection ?name filename =
-  let cin = open_in_bin (filename : Filepath.t :> string) in
-  let gen_read f cin =
-    try f cin with
+  let open Filepath.Operators in
+  let ocamlgraph_counter, pre_existing_projects, loaded_states, last_created =
+    try
+      let$ cin = Filepath.with_open_in_exn ~binary:true filename in
+      let check_magic format current =
+        let old = input_value cin in
+        if old <> current then begin
+          let s =
+            Format.asprintf
+              "project saved with an incompatible version \
+               (old: \"%a\", current: \"%a\")"
+              (fun fmt -> Format.fprintf fmt format) old
+              (fun fmt -> Format.fprintf fmt format) current
+          in
+          raise (IOError s)
+        end
+      in
+      check_magic "%S" System_config.Version.id;
+      check_magic "magic number %d" magic;
+      let ocamlgraph_counter = input_value cin in
+      let pre_existing_projects = Descr.init project_under_copy in
+      let loaded_states, last_created =
+        Descr.input_val cin (Descr.global_state name selection)
+      in
+      ocamlgraph_counter, pre_existing_projects, loaded_states, last_created
+    with
+    | Failure s ->
+      raise (IOError s)
     | End_of_file ->
-      close_in cin;
       abort "unexpected end of file while loading '%a'"
         Filepath.pretty filename
-    | Failure s -> close_in cin; raise (IOError s)
   in
-  let read = gen_read input_value in
-  let check_magic cin to_string current =
-    let old = read cin in
-    if old <> current then begin
-      close_in cin;
-      let s =
-        Format.sprintf
-          "project saved with an incompatible version (old: %S,current: %S)"
-          (to_string old)
-          (to_string current)
-      in
-      raise (IOError s)
-    end
-  in
-  check_magic cin (fun x -> x) System_config.Version.id;
-  check_magic cin (fun n -> "magic number " ^ string_of_int n) magic;
-  let ocamlgraph_counter = read cin in
-  let pre_existing_projects = Descr.init project_under_copy in
-  let loaded_states, last_created =
-    gen_read
-      (fun c -> Descr.input_val c (Descr.global_state name selection))
-      cin
-  in
-  close_in cin;
   last_created_by_copy_ref := last_created;
   Descr.finalize loaded_states selection;
   Graph.Blocks.after_unserialization ocamlgraph_counter;
