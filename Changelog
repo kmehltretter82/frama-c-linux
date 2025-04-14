@@ -18,11 +18,11 @@
 Open Source Release <next-release>
 ###############################################################################
 
-o   Kernel    [2025-04-11] Removed files in share/compliance.
-              Compiler builtin JSON files were moved to share/machdeps.
-o!  Kernel    [2025-04-10] Building types via `Cil_const` now uses
+o!  Kernel    [2025-04-14] Building types via `Cil_const` now uses
               `Ast_types.add_attributes` and in case of array tries to push
               qualifiers to the array elements, unless stated otherwise.
+o   Kernel    [2025-04-11] Removed files in share/compliance.
+              Compiler builtin JSON files were moved to share/machdeps.
 -!  Kernel    [2025-03-21] Change API to register attributes, with now the
               possibility to ignore an attribute when comparing types, and
               to print or not the attribute in the AST. AttrIgnored was replaced
