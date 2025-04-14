@@ -30,17 +30,17 @@ PULLCACHE=
 UPDATE=
 GENERATE=
 LOGS=
-TESTS=
+TESTS=()
 SAVE=
 COVER=
 HTML=
 XML=
 JSON=
 
-PTESTS_DIR=
+PTESTS_DIR=()
 DUNE_ALIAS=()
-DUNE_OPT=
-DUNE_OPT_POST=
+DUNE_OPT=()
+DUNE_OPT_POST=()
 DUNE_LOG=./.test-errors.log
 ALIAS_NAME=ptests
 LOCAL_WP_CACHE=$(pwd -P)/.wp-cache
@@ -111,43 +111,43 @@ function Usage
 
 function Head()
 {
-    echo "# $@"
+    echo "# $*"
 }
 
 function Error ()
 {
-    echo "Error: $@"
+    echo "Error: $*"
     exit 1
 }
 
 function ErrorUsage ()
 {
-    echo "Error: $@"
+    echo "Error: $*"
     echo "USAGE: ${THIS_SCRIPT} -h"
     exit 1
 }
 
 function Echo()
 {
-    [ "$VERBOSE" != "yes" ] || echo $@
+    [ "$VERBOSE" != "yes" ] || echo "$@"
 }
 
 function Run
 {
-    Echo "> $@"
-    $@
+    Echo "> $*"
+    "$@"
 }
 
 function Cmd
 {
-    Run $@
-    [ "$?" = "0" ] || Error "(command exits $?): $@"
+    Run "$@" || Error "(command exits $?): $*"
 }
 
 function RequiredTools
 {
-    for tool in $@ ; do
-        Where=$(which $tool) || Error "Executable not found: $tool"
+    local tool
+    for tool in "$@" ; do
+        which "$tool" >/dev/null 2>&1 || Error "Executable not found: $tool"
     done
 }
 
@@ -224,11 +224,11 @@ do
             elif [ "$1" != "${1#/}" ]; then
                 Error "Dune only accepts relative path, $1 is absolute"
             elif [ -f "$1" ] || [ -d "$1" ]; then
-                TESTS+=" $1"
+                TESTS+=("$1")
             elif [ -d "tests/$1" ]; then
-                TESTS+=" tests/$1"
+                TESTS+=("tests/$1")
             elif [ -d "src/plugins/$1/tests" ]; then
-                TESTS+=" src/plugins/$1/tests"
+                TESTS+=("src/plugins/$1/tests")
             else
                 ErrorUsage "'$1' is neither a file/directory or a dune alias"
             fi
@@ -238,15 +238,16 @@ do
 done
 
 if [ "$UPDATE" = "yes" ] || [ "$GENERATE" = "yes" ]; then
-    DUNE_OPT+=" --auto-promote"
+    DUNE_OPT+=("--auto-promote")
 fi
 
 if [ "$VERBOSE" = "yes" ]; then
-  DUNE_OPT+=" --display=short --always-show-command-line"
+  DUNE_OPT+=("--display=short")
+  DUNE_OPT+=("--always-show-command-line")
 fi
 
 # Pass all the remaining options (after '--') to dune at the end of the command
-DUNE_OPT_POST="$@"
+DUNE_OPT_POST=("$@")
 
 # --------------------------------------------------------------------------
 # ---  WP Cache Environment
@@ -291,7 +292,7 @@ function CloneCache
     if [ ! -d "$FRAMAC_WP_CACHEDIR" ]; then
         Head "Cloning WP cache (from $FRAMAC_WP_CACHE_GIT to $FRAMAC_WP_CACHEDIR)..."
         RequiredTools git
-        Cmd git clone $FRAMAC_WP_CACHE_GIT $FRAMAC_WP_CACHEDIR
+        Cmd git clone "$FRAMAC_WP_CACHE_GIT" "$FRAMAC_WP_CACHEDIR"
     fi
 }
 
@@ -301,7 +302,7 @@ function PullCache
     then
         Head "Pull WP cache (to $FRAMAC_WP_CACHEDIR)..."
         RequiredTools git
-        Run git -C $FRAMAC_WP_CACHEDIR pull --rebase
+        Run git -C "$FRAMAC_WP_CACHEDIR" pull --rebase
     fi
 }
 
@@ -311,7 +312,8 @@ function PullCache
 
 function PrepareCoverage
 {
-    export BISECT_FILE="$(pwd -P)/_bisect/bisect-"
+    BISECT_FILE="$(pwd -P)/_bisect/bisect-"
+    export BISECT_FILE
     if [ "$COVER" = "yes" ] ;
     then
         Cmd rm -rf _coverage
@@ -319,7 +321,7 @@ function PrepareCoverage
         Cmd mkdir _coverage
         Cmd mkdir _bisect
 
-        DUNE_OPT+=" --workspace dev/dune-workspace.cover"
+        DUNE_OPT+=("--workspace dev/dune-workspace.cover")
     fi
 }
 
@@ -355,20 +357,20 @@ function GenerateDuneFiles
 
 function CheckDuneFiles
 {
-    DEFAULT_FILE=tests/syntax/result/dune
+    local default_file="tests/syntax/result/dune"
     if [ "$PREPARE" != "yes" ] ;
     then
-        if [ ! -f "$DEFAULT_FILE" ] ;
+        if [ ! -f "$default_file" ] ;
         then
             GenerateDuneFiles
         else
-            DATE_TEST_MODIFICATION=$(find -L $TESTS -type f \
+            DATE_TEST_MODIFICATION=$(find -L "${TESTS[@]}" -type f \
                                     -not -path "*/result*/*" \
                                     -not -path "*/oracle*/*" \
                                     -exec stat --printf "%Y\n" {} \+ | \
                                     sort -n -r | head -n 1)
-            DATE_TEST_GENERATION=$(stat $DEFAULT_FILE --printf "%Y\n")
-            if [ $DATE_TEST_MODIFICATION -gt $DATE_TEST_GENERATION ] ;
+            DATE_TEST_GENERATION=$(stat $default_file --printf "%Y\n")
+            if [ "$DATE_TEST_MODIFICATION" -gt "$DATE_TEST_GENERATION" ] ;
             then
                 GenerateDuneFiles
             fi
@@ -378,11 +380,12 @@ function CheckDuneFiles
 
 function PrepareTests
 {
-    if [ -z "$TESTS" ] && (( ${#DUNE_ALIAS[@]} == 0 )); then
+    local dir
+    if [ "${#TESTS[@]}" == 0 ] && (( "${#DUNE_ALIAS[@]}" == 0 )); then
         DUNE_ALIAS+=("@runtest")
         for dir in $TEST_DIRS ; do
             if [ -d "$dir" ]; then
-                TESTS+=" $dir"
+                TESTS+=("$dir")
             fi
         done
     fi
@@ -402,18 +405,20 @@ function PrepareTests
 # ---  Test Dir Alias
 # --------------------------------------------------------------------------
 
-[ "$DUNE_LOG" = "" ] || rm -rf $DUNE_LOG
+[ "$DUNE_LOG" = "" ] || rm -rf "$DUNE_LOG"
 function RunAlias
 {
     Head "Running tests..."
+    local commands=("${DUNE_OPT[@]}" "$@" "${DUNE_OPT_POST[@]}")
+
     if [ "$DUNE_LOG" = "" ]; then
-        Run dune build $DUNE_OPT $@ $DUNE_OPT_POST
+        Run dune build "${commands[@]}"
     elif [ "$SAVE" != "yes" ] && [ "$VERBOSE" != "yes" ]; then
-        Run dune build $DUNE_OPT $@ $DUNE_OPT_POST
+        Run dune build "${commands[@]}"
     else
         # note: the Run function cannot performs redirection
-        echo "> dune build $DUNE_OPT $@ $DUNE_OPT_POST 2> >(tee -a $DUNE_LOG >&2)"
-        dune build $DUNE_OPT $@ $DUNE_OPT_POST 2> >(tee -a $DUNE_LOG >&2)
+        echo "> dune build ${commands[*]} 2> >(tee -a $DUNE_LOG >&2)"
+        dune build "${commands[@]}" 2> >(tee -a "$DUNE_LOG" >&2)
     fi
 }
 
@@ -423,19 +428,19 @@ function RunAlias
 
 function TestDir
 {
-    local ALIAS
+    local alias cfg test
     case "$CONFIG" in
         "<all>")
-            ALIAS=$1/${ALIAS_NAME}
-            CFG="(all configs)"
+            alias=$1/${ALIAS_NAME}
+            cfg="(all configs)"
             ;;
         "<default>")
-            ALIAS=$1/${ALIAS_NAME}_config
-            CFG="(default config)"
+            alias=$1/${ALIAS_NAME}_config
+            cfg="(default config)"
             ;;
         *)
-            ALIAS=$1/${ALIAS_NAME}_config_$CONFIG
-            CFG="(config $CONFIG)"
+            alias=$1/${ALIAS_NAME}_config_$CONFIG
+            cfg="(config $CONFIG)"
             ;;
     esac
 
@@ -446,14 +451,13 @@ function TestDir
     if [[ ! "${DUNE_ALIAS[*]}" =~ "@runtest" ]]; then
         # Find all files and folders ending with ".t" except run.t files, and
         # add their respective aliases to DUNE_ALIAS.
-        cramtests=$(find "$1" -name '*.t' ! -name 'run.t')
-        for test in $cramtests ; do
+        for test in $(find "$1" -name '*.t' ! -name 'run.t') ; do
             DUNE_ALIAS+=("@${test%.*}")
         done
     fi
 
-    Head "Register test on directory $1 $CFG"
-    DUNE_ALIAS+=("@$ALIAS")
+    Head "Register test on directory $1 $cfg"
+    DUNE_ALIAS+=("@$alias")
 }
 
 # --------------------------------------------------------------------------
@@ -462,41 +466,40 @@ function TestDir
 
 function TestFile
 {
-    DIR=$(dirname $1)
-    FILE=$(basename $1)
-    local ALIAS
+    local dir file alias result cfg res
+    dir=$(dirname "$1")
+    file=$(basename "$1")
 
     case "$CONFIG" in
         "<all>")
-            RESULT=result*/
-            CFG="(all config)"
+            result="result*/"
+            cfg="(all config)"
             ;;
         "<default>")
-            RESULT=result
-            CFG="(default config)"
+            result="result/"
+            cfg="(default config)"
             ;;
         *)
-            RESULT=result_$CONFIG
-            CFG="(config $CONFIG)"
+            result="result_$CONFIG/"
+            cfg="(config $CONFIG)"
             ;;
     esac
 
-    RESULTS="$DIR/$RESULT"
-    for res in $RESULTS ; do
+    for res in "$dir"/$result ; do
         # Ignore cases where no result folder is found
         [ -d "$res" ] || break
 
         if [ "$LOGS" = "yes" ]; then
-            ALIAS+=" @$res/$FILE"
+            alias+=("@${res}${file}")
         else
-            ALIAS+=" @$res/${FILE%.*}.diff"
+            alias+=("@${res}${file%.*}.diff")
         fi
     done
 
-    FindPtestDir "$DIR"
+    FindPtestDir "$dir"
 
-    Head "Register test on file $1 $CFG"
-    DUNE_ALIAS+=("$ALIAS")
+    Head "Register test on file $1 $cfg"
+    DUNE_ALIAS+=("${alias[@]}")
 }
 
 # --------------------------------------------------------------------------
@@ -505,17 +508,17 @@ function TestFile
 
 function FindPtestDir
 {
-    local DIR="$1"
+    local dir="$1"
     if [ "$GENERATE" = "yes" ]; then
         # Look for the root folder of ptests, which contains ptests_config file
         # Only relative paths are accepted by dune, so the root folder of
         # every paths is '.'
-        while [ -d "$DIR" ] && [ "$DIR" != "." ]; do
-            if [ -f "$DIR/ptests_config" ]; then
-                PTESTS_DIR+=" $DIR"
+        while [ -d "$dir" ] && [ "$dir" != "." ]; do
+            if [ -f "$dir/ptests_config" ]; then
+                PTESTS_DIR+=("$dir")
                 break
             else
-                DIR=$(dirname "$DIR")
+                dir=$(dirname "$dir")
             fi
         done
     fi
@@ -539,7 +542,7 @@ function Register
 
     if [ "$GENERATE" = "yes" ]; then
         # Keep only one occurence of each folder
-        PTESTS_DIR=$(echo "$PTESTS_DIR" | tr ' ' '\n' | sort -u)
+        PTESTS_DIR=($(IFS=$'\n'; sort -u <<< "${PTESTS_DIR[*]}"))
     fi
 }
 
@@ -549,11 +552,10 @@ function Register
 
 function MissingOracles
 {
-    Run command -v frama-c-ptests 2>&1 >/dev/null
-    if [ $? -eq 0 ] ; then
-        Cmd frama-c-ptests "$1" "$PTESTS_DIR" 2>&1 >/dev/null
+    if Run which frama-c-ptests >/dev/null 2>&1 ; then
+        Cmd frama-c-ptests "$1" "${PTESTS_DIR[@]}" >/dev/null 2>&1
     else
-        Cmd dune exec -- frama-c-ptests "$1" "$PTESTS_DIR" 2>&1 >/dev/null
+        Cmd dune exec -- frama-c-ptests "$1" "${PTESTS_DIR[@]}" >/dev/null 2>&1
     fi
 }
 
@@ -579,25 +581,26 @@ function RemoveMissingOracles
 
 function Status
 {
+    local nb dir
     #-- Count number of executed tests
     if [ "$1" != "" ] && [ -f "$1" ]; then
         if [ "$VERBOSE" = "yes" ] ; then
             #-- Total
-            NB=$(grep -c "^frama-c-wtests " "$1")
-            Head "Number of executed frama-c-wtests= $NB"
+            nb=$(grep -c "^frama-c-wtests " "$1")
+            Head "Number of executed frama-c-wtests= $nb"
             #-- Details
             Head "Details by directory:"
-            if  [ "$NB" != "0" ]; then
-                for dir in $TESTS ; do
+            if  [ "$nb" != "0" ]; then
+                for dir in "${TESTS[@]}" ; do
                     if [ -d "$dir" ]; then
-                        NB=$(grep -c "^frama-c-wtests $dir" "$1")
-                        [ "$NB" = "0" ] || echo "- $dir= $NB"
+                        nb=$(grep -c "^frama-c-wtests $dir" "$1")
+                        [ "$nb" = "0" ] || echo "- $dir= $nb"
                     fi
                 done
             fi
         fi
         if [ "$SAVE" != "yes" ]; then
-            Cmd rm -f $1
+            Cmd rm -f "$1"
         fi
     fi
 
@@ -605,8 +608,8 @@ function Status
     if [ "$UPDATE" = "yes" ]; then
         Head "Update $FRAMAC_WP_CACHEDIR and check status"
         RequiredTools git
-        Run git -C $FRAMAC_WP_CACHEDIR add -A
-        Run git -C $FRAMAC_WP_CACHEDIR status -s
+        Run git -C "$FRAMAC_WP_CACHEDIR" add -A
+        Run git -C "$FRAMAC_WP_CACHEDIR" status -s
     fi
 }
 
@@ -620,11 +623,11 @@ PullCache
 PrepareCoverage
 PrepareTests
 CheckDuneFiles
-Register $TESTS
+Register "${TESTS[@]}"
 CreateMissingOracles
 RunAlias $(IFS=$'\n'; sort -u <<<"${DUNE_ALIAS[*]}")
 RemoveMissingOracles
-Status $DUNE_LOG
+Status "$DUNE_LOG"
 GenerateCoverage
 
 # --------------------------------------------------------------------------
