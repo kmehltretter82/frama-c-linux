@@ -164,11 +164,11 @@ module CounterExamples: Parameter_sig.Bool
 
 val has_out : unit -> bool
 val has_session : unit -> bool
-val get_session : force:bool -> unit -> Datatype.Filepath.t
-val get_session_dir : force:bool -> string -> Datatype.Filepath.t
-val get_output : unit -> Datatype.Filepath.t
-val get_output_dir : string -> Datatype.Filepath.t
-val make_output_dir : Datatype.Filepath.t -> unit
+val get_session : force:bool -> unit -> Filepath.t
+val get_session_dir : force:bool -> string -> Filepath.t
+val get_output : unit -> Filepath.t
+val get_output_dir : string -> Filepath.t
+val make_output_dir : Filepath.t -> unit
 
 (** {2 Debugging Categories} *)
 

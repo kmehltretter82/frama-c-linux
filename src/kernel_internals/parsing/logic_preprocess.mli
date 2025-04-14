@@ -35,5 +35,4 @@
     @raises Sys_error if the file cannot be opened.
 *)
 
-val file: string -> (string -> string -> string) -> string ->
-  Datatype.Filepath.t
+val file: string -> (string -> string -> string) -> string -> Filepath.t

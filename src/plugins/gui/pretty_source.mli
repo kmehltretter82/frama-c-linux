@@ -69,7 +69,7 @@ val ki_of_localizable : localizable -> kinstr
 val varinfo_of_localizable : localizable -> varinfo option
 
 val localizable_from_locs :
-  Locs.state -> file:Datatype.Filepath.t -> line:int -> localizable list
+  Locs.state -> file:Filepath.t -> line:int -> localizable list
 (** Returns the lists of localizable in [file] at [line]
     visible in the current [Locs.state].
     This function is inefficient as it iterates on all the current

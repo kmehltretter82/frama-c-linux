@@ -137,7 +137,7 @@ val pre_register: t -> unit
 val get_all: unit -> t list
 (** Return the list of toplevel files. *)
 
-val from_filename: ?cpp:string -> Datatype.Filepath.t -> t
+val from_filename: ?cpp:string -> Filepath.t -> t
 (** Build a file from its name. The optional argument is the preprocessor
     command. Default is [!get_preprocessor_command ()]. *)
 

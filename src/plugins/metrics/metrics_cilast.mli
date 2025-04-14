@@ -44,7 +44,7 @@ class type sloc_visitor = object
   (* Print the metrics of a file [string] to a formatter
      Yields a fatal error if the file does not exist (or has no metrics).
   *)
-  method pp_file_metrics: Format.formatter -> Datatype.Filepath.t -> unit
+  method pp_file_metrics: Format.formatter -> Filepath.t -> unit
 
   method pp_detailed_text_metrics: Format.formatter -> unit
   (** Print results of all file and functions to the given formatter as text *)

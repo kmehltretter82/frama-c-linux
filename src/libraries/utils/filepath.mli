@@ -39,7 +39,7 @@ val equal: t -> t -> bool
 (** Comparison of paths. *)
 val compare: t -> t -> int
 
-(** Hash of paths. **)
+(** Hash of paths. *)
 val hash: t -> int
 
 (** Copy of paths. Currently implemented as identity. *)
@@ -69,7 +69,7 @@ val pp_abs: Format.formatter -> t -> unit
 (** {2 Constant paths} *)
 (* ************************************************************************* *)
 
-(** Empty filepath, used as 'dummy' for [Datatype.Filepath].
+(** Empty filepath.
     @since 23.0-Vanadium.
 *)
 val empty: t
@@ -110,8 +110,7 @@ exception File_exists
       but [normalize] may accept them.
 
     @before 21.0-Scandium no [existence] argument.
-    @before Frama-C+dev this function was [normalize]
-*)
+    @before Frama-C+dev this function was [normalize] *)
 val of_string: ?existence:existence -> ?base:t -> string -> t
 
 (** [to_pretty_string p] returns [p] prettified,
@@ -135,18 +134,15 @@ val to_string_list: t list -> string list
       E.g. for the path "FRAMAC_SHARE/libc/string.h", returns
       ("FRAMAC_SHARE", "libc/string.h").
 
-    @since 22.0-Titanium
-*)
+    @since 22.0-Titanium *)
 val to_base_uri: t -> string option * string
 
 (** Equivalent to [Filename.basename].
-    @since 28.0-Nickel
-*)
+    @since 28.0-Nickel *)
 val basename: t -> string
 
 (** Equivalent to [Filename.dirname].
-    @since 28.0-Nickel
-*)
+    @since 28.0-Nickel *)
 val dirname: t -> t
 
 (** [extend ~existence file ext] returns the normalized path to the file
@@ -154,31 +150,27 @@ val dirname: t -> t
     The resulting path must respect [existence].
 
     @since 29.0-Copper
-    @before Frama-C+dev this function was [Normalize.extend]
-*)
+    @before Frama-C+dev this function was [Normalize.extend] *)
 val extend: ?existence:existence -> t -> string -> t
 
 (** [concat ~existence dir file] returns the normalized path
     resulting from the concatenation of [dir] ^ "/" ^ [file].
     The resulting path must respect [existence].
 
-    @since 22.0-Titanium
-*)
+    @since 22.0-Titanium *)
 val concat: ?existence:existence -> t -> string -> t
 
 (** [concats ~existence dir paths] concatenates a list of paths, as per
     the [concat] function.
 
-    @since 28.0-Nickel
-*)
+    @since 28.0-Nickel *)
 val concats: ?existence:existence -> t -> string list -> t
 
 (** returns true if the file is relative to [base]
     (that is, it is prefixed by [base_name]), or to the current
     working directory if no base is specified.
     @since Aluminium-20160501
-    @before 23.0-Vanadium argument types were string instead of t.
-*)
+    @before 23.0-Vanadium argument types were string instead of t. *)
 val is_relative: ?base_name:t -> t -> bool
 
 (** [relativize base_name file_name] returns a relative path name of
@@ -198,13 +190,11 @@ val relativize: ?base_name:string -> string -> string
     symbolic links in directory names.
 
     @since 25.0-Manganese
-    @before 28.0-Nickel return type was string instead of t.
-*)
+    @before 28.0-Nickel return type was string instead of t. *)
 val pwd : unit -> t
 
 (** Equivalent to [Sys.file_exists].
-    @since 28.0-Nickel
-*)
+    @since 28.0-Nickel *)
 val exists: t -> bool
 
 (** [is_file f] returns [true] iff [f] points to a regular file
@@ -214,23 +204,19 @@ val exists: t -> bool
 val is_file: t -> bool
 
 (** Equivalent to [Sys.is_directory].
-    @since 28.0-Nickel
-*)
+    @since 28.0-Nickel *)
 val is_dir: t -> bool
 
 (** Equivalent to [Sys.readdir].
-    @since 28.0-Nickel
-*)
+    @since 28.0-Nickel *)
 val readdir: t -> string array
 
 (** Equivalent to [Sys.remove].
-    @since 28.0-Nickel
-*)
+    @since 28.0-Nickel *)
 val remove: t -> unit
 
 (** Equivalent to [Sys.rename].
-    @since 28.0-Nickel
-*)
+    @since 28.0-Nickel *)
 val rename: t -> t -> unit
 
 
@@ -253,8 +239,7 @@ val reset_symbolic_dirs: unit -> unit
 (** Returns the list of symbolic dirs added via [add_symbolic_dir], plus
     preexisting ones (e.g. FRAMAC_SHARE), as pairs (name, dir).
 
-    @since 22.0-Titanium
-*)
+    @since 22.0-Titanium *)
 val all_symbolic_dirs: unit -> (string * t) list
 
 
@@ -263,8 +248,7 @@ val all_symbolic_dirs: unit -> (string * t) list
 (* ************************************************************************* *)
 
 (** Describes a position in a source file.
-    @since 18.0-Argon
-*)
+    @since 18.0-Argon *)
 type position =
   {
     pos_path : t;
@@ -274,18 +258,15 @@ type position =
   }
 
 (** Empty position, used as 'dummy' for [Cil_datatype.Position].
-    @since 30.0-Zinc
-*)
+    @since 30.0-Zinc *)
 val empty_pos : position
 
 (** Pretty-prints a position, in the format file:line.
-    @since 18.0-Argon
-*)
+    @since 18.0-Argon *)
 val pp_pos : Format.formatter -> position -> unit
 
 (** Return true if the given position is the empty position.
-    @since 30.0-Zinc
-*)
+    @since 30.0-Zinc *)
 val is_empty_pos : position -> bool
 
 
@@ -293,17 +274,15 @@ val is_empty_pos : position -> bool
 (** {2 High level Input/Output} *)
 (* ************************************************************************* *)
 
-val copy_file : t -> t -> unit
 (** [copy source target] copies source file to target file.
     @since Frama-C+dev
-    @before Frama-C+dev this function was [Command.copy]
-*)
+    @before Frama-C+dev this function was [Command.copy] *)
+val copy_file : t -> t -> unit
 
-val iter_lines : t -> (string -> unit) -> unit
 (** Iter over all text lines in the file
     @since Frama-C+dev
-    @before Frama-C+dev this function was [Command.read_lines]
-*)
+    @before Frama-C+dev this function was [Command.read_lines] *)
+val iter_lines : t -> (string -> unit) -> unit
 
 
 (* ************************************************************************* *)
@@ -345,8 +324,7 @@ type ('ch,'a) exn_processor = ('ch -> 'a) -> 'a
     @return [Ok (f input_channel)] if no exceptions are thrown, or [Error s]
     if a [Sys_error s] is thrown during the execution of [f] or during the
     closing of the file.
-    @since Frama-C+dev
-*)
+    @since Frama-C+dev *)
 val with_open_in:
   ?if_missing:action_if_missing ->
   ?binary:bool ->
@@ -356,8 +334,7 @@ val with_open_in:
 
 (** Same as {!with_open_in} but raises [Sys_error] instead of returning [Error].
     @since Frama-C+dev
-    @before Frama-C+dev this function was [Command.read_file]
-*)
+    @before Frama-C+dev this function was [Command.read_file] *)
 val with_open_in_exn :
   ?if_missing:action_if_missing ->
   ?binary:bool ->
@@ -380,8 +357,7 @@ val with_open_in_exn :
     @return [Ok (f output_channel)] if no exceptions are thrown, or [Error s]
     if a [Sys_error s] is thrown during the execution of [f] or during the
     closing the file.
-    @since Frama-C+dev
-*)
+    @since Frama-C+dev *)
 val with_open_out:
   ?if_missing:action_if_missing ->
   ?if_exists:action_if_exists ->
@@ -392,8 +368,7 @@ val with_open_out:
 
 (** Same as {!with_open_out} but raises [Sys_error] instead of returning [Error].
     @since Frama-C+dev
-    @before Frama-C+dev this function was [Command.write_file]
-*)
+    @before Frama-C+dev this function was [Command.write_file] *)
 val with_open_out_exn:
   ?if_missing:action_if_missing ->
   ?if_exists:action_if_exists ->
@@ -410,16 +385,14 @@ val with_open_out_exn:
     @return [Ok (f fmt)] if no exceptions are thrown, or [Error s]
     if a [Sys_error s] is thrown during the execution of [f] or when
     closing the file.
-    @since Frama-C+dev
-*)
+    @since Frama-C+dev *)
 val with_formatter: t -> (Format.formatter, 'a) safe_processor
 
 (** Same as {!with_formatter} but raises [Sys_error] instead of returning
     [Error].
     @since Frama-C+dev
     @before Frama-C+dev this function was [Command.pp_to_file] and
-    [Command.print_file]
-*)
+    [Command.print_file] *)
 val with_formatter_exn: t -> (Format.formatter, 'a) exn_processor
 
 (** Opening this module allows to use shorter syntax to deal with files.
@@ -451,8 +424,7 @@ val with_formatter_exn: t -> (Format.formatter, 'a) exn_processor
         else Error "wrong file header"
       with End_of_file ->
         Error "file is empty"
-    ]}
-*)
+    ]} *)
 module Operators : sig
   (** {3 Result operators}
       These operators are intended to be used with {!with_open_in} or {!with_open_out}.
@@ -484,8 +456,7 @@ val bincopy : bytes -> in_channel -> out_channel -> unit
 (** [copy buffer cin cout] reads [cin] until end-of-file
     and copy it in [cout].
     [buffer] is a temporary string used during the copy.
-    Recommended size is [2048].
-*)
+    Recommended size is [2048]. *)
 [@@deprecated "This function is only used locally and is not exported anymore."]
 
 module Normalized: sig
