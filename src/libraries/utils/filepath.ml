@@ -20,6 +20,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+type t = string
+
 type path = {
   hash : int ;
   path_name : string ;
@@ -41,6 +43,7 @@ let dummy = {
 let re_drive = Str.regexp "[A-Za-z]:"
 let re_path = Str.regexp "[/\\\\]"
 let re_root = Str.regexp "/\\|\\([A-Za-z]:\\\\\\)\\|\\([A-Za-z]:/\\)"
+
 
 (* -------------------------------------------------------------------------- *)
 (* --- Path Indexing                                                      --- *)
@@ -125,6 +128,11 @@ let insert base path_name =
       Array.set cache (hash land 255) (Some (path_name, path));
       path
 
+
+(* -------------------------------------------------------------------------- *)
+(* --- Current Working dir                                                --- *)
+(* -------------------------------------------------------------------------- *)
+
 (* Note: the call to Unix.realpath prevents some issues with symbolic links
    in directory names. If you have problems with this, please contact us.
    For the same reason, Sys.getcwd should _not_ be called directly, but only
@@ -135,7 +143,10 @@ let pwd () = Unix.(realpath (getcwd ()))
 
 let cwd = insert dummy (pwd ())
 
-type t = string
+
+(* -------------------------------------------------------------------------- *)
+(* --- Conversion from string                                             --- *)
+(* -------------------------------------------------------------------------- *)
 
 type existence =
   | Must_exist
@@ -172,31 +183,31 @@ let of_string ?(existence=Indifferent) ?base path_name =
     then raise File_exists
     else path
 
+let to_string_list l = l
+
+
 (* -------------------------------------------------------------------------- *)
-(* --- Symboling Names                                                    --- *)
+(* --- Basic datatype functions                                           --- *)
 (* -------------------------------------------------------------------------- *)
 
-(* Note: Symbolic directories are not currently projectified *)
-let symbolic_dirs = Hashtbl.create 3
+let equal : t -> t -> bool = (=)
 
-let add_symbolic_dir name dir =
-  Hashtbl.replace symbolic_dirs dir name ;
-  (insert cwd (dir:>string)).symbolic_name <- Some name
+let compare = String.compare
 
-(** Initialize using Config *)
-let add_symbolic_dir_list name =
-  List.iter (fun d -> add_symbolic_dir name d)
 
-let reset_symbolic_dirs () = Hashtbl.clear symbolic_dirs
+(* -------------------------------------------------------------------------- *)
+(* --- Constant paths                                                     --- *)
+(* -------------------------------------------------------------------------- *)
 
-let all_symbolic_dirs () =
-  let compare (s1, s1') (s2, s2') =
-    let c = String.compare s1 s2 in
-    if c <> 0 then c
-    else String.compare s1' s2'
-  in
-  List.sort compare @@
-  Hashtbl.fold (fun dir name acc -> (name, dir) :: acc) symbolic_dirs []
+let empty = of_string ""
+let is_empty fp = equal fp empty
+let special_stdout = of_string "-"
+let is_special_stdout fp = equal fp special_stdout
+
+
+(* -------------------------------------------------------------------------- *)
+(* --- Pretty printing                                                    --- *)
+(* -------------------------------------------------------------------------- *)
 
 let rec add_uri_path buffer path =
   let open Buffer in
@@ -239,6 +250,58 @@ let to_pretty_string file_name =
     let path = insert cwd file_name in
     skip_dot (add_path path)
 
+let pretty fmt p =
+  if is_special_stdout p then
+    Format.fprintf fmt "<stdout>"
+  else if is_empty p then
+    Format.fprintf fmt "<unknown location>"
+  else
+    Format.fprintf fmt "%s" (to_pretty_string p)
+
+let compare_pretty ?(case_sensitive=false) s1 s2 =
+  let s1 = to_pretty_string s1 in
+  let s2 = to_pretty_string s2 in
+  if case_sensitive then String.compare s1 s2
+  else
+    String.compare
+      (String.lowercase_ascii s1)
+      (String.lowercase_ascii s2)
+
+let pp_abs fmt p = Format.fprintf fmt "%s" p
+
+
+(* -------------------------------------------------------------------------- *)
+(* --- Path manipulation                                                  --- *)
+(* -------------------------------------------------------------------------- *)
+
+let basename p = Filename.basename p
+
+let dirname p = Filename.dirname p
+
+let extend ?existence t ext = of_string ?existence (t ^ ext)
+
+let concat ?existence t s = of_string ?existence (t ^ "/" ^ s)
+
+let concats ?existence t sl =
+  let s' = List.fold_left (fun acc s -> acc ^ "/" ^ s) "" sl in
+  of_string ?existence (t ^ s')
+
+let to_base_uri name =
+  let p = insert cwd name in
+  let buf = Buffer.create 80 in
+  let res = add_uri_path buf p in
+  let uri =
+    Buffer.contents buf in
+  let uri =
+    try
+      if String.get uri 0 = '/' then
+        String.sub uri 1 (String.length uri - 1)
+      else uri
+    with Invalid_argument _ -> uri
+  in
+  res, uri
+
+
 (* -------------------------------------------------------------------------- *)
 (* --- Relative Paths                                                     --- *)
 (* -------------------------------------------------------------------------- *)
@@ -266,62 +329,57 @@ let is_relative ?base_name file_name =
   base_name = file_name
   || String.starts_with ~prefix:(base_name ^ Filename.dir_sep) file_name
 
+
 (* -------------------------------------------------------------------------- *)
-(* --- Basic operations                                                   --- *)
+(* --- Symboling Names                                                    --- *)
 (* -------------------------------------------------------------------------- *)
 
-let extend ?existence t ext = of_string ?existence (t ^ ext)
-let concat ?existence t s = of_string ?existence (t ^ "/" ^ s)
-let concats ?existence t sl =
-  let s' = List.fold_left (fun acc s -> acc ^ "/" ^ s) "" sl in
-  of_string ?existence (t ^ s')
+(* Note: Symbolic directories are not currently projectified *)
+let symbolic_dirs = Hashtbl.create 3
 
-let to_string_list l = l
+let add_symbolic_dir name dir =
+  Hashtbl.replace symbolic_dirs dir name ;
+  (insert cwd (dir:>string)).symbolic_name <- Some name
 
-let equal : t -> t -> bool = (=)
-let compare = String.compare
+(** Initialize using Config *)
+let add_symbolic_dir_list name =
+  List.iter (fun d -> add_symbolic_dir name d)
 
-let compare_pretty ?(case_sensitive=false) s1 s2 =
-  let s1 = to_pretty_string s1 in
-  let s2 = to_pretty_string s2 in
-  if case_sensitive then String.compare s1 s2
-  else
-    String.compare
-      (String.lowercase_ascii s1)
-      (String.lowercase_ascii s2)
+let reset_symbolic_dirs () = Hashtbl.clear symbolic_dirs
 
-let empty = of_string ""
-let is_empty fp = equal fp empty
-let special_stdout = of_string "-"
-let is_special_stdout fp = equal fp special_stdout
+let all_symbolic_dirs () =
+  let compare (s1, s1') (s2, s2') =
+    let c = String.compare s1 s2 in
+    if c <> 0 then c
+    else String.compare s1' s2'
+  in
+  List.sort compare @@
+  Hashtbl.fold (fun dir name acc -> (name, dir) :: acc) symbolic_dirs []
 
-let pretty fmt p =
-  if is_special_stdout p then
-    Format.fprintf fmt "<stdout>"
-  else if is_empty p then
-    Format.fprintf fmt "<unknown location>"
-  else
-    Format.fprintf fmt "%s" (to_pretty_string p)
-let pp_abs fmt p = Format.fprintf fmt "%s" p
+
+(* -------------------------------------------------------------------------- *)
+(* --- File system                                                        --- *)
+(* -------------------------------------------------------------------------- *)
+
+let exists (s : t) = Sys.file_exists (s :> string)
+
 let is_file fp =
   try
     (Unix.stat (fp :> string)).Unix.st_kind = Unix.S_REG
   with _ -> false
 
-let to_base_uri name =
-  let p = insert cwd name in
-  let buf = Buffer.create 80 in
-  let res = add_uri_path buf p in
-  let uri =
-    Buffer.contents buf in
-  let uri =
-    try
-      if String.get uri 0 = '/' then
-        String.sub uri 1 (String.length uri - 1)
-      else uri
-    with Invalid_argument _ -> uri
-  in
-  res, uri
+let is_dir (s : t) = Sys.is_directory (s :> string)
+
+let readdir (s : t) = Sys.readdir (s :> string)
+
+let remove (s : t) = Sys.remove (s :> string)
+
+let rename s t = Sys.rename s t
+
+
+(* -------------------------------------------------------------------------- *)
+(* --- Position in source file                                            --- *)
+(* -------------------------------------------------------------------------- *)
 
 type position =
   {
@@ -347,19 +405,6 @@ let pp_pos fmt pos =
 
 let is_empty_pos pos = pos == empty_pos
 
-let exists (s : t) = Sys.file_exists (s :> string)
-
-let is_dir (s : t) = Sys.is_directory (s :> string)
-
-let readdir (s : t) = Sys.readdir (s :> string)
-
-let remove (s : t) = Sys.remove (s :> string)
-
-let rename s t = Sys.rename s t
-
-let basename p = Filename.basename p
-
-let dirname p = Filename.dirname p
 
 (* -------------------------------------------------------------------------- *)
 (* --- Low level Input/Output                                            --- *)
