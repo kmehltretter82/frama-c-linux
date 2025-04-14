@@ -13,7 +13,7 @@ let run () =
         if_ (i < of_int 3)
           ~then_:[incr i]
           ~else_:[i := zero];
-        call `none f [i]
+        call f [i]
       ]
     );
   Kernel.result "%a" Printer.pp_file (Ast.get ())

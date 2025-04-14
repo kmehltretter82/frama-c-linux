@@ -248,20 +248,21 @@ module Pure :
 sig
   include module type of Exp
 
+  type call'
   type instr'
   type stmt'
 
-  type instr = [ `instr of instr' ]
+  type call = [ `call of call' ]
+  type instr = [ call | `instr of instr' ]
   type stmt = [ instr | `stmt of stmt' ]
 
   (* Instructions *)
   val of_instr : Cil_types.instr -> [> instr]
   val skip : [> instr]
-  val assign : [< lval] -> [< exp] -> [> instr]
+  val assign : [< lval] -> [< exp | call] -> [> instr]
   val incr : [< lval] -> [> instr]
-  val call : [< lval | `none] -> Cil_types.kernel_function -> [< exp] list ->
-    [> instr]
-  val call_ptr : [< lval | `none] -> [< exp] -> [< exp] list -> [> instr]
+  val call : Cil_types.kernel_function -> [< exp] list -> [> call]
+  val call_ptr : [< exp] -> [< exp] list -> [> call]
 
   val local : ?ghost:bool -> ?init:'v -> (init,'v) typ -> string ->
     [> var] * [> instr]
@@ -295,7 +296,7 @@ sig
   val (let+) : var * stmt -> (var -> stmt list) -> stmt list
   val (and+) : var -> var -> var * var
 
-  val (:=) : [< lval] -> [< exp] -> [> instr] (* assign *)
+  val (:=) : [< lval] -> [< exp | call] -> [> instr] (* assign *)
   val (+=) : [< lval] -> [< exp] -> [> instr]
   val (-=) : [< lval] -> [< exp] -> [> instr]
 end
