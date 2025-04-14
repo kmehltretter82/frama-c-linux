@@ -819,9 +819,11 @@ struct
   let skip = `instr Skip
   let assign dest src = `instr (Assign (harden_lval dest, harden_exp src))
   let incr dest = `instr (Assign (harden_lval dest, harden_exp (add dest one)))
-  let call res callee args =
+  let call_ptr res callee args =
     `instr (Call (harden_lval_opt res, harden_exp callee, harden_exp_list args))
-
+  let call res callee args =
+    let callee' = Kernel_function.get_vi callee in
+    call_ptr res (var callee') args
   let of_stmtkind sk = `stmt (CilStmtkind sk)
   let of_stmt s = `stmt (CilStmt s)
   let of_stmts l = `stmt (Sequence (List.map (fun s -> CilStmt s) l))
@@ -1476,12 +1478,16 @@ struct
   let incr lval =
     assign lval (add lval (of_int 1))
 
-  let call dest callee args =
+  let call_ptr dest callee args =
     let loc = current_loc () in
     let dest' = cil_lval_opt ~loc dest
     and callee' = cil_exp ~loc callee
     and args' = cil_exp_list ~loc args in
     of_instr (Cil_types.Call (dest', callee', args', loc))
+
+  let call res callee args =
+    let callee' = Kernel_function.get_vi callee in
+    call_ptr res (var callee') args
 
   let pure exp =
     let loc = current_loc () in
