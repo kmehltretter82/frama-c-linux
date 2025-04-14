@@ -1,5 +1,5 @@
 /* run.config
-STDOPT: +"-machdep gcc_x86_32"
+STDOPT: +"-machdep gcc_x86_32 -keep-unused-functions all"
 */
 
 extern __attribute__((const, noreturn))
@@ -20,8 +20,8 @@ void main(int z) {
   case 2: ___assert_task_state[0]=1;break;
   case -1: ++X;break;
   }
-   
-  
+
+
 }
 
 int T[__builtin_types_compatible_p(int,int)+__builtin_types_compatible_p(int,float)];

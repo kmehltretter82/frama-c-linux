@@ -18,6 +18,8 @@
 Open Source Release <next-release>
 ###############################################################################
 
+-   Kernel    [2025-04-14] Unused static or inline functions are now removed
+              from the AST by default (this can affect Metrics coverage values).
 o!  Kernel    [2025-04-14] Building types via `Cil_const` now uses
               `Ast_types.add_attributes` and in case of array tries to push
               qualifiers to the array elements, unless stated otherwise.
