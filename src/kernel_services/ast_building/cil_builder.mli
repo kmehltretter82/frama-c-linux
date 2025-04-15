@@ -214,7 +214,7 @@ sig
   val (==) : [< exp] -> [< exp] -> [> exp]
   val (!=) : [< exp] -> [< exp] -> [> exp]
   val (--) : [< exp] -> [< exp] -> [> exp]
-  val (.@[]) : [< lval] -> [< exp] -> [> exp] (* C index operator [] *)
+  val (.@[]) : [< lval] -> [< exp] -> [> lval] (* C index operator [] *)
 
   (* Export CIL objects from built expressions *)
 
