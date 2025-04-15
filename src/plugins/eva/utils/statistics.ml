@@ -91,6 +91,27 @@ let register_statement_stat name =
 
 type key = Key : 'a t * 'a -> key
 
+type cmp = { cmp : 'a 'b. 'a t -> 'b t -> int }
+
+let compare (cmp: cmp) (Key (s1, x1)) (Key (s2, x2)) =
+  let c = cmp.cmp s1 s2 in
+  if c <> 0 then c else
+    match s1.kind, s2.kind with
+    | Global, Global -> 0
+    | Function, Function -> Kernel_function.compare x1 x2
+    | Statement, Statement -> Cil_datatype.Stmt.compare x1 x2
+    | Global, (Function | Statement) -> -1
+    | (Function | Statement), Global -> 1
+    | Function, Statement -> -1
+    | Statement, Function -> 1
+
+(* Optimized comparison, using the key id. *)
+let compare_opt = compare { cmp = fun s1 s2 -> s1.id - s2.id }
+
+(* Lexicographical comparison, using the key name. *)
+let compare_lex = compare { cmp = fun s1 s2 -> String.compare s1.name s2.name }
+
+
 module Key_Datatype = struct
   include Datatype.Serializable_undefined
 
@@ -100,17 +121,7 @@ module Key_Datatype = struct
     (Key (register s.name s.kind, x))
   let reprs = [Key ({ id = 0; name="dummy"; kind=Global }, ())]
   let equal = Datatype.from_compare
-  let compare (Key (s1,x1)) (Key (s2,x2)) =
-    let c = s1.id - s2.id in
-    if c <> 0 then c else
-      match s1.kind, s2.kind with
-      | Global, Global -> 0
-      | Function, Function -> Kernel_function.compare x1 x2
-      | Statement, Statement -> Cil_datatype.Stmt.compare x1 x2
-      | Global, (Function | Statement) -> -1
-      | (Function | Statement), Global -> 1
-      | Function, Statement -> -1
-      | Statement, Function -> 1
+  let compare = compare_opt
   let hash (Key (s,x)) =
     let h = match s.kind with
       | Global -> 0
@@ -184,7 +195,7 @@ let reset_all () =
 
 let export_as_list () =
   State.to_seq () |> List.of_seq |>
-  List.sort (fun (k1,_v1) (k2,_v2) -> Key.compare k1 k2)
+  List.sort (fun (k1,_v1) (k2,_v2) -> compare_lex k1 k2)
 
 let export_as_csv_to_channel out_channel =
   let fmt = Format.formatter_of_out_channel out_channel in
