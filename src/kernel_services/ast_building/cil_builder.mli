@@ -21,8 +21,13 @@
 (**************************************************************************)
 
 (** This module is meant to build C or ACSL expressions in a unified way.
-    Compared to "classic" Cil functions it also avoid the necessity to provide
+    Compared to "classic" Cil functions it also avoids the necessity to provide
     a location everywhere.
+
+    Some naming conventions:
+    - "prime" types (suffixed with `'`) are a "low-level" representation, "hiding" constructors
+      so that the corresponding unprimed types can be used directly, improving readability;
+    - `harden` functions perform an "unboxing" of the polymorphic variant constructor.
 *)
 
 module Type :
@@ -209,7 +214,7 @@ sig
   val (==) : [< exp] -> [< exp] -> [> exp]
   val (!=) : [< exp] -> [< exp] -> [> exp]
   val (--) : [< exp] -> [< exp] -> [> exp]
-  val (.@[]) : [< lval] -> [< exp] -> [> exp] (* C index operator [] *)
+  val (.@[]) : [< lval] -> [< exp] -> [> lval] (* C index operator [] *)
 
   (* Export CIL objects from built expressions *)
 
@@ -247,19 +252,29 @@ end
 module Pure :
 sig
   include module type of Exp
+    with type ('v,'s) typ = ('v,'s) Type.typ
+     and type const' = Exp.const'
+     and type var' = Exp.var'
+     and type lval' = Exp.lval'
+     and type exp' = Exp.exp'
+     and type init' = Exp.init'
+     and type label = Exp.label
 
+  type call'
   type instr'
   type stmt'
 
-  type instr = [ `instr of instr' ]
+  type call = [ `call of call' ]
+  type instr = [ call | `instr of instr' ]
   type stmt = [ instr | `stmt of stmt' ]
 
   (* Instructions *)
   val of_instr : Cil_types.instr -> [> instr]
   val skip : [> instr]
-  val assign : [< lval] -> [< exp] -> [> instr]
+  val assign : [< lval] -> [< exp | call] -> [> instr]
   val incr : [< lval] -> [> instr]
-  val call : [< lval | `none] -> [< exp] -> [< exp] list -> [> instr]
+  val call : Cil_types.kernel_function -> [< exp] list -> [> call]
+  val call_ptr : [< exp] -> [< exp] list -> [> call]
 
   val local : ?ghost:bool -> ?init:'v -> (init,'v) typ -> string ->
     [> var] * [> instr]
@@ -293,7 +308,7 @@ sig
   val (let+) : var * stmt -> (var -> stmt list) -> stmt list
   val (and+) : var -> var -> var * var
 
-  val (:=) : [< lval] -> [< exp] -> [> instr] (* assign *)
+  val (:=) : [< lval] -> [< exp | call] -> [> instr] (* assign *)
   val (+=) : [< lval] -> [< exp] -> [> instr]
   val (-=) : [< lval] -> [< exp] -> [> instr]
 end
@@ -370,7 +385,9 @@ sig
   val skip : unit -> unit
   val assign : [< lval] -> [< exp] -> unit
   val incr : [< lval] -> unit
-  val call : [< lval | `none] -> [< exp] -> [< exp] list -> unit
+  val call : [< lval | `none] -> Cil_types.kernel_function -> [< exp] list ->
+    unit
+  val call_ptr : [< lval | `none] -> [< exp] -> [< exp] list -> unit
   val pure : [< exp ] -> unit
 
   (* Operators *)

@@ -777,11 +777,13 @@ struct
 
   type ghost = NoGhost | Ghost
 
+  type call' = exp' * exp' list
+
   type instr' =
     | CilInstr of Cil_types.instr
     | Skip
     | Assign of lval' * exp'
-    | Call of lval' option * exp' * exp' list
+    | Call of lval' option * call'
     | Local of var' * init' option * ghost
     | LocalCopy of Cil_types.varinfo * var' * init' option * ghost
 
@@ -796,13 +798,19 @@ struct
 
   and block = stmt' list * Cil_types.attributes
 
-  type instr = [ `instr of instr' ]
+  type call = [ `call of call' ]
+  type instr = [ call | `instr of instr' ]
   type stmt = [ instr | `stmt of stmt' ]
 
   (* Depolymorphize *)
 
+  let harden_call c =
+    match (c :> call) with
+    | `call call -> call
+
   let harden_instr i =
     match (i :> instr) with
+    | `call call -> Call (None, call)
     | `instr instr -> instr
 
   let harden_stmt s =
@@ -817,11 +825,12 @@ struct
 
   let of_instr i = `instr (CilInstr i)
   let skip = `instr Skip
-  let assign dest src = `instr (Assign (harden_lval dest, harden_exp src))
+  let assign dest = function
+    | #exp as src -> `instr (Assign (harden_lval dest, harden_exp src))
+    | #call as call -> `instr (Call (Some (harden_lval dest), harden_call call))
   let incr dest = `instr (Assign (harden_lval dest, harden_exp (add dest one)))
-  let call res callee args =
-    `instr (Call (harden_lval_opt res, harden_exp callee, harden_exp_list args))
-
+  let call_ptr callee args = `call (harden_exp callee, harden_exp_list args)
+  let call callee args = call_ptr (var (Kernel_function.get_vi callee)) args
   let of_stmtkind sk = `stmt (CilStmtkind sk)
   let of_stmt s = `stmt (CilStmt s)
   let of_stmts l = `stmt (Sequence (List.map (fun s -> CilStmt s) l))
@@ -911,7 +920,7 @@ struct
       and src' = build_exp ~scope ~loc src in
       let src' = Cil.mkCast ~newt:(Cil.typeOfLval dest') src' in
       Cil_types.Set (dest', src', loc), scope
-    | Call (dest,callee,args) ->
+    | Call (dest,(callee,args)) ->
       let dest' = Option.map (build_lval ~scope ~loc) dest
       and callee' = build_exp ~scope ~loc callee
       and args' = List.map (build_exp ~scope ~loc) args in
@@ -1476,12 +1485,16 @@ struct
   let incr lval =
     assign lval (add lval (of_int 1))
 
-  let call dest callee args =
+  let call_ptr dest callee args =
     let loc = current_loc () in
     let dest' = cil_lval_opt ~loc dest
     and callee' = cil_exp ~loc callee
     and args' = cil_exp_list ~loc args in
     of_instr (Cil_types.Call (dest', callee', args', loc))
+
+  let call res callee args =
+    let callee' = Kernel_function.get_vi callee in
+    call_ptr res (var callee') args
 
   let pure exp =
     let loc = current_loc () in
