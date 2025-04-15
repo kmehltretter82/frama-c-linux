@@ -208,6 +208,7 @@ module SplitMap = SplitTerm.Map
 type branch =
   | Branch of int
   | Builtin_result of Kernel_function.t * Cil_datatype.Kinstr.t * int
+  | Spec_behavior of Kernel_function.t * Cil_datatype.Kinstr.t * int
 [@@deriving eq, ord]
 
 module BranchDatatype = Datatype.Make_with_collections (struct
@@ -217,13 +218,16 @@ module BranchDatatype = Datatype.Make_with_collections (struct
     let reprs = [Branch 0]
     let pretty fmt = function
       | Branch id -> Format.fprintf fmt "%d" id
-      | Builtin_result (kf, _, id) ->
+      | Builtin_result (kf, _, id) | Spec_behavior (kf, _, id) ->
         Format.fprintf fmt "%s#%d" (Kernel_function.get_name kf) id
     let hash = function
       | Branch id -> Hashtbl.hash (1, id)
       | Builtin_result (kf, kinstr, id) ->
         Hashtbl.hash
           (2, Kernel_function.hash kf, Cil_datatype.Kinstr.hash kinstr, id)
+      | Spec_behavior (kf, kinstr, id) ->
+        Hashtbl.hash
+          (3, Kernel_function.hash kf, Cil_datatype.Kinstr.hash kinstr, id)
   end)
 
 (* The key have several fields, one for each kind of partitioning:
@@ -281,8 +285,7 @@ struct
     dynamic_splits = SplitMap.empty;
   }
 
-  let branch_singleton b =
-    { empty with branches = [b] }
+  let branch_singleton b = { empty with branches = [b] }
 
   include Datatype.Make_with_collections (struct
       include Datatype.Serializable_undefined

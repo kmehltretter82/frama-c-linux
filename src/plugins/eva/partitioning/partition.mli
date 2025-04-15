@@ -43,6 +43,8 @@ type branch =
   (** Junction branch id in the control flow *)
   | Builtin_result of Kernel_function.t * Cil_datatype.Kinstr.t * int
   (** Case of a builtin *)
+  | Spec_behavior of Kernel_function.t * Cil_datatype.Kinstr.t * int
+  (** Behavior of a spec *)
 
 (** Partitioning keys attached to states. *)
 type key

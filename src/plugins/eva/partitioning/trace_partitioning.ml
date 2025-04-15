@@ -197,7 +197,9 @@ struct
 
   let call_return ~caller kind result =
     let policy = call_return_policy in
-    let callee_history = policy.callee_history || kind = `Builtin in
+    let callee_history =
+      policy.callee_history || kind = `Spec || kind = `Builtin
+    in
     let policy = { policy with callee_history } in
     let combine = Partition.Key.combine ~policy in
     List.map (fun (k, s) -> combine ~caller ~callee:k, s) result

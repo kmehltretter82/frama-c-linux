@@ -618,6 +618,11 @@ module Make
       let states =
         compute_specification ~warn kinstr call.kf call.return spec state
       in
-      List.map (fun s -> Partition.Key.empty, s) (States.to_list states)
+      let add_key behavior_id state =
+        Partition.Key.branch_singleton
+          (Partition.Spec_behavior (call.kf, kinstr, behavior_id)),
+        state
+      in
+      List.mapi add_key (States.to_list states)
 
 end
