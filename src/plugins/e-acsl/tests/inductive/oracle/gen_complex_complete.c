@@ -18,8 +18,6 @@ predicate P(integer i, integer x) =
   (i == 0 && x == i + 1) || (i == 0 && x == i + 2);
 
 */
-int __gen_e_acsl_P_3(int i, int x);
-
 int __gen_e_acsl_P(int i, int x);
 
 int main(void)
@@ -46,7 +44,7 @@ int main(void)
     int __gen_e_acsl_P_4;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
       {.values = (void *)0};
-    __gen_e_acsl_P_4 = __gen_e_acsl_P_3(0,2);
+    __gen_e_acsl_P_4 = __gen_e_acsl_P(0,2);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,"P(0, 2)",0,
                                  __gen_e_acsl_P_4);
     __gen_e_acsl_assert_data_2.blocking = 1;
@@ -78,22 +76,6 @@ int __gen_e_acsl_P(int i, int x)
     __gen_e_acsl_or = __gen_e_acsl_and_2;
   }
   return __gen_e_acsl_or;
-}
-
-/*@ assigns \result;
-    assigns \result \from i, x; */
-int __gen_e_acsl_P_3(int i, int x)
-{
-  int __gen_e_acsl_and_3;
-  int __gen_e_acsl_or_2;
-  if (i == 0) __gen_e_acsl_and_3 = x == i + 1; else __gen_e_acsl_and_3 = 0;
-  if (__gen_e_acsl_and_3) __gen_e_acsl_or_2 = 1;
-  else {
-    int __gen_e_acsl_and_4;
-    if (i == 0) __gen_e_acsl_and_4 = x == i + 2; else __gen_e_acsl_and_4 = 0;
-    __gen_e_acsl_or_2 = __gen_e_acsl_and_4;
-  }
-  return __gen_e_acsl_or_2;
 }
 
 

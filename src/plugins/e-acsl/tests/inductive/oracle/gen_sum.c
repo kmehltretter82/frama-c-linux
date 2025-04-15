@@ -29,8 +29,6 @@ predicate __gen_e_acsl_sum_here
 */
 int __gen_e_acsl_sum_here(int *arr, int low, int high, int len, int res);
 
-int __gen_e_acsl_sum_here_3(int *arr, int low, int high, int len, int res);
-
 /*@
 predicate sum{L}
   (int *arr, integer low, integer high, integer len, integer res) =
@@ -90,7 +88,7 @@ int main(void)
     int __gen_e_acsl_sum_here_4;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
       {.values = (void *)0};
-    __gen_e_acsl_sum_here_4 = __gen_e_acsl_sum_here_3(ptr,1,2,4,4);
+    __gen_e_acsl_sum_here_4 = __gen_e_acsl_sum_here(ptr,1,2,4,4);
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"ptr",
                                  (void *)ptr);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,
@@ -108,21 +106,6 @@ int main(void)
   /*@ assert !sum(ptr, 1, 2, 4, 4); */ ;
   __retres = 0;
   __e_acsl_memory_clean();
-  return __retres;
-}
-
-int __gen_e_acsl_sum_here_3(int *arr, int low, int high, int len, int res)
-{
-  __e_acsl_mpz_t __gen_e_acsl_sum_fun5_here_6;
-  __e_acsl_mpz_t __gen_e_acsl_res_2;
-  int __gen_e_acsl_eq_2;
-  __gen_e_acsl_sum_fun5_here(& __gen_e_acsl_sum_fun5_here_6,arr,low,high,len);
-  __gmpz_init_set_si(__gen_e_acsl_res_2,(long)res);
-  __gen_e_acsl_eq_2 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_sum_fun5_here_6),
-                                 (__e_acsl_mpz_struct const *)(__gen_e_acsl_res_2));
-  int __retres = __gen_e_acsl_eq_2 == 0;
-  __gmpz_clear(__gen_e_acsl_sum_fun5_here_6);
-  __gmpz_clear(__gen_e_acsl_res_2);
   return __retres;
 }
 

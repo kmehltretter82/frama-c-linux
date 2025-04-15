@@ -128,43 +128,57 @@ let type_of_number_ty lv = function
   | Real -> Error.not_yet "real number"
   | Nan -> Typing.typ_of_lty lv.lv_type
 
+let type_of_profile li profile_types ret_ty =
+  let params_ty_vi =
+    List.map
+      (* build the formals: cannot use [Cil.makeFormal] since the function
+         does not exist yet *)
+      (fun (lvi, pty) -> lvi.lv_name, pty, [])
+      profile_types
+  in
+  (* build the varinfo storing the result *)
+  let res_as_extra_arg = result_as_extra_argument ret_ty in
+  let ret_ty, params_ty_with_ret =
+    let vname = "__retres" in
+    if res_as_extra_arg then
+      let ret_ty_ptr = Cil_const.mk_tptr ret_ty (* call by reference *) in
+      let vname = vname ^ "_arg" in
+      Cil_const.voidType, (vname, ret_ty_ptr, []) :: params_ty_vi
+    else
+      ret_ty, params_ty_vi
+  in
+  (* build the function's varinfo *)
+  Cil_const.mk_tfun
+    ~tattr:li.l_var_info.lv_attr
+    ret_ty
+    (Some params_ty_with_ret)
+    false
+
 (* Generate a kernel function from a given logic info [li] *)
-let generate_kf ~loc fname env params_ty ret_ty params_ival li =
+let generate_kf ~loc fname env profile_types ret_ty kf_typ params_ival li =
   (* build the formal parameters *)
-  let params, params_ty_vi =
-    List.fold_right2
-      (fun lvi pty (params, params_ty) ->
-         let ty = type_of_number_ty lvi pty in
-         (* build the formals: cannot use [Cil.makeFormal] since the function
-            does not exist yet *)
-         let vi = Cil.makeVarinfo false true lvi.lv_name ty in
-         vi :: params, (lvi.lv_name, ty, []) :: params_ty)
-      li.l_profile
-      params_ty
-      ([], [])
+  let params = List.map
+      (fun (lvi, pty) -> Cil.makeVarinfo false true lvi.lv_name pty)
+      profile_types
   in
   (* build the varinfo storing the result *)
   let res_as_extra_arg = result_as_extra_argument ret_ty in
   let is_gmp = Gmp_types.is_t ret_ty in
-  let ret_vi, ret_ty, params_with_ret, params_ty_with_ret =
+  let ret_vi, ret_ty, params_with_ret =
     let vname = "__retres" in
     if res_as_extra_arg then
       let ret_ty_ptr = Cil_const.mk_tptr ret_ty (* call by reference *) in
       let vname = vname ^ "_arg" in
       let vi = Cil.makeVarinfo false true vname ret_ty_ptr in
-      vi, Cil_const.voidType, vi :: params, (vname, ret_ty_ptr, []) :: params_ty_vi
+      vi, Cil_const.voidType, vi :: params
     else
-      Cil.makeVarinfo false false vname ret_ty, ret_ty, params, params_ty_vi
+      Cil.makeVarinfo false false vname ret_ty, ret_ty, params
   in
   (* build the function's varinfo *)
   let vi =
     Cil.makeGlobalVar
       fname
-      (Cil_const.mk_tfun
-         ~tattr:li.l_var_info.lv_attr
-         ret_ty
-         (Some params_ty_with_ret)
-         false)
+      kf_typ
   in
   vi.vdefined <- true;
   (* create the fundec *)
@@ -265,7 +279,7 @@ let generate_kf ~loc fname env params_ty ret_ty params_ival li =
 
 (* This module memoizes for each translated logic_info the corresponding
    generated kernel functions. Each generated kernel function is associated
-   with its signature (profile + return type), because sometimes multiple
+   with its signature (return type + parameter types), because sometimes multiple
    translated versions of a single logic_info are required, depending on the
    calling context. *)
 module Gen_functions : sig
@@ -275,18 +289,16 @@ module Gen_functions : sig
   val clear : unit -> unit
 
   val fold_sorted :
-    (Profile.t * typ -> fgen -> 'a -> 'a) -> 'a -> 'a
+    (typ list -> fgen -> 'a -> 'a) -> 'a -> 'a
 
   val memo :
-    (typ ->
-     Profile.t ->
-     logic_info ->
+    (logic_info ->
      varinfo * kernel_function * (unit -> unit)) ->
-    Profile.t * typ ->
+    typ list ->
     logic_info ->
     varinfo * (unit -> unit)
 
-  val replace : logic_info -> Profile.t * typ -> fgen -> unit
+  val replace : logic_info -> typ list -> fgen -> unit
 
   val kernel_functions_of_logic_info : logic_info -> varinfo list
 
@@ -294,15 +306,8 @@ end = struct
 
   module Memo_tbl = Logic_info.Hashtbl
 
-  (* The signature of generated functions depends on the profile of the logic
-     function as well as its return type. In certain contexts the return type
-     might be GMP; in these cases an additional result parameter is required. *)
-  module Profile_and_return_type =
-    Datatype.Pair_with_collections
-      (Profile)
-      (Typ) (* return type *)
-
-  module Signatures = Profile_and_return_type.Hashtbl
+  module Params_and_ret_ty = Datatype.List_with_collections (Typ)
+  module Signatures = Params_and_ret_ty.Hashtbl
 
   type fgen = (kernel_function, exn) result
 
@@ -317,17 +322,17 @@ end = struct
       (fun _ -> Signatures.fold_sorted f)
       memo_tbl
 
-  let memo f (profile, ret_ty) li =
+  let memo f typ li =
     let gen tbl =
-      let vi, kf, gen_body = f ret_ty profile li in
-      Signatures.add tbl (profile, ret_ty) (Ok kf);
+      let vi, kf, gen_body = f li in
+      Signatures.add tbl typ (Ok kf);
       vi, gen_body
     in
     (* memoize the function's varinfo *)
     try
       let h = Memo_tbl.find memo_tbl li in
       try
-        let kf = Signatures.find h (profile, ret_ty) in
+        let kf = Signatures.find h typ in
         let kf = match kf with
           | Ok kf -> kf
           | Error exn -> raise exn
@@ -340,9 +345,9 @@ end = struct
       Memo_tbl.add memo_tbl li h;
       gen h
 
-  let replace li (profile, ret_ty) fgen =
+  let replace li typ fgen =
     let h = Memo_tbl.find memo_tbl li in
-    Signatures.replace h (profile, ret_ty) fgen
+    Signatures.replace h typ fgen
 
   let kernel_functions_of_logic_info li =
     try
@@ -412,11 +417,10 @@ let ret_ty_of_tapp ~env = function
 
 (* Generate (and memoize) the function body and create the calls to the
    generated functions. *)
-let function_to_exp ~loc ?tapp fname env kf li params_ty profile args =
-  let ret_ty = ret_ty_of_tapp ~env tapp in
+let function_to_exp ~loc ?tapp fname env kf li profile_types ret_ty params_and_ret_ty kf_typ profile args =
   (* memoize the function's varinfo *)
   let fvi, gen_body =
-    Gen_functions.memo (generate_kf fname ~loc env params_ty) (profile, ret_ty) li
+    Gen_functions.memo (generate_kf fname ~loc env profile_types ret_ty kf_typ profile) params_and_ret_ty li
   in
   (* the generation of the function body must be performed after memoizing the
      kernel function in order to handle recursive calls in finite time :-) *)
@@ -511,7 +515,7 @@ let app_to_exp ~adata ~loc ?tapp kf env ?eargs li targs =
       begin
         raise_errors li.l_body;
         (* build the arguments and compute the integer_ty of the parameters *)
-        let params_ty, params_ival, args, adata, env =
+        let params_num_ty, params_ival, args, adata, env =
           let eargs, adata, env =
             match eargs with
             | None ->
@@ -566,12 +570,20 @@ let app_to_exp ~adata ~loc ?tapp kf env ?eargs li targs =
         in
         let profile = Profile.make li.l_profile params_ival in
         let vi, e, env =
+          let ret_ty = ret_ty_of_tapp ~env tapp in
+          let params_ty =
+            List.map2
+              (fun lvi pty -> lvi, type_of_number_ty lvi pty)
+              li.l_profile
+              params_num_ty
+          in
+          let kf_typ = type_of_profile li params_ty ret_ty in
+          let params_and_ret_ty = ret_ty :: List.map snd params_ty in
           try
-            function_to_exp ~loc ?tapp gen_fname env kf li params_ty profile args
+            function_to_exp ~loc ?tapp gen_fname env kf li params_ty ret_ty params_and_ret_ty kf_typ profile args
           with exn ->
             (* Those accesses always succeed *)
-            let ret_ty = ret_ty_of_tapp ~env tapp in
-            Gen_functions.replace li (profile, ret_ty) (Error exn);
+            Gen_functions.replace li params_and_ret_ty (Error exn);
             raise exn
         in
         vi, e, adata, env
