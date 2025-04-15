@@ -235,6 +235,14 @@ module type Map = sig
   (** Build a datatype of the map according to the datatype of values in the
       map. *)
 
+  val pretty :
+    ?pre:Pretty_utils.sformat ->
+    ?sep:Pretty_utils.sformat ->
+    ?arrow:Pretty_utils.sformat ->
+    ?suf:Pretty_utils.sformat ->
+    ?empty:Pretty_utils.sformat ->
+    'a Pretty_utils.formatter ->
+    'a t Pretty_utils.formatter
 end
 
 (** Marshallable collectors with hashtbl-like interface. *)
