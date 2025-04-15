@@ -21,8 +21,13 @@
 (**************************************************************************)
 
 (** This module is meant to build C or ACSL expressions in a unified way.
-    Compared to "classic" Cil functions it also avoid the necessity to provide
+    Compared to "classic" Cil functions it also avoids the necessity to provide
     a location everywhere.
+
+    Some naming conventions:
+    - "prime" types (suffixed with `'`) are a "low-level" representation, "hiding" constructors
+      so that the corresponding unprimed types can be used directly, improving readability;
+    - `harden` functions perform an "unboxing" of the polymorphic variant constructor.
 *)
 
 module Type :
