@@ -20,7 +20,9 @@
 (*                                                                        *)
 (**************************************************************************)
 
+[@@@ api_start]
 type 'a t
+[@@@ api_end]
 
 (* Register a statistic class *)
 
@@ -43,6 +45,7 @@ val reset_all: unit -> unit
 (* Export the computed statistics as CSV *)
 val export_as_csv : ?filename:Filepath.Normalized.t -> unit -> unit
 
+[@@@ api_start]
 (* Get the current stat value *)
 val get : 'a t -> 'a -> int
 
@@ -54,4 +57,4 @@ val max_widenings : Cil_types.stmt t
 val max_unrolling : Cil_types.stmt t
 val partitioning_index_hits : unit t
 val partitioning_index_misses : unit t
-
+[@@@ api_end]
