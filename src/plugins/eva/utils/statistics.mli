@@ -43,6 +43,9 @@ val reset_all: unit -> unit
 (* Export the computed statistics as CSV *)
 val export_as_csv : ?filename:Filepath.Normalized.t -> unit -> unit
 
+(* Get the current stat value *)
+val get : 'a t -> 'a -> int
+
 (* Some Eva statistics *)
 val iterations : Cil_types.stmt t
 val memexec_hits : Cil_types.kernel_function t

@@ -174,7 +174,6 @@ module State =
       let size = 17
     end)
 
-
 (* --- Statistics update --- *)
 
 let set (type a) (stat : a t) (x : a) value =
@@ -196,6 +195,11 @@ let reset_all () =
 
 
 (* -- Export --- *)
+
+let get (type a) (stat : a t) (x : a) =
+  let k = Key (stat,x) in
+  State.find_opt k
+  |> Option.value ~default: 0
 
 let export_as_list () =
   State.to_seq () |> List.of_seq |>
