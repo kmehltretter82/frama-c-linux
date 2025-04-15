@@ -5,7 +5,7 @@
 [eva:initial-state] Values of globals at initialization
   
 [eva] computing for function f <- main.
-  Called from statistics.i:18.
+  Called from statistics.i:29.
 [eva] computing for function g <- f <- main.
   Called from statistics.i:13.
 [eva] Recording results for g
@@ -25,10 +25,10 @@
 [eva] Done for function g
 [eva] Recording results for f
 [eva] Done for function f
-[eva:alarm] statistics.i:19: Warning: 
+[eva:alarm] statistics.i:30: Warning: 
   signed overflow. assert -2147483648 ≤ n - 1;
 [eva] computing for function f <- main.
-  Called from statistics.i:19.
+  Called from statistics.i:30.
 [eva] statistics.i:13: Reusing old results for call to g
 [eva] statistics.i:13: Reusing old results for call to g
 [eva] statistics.i:13: Reusing old results for call to g
@@ -38,6 +38,10 @@
 [eva] Done for function g
 [eva] Recording results for f
 [eva] Done for function f
+[eva] computing for function h <- main.
+  Called from statistics.i:31.
+[eva] Recording results for h
+[eva] Done for function h
 [eva] Recording results for main
 [eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
@@ -45,12 +49,16 @@
   
 [eva:final-states] Values at end of function f:
   i ∈ [0..2147483647]
+[eva:final-states] Values at end of function h:
+  i ∈ {4}
 [eva:final-states] Values at end of function main:
   __retres ∈ {0}
 [from] Computing for function g
 [from] Done for function g
 [from] Computing for function f
 [from] Done for function f
+[from] Computing for function h
+[from] Done for function h
 [from] Computing for function main
 [from] Done for function main
 [from] ====== DEPENDENCIES COMPUTED ======
@@ -58,6 +66,8 @@
 [from] Function g:
   NO EFFECTS
 [from] Function f:
+  NO EFFECTS
+[from] Function h:
   NO EFFECTS
 [from] Function main:
   \result FROM \nothing
@@ -69,6 +79,10 @@
 [inout] Out (internal) for function f:
     i
 [inout] Inputs for function f:
+    \nothing
+[inout] Out (internal) for function h:
+    i; j
+[inout] Inputs for function h:
     \nothing
 [inout] Out (internal) for function main:
     __retres
