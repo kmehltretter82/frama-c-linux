@@ -294,14 +294,37 @@ struct
       ~package ~name:"declKind"
       ~descr:(Md.plain "Declaration kind")
       (Junion [
+          (* C *)
           Jkey "ENUM";
           Jkey "UNION";
           Jkey "STRUCT";
           Jkey "TYPEDEF";
           Jkey "GLOBAL";
           Jkey "FUNCTION";
-          Jkey "GANNOT";
+          (* ACSL *)
+          Jkey "LFUNPRED";
+          Jkey "INVARIANT";
+          Jkey "AXIOMATIC";
+          Jkey "MODULE";
+          Jkey "LEMMA";
+          Jkey "EXTENSION";
+          Jkey "VOLATILE";
+          Jkey "LTYPE";
+          Jkey "MODEL";
         ])
+
+  let global_annotation_kind = function
+    | Dfun_or_pred _ -> "LFUNPRED"
+    | Dinvariant _ -> "INVARIANT"
+    | Dtype_annot _ -> "INVARIANT"
+    | Daxiomatic _ -> "AXIOMATIC"
+    | Dmodule _ -> "MODULE"
+    | Dlemma _ -> "LEMMA"
+    | Dextended _ -> "EXTENSION"
+    | Dvolatile _ -> "VOLATILE"
+    | Dtype _ -> "LTYPE"
+    | Dmodel_annot _ -> "MODEL"
+
   let to_json = function
     | SEnum _ -> `String "ENUM"
     | SComp { cstruct = true } -> `String "STRUCT"
@@ -309,7 +332,7 @@ struct
     | SType _ -> `String "TYPEDEF"
     | SGlobal _ -> `String "GLOBAL"
     | SFunction _ -> `String "FUNCTION"
-    | SGAnnot _ -> `String "GANNOT"
+    | SGAnnot a -> `String (global_annotation_kind a)
 end
 
 module GAnnotRoots = struct
