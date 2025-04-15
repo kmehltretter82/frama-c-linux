@@ -118,7 +118,7 @@ val new_monitor:
 (** These actions redefine the partitioning by updating keys or splitting
     states. They are applied to all the pair (key, state) in a flow. *)
 type action =
-  | Enter_loop of unroll_limit
+  | Enter_loop of unroll_limit * Eva_automata.loop
   (** Enters a loop in which the n first iterations will be kept separate:
       creates an iteration counter at 0 for each states in the flow; states at
       different iterations will be kept separate, untill reaching the

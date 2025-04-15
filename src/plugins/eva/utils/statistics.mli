@@ -48,6 +48,7 @@ val iterations : Cil_types.stmt t
 val memexec_hits : Cil_types.kernel_function t
 val memexec_misses : Cil_types.kernel_function t
 val max_widenings : Cil_types.stmt t
+val max_unrolling : Cil_types.stmt t
 val partitioning_index_hits : unit t
 val partitioning_index_misses : unit t
 

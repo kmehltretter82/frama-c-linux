@@ -23,6 +23,11 @@
 open Lattice_bounds
 open Bottom.Operators
 
+(* Helper for comparison functions *)
+let (<?>) c lcmp =
+  if c <> 0 then c else Lazy.force lcmp
+
+
 (* --- Split monitors --- *)
 
 type split_kind = Eva_annotations.split_kind = Static | Dynamic
@@ -118,6 +123,7 @@ module SplitMonitor = Datatype.Make_with_collections (
       { m with split_values = m.split_values }
   end)
 
+
 (* --- Stamp rationing --- *)
 
 (* Stamps used to label states according to slevel.
@@ -135,9 +141,62 @@ type rationing =
 
 let new_rationing ~limit ~merge = { current = ref 0; limit; merge }
 
+
+(* --- Loops unrolling --- *)
+
+module LoopUnrolling =
+struct
+  module Prototype =
+  struct
+    include Datatype.Serializable_undefined
+    type t = {
+      loop : Cil_types.stmt;
+      current : int;
+      limit : int;
+    }
+
+    let name = "Partition.LoopUnrolling"
+
+    let reprs =
+      List.map
+        (fun stmt -> {
+             loop = stmt;
+             current = 0;
+             limit = 0;
+           })
+        Cil_datatype.Stmt.reprs
+
+    let pretty fmt l =
+      let pp_sid fmt stmt =
+        Format.pp_print_int fmt stmt.Cil_types.sid
+      in
+      Format.fprintf fmt "s%a: %d/%d"
+        pp_sid l.loop
+        l.current
+        l.limit
+
+    let compare l1 l2 =
+      Int.compare l1.current l2.current
+      <?> lazy (Int.compare l1.limit l2.limit)
+
+    let hash l =
+      Hashtbl.hash (l.current, l.limit)
+  end
+
+  include Datatype.Make (Prototype)
+  include Prototype
+
+  let create ~loop ~limit =
+    { loop=loop.Eva_automata.stmt ; current = 0; limit }
+
+  let incr unrolling =
+    let unrolling' = { unrolling with current = unrolling.current + 1 } in
+    Statistics.(grow max_unrolling unrolling.loop unrolling'.current);
+    unrolling'
+end
+
+
 (* --- Keys --- *)
-
-
 
 module SplitMap = SplitTerm.Map
 
@@ -168,7 +227,7 @@ type branch = int
 type key = {
   ration_stamp : stamp;
   branches : branch list;
-  loops : (int * int) list; (* current iteration / max unrolling *)
+  loops : LoopUnrolling.t list;
   splits : Integer.t SplitMap.t; (* term -> value *)
   dynamic_splits : split_monitor SplitMap.t; (* term -> monitor *)
 }
@@ -182,11 +241,10 @@ type call_return_policy = {
 
 module Key =
 struct
-
   module IntPair = Datatype.Pair (Datatype.Int) (Datatype.Int)
   module Stamp = Datatype.Option (IntPair)
   module BranchList = Datatype.List (Datatype.Int)
-  module LoopList = Datatype.List (IntPair)
+  module LoopList = Datatype.List (LoopUnrolling)
   module Splits = SplitMap.Make (Datatype.Integer)
   module DSplits = SplitMap.Make (SplitMonitor)
 
@@ -218,15 +276,14 @@ struct
         |]
 
       let compare k1 k2 =
-        let (<?>) c (cmp,x,y) =
-          if c = 0 then cmp x y else c
-        in
         LoopList.compare k1.loops k2.loops
-        <?> (Splits.compare, k1.splits, k2.splits)
+        <?> lazy (Splits.compare k1.splits k2.splits)
         (* Ignore monitors in comparison *)
-        <?> (SplitMap.compare (fun _ _ -> 0), k1.dynamic_splits, k2.dynamic_splits)
-        <?> (BranchList.compare, k1.branches, k2.branches)
-        <?> (Stdlib.Option.compare IntPair.compare, k1.ration_stamp, k2.ration_stamp)
+        <?> lazy (SplitMap.compare (fun _ _ -> 0)
+                    k1.dynamic_splits k2.dynamic_splits)
+        <?> lazy (BranchList.compare k1.branches k2.branches)
+        <?> lazy (Stdlib.Option.compare IntPair.compare
+                    k1.ration_stamp k2.ration_stamp)
 
       let equal = Datatype.from_compare
 
@@ -248,7 +305,7 @@ struct
           fmt
           key.branches;
         Pretty_utils.pp_list ~pre:"(@[" ~sep:" ;@ " ~suf:"@])"
-          (fun fmt (i,_j) -> Format.pp_print_int fmt i)
+          (fun fmt { LoopUnrolling.current=i; _ } -> Format.pp_print_int fmt i)
           fmt
           key.loops;
         Pretty_utils.pp_list ~pre:"{@[" ~sep:" ;@ " ~suf:"@]}"
@@ -319,7 +376,7 @@ type unroll_limit =
   | AutoUnroll of Eva_automata.loop * int * int
 
 type action =
-  | Enter_loop of unroll_limit
+  | Enter_loop of unroll_limit * Eva_automata.loop
   | Leave_loop
   | Incr_loop
   | Branch of branch * int
@@ -582,7 +639,7 @@ struct
         | Split _ | Update_dynamic_splits ->
           assert false (* Handled above *)
 
-        | Enter_loop limit_kind -> fun k x ->
+        | Enter_loop (limit_kind, loop) -> fun k x ->
           let limit = try match limit_kind with
             | ExpLimit cil_exp ->
               let exp = Eva_ast.translate_exp cil_exp
@@ -600,7 +657,8 @@ struct
             with
             | Operation_failed -> 0
           in
-          { k with loops = (0,limit) :: k.loops }
+          let new_unrolling = LoopUnrolling.create ~loop ~limit in
+          { k with loops = new_unrolling :: k.loops }
 
         | Leave_loop -> fun k _x ->
           begin match k.loops with
@@ -611,16 +669,18 @@ struct
         | Incr_loop -> fun k _x ->
           begin match k.loops with
             | [] -> raise InvalidAction
-            | (h, limit) :: tl ->
-              if h >= limit then begin
-                if limit > 0 then
+            | unrolling :: tl ->
+              if unrolling.current >= unrolling.limit then begin
+                if unrolling.limit > 0 then
                   Self.warning ~once:true ~current:true
                     ~wkey:Self.wkey_loop_unroll_partial
                     "loop not completely unrolled";
                 k
               end
-              else
-                { k with loops = (h + 1, limit) :: tl }
+              else begin
+
+                { k with loops = LoopUnrolling.incr unrolling :: tl }
+              end
           end
 
         | Branch (b,max) -> fun k _x ->
