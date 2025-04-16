@@ -1,3 +1,9 @@
+/* run.config
+  STDOPT:
+  EXIT:3
+    STDOPT: +"-cpp-extra-args=-DUNSUPPORTED"
+*/
+
 typedef struct {
   int a;
 } A;
@@ -21,3 +27,19 @@ const C c1 = { .b = b1, .c = 3 };
 const C c2 = { .b = b1, .c = 3, .b.b = 4 };
 const C c3 = { .b.b = 4, .c = 3, .b.a.a = 5 };
 const C c4 = { .b.b = 4, .c = 3, .b.a.a = 5, .b.a = b3.a };
+
+#ifdef UNSUPPORTED
+
+typedef union {
+  int a;
+  int b;
+} U;
+
+typedef struct {
+  U u;
+} D;
+
+const U u = { .a = 4 };
+const D d = { .u = u, .u.a = 42 };
+
+#endif

@@ -2886,7 +2886,10 @@ let rec setOneInit this o preinit =
           Cil_printer.pp_exp e
           Cil_printer.pp_offset o;
         match e.enode, Ast_types.unroll_skel (Cil.typeOf e) with
-        | Lval old_lv, TComp { cfields = Some fields } ->
+        | Lval old_lv, TComp { cfields = Some fields; cstruct} ->
+          if not cstruct then
+            Kernel.not_yet_implemented ~current:true
+              "Overriding initialization of unions";
           (* To be done, we need to have an lvalue and a Tcomp, otherwise we
              cannot apply the transformation. *)
           let pMaxIdx = List.length fields in
