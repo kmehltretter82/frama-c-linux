@@ -24,7 +24,7 @@ pthread_t        jobs51;
 pthread_t        jobs6;
 
 
-int random();
+int random(void);
 
 void *f1(void *_) {
   int t = u1;
@@ -77,7 +77,7 @@ void *f6(void *_) {
   return NULL;
 }
 
-void main()
+void main(void)
 {
 
   int t ;

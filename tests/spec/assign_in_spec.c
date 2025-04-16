@@ -1,5 +1,5 @@
 
 
 //@ ensures \result = 1;
-int f();
+int f(void);
 

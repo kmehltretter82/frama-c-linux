@@ -14,7 +14,7 @@
 void f1(void);
 
 // empty spec function
-void f2(){
+void f2(void){
   f1();
   return;
 }
@@ -31,8 +31,8 @@ int f4(int* b){
   return f3(b);
 }
 
-__attribute__((__noreturn__)) void f5();
+__attribute__((__noreturn__)) void f5(void);
 
-void f5(){
+void f5(void){
   while(1);
 }

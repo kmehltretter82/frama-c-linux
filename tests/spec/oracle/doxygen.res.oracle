@@ -16,7 +16,7 @@ void doxygen_group(void)
 //@} 
 //@}
 //@} Bly
-void main();
+void main(void);
 
 
 [kernel] Parsing doxygen.c (with preprocessing)
@@ -37,6 +37,6 @@ void doxygen_group(void)
 //@} 
 //@}
 //@} Bly
-void main();
+void main(void);
 
 

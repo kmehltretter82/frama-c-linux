@@ -16,7 +16,7 @@ pthread_t        jobs5;
 pthread_t        jobs6;
 
 
-int random();
+int random(void);
 
 void *f1(void *_) {
   t[1]=11;
@@ -50,7 +50,7 @@ void *f6(void *_) {
   return NULL;
 }
 
-void main()
+void main(void)
 {
   pthread_create( &jobs1 , NULL, f1, NULL);
   pthread_create( &jobs2 , NULL, f2, NULL);

@@ -13,7 +13,7 @@ extern int result;
 pthread_mutex_t  locks[N];
 pthread_t        jobs[N];
 
-int random();
+int random(void);
 unsigned int f(short i, unsigned int v);
 
 
@@ -31,7 +31,7 @@ void * job( void * k ) {
   }
 }
 
-int main() {
+int main(void) {
   int i, j, l;
 
   for(i=0; i<N; i++)

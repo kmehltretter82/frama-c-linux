@@ -1,4 +1,12 @@
 [kernel] Parsing cast_fun.i (no preprocessing)
+[kernel:typing:no-proto] cast_fun.i:6: Warning: 
+  Function f1 is declared without prototype.
+  Its formals will be inferred from actual arguments at first call.
+  Declare it as f1(void) if the function does not take any parameters.
+[kernel:typing:no-proto] cast_fun.i:45: Warning: 
+  Function f10 is declared without prototype.
+  Its formals will be inferred from actual arguments at first call.
+  Declare it as f10(void) if the function does not take any parameters.
 [kernel:typing:incompatible-types-call] cast_fun.i:64: Warning: 
   implicit conversion between incompatible function types:
   int (*)(void)

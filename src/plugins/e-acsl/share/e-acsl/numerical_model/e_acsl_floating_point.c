@@ -33,7 +33,7 @@ double eacsl_math_HUGE_VAL = 0.0;
 float eacsl_math_HUGE_VALF = 0.0;
 double eacsl_math_INFINITY = 0.0;
 
-void init_infinity_values() {
+void init_infinity_values(void) {
   /* Initialize E-ACSL infinity values */
   eacsl_math_HUGE_VAL = HUGE_VAL;
   eacsl_math_HUGE_VALF = HUGE_VALF;

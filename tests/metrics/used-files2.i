@@ -5,6 +5,6 @@
 int leaf(void);
 int f(void);
 
-int g() {
+int g(void) {
   return f();
 }

@@ -18,4 +18,4 @@ requires P : T[0]==3
 
 
 */
-void main() ;
+void main(void) ;
