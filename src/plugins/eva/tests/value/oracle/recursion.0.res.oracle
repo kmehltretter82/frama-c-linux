@@ -250,8 +250,6 @@
   __retres ∈ [10..2147483647]
 [eva:final-states] Values at end of function decr:
   
-[eva:final-states] Values at end of function bug_memexec:
-  
 [eva:final-states] Values at end of function escaping_formal:
   p ∈ {{ NULL + [--..--] ; &x }}
   x ∈ [--..--]
@@ -298,6 +296,8 @@
   __retres ∈ [0..4294967294]
 [eva:final-states] Values at end of function syracuse_ptr:
   y ∈ [0..4294967294]
+[eva:final-states] Values at end of function bug_memexec:
+  
 [eva:final-states] Values at end of function binary_search:
   mid ∈ {7}
   __retres ∈ [--..--]
@@ -331,8 +331,6 @@
 [from] Computing for function decr <-decr
 [from] Done for function decr
 [from] Done for function decr
-[from] Computing for function bug_memexec
-[from] Done for function bug_memexec
 [from] Computing for function escaping_formal
 [from] Computing for function escaping_formal <-escaping_formal
 [from] Done for function escaping_formal
@@ -397,6 +395,8 @@
 [from] Computing for function syracuse_ptr <-syracuse_ptr
 [from] Done for function syracuse_ptr
 [from] Done for function syracuse_ptr
+[from] Computing for function bug_memexec
+[from] Done for function bug_memexec
 [from] Computing for function binary_search
 [from] Computing for function binary_search <-binary_search
 [from] Done for function binary_search
@@ -426,8 +426,6 @@
   __retres FROM i
   \result FROM i
 [from] Function decr:
-  NO EFFECTS
-[from] Function bug_memexec:
   NO EFFECTS
 [from] Function escaping_formal:
   p FROM count
@@ -481,6 +479,8 @@
   \result FROM i
 [from] Function syracuse_ptr:
   y FROM p_0; result; x
+[from] Function bug_memexec:
+  NO EFFECTS
 [from] Function binary_search:
   mid FROM start; end
   __retres FROM data; toFind; start; end; array[7]
@@ -504,10 +504,6 @@
     x
 [inout] Inputs for function decr:
     nondet; i
-[inout] Out (internal) for function bug_memexec:
-    \nothing
-[inout] Inputs for function bug_memexec:
-    nondet
 [inout] Out (internal) for function escaping_formal:
     p; x
 [inout] Inputs for function escaping_formal:
@@ -576,6 +572,10 @@
     prev_arg; y
 [inout] Inputs for function syracuse_ptr:
     n; p_0; result; prev_res; x
+[inout] Out (internal) for function bug_memexec:
+    \nothing
+[inout] Inputs for function bug_memexec:
+    nondet
 [inout] Out (internal) for function binary_search:
     mid; tmp; tmp_0; __retres
 [inout] Inputs for function binary_search:
