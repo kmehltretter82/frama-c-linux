@@ -708,6 +708,11 @@ module NeverRemoveGlobals =
       let dependencies = []
     end)
 
+let () =
+  State_dependency_graph.add_dependencies
+    ~from:NeverRemoveGlobals.self
+    [ Ast.self; Ast.UntypedFiles.self ]
+
 let never_remove_global globname =
   NeverRemoveGlobals.add globname
 
