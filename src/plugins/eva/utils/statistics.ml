@@ -91,46 +91,39 @@ let register_statement_stat name =
 
 type key = Key : 'a t * 'a -> key
 
-type cmp = { cmp : 'a 'b. 'a t -> 'b t -> int }
+module Key = struct
 
-let compare (cmp: cmp) (Key (s1, x1)) (Key (s2, x2)) =
-  let c = cmp.cmp s1 s2 in
-  if c <> 0 then c else
-    match s1.kind, s2.kind with
-    | Global, Global -> 0
-    | Function, Function -> Kernel_function.compare x1 x2
-    | Statement, Statement -> Cil_datatype.Stmt.compare x1 x2
-    | Global, (Function | Statement) -> -1
-    | (Function | Statement), Global -> 1
-    | Function, Statement -> -1
-    | Statement, Function -> 1
+  type cmp = { cmp : 'a 'b. 'a t -> 'b t -> int }
 
-(* Optimized comparison, using the key id. *)
-let compare_opt = compare { cmp = fun s1 s2 -> s1.id - s2.id }
+  let compare_key (cmp: cmp) (Key (s1, x1)) (Key (s2, x2)) =
+    let c = cmp.cmp s1 s2 in
+    if c <> 0 then c else
+      match s1.kind, s2.kind with
+      | Global, Global -> 0
+      | Function, Function -> Kernel_function.compare x1 x2
+      | Statement, Statement -> Cil_datatype.Stmt.compare x1 x2
+      | Global, (Function | Statement) -> -1
+      | (Function | Statement), Global -> 1
+      | Function, Statement -> -1
+      | Statement, Function -> 1
 
-(* Lexicographical comparison, using the key name. *)
-let compare_lex = compare { cmp = fun s1 s2 -> String.compare s1.name s2.name }
+  (* Optimized comparison, using the key id. *)
+  let compare_opt =
+    compare_key { cmp = fun s1 s2 -> s1.id - s2.id }
 
+  (* Lexicographical comparison, using the key name. *)
+  let compare_lex =
+    compare_key { cmp = fun s1 s2 -> String.compare s1.name s2.name }
 
-module Key_Datatype = struct
-  include Datatype.Serializable_undefined
-
-  type t = key
-  let name = "Statistics.Key"
-  let rehash (Key (s, x)) =
-    (Key (register s.name s.kind, x))
-  let reprs = [Key ({ id = 0; name="dummy"; kind=Global }, ())]
-  let equal = Datatype.from_compare
-  let compare = compare_opt
-  let hash (Key (s,x)) =
+  let hash_key (Key (s, x)) =
     let h = match s.kind with
       | Global -> 0
       | Function -> Kernel_function.hash x
       | Statement -> Cil_datatype.Stmt.hash x
     in
     Hashtbl.hash (s.id, h)
-  let copy k = k
-  let pretty fmt (Key (s,x)) =
+
+  let pretty_key fmt (Key (s, x)) =
     match s.kind with
     | Global ->
       Format.fprintf fmt "%s" s.name
@@ -139,10 +132,21 @@ module Key_Datatype = struct
     | Statement ->
       let loc = Cil_datatype.Stmt.loc x in
       Format.fprintf fmt "%s:%a" s.name Cil_datatype.Location.pretty loc
-end
 
-module Key = struct
-  include Datatype.Make_with_collections (Key_Datatype)
+  module Prototype = struct
+    include Datatype.Serializable_undefined
+    type t = key
+    let name = "Statistics.Key"
+    let reprs = [Key ({ id = 0; name="dummy"; kind=Global }, ())]
+    let compare = compare_opt
+    let equal = Datatype.from_compare
+    let hash = hash_key
+    let pretty = pretty_key
+    let copy k = k
+    let rehash (Key (s, x)) = (Key (register s.name s.kind, x))
+  end
+
+  include Datatype.Make_with_collections (Prototype)
 
   let name (Key (s, _x)) = s.name
 
@@ -195,7 +199,7 @@ let reset_all () =
 
 let export_as_list () =
   State.to_seq () |> List.of_seq |>
-  List.sort (fun (k1,_v1) (k2,_v2) -> compare_lex k1 k2)
+  List.sort (fun (k1,_v1) (k2,_v2) -> Key.compare_lex k1 k2)
 
 let export_as_csv_to_channel out_channel =
   let fmt = Format.formatter_of_out_channel out_channel in
