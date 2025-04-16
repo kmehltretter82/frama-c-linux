@@ -49,6 +49,10 @@
     (* from TS 18661-1:2014 (for glibc >=2.35) *)
     "__STDC_IEC_60559_BFP__"; "__STDC_IEC_60559_COMPLEX__";
 
+    (* Defined by gcc 15 and C23. *)
+    "__STDC_EMBED_NOT_FOUND__"; "__STDC_EMBED_FOUND__";
+    "__STDC_EMBED_EMPTY__";
+
     (* expanding assert, an ACSL keyword, is not a good idea. *)
     "assert";
     (* __nonnull is predefined by Clang on macOS. *)
@@ -249,7 +253,7 @@ rule main = parse
   | "//@" ('{' | '}') { (* See comments for "/*@{" above *)
         Buffer.add_string output_buffer (lexeme lexbuf);
         oneline_comment lexbuf;
-      } 
+      }
   | "//"  (_ as c) {
       if c = !Clexer.annot_char then begin
         process_annot_start ();
@@ -268,7 +272,7 @@ rule main = parse
       make_newline (); Buffer.add_char output_buffer '\n'; main lexbuf }
   | eof  { }
   | '"' {
-      Buffer.add_char output_buffer '"'; 
+      Buffer.add_char output_buffer '"';
       c_string lexbuf }
   | "'" {
       Buffer.add_char output_buffer '\'';
@@ -282,10 +286,10 @@ and macro blacklisted = parse
       Buffer.add_char output_buffer '\n';
       macro blacklisted lexbuf
     }
-(* we ignore comments in macro definition, as their expansion 
+(* we ignore comments in macro definition, as their expansion
    in ACSL annotations would lead to ill-formed ACSL. *)
 | "/*" { macro_comment blacklisted lexbuf }
-| '"' { 
+| '"' {
   if not blacklisted then
     Buffer.add_char preprocess_buffer '"';
   macro_string blacklisted lexbuf
@@ -407,7 +411,7 @@ and annot = parse
      as cpp is likely to count it as part of an identifier, but this would
      imply that we can not speak about $ ident in annotations.
    *)
-  | '\\' { 
+  | '\\' {
         is_newline := CHAR;
         Buffer.add_string preprocess_buffer backslash;
         annot lexbuf }
