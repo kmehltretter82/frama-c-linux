@@ -9,7 +9,7 @@ compiling Frama-C 30.0.
 - lablgtk3-sourceview3.3.1.5
 - menhir.20240715
 - ocamlfind.1.9.6
-- ocamlgraph.2.1.0
+- ocamlgraph.2.2.0
 - ppx_deriving_yaml.0.3.0
 - ppx_deriving_yojson.3.9.0
 - unionFind.20220122

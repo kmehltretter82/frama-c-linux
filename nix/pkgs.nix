@@ -7,6 +7,7 @@ let
     combinetura = oself.callPackage ./combinetura.nix {};
     dolmen = oself.callPackage ./dolmen.nix {};
     mlmpfr = oself.callPackage ./mlmpfr.nix {};
+    ocamlgraph = oself.callPackage ./ocamlgraph.nix {};
     ppxlib = oself.callPackage ./ppxlib.nix {};
     ppxlib_jane = oself.callPackage ./ppxlib_jane.nix {};
     why3 = oself.callPackage ./why3.nix {};
