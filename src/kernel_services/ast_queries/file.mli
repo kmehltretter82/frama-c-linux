@@ -144,7 +144,10 @@ val from_filename: ?cpp:string -> Datatype.Filepath.t -> t
 val never_remove_global: string -> unit
 (** Adds the global name to the list of globals to be kept by Rmtmps,
     even if unused, overriding any command-line options.
-    Must be called before Rmtmps is run. *)
+    Must be called before Rmtmps is run.
+
+    @since Frama-C+dev
+*)
 
 (* ************************************************************************* *)
 (** {2 Initializers} *)
