@@ -34,8 +34,7 @@ import { DEVEL } from 'dome';
 import { Label } from 'dome/controls/labels';
 import { DefineElement } from 'dome/layout/dispatch';
 import { Inset } from 'dome/frame/toolbars';
-import { docHistory, HelpButton, helpLinkTag } from 'dome/help';
-import { Pattern } from 'dome/text/markdown';
+import { ChapterProps, docHistory, HelpButton } from 'dome/help';
 import * as State from './state';
 import * as Search from './search';
 import doc from './doc.md?raw';
@@ -234,13 +233,6 @@ export interface ToolProps {
   children?: React.ReactNode;
 }
 
-export interface ChapterProps {
-  id: string;
-  content: string;
-  rank?: number;
-  patterns?: Pattern[];
-}
-
 /** @ignore */
 export const SIDEBAR = new State.ElementRack<SidebarProps>();
 
@@ -267,8 +259,6 @@ export function registerStatusbar(status: ToolProps): void {
 
 /** The new chapter is recorded with an error if its Id already exist. */
 export function registerDocChapter(chapter: ChapterProps): void {
-  if(!chapter.patterns) chapter.patterns = [];
-  chapter.patterns.push(helpLinkTag);
   DOCCHAPTER.register(chapter);
 }
 

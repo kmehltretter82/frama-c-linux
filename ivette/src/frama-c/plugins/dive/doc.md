@@ -1,7 +1,7 @@
 # Dive {#dive}
 
 Dive is a Frama-C plugin that leverages the results from [Eva](#eva), filtered
-by [Studia](#studia), to visualize data dependency relationships between memory
+by [Studia](#eva-studia), to visualize data dependency relationships between memory
 locations. Its primary goal is to identify the source of false alarms raised
 during the analysis.
 

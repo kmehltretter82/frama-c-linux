@@ -31,9 +31,11 @@ import * as Dome from 'dome';
 import { Vfill } from 'dome/layout/boxes';
 import { LSplit } from 'dome/layout/splitters';
 import * as Toolbar from 'dome/frame/toolbars';
+import { docChapters } from 'dome/help';
+import { useGlobalState } from 'dome/data/states';
 import * as Sidebar from './Sidebar';
 import * as Controller from './Controller';
-import { TOOLBAR, STATUSBAR } from 'ivette';
+import { TOOLBAR, STATUSBAR, DOCCHAPTER } from 'ivette';
 import * as State from 'ivette/state';
 import * as Search from 'ivette/search';
 import * as Laboratory from 'ivette/laboratory';
@@ -53,6 +55,9 @@ export default function Application(): JSX.Element {
 
   const ToolBar = State.useChildren(TOOLBAR);
   const StatusBar = State.useChildren(STATUSBAR);
+
+  const [ , setChapters ] = useGlobalState(docChapters);
+  setChapters(DOCCHAPTER.getElements());
 
   return (
     <Vfill>
