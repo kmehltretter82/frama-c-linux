@@ -740,6 +740,8 @@ module type Builder = sig
          (** see [Filepath] module. *)
        end): Filepath_list
 
+  module Value_int: Value_datatype with type t = int
+
   module Filepath_map
       (V: Value_datatype)
       (_: sig

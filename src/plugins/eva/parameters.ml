@@ -660,14 +660,7 @@ let () = Parameter_customize.set_group precision_tuning
 let () = Parameter_customize.argument_may_be_fundecl ()
 module SlevelFunction =
   Kernel_function_map
-    (struct
-      include Datatype.Int
-      let of_string s =
-        try int_of_string s
-        with Failure _ ->
-          raise (Cannot_build ("'" ^ s ^ "' is not an integer"))
-      let to_string = string_of_int
-    end)
+    (Value_int)
     (struct
       let option_name = "-eva-slevel-function"
       let arg_name = "f:n"
@@ -749,14 +742,7 @@ let () = Parameter_customize.set_group precision_tuning
 let () = Parameter_customize.argument_may_be_fundecl ()
 module HistoryPartitioningFunction =
   Kernel_function_map
-    (struct
-      include Datatype.Int
-      let of_string s =
-        try int_of_string s
-        with Failure _ ->
-          raise (Cannot_build ("'" ^ s ^ "' is not an integer"))
-      let to_string = string_of_int
-    end)
+    (Value_int)
     (struct
       let option_name = "-eva-partition-history-function"
       let arg_name = "f:n"
@@ -951,14 +937,7 @@ let () = add_precision_dep LinearLevel.parameter
 let () = Parameter_customize.set_group precision_tuning
 module LinearLevelFunction =
   Kernel_function_map
-    (struct
-      include Datatype.Int
-      let of_string s =
-        try int_of_string s
-        with Failure _ ->
-          raise (Cannot_build ("'" ^ s ^ "' is not an integer"))
-      let to_string = string_of_int
-    end)
+    (Value_int)
     (struct
       let option_name = "-eva-subdivide-non-linear-function"
       let arg_name = "f:n"

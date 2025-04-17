@@ -817,14 +817,7 @@ module Memlimit =
 let () = Parameter_customize.set_group wp_prover
 module FctTimeout =
   Kernel_function_map
-    (struct
-      include Datatype.Int
-      let of_string s =
-        try int_of_string s
-        with Failure _ ->
-          raise (Cannot_build ("'" ^ s ^ "' is not an integer"))
-      let to_string = string_of_int
-    end)
+    (Value_int)
     (struct
       let option_name = "-wp-fct-timeout"
       let arg_name = "f1:t1,...,fn:tn"

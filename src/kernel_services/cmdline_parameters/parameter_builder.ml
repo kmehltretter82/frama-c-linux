@@ -1538,6 +1538,16 @@ struct
         let default = []
       end)
 
+  module Value_int = struct
+    include Datatype.Int
+
+    let of_string s =
+      try int_of_string s
+      with Failure _ -> raise (Cannot_build ("'" ^ s ^ "' is not an integer"))
+
+    let to_string = string_of_int
+  end
+
   module Make_map
       (K: Parameter_sig.String_datatype_with_collections)
       (V: Parameter_sig.Value_datatype)
