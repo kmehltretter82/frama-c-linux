@@ -819,12 +819,11 @@ module FctTimeout =
   Kernel_function_map
     (struct
       include Datatype.Int
-      type key = Cil_types.kernel_function
-      let of_string ~key:_ ~prev:_ s =
+      let of_string ~prev:_ s =
         try int_of_string s
         with Failure _ ->
           raise (Cannot_build ("'" ^ s ^ "' is not an integer"))
-      let to_string ~key:_ = string_of_int
+      let to_string = string_of_int
     end)
     (struct
       let option_name = "-wp-fct-timeout"

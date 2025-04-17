@@ -489,12 +489,11 @@ struct
     include String_map
         (struct
           include Datatype.String
-          type key = string
-          let of_string ~key:_ ~prev:_ s =
+          let of_string ~prev:_ s =
             if s = ""
             then raise (Cannot_build "missing filename")
             else s
-          let to_string ~key:_a b = b
+          let to_string b = b
         end)
         (struct
           let option_name = logfile_optname

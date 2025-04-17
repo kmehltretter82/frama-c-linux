@@ -192,8 +192,8 @@ module DomainsFunction =
     end)
     (struct
       include Domain_mode.Function_Mode
-      let of_string ~key ~prev str =
-        try of_string ~key ~prev str
+      let of_string ~prev str =
+        try of_string ~prev str
         with Invalid_argument msg -> raise (Cannot_build msg)
     end)
     (struct
@@ -235,11 +235,10 @@ module EqualityCallFunction =
   Kernel_function_map
     (struct
       include Datatype.String
-      type key = Cil_types.kernel_function
-      let of_string ~key:_ ~prev:_ = function
+      let of_string ~prev:_ = function
         | "none" | "formals" | "all" as x -> x
         | _ -> raise (Cannot_build "must be 'none', 'formals' or 'all'.")
-      let to_string ~key:_ s = s
+      let to_string s = s
     end)
     (struct
       let option_name = "-eva-equality-through-calls-function"
@@ -663,12 +662,11 @@ module SlevelFunction =
   Kernel_function_map
     (struct
       include Datatype.Int
-      type key = Cil_types.kernel_function
-      let of_string ~key:_ ~prev:_ s =
+      let of_string ~prev:_ s =
         try int_of_string s
         with Failure _ ->
           raise (Cannot_build ("'" ^ s ^ "' is not an integer"))
-      let to_string ~key:_ = string_of_int
+      let to_string = string_of_int
     end)
     (struct
       let option_name = "-eva-slevel-function"
@@ -753,12 +751,11 @@ module HistoryPartitioningFunction =
   Kernel_function_map
     (struct
       include Datatype.Int
-      type key = Cil_types.kernel_function
-      let of_string ~key:_ ~prev:_ s =
+      let of_string ~prev:_ s =
         try int_of_string s
         with Failure _ ->
           raise (Cannot_build ("'" ^ s ^ "' is not an integer"))
-      let to_string ~key:_ = string_of_int
+      let to_string = string_of_int
     end)
     (struct
       let option_name = "-eva-partition-history-function"
@@ -820,12 +817,11 @@ module SplitReturnFunction =
     (struct
       (* this type is ad-hoc: cannot use Kernel_function_multiple_map here *)
       include Split_strategy
-      type key = Cil_types.kernel_function
-      let of_string ~key:_ ~prev:_ s =
+      let of_string ~prev:_ s =
         try Split_strategy.of_string s
         with Split_strategy.ParseFailure s ->
           raise (Cannot_build ("unknown split strategy " ^ s))
-      let to_string ~key:_ v =
+      let to_string v =
         Split_strategy.to_string v
     end)
     (struct
@@ -892,16 +888,15 @@ module BuiltinsOverrides =
   Kernel_function_map
     (struct
       include Datatype.String
-      type key = Cil_types.kernel_function
-      let of_string ~key:kf ~prev:_ name =
+      let of_string ~prev:_ name =
         if not (mem_builtin name) then
-          abort "option '-eva-builtin %a:%s': undeclared builtin '%s'@.\
+          abort "option '-eva-builtin': undeclared builtin '%s'@.\
                  declared builtins: @[%a@]"
-            Kernel_function.pretty kf name name
+            name
             (Pretty_utils.pp_list ~sep:",@ " Format.pp_print_string)
             (Datatype.String.Set.elements !builtins);
         name
-      let to_string ~key:_ name = name
+      let to_string name = name
     end)
     (struct
       let option_name = "-eva-builtin"
@@ -958,12 +953,11 @@ module LinearLevelFunction =
   Kernel_function_map
     (struct
       include Datatype.Int
-      type key = Cil_types.kernel_function
-      let of_string ~key:_ ~prev:_ s =
+      let of_string ~prev:_ s =
         try int_of_string s
         with Failure _ ->
           raise (Cannot_build ("'" ^ s ^ "' is not an integer"))
-      let to_string ~key:_ = string_of_int
+      let to_string = string_of_int
     end)
     (struct
       let option_name = "-eva-subdivide-non-linear-function"

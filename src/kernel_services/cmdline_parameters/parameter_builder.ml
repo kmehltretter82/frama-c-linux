@@ -1542,7 +1542,7 @@ struct
 
   module Make_map
       (K: Parameter_sig.String_datatype_with_collections)
-      (V: Parameter_sig.Value_datatype with type key = K.t)
+      (V: Parameter_sig.Value_datatype)
       (X: sig
          include Parameter_sig.Input_collection
          val default: V.t K.Map.t
@@ -1554,8 +1554,8 @@ struct
 
     let find_ref = ref (fun _ -> assert false)
 
-    let of_val ~key k ~prev v =
-      try Option.map (V.of_string ~key ~prev) v
+    let of_val k ~prev v =
+      try Option.map (V.of_string ~prev) v
       with Cannot_build s ->
         cannot_build (Format.asprintf "@[value bound to '%s':@ %s@]" k s)
 
@@ -1569,11 +1569,11 @@ struct
           | [ k ] ->
             let key = K.of_string k in
             let prev = try Some (!find_ref key) with Not_found -> None in
-            key, of_val ~key k ~prev None
+            key, of_val k ~prev None
           | [ k; v ] ->
             let key = K.of_string k in
             let prev = try Some (!find_ref key) with Not_found -> None in
-            key, of_val ~key k ~prev (Some v)
+            key, of_val k ~prev (Some v)
           | _ :: _ :: _ :: _ ->
             (* by definition of [Str.bounded_split_delim]: *)
             assert false
@@ -1581,7 +1581,7 @@ struct
         let key_str = K.to_string key in
         match v with
         | None -> key_str
-        | Some v -> Format.asprintf "%s:%s" key_str (V.to_string ~key v)
+        | Some v -> Format.asprintf "%s:%s" key_str (V.to_string v)
 
     end
 
@@ -1658,7 +1658,7 @@ struct
               in
               match !key with
               | None -> K.Set.empty, None
-              | Some key -> keys, of_val ~key k ~prev v_opt
+              | Some _ -> keys, of_val k ~prev v_opt
             in
             match Str.bounded_full_split r s 2 with
             | ([] | [ Str.Text _ ]) ->  (* no delimiter ':' *)
@@ -1708,7 +1708,7 @@ struct
   end
 
   module String_map
-      (V: Parameter_sig.Value_datatype with type key = string)
+      (V: Parameter_sig.Value_datatype)
       (X: sig
          include Parameter_sig.Input_with_arg
          val default: V.t Datatype.String.Map.t
@@ -1719,7 +1719,7 @@ struct
       (struct include X let dependencies = [] end)
 
   module Filepath_map
-      (V: Parameter_sig.Value_datatype with type key = Fc_Filepath.Normalized.t)
+      (V: Parameter_sig.Value_datatype)
       (X: sig
          include Parameter_sig.Input_with_arg
          val existence: Fc_Filepath.existence
@@ -1743,7 +1743,7 @@ struct
       (struct include X let dependencies = [] end)
 
   module Kernel_function_map
-      (V: Parameter_sig.Value_datatype with type key = kernel_function)
+      (V: Parameter_sig.Value_datatype)
       (X: sig
          include Parameter_sig.Input_with_arg
          val default: V.t Cil_datatype.Kf.Map.t
@@ -1767,7 +1767,7 @@ struct
 
   module Make_multiple_map
       (K: Parameter_sig.String_datatype_with_collections)
-      (V: Parameter_sig.Multiple_value_datatype with type key = K.t)
+      (V: Parameter_sig.Multiple_value_datatype)
       (X: sig
          include Parameter_sig.Input_collection
          val default: V.t list K.Map.t
@@ -1779,8 +1779,8 @@ struct
 
     let find_ref = ref (fun _ -> assert false)
 
-    let of_val ~key k ~prev v =
-      try Option.map (V.of_string ~key ~prev) v
+    let of_val k ~prev v =
+      try Option.map (V.of_string ~prev) v
       with Cannot_build s ->
         cannot_build
           (Format.asprintf "@[value bound to '%s':@ %s@]" k s)
@@ -1797,12 +1797,12 @@ struct
             let prev = try Some (!find_ref key) with Not_found -> None in
             let l = match l with
               | [] ->
-                (match of_val ~key k ~prev None with
+                (match of_val k ~prev None with
                  | None -> []
                  | Some v -> [ v ])
               | _ :: _ ->
                 List.fold_right (* preserve order *)
-                  (fun v acc -> match of_val ~key k ~prev (Some v) with
+                  (fun v acc -> match of_val k ~prev (Some v) with
                      | None -> acc
                      | Some v -> v :: acc)
                   l
@@ -1817,7 +1817,7 @@ struct
              let rec pp_custom_list = function
                | [] -> ()
                | v :: l ->
-                 Format.fprintf fmt ":%s" (V.to_string ~key v);
+                 Format.fprintf fmt ":%s" (V.to_string v);
                  pp_custom_list l
              in
              pp_custom_list l)
@@ -1858,18 +1858,18 @@ struct
             []
             l
         in
-        let rec parse_values ~key k ~prev acc s = function
-          | [] -> remove_none_and_rev (of_val ~key k ~prev (Some s) :: acc)
+        let rec parse_values k ~prev acc s = function
+          | [] -> remove_none_and_rev (of_val k ~prev (Some s) :: acc)
           | [Str.Text t] ->
-            remove_none_and_rev (of_val ~key k ~prev (Some (s ^ t)) :: acc)
+            remove_none_and_rev (of_val k ~prev (Some (s ^ t)) :: acc)
           | Str.Text t :: Str.Delim d :: l ->
             let (suf, pre) = split_delim d in
-            let v = of_val ~key k ~prev (Some (s ^ t ^ suf)) in
-            parse_values ~key k ~prev (v :: acc) pre l
+            let v = of_val k ~prev (Some (s ^ t ^ suf)) in
+            parse_values k ~prev (v :: acc) pre l
           | Str.Delim d :: l ->
             let (suf,pre) = split_delim d in
-            let v = of_val ~key k ~prev (Some (s ^ suf)) in
-            parse_values ~key k ~prev (v :: acc) pre l
+            let v = of_val k ~prev (Some (s ^ suf)) in
+            parse_values k ~prev (v :: acc) pre l
           | Str.Text _ :: Str.Text _ :: _ ->
             (* By construction, there must be a Delim between two consecutive
                Text in the value returned by full_split *)
@@ -1893,7 +1893,7 @@ struct
           in
           match !key with
           | None -> K.Set.empty, []
-          | Some key -> keys, f ~key ~prev
+          | Some _ -> keys, f ~prev
         in
         let get_pairing k v l =
           apply_to_previous_pairing k (parse_values k [] v l)
@@ -1904,8 +1904,7 @@ struct
             | [] -> cannot_build ("cannot interpret '" ^ s ^ "'")
             | [Str.Text t] ->
               apply_to_previous_pairing t
-                (fun ~key ~prev ->
-                   remove_none_and_rev [of_val ~key t ~prev None])
+                (fun ~prev -> remove_none_and_rev [of_val t ~prev None])
             | Str.Delim d :: l ->
               let (f,s) = split_delim d in
               get_pairing f s l
@@ -1944,7 +1943,7 @@ struct
   end
 
   module String_multiple_map
-      (V: Parameter_sig.Multiple_value_datatype with type key = string)
+      (V: Parameter_sig.Multiple_value_datatype)
       (X: sig
          include Parameter_sig.Input_with_arg
          val default: V.t list Datatype.String.Map.t
@@ -1955,7 +1954,7 @@ struct
       (struct include X let dependencies = [] end)
 
   module Kernel_function_multiple_map
-      (V: Parameter_sig.Multiple_value_datatype with type key = kernel_function)
+      (V: Parameter_sig.Multiple_value_datatype)
       (X: sig
          include Parameter_sig.Input_with_arg
          val default: V.t list Cil_datatype.Kf.Map.t

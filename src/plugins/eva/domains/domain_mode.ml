@@ -70,9 +70,8 @@ end
 
 module Function_Mode = struct
   include Datatype.Pair (Kernel_function) (Mode)
-  type key = string
 
-  let of_string ~key:_ ~prev:_ str =
+  let of_string ~prev:_ str =
     let get_function str =
       try Globals.Functions.find_by_name str
       with Not_found -> raise (Invalid_argument ("no function " ^ str))
@@ -86,7 +85,7 @@ module Function_Mode = struct
       | [ kf; mode ] -> get_function kf, Mode.of_string mode
       | _ -> raise (Invalid_argument ("invalid argument " ^ str))
 
-  let to_string ~key:_ (kf, mode) =
+  let to_string (kf, mode) =
     Kernel_function.get_name kf ^ "+" ^ Mode.to_string mode
 end
 

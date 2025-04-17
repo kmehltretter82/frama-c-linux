@@ -162,11 +162,8 @@ module Widening_arguments =
   String_map
     (struct
       include Datatype.Int
-      type key = string
-
-      let to_string ~key:_ i = string_of_int i
-
-      let of_string ~key:_ ~prev: _ s = int_of_string s
+      let to_string i = string_of_int i
+      let of_string ~prev:_ s = int_of_string s
     end)
     (struct
       let default = Datatype.String.Map.empty
@@ -190,11 +187,8 @@ module Widening_output =
   String_map
     (struct
       include Datatype.Int
-      type key = string
-
-      let to_string ~key:_ i = string_of_int i
-
-      let of_string ~key:_ ~prev: _ s = int_of_string s
+      let to_string i = string_of_int i
+      let of_string ~prev:_ s = int_of_string s
     end)
     (struct
       let default = Datatype.String.Map.empty

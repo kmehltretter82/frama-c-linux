@@ -345,9 +345,8 @@ module Filepath_map
   P.Filepath_map
     (struct
       include Datatype.String
-      type key = Filepath.Normalized.t
-      let of_string ~key:_ ~prev:_ s = s
-      let to_string ~key:_ s = s
+      let of_string ~prev:_ s = s
+      let to_string s = s
     end)
     (struct
       let () = Parameter_customize.set_module_name X.module_name
@@ -1502,9 +1501,8 @@ module GeneratedSpecCustom =
   P.String_map
     (struct
       include Datatype.String
-      type key = string
-      let of_string ~key:_ ~prev:_ s = s
-      let to_string ~key:_ s = s
+      let of_string ~prev:_ s = s
+      let to_string s = s
     end)
     (struct
       let option_name = "-generated-spec-custom"
