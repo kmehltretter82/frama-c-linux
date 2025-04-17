@@ -72,27 +72,22 @@ module Function_Mode = struct
   include Datatype.Pair (Kernel_function) (Mode)
   type key = string
 
-  let of_string ~key ~prev:_ str =
-    match str with
-    | None -> raise (Invalid_argument ("no value bound to " ^ key))
-    | Some str ->
-      let get_function str =
-        try Globals.Functions.find_by_name str
-        with Not_found -> raise (Invalid_argument ("no function " ^ str))
-      in
-      match String.split_on_char '-' str with
-      | [ kf; "" ] -> Some (get_function kf, Mode.none)
-      | _ ->
-        match String.split_on_char '+' str with
-        | [ kf ]       -> Some (get_function kf, Mode.default)
-        | [ kf; "" ]   -> Some (get_function kf, Mode.all)
-        | [ kf; mode ] -> Some (get_function kf, Mode.of_string mode)
-        | _ -> raise (Invalid_argument ("invalid argument " ^ str))
+  let of_string ~key:_ ~prev:_ str =
+    let get_function str =
+      try Globals.Functions.find_by_name str
+      with Not_found -> raise (Invalid_argument ("no function " ^ str))
+    in
+    match String.split_on_char '-' str with
+    | [ kf; "" ] -> get_function kf, Mode.none
+    | _ ->
+      match String.split_on_char '+' str with
+      | [ kf ]       -> get_function kf, Mode.default
+      | [ kf; "" ]   -> get_function kf, Mode.all
+      | [ kf; mode ] -> get_function kf, Mode.of_string mode
+      | _ -> raise (Invalid_argument ("invalid argument " ^ str))
 
-  let to_string ~key:_ = function
-    | None -> None
-    | Some (kf, mode) ->
-      Some (Kernel_function.get_name kf ^ "+" ^ Mode.to_string mode)
+  let to_string ~key:_ (kf, mode) =
+    Kernel_function.get_name kf ^ "+" ^ Mode.to_string mode
 end
 
 include Datatype.List (Function_Mode)

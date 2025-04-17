@@ -821,13 +821,10 @@ module FctTimeout =
       include Datatype.Int
       type key = Cil_types.kernel_function
       let of_string ~key:_ ~prev:_ s =
-        Option.map
-          (fun s ->
-             try int_of_string s
-             with Failure _ ->
-               raise (Cannot_build ("'" ^ s ^ "' is not an integer")))
-          s
-      let to_string ~key:_ = Option.map string_of_int
+        try int_of_string s
+        with Failure _ ->
+          raise (Cannot_build ("'" ^ s ^ "' is not an integer"))
+      let to_string ~key:_ = string_of_int
     end)
     (struct
       let option_name = "-wp-fct-timeout"

@@ -491,10 +491,9 @@ struct
           include Datatype.String
           type key = string
           let of_string ~key:_ ~prev:_ s =
-            match s with
-            | None -> raise (Cannot_build "missing delimiter")
-            | Some s when s = "" -> raise (Cannot_build "missing filename")
-            | Some _ -> s
+            if s = ""
+            then raise (Cannot_build "missing filename")
+            else s
           let to_string ~key:_a b = b
         end)
         (struct

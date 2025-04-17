@@ -1555,10 +1555,9 @@ struct
     let find_ref = ref (fun _ -> assert false)
 
     let of_val ~key k ~prev v =
-      try V.of_string ~key ~prev v
+      try Option.map (V.of_string ~key ~prev) v
       with Cannot_build s ->
-        cannot_build
-          (Format.asprintf "@[value bound to '%s':@ %s@]" k s)
+        cannot_build (Format.asprintf "@[value bound to '%s':@ %s@]" k s)
 
     module Pair = struct
       include Datatype.Pair(K)(Datatype.Option(V))
@@ -1579,12 +1578,11 @@ struct
             (* by definition of [Str.bounded_split_delim]: *)
             assert false
       let to_string (key, v) =
-        let v = V.to_string ~key v in
-        let delim, v = match v with
-          | None -> "", ""
-          | Some v -> ":", v
-        in
-        Format.asprintf "%s%s%s" (K.to_string key) delim v
+        let key_str = K.to_string key in
+        match v with
+        | None -> key_str
+        | Some v -> Format.asprintf "%s:%s" key_str (V.to_string ~key v)
+
     end
 
     module C = struct
@@ -1782,7 +1780,7 @@ struct
     let find_ref = ref (fun _ -> assert false)
 
     let of_val ~key k ~prev v =
-      try V.of_string ~key ~prev v
+      try Option.map (V.of_string ~key ~prev) v
       with Cannot_build s ->
         cannot_build
           (Format.asprintf "@[value bound to '%s':@ %s@]" k s)
@@ -1819,9 +1817,7 @@ struct
              let rec pp_custom_list = function
                | [] -> ()
                | v :: l ->
-                 Option.iter
-                   (fun v -> Format.fprintf fmt ":%s" v)
-                   (V.to_string ~key (Some v));
+                 Format.fprintf fmt ":%s" (V.to_string ~key v);
                  pp_custom_list l
              in
              pp_custom_list l)

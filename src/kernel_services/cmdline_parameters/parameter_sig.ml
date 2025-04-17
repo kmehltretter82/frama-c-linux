@@ -94,17 +94,15 @@ module type Value_datatype = sig
   include Datatype.S
   type key
 
-  val of_string: key:key -> prev:t option -> string option -> t option
+  val of_string: key:key -> prev:t option -> string -> t
   (** [key] is the key associated to this value, while [prev] is the previous
-      value associated to this key (if any). The optional string is [None] if
-      there is no value associated to the key, and [Some v] (potentially [v =
-      ""]) otherwise.
+      value associated to this key (if any).
       @return None if there is no value to associate to the key or [Some v]
       otherwise.
       @raise Cannot_build if there is no element corresponding to the given
       string. *)
 
-  val to_string: key:key -> t option -> string option
+  val to_string: key:key -> t -> string
   (** [key] is the key associated to this value. The optional string is [None] if
       there is no value associated to the key, and [Some v] (potentially [v =
       ""]) otherwise.
@@ -119,8 +117,8 @@ end
 module type Multiple_value_datatype = sig
   include Datatype.S
   type key
-  val of_string: key:key -> prev:t list option -> string option -> t option
-  val to_string: key:key -> t option -> string option
+  val of_string: key:key -> prev:t list option -> string -> t
+  val to_string: key:key -> t -> string
 end
 
 (* ************************************************************************** *)
