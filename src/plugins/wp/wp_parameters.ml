@@ -819,7 +819,7 @@ module FctTimeout =
   Kernel_function_map
     (struct
       include Datatype.Int
-      let of_string ~prev:_ s =
+      let of_string s =
         try int_of_string s
         with Failure _ ->
           raise (Cannot_build ("'" ^ s ^ "' is not an integer"))

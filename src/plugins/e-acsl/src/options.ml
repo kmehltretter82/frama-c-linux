@@ -163,7 +163,7 @@ module Widening_arguments =
     (struct
       include Datatype.Int
       let to_string i = string_of_int i
-      let of_string ~prev:_ s = int_of_string s
+      let of_string s = int_of_string s
     end)
     (struct
       let default = Datatype.String.Map.empty
@@ -188,7 +188,7 @@ module Widening_output =
     (struct
       include Datatype.Int
       let to_string i = string_of_int i
-      let of_string ~prev:_ s = int_of_string s
+      let of_string s = int_of_string s
     end)
     (struct
       let default = Datatype.String.Map.empty

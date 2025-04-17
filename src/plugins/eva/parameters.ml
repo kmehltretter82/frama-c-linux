@@ -192,8 +192,8 @@ module DomainsFunction =
     end)
     (struct
       include Domain_mode.Function_Mode
-      let of_string ~prev str =
-        try of_string ~prev str
+      let of_string str =
+        try of_string str
         with Invalid_argument msg -> raise (Cannot_build msg)
     end)
     (struct
@@ -235,7 +235,7 @@ module EqualityCallFunction =
   Kernel_function_map
     (struct
       include Datatype.String
-      let of_string ~prev:_ = function
+      let of_string = function
         | "none" | "formals" | "all" as x -> x
         | _ -> raise (Cannot_build "must be 'none', 'formals' or 'all'.")
       let to_string s = s
@@ -662,7 +662,7 @@ module SlevelFunction =
   Kernel_function_map
     (struct
       include Datatype.Int
-      let of_string ~prev:_ s =
+      let of_string s =
         try int_of_string s
         with Failure _ ->
           raise (Cannot_build ("'" ^ s ^ "' is not an integer"))
@@ -751,7 +751,7 @@ module HistoryPartitioningFunction =
   Kernel_function_map
     (struct
       include Datatype.Int
-      let of_string ~prev:_ s =
+      let of_string s =
         try int_of_string s
         with Failure _ ->
           raise (Cannot_build ("'" ^ s ^ "' is not an integer"))
@@ -817,7 +817,7 @@ module SplitReturnFunction =
     (struct
       (* this type is ad-hoc: cannot use Kernel_function_multiple_map here *)
       include Split_strategy
-      let of_string ~prev:_ s =
+      let of_string s =
         try Split_strategy.of_string s
         with Split_strategy.ParseFailure s ->
           raise (Cannot_build ("unknown split strategy " ^ s))
@@ -888,7 +888,7 @@ module BuiltinsOverrides =
   Kernel_function_map
     (struct
       include Datatype.String
-      let of_string ~prev:_ name =
+      let of_string name =
         if not (mem_builtin name) then
           abort "option '-eva-builtin': undeclared builtin '%s'@.\
                  declared builtins: @[%a@]"
@@ -953,7 +953,7 @@ module LinearLevelFunction =
   Kernel_function_map
     (struct
       include Datatype.Int
-      let of_string ~prev:_ s =
+      let of_string s =
         try int_of_string s
         with Failure _ ->
           raise (Cannot_build ("'" ^ s ^ "' is not an integer"))

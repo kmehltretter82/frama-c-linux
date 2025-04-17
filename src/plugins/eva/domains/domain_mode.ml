@@ -71,7 +71,7 @@ end
 module Function_Mode = struct
   include Datatype.Pair (Kernel_function) (Mode)
 
-  let of_string ~prev:_ str =
+  let of_string str =
     let get_function str =
       try Globals.Functions.find_by_name str
       with Not_found -> raise (Invalid_argument ("no function " ^ str))

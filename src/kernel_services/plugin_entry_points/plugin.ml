@@ -489,7 +489,7 @@ struct
     include String_map
         (struct
           include Datatype.String
-          let of_string ~prev:_ s =
+          let of_string s =
             if s = ""
             then raise (Cannot_build "missing filename")
             else s

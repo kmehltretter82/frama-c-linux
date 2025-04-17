@@ -11,7 +11,7 @@ module M =
     (struct
       include Datatype.Integer
       type key = string
-      let of_string ~prev:_ arg =
+      let of_string arg =
         try Integer.of_string arg
         with Failure _ ->
           raise (Cannot_build "expecting an integer")

@@ -345,7 +345,7 @@ module Filepath_map
   P.Filepath_map
     (struct
       include Datatype.String
-      let of_string ~prev:_ s = s
+      let of_string s = s
       let to_string s = s
     end)
     (struct
@@ -1501,7 +1501,7 @@ module GeneratedSpecCustom =
   P.String_map
     (struct
       include Datatype.String
-      let of_string ~prev:_ s = s
+      let of_string s = s
       let to_string s = s
     end)
     (struct

@@ -93,7 +93,7 @@ end
 module type Value_datatype = sig
   include Datatype.S
 
-  val of_string: prev:t option -> string -> t
+  val of_string: string -> t
   (** [key] is the key associated to this value, while [prev] is the previous
       value associated to this key (if any).
       @return None if there is no value to associate to the key or [Some v]
@@ -108,15 +108,6 @@ module type Value_datatype = sig
       @return None if there is no value to associate to the key or [Some v]
       otherwise. *)
 
-end
-
-(** Signature of the optional value associated to the key and required to build
-    multiple map parameters. Almost similar to {!Value_datatype}.
-    @since Sodium-20150201 *)
-module type Multiple_value_datatype = sig
-  include Datatype.S
-  val of_string: prev:t list option -> string -> t
-  val to_string: t -> string
 end
 
 (* ************************************************************************** *)
@@ -792,13 +783,13 @@ module type Builder = sig
   (** Parameter is a map where multibindings are allowed. *)
   module Make_multiple_map
       (K: String_datatype_with_collections)
-      (V: Multiple_value_datatype)
+      (V: Value_datatype)
       (_: sig include Input_collection val default: V.t list K.Map.t end):
     Multiple_map
     with type key = K.t and type value = V.t and type t = V.t list K.Map.t
 
   module String_multiple_map
-      (V: Multiple_value_datatype)
+      (V: Value_datatype)
       (_: sig
          include Input_with_arg
          val default: V.t list Datatype.String.Map.t
@@ -812,7 +803,7 @@ module type Builder = sig
       Use {!Parameter_customize.argument_may_be_fundecl} to also include
       pure prototypes. *)
   module Kernel_function_multiple_map
-      (V: Multiple_value_datatype)
+      (V: Value_datatype)
       (_: sig
          include Input_with_arg
          val default: V.t list Cil_datatype.Kf.Map.t
