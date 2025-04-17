@@ -1180,8 +1180,6 @@ struct
     (* Memoized access to the state *)
     (* ********************************************************************** *)
 
-    let get_nomemo () = S.memo (fun () -> raise Not_found)
-
     let get () =
       let compute () =
         let s = As_string.get () in
@@ -1552,8 +1550,6 @@ struct
     type key = K.t
     type value = V.t
 
-    let find_ref = ref (fun _ -> assert false)
-
     let of_val k v =
       try Option.map V.of_string v
       with Cannot_build s ->
@@ -1608,7 +1604,6 @@ struct
       let fold f m acc = K.Map.fold (fun k v -> f (k, Some v)) m acc
       let reorder = Fun.id
 
-      exception Found of V.t
       let of_singleton_string =
         let r = Str.regexp "\\([^:]\\|^\\):\\([^:]\\|$\\)" in
         (* delimiter is no more than 3 characters long, the first belonging to
@@ -1634,25 +1629,7 @@ struct
         fun s ->
           let (keys, value) =
             let get_pairing k v_opt =
-              let keys = k_of_singleton_string k in
-              let key = ref None in
-              let _prev =
-                try
-                  K.Set.iter
-                    (fun k ->
-                       key := Some k;
-                       (* choose any previous value, whatever it is:
-                          don't know which clear semantics one would like *)
-                       try raise (Found (!find_ref k)) with Not_found -> ())
-                    keys;
-                  (* assume there is always at least a key *)
-                  None
-                with Found v ->
-                  Some v
-              in
-              match !key with
-              | None -> K.Set.empty, None
-              | Some _ -> keys, of_val k v_opt
+              k_of_singleton_string k, of_val k v_opt
             in
             match Str.bounded_full_split r s 2 with
             | ([] | [ Str.Text _ ]) ->  (* no delimiter ':' *)
@@ -1697,7 +1674,6 @@ struct
     let find k = K.Map.find k (get ())
     let mem k = K.Map.mem k (get ())
     let get_default () = X.default
-    let () = find_ref := (fun k -> K.Map.find k (get_nomemo ()))
 
   end
 
@@ -1771,8 +1747,6 @@ struct
     type key = K.t
     type value = V.t
 
-    let find_ref = ref (fun _ -> assert false)
-
     let of_val k v =
       try Option.map V.of_string v
       with Cannot_build s ->
@@ -1833,8 +1807,6 @@ struct
       let fold f m acc = K.Map.fold (fun k v -> f (k, v)) m acc
       let reorder = Fun.id
 
-      exception Found of V.t list
-
       let of_singleton_string =
         let k_of_singleton_string =
           if (K.of_singleton_string==no_element_of_string)
@@ -1851,53 +1823,32 @@ struct
             []
             l
         in
-        let rec parse_values k ~prev acc s = function
+        let rec parse_values k acc s = function
           | [] -> remove_none_and_rev (of_val k (Some s) :: acc)
           | [Str.Text t] ->
             remove_none_and_rev (of_val k (Some (s ^ t)) :: acc)
           | Str.Text t :: Str.Delim d :: l ->
             let (suf, pre) = split_delim d in
             let v = of_val k (Some (s ^ t ^ suf)) in
-            parse_values k ~prev (v :: acc) pre l
+            parse_values k (v :: acc) pre l
           | Str.Delim d :: l ->
             let (suf,pre) = split_delim d in
             let v = of_val k (Some (s ^ suf)) in
-            parse_values k ~prev (v :: acc) pre l
+            parse_values k (v :: acc) pre l
           | Str.Text _ :: Str.Text _ :: _ ->
             (* By construction, there must be a Delim between two consecutive
                Text in the value returned by full_split *)
             assert false
         in
-        let apply_to_previous_pairing k f =
-          let keys = k_of_singleton_string k in
-          let key = ref None in
-          let prev =
-            try
-              K.Set.iter
-                (fun k ->
-                   key := Some k;
-                   (* choose any previous value, whatever it is:
-                      don't know which clear semantics one would like *)
-                   try raise (Found (!find_ref k)) with Not_found -> ())
-                keys;
-              None
-            with Found v ->
-              Some v
-          in
-          match !key with
-          | None -> K.Set.empty, []
-          | Some _ -> keys, f ~prev
-        in
         let get_pairing k v l =
-          apply_to_previous_pairing k (parse_values k [] v l)
+          k_of_singleton_string k, parse_values k [] v l
         in
         fun s ->
           let (keys, values) =
             match Str.full_split r s with
             | [] -> cannot_build ("cannot interpret '" ^ s ^ "'")
             | [Str.Text t] ->
-              apply_to_previous_pairing t
-                (fun ~prev:_ -> remove_none_and_rev [of_val t None])
+              k_of_singleton_string t, remove_none_and_rev [of_val t None]
             | Str.Delim d :: l ->
               let (f,s) = split_delim d in
               get_pairing f s l
@@ -1931,7 +1882,6 @@ struct
     let find k = K.Map.find k (get ())
     let mem k = K.Map.mem k (get ())
     let get_default () = X.default
-    let () = find_ref := (fun k -> K.Map.find k (get_nomemo ()))
 
   end
 
