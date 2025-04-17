@@ -40,7 +40,7 @@ let rec add_lval (m:map) (s:stmt) (lv:lval) : node =
   add_loffset m s (add_lhost m s h) (Cil.typeOfLhost h) (snd lv)
 
 and add_lhost (m:map) (s:stmt) = function
-  | Var x -> Memory.add_root m x
+  | Var x -> Memory.add_cvar m x
   | Mem e -> pointer @@ add_exp m s e
 
 and add_loffset (m:map) (s:stmt) (r:node) (ty:typ)= function

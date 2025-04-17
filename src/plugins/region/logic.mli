@@ -31,4 +31,5 @@ type env
 
 val add_addr_lval : env -> term_lval -> node
 val add_term_lval : env -> term_lval -> domain
-val add_term : env -> term -> domain
+val add_term      : env -> term      -> domain
+val add_predicate : env -> predicate -> unit

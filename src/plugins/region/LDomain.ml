@@ -26,10 +26,12 @@ module Fmap = Fieldinfo.Map
 
 type 'a t =
   | Pure
+  | Dvar   of string
   | Ptr    of 'a
   | Array  of 'a t (* no pure *)
   | Record of 'a t Fmap.t (* not all pure *)
   | Logic  of logic_type_info * 'a t list (* not all pure *)
+  | Arrow  of 'a t list * 'a t (* not all pure *)
 
 (* -------------------------------------------------------------------------- *)
 (* ---  Printer                                                           --- *)
@@ -37,6 +39,7 @@ type 'a t =
 
 let rec pretty pp fmt = function
   | Pure -> Format.pp_print_string fmt "_"
+  | Dvar v -> Format.fprintf fmt "D.%s" v
   | Ptr r -> pp fmt r
   | Array d -> pretty pp fmt d ; Format.pp_print_string fmt "[]"
   | Record m ->
@@ -51,6 +54,11 @@ let rec pretty pp fmt = function
     Format.fprintf fmt "@[<hov 2>%a<%a" Logic_type_info.pretty a (pretty pp) d ;
     List.iter (Format.fprintf fmt ",@,%a" (pretty pp)) ds ;
     Format.fprintf fmt ">@]"
+  | Arrow ([],dr) -> pretty pp fmt dr
+  | Arrow (d::ds,dr) ->
+    Format.fprintf fmt "@[<hov 2>%a" (pretty pp) d ;
+    List.iter (Format.fprintf fmt "->@,%a" (pretty pp)) ds ;
+    Format.fprintf fmt "@[:%a@]" (pretty pp) dr
 
 (* -------------------------------------------------------------------------- *)
 (* ---  Smart constructors                                                --- *)
@@ -62,34 +70,44 @@ let ptr r = Ptr r
 let scalar = function None -> Pure | Some r -> Ptr r
 let array d = if d == Pure then Pure else Array d
 let field fd d = if d == Pure then Pure else Record (Fmap.singleton fd d)
-
 let logic s l =
   if Logic_const.is_unrollable_ltdef s then invalid_arg "Region.LDomain.logic"
   else if List.for_all is_pure l then Pure
   else Logic (s,l)
+
+let rec arrow ds d =
+  if ds = [] then d
+  else if is_pure d && List.for_all is_pure ds then pure
+  else match d with
+    | Arrow (ds2, d) -> arrow (List.concat [ds;ds2]) d
+    | _ -> Arrow (ds, d)
 
 (* -------------------------------------------------------------------------- *)
 (* ---  Merge                                                             --- *)
 (* -------------------------------------------------------------------------- *)
 
 let rec collect f w = function
-  | Pure -> w
+  | Pure | Dvar _ -> w
   | Ptr r -> Some (match w with None -> r | Some r0 -> f r0 r)
   | Array d -> collect f w d
   | Record m -> Fmap.fold (fun _ d w -> collect f w d) m w
   | Logic(_,ds) -> List.fold_left (collect f) w ds
+  | Arrow(ds,dr) -> List.fold_left (collect f) (collect f w dr) ds
 
 let pointed f d = collect f None d
 
 let rec merge f d1 d2 =
   match d1, d2 with
   | Pure, d | d, Pure -> d
+  | Dvar a, Dvar b -> Dvar (min a b) (* sould never apply *)
   | Ptr r1, Ptr r2 -> Ptr (f r1 r2)
   | Record m1, Record m2 ->
     Record (Fmap.union (fun _ d1 d2 -> Some (merge f d1 d2)) m1 m2)
   | Array d1, Array d2 -> Array (merge f d1 d2)
   | Logic (a1, ds1), Logic (a2, ds2) when Logic_type_info.equal a1 a2 ->
     Logic (a1, List.map2 (merge f) ds1 ds2)
+  | Arrow(ds1,dr1), Arrow(ds2,dr2) when List.compare_lengths ds1 ds2 = 0 ->
+    arrow (List.map2 (merge f) ds1 ds2) @@ merge f dr1 dr2
   | _ -> scalar @@ collect f (collect f None d1) d2
 
 (* -------------------------------------------------------------------------- *)
@@ -105,6 +123,17 @@ let get_field f d fd =
   | Record mf -> (try Fmap.find fd mf with Not_found -> Pure)
   | _ -> get f d
 
+(* -------------------------------------------------------------------------- *)
+(* ---  Transform type into domain                                        --- *)
+(* -------------------------------------------------------------------------- *)
+
+module M = Map.Make(String)
+type 'a context = 'a t M.t
+let empty = M.empty
+let make l : 'a context = List.fold_left (fun m (s,r) -> M.add s r m) empty l
+
+let get v ctxt = try M.find v ctxt with Not_found -> pure
+
 let rec of_typ create ty : 'a t = match ty.tnode with
   | TBuiltin_va_list  | TFun _ | TPtr _ -> ptr @@ create ()
   | TArray (ty,_) -> array @@ of_typ create ty
@@ -117,27 +146,53 @@ let rec of_typ create ty : 'a t = match ty.tnode with
   | TVoid | TInt _ | TFloat _ | TComp _ | TEnum _ -> pure
   | TNamed { ttype } -> of_typ create ttype
 
-module M = Map.Make(String)
-
-type 'a context = 'a t M.t
-
-let empty = M.empty
-
-let rec of_ltype ctxt create = function
-  (* match Ast_types.unroll_logic ~unroll_typedef:false lt with *)
+let rec of_ltype create lt =
+  match Ast_types.unroll_logic ~unroll_typedef:false lt with
   | Ctype ty -> of_typ create ty
-  | Lvar v -> (try M.find v ctxt with Not_found -> pure)
-  | Ltype (ti,ts) ->
-    begin
-      let ds = List.map (of_ltype ctxt create) ts in
-      match ti.lt_def with
-      | Some (LTsum _) | None -> logic ti ds
-      | Some (LTsyn def) ->
-        let add_ctxt ctxt a d = M.add a d ctxt in
-        let ctxt = List.fold_left2 add_ctxt M.empty ti.lt_params ds in
-        of_ltype ctxt create def
-    end
+  | Lvar v -> Dvar v
+  | Ltype (ti,ts) -> logic ti @@ List.map (of_ltype create) ts
   | Lboolean | Linteger | Lreal -> pure
-  | Larrow (_prms,_rty) -> Options.abort "LDomain.of_ltype: Larrow"
+  | Larrow (prms,ty) ->
+    arrow (List.map (of_ltype create) prms) @@ of_ltype create ty
+
+(* let subst (ctxt:'a context) (d:'a t) : 'a t = TODO, maybe not needed *)
+
+(* -------------------------------------------------------------------------- *)
+(* ---  Unification                                                       --- *)
+(* -------------------------------------------------------------------------- *)
+
+type 'a sigma = 'a context ref
+
+let rec unify (f:'a -> 'a -> 'a) (s:'a sigma) (d1:'a t) (d2:'a t) =
+  match d1, d2 with
+  | Pure, _ | _, Pure -> ()
+  | Dvar v, _ -> s := M.add v (merge f d2 @@ get v !s) !s
+  | Ptr r1, Ptr r2 -> ignore @@ f r1 r2
+  | Array d1, Array d2 -> unify f s d1 d2
+  | Record m1, Record m2 ->
+    ignore @@ Fmap.union (fun _ d1 d2 -> unify f s d1 d2 ; None) m1 m2
+  | Logic (t1,ds1), Logic(t2,ds2) when Logic_type_info.equal t1 t2 ->
+    List.iter2 (unify f s) ds1 ds2
+  | Arrow(ds1,r1), Arrow(ds2,r2) when List.compare_lengths ds1 ds2 = 0 ->
+    List.iter2 (unify f s) (r1::ds1) (r2::ds2)
+  | Ptr _, _ -> ignore @@ merge f d1 d2
+  | Array d, _ -> unify f s d @@ scalar @@ pointed f d2
+  | Record m, _ ->
+    begin match pointed f d2 with
+      | None -> ()
+      | Some r -> let d' = ptr r in Fmap.iter (fun _ d -> unify f s d d') m
+    end
+  | Logic(_,ds), _ ->
+    begin match pointed f d2 with
+      | None -> ()
+      | Some r -> let d' = ptr r in List.iter (fun d -> unify f s d d') ds
+    end
+  | Arrow(ds,dr), _ ->
+    begin match pointed f d2 with
+      | None -> ()
+      | Some r -> let d' = ptr r in List.iter (fun d -> unify f s d d') (dr::ds)
+    end
+
+let subst _ctxt _d = assert false
 
 (* -------------------------------------------------------------------------- *)

@@ -29,7 +29,7 @@ open Memory
 
 let rec add_path (m:map) (p:path): node =
   match p.step with
-  | Var x -> add_root m x
+  | Var x -> add_cvar m x
   | Field(lv,fd) -> Memory.add_field m (add_path m lv) fd
   | Index(lv,_) -> Memory.add_index m (add_path m lv) lv.typ
   | Star e | Cast(_,e) -> add_pointer m e
@@ -58,7 +58,7 @@ let add_region (m: map) (r : Annot.region) =
   | Some a -> add_label m a :: rs
 
 (* -------------------------------------------------------------------------- *)
-(* ---  Process ACSL logic                                                --- *)
+(* ---  Process ACSL logic terms & predicates                             --- *)
 (* -------------------------------------------------------------------------- *)
 
 open LDomain
@@ -143,7 +143,7 @@ let add_term_lval (env:env) lv =
     begin match logic_var env lv with
       | VAL d -> term_offset env d loffset
       | VAR x ->
-        let rh = Memory.add_root env.map x in
+        let rh = Memory.add_cvar env.map x in
         load env acs x.vtype @@ addr_offset env x.vtype rh loffset
     end
 
@@ -160,15 +160,132 @@ let add_addr_lval (env:env) (lhost,loffset) : node =
         let te = Logic_utils.logicCType lv.lv_type in
         addr_offset env te (pointer env d) loffset
       | VAR x ->
-        addr_offset env x.vtype (Memory.add_root env.map x) loffset
+        addr_offset env x.vtype (Memory.add_cvar env.map x) loffset
     end
 
+let rec add_loffset (env:env) loffest d = match loffest with
+  | TNoOffset -> d
+  | TField(fd,offset) -> LDomain.field fd @@ add_loffset env offset d
+  | TModel _ -> Options.abort "Region.Logic.add_loffset: TModel not implemented"
+  | TIndex(_,offset) -> LDomain.array @@ add_loffset env offset d
 
-let add_term (env:env) (t:term) : domain = match t.term_node with
+let call (env:env) (l:logic_info) (ds:domain list) : domain =
+  let sigma = ref LDomain.empty in
+  let unify = LDomain.unify (merge env) sigma in
+  List.iter2 (fun x -> unify (Memory.add_logic_var env.map x)) l.l_profile ds ;
+  LDomain.subst !sigma @@ Memory.add_logic_info env.map l
+
+let iadd_logic_var m v = ignore @@ add_logic_var m v
+
+let rec add_term (env:env) (t:term) : domain = match t.term_node with
   | TConst _  | TSizeOf _ | TSizeOfE _ | TSizeOfStr _ | TAlignOf _ | TAlignOfE _
-    -> pure
+  | Tnull | Tempty_set | Ttypeof _ | Ttype _  | Trange _ -> pure
   | TLval lval -> add_term_lval env lval
   | TAddrOf lval | TStartOf lval -> ptr @@ add_addr_lval env lval
-  | _ -> assert false
+  | Tif (b,ct, cf) ->
+    iadd_term env b ;
+    let dt = add_term env ct in
+    let df = add_term env cf in
+    merge_domain env.map dt df
+  | TUnOp(_,t) | TCast(_,_,t) | Tat(t,_) -> add_term env t
+  | TBinOp ((PlusPI|MinusPI),t1,t2) ->
+    let d1 = add_term env t1 in
+    let d2 = add_term env t2 in
+    merge_domain env.map d1 d2
+  | TBinOp(_,t1,t2) -> iadd_term env t1 ; iadd_term env t2 ; pure
+  | Tbase_addr(_,t) | Toffset (_,t) | Tblock_length(_,t) ->
+    iadd_term env t ; pure
+  | TUpdate(lv,o,v) ->
+    merge_domain env.map (add_term env lv) @@ add_loffset env o @@ add_term env v
+  | Tunion ts | Tinter ts ->
+    List.fold_left (fun d t -> merge_domain env.map d @@ add_term env t) pure ts
+  | Tcomprehension(t,q,p) ->
+    Option.iter (add_predicate env) p ;
+    List.iter (iadd_logic_var env.map) q ;
+    add_term env t
+  | Tapp(f,_,ts) -> call env f @@ List.map (add_term env) ts
+  | Tlambda(q,t) ->
+    LDomain.arrow (List.map (Memory.add_logic_var env.map) q) @@ add_term env t
+  | Tlet({ l_body ; l_var_info=v },b) ->
+    begin match l_body with
+      | LBterm a ->
+        let dv = add_logic_var env.map v in
+        let da = add_term env a in
+        let sigma = ref LDomain.empty in
+        LDomain.unify (merge env) sigma da dv ;
+        LDomain.subst !sigma @@ add_term env b
+      | LBpred p ->
+        iadd_logic_var env.map v ;
+        add_predicate env p ;
+        add_term env t
+      | _ ->  Options.abort "Logic.add_term: Tlet without term nor predicate"
+    end
+  | TDataCons(c,ts) ->
+    let ds = List.map (add_term env) ts in
+    let args = List.map (of_ltype (new_chunk env.map)) c.ctor_params in
+    let sigma = ref LDomain.empty in
+    List.iter2 (unify (merge env) sigma) ds args ;
+    match c.ctor_type.lt_def with
+    | Some (LTsyn lt) -> of_ltype (new_chunk env.map) lt
+    | None | Some (LTsum _) -> pure
+
+and iadd_term env t = ignore @@ add_term env t
+
+and add_predicate (env:env) (p:predicate) = match p.pred_content with
+  | Pfalse | Ptrue -> ()
+  | Pseparated ts -> List.iter (iadd_term env) ts
+  | Prel(_,t1,t2) | Pfresh(_,_,t1,t2) -> iadd_term env t1 ; iadd_term env t2
+  | Pand(p1,p2) | Por(p1,p2) | Pxor(p1,p2) | Piff(p1,p2) | Pimplies(p1,p2) ->
+    add_predicate env p1 ;
+    add_predicate env p2 ;
+  | Pnot p | Pat(p,_) -> add_predicate env p
+  | Pif(c,pt,pf) ->
+    iadd_term env c ;
+    add_predicate env pt ;
+    add_predicate env pf ;
+  | Pobject_pointer(_,t) | Pvalid(_,t) | Pvalid_read(_,t)
+  | Pvalid_function t | Pinitialized(_,t) | Pdangling(_,t)
+  | Pallocable(_,t) | Pfreeable(_,t) -> iadd_term env t
+  | Pforall (q,p) | Pexists (q,p) ->
+    List.iter (iadd_logic_var env.map) q ; add_predicate env p
+  | Plet({l_var_info=v} as lv,p2) ->
+    begin match lv.l_body with
+      | LBterm t ->
+        let dv = add_logic_var env.map v in
+        let dt = add_term env t in
+        let sigma = ref empty in
+        LDomain.unify (merge env) sigma dt dv ;
+        add_predicate env p2
+      | LBpred p1 ->
+        iadd_logic_var env.map v ;
+        add_predicate env p1 ;
+        add_predicate env p2
+      | LBnone -> add_predicate env p2
+      | _ ->
+        Options.abort "Logic.add_predicate: (%a) not yet implemented"
+          Printer.pp_predicate p
+    end
+  | Papp(f,_,ts) -> ignore @@ call env f @@ List.map (add_term env) ts
 
 let () = rterm := add_term
+
+(* -------------------------------------------------------------------------- *)
+(* ---  Process ACSL logic                                                --- *)
+(* -------------------------------------------------------------------------- *)
+
+
+
+
+(* let rec add_logic_info : ajouter le corps des logic_info
+   => créer un environnement dans lequel on va pouvoir typer les logic_info
+
+*)
+
+(* let add_behaviour ... = ... *)
+(* let add_code_annot ... = ... *)
+(* let add_spec ... = ... *)
+(* let add_variant ... = ... *)
+(* ===> utiliser un visiteur // nope
+
+
+*)

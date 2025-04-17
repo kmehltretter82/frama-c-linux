@@ -193,7 +193,7 @@ struct
   let to_json (m: Memory.region) =
     Json.of_fields [
       "node", Node.to_json m.node ;
-      "roots", Roots.to_json m.roots ;
+      "roots", Roots.to_json m.cvars ;
       "labels", labels_to_json m.labels ;
       "parents", NodeList.to_json m.parents ;
       "sizeof", Json.of_int @@ m.sizeof ;

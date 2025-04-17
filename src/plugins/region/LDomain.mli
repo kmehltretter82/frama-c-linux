@@ -26,10 +26,12 @@ open Cil_datatype
 
 type 'a t = private
   | Pure
+  | Dvar   of string
   | Ptr    of 'a
   | Array  of 'a t
   | Record of 'a t Fieldinfo.Map.t
   | Logic  of logic_type_info * 'a t list
+  | Arrow  of 'a t list * 'a t
 
 val is_pure : 'a t -> bool
 val pretty : (formatter -> 'a -> unit) -> formatter -> 'a t -> unit
@@ -40,6 +42,7 @@ val scalar : 'a option -> 'a t
 val array : 'a t -> 'a t
 val field : fieldinfo -> 'a t -> 'a t
 val logic : logic_type_info -> 'a t list -> 'a t
+val arrow : 'a t list -> 'a t -> 'a t
 
 val merge : ('a -> 'a -> 'a) -> 'a t -> 'a t -> 'a t
 
@@ -52,6 +55,11 @@ val get_index : ('a -> 'a -> 'a) -> 'a t -> 'a t
 type 'a context
 
 val empty : 'a context
+val make : (string * 'a t) list -> 'a context
 
-val of_ltype : 'a context -> (unit -> 'a) -> logic_type -> 'a t
+val of_ltype : (unit -> 'a) -> logic_type -> 'a t
 val of_typ : (unit -> 'a) -> typ -> 'a t
+
+type 'a sigma = 'a context ref
+val unify : ('a -> 'a -> 'a) -> 'a sigma -> 'a t -> 'a t -> unit
+val subst : 'a context -> 'a t -> 'a t

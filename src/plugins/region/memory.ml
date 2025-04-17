@@ -28,6 +28,7 @@ module Vset = Varinfo.Set
 module Lmap = Map.Make(String)
 module Lset = Set.Make(String)
 module LVmap = Logic_var.Map
+module LVImap = Logic_info.Map
 
 (* -------------------------------------------------------------------------- *)
 (* --- Region Maps                                                        --- *)
@@ -46,7 +47,7 @@ and layout =
 and chunk = {
   cparents: node list ;
   cpointed: node list ;
-  croots: Vset.t ;
+  ccvars: Vset.t ;
   clabels: Lset.t ;
   creads: Access.Set.t ;
   cwrites: Access.Set.t ;
@@ -61,10 +62,11 @@ type context = node LDomain.context
 
 type map = {
   store: chunk Ufind.store ;
-  mutable locked: bool ;
-  mutable roots: node Vmap.t ;
   mutable labels: node Lmap.t ;
-  mutable vroots: domain LVmap.t ;
+  mutable locked: bool ;
+  mutable cvars: node Vmap.t ;
+  mutable lvars: domain LVmap.t ;
+  mutable logics: domain LVImap.t ;
 }
 
 (* -------------------------------------------------------------------------- *)
@@ -97,23 +99,25 @@ let unlock m = m.locked <- false
 let create () = {
   locked = false ;
   store = Ufind.new_store () ;
-  roots = Vmap.empty ;
+  cvars = Vmap.empty ;
   labels = Lmap.empty ;
-  vroots = LVmap.empty ;
+  lvars = LVmap.empty ;
+  logics = LVImap.empty ;
 }
 
 let copy ?locked m = {
   locked = (match locked with None -> m.locked | Some l -> l) ;
   store = Ufind.copy m.store ;
-  roots = m.roots ;
+  cvars = m.cvars ;
   labels = m.labels ;
-  vroots = m.vroots ;
+  lvars = m.lvars ;
+  logics = m.logics ;
 }
 
 let empty = {
   cparents = [] ;
   cpointed = [] ;
-  croots = Vset.empty ;
+  ccvars = Vset.empty ;
   clabels = Lset.empty ;
   creads = Access.Set.empty ;
   cwrites = Access.Set.empty ;
@@ -172,7 +176,7 @@ let pp_chunk name fmt (m: chunk) =
       (acs 'R' m.creads) (acs 'W' m.cwrites) (acs 'A' m.cshifts) ;
     List.iter (Format.fprintf fmt "@ (%a)" Typ.pretty) (ctypes m) ;
     Lset.iter (Format.fprintf fmt "@ %s:") m.clabels ;
-    Vset.iter (Format.fprintf fmt "@ %a" Varinfo.pretty) m.croots ;
+    Vset.iter (Format.fprintf fmt "@ %a" Varinfo.pretty) m.ccvars ;
     if Options.debug_atleast 1 then
       begin
         Access.Set.iter (Format.fprintf fmt "@ R:%a" Access.pretty) m.creads ;
@@ -213,13 +217,6 @@ let new_chunk (m: map) ?parent ?(size=0) ?ptr ?pointed () =
   let cpointed = match pointed with None -> [] | Some ptr -> [ptr] in
   Ufind.make m.store  { empty with clayout ; cpointed ; cparents }
 
-let add_root (m: map) v =
-  try Vmap.find v m.roots with Not_found ->
-    failwith_locked m "Region.Memory.add_root" ;
-    let n = new_chunk m () in
-    update m n (fun d -> { d with croots = Vset.singleton v }) ;
-    m.roots <- Vmap.add v n m.roots ; n
-
 let add_label (m: map) a =
   try Lmap.find a m.labels with Not_found ->
     failwith_locked m "Region.Memory.add_label" ;
@@ -227,17 +224,32 @@ let add_label (m: map) a =
     update m n (fun d -> { d with clabels = Lset.singleton a }) ;
     m.labels <- Lmap.add a n m.labels ; n
 
+let add_cvar (m: map) v =
+  try Vmap.find v m.cvars with Not_found ->
+    failwith_locked m "Region.Memory.add_varinfo" ;
+    let n = new_chunk m () in
+    update m n (fun d -> { d with ccvars = Vset.singleton v }) ;
+    m.cvars <- Vmap.add v n m.cvars ; n
+
+let add_logic_info (m: map) f =
+  try LVImap.find f m.logics with Not_found ->
+    failwith_locked m "Region.Memory.add_logic_info" ;
+    let get_type t = LDomain.of_ltype (new_chunk m) t in
+    let d = Option.fold ~none:LDomain.pure ~some:get_type f.l_type in
+    m.logics <- LVImap.add f d m.logics ; d
+
 let add_logic_var (m: map) lv =
-  try LVmap.find lv m.vroots with Not_found ->
-    failwith_locked m "Region.Memory.add_lvroot" ;
+  try LVmap.find lv m.lvars with Not_found ->
+    failwith_locked m "Region.Memory.add_logic_var" ;
     assert (lv.lv_origin = None);
-    let d = LDomain.of_ltype LDomain.empty (new_chunk m) lv.lv_type in
-    m.vroots <- LVmap.add lv d m.vroots ; d
+    let d = LDomain.of_ltype (new_chunk m) lv.lv_type in
+    m.lvars <- LVmap.add lv d m.lvars ; d
 
 let domain_of_typ (m:map) (typ:typ) = LDomain.of_typ (new_chunk m) typ
 
-let domain_of_ltyp (m:map) ?(ctxt:context=LDomain.empty) (lt:logic_type) =
-  LDomain.of_ltype ctxt (new_chunk m) lt
+let domain_of_ltyp (m:map) ?(ctxt) (lt:logic_type) =
+  let d : domain = LDomain.of_ltype (new_chunk m) lt in
+  Option.fold ~none:d ~some:(fun (c:context) -> LDomain.subst c d) ctxt
 
 (* -------------------------------------------------------------------------- *)
 (* --- Iterator                                                           --- *)
@@ -257,7 +269,7 @@ let rec walk h m (f: node -> unit) n =
 
 let iter (m:map) (f: node -> unit) =
   let h = Hashtbl.create 0 in
-  Vmap.iter (fun _x n -> walk h m f n) m.roots
+  Vmap.iter (fun _x n -> walk h m f n) m.cvars
 
 let size (m: map) (r: node) =
   sizeof (Ufind.get m.store r).clayout
@@ -265,8 +277,8 @@ let size (m: map) (r: node) =
 let parents (m: map) (r: node) =
   nodes m (Ufind.get m.store r).cparents
 
-let roots (m: map) (r: node) =
-  Vset.elements (Ufind.get m.store r).croots
+let cvars (m: map) (r: node) =
+  Vset.elements (Ufind.get m.store r).ccvars
 
 let labels (m: map) (r: node) =
   Lset.elements (Ufind.get m.store r).clabels
@@ -360,7 +372,7 @@ let merge_chunk (m: map) (q:queue) (root:node)
     cparents = nodes m @@ Store.bag a.cparents b.cparents ;
     cpointed = nodes m @@ Store.bag a.cpointed b.cpointed ;
     clabels = Lset.union a.clabels b.clabels ;
-    croots = Vset.union a.croots b.croots ;
+    ccvars = Vset.union a.ccvars b.ccvars ;
     creads = Access.Set.union a.creads b.creads ;
     cwrites = Access.Set.union a.cwrites b.cwrites ;
     cshifts = Access.Set.union a.cshifts b.cshifts ;
@@ -475,7 +487,7 @@ let pointed_by m (r : node) =
   let rg = Ufind.get m.store r in rg.cpointed
 
 let cvar (m: map) (v: varinfo) : node =
-  Ufind.find m.store @@ Vmap.find v m.roots
+  Ufind.find m.store @@ Vmap.find v m.cvars
 
 let rec move (m: map) (r: node) (p: int) (s: int) =
   let c = Ufind.get m.store r in
@@ -585,9 +597,9 @@ let rec singleton m r =
   let node = Ufind.get m.store r in
   (* normalized parents *)
   match nodes m node.cparents with
-  | [] -> Vset.cardinal node.croots = 1
+  | [] -> Vset.cardinal node.ccvars = 1
   | [r0] ->
-    Vset.is_empty node.croots &&
+    Vset.is_empty node.ccvars &&
     single_path m r0 r (sizeof node.clayout) &&
     (* r != r0 && (* This test may be useful to prevent infinity loops. *) *)
     singleton m r0
@@ -647,7 +659,7 @@ type range = Range of {
 type region = {
   node: node ;
   parents: node list ;
-  roots: root list ;
+  cvars: root list ;
   labels: string list ;
   types: typ list ;
   typed : typ option ;
@@ -706,7 +718,7 @@ let pp_region fmt (m: region) =
       pp_node m.node
       (acs 'R' m.reads) (acs 'W' m.writes) (acs 'A' m.shifts) ;
     List.iter (Format.fprintf fmt "@ %s:") m.labels ;
-    List.iter (Format.fprintf fmt "@ %a" pp_root) m.roots ;
+    List.iter (Format.fprintf fmt "@ %a" pp_root) m.cvars ;
     List.iter (Format.fprintf fmt "@ (%a)" Typ.pretty) m.types ;
     Format.fprintf fmt "@ %db" m.sizeof ;
     Option.iter (Format.fprintf fmt "@ (*%a)" pp_node) m.pointed ;
@@ -758,7 +770,7 @@ let make_region (m: map) (n: node) (r: chunk) : region =
   {
     node = n ;
     parents = nodes m r.cparents ;
-    roots = List.map (make_root sizeof) @@ Vset.elements r.croots ;
+    cvars = List.map (make_root sizeof) @@ Vset.elements r.ccvars ;
     labels = Lset.elements r.clabels ;
     reads = Access.Set.elements r.creads ;
     writes = Access.Set.elements r.cwrites ;

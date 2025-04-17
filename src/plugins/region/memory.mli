@@ -41,7 +41,7 @@ type range = Range of {
 type region = {
   node: node ;
   parents: node list ;
-  roots: root list ;
+  cvars: root list ;
   labels: string list ;
   types: typ list ;
   typed : typ option ;
@@ -83,7 +83,7 @@ val nodes : map -> node list -> node list
 
 val size : map -> node -> int
 val parents : map -> node -> node list
-val roots : map -> node -> varinfo list
+val cvars : map -> node -> varinfo list
 val labels : map -> node -> string list
 val region : map -> node -> region
 val regions : map -> region list
@@ -93,8 +93,9 @@ val new_chunk : map ->
   ?parent:node -> ?size:int -> ?ptr:node -> ?pointed:node ->
   unit -> node
 
-val add_root : map -> Cil_types.varinfo -> node
+val add_cvar : map -> Cil_types.varinfo -> node
 val add_logic_var : map -> Cil_types.logic_var -> domain
+val add_logic_info : map -> Cil_types.logic_info -> domain
 val add_label : map -> string -> node
 val add_field : map -> node -> fieldinfo -> node
 val add_index : map -> node -> typ -> node
