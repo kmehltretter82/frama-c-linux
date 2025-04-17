@@ -771,7 +771,7 @@ let get_config_mode () =
 let get_config_custom () =
   let default = get_config_mode () in
   let collect (k,v) config =
-    let mode = get_mode ~allow_skip:true (Option.get v) in
+    let mode = get_mode ~allow_skip:true v in
     match k with
     | "exits" -> {config with c_exits = mode}
     | "assigns" -> {config with c_assigns = mode}

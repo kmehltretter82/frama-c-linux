@@ -1561,28 +1561,26 @@ struct
     type value = V.t
 
     let of_val k v =
-      try Option.map V.of_string v
+      try V.of_string v
       with Cannot_build s ->
         cannot_build (Format.asprintf "@[value bound to '%s':@ %s@]" k s)
 
     module Pair = struct
-      include Datatype.Pair(K)(Datatype.Option(V))
+      include Datatype.Pair(K)(V)
+
       let of_string =
         let r = Str.regexp_string ":" in
         fun s ->
           match Str.bounded_split_delim r s 2 with
           | [] -> cannot_build ("cannot interpret '" ^ s ^ "'")
-          | [ k ] -> K.of_string k, of_val k None
-          | [ k; v ] -> K.of_string k, of_val k (Some v)
+          | [ k ] -> cannot_build ("no value bound to '" ^ k ^ "'")
+          | [ k; v ] -> K.of_string k, of_val k v
           | _ :: _ :: _ :: _ ->
             (* by definition of [Str.bounded_split_delim]: *)
             assert false
-      let to_string (key, v) =
-        let key_str = K.to_string key in
-        match v with
-        | None -> key_str
-        | Some v -> Format.asprintf "%s:%s" key_str (V.to_string v)
 
+      let to_string (key, v) =
+        Format.asprintf "%s:%s" (K.to_string key) (V.to_string v)
     end
 
     module C = struct
@@ -1590,28 +1588,24 @@ struct
       let equal = K.Map.equal V.equal
       let empty = K.Map.empty
       let is_empty = K.Map.is_empty
-      let add (k, v) m = match v with
-        | None ->
-          (* no value associated to the key: remove the previous binding *)
-          K.Map.remove k m
-        | Some v ->
-          try
-            let old = K.Map.find k m in
-            if V.equal old v then
-              m
-            else begin
-              P.L.warning "@[option %s:@ '%a' previously bound to '%a';@ \
-                           now bound to '%a'.@]"
-                X.option_name K.pretty k V.pretty old V.pretty v;
-              K.Map.add k v m
-            end
-          with Not_found ->
+      let add (k, v) m =
+        try
+          let old = K.Map.find k m in
+          if V.equal old v then
+            m
+          else begin
+            P.L.warning "@[option %s:@ '%a' previously bound to '%a';@ \
+                         now bound to '%a'.@]"
+              X.option_name K.pretty k V.pretty old V.pretty v;
             K.Map.add k v m
+          end
+        with Not_found ->
+          K.Map.add k v m
 
       let mem (k, _v) m = K.Map.mem k m
       let remove (k, _v) m = K.Map.remove k m
-      let iter f m = K.Map.iter (fun k v -> f (k, Some v)) m
-      let fold f m acc = K.Map.fold (fun k v -> f (k, Some v)) m acc
+      let iter f m = K.Map.iter (fun k v -> f (k, v)) m
+      let fold f m acc = K.Map.fold (fun k v -> f (k, v)) m acc
       let reorder = Fun.id
 
       let of_singleton_string =
@@ -1642,20 +1636,20 @@ struct
               k_of_singleton_string k, of_val k v_opt
             in
             match Str.bounded_full_split r s 2 with
-            | ([] | [ Str.Text _ ]) ->  (* no delimiter ':' *)
-              get_pairing s None
+            | [] -> cannot_build ("cannot interpret '" ^ s ^ "'")
+            | [ Str.Text k ] -> cannot_build ("no value bound to '" ^ k ^ "'")
             | [ Str.Delim d ] ->
               let (f,s) = split_delim d in
-              get_pairing f (Some s)
+              get_pairing f s
             | [ Str.Delim d; Str.Text t ] ->
               let (f,s) = split_delim d in
-              get_pairing f (Some (s ^ t))
+              get_pairing f (s ^ t)
             | [ Str.Text t1; Str.Delim d; Str.Text t2 ] ->
               let (f,s) = split_delim d in
-              get_pairing (t1 ^ f) (Some (s ^ t2))
+              get_pairing (t1 ^ f) (s ^ t2)
             | [ Str.Text t; Str.Delim d] ->
               let (f,s) = split_delim d in
-              get_pairing (t ^ f) (Some s)
+              get_pairing (t ^ f) s
             | _ -> (* by definition of [Str.bounded_full_split]: *)
               assert false
           in
@@ -1758,10 +1752,9 @@ struct
     type value = V.t
 
     let of_val k v =
-      try Option.map V.of_string v
+      try V.of_string v
       with Cannot_build s ->
-        cannot_build
-          (Format.asprintf "@[value bound to '%s':@ %s@]" k s)
+        cannot_build (Format.asprintf "@[value bound to '%s':@ %s@]" k s)
 
     module Pair = struct
       include Datatype.Pair(K)(Datatype.List(V))
@@ -1770,21 +1763,10 @@ struct
         let r = Str.regexp_string ":" in
         fun s -> match Str.split_delim r s with
           | [] -> cannot_build ("cannot interpret '" ^ s ^ "'")
+          | [k] -> cannot_build ("no value bound to '" ^ k ^ "'")
           | k :: l ->
             let key = K.of_string k in
-            let l = match l with
-              | [] ->
-                (match of_val k None with
-                 | None -> []
-                 | Some v -> [ v ])
-              | _ :: _ ->
-                List.fold_right (* preserve order *)
-                  (fun v acc -> match of_val k (Some v) with
-                     | None -> acc
-                     | Some v -> v :: acc)
-                  l
-                  []
-            in
+            let l = List.map (of_val k) l in
             key, l
 
       let to_string (key, l) =
@@ -1827,23 +1809,16 @@ struct
         let split_delim d =
           (Stdlib.String.sub d 0 1, Stdlib.String.sub d 2 1)
         in
-        let remove_none_and_rev l =
-          List.fold_left
-            (fun acc v -> match v with None -> acc | Some v -> v :: acc)
-            []
-            l
-        in
         let rec parse_values k acc s = function
-          | [] -> remove_none_and_rev (of_val k (Some s) :: acc)
-          | [Str.Text t] ->
-            remove_none_and_rev (of_val k (Some (s ^ t)) :: acc)
+          | [] -> List.rev (of_val k s :: acc)
+          | [Str.Text t] -> List.rev (of_val k (s ^ t) :: acc)
           | Str.Text t :: Str.Delim d :: l ->
             let (suf, pre) = split_delim d in
-            let v = of_val k (Some (s ^ t ^ suf)) in
+            let v = of_val k (s ^ t ^ suf) in
             parse_values k (v :: acc) pre l
           | Str.Delim d :: l ->
             let (suf,pre) = split_delim d in
-            let v = of_val k (Some (s ^ suf)) in
+            let v = of_val k (s ^ suf) in
             parse_values k (v :: acc) pre l
           | Str.Text _ :: Str.Text _ :: _ ->
             (* By construction, there must be a Delim between two consecutive
@@ -1857,8 +1832,7 @@ struct
           let (keys, values) =
             match Str.full_split r s with
             | [] -> cannot_build ("cannot interpret '" ^ s ^ "'")
-            | [Str.Text t] ->
-              k_of_singleton_string t, remove_none_and_rev [of_val t None]
+            | [Str.Text k] -> cannot_build ("no value bound to '" ^ k ^ "'")
             | Str.Delim d :: l ->
               let (f,s) = split_delim d in
               get_pairing f s l

@@ -897,7 +897,7 @@ let () = add_correctness_dep BuiltinsOverrides.parameter
 (* Exported in Eva.mli. *)
 let use_builtin key name =
   if mem_builtin name
-  then BuiltinsOverrides.add (key, Some name)
+  then BuiltinsOverrides.add (key, name)
   else raise Not_found
 
 let () = Parameter_customize.set_group precision_tuning

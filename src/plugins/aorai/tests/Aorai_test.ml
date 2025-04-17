@@ -111,7 +111,7 @@ let extend () =
       Project.set_current my_project;
       Kernel.SymbolicPath.add
         (Filepath.Normalized.of_string (Filename.get_temp_dir_name ()),
-         Some "TMPDIR");
+         "TMPDIR");
       Files.append_after [ Filepath.Normalized.of_string tmpfile ];
       Kernel.LogicalOperators.on ();
       Constfold.off ();

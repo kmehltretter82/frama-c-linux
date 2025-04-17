@@ -554,7 +554,7 @@ module type Map = sig
   (** Type of the values associated to the keys. *)
   type value
 
-  include Collection with type elt = key * value option
+  include Collection with type elt = key * value
   (** A map is a collection in which elements are pairs [(key, value)], but some
       values may be missing. *)
 
