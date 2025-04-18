@@ -75,9 +75,9 @@ struct
         with Not_found ->
           raise (Cannot_build ("no function '" ^ function_name ^ "'"))
       in
-      try Globals.Vars.find_from_astinfo variable_name (Whole_function kf)
+      try [ Globals.Vars.find_from_astinfo variable_name (Whole_function kf) ]
       with Not_found ->
-      try Globals.Vars.find_from_astinfo variable_name (Formal kf)
+      try [ Globals.Vars.find_from_astinfo variable_name (Formal kf) ]
       with Not_found ->
         raise (Cannot_build ("no variable '" ^ variable_name ^ "' in function "
                              ^ function_name))
@@ -86,7 +86,7 @@ struct
       if not (Str.string_match regexp s 0) then
         raise (Cannot_build ("wrong syntax: '" ^ s ^ "'"));
       match Globals.Syntactic_search.find_in_scope s Cil_types.Program with
-      | Some vi -> vi
+      | Some vi -> [ vi ]
       | None ->
         raise (Cannot_build ("no global variable '" ^ s ^ "'"))
 
@@ -94,8 +94,6 @@ struct
     match Kernel_function.find_defining_kf vi with
     | None -> vi.vname
     | Some kf -> Kernel_function.get_name kf ^ "::" ^ vi.vname
-
-  let of_singleton_string = no_element_of_string
 end
 
 module type Varinfo_set = Parameter_sig.Set

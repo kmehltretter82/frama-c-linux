@@ -186,8 +186,7 @@ module DomainsFunction =
   Make_multiple_map
     (struct
       include Datatype.String
-      let of_string str = check_domain "-eva-domains-function" str; str
-      let of_singleton_string = no_element_of_string
+      let of_string str = check_domain "-eva-domains-function" str; [ str ]
       let to_string str = str
     end)
     (struct

@@ -74,15 +74,13 @@ end
 module type Value_datatype_with_collections = sig
   include Datatype.S_with_collections
 
-  val of_string: string -> t
-  (** @raise Cannot_build if there is no element corresponding to the given
-      string. *)
-
-  val of_singleton_string: string -> Set.t
-  (** If a single string can be mapped to several elements. Can
-      default to {!no_element_of_string} to indicate that each string [s] is
-      mapped exactly to [of_string s].
-  *)
+  val of_string: string -> t list
+  (** Returns the list of elements corresponding to the given string.
+      Should return a list of one element for most uses, except if one string
+      can represent several elements.
+      @raise Cannot_build if the string is invalid.
+      @before Frama-C+dev This function returned only one element, and function
+      [of_singleton_string] was used to return a set of elements. *)
 
   val to_string: t -> string
 end
@@ -568,11 +566,6 @@ module type Filepath_map =
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 module type Builder = sig
 
-  val no_element_of_string: string -> 'a
-  (** @raise Cannot_build for any entry
-      @since Sodium-20150201
-  *)
-
   module Bool(_:sig include Input val default: bool end): Bool
   module Action(_: Input) : Bool
 
@@ -699,7 +692,7 @@ module type Builder = sig
       (E:
        sig
          include Value_datatype
-         val of_singleton_string: string -> t list
+         val of_string: string -> t list
        end)
       (_: sig include Input_collection val default: E.t list end):
     List with type elt = E.t and type t = E.t list

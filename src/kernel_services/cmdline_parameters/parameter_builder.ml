@@ -66,6 +66,17 @@ let force_ast_compute
   : (unit -> unit) ref
   = Extlib.mk_fun "Parameter_builder.force_ast_compute"
 
+let get_definition kf =
+  match kf.fundec with
+  | Definition (fundec, _) -> Some fundec
+  | Declaration _ -> None
+
+let is_definition kf = Option.is_some (get_definition kf)
+let is_declaration kf = Option.is_none (get_definition kf)
+
+let get_c_ified_functions s =
+  Cil_datatype.Kf.Set.elements (Parameter_customize.get_c_ified_functions s)
+
 (* ************************************************************************* *)
 (** {2 Specific functors} *)
 (* ************************************************************************* *)
@@ -440,31 +451,24 @@ struct
         (* Using a parameter that is in fact a function name only makes sense
            if we have an AST somewhere. *)
         !force_ast_compute();
-        let possible_funcs = Parameter_customize.get_c_ified_functions s in
+        let possible_funcs = get_c_ified_functions s in
         let possible_funcs =
           if allow_fundecl then possible_funcs
-          else
-            Cil_datatype.Kf.Set.filter
-              (fun s ->
-                 match s.fundec with
-                 | Definition _ -> true
-                 | Declaration _ -> false)
-              possible_funcs
+          else List.filter is_definition possible_funcs
         in
-        if Cil_datatype.Kf.Set.is_empty possible_funcs then
+        match possible_funcs with
+        | [] ->
           P.L.abort
             "'%s' is not a %sfunction. \
              Please choose a valid function name for option %s"
             s (if allow_fundecl then "" else "defined ") name
-        else begin
-          if Cil_datatype.Kf.Set.cardinal possible_funcs > 1 then
-            P.L.warning
-              "ambiguous function name %s for option %s. \
-               Choosing arbitrary function with corresponding name."
-              s name;
-          (Cil_datatype.Kf.vi
-             (Cil_datatype.Kf.Set.choose possible_funcs)).vname
-        end
+        | [ kf ] -> (Cil_datatype.Kf.vi kf).vname
+        | kf :: _ ->
+          P.L.warning
+            "ambiguous function name %s for option %s. \
+             Choosing arbitrary function with corresponding name."
+            s name;
+          (Cil_datatype.Kf.vi kf).vname
 
     let get_plain_string = get
 
@@ -829,13 +833,11 @@ struct
   exception Cannot_build of string
 
   let cannot_build msg = raise (Cannot_build msg)
-  let no_element_of_string msg = cannot_build msg
 
   module Make_collection
       (E: sig (* element in the collection *)
          type t
          val ty: t Type.t
-         val of_string: string -> t (* may raise [Cannot_build] *)
          val to_string: t -> string
        end)
       (C: sig (* the collection, as a persistent datastructure *)
@@ -848,11 +850,7 @@ struct
          val remove: E.t -> t -> t
          val iter: (E.t -> unit) -> t -> unit
          val fold: (E.t -> 'a -> 'a) -> t -> 'a -> 'a
-         val of_singleton_string: string -> t
-         (* For specific ways to parse a collection from a single string.
-            If physically equal to [no_element_of_string], we revert back to
-            using [E.of_string]
-         *)
+         val of_string: string -> t (* may raise [Cannot_build] *)
          val reorder: t -> t
          (* Used after having parsed a comma-separated string representing
             parameters. The add actions are done in the reverse order with
@@ -1160,13 +1158,8 @@ struct
                  parse_error ("unknown category '" ^ word ^ "'")
              else (* not is_category *)
                try
-                 if C.of_singleton_string == no_element_of_string then begin
-                   let elt = E.of_string word in
-                   unparsable, extend elt col
-                 end else begin
-                   let elts = C.of_singleton_string word in
-                   unparsable, C.fold extend elts col
-                 end
+                 let elts = C.of_string word in
+                 unparsable, C.fold extend elts col
                with Cannot_build msg ->
                  Some msg, col)
           tokens
@@ -1270,7 +1263,7 @@ struct
     module C = struct
       include E.Set
       let reorder = Fun.id
-      let of_singleton_string = E.of_singleton_string
+      let of_string s = E.Set.of_list (E.of_string s)
     end
 
     module S = struct
@@ -1299,9 +1292,8 @@ struct
 
   module String_for_collection = struct
     include Datatype.String
-    let of_string = Datatype.identity
+    let of_string s = [ s ]
     let to_string = Datatype.identity
-    let of_singleton_string = no_element_of_string
   end
 
   module String_set(X: Parameter_sig.Input_with_arg) =
@@ -1322,30 +1314,17 @@ struct
       (String_for_collection)
       (struct include X let dependencies = [] end)
 
-  let check_function s must_exist require_fundecl no_function set =
-    if no_function set then
-      let specific_msg = if require_fundecl then " declaration" else "" in
-      let error s =
-        cannot_build (Format.asprintf "no function%s '%s'"
-                        specific_msg s)
-      in
-      if require_fundecl then
-        error s
-      else
-      if must_exist then
-        error s
-      else
-      if Cmdline.permissive then begin
-        P.L.warning "ignoring non-existing function%s '%s'."
-          specific_msg s;
-        set
-      end else
-        error s
-    else
-      set
+  let check_function s must_exist require_fundecl list =
+    let specific_msg = if require_fundecl then " declaration" else "" in
+    if list = [] then
+      if Cmdline.permissive && not (must_exist || require_fundecl)
+      then P.L.warning "ignoring non-existing function%s '%s'." specific_msg s
+      else cannot_build (Format.asprintf "no function%s '%s'" specific_msg s);
+    list
 
   module Kernel_function_string(
-      A: sig val accept_fundecl: bool
+      A: sig
+        val accept_fundecl: bool
         val require_fundecl: bool
         val must_exist: bool
       end) =
@@ -1353,48 +1332,23 @@ struct
 
     include Cil_datatype.Kf
 
-    let of_string s =
-      try
-        (if A.require_fundecl then
-           !find_kf_decl_by_name
-         else
-         if A.accept_fundecl then
-           !find_kf_by_name
-         else
-           !find_kf_def_by_name) s
-      with Not_found ->
-        cannot_build
-          (Format.asprintf "no%s function '%s'"
-             (if A.accept_fundecl then ""
-              else if A.require_fundecl then " declared"
-              else " defined")
-             s)
-
     (* Cannot reuse any code to implement [to_string] without forward
        reference. Prefer small code duplication here. *)
     let to_string kf = match kf.fundec with
       | Definition(d, _) -> d.svar.vname
       | Declaration(_, vi, _, _) -> vi.vname
 
-    let of_singleton_string s =
-      let fcts = Parameter_customize.get_c_ified_functions s in
-      let filter keep_def keep_decl =
-        Set.filter
-          (fun s ->
-             match s.fundec with
-             | Definition _ -> keep_def
-             | Declaration _ -> keep_decl)
-      in
+    let of_string s =
+      let fcts = get_c_ified_functions s in
       let res =
         if A.require_fundecl then
-          filter false true fcts
-        else
-        if A.accept_fundecl then
+          List.filter is_declaration fcts
+        else if A.accept_fundecl then
           fcts
         else
-          filter true false fcts
+          List.filter is_definition fcts
       in
-      check_function s A.must_exist A.require_fundecl Set.is_empty res
+      check_function s A.must_exist A.require_fundecl res
 
   end
 
@@ -1431,28 +1385,13 @@ struct
     include Make_set
         (struct
           include Cil_datatype.Fundec
-          let of_string s =
-            try
-              let kf = !find_kf_def_by_name s in
-              match kf.fundec with
-              | Definition (f, _) -> f
-              | Declaration _ -> assert false
-            with Not_found ->
-              cannot_build (Format.asprintf "no defined function '%s'" s)
 
           let to_string f = f.svar.vname
 
-          let of_singleton_string s =
-            let fcts = Parameter_customize.get_c_ified_functions s in
-            let defs =
-              Cil_datatype.Kf.Set.fold
-                (fun s acc ->
-                   match s.fundec with
-                   | Definition(f,_) -> Set.add f acc
-                   | Declaration _ -> acc)
-                fcts Set.empty
-            in
-            check_function s must_exist require_fundecl Set.is_empty defs
+          let of_string s =
+            let fcts = get_c_ified_functions s in
+            let defs = List.filter_map get_definition fcts in
+            check_function s must_exist require_fundecl defs
 
         end)
         (struct
@@ -1469,7 +1408,7 @@ struct
   module Make_list
       (E: sig
          include Parameter_sig.Value_datatype
-         val of_singleton_string: string -> t list
+         val of_string: string -> t list
        end)
       (X: sig include Parameter_sig.Input_collection val default: E.t list end):
     Parameter_sig.List with type elt = E.t and type t = E.t list =
@@ -1485,7 +1424,7 @@ struct
       let iter = List.iter
       let fold f l acc = List.fold_left (fun acc x -> f x acc) acc l
       let reorder = List.rev
-      let of_singleton_string = E.of_singleton_string
+      let of_string = E.of_string
     end
 
     module S = struct
@@ -1533,10 +1472,9 @@ struct
       (struct
         include Datatype.Filepath
         let to_string s = (s : t :> string)
-        let of_singleton_string = no_element_of_string
 
         let of_string s =
-          normalize_filepath ~existence:X.existence ~file_kind:X.file_kind s
+          [ normalize_filepath ~existence:X.existence ~file_kind:X.file_kind s ]
       end)
       (struct
         include X
@@ -1580,17 +1518,6 @@ struct
     module Pair = struct
       include Datatype.Pair(K)(V)
 
-      let of_string =
-        let r = Str.regexp_string ":" in
-        fun s ->
-          match Str.bounded_split_delim r s 2 with
-          | [] -> cannot_build ("cannot interpret '" ^ s ^ "'")
-          | [ k ] -> cannot_build ("no value bound to '" ^ k ^ "'")
-          | [ k; v ] -> K.of_string k, of_val k v
-          | _ :: _ :: _ :: _ ->
-            (* by definition of [Str.bounded_split_delim]: *)
-            assert false
-
       let to_string (key, v) =
         Format.asprintf "%s:%s" (K.to_string key) (V.to_string v)
     end
@@ -1620,7 +1547,7 @@ struct
       let fold f m acc = K.Map.fold (fun k v -> f (k, v)) m acc
       let reorder = Fun.id
 
-      let of_singleton_string =
+      let of_string =
         let r = Str.regexp "\\([^:]\\|^\\):\\([^:]\\|$\\)" in
         (* delimiter is no more than 3 characters long, the first belonging to
            the element before it, the third belonging to the element after it.
@@ -1637,15 +1564,10 @@ struct
           | _ -> (* impossible case *)
             raise (Cannot_build ("delimiter="^d))
         in
-        let k_of_singleton_string =
-          if (K.of_singleton_string==no_element_of_string)
-          then (fun x -> K.Set.singleton (K.of_string x))
-          else K.of_singleton_string
-        in
         fun s ->
           let (keys, value) =
             let get_pairing k v_opt =
-              k_of_singleton_string k, of_val k v_opt
+              K.Set.of_list (K.of_string k), of_val k v_opt
             in
             match Str.bounded_full_split r s 2 with
             | [] -> cannot_build ("cannot interpret '" ^ s ^ "'")
@@ -1716,14 +1638,13 @@ struct
         include Datatype.Filepath
         let of_string s =
           try
-            Fc_Filepath.Normalized.of_string ~existence:X.existence s
+            [ Fc_Filepath.Normalized.of_string ~existence:X.existence s ]
           with
           | Fc_Filepath.No_file ->
             P.L.abort "file '%s' not found" s
           | Fc_Filepath.File_exists ->
             P.L.abort "file '%s' already exists" s
         let to_string = Fc_Filepath.Normalized.to_pretty_string
-        let of_singleton_string = no_element_of_string
       end)
       (V)
       (struct include X let dependencies = [] end)
@@ -1771,16 +1692,6 @@ struct
     module Pair = struct
       include Datatype.Pair(K)(Datatype.List(V))
 
-      let of_string =
-        let r = Str.regexp_string ":" in
-        fun s -> match Str.split_delim r s with
-          | [] -> cannot_build ("cannot interpret '" ^ s ^ "'")
-          | [k] -> cannot_build ("no value bound to '" ^ k ^ "'")
-          | k :: l ->
-            let key = K.of_string k in
-            let l = List.map (of_val k) l in
-            key, l
-
       let to_string (key, l) =
         Format.asprintf "%s%t"
           (K.to_string key)
@@ -1811,12 +1722,7 @@ struct
       let fold f m acc = K.Map.fold (fun k v -> f (k, v)) m acc
       let reorder = Fun.id
 
-      let of_singleton_string =
-        let k_of_singleton_string =
-          if (K.of_singleton_string==no_element_of_string)
-          then (fun x -> K.Set.singleton (K.of_string x))
-          else K.of_singleton_string
-        in
+      let of_string =
         let r = Str.regexp "[^:]:[^:]" in
         let split_delim d =
           (Stdlib.String.sub d 0 1, Stdlib.String.sub d 2 1)
@@ -1838,7 +1744,7 @@ struct
             assert false
         in
         let get_pairing k v l =
-          k_of_singleton_string k, parse_values k [] v l
+          K.Set.of_list (K.of_string k), parse_values k [] v l
         in
         fun s ->
           let (keys, values) =
