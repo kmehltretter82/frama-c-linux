@@ -5,12 +5,11 @@
 
 const path = require('path');
 const fs = require('fs');
-const fsExtra = require("fs-extra");
 
 const loader = process.argv[2];
 const inputFiles = process.argv.slice(3);
 const packages = new Map();
-const pluginsPath = "./src/renderer/public/plugins";
+const pluginsPath = "./src/renderer/public";
 let buffer = '// Ivette Package Loader (generated)\n';
 
 function error(message) {
@@ -43,8 +42,11 @@ function mergeDirectories(source, target) {
     if (fs.lstatSync(sourcePath).isDirectory()) {
       mergeDirectories(sourcePath, targetPath);
     } else {
-      if (!fs.existsSync(targetPath)) fsExtra.copySync(sourcePath, targetPath);
-      else error(`File already exist: ${targetPath}`);
+      if (!fs.existsSync(targetPath)) {
+        const pathFile = path.dirname(targetPath);
+        if (!fs.existsSync(pathFile)) fs.mkdirSync(pathFile, { recursive: true });
+        fs.copyFileSync(sourcePath, targetPath);
+      } else error(`File already exist: ${targetPath}`);
     }
   });
 }
@@ -56,13 +58,12 @@ function delPublicFolder() {
 }
 
 function copyExtraRessources(pkg, id) {
-  delPublicFolder();
   if(!pkg.ressources || !Array.isArray(pkg.ressources)) return;
   pkg.ressources.forEach((ressource) => {
-    if(ressource.from)
+    if(ressource)
       mergeDirectories(
-        path.join('./src', id, ressource.from),
-        path.join(pluginsPath, ressource.to)
+        path.join('./src', id, ressource),
+        path.join(pluginsPath, id, ressource)
       );
   })
 }
@@ -70,7 +71,7 @@ function copyExtraRessources(pkg, id) {
 function configure(pkg, id) {
   if (!pkg.done) {
     pkg.done = true;
-    /** add extra ressources in public folder */
+    /** add plugins extra ressources in public folder */
     copyExtraRessources(pkg, id);
     for(let parent = id;;) {
       parent = path.dirname(parent);
@@ -83,6 +84,9 @@ function configure(pkg, id) {
     buffer += `import '${path.join(id,main)}';\n`;
   }
 }
+
+delPublicFolder(); // Delete public folder
+mergeDirectories('./src/renderer/ressources',  pluginsPath); // merge permanent ressources
 
 packages.forEach(configure);
 fs.writeFileSync(loader, buffer);

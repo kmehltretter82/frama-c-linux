@@ -35,6 +35,8 @@ import { State, GlobalState, useGlobalState } from './data/states';
 import * as Json from 'dome/data/json';
 import * as Settings from 'dome/data/settings';
 
+import * as path from 'path';
+
 import './dark.css';
 import './light.css';
 import './style.css';
@@ -1105,6 +1107,22 @@ export function useGlobalSettings<A extends Json.json>(
     globalKey, decoder, Json.identity, defaultValue,
   );
   return Settings.useGlobalSettings(G);
+}
+
+
+// --------------------------------------------------------------------------
+// --- Path ressources
+// --------------------------------------------------------------------------
+
+export function getResourcesPath(): string {
+  const prodPath = !DEVEL && __dirname.includes("out/renderer") ?
+    __dirname : process.resourcesPath;
+  return DEVEL ? `/` : `file://${prodPath}`;
+}
+
+export function getResourcePath(filePath: string): string {
+  const ressourcesPath = getResourcesPath();
+  return path.join(ressourcesPath, filePath);
 }
 
 // --------------------------------------------------------------------------

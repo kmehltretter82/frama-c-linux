@@ -125,7 +125,7 @@ the capture of sandbox help component below.
 
 #### plugins
 
-[icon-warning-orange]: __Never manually add files to `ivette/renderer/public/plugins`, this folder is generated automatically.__
+[icon-warning-orange]: __Never manually add files to no track folder in `ivette/renderer/public/`, this folders is generated automatically.__
 
 Images contained in plugins require an additional step.
 Plugin resources should only be loaded if the plugin is loaded.
@@ -133,15 +133,12 @@ Plugin resources should only be loaded if the plugin is loaded.
 Follow these steps:
 
 * Add the images folder to your plugin
-* Complete the `pkg.json` by adding the `resources` field. Example :
+* Complete the `pkg.json` by adding the `ressources` field. Example :
 
 ``` js
 {
   "name": "Frama-C/Eva",
-  "ressources": [{
-    "from": "./images/",
-    "to": "./eva/images"
-  }]
+  "ressources": ["./images/"]
 }
 ```
-* Add images to `.md` with ` ![alt](plugins/<ressources.to>/<image-name>)`. Using the previous example, add `![alt](plugins/eva/images/<image-name>)`.
+* Add images to `.md` with ` ![alt](<ressources.from>/<image-name>)`. Using the previous example, add `![alt](frama-c/plugins/eva/images/<image-name>)`.
