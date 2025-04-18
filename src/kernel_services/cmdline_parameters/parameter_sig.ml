@@ -704,7 +704,7 @@ module type Builder = sig
       Note that [t] must be comparable using [Stdlib.compare].
       @since 29.0-Copper *)
   module Enum(X : sig
-      include Input_with_arg
+      include Input
       type t
       val default: t
       val all_values: t list

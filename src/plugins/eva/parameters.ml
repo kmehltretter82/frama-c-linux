@@ -574,14 +574,13 @@ module DescendingIteration =
   Enum
     (struct
       let option_name = "-eva-descending-iteration"
-      let arg_name = "no|exits|full"
       let help = "Experimental. After hitting a postfix point, try to improve \
                   the precision with either a <full> iteration or an iteration \
                   from loop head to exit paths (<exits>) or do not try anything \
                   (<no>). Default is <no>."
       type t = descending_strategy
       let default = NoIteration
-      let all_values = [NoIteration ; FullIteration ; ExitIteration]
+      let all_values = [NoIteration ; ExitIteration ; FullIteration ]
       let to_string = function
         | NoIteration -> "no"
         | FullIteration -> "full"

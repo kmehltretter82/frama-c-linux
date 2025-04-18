@@ -778,7 +778,7 @@ struct
 
   module Enum
       (X: sig
-         include Parameter_sig.Input_with_arg
+         include Parameter_sig.Input
          type t
          val default: t
          val all_values: t list
@@ -798,6 +798,11 @@ struct
         end)
 
       include X
+
+      let arg_name =
+        all_values
+        |> List.map to_string
+        |> Stdlib.String.concat "|"
 
       let of_string =
         let table =
