@@ -751,6 +751,30 @@ let () = add_precision_dep HistoryPartitioning.parameter
 let () = HistoryPartitioning.set_range ~min:0 ~max:max_int
 
 let () = Parameter_customize.set_group precision_tuning
+let () = Parameter_customize.argument_may_be_fundecl ()
+module HistoryPartitioningFunction =
+  Kernel_function_map
+    (struct
+      include Datatype.Int
+      type key = Cil_types.kernel_function
+      let of_string ~key:_ ~prev:_ s =
+        Option.map
+          (fun s ->
+             try int_of_string s
+             with Failure _ ->
+               raise (Cannot_build ("'" ^ s ^ "' is not an integer")))
+          s
+      let to_string ~key:_ = Option.map string_of_int
+    end)
+    (struct
+      let option_name = "-eva-partition-history-function"
+      let arg_name = "f:n"
+      let help = "Override partition-history with <n> when analyzing <f>"
+      let default = Kernel_function.Map.empty
+    end)
+let () = add_precision_dep HistoryPartitioningFunction.parameter
+
+let () = Parameter_customize.set_group precision_tuning
 module ValuePartitioning =
   String_set
     (struct

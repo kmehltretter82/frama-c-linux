@@ -104,7 +104,9 @@ struct
       warn "more than one loop unroll annotation; ignoring";
       default
 
-  let history_size = HistoryPartitioning.get ()
+  let history_size =
+    try HistoryPartitioningFunction.find kf
+    with Not_found -> HistoryPartitioning.get ()
 
   let split_limit = SplitLimit.get ()
 
