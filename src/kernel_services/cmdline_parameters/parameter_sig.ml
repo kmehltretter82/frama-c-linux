@@ -58,7 +58,7 @@ end
 (** Signature required to build custom collection parameters in which elements
     are convertible to string.
     @since Sodium-20150201 *)
-module type String_datatype = sig
+module type Value_datatype = sig
   include Datatype.S
 
   val of_string: string -> t
@@ -71,7 +71,7 @@ end
 (** Signature requires to build custom collection parameters in which elements
     are convertible to string.
     @since Sodium-20150201 *)
-module type String_datatype_with_collections = sig
+module type Value_datatype_with_collections = sig
   include Datatype.S_with_collections
 
   val of_string: string -> t
@@ -85,29 +85,6 @@ module type String_datatype_with_collections = sig
   *)
 
   val to_string: t -> string
-end
-
-(** Signature of the optional value associated to the key and required to build
-    map parameters.
-    @since Sodium-20150201 *)
-module type Value_datatype = sig
-  include Datatype.S
-
-  val of_string: string -> t
-  (** [key] is the key associated to this value, while [prev] is the previous
-      value associated to this key (if any).
-      @return None if there is no value to associate to the key or [Some v]
-      otherwise.
-      @raise Cannot_build if there is no element corresponding to the given
-      string. *)
-
-  val to_string: t -> string
-  (** [key] is the key associated to this value. The optional string is [None] if
-      there is no value associated to the key, and [Some v] (potentially [v =
-      ""]) otherwise.
-      @return None if there is no value to associate to the key or [Some v]
-      otherwise. *)
-
 end
 
 (* ************************************************************************** *)
@@ -700,11 +677,7 @@ module type Builder = sig
 
   exception Cannot_build of string
   module Make_set
-      (E:
-       sig
-         include String_datatype_with_collections
-         val of_singleton_string: string -> Set.t
-       end)
+      (E: Value_datatype_with_collections)
       (_: sig include Input_collection val default: E.Set.t end):
     Set with type elt = E.t and type t = E.Set.t
 
@@ -724,7 +697,7 @@ module type Builder = sig
   module Make_list
       (E:
        sig
-         include String_datatype
+         include Value_datatype
          val of_singleton_string: string -> t list
        end)
       (_: sig include Input_collection val default: E.t list end):
@@ -757,7 +730,7 @@ module type Builder = sig
 
   (** Parameter is a map where multibindings are **not** allowed. *)
   module Make_map
-      (K: String_datatype_with_collections)
+      (K: Value_datatype_with_collections)
       (V: Value_datatype)
       (_: sig include Input_collection val default: V.t K.Map.t end):
     Map
@@ -784,7 +757,7 @@ module type Builder = sig
 
   (** Parameter is a map where multibindings are allowed. *)
   module Make_multiple_map
-      (K: String_datatype_with_collections)
+      (K: Value_datatype_with_collections)
       (V: Value_datatype)
       (_: sig include Input_collection val default: V.t list K.Map.t end):
     Multiple_map

@@ -1250,7 +1250,7 @@ struct
   end
 
   module Make_set
-      (E: Parameter_sig.String_datatype_with_collections)
+      (E: Parameter_sig.Value_datatype_with_collections)
       (X: sig
          include Parameter_sig.Input_collection
          val default: E.Set.t
@@ -1462,7 +1462,7 @@ struct
 
   module Make_list
       (E: sig
-         include Parameter_sig.String_datatype
+         include Parameter_sig.Value_datatype
          val of_singleton_string: string -> t list
        end)
       (X: sig include Parameter_sig.Input_collection val default: E.t list end):
@@ -1549,7 +1549,7 @@ struct
   end
 
   module Make_map
-      (K: Parameter_sig.String_datatype_with_collections)
+      (K: Parameter_sig.Value_datatype_with_collections)
       (V: Parameter_sig.Value_datatype)
       (X: sig
          include Parameter_sig.Input_collection
@@ -1740,7 +1740,7 @@ struct
   end
 
   module Make_multiple_map
-      (K: Parameter_sig.String_datatype_with_collections)
+      (K: Parameter_sig.Value_datatype_with_collections)
       (V: Parameter_sig.Value_datatype)
       (X: sig
          include Parameter_sig.Input_collection
