@@ -174,6 +174,15 @@ module State =
       let size = 17
     end)
 
+
+(* --- Statistics retrieval --- *)
+
+let get (type a) (stat : a t) (x : a) =
+  let k = Key (stat,x) in
+  State.find_opt k
+  |> Option.value ~default: 0
+
+
 (* --- Statistics update --- *)
 
 let set (type a) (stat : a t) (x : a) value =
@@ -182,7 +191,7 @@ let set (type a) (stat : a t) (x : a) value =
 
 let update (type a) (stat : a t) (x : a) (f : int -> int) =
   let k = Key (stat,x) in
-  State.replace k (f (State.find_opt k |> Option.value ~default:0))
+  State.replace k (f (get stat x))
 
 let incr (type a) (stat : a t) (x : a) =
   update stat x (fun v -> v + 1)
@@ -195,11 +204,6 @@ let reset_all () =
 
 
 (* -- Export --- *)
-
-let get (type a) (stat : a t) (x : a) =
-  let k = Key (stat,x) in
-  State.find_opt k
-  |> Option.value ~default: 0
 
 let export_as_list () =
   State.to_seq () |> List.of_seq |>

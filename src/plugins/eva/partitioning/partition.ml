@@ -150,10 +150,11 @@ struct
   struct
     include Datatype.Serializable_undefined
     type t = {
-      loop : Cil_types.stmt;
+      loop : Cil_datatype.Stmt.t;
       current : int;
       limit : int;
     }
+    [@@deriving eq,ord]
 
     let name = "Partition.LoopUnrolling"
 
@@ -175,10 +176,6 @@ struct
         l.current
         l.limit
 
-    let compare l1 l2 =
-      Int.compare l1.current l2.current
-      <?> lazy (Int.compare l1.limit l2.limit)
-
     let hash l =
       Hashtbl.hash (l.current, l.limit)
   end
@@ -190,9 +187,17 @@ struct
     { loop=loop.Eva_automata.stmt ; current = 0; limit }
 
   let incr unrolling =
-    let unrolling' = { unrolling with current = unrolling.current + 1 } in
-    Statistics.(grow max_unrolling unrolling.loop unrolling'.current);
-    unrolling'
+    if unrolling.current >= unrolling.limit then begin
+      if unrolling.limit > 0 then
+        Self.warning ~once:true ~current:true
+          ~wkey:Self.wkey_loop_unroll_partial
+          "loop not completely unrolled";
+      unrolling
+    end else begin
+      let unrolling' = { unrolling with current = unrolling.current + 1 } in
+      Statistics.(grow max_unrolling unrolling.loop unrolling'.current);
+      unrolling'
+    end
 end
 
 
@@ -670,17 +675,7 @@ struct
           begin match k.loops with
             | [] -> raise InvalidAction
             | unrolling :: tl ->
-              if unrolling.current >= unrolling.limit then begin
-                if unrolling.limit > 0 then
-                  Self.warning ~once:true ~current:true
-                    ~wkey:Self.wkey_loop_unroll_partial
-                    "loop not completely unrolled";
-                k
-              end
-              else begin
-
-                { k with loops = LoopUnrolling.incr unrolling :: tl }
-              end
+              { k with loops = LoopUnrolling.incr unrolling :: tl }
           end
 
         | Branch (b,max) -> fun k _x ->
