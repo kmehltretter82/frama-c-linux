@@ -1,5 +1,5 @@
 /* run.config*
-   STDOPT: #"-eva-slevel 5 -eva-slevel-function main:0 -eva-slevel-function gu:21 -eva-slevel-function ginc:21"
+   STDOPT: +"-eva-slevel 5 -eva-slevel-function main:0 -eva-slevel-function gu:21 -eva-slevel-function ginc:21 -then -eva-slevel-function gu:0,ginc:0"
 */
 
 volatile int c;
@@ -22,17 +22,17 @@ int f(void)
 
 void gu(int u)
 {
-      /*@ assert 
-      u ==  1 || 
+      /*@ assert
+      u ==  1 ||
       u ==  2 || u ==  3 ||
-      u ==  4 || u ==  5 || 
-      u ==  6 || u ==  7 || 
+      u ==  4 || u ==  5 ||
+      u ==  6 || u ==  7 ||
       u ==  8 ||
       u ==  9 || u == 10 ||
-      u == 11 || 
+      u == 11 ||
       u == 12 || u == 13 ||
-      u == 14 || u == 15 || 
-      u == 16 || u == 17 || 
+      u == 14 || u == 15 ||
+      u == 16 || u == 17 ||
       u == 18 ||
       u == 19 || u == 20 ;
     */
@@ -45,19 +45,19 @@ void ginc(int u)
   int inc;
   inc  = 4 * u;
 
-    /*@ assert 
-      inc ==   4 || 
+    /*@ assert
+      inc ==   4 ||
       inc ==   8 || inc == 12 ||
-      inc ==  16 || inc == 20 || 
-      inc ==  24 || inc == 28 || 
+      inc ==  16 || inc == 20 ||
+      inc ==  24 || inc == 28 ||
       inc ==  32 ||
-      inc ==  36 || 
+      inc ==  36 ||
       inc ==  40 || inc == 44 ||
-      inc ==  48 || inc == 52 || 
-      inc ==  56 || inc == 60 || 
-      inc ==  64 || inc == 68 || 
+      inc ==  48 || inc == 52 ||
+      inc ==  56 || inc == 60 ||
+      inc ==  64 || inc == 68 ||
       inc ==  72 || inc == 76 ||
-      inc == 80 ; 
+      inc == 80 ;
     */
 
   Frama_C_show_each_inc(inc);
