@@ -966,12 +966,17 @@ module Export: sig
 end
 
 module Statistics: sig
+  (** This module keeps track of statistics collected by Eva during an
+      analysis. *)
+
+  (** Type of statistics. Type parameter ['a] show whether a statistic is tied:
+      - to [kernel_function],
+      - to Cil [stmt],
+      - to the whole program, with [unit].  *)
   type 'a t
 
-  (* Get the current stat value *)
-  val get : 'a t -> 'a -> int
+  (** {2 Registered statistics } *)
 
-  (* Some Eva statistics *)
   val iterations : Cil_types.stmt t
   val memexec_hits : Cil_types.kernel_function t
   val memexec_misses : Cil_types.kernel_function t
@@ -979,4 +984,10 @@ module Statistics: sig
   val max_unrolling : Cil_types.stmt t
   val partitioning_index_hits : unit t
   val partitioning_index_misses : unit t
+
+  (** {2 Statistics retrieval } *)
+
+  (** Get the current stat value for a given element (statement, function or unit
+      according to the statistic type). **)
+  val get : 'a t -> 'a -> int
 end
