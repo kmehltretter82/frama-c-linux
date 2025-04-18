@@ -2292,12 +2292,6 @@ let doTransformWhile = ref false
 
 let setDoTransformWhile () = doTransformWhile := true
 
-(* To avoid generating forward ingoing gotos, we translate conditionals in
- * an alternate way. (useful for Jessie) *)
-let doAlternateConditional = ref false
-
-let setDoAlternateConditional () = doAlternateConditional := true
-
 (************ Labels ***********)
 (* Since we turn dowhile and for loops into while we need to take care in
  * processing the continue statement. For each loop that we enter we place a
@@ -3744,11 +3738,6 @@ and blockCanBreak b =
       (if stmtFallsThrough s then aux tl
        else compute_from_root aux tl)
   in aux b.bstmts
-
-let chunkFallsThrough c =
-  let get_stmt (s,_,_,_,_) = s in
-  let stmts = List.rev_map get_stmt c.stmts in
-  stmtListFallsThrough stmts
 
 let has_local_init chunk =
   List.exists
@@ -7775,49 +7764,21 @@ and compileCondExp ?(hide=false) ~ghost ce st sf =
   (* If the chunk is small then will copy it, else create a goto and add
      the corresponding label to the chunk. *)
   let duplicate label chunk =
-    try (true, chunk, duplicateChunk chunk)
+    try (chunk, duplicateChunk chunk)
     with Failure _ ->
       let lab = newLabelName ghost label in
-      (false, gotoChunk ~ghost lab loc, consLabel ~ghost lab chunk loc false)
-  in
-  (* Alternative normalization when !doAlternateConditional is true. *)
-  let alternate_goto falls_through label =
-    let lab = newLabelName ghost label in
-    let goto =
-      if falls_through then gotoChunk ~ghost lab loc else skipChunk
-    in
-    let lab =
-      if falls_through then consLabel ~ghost lab empty loc false else skipChunk
-    in
-    goto, lab
+      (gotoChunk ~ghost lab loc, consLabel ~ghost lab chunk loc false)
   in
   match ce with
   | CEAnd (ce1, ce2) ->
-    let (duplicable, sf1, sf2) = duplicate "_LAND" sf in
+    let (sf1, sf2) = duplicate "_LAND" sf in
     let st' = compileCondExp ~hide ~ghost ce2 st sf1 in
-    if not duplicable && !doAlternateConditional then
-      let st_fall_through = chunkFallsThrough st' in
-      (* if st does not fall through, we do not need to add a goto
-         after the else part. This prevents spurious falls-through warning
-         afterwards. *)
-      let sf' = duplicateChunk sf1 in
-      let goto, lab = alternate_goto st_fall_through "_LAND" in
-      (compileCondExp ~hide ~ghost ce1 st' sf')
-      @@@ goto @@@ sf2 @@@ lab
-    else
-      compileCondExp ~hide ~ghost ce1 st' sf2
+    compileCondExp ~hide ~ghost ce1 st' sf2
 
   | CEOr (ce1, ce2) ->
-    let (duplicable, st1, st2) = duplicate "_LOR" st in
+    let (st1, st2) = duplicate "_LOR" st in
     let sf' = compileCondExp ~hide ~ghost ce2 st2 sf in
-    if not duplicable && !doAlternateConditional then
-      let sf_fall_through = chunkFallsThrough sf' in
-      let st' = duplicateChunk st2 in
-      let goto, lab = alternate_goto sf_fall_through "_LOR" in
-      (compileCondExp ~hide ~ghost ce1 st' sf')
-      @@@ goto @@@ st1 @@@ lab
-    else
-      compileCondExp ~hide ~ghost ce1 st1 sf'
+    compileCondExp ~hide ~ghost ce1 st1 sf'
 
   | CENot ce1 -> compileCondExp ~hide ~ghost ce1 sf st
 
@@ -10380,3 +10341,5 @@ let areCompatibleTypes t1 t2 = areCompatibleTypes t1 t2
 let frama_c_keep_block = Ast_attributes.frama_c_keep_block
 let frama_c_destructor = Ast_attributes.frama_c_destructor
 let fc_local_static    = Ast_attributes.fc_local_static
+
+let setDoAlternateConditional () = ()
