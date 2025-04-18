@@ -186,10 +186,6 @@ val ghost_local_env: bool -> local_env
 (** Applies [mkAddrOf] after marking variable whose address is taken. *)
 val mkAddrOfAndMark : Cil_types.location -> Cil_types.lval -> Cil_types.exp
 
-(** If called, sets a flag so that [continue] in while loops get transformed
-    into forward gotos, like it is already done in do-while and for loops. *)
-val setDoTransformWhile : unit -> unit
-
 (** Raise Failure *)
 val integral_cast: Cil_types.typ -> Cil_types.term -> Cil_types.term
 
@@ -265,6 +261,10 @@ val fc_local_static: string
 [@@deprecated "use Ast_attributes.fc_local_static instead."]
 [@@migrate { repl = Ast_attributes.fc_local_static }]
 
+(** If called, sets a flag so that [continue] in while loops get transformed
+    into forward gotos, like it is already done in do-while and for loops. *)
+val setDoTransformWhile : unit -> unit
+[@@deprecated "Frama-C does not support this normalisation anymore"]
 
 (** If called, sets a flag so that translation of conditionals does not result
     in forward ingoing gotos (from the if-branch to the else-branch). *)

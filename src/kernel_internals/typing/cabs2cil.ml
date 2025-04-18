@@ -2286,12 +2286,6 @@ end
 
 open BlockChunk
 
-(* To avoid generating backward gotos, we treat while loops as non-while ones,
- * adding a marker for continue. (useful for Jessie) *)
-let doTransformWhile = ref false
-
-let setDoTransformWhile () = doTransformWhile := true
-
 (************ Labels ***********)
 (* Since we turn dowhile and for loops into while we need to take care in
  * processing the continue statement. For each loop that we enter we place a
@@ -2299,7 +2293,7 @@ let setDoTransformWhile () = doTransformWhile := true
  * for a Non-while loop we must generate a label for the continue *)
 
 type loopstate =
-    While of string ref
+  | While of bool ref
   | NotWhile of string ref
 
 let continues : loopstate list ref = ref []
@@ -2311,14 +2305,8 @@ let continueOrLabelChunk ~ghost (l: location) : chunk =
   match !continues with
   | [] -> Errorloc.abort_context "continue not in a loop"
   | While lr :: _ ->
-    if !doTransformWhile then
-      begin
-        if !lr = "" then begin
-          lr := newLabelName ghost "__Cont"
-        end;
-        gotoChunk ~ghost !lr l
-      end
-    else continueChunk ~ghost l
+    lr := true;
+    continueChunk ~ghost l
   | NotWhile lr :: _ ->
     if !lr = "" then begin
       lr := newLabelName ghost "__Cont"
@@ -3542,8 +3530,8 @@ let startLoop iswhile =
   incr C_logic_env.nb_loop;
   add_label_env "LoopEntry";
   add_label_env "LoopCurrent";
-  continues :=
-    (if iswhile then While (ref "") else NotWhile (ref "")) :: !continues;
+  let continue = if iswhile then While (ref false) else NotWhile (ref "") in
+  continues := continue :: !continues;
   enter_break_env ()
 
 let exitLoop () =
@@ -3593,11 +3581,7 @@ let consLabel ~ghost (l: string) (c: chunk) (loc: location)
 let consLabContinue ~ghost (c: chunk) =
   match !continues with
   | [] -> Kernel.fatal ~current:true "labContinue not in a loop"
-  | While lr :: _ ->
-    begin
-      assert (!doTransformWhile);
-      if !lr = "" then c else consLabel ~ghost !lr c (Current_loc.get ()) false
-    end
+  | While _ :: _ -> Kernel.fatal ~current:true "labContinue in a while"
   | NotWhile lr :: _ ->
     if !lr = "" then c else consLabel ~ghost !lr c (Current_loc.get ()) false
 
@@ -3605,7 +3589,8 @@ let consLabContinue ~ghost (c: chunk) =
 let continueUsed () =
   match !continues with
   | [] -> Kernel.fatal ~current:true "not in a loop"
-  | (While lr | NotWhile lr) :: _ -> !lr <> ""
+  | While    lr :: _ -> !lr
+  | NotWhile lr :: _ -> !lr <> ""
 
 (****** TYPE SPECIFIERS *******)
 
@@ -9897,11 +9882,6 @@ and doStatement local_env (s : Cabs.statement) : chunk =
     startLoop true;
     let a = mk_loop_annot a loc in
     let s' = doStatement local_env s in
-    let s' =
-      if !doTransformWhile then
-        s' @@@ (consLabContinue ~ghost skipChunk, ghost)
-      else s'
-    in
     let loc' = convLoc loc in
     let break_cond = breakChunk ~ghost loc' in
     exitLoop ();
@@ -10343,3 +10323,4 @@ let frama_c_destructor = Ast_attributes.frama_c_destructor
 let fc_local_static    = Ast_attributes.fc_local_static
 
 let setDoAlternateConditional () = ()
+let setDoTransformWhile () = ()
