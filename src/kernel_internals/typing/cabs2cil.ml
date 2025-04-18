@@ -7770,16 +7770,30 @@ and doCondExp local_env asconst
   result
 
 and compileCondExp ?(hide=false) ~ghost ce st sf =
+  let (@@@) c1 c2 = c1 @@@ (c2, ghost) in
+  let loc = Current_loc.get () in
+  (* If the chunk is small then will copy it, else create a goto and add
+     the corresponding label to the chunk. *)
+  let duplicate label chunk =
+    try (true, chunk, duplicateChunk chunk)
+    with Failure _ ->
+      let lab = newLabelName ghost label in
+      (false, gotoChunk ~ghost lab loc, consLabel ~ghost lab chunk loc false)
+  in
+  (* Alternative normalization when !doAlternateConditional is true. *)
+  let alternate_goto falls_through label =
+    let lab = newLabelName ghost label in
+    let goto =
+      if falls_through then gotoChunk ~ghost lab loc else skipChunk
+    in
+    let lab =
+      if falls_through then consLabel ~ghost lab empty loc false else skipChunk
+    in
+    goto, lab
+  in
   match ce with
   | CEAnd (ce1, ce2) ->
-    let loc = Current_loc.get () in
-    let (duplicable, sf1, sf2) =
-      (* If sf is small then will copy it *)
-      try (true, sf, duplicateChunk sf)
-      with Failure _ ->
-        let lab = newLabelName ghost "_LAND" in
-        (false, gotoChunk ~ghost lab loc, consLabel ~ghost lab sf loc false)
-    in
+    let (duplicable, sf1, sf2) = duplicate "_LAND" sf in
     let st' = compileCondExp ~hide ~ghost ce2 st sf1 in
     if not duplicable && !doAlternateConditional then
       let st_fall_through = chunkFallsThrough st' in
@@ -7787,53 +7801,23 @@ and compileCondExp ?(hide=false) ~ghost ce st sf =
          after the else part. This prevents spurious falls-through warning
          afterwards. *)
       let sf' = duplicateChunk sf1 in
-      let lab = newLabelName ghost "_LAND" in
-      let gotostmt =
-        if st_fall_through then gotoChunk ~ghost lab loc else skipChunk
-      in
-      let labstmt =
-        if st_fall_through then
-          consLabel ~ghost lab empty loc false
-        else skipChunk
-      in
-      let (@@@) s1 s2 = s1 @@@ (s2, ghost) in
+      let goto, lab = alternate_goto st_fall_through "_LAND" in
       (compileCondExp ~hide ~ghost ce1 st' sf')
-      @@@ gotostmt @@@ sf2 @@@ labstmt
+      @@@ goto @@@ sf2 @@@ lab
     else
-      let sf' = sf2 in
-      compileCondExp ~hide ~ghost ce1 st' sf'
+      compileCondExp ~hide ~ghost ce1 st' sf2
 
   | CEOr (ce1, ce2) ->
-    let loc = Current_loc.get () in
-    let (duplicable, st1, st2) =
-      (* If st is small then will copy it *)
-      try (true, st, duplicateChunk st)
-      with Failure _ ->
-        let lab = newLabelName ghost "_LOR" in
-        (false, gotoChunk ~ghost lab loc, consLabel ~ghost lab st loc false)
-    in
+    let (duplicable, st1, st2) = duplicate "_LOR" st in
+    let sf' = compileCondExp ~hide ~ghost ce2 st2 sf in
     if not duplicable && !doAlternateConditional then
-      let st' = duplicateChunk st1 in
-      let sf' = compileCondExp ~hide ~ghost ce2 st1 sf in
       let sf_fall_through = chunkFallsThrough sf' in
-      let lab = newLabelName ghost "_LOR" in
-      let gotostmt =
-        if sf_fall_through then
-          gotoChunk ~ghost lab loc
-        else skipChunk
-      in
-      let labstmt =
-        if sf_fall_through then
-          consLabel ~ghost lab empty (Current_loc.get ()) false
-        else skipChunk
-      in
-      let (@@@) s1 s2 = s1 @@@ (s2, ghost) in
+      let st' = duplicateChunk st2 in
+      let goto, lab = alternate_goto sf_fall_through "_LOR" in
       (compileCondExp ~hide ~ghost ce1 st' sf')
-      @@@ gotostmt @@@ st2 @@@ labstmt
+      @@@ goto @@@ st1 @@@ lab
     else
-      let st' = st1 in
-      let sf' = compileCondExp ~hide ~ghost ce2 st2 sf in
-      compileCondExp ~hide ~ghost ce1 st' sf'
+      compileCondExp ~hide ~ghost ce1 st1 sf'
 
   | CENot ce1 -> compileCondExp ~hide ~ghost ce1 sf st
 
@@ -7842,17 +7826,17 @@ and compileCondExp ?(hide=false) ~ghost ce st sf =
       | Const(CInt64(i,_,_))
         when (not (Integer.equal i Integer.zero)) && canDrop sf ->
         full_clean_up_chunk_locals sf;
-        se @@@ (st, ghost)
+        se @@@ st
       | Const(CInt64(z,_,_))
         when (Integer.equal z Integer.zero) && canDrop st ->
         full_clean_up_chunk_locals st;
-        se @@@ (sf, ghost)
+        se @@@ sf
       | _ ->
         let se', e' =
           if hide then hide_chunk ~ghost ~loc:e.eloc [] se e (typeOf e)
           else se, e
         in
-        (empty @@@ (se', ghost)) @@@ (ifChunk ~ghost e' e'.eloc st sf, ghost)
+        (empty @@@ se') @@@ (ifChunk ~ghost e' e'.eloc st sf)
     end
 
 
