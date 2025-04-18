@@ -7686,6 +7686,7 @@ and doCondExp local_env asconst
              and should not appear (i.e. be None) in toplevel calls. *)
     (e: Cabs.expression) : condExpRes =
   let ghost = local_env.is_ghost in
+  let loc = e.expr_loc in
   let rec addChunkBeforeCE (c0: chunk) ce =
     let c0 = remove_effects c0 in
     match ce with
@@ -7705,45 +7706,35 @@ and doCondExp local_env asconst
     | CEOr(ce1,ce2) -> CEOr(remove_effects_ce ce1, remove_effects_ce ce2)
     | CENot(ce) -> CENot(remove_effects_ce ce)
   in
-  let loc = e.expr_loc in
-  let result = match e.expr_node with
-    | Cabs.BINARY (Cabs.AND, e1, e2) -> begin
-        let ce1 = doCondExp (no_paren_local_env local_env) asconst ?ctxt e1 in
-        let ce2 = doCondExp (no_paren_local_env local_env) asconst ~ctxt:e e2 in
-        let ce1 = remove_effects_ce ce1 in
-        match ce1, ce2 with
-        | CEExp (se1, ({enode = Const ci1})), _ ->
-          (match isConstTrueFalse ci1 with
-           | `CTrue -> addChunkBeforeCE se1 ce2
-           | `CFalse ->
-             (* se2 might contain labels so we cannot always drop it *)
-             if canDropCE ce2 then begin
-               clean_up_cond_locals ce2; ce1
-             end else CEAnd (ce1, ce2))
-        | CEExp(se1, e1'), CEExp (se2, e2') when
-            Machine.use_logical_operators () && isEmpty se1 && isEmpty se2 ->
-          CEExp (empty, new_exp ~loc (BinOp(LAnd, e1', e2', intType)))
-        | _ -> CEAnd (ce1, ce2)
+  (* Simplify the condition expression when possible :
+     - If ce1 expression is always true (resp. false) for logical AND
+       (resp. OR), we can drop it and only keep its chunk added before ce2.
+     - If ce1 expression is always false (resp. true) for logical AND
+       (resp. OR), we can drop ce2 if possible. *)
+  let simplify_binop op ce1 ce2 =
+    let op' = if op = AND then LAnd else LOr in
+    let keep_all = if op' = LAnd then CEAnd (ce1, ce2) else CEOr (ce1, ce2) in
+    match ce1, ce2 with
+    | CEExp (se1, ({enode = Const ci1})), _ -> begin
+        match op, isConstTrueFalse ci1 with
+        | AND, `CTrue  | OR,`CFalse -> addChunkBeforeCE se1 ce2
+        (* se2 might contain labels so we cannot drop it *)
+        | AND, `CFalse | OR, `CTrue when canDropCE ce2 ->
+          clean_up_cond_locals ce2; ce1
+        | _, _ -> keep_all
       end
-
-    | Cabs.BINARY (Cabs.OR, e1, e2) -> begin
-        let ce1 = doCondExp (no_paren_local_env local_env) asconst ?ctxt e1 in
-        let ce2 = doCondExp (no_paren_local_env local_env) asconst ~ctxt:e e2 in
-        let ce1 = remove_effects_ce ce1 in
-        match ce1, ce2 with
-        | CEExp (se1, ({enode = Const ci1})), _ ->
-          (match isConstTrueFalse ci1 with
-           | `CFalse -> addChunkBeforeCE se1 ce2
-           | `CTrue ->
-             (* se2 might contain labels so we cannot drop it *)
-             if canDropCE ce2 then begin
-               clean_up_cond_locals ce2; ce1
-             end else CEOr (ce1, ce2))
-        | CEExp (se1, e1'), CEExp (se2, e2') when
-            Machine.use_logical_operators () && isEmpty se1 && isEmpty se2 ->
-          CEExp (empty, new_exp ~loc (BinOp(LOr, e1', e2', intType)))
-        | _ -> CEOr (ce1, ce2)
-      end
+    | CEExp(se1, e1'), CEExp (se2, e2') when
+        Machine.use_logical_operators () && isEmpty se1 && isEmpty se2 ->
+      CEExp (empty, new_exp ~loc (BinOp(op', e1', e2', intType)))
+    | _ -> keep_all
+  in
+  let result =
+    match e.expr_node with
+    | Cabs.BINARY ((Cabs.AND | Cabs.OR as op), e1, e2) ->
+      let ce1 = doCondExp (no_paren_local_env local_env) asconst ?ctxt e1 in
+      let ce2 = doCondExp (no_paren_local_env local_env) asconst ~ctxt:e e2 in
+      let ce1 = remove_effects_ce ce1 in
+      simplify_binop op ce1 ce2
 
     | Cabs.UNARY(Cabs.NOT, e1) -> begin
         match doCondExp (no_paren_local_env local_env) asconst ?ctxt e1 with
