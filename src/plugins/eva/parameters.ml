@@ -580,11 +580,10 @@ module DescendingIteration =
                   (<no>). Default is <no>."
       type t = descending_strategy
       let default = NoIteration
-      let all_values = [NoIteration ; ExitIteration ; FullIteration ]
-      let to_string = function
-        | NoIteration -> "no"
-        | FullIteration -> "full"
-        | ExitIteration -> "exits"
+      let values =
+        [ NoIteration, "no";
+          FullIteration, "full";
+          ExitIteration, "exits" ]
     end)
 let () = add_precision_dep DescendingIteration.parameter
 
