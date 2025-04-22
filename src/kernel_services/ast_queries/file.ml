@@ -275,12 +275,12 @@ let regexp_machdep = Str.regexp "^machdep_\\([^.]*\\).yaml$"
 let mem_machdep s = Kernel.Machdep.is_default s || Sys.file_exists s
 
 let default_machdeps () =
-  Array.fold_right
+  Filesystem.fold_dir
     (fun s acc ->
        if Str.string_match regexp_machdep s 0 then
          Str.matched_group 1 s :: acc
        else acc)
-    (Sys.readdir (Kernel.Machdep.get_dir() :> string))
+    (Kernel.Machdep.get_dir())
     []
 
 let pretty_machdeps fmt =

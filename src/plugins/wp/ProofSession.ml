@@ -209,14 +209,8 @@ let remove_unmarked_files ~dry =
     let marks = get_marks_dir ~force:false in
     if Filesystem.exists marks && Filesystem.is_dir marks then
       begin
-        let files =
-          Array.fold_left
-            (fun s f -> StringSet.add f s) StringSet.empty (Filesystem.readdir dir)
-        in
-        let marks =
-          Array.fold_left
-            (fun s f -> StringSet.add f s) StringSet.empty (Filesystem.readdir marks)
-        in
+        let files = Filesystem.fold_dir StringSet.add dir StringSet.empty in
+        let marks = Filesystem.fold_dir StringSet.add marks StringSet.empty in
         let orphans = StringSet.diff files marks in
         let orphans = StringSet.remove ".marks" orphans in
         let remove file =

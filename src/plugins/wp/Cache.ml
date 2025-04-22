@@ -230,7 +230,7 @@ let cleanup_cache () =
         Wp_parameters.warning ~current:false ~once:true
           "Cleanup mode deactivated with global cache."
       else
-        Array.iter
+        Filesystem.iter_dir
           (fun f ->
              if Filename.check_suffix f ".json" then
                let hash = Filename.chop_suffix f ".json" in
@@ -239,7 +239,7 @@ let cleanup_cache () =
                    incr removed ;
                    Filesystem.remove_file (Filepath.concat dir f) ;
                  end
-          ) (Filesystem.readdir dir) ;
+          ) dir ;
     with
     | Unix.Unix_error _ as exn ->
       Wp_parameters.warning ~current:false

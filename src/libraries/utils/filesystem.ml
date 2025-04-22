@@ -36,7 +36,20 @@ let is_file (p : t) =
 
 let is_dir (p : t) = Sys.is_directory (p :> string)
 
-let readdir (p : t) = Sys.readdir (p :> string)
+let readdir (p : t) =
+  Sys.readdir (p :> string)
+
+let list_dir (p : t) =
+  Sys.readdir (p :> string)
+  |> Array.to_list
+
+let iter_dir (f : string -> unit) (p : t) : unit =
+  Sys.readdir (p :> string)
+  |> Array.iter (fun s -> f s)
+
+let fold_dir (f : string -> 'a -> 'a) (p : t) (acc : 'a) : 'a =
+  Sys.readdir (p :> string)
+  |> Array.fold_left (fun acc s ->  f s acc) acc
 
 let remove_file (p : t) =
   try

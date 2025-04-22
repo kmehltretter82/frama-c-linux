@@ -41,6 +41,19 @@ val is_dir: Filepath.t -> bool
 (** Equivalent to [Sys.readdir].
     @since 28.0-Nickel *)
 val readdir: Filepath.t -> string array
+[@@deprecated "Use iter_dir or fold_dir instead"]
+
+(** Contents of a directory
+    @since Frama-C+dev *)
+val list_dir: Filepath.t -> string list
+
+(** Iter through the contents of a directory.
+    @since Frama-C+dev *)
+val iter_dir: (string -> unit) -> Filepath.t -> unit
+
+(** Iter through the contents of a directory.
+    @since Frama-C+dev *)
+val fold_dir: (string -> 'a -> 'a) -> Filepath.t -> 'a -> 'a
 
 (** [mkdir ?parents name perm] creates directory [name] with permission
     [perm]. If [parents] is true, recursively create parent directories
