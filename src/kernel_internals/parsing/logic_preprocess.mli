@@ -35,4 +35,4 @@
     @raises Sys_error if the file cannot be opened.
 *)
 
-val file: string -> (string -> string -> string) -> string -> Filepath.t
+val file: string -> (Filepath.t -> Filepath.t -> string) -> string -> Filepath.t

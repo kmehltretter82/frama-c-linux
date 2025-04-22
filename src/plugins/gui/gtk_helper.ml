@@ -51,7 +51,7 @@ module Configuration = struct
     Gui_parameters.Config_dir.get_file ~create_path:true "frama-c-gui.config"
   let load () = loadConfiguration (configuration_file ())
   let save () = saveConfiguration (configuration_file ())
-  let reset () = Filesystem.safe_remove_file (configuration_file () :> string);
+  let reset () = Filesystem.remove_file (configuration_file ());
     loadConfiguration (configuration_file ())
   let () = Cmdline.at_normal_exit save
 

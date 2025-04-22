@@ -176,7 +176,7 @@ let promote ?timeout ?steplimit (res : VCS.result) =
 
 let file_from_hash hash =
   let dir = get_usable_dir ~make:true () in
-  let file = Printf.sprintf "%s/%s.json" (dir:>string) hash in
+  let file = Filepath.concat dir (hash ^ ".json") in
   file
 
 let get_cache_result ~mode hash =
@@ -186,12 +186,12 @@ let get_cache_result ~mode hash =
     try
       let hash = Lazy.force hash in
       let file = file_from_hash hash in
-      let path = Filepath.of_string file in
-      if not (Filesystem.exists path) then VCS.no_result
+
+      if not (Filesystem.exists file) then VCS.no_result
       else
         try
           mark_cache ~mode hash ;
-          Json.load_file path |> ProofScript.result_of_json
+          Json.load_file file |> ProofScript.result_of_json
         with err ->
           Wp_parameters.warning ~current:false ~once:true
             "invalid cache entry (%s)" (Printexc.to_string err) ;
@@ -205,10 +205,9 @@ let set_cache_result ~mode hash prover result =
     let hash = Lazy.force hash in
     try
       let file = file_from_hash hash in
-      let path = Filepath.of_string file in
       mark_cache ~mode hash ;
       ProofScript.json_of_result (VCS.Why3 prover) result
-      |> Json.save_file path
+      |> Json.save_file file
     with err ->
       Wp_parameters.warning ~current:false ~once:true
         "can not update cache (%s)" (Printexc.to_string err)
@@ -217,7 +216,7 @@ let clear_result ~digest prover goal =
   try
     let hash = digest prover goal in
     let file = file_from_hash hash in
-    Filesystem.safe_remove_file file
+    Filesystem.remove_file file
   with err ->
     Wp_parameters.warning ~current:false ~once:true
       "can not clean cache entry (%s)" (Printexc.to_string err)
@@ -226,7 +225,7 @@ let cleanup_cache () =
   let mode = get_mode () in
   if mode = Cleanup && (!hits > 0 || !miss > 0) then
     try
-      let dir = (get_usable_dir ():>string) in
+      let dir = get_usable_dir () in
       if is_global_cache () then
         Wp_parameters.warning ~current:false ~once:true
           "Cleanup mode deactivated with global cache."
@@ -238,9 +237,9 @@ let cleanup_cache () =
                if not (Hashtbl.mem cleanup hash) then
                  begin
                    incr removed ;
-                   Filesystem.safe_remove_file (Printf.sprintf "%s/%s" dir f) ;
+                   Filesystem.remove_file (Filepath.concat dir f) ;
                  end
-          ) (Sys.readdir dir) ;
+          ) (Filesystem.readdir dir) ;
     with
     | Unix.Unix_error _ as exn ->
       Wp_parameters.warning ~current:false

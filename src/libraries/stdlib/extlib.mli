@@ -250,27 +250,21 @@ val safe_at_exit : (unit -> unit) -> unit
 
 val cleanup_at_exit: string -> unit
 [@@deprecated "Use Filesystem.cleanup_at_exit instead"]
-[@@migrate { repl = Filesystem.cleanup_at_exit }]
 
 val temp_file_cleanup_at_exit: ?debug:bool -> string -> string -> string
 [@@deprecated "Use Filesystem.temp_file_cleanup_at_exit instead"]
-[@@migrate { repl = Filesystem.temp_file_cleanup_at_exit }]
 
 val temp_dir_cleanup_at_exit: ?debug:bool -> string -> 'filepath
 [@@deprecated "Use Filesystem.temp_dir_cleanup_at_exit instead"]
-[@@migrate { repl = Filesystem.temp_dir_cleanup_at_exit }]
 
 val mkdir : ?parents:bool -> 'f -> Unix.file_perm -> bool
 [@@deprecated "Use Filesystem.make_dir instead"]
-[@@migrate { repl = Filesystem.make_dir }]
 
 val safe_remove: string -> unit
-[@@deprecated "Use Filesystem.safe_remove_file instead"]
-[@@migrate { repl = Filesystem.safe_remove_file }]
+[@@deprecated "Use Filesystem.remove_file instead"]
 
 val safe_remove_dir: string -> unit
-[@@deprecated "Use Filesystem.safe_remove_dir instead"]
-[@@migrate { repl = Filesystem.safe_remove_dir }]
+[@@deprecated "Use Filesystem.remove_dir instead"]
 
 
 (* ************************************************************************* *)

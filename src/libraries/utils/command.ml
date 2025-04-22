@@ -124,9 +124,9 @@ let command_generic ~async ?stdout ?stderr cmd args =
   in
   let delete () =
     begin
-      Filesystem.safe_remove_file inf;
-      Filesystem.safe_remove_file outf;
-      Filesystem.safe_remove_file errf;
+      Filesystem.remove_file (Filepath.of_string inf);
+      Filesystem.remove_file (Filepath.of_string outf);
+      Filesystem.remove_file (Filepath.of_string errf);
     end in
   let deleted = cancelable_at_exit delete in
   let pid = Unix.create_process cmd (Array.of_list (cmd :: args))

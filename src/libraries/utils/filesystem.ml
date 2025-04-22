@@ -38,18 +38,16 @@ let is_dir (s : t) = Sys.is_directory (s :> string)
 
 let readdir (s : t) = Sys.readdir (s :> string)
 
-let remove (s : t) = Sys.remove (s :> string)
+let remove_file (f : t) = try Unix.unlink (f :> string) with Unix.Unix_error _ -> ()
 
-let safe_remove_file f = try Unix.unlink f with Unix.Unix_error _ -> ()
-
-let rec safe_remove_dir d =
+let rec remove_dir (d : t) =
   try
     Array.iter
       (fun a ->
-         let f = Printf.sprintf "%s/%s" d a in
-         if Sys.is_directory f then safe_remove_dir f else safe_remove_file f
-      ) (Sys.readdir d) ;
-    Unix.rmdir d
+         let f = Filepath.concat d a in
+         if is_dir f then remove_dir f else remove_file f
+      ) (readdir d) ;
+    Unix.rmdir (d :> string)
   with Unix.Unix_error _ | Sys_error _ -> ()
 
 let rename (s : t) (t : t) = Sys.rename (s :> string) (t :> string)
@@ -81,55 +79,53 @@ let rec make_dir ?(parents=false) (name: t) perm =
 (* --- Temporary files                                                    --- *)
 (* -------------------------------------------------------------------------- *)
 
-let cleanup_at_exit f = Extlib.safe_at_exit (fun () -> safe_remove_file f)
+let cleanup_at_exit f = Extlib.safe_at_exit (fun () -> remove_file f)
 
 exception Temp_file_error of string
 
-let temp_file_cleanup_at_exit ?(debug=false) s1 s2 =
-  let file, out =
-    try Filename.open_temp_file s1 s2
-    with Sys_error s -> raise (Temp_file_error s)
-  in
-  (try close_out out with Unix.Unix_error _ -> ());
-  Extlib.safe_at_exit
-    begin fun () ->
-      if debug then
-        begin
-          if Sys.file_exists file then
-            Format.printf
-              "Debug: not removing dir %s@." file;
-        end
-      else
-        safe_remove_file file
-    end ;
-  file
+let temp_file ~prefix ~suffix =
+  try
+    Filename.temp_file prefix suffix |> Filepath.of_string
+  with Sys_error s ->
+    raise (Temp_file_error s)
 
-let temp_dir_cleanup_at_exit ?(debug=false) base =
-  let rec try_dir_cleanup_at_exit limit base =
-    let file = Filename.temp_file base ".tmp" in
-    let dir = Filename.chop_extension file ^ ".dir" in
-    safe_remove_file file;
+let temp_dir ~prefix ~suffix =
+  (* temp_dir is introduced in Ocaml 5.1 *)
+  let rec one_try limit =
+    let dir = Filename.temp_file prefix suffix in
     try
+      Unix.unlink dir;
       Unix.mkdir dir 0o700 ;
-      Extlib.safe_at_exit
-        begin fun () ->
-          if debug then
-            begin
-              if Sys.file_exists dir then
-                Format.printf
-                  "Debug: not removing dir %s@." dir;
-            end
-          else
-            safe_remove_dir dir
-        end ;
       Filepath.of_string dir
     with Unix.Unix_error(err,_,_) ->
       if limit < 0 then
         raise (Temp_file_error (Unix.error_message err))
       else
-        try_dir_cleanup_at_exit (pred limit) base
+        one_try (pred limit)
   in
-  try_dir_cleanup_at_exit 10 base
+  one_try 10
+
+let temp_file_cleanup_at_exit ?(debug=false) prefix suffix =
+  let file = temp_file ~prefix ~suffix in
+  Extlib.safe_at_exit
+    begin fun () ->
+      if not debug then
+        remove_file file
+      else if exists file then
+        Format.printf "Debug: not removing dir %a@." pretty file;
+    end;
+  file
+
+let temp_dir_cleanup_at_exit ?(debug=false) prefix =
+  let dir = temp_dir ~prefix ~suffix:".dir" in
+  Extlib.safe_at_exit
+    begin fun () ->
+      if not debug then
+        remove_dir dir
+      else if exists dir then
+        Format.printf "Debug: not removing dir %a@." pretty dir;
+    end;
+  dir
 
 
 (* -------------------------------------------------------------------------- *)

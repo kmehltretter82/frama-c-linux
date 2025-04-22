@@ -1422,7 +1422,7 @@ let updatescript ~script driver task =
   in
   let d_old = Digest.file (backup :> string) in
   let d_new = Digest.file (script :> string) in
-  if String.equal d_new d_old then Filesystem.safe_remove_file (backup :> string)
+  if String.equal d_new d_old then Filesystem.remove_file backup
 
 let editor ~script ~merge ~config pconf driver task =
   Task.sync editor_mutex

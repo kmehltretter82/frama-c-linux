@@ -395,14 +395,13 @@ let pretty_machdep ?fmt ?machdep () =
 
 let create_temp_file name suffix =
   let debug = Kernel.is_debug_key_enabled Kernel.dkey_pp_keep_temp_files in
-  let of_string = Filepath.of_string in
-  try of_string (Filesystem.temp_file_cleanup_at_exit ~debug name suffix)
+  try Filesystem.temp_file_cleanup_at_exit ~debug name suffix
   with Filesystem.Temp_file_error s ->
     Kernel.abort "cannot create temporary file: %s" s
 
 let safe_remove_file (f : Filepath.t) =
   if not (Kernel.is_debug_key_enabled Kernel.dkey_pp_keep_temp_files) then
-    Filesystem.safe_remove_file (f :> string)
+    Filesystem.remove_file f
 
 let cpp_name cmd =
   let cmd = List.hd (String.split_on_char ' ' cmd) in
@@ -411,8 +410,8 @@ let cpp_name cmd =
 let replace_in_cpp_cmd cmdl supp_args in_file out_file =
   (* using Filename.quote for filenames which contain space or shell
      metacharacters *)
-  let in_file = Filename.quote in_file
-  and out_file = Filename.quote out_file in
+  let in_file = Filepath.to_quoted_string in_file
+  and out_file = Filepath.to_quoted_string out_file in
   let substitute s =
     match Str.matched_string s with
     | "%%" -> "%"
@@ -550,7 +549,7 @@ let build_cpp_cmd = function
         fc_define_args
     in
     let cpp_command =
-      replace_in_cpp_cmd cmdl supp_args (f:>string) (ppf:>string)
+      replace_in_cpp_cmd cmdl supp_args f ppf
     in
     let workdir, cpp_command_with_chdir = adjust_pwd f cpp_command in
     if workdir <> None then

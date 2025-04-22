@@ -115,7 +115,7 @@ let dump_buffer buffer = function
       Filesystem.with_open_out_exn log
         (fun out -> Buffer.output_buffer out buffer)
     else if Wp_parameters.has_out () then
-      Filesystem.safe_remove_file (log :> string)
+      Filesystem.remove_file log
 
 let echo_buffer buffer =
   let n = Buffer.length buffer in

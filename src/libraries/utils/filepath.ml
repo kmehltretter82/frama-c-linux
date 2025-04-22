@@ -185,6 +185,9 @@ let of_string ?(existence=Indifferent) ?base path_name =
 
 let to_string_list l = l
 
+let to_quoted_string s =
+  Filename.quote s
+
 
 (* -------------------------------------------------------------------------- *)
 (* --- Basic datatype functions                                           --- *)

@@ -57,17 +57,13 @@ val readdir: Filepath.t -> string array
     type was [unit]. Also, the function did not check for path's existence. *)
 val make_dir : ?parents:bool -> Filepath.t -> Unix.file_perm -> bool
 
-(** Equivalent to [Sys.remove].
-    @since 28.0-Nickel *)
-val remove: Filepath.t -> unit
-
 (** Tries to delete a file and never fails.
     @before Frama-C+dev it was Extlib.safe_remove *)
-val safe_remove_file: string -> unit
+val remove_file: Filepath.t -> unit
 
 (** Tries to delete a directory and never fails.
     @before Frama-C+dev it was Extlib.safe_remove_dir *)
-val safe_remove_dir: string -> unit
+val remove_dir: Filepath.t -> unit
 
 (** Equivalent to [Sys.rename].
     @since 28.0-Nickel *)
@@ -78,24 +74,43 @@ val rename: Filepath.t -> Filepath.t -> unit
 (** {2 Temporary files} *)
 (* ************************************************************************* *)
 
-val cleanup_at_exit: string -> unit
 (** [cleanup_at_exit file] indicates that [file] must be removed when the
     program exits (except if exit is caused by a signal).
-    If [file] does not exist, nothing happens. *)
+    If [file] does not exist, nothing happens.
+    @since Frama-C+dev
+    @before Frama-C+dev was in Extlib and used a string instead of
+    [Filepath.t] *)
+val cleanup_at_exit: Filepath.t -> unit
 
 exception Temp_file_error of string
 
-val temp_file_cleanup_at_exit: ?debug:bool -> string -> string -> string
+(** Similar to [Filename.temp_file].
+    @raise Temp_file_error if the temp file cannot be created.
+    @since Frama-C+dev *)
+val temp_file: prefix:string -> suffix:string -> Filepath.t
+
+(** Similar to [Filename.temp_dir].
+    @raise Temp_file_error if the temp dir cannot be created.
+    @since Frama-C+dev *)
+val temp_dir: prefix:string -> suffix:string -> Filepath.t
+
 (** Similar to [Filename.temp_file] except that the temporary file will be
     deleted at the end of the execution (see above), unless [debug] is set
     to true, in which case a message with the name of the kept file will be
     printed.
     @raise Temp_file_error if the temp file cannot be created.
-*)
+    @before Frama-C+dev was in Extlib and returned a string instead of
+    [Filepath.t] *)
+val temp_file_cleanup_at_exit: ?debug:bool -> string -> string -> Filepath.t
 
+(** Similar to [Filename.temp_dir] except that the temporary directory will be
+    deleted at the end of the execution (see above), unless [debug] is set
+    to true, in which case a message with the name of the kept file will be
+    printed.
+    @raise Temp_file_error if the temp dir cannot be created.
+    @before 28.0-Nickel returned a string instead of [Filepath.t]
+    @before Frama-C+dev was in Extlib *)
 val temp_dir_cleanup_at_exit: ?debug:bool -> string -> Filepath.t
-(** @raise Temp_file_error if the temp dir cannot be created.
-    @since 28.0-Nickel modify return type *)
 
 
 (* ************************************************************************* *)

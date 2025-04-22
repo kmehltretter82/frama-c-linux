@@ -120,6 +120,11 @@ val of_string: ?existence:existence -> ?base:t -> string -> t
     See [pretty] for details about usage. *)
 val to_pretty_string: t -> string
 
+(** [to_quoted_string p] returns [p] but quoted, suitable for use as
+    one argument in a command line. See [Filename.quoted]
+    @since Frama-C+dev *)
+val to_quoted_string: t -> string
+
 (** [to_string_list l] returns [l] as a list of strings containing the
     absolute paths to the elements of [l].
     @since 23.0-Vanadium *)
@@ -268,8 +273,8 @@ val readdir: t -> string array
 [@@migrate { repl = Filesystem.readdir } ]
 
 val remove: t -> unit
-[@@deprecated "Use Filesystem.remove instead"]
-[@@migrate { repl = Filesystem.remove } ]
+[@@deprecated "Use Filesystem.remove_file instead"]
+[@@migrate { repl = Filesystem.remove_file } ]
 
 val rename: t -> t -> unit
 [@@deprecated "Use Filesystem.rename instead"]

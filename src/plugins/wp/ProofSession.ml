@@ -136,14 +136,14 @@ let remove wpo =
   | NoScript -> ()
   | Script f ->
     begin
-      Filesystem.safe_remove_file (f:>string) ;
+      Filesystem.remove_file f ;
       Hashtbl.replace files f NoScript ;
     end
   | Deprecated f0 ->
     begin
       Wp_parameters.feedback
         "Removed deprecated script for '%s'" wpo.po_sid ;
-      Filesystem.safe_remove_file (f0 :> string) ;
+      Filesystem.remove_file f0 ;
       let f = filename ~force:false wpo in
       Hashtbl.replace files f NoScript ;
     end
@@ -171,7 +171,7 @@ let save ~stdout wpo js =
       begin
         Wp_parameters.feedback
           "Upgraded script for '%s'" wpo.po_sid ;
-        Filesystem.safe_remove_file (f0 :> string) ;
+        Filesystem.remove_file f0 ;
         let f = filename ~force:true wpo in
         Json.save_file f js ;
         Hashtbl.replace files f (Script f) ;
@@ -188,7 +188,7 @@ let remove_marks ~dry =
   if Filesystem.exists marks && Filesystem.is_dir marks then
     if dry
     then Wp_parameters.feedback "[dry] remove marks"
-    else Filesystem.safe_remove_dir (marks :> string)
+    else Filesystem.remove_dir marks
 
 let reset_marks () =
   remove_marks ~dry:false ;
@@ -223,7 +223,7 @@ let remove_unmarked_files ~dry =
           let path = Filepath.concat dir file in
           if dry
           then Wp_parameters.feedback "[dry] rm %a" Filepath.pretty path
-          else Filesystem.remove path
+          else Filesystem.remove_file path
         in
         StringSet.iter remove orphans ;
         remove_marks ~dry

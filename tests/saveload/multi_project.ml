@@ -14,7 +14,7 @@ let main () =
   check "default" (<>);
   Kernel.Files.set [];
   Project.load_all fp;
-  Filesystem.safe_remove_file "foo.sav";
+  Filesystem.remove_file fp;
   ignore (Project.create_by_copy ~last:false "bar");
   assert
     (Project.equal (Project.current ()) (Project.from_unique_name "default"));

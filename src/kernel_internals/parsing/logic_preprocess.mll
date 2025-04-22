@@ -168,6 +168,7 @@
     in aux content
 
   let preprocess_annots suffix cpp outfile =
+    let open Filesystem.Operators in
     if !has_annot then begin
       let debug = Kernel.is_debug_key_enabled Kernel.dkey_pp_keep_temp_files in
       let ppname =
@@ -176,9 +177,10 @@
           Kernel.abort
             "Could not open temporary file for logic preprocessing: %s" s
       in
-      let ppfile = open_out ppname in
-      Buffer.output_buffer ppfile preprocess_buffer;
-      close_out ppfile;
+      let () =
+        let$ ppfile = Filesystem.with_open_out_exn ppname in
+        Buffer.output_buffer ppfile preprocess_buffer;
+      in
       let cppname = Filesystem.temp_file_cleanup_at_exit ~debug "cppannot" suffix in
       let pp_cmd = cpp ppname cppname in
       Kernel.feedback ~dkey:Kernel.dkey_pp_logic
@@ -187,16 +189,15 @@
       let result_file =
         if res <> 0 then begin
           abort_preprocess "Preprocessor call exited with an error";
-          if not debug then Filesystem.safe_remove_file cppname;
+          if not debug then Filesystem.remove_file cppname;
           ppname
         end else cppname
       in
-      let result = open_in result_file in
+      let$ result = Filesystem.with_open_in_exn result_file in
       let content =
         Str.split_delim re_annot_content (Buffer.contents output_buffer)
       in
-      output_result outfile result content;
-      close_in result
+      output_result outfile result content
     end else begin
       Buffer.output_buffer outfile output_buffer
     end;
@@ -546,14 +547,13 @@ parse
         Filesystem.temp_file_cleanup_at_exit ~debug
           (Filename.basename filename) ".pp"
       in
-      let fp_of_string = Filepath.of_string in
-      let workdir_opt = Parse_env.get_workdir (fp_of_string filename) in
+      let workdir_opt = Parse_env.get_workdir (Filepath.of_string filename) in
       Option.iter
-        (fun workdir -> Parse_env.set_workdir (fp_of_string ppname) workdir)
+        (fun workdir -> Parse_env.set_workdir ppname workdir)
         workdir_opt;
-      let ppfile = open_out ppname in
+      let open Filesystem.Operators in
+      let$ ppfile = Filesystem.with_open_out_exn ppname in
       main lex;
       preprocess_annots suffix cpp ppfile;
-      close_out ppfile;
-      Filepath.of_string ppname
+      ppname
 }

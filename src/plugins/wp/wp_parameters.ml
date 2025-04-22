@@ -1137,7 +1137,7 @@ let make_gui_dir () =
         "." in
     let dir = Fc_Filepath.of_string (home ^ "/" ^ ".frama-c-wp") in
     if Filesystem.exists dir && Filesystem.is_dir dir then
-      Filesystem.safe_remove_dir (dir:>string);
+      Filesystem.remove_dir dir;
     make_output_dir dir ; dir
   with _ ->
     make_tmp_dir ()
