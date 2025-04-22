@@ -168,6 +168,15 @@ val concat: ?existence:existence -> t -> string -> t
     @since 28.0-Nickel *)
 val concats: ?existence:existence -> t -> string list -> t
 
+(** Same as [Filename.check_suffix].
+    @since Frama-C+dev *)
+val has_suffix: t -> string -> bool
+
+(** Same as [Filename.chop_suffix].
+    @raise Invalid_argument if the suffix does not appear in the filepath.
+    @since Frama-C+dev *)
+val chop_suffix: t -> string -> t
+
 (** returns true if the file is relative to [base]
     (that is, it is prefixed by [base_name]), or to the current
     working directory if no base is specified.

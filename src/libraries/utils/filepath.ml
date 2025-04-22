@@ -158,6 +158,10 @@ let concats ?existence t sl =
   let s' = List.fold_left (fun acc s -> acc ^ "/" ^ s) "" sl in
   of_string ?existence (t ^ s')
 
+let has_suffix p suffix = Filename.check_suffix p suffix
+
+let chop_suffix p suffix = Filename.chop_suffix p suffix
+
 
 (* -------------------------------------------------------------------------- *)
 (* --- Relative Paths                                                     --- *)
