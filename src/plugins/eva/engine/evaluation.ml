@@ -139,7 +139,7 @@ let warn_pointer_comparison typ =
   match Parameters.WarnPointerComparison.get () with
   | `None -> false
   | `All -> true
-  | `Pointer -> Ast_types.(is_ptr (unroll typ))
+  | `Pointer -> Ast_types.(is_ptr typ)
 
 let propagate_all_pointer_comparison typ =
   not (Ast_types.is_ptr typ)
