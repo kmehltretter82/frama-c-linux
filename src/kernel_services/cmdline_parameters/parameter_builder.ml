@@ -1548,6 +1548,12 @@ struct
     let to_string = string_of_int
   end
 
+  module Value_string = struct
+    include Datatype.String
+    let of_string s = s
+    let to_string s = s
+  end
+
   module Make_map
       (K: Parameter_sig.Value_datatype_with_collections)
       (V: Parameter_sig.Value_datatype)
