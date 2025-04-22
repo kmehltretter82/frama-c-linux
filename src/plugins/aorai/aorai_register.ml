@@ -30,7 +30,7 @@ let dot_file = ref Filepath.empty
 (* Performs some checks before calling [open_in f], reporting ["errmsg: <f>"]
    in case of error. *)
 let check_and_open_in (f : Filepath.t) errmsg =
-  if not (Filepath.is_file f) then
+  if not (Filesystem.is_file f) then
     Aorai_option.abort "%s: %a" errmsg Filepath.pretty f;
   open_in (f :> string)
 
@@ -64,12 +64,12 @@ let init_file_names () =
     let pre = match opt_suf with None -> pre | Some s -> pre ^ s in
     let rec fn p s n =
       let fp = Filepath.of_string (p ^ (string_of_int n) ^ s) in
-      if not (Filepath.exists fp) then fp
+      if not (Filesystem.exists fp) then fp
       else fn p s (n+1)
     in
     let name =
       let fp = Filepath.of_string (pre^suf) in
-      if not (Filepath.exists fp) then fp
+      if not (Filesystem.exists fp) then fp
       else fn pre suf 0
     in
     name

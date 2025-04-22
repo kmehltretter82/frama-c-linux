@@ -1050,7 +1050,7 @@ module Machdep = struct
     let filename = "machdep_" ^ machdep ^ ".yaml" in
     Filepath.concat (get_dir()) filename
   let is_default machdep =
-    Filepath.is_file (get_default_file machdep)
+    Filesystem.is_file (get_default_file machdep)
 
   let normalize name =
     if is_default name then name else (Filepath.of_string name :> string)

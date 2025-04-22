@@ -505,7 +505,7 @@ and bal = parse
         let configure ()=
           let drivers =
             List.map (fun file ->
-                if Filepath.exists file
+                if Filesystem.exists file
                 then file
                 else LogicBuiltins.find_lib file)
               drivers in

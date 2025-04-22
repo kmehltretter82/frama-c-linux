@@ -396,13 +396,13 @@ let pretty_machdep ?fmt ?machdep () =
 let create_temp_file name suffix =
   let debug = Kernel.is_debug_key_enabled Kernel.dkey_pp_keep_temp_files in
   let of_string = Filepath.of_string in
-  try of_string (Extlib.temp_file_cleanup_at_exit ~debug name suffix)
-  with Extlib.Temp_file_error s ->
+  try of_string (Filesystem.temp_file_cleanup_at_exit ~debug name suffix)
+  with Filesystem.Temp_file_error s ->
     Kernel.abort "cannot create temporary file: %s" s
 
 let safe_remove_file (f : Filepath.t) =
   if not (Kernel.is_debug_key_enabled Kernel.dkey_pp_keep_temp_files) then
-    Extlib.safe_remove (f :> string)
+    Filesystem.safe_remove_file (f :> string)
 
 let cpp_name cmd =
   let cmd = List.hd (String.split_on_char ' ' cmd) in
@@ -481,7 +481,7 @@ let build_cpp_cmd = function
   | NoCPP _ | External _ -> None
   | NeedCPP (f, cmdl, extra_for_this_file, is_gnu_like) ->
     let extra_args = extra_for_this_file @ Kernel.CppExtraArgs.get () in
-    if not (Filepath.exists f) then
+    if not (Filesystem.exists f) then
       Kernel.abort "source file %a does not exist"
         Filepath.pretty f;
     let add_if_gnu ~to_warn opt =
@@ -600,7 +600,7 @@ let abort_with_detailed_pp_message f cpp_command =
 
 let parse_cabs cpp_command = function
   | NoCPP f ->
-    if not (Filepath.exists f) then
+    if not (Filesystem.exists f) then
       Kernel.abort "preprocessed file %a does not exist"
         Filepath.pretty f;
     Kernel.feedback "Parsing %a (no preprocessing)"
@@ -651,7 +651,7 @@ let parse_cabs cpp_command = function
     safe_remove_file ppf;
     (cil,(f,defs))
   | External (f,suf) ->
-    if not (Filepath.exists f) then
+    if not (Filesystem.exists f) then
       Kernel.abort "file %a does not exist."
         Filepath.pretty f;
     Kernel.feedback "Parsing %a (external front-end)"
@@ -1685,7 +1685,7 @@ let add_source_if_new tbl (fp : Filepath.t) =
    the included sources listed in [file],
    which contains the output of 'gcc -H -MM'. *)
 let add_included_sources tbl file =
-  Filepath.iter_lines file @@ fun line ->
+  Filesystem.iter_lines file @@ fun line ->
   if Str.string_match re_included_file line 0 then
     let f = Str.matched_group 1 line in
     add_source_if_new tbl (Filepath.of_string f)
@@ -1944,7 +1944,7 @@ let create_rebuilt_project_from_visitor
       let ext = if preprocess then ".c" else ".i" in
       create_temp_file name ext
     in
-    Filepath.with_formatter_exn f (fun fmt -> pretty_ast ~prj ~fmt ());
+    Filesystem.with_formatter_exn f (fun fmt -> pretty_ast ~prj ~fmt ());
     let redo () =
       (*      Kernel.feedback "redoing initialization on file %s" f;*)
       Files.reset ();

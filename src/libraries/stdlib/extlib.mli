@@ -243,50 +243,35 @@ external address_of_value: 'a -> int = "address_of_value" [@@noalloc]
 (** {2 System commands} *)
 (* ************************************************************************* *)
 
-val mkdir : ?parents:bool -> Filepath.t -> Unix.file_perm -> bool
-(** [mkdir ?parents name perm] creates directory [name] with permission
-    [perm]. If [parents] is true, recursively create parent directories
-    if needed. [parents] defaults to false.
-    Note that this function may create some of the parent directories
-    and then fail to create the children, e.g. if [perm] does not allow
-    user execution of the created directory. This will leave the filesystem
-    in a modified state before raising an exception.
-    Returns [true] if the directory was created, [false] otherwise.
-    @raise Unix.Unix_error if cannot create [name] or its parents.
-    @raise Failure if the path exists but is not a directory
-    @since 19.0-Potassium
-    @before 28.0-Nickel [name] argument was of type [string] and the returned
-    type was [unit]. Also, the function did not check for path's existence.
-*)
-
 val safe_at_exit : (unit -> unit) -> unit
 (** Register function to call with [Stdlib.at_exit], but only
     for non-child process (fork). The order of execution is preserved
     {i wrt} ordinary calls to [Stdlib.at_exit]. *)
 
 val cleanup_at_exit: string -> unit
-(** [cleanup_at_exit file] indicates that [file] must be removed when the
-    program exits (except if exit is caused by a signal).
-    If [file] does not exist, nothing happens. *)
-
-exception Temp_file_error of string
+[@@deprecated "Use Filesystem.cleanup_at_exit instead"]
+[@@migrate { repl = Filesystem.cleanup_at_exit }]
 
 val temp_file_cleanup_at_exit: ?debug:bool -> string -> string -> string
-(** Similar to [Filename.temp_file] except that the temporary file will be
-    deleted at the end of the execution (see above), unless [debug] is set
-    to true, in which case a message with the name of the kept file will be
-    printed.
-    @raise Temp_file_error if the temp file cannot be created.
-*)
+[@@deprecated "Use Filesystem.temp_file_cleanup_at_exit instead"]
+[@@migrate { repl = Filesystem.temp_file_cleanup_at_exit }]
 
-val temp_dir_cleanup_at_exit: ?debug:bool -> string -> Filepath.t
-(** @raise Temp_file_error if the temp dir cannot be created.
-    @since 28.0-Nickel modify return type *)
+val temp_dir_cleanup_at_exit: ?debug:bool -> string -> 'filepath
+[@@deprecated "Use Filesystem.temp_dir_cleanup_at_exit instead"]
+[@@migrate { repl = Filesystem.temp_dir_cleanup_at_exit }]
+
+val mkdir : ?parents:bool -> 'f -> Unix.file_perm -> bool
+[@@deprecated "Use Filesystem.make_dir instead"]
+[@@migrate { repl = Filesystem.make_dir }]
 
 val safe_remove: string -> unit
-(** Tries to delete a file and never fails. *)
+[@@deprecated "Use Filesystem.safe_remove_file instead"]
+[@@migrate { repl = Filesystem.safe_remove_file }]
 
 val safe_remove_dir: string -> unit
+[@@deprecated "Use Filesystem.safe_remove_dir instead"]
+[@@migrate { repl = Filesystem.safe_remove_dir }]
+
 
 (* ************************************************************************* *)
 (** {2 Comparison functions} *)

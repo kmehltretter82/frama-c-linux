@@ -824,7 +824,7 @@ class visitor (ctx:context) c =
           let tgtdir = WpContext.directory () in
           let why3src = Filepath.basename source in
           let target = Filepath.concat tgtdir (why3src :> string) in
-          Filepath.copy_file source target
+          Filesystem.copy_file source target
       in
       let iter_file opt =
         match Str.split_delim regexp_col opt with
@@ -1333,8 +1333,8 @@ let output_task wpo drv ?(script : Filepath.t option) prover task =
       ~pid:wpo.Wpo.po_pid
       ~model:wpo.Wpo.po_model
       ~prover:(VCS.Why3 prover) in
-  let open Filepath.Operators in
-  let$ fmt = Filepath.with_formatter_exn file in
+  let open Filesystem.Operators in
+  let$ fmt = Filesystem.with_formatter_exn file in
   Format.fprintf fmt "(* WP Task for Prover %s *)@\n"
     (Why3Provers.ident_why3 prover) ;
   let old = Option.map
@@ -1413,16 +1413,16 @@ let scriptfile ~force ~ext wpo =
 
 let updatescript ~script driver task =
   let backup = Filepath.extend script ".bak" in
-  Filepath.rename script backup ;
+  Filesystem.rename script backup ;
   let _printing_info =
-    let open Filepath.Operators in
-    let$ old = Filepath.with_open_in_exn backup in
-    let$ fmt = Filepath.with_formatter_exn script in
+    let open Filesystem.Operators in
+    let$ old = Filesystem.with_open_in_exn backup in
+    let$ fmt = Filesystem.with_formatter_exn script in
     Why3.Driver.print_task_prepared ~old driver fmt task
   in
   let d_old = Digest.file (backup :> string) in
   let d_new = Digest.file (script :> string) in
-  if String.equal d_new d_old then Extlib.safe_remove (backup :> string)
+  if String.equal d_new d_old then Filesystem.safe_remove_file (backup :> string)
 
 let editor ~script ~merge ~config pconf driver task =
   Task.sync editor_mutex
@@ -1445,11 +1445,11 @@ let prepare ~mode wpo driver task =
   let ext = Filename.extension (Why3.Driver.file_of_task driver "S" "T" task) in
   let force = mode <> VCS.Batch in
   let script = scriptfile ~force wpo ~ext in
-  if Filepath.exists script then Some (script, true) else
+  if Filesystem.exists script then Some (script, true) else
   if force then
     begin
-      let open Filepath.Operators in
-      let$ fmt = Filepath.with_formatter_exn script in
+      let open Filesystem.Operators in
+      let$ fmt = Filesystem.with_formatter_exn script in
       ignore @@ Why3.Driver.print_task_prepared driver fmt task;
       Some (script, false)
     end

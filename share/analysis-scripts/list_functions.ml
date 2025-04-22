@@ -159,9 +159,9 @@ class fun_cabs_visitor print_libc = object(self)
 end
 
 let print_json fp funinfos_json =
-  let open Filepath.Operators in
+  let open Filesystem.Operators in
   let result =
-    let+ fmt = Filepath.with_formatter fp in
+    let+ fmt = Filesystem.with_formatter fp in
     Format.fprintf fmt "%a@." Json.pp funinfos_json;
   in
   match result with

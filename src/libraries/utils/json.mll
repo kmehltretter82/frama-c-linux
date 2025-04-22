@@ -231,7 +231,7 @@ let save_formatter ?(pretty=true) fmt v =
   if pretty then pp fmt v else pp_dump fmt v
 
 let save_file ?(pretty=true) file v =
-  Filepath.with_open_out_exn file (fun out -> save_channel ~pretty out v)
+  Filesystem.with_open_out_exn file (fun out -> save_channel ~pretty out v)
 
 let invalid name = raise (Invalid_argument ("Json." ^ name))
 

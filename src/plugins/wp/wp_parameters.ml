@@ -1106,7 +1106,7 @@ let has_out () = not @@ Fc_Filepath.is_empty (OutputDir.get ())
 
 let make_output_dir dir =
   try
-    if Extlib.mkdir ~parents:true dir 0o770 then
+    if Filesystem.make_dir ~parents:true dir 0o770 then
       debug ~dkey "Created output directory '%a'" Fc_Filepath.pretty dir
   with Unix.Unix_error (err,_,_) ->
     let msg = Unix.error_message err in
@@ -1120,8 +1120,8 @@ let make_tmp_dir () : Fc_Filepath.t =
   match !unique_tmp with
   | None ->
     let tmp =
-      try Extlib.temp_dir_cleanup_at_exit "wp"
-      with Extlib.Temp_file_error s ->
+      try Filesystem.temp_dir_cleanup_at_exit "wp"
+      with Filesystem.Temp_file_error s ->
         abort "Cannot create temporary file: %s" s
     in
     unique_tmp := Some tmp ;
@@ -1136,8 +1136,8 @@ let make_gui_dir () =
       try Sys.getenv "HOME" (*Unix like*) with Not_found ->
         "." in
     let dir = Fc_Filepath.of_string (home ^ "/" ^ ".frama-c-wp") in
-    if Fc_Filepath.exists dir && Fc_Filepath.is_dir dir then
-      Extlib.safe_remove_dir (dir:>string);
+    if Filesystem.exists dir && Filesystem.is_dir dir then
+      Filesystem.safe_remove_dir (dir:>string);
     make_output_dir dir ; dir
   with _ ->
     make_tmp_dir ()
@@ -1181,7 +1181,7 @@ let default = Fc_Filepath.(concat (pwd ()) "/.frama-c")
 
 let has_session () =
   Session.is_set () ||
-  ( Fc_Filepath.exists default && Fc_Filepath.is_dir default )
+  ( Filesystem.exists default && Filesystem.is_dir default )
 
 let get_session ~force () =
   if force then
@@ -1211,10 +1211,10 @@ let print_generated ?header file =
     | Some head -> head in
   debug ~dkey:cat_print_generated "%S@\n%t@." header
     begin fun fmt ->
-      if not (Fc_Filepath.exists file) then
+      if not (Filesystem.exists file) then
         Format.pp_print_string fmt "<missing file>"
       else
-        Fc_Filepath.iter_lines file (fun s ->
+        Filesystem.iter_lines file (fun s ->
             Format.pp_print_string fmt s;
             Format.pp_print_newline fmt ())
     end

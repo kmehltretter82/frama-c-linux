@@ -262,28 +262,6 @@ external address_of_value: 'a -> int = "address_of_value" [@@noalloc]
   hence interrupting the process, might not work: child processes still need to
   run some daemons, such as [flush_all] which is registered by default. *)
 
-let rec mkdir ?(parents=false) (name: Filepath.t) perm =
-  if Filepath.exists name then
-    if not (Filepath.is_dir name) then
-      failwith (Format.asprintf "mkdir: %a exists but is not a directory"
-                  Filepath.pretty name)
-    else false
-  else begin
-    begin
-      try Unix.mkdir (name:>string) perm
-      with
-      | Unix.Unix_error (Unix.ENOENT,_,_) when parents ->
-        let parent_name = Filepath.dirname name in
-        if name <> parent_name then
-          begin
-            ignore (mkdir ~parents parent_name perm);
-            Unix.mkdir (name:>string) perm
-          end
-      | e -> raise e
-    end;
-    true
-  end
-
 let pid = Unix.getpid ()
 let safe_at_exit f =
   at_exit
@@ -292,67 +270,6 @@ let safe_at_exit f =
       if child = pid then f ()
     end
 
-let safe_remove f = try Unix.unlink f with Unix.Unix_error _ -> ()
-
-let rec safe_remove_dir d =
-  try
-    Array.iter
-      (fun a ->
-         let f = Printf.sprintf "%s/%s" d a in
-         if Sys.is_directory f then safe_remove_dir f else safe_remove f
-      ) (Sys.readdir d) ;
-    Unix.rmdir d
-  with Unix.Unix_error _ | Sys_error _ -> ()
-
-let cleanup_at_exit f = safe_at_exit (fun () -> safe_remove f)
-
-exception Temp_file_error of string
-
-let temp_file_cleanup_at_exit ?(debug=false) s1 s2 =
-  let file, out =
-    try Filename.open_temp_file s1 s2
-    with Sys_error s -> raise (Temp_file_error s)
-  in
-  (try close_out out with Unix.Unix_error _ -> ());
-  safe_at_exit
-    begin fun () ->
-      if debug then
-        begin
-          if Sys.file_exists file then
-            Format.printf
-              "[extlib] Debug: not removing file %s@." file;
-        end
-      else
-        safe_remove file
-    end ;
-  file
-
-let temp_dir_cleanup_at_exit ?(debug=false) base =
-  let rec try_dir_cleanup_at_exit limit base =
-    let file = Filename.temp_file base ".tmp" in
-    let dir = Filename.chop_extension file ^ ".dir" in
-    safe_remove file;
-    try
-      Unix.mkdir dir 0o700 ;
-      safe_at_exit
-        begin fun () ->
-          if debug then
-            begin
-              if Sys.file_exists dir then
-                Format.printf
-                  "[extlib] Debug: not removing dir %s@." dir;
-            end
-          else
-            safe_remove_dir dir
-        end ;
-      Filepath.of_string dir
-    with Unix.Unix_error(err,_,_) ->
-      if limit < 0 then
-        raise (Temp_file_error (Unix.error_message err))
-      else
-        try_dir_cleanup_at_exit (pred limit) base
-  in
-  try_dir_cleanup_at_exit 10 base
 
 (* ************************************************************************* *)
 (** Strings *)
@@ -421,3 +338,15 @@ let compare_ignore_case s1 s2 =
   String.compare
     (String.lowercase_ascii s1)
     (String.lowercase_ascii s2)
+
+
+(* ************************************************************************* *)
+(** Deprecated functions *)
+(* ************************************************************************* *)
+
+let mkdir ?parents:_ _ = failwith "deprecated"
+let safe_remove _ = failwith "deprecated"
+let safe_remove_dir _ = failwith "deprecated"
+let cleanup_at_exit _ = failwith "deprecated"
+let temp_file_cleanup_at_exit ?debug:_ _ = failwith "deprecated"
+let temp_dir_cleanup_at_exit ?debug:_ _ = failwith "deprecated"

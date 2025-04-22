@@ -670,18 +670,18 @@ struct
     let is_set = Dir_name.is_set
 
     let expected ~dir path =
-      if dir <> Fc_Filepath.is_dir path then
+      if dir <> Filesystem.is_dir path then
         P.L.abort "%a is expected to be a %s"
           pretty path (if dir then "directory" else "file")
 
     let mk_dir d =
-      try ignore @@ Extlib.mkdir ~parents:true d 0o755
+      try ignore @@ Filesystem.make_dir ~parents:true d 0o755
       with Unix.Unix_error _ ->
         P.L.abort "cannot create %s directory `%a'" Info.dirname pretty d
 
     let get_dir ?(create_path=false) s =
       let dir = concat (get ()) s in
-      if Fc_Filepath.exists dir
+      if Filesystem.exists dir
       then (expected ~dir:true dir ; dir)
       else if create_path
       then (mk_dir dir ; dir)
@@ -692,7 +692,7 @@ struct
       (* No need to create anything here, as the path of sub-directories has
          been already created by [get_dir] for computing [base_dir]. *)
       let path = concat base_dir @@ Filename.basename s in
-      if Fc_Filepath.exists path then
+      if Filesystem.exists path then
         expected ~dir:false path ;
       path
   end

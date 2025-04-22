@@ -29,7 +29,7 @@ let output format context filename =
     | Json -> Server_interface.output_to_json channel graph
   in
   Self.result "output to %a" Filepath.pretty filename;
-  match Filepath.with_open_out filename output_function with
+  match Filesystem.with_open_out filename output_function with
   | Ok () -> ()
   | Error error ->
     Self.warning "failed to output graph: %s" error

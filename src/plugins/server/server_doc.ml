@@ -329,7 +329,7 @@ let metadata page : json =
 
 let pp_one_page ~root ~page ~title body =
   let full_path = Filepath.concat root page in
-  ignore (Extlib.mkdir ~parents:true (Filepath.dirname full_path) 0o755);
+  ignore (Filesystem.make_dir ~parents:true (Filepath.dirname full_path) 0o755);
   try
     let chan = open_out (full_path:>string) in
     let fmt = Format.formatter_of_out_channel chan in
@@ -351,7 +351,7 @@ let dump ~root ?(meta=true) () =
          let intro = match page.readme with
            | None -> Markdown.section ~title page.descr
            | Some file ->
-             if Filepath.exists file
+             if Filesystem.exists file
              then Markdown.rawfile (file :> string) @ page.descr
              else (
                Senv.warning "Can not find %a file"
@@ -387,7 +387,7 @@ let () =
     fun () ->
       if not (Senv.Doc.is_empty ()) then
         let root = Senv.Doc.get () in
-        if Filepath.is_dir root then
+        if Filesystem.is_dir root then
           begin
             Senv.feedback "[doc] Root: '%a'" Filepath.pretty root ;
             Package.iter package ;

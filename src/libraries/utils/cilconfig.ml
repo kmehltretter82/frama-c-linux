@@ -165,8 +165,8 @@ let saveConfiguration (fname : Filepath.t) =
     Buffer.contents buff
   in
   try
-    let open Filepath.Operators in
-    let$ oc = Filepath.with_open_out_exn fname in
+    let open Filesystem.Operators in
+    let$ oc = Filesystem.with_open_out_exn fname in
     Kernel.debug "Saving configuration to %s@." (fname :> string);
     H.iter (fun k c ->
         output_string oc (k ^ "\n");
@@ -234,9 +234,9 @@ let loadConfiguration (fname : Filepath.t) : unit =
     in
     getOne ()
   in
-  let open Filepath.Operators in
+  let open Filesystem.Operators in
   try
-    let$ ic = Filepath.with_open_in_exn fname in
+    let$ ic = Filesystem.with_open_in_exn fname in
     Kernel.debug "Loading configuration from %s@." (fname :> string);
     while true do
       let k = input_line ic in

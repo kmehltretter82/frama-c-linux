@@ -447,8 +447,8 @@ let register_after_global_load_hook = After_global_load.extend
 let magic = 9 (* magic number *)
 
 let save_projects selection projects filename =
-  let open Filepath.Operators in
-  let$ cout = Filepath.with_open_out_exn ~binary:true filename in
+  let open Filesystem.Operators in
+  let$ cout = Filesystem.with_open_out_exn ~binary:true filename in
   output_value cout System_config.Version.id;
   output_value cout magic;
   output_value cout !Graph.Blocks.cpt_vertex;
@@ -590,10 +590,10 @@ module Descr = struct
 end
 
 let load_projects ~project_under_copy selection ?name filename =
-  let open Filepath.Operators in
+  let open Filesystem.Operators in
   let ocamlgraph_counter, pre_existing_projects, loaded_states, last_created =
     try
-      let$ cin = Filepath.with_open_in_exn ~binary:true filename in
+      let$ cin = Filesystem.with_open_in_exn ~binary:true filename in
       let check_magic format current =
         let old = input_value cin in
         if old <> current then begin
@@ -676,18 +676,18 @@ let create_by_copy
     name (src.unique_name);
   let filename =
     Filepath.of_string (
-      try Extlib.temp_file_cleanup_at_exit "frama_c_create_by_copy" ".sav"
-      with Extlib.Temp_file_error s -> abort "cannot create temporary file: %s" s)
+      try Filesystem.temp_file_cleanup_at_exit "frama_c_create_by_copy" ".sav"
+      with Filesystem.Temp_file_error s -> abort "cannot create temporary file: %s" s)
   in
   save ~selection ~project:src filename;
   try
     let prj = load_with_copy ~project_under_copy:src ~selection ~name filename in
-    Extlib.safe_remove (filename:>string);
+    Filesystem.safe_remove_file (filename:>string);
     if last then last_created_by_copy_ref := Some prj;
     Create_by_copy_hook.apply (src, prj);
     prj
   with e ->
-    Extlib.safe_remove (filename:>string);
+    Filesystem.safe_remove_file (filename:>string);
     raise e
 
 (* ************************************************************************** *)
@@ -699,7 +699,7 @@ module Undo = struct
   let short_filename = "frama_c_undo_restore"
   let filename = ref Filepath.empty
 
-  let clear_breakpoint () = Extlib.safe_remove (!filename:>string)
+  let clear_breakpoint () = Filesystem.safe_remove_file (!filename:>string)
 
   let restore () =
     try
@@ -711,8 +711,8 @@ module Undo = struct
   let breakpoint () =
     clear_breakpoint ();
     filename := Filepath.of_string
-        (try Extlib.temp_file_cleanup_at_exit short_filename ".sav"
-         with Extlib.Temp_file_error s ->
+        (try Filesystem.temp_file_cleanup_at_exit short_filename ".sav"
+         with Filesystem.Temp_file_error s ->
            abort "cannot create temporary file: %s" s)
 
 end

@@ -131,7 +131,7 @@ let () =
 let run () =
   Ast.compute ();
   let debug = Kernel.debug_atleast 1 in
-  let my_file = Extlib.temp_file_cleanup_at_exit ~debug "Extend" ".i" in
+  let my_file = Filesystem.temp_file_cleanup_at_exit ~debug "Extend" ".i" in
   let out = open_out my_file in
   let fmt = Format.formatter_of_out_channel out in
   File.pretty_ast ~fmt ();

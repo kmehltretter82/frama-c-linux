@@ -1346,7 +1346,7 @@ struct
       output_to_dot ~pp_vertex ~wto out automaton
 
     let to_dot_file pp_value result filepath =
-      match Filepath.with_open_out filepath (to_dot_output pp_value result) with
+      match Filesystem.with_open_out filepath (to_dot_output pp_value result) with
       | Ok () -> ()
       | Error error ->
         Kernel.warning "cannot output automaton to dot file %a: %s"

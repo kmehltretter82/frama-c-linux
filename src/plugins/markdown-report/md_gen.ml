@@ -562,7 +562,7 @@ let mk_remarks is_draft =
     Parse_remarks.get_remarks (Mdr_params.Remarks.get ())
   else if is_draft then begin
     let f = Mdr_params.Output.get() in
-    if Filepath.exists f then begin
+    if Filesystem.exists f then begin
       Mdr_params.feedback
         "Re-using pre-existing remarks in draft file %a"
         Filepath.pretty f;
@@ -617,9 +617,9 @@ let gen_report ~draft:is_draft () =
     Mdr_params.error "No output file specified (use option %s)."
       Mdr_params.Output.option_name
   else
-    let open Filepath.Operators in
+    let open Filesystem.Operators in
     let result =
-      let+ fmt = Filepath.with_formatter file in
+      let+ fmt = Filesystem.with_formatter file in
       Markdown.pp_pandoc fmt doc;
       Format.pp_print_newline fmt ();
     in

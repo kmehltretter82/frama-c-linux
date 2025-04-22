@@ -54,8 +54,8 @@ let store_referenced_source fname =
   let fp = Filepath.of_string fname in
   if not (Hashtbl.mem referenced_files fp) then begin
     try
-      let open Filepath.Operators in
-      let$ inchan = Filepath.with_open_in_exn ~binary:true fp in
+      let open Filesystem.Operators in
+      let$ inchan = Filesystem.with_open_in_exn ~binary:true fp in
       let contents = really_input_string inchan (in_channel_length inchan) in
       SourceFiles.replace fp contents;
       Hashtbl.add referenced_files fp true
@@ -98,8 +98,8 @@ let open_source ~scan_references fname =
   try
     Kernel.feedback ~dkey:Kernel.dkey_file_source
       "opening source file: %S" fname;
-    let open Filepath.Operators in
-    let$ inchan = Filepath.with_open_in_exn ~binary:true fp in
+    let open Filesystem.Operators in
+    let$ inchan = Filesystem.with_open_in_exn ~binary:true fp in
     let contents = really_input_string inchan (in_channel_length inchan) in
     SourceFiles.replace fp contents;
     let workdir =

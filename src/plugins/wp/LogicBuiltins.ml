@@ -294,13 +294,13 @@ let add_option ~driver_dir group name ~library value =
 (** Includes *)
 
 let find_lib file =
-  if Filepath.exists file then file else
+  if Filesystem.exists file then file else
     let rec lookup file = function
       | [] -> Wp_parameters.abort "File '%a' not found"
                 Filepath.pretty file
       | dir::dirs ->
         let path = Filepath.concat dir (file :> string) in
-        if Filepath.exists path then path else lookup file dirs
+        if Filesystem.exists path then path else lookup file dirs
     in
     lookup file (cdriver_ro ()).includes
 

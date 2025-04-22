@@ -182,7 +182,7 @@ val relativize: ?base_name:string -> string -> string
 
 
 (* ************************************************************************* *)
-(** {2 File system} *)
+(** {2 Current working directory} *)
 (* ************************************************************************* *)
 
 (** Return the current working directory.
@@ -192,32 +192,6 @@ val relativize: ?base_name:string -> string -> string
     @since 25.0-Manganese
     @before 28.0-Nickel return type was string instead of t. *)
 val pwd : unit -> t
-
-(** Equivalent to [Sys.file_exists].
-    @since 28.0-Nickel *)
-val exists: t -> bool
-
-(** [is_file f] returns [true] iff [f] points to a regular file
-    (or a symbolic link pointing to a file).
-    Returns [false] if any errors happen when [stat]'ing the file.
-    @since 22.0-Titanium *)
-val is_file: t -> bool
-
-(** Equivalent to [Sys.is_directory].
-    @since 28.0-Nickel *)
-val is_dir: t -> bool
-
-(** Equivalent to [Sys.readdir].
-    @since 28.0-Nickel *)
-val readdir: t -> string array
-
-(** Equivalent to [Sys.remove].
-    @since 28.0-Nickel *)
-val remove: t -> unit
-
-(** Equivalent to [Sys.rename].
-    @since 28.0-Nickel *)
-val rename: t -> t -> unit
 
 
 (* ************************************************************************* *)
@@ -271,193 +245,43 @@ val is_empty_pos : position -> bool
 
 
 (* ************************************************************************* *)
-(** {2 High level Input/Output} *)
-(* ************************************************************************* *)
-
-(** [copy source target] copies source file to target file.
-    @since Frama-C+dev
-    @before Frama-C+dev this function was [Command.copy] *)
-val copy_file : t -> t -> unit
-
-(** Iter over all text lines in the file
-    @since Frama-C+dev
-    @before Frama-C+dev this function was [Command.read_lines] *)
-val iter_lines : t -> (string -> unit) -> unit
-
-
-(* ************************************************************************* *)
-(** {2 Low level file Input/Output} *)
-(* ************************************************************************* *)
-
-(** This type defines what action {!with_open_in} and {!with_open_out} must
-    perform when the file to open does not exist. *)
-type action_if_missing =
-  | Create of int (** create the file with the given permissions *)
-  | DoNotCreate (** do not create the file and fail *)
-
-(** This type define what action [with_open_out] must perform when the file to
-    open already exists. *)
-type action_if_exists =
-  | Error (** file opening functions will fail with an error *)
-  | Append (** the writing contents will be appended *)
-  | Truncate (** the file will be truncated before any writes *)
-
-(** A [safe_processor] helps to handle file operations while ensuring the
-    file will be closed no matter what happens. It is a function that takes
-    a file operation [f] as a parameter, opens a file and calls the [f] with
-    the newly-created channel. *)
-type ('ch,'a) safe_processor = ('ch -> 'a) -> ('a,string) result
-
-(** Same as [safe_processor] but when a [Sys_error] is raised, re-raise it
-    after closing the file *)
-type ('ch,'a) exn_processor = ('ch -> 'a) -> 'a
-
-(** [with_open_in path f] opens file [path] for reading and calls [f] with the
-    newly-created input channel. The file is closed when [f] returns or whenever
-    an exception is thrown by [f].
-    @param if_missing defines what must be done if the file does not exist,
-    defaults to [DoNotCreate].
-    @param binary must be set if the file needs to be opened in binary mode
-    (disables conversion, e.g. new lines), defaults to [false]
-    @param blocking must be unset if the file needs to be opened in nonblocking
-    mode, defaults to [true].
-    @return [Ok (f input_channel)] if no exceptions are thrown, or [Error s]
-    if a [Sys_error s] is thrown during the execution of [f] or during the
-    closing of the file.
-    @since Frama-C+dev *)
-val with_open_in:
-  ?if_missing:action_if_missing ->
-  ?binary:bool ->
-  ?blocking:bool ->
-  t ->
-  (in_channel, 'a) safe_processor
-
-(** Same as {!with_open_in} but raises [Sys_error] instead of returning [Error].
-    @since Frama-C+dev
-    @before Frama-C+dev this function was [Command.read_file] *)
-val with_open_in_exn :
-  ?if_missing:action_if_missing ->
-  ?binary:bool ->
-  ?blocking:bool ->
-  t ->
-  (in_channel, 'a) exn_processor
-
-(** [with_open_out path f] calls [f] with a new output channel on the file [path]
-    opened for writing. The file is closed when [f] returns or whenever an
-    exception is thrown by [f].
-    @param if_missing defines what must be done if the file does not exist,
-    defaults to [Create 0o666].
-    @param if_exists defines what action must be performed when the file already
-    exists, defaults to [Truncate].
-    @param binary must be set if the file needs to be opened in binary mode
-    (disables conversion, e.g. new lines), defaults to [false].
-    @param blocking must be unset if the file needs to be opened in nonblocking
-    mode, defaults to [true].
-
-    @return [Ok (f output_channel)] if no exceptions are thrown, or [Error s]
-    if a [Sys_error s] is thrown during the execution of [f] or during the
-    closing the file.
-    @since Frama-C+dev *)
-val with_open_out:
-  ?if_missing:action_if_missing ->
-  ?if_exists:action_if_exists ->
-  ?binary:bool ->
-  ?blocking:bool ->
-  t ->
-  (out_channel, 'a) safe_processor
-
-(** Same as {!with_open_out} but raises [Sys_error] instead of returning [Error].
-    @since Frama-C+dev
-    @before Frama-C+dev this function was [Command.write_file] *)
-val with_open_out_exn:
-  ?if_missing:action_if_missing ->
-  ?if_exists:action_if_exists ->
-  ?binary:bool ->
-  ?blocking:bool ->
-  t ->
-  (out_channel, 'a) exn_processor
-
-
-(** [with_formatter_exn path f] calls [f] with a formatter writing to the file
-    [path]. The file is closed and the formatter is flushed when [f] returns or
-    whenever an exception is thrown by [f].
-
-    @return [Ok (f fmt)] if no exceptions are thrown, or [Error s]
-    if a [Sys_error s] is thrown during the execution of [f] or when
-    closing the file.
-    @since Frama-C+dev *)
-val with_formatter: t -> (Format.formatter, 'a) safe_processor
-
-(** Same as {!with_formatter} but raises [Sys_error] instead of returning
-    [Error].
-    @since Frama-C+dev
-    @before Frama-C+dev this function was [Command.pp_to_file] and
-    [Command.print_file] *)
-val with_formatter_exn: t -> (Format.formatter, 'a) exn_processor
-
-(** Opening this module allows to use shorter syntax to deal with files.
-
-    {[
-      let open Filepath.Operators in
-      let result =
-        let+ channel = Filepath.with_open_out filepath in
-        output_string channel "42";
-      in
-      match result with
-      | Ok () -> ()
-      | Error error ->
-        Format.printf "error writing to file %a: %s"
-          Filepath.pretty filepath
-          error
-    ]}
-
-    When the file processing returns a result by itself, the operator [let*]
-    can be used instead:
-
-    {[
-      let open Filepath.Operators in
-      let* channel = Filepath.with_open_in filepath in
-      try
-        let header = input_line channel in
-        if header = "42"
-        then Ok ()
-        else Error "wrong file header"
-      with End_of_file ->
-        Error "file is empty"
-    ]} *)
-module Operators : sig
-  (** {3 Result operators}
-      These operators are intended to be used with {!with_open_in} or {!with_open_out}.
-  *)
-
-  val (let+): ('ch,'a) safe_processor -> ('ch -> 'a) -> ('a,string) result
-  val (let*):
-    ('ch,('a,string) result) safe_processor ->
-    ('ch -> ('a,string) result) ->
-    ('a,string) result
-
-  (** {3 Exception operators}
-      These operators are intended to be used with {!with_open_in_exn} or
-      {!with_open_out_exn}, error [Sys_error] must be caught.
-  *)
-
-  val (let$): ('ch,'a) exn_processor -> ('ch -> 'a) -> 'a
-end
-
-
-(* ************************************************************************* *)
 (** {2 Deprecated functions} *)
 (* ************************************************************************* *)
 
 val normalize: ?existence:existence -> ?base_name:string -> string -> string
 [@@deprecated "Use Filepath.of_string instead."]
 
-val bincopy : bytes -> in_channel -> out_channel -> unit
-(** [copy buffer cin cout] reads [cin] until end-of-file
-    and copy it in [cout].
-    [buffer] is a temporary string used during the copy.
-    Recommended size is [2048]. *)
-[@@deprecated "This function is only used locally and is not exported anymore."]
+val exists: t -> bool
+[@@deprecated "Use Filesystem.exists instead"]
+[@@migrate { repl = Filesystem.exists } ]
+
+val is_file: t -> bool
+[@@deprecated "Use Filesystem.is_file instead"]
+[@@migrate { repl = Filesystem.is_file } ]
+
+val is_dir: t -> bool
+[@@deprecated "Use Filesystem.is_dir instead"]
+[@@migrate { repl = Filesystem.is_dir } ]
+
+val readdir: t -> string array
+[@@deprecated "Use Filesystem.readdir instead"]
+[@@migrate { repl = Filesystem.readdir } ]
+
+val remove: t -> unit
+[@@deprecated "Use Filesystem.remove instead"]
+[@@migrate { repl = Filesystem.remove } ]
+
+val rename: t -> t -> unit
+[@@deprecated "Use Filesystem.rename instead"]
+[@@migrate { repl = Filesystem.rename } ]
+
+val copy_file : t -> t -> unit
+[@@deprecated "Use Filesystem.copy_file instead"]
+[@@migrate { repl = Filesystem.copy_file } ]
+
+val iter_lines : t -> (string -> unit) -> unit
+[@@deprecated "Use Filesystem.iter_lines instead"]
+[@@migrate { repl = Filesystem.iter_lines } ]
 
 module Normalized: sig
   type nonrec t = t
@@ -476,6 +300,7 @@ module Normalized: sig
   val is_empty: t -> bool
   val is_special_stdout: t -> bool
   val is_file: t -> bool
+  [@@deprecated "Use Filesystem.is_file."]
   val to_base_uri: t -> string option * string
 end
 [@@deprecated "Use Filepath directly instead."]

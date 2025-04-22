@@ -194,11 +194,11 @@ let to_dot_file ~temp ?in_kf reason =
     try
       let f name ext =
         if temp
-        then Extlib.temp_file_cleanup_at_exit name ext
+        then Filesystem.temp_file_cleanup_at_exit name ext
         else Filename.temp_file name ext
       in
       f "impact_reason" ".dot"
-    with Extlib.Temp_file_error s ->
+    with Filesystem.Temp_file_error s ->
       Options.abort "cannot create temporary file: %s" s
   in
   let cout = open_out dot_file in

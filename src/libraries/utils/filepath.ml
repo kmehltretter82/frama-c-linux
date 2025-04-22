@@ -359,26 +359,6 @@ let all_symbolic_dirs () =
 
 
 (* -------------------------------------------------------------------------- *)
-(* --- File system                                                        --- *)
-(* -------------------------------------------------------------------------- *)
-
-let exists (s : t) = Sys.file_exists (s :> string)
-
-let is_file fp =
-  try
-    (Unix.stat (fp :> string)).Unix.st_kind = Unix.S_REG
-  with _ -> false
-
-let is_dir (s : t) = Sys.is_directory (s :> string)
-
-let readdir (s : t) = Sys.readdir (s :> string)
-
-let remove (s : t) = Sys.remove (s :> string)
-
-let rename s t = Sys.rename s t
-
-
-(* -------------------------------------------------------------------------- *)
 (* --- Position in source file                                            --- *)
 (* -------------------------------------------------------------------------- *)
 
@@ -407,137 +387,21 @@ let pp_pos fmt pos =
 let is_empty_pos pos = pos == empty_pos
 
 
-(* -------------------------------------------------------------------------- *)
-(* --- Low level Input/Output                                            --- *)
-(* -------------------------------------------------------------------------- *)
-
-type action_if_missing = Create of int | DoNotCreate
-type action_if_exists = Error | Append | Truncate
-
-type ('ch,'a) safe_processor = ('ch -> 'a) -> ('a,string) result
-type ('ch,'a) exn_processor = ('ch -> 'a) -> 'a
-
-let flags_and_perm ?if_exists ~if_missing ~binary ~blocking default =
-  let l =
-    default ::
-    (if binary then [Open_binary] else [Open_text]) @
-    (if blocking then [] else [Open_nonblock]) @
-    match if_exists with
-    | Some Error -> [Open_excl]
-    | Some Append ->  [Open_append]
-    | Some Truncate -> [Open_trunc]
-    | None -> []
-  in
-  match if_missing with
-  | DoNotCreate -> l, 0 (* perm is ignored when Open_creat is not set *)
-  | Create mode -> Open_creat :: l, mode
-
-(* We don't directly use Fun.protect as it catches exceptions in [finally]
-   and reraise them as [Finally_raised exn]. However, a [Sys_error] can be
-   raised by {!close_out} (and {!close_in} but it should not happen).
-*)
-let protect_file_op ~(close: 'ch -> unit) (job: 'ch -> 'a) (channel: 'ch) =
-  let r =
-    try job channel with
-    | exn ->
-      try
-        close channel;
-        raise exn
-      with
-      | Sys_error _ ->
-        raise exn (* re-raise the first exception, do not erase it *)
-  in
-  close channel;
-  r
-
-let check_nonempty p =
-  if is_empty p then
-    invalid_arg "path should not be empty"
-
-let with_open_in_exn
-    ?(if_missing=DoNotCreate)
-    ?(binary=false)
-    ?(blocking=true)
-    (p: t)
-    (job: in_channel -> 'a): 'a =
-  check_nonempty p;
-  let flags, perm =
-    flags_and_perm ~if_missing ~binary ~blocking Open_rdonly
-  in
-  open_in_gen flags perm p |> protect_file_op ~close:close_in job
-
-let with_open_in ?if_missing ?binary ?blocking p job =
-  try Ok (with_open_in_exn ?if_missing ?binary ?blocking p job)
-  with Sys_error s -> Error s
-
-let with_open_out_exn
-    ?(if_missing=Create 0o666)
-    ?(if_exists=Truncate)
-    ?(binary=false)
-    ?(blocking=true)
-    (p: t)
-    (job: out_channel -> 'a): 'a =
-  check_nonempty p;
-  let flags, perm =
-    flags_and_perm ~if_exists ~if_missing ~binary ~blocking Open_wronly
-  in
-  open_out_gen flags perm p |> protect_file_op ~close:close_out job
-
-let with_open_out ?if_missing ?if_exists ?binary ?blocking p job =
-  try Ok (with_open_out_exn ?if_missing ?if_exists ?binary ?blocking p job)
-  with Sys_error s -> Error s
-
-module Operators =
-struct
-  let (let+) with_open job = with_open job
-  let (let*) with_open job = with_open job |> Result.join
-  let (let$) with_open job = with_open job
-end
-
-
-(* -------------------------------------------------------------------------- *)
-(* --- High level Input/Output                                            --- *)
-(* -------------------------------------------------------------------------- *)
-
-open Operators
-
-let with_formatter_exn p job =
-  let$ out_channel = with_open_out_exn p in
-  let fmt = Format.formatter_of_out_channel out_channel in
-  let finally = Format.pp_print_flush fmt in
-  Fun.protect ~finally (fun () -> job fmt)
-
-let with_formatter p job =
-  try Ok (with_formatter_exn p job)
-  with Sys_error s -> Error s
-
-let rec bincopy buffer in_channel out_channel =
-  let s = Bytes.length buffer in
-  let n = input in_channel buffer 0 s in
-  if n > 0 then
-    ( output out_channel buffer 0 n ; bincopy buffer in_channel out_channel )
-  else
-    ( flush out_channel )
-
-let copy_file src tgt =
-  let$ in_channel = with_open_in_exn src in
-  let$ out_channel = with_open_out_exn tgt in
-  bincopy (Bytes.create 2048) in_channel out_channel
-
-let iter_lines p job =
-  let$ in_channel = with_open_in_exn p in
-  try
-    while true do
-      job (input_line in_channel) ;
-    done
-  with End_of_file -> ()
-
 
 (* -------------------------------------------------------------------------- *)
 (* --- Deprecated Normalized module                                       --- *)
 (* -------------------------------------------------------------------------- *)
 
 let normalize ?existence ?base_name s = of_string ?existence ?base:base_name s
+
+let exists _ = failwith "deprecated"
+let is_file _ = failwith "deprecated"
+let is_dir _ = failwith "deprecated"
+let readdir  _ = failwith "deprecated"
+let remove _ = failwith "deprecated"
+let rename _ = failwith "deprecated"
+let copy_file _ = failwith "deprecated"
+let iter_lines _ = failwith "deprecated"
 
 module Normalized = struct
   type nonrec t = t
@@ -558,6 +422,7 @@ module Normalized = struct
   let is_special_stdout = is_special_stdout
   let pretty = pretty
   let pp_abs = pp_abs
-  let is_file = is_file
+  let is_file p =
+    try (Unix.stat (p :> string)).Unix.st_kind = Unix.S_REG with _ -> false
   let to_base_uri = to_base_uri
 end

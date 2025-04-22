@@ -31,7 +31,7 @@ val pp_to_file : Filepath.t -> (Format.formatter -> unit) -> unit
     The formatter is always properly flushed and closed on return.
     Exceptions in [pp] are re-raised after closing. *)
 [@@deprecated "Use Filepath.with_formatter_exn instead."]
-[@@migrate { repl = Filepath.with_formatter_exn } ]
+[@@migrate { repl = Filesystem.with_formatter_exn } ]
 
 val bincopy : bytes -> in_channel -> out_channel -> unit
 (** [copy buffer cin cout] reads [cin] until end-of-file
@@ -44,7 +44,7 @@ val bincopy : bytes -> in_channel -> out_channel -> unit
 val copy : Filepath.t -> Filepath.t -> unit
 (** [copy source target] copies source file to target file using [bincopy]. *)
 [@@deprecated "Use Filepath.copy instead."]
-[@@migrate { repl = Filepath.copy_file } ]
+[@@migrate { repl = Filesystem.copy_file } ]
 
 val read_file : Filepath.t -> (in_channel -> 'a) -> 'a
 (** Properly close the channel and re-raise exceptions *)
@@ -64,7 +64,7 @@ val write_file : Filepath.t -> (out_channel -> 'a) -> 'a
 val print_file : Filepath.t -> (Format.formatter -> 'a) -> 'a
 (** Properly flush and close the channel and re-raise exceptions *)
 [@@deprecated "Use Filepath.with_formatter_exn instead."]
-[@@migrate { repl = Filepath.with_formatter_exn } ]
+[@@migrate { repl = Filesystem.with_formatter_exn } ]
 
 (* ************************************************************************* *)
 (** {2 Pretty from files} *)

@@ -14,7 +14,7 @@ let main () =
   check "default" (<>);
   Kernel.Files.set [];
   Project.load_all fp;
-  Extlib.safe_remove "foo.sav";
+  Filesystem.safe_remove_file "foo.sav";
   ignore (Project.create_by_copy ~last:false "bar");
   assert
     (Project.equal (Project.current ()) (Project.from_unique_name "default"));

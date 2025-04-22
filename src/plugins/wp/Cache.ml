@@ -70,9 +70,9 @@ let is_session_dir path =
 let get_usable_dir ?(make=false) () =
   let path = CACHEDIR.get () in
   let parents = is_session_dir path in
-  if not (Filepath.exists path) && make then
-    ignore (Extlib.mkdir ~parents path 0o755);
-  if not (Filepath.is_dir path) then begin
+  if not (Filesystem.exists path) && make then
+    ignore (Filesystem.make_dir ~parents path 0o755);
+  if not (Filesystem.is_dir path) then begin
     Wp_parameters.warning ~current:false ~once:true
       "Cache path %a is not a directory"
       Filepath.pretty path;
@@ -187,7 +187,7 @@ let get_cache_result ~mode hash =
       let hash = Lazy.force hash in
       let file = file_from_hash hash in
       let path = Filepath.of_string file in
-      if not (Filepath.exists path) then VCS.no_result
+      if not (Filesystem.exists path) then VCS.no_result
       else
         try
           mark_cache ~mode hash ;
@@ -217,7 +217,7 @@ let clear_result ~digest prover goal =
   try
     let hash = digest prover goal in
     let file = file_from_hash hash in
-    Extlib.safe_remove file
+    Filesystem.safe_remove_file file
   with err ->
     Wp_parameters.warning ~current:false ~once:true
       "can not clean cache entry (%s)" (Printexc.to_string err)
@@ -238,7 +238,7 @@ let cleanup_cache () =
                if not (Hashtbl.mem cleanup hash) then
                  begin
                    incr removed ;
-                   Extlib.safe_remove (Printf.sprintf "%s/%s" dir f) ;
+                   Filesystem.safe_remove_file (Printf.sprintf "%s/%s" dir f) ;
                  end
           ) (Sys.readdir dir) ;
     with

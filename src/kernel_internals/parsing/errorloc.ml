@@ -125,7 +125,7 @@ let setCurrentFile n =
   let current = Option.get !current in
   let base = current.current_working_directory in
   let norm = Filepath.of_string ?base n in
-  if not (is_special_file n) && not (Filepath.exists norm)
+  if not (is_special_file n) && not (Filesystem.exists norm)
   then begin
     currentLine := None;
     Kernel.warning ~wkey:Kernel.wkey_line_directive ~once:true
@@ -145,14 +145,14 @@ let setCurrentFile n =
    similar to 'grep -C<ctx>'.
    Most exceptions are silently caught and printing is stopped if they occur. *)
 let pp_context_from_file ?(ctx=2) fmt (start_pos, pos) =
-  let open Filepath.Operators in
+  let open Filesystem.Operators in
   let open Filepath in
   let start_pos =
-    if equal start_pos.pos_path pos.pos_path then start_pos
+    if Filepath.equal start_pos.pos_path pos.pos_path then start_pos
     else pos
   in
   try
-    let$ in_ch = with_open_in_exn pos.pos_path in
+    let$ in_ch = Filesystem.with_open_in_exn pos.pos_path in
     let first_error_line, start_char, last_error_line =
       min start_pos.pos_lnum pos.pos_lnum,
       (start_pos.pos_cnum - start_pos.pos_bol),

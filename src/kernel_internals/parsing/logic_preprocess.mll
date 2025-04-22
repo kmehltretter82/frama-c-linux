@@ -171,15 +171,15 @@
     if !has_annot then begin
       let debug = Kernel.is_debug_key_enabled Kernel.dkey_pp_keep_temp_files in
       let ppname =
-        try Extlib.temp_file_cleanup_at_exit ~debug "ppannot" suffix
-        with Extlib.Temp_file_error s ->
+        try Filesystem.temp_file_cleanup_at_exit ~debug "ppannot" suffix
+        with Filesystem.Temp_file_error s ->
           Kernel.abort
             "Could not open temporary file for logic preprocessing: %s" s
       in
       let ppfile = open_out ppname in
       Buffer.output_buffer ppfile preprocess_buffer;
       close_out ppfile;
-      let cppname = Extlib.temp_file_cleanup_at_exit ~debug "cppannot" suffix in
+      let cppname = Filesystem.temp_file_cleanup_at_exit ~debug "cppannot" suffix in
       let pp_cmd = cpp ppname cppname in
       Kernel.feedback ~dkey:Kernel.dkey_pp_logic
         "logic preprocessing with \"%s\"" pp_cmd;
@@ -187,7 +187,7 @@
       let result_file =
         if res <> 0 then begin
           abort_preprocess "Preprocessor call exited with an error";
-          if not debug then Extlib.safe_remove cppname;
+          if not debug then Filesystem.safe_remove_file cppname;
           ppname
         end else cppname
       in
@@ -543,7 +543,7 @@ parse
     | Ok source ->
       let lex = Lexing.from_string source in
       let ppname =
-        Extlib.temp_file_cleanup_at_exit ~debug
+        Filesystem.temp_file_cleanup_at_exit ~debug
           (Filename.basename filename) ".pp"
       in
       let fp_of_string = Filepath.of_string in

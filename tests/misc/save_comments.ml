@@ -30,7 +30,7 @@ let run () =
   File.pretty_ast ~fmt ();
   let file =
     Filepath.of_string
-      (Extlib.temp_file_cleanup_at_exit "save_comments_test" ".sav")
+      (Filesystem.temp_file_cleanup_at_exit "save_comments_test" ".sav")
   in
   let name = "saved_project" in
   find_comment ();

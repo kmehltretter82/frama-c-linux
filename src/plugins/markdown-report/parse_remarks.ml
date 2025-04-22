@@ -80,9 +80,9 @@ let parse_line env line =
       let f = Str.matched_group 1 line in
       Mdr_params.debug ~dkey
         "Remark for section %s in file %s" env.current_section f;
-      let open Filepath.Operators in
+      let open Filesystem.Operators in
       let result =
-        let+ chan = Filepath.(with_open_in (of_string f)) in
+        let+ chan = Filesystem.with_open_in (Filepath.of_string f) in
         add_channel env chan
       in
       match result with
@@ -117,7 +117,7 @@ let parse_remarks env chan =
 let get_remarks f =
   Mdr_params.debug ~dkey "Using remarks file %a"
     Filepath.pretty f;
-  match Filepath.with_open_in f (parse_remarks (empty_env ())) with
+  match Filesystem.with_open_in f (parse_remarks (empty_env ())) with
   | Ok { remarks } -> remarks
   | Error err ->
     Mdr_params.error

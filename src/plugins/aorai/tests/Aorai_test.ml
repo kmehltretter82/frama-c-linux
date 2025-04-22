@@ -88,7 +88,7 @@ let extend () =
           (fun () ->
              if Debug.get () >= 1 || not !ok then
                result "Keeping temp file %s" tmpfile
-             else Extlib.safe_remove tmpfile)
+             else Filesystem.safe_remove_file tmpfile)
       in
       let chan = open_out tmpfile in
       let fmt = Format.formatter_of_out_channel chan in
