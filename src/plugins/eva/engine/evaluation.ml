@@ -137,10 +137,9 @@ let may_be_reduced_lval lval =
 
 let warn_pointer_comparison typ =
   match Parameters.WarnPointerComparison.get () with
-  | "none" -> false
-  | "all" -> true
-  | "pointer" -> Ast_types.(is_ptr (unroll typ))
-  | _ -> assert false
+  | `None -> false
+  | `All -> true
+  | `Pointer -> Ast_types.(is_ptr (unroll typ))
 
 let propagate_all_pointer_comparison typ =
   not (Ast_types.is_ptr typ)

@@ -415,15 +415,15 @@ let () = add_correctness_dep UndefinedPointerComparisonPropagateAll.parameter
 
 let () = Parameter_customize.set_group alarms
 module WarnPointerComparison =
-  String
+  Enum
     (struct
+      type t = [ `All | `Pointer | `None ]
       let option_name = "-eva-warn-undefined-pointer-comparison"
       let help = "Warn on all pointer comparisons, on comparisons where \
                   the arguments have pointer type (default), or never warn"
-      let default = "pointer"
-      let arg_name = "all|pointer|none"
+      let default = `Pointer
+      let values = [ `All, "all"; `Pointer, "pointer"; `None, "none" ]
     end)
-let () = WarnPointerComparison.set_possible_values ["all"; "pointer"; "none"]
 let () = add_correctness_dep WarnPointerComparison.parameter
 
 let () = Parameter_customize.set_group alarms
@@ -547,17 +547,20 @@ let () = add_correctness_dep AllocatedContextValid.parameter
 
 let () = Parameter_customize.set_group initial_context
 module InitializationPaddingGlobals =
-  String
+  Enum
     (struct
-      let default = "yes"
+      type t =   [ `Initialized | `Uninitialized | `MaybeInitialized ]
       let option_name = "-eva-initialization-padding-globals"
-      let arg_name = "yes|no|maybe"
       let help = "Specify how padding bits are initialized inside global \
                   variables. Possible values are <yes> (padding is fully \
                   initialized), <no> (padding is completely uninitialized), or \
                   <maybe> (padding may be uninitialized). Default is <yes>."
+      let default = `Initialized
+      let values =
+        [ `Initialized, "yes";
+          `Uninitialized, "no" ;
+          `MaybeInitialized, "maybe" ]
     end)
-let () = InitializationPaddingGlobals.set_possible_values ["yes"; "no"; "maybe"]
 let () = add_correctness_dep InitializationPaddingGlobals.parameter
 
 (* ------------------------------------------------------------------------- *)
