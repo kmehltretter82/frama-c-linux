@@ -692,11 +692,11 @@ module SymbolicPath =
 
 let () =
   SymbolicPath.add_update_hook
-    (fun _old map ->
+    (fun _prev curr ->
        (* keep module [Filepath] synchronized with [SymbolicPath] *)
+       let module FMap = Datatype.Filepath.Map in
        Filepath.reset_symbolic_dirs ();
-       Datatype.Filepath.Map.iter
-         (fun n p -> Filepath.add_symbolic_dir p n) map)
+       FMap.iter (fun f n -> Filepath.add_symbolic_dir n f) curr)
 
 (* [SymbolicPath] is better to be not projectified,
    but must be saved: use a fake state for saving it without projectifying it *)

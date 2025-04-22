@@ -35,9 +35,6 @@ type t = string
 *)
 let pwd () = Unix.(realpath (getcwd ()))
 
-let cwd =
-  Hpath.(insert dummy (pwd ()))
-
 
 (* -------------------------------------------------------------------------- *)
 (* --- Conversion from string                                             --- *)
@@ -51,32 +48,27 @@ type existence =
 exception No_file
 exception File_exists
 
-let of_string ?(existence=Indifferent) ?base path_name =
-  let path =
-    if path_name = ""
-    then ""
-    else
-      let base =
-        match base with
-        | None -> cwd
-        | Some (b : t) -> Hpath.insert cwd b
-      in
-      let norm_path_name = (Hpath.insert base path_name).path_name in
-      if norm_path_name = ""
-      then "/"
-      else norm_path_name
-  in
+let normalize ?base s =
+  if s = ""
+  then ""
+  else
+    let norm_path_name = Hpath.(of_string ?base s |> to_string) in
+    if norm_path_name = ""
+    then "/"
+    else norm_path_name
+
+let check_existence ~existence p =
   match existence with
-  | Indifferent ->
-    path
-  | Must_exist ->
-    if Sys.file_exists path
-    then path
-    else raise No_file
-  | Must_not_exist ->
-    if Sys.file_exists path
-    then raise File_exists
-    else path
+  | Must_exist when not (Sys.file_exists p) ->
+    raise No_file
+  | Must_not_exist when Sys.file_exists p ->
+    raise File_exists
+  | _ -> ()
+
+let of_string ?(existence=Indifferent) ?base s =
+  let p = normalize ?base s in
+  check_existence ~existence p;
+  p
 
 let to_string_list l = l
 
@@ -108,54 +100,31 @@ let is_special_stdout fp = equal fp special_stdout
 (* --- Pretty printing                                                    --- *)
 (* -------------------------------------------------------------------------- *)
 
-let rec add_uri_path buffer path =
-  let open Buffer in
-  match path.Hpath.symbolic_name with
-  | None ->
-    begin
-      match path.dir with
-      | None -> add_string buffer path.path_name; None
-      | Some d ->
-        if d != cwd (* hconsed *) then begin
-          let symb_base = add_uri_path buffer d in
-          add_char buffer '/';
-          add_string buffer path.base_name;
-          symb_base
-        end else begin
-          add_string buffer path.base_name;
-          Some "PWD"
-        end
-    end
-  | Some sn -> Some sn
+let to_base_uri name =
+  Hpath.(of_string name |> to_uri)
 
-let add_path path =
-  let buf = Buffer.create 80 in
-  match add_uri_path buf path with
-  | None -> Buffer.contents buf
-  | Some "PWD" -> Buffer.contents buf
-  | Some symb -> symb ^ Buffer.contents buf
-
-let rec skip_dot file_name =
-  if String.starts_with ~prefix:"./" file_name then
-    skip_dot (String.sub file_name 2 (String.length file_name - 2))
-  else file_name
-
-let to_pretty_string file_name =
-  if file_name = "" then
+let to_pretty_string p =
+  let rec skip_dot s =
+    if String.starts_with ~prefix:"./" s then
+      skip_dot (String.sub s 2 (String.length s - 2))
+    else s
+  in
+  if is_special_stdout p then
+    "<stdout>"
+  else if is_empty p then
     "<unknown location>"
-  else if Filename.is_relative file_name then
-    skip_dot file_name
+  else if Filename.is_relative p then
+    skip_dot p
   else
-    let path = Hpath.insert cwd file_name in
-    skip_dot (add_path path)
+    let s = match to_base_uri p with
+      | None, uri -> uri
+      | Some "PWD", uri -> uri
+      | Some symb, uri -> symb ^ "/" ^ uri
+    in
+    skip_dot s
 
 let pretty fmt p =
-  if is_special_stdout p then
-    Format.fprintf fmt "<stdout>"
-  else if is_empty p then
-    Format.fprintf fmt "<unknown location>"
-  else
-    Format.fprintf fmt "%s" (to_pretty_string p)
+  Format.pp_print_string fmt (to_pretty_string p)
 
 let compare_pretty ?(case_sensitive=false) s1 s2 =
   let s1 = to_pretty_string s1 in
@@ -185,31 +154,16 @@ let concats ?existence t sl =
   let s' = List.fold_left (fun acc s -> acc ^ "/" ^ s) "" sl in
   of_string ?existence (t ^ s')
 
-let to_base_uri name =
-  let p = Hpath.insert cwd name in
-  let buf = Buffer.create 80 in
-  let res = add_uri_path buf p in
-  let uri =
-    Buffer.contents buf in
-  let uri =
-    try
-      if String.get uri 0 = '/' then
-        String.sub uri 1 (String.length uri - 1)
-      else uri
-    with Invalid_argument _ -> uri
-  in
-  res, uri
-
 
 (* -------------------------------------------------------------------------- *)
 (* --- Relative Paths                                                     --- *)
 (* -------------------------------------------------------------------------- *)
 
-let relativize ?base_name file_name =
-  let file_name = (Hpath.insert cwd file_name).path_name in
+let relativize ?base_name p =
+  let file_name = normalize p in
   let base_name = match base_name with
-    | None -> cwd.path_name
-    | Some b -> (Hpath.insert cwd b).path_name
+    | None -> Hpath.(cwd |> to_string)
+    | Some b -> Hpath.(of_string b |> to_string)
   in
   if base_name = file_name then "." else
     let base_name = base_name ^ Filename.dir_sep in
@@ -220,12 +174,11 @@ let relativize ?base_name file_name =
     else file_name
 
 let is_relative ?base_name file_name =
-  let file_name = (Hpath.insert cwd file_name).path_name in
   let base_name = match base_name with
-    | None -> cwd.path_name
-    | Some b -> (Hpath.insert cwd b).path_name
+    | None -> Hpath.(cwd |> to_string)
+    | Some b -> Hpath.(of_string b |> to_string)
   in
-  base_name = file_name
+  String.equal base_name file_name
   || String.starts_with ~prefix:(base_name ^ Filename.dir_sep) file_name
 
 
@@ -233,27 +186,21 @@ let is_relative ?base_name file_name =
 (* --- Symboling Names                                                    --- *)
 (* -------------------------------------------------------------------------- *)
 
-(* Note: Symbolic directories are not currently projectified *)
-let symbolic_dirs = Hashtbl.create 3
+let add_symbolic_dir name p =
+  Hpath.(Names.add (of_string p) name)
 
-let add_symbolic_dir name dir =
-  Hashtbl.replace symbolic_dirs dir name ;
-  (Hpath.insert cwd (dir:>string)).symbolic_name <- Some name
+let add_symbolic_dir_list name l =
+  List.iter (fun p -> Hpath.(Names.add (of_string p)) name) l
 
-(** Initialize using Config *)
-let add_symbolic_dir_list name =
-  List.iter (fun d -> add_symbolic_dir name d)
+let remove_symbolic_dir p =
+  Hpath.Names.remove (Hpath.of_string p)
 
-let reset_symbolic_dirs () = Hashtbl.clear symbolic_dirs
+let reset_symbolic_dirs () =
+  Hpath.Names.reset ()
 
 let all_symbolic_dirs () =
-  let compare (s1, s1') (s2, s2') =
-    let c = String.compare s1 s2 in
-    if c <> 0 then c
-    else String.compare s1' s2'
-  in
-  List.sort compare @@
-  Hashtbl.fold (fun dir name acc -> (name, dir) :: acc) symbolic_dirs []
+  Hpath.Names.all ()
+  |> List.map (fun (path, name) -> (name, Hpath.to_string path))
 
 
 (* -------------------------------------------------------------------------- *)

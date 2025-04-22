@@ -206,19 +206,25 @@ val pwd : unit -> t
 (** [add_symbolic_dir name dir] indicates that the (absolute) path [dir] must
     be replaced by [name] when pretty-printing paths.
     This alias ensures that system-dependent paths such as FRAMAC_SHARE are
-    printed identically in different machines. *)
+    printed identically in different machines.
+    @before Frama-C+dev was in Filepath *)
 val add_symbolic_dir: string -> t -> unit
 
 val add_symbolic_dir_list: string -> t list -> unit
 
 (** Remove all symbolic dirs that have been added earlier.
-    @since 23.0-Vanadium *)
+    @since Frama-C+dev *)
+val remove_symbolic_dir: t -> unit
+
+(** Remove all symbolic dirs that have been added earlier.
+    @since 23.0-Vanadium
+    @before Frama-C+dev was in Filepath *)
 val reset_symbolic_dirs: unit -> unit
 
 (** Returns the list of symbolic dirs added via [add_symbolic_dir], plus
     preexisting ones (e.g. FRAMAC_SHARE), as pairs (name, dir).
-
-    @since 22.0-Titanium *)
+    @since 22.0-Titanium
+    @before Frama-C+dev was in Filepath *)
 val all_symbolic_dirs: unit -> (string * t) list
 
 
