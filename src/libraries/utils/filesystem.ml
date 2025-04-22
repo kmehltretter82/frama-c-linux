@@ -26,48 +26,51 @@ open Filepath
 (* --- File system                                                        --- *)
 (* -------------------------------------------------------------------------- *)
 
-let exists (s : t) =
-  Sys.file_exists (s :> string)
+let exists (p : t) =
+  Sys.file_exists (p :> string)
 
-let is_file (fp : t) =
+let is_file (p : t) =
   try
-    (Unix.stat (fp :> string)).Unix.st_kind = Unix.S_REG
+    (Unix.stat (p :> string)).Unix.st_kind = Unix.S_REG
   with _ -> false
 
-let is_dir (s : t) = Sys.is_directory (s :> string)
+let is_dir (p : t) = Sys.is_directory (p :> string)
 
-let readdir (s : t) = Sys.readdir (s :> string)
+let readdir (p : t) = Sys.readdir (p :> string)
 
-let remove_file (f : t) = try Unix.unlink (f :> string) with Unix.Unix_error _ -> ()
+let remove_file (p : t) =
+  try
+    Unix.unlink (p :> string)
+  with Unix.Unix_error _ -> ()
 
-let rec remove_dir (d : t) =
+let rec remove_dir (p : t) =
   try
     Array.iter
       (fun a ->
-         let f = Filepath.concat d a in
+         let f = Filepath.concat p a in
          if is_dir f then remove_dir f else remove_file f
-      ) (readdir d) ;
-    Unix.rmdir (d :> string)
+      ) (readdir p) ;
+    Unix.rmdir (p :> string)
   with Unix.Unix_error _ | Sys_error _ -> ()
 
 let rename (s : t) (t : t) = Sys.rename (s :> string) (t :> string)
 
-let rec make_dir ?(parents=false) (name: t) perm =
-  if exists name then
-    if not (is_dir name) then
+let rec make_dir ?(parents=false) (p: t) perm =
+  if exists p then
+    if not (is_dir p) then
       failwith (Format.asprintf "mkdir: %a exists but is not a directory"
-                  Filepath.pretty name)
+                  Filepath.pretty p)
     else false
   else begin
     begin
-      try Unix.mkdir (name:>string) perm
+      try Unix.mkdir (p :> string) perm
       with
       | Unix.Unix_error (Unix.ENOENT,_,_) when parents ->
-        let parent_name = Filepath.dirname name in
-        if name <> parent_name then
+        let parent = Filepath.dirname p in
+        if p <> parent then
           begin
-            ignore (make_dir ~parents parent_name perm);
-            Unix.mkdir (name:>string) perm
+            ignore (make_dir ~parents parent perm);
+            Unix.mkdir (p :> string) perm
           end
       | e -> raise e
     end;
