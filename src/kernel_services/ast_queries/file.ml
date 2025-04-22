@@ -393,11 +393,6 @@ let pretty_machdep ?fmt ?machdep () =
 (** {2 Initializations} *)
 (* ************************************************************************* *)
 
-let create_temp_file prefix suffix =
-  try Temp_files.file prefix suffix
-  with Filesystem.Temp_file_error s ->
-    Kernel.abort "cannot create temporary file: %s" s
-
 let safe_remove_file (f : Filepath.t) =
   if not (Kernel.is_debug_key_enabled Kernel.dkey_pp_keep_temp_files) then
     Filesystem.remove_file f
@@ -488,7 +483,7 @@ let build_cpp_cmd = function
       | Not_gnu -> [], []
       | Unknown -> opt :: to_warn, [opt]
     in
-    let ppf = create_temp_file (Filepath.basename f) ".i" in
+    let ppf = Temp_files.file (Filepath.basename f) ".i" in
     (* Hypothesis: the preprocessor is POSIX compliant,
        hence understands -I and -D. *)
     let fc_include_args =

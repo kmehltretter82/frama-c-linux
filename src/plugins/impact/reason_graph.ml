@@ -191,13 +191,10 @@ let to_dot_formatter ?in_kf reason fmt =
 (* May raise [Sys_error] *)
 let to_dot_file ~temp ?in_kf reason =
   let dot_file =
-    try
-      let prefix = "impact_reason" and suffix = ".dot" in
-      if temp
-      then Temp_files.file prefix suffix
-      else Filesystem.temp_file ~prefix ~suffix
-    with Filesystem.Temp_file_error s ->
-      Options.abort "cannot create temporary file: %s" s
+    let prefix = "impact_reason" and suffix = ".dot" in
+    if temp
+    then Temp_files.file prefix suffix
+    else Filesystem.temp_file ~prefix ~suffix
   in
   let open Filesystem.Operators in
   let$ fmt = Filesystem.with_formatter_exn dot_file in

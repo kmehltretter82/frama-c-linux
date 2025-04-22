@@ -20,8 +20,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-exception Temp_file_error of string
-
 (** This module provides a layer above the {!Filesystem} module to handle
     automatic removal of temporary files when the program exits, except if exit
     is caused by a signal and except if [keep] is given and set to true. If
@@ -42,12 +40,12 @@ val cleanup_at_exit: Filepath.t -> unit
     deleted at the end of the execution (see above).
     @raise Temp_file_error if the temp file cannot be created.
     @before Frama-C+dev was in Extlib and returned a string instead of
-    [Filepath.t] and [keep] was named [debug] *)
+    [Filepath.t], raised Temp_file_error and [keep] was named [debug] *)
 val file: ?keep:bool -> string -> string -> Filepath.t
 
 (** Similar to [Filename.temp_dir] except that the temporary directory will be
     deleted at the end of the execution (see above).
-    @raise Temp_file_error if the temp dir cannot be created.
     @before 28.0-Nickel returned a string instead of [Filepath.t]
-    @before Frama-C+dev was in Extlib and [keep] was named [debug] *)
+    @before Frama-C+dev was in Extlib, raised Temp_file_error and [keep] was
+    named [debug] *)
 val dir: ?keep:bool -> string -> string -> Filepath.t

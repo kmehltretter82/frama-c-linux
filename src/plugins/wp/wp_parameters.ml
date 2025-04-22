@@ -1119,11 +1119,7 @@ let unique_tmp : Fc_Filepath.t option ref = ref None
 let make_tmp_dir () : Fc_Filepath.t =
   match !unique_tmp with
   | None ->
-    let tmp =
-      try Temp_files.dir "wp" ".dir"
-      with Temp_files.Temp_file_error s ->
-        abort "Cannot create temporary file: %s" s
-    in
+    let tmp = Temp_files.dir "wp" ".dir" in
     unique_tmp := Some tmp ;
     debug ~dkey "Created temporary directory '%a'" Fc_Filepath.pretty tmp ;
     tmp
