@@ -446,6 +446,15 @@ let register_after_global_load_hook = After_global_load.extend
 
 let magic = 9 (* magic number *)
 
+(* Cannot use Temp_files.file as it would create a cricular dependency *)
+let temp_file ~prefix ~suffix =
+  try
+    let file = Filesystem.temp_file ~prefix ~suffix in
+    Extlib.safe_at_exit (fun () -> Filesystem.remove_file file);
+    file
+  with Filesystem.Temp_file_error s ->
+    abort "cannot create temporary file: %s" s
+
 let save_projects selection projects filename =
   let open Filesystem.Operators in
   let$ cout = Filesystem.with_open_out_exn ~binary:true filename in
@@ -674,10 +683,7 @@ let create_by_copy
     ?(selection=State_selection.full) ?(src=current()) ~last name =
   guarded_feedback selection 2 "creating project %S by copying project %S"
     name (src.unique_name);
-  let filename =
-    try Filesystem.temp_file_cleanup_at_exit "frama_c_create_by_copy" ".sav"
-    with Filesystem.Temp_file_error s -> abort "cannot create temporary file: %s" s
-  in
+  let filename = temp_file ~prefix:"frama_c_create_by_copy" ~suffix:".sav" in
   save ~selection ~project:src filename;
   try
     let prj = load_with_copy ~project_under_copy:src ~selection ~name filename in
@@ -709,10 +715,7 @@ module Undo = struct
 
   let breakpoint () =
     clear_breakpoint ();
-    filename :=
-      (try Filesystem.temp_file_cleanup_at_exit short_filename ".sav"
-       with Filesystem.Temp_file_error s ->
-         abort "cannot create temporary file: %s" s)
+    filename := temp_file ~prefix:short_filename ~suffix:".sav"
 
 end
 

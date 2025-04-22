@@ -642,8 +642,7 @@ let gen_all_defines fmt mach =
   Format.fprintf fmt "#endif // __FC_MACHDEP@\n"
 
 let generate_machdep_header ?(censored_macros=Datatype.String.Set.empty) mach =
-  let debug = Kernel.(is_debug_key_enabled dkey_pp_keep_temp_files) in
-  let temp = Filesystem.temp_dir_cleanup_at_exit ~debug "__fc_machdep" in
+  let temp = Temp_files.dir "__fc_machdep" ".dir" in
   let fc_machdep = Filepath.concat temp "__fc_machdep.h" in
   let gen_machdep = Fun.flip gen_all_defines mach in
   Filesystem.with_formatter_exn fc_machdep gen_machdep;

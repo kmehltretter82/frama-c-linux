@@ -79,8 +79,6 @@ let rec make_dir ?(parents=false) (name: t) perm =
 (* --- Temporary files                                                    --- *)
 (* -------------------------------------------------------------------------- *)
 
-let cleanup_at_exit f = Extlib.safe_at_exit (fun () -> remove_file f)
-
 exception Temp_file_error of string
 
 let temp_file ~prefix ~suffix =
@@ -104,28 +102,6 @@ let temp_dir ~prefix ~suffix =
         one_try (pred limit)
   in
   one_try 10
-
-let temp_file_cleanup_at_exit ?(debug=false) prefix suffix =
-  let file = temp_file ~prefix ~suffix in
-  Extlib.safe_at_exit
-    begin fun () ->
-      if not debug then
-        remove_file file
-      else if exists file then
-        Format.printf "Debug: not removing dir %a@." pretty file;
-    end;
-  file
-
-let temp_dir_cleanup_at_exit ?(debug=false) prefix =
-  let dir = temp_dir ~prefix ~suffix:".dir" in
-  Extlib.safe_at_exit
-    begin fun () ->
-      if not debug then
-        remove_dir dir
-      else if exists dir then
-        Format.printf "Debug: not removing dir %a@." pretty dir;
-    end;
-  dir
 
 
 (* -------------------------------------------------------------------------- *)

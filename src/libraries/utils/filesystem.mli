@@ -74,13 +74,7 @@ val rename: Filepath.t -> Filepath.t -> unit
 (** {2 Temporary files} *)
 (* ************************************************************************* *)
 
-(** [cleanup_at_exit file] indicates that [file] must be removed when the
-    program exits (except if exit is caused by a signal).
-    If [file] does not exist, nothing happens.
-    @since Frama-C+dev
-    @before Frama-C+dev was in Extlib and used a string instead of
-    [Filepath.t] *)
-val cleanup_at_exit: Filepath.t -> unit
+(** See [Temp_files] module for automatic removal of temp files at exit. *)
 
 exception Temp_file_error of string
 
@@ -93,24 +87,6 @@ val temp_file: prefix:string -> suffix:string -> Filepath.t
     @raise Temp_file_error if the temp dir cannot be created.
     @since Frama-C+dev *)
 val temp_dir: prefix:string -> suffix:string -> Filepath.t
-
-(** Similar to [Filename.temp_file] except that the temporary file will be
-    deleted at the end of the execution (see above), unless [debug] is set
-    to true, in which case a message with the name of the kept file will be
-    printed.
-    @raise Temp_file_error if the temp file cannot be created.
-    @before Frama-C+dev was in Extlib and returned a string instead of
-    [Filepath.t] *)
-val temp_file_cleanup_at_exit: ?debug:bool -> string -> string -> Filepath.t
-
-(** Similar to [Filename.temp_dir] except that the temporary directory will be
-    deleted at the end of the execution (see above), unless [debug] is set
-    to true, in which case a message with the name of the kept file will be
-    printed.
-    @raise Temp_file_error if the temp dir cannot be created.
-    @before 28.0-Nickel returned a string instead of [Filepath.t]
-    @before Frama-C+dev was in Extlib *)
-val temp_dir_cleanup_at_exit: ?debug:bool -> string -> Filepath.t
 
 
 (* ************************************************************************* *)

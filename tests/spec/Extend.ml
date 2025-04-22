@@ -130,8 +130,7 @@ let () =
 
 let run () =
   Ast.compute ();
-  let debug = Kernel.debug_atleast 1 in
-  let my_file = Filesystem.temp_file_cleanup_at_exit ~debug "Extend" ".i" in
+  let my_file = Temp_files.file "Extend" ".i" in
   let open Filesystem.Operators in
   let$ fmt = Filesystem.with_formatter_exn my_file in
   File.pretty_ast ~fmt ();

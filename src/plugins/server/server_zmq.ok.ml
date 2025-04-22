@@ -172,8 +172,8 @@ let launch_server url =
       raise exn
 
 let temp_url () =
-  let socket = Filesystem.temp_file_cleanup_at_exit "frama-c.socket" ".io" in
-  "ipc://" ^ socket
+  let socket = Temp_files.file "frama-c.socket" ".io" in
+  "ipc://" ^ (socket :> string)
 
 let start_server () =
   match !server with

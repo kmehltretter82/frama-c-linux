@@ -393,9 +393,8 @@ let pretty_machdep ?fmt ?machdep () =
 (** {2 Initializations} *)
 (* ************************************************************************* *)
 
-let create_temp_file name suffix =
-  let debug = Kernel.is_debug_key_enabled Kernel.dkey_pp_keep_temp_files in
-  try Filesystem.temp_file_cleanup_at_exit ~debug name suffix
+let create_temp_file prefix suffix =
+  try Temp_files.file prefix suffix
   with Filesystem.Temp_file_error s ->
     Kernel.abort "cannot create temporary file: %s" s
 
@@ -489,7 +488,7 @@ let build_cpp_cmd = function
       | Not_gnu -> [], []
       | Unknown -> opt :: to_warn, [opt]
     in
-    let ppf = create_temp_file (Filename.basename (f :> string)) ".i" in
+    let ppf = create_temp_file (Filepath.basename f) ".i" in
     (* Hypothesis: the preprocessor is POSIX compliant,
        hence understands -I and -D. *)
     let fc_include_args =
@@ -1725,7 +1724,7 @@ let compute_sources_table cpp_commands =
     match cmd_opt with
     | None -> ()
     | Some (cpp_cmd, _ppf) ->
-      let tmp_file = create_temp_file "audit_produce_sources" ".txt" in
+      let tmp_file = Temp_files.file "audit_produce_sources" ".txt" in
       let tmp_file' = (tmp_file :> string) in
       let cmd_for_sources = cpp_cmd ^ " -H -MM >/dev/null 2>" ^ tmp_file' in
       let exit_code = Sys.command cmd_for_sources in
@@ -1941,7 +1940,7 @@ let create_rebuilt_project_from_visitor
     let f =
       let name = "frama_c_project_" ^ prj_name ^ "_" in
       let ext = if preprocess then ".c" else ".i" in
-      create_temp_file name ext
+      Temp_files.file name ext
     in
     Filesystem.with_formatter_exn f (fun fmt -> pretty_ast ~prj ~fmt ());
     let redo () =

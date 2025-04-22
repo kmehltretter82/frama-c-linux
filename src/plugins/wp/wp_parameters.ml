@@ -1120,8 +1120,8 @@ let make_tmp_dir () : Fc_Filepath.t =
   match !unique_tmp with
   | None ->
     let tmp =
-      try Filesystem.temp_dir_cleanup_at_exit "wp"
-      with Filesystem.Temp_file_error s ->
+      try Temp_files.dir "wp" ".dir"
+      with Temp_files.Temp_file_error s ->
         abort "Cannot create temporary file: %s" s
     in
     unique_tmp := Some tmp ;

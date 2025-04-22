@@ -192,12 +192,10 @@ let to_dot_formatter ?in_kf reason fmt =
 let to_dot_file ~temp ?in_kf reason =
   let dot_file =
     try
-      let f name ext =
-        if temp
-        then Filesystem.temp_file_cleanup_at_exit name ext
-        else Filesystem.temp_file ~prefix:name ~suffix:ext
-      in
-      f "impact_reason" ".dot"
+      let prefix = "impact_reason" and suffix = ".dot" in
+      if temp
+      then Temp_files.file prefix suffix
+      else Filesystem.temp_file ~prefix ~suffix
     with Filesystem.Temp_file_error s ->
       Options.abort "cannot create temporary file: %s" s
   in
