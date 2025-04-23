@@ -11,12 +11,11 @@ module M =
     (struct
       include Datatype.Integer
       type key = string
-      let of_string ~key:_ ~prev:_ arg =
-        try
-          Option.map Integer.of_string arg
+      let of_string arg =
+        try Integer.of_string arg
         with Failure _ ->
           raise (Cannot_build "expecting an integer")
-      let to_string ~key:_ = Option.map Integer.to_string
+      let to_string = Integer.to_string
     end)
     (struct
       let option_name = "-multiple-map"

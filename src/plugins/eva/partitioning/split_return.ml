@@ -297,9 +297,8 @@ let pretty_strategies fmt =
   let pp_kf kf fmt = Kernel_function.pretty fmt kf in
   let pp_user (kf, strategy) =
     match strategy with
-    | None -> ()
-    | Some SplitAuto -> pp_one "auto" (pp_kf kf) (kf_strategy kf)
-    | Some s -> pp_one "user" (pp_kf kf) s
+    | SplitAuto -> pp_one "auto" (pp_kf kf) (kf_strategy kf)
+    | s -> pp_one "user" (pp_kf kf) s
   in
   Parameters.SplitReturnFunction.iter pp_user;
   if not (Parameters.SplitReturnFunction.is_empty ()) &&

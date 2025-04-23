@@ -343,12 +343,7 @@ module Filepath_map
        val file_kind: string
      end) =
   P.Filepath_map
-    (struct
-      include Datatype.String
-      type key = Filepath.Normalized.t
-      let of_string ~key:_ ~prev:_ s = s
-      let to_string ~key:_ s = s
-    end)
+    (P.Value_string)
     (struct
       let () = Parameter_customize.set_module_name X.module_name
       include X
@@ -1500,12 +1495,7 @@ let () = Parameter_customize.set_group normalisation
 let () = Parameter_customize.do_not_reset_on_copy ()
 module GeneratedSpecCustom =
   P.String_map
-    (struct
-      include Datatype.String
-      type key = string
-      let of_string ~key:_ ~prev:_ s = s
-      let to_string ~key:_ s = s
-    end)
+    (P.Value_string)
     (struct
       let option_name = "-generated-spec-custom"
       let arg_name = "c1:m1,c2:m2,..."

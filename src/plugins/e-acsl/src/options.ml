@@ -160,20 +160,7 @@ let () = Widening_arguments_base.set_range ~min:0 ~max:2
 
 module Widening_arguments =
   String_map
-    (struct
-      include Datatype.Int
-      type key = string
-
-      let to_string ~key:_ i =
-        match i with
-        | None -> None
-        | Some i -> Some (string_of_int i)
-
-      let of_string ~key:_ ~prev: _ s =
-        match s with
-        | None -> None
-        | Some s ->  Some (int_of_string s)
-    end)
+    (Value_int)
     (struct
       let default = Datatype.String.Map.empty
       let option_name = "-e-acsl-widening-arguments"
@@ -194,20 +181,7 @@ let () = Widening_output_base.set_range ~min:0 ~max:2
 
 module Widening_output =
   String_map
-    (struct
-      include Datatype.Int
-      type key = string
-
-      let to_string ~key:_ i =
-        match i with
-        | None -> None
-        | Some i -> Some (string_of_int i)
-
-      let of_string ~key:_ ~prev: _ s =
-        match s with
-        | None -> None
-        | Some s ->  Some (int_of_string s)
-    end)
+    (Value_int)
     (struct
       let default = Datatype.String.Map.empty
       let option_name = "-e-acsl-widening-output"

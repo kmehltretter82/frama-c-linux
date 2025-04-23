@@ -58,7 +58,7 @@ end
 (** Signature required to build custom collection parameters in which elements
     are convertible to string.
     @since Sodium-20150201 *)
-module type String_datatype = sig
+module type Value_datatype = sig
   include Datatype.S
 
   val of_string: string -> t
@@ -71,7 +71,7 @@ end
 (** Signature requires to build custom collection parameters in which elements
     are convertible to string.
     @since Sodium-20150201 *)
-module type String_datatype_with_collections = sig
+module type Value_datatype_with_collections = sig
   include Datatype.S_with_collections
 
   val of_string: string -> t
@@ -85,42 +85,6 @@ module type String_datatype_with_collections = sig
   *)
 
   val to_string: t -> string
-end
-
-(** Signature of the optional value associated to the key and required to build
-    map parameters.
-    @since Sodium-20150201 *)
-module type Value_datatype = sig
-  include Datatype.S
-  type key
-
-  val of_string: key:key -> prev:t option -> string option -> t option
-  (** [key] is the key associated to this value, while [prev] is the previous
-      value associated to this key (if any). The optional string is [None] if
-      there is no value associated to the key, and [Some v] (potentially [v =
-      ""]) otherwise.
-      @return None if there is no value to associate to the key or [Some v]
-      otherwise.
-      @raise Cannot_build if there is no element corresponding to the given
-      string. *)
-
-  val to_string: key:key -> t option -> string option
-  (** [key] is the key associated to this value. The optional string is [None] if
-      there is no value associated to the key, and [Some v] (potentially [v =
-      ""]) otherwise.
-      @return None if there is no value to associate to the key or [Some v]
-      otherwise. *)
-
-end
-
-(** Signature of the optional value associated to the key and required to build
-    multiple map parameters. Almost similar to {!Value_datatype}.
-    @since Sodium-20150201 *)
-module type Multiple_value_datatype = sig
-  include Datatype.S
-  type key
-  val of_string: key:key -> prev:t list option -> string option -> t option
-  val to_string: key:key -> t option -> string option
 end
 
 (* ************************************************************************** *)
@@ -567,7 +531,7 @@ module type Map = sig
   (** Type of the values associated to the keys. *)
   type value
 
-  include Collection with type elt = key * value option
+  include Collection with type elt = key * value
   (** A map is a collection in which elements are pairs [(key, value)], but some
       values may be missing. *)
 
@@ -713,11 +677,7 @@ module type Builder = sig
 
   exception Cannot_build of string
   module Make_set
-      (E:
-       sig
-         include String_datatype_with_collections
-         val of_singleton_string: string -> Set.t
-       end)
+      (E: Value_datatype_with_collections)
       (_: sig include Input_collection val default: E.Set.t end):
     Set with type elt = E.t and type t = E.Set.t
 
@@ -737,7 +697,7 @@ module type Builder = sig
   module Make_list
       (E:
        sig
-         include String_datatype
+         include Value_datatype
          val of_singleton_string: string -> t list
        end)
       (_: sig include Input_collection val default: E.t list end):
@@ -753,8 +713,11 @@ module type Builder = sig
          (** see [Filepath] module. *)
        end): Filepath_list
 
+  module Value_int: Value_datatype with type t = int
+  module Value_string: Value_datatype with type t = string
+
   module Filepath_map
-      (V: Value_datatype with type key = Fc_Filepath.Normalized.t)
+      (V: Value_datatype)
       (_: sig
          include Input_with_arg
          val default: V.t Datatype.Filepath.Map.t
@@ -768,14 +731,14 @@ module type Builder = sig
 
   (** Parameter is a map where multibindings are **not** allowed. *)
   module Make_map
-      (K: String_datatype_with_collections)
-      (V: Value_datatype with type key = K.t)
+      (K: Value_datatype_with_collections)
+      (V: Value_datatype)
       (_: sig include Input_collection val default: V.t K.Map.t end):
     Map
     with type key = K.t and type value = V.t and type t = V.t K.Map.t
 
   module String_map
-      (V: Value_datatype with type key = string)
+      (V: Value_datatype)
       (_: sig include Input_with_arg val default: V.t Datatype.String.Map.t end):
     Map
     with type key = string
@@ -786,7 +749,7 @@ module type Builder = sig
       Use {!Parameter_customize.argument_may_be_fundecl} to also include
       pure prototypes. *)
   module Kernel_function_map
-      (V: Value_datatype with type key = Cil_types.kernel_function)
+      (V: Value_datatype)
       (_: sig include Input_with_arg val default: V.t Cil_datatype.Kf.Map.t end):
     Map
     with type key = Cil_types.kernel_function
@@ -795,14 +758,14 @@ module type Builder = sig
 
   (** Parameter is a map where multibindings are allowed. *)
   module Make_multiple_map
-      (K: String_datatype_with_collections)
-      (V: Multiple_value_datatype with type key = K.t)
+      (K: Value_datatype_with_collections)
+      (V: Value_datatype)
       (_: sig include Input_collection val default: V.t list K.Map.t end):
     Multiple_map
     with type key = K.t and type value = V.t and type t = V.t list K.Map.t
 
   module String_multiple_map
-      (V: Multiple_value_datatype with type key = string)
+      (V: Value_datatype)
       (_: sig
          include Input_with_arg
          val default: V.t list Datatype.String.Map.t
@@ -816,7 +779,7 @@ module type Builder = sig
       Use {!Parameter_customize.argument_may_be_fundecl} to also include
       pure prototypes. *)
   module Kernel_function_multiple_map
-      (V: Multiple_value_datatype with type key = Cil_types.kernel_function)
+      (V: Value_datatype)
       (_: sig
          include Input_with_arg
          val default: V.t list Cil_datatype.Kf.Map.t

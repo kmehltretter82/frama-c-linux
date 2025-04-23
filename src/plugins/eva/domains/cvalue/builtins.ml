@@ -201,8 +201,7 @@ let prepare_builtins () =
     table;
   (* Overrides builtins attribution according to the -eva-builtin option. *)
   Parameters.BuiltinsOverrides.iter
-    (fun (kf, name) ->
-       prepare_builtin kf (Hashtbl.find table (Option.get name)));
+    (fun (kf, name) -> prepare_builtin kf (Hashtbl.find table name));
   BuiltinsOverride.mark_as_computed ()
 
 let find_builtin_override = Hashtbl.find_opt builtins_table

@@ -192,8 +192,8 @@ module DomainsFunction =
     end)
     (struct
       include Domain_mode.Function_Mode
-      let of_string ~key ~prev str =
-        try of_string ~key ~prev str
+      let of_string str =
+        try of_string str
         with Invalid_argument msg -> raise (Cannot_build msg)
     end)
     (struct
@@ -235,11 +235,10 @@ module EqualityCallFunction =
   Kernel_function_map
     (struct
       include Datatype.String
-      type key = Cil_types.kernel_function
-      let of_string ~key:_ ~prev:_ = function
-        | None | Some ("none" | "formals" | "all") as x -> x
+      let of_string = function
+        | "none" | "formals" | "all" as x -> x
         | _ -> raise (Cannot_build "must be 'none', 'formals' or 'all'.")
-      let to_string ~key:_ s = s
+      let to_string s = s
     end)
     (struct
       let option_name = "-eva-equality-through-calls-function"
@@ -661,18 +660,7 @@ let () = Parameter_customize.set_group precision_tuning
 let () = Parameter_customize.argument_may_be_fundecl ()
 module SlevelFunction =
   Kernel_function_map
-    (struct
-      include Datatype.Int
-      type key = Cil_types.kernel_function
-      let of_string ~key:_ ~prev:_ s =
-        Option.map
-          (fun s ->
-             try int_of_string s
-             with Failure _ ->
-               raise (Cannot_build ("'" ^ s ^ "' is not an integer")))
-          s
-      let to_string ~key:_ = Option.map string_of_int
-    end)
+    (Value_int)
     (struct
       let option_name = "-eva-slevel-function"
       let arg_name = "f:n"
@@ -754,18 +742,7 @@ let () = Parameter_customize.set_group precision_tuning
 let () = Parameter_customize.argument_may_be_fundecl ()
 module HistoryPartitioningFunction =
   Kernel_function_map
-    (struct
-      include Datatype.Int
-      type key = Cil_types.kernel_function
-      let of_string ~key:_ ~prev:_ s =
-        Option.map
-          (fun s ->
-             try int_of_string s
-             with Failure _ ->
-               raise (Cannot_build ("'" ^ s ^ "' is not an integer")))
-          s
-      let to_string ~key:_ = Option.map string_of_int
-    end)
+    (Value_int)
     (struct
       let option_name = "-eva-partition-history-function"
       let arg_name = "f:n"
@@ -826,13 +803,12 @@ module SplitReturnFunction =
     (struct
       (* this type is ad-hoc: cannot use Kernel_function_multiple_map here *)
       include Split_strategy
-      type key = Cil_types.kernel_function
-      let of_string ~key:_ ~prev:_ s =
-        try Option.map Split_strategy.of_string s
+      let of_string s =
+        try Split_strategy.of_string s
         with Split_strategy.ParseFailure s ->
           raise (Cannot_build ("unknown split strategy " ^ s))
-      let to_string ~key:_ v =
-        Option.map Split_strategy.to_string v
+      let to_string v =
+        Split_strategy.to_string v
     end)
     (struct
       let option_name = "-eva-split-return-function"
@@ -898,23 +874,15 @@ module BuiltinsOverrides =
   Kernel_function_map
     (struct
       include Datatype.String
-      type key = Cil_types.kernel_function
-      let of_string ~key:kf ~prev:_ nameopt =
-        begin match nameopt with
-          | Some name ->
-            if not (mem_builtin name) then
-              abort "option '-eva-builtin %a:%s': undeclared builtin '%s'@.\
-                     declared builtins: @[%a@]"
-                Kernel_function.pretty kf name name
-                (Pretty_utils.pp_list ~sep:",@ " Format.pp_print_string)
-                (Datatype.String.Set.elements !builtins)
-          | _ -> abort
-                   "option '-eva-builtin':@ \
-                    no builtin associated to function '%a',@ use '%a:<builtin>'"
-                   Kernel_function.pretty kf Kernel_function.pretty kf
-        end;
-        nameopt
-      let to_string ~key:_ name = name
+      let of_string name =
+        if not (mem_builtin name) then
+          abort "option '-eva-builtin': undeclared builtin '%s'@.\
+                 declared builtins: @[%a@]"
+            name
+            (Pretty_utils.pp_list ~sep:",@ " Format.pp_print_string)
+            (Datatype.String.Set.elements !builtins);
+        name
+      let to_string name = name
     end)
     (struct
       let option_name = "-eva-builtin"
@@ -929,7 +897,7 @@ let () = add_correctness_dep BuiltinsOverrides.parameter
 (* Exported in Eva.mli. *)
 let use_builtin key name =
   if mem_builtin name
-  then BuiltinsOverrides.add (key, Some name)
+  then BuiltinsOverrides.add (key, name)
   else raise Not_found
 
 let () = Parameter_customize.set_group precision_tuning
@@ -969,18 +937,7 @@ let () = add_precision_dep LinearLevel.parameter
 let () = Parameter_customize.set_group precision_tuning
 module LinearLevelFunction =
   Kernel_function_map
-    (struct
-      include Datatype.Int
-      type key = Cil_types.kernel_function
-      let of_string ~key:_ ~prev:_ s =
-        Option.map
-          (fun s ->
-             try int_of_string s
-             with Failure _ ->
-               raise (Cannot_build ("'" ^ s ^ "' is not an integer")))
-          s
-      let to_string ~key:_ = Option.map string_of_int
-    end)
+    (Value_int)
     (struct
       let option_name = "-eva-subdivide-non-linear-function"
       let arg_name = "f:n"
