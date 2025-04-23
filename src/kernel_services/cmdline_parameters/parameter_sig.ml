@@ -701,7 +701,7 @@ module type Builder = sig
 
   (** A fixed set of possible values, represented by a type [t], intended to be
       a variant with only a finite number of possible constructions.
-      Note that [t] must be comparable using [Stdlib.compare].
+      Note that [t] must be comparable with structural equality
       @since 29.0-Copper
       @before Frama-C+dev it required [all_values : t list] and
       [to_string : t -> string] *)

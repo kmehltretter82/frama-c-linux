@@ -803,22 +803,15 @@ struct
         |> List.map snd
         |> Stdlib.String.concat "|"
 
-      let of_string =
-        let table =
-          List.to_seq X.values
-          |> Seq.map (fun (x,s) -> (s, x))
-          |> Hashtbl.of_seq
-        in
-        Hashtbl.find_opt table
+      let of_string s =
+        X.values
+        |> List.map (fun (x,s) -> (s, x))
+        |> List.assoc_opt s
 
-      let to_string =
-        let map =
-          List.to_seq X.values
-          |> Map.of_seq
-        in
-        fun x ->
-          try Map.find x map
-          with Not_found -> invalid_arg "not one of possible values"
+      let to_string x =
+        try
+          List.assoc x X.values
+        with Not_found -> invalid_arg "not one of possible values"
     end
 
     include Custom (Custom_input)
