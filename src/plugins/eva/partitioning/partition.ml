@@ -177,7 +177,7 @@ struct
         l.limit
 
     let hash l =
-      Hashtbl.hash (l.current, l.limit)
+      Hashtbl.hash (l.loop.sid, l.current, l.limit)
   end
 
   include Datatype.Make (Prototype)
