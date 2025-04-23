@@ -18,6 +18,9 @@
 Open Source Release <next-release>
 ###############################################################################
 
+o!  Kernel    [2025-04-23] Remove allegedly unused optionnal normalizations on
+              while loops and conditionals (`setDoTransformWhile` and
+              `setDoAlternateConditional`).
 -*  Kernel    [2025-04-14] Add support for initializer overrides in
               structures using compound litterals (fix #@1514).
 -   Kernel    [2025-04-14] Unused static or inline functions are now removed

@@ -2286,18 +2286,6 @@ end
 
 open BlockChunk
 
-(* To avoid generating backward gotos, we treat while loops as non-while ones,
- * adding a marker for continue. (useful for Jessie) *)
-let doTransformWhile = ref false
-
-let setDoTransformWhile () = doTransformWhile := true
-
-(* To avoid generating forward ingoing gotos, we translate conditionals in
- * an alternate way. (useful for Jessie) *)
-let doAlternateConditional = ref false
-
-let setDoAlternateConditional () = doAlternateConditional := true
-
 (************ Labels ***********)
 (* Since we turn dowhile and for loops into while we need to take care in
  * processing the continue statement. For each loop that we enter we place a
@@ -2305,7 +2293,7 @@ let setDoAlternateConditional () = doAlternateConditional := true
  * for a Non-while loop we must generate a label for the continue *)
 
 type loopstate =
-    While of string ref
+  | While of bool ref
   | NotWhile of string ref
 
 let continues : loopstate list ref = ref []
@@ -2317,14 +2305,8 @@ let continueOrLabelChunk ~ghost (l: location) : chunk =
   match !continues with
   | [] -> Errorloc.abort_context "continue not in a loop"
   | While lr :: _ ->
-    if !doTransformWhile then
-      begin
-        if !lr = "" then begin
-          lr := newLabelName ghost "__Cont"
-        end;
-        gotoChunk ~ghost !lr l
-      end
-    else continueChunk ~ghost l
+    lr := true;
+    continueChunk ~ghost l
   | NotWhile lr :: _ ->
     if !lr = "" then begin
       lr := newLabelName ghost "__Cont"
@@ -3548,8 +3530,8 @@ let startLoop iswhile =
   incr C_logic_env.nb_loop;
   add_label_env "LoopEntry";
   add_label_env "LoopCurrent";
-  continues :=
-    (if iswhile then While (ref "") else NotWhile (ref "")) :: !continues;
+  let continue = if iswhile then While (ref false) else NotWhile (ref "") in
+  continues := continue :: !continues;
   enter_break_env ()
 
 let exitLoop () =
@@ -3599,11 +3581,7 @@ let consLabel ~ghost (l: string) (c: chunk) (loc: location)
 let consLabContinue ~ghost (c: chunk) =
   match !continues with
   | [] -> Kernel.fatal ~current:true "labContinue not in a loop"
-  | While lr :: _ ->
-    begin
-      assert (!doTransformWhile);
-      if !lr = "" then c else consLabel ~ghost !lr c (Current_loc.get ()) false
-    end
+  | While _ :: _ -> Kernel.fatal ~current:true "labContinue in a while"
   | NotWhile lr :: _ ->
     if !lr = "" then c else consLabel ~ghost !lr c (Current_loc.get ()) false
 
@@ -3611,7 +3589,8 @@ let consLabContinue ~ghost (c: chunk) =
 let continueUsed () =
   match !continues with
   | [] -> Kernel.fatal ~current:true "not in a loop"
-  | (While lr | NotWhile lr) :: _ -> !lr <> ""
+  | While    lr :: _ -> !lr
+  | NotWhile lr :: _ -> !lr <> ""
 
 (****** TYPE SPECIFIERS *******)
 
@@ -3744,11 +3723,6 @@ and blockCanBreak b =
       (if stmtFallsThrough s then aux tl
        else compute_from_root aux tl)
   in aux b.bstmts
-
-let chunkFallsThrough c =
-  let get_stmt (s,_,_,_,_) = s in
-  let stmts = List.rev_map get_stmt c.stmts in
-  stmtListFallsThrough stmts
 
 let has_local_init chunk =
   List.exists
@@ -7686,6 +7660,7 @@ and doCondExp local_env asconst
              and should not appear (i.e. be None) in toplevel calls. *)
     (e: Cabs.expression) : condExpRes =
   let ghost = local_env.is_ghost in
+  let loc = e.expr_loc in
   let rec addChunkBeforeCE (c0: chunk) ce =
     let c0 = remove_effects c0 in
     match ce with
@@ -7705,45 +7680,35 @@ and doCondExp local_env asconst
     | CEOr(ce1,ce2) -> CEOr(remove_effects_ce ce1, remove_effects_ce ce2)
     | CENot(ce) -> CENot(remove_effects_ce ce)
   in
-  let loc = e.expr_loc in
-  let result = match e.expr_node with
-    | Cabs.BINARY (Cabs.AND, e1, e2) -> begin
-        let ce1 = doCondExp (no_paren_local_env local_env) asconst ?ctxt e1 in
-        let ce2 = doCondExp (no_paren_local_env local_env) asconst ~ctxt:e e2 in
-        let ce1 = remove_effects_ce ce1 in
-        match ce1, ce2 with
-        | CEExp (se1, ({enode = Const ci1})), _ ->
-          (match isConstTrueFalse ci1 with
-           | `CTrue -> addChunkBeforeCE se1 ce2
-           | `CFalse ->
-             (* se2 might contain labels so we cannot always drop it *)
-             if canDropCE ce2 then begin
-               clean_up_cond_locals ce2; ce1
-             end else CEAnd (ce1, ce2))
-        | CEExp(se1, e1'), CEExp (se2, e2') when
-            Machine.use_logical_operators () && isEmpty se1 && isEmpty se2 ->
-          CEExp (empty, new_exp ~loc (BinOp(LAnd, e1', e2', intType)))
-        | _ -> CEAnd (ce1, ce2)
+  (* Simplify the condition expression when possible :
+     - If ce1 expression is always true (resp. false) for logical AND
+       (resp. OR), we can drop it and only keep its chunk added before ce2.
+     - If ce1 expression is always false (resp. true) for logical AND
+       (resp. OR), we can drop ce2 if possible. *)
+  let simplify_binop op ce1 ce2 =
+    let op' = if op = AND then LAnd else LOr in
+    let keep_all = if op' = LAnd then CEAnd (ce1, ce2) else CEOr (ce1, ce2) in
+    match ce1, ce2 with
+    | CEExp (se1, ({enode = Const ci1})), _ -> begin
+        match op, isConstTrueFalse ci1 with
+        | AND, `CTrue  | OR,`CFalse -> addChunkBeforeCE se1 ce2
+        (* se2 might contain labels so we cannot drop it *)
+        | AND, `CFalse | OR, `CTrue when canDropCE ce2 ->
+          clean_up_cond_locals ce2; ce1
+        | _, _ -> keep_all
       end
-
-    | Cabs.BINARY (Cabs.OR, e1, e2) -> begin
-        let ce1 = doCondExp (no_paren_local_env local_env) asconst ?ctxt e1 in
-        let ce2 = doCondExp (no_paren_local_env local_env) asconst ~ctxt:e e2 in
-        let ce1 = remove_effects_ce ce1 in
-        match ce1, ce2 with
-        | CEExp (se1, ({enode = Const ci1})), _ ->
-          (match isConstTrueFalse ci1 with
-           | `CFalse -> addChunkBeforeCE se1 ce2
-           | `CTrue ->
-             (* se2 might contain labels so we cannot drop it *)
-             if canDropCE ce2 then begin
-               clean_up_cond_locals ce2; ce1
-             end else CEOr (ce1, ce2))
-        | CEExp (se1, e1'), CEExp (se2, e2') when
-            Machine.use_logical_operators () && isEmpty se1 && isEmpty se2 ->
-          CEExp (empty, new_exp ~loc (BinOp(LOr, e1', e2', intType)))
-        | _ -> CEOr (ce1, ce2)
-      end
+    | CEExp(se1, e1'), CEExp (se2, e2') when
+        Machine.use_logical_operators () && isEmpty se1 && isEmpty se2 ->
+      CEExp (empty, new_exp ~loc (BinOp(op', e1', e2', intType)))
+    | _ -> keep_all
+  in
+  let result =
+    match e.expr_node with
+    | Cabs.BINARY ((Cabs.AND | Cabs.OR as op), e1, e2) ->
+      let ce1 = doCondExp (no_paren_local_env local_env) asconst ?ctxt e1 in
+      let ce2 = doCondExp (no_paren_local_env local_env) asconst ~ctxt:e e2 in
+      let ce1 = remove_effects_ce ce1 in
+      simplify_binop op ce1 ce2
 
     | Cabs.UNARY(Cabs.NOT, e1) -> begin
         match doCondExp (no_paren_local_env local_env) asconst ?ctxt e1 with
@@ -7779,70 +7744,26 @@ and doCondExp local_env asconst
   result
 
 and compileCondExp ?(hide=false) ~ghost ce st sf =
+  let (@@@) c1 c2 = c1 @@@ (c2, ghost) in
+  let loc = Current_loc.get () in
+  (* If the chunk is small then will copy it, else create a goto and add
+     the corresponding label to the chunk. *)
+  let duplicate label chunk =
+    try (chunk, duplicateChunk chunk)
+    with Failure _ ->
+      let lab = newLabelName ghost label in
+      (gotoChunk ~ghost lab loc, consLabel ~ghost lab chunk loc false)
+  in
   match ce with
   | CEAnd (ce1, ce2) ->
-    let loc = Current_loc.get () in
-    let (duplicable, sf1, sf2) =
-      (* If sf is small then will copy it *)
-      try (true, sf, duplicateChunk sf)
-      with Failure _ ->
-        let lab = newLabelName ghost "_LAND" in
-        (false, gotoChunk ~ghost lab loc, consLabel ~ghost lab sf loc false)
-    in
+    let (sf1, sf2) = duplicate "_LAND" sf in
     let st' = compileCondExp ~hide ~ghost ce2 st sf1 in
-    if not duplicable && !doAlternateConditional then
-      let st_fall_through = chunkFallsThrough st' in
-      (* if st does not fall through, we do not need to add a goto
-         after the else part. This prevents spurious falls-through warning
-         afterwards. *)
-      let sf' = duplicateChunk sf1 in
-      let lab = newLabelName ghost "_LAND" in
-      let gotostmt =
-        if st_fall_through then gotoChunk ~ghost lab loc else skipChunk
-      in
-      let labstmt =
-        if st_fall_through then
-          consLabel ~ghost lab empty loc false
-        else skipChunk
-      in
-      let (@@@) s1 s2 = s1 @@@ (s2, ghost) in
-      (compileCondExp ~hide ~ghost ce1 st' sf')
-      @@@ gotostmt @@@ sf2 @@@ labstmt
-    else
-      let sf' = sf2 in
-      compileCondExp ~hide ~ghost ce1 st' sf'
+    compileCondExp ~hide ~ghost ce1 st' sf2
 
   | CEOr (ce1, ce2) ->
-    let loc = Current_loc.get () in
-    let (duplicable, st1, st2) =
-      (* If st is small then will copy it *)
-      try (true, st, duplicateChunk st)
-      with Failure _ ->
-        let lab = newLabelName ghost "_LOR" in
-        (false, gotoChunk ~ghost lab loc, consLabel ~ghost lab st loc false)
-    in
-    if not duplicable && !doAlternateConditional then
-      let st' = duplicateChunk st1 in
-      let sf' = compileCondExp ~hide ~ghost ce2 st1 sf in
-      let sf_fall_through = chunkFallsThrough sf' in
-      let lab = newLabelName ghost "_LOR" in
-      let gotostmt =
-        if sf_fall_through then
-          gotoChunk ~ghost lab loc
-        else skipChunk
-      in
-      let labstmt =
-        if sf_fall_through then
-          consLabel ~ghost lab empty (Current_loc.get ()) false
-        else skipChunk
-      in
-      let (@@@) s1 s2 = s1 @@@ (s2, ghost) in
-      (compileCondExp ~hide ~ghost ce1 st' sf')
-      @@@ gotostmt @@@ st2 @@@ labstmt
-    else
-      let st' = st1 in
-      let sf' = compileCondExp ~hide ~ghost ce2 st2 sf in
-      compileCondExp ~hide ~ghost ce1 st' sf'
+    let (st1, st2) = duplicate "_LOR" st in
+    let sf' = compileCondExp ~hide ~ghost ce2 st2 sf in
+    compileCondExp ~hide ~ghost ce1 st1 sf'
 
   | CENot ce1 -> compileCondExp ~hide ~ghost ce1 sf st
 
@@ -7851,17 +7772,17 @@ and compileCondExp ?(hide=false) ~ghost ce st sf =
       | Const(CInt64(i,_,_))
         when (not (Integer.equal i Integer.zero)) && canDrop sf ->
         full_clean_up_chunk_locals sf;
-        se @@@ (st, ghost)
+        se @@@ st
       | Const(CInt64(z,_,_))
         when (Integer.equal z Integer.zero) && canDrop st ->
         full_clean_up_chunk_locals st;
-        se @@@ (sf, ghost)
+        se @@@ sf
       | _ ->
         let se', e' =
           if hide then hide_chunk ~ghost ~loc:e.eloc [] se e (typeOf e)
           else se, e
         in
-        (empty @@@ (se', ghost)) @@@ (ifChunk ~ghost e' e'.eloc st sf, ghost)
+        (empty @@@ se') @@@ (ifChunk ~ghost e' e'.eloc st sf)
     end
 
 
@@ -9961,11 +9882,6 @@ and doStatement local_env (s : Cabs.statement) : chunk =
     startLoop true;
     let a = mk_loop_annot a loc in
     let s' = doStatement local_env s in
-    let s' =
-      if !doTransformWhile then
-        s' @@@ (consLabContinue ~ghost skipChunk, ghost)
-      else s'
-    in
     let loc' = convLoc loc in
     let break_cond = breakChunk ~ghost loc' in
     exitLoop ();
@@ -10405,3 +10321,6 @@ let areCompatibleTypes t1 t2 = areCompatibleTypes t1 t2
 let frama_c_keep_block = Ast_attributes.frama_c_keep_block
 let frama_c_destructor = Ast_attributes.frama_c_destructor
 let fc_local_static    = Ast_attributes.fc_local_static
+
+let setDoAlternateConditional () = ()
+let setDoTransformWhile () = ()
