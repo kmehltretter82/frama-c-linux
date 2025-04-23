@@ -964,3 +964,56 @@ module Export: sig
   *)
   val cleaner : unit -> Visitor.frama_c_inplace
 end
+
+module Statistics: sig
+  (** This module keeps track of statistics collected by Eva during an
+      analysis. *)
+
+  (** Type of statistics. Type parameter ['a] show whether a statistic is tied:
+      - to [kernel_function],
+      - to Cil [stmt],
+      - to the whole program, with [unit].  *)
+  type 'a t
+
+  (** {2 Registered statistics } *)
+
+  val iterations : Cil_types.stmt t
+  val memexec_hits : Cil_types.kernel_function t
+  val memexec_misses : Cil_types.kernel_function t
+  val max_widenings : Cil_types.stmt t
+  val max_unrolling : Cil_types.stmt t
+  val partitioning_index_hits : unit t
+  val partitioning_index_misses : unit t
+
+
+  (** {2 Statistics registration } *)
+
+  (** Registers a statistic tied to the whole program. *)
+  val register_global_stat : string -> unit t
+
+  (** Registers a statistic tied to functions. *)
+  val register_function_stat : string -> Cil_types.kernel_function t
+
+  (** Registers a statistic tied to statements. *)
+  val register_statement_stat : string -> Cil_types.stmt t
+
+
+  (** {2 Statistics retrieval } *)
+
+  (** Get the current stat value for a given element (statement, function or unit
+      according to the statistic type). **)
+  val get : 'a t -> 'a -> int
+
+
+  (** {2 Statistics update } *)
+
+  (** Set the stat to the given value. *)
+  val set : 'a t -> 'a -> int -> unit
+
+  (** Adds 1 to the stat or set it to 1 if undefined. *)
+  val incr : 'a t -> 'a -> unit
+
+  (** Set the stat to the maximum between the current value and the given
+      value. *)
+  val grow : 'a t -> 'a -> int -> unit
+end

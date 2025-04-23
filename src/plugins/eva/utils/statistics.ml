@@ -175,6 +175,14 @@ module State =
     end)
 
 
+(* --- Statistics retrieval --- *)
+
+let get (type a) (stat : a t) (x : a) =
+  let k = Key (stat,x) in
+  State.find_opt k
+  |> Option.value ~default: 0
+
+
 (* --- Statistics update --- *)
 
 let set (type a) (stat : a t) (x : a) value =
@@ -183,7 +191,7 @@ let set (type a) (stat : a t) (x : a) value =
 
 let update (type a) (stat : a t) (x : a) (f : int -> int) =
   let k = Key (stat,x) in
-  State.replace k (f (State.find_opt k |> Option.value ~default:0))
+  State.replace k (f (get stat x))
 
 let incr (type a) (stat : a t) (x : a) =
   update stat x (fun v -> v + 1)
@@ -227,3 +235,14 @@ let export_as_csv ?filename () =
       export_as_csv_to_file filename
   | Some filename ->
     export_as_csv_to_file filename
+
+
+(* Centralized statistics registration *)
+
+let iterations = register_statement_stat "iterations"
+let memexec_hits = register_function_stat "memexec-hits"
+let memexec_misses = register_function_stat "memexec-misses"
+let max_widenings = register_statement_stat "max-widenings"
+let max_unrolling = register_statement_stat "max-unrolling"
+let partitioning_index_hits = register_global_stat "partitioning-index-hits"
+let partitioning_index_misses = register_global_stat "partitioning-index-misses"

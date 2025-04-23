@@ -23,8 +23,6 @@
 open Cil_types
 open Partition
 
-let stat_max_widenings = Statistics.register_statement_stat "max-widenings"
-
 let dkey = Self.dkey_partition
 
 module Make
@@ -166,13 +164,13 @@ struct
 
   (* Partition transfer functions *)
 
-  let enter_loop (flow : flow) (i : Eva_automata.loop) : flow =
-    Flow.transfer_keys flow (Enter_loop (unroll i))
+  let enter_loop (flow : flow) (loop : Eva_automata.loop) : flow =
+    Flow.transfer_keys flow (Enter_loop (unroll loop, loop))
 
-  let leave_loop (flow : flow) (_i : Eva_automata.loop) : flow =
+  let leave_loop (flow : flow) (_loop : Eva_automata.loop) : flow =
     Flow.transfer_keys flow Leave_loop
 
-  let next_loop_iteration (flow : flow) (_i : stmt) : flow =
+  let next_loop_iteration (flow : flow) (_loop : stmt) : flow =
     Flow.transfer_keys flow Incr_loop
 
   let empty_rationing = new_rationing ~limit:0 ~merge:false
@@ -352,7 +350,7 @@ struct
           w.widened_state <- Some next;
           w.widening_counter <- widening_period - 1;
           w.widening_steps <- w.widening_steps + 1;
-          Statistics.grow stat_max_widenings stmt w.widening_steps;
+          Statistics.(grow max_widenings) stmt w.widening_steps;
           Some next
         end
       with Not_found ->
