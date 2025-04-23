@@ -167,17 +167,18 @@ module Automaton = Datatype.Make
       let pretty fmt automaton = G.pretty fmt automaton.graph
     end)
 
+(* A vertex should be chosen as a widening point depending on its priority :
+   high priority vertices are start of statements and loop heads. *)
+let wto_priority v =
+  match v.vertex_info with
+  | LoopHead _ -> 1
+  | NoneInfo ->
+    match v.vertex_start_of with
+    | Some _stmt -> 1
+    | None -> 0
+
 let wto_pref v1 v2 =
-  match v1.vertex_info, v2.vertex_info with
-  | LoopHead {level = i}, LoopHead {level = j} -> - (compare i j)
-  | NoneInfo, LoopHead _ -> -1
-  | LoopHead _ , NoneInfo -> 1
-  | NoneInfo, NoneInfo ->
-    match v1.vertex_start_of, v2.vertex_start_of with
-    | None, None -> 0
-    | None, _ -> -1
-    | _ , None -> 1
-    | Some _, Some _ -> 0
+  wto_priority v1 - wto_priority v2
 
 let build_wto graph entry_point =
   G.build_wto ~pref:wto_pref graph entry_point

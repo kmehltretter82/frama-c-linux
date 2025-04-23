@@ -380,10 +380,13 @@
   Called from auto_loop_unroll.c:433.
 [eva:loop-unroll:auto] auto_loop_unroll.c:310: Automatic loop unrolling.
 [eva] auto_loop_unroll.c:315: Frama_C_show_each_30: {30}
+[eva:loop-unroll:auto] auto_loop_unroll.c:319: Automatic loop unrolling.
 [eva:partition] auto_loop_unroll.c:319: starting to merge loop iterations
 [eva:alarm] auto_loop_unroll.c:320: Warning: 
   signed overflow. assert res + 1 ≤ 2147483647;
-[eva] auto_loop_unroll.c:324: Frama_C_show_each_top: [0..2147483647]
+[eva:partition] auto_loop_unroll.c:319: 
+  Trace partitioning superposing up to 100 states
+[eva] auto_loop_unroll.c:324: Frama_C_show_each_top: [31..2147483647]
 [eva:loop-unroll:auto] auto_loop_unroll.c:327: Automatic loop unrolling.
 [eva] auto_loop_unroll.c:333: Frama_C_show_each_32: {32}
 [eva:loop-unroll:auto] auto_loop_unroll.c:336: Automatic loop unrolling.
