@@ -20,8 +20,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-type t = string
-
 
 (* -------------------------------------------------------------------------- *)
 (* --- Current Working dir                                                --- *)
@@ -77,13 +75,19 @@ let to_quoted_string s =
 
 
 (* -------------------------------------------------------------------------- *)
-(* --- Basic datatype functions                                           --- *)
+(* --- Datatype                                                           --- *)
 (* -------------------------------------------------------------------------- *)
 
-let equal = String.equal
-let compare = String.compare
-let hash = Hashtbl.hash (* String.hash only introduced in OCaml 5.0 *)
-let copy = Fun.id
+include Datatype.Make_with_collections (struct
+    include Datatype.Serializable_undefined
+    type nonrec t = string
+    let name = "Filepath"
+    let reprs = [ of_string "/" ]
+    let equal = String.equal
+    let compare = String.compare
+    let hash = Hashtbl.hash (* String.hash only introduced in OCaml 5.0 *)
+    let copy = Fun.id
+  end)
 
 
 (* -------------------------------------------------------------------------- *)

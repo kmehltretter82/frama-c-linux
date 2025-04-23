@@ -517,7 +517,7 @@ end
 module type String_list = List with type elt = string and type t = string list
 
 module type Filepath_list =
-  List with type elt = Datatype.Filepath.t and type t = Datatype.Filepath.t list
+  List with type elt = Filepath.t and type t = Filepath.t list
 
 (** Signature for maps as command line parameters.
     @since Sodium-20150201 *)
@@ -555,7 +555,7 @@ module type Multiple_map = sig
 end
 
 module type Filepath_map =
-  Map with type key = Datatype.Filepath.t
+  Map with type key = Filepath.t
 
 (* ************************************************************************** *)
 (** {2 All the different kinds of command line options as functors} *)
@@ -713,14 +713,14 @@ module type Builder = sig
       (V: Value_datatype)
       (_: sig
          include Input_with_arg
-         val default: V.t Datatype.Filepath.Map.t
+         val default: V.t Fc_Filepath.Map.t
          val existence: Fc_Filepath.existence
          val file_kind: string
        end):
     Map
     with type key = Fc_Filepath.t
      and type value = V.t
-     and type t = V.t Datatype.Filepath.Map.t
+     and type t = V.t Fc_Filepath.Map.t
 
   (** Parameter is a map where multibindings are **not** allowed. *)
   module Make_map

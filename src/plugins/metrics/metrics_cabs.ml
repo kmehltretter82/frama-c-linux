@@ -39,8 +39,8 @@ class metricsCabsVisitor = object(self)
   (* Local metrics are kept stored after computation in this map of maps.
      Its storing hierarchy is as follows: filename -> function_name -> metrics *)
   val mutable metrics_map:
-    (BasicMetrics.t Metrics_base.OptionKf.Map.t) Datatype.Filepath.Map.t =
-    Datatype.Filepath.Map.empty
+    (BasicMetrics.t Metrics_base.OptionKf.Map.t) Filepath.Map.t =
+    Filepath.Map.empty
 
   val functions_no_source: (string, int) Hashtbl.t = Hashtbl.create 97
   val functions_with_source: (string, int) Hashtbl.t = Hashtbl.create 97
@@ -52,7 +52,7 @@ class metricsCabsVisitor = object(self)
   method set_standalone v = standalone <- v
   method get_metrics = !global_metrics
   method private update_metrics_map filename strmap =
-    metrics_map <- Datatype.Filepath.Map.add filename strmap metrics_map
+    metrics_map <- Filepath.Map.add filename strmap metrics_map
 
   (* Utility methods to increase metrics counts *)
   method private incr_both_metrics f =
@@ -71,7 +71,7 @@ class metricsCabsVisitor = object(self)
     global_metrics := BasicMetrics.set_cyclo !global_metrics
         (!global_metrics.ccyclo + !local_metrics.ccyclo);
     (try
-       let fun_tbl = Datatype.Filepath.Map.find filename metrics_map in
+       let fun_tbl = Filepath.Map.find filename metrics_map in
        self#update_metrics_map filename
          (Metrics_base.OptionKf.Map.add func !local_metrics fun_tbl);
      with
@@ -214,7 +214,7 @@ class metricsCabsVisitor = object(self)
     Cil.DoChildren
 
   method private stats_of_filename filename =
-    try Datatype.Filepath.Map.find filename metrics_map
+    try Filepath.Map.find filename metrics_map
     with
     | Not_found ->
       Metrics_parameters.fatal "Metrics for file %a not_found@."
@@ -230,7 +230,7 @@ class metricsCabsVisitor = object(self)
       ) filename
 
   method pp_detailed_text_metrics fmt () =
-    Datatype.Filepath.Map.iter
+    Filepath.Map.iter
       (fun filename _func_tbl ->
          Format.fprintf fmt "%a" self#pp_file_metrics filename) metrics_map
 
@@ -636,7 +636,7 @@ let compute_on_cabs () =
     List.iter (fun file ->
         Metrics_parameters.debug
           ~level:2 "Compute Cabs metrics for file %a@."
-          Datatype.Filepath.pretty (fst file);
+          Filepath.pretty (fst file);
         ignore
           (Cabsvisit.visitCabsFile (cabs_visitor:>Cabsvisit.cabsVisitor) file);
       )

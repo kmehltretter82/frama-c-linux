@@ -526,7 +526,7 @@ module FileIndex = struct
 
   module S =
     State_builder.Hashtbl
-      (Datatype.Filepath.Hashtbl)
+      (Filepath.Hashtbl)
       (Datatype.List(Global))
       (struct
         let name = "Globals.FileIndex"

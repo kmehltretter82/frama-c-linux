@@ -156,7 +156,7 @@ module Cabs_file = struct
         let name = "Cabs_file"
         let reprs = List.concat_map
             (fun p -> [ p, []; p, [ true, Cabs.GLOBANNOT [] ] ])
-            Datatype.Filepath.reprs
+            Filepath.reprs
         let pretty fmt cabs = !pretty_ref fmt cabs
       end)
 end
@@ -284,7 +284,7 @@ module File =
               globals = [];
               globinit = None;
               globinitcalled = false })
-          Datatype.Filepath.reprs
+          Filepath.reprs
       include Datatype.Undefined
     end)
 

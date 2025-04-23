@@ -455,7 +455,7 @@ and bal = parse
   let load_file ?(ontty=`Transient) file =
     try
       Wp_parameters.feedback ~dkey:dkey_driver ~ontty "Loading driver '%a'"
-        Datatype.Filepath.pretty file;
+        Filepath.pretty file;
       let driver_dir = Filepath.dirname file in
       let inc = open_in (file :> string) in
       let lex = Lexing.from_channel inc in

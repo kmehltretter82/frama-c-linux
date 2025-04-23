@@ -24,8 +24,8 @@ module StringList = Datatype.List(Datatype.String)
 
 module Flags =
   State_builder.Hashtbl
-    (Datatype.Filepath.Hashtbl)
-    (Datatype.Pair(Datatype.Filepath)(StringList))
+    (Filepath.Hashtbl)
+    (Datatype.Pair(Filepath)(StringList))
     (struct
       let name ="JsonCompilationDatabase.Flags"
       let dependencies = [Kernel.JsonCompilationDatabase.self]

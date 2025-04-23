@@ -67,7 +67,7 @@ class type sloc_visitor = object
   (** Print computed metrics to a formatter *)
 
   method get_metrics_map:
-    (BasicMetrics.t OptionKf.Map.t) Datatype.Filepath.Map.t
+    (BasicMetrics.t OptionKf.Map.t) Filepath.Map.t
     (** Compute and return per-function metrics *)
 end
 
@@ -88,8 +88,8 @@ class slocVisitor ~libc : sloc_visitor = object(self)
      Its storing hierarchy is as follows: filename -> function_name -> metrics
   *)
   val mutable metrics_map:
-    (BasicMetrics.t OptionKf.Map.t) Datatype.Filepath.Map.t =
-    Datatype.Filepath.Map.empty
+    (BasicMetrics.t OptionKf.Map.t) Filepath.Map.t =
+    Filepath.Map.empty
 
   val mutable seen_vars = Varinfo.Set.empty;
 
@@ -107,7 +107,7 @@ class slocVisitor ~libc : sloc_visitor = object(self)
   method get_metrics_map = metrics_map
 
   method private update_metrics_map filename kfmap =
-    metrics_map <- Datatype.Filepath.Map.add filename kfmap metrics_map
+    metrics_map <- Filepath.Map.add filename kfmap metrics_map
 
   (* Utility method to increase metrics counts *)
   method private incr_both_metrics f =
@@ -118,7 +118,7 @@ class slocVisitor ~libc : sloc_visitor = object(self)
     map := VInfoMap.add vinfo value !map
 
   method private stats_of_filename filename =
-    try Datatype.Filepath.Map.find filename metrics_map
+    try Filepath.Map.find filename metrics_map
     with
     | Not_found ->
       Metrics_parameters.fatal "Metrics for file %a not_found@."
@@ -134,7 +134,7 @@ class slocVisitor ~libc : sloc_visitor = object(self)
       ) filename
 
   method pp_detailed_text_metrics fmt =
-    Datatype.Filepath.Map.iter
+    Filepath.Map.iter
       (fun filename _func_tbl ->
          Format.fprintf fmt "%a" self#pp_file_metrics filename) metrics_map
 
@@ -143,7 +143,7 @@ class slocVisitor ~libc : sloc_visitor = object(self)
     Format.pp_set_tags fmt true;
     let pr_hdr fmt hdr_name =
       Format.fprintf fmt "@{<th>%s@}" hdr_name in
-    Datatype.Filepath.Map.iter
+    Filepath.Map.iter
       (fun filename func_tbl ->
          Metrics_parameters.result ~level:2 "%a" self#pp_file_metrics filename;
          if func_tbl <> OptionKf.Map.empty then
@@ -158,7 +158,7 @@ class slocVisitor ~libc : sloc_visitor = object(self)
                 %a@ \
                 @}@]@]@ @} \
                 @]@ "
-               Datatype.Filepath.pretty filename
+               Filepath.pretty filename
                pr_hdr "Function" pr_hdr "#If stmts" pr_hdr "#Assignments"
                pr_hdr "#Loops" pr_hdr "#Calls" pr_hdr "#Gotos"
                pr_hdr "#Pointer dereferencing" pr_hdr "#Exits"
@@ -174,7 +174,7 @@ class slocVisitor ~libc : sloc_visitor = object(self)
          else
            Metrics_parameters.warning
              "Filename <%a> has no functions@."
-             Datatype.Filepath.pretty filename)
+             Filepath.pretty filename)
       metrics_map
 
   (* Save the local metrics currently computed.
@@ -190,7 +190,7 @@ class slocVisitor ~libc : sloc_visitor = object(self)
     global_metrics := BasicMetrics.set_cyclo !global_metrics
         (!global_metrics.ccyclo + !local_metrics.ccyclo);
     (try
-       let fun_tbl = Datatype.Filepath.Map.find filename metrics_map in
+       let fun_tbl = Filepath.Map.find filename metrics_map in
        self#update_metrics_map filename
          (OptionKf.Map.add funcname !local_metrics fun_tbl);
      with
@@ -435,10 +435,10 @@ let compute_files_defining_globals gvars =
           Metrics_parameters.feedback ~dkey "found %s at: %a"
             (if is_def then "definition" else "declaration")
             Printer.pp_location loc;
-          Datatype.Filepath.Set.add ((fst loc).Filepath.pos_path) acc
+          Filepath.Set.add ((fst loc).Filepath.pos_path) acc
         end
       else acc
-    ) (Datatype.Filepath.Set.empty) gvars
+    ) (Filepath.Set.empty) gvars
 
 class logic_loc_visitor = object
   inherit Visitor.frama_c_inplace
@@ -470,10 +470,10 @@ let get_filenames_in_funspec kf =
             Metrics_parameters.feedback ~dkey ~once:true
               "found annotation in: %a"
               Filepath.pretty path;
-            Datatype.Filepath.Set.add path acc'
+            Filepath.Set.add path acc'
           ) locs acc
-      ) Datatype.Filepath.Set.empty spec.spec_behavior
-  with Annotations.No_funspec _ -> Datatype.Filepath.Set.empty
+      ) Filepath.Set.empty spec.spec_behavior
+  with Annotations.No_funspec _ -> Filepath.Set.empty
 
 let compute_files_defining_funspecs gvars =
   List.fold_left
@@ -481,9 +481,9 @@ let compute_files_defining_funspecs gvars =
        try
          let kf = Globals.Functions.get vi in
          let fs = get_filenames_in_funspec kf in
-         Datatype.Filepath.Set.union acc fs
+         Filepath.Set.union acc fs
        with Not_found -> acc
-    ) Datatype.Filepath.Set.empty gvars
+    ) Filepath.Set.empty gvars
 
 let used_files () =
   match reachable_from_main () with
@@ -493,35 +493,35 @@ let used_files () =
   | Some reachable_gvars ->
     let used_for_defs = compute_files_defining_globals reachable_gvars in
     let used_for_specs = compute_files_defining_funspecs reachable_gvars in
-    Datatype.Filepath.Set.union used_for_defs used_for_specs
+    Filepath.Set.union used_for_defs used_for_specs
 
 let pretty_used_files used_files =
   (* Note: used_files may also contain #include'd files,
            but we only want those given on the command line *)
   let cmdline_files = List.fold_left (fun acc file ->
-      Datatype.Filepath.Set.add (
+      Filepath.Set.add (
         Filepath.of_string (Kernel_file.get_name file)
       ) acc
-    ) Datatype.Filepath.Set.empty (Kernel_file.get_all ())
+    ) Filepath.Set.empty (Kernel_file.get_all ())
   in
   let used_cmdline_files, used_included_files =
-    Datatype.Filepath.Set.partition (fun path ->
-        Datatype.Filepath.Set.mem path cmdline_files
+    Filepath.Set.partition (fun path ->
+        Filepath.Set.mem path cmdline_files
       ) used_files
   in
   let is_c_file s = String.ends_with ~suffix:".c" s && s <> ".c" in
   let used_included_c_files =
-    Datatype.Filepath.Set.filter
+    Filepath.Set.filter
       (fun f -> is_c_file (f : Filepath.t :> string))
       used_included_files
   in
   let used_implicitly_included_c_files =
-    Datatype.Filepath.Set.diff used_included_c_files cmdline_files
+    Filepath.Set.diff used_included_c_files cmdline_files
   in
   let unused_cmdline_files =
-    Datatype.Filepath.Set.diff cmdline_files used_cmdline_files
+    Filepath.Set.diff cmdline_files used_cmdline_files
   in
-  let nb s = Datatype.Filepath.Set.cardinal s in
+  let nb s = Filepath.Set.cardinal s in
   let pp_filepaths title fmt paths =
     let n = nb paths in
     if n = 0 then Format.ifprintf fmt ""
@@ -533,7 +533,7 @@ let pretty_used_files used_files =
          @\n%a@\n"
         title n (String.make (title_len + 4) '=')
         (Pretty_utils.pp_list ~sep:" \\@\n" ~suf:" \\" Filepath.pretty)
-        (Datatype.Filepath.Set.elements paths)
+        (Filepath.Set.elements paths)
   in
   Metrics_parameters.result
     "Used files starting at function '%a':@\n\

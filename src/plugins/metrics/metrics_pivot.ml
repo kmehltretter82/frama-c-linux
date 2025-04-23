@@ -248,11 +248,11 @@ module FunctionAtPos = struct
       List.fold_left (fun acc ((pos1, _, _) as triple) ->
           let fp = pos1.Filepath.pos_path in
           Hashtbl.add tmp fp triple;
-          Datatype.Filepath.Set.add fp acc
-        ) Datatype.Filepath.Set.empty (Cabs2cil.func_locs ())
+          Filepath.Set.add fp acc
+        ) Filepath.Set.empty (Cabs2cil.func_locs ())
     in
     Hashtbl.clear tbl;
-    Datatype.Filepath.Set.iter (fun fp ->
+    Filepath.Set.iter (fun fp ->
         let l =
           List.sort (fun (start1, _, _) (start2, _, _) ->
               Cil_datatype.Position.compare start1 start2

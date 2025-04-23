@@ -300,10 +300,10 @@ class syntactic_printer ~libc reachable = object(self)
     let add_binding map filename fvinfo =
       let set =
         try
-          let x = Datatype.Filepath.Map.find filename map in
+          let x = Filepath.Map.find filename map in
           Varinfo.Set.add fvinfo x
         with Not_found -> Varinfo.Set.add fvinfo Varinfo.Set.empty
-      in Datatype.Filepath.Map.add filename set map
+      in Filepath.Map.add filename set map
     in
     let map =
       Varinfo.Set.fold
@@ -312,10 +312,10 @@ class syntactic_printer ~libc reachable = object(self)
              let path = Metrics_base.file_of_vinfodef fvinfo in
              add_binding acc path fvinfo
            else acc
-        ) set Datatype.Filepath.Map.empty
+        ) set Filepath.Map.empty
     in
     Format.fprintf fmt "@[<v 0>";
-    Datatype.Filepath.Map.iter
+    Filepath.Map.iter
       (fun path fvinfoset ->
          Format.fprintf fmt "@[<hov 2><%a>:@ %a@]@ "
            Filepath.pretty path

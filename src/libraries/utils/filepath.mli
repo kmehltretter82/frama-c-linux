@@ -33,23 +33,10 @@ type t = private string
 (** {2 Basic datatype functions} *)
 (* ************************************************************************* *)
 
-(** Equality of paths. *)
-val equal: t -> t -> bool
+(** [Filepath.t] is a Frama-C datatype, and come with usual [compare], [equal],
+    [hash] and [pretty] functions.
 
-(** Comparison of paths. *)
-val compare: t -> t -> int
-
-(** Hash of paths. *)
-val hash: t -> int
-
-(** Copy of paths. Currently implemented as identity. *)
-val copy: t -> t
-
-(** Compares prettified (i.e. relative) paths, with or without
-    case sensitivity (by default, [case_sensitive = false]). *)
-val compare_pretty : ?case_sensitive:bool -> t -> t -> int
-
-(** Pretty-print a path according to these rules:
+    Pretty-print id done according to these rules:
     - relative filenames are kept, except for leading './',
       which are stripped;
     - absolute filenames are relativized if their prefix is included in the
@@ -59,7 +46,12 @@ val compare_pretty : ?case_sensitive:bool -> t -> t -> int
       Therefore, the result of this function may not designate a valid name
       in the filesystem and must ONLY be used to pretty-print information;
       it must NEVER to be converted back to a filepath later. *)
-val pretty: Format.formatter -> t -> unit
+
+include Datatype.S_with_collections with type t := t
+
+(** Compares prettified (i.e. relative) paths, with or without
+    case sensitivity (by default, [case_sensitive = false]). *)
+val compare_pretty : ?case_sensitive:bool -> t -> t -> int
 
 (** Pretty-prints the normalized (absolute) path. *)
 val pp_abs: Format.formatter -> t -> unit

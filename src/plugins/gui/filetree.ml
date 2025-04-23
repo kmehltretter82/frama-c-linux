@@ -403,7 +403,7 @@ module State = struct
      gtk node *)
   type cache = {
     cache_files:
-      (int list * MODEL.custom_tree) Datatype.Filepath.Hashtbl.t;
+      (int list * MODEL.custom_tree) Filepath.Hashtbl.t;
     cache_vars:
       (int list * MODEL.custom_tree) Varinfo.Hashtbl.t;
     cache_global_annot:
@@ -411,14 +411,14 @@ module State = struct
   }
 
   let default_cache () = {
-    cache_files = Datatype.Filepath.Hashtbl.create 17;
+    cache_files = Filepath.Hashtbl.create 17;
     cache_vars = Varinfo.Hashtbl.create 17;
     cache_global_annot = Global_annotation.Hashtbl.create 17;
   }
 
   let path_from_node cache = function
     | File (s, _) ->
-      (try Some (Datatype.Filepath.Hashtbl.find cache.cache_files s)
+      (try Some (Filepath.Hashtbl.find cache.cache_files s)
        with Not_found -> None)
     | Global (GFun ({svar = vi},_) | GVar(vi,_,_) |
               GVarDecl(vi,_) | GFunDecl (_,vi,_)) ->
@@ -432,7 +432,7 @@ module State = struct
   let fill_cache cache (path:int list) row =
     match row.MODEL.finfo with
     | MYTREE.MFile (storage,_) ->
-      Datatype.Filepath.Hashtbl.add
+      Filepath.Hashtbl.add
         cache.cache_files (Filepath.of_string storage.MYTREE.name) (path,row)
     | MYTREE.MGlobal storage ->
       match storage.MYTREE.globals with
@@ -737,7 +737,7 @@ let make (tree_view:GTree.view) =
     method set_file_attribute ?strikethrough ?text filename =
       try
         set_row model_custom ?strikethrough ?text
-          (Datatype.Filepath.Hashtbl.find path_cache.State.cache_files filename)
+          (Filepath.Hashtbl.find path_cache.State.cache_files filename)
       with Not_found -> () (* Some files might not be in the list because
                               of our filters. Ignore *)
 
@@ -753,7 +753,7 @@ let make (tree_view:GTree.view) =
     method get_file_globals file =
       try
         let _, raw_row =
-          Datatype.Filepath.Hashtbl.find path_cache.State.cache_files file in
+          Filepath.Hashtbl.find path_cache.State.cache_files file in
         MYTREE.sons_info raw_row.MODEL.finfo
       with Not_found -> [] (* Some files may be hidden if they contain nothing
                               interesting *)

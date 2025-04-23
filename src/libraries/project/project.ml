@@ -25,7 +25,7 @@
 (* ************************************************************************** *)
 
 open Project_skeleton
-open Output
+open Project_output
 
 (* re-exporting record fields *)
 type project = t = private

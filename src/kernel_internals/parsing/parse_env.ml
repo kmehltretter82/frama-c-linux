@@ -25,7 +25,7 @@
 let referenced_files = Hashtbl.create 7
 
 module SourceFiles =
-  State_builder.Hashtbl(Datatype.Filepath.Hashtbl)(Datatype.String)
+  State_builder.Hashtbl(Filepath.Hashtbl)(Datatype.String)
     (struct
       let name = "SourceFiles"
       let dependencies = [ Kernel.Files.self ]
@@ -34,7 +34,7 @@ module SourceFiles =
 
 (* maps .i/.pp files to their workdir (when a JCDB is used) *)
 module PreprocessingWorkdir =
-  State_builder.Hashtbl(Datatype.Filepath.Hashtbl)(Datatype.String)
+  State_builder.Hashtbl(Filepath.Hashtbl)(Datatype.String)
     (struct
       let name = "PreprocessingWorkdir"
       let dependencies =

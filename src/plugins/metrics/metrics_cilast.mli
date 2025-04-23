@@ -54,7 +54,7 @@ class type sloc_visitor = object
 
   method get_metrics_map:
     (Metrics_base.BasicMetrics.t Metrics_base.OptionKf.Map.t)
-      Datatype.Filepath.Map.t
+      Filepath.Map.t
       (** Compute and return per-function metrics *)
 end
 
@@ -76,7 +76,7 @@ val get_cilast_metrics : libc:bool -> cilast_metrics ;;
 (** Computes and returns individual metrics per function. *)
 val get_metrics_map : libc:bool ->
   (Metrics_base.BasicMetrics.t Metrics_base.OptionKf.Map.t)
-    Datatype.Filepath.Map.t
+    Filepath.Map.t
 
 (** Compute metrics on whole CIL AST *)
 val compute_on_cilast: libc:bool -> unit ;;
@@ -98,7 +98,7 @@ val reachable_from_main: unit -> Cil_types.varinfo list option;;
     (as given by [reachable_from_main]).
     This function requires a defined entry point.
 *)
-val used_files: unit -> Datatype.Filepath.Set.t
+val used_files: unit -> Filepath.Set.t
 
 (** Pretty-prints the result of [used_files] in a verbose way. *)
-val pretty_used_files: Datatype.Filepath.Set.t -> unit
+val pretty_used_files: Filepath.Set.t -> unit

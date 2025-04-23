@@ -546,7 +546,7 @@ struct
 
     include Build
         (struct
-          include Datatype.Filepath
+          include Fc_Filepath
           include X
           let default () = Filepath.empty
           let functor_name = "Filepath"
@@ -1466,7 +1466,7 @@ struct
        end) =
     Make_list
       (struct
-        include Datatype.Filepath
+        include Fc_Filepath
         let to_string s = (s : t :> string)
 
         let of_string s =
@@ -1627,11 +1627,11 @@ struct
       (X: sig
          include Parameter_sig.Input_with_arg
          val existence: Fc_Filepath.existence
-         val default: V.t Datatype.Filepath.Map.t
+         val default: V.t Fc_Filepath.Map.t
        end) =
     Make_map
       (struct
-        include Datatype.Filepath
+        include Fc_Filepath
         let of_string s =
           try
             [ Fc_Filepath.of_string ~existence:X.existence s ]

@@ -347,7 +347,7 @@ module Filepath_map
     (struct
       let () = Parameter_customize.set_module_name X.module_name
       include X
-      let default = Datatype.Filepath.Map.empty
+      let default = Filepath.Map.empty
     end)
 
 module Kernel_function_set(X: Input_with_arg) =
@@ -694,9 +694,8 @@ let () =
   SymbolicPath.add_update_hook
     (fun _prev curr ->
        (* keep module [Filepath] synchronized with [SymbolicPath] *)
-       let module FMap = Datatype.Filepath.Map in
        Filepath.reset_symbolic_dirs ();
-       FMap.iter (fun f n -> Filepath.add_symbolic_dir n f) curr)
+       Filepath.Map.iter (fun f n -> Filepath.add_symbolic_dir n f) curr)
 
 (* [SymbolicPath] is better to be not projectified,
    but must be saved: use a fake state for saving it without projectifying it *)

@@ -237,8 +237,8 @@ module Parameter = struct
   module Filepath =
     Common
       (struct
-        type t = Datatype.Filepath.t
-        let ty = Datatype.Filepath.ty
+        type t = Filepath.t
+        let ty = Filepath.ty
         let modname = "Filepath"
       end)
 

@@ -1603,14 +1603,7 @@ module Integer =
     end)
 let integer = Integer.ty
 
-module Filepath = struct
-  include Simple_type
-      (struct
-        include Filepath
-        let name = "Filepath"
-        let reprs = [ Filepath.of_string "/" ]
-      end)
-end
+module Filepath = String
 let filepath = Filepath.ty
 
 module Rational =
