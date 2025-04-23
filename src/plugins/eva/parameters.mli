@@ -92,13 +92,15 @@ module InterproceduralHistory : Parameter_sig.Bool
 module ArrayPrecisionLevel: Parameter_sig.Int
 
 module AllocatedContextValid: Parameter_sig.Bool
-module InitializationPaddingGlobals: Parameter_sig.String
+module InitializationPaddingGlobals: Parameter_sig.S
+  with type t = [ `Initialized | `Uninitialized | `MaybeInitialized ]
 
 module Numerors_Real_Size : Parameter_sig.Int
 module Numerors_Mode : Parameter_sig.String
 
 module UndefinedPointerComparisonPropagateAll: Parameter_sig.Bool
-module WarnPointerComparison: Parameter_sig.String
+module WarnPointerComparison: Parameter_sig.S
+  with type t = [ `All | `Pointer | `None ]
 
 module ReduceOnLogicAlarms: Parameter_sig.Bool
 module InitializedLocals: Parameter_sig.Bool

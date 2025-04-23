@@ -778,40 +778,46 @@ struct
 
   module Enum
       (X: sig
-         include Parameter_sig.Input_with_arg
+         include Parameter_sig.Input
          type t
          val default: t
-         val all_values: t list
-         val to_string: t -> string
+         val values: (t * string) list
        end) =
   struct
     module Custom_input =
     struct
-      include Datatype.Make (struct
+      include Datatype.Make_with_set_and_map (struct
           include Datatype.Serializable_undefined
           let name = "Parameter_builder.Enum(" ^ X.option_name ^ ")"
           type t = X.t
           let copy x = x
-          let compare = Stdlib.compare
+          let compare = Extlib.compare_basic
           let equal = Datatype.from_compare
-          let reprs = X.all_values
+          let reprs = List.map fst X.values
         end)
 
       include X
 
-      let of_string =
-        let table =
-          List.to_seq X.all_values
-          |> Seq.map (fun x -> X.to_string x, x)
-          |> Hashtbl.of_seq
-        in
-        Hashtbl.find_opt table
+      let arg_name =
+        values
+        |> List.map snd
+        |> Stdlib.String.concat "|"
+
+      let of_string s =
+        X.values
+        |> List.map (fun (x,s) -> (s, x))
+        |> List.assoc_opt s
+
+      let to_string x =
+        try
+          List.assoc x X.values
+        with Not_found -> invalid_arg "not one of possible values"
     end
 
     include Custom (Custom_input)
 
     let () =
-      set_possible_values (List.map X.to_string X.all_values)
+      set_possible_values (List.map snd X.values)
   end
 
   (* ************************************************************************ *)

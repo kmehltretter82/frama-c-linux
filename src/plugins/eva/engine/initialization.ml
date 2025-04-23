@@ -49,11 +49,7 @@ let padding_initialization ~local : padding_initialization =
     if Kernel.InitializedPaddingLocals.get ()
     then `Initialized else `Uninitialized
   else
-    match Parameters.InitializationPaddingGlobals.get () with
-    | "yes" -> `Initialized
-    | "maybe" -> `MaybeInitialized
-    | "no" -> `Uninitialized
-    | _ -> assert false
+    Parameters.InitializationPaddingGlobals.get ()
 
 (* Warn if the size is unknown. *)
 let warn_unknown_size vi =
