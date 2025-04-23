@@ -216,7 +216,7 @@ let istore imap m ip =
 let add_bhv ~kf (s:imap) (m:map) (bhv:behavior) =
   List.iter
     (fun e ->
-       let rs = Annot.of_extension e in
+       let rs = Spec.of_extension e in
        if rs <> [] then
          begin
            List.iter (Logic.add_region m) rs ;

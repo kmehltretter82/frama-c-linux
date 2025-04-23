@@ -23,8 +23,8 @@
 open Memory
 open Cil_types
 
-val add_path : map -> Annot.path -> node
-val add_region : map -> Annot.region -> unit
+val add_path : map -> Spec.path -> node
+val add_region : map -> Spec.region -> unit
 
 
 type env

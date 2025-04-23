@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Annot
+open Spec
 open Memory
 
 (* -------------------------------------------------------------------------- *)
@@ -50,7 +50,7 @@ and add_exp (m:map) (p:path): Memory.node option =
   | AddrOf p -> Some (add_path m p)
   | Shift p -> add_exp m p
 
-let add_region (m: map) (r : Annot.region) =
+let add_region (m: map) (r : Spec.region) =
   let rs = List.map (add_path m) r.rpath in
   merge_all m @@
   match r.rname with

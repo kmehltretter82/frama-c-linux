@@ -70,6 +70,10 @@ let ptr r = Ptr r
 let scalar = function None -> Pure | Some r -> Ptr r
 let array d = if d == Pure then Pure else Array d
 let field fd d = if d == Pure then Pure else Record (Fmap.singleton fd d)
+let record m =
+  if Fmap.is_empty m || Fmap.for_all (fun _ -> is_pure) m then Pure
+  else Record m
+
 let logic s l =
   if Logic_const.is_unrollable_ltdef s then invalid_arg "Region.LDomain.logic"
   else if List.for_all is_pure l then Pure
@@ -132,7 +136,8 @@ type 'a context = 'a t M.t
 let empty = M.empty
 let make l : 'a context = List.fold_left (fun m (s,r) -> M.add s r m) empty l
 
-let get v ctxt = try M.find v ctxt with Not_found -> pure
+let get ?(default=pure) v ctxt =
+  try M.find v ctxt with Not_found -> default
 
 let rec of_typ create ty : 'a t = match ty.tnode with
   | TBuiltin_va_list  | TFun _ | TPtr _ -> ptr @@ create ()
@@ -193,6 +198,12 @@ let rec unify (f:'a -> 'a -> 'a) (s:'a sigma) (d1:'a t) (d2:'a t) =
       | Some r -> let d' = ptr r in List.iter (fun d -> unify f s d d') (dr::ds)
     end
 
-let subst _ctxt _d = assert false
+let rec subst ctxt d = match d with
+  | Pure | Ptr _ -> d
+  | Dvar v -> get ~default:d v ctxt
+  | Array a -> array @@ subst ctxt a
+  | Record m -> record @@ Fmap.map (subst ctxt) m
+  | Logic(t,ds) -> logic t @@ List.map (subst ctxt) ds
+  | Arrow(ds,d) -> arrow (List.map (subst ctxt) ds) @@ subst ctxt d
 
 (* -------------------------------------------------------------------------- *)

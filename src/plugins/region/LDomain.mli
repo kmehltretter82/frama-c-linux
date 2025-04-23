@@ -41,6 +41,7 @@ val ptr : 'a -> 'a t
 val scalar : 'a option -> 'a t
 val array : 'a t -> 'a t
 val field : fieldinfo -> 'a t -> 'a t
+val record : 'a t Fieldinfo.Map.t -> 'a t
 val logic : logic_type_info -> 'a t list -> 'a t
 val arrow : 'a t list -> 'a t -> 'a t
 
