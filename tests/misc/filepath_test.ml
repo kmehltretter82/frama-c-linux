@@ -17,11 +17,11 @@ let () =
   Kernel.feedback "normalize(): %s"
     (Filepath.of_string "" :> string );
   Kernel.feedback "relativize(.): %s"
-    (Filepath.relativize ".");
+    (Filepath.(relativize (of_string ".")));
   Kernel.feedback "relativize(./tests/..): %s"
-    (Filepath.relativize "./tests/..");
+    (Filepath.(relativize (of_string "./tests/..")));
   Kernel.feedback "relativize(/a/bc/d,base_name:/a/b/): %s"
-    (Filepath.relativize ~base_name:"/a/b/" "/a/bc/d");
+    (Filepath.(relativize ~base:(of_string "/a/b/") (of_string "/a/bc/d")));
   Filepath.add_symbolic_dir "SYMB" (Filepath.of_string "/tmp/symb/");
   Kernel.feedback "pretty with symbolic path: %a"
     Filepath.pretty (Filepath.of_string "/tmp/symb/file.c")

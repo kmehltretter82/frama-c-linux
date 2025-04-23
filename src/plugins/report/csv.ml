@@ -22,12 +22,9 @@
 
 (* Split the location into 'dir,file,line number,char number' in this order *)
 let split_loc loc =
-  let file =
-    Filepath.to_pretty_string loc.Filepath.pos_path
-  in
-  let dir = Filename.dirname file in
-  let dir = Filepath.relativize dir in
-  let file = Filename.basename file in
+  let file = loc.Filepath.pos_path in
+  let dir = Filepath.(dirname file |> to_pretty_relative) in
+  let file = Filepath.basename file in
   dir, file, loc.Filepath.pos_lnum, loc.Filepath.pos_cnum
 
 (* For properties that we want to skip *)

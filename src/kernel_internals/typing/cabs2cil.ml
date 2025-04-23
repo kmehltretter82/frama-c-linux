@@ -323,8 +323,8 @@ let process_stdlib_pragma name args =
     match args with
     | [ ACons ("pop",_) ] -> pop_stdheader (); None
     | [ ACons ("push",_); AStr s ] ->
-      let base_name = (System_config.Share.libc:>string) in
-      let relative_name = Filepath.relativize ~base_name s in
+      let base = System_config.Share.libc in
+      let relative_name = Filepath.relativize ~base (Filepath.of_string s) in
       push_stdheader relative_name;
       None
     | _ -> Some (name, args)

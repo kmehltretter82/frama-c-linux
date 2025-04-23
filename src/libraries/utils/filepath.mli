@@ -112,6 +112,11 @@ val of_string: ?existence:existence -> ?base:t -> string -> t
     See [pretty] for details about usage. *)
 val to_pretty_string: t -> string
 
+(** [to_pretty_relative p] returns [p] relativized if it is relative,
+    or returns the same thing as {!to_pretty_string} otherwise.
+    @since Frama-C+dev *)
+val to_pretty_relative: ?base:t -> t -> string
+
 (** [to_quoted_string p] returns [p] but quoted, suitable for use as
     one argument in a command line. See [Filename.quoted]
     @since Frama-C+dev *)
@@ -167,15 +172,18 @@ val concats: ?existence:existence -> t -> string list -> t
     (that is, it is prefixed by [base_name]), or to the current
     working directory if no base is specified.
     @since Aluminium-20160501
-    @before 23.0-Vanadium argument types were string instead of t. *)
-val is_relative: ?base_name:t -> t -> bool
+    @before 23.0-Vanadium argument types were string instead of t.
+    @before Frama-C+dev named argument was [base_name] *)
+val is_relative: ?base:t -> t -> bool
 
 (** [relativize base_name file_name] returns a relative path name of
     [file_name] w.r.t. [base_name], if [base_name] is a prefix of [file];
     otherwise, returns [file_name] unchanged.
     The default base name is the current working directory name.
-    @since Aluminium-20160501 *)
-val relativize: ?base_name:string -> string -> string
+    @since Aluminium-20160501
+    @before Frama-C+dev argument types were string instead of t and named
+    argument was [base_name] *)
+val relativize: ?base:t -> t -> string
 
 
 (* ************************************************************************* *)

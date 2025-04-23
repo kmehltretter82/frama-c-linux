@@ -253,7 +253,7 @@ let is_libc ip =
   | None -> false
   | Some position ->
     let libc_path = Kernel.Share.get_dir "libc" in
-    Filepath.is_relative ~base_name:libc_path position.pos_path
+    Filepath.is_relative ~base:libc_path position.pos_path
 
 let model = States.model ()
 

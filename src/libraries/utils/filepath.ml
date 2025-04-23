@@ -163,27 +163,22 @@ let concats ?existence t sl =
 (* --- Relative Paths                                                     --- *)
 (* -------------------------------------------------------------------------- *)
 
-let relativize ?base_name p =
-  let file_name = normalize p in
-  let base_name = match base_name with
-    | None -> Hpath.(cwd |> to_string)
-    | Some b -> Hpath.(of_string b |> to_string)
-  in
-  if base_name = file_name then "." else
-    let base_name = base_name ^ Filename.dir_sep in
-    if String.starts_with ~prefix:base_name file_name then
-      let n = String.length base_name in
-      let file_name = String.sub file_name n (String.length file_name - n) in
-      if file_name = "" then "." else file_name
-    else file_name
+let relativize ?(base=Hpath.(cwd |> to_string)) p =
+  if base = p then "." else
+    let base = base ^ Filename.dir_sep in
+    if String.starts_with ~prefix:base p then
+      let n = String.length base in
+      let p = String.sub p n (String.length p - n) in
+      if p = "" then "." else p
+    else p
 
-let is_relative ?base_name file_name =
-  let base_name = match base_name with
-    | None -> Hpath.(cwd |> to_string)
-    | Some b -> Hpath.(of_string b |> to_string)
-  in
-  String.equal base_name file_name
-  || String.starts_with ~prefix:(base_name ^ Filename.dir_sep) file_name
+let is_relative ?(base=Hpath.(cwd |> to_string)) p =
+  String.equal base p || String.starts_with ~prefix:(base ^ Filename.dir_sep) p
+
+let to_pretty_relative ?base p =
+  if is_relative ?base p
+  then relativize ?base p
+  else to_pretty_string p
 
 
 (* -------------------------------------------------------------------------- *)
