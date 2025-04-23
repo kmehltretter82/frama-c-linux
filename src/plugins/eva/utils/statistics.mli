@@ -40,13 +40,6 @@ val max_unrolling : Cil_types.stmt t
 val partitioning_index_hits : unit t
 val partitioning_index_misses : unit t
 
-(** {2 Statistics retrieval } *)
-
-(** Get the current stat value for a given element (statement, function or unit
-    according to the statistic type). **)
-val get : 'a t -> 'a -> int
-[@@@ api_end]
-
 
 (** {2 Statistics registration } *)
 
@@ -60,6 +53,13 @@ val register_function_stat : string -> Cil_types.kernel_function t
 val register_statement_stat : string -> Cil_types.stmt t
 
 
+(** {2 Statistics retrieval } *)
+
+(** Get the current stat value for a given element (statement, function or unit
+    according to the statistic type). **)
+val get : 'a t -> 'a -> int
+
+
 (** {2 Statistics update } *)
 
 (** Set the stat to the given value. *)
@@ -71,6 +71,7 @@ val incr : 'a t -> 'a -> unit
 (** Set the stat to the maximum between the current value and the given
     value. *)
 val grow : 'a t -> 'a -> int -> unit
+[@@@ api_end]
 
 (** Reset all statistics to zero. *)
 val reset_all: unit -> unit
