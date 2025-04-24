@@ -255,7 +255,7 @@ struct
       "reached statement %d with %d incoming states, %d to propagate"
       stmt.sid dest.incoming_states (flow_size flow)
 
-  let join (sources : (branch*flow) list) (dest : store) : flow =
+  let join (sources : (int*flow) list) (dest : store) : flow =
     (* Get every source flow *)
     let sources_states =
       (* Is there more than one non-empty incoming flow? *)
@@ -264,7 +264,7 @@ struct
       | sources ->
         (* Several branches -> partition according to the incoming branch *)
         let get (b,flow) =
-          Flow.transfer_keys flow (Branch (b,history_size))
+          Flow.transfer_keys flow (Add_branch (b,history_size))
         in
         List.map get sources
     in

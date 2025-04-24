@@ -326,11 +326,12 @@ module Make (Engine: Engine_sig.S) = struct
       let cvalue_states =
         Builtins.apply_builtin builtin cvalue_call ~pre ~post
       in
-      let insert cvalue_state =
-        Partition.Key.empty,
+      let insert branch_id cvalue_state =
+        Partition.Key.branch_singleton
+          (Builtin_result (call.kf, kinstr, branch_id)),
         Engine.Dom.set Cvalue_domain.State.key cvalue_state final_state
       in
-      let states = List.map insert cvalue_states in
+      let states = List.mapi insert cvalue_states in
       Engine_sig.{ states; cacheable; }
 
   (* Uses cvalue builtin only if the cvalue domain is available. Otherwise, only

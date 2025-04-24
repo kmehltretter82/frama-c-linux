@@ -118,7 +118,7 @@ sig
       This function also interprets partitioning annotations at the store
       vertex (slevel, splits, merges, ...) which will generally change the
       current partitioning. *)
-  val join : (Partition.branch * flow) list -> store -> flow
+  val join : (int * flow) list -> store -> flow
 
   (** Widen a flow. The widening object keeps track of the previous widenings
       and previous propagated states to ensure termination. *)

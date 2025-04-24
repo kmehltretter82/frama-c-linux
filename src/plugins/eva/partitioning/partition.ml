@@ -205,7 +205,26 @@ end
 
 module SplitMap = SplitTerm.Map
 
-type branch = int
+type branch =
+  | Branch of int
+  | Builtin_result of Kernel_function.t * Cil_datatype.Kinstr.t * int
+[@@deriving eq, ord]
+
+module BranchDatatype = Datatype.Make_with_collections (struct
+    include Datatype.Serializable_undefined
+    type t = branch [@@deriving eq, ord]
+    let name = "Partition.Branch"
+    let reprs = [Branch 0]
+    let pretty fmt = function
+      | Branch id -> Format.fprintf fmt "%d" id
+      | Builtin_result (kf, _, id) ->
+        Format.fprintf fmt "%s#%d" (Kernel_function.get_name kf) id
+    let hash = function
+      | Branch id -> Hashtbl.hash (1, id)
+      | Builtin_result (kf, kinstr, id) ->
+        Hashtbl.hash
+          (2, Kernel_function.hash kf, Cil_datatype.Kinstr.hash kinstr, id)
+  end)
 
 (* The key have several fields, one for each kind of partitioning:
    - Ration stamps: These modelize the legacy slevel. Each state is given
@@ -248,7 +267,7 @@ module Key =
 struct
   module IntPair = Datatype.Pair (Datatype.Int) (Datatype.Int)
   module Stamp = Datatype.Option (IntPair)
-  module BranchList = Datatype.List (Datatype.Int)
+  module BranchList = Datatype.List (BranchDatatype)
   module LoopList = Datatype.List (LoopUnrolling)
   module Splits = SplitMap.Make (Datatype.Integer)
   module DSplits = SplitMap.Make (SplitMonitor)
@@ -261,6 +280,9 @@ struct
     splits = SplitMap.empty;
     dynamic_splits = SplitMap.empty;
   }
+
+  let branch_singleton b =
+    { empty with branches = [b] }
 
   include Datatype.Make_with_collections (struct
       include Datatype.Serializable_undefined
@@ -306,7 +328,7 @@ struct
           | None -> ()
         end;
         Pretty_utils.pp_list ~pre:"[@[" ~sep:" ;@ " ~suf:"@]]"
-          Format.pp_print_int
+          BranchDatatype.pretty
           fmt
           key.branches;
         Pretty_utils.pp_list ~pre:"(@[" ~sep:" ;@ " ~suf:"@])"
@@ -384,7 +406,7 @@ type action =
   | Enter_loop of unroll_limit * Eva_automata.loop
   | Leave_loop
   | Incr_loop
-  | Branch of branch * int
+  | Add_branch of int * int
   | Ration of rationing
   | Restrict of Eva_ast.exp * Integer.t list
   | Split of split_monitor
@@ -678,9 +700,10 @@ struct
               { k with loops = LoopUnrolling.incr unrolling :: tl }
           end
 
-        | Branch (b,max) -> fun k _x ->
+        | Add_branch (b,max) -> fun k _x ->
           if max > 0 then
-            { k with branches = b :: Extlib.list_first_n (max - 1) k.branches  }
+            let trunc = Extlib.list_first_n (max - 1) k.branches in
+            { k with branches = Branch b :: trunc }
           else if k.branches <> [] then
             { k with branches = [] }
           else
