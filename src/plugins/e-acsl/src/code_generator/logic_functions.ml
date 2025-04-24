@@ -157,7 +157,6 @@ let generate_kf ~loc fname env params_ty ret_ty params_ival li =
       Cil.makeVarinfo false false vname ret_ty, ret_ty, params, params_ty_vi
   in
   let kf_typ =
-    (* build the function's varinfo *)
     Cil_const.mk_tfun
       ~tattr:li.l_var_info.lv_attr
       ret_ty
@@ -165,11 +164,7 @@ let generate_kf ~loc fname env params_ty ret_ty params_ival li =
       false
   in
   (* build the function's varinfo *)
-  let vi =
-    Cil.makeGlobalVar
-      fname
-      kf_typ
-  in
+  let vi = Cil.makeGlobalVar fname kf_typ in
   vi.vdefined <- true;
   (* create the fundec *)
   let fundec =
