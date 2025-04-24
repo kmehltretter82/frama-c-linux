@@ -109,7 +109,7 @@ module State = struct
 
   include Datatype.Make_with_collections (struct
       type t = state
-      let name = "Mthread.state"
+      let name = "mthread"
       let reprs = [ default ; top ]
 
       let copy state =
