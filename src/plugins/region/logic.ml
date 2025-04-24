@@ -20,8 +20,12 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Cil_types
+open Cil_datatype
+
 open Spec
 open Memory
+open LDomain
 
 (* -------------------------------------------------------------------------- *)
 (* ---  Process ACSL region annotations                                   --- *)
@@ -60,11 +64,6 @@ let add_region (m: map) (r : Spec.region) =
 (* -------------------------------------------------------------------------- *)
 (* ---  Process ACSL logic terms & predicates                             --- *)
 (* -------------------------------------------------------------------------- *)
-
-open LDomain
-open Cil_types
-open Cil_datatype
-
 
 type env = {
   map : map ;
@@ -273,19 +272,22 @@ let () = rterm := add_term
 (* ---  Process ACSL logic                                                --- *)
 (* -------------------------------------------------------------------------- *)
 
-
-
-
 (* let rec add_logic_info : ajouter le corps des logic_info
    => créer un environnement dans lequel on va pouvoir typer les logic_info
-
 *)
-
-(* let add_behaviour ... = ... *)
-(* let add_code_annot ... = ... *)
-(* let add_spec ... = ... *)
-(* let add_variant ... = ... *)
-(* ===> utiliser un visiteur // nope
-
-
-*)
+let add_logic_info_body (env:env) (l:logic_info) : domain = match l.l_body with
+  | LBnone -> pure
+  | LBpred p ->
+    (* create environment *)
+    add_predicate env p ; pure
+  | LBterm t ->
+    (* create environment *)
+    let dres = Memory.logic_info env.map l in
+    let dresult = add_term env t in
+    let sigma = ref LDomain.empty in
+    unify (merge env) sigma dresult dres ;
+    subst !sigma dresult
+  | LBreads ts ->
+    List.iter (fun t -> iadd_term env t.it_content) ts ; pure
+  | LBinductive _ ->
+    Options.abort "Logic.add_logic_info: inductive not implemented yet"

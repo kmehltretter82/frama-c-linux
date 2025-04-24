@@ -489,6 +489,12 @@ let pointed_by m (r : node) =
 let cvar (m: map) (v: varinfo) : node =
   Ufind.find m.store @@ Vmap.find v m.cvars
 
+let logic_info (m: map) (l: logic_info) =
+  LVImap.find l m.logics
+
+let lvar (m: map) (v: logic_var) =
+  LVmap.find v m.lvars
+
 let rec move (m: map) (r: node) (p: int) (s: int) =
   let c = Ufind.get m.store r in
   match c.clayout with
