@@ -52,7 +52,19 @@
 
 /*! \brief Structure to hold pieces of information about function and statement
  * contracts at runtime. */
-typedef struct contract_t __attribute__((FC_BUILTIN)) contract_t;
+typedef struct contract_t {
+  /*! \internal Number of cells in the char array used to store the results of
+     * the assumes clauses.
+     */
+  size_t char_count;
+
+  /*! \internal Char array to store the results of the assumes clauses. One bit
+     * per behavior.
+     *
+     * The functions \ref find_char_index() and \ref find_bit_index() can be
+     * used to find the location of the bit for a specific behavior. */
+  char *assumes;
+} __attribute__((FC_BUILTIN)) contract_t;
 
 /*! \brief Allocate and initialize a structure to hold pieces of information
  * about `size` behaviors.
