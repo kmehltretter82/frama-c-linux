@@ -128,13 +128,13 @@ let type_of_number_ty lv = function
   | Real -> Error.not_yet "real number"
   | Nan -> Typing.typ_of_lty lv.lv_type
 
-let type_of_profile li profile_types ret_ty =
+let type_of_profile li params_ty ret_ty =
   let params_ty_vi =
     List.map
       (* build the formals: cannot use [Cil.makeFormal] since the function
          does not exist yet *)
       (fun (lvi, pty) -> lvi.lv_name, pty, [])
-      profile_types
+      params_ty
   in
   (* build the varinfo storing the result *)
   let res_as_extra_arg = result_as_extra_argument ret_ty in
@@ -155,11 +155,12 @@ let type_of_profile li profile_types ret_ty =
     false
 
 (* Generate a kernel function from a given logic info [li] *)
-let generate_kf ~loc fname env profile_types ret_ty kf_typ params_ival li =
+let generate_kf ~loc fname env params_ty ret_ty params_ival li =
+  let kf_typ = type_of_profile li params_ty ret_ty in
   (* build the formal parameters *)
   let params = List.map
       (fun (lvi, pty) -> Cil.makeVarinfo false true lvi.lv_name pty)
-      profile_types
+      params_ty
   in
   (* build the varinfo storing the result *)
   let res_as_extra_arg = result_as_extra_argument ret_ty in
@@ -417,10 +418,11 @@ let ret_ty_of_tapp ~env = function
 
 (* Generate (and memoize) the function body and create the calls to the
    generated functions. *)
-let function_to_exp ~loc ?tapp fname env kf li profile_types ret_ty params_and_ret_ty kf_typ profile args =
+let function_to_exp ~loc ?tapp fname env kf li params_ty ret_ty profile args =
+  let params_and_ret_ty = ret_ty :: List.map snd params_ty in
   (* memoize the function's varinfo *)
   let fvi, gen_body =
-    Gen_functions.memo (generate_kf fname ~loc env profile_types ret_ty kf_typ profile) params_and_ret_ty li
+    Gen_functions.memo (generate_kf fname ~loc env params_ty ret_ty profile) params_and_ret_ty li
   in
   (* the generation of the function body must be performed after memoizing the
      kernel function in order to handle recursive calls in finite time :-) *)
@@ -575,13 +577,11 @@ let app_to_exp ~adata ~loc ?tapp kf env ?eargs li targs =
           li.l_profile
           params_num_ty
       in
-      let kf_typ = type_of_profile li params_ty ret_ty in
-      let params_and_ret_ty = ret_ty :: List.map snd params_ty in
       try
-        function_to_exp ~loc ?tapp gen_fname env kf li params_ty ret_ty params_and_ret_ty kf_typ profile args
+        function_to_exp ~loc ?tapp gen_fname env kf li params_ty ret_ty profile args
       with exn ->
         (* Those accesses always succeed *)
-        Gen_functions.replace li params_and_ret_ty (Error exn);
+        Gen_functions.replace li (ret_ty :: List.map snd params_ty) (Error exn);
         raise exn
     in
     e, adata, env
