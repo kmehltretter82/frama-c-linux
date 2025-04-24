@@ -6,6 +6,7 @@
 [mt] Warning: Mthread is an experimental plugin and is still in development.
 [mt] ******* Starting mthread
 [mt] *** Computing value analysis for main thread
+[eva] Analyzing a complete application starting at main
 [mt] New thread: <main>, fun main
 [mt] mutex.c:51: Initializing mutex m1
 [mt] mutex.c:52: Initializing mutex m2
@@ -46,6 +47,8 @@
 [mt] ***** Iteration 1
 [mt] *** Computing thread jobs1, iteration 1 (first iteration)
 [mt] * Computing value analysis for thread jobs1
+[eva] Analyzing a complete application starting at f1
+[eva] Initial state supplied by user
 [mt] mutex.c:23: Lock m1
 [mt] mutex.c:24: Lock m2
 [mt] mutex.c:26: Release m2
@@ -76,6 +79,8 @@
 [mt] *** Thread jobs1 computed
 [mt] *** Computing thread jobs2, iteration 1 (first iteration)
 [mt] * Computing value analysis for thread jobs2
+[eva] Analyzing a complete application starting at f2
+[eva] Initial state supplied by user
 [mt] mutex.c:32: Lock m1
 [mt] mutex.c:35: Release m1
 [mt] * Starting to save the state of the value analysis
@@ -100,6 +105,8 @@
 [mt] *** Thread jobs2 computed
 [mt] *** Computing thread jobs3, iteration 1 (first iteration)
 [mt] * Computing value analysis for thread jobs3
+[eva] Analyzing a complete application starting at f3
+[eva] Initial state supplied by user
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -116,6 +123,8 @@
 [mt] *** Thread jobs3 computed
 [mt] *** Computing thread jobs4, iteration 1 (first iteration)
 [mt] * Computing value analysis for thread jobs4
+[eva] Analyzing a complete application starting at f4
+[eva] Initial state supplied by user
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -147,6 +156,8 @@
 [mt] ***** Iteration 2
 [mt] *** Computing thread <main>, iteration 2 (potential shared vars changed)
 [mt] * Computing value analysis for thread <main>
+[eva] Analyzing a complete application starting at main
+[eva] Initial state supplied by user
 [mt] Thread <main>, fun main
 [mt] mutex.c:51: Initializing mutex m1
 [mt] mutex.c:52: Initializing mutex m2
@@ -186,6 +197,8 @@
 [mt] *** Computing thread jobs1, iteration 2
     (potential shared vars changed, interferences changed)
 [mt] * Computing value analysis for thread jobs1
+[eva] Analyzing a complete application starting at f1
+[eva] Initial state supplied by user
 [mt] mutex.c:23: Lock m1
 [mt] mutex.c:24: Lock m2
 [eva:interferences] mutex.c:25: inject threads interferences at this point
@@ -225,6 +238,8 @@
 [mt] *** Computing thread jobs2, iteration 2
     (potential shared vars changed, interferences changed)
 [mt] * Computing value analysis for thread jobs2
+[eva] Analyzing a complete application starting at f2
+[eva] Initial state supplied by user
 [mt] mutex.c:32: Lock m1
 [eva:interferences] mutex.c:33: inject threads interferences at this point
 [eva:interferences] mutex.c:34: inject threads interferences at this point
@@ -252,6 +267,8 @@
 [mt] *** Computing thread jobs3, iteration 2
     (potential shared vars changed, interferences changed)
 [mt] * Computing value analysis for thread jobs3
+[eva] Analyzing a complete application starting at f3
+[eva] Initial state supplied by user
 [eva:interferences] mutex.c:40: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
@@ -276,6 +293,8 @@
 [mt] *** Thread jobs3 computed
 [mt] *** Computing thread jobs4, iteration 2 (interferences changed)
 [mt] * Computing value analysis for thread jobs4
+[eva] Analyzing a complete application starting at f4
+[eva] Initial state supplied by user
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -324,6 +343,8 @@
 [mt] ***** Iteration 3
 [mt] *** Computing thread <main>, iteration 3 (interferences changed)
 [mt] * Computing value analysis for thread <main>
+[eva] Analyzing a complete application starting at main
+[eva] Initial state supplied by user
 [mt] Thread <main>, fun main
 [mt] mutex.c:51: Initializing mutex m1
 [mt] mutex.c:52: Initializing mutex m2
@@ -365,6 +386,8 @@
 [mt] *** Thread <main> computed
 [mt] *** Computing thread jobs1, iteration 3 (interferences changed)
 [mt] * Computing value analysis for thread jobs1
+[eva] Analyzing a complete application starting at f1
+[eva] Initial state supplied by user
 [mt] mutex.c:23: Lock m1
 [mt] mutex.c:24: Lock m2
 [eva:interferences] mutex.c:25: inject threads interferences at this point
@@ -405,6 +428,8 @@
     (shared vars values changed, thread initial memory state changed,
      interferences changed)
 [mt] * Computing value analysis for thread jobs2
+[eva] Analyzing a complete application starting at f2
+[eva] Initial state supplied by user
 [mt] mutex.c:32: Lock m1
 [eva:interferences] mutex.c:33: inject threads interferences at this point
 [eva:interferences] mutex.c:34: inject threads interferences at this point
@@ -432,6 +457,8 @@
 [mt] *** Computing thread jobs3, iteration 3
     (thread initial memory state changed, interferences changed)
 [mt] * Computing value analysis for thread jobs3
+[eva] Analyzing a complete application starting at f3
+[eva] Initial state supplied by user
 [eva:interferences] mutex.c:40: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
@@ -457,6 +484,8 @@
 [mt] *** Computing thread jobs4, iteration 3
     (thread initial memory state changed, interferences changed)
 [mt] * Computing value analysis for thread jobs4
+[eva] Analyzing a complete application starting at f4
+[eva] Initial state supplied by user
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -501,6 +530,8 @@
 [mt] ***** Iteration 4
 [mt] *** Computing thread <main>, iteration 4 (interferences changed)
 [mt] * Computing value analysis for thread <main>
+[eva] Analyzing a complete application starting at main
+[eva] Initial state supplied by user
 [mt] Thread <main>, fun main
 [mt] mutex.c:51: Initializing mutex m1
 [mt] mutex.c:52: Initializing mutex m2
@@ -539,6 +570,8 @@
 [mt] *** Thread <main> computed
 [mt] *** Computing thread jobs2, iteration 4 (shared vars values changed)
 [mt] * Computing value analysis for thread jobs2
+[eva] Analyzing a complete application starting at f2
+[eva] Initial state supplied by user
 [mt] mutex.c:32: Lock m1
 [eva:interferences] mutex.c:33: inject threads interferences at this point
 [eva:interferences] mutex.c:34: inject threads interferences at this point

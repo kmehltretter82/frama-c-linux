@@ -6,6 +6,7 @@
 [mt] Warning: Mthread is an experimental plugin and is still in development.
 [mt] ******* Starting mthread
 [mt] *** Computing value analysis for main thread
+[eva] Analyzing a complete application starting at main
 [mt] New thread: <main>, fun main
 [mt] philo_nofifo.c:31: Initializing mutex locks[0]
 [mt] philo_nofifo.c:31: Initializing mutex locks[1]
@@ -42,6 +43,8 @@
 [mt] ***** Iteration 1
 [mt] *** Computing thread jobs[0], iteration 1 (first iteration)
 [mt] * Computing value analysis for thread jobs[0]
+[eva] Analyzing a complete application starting at job
+[eva] Initial state supplied by user
 [mt] philo_nofifo.c:12: Lock locks[4]
 [mt] philo_nofifo.c:13: Lock locks[1]
 [mt] philo_nofifo.c:14: Release locks[1]
@@ -79,6 +82,8 @@
 [mt] *** Thread jobs[0] computed
 [mt] *** Computing thread jobs[1], iteration 1 (first iteration)
 [mt] * Computing value analysis for thread jobs[1]
+[eva] Analyzing a complete application starting at job
+[eva] Initial state supplied by user
 [mt] philo_nofifo.c:12: Lock locks[0]
 [mt] philo_nofifo.c:13: Lock locks[2]
 [mt] philo_nofifo.c:14: Release locks[2]
@@ -116,6 +121,8 @@
 [mt] *** Thread jobs[1] computed
 [mt] *** Computing thread jobs[2], iteration 1 (first iteration)
 [mt] * Computing value analysis for thread jobs[2]
+[eva] Analyzing a complete application starting at job
+[eva] Initial state supplied by user
 [mt] philo_nofifo.c:12: Lock locks[1]
 [mt] philo_nofifo.c:13: Lock locks[3]
 [mt] philo_nofifo.c:14: Release locks[3]
@@ -153,6 +160,8 @@
 [mt] *** Thread jobs[2] computed
 [mt] *** Computing thread jobs[3], iteration 1 (first iteration)
 [mt] * Computing value analysis for thread jobs[3]
+[eva] Analyzing a complete application starting at job
+[eva] Initial state supplied by user
 [mt] philo_nofifo.c:12: Lock locks[2]
 [mt] philo_nofifo.c:13: Lock locks[4]
 [mt] philo_nofifo.c:14: Release locks[4]
@@ -190,6 +199,8 @@
 [mt] *** Thread jobs[3] computed
 [mt] *** Computing thread jobs[4], iteration 1 (first iteration)
 [mt] * Computing value analysis for thread jobs[4]
+[eva] Analyzing a complete application starting at job
+[eva] Initial state supplied by user
 [mt] philo_nofifo.c:12: Lock locks[3]
 [mt] philo_nofifo.c:13: Lock locks[0]
 [mt] philo_nofifo.c:14: Release locks[0]

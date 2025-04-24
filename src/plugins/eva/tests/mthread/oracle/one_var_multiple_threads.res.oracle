@@ -8,6 +8,7 @@
 [mt] Warning: Mthread is an experimental plugin and is still in development.
 [mt] ******* Starting mthread
 [mt] *** Computing value analysis for main thread
+[eva] Analyzing a complete application starting at main
 [mt] New thread: <main>, fun main
 [mt] one_var_multiple_threads.c:37: Initializing mutex lock1
 [mt] one_var_multiple_threads.c:38: Initializing mutex lock2
@@ -68,6 +69,8 @@
 [mt] ***** Iteration 1
 [mt] *** Computing thread jobs, iteration 1 (first iteration)
 [mt] * Computing value analysis for thread jobs
+[eva] Analyzing a complete application starting at f
+[eva] Initial state supplied by user
 [mt] one_var_multiple_threads.c:20: Lock lock1
 [mt] one_var_multiple_threads.c:23: Release lock1
 [mt] * Starting to save the state of the value analysis
@@ -96,6 +99,8 @@
 [mt] *** Thread jobs computed
 [mt] *** Computing thread jobs, iteration 1 (first iteration)
 [mt] * Computing value analysis for thread jobs
+[eva] Analyzing a complete application starting at g
+[eva] Initial state supplied by user
 [mt] one_var_multiple_threads.c:28: Lock lock2
 [mt] one_var_multiple_threads.c:31: Release lock2
 [eva:alarm] one_var_multiple_threads.c:32: Warning: 
@@ -142,6 +147,8 @@
 [mt] ***** Iteration 2
 [mt] *** Computing thread <main>, iteration 2 (potential shared vars changed)
 [mt] * Computing value analysis for thread <main>
+[eva] Analyzing a complete application starting at main
+[eva] Initial state supplied by user
 [mt] Thread <main>, fun main
 [mt] one_var_multiple_threads.c:37: Initializing mutex lock1
 [mt] one_var_multiple_threads.c:38: Initializing mutex lock2
@@ -193,6 +200,8 @@
 [mt] *** Computing thread jobs, iteration 2
     (potential shared vars changed, interferences changed)
 [mt] * Computing value analysis for thread jobs
+[eva] Analyzing a complete application starting at f
+[eva] Initial state supplied by user
 [mt] one_var_multiple_threads.c:20: Lock lock1
 [eva:interferences] one_var_multiple_threads.c:21: 
   inject threads interferences at this point
@@ -240,6 +249,8 @@
 [mt] *** Computing thread jobs, iteration 2
     (potential shared vars changed, interferences changed)
 [mt] * Computing value analysis for thread jobs
+[eva] Analyzing a complete application starting at g
+[eva] Initial state supplied by user
 [mt] one_var_multiple_threads.c:28: Lock lock2
 [eva:interferences] one_var_multiple_threads.c:29: 
   inject threads interferences at this point
@@ -348,6 +359,8 @@
 [mt] *** Computing thread <main>, iteration 3
     (shared vars values changed, interferences changed)
 [mt] * Computing value analysis for thread <main>
+[eva] Analyzing a complete application starting at main
+[eva] Initial state supplied by user
 [mt] Thread <main>, fun main
 [mt] one_var_multiple_threads.c:37: Initializing mutex lock1
 [mt] one_var_multiple_threads.c:38: Initializing mutex lock2
@@ -411,6 +424,8 @@
 [mt] *** Computing thread jobs, iteration 3
     (thread initial memory state changed, interferences changed)
 [mt] * Computing value analysis for thread jobs
+[eva] Analyzing a complete application starting at f
+[eva] Initial state supplied by user
 [mt] one_var_multiple_threads.c:20: Lock lock1
 [eva:interferences] one_var_multiple_threads.c:21: 
   inject threads interferences at this point
@@ -464,6 +479,8 @@
 [mt] *** Computing thread jobs, iteration 3
     (thread initial memory state changed, interferences changed)
 [mt] * Computing value analysis for thread jobs
+[eva] Analyzing a complete application starting at g
+[eva] Initial state supplied by user
 [mt] one_var_multiple_threads.c:28: Lock lock2
 [eva:interferences] one_var_multiple_threads.c:29: 
   inject threads interferences at this point
@@ -569,6 +586,8 @@
 [mt] *** Computing thread <main>, iteration 4
     (shared vars values changed, interferences changed)
 [mt] * Computing value analysis for thread <main>
+[eva] Analyzing a complete application starting at main
+[eva] Initial state supplied by user
 [mt] Thread <main>, fun main
 [mt] one_var_multiple_threads.c:37: Initializing mutex lock1
 [mt] one_var_multiple_threads.c:38: Initializing mutex lock2
@@ -636,6 +655,8 @@
 [mt] *** Computing thread jobs, iteration 4
     (thread initial memory state changed, interferences changed)
 [mt] * Computing value analysis for thread jobs
+[eva] Analyzing a complete application starting at f
+[eva] Initial state supplied by user
 [mt] one_var_multiple_threads.c:20: Lock lock1
 [eva:interferences] one_var_multiple_threads.c:21: 
   inject threads interferences at this point
@@ -689,6 +710,8 @@
 [mt] *** Computing thread jobs, iteration 4
     (thread initial memory state changed, interferences changed)
 [mt] * Computing value analysis for thread jobs
+[eva] Analyzing a complete application starting at g
+[eva] Initial state supplied by user
 [mt] one_var_multiple_threads.c:28: Lock lock2
 [eva:alarm] one_var_multiple_threads.c:29: Warning: 
   signed overflow. assert s2.data + 1 ≤ 2147483647;
@@ -805,6 +828,8 @@
 [mt] *** Computing thread <main>, iteration 5
     (shared vars values changed, interferences changed)
 [mt] * Computing value analysis for thread <main>
+[eva] Analyzing a complete application starting at main
+[eva] Initial state supplied by user
 [mt] Thread <main>, fun main
 [mt] one_var_multiple_threads.c:37: Initializing mutex lock1
 [mt] one_var_multiple_threads.c:38: Initializing mutex lock2
@@ -874,6 +899,8 @@
 [mt] *** Computing thread jobs, iteration 5
     (thread initial memory state changed, interferences changed)
 [mt] * Computing value analysis for thread jobs
+[eva] Analyzing a complete application starting at f
+[eva] Initial state supplied by user
 [mt] one_var_multiple_threads.c:20: Lock lock1
 [eva:alarm] one_var_multiple_threads.c:21: Warning: 
   signed overflow. assert s1.data + 1 ≤ 2147483647;
@@ -933,6 +960,8 @@
 [mt] *** Computing thread jobs, iteration 5
     (thread initial memory state changed, interferences changed)
 [mt] * Computing value analysis for thread jobs
+[eva] Analyzing a complete application starting at g
+[eva] Initial state supplied by user
 [mt] one_var_multiple_threads.c:28: Lock lock2
 [eva:alarm] one_var_multiple_threads.c:29: Warning: 
   signed overflow. assert s2.data + 1 ≤ 2147483647;
@@ -1052,6 +1081,8 @@
 [mt] ***** Iteration 6
 [mt] *** Computing thread <main>, iteration 6 (interferences changed)
 [mt] * Computing value analysis for thread <main>
+[eva] Analyzing a complete application starting at main
+[eva] Initial state supplied by user
 [mt] Thread <main>, fun main
 [mt] one_var_multiple_threads.c:37: Initializing mutex lock1
 [mt] one_var_multiple_threads.c:38: Initializing mutex lock2
@@ -1116,6 +1147,8 @@
 [mt] *** Thread <main> computed
 [mt] *** Computing thread jobs, iteration 6 (interferences changed)
 [mt] * Computing value analysis for thread jobs
+[eva] Analyzing a complete application starting at f
+[eva] Initial state supplied by user
 [mt] one_var_multiple_threads.c:20: Lock lock1
 [eva:alarm] one_var_multiple_threads.c:21: Warning: 
   signed overflow. assert s1.data + 1 ≤ 2147483647;

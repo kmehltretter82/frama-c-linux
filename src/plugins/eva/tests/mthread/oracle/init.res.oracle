@@ -6,6 +6,7 @@
 [mt] Warning: Mthread is an experimental plugin and is still in development.
 [mt] ******* Starting mthread
 [mt] *** Computing value analysis for main thread
+[eva] Analyzing a complete application starting at main
 [mt] New thread: <main>, fun main
 [mt] init.c:22: Initializing mutex locks[0]
 [mt] init.c:22: Initializing mutex locks[1]

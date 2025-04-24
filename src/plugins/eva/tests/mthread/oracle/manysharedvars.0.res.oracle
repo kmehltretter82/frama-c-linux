@@ -6,6 +6,7 @@
 [mt] Warning: Mthread is an experimental plugin and is still in development.
 [mt] ******* Starting mthread
 [mt] *** Computing value analysis for main thread
+[eva] Analyzing a complete application starting at main
 [mt] New thread: <main>, fun main
 [mt] manysharedvars.c:42: Initializing mutex lock
 [mt] manysharedvars.c:43: New thread: jobs, fun f, parent <main>, args {0}
@@ -79,6 +80,8 @@
 [mt] ***** Iteration 1
 [mt] *** Computing thread jobs, iteration 1 (first iteration)
 [mt] * Computing value analysis for thread jobs
+[eva] Analyzing a complete application starting at f
+[eva] Initial state supplied by user
 [mt] manysharedvars.c:28: Lock lock
 [mt] manysharedvars.c:31: Release lock
 [eva:alarm] manysharedvars.c:29: Warning: 
@@ -169,6 +172,8 @@
 [mt] ***** Iteration 2
 [mt] *** Computing thread <main>, iteration 2 (potential shared vars changed)
 [mt] * Computing value analysis for thread <main>
+[eva] Analyzing a complete application starting at main
+[eva] Initial state supplied by user
 [mt] Thread <main>, fun main
 [mt] manysharedvars.c:42: Initializing mutex lock
 [mt] manysharedvars.c:43: Thread jobs, fun f, parent <main>, args {0}
@@ -241,6 +246,8 @@
 [mt] *** Computing thread jobs, iteration 2
     (potential shared vars changed, interferences changed)
 [mt] * Computing value analysis for thread jobs
+[eva] Analyzing a complete application starting at f
+[eva] Initial state supplied by user
 [mt] manysharedvars.c:28: Lock lock
 [eva:interferences] manysharedvars.c:29: 
   inject threads interferences at this point
@@ -2247,6 +2254,8 @@
 [mt] *** Computing thread <main>, iteration 3
     (shared vars values changed, interferences changed)
 [mt] * Computing value analysis for thread <main>
+[eva] Analyzing a complete application starting at main
+[eva] Initial state supplied by user
 [mt] Thread <main>, fun main
 [mt] manysharedvars.c:42: Initializing mutex lock
 [mt] manysharedvars.c:43: Thread jobs, fun f, parent <main>, args {0}

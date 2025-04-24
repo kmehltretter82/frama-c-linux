@@ -6,6 +6,7 @@
 [mt] Warning: Mthread is an experimental plugin and is still in development.
 [mt] ******* Starting mthread
 [mt] *** Computing value analysis for main thread
+[eva] Analyzing a complete application starting at main
 [mt] New thread: <main>, fun main
 [mt] memcpy.c:38: New thread: tjob0, fun job0, parent <main>, args {0}
 [mt] memcpy.c:38: Start thread tjob0
@@ -54,6 +55,8 @@
 [mt] ***** Iteration 1
 [mt] *** Computing thread tjob0, iteration 1 (first iteration)
 [mt] * Computing value analysis for thread tjob0
+[eva] Analyzing a complete application starting at job0
+[eva] Initial state supplied by user
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -69,6 +72,8 @@
 [mt] *** Thread tjob0 computed
 [mt] *** Computing thread tjob1, iteration 1 (first iteration)
 [mt] * Computing value analysis for thread tjob1
+[eva] Analyzing a complete application starting at job1
+[eva] Initial state supplied by user
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -86,6 +91,8 @@
 [mt] *** Thread tjob1 computed
 [mt] *** Computing thread tjob2, iteration 1 (first iteration)
 [mt] * Computing value analysis for thread tjob2
+[eva] Analyzing a complete application starting at job2
+[eva] Initial state supplied by user
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -119,6 +126,8 @@
 [mt] ***** Iteration 2
 [mt] *** Computing thread <main>, iteration 2 (potential shared vars changed)
 [mt] * Computing value analysis for thread <main>
+[eva] Analyzing a complete application starting at main
+[eva] Initial state supplied by user
 [mt] Thread <main>, fun main
 [mt] memcpy.c:38: Thread tjob0, fun job0, parent <main>, args {0}
 [mt] memcpy.c:38: Start thread tjob0
@@ -206,6 +215,8 @@
 [mt] *** Thread <main> computed
 [mt] *** Computing thread tjob0, iteration 2 (interferences changed)
 [mt] * Computing value analysis for thread tjob0
+[eva] Analyzing a complete application starting at job0
+[eva] Initial state supplied by user
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -222,6 +233,8 @@
 [mt] *** Computing thread tjob1, iteration 2
     (potential shared vars changed, interferences changed)
 [mt] * Computing value analysis for thread tjob1
+[eva] Analyzing a complete application starting at job1
+[eva] Initial state supplied by user
 [eva:interferences] memcpy.c:26: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
@@ -241,6 +254,8 @@
 [mt] *** Computing thread tjob2, iteration 2
     (potential shared vars changed, interferences changed)
 [mt] * Computing value analysis for thread tjob2
+[eva] Analyzing a complete application starting at job2
+[eva] Initial state supplied by user
 [eva:interferences] memcpy.c:31: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
@@ -295,6 +310,8 @@
 [mt] ***** Iteration 3
 [mt] *** Computing thread tjob1, iteration 3 (shared vars values changed)
 [mt] * Computing value analysis for thread tjob1
+[eva] Analyzing a complete application starting at job1
+[eva] Initial state supplied by user
 [eva:interferences] memcpy.c:26: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
@@ -313,6 +330,8 @@
 [mt] *** Thread tjob1 computed
 [mt] *** Computing thread tjob2, iteration 3 (shared vars values changed)
 [mt] * Computing value analysis for thread tjob2
+[eva] Analyzing a complete application starting at job2
+[eva] Initial state supplied by user
 [eva:interferences] memcpy.c:31: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved

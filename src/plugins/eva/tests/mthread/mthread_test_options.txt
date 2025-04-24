@@ -12,7 +12,7 @@
 ../../../share/mthread/mthread_queue.c
 # Verbosity options
 -mt-verbose 3
--eva-verbose 0
+-eva-verbose 1
 -eva-no-show-progress
--eva-msg-key interferences,-summary,-initial-state
+-eva-msg-key interferences,-summary,-initial-state,-final-states,-partition
 -eva-warn-key experimental=inactive

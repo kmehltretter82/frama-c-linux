@@ -1,7 +1,7 @@
 /* run.config*
-  STDOPT: +"-eva-verbose=1 -main main_interrupt_one_shot -mt-interrupt-handlers interrupt_oneshot"
-  STDOPT: +"-eva-verbose=1 -main main_interrupt_incr -mt-interrupt-handlers interrupt_incr"
-  STDOPT: +"-eva-verbose=1 -main main_interrupt_cross_incr -mt-interrupt-handlers interrupt_cross_incr1,interrupt_cross_incr2"
+  STDOPT: +"-main main_interrupt_one_shot -mt-interrupt-handlers interrupt_oneshot"
+  STDOPT: +"-main main_interrupt_incr -mt-interrupt-handlers interrupt_incr"
+  STDOPT: +"-main main_interrupt_cross_incr -mt-interrupt-handlers interrupt_cross_incr1,interrupt_cross_incr2"
 */
 int interrupt_received;
 

@@ -6,10 +6,12 @@
 [mt] Warning: Mthread is an experimental plugin and is still in development.
 [mt] ******* Starting mthread
 [mt] *** Computing value analysis for main thread
+[eva] Analyzing a complete application starting at main
 [mt] New thread: <main>, fun main
 [kernel:annot:missing-spec] messy_init.c:15: Warning: 
   Neither code nor specification for function random,
    generating default assigns. See -generated-spec-* options for more info
+[eva] using specification for function random
 [mt] messy_init.c:16: Initializing mutex lock
 [mt] messy_init.c:19: Lock lock
 [mt] messy_init.c:22: New thread: job, fun fjob, parent <main>, args {0}
@@ -33,6 +35,8 @@
 [mt] ***** Iteration 1
 [mt] *** Computing thread job, iteration 1 (first iteration)
 [mt] * Computing value analysis for thread job
+[eva] Analyzing a complete application starting at fjob
+[eva] Initial state supplied by user
 [mt] messy_init.c:10: Warning: Trying to lock a possibly uninitialized mutex.
 [mt] messy_init.c:10: Warning: 
   Unable to check that mutex lock has not already been locked;

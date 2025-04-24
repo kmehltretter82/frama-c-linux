@@ -6,6 +6,7 @@
 [mt] Warning: Mthread is an experimental plugin and is still in development.
 [mt] ******* Starting mthread
 [mt] *** Computing value analysis for main thread
+[eva] Analyzing a complete application starting at main
 [mt] New thread: <main>, fun main
 [mt] nice_offsets.c:20: Initializing mutex t[0].a1
 [mt] nice_offsets.c:21: Initializing mutex t[1].b1[2].a0

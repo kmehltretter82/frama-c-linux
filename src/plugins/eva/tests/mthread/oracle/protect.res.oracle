@@ -6,6 +6,7 @@
 [mt] Warning: Mthread is an experimental plugin and is still in development.
 [mt] ******* Starting mthread
 [mt] *** Computing value analysis for main thread
+[eva] Analyzing a complete application starting at main
 [mt] New thread: <main>, fun main
 [mt] protect.c:19: Initializing mutex lock1
 [mt] protect.c:20: Initializing mutex lock2
@@ -44,6 +45,8 @@
 [mt] ***** Iteration 1
 [mt] *** Computing thread tjob, iteration 1 (first iteration)
 [mt] * Computing value analysis for thread tjob
+[eva] Analyzing a complete application starting at job
+[eva] Initial state supplied by user
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -76,6 +79,8 @@
 [mt] ***** Iteration 2
 [mt] *** Computing thread <main>, iteration 2 (potential shared vars changed)
 [mt] * Computing value analysis for thread <main>
+[eva] Analyzing a complete application starting at main
+[eva] Initial state supplied by user
 [mt] Thread <main>, fun main
 [mt] protect.c:19: Initializing mutex lock1
 [mt] protect.c:20: Initializing mutex lock2
@@ -135,6 +140,8 @@
 [mt] *** Computing thread tjob, iteration 2
     (potential shared vars changed, interferences changed)
 [mt] * Computing value analysis for thread tjob
+[eva] Analyzing a complete application starting at job
+[eva] Initial state supplied by user
 [eva:interferences] protect.c:12: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
@@ -185,6 +192,8 @@
 [mt] ***** Iteration 3
 [mt] *** Computing thread tjob, iteration 3 (shared vars values changed)
 [mt] * Computing value analysis for thread tjob
+[eva] Analyzing a complete application starting at job
+[eva] Initial state supplied by user
 [eva:interferences] protect.c:12: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved

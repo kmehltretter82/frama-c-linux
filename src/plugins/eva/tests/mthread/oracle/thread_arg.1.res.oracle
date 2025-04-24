@@ -6,6 +6,7 @@
 [mt] Warning: Mthread is an experimental plugin and is still in development.
 [mt] ******* Starting mthread
 [mt] *** Computing value analysis for main thread
+[eva] Analyzing a complete application starting at main
 [mt] New thread: <main>, fun main
 [mt] thread_arg.c:33: Initializing mutex locks[0]
 [mt] thread_arg.c:33: Initializing mutex locks[1]
@@ -43,7 +44,10 @@
 [mt] ***** Iteration 1
 [mt] *** Computing thread jobs[0], iteration 1 (first iteration)
 [mt] * Computing value analysis for thread jobs[0]
+[eva] Analyzing a complete application starting at job
+[eva] Initial state supplied by user
 [mt] thread_arg.c:25: Lock locks[0]
+[eva] using specification for function Frama_C_interval
 [mt] thread_arg.c:27: Release locks[0]
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
@@ -71,7 +75,10 @@
 [mt] *** Thread jobs[0] computed
 [mt] *** Computing thread jobs[1], iteration 1 (first iteration)
 [mt] * Computing value analysis for thread jobs[1]
+[eva] Analyzing a complete application starting at job
+[eva] Initial state supplied by user
 [mt] thread_arg.c:25: Lock locks[1]
+[eva] using specification for function Frama_C_interval
 [mt] thread_arg.c:27: Release locks[1]
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
@@ -115,6 +122,8 @@
 [mt] ***** Iteration 2
 [mt] *** Computing thread <main>, iteration 2 (potential shared vars changed)
 [mt] * Computing value analysis for thread <main>
+[eva] Analyzing a complete application starting at main
+[eva] Initial state supplied by user
 [mt] Thread <main>, fun main
 [mt] thread_arg.c:33: Initializing mutex locks[0]
 [mt] thread_arg.c:33: Initializing mutex locks[1]
@@ -151,7 +160,10 @@
 [mt] *** Computing thread jobs[0], iteration 2
     (potential shared vars changed, interferences changed)
 [mt] * Computing value analysis for thread jobs[0]
+[eva] Analyzing a complete application starting at job
+[eva] Initial state supplied by user
 [mt] thread_arg.c:25: Lock locks[0]
+[eva] using specification for function Frama_C_interval
 [eva:interferences] thread_arg.c:26: inject threads interferences at this point
 [eva:interferences] thread_arg.c:26: inject threads interferences at this point
 [mt] thread_arg.c:27: Release locks[0]
@@ -197,7 +209,10 @@
 [mt] *** Computing thread jobs[1], iteration 2
     (potential shared vars changed, interferences changed)
 [mt] * Computing value analysis for thread jobs[1]
+[eva] Analyzing a complete application starting at job
+[eva] Initial state supplied by user
 [mt] thread_arg.c:25: Lock locks[1]
+[eva] using specification for function Frama_C_interval
 [eva:interferences] thread_arg.c:26: inject threads interferences at this point
 [eva:interferences] thread_arg.c:26: inject threads interferences at this point
 [mt] thread_arg.c:27: Release locks[1]
@@ -299,6 +314,8 @@
 [mt] *** Computing thread <main>, iteration 3
     (shared vars values changed, interferences changed)
 [mt] * Computing value analysis for thread <main>
+[eva] Analyzing a complete application starting at main
+[eva] Initial state supplied by user
 [mt] Thread <main>, fun main
 [mt] thread_arg.c:33: Initializing mutex locks[0]
 [mt] thread_arg.c:33: Initializing mutex locks[1]
@@ -337,7 +354,10 @@
 [mt] *** Computing thread jobs[0], iteration 3
     (shared vars values changed, interferences changed)
 [mt] * Computing value analysis for thread jobs[0]
+[eva] Analyzing a complete application starting at job
+[eva] Initial state supplied by user
 [mt] thread_arg.c:25: Lock locks[0]
+[eva] using specification for function Frama_C_interval
 [eva:interferences] thread_arg.c:26: inject threads interferences at this point
 [eva:interferences] thread_arg.c:26: inject threads interferences at this point
 [mt] thread_arg.c:27: Release locks[0]
@@ -384,7 +404,10 @@
     (shared vars values changed, thread initial memory state changed,
      interferences changed)
 [mt] * Computing value analysis for thread jobs[1]
+[eva] Analyzing a complete application starting at job
+[eva] Initial state supplied by user
 [mt] thread_arg.c:25: Lock locks[1]
+[eva] using specification for function Frama_C_interval
 [eva:interferences] thread_arg.c:26: inject threads interferences at this point
 [eva:interferences] thread_arg.c:26: inject threads interferences at this point
 [mt] thread_arg.c:27: Release locks[1]
@@ -482,6 +505,8 @@
 [mt] *** Computing thread <main>, iteration 4
     (shared vars values changed, interferences changed)
 [mt] * Computing value analysis for thread <main>
+[eva] Analyzing a complete application starting at main
+[eva] Initial state supplied by user
 [mt] Thread <main>, fun main
 [mt] thread_arg.c:33: Initializing mutex locks[0]
 [mt] thread_arg.c:33: Initializing mutex locks[1]
@@ -522,7 +547,10 @@
 [mt] *** Computing thread jobs[0], iteration 4
     (shared vars values changed, interferences changed)
 [mt] * Computing value analysis for thread jobs[0]
+[eva] Analyzing a complete application starting at job
+[eva] Initial state supplied by user
 [mt] thread_arg.c:25: Lock locks[0]
+[eva] using specification for function Frama_C_interval
 [eva:interferences] thread_arg.c:26: inject threads interferences at this point
 [eva:interferences] thread_arg.c:26: inject threads interferences at this point
 [mt] thread_arg.c:27: Release locks[0]
@@ -571,7 +599,10 @@
     (shared vars values changed, thread initial memory state changed,
      interferences changed)
 [mt] * Computing value analysis for thread jobs[1]
+[eva] Analyzing a complete application starting at job
+[eva] Initial state supplied by user
 [mt] thread_arg.c:25: Lock locks[1]
+[eva] using specification for function Frama_C_interval
 [eva:interferences] thread_arg.c:26: inject threads interferences at this point
 [eva:alarm] thread_arg.c:26: Warning: 
   signed overflow.
@@ -674,6 +705,8 @@
 [mt] ***** Iteration 5
 [mt] *** Computing thread <main>, iteration 5 (interferences changed)
 [mt] * Computing value analysis for thread <main>
+[eva] Analyzing a complete application starting at main
+[eva] Initial state supplied by user
 [mt] Thread <main>, fun main
 [mt] thread_arg.c:33: Initializing mutex locks[0]
 [mt] thread_arg.c:33: Initializing mutex locks[1]
@@ -712,7 +745,10 @@
 [mt] *** Thread <main> computed
 [mt] *** Computing thread jobs[0], iteration 5 (interferences changed)
 [mt] * Computing value analysis for thread jobs[0]
+[eva] Analyzing a complete application starting at job
+[eva] Initial state supplied by user
 [mt] thread_arg.c:25: Lock locks[0]
+[eva] using specification for function Frama_C_interval
 [eva:interferences] thread_arg.c:26: inject threads interferences at this point
 [eva:alarm] thread_arg.c:26: Warning: 
   signed overflow.
@@ -761,7 +797,10 @@
 [mt] *** Thread jobs[0] computed
 [mt] *** Computing thread jobs[1], iteration 5 (interferences changed)
 [mt] * Computing value analysis for thread jobs[1]
+[eva] Analyzing a complete application starting at job
+[eva] Initial state supplied by user
 [mt] thread_arg.c:25: Lock locks[1]
+[eva] using specification for function Frama_C_interval
 [eva:interferences] thread_arg.c:26: inject threads interferences at this point
 [eva:alarm] thread_arg.c:26: Warning: 
   signed overflow.
@@ -864,6 +903,8 @@
 [mt] ***** Iteration 6
 [mt] *** Computing thread <main>, iteration 6 (interferences changed)
 [mt] * Computing value analysis for thread <main>
+[eva] Analyzing a complete application starting at main
+[eva] Initial state supplied by user
 [mt] Thread <main>, fun main
 [mt] thread_arg.c:33: Initializing mutex locks[0]
 [mt] thread_arg.c:33: Initializing mutex locks[1]

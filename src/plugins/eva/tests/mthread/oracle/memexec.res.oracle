@@ -6,6 +6,7 @@
 [mt] Warning: Mthread is an experimental plugin and is still in development.
 [mt] ******* Starting mthread
 [mt] *** Computing value analysis for main thread
+[eva] Analyzing a complete application starting at main
 [mt] New thread: <main>, fun main
 [mt] memexec.c:32: New thread: th1, fun t1, parent <main>, args {0}
 [mt] memexec.c:32: Start thread th1
@@ -28,6 +29,8 @@
 [mt] ***** Iteration 1
 [mt] *** Computing thread th1, iteration 1 (first iteration)
 [mt] * Computing value analysis for thread th1
+[eva] Analyzing a complete application starting at t1
+[eva] Initial state supplied by user
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -66,6 +69,8 @@
 [mt] ***** Iteration 2
 [mt] *** Computing thread <main>, iteration 2 (potential shared vars changed)
 [mt] * Computing value analysis for thread <main>
+[eva] Analyzing a complete application starting at main
+[eva] Initial state supplied by user
 [mt] Thread <main>, fun main
 [mt] memexec.c:32: Thread th1, fun t1, parent <main>, args {0}
 [mt] memexec.c:32: Start thread th1
@@ -87,6 +92,8 @@
 [mt] *** Computing thread th1, iteration 2
     (potential shared vars changed, interferences changed)
 [mt] * Computing value analysis for thread th1
+[eva] Analyzing a complete application starting at t1
+[eva] Initial state supplied by user
 [eva:interferences] memexec.c:14: inject threads interferences at this point
 [eva:interferences] memexec.c:10: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
@@ -174,6 +181,8 @@
 [mt] *** Computing thread <main>, iteration 3
     (shared vars values changed, interferences changed)
 [mt] * Computing value analysis for thread <main>
+[eva] Analyzing a complete application starting at main
+[eva] Initial state supplied by user
 [mt] Thread <main>, fun main
 [mt] memexec.c:32: Thread th1, fun t1, parent <main>, args {0}
 [mt] memexec.c:32: Start thread th1
