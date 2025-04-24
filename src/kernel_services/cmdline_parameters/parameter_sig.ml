@@ -648,13 +648,12 @@ module type Builder = sig
 
   (** Allow using custom types as parameters.
       @since 29.0-Copper *)
-  module Custom(X: sig
-      include Input_with_arg
-      include Datatype.S
-      val default: t
-      val of_string: string -> t option
-      val to_string: t -> string
-    end) : Custom with type t = X.t
+  module Custom
+      (V: Value_datatype)
+      (_: sig
+         include Input_with_arg
+         val default: V.t
+       end) : Custom with type t = V.t
 
   (** A fixed set of possible values, represented by a type [t], intended to be
       a variant with only a finite number of possible constructions.

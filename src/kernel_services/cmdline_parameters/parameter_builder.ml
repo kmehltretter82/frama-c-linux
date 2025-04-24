@@ -701,18 +701,21 @@ struct
   (** {3 Custom parameters} *)
   (* ************************************************************************ *)
 
+  exception Cannot_build of string
+
+  let cannot_build msg = raise (Cannot_build msg)
+
   module Custom
+      (V: Parameter_sig.Value_datatype)
       (X: sig
          include Parameter_sig.Input_with_arg
-         include Datatype.S
-         val default: t
-         val of_string: string -> t option
-         val to_string: t -> string
+         val default: V.t
        end) =
   struct
 
     include Build
         (struct
+          include V
           include X
           let default () = default
           let functor_name = "Value"
@@ -726,28 +729,19 @@ struct
     module String_parameter =
     struct
       let get () =
-        X.to_string (get ())
+        V.to_string (get ())
 
       let set s =
-        match X.of_string s with
-        | Some x -> set x
-        | None ->
-          (* Error during conversion from string to t, abort *)
-          let help_text =
-            match !possible_values with
-            | [] -> ""
-            | l ->
-              Format.asprintf "@ Possible values are: %a"
-                (Pretty_utils.pp_list ~sep:",@ " Format.pp_print_string) l
-          in
-          P.L.abort "invalid input '%s' for option %s. %s" s name help_text
+        try set (V.of_string s)
+        with Cannot_build msg ->
+          P.L.abort "invalid input '%s' for option %s: %s" s name msg
 
       let add_set_hook f =
-        let f' x1 x2 = f (X.to_string x1) (X.to_string x2) in
+        let f' x1 x2 = f (V.to_string x1) (V.to_string x2) in
         add_set_hook f'
 
       let add_update_hook f =
-        let f' x1 x2 = f (X.to_string x1) (X.to_string x2) in
+        let f' x1 x2 = f (V.to_string x1) (V.to_string x2) in
         add_update_hook f'
     end
 
@@ -788,7 +782,10 @@ struct
          val values: (t * string) list
        end) =
   struct
-    module Custom_input =
+
+    let string_list ~sep = List.map snd X.values |> Stdlib.String.concat sep
+
+    module Custom_value =
     struct
       include Datatype.Make_with_set_and_map (struct
           include Datatype.Serializable_undefined
@@ -800,17 +797,15 @@ struct
           let reprs = List.map fst X.values
         end)
 
-      include X
-
-      let arg_name =
-        values
-        |> List.map snd
-        |> Stdlib.String.concat "|"
+      let of_string_opt s =
+        X.values
+        |> List.map (fun (x, s) -> (s, x))
+        |> List.assoc_opt s
 
       let of_string s =
-        X.values
-        |> List.map (fun (x,s) -> (s, x))
-        |> List.assoc_opt s
+        match of_string_opt s with
+        | Some s -> s
+        | None -> cannot_build ("possible values are " ^ string_list ~sep:",")
 
       let to_string x =
         try
@@ -818,10 +813,15 @@ struct
         with Not_found -> invalid_arg "not one of possible values"
     end
 
-    include Custom (Custom_input)
+    module Custom_input =
+    struct
+      include X
+      let arg_name = string_list ~sep:"|"
+    end
 
-    let () =
-      set_possible_values (List.map snd X.values)
+    include Custom (Custom_value) (Custom_input)
+
+    let () = set_possible_values (List.map snd X.values)
   end
 
   (* ************************************************************************ *)
@@ -829,10 +829,6 @@ struct
   (* ************************************************************************ *)
 
   type collect_action = Add | Remove
-
-  exception Cannot_build of string
-
-  let cannot_build msg = raise (Cannot_build msg)
 
   module Make_collection
       (E: sig (* element in the collection *)
