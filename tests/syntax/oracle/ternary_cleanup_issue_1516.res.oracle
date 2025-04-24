@@ -10,14 +10,14 @@ int f(void)
 void main(void)
 {
   int tmp_3;
-  int tmp_5;
+  int tmp_4;
   f();
   f();
   tmp_3 = f();
   if (! tmp_3) tmp_3 = f();
-  tmp_5 = f();
-  if (! tmp_5) f();
   int y = tmp_3;
+  tmp_4 = f();
+  if (! tmp_4) f();
   return;
 }
 

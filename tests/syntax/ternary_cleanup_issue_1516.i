@@ -26,7 +26,7 @@ void main(){
   // Same again without dropping the result of the ternary
   int y = f() ? : f();
 
-  // For some reason we recompute e1 manually here without using ce1
+  // Keep ce1 and e3
   f() ? : f();
 
   return;
