@@ -476,7 +476,7 @@ let app_to_exp ~adata ~loc ?tapp kf env ?eargs li targs =
   let fname = li.l_var_info.lv_name in
   (* build the varinfo (as an expression) which stores the result of the
      function call. *)
-  let _, e, adata, env =
+  let e, adata, env =
     if Builtins.mem li.l_var_info.lv_name then
       (* E-ACSL built-in function call *)
       let args, adata, env =
@@ -495,7 +495,7 @@ let app_to_exp ~adata ~loc ?tapp kf env ?eargs li targs =
               fname;
           eargs, adata, env
       in
-      let vi, e, env =
+      let _, e, env =
         Env.new_var
           ~loc
           ~name:(fname ^ "_app")
@@ -510,7 +510,7 @@ let app_to_exp ~adata ~loc ?tapp kf env ?eargs li targs =
                  fname
                  args ])
       in
-      vi, e, adata, env
+      e, adata, env
     else
       begin
         raise_errors li.l_body;
@@ -569,7 +569,7 @@ let app_to_exp ~adata ~loc ?tapp kf env ?eargs li targs =
           Varname.get ~scope:Global (Functions.RTL.mk_gen_name fname)
         in
         let profile = Profile.make li.l_profile params_ival in
-        let vi, e, env =
+        let _, e, env =
           let ret_ty = ret_ty_of_tapp ~env tapp in
           let params_ty =
             List.map2
@@ -586,7 +586,7 @@ let app_to_exp ~adata ~loc ?tapp kf env ?eargs li targs =
             Gen_functions.replace li params_and_ret_ty (Error exn);
             raise exn
         in
-        vi, e, adata, env
+        e, adata, env
       end
   in
   e, adata, env
