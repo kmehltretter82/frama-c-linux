@@ -128,42 +128,40 @@ let type_of_number_ty lv = function
   | Real -> Error.not_yet "real number"
   | Nan -> Typing.typ_of_lty lv.lv_type
 
-let type_of_profile li params_ty ret_ty =
-  let params_ty_vi =
-    List.map
-      (* build the formals: cannot use [Cil.makeFormal] since the function
-         does not exist yet *)
-      (fun (lvi, pty) -> lvi.lv_name, pty, [])
-      params_ty
-  in
-  (* build the varinfo storing the result *)
-  let res_as_extra_arg = result_as_extra_argument ret_ty in
-  let ret_ty, params_ty_with_ret =
-    let vname = "__retres" in
-    if res_as_extra_arg then
-      let ret_ty_ptr = Cil_const.mk_tptr ret_ty (* call by reference *) in
-      let vname = vname ^ "_arg" in
-      Cil_const.voidType, (vname, ret_ty_ptr, []) :: params_ty_vi
-    else
-      ret_ty, params_ty_vi
-  in
-  (* build the function's varinfo *)
-  Cil_const.mk_tfun
-    ~tattr:li.l_var_info.lv_attr
-    ret_ty
-    (Some params_ty_with_ret)
-    false
-
 (* Generate a kernel function from a given logic info [li] *)
 let generate_kf ~loc fname env params_ty ret_ty params_ival li =
-  let kf_typ = type_of_profile li params_ty ret_ty in
+  let res_as_extra_arg = result_as_extra_argument ret_ty in
+  let kf_typ =
+    let params_ty_vi =
+      List.map
+        (* build the formals: cannot use [Cil.makeFormal] since the function
+           does not exist yet *)
+        (fun (lvi, pty) -> lvi.lv_name, pty, [])
+        params_ty
+    in
+    (* build the varinfo storing the result *)
+    let ret_ty, params_ty_with_ret =
+      let vname = "__retres" in
+      if res_as_extra_arg then
+        let ret_ty_ptr = Cil_const.mk_tptr ret_ty (* call by reference *) in
+        let vname = vname ^ "_arg" in
+        Cil_const.voidType, (vname, ret_ty_ptr, []) :: params_ty_vi
+      else
+        ret_ty, params_ty_vi
+    in
+    (* build the function's varinfo *)
+    Cil_const.mk_tfun
+      ~tattr:li.l_var_info.lv_attr
+      ret_ty
+      (Some params_ty_with_ret)
+      false
+  in
   (* build the formal parameters *)
   let params = List.map
       (fun (lvi, pty) -> Cil.makeVarinfo false true lvi.lv_name pty)
       params_ty
   in
   (* build the varinfo storing the result *)
-  let res_as_extra_arg = result_as_extra_argument ret_ty in
   let is_gmp = Gmp_types.is_t ret_ty in
   let ret_vi, ret_ty, params_with_ret =
     let vname = "__retres" in
