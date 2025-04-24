@@ -403,11 +403,15 @@ let ret_ty_of_tapp ~env = function
 
 (* Generate (and memoize) the function body and create the calls to the
    generated functions. *)
-let function_to_exp ~loc ?tapp fname env kf li params_ty ret_ty params_ival args =
+let function_to_exp ~loc ?tapp fname env kf li params_ty ret_ty params_ival args
+  =
   let params_and_ret_ty = ret_ty :: List.map snd params_ty in
   (* memoize the function's varinfo *)
   let fvi, gen_body =
-    Gen_functions.memo (generate_kf fname ~loc env params_ty ret_ty params_ival) params_and_ret_ty li
+    Gen_functions.memo
+      (generate_kf fname ~loc env params_ty ret_ty params_ival)
+      params_and_ret_ty
+      li
   in
   (* the generation of the function body must be performed after memoizing the
      kernel function in order to handle recursive calls in finite time :-) *)
@@ -562,7 +566,9 @@ let app_to_exp ~adata ~loc ?tapp kf env ?eargs li targs =
           params_num_ty
       in
       try
-        function_to_exp ~loc ?tapp gen_fname env kf li params_ty ret_ty params_ival args
+        function_to_exp
+          ~loc ?tapp
+          gen_fname env kf li params_ty ret_ty params_ival args
       with exn ->
         (* Those accesses always succeed *)
         Gen_functions.replace li (ret_ty :: List.map snd params_ty) (Error exn);
