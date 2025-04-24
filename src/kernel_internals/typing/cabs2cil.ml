@@ -7070,6 +7070,11 @@ and doExp local_env
         (* Compile the conditional expression *)
         let ghost = local_env.is_ghost in
         let ce1 = doCondExp (no_paren_local_env local_env) asconst e1 in
+        let clean_cond_exp () =
+          (* In cases where we do not use ce1, we need to clean its locals
+             to avoid keeping them in the current fundec. *)
+          clean_up_cond_locals ce1;
+        in
         let what' = match what with
           | ADrop -> ADrop
           | _ -> AExp None
@@ -7155,6 +7160,7 @@ and doExp local_env
                let tmp = newTempVar ~ghost loc descr true tresult in
                let tmp_var = var tmp in
                let tmp_lval = new_exp ~loc:e.expr_loc (Lval (tmp_var)) in
+               clean_cond_exp ();
                let (r1, se1, _, _) =
                  doExp
                    (no_paren_local_env local_env) asconst e1
@@ -7173,6 +7179,7 @@ and doExp local_env
                  res
                  tresult
              | None ->
+               clean_cond_exp ();
                (* we can drop e3, just keep e1 in case it is dangerous *)
                let (r1,se1,e1,_) =
                  doExp (no_paren_local_env local_env) asconst e1 ADrop
@@ -7203,6 +7210,7 @@ and doExp local_env
                let cond = compileCondExp ~ghost ce1 se2 se3 in
                finishExp (r2@r3) cond res tresult
              | Some _ ->
+               clean_cond_exp ();
                (* we just keep e1 in case it is dangerous. everything
                   else can be dropped *)
                let (r1,se1,e1,_) =
@@ -7224,6 +7232,7 @@ and doExp local_env
                 let tmp = newTempVar ~ghost loc descr true tresult in
                 let tmp_var = var tmp in
                 let tmp_lval = new_exp ~loc:e.expr_loc (Lval (tmp_var)) in
+                clean_cond_exp ();
                 let (r1,se1, _, _) =
                   doExp
                     (no_paren_local_env local_env)
