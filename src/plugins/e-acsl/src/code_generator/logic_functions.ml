@@ -130,6 +130,7 @@ let type_of_number_ty lv = function
 
 (* Generate a kernel function from a given logic info [li] *)
 let generate_kf ~loc fname env params_ty ret_ty params_ival li =
+  let profile = Profile.make li.l_profile params_ival in
   let res_as_extra_arg = result_as_extra_argument ret_ty in
   let params_ty_vi =
     List.map
@@ -195,7 +196,7 @@ let generate_kf ~loc fname env params_ty ret_ty params_ival li =
     let env = Env.push env in
     (* fill the typing environment with the function's parameters
        before generating the code (code generation invokes typing) *)
-    let env = Env.Logic_env.push_new env params_ival in
+    let env = Env.Logic_env.push_new env profile in
     let env =
       List.fold_left2 (Env.Logic_binding.add_binding) env li.l_profile params
     in
@@ -402,11 +403,11 @@ let ret_ty_of_tapp ~env = function
 
 (* Generate (and memoize) the function body and create the calls to the
    generated functions. *)
-let function_to_exp ~loc ?tapp fname env kf li params_ty ret_ty profile args =
+let function_to_exp ~loc ?tapp fname env kf li params_ty ret_ty params_ival args =
   let params_and_ret_ty = ret_ty :: List.map snd params_ty in
   (* memoize the function's varinfo *)
   let fvi, gen_body =
-    Gen_functions.memo (generate_kf fname ~loc env params_ty ret_ty profile) params_and_ret_ty li
+    Gen_functions.memo (generate_kf fname ~loc env params_ty ret_ty params_ival) params_and_ret_ty li
   in
   (* the generation of the function body must be performed after memoizing the
      kernel function in order to handle recursive calls in finite time :-) *)
@@ -552,7 +553,6 @@ let app_to_exp ~adata ~loc ?tapp kf env ?eargs li targs =
     let gen_fname =
       Varname.get ~scope:Global (Functions.RTL.mk_gen_name fname)
     in
-    let profile = Profile.make li.l_profile params_ival in
     let _, e, env =
       let ret_ty = ret_ty_of_tapp ~env tapp in
       let params_ty =
@@ -562,7 +562,7 @@ let app_to_exp ~adata ~loc ?tapp kf env ?eargs li targs =
           params_num_ty
       in
       try
-        function_to_exp ~loc ?tapp gen_fname env kf li params_ty ret_ty profile args
+        function_to_exp ~loc ?tapp gen_fname env kf li params_ty ret_ty params_ival args
       with exn ->
         (* Those accesses always succeed *)
         Gen_functions.replace li (ret_ty :: List.map snd params_ty) (Error exn);
