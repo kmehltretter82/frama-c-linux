@@ -646,7 +646,7 @@
     recreation.c:40:
       # cvalue: end ∈ {1} 
   interferences by mutexes:
-    {  }:
+    { locks[2]; locks[4] }:
       # cvalue: end ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
@@ -690,7 +690,7 @@
     recreation.c:40:
       # cvalue: end ∈ {1} 
   interferences by mutexes:
-    {  }:
+    { locks[3]; locks[5] }:
       # cvalue: end ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
@@ -734,7 +734,7 @@
     recreation.c:40:
       # cvalue: end ∈ {1} 
   interferences by mutexes:
-    {  }:
+    { locks[4]; locks[6] }:
       # cvalue: end ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
@@ -778,7 +778,7 @@
     recreation.c:40:
       # cvalue: end ∈ {1} 
   interferences by mutexes:
-    {  }:
+    { locks[5]; locks[7] }:
       # cvalue: end ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
@@ -822,7 +822,7 @@
     recreation.c:40:
       # cvalue: end ∈ {1} 
   interferences by mutexes:
-    {  }:
+    { locks[6]; locks[8] }:
       # cvalue: end ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
@@ -866,7 +866,7 @@
     recreation.c:40:
       # cvalue: end ∈ {1} 
   interferences by mutexes:
-    {  }:
+    { locks[7]; locks[9] }:
       # cvalue: end ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
@@ -910,7 +910,7 @@
     recreation.c:40:
       # cvalue: end ∈ {1} 
   interferences by mutexes:
-    {  }:
+    { locks[8]; locks[10] }:
       # cvalue: end ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
@@ -954,7 +954,7 @@
     recreation.c:40:
       # cvalue: end ∈ {1} 
   interferences by mutexes:
-    {  }:
+    { locks[9]; locks[11] }:
       # cvalue: end ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
@@ -1003,7 +1003,7 @@
     recreation.c:40:
       # cvalue: end ∈ {1} 
   interferences by mutexes:
-    {  }:
+    { locks[0]; locks[10] }:
       # cvalue: end ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
@@ -1275,7 +1275,7 @@
     recreation.c:40:
       # cvalue: end ∈ {1} 
   interferences by mutexes:
-    {  }:
+    { locks[2]; locks[4] }:
       # cvalue: end ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
@@ -1319,7 +1319,7 @@
     recreation.c:40:
       # cvalue: end ∈ {1} 
   interferences by mutexes:
-    {  }:
+    { locks[3]; locks[5] }:
       # cvalue: end ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
@@ -1363,7 +1363,7 @@
     recreation.c:40:
       # cvalue: end ∈ {1} 
   interferences by mutexes:
-    {  }:
+    { locks[4]; locks[6] }:
       # cvalue: end ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
@@ -1407,7 +1407,7 @@
     recreation.c:40:
       # cvalue: end ∈ {1} 
   interferences by mutexes:
-    {  }:
+    { locks[5]; locks[7] }:
       # cvalue: end ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
@@ -1451,7 +1451,7 @@
     recreation.c:40:
       # cvalue: end ∈ {1} 
   interferences by mutexes:
-    {  }:
+    { locks[6]; locks[8] }:
       # cvalue: end ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
@@ -1495,7 +1495,7 @@
     recreation.c:40:
       # cvalue: end ∈ {1} 
   interferences by mutexes:
-    {  }:
+    { locks[7]; locks[9] }:
       # cvalue: end ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
@@ -1539,7 +1539,7 @@
     recreation.c:40:
       # cvalue: end ∈ {1} 
   interferences by mutexes:
-    {  }:
+    { locks[8]; locks[10] }:
       # cvalue: end ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
@@ -1583,7 +1583,7 @@
     recreation.c:40:
       # cvalue: end ∈ {1} 
   interferences by mutexes:
-    {  }:
+    { locks[9]; locks[11] }:
       # cvalue: end ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
@@ -1632,7 +1632,7 @@
     recreation.c:40:
       # cvalue: end ∈ {1} 
   interferences by mutexes:
-    {  }:
+    { locks[0]; locks[10] }:
       # cvalue: end ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed

@@ -230,7 +230,7 @@
                   .data2 ∈ {3}
                 s2 ∈ {0} 
   interferences by mutexes:
-    {  }:
+    { lock1 }:
       # cvalue: s1.data ∈ {1}
                   .data2 ∈ {0; 3}
                 s2 ∈ {0}
@@ -283,7 +283,7 @@
       s2.data ∈ {0; 1}
         .data2 ∈ {0; 3} 
   interferences by mutexes:
-    {  }:
+    { lock2 }:
       # cvalue:
       s1.data ∈ {0; 1}
         .data2 ∈ {0; 3}
@@ -452,7 +452,7 @@
       s2.data ∈ {0; 1}
         .data2 ∈ {0; 3} 
   interferences by mutexes:
-    {  }:
+    { lock1 }:
       # cvalue:
       s1.data ∈ {0; 1; 2}
         .data2 ∈ {0; 3; 6}
@@ -507,7 +507,7 @@
       s2.data ∈ {0; 1; 2}
         .data2 ∈ {0; 3; 6} 
   interferences by mutexes:
-    {  }:
+    { lock2 }:
       # cvalue:
       s1.data ∈ {0; 1; 2}
         .data2 ∈ {0; 3; 6}
@@ -677,7 +677,7 @@
       s2.data ∈ [0..2147483647]
         .data2 ∈ [0..2147483646],0%3 
   interferences by mutexes:
-    {  }:
+    { lock1 }:
       # cvalue:
       s1.data ∈ {0; 1; 2; 3}
         .data2 ∈ {0; 3; 6; 9}
@@ -738,7 +738,7 @@
       s2.data ∈ [0..2147483647]
         .data2 ∈ [0..2147483646],0%3 
   interferences by mutexes:
-    {  }:
+    { lock2 }:
       # cvalue:
       s1.data ∈ {0; 1; 2; 3}
         .data2 ∈ {0; 3; 6; 9}
@@ -921,7 +921,7 @@
       s2.data ∈ [0..2147483647]
         .data2 ∈ [0..2147483646],0%3 
   interferences by mutexes:
-    {  }:
+    { lock1 }:
       # cvalue:
       s1.data ∈ [0..2147483647]
         .data2 ∈ [0..2147483646],0%3
@@ -982,7 +982,7 @@
       s2.data ∈ [0..2147483647]
         .data2 ∈ [0..2147483646],0%3 
   interferences by mutexes:
-    {  }:
+    { lock2 }:
       # cvalue:
       s1.data ∈ [0..2147483647]
         .data2 ∈ [0..2147483646],0%3
@@ -1163,7 +1163,7 @@
       s2.data ∈ [0..2147483647]
         .data2 ∈ [0..2147483646],0%3 
   interferences by mutexes:
-    {  }:
+    { lock1 }:
       # cvalue:
       s1.data ∈ [0..2147483647]
         .data2 ∈ [0..2147483646],0%3

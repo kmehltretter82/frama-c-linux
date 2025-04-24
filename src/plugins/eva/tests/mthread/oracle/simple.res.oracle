@@ -205,7 +205,7 @@
                 c ∈ {1}
                 v ∈ {1} 
   interferences by mutexes:
-    {  }:
+    { lock }:
       # cvalue: a ∈ {1}
                 b ∈ {0; 1}
                 c ∈ {0; 1}
@@ -246,31 +246,31 @@
   shared bases: {a, b, c, v}
   interferences by location:
     simple.c:32:
-      # cvalue: a ∈ {0; 1}
-                b ∈ {0; 1; 2}
-                c ∈ {0; 1}
-                v ∈ {0; 1} 
+      # cvalue: a ∈ {0}
+                b ∈ {2}
+                c ∈ {0}
+                v ∈ {0} 
     simple.c:33:
-      # cvalue: a ∈ {1; 2}
-                b ∈ {0; 1; 2}
-                c ∈ {0; 1}
-                v ∈ {0; 1} 
+      # cvalue: a ∈ {2}
+                b ∈ {2}
+                c ∈ {0}
+                v ∈ {0} 
     simple.c:34:
-      # cvalue: a ∈ {1; 2}
-                b ∈ {0; 1; 2}
-                c ∈ {0; 1; 2}
-                v ∈ {0; 1} 
+      # cvalue: a ∈ {2}
+                b ∈ {2}
+                c ∈ {2}
+                v ∈ {0} 
     simple.c:35:
-      # cvalue: a ∈ {1; 2}
-                b ∈ {0; 1; 2}
-                c ∈ {0; 1; 2}
-                v ∈ {0; 1; 2} 
+      # cvalue: a ∈ {2}
+                b ∈ {2}
+                c ∈ {2}
+                v ∈ {2} 
   interferences by mutexes:
-    {  }:
-      # cvalue: a ∈ {0; 1; 2}
-                b ∈ {0; 1; 2}
-                c ∈ {0; 1; 2}
-                v ∈ {0; 1; 2}
+    { lock }:
+      # cvalue: a ∈ {0; 2}
+                b ∈ {2}
+                c ∈ {0; 2}
+                v ∈ {0; 2}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread job2 computed
@@ -284,13 +284,13 @@
 [mt] <main> reads  c ∈ {0}  // simple.c:48 main
 [mt] <main> reads  v ∈ {0}  // simple.c:48 main
 [mt] job1 writes  a ∈ {1}  // simple.c:21 f1
-[mt] job2 writes  a ∈ {1; 2}  // simple.c:33 f2
+[mt] job2 writes  a ∈ {2}  // simple.c:33 f2
 [mt] job1 writes  b ∈ {1}  // simple.c:22 f1
-[mt] job2 writes  b ∈ {0; 1; 2}  // simple.c:32 f2
+[mt] job2 writes  b ∈ {2}  // simple.c:32 f2
 [mt] job1 writes  c ∈ {1}  // simple.c:23 f1
-[mt] job2 writes  c ∈ {0; 1; 2}  // simple.c:34 f2
+[mt] job2 writes  c ∈ {2}  // simple.c:34 f2
 [mt] job1 writes  v ∈ {1}  // simple.c:24 g1 :: simple.c:24 <- f1
-[mt] job2 writes  v ∈ {0; 1; 2}  // simple.c:35 g2 :: simple.c:35 <- f2
+[mt] job2 writes  v ∈ {2}  // simple.c:35 g2 :: simple.c:35 <- f2
 [mt] Possible read/write data races:
   v:
     read by <main> at simple.c:48, protected by lock
@@ -317,11 +317,10 @@
                                     b ∈ {1}
                                     c ∈ {1}
                                     v ∈ {1}
-[mt] Write summary for job2 (updated):
-  a ∈ {1; 2}
-  b ∈ {0; 1; 2}
-  c ∈ {0; 1; 2}
-  v ∈ {0; 1; 2}
+[mt] Write summary for job2 (updated): a ∈ {2}
+                                    b ∈ {2}
+                                    c ∈ {2}
+                                    v ∈ {2}
 [mt] Mutexes for concurrent accesses:
   a  protected by lock
   b  protected by lock
@@ -415,28 +414,28 @@
   shared bases: {a, b, c, v}
   interferences by location:
     simple.c:21:
-      # cvalue: a ∈ {0; 1; 2}
-                b ∈ {0; 1; 2}
-                c ∈ {0; 1; 2}
-                v ∈ {0; 1; 2} 
+      # cvalue: a ∈ {1}
+                b ∈ {0; 2}
+                c ∈ {0; 2}
+                v ∈ {0; 2} 
     simple.c:22:
-      # cvalue: a ∈ {0; 1; 2}
-                b ∈ {0; 1; 2}
-                c ∈ {0; 1; 2}
-                v ∈ {0; 1; 2} 
+      # cvalue: a ∈ {1}
+                b ∈ {1}
+                c ∈ {0; 2}
+                v ∈ {0; 2} 
     simple.c:23:
-      # cvalue: a ∈ {0; 1; 2}
-                b ∈ {0; 1; 2}
-                c ∈ {0; 1; 2}
-                v ∈ {0; 1; 2} 
+      # cvalue: a ∈ {1}
+                b ∈ {1}
+                c ∈ {1}
+                v ∈ {0; 2} 
     simple.c:24:
-      # cvalue: a ∈ {0; 1; 2}
-                b ∈ {0; 1; 2}
-                c ∈ {0; 1; 2}
-                v ∈ {0; 1; 2} 
+      # cvalue: a ∈ {1}
+                b ∈ {1}
+                c ∈ {1}
+                v ∈ {1} 
   interferences by mutexes:
-    {  }:
-      # cvalue: a ∈ {0; 1; 2}
+    { lock }:
+      # cvalue: a ∈ {1}
                 b ∈ {0; 1; 2}
                 c ∈ {0; 1; 2}
                 v ∈ {0; 1; 2}
@@ -477,28 +476,28 @@
   interferences by location:
     simple.c:32:
       # cvalue: a ∈ {0; 1; 2}
-                b ∈ {0; 1; 2}
+                b ∈ {2}
                 c ∈ {0; 1; 2}
                 v ∈ {0; 1; 2} 
     simple.c:33:
-      # cvalue: a ∈ {0; 1; 2}
-                b ∈ {0; 1; 2}
+      # cvalue: a ∈ {2}
+                b ∈ {2}
                 c ∈ {0; 1; 2}
                 v ∈ {0; 1; 2} 
     simple.c:34:
-      # cvalue: a ∈ {0; 1; 2}
-                b ∈ {0; 1; 2}
-                c ∈ {0; 1; 2}
+      # cvalue: a ∈ {2}
+                b ∈ {2}
+                c ∈ {2}
                 v ∈ {0; 1; 2} 
     simple.c:35:
-      # cvalue: a ∈ {0; 1; 2}
-                b ∈ {0; 1; 2}
-                c ∈ {0; 1; 2}
-                v ∈ {0; 1; 2} 
+      # cvalue: a ∈ {2}
+                b ∈ {2}
+                c ∈ {2}
+                v ∈ {2} 
   interferences by mutexes:
-    {  }:
+    { lock }:
       # cvalue: a ∈ {0; 1; 2}
-                b ∈ {0; 1; 2}
+                b ∈ {2}
                 c ∈ {0; 1; 2}
                 v ∈ {0; 1; 2}
 [mt] * Computing cfg
@@ -513,14 +512,14 @@
 [mt] <main> reads  b ∈ {0; 1; 2}  // simple.c:48 main
 [mt] <main> reads  c ∈ {0; 1; 2}  // simple.c:48 main
 [mt] <main> reads  v ∈ {0; 1; 2}  // simple.c:48 main
-[mt] job1 writes  a ∈ {0; 1; 2}  // simple.c:21 f1
-[mt] job2 writes  a ∈ {0; 1; 2}  // simple.c:33 f2
-[mt] job1 writes  b ∈ {0; 1; 2}  // simple.c:22 f1
-[mt] job2 writes  b ∈ {0; 1; 2}  // simple.c:32 f2
-[mt] job1 writes  c ∈ {0; 1; 2}  // simple.c:23 f1
-[mt] job2 writes  c ∈ {0; 1; 2}  // simple.c:34 f2
-[mt] job1 writes  v ∈ {0; 1; 2}  // simple.c:24 g1 :: simple.c:24 <- f1
-[mt] job2 writes  v ∈ {0; 1; 2}  // simple.c:35 g2 :: simple.c:35 <- f2
+[mt] job1 writes  a ∈ {1}  // simple.c:21 f1
+[mt] job2 writes  a ∈ {2}  // simple.c:33 f2
+[mt] job1 writes  b ∈ {1}  // simple.c:22 f1
+[mt] job2 writes  b ∈ {2}  // simple.c:32 f2
+[mt] job1 writes  c ∈ {1}  // simple.c:23 f1
+[mt] job2 writes  c ∈ {2}  // simple.c:34 f2
+[mt] job1 writes  v ∈ {1}  // simple.c:24 g1 :: simple.c:24 <- f1
+[mt] job2 writes  v ∈ {2}  // simple.c:35 g2 :: simple.c:35 <- f2
 [mt] Possible read/write data races:
   v:
     read by <main> at simple.c:48, protected by lock
@@ -539,16 +538,14 @@
     write by job1 at simple.c:21, protected by lock
     write by job2 at simple.c:33, protected by lock
 [mt] Shared memory: a; b; c; v
-[mt] Write summary for job1 (updated):
-  a ∈ {0; 1; 2}
-  b ∈ {0; 1; 2}
-  c ∈ {0; 1; 2}
-  v ∈ {0; 1; 2}
-[mt] Write summary for job2 (updated):
-  a ∈ {0; 1; 2}
-  b ∈ {0; 1; 2}
-  c ∈ {0; 1; 2}
-  v ∈ {0; 1; 2}
+[mt] Write summary for job1: a ∈ {1}
+                          b ∈ {1}
+                          c ∈ {1}
+                          v ∈ {1}
+[mt] Write summary for job2: a ∈ {2}
+                          b ∈ {2}
+                          c ∈ {2}
+                          v ∈ {2}
 [mt] Mutexes for concurrent accesses:
   a  protected by lock
   b  protected by lock
@@ -569,8 +566,7 @@
     Read by <main>, Write by job1: protected by lock
 [mt] ***** Shared variables computed
 [mt] ***** Iteration 4
-[mt] *** Computing thread <main>, iteration 4
-    (shared vars values changed, interferences changed)
+[mt] *** Computing thread <main>, iteration 4 (interferences changed)
 [mt] * Computing value analysis for thread <main>
 [mt] Thread <main>, fun main
 [mt] simple.c:42: Initializing mutex lock
@@ -609,6 +605,66 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
+[mt] *** Computing thread job1, iteration 4 (interferences changed)
+[mt] * Computing value analysis for thread job1
+[mt] simple.c:20: Lock lock
+[eva:interferences] simple.c:21: inject threads interferences at this point
+[eva:interferences] simple.c:22: inject threads interferences at this point
+[eva:interferences] simple.c:23: inject threads interferences at this point
+[eva:interferences] simple.c:24: inject threads interferences at this point
+[mt] simple.c:25: Release lock
+[mt] * Starting to save the state of the value analysis
+[mt] * state saved
+[mt] * Computing shared variables
+[mt] Globals accessed by thread:
+  a: write by job1 at simple.c:21 <- f1
+  b: write by job1 at simple.c:22 <- f1
+  c: write by job1 at simple.c:23 <- f1
+  e: write by job1 at simple.c:26 <- f1
+  v: write by job1 at simple.c:24 <- f1
+  lock:
+    read by job1 at FRAMAC_SHARE/mthread_pthread.c:56 <-
+      pthread_mutex_lock :: simple.c:20 <- f1
+    read by job1 at FRAMAC_SHARE/mthread_pthread.c:66 <-
+      pthread_mutex_unlock :: simple.c:25 <- f1
+[mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes:
+    a = 1; simple.c:21 <- f1
+    *((int *)p) = 1; simple.c:22 <- f1
+    c = 1; simple.c:23 <- f1
+    g1(); simple.c:24 <- f1
+  shared bases: {a, b, c, v}
+  interferences by location:
+    simple.c:21:
+      # cvalue: a ∈ {1}
+                b ∈ {0; 2}
+                c ∈ {0; 2}
+                v ∈ {0; 2} 
+    simple.c:22:
+      # cvalue: a ∈ {1}
+                b ∈ {1}
+                c ∈ {0; 2}
+                v ∈ {0; 2} 
+    simple.c:23:
+      # cvalue: a ∈ {1}
+                b ∈ {1}
+                c ∈ {1}
+                v ∈ {0; 2} 
+    simple.c:24:
+      # cvalue: a ∈ {1}
+                b ∈ {1}
+                c ∈ {1}
+                v ∈ {1} 
+  interferences by mutexes:
+    { lock }:
+      # cvalue: a ∈ {1}
+                b ∈ {0; 1; 2}
+                c ∈ {0; 1; 2}
+                v ∈ {0; 1; 2}
+[mt] * Computing cfg
+[mt] * Cfg computed
+[mt] *** Thread job1 computed
 [mt] ***** Threads computed for iteration 4.
 [mt] * Computing live threads and locked mutexes
 [mt] * threads and mutexes computed
@@ -618,42 +674,40 @@
 [mt] <main> reads  b ∈ {0; 1; 2}  // simple.c:48 main
 [mt] <main> reads  c ∈ {0; 1; 2}  // simple.c:48 main
 [mt] <main> reads  v ∈ {0; 1; 2}  // simple.c:48 main
-[mt] job1 writes  a ∈ {0; 1; 2}  // simple.c:21 f1
-[mt] job2 writes  a ∈ {0; 1; 2}  // simple.c:33 f2
-[mt] job1 writes  b ∈ {0; 1; 2}  // simple.c:22 f1
-[mt] job2 writes  b ∈ {0; 1; 2}  // simple.c:32 f2
-[mt] job1 writes  c ∈ {0; 1; 2}  // simple.c:23 f1
-[mt] job2 writes  c ∈ {0; 1; 2}  // simple.c:34 f2
-[mt] job1 writes  v ∈ {0; 1; 2}  // simple.c:24 g1 :: simple.c:24 <- f1
-[mt] job2 writes  v ∈ {0; 1; 2}  // simple.c:35 g2 :: simple.c:35 <- f2
+[mt] job2 writes  a ∈ {2}  // simple.c:33 f2
+[mt] job1 writes  a ∈ {1}  // simple.c:21 f1
+[mt] job2 writes  b ∈ {2}  // simple.c:32 f2
+[mt] job1 writes  b ∈ {1}  // simple.c:22 f1
+[mt] job2 writes  c ∈ {2}  // simple.c:34 f2
+[mt] job1 writes  c ∈ {1}  // simple.c:23 f1
+[mt] job2 writes  v ∈ {2}  // simple.c:35 g2 :: simple.c:35 <- f2
+[mt] job1 writes  v ∈ {1}  // simple.c:24 g1 :: simple.c:24 <- f1
 [mt] Possible read/write data races:
   v:
     read by <main> at simple.c:48, protected by lock
-    write by job1 at simple.c:24, protected by lock
     write by job2 at simple.c:35, protected by lock
+    write by job1 at simple.c:24, protected by lock
   c:
     read by <main> at simple.c:48, protected by lock
-    write by job1 at simple.c:23, protected by lock
     write by job2 at simple.c:34, protected by lock
+    write by job1 at simple.c:23, protected by lock
   b:
     read by <main> at simple.c:48, protected by lock
-    write by job1 at simple.c:22, protected by lock
     write by job2 at simple.c:32, protected by lock
+    write by job1 at simple.c:22, protected by lock
   a:
     read by <main> at simple.c:48, protected by lock
-    write by job1 at simple.c:21, protected by lock
     write by job2 at simple.c:33, protected by lock
+    write by job1 at simple.c:21, protected by lock
 [mt] Shared memory: a; b; c; v
-[mt] Write summary for job1:
-  a ∈ {0; 1; 2}
-  b ∈ {0; 1; 2}
-  c ∈ {0; 1; 2}
-  v ∈ {0; 1; 2}
-[mt] Write summary for job2:
-  a ∈ {0; 1; 2}
-  b ∈ {0; 1; 2}
-  c ∈ {0; 1; 2}
-  v ∈ {0; 1; 2}
+[mt] Write summary for job1: a ∈ {1}
+                          b ∈ {1}
+                          c ∈ {1}
+                          v ∈ {1}
+[mt] Write summary for job2: a ∈ {2}
+                          b ∈ {2}
+                          c ∈ {2}
+                          v ∈ {2}
 [mt] Mutexes for concurrent accesses:
   a  protected by lock
   b  protected by lock
