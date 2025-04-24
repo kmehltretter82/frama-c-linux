@@ -114,26 +114,27 @@ let generate_body ~loc kf env ret_ty ret_vi = function
   | LBpred p -> pred_to_block ~loc kf env ret_vi p
   | LBnone |LBreads _ | LBinductive _ -> assert false
 
+let type_of_number_ty lv = function
+  | Gmpz ->
+    (* GMP's integer are arrays: consider them as pointers in function's
+       parameters *)
+    Gmp_types.Z.t_as_ptr ()
+  | C_integer _ when Options.Gmp_only.get () -> Gmp_types.Z.t_as_ptr ()
+  | C_integer ik -> Cil_const.mk_tint ik
+  | C_float _ when Options.Gmp_only.get () -> Gmp_types.Q.t_as_ptr ()
+  | C_float fk -> Cil_const.mk_tfloat fk
+  (* for the time being, no reals but rationals instead *)
+  | Rational -> Gmp_types.Q.t ()
+  | Real -> Error.not_yet "real number"
+  | Nan -> Typing.typ_of_lty lv.lv_type
+
 (* Generate a kernel function from a given logic info [li] *)
 let generate_kf ~loc fname env params_ty ret_ty params_ival li =
   (* build the formal parameters *)
   let params, params_ty_vi =
     List.fold_right2
       (fun lvi pty (params, params_ty) ->
-         let ty = match pty with
-           | Gmpz ->
-             (* GMP's integer are arrays: consider them as pointers in function's
-                parameters *)
-             Gmp_types.Z.t_as_ptr ()
-           | C_integer _ when Options.Gmp_only.get () -> Gmp_types.Z.t_as_ptr ()
-           | C_integer ik -> Cil_const.mk_tint ik
-           | C_float _ when Options.Gmp_only.get () -> Gmp_types.Q.t_as_ptr ()
-           | C_float fk -> Cil_const.mk_tfloat fk
-           (* for the time being, no reals but rationals instead *)
-           | Rational -> Gmp_types.Q.t ()
-           | Real -> Error.not_yet "real number"
-           | Nan -> Typing.typ_of_lty lvi.lv_type
-         in
+         let ty = type_of_number_ty lvi pty in
          (* build the formals: cannot use [Cil.makeFormal] since the function
             does not exist yet *)
          let vi = Cil.makeVarinfo false true lvi.lv_name ty in
