@@ -511,79 +511,77 @@ let app_to_exp ~adata ~loc ?tapp kf env ?eargs li targs =
     in
     e, adata, env
   else
-    begin
-      raise_errors li.l_body;
-      (* build the arguments and compute the integer_ty of the parameters *)
-      let params_num_ty, params_ival, args, adata, env =
-        let eargs, adata, env =
-          match eargs with
-          | None ->
-            List.fold_right
-              (fun targ (eargs, adata, env) ->
-                 let e, adata, env = !term_to_exp_ref ~adata kf env targ in
-                 e :: eargs, adata, env)
-              targs
-              ([], adata, env)
-          | Some eargs ->
-            if List.compare_lengths targs eargs <> 0 then
-              Options.fatal
-                "[Tapp] unexpected number of arguments when calling %s"
-                fname;
-            eargs, adata, env
-        in
-        try
-          List.fold_right2
-            (fun targ earg (params_ty, params_ival, args, adata, env) ->
-               let logic_env = Env.Logic_env.get env in
-               let param_ty = Typing.get_number_ty ~logic_env targ in
-               let param_ival = Interval.get ~logic_env targ in
-               let e, env =
-                 try
-                   let ty = Typing.typ_of_number_ty param_ty in
-                   Typed_number.add_cast
-                     ~loc
-                     ~name:(Varname.of_exp earg)
-                     env
-                     kf
-                     (Some ty)
-                     Analyses_types.C_number
-                     (Some targ)
-                     earg
-                 with Typing.Not_a_number ->
-                   earg, env
-               in
-               param_ty :: params_ty,
-               param_ival :: params_ival,
-               e :: args,
-               adata,
-               env)
-            targs eargs
-            ([], [], [], adata ,env)
-        with Invalid_argument _ ->
-          Options.fatal
-            "[Tapp] unexpected number of arguments when calling %s"
-            fname
+    let () = raise_errors li.l_body in
+    (* build the arguments and compute the integer_ty of the parameters *)
+    let params_num_ty, params_ival, args, adata, env =
+      let eargs, adata, env =
+        match eargs with
+        | None ->
+          List.fold_right
+            (fun targ (eargs, adata, env) ->
+               let e, adata, env = !term_to_exp_ref ~adata kf env targ in
+               e :: eargs, adata, env)
+            targs
+            ([], adata, env)
+        | Some eargs ->
+          if List.compare_lengths targs eargs <> 0 then
+            Options.fatal
+              "[Tapp] unexpected number of arguments when calling %s"
+              fname;
+          eargs, adata, env
       in
-      let gen_fname =
-        Varname.get ~scope:Global (Functions.RTL.mk_gen_name fname)
+      try
+        List.fold_right2
+          (fun targ earg (params_ty, params_ival, args, adata, env) ->
+             let logic_env = Env.Logic_env.get env in
+             let param_ty = Typing.get_number_ty ~logic_env targ in
+             let param_ival = Interval.get ~logic_env targ in
+             let e, env =
+               try
+                 let ty = Typing.typ_of_number_ty param_ty in
+                 Typed_number.add_cast
+                   ~loc
+                   ~name:(Varname.of_exp earg)
+                   env
+                   kf
+                   (Some ty)
+                   Analyses_types.C_number
+                   (Some targ)
+                   earg
+               with Typing.Not_a_number ->
+                 earg, env
+             in
+             param_ty :: params_ty,
+             param_ival :: params_ival,
+             e :: args,
+             adata,
+             env)
+          targs eargs
+          ([], [], [], adata ,env)
+      with Invalid_argument _ ->
+        Options.fatal
+          "[Tapp] unexpected number of arguments when calling %s"
+          fname
+    in
+    let gen_fname =
+      Varname.get ~scope:Global (Functions.RTL.mk_gen_name fname)
+    in
+    let profile = Profile.make li.l_profile params_ival in
+    let _, e, env =
+      let ret_ty = ret_ty_of_tapp ~env tapp in
+      let params_ty =
+        List.map2
+          (fun lvi pty -> lvi, type_of_number_ty lvi pty)
+          li.l_profile
+          params_num_ty
       in
-      let profile = Profile.make li.l_profile params_ival in
-      let _, e, env =
-        let ret_ty = ret_ty_of_tapp ~env tapp in
-        let params_ty =
-          List.map2
-            (fun lvi pty -> lvi, type_of_number_ty lvi pty)
-            li.l_profile
-            params_num_ty
-        in
-        let kf_typ = type_of_profile li params_ty ret_ty in
-        let params_and_ret_ty = ret_ty :: List.map snd params_ty in
-        try
-          function_to_exp ~loc ?tapp gen_fname env kf li params_ty ret_ty params_and_ret_ty kf_typ profile args
-        with exn ->
-          (* Those accesses always succeed *)
-          Gen_functions.replace li params_and_ret_ty (Error exn);
-          raise exn
-      in
-      e, adata, env
-    end
+      let kf_typ = type_of_profile li params_ty ret_ty in
+      let params_and_ret_ty = ret_ty :: List.map snd params_ty in
+      try
+        function_to_exp ~loc ?tapp gen_fname env kf li params_ty ret_ty params_and_ret_ty kf_typ profile args
+      with exn ->
+        (* Those accesses always succeed *)
+        Gen_functions.replace li params_and_ret_ty (Error exn);
+        raise exn
+    in
+    e, adata, env
