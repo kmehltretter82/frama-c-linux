@@ -151,7 +151,8 @@ let generate_kf ~loc fname env params_ty ret_ty params_ival li =
       let ret_ty_ptr = Cil_const.mk_tptr ret_ty (* call by reference *) in
       let vname = vname ^ "_arg" in
       let vi = Cil.makeVarinfo false true vname ret_ty_ptr in
-      vi, Cil_const.voidType, vi :: params, (vname, ret_ty_ptr, []) :: params_ty_vi
+      let ret_ty_vi = vname, ret_ty_ptr, [] in
+      vi, Cil_const.voidType, vi :: params, ret_ty_vi :: params_ty_vi
     else
       Cil.makeVarinfo false false vname ret_ty, ret_ty, params, params_ty_vi
   in
