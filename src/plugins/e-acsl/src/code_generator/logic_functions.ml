@@ -138,28 +138,20 @@ let generate_kf ~loc fname env params_ty ret_ty params_ival li =
       (fun (lvi, pty) -> lvi.lv_name, pty, [])
       params_ty
   in
-  (* build the varinfo storing the result *)
-  let ret_ty', params_ty_with_ret =
-    let vname = "__retres" in
-    if res_as_extra_arg then
-      let ret_ty_ptr = Cil_const.mk_tptr ret_ty (* call by reference *) in
-      let vname = vname ^ "_arg" in
-      Cil_const.voidType, (vname, ret_ty_ptr, []) :: params_ty_vi
-    else
-      ret_ty, params_ty_vi
-  in
-  let kf_typ =
-    (* build the function's varinfo *)
-    Cil_const.mk_tfun
-      ~tattr:li.l_var_info.lv_attr
-      ret_ty'
-      (Some params_ty_with_ret)
-      false
-  in
   (* build the formal parameters *)
   let params = List.map
       (fun (lvi, pty) -> Cil.makeVarinfo false true lvi.lv_name pty)
       params_ty
+  in
+  (* build the varinfo storing the result *)
+  let params_ty_with_ret =
+    let vname = "__retres" in
+    if res_as_extra_arg then
+      let ret_ty_ptr = Cil_const.mk_tptr ret_ty (* call by reference *) in
+      let vname = vname ^ "_arg" in
+      (vname, ret_ty_ptr, []) :: params_ty_vi
+    else
+      params_ty_vi
   in
   (* build the varinfo storing the result *)
   let is_gmp = Gmp_types.is_t ret_ty in
@@ -172,6 +164,14 @@ let generate_kf ~loc fname env params_ty ret_ty params_ival li =
       vi, Cil_const.voidType, vi :: params
     else
       Cil.makeVarinfo false false vname ret_ty, ret_ty, params
+  in
+  let kf_typ =
+    (* build the function's varinfo *)
+    Cil_const.mk_tfun
+      ~tattr:li.l_var_info.lv_attr
+      ret_ty
+      (Some params_ty_with_ret)
+      false
   in
   (* build the function's varinfo *)
   let vi =
