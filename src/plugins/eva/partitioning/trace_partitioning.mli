@@ -82,6 +82,8 @@ sig
 
   (* --- Partition transfer functions --- *)
 
+  val add_disjunction_keys : Cil_types.stmt -> Partition.key -> 'state list ->
+    (Partition.key * 'state) list
   val enter_loop : flow -> Eva_automata.loop -> flow
   val leave_loop : flow -> Eva_automata.loop -> flow
   val next_loop_iteration : flow -> Cil_types.stmt -> flow

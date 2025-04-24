@@ -45,6 +45,8 @@ type branch =
   (** Case of a builtin *)
   | Spec_behavior of Kernel_function.t * Cil_datatype.Kinstr.t * int
   (** Behavior of a spec *)
+  | Disjunction_case of Cil_datatype.Stmt.t * int
+  (** Case of a disjunction in an assert annotation *)
 
 (** Partitioning keys attached to states. *)
 type key
@@ -62,8 +64,8 @@ module Key : sig
   val empty : t
   (** Initial key: no partitioning. *)
 
-  val branch_singleton : branch -> t
-  (** Key for a branch. *)
+  val add_branch : ?history_size:int -> branch -> t -> t
+  (** Key for a branch appended to an existing key. *)
 
   val exceed_rationing: t -> bool
   val combine : policy:call_return_policy -> caller:t -> callee:t -> t

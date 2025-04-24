@@ -209,6 +209,7 @@ type branch =
   | Branch of int
   | Builtin_result of Kernel_function.t * Cil_datatype.Kinstr.t * int
   | Spec_behavior of Kernel_function.t * Cil_datatype.Kinstr.t * int
+  | Disjunction_case of Cil_datatype.Stmt.t * int
 [@@deriving eq, ord]
 
 module BranchDatatype = Datatype.Make_with_collections (struct
@@ -220,6 +221,7 @@ module BranchDatatype = Datatype.Make_with_collections (struct
       | Branch id -> Format.fprintf fmt "%d" id
       | Builtin_result (kf, _, id) | Spec_behavior (kf, _, id) ->
         Format.fprintf fmt "%s#%d" (Kernel_function.get_name kf) id
+      | Disjunction_case (stmt, id) -> Format.fprintf fmt "@%d#%d" stmt.sid id
     let hash = function
       | Branch id -> Hashtbl.hash (1, id)
       | Builtin_result (kf, kinstr, id) ->
@@ -228,6 +230,8 @@ module BranchDatatype = Datatype.Make_with_collections (struct
       | Spec_behavior (kf, kinstr, id) ->
         Hashtbl.hash
           (3, Kernel_function.hash kf, Cil_datatype.Kinstr.hash kinstr, id)
+      | Disjunction_case (stmt, id) ->
+        Hashtbl.hash (4, Cil_datatype.Stmt.hash stmt, id)
   end)
 
 (* The key have several fields, one for each kind of partitioning:
@@ -285,7 +289,17 @@ struct
     dynamic_splits = SplitMap.empty;
   }
 
-  let branch_singleton b = { empty with branches = [b] }
+  let add_branch ?history_size b k =
+    match history_size with
+    | None -> { k with branches = b :: k.branches }
+    | Some history_size ->
+      if history_size > 0 then
+        let trunc = Extlib.list_first_n (history_size - 1) k.branches in
+        { k with branches = b :: trunc }
+      else if k.branches <> [] then
+        { k with branches = [] }
+      else
+        k
 
   include Datatype.Make_with_collections (struct
       include Datatype.Serializable_undefined
@@ -704,13 +718,7 @@ struct
           end
 
         | Add_branch (b,max) -> fun k _x ->
-          if max > 0 then
-            let trunc = Extlib.list_first_n (max - 1) k.branches in
-            { k with branches = Branch b :: trunc }
-          else if k.branches <> [] then
-            { k with branches = [] }
-          else
-            k
+          Key.add_branch ~history_size:max (Branch b) k
 
         | Ration { current; limit; merge } ->
           let length = List.length p in

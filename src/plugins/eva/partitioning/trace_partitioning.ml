@@ -164,6 +164,17 @@ struct
 
   (* Partition transfer functions *)
 
+  let add_disjunction_keys stmt key states =
+    let add_key =
+      if List.compare_length_with states 1 <= 0 then
+        fun _ s -> key, s
+      else
+        fun i s ->
+          let branch = Disjunction_case (stmt, i) in
+          Partition.Key.add_branch ~history_size branch key, s
+    in
+    List.mapi add_key states
+
   let enter_loop (flow : flow) (loop : Eva_automata.loop) : flow =
     Flow.transfer_keys flow (Enter_loop (unroll loop, loop))
 
@@ -203,6 +214,7 @@ struct
     let policy = { policy with callee_history } in
     let combine = Partition.Key.combine ~policy in
     List.map (fun (k, s) -> combine ~caller ~callee:k, s) result
+
 
   (* Reset state (for hierchical convergence) *)
 
