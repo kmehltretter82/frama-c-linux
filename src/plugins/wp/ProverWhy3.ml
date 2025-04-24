@@ -1339,10 +1339,10 @@ let output_task wpo drv ?(script : Filepath.t option) prover task =
     (Why3Provers.ident_why3 prover) ;
   let old = Option.map
       (fun fscript ->
-         let hash = Digest.file fscript |> Digest.to_hex in
+         let hash = Filesystem.digest fscript in
          Format.fprintf fmt "(* WP Script %s *)@\n" hash ;
-         open_in fscript
-      ) (script :> string option) in
+         open_in (fscript :> string)
+      ) script in
   let _ = Why3.Driver.print_task_prepared ?old drv fmt task in
   Option.iter close_in old
 
@@ -1354,7 +1354,7 @@ let digest_task wpo drv ?(script : Filepath.t option) prover task =
       ~model:wpo.Wpo.po_model
       ~prover:(VCS.Why3 prover) in
   begin
-    Digest.file (file :> string) |> Digest.to_hex
+    Filesystem.digest file
   end
 
 let run_batch pconf driver ~config
@@ -1420,9 +1420,7 @@ let updatescript ~script driver task =
     let$ fmt = Filesystem.with_formatter_exn script in
     Why3.Driver.print_task_prepared ~old driver fmt task
   in
-  let d_old = Digest.file (backup :> string) in
-  let d_new = Digest.file (script :> string) in
-  if String.equal d_new d_old then Filesystem.remove_file backup
+  if Filesystem.same_digest backup script then Filesystem.remove_file backup
 
 let editor ~script ~merge ~config pconf driver task =
   Task.sync editor_mutex

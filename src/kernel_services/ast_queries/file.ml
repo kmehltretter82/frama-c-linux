@@ -1667,12 +1667,9 @@ let init_cil () =
 
 let re_included_file = Str.regexp "^[.]+ \\(.*\\)$"
 
-let file_hash file =
-  Digest.to_hex (Digest.file file)
-
 let add_source_if_new tbl (fp : Filepath.t) =
   if not (Hashtbl.mem tbl fp) then
-    Hashtbl.replace tbl fp (file_hash (fp:>string))
+    Hashtbl.replace tbl fp (Filesystem.digest fp)
 
 (* Inserts, into the hashtbl of (Filepath.t, Digest.t), [tbl],
    the included sources listed in [file],

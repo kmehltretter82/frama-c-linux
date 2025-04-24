@@ -103,6 +103,20 @@ val temp_dir: prefix:string -> suffix:string -> Filepath.t
 
 
 (* ************************************************************************* *)
+(** {2 File comparison} *)
+(* ************************************************************************* *)
+
+(** [digest p] computes the hash of a file [p] using {!Stdlib.Digest.file}.
+    @since Frama-C+dev *)
+val digest: Filepath.t -> string
+
+(** [digest p1 p2] compares the hashes of two files [p1] and [p2] using
+    {!Stdlib.Digest.file} and returns [true] if they have the same.
+    @since Frama-C+dev *)
+val same_digest: Filepath.t -> Filepath.t -> bool
+
+
+(* ************************************************************************* *)
 (** {2 High level Input/Output} *)
 (* ************************************************************************* *)
 
