@@ -131,28 +131,28 @@ let type_of_number_ty lv = function
 (* Generate a kernel function from a given logic info [li] *)
 let generate_kf ~loc fname env params_ty ret_ty params_ival li =
   let res_as_extra_arg = result_as_extra_argument ret_ty in
+  let params_ty_vi =
+    List.map
+      (* build the formals: cannot use [Cil.makeFormal] since the function
+         does not exist yet *)
+      (fun (lvi, pty) -> lvi.lv_name, pty, [])
+      params_ty
+  in
+  (* build the varinfo storing the result *)
+  let ret_ty', params_ty_with_ret =
+    let vname = "__retres" in
+    if res_as_extra_arg then
+      let ret_ty_ptr = Cil_const.mk_tptr ret_ty (* call by reference *) in
+      let vname = vname ^ "_arg" in
+      Cil_const.voidType, (vname, ret_ty_ptr, []) :: params_ty_vi
+    else
+      ret_ty, params_ty_vi
+  in
   let kf_typ =
-    let params_ty_vi =
-      List.map
-        (* build the formals: cannot use [Cil.makeFormal] since the function
-           does not exist yet *)
-        (fun (lvi, pty) -> lvi.lv_name, pty, [])
-        params_ty
-    in
-    (* build the varinfo storing the result *)
-    let ret_ty, params_ty_with_ret =
-      let vname = "__retres" in
-      if res_as_extra_arg then
-        let ret_ty_ptr = Cil_const.mk_tptr ret_ty (* call by reference *) in
-        let vname = vname ^ "_arg" in
-        Cil_const.voidType, (vname, ret_ty_ptr, []) :: params_ty_vi
-      else
-        ret_ty, params_ty_vi
-    in
     (* build the function's varinfo *)
     Cil_const.mk_tfun
       ~tattr:li.l_var_info.lv_attr
-      ret_ty
+      ret_ty'
       (Some params_ty_with_ret)
       false
   in
