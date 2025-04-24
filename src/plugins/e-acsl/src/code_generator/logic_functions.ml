@@ -144,26 +144,16 @@ let generate_kf ~loc fname env params_ty ret_ty params_ival li =
       params_ty
   in
   (* build the varinfo storing the result *)
-  let params_ty_with_ret =
-    let vname = "__retres" in
-    if res_as_extra_arg then
-      let ret_ty_ptr = Cil_const.mk_tptr ret_ty (* call by reference *) in
-      let vname = vname ^ "_arg" in
-      (vname, ret_ty_ptr, []) :: params_ty_vi
-    else
-      params_ty_vi
-  in
-  (* build the varinfo storing the result *)
   let is_gmp = Gmp_types.is_t ret_ty in
-  let ret_vi, ret_ty, params_with_ret =
+  let ret_vi, ret_ty, params_with_ret, params_ty_with_ret =
     let vname = "__retres" in
     if res_as_extra_arg then
       let ret_ty_ptr = Cil_const.mk_tptr ret_ty (* call by reference *) in
       let vname = vname ^ "_arg" in
       let vi = Cil.makeVarinfo false true vname ret_ty_ptr in
-      vi, Cil_const.voidType, vi :: params
+      vi, Cil_const.voidType, vi :: params, (vname, ret_ty_ptr, []) :: params_ty_vi
     else
-      Cil.makeVarinfo false false vname ret_ty, ret_ty, params
+      Cil.makeVarinfo false false vname ret_ty, ret_ty, params, params_ty_vi
   in
   let kf_typ =
     (* build the function's varinfo *)
