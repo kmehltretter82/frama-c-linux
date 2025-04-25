@@ -26,11 +26,4 @@ type split_strategy =
   | SplitEqList of Datatype.Integer.t list
   | FullSplit
 
-include Datatype.S_with_collections with type t = split_strategy
-
-exception ParseFailure of string
-
-val of_string: string -> t
-(* @raise ParseFailure *)
-
-val to_string: t -> string
+include Parameter_sig.Value_datatype with type t = split_strategy

@@ -800,16 +800,7 @@ let () = Parameter_customize.set_group precision_tuning
 let () = Parameter_customize.argument_may_be_fundecl ()
 module SplitReturnFunction =
   Kernel_function_map
-    (struct
-      (* this type is ad-hoc: cannot use Kernel_function_multiple_map here *)
-      include Split_strategy
-      let of_string s =
-        try Split_strategy.of_string s
-        with Split_strategy.ParseFailure s ->
-          raise (Cannot_build ("unknown split strategy " ^ s))
-      let to_string v =
-        Split_strategy.to_string v
-    end)
+    (Split_strategy)
     (struct
       let option_name = "-eva-split-return-function"
       let arg_name = "f:n"
@@ -821,29 +812,17 @@ let () = add_precision_dep SplitReturnFunction.parameter
 
 let () = Parameter_customize.set_group precision_tuning
 module SplitReturn =
-  String
+  Custom
+    (Split_strategy)
     (struct
       let option_name = "-eva-split-return"
       let arg_name = "mode"
-      let default = ""
+      let default = Split_strategy.NoSplit
       let help = "When 'mode' is a number, or 'full', this is equivalent \
                   to -eva-split-return-function f:mode for all functions f. \
                   When mode is 'auto', automatically split states at the end \
                   of all functions, according to the function return code"
     end)
-module SplitGlobalStrategy = State_builder.Ref (Split_strategy)
-    (struct
-      let default () = Split_strategy.NoSplit
-      let name = "Parameters.SplitGlobalStrategy"
-      let dependencies = [SplitReturn.self]
-    end)
-let () =
-  SplitReturn.add_set_hook
-    (fun _ x -> SplitGlobalStrategy.set
-        (try Split_strategy.of_string x
-         with Split_strategy.ParseFailure s ->
-           abort "@[@[incorrect argument for option %s@ (%s).@]"
-             SplitReturn.name s))
 let () = add_precision_dep SplitReturn.parameter
 
 (* --- Misc --- *)
@@ -1420,7 +1399,7 @@ let () =
   bind (module LinearLevel) (fun n -> n * 20);
   bind (module RmAssert) (fun n -> n > 0);
   bind (module Domains) (fun n -> Datatype.String.Set.of_list (domains n));
-  bind (module SplitReturn) (fun n -> if n > 3 then "auto" else "");
+  bind (module SplitReturn) (fun n -> if n > 3 then SplitAuto else NoSplit);
   bind (module EqualityCall) (fun n -> if n > 4 then "formals" else "none");
   bind (module OctagonCall) (fun n -> n > 6);
   ()

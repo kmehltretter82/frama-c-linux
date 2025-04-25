@@ -67,8 +67,6 @@ include
     let mem_project = Datatype.never_any_project
   end)
 
-exception ParseFailure of string
-
 let of_string s =
   match s with
   | "" -> NoSplit
@@ -78,8 +76,10 @@ let of_string s =
     let r = Str.regexp ":" in
     let conv s =
       try Integer.of_string s
-      with Invalid_argument _ -> raise (ParseFailure s)
-    in SplitEqList (List.map conv (Str.split r s))
+      with Invalid_argument _ ->
+        raise (Self.Cannot_build ("unknown split strategy " ^ s))
+    in
+    SplitEqList (List.map conv (Str.split r s))
 
 let to_string = function
   | NoSplit -> ""
