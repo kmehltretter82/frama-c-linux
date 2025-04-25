@@ -22,41 +22,27 @@
 
 open Abstract_interp
 
+(* To be completed with more involved strategies *)
 type split_strategy =
   | NoSplit
   | SplitAuto
   | SplitEqList of Datatype.Integer.t list
   | FullSplit
-  (* To be completed with more involved strategies *)
+[@@ deriving eq, ord]
 
-include
-  Datatype.Make_with_collections(struct
-    type t = split_strategy
-    let name = "Value.Split_strategy"
-    let rehash = Datatype.identity
-    let structural_descr = Structural_descr.t_abstract
+include Datatype.Make (struct
+    include Datatype.Serializable_undefined
+
+    type t = split_strategy [@@ deriving eq, ord]
+    let name = "Eva.Split_strategy"
     let reprs = [NoSplit]
-    let compare s1 s2 = match s1, s2 with
-      | NoSplit, NoSplit -> 0
-      | NoSplit, _ -> -1
-      | _, NoSplit -> 1
-      | SplitAuto, SplitAuto -> 0
-      | SplitAuto, _ -> -1
-      | _, SplitAuto -> 1
-      | FullSplit, FullSplit -> 0
-      | FullSplit, _ -> -1
-      | _, FullSplit -> 1
-      | SplitEqList l1, SplitEqList l2 ->
-        Extlib.list_compare Int.compare l1 l2
 
-    let equal = Datatype.from_compare
     let hash = function
-      | NoSplit -> 17
-      | SplitAuto -> 47
-      | FullSplit -> 19
-      | SplitEqList l ->
-        List.fold_left (fun acc i -> acc * 13 + 57 * Int.hash i) 1 l
-    let copy = Datatype.identity
+      | NoSplit -> 0
+      | SplitAuto -> 1
+      | FullSplit -> 2
+      | SplitEqList l -> 3 + Hashtbl.hash (List.map Int.hash l)
+
     let pretty fmt = function
       | NoSplit -> Format.pp_print_string fmt "no split"
       | SplitAuto -> Format.pp_print_string fmt "auto split"
@@ -64,7 +50,8 @@ include
       | SplitEqList l ->
         Format.fprintf fmt "Split on \\result == %a"
           (Pretty_utils.pp_list ~sep:",@ " Datatype.Integer.pretty) l
-    let mem_project = Datatype.never_any_project
+
+    let copy = Datatype.identity
   end)
 
 let of_string s =
