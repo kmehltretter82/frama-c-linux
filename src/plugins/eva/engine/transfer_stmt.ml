@@ -31,7 +31,7 @@ module type S = sig
   val assign: state -> kinstr -> lval -> exp -> state or_bottom
   val assume: state -> stmt -> exp -> bool -> state or_bottom
   val call:
-    stmt -> lval option -> exp -> exp list -> state ->
+    stmt -> lval option -> lval -> exp list -> state ->
     state Engine_sig.call_result
   val check_unspecified_sequence:
     stmt ->
@@ -710,12 +710,12 @@ module Make (Engine: Engine_sig.S) = struct
     in
     Engine_sig.{ states; cacheable; kind }
 
-  let call stmt lval_option funcexp args state =
+  let call stmt lval_option funclv args state =
     let ki_call = Kstmt stmt in
     let subdivnb = subdivide_stmt stmt in
-    (* Resolve [funcexp] into the called kernel functions. *)
+    (* Resolve [funclv] into the called kernel functions. *)
     let functions, alarms =
-      Eval.eval_function_exp ~subdivnb funcexp ~args state
+      Eval.eval_function_exp ~subdivnb funclv ~args state
     in
     Alarmset.emit ki_call alarms;
     let bottom =

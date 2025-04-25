@@ -3351,7 +3351,7 @@ let allow_return_collapse ~tlv ~tf =
   )
 
 let tcallres f =
-  match Ast_types.unroll_node (typeOf f) with
+  match Ast_types.unroll_node (typeOfLval f) with
   | TFun (rt, _, _) -> rt
   | _ -> Errorloc.abort_context "Function call to a non-function"
 
@@ -3388,7 +3388,7 @@ let collapseCallCast (s1,s2) = match s1.skind, s2.skind with
       Some [ s1 ]
     end else None
   | Instr (Call (Some (Var vi, NoOffset),
-                 ({ enode = Lval (Var f, NoOffset)} as ef), args, l)),
+                 ((Var f, NoOffset) as ef), args, l)),
     Instr (
       Local_init(
         destv,
@@ -3400,7 +3400,7 @@ let collapseCallCast (s1,s2) = match s1.skind, s2.skind with
       Some [s1]
     end else None
   | Instr (Call (Some (Var v1, NoOffset),
-                 ({ enode = Lval (Var f, NoOffset)} as ef), args, l)),
+                 ((Var f, NoOffset) as ef), args, l)),
     Instr (
       Local_init(
         v2, AssignInit(SingleInit { enode = Lval (Var v1', NoOffset) }),_)) ->
@@ -6387,17 +6387,17 @@ and doExp local_env
       (* Get the result type and the argument types *)
       let (resType, argTypes, isvar, f'', tattr) =
         match Ast_types.unroll ft' with
-        | { tnode = TFun(rt,at,isvar); tattr } -> (rt,at,isvar,f',tattr)
+        | { tnode = TFun(rt,at,isvar); tattr } ->
+          let lv = match f'.enode with Lval lv -> lv | _ -> assert false in
+          (rt,at,isvar,lv,tattr)
         | { tnode = TPtr t } -> begin
             match Ast_types.unroll t with
             | { tnode = TFun (rt, at, isvar) } -> (* Make the function pointer
                                                    * explicit  *)
               let f'' =
                 match f'.enode with
-                | AddrOf lv -> new_exp ~loc:f'.eloc (Lval(lv))
-                | _ ->
-                  new_exp ~loc:f'.eloc
-                    (Lval (mkMem ~addr:f' ~off:NoOffset))
+                | AddrOf lv -> lv
+                | _ -> mkMem ~addr:f' ~off:NoOffset
               in
               (rt,at,isvar, f'',[])
             | x ->
@@ -6418,16 +6418,16 @@ and doExp local_env
        * want to give warnings. We'll just leave the arguments of these
        * functions alone*)
       let isSpecialBuiltin =
-        match f''.enode with
-        | Lval (Var fv, NoOffset) -> Cil_builtins.is_special_builtin fv.vname
+        match f'' with
+        | Var fv, NoOffset -> Cil_builtins.is_special_builtin fv.vname
         | _ -> false
       in
       let init_chunk = unspecified_chunk empty in
       (* Do the arguments. In REVERSE order !!! Both GCC and MSVC do this *)
       let rec loopArgs ?(are_ghost=false) = function
         | ([], []) ->
-          (match argTypes, f''.enode with
-           | None, Lval (Var f,NoOffset) ->
+          (match argTypes, f'' with
+           | None, (Var f, NoOffset) ->
              (* we call a function without prototype with 0 argument.
                 Hence, it really has no parameter.
              *)
@@ -6547,7 +6547,7 @@ and doExp local_env
               (ss @@@ (sa, ghost), a' :: args')
           in
           let (chunk,args as res) = loop args in
-          (match argTypes, f''.enode with
+          (match argTypes, f'' with
            | Some _,_ ->
              if isvar then begin
                (* use default argument promotion to infer the type of the
@@ -6555,7 +6555,7 @@ and doExp local_env
                promote_variadic_arguments res
              end else
                res
-           | None, Lval (Var f, NoOffset)
+           | None, (Var f, NoOffset)
              when not isSpecialBuiltin ->
              begin
                (* use default argument promotion to infer the type of the
@@ -6637,7 +6637,7 @@ and doExp local_env
       (* Do we actually have a call, or an expression? *)
       let piscall: bool ref = ref true in
 
-      let pf: exp ref = ref f'' in (* function to call *)
+      let pf: lval ref = ref f'' in (* function to call *)
       let pargs: exp list ref = ref args' in (* arguments *)
       let pis__builtin_va_arg: bool ref = ref false in
       let pwhat: expAction ref = ref what in (* what to do with result *)
@@ -6664,8 +6664,8 @@ and doExp local_env
         | _ -> ""
       in
       (* Try to intercept some builtins *)
-      (match (!pf).enode with
-       | Lval(Var fv, NoOffset) -> begin
+      (match !pf with
+       | Var fv, NoOffset -> begin
            match fv.vname with
            | "__builtin_va_arg" ->
              begin
@@ -6775,7 +6775,7 @@ and doExp local_env
                      "Cannot find __builtin_stdarg_start to replace %s"
                      fv.vname
                in
-               pf := new_exp ~loc (Lval (var v))
+               pf := var v
              end
            |  "__builtin_next_arg" ->
              begin
@@ -6802,7 +6802,8 @@ and doExp local_env
                (match !pargs with
                 | [ ] -> begin
                     piscall := false;
-                    pres := new_exp ~loc:e.expr_loc (SizeOfE !pf);
+                    let e' = new_exp ~loc:e.expr_loc (Lval !pf) in
+                    pres := new_exp ~loc:e.expr_loc (SizeOfE e');
                     prestype := (Machine.sizeof_type ())
                   end
                 | _ ->
@@ -7016,7 +7017,7 @@ and doExp local_env
             in
             let descr =
               Format.asprintf "%a(%a)"
-                Cil_descriptive_printer.pp_exp !pf
+                Cil_descriptive_printer.pp_lval !pf
                 (Pretty_utils.pp_list ~sep:", "
                    Cil_descriptive_printer.pp_exp)
                 !pargs

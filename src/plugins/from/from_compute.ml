@@ -325,7 +325,7 @@ struct
       Async.yield ();
       let request = To_Use.stmt_request stmt in
       let called_vinfos = Eva.Results.(eval_callee f request |> default []) in
-      let f_deps = Eva.Results.expr_deps f request in
+      let f_deps = Eva.Results.lval_deps f request in
       (* dependencies for the evaluation of [f] *)
       let f_deps = Eva.Assigns.Memory.find state.deps_table f_deps in
       let additional_deps =
@@ -452,8 +452,8 @@ struct
               transfer_assign stmt ~init:true lv Eva.Deps.bottom r
         in
         aux (Cil.var v) i state
-      | Call (lvaloption,funcexp,argl,loc) ->
-        transfer_call stmt lvaloption funcexp argl loc state
+      | Call (lvaloption,funclv,argl,loc) ->
+        transfer_call stmt lvaloption funclv argl loc state
       | Local_init (v, ConsInit(f, args, kind), loc) ->
         Cil.treat_constructor_as_func
           (transfer_call stmt) v f args kind loc state

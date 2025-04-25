@@ -178,20 +178,20 @@ let add_instr ~kf (m:map) (s:stmt) (instr:instr) =
     Memory.add_write m r (Lval (s,Cil.var x)) ;
     Cil.treat_constructor_as_func
       begin fun _res fct args _loc ->
-        add_value m s fct ;
+        ignore (add_lval m s fct);
         List.iter (add_value m s) args ;
         add_call ~kf ~stmt:s m ~result:(Some r) fct args
       end x vf args kind loc
 
-  | Call(lr,e,es,_) ->
-    add_value m s e ;
+  | Call(lr,f,es,_) ->
+    ignore (add_lval m s f);
     List.iter (add_value m s) es ;
     let result = Option.map
         (fun lv ->
            let r = add_lval m s lv in
            Memory.add_write m r (Lval(s,lv)) ; r
         ) lr
-    in add_call ~kf ~stmt:s m ~result e es
+    in add_call ~kf ~stmt:s m ~result f es
 
   | Asm _ ->
     Options.warning ~source:(fst @@ Stmt.loc s)

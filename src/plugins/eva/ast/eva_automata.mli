@@ -47,7 +47,7 @@ type transition =
   | Return of exp option * stmt
   | Guard of exp * guard_kind * stmt
   | Assign of lval * exp * stmt
-  | Call of lval option * exp * exp list * stmt
+  | Call of lval option * lval * exp list * stmt
   | Init of varinfo * init * stmt
   | Asm of attributes * string list * extended_asm option * stmt
 

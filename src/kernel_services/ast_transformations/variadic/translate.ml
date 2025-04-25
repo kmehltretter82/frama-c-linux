@@ -106,7 +106,7 @@ let translate_variadics (file : file) =
 
         let translated_call callee args =
           of_instr
-            (mk_call (cil_exp ~loc callee) (List.map (cil_exp ~loc) args))
+            (mk_call (cil_lval ~loc callee) (List.map (cil_exp ~loc) args))
       end
       in
       (module B : Builder.S)
@@ -214,17 +214,17 @@ let translate_variadics (file : file) =
         | NoTranslation ->
           raise Not_found
         | _ ->
-          Generic.translate_call (Cil.evar ~loc f)
+          Generic.translate_call (Cil.var f)
       in
       begin match i with
         (* Translate builtins *)
-        | Call(_, {enode = Lval(Var vi, _)}, _, _)
+        | Call(_, (Var vi, _), _, _)
           when Classify.is_va_builtin vi.vname ->
           File.must_recompute_cfg fundec;
           Cil.ChangeTo (Generic.translate_va_builtin fundec i)
 
         (* Translate variadic calls *)
-        | Call(lv, {enode = Lval(Var vi, NoOffset)}, args, loc) ->
+        | Call(lv, (Var vi, NoOffset), args, loc) ->
           begin
             try
               let mk_call f args = Call (lv, f, args, loc) in
@@ -237,7 +237,7 @@ let translate_variadics (file : file) =
 
         | Call(lv, callee, args, loc) ->
           let is_variadic =
-            List.mem Generic.vpar (Typ.params (Cil.typeOf callee))
+            List.mem Generic.vpar (Typ.params (Cil.typeOfLval callee))
           in
           if is_variadic then begin
             let mk_call f args = Call (lv, f, args, loc) in
@@ -261,8 +261,8 @@ let translate_variadics (file : file) =
                   | Plain_func, args -> args
                 in
                 let f =
-                  match f.enode with
-                  | Lval (Var f, NoOffset) -> f
+                  match f with
+                  | Var f, NoOffset -> f
                   | _ ->
                     Kernel.fatal
                       "Constructor cannot be translated as indirect call"

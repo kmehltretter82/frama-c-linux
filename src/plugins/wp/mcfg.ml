@@ -119,7 +119,7 @@ module type S = sig
   (* -------------------------------------------------------------------------- *)
 
   val call_dynamic : t_env -> stmt ->
-    WpPropId.prop_id -> exp -> (kernel_function * t_prop) list -> t_prop
+    WpPropId.prop_id -> lval -> (kernel_function * t_prop) list -> t_prop
 
   val call_goal_precond : t_env -> stmt ->
     kernel_function -> exp list ->

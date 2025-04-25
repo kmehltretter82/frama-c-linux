@@ -107,12 +107,12 @@ class transformer = object(self)
     | Not_found -> (fct, args)
 
   method! vinst = function
-    | Call(_, { enode = Lval((Var _), NoOffset)} , _, _)
+    | Call(_, (Var _, NoOffset), _, _)
     | Local_init(_, ConsInit(_ , _, Plain_func), _) ->
       let change = function
-        | [ Call(r, ({ enode = Lval((Var f), NoOffset) } as e), args, loc) ] ->
+        | [ Call(r, (Var f, NoOffset), args, loc) ] ->
           let f, args = self#replace_call (r, f, args) in
-          [ Call(r, { e with enode = Lval((Var f), NoOffset) }, args, loc) ]
+          [ Call(r, Cil.var f, args, loc) ]
         | [ Local_init(r, ConsInit(f, args, Plain_func), loc) ] ->
           let f, args = self#replace_call (Some (Cil.var r), f, args) in
           [ Local_init(r, ConsInit(f, args, Plain_func), loc) ]
@@ -130,7 +130,7 @@ let compute_call_preconditions_statuses kf =
   let _ = Kernel_function.find_all_enclosing_blocks stmt in
   match stmt.skind with
   | Instr (Local_init(_, ConsInit(fct, _, Plain_func), _))
-  | Instr (Call(_, { enode = Lval ((Var fct), NoOffset) }, _, _)) ->
+  | Instr (Call(_, (Var fct, NoOffset), _, _)) ->
     let called_kf = Globals.Functions.get fct in
     Statuses_by_call.setup_all_preconditions_proxies called_kf ;
     let reqs = Statuses_by_call.all_call_preconditions_at

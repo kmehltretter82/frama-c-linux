@@ -1039,7 +1039,7 @@ struct
   let call_pointer sigma fct =
     let outcome = Warning.catch
         ~severe:true ~fallback:"Degenerated goal"
-        (C.call sigma) fct in
+        (C.lval sigma) fct in
     match outcome with
     | Warning.Failed warn -> warn,None
     | Warning.Result(warn,floc) -> warn,Some floc

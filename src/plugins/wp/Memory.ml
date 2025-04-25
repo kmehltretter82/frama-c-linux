@@ -396,10 +396,6 @@ sig
   val lval : sigma -> lval -> loc
   (** Evaluate the left-value on the given memory state. *)
 
-  val call : sigma -> exp -> loc
-  (** Address of a function pointer.
-      Handles [AddrOf], [StartOf] and [Lval] as usual. *)
-
   val instance_of : loc -> kernel_function -> pred
   (** Check whether a function pointer is (an instance of)
       some kernel function. Currently, the meaning

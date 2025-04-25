@@ -129,8 +129,8 @@ let print_calldeps () =
          | Kglobal ->
            (fun fmt -> Format.fprintf fmt "@[entry point:@]"),
            Kernel_function.get_type (fst (Globals.entry_point ()))
-         | Kstmt ({skind = Instr (Call (_, ekf, _, _))} as s) ->
-           treat_call s (Cil.typeOf ekf)
+         | Kstmt ({skind = Instr (Call (_, lvkf, _, _))} as s) ->
+           treat_call s (Cil.typeOfLval lvkf)
          | Kstmt ({skind = Instr (Local_init(_,ConsInit(f,_,_),_))} as s)->
            treat_call s f.vtype
          | _ -> assert false (* Not a call *)

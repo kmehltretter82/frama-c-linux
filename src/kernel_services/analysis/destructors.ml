@@ -48,7 +48,7 @@ let add_destructor (_, l as acc) var =
       vf.vreferenced <- true;
       let s =
         Cil.mkStmtOneInstr ~valid_sid:true
-          (Call(None,Cil.evar ~loc vf,e::args,loc))
+          (Call(None, Cil.var vf,e::args,loc))
       in (true, s :: l)
     in
     let rec aux e a =

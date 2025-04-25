@@ -107,8 +107,7 @@ let () = Request.register ~package
     callers
 
 let eval_callee stmt lval =
-  let expr = Eva_utils.lval_to_exp lval in
-  Results.(before stmt |> eval_callee expr |> default [])
+  Results.(before stmt |> eval_callee lval |> default [])
 
 let callees = function
   | Printer_tag.PLval (_kf, Kstmt stmt, (Mem _, NoOffset as lval))

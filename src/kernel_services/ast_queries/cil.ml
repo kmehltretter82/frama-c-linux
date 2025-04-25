@@ -1752,10 +1752,10 @@ and childrenInstr (vis: cilVisitor) (i: instr) : instr =
     let lv' = fLval lv in let e' = fExp e in
     if lv' != lv || e' != e then Set(lv',e',l) else i
   | Call(None,f,args,l) ->
-    let f' = fExp f in let args' = Extlib.map_no_copy fExp args in
+    let f' = fLval f in let args' = Extlib.map_no_copy fExp args in
     if f' != f || args' != args then Call(None,f',args',l) else i
   | Call(Some lv,fn,args,l) ->
-    let lv' = fLval lv in let fn' = fExp fn in
+    let lv' = fLval lv in let fn' = fLval fn in
     let args' = Extlib.map_no_copy fExp args in
     if lv' != lv || fn' != fn || args' != args
     then Call(Some lv', fn', args', l) else i
@@ -4353,7 +4353,7 @@ class constFoldVisitorClass (machdep: bool) : cilVisitor = object
     match i with
     (* Skip two functions to which we add Sizeof to the type arguments.
        See the comments for these above. *)
-      Call(_,({enode = Lval (Var vi,NoOffset)}),_,_)
+      Call(_,(Var vi,NoOffset),_,_)
       when ((vi.vname = "__builtin_va_arg")
             || (vi.vname = "__builtin_types_compatible_p")) ->
       SkipChildren
@@ -4787,7 +4787,7 @@ let treat_constructor_as_func action v f args kind loc =
     | Plain_func -> Some (var v), args
     | Constructor -> None, mkAddrOfVi v :: args
   in
-  action lv (evar f) args loc
+  action lv (var f) args loc
 
 let fold_local_init b f acc =
   let rec find_stmt acc s =
@@ -4823,7 +4823,7 @@ let has_extern_local_init b =
   end
 
 let instr_falls_through = function
-  | Call (_, f, _, _) -> not (Ast_types.has_attribute "noreturn" (typeOf f))
+  | Call (_, f, _, _) -> not (Ast_types.has_attribute "noreturn" (typeOfLval f))
   | _ -> true
 
 let splitFunctionType (ftype: typ)

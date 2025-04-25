@@ -331,12 +331,6 @@ struct
 
     | CastE(tr,e) -> cast tr (Cil.typeOf e) (!s_exp env e)
 
-  let rec call_node env e =
-    match e.enode with
-    | CastE(_,e) -> call_node env e
-    | AddrOf lv | StartOf lv | Lval lv -> lval env lv
-    | _ -> Warning.error ~source:"call" "Unsupported function pointer"
-
   (* -------------------------------------------------------------------------- *)
   (* --- Exp with Error                                                     --- *)
   (* -------------------------------------------------------------------------- *)
@@ -414,7 +408,6 @@ struct
 
   let exp env e = Current_loc.with_loc e.eloc (exp_protected env) e
   let cond env e = Current_loc.with_loc e.eloc (cond_node env) e
-  let call env e = Current_loc.with_loc e.eloc (call_node env) e
   let result env tr = function
     | R_var x -> F.e_var x
     | R_loc l -> cval (M.load env (Ctypes.object_of tr) l)

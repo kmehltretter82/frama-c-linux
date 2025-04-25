@@ -513,7 +513,7 @@ module Select (Eval: Eval) = struct
          | Mem _, NoOffset when Ast_types.is_fun ty -> begin
              (* Function pointers *)
              (* get the list of functions in the values *)
-             let e = Eva_ast.(Build.lval (translate_lval lv)) in
+             let lv = Eva_ast.translate_lval lv in
              let state =
                match ki with
                | Kglobal -> Eval.Analysis.get_global_state ()
@@ -522,7 +522,7 @@ module Select (Eval: Eval) = struct
              match state  with
              | `Bottom | `Top -> ()
              | `Value state ->
-               let funs, _ = Eval.Analysis.eval_function_exp state e in
+               let funs, _ = Eval.Analysis.eval_function_exp state lv in
                match funs with
                | `Bottom -> ()
                | `Value funs ->

@@ -1281,13 +1281,14 @@ and instr =
   (** An assignment. A cast is present if the exp has different type from
       lval *)
 
-  | Call of lval option * exp * exp list * location
+  | Call of lval option * lval * exp list * location
   (** optional: result is an lval. A cast might be necessary if the declared
       result type of the function is not the same as that of the destination.
       Actual arguments must have a type equivalent (i.e. {!Cil.need_cast} must
       return [false]) to the one of the formals of the function.
       If the type of the result variable is not the same as the declared type of
       the function result then an implicit cast exists.
+      @before Frama-C+dev the function was an expression instead of lval.
   *)
   | Local_init of varinfo * local_init * location
   (** initialization of a local variable. The corresponding varinfo must

@@ -71,7 +71,7 @@ let add_vpar vi =
 
 let translate_va_builtin caller inst =
   let vi, args, loc = match inst with
-    | Call(_, {enode = Lval(Var vi, _)}, args, loc) ->
+    | Call(_, (Var vi, _), args, loc) ->
       vi, args, loc
     | _ -> assert false
   in
@@ -143,7 +143,7 @@ let translate_call ~builder callee pars =
     "Generic translation of call to variadic function.";
 
   (* Split params into static, variadic and ghost part *)
-  let ng_params, g_params = Typ.ghost_partitioned_params (Cil.typeOf callee) in
+  let ng_params, g_params = Typ.ghost_partitioned_params (Cil.typeOfLval callee) in
   let static_size = List.length ng_params - 1 in
   let s_exps, r_exps = List.break static_size pars in
   let variadic_size = (List.length r_exps) - (List.length g_params) in
@@ -167,4 +167,4 @@ let translate_call ~builder callee pars =
   (* Translate the call *)
   let new_arg = Build.(cast' (vpar_typ []) (addr vargs)) in
   let new_args = Build.(of_exp_list s_exps @ [new_arg] @ of_exp_list g_exps) in
-  Build.(translated_call (of_exp callee) new_args)
+  Build.(translated_call (of_lval callee) new_args)

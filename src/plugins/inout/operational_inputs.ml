@@ -316,8 +316,9 @@ module Computer(Fenv:Dataflows.FUNCTION_ENV)(X:sig
   let transfer_call ~for_writing s dest f args _loc data =
     let request = X.stmt_request s in
     (* Join the inputs of [args] and of the function expression. *)
+    let f_inputs = Eva.Results.lval_deps f request in
     let eval_deps acc e = Zone.join acc (Eva.Results.expr_deps e request) in
-    let f_args_inputs = List.fold_left eval_deps Zone.bottom (f :: args) in
+    let f_args_inputs = List.fold_left eval_deps f_inputs args in
     let data =
       catenate
         data
@@ -401,8 +402,8 @@ module Computer(Fenv:Dataflows.FUNCTION_ENV)(X:sig
             add_out ~for_writing:false request lv Zone.bottom acc
       in
       aux (Cil.var v) i data
-    | Call (lvaloption,funcexp,argl,loc) ->
-      transfer_call ~for_writing:true stmt lvaloption funcexp argl loc data
+    | Call (lvaloption,funclv,argl,loc) ->
+      transfer_call ~for_writing:true stmt lvaloption funclv argl loc data
     | Local_init(v, ConsInit(f, args, kind), loc) ->
       let transfer = transfer_call ~for_writing:false stmt in
       Cil.treat_constructor_as_func transfer v f args kind loc data

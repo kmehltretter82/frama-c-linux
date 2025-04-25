@@ -35,4 +35,4 @@ val translate_va_builtin :
 
 (* Generic translation of calls *)
 val translate_call :
-  builder:Builder.t -> Cil_types.exp -> Cil_types.exp list -> unit
+  builder:Builder.t -> Cil_types.lval -> Cil_types.exp list -> unit

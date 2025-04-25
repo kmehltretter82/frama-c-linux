@@ -237,7 +237,7 @@ let set_instr ?(post=false) loc lhs rhs env kf =
 module Function_call: sig
   (* Top-level handler for Call instructions *)
   val instr:
-    lval option -> exp -> exp list -> location -> Env.t -> kernel_function ->
+    lval option -> lval -> exp list -> location -> Env.t -> kernel_function ->
     Env.t
 end = struct
 
@@ -303,12 +303,14 @@ end = struct
 
   (* Update local environment with a statement tracking temporal metadata
      associated with memcpy/memset call *)
-  let call_memxxx loc args fexp env =
-    if Libc.is_memcpy fexp || Libc.is_memset fexp then
+  let call_memxxx loc args (flv : lval) env =
+    if Libc.is_memcpy flv || Libc.is_memset flv then
       let prefix = RTL.temporal_prefix in
-      let name = match fexp.enode with
-        | Lval(Var vi, _) -> vi.vname
-        | _ -> Options.fatal "[Temporal.call_memxxx] not a left-value"
+      let name = match flv with
+        | Var vi, _ -> vi.vname
+        | _ ->
+          Options.fatal
+            "[Temporal.call_memxxx] should not be called on function pointer"
       in
       let stmt =
         Smart_stmt.rtl_call ~loc ~prefix name args
@@ -317,7 +319,7 @@ end = struct
     else
       env
 
-  let instr ret fexp args loc env kf =
+  let instr ret flv args loc env kf =
     (* Add function calls to reset_parameters and reset_return before each
        function call regardless. They are not really required, as if the
        instrumentation is correct then the right parameters will be saved
@@ -335,15 +337,15 @@ end = struct
     let env = Env.add_stmt ~post:false env stmt in
     (* Push parameters with either a call to a function pointer or a function
         definition otherwise there is no point. *)
-    let has_def = Functions.has_fundef fexp in
+    let has_def = Functions.has_fundef flv in
     let env =
-      if Ast_types.is_fun (Cil.typeOf fexp) || has_def then
+      if Ast_types.is_fun (Cil.typeOfLval flv) || has_def then
         save_params loc args env kf
       else
         env
     in
     (* Handle special cases of memcpy/memset *)
-    let env = call_memxxx loc args fexp env in
+    let env = call_memxxx loc args flv env in
     (* Memory allocating functions have no definitions so below expression
        should capture them *)
     let alloc = not has_def in
@@ -382,10 +384,10 @@ end = struct
       match li with
       | AssignInit init ->
         handle_init NoOffset loc vi init env kf
-      | ConsInit(fexp, args, _) ->
+      | ConsInit(fvi, args, _) ->
         let ret = Some (Cil.var vi) in
-        let fexp = Cil.evar ~loc fexp in
-        Function_call.instr ret fexp args loc env kf
+        let flv = Cil.var fvi in
+        Function_call.instr ret flv args loc env kf
     else
       env
 end
@@ -444,8 +446,8 @@ let handle_instruction instr env kf =
   match instr with
   | Set(lv, exp, loc) ->
     set_instr loc lv exp env kf
-  | Call(ret, fexp, args, loc) ->
-    Function_call.instr ret fexp args loc env kf
+  | Call(ret, flv, args, loc) ->
+    Function_call.instr ret flv args loc env kf
   | Local_init(vi, li, loc) ->
     Local_init.instr vi li loc env kf
   | Asm _ ->

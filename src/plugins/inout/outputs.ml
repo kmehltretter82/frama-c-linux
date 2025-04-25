@@ -67,10 +67,10 @@ class virtual do_it_ = object(self)
         match i with
         | Set (lv,_,_) ->
           assign_lval lv
-        | Call (lv_opt, exp, _, _) ->
+        | Call (lv_opt, lv, _, _) ->
           begin
             Option.iter assign_lval lv_opt;
-            let callees = Eva.Results.(before stmt |> eval_callee exp) in
+            let callees = Eva.Results.(before stmt |> eval_callee lv) in
             match callees with
             | Ok callees ->
               let join_outputs kf =

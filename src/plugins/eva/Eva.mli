@@ -424,7 +424,7 @@ module Results: sig
       without offset.
       Also see [callee] for a function which applies directly on Call
       statements. *)
-  val eval_callee : Cil_types.exp -> request -> Kernel_function.t list result
+  val eval_callee : Cil_types.lval -> request -> Kernel_function.t list result
 
 
   (** Evaluated values conversion *)

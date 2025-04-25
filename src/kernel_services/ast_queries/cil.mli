@@ -1083,9 +1083,10 @@ val block_from_unspecified_sequence:
     the parameters corresponding to the call to [f], of kind [kind],
     initializing [v] with arguments [args].
     @since Phosphorus-20170501-beta1
+    @before Frama-C+dev [action] took an expression instead of an lval.
 *)
 val treat_constructor_as_func:
-  (lval option -> exp -> exp list -> location -> 'a) ->
+  (lval option -> lval -> exp list -> location -> 'a) ->
   varinfo -> varinfo -> exp list -> constructor_kind -> location -> 'a
 
 (** [find_def_stmt b v] returns the [Local_init] instruction within [b] that

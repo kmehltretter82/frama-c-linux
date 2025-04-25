@@ -274,7 +274,7 @@ sig
   val assign : [< lval] -> [< exp | call] -> [> instr]
   val incr : [< lval] -> [> instr]
   val call : Cil_types.kernel_function -> [< exp] list -> [> call]
-  val call_ptr : [< exp] -> [< exp] list -> [> call]
+  val call_ptr : [< lval] -> [< exp] list -> [> call]
 
   val local : ?ghost:bool -> ?init:'v -> (init,'v) typ -> string ->
     [> var] * [> instr]
@@ -387,7 +387,7 @@ sig
   val incr : [< lval] -> unit
   val call : [< lval | `none] -> Cil_types.kernel_function -> [< exp] list ->
     unit
-  val call_ptr : [< lval | `none] -> [< exp] -> [< exp] list -> unit
+  val call_ptr : [< lval | `none] -> [< lval] -> [< exp] list -> unit
   val pure : [< exp ] -> unit
 
   (* Operators *)

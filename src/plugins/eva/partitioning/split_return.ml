@@ -53,9 +53,9 @@ module ReturnUsage = struct
 
   (* Treat a [Call] instruction. Immediate calls (no functions pointers)
      are added to the current usage store *)
-  let add_call (uf: return_usage_per_fun) lv_opt e_fun =
-    match e_fun.enode, lv_opt with
-    | Lval (Var vi, NoOffset), Some lv
+  let add_call (uf: return_usage_per_fun) lv_opt lv_fun =
+    match lv_fun, lv_opt with
+    | (Var vi, NoOffset), Some lv
       when Ast_types.is_integral_or_pointer (Cil.typeOfLval lv) ->
       let kf = Globals.Functions.get vi in
       let u = find_or_default uf lv in
@@ -64,7 +64,7 @@ module ReturnUsage = struct
       if debug then Format.printf
           "[Usage] %a returns %a@." Kernel_function.pretty kf Printer.pp_lval lv;
       MapLval.add lv u uf
-    | _ -> uf
+    | _ , _-> uf
 
   (* Treat a [Set] instruction [lv = (cast) lv']. Useful for return codes
      that are stored inside values of a slightly different type *)
@@ -176,8 +176,8 @@ module ReturnUsage = struct
       (match i with
        | Set (lv, e, _) ->
          usage <- add_alias usage lv e
-       | Call (lv_opt, e, _, _) ->
-         usage <- add_call usage lv_opt e
+       | Call (lv_opt, lv, _, _) ->
+         usage <- add_call usage lv_opt lv
        | Local_init(v, AssignInit i, _) ->
          let rec aux lv i =
            match i with
@@ -187,7 +187,7 @@ module ReturnUsage = struct
          in
          aux (Cil.var v) i
        | Local_init(v, ConsInit(f,_,Plain_func), _) ->
-         usage <- add_call usage (Some (Cil.var v)) (Cil.evar f)
+         usage <- add_call usage (Some (Cil.var v)) (Cil.var f)
        | Local_init(_, ConsInit _,_) -> () (* not a real assignment. *)
        | Asm _ | Skip _ | Code_annot _ -> ()
       );

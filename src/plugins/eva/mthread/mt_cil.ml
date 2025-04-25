@@ -32,7 +32,7 @@ let mthread_global_var var_name () =
 
 let is_call_to_sync stmt =
   match stmt.skind with
-  | Instr (Call (_, { enode = Lval (Var vi, _)}, _, _))
+  | Instr (Call (_, (Var vi, _), _, _))
     when vi.vname = "Frama_C_mthread_sync" -> true
   (* No Local_init possible here, as Frama_C_mthread_sync returns void. *)
   | _ -> false

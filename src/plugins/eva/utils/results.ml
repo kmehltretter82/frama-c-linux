@@ -360,10 +360,10 @@ struct
     let access = if for_writing then Locations.Write else Read in
     Address (Response.map eval (get req), access)
 
-  let eval_callee exp req =
+  let eval_callee lv req =
     let join = (@)
     and extract state =
-      let r,_alarms = A.Eval.eval_function_exp exp state in
+      let r,_alarms = A.Eval.eval_function_exp lv state in
       r >>-: List.map fst
     in
     get req |> Response.map_join' extract join |> convert |>
@@ -600,28 +600,28 @@ let eval_address ?(for_writing=false) lval req =
   let lval = Eva_ast.translate_lval lval in
   eval_address' ~for_writing lval req
 
-let eval_callee exp req =
+let eval_callee lv req =
   (* Check the validity of exp *)
-  begin match exp with
-    | Cil_types.({ enode = Lval (_, NoOffset) }) -> ()
+  begin match lv with
+    | Cil_types.((_, NoOffset)) -> ()
     | _ ->
       invalid_arg "The callee must be an lvalue with no offset"
   end;
   let module M = Make () in
-  let exp = Eva_ast.translate_exp exp in
-  M.eval_callee exp req
+  let lv = Eva_ast.translate_lval lv in
+  M.eval_callee lv req
 
 let callee stmt =
-  let callee_exp =
+  let callee_lv =
     match stmt.Cil_types.skind with
-    | Instr (Call (_lval, callee_exp, _args, _loc)) ->
-      callee_exp
+    | Instr (Call (_lval, callee_lv, _args, _loc)) ->
+      callee_lv
     | Instr (Local_init (_vi, ConsInit (f, _, _), _loc)) ->
-      Cil.evar f
+      Cil.var f
     | _ ->
       invalid_arg "Can only evaluate the callee on a statement which is a Call"
   in
-  before stmt |> eval_callee callee_exp |> Result.value ~default:[]
+  before stmt |> eval_callee callee_lv |> Result.value ~default:[]
 
 (* Value conversion *)
 

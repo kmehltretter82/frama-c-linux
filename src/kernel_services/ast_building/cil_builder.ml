@@ -777,7 +777,7 @@ struct
 
   type ghost = NoGhost | Ghost
 
-  type call' = exp' * exp' list
+  type call' = lval' * exp' list
 
   type instr' =
     | CilInstr of Cil_types.instr
@@ -829,7 +829,7 @@ struct
     | #exp as src -> `instr (Assign (harden_lval dest, harden_exp src))
     | #call as call -> `instr (Call (Some (harden_lval dest), harden_call call))
   let incr dest = `instr (Assign (harden_lval dest, harden_exp (add dest one)))
-  let call_ptr callee args = `call (harden_exp callee, harden_exp_list args)
+  let call_ptr callee args = `call (harden_lval callee, harden_exp_list args)
   let call callee args = call_ptr (var (Kernel_function.get_vi callee)) args
   let of_stmtkind sk = `stmt (CilStmtkind sk)
   let of_stmt s = `stmt (CilStmt s)
@@ -922,7 +922,7 @@ struct
       Cil_types.Set (dest', src', loc), scope
     | Call (dest,(callee,args)) ->
       let dest' = Option.map (build_lval ~scope ~loc) dest
-      and callee' = build_exp ~scope ~loc callee
+      and callee' = build_lval ~scope ~loc callee
       and args' = List.map (build_exp ~scope ~loc) args in
       Cil_types.Call (dest', callee', args', loc), scope
     | Local (v, init, ghost) ->
@@ -1488,7 +1488,7 @@ struct
   let call_ptr dest callee args =
     let loc = current_loc () in
     let dest' = cil_lval_opt ~loc dest
-    and callee' = cil_exp ~loc callee
+    and callee' = cil_lval ~loc callee
     and args' = cil_exp_list ~loc args in
     of_instr (Cil_types.Call (dest', callee', args', loc))
 

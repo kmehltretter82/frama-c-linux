@@ -444,11 +444,11 @@ let find_label kf label =
   let labels = label_table kf in
   Datatype.String.Map.find label labels
 
-let get_called fct = match fct.enode with
-  | Lval (Var vkf, NoOffset) ->
+let get_called = function
+  | Var vkf, _ ->
     (try Some (Globals.Functions.get vkf)
      with Not_found -> None)
-  | _ -> None
+  | _, _ -> None
 
 (* ************************************************************************* *)
 (** {2 CallSites} *)
@@ -463,11 +463,10 @@ module KfCallers =
       let dependencies = [ Ast.self ]
     end)
 
-let called_kernel_function fct =
-  match fct.enode with
-  | Lval (Var vinfo,NoOffset) ->
+let called_kernel_function = function
+  | Var vinfo, _ ->
     (try Some(Globals.Functions.get vinfo) with Not_found -> None)
-  | _ -> None
+  | _, _ -> None
 
 class callsite_visitor hmap = object (self)
   inherit Cil.nopCilVisitor

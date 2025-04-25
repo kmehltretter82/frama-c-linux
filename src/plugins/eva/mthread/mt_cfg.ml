@@ -747,7 +747,7 @@ let dot_fprint_graph fmt start_tg link_stmt =
 
         | NCall (s, (ln, l)) ->
           let fun_name = match s.skind with
-            | Instr (Call (_, { enode = Lval (Var _, _) }, _, _)
+            | Instr (Call (_, (Var _, _), _, _)
                     |Local_init(_,ConsInit _,_)) ->
               (fun _ -> "")
             | _ -> (fun kf -> Kernel_function.get_name kf)

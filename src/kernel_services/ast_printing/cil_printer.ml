@@ -945,23 +945,23 @@ class cil_printer () = object (self)
   method instr fmt (i:instr) = (* imperative instruction *)
     fprintf fmt "%a"
       (self#line_directive ~forcefile:false) (Cil_datatype.Instr.loc i);
-    let pp_call dest e fmt args =
+    let pp_call dest flv fmt args =
       (match dest with
        | None -> ()
        | Some lv ->
          fprintf fmt "%a = " self#lval lv;
          (* Maybe we need to print a cast *)
          (let destt = Cil.typeOfLval lv in
-          match Ast_types.unroll_node (Cil.typeOf e) with
+          match Ast_types.unroll_node (Cil.typeOfLval flv) with
           | TFun(rt, _, _) when (Cil.need_cast rt destt) ->
             fprintf fmt "(%a)" (self#typ None) destt
           | _ -> ()));
       (* Now the function name *)
-      (match e.enode with
-       | Lval(Var _, _) -> self#exp fmt e
-       | _ -> fprintf fmt "(%a)"  self#exp e);
+      (match fst flv with
+       | Var _ -> self#lval fmt flv
+       | Mem _ -> fprintf fmt "(%a)"  self#lval flv);
 
-      let (_, param_ts, _, _) = Cil.splitFunctionType (Cil.typeOf e) in
+      let (_, param_ts, _, _) = Cil.splitFunctionType (Cil.typeOfLval flv) in
       let _, g_params_ts = Cil.argsToPairOfLists param_ts in
 
       let rec break n l =
@@ -1043,14 +1043,14 @@ class cil_printer () = object (self)
     | Local_init(vi, ConsInit(f, args, Constructor), _) ->
       let args = Cil.mkAddrOfVi vi :: args in
       Format.fprintf fmt "@[<2>%a%s@]@\n" self#vdecl vi instr_terminator;
-      pp_call None (Cil.evar f) fmt args
+      pp_call None (Cil.var f) fmt args
     | Local_init(vi, ConsInit(f, args, Plain_func), _) ->
       Format.fprintf fmt "@[<2>%a =@ %a@]" self#vdecl vi
-        (pp_call None (Cil.evar f)) args;
+        (pp_call None (Cil.var f)) args;
       (* In cabs2cil we have turned the call to builtin_va_arg into a
          three-argument call: the last argument is the address of the
          destination *)
-    | Call(None, {enode = Lval(Var vi, NoOffset)},
+    | Call(None, (Var vi, NoOffset),
            [dest; {enode = SizeOf t}; adest], (l,_))
       when vi.vname = "__builtin_va_arg"
         && not state.print_cil_as_is ->
@@ -1072,29 +1072,28 @@ class cil_printer () = object (self)
 
     (* In cabs2cil we have dropped the last argument in the call to
        __builtin_va_start, __builtin_stdarg_start, __builtin_c23_va_start. *)
-    | Call(None, {enode = Lval(Var vi, NoOffset)}, [marker], l)
+    | Call(None, (Var vi, NoOffset), [marker], l)
       when ((vi.vname = "__builtin_stdarg_start" ||
              vi.vname = "__builtin_va_start" ||
              vi.vname = "__builtin_c23_va_start")
             && not state.print_cil_as_is) ->
       let last = self#getLastNamedArgument () in
-      self#instr fmt (Call(None, Cil.dummy_exp(Lval(Var vi,NoOffset)),
-                           [marker; last],l))
+      self#instr fmt (Call(None, Cil.var vi, [marker; last], l))
 
     (* In cabs2cil we have dropped the last argument in the call to
        __builtin_next_arg. *)
-    | Call(res, {enode = Lval(Var vi, NoOffset)}, [ ], l)
+    | Call(res, (Var vi, NoOffset), [ ], l)
       when vi.vname = "__builtin_next_arg"
         && not state.print_cil_as_is ->
       let last = self#getLastNamedArgument () in
-      self#instr fmt (Call(res,Cil.dummy_exp(Lval(Var vi,NoOffset)),[last],l))
+      self#instr fmt (Call(res, Cil.var vi, [last], l))
 
     (* In cabs2cil we have turned the call to
        __builtin_types_compatible_p(t1, t2) into
        __builtin_types_compatible_p(sizeof t1, sizeof t2), so that we can
        represent the types as expressions.
        Remove the sizeofs when printing. *)
-    | Call(dest, {enode = Lval(Var vi, NoOffset)},
+    | Call(dest, (Var vi, NoOffset),
            [{enode = SizeOf t1}; {enode = SizeOf t2}], _)
       when vi.vname = "__builtin_types_compatible_p"
         && not state.print_cil_as_is ->
@@ -1108,14 +1107,14 @@ class cil_printer () = object (self)
         (self#typ None) t1
         (self#typ None) t2
         instr_terminator
-    | Call(_, {enode = Lval(Var vi, NoOffset)}, _, (l,_))
+    | Call(_, (Var vi, NoOffset), _, (l,_))
       when vi.vname = "__builtin_types_compatible_p"
         && not state.print_cil_as_is ->
       Kernel.fatal ~source:l
         "__builtin_types_compatible_p: cabs2cil should have added sizeof to \
          the arguments."
 
-    | Call(dest, {enode = Lval (Var vi, NoOffset)}, [ arg ], (l, _))
+    | Call(dest, (Var vi, NoOffset), [ arg ], (l, _))
       when vi.vname = "__builtin_offsetof"
         && not state.print_cil_as_is ->
       begin

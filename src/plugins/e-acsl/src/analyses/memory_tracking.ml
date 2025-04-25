@@ -649,9 +649,9 @@ module rec Transfer
       do_call None f (Cil.mkAddrOfVi v :: args) state
     | Local_init(v,ConsInit(f,args,Plain_func),_) ->
       do_call (Some (Cil.var v)) f args state
-    | Call(result, f_exp, l, _) ->
-      (match f_exp.enode with
-       | Lval(Var vi, NoOffset) -> do_call result vi l state
+    | Call(result, f_lv, l, _) ->
+      (match f_lv with
+       | Var vi, NoOffset -> do_call result vi l state
        | _ ->
          Options.warning ~current:true
            "function pointers may introduce too limited instrumentation.";

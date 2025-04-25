@@ -22,9 +22,10 @@
 
 open Cil_types
 
-val has_fundef: exp -> bool
-(** @return [true] if a function whose name is given via [exp] is defined and
-    [false] otherwise *)
+val has_fundef: lval -> bool
+(** @return [true] if a function whose name is given via [lval] is defined and
+    [false] otherwise.
+    @before Frama-C+dev Function parameter was an expression. *)
 
 val check: kernel_function -> bool
 (** @return [true] iff code must be generated for annotations of the given
@@ -80,17 +81,20 @@ module Libc: sig
   (** Given the name of C library function return the name of the RTL function
       that potentially replaces it. *)
 
-  val is_memcpy: exp -> bool
-  (** Return [true] if [exp] captures a function name that matches [memcpy] or
-      an equivalent function *)
+  val is_memcpy: lval -> bool
+  (** Return [true] if [lval] captures a function name that matches [memcpy] or
+      an equivalent function.
+      @before Frama-C+dev Function parameter was an expression. *)
 
-  val is_memset: exp -> bool
-  (** Return [true] if [exp] captures a function name that matches [memset] or
-      an equivalent function *)
+  val is_memset: lval -> bool
+  (** Return [true] if [lval] captures a function name that matches [memset] or
+      an equivalent function.
+      @before Frama-C+dev Function parameter was an expression. *)
 
-  val is_vla_free: exp -> bool
-  (** Return [true] if [exp] captures a function name that matches
-      a function that allocates memory for a variable-size array. *)
+  val is_vla_free: lval -> bool
+  (** Return [true] if [lval] captures a function name that matches
+      a function that allocates memory for a variable-size array..
+      @before Frama-C+dev Function parameter was an expression. *)
 
   val is_vla_free_name: string -> bool
   (** Return [true] if [string] captures a function name that matches
