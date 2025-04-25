@@ -7070,6 +7070,11 @@ and doExp local_env
         (* Compile the conditional expression *)
         let ghost = local_env.is_ghost in
         let ce1 = doCondExp (no_paren_local_env local_env) asconst e1 in
+        let clean_cond_exp () =
+          (* In cases where we do not use ce1, we need to clean its locals
+             to avoid keeping them in the current fundec. *)
+          clean_up_cond_locals ce1;
+        in
         let what' = match what with
           | ADrop -> ADrop
           | _ -> AExp None
@@ -7149,30 +7154,15 @@ and doExp local_env
             let res = Cil.zero ~loc in
             (match e2'o with
              | None when is_dangerous e3' || not (isEmpty se3) ->
-               let descr =
-                 Format.asprintf "%a" Cprint.print_expression e1
-               in
-               let tmp = newTempVar ~ghost loc descr true tresult in
-               let tmp_var = var tmp in
-               let tmp_lval = new_exp ~loc:e.expr_loc (Lval (tmp_var)) in
-               let (r1, se1, _, _) =
-                 doExp
-                   (no_paren_local_env local_env) asconst e1
-                   (ASet(false, tmp_var, [], tresult))
-               in
-               let se1 = local_var_chunk se1 tmp in
-               let dangerous =
+               let se3' =
                  if is_dangerous e3' then
-                   keepPureExpr ~ghost e3' loc
-                 else skipChunk
+                   se3 @@@ (keepPureExpr ~ghost e3' loc, ghost)
+                 else se3
                in
-               finishExp (r1@r3)
-                 ((empty @@@ (se1, ghost)) @@@
-                  (ifChunk ~ghost tmp_lval loc skipChunk
-                     (se3 @@@ (dangerous, ghost)), ghost))
-                 res
-                 tresult
+               let cond = compileCondExp ~ghost ce1 skipChunk se3' in
+               finishExp r3 cond res tresult
              | None ->
+               clean_cond_exp ();
                (* we can drop e3, just keep e1 in case it is dangerous *)
                let (r1,se1,e1,_) =
                  doExp (no_paren_local_env local_env) asconst e1 ADrop
@@ -7191,8 +7181,7 @@ and doExp local_env
                   dangerous expression is to be evaluated *)
                let se2 =
                  if is_dangerous e2' then
-                   se2 @@@
-                   (keepPureExpr ~ghost e2' loc, ghost)
+                   se2 @@@ (keepPureExpr ~ghost e2' loc, ghost)
                  else se2
                in
                let se3 =
@@ -7203,6 +7192,7 @@ and doExp local_env
                let cond = compileCondExp ~ghost ce1 se2 se3 in
                finishExp (r2@r3) cond res tresult
              | Some _ ->
+               clean_cond_exp ();
                (* we just keep e1 in case it is dangerous. everything
                   else can be dropped *)
                let (r1,se1,e1,_) =
@@ -7224,6 +7214,7 @@ and doExp local_env
                 let tmp = newTempVar ~ghost loc descr true tresult in
                 let tmp_var = var tmp in
                 let tmp_lval = new_exp ~loc:e.expr_loc (Lval (tmp_var)) in
+                clean_cond_exp ();
                 let (r1,se1, _, _) =
                   doExp
                     (no_paren_local_env local_env)
