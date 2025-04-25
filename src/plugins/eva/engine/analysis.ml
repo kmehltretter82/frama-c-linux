@@ -114,8 +114,8 @@ module Make (Abstract: Abstractions.S) = struct
       let for_writing = false in
       Eval.lvaluate ~for_writing state lv >>=: get_loc
 
-    let eval_function_exp state ?args e =
-      Eval.eval_function_exp e ?args state >>=: (List.map fst)
+    let eval_function state ?args lv =
+      Eval.eval_function lv ?args state >>=: (List.map fst)
 
     let assume_cond stmt state cond positive =
       fst (Eval.reduce state cond positive) >>- fun valuation ->

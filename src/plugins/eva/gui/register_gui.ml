@@ -522,7 +522,7 @@ module Select (Eval: Eval) = struct
              match state  with
              | `Bottom | `Top -> ()
              | `Value state ->
-               let funs, _ = Eval.Analysis.eval_function_exp state lv in
+               let funs, _ = Eval.Analysis.eval_function state lv in
                match funs with
                | `Bottom -> ()
                | `Value funs ->

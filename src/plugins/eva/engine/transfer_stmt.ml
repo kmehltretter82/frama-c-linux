@@ -715,7 +715,7 @@ module Make (Engine: Engine_sig.S) = struct
     let subdivnb = subdivide_stmt stmt in
     (* Resolve [funclv] into the called kernel functions. *)
     let functions, alarms =
-      Eval.eval_function_exp ~subdivnb funclv ~args state
+      Eval.eval_function ~subdivnb funclv ~args state
     in
     Alarmset.emit ki_call alarms;
     let bottom =

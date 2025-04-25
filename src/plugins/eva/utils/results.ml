@@ -363,7 +363,7 @@ struct
   let eval_callee lv req =
     let join = (@)
     and extract state =
-      let r,_alarms = A.Eval.eval_function_exp lv state in
+      let r,_alarms = A.Eval.eval_function lv state in
       r >>-: List.map fst
     in
     get req |> Response.map_join' extract join |> convert |>

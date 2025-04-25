@@ -1718,7 +1718,7 @@ module Make
     let expr = Eva_ast.Build.(ne expr (var_addr vi_f)) in
     fst (reduce ~valuation state expr false)
 
-  let eval_function_exp ?subdivnb funclv ?args state =
+  let eval_function ?subdivnb funclv ?args state =
     match funclv.node with
     | Var vinfo, NoOffset ->
       `Value [Globals.Functions.get vinfo, Valuation.empty], Alarmset.none
