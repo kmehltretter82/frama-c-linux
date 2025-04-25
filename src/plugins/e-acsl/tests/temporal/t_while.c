@@ -7,7 +7,7 @@
 
 #include <stdint.h>
 
-#define intaddr(_x) ((uintptr_t) & _x)
+#define intaddr(_x) ((uintptr_t)&_x)
 
 int main(void) {
   int i = 0;

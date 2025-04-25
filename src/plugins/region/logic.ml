@@ -247,23 +247,21 @@ and add_predicate (env:env) (p:predicate) = match p.pred_content with
   | Pallocable(_,t) | Pfreeable(_,t) -> iadd_term env t
   | Pforall (q,p) | Pexists (q,p) ->
     List.iter (iadd_logic_var env.map) q ; add_predicate env p
-  | Plet({l_var_info=v} as lv,p2) ->
-    begin match lv.l_body with
-      | LBterm t ->
-        let dv = add_logic_var env.map v in
-        let dt = add_term env t in
-        let sigma = ref empty in
-        LDomain.unify (merge env) sigma dt dv ;
-        add_predicate env p2
-      | LBpred p1 ->
-        iadd_logic_var env.map v ;
-        add_predicate env p1 ;
-        add_predicate env p2
-      | LBnone -> add_predicate env p2
-      | _ ->
-        Options.abort "Logic.add_predicate: (%a) not yet implemented"
-          Printer.pp_predicate p
-    end
+  | Plet({ l_var_info = v ; l_body = LBterm t ; },p2) ->
+    let dv = add_logic_var env.map v in
+    let dt = add_term env t in
+    let sigma = ref empty in
+    LDomain.unify (merge env) sigma dt dv ;
+    add_predicate env p2
+  | Plet({ l_var_info = v ; l_body = LBpred p1 ; },p2) ->
+    iadd_logic_var env.map v ;
+    add_predicate env p1 ;
+    add_predicate env p2
+  | Plet({ l_body = LBnone ; },p2) ->
+    add_predicate env p2
+  | Plet _ ->
+    Options.abort "Logic.add_predicate: (%a) not yet implemented"
+      Printer.pp_predicate p
   | Papp(f,_,ts) -> ignore @@ call env f @@ List.map (add_term env) ts
 
 let () = rterm := add_term
@@ -277,17 +275,8 @@ let () = rterm := add_term
 *)
 let add_logic_info_body (env:env) (l:logic_info) : domain = match l.l_body with
   | LBnone -> pure
-  | LBpred p ->
-    (* create environment *)
-    add_predicate env p ; pure
-  | LBterm t ->
-    (* create environment *)
-    let dres = Memory.logic_info env.map l in
-    let dresult = add_term env t in
-    let sigma = ref LDomain.empty in
-    unify (merge env) sigma dresult dres ;
-    subst !sigma dresult
-  | LBreads ts ->
-    List.iter (fun t -> iadd_term env t.it_content) ts ; pure
+  | LBpred p -> add_predicate env p ; pure
+  | LBterm t -> add_term env t
+  | LBreads ts -> List.iter (fun t -> iadd_term env t.it_content) ts ; pure
   | LBinductive _ ->
     Options.abort "Logic.add_logic_info: inductive not implemented yet"
