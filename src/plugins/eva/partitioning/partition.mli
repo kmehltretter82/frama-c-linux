@@ -46,7 +46,7 @@ type branch =
   | Spec_behavior of Kernel_function.t * Cil_datatype.Kinstr.t * int
   (** Behavior of a spec *)
   | Disjunction_case of Cil_datatype.Stmt.t * int
-  (** Case of a disjunction in an assert annotation *)
+  (** Case of a disjunction in an ACSL annotation *)
 
 (** Partitioning keys attached to states. *)
 type key

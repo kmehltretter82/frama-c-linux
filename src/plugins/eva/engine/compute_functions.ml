@@ -326,8 +326,8 @@ module Make (Engine: Engine_sig.S) = struct
       let cvalue_states =
         Builtins.apply_builtin builtin cvalue_call ~pre ~post
       in
-      let insert branch_id cvalue_state =
-        let branch = Partition.Builtin_result (call.kf, kinstr, branch_id) in
+      let insert result_id cvalue_state =
+        let branch = Partition.Builtin_result (call.kf, kinstr, result_id) in
         Partition.Key.(add_branch branch empty),
         Engine.Dom.set Cvalue_domain.State.key cvalue_state final_state
       in
