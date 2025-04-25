@@ -108,7 +108,7 @@ digraph G {
         color="#000000FF", label="sum += a;\nreads a", style="filled", ];
   v335 [URL="code.html#sid60", fillcolor="#CCCCFFFF", shape=box,
         color="#000000FF",
-        label="/*@ assert Eva: signed_overflow: sum + b <= 2147483647; */\n/*@ assert Eva: signed_overflow: -2147483648 <= sum + b; */\nsum += b;\nreads b",
+        label="/*@ assert Eva: signed_overflow: -2147483648 <= sum + b; */\n/*@ assert Eva: signed_overflow: sum + b <= 2147483647; */\nsum += b;\nreads b",
         style="filled", ];
   v336 [URL="code.html#sid61", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="Call pthread_mutex_unlock(& lock);",
