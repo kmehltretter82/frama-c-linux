@@ -757,7 +757,7 @@ let () =
 let unroll_typer (ctxt: Logic_typing.typing_context) (_loc:location) args =
   let open Logic_typing in
   let env =
-    Lenv.empty () |> append_here_label |> append_init_label |> append_pre_label
+    Lenv.empty () |> append_here_label |> append_pre_label
   in Ext_terms (List.map (ctxt.type_term ctxt env) args)
 
 let register_extensions () =

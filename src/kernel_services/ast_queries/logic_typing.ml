@@ -350,7 +350,10 @@ module Lenv = struct
       in if exists name then aux 0 else name
     in Cil_const.make_logic_var_kind name kind typ
 
-  let no_label env = Smap.is_empty env.logic_labels
+  let no_label env =
+    (* Init is always available *)
+    Smap.filter (fun _ l -> l <> BuiltinLabel Init) env.logic_labels
+    |> Smap.is_empty
 
   let enter_post_state env kind =
     let real_kind =
@@ -402,7 +405,8 @@ module Lenv = struct
       local_vars = Smap.empty;
       local_logic_info = Smap.empty;
       type_vars = Smap.empty;
-      logic_labels = Smap.empty;
+      (* Init is *always* available *)
+      logic_labels = Smap.singleton "Init" (BuiltinLabel Init);
       current_logic_label = None;
       is_post_state = None;
       enclosing_post_state=None;
@@ -416,7 +420,8 @@ module Lenv = struct
 end
 
 let append_init_label env =
-  Lenv.add_logic_label "Init" Logic_const.init_label env
+  (* for compatibility *)
+  env
 
 let append_here_label env =
   let env = Lenv.add_logic_label "Here" Logic_const.here_label env in
@@ -459,7 +464,6 @@ let enter_post_state env kind = Lenv.enter_post_state env kind
 
 let post_state_env kind typ =
   let env = Lenv.funspec () in
-  let env = append_init_label env in
   let env = append_here_label env in
   let env = append_old_and_post_labels env in
   (* NB: this allows to have \result and Exits as termination kind *)
@@ -3767,7 +3771,7 @@ struct
     end)
 
   let type_spec old_behaviors loc is_stmt_contract result env s =
-    let env = append_here_label (append_init_label env) in
+    let env = append_here_label env in
     let env_with_result = add_result env result in
     let env_with_result_and_exit_status = add_exit_status env_with_result in
     (* assigns_env is a bit special:
@@ -3908,13 +3912,11 @@ struct
     in type_spec old_behaviors vi.vdecl false log_return_typ env s
 
   let code_annot_env () =
-    let env = append_here_label (append_pre_label (append_init_label
-                                                     (Lenv.empty()))) in
+    let env = append_here_label (append_pre_label (Lenv.empty())) in
     if C.is_loop () then append_loop_labels env else env
 
   let loop_annot_env () =
-    append_loop_labels (append_here_label (append_pre_label (append_init_label
-                                                               (Lenv.empty()))))
+    append_loop_labels (append_here_label (append_pre_label (Lenv.empty())))
 
   let code_annot loc current_behaviors current_return_type ca =
     let source = fst loc in
@@ -4060,7 +4062,7 @@ struct
       C.error loc "some type variable appears only in the return type. \
                    All type variables need to occur also in the parameters types."
 
-  let annot_env loc labels poly =
+  let global_annot_env loc labels poly =
     let env = init_type_variables loc poly in
     let labels,env =
       List.fold_right
@@ -4093,7 +4095,7 @@ struct
     | InModule m -> Format.sprintf "%s::%s" m name
 
   let logic_decl loc ~context f labels poly ?return_type p =
-    let labels,env = annot_env loc labels poly in
+    let labels,env = global_annot_env loc labels poly in
     let t = match return_type with
       | None -> None;
       | Some t -> Some (plain_logic_type loc env t)
@@ -4228,7 +4230,7 @@ struct
         List.fold_left
           (fun (global_default, acc) (id,labels,poly,e) ->
              Lenv.default_label := None;
-             let labels,env = annot_env loc labels poly in
+             let labels,env = global_annot_env loc labels poly in
              let p = predicate env e in
              let res = update_ind_case_wrt_default_label (id, labels, poly, p)
              in
@@ -4349,7 +4351,7 @@ struct
           Cil_printer.pp_lemma_kind old_kind
           Cil_datatype.Location.pretty old_loc
       end;
-      let labels,env = annot_env loc labels poly in
+      let labels,env = global_annot_env loc labels poly in
       let p = Logic_const.toplevel_predicate ~kind (predicate env e) in
       let labels = match !Lenv.default_label with
         | None -> labels
@@ -4360,7 +4362,7 @@ struct
       Some def
 
     | LDinvariant (s, e) ->
-      let labels,env = annot_env loc [] [] in
+      let labels,env = global_annot_env loc [] [] in
       let li = Cil_const.make_logic_info s in
       let p = predicate env e in
       let labels = match !Lenv.default_label with

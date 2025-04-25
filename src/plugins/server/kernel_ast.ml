@@ -1054,7 +1054,7 @@ let () =
 
 let environment () =
   let open Logic_typing in
-  Lenv.empty () |> append_pre_label |> append_init_label |> append_here_label
+  Lenv.empty () |> append_pre_label |> append_here_label
 
 let parse_expr env kf stmt term =
   let term = Logic_parse_string.term ~env kf term in
