@@ -53,7 +53,7 @@
 , jq
 , perl
 , pkgs
-, python3
+, python310
 , python3Packages
 , socat
 , swi-prolog
@@ -128,7 +128,7 @@ stdenvNoCC.mkDerivation rec {
     jq
     perl
     pkgs.fontconfig
-    python3
+    python310
     python3Packages.jsonschema
     python3Packages.pyaml
     socat

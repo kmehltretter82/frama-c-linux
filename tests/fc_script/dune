@@ -1,6 +1,6 @@
 ; Almost all frama-c-script commands require Python
 (cram
-  (enabled_if %{read:../../python-3.7-available})
+  (enabled_if %{read:../../python-3.10-available})
   (deps
     %{bin:frama-c}
     %{bin:frama-c-script}

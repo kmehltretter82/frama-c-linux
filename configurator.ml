@@ -267,7 +267,7 @@ let python_available configurator =
           int_of_string @@ Str.matched_group 2 out
         else raise Not_found
       in
-      if maj <> 3 || med < 7 then raise Not_found ;
+      if maj <> 3 || med < 10 then raise Not_found ;
       true
     with Not_found | Failure _ -> false
 
@@ -317,7 +317,7 @@ let configure configurator =
   with End_of_file ->
     close_in ic;
     close_out oc;
-    let python = open_out "python-3.7-available" in
+    let python = open_out "python-3.10-available" in
     Printf.fprintf python "%B" (python_available configurator);
     close_out python;
     let gcc = open_out "gcc-is-genuine" in
