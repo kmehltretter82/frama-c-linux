@@ -99,7 +99,7 @@ end
        let a2 = shiftfield_F1_FD_pos a1 in
        let x = get t a2 in
        let a3 = Load_S2_A a t in
-       let a4 = Load_S2_A a (set (memcpy t t1 a a 1) a2 i) in
+       let a4 = Load_S2_A a (set (memcpy t a t1 a 1) a2 i) in
        not x = i ->
        region (a1.base) <= 0 ->
        region (a.base) <= 0 ->

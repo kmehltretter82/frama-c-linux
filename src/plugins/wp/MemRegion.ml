@@ -204,12 +204,12 @@ struct
         p_call f_eqmem [m0;m1;to_addr l;n]
       | _ -> L.eqmem chunk m0 m1 (loc l) n
 
-    let memcpy chunk m0 m1 l0 l1 n =
+    let memcpy chunk m0 l0 m1 l1 n =
       match Sigma.ckind chunk with
       | State.Mu { data = ValInit | Value _ } -> m1
       | State.Mu { data = ArrInit | Array _ } ->
-        e_fun f_memcpy [m0;m1;to_addr l0;to_addr l1;n]
-      | _ -> L.memcpy chunk m0 m1 (loc l0) (loc l1) n
+        e_fun f_memcpy [m0;to_addr l0;m1;to_addr l1;n]
+      | _ -> L.memcpy chunk m0 (loc l0) m1 (loc l1) n
 
     (* ---------------------------------------------------------------------- *)
     (* --- Load                                                           --- *)

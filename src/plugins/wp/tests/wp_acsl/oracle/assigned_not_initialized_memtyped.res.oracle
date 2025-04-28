@@ -16,7 +16,7 @@ Assume {
   Have: 10 <= i.
 }
 Prove: IsInitArray_sint32(array_0, 10,
-         memcpy(Init_0, Init_undef_0, a, a, 10)).
+         memcpy(Init_0, a, Init_undef_0, a, 10)).
 
 ------------------------------------------------------------
 ------------------------------------------------------------
@@ -34,7 +34,7 @@ Assume {
   Have: 10 <= i.
 }
 Prove: IsInitArray_sint32(pg_array_0, 10,
-         memcpy(memcpy(Init_0, Init_undef_0, a, a, 10), Init_undef_1, a_1,
+         memcpy(memcpy(Init_0, a, Init_undef_0, a, 10), a_1, Init_undef_1,
            a_1, 10)).
 
 ------------------------------------------------------------
@@ -51,8 +51,8 @@ Assume {
   Have: 10 <= i.
 }
 Prove: IsInitArray_sint32(a, 10,
-         memcpy(memcpy(Init_0, Init_undef_0, a_1, a_1, 10), Init_undef_1,
-           a_2, a_2, 10)).
+         memcpy(memcpy(Init_0, a_1, Init_undef_0, a_1, 10), a_2,
+           Init_undef_1, a_2, 10)).
 
 ------------------------------------------------------------
 ------------------------------------------------------------
@@ -97,8 +97,8 @@ Assume {
   Have: 10 <= i.
 }
 Prove: IsInit_S1_S(pg_comp_0,
-         memcpy(memcpy(Init_0, Init_undef_0, a, a, 11), Init_undef_1,
-           pg_comp_0, pg_comp_0, 11)).
+         memcpy(memcpy(Init_0, a, Init_undef_0, a, 11), pg_comp_0,
+           Init_undef_1, pg_comp_0, 11)).
 
 ------------------------------------------------------------
 
@@ -112,8 +112,8 @@ Assume {
   Have: 10 <= i.
 }
 Prove: IsInit_S1_S(a,
-         memcpy(memcpy(Init_0, Init_undef_0, a, a, 11), Init_undef_1,
-           pg_comp_0, pg_comp_0, 11)).
+         memcpy(memcpy(Init_0, a, Init_undef_0, a, 11), pg_comp_0,
+           Init_undef_1, pg_comp_0, 11)).
 
 ------------------------------------------------------------
 ------------------------------------------------------------
@@ -137,6 +137,6 @@ Assume {
   (* Else *)
   Have: 10 <= i.
 }
-Prove: IsInit_S1_S(s, memcpy(Init_0, Init_undef_0, s, s, 11)).
+Prove: IsInit_S1_S(s, memcpy(Init_0, s, Init_undef_0, s, 11)).
 
 ------------------------------------------------------------

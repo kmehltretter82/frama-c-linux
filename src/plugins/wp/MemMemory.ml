@@ -67,13 +67,13 @@ let r_eqmem = function
 (* --- Simplifier for 'memcpy'                                            --- *)
 (* -------------------------------------------------------------------------- *)
 
-(* memcpy(m,m0,q,q0,n)[p] =
+(* memcpy(m,q,m0,q0,n)[p] =
    - m[p] WHEN separated (p,1,q,n)
    - m0[q0 ++ p.offset - q.offset] WHEN not separated (p,1,q,n)
 *)
 let r_get_memcpy es ks =
   match es, ks with
-  | [m;m0;q;q0;n],[p] ->
+  | [m;q;m0;q0;n],[p] ->
     begin
       match MemAddr.is_separated [p;e_one;q;n] with
       | L.Yes -> F.e_get m p

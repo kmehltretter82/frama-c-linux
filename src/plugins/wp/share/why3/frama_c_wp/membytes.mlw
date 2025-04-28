@@ -1130,7 +1130,10 @@ module MemBytes
   function init_seq (s: int) : S.seq bool =
     S.create True s
 
-  function memcpy (mtgt msrc: map int (block 'a)) (ptgt psrc: addr) (size: int): map int (block 'a) =
+  function memcpy
+    (mtgt: map int (block 'a)) (ptgt: addr)
+    (msrc: map int (block 'a)) (psrc: addr) (size: int)
+    : map int (block 'a) =
     set mtgt ptgt.base (bwrite_seq (get msrc psrc.base) ptgt.offset (to_seq msrc[psrc.base] psrc.offset size))
 
   predicate eqmem (m1 m2: map int (block 'a)) (a: addr) (size: int) =
@@ -1196,9 +1199,9 @@ module MemBytes
       read_uint8 (write_sint8 m a v) a = to_uint8 v
     
   lemma read_uint8_copy_sep:
-    forall mw mc: memory, size: int, ar aw ac: addr [read_uint8 (memcpy mw mc aw ac size) ar].
+    forall mw mc: memory, size: int, ar aw ac: addr [read_uint8 (memcpy mw aw mc ac size) ar].
     separated ar 1 aw size ->
-      read_uint8 (memcpy mw mc aw ac size) ar = read_uint8 mw ar
+      read_uint8 (memcpy mw aw mc ac size) ar = read_uint8 mw ar
     by
       let ob = mw[aw.base] in
       let nb = bwrite_seq ob aw.offset (to_seq mc[ac.base] ac.offset size) in
@@ -1255,9 +1258,9 @@ module MemBytes
       read_uint16 (write_sint16 m a v) a = to_uint16 v
     
   lemma read_uint16_copy_sep:
-    forall mw mc: memory, size: int, ar aw ac: addr [read_uint16 (memcpy mw mc aw ac size) ar].
+    forall mw mc: memory, size: int, ar aw ac: addr [read_uint16 (memcpy mw aw mc ac size) ar].
     separated ar 2 aw size ->
-      read_uint16 (memcpy mw mc aw ac size) ar = read_uint16 mw ar
+      read_uint16 (memcpy mw aw mc ac size) ar = read_uint16 mw ar
     by
       let ob = mw[aw.base] in
       let nb = bwrite_seq ob aw.offset (to_seq mc[ac.base] ac.offset size) in
@@ -1314,9 +1317,9 @@ module MemBytes
       read_uint32 (write_sint32 m a v) a = to_uint32 v
     
   lemma read_uint32_copy_sep:
-    forall mw mc: memory, size: int, ar aw ac: addr [read_uint32 (memcpy mw mc aw ac size) ar].
+    forall mw mc: memory, size: int, ar aw ac: addr [read_uint32 (memcpy mw aw mc ac size) ar].
     separated ar 4 aw size ->
-      read_uint32 (memcpy mw mc aw ac size) ar = read_uint32 mw ar
+      read_uint32 (memcpy mw aw mc ac size) ar = read_uint32 mw ar
     by
       let ob = mw[aw.base] in
       let nb = bwrite_seq ob aw.offset (to_seq mc[ac.base] ac.offset size) in
@@ -1373,9 +1376,9 @@ module MemBytes
       read_uint64 (write_sint64 m a v) a = to_uint64 v
     
   lemma read_uint64_copy_sep:
-    forall mw mc: memory, size: int, ar aw ac: addr [read_uint64 (memcpy mw mc aw ac size) ar].
+    forall mw mc: memory, size: int, ar aw ac: addr [read_uint64 (memcpy mw aw mc ac size) ar].
     separated ar 8 aw size ->
-      read_uint64 (memcpy mw mc aw ac size) ar = read_uint64 mw ar
+      read_uint64 (memcpy mw aw mc ac size) ar = read_uint64 mw ar
     by
       let ob = mw[aw.base] in
       let nb = bwrite_seq ob aw.offset (to_seq mc[ac.base] ac.offset size) in
@@ -1432,9 +1435,9 @@ module MemBytes
       read_sint8 (write_uint8 m a v) a = to_sint8 v
     
   lemma read_sint8_copy_sep:
-    forall mw mc: memory, size: int, ar aw ac: addr [read_sint8 (memcpy mw mc aw ac size) ar].
+    forall mw mc: memory, size: int, ar aw ac: addr [read_sint8 (memcpy mw aw mc ac size) ar].
     separated ar 1 aw size ->
-      read_sint8 (memcpy mw mc aw ac size) ar = read_sint8 mw ar
+      read_sint8 (memcpy mw aw mc ac size) ar = read_sint8 mw ar
     by
       let ob = mw[aw.base] in
       let nb = bwrite_seq ob aw.offset (to_seq mc[ac.base] ac.offset size) in
@@ -1491,9 +1494,9 @@ module MemBytes
       read_sint16 (write_uint16 m a v) a = to_sint16 v
     
   lemma read_sint16_copy_sep:
-    forall mw mc: memory, size: int, ar aw ac: addr [read_sint16 (memcpy mw mc aw ac size) ar].
+    forall mw mc: memory, size: int, ar aw ac: addr [read_sint16 (memcpy mw aw mc ac size) ar].
     separated ar 2 aw size ->
-      read_sint16 (memcpy mw mc aw ac size) ar = read_sint16 mw ar
+      read_sint16 (memcpy mw aw mc ac size) ar = read_sint16 mw ar
     by
       let ob = mw[aw.base] in
       let nb = bwrite_seq ob aw.offset (to_seq mc[ac.base] ac.offset size) in
@@ -1550,9 +1553,9 @@ module MemBytes
       read_sint32 (write_uint32 m a v) a = to_sint32 v
     
   lemma read_sint32_copy_sep:
-    forall mw mc: memory, size: int, ar aw ac: addr [read_sint32 (memcpy mw mc aw ac size) ar].
+    forall mw mc: memory, size: int, ar aw ac: addr [read_sint32 (memcpy mw aw mc ac size) ar].
     separated ar 4 aw size ->
-      read_sint32 (memcpy mw mc aw ac size) ar = read_sint32 mw ar
+      read_sint32 (memcpy mw aw mc ac size) ar = read_sint32 mw ar
     by
       let ob = mw[aw.base] in
       let nb = bwrite_seq ob aw.offset (to_seq mc[ac.base] ac.offset size) in
@@ -1609,9 +1612,9 @@ module MemBytes
       read_sint64 (write_uint64 m a v) a = to_sint64 v
     
   lemma read_sint64_copy_sep:
-    forall mw mc: memory, size: int, ar aw ac: addr [read_sint64 (memcpy mw mc aw ac size) ar].
+    forall mw mc: memory, size: int, ar aw ac: addr [read_sint64 (memcpy mw aw mc ac size) ar].
     separated ar 8 aw size ->
-      read_sint64 (memcpy mw mc aw ac size) ar = read_sint64 mw ar
+      read_sint64 (memcpy mw aw mc ac size) ar = read_sint64 mw ar
     by
       let ob = mw[aw.base] in
       let nb = bwrite_seq ob aw.offset (to_seq mc[ac.base] ac.offset size) in
@@ -1686,9 +1689,9 @@ module MemBytes
     read_init8 (write_init8 m a i) a = i
     
   lemma read_init8_copy_sep:
-    forall mw mc: init, size: int, ar aw ac: addr [read_init8 (memcpy mw mc aw ac size) ar].
+    forall mw mc: init, size: int, ar aw ac: addr [read_init8 (memcpy mw aw mc ac size) ar].
     separated ar 1 aw size ->
-      read_init8 (memcpy mw mc aw ac size) ar = read_init8 mw ar
+      read_init8 (memcpy mw aw mc ac size) ar = read_init8 mw ar
     by
       let ob = mw[aw.base] in
       let nb = bwrite_seq ob aw.offset (to_seq mc[ac.base] ac.offset size) in
@@ -1719,9 +1722,9 @@ module MemBytes
     read_init16 (write_init16 m a i) a = i
     
   lemma read_init16_copy_sep:
-    forall mw mc: init, size: int, ar aw ac: addr [read_init16 (memcpy mw mc aw ac size) ar].
+    forall mw mc: init, size: int, ar aw ac: addr [read_init16 (memcpy mw aw mc ac size) ar].
     separated ar 2 aw size ->
-      read_init16 (memcpy mw mc aw ac size) ar = read_init16 mw ar
+      read_init16 (memcpy mw aw mc ac size) ar = read_init16 mw ar
     by
       let ob = mw[aw.base] in
       let nb = bwrite_seq ob aw.offset (to_seq mc[ac.base] ac.offset size) in
@@ -1752,9 +1755,9 @@ module MemBytes
     read_init32 (write_init32 m a i) a = i
     
   lemma read_init32_copy_sep:
-    forall mw mc: init, size: int, ar aw ac: addr [read_init32 (memcpy mw mc aw ac size) ar].
+    forall mw mc: init, size: int, ar aw ac: addr [read_init32 (memcpy mw aw mc ac size) ar].
     separated ar 4 aw size ->
-      read_init32 (memcpy mw mc aw ac size) ar = read_init32 mw ar
+      read_init32 (memcpy mw aw mc ac size) ar = read_init32 mw ar
     by
       let ob = mw[aw.base] in
       let nb = bwrite_seq ob aw.offset (to_seq mc[ac.base] ac.offset size) in
@@ -1785,9 +1788,9 @@ module MemBytes
     read_init64 (write_init64 m a i) a = i
     
   lemma read_init64_copy_sep:
-    forall mw mc: init, size: int, ar aw ac: addr [read_init64 (memcpy mw mc aw ac size) ar].
+    forall mw mc: init, size: int, ar aw ac: addr [read_init64 (memcpy mw aw mc ac size) ar].
     separated ar 8 aw size ->
-      read_init64 (memcpy mw mc aw ac size) ar = read_init64 mw ar
+      read_init64 (memcpy mw aw mc ac size) ar = read_init64 mw ar
     by
       let ob = mw[aw.base] in
       let nb = bwrite_seq ob aw.offset (to_seq mc[ac.base] ac.offset size) in

@@ -1020,7 +1020,7 @@ struct
   let separated p n p' n' = F.p_call MemAddr.p_separated [p;n;p';n']
 
   let eqmem _chunk m0 m1 l n = F.p_call f_eqmem [m0;m1;l;n]
-  let memcpy _chunk m m0 l l0 n = F.e_fun f_memcpy [m;m0;l;l0;n]
+  let memcpy _chunk m l m0 l0 n = F.e_fun f_memcpy [m;l;m0;l0;n]
 
   let updated sigma c l v = State.chunk c , F.e_set (State.value sigma c) l v
 

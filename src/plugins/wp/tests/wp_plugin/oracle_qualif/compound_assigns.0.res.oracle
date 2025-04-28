@@ -1,4 +1,4 @@
-# frama-c -wp -wp-model 'Typed' -wp-timeout 5 [...]
+# frama-c -wp -wp-model 'Typed' -wp-timeout 8 [...]
 [kernel] Parsing compound_assigns.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] [Valid] Goal swapA_exits (Cfg) (Unreachable)

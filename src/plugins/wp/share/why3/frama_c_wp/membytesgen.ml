@@ -499,7 +499,10 @@ let membytes_preambule fmt () =
   function init_seq (s: int) : S.seq bool =
     S.create True s
 
-  function memcpy (mtgt msrc: map int (block 'a)) (ptgt psrc: addr) (size: int): map int (block 'a) =
+  function memcpy
+    (mtgt: map int (block 'a)) (ptgt: addr)
+    (msrc: map int (block 'a)) (psrc: addr) (size: int)
+    : map int (block 'a) =
     set mtgt ptgt.base (bwrite_seq (get msrc psrc.base) ptgt.offset (to_seq msrc[psrc.base] psrc.offset size))
 
   predicate eqmem (m1 m2: map int (block 'a)) (a: addr) (size: int) =
@@ -555,7 +558,7 @@ let membytes_read_copy_sep fmt rt =
   let guard fmt =
     fprintf fmt "separated ar %d aw size" ((snd rt) / 8) in
   let result fmt =
-    fprintf fmt "read_%a (memcpy mw mc aw ac size) ar" pp_type rt
+    fprintf fmt "read_%a (memcpy mw aw mc ac size) ar" pp_type rt
   in
   let eq fmt = fprintf fmt "%t = read_%a mw ar" result pp_type rt in
   fprintf fmt "@[<v 2>lemma read_%a_copy_sep:@," pp_type rt ;
@@ -606,7 +609,7 @@ let membytes_read_copy_init_sep fmt rsize =
   let guard fmt =
     fprintf fmt "separated ar %d aw size" (rsize / 8) in
   let read_copy fmt =
-    fprintf fmt "read_init%d (memcpy mw mc aw ac size) ar" rsize
+    fprintf fmt "read_init%d (memcpy mw aw mc ac size) ar" rsize
   in
   let eq fmt = fprintf fmt "%t = read_init%d mw ar" read_copy rsize in
   fprintf fmt "@[<v 2>lemma read_init%d_copy_sep:@," rsize ;

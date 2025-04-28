@@ -485,7 +485,7 @@
       },
       "bread_32bits_bwrite_16bits_sep": {
         "tactic": "split_vc",
-        "children": [ { "prover": "alt-ergo@2.5.4", "time": 2 } ]
+        "children": [ { "prover": "alt-ergo@2.5.4", "time": 2.0 } ]
       },
       "bread_32bits_bwrite_32bits_eq": {
         "prover": "alt-ergo@2.5.4",

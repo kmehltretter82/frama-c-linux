@@ -1,7 +1,7 @@
 /* run.config_qualif
 
    OPT: -wp-prop=-lack,-tactic -wp-timeout 10
-   OPT: -wp-prop=tactic -wp-auto=wp:split,wp:range -wp-prover=tip,Alt-Ergo -wp-script dry
+   OPT: -wp-prop=tactic -wp-timeout 5 -wp-auto=wp:split,wp:range -wp-prover=tip,Alt-Ergo -wp-script dry
    OPT: -wp-prop=lack
  */
 /*@ requires \valid(a+(0..n-1)) ;

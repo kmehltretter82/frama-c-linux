@@ -62,7 +62,7 @@ sig
   val separated : loc -> term -> loc -> term -> pred
 
   val eqmem : Chunk.t -> term -> term -> loc -> term -> pred
-  val memcpy : Chunk.t -> term -> term -> loc -> loc -> term -> term
+  val memcpy : Chunk.t -> term -> loc -> term -> loc -> term -> term
 
   val load_int : sigma -> c_int -> loc -> term
   val load_float : sigma -> c_float -> loc -> term
@@ -540,9 +540,9 @@ struct
              let tau = Chunk.tau_of_chunk chunk in
              let basename = Chunk.basename_of_chunk chunk ^ "_undef" in
              let m_undef = F.e_var (Lang.freshvar ~basename tau) in
-             M.memcpy chunk m_pre m_undef loc loc size
+             M.memcpy chunk m_pre loc m_undef loc size
            | Some src ->
-             M.memcpy chunk m_pre m_pre loc src size
+             M.memcpy chunk m_pre loc m_pre src size
          in
          ps := Set(m_post,m_copied) :: !ps
       ) domain ; !ps

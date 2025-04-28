@@ -37,15 +37,17 @@ theory Memory
     forall b:int [binit b]. binit b ->
     forall p [m[p]]. p.base = b -> m[p]
 
-  predicate eqmem (m1 m2 : map addr 'a) (p:addr) (a:int) =
-    forall q:addr [m1[q]|m2[q]]. included q 1 p a -> m1[q] = m2[q]
+  predicate eqmem (m1 m2 : map addr 'a) (p:addr) (n:int) =
+    forall q:addr [m1[q]|m2[q]]. included q 1 p n -> m1[q] = m2[q]
 
   (* copies the [s] bytes from [m1].[b1] into [m0].[m0] *)
-  function memcpy (m0 m1: map addr 'a) (b0 b1:addr) (s:int) : map addr 'a =
+  function memcpy
+    (m0: map addr 'a) (a0:addr)
+    (m1: map addr 'a) (a1:addr) (s:int) : map addr 'a =
     fun (p:addr) ->
-    if separated p 1 b0 s then m0 p else
-    let offset = b1.offset - b0.offset + p.offset in
-    m1 { b1 with offset = offset }
+    if separated p 1 a0 s then m0 p else
+    let offset = a1.offset - a0.offset + p.offset in
+    m1 { a1 with offset = offset }
 
   lemma eqmem_single :
     forall m1 m2 : map addr 'a.
@@ -73,8 +75,8 @@ theory Memory
 
   lemma eqmem_memcpy :
     forall m0 m1 : map addr 'a.
-    forall p p' h : addr.
+    forall p p' q : addr.
     forall n n' : int.
-      separated p n p' n' -> eqmem m0 (memcpy m0 m1 p h n) p' n'
+      separated p n p' n' -> eqmem m0 (memcpy m0 p m1 q n) p' n'
 
 end

@@ -170,11 +170,11 @@ Cluster Shifts {
 }
 
 Goal Post-condition 'P' in 'swapA':
-Let a = memcpy(M000c_sint32_0, M000c_sint32_undef_0, p, p, 24).
-Let a_1 = memcpy(M001a_float64_0, M001a_float64_undef_0, p, p, 24).
+Let a = memcpy(M000c_sint32_0, p, M000c_sint32_undef_0, p, 24).
+Let a_1 = memcpy(M001a_float64_0, p, M001a_float64_undef_0, p, 24).
 Let a_2 = Load_R0002_S1_A(q, M000c_sint32_0, M001a_float64_0).
-Let a_3 = memcpy(a, M000c_sint32_undef_1, q, q, 24).
-Let a_4 = memcpy(a_1, M001a_float64_undef_1, q, q, 24).
+Let a_3 = memcpy(a, q, M000c_sint32_undef_1, q, 24).
+Let a_4 = memcpy(a_1, q, M001a_float64_undef_1, q, 24).
 Let a_5 = Load_R0002_S1_A(q, a_3, a_4).
 Let a_6 = Load_R0002_S1_A(p, M000c_sint32_0, M001a_float64_0).
 Let a_7 = Load_R0002_S1_A(p, a_3, a_4).
@@ -200,11 +200,11 @@ Prove: EqS1_A(a_7, a_2).
 ------------------------------------------------------------
 
 Goal Post-condition 'Q' in 'swapA':
-Let a = memcpy(M000c_sint32_0, M000c_sint32_undef_0, p, p, 24).
-Let a_1 = memcpy(M001a_float64_0, M001a_float64_undef_0, p, p, 24).
+Let a = memcpy(M000c_sint32_0, p, M000c_sint32_undef_0, p, 24).
+Let a_1 = memcpy(M001a_float64_0, p, M001a_float64_undef_0, p, 24).
 Let a_2 = Load_R0002_S1_A(q, M000c_sint32_0, M001a_float64_0).
-Let a_3 = memcpy(a, M000c_sint32_undef_1, q, q, 24).
-Let a_4 = memcpy(a_1, M001a_float64_undef_1, q, q, 24).
+Let a_3 = memcpy(a, q, M000c_sint32_undef_1, q, 24).
+Let a_4 = memcpy(a_1, q, M001a_float64_undef_1, q, 24).
 Let a_5 = Load_R0002_S1_A(q, a_3, a_4).
 Let a_6 = Load_R0002_S1_A(p, M000c_sint32_0, M001a_float64_0).
 Assume {
