@@ -59,7 +59,7 @@ let framed memory = p_call p_framed [ memory ]
 (* -------------------------------------------------------------------------- *)
 
 let r_eqmem = function
-  | [_;_;_;n] when n = e_zero -> e_false
+  | [_;_;_;n] when n = e_zero -> e_true
   | [m0;m1;p;n] when n = e_one -> e_eq (e_get m0 p) (e_get m1 p)
   | _ -> raise Not_found
 
