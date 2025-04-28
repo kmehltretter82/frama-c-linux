@@ -127,7 +127,8 @@ val region : term -> term
 (** [region(base: int) : int] The memory region a base belongs to. *)
 
 val binit : term -> pred
-(** [binit (base: int)] The base address is always initialized. *)
+(** [binit (base: int)]
+    The memory associated to this base address is always initialized. *)
 
 val linked : term -> pred
 (** [linked(m: malloc)] *)
