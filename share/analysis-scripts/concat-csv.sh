@@ -92,8 +92,7 @@ fi
   do
     if [ -n "$header_column" ]
     then
-      base=$(basename "$f")
-      project="${base%%.*}"
+      project="${f%%.*}"
       sed -e '1d' -e "s/^/$project\t/" "$f";
     else
       sed -e '1d' "$f";
