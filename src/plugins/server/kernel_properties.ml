@@ -330,7 +330,9 @@ let iter f =
    are not taken into account when status are updated. *)
 let add_reload_hook (f : unit -> unit) : unit =
   Property_status.register_status_update_hook
-    (fun _emitter _ip _status -> f())
+    (fun _emitter _ip _status -> f());
+  Project.register_after_set_current_hook ~user_only:false
+    (fun _project -> f ())
 
 let add_update_hook (f : Property.t -> unit) : unit =
   Property_status.register_property_add_hook
