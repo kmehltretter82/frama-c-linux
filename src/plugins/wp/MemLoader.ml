@@ -529,7 +529,7 @@ struct
     let ps = ref [] in
     let size = F.e_mul length @@ M.sizeof obj in
     let domain =
-      if init then M.value_footprint obj loc else M.init_footprint obj loc in
+      if init then M.init_footprint obj loc else M.value_footprint obj loc in
     Domain.iter
       (fun chunk ->
          let m_pre = Sigma.value s.pre chunk in

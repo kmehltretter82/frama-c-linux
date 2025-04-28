@@ -146,9 +146,9 @@ Cluster Shifts {
 }
 
 Goal Post-condition 'P' in 'swapA':
-Let a = memcpy(mem_0, p, mem_undef_0, p, 24).
+Let a = memcpy(mem_0, p, mem_0, q, 24).
 Let a_1 = Load_S1_A(q, mem_0).
-Let a_2 = memcpy(a, q, mem_undef_1, q, 24).
+Let a_2 = memcpy(a, q, mem_undef_0, q, 24).
 Let a_3 = Load_S1_A(q, a_2).
 Let a_4 = Load_S1_A(p, mem_0).
 Let a_5 = Load_S1_A(p, a_2).
@@ -175,9 +175,9 @@ Prove: EqS1_A(a_5, a_1).
 ------------------------------------------------------------
 
 Goal Post-condition 'Q' in 'swapA':
-Let a = memcpy(mem_0, p, mem_undef_0, p, 24).
+Let a = memcpy(mem_0, p, mem_0, q, 24).
 Let a_1 = Load_S1_A(q, mem_0).
-Let a_2 = memcpy(a, q, mem_undef_1, q, 24).
+Let a_2 = memcpy(a, q, mem_undef_0, q, 24).
 Let a_3 = Load_S1_A(q, a_2).
 Let a_4 = Load_S1_A(p, mem_0).
 Assume {

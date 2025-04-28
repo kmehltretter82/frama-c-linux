@@ -110,11 +110,11 @@ Cluster S1_A {
 }
 
 Goal Post-condition 'P' in 'swapA':
-Let a = memcpy(Mint_0, p, Mint_undef_0, p, 5).
-Let a_1 = memcpy(Mf64_0, p, Mf64_undef_0, p, 5).
+Let a = memcpy(Mint_0, p, Mint_0, q, 5).
+Let a_1 = memcpy(Mf64_0, p, Mf64_0, q, 5).
 Let a_2 = Load_S1_A(q, Mint_0, Mf64_0).
-Let a_3 = memcpy(a, q, Mint_undef_1, q, 5).
-Let a_4 = memcpy(a_1, q, Mf64_undef_1, q, 5).
+Let a_3 = memcpy(a, q, Mint_undef_0, q, 5).
+Let a_4 = memcpy(a_1, q, Mf64_undef_0, q, 5).
 Let a_5 = Load_S1_A(q, a_3, a_4).
 Let a_6 = Load_S1_A(p, Mint_0, Mf64_0).
 Let a_7 = Load_S1_A(p, a_3, a_4).
@@ -140,11 +140,11 @@ Prove: EqS1_A(a_7, a_2).
 ------------------------------------------------------------
 
 Goal Post-condition 'Q' in 'swapA':
-Let a = memcpy(Mint_0, p, Mint_undef_0, p, 5).
-Let a_1 = memcpy(Mf64_0, p, Mf64_undef_0, p, 5).
+Let a = memcpy(Mint_0, p, Mint_0, q, 5).
+Let a_1 = memcpy(Mf64_0, p, Mf64_0, q, 5).
 Let a_2 = Load_S1_A(q, Mint_0, Mf64_0).
-Let a_3 = memcpy(a, q, Mint_undef_1, q, 5).
-Let a_4 = memcpy(a_1, q, Mf64_undef_1, q, 5).
+Let a_3 = memcpy(a, q, Mint_undef_0, q, 5).
+Let a_4 = memcpy(a_1, q, Mf64_undef_0, q, 5).
 Let a_5 = Load_S1_A(q, a_3, a_4).
 Let a_6 = Load_S1_A(p, Mint_0, Mf64_0).
 Assume {
