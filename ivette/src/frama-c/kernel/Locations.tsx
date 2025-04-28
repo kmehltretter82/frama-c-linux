@@ -37,6 +37,7 @@ import { TitleBar } from 'ivette';
 import * as Display from 'ivette/display';
 import * as Ast from 'frama-c/kernel/api/ast';
 import * as Server from 'frama-c/server';
+import { projectChanged } from 'frama-c/kernel/api/services';
 
 // --------------------------------------------------------------------------
 // --- Global Multi-Selection
@@ -77,8 +78,6 @@ export function setSelection(s: MultiSelection): void {
     Display.alertComponent('fc.kernel.locations');
   }
 }
-
-Server.onShutdown(() => MultiSelection.setValue(emptySelection));
 
 export function setIndex(index: number): void {
   const s = MultiSelection.getValue();
@@ -122,6 +121,13 @@ function gotoIndex(index: number): void {
   const selection = MultiSelection.getValue();
   if (0 <= index && index <= selection.markers.length)
     updateSelection({ ...selection, index });
+}
+
+
+{
+  Server.onReady(clearSelection);
+  Server.onSignal(projectChanged, clearSelection);
+  Server.onShutdown(clearSelection);
 }
 
 // --------------------------------------------------------------------------
