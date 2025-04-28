@@ -299,14 +299,12 @@ module Make_Dataflow
 
   let transfer_call (stmt : stmt) (dest : lval option) (callee : exp)
       (args : exp list) (key, state : key * state) : (key * state) list =
-    let result, call_cacheable =
-      Transfer.call stmt dest callee args state
-    in
-    if call_cacheable = Eval.NoCacheCallers then
+    let result = Transfer.call stmt dest callee args state in
+    if result.cacheable = Eval.NoCacheCallers then
       (* Propagate info that the current call cannot be cached either *)
       cacheable := Eval.NoCacheCallers;
     (* Recombine callee partitioning keys with caller key *)
-    Partitioning.call_return ~caller:key result
+    Partitioning.call_return ~caller:key result.kind result.states
 
   let transfer_return (stmt : stmt) (return_exp : exp option)
     : transfer_function =
@@ -384,22 +382,26 @@ module Make_Dataflow
       States.to_list
         (List.fold_left interp_annot (States.singleton state) annots)
 
-  let transfer_statement (stmt : stmt) (state : state) : state list =
+  let transfer_statement (stmt : stmt) : transfer_function =
+    fun (key, state) ->
     (* Interpret annotations *)
     let states = transfer_annotations stmt ~record:true state in
     (* Check unspecified sequences *)
-    match stmt.skind with
-    | UnspecifiedSequence seq when Kernel.UnspecifiedAccess.get () ->
-      let translate = List.map Eva_ast.translate_lval in
-      let translate_elt (stmt, modified, writes, reads, refs) =
-        stmt, translate modified, translate writes, translate reads, refs
-      in
-      let seq = List.map translate_elt seq in
-      let check s =
-        Transfer.check_unspecified_sequence stmt s seq = `Value ()
-      in
-      List.filter check states
-    | _ -> states
+    let states =
+      match stmt.skind with
+      | UnspecifiedSequence seq when Kernel.UnspecifiedAccess.get () ->
+        let translate = List.map Eva_ast.translate_lval in
+        let translate_elt (stmt, modified, writes, reads, refs) =
+          stmt, translate modified, translate writes, translate reads, refs
+        in
+        let seq = List.map translate_elt seq in
+        let check s =
+          Transfer.check_unspecified_sequence stmt s seq = `Value ()
+        in
+        List.filter check states
+      | _ -> states
+    in
+    Partitioning.add_disjunction_keys stmt key states
 
 
   (* --- Iteration strategy ---*)
@@ -470,9 +472,9 @@ module Make_Dataflow
       (sources : ('branch * flow) list) : bool =
     let current_stmt = vertex_stmt v in
     Option.iter (fun stmt -> current_ki := Kstmt stmt) current_stmt;
-    let curent_location = Option.map Cil_datatype.Stmt.loc current_stmt in
+    let current_location = Option.map Cil_datatype.Stmt.loc current_stmt in
     let open Current_loc.Operators in
-    let<?> UpdatedCurrentLoc = curent_location in
+    let<?> UpdatedCurrentLoc = current_location in
     (* Get vertex store *)
     let store = get_vertex_store v in
     (* Join incoming states *)
@@ -483,7 +485,7 @@ module Make_Dataflow
         (* Callbacks *)
         call_statement_callbacks stmt flow;
         (* Transfer function associated to the statement *)
-        Partitioning.transfer (lift'' (transfer_statement stmt)) flow
+        Partitioning.transfer (transfer_statement stmt) flow
       | _ -> flow
     in
     (* Widen if necessary *)

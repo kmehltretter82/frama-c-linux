@@ -38,6 +38,16 @@
 
 (** {2 Keys and partitions.} *)
 
+type branch =
+  | Branch of int
+  (** Junction branch id in the control flow *)
+  | Builtin_result of Kernel_function.t * Cil_datatype.Kinstr.t * int
+  (** Case of a builtin *)
+  | Spec_behavior of Kernel_function.t * Cil_datatype.Kinstr.t * int
+  (** Behavior of a spec *)
+  | Disjunction_case of Cil_datatype.Stmt.t * int
+  (** Case of a disjunction in an ACSL annotation *)
+
 (** Partitioning keys attached to states. *)
 type key
 
@@ -50,12 +60,16 @@ type call_return_policy = {
 
 module Key : sig
   include Datatype.S_with_collections with type t = key
+
   val empty : t
   (** Initial key: no partitioning. *)
 
-  val exceed_rationing : t -> bool
+  val add_branch : ?history_size:int -> branch -> t -> t
+  (** Key for a branch appended to an existing key. *)
+
+  val exceed_rationing: t -> bool
   val combine : policy:call_return_policy -> caller:t -> callee:t -> t
-  (** Recombinaison of keys after a call *)
+  (** Recombinaison of keys after a call. *)
 end
 
 (** Collection of states, each identified by a unique key. *)
@@ -75,8 +89,6 @@ val map : ('a  -> 'a) -> 'a partition -> 'a partition
 
 
 (** {2 Partitioning actions.} *)
-
-type branch = int (** Junction branch id in the control flow *)
 
 (** Rationing are used to keep separate the [n] first states propagated at
     a point, by creating unique stamp until the limit is reached.
@@ -129,12 +141,12 @@ type action =
   | Incr_loop
   (** Increments the iteration counter of the current loop for all states in
       the flow. States with different iteration counter are kept separate. *)
-  | Branch of branch * int
-  (** Identifies all the states in the flow as coming from [branch].
-      They will be kept separated from states coming from other branches.
-      The integer is the maximum number of successive branches kept in the keys:
-      this action also removes the oldest branches from the keys to meet this
-      constraint. *)
+  | Add_branch of int * int
+  (** Identifies all the states in the flow as coming from the branch identified
+      by the first integer. They will be kept separated from states coming from
+      other branches. The second integer is the maximum number of successive
+      branches kept in the keys: this action also removes the oldest branches
+      from the keys to meet this constraint. *)
   | Ration of rationing
   (** Ensures that the first states encountered are kept separate, by creating a
       unique ration stamp for each new state until the [limit] is reached. The

@@ -164,6 +164,17 @@ struct
 
   (* Partition transfer functions *)
 
+  let add_disjunction_keys stmt key states =
+    let add_key =
+      if List.compare_length_with states 1 <= 0 then
+        fun _ s -> key, s
+      else
+        fun i s ->
+          let branch = Disjunction_case (stmt, i) in
+          Partition.Key.add_branch ~history_size branch key, s
+    in
+    List.mapi add_key states
+
   let enter_loop (flow : flow) (loop : Eva_automata.loop) : flow =
     Flow.transfer_keys flow (Enter_loop (unroll loop, loop))
 
@@ -195,9 +206,15 @@ struct
           then apply (Restrict (return_exp, i))
           else apply (Ration empty_rationing)
 
-  let call_return ~caller result =
-    let combine = Partition.Key.combine ~policy:call_return_policy in
+  let call_return ~caller kind result =
+    let policy = call_return_policy in
+    let callee_history =
+      policy.callee_history || kind = `Spec || kind = `Builtin
+    in
+    let policy = { policy with callee_history } in
+    let combine = Partition.Key.combine ~policy in
     List.map (fun (k, s) -> combine ~caller ~callee:k, s) result
+
 
   (* Reset state (for hierchical convergence) *)
 
@@ -255,7 +272,7 @@ struct
       "reached statement %d with %d incoming states, %d to propagate"
       stmt.sid dest.incoming_states (flow_size flow)
 
-  let join (sources : (branch*flow) list) (dest : store) : flow =
+  let join (sources : (int*flow) list) (dest : store) : flow =
     (* Get every source flow *)
     let sources_states =
       (* Is there more than one non-empty incoming flow? *)
@@ -264,7 +281,7 @@ struct
       | sources ->
         (* Several branches -> partition according to the incoming branch *)
         let get (b,flow) =
-          Flow.transfer_keys flow (Branch (b,history_size))
+          Flow.transfer_keys flow (Add_branch (b,history_size))
         in
         List.map get sources
     in

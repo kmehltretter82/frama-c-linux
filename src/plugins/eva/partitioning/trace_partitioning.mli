@@ -82,6 +82,8 @@ sig
 
   (* --- Partition transfer functions --- *)
 
+  val add_disjunction_keys : Cil_types.stmt -> Partition.key -> 'state list ->
+    (Partition.key * 'state) list
   val enter_loop : flow -> Eva_automata.loop -> flow
   val leave_loop : flow -> Eva_automata.loop -> flow
   val next_loop_iteration : flow -> Cil_types.stmt -> flow
@@ -90,7 +92,7 @@ sig
   (** After the analysis of a function call, recombines callee partitioning keys
       with the caller key. *)
   val call_return:
-    caller:Partition.key ->
+    caller:Partition.key -> Engine_sig.call_kind ->
     (Partition.key * state) list -> (Partition.key * state) list
 
   (* --- Operators --- *)
@@ -118,7 +120,7 @@ sig
       This function also interprets partitioning annotations at the store
       vertex (slevel, splits, merges, ...) which will generally change the
       current partitioning. *)
-  val join : (Partition.branch * flow) list -> store -> flow
+  val join : (int * flow) list -> store -> flow
 
   (** Widen a flow. The widening object keeps track of the previous widenings
       and previous propagated states to ensure termination. *)

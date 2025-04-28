@@ -32,7 +32,7 @@ module type S = sig
   val assume: state -> stmt -> exp -> bool -> state or_bottom
   val call:
     stmt -> lval option -> exp -> exp list -> state ->
-    (Partition.key * state) list * Eval.cacheable
+    state Engine_sig.call_result
   val check_unspecified_sequence:
     stmt ->
     state -> (stmt * lval list * lval list * lval list * stmt ref list) list ->
@@ -295,7 +295,7 @@ module Make (Engine: Engine_sig.S) = struct
           Domain.Store.register_initial_state callstack call.kf state;
           Engine.Compute.compute_call stmt call recursion state
         | `Bottom ->
-          { states = []; cacheable = Cacheable; }
+          { states = []; cacheable = Cacheable; kind = `Bottom }
       in
       Eva_utils.pop_call_stack ();
       res
@@ -454,7 +454,7 @@ module Make (Engine: Engine_sig.S) = struct
         [] call_result.states
     in
     InOutCallback.clear ();
-    call_result.cacheable, states
+    { call_result with states }
 
 
   (* ------------------- Evaluation of the arguments ------------------------ *)
@@ -700,6 +700,21 @@ module Make (Engine: Engine_sig.S) = struct
 
   (* --------------------- Process the call statement ---------------------- *)
 
+  let join_call_results res1 res2 =
+    let states = res2.Engine_sig.states @ res1.Engine_sig.states
+    and cacheable =
+      if res1.cacheable = NoCacheCallers || res2.cacheable = NoCacheCallers
+      then NoCacheCallers
+      else Cacheable
+    and kind = match res1.kind, res2.kind with
+      | `Body, _ | _, `Body -> `Body
+      | `Spec, _ | _, `Spec -> `Spec
+      | `Builtin, _ | _, `Builtin -> `Builtin
+      | `Internal, _ | _, `Internal -> `Internal
+      | `Bottom, `Bottom -> `Bottom
+    in
+    Engine_sig.{ states; cacheable; kind }
+
   let call stmt lval_option funcexp args state =
     let ki_call = Kstmt stmt in
     let subdivnb = subdivide_stmt stmt in
@@ -708,41 +723,43 @@ module Make (Engine: Engine_sig.S) = struct
       Eval.eval_function_exp ~subdivnb funcexp ~args state
     in
     Alarmset.emit ki_call alarms;
-    let cacheable = ref Cacheable in
-    let eval =
-      let+ functions = functions in
+    let bottom =
+      Engine_sig.{ states = []; cacheable = Cacheable; kind = `Bottom }
+    in
+    let process_one_function kf valuation =
+      (* The special Frama_C_ functions to print states are handled here. *)
+      if apply_special_directives ~subdivnb kf args state
+      then
+        let () = apply_cvalue_callback kf stmt state in
+        let states = [(Partition.Key.empty, state)] in
+        Engine_sig.{ states; cacheable = Cacheable; kind = `Internal }
+      else
+        (* Create the call. *)
+        let eval, alarms = make_call ~subdivnb stmt kf args valuation state in
+        Alarmset.emit ki_call alarms;
+        match eval with
+        | `Bottom -> bottom
+        | `Value (call, recursion, valuation) ->
+          let call_result =
+            do_one_call valuation stmt lval_option call recursion state
+          in
+          let cacheable =
+            if call_result.cacheable = NoCacheCallers then NoCacheCallers
+            else Cacheable
+          in
+          Engine_sig.{ call_result with cacheable }
+    in
+    match functions with
+    | `Bottom -> bottom
+    | `Value functions ->
       (* Check "calls" annotations, and reduce called functions accordingly. *)
       let functions = Transfer_logic.check_calls_annotations stmt functions in
-      let process_one_function kf valuation =
-        (* The special Frama_C_ functions to print states are handled here. *)
-        if apply_special_directives ~subdivnb kf args state
-        then
-          let () = apply_cvalue_callback kf stmt state in
-          [(Partition.Key.empty, state)]
-        else
-          (* Create the call. *)
-          let eval, alarms = make_call ~subdivnb stmt kf args valuation state in
-          Alarmset.emit ki_call alarms;
-          let states =
-            let+ call, recursion, valuation = eval in
-            (* Do the call. *)
-            let c, states =
-              do_one_call valuation stmt lval_option call recursion state
-            in
-            (* If needed, propagate that callers cannot be cached. *)
-            if c = NoCacheCallers then
-              cacheable := NoCacheCallers;
-            states
-          in
-          Bottom.value ~bottom:[] states
-      in
       (* Process each possible function apart, and append the result list. *)
       let process acc (kf, valuation) =
-        process_one_function kf valuation @ acc
+        process_one_function kf valuation
+        |> join_call_results acc
       in
-      List.fold_left process [] functions
-    in
-    Bottom.value ~bottom:[] eval, !cacheable
+      List.fold_left process bottom functions
 
   (* ------------------------------------------------------------------------ *)
   (*                            Unspecified Sequence                          *)
