@@ -157,6 +157,12 @@ struct
       | Raw of M.loc
       | Loc of M.loc * region
 
+    let pretty fmt (l: loc) =
+      match l with
+      | Null -> M.pretty fmt M.null
+      | Raw l -> M.pretty fmt l
+      | Loc (l,r) -> Format.fprintf fmt "%a@%a" M.pretty l R.pretty r
+
     let make a = function None -> Raw a | Some r -> Loc(a,r)
     let loc = function Null -> M.null | Raw a | Loc(a,_) -> a
     let reg = function Null | Raw _ -> None | Loc(_,r) -> Some r
@@ -384,17 +390,13 @@ struct
   type loc = LOADER.loc
   type segment = loc rloc
 
+  let pretty = LOADER.pretty
+
   include MemLoader.Make(LOADER)
 
   let lookup = M.lookup (*TODO: lookups in MemRegion *)
 
   let updates = M.updates (*TODO: updates in MemRegion *)
-
-  let pretty fmt (l: loc) =
-    match l with
-    | Null -> M.pretty fmt M.null
-    | Raw l -> M.pretty fmt l
-    | Loc (l,r) -> Format.fprintf fmt "%a@%a" M.pretty l R.pretty r
 
   (* {2 Memory Model API} *)
 

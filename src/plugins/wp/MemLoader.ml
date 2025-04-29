@@ -46,6 +46,7 @@ sig
   val name : string
 
   type loc
+  val pretty : Format.formatter -> loc -> unit
   val sizeof : c_object -> term
   val field : loc -> fieldinfo -> loc
   val shift : loc -> c_object -> term -> loc
@@ -133,7 +134,14 @@ struct
   (* ---  Loader utils                                                      --- *)
   (* -------------------------------------------------------------------------- *)
 
-  module AKEY =
+  module COMP_KEY =
+  struct
+    type t = int * compinfo
+    let compare (r,c) (r',c') = if r=r' then Compinfo.compare c c' else r-r'
+    let pretty fmt (r,c) = Format.fprintf fmt "%d:%a" r Compinfo.pretty c
+  end
+
+  module ARRAY_KEY =
   struct
     type t = int * base * Matrix.t
     and base = I of c_int | F of c_float | P | C of compinfo
@@ -179,20 +187,22 @@ struct
     val kind : Lang.datakind
     val footprint : c_object -> M.loc -> domain
     val t_comp : compinfo -> Lang.tau
-    val t_array : AKEY.base -> Lang.tau
+    val t_array : ARRAY_KEY.base -> Lang.tau
     val comp_id : compinfo -> string
-    val array_id : AKEY.base -> string
+    val array_id : ARRAY_KEY.base -> string
     val load : sigma -> c_object -> M.loc -> term
   end
+
+  let fail _ _ _ = assert false
 
   module VALUE_LOAD_INFO = struct
     let kind = KValue
     let footprint = M.value_footprint
     let t_comp = Lang.t_comp
-    let t_array = AKEY.tau
+    let t_array = ARRAY_KEY.tau
     let comp_id = Lang.comp_id
-    let array_id = AKEY.key
-    let load_rec = ref (fun _ _ _ -> assert false)
+    let array_id = ARRAY_KEY.key
+    let load_rec = ref fail
     let load sigma = !load_rec sigma
   end
 
@@ -200,23 +210,16 @@ struct
     let kind = KInit
     let footprint = M.init_footprint
     let t_comp = Lang.t_init
-    let t_array = AKEY.tau_init
+    let t_array = ARRAY_KEY.tau_init
     let comp_id = Lang.comp_init_id
-    let array_id = AKEY.key_init
-    let load_rec = ref (fun _ _ _ -> assert false)
+    let array_id = ARRAY_KEY.key_init
+    let load_rec = ref fail
     let load sigma = !load_rec sigma
   end
 
   (* -------------------------------------------------------------------------- *)
   (* ---  Compound Loader                                                   --- *)
   (* -------------------------------------------------------------------------- *)
-
-  module COMP_KEY =
-  struct
-    type t = int * compinfo
-    let compare (r,c) (r',c') = if r=r' then Compinfo.compare c c' else r-r'
-    let pretty fmt (r,c) = Format.fprintf fmt "%d:%a" r Compinfo.pretty c
-  end
 
   module COMP_GEN (Info : LOAD_INFO) = WpContext.Generator(COMP_KEY)
       (struct
@@ -270,17 +273,17 @@ struct
   (* ---  Array Loader                                                      --- *)
   (* -------------------------------------------------------------------------- *)
 
-  module ARRAY_GEN(Info: LOAD_INFO) = WpContext.Generator(AKEY)
+  module ARRAY_GEN(Info: LOAD_INFO) = WpContext.Generator(ARRAY_KEY)
       (struct
         open Matrix
         let name = M.name ^ ".ARRAY" ^ (if Info.kind=KInit then "INIT" else "")
-        type key = AKEY.t
+        type key = ARRAY_KEY.t
         type data = lfun * chunk list
 
         let generate (r,a,ds) =
           let x = Lang.freshvar ~basename:"p" (Lang.t_addr()) in
           let v = e_var x in
-          let obj = AKEY.obj a in
+          let obj = ARRAY_KEY.obj a in
           let loc = M.of_region_pointer r obj v in (* t_pointer -> loc *)
           let domain = Info.footprint obj loc in
           let result = Matrix.cc_tau (Info.t_array a) ds in
@@ -347,9 +350,14 @@ struct
          val load_float : sigma -> c_float -> M.loc -> term
          val load_pointer : sigma -> typ -> M.loc -> term
        end)
-      (COMP: sig val get : (int*compinfo) -> (lfun * chunk list) end)
-      (ARRAY: sig val get : (int*AKEY.base*Matrix.t) -> (lfun * chunk list) end)
-  = struct
+      (COMP: sig
+         val get : (int*compinfo) -> (lfun * chunk list)
+       end)
+      (ARRAY: sig
+         val get : (int*ARRAY_KEY.base*Matrix.t) -> (lfun * chunk list)
+       end) =
+  struct
+
     let load_comp sigma comp loc =
       let r , p = M.to_region_pointer loc in
       let f , m = COMP.get (r,comp) in
@@ -359,7 +367,7 @@ struct
       let r , p = M.to_region_pointer loc in
       let e , ns = Ctypes.array_dimensions a in
       let ds = Matrix.of_dims ns in
-      let f , m = ARRAY.get @@ AKEY.make r e ds in
+      let f , m = ARRAY.get @@ ARRAY_KEY.make r e ds in
       F.e_fun f (p :: Matrix.cc_dims ns @ memories sigma m)
 
     let load sigma obj loc =
@@ -441,21 +449,21 @@ struct
         let compile = Lang.local generate
       end)
 
-  module IS_ARRAY_INIT = WpContext.Generator(AKEY)
+  module IS_ARRAY_INIT = WpContext.Generator(ARRAY_KEY)
       (struct
         open Matrix
         let name = M.name ^ ".IS_ARRAY_INIT"
-        type key = AKEY.t
+        type key = ARRAY_KEY.t
         type data = lfun * chunk list
 
         let generate (r,a,ds) =
           let x = Lang.freshvar ~basename:"p" (Lang.t_addr()) in
           let v = e_var x in
-          let obj = AKEY.obj a in
+          let obj = ARRAY_KEY.obj a in
           let loc = M.of_region_pointer r obj v in
           let domain = M.init_footprint obj loc in
           let name = Format.asprintf "IsInitArray%a_%s%a"
-              pp_rid r (AKEY.key a) Matrix.pp_suffix_id ds in
+              pp_rid r (ARRAY_KEY.key a) Matrix.pp_suffix_id ds in
           let lfun = Lang.generated_p name in
           let xmem,chunks,sigma = signature domain in
           let env = Matrix.cc_env ds in
@@ -485,7 +493,7 @@ struct
     let r , p = M.to_region_pointer loc in
     let e , ns = Ctypes.array_dimensions ainfo in
     let ds = Matrix.of_dims ns in
-    let f , m = IS_ARRAY_INIT.get @@ AKEY.make r e ds in
+    let f , m = IS_ARRAY_INIT.get @@ ARRAY_KEY.make r e ds in
     F.p_call f (p :: Matrix.cc_dims ns @ memories sigma m)
 
   let initialized_loc sigma obj loc =
@@ -586,7 +594,8 @@ struct
     | C_comp _ | C_array _ ->
       let v_src = load_init seq.pre obj src in
       let v_tgt = load_init seq.post obj loc in
-      Set(v_tgt,v_src) :: update seq ~init:true obj loc ~src ()
+      let src = if Wp_parameters.Havoc.get () then None else Some src in
+      Set(v_tgt,v_src) :: update seq ~init:true obj loc ?src ()
 
   (* -------------------------------------------------------------------------- *)
   (* --- Assigned                                                           --- *)

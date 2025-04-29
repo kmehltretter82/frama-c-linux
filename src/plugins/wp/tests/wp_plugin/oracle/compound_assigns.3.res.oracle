@@ -4,6 +4,8 @@
 [wp] [Valid] Goal copy_exits (Cfg) (Unreachable)
 [wp] [Valid] Goal copy_terminates (Cfg) (Trivial)
 [wp] Warning: Missing RTE guards
+[wp] [Valid] Goal init_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal init_terminates (Cfg) (Trivial)
 [wp] [Valid] Goal swap_exits (Cfg) (Unreachable)
 [wp] [Valid] Goal swap_terminates (Cfg) (Trivial)
 ------------------------------------------------------------
@@ -111,7 +113,7 @@ Cluster S1_A {
   
 }
 
-Goal Assertion 'Kept' (file compound_assigns.i, line 83):
+Goal Assertion 'Kept' (file compound_assigns.i, line 82):
 Let a = memcpy(Mint_0, tmp_0, Mint_0, p, 5).
 Let a_1 = memcpy(Mf64_0, tmp_0, Mf64_0, p, 5).
 Let a_2 = Load_S1_A(s, Mint_0, Mf64_0).
@@ -140,7 +142,7 @@ Prove: EqS1_A(a_3, a_2).
 
 ------------------------------------------------------------
 
-Goal Assertion 'Kept' (file compound_assigns.i, line 85):
+Goal Assertion 'Kept' (file compound_assigns.i, line 84):
 Let a = memcpy(Mint_0, tmp_0, Mint_0, p, 5).
 Let a_1 = memcpy(a, p, a, s, 5).
 Let a_2 = memcpy(Mf64_0, tmp_0, Mf64_0, p, 5).
@@ -175,38 +177,38 @@ Prove: EqS1_A(a_6, a_5).
 
 ------------------------------------------------------------
 
-Goal Assigns (file compound_assigns.i, line 58) in 'copy' (1/6):
+Goal Assigns (file compound_assigns.i, line 57) in 'copy' (1/6):
+Effect at line 78
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Assigns (file compound_assigns.i, line 57) in 'copy' (2/6):
+Effect at line 78
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Assigns (file compound_assigns.i, line 57) in 'copy' (3/6):
 Effect at line 79
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file compound_assigns.i, line 58) in 'copy' (2/6):
+Goal Assigns (file compound_assigns.i, line 57) in 'copy' (4/6):
 Effect at line 79
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file compound_assigns.i, line 58) in 'copy' (3/6):
-Effect at line 80
+Goal Assigns (file compound_assigns.i, line 57) in 'copy' (5/6):
+Effect at line 81
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file compound_assigns.i, line 58) in 'copy' (4/6):
-Effect at line 80
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Assigns (file compound_assigns.i, line 58) in 'copy' (5/6):
-Effect at line 82
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Assigns (file compound_assigns.i, line 58) in 'copy' (6/6):
-Effect at line 84
+Goal Assigns (file compound_assigns.i, line 57) in 'copy' (6/6):
+Effect at line 83
 Prove: true.
 
 ------------------------------------------------------------
@@ -427,6 +429,182 @@ Prove: EqS1_A(a_4, a_5).
 
 ------------------------------------------------------------
 ------------------------------------------------------------
+  Function init
+------------------------------------------------------------
+
+Cluster Compound {
+  
+  Function Load_Init_S1_A (p_2 : addr) (Init_6 : bool[addr]) : Init_S1_A
+    = {
+         Init_F1_A_f = (Array_sint32_init (shiftfield_F1_A_f p_2) 4 Init_6) ;
+         Init_F1_A_g = Init_6[(shiftfield_F1_A_g p_2)]
+      }
+  
+  Function Array_sint32_init (p_2 : addr) (n_2 : int)
+    (Init_6 : bool[addr]) : bool[]
+  
+  Function Load_S1_A (p_2 : addr) (Mint_6 : int[addr])
+    (Mf64_6 : f64[addr]) : S1_A
+    = {
+         F1_A_f = (Array_sint32 (shiftfield_F1_A_f p_2) 4 Mint_6) ;
+         F1_A_g = Mf64_6[(shiftfield_F1_A_g p_2)]
+      }
+  
+  Function Array_sint32 (p_2 : addr) (n_2 : int) (Mint_6 : int[addr]) : int[]
+  
+  Predicate IsInit_S1_A (p_0 : addr) (Init_0 : bool[addr])
+    = (IsInitArray_sint32 (shiftfield_F1_A_f p_0) 4 Init_0)
+      /\ Init_0[(shiftfield_F1_A_g p_0)]
+  
+  Function shiftfield_F1_A_g (p_1 : addr) : addr = (shift p_1 4)
+  
+  Predicate IsInitArray_sint32 (p_0 : addr) (n_0 : int) (Init_0 : bool[addr])
+    = forall i_0:int. (0<=i_0) -> (i_0<n_0) -> Init_0[(shift_sint32 p_0 i_0)]
+  
+  Function shift_sint32 (p_0 : addr) (k_0 : int) : addr = (shift p_0 k_0)
+  
+  Function shiftfield_F1_A_f (p_0 : addr) : addr = (shift p_0 0)
+  
+  Axiom Load_Init_S1_A_framed:
+    forall Init_7: bool[addr].
+    forall Init_8: bool[addr].
+    forall p_2: addr.
+    (eqmem Init_7 Init_8 p_2 5)
+    -> ((Load_Init_S1_A p_2 Init_8)=(Load_Init_S1_A p_2 Init_7))
+  
+  Axiom Array_sint32_init_framed:
+    forall Init_7: bool[addr].
+    forall Init_8: bool[addr].
+    forall n_2: int.
+    forall p_2: addr.
+    (eqmem Init_7 Init_8 p_2 n_2)
+    -> ((Array_sint32_init p_2 n_2 Init_8)=
+        (Array_sint32_init p_2 n_2 Init_7))
+  
+  Axiom Array_sint32_init_access:
+    forall Init_6: bool[addr].
+    forall i_2: int.
+    forall n_2: int.
+    forall p_2: addr.
+    [ (Array_sint32_init p_2 n_2 Init_6)[i_2] ]
+    (0<=i_2) -> (i_2<n_2)
+    -> ((Array_sint32_init p_2 n_2 Init_6)[i_2]=
+        Init_6[(shift_sint32 p_2 i_2)])
+  
+  Axiom Load_S1_A_framed:
+    forall Mf64_7: f64[addr].
+    forall Mf64_8: f64[addr].
+    forall Mint_7: int[addr].
+    forall Mint_8: int[addr].
+    forall p_2: addr.
+    (eqmem Mf64_7 Mf64_8 p_2 5) -> (eqmem Mint_7 Mint_8 p_2 5)
+    -> ((Load_S1_A p_2 Mint_8 Mf64_8)=(Load_S1_A p_2 Mint_7 Mf64_7))
+  
+  Axiom Array_sint32_framed:
+    forall Mint_7: int[addr].
+    forall Mint_8: int[addr].
+    forall n_2: int.
+    forall p_2: addr.
+    (eqmem Mint_7 Mint_8 p_2 n_2)
+    -> ((Array_sint32 p_2 n_2 Mint_8)=(Array_sint32 p_2 n_2 Mint_7))
+  
+  Axiom Array_sint32_access:
+    forall Mint_6: int[addr].
+    forall i_2: int.
+    forall n_2: int.
+    forall p_2: addr.
+    [ (Array_sint32 p_2 n_2 Mint_6)[i_2] ]
+    (0<=i_2) -> (i_2<n_2)
+    -> ((Array_sint32 p_2 n_2 Mint_6)[i_2]=Mint_6[(shift_sint32 p_2 i_2)])
+  
+}
+
+Cluster Matrix {
+  
+  Predicate EqArray_int (n_0 : int) (T_0 : int[]) (T_1 : int[])
+    = forall i_0:int. (0<=i_0) -> (i_0<n_0) -> (T_1[i_0]=T_0[i_0])
+  
+  Predicate IsArray_sint32 (T_0 : int[])
+    = forall i_0:int. (is_sint32 T_0[i_0])
+  
+}
+
+Cluster S1_A {
+  
+  Type S1_A = { F1_A_f : int[]; F1_A_g : f64; }
+  
+  Predicate EqS1_A (S_0 : S1_A) (S_1 : S1_A)
+    = (S_1.F1_A_g=S_0.F1_A_g) /\ (EqArray_int 4 S_0.F1_A_f S_1.F1_A_f)
+  
+  Predicate IsS1_A (S_0 : S1_A) = (IsArray_sint32 S_0.F1_A_f)
+  
+}
+
+Goal Post-condition (file compound_assigns.i, line 91) in 'init':
+Let a = Load_S1_A(p, memcpy(Mint_0, p, Mint_0, q, 5),
+          memcpy(Mf64_0, p, Mf64_0, q, 5)).
+Let a_1 = Load_S1_A(q, Mint_0, Mf64_0).
+Assume {
+  Type: IsS1_A(a_1) /\ IsS1_A(a).
+  (* Heap *)
+  Type: (region(p.base) <= 0) /\ (region(q.base) <= 0).
+  (* Pre-condition *)
+  Have: separated(p, 5, q, 5).
+  Have: a = a_1.
+}
+Prove: EqS1_A(a, a_1).
+
+------------------------------------------------------------
+
+Goal Post-condition (file compound_assigns.i, line 92) in 'init':
+Let a = memcpy(Init_0, p, Init_0, q, 5).
+Let a_1 = Load_S1_A(p, memcpy(Mint_0, p, Mint_0, q, 5),
+            memcpy(Mf64_0, p, Mf64_0, q, 5)).
+Let a_2 = Load_S1_A(q, Mint_0, Mf64_0).
+Assume {
+  Type: IsS1_A(a_2) /\ IsS1_A(a_1).
+  (* Heap *)
+  Type: (region(p.base) <= 0) /\ (region(q.base) <= 0) /\ scinit(Init_0).
+  (* Pre-condition *)
+  Have: IsInit_S1_A(q, Init_0).
+  (* Pre-condition *)
+  Have: separated(p, 5, q, 5).
+  Have: (Load_Init_S1_A(p, a) = Load_Init_S1_A(q, Init_0)) /\ (a_1 = a_2).
+  (* Assertion 'PF,Z3_only' *)
+  Have: forall i : Z. ((0 <= i) -> ((i <= 3) ->
+      (a[shift_sint32(shiftfield_F1_A_f(p), i)]=true))).
+}
+Prove: IsInit_S1_A(p, a).
+
+------------------------------------------------------------
+
+Goal Assertion 'PF,Z3_only' (file compound_assigns.i, line 99):
+Let a = memcpy(Init_0, p, Init_0, q, 5).
+Let a_1 = Load_S1_A(p, memcpy(Mint_0, p, Mint_0, q, 5),
+            memcpy(Mf64_0, p, Mf64_0, q, 5)).
+Let a_2 = Load_S1_A(q, Mint_0, Mf64_0).
+Assume {
+  Type: IsS1_A(a_2) /\ IsS1_A(a_1).
+  (* Heap *)
+  Type: (region(p.base) <= 0) /\ (region(q.base) <= 0) /\ scinit(Init_0).
+  (* Goal *)
+  When: (0 <= i) /\ (i <= 3).
+  (* Pre-condition *)
+  Have: IsInit_S1_A(q, Init_0).
+  (* Pre-condition *)
+  Have: separated(p, 5, q, 5).
+  Have: (Load_Init_S1_A(p, a) = Load_Init_S1_A(q, Init_0)) /\ (a_1 = a_2).
+}
+Prove: (a[shift_sint32(shiftfield_F1_A_f(p), i)]=true).
+
+------------------------------------------------------------
+
+Goal Assigns (file compound_assigns.i, line 90) in 'init':
+Effect at line 96
+Prove: true.
+
+------------------------------------------------------------
+------------------------------------------------------------
   Function swap
 ------------------------------------------------------------
 
@@ -582,14 +760,14 @@ Prove: EqS1_A(a_5, a_6).
 
 ------------------------------------------------------------
 
-Goal Assigns (file compound_assigns.i, line 38) in 'swap' (1/2):
-Effect at line 51
+Goal Assigns (file compound_assigns.i, line 37) in 'swap' (1/2):
+Effect at line 50
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file compound_assigns.i, line 38) in 'swap' (2/2):
-Effect at line 52
+Goal Assigns (file compound_assigns.i, line 37) in 'swap' (2/2):
+Effect at line 51
 Prove: true.
 
 ------------------------------------------------------------

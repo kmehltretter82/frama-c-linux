@@ -27,7 +27,6 @@ struct A {
 /*@
   strategy Unfold:
     \tactic("Wp.unfold", \ingoal( EqS1_A(_,_) ));
-
 */
 
 // Disable singleton region
@@ -83,4 +82,20 @@ void copy(int side, struct A *p, struct A *q, struct A *r)
    //@ assert Kept: *s == \at(*s,L);
    *p = *s;
    //@ assert Kept: *s == \at(*s,L);
+}
+
+/*@
+  requires \initialized(q);
+  requires \separated(p,q);
+  assigns *p;
+  ensures *p == \old(*q);
+  ensures \initialized(p);
+*/
+void init(struct A *p, struct A *q)
+{
+   *p = *q;
+   // Currently only proved by Z3:
+   /*@ assert PF: Z3_only:
+         \forall integer i; 0 <= i < 4 ==> \initialized(&(p->f[i]));
+    */
 }

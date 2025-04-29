@@ -595,6 +595,7 @@ struct
 
   type nonrec loc = loc
 
+  let pretty = Lang.F.pp_term
   let sizeof = protected_sizeof_object
   let field = field
   let shift = shift

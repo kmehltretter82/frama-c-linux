@@ -40,6 +40,7 @@ sig
   val name : string
 
   type loc
+  val pretty : Format.formatter -> loc -> unit
   val sizeof : c_object -> term
   val field : loc -> fieldinfo -> loc
   val shift : loc -> c_object -> term -> loc

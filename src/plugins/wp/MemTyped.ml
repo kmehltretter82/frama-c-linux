@@ -995,6 +995,7 @@ module LOADER =
 struct
   let name = "MemTyped.LOADER"
   type loc = F.term
+  let pretty = F.pp_term
   let field = field
   let shift = shift
   let sizeof = length_of_object
