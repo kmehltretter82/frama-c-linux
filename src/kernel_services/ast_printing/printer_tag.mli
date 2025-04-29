@@ -31,6 +31,7 @@ type declaration =
   | SType of typeinfo
   | SGlobal of varinfo
   | SFunction of kernel_function
+  | SGAnnot of global_annotation
 
 (** Prints a concise label of the declaration. *)
 val pp_declaration : Format.formatter -> declaration -> unit

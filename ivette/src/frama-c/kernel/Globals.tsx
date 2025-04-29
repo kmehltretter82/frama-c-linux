@@ -576,6 +576,69 @@ export function Types(): JSX.Element {
 }
 
 // --------------------------------------------------------------------------
+// --- Global Annotations Section
+// --------------------------------------------------------------------------
+
+export function GlobalAnnots(): JSX.Element {
+  return <>
+    <Declarations
+      id='ltypes'
+      label='Logic Types'
+      title='Logic Types'
+      filter={(d): boolean => d.kind === 'LTYPE'}
+    />
+    <Declarations
+      id='lfun-preds'
+      label='Predicates and Logic Functions'
+      title='Predicates and Logic Functions'
+      filter={(d): boolean => d.kind === 'LFUNPRED'}
+    />
+    <Declarations
+      id='laxiomatics'
+      label='Axiomatic Definitions'
+      title='Axiomatic Definitions'
+      filter={(d): boolean => d.kind === 'AXIOMATIC'}
+    />
+    <Declarations
+      id='lemmas'
+      label='Lemmas'
+      title='Lemmas'
+      filter={(d): boolean => d.kind === 'LEMMA'}
+    />
+    <Declarations
+      id='lmodules'
+      label='Logic Modules'
+      title='Logic Modules'
+      filter={(d): boolean => d.kind === 'MODULE'}
+    />
+    <Declarations
+      id='linvariants'
+      label='Invariants'
+      title='Invariants'
+      filter={(d): boolean => d.kind === 'INVARIANT'}
+    />
+    <Declarations
+      id='lmodel'
+      label='Model Fields'
+      title='Model Fields'
+      filter={(d): boolean => d.kind === 'MODEL'}
+    />
+    <Declarations
+      id='lvolatile'
+      label='Volatile Annotations'
+      title='Volatile Annotations'
+      filter={(d): boolean => d.kind === 'VOLATILE'}
+    />
+    <Declarations
+      id='lextensions'
+      label='ACSL Extensions'
+      title='ACSL Extensions'
+      filter={(d): boolean => d.kind === 'EXTENSION'}
+    />
+  </>;
+}
+
+// --------------------------------------------------------------------------
 // --- Files Section
 // --------------------------------------------------------------------------
 type FilesProps = {
@@ -761,6 +824,7 @@ export function GlobalDeclarations(): JSX.Element {
         <Types />
         <Variables scrollableParent={scrollableArea} />
         <Functions scrollableParent={scrollableArea} />
+        <GlobalAnnots />
       </div>
     </>
   );

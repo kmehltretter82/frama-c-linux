@@ -199,6 +199,7 @@ module Decl = MakeTag
         | SType _ -> Printf.sprintf "#T%d" (incr kid ; !kid)
         | SGlobal vi -> Printf.sprintf "#G%d" vi.vid
         | SFunction kf -> Printf.sprintf "#F%d" @@ Kernel_function.get_id kf
+        | SGAnnot _ -> Printf.sprintf "#A%d" (incr kid; !kid)
     end)
 
 module Marker = MakeTag
@@ -293,13 +294,37 @@ struct
       ~package ~name:"declKind"
       ~descr:(Md.plain "Declaration kind")
       (Junion [
+          (* C *)
           Jkey "ENUM";
           Jkey "UNION";
           Jkey "STRUCT";
           Jkey "TYPEDEF";
           Jkey "GLOBAL";
           Jkey "FUNCTION";
+          (* ACSL *)
+          Jkey "LFUNPRED";
+          Jkey "INVARIANT";
+          Jkey "AXIOMATIC";
+          Jkey "MODULE";
+          Jkey "LEMMA";
+          Jkey "EXTENSION";
+          Jkey "VOLATILE";
+          Jkey "LTYPE";
+          Jkey "MODEL";
         ])
+
+  let global_annotation_kind = function
+    | Dfun_or_pred _ -> "LFUNPRED"
+    | Dinvariant _ -> "INVARIANT"
+    | Dtype_annot _ -> "INVARIANT"
+    | Daxiomatic _ -> "AXIOMATIC"
+    | Dmodule _ -> "MODULE"
+    | Dlemma _ -> "LEMMA"
+    | Dextended _ -> "EXTENSION"
+    | Dvolatile _ -> "VOLATILE"
+    | Dtype _ -> "LTYPE"
+    | Dmodel_annot _ -> "MODEL"
+
   let to_json = function
     | SEnum _ -> `String "ENUM"
     | SComp { cstruct = true } -> `String "STRUCT"
@@ -307,6 +332,20 @@ struct
     | SType _ -> `String "TYPEDEF"
     | SGlobal _ -> `String "GLOBAL"
     | SFunction _ -> `String "FUNCTION"
+    | SGAnnot a -> `String (global_annotation_kind a)
+end
+
+module GAnnotRoots = struct
+  include State_builder.Hashtbl
+      (Cil_datatype.Global_annotation.Hashtbl)
+      (Datatype.Unit)
+      (struct
+        let name = "Server.Kernel_ast.GAnnotsRoots"
+        let size = 43
+        let dependencies = [ Ast.self ]
+      end)
+
+  let is_root ga = mem ga
 end
 
 module DeclAttributes =
@@ -323,6 +362,10 @@ struct
       Cil.iterGlobals
         (Ast.get())
         (fun g ->
+           begin match g with
+             | GAnnot(ga,_) -> GAnnotRoots.add ga ()
+             | _ -> ()
+           end ;
            match declaration_of_global g with
            | None -> ()
            | Some d ->
@@ -383,7 +426,12 @@ struct
       ~add_reload_hook:ast_update_hook
       model
 
-  let () = Decl.hook (States.update array)
+  let update (d, s) =
+    match d with
+    | SGAnnot ga when not @@ GAnnotRoots.is_root ga -> ()
+    | _ -> States.update array (d,s)
+
+  let () = Decl.hook update
 
 end
 
@@ -449,6 +497,30 @@ module MarkerAttributes =
 struct
   open Printer_tag
 
+  let global_annotation_label_kind short = function
+    | Dfun_or_pred ({ l_type = None }, _) ->
+      if short then "Pred" else "Predicate"
+    | Dfun_or_pred _ ->
+      if short then "LFun" else "Logic Function"
+    | Dinvariant _ ->
+      if short then "Inv" else "Invariant"
+    | Dtype_annot _ ->
+      if short then "TInv" else "Type Invariant"
+    | Daxiomatic _ ->
+      if short then "Ax" else "Axiomatic"
+    | Dmodule _ ->
+      if short then "Mod" else "Module"
+    | Dlemma _ ->
+      "Lemma"
+    | Dextended _ ->
+      if short then "Ext" else "Extension"
+    | Dvolatile _ ->
+      if short then "Vol" else "Volatile"
+    | Dtype _ ->
+      if short then "LType" else "Logic Type"
+    | Dmodel_annot _ ->
+      "Model"
+
   let label_kind ~short m =
     match varinfo_of_localizable m with
     | Some vi ->
@@ -471,6 +543,8 @@ struct
       | PIP _ -> if short then "Prop" else "Property"
       | PGlobal (GType _ | GCompTag _ | GEnumTag _ | GEnumTagDecl _)
       | PType _ -> "Type"
+      | PGlobal (GAnnot (ga, _)) ->
+        global_annotation_label_kind short ga
       | PGlobal _ -> if short then "Decl" else "Declaration"
 
   let descr_localizable fmt = function
