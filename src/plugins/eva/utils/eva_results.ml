@@ -211,7 +211,13 @@ let set_results results =
     let ki = Cil_types.Kstmt stmt in
     ignore (Alarms.register Eva_utils.emitter ki ~status:st alarm)
   in
-  AlarmsStmt.Hashtbl.iter aux_alarms results.alarms;
+  (* Sort alarms, as the order in which several alarms on a same statement are
+     registered impacts the order in which they are displayed. *)
+  let cmp (a1, s1) (a2, s2) =
+    let n = Stmt.compare s1 s2 in
+    if n <> 0 then n else Alarms.compare a1 a2
+  in
+  AlarmsStmt.Hashtbl.iter_sorted ~cmp aux_alarms results.alarms;
   (* Statuses *)
   let aux_statuses ip st =
     Property_status.emit Eva_utils.emitter ~hyps:[] ip st
