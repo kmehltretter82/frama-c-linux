@@ -34,8 +34,7 @@ import { DEVEL } from 'dome';
 import { Label } from 'dome/controls/labels';
 import { DefineElement } from 'dome/layout/dispatch';
 import { Inset } from 'dome/frame/toolbars';
-import { docHistory, HelpButton } from 'dome/help';
-import { Pattern } from 'dome/text/markdown';
+import { ChapterProps, docHistory, HelpButton } from 'dome/help';
 import * as State from './state';
 import * as Search from './search';
 import doc from './doc.md?raw';
@@ -232,13 +231,6 @@ export interface ToolProps {
   id: string;
   rank?: number;
   children?: React.ReactNode;
-}
-
-export interface ChapterProps {
-  id: string;
-  content: string;
-  rank?: number;
-  patterns?: Pattern[];
 }
 
 /** @ignore */
