@@ -444,6 +444,7 @@ struct
             d_definition = def ;
             d_cluster = cluster ;
           } ;
+          frame_lemmas lfun obj loc [e_var x] chunks ;
           lfun , chunks
 
         let compile = Lang.local generate
@@ -479,6 +480,13 @@ struct
             d_definition = Predicate (Def, def) ;
             d_cluster = cluster ;
           } ;
+          begin
+            match env.length with
+            | None -> ()
+            | Some length ->
+              let ns = List.map F.e_var env.size_var in
+              frame_lemmas lfun obj ~length loc (v::ns) chunks
+          end ;
           lfun , chunks
 
         let compile = Lang.local generate

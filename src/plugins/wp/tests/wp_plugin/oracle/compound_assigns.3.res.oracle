@@ -517,6 +517,22 @@ Cluster Compound {
     (0<=i_2) -> (i_2<n_2)
     -> ((Array_sint32 p_2 n_2 Mint_6)[i_2]=Mint_6[(shift_sint32 p_2 i_2)])
   
+  Axiom IsInit_S1_A_framed:
+    forall Init_1: bool[addr].
+    forall Init_2: bool[addr].
+    forall p_0: addr.
+    (eqmem Init_1 Init_2 p_0 5)
+    -> ((IsInit_S1_A p_0 Init_2) <-> (IsInit_S1_A p_0 Init_1))
+  
+  Axiom IsInitArray_sint32_framed:
+    forall Init_1: bool[addr].
+    forall Init_2: bool[addr].
+    forall n_0: int.
+    forall p_0: addr.
+    (eqmem Init_1 Init_2 p_0 n_0)
+    -> ((IsInitArray_sint32 p_0 n_0 Init_2)
+        <-> (IsInitArray_sint32 p_0 n_0 Init_1))
+  
 }
 
 Cluster Matrix {

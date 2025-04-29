@@ -645,6 +645,22 @@ Cluster Compound {
     -> ((Array_R0003_sint32 p_2 n_2 mem_0)[i_2]=
         (read_sint32 mem_0 (shift_sint32 p_2 i_2)))
   
+  Axiom IsInit_S1_A_R0003_framed:
+    forall init_1: bool[][].
+    forall init_2: bool[][].
+    forall p_0: addr.
+    (eqmem init_1 init_2 p_0 24)
+    -> ((IsInit_S1_A_R0003 p_0 init_2) <-> (IsInit_S1_A_R0003 p_0 init_1))
+  
+  Axiom IsInitArray_R0003_sint32_framed:
+    forall init_1: bool[][].
+    forall init_2: bool[][].
+    forall n_0: int.
+    forall p_0: addr.
+    (eqmem init_1 init_2 p_0 (4*n_0))
+    -> ((IsInitArray_R0003_sint32 p_0 n_0 init_2)
+        <-> (IsInitArray_R0003_sint32 p_0 n_0 init_1))
+  
 }
 
 Cluster Globals {
