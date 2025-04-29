@@ -28,6 +28,7 @@
 __PUSH_FC_STDLIB
 #include "__fc_define_mbstate_t.h"
 #include "__fc_define_wchar_t.h"
+#include "__fc_define_weof.h"
 #include "__fc_define_wint_t.h"
 #include "__fc_define_size_t.h"
 #include "__fc_define_file.h"
@@ -43,12 +44,9 @@ __PUSH_FC_STDLIB
 #include "time.h"
 
 #include "string.h"
+#include "stdarg.h"
 
 __BEGIN_DECLS
-
-#ifndef WEOF
-#define WEOF __FC_WEOF
-#endif
 
 /*@
   requires valid:
