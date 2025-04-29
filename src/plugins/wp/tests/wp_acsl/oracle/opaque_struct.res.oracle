@@ -201,17 +201,15 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Check 'fails' (file opaque_struct.i, line 38):
-Let a = memcpy(Init_0, p, Init_undef_0, p, Length_of_S1_S).
 Assume {
-  Type: scinit(Init_0) /\ scinit(a).
   (* Heap *)
-  Type: (region(p.base) <= 0) /\ linked(Malloc_0).
+  Type: (region(p.base) <= 0) /\ linked(Malloc_0) /\ scinit(Init_0).
   (* Pre-condition *)
   Have: IsInit_S1_S(p, Init_0).
   (* Pre-condition *)
   Have: valid_rw(Malloc_0, p, Length_of_S1_S).
 }
-Prove: IsInit_S1_S(p, a).
+Prove: IsInit_S1_S(p, memcpy(Init_0, p, Init_undef_0, p, Length_of_S1_S)).
 
 ------------------------------------------------------------
 
@@ -241,28 +239,24 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Check 'fail' (file opaque_struct.i, line 54):
-Let a = memcpy(Init_0, p, Init_undef_0, p, Length_of_S1_S).
 Assume {
-  Type: scinit(Init_0) /\ scinit(a).
   (* Heap *)
-  Type: region(p.base) <= 0.
+  Type: (region(p.base) <= 0) /\ scinit(Init_0).
   (* Pre-condition *)
   Have: !IsInit_S1_S(p, Init_0).
 }
-Prove: !IsInit_S1_S(p, a).
+Prove: !IsInit_S1_S(p, memcpy(Init_0, p, Init_undef_0, p, Length_of_S1_S)).
 
 ------------------------------------------------------------
 
 Goal Check 'fail' (file opaque_struct.i, line 55):
-Let a = memcpy(Init_0, p, Init_undef_0, p, Length_of_S1_S).
 Assume {
-  Type: scinit(Init_0) /\ scinit(a).
   (* Heap *)
-  Type: region(p.base) <= 0.
+  Type: (region(p.base) <= 0) /\ scinit(Init_0).
   (* Pre-condition *)
   Have: !IsInit_S1_S(p, Init_0).
 }
-Prove: IsInit_S1_S(p, a).
+Prove: IsInit_S1_S(p, memcpy(Init_0, p, Init_undef_0, p, Length_of_S1_S)).
 
 ------------------------------------------------------------
 [wp] opaque_struct.i:31: Warning: 

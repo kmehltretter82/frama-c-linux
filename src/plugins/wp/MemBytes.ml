@@ -47,6 +47,9 @@ struct
   let p_sconst = Lang.extern_fp ~coloring:true ~library "sconst"
   let sconst m = p_call p_sconst [m]
 
+  let p_scinit = Lang.extern_fp ~coloring:true ~library "scinit"
+  let scinit m = p_call p_scinit [m]
+
   let p_bytes = Lang.extern_fp ~library "bytes"
   let bytes m = p_call p_bytes [ m ]
 
@@ -1000,6 +1003,7 @@ let frame sigma =
     else []
   in
   wellformed_frame MemAddr.linked m_alloc @
+  wellformed_frame WBytes.scinit m_init @
   wellformed_frame WBytes.sconst m_mem @
   [ framed (Sigma.value sigma m_mem) ]
 

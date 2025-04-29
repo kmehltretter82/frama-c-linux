@@ -11,7 +11,7 @@ Let a = shift_sint32(array_0, 0).
 Assume {
   Type: is_sint32(i).
   (* Heap *)
-  Type: region(array_0.base) <= 0.
+  Type: (region(array_0.base) <= 0) /\ scinit(Init_0).
   (* Else *)
   Have: 10 <= i.
 }
@@ -29,7 +29,8 @@ Let a_1 = shift_sint32(pg_array_0, 0).
 Assume {
   Type: is_sint32(i).
   (* Heap *)
-  Type: (region(G_glob_array_51) <= 0) /\ (region(pg_array_0.base) <= 0).
+  Type: (region(G_glob_array_51) <= 0) /\ (region(pg_array_0.base) <= 0) /\
+      scinit(Init_0).
   (* Else *)
   Have: 10 <= i.
 }
@@ -46,7 +47,8 @@ Let a_2 = shift_sint32(pg_array_0, 0).
 Assume {
   Type: is_sint32(i).
   (* Heap *)
-  Type: (region(G_glob_array_51) <= 0) /\ (region(pg_array_0.base) <= 0).
+  Type: (region(G_glob_array_51) <= 0) /\ (region(pg_array_0.base) <= 0) /\
+      scinit(Init_0).
   (* Else *)
   Have: 10 <= i.
 }
@@ -76,7 +78,8 @@ Let a = global(G_glob_atomic_39).
 Assume {
   Type: is_sint32(i_2).
   (* Heap *)
-  Type: (region(G_glob_atomic_39) <= 0) /\ (region(pg_atomic_0.base) <= 0).
+  Type: (region(G_glob_atomic_39) <= 0) /\ (region(pg_atomic_0.base) <= 0) /\
+      scinit(Init_0).
   (* Else *)
   Have: 10 <= i_2.
 }
@@ -92,7 +95,8 @@ Let a = global(G_glob_comp_45).
 Assume {
   Type: is_sint32(i).
   (* Heap *)
-  Type: (region(G_glob_comp_45) <= 0) /\ (region(pg_comp_0.base) <= 0).
+  Type: (region(G_glob_comp_45) <= 0) /\ (region(pg_comp_0.base) <= 0) /\
+      scinit(Init_0).
   (* Else *)
   Have: 10 <= i.
 }
@@ -107,7 +111,8 @@ Let a = global(G_glob_comp_45).
 Assume {
   Type: is_sint32(i).
   (* Heap *)
-  Type: (region(G_glob_comp_45) <= 0) /\ (region(pg_comp_0.base) <= 0).
+  Type: (region(G_glob_comp_45) <= 0) /\ (region(pg_comp_0.base) <= 0) /\
+      scinit(Init_0).
   (* Else *)
   Have: 10 <= i.
 }
@@ -133,7 +138,7 @@ Goal Check 'FAIL' (file assigned_not_initialized_memtyped.i, line 22):
 Assume {
   Type: is_sint32(i).
   (* Heap *)
-  Type: region(s.base) <= 0.
+  Type: (region(s.base) <= 0) /\ scinit(Init_0).
   (* Else *)
   Have: 10 <= i.
 }

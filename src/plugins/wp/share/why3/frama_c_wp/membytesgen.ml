@@ -634,6 +634,10 @@ let membytes_context fmt () =
     {|
   predicate bytes(m: memory) =
     forall a: addr. 0 <= raw_get m a <= 255
+
+  predicate scinit (m: init) =
+    forall a: addr. binit a.base ->
+      get (get m a.base) a.offset
 |}
 
 let membytes fmt () =

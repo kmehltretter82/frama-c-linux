@@ -981,8 +981,6 @@ let is_well_formed sigma =
   let have p = pool := p :: !pool in
   Sigma.iter (fun c m ->
       match Sigma.ckind c with
-      | State.Mu T_init ->
-        have @@ MemMemory.scinit (F.e_var m)
       | State.Mu (M_int _ as chunk) ->
         have @@ F.p_call (ChunkContent.get chunk) [F.e_var m]
       | _ -> ()
@@ -1089,6 +1087,7 @@ let frame sigma =
     else []
   in
   wellformed_frame MemAddr.linked T_alloc @
+  wellformed_frame MemMemory.scinit T_init @
   wellformed_frame MemMemory.sconst (M_int (Ctypes.c_char ())) @
   wellformed_frame MemMemory.framed M_pointer
 
