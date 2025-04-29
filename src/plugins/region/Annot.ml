@@ -76,16 +76,58 @@ let add_post_cond m kf ki b formal cs =
 
 let add_extension _ = ()
 
-let add_behavior ~kf ~ki (m:map) (b:behavior) =
+let formal kf m =
   let formals = Kernel_function.get_formals kf in
   let add_formal f v = Vmap.add v (of_typ (new_chunk m) v.vtype) f in
-  let f = List.fold_left add_formal Vmap.empty formals in
+  List.fold_left add_formal Vmap.empty formals
+
+let add_behavior ~kf ~ki (m:map) (b:behavior) =
+  let f = formal kf m in
   List.iter (add_requires m kf ki b f) b.b_requires ;
   List.iter (add_assumes m kf ki b f)  b.b_assumes  ;
   add_post_cond m kf ki b f            b.b_post_cond ;
   add_assigns m kf ki b f              b.b_assigns ;
   add_allocation m kf ki b f           b.b_allocation ;
   List.iter (add_extension)            b.b_extended
+
+(* -------------------------------------------------------------------------- *)
+(* ---  Process Code Annotation                                           --- *)
+(* -------------------------------------------------------------------------- *)
+
+let add_variant _ = ()
+
+let add_spec ~kf ~ki (map:map) (s:spec) =
+  let formal = formal kf map in
+  let p_term = Property.ip_terminates_of_spec kf ki s in
+  let env_term op = { map ; property = Option.get op ; formal ; result = pure } in
+  Option.iter (add_ip (env_term p_term)) s.spec_terminates ;
+  Option.iter (add_variant) s.spec_variant ;
+  List.iter (add_behavior ~kf ~ki map) s.spec_behavior
+
+let add_code_annot ~kf ~ki ~stmt (map:map) (c:code_annotation) =
+  let formal = formal kf map in
+  match c.annot_content with
+  | AAssert (_,{ tp_statement = p }) ->
+    let property = Property.ip_of_code_annot_single kf stmt c in
+    let env = { map ; property ; formal ; result = pure } in
+    add_predicate env p
+  | AStmtSpec (_,s) -> add_spec ~kf ~ki map s
+  | AInvariant (_,_,{ tp_statement = p }) ->
+    let property = Property.ip_of_code_annot_single kf stmt c in
+    let env = { map ; property ; formal ; result = pure } in
+    add_predicate env p
+  | AVariant v -> add_variant v
+  | AAssigns (_,WritesAny) -> ()
+  | AAssigns (_,Writes asgn) ->
+    let property = Option.get @@ Property.ip_assigns_of_code_annot kf ki c in
+    List.iter (iadd_from { map ; property ; formal ; result = pure }) asgn
+  | AAllocation (_,FreeAllocAny) -> ()
+  | AAllocation (_,(FreeAlloc (its1,its2) as alloc)) ->
+    let bol = Property.Id_loop c in
+    let property = Option.get @@ Property.ip_of_allocation kf ki bol alloc in
+    List.iter (iadd_it { map ; property ; formal ; result = pure }) its1 ;
+    List.iter (iadd_it { map ; property ; formal ; result = pure }) its2
+  | AExtended (_,_,_) -> assert false
 
 
 (* let add_code_annot ... = ... *)

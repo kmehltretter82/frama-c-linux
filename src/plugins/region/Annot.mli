@@ -25,3 +25,5 @@ open Cil_types
 open Memory
 
 val add_behavior : kf:kernel_function -> ki:kinstr -> map -> behavior -> unit
+val add_code_annot : kf:kernel_function ->
+  ki:kinstr -> stmt:stmt -> map -> code_annotation -> unit
