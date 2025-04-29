@@ -598,8 +598,9 @@ struct
         | Memory.Loc l -> pointer_val l
       in stored seq obj l1 v
 
-  let copied_init seq obj l1 l2 =
-    stored_init seq obj l1 (load_init seq.pre obj l2)
+  let copied_init seq obj l1 l2 = match oget_Mloc l1, oget_Mloc l2 with
+    | Some l1, Some l2 -> M.copied_init seq obj l1 l2
+    | _, _ -> stored_init seq obj l1 (load_init seq.pre obj l2)
 
   (* -------------------------------------------------------------------------- *)
   (* ---  Pointer Comparison                                                --- *)
