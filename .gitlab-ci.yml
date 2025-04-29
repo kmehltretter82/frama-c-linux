@@ -21,7 +21,7 @@ default:
 ### VARIABLES
 
 variables:
-  DEFAULT: "master"
+  DEFAULT: "stable/release"
   OCAML: "4.14"
   OPAM_OPTS: "--with-test --with-doc"
   NODE: "22"
