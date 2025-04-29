@@ -95,14 +95,13 @@ type binop =
   | BXor     (** exclusive-or *)
   | BOr      (** inclusive-or *)
 
-  | LAnd     (** logical and. Unlike other expressions this one does not always
-                 evaluate both operands. If you want
-                 to use these, you must set
-                 {!Cil.useLogicalOperators}. *)
-  | LOr      (** logical or. Unlike other expressions this one does not always
-                 evaluate both operands.  If you
-                 want to use these, you must set
-                 {!Cil.useLogicalOperators}. *)
+  | LAnd     (** logical and. Unlike other operators, this one does not always
+                 evaluate both operands. If you want to keep it during
+                 normalization, you must set {!Kernel.LogicalOperators}. You can
+                 know if the current machine support them via
+                 {!Machine.use_logical_operators}. *)
+  | LOr      (** logical or. Like [LAnd] this operator is removed unless
+                 {!Kernel.LogicalOperators} is set. *)
 [@@deriving eq]
 
 (* ************************************************************************* *)
