@@ -34,7 +34,7 @@ import { Modal, showModal, closeModal } from './dialogs';
 import { Markdown } from './text/markdown';
 import { SideBar, SidebarTitle } from './frame/sidebars';
 import { Tree, Node } from './frame/tree';
-import { LSplit, Direction } from './layout/splitters';
+import { LSplit } from './layout/splitters';
 
 import * as Ivette from 'ivette';
 import { ChapterProps } from 'ivette';
@@ -279,7 +279,7 @@ function GeneralDocModal(): JSX.Element {
   return (
     <Modal className='modal-framac-doc' label={title} actions={actionsHeader}>
       <LSplit settings="frama-c.modal-doc.split"
-        defaultPosition={Direction.VERTICAL}
+        defaultPosition={250}
       >
         <SideBar>
           <SidebarTitle label='Table of contents' >
