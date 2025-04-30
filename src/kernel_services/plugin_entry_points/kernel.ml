@@ -1777,9 +1777,8 @@ module Remove_projects =
   P.Make_set
     (struct
       include Project.Datatype
-      let of_singleton_string = P.no_element_of_string
       let of_string s =
-        try Project.from_unique_name s
+        try [ Project.from_unique_name s ]
         with Project.Unknown_project ->
           raise (P.Cannot_build ("no project '" ^ s ^ "'"))
       let to_string = Project.get_unique_name

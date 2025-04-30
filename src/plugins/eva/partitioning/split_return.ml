@@ -263,7 +263,7 @@ module KfStrategy = Kernel_function.Make_Table(Split_strategy)
     (struct
       let size = 17
       let dependencies = [Parameters.SplitReturnFunction.self;
-                          Parameters.SplitGlobalStrategy.self;
+                          Parameters.SplitReturn.self;
                           AutoStrategy.self]
       let name = "Value.Split_return.Kfstrategy"
     end)
@@ -277,7 +277,7 @@ let kf_strategy =
          | Split_strategy.SplitAuto -> find_auto_strategy kf
          | s -> s
        with Not_found ->
-       match Parameters.SplitGlobalStrategy.get () with
+       match Parameters.SplitReturn.get () with
        | Split_strategy.SplitAuto -> find_auto_strategy kf
        | s -> s
     )
@@ -302,11 +302,11 @@ let pretty_strategies fmt =
   in
   Parameters.SplitReturnFunction.iter pp_user;
   if not (Parameters.SplitReturnFunction.is_empty ()) &&
-     match Parameters.SplitGlobalStrategy.get () with
+     match Parameters.SplitReturn.get () with
      | Split_strategy.NoSplit | Split_strategy.SplitAuto -> false
      | _ -> true
   then Format.fprintf fmt "@[other functions:@]@ ";
-  begin match Parameters.SplitGlobalStrategy.get () with
+  begin match Parameters.SplitReturn.get () with
     | SplitAuto ->
       let pp_auto kf s =
         if not (Parameters.SplitReturnFunction.mem kf) then
@@ -321,7 +321,7 @@ let pretty_strategies fmt =
 
 let pretty_strategies () =
   if not (Parameters.SplitReturnFunction.is_empty ()) ||
-     (Parameters.SplitGlobalStrategy.get () != Split_strategy.NoSplit)
+     (Parameters.SplitReturn.get () != Split_strategy.NoSplit)
   then
     let dkey = Self.dkey_split_return in
     Self.feedback ~dkey
