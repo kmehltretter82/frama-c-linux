@@ -36,66 +36,60 @@ let ty_fst_arg = function
   | _ -> raise Not_found
 
 
-let l_memcpy = Qed.Engine.F_call "memcpy"
-let l_set_init = Qed.Engine.F_call "set_init"
-
-let p_eqmem = Lang.extern_fp ~library "eqmem"
-let f_memcpy = Lang.extern_f ~library ~typecheck:ty_fst_arg ~link:l_memcpy "memcpy"
-let p_framed = Lang.extern_fp ~coloring:true ~library "framed" (* m-pointer -> prop *)
+let f_eqmem = Lang.extern_fp ~library "eqmem"
+let f_memcpy = Lang.extern_f ~library ~typecheck:ty_fst_arg "memcpy"
+let p_framed = Lang.extern_fp ~coloring:true ~library "framed" (* ptr-memory -> prop *)
 let p_sconst = Lang.extern_fp ~coloring:true ~library "sconst" (* int-memory -> prop *)
-let f_set_init =
-  Lang.extern_f ~library ~typecheck:ty_fst_arg ~link:l_set_init "set_init"
-let p_cinits = Lang.extern_fp ~coloring:true ~library "cinits" (* initializaton-table -> prop *)
-let p_is_init_r = Lang.extern_fp ~library "is_init_range"
-let p_monotonic = Lang.extern_fp ~library "monotonic_init"
+let p_scinit = Lang.extern_fp ~coloring:true ~library "scinit" (* init-memory -> prop *)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Utilities                                                          --- *)
 (* -------------------------------------------------------------------------- *)
 
-let t_mem t = L.Array(MemAddr.t_addr,t)
 let t_malloc = L.Array(L.Int,L.Int)
+let t_mem t = L.Array(MemAddr.t_addr,t)
 let t_init = L.Array(MemAddr.t_addr,L.Bool)
 
-let cinits memory = p_call p_cinits [ memory ]
 let sconst memory = p_call p_sconst [ memory ]
+let scinit memory = p_call p_scinit [ memory ]
 let framed memory = p_call p_framed [ memory ]
 
 (* -------------------------------------------------------------------------- *)
-(* --- Simplifier for 'havoc'                                             --- *)
+(* --- Simplifier for 'eqmem'                                             --- *)
 (* -------------------------------------------------------------------------- *)
 
-(* havoc(m_undef, havoc(_undef,m0,p0,a0), p1,a1) =
-   - havoc(m_undef, m0, p1,a1) WHEN included (p1,a1,p0,a0) *)
-let r_havoc = function
-  | [m1;undef1;p1;p2;a1] -> begin
-      if equal p1 p2 then
-        match F.repr m1 with
-        | L.Fun( f , [m0;_undef0;p01;p02;a0] ) when f == f_memcpy ->
-          if equal p01 p02 then begin
-            let open Qed.Logic in
-            match MemAddr.is_included [p01;a0;p1;a1] with
-            | Yes -> F.e_fun f_memcpy [m0;undef1;p1;p2;a1]
-            | _ -> raise Not_found
-          end else raise Not_found
-        | _ -> raise Not_found
-      else raise Not_found
-    end
+let r_eqmem = function
+  | [_;_;_;n] when n = e_zero -> e_true
+  | [m0;m1;p;n] when n = e_one -> e_eq (e_get m0 p) (e_get m1 p)
   | _ -> raise Not_found
 
-(* havoc(undef,m,p,a)[k] =
-   - m[k]     WHEN separated (p,a,k,1)
-   - undef[k] WHEN NOT separated (p,a,k,1)
+(* -------------------------------------------------------------------------- *)
+(* --- Simplifier for 'memcpy'                                            --- *)
+(* -------------------------------------------------------------------------- *)
+
+(* memcpy(m,q,m0,q0,n)[p] =
+   - m[p] WHEN separated (p,1,q,n)
+   - m0[q0 ++ p.offset - q.offset] WHEN not separated (p,1,q,n)
 *)
-let r_get_havoc es ks =
+let r_get_memcpy es ks =
   match es, ks with
-  | [m;undef;p1;p2;a],[k] ->
-    if equal p1 p2 then begin
-      match MemAddr.is_separated [p1;a;k;e_one] with
-      | L.Yes -> F.e_get m k
-      | L.No  -> F.e_get undef k
+  | [m;q;m0;q0;n],[p] ->
+    begin
+      match MemAddr.is_separated [p;e_one;q;n] with
+      | L.Yes -> F.e_get m p
+      | L.No ->
+        if p == q then
+          F.e_get m0 q0
+        else
+        if q == q0 then
+          F.e_get m0 p
+        else
+          let i = MemAddr.offset p in
+          let j = MemAddr.offset q in
+          let q' = MemAddr.shift q0 (F.e_sub i j) in
+          F.e_get m0 q'
       | _ -> raise Not_found
-    end else raise Not_found
+    end
   | _ -> raise Not_found
 
 (* -------------------------------------------------------------------------- *)
@@ -104,35 +98,9 @@ let r_get_havoc es ks =
 
 let () = Context.register
     begin fun () ->
-      F.set_builtin f_memcpy r_havoc ;
-      F.set_builtin_get f_memcpy r_get_havoc ;
+      F.set_builtin f_eqmem r_eqmem ;
+      F.set_builtin_get f_memcpy r_get_memcpy ;
     end
-
-(* -------------------------------------------------------------------------- *)
-(* --- Frame Conditions                                                   --- *)
-(* -------------------------------------------------------------------------- *)
-
-module T = Definitions.Trigger
-
-let frames ~addr:p ~offset:n ~sizeof:s ?(basename="mem") tau =
-  let t_mem = L.Array(MemAddr.t_addr,tau) in
-  let m  = F.e_var (Lang.freshvar ~basename t_mem) in
-  let m' = F.e_var (Lang.freshvar ~basename t_mem) in
-  let pt' = F.e_var (Lang.freshvar ~basename:"pt" MemAddr.t_addr) in
-  let ps' = F.e_var (Lang.freshvar ~basename:"ps" MemAddr.t_addr) in
-  let n' = F.e_var (Lang.freshvar ~basename:"n" L.Int) in
-  let mh = F.e_fun f_memcpy [m;m';pt';ps';n'] in
-  let v' = F.e_var (Lang.freshvar ~basename:"v" tau) in
-  let meq = F.p_call p_eqmem [m;m';pt';n'] in
-  let diff = F.p_call MemAddr.p_separated [p;n;pt';s] in
-  let sep = F.p_call MemAddr.p_separated [p;n;pt';n'] in
-  let inc = F.p_call MemAddr.p_included [p;n;pt';n'] in
-  let teq = T.of_pred meq in
-  [
-    "update" , [] , [diff] , m , e_set m pt' v' ;
-    "eqmem" , [teq] , [inc;meq] , m , m' ;
-    "memcpy_neq" , [] , [sep] , m , mh ;
-  ]
 
 (* -------------------------------------------------------------------------- *)
 (* --- Unsupported Unions                                                 --- *)
@@ -140,10 +108,10 @@ let frames ~addr:p ~offset:n ~sizeof:s ?(basename="mem") tau =
 
 let wkey = Wp_parameters.register_warn_category "union"
 
-let unsupported_union (fd : Cil_types.fieldinfo) =
+let unsupported_union ~model (fd : Cil_types.fieldinfo) =
   if not fd.fcomp.cstruct then
     Wp_parameters.warning ~once:true ~wkey
-      "Accessing union fields with WP might be unsound.@\n\
-       Please refer to WP manual."
+      "Accessing union fields with %s model might be unsound.@\n\
+       Please refer to WP manual." model
 
 (* -------------------------------------------------------------------------- *)

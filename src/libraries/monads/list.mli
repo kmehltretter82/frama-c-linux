@@ -24,5 +24,5 @@
     to represent non-deterministic computations.
     @since Frama-C+dev *)
 
-include module type of Stdlib.List
 include Monad.S_with_product with type 'a t = 'a list
+include module type of Stdlib.List

@@ -25,5 +25,10 @@
     the standard library.
     @since Frama-C+dev *)
 
-include module type of Stdlib.Option
 include Monad.S_with_product with type 'a t = 'a option
+include module type of Stdlib.Option
+
+(** Reverse {!Stdlib.Option.bind} parameters for monad compatibility.
+    [bind f o] is [f v] if [o] is [Some v] and [None] if [o] is [None].
+*)
+val bind: ('a -> 'b t) -> 'a t -> 'b t

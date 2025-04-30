@@ -796,8 +796,6 @@ struct
             } ;
             Some lfun
           end ()
-      | { lt_def = Some(LTsum(_)) ; lt_params=_ } ->
-        Wp_parameters.not_yet_implemented "Type parameters for sum types"
       | _ -> None
     in
     Typedefs.update lt constrainer ;

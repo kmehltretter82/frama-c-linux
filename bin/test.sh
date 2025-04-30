@@ -246,6 +246,10 @@ if [ "$VERBOSE" = "yes" ]; then
   DUNE_OPT+=("--always-show-command-line")
 fi
 
+if [ "$COVER" = "yes" ]; then
+    DUNE_OPT+=("--workspace=dev/dune-workspace.cover")
+fi
+
 # Pass all the remaining options (after '--') to dune at the end of the command
 DUNE_OPT_POST=("$@")
 
@@ -320,8 +324,6 @@ function PrepareCoverage
         Cmd rm -rf _bisect
         Cmd mkdir _coverage
         Cmd mkdir _bisect
-
-        DUNE_OPT+=("--workspace dev/dune-workspace.cover")
     fi
 }
 
@@ -409,7 +411,9 @@ function PrepareTests
 function RunAlias
 {
     Head "Running tests..."
-    local commands=("${DUNE_OPT[@]}" "$@" "${DUNE_OPT_POST[@]}")
+    # Do not use "" here to avoid 'unknown option' on options with arguments.
+    # shellcheck disable=SC2206
+    local commands=(${DUNE_OPT[@]} $@ ${DUNE_OPT_POST[@]})
 
     if [ "$DUNE_LOG" = "" ]; then
         Run dune build "${commands[@]}"

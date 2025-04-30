@@ -7,20 +7,19 @@
 [wp] [Unsuccess] typed_comp_check_FAIL (Alt-Ergo) (Cached)
 [wp] [Unsuccess] typed_array_check_FAIL (Alt-Ergo) (Cached)
 [wp] [Unsuccess] typed_assigned_glob_atomic_check_FAIL (Alt-Ergo) (Cached)
-[wp] [Valid] typed_assigned_glob_atomic_check_OK (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_assigned_glob_atomic_check_OK (Alt-Ergo) (Cached)
 [wp] [Unsuccess] typed_assigned_glob_comp_check_FAIL (Alt-Ergo) (Cached)
 [wp] [Unsuccess] typed_assigned_glob_comp_check_FAIL_2 (Alt-Ergo) (Cached)
 [wp] [Unsuccess] typed_assigned_glob_array_check_FAIL (Alt-Ergo) (Cached)
-[wp] [Valid] typed_assigned_glob_array_check_OK (Alt-Ergo) (Cached)
-[wp] Proved goals:    2 / 9
-  Alt-Ergo:        2
-  Unsuccess:       7
+[wp] [Unsuccess] typed_assigned_glob_array_check_OK (Alt-Ergo) (Cached)
+[wp] Proved goals:    0 / 9
+  Unsuccess:       9
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   atomic                    -        -        1       0.0%
   comp                      -        -        1       0.0%
   array                     -        -        1       0.0%
-  assigned_glob_atomic      -        1        2      50.0%
+  assigned_glob_atomic      -        -        2       0.0%
   assigned_glob_comp        -        -        2       0.0%
-  assigned_glob_array       -        1        2      50.0%
+  assigned_glob_array       -        -        2       0.0%
 ------------------------------------------------------------

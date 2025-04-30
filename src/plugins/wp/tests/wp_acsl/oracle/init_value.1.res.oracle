@@ -15,16 +15,16 @@
 [wp] [Valid] Goal main_ko_exits (Cfg) (Unreachable)
 [wp] [Valid] Goal main_ko_terminates (Cfg) (Trivial)
 [wp:union] init_value.i:61: Warning: 
-  Accessing union fields with WP might be unsound.
+  Accessing union fields with Hoare model might be unsound.
   Please refer to WP manual.
 [wp:union] init_value.i:73: Warning: 
-  Accessing union fields with WP might be unsound.
+  Accessing union fields with Hoare model might be unsound.
   Please refer to WP manual.
 [wp:union] init_value.i:72: Warning: 
-  Accessing union fields with WP might be unsound.
+  Accessing union fields with Hoare model might be unsound.
   Please refer to WP manual.
 [wp:union] init_value.i:40: Warning: 
-  Accessing union fields with WP might be unsound.
+  Accessing union fields with Hoare model might be unsound.
   Please refer to WP manual.
 ------------------------------------------------------------
   Function fa1

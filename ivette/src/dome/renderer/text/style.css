@@ -82,11 +82,27 @@
   }
 }
 
+@keyframes blink-animation { 50% { opacity: 0; } }
+
 .dome-pages a
 {
   color: var(--text-highlighted);
   font-weight: 600;
   text-decoration: none;
+
+  &.invalid-link {
+    font-size: bolder;
+    pointer-events: none;
+    &::before {
+      color: red;
+      animation: blink-animation 1s infinite;
+      content: "⚠ ";
+    }
+    &::after {
+      color: var(--error);
+      content: " (" attr(href) ": is not a valid id)";
+    }
+  }
 }
 
 .dome-pages code {

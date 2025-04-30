@@ -778,23 +778,20 @@ struct
     obj , domain , seq , loc
 
   let cc_stored lv seq loc obj expr =
-    let intercept_volatile kind lv =
-      let warn = "unsafe " ^ kind ^ "-access to volatile l-value" in
+    let is_volatile kind lv =
+      let warn = Printf.sprintf "unsafe %s-access to volatile l-value" kind in
       Cil.isVolatileLval lv && Cvalues.volatile ~warn ()
     in
-    if intercept_volatile "write" lv then None
+    if is_volatile "write" lv then None
     else
       let value = match expr.enode with
-        | Lval lv when not @@ intercept_volatile "read" lv ->
+        | Lval lv when not @@ is_volatile "read" lv ->
           M.copied seq obj loc (C.lval seq.pre lv)
         | _ ->
-          (* Note: a volatile lval will be compiled to an unknown value *)
           M.stored seq obj loc (C.val_of_exp seq.pre expr)
       in
       let init = match expr.enode with
-        | Lval lv when intercept_volatile "read" lv ->
-          M.stored_init seq obj loc (Cvalues.initialized_obj obj)
-        | Lval lv when Ast_types.is_struct_or_union (Cil.typeOfLval lv) ->
+        | Lval lv when not @@ is_volatile "read" lv ->
           M.copied_init seq obj loc (C.lval seq.pre lv)
         | _ ->
           M.stored_init seq obj loc (Cvalues.initialized_obj obj)

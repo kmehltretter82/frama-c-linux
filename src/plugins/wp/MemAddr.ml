@@ -72,6 +72,8 @@ let p_included = Lang.extern_fp ~library "included"
 
 (* base -> region *)
 let f_region = Lang.extern_f ~coloring:true ~library ~result:Qed.Logic.Int "region"
+(* always initialized bases *)
+let p_binit =  Lang.extern_fp ~coloring:true ~library "binit"
 (* allocation-table -> prop *)
 let p_linked = Lang.extern_fp ~coloring:true ~library "linked"
 
@@ -96,6 +98,7 @@ let addr_le addr1 addr2 = p_call p_addr_le [ addr1 ; addr2 ]
 (* Regions *)
 
 let region base = e_fun f_region [ base ]
+let binit base = p_call p_binit [ base ]
 let linked memory = p_call p_linked [ memory ]
 
 (* Validity *)

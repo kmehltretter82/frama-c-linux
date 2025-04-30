@@ -149,6 +149,10 @@ export interface MarkdownProps {
   patterns?: Pattern[];
   /** scroll to the chosen id */
   scrollTo?: string;
+  /** On link click */
+  onLinkClick?: (id: string) => void
+  /** check link: return true if id existe */
+  checkLink?: (id: string) => boolean
   /** Children */
   children?: string | null;
 }
@@ -156,7 +160,8 @@ export interface MarkdownProps {
 export function Markdown(
   props: MarkdownProps
 ): JSX.Element {
-  const { className, scrollTo, patterns = [], children } = props;
+  const { className, scrollTo, checkLink, onLinkClick,
+    patterns = [], children } = props;
   const mdPatterns = patterns.concat(defautPatterns);
 
   const theme = Themes.useColorTheme()[0];
@@ -201,10 +206,14 @@ export function Markdown(
     a: ({ href, children }) => {
       if (href && href.startsWith("#")) {
         const id = href.slice(1);
+        const className = checkLink && !checkLink(id) ?
+          "invalid-link" : undefined;
         return ( <a href={href}
+          className={className}
           onClick={(e) => {
             e.preventDefault();
-            scroll(id);
+            if(onLinkClick) onLinkClick(id);
+            else scroll(id);
           }}>{children}</a>
         );
       }

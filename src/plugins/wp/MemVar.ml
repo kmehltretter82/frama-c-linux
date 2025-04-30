@@ -454,7 +454,8 @@ struct
     | Loc l -> Loc (M.field l f)
     | Ref x -> noref ~op:"field access to" x
     | Val(m,x,ofs) ->
-      if not @@ is_heap_allocated m then MemMemory.unsupported_union f ;
+      if not @@ is_heap_allocated m then
+        MemMemory.unsupported_union ~model:"Hoare" f ;
       Val(m,x,ofs @ [Field f])
 
   let rec ofs_shift obj k = function
@@ -589,7 +590,8 @@ struct
       Some ((mloc_of_path m x ofs))
     | Ref _ | Val ((CREF | CVAL), _, _) -> None
 
-  let copied seq obj l1 l2 = match oget_Mloc l1, oget_Mloc l2 with
+  let copied seq obj l1 l2 =
+    match oget_Mloc l1, oget_Mloc l2 with
     | Some l1, Some l2 -> M.copied seq obj l1 l2
     | _, _ ->
       let v = match load seq.pre obj l2 with
@@ -598,7 +600,11 @@ struct
       in stored seq obj l1 v
 
   let copied_init seq obj l1 l2 =
-    stored_init seq obj l1 (load_init seq.pre obj l2)
+    match oget_Mloc l1, oget_Mloc l2 with
+    | Some l1, Some l2 -> M.copied_init seq obj l1 l2
+    | _, _ ->
+      let vi = load_init seq.pre obj l2 in
+      stored_init seq obj l1 vi
 
   (* -------------------------------------------------------------------------- *)
   (* ---  Pointer Comparison                                                --- *)

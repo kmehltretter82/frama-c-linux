@@ -79,12 +79,40 @@ void glob_arr(void)
 
 void formal(int x)
 {
+  int l = 42;
+
 	int * p = &x ;
 	//@ assert provable: \initialized(p);
+
+  int * q = &l ;
+  *q = x ;
+  //@ assert provable: \initialized(q);
 }
 
 void ptr_on_local(void){
   int x[3] = {0} ;
   int *p = x ;
   //@ assert provable: \initialized(p + (0..2));
+}
+
+struct X { int x, y ; };
+
+void copy_struct(void){
+  struct X x = {1, 2};
+
+  struct X y ;
+  y.x = 1;
+
+  struct X z = {1, 2};
+
+  z = y ;
+  y = x ;
+
+  struct X* px = &x ;
+  struct X* py = &y ;
+  struct X* pz = &z ;
+
+  //@ assert provable:  \initialized(px);
+  //@ assert provable:  \initialized(py);
+  //@ assert not_provable: !\initialized(pz);
 }

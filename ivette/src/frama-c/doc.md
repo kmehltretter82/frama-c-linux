@@ -22,7 +22,7 @@ related to the element, including:
 ## Source code {#framac-source-code}
 
 This component displays the source code of the files given to Frama-C.
-It is synchronized with the [AST](#frama-c-ast) component: it is centered
+It is synchronized with the [AST](#framac-ast) component: it is centered
 on the line containing the currently selected AST element;
 when possible, left-clicking on a line selects the related AST element.
 

@@ -227,10 +227,11 @@ let rec tau_of_ltype t =
   | Lreal -> Logic.Real
   | Ctype typ -> tau_of_ctype typ
   | Lvar x -> Logic.Tvar (varpoly 1 x (Context.get poly))
-  | Larrow _ ->
-    Warning.error "array type non-supported(%a)"
-      Printer.pp_logic_type t
   | Ltype(lt,lts) -> atype lt (List.map tau_of_ltype lts)
+  | Larrow(ts,tr) ->
+    List.fold_left
+      (fun r k -> Logic.Array(tau_of_ltype k,r))
+      (tau_of_ltype tr) ts
 
 let tau_of_return = function None -> Logic.Prop | Some t -> tau_of_ltype t
 

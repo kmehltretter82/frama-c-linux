@@ -94,11 +94,23 @@ and add_exp (m: map) (s:stmt) (e:exp) : scalar =
     -> integral
 
 (* -------------------------------------------------------------------------- *)
+(* --- Compound L-Values                                                  --- *)
+(* -------------------------------------------------------------------------- *)
+
+let is_comp lv =
+  Ast_types.is_struct_or_union @@ Cil.typeOfLval lv
+
+(* -------------------------------------------------------------------------- *)
 (* --- Initializers                                                       --- *)
 (* -------------------------------------------------------------------------- *)
 
 let rec add_init (m:map) (s:stmt) (acs:Access.acs) (lv:lval) (iv:init) =
   match iv with
+
+  | SingleInit { enode = Lval le } when is_comp le ->
+    let r = add_lval m s lv in
+    let v = add_lval m s le in
+    Memory.merge m r v
 
   | SingleInit e ->
     let r = add_lval m s lv in
@@ -120,11 +132,10 @@ let add_instr (m:map) (s:stmt) (instr:instr) =
   match instr with
   | Skip _ | Code_annot _ -> ()
 
-  | Set(lv, { enode = Lval  le }, _)
-    when Ast_types.is_struct_or_union @@ Cil.typeOfLval lv (* cannot get an array *) ->
-    let n1 = add_lval m s lv in
-    let n2 = add_lval m s le in
-    Memory.merge m n1 n2
+  | Set(lv, { enode = Lval le }, _) when is_comp le ->
+    let r = add_lval m s lv in
+    let v = add_lval m s le in
+    Memory.merge m r v
 
   | Set(lv,e,_) ->
     let r = add_lval m s lv in

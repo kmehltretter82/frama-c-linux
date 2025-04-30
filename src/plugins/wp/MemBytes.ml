@@ -41,31 +41,14 @@ struct
     | Some l :: _ -> l
     | _ -> raise Not_found
 
-  let l_memcpy = Qed.Engine.F_call "memcpy"
-  let f_memcpy =
-    Lang.extern_f ~library ~typecheck:ty_fst_arg ~link:l_memcpy "memcpy"
-  let memcpy mtgt msrc ltgt lsrc length =
-    Lang.F.e_fun f_memcpy [mtgt;msrc;ltgt;lsrc;length]
+  let f_eqmem = Lang.extern_fp ~library "eqmem"
+  let f_memcpy = Lang.extern_f ~library ~typecheck:ty_fst_arg "memcpy"
 
-  let p_cinits = Lang.extern_fp ~coloring:true ~library "cinits"
-  let cinits m = p_call p_cinits [m]
   let p_sconst = Lang.extern_fp ~coloring:true ~library "sconst"
   let sconst m = p_call p_sconst [m]
-  let p_eqmem = Lang.extern_fp ~library "eqmem"
-  let eqmem m1 m2 a size = p_call p_eqmem [ m1 ; m2 ; a ; size ]
-  let p_is_init_range = Lang.extern_fp ~library "is_init_range"
-  let is_init_range m a size = p_call p_is_init_range [ m ; a ; size ]
-  let f_set_init_range = Lang.extern_fp ~library "set_init_range"
-  let set_init_range m a size = e_fun f_set_init_range [ m ; a ; size ]
 
-  let ty_fst_arg_val = function
-    | Some (Qed.Logic.Array (_, Qed.Logic.Array (_, t))) :: _ -> t
-    | _ -> raise Not_found
-
-  let f_raw_get = Lang.extern_f ~typecheck:ty_fst_arg_val ~library "raw_get"
-  let raw_get m a = e_fun f_raw_get [ m ; a ]
-  let f_raw_set = Lang.extern_f ~typecheck:ty_fst_arg ~library "raw_set"
-  let raw_set m a v = e_fun f_raw_set [ m ; a ; v]
+  let p_scinit = Lang.extern_fp ~coloring:true ~library "scinit"
+  let scinit m = p_call p_scinit [m]
 
   let p_bytes = Lang.extern_fp ~library "bytes"
   let bytes m = p_call p_bytes [ m ]
@@ -169,11 +152,6 @@ struct
     | Mem -> tau_of_memory
     | Init -> tau_of_init
     | Alloc -> Logic.Array (Logic.Int, Logic.Int)
-
-  let val_of_chunk = function
-    | Mem -> Logic.Int
-    | Init -> Logic.Bool
-    | Alloc -> Logic.Int
 
   let basename_of_chunk = function
     | Mem -> "mem"
@@ -563,7 +541,7 @@ let load_pointer_raw memory _ty loc =
 let load_pointer sigma _ty loc =
   MemAddr.addr_of_int @@ load_int sigma (Ctypes.c_ptr ()) loc
 
-let load_init memory size loc =
+let load_init_raw memory size loc =
   match size with
   | 1 -> WBytes.read_init8  memory loc
   | 2 -> WBytes.read_init16 memory loc
@@ -571,10 +549,10 @@ let load_init memory size loc =
   | 8 -> WBytes.read_init64 memory loc
   | _ -> assert false
 
-let is_init_atom sigma obj loc =
+let load_init_atom sigma obj loc =
   let init_memory = Sigma.value sigma m_init in
   let size = sizeof_object obj in
-  load_init init_memory size loc
+  load_init_raw init_memory size loc
 
 let store_int sigma kind addr v =
   let write = match kind with
@@ -606,110 +584,54 @@ let store_init_raw m size loc v =
   in
   write m loc v
 
-let set_init_atom sigma obj loc v =
+let store_init_atom sigma obj loc v =
   let init_memory = Sigma.value sigma m_init in
   let size = sizeof_object obj in
   m_init, store_init_raw init_memory size loc v
 
-module Model = struct
-
-  let name = "MemBytes.Loader"
+module LOADER =
+struct
+  let name = "MemBytes.LOADER"
 
   type nonrec loc = loc
 
+  let pretty = Lang.F.pp_term
   let sizeof = protected_sizeof_object
   let field = field
   let shift = shift
 
-  let to_addr l = l
   let to_region_pointer l = 0,l
   let of_region_pointer _r _obj l = l
 
   let value_footprint _ _ = Sigma.Domain.singleton m_mem
   let init_footprint _ _ = Sigma.Domain.singleton m_init
 
-  let frames  ~addr:p ~offset:n ?(basename="mem") tau =
-    let t_block = Qed.Logic.Array (Qed.Logic.Int, tau) in
-    let t_mem = Qed.Logic.Array(Qed.Logic.Int, t_block) in
-    let m  = e_var (Lang.freshvar ~basename t_mem) in
-    let m' = e_var (Lang.freshvar ~basename t_mem) in
-    let p' = e_var (Lang.freshvar ~basename:"q" MemAddr.t_addr) in
-    let n' = e_var (Lang.freshvar ~basename:"n" Qed.Logic.Int) in
-    let mh = WBytes.memcpy m m' p' p' n' in
-    let v' = e_var (Lang.freshvar ~basename:"v" tau) in
-    let meq = WBytes.eqmem m m' p' n' in
-    let diff = p_call MemAddr.p_separated [p;n;p';e_one] in
-    let sep = p_call MemAddr.p_separated [p;n;p';n'] in
-    let inc = p_call MemAddr.p_included [p;n;p';n'] in
-    let teq = Definitions.Trigger.of_pred meq in
-    [
-      "update" , []    , [diff]    , m , WBytes.raw_set m p' v' ;
-      "eqmem"  , [teq] , [inc;meq] , m , m' ;
-      "havoc"  , []    , [sep]     , m , mh ;
-    ]
-
-  let frames obj addr chunk =
-    match Sigma.ckind chunk with
-    | State.Mu Alloc -> []
-    | State.Mu m ->
-      let offset = sizeof obj in
-      let tau = Chunk.val_of_chunk m in
-      let basename = Chunk.basename_of_chunk m in
-      frames ~addr ~offset ~basename tau
-    | _ -> []
-
   let last sigma obj l =
     let n = protected_sizeof_object obj in
     e_sub (e_div (allocated sigma l) n) e_one
 
-  let memcpy obj ~mtgt ~msrc ~ltgt ~lsrc ~length chunk =
-    match Sigma.ckind chunk with
-    | State.Mu Alloc -> msrc
-    | State.Mu _ ->
-      let n = e_mul (e_int @@ sizeof_object obj) length in
-      WBytes.memcpy mtgt msrc ltgt lsrc n
-    | _ -> assert false
+  let fresh _l =
+    let x = Lang.freshvar ~basename:"p" MemAddr.t_addr in
+    [x] , e_var x
 
-  let memcpy_enforced_length ~mtgt ~msrc ~ltgt ~lsrc ~length chunk =
-    match Sigma.ckind chunk with
-    | State.Mu Alloc -> msrc
-    | State.Mu _ ->
-      let n = length in
-      WBytes.memcpy mtgt msrc ltgt lsrc n
-    | _ -> assert false
+  let separated p n p' n' = p_call MemAddr.p_separated [p;n;p';n']
 
-  let eqmem_forall obj loc _chunk m1 m2 =
-    let xp = Lang.freshvar ~basename:"p" MemAddr.t_addr in
-    let p = e_var xp in
-    let addrof l = l in
-    let separated =
-      MemAddr.separated
-        ~shift ~addrof ~sizeof (Rloc (C_int UInt8, p)) (Rloc (obj, loc))
-    in
-    let equal = p_equal (WBytes.raw_get m1 p) (WBytes.raw_get m2 p) in
-    [xp],separated,equal
+  let eqmem _chunk m0 m1 l n = p_call WBytes.f_eqmem [m0;m1;l;n]
+  let memcpy _chunk m0 l0 m1 l1 n = e_fun WBytes.f_memcpy [m0;l0;m1;l1;n]
 
   let load_int = load_int
   let load_float = load_float
   let load_pointer = load_pointer
+  let load_init_atom = load_init_atom
 
   let store_int = store_int
   let store_float = store_float
   let store_pointer = store_pointer
-
-  let is_init_atom = is_init_atom
-  let is_init_range sigma obj loc length =
-    let n = e_mul (sizeof obj) length in
-    WBytes.is_init_range (Sigma.value sigma m_init) loc n
-
-  let set_init_atom = set_init_atom
-  let set_init obj loc ~length _chunk ~current =
-    let n = e_mul (sizeof obj) length in
-    WBytes.set_init_range current loc n
+  let store_init_atom = store_init_atom
 
 end
 
-include MemLoader.Make(Model)
+include MemLoader.Make(LOADER)
 
 (* ********************************************************************** *)
 (* BASES                                                                  *)
@@ -759,6 +681,16 @@ module BASE = WpContext.Generator(Cil_datatype.Varinfo)
           l_lemma = p_equal (MemAddr.region base) (e_int region) ;
           l_cluster = cluster_globals () ;
         }
+
+      let binit prefix x base =
+        if Cvalues.always_initialized x then
+          let name = prefix ^ "_binit" in
+          Definitions.define_lemma {
+            l_kind = Admit ;
+            l_name = name ; l_triggers = [] ; l_forall = [] ;
+            l_lemma = MemAddr.binit base ;
+            l_cluster = cluster_globals () ;
+          }
 
       let sizeof x =
         Warning.handle
@@ -821,6 +753,7 @@ module BASE = WpContext.Generator(Cil_datatype.Varinfo)
         static_alloc prefix base ;
         region prefix vi base ;
         alloc prefix vi base ;
+        binit prefix vi base ;
         pointer_type prefix base ;
         base
     end)
@@ -1071,7 +1004,7 @@ let frame sigma =
     else []
   in
   wellformed_frame MemAddr.linked m_alloc @
-  wellformed_frame WBytes.cinits m_init @
+  wellformed_frame WBytes.scinit m_init @
   wellformed_frame WBytes.sconst m_mem @
   [ framed (Sigma.value sigma m_mem) ]
 
@@ -1106,18 +1039,3 @@ let scope seq scope xs =
            in e_set m (BASE.get x) size)
         (Sigma.value seq.pre m_alloc) xs in
     [ p_equal (Sigma.value seq.post m_alloc) alloc ]
-
-(* ********************************************************************** *)
-(* API with Region                                                        *)
-(* ********************************************************************** *)
-
-let sizeof = protected_sizeof_object
-let last = Model.last
-let frames = Model.frames
-let eqmem_forall = Model.eqmem_forall
-let set_init = Model.set_init
-let is_init_range = Model.is_init_range
-let value_footprint = Model.value_footprint
-let init_footprint = Model.init_footprint
-let memcpy = Model.memcpy
-let memcpy_enforced_length = Model.memcpy_enforced_length

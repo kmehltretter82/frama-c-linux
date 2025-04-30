@@ -152,12 +152,10 @@ export function Node(props: NodeProps): JSX.Element {
               label={label}
             ></Label>
           </div>
-          { (actions || foldIconPosition === 'right') &&
-            <Actions>
-              { actions && actions }
-              { foldIconPosition === 'right' && foldIcon }
-            </Actions>
-          }
+          <Actions>
+            { actions && actions }
+            { foldIconPosition === 'right' && foldIcon }
+          </Actions>
       </div>
       { countChildren > 0 &&
         <div className={classSubtree} style={style}>

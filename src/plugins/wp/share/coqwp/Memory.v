@@ -383,20 +383,3 @@ Admitted.
 
 Definition cinits (m: farray addr bool) : Prop.
 Admitted.
-
-Definition is_init_range(m: farray addr bool) (p: addr) (l: Z) :=
-  forall i : int, (0 <= i)%Z /\ (i < l)%Z -> m .[ shift p i ] = true.
-
-Definition set_init (m: farray addr bool) (p:addr) (a: Z) : farray addr bool.
-Admitted.
-
-Lemma set_init_access:
-  forall m: farray addr bool,
-  forall q p : addr,
-  forall a : int,
-    (~  separated q 1%Z p a -> (set_init m p a) .[ q ] = m .[ q ])
-    /\ (separated q 1%Z p a -> (set_init m p a) .[ q ] = true).
-Admitted.
-
-Definition monotonic_init(m1 m2 : farray addr bool) :=
-  forall p: addr, m1 .[ p ] = true -> m2 .[ p ] = true.

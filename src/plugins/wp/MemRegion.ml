@@ -72,45 +72,13 @@ sig
 end
 
 (* -------------------------------------------------------------------------- *)
-(* --- Underlying Model (Handles Addresses & Garbled)                     --- *)
-(* -------------------------------------------------------------------------- *)
-
-module type ModelWithLoader = sig
-  include Memory.Model
-  val sizeof : c_object -> term
-
-  val last : sigma -> c_object -> loc -> term
-  val frames : c_object -> loc -> chunk -> frame list
-
-  val memcpy : c_object -> mtgt:term -> msrc:term -> ltgt:loc -> lsrc:loc ->
-    length:term -> Chunk.t -> term
-  val memcpy_enforced_length : mtgt:term -> msrc:term ->
-    ltgt:loc -> lsrc:loc -> length:term -> Chunk.t -> term
-
-  val eqmem_forall : c_object -> loc -> chunk -> term -> term -> var list * pred * pred
-
-  val load_int : sigma -> c_int -> loc -> term
-  val load_float : sigma -> c_float -> loc -> term
-  val load_pointer : sigma -> typ -> loc -> loc
-
-  val store_int : sigma -> c_int -> loc -> term -> chunk * term
-  val store_float : sigma -> c_float -> loc -> term -> chunk * term
-  val store_pointer : sigma -> typ -> loc -> term -> chunk * term
-
-  val set_init_atom : sigma -> c_object -> loc -> term -> chunk * term
-  val set_init : c_object -> loc -> length:term -> chunk -> current:term -> term
-  val is_init_atom : sigma -> c_object -> loc -> term
-  val is_init_range : sigma -> c_object -> loc -> term -> pred
-
-  val value_footprint : c_object -> loc -> domain
-  val init_footprint : c_object -> loc -> domain
-end
-
-(* -------------------------------------------------------------------------- *)
 (* --- Region Memory Model                                                --- *)
 (* -------------------------------------------------------------------------- *)
 
-module Make (R:RegionProxy) (M:ModelWithLoader) (*: Memory.Model*) =
+module Make
+    (R:RegionProxy)
+    (M:Model)
+    (L:MemLoader.Model with type loc = M.loc) =
 struct
 
   type region = R.region
@@ -150,11 +118,6 @@ struct
       | Array p -> Qed.Logic.Array(MemAddr.t_addr,tau_of_prim p)
       | ArrInit -> Qed.Logic.Array(MemAddr.t_addr,Qed.Logic.Bool)
 
-    let prim_tau_of_chunk { data } =
-      match data with
-      | Value p | Array p -> tau_of_prim p
-      | ValInit | ArrInit -> Qed.Logic.Bool
-
     let basename_of_chunk c =
       match c.data with
       | ValInit -> "Vinit"
@@ -163,7 +126,7 @@ struct
       | Value p ->
         match R.name c.region with
         | Some a -> a
-        | None -> Format.asprintf "V%4x_%a" (R.id c.region) pp_prim p
+        | None -> Format.asprintf "V%04x_%a" (R.id c.region) pp_prim p
 
     let is_init c =
       match c.data with
@@ -185,126 +148,28 @@ struct
   (* --- Region Loader                                                         --- *)
   (* -------------------------------------------------------------------------- *)
 
-  module Loader =
+  module LOADER =
   struct
-    let name = "MemRegion.Loader"
+    let name = "MemRegion.LOADER"
 
     type loc =
       | Null
       | Raw of M.loc
       | Loc of M.loc * region
 
+    let pretty fmt (l: loc) =
+      match l with
+      | Null -> M.pretty fmt M.null
+      | Raw l -> M.pretty fmt l
+      | Loc (l,r) -> Format.fprintf fmt "%a@%a" M.pretty l R.pretty r
+
     let make a = function None -> Raw a | Some r -> Loc(a,r)
     let loc = function Null -> M.null | Raw a | Loc(a,_) -> a
     let reg = function Null | Raw _ -> None | Loc(_,r) -> Some r
-    let kind = function Null | Raw _ -> Garbled | Loc(_,r) -> R.kind r
     let rfold f = function Null | Raw _ -> None | Loc(_,r) -> f r
 
     (* ---------------------------------------------------------------------- *)
     (* --- Utilities on locations                                         --- *)
-    (* ---------------------------------------------------------------------- *)
-
-    let last sigma ty l = M.last sigma ty (loc l)
-
-    let to_addr l = M.pointer_val (loc l)
-
-    let sizeof ty = M.sizeof ty
-
-    let field l fd =
-      make (M.field (loc l) fd) (rfold (fun r -> R.field r fd) l)
-
-    let ofield l fd =
-      Option.map (fun r -> Loc (M.field (loc l) fd, r))
-      @@ rfold (fun r -> R.field r fd) l
-
-    let shift l obj ofs =
-      make (M.shift (loc l) obj ofs) (rfold (fun r -> R.shift r obj) l)
-
-    let frames  ~addr:p ~offset:n ~sizeof:s ?(basename = "Rmem") tau =
-      let t_mem = Qed.Logic.Array(MemAddr.t_addr, tau) in
-      let m  = e_var (Lang.freshvar ~basename t_mem) in
-      let m' = e_var (Lang.freshvar ~basename t_mem) in
-      let pt' = F.e_var (Lang.freshvar ~basename:"pt" MemAddr.t_addr) in
-      let ps' = F.e_var (Lang.freshvar ~basename:"ps" MemAddr.t_addr) in
-      let n' = e_var (Lang.freshvar ~basename:"n" Qed.Logic.Int) in
-      let mh = Lang.F.e_fun f_memcpy [m;m';pt';ps';n'] in
-      let v' = e_var (Lang.freshvar ~basename:"v" tau ) in
-      let meq = p_call p_eqmem [m;m';pt';n'] in
-      let diff = p_call MemAddr.p_separated [p;n;pt';s] in
-      let sep = p_call MemAddr.p_separated [p;n;pt';n'] in
-      let inc = p_call MemAddr.p_included [p;n;pt';n'] in
-      let teq = Definitions.Trigger.of_pred meq in
-      [
-        "update"     , []    , [diff]    , m , e_set m pt' v' ;
-        "eqmem"      , [teq] , [inc;meq] , m , m' ;
-        "memcpy_neq" , []    , [sep]     , m , mh ;
-      ]
-
-
-    let get_tau l c = match kind l, Sigma.ckind c with
-      | _, State.Mu c -> Chunk.prim_tau_of_chunk c
-      | _ -> Sigma.Chunk.tau_of_chunk c
-
-    let frames ty l (c : Sigma.Chunk.t) =
-      match kind l with
-      | Single Ptr | Many Ptr | Garbled ->
-        let offset = M.sizeof ty in
-        let sizeof = M.sizeof ty in
-        let tau = get_tau l c in
-        let basename = Sigma.Chunk.basename_of_chunk c in
-        frames ~addr:(to_addr l) ~offset ~sizeof ~basename tau
-      | _ ->
-        let offset = M.sizeof ty in
-        let sizeof = M.sizeof ty in
-        let tau = get_tau l c in
-        let basename = Sigma.Chunk.basename_of_chunk c in
-        frames ~addr:(to_addr l) ~offset ~sizeof ~basename tau
-
-    let memcpy ty ~mtgt ~msrc ~ltgt ~lsrc ~length chunk =
-      match Sigma.ckind chunk with
-      | State.Mu { data } ->
-        begin
-          match data with
-          | Value _ | ValInit -> msrc
-          | Array _ | ArrInit ->
-            e_fun f_memcpy [mtgt;msrc;to_addr ltgt;to_addr lsrc;length]
-        end
-      | _ ->
-        M.memcpy ty ~mtgt ~msrc ~ltgt:(loc ltgt) ~lsrc:(loc lsrc) ~length chunk
-
-    let memcpy_enforced_length ~mtgt ~msrc ~ltgt ~lsrc ~length chunk =
-      match Sigma.ckind chunk with
-      | State.Mu { data } ->
-        begin
-          match data with
-          | Value _ | ValInit -> msrc
-          | Array _ | ArrInit ->
-            e_fun f_memcpy [mtgt;msrc;to_addr ltgt;to_addr lsrc;length]
-        end
-      | _ ->
-        M.memcpy_enforced_length ~mtgt ~msrc
-          ~ltgt:(loc ltgt) ~lsrc:(loc lsrc) ~length chunk
-
-    let eqmem_forall ty l chunk m1 m2 =
-      match Sigma.ckind chunk with
-      | State.Mu { data } ->
-        begin
-          match data with
-          | Value _ | ValInit -> [], p_true, p_equal m1 m2
-          | Array _ | ArrInit ->
-            let xp = Lang.freshvar ~basename:"b" MemAddr.t_addr in
-            let p = e_var xp in
-            let n = M.sizeof ty in
-            let separated =
-              p_call MemAddr.p_separated [p;e_one;to_addr l;n] in
-            let equal = p_equal (e_get m1 p) (e_get m2 p) in
-            [xp],separated,equal
-        end
-      | _ ->
-        M.eqmem_forall ty (loc l) chunk m1 m2
-
-    (* ---------------------------------------------------------------------- *)
-    (* --- Load                                                           --- *)
     (* ---------------------------------------------------------------------- *)
 
     let localized action = function
@@ -316,8 +181,48 @@ struct
           "Attempt to %s without region (%a)" action M.pretty a
       | Loc(l,r) -> l,r
 
+    let sizeof ty = L.sizeof ty
+    let to_addr l = M.pointer_val (loc l)
+    let last sigma ty l = L.last sigma ty (loc l)
+
+    let field l fd =
+      make (M.field (loc l) fd) (rfold (fun r -> R.field r fd) l)
+
+    let ofield l fd =
+      Option.map (fun r -> Loc (M.field (loc l) fd, r))
+      @@ rfold (fun r -> R.field r fd) l
+
+    let shift l obj ofs =
+      make (M.shift (loc l) obj ofs) (rfold (fun r -> R.shift r obj) l)
+
+    let fresh l =
+      let l0,r = localized "quantify loc" l in
+      let xs, l1 = L.fresh l0 in
+      xs, Loc(l1,r)
+
+    let separated p n p' n' = L.separated (loc p) n (loc p') n'
+
+    let eqmem chunk m0 m1 l n =
+      match Sigma.ckind chunk with
+      | State.Mu { data = ValInit | Value _ } ->
+        p_equal m0 m1
+      | State.Mu { data = ArrInit | Array _ } ->
+        p_call f_eqmem [m0;m1;to_addr l;n]
+      | _ -> L.eqmem chunk m0 m1 (loc l) n
+
+    let memcpy chunk m0 l0 m1 l1 n =
+      match Sigma.ckind chunk with
+      | State.Mu { data = ValInit | Value _ } -> m1
+      | State.Mu { data = ArrInit | Array _ } ->
+        e_fun f_memcpy [m0;to_addr l0;m1;to_addr l1;n]
+      | _ -> L.memcpy chunk m0 (loc l0) m1 (loc l1) n
+
+    (* ---------------------------------------------------------------------- *)
+    (* --- Load                                                           --- *)
+    (* ---------------------------------------------------------------------- *)
+
     let to_region_pointer l =
-      let l,r = localized "loader" l in R.id r, M.pointer_val l
+      let l,r = localized "get region pointer" l in R.id r, M.pointer_val l
 
     let of_region_pointer r _ t =
       make (M.pointer_loc t) (R.of_id r)
@@ -331,7 +236,7 @@ struct
     let load_int sigma iota loc : term =
       let l,r = localized "load int" loc in
       match R.kind r with
-      | Garbled -> M.load_int sigma iota l
+      | Garbled -> L.load_int sigma iota l
       | Single p ->
         check_access "load" p (Int iota) ;
         State.value sigma { data = Value p ; region = r }
@@ -344,7 +249,7 @@ struct
     let load_float sigma flt loc : term =
       let l,r = localized "load float" loc in
       match R.kind r with
-      | Garbled -> M.load_float sigma flt l
+      | Garbled -> L.load_float sigma flt l
       | Single p ->
         check_access "load" p (Float flt) ;
         State.value sigma { data = Value p ; region = r }
@@ -365,7 +270,7 @@ struct
       | Some _ as rp ->
         let loc =
           match R.kind r with
-          | Garbled -> M.load_pointer sigma ty l
+          | Garbled -> L.load_pointer sigma ty l
           | Single p ->
             check_access "load" p Ptr ;
             M.pointer_loc @@
@@ -385,8 +290,7 @@ struct
     let store_int sigma iota loc v : Sigma.chunk * term =
       let l,r = localized "store int" loc in
       match R.kind r with
-      | Garbled ->
-        M.store_int sigma iota l v
+      | Garbled -> L.store_int sigma iota l v
       | Single p ->
         check_access "store" p (Int iota) ;
         State.chunk { data = Value p ; region = r }, v
@@ -398,8 +302,7 @@ struct
     let store_float sigma flt loc v : Sigma.chunk * term =
       let l,r = localized "store float" loc in
       match R.kind r with
-      | Garbled ->
-        M.store_float sigma flt l v
+      | Garbled -> L.store_float sigma flt l v
       | Single p ->
         check_access "store" p (Float flt) ;
         State.chunk { data = Value p ; region = r }, v
@@ -411,8 +314,7 @@ struct
     let store_pointer sigma ty loc v : Sigma.chunk * term =
       let l,r = localized "store pointer" loc in
       match R.kind r with
-      | Garbled ->
-        M.store_pointer sigma ty l v
+      | Garbled -> L.store_pointer sigma ty l v
       | Single p ->
         check_access "store" p Ptr ;
         State.chunk { data = Value p ; region = r }, v
@@ -425,58 +327,37 @@ struct
     (* --- Init                                                           --- *)
     (* ---------------------------------------------------------------------- *)
 
-    let is_init_atom sigma ty loc : term =
+    let load_init_atom sigma obj loc : term =
       let l,r = localized "init atom" loc in
       match R.kind r with
-      | Garbled -> M.is_init_atom sigma ty l
+      | Garbled -> L.load_init_atom sigma obj l
       | Single _-> State.value sigma { data = ValInit ; region = r }
       | Many _ ->
         e_get
           (State.value sigma { data = ArrInit ; region = r })
           (M.pointer_val l)
 
-    let set_init_atom sigma ty loc v : Sigma.chunk * term =
+    let store_init_atom sigma obj loc v : Sigma.chunk * term =
       let l,r = localized "init atom" loc in
       match R.kind r with
-      | Garbled ->
-        M.set_init_atom sigma ty l v
+      | Garbled -> L.store_init_atom sigma obj l v
       | Single _-> State.chunk { data = ValInit ; region = r }, v
       | Many _ ->
         let rc = Chunk.{ data = ArrInit ; region = r } in
         State.chunk rc, e_set (State.value sigma rc) (M.pointer_val l) v
 
-    let is_init_range sigma ty loc length : pred =
-      let l,r = localized "init atom" loc in
-      match R.kind r with
-      | Garbled -> M.is_init_range sigma ty l length
-      | Single _ ->
-        Lang.F.p_bool @@ State.value sigma { data = ValInit ; region = r }
-      | Many _ ->
-        let map = State.value sigma { data = ArrInit ; region = r } in
-        let size = e_mul (M.sizeof ty) length in
-        p_call p_is_init_r [map;M.pointer_val l;size]
-
-    let set_init ty loc ~length chunk ~current : term =
-      let l,r = localized "init atom" loc in
-      match R.kind r with
-      | Garbled -> M.set_init ty l ~length chunk ~current
-      | Single _ -> e_true
-      | Many _ ->
-        let size = e_mul (M.sizeof ty) length in
-        e_fun f_set_init [current;M.pointer_val l;size]
-
     (* ---------------------------------------------------------------------- *)
     (* --- Footprints                                                     --- *)
     (* ---------------------------------------------------------------------- *)
 
-    let mfootprint ~value obj l =
-      if value
-      then M.value_footprint obj l
-      else M.init_footprint obj l
+    let lfootprint ~init obj l =
+      if init
+      then L.init_footprint obj l
+      else L.value_footprint obj l
 
-    let rec footprint ~value obj loc = match loc with
-      | Null  -> mfootprint ~value obj M.null
-      | Raw l -> mfootprint ~value obj l
+    let rec footprint ~init obj loc = match loc with
+      | Null  -> lfootprint ~init obj M.null
+      | Raw l -> lfootprint ~init obj l
       | Loc(l,r) ->
         match obj with
         | C_comp { cfields = None} -> Domain.empty
@@ -486,91 +367,75 @@ struct
                let obj = Ctypes.object_of fd.ftype in
                match ofield loc fd with
                | None -> dom
-               | Some loc -> Domain.union dom (footprint ~value obj loc)
+               | Some loc -> Domain.union dom (footprint ~init obj loc)
             ) Domain.empty fds
         | C_array { arr_element = elt } ->
           let obj = object_of elt in
-          footprint ~value obj (shift loc obj e_zero)
+          footprint ~init obj (shift loc obj e_zero)
         | C_int _ | C_float _ | C_pointer _ ->
           match R.kind r with
-          | Garbled -> mfootprint ~value obj l
+          | Garbled -> lfootprint ~init obj l
           | Single p ->
-            let data = if value then Chunk.Value p else ValInit in
+            let data = Chunk.(if init then ValInit else Value p) in
             State.singleton { data ; region = r }
           | Many p ->
-            let data = if value then Chunk.Array p else ArrInit in
+            let data = Chunk.(if init then ArrInit else Array p) in
             State.singleton { data ; region = r }
 
-    let value_footprint = footprint ~value:true
-    let init_footprint = footprint ~value:false
+    let value_footprint = footprint ~init:false
+    let init_footprint = footprint ~init:true
 
   end
 
-  type loc = Loader.loc
+  type loc = LOADER.loc
   type segment = loc rloc
 
-  module LOADER = MemLoader.Make(Loader)
+  let pretty = LOADER.pretty
 
-  let load = LOADER.load
-  let load_init = LOADER.load_init
-  let stored = LOADER.stored
-  let stored_init = LOADER.stored_init
-  let copied = LOADER.copied
-  let copied_init = LOADER.copied_init
-  let initialized = LOADER.initialized
-  let domain = LOADER.domain
-  let assigned = LOADER.assigned
-
-  (* {2 Reversing the Model} *)
+  include MemLoader.Make(LOADER)
 
   let lookup = M.lookup (*TODO: lookups in MemRegion *)
 
   let updates = M.updates (*TODO: updates in MemRegion *)
 
-  let pretty fmt (l: loc) =
-    match l with
-    | Null -> M.pretty fmt M.null
-    | Raw l -> M.pretty fmt l
-    | Loc (l,r) -> Format.fprintf fmt "%a@%a" M.pretty l R.pretty r
-
   (* {2 Memory Model API} *)
 
-  let vars l = M.vars @@ Loader.loc l
-  let occurs x l = M.occurs x @@ Loader.loc l
-  let null = Loader.Null
+  let vars l = M.vars @@ LOADER.loc l
+  let occurs x l = M.occurs x @@ LOADER.loc l
+  let null = LOADER.Null
 
   let literal ~eid:eid str =
-    Loader.make (M.literal ~eid str) (R.literal ~eid str)
+    LOADER.make (M.literal ~eid str) (R.literal ~eid str)
 
-  let cvar v = Loader.make (M.cvar v) (R.cvar v)
-  let field = Loader.field
-  let shift = Loader.shift
+  let cvar v = LOADER.make (M.cvar v) (R.cvar v)
+  let field = LOADER.field
+  let shift = LOADER.shift
 
-  let pointer_loc t = Loader.Raw (M.pointer_loc t)
-  let pointer_val l = M.pointer_val @@ Loader.loc l
-  let base_addr l = Loader.Raw (M.base_addr @@ Loader.loc l)
-  let base_offset l = M.base_offset @@ Loader.loc l
-  let block_length sigma obj l = M.block_length sigma obj @@ Loader.loc l
-  let is_null = function Loader.Null -> p_true | Raw l | Loc(l,_) -> M.is_null l
-  let loc_of_int obj t = Loader.Raw (M.loc_of_int obj t)
-  let int_of_loc iota l = M.int_of_loc iota @@ Loader.loc l
+  let pointer_loc t = LOADER.Raw (M.pointer_loc t)
+  let pointer_val l = M.pointer_val @@ LOADER.loc l
+  let base_addr l = LOADER.Raw (M.base_addr @@ LOADER.loc l)
+  let base_offset l = M.base_offset @@ LOADER.loc l
+  let block_length sigma obj l = M.block_length sigma obj @@ LOADER.loc l
+  let is_null = function LOADER.Null -> p_true | Raw l | Loc(l,_) -> M.is_null l
+  let loc_of_int obj t = LOADER.Raw (M.loc_of_int obj t)
+  let int_of_loc iota l = M.int_of_loc iota @@ LOADER.loc l
 
   let cast conv l =
-    let l0 = Loader.loc l in
-    let r0 = Loader.reg l in
-    Loader.make (M.cast conv l0) r0
+    let l0 = LOADER.loc l in
+    let r0 = LOADER.reg l in
+    LOADER.make (M.cast conv l0) r0
 
-  let loc_eq  a b = M.loc_eq  (Loader.loc a) (Loader.loc b)
-  let loc_lt  a b = M.loc_lt  (Loader.loc a) (Loader.loc b)
-  let loc_neq a b = M.loc_neq (Loader.loc a) (Loader.loc b)
-  let loc_leq a b = M.loc_leq (Loader.loc a) (Loader.loc b)
-  let loc_diff obj a b = M.loc_diff obj (Loader.loc a) (Loader.loc b)
+  let loc_eq  a b = M.loc_eq  (LOADER.loc a) (LOADER.loc b)
+  let loc_lt  a b = M.loc_lt  (LOADER.loc a) (LOADER.loc b)
+  let loc_neq a b = M.loc_neq (LOADER.loc a) (LOADER.loc b)
+  let loc_leq a b = M.loc_leq (LOADER.loc a) (LOADER.loc b)
+  let loc_diff obj a b = M.loc_diff obj (LOADER.loc a) (LOADER.loc b)
 
   let rloc = function
-    | Rloc(obj, l) -> Rloc (obj, Loader.loc l)
-    | Rrange(l, obj, inf, sup) -> Rrange(Loader.loc l, obj, inf, sup)
+    | Rloc(obj, l) -> Rloc (obj, LOADER.loc l)
+    | Rrange(l, obj, inf, sup) -> Rrange(LOADER.loc l, obj, inf, sup)
 
-  let rloc_region = function Rloc(_,l) | Rrange(l,_,_,_) -> Loader.reg l
+  let rloc_region = function Rloc(_,l) | Rrange(l,_,_,_) -> LOADER.reg l
 
   let valid sigma acs r = M.valid sigma acs @@ rloc r
   let invalid sigma r = M.invalid sigma (rloc r)
@@ -598,11 +463,9 @@ struct
          | State.Mu { data } ->
            begin
              match data with
-             | ValInit -> ()
-             | ArrInit -> assume @@ MemMemory.cinits (e_var m)
              | Value Ptr -> assume @@ global sigma (e_var m)
              | Array Ptr -> assume @@ MemMemory.framed (e_var m)
-             | Value (Int _ | Float _) | Array (Int _ | Float _) -> ()
+             | ValInit | ArrInit | Value _ | Array _ -> ()
            end
          | _ -> ()
       ) sigma ;

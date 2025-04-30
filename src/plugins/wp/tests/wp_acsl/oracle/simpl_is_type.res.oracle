@@ -207,7 +207,7 @@ Prove: exists i : Z. forall i_1 : Z. (is_uint8(i_1) ->
 
 Goal Post-condition (file simpl_is_type.i, line 17) in 'f':
 Let a = shift_sint32(t, 0).
-Let a_1 = memcpy(Mint_0, Mint_undef_0, a, a, size_0).
+Let a_1 = memcpy(Mint_0, a, Mint_undef_0, a, size_0).
 Assume {
   Type: is_sint32(i) /\ is_sint32(size_0).
   (* Heap *)
@@ -230,7 +230,7 @@ Assume {
   (* Else *)
   Have: size_0 <= i.
 }
-Prove: 0 < memcpy(Mint_0, Mint_undef_0, a, a, i)[shift_sint32(t, i_1)].
+Prove: 0 < memcpy(Mint_0, a, Mint_undef_0, a, i)[shift_sint32(t, i_1)].
 
 ------------------------------------------------------------
 
@@ -246,7 +246,7 @@ Prove: true.
 
 Goal Preservation of Invariant (file simpl_is_type.i, line 23):
 Let a = shift_sint32(t, 0).
-Let a_1 = memcpy(Mint_0, Mint_undef_0, a, a, size_0).
+Let a_1 = memcpy(Mint_0, a, Mint_undef_0, a, size_0).
 Let a_2 = shift_sint32(t, i).
 Let a_3 = a_1[a_2].
 Assume {
@@ -285,7 +285,7 @@ Prove: true.
 
 Goal Preservation of Invariant (file simpl_is_type.i, line 24):
 Let a = shift_sint32(t, 0).
-Let a_1 = memcpy(Mint_0, Mint_undef_0, a, a, size_0).
+Let a_1 = memcpy(Mint_0, a, Mint_undef_0, a, size_0).
 Let a_2 = shift_sint32(t, i).
 Let a_3 = a_1[a_2].
 Let a_4 = a_1[a_2 <- -a_3].
@@ -352,7 +352,7 @@ Prove: true.
 Goal Loop assigns (file simpl_is_type.i, line 25) (3/3):
 Effect at line 29
 Let a = shift_sint32(t, 0).
-Let a_1 = memcpy(Mint_0, Mint_undef_0, a, a, size_0).
+Let a_1 = memcpy(Mint_0, a, Mint_undef_0, a, size_0).
 Let x = i - 1.
 Let a_2 = shift_sint32(t, x).
 Let a_3 = a_1[a_2].
