@@ -368,10 +368,10 @@ module type Caching = sig
       by the ones in [previous_output].
       It must be exact to ensure that the MemExec cache does not impact the
       analysis precision.
-      [reuse] is only applied to re-interpret a code C already analyzed with an
-      equivalent initial state. [current_input] is the new input state for the
-      analysis of C, and [previous_output] was the final state of the former
-      analysis. See below for details.
+      [reuse] is only applied to re-interpret a code <C> already analyzed with
+      an equivalent initial state. [current_input] is the new input state for
+      the analysis of <C>, and [previous_output] was the final state of the
+      former analysis of <C>. See below for details.
       Defined by {!Domain_builder.Complete} with a naive implementation which
       is only sound when [filter] is implemented as the identity. *)
   val reuse: Base.Hptset.t -> current_input:t -> previous_output:t -> t
