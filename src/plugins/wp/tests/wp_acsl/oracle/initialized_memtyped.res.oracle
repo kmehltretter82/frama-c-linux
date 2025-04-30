@@ -1,9 +1,11 @@
 # frama-c -wp [...]
 [kernel] Parsing initialized_memtyped.i (no preprocessing)
 [wp] Running WP plugin...
+[wp] [Valid] Goal copy_struct_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal copy_struct_terminates (Cfg) (Trivial)
+[wp] Warning: Missing RTE guards
 [wp] [Valid] Goal formal_exits (Cfg) (Unreachable)
 [wp] [Valid] Goal formal_terminates (Cfg) (Trivial)
-[wp] Warning: Missing RTE guards
 [wp] [Valid] Goal glob_arr_exits (Cfg) (Unreachable)
 [wp] [Valid] Goal glob_arr_terminates (Cfg) (Trivial)
 [wp] [Valid] Goal glob_var_exits (Cfg) (Unreachable)
@@ -13,12 +15,157 @@
 [wp] [Valid] Goal test_exits (Cfg) (Unreachable)
 [wp] [Valid] Goal test_terminates (Cfg) (Trivial)
 ------------------------------------------------------------
+  Function copy_struct
+------------------------------------------------------------
+
+Goal Assertion 'provable' (file initialized_memtyped.i, line 115):
+Let a = global(L_y_70).
+Let a_1 = shiftfield_F3_X_x(a).
+Let m = Init_0[a_1 <- true].
+Let a_2 = global(L_z_71).
+Let a_3 = memcpy(m, a_2, m, a, 2).
+Let a_4 = global(L_x_69).
+Let a_5 = memcpy(a_3, a, a_3, a_4, 2).
+Let m_1 = Mint_0[a_1 <- 1].
+Let a_6 = memcpy(m_1, a_2, m_1, a, 2).
+Let a_7 = shiftfield_F3_X_y(a_2).
+Let a_8 = shiftfield_F3_X_x(a_2).
+Let a_9 = shiftfield_F3_X_y(a_4).
+Let a_10 = shiftfield_F3_X_x(a_4).
+Assume {
+  (* Heap *)
+  Type: scinit(Init_0).
+  (* Initializer *)
+  Init: (Init_0[a_10]=true).
+  (* Initializer *)
+  Init: Mint_0[a_10] = 1.
+  (* Initializer *)
+  Init: (Init_0[a_9]=true).
+  (* Initializer *)
+  Init: Mint_0[a_9] = 2.
+  (* Initializer *)
+  Init: (Init_0[a_8]=true).
+  (* Initializer *)
+  Init: Mint_0[a_8] = 1.
+  (* Initializer *)
+  Init: (Init_0[a_7]=true).
+  (* Initializer *)
+  Init: Mint_0[a_7] = 2.
+  Have: (Load_Init_S3_X(a_2, a_3) = Load_Init_S3_X(a, m)) /\
+      (Load_S3_X(a_2, a_6) = Load_S3_X(a, m_1)).
+  Have: (Load_Init_S3_X(a, a_5) = Load_Init_S3_X(a_4, a_3)) /\
+      (Load_S3_X(a, memcpy(a_6, a, a_6, a_4, 2)) = Load_S3_X(a_4, a_6)).
+}
+Prove: IsInit_S3_X(a_4, a_5).
+
+------------------------------------------------------------
+
+Goal Assertion 'provable' (file initialized_memtyped.i, line 116):
+Let a = global(L_x_69).
+Let a_1 = global(L_y_70).
+Let a_2 = shiftfield_F3_X_x(a_1).
+Let m = Init_0[a_2 <- true].
+Let a_3 = global(L_z_71).
+Let a_4 = memcpy(m, a_3, m, a_1, 2).
+Let a_5 = memcpy(a_4, a_1, a_4, a, 2).
+Let m_1 = Mint_0[a_2 <- 1].
+Let a_6 = memcpy(m_1, a_3, m_1, a_1, 2).
+Let a_7 = shiftfield_F3_X_y(a_3).
+Let a_8 = shiftfield_F3_X_x(a_3).
+Let a_9 = shiftfield_F3_X_y(a).
+Let a_10 = shiftfield_F3_X_x(a).
+Assume {
+  (* Heap *)
+  Type: scinit(Init_0).
+  (* Initializer *)
+  Init: (Init_0[a_10]=true).
+  (* Initializer *)
+  Init: Mint_0[a_10] = 1.
+  (* Initializer *)
+  Init: (Init_0[a_9]=true).
+  (* Initializer *)
+  Init: Mint_0[a_9] = 2.
+  (* Initializer *)
+  Init: (Init_0[a_8]=true).
+  (* Initializer *)
+  Init: Mint_0[a_8] = 1.
+  (* Initializer *)
+  Init: (Init_0[a_7]=true).
+  (* Initializer *)
+  Init: Mint_0[a_7] = 2.
+  Have: (Load_Init_S3_X(a_3, a_4) = Load_Init_S3_X(a_1, m)) /\
+      (Load_S3_X(a_3, a_6) = Load_S3_X(a_1, m_1)).
+  Have: (Load_Init_S3_X(a_1, a_5) = Load_Init_S3_X(a, a_4)) /\
+      (Load_S3_X(a_1, memcpy(a_6, a_1, a_6, a, 2)) = Load_S3_X(a, a_6)).
+  (* Assertion 'provable' *)
+  Have: IsInit_S3_X(a, a_5).
+}
+Prove: IsInit_S3_X(a_1, a_5).
+
+------------------------------------------------------------
+
+Goal Assertion 'not_provable' (file initialized_memtyped.i, line 117):
+Let a = global(L_y_70).
+Let a_1 = shiftfield_F3_X_x(a).
+Let m = Init_0[a_1 <- true].
+Let a_2 = global(L_z_71).
+Let a_3 = memcpy(m, a_2, m, a, 2).
+Let a_4 = global(L_x_69).
+Let a_5 = memcpy(a_3, a, a_3, a_4, 2).
+Let m_1 = Mint_0[a_1 <- 1].
+Let a_6 = memcpy(m_1, a_2, m_1, a, 2).
+Let a_7 = shiftfield_F3_X_y(a_2).
+Let a_8 = shiftfield_F3_X_x(a_2).
+Let a_9 = shiftfield_F3_X_y(a_4).
+Let a_10 = shiftfield_F3_X_x(a_4).
+Assume {
+  (* Heap *)
+  Type: scinit(Init_0).
+  (* Initializer *)
+  Init: (Init_0[a_10]=true).
+  (* Initializer *)
+  Init: Mint_0[a_10] = 1.
+  (* Initializer *)
+  Init: (Init_0[a_9]=true).
+  (* Initializer *)
+  Init: Mint_0[a_9] = 2.
+  (* Initializer *)
+  Init: (Init_0[a_8]=true).
+  (* Initializer *)
+  Init: Mint_0[a_8] = 1.
+  (* Initializer *)
+  Init: (Init_0[a_7]=true).
+  (* Initializer *)
+  Init: Mint_0[a_7] = 2.
+  Have: (Load_Init_S3_X(a_2, a_3) = Load_Init_S3_X(a, m)) /\
+      (Load_S3_X(a_2, a_6) = Load_S3_X(a, m_1)).
+  Have: (Load_Init_S3_X(a, a_5) = Load_Init_S3_X(a_4, a_3)) /\
+      (Load_S3_X(a, memcpy(a_6, a, a_6, a_4, 2)) = Load_S3_X(a_4, a_6)).
+  (* Assertion 'provable' *)
+  Have: IsInit_S3_X(a_4, a_5).
+  (* Assertion 'provable' *)
+  Have: IsInit_S3_X(a, a_5).
+}
+Prove: !IsInit_S3_X(a_2, a_5).
+
+------------------------------------------------------------
+------------------------------------------------------------
   Function formal
 ------------------------------------------------------------
 
-Goal Assertion 'provable' (file initialized_memtyped.i, line 83):
-Assume { (* Heap *) Type: cinits(Init_0). }
+Goal Assertion 'provable' (file initialized_memtyped.i, line 85):
+Assume {
+  (* Heap *)
+  Type: scinit(Init_0).
+  (* Initializer *)
+  Init: (Init_0[global(L_l_60)]=true).
+}
 Prove: (Init_0[global(P_x_59)]=true).
+
+------------------------------------------------------------
+
+Goal Assertion 'provable' (file initialized_memtyped.i, line 89):
+Prove: true.
 
 ------------------------------------------------------------
 ------------------------------------------------------------
@@ -28,7 +175,7 @@ Prove: (Init_0[global(P_x_59)]=true).
 Goal Post-condition 'provable' in 'glob_arr':
 Assume {
   (* Heap *)
-  Type: (region(G_ga_47) <= 0) /\ cinits(Init_0).
+  Type: (region(G_ga_47) <= 0) /\ scinit(Init_0).
   (* Goal *)
   When: (0 <= i) /\ (i <= 4).
 }
@@ -40,7 +187,7 @@ Goal Post-condition 'unknown' in 'glob_arr':
 Assume {
   (* Heap *)
   Type: (region(G_ga_47) <= 0) /\ (region(pga_0.base) <= 0) /\
-      cinits(Init_0).
+      scinit(Init_0).
   (* Goal *)
   When: (0 <= i) /\ (i <= 4).
 }
@@ -52,7 +199,7 @@ Prove: (Init_0[shift_sint32(pga_0, i)]=true).
 ------------------------------------------------------------
 
 Goal Post-condition 'provable' in 'glob_var':
-Assume { (* Heap *) Type: (region(G_gx_41) <= 0) /\ cinits(Init_0). }
+Assume { (* Heap *) Type: (region(G_gx_41) <= 0) /\ scinit(Init_0). }
 Prove: (Init_0[global(G_gx_41)]=true).
 
 ------------------------------------------------------------
@@ -60,7 +207,7 @@ Prove: (Init_0[global(G_gx_41)]=true).
 Goal Post-condition 'unknown' in 'glob_var':
 Assume {
   (* Heap *)
-  Type: (region(G_gx_41) <= 0) /\ (region(px_0.base) <= 0) /\ cinits(Init_0).
+  Type: (region(G_gx_41) <= 0) /\ (region(px_0.base) <= 0) /\ scinit(Init_0).
 }
 Prove: (Init_0[px_0]=true).
 
@@ -69,11 +216,11 @@ Prove: (Init_0[px_0]=true).
   Function ptr_on_local
 ------------------------------------------------------------
 
-Goal Assertion 'provable' (file initialized_memtyped.i, line 89):
-Let a = global(L_x_63).
+Goal Assertion 'provable' (file initialized_memtyped.i, line 95):
+Let a = global(L_x_65).
 Assume {
   (* Heap *)
-  Type: cinits(Init_0).
+  Type: scinit(Init_0).
   (* Goal *)
   When: (0 <= i) /\ (i <= 2).
   (* Initializer *)
@@ -90,19 +237,19 @@ Prove: (Init_0[shift_sint32(a, i)]=true).
 ------------------------------------------------------------
 
 Goal Check 'unknown' (file initialized_memtyped.i, line 12):
-Assume { (* Heap *) Type: (region(x.base) <= 0) /\ cinits(Init_0). }
+Assume { (* Heap *) Type: (region(x.base) <= 0) /\ scinit(Init_0). }
 Prove: (Init_0[x]=true).
 
 ------------------------------------------------------------
 
 Goal Check 'unknown' (file initialized_memtyped.i, line 13):
-Assume { (* Heap *) Type: (region(a.base) <= 0) /\ cinits(Init_0). }
+Assume { (* Heap *) Type: (region(a.base) <= 0) /\ scinit(Init_0). }
 Prove: IsInitArray_sint32(a, 2, Init_0).
 
 ------------------------------------------------------------
 
 Goal Check 'unknown' (file initialized_memtyped.i, line 14):
-Assume { (* Heap *) Type: (region(c.base) <= 0) /\ cinits(Init_0). }
+Assume { (* Heap *) Type: (region(c.base) <= 0) /\ scinit(Init_0). }
 Prove: IsInit_S2_C(c, Init_0).
 
 ------------------------------------------------------------
@@ -120,7 +267,7 @@ Prove: true.
 Goal Check 'unknown' (file initialized_memtyped.i, line 21):
 Assume {
   (* Heap *)
-  Type: (region(a.base) <= 0) /\ (region(x.base) <= 0) /\ cinits(Init_0).
+  Type: (region(a.base) <= 0) /\ (region(x.base) <= 0) /\ scinit(Init_0).
 }
 Prove: (Init_0[x <- true][shift_sint32(a, 1)]=true).
 
@@ -129,7 +276,7 @@ Prove: (Init_0[x <- true][shift_sint32(a, 1)]=true).
 Goal Check 'unknown' (file initialized_memtyped.i, line 22):
 Assume {
   (* Heap *)
-  Type: (region(a.base) <= 0) /\ (region(x.base) <= 0) /\ cinits(Init_0).
+  Type: (region(a.base) <= 0) /\ (region(x.base) <= 0) /\ scinit(Init_0).
 }
 Prove: IsInitArray_sint32(a, 2,
          Init_0[x <- true][shift_sint32(a, 0) <- true]).
@@ -149,7 +296,7 @@ Prove: true.
 Goal Check 'provable' (file initialized_memtyped.i, line 27):
 Assume {
   (* Heap *)
-  Type: (region(a.base) <= 0) /\ (region(x.base) <= 0) /\ cinits(Init_0).
+  Type: (region(a.base) <= 0) /\ (region(x.base) <= 0) /\ scinit(Init_0).
 }
 Prove: IsInitArray_sint32(a, 2,
          Init_0[x <- true][shift_sint32(a, 0) <- true][shift_sint32(a, 1)
@@ -166,7 +313,7 @@ Goal Check 'unknown' (file initialized_memtyped.i, line 31):
 Assume {
   (* Heap *)
   Type: (region(a.base) <= 0) /\ (region(c.base) <= 0) /\
-      (region(x.base) <= 0) /\ cinits(Init_0).
+      (region(x.base) <= 0) /\ scinit(Init_0).
 }
 Prove: IsInit_S1_S(shiftfield_F2_C_s(c),
          Init_0[x <- true][shift_sint32(a, 0) <- true][shift_sint32(a, 1)
@@ -178,7 +325,7 @@ Goal Check 'unknown' (file initialized_memtyped.i, line 32):
 Assume {
   (* Heap *)
   Type: (region(a.base) <= 0) /\ (region(c.base) <= 0) /\
-      (region(x.base) <= 0) /\ cinits(Init_0).
+      (region(x.base) <= 0) /\ scinit(Init_0).
 }
 Prove: IsInitArray_sint32(shiftfield_F2_C_a(c), 10,
          Init_0[x <- true][shift_sint32(a, 0) <- true][shift_sint32(a, 1)
@@ -190,7 +337,7 @@ Goal Check 'unknown' (file initialized_memtyped.i, line 33):
 Assume {
   (* Heap *)
   Type: (region(a.base) <= 0) /\ (region(c.base) <= 0) /\
-      (region(x.base) <= 0) /\ cinits(Init_0).
+      (region(x.base) <= 0) /\ scinit(Init_0).
 }
 Prove: IsInit_S2_C(c,
          Init_0[x <- true][shift_sint32(a, 0) <- true][shift_sint32(a, 1)
@@ -207,7 +354,7 @@ Goal Check 'unknown' (file initialized_memtyped.i, line 37):
 Assume {
   (* Heap *)
   Type: (region(a.base) <= 0) /\ (region(c.base) <= 0) /\
-      (region(x.base) <= 0) /\ cinits(Init_0).
+      (region(x.base) <= 0) /\ scinit(Init_0).
 }
 Prove: (Init_0[x <- true][shift_sint32(a, 0) <- true][shift_sint32(a, 1)
           <- true][shiftfield_F1_S_y(shiftfield_F2_C_s(c))]=true).
@@ -219,7 +366,7 @@ Let a_1 = shiftfield_F2_C_s(c).
 Assume {
   (* Heap *)
   Type: (region(a.base) <= 0) /\ (region(c.base) <= 0) /\
-      (region(x.base) <= 0) /\ cinits(Init_0).
+      (region(x.base) <= 0) /\ scinit(Init_0).
 }
 Prove: IsInit_S1_S(a_1,
          Init_0[x <- true][shift_sint32(a, 0) <- true][shift_sint32(a, 1)
@@ -232,7 +379,7 @@ Goal Check 'unknown' (file initialized_memtyped.i, line 39):
 Assume {
   (* Heap *)
   Type: (region(a.base) <= 0) /\ (region(c.base) <= 0) /\
-      (region(x.base) <= 0) /\ cinits(Init_0).
+      (region(x.base) <= 0) /\ scinit(Init_0).
 }
 Prove: IsInit_S2_C(c,
          Init_0[x <- true][shift_sint32(a, 0) <- true][shift_sint32(a, 1)
@@ -246,7 +393,7 @@ Let a_1 = shiftfield_F2_C_s(c).
 Assume {
   (* Heap *)
   Type: (region(a.base) <= 0) /\ (region(c.base) <= 0) /\
-      (region(x.base) <= 0) /\ cinits(Init_0).
+      (region(x.base) <= 0) /\ scinit(Init_0).
 }
 Prove: IsInit_S1_S(a_1,
          Init_0[x <- true][shift_sint32(a, 0) <- true][shift_sint32(a, 1)
@@ -260,7 +407,7 @@ Let a_1 = shiftfield_F2_C_s(c).
 Assume {
   (* Heap *)
   Type: (region(a.base) <= 0) /\ (region(c.base) <= 0) /\
-      (region(x.base) <= 0) /\ cinits(Init_0).
+      (region(x.base) <= 0) /\ scinit(Init_0).
 }
 Prove: IsInit_S2_C(c,
          Init_0[x <- true][shift_sint32(a, 0) <- true][shift_sint32(a, 1)
@@ -275,7 +422,7 @@ Let a_2 = shiftfield_F2_C_a(c).
 Assume {
   (* Heap *)
   Type: (region(a.base) <= 0) /\ (region(c.base) <= 0) /\
-      (region(x.base) <= 0) /\ cinits(Init_0).
+      (region(x.base) <= 0) /\ scinit(Init_0).
   (* Goal *)
   When: (0 <= i) /\ (i <= 8).
 }
@@ -296,7 +443,7 @@ Let a_2 = shiftfield_F2_C_a(c).
 Assume {
   (* Heap *)
   Type: (region(a.base) <= 0) /\ (region(c.base) <= 0) /\
-      (region(x.base) <= 0) /\ cinits(Init_0).
+      (region(x.base) <= 0) /\ scinit(Init_0).
 }
 Prove: IsInit_S2_C(c,
          Init_0[x <- true][shift_sint32(a, 0) <- true][shift_sint32(a, 1)
@@ -316,7 +463,7 @@ Let a_2 = shiftfield_F2_C_a(c).
 Assume {
   (* Heap *)
   Type: (region(a.base) <= 0) /\ (region(c.base) <= 0) /\
-      (region(x.base) <= 0) /\ cinits(Init_0).
+      (region(x.base) <= 0) /\ scinit(Init_0).
 }
 Prove: IsInit_S2_C(c,
          Init_0[x <- true][shift_sint32(a, 0) <- true][shift_sint32(a, 1)

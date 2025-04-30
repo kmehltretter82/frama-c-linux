@@ -1,0 +1,19 @@
+{
+  "profile": [ { "prover": "alt-ergo@2.5.4", "size": 16, "time": 0.183 } ],
+  "proofs": {
+    "Qed": {
+      "c_euclidian": { "prover": "alt-ergo@2.5.4", "time": 0.021 },
+      "cdiv_closed_remainder": {
+        "tactic": "split_vc",
+        "children": [
+          { "prover": "alt-ergo@2.5.4", "time": 0.023 },
+          null,
+          { "prover": "alt-ergo@2.5.4", "time": 0.036 }
+        ]
+      },
+      "cdiv_inv": null,
+      "cdiv_neutral": { "prover": "alt-ergo@2.5.4", "time": 0.02 },
+      "cmod_remainder": { "prover": "alt-ergo@2.5.4", "time": 0.027 }
+    }
+  }
+}

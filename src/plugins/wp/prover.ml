@@ -70,7 +70,12 @@ let run_prover wpo ?config ?(mode=Batch) ?progress ?result prover =
     | Task.Result r -> r
     | Task.Canceled -> VCS.no_result
     | Task.Timeout t -> VCS.timeout t
-    | Task.Failed exn -> VCS.failed (error exn)
+    | Task.Failed exn ->
+      let msg = error exn in
+      Wp_parameters.warning ~current:false
+        "@[<hov 2>Goal %s:@ running prover %s failed (%s)@]"
+        (Wpo.get_label wpo) (VCS.name_of_prover prover) msg ;
+      VCS.failed msg
   in
   let res = { res with solver_time = Wpo.qed_time wpo } in
   update ?result wpo prover res ;

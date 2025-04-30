@@ -35,7 +35,7 @@ let lookup_havoc e =
   | L.Aget( m , p ) ->
     begin
       match F.repr m with
-      | L.Fun( f , [m_sep;m_undef;a;b;n] )
+      | L.Fun( f , [m_sep;a;m_undef;b;n] )
         when f == MemMemory.f_memcpy ->
         if F.equal a b then Some( m_sep , m_undef , a , n , p )
         else None

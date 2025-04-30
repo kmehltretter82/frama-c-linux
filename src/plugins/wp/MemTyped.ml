@@ -160,13 +160,6 @@ struct
   let pretty fmt = function
     | M_int i -> Format.fprintf fmt "M%a" Ctypes.pp_int i
     | m -> Format.pp_print_string fmt (basename_of_chunk m)
-  let val_of_chunk = function
-    | M_int _ -> L.Int
-    | M_f32 -> Cfloat.tau_of_float Ctypes.Float32
-    | M_f64 -> Cfloat.tau_of_float Ctypes.Float64
-    | M_pointer -> MemAddr.t_addr
-    | T_alloc -> L.Int
-    | T_init -> L.Bool
   let tau_of_chunk = function
     | M_int _ -> L.Array(MemAddr.t_addr,L.Int)
     | M_pointer -> L.Array(MemAddr.t_addr,MemAddr.t_addr)
@@ -430,7 +423,7 @@ module Shift = WpContext.Generator(Cobj)
     end)
 
 let field l f =
-  MemMemory.unsupported_union f ;
+  MemMemory.unsupported_union ~model:"Typed" f ;
   F.e_fun (ShiftField.get f) [l]
 
 let shift l obj k = F.e_fun (Shift.get obj) [l;k]
@@ -582,27 +575,15 @@ module BASE = WpContext.Generator(Varinfo)
             l_cluster = cluster_globals () ;
           }
 
-      let initialization prefix x base =
-        match sizeof x with
-        | Some size when Cvalues.always_initialized x ->
-          let a = Lang.freshvar ~basename:"init" t_init in
-          let m = F.e_var a in
-          let init_access =
-            if size = F.e_one then
-              F.p_bool (F.e_get m (MemAddr.mk_addr base F.e_zero))
-            else
-              F.p_call p_is_init_r [ m ; MemAddr.mk_addr base F.e_zero ; size ]
-          in
-          let m_init = MemMemory.cinits m in
-          let init_prop = F.p_forall [a] (F.p_imply m_init init_access) in
+      let binit prefix x base =
+        if Cvalues.always_initialized x then
+          let name = prefix ^ "_binit" in
           Definitions.define_lemma {
             l_kind = Admit ;
-            l_name = prefix ^ "_init" ;
-            l_triggers = [] ; l_forall = [] ;
-            l_lemma = init_prop ;
+            l_name = name ; l_triggers = [] ; l_forall = [] ;
+            l_lemma = MemAddr.binit base ;
             l_cluster = cluster_globals () ;
           }
-        | _ -> ()
 
       let generate x =
         let acs_rd = Ast_types.has_qualifier "const" x.vtype in
@@ -625,7 +606,7 @@ module BASE = WpContext.Generator(Varinfo)
         RegisterBASE.define lfun x ;
         region prefix x base ;
         linked prefix x base ;
-        initialization prefix x base ;
+        binit prefix x base ;
         base
 
       let compile = Lang.local generate
@@ -962,21 +943,6 @@ let loc_of_int _ v = MemAddr.addr_of_int v
 let int_of_loc _ l = MemAddr.int_of_addr l
 
 (* -------------------------------------------------------------------------- *)
-(* --- Frames                                                             --- *)
-(* -------------------------------------------------------------------------- *)
-
-let frames obj addr chunk =
-  match Sigma.ckind chunk with
-  | State.Mu T_alloc -> []
-  | State.Mu m ->
-    let offset = length_of_object obj in
-    let sizeof = F.e_one in
-    let tau = Chunk.val_of_chunk m in
-    let basename = Chunk.basename_of_chunk m in
-    MemMemory.frames ~addr ~offset ~sizeof ~basename tau
-  | _ -> []
-
-(* -------------------------------------------------------------------------- *)
 (* --- Chunk element type                                                 --- *)
 (* -------------------------------------------------------------------------- *)
 
@@ -1012,10 +978,11 @@ module ChunkContent = WpContext.Generator(Chunk)
 
 let is_well_formed sigma =
   let pool = ref [] in
-  Sigma.iter (fun c x ->
+  let have p = pool := p :: !pool in
+  Sigma.iter (fun c m ->
       match Sigma.ckind c with
       | State.Mu (M_int _ as chunk) ->
-        pool := F.p_call (ChunkContent.get chunk) [F.e_var x] :: !pool
+        have @@ F.p_call (ChunkContent.get chunk) [F.e_var m]
       | _ -> ()
     ) sigma ;
   F.p_conj !pool
@@ -1024,86 +991,46 @@ let is_well_formed sigma =
 (* --- Loader                                                             --- *)
 (* -------------------------------------------------------------------------- *)
 
-module MODEL =
+module LOADER =
 struct
   let name = "MemTyped.LOADER"
   type loc = F.term
+  let pretty = F.pp_term
   let field = field
   let shift = shift
   let sizeof = length_of_object
   let init_footprint = init_footprint
   let value_footprint = value_footprint
-  let frames = frames
-  let to_addr l = l
   let to_region_pointer l = 0,l
   let of_region_pointer _ _ l = l
-
-  let load_int sigma i l = F.e_get (State.value sigma (M_int i)) l
-  let load_float sigma f l = F.e_get (State.value sigma (m_float f)) l
-  let load_pointer sigma _t l = F.e_get (State.value sigma M_pointer) l
 
   let last sigma obj l =
     let n = length_of_object obj in
     F.e_sub (F.e_div (allocated sigma l) n) F.e_one
 
-  let memcpy obj ~mtgt ~msrc ~ltgt ~lsrc ~length chunk =
-    match Sigma.ckind chunk with
-    | State.Mu T_alloc -> msrc
-    | State.Mu _ ->
-      let n = F.e_mul (length_of_object obj) length in
-      F.e_fun f_memcpy [mtgt;msrc;ltgt;lsrc;n]
-    | _ -> assert false
+  let load_int sigma i l = F.e_get (State.value sigma (M_int i)) l
+  let load_float sigma f l = F.e_get (State.value sigma (m_float f)) l
+  let load_pointer sigma _t l = F.e_get (State.value sigma M_pointer) l
+  let load_init_atom sigma _ l = F.e_get (State.value sigma T_init) l
 
-  let memcpy_enforced_length ~mtgt ~msrc ~ltgt ~lsrc ~length chunk =
-    match Sigma.ckind chunk with
-    | State.Mu T_alloc -> msrc
-    | State.Mu _ ->
-      let n = length in
-      F.e_fun f_memcpy [mtgt;msrc;ltgt;lsrc;n]
-    | _ -> assert false
+  let fresh _l =
+    let x = Lang.freshvar ~basename:"p" MemAddr.t_addr in
+    [x] , F.e_var x
+  let separated p n p' n' = F.p_call MemAddr.p_separated [p;n;p';n']
 
-
-  let eqmem_forall obj loc _chunk m1 m2 =
-    let xp = Lang.freshvar ~basename:"p" MemAddr.t_addr in
-    let p = F.e_var xp in
-    let n = length_of_object obj in
-    let separated = F.p_call MemAddr.p_separated [p;F.e_one;loc;n] in
-    let equal = F.p_equal (F.e_get m1 p) (F.e_get m2 p) in
-    [xp],separated,equal
+  let eqmem _chunk m0 m1 l n = F.p_call f_eqmem [m0;m1;l;n]
+  let memcpy _chunk m l m0 l0 n = F.e_fun f_memcpy [m;l;m0;l0;n]
 
   let updated sigma c l v = State.chunk c , F.e_set (State.value sigma c) l v
 
   let store_int sigma i l v = updated sigma (M_int i) l v
   let store_float sigma f l v = updated sigma (m_float f) l v
   let store_pointer sigma _ty l v = updated sigma M_pointer l v
+  let store_init_atom sigma _obj l v = updated sigma T_init l v
 
-  let set_init_atom sigma _obj l v = updated sigma T_init l v
-  let is_init_atom sigma _ l = F.e_get (State.value sigma T_init) l
-
-  let is_init_range sigma obj loc length =
-    let n = F.e_mul (length_of_object obj) length in
-    F.p_call p_is_init_r [ State.value sigma T_init ; loc ; n ]
-
-  let set_init obj loc ~length _chunk ~current =
-    let n = F.e_mul (length_of_object obj) length in
-    F.e_fun f_set_init [current;loc;n]
 end
 
-module LOADER = MemLoader.Make(MODEL)
-
-let load = LOADER.load
-let load_init = LOADER.load_init
-let stored = LOADER.stored
-let stored_init = LOADER.stored_init
-let copied = LOADER.copied
-let copied_init = LOADER.copied_init
-let initialized = LOADER.initialized
-let domain = LOADER.domain
-
-let assigned seq obj loc =
-  (* Maintain always initialized values initialized *)
-  Assert (MemMemory.cinits (State.value seq.post T_init)) ::
-  LOADER.assigned seq obj loc
+include MemLoader.Make(LOADER)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Loc Comparison                                                     --- *)
@@ -1161,7 +1088,7 @@ let frame sigma =
     else []
   in
   wellformed_frame MemAddr.linked T_alloc @
-  wellformed_frame MemMemory.cinits T_init @
+  wellformed_frame MemMemory.scinit T_init @
   wellformed_frame MemMemory.sconst (M_int (Ctypes.c_char ())) @
   wellformed_frame MemMemory.framed M_pointer
 

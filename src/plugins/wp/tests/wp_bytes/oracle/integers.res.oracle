@@ -1426,7 +1426,7 @@ Prove: (x = 1) /\ (0 < x).
 ------------------------------------------------------------
 
 Goal Check (file integers.i, line 79):
-Let a = global(L_m64_38). Assume { (* Heap *) Type: cinits(init_0). }
+Let a = global(L_m64_38). Assume { (* Heap *) Type: scinit(init_0). }
 Prove: (read_init64(write_init32(write_init8(write_init16(write_init32(
                                                             write_init64(init_0,
                                                               a, true),
@@ -1439,7 +1439,7 @@ Prove: (read_init64(write_init32(write_init8(write_init16(write_init32(
 ------------------------------------------------------------
 
 Goal Check (file integers.i, line 80):
-Let a = global(L_m32_39). Assume { (* Heap *) Type: cinits(init_0). }
+Let a = global(L_m32_39). Assume { (* Heap *) Type: scinit(init_0). }
 Prove: (read_init32(write_init32(write_init8(write_init16(write_init32(
                                                             write_init64(init_0,
                                                               global(L_m64_38),
@@ -1451,7 +1451,7 @@ Prove: (read_init32(write_init32(write_init8(write_init16(write_init32(
 ------------------------------------------------------------
 
 Goal Check (file integers.i, line 81):
-Let a = global(L_m16_40). Assume { (* Heap *) Type: cinits(init_0). }
+Let a = global(L_m16_40). Assume { (* Heap *) Type: scinit(init_0). }
 Prove: (read_init16(write_init32(write_init8(write_init16(write_init32(
                                                             write_init64(init_0,
                                                               global(L_m64_38),
@@ -1464,7 +1464,7 @@ Prove: (read_init16(write_init32(write_init8(write_init16(write_init32(
 ------------------------------------------------------------
 
 Goal Check (file integers.i, line 82):
-Let a = global(L_m8_41). Assume { (* Heap *) Type: cinits(init_0). }
+Let a = global(L_m8_41). Assume { (* Heap *) Type: scinit(init_0). }
 Prove: (read_init8(write_init32(write_init8(write_init16(write_init32(
                                                            write_init64(init_0,
                                                              global(L_m64_38),
@@ -1564,7 +1564,7 @@ Prove: (x = (-1)) /\ (x < 0).
 ------------------------------------------------------------
 
 Goal Check (file integers.i, line 54):
-Let a = global(L_p64_31). Assume { (* Heap *) Type: cinits(init_0). }
+Let a = global(L_p64_31). Assume { (* Heap *) Type: scinit(init_0). }
 Prove: (read_init64(write_init32(write_init8(write_init16(write_init32(
                                                             write_init64(init_0,
                                                               a, true),
@@ -1577,7 +1577,7 @@ Prove: (read_init64(write_init32(write_init8(write_init16(write_init32(
 ------------------------------------------------------------
 
 Goal Check (file integers.i, line 55):
-Let a = global(L_p32_32). Assume { (* Heap *) Type: cinits(init_0). }
+Let a = global(L_p32_32). Assume { (* Heap *) Type: scinit(init_0). }
 Prove: (read_init32(write_init32(write_init8(write_init16(write_init32(
                                                             write_init64(init_0,
                                                               global(L_p64_31),
@@ -1589,7 +1589,7 @@ Prove: (read_init32(write_init32(write_init8(write_init16(write_init32(
 ------------------------------------------------------------
 
 Goal Check (file integers.i, line 56):
-Let a = global(L_p16_33). Assume { (* Heap *) Type: cinits(init_0). }
+Let a = global(L_p16_33). Assume { (* Heap *) Type: scinit(init_0). }
 Prove: (read_init16(write_init32(write_init8(write_init16(write_init32(
                                                             write_init64(init_0,
                                                               global(L_p64_31),
@@ -1602,7 +1602,7 @@ Prove: (read_init16(write_init32(write_init8(write_init16(write_init32(
 ------------------------------------------------------------
 
 Goal Check (file integers.i, line 57):
-Let a = global(L_p8_34). Assume { (* Heap *) Type: cinits(init_0). }
+Let a = global(L_p8_34). Assume { (* Heap *) Type: scinit(init_0). }
 Prove: (read_init8(write_init32(write_init8(write_init16(write_init32(
                                                            write_init64(init_0,
                                                              global(L_p64_31),
@@ -1702,7 +1702,7 @@ Prove: (x = 1) /\ (0 < x).
 ------------------------------------------------------------
 
 Goal Check (file integers.i, line 29):
-Let a = global(L_u64_22). Assume { (* Heap *) Type: cinits(init_0). }
+Let a = global(L_u64_22). Assume { (* Heap *) Type: scinit(init_0). }
 Prove: (read_init64(write_init32(write_init8(write_init16(write_init32(
                                                             write_init64(init_0,
                                                               a, true),
@@ -1715,7 +1715,7 @@ Prove: (read_init64(write_init32(write_init8(write_init16(write_init32(
 ------------------------------------------------------------
 
 Goal Check (file integers.i, line 30):
-Let a = global(L_u32_23). Assume { (* Heap *) Type: cinits(init_0). }
+Let a = global(L_u32_23). Assume { (* Heap *) Type: scinit(init_0). }
 Prove: (read_init32(write_init32(write_init8(write_init16(write_init32(
                                                             write_init64(init_0,
                                                               global(L_u64_22),
@@ -1727,7 +1727,7 @@ Prove: (read_init32(write_init32(write_init8(write_init16(write_init32(
 ------------------------------------------------------------
 
 Goal Check (file integers.i, line 31):
-Let a = global(L_u16_24). Assume { (* Heap *) Type: cinits(init_0). }
+Let a = global(L_u16_24). Assume { (* Heap *) Type: scinit(init_0). }
 Prove: (read_init16(write_init32(write_init8(write_init16(write_init32(
                                                             write_init64(init_0,
                                                               global(L_u64_22),
@@ -1740,7 +1740,7 @@ Prove: (read_init16(write_init32(write_init8(write_init16(write_init32(
 ------------------------------------------------------------
 
 Goal Check (file integers.i, line 32):
-Let a = global(L_u8_25). Assume { (* Heap *) Type: cinits(init_0). }
+Let a = global(L_u8_25). Assume { (* Heap *) Type: scinit(init_0). }
 Prove: (read_init8(write_init32(write_init8(write_init16(write_init32(
                                                            write_init64(init_0,
                                                              global(L_u64_22),

@@ -387,7 +387,9 @@ class configurator (tactic : Tactical.tactical) =
       let tree = ProofEngine.tree node in
       let pool = ProofEngine.pool tree in
       let ctxt = ProofEngine.tree_context tree in
-      WpContext.on_context ctxt (self#select node pool) selection
+      Lang.local ~pool
+        (WpContext.on_context ctxt (self#select node pool))
+        selection
 
     method private commit tree node process =
       try

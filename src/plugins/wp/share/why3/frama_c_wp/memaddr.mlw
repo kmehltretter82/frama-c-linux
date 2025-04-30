@@ -130,6 +130,8 @@ theory MemAddr
 
   (* Regions *)
 
+  (* the memory associated to this base is always initialized *)
+  predicate binit int
   function region int: int
   predicate linked (malloc)
 

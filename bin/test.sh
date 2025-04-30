@@ -321,7 +321,7 @@ function PrepareCoverage
         Cmd mkdir _coverage
         Cmd mkdir _bisect
 
-        DUNE_OPT+=("--workspace dev/dune-workspace.cover")
+        DUNE_OPT+=("--workspace=dev/dune-workspace.cover")
     fi
 }
 

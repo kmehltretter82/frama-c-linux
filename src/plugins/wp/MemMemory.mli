@@ -35,36 +35,17 @@ val t_init : tau (** initialization tables *)
 
 val t_mem : tau -> tau (** t_addr indexed array *)
 
-(* val f_havoc : lfun *)
+val f_eqmem : lfun
 val f_memcpy : lfun
-val f_set_init : lfun
 
-val p_is_init_r : lfun
-val p_eqmem : lfun
-val p_monotonic : lfun
-
-val cinits : term -> pred
 val sconst : term -> pred
+val scinit : term -> pred
 val framed : term -> pred
 
 (* -------------------------------------------------------------------------- *)
 
-(** {2 Frame Conditions}
-
-    [frames ~addr] are frame conditions for reading a value
-    at address [addr] from a chunk of memory.
-    The value read at [addr] have length [offset],
-    while individual element in memory chunk have type [tau] and
-    offset length [sizeof].
-
-    Memory variables use [~basename] or ["mem"] by default.
-*)
-
-val frames : addr:term -> offset:term -> sizeof:term ->
-  ?basename:string -> tau -> Memory.frame list
-
 (** {2 Unsupported Union Fields} *)
 
-val unsupported_union : Cil_types.fieldinfo -> unit
+val unsupported_union : model:string -> Cil_types.fieldinfo -> unit
 
 (* -------------------------------------------------------------------------- *)
