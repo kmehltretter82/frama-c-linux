@@ -20,14 +20,14 @@
 (*                                                                        *)
 (**************************************************************************)
 
-include Stdlib.List
-
 module Minimal = struct
   type 'a t = 'a list
   let return   x = [ x ]
-  let map   f xs = map f xs
-  let flatten xs = flatten xs
-  let product ls rs = combine ls rs
+  let map   f xs = Stdlib.List.map f xs
+  let flatten xs = Stdlib.List.flatten xs
+  let product ls rs = Stdlib.List.combine ls rs
 end
 
 include Monad.Make_based_on_map_with_product (Minimal)
+
+include Stdlib.List
