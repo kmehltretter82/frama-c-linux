@@ -171,8 +171,12 @@ let rec lt_of_ty env menv (tvs : tvars)  (ty: W.Ty.ty) : C.logic_type =
   | Tyapp(s,[]) when W.Ty.(ts_equal s ts_int) -> C.Linteger
   | Tyapp(s,[]) when W.Ty.(ts_equal s ts_real) -> C.Lreal
   | Tyapp(s,[]) when W.Ty.(ts_equal s ts_bool) -> C.Lboolean
+  | Tyapp(s,[a;b]) when W.Ty.(ts_equal s ts_func) ->
+    let ta = lt_of_ty env menv tvs a in
+    let tb = lt_of_ty env menv tvs b in
+    C.Larrow([ta],tb)
   | Tyapp(s,ts) ->
-    C.Ltype(lt_of_ts env menv s [], List.map (lt_of_ty env menv tvs ) ts)
+    C.Ltype(lt_of_ts env menv s [], List.map (lt_of_ty env menv tvs) ts)
 
 and lt_of_ts env menv (ts : W.Ty.tysymbol) (cs: W.Decl.constructor list) : C.logic_type_info =
   try W.Ty.Hts.find env.tenv ts with Not_found ->
