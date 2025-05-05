@@ -22,7 +22,7 @@
 
 
 (* -------------------------------------------------------------------------- *)
-(* --- Current Working dir                                                --- *)
+(* --- Current Working Directory                                          --- *)
 (* -------------------------------------------------------------------------- *)
 
 (* Note: the call to Unix.realpath prevents some issues with symbolic links
@@ -61,7 +61,7 @@ let check_existence ~existence p =
     raise No_file
   | Must_not_exist when Sys.file_exists p ->
     raise File_exists
-  | _ -> ()
+  | Indifferent | Must_exist | Must_not_exist -> ()
 
 let of_string ?(existence=Indifferent) ?base s =
   let p = normalize ?base s in
@@ -237,7 +237,7 @@ let is_empty_pos pos = pos == empty_pos
 
 
 (* -------------------------------------------------------------------------- *)
-(* --- Deprecated Normalized module                                       --- *)
+(* --- Deprecated functions and modules                                   --- *)
 (* -------------------------------------------------------------------------- *)
 
 let normalize ?existence ?base_name s = of_string ?existence ?base:base_name s

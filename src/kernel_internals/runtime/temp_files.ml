@@ -35,14 +35,14 @@ let file ?keep prefix suffix =
     try
       temp_file ~prefix ~suffix
     with Filesystem.Temp_file_error s ->
-      Kernel.abort "Could not open temporary file: %s" s
+      Kernel.abort "Cannot open temporary file: %s" s
   in
   Extlib.safe_at_exit
     begin fun () ->
       if not (should_keep_temp_file keep) then
         remove_file file
       else if exists file then
-        Kernel.debug ~dkey "not removing file %a@." Filepath.pretty file
+        Kernel.debug ~dkey "Not removing file %a@." Filepath.pretty file
     end;
   file
 
@@ -51,13 +51,13 @@ let dir ?keep prefix suffix =
     try
       temp_dir ~prefix ~suffix
     with Filesystem.Temp_file_error s ->
-      Kernel.abort "Could not create temporary dir: %s" s
+      Kernel.abort "Cannot create temporary dir: %s" s
   in
   Extlib.safe_at_exit
     begin fun () ->
       if not (should_keep_temp_file keep) then
         remove_dir dir
       else if exists dir then
-        Kernel.debug ~dkey  "not removing dir %a@." Filepath.pretty dir;
+        Kernel.debug ~dkey  "Not removing dir %a@." Filepath.pretty dir;
     end;
   dir

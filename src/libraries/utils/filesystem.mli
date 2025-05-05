@@ -51,7 +51,7 @@ val list_dir: Filepath.t -> string list
     @since Frama-C+dev *)
 val iter_dir: (string -> unit) -> Filepath.t -> unit
 
-(** Iter through the contents of a directory.
+(** Fold over the contents of a directory.
     @since Frama-C+dev *)
 val fold_dir: (string -> 'a -> 'a) -> Filepath.t -> 'a -> 'a
 
@@ -127,7 +127,7 @@ val bincopy : bytes -> in_channel -> out_channel -> unit
     Recommended size is [2048]. *)
 [@@deprecated "This function is only used locally and is not exported anymore."]
 
-(** [copy source target] copies source file to target file.
+(** [copy_file source target] copies source file to target file.
     @since Frama-C+dev
     @before Frama-C+dev this function was [Command.copy] *)
 val copy_file : Filepath.t -> Filepath.t -> unit
@@ -251,9 +251,9 @@ val with_formatter_exn: Filepath.t -> (Format.formatter, 'a) exn_processor
 (** Opening this module allows to use shorter syntax to deal with files.
 
     {[
-      let open Filepath.Operators in
+      let open Filesystem.Operators in
       let result =
-        let+ channel = Filepath.with_open_out filepath in
+        let+ channel = Filesystem.with_open_out filepath in
         output_string channel "42";
       in
       match result with
@@ -268,8 +268,8 @@ val with_formatter_exn: Filepath.t -> (Format.formatter, 'a) exn_processor
     can be used instead:
 
     {[
-      let open Filepath.Operators in
-      let* channel = Filepath.with_open_in filepath in
+      let open Filesystem.Operators in
+      let* channel = Filesystem.with_open_in filepath in
       try
         let header = input_line channel in
         if header = "42"

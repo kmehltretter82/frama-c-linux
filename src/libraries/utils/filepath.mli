@@ -21,7 +21,7 @@
 (**************************************************************************)
 
 (** Functions manipulating normalized filepaths.
-    In these functions, references to the current working directory refer
+    In these functions, references *he current working directory refer
     to the result given by function Sys.getcwd.
 *)
 
@@ -33,10 +33,10 @@ type t = private string
 (** {2 Basic datatype functions} *)
 (* ************************************************************************* *)
 
-(** [Filepath.t] is a Frama-C datatype, and come with usual [compare], [equal],
+(** [Filepath.t] is a Frama-C datatype, and comes with usual [compare], [equal],
     [hash] and [pretty] functions.
 
-    Pretty-print id done according to these rules:
+    Pretty-print is done according to these rules:
     - relative filenames are kept, except for leading './',
       which are stripped;
     - absolute filenames are relativized if their prefix is included in the
@@ -45,7 +45,7 @@ type t = private string
       See {!add_symbolic_dir} for more details.
       Therefore, the result of this function may not designate a valid name
       in the filesystem and must ONLY be used to pretty-print information;
-      it must NEVER to be converted back to a filepath later. *)
+      it must NEVER to be converted back to a filepath later on. *)
 
 include Datatype.S_with_collections with type t := t
 
@@ -177,16 +177,16 @@ val has_suffix: t -> string -> bool
     @since Frama-C+dev *)
 val chop_suffix: t -> string -> t
 
-(** returns true if the file is relative to [base]
-    (that is, it is prefixed by [base_name]), or to the current
+(** @return true if the file is relative to [base]
+    (that is, it is prefixed by [base]), or to the current
     working directory if no base is specified.
     @since Aluminium-20160501
     @before 23.0-Vanadium argument types were string instead of t.
     @before Frama-C+dev named argument was [base_name] *)
 val is_relative: ?base:t -> t -> bool
 
-(** [relativize base_name file_name] returns a relative path name of
-    [file_name] w.r.t. [base_name], if [base_name] is a prefix of [file];
+(** [relativize base file_name] returns a relative path name of
+    [file_name] w.r.t. [base], if [base] is a prefix of [file];
     otherwise, returns [file_name] unchanged.
     The default base name is the current working directory name.
     @since Aluminium-20160501
@@ -199,7 +199,7 @@ val relativize: ?base:t -> t -> string
 (** {2 Current working directory} *)
 (* ************************************************************************* *)
 
-(** Return the current working directory.
+(** @return the current working directory.
     Implicitly uses {!Unix.realpath} to normalize paths and avoid issues with
     symbolic links in directory names.
 
@@ -215,8 +215,7 @@ val pwd : unit -> t
 (** [add_symbolic_dir name dir] indicates that the (absolute) path [dir] must
     be replaced by [name] when pretty-printing paths.
     This alias ensures that system-dependent paths such as FRAMAC_SHARE are
-    printed identically in different machines.
-    @before Frama-C+dev was in Filepath *)
+    printed identically in different machines. *)
 val add_symbolic_dir: string -> t -> unit
 
 val add_symbolic_dir_list: string -> t list -> unit
@@ -226,14 +225,12 @@ val add_symbolic_dir_list: string -> t list -> unit
 val remove_symbolic_dir: t -> unit
 
 (** Remove all symbolic dirs that have been added earlier.
-    @since 23.0-Vanadium
-    @before Frama-C+dev was in Filepath *)
+    @since 23.0-Vanadium *)
 val reset_symbolic_dirs: unit -> unit
 
 (** Returns the list of symbolic dirs added via [add_symbolic_dir], plus
     preexisting ones (e.g. FRAMAC_SHARE), as pairs (name, dir).
-    @since 22.0-Titanium
-    @before Frama-C+dev was in Filepath *)
+    @since 22.0-Titanium *)
 val all_symbolic_dirs: unit -> (string * t) list
 
 

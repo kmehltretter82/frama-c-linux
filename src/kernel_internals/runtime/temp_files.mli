@@ -25,8 +25,8 @@
     is caused by a signal and except if [keep] is given and set to true. If
     [keep] is omitted, the files are only kept if the debug key
     {!Kernel.dkey_pp_keep_temp_files} is set. If the file is kept, a message
-    with the name of the file will be printed. When the temporary file cannot be
-    created, these functions aborts. *)
+    with the path of the preserved file or directory is emitted. When the
+    temporary file or directory cannot be created, these functions abort. *)
 
 (** [cleanup_at_exit file] indicates that [file] must be removed when the
     program exits (except if exit is caused by a signal).
