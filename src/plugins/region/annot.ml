@@ -23,7 +23,7 @@
 open Cil_types
 
 open Memory
-open LDomain
+open Ldomain
 open Logic
 
 (* -------------------------------------------------------------------------- *)
@@ -107,31 +107,43 @@ let add_variant ~kf ~ki ?formal map variant =
 let add_spec ~kf ~ki ?formal (map:map) (s:spec) =
   let p_term = Property.ip_terminates_of_spec kf ki s in
   let formal = Option.value ~default:Vmap.empty formal in
-  let env_term op = { map ; property = Option.get op ; formal ; result = pure } in
+  let env_term op =
+    { map ; property = Option.get op ; formal ; result = pure }
+  in
   Option.iter (add_ipred (env_term p_term)) s.spec_terminates ;
   Option.iter (add_variant ~kf ~ki ~formal map) s.spec_variant ;
   List.iter (add_behavior ~kf ~ki ~formal map) s.spec_behavior
 
-let add_code_annot ~kf ~ki ~stmt ?formal (map:map) (c:code_annotation) =
+(* -------------------------------------------------------------------------- *)
+(* ---  Process Function Body                                             --- *)
+(* -------------------------------------------------------------------------- *)
+
+let add_code_annot ~kf ~stmt ?formal (map:map) (c:code_annotation) =
   let formal = Option.value ~default:Vmap.empty formal in
   match c.annot_content with
   | AAssert (_,{ tp_statement = p }) ->
     let property = Property.ip_of_code_annot_single kf stmt c in
     let env = { map ; property ; formal ; result = pure } in
     add_predicate env p
-  | AStmtSpec (_,s) -> add_spec ~kf ~ki ~formal map s
+  | AStmtSpec (_,s) ->
+    let ki = Cil_datatype.Kinstr.kinstr_of_opt_stmt (Some stmt) in
+    add_spec ~kf ~ki ~formal map s
   | AInvariant (_,_,{ tp_statement = p }) ->
     let property = Property.ip_of_code_annot_single kf stmt c in
     let env = { map ; property ; formal ; result = pure } in
     add_predicate env p
-  | AVariant v -> add_variant ~kf ~ki ~formal map v
+  | AVariant v ->
+    let ki = Cil_datatype.Kinstr.kinstr_of_opt_stmt (Some stmt) in
+    add_variant ~kf ~ki ~formal map v
   | AAssigns (_,WritesAny) -> ()
   | AAssigns (_,Writes asgn) ->
+    let ki = Cil_datatype.Kinstr.kinstr_of_opt_stmt (Some stmt) in
     let property = Option.get @@ Property.ip_assigns_of_code_annot kf ki c in
     List.iter (iadd_from { map ; property ; formal ; result = pure }) asgn
   | AAllocation (_,FreeAllocAny) -> ()
   | AAllocation (_,(FreeAlloc (its1,its2) as alloc)) ->
     let bol = Property.Id_loop c in
+    let ki = Cil_datatype.Kinstr.kinstr_of_opt_stmt (Some stmt) in
     let property = Option.get @@ Property.ip_of_allocation kf ki bol alloc in
     List.iter (iadd_iterm { map ; property ; formal ; result = pure }) its1 ;
     List.iter (iadd_iterm { map ; property ; formal ; result = pure }) its2

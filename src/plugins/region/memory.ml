@@ -57,8 +57,8 @@ and chunk = {
 
 type rg = node Ranges.range
 
-type domain = node LDomain.t
-type context = node LDomain.context
+type domain = node Ldomain.t
+type context = node Ldomain.context
 
 type map = {
   store: chunk Ufind.store ;
@@ -234,22 +234,22 @@ let add_cvar (m: map) v =
 let add_logic_info (m: map) f =
   try LVImap.find f m.logics with Not_found ->
     failwith_locked m "Region.Memory.add_logic_info" ;
-    let get_type t = LDomain.of_ltype (new_chunk m) t in
-    let d = Option.fold ~none:LDomain.pure ~some:get_type f.l_type in
+    let get_type t = Ldomain.of_ltype (new_chunk m) t in
+    let d = Option.fold ~none:Ldomain.pure ~some:get_type f.l_type in
     m.logics <- LVImap.add f d m.logics ; d
 
 let add_logic_var (m: map) lv =
   try LVmap.find lv m.lvars with Not_found ->
     failwith_locked m "Region.Memory.add_logic_var" ;
     assert (lv.lv_origin = None);
-    let d = LDomain.of_ltype (new_chunk m) lv.lv_type in
+    let d = Ldomain.of_ltype (new_chunk m) lv.lv_type in
     m.lvars <- LVmap.add lv d m.lvars ; d
 
-let domain_of_typ (m:map) (typ:typ) = LDomain.of_typ (new_chunk m) typ
+let domain_of_typ (m:map) (typ:typ) = Ldomain.of_typ (new_chunk m) typ
 
 let domain_of_ltyp (m:map) ?(ctxt) (lt:logic_type) =
-  let d : domain = LDomain.of_ltype (new_chunk m) lt in
-  Option.fold ~none:d ~some:(fun (c:context) -> LDomain.subst c d) ctxt
+  let d : domain = Ldomain.of_ltype (new_chunk m) lt in
+  Option.fold ~none:d ~some:(fun (c:context) -> Ldomain.subst c d) ctxt
 
 (* -------------------------------------------------------------------------- *)
 (* --- Iterator                                                           --- *)
@@ -404,7 +404,7 @@ let merge (m: map) (a: node) (b: node) : unit =
   failwith_locked m "Region.Memory.merge" ;
   merge_all m [a;b]
 
-let merge_domain (m:map) = LDomain.merge (fun a b -> merge m a b ; min a b)
+let merge_domain (m:map) = Ldomain.merge (fun a b -> merge m a b ; min a b)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Offset                                                             --- *)

@@ -118,9 +118,11 @@ let rec add_init (m:map) (s:stmt) (acs:Access.acs) (lv:lval) (iv:init) =
 (* --- Instructions                                                       --- *)
 (* -------------------------------------------------------------------------- *)
 
-let add_instr (m:map) (s:stmt) (instr:instr) =
+let add_instr ~kf (m:map) (s:stmt) (instr:instr) =
   match instr with
-  | Skip _ | Code_annot _ -> ()
+  | Skip _ -> ()
+  | Code_annot (annot,_) ->
+    Annot.add_code_annot ~kf ~stmt:s m annot
 
   | Set(lv, { enode = Lval le }, _) when is_comp le ->
     let r = add_lval m s lv in
@@ -163,13 +165,12 @@ type rmap = Memory.map Stmt.Map.t ref
 let store rmap m s =
   rmap := Stmt.Map.add s (Memory.copy ~locked:true m) !rmap
 
-let rec add_stmt (r:rmap) (m:map) (s:stmt) =
-  let annots = Annotations.code_annot s in
-  if annots <> [] then
-    Options.warning ~source:(fst @@ Stmt.loc s)
-      "Annotations not analyzed" ;
+let rec add_stmt ~kf (r:rmap) (m:map) (s:stmt) =
+  let add_block = add_block ~kf in
+  let add_annot = Annot.add_code_annot ~kf ~stmt:s m in
+  List.iter add_annot @@ Annotations.code_annot s ;
   match s.skind with
-  | Instr ki -> add_instr m s ki ; store r m s
+  | Instr ki -> add_instr ~kf m s ki ; store r m s
   | Return(Some e,_) -> add_value m s e ; store r m s
   | Goto _ | Break _ | Continue _ | Return(None,_) -> store r m s
   | If(e,st,se,_) ->
@@ -181,28 +182,30 @@ let rec add_stmt (r:rmap) (m:map) (s:stmt) =
     add_value  m s e ;
     store r m s ;
     add_block r m b ;
-  | Block b | Loop(_,b,_,_,_) -> add_block r m b
-  | UnspecifiedSequence s -> add_block r m @@ Cil.block_from_unspecified_sequence s
+  | Block b -> add_block r m b
+  | Loop(annots,b,_,_,_) -> List.iter add_annot annots ; add_block r m b
+  | UnspecifiedSequence s ->
+    add_block r m @@ Cil.block_from_unspecified_sequence s
   | Throw(exn,_) -> Option.iter (fun (e,_) -> add_value  m s e) exn
   | TryCatch(b,hs,_)  ->
     add_block r m b ;
-    List.iter (fun (c,b) -> add_catch r m c ; add_block r m b) hs ;
+    List.iter (fun (c,b) -> add_catch ~kf r m c ; add_block r m b) hs ;
   | TryExcept(a,(ks,e),b,_) ->
     add_block r m a ;
-    List.iter (add_instr m s) ks ;
+    List.iter (add_instr ~kf m s) ks ;
     add_value  m s e ;
     add_block r m b ;
   | TryFinally(a,b,_) ->
     add_block r m a ;
     add_block r m b ;
 
-and add_catch (r:rmap) (m:map) (c:catch_binder) =
+and add_catch ~kf (r:rmap) (m:map) (c:catch_binder) =
   match c with
   | Catch_all -> ()
-  | Catch_exn(_,xbs) -> List.iter (fun (_,b) -> add_block r m b) xbs
+  | Catch_exn(_,xbs) -> List.iter (fun (_,b) -> add_block ~kf r m b) xbs
 
-and add_block (r:rmap) (m:map) (b:block) =
-  List.iter (add_stmt r m) b.bstmts
+and add_block ~kf (r:rmap) (m:map) (b:block) =
+  List.iter (add_stmt ~kf r m) b.bstmts
 
 (* -------------------------------------------------------------------------- *)
 (* --- Behavior                                                           --- *)
@@ -243,12 +246,14 @@ let domain ?global kf =
     try
       let funspec = Annotations.funspec kf in
       List.iter (add_bhv ~kf s m) funspec.spec_behavior ;
+      let ki = Kinstr.kinstr_of_opt_stmt None in
+      List.iter (Annot.add_behavior ~kf ~ki m) funspec.spec_behavior ;
     with Annotations.No_funspec _ -> ()
   end ;
   begin
     try
       let fundec = Kernel_function.get_definition kf in
-      add_block r m fundec.sbody ;
+      add_block ~kf r m fundec.sbody ;
     with Kernel_function.No_Definition -> ()
   end ;
   {
