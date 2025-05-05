@@ -193,7 +193,7 @@ let to_dot_file ~temp ?in_kf reason =
   let dot_file =
     let prefix = "impact_reason" and suffix = ".dot" in
     if temp
-    then Temp_files.file prefix suffix
+    then Temp_files.file ~prefix ~suffix ()
     else Filesystem.temp_file ~prefix ~suffix
   in
   let open Filesystem.Operators in

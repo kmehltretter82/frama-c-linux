@@ -483,7 +483,7 @@ let build_cpp_cmd = function
       | Not_gnu -> [], []
       | Unknown -> opt :: to_warn, [opt]
     in
-    let ppf = Temp_files.file (Filepath.basename f) ".i" in
+    let ppf = Temp_files.file ~prefix:(Filepath.basename f) ~suffix:".i" () in
     (* Hypothesis: the preprocessor is POSIX compliant,
        hence understands -I and -D. *)
     let fc_include_args =
@@ -1716,7 +1716,8 @@ let compute_sources_table cpp_commands =
     match cmd_opt with
     | None -> ()
     | Some (cpp_cmd, _ppf) ->
-      let tmp_file = Temp_files.file "audit_produce_sources" ".txt" in
+      let tmp_file =
+        Temp_files.file ~prefix:"audit_produce_sources" ~suffix:".txt" () in
       let tmp_file' = (tmp_file :> string) in
       let cmd_for_sources = cpp_cmd ^ " -H -MM >/dev/null 2>" ^ tmp_file' in
       let exit_code = Sys.command cmd_for_sources in
@@ -1930,9 +1931,9 @@ let create_rebuilt_project_from_visitor
   let prj = create_project_from_visitor ?reorder ?last prj_name visitor in
   try
     let f =
-      let name = "frama_c_project_" ^ prj_name ^ "_" in
-      let ext = if preprocess then ".c" else ".i" in
-      Temp_files.file name ext
+      let prefix = "frama_c_project_" ^ prj_name ^ "_" in
+      let suffix = if preprocess then ".c" else ".i" in
+      Temp_files.file ~prefix ~suffix ()
     in
     Filesystem.with_formatter_exn f (fun fmt -> pretty_ast ~prj ~fmt ());
     let redo () =

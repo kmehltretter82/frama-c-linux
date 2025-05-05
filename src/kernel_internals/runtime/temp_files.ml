@@ -30,7 +30,7 @@ let should_keep_temp_file = function
   | None -> Kernel.is_debug_key_enabled dkey
   | Some b -> b
 
-let file ?keep prefix suffix =
+let file ?keep ~prefix ~suffix () =
   let file =
     try
       temp_file ~prefix ~suffix
@@ -46,7 +46,7 @@ let file ?keep prefix suffix =
     end;
   file
 
-let dir ?keep prefix suffix =
+let dir ?keep ~prefix ~suffix () =
   let dir =
     try
       temp_dir ~prefix ~suffix

@@ -29,7 +29,7 @@ let run () =
   Format.printf "Printing default project second time:@.";
   File.pretty_ast ~fmt ();
   let file =
-    (Temp_files.file "save_comments_test" ".sav")
+    (Temp_files.file ~prefix:"save_comments_test" ~suffix:".sav" ())
   in
   let name = "saved_project" in
   find_comment ();

@@ -172,7 +172,7 @@ let launch_server url =
       raise exn
 
 let temp_url () =
-  let socket = Temp_files.file "frama-c.socket" ".io" in
+  let socket = Temp_files.file ~prefix:"frama-c.socket" ~suffix:".io" () in
   "ipc://" ^ (socket :> string)
 
 let start_server () =

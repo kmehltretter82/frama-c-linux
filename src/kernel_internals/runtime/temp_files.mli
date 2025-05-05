@@ -40,12 +40,13 @@ val cleanup_at_exit: Filepath.t -> unit
     deleted at the end of the execution (see above).
     @raise Temp_file_error if the temp file cannot be created.
     @before Frama-C+dev was in Extlib and returned a string instead of
-    [Filepath.t], raised Temp_file_error and [keep] was named [debug] *)
-val file: ?keep:bool -> string -> string -> Filepath.t
+    [Filepath.t], raised Temp_file_error, [keep] was named [debug] and [prefix]
+    and [suffix] arguments were not named. *)
+val file: ?keep:bool -> prefix:string -> suffix:string -> unit -> Filepath.t
 
 (** Similar to [Filename.temp_dir] except that the temporary directory will be
     deleted at the end of the execution (see above).
     @before 28.0-Nickel returned a string instead of [Filepath.t]
-    @before Frama-C+dev was in Extlib, raised Temp_file_error and [keep] was
-    named [debug] *)
-val dir: ?keep:bool -> string -> string -> Filepath.t
+    @before Frama-C+dev was in Extlib, raised Temp_file_error and [keep] was named [debug] and [prefix]
+    and [suffix] arguments were not named. *)
+val dir: ?keep:bool -> prefix:string -> suffix:string -> unit -> Filepath.t

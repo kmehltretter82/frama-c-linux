@@ -130,7 +130,7 @@ let () =
 
 let run () =
   Ast.compute ();
-  let my_file = Temp_files.file "Extend" ".i" in
+  let my_file = Temp_files.file ~prefix:"Extend" ~suffix:".i" () in
   let open Filesystem.Operators in
   let$ fmt = Filesystem.with_formatter_exn my_file in
   File.pretty_ast ~fmt ();

@@ -172,7 +172,7 @@
     if !has_annot then begin
       let debug = Kernel.is_debug_key_enabled Kernel.dkey_pp_keep_temp_files in
       let ppname =
-        try Temp_files.file "ppannot" suffix
+        try Temp_files.file ~prefix:"ppannot" ~suffix ()
         with Filesystem.Temp_file_error s ->
           Kernel.abort
             "Could not open temporary file for logic preprocessing: %s" s
@@ -181,7 +181,7 @@
         let$ ppfile = Filesystem.with_open_out_exn ppname in
         Buffer.output_buffer ppfile preprocess_buffer;
       in
-      let cppname = Temp_files.file "cppannot" suffix in
+      let cppname = Temp_files.file ~prefix:"cppannot" ~suffix () in
       let pp_cmd = cpp ppname cppname in
       Kernel.feedback ~dkey:Kernel.dkey_pp_logic
         "logic preprocessing with \"%s\"" pp_cmd;
@@ -543,7 +543,7 @@ parse
     | Ok source ->
       let lex = Lexing.from_string source in
       let prefix = Filename.basename filename in
-      let ppname = Temp_files.file prefix ".pp" in
+      let ppname = Temp_files.file ~prefix ~suffix:".pp" () in
       let workdir_opt = Parse_env.get_workdir (Filepath.of_string filename) in
       Option.iter
         (fun workdir -> Parse_env.set_workdir ppname workdir)
