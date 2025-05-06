@@ -43,7 +43,7 @@ val is_dir: Filepath.t -> bool
 val readdir: Filepath.t -> string array
 [@@deprecated "Use iter_dir or fold_dir instead"]
 
-(** Contents of a directory
+(** Contents of a directory.
     @since Frama-C+dev *)
 val list_dir: Filepath.t -> string list
 
@@ -55,7 +55,7 @@ val iter_dir: (string -> unit) -> Filepath.t -> unit
     @since Frama-C+dev *)
 val fold_dir: (string -> 'a -> 'a) -> Filepath.t -> 'a -> 'a
 
-(** [mkdir ?parents name perm] creates directory [name] with permission
+(** [make_dir ?parents name perm] creates directory [name] with permission
     [perm]. If [parents] is true, recursively create parent directories
     if needed. [parents] defaults to false.
     Note that this function may create some of the parent directories
@@ -110,7 +110,7 @@ val temp_dir: prefix:string -> suffix:string -> Filepath.t
     @since Frama-C+dev *)
 val digest: Filepath.t -> string
 
-(** [digest p1 p2] compares the hashes of two files [p1] and [p2] using
+(** [same_digest p1 p2] compares the hashes of two files [p1] and [p2] using
     {!Stdlib.Digest.file} and returns [true] if they have the same.
     @since Frama-C+dev *)
 val same_digest: Filepath.t -> Filepath.t -> bool
@@ -121,7 +121,7 @@ val same_digest: Filepath.t -> Filepath.t -> bool
 (* ************************************************************************* *)
 
 val bincopy : bytes -> in_channel -> out_channel -> unit
-(** [copy buffer cin cout] reads [cin] until end-of-file
+(** [bincopy buffer cin cout] reads [cin] until end-of-file
     and copy it in [cout].
     [buffer] is a temporary string used during the copy.
     Recommended size is [2048]. *)
@@ -231,7 +231,7 @@ val with_open_out_exn:
   (out_channel, 'a) exn_processor
 
 
-(** [with_formatter_exn path f] calls [f] with a formatter writing to the file
+(** [with_formatter path f] calls [f] with a formatter writing to the file
     [path]. The file is closed and the formatter is flushed when [f] returns or
     whenever an exception is thrown by [f].
 
