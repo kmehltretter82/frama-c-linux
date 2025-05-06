@@ -1699,7 +1699,6 @@ let oneFilePass1 (f:file) : unit =
       if fromGFun && Ast_attributes.contains "weak" oldvi.vattr &&
          not (Ast_attributes.contains "weak" vi.vattr) then
         begin
-          let open Filepath in
           let oldpath = (fst oldvi.vdecl).pos_path in
           let newpath = (fst vi.vdecl).pos_path in
           Kernel.abort ~current:true
@@ -1708,7 +1707,7 @@ let oneFilePass1 (f:file) : unit =
              Please exchange command-line arguments to put '%a' \
              before '%a'.@."
             Printer.pp_location oldvi.vdecl
-            pretty newpath pretty oldpath
+            Filepath.pretty newpath Filepath.pretty oldpath
         end;
       newrep.ndata.vattr <- Ast_attributes.add_list oldvi.vattr vi.vattr;
       newrep.ndata.vdecl <- newdecl

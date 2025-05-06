@@ -823,7 +823,7 @@ class visitor (ctx:context) c =
         then
           let tgtdir = WpContext.directory () in
           let why3src = Filepath.basename source in
-          let target = Filepath.concat tgtdir (why3src :> string) in
+          let target = Filepath.(tgtdir / why3src) in
           Filesystem.copy_file source target
       in
       let iter_file opt =
@@ -1408,8 +1408,7 @@ let editor_command pconf =
 
 let scriptfile ~force ~ext wpo =
   let dir = Wp_parameters.get_session_dir ~force "interactive" in
-  let filenoext = Filepath.concat dir wpo.Wpo.po_sid in
-  Filepath.extend filenoext ext
+  Filepath.(dir / (wpo.Wpo.po_sid ^ ext))
 
 let updatescript ~script driver task =
   let backup = Filepath.extend script ".bak" in
@@ -1525,7 +1524,7 @@ let print_debug_task wpo drv prover task =
     let prover = Why3Provers.title prover in
     let goal = Wpo.get_gid wpo ^ "_" ^ prover in
     let filename = Why3.Driver.file_of_task drv "" goal task in
-    let file = Filepath.concat out_dir filename in
+    let file = Filepath.(out_dir / filename) in
     let out_channel = open_out (file :> string) in
     let fmt = Format.formatter_of_out_channel out_channel in
     Format.fprintf fmt "%a" pp_task task ;

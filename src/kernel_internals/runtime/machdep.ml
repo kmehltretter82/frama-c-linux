@@ -643,10 +643,10 @@ let gen_all_defines fmt mach =
 
 let generate_machdep_header ?(censored_macros=Datatype.String.Set.empty) mach =
   let temp = Temp_files.dir ~prefix:"__fc_machdep" ~suffix:".dir" () in
-  let fc_machdep = Filepath.concat temp "__fc_machdep.h" in
+  let fc_machdep = Filepath.(temp / "__fc_machdep.h") in
   let gen_machdep = Fun.flip gen_all_defines mach in
   Filesystem.with_formatter_exn fc_machdep gen_machdep;
-  let fc_builtins = Filepath.concat temp "__fc_builtin_macros.h" in
+  let fc_builtins = Filepath.(temp / "__fc_builtin_macros.h") in
   let gen_builtins =
     Fun.(flip (flip gen_define_custom_macros censored_macros) mach)
   in

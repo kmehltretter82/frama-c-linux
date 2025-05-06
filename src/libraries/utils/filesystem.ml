@@ -60,7 +60,7 @@ let rec remove_dir (p : t) =
   try
     Array.iter
       (fun a ->
-         let f = Filepath.concat p a in
+         let f = p / a in
          if is_dir f then remove_dir f else remove_file f
       ) (readdir p) ;
     Unix.rmdir (p :> string)

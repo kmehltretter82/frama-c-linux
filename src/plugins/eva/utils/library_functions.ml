@@ -113,5 +113,5 @@ let warn_unsupported_spec name =
       "@[The specification of function '%a' is currently not supported by Eva.@ \
        Consider adding '%a'@ to the analyzed source files.@]"
       Printer.pp_varname name Filepath.pretty
-      (Filepath.concat System_config.Share.libc header)
+      Filepath.(System_config.Share.libc / header)
   with Not_found -> ()

@@ -69,10 +69,8 @@ let path_for chapter filename =
   | `Plugin name -> "../.." , Printf.sprintf "plugins/%s/%s" name filename
 
 let path_for_readme ~plugin filename =
-  let dirname = match plugin with Kernel -> "server" | Plugin p -> p in
-  Filepath.concats
-    (Filepath.of_string ".")
-    ["src";"plugins";dirname;"doc";filename]
+  let dir_name = match plugin with Kernel -> "server" | Plugin p -> p in
+  Filepath.(of_string "src" / "plugins" / dir_name / "doc" / filename)
 
 let page chapter ~title ?(descr=[]) ?(plugin=Kernel) ~readme ~filename () =
   let rootdir , path = path_for chapter filename in
@@ -328,7 +326,7 @@ let metadata page : json =
 (* -------------------------------------------------------------------------- *)
 
 let pp_one_page ~root ~page ~title body =
-  let full_path = Filepath.concat root page in
+  let full_path = Filepath.(root / page) in
   ignore (Filesystem.make_dir ~parents:true (Filepath.dirname full_path) 0o755);
   try
     let chan = open_out (full_path:>string) in
@@ -361,12 +359,12 @@ let dump ~root ?(meta=true) () =
          let body = Markdown.subsections page.descr (build [] page.sections) in
          pp_one_page ~root ~page:path ~title (intro @ body) ;
          if meta then
-           let path = Filepath.concat root (path ^ ".json") in
+           let path = Filepath.(root / (path ^ ".json")) in
            Yojson.Basic.to_file (path:>string) (metadata page) ;
       ) !pages ;
     Senv.feedback "[doc] Page: 'readme.md'" ;
     if meta then
-      let path = Filepath.concat root "readme.md.json" in
+      let path = Filepath.(root / "readme.md.json") in
       Yojson.Basic.to_file (path:>string) maindata ;
       let body =
         [ Md.H1 (Md.plain "Presentation", None);

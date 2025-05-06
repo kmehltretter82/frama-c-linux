@@ -312,7 +312,7 @@ struct
 
     let add_plugin path =
       if is_kernel then path
-      else Fc_Filepath.concat path plugin_subpath
+      else Fc_Filepath.(path / plugin_subpath)
 
     let dirs () =
       if is_visible && is_set () then [ get () ]
@@ -321,7 +321,7 @@ struct
     let find ~is_dir relative =
       let exception Found of Fc_Filepath.t in
       let check_presence dir =
-        let path = Fc_Filepath.concat dir relative in
+        let path = Fc_Filepath.(dir / relative) in
         if Filesystem.exists path then raise (Found path)
       in
       try
@@ -351,8 +351,6 @@ struct
        end)
   =
   struct
-    open Fc_Filepath
-
     let is_visible = D.is_visible
     let is_kernel = P.name = ""
 
@@ -386,9 +384,9 @@ struct
     let get () =
       if Dir_name.is_set () then Dir_name.get ()
       else match Sys.getenv_opt var_name with
-        | Some s when s <> "" -> of_string s
+        | Some s when s <> "" -> Fc_Filepath.of_string s
         | _ when is_kernel -> D.default_root ()
-        | _ -> concat (D.kernel_get ()) P.shortname
+        | _ -> Fc_Filepath.(D.kernel_get () / P.shortname)
 
     let set = Dir_name.set
     let is_set = Dir_name.is_set
@@ -396,15 +394,15 @@ struct
     let expected ~dir path =
       if dir <> Filesystem.is_dir path then
         L.abort "%a is expected to be a %s"
-          pretty path (if dir then "directory" else "file")
+          Fc_Filepath.pretty path (if dir then "directory" else "file")
 
     let mk_dir d =
       try ignore @@ Filesystem.make_dir ~parents:true d 0o755
       with Unix.Unix_error _ ->
-        L.abort "cannot create %s directory `%a'" D.name pretty d
+        L.abort "cannot create %s directory `%a'" D.name Fc_Filepath.pretty d
 
     let get_dir ?(create_path=false) s =
-      let dir = concat (get ()) s in
+      let dir = Fc_Filepath.(get () / s) in
       if Filesystem.exists dir
       then (expected ~dir:true dir ; dir)
       else if create_path
@@ -415,7 +413,7 @@ struct
       let base_dir = get_dir ?create_path @@ Filename.dirname s in
       (* No need to create anything here, as the path of sub-directories has
          been already created by [get_dir] for computing [base_dir]. *)
-      let path = concat base_dir @@ Filename.basename s in
+      let path = Fc_Filepath.(base_dir / Filename.basename s) in
       if Filesystem.exists path then expected ~dir:false path ;
       path
   end

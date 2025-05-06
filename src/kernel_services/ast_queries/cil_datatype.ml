@@ -241,8 +241,7 @@ module Location = struct
     Position.to_lexing_pos pos1, Position.to_lexing_pos pos2
 
   let compare_start_semantic (pos1, _) (pos2, _) =
-    let open Filepath in
-    let c = Filepath.compare pos1.pos_path pos2.pos_path in
+    let c = Filepath.compare pos1.Filepath.pos_path pos2.Filepath.pos_path in
     if c <> 0 then c else
       let c = pos1.pos_lnum - pos2.pos_lnum in
       if c <> 0 then c else

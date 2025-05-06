@@ -81,8 +81,8 @@ let saving_mode () =
 
 let files : (Filepath.t,script) Hashtbl.t = Hashtbl.create 32
 
-let jsonfile (dir:Filepath.t) name =
-  Filepath.concat dir (name ^ ".json")
+let jsonfile (dir:Filepath.t) filename =
+  Filepath.(dir / (filename ^ ".json"))
 
 let get_script_dir ~force =
   Wp_parameters.get_session_dir ~force "script"
@@ -179,7 +179,7 @@ let save ~stdout wpo js =
 
 let get_marks_dir ~force =
   let scripts = Wp_parameters.get_session_dir ~force "script" in
-  let path = Filepath.concat scripts ".marks" in
+  let path = Filepath.(scripts / ".marks") in
   if force then Wp_parameters.make_output_dir path ;
   path
 
@@ -197,7 +197,7 @@ let reset_marks () =
 let mark goal =
   let marks = get_marks_dir ~force:false in
   if Filesystem.exists marks && Filesystem.is_dir marks then
-    let mark = Filepath.concat marks (goal.po_sid ^ ".json") in
+    let mark = Filepath.(marks / (goal.po_sid ^ ".json")) in
     if Filesystem.exists mark then ()
     else close_out @@ open_out (mark :> string)
 
@@ -214,7 +214,7 @@ let remove_unmarked_files ~dry =
         let orphans = StringSet.diff files marks in
         let orphans = StringSet.remove ".marks" orphans in
         let remove file =
-          let path = Filepath.concat dir file in
+          let path = Filepath.(dir / file) in
           if dry
           then Wp_parameters.feedback "[dry] rm %a" Filepath.pretty path
           else Filesystem.remove_file path

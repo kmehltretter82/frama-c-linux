@@ -36,7 +36,7 @@ module Share = struct
   let dirs = List.map Filepath.of_string Config_data.Sites.share
   let path = String.concat ":" (Filepath.to_string_list dirs)
   let main = List.hd (List.rev dirs)
-  let libc = Filepath.concat main "libc"
+  let libc = Filepath.(main / "libc")
 
   let () = Filepath.add_symbolic_dir_list "FRAMAC_SHARE" dirs
 end

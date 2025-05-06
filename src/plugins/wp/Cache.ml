@@ -174,10 +174,9 @@ let promote ?timeout ?steplimit (res : VCS.result) =
     else (* can be run a longer time or widely *)
       VCS.no_result
 
-let file_from_hash hash =
+let file_from_hash file_hash =
   let dir = get_usable_dir ~make:true () in
-  let file = Filepath.concat dir (hash ^ ".json") in
-  file
+  Filepath.(dir / (file_hash ^ ".json"))
 
 let get_cache_result ~mode hash =
   match mode with
@@ -237,7 +236,7 @@ let cleanup_cache () =
                if not (Hashtbl.mem cleanup hash) then
                  begin
                    incr removed ;
-                   Filesystem.remove_file (Filepath.concat dir f) ;
+                   Filesystem.remove_file Filepath.(dir / f) ;
                  end
           ) dir ;
     with

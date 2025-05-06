@@ -1,7 +1,6 @@
 open Cil_types
 
-let print_loc fmt (b,e) =
-  let open Filepath in
+let print_loc fmt (b,e : Filepath.position * Filepath.position) =
   Format.fprintf fmt "Start line %d, char %d; End line %d, char %d"
     b.pos_lnum (b.pos_cnum - b.pos_bol) e.pos_lnum (e.pos_cnum - e.pos_bol)
 

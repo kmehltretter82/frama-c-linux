@@ -154,6 +154,8 @@ let extend ?existence t ext = of_string ?existence (t ^ ext)
 
 let concat ?existence t s = of_string ?existence (t ^ "/" ^ s)
 
+let (/) = concat ~existence:Indifferent
+
 let concats ?existence t sl =
   let s' = List.fold_left (fun acc s -> acc ^ "/" ^ s) "" sl in
   of_string ?existence (t ^ s')
@@ -274,3 +276,4 @@ module Normalized = struct
     try (Unix.stat (p :> string)).Unix.st_kind = Unix.S_REG with _ -> false
   let to_base_uri = to_base_uri
 end
+

@@ -1047,7 +1047,7 @@ module Machdep = struct
   let get_dir () = Share.get_dir "machdeps"
   let get_default_file machdep =
     let filename = "machdep_" ^ machdep ^ ".yaml" in
-    Filepath.concat (get_dir()) filename
+    Filepath.(get_dir () / filename)
   let is_default machdep =
     Filesystem.is_file (get_default_file machdep)
 

@@ -26,10 +26,9 @@ let home () =
   | s -> Filepath.of_string s
 
 let env_or_default env default =
-  let open Filepath in
   match Sys.getenv_opt env with
-  | Some s when s <> "" -> concat (of_string s) "frama-c"
-  | _ -> concats (home ()) default
+  | Some s when s <> "" -> Filepath.(of_string s / "frama-c")
+  | _ -> Filepath.concats (home ()) default
 
 let cache () =
   env_or_default "XDG_CACHE_HOME" [ "Library" ; "Caches" ; "frama-c"]

@@ -1161,12 +1161,12 @@ let get_output () =
   let name = Project.get_unique_name project in
   if name = "default" then base
   else
-    let dir = Fc_Filepath.concat base name in
+    let dir = Fc_Filepath.(base / name) in
     make_output_dir dir ; dir
 
 let get_output_dir d =
   let base = get_output () in
-  let path = Fc_Filepath.concat base d in
+  let path = Fc_Filepath.(base / d) in
   make_output_dir path ; path
 
 (* -------------------------------------------------------------------------- *)
@@ -1190,7 +1190,7 @@ let get_session ~force () =
 
 let get_session_dir ~force d =
   let base = get_session ~force () in
-  let path = Fc_Filepath.concat base d in
+  let path = Fc_Filepath.(base / d) in
   if force then make_output_dir path ; path
 
 (* -------------------------------------------------------------------------- *)

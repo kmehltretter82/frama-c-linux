@@ -146,9 +146,9 @@ let setCurrentFile n =
    Most exceptions are silently caught and printing is stopped if they occur. *)
 let pp_context_from_file ?(ctx=2) fmt (start_pos, pos) =
   let open Filesystem.Operators in
-  let open Filepath in
   let start_pos =
-    if Filepath.equal start_pos.pos_path pos.pos_path then start_pos
+    if Filepath.equal start_pos.Filepath.pos_path pos.Filepath.pos_path
+    then start_pos
     else pos
   in
   try

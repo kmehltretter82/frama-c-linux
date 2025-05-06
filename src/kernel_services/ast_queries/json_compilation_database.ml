@@ -298,7 +298,7 @@ let compute_flags_from_file () =
   let database = Kernel.JsonCompilationDatabase.get () in
   let jcdb_dir, jcdb_path =
     if Filesystem.is_dir database then
-      database, Filepath.concat database "compile_commands.json"
+      database, Filepath.(database / "compile_commands.json")
     else Filepath.dirname database, database
   in
   Kernel.feedback ~dkey:Kernel.dkey_compilation_db
