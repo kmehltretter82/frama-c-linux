@@ -27,17 +27,12 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'A' (file doomed_loop.i, line 18):
-Prove: true.
-
-------------------------------------------------------------
-
 Goal Establishment of Invariant 'A' (file doomed_loop.i, line 18):
 Prove: P_P(0).
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'B' (file doomed_loop.i, line 19):
+Goal Preservation of Invariant 'A' (file doomed_loop.i, line 18):
 Prove: true.
 
 ------------------------------------------------------------
@@ -45,6 +40,11 @@ Prove: true.
 Goal Establishment of Invariant 'B' (file doomed_loop.i, line 19):
 Assume { (* Invariant 'A' *) Have: P_P(0). }
 Prove: false.
+
+------------------------------------------------------------
+
+Goal Preservation of Invariant 'B' (file doomed_loop.i, line 19):
+Prove: true.
 
 ------------------------------------------------------------
 

@@ -91,12 +91,17 @@ Prove: (a_16 = (1 + x[i])) /\ (a_17 = (1 + a_16)) /\ (a_18 = (1 + a_19)) /\
 
 ------------------------------------------------------------
 
+Goal Establishment of Invariant (file chunk_typing.i, line 31):
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Preservation of Invariant (file chunk_typing.i, line 31):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file chunk_typing.i, line 31):
+Goal Establishment of Invariant (file chunk_typing.i, line 32):
 Prove: true.
 
 ------------------------------------------------------------
@@ -206,7 +211,7 @@ Prove: a_24[shift_sint8(i8_0, i_1)] = 1.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file chunk_typing.i, line 32):
+Goal Establishment of Invariant (file chunk_typing.i, line 33):
 Prove: true.
 
 ------------------------------------------------------------
@@ -320,7 +325,7 @@ Prove: a_25[shift_uint8(u8_0, i_1)] = 2.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file chunk_typing.i, line 33):
+Goal Establishment of Invariant (file chunk_typing.i, line 34):
 Prove: true.
 
 ------------------------------------------------------------
@@ -438,7 +443,7 @@ Prove: a_26[shift_sint16(i16_0, i_1)] = 3.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file chunk_typing.i, line 34):
+Goal Establishment of Invariant (file chunk_typing.i, line 35):
 Prove: true.
 
 ------------------------------------------------------------
@@ -560,7 +565,7 @@ Prove: a_27[shift_uint16(u16_0, i_1)] = 4.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file chunk_typing.i, line 35):
+Goal Establishment of Invariant (file chunk_typing.i, line 36):
 Prove: true.
 
 ------------------------------------------------------------
@@ -686,7 +691,7 @@ Prove: a_28[shift_sint32(i32_0, i_1)] = 5.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file chunk_typing.i, line 36):
+Goal Establishment of Invariant (file chunk_typing.i, line 37):
 Prove: true.
 
 ------------------------------------------------------------
@@ -816,7 +821,7 @@ Prove: a_29[shift_uint32(u32_0, i_1)] = 6.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file chunk_typing.i, line 37):
+Goal Establishment of Invariant (file chunk_typing.i, line 38):
 Prove: true.
 
 ------------------------------------------------------------
@@ -950,7 +955,7 @@ Prove: a_30[shift_sint64(i64_0, i_1)] = 7.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file chunk_typing.i, line 38):
+Goal Establishment of Invariant (file chunk_typing.i, line 39):
 Prove: true.
 
 ------------------------------------------------------------
@@ -1085,11 +1090,6 @@ Assume {
       (a_3[shift_sint64(i64_0, i_2)] = 7))).
 }
 Prove: a_31[shift_uint64(u64_0, i_1)] = 8.
-
-------------------------------------------------------------
-
-Goal Establishment of Invariant (file chunk_typing.i, line 39):
-Prove: true.
 
 ------------------------------------------------------------
 
@@ -1810,12 +1810,12 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file chunk_typing.i, line 44):
+Goal Positivity of Loop variant at loop (file chunk_typing.i, line 44):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Positivity of Loop variant at loop (file chunk_typing.i, line 44):
+Goal Decreasing of Loop variant at loop (file chunk_typing.i, line 44):
 Prove: true.
 
 ------------------------------------------------------------

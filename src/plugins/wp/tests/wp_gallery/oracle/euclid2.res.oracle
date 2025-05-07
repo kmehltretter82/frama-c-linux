@@ -27,6 +27,11 @@ Prove: x = euclid_gcd_0.
 
 ------------------------------------------------------------
 
+Goal Establishment of Invariant (file euclid2.c, line 17):
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Preservation of Invariant (file euclid2.c, line 17):
 Let x = number.Gcd.gcd(a_2, b).
 Let x_1 = a_1 % a.
@@ -43,11 +48,6 @@ Assume {
   Have: a != 0.
 }
 Prove: number.Gcd.gcd(a, x_1) = x.
-
-------------------------------------------------------------
-
-Goal Establishment of Invariant (file euclid2.c, line 17):
-Prove: true.
 
 ------------------------------------------------------------
 
@@ -74,6 +74,11 @@ Prove: true.
 
 ------------------------------------------------------------
 
+Goal Positivity of Loop variant at loop (file euclid2.c, line 20):
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Decreasing of Loop variant at loop (file euclid2.c, line 20):
 Let x = a % a_1.
 Let x_1 = number.Gcd.gcd(a_2, b).
@@ -92,10 +97,5 @@ Assume {
   Have: number.Gcd.gcd(a_1, x) = x_1.
 }
 Prove: IAbs.abs(x) < IAbs.abs(a_1).
-
-------------------------------------------------------------
-
-Goal Positivity of Loop variant at loop (file euclid2.c, line 20):
-Prove: true.
 
 ------------------------------------------------------------

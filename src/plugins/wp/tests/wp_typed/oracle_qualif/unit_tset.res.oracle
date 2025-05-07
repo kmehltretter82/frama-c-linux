@@ -8,8 +8,8 @@
 [wp] 5 goals scheduled
 [wp] [Valid] typed_complex_terminates (Qed)
 [wp] [Valid] typed_complex_exits (Qed)
-[wp] [Valid] typed_complex_assigns_exit (Qed)
 [wp] [Valid] typed_complex_assigns_normal (Qed)
+[wp] [Valid] typed_complex_assigns_exit (Qed)
 [wp] [Valid] typed_complex_call_job_requires (Qed)
 [wp] Proved goals:    5 / 5
   Qed:             5

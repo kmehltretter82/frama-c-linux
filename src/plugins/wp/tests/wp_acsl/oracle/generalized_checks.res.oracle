@@ -70,11 +70,6 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns nothing in 'caller':
-Prove: true.
-
-------------------------------------------------------------
-
 Goal Assigns nothing in 'caller' (1/2):
 Prove: true.
 
@@ -82,6 +77,11 @@ Prove: true.
 
 Goal Assigns nothing in 'caller' (2/2):
 Call Result at line 65
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Assigns nothing in 'caller':
 Prove: true.
 
 ------------------------------------------------------------
@@ -157,11 +157,6 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns nothing in 'job':
-Prove: true.
-
-------------------------------------------------------------
-
 Goal Assigns nothing in 'job' (1/2):
 Prove: true.
 
@@ -169,6 +164,11 @@ Prove: true.
 
 Goal Assigns nothing in 'job' (2/2):
 Call Result at line 52
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Assigns nothing in 'job':
 Prove: true.
 
 ------------------------------------------------------------
@@ -182,13 +182,13 @@ Prove: false.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'false_but_preserved' (file generalized_checks.i, line 70):
-Prove: true.
+Goal Establishment of Invariant 'false_but_preserved' (file generalized_checks.i, line 70):
+Prove: false.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'false_but_preserved' (file generalized_checks.i, line 70):
-Prove: false.
+Goal Preservation of Invariant 'false_but_preserved' (file generalized_checks.i, line 70):
+Prove: true.
 
 ------------------------------------------------------------
 

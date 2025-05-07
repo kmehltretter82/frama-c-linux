@@ -24,11 +24,6 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns nothing in 'main':
-Prove: true.
-
-------------------------------------------------------------
-
 Goal Assigns nothing in 'main' (1/6):
 Prove: true.
 
@@ -60,6 +55,11 @@ Prove: true.
 
 Goal Assigns nothing in 'main' (6/6):
 Effect at line 30
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Assigns nothing in 'main':
 Prove: true.
 
 ------------------------------------------------------------

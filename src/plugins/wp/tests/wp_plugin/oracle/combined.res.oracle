@@ -28,12 +28,17 @@ Prove: (50 <= A) /\ (A <= 100).
 
 ------------------------------------------------------------
 
+Goal Establishment of Invariant (file combined.c, line 16):
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Preservation of Invariant (file combined.c, line 16):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file combined.c, line 16):
+Goal Establishment of Invariant (file combined.c, line 17):
 Prove: true.
 
 ------------------------------------------------------------
@@ -65,7 +70,7 @@ Prove: P_P(a_1[shift_sint32(t, i) <- v][shift_sint32(t, i_1)]).
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file combined.c, line 17):
+Goal Establishment of Invariant (file combined.c, line 23):
 Prove: true.
 
 ------------------------------------------------------------
@@ -92,11 +97,6 @@ Assume {
   Have: j <= 99.
 }
 Prove: A <= x.
-
-------------------------------------------------------------
-
-Goal Establishment of Invariant (file combined.c, line 23):
-Prove: true.
 
 ------------------------------------------------------------
 
@@ -185,22 +185,22 @@ Prove: included(a_1, 1, shift_sint32(t, A), 100 - A).
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file combined.c, line 21):
-Prove: true.
-
-------------------------------------------------------------
-
 Goal Positivity of Loop variant at loop (file combined.c, line 21):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file combined.c, line 27):
+Goal Decreasing of Loop variant at loop (file combined.c, line 21):
 Prove: true.
 
 ------------------------------------------------------------
 
 Goal Positivity of Loop variant at loop (file combined.c, line 27):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Decreasing of Loop variant at loop (file combined.c, line 27):
 Prove: true.
 
 ------------------------------------------------------------

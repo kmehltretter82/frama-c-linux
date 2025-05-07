@@ -6,11 +6,11 @@
 [wp] Warning: Missing RTE guards
 [wp] 6 goals scheduled
 [wp] [Valid] typed_LoopCurrent_ensures (Qed)
-[wp] [Unsuccess] typed_LoopCurrent_loop_invariant_A_preserved (Alt-Ergo) (Cached)
 [wp] [Valid] typed_LoopCurrent_loop_invariant_A_established (Qed)
+[wp] [Unsuccess] typed_LoopCurrent_loop_invariant_A_preserved (Alt-Ergo) (Cached)
 [wp] [Valid] typed_LoopCurrent_loop_assigns (Qed)
-[wp] [Valid] typed_LoopCurrent_loop_variant_decrease (Qed)
 [wp] [Valid] typed_LoopCurrent_loop_variant_positive (Qed)
+[wp] [Valid] typed_LoopCurrent_loop_variant_decrease (Qed)
 [wp] Proved goals:    7 / 8
   Terminating:     1
   Unreachable:     1

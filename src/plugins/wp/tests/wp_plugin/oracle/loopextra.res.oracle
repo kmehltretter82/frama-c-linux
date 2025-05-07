@@ -8,12 +8,12 @@
   Function f
 ------------------------------------------------------------
 
-Goal Preservation of Invariant (file loopextra.i, line 6):
+Goal Establishment of Invariant (file loopextra.i, line 6):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file loopextra.i, line 6):
+Goal Preservation of Invariant (file loopextra.i, line 6):
 Prove: true.
 
 ------------------------------------------------------------
@@ -23,12 +23,12 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant (file loopextra.i, line 14):
+Goal Establishment of Invariant (file loopextra.i, line 14):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file loopextra.i, line 14):
+Goal Preservation of Invariant (file loopextra.i, line 14):
 Prove: true.
 
 ------------------------------------------------------------
@@ -77,22 +77,22 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file loopextra.i, line 10):
-Prove: true.
-
-------------------------------------------------------------
-
 Goal Positivity of Loop variant at loop (file loopextra.i, line 10):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file loopextra.i, line 18):
+Goal Decreasing of Loop variant at loop (file loopextra.i, line 10):
 Prove: true.
 
 ------------------------------------------------------------
 
 Goal Positivity of Loop variant at loop (file loopextra.i, line 18):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Decreasing of Loop variant at loop (file loopextra.i, line 18):
 Prove: true.
 
 ------------------------------------------------------------

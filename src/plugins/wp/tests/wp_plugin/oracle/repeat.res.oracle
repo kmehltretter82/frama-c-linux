@@ -28,12 +28,17 @@ Prove: true.
 
 ------------------------------------------------------------
 
+Goal Establishment of Invariant (file repeat.c, line 61):
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Preservation of Invariant (file repeat.c, line 61):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file repeat.c, line 61):
+Goal Establishment of Invariant (file repeat.c, line 62):
 Prove: true.
 
 ------------------------------------------------------------
@@ -68,12 +73,13 @@ Prove: (a_2 *^ x) = a_1.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file repeat.c, line 62):
+Goal Loop assigns (file repeat.c, line 63):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file repeat.c, line 63):
+Goal Assigns (file repeat.c, line 56) in 'induction':
+Effect at line 66
 Prove: true.
 
 ------------------------------------------------------------
@@ -89,18 +95,12 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file repeat.c, line 56) in 'induction':
-Effect at line 66
+Goal Positivity of Loop variant at loop (file repeat.c, line 66):
 Prove: true.
 
 ------------------------------------------------------------
 
 Goal Decreasing of Loop variant at loop (file repeat.c, line 66):
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Positivity of Loop variant at loop (file repeat.c, line 66):
 Prove: true.
 
 ------------------------------------------------------------
@@ -173,12 +173,17 @@ Prove: true.
 
 ------------------------------------------------------------
 
+Goal Establishment of Invariant (file repeat.c, line 82):
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Preservation of Invariant (file repeat.c, line 82):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file repeat.c, line 82):
+Goal Establishment of Invariant (file repeat.c, line 83):
 Prove: true.
 
 ------------------------------------------------------------
@@ -215,11 +220,6 @@ Prove: (a *^ x) = a_2.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file repeat.c, line 83):
-Prove: true.
-
-------------------------------------------------------------
-
 Goal Loop assigns (file repeat.c, line 84):
 Prove: true.
 
@@ -247,12 +247,12 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file repeat.c, line 87):
+Goal Positivity of Loop variant at loop (file repeat.c, line 87):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Positivity of Loop variant at loop (file repeat.c, line 87):
+Goal Decreasing of Loop variant at loop (file repeat.c, line 87):
 Prove: true.
 
 ------------------------------------------------------------
@@ -281,12 +281,12 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant (generated):
+Goal Establishment of Invariant (generated):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (generated):
+Goal Preservation of Invariant (generated):
 Prove: true.
 
 ------------------------------------------------------------

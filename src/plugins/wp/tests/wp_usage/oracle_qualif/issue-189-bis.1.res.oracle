@@ -5,14 +5,14 @@
 [wp] 10 goals scheduled
 [wp] [Valid] typed_memcpy_context_vars_ensures_memcpy_ok (Alt-Ergo) (Cached)
 [wp] [Valid] typed_memcpy_context_vars_ensures_unmodified_ok (Qed)
-[wp] [Valid] typed_memcpy_context_vars_loop_invariant_ok_cpy_preserved (Alt-Ergo) (Cached)
 [wp] [Valid] typed_memcpy_context_vars_loop_invariant_ok_cpy_established (Qed)
-[wp] [Valid] typed_memcpy_context_vars_loop_invariant_ok_dst_preserved (Qed)
+[wp] [Valid] typed_memcpy_context_vars_loop_invariant_ok_cpy_preserved (Alt-Ergo) (Cached)
 [wp] [Valid] typed_memcpy_context_vars_loop_invariant_ok_dst_established (Qed)
-[wp] [Valid] typed_memcpy_context_vars_loop_invariant_ok_len_preserved (Alt-Ergo) (Cached)
+[wp] [Valid] typed_memcpy_context_vars_loop_invariant_ok_dst_preserved (Qed)
 [wp] [Valid] typed_memcpy_context_vars_loop_invariant_ok_len_established (Qed)
-[wp] [Valid] typed_memcpy_context_vars_loop_invariant_ok_src_preserved (Qed)
+[wp] [Valid] typed_memcpy_context_vars_loop_invariant_ok_len_preserved (Alt-Ergo) (Cached)
 [wp] [Valid] typed_memcpy_context_vars_loop_invariant_ok_src_established (Qed)
+[wp] [Valid] typed_memcpy_context_vars_loop_invariant_ok_src_preserved (Qed)
 [wp] Proved goals:   10 / 10
   Qed:             7
   Alt-Ergo:        3

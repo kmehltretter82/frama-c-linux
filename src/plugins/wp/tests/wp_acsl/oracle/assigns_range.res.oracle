@@ -133,12 +133,6 @@ Prove: true.
 
 Goal Assigns 'qed_ko' in 'call_assigns_t1':
 Call Effect at line 49
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Assigns 'qed_ko' in 'call_assigns_t1':
-Call Effect at line 49
 Assume {
   Type: is_sint32(i).
   (* Goal *)
@@ -147,6 +141,12 @@ Assume {
   Have: (5 <= i) /\ (i <= 7).
 }
 Prove: false.
+
+------------------------------------------------------------
+
+Goal Assigns 'qed_ko' in 'call_assigns_t1':
+Call Effect at line 49
+Prove: true.
 
 ------------------------------------------------------------
 
@@ -173,12 +173,6 @@ Prove: true.
 
 Goal Assigns 'qed_ko' in 'call_assigns_t2':
 Call Effect at line 57
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Assigns 'qed_ko' in 'call_assigns_t2':
-Call Effect at line 57
 Assume {
   Type: is_sint32(i).
   (* Heap *)
@@ -194,6 +188,12 @@ Assume {
       (((i_1 < i) \/ ((3 + i) <= i_1)) -> (t2_1[i_1] = t2_0[i_1])))).
 }
 Prove: false.
+
+------------------------------------------------------------
+
+Goal Assigns 'qed_ko' in 'call_assigns_t2':
+Call Effect at line 57
+Prove: true.
 
 ------------------------------------------------------------
 
@@ -220,12 +220,6 @@ Prove: true.
 
 Goal Assigns 'qed_ko' in 'call_assigns_t4':
 Call Effect at line 65
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Assigns 'qed_ko' in 'call_assigns_t4':
-Call Effect at line 65
 Assume {
   Type: is_sint32(i) /\ is_sint32(j).
   (* Heap *)
@@ -239,6 +233,12 @@ Assume {
       (((i_1 < 0) \/ (j < i_1)) -> (t4_1[i_1] = t4_0[i_1])))).
 }
 Prove: i <= 0.
+
+------------------------------------------------------------
+
+Goal Assigns 'qed_ko' in 'call_assigns_t4':
+Call Effect at line 65
+Prove: true.
 
 ------------------------------------------------------------
 

@@ -33,10 +33,10 @@
 [wp] [Valid] typed_assert_needed_assert_qed_ok_ok_with_hyp (Qed)
 [wp] [Unsuccess] typed_bts0513_ensures_ko1 (Alt-Ergo) (Cached)
 [wp] [Unsuccess] typed_bts0513_ensures_ko2 (Alt-Ergo) (Cached)
-[wp] [Valid] typed_razT_loop_invariant_qed_ok_preserved (Alt-Ergo) (Cached)
 [wp] [Valid] typed_razT_loop_invariant_qed_ok_established (Qed)
-[wp] [Valid] typed_razT_loop_variant_decrease (Qed)
+[wp] [Valid] typed_razT_loop_invariant_qed_ok_preserved (Alt-Ergo) (Cached)
 [wp] [Valid] typed_razT_loop_variant_positive (Qed)
+[wp] [Valid] typed_razT_loop_variant_decrease (Qed)
 [wp] [Unsuccess] typed_razT_b1_ensures_e1 (Alt-Ergo) (Cached)
 [wp] Proved goals:   29 / 33
   Terminating:     6

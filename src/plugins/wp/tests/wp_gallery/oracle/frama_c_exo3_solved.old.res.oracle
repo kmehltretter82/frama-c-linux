@@ -9,29 +9,29 @@
 [wp] Goal typed_ref_equal_elements_ensures_3 : not tried
 [wp] Goal typed_ref_equal_elements_assert_rte_mem_access : trivial
 [wp] Goal typed_ref_equal_elements_assert_rte_mem_access_2 : trivial
-[wp] Goal typed_ref_equal_elements_loop_invariant_preserved : not tried
 [wp] Goal typed_ref_equal_elements_loop_invariant_established : not tried
-[wp] Goal typed_ref_equal_elements_loop_invariant_2_preserved : not tried
+[wp] Goal typed_ref_equal_elements_loop_invariant_preserved : not tried
 [wp] Goal typed_ref_equal_elements_loop_invariant_2_established : not tried
+[wp] Goal typed_ref_equal_elements_loop_invariant_2_preserved : not tried
 [wp] Goal typed_ref_equal_elements_assert_rte_index_bound : not tried
 [wp] Goal typed_ref_equal_elements_assert_rte_index_bound_2 : not tried
 [wp] Goal typed_ref_equal_elements_assert_rte_signed_overflow : not tried
-[wp] Goal typed_ref_equal_elements_loop_invariant_3_preserved : not tried
 [wp] Goal typed_ref_equal_elements_loop_invariant_3_established : not tried
-[wp] Goal typed_ref_equal_elements_loop_invariant_4_preserved : not tried
+[wp] Goal typed_ref_equal_elements_loop_invariant_3_preserved : not tried
 [wp] Goal typed_ref_equal_elements_loop_invariant_4_established : not tried
-[wp] Goal typed_ref_equal_elements_loop_invariant_5_preserved : not tried
+[wp] Goal typed_ref_equal_elements_loop_invariant_4_preserved : not tried
 [wp] Goal typed_ref_equal_elements_loop_invariant_5_established : not tried
-[wp] Goal typed_ref_equal_elements_loop_invariant_6_preserved : not tried
+[wp] Goal typed_ref_equal_elements_loop_invariant_5_preserved : not tried
 [wp] Goal typed_ref_equal_elements_loop_invariant_6_established : not tried
-[wp] Goal typed_ref_equal_elements_loop_invariant_7_preserved : not tried
+[wp] Goal typed_ref_equal_elements_loop_invariant_6_preserved : not tried
 [wp] Goal typed_ref_equal_elements_loop_invariant_7_established : not tried
-[wp] Goal typed_ref_equal_elements_loop_invariant_8_preserved : not tried
+[wp] Goal typed_ref_equal_elements_loop_invariant_7_preserved : not tried
 [wp] Goal typed_ref_equal_elements_loop_invariant_8_established : not tried
-[wp] Goal typed_ref_equal_elements_loop_invariant_9_preserved : not tried
+[wp] Goal typed_ref_equal_elements_loop_invariant_8_preserved : not tried
 [wp] Goal typed_ref_equal_elements_loop_invariant_9_established : not tried
-[wp] Goal typed_ref_equal_elements_loop_invariant_10_preserved : not tried
+[wp] Goal typed_ref_equal_elements_loop_invariant_9_preserved : not tried
 [wp] Goal typed_ref_equal_elements_loop_invariant_10_established : not tried
+[wp] Goal typed_ref_equal_elements_loop_invariant_10_preserved : not tried
 [wp] Goal typed_ref_equal_elements_assert_rte_mem_access_3 : not tried
 [wp] Goal typed_ref_equal_elements_assert_rte_index_bound_3 : not tried
 [wp] Goal typed_ref_equal_elements_assert_rte_index_bound_4 : not tried
@@ -50,10 +50,10 @@
 [wp] Goal typed_ref_equal_elements_assigns_part1 : trivial
 [wp] Goal typed_ref_equal_elements_assigns_part2 : not tried
 [wp] Goal typed_ref_equal_elements_assigns_part3 : not tried
-[wp] Goal typed_ref_equal_elements_loop_variant_decrease : not tried
 [wp] Goal typed_ref_equal_elements_loop_variant_positive : not tried
-[wp] Goal typed_ref_equal_elements_loop_variant_2_decrease : not tried
+[wp] Goal typed_ref_equal_elements_loop_variant_decrease : not tried
 [wp] Goal typed_ref_equal_elements_loop_variant_2_positive : not tried
+[wp] Goal typed_ref_equal_elements_loop_variant_2_decrease : not tried
 [wp] frama_c_exo3_solved.old.c:73: Warning: 
   Memory model hypotheses for function 'equal_elements':
   /*@

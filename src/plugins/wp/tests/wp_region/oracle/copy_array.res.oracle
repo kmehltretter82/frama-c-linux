@@ -38,6 +38,11 @@ Prove: a_3[shift_sint32(b, i_1)] = a_3[shift_sint32(a, i_1)].
 
 ------------------------------------------------------------
 
+Goal Establishment of Invariant 'Copy' (file copy_array.c, line 11):
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Preservation of Invariant 'Copy' (file copy_array.c, line 11):
 Let a_1 = shift_sint32(a, 0).
 Let x = 4 * n.
@@ -73,17 +78,12 @@ Prove: a_3[shift_sint32(b, i_1)] = a_3[shift_sint32(a, i_1)].
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'Copy' (file copy_array.c, line 11):
+Goal Establishment of Invariant 'Range' (file copy_array.c, line 10):
 Prove: true.
 
 ------------------------------------------------------------
 
 Goal Preservation of Invariant 'Range' (file copy_array.c, line 10):
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Establishment of Invariant 'Range' (file copy_array.c, line 10):
 Prove: true.
 
 ------------------------------------------------------------
@@ -202,12 +202,12 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file copy_array.c, line 15):
+Goal Positivity of Loop variant at loop (file copy_array.c, line 15):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Positivity of Loop variant at loop (file copy_array.c, line 15):
+Goal Decreasing of Loop variant at loop (file copy_array.c, line 15):
 Prove: true.
 
 ------------------------------------------------------------

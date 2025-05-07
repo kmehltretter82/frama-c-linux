@@ -28,11 +28,6 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns nothing in 'g':
-Prove: true.
-
-------------------------------------------------------------
-
 Goal Assigns nothing in 'g' (1/5):
 Prove: true.
 
@@ -62,6 +57,11 @@ Prove: true.
 Goal Assigns nothing in 'g' (5/5):
 Effect at line 10
 Tags: Default.
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Assigns nothing in 'g':
 Prove: true.
 
 ------------------------------------------------------------

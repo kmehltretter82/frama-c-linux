@@ -10,22 +10,22 @@
   Function f
 ------------------------------------------------------------
 
-Goal Preservation of Invariant (file unit_loopscope.i, line 13):
-Prove: true.
-
-------------------------------------------------------------
-
 Goal Establishment of Invariant (file unit_loopscope.i, line 13):
 Prove: false.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file unit_loopscope.i, line 16):
+Goal Preservation of Invariant (file unit_loopscope.i, line 13):
 Prove: true.
 
 ------------------------------------------------------------
 
 Goal Positivity of Loop variant at loop (file unit_loopscope.i, line 16):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Decreasing of Loop variant at loop (file unit_loopscope.i, line 16):
 Prove: true.
 
 ------------------------------------------------------------

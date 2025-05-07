@@ -20,6 +20,11 @@
   Function array
 ------------------------------------------------------------
 
+Goal Establishment of Invariant (file assigned_initialized_memvar.i, line 71):
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Preservation of Invariant (file assigned_initialized_memvar.i, line 71):
 Assume {
   Type: is_sint32(i) /\ is_sint32(1 + i).
@@ -36,17 +41,12 @@ Prove: ((-1) <= i) /\
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file assigned_initialized_memvar.i, line 71):
+Goal Establishment of Invariant (file assigned_initialized_memvar.i, line 78):
 Prove: true.
 
 ------------------------------------------------------------
 
 Goal Preservation of Invariant (file assigned_initialized_memvar.i, line 78):
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Establishment of Invariant (file assigned_initialized_memvar.i, line 78):
 Prove: true.
 
 ------------------------------------------------------------
@@ -81,17 +81,12 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file assigned_initialized_memvar.i, line 75):
-Prove: true.
-
-------------------------------------------------------------
-
 Goal Positivity of Loop variant at loop (file assigned_initialized_memvar.i, line 75):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file assigned_initialized_memvar.i, line 82):
+Goal Decreasing of Loop variant at loop (file assigned_initialized_memvar.i, line 75):
 Prove: true.
 
 ------------------------------------------------------------
@@ -100,8 +95,18 @@ Goal Positivity of Loop variant at loop (file assigned_initialized_memvar.i, lin
 Prove: true.
 
 ------------------------------------------------------------
+
+Goal Decreasing of Loop variant at loop (file assigned_initialized_memvar.i, line 82):
+Prove: true.
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function comp
+------------------------------------------------------------
+
+Goal Establishment of Invariant (file assigned_initialized_memvar.i, line 133):
+Prove: true.
+
 ------------------------------------------------------------
 
 Goal Preservation of Invariant (file assigned_initialized_memvar.i, line 133):
@@ -120,17 +125,12 @@ Prove: ((-1) <= i) /\
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file assigned_initialized_memvar.i, line 133):
+Goal Establishment of Invariant (file assigned_initialized_memvar.i, line 140):
 Prove: true.
 
 ------------------------------------------------------------
 
 Goal Preservation of Invariant (file assigned_initialized_memvar.i, line 140):
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Establishment of Invariant (file assigned_initialized_memvar.i, line 140):
 Prove: true.
 
 ------------------------------------------------------------
@@ -165,17 +165,12 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file assigned_initialized_memvar.i, line 137):
-Prove: true.
-
-------------------------------------------------------------
-
 Goal Positivity of Loop variant at loop (file assigned_initialized_memvar.i, line 137):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file assigned_initialized_memvar.i, line 144):
+Goal Decreasing of Loop variant at loop (file assigned_initialized_memvar.i, line 137):
 Prove: true.
 
 ------------------------------------------------------------
@@ -184,8 +179,18 @@ Goal Positivity of Loop variant at loop (file assigned_initialized_memvar.i, lin
 Prove: true.
 
 ------------------------------------------------------------
+
+Goal Decreasing of Loop variant at loop (file assigned_initialized_memvar.i, line 144):
+Prove: true.
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function descr
+------------------------------------------------------------
+
+Goal Establishment of Invariant (file assigned_initialized_memvar.i, line 112):
+Prove: true.
+
 ------------------------------------------------------------
 
 Goal Preservation of Invariant (file assigned_initialized_memvar.i, line 112):
@@ -204,8 +209,19 @@ Prove: ((-1) <= i) /\
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file assigned_initialized_memvar.i, line 112):
-Prove: true.
+Goal Establishment of Invariant (file assigned_initialized_memvar.i, line 119):
+Assume {
+  Have: 0 <= i.
+  Have: i <= 9.
+  Type: is_sint32(i_1).
+  (* Invariant *)
+  Have: (0 <= i_1) /\ (i_1 <= 10) /\
+      (((0 < i_1) ->
+       (forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i_1) -> (v[i_2]=true)))))).
+  (* Else *)
+  Have: 10 <= i_1.
+}
+Prove: (v[i]=true).
 
 ------------------------------------------------------------
 
@@ -260,22 +276,6 @@ Assume {
 Prove: ((Init_s_0.Init_F1_S_i)=true) /\
     (forall i_2 : Z. ((0 <= i_2) -> ((i_2 <= 9) ->
      ((Init_s_0.Init_F1_S_a)[i_2]=true)))).
-
-------------------------------------------------------------
-
-Goal Establishment of Invariant (file assigned_initialized_memvar.i, line 119):
-Assume {
-  Have: 0 <= i.
-  Have: i <= 9.
-  Type: is_sint32(i_1).
-  (* Invariant *)
-  Have: (0 <= i_1) /\ (i_1 <= 10) /\
-      (((0 < i_1) ->
-       (forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i_1) -> (v[i_2]=true)))))).
-  (* Else *)
-  Have: 10 <= i_1.
-}
-Prove: (v[i]=true).
 
 ------------------------------------------------------------
 
@@ -347,17 +347,12 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file assigned_initialized_memvar.i, line 116):
-Prove: true.
-
-------------------------------------------------------------
-
 Goal Positivity of Loop variant at loop (file assigned_initialized_memvar.i, line 116):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file assigned_initialized_memvar.i, line 123):
+Goal Decreasing of Loop variant at loop (file assigned_initialized_memvar.i, line 116):
 Prove: true.
 
 ------------------------------------------------------------
@@ -366,8 +361,18 @@ Goal Positivity of Loop variant at loop (file assigned_initialized_memvar.i, lin
 Prove: true.
 
 ------------------------------------------------------------
+
+Goal Decreasing of Loop variant at loop (file assigned_initialized_memvar.i, line 123):
+Prove: true.
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function field
+------------------------------------------------------------
+
+Goal Establishment of Invariant (file assigned_initialized_memvar.i, line 51):
+Prove: true.
+
 ------------------------------------------------------------
 
 Goal Preservation of Invariant (file assigned_initialized_memvar.i, line 51):
@@ -383,11 +388,6 @@ Assume {
 Prove: ((-1) <= i) /\
     (forall i_1 : Z. ((i_1 <= i) -> ((0 <= i_1) ->
      (v[i <- true][i_1]=true)))).
-
-------------------------------------------------------------
-
-Goal Establishment of Invariant (file assigned_initialized_memvar.i, line 51):
-Prove: true.
 
 ------------------------------------------------------------
 
@@ -419,17 +419,12 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file assigned_initialized_memvar.i, line 55):
-Prove: true.
-
-------------------------------------------------------------
-
 Goal Positivity of Loop variant at loop (file assigned_initialized_memvar.i, line 55):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file assigned_initialized_memvar.i, line 61):
+Goal Decreasing of Loop variant at loop (file assigned_initialized_memvar.i, line 55):
 Prove: true.
 
 ------------------------------------------------------------
@@ -438,8 +433,18 @@ Goal Positivity of Loop variant at loop (file assigned_initialized_memvar.i, lin
 Prove: true.
 
 ------------------------------------------------------------
+
+Goal Decreasing of Loop variant at loop (file assigned_initialized_memvar.i, line 61):
+Prove: true.
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function index
+------------------------------------------------------------
+
+Goal Establishment of Invariant (file assigned_initialized_memvar.i, line 92):
+Prove: true.
+
 ------------------------------------------------------------
 
 Goal Preservation of Invariant (file assigned_initialized_memvar.i, line 92):
@@ -455,11 +460,6 @@ Assume {
 Prove: ((-1) <= i) /\
     (forall i_1 : Z. ((i_1 <= i) -> ((0 <= i_1) ->
      (v[i <- true][i_1]=true)))).
-
-------------------------------------------------------------
-
-Goal Establishment of Invariant (file assigned_initialized_memvar.i, line 92):
-Prove: true.
 
 ------------------------------------------------------------
 
@@ -497,17 +497,12 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file assigned_initialized_memvar.i, line 96):
-Prove: true.
-
-------------------------------------------------------------
-
 Goal Positivity of Loop variant at loop (file assigned_initialized_memvar.i, line 96):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file assigned_initialized_memvar.i, line 102):
+Goal Decreasing of Loop variant at loop (file assigned_initialized_memvar.i, line 96):
 Prove: true.
 
 ------------------------------------------------------------
@@ -516,8 +511,18 @@ Goal Positivity of Loop variant at loop (file assigned_initialized_memvar.i, lin
 Prove: true.
 
 ------------------------------------------------------------
+
+Goal Decreasing of Loop variant at loop (file assigned_initialized_memvar.i, line 102):
+Prove: true.
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function initialize
+------------------------------------------------------------
+
+Goal Establishment of Invariant (file assigned_initialized_memvar.i, line 17):
+Prove: true.
+
 ------------------------------------------------------------
 
 Goal Preservation of Invariant (file assigned_initialized_memvar.i, line 17):
@@ -533,11 +538,6 @@ Assume {
 Prove: ((-1) <= i) /\
     (forall i_1 : Z. ((i_1 <= i) -> ((0 <= i_1) ->
      (v[i <- true][i_1]=true)))).
-
-------------------------------------------------------------
-
-Goal Establishment of Invariant (file assigned_initialized_memvar.i, line 17):
-Prove: true.
 
 ------------------------------------------------------------
 
@@ -562,17 +562,22 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file assigned_initialized_memvar.i, line 21):
+Goal Positivity of Loop variant at loop (file assigned_initialized_memvar.i, line 21):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Positivity of Loop variant at loop (file assigned_initialized_memvar.i, line 21):
+Goal Decreasing of Loop variant at loop (file assigned_initialized_memvar.i, line 21):
 Prove: true.
 
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function range
+------------------------------------------------------------
+
+Goal Establishment of Invariant (file assigned_initialized_memvar.i, line 30):
+Prove: true.
+
 ------------------------------------------------------------
 
 Goal Preservation of Invariant (file assigned_initialized_memvar.i, line 30):
@@ -591,8 +596,19 @@ Prove: ((-1) <= i) /\
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file assigned_initialized_memvar.i, line 30):
-Prove: true.
+Goal Establishment of Invariant (file assigned_initialized_memvar.i, line 37):
+Assume {
+  Have: 0 <= i.
+  Have: i <= 9.
+  Type: is_sint32(i_1).
+  (* Invariant *)
+  Have: (0 <= i_1) /\ (i_1 <= 10) /\
+      (((0 < i_1) ->
+       (forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i_1) -> (v[i_2]=true)))))).
+  (* Else *)
+  Have: 10 <= i_1.
+}
+Prove: (v[i]=true).
 
 ------------------------------------------------------------
 
@@ -627,22 +643,6 @@ Prove: forall i_2 : Z. ((0 <= i_2) -> ((i_2 <= 9) ->
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file assigned_initialized_memvar.i, line 37):
-Assume {
-  Have: 0 <= i.
-  Have: i <= 9.
-  Type: is_sint32(i_1).
-  (* Invariant *)
-  Have: (0 <= i_1) /\ (i_1 <= 10) /\
-      (((0 < i_1) ->
-       (forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i_1) -> (v[i_2]=true)))))).
-  (* Else *)
-  Have: 10 <= i_1.
-}
-Prove: (v[i]=true).
-
-------------------------------------------------------------
-
 Goal Check (file assigned_initialized_memvar.i, line 44):
 Prove: true.
 
@@ -664,22 +664,22 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file assigned_initialized_memvar.i, line 34):
-Prove: true.
-
-------------------------------------------------------------
-
 Goal Positivity of Loop variant at loop (file assigned_initialized_memvar.i, line 34):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file assigned_initialized_memvar.i, line 41):
+Goal Decreasing of Loop variant at loop (file assigned_initialized_memvar.i, line 34):
 Prove: true.
 
 ------------------------------------------------------------
 
 Goal Positivity of Loop variant at loop (file assigned_initialized_memvar.i, line 41):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Decreasing of Loop variant at loop (file assigned_initialized_memvar.i, line 41):
 Prove: true.
 
 ------------------------------------------------------------

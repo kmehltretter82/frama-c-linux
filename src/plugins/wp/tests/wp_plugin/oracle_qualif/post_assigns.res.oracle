@@ -9,10 +9,10 @@
 [wp] [Valid] typed_receive_terminates (Qed)
 [wp] [Valid] typed_receive_ensures (Qed)
 [wp] [Valid] typed_receive_exits (Qed)
-[wp] [Valid] typed_receive_assigns_exit_part1 (Qed)
-[wp] [Valid] typed_receive_assigns_exit_part2 (Qed)
 [wp] [Valid] typed_receive_assigns_normal_part1 (Qed)
 [wp] [Valid] typed_receive_assigns_normal_part2 (Qed)
+[wp] [Valid] typed_receive_assigns_exit_part1 (Qed)
+[wp] [Valid] typed_receive_assigns_exit_part2 (Qed)
 [wp] Proved goals:    7 / 7
   Qed:             7
 ------------------------------------------------------------

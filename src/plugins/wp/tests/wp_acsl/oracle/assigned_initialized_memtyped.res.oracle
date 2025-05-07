@@ -56,6 +56,11 @@ Prove: IsInit_S1_S(global(G_glob_82), Init_0).
 
 ------------------------------------------------------------
 
+Goal Establishment of Invariant 'CHECK' (file assigned_initialized_memtyped.i, line 129):
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Preservation of Invariant 'CHECK' (file assigned_initialized_memtyped.i, line 129):
 Let a = shiftfield_F1_S_a(pg_0).
 Let a_1 = shift_sint32(a, 0).
@@ -76,11 +81,6 @@ Assume {
 Prove: ((-1) <= i) /\
     (forall i_1 : Z. ((i_1 <= i) -> ((0 <= i_1) ->
      (a_2[shift_sint32(a, i) <- true][shift_sint32(a, i_1)]=true)))).
-
-------------------------------------------------------------
-
-Goal Establishment of Invariant 'CHECK' (file assigned_initialized_memtyped.i, line 129):
-Prove: true.
 
 ------------------------------------------------------------
 
@@ -382,6 +382,11 @@ Prove: true.
   Function initialize
 ------------------------------------------------------------
 
+Goal Establishment of Invariant 'CHECK' (file assigned_initialized_memtyped.i, line 16):
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Preservation of Invariant 'CHECK' (file assigned_initialized_memtyped.i, line 16):
 Let a = shiftfield_F1_S_a(s).
 Let a_1 = shift_sint32(a, 0).
@@ -401,11 +406,6 @@ Assume {
 Prove: ((-1) <= i) /\
     (forall i_1 : Z. ((i_1 <= i) -> ((0 <= i_1) ->
      (a_2[shift_sint32(a, i) <- true][shift_sint32(a, i_1)]=true)))).
-
-------------------------------------------------------------
-
-Goal Establishment of Invariant 'CHECK' (file assigned_initialized_memtyped.i, line 16):
-Prove: true.
 
 ------------------------------------------------------------
 

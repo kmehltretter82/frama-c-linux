@@ -8,12 +8,12 @@
 [wp] 8 goals scheduled
 [wp] [Valid] typed_jobA_terminates (Qed)
 [wp] [Valid] typed_jobA_exits (Qed)
-[wp] [Valid] typed_jobA_assigns_exit (Qed)
 [wp] [Valid] typed_jobA_assigns_normal (Qed)
+[wp] [Valid] typed_jobA_assigns_exit (Qed)
 [wp] [Valid] typed_jobG_terminates (Qed)
 [wp] [Valid] typed_jobG_exits (Qed)
-[wp] [Valid] typed_jobG_assigns_exit (Qed)
 [wp] [Valid] typed_jobG_assigns_normal (Qed)
+[wp] [Valid] typed_jobG_assigns_exit (Qed)
 [wp] Proved goals:    8 / 8
   Qed:             8
 ------------------------------------------------------------

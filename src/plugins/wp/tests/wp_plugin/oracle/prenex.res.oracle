@@ -49,12 +49,17 @@ Prove: (forall i_1 : Z. ((0 <= i_1) -> ((i_1 < n) ->
 
 ------------------------------------------------------------
 
+Goal Establishment of Invariant 'I' (file prenex.i, line 19):
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Preservation of Invariant 'I' (file prenex.i, line 19):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'I' (file prenex.i, line 19):
+Goal Establishment of Invariant 'PI' (file prenex.i, line 21):
 Prove: true.
 
 ------------------------------------------------------------
@@ -93,7 +98,7 @@ Prove: Mint_0[shift_sint32(p, i)] < Mint_0[shift_sint32(q, i_1)].
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'PI' (file prenex.i, line 21):
+Goal Establishment of Invariant 'J' (file prenex.i, line 29):
 Prove: true.
 
 ------------------------------------------------------------
@@ -103,7 +108,7 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'J' (file prenex.i, line 29):
+Goal Establishment of Invariant 'PJ' (file prenex.i, line 31):
 Prove: true.
 
 ------------------------------------------------------------
@@ -146,11 +151,6 @@ Prove: x < Mint_0[shift_sint32(q, i_1)].
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'PJ' (file prenex.i, line 31):
-Prove: true.
-
-------------------------------------------------------------
-
 Goal Loop assigns (file prenex.i, line 24) (1/2):
 Prove: true.
 
@@ -167,22 +167,22 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file prenex.i, line 27):
-Prove: true.
-
-------------------------------------------------------------
-
 Goal Positivity of Loop variant at loop (file prenex.i, line 27):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file prenex.i, line 36):
+Goal Decreasing of Loop variant at loop (file prenex.i, line 27):
 Prove: true.
 
 ------------------------------------------------------------
 
 Goal Positivity of Loop variant at loop (file prenex.i, line 36):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Decreasing of Loop variant at loop (file prenex.i, line 36):
 Prove: true.
 
 ------------------------------------------------------------

@@ -115,11 +115,6 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file reference_and_struct.i, line 19) in 'call_reset':
-Prove: true.
-
-------------------------------------------------------------
-
 Goal Assigns (file reference_and_struct.i, line 19) in 'call_reset' (1/2):
 Prove: true.
 
@@ -127,6 +122,11 @@ Prove: true.
 
 Goal Assigns (file reference_and_struct.i, line 19) in 'call_reset' (2/2):
 Effect at line 23
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Assigns (file reference_and_struct.i, line 19) in 'call_reset':
 Prove: true.
 
 ------------------------------------------------------------

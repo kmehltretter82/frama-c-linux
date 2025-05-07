@@ -242,7 +242,7 @@ let compare_prop_id pid1 pid2 =
   let cmp = Description.full_compare p1 p2 in
   if cmp <> 0 then cmp
   else
-    let cmp = compare_kind pid2.p_kind pid1.p_kind in
+    let cmp = compare_kind pid1.p_kind pid2.p_kind in
     if cmp <> 0 then cmp
     else
       Stdlib.compare pid1.p_part pid2.p_part

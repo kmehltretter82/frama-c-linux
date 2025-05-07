@@ -113,12 +113,6 @@ Prove: true.
 
 Goal Assigns nothing in 'f5_ko':
 Call Effect at line 25
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Assigns nothing in 'f5_ko':
-Call Effect at line 25
 Assume {
   (* Heap *)
   Type: IsArray_sint32(A).
@@ -127,6 +121,12 @@ Assume {
       (((i < 0) \/ (10 <= i)) -> (A_1[x] = A[x])))).
 }
 Prove: false.
+
+------------------------------------------------------------
+
+Goal Assigns nothing in 'f5_ko':
+Call Effect at line 25
+Prove: true.
 
 ------------------------------------------------------------
 ------------------------------------------------------------
@@ -145,12 +145,6 @@ Prove: true.
 
 Goal Assigns nothing in 'f6_ko':
 Call Effect at line 28
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Assigns nothing in 'f6_ko':
-Call Effect at line 28
 Assume {
   (* Heap *)
   Type: IsArray_sint32(A).
@@ -159,5 +153,11 @@ Assume {
       (((i < 0) \/ (10 <= i)) -> (A_1[x] = A[x])))).
 }
 Prove: false.
+
+------------------------------------------------------------
+
+Goal Assigns nothing in 'f6_ko':
+Call Effect at line 28
+Prove: true.
 
 ------------------------------------------------------------

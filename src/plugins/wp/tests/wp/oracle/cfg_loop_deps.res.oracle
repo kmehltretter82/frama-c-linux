@@ -8,6 +8,12 @@
   Function function
 ------------------------------------------------------------
 
+Goal Establishment of Invariant 'Check_Q' (file cfg_loop_deps.i, line 19):
+Assume { (* Invariant 'Inv_P' *) Have: P_P(0). }
+Prove: P_Q(0).
+
+------------------------------------------------------------
+
 Goal Preservation of Invariant 'Check_Q' (file cfg_loop_deps.i, line 19):
 Let x = 1 + i.
 Assume {
@@ -37,9 +43,8 @@ Prove: P_Q(x).
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'Check_Q' (file cfg_loop_deps.i, line 19):
-Assume { (* Invariant 'Inv_P' *) Have: P_P(0). }
-Prove: P_Q(0).
+Goal Establishment of Invariant 'Inv_P' (file cfg_loop_deps.i, line 18):
+Prove: P_P(0).
 
 ------------------------------------------------------------
 
@@ -66,8 +71,14 @@ Prove: P_P(x).
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'Inv_P' (file cfg_loop_deps.i, line 18):
-Prove: P_P(0).
+Goal Establishment of Invariant 'Inv_S' (file cfg_loop_deps.i, line 21):
+Assume {
+  (* Invariant 'Inv_P' *)
+  Have: P_P(0).
+  (* Invariant 'Admit_R' *)
+  Have: P_R(0).
+}
+Prove: P_S(0).
 
 ------------------------------------------------------------
 
@@ -98,17 +109,6 @@ Prove: P_S(x).
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'Inv_S' (file cfg_loop_deps.i, line 21):
-Assume {
-  (* Invariant 'Inv_P' *)
-  Have: P_P(0).
-  (* Invariant 'Admit_R' *)
-  Have: P_R(0).
-}
-Prove: P_S(0).
-
-------------------------------------------------------------
-
 Goal Check (file cfg_loop_deps.i, line 26):
 Assume {
   Type: is_sint32(i).
@@ -136,12 +136,12 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file cfg_loop_deps.i, line 24):
+Goal Positivity of Loop variant at loop (file cfg_loop_deps.i, line 24):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Positivity of Loop variant at loop (file cfg_loop_deps.i, line 24):
+Goal Decreasing of Loop variant at loop (file cfg_loop_deps.i, line 24):
 Prove: true.
 
 ------------------------------------------------------------

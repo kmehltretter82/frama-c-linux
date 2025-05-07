@@ -21,12 +21,12 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file bigarray.c, line 19):
+Goal Positivity of Loop variant at loop (file bigarray.c, line 19):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Positivity of Loop variant at loop (file bigarray.c, line 19):
+Goal Decreasing of Loop variant at loop (file bigarray.c, line 19):
 Prove: true.
 
 ------------------------------------------------------------

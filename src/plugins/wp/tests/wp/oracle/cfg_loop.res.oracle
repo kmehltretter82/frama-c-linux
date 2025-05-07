@@ -13,12 +13,12 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant (file cfg_loop.i, line 42):
+Goal Establishment of Invariant (file cfg_loop.i, line 42):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file cfg_loop.i, line 42):
+Goal Preservation of Invariant (file cfg_loop.i, line 42):
 Prove: true.
 
 ------------------------------------------------------------
@@ -32,6 +32,11 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Termination-condition (file cfg_loop.i, line 7) in 'loop_switch':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Establishment of Invariant (file cfg_loop.i, line 13):
 Prove: true.
 
 ------------------------------------------------------------
@@ -54,7 +59,7 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file cfg_loop.i, line 13):
+Goal Establishment of Invariant (file cfg_loop.i, line 14):
 Prove: true.
 
 ------------------------------------------------------------
@@ -73,11 +78,6 @@ Prove: true.
 
 Goal Preservation of Invariant (file cfg_loop.i, line 14) (3/3):
 Tags: Case 1.
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Establishment of Invariant (file cfg_loop.i, line 14):
 Prove: true.
 
 ------------------------------------------------------------

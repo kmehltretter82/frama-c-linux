@@ -8,12 +8,12 @@
 [wp] [Valid] typed_f_assigns (Qed)
 [wp] [Valid] typed_g_terminates (Qed)
 [wp] [Valid] typed_g_exits (Qed)
-[wp] [Valid] typed_g_assigns_exit (Qed)
 [wp] [Valid] typed_g_assigns_normal_part1 (Qed)
 [wp] [Valid] typed_g_assigns_normal_part2 (Qed)
 [wp] [Valid] typed_g_assigns_normal_part3 (Qed)
 [wp] [Valid] typed_g_assigns_normal_part4 (Qed)
 [wp] [Valid] typed_g_assigns_normal_part5 (Qed)
+[wp] [Valid] typed_g_assigns_exit (Qed)
 [wp] Proved goals:   11 / 11
   Terminating:     1
   Unreachable:     1

@@ -37,6 +37,20 @@ Prove: a_2[shift_sint32(t, i_1)] = e.
 
 ------------------------------------------------------------
 
+Goal Establishment of Invariant 'qed_ok' (file loop.i, line 12):
+Assume {
+  Type: is_sint32(a) /\ is_sint32(b).
+  (* Heap *)
+  Type: (region(t.base) <= 0) /\ linked(Malloc_0).
+  (* Pre-condition *)
+  Have: valid_rw(Malloc_0, shift_sint32(t, a), 1 + b - a).
+  (* Pre-condition *)
+  Have: a <= b.
+}
+Prove: a <= (1 + b).
+
+------------------------------------------------------------
+
 Goal Preservation of Invariant 'qed_ok' (file loop.i, line 12):
 Let a_1 = shift_sint32(t, a).
 Let x = -a.
@@ -65,17 +79,8 @@ Prove: a <= x_2.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'qed_ok' (file loop.i, line 12):
-Assume {
-  Type: is_sint32(a) /\ is_sint32(b).
-  (* Heap *)
-  Type: (region(t.base) <= 0) /\ linked(Malloc_0).
-  (* Pre-condition *)
-  Have: valid_rw(Malloc_0, shift_sint32(t, a), 1 + b - a).
-  (* Pre-condition *)
-  Have: a <= b.
-}
-Prove: a <= (1 + b).
+Goal Establishment of Invariant 'qed_ok' (file loop.i, line 13):
+Prove: true.
 
 ------------------------------------------------------------
 
@@ -108,11 +113,6 @@ Assume {
   Have: a <= x.
 }
 Prove: a_2[shift_sint32(t, i) <- e][shift_sint32(t, i_1)] = e.
-
-------------------------------------------------------------
-
-Goal Establishment of Invariant 'qed_ok' (file loop.i, line 13):
-Prove: true.
 
 ------------------------------------------------------------
 
@@ -186,12 +186,12 @@ Prove: i <= x.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file loop.i, line 17):
+Goal Positivity of Loop variant at loop (file loop.i, line 17):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Positivity of Loop variant at loop (file loop.i, line 17):
+Goal Decreasing of Loop variant at loop (file loop.i, line 17):
 Prove: true.
 
 ------------------------------------------------------------

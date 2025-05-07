@@ -9,32 +9,32 @@
 [wp] Goal typed_ref_equal_elements_ensures_v1_v2_diff : not tried
 [wp] Goal typed_ref_equal_elements_assert_rte_mem_access : trivial
 [wp] Goal typed_ref_equal_elements_assert_rte_mem_access_2 : trivial
-[wp] Goal typed_ref_equal_elements_loop_invariant_preserved : not tried
 [wp] Goal typed_ref_equal_elements_loop_invariant_established : not tried
-[wp] Goal typed_ref_equal_elements_loop_invariant_set_at_0_preserved : not tried
+[wp] Goal typed_ref_equal_elements_loop_invariant_preserved : not tried
 [wp] Goal typed_ref_equal_elements_loop_invariant_set_at_0_established : not tried
+[wp] Goal typed_ref_equal_elements_loop_invariant_set_at_0_preserved : not tried
 [wp] Goal typed_ref_equal_elements_assert_rte_index_bound : not tried
 [wp] Goal typed_ref_equal_elements_assert_rte_index_bound_2 : not tried
 [wp] Goal typed_ref_equal_elements_assert_set_at_1 : not tried
 [wp] Goal typed_ref_equal_elements_assert_rte_signed_overflow : not tried
-[wp] Goal typed_ref_equal_elements_loop_invariant_bound_preserved : not tried
 [wp] Goal typed_ref_equal_elements_loop_invariant_bound_established : not tried
-[wp] Goal typed_ref_equal_elements_loop_invariant_seen_sound1_preserved : not tried
+[wp] Goal typed_ref_equal_elements_loop_invariant_bound_preserved : not tried
 [wp] Goal typed_ref_equal_elements_loop_invariant_seen_sound1_established : not tried
-[wp] Goal typed_ref_equal_elements_loop_invariant_seen_sound2_preserved : not tried
+[wp] Goal typed_ref_equal_elements_loop_invariant_seen_sound1_preserved : not tried
 [wp] Goal typed_ref_equal_elements_loop_invariant_seen_sound2_established : not tried
-[wp] Goal typed_ref_equal_elements_loop_invariant_v1_first_preserved : not tried
+[wp] Goal typed_ref_equal_elements_loop_invariant_seen_sound2_preserved : not tried
 [wp] Goal typed_ref_equal_elements_loop_invariant_v1_first_established : not tried
-[wp] Goal typed_ref_equal_elements_loop_invariant_v1_sound1_preserved : not tried
+[wp] Goal typed_ref_equal_elements_loop_invariant_v1_first_preserved : not tried
 [wp] Goal typed_ref_equal_elements_loop_invariant_v1_sound1_established : not tried
-[wp] Goal typed_ref_equal_elements_loop_invariant_v1_sound2_preserved : not tried
+[wp] Goal typed_ref_equal_elements_loop_invariant_v1_sound1_preserved : not tried
 [wp] Goal typed_ref_equal_elements_loop_invariant_v1_sound2_established : not tried
-[wp] Goal typed_ref_equal_elements_loop_invariant_v1_v2_diff_preserved : not tried
+[wp] Goal typed_ref_equal_elements_loop_invariant_v1_sound2_preserved : not tried
 [wp] Goal typed_ref_equal_elements_loop_invariant_v1_v2_diff_established : not tried
-[wp] Goal typed_ref_equal_elements_loop_invariant_v2_sound1_preserved : not tried
+[wp] Goal typed_ref_equal_elements_loop_invariant_v1_v2_diff_preserved : not tried
 [wp] Goal typed_ref_equal_elements_loop_invariant_v2_sound1_established : not tried
-[wp] Goal typed_ref_equal_elements_loop_invariant_v2_sound2_preserved : not tried
+[wp] Goal typed_ref_equal_elements_loop_invariant_v2_sound1_preserved : not tried
 [wp] Goal typed_ref_equal_elements_loop_invariant_v2_sound2_established : not tried
+[wp] Goal typed_ref_equal_elements_loop_invariant_v2_sound2_preserved : not tried
 [wp] Goal typed_ref_equal_elements_assert_rte_mem_access_3 : not tried
 [wp] Goal typed_ref_equal_elements_assert_rte_index_bound_3 : not tried
 [wp] Goal typed_ref_equal_elements_assert_rte_index_bound_4 : not tried
@@ -51,10 +51,10 @@
 [wp] Goal typed_ref_equal_elements_assigns_part1 : trivial
 [wp] Goal typed_ref_equal_elements_assigns_part2 : not tried
 [wp] Goal typed_ref_equal_elements_assigns_part3 : not tried
-[wp] Goal typed_ref_equal_elements_loop_variant_decrease : not tried
 [wp] Goal typed_ref_equal_elements_loop_variant_positive : not tried
-[wp] Goal typed_ref_equal_elements_loop_variant_2_decrease : not tried
+[wp] Goal typed_ref_equal_elements_loop_variant_decrease : not tried
 [wp] Goal typed_ref_equal_elements_loop_variant_2_positive : not tried
+[wp] Goal typed_ref_equal_elements_loop_variant_2_decrease : not tried
 [wp] frama_c_exo3_solved.old.v2.c:56: Warning: 
   Memory model hypotheses for function 'equal_elements':
   /*@

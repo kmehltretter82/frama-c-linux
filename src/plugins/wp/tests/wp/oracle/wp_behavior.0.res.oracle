@@ -235,12 +235,6 @@ Prove: true.
 
 Goal Assigns (file wp_behavior.i, line 65) in 'call':
 Call Effect at line 69
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Assigns (file wp_behavior.i, line 65) in 'call':
-Call Effect at line 69
 Assume {
   (* Heap *)
   Type: (region(px_0.base) <= 0) /\ (region(py_0.base) <= 0) /\
@@ -254,6 +248,12 @@ Assume {
 }
 Prove: (((!invalid(Malloc_0, qx_0, 1)) -> ((qx_0 = px_0) \/ (qx_0 = py_0)))) /\
     (((!invalid(Malloc_0, qy_0, 1)) -> ((qy_0 = px_0) \/ (qy_0 = py_0)))).
+
+------------------------------------------------------------
+
+Goal Assigns (file wp_behavior.i, line 65) in 'call':
+Call Effect at line 69
+Prove: true.
 
 ------------------------------------------------------------
 
@@ -304,12 +304,6 @@ Prove: true.
 
 Goal Assigns (file wp_behavior.i, line 82) in 'call_unguarded':
 Call Effect at line 86
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Assigns (file wp_behavior.i, line 82) in 'call_unguarded':
-Call Effect at line 86
 Assume {
   (* Heap *)
   Type: (region(px_0.base) <= 0) /\ (region(py_0.base) <= 0) /\
@@ -322,6 +316,12 @@ Assume {
   Have: P_P /\ P_R.
 }
 Prove: py_0 = px_0.
+
+------------------------------------------------------------
+
+Goal Assigns (file wp_behavior.i, line 82) in 'call_unguarded':
+Call Effect at line 86
+Prove: true.
 
 ------------------------------------------------------------
 

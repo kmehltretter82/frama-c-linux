@@ -30,12 +30,12 @@ Prove: false.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant (file issue_825.i, line 9):
+Goal Establishment of Invariant (file issue_825.i, line 9):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file issue_825.i, line 9):
+Goal Preservation of Invariant (file issue_825.i, line 9):
 Prove: true.
 
 ------------------------------------------------------------
@@ -58,12 +58,12 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file issue_825.i, line 13):
+Goal Positivity of Loop variant at loop (file issue_825.i, line 13):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Positivity of Loop variant at loop (file issue_825.i, line 13):
+Goal Decreasing of Loop variant at loop (file issue_825.i, line 13):
 Prove: true.
 
 ------------------------------------------------------------

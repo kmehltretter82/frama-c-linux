@@ -12,17 +12,12 @@
   Function f
 ------------------------------------------------------------
 
-Goal Preservation of Invariant (file bts_1588.i, line 5):
-Prove: true.
-
-------------------------------------------------------------
-
 Goal Establishment of Invariant (file bts_1588.i, line 5):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'l1_2' (file bts_1588.i, line 4):
+Goal Preservation of Invariant (file bts_1588.i, line 5):
 Prove: true.
 
 ------------------------------------------------------------
@@ -32,7 +27,17 @@ Prove: true.
 
 ------------------------------------------------------------
 
+Goal Preservation of Invariant 'l1_2' (file bts_1588.i, line 4):
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Assertion 'a1' (file bts_1588.i, line 11):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Establishment of Invariant (file bts_1588.i, line 22):
 Prove: true.
 
 ------------------------------------------------------------
@@ -54,7 +59,7 @@ Prove: 0 < z.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file bts_1588.i, line 22):
+Goal Positivity of Loop variant at loop (file bts_1588.i, line 8):
 Prove: true.
 
 ------------------------------------------------------------
@@ -64,17 +69,12 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Positivity of Loop variant at loop (file bts_1588.i, line 8):
+Goal Positivity of Loop variant at loop (file bts_1588.i, line 25):
 Prove: true.
 
 ------------------------------------------------------------
 
 Goal Decreasing of Loop variant at loop (file bts_1588.i, line 25):
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Positivity of Loop variant at loop (file bts_1588.i, line 25):
 Prove: true.
 
 ------------------------------------------------------------

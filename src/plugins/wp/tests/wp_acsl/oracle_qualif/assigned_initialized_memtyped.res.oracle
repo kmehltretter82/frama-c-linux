@@ -3,8 +3,8 @@
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 [wp] 42 goals scheduled
-[wp] [Valid] typed_initialize_loop_invariant_CHECK_preserved (Alt-Ergo) (Cached)
 [wp] [Valid] typed_initialize_loop_invariant_CHECK_established (Qed)
+[wp] [Valid] typed_initialize_loop_invariant_CHECK_preserved (Alt-Ergo) (Cached)
 [wp] [Valid] typed_initialize_check_CHECK (Alt-Ergo) (Cached)
 [wp] [Valid] typed_initialize_loop_assigns_part1 (Qed)
 [wp] [Valid] typed_initialize_loop_assigns_part2 (Qed)
@@ -35,8 +35,8 @@
 [wp] [Valid] typed_comp_loop_assigns_part2 (Qed)
 [wp] [Valid] typed_comp_loop_assigns_part3 (Qed)
 [wp] [Unsuccess] typed_assigned_glob_check_FAILS (Alt-Ergo) (Cached)
-[wp] [Valid] typed_assigned_glob_loop_invariant_CHECK_preserved (Alt-Ergo) (Cached)
 [wp] [Valid] typed_assigned_glob_loop_invariant_CHECK_established (Qed)
+[wp] [Valid] typed_assigned_glob_loop_invariant_CHECK_preserved (Alt-Ergo) (Cached)
 [wp] [Unsuccess] typed_assigned_glob_check_FAILS_2 (Alt-Ergo) (Cached)
 [wp] [Unsuccess] typed_assigned_glob_check_FAILS_3 (Alt-Ergo) (Cached)
 [wp] [Valid] typed_assigned_glob_loop_assigns_part1 (Qed)

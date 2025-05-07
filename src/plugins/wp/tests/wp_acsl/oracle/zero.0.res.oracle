@@ -18,6 +18,11 @@ Prove: P_Foo(to_f64(.0)).
   Function init
 ------------------------------------------------------------
 
+Goal Establishment of Invariant (file zero.i, line 24):
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Preservation of Invariant (file zero.i, line 24):
 Let a = shift_float64(s, 0).
 Assume {
@@ -39,7 +44,7 @@ Prove: to_uint32(1 + i) <= 10.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file zero.i, line 24):
+Goal Establishment of Invariant 'is_zero' (file zero.i, line 25):
 Prove: true.
 
 ------------------------------------------------------------
@@ -71,11 +76,6 @@ Prove: of_f64(a_1[shift_float64(s, i) <- to_f64(.0)][shift_float64(s, i_1)])
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'is_zero' (file zero.i, line 25):
-Prove: true.
-
-------------------------------------------------------------
-
 Goal Loop assigns (file zero.i, line 26) (1/2):
 Prove: true.
 
@@ -95,6 +95,11 @@ Prove: true.
 
 Goal Assigns (file zero.i, line 19) in 'init' (2/2):
 Effect at line 29
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Positivity of Loop variant at loop (file zero.i, line 29):
 Prove: true.
 
 ------------------------------------------------------------
@@ -124,10 +129,5 @@ Assume {
          = .0))).
 }
 Prove: i < x.
-
-------------------------------------------------------------
-
-Goal Positivity of Loop variant at loop (file zero.i, line 29):
-Prove: true.
 
 ------------------------------------------------------------
