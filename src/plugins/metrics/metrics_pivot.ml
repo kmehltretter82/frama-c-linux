@@ -52,7 +52,7 @@ let string_of_string_list sep =
 let split_loc (loc : Cil_types.location) =
   let fp = (fst loc).pos_path in
   let line = string_of_int (fst loc).pos_lnum in
-  let fp_pretty = Filepath.Normalized.to_pretty_string fp in
+  let fp_pretty = Filepath.to_pretty_string fp in
   let dir = Filename.dirname fp_pretty in
   let name = Filename.basename fp_pretty in
   let ext = Filename.extension name in
@@ -223,7 +223,7 @@ let split_domain = function
 
 module FunctionAtPos = struct
   let tbl :
-    (Filepath.Normalized.t,
+    (Filepath.t,
      (Filepath.position * Filepath.position * string) Array.t)
       Hashtbl.t =
     Hashtbl.create 16
@@ -248,11 +248,11 @@ module FunctionAtPos = struct
       List.fold_left (fun acc ((pos1, _, _) as triple) ->
           let fp = pos1.Filepath.pos_path in
           Hashtbl.add tmp fp triple;
-          Datatype.Filepath.Set.add fp acc
-        ) Datatype.Filepath.Set.empty (Cabs2cil.func_locs ())
+          Filepath.Set.add fp acc
+        ) Filepath.Set.empty (Cabs2cil.func_locs ())
     in
     Hashtbl.clear tbl;
-    Datatype.Filepath.Set.iter (fun fp ->
+    Filepath.Set.iter (fun fp ->
         let l =
           List.sort (fun (start1, _, _) (start2, _, _) ->
               Cil_datatype.Position.compare start1 start2

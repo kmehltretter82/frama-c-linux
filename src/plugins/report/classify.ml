@@ -172,8 +172,8 @@ let add_rule jvalue =
 
 let configure file =
   begin
-    let path = Datatype.Filepath.of_string file in
-    R.feedback "Loading '%a'" Datatype.Filepath.pretty path;
+    let path = Filepath.of_string file in
+    R.feedback "Loading '%a'" Filepath.pretty path;
     try
       match Json.load_file path with
       | `List values -> List.iter add_rule values
@@ -183,7 +183,7 @@ let configure file =
       let source = Log.source ~file ~line in
       R.abort ~source "%s" msg
     | WrongFormat msg ->
-      let file = Datatype.Filepath.of_string file in
+      let file = Filepath.of_string file in
       let source = Log.source ~file ~line:1 in
       R.abort ~source "%s" msg
     | Sys_error msg ->
@@ -221,7 +221,7 @@ let json_of_source = function
     let file =
       if R.AbsolutePath.get ()
       then (pos.Filepath.pos_path :> string)
-      else Filepath.Normalized.to_pretty_string pos.Filepath.pos_path
+      else Filepath.to_pretty_string pos.Filepath.pos_path
     in
     [
       "file" , Json.of_string file ;
@@ -519,13 +519,13 @@ let report_dump fmt =
   end
 
 let report_output file =
-  R.feedback "Output %a@." Filepath.Normalized.pretty file;
-  Filepath.with_formatter_exn file report_dump
+  R.feedback "Output %a@." Filepath.pretty file;
+  Filesystem.with_formatter_exn file report_dump
 
 let report_number name nb opt =
   if nb > 0 then R.feedback "%s%4d" name nb ;
   let file = opt () in
-  if not (Filepath.Normalized.is_empty file) then
+  if not (Filepath.is_empty file) then
     let out = open_out (file:>string) in
     output_string out (string_of_int nb) ;
     flush out ; close_out out

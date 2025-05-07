@@ -79,7 +79,7 @@ let generate_failure_file is_const =
     incr count;
     let name = "test_case_" ^ kind ^ "_" ^ string_of_int !count ^ ".i" in
     let dirname = Filename.dirname Sys.executable_name in
-    let name = Filepath.Normalized.of_string (dirname ^ "/" ^ name) in
+    let name = Filepath.of_string (dirname ^ "/" ^ name) in
     let out = open_out (name:>string) in
     let fmt = Format.formatter_of_out_channel out in
     let typ = List.hd types in
@@ -118,7 +118,7 @@ let generate_failure_file is_const =
     Kernel.add_debug_keys Kernel.dkey_print_attrs;
     Format.fprintf fmt "%a@." Cil_printer.pp_file file;
     close_out out;
-    Filepath.Normalized.to_pretty_string name
+    Filepath.to_pretty_string name
 
 let test (types, kind) =
   let out_type = List.hd types in

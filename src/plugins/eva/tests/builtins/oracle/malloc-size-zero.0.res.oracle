@@ -54,26 +54,15 @@
   Frama_C_dump_each:
   # cvalue:
   __fc_heap_status ∈ [--..--]
-  __fc_errno ∈ [--..--]
-  __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
   __fc_random48_init ∈ {0}
   __fc_random48_counter[0..2] ∈ [--..--]
   __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
-  __fc_env[0] ∈ {{ NULL ; &S_0___fc_env[0] }}
-          [1] ∈ {{ NULL ; &S_1___fc_env[0] }}
-          [2..4095] ∈ {{ NULL ; &S_0___fc_env[0] ; &S_1___fc_env[0] }}
-  __fc_mblen_state ∈ [--..--]
-  __fc_mbtowc_state ∈ [--..--]
-  __fc_wctomb_state ∈ [--..--]
-  Frama_C_entropy_source ∈ [--..--]
   foo ∈ [--..--]
   p1 ∈ {{ &__malloc_my_calloc_l10[0] }}
   q1 ∈
     {{ &__malloc_my_calloc_l10_0[0] ; &__malloc_my_calloc_l10_1[0] ;
        &__malloc_my_calloc_l10_2[0] ; &__malloc_w_my_calloc_l10_3[0] }} or UNINITIALIZED
-  S_0___fc_env[0..1] ∈ [--..--]
-  S_1___fc_env[0..1] ∈ [--..--]
   __malloc_my_calloc_l10∈ ∅
   __malloc_my_calloc_l10_0∈ ∅
   __malloc_my_calloc_l10_1∈ ∅

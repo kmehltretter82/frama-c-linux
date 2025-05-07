@@ -184,24 +184,24 @@ module FileIndex : sig
 
   (** {2 Getters} *)
 
-  val get_symbols : Datatype.Filepath.t -> global list
+  val get_symbols : Filepath.t -> global list
   (** All global C symbols of the given module.
       @since Boron-20100401 *)
 
-  val get_files: unit -> Datatype.Filepath.t list
+  val get_files: unit -> Filepath.t list
   (** Get the files list containing all [global] C symbols. *)
 
   (** {2 Searching among all [global] C symbols} *)
 
-  val get_globals : Datatype.Filepath.t -> (varinfo * initinfo) list
+  val get_globals : Filepath.t -> (varinfo * initinfo) list
   (** Global variables of the given module for the kernel user interface *)
 
-  val get_global_annotations: Datatype.Filepath.t -> global_annotation list
+  val get_global_annotations: Filepath.t -> global_annotation list
   (** Global annotations of the given module for the kernel user interface
       @since Nitrogen-20111001 *)
 
   val get_functions :
-    ?declarations:bool -> Datatype.Filepath.t -> kernel_function list
+    ?declarations:bool -> Filepath.t -> kernel_function list
   (** Global functions of the given module for the kernel user interface.
       If [declarations] is true, functions declared in a module but defined
       in another module are only reported in the latter (default is false).
@@ -336,6 +336,25 @@ val get_comments_stmt: stmt -> string list
     @since Nitrogen-20111001
 *)
 
+(* ************************************************************************* *)
+(** {2 Getters} *)
+(* ************************************************************************* *)
+
+val get_annotation_name: global_annotation -> string option
+(** Returns the name of the global annotation, when it exists
+    (e.g. for axiomatics, predicates, etc), or [None] if no such name exists
+    (e.g. for volatile blocks).
+
+    @since Frama-C+dev
+*)
+
+val get_name: global -> string option
+(** Returns the name of the global, when it exists (e.g. for variables,
+    functions, types, etc), or [None] if no such name exists
+    (e.g. for assembly statements).
+
+    @since Frama-C+dev
+*)
 
 (* **/** *)
 (* Forward reference to functions defined in Kernel_function. Do not

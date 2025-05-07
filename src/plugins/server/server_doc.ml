@@ -45,7 +45,7 @@ type page = {
   title : string ;
   order : int ;
   descr : Markdown.elements ;
-  readme: Filepath.Normalized.t option ;
+  readme: Filepath.t option ;
   mutable sections : section list ;
 }
 
@@ -69,10 +69,8 @@ let path_for chapter filename =
   | `Plugin name -> "../.." , Printf.sprintf "plugins/%s/%s" name filename
 
 let path_for_readme ~plugin filename =
-  let dirname = match plugin with Kernel -> "server" | Plugin p -> p in
-  Filepath.Normalized.concats
-    (Filepath.Normalized.of_string ".")
-    ["src";"plugins";dirname;"doc";filename]
+  let dir_name = match plugin with Kernel -> "server" | Plugin p -> p in
+  Filepath.(of_string "src" / "plugins" / dir_name / "doc" / filename)
 
 let page chapter ~title ?(descr=[]) ?(plugin=Kernel) ~readme ~filename () =
   let rootdir , path = path_for chapter filename in
@@ -328,8 +326,8 @@ let metadata page : json =
 (* -------------------------------------------------------------------------- *)
 
 let pp_one_page ~root ~page ~title body =
-  let full_path = Filepath.Normalized.concat root page in
-  ignore (Extlib.mkdir ~parents:true (Filepath.dirname full_path) 0o755);
+  let full_path = Filepath.(root / page) in
+  ignore (Filesystem.make_dir ~parents:true (Filepath.dirname full_path) 0o755);
   try
     let chan = open_out (full_path:>string) in
     let fmt = Format.formatter_of_out_channel chan in
@@ -337,7 +335,7 @@ let pp_one_page ~root ~page ~title body =
     Markdown.(pp_pandoc ~page fmt (pandoc ~title body))
   with Sys_error e ->
     Senv.fatal "Could not open file %a for writing: %s"
-      Filepath.Normalized.pretty full_path e
+      Filepath.pretty full_path e
 
 (* Build section contents in reverse order *)
 let build d s = List.fold_left (fun d s -> s() :: d) d s
@@ -351,22 +349,22 @@ let dump ~root ?(meta=true) () =
          let intro = match page.readme with
            | None -> Markdown.section ~title page.descr
            | Some file ->
-             if Filepath.exists file
+             if Filesystem.exists file
              then Markdown.rawfile (file :> string) @ page.descr
              else (
                Senv.warning "Can not find %a file"
-                 Filepath.Normalized.pretty file ;
+                 Filepath.pretty file ;
                Markdown.section ~title page.descr)
          in
          let body = Markdown.subsections page.descr (build [] page.sections) in
          pp_one_page ~root ~page:path ~title (intro @ body) ;
          if meta then
-           let path = Filepath.Normalized.concat root (path ^ ".json") in
+           let path = Filepath.(root / (path ^ ".json")) in
            Yojson.Basic.to_file (path:>string) (metadata page) ;
       ) !pages ;
     Senv.feedback "[doc] Page: 'readme.md'" ;
     if meta then
-      let path = Filepath.Normalized.concat root "readme.md.json" in
+      let path = Filepath.(root / "readme.md.json") in
       Yojson.Basic.to_file (path:>string) maindata ;
       let body =
         [ Md.H1 (Md.plain "Presentation", None);
@@ -387,15 +385,15 @@ let () =
     fun () ->
       if not (Senv.Doc.is_empty ()) then
         let root = Senv.Doc.get () in
-        if Filepath.is_dir root then
+        if Filesystem.is_dir root then
           begin
-            Senv.feedback "[doc] Root: '%a'" Filepath.Normalized.pretty root ;
+            Senv.feedback "[doc] Root: '%a'" Filepath.pretty root ;
             Package.iter package ;
             dump ~root () ;
           end
         else
           Senv.error "[doc] File '%a' is not a directory"
-            Filepath.Normalized.pretty root
+            Filepath.pretty root
   end
 
 (* -------------------------------------------------------------------------- *)

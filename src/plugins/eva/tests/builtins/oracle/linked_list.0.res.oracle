@@ -23,17 +23,10 @@
   __fc_cuserid[0..8] ∈ {0}
   __fc_p_cuserid ∈ {{ &__fc_cuserid[0] }}
   Frama_C_entropy_source ∈ [--..--]
-  __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
   __fc_random48_init ∈ {0}
   __fc_random48_counter[0..2] ∈ [--..--]
   __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
-  __fc_env[0] ∈ {{ NULL ; &S_0___fc_env[0] }}
-          [1] ∈ {{ NULL ; &S_1___fc_env[0] }}
-          [2..4095] ∈ {{ NULL ; &S_0___fc_env[0] ; &S_1___fc_env[0] }}
-  __fc_mblen_state ∈ [--..--]
-  __fc_mbtowc_state ∈ [--..--]
-  __fc_wctomb_state ∈ [--..--]
   __fc_initial_stdout.__fc_FILE_id ∈ {1}
                      .__fc_FILE_data ∈ {0}
   __fc_initial_stderr.__fc_FILE_id ∈ {2}
@@ -43,8 +36,6 @@
   head ∈ {0}
   i ∈ {1}
   malloc_next_free ∈ {0}
-  S_0___fc_env[0..1] ∈ [--..--]
-  S_1___fc_env[0..1] ∈ [--..--]
   ==END OF DUMP==
 [eva] computing for function malloc <- main.
   Called from linked_list.c:41.
@@ -70,17 +61,10 @@
   __fc_cuserid[0..8] ∈ {0}
   __fc_p_cuserid ∈ {{ &__fc_cuserid[0] }}
   Frama_C_entropy_source ∈ [--..--]
-  __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
   __fc_random48_init ∈ {0}
   __fc_random48_counter[0..2] ∈ [--..--]
   __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
-  __fc_env[0] ∈ {{ NULL ; &S_0___fc_env[0] }}
-          [1] ∈ {{ NULL ; &S_1___fc_env[0] }}
-          [2..4095] ∈ {{ NULL ; &S_0___fc_env[0] ; &S_1___fc_env[0] }}
-  __fc_mblen_state ∈ [--..--]
-  __fc_mbtowc_state ∈ [--..--]
-  __fc_wctomb_state ∈ [--..--]
   __fc_initial_stdout.__fc_FILE_id ∈ {1}
                      .__fc_FILE_data ∈ {0}
   __fc_initial_stderr.__fc_FILE_id ∈ {2}
@@ -90,8 +74,6 @@
   head ∈ {0}
   i ∈ {1}
   malloc_next_free ∈ {8}
-  S_0___fc_env[0..1] ∈ [--..--]
-  S_1___fc_env[0..1] ∈ [--..--]
   ==END OF DUMP==
 [eva:partition] linked_list.c:39: starting to merge loop iterations
 [eva] linked_list.c:40: 
@@ -113,17 +95,10 @@
   __fc_cuserid[0..8] ∈ {0}
   __fc_p_cuserid ∈ {{ &__fc_cuserid[0] }}
   Frama_C_entropy_source ∈ [--..--]
-  __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
   __fc_random48_init ∈ {0}
   __fc_random48_counter[0..2] ∈ [--..--]
   __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
-  __fc_env[0] ∈ {{ NULL ; &S_0___fc_env[0] }}
-          [1] ∈ {{ NULL ; &S_1___fc_env[0] }}
-          [2..4095] ∈ {{ NULL ; &S_0___fc_env[0] ; &S_1___fc_env[0] }}
-  __fc_mblen_state ∈ [--..--]
-  __fc_mbtowc_state ∈ [--..--]
-  __fc_wctomb_state ∈ [--..--]
   __fc_initial_stdout.__fc_FILE_id ∈ {1}
                      .__fc_FILE_data ∈ {0}
   __fc_initial_stderr.__fc_FILE_id ∈ {2}
@@ -133,8 +108,6 @@
   head ∈ {{ NULL ; (item *)&MEMORY }}
   i ∈ {1; 2}
   malloc_next_free ∈ {0; 8}
-  S_0___fc_env[0..1] ∈ [--..--]
-  S_1___fc_env[0..1] ∈ [--..--]
   ==END OF DUMP==
 [eva] computing for function malloc <- main.
   Called from linked_list.c:41.
@@ -159,17 +132,10 @@
   __fc_cuserid[0..8] ∈ {0}
   __fc_p_cuserid ∈ {{ &__fc_cuserid[0] }}
   Frama_C_entropy_source ∈ [--..--]
-  __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
   __fc_random48_init ∈ {0}
   __fc_random48_counter[0..2] ∈ [--..--]
   __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
-  __fc_env[0] ∈ {{ NULL ; &S_0___fc_env[0] }}
-          [1] ∈ {{ NULL ; &S_1___fc_env[0] }}
-          [2..4095] ∈ {{ NULL ; &S_0___fc_env[0] ; &S_1___fc_env[0] }}
-  __fc_mblen_state ∈ [--..--]
-  __fc_mbtowc_state ∈ [--..--]
-  __fc_wctomb_state ∈ [--..--]
   __fc_initial_stdout.__fc_FILE_id ∈ {1}
                      .__fc_FILE_data ∈ {0}
   __fc_initial_stderr.__fc_FILE_id ∈ {2}
@@ -179,8 +145,6 @@
   head ∈ {{ NULL ; (item *)&MEMORY }}
   i ∈ {1; 2}
   malloc_next_free ∈ {8; 16}
-  S_0___fc_env[0..1] ∈ [--..--]
-  S_1___fc_env[0..1] ∈ [--..--]
   ==END OF DUMP==
 [eva] linked_list.c:40: 
   Frama_C_dump_each:
@@ -204,17 +168,10 @@
   __fc_cuserid[0..8] ∈ {0}
   __fc_p_cuserid ∈ {{ &__fc_cuserid[0] }}
   Frama_C_entropy_source ∈ [--..--]
-  __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
   __fc_random48_init ∈ {0}
   __fc_random48_counter[0..2] ∈ [--..--]
   __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
-  __fc_env[0] ∈ {{ NULL ; &S_0___fc_env[0] }}
-          [1] ∈ {{ NULL ; &S_1___fc_env[0] }}
-          [2..4095] ∈ {{ NULL ; &S_0___fc_env[0] ; &S_1___fc_env[0] }}
-  __fc_mblen_state ∈ [--..--]
-  __fc_mbtowc_state ∈ [--..--]
-  __fc_wctomb_state ∈ [--..--]
   __fc_initial_stdout.__fc_FILE_id ∈ {1}
                      .__fc_FILE_data ∈ {0}
   __fc_initial_stderr.__fc_FILE_id ∈ {2}
@@ -224,8 +181,6 @@
   head ∈ {{ NULL ; (item *)&MEMORY{[0], [8]} }}
   i ∈ {1; 2; 3}
   malloc_next_free ∈ {0; 8; 16}
-  S_0___fc_env[0..1] ∈ [--..--]
-  S_1___fc_env[0..1] ∈ [--..--]
   ==END OF DUMP==
 [eva] computing for function malloc <- main.
   Called from linked_list.c:41.
@@ -253,17 +208,10 @@
   __fc_cuserid[0..8] ∈ {0}
   __fc_p_cuserid ∈ {{ &__fc_cuserid[0] }}
   Frama_C_entropy_source ∈ [--..--]
-  __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
   __fc_random48_init ∈ {0}
   __fc_random48_counter[0..2] ∈ [--..--]
   __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
-  __fc_env[0] ∈ {{ NULL ; &S_0___fc_env[0] }}
-          [1] ∈ {{ NULL ; &S_1___fc_env[0] }}
-          [2..4095] ∈ {{ NULL ; &S_0___fc_env[0] ; &S_1___fc_env[0] }}
-  __fc_mblen_state ∈ [--..--]
-  __fc_mbtowc_state ∈ [--..--]
-  __fc_wctomb_state ∈ [--..--]
   __fc_initial_stdout.__fc_FILE_id ∈ {1}
                      .__fc_FILE_data ∈ {0}
   __fc_initial_stderr.__fc_FILE_id ∈ {2}
@@ -273,8 +221,6 @@
   head ∈ {{ NULL ; (item *)&MEMORY{[0], [8]} }}
   i ∈ {1; 2; 3}
   malloc_next_free ∈ {8; 16; 24}
-  S_0___fc_env[0..1] ∈ [--..--]
-  S_1___fc_env[0..1] ∈ [--..--]
   ==END OF DUMP==
 [eva] linked_list.c:40: 
   Frama_C_dump_each:
@@ -300,17 +246,10 @@
   __fc_cuserid[0..8] ∈ {0}
   __fc_p_cuserid ∈ {{ &__fc_cuserid[0] }}
   Frama_C_entropy_source ∈ [--..--]
-  __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
   __fc_random48_init ∈ {0}
   __fc_random48_counter[0..2] ∈ [--..--]
   __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
-  __fc_env[0] ∈ {{ NULL ; &S_0___fc_env[0] }}
-          [1] ∈ {{ NULL ; &S_1___fc_env[0] }}
-          [2..4095] ∈ {{ NULL ; &S_0___fc_env[0] ; &S_1___fc_env[0] }}
-  __fc_mblen_state ∈ [--..--]
-  __fc_mbtowc_state ∈ [--..--]
-  __fc_wctomb_state ∈ [--..--]
   __fc_initial_stdout.__fc_FILE_id ∈ {1}
                      .__fc_FILE_data ∈ {0}
   __fc_initial_stderr.__fc_FILE_id ∈ {2}
@@ -320,8 +259,6 @@
   head ∈ {{ NULL ; (item *)&MEMORY{[0], [8], [16]} }}
   i ∈ [1..10]
   malloc_next_free ∈ {0; 8; 16; 24}
-  S_0___fc_env[0..1] ∈ [--..--]
-  S_1___fc_env[0..1] ∈ [--..--]
   ==END OF DUMP==
 [eva] computing for function malloc <- main.
   Called from linked_list.c:41.
@@ -351,17 +288,10 @@
   __fc_cuserid[0..8] ∈ {0}
   __fc_p_cuserid ∈ {{ &__fc_cuserid[0] }}
   Frama_C_entropy_source ∈ [--..--]
-  __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
   __fc_random48_init ∈ {0}
   __fc_random48_counter[0..2] ∈ [--..--]
   __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
-  __fc_env[0] ∈ {{ NULL ; &S_0___fc_env[0] }}
-          [1] ∈ {{ NULL ; &S_1___fc_env[0] }}
-          [2..4095] ∈ {{ NULL ; &S_0___fc_env[0] ; &S_1___fc_env[0] }}
-  __fc_mblen_state ∈ [--..--]
-  __fc_mbtowc_state ∈ [--..--]
-  __fc_wctomb_state ∈ [--..--]
   __fc_initial_stdout.__fc_FILE_id ∈ {1}
                      .__fc_FILE_data ∈ {0}
   __fc_initial_stderr.__fc_FILE_id ∈ {2}
@@ -371,8 +301,6 @@
   head ∈ {{ NULL ; (item *)&MEMORY{[0], [8], [16]} }}
   i ∈ [1..10]
   malloc_next_free ∈ {8; 16; 24; 32}
-  S_0___fc_env[0..1] ∈ [--..--]
-  S_1___fc_env[0..1] ∈ [--..--]
   ==END OF DUMP==
 [eva] linked_list.c:40: 
   Frama_C_dump_each:
@@ -400,17 +328,10 @@
   __fc_cuserid[0..8] ∈ {0}
   __fc_p_cuserid ∈ {{ &__fc_cuserid[0] }}
   Frama_C_entropy_source ∈ [--..--]
-  __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
   __fc_random48_init ∈ {0}
   __fc_random48_counter[0..2] ∈ [--..--]
   __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
-  __fc_env[0] ∈ {{ NULL ; &S_0___fc_env[0] }}
-          [1] ∈ {{ NULL ; &S_1___fc_env[0] }}
-          [2..4095] ∈ {{ NULL ; &S_0___fc_env[0] ; &S_1___fc_env[0] }}
-  __fc_mblen_state ∈ [--..--]
-  __fc_mbtowc_state ∈ [--..--]
-  __fc_wctomb_state ∈ [--..--]
   __fc_initial_stdout.__fc_FILE_id ∈ {1}
                      .__fc_FILE_data ∈ {0}
   __fc_initial_stderr.__fc_FILE_id ∈ {2}
@@ -420,8 +341,6 @@
   head ∈ {{ NULL ; (item *)&MEMORY{[0], [8], [16], [24]} }}
   i ∈ [1..10]
   malloc_next_free ∈ {0; 8; 16; 24; 32}
-  S_0___fc_env[0..1] ∈ [--..--]
-  S_1___fc_env[0..1] ∈ [--..--]
   ==END OF DUMP==
 [eva] computing for function malloc <- main.
   Called from linked_list.c:41.
@@ -453,17 +372,10 @@
   __fc_cuserid[0..8] ∈ {0}
   __fc_p_cuserid ∈ {{ &__fc_cuserid[0] }}
   Frama_C_entropy_source ∈ [--..--]
-  __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
   __fc_random48_init ∈ {0}
   __fc_random48_counter[0..2] ∈ [--..--]
   __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
-  __fc_env[0] ∈ {{ NULL ; &S_0___fc_env[0] }}
-          [1] ∈ {{ NULL ; &S_1___fc_env[0] }}
-          [2..4095] ∈ {{ NULL ; &S_0___fc_env[0] ; &S_1___fc_env[0] }}
-  __fc_mblen_state ∈ [--..--]
-  __fc_mbtowc_state ∈ [--..--]
-  __fc_wctomb_state ∈ [--..--]
   __fc_initial_stdout.__fc_FILE_id ∈ {1}
                      .__fc_FILE_data ∈ {0}
   __fc_initial_stderr.__fc_FILE_id ∈ {2}
@@ -473,8 +385,6 @@
   head ∈ {{ NULL ; (item *)&MEMORY{[0], [8], [16], [24]} }}
   i ∈ [1..10]
   malloc_next_free ∈ {8; 16; 24; 32; 40}
-  S_0___fc_env[0..1] ∈ [--..--]
-  S_1___fc_env[0..1] ∈ [--..--]
   ==END OF DUMP==
 [eva] linked_list.c:40: 
   Frama_C_dump_each:
@@ -504,17 +414,10 @@
   __fc_cuserid[0..8] ∈ {0}
   __fc_p_cuserid ∈ {{ &__fc_cuserid[0] }}
   Frama_C_entropy_source ∈ [--..--]
-  __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
   __fc_random48_init ∈ {0}
   __fc_random48_counter[0..2] ∈ [--..--]
   __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
-  __fc_env[0] ∈ {{ NULL ; &S_0___fc_env[0] }}
-          [1] ∈ {{ NULL ; &S_1___fc_env[0] }}
-          [2..4095] ∈ {{ NULL ; &S_0___fc_env[0] ; &S_1___fc_env[0] }}
-  __fc_mblen_state ∈ [--..--]
-  __fc_mbtowc_state ∈ [--..--]
-  __fc_wctomb_state ∈ [--..--]
   __fc_initial_stdout.__fc_FILE_id ∈ {1}
                      .__fc_FILE_data ∈ {0}
   __fc_initial_stderr.__fc_FILE_id ∈ {2}
@@ -524,8 +427,6 @@
   head ∈ {{ NULL ; &MEMORY + [0..1016],0%8 }}
   i ∈ [1..10]
   malloc_next_free ∈ [0..1016],0%8
-  S_0___fc_env[0..1] ∈ [--..--]
-  S_1___fc_env[0..1] ∈ [--..--]
   ==END OF DUMP==
 [eva] computing for function malloc <- main.
   Called from linked_list.c:41.
@@ -559,17 +460,10 @@
   __fc_cuserid[0..8] ∈ {0}
   __fc_p_cuserid ∈ {{ &__fc_cuserid[0] }}
   Frama_C_entropy_source ∈ [--..--]
-  __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
   __fc_random48_init ∈ {0}
   __fc_random48_counter[0..2] ∈ [--..--]
   __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
-  __fc_env[0] ∈ {{ NULL ; &S_0___fc_env[0] }}
-          [1] ∈ {{ NULL ; &S_1___fc_env[0] }}
-          [2..4095] ∈ {{ NULL ; &S_0___fc_env[0] ; &S_1___fc_env[0] }}
-  __fc_mblen_state ∈ [--..--]
-  __fc_mbtowc_state ∈ [--..--]
-  __fc_wctomb_state ∈ [--..--]
   __fc_initial_stdout.__fc_FILE_id ∈ {1}
                      .__fc_FILE_data ∈ {0}
   __fc_initial_stderr.__fc_FILE_id ∈ {2}
@@ -579,8 +473,6 @@
   head ∈ {{ NULL ; &MEMORY + [0..1016],0%8 }}
   i ∈ [1..10]
   malloc_next_free ∈ [8..1024],0%8
-  S_0___fc_env[0..1] ∈ [--..--]
-  S_1___fc_env[0..1] ∈ [--..--]
   ==END OF DUMP==
 [eva:alarm] linked_list.c:43: Warning: 
   out of bounds write. assert \valid(&curr->val);
@@ -856,17 +748,10 @@
   __fc_cuserid[0..8] ∈ {0}
   __fc_p_cuserid ∈ {{ &__fc_cuserid[0] }}
   Frama_C_entropy_source ∈ [--..--]
-  __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
   __fc_random48_init ∈ {0}
   __fc_random48_counter[0..2] ∈ [--..--]
   __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
-  __fc_env[0] ∈ {{ NULL ; &S_0___fc_env[0] }}
-          [1] ∈ {{ NULL ; &S_1___fc_env[0] }}
-          [2..4095] ∈ {{ NULL ; &S_0___fc_env[0] ; &S_1___fc_env[0] }}
-  __fc_mblen_state ∈ [--..--]
-  __fc_mbtowc_state ∈ [--..--]
-  __fc_wctomb_state ∈ [--..--]
   __fc_initial_stdout.__fc_FILE_id ∈ {1}
                      .__fc_FILE_data ∈ {0}
   __fc_initial_stderr.__fc_FILE_id ∈ {2}
@@ -876,8 +761,6 @@
   head ∈ {{ NULL ; &MEMORY + [0..1016],0%8 }}
   i ∈ [1..10]
   malloc_next_free ∈ [0..1024],0%8
-  S_0___fc_env[0..1] ∈ [--..--]
-  S_1___fc_env[0..1] ∈ [--..--]
   ==END OF DUMP==
 [eva] computing for function malloc <- main.
   Called from linked_list.c:41.
@@ -1155,17 +1038,10 @@
   __fc_cuserid[0..8] ∈ {0}
   __fc_p_cuserid ∈ {{ &__fc_cuserid[0] }}
   Frama_C_entropy_source ∈ [--..--]
-  __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
   __fc_random48_init ∈ {0}
   __fc_random48_counter[0..2] ∈ [--..--]
   __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
-  __fc_env[0] ∈ {{ NULL ; &S_0___fc_env[0] }}
-          [1] ∈ {{ NULL ; &S_1___fc_env[0] }}
-          [2..4095] ∈ {{ NULL ; &S_0___fc_env[0] ; &S_1___fc_env[0] }}
-  __fc_mblen_state ∈ [--..--]
-  __fc_mbtowc_state ∈ [--..--]
-  __fc_wctomb_state ∈ [--..--]
   __fc_initial_stdout.__fc_FILE_id ∈ {1}
                      .__fc_FILE_data ∈ {0}
   __fc_initial_stderr.__fc_FILE_id ∈ {2}
@@ -1175,8 +1051,6 @@
   head ∈ {{ NULL ; &MEMORY + [0..1016],0%8 }}
   i ∈ [1..10]
   malloc_next_free ∈ [8..1032],0%8
-  S_0___fc_env[0..1] ∈ [--..--]
-  S_1___fc_env[0..1] ∈ [--..--]
   ==END OF DUMP==
 [eva] linked_list.c:40: 
   Frama_C_dump_each:
@@ -1450,17 +1324,10 @@
   __fc_cuserid[0..8] ∈ {0}
   __fc_p_cuserid ∈ {{ &__fc_cuserid[0] }}
   Frama_C_entropy_source ∈ [--..--]
-  __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
   __fc_random48_init ∈ {0}
   __fc_random48_counter[0..2] ∈ [--..--]
   __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
-  __fc_env[0] ∈ {{ NULL ; &S_0___fc_env[0] }}
-          [1] ∈ {{ NULL ; &S_1___fc_env[0] }}
-          [2..4095] ∈ {{ NULL ; &S_0___fc_env[0] ; &S_1___fc_env[0] }}
-  __fc_mblen_state ∈ [--..--]
-  __fc_mbtowc_state ∈ [--..--]
-  __fc_wctomb_state ∈ [--..--]
   __fc_initial_stdout.__fc_FILE_id ∈ {1}
                      .__fc_FILE_data ∈ {0}
   __fc_initial_stderr.__fc_FILE_id ∈ {2}
@@ -1470,8 +1337,6 @@
   head ∈ {{ NULL ; &MEMORY + [0..1016],0%8 }}
   i ∈ [1..10]
   malloc_next_free ∈ [0..2147483640],0%8
-  S_0___fc_env[0..1] ∈ [--..--]
-  S_1___fc_env[0..1] ∈ [--..--]
   ==END OF DUMP==
 [eva] computing for function malloc <- main.
   Called from linked_list.c:41.
@@ -1749,17 +1614,10 @@
   __fc_cuserid[0..8] ∈ {0}
   __fc_p_cuserid ∈ {{ &__fc_cuserid[0] }}
   Frama_C_entropy_source ∈ [--..--]
-  __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
   __fc_random48_init ∈ {0}
   __fc_random48_counter[0..2] ∈ [--..--]
   __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
-  __fc_env[0] ∈ {{ NULL ; &S_0___fc_env[0] }}
-          [1] ∈ {{ NULL ; &S_1___fc_env[0] }}
-          [2..4095] ∈ {{ NULL ; &S_0___fc_env[0] ; &S_1___fc_env[0] }}
-  __fc_mblen_state ∈ [--..--]
-  __fc_mbtowc_state ∈ [--..--]
-  __fc_wctomb_state ∈ [--..--]
   __fc_initial_stdout.__fc_FILE_id ∈ {1}
                      .__fc_FILE_data ∈ {0}
   __fc_initial_stderr.__fc_FILE_id ∈ {2}
@@ -1769,8 +1627,6 @@
   head ∈ {{ NULL ; &MEMORY + [0..1016],0%8 }}
   i ∈ [1..10]
   malloc_next_free ∈ [-2147483648..2147483640],0%8
-  S_0___fc_env[0..1] ∈ [--..--]
-  S_1___fc_env[0..1] ∈ [--..--]
   ==END OF DUMP==
 [eva] linked_list.c:40: 
   Frama_C_dump_each:
@@ -2045,17 +1901,10 @@
   __fc_cuserid[0..8] ∈ {0}
   __fc_p_cuserid ∈ {{ &__fc_cuserid[0] }}
   Frama_C_entropy_source ∈ [--..--]
-  __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
   __fc_random48_init ∈ {0}
   __fc_random48_counter[0..2] ∈ [--..--]
   __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
-  __fc_env[0] ∈ {{ NULL ; &S_0___fc_env[0] }}
-          [1] ∈ {{ NULL ; &S_1___fc_env[0] }}
-          [2..4095] ∈ {{ NULL ; &S_0___fc_env[0] ; &S_1___fc_env[0] }}
-  __fc_mblen_state ∈ [--..--]
-  __fc_mbtowc_state ∈ [--..--]
-  __fc_wctomb_state ∈ [--..--]
   __fc_initial_stdout.__fc_FILE_id ∈ {1}
                      .__fc_FILE_data ∈ {0}
   __fc_initial_stderr.__fc_FILE_id ∈ {2}
@@ -2065,8 +1914,6 @@
   head ∈ {{ NULL ; &MEMORY + [0..1016],0%8 }}
   i ∈ [1..10]
   malloc_next_free ∈ [-2147483648..2147483640],0%8
-  S_0___fc_env[0..1] ∈ [--..--]
-  S_1___fc_env[0..1] ∈ [--..--]
   ==END OF DUMP==
 [eva] computing for function malloc <- main.
   Called from linked_list.c:41.
@@ -2345,17 +2192,10 @@
   __fc_cuserid[0..8] ∈ {0}
   __fc_p_cuserid ∈ {{ &__fc_cuserid[0] }}
   Frama_C_entropy_source ∈ [--..--]
-  __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
   __fc_random48_init ∈ {0}
   __fc_random48_counter[0..2] ∈ [--..--]
   __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
-  __fc_env[0] ∈ {{ NULL ; &S_0___fc_env[0] }}
-          [1] ∈ {{ NULL ; &S_1___fc_env[0] }}
-          [2..4095] ∈ {{ NULL ; &S_0___fc_env[0] ; &S_1___fc_env[0] }}
-  __fc_mblen_state ∈ [--..--]
-  __fc_mbtowc_state ∈ [--..--]
-  __fc_wctomb_state ∈ [--..--]
   __fc_initial_stdout.__fc_FILE_id ∈ {1}
                      .__fc_FILE_data ∈ {0}
   __fc_initial_stderr.__fc_FILE_id ∈ {2}
@@ -2365,8 +2205,6 @@
   head ∈ {{ NULL ; &MEMORY + [0..1016],0%8 }}
   i ∈ [1..10]
   malloc_next_free ∈ [-2147483648..2147483640],0%8
-  S_0___fc_env[0..1] ∈ [--..--]
-  S_1___fc_env[0..1] ∈ [--..--]
   ==END OF DUMP==
 [eva] computing for function printf_va_1 <- main.
   Called from linked_list.c:51.

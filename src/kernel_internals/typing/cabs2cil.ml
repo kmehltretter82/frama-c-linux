@@ -257,9 +257,9 @@ let rec check_no_locals_in_initializer i =
 (* ---------- source error message handling ------------- *)
 let cabslu s =
   {Cil_datatype.Position.unknown with
-   Filepath.pos_path = Datatype.Filepath.of_string ("Cabs2cil_start" ^ s)},
+   pos_path = Filepath.of_string ("Cabs2cil_start" ^ s)},
   {Cil_datatype.Position.unknown with
-   Filepath.pos_path = Datatype.Filepath.of_string ("Cabs2cil_end" ^ s)}
+   pos_path = Filepath.of_string ("Cabs2cil_end" ^ s)}
 
 
 (** Keep a list of the variable ID for the variables that were created to
@@ -323,8 +323,8 @@ let process_stdlib_pragma name args =
     match args with
     | [ ACons ("pop",_) ] -> pop_stdheader (); None
     | [ ACons ("push",_); AStr s ] ->
-      let base_name = (System_config.Share.libc:>string) in
-      let relative_name = Filepath.relativize ~base_name s in
+      let base = System_config.Share.libc in
+      let relative_name = Filepath.relativize ~base (Filepath.of_string s) in
       push_stdheader relative_name;
       None
     | _ -> Some (name, args)
@@ -674,7 +674,7 @@ let debugLoc = false
 let convLoc (l : cabsloc) =
   if debugLoc then
     Kernel.debug "convLoc at %a: line %d, btye %d\n"
-      Datatype.Filepath.pretty (fst l).Filepath.pos_path
+      Filepath.pretty (fst l).Filepath.pos_path
       (fst l).Filepath.pos_lnum (fst l).Filepath.pos_bol;
   l
 

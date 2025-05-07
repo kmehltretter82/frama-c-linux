@@ -39,7 +39,7 @@ module OptionKf : Datatype.S_with_collections with type t = Kernel_function.t op
 module BasicMetrics : sig
   (** Simple type of metrics. *)
   type t = {
-    cfile_name : Datatype.Filepath.t ;    (** Filename *)
+    cfile_name : Filepath.t ;    (** Filename *)
     cfunc : OptionKf.t; (** Function name if applicable
                             ([None] for global metrics) *)
     cslocs: int ;            (** Lines of code w.r.t. statements *)
@@ -124,15 +124,15 @@ val pretty_entry_points :
 val json_of_entry_points : int VInfoMap.t -> Yojson.t
 
 (** Get the filename where the definition of a varinfo occurs *)
-val file_of_vinfodef: Cil_types.varinfo -> Datatype.Filepath.t;;
+val file_of_vinfodef: Cil_types.varinfo -> Filepath.t;;
 
 (** Get the filename containing the function definition *)
-val file_of_fundef: Cil_types.fundec -> Datatype.Filepath.t;;
+val file_of_fundef: Cil_types.fundec -> Filepath.t;;
 
 
 val extract_fundef_name: Cabs.single_name -> string;;
 val kf_of_cabs_name: Cabs.single_name -> Kernel_function.t;;
-val get_filename: Cabs.definition -> Datatype.Filepath.t;;
+val get_filename: Cabs.definition -> Filepath.t;;
 
 (** Type of the generated report file.
     Automatically set according to the file extension.
@@ -146,7 +146,7 @@ type output_type =
 (** get_file_type [extension] sets the output type according to [extension].
     Raises an error if [extension] is not among supported extensions or is empty.
 *)
-val get_file_type: Filepath.Normalized.t -> output_type;;
+val get_file_type: Filepath.t -> output_type;;
 
 (** consider_function [vinfo] returns false if the varinfo is not a function we
     are interested in.

@@ -66,7 +66,7 @@ let run () =
     let open Filename in
     (remove_extension (basename __FILE__) ^ ".dot")
   in
-  let filepath = Filepath.Normalized.of_string filepath in
+  let filepath = Filepath.of_string filepath in
   Dataflow.Result.to_dot_file LivenessDomain.pretty results filepath
 
 let () =

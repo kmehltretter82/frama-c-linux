@@ -817,29 +817,29 @@ class visitor (ctx:context) c =
 
     method on_library thy =
       let copy_file source =
-        if not (Datatype.Filepath.equal
+        if not (Filepath.equal
                   (Filepath.dirname source)
                   (Wp_parameters.Share.get_dir "."))
         then
           let tgtdir = WpContext.directory () in
           let why3src = Filepath.basename source in
-          let target = Filepath.Normalized.concat tgtdir (why3src :> string) in
-          Filepath.copy source target
+          let target = Filepath.(tgtdir / why3src) in
+          Filesystem.copy_file source target
       in
       let iter_file opt =
         match Str.split_delim regexp_col opt with
         | [file] ->
-          let path = Filepath.Normalized.of_string file in
+          let path = Filepath.of_string file in
           let filenoext = filenoext file in
           copy_file path;
           self#add_import_file [filenoext]
             (String.capitalize_ascii filenoext);
         | [file;lib] ->
-          let path = Filepath.Normalized.of_string file in
+          let path = Filepath.of_string file in
           copy_file path;
           self#add_import_file [filenoext file] lib;
         | [file;lib;name] ->
-          let path = Filepath.Normalized.of_string file in
+          let path = Filepath.of_string file in
           copy_file path;
           self#add_import_file_as [filenoext file] lib name;
         | _ -> why3_failure
@@ -1103,7 +1103,7 @@ let add_model_trace (probes: Lang.F.term Probe.Map.t) cnv t =
           ({Filepath.pos_path;pos_lnum=l1;pos_cnum=c1},
            {Filepath.pos_lnum=l2;pos_cnum=c2}) ->
           Why3.Loc.user_position
-            (Filepath.Normalized.to_pretty_string pos_path) l1 c1 l2 c2
+            (Filepath.to_pretty_string pos_path) l1 c1 l2 c2
       in Term.create_lsymbol (Ident.id_fresh ~loc ~attrs p.name) [] ty
     in
     let fold (p:Probe.t) (term:Lang.F.term) task =
@@ -1328,37 +1328,37 @@ let call_prover_task ~timeout ~steps ~config ~probes prover call =
 (* --- Batch Prover                                                       --- *)
 (* -------------------------------------------------------------------------- *)
 
-let output_task wpo drv ?(script : Filepath.Normalized.t option) prover task =
+let output_task wpo drv ?(script : Filepath.t option) prover task =
   let file = Wpo.DISK.file_goal
       ~pid:wpo.Wpo.po_pid
       ~model:wpo.Wpo.po_model
       ~prover:(VCS.Why3 prover) in
-  let open Filepath.Operators in
-  let$ fmt = Filepath.with_formatter_exn file in
+  let open Filesystem.Operators in
+  let$ fmt = Filesystem.with_formatter_exn file in
   Format.fprintf fmt "(* WP Task for Prover %s *)@\n"
     (Why3Provers.ident_why3 prover) ;
   let old = Option.map
       (fun fscript ->
-         let hash = Digest.file fscript |> Digest.to_hex in
+         let hash = Filesystem.digest fscript in
          Format.fprintf fmt "(* WP Script %s *)@\n" hash ;
-         open_in fscript
-      ) (script :> string option) in
+         open_in (fscript :> string)
+      ) script in
   let _ = Why3.Driver.print_task_prepared ?old drv fmt task in
   Option.iter close_in old
 
 
-let digest_task wpo drv ?(script : Filepath.Normalized.t option) prover task =
+let digest_task wpo drv ?(script : Filepath.t option) prover task =
   output_task wpo drv ?script prover task;
   let file = Wpo.DISK.file_goal
       ~pid:wpo.Wpo.po_pid
       ~model:wpo.Wpo.po_model
       ~prover:(VCS.Why3 prover) in
   begin
-    Digest.file (file :> string) |> Digest.to_hex
+    Filesystem.digest file
   end
 
 let run_batch pconf driver ~config
-    ?(script : Filepath.Normalized.t option)
+    ?(script : Filepath.t option)
     ~timeout ~steplimit ~memlimit
     ?(probes=Probe.Map.empty)
     prover task =
@@ -1408,27 +1408,24 @@ let editor_command pconf =
 
 let scriptfile ~force ~ext wpo =
   let dir = Wp_parameters.get_session_dir ~force "interactive" in
-  let filenoext = Filepath.Normalized.concat dir wpo.Wpo.po_sid in
-  Filepath.Normalized.extend filenoext ext
+  Filepath.(dir / (wpo.Wpo.po_sid ^ ext))
 
 let updatescript ~script driver task =
-  let backup = Filepath.Normalized.extend script ".bak" in
-  Filepath.rename script backup ;
+  let backup = Filepath.extend script ".bak" in
+  Filesystem.rename script backup ;
   let _printing_info =
-    let open Filepath.Operators in
-    let$ old = Filepath.with_open_in_exn backup in
-    let$ fmt = Filepath.with_formatter_exn script in
+    let open Filesystem.Operators in
+    let$ old = Filesystem.with_open_in_exn backup in
+    let$ fmt = Filesystem.with_formatter_exn script in
     Why3.Driver.print_task_prepared ~old driver fmt task
   in
-  let d_old = Digest.file (backup :> string) in
-  let d_new = Digest.file (script :> string) in
-  if String.equal d_new d_old then Extlib.safe_remove (backup :> string)
+  if Filesystem.same_digest backup script then Filesystem.remove_file backup
 
 let editor ~script ~merge ~config pconf driver task =
   Task.sync editor_mutex
     begin fun () ->
       Wp_parameters.feedback ~ontty:`Transient "Editing %a..."
-        Filepath.Normalized.pretty script ;
+        Filepath.pretty script ;
       if merge then updatescript ~script driver task ;
       let command = editor_command pconf in
       Wp_parameters.debug ~dkey "Editor command %S" command ;
@@ -1445,11 +1442,11 @@ let prepare ~mode wpo driver task =
   let ext = Filename.extension (Why3.Driver.file_of_task driver "S" "T" task) in
   let force = mode <> VCS.Batch in
   let script = scriptfile ~force wpo ~ext in
-  if Filepath.exists script then Some (script, true) else
+  if Filesystem.exists script then Some (script, true) else
   if force then
     begin
-      let open Filepath.Operators in
-      let$ fmt = Filepath.with_formatter_exn script in
+      let open Filesystem.Operators in
+      let$ fmt = Filesystem.with_formatter_exn script in
       ignore @@ Why3.Driver.print_task_prepared driver fmt task;
       Some (script, false)
     end
@@ -1527,7 +1524,7 @@ let print_debug_task wpo drv prover task =
     let prover = Why3Provers.title prover in
     let goal = Wpo.get_gid wpo ^ "_" ^ prover in
     let filename = Why3.Driver.file_of_task drv "" goal task in
-    let file = Datatype.Filepath.concat out_dir filename in
+    let file = Filepath.(out_dir / filename) in
     let out_channel = open_out (file :> string) in
     let fmt = Format.formatter_of_out_channel out_channel in
     Format.fprintf fmt "%a" pp_task task ;

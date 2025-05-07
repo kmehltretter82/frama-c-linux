@@ -20,5 +20,5 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val check_configuration: Filepath.Normalized.t -> unit
-val print_configuration: Filepath.Normalized.t -> unit
+val check_configuration: Filepath.t -> unit
+val print_configuration: Filepath.t -> unit

@@ -94,7 +94,7 @@ module Vars = struct
       iter_glob
         (fun v ->
            v.vname = name &&
-           Filepath.Normalized.equal file (fst v.vdecl).pos_path)
+           Filepath.equal file (fst v.vdecl).pos_path)
     | Whole_function kf ->
       List.find (fun v -> v.vname = name) (get_locals kf @ !get_statics kf)
     | Formal kf ->
@@ -526,7 +526,7 @@ module FileIndex = struct
 
   module S =
     State_builder.Hashtbl
-      (Datatype.Filepath.Hashtbl)
+      (Filepath.Hashtbl)
       (Datatype.List(Global))
       (struct
         let name = "Globals.FileIndex"
@@ -541,7 +541,7 @@ module FileIndex = struct
         (fun glob ->
            let f = (fst (Global.loc glob)).Filepath.pos_path in
            Kernel.debug ~dkey:Kernel.dkey_globals "Indexing global in file %a@."
-             Datatype.Filepath.pretty f;
+             Filepath.pretty f;
            ignore
              (S.memo
                 ~change:(fun l -> glob :: l) (fun _ -> [ glob ]) f))
@@ -909,7 +909,7 @@ module Comments_stmt_cache =
     end)
 
 let get_comments_global g =
-  let last_pos (f : Datatype.Filepath.t) =
+  let last_pos (f : Filepath.t) =
     { Filepath.pos_path = f;
       Filepath.pos_lnum = max_int;
       Filepath.pos_cnum = max_int;
@@ -932,7 +932,7 @@ let get_comments_global g =
       | [] ->
         Kernel.fatal "Cannot find global %a in file %a"
           Cil_printer.pp_global g
-          Datatype.Filepath.pretty file
+          Filepath.pretty file
       | g' :: l when Cil_datatype.Global.equal g g' ->
         { Filepath.pos_path = file;
           Filepath.pos_lnum = 1;
@@ -978,3 +978,32 @@ let get_comments_stmt s =
     let last = snd (Cil_datatype.Stmt.loc s) in
     Cabshelper.Comments.get (first,last)
   in Comments_stmt_cache.memo add s
+
+(* ************************************************************************* *)
+(** {2 Getters} *)
+(* ************************************************************************* *)
+
+let get_annotation_name ga = match ga with
+  | Dfun_or_pred ({l_var_info = {lv_name = name}}, _)
+  | Daxiomatic (name, _, _, _)
+  | Dmodule (name, _, _, _, _)
+  | Dtype ({lt_name = name}, _)
+  | Dlemma (name, _, _, _, _, _)
+  | Dinvariant ({l_var_info = {lv_name = name}}, _)
+  | Dtype_annot ({l_var_info = {lv_name = name}}, _)
+  | Dmodel_annot ({mi_name = name}, _)
+  | Dextended ({ext_name = name}, _, _) -> Some name
+  | Dvolatile _ -> None
+
+let get_name g = match g with
+  | GFun ({svar = {vorig_name = name}}, _)
+  | GFunDecl(_, {vorig_name = name}, _)
+  | GVar ({vorig_name = name}, _, _)
+  | GVarDecl ({vorig_name = name}, _)
+  | GType ({torig_name = name}, _)
+  | GCompTag ({corig_name = name}, _)
+  | GCompTagDecl ({corig_name = name}, _)
+  | GEnumTag ({eorig_name = name}, _)
+  | GEnumTagDecl ({eorig_name = name}, _) -> Some name
+  | GAnnot (ga, _) -> get_annotation_name ga
+  | _ -> None

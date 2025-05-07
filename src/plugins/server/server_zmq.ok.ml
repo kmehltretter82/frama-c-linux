@@ -172,9 +172,8 @@ let launch_server url =
       raise exn
 
 let temp_url () =
-  let socket = Filename.temp_file "frama-c.socket" ".io" in
-  Extlib.safe_at_exit (fun () -> Extlib.safe_remove socket) ;
-  "ipc://" ^ socket
+  let socket = Temp_files.file ~prefix:"frama-c.socket" ~suffix:".io" () in
+  "ipc://" ^ (socket :> string)
 
 let start_server () =
   match !server with

@@ -43,7 +43,7 @@ let mark_cache ~mode hash =
 module CACHEDIR = WpContext.StaticGenerator(Datatype.Unit)
     (struct
       type key = unit
-      type data = Filepath.Normalized.t
+      type data = Filepath.t
       let name = "Wp.Cache.dir"
       let compile () =
         try
@@ -51,12 +51,12 @@ module CACHEDIR = WpContext.StaticGenerator(Datatype.Unit)
             raise Not_found ;
           let gdir = Sys.getenv "FRAMAC_WP_CACHEDIR" in
           if gdir = "" then raise Not_found ;
-          Filepath.Normalized.of_string gdir
+          Filepath.of_string gdir
         with Not_found ->
         try
           let gdir = Wp_parameters.CacheDir.get() in
           if gdir = "" then raise Not_found ;
-          Filepath.Normalized.of_string gdir
+          Filepath.of_string gdir
         with Not_found ->
           Wp_parameters.get_session_dir ~force:false "cache"
     end)
@@ -64,18 +64,18 @@ module CACHEDIR = WpContext.StaticGenerator(Datatype.Unit)
 let get_dir () = (CACHEDIR.get () :> string)
 
 let is_session_dir path =
-  0 = Filepath.Normalized.compare
+  0 = Filepath.compare
     path (Wp_parameters.get_session_dir ~force:false "cache")
 
 let get_usable_dir ?(make=false) () =
   let path = CACHEDIR.get () in
   let parents = is_session_dir path in
-  if not (Filepath.exists path) && make then
-    ignore (Extlib.mkdir ~parents path 0o755);
-  if not (Filepath.is_dir path) then begin
+  if not (Filesystem.exists path) && make then
+    ignore (Filesystem.make_dir ~parents path 0o755);
+  if not (Filesystem.is_dir path) then begin
     Wp_parameters.warning ~current:false ~once:true
       "Cache path %a is not a directory"
-      Filepath.Normalized.pretty path;
+      Filepath.pretty path;
     raise Not_found
   end;
   path
@@ -174,10 +174,9 @@ let promote ?timeout ?steplimit (res : VCS.result) =
     else (* can be run a longer time or widely *)
       VCS.no_result
 
-let file_from_hash hash =
+let file_from_hash file_hash =
   let dir = get_usable_dir ~make:true () in
-  let file = Printf.sprintf "%s/%s.json" (dir:>string) hash in
-  file
+  Filepath.(dir / (file_hash ^ ".json"))
 
 let get_cache_result ~mode hash =
   match mode with
@@ -186,12 +185,12 @@ let get_cache_result ~mode hash =
     try
       let hash = Lazy.force hash in
       let file = file_from_hash hash in
-      let path = Filepath.Normalized.of_string file in
-      if not (Filepath.exists path) then VCS.no_result
+
+      if not (Filesystem.exists file) then VCS.no_result
       else
         try
           mark_cache ~mode hash ;
-          Json.load_file path |> ProofScript.result_of_json
+          Json.load_file file |> ProofScript.result_of_json
         with err ->
           Wp_parameters.warning ~current:false ~once:true
             "invalid cache entry (%s)" (Printexc.to_string err) ;
@@ -205,10 +204,9 @@ let set_cache_result ~mode hash prover result =
     let hash = Lazy.force hash in
     try
       let file = file_from_hash hash in
-      let path = Filepath.Normalized.of_string file in
       mark_cache ~mode hash ;
       ProofScript.json_of_result (VCS.Why3 prover) result
-      |> Json.save_file path
+      |> Json.save_file file
     with err ->
       Wp_parameters.warning ~current:false ~once:true
         "can not update cache (%s)" (Printexc.to_string err)
@@ -217,7 +215,7 @@ let clear_result ~digest prover goal =
   try
     let hash = digest prover goal in
     let file = file_from_hash hash in
-    Extlib.safe_remove file
+    Filesystem.remove_file file
   with err ->
     Wp_parameters.warning ~current:false ~once:true
       "can not clean cache entry (%s)" (Printexc.to_string err)
@@ -226,21 +224,21 @@ let cleanup_cache () =
   let mode = get_mode () in
   if mode = Cleanup && (!hits > 0 || !miss > 0) then
     try
-      let dir = (get_usable_dir ():>string) in
+      let dir = get_usable_dir () in
       if is_global_cache () then
         Wp_parameters.warning ~current:false ~once:true
           "Cleanup mode deactivated with global cache."
       else
-        Array.iter
+        Filesystem.iter_dir
           (fun f ->
              if Filename.check_suffix f ".json" then
                let hash = Filename.chop_suffix f ".json" in
                if not (Hashtbl.mem cleanup hash) then
                  begin
                    incr removed ;
-                   Extlib.safe_remove (Printf.sprintf "%s/%s" dir f) ;
+                   Filesystem.remove_file Filepath.(dir / f) ;
                  end
-          ) (Sys.readdir dir) ;
+          ) dir ;
     with
     | Unix.Unix_error _ as exn ->
       Wp_parameters.warning ~current:false

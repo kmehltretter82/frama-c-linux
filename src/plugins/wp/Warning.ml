@@ -39,7 +39,7 @@ struct
     if w1 == w2 then 0 else
       let f1 = w1.loc.Filepath.pos_path in
       let f2 = w2.loc.Filepath.pos_path in
-      let fc = Datatype.Filepath.compare f1 f2 in
+      let fc = Filepath.compare f1 f2 in
       if fc <> 0 then fc else
         let l1 = w1.loc.Filepath.pos_lnum in
         let l2 = w2.loc.Filepath.pos_lnum in

@@ -83,19 +83,21 @@ let extend () =
           chop_extension (basename (List.hd (Kernel.Files.get()):>string))) ^
         "_" ^ (TestID.get ()) ^ ".i"
       in
+      let tmpfile = Filepath.of_string tmpfile in
       let () =
         Extlib.safe_at_exit
           (fun () ->
              if Debug.get () >= 1 || not !ok then
-               result "Keeping temp file %s" tmpfile
-             else Extlib.safe_remove tmpfile)
+               result "Keeping temp file %a" Filepath.pretty tmpfile
+             else Filesystem.remove_file tmpfile)
       in
-      let chan = open_out tmpfile in
-      let fmt = Format.formatter_of_out_channel chan in
-      let aorai_prj = Project.from_unique_name "aorai" in
-      Project.on aorai_prj Kernel.PrintLibc.on ();
-      File.pretty_ast ~prj:aorai_prj ~fmt ();
-      close_out chan;
+      let () =
+        let open Filesystem.Operators in
+        let$ fmt = Filesystem.with_formatter_exn tmpfile in
+        let aorai_prj = Project.from_unique_name "aorai" in
+        Project.on aorai_prj Kernel.PrintLibc.on ();
+        File.pretty_ast ~prj:aorai_prj ~fmt ();
+      in
       let selection =
         List.fold_left
           (fun selection state ->
@@ -110,9 +112,9 @@ let extend () =
       Project.copy ~selection my_project;
       Project.set_current my_project;
       Kernel.SymbolicPath.add
-        (Filepath.Normalized.of_string (Filename.get_temp_dir_name ()),
+        (Filepath.of_string (Filename.get_temp_dir_name ()),
          "TMPDIR");
-      Files.append_after [ Filepath.Normalized.of_string tmpfile ];
+      Files.append_after [ tmpfile ];
       Kernel.LogicalOperators.on ();
       Constfold.off ();
       Ast.compute();

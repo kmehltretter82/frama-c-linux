@@ -130,14 +130,13 @@ let () =
 
 let run () =
   Ast.compute ();
-  let debug = Kernel.debug_atleast 1 in
-  let my_file = Extlib.temp_file_cleanup_at_exit ~debug "Extend" ".i" in
-  let out = open_out my_file in
-  let fmt = Format.formatter_of_out_channel out in
+  let my_file = Temp_files.file ~prefix:"Extend" ~suffix:".i" () in
+  let open Filesystem.Operators in
+  let$ fmt = Filesystem.with_formatter_exn my_file in
   File.pretty_ast ~fmt ();
   let prj = Project.create "reparsing" in
   Project.on prj add_builtin ();
-  Project.on prj Kernel.Files.add (Datatype.Filepath.of_string my_file);
+  Project.on prj Kernel.Files.add my_file;
   Kernel.feedback "Reparsing file";
   (* Avoid having a temporary name in the oracle. *)
   Kernel.Verbose.set 0;

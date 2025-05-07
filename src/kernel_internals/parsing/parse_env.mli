@@ -22,6 +22,6 @@
 
 val open_source : scan_references:bool -> string -> (string, string) result
 
-val set_workdir : Filepath.Normalized.t -> string -> unit
+val set_workdir : Filepath.t -> string -> unit
 
-val get_workdir : Filepath.Normalized.t -> string option
+val get_workdir : Filepath.t -> string option

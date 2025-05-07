@@ -146,7 +146,7 @@ struct
      E.g. in `frama-c -plugin1-log file.txt -then -plugin2-log file.txt`,
      the formatter avoids Frama-C from opening file.txt a second time, which
      would truncate its contents. *)
-  let file_formatters : (string, Format.formatter) Hashtbl.t =
+  let file_formatters : (Filepath.t, Format.formatter) Hashtbl.t =
     Hashtbl.create 0
 
   (* Opens and returns a new file formatter if the file has not been opened
@@ -155,12 +155,12 @@ struct
     (* Note: normalized paths are not necessarily canonical, so if the
        command-line arguments are unusual, this may fail to detect two
        filenames as referring to the same file. *)
-    let normalized_filename = Filepath.normalize filename in
+    let normalized_filename = Filepath.of_string filename in
     try
       Hashtbl.find file_formatters normalized_filename
     with
     | Not_found ->
-      let oc = open_out normalized_filename in
+      let oc = open_out (normalized_filename :> string)in
       let fmt = Format.formatter_of_out_channel oc in
       Hashtbl.add file_formatters normalized_filename fmt;
       Extlib.safe_at_exit (fun () -> close_out oc);
@@ -312,17 +312,17 @@ struct
 
     let add_plugin path =
       if is_kernel then path
-      else Fc_Filepath.Normalized.concat path plugin_subpath
+      else Fc_Filepath.(path / plugin_subpath)
 
     let dirs () =
       if is_visible && is_set () then [ get () ]
       else List.map add_plugin System_config.Share.dirs
 
     let find ~is_dir relative =
-      let exception Found of Fc_Filepath.Normalized.t in
+      let exception Found of Fc_Filepath.t in
       let check_presence dir =
-        let path = Fc_Filepath.Normalized.concat dir relative in
-        if Fc_Filepath.exists path then raise (Found path)
+        let path = Fc_Filepath.(dir / relative) in
+        if Filesystem.exists path then raise (Found path)
       in
       try
         List.iter check_presence (dirs ()) ;
@@ -332,9 +332,9 @@ struct
           relative
           (if is_kernel then "" else "/" ^ P.name)
       with
-      | Found path when is_dir <> Fc_Filepath.is_dir path ->
+      | Found path when is_dir <> Filesystem.is_dir path ->
         L.abort "%a is expected to be a %s"
-          Fc_Filepath.Normalized.pretty path
+          Fc_Filepath.pretty path
           (if is_dir then "directory" else "file")
       | Found path -> path
 
@@ -345,14 +345,12 @@ struct
   module Make_user_dir_root
       (D: sig
          val name : string
-         val default_root : unit -> Fc_Filepath.Normalized.t
-         val kernel_get : unit -> Fc_Filepath.Normalized.t
+         val default_root : unit -> Fc_Filepath.t
+         val kernel_get : unit -> Fc_Filepath.t
          val is_visible : bool
        end)
   =
   struct
-    open Fc_Filepath.Normalized
-
     let is_visible = D.is_visible
     let is_kernel = P.name = ""
 
@@ -386,26 +384,26 @@ struct
     let get () =
       if Dir_name.is_set () then Dir_name.get ()
       else match Sys.getenv_opt var_name with
-        | Some s when s <> "" -> of_string s
+        | Some s when s <> "" -> Fc_Filepath.of_string s
         | _ when is_kernel -> D.default_root ()
-        | _ -> concat (D.kernel_get ()) P.shortname
+        | _ -> Fc_Filepath.(D.kernel_get () / P.shortname)
 
     let set = Dir_name.set
     let is_set = Dir_name.is_set
 
     let expected ~dir path =
-      if dir <> Fc_Filepath.is_dir path then
+      if dir <> Filesystem.is_dir path then
         L.abort "%a is expected to be a %s"
-          pretty path (if dir then "directory" else "file")
+          Fc_Filepath.pretty path (if dir then "directory" else "file")
 
     let mk_dir d =
-      try ignore @@ Extlib.mkdir ~parents:true d 0o755
+      try ignore @@ Filesystem.make_dir ~parents:true d 0o755
       with Unix.Unix_error _ ->
-        L.abort "cannot create %s directory `%a'" D.name pretty d
+        L.abort "cannot create %s directory `%a'" D.name Fc_Filepath.pretty d
 
     let get_dir ?(create_path=false) s =
-      let dir = concat (get ()) s in
-      if Fc_Filepath.exists dir
+      let dir = Fc_Filepath.(get () / s) in
+      if Filesystem.exists dir
       then (expected ~dir:true dir ; dir)
       else if create_path
       then (mk_dir dir ; dir)
@@ -415,15 +413,15 @@ struct
       let base_dir = get_dir ?create_path @@ Filename.dirname s in
       (* No need to create anything here, as the path of sub-directories has
          been already created by [get_dir] for computing [base_dir]. *)
-      let path = concat base_dir @@ Filename.basename s in
-      if Fc_Filepath.exists path then expected ~dir:false path ;
+      let path = Fc_Filepath.(base_dir / Filename.basename s) in
+      if Filesystem.exists path then expected ~dir:false path ;
       path
   end
 
   module Session = Make_user_dir_root
       (struct
         let name = "session"
-        let default_root () = Fc_Filepath.Normalized.of_string "./.frama-c"
+        let default_root () = Fc_Filepath.of_string "./.frama-c"
         let kernel_get () = !session_ref ()
         let is_visible = !session_visible_ref
       end)

@@ -25,7 +25,7 @@
 (* ************************************************************************** *)
 
 open Project_skeleton
-open Output
+open Project_output
 
 (* re-exporting record fields *)
 type project = t = private
@@ -446,9 +446,18 @@ let register_after_global_load_hook = After_global_load.extend
 
 let magic = 9 (* magic number *)
 
+(* Cannot use Temp_files.file as it would create a cricular dependency *)
+let temp_file ~prefix ~suffix =
+  try
+    let file = Filesystem.temp_file ~prefix ~suffix in
+    Extlib.safe_at_exit (fun () -> Filesystem.remove_file file);
+    file
+  with Filesystem.Temp_file_error s ->
+    abort "cannot create temporary file: %s" s
+
 let save_projects selection projects filename =
-  let open Filepath.Operators in
-  let$ cout = Filepath.with_open_out_exn ~binary:true filename in
+  let open Filesystem.Operators in
+  let$ cout = Filesystem.with_open_out_exn ~binary:true filename in
   output_value cout System_config.Version.id;
   output_value cout magic;
   output_value cout !Graph.Blocks.cpt_vertex;
@@ -467,12 +476,12 @@ let save_projects selection projects filename =
 
 let save ?(selection=State_selection.full) ?(project=current()) filename =
   guarded_feedback selection 2 "saving project %S into file %a"
-    project.unique_name Filepath.Normalized.pretty filename;
+    project.unique_name Filepath.pretty filename;
   save_projects selection (Q.singleton project) filename
 
 let save_all ?(selection=State_selection.full) filename =
   guarded_feedback selection 2 "saving the current session into file %a"
-    Filepath.Normalized.pretty filename;
+    Filepath.pretty filename;
   save_projects selection projects filename
 
 module Descr = struct
@@ -590,39 +599,38 @@ module Descr = struct
 end
 
 let load_projects ~project_under_copy selection ?name filename =
-  let cin = open_in_bin (filename : Filepath.Normalized.t :> string) in
-  let gen_read f cin =
-    try f cin with
-    | End_of_file ->
-      close_in cin;
-      abort "unexpected end of file while loading '%a'"
-        Filepath.Normalized.pretty filename
-    | Failure s -> close_in cin; raise (IOError s)
-  in
-  let read = gen_read input_value in
-  let check_magic cin to_string current =
-    let old = read cin in
-    if old <> current then begin
-      close_in cin;
-      let s =
-        Format.sprintf
-          "project saved with an incompatible version (old: %S,current: %S)"
-          (to_string old)
-          (to_string current)
+  let open Filesystem.Operators in
+  let ocamlgraph_counter, pre_existing_projects, loaded_states, last_created =
+    try
+      let$ cin = Filesystem.with_open_in_exn ~binary:true filename in
+      let check_magic format current =
+        let old = input_value cin in
+        if old <> current then begin
+          let s =
+            Format.asprintf
+              "project saved with an incompatible version \
+               (old: \"%a\", current: \"%a\")"
+              (fun fmt -> Format.fprintf fmt format) old
+              (fun fmt -> Format.fprintf fmt format) current
+          in
+          raise (IOError s)
+        end
       in
+      check_magic "%S" System_config.Version.id;
+      check_magic "magic number %d" magic;
+      let ocamlgraph_counter = input_value cin in
+      let pre_existing_projects = Descr.init project_under_copy in
+      let loaded_states, last_created =
+        Descr.input_val cin (Descr.global_state name selection)
+      in
+      ocamlgraph_counter, pre_existing_projects, loaded_states, last_created
+    with
+    | Failure s ->
       raise (IOError s)
-    end
+    | End_of_file ->
+      abort "unexpected end of file while loading '%a'"
+        Filepath.pretty filename
   in
-  check_magic cin (fun x -> x) System_config.Version.id;
-  check_magic cin (fun n -> "magic number " ^ string_of_int n) magic;
-  let ocamlgraph_counter = read cin in
-  let pre_existing_projects = Descr.init project_under_copy in
-  let loaded_states, last_created =
-    gen_read
-      (fun c -> Descr.input_val c (Descr.global_state name selection))
-      cin
-  in
-  close_in cin;
   last_created_by_copy_ref := last_created;
   Descr.finalize loaded_states selection;
   Graph.Blocks.after_unserialization ocamlgraph_counter;
@@ -650,7 +658,7 @@ let load_projects ~project_under_copy selection ?name filename =
 let load_with_copy
     ?project_under_copy ?(selection=State_selection.full) ?name filename =
   guarded_feedback selection 2 "loading the project saved in file %a"
-    Filepath.Normalized.pretty filename;
+    Filepath.pretty filename;
   match load_projects ~project_under_copy selection ?name filename with
   | [ p ] -> p
   | [] | _ :: _ :: _ -> assert false
@@ -660,7 +668,7 @@ let load = load_with_copy ?project_under_copy:None
 let load_all ?(selection=State_selection.full) filename =
   remove_all ();
   guarded_feedback selection 2 "loading the session saved in file %a"
-    Filepath.Normalized.pretty filename;
+    Filepath.pretty filename;
   try
     ignore (load_projects ~project_under_copy:None selection filename)
   with IOError _ as e ->
@@ -675,20 +683,16 @@ let create_by_copy
     ?(selection=State_selection.full) ?(src=current()) ~last name =
   guarded_feedback selection 2 "creating project %S by copying project %S"
     name (src.unique_name);
-  let filename =
-    Filepath.Normalized.of_string (
-      try Extlib.temp_file_cleanup_at_exit "frama_c_create_by_copy" ".sav"
-      with Extlib.Temp_file_error s -> abort "cannot create temporary file: %s" s)
-  in
+  let filename = temp_file ~prefix:"frama_c_create_by_copy" ~suffix:".sav" in
   save ~selection ~project:src filename;
   try
     let prj = load_with_copy ~project_under_copy:src ~selection ~name filename in
-    Extlib.safe_remove (filename:>string);
+    Filesystem.remove_file filename;
     if last then last_created_by_copy_ref := Some prj;
     Create_by_copy_hook.apply (src, prj);
     prj
   with e ->
-    Extlib.safe_remove (filename:>string);
+    Filesystem.remove_file filename;
     raise e
 
 (* ************************************************************************** *)
@@ -698,9 +702,9 @@ let create_by_copy
 module Undo = struct
 
   let short_filename = "frama_c_undo_restore"
-  let filename = ref Filepath.Normalized.empty
+  let filename = ref Filepath.empty
 
-  let clear_breakpoint () = Extlib.safe_remove (!filename:>string)
+  let clear_breakpoint () = Filesystem.remove_file !filename
 
   let restore () =
     try
@@ -711,10 +715,7 @@ module Undo = struct
 
   let breakpoint () =
     clear_breakpoint ();
-    filename := Filepath.Normalized.of_string
-        (try Extlib.temp_file_cleanup_at_exit short_filename ".sav"
-         with Extlib.Temp_file_error s ->
-           abort "cannot create temporary file: %s" s)
+    filename := temp_file ~prefix:short_filename ~suffix:".sav"
 
 end
 

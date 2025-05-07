@@ -28,7 +28,7 @@ type cpp_opt_kind = Gnu | Not_gnu | Unknown
 
 type file =
   | NeedCPP of
-      Filepath.Normalized.t (* Filename of the [.c] to preprocess. *)
+      Filepath.t (* Filename of the [.c] to preprocess. *)
       * string (* Preprocessing command, as given by -cpp-command, or
                   the default value, but without extra arguments. *)
       * string list (* Extra arguments, specific to this file (that is,
@@ -37,9 +37,8 @@ type file =
                        to the C preprocessor. *)
       * cpp_opt_kind (* Whether the preprocessor is known to be compatible with
                         GCC-style options (mostly, -D and -I). *)
-  | NoCPP of Filepath.Normalized.t (** filename of a preprocessed [.c] *)
-  | External of Filepath.Normalized.t * string
-  (* file * name of plug-in that handles it *)
+  | NoCPP of Filepath.t (** filename of a preprocessed [.c] *)
+  | External of Filepath.t * string (* file * name of plug-in that handles it *)
 
 module D =
   Datatype.Make
@@ -48,9 +47,9 @@ module D =
       type t = file
       let name = "File"
       let reprs =
-        [ NeedCPP(Filepath.Normalized.empty, "", [], Unknown);
-          NoCPP Filepath.Normalized.empty;
-          External(Filepath.Normalized.empty, "")
+        [ NeedCPP(Filepath.empty, "", [], Unknown);
+          NoCPP Filepath.empty;
+          External(Filepath.empty, "")
         ]
       let structural_descr = Structural_descr.t_abstract
       let mem_project = Datatype.never_any_project
@@ -67,7 +66,7 @@ let get_suffixes () =
     [ ".c"; ".i"; ".h" ]
 
 let get_filepath = function NeedCPP (s, _, _, _) | NoCPP s | External (s, _) -> s
-let get_name s = Filepath.Normalized.to_pretty_string (get_filepath s)
+let get_name s = Filepath.to_pretty_string (get_filepath s)
 
 (* ************************************************************************* *)
 (** {2 Preprocessor command} *)
@@ -114,7 +113,7 @@ let from_filename ?cpp f =
       Kernel.warning ~wkey:Kernel.wkey_jcdb
         "found flags for file %a@ both in -cpp-extra-args-per-file and@ \
          in the json compilation database;@ the latter will be ignored"
-        Filepath.Normalized.pretty f;
+        Filepath.pretty f;
     if extra_by_file <> "" then [extra_by_file] else jcdb_flags
   in
   if Filename.check_suffix (f:>string) ".i" then begin
@@ -276,12 +275,12 @@ let regexp_machdep = Str.regexp "^machdep_\\([^.]*\\).yaml$"
 let mem_machdep s = Kernel.Machdep.is_default s || Sys.file_exists s
 
 let default_machdeps () =
-  Array.fold_right
+  Filesystem.fold_dir
     (fun s acc ->
        if Str.string_match regexp_machdep s 0 then
          Str.matched_group 1 s :: acc
        else acc)
-    (Sys.readdir (Kernel.Machdep.get_dir() :> string))
+    (Kernel.Machdep.get_dir())
     []
 
 let pretty_machdeps fmt =
@@ -316,7 +315,7 @@ let get_machdep () =
   let file =
     if Kernel.Machdep.is_default m
     then Kernel.Machdep.get_default_file m
-    else Filepath.Normalized.of_string ~existence:Must_exist m
+    else Filepath.of_string ~existence:Must_exist m
   in
   let res =
     Result.bind
@@ -394,16 +393,9 @@ let pretty_machdep ?fmt ?machdep () =
 (** {2 Initializations} *)
 (* ************************************************************************* *)
 
-let create_temp_file name suffix =
-  let debug = Kernel.is_debug_key_enabled Kernel.dkey_pp_keep_temp_files in
-  let of_string = Filepath.Normalized.of_string in
-  try of_string (Extlib.temp_file_cleanup_at_exit ~debug name suffix)
-  with Extlib.Temp_file_error s ->
-    Kernel.abort "cannot create temporary file: %s" s
-
-let safe_remove_file (f : Datatype.Filepath.t) =
+let safe_remove_file (f : Filepath.t) =
   if not (Kernel.is_debug_key_enabled Kernel.dkey_pp_keep_temp_files) then
-    Extlib.safe_remove (f :> string)
+    Filesystem.remove_file f
 
 let cpp_name cmd =
   let cmd = List.hd (String.split_on_char ' ' cmd) in
@@ -412,8 +404,8 @@ let cpp_name cmd =
 let replace_in_cpp_cmd cmdl supp_args in_file out_file =
   (* using Filename.quote for filenames which contain space or shell
      metacharacters *)
-  let in_file = Filename.quote in_file
-  and out_file = Filename.quote out_file in
+  let in_file = Filepath.to_quoted_string in_file
+  and out_file = Filepath.to_quoted_string out_file in
   let substitute s =
     match Str.matched_string s with
     | "%%" -> "%"
@@ -482,16 +474,16 @@ let build_cpp_cmd = function
   | NoCPP _ | External _ -> None
   | NeedCPP (f, cmdl, extra_for_this_file, is_gnu_like) ->
     let extra_args = extra_for_this_file @ Kernel.CppExtraArgs.get () in
-    if not (Filepath.exists f) then
+    if not (Filesystem.exists f) then
       Kernel.abort "source file %a does not exist"
-        Filepath.Normalized.pretty f;
+        Filepath.pretty f;
     let add_if_gnu ~to_warn opt =
       match is_gnu_like with
       | Gnu -> [], [opt]
       | Not_gnu -> [], []
       | Unknown -> opt :: to_warn, [opt]
     in
-    let ppf = create_temp_file (Filename.basename (f :> string)) ".i" in
+    let ppf = Temp_files.file ~prefix:(Filepath.basename f) ~suffix:".i" () in
     (* Hypothesis: the preprocessor is POSIX compliant,
        hence understands -I and -D. *)
     let fc_include_args =
@@ -551,7 +543,7 @@ let build_cpp_cmd = function
         fc_define_args
     in
     let cpp_command =
-      replace_in_cpp_cmd cmdl supp_args (f:>string) (ppf:>string)
+      replace_in_cpp_cmd cmdl supp_args f ppf
     in
     let workdir, cpp_command_with_chdir = adjust_pwd f cpp_command in
     if workdir <> None then
@@ -579,7 +571,7 @@ let abort_with_detailed_pp_message f cpp_command =
         Format.asprintf "note: %s is set but \
                          contains no entries for '%a'.@ "
           Kernel.JsonCompilationDatabase.option_name
-          Datatype.Filepath.pretty f
+          Filepath.pretty f
       else ""
     else
     if not (Kernel.CppExtraArgs.is_set ()) &&
@@ -597,20 +589,20 @@ let abort_with_detailed_pp_message f cpp_command =
     "failed to run: %s\n(PWD: %a)@\n\
      %sSee chapter \"Preparing the Sources\" in the Frama-C user manual \
      for more details."
-    cpp_command Filepath.Normalized.pretty (Filepath.pwd ()) possible_cause
+    cpp_command Filepath.pretty (Filepath.pwd ()) possible_cause
 
 let parse_cabs cpp_command = function
   | NoCPP f ->
-    if not (Filepath.exists f) then
+    if not (Filesystem.exists f) then
       Kernel.abort "preprocessed file %a does not exist"
-        Filepath.Normalized.pretty f;
+        Filepath.pretty f;
     Kernel.feedback "Parsing %a (no preprocessing)"
-      Datatype.Filepath.pretty f;
+      Filepath.pretty f;
     Frontc.parse f ()
   | NeedCPP (f, cmdl, _extra_for_this_file, is_gnu_like) ->
     let cpp_command, ppf = Option.get cpp_command in
     Kernel.feedback "Parsing %a (with preprocessing)"
-      Datatype.Filepath.pretty f;
+      Filepath.pretty f;
     if Sys.command cpp_command <> 0 then begin
       safe_remove_file ppf;
       abort_with_detailed_pp_message f cpp_command
@@ -637,7 +629,7 @@ let parse_cabs cpp_command = function
         let ppf' =
           try Logic_preprocess.file ".c"
                 (replace_in_cpp_cmd cmdl "")
-                (ppf : Filepath.Normalized.t :> string)
+                (ppf : Filepath.t :> string)
           with Sys_error _ as e ->
             safe_remove_file ppf;
             Kernel.abort "preprocessing of annotations failed (%s)"
@@ -652,17 +644,17 @@ let parse_cabs cpp_command = function
     safe_remove_file ppf;
     (cil,(f,defs))
   | External (f,suf) ->
-    if not (Filepath.exists f) then
+    if not (Filesystem.exists f) then
       Kernel.abort "file %a does not exist."
-        Filepath.Normalized.pretty f;
+        Filepath.pretty f;
     Kernel.feedback "Parsing %a (external front-end)"
-      Datatype.Filepath.pretty f;
+      Filepath.pretty f;
     (match Hashtbl.find_opt check_suffixes suf with
      | Some parse -> parse (f:>string)
      | None ->
        Kernel.abort
          "could not find a suitable plugin for parsing %a."
-         Filepath.Normalized.pretty f)
+         Filepath.pretty f)
 
 let to_cil_cabs cpp_cmds_and_args f =
   let cpp_command = List.assoc f cpp_cmds_and_args in
@@ -691,7 +683,7 @@ let () =
         Kernel.abort "preprocessing of annotations failed (%s)"
           (Printexc.to_string e)
     in
-    let path = Datatype.Filepath.of_string f in
+    let path = Filepath.of_string f in
     let (cil,(_,defs)) = Frontc.parse ppf () in
     cil.fileName <- path;
     safe_remove_file ppf;
@@ -700,6 +692,21 @@ let () =
   new_file_type ".ci" handle
 
 
+module NeverRemoveGlobals =
+  State_builder.Set_ref
+    (Datatype.String.Set)
+    (struct
+      let name = "File.NeverRemoveGlobals"
+      let dependencies = []
+    end)
+
+let () =
+  State_dependency_graph.add_dependencies
+    ~from:NeverRemoveGlobals.self
+    [ Ast.self; Ast.UntypedFiles.self ]
+
+let never_remove_global globname =
+  NeverRemoveGlobals.add globname
 
 (* Keep defined entry point even if not defined, and possibly
    other unused globals according to relevant command-line parameters.
@@ -708,6 +715,8 @@ let isRoot g =
   let keepFuncs = Kernel.KeepUnusedFunctions.get () in
   let keepTypes = Kernel.Keep_unused_types.get () in
   Rmtmps.isExportedRoot g ||
+  Option.fold ~none:false
+    ~some:(fun n -> NeverRemoveGlobals.mem n) (Globals.get_name g) ||
   match g with
   | GFun({svar = v; sspec = spec},_)
   | GFunDecl(spec,v,_) ->
@@ -717,7 +726,8 @@ let isRoot g =
        the command-line option *)
     || keepFuncs = "all_debug"
     || (keepFuncs = "all" && not (Cil_builtins.Builtin_functions.mem v.vname))
-    || (keepFuncs = "specified" && not (is_empty_funspec spec))
+    || (keepFuncs = "user-specified" &&
+        (not (is_empty_funspec spec) && not (Cil.global_is_in_libc g)))
   | GType _ | GCompTag _ | GCompTagDecl _ | GEnumTag _ | GEnumTagDecl _ ->
     keepTypes
   | _ -> false
@@ -1675,32 +1685,29 @@ let init_cil () =
 
 let re_included_file = Str.regexp "^[.]+ \\(.*\\)$"
 
-let file_hash file =
-  Digest.to_hex (Digest.file file)
-
-let add_source_if_new tbl (fp : Filepath.Normalized.t) =
+let add_source_if_new tbl (fp : Filepath.t) =
   if not (Hashtbl.mem tbl fp) then
-    Hashtbl.replace tbl fp (file_hash (fp:>string))
+    Hashtbl.replace tbl fp (Filesystem.digest fp)
 
-(* Inserts, into the hashtbl of (Filepath.Normalized.t, Digest.t), [tbl],
+(* Inserts, into the hashtbl of (Filepath.t, Digest.t), [tbl],
    the included sources listed in [file],
    which contains the output of 'gcc -H -MM'. *)
 let add_included_sources tbl file =
-  Filepath.iter_lines file @@ fun line ->
+  Filesystem.iter_lines file @@ fun line ->
   if Str.string_match re_included_file line 0 then
     let f = Str.matched_group 1 line in
-    add_source_if_new tbl (Filepath.Normalized.of_string f)
+    add_source_if_new tbl (Filepath.of_string f)
 
 let print_all_sources out all_sources_tbl =
   let elems =
     Hashtbl.fold (fun f hash acc ->
-        (Filepath.Normalized.to_pretty_string f, hash) :: acc)
+        (Filepath.to_pretty_string f, hash) :: acc)
       all_sources_tbl []
   in
   let sorted_elems =
     List.sort (fun (f1, _) (f2, _) -> Extlib.compare_ignore_case f1 f2) elems
   in
-  if Filepath.Normalized.is_special_stdout out then begin
+  if Filepath.is_special_stdout out then begin
     (* text format, to stdout *)
     Kernel.feedback "Audit: all used sources, with md5 hashes:@\n%a"
       (Pretty_utils.pp_list ~sep:"@\n"
@@ -1717,7 +1724,7 @@ let print_all_sources out all_sources_tbl =
     try Json.merge_object out json
     with Json.CannotMerge _ ->
       Kernel.failure "%s: error when writing json file %a."
-        Kernel.AuditPrepare.option_name Filepath.Normalized.pretty out
+        Kernel.AuditPrepare.option_name Filepath.pretty out
   end
 
 let compute_sources_table cpp_commands =
@@ -1727,7 +1734,8 @@ let compute_sources_table cpp_commands =
     match cmd_opt with
     | None -> ()
     | Some (cpp_cmd, _ppf) ->
-      let tmp_file = create_temp_file "audit_produce_sources" ".txt" in
+      let tmp_file =
+        Temp_files.file ~prefix:"audit_produce_sources" ~suffix:".txt" () in
       let tmp_file' = (tmp_file :> string) in
       let cmd_for_sources = cpp_cmd ^ " -H -MM >/dev/null 2>" ^ tmp_file' in
       let exit_code = Sys.command cmd_for_sources in
@@ -1756,16 +1764,16 @@ let source_hashes_of_json path =
   with
   | Yojson.Json_error msg ->
     Kernel.abort "error reading %a: %s"
-      Filepath.Normalized.pretty path msg
+      Filepath.pretty path msg
   | Yojson.Basic.Util.Type_error (msg, v) ->
     Kernel.abort "error reading %a: %s - %s"
-      Filepath.Normalized.pretty path msg
+      Filepath.pretty path msg
       (Yojson.Basic.pretty_to_string v)
 
 let check_source_hashes expected actual_table =
   let checked, diffs =
     Hashtbl.fold (fun fp hash (acc_checked, acc_diffs) ->
-        let fp = Filepath.Normalized.to_pretty_string fp in
+        let fp = Filepath.to_pretty_string fp in
         let expected_hash = List.assoc_opt fp expected in
         let checked = Datatype.String.Set.add fp acc_checked in
         let diffs =
@@ -1807,16 +1815,16 @@ let print_and_exit cpp_commands =
 
 let prepare_audit () =
   let audit_path = Kernel.AuditPrepare.get () in
-  if not (Filepath.Normalized.is_empty audit_path) then
+  if not (Filepath.is_empty audit_path) then
     let files = Files.get () in (* Allow pre-registration of prologue files *)
     let cpp_commands = List.map (fun f -> (f, build_cpp_cmd f)) files in
     let all_sources_tbl = compute_sources_table cpp_commands in
     print_all_sources audit_path all_sources_tbl;
     (* This is normally done by another hook at normal exit, but it is done
        before our hook, so we need to redo it. *)
-    if not (Filepath.Normalized.is_special_stdout audit_path) then
+    if not (Filepath.is_special_stdout audit_path) then
       Kernel.feedback "Audit: sources list written to: %a@."
-        Filepath.Normalized.pretty audit_path
+        Filepath.pretty audit_path
 
 let () = Cmdline.at_normal_exit prepare_audit
 
@@ -1826,7 +1834,7 @@ let prepare_from_c_files () =
   let cpp_commands = List.map (fun f -> (f, build_cpp_cmd f)) files in
   if Kernel.PrintCppCommands.get () then print_and_exit cpp_commands;
   let audit_check_path = Kernel.AuditCheck.get () in
-  if not (Filepath.Normalized.is_empty audit_check_path) then begin
+  if not (Filepath.is_empty audit_check_path) then begin
     let all_sources_tbl = compute_sources_table cpp_commands in
     let expected_hashes = source_hashes_of_json audit_check_path in
     check_source_hashes expected_hashes all_sources_tbl
@@ -1941,11 +1949,11 @@ let create_rebuilt_project_from_visitor
   let prj = create_project_from_visitor ?reorder ?last prj_name visitor in
   try
     let f =
-      let name = "frama_c_project_" ^ prj_name ^ "_" in
-      let ext = if preprocess then ".c" else ".i" in
-      create_temp_file name ext
+      let prefix = "frama_c_project_" ^ prj_name ^ "_" in
+      let suffix = if preprocess then ".c" else ".i" in
+      Temp_files.file ~prefix ~suffix ()
     in
-    Filepath.with_formatter_exn f (fun fmt -> pretty_ast ~prj ~fmt ());
+    Filesystem.with_formatter_exn f (fun fmt -> pretty_ast ~prj ~fmt ());
     let redo () =
       (*      Kernel.feedback "redoing initialization on file %s" f;*)
       Files.reset ();

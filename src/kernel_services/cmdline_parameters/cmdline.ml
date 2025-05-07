@@ -272,10 +272,10 @@ exception Cannot_parse of string * string
 let raise_error name because = raise (Cannot_parse(name, because))
 
 let error name msg =
-  let bin_name = Filepath.Normalized.of_string Sys.argv.(0) in
+  let bin_name = Filepath.of_string Sys.argv.(0) in
   Kernel_log.abort
     "option `%s' %s.@\nuse `%a -help' for more information."
-    name msg Filepath.Normalized.pretty bin_name
+    name msg Filepath.pretty bin_name
 
 let warning name msg =
   Kernel_log.warning
@@ -859,7 +859,7 @@ let add_aliases orig ~plugin ~group ?visible ?deprecated stage aliases =
 let replace_option_setting = Plugin.replace_option_setting
 let replace_option_help = Plugin.replace_option_help
 
-module On_Files = Hook.Build(struct type t = Filepath.Normalized.t list end)
+module On_Files = Hook.Build(struct type t = Filepath.t list end)
 let use_cmdline_files = On_Files.extend
 
 let set_files used_loading l =
@@ -905,7 +905,7 @@ let set_files used_loading l =
         "ignoring source files specified on the command line \
          while loading a global initial context."
     else begin
-      On_Files.apply (List.map Filepath.Normalized.of_string l);
+      On_Files.apply (List.map Filepath.of_string l);
       After_setting.apply l
     end
 

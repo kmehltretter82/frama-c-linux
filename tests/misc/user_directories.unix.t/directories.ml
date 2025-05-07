@@ -47,7 +47,7 @@ module Session = Self.Session
 let never_fail_get f x =
   try
     let s = f x in
-    Self.feedback "Found: %a" Filepath.Normalized.pretty s
+    Self.feedback "Found: %a" Filepath.pretty s
   with _ -> ()
 
 let run_all () =
@@ -82,11 +82,11 @@ let run_all () =
       let session_file = Session.get_file "not_created_filepath/file" in
 
       Self.feedback "Not created:" ;
-      Self.feedback "%a" Filepath.Normalized.pretty cache_dir ;
-      Self.feedback "%a" Filepath.Normalized.pretty config_dir ;
-      Self.feedback "%a" Filepath.Normalized.pretty state_dir ;
-      Self.feedback "%a" Filepath.Normalized.pretty session_dir ;
-      Self.feedback "%a" Filepath.Normalized.pretty session_file
+      Self.feedback "%a" Filepath.pretty cache_dir ;
+      Self.feedback "%a" Filepath.pretty config_dir ;
+      Self.feedback "%a" Filepath.pretty state_dir ;
+      Self.feedback "%a" Filepath.pretty session_dir ;
+      Self.feedback "%a" Filepath.pretty session_file
     with Not_found ->
       Self.error "Failure when creating directories"
 

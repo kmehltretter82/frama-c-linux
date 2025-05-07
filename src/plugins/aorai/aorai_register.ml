@@ -24,14 +24,14 @@
 (**************************************************************************)
 
 (* [VP] Need to get rid of those global references at some point. *)
-let c_file = ref Filepath.Normalized.empty
-let dot_file = ref Filepath.Normalized.empty
+let c_file = ref Filepath.empty
+let dot_file = ref Filepath.empty
 
 (* Performs some checks before calling [open_in f], reporting ["errmsg: <f>"]
    in case of error. *)
-let check_and_open_in (f : Filepath.Normalized.t) errmsg =
-  if not (Filepath.Normalized.is_file f) then
-    Aorai_option.abort "%s: %a" errmsg Filepath.Normalized.pretty f;
+let check_and_open_in (f : Filepath.t) errmsg =
+  if not (Filesystem.is_file f) then
+    Aorai_option.abort "%s: %a" errmsg Filepath.pretty f;
   open_in (f :> string)
 
 let load_ya_file filename  =
@@ -50,26 +50,26 @@ let load_ya_file filename  =
 let display_status () =
   if Aorai_option.verbose_atleast 2 then begin
     Aorai_option.feedback "\n"  ;
-    Aorai_option.feedback "C file:            '%a'\n" Filepath.Normalized.pretty !c_file ;
+    Aorai_option.feedback "C file:            '%a'\n" Filepath.pretty !c_file ;
     Aorai_option.feedback "Entry point:       '%a'\n"
       Kernel_function.pretty (fst (Globals.entry_point())) ;
     if Aorai_option.Dot.get () then
-      Aorai_option.feedback "Dot file:          '%a'\n" Filepath.Normalized.pretty !dot_file;
+      Aorai_option.feedback "Dot file:          '%a'\n" Filepath.pretty !dot_file;
   end
 
 let init_file_names () =
   let freshname ?opt_suf file suf =
-    let name = (file:Filepath.Normalized.t:>string) in
+    let name = (file:Filepath.t:>string) in
     let pre = Filename.remove_extension name in
     let pre = match opt_suf with None -> pre | Some s -> pre ^ s in
     let rec fn p s n =
-      let fp = Filepath.Normalized.of_string (p ^ (string_of_int n) ^ s) in
-      if not (Filepath.exists fp) then fp
+      let fp = Filepath.of_string (p ^ (string_of_int n) ^ s) in
+      if not (Filesystem.exists fp) then fp
       else fn p s (n+1)
     in
     let name =
-      let fp = Filepath.Normalized.of_string (pre^suf) in
-      if not (Filepath.exists fp) then fp
+      let fp = Filepath.of_string (pre^suf) in
+      if not (Filesystem.exists fp) then fp
       else fn pre suf 0
     in
     name

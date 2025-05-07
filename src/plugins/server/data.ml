@@ -208,11 +208,11 @@ struct
   let to_json s = `String s
 end
 
-module Jfile : S with type t = Filepath.Normalized.t =
+module Jfile : S with type t = Filepath.t =
 struct
-  type t = Filepath.Normalized.t
+  type t = Filepath.t
   let jtype = Jstring
-  let of_json js = Ju.to_string js |> Filepath.Normalized.of_string
+  let of_json js = Ju.to_string js |> Filepath.of_string
   let to_json (file:t) = `String (file :> string)
 end
 

@@ -22,12 +22,9 @@
 
 (* Split the location into 'dir,file,line number,char number' in this order *)
 let split_loc loc =
-  let file =
-    Filepath.Normalized.to_pretty_string loc.Filepath.pos_path
-  in
-  let dir = Filename.dirname file in
-  let dir = Filepath.relativize dir in
-  let file = Filename.basename file in
+  let file = loc.Filepath.pos_path in
+  let dir = Filepath.(dirname file |> to_pretty_relative) in
+  let file = Filepath.basename file in
   dir, file, loc.Filepath.pos_lnum, loc.Filepath.pos_cnum
 
 (* For properties that we want to skip *)
@@ -95,7 +92,7 @@ let print_csv =
 let print_csv_once () =
   let file = Report_parameters.CSVFile.get () in
   Report_parameters.feedback "Dumping properties in '%a'"
-    Filepath.Normalized.pretty file;
+    Filepath.pretty file;
   print_csv (file:>string)
 
 let print_csv, _ =

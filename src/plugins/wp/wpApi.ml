@@ -303,8 +303,9 @@ struct
           "total", Jnumber;
         ])
   let to_json cs : Json.t =
+    let cache = Cache.get_mode () in
     let summary = Pretty_utils.to_string
-        (Stats.pp_stats ~shell:false ~cache:Update) cs
+        (Stats.pp_stats ~shell:false ~cache) cs
     in `Assoc [
       "summary", `String summary ;
       "tactics", `Int cs.tactics ;

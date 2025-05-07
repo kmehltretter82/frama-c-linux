@@ -1,6 +1,6 @@
 [kernel] Parsing line_directives.c (with preprocessing)
 [kernel:pp:line-directive] Warning: 
-  ignoring non-existing file 'PWD/non-existing-file.c', referenced in a line directive
+  ignoring non-existing file 'non-existing-file.c', referenced in a line directive
 [kernel:CERT:MSC:37] line_directives.c:6: Warning: 
   Body of function f falls-through. Adding a return statement
 [kernel:CERT:MSC:37] line_directives.c:2: Warning: 

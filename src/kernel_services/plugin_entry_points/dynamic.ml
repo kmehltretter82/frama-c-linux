@@ -99,7 +99,7 @@ let is_package =
 
 let is_file base ext =
   let file = base ^ ext in
-  if (Filepath.exists (Filepath.Normalized.of_string file)) then Some file else None
+  if (Filesystem.exists (Filepath.of_string file)) then Some file else None
 
 let is_object base =
   if Dynlink.is_native then is_file base ".cmxs" else
@@ -237,8 +237,8 @@ module Parameter = struct
   module Filepath =
     Common
       (struct
-        type t = Datatype.Filepath.t
-        let ty = Datatype.Filepath.ty
+        type t = Filepath.t
+        let ty = Filepath.ty
         let modname = "Filepath"
       end)
 

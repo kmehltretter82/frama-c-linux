@@ -7,14 +7,14 @@ let check name test =
 let main () =
   ignore (Project.create_by_copy ~last:false "foo");
   ignore (Project.create "foobar");
-  let fp = Filepath.Normalized.of_string "foo.sav" in
+  let fp = Filepath.of_string "foo.sav" in
   Project.save_all fp;
   check "foo" (<>);
   check "foobar" (=);
   check "default" (<>);
   Kernel.Files.set [];
   Project.load_all fp;
-  Extlib.safe_remove "foo.sav";
+  Filesystem.remove_file fp;
   ignore (Project.create_by_copy ~last:false "bar");
   assert
     (Project.equal (Project.current ()) (Project.from_unique_name "default"));

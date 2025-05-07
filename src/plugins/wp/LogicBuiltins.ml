@@ -109,7 +109,7 @@ type sigfun = kind list * builtin
 type driver = {
   driverid : string;
   description : string;
-  includes : Filepath.Normalized.t list;
+  includes : Filepath.t list;
   hlogic : (string , sigfun list) Hashtbl.t;
   htypes : (string , t_builtin) Hashtbl.t;
   hdeps : (string, string list) Hashtbl.t;
@@ -294,13 +294,13 @@ let add_option ~driver_dir group name ~library value =
 (** Includes *)
 
 let find_lib file =
-  if Filepath.exists file then file else
+  if Filesystem.exists file then file else
     let rec lookup file = function
       | [] -> Wp_parameters.abort "File '%a' not found"
-                Filepath.Normalized.pretty file
+                Filepath.pretty file
       | dir::dirs ->
-        let path = Filepath.Normalized.concat dir (file :> string) in
-        if Filepath.exists path then path else lookup file dirs
+        let path = Filepath.(dir / (file :> string)) in
+        if Filesystem.exists path then path else lookup file dirs
     in
     lookup file (cdriver_ro ()).includes
 

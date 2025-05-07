@@ -347,7 +347,7 @@ module Filepath_map
     (struct
       let () = Parameter_customize.set_module_name X.module_name
       include X
-      let default = Datatype.Filepath.Map.empty
+      let default = Filepath.Map.empty
     end)
 
 module Kernel_function_set(X: Input_with_arg) =
@@ -692,11 +692,10 @@ module SymbolicPath =
 
 let () =
   SymbolicPath.add_update_hook
-    (fun _old map ->
+    (fun _prev curr ->
        (* keep module [Filepath] synchronized with [SymbolicPath] *)
        Filepath.reset_symbolic_dirs ();
-       Datatype.Filepath.Map.iter
-         (fun n p -> Filepath.add_symbolic_dir p n) map)
+       Filepath.Map.iter (fun f n -> Filepath.add_symbolic_dir n f) curr)
 
 (* [SymbolicPath] is better to be not projectified,
    but must be saved: use a fake state for saving it without projectifying it *)
@@ -796,7 +795,7 @@ module CodeOutput = struct
 
   let output job =
     let file = get () in
-    if Filepath.Normalized.(is_special_stdout file || is_empty file)
+    if Filepath.(is_special_stdout file || is_empty file)
     then Log.print_delayed job
     else
       try
@@ -812,7 +811,7 @@ module CodeOutput = struct
         warning
           "Fail to open file \"%a\" for code output@\nSystem error: %s.@\n\
            Code is output on stdout instead."
-          Filepath.Normalized.pretty file s ;
+          Filepath.pretty file s ;
         Log.print_delayed job
 
   let close_all () =
@@ -824,7 +823,7 @@ module CodeOutput = struct
          with Sys_error s ->
            failure
              "Fail to close output file \"%a\"@\nSystem error: %s."
-             Filepath.Normalized.pretty file s)
+             Filepath.pretty file s)
       streams
 
   let () = Extlib.safe_at_exit close_all
@@ -1048,12 +1047,12 @@ module Machdep = struct
   let get_dir () = Share.get_dir "machdeps"
   let get_default_file machdep =
     let filename = "machdep_" ^ machdep ^ ".yaml" in
-    Filepath.Normalized.concat (get_dir()) filename
+    Filepath.(get_dir () / filename)
   let is_default machdep =
-    Filepath.Normalized.is_file (get_default_file machdep)
+    Filesystem.is_file (get_default_file machdep)
 
   let normalize name =
-    if is_default name then name else Filepath.normalize name
+    if is_default name then name else (Filepath.of_string name :> string)
 
   let () =
     let set_if_necessary old_name new_name =
@@ -1327,15 +1326,17 @@ module KeepUnusedFunctions =
   String(struct
     let module_name = "KeepUnusedFunctions"
     let option_name = "-keep-unused-functions"
-    let default = "specified"
-    let arg_name = "none|specified|all|all_debug"
+    let default = "user-specified"
+    let arg_name = "none|user-specified|all|all_debug"
     let help = "whether to keep unused function declarations: none, \
-                only functions with specifications (by default), \
+                only functions with user specifications (by default; \
+                excludes stdlib and generated functions), \
                 or keep all unused functions (all_debug also includes \
                 compiler builtins)"
   end)
-let () = KeepUnusedFunctions.set_possible_values ["none"; "specified"; "all";
-                                                  "all_debug"]
+let () =
+  KeepUnusedFunctions.set_possible_values
+    ["none"; "user-specified"; "all"; "all_debug"]
 
 let () = Parameter_customize.set_group normalisation
 let () = Parameter_customize.set_negative_option_name "-remove-unused-types"

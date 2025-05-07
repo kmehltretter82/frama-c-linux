@@ -58,13 +58,13 @@ let dump_to_json () =
      * "ocaml_wflags", `String System_config.ocaml_wflags ; *)
     "datadir", `String (System_config.Share.main:>string) ;
     "datadirs",
-    list string (Filepath.Normalized.to_string_list System_config.Share.dirs) ;
+    list string (Filepath.to_string_list System_config.Share.dirs) ;
     "framac_libc", `String (System_config.Share.libc:>string) ;
     "plugin_dir",
-    list string (Filepath.Normalized.to_string_list System_config.Plugins.dirs) ;
+    list string (Filepath.to_string_list System_config.Plugins.dirs) ;
     "lib_dir", `String (System_config.Lib.main:>string) ;
     "lib_dirs",
-    list string (Filepath.Normalized.to_string_list System_config.Lib.dirs) ;
+    list string (Filepath.to_string_list System_config.Lib.dirs) ;
     "preprocessor", `String System_config.Preprocessor.command ;
     "using_default_cpp", `Bool System_config.Preprocessor.is_default ;
     "preprocessor_is_gnu_like", `Bool System_config.Preprocessor.is_gnu_like ;

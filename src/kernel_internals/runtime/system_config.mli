@@ -41,37 +41,37 @@ end
 
 (** Unless you are working in the kernel of Frama-C, you should not use this. *)
 module Share : sig
-  val dirs: Filepath.Normalized.t list
+  val dirs: Filepath.t list
   (** Directories where architecture-independent files are located, in order of
       priority.
   *)
 
-  val main: Filepath.Normalized.t
+  val main: Filepath.t
   (** Last directory of {!dirs} (the directory of frama-c installation) *)
 
   val path: string
   (** The colon-separated concatenation of {!dirs}. *)
 
-  val libc: Filepath.Normalized.t
+  val libc: Filepath.t
   (** Directory where Frama-C libc headers are. *)
 end
 
 (** Unless you are working in the kernel of Frama-C, you should not use this. *)
 module Lib : sig
-  val dirs: Filepath.Normalized.t list
+  val dirs: Filepath.t list
   (** Directories where library and executable files are located, in order of
       priority. *)
 
   val path: string
   (** The colon-separated concatenation of {!dirs}. *)
 
-  val main: Filepath.Normalized.t
+  val main: Filepath.t
   (** Last directory of libdirs (the directory of frama-c installation) *)
 end
 
 (** Unless you are working in the kernel of Frama-C, you should not use this. *)
 module Plugins : sig
-  val dirs: Filepath.Normalized.t list
+  val dirs: Filepath.t list
   (** Directories where the Frama-C dynamic plug-ins are located. *)
 
   val path: string
@@ -119,13 +119,13 @@ end
 (** Default user directories
     Unless you are working in the kernel of Frama-C, you should not use this. *)
 module User_dirs : sig
-  val cache: unit -> Filepath.Normalized.t
+  val cache: unit -> Filepath.t
   (** Where Frama-C should read/write cached files. *)
 
-  val config: unit -> Filepath.Normalized.t
+  val config: unit -> Filepath.t
   (** Where Frama-C should read/write config files. *)
 
-  val state: unit -> Filepath.Normalized.t
+  val state: unit -> Filepath.t
   (** Where Frama-C should read/write state files *)
 end
 

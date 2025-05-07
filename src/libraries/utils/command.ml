@@ -25,8 +25,8 @@
 (* -------------------------------------------------------------------------- *)
 
 let pp_from_file fmt path =
-  let open Filepath.Operators in
-  let$ cin = Filepath.with_open_in_exn path in
+  let open Filesystem.Operators in
+  let$ cin = Filesystem.with_open_in_exn path in
   try
     while true do
       Async.yield () ;
@@ -98,7 +98,7 @@ let flush b f =
   match b with
   | None -> ()
   | Some b ->
-    try Filepath.iter_lines f
+    try Filesystem.iter_lines f
           (fun line -> Buffer.add_string b line ; Buffer.add_char b '\n') ;
     with Sys_error _ -> ()
 
@@ -124,9 +124,9 @@ let command_generic ~async ?stdout ?stderr cmd args =
   in
   let delete () =
     begin
-      Extlib.safe_remove inf;
-      Extlib.safe_remove outf;
-      Extlib.safe_remove errf;
+      Filesystem.remove_file (Filepath.of_string inf);
+      Filesystem.remove_file (Filepath.of_string outf);
+      Filesystem.remove_file (Filepath.of_string errf);
     end in
   let deleted = cancelable_at_exit delete in
   let pid = Unix.create_process cmd (Array.of_list (cmd :: args))
@@ -158,8 +158,8 @@ let command_generic ~async ?stdout ?stderr cmd args =
       else
         begin
           let result = Result status in
-          flush stdout (Filepath.Normalized.of_string outf) ;
-          flush stderr (Filepath.Normalized.of_string errf) ;
+          flush stdout (Filepath.of_string outf) ;
+          flush stderr (Filepath.of_string errf) ;
           delete () ;
           deleted () ;
           killed () ;
@@ -206,10 +206,10 @@ let command = spawn
 (* --- Deprecated file Utilities                                          --- *)
 (* -------------------------------------------------------------------------- *)
 
-let bincopy = Filepath.bincopy [@alert "-deprecated"]
-let copy = Filepath.copy
-let read_file p = Filepath.with_open_in_exn p
-let read_lines = Filepath.iter_lines
-let write_file p = Filepath.with_open_out_exn p
-let pp_to_file = Filepath.with_formatter_exn
-let print_file = Filepath.with_formatter_exn
+let bincopy = Filesystem.bincopy [@alert "-deprecated"]
+let copy = Filesystem.copy_file
+let read_file p = Filesystem.with_open_in_exn p
+let read_lines = Filesystem.iter_lines
+let write_file p = Filesystem.with_open_out_exn p
+let pp_to_file = Filesystem.with_formatter_exn
+let print_file = Filesystem.with_formatter_exn

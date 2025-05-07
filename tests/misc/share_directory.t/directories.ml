@@ -17,7 +17,7 @@ module Path =
 let never_fail_get f x =
   try
     let s = f x in
-    Self.feedback "Found: %a" Filepath.Normalized.pretty s
+    Self.feedback "Found: %a" Filepath.pretty s
   with _ -> ()
 
 let run_all () =

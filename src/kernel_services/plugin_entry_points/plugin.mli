@@ -188,13 +188,13 @@ val positive_debug_ref: int ref
 (** @since Boron-20100401 *)
 
 val session_is_set_ref: (unit -> bool) ref
-val session_ref: (unit -> Filepath.Normalized.t) ref
+val session_ref: (unit -> Filepath.t) ref
 
 val cache_is_set_ref: (unit -> bool) ref
-val cache_ref: (unit -> Filepath.Normalized.t) ref
+val cache_ref: (unit -> Filepath.t) ref
 
 val config_is_set_ref: (unit -> bool) ref
-val config_ref: (unit -> Filepath.Normalized.t) ref
+val config_ref: (unit -> Filepath.t) ref
 
 val state_is_set_ref: (unit -> bool) ref
-val state_ref: (unit -> Filepath.Normalized.t) ref
+val state_ref: (unit -> Filepath.t) ref

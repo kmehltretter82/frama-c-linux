@@ -29,8 +29,7 @@ let run () =
   Format.printf "Printing default project second time:@.";
   File.pretty_ast ~fmt ();
   let file =
-    Filepath.Normalized.of_string
-      (Extlib.temp_file_cleanup_at_exit "save_comments_test" ".sav")
+    (Temp_files.file ~prefix:"save_comments_test" ~suffix:".sav" ())
   in
   let name = "saved_project" in
   find_comment ();

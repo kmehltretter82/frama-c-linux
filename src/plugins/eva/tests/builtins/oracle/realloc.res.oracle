@@ -12,25 +12,15 @@
   Frama_C_dump_each:
   # cvalue:
   __fc_heap_status ∈ [--..--]
-  __fc_errno ∈ [--..--]
-  __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
   __fc_random48_init ∈ {0}
   __fc_random48_counter[0..2] ∈ [--..--]
   __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
-  __fc_env[0] ∈ {{ NULL ; &S_0___fc_env[0] }}
-          [1] ∈ {{ NULL ; &S_1___fc_env[0] }}
-          [2..4095] ∈ {{ NULL ; &S_0___fc_env[0] ; &S_1___fc_env[0] }}
-  __fc_mblen_state ∈ [--..--]
-  __fc_mbtowc_state ∈ [--..--]
-  __fc_wctomb_state ∈ [--..--]
   Frama_C_entropy_source ∈ [--..--]
   p ∈ {{ &__malloc_main1_l12 }}
   pp ∈ {{ &__malloc_main1_l12 }}
   q ∈ UNINITIALIZED
   v ∈ [--..--]
-  S_0___fc_env[0..1] ∈ [--..--]
-  S_1___fc_env[0..1] ∈ [--..--]
   __malloc_main1_l12 ∈ {17}
   ==END OF DUMP==
 [eva] realloc.c:16: Call to builtin realloc
@@ -42,25 +32,15 @@
   Frama_C_dump_each:
   # cvalue:
   __fc_heap_status ∈ [--..--]
-  __fc_errno ∈ [--..--]
-  __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
   __fc_random48_init ∈ {0}
   __fc_random48_counter[0..2] ∈ [--..--]
   __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
-  __fc_env[0] ∈ {{ NULL ; &S_0___fc_env[0] }}
-          [1] ∈ {{ NULL ; &S_1___fc_env[0] }}
-          [2..4095] ∈ {{ NULL ; &S_0___fc_env[0] ; &S_1___fc_env[0] }}
-  __fc_mblen_state ∈ [--..--]
-  __fc_mbtowc_state ∈ [--..--]
-  __fc_wctomb_state ∈ [--..--]
   Frama_C_entropy_source ∈ [--..--]
   p ∈ ESCAPINGADDR
   pp ∈ ESCAPINGADDR
   q ∈ {{ &__realloc_main1_l16[0] }}
   v ∈ [--..--]
-  S_0___fc_env[0..1] ∈ [--..--]
-  S_1___fc_env[0..1] ∈ [--..--]
   __realloc_main1_l16[0] ∈ {17}
                      [1] ∈ UNINITIALIZED
   ==END OF DUMP==
@@ -89,25 +69,15 @@
   Frama_C_dump_each:
   # cvalue:
   __fc_heap_status ∈ [--..--]
-  __fc_errno ∈ [--..--]
-  __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
   __fc_random48_init ∈ {0}
   __fc_random48_counter[0..2] ∈ [--..--]
   __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
-  __fc_env[0] ∈ {{ NULL ; &S_0___fc_env[0] }}
-          [1] ∈ {{ NULL ; &S_1___fc_env[0] }}
-          [2..4095] ∈ {{ NULL ; &S_0___fc_env[0] ; &S_1___fc_env[0] }}
-  __fc_mblen_state ∈ [--..--]
-  __fc_mbtowc_state ∈ [--..--]
-  __fc_wctomb_state ∈ [--..--]
   Frama_C_entropy_source ∈ [--..--]
   x ∈ {3; 4}
   r ∈ ESCAPINGADDR
   s ∈ {{ &__realloc_main2_l26[0] }}
   v ∈ [--..--]
-  S_0___fc_env[0..1] ∈ [--..--]
-  S_1___fc_env[0..1] ∈ [--..--]
   __realloc_main2_l26[0..2] ∈ {6}
                      [3] ∈ {6} or UNINITIALIZED
                      [4..5] ∈ UNINITIALIZED
@@ -132,18 +102,10 @@
   Frama_C_dump_each:
   # cvalue:
   __fc_heap_status ∈ [--..--]
-  __fc_errno ∈ [--..--]
-  __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
   __fc_random48_init ∈ {0}
   __fc_random48_counter[0..2] ∈ [--..--]
   __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
-  __fc_env[0] ∈ {{ NULL ; &S_0___fc_env[0] }}
-          [1] ∈ {{ NULL ; &S_1___fc_env[0] }}
-          [2..4095] ∈ {{ NULL ; &S_0___fc_env[0] ; &S_1___fc_env[0] }}
-  __fc_mblen_state ∈ [--..--]
-  __fc_mbtowc_state ∈ [--..--]
-  __fc_wctomb_state ∈ [--..--]
   Frama_C_entropy_source ∈ [--..--]
   q ∈ {{ &__malloc_main3_l32[0] }}
   r ∈ {{ &__malloc_main3_l35[0] }}
@@ -151,8 +113,6 @@
   x ∈ {0; 1}
   s ∈ UNINITIALIZED
   v ∈ [--..--]
-  S_0___fc_env[0..1] ∈ [--..--]
-  S_1___fc_env[0..1] ∈ [--..--]
   __malloc_main3_l32[0..4] ∈ {5}
   __malloc_main3_l35[0..5] ∈ {6}
   ==END OF DUMP==
@@ -166,18 +126,10 @@
   Frama_C_dump_each:
   # cvalue:
   __fc_heap_status ∈ [--..--]
-  __fc_errno ∈ [--..--]
-  __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
   __fc_random48_init ∈ {0}
   __fc_random48_counter[0..2] ∈ [--..--]
   __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
-  __fc_env[0] ∈ {{ NULL ; &S_0___fc_env[0] }}
-          [1] ∈ {{ NULL ; &S_1___fc_env[0] }}
-          [2..4095] ∈ {{ NULL ; &S_0___fc_env[0] ; &S_1___fc_env[0] }}
-  __fc_mblen_state ∈ [--..--]
-  __fc_mbtowc_state ∈ [--..--]
-  __fc_wctomb_state ∈ [--..--]
   Frama_C_entropy_source ∈ [--..--]
   q ∈ {{ &__malloc_main3_l32[0] }} or ESCAPINGADDR
   r ∈ {{ &__malloc_main3_l35[0] }} or ESCAPINGADDR
@@ -185,8 +137,6 @@
   x ∈ {0; 1}
   s ∈ {{ &__realloc_main3_l46[0] }}
   v ∈ [--..--]
-  S_0___fc_env[0..1] ∈ [--..--]
-  S_1___fc_env[0..1] ∈ [--..--]
   __malloc_main3_l32[0..4] ∈ {5}
   __malloc_main3_l35[0..5] ∈ {6}
   __realloc_main3_l46[0..4] ∈ {5; 6}
@@ -232,18 +182,10 @@
   Frama_C_dump_each:
   # cvalue:
   __fc_heap_status ∈ [--..--]
-  __fc_errno ∈ [--..--]
-  __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
   __fc_random48_init ∈ {0}
   __fc_random48_counter[0..2] ∈ [--..--]
   __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
-  __fc_env[0] ∈ {{ NULL ; &S_0___fc_env[0] }}
-          [1] ∈ {{ NULL ; &S_1___fc_env[0] }}
-          [2..4095] ∈ {{ NULL ; &S_0___fc_env[0] ; &S_1___fc_env[0] }}
-  __fc_mblen_state ∈ [--..--]
-  __fc_mbtowc_state ∈ [--..--]
-  __fc_wctomb_state ∈ [--..--]
   Frama_C_entropy_source ∈ [--..--]
   sizep ∈ [2..10]
   sizeq ∈ [0..10]
@@ -252,8 +194,6 @@
   rp ∈ UNINITIALIZED
   rq ∈ UNINITIALIZED
   v ∈ [--..--]
-  S_0___fc_env[0..1] ∈ [--..--]
-  S_1___fc_env[0..1] ∈ [--..--]
   __malloc_main4_l55[0] ∈ {0}
                     [1] ∈ {1}
                     [2] ∈ {2}
@@ -289,18 +229,10 @@
   Frama_C_dump_each:
   # cvalue:
   __fc_heap_status ∈ [--..--]
-  __fc_errno ∈ [--..--]
-  __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
   __fc_random48_init ∈ {0}
   __fc_random48_counter[0..2] ∈ [--..--]
   __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
-  __fc_env[0] ∈ {{ NULL ; &S_0___fc_env[0] }}
-          [1] ∈ {{ NULL ; &S_1___fc_env[0] }}
-          [2..4095] ∈ {{ NULL ; &S_0___fc_env[0] ; &S_1___fc_env[0] }}
-  __fc_mblen_state ∈ [--..--]
-  __fc_mbtowc_state ∈ [--..--]
-  __fc_wctomb_state ∈ [--..--]
   Frama_C_entropy_source ∈ [--..--]
   sizep ∈ [2..10]
   sizeq ∈ [0..10]
@@ -309,8 +241,6 @@
   rp ∈ {{ &__realloc_main4_l67[0] }}
   rq ∈ {{ &__realloc_main4_l68[0] }}
   v ∈ [--..--]
-  S_0___fc_env[0..1] ∈ [--..--]
-  S_1___fc_env[0..1] ∈ [--..--]
   __realloc_main4_l67[0] ∈ {0}
                      [1] ∈ {1}
                      [2] ∈ {2} or UNINITIALIZED
@@ -352,26 +282,16 @@
   Frama_C_dump_each:
   # cvalue:
   __fc_heap_status ∈ [--..--]
-  __fc_errno ∈ [--..--]
-  __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
   __fc_random48_init ∈ {0}
   __fc_random48_counter[0..2] ∈ [--..--]
   __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
-  __fc_env[0] ∈ {{ NULL ; &S_0___fc_env[0] }}
-          [1] ∈ {{ NULL ; &S_1___fc_env[0] }}
-          [2..4095] ∈ {{ NULL ; &S_0___fc_env[0] ; &S_1___fc_env[0] }}
-  __fc_mblen_state ∈ [--..--]
-  __fc_mbtowc_state ∈ [--..--]
-  __fc_wctomb_state ∈ [--..--]
   Frama_C_entropy_source ∈ [--..--]
   p ∈ {{ &__malloc_main5_l76 }}
   c ∈ {0; 1}
   q ∈ {{ NULL ; &__malloc_main5_l76 }}
   r ∈ UNINITIALIZED
   v ∈ [--..--]
-  S_0___fc_env[0..1] ∈ [--..--]
-  S_1___fc_env[0..1] ∈ [--..--]
   __malloc_main5_l76 ∈ {1}
   ==END OF DUMP==
 [eva] realloc.c:85: Call to builtin realloc
@@ -383,26 +303,16 @@
   Frama_C_dump_each:
   # cvalue:
   __fc_heap_status ∈ [--..--]
-  __fc_errno ∈ [--..--]
-  __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
   __fc_random48_init ∈ {0}
   __fc_random48_counter[0..2] ∈ [--..--]
   __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
-  __fc_env[0] ∈ {{ NULL ; &S_0___fc_env[0] }}
-          [1] ∈ {{ NULL ; &S_1___fc_env[0] }}
-          [2..4095] ∈ {{ NULL ; &S_0___fc_env[0] ; &S_1___fc_env[0] }}
-  __fc_mblen_state ∈ [--..--]
-  __fc_mbtowc_state ∈ [--..--]
-  __fc_wctomb_state ∈ [--..--]
   Frama_C_entropy_source ∈ [--..--]
   p ∈ {{ &__malloc_main5_l76 }} or ESCAPINGADDR
   c ∈ {0; 1}
   q ∈ {{ NULL ; &__malloc_main5_l76 }} or ESCAPINGADDR
   r ∈ {{ &__realloc_main5_l85[0] }}
   v ∈ [--..--]
-  S_0___fc_env[0..1] ∈ [--..--]
-  S_1___fc_env[0..1] ∈ [--..--]
   __malloc_main5_l76 ∈ {1}
   __realloc_main5_l85[0] ∈ {1} or UNINITIALIZED
                      [1] ∈ UNINITIALIZED
@@ -449,25 +359,15 @@
   Frama_C_dump_each:
   # cvalue:
   __fc_heap_status ∈ [--..--]
-  __fc_errno ∈ [--..--]
-  __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
   __fc_random48_init ∈ {0}
   __fc_random48_counter[0..2] ∈ [--..--]
   __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
-  __fc_env[0] ∈ {{ NULL ; &S_0___fc_env[0] }}
-          [1] ∈ {{ NULL ; &S_1___fc_env[0] }}
-          [2..4095] ∈ {{ NULL ; &S_0___fc_env[0] ; &S_1___fc_env[0] }}
-  __fc_mblen_state ∈ [--..--]
-  __fc_mbtowc_state ∈ [--..--]
-  __fc_wctomb_state ∈ [--..--]
   Frama_C_entropy_source ∈ [--..--]
   p ∈ ESCAPINGADDR
   q ∈ {{ &__realloc_main7_l115[0] }}
   x ∈ UNINITIALIZED
   v ∈ [--..--]
-  S_0___fc_env[0..1] ∈ [--..--]
-  S_1___fc_env[0..1] ∈ [--..--]
   __realloc_main7_l115[0] ∈ {{ &x }}
                       [1] ∈ UNINITIALIZED
   ==END OF DUMP==
@@ -477,24 +377,14 @@
   Frama_C_dump_each:
   # cvalue:
   __fc_heap_status ∈ [--..--]
-  __fc_errno ∈ [--..--]
-  __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
   __fc_random48_init ∈ {0}
   __fc_random48_counter[0..2] ∈ [--..--]
   __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
-  __fc_env[0] ∈ {{ NULL ; &S_0___fc_env[0] }}
-          [1] ∈ {{ NULL ; &S_1___fc_env[0] }}
-          [2..4095] ∈ {{ NULL ; &S_0___fc_env[0] ; &S_1___fc_env[0] }}
-  __fc_mblen_state ∈ [--..--]
-  __fc_mbtowc_state ∈ [--..--]
-  __fc_wctomb_state ∈ [--..--]
   Frama_C_entropy_source ∈ [--..--]
   p ∈ ESCAPINGADDR
   q ∈ {{ &__realloc_main7_l115[0] }}
   v ∈ [--..--]
-  S_0___fc_env[0..1] ∈ [--..--]
-  S_1___fc_env[0..1] ∈ [--..--]
   __realloc_main7_l115[0] ∈ ESCAPINGADDR
                       [1] ∈ UNINITIALIZED
   ==END OF DUMP==
@@ -516,24 +406,14 @@
   Frama_C_dump_each:
   # cvalue:
   __fc_heap_status ∈ [--..--]
-  __fc_errno ∈ [--..--]
-  __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
   __fc_random48_init ∈ {0}
   __fc_random48_counter[0..2] ∈ [--..--]
   __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
-  __fc_env[0] ∈ {{ NULL ; &S_0___fc_env[0] }}
-          [1] ∈ {{ NULL ; &S_1___fc_env[0] }}
-          [2..4095] ∈ {{ NULL ; &S_0___fc_env[0] ; &S_1___fc_env[0] }}
-  __fc_mblen_state ∈ [--..--]
-  __fc_mbtowc_state ∈ [--..--]
-  __fc_wctomb_state ∈ [--..--]
   Frama_C_entropy_source ∈ [--..--]
   p ∈ ESCAPINGADDR
   q ∈ {{ &__realloc_main8_l126[0] }}
   v ∈ [--..--]
-  S_0___fc_env[0..1] ∈ [--..--]
-  S_1___fc_env[0..1] ∈ [--..--]
   __realloc_main8_l126∈ ∅
   ==END OF DUMP==
 [eva] realloc.c:128: Call to builtin free
@@ -554,24 +434,14 @@
   Frama_C_dump_each:
   # cvalue:
   __fc_heap_status ∈ [--..--]
-  __fc_errno ∈ [--..--]
-  __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
   __fc_random48_init ∈ {0}
   __fc_random48_counter[0..2] ∈ [--..--]
   __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
-  __fc_env[0] ∈ {{ NULL ; &S_0___fc_env[0] }}
-          [1] ∈ {{ NULL ; &S_1___fc_env[0] }}
-          [2..4095] ∈ {{ NULL ; &S_0___fc_env[0] ; &S_1___fc_env[0] }}
-  __fc_mblen_state ∈ [--..--]
-  __fc_mbtowc_state ∈ [--..--]
-  __fc_wctomb_state ∈ [--..--]
   Frama_C_entropy_source ∈ [--..--]
   p ∈ ESCAPINGADDR
   q ∈ {{ (int *)&__realloc_main9_l135 }}
   v ∈ [--..--]
-  S_0___fc_env[0..1] ∈ [--..--]
-  S_1___fc_env[0..1] ∈ [--..--]
   __realloc_main9_l135# ∈ {1}%32, bits 0 to 7 
   ==END OF DUMP==
 [eva] realloc.c:137: Call to builtin free
@@ -593,24 +463,14 @@
   Frama_C_dump_each:
   # cvalue:
   __fc_heap_status ∈ [--..--]
-  __fc_errno ∈ [--..--]
-  __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
   __fc_random48_init ∈ {0}
   __fc_random48_counter[0..2] ∈ [--..--]
   __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
-  __fc_env[0] ∈ {{ NULL ; &S_0___fc_env[0] }}
-          [1] ∈ {{ NULL ; &S_1___fc_env[0] }}
-          [2..4095] ∈ {{ NULL ; &S_0___fc_env[0] ; &S_1___fc_env[0] }}
-  __fc_mblen_state ∈ [--..--]
-  __fc_mbtowc_state ∈ [--..--]
-  __fc_wctomb_state ∈ [--..--]
   Frama_C_entropy_source ∈ [--..--]
   v ∈ [--..--]
   p ∈ {{ &__realloc_main10_l152[0] }}
   q ∈ ESCAPINGADDR
-  S_0___fc_env[0..1] ∈ [--..--]
-  S_1___fc_env[0..1] ∈ [--..--]
   __realloc_main10_l152[0] ∈ {4}
                        [1] ∈ UNINITIALIZED
   ==END OF DUMP==
@@ -624,24 +484,14 @@
   Frama_C_dump_each:
   # cvalue:
   __fc_heap_status ∈ [--..--]
-  __fc_errno ∈ [--..--]
-  __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
   __fc_random48_init ∈ {0}
   __fc_random48_counter[0..2] ∈ [--..--]
   __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
-  __fc_env[0] ∈ {{ NULL ; &S_0___fc_env[0] }}
-          [1] ∈ {{ NULL ; &S_1___fc_env[0] }}
-          [2..4095] ∈ {{ NULL ; &S_0___fc_env[0] ; &S_1___fc_env[0] }}
-  __fc_mblen_state ∈ [--..--]
-  __fc_mbtowc_state ∈ [--..--]
-  __fc_wctomb_state ∈ [--..--]
   Frama_C_entropy_source ∈ [--..--]
   v ∈ [--..--]
   p ∈ {{ &__realloc_w_main10_l152[0] }}
   q ∈ {{ &__realloc_w_main10_l152[0] }} or ESCAPINGADDR
-  S_0___fc_env[0..1] ∈ [--..--]
-  S_1___fc_env[0..1] ∈ [--..--]
   __realloc_w_main10_l152[0] ∈ {4}
                          [1] ∈ UNINITIALIZED
   ==END OF DUMP==

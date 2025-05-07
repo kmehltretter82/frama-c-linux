@@ -4309,7 +4309,7 @@ let emptyFunction name =
 
 let dummyFile =
   { globals = [];
-    fileName = Datatype.Filepath.of_string "<dummy>";
+    fileName = Filepath.of_string "<dummy>";
     globinit = None;
     globinitcalled = false;}
 

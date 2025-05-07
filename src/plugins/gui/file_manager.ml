@@ -25,7 +25,7 @@ let add_files (host_window: Design.main_window_extension_points) =
     (host_window :> Gtk_helper.source_files_chooser_host)
     (Kernel.Files.get () :> string list)
     (fun filenames ->
-       Kernel.Files.set (List.map Datatype.Filepath.of_string filenames);
+       Kernel.Files.set (List.map Filepath.of_string filenames);
        if Ast.is_computed () then
          Gui_parameters.warning "Input files unchanged. Ignored."
        else begin
@@ -33,7 +33,7 @@ let add_files (host_window: Design.main_window_extension_points) =
          host_window#reset ()
        end)
 
-let filename: Filepath.Normalized.t option ref = ref None
+let filename: Filepath.t option ref = ref None
 (* [None] for opening the 'save as' dialog box;
    [Some f] for saving in file [f] *)
 
@@ -94,7 +94,7 @@ let save_file_as (host_window: Design.main_window_extension_points) =
        | `SAVE ->
          Option.iter
            (save_in host_window (dialog :> GWindow.window_skel))
-           (Option.map Filepath.Normalized.of_string dialog#filename)
+           (Option.map Filepath.of_string dialog#filename)
        | `DELETE_EVENT | `CANCEL -> ());
   dialog#destroy ()
 
@@ -118,7 +118,7 @@ let load_file (host_window: Design.main_window_extension_points) =
          begin match dialog#filename with
            | None -> ()
            | Some f ->
-             Project.load_all (Filepath.Normalized.of_string f)
+             Project.load_all (Filepath.of_string f)
          end
        | `DELETE_EVENT | `CANCEL -> ());
   dialog#destroy ()
