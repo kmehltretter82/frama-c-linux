@@ -700,6 +700,21 @@ let () =
   new_file_type ".ci" handle
 
 
+module NeverRemoveGlobals =
+  State_builder.Set_ref
+    (Datatype.String.Set)
+    (struct
+      let name = "File.NeverRemoveGlobals"
+      let dependencies = []
+    end)
+
+let () =
+  State_dependency_graph.add_dependencies
+    ~from:NeverRemoveGlobals.self
+    [ Ast.self; Ast.UntypedFiles.self ]
+
+let never_remove_global globname =
+  NeverRemoveGlobals.add globname
 
 (* Keep defined entry point even if not defined, and possibly
    other unused globals according to relevant command-line parameters.
@@ -708,6 +723,8 @@ let isRoot g =
   let keepFuncs = Kernel.KeepUnusedFunctions.get () in
   let keepTypes = Kernel.Keep_unused_types.get () in
   Rmtmps.isExportedRoot g ||
+  Option.fold ~none:false
+    ~some:(fun n -> NeverRemoveGlobals.mem n) (Globals.get_name g) ||
   match g with
   | GFun({svar = v; sspec = spec},_)
   | GFunDecl(spec,v,_) ->
@@ -717,7 +734,8 @@ let isRoot g =
        the command-line option *)
     || keepFuncs = "all_debug"
     || (keepFuncs = "all" && not (Cil_builtins.Builtin_functions.mem v.vname))
-    || (keepFuncs = "specified" && not (is_empty_funspec spec))
+    || (keepFuncs = "user-specified" &&
+        (not (is_empty_funspec spec) && not (Cil.global_is_in_libc g)))
   | GType _ | GCompTag _ | GCompTagDecl _ | GEnumTag _ | GEnumTagDecl _ ->
     keepTypes
   | _ -> false

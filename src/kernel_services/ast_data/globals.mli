@@ -336,6 +336,25 @@ val get_comments_stmt: stmt -> string list
     @since Nitrogen-20111001
 *)
 
+(* ************************************************************************* *)
+(** {2 Getters} *)
+(* ************************************************************************* *)
+
+val get_annotation_name: global_annotation -> string option
+(** Returns the name of the global annotation, when it exists
+    (e.g. for axiomatics, predicates, etc), or [None] if no such name exists
+    (e.g. for volatile blocks).
+
+    @since Frama-C+dev
+*)
+
+val get_name: global -> string option
+(** Returns the name of the global, when it exists (e.g. for variables,
+    functions, types, etc), or [None] if no such name exists
+    (e.g. for assembly statements).
+
+    @since Frama-C+dev
+*)
 
 (* **/** *)
 (* Forward reference to functions defined in Kernel_function. Do not

@@ -6,7 +6,6 @@
 #include "stddef.h"
 #include "stdint.h"
 #include "string.h"
-#include "strings.h"
 typedef unsigned short byte;
 union __anonunion_PROPERLY_ALIGNED_TYPE_1 {
    int a ;

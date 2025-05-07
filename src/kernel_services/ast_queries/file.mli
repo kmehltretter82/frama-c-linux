@@ -141,6 +141,14 @@ val from_filename: ?cpp:string -> Datatype.Filepath.t -> t
 (** Build a file from its name. The optional argument is the preprocessor
     command. Default is [!get_preprocessor_command ()]. *)
 
+val never_remove_global: string -> unit
+(** Adds the global name to the list of globals to be kept by Rmtmps,
+    even if unused, overriding any command-line options.
+    Must be called before Rmtmps is run.
+
+    @since Frama-C+dev
+*)
+
 (* ************************************************************************* *)
 (** {2 Initializers} *)
 (* ************************************************************************* *)
