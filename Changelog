@@ -18,6 +18,10 @@
 Open Source Release <next-release>
 ###############################################################################
 
+-!  Kernel    [2024-05-07] Changed default behavior of -keep-unused-functions:
+              instead of 'specified', its default value is now 'user-specified':
+              unused libc functions with specifications are now removed during
+              normalization.
 *!  Kernel    [2025-04-25] Init is always available in logic annotations
 o!  Kernel    [2025-04-23] Remove allegedly unused optionnal normalizations on
               while loops and conditionals (`setDoTransformWhile` and
