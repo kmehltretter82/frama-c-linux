@@ -69,7 +69,7 @@ struct
         ])
 
   let to_json p =
-    let path = Filepath.(Normalized.to_pretty_string p.pos_path) in
+    let path = Filepath.(to_pretty_string p.pos_path) in
     let file =
       if Server_parameters.has_relative_filepath ()
       then path
@@ -89,7 +89,7 @@ struct
       begin
         match List.assoc "file" assoc, List.assoc "line" assoc with
         | `String path, `Int line ->
-          Log.source ~file:(Filepath.Normalized.of_string path) ~line
+          Log.source ~file:(Filepath.of_string path) ~line
         | _, _ -> fail ()
         | exception Not_found -> fail ()
       end
@@ -942,7 +942,7 @@ let () = Information.register
     ~title:"Source file location"
     begin fun fmt loc ->
       let pos = fst @@ Printer_tag.loc_of_localizable loc in
-      if Filepath.Normalized.is_empty pos.pos_path then
+      if Filepath.is_empty pos.pos_path then
         raise Not_found ;
       Filepath.pp_pos fmt pos
     end
@@ -1064,7 +1064,7 @@ let () = Server_parameters.Debug.add_hook_on_update
 
 let get_marker_at ~file ~line ~col =
   if file="" then None else
-    let pos_path = Filepath.Normalized.of_string file in
+    let pos_path = Filepath.of_string file in
     let pos =
       Filepath.{ pos_path; pos_lnum = line; pos_cnum = col; pos_bol = 0; }
     in
@@ -1097,7 +1097,7 @@ let () =
 
 let get_files () =
   let files = Kernel.Files.get () in
-  List.map (fun f -> (f:Filepath.Normalized.t:>string)) files
+  List.map (fun f -> (f:Filepath.t:>string)) files
 
 let () =
   Request.register

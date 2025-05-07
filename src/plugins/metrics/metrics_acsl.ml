@@ -321,5 +321,5 @@ let dump () =
       close_out chan
     with Sys_error s ->
       Metrics_parameters.abort "Cannot open file %a (%s)"
-        Filepath.Normalized.pretty out s
+        Filepath.pretty out s
   end else Metrics_parameters.result "%t" dump_acsl_stats

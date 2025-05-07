@@ -191,26 +191,20 @@ let to_dot_formatter ?in_kf reason fmt =
 (* May raise [Sys_error] *)
 let to_dot_file ~temp ?in_kf reason =
   let dot_file =
-    try
-      let f name ext =
-        if temp
-        then Extlib.temp_file_cleanup_at_exit name ext
-        else Filename.temp_file name ext
-      in
-      f "impact_reason" ".dot"
-    with Extlib.Temp_file_error s ->
-      Options.abort "cannot create temporary file: %s" s
+    let prefix = "impact_reason" and suffix = ".dot" in
+    if temp
+    then Temp_files.file ~prefix ~suffix ()
+    else Filesystem.temp_file ~prefix ~suffix
   in
-  let cout = open_out dot_file in
-  let fmt = Format.formatter_of_out_channel cout in
+  let open Filesystem.Operators in
+  let$ fmt = Filesystem.with_formatter_exn dot_file in
   to_dot_formatter ?in_kf reason fmt;
-  close_out cout;
   dot_file
 
 let print_dot_graph reason =
   try
     let dot_file = to_dot_file ~temp:false reason in
-    Options.result "Graph output in file '%s'" dot_file
+    Options.result "Graph output in file '%a'" Filepath.pretty dot_file
   with Sys_error _ as exn ->
     Options.error "Could not generate impact graph: %s"
       (Printexc.to_string exn)

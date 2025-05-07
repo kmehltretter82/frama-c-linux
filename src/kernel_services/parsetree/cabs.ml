@@ -171,7 +171,7 @@ and definition =
 
 (** the file name, and then the list of toplevel forms.
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
-and file = Datatype.Filepath.t * (bool * definition) list
+and file = Filepath.t * (bool * definition) list
 
 
 (*

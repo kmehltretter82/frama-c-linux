@@ -460,7 +460,7 @@ let gen_file =
        f.svar.vdefined <- true;
        f.sbody <- body;
        (env,
-        { fileName = Filepath.Normalized.empty;
+        { fileName = Filepath.empty;
           globals = [
             GVarDecl (x,Cil_datatype.Location.unknown);
             GVarDecl (y,Cil_datatype.Location.unknown);
@@ -515,7 +515,7 @@ let check_file (env, file) =
       Kernel_function.pretty fmt f;
       let prj2 = Project.create "copy" in
       Project.set_current prj2;
-      Kernel.Files.set [ Filepath.Normalized.of_string file_name ];
+      Kernel.Files.set [ Filepath.of_string file_name ];
       let parse_success =
         try
           File.init_from_cmdline (); true

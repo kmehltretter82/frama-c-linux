@@ -107,7 +107,7 @@ module ArtifactLocation = struct
   let default = create ~uri:"" ()
 
   let of_loc loc =
-    let uriBaseId, uri = Filepath.(Normalized.to_base_uri (fst loc).pos_path) in
+    let uriBaseId, uri = Filepath.(to_base_uri (fst loc).pos_path) in
     create ~uri ?uriBaseId ()
 end
 
@@ -259,11 +259,10 @@ module Region = struct
   let default = create ()
 
   let of_loc loc =
-    let open Filepath in
     let (start, finish) = loc in
-    let startLine = start.pos_lnum in
+    let startLine = start.Filepath.pos_lnum in
     let startColumn = start.pos_cnum - start.pos_bol in
-    let endLine = finish.pos_lnum in
+    let endLine = finish.Filepath.pos_lnum in
     let endColumn = finish.pos_cnum - finish.pos_bol in
     let byteLength = finish.pos_cnum - start.pos_cnum in
     create ~startLine ~startColumn ~endLine ~endColumn ~byteLength ()

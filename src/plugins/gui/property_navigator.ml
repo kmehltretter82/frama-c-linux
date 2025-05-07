@@ -55,7 +55,7 @@ let all_properties () =
 
 
 type property = {
-  module_name:Datatype.Filepath.t;
+  module_name:Filepath.t;
   function_name:string;
   kind:string;
   status_name:string;
@@ -80,9 +80,9 @@ let make_property ip =
     Format.asprintf "%a" Consolidation.pretty con_status
   in
   let function_name, module_name = match Property.get_kf ip with
-    | None -> "", Datatype.Filepath.dummy (* TODO: it would be great to find the location
-                                             of global invariants or lemmas, but there isn't
-                                             enough information in the ast *)
+    | None -> "", Filepath.empty (* TODO: it would be great to find the location
+                                    of global invariants or lemmas, but there isn't
+                                    enough information in the ast *)
     | Some kf -> kf_name_and_module kf
   in
   let kind =
@@ -598,7 +598,7 @@ let make_panel (main_ui:main_window_extension_points) =
 
   (* Module name column viewer *)
   make_view_column (GTree.cell_renderer_text [top])
-    (function{module_name=m} -> [`TEXT (Filepath.Normalized.to_pretty_string m)])
+    (function{module_name=m} -> [`TEXT (Filepath.to_pretty_string m)])
     ~title:"File";
 
   (* Kind name column viewer *)

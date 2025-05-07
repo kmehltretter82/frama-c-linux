@@ -57,7 +57,7 @@ struct
     else
       let kind = Generate.get () in
       let ext = if kind = "sarif" then ".sarif" else ".md" in
-      Fc_Filepath.Normalized.concat s ext
+      Fc_Filepath.(s / ext)
 end
 
 let () =

@@ -782,7 +782,7 @@ let export gstat specfile =
   let sect_prop = Buffer.create 64 in (* default sub-section *)
   let file = ref None in
   let section = ref HEAD in
-  Filepath.iter_lines specfile
+  Filesystem.iter_lines specfile
     begin fun line ->
       match Rformat.command line with
       | Rformat.ARG("AXIOMATIC_PREFIX",f) -> config.axiomatic_prefix <- f
@@ -852,8 +852,8 @@ let export gstat specfile =
          ~prop:(Buffer.contents sect_prop))
   | Some report ->
     Wp_parameters.feedback "Report '%s'" report ;
-    let open Filepath.Operators in
-    let$ fout = Filepath.(with_formatter_exn (Normalized.of_string report)) in
+    let open Filesystem.Operators in
+    let$ fout = Filesystem.with_formatter_exn (Filepath.of_string report) in
     print gstat ~config
       ~head:(Buffer.contents head) ~tail:(Buffer.contents tail)
       ~chap:(Buffer.contents chap)
@@ -879,8 +879,8 @@ let export_json gstat ?jinput ~joutput () =
             Wp_parameters.feedback "Report out: '%s'" joutput ;
             jinput
         in
-        let jpath = Filepath.Normalized.of_string jfile in
-        if Filepath.exists jpath then
+        let jpath = Filepath.of_string jfile in
+        if Filesystem.exists jpath then
           Json.load_file jpath
         else `Null
       with Json.Error(file,line,msg) ->
@@ -889,7 +889,7 @@ let export_json gstat ?jinput ~joutput () =
         `Null
     in
     rankify_fcstat gstat js ;
-    Json.save_file (Filepath.Normalized.of_string joutput) (json_of_fcstat gstat) ;
+    Json.save_file (Filepath.of_string joutput) (json_of_fcstat gstat) ;
   end
 
 

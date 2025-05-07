@@ -26,12 +26,12 @@
 (** {2 File Utilities} *)
 (* ************************************************************************* *)
 
-val pp_to_file : Filepath.Normalized.t -> (Format.formatter -> unit) -> unit
+val pp_to_file : Filepath.t -> (Format.formatter -> unit) -> unit
 (** [pp_to_file file pp] runs [pp] on a formatter that writes into [file].
     The formatter is always properly flushed and closed on return.
     Exceptions in [pp] are re-raised after closing. *)
-[@@deprecated "Use Filepath.with_formatter_exn instead."]
-[@@migrate { repl = Filepath.with_formatter_exn } ]
+[@@deprecated "Use Filesystem.with_formatter_exn instead."]
+[@@migrate { repl = Filesystem.with_formatter_exn } ]
 
 val bincopy : bytes -> in_channel -> out_channel -> unit
 (** [copy buffer cin cout] reads [cin] until end-of-file
@@ -41,36 +41,36 @@ val bincopy : bytes -> in_channel -> out_channel -> unit
 *)
 [@@deprecated "This function is only used locally and is not exported anymore."]
 
-val copy : Filepath.Normalized.t -> Filepath.Normalized.t -> unit
+val copy : Filepath.t -> Filepath.t -> unit
 (** [copy source target] copies source file to target file using [bincopy]. *)
-[@@deprecated "Use Filepath.copy instead."]
-[@@migrate { repl = Filepath.copy } ]
+[@@deprecated "Use Filesystem.copy instead."]
+[@@migrate { repl = Filesystem.copy_file } ]
 
-val read_file : Filepath.Normalized.t -> (in_channel -> 'a) -> 'a
+val read_file : Filepath.t -> (in_channel -> 'a) -> 'a
 (** Properly close the channel and re-raise exceptions *)
-[@@deprecated "Use Filepath.with_open_in_exn instead."]
-[@@migrate { repl = Filepath.with_open_in_exn } ]
+[@@deprecated "Use Filesystem.with_open_in_exn instead."]
+[@@migrate { repl = Filesystem.with_open_in_exn } ]
 
-val read_lines : Filepath.Normalized.t -> (string -> unit) -> unit
+val read_lines : Filepath.t -> (string -> unit) -> unit
 (** Iter over all text lines in the file *)
-[@@deprecated "Use Filepath.iter_lines instead."]
-[@@migrate { repl = Filepath.iter_lines } ]
+[@@deprecated "Use Filesystem.iter_lines instead."]
+[@@migrate { repl = Filesystem.iter_lines } ]
 
-val write_file : Filepath.Normalized.t -> (out_channel -> 'a) -> 'a
+val write_file : Filepath.t -> (out_channel -> 'a) -> 'a
 (** Properly close the channel and re-raise exceptions *)
-[@@deprecated "Use Filepath.with_open_out_exn instead."]
-[@@migrate { repl = Filepath.with_open_out_exn } ]
+[@@deprecated "Use Filesystem.with_open_out_exn instead."]
+[@@migrate { repl = Filesystem.with_open_out_exn } ]
 
-val print_file : Filepath.Normalized.t -> (Format.formatter -> 'a) -> 'a
+val print_file : Filepath.t -> (Format.formatter -> 'a) -> 'a
 (** Properly flush and close the channel and re-raise exceptions *)
-[@@deprecated "Use Filepath.with_formatter_exn instead."]
-[@@migrate { repl = Filepath.with_formatter_exn } ]
+[@@deprecated "Use Filesystem.with_formatter_exn instead."]
+[@@migrate { repl = Filesystem.with_formatter_exn } ]
 
 (* ************************************************************************* *)
 (** {2 Pretty from files} *)
 (* ************************************************************************* *)
 
-val pp_from_file : Format.formatter -> Filepath.Normalized.t -> unit
+val pp_from_file : Format.formatter -> Filepath.t -> unit
 (** [pp_from_file fmt file] dumps the content of [file] into the [fmt].
     Exceptions in [pp] are re-raised after closing. *)
 

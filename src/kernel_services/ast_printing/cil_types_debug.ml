@@ -100,7 +100,7 @@ and pp_assigns fmt = function
 
 
 and pp_file fmt file = Format.fprintf fmt "{fileName=%a;globals=%a;globinit=%a;globinitcalled=%a}"
-    Filepath.Normalized.pp_abs file.fileName (pp_list pp_global) file.globals (pp_option pp_fundec) file.globinit pp_bool file.globinitcalled
+    Filepath.pp_abs file.fileName (pp_list pp_global) file.globals (pp_option pp_fundec) file.globinit pp_bool file.globinitcalled
 
 and pp_global fmt = function
   | GType(typeinfo,location) -> Format.fprintf fmt "GType(%a,%a)"  pp_typeinfo typeinfo  pp_location location
@@ -597,7 +597,7 @@ and pp_location fmt (pos_start,pos_end) =
 
 and pp_if_loc_known prefix suffix fmt loc =
   if print_locations &&
-     not (Filepath.Normalized.is_empty (fst loc).Filepath.pos_path)
+     not (Filepath.is_empty (fst loc).Filepath.pos_path)
   then Format.fprintf fmt "%s%a%s" prefix pp_location loc suffix
   else ()
 

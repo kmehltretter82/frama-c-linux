@@ -545,7 +545,7 @@ let dkey = Kernel.register_category "pretty-source"
 module LineToLocalizable =
   Datatype.Hashtbl(Datatype.Int.Hashtbl)(Datatype.Int)
 module FileToLines =
-  Datatype.Hashtbl(Datatype.Filepath.Hashtbl)(Datatype.Filepath)
+  Datatype.Hashtbl(Filepath.Hashtbl)(Filepath)
 
 module MappingLineLocalizable = struct
   module LineToLocalizableAux =
@@ -573,8 +573,8 @@ class pos_to_localizable =
         if p1.Filepath.pos_path <> p2.Filepath.pos_path then
           Kernel.debug ~once:true ~dkey
             "Localizable over two files: %a and %a; %a"
-            Datatype.Filepath.pretty p1.Filepath.pos_path
-            Datatype.Filepath.pretty p2.Filepath.pos_path
+            Filepath.pretty p1.Filepath.pos_path
+            Filepath.pretty p2.Filepath.pos_path
             Localizable.pretty localizable;
         let file = p1.Filepath.pos_path in
         let hfile =

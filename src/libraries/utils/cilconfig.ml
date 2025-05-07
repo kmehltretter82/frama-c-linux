@@ -128,7 +128,7 @@ let useConfigurationList (key: string) (f: configData list -> unit) =
   with Not_found -> ()
 
 
-let saveConfiguration (fname : Datatype.Filepath.t) =
+let saveConfiguration (fname : Filepath.t) =
   (* Convert configuration data to a string, for saving externally *)
   let configToString (c: configData) : string =
     let buff = Buffer.create 80 in
@@ -165,8 +165,8 @@ let saveConfiguration (fname : Datatype.Filepath.t) =
     Buffer.contents buff
   in
   try
-    let open Filepath.Operators in
-    let$ oc = Filepath.with_open_out_exn fname in
+    let open Filesystem.Operators in
+    let$ oc = Filesystem.with_open_out_exn fname in
     Kernel.debug "Saving configuration to %s@." (fname :> string);
     H.iter (fun k c ->
         output_string oc (k ^ "\n");
@@ -182,7 +182,7 @@ let floatRegexp = Str.regexp "f\\([^;]+\\);"
 let boolRegexp = Str.regexp "b\\(\\(true\\)\\|\\(false\\)\\);"
 let stringRegexp = Str.regexp "\"\\([^\"]*\\)\""
 
-let loadConfiguration (fname : Datatype.Filepath.t) : unit =
+let loadConfiguration (fname : Filepath.t) : unit =
   H.clear configurationData;
 
   let stringToConfig (s: string) : configData =
@@ -234,9 +234,9 @@ let loadConfiguration (fname : Datatype.Filepath.t) : unit =
     in
     getOne ()
   in
-  let open Filepath.Operators in
+  let open Filesystem.Operators in
   try
-    let$ ic = Filepath.with_open_in_exn fname in
+    let$ ic = Filesystem.with_open_in_exn fname in
     Kernel.debug "Loading configuration from %s@." (fname :> string);
     while true do
       let k = input_line ic in

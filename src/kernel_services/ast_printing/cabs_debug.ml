@@ -184,7 +184,7 @@ and pp_def fmt = function
   |     GLOBANNOT _ -> fprintf fmt "GLOBANNOT"
 
 and pp_file fmt (s,l) =
-  fprintf fmt "@[FILE %a, {" Filepath.Normalized.pp_abs s;
+  fprintf fmt "@[FILE %a, {" Filepath.pp_abs s;
   List.iter
     (fun (b,def) -> fprintf fmt "@ %b, def(%a)" b pp_def def)
     l;

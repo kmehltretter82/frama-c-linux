@@ -38,7 +38,7 @@ module Metrics_base : sig
     Datatype.S_with_collections with type t = Kernel_function.t option
   module BasicMetrics : sig
     type t = {
-      cfile_name : Filepath.Normalized.t;
+      cfile_name : Filepath.t;
       cfunc : Kernel_function.t option;
       cslocs: int;
       cifs: int;
@@ -60,5 +60,5 @@ end
 module Metrics_cilast : sig
   val get_metrics_map: libc:bool ->
     (Metrics_base.BasicMetrics.t Metrics_base.OptionKf.Map.t)
-      Datatype.Filepath.Map.t
+      Filepath.Map.t
 end

@@ -648,14 +648,14 @@ module Make (Engine: Engine_sig.S) = struct
     in
     let n = try DumpFileCounters.find name with Not_found -> 0 in
     DumpFileCounters.add name (n+1);
-    let file = Format.sprintf "%s_%d" name n |> Filepath.Normalized.of_string in
-    let open Filepath.Operators in
-    let$ fmt = Filepath.with_formatter_exn file in
+    let file = Format.sprintf "%s_%d" name n |> Filepath.of_string in
+    let open Filesystem.Operators in
+    let$ fmt = Filesystem.with_formatter_exn file in
     let l = fst (Current_loc.get ()) in
     Self.feedback ~current:true "Dumping state in file '%a'%t"
-      Filepath.Normalized.pretty file Eva_utils.pp_callstack;
+      Filepath.pretty file Eva_utils.pp_callstack;
     Format.fprintf fmt "DUMPING STATE at file %a line %d@."
-      Datatype.Filepath.pretty l.Filepath.pos_path
+      Filepath.pretty l.Filepath.pos_path
       l.Filepath.pos_lnum;
     let pretty_args = pretty_arguments ~subdivnb state in
     if arguments <> []

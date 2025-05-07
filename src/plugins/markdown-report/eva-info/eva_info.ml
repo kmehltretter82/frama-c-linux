@@ -66,7 +66,7 @@ let is_analyzed_function vi =
                    (Kernel_function.get_vi kf)
                    vi)
               (Globals.FileIndex.get_functions
-                 (Filepath.Normalized.of_string s)))
+                 (Filepath.of_string s)))
          (Markdown_report.Mdr_params.Stubs.get())) &&
   not (List.mem vi.vname
          (String.split_on_char ','

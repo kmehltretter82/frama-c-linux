@@ -28,7 +28,7 @@ open Gtk_helper
 let fixed_height = false
 
 type filetree_node =
-  | File of Datatype.Filepath.t * Cil_types.global list
+  | File of Filepath.t * Cil_types.global list
   | Global of Cil_types.global
 
 let same_node n1 n2 = match n1, n2 with
@@ -37,7 +37,7 @@ let same_node n1 n2 = match n1, n2 with
   | _ -> false
 
 let _pretty_node fmt = function
-  | File (s, _) -> Datatype.Filepath.pretty fmt s
+  | File (s, _) -> Filepath.pretty fmt s
   | Global (GFun ({svar = vi},_) | GVar(vi,_,_) |
             GFunDecl (_,vi,_) | GVarDecl(vi,_)) ->
     Format.fprintf fmt "%s" vi.vname
@@ -66,14 +66,14 @@ class type t =  object
   method model : GTree.model
   method flat_mode: bool
   method set_file_attribute:
-    ?strikethrough:bool -> ?text:string -> Datatype.Filepath.t -> unit
+    ?strikethrough:bool -> ?text:string -> Filepath.t -> unit
   method set_global_attribute:
     ?strikethrough:bool -> ?text:string -> varinfo -> unit
   method add_global_filter:
     text:string -> key:string -> (Cil_types.global -> bool) ->
     (unit -> bool) * GMenu.check_menu_item
   method get_file_globals:
-    Datatype.Filepath.t -> (string * bool) list
+    Filepath.t -> (string * bool) list
   method find_visible_global:
     string -> Cil_types.global option
   method add_select_function :
@@ -254,7 +254,7 @@ module MYTREE = struct
     | Custom sort -> Custom (fun g h -> sort h g)
 
   let storage_type = function
-    | MFile (s, _) -> File (Datatype.Filepath.of_string s.name,
+    | MFile (s, _) -> File (Filepath.of_string s.name,
                             Array.to_list s.globals)
     | MGlobal { globals = [| g |] } -> Global g
     | MGlobal _ -> assert false
@@ -293,8 +293,8 @@ module MYTREE = struct
     Ast_attributes.contains "FC_BUILTIN" (Cil_datatype.Global.attr g)
 
   let comes_from_share filename =
-    let path = Filepath.Normalized.of_string filename in
-    Filepath.is_relative ~base_name:System_config.Share.main path
+    let path = Filepath.of_string filename in
+    Filepath.is_relative ~base:System_config.Share.main path
 
   let is_function t = match t with
     | MFile _ -> false
@@ -362,7 +362,7 @@ module MYTREE = struct
 
   let make_file hide sort_order (path, globs) =
     let storage =
-      default_storage (path : Filepath.Normalized.t :> string) (Array.of_list globs)
+      default_storage (path : Filepath.t :> string) (Array.of_list globs)
     in
     let sons = make_list_globals hide sort_order globs in
     storage, sons
@@ -403,7 +403,7 @@ module State = struct
      gtk node *)
   type cache = {
     cache_files:
-      (int list * MODEL.custom_tree) Datatype.Filepath.Hashtbl.t;
+      (int list * MODEL.custom_tree) Filepath.Hashtbl.t;
     cache_vars:
       (int list * MODEL.custom_tree) Varinfo.Hashtbl.t;
     cache_global_annot:
@@ -411,14 +411,14 @@ module State = struct
   }
 
   let default_cache () = {
-    cache_files = Datatype.Filepath.Hashtbl.create 17;
+    cache_files = Filepath.Hashtbl.create 17;
     cache_vars = Varinfo.Hashtbl.create 17;
     cache_global_annot = Global_annotation.Hashtbl.create 17;
   }
 
   let path_from_node cache = function
     | File (s, _) ->
-      (try Some (Datatype.Filepath.Hashtbl.find cache.cache_files s)
+      (try Some (Filepath.Hashtbl.find cache.cache_files s)
        with Not_found -> None)
     | Global (GFun ({svar = vi},_) | GVar(vi,_,_) |
               GVarDecl(vi,_) | GFunDecl (_,vi,_)) ->
@@ -432,8 +432,8 @@ module State = struct
   let fill_cache cache (path:int list) row =
     match row.MODEL.finfo with
     | MYTREE.MFile (storage,_) ->
-      Datatype.Filepath.Hashtbl.add
-        cache.cache_files (Datatype.Filepath.of_string storage.MYTREE.name) (path,row)
+      Filepath.Hashtbl.add
+        cache.cache_files (Filepath.of_string storage.MYTREE.name) (path,row)
     | MYTREE.MGlobal storage ->
       match storage.MYTREE.globals with
       (* Only one element in this array by invariant: this is a leaf*)
@@ -477,7 +477,7 @@ module State = struct
       else
         let sorted_files = (List.sort (fun (p1, _) (p2, _) ->
             (* invert comparison order due to inversion by fold_left below *)
-            Filepath.Normalized.compare_pretty p2 p1
+            Filepath.compare_pretty p2 p1
           ) files)
         in
         let files = List.fold_left
@@ -737,7 +737,7 @@ let make (tree_view:GTree.view) =
     method set_file_attribute ?strikethrough ?text filename =
       try
         set_row model_custom ?strikethrough ?text
-          (Datatype.Filepath.Hashtbl.find path_cache.State.cache_files filename)
+          (Filepath.Hashtbl.find path_cache.State.cache_files filename)
       with Not_found -> () (* Some files might not be in the list because
                               of our filters. Ignore *)
 
@@ -753,7 +753,7 @@ let make (tree_view:GTree.view) =
     method get_file_globals file =
       try
         let _, raw_row =
-          Datatype.Filepath.Hashtbl.find path_cache.State.cache_files file in
+          Filepath.Hashtbl.find path_cache.State.cache_files file in
         MYTREE.sons_info raw_row.MODEL.finfo
       with Not_found -> [] (* Some files may be hidden if they contain nothing
                               interesting *)
@@ -792,7 +792,7 @@ let make (tree_view:GTree.view) =
           (* search children *)
           (* note: we avoid calling [storage_type] here because
                    we do not need the child nodes *)
-          let fake_node = File (Datatype.Filepath.of_string name,[]) in
+          let fake_node = File (Filepath.of_string name,[]) in
           if is_current_node fake_node then node_found ();
           Array.iter (aux text) t.MODEL.sons
         | MYTREE.MGlobal {MYTREE.name} as st ->
@@ -946,8 +946,8 @@ let make (tree_view:GTree.view) =
               if m = "" (* Unknown location *) then
                 true, "Unknown file", strike, false
               else
-                let path = Datatype.Filepath.of_string m in
-                false, Filepath.Normalized.to_pretty_string path, strike, false
+                let path = Filepath.of_string m in
+                false, Filepath.to_pretty_string path, strike, false
             | MYTREE.MGlobal ({MYTREE.name=m; strikethrough=strike}) as s ->
               false, m, strike, MYTREE.is_function s
           in

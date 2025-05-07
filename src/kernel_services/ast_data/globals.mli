@@ -184,24 +184,24 @@ module FileIndex : sig
 
   (** {2 Getters} *)
 
-  val get_symbols : Datatype.Filepath.t -> global list
+  val get_symbols : Filepath.t -> global list
   (** All global C symbols of the given module.
       @since Boron-20100401 *)
 
-  val get_files: unit -> Datatype.Filepath.t list
+  val get_files: unit -> Filepath.t list
   (** Get the files list containing all [global] C symbols. *)
 
   (** {2 Searching among all [global] C symbols} *)
 
-  val get_globals : Datatype.Filepath.t -> (varinfo * initinfo) list
+  val get_globals : Filepath.t -> (varinfo * initinfo) list
   (** Global variables of the given module for the kernel user interface *)
 
-  val get_global_annotations: Datatype.Filepath.t -> global_annotation list
+  val get_global_annotations: Filepath.t -> global_annotation list
   (** Global annotations of the given module for the kernel user interface
       @since Nitrogen-20111001 *)
 
   val get_functions :
-    ?declarations:bool -> Datatype.Filepath.t -> kernel_function list
+    ?declarations:bool -> Filepath.t -> kernel_function list
   (** Global functions of the given module for the kernel user interface.
       If [declarations] is true, functions declared in a module but defined
       in another module are only reported in the latter (default is false).

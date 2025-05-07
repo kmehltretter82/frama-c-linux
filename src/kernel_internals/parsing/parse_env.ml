@@ -25,7 +25,7 @@
 let referenced_files = Hashtbl.create 7
 
 module SourceFiles =
-  State_builder.Hashtbl(Datatype.Filepath.Hashtbl)(Datatype.String)
+  State_builder.Hashtbl(Filepath.Hashtbl)(Datatype.String)
     (struct
       let name = "SourceFiles"
       let dependencies = [ Kernel.Files.self ]
@@ -34,7 +34,7 @@ module SourceFiles =
 
 (* maps .i/.pp files to their workdir (when a JCDB is used) *)
 module PreprocessingWorkdir =
-  State_builder.Hashtbl(Datatype.Filepath.Hashtbl)(Datatype.String)
+  State_builder.Hashtbl(Filepath.Hashtbl)(Datatype.String)
     (struct
       let name = "PreprocessingWorkdir"
       let dependencies =
@@ -51,11 +51,11 @@ let get_workdir file =
   with Not_found -> None
 
 let store_referenced_source fname =
-  let fp = Datatype.Filepath.of_string fname in
+  let fp = Filepath.of_string fname in
   if not (Hashtbl.mem referenced_files fp) then begin
     try
-      let open Filepath.Operators in
-      let$ inchan = Filepath.with_open_in_exn ~binary:true fp in
+      let open Filesystem.Operators in
+      let$ inchan = Filesystem.with_open_in_exn ~binary:true fp in
       let contents = really_input_string inchan (in_channel_length inchan) in
       SourceFiles.replace fp contents;
       Hashtbl.add referenced_files fp true
@@ -90,7 +90,7 @@ let scan_source_for_references ~workdir contents =
     ) lines
 
 let open_source ~scan_references fname =
-  let fp = Datatype.Filepath.of_string fname in
+  let fp = Filepath.of_string fname in
   try
     let s = SourceFiles.find fp in
     Ok s
@@ -98,8 +98,8 @@ let open_source ~scan_references fname =
   try
     Kernel.feedback ~dkey:Kernel.dkey_file_source
       "opening source file: %S" fname;
-    let open Filepath.Operators in
-    let$ inchan = Filepath.with_open_in_exn ~binary:true fp in
+    let open Filesystem.Operators in
+    let$ inchan = Filesystem.with_open_in_exn ~binary:true fp in
     let contents = really_input_string inchan (in_channel_length inchan) in
     SourceFiles.replace fp contents;
     let workdir =

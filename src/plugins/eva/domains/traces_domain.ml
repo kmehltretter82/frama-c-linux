@@ -1244,10 +1244,10 @@ module D = struct
   let leave_scope kf vars state =
     Traces.add_trans state (LeaveScope (kf, vars))
 
-  let output_dot (filename : Filepath.Normalized.t) state =
+  let output_dot (filename : Filepath.t) state =
     let out = open_out (filename :> string) in
     Self.feedback ~dkey:log_category "@[Output dot produced to %a.@]"
-      Filepath.Normalized.pretty filename;
+      Filepath.pretty filename;
     GraphDot.output_graph out (complete_graph (snd (Traces.get_current state)));
     close_out out
 

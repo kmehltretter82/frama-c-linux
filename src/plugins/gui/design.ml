@@ -209,7 +209,7 @@ let filetree_selector
             globals
             ([],[],[],[],[],[])
         in
-        main_ui#pretty_information "@[File %a@]@." Datatype.Filepath.pretty f;
+        main_ui#pretty_information "@[File %a@]@." Filepath.pretty f;
         let printing
             (head:string)
             (ellipsis:bool)

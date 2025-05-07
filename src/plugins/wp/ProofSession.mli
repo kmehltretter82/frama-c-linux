@@ -22,8 +22,8 @@
 
 type script =
   | NoScript
-  | Script of Filepath.Normalized.t
-  | Deprecated of Filepath.Normalized.t
+  | Script of Filepath.t
+  | Deprecated of Filepath.t
 
 type mode =
   | Batch
@@ -37,7 +37,7 @@ val set_mode : mode -> unit
 val scratch_mode : unit -> bool
 val saving_mode : unit -> bool
 
-val pp_file : Format.formatter -> Filepath.Normalized.t -> unit
+val pp_file : Format.formatter -> Filepath.t -> unit
 val pp_script_for : Format.formatter -> Wpo.t -> unit
 
 val get : Wpo.t -> script
@@ -46,7 +46,7 @@ val save : stdout:bool -> Wpo.t -> Json.t -> unit
 val load : Wpo.t -> Json.t
 val remove : Wpo.t -> unit
 
-val filename : force:bool -> Wpo.t -> Filepath.Normalized.t
+val filename : force:bool -> Wpo.t -> Filepath.t
 
 val mark : Wpo.t -> unit
 val reset_marks : unit -> unit

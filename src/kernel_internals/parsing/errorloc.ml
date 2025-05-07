@@ -48,7 +48,7 @@
 type parseinfo = {
   lexbuf : Lexing.lexbuf;
   menhir_pos: (Lexing.position * Lexing.position) MenhirLib.ErrorReports.buffer;
-  mutable current_working_directory : string option;
+  mutable current_working_directory : Filepath.t option;
 }
 
 let current = ref None
@@ -71,11 +71,11 @@ let startParsing fname lexer =
     | Ok in_str ->
       let lexbuf = Lexing.from_string in_str in
       let menhir_pos, lexer = MenhirLib.ErrorReports.wrap lexer in
-      let filename = Filepath.normalize fname in
+      let filename = Filepath.of_string fname in
       let i = { lexbuf; menhir_pos; current_working_directory = None } in
       (* Initialize lexer buffer. *)
       lexbuf.Lexing.lex_curr_p <-
-        { Lexing.pos_fname = filename;
+        { Lexing.pos_fname = (filename :> string);
           Lexing.pos_lnum  = 1;
           Lexing.pos_bol   = 0;
           Lexing.pos_cnum  = 0
@@ -108,7 +108,7 @@ let setCurrentLine (i: int) =
 
 let setCurrentWorkingDirectory s =
   let current = Option.get !current in
-  current.current_working_directory <- Some s
+  current.current_working_directory <- Some (Filepath.of_string s)
 
 (* preprocessors tend to use '<xxx>' filenames in line directives to
    denote special locations, e.g. builtin or command-line-defined macros.
@@ -123,17 +123,18 @@ let is_special_file n =
 
 let setCurrentFile n =
   let current = Option.get !current in
-  let base_name = current.current_working_directory in
-  let norm = Filepath.normalize ?base_name n in
-  if not (is_special_file n) && not (Sys.file_exists norm)
+  let base = current.current_working_directory in
+  let norm = Filepath.of_string ?base n in
+  if not (is_special_file n) && not (Filesystem.exists norm)
   then begin
     currentLine := None;
     Kernel.warning ~wkey:Kernel.wkey_line_directive ~once:true
-      "ignoring non-existing file '%s', referenced in a line directive" norm
+      "ignoring non-existing file '%a', referenced in a line directive"
+      Filepath.pretty norm
   end else begin
     let pos = current.lexbuf.Lexing.lex_curr_p in
     current.lexbuf.Lexing.lex_curr_p <- {
-      pos with Lexing.pos_fname = norm;
+      pos with Lexing.pos_fname = (norm :> string);
                Lexing.pos_lnum = (Option.get !currentLine);
                Lexing.pos_bol = pos.Lexing.pos_cnum;
     }
@@ -144,14 +145,14 @@ let setCurrentFile n =
    similar to 'grep -C<ctx>'.
    Most exceptions are silently caught and printing is stopped if they occur. *)
 let pp_context_from_file ?(ctx=2) fmt (start_pos, pos) =
-  let open Filepath.Operators in
-  let open Filepath in
+  let open Filesystem.Operators in
   let start_pos =
-    if Normalized.equal start_pos.pos_path pos.pos_path then start_pos
+    if Filepath.equal start_pos.Filepath.pos_path pos.Filepath.pos_path
+    then start_pos
     else pos
   in
   try
-    let$ in_ch = with_open_in_exn pos.pos_path in
+    let$ in_ch = Filesystem.with_open_in_exn pos.pos_path in
     let first_error_line, start_char, last_error_line =
       min start_pos.pos_lnum pos.pos_lnum,
       (start_pos.pos_cnum - start_pos.pos_bol),

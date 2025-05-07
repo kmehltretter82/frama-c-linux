@@ -182,7 +182,7 @@ type termination_kind = Normal | Exits | Breaks | Continues | Returns
     type {!Cil_types.location})
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 type file = {
-  mutable fileName: Filepath.Normalized.t;   (** The complete file name *)
+  mutable fileName: Filepath.t;   (** The complete file name *)
 
   mutable globals: global list;
   (** List of globals as they will appear in the printed file *)
@@ -1875,7 +1875,7 @@ type syntactic_scope =
       @since 27.0-Cobalt
   *)
   | Program (** Only non-static global symbols. *)
-  | Translation_unit of Filepath.Normalized.t
+  | Translation_unit of Filepath.t
   (** Any global visible within the given C source file. *)
   | Formal of kernel_function
   (** formal parameter of the given function.

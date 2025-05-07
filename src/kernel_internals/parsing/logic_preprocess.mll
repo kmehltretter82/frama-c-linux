@@ -115,7 +115,7 @@
   let annot_end_comment = "////////////////__ANNOT_END_COMMENT__"
 
   let abort_preprocess reason =
-    let source = {Cil_datatype.Position.unknown with Filepath.pos_path = Datatype.Filepath.of_string !curr_file;
+    let source = {Cil_datatype.Position.unknown with Filepath.pos_path = Filepath.of_string !curr_file;
                   pos_lnum = !curr_line;}
     in
     Kernel.error ~source
@@ -168,18 +168,20 @@
     in aux content
 
   let preprocess_annots suffix cpp outfile =
+    let open Filesystem.Operators in
     if !has_annot then begin
       let debug = Kernel.is_debug_key_enabled Kernel.dkey_pp_keep_temp_files in
       let ppname =
-        try Extlib.temp_file_cleanup_at_exit ~debug "ppannot" suffix
-        with Extlib.Temp_file_error s ->
+        try Temp_files.file ~prefix:"ppannot" ~suffix ()
+        with Filesystem.Temp_file_error s ->
           Kernel.abort
             "Could not open temporary file for logic preprocessing: %s" s
       in
-      let ppfile = open_out ppname in
-      Buffer.output_buffer ppfile preprocess_buffer;
-      close_out ppfile;
-      let cppname = Extlib.temp_file_cleanup_at_exit ~debug "cppannot" suffix in
+      let () =
+        let$ ppfile = Filesystem.with_open_out_exn ppname in
+        Buffer.output_buffer ppfile preprocess_buffer;
+      in
+      let cppname = Temp_files.file ~prefix:"cppannot" ~suffix () in
       let pp_cmd = cpp ppname cppname in
       Kernel.feedback ~dkey:Kernel.dkey_pp_logic
         "logic preprocessing with \"%s\"" pp_cmd;
@@ -187,16 +189,15 @@
       let result_file =
         if res <> 0 then begin
           abort_preprocess "Preprocessor call exited with an error";
-          if not debug then Extlib.safe_remove cppname;
+          if not debug then Filesystem.remove_file cppname;
           ppname
         end else cppname
       in
-      let result = open_in result_file in
+      let$ result = Filesystem.with_open_in_exn result_file in
       let content =
         Str.split_delim re_annot_content (Buffer.contents output_buffer)
       in
-      output_result outfile result content;
-      close_in result
+      output_result outfile result content
     end else begin
       Buffer.output_buffer outfile output_buffer
     end;
@@ -536,24 +537,20 @@ parse
 {
   let file suffix cpp filename =
     reset ();
-    let debug = Kernel.is_debug_key_enabled Kernel.dkey_pp_keep_temp_files in
     let scan_references = Kernel.EagerLoadSources.get () in
     match Parse_env.open_source ~scan_references filename with
     | Error msg -> Kernel.abort "logic_preprocess: %s" msg
     | Ok source ->
       let lex = Lexing.from_string source in
-      let ppname =
-        Extlib.temp_file_cleanup_at_exit ~debug
-          (Filename.basename filename) ".pp"
-      in
-      let fp_of_string = Filepath.Normalized.of_string in
-      let workdir_opt = Parse_env.get_workdir (fp_of_string filename) in
+      let prefix = Filename.basename filename in
+      let ppname = Temp_files.file ~prefix ~suffix:".pp" () in
+      let workdir_opt = Parse_env.get_workdir (Filepath.of_string filename) in
       Option.iter
-        (fun workdir -> Parse_env.set_workdir (fp_of_string ppname) workdir)
+        (fun workdir -> Parse_env.set_workdir ppname workdir)
         workdir_opt;
-      let ppfile = open_out ppname in
+      let open Filesystem.Operators in
+      let$ ppfile = Filesystem.with_open_out_exn ppname in
       main lex;
       preprocess_annots suffix cpp ppfile;
-      close_out ppfile;
-      Datatype.Filepath.of_string ppname
+      ppname
 }

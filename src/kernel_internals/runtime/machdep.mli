@@ -146,4 +146,4 @@ val gen_all_defines: Format.formatter -> mach -> unit
     @before 29.0-Copper censored_macros did not exist.
 *)
 val generate_machdep_header:
-  ?censored_macros:Datatype.String.Set.t -> mach -> Filepath.Normalized.t
+  ?censored_macros:Datatype.String.Set.t -> mach -> Filepath.t

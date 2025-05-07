@@ -154,8 +154,9 @@ module Cabs_file = struct
       (struct
         type t = Cabs.file
         let name = "Cabs_file"
-        let reprs = [ Datatype.Filepath.dummy, [];
-                      Datatype.Filepath.dummy, [ true, Cabs.GLOBANNOT [] ] ]
+        let reprs = List.concat_map
+            (fun p -> [ p, []; p, [ true, Cabs.GLOBANNOT [] ] ])
+            Filepath.reprs
         let pretty fmt cabs = !pretty_ref fmt cabs
       end)
 end
@@ -168,7 +169,7 @@ module Position =  struct
   let pretty_ref = ref UtilsFilepath.pp_pos
   let unknown = Filepath.empty_pos
   let of_lexing_pos p = {
-    Filepath.pos_path = Datatype.Filepath.of_string p.Lexing.pos_fname;
+    Filepath.pos_path = Filepath.of_string p.Lexing.pos_fname;
     pos_lnum = p.Lexing.pos_lnum;
     pos_bol = p.Lexing.pos_bol;
     pos_cnum = p.Lexing.pos_cnum;
@@ -195,7 +196,7 @@ module Position =  struct
       (pos.Filepath.pos_cnum - pos.Filepath.pos_bol)
   let pretty_debug fmt pos =
     Format.fprintf fmt "%a:%d:%d"
-      Datatype.Filepath.pretty pos.Filepath.pos_path
+      Filepath.pretty pos.Filepath.pos_path
       pos.Filepath.pos_lnum pos.Filepath.pos_cnum
 end
 
@@ -216,12 +217,12 @@ module Location = struct
 
   let pretty_long fmt loc =
     let path = (fst loc).Filepath.pos_path in
-    if path = Datatype.Filepath.dummy then Format.fprintf fmt "generated"
+    if path = Filepath.empty then Format.fprintf fmt "generated"
     else
       let line = (fst loc).Filepath.pos_lnum in
       if line > 0 then
         Format.fprintf fmt "file %a, line %d"
-          Datatype.Filepath.pretty path line
+          Filepath.pretty path line
 
   let pretty_line fmt loc =
     let line = (fst loc).Filepath.pos_lnum in
@@ -240,8 +241,7 @@ module Location = struct
     Position.to_lexing_pos pos1, Position.to_lexing_pos pos2
 
   let compare_start_semantic (pos1, _) (pos2, _) =
-    let open Filepath in
-    let c = Datatype.Filepath.compare pos1.pos_path pos2.pos_path in
+    let c = Filepath.compare pos1.Filepath.pos_path pos2.Filepath.pos_path in
     if c <> 0 then c else
       let c = pos1.pos_lnum - pos2.pos_lnum in
       if c <> 0 then c else
@@ -278,10 +278,12 @@ module File =
       type t = file
       let name = "File"
       let reprs =
-        [ { fileName = Datatype.Filepath.dummy;
-            globals = [];
-            globinit = None;
-            globinitcalled = false } ]
+        List.map (fun p ->
+            { fileName = p;
+              globals = [];
+              globinit = None;
+              globinitcalled = false })
+          Filepath.reprs
       include Datatype.Undefined
     end)
 
@@ -2646,7 +2648,7 @@ module Syntactic_scope =
         | Program, _ -> 1
         | _, Program -> -1
         | Translation_unit s1, Translation_unit s2 ->
-          Datatype.Filepath.compare s1 s2
+          Filepath.compare s1 s2
         | Translation_unit _, _ -> 1
         | _, Translation_unit _ -> -1
         | Formal kf1, Formal kf2 -> Kf.compare kf1 kf2
@@ -2661,14 +2663,14 @@ module Syntactic_scope =
         match s with
         | Global -> 3
         | Program -> 5
-        | Translation_unit s -> 7 * Datatype.Filepath.hash s + 11
+        | Translation_unit s -> 7 * Filepath.hash s + 11
         | Block_scope s -> 13 * Stmt_Id.hash s  + 17
         | Whole_function kf -> 19 * Kf.hash kf + 23
         | Formal kf -> 29 * Kf.hash kf + 31
       let pretty fmt = function
         | Global | Program -> Format.pp_print_string fmt "<Whole Program>"
         | Translation_unit s ->
-          Format.fprintf fmt "File %a" Datatype.Filepath.pretty s
+          Format.fprintf fmt "File %a" Filepath.pretty s
         | Formal kf ->
           Format.fprintf fmt "Parameter of %a" Kf.pretty kf
         | Whole_function kf ->

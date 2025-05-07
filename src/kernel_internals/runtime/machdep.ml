@@ -642,14 +642,13 @@ let gen_all_defines fmt mach =
   Format.fprintf fmt "#endif // __FC_MACHDEP@\n"
 
 let generate_machdep_header ?(censored_macros=Datatype.String.Set.empty) mach =
-  let debug = Kernel.(is_debug_key_enabled dkey_pp_keep_temp_files) in
-  let temp = Extlib.temp_dir_cleanup_at_exit ~debug "__fc_machdep" in
-  let fc_machdep = Filepath.Normalized.concat temp "__fc_machdep.h" in
+  let temp = Temp_files.dir ~prefix:"__fc_machdep" ~suffix:".dir" () in
+  let fc_machdep = Filepath.(temp / "__fc_machdep.h") in
   let gen_machdep = Fun.flip gen_all_defines mach in
-  Filepath.with_formatter_exn fc_machdep gen_machdep;
-  let fc_builtins = Filepath.Normalized.concat temp "__fc_builtin_macros.h" in
+  Filesystem.with_formatter_exn fc_machdep gen_machdep;
+  let fc_builtins = Filepath.(temp / "__fc_builtin_macros.h") in
   let gen_builtins =
     Fun.(flip (flip gen_define_custom_macros censored_macros) mach)
   in
-  Filepath.with_formatter_exn fc_builtins gen_builtins ;
+  Filesystem.with_formatter_exn fc_builtins gen_builtins ;
   temp

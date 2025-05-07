@@ -207,7 +207,7 @@ struct
 
   let parse fp =
     Kernel.feedback ~dkey:Kernel.dkey_builtins "Parsing builtins file: %a"
-      Datatype.Filepath.pretty fp;
+      Filepath.pretty fp;
     let json = Json.from_file fp in
     member "data" json
 
@@ -231,7 +231,7 @@ struct
           | `List l -> Some (List.map to_string l)
           | _ ->
             Kernel.fatal "invalid 'types': expected list (in %a)"
-              Datatype.Filepath.pretty fp
+              Filepath.pretty fp
         in
         let cb = { name; compiler; rettype; args; types; variadic} in
         Builtin_templates.replace name cb

@@ -144,7 +144,7 @@ let print_std_includes fmt globs =
     let extract_file acc = function
       | AStr s ->
         (* These strings are filepaths, so we normalize and prettify them *)
-        let s = Filepath.Normalized.(to_pretty_string (of_string s)) in
+        let s = Filepath.(to_pretty_string (of_string s)) in
         Datatype.String.Set.add s acc
       | _ -> Kernel.warning "Unexpected attribute parameter for fc_stdlib"; acc
     in
@@ -1404,7 +1404,7 @@ class cil_printer () = object (self)
 
   (* Store here the name of the last file printed in a line number. This is
      private to the object *)
-  val mutable lastFileName = Datatype.Filepath.dummy
+  val mutable lastFileName = Filepath.empty
   val mutable lastLineNumber = -1
 
   (* Make sure that you only call self#line_directive on an empty line *)
@@ -1429,7 +1429,7 @@ class cil_printer () = object (self)
         if forcefile || pos.Filepath.pos_path <> lastFileName then begin
           lastFileName <- pos.Filepath.pos_path;
           Format.asprintf " \"%a\""
-            Datatype.Filepath.pretty pos.Filepath.pos_path
+            Filepath.pretty pos.Filepath.pos_path
         end else
           ""
       in

@@ -51,7 +51,7 @@ module Configuration = struct
     Gui_parameters.Config_dir.get_file ~create_path:true "frama-c-gui.config"
   let load () = loadConfiguration (configuration_file ())
   let save () = saveConfiguration (configuration_file ())
-  let reset () = Extlib.safe_remove (configuration_file () :> string);
+  let reset () = Filesystem.remove_file (configuration_file ());
     loadConfiguration (configuration_file ())
   let () = Cmdline.at_normal_exit save
 
@@ -876,7 +876,7 @@ let prepare_editor_cmd s line filename =
   (* always start in background, otherwise will freeze the GUI *)
   s ^ " &"
 
-let open_in_external_viewer ?(line=1) (file : Datatype.Filepath.t) =
+let open_in_external_viewer ?(line=1) (file : Filepath.t) =
   let filename = Format.asprintf "%S" (file :> string) in
   let editor = Configuration.find_string ~default:"emacs +%d %s" "editor" in
   if editor = "" then

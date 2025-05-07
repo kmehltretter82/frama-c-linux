@@ -523,18 +523,18 @@ struct
 
   let normalize_filepath ~existence ~file_kind s =
     try
-      Filepath.Normalized.of_string ~existence s
+      Filepath.of_string ~existence s
     with
     | Filepath.No_file ->
       P.L.abort "%s%sfile '%s' does not exist"
         file_kind
         (if file_kind = "" then "" else " ")
-        (Filepath.Normalized.(to_pretty_string (of_string s)))
+        (Filepath.(to_pretty_string (of_string s)))
     | Filepath.File_exists ->
       P.L.abort "%s%sfile '%s' already exists"
         file_kind
         (if file_kind = "" then "" else " ")
-        (Filepath.Normalized.(to_pretty_string (of_string s)))
+        (Filepath.(to_pretty_string (of_string s)))
 
   module Filepath
       (X: sig
@@ -546,15 +546,15 @@ struct
 
     include Build
         (struct
-          include Datatype.Filepath
+          include Fc_Filepath
           include X
-          let default () = Filepath.Normalized.empty
+          let default () = Filepath.empty
           let functor_name = "Filepath"
         end)
 
     let convert f oldstr newstr =
-      let oldfp = Filepath.Normalized.to_pretty_string oldstr in
-      let newfp = Filepath.Normalized.to_pretty_string newstr in
+      let oldfp = Filepath.to_pretty_string oldstr in
+      let newfp = Filepath.to_pretty_string newstr in
       f oldfp newfp
 
     let set_str s =
@@ -572,7 +572,7 @@ struct
         stage
         (Cmdline.String set_str)
 
-    let parameter_get fp = Filepath.Normalized.to_pretty_string (get fp)
+    let parameter_get fp = Filepath.to_pretty_string (get fp)
     let parameter_add_set_hook f = add_set_hook (convert f)
     let parameter_add_update_hook f = add_update_hook (convert f)
 
@@ -600,7 +600,7 @@ struct
       else
         p
 
-    let is_empty () = Filepath.Normalized.is_empty (get ())
+    let is_empty () = Filepath.is_empty (get ())
   end
 
   (* ************************************************************************ *)
@@ -649,7 +649,7 @@ struct
        end): Parameter_sig.User_dir_opt
   =
   struct
-    open Fc_Filepath.Normalized
+    open Fc_Filepath
 
     module Dir_name =
       Filepath
@@ -670,18 +670,18 @@ struct
     let is_set = Dir_name.is_set
 
     let expected ~dir path =
-      if dir <> Fc_Filepath.is_dir path then
+      if dir <> Filesystem.is_dir path then
         P.L.abort "%a is expected to be a %s"
           pretty path (if dir then "directory" else "file")
 
     let mk_dir d =
-      try ignore @@ Extlib.mkdir ~parents:true d 0o755
+      try ignore @@ Filesystem.make_dir ~parents:true d 0o755
       with Unix.Unix_error _ ->
         P.L.abort "cannot create %s directory `%a'" Info.dirname pretty d
 
     let get_dir ?(create_path=false) s =
       let dir = concat (get ()) s in
-      if Fc_Filepath.exists dir
+      if Filesystem.exists dir
       then (expected ~dir:true dir ; dir)
       else if create_path
       then (mk_dir dir ; dir)
@@ -692,7 +692,7 @@ struct
       (* No need to create anything here, as the path of sub-directories has
          been already created by [get_dir] for computing [base_dir]. *)
       let path = concat base_dir @@ Filename.basename s in
-      if Fc_Filepath.exists path then
+      if Filesystem.exists path then
         expected ~dir:false path ;
       path
   end
@@ -1466,7 +1466,7 @@ struct
        end) =
     Make_list
       (struct
-        include Datatype.Filepath
+        include Fc_Filepath
         let to_string s = (s : t :> string)
 
         let of_string s =
@@ -1627,20 +1627,20 @@ struct
       (X: sig
          include Parameter_sig.Input_with_arg
          val existence: Fc_Filepath.existence
-         val default: V.t Datatype.Filepath.Map.t
+         val default: V.t Fc_Filepath.Map.t
        end) =
     Make_map
       (struct
-        include Datatype.Filepath
+        include Fc_Filepath
         let of_string s =
           try
-            [ Fc_Filepath.Normalized.of_string ~existence:X.existence s ]
+            [ Fc_Filepath.of_string ~existence:X.existence s ]
           with
           | Fc_Filepath.No_file ->
             P.L.abort "file '%s' not found" s
           | Fc_Filepath.File_exists ->
             P.L.abort "file '%s' already exists" s
-        let to_string = Fc_Filepath.Normalized.to_pretty_string
+        let to_string = Fc_Filepath.to_pretty_string
       end)
       (V)
       (struct include X let dependencies = [] end)

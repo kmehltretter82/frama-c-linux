@@ -42,9 +42,9 @@
 (*                                                                          *)
 (****************************************************************************)
 
-let parse_to_cabs (path : Datatype.Filepath.t) =
+let parse_to_cabs (path : Filepath.t) =
   try
-    Kernel.feedback ~level:2 "Parsing %a" Datatype.Filepath.pretty path;
+    Kernel.feedback ~level:2 "Parsing %a" Filepath.pretty path;
     Errorloc.clear_errors () ;
     let lexbuf, lexer =
       Clexer.init ~filename:(path :> string) Clexer.initial in
@@ -63,14 +63,14 @@ let parse_to_cabs (path : Datatype.Filepath.t) =
     Clexer.finish ();
     if Errorloc.had_errors () then begin
       Kernel.abort "There were parsing errors in %a"
-        Datatype.Filepath.pretty path
+        Filepath.pretty path
     end;
 
     (path, cabs)
   with
   | Sys_error msg ->
     Clexer.finish () ;
-    Kernel.abort "Cannot open %a : %s" Datatype.Filepath.pretty path msg ;
+    Kernel.abort "Cannot open %a : %s" Filepath.pretty path msg ;
   | Parsing.Parse_error ->
     Errorloc.parse_error "syntax error"
 
@@ -78,12 +78,12 @@ module Syntactic_transformations = Hook.Fold(struct type t = Cabs.file end)
 let add_syntactic_transformation = Syntactic_transformations.extend
 
 let parse path =
-  Kernel.feedback ~level:2 "Parsing %a to Cabs" Datatype.Filepath.pretty path;
+  Kernel.feedback ~level:2 "Parsing %a to Cabs" Filepath.pretty path;
   let cabs = parse_to_cabs path in
   let cabs = Syntactic_transformations.apply cabs in
   (* Now (return a function that will) convert to CIL *)
   fun _ ->
     Kernel.feedback ~level:2 "Converting %a from Cabs to CIL"
-      Datatype.Filepath.pretty path;
+      Filepath.pretty path;
     let cil = Cabs2cil.convFile cabs in
     cil,cabs

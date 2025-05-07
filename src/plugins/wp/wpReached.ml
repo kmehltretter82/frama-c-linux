@@ -242,7 +242,7 @@ module N = Dotgraph.Node(Nmap)
 
 let dump ~dir kf reached =
   let name = Kernel_function.get_name kf in
-  let file = Format.asprintf "%a/%s.dot" Datatype.Filepath.pretty dir name in
+  let file = Format.asprintf "%a/%s.dot" Filepath.pretty dir name in
   let dot = G.open_dot ~file ~name () in
   N.define dot
     (fun a na ->

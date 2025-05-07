@@ -115,7 +115,7 @@ class stmt_count_visitor =
    location-based approach. *)
 let located_within_framac_libc loc =
   let pos = fst loc in
-  Filepath.is_relative ~base_name:System_config.Share.libc pos.Filepath.pos_path
+  Filepath.is_relative ~base:System_config.Share.libc pos.Filepath.pos_path
 
 class fun_cabs_visitor print_libc = object(self)
   inherit Cabsvisit.nopCabsVisitor
@@ -159,17 +159,17 @@ class fun_cabs_visitor print_libc = object(self)
 end
 
 let print_json fp funinfos_json =
-  let open Filepath.Operators in
+  let open Filesystem.Operators in
   let result =
-    let+ fmt = Filepath.with_formatter fp in
+    let+ fmt = Filesystem.with_formatter fp in
     Format.fprintf fmt "%a@." Json.pp funinfos_json;
   in
   match result with
   | Ok () ->
-    Self.debug "List written to: %a" Filepath.Normalized.pretty fp
+    Self.debug "List written to: %a" Filepath.pretty fp
   | Error msg ->
     Self.abort "cannot write JSON to %a: %s"
-      Filepath.Normalized.pretty fp msg
+      Filepath.pretty fp msg
 
 let pp_semlocs fmt t =
   Format.fprintf fmt "%a"
@@ -282,7 +282,7 @@ let run () =
       (fun fi1 fi2 -> Extlib.compare_ignore_case fi1.name fi2.name) funinfos
   in
   let outfp = Output.get () in
-  if Filepath.Normalized.is_empty outfp then
+  if Filepath.is_empty outfp then
     print_text funinfos
   else
     let funinfos_json = `List (List.map (fun fi ->
