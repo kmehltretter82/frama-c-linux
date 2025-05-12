@@ -498,9 +498,9 @@ let ghost_comments = "//\n" | ("//" [^'\n''@'] ([^'\n']*("\\\n")?)* '\n')
 
 rule initial = parse
 
-  (* Skip special doxygen comments. Use of '@' instead of '!annot_char' is
-     intentional *)
-  | "/*" ("" | "@{" | "@}" as suf)
+  (* Skip special doxygen comments or similar cases, e.g. /*@**...*/.
+      Use of '@' instead of '!annot_char' is intentional *)
+  | "/*" ("" | "@{" | "@}" | "@*" as suf)
     {
     do_lex_comment ~first_string:suf comment lexbuf ;
     initial lexbuf
@@ -515,7 +515,7 @@ rule initial = parse
     }
 
   (* See comment for "/*@{" above *)
-  | "//" ("" | "@{" | "@}" as suf)
+  | "//" ("" | "@{" | "@}" | "@*" as suf)
     {
     do_oneline_ghost ~first_string:suf onelinecomment lexbuf initial
     }
