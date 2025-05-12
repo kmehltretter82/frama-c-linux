@@ -160,8 +160,6 @@ let rec of_ltype create lt =
   | Larrow (prms,ty) ->
     arrow (List.map (of_ltype create) prms) @@ of_ltype create ty
 
-(* let subst (ctxt:'a context) (d:'a t) : 'a t = TODO, maybe not needed *)
-
 (* -------------------------------------------------------------------------- *)
 (* ---  Unification                                                       --- *)
 (* -------------------------------------------------------------------------- *)

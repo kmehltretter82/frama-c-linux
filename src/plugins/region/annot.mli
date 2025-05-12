@@ -25,6 +25,8 @@ open Cil_types
 open Memory
 
 val add_behavior : kf:kernel_function -> ki:kinstr ->
-  ?formal:domain Cil_datatype.Varinfo.Map.t -> map -> funbehavior -> unit
+  ?formal:domain Cil_datatype.Varinfo.Map.t -> ?result:domain ->
+  map -> funbehavior -> unit
 val add_code_annot : kf:kernel_function -> stmt:stmt ->
-  ?formal:domain Cil_datatype.Varinfo.Map.t -> map -> code_annotation -> unit
+  ?formal:domain Cil_datatype.Varinfo.Map.t -> ?result:domain ->
+  map -> code_annotation -> unit
