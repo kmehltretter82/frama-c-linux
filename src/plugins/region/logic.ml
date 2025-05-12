@@ -65,9 +65,11 @@ let add_region (m: map) (r : Spec.region) =
 (* ---  Process ACSL logic terms & predicates                             --- *)
 (* -------------------------------------------------------------------------- *)
 
+type result = node
+
 type env = {
   map : map ;
-  result : domain ;
+  result : result ;
   formal : domain Varinfo.Map.t ;
   property : Property.t ;
 }
@@ -133,7 +135,7 @@ let add_term_lval (env:env) lv =
   let acs = Access.Term (env.property, lv) in
   let (lhost,loffset) = lv in
   match lhost with
-  | TResult _ -> term_offset env env.result loffset
+  | TResult ty -> load env acs ty @@ addr_offset env ty env.result loffset
   | TMem e ->
     let rh = pointer env (!rterm env e) in
     let te = Logic_typing.ctype_of_pointed e.term_type in
@@ -148,7 +150,7 @@ let add_term_lval (env:env) lv =
 
 let add_addr_lval (env:env) (lhost,loffset) : node =
   match lhost with
-  | TResult tr -> addr_offset env tr (pointer env env.result) loffset
+  | TResult ty -> addr_offset env ty env.result loffset
   | TMem e ->
     let rh = pointer env (!rterm env e) in
     let te = Logic_typing.ctype_of_pointed e.term_type in

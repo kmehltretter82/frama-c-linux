@@ -118,11 +118,11 @@ let rec add_init (m:map) (s:stmt) (acs:Access.acs) (lv:lval) (iv:init) =
 (* --- Instructions                                                       --- *)
 (* -------------------------------------------------------------------------- *)
 
-let add_instr ~kf (m:map) (s:stmt) (instr:instr) =
+let add_instr ~kf ~result (m:map) (s:stmt) (instr:instr) =
   match instr with
   | Skip _ -> ()
   | Code_annot (annot,_) ->
-    Annot.add_code_annot ~kf ~stmt:s m annot
+    Annot.add_code_annot ~kf ~stmt:s ~result m annot
 
   | Set(lv, { enode = Lval le }, _) when is_comp le ->
     let r = add_lval m s lv in
@@ -139,19 +139,24 @@ let add_instr ~kf (m:map) (s:stmt) (instr:instr) =
     let acs = Access.Init(s,x) in
     add_init m s acs (Var x,NoOffset) iv
 
+  | Local_init(_,ConsInit _,_) ->
+    Options.warning ~source:(fst @@ Stmt.loc s)
+      "Constructor init not yet implemented"
+
   | Call(lr,e,es,_) ->
     add_value m s e ;
     List.iter (add_value m s) es ;
     Option.iter
       (fun lv ->
          let r = add_lval m s lv in
-         Memory.add_write m r (Lval(s,lv))
+         Memory.add_write m r (Lval(s,lv)) ;
       ) lr ;
+      (*
+    let result = Option.fold ~none:pure ~some:(Ldomain.of_lval) lv in
+    let ofun = Kernel_function.(Option.map get_vi @@ get_called e) in
+    add_call ~kf m result e es ; *)
     Options.warning ~source:(fst @@ Stmt.loc s) "Incomplete call analysis"
 
-  | Local_init(_,ConsInit _,_) ->
-    Options.warning ~source:(fst @@ Stmt.loc s)
-      "Constructor init not yet implemented"
   | Asm _ ->
     Options.warning ~source:(fst @@ Stmt.loc s)
       "Inline assembly not supported (ignored)"
@@ -165,12 +170,12 @@ type rmap = Memory.map Stmt.Map.t ref
 let store rmap m s =
   rmap := Stmt.Map.add s (Memory.copy ~locked:true m) !rmap
 
-let rec add_stmt ~kf (r:rmap) (m:map) (s:stmt) =
-  let add_block = add_block ~kf in
-  let add_annot = Annot.add_code_annot ~kf ~stmt:s m in
+let rec add_stmt ~kf ~result (r:rmap) (m:map) (s:stmt) =
+  let add_block = add_block ~kf ~result in
+  let add_annot = Annot.add_code_annot ~kf ~stmt:s ~result m in
   List.iter add_annot @@ Annotations.code_annot s ;
   match s.skind with
-  | Instr ki -> add_instr ~kf m s ki ; store r m s
+  | Instr ki -> add_instr ~kf ~result m s ki ; store r m s
   | Return(Some e,_) -> add_value m s e ; store r m s
   | Goto _ | Break _ | Continue _ | Return(None,_) -> store r m s
   | If(e,st,se,_) ->
@@ -189,23 +194,23 @@ let rec add_stmt ~kf (r:rmap) (m:map) (s:stmt) =
   | Throw(exn,_) -> Option.iter (fun (e,_) -> add_value  m s e) exn
   | TryCatch(b,hs,_)  ->
     add_block r m b ;
-    List.iter (fun (c,b) -> add_catch ~kf r m c ; add_block r m b) hs ;
+    List.iter (fun (c,b) -> add_catch ~kf ~result r m c ; add_block r m b) hs ;
   | TryExcept(a,(ks,e),b,_) ->
     add_block r m a ;
-    List.iter (add_instr ~kf m s) ks ;
+    List.iter (add_instr ~kf ~result m s) ks ;
     add_value  m s e ;
     add_block r m b ;
   | TryFinally(a,b,_) ->
     add_block r m a ;
     add_block r m b ;
 
-and add_catch ~kf (r:rmap) (m:map) (c:catch_binder) =
+and add_catch ~kf ~result (r:rmap) (m:map) (c:catch_binder) =
   match c with
   | Catch_all -> ()
-  | Catch_exn(_,xbs) -> List.iter (fun (_,b) -> add_block ~kf r m b) xbs
+  | Catch_exn(_,xbs) -> List.iter (fun (_,b) -> add_block ~kf ~result r m b) xbs
 
-and add_block ~kf (r:rmap) (m:map) (b:block) =
-  List.iter (add_stmt ~kf r m) b.bstmts
+and add_block ~kf ~result (r:rmap) (m:map) (b:block) =
+  List.iter (add_stmt ~kf ~result r m) b.bstmts
 
 (* -------------------------------------------------------------------------- *)
 (* --- Behavior                                                           --- *)
@@ -216,7 +221,7 @@ type imap = Memory.map Property.Map.t ref
 let istore imap m ip =
   imap := Property.Map.add ip (Memory.copy ~locked:true m) !imap
 
-let add_bhv ~kf (s:imap) (m:map) (bhv:behavior) =
+let add_bhv ~kf ~result:_ (s:imap) (m:map) (bhv:behavior) =
   List.iter
     (fun e ->
        let rs = Spec.of_extension e in
@@ -242,18 +247,19 @@ let domain ?global kf =
   let m = match global with Some g -> g | None -> Memory.create () in
   let r = ref Stmt.Map.empty in
   let s = ref Property.Map.empty in
+  let result = Memory.new_chunk m () in
   begin
     try
       let funspec = Annotations.funspec kf in
-      List.iter (add_bhv ~kf s m) funspec.spec_behavior ;
+      List.iter (add_bhv ~kf ~result s m) funspec.spec_behavior ;
       let ki = Kinstr.kinstr_of_opt_stmt None in
-      List.iter (Annot.add_behavior ~kf ~ki m) funspec.spec_behavior ;
+      List.iter (Annot.add_behavior ~kf ~ki ~result m) funspec.spec_behavior ;
     with Annotations.No_funspec _ -> ()
   end ;
   begin
     try
       let fundec = Kernel_function.get_definition kf in
-      add_block ~kf r m fundec.sbody ;
+      add_block ~kf ~result r m fundec.sbody ;
     with Kernel_function.No_Definition -> ()
   end ;
   {

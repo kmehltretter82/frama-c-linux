@@ -29,13 +29,13 @@ val add_path : map -> Spec.path -> node
 val add_region : map -> Spec.region -> unit
 
 
+type result = node
 type env = {
   map : map ;
-  result : domain ;
+  result : result ;
   formal : domain Varinfo.Map.t ;
   property : Property.t ;
 }
-
 val add_addr_lval : env -> term_lval -> node
 val add_term_lval : env -> term_lval -> domain
 val add_term      : env -> term      -> domain
