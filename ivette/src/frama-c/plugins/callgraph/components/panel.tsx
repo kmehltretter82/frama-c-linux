@@ -253,6 +253,8 @@ interface PanelContentProps {
   properties: statusData[];
   evaProperties: Eva.propertiesData[];
   style: CSSStyleDeclaration;
+  visibleNodes: number;
+  visibleLinks: number;
   panelVisibleState: [boolean, () => void];
 }
 
@@ -260,9 +262,10 @@ export function Panel(
   props: PanelContentProps
 ): JSX.Element {
   const { graphData, selectedNodes, tainted,
-    properties, evaProperties, style, panelVisibleState } = props;
+    properties, evaProperties, style,
+    visibleNodes, visibleLinks, panelVisibleState } = props;
   const countNodes = graphData.nodes.length;
-  const countLink = graphData.links.length;
+  const countLinks = graphData.links.length;
   const countSelected = selectedNodes.set.size;
   const [ panelVisible, flipPanelVisible ] = panelVisibleState;
 
@@ -279,7 +282,8 @@ export function Panel(
     <DPanel
       position={ positionDefault ? 'right' : 'left'}
       visible={panelVisible}
-      label={`${countNodes} / ${countLink} ( Nodes / links )`}
+      label={`${visibleNodes || 0} / ${visibleLinks || 0} ( Nodes / links )`}
+      title={`Total ${countNodes} / ${countLinks}`}
       actions={
         <Hbox>
           <IconButton
@@ -328,8 +332,8 @@ export function Panel(
             selectedNodes,
             properties,
             evaProperties,
-            nodes: graphData.nodes.length,
-            links: graphData.links.length,
+            nodes: countNodes,
+            links: countLinks,
             tainted: tainted > 0,
             style,
             showKind, showStatus, showEva

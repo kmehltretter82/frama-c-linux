@@ -28,7 +28,7 @@ import { LED } from 'dome/controls/displays';
 import { Icon } from 'dome/controls/icons';
 import { renderTaint } from 'frama-c/kernel/Properties';
 
-import { SelectedNodes, CGNode } from "../definitions";
+import { SelectedNodes, CGNode, SetSelectedNodes } from "../definitions";
 
 const isTaintedScope = (node: NodeObject3D<CGNode>): boolean => {
   return Boolean(
@@ -59,17 +59,19 @@ const getNodeText = (node: CGNode): string => {
 
 export const getNode = (
   node: NodeObject3D<CGNode>,
-  selectedNodes: SelectedNodes,
+  selectedNodesState: [SelectedNodes, SetSelectedNodes],
   multiSelectFunction:
-    (id: string, event: MouseEvent | React.MouseEvent) => void
+    (selectedNodesState: [SelectedNodes, SetSelectedNodes],
+    id: string, event: MouseEvent | React.MouseEvent) => void
 ): JSX.Element => {
+  const [selectedNodes, ] = selectedNodesState;
   const className = classes(
     'node-graph',
     selectedNodes.set.has(node.id) && "node-selected"
   );
 
   const select = (event: React.MouseEvent): void => {
-    multiSelectFunction(node.id, event);
+    multiSelectFunction(selectedNodesState, node.id, event);
   };
 
   return (

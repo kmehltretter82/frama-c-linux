@@ -25,14 +25,14 @@ import React from 'react';
 import * as Dome from 'dome';
 
 import { State } from 'dome/data/states';
-import {  Spinner } from 'dome/controls/buttons';
+import { Spinner } from 'dome/controls/buttons';
 import { ToolBar, ButtonGroup, Button, Filler } from 'dome/frame/toolbars';
 
 import {
   ModeDisplay, SelectedNodesData
 } from "frama-c/plugins/callgraph/definitions";
 
-import { IThreeStateButton, ThreeStateButton } from "./threeStateButton";
+import { IThreeStateButton, ThreeStateButton } from "./buttons";
 
 /* -------------------------------------------------------------------------- */
 /* --- Callgraph Toolsbar component                                       --- */
@@ -49,6 +49,7 @@ interface CallgraphToolsBarProps {
   verticalSpacingState: State<number>,
   horizontalSpacingState: State<number>,
   linkThicknessState: State<number>,
+  showParticlesState: [boolean, React.Dispatch<React.SetStateAction<boolean>>],
   selectedFunctions:SelectedNodesData,
   taintedFunctions: string[],
   unprovenPropertiesFunctions: SelectedNodesData,
@@ -62,7 +63,8 @@ export function CallgraphToolsBar(props: CallgraphToolsBarProps): JSX.Element {
   const {
     displayModeState, selectedParentsState,
     selectedChildrenState, panelVisibleState,
-    verticalSpacingState, horizontalSpacingState, linkThicknessState,
+    verticalSpacingState, horizontalSpacingState,
+    linkThicknessState, showParticlesState,
     selectedFunctions, taintedFunctions,
     unprovenPropertiesFunctions, cycleFunctions, dagMode,
     updateNodes
@@ -73,6 +75,7 @@ export function CallgraphToolsBar(props: CallgraphToolsBarProps): JSX.Element {
   const [verticalSpacing, setVerticalSpacing] = verticalSpacingState;
   const [horizontalSpacing, setHorizontalSpacing] = horizontalSpacingState;
   const [linkThickness, setLinkThickness] = linkThicknessState;
+  const [showParticles, setShowParticles] = showParticlesState;
 
   function menuItem(label: string, onClick: ()=>void, enabled?: boolean)
     : Dome.PopupMenuItem {
@@ -147,6 +150,11 @@ export function CallgraphToolsBar(props: CallgraphToolsBarProps): JSX.Element {
 
       <Filler/>
 
+      <Button
+        label="Show particles"
+        selected={showParticles}
+        onClick={() => setShowParticles(v => !v)}
+        />
       <div className='cg-spinner'>
         Edges: <Spinner
         value={linkThickness}

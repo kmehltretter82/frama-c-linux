@@ -31,9 +31,8 @@ import * as Themes from 'dome/themes';
 import { Pattern } from 'dome/text/markdown';
 import doc from '../callgraph.md?raw';
 import { ModeDisplay } from '../definitions';
-import {
-  IThreeStateButton, ThreeStateButton, TThreesButtonState
-} from './threeStateButton';
+import { IThreeStateButton, ThreeStateButton, TThreesButtonState
+} from './buttons';
 
 /* -------------------------------------------------------------------------- */
 /* --- Callgraph titlebar component                                       --- */

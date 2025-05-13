@@ -46,6 +46,7 @@ import AutoSizer from 'react-virtualized-auto-sizer';
 
 import * as Dome from 'dome';
 import * as Themes from 'dome/themes';
+import { transformColor } from '../colors';
 
 /* -------------------------------------------------------------------------- */
 /* --- Graph Specifications                                               --- */
@@ -73,10 +74,16 @@ export interface Edge {
 interface GNode {
   id: string;
   label?: string;
+  /** Nodes style */
+  visible?: boolean;
 }
 interface GLink {
   source: string;
   target: string;
+  /** Links style */
+  visible?: boolean;
+  color?: string;
+  width?: number;
 }
 interface GData {
   nodes: GNode[];
@@ -116,7 +123,7 @@ export interface ILinksOptions {
   /** visibility of the links */
   visibility?: boolean | ((node: GLink) => boolean);
   /** Size of the arrows */
-  directionalArrow?: number;
+  directionalArrow?: number | ((node: GLink) => number);
   /** Number of directional particles */
   directionalParticle?: number;
   /** Width of directional particles */
@@ -225,6 +232,9 @@ export interface GraphProps {
 
   /** Options graph 3D */
   options3D?: IGraphOptions3D;
+
+  /** refresh graph */
+  refresh?: boolean;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -290,25 +300,31 @@ function getForceGraphOptions(
   fgRef: React.MutableRefObject<ForceGraphMethods3D<NodeObject3D<GNode>,
   LinkObject3D<GNode, GLink>> | undefined>,
   options: IGraphOptions3D,
+  theme: Themes.ColorTheme,
+  style: CSSStyleDeclaration
 ): ForceGraphProps3D<GNode, GLink> {
   const ret: ForceGraphProps3D<GNode, GLink> = {};
 
   const { linkOptions, nodesOptions } = options;
 
-  if (linkOptions) {
-    const { width, color, visibility, directionalArrow,
-      directionalParticle, particleWidth, particleColor
-    } = linkOptions;
-    if (width) ret.linkWidth = width;
-    if (color) ret.linkColor = color;
-    if (visibility) ret.linkVisibility = visibility;
-    if (directionalArrow) ret.linkDirectionalArrowLength = directionalArrow;
-    if (directionalParticle) ret.linkDirectionalParticles = directionalParticle;
-    if (particleWidth) ret.linkDirectionalParticleWidth = particleWidth;
-    if (particleColor) ret.linkDirectionalParticleColor = particleColor;
-  }
+  const {
+    width, color, visibility,
+    directionalArrow, directionalParticle,
+    particleWidth, particleColor
+  } = linkOptions || {};
+  /* eslint-disable max-len */
+  ret.linkWidth = width ?? ((link) => link?.width ?? 1);
+  ret.linkColor = color ?? ((link) => link?.color ?? style.getPropertyValue('--graph-ed-color-default'));
+  ret.linkVisibility = visibility ?? ((link) => link?.visible ?? true);
+  ret.linkDirectionalArrowLength = directionalArrow ?? ((link) => ((link?.width ?? 1) * 2));
+  ret.linkDirectionalParticles = directionalParticle;
+  ret.linkDirectionalParticleWidth = particleWidth ?? ((link) => ((link?.width ?? 1) * 150 / 100));
+  ret.linkDirectionalParticleColor = particleColor ?? ((link) => transformColor(
+      link?.color ?? "black", theme === "light" ? -50 : 50
+    ));
 
-  if (nodesOptions?.visibility) ret.nodeVisibility = nodesOptions?.visibility;
+  ret.nodeVisibility = nodesOptions?.visibility ?? ((link) => link?.visible ?? true);
+  /* eslint-enable max-len */
 
   if(options) {
     const {
@@ -318,7 +334,8 @@ function getForceGraphOptions(
 
     if (displayMode) ret.dagMode = displayMode;
     if (depthSpacing) ret.dagLevelDistance = depthSpacing;
-    if (backgroundColor) ret.backgroundColor = backgroundColor;
+    ret.backgroundColor = backgroundColor ||
+      style.getPropertyValue('--background');
 
     ret.onEngineStop = getOnEngineStop(fgRef, { autoCenter });
     ret.onDagError = (val) => {
@@ -356,8 +373,10 @@ function Graph3D(props: IGProps3D): JSX.Element {
     | undefined
   >(undefined);
 
-  const graphOptions = getForceGraphOptions(fgRef3D, options || {});
+  const [theme,] = Themes.useColorTheme();
   const style = Themes.useStyle();
+  const graphOptions = getForceGraphOptions(
+    fgRef3D, options || {}, theme, style);
 
   const [ , flipHorizontalSpacingIsSet ] =
     Dome.useFlipSettings('ivette.callgraph.horizontalSpacingIsSet', true);
@@ -437,7 +456,7 @@ function Graph3D(props: IGProps3D): JSX.Element {
 /* -------------------------------------------------------------------------- */
 
 export function Graph(props: GraphProps): JSX.Element {
-  const { nodes, edges, onSelection,
+  const { nodes, edges, onSelection, refresh,
           display = true, selected, options3D } = props;
   const data: GData = React.useMemo(
     () => ({
@@ -454,7 +473,7 @@ export function Graph(props: GraphProps): JSX.Element {
           {(size: Size) => (
             <div className={props.className}>
               <Graph2D
-                key='2D'
+                key={refresh ? '2D' : '_2D'}
                 data={data}
                 onSelection={onSelection}
                 selected={selected}
@@ -469,7 +488,7 @@ export function Graph(props: GraphProps): JSX.Element {
           {(size: Size) => (
             <div className={props.className}>
               <Graph3D
-                key='3D'
+                key={refresh ? '3D' : '_3D'}
                 data={data}
                 onSelection={onSelection}
                 selected={selected}
