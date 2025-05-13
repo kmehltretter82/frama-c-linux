@@ -37,6 +37,7 @@
   NON TERMINATING FUNCTION
 [eva:final-states] Values at end of function main:
   __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
   __retres ∈ {0}
 [from] Computing for function memchr_bug
 [from] Computing for function malloc <-memchr_bug
@@ -51,6 +52,7 @@
   These dependencies hold at termination for the executions that terminate:
 [from] Function malloc:
   __fc_heap_status FROM __fc_heap_status; size (and SELF)
+  __fc_errno FROM __fc_heap_status; size
   \result FROM __fc_heap_status; size
 [from] Function memchr:
   \result FROM s; c; __malloc_w_memchr_bug_l12[0]
@@ -60,10 +62,10 @@
   \result FROM \nothing
 [from] ====== END OF DEPENDENCIES ======
 [inout] Out (internal) for function memchr_bug:
-    __fc_heap_status; b; i
+    __fc_heap_status; __fc_errno; b; i
 [inout] Inputs for function memchr_bug:
     __fc_heap_status; __malloc_w_memchr_bug_l12[0]
 [inout] Out (internal) for function main:
-    __fc_heap_status; __retres
+    __fc_heap_status; __fc_errno; __retres
 [inout] Inputs for function main:
     __fc_heap_status; nondet; __malloc_w_memchr_bug_l12[0]

@@ -65,12 +65,14 @@
   q ∈ {{ NULL ; &__alloca_w_loop_l23[0] }}
 [eva:final-states] Values at end of function f:
   __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
   __fc_stack_status ∈ [--..--]
   p ∈ {{ &__alloca_f_l6[0] }} or ESCAPINGADDR
   q ∈ {{ NULL ; &__malloc_f_l7[0] }} or ESCAPINGADDR
   r ∈ {{ NULL ; &__alloca_f_l6[0] ; &__malloc_f_l7[0] }} or ESCAPINGADDR
 [eva:final-states] Values at end of function main:
   __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
   __fc_stack_status ∈ [--..--]
   a ∈ {{ &__alloca_main_l30 }}
   p ∈ {{ &__alloca_main_l35[0] }}

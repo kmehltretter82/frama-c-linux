@@ -40,6 +40,9 @@ int main() {
   int p_memal_res2 = posix_memalign((void**)&p_al1, 32, 42);
   free(p_al1);
 
+  int p_memal_inv = posix_memalign((void**)&p_al1, 42, 42);
+  //@ assert ok_einval_expected: p_memal_inv == EINVAL;
+
   //__fc_realpath test
   char *resolved_name = malloc(PATH_MAX);
   if (!resolved_name) return 1;

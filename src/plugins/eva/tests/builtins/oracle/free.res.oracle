@@ -14,6 +14,7 @@
   Frama_C_dump_each:
   # cvalue:
   __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
   __fc_random48_init ∈ {0}
   __fc_random48_counter[0..2] ∈ [--..--]
@@ -66,6 +67,7 @@
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main1:
   __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
   p ∈ {{ &__malloc_main1_l8[0] }} or ESCAPINGADDR
   q ∈ {{ &__malloc_main1_l10[0] }} or ESCAPINGADDR
   r ∈ {{ &__malloc_main1_l8[0] ; &__malloc_main1_l10[0] }} or ESCAPINGADDR
@@ -83,10 +85,12 @@
                     [5..9] ∈ UNINITIALIZED
 [eva:final-states] Values at end of function main2:
   __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
   p ∈ ESCAPINGADDR
   i ∈ {1}
 [eva:final-states] Values at end of function main:
   __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
   __malloc_main1_l8[0] ∈ UNINITIALIZED
                    [1] ∈ {1}
                    [2..9] ∈ UNINITIALIZED
@@ -112,18 +116,22 @@
   __fc_heap_status FROM __fc_heap_status (and SELF)
 [from] Function malloc:
   __fc_heap_status FROM __fc_heap_status; size (and SELF)
+  __fc_errno FROM __fc_heap_status; size
   \result FROM __fc_heap_status; size
 [from] Function main1:
   __fc_heap_status FROM __fc_heap_status (and SELF)
+  __fc_errno FROM __fc_heap_status
   __malloc_main1_l8[1] FROM __fc_heap_status
   __malloc_main1_l10[2] FROM __fc_heap_status
   __malloc_main1_l16[3] FROM __fc_heap_status
   __malloc_main1_l23[4] FROM __fc_heap_status
 [from] Function main2:
   __fc_heap_status FROM __fc_heap_status (and SELF)
+  __fc_errno FROM __fc_heap_status
   __malloc_main2_l35 FROM __fc_heap_status
 [from] Function main:
   __fc_heap_status FROM __fc_heap_status; v (and SELF)
+  __fc_errno FROM __fc_heap_status; v (and SELF)
   __malloc_main1_l8[1] FROM __fc_heap_status; v (and SELF)
   __malloc_main1_l10[2] FROM __fc_heap_status; v (and SELF)
   __malloc_main1_l16[3] FROM __fc_heap_status; v (and SELF)
@@ -131,16 +139,17 @@
   __malloc_main2_l35 FROM __fc_heap_status; v (and SELF)
 [from] ====== END OF DEPENDENCIES ======
 [inout] Out (internal) for function main1:
-    __fc_heap_status; p; q; r; tmp_1; u; t; s; __malloc_main1_l8[1];
-    __malloc_main1_l10[2]; __malloc_main1_l16[3]; __malloc_main1_l23[4]
+    __fc_heap_status; __fc_errno; p; q; r; tmp_1; u; t; s;
+    __malloc_main1_l8[1]; __malloc_main1_l10[2]; __malloc_main1_l16[3];
+    __malloc_main1_l23[4]
 [inout] Inputs for function main1:
     __fc_heap_status; v
 [inout] Out (internal) for function main2:
-    __fc_heap_status; p; i; __malloc_main2_l35
+    __fc_heap_status; __fc_errno; p; i; __malloc_main2_l35
 [inout] Inputs for function main2:
     __fc_heap_status
 [inout] Out (internal) for function main:
-    __fc_heap_status; __malloc_main1_l8[1]; __malloc_main1_l10[2];
+    __fc_heap_status; __fc_errno; __malloc_main1_l8[1]; __malloc_main1_l10[2];
     __malloc_main1_l16[3]; __malloc_main1_l23[4]; __malloc_main2_l35
 [inout] Inputs for function main:
     __fc_heap_status; v

@@ -117,6 +117,7 @@
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function convergence_issue:
   __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
   size ∈ {64000}
   p ∈
    {{ &__calloc_convergence_issue_l73 ;
@@ -125,6 +126,7 @@
   r ∈ {0}
 [eva:final-states] Values at end of function main2:
   __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
   t[0] ∈ {0}
    [1] ∈ {1}
    [2] ∈ {2}
@@ -929,6 +931,7 @@
   i ∈ {800}
 [eva:final-states] Values at end of function main3:
   __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
   p ∈ {{ &__malloc_w_main3_l51 }} or UNINITIALIZED
   q ∈ {{ &__malloc_w_main3_l51 }}
   r ∈ {{ &__malloc_w_main3_l51 }}
@@ -943,6 +946,7 @@
    {{ (? *)&__malloc_w_main1_l23 }} or UNINITIALIZED%32, bits 8 to 31 
 [eva:final-states] Values at end of function main1:
   __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
   t[0..1] ∈ {{ &__malloc_w_main1_l23[0] }}
   p ∈ {{ &__malloc_w_main1_l23 + [0..124] }}
   n ∈ {4}
@@ -950,6 +954,7 @@
   __malloc_w_main1_l23[0..31] ∈ [--..--] or UNINITIALIZED
 [eva:final-states] Values at end of function main:
   __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
   __malloc_w_main1_l23[0..31] ∈ [--..--] or UNINITIALIZED
 [from] Computing for function convergence_issue
 [from] Computing for function calloc <-convergence_issue
@@ -973,16 +978,21 @@
   These dependencies hold at termination for the executions that terminate:
 [from] Function calloc:
   __fc_heap_status FROM __fc_heap_status; nmemb; size (and SELF)
+  __fc_errno FROM __fc_heap_status; nmemb; size
   \result FROM __fc_heap_status; nmemb; size
 [from] Function convergence_issue:
   __fc_heap_status FROM __fc_heap_status (and SELF)
+  __fc_errno FROM __fc_heap_status
 [from] Function malloc:
   __fc_heap_status FROM __fc_heap_status; size (and SELF)
+  __fc_errno FROM __fc_heap_status; size
   \result FROM __fc_heap_status; size
 [from] Function main2:
   __fc_heap_status FROM __fc_heap_status (and SELF)
+  __fc_errno FROM __fc_heap_status
 [from] Function main3:
   __fc_heap_status FROM __fc_heap_status (and SELF)
+  __fc_errno FROM __fc_heap_status (and SELF)
 [from] Function memcpy:
   p FROM t{[0][bits 8 to 31]; [1][bits 0 to 23]} (and SELF)
   \result FROM dest
@@ -990,23 +1000,25 @@
   p FROM t{[0][bits 8 to 31]; [1][bits 0 to 23]} (and SELF)
 [from] Function main1:
   __fc_heap_status FROM __fc_heap_status (and SELF)
+  __fc_errno FROM __fc_heap_status (and SELF)
   __malloc_w_main1_l23[0..31] FROM __fc_heap_status (and SELF)
   \result FROM __fc_heap_status; __malloc_w_main1_l23[0..31]
 [from] Function main:
   __fc_heap_status FROM __fc_heap_status (and SELF)
+  __fc_errno FROM __fc_heap_status
   __malloc_w_main1_l23[0..31] FROM __fc_heap_status (and SELF)
 [from] ====== END OF DEPENDENCIES ======
 [inout] Out (internal) for function convergence_issue:
-    __fc_heap_status; size; p; tmp_0; q; r
+    __fc_heap_status; __fc_errno; size; p; tmp_0; q; r
 [inout] Inputs for function convergence_issue:
     __fc_heap_status; v; __calloc_convergence_issue_l73;
     __calloc_w_convergence_issue_l82{[0..63998]; [200000]}
 [inout] Out (internal) for function main2:
-    __fc_heap_status; t[0..799]; i; tmp
+    __fc_heap_status; __fc_errno; t[0..799]; i; tmp
 [inout] Inputs for function main2:
     __fc_heap_status
 [inout] Out (internal) for function main3:
-    __fc_heap_status; p; q; r; i; d; cmp; eq
+    __fc_heap_status; __fc_errno; p; q; r; i; d; cmp; eq
 [inout] Inputs for function main3:
     __fc_heap_status
 [inout] Out (internal) for function copy:
@@ -1014,11 +1026,12 @@
 [inout] Inputs for function copy:
     t{[0][bits 8 to 31]; [1][bits 0 to 23]}
 [inout] Out (internal) for function main1:
-    __fc_heap_status; t[0..1]; i; p; n; r; __malloc_w_main1_l23[0..31]
+    __fc_heap_status; __fc_errno; t[0..1]; i; p; n; r;
+    __malloc_w_main1_l23[0..31]
 [inout] Inputs for function main1:
     __fc_heap_status; __malloc_w_main1_l23[0..31]
 [inout] Out (internal) for function main:
-    __fc_heap_status; __malloc_w_main1_l23[0..31]
+    __fc_heap_status; __fc_errno; __malloc_w_main1_l23[0..31]
 [inout] Inputs for function main:
     __fc_heap_status; v; __malloc_w_main1_l23[0..31];
     __calloc_convergence_issue_l73;

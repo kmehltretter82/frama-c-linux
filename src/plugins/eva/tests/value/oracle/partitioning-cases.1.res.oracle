@@ -68,6 +68,7 @@
   nb ∈ [0..100]
 [eva:final-states] Values at end of function test_builtin:
   __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
   p ∈ {{ NULL ; (int *)&__malloc_test_builtin_l12 }}
 [eva:final-states] Values at end of function test_spec:
   Frama_C_entropy_source ∈ [--..--]
@@ -75,6 +76,7 @@
 [eva:final-states] Values at end of function main:
   __fc_heap_status ∈ [--..--]
   Frama_C_entropy_source ∈ [--..--]
+  __fc_errno ∈ [--..--]
 [from] Computing for function test_assert
 [from] Computing for function Frama_C_interval <-test_assert
 [from] Done for function Frama_C_interval
@@ -100,6 +102,7 @@
   \result FROM x
 [from] Function malloc:
   __fc_heap_status FROM __fc_heap_status; size (and SELF)
+  __fc_errno FROM __fc_heap_status; size
   \result FROM __fc_heap_status; size
 [from] Function sgn_spec:
   \result FROM nb
@@ -107,18 +110,20 @@
   Frama_C_entropy_source FROM Frama_C_entropy_source (and SELF)
 [from] Function test_builtin:
   __fc_heap_status FROM __fc_heap_status (and SELF)
+  __fc_errno FROM __fc_heap_status
 [from] Function test_spec:
   Frama_C_entropy_source FROM Frama_C_entropy_source (and SELF)
 [from] Function main:
   __fc_heap_status FROM __fc_heap_status (and SELF)
   Frama_C_entropy_source FROM Frama_C_entropy_source (and SELF)
+  __fc_errno FROM __fc_heap_status
 [from] ====== END OF DEPENDENCIES ======
 [inout] Out (internal) for function test_assert:
     Frama_C_entropy_source; nb
 [inout] Inputs for function test_assert:
     Frama_C_entropy_source
 [inout] Out (internal) for function test_builtin:
-    __fc_heap_status; p
+    __fc_heap_status; __fc_errno; p
 [inout] Inputs for function test_builtin:
     __fc_heap_status
 [inout] Out (internal) for function test_spec:
@@ -126,6 +131,6 @@
 [inout] Inputs for function test_spec:
     Frama_C_entropy_source
 [inout] Out (internal) for function main:
-    __fc_heap_status; Frama_C_entropy_source
+    __fc_heap_status; Frama_C_entropy_source; __fc_errno
 [inout] Inputs for function main:
     __fc_heap_status; Frama_C_entropy_source

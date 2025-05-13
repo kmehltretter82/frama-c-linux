@@ -22,6 +22,7 @@
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main3:
   __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
   q ∈ {{ NULL ; &__malloc_main3_l78[-1] }} or ESCAPINGADDR
   r ∈ {{ NULL ; &__realloc_main3_l79[-1] }} or ESCAPINGADDR
   p ∈ {{ &empties[-1] }}
@@ -39,14 +40,17 @@
   __fc_heap_status FROM __fc_heap_status (and SELF)
 [from] Function malloc:
   __fc_heap_status FROM __fc_heap_status; size (and SELF)
+  __fc_errno FROM __fc_heap_status; size
   \result FROM __fc_heap_status; size
 [from] Function realloc:
   __fc_heap_status FROM __fc_heap_status (and SELF)
+  __fc_errno FROM __fc_heap_status; size
   \result FROM __fc_heap_status; ptr; size
 [from] Function main3:
   __fc_heap_status FROM __fc_heap_status (and SELF)
+  __fc_errno FROM __fc_heap_status
 [from] ====== END OF DEPENDENCIES ======
 [inout] Out (internal) for function main3:
-    __fc_heap_status; q; r; p; i
+    __fc_heap_status; __fc_errno; q; r; p; i
 [inout] Inputs for function main3:
     __fc_heap_status

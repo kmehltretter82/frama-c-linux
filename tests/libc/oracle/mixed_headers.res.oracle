@@ -29,6 +29,7 @@
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
   p ∈ {{ &__malloc_main_l11[0] }}
   q ∈ {{ &__malloc_main_l12[0] }}
   __retres ∈ {0}

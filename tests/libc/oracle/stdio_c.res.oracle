@@ -1099,6 +1099,7 @@
                           [2147483646] ∈ {0} or UNINITIALIZED
 [eva:final-states] Values at end of function vasprintf:
   __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
   Frama_C_entropy_source ∈ [--..--]
   len ∈ [1..256]
   s ∈ {{ NULL ; &__malloc_vasprintf_l124[0] }}
@@ -1107,6 +1108,7 @@
                          [255] ∈ {0} or UNINITIALIZED
 [eva:final-states] Values at end of function asprintf:
   __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
   Frama_C_entropy_source ∈ [--..--]
   args ∈ {{ &__va_args[0] }}
   res ∈ [-1..256]
