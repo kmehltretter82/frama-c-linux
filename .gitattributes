@@ -193,7 +193,7 @@ README* header_spec=.ignore
 /doc/developer/examples/**/* header_spec=.ignore
 /doc/developer/tutorial/**/* header_spec=.ignore
 /doc/qualification/testing header_spec=.ignore
-/doc/release/periodic-elements.txt header_spec=.ignore
+/doc/periodic-elements.txt header_spec=.ignore
 /doc/eva/watchpoints header_spec=.ignore
 /doc/scope/M.v header_spec=.ignore
 

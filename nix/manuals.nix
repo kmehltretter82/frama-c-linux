@@ -44,7 +44,6 @@ stdenv.mkDerivation rec {
 
   buildPhase = ''
     make -C doc NO_SUFFIX=yes all version
-    make -C doc/release # no artifacts however
   '';
 
   installPhase = ''
