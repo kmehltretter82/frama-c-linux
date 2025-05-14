@@ -140,6 +140,12 @@ let to_call_list cs =
   in
   (cs.entry_point, Cil_types.Kglobal) :: l
 
+(* Iteration *)
+
+let rec iter f cs =
+  f cs;
+  pop cs |> Option.iter (iter f)
+
 (* Stable hash and pretty-printing *)
 
 let stmt_hash s =

@@ -87,5 +87,10 @@ val to_stmt_list : t -> Cil_types.stmt list
 (** Gives the list of call from the bottom to the top of the callstack
     (i.e. reverse order of the call stack). *)
 val to_call_list : t -> (Cil_types.kernel_function * Cil_types.kinstr) list
-
 [@@@ api_end]
+
+(** {2 Iteration} *)
+
+(** [iter f cs] calls [f] on [cs] and all the callstacks obtained by successful
+    calls to {!pop} until the result of the call is [None]. *)
+val iter : (t -> unit) -> t -> unit

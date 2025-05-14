@@ -26,8 +26,12 @@ open Cil_types
 
 (** Functions dealing with call stacks. *)
 
-(** Clears the current callstack: future accesses to the current callstack
+(** Reset the current callstack: future accesses to the current callstack
     will fail. *)
+val reset_call_stack : unit -> unit
+
+(** Same as {!reset_call_stack}, but records and keep perfs (see
+    {!Eva_perf}). *)
 val clear_call_stack : unit -> unit
 
 (** Initializes the current callstack with the main entry point. *)
