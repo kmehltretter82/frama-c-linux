@@ -96,6 +96,7 @@ val new_chunk : map ->
 val add_cvar : map -> Cil_types.varinfo -> node
 val add_logic_var : map -> Cil_types.logic_var -> domain
 val add_logic_info : map -> Cil_types.logic_info -> domain
+val add_result : map -> node
 val add_label : map -> string -> node
 val add_field : map -> node -> fieldinfo -> node
 val add_index : map -> node -> typ -> node
@@ -120,6 +121,7 @@ val field : map -> node -> fieldinfo -> node
 val index : map -> node -> typ -> node
 val lval : map -> lval -> node
 val exp : map -> exp -> node option
+val result : map -> node option
 
 val ranges : map -> node -> range list
 val points_to : map -> node -> node option

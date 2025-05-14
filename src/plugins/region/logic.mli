@@ -29,7 +29,7 @@ val add_path : map -> Spec.path -> node
 val add_region : map -> Spec.region -> unit
 
 
-type result = node
+type result = node option
 type env = {
   map : map ;
   result : result ;
@@ -40,5 +40,7 @@ val add_addr_lval : env -> term_lval -> node
 val add_term_lval : env -> term_lval -> domain
 val add_term      : env -> term      -> domain
 val add_predicate : env -> predicate -> unit
+
+val get_result : env -> node
 
 val add_logic_info_body : env -> logic_info -> domain

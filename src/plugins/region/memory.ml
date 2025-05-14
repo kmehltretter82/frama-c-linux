@@ -67,6 +67,7 @@ type map = {
   mutable cvars: node Vmap.t ;
   mutable lvars: domain LVmap.t ;
   mutable logics: domain LVImap.t ;
+  mutable result: node option ;
 }
 
 (* -------------------------------------------------------------------------- *)
@@ -103,6 +104,7 @@ let create () = {
   labels = Lmap.empty ;
   lvars = LVmap.empty ;
   logics = LVImap.empty ;
+  result = None;
 }
 
 let copy ?locked m = {
@@ -112,6 +114,7 @@ let copy ?locked m = {
   labels = m.labels ;
   lvars = m.lvars ;
   logics = m.logics ;
+  result = m.result ;
 }
 
 let empty = {
@@ -244,6 +247,12 @@ let add_logic_var (m: map) lv =
     assert (lv.lv_origin = None);
     let d = Ldomain.of_ltype (new_chunk m) lv.lv_type in
     m.lvars <- LVmap.add lv d m.lvars ; d
+
+let add_result (m: map) =
+  let result = match m.result with
+    | None -> new_chunk m ()
+    | Some r -> r
+  in m.result <- Some result ; result
 
 let domain_of_typ (m:map) (typ:typ) = Ldomain.of_typ (new_chunk m) typ
 
@@ -558,6 +567,8 @@ and exp (m: map) (e: exp) : node option =
   | CastE(_, e) -> exp m e
   | BinOp((PlusPI|MinusPI),p,_,_) -> exp m p
   | UnOp (_, _, _) | BinOp (_, _, _, _) -> None
+
+let result (m: map) = m.result
 
 (* -------------------------------------------------------------------------- *)
 
