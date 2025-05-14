@@ -81,6 +81,7 @@
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
   p ∈ {{ &__malloc_main_l16 }}
   q ∈ {{ &__malloc_main_l25 }}
   r ∈
@@ -107,9 +108,11 @@
   These dependencies hold at termination for the executions that terminate:
 [from] Function malloc:
   __fc_heap_status FROM __fc_heap_status; size (and SELF)
+  __fc_errno FROM __fc_heap_status; size
   \result FROM __fc_heap_status; size
 [from] Function main:
   __fc_heap_status FROM __fc_heap_status; d (and SELF)
+  __fc_errno FROM __fc_heap_status; d
   p FROM __fc_heap_status
   q FROM __fc_heap_status
   r FROM __fc_heap_status
@@ -124,8 +127,8 @@
   __malloc_main_l33[0..1] FROM __fc_heap_status; d
 [from] ====== END OF DEPENDENCIES ======
 [inout] Out (internal) for function main:
-    __fc_heap_status; p; q; r; a; t; u; v; c; tmp; tmp_0; tmp_1; tmp_2; 
-    tmp_3; tmp_4; __malloc_main_l16; __malloc_main_l17{[0]; [9]};
+    __fc_heap_status; __fc_errno; p; q; r; a; t; u; v; c; tmp; tmp_0; tmp_1;
+    tmp_2; tmp_3; tmp_4; __malloc_main_l16; __malloc_main_l17{[0]; [9]};
     __malloc_main_l25; __malloc_main_l32[0]; __malloc_main_l33[0..1]
 [inout] Inputs for function main:
     __fc_heap_status; p; q; r; t; u; v; ch; __malloc_main_l25

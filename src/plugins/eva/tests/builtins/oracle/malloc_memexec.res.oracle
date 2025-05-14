@@ -41,6 +41,7 @@
   __malloc_w_main_l23[0] ∈ {1; 2} or UNINITIALIZED
 [eva:final-states] Values at end of function main:
   __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
   p ∈ {{ &__malloc_main_l14 }}
   q ∈ {{ &__malloc_w_main_l23[0] }}
   __malloc_main_l14 ∈ {1}
@@ -58,9 +59,11 @@
   __malloc_w_main_l23[0] FROM p; i (and SELF)
 [from] Function malloc:
   __fc_heap_status FROM __fc_heap_status; size (and SELF)
+  __fc_errno FROM __fc_heap_status; size
   \result FROM __fc_heap_status; size
 [from] Function main:
   __fc_heap_status FROM __fc_heap_status (and SELF)
+  __fc_errno FROM __fc_heap_status
   __malloc_main_l14 FROM __fc_heap_status; v (and SELF)
   __malloc_w_main_l23[0] FROM __fc_heap_status; v (and SELF)
 [from] ====== END OF DEPENDENCIES ======
@@ -77,4 +80,4 @@
   Operational inputs on termination:
     __fc_heap_status; v
   Sure outputs:
-    p; q; __malloc_main_l14
+    __fc_errno; p; q; __malloc_main_l14

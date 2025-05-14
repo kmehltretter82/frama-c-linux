@@ -146,14 +146,14 @@
 > [eva] allocated.c:87: Call to builtin free
 > [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_37}
 > [eva:partition] allocated.c:81: Trace partitioning superposing up to 500 states
-739,741c839,840
+740,742c840,841
 <   __malloc_main_l82_7[0] ∈ {21} or UNINITIALIZED
 <                      [1] ∈ {24} or UNINITIALIZED
 <                      [2] ∈ {27} or UNINITIALIZED
 ---
 >   __malloc_main_l82_7[0] ∈ {14} or UNINITIALIZED
 >                      [1] ∈ {17} or UNINITIALIZED
-813a913,930
+814a914,931
 >   __malloc_main_l82_32[0] ∈ {21} or UNINITIALIZED
 >                       [1] ∈ {24} or UNINITIALIZED
 >                       [2] ∈ {27} or UNINITIALIZED
@@ -172,22 +172,22 @@
 >   __malloc_main_l82_37[0] ∈ {21} or UNINITIALIZED
 >                       [1] ∈ {24} or UNINITIALIZED
 >                       [2] ∈ {27} or UNINITIALIZED
-857c974
+860c977
 <   __malloc_main_l82_7[0..2] FROM __fc_heap_status; nondet (and SELF)
 ---
 >   __malloc_main_l82_7[0..1] FROM __fc_heap_status; nondet (and SELF)
-881a999,1004
+884a1002,1007
 >   __malloc_main_l82_32[0..2] FROM __fc_heap_status; nondet (and SELF)
 >   __malloc_main_l82_33[0..2] FROM __fc_heap_status; nondet (and SELF)
 >   __malloc_main_l82_34[0..2] FROM __fc_heap_status; nondet (and SELF)
 >   __malloc_main_l82_35[0..2] FROM __fc_heap_status; nondet (and SELF)
 >   __malloc_main_l82_36[0..2] FROM __fc_heap_status; nondet (and SELF)
 >   __malloc_main_l82_37[0..2] FROM __fc_heap_status; nondet (and SELF)
-905c1028
+908c1031
 <     __malloc_main_l82_6[0..1]; __malloc_main_l82_7[0..2];
 ---
 >     __malloc_main_l82_6[0..1]; __malloc_main_l82_7[0..1];
-917a1041,1043
+920a1044,1046
 >     __malloc_main_l82_32[0..2]; __malloc_main_l82_33[0..2];
 >     __malloc_main_l82_34[0..2]; __malloc_main_l82_35[0..2];
 >     __malloc_main_l82_36[0..2]; __malloc_main_l82_37[0..2];

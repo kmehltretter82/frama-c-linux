@@ -58,10 +58,13 @@
   i ∈ {2000}
 [eva:final-states] Values at end of function alloc:
   __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
 [eva:final-states] Values at end of function k:
   __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
 [eva:final-states] Values at end of function main:
   __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
   t[0..1999] ∈ [0..1999]
   p1 ∈ {{ &__malloc_main_l31 }}
   p2 ∈ {{ &__malloc_main_l32 }}
@@ -83,15 +86,19 @@
   t[0..1999] FROM \nothing (and SELF)
 [from] Function malloc:
   __fc_heap_status FROM __fc_heap_status; size (and SELF)
+  __fc_errno FROM __fc_heap_status; size
   \result FROM __fc_heap_status; size
 [from] Function alloc:
   __fc_heap_status FROM __fc_heap_status (and SELF)
+  __fc_errno FROM __fc_heap_status
   \result FROM __fc_heap_status
 [from] Function k:
   __fc_heap_status FROM __fc_heap_status (and SELF)
+  __fc_errno FROM __fc_heap_status
   \result FROM __fc_heap_status
 [from] Function main:
   __fc_heap_status FROM __fc_heap_status (and SELF)
+  __fc_errno FROM __fc_heap_status
   t[0..1999] FROM \nothing (and SELF)
 [from] ====== END OF DEPENDENCIES ======
 [inout] Out (internal) for function f:
@@ -99,14 +106,14 @@
 [inout] Inputs for function f:
     \nothing
 [inout] Out (internal) for function alloc:
-    __fc_heap_status; tmp
+    __fc_heap_status; __fc_errno; tmp
 [inout] Inputs for function alloc:
     __fc_heap_status
 [inout] Out (internal) for function k:
-    __fc_heap_status; tmp
+    __fc_heap_status; __fc_errno; tmp
 [inout] Inputs for function k:
     __fc_heap_status
 [inout] Out (internal) for function main:
-    __fc_heap_status; t[0..1999]; p1; p2; p3; p4
+    __fc_heap_status; __fc_errno; t[0..1999]; p1; p2; p3; p4
 [inout] Inputs for function main:
     __fc_heap_status; t[1..2]

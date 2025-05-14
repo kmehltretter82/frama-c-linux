@@ -39,6 +39,7 @@
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
   p1 ∈ [--..--]
   p2 ∈ [--..--] or UNINITIALIZED
   p3 ∈ [--..--] or UNINITIALIZED
@@ -54,12 +55,14 @@
   These dependencies hold at termination for the executions that terminate:
 [from] Function calloc:
   __fc_heap_status FROM __fc_heap_status; nmemb; size (and SELF)
+  __fc_errno FROM __fc_heap_status; nmemb; size
   \result FROM __fc_heap_status; nmemb; size
 [from] Function main:
   __fc_heap_status FROM __fc_heap_status (and SELF)
+  __fc_errno FROM __fc_heap_status
   \result FROM __fc_heap_status
 [from] ====== END OF DEPENDENCIES ======
 [inout] Out (internal) for function main:
-    __fc_heap_status; p1; p2; p3; p4; p5; p9001; __retres
+    __fc_heap_status; __fc_errno; p1; p2; p3; p4; p5; p9001; __retres
 [inout] Inputs for function main:
     __fc_heap_status; nondet

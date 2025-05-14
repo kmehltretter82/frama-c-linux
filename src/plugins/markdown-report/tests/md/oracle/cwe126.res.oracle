@@ -21,6 +21,7 @@
 [eva:final-states] 
   Values at end of function CWE126_Buffer_Overread__malloc_char_loop_64_bad:
   __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
   data ∈ ESCAPINGADDR
 [eva:final-states] 
   Values at end of function CWE126_Buffer_Overread__malloc_char_loop_64b_goodG2BSink:
@@ -29,12 +30,15 @@
   data ∈ ESCAPINGADDR
 [eva:final-states] Values at end of function goodG2B:
   __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
   data ∈ ESCAPINGADDR
 [eva:final-states] 
   Values at end of function CWE126_Buffer_Overread__malloc_char_loop_64_good:
   __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
 [eva:final-states] Values at end of function main:
   __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
   __retres ∈ {0}
 [eva:summary] ====== ANALYSIS SUMMARY ======
   ----------------------------------------------------------------------------

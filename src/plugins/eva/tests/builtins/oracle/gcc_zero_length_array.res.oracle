@@ -21,6 +21,7 @@
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function make_fam:
   __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
   i ∈ {11}
   p ∈ {{ &__malloc_make_fam_l15[0] }}
   __malloc_make_fam_l15[0].len ∈ {11}
@@ -37,6 +38,7 @@
                        [11].len ∈ {10}
 [eva:final-states] Values at end of function main:
   __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
   pfam ∈ ESCAPINGADDR
   res ∈ {10}
 [from] Computing for function make_fam
@@ -53,23 +55,26 @@
   __fc_heap_status FROM __fc_heap_status (and SELF)
 [from] Function malloc:
   __fc_heap_status FROM __fc_heap_status; size (and SELF)
+  __fc_errno FROM __fc_heap_status; size
   \result FROM __fc_heap_status; size
 [from] Function make_fam:
   __fc_heap_status FROM __fc_heap_status; len (and SELF)
+  __fc_errno FROM __fc_heap_status; len
   __malloc_make_fam_l15[0] FROM __fc_heap_status; len
                        [1..11] FROM __fc_heap_status; len (and SELF)
   \result FROM __fc_heap_status; len
 [from] Function main:
   __fc_heap_status FROM __fc_heap_status (and SELF)
+  __fc_errno FROM __fc_heap_status
   __malloc_make_fam_l15[0] FROM __fc_heap_status
                        [1..11] FROM __fc_heap_status (and SELF)
   \result FROM __fc_heap_status; __malloc_make_fam_l15[11]
 [from] ====== END OF DEPENDENCIES ======
 [inout] Out (internal) for function make_fam:
-    __fc_heap_status; i; p; __malloc_make_fam_l15[0..11]
+    __fc_heap_status; __fc_errno; i; p; __malloc_make_fam_l15[0..11]
 [inout] Inputs for function make_fam:
     __fc_heap_status
 [inout] Out (internal) for function main:
-    __fc_heap_status; pfam; res; __malloc_make_fam_l15[0..11]
+    __fc_heap_status; __fc_errno; pfam; res; __malloc_make_fam_l15[0..11]
 [inout] Inputs for function main:
     __fc_heap_status; __malloc_make_fam_l15[11]

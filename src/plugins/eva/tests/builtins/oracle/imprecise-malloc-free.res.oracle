@@ -75,6 +75,7 @@
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
   size1 ∈ {{ &size1 + [-8589934592..8589934588],0%4 }}
   size2 ∈
        {{ garbled mix of &{size2}
@@ -100,15 +101,17 @@
   __fc_heap_status FROM __fc_heap_status (and SELF)
 [from] Function malloc:
   __fc_heap_status FROM __fc_heap_status; size (and SELF)
+  __fc_errno FROM __fc_heap_status; size
   \result FROM __fc_heap_status; size
 [from] Function main:
   __fc_heap_status FROM i; __fc_heap_status (and SELF)
+  __fc_errno FROM i; __fc_heap_status
   __malloc_main_l14[0] FROM __fc_heap_status
   __malloc_main_l15[0] FROM i; __fc_heap_status
   __malloc_main_l16[0] FROM i; __fc_heap_status
 [from] ====== END OF DEPENDENCIES ======
 [inout] Out (internal) for function main:
-    __fc_heap_status; size1; size2; p; q; r; __malloc_main_l14[0];
+    __fc_heap_status; __fc_errno; size1; size2; p; q; r; __malloc_main_l14[0];
     __malloc_main_l15[0]; __malloc_main_l16[0]
 [inout] Inputs for function main:
     i; __fc_heap_status

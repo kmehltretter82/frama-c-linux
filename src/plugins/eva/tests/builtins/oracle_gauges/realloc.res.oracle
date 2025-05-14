@@ -1,4 +1,4 @@
-497a498,726
+512a513,753
 > [eva] realloc.c:152: Call to builtin realloc
 > [eva:malloc] bases_to_realloc: {__realloc_w_main10_l152}
 > [eva:malloc] realloc.c:152: weak free on bases: {__realloc_w_main10_l152}
@@ -7,6 +7,7 @@
 >   Frama_C_dump_each:
 >   # cvalue:
 >   __fc_heap_status ∈ [--..--]
+>   __fc_errno ∈ [--..--]
 >   __fc_rand_max ∈ {2147483647}
 >   __fc_random48_init ∈ {0}
 >   __fc_random48_counter[0..2] ∈ [--..--]
@@ -26,6 +27,7 @@
 >   Frama_C_dump_each:
 >   # cvalue:
 >   __fc_heap_status ∈ [--..--]
+>   __fc_errno ∈ [--..--]
 >   __fc_rand_max ∈ {2147483647}
 >   __fc_random48_init ∈ {0}
 >   __fc_random48_counter[0..2] ∈ [--..--]
@@ -45,6 +47,7 @@
 >   Frama_C_dump_each:
 >   # cvalue:
 >   __fc_heap_status ∈ [--..--]
+>   __fc_errno ∈ [--..--]
 >   __fc_rand_max ∈ {2147483647}
 >   __fc_random48_init ∈ {0}
 >   __fc_random48_counter[0..2] ∈ [--..--]
@@ -64,6 +67,7 @@
 >   Frama_C_dump_each:
 >   # cvalue:
 >   __fc_heap_status ∈ [--..--]
+>   __fc_errno ∈ [--..--]
 >   __fc_rand_max ∈ {2147483647}
 >   __fc_random48_init ∈ {0}
 >   __fc_random48_counter[0..2] ∈ [--..--]
@@ -83,6 +87,7 @@
 >   Frama_C_dump_each:
 >   # cvalue:
 >   __fc_heap_status ∈ [--..--]
+>   __fc_errno ∈ [--..--]
 >   __fc_rand_max ∈ {2147483647}
 >   __fc_random48_init ∈ {0}
 >   __fc_random48_counter[0..2] ∈ [--..--]
@@ -102,6 +107,7 @@
 >   Frama_C_dump_each:
 >   # cvalue:
 >   __fc_heap_status ∈ [--..--]
+>   __fc_errno ∈ [--..--]
 >   __fc_rand_max ∈ {2147483647}
 >   __fc_random48_init ∈ {0}
 >   __fc_random48_counter[0..2] ∈ [--..--]
@@ -121,6 +127,7 @@
 >   Frama_C_dump_each:
 >   # cvalue:
 >   __fc_heap_status ∈ [--..--]
+>   __fc_errno ∈ [--..--]
 >   __fc_rand_max ∈ {2147483647}
 >   __fc_random48_init ∈ {0}
 >   __fc_random48_counter[0..2] ∈ [--..--]
@@ -140,6 +147,7 @@
 >   Frama_C_dump_each:
 >   # cvalue:
 >   __fc_heap_status ∈ [--..--]
+>   __fc_errno ∈ [--..--]
 >   __fc_rand_max ∈ {2147483647}
 >   __fc_random48_init ∈ {0}
 >   __fc_random48_counter[0..2] ∈ [--..--]
@@ -159,6 +167,7 @@
 >   Frama_C_dump_each:
 >   # cvalue:
 >   __fc_heap_status ∈ [--..--]
+>   __fc_errno ∈ [--..--]
 >   __fc_rand_max ∈ {2147483647}
 >   __fc_random48_init ∈ {0}
 >   __fc_random48_counter[0..2] ∈ [--..--]
@@ -179,6 +188,7 @@
 >   Frama_C_dump_each:
 >   # cvalue:
 >   __fc_heap_status ∈ [--..--]
+>   __fc_errno ∈ [--..--]
 >   __fc_rand_max ∈ {2147483647}
 >   __fc_random48_init ∈ {0}
 >   __fc_random48_counter[0..2] ∈ [--..--]
@@ -198,6 +208,7 @@
 >   Frama_C_dump_each:
 >   # cvalue:
 >   __fc_heap_status ∈ [--..--]
+>   __fc_errno ∈ [--..--]
 >   __fc_rand_max ∈ {2147483647}
 >   __fc_random48_init ∈ {0}
 >   __fc_random48_counter[0..2] ∈ [--..--]
@@ -217,6 +228,7 @@
 >   Frama_C_dump_each:
 >   # cvalue:
 >   __fc_heap_status ∈ [--..--]
+>   __fc_errno ∈ [--..--]
 >   __fc_rand_max ∈ {2147483647}
 >   __fc_random48_init ∈ {0}
 >   __fc_random48_counter[0..2] ∈ [--..--]
@@ -228,7 +240,7 @@
 >   __realloc_w_main10_l152[0] ∈ {4}
 >                          [1] ∈ UNINITIALIZED
 >   ==END OF DUMP==
-564a794,858
+579a821,885
 > [eva] realloc.c:167: Call to builtin reallocarray
 > [eva] realloc.c:167: Call to builtin reallocarray
 > [eva] computing for function Frama_C_interval <- main11 <- main.
@@ -294,7 +306,7 @@
 > [eva:malloc] bases_to_realloc: {}
 > [eva:malloc] realloc.c:171: strong free on bases: {}
 > [eva] realloc.c:172: Frama_C_show_each_p: {{ NULL ; &__realloc_w_main11_l171 }}
-632,633c926,928
+658,659c964,966
 <   p ∈ {{ NULL ; &__malloc_main11_l160 ; (int *)&__realloc_main11_l171 }}
 <   q ∈ {0} or UNINITIALIZED or ESCAPINGADDR
 ---

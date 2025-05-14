@@ -270,7 +270,7 @@ Error while parsing something in the commands file
 (set -o pipefail is used so that the exit status of the whole pipe fails if one 
  of the command fails. Moreover a sub-shell `(set -o pipefail && ...)` is used 
  so that we do not need to restore the pipefail setting).
-  $ (set -o pipefail && dune exec --cache=disabled -- frama-c -commands-file with_error.txt src_empty.c -then -print | sed 's/^\(\s*use `\).*\(frama-c -help.*\)$/\1\2/g')
+  $ ./test-error.sh
   [kernel] Expanding arguments from with_error.txt
   [kernel] User Error: option `-cache-size' requires an integer as argument.
     use `frama-c -help' for more information.
