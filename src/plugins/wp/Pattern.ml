@@ -64,7 +64,7 @@ let concat ~loc es =
 module Vmap = Map.Make(String)
 
 type context = {
-  typing : typing_context ;
+  typing : typing_context option ;
   mutable value : bool ;
   mutable pvars : pvar Vmap.t ;
 }
@@ -76,20 +76,27 @@ type value = ast
 (* --- Node Parsing                                                       --- *)
 (* -------------------------------------------------------------------------- *)
 
-let context typing = { typing ; value = false ; pvars = Vmap.empty }
+let context ?tc () = { typing = tc ; value = false ; pvars = Vmap.empty }
+
+exception TypeError of Cil_types.location * string
+
+let error ctxt loc msg =
+  match ctxt.typing with
+  | None -> Pretty_utils.ksfprintf (fun e -> raise (TypeError(loc, e))) msg
+  | Some tc -> tc.error loc msg
 
 let pint ctxt ~loc a =
   try int_of_string a
-  with _ -> ctxt.typing.error loc "Invalid int %S" a
+  with _ -> error ctxt loc "Invalid int %S" a
 
 let pinteger ctxt ~loc a =
   try Z.of_string a
-  with _ -> ctxt.typing.error loc "Invalid integer %S" a
+  with _ -> error ctxt loc "Invalid integer %S" a
 
 let pvar ctxt ~loc x =
   try Vmap.find x ctxt.pvars with Not_found ->
     if ctxt.value then
-      ctxt.typing.error loc "Unknown pattern variable '%s'" x
+      error ctxt loc "Unknown pattern variable '%s'" x
     else
       let pv = { loc ; value = x } in
       ctxt.pvars <- Vmap.add x pv ctxt.pvars ; pv
@@ -98,7 +105,7 @@ let pbound ctxt p =
   let loc = p.lexpr_loc in
   match p.lexpr_node with
   | PLconstant (IntConstant a) -> pint ctxt ~loc a
-  | _ -> ctxt.typing.error loc "Invalid bound (int expected)"
+  | _ -> error ctxt loc "Invalid bound (int expected)"
 
 let rec ptrail rps = function
   | [] -> List.rev rps,false
@@ -181,7 +188,7 @@ let rec parse ctxt p =
         { loc ; value = Get(parse ctxt a,parse ctxt b) }
     end
   | _ ->
-    ctxt.typing.error loc
+    error ctxt loc
       (if ctxt.value then "Invalid value" else "Invalid pattern")
 
 and parse_binop ctxt ~loc (op:binop) a b =

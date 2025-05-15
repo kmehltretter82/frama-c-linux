@@ -6,7 +6,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Logic_typing
 open Logic_ptree
 
 (* -------------------------------------------------------------------------- *)
@@ -17,13 +16,23 @@ type context
 type pattern
 type value
 
-(** Creates an empty environment *)
-val context : typing_context -> context
+exception TypeError of Cil_types.location * string
 
-(** Parse a pattern and enrich the environment with pattern variables *)
+(** Creates an empty environment.
+    @before Frama-C+dev the typing context was mandatory.
+*)
+val context : ?tc:Logic_typing.typing_context -> unit -> context
+
+(** Parse a pattern and enrich the environment with pattern variables
+    @raise TypeError in case of error when context does not have typing_context
+    @before Frama-C+dev it used to always use the typing_context for errors
+*)
 val pa_pattern : context -> lexpr -> pattern
 
-(** Parse value according to the environment *)
+(** Parse value according to the environment
+    @raise TypeError in case of error when context does not have typing_context
+    @before Frama-C+dev it used to always use the typing_context for errors
+*)
 val pa_value : context -> lexpr -> value
 
 (** Return a value that equals the pattern *)
