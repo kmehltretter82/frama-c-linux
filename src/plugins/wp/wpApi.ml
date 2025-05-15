@@ -438,6 +438,30 @@ let goals =
     ~add_reload_hook
     gmodel
 
+let () =
+  R.register ~package ~kind:`GET ~name:"getGoalsFromASTMarker"
+    ~descr:(Md.plain "Get goals from AST marker")
+    ~input:(module AST.Marker)
+    ~output:(module D.Jlist(Goal))
+    begin fun marker ->
+      let open Printer_tag in
+      let has_marker g =
+        let is_marker = Localizable.equal marker in
+        let in_stmt = match g.Wpo.po_formula.source with
+          | Some(stmt,_) -> is_marker @@ localizable_of_stmt stmt
+          | None -> false
+        in
+        in_stmt ||
+        match WpPropId.property_of_id g.Wpo.po_pid with
+        | IPOther {io_loc = OLStmt(_,s)} -> is_marker @@ localizable_of_stmt s
+        | ip -> is_marker @@ Printer_tag.PIP ip
+      in
+      let select g = has_marker g && not @@ Wpo.is_tactic g in
+      let l = ref [] in
+      Wpo.iter_on_goals(fun g -> if select g then l := g :: !l) ;
+      List.sort Wpo.S.compare !l
+    end
+
 (* -------------------------------------------------------------------------- *)
 (* --- Generate RTEs                                                      --- *)
 (* -------------------------------------------------------------------------- *)

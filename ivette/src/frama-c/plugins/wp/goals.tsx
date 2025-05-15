@@ -135,13 +135,15 @@ function filterGoal(
 /* --- Goals Table                                                        --- */
 /* -------------------------------------------------------------------------- */
 
+type Goal = WP.goal | undefined;
+
 export interface GoalTableProps {
   display: boolean;
   failed: boolean;
   scoped: boolean;
   scope: Ast.decl | undefined;
   current: WP.goal | undefined;
-  setCurrent: (goal: WP.goal) => void;
+  setCurrent: (goal: WP.goal | undefined) => void;
   setTIP: (goal: WP.goal) => void;
   setGoals: (goals: number) => void;
   setTotal: (total: number) => void;
@@ -150,17 +152,46 @@ export interface GoalTableProps {
 export function GoalTable(props: GoalTableProps): JSX.Element {
   const {
     display, scoped, failed,
-    scope, current, setCurrent, setTIP,
+    scope,
+    current, setCurrent,
+    setTIP,
     setGoals, setTotal,
   } = props;
   const { model } = States.useSyncArrayProxy(WP.goals);
+
   const goals = model.getRowCount();
   const total = model.getTotalRowCount();
+
+  const selectedMarker = States.getSelected();
+  const markerGoals =
+    States.useRequestResponse(WP.getGoalsFromASTMarker, selectedMarker);
+
+  const [target, setTarget] = React.useState<Goal>(undefined);
+
+  const candidates =
+    markerGoals?.filter(
+      (value: WP.goal): boolean => !failed || !model.getData(value)?.passed
+    );
+
+  React.useEffect(() => {
+    if (candidates) {
+      const selection =
+        candidates.length === 0
+          ? undefined
+          : target && candidates.includes(target)
+            ? target
+            : candidates[0];
+
+      setCurrent(selection);
+    }
+  }, [target, setCurrent, candidates]);
+
   const onSelection = React.useCallback(
     ({ wpo, marker }: WP.goalsData) => {
       States.setSelected(marker);
-      setCurrent(wpo);
-    }, [setCurrent]);
+      setTarget(wpo);
+    }, []);
+
   const onDoubleClick = React.useCallback(
     ({ wpo }: WP.goalsData) => {
       setTIP(wpo);
@@ -169,6 +200,7 @@ export function GoalTable(props: GoalTableProps): JSX.Element {
 
   React.useEffect(() => {
     if (failed || scoped) {
+      /* if we ever add new filters here, check selection above */
       model.setFilter(filterGoal(failed, scope));
     } else {
       model.setFilter();
@@ -199,17 +231,27 @@ export function GoalTable(props: GoalTableProps): JSX.Element {
       onDoubleClick={onDoubleClick}
       renderEmpty={renderEmpty}
     >
-      <Column id='scope' label='Scope'
+      <Column
+        id='scope'
+        label='Scope'
               width={150}
               getter={getScope} />
-      <Column id='name' label='Property'
+      <Column
+        id='name'
+        label='Property'
               width={150} />
-      <Column id='script' icon='FILE'
+      <Column
+        id='script'
+        icon='FILE'
               fixed width={30}
-              getter={getScript} render={renderIcon} />
-      <Column id='status' label='Status'
+        getter={getScript}
+        render={renderIcon} />
+      <Column
+        id='status'
+        label='Status'
               fill={true}
-              getter={getStatus} render={renderCell} />
+        getter={getStatus}
+        render={renderCell} />
     </Table>
   );
 }
