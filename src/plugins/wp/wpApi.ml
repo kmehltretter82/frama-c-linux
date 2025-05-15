@@ -354,6 +354,15 @@ let get_status g =
     verdict = (ProofEngine.consolidated g).best ;
   }
 
+let get_ast_dependencies g =
+  let open Wpo in
+  let module Stmts = Cil_datatype.Stmt.Set in
+  let module Props = Property.Set in
+  let add_stmt s l = Printer_tag.localizable_of_stmt s :: l in
+  let add_prop p l = Printer_tag.PIP p :: l in
+  Stmts.fold add_stmt g.po_formula.path @@
+  Props.fold add_prop g.po_formula.deps []
+
 let () = S.column gmodel ~name:"marker"
     ~descr:(Md.plain "Associated Marker")
     ~data:(module AST.Marker) ~get:get_marker
@@ -416,6 +425,11 @@ let () = S.column gmodel ~name:"saved"
     ~descr:(Md.plain "Saved Script")
     ~data:(module D.Jbool)
     ~get:(fun wpo -> ProofEngine.get wpo = `Saved)
+
+let () = S.column gmodel ~name:"deps"
+    ~descr:(Md.plain "Dependencies")
+    ~data:(module D.Jlist(AST.Marker))
+    ~get:get_ast_dependencies
 
 let filter hook fn = hook (fun g -> if not @@ Wpo.is_tactic g then fn g)
 let (++) h1 h2 fn = h1 fn ; h2 fn

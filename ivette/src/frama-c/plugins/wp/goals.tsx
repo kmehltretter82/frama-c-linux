@@ -28,6 +28,7 @@ import { Table, Column } from 'dome/table/views';
 import * as States from 'frama-c/states';
 import * as Ast from 'frama-c/kernel/api/ast';
 import * as WP from 'frama-c/plugins/wp/api';
+import * as Locations from 'frama-c/kernel/Locations';
 
 /* -------------------------------------------------------------------------- */
 /* --- Table Cells                                                        --- */
@@ -80,7 +81,7 @@ export function getScript(g : WP.goalsData): IconProps {
   const { script, saved, proof } = g;
   return (
     script ? (saved ? savedScript : updatedScript)
-    : (proof ? proofEdit : proofNone)
+      : (proof ? proofEdit : proofNone)
   );
 }
 
@@ -210,6 +211,23 @@ export function GoalTable(props: GoalTableProps): JSX.Element {
   React.useEffect(() => setGoals(goals), [goals, setGoals]);
   React.useEffect(() => setTotal(total), [total, setTotal]);
 
+  React.useEffect(() => {
+    if (current) {
+      const data = model.getData(current);
+      if (data) {
+        const { name, deps } = data;
+        Locations.setSelection({
+          plugin: 'WP',
+          label: `Dependencies of ${name}`,
+          title: `${name} depends on these statements and annotations`,
+          markers: deps
+        });
+      }
+    } else {
+      Locations.clearSelection();
+    }
+  }, [current, model]);
+
   const renderEmpty = React.useCallback(() => {
     const kind = failed ? ' failed' : '';
     const loc = scoped ? ' in current scope' : '';
@@ -234,22 +252,22 @@ export function GoalTable(props: GoalTableProps): JSX.Element {
       <Column
         id='scope'
         label='Scope'
-              width={150}
-              getter={getScope} />
+        width={150}
+        getter={getScope} />
       <Column
         id='name'
         label='Property'
-              width={150} />
+        width={150} />
       <Column
         id='script'
         icon='FILE'
-              fixed width={30}
+        fixed width={30}
         getter={getScript}
         render={renderIcon} />
       <Column
         id='status'
         label='Status'
-              fill={true}
+        fill={true}
         getter={getStatus}
         render={renderCell} />
     </Table>
