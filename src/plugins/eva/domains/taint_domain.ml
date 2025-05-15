@@ -157,10 +157,7 @@ end
 
 module TransferTaint = struct
 
-  let loc_of_lval valuation lv =
-    match valuation.Abstract_domain.find_loc lv with
-    | `Value loc -> loc.Eval.loc
-    | `Top -> Precise_locs.loc_top
+  let loc_of_lval valuation lv = valuation.Abstract_domain.find_loc_def lv
 
   (* Keeps only active tainted assumes for [stmt]. A tainted assume in [state]
      is considered active on a statement [stmt] whenever there exists a path

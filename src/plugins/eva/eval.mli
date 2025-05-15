@@ -169,6 +169,7 @@ module type Valuation = sig
   val add : t -> exp -> (value, origin) record_val -> t
   val fold : (exp -> (value, origin) record_val -> 'a -> 'a) -> t -> 'a -> 'a
   val find_loc : t -> lval -> loc record_loc or_top
+  val find_loc_def : t -> lval -> loc
   val remove : t -> exp -> t
   val remove_loc : t -> lval -> t
 end

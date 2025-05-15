@@ -480,11 +480,7 @@ module D : Abstract_domain.Leaf
   (* build a [get_locs] function from a valuation *)
   let get_locs valuation =
     fun lv ->
-    let r =
-      match valuation.Abstract_domain.find_loc lv with
-      | `Top -> Precise_locs.loc_top
-      | `Value loc -> loc.Eval.loc
-    in
+    let r = valuation.Abstract_domain.find_loc_def lv in
     if Precise_locs.(equal_loc loc_top r) then
       Self.fatal "Unknown location for %a" Eva_ast.pp_lval lv
     else r

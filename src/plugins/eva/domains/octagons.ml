@@ -1615,11 +1615,7 @@ module Domain = struct
         | `Value (Cvalue.V.Top _) -> `Top
         | `Value cvalue -> `Value cvalue
     in
-    let eval_loc lval =
-      match valuation.Abstract_domain.find_loc lval with
-      | `Top -> Precise_locs.loc_top
-      | `Value record -> record.loc
-    in
+    let eval_loc lval = valuation.Abstract_domain.find_loc_def lval in
     let eval_deps var =
       Variable.deps ~eval_loc var
     in

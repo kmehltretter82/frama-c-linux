@@ -327,9 +327,8 @@ module Make (Engine: Engine_sig.S) = struct
         | None -> default valuation expr
         | Some inout ->
           let find_loc lval =
-            match Eval.Valuation.find_loc valuation lval with
-            | `Top -> Precise_locs.loc_top
-            | `Value record -> get record.loc
+            Eval.Valuation.find_loc_def valuation lval
+            |> get
           in
           let expr_zone = Eva_ast.PreciseDepsOf.zone_of_exp find_loc expr in
           let written_zone = inout.Inout_type.over_outputs_if_termination in

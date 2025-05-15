@@ -279,6 +279,11 @@ module Make
       try `Value (fst (LCache.find lval (snd cache)))
       with Not_found -> `Top
 
+    let find_loc_def cache lval =
+      match find_loc cache lval with
+      | `Top -> Loc.top
+      | `Value record -> record.loc
+
     (* Locations of lvalue. *)
     let find_loc' (cache:t) lval =
       try `Value (LCache.find lval (snd cache))
@@ -1580,7 +1585,8 @@ module Make
     let find = Valuation.find valuation in
     let fold f acc = Valuation.fold f valuation acc in
     let find_loc = Valuation.find_loc valuation in
-    Abstract_domain.{ find ; fold ; find_loc }
+    let find_loc_def = Valuation.find_loc_def valuation in
+    Abstract_domain.{ find ; fold ; find_loc ; find_loc_def }
 
   let evaluate ?(valuation=Cache.empty) ?(reduction=true) ?subdivnb state expr =
     let eval, alarms = subdivided_forward_eval valuation ?subdivnb state expr in
