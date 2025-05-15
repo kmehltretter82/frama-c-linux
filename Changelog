@@ -18,7 +18,9 @@
 Open Source Release <next-release>
 ###############################################################################
 
--!  Kernel    [2024-05-07] Changed default behavior of -keep-unused-functions:
+-   Kernel    [2025-05-15] Transparently compress and decompress when using
+              -save/-load (still supports loading uncompressed files).
+-!  Kernel    [2025-05-07] Changed default behavior of -keep-unused-functions:
               instead of 'specified', its default value is now 'user-specified':
               unused libc functions with specifications are now removed during
               normalization.
