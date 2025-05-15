@@ -103,7 +103,7 @@ Prove: included(a, 4, global(G_dest_45), 1).
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file bts_1382.i, line 18):
+Goal Positivity of Loop variant at loop (file bts_1382.i, line 18):
 bts_1382.i:19: warning from Typed Model:
  - Warning: Hide sub-term definition
    Reason: Cast with incompatible pointers types (source: sint32*) (target: uint8*)
@@ -117,7 +117,7 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Positivity of Loop variant at loop (file bts_1382.i, line 18):
+Goal Decreasing of Loop variant at loop (file bts_1382.i, line 18):
 bts_1382.i:19: warning from Typed Model:
  - Warning: Hide sub-term definition
    Reason: Cast with incompatible pointers types (source: sint32*) (target: uint8*)

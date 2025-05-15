@@ -18,6 +18,11 @@
   Function f1
 ------------------------------------------------------------
 
+Goal Establishment of Invariant (file terminates_variant_option.i, line 37):
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Preservation of Invariant (file terminates_variant_option.i, line 37):
 Assume {
   Type: is_sint32(c1_0) /\ is_sint32(cpt_0) /\ is_sint32(cpt_0 - 1).
@@ -34,22 +39,17 @@ Prove: (0 < cpt_0) /\ (cpt_0 <= (1 + c1_0)).
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file terminates_variant_option.i, line 37):
-Prove: true.
-
-------------------------------------------------------------
-
 Goal Loop assigns (file terminates_variant_option.i, line 38):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file terminates_variant_option.i, line 41):
+Goal Positivity of Loop variant at loop (file terminates_variant_option.i, line 41):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Positivity of Loop variant at loop (file terminates_variant_option.i, line 41):
+Goal Decreasing of Loop variant at loop (file terminates_variant_option.i, line 41):
 Prove: true.
 
 ------------------------------------------------------------
@@ -62,18 +62,23 @@ Prove: true.
 
 ------------------------------------------------------------
 
+Goal Positivity of Loop variant at loop (file terminates_variant_option.i, line 29):
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Decreasing of Loop variant at loop (file terminates_variant_option.i, line 29):
 Assume { Type: is_uint32(i). (* Then *) Have: 0 < i. }
 Prove: to_uint32(i - 1) < i.
 
 ------------------------------------------------------------
-
-Goal Positivity of Loop variant at loop (file terminates_variant_option.i, line 29):
-Prove: true.
-
-------------------------------------------------------------
 ------------------------------------------------------------
   Function fails_positive
+------------------------------------------------------------
+
+Goal Establishment of Invariant (file terminates_variant_option.i, line 15):
+Prove: true.
+
 ------------------------------------------------------------
 
 Goal Preservation of Invariant (file terminates_variant_option.i, line 15):
@@ -93,11 +98,6 @@ Prove: (0 < v) /\ (v <= (1 + x)).
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file terminates_variant_option.i, line 15):
-Prove: true.
-
-------------------------------------------------------------
-
 Goal Loop assigns (file terminates_variant_option.i, line 16) (1/2):
 Prove: true.
 
@@ -109,12 +109,12 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file terminates_variant_option.i, line 19):
+Goal Positivity of Loop variant at loop (file terminates_variant_option.i, line 19):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Positivity of Loop variant at loop (file terminates_variant_option.i, line 19):
+Goal Decreasing of Loop variant at loop (file terminates_variant_option.i, line 19):
 Prove: true.
 
 ------------------------------------------------------------
@@ -127,12 +127,12 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file terminates_variant_option.i, line 54):
+Goal Positivity of Loop variant at loop (file terminates_variant_option.i, line 54):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Positivity of Loop variant at loop (file terminates_variant_option.i, line 54):
+Goal Decreasing of Loop variant at loop (file terminates_variant_option.i, line 54):
 Prove: true.
 
 ------------------------------------------------------------
@@ -145,12 +145,12 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file terminates_variant_option.i, line 61):
+Goal Positivity of Loop variant at loop (file terminates_variant_option.i, line 61):
 Prove: false.
 
 ------------------------------------------------------------
 
-Goal Positivity of Loop variant at loop (file terminates_variant_option.i, line 61):
+Goal Decreasing of Loop variant at loop (file terminates_variant_option.i, line 61):
 Prove: false.
 
 ------------------------------------------------------------

@@ -13,13 +13,26 @@ Prove: true.
 
 ------------------------------------------------------------
 
+Goal Establishment of Invariant 'BASE' (file user_string.i, line 28):
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Preservation of Invariant 'BASE' (file user_string.i, line 28):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'BASE' (file user_string.i, line 28):
-Prove: true.
+Goal Establishment of Invariant 'RANGE' (file user_string.i, line 29):
+Assume {
+  (* Heap *)
+  Type: (region(s.base) <= 0) /\ linked(Malloc_0) /\ sconst(Mchar_0).
+  (* Pre-condition *)
+  Have: P_Length_of_str_is(Malloc_0, Mchar_0, s, i).
+  (* Pre-condition *)
+  Have: P_Length_of_str_is(Malloc_0, Mchar_0, s, i_1).
+}
+Prove: addr_le(s, s) /\ addr_le(s, shift_sint8(s, L_Length(Mchar_0, s))).
 
 ------------------------------------------------------------
 
@@ -52,16 +65,8 @@ Prove: addr_le(s, a_1) /\ addr_le(a_1, a).
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'RANGE' (file user_string.i, line 29):
-Assume {
-  (* Heap *)
-  Type: (region(s.base) <= 0) /\ linked(Malloc_0) /\ sconst(Mchar_0).
-  (* Pre-condition *)
-  Have: P_Length_of_str_is(Malloc_0, Mchar_0, s, i).
-  (* Pre-condition *)
-  Have: P_Length_of_str_is(Malloc_0, Mchar_0, s, i_1).
-}
-Prove: addr_le(s, s) /\ addr_le(s, shift_sint8(s, L_Length(Mchar_0, s))).
+Goal Establishment of Invariant 'ZERO' (file user_string.i, line 30):
+Prove: true.
 
 ------------------------------------------------------------
 
@@ -97,11 +102,6 @@ Assume {
   Have: addr_le(s, a) /\ addr_le(a, a_1).
 }
 Prove: Mchar_0[shift_sint8(s, i)] != 0.
-
-------------------------------------------------------------
-
-Goal Establishment of Invariant 'ZERO' (file user_string.i, line 30):
-Prove: true.
 
 ------------------------------------------------------------
 
@@ -150,11 +150,6 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file user_string.i, line 34):
-Prove: true.
-
-------------------------------------------------------------
-
 Goal Positivity of Loop variant at loop (file user_string.i, line 34):
 Let x = s.offset.
 Let x_1 = ss_0.offset.
@@ -189,5 +184,10 @@ Assume {
       (Mchar_0[shift_sint8(s, i_2)] != 0))).
 }
 Prove: x_1 <= (x + x_2).
+
+------------------------------------------------------------
+
+Goal Decreasing of Loop variant at loop (file user_string.i, line 34):
+Prove: true.
 
 ------------------------------------------------------------

@@ -39,6 +39,11 @@ Prove: true.
 
 ------------------------------------------------------------
 
+Goal Establishment of Invariant 'no_eva' (file FRAMAC_SHARE/libc/string.c, line 33):
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Preservation of Invariant 'no_eva' (file FRAMAC_SHARE/libc/string.c, line 33):
 Let a = shift_sint8(dest_0, 0).
 Let a_1 = memcpy(Mchar_0, a, Mchar_undef_0, a, n).
@@ -67,7 +72,7 @@ Prove: to_uint64(1 + i) <= n.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'no_eva' (file FRAMAC_SHARE/libc/string.c, line 33):
+Goal Establishment of Invariant 'no_eva' (file FRAMAC_SHARE/libc/string.c, line 34):
 Prove: true.
 
 ------------------------------------------------------------
@@ -103,11 +108,6 @@ Assume {
   Have: x <= n.
 }
 Prove: a_2[shift_sint8(src_0, i_1)] = a_2[shift_sint8(dest_0, i_1)].
-
-------------------------------------------------------------
-
-Goal Establishment of Invariant 'no_eva' (file FRAMAC_SHARE/libc/string.c, line 34):
-Prove: true.
 
 ------------------------------------------------------------
 
@@ -167,6 +167,11 @@ Prove: true.
 
 ------------------------------------------------------------
 
+Goal Positivity of Loop variant at loop (file FRAMAC_SHARE/libc/string.c, line 38):
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Decreasing of Loop variant at loop (file FRAMAC_SHARE/libc/string.c, line 38):
 Let x = to_uint64(1 + i).
 Let a = shift_sint8(dest_0, 0).
@@ -199,11 +204,6 @@ Assume {
       (a_2[shift_sint8(src_0, i_1)] = a_2[shift_sint8(dest_0, i_1)]))).
 }
 Prove: i < x.
-
-------------------------------------------------------------
-
-Goal Positivity of Loop variant at loop (file FRAMAC_SHARE/libc/string.c, line 38):
-Prove: true.
 
 ------------------------------------------------------------
 
@@ -297,6 +297,11 @@ Prove: true.
 
 ------------------------------------------------------------
 
+Goal Establishment of Invariant 'no_eva' (file FRAMAC_SHARE/libc/string.c, line 95):
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Preservation of Invariant 'no_eva' (file FRAMAC_SHARE/libc/string.c, line 95):
 Let a = shift_sint8(dest_0, 0).
 Let a_1 = memcpy(Mchar_0, a, Mchar_undef_0, a, n).
@@ -337,7 +342,7 @@ Prove: to_uint64(1 + i) <= n.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'no_eva' (file FRAMAC_SHARE/libc/string.c, line 95):
+Goal Establishment of Invariant 'no_eva' (file FRAMAC_SHARE/libc/string.c, line 96):
 Prove: true.
 
 ------------------------------------------------------------
@@ -388,7 +393,7 @@ Prove: a_1[shift_sint8(d, i) <- a_1[shift_sint8(s, i)]][shift_sint8(d, i_1)] =
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'no_eva' (file FRAMAC_SHARE/libc/string.c, line 96):
+Goal Establishment of Invariant 'no_eva' (file FRAMAC_SHARE/libc/string.c, line 97):
 Prove: true.
 
 ------------------------------------------------------------
@@ -443,8 +448,29 @@ Prove: a_2[a_4] = Mchar_0[a_4].
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'no_eva' (file FRAMAC_SHARE/libc/string.c, line 97):
-Prove: true.
+Goal Establishment of Invariant 'no_eva' (file FRAMAC_SHARE/libc/string.c, line 107):
+Let a = shift_sint8(d, 0).
+Let a_1 = shift_sint8(s, 0).
+Assume {
+  Type: is_sint32(memoverlap_0) /\ is_uint64(n).
+  (* Heap *)
+  Type: (region(d.base) <= 0) /\ (region(s.base) <= 0) /\ linked(Malloc_0).
+  (* Pre-condition 'valid_dest' *)
+  Have: P_valid_or_empty(Malloc_0, d, n).
+  (* Pre-condition 'valid_src' *)
+  Have: P_valid_read_or_empty(Malloc_0, s, n).
+  (* Else *)
+  Have: n != 0.
+  (* Call 'memoverlap' *)
+  Have: ((separated(a, n, a_1, n) -> (memoverlap_0 = 0))) /\
+      ((addr_le(d, s) -> (addr_lt(s, shift_sint8(d, n)) ->
+       ((!separated(a, n, a_1, n)) -> (memoverlap_0 = (-1)))))) /\
+      ((addr_lt(s, d) -> (addr_le(d, shift_sint8(s, n)) ->
+       ((!separated(a, n, a_1, n)) -> (memoverlap_0 = 1))))).
+  (* Else *)
+  Have: 0 < memoverlap_0.
+}
+Prove: to_uint64(n - 1) < n.
 
 ------------------------------------------------------------
 
@@ -492,29 +518,35 @@ Prove: to_uint64(i - 1) < n.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'no_eva' (file FRAMAC_SHARE/libc/string.c, line 107):
-Let a = shift_sint8(d, 0).
-Let a_1 = shift_sint8(s, 0).
+Goal Establishment of Invariant 'no_eva' (file FRAMAC_SHARE/libc/string.c, line 108):
+Let x = to_uint64(n - 1).
+Let a = shift_sint8(dest_0, 0).
+Let a_1 = shift_sint8(src_0, 0).
 Assume {
   Type: is_sint32(memoverlap_0) /\ is_uint64(n).
   (* Heap *)
-  Type: (region(d.base) <= 0) /\ (region(s.base) <= 0) /\ linked(Malloc_0).
+  Type: (region(dest_0.base) <= 0) /\ (region(src_0.base) <= 0) /\
+      linked(Malloc_0) /\ sconst(Mchar_0).
+  (* Goal *)
+  When: (i < n) /\ (x < i).
   (* Pre-condition 'valid_dest' *)
-  Have: P_valid_or_empty(Malloc_0, d, n).
+  Have: P_valid_or_empty(Malloc_0, dest_0, n).
   (* Pre-condition 'valid_src' *)
-  Have: P_valid_read_or_empty(Malloc_0, s, n).
+  Have: P_valid_read_or_empty(Malloc_0, src_0, n).
   (* Else *)
   Have: n != 0.
   (* Call 'memoverlap' *)
   Have: ((separated(a, n, a_1, n) -> (memoverlap_0 = 0))) /\
-      ((addr_le(d, s) -> (addr_lt(s, shift_sint8(d, n)) ->
+      ((addr_le(dest_0, src_0) -> (addr_lt(src_0, shift_sint8(dest_0, n)) ->
        ((!separated(a, n, a_1, n)) -> (memoverlap_0 = (-1)))))) /\
-      ((addr_lt(s, d) -> (addr_le(d, shift_sint8(s, n)) ->
+      ((addr_lt(src_0, dest_0) -> (addr_le(dest_0, shift_sint8(src_0, n)) ->
        ((!separated(a, n, a_1, n)) -> (memoverlap_0 = 1))))).
   (* Else *)
   Have: 0 < memoverlap_0.
+  (* Invariant 'no_eva' *)
+  Have: x < n.
 }
-Prove: to_uint64(n - 1) < n.
+Prove: Mchar_0[shift_sint8(src_0, i)] = Mchar_0[shift_sint8(dest_0, i)].
 
 ------------------------------------------------------------
 
@@ -568,35 +600,8 @@ Prove: a_1[shift_sint8(d, i) <- a_1[shift_sint8(s, i)]][shift_sint8(d, i_1)] =
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'no_eva' (file FRAMAC_SHARE/libc/string.c, line 108):
-Let x = to_uint64(n - 1).
-Let a = shift_sint8(dest_0, 0).
-Let a_1 = shift_sint8(src_0, 0).
-Assume {
-  Type: is_sint32(memoverlap_0) /\ is_uint64(n).
-  (* Heap *)
-  Type: (region(dest_0.base) <= 0) /\ (region(src_0.base) <= 0) /\
-      linked(Malloc_0) /\ sconst(Mchar_0).
-  (* Goal *)
-  When: (i < n) /\ (x < i).
-  (* Pre-condition 'valid_dest' *)
-  Have: P_valid_or_empty(Malloc_0, dest_0, n).
-  (* Pre-condition 'valid_src' *)
-  Have: P_valid_read_or_empty(Malloc_0, src_0, n).
-  (* Else *)
-  Have: n != 0.
-  (* Call 'memoverlap' *)
-  Have: ((separated(a, n, a_1, n) -> (memoverlap_0 = 0))) /\
-      ((addr_le(dest_0, src_0) -> (addr_lt(src_0, shift_sint8(dest_0, n)) ->
-       ((!separated(a, n, a_1, n)) -> (memoverlap_0 = (-1)))))) /\
-      ((addr_lt(src_0, dest_0) -> (addr_le(dest_0, shift_sint8(src_0, n)) ->
-       ((!separated(a, n, a_1, n)) -> (memoverlap_0 = 1))))).
-  (* Else *)
-  Have: 0 < memoverlap_0.
-  (* Invariant 'no_eva' *)
-  Have: x < n.
-}
-Prove: Mchar_0[shift_sint8(src_0, i)] = Mchar_0[shift_sint8(dest_0, i)].
+Goal Establishment of Invariant 'no_eva' (file FRAMAC_SHARE/libc/string.c, line 109):
+Prove: true.
 
 ------------------------------------------------------------
 
@@ -651,11 +656,6 @@ Assume {
       (a_2[shift_sint8(d, i_2)] = Mchar_0[shift_sint8(s, i_2)]))).
 }
 Prove: a_2[a_4] = Mchar_0[a_4].
-
-------------------------------------------------------------
-
-Goal Establishment of Invariant 'no_eva' (file FRAMAC_SHARE/libc/string.c, line 109):
-Prove: true.
 
 ------------------------------------------------------------
 
@@ -793,11 +793,6 @@ Prove: included(a_2, 1, a, n).
 
 ------------------------------------------------------------
 
-Goal Assigns (file FRAMAC_SHARE/libc/string.h, line 149) in 'memmove':
-Prove: true.
-
-------------------------------------------------------------
-
 Goal Assigns (file FRAMAC_SHARE/libc/string.h, line 149) in 'memmove' (1/7):
 Prove: true.
 
@@ -835,6 +830,16 @@ Prove: true.
 
 Goal Assigns (file FRAMAC_SHARE/libc/string.h, line 149) in 'memmove' (7/7):
 Effect at line 117
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Assigns (file FRAMAC_SHARE/libc/string.h, line 149) in 'memmove':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Positivity of Loop variant at loop (file FRAMAC_SHARE/libc/string.c, line 101):
 Prove: true.
 
 ------------------------------------------------------------
@@ -889,7 +894,7 @@ Prove: i < x.
 
 ------------------------------------------------------------
 
-Goal Positivity of Loop variant at loop (file FRAMAC_SHARE/libc/string.c, line 101):
+Goal Positivity of Loop variant at loop (file FRAMAC_SHARE/libc/string.c, line 113):
 Prove: true.
 
 ------------------------------------------------------------
@@ -945,10 +950,5 @@ Assume {
       ((i_1 <= x) -> (a_2[a_4] = Mchar_0[a_4]))).
 }
 Prove: x < i.
-
-------------------------------------------------------------
-
-Goal Positivity of Loop variant at loop (file FRAMAC_SHARE/libc/string.c, line 113):
-Prove: true.
 
 ------------------------------------------------------------

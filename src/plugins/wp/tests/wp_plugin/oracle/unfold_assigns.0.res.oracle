@@ -61,12 +61,6 @@ Prove: true.
 
 Goal Assigns (file unfold_assigns.i, line 95) in 'NESTED_ARRAY_STATIC':
 Call Effect at line 97
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Assigns (file unfold_assigns.i, line 95) in 'NESTED_ARRAY_STATIC':
-Call Effect at line 97
 Assume {
   (* Heap *)
   Type: (region(s.base) <= 0) /\ linked(Malloc_0).
@@ -74,6 +68,12 @@ Assume {
   When: !invalid(Malloc_0, s, 4).
 }
 Prove: false.
+
+------------------------------------------------------------
+
+Goal Assigns (file unfold_assigns.i, line 95) in 'NESTED_ARRAY_STATIC':
+Call Effect at line 97
+Prove: true.
 
 ------------------------------------------------------------
 ------------------------------------------------------------
@@ -92,12 +92,6 @@ Prove: true.
 
 Goal Assigns (file unfold_assigns.i, line 102) in 'NESTED_ARRAY_VARS':
 Call Effect at line 104
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Assigns (file unfold_assigns.i, line 102) in 'NESTED_ARRAY_VARS':
-Call Effect at line 104
 Assume {
   Type: is_uint32(n).
   (* Heap *)
@@ -108,6 +102,12 @@ Assume {
   Have: 3 <= n.
 }
 Prove: included(s, 4, shift_sint32(shiftfield_F2_With_array_t(s), 1), n).
+
+------------------------------------------------------------
+
+Goal Assigns (file unfold_assigns.i, line 102) in 'NESTED_ARRAY_VARS':
+Call Effect at line 104
+Prove: true.
 
 ------------------------------------------------------------
 ------------------------------------------------------------
@@ -126,12 +126,6 @@ Prove: true.
 
 Goal Assigns (file unfold_assigns.i, line 37) in 'NO_UNFOLD_KO':
 Call Effect at line 39
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Assigns (file unfold_assigns.i, line 37) in 'NO_UNFOLD_KO':
-Call Effect at line 39
 Assume {
   (* Heap *)
   Type: (region(s.base) <= 0) /\ linked(Malloc_0).
@@ -139,6 +133,12 @@ Assume {
   When: !invalid(Malloc_0, s, 2).
 }
 Prove: false.
+
+------------------------------------------------------------
+
+Goal Assigns (file unfold_assigns.i, line 37) in 'NO_UNFOLD_KO':
+Call Effect at line 39
+Prove: true.
 
 ------------------------------------------------------------
 ------------------------------------------------------------
@@ -232,12 +232,6 @@ Prove: true.
 
 Goal Assigns (file unfold_assigns.i, line 75) in 'PARTIAL_ASSIGNS_STATIC':
 Call Effect at line 77
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Assigns (file unfold_assigns.i, line 75) in 'PARTIAL_ASSIGNS_STATIC':
-Call Effect at line 77
 Assume {
   (* Heap *)
   Type: (region(p.base) <= 0) /\ linked(Malloc_0).
@@ -245,6 +239,12 @@ Assume {
   When: !invalid(Malloc_0, shift_sint32(p, 0), 5).
 }
 Prove: false.
+
+------------------------------------------------------------
+
+Goal Assigns (file unfold_assigns.i, line 75) in 'PARTIAL_ASSIGNS_STATIC':
+Call Effect at line 77
+Prove: true.
 
 ------------------------------------------------------------
 ------------------------------------------------------------
@@ -257,12 +257,6 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Exit-condition (generated) in 'PARTIAL_ASSIGNS_VARS':
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Assigns (file unfold_assigns.i, line 81) in 'PARTIAL_ASSIGNS_VARS':
-Call Effect at line 83
 Prove: true.
 
 ------------------------------------------------------------
@@ -285,6 +279,12 @@ Prove: (n <= 0) \/ included(a, x, shift_sint32(p, 1), n - 1) \/
     included(a, x, shift_sint32(p, n), 1).
 
 ------------------------------------------------------------
+
+Goal Assigns (file unfold_assigns.i, line 81) in 'PARTIAL_ASSIGNS_VARS':
+Call Effect at line 83
+Prove: true.
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function RANGE_NESTED_ARRAY_STATIC
 ------------------------------------------------------------
@@ -301,12 +301,6 @@ Prove: true.
 
 Goal Assigns (file unfold_assigns.i, line 111) in 'RANGE_NESTED_ARRAY_STATIC':
 Call Effect at line 116
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Assigns (file unfold_assigns.i, line 111) in 'RANGE_NESTED_ARRAY_STATIC':
-Call Effect at line 116
 Assume {
   (* Heap *)
   Type: (region(s.base) <= 0) /\ linked(Malloc_0).
@@ -314,6 +308,12 @@ Assume {
   When: !invalid(Malloc_0, shift_S2_With_array(s, 0), 12).
 }
 Prove: false.
+
+------------------------------------------------------------
+
+Goal Assigns (file unfold_assigns.i, line 111) in 'RANGE_NESTED_ARRAY_STATIC':
+Call Effect at line 116
+Prove: true.
 
 ------------------------------------------------------------
 ------------------------------------------------------------
@@ -326,12 +326,6 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Exit-condition (generated) in 'RANGE_NESTED_ARRAY_VARS':
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Assigns (file unfold_assigns.i, line 121) in 'RANGE_NESTED_ARRAY_VARS':
-Call Effect at line 126
 Prove: true.
 
 ------------------------------------------------------------
@@ -357,6 +351,12 @@ Prove: (n < 0) \/ included(a, x_1, shift_S2_With_array(s, 2), x - 4) \/
     included(a, x_1, shift_sint32(a_2, 0), 1) \/
     included(a, x_1, shift_sint32(a_2, 1), m) \/
     included(a, x_1, shift_sint32(shiftfield_F2_With_array_t(a_1), 0), 1 + m).
+
+------------------------------------------------------------
+
+Goal Assigns (file unfold_assigns.i, line 121) in 'RANGE_NESTED_ARRAY_VARS':
+Call Effect at line 126
+Prove: true.
 
 ------------------------------------------------------------
 ------------------------------------------------------------
@@ -389,12 +389,6 @@ Prove: true.
 
 Goal Assigns (file unfold_assigns.i, line 53) in 'USE_ASSIGN_UNFOLD_KO':
 Call Effect at line 57
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Assigns (file unfold_assigns.i, line 53) in 'USE_ASSIGN_UNFOLD_KO':
-Call Effect at line 57
 Assume {
   (* Heap *)
   Type: (region(p.base) <= 0) /\ linked(Malloc_0).
@@ -402,6 +396,12 @@ Assume {
   When: !invalid(Malloc_0, p, 2).
 }
 Prove: false.
+
+------------------------------------------------------------
+
+Goal Assigns (file unfold_assigns.i, line 53) in 'USE_ASSIGN_UNFOLD_KO':
+Call Effect at line 57
+Prove: true.
 
 ------------------------------------------------------------
 ------------------------------------------------------------

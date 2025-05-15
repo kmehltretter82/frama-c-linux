@@ -16,12 +16,12 @@
 [wp] [Valid] typed_binary_search_ensures_Found (Qed)
 [wp] [Valid] typed_binary_search_ensures_NotFound (Alt-Ergo) (Cached)
 [wp] [Valid] typed_binary_search_assert_rte_signed_overflow (Qed)
-[wp] [Valid] typed_binary_search_loop_invariant_Left_preserved (Alt-Ergo) (Cached)
 [wp] [Valid] typed_binary_search_loop_invariant_Left_established (Qed)
-[wp] [Valid] typed_binary_search_loop_invariant_Range_preserved (Alt-Ergo) (Cached)
+[wp] [Valid] typed_binary_search_loop_invariant_Left_preserved (Alt-Ergo) (Cached)
 [wp] [Valid] typed_binary_search_loop_invariant_Range_established (Qed)
-[wp] [Valid] typed_binary_search_loop_invariant_Right_preserved (Alt-Ergo) (Cached)
+[wp] [Valid] typed_binary_search_loop_invariant_Range_preserved (Alt-Ergo) (Cached)
 [wp] [Valid] typed_binary_search_loop_invariant_Right_established (Qed)
+[wp] [Valid] typed_binary_search_loop_invariant_Right_preserved (Alt-Ergo) (Cached)
 [wp] [Valid] typed_binary_search_assert_rte_signed_overflow_2 (Alt-Ergo) (Cached)
 [wp] [Valid] typed_binary_search_assert_rte_signed_overflow_3 (Alt-Ergo) (Cached)
 [wp] [Valid] typed_binary_search_assert_rte_signed_overflow_4 (Alt-Ergo) (Cached)
@@ -31,8 +31,8 @@
 [wp] [Valid] typed_binary_search_assert_rte_signed_overflow_6 (Alt-Ergo) (Cached)
 [wp] [Valid] typed_binary_search_assert_rte_signed_overflow_7 (Alt-Ergo) (Cached)
 [wp] [Valid] typed_binary_search_loop_assigns (Qed)
-[wp] [Valid] typed_binary_search_loop_variant_decrease (Alt-Ergo) (Cached)
 [wp] [Valid] typed_binary_search_loop_variant_positive (Qed)
+[wp] [Valid] typed_binary_search_loop_variant_decrease (Alt-Ergo) (Cached)
 [wp] Proved goals:   30 / 30
   Terminating:     1
   Unreachable:     1

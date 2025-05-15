@@ -62,6 +62,20 @@ Prove: P_Q(Malloc_0, a_2, t, a, b).
 
 ------------------------------------------------------------
 
+Goal Establishment of Invariant 'Index' (file axioms.i, line 30):
+Assume {
+  Type: is_sint32(a) /\ is_sint32(b).
+  (* Heap *)
+  Type: (region(t.base) <= 0) /\ linked(Malloc_0).
+  (* Pre-condition *)
+  Have: valid_rw(Malloc_0, shift_sint32(t, a), 1 + b - a).
+  (* Pre-condition *)
+  Have: a <= b.
+}
+Prove: a <= (1 + b).
+
+------------------------------------------------------------
+
 Goal Preservation of Invariant 'Index' (file axioms.i, line 30):
 Let a_1 = shift_sint32(t, a).
 Let x = -a.
@@ -91,17 +105,8 @@ Prove: a <= x_2.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'Index' (file axioms.i, line 30):
-Assume {
-  Type: is_sint32(a) /\ is_sint32(b).
-  (* Heap *)
-  Type: (region(t.base) <= 0) /\ linked(Malloc_0).
-  (* Pre-condition *)
-  Have: valid_rw(Malloc_0, shift_sint32(t, a), 1 + b - a).
-  (* Pre-condition *)
-  Have: a <= b.
-}
-Prove: a <= (1 + b).
+Goal Establishment of Invariant 'Positive' (file axioms.i, line 31):
+Prove: true.
 
 ------------------------------------------------------------
 
@@ -134,11 +139,6 @@ Assume {
   Have: a <= x.
 }
 Prove: 0 < a_2[shift_sint32(t, i) <- 1][shift_sint32(t, i_1)].
-
-------------------------------------------------------------
-
-Goal Establishment of Invariant 'Positive' (file axioms.i, line 31):
-Prove: true.
 
 ------------------------------------------------------------
 
@@ -212,12 +212,12 @@ Prove: i <= x.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file axioms.i, line 35):
+Goal Positivity of Loop variant at loop (file axioms.i, line 35):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Positivity of Loop variant at loop (file axioms.i, line 35):
+Goal Decreasing of Loop variant at loop (file axioms.i, line 35):
 Prove: true.
 
 ------------------------------------------------------------

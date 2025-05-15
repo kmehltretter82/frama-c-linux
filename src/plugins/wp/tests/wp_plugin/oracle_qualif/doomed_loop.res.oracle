@@ -11,10 +11,10 @@
 [wp] [Failed] (Doomed) typed_foo_wp_smoke_dead_code_s9 (Qed)
 [wp] doomed_loop.i:25: Warning: Failed smoke-test
 [wp] [Valid] typed_foo_terminates (Qed)
-[wp] [Valid] typed_foo_loop_invariant_A_preserved (Qed)
 [wp] [Unsuccess] typed_foo_loop_invariant_A_established (Alt-Ergo) (Cached)
-[wp] [Valid] typed_foo_loop_invariant_B_preserved (Qed)
+[wp] [Valid] typed_foo_loop_invariant_A_preserved (Qed)
 [wp] [Unsuccess] typed_foo_loop_invariant_B_established (Alt-Ergo) (Cached)
+[wp] [Valid] typed_foo_loop_invariant_B_preserved (Qed)
 [wp] [Valid] typed_foo_loop_assigns (Qed)
 [wp] Proved goals:    5 / 10
   Unreachable:     1

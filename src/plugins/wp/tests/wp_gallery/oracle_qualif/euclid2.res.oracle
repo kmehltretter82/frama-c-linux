@@ -6,14 +6,14 @@
 [wp] Warning: Missing RTE guards
 [wp] 9 goals scheduled
 [wp] [Valid] typed_euclid_gcd_ensures (Alt-Ergo) (Cached)
-[wp] [Valid] typed_euclid_gcd_loop_invariant_preserved (Alt-Ergo) (Cached)
 [wp] [Valid] typed_euclid_gcd_loop_invariant_established (Qed)
+[wp] [Valid] typed_euclid_gcd_loop_invariant_preserved (Alt-Ergo) (Cached)
 [wp] [Valid] typed_euclid_gcd_loop_assigns (Qed)
 [wp] [Valid] typed_euclid_gcd_assigns_part1 (Qed)
 [wp] [Valid] typed_euclid_gcd_assigns_part2 (Qed)
 [wp] [Valid] typed_euclid_gcd_assigns_part3 (Qed)
-[wp] [Valid] typed_euclid_gcd_loop_variant_decrease (Alt-Ergo) (Cached)
 [wp] [Valid] typed_euclid_gcd_loop_variant_positive (Qed)
+[wp] [Valid] typed_euclid_gcd_loop_variant_decrease (Alt-Ergo) (Cached)
 [wp] Proved goals:   11 / 11
   Terminating:     1
   Unreachable:     1

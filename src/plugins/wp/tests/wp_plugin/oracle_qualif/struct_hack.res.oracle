@@ -9,16 +9,16 @@
 [wp] struct_hack.i:53: Warning: 
   Missing assigns clause (assigns 'everything' instead)
 [wp] 10 goals scheduled
-[wp] [Valid] typed_f0_loop_invariant_qed_ok_preserved (Alt-Ergo) (Cached)
 [wp] [Valid] typed_f0_loop_invariant_qed_ok_established (Qed)
+[wp] [Valid] typed_f0_loop_invariant_qed_ok_preserved (Alt-Ergo) (Cached)
 [wp] [Valid] typed_f0_assert_qed_ok (Alt-Ergo) (Cached)
-[wp] [Valid] typed_f0_loop_variant_decrease (Qed)
 [wp] [Valid] typed_f0_loop_variant_positive (Qed)
-[wp] [Valid] typed_f1_loop_invariant_qed_ok_preserved (Alt-Ergo) (Cached)
+[wp] [Valid] typed_f0_loop_variant_decrease (Qed)
 [wp] [Valid] typed_f1_loop_invariant_qed_ok_established (Qed)
+[wp] [Valid] typed_f1_loop_invariant_qed_ok_preserved (Alt-Ergo) (Cached)
 [wp] [Valid] typed_f1_assert_qed_ok (Alt-Ergo) (Cached)
-[wp] [Valid] typed_f1_loop_variant_decrease (Qed)
 [wp] [Valid] typed_f1_loop_variant_positive (Qed)
+[wp] [Valid] typed_f1_loop_variant_decrease (Qed)
 [wp] Proved goals:   10 / 10
   Qed:             6
   Alt-Ergo:        4

@@ -49,13 +49,25 @@ Prove: L_fact(n) = F1_0.
 
 ------------------------------------------------------------
 
+Goal Establishment of Invariant (file user_rec.i, line 15):
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Preservation of Invariant (file user_rec.i, line 15):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file user_rec.i, line 15):
-Prove: true.
+Goal Establishment of Invariant (file user_rec.i, line 16):
+Assume {
+  Type: is_sint32(n).
+  (* Else *)
+  Have: 2 <= n.
+  (* Invariant *)
+  Have: 0 < n.
+}
+Prove: L_fact(1) = 1.
 
 ------------------------------------------------------------
 
@@ -82,29 +94,17 @@ Prove: x_1 = L_fact(i).
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file user_rec.i, line 16):
-Assume {
-  Type: is_sint32(n).
-  (* Else *)
-  Have: 2 <= n.
-  (* Invariant *)
-  Have: 0 < n.
-}
-Prove: L_fact(1) = 1.
-
-------------------------------------------------------------
-
 Goal Loop assigns (file user_rec.i, line 17):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file user_rec.i, line 20):
+Goal Positivity of Loop variant at loop (file user_rec.i, line 20):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Positivity of Loop variant at loop (file user_rec.i, line 20):
+Goal Decreasing of Loop variant at loop (file user_rec.i, line 20):
 Prove: true.
 
 ------------------------------------------------------------
@@ -130,6 +130,16 @@ Prove: L_fact(n) = F2_0.
 
 ------------------------------------------------------------
 
+Goal Establishment of Invariant 'PART' (file user_rec.i, line 30):
+Assume {
+  Type: is_sint32(n).
+  (* Invariant 'RANGE' *)
+  Have: (0 < n) \/ (n <= 1).
+}
+Prove: (L_fact(1) = 1) \/ (n <= 1).
+
+------------------------------------------------------------
+
 Goal Preservation of Invariant 'PART' (file user_rec.i, line 30):
 Let x = i * p.
 Assume {
@@ -152,13 +162,8 @@ Prove: if (n <= 1) then (x = 1) else (x = L_fact(i)).
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'PART' (file user_rec.i, line 30):
-Assume {
-  Type: is_sint32(n).
-  (* Invariant 'RANGE' *)
-  Have: (0 < n) \/ (n <= 1).
-}
-Prove: (L_fact(1) = 1) \/ (n <= 1).
+Goal Establishment of Invariant 'RANGE' (file user_rec.i, line 29):
+Prove: true.
 
 ------------------------------------------------------------
 
@@ -180,22 +185,17 @@ Prove: if (n <= 1) then (i = 1) else (0 < i).
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'RANGE' (file user_rec.i, line 29):
-Prove: true.
-
-------------------------------------------------------------
-
 Goal Loop assigns (file user_rec.i, line 31):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file user_rec.i, line 34):
+Goal Positivity of Loop variant at loop (file user_rec.i, line 34):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Positivity of Loop variant at loop (file user_rec.i, line 34):
+Goal Decreasing of Loop variant at loop (file user_rec.i, line 34):
 Prove: true.
 
 ------------------------------------------------------------
@@ -219,6 +219,17 @@ Assume {
   Have: n_1 <= 1.
 }
 Prove: x = F4_0.
+
+------------------------------------------------------------
+
+Goal Establishment of Invariant 'NEVER' (file user_rec.i, line 44):
+Let x = L_fact(n).
+Assume {
+  Type: is_sint32(n).
+  (* Invariant 'RANGE' *)
+  Have: (0 < n) \/ (n <= 1).
+}
+Prove: ((x / x) = 1) \/ (n <= 1).
 
 ------------------------------------------------------------
 
@@ -247,14 +258,8 @@ Prove: if (n <= 1) then (x_3 = 1) else ((x_1 / L_fact(x_2)) = x_3).
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'NEVER' (file user_rec.i, line 44):
-Let x = L_fact(n).
-Assume {
-  Type: is_sint32(n).
-  (* Invariant 'RANGE' *)
-  Have: (0 < n) \/ (n <= 1).
-}
-Prove: ((x / x) = 1) \/ (n <= 1).
+Goal Establishment of Invariant 'RANGE' (file user_rec.i, line 43):
+Prove: true.
 
 ------------------------------------------------------------
 
@@ -278,22 +283,17 @@ Prove: if (n <= 1) then (x_1 = n_1) else (n_1 <= x_1).
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'RANGE' (file user_rec.i, line 43):
-Prove: true.
-
-------------------------------------------------------------
-
 Goal Loop assigns (file user_rec.i, line 45):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file user_rec.i, line 48):
+Goal Positivity of Loop variant at loop (file user_rec.i, line 48):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Positivity of Loop variant at loop (file user_rec.i, line 48):
+Goal Decreasing of Loop variant at loop (file user_rec.i, line 48):
 Prove: true.
 
 ------------------------------------------------------------

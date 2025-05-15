@@ -9,8 +9,8 @@
 [wp] [Valid] bytes_caller_terminates (Qed)
 [wp] [Valid] bytes_caller_ensures (Alt-Ergo) (Cached)
 [wp] [Valid] bytes_caller_exits (Qed)
-[wp] [Valid] bytes_caller_assigns_exit (Qed)
 [wp] [Valid] bytes_caller_assigns_normal (Qed)
+[wp] [Valid] bytes_caller_assigns_exit (Qed)
 [wp] Proved goals:    5 / 5
   Qed:             4
   Alt-Ergo:        1

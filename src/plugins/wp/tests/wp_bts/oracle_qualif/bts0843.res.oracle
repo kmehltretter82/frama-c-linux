@@ -8,8 +8,8 @@
 [wp] [Valid] typed_f3_assigns (Qed)
 [wp] [Valid] typed_g3_terminates (Qed)
 [wp] [Valid] typed_g3_exits (Qed)
-[wp] [Valid] typed_g3_assigns_exit (Qed)
 [wp] [Valid] typed_g3_assigns_normal (Alt-Ergo) (Cached)
+[wp] [Valid] typed_g3_assigns_exit (Qed)
 [wp] [Valid] typed_g3_call_f3_requires (Qed)
 [wp] Proved goals:    8 / 8
   Terminating:     1

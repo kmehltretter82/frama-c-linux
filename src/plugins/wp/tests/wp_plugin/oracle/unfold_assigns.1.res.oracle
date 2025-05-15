@@ -80,12 +80,6 @@ Prove: true.
 
 Goal Assigns (file unfold_assigns.i, line 102) in 'NESTED_ARRAY_VARS':
 Call Effect at line 104
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Assigns (file unfold_assigns.i, line 102) in 'NESTED_ARRAY_VARS':
-Call Effect at line 104
 Let a = shiftfield_F2_With_array_t(s).
 Let a_1 = shift_sint32(a, 1).
 Assume {
@@ -101,6 +95,12 @@ Assume {
 }
 Prove: (i = (-1)) \/ included(s, 4, a_1, n) \/ included(a, 3, a_1, n) \/
     included(shift_sint32(a, i), 1, a_1, n).
+
+------------------------------------------------------------
+
+Goal Assigns (file unfold_assigns.i, line 102) in 'NESTED_ARRAY_VARS':
+Call Effect at line 104
+Prove: true.
 
 ------------------------------------------------------------
 ------------------------------------------------------------
@@ -219,12 +219,6 @@ Prove: true.
 
 Goal Assigns (file unfold_assigns.i, line 75) in 'PARTIAL_ASSIGNS_STATIC':
 Call Effect at line 77
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Assigns (file unfold_assigns.i, line 75) in 'PARTIAL_ASSIGNS_STATIC':
-Call Effect at line 77
 Assume {
   (* Heap *)
   Type: (region(p.base) <= 0) /\ linked(Malloc_0).
@@ -232,6 +226,12 @@ Assume {
   When: (0 <= i) /\ (i <= 4) /\ (!invalid(Malloc_0, shift_sint32(p, 0), 5)).
 }
 Prove: (i = 0) \/ (i = 4) \/ ((0 < i) /\ (i <= 3)).
+
+------------------------------------------------------------
+
+Goal Assigns (file unfold_assigns.i, line 75) in 'PARTIAL_ASSIGNS_STATIC':
+Call Effect at line 77
+Prove: true.
 
 ------------------------------------------------------------
 ------------------------------------------------------------
@@ -244,12 +244,6 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Exit-condition (generated) in 'PARTIAL_ASSIGNS_VARS':
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Assigns (file unfold_assigns.i, line 81) in 'PARTIAL_ASSIGNS_VARS':
-Call Effect at line 83
 Prove: true.
 
 ------------------------------------------------------------
@@ -275,6 +269,12 @@ Prove: (i = 0) \/ (n = i) \/ (n <= 0) \/ included(a, x, a_1, x_1) \/
     included(shift_sint32(p, i), 1, a_1, x_1).
 
 ------------------------------------------------------------
+
+Goal Assigns (file unfold_assigns.i, line 81) in 'PARTIAL_ASSIGNS_VARS':
+Call Effect at line 83
+Prove: true.
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function RANGE_NESTED_ARRAY_STATIC
 ------------------------------------------------------------
@@ -285,12 +285,6 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Exit-condition (generated) in 'RANGE_NESTED_ARRAY_STATIC':
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Assigns (file unfold_assigns.i, line 111) in 'RANGE_NESTED_ARRAY_STATIC':
-Call Effect at line 116
 Prove: true.
 
 ------------------------------------------------------------
@@ -314,6 +308,12 @@ Prove: (i = 2) \/
         ((7 <= x_1) /\ (x_1 <= 10)))))))).
 
 ------------------------------------------------------------
+
+Goal Assigns (file unfold_assigns.i, line 111) in 'RANGE_NESTED_ARRAY_STATIC':
+Call Effect at line 116
+Prove: true.
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function RANGE_NESTED_ARRAY_VARS
 ------------------------------------------------------------
@@ -324,12 +324,6 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Exit-condition (generated) in 'RANGE_NESTED_ARRAY_VARS':
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Assigns (file unfold_assigns.i, line 121) in 'RANGE_NESTED_ARRAY_VARS':
-Call Effect at line 126
 Prove: true.
 
 ------------------------------------------------------------
@@ -373,6 +367,12 @@ Prove: (n < 0) \/ included(a, x_1, a_1, x_2) \/ included(a_2, 4, a_1, x_2) \/
        ((x_5 = (-1)) \/ (x_5 = 0) \/ (x_5 = 3) \/
         included(a_9, 1, a_1, x_2) \/ included(a_9, 1, a_5, m) \/
         included(a_9, 1, a_6, x_3))))))).
+
+------------------------------------------------------------
+
+Goal Assigns (file unfold_assigns.i, line 121) in 'RANGE_NESTED_ARRAY_VARS':
+Call Effect at line 126
+Prove: true.
 
 ------------------------------------------------------------
 ------------------------------------------------------------

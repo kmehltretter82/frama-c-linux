@@ -36,12 +36,17 @@ Prove: Mint_0[shift_sint32(b, i)] = v[i].
 
 ------------------------------------------------------------
 
+Goal Establishment of Invariant (file assigns_path.i, line 16):
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Preservation of Invariant (file assigns_path.i, line 16):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file assigns_path.i, line 16):
+Goal Establishment of Invariant (file assigns_path.i, line 17):
 Prove: true.
 
 ------------------------------------------------------------
@@ -71,11 +76,6 @@ Prove: v[i <- Mint_0[shift_sint32(b, i)]][i_1] = Mint_0[shift_sint32(b, i_1)].
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file assigns_path.i, line 17):
-Prove: true.
-
-------------------------------------------------------------
-
 Goal Loop assigns (file assigns_path.i, line 18):
 Prove: true.
 
@@ -92,12 +92,12 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file assigns_path.i, line 21):
+Goal Positivity of Loop variant at loop (file assigns_path.i, line 21):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Positivity of Loop variant at loop (file assigns_path.i, line 21):
+Goal Decreasing of Loop variant at loop (file assigns_path.i, line 21):
 Prove: true.
 
 ------------------------------------------------------------

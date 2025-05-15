@@ -8,8 +8,8 @@
 [wp] 4 goals scheduled
 [wp] [Valid] typed_mess1_terminates (Qed)
 [wp] [Valid] typed_mess1_exits (Qed)
-[wp] [Valid] typed_mess1_assigns_exit (Qed)
 [wp] [Valid] typed_mess1_assigns_normal (Qed)
+[wp] [Valid] typed_mess1_assigns_exit (Qed)
 [wp] Proved goals:    4 / 4
   Qed:             4
 ------------------------------------------------------------

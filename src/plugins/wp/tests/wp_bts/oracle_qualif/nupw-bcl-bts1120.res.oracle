@@ -9,12 +9,12 @@
 [wp] [Valid] typed_g_terminates (Qed)
 [wp] [Valid] typed_g_exits_ok (Qed)
 [wp] [Valid] typed_g_loop_assigns (Qed)
-[wp] [Valid] typed_g_assigns_exit (Qed)
 [wp] [Valid] typed_g_assigns_normal_part1 (Qed)
 [wp] [Valid] typed_g_assigns_normal_part2 (Qed)
 [wp] [Valid] typed_g_assigns_normal_part3 (Qed)
-[wp] [Valid] typed_g_loop_variant_decrease (Qed)
+[wp] [Valid] typed_g_assigns_exit (Qed)
 [wp] [Valid] typed_g_loop_variant_positive (Qed)
+[wp] [Valid] typed_g_loop_variant_decrease (Qed)
 [wp] Proved goals:    9 / 9
   Qed:             9
 ------------------------------------------------------------

@@ -11,12 +11,12 @@
   Function acquire
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'RANGE' (file issue_751.i, line 7):
+Goal Establishment of Invariant 'RANGE' (file issue_751.i, line 7):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'RANGE' (file issue_751.i, line 7):
+Goal Preservation of Invariant 'RANGE' (file issue_751.i, line 7):
 Prove: true.
 
 ------------------------------------------------------------
@@ -48,12 +48,12 @@ Prove: j <= 8.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file issue_751.i, line 11):
+Goal Positivity of Loop variant at loop (file issue_751.i, line 11):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Positivity of Loop variant at loop (file issue_751.i, line 11):
+Goal Decreasing of Loop variant at loop (file issue_751.i, line 11):
 Prove: true.
 
 ------------------------------------------------------------

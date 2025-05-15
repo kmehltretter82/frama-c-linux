@@ -57,12 +57,12 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file funvar_inv.i, line 32):
+Goal Positivity of Loop variant at loop (file funvar_inv.i, line 32):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Positivity of Loop variant at loop (file funvar_inv.i, line 32):
+Goal Decreasing of Loop variant at loop (file funvar_inv.i, line 32):
 Prove: true.
 
 ------------------------------------------------------------
@@ -109,6 +109,11 @@ Prove: true.
 
 ------------------------------------------------------------
 
+Goal Positivity of Loop variant at loop (file funvar_inv.i, line 48):
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Decreasing of Loop variant at loop (file funvar_inv.i, line 48):
 Let x = G[i].
 Let x_1 = (-4) * i.
@@ -123,11 +128,6 @@ Assume {
   Have: x != 0.
 }
 Prove: ((12 - (4 * i)) / 4) < ((16 - (4 * i)) / 4).
-
-------------------------------------------------------------
-
-Goal Positivity of Loop variant at loop (file funvar_inv.i, line 48):
-Prove: true.
 
 ------------------------------------------------------------
 ------------------------------------------------------------
@@ -173,6 +173,11 @@ Prove: true.
 
 ------------------------------------------------------------
 
+Goal Positivity of Loop variant at loop (file funvar_inv.i, line 65):
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Decreasing of Loop variant at loop (file funvar_inv.i, line 65):
 Let x = G[i].
 Let x_1 = (-16) * i.
@@ -187,11 +192,6 @@ Assume {
   Have: x != 0.
 }
 Prove: ((48 - (16 * i)) / 16) < ((64 - (16 * i)) / 16).
-
-------------------------------------------------------------
-
-Goal Positivity of Loop variant at loop (file funvar_inv.i, line 65):
-Prove: true.
 
 ------------------------------------------------------------
 [wp] funvar_inv.i:26: Warning: 

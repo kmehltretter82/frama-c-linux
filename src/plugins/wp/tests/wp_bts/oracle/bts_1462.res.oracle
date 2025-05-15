@@ -14,12 +14,12 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant (file bts_1462.i, line 27):
+Goal Establishment of Invariant (file bts_1462.i, line 27):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file bts_1462.i, line 27):
+Goal Preservation of Invariant (file bts_1462.i, line 27):
 Prove: true.
 
 ------------------------------------------------------------
@@ -41,6 +41,11 @@ Prove: true.
 Goal Assertion 'for_value' (file bts_1462.i, line 5):
 Assume { Type: is_sint32(c). }
 Prove: (c = 1) \/ (c <= 0) \/ (2 <= c).
+
+------------------------------------------------------------
+
+Goal Establishment of Invariant 'A_KO' (file bts_1462.i, line 9):
+Prove: true.
 
 ------------------------------------------------------------
 
@@ -67,7 +72,7 @@ Prove: y = 0.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'A_KO' (file bts_1462.i, line 9):
+Goal Establishment of Invariant 'B' (file bts_1462.i, line 10):
 Prove: true.
 
 ------------------------------------------------------------
@@ -77,17 +82,12 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'B' (file bts_1462.i, line 10):
+Goal Establishment of Invariant 'C' (file bts_1462.i, line 11):
 Prove: true.
 
 ------------------------------------------------------------
 
 Goal Preservation of Invariant 'C' (file bts_1462.i, line 11):
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Establishment of Invariant 'C' (file bts_1462.i, line 11):
 Prove: true.
 
 ------------------------------------------------------------
@@ -109,12 +109,12 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file bts_1462.i, line 15):
+Goal Positivity of Loop variant at loop (file bts_1462.i, line 15):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Positivity of Loop variant at loop (file bts_1462.i, line 15):
+Goal Decreasing of Loop variant at loop (file bts_1462.i, line 15):
 Prove: true.
 
 ------------------------------------------------------------

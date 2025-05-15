@@ -7,14 +7,14 @@
 [wp] 10 goals scheduled
 [wp] [Valid] typed_exo1_ensures (Alt-Ergo) (Cached)
 [wp] [Valid] typed_exo1_ensures_2 (Alt-Ergo) (Cached)
-[wp] [Valid] typed_exo1_loop_invariant_preserved (Alt-Ergo) (Cached)
 [wp] [Valid] typed_exo1_loop_invariant_established (Qed)
-[wp] [Valid] typed_exo1_loop_invariant_2_preserved (Alt-Ergo) (Cached)
+[wp] [Valid] typed_exo1_loop_invariant_preserved (Alt-Ergo) (Cached)
 [wp] [Valid] typed_exo1_loop_invariant_2_established (Qed)
+[wp] [Valid] typed_exo1_loop_invariant_2_preserved (Alt-Ergo) (Cached)
 [wp] [Valid] typed_exo1_loop_assigns (Qed)
 [wp] [Valid] typed_exo1_assigns (Qed)
-[wp] [Valid] typed_exo1_loop_variant_decrease (Qed)
 [wp] [Valid] typed_exo1_loop_variant_positive (Qed)
+[wp] [Valid] typed_exo1_loop_variant_decrease (Qed)
 [wp] Proved goals:   12 / 12
   Terminating:     1
   Unreachable:     1

@@ -76,6 +76,11 @@ Prove: true.
 
 ------------------------------------------------------------
 
+Goal Establishment of Invariant 'A' (file doomed_axioms.i, line 24):
+Prove: P_P(0).
+
+------------------------------------------------------------
+
 Goal Preservation of Invariant 'A' (file doomed_axioms.i, line 24):
 Let x_1 = 1 + n.
 Assume {
@@ -99,8 +104,9 @@ Prove: P_P(x_1).
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'A' (file doomed_axioms.i, line 24):
-Prove: P_P(0).
+Goal Establishment of Invariant 'B' (file doomed_axioms.i, line 25):
+Assume { (* Invariant 'A' *) Have: P_P(0). }
+Prove: P_Q(0).
 
 ------------------------------------------------------------
 
@@ -129,9 +135,10 @@ Prove: P_Q(x_1).
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'B' (file doomed_axioms.i, line 25):
-Assume { (* Invariant 'A' *) Have: P_P(0). }
-Prove: P_Q(0).
+Goal Establishment of Invariant 'C' (file doomed_axioms.i, line 26):
+Assume { (* Invariant 'A' *) Have: P_P(0). (* Invariant 'B' *) Have: P_Q(0).
+}
+Prove: P_R(0).
 
 ------------------------------------------------------------
 
@@ -159,13 +166,6 @@ Assume {
   Have: P_Q(x_1).
 }
 Prove: P_R(x_1).
-
-------------------------------------------------------------
-
-Goal Establishment of Invariant 'C' (file doomed_axioms.i, line 26):
-Assume { (* Invariant 'A' *) Have: P_P(0). (* Invariant 'B' *) Have: P_Q(0).
-}
-Prove: P_R(0).
 
 ------------------------------------------------------------
 

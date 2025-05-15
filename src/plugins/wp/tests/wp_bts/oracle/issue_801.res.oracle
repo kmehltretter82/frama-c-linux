@@ -13,14 +13,14 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'A' (file issue_801.i, line 11):
-Assume { Type: is_sint32(s). (* Then *) Have: s <= 9. }
-Prove: false.
+Goal Establishment of Invariant 'A' (file issue_801.i, line 11):
+Prove: true.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'A' (file issue_801.i, line 11):
-Prove: true.
+Goal Preservation of Invariant 'A' (file issue_801.i, line 11):
+Assume { Type: is_sint32(s). (* Then *) Have: s <= 9. }
+Prove: false.
 
 ------------------------------------------------------------
 
@@ -29,12 +29,12 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file issue_801.i, line 14):
+Goal Positivity of Loop variant at loop (file issue_801.i, line 14):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Positivity of Loop variant at loop (file issue_801.i, line 14):
+Goal Decreasing of Loop variant at loop (file issue_801.i, line 14):
 Prove: true.
 
 ------------------------------------------------------------

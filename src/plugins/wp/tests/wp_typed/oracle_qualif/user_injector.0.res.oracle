@@ -16,9 +16,6 @@
 [wp] [Valid] typed_job_ensures_E1 (Qed)
 [wp] [Valid] typed_job_ensures_E2 (Qed)
 [wp] [Valid] typed_job_exits (Qed)
-[wp] [Valid] typed_job_assigns_exit_part1 (Qed)
-[wp] [Valid] typed_job_assigns_exit_part2 (Qed)
-[wp] [Valid] typed_job_assigns_exit_part3 (Qed)
 [wp] [Valid] typed_job_assigns_normal_part1 (Qed)
 [wp] [Valid] typed_job_assigns_normal_part2 (Qed)
 [wp] [Valid] typed_job_assigns_normal_part3 (Qed)
@@ -28,6 +25,9 @@
 [wp] [Valid] typed_job_assigns_normal_part7 (Qed)
 [wp] [Valid] typed_job_assigns_normal_part8 (Qed)
 [wp] [Valid] typed_job_assigns_normal_part9 (Qed)
+[wp] [Valid] typed_job_assigns_exit_part1 (Qed)
+[wp] [Valid] typed_job_assigns_exit_part2 (Qed)
+[wp] [Valid] typed_job_assigns_exit_part3 (Qed)
 [wp] Proved goals:   22 / 22
   Qed:            22
 ------------------------------------------------------------

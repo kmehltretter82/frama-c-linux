@@ -24,11 +24,6 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns nothing in 'g':
-Prove: true.
-
-------------------------------------------------------------
-
 Goal Assigns nothing in 'g' (1/3):
 Prove: true.
 
@@ -46,12 +41,17 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file nupw-bcl-bts1120.i, line 22):
+Goal Assigns nothing in 'g':
 Prove: true.
 
 ------------------------------------------------------------
 
 Goal Positivity of Loop variant at loop (file nupw-bcl-bts1120.i, line 22):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Decreasing of Loop variant at loop (file nupw-bcl-bts1120.i, line 22):
 Prove: true.
 
 ------------------------------------------------------------

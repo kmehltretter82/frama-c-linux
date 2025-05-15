@@ -14,11 +14,11 @@
 [wp] [Valid] typed_init_t2_bis_v1_loop_assigns_part1 (Qed)
 [wp] [Unsuccess] typed_init_t2_bis_v1_loop_assigns_part2 (Alt-Ergo) (Cached)
 [wp] [Unsuccess] typed_init_t2_bis_v1_loop_assigns_part3 (Alt-Ergo) (Cached)
+[wp] [Valid] typed_init_t2_bis_v1_assigns_normal_part1 (Qed)
+[wp] [Unsuccess] typed_init_t2_bis_v1_assigns_normal_part2 (Alt-Ergo) (Cached)
 [wp] [Valid] typed_init_t2_bis_v1_assigns_exit_part1 (Qed)
 [wp] [Unsuccess] typed_init_t2_bis_v1_assigns_exit_part2 (Alt-Ergo) (Cached)
 [wp] [Valid] typed_init_t2_bis_v1_assigns_exit_part3 (Qed)
-[wp] [Valid] typed_init_t2_bis_v1_assigns_normal_part1 (Qed)
-[wp] [Unsuccess] typed_init_t2_bis_v1_assigns_normal_part2 (Alt-Ergo) (Cached)
 [wp] Proved goals:    7 / 16
   Qed:             7
   Unsuccess:       9

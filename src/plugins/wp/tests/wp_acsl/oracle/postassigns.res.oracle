@@ -150,12 +150,12 @@ Prove: true.
   Function job3
 ------------------------------------------------------------
 
-Goal Preservation of Invariant (file postassigns.c, line 38):
+Goal Establishment of Invariant (file postassigns.c, line 38):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file postassigns.c, line 38):
+Goal Preservation of Invariant (file postassigns.c, line 38):
 Prove: true.
 
 ------------------------------------------------------------
@@ -203,12 +203,12 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file postassigns.c, line 42):
+Goal Positivity of Loop variant at loop (file postassigns.c, line 42):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Positivity of Loop variant at loop (file postassigns.c, line 42):
+Goal Decreasing of Loop variant at loop (file postassigns.c, line 42):
 Prove: true.
 
 ------------------------------------------------------------

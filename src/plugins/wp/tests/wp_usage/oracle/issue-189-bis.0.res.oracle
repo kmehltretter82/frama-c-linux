@@ -79,6 +79,11 @@ Prove: a_2[a_5] = Mint_0[a_5].
 
 ------------------------------------------------------------
 
+Goal Establishment of Invariant 'cpy' (file issue-189-bis.i, line 27):
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Preservation of Invariant 'cpy' (file issue-189-bis.i, line 27):
 Let a = Mptr_0[global(P_dst_25)].
 Let a_1 = shift_uint8(a, 0).
@@ -116,7 +121,7 @@ Prove: a_5[shift_uint8(a_3, i)] = a_5[shift_uint8(a, i)].
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'cpy' (file issue-189-bis.i, line 27):
+Goal Establishment of Invariant 'dst' (file issue-189-bis.i, line 25):
 Prove: true.
 
 ------------------------------------------------------------
@@ -126,7 +131,7 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'dst' (file issue-189-bis.i, line 25):
+Goal Establishment of Invariant 'len' (file issue-189-bis.i, line 23):
 Prove: true.
 
 ------------------------------------------------------------
@@ -163,17 +168,12 @@ Prove: len_0 <= (1 + len_1).
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'len' (file issue-189-bis.i, line 23):
+Goal Establishment of Invariant 'src' (file issue-189-bis.i, line 24):
 Prove: true.
 
 ------------------------------------------------------------
 
 Goal Preservation of Invariant 'src' (file issue-189-bis.i, line 24):
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Establishment of Invariant 'src' (file issue-189-bis.i, line 24):
 Prove: true.
 
 ------------------------------------------------------------
@@ -244,12 +244,12 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file issue-189-bis.i, line 32):
+Goal Positivity of Loop variant at loop (file issue-189-bis.i, line 32):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Positivity of Loop variant at loop (file issue-189-bis.i, line 32):
+Goal Decreasing of Loop variant at loop (file issue-189-bis.i, line 32):
 Prove: true.
 
 ------------------------------------------------------------
@@ -326,6 +326,11 @@ Prove: a_2[a_5] = Mint_0[a_5].
 
 ------------------------------------------------------------
 
+Goal Establishment of Invariant 'ok,cpy' (file issue-189-bis.i, line 56):
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Preservation of Invariant 'ok,cpy' (file issue-189-bis.i, line 56):
 Let a = Mptr_0[global(P_dst_48)].
 Let a_1 = shift_uint8(a, 0).
@@ -363,7 +368,7 @@ Prove: a_5[shift_uint8(a_3, i)] = a_5[shift_uint8(a, i)].
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'ok,cpy' (file issue-189-bis.i, line 56):
+Goal Establishment of Invariant 'ok,dst' (file issue-189-bis.i, line 54):
 Prove: true.
 
 ------------------------------------------------------------
@@ -373,7 +378,7 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'ok,dst' (file issue-189-bis.i, line 54):
+Goal Establishment of Invariant 'ok,len' (file issue-189-bis.i, line 52):
 Prove: true.
 
 ------------------------------------------------------------
@@ -410,17 +415,12 @@ Prove: len_0 <= (1 + len_1).
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'ok,len' (file issue-189-bis.i, line 52):
+Goal Establishment of Invariant 'ok,src' (file issue-189-bis.i, line 53):
 Prove: true.
 
 ------------------------------------------------------------
 
 Goal Preservation of Invariant 'ok,src' (file issue-189-bis.i, line 53):
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Establishment of Invariant 'ok,src' (file issue-189-bis.i, line 53):
 Prove: true.
 
 ------------------------------------------------------------
@@ -489,12 +489,12 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file issue-189-bis.i, line 61):
+Goal Positivity of Loop variant at loop (file issue-189-bis.i, line 61):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Positivity of Loop variant at loop (file issue-189-bis.i, line 61):
+Goal Decreasing of Loop variant at loop (file issue-189-bis.i, line 61):
 Prove: true.
 
 ------------------------------------------------------------

@@ -7,10 +7,10 @@
 [wp] unit_loopscope.i:16: Warning: 
   Missing assigns clause (assigns 'everything' instead)
 [wp] 4 goals scheduled
-[wp] [Valid] typed_ref_f_loop_invariant_preserved (Qed)
 [wp] [Unsuccess] typed_ref_f_loop_invariant_established (Alt-Ergo) (Cached)
-[wp] [Valid] typed_ref_f_loop_variant_decrease (Qed)
+[wp] [Valid] typed_ref_f_loop_invariant_preserved (Qed)
 [wp] [Valid] typed_ref_f_loop_variant_positive (Qed)
+[wp] [Valid] typed_ref_f_loop_variant_decrease (Qed)
 [wp] Proved goals:    5 / 6
   Terminating:     1
   Unreachable:     1

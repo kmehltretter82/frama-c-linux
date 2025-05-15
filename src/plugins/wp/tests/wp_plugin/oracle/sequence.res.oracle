@@ -56,12 +56,17 @@ Prove: true.
 
 ------------------------------------------------------------
 
+Goal Establishment of Invariant 'ok,id_max' (file sequence.i, line 87):
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Preservation of Invariant 'ok,id_max' (file sequence.i, line 87):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'ok,id_max' (file sequence.i, line 87):
+Goal Establishment of Invariant 'ok,id_min' (file sequence.i, line 86):
 Prove: true.
 
 ------------------------------------------------------------
@@ -71,7 +76,7 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'ok,id_min' (file sequence.i, line 86):
+Goal Establishment of Invariant 'ok,inv' (file sequence.i, line 88):
 Prove: true.
 
 ------------------------------------------------------------
@@ -104,11 +109,6 @@ Assume {
   Have: 0 <= n.
 }
 Prove: ([ y ] *^ x_1) = a ^ [ y ].
-
-------------------------------------------------------------
-
-Goal Establishment of Invariant 'ok,inv' (file sequence.i, line 88):
-Prove: true.
 
 ------------------------------------------------------------
 
@@ -151,12 +151,12 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file sequence.i, line 91):
+Goal Positivity of Loop variant at loop (file sequence.i, line 91):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Positivity of Loop variant at loop (file sequence.i, line 91):
+Goal Decreasing of Loop variant at loop (file sequence.i, line 91):
 Prove: true.
 
 ------------------------------------------------------------

@@ -27,6 +27,11 @@ Prove: x = euclid_gcd_0.
 
 ------------------------------------------------------------
 
+Goal Establishment of Invariant (file euclid3.c, line 19):
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Preservation of Invariant (file euclid3.c, line 19):
 Let x = number.Gcd.gcd(a_2, b).
 Let x_1 = a_1 % a.
@@ -43,11 +48,6 @@ Assume {
   Have: a != 0.
 }
 Prove: number.Gcd.gcd(a, x_1) = x.
-
-------------------------------------------------------------
-
-Goal Establishment of Invariant (file euclid3.c, line 19):
-Prove: true.
 
 ------------------------------------------------------------
 
@@ -74,6 +74,11 @@ Prove: true.
 
 ------------------------------------------------------------
 
+Goal Positivity of Loop variant at loop (file euclid3.c, line 22):
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Decreasing of Loop variant at loop (file euclid3.c, line 22):
 Let x = a % a_1.
 Let x_1 = number.Gcd.gcd(a_2, b).
@@ -92,11 +97,6 @@ Assume {
   Have: number.Gcd.gcd(a_1, x) = x_1.
 }
 Prove: IAbs.abs(x) < IAbs.abs(a_1).
-
-------------------------------------------------------------
-
-Goal Positivity of Loop variant at loop (file euclid3.c, line 22):
-Prove: true.
 
 ------------------------------------------------------------
 ------------------------------------------------------------
@@ -139,35 +139,6 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns nothing in 'minmax_gcd' (1/5):
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Assigns nothing in 'minmax_gcd' (2/5):
-Effect at line 40
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Assigns nothing in 'minmax_gcd' (3/5):
-Effect at line 40
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Assigns nothing in 'minmax_gcd' (4/5):
-Effect at line 41
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Assigns nothing in 'minmax_gcd' (5/5):
-Effect at line 41
-Prove: true.
-
-------------------------------------------------------------
-
 Goal Assigns nothing in 'minmax_gcd' (1/6):
 Prove: true.
 
@@ -199,6 +170,35 @@ Prove: true.
 
 Goal Assigns nothing in 'minmax_gcd' (6/6):
 Call Result at line 42
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Assigns nothing in 'minmax_gcd' (1/5):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Assigns nothing in 'minmax_gcd' (2/5):
+Effect at line 40
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Assigns nothing in 'minmax_gcd' (3/5):
+Effect at line 40
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Assigns nothing in 'minmax_gcd' (4/5):
+Effect at line 41
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Assigns nothing in 'minmax_gcd' (5/5):
+Effect at line 41
 Prove: true.
 
 ------------------------------------------------------------

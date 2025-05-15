@@ -11,10 +11,10 @@
 [wp] [Passed] (Unsuccess) typed_euclid_euclid_gcd_wp_smoke_dead_code_s11 (Alt-Ergo) (Cached)
 [wp] [Passed] (Unsuccess) typed_euclid_euclid_gcd_wp_smoke_dead_code_s12 (Alt-Ergo) (Cached)
 [wp] [Valid] typed_euclid_euclid_gcd_ensures (Alt-Ergo) (Cached)
-[wp] [Valid] typed_euclid_euclid_gcd_loop_invariant_preserved (Alt-Ergo) (Cached)
 [wp] [Valid] typed_euclid_euclid_gcd_loop_invariant_established (Qed)
-[wp] [Valid] typed_euclid_euclid_gcd_loop_invariant_2_preserved (Alt-Ergo) (Cached)
+[wp] [Valid] typed_euclid_euclid_gcd_loop_invariant_preserved (Alt-Ergo) (Cached)
 [wp] [Valid] typed_euclid_euclid_gcd_loop_invariant_2_established (Qed)
+[wp] [Valid] typed_euclid_euclid_gcd_loop_invariant_2_preserved (Alt-Ergo) (Cached)
 [wp] [Valid] typed_euclid_euclid_gcd_assert_rte_division_by_zero (Qed)
 [wp] [Valid] typed_euclid_euclid_gcd_assert_rte_signed_overflow (Alt-Ergo) (Cached)
 [wp] [Valid] typed_euclid_euclid_gcd_assert_rte_signed_overflow_2 (Alt-Ergo) (Cached)
@@ -22,8 +22,8 @@
 [wp] [Valid] typed_euclid_euclid_gcd_assigns_part1 (Qed)
 [wp] [Valid] typed_euclid_euclid_gcd_assigns_part2 (Qed)
 [wp] [Valid] typed_euclid_euclid_gcd_assigns_part3 (Qed)
-[wp] [Valid] typed_euclid_euclid_gcd_loop_variant_decrease (Alt-Ergo) (Cached)
 [wp] [Valid] typed_euclid_euclid_gcd_loop_variant_positive (Qed)
+[wp] [Valid] typed_euclid_euclid_gcd_loop_variant_decrease (Alt-Ergo) (Cached)
 [wp] Proved goals:   21 / 21
   Terminating:     1
   Unreachable:     1

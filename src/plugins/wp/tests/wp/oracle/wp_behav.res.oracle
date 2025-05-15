@@ -171,6 +171,11 @@ Prove: false.
   Function razT
 ------------------------------------------------------------
 
+Goal Establishment of Invariant 'qed_ok' (file wp_behav.c, line 81):
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Preservation of Invariant 'qed_ok' (file wp_behav.c, line 81):
 Assume {
   Type: is_sint32(i) /\ is_sint32(n) /\ is_sint32(n_1) /\ is_sint32(1 + i).
@@ -187,17 +192,12 @@ Prove: T[i <- 0][i_1] = 0.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'qed_ok' (file wp_behav.c, line 81):
+Goal Positivity of Loop variant at loop (file wp_behav.c, line 84):
 Prove: true.
 
 ------------------------------------------------------------
 
 Goal Decreasing of Loop variant at loop (file wp_behav.c, line 84):
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Positivity of Loop variant at loop (file wp_behav.c, line 84):
 Prove: true.
 
 ------------------------------------------------------------

@@ -12,12 +12,12 @@
    generating default clauses. See -generated-spec-* options for more info
 [wp] Warning: Missing RTE guards
 [wp] 6 goals scheduled
-[wp] [Valid] typed_call_assigns_t1_assigns_exit (Qed)
 [wp] [Unsuccess] typed_call_assigns_t1_assigns_normal (Alt-Ergo) (Cached)
-[wp] [Valid] typed_call_assigns_t2_assigns_exit (Qed)
+[wp] [Valid] typed_call_assigns_t1_assigns_exit (Qed)
 [wp] [Unsuccess] typed_call_assigns_t2_assigns_normal (Alt-Ergo) (Cached)
-[wp] [Valid] typed_call_assigns_t4_assigns_exit (Qed)
+[wp] [Valid] typed_call_assigns_t2_assigns_exit (Qed)
 [wp] [Unsuccess] typed_call_assigns_t4_assigns_normal (Alt-Ergo) (Cached)
+[wp] [Valid] typed_call_assigns_t4_assigns_exit (Qed)
 [wp] Proved goals:    3 / 6
   Qed:             3
   Unsuccess:       3

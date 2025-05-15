@@ -243,13 +243,13 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file terminates_formulae.i, line 59):
-Assume { Type: is_uint32(i). (* Goal *) When: P_Q. (* Then *) Have: 0 < i. }
-Prove: to_uint32(i - 1) < i.
+Goal Positivity of Loop variant at loop (file terminates_formulae.i, line 59):
+Prove: true.
 
 ------------------------------------------------------------
 
-Goal Positivity of Loop variant at loop (file terminates_formulae.i, line 59):
-Prove: true.
+Goal Decreasing of Loop variant at loop (file terminates_formulae.i, line 59):
+Assume { Type: is_uint32(i). (* Goal *) When: P_Q. (* Then *) Have: 0 < i. }
+Prove: to_uint32(i - 1) < i.
 
 ------------------------------------------------------------

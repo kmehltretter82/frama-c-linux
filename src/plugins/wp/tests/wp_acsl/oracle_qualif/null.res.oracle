@@ -18,12 +18,12 @@
 [wp] [Valid] typed_null_is_zero_ensures (Qed)
 [wp] [Valid] typed_qed_terminates (Qed)
 [wp] [Valid] typed_qed_exits (Qed)
-[wp] [Valid] typed_qed_assigns_exit (Qed)
 [wp] [Valid] typed_qed_assigns_normal (Qed)
+[wp] [Valid] typed_qed_assigns_exit (Qed)
 [wp] [Valid] typed_prover_terminates (Qed)
 [wp] [Valid] typed_prover_exits (Qed)
-[wp] [Valid] typed_prover_assigns_exit (Qed)
 [wp] [Valid] typed_prover_assigns_normal (Alt-Ergo) (Cached)
+[wp] [Valid] typed_prover_assigns_exit (Qed)
 [wp] Proved goals:   15 / 15
   Terminating:     1
   Unreachable:     1

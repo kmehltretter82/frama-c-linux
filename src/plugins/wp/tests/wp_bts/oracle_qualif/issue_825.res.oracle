@@ -8,13 +8,13 @@
 [wp] [Valid] Goal job_terminates (Cfg) (Trivial)
 [wp] 10 goals scheduled
 [wp] [Unsuccess] typed_job_ensures (Alt-Ergo) (Cached)
-[wp] [Valid] typed_job_loop_invariant_preserved (Qed)
 [wp] [Valid] typed_job_loop_invariant_established (Qed)
+[wp] [Valid] typed_job_loop_invariant_preserved (Qed)
 [wp] [Valid] typed_job_loop_assigns_part1 (Qed)
 [wp] [Unsuccess] typed_job_loop_assigns_part2 (Alt-Ergo) (Cached)
 [wp] [Valid] typed_job_assigns (Qed)
-[wp] [Valid] typed_job_loop_variant_decrease (Qed)
 [wp] [Valid] typed_job_loop_variant_positive (Qed)
+[wp] [Valid] typed_job_loop_variant_decrease (Qed)
 [wp] [Unsuccess] typed_issue_check_ko (Alt-Ergo) (Cached)
 [wp] [Unsuccess] typed_issue_check_ko_2 (Alt-Ergo) (Cached)
 [wp] Proved goals:   10 / 14

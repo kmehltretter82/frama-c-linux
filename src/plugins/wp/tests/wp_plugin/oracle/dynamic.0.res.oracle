@@ -111,18 +111,6 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns for 'bhv1' (file dynamic.i, line 63) in 'behavior' (1/2):
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Assigns for 'bhv1' (file dynamic.i, line 63) in 'behavior' (2/2):
-Call Effect at line 67
-Tags: Call h2.
-Prove: true.
-
-------------------------------------------------------------
-
 Goal Assigns for 'bhv1' (file dynamic.i, line 63) in 'behavior' (1/4):
 Prove: true.
 
@@ -144,6 +132,18 @@ Prove: true.
 
 Goal Assigns for 'bhv1' (file dynamic.i, line 63) in 'behavior' (4/4):
 Call Result at line 67
+Tags: Call h2.
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Assigns for 'bhv1' (file dynamic.i, line 63) in 'behavior' (1/2):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Assigns for 'bhv1' (file dynamic.i, line 63) in 'behavior' (2/2):
+Call Effect at line 67
 Tags: Call h2.
 Prove: true.
 
@@ -195,18 +195,6 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns for 'bhv1' (file dynamic.i, line 72) in 'some_behaviors' (1/2):
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Assigns for 'bhv1' (file dynamic.i, line 72) in 'some_behaviors' (2/2):
-Call Effect at line 80
-Tags: Call h2.
-Prove: true.
-
-------------------------------------------------------------
-
 Goal Assigns for 'bhv1' (file dynamic.i, line 72) in 'some_behaviors' (1/5):
 Prove: true.
 
@@ -240,6 +228,18 @@ Prove: true.
 
 ------------------------------------------------------------
 
+Goal Assigns for 'bhv1' (file dynamic.i, line 72) in 'some_behaviors' (1/2):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Assigns for 'bhv1' (file dynamic.i, line 72) in 'some_behaviors' (2/2):
+Call Effect at line 80
+Tags: Call h2.
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Call point h1 h2 h0 for bhv0 in 'some_behaviors' at instruction (file dynamic.i, line 80):
 Prove: true.
 
@@ -258,25 +258,6 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Post-condition for 'bhv0' (file dynamic.i, line 77) in 'some_behaviors' (3/3):
-Tags: Call h1.
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Assigns for 'bhv0' nothing in 'some_behaviors' (1/3):
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Assigns for 'bhv0' nothing in 'some_behaviors' (2/3):
-Call Effect at line 80
-Tags: Call h2.
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Assigns for 'bhv0' nothing in 'some_behaviors' (3/3):
-Call Effect at line 80
 Tags: Call h1.
 Prove: true.
 
@@ -322,6 +303,25 @@ Prove: true.
 
 ------------------------------------------------------------
 
+Goal Assigns for 'bhv0' nothing in 'some_behaviors' (1/3):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Assigns for 'bhv0' nothing in 'some_behaviors' (2/3):
+Call Effect at line 80
+Tags: Call h2.
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Assigns for 'bhv0' nothing in 'some_behaviors' (3/3):
+Call Effect at line 80
+Tags: Call h1.
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Termination-condition (generated) in 'some_behaviors' (1/2):
 Call terminates (missing decreases) at line 80
 Prove: false.
@@ -362,11 +362,6 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file dynamic.i, line 85) in 'missing_context':
-Prove: true.
-
-------------------------------------------------------------
-
 Goal Assigns (file dynamic.i, line 85) in 'missing_context' (1/2):
 Prove: true.
 
@@ -375,6 +370,11 @@ Prove: true.
 Goal Assigns (file dynamic.i, line 85) in 'missing_context' (2/2):
 Call Result at line 89
 Tags: Call h1.
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Assigns (file dynamic.i, line 85) in 'missing_context':
 Prove: true.
 
 ------------------------------------------------------------
