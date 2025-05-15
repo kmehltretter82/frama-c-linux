@@ -18,6 +18,15 @@
   x ∈ {2}
   y ∈ {4}
   __retres ∈ {8}
+MAIN (compressed: false):
+[kernel] Checking "foo"
+[kernel] Checking "foobar"
+[kernel] Checking "default"
+[kernel] Checking "foo"
+[kernel] Checking "foobar"
+[kernel] Checking "default"
+[kernel] Checking "bar"
+MAIN (compressed: true):
 [kernel] Checking "foo"
 [kernel] Checking "foobar"
 [kernel] Checking "default"

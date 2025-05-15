@@ -214,6 +214,24 @@ let with_open_out ?if_missing ?if_exists ?binary ?blocking p job =
   try Ok (with_open_out_exn ?if_missing ?if_exists ?binary ?blocking p job)
   with Sys_error s -> Error s
 
+module Compressed : sig
+  val with_open_in_exn :
+    Filepath.t ->
+    (Channel.input, 'a) exn_processor
+  val with_open_out_exn :
+    ?compress:bool ->
+    Filepath.t ->
+    (Channel.output, 'a) exn_processor
+end = struct
+  let with_open_in_exn (p : t) job =
+    Channel.open_in_bin (p :> string)
+    |> protect_file_op ~close:Channel.close_in job
+
+  let with_open_out_exn ?compress (p : t) job =
+    Channel.open_out_bin ?compress (p :> string)
+    |> protect_file_op ~close:Channel.close_out job
+end
+
 module Operators =
 struct
   let (let+) with_open job = with_open job
