@@ -89,29 +89,30 @@ export function useRequestStatus<Kd extends Server.RqKind, In, Out>(
   const updateStable = Dome.useProtected(setStable);
   const updateResponse = Dome.useProtected(setResponse);
   const updateError = Dome.useProtected(setError);
+  const last = React.useRef('');
 
   // Fetch Request
   const trigger = Dome.useProtected<void>(
-      async function (): Promise<void> {
-        updateError(undefined);
-        updateResponse(undefined);
-        try {
-          if (Server.isRunning() && prm !== undefined) {
-            const task = Server.send(rq, prm);
-            killer.current = task.kill ?? NOP;
-            const result = await task;
-            updateResponse(result);
-            updateStable(result);
-          } else {
-            updateStable(rq.fallback);
-          }
-        } catch (err) {
-          updateError(`${err}`);
+    async function (): Promise<void> {
+      updateError(undefined);
+      updateResponse(undefined);
+      try {
+        if (Server.isRunning() && prm !== undefined) {
+          const task = Server.send(rq, prm);
+          killer.current = task.kill ?? NOP;
+          const result = await task;
+          updateResponse(result);
+          updateStable(result);
+        } else {
           updateStable(rq.fallback);
-        } finally {
-          killer.current = NOP;
         }
+      } catch (err) {
+        updateError(`${err}`);
+        updateStable(rq.fallback);
+      } finally {
+        killer.current = NOP;
       }
+    }
   );
 
   // Use Fallback
@@ -130,10 +131,11 @@ export function useRequestStatus<Kd extends Server.RqKind, In, Out>(
   React.useEffect(() => {
     if (cached !== null) {
       trigger();
+      last.current = cached;
     } else {
       fallback();
     }
-  }, [cached, trigger, fallback] );
+  }, [cached, trigger, fallback]);
 
   // Signal Management
   const rqsignals = rq.signals.concat(signals);
@@ -144,15 +146,19 @@ export function useRequestStatus<Kd extends Server.RqKind, In, Out>(
     };
   });
 
+  const changed = cached !== last.current;
+
   // Full Response
   const pending =
-    running &&
-    prm !== undefined &&
-    response === undefined &&
-    error === undefined;
+    changed ||
+    (running &&
+      prm !== undefined &&
+      response === undefined &&
+      error === undefined);
   const value = response ?? rq.fallback;
   return {
-    response, value, stable, error, pending,
+    response: (changed ? undefined : response),
+    value, stable, error, pending,
     kill: killer.current,
   };
 }
