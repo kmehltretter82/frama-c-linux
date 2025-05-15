@@ -24,17 +24,17 @@ open Cil_types
 open Eval
 
 module Make
-    (Abstract: Abstractions.S)
-    (States: Powerset.S with type state = Abstract.Dom.t)
-    (_ : Transfer_logic.S with type state = Abstract.Dom.t
+    (Engine: Engine_sig.S)
+    (States: Powerset.S with type state = Engine.Dom.t)
+    (_ : Transfer_logic.S with type state = Engine.Dom.t
                            and type states = States.t)
   : sig
 
-    val treat_statement_assigns: assigns -> Abstract.Dom.t -> Abstract.Dom.t
+    val treat_statement_assigns: assigns -> Engine.Dom.t -> Engine.Dom.t
 
     val compute_using_specification:
       warn:bool ->
-      kinstr -> (Abstract.Loc.location, Abstract.Val.t) call -> spec ->
-      Abstract.Dom.t -> (Partition.key*Abstract.Dom.t) list
+      kinstr -> (Engine.Loc.location, Engine.Val.t) call -> spec ->
+      Engine.Dom.t -> (Partition.key*Engine.Dom.t) list
 
   end

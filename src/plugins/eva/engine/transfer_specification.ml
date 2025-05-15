@@ -191,14 +191,14 @@ let precise_loc_of_assign env kind term =
     None
 
 module Make
-    (Abstract: Abstractions.S)
-    (States: Powerset.S with type state = Abstract.Dom.t)
-    (Logic : Transfer_logic.S with type state = Abstract.Dom.t
+    (Engine: Engine_sig.S)
+    (States: Powerset.S with type state = Engine.Dom.t)
+    (Logic : Transfer_logic.S with type state = Engine.Dom.t
                                and type states = States.t)
 = struct
 
-  module Domain = Abstract.Dom
-  module Location = Abstract.Loc
+  module Domain = Engine.Dom
+  module Location = Engine.Loc
   include Cvalue_domain.Getters (Domain)
 
   (* Most transfer functions about logic return a set of states instead of a
