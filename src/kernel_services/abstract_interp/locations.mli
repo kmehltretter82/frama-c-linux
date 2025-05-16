@@ -243,6 +243,7 @@ module Zone : sig
   include Lattice_type.With_Diff with type t := t
 
   val is_bottom: t -> bool
+  val is_top: t -> bool
   val inject : Base.t -> Int_Intervals.t -> t
 
   val find_lonely_key : t -> Base.t * Int_Intervals.t

@@ -20,12 +20,55 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(** Analysis locations. *)
+
+(** Analysis location of globals. *)
+type global = Cil_types.global
+
+(** Analysis location of locals: a statement and its associated callstack. *)
 type local = Cil_types.stmt * Callstack.t
 
-module Local :
-sig
-  include Datatype.S_with_collections with type t = local
+(** Analysis location. *)
+type t =
+  | Global of global
+  | Local of local
+
+module type S = sig
+  include Datatype.S_with_collections
 
   val loc : t -> Cil_types.location
+  (** [loc aloc] returns the source location of the given analysis location. *)
+
   val pos : t -> Filepath.position
+  (** [pos aloc] returns the source file of the given analysis location. *)
+
+  val pretty_loc : Format.formatter -> t -> unit
+  (** Pretty-print the [Analysis_location] as a location in a source file. In
+      the case of a local analysis location, the short callstack leading to that
+      location is also printed. *)
 end
+
+module Global : S with type t = global
+module Local : S with type t = local
+include S with type t := t
+
+val of_stmt : Cil_types.stmt -> t
+(** [of_stmt stmt] creates the local analysis location from the statement
+    [stmt]. This should only be called during the analysis of a function as the
+    current callstack must be available. *)
+
+val of_call : ('a, 'b) Eval.call -> t
+(** [of_call call] creates the global or local analysis location from the call
+    information [call]. If this is the entry point of the analysis (i.e. the
+    callsite is [Kglobal]) then the analysis location will be global. If there
+    is a statement callsite then the analysis location will be local. *)
+
+val of_kinstr_lval : Cil_types.kinstr -> Eva_ast.lval -> t
+(** [of_kinstr_lval kinstr lval] creates the global or local analysis location
+    from [kinstr] and [lval]. There are three distinct cases:
+    - [kinstr] is a [Kstmt]: the function returns the local analysis location of
+      the statement as with {!of_stmt}. This should only be called during the
+      analysis of a function as the current callstack must be available.
+    - [kinstr] is a [Kglobal] and [lval] is a [Var]: the function returns the
+      global analysis location of the varinfo.
+    - Otherwise this is an error case and a [fatal] is raised. *)

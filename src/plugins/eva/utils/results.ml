@@ -733,19 +733,20 @@ let alarms : type a. a evaluation -> Alarms.t list =
 
 let expr_deps expr request =
   let lval_to_loc lv = eval_address' lv request |> as_precise_loc in
-  Eva_ast.zone_of_exp lval_to_loc (Eva_ast.translate_exp expr)
+  Eva_ast.PreciseDepsOf.zone_of_exp lval_to_loc (Eva_ast.translate_exp expr)
 
 let lval_deps lval request =
   let lval_to_loc lv = eval_address' lv request |> as_precise_loc in
-  Eva_ast.zone_of_lval lval_to_loc (Eva_ast.translate_lval lval)
+  Eva_ast.PreciseDepsOf.zone_of_lval lval_to_loc (Eva_ast.translate_lval lval)
 
 let address_deps lval request =
   let lval_to_loc lv = eval_address' lv request |> as_precise_loc in
-  Eva_ast.indirect_zone_of_lval lval_to_loc (Eva_ast.translate_lval lval)
+  Eva_ast.PreciseDepsOf.indirect_zone_of_lval
+    lval_to_loc (Eva_ast.translate_lval lval)
 
 let expr_dependencies expr request =
   let lval_to_loc lv = eval_address' lv request |> as_precise_loc in
-  Eva_ast.deps_of_exp lval_to_loc (Eva_ast.translate_exp expr)
+  Eva_ast.PreciseDepsOf.deps_of_exp lval_to_loc (Eva_ast.translate_exp expr)
 
 (* Taint *)
 

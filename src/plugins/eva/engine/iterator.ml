@@ -81,7 +81,7 @@ module Make_Dataflow
                                and type states = States.t)
     (Spec: sig
        val treat_statement_assigns:
-         assigns -> Engine.Dom.t -> Engine.Dom.t
+         stmt -> assigns -> Engine.Dom.t -> Engine.Dom.t
      end)
     (AnalysisParam : sig
        val kf: kernel_function
@@ -271,7 +271,7 @@ module Make_Dataflow
     (* There should be only one statement contract, if any. *)
     | (_, spec) :: _ ->
       let assigns = Ast_info.merge_assigns_from_spec ~warn:false spec in
-      lift (Spec.treat_statement_assigns assigns)
+      lift (Spec.treat_statement_assigns stmt assigns)
 
   let transfer_assume (stmt : stmt) (exp : exp) (kind : guard_kind)
     : transfer_function =
@@ -708,7 +708,8 @@ module Computer
     (Logic : Transfer_logic.S with type state = Engine.Dom.t
                                and type states = States.t)
     (Spec: sig
-       val treat_statement_assigns: assigns -> Engine.Dom.t -> Engine.Dom.t
+       val treat_statement_assigns:
+         stmt -> assigns -> Engine.Dom.t -> Engine.Dom.t
      end)
 = struct
 

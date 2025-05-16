@@ -322,13 +322,17 @@ module Transfer = struct
       let ploc = to_loc lval in
       let loc = Precise_locs.imprecise_location ploc in
       let lv_zone = Locations.(enumerate_valid_bits Write loc) in
-      let lv_indirect_zone = Eva_ast.indirect_zone_of_lval to_loc lval in
+      let lv_indirect_zone =
+        Eva_ast.PreciseDepsOf.indirect_zone_of_lval to_loc lval
+      in
       keep_globals_only lv_zone, keep_globals_only lv_indirect_zone
 
   let assign_memory lval exp valuation memory =
     let to_loc = loc_of_lval valuation in
     let written_zone, lv_indirect_zone = compute_zones lval to_loc in
-    let exp_zone = Eva_ast.zone_of_exp to_loc exp |> keep_globals_only in
+    let exp_zone =
+      Eva_ast.PreciseDepsOf.zone_of_exp to_loc exp |> keep_globals_only
+    in
     let read_zone = Locations.Zone.join lv_indirect_zone exp_zone in
     let read = Locations.Zone.join memory.read read_zone in
     let written = Locations.Zone.join memory.written written_zone in
@@ -355,7 +359,9 @@ module Transfer = struct
   let assume stmt exp _ valuation state =
     let to_loc = loc_of_lval valuation in
     let { memory } = reset state in
-    let read_zone = Eva_ast.zone_of_exp to_loc exp |> keep_globals_only in
+    let read_zone =
+      Eva_ast.PreciseDepsOf.zone_of_exp to_loc exp |> keep_globals_only
+    in
     let read = Locations.Zone.join memory.read read_zone in
     let state = { state with memory = { memory with read } } in
     Cache.save stmt state

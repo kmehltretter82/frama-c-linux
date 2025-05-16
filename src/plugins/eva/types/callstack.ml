@@ -103,6 +103,12 @@ let pop cs =
   | [] -> None
   | _ :: tail -> Some { cs with stack = tail }
 
+let pop_call cs =
+  let open Cil_types in
+  match cs.stack with
+  | [] -> (cs.entry_point, Kglobal), None
+  | (kf, stmt) :: tail -> (kf, Kstmt stmt), Some { cs with stack = tail }
+
 let top cs =
   match cs.stack with
   | [] -> None

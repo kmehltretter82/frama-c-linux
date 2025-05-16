@@ -47,7 +47,8 @@ module Computer
     (_ : Transfer_logic.S with type state = Engine.Dom.t
                            and type states = States.t)
     (_: sig
-       val treat_statement_assigns: assigns -> Engine.Dom.t -> Engine.Dom.t
+       val treat_statement_assigns:
+         stmt -> assigns -> Engine.Dom.t -> Engine.Dom.t
      end)
   : sig
 
