@@ -97,14 +97,14 @@ let pre_analysis () =
   generate_specs ();
   Widen.precompute_widen_hints ();
   Builtins.prepare_builtins ();
-  Eva_perf.reset ();
   Statistics.reset_all ();
   clear_caches ();
   (* We may be resuming Value from a previously crashed analysis. Clear
      degeneration states *)
   Eva_utils.DegenerationPoints.clear ();
   Origin.clear ();
-  Eva_utils.clear_call_stack ()
+  Eva_utils.reset_call_stack ();
+  Cvalue_callbacks.apply_at_start_hooks ()
 
 let post_analysis_cleanup ~aborted =
   Eva_utils.clear_call_stack ();

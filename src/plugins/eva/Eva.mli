@@ -766,6 +766,9 @@ module Cvalue_callbacks: sig
 
   type state = Cvalue.Model.t
 
+  (** Registers a function to be applied at the start of an analysis. *)
+  val register_at_start_hook: (unit -> unit) -> unit
+
   (** If not None:
       - the assigns of the function, i.e. the dependencies of the result
         and the dependencies of each zone written to;

@@ -24,6 +24,14 @@ open Cil_types
 
 type state = Cvalue.Model.t
 
+module Reset = Hook.Build (struct type t = unit end)
+
+let register_at_start_hook f =
+  Reset.extend f
+
+let apply_at_start_hooks () =
+  Reset.apply ()
+
 type analysis_kind = [ `Builtin | `Spec | `Body | `Reuse ]
 
 type call_hook =

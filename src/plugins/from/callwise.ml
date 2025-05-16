@@ -56,6 +56,9 @@ type from_state = {
     stack is manually synchronized with Value's callstack. *)
 let call_froms_stack : from_state list ref = ref []
 
+let reset () =
+  call_froms_stack := []
+
 let record_callwise_dependencies_in_db call_site froms =
   try
     let previous = Tbl.find call_site in
@@ -157,6 +160,7 @@ let record_for_individual_froms callstack kf pre_state value_res =
 
 (* Register our callbacks inside the value analysis *)
 let () =
+  Eva.Cvalue_callbacks.register_at_start_hook reset;
   Eva.Cvalue_callbacks.register_call_hook call_for_individual_froms;
   Eva.Cvalue_callbacks.register_call_results_hook record_for_individual_froms
 

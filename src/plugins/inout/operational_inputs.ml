@@ -568,6 +568,9 @@ module Callwise = struct
 
   let call_inout_stack = ref []
 
+  let reset () =
+    call_inout_stack := []
+
   let call_for_callwise_inout _callstack kf _state = function
     | `Body ->
       let table_current_function = CallsiteHash.create 7 in
@@ -681,6 +684,7 @@ module Callwise = struct
   (* Register our callbacks inside the value analysis *)
 
   let () =
+    Eva.Cvalue_callbacks.register_at_start_hook reset;
     Eva.Cvalue_callbacks.register_call_results_hook record_for_callwise_inout;
     Eva.Cvalue_callbacks.register_call_hook call_for_callwise_inout
 

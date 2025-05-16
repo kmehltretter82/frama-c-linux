@@ -26,11 +26,15 @@ open Cil_types
 
 let current_callstack : Callstack.t option ref = ref None
 
+let reset_call_stack () =
+  current_callstack := None;
+  Eva_perf.reset ()
+
 let clear_call_stack () =
   match !current_callstack with
   | None -> ()
   | Some cs ->
-    Eva_perf.stop cs;
+    Callstack.iter Eva_perf.stop cs; (* Stop the whole remaining stack *)
     current_callstack := None
 
 let init_call_stack kf =
