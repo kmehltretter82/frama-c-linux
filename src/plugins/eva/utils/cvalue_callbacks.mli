@@ -30,6 +30,9 @@
 
 type state = Cvalue.Model.t
 
+(** Registers a function to be applied at the start of an analysis. *)
+val register_at_start_hook: (unit -> unit) -> unit
+
 (** If not None:
     - the assigns of the function, i.e. the dependencies of the result
       and the dependencies of each zone written to;
@@ -86,6 +89,8 @@ val register_call_results_hook: call_results_hook -> unit
 val register_statement_hook:
   (Callstack.t -> Cil_types.stmt -> state list -> unit) -> unit
 
+val apply_at_start_hooks:
+  unit -> unit
 val apply_call_hooks:
   Callstack.t -> Cil_types.kernel_function -> state -> analysis_kind -> unit
 val apply_call_results_hooks:

@@ -103,7 +103,8 @@ let pre_analysis () =
      degeneration states *)
   Eva_utils.DegenerationPoints.clear ();
   Origin.clear ();
-  Eva_utils.reset_call_stack ()
+  Eva_utils.reset_call_stack ();
+  Cvalue_callbacks.apply_at_start_hooks ()
 
 let post_analysis_cleanup ~aborted =
   Eva_utils.clear_call_stack ();
