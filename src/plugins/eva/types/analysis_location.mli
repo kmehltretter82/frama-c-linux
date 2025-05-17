@@ -52,6 +52,10 @@ module Global : S with type t = global
 module Local : S with type t = local
 include S with type t := t
 
+val callstack : t -> Callstack.t option
+(** [callstack aloc] returns the callstack of an analysis location if it is
+    a local one, or [None] otherwise. *)
+
 val of_stmt : Cil_types.stmt -> t
 (** [of_stmt stmt] creates the local analysis location from the statement
     [stmt]. This should only be called during the analysis of a function as the

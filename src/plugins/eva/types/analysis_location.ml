@@ -110,6 +110,11 @@ let pos aloc =
   | Local l -> Local.pos l
   | Global g -> Global.pos g
 
+let callstack aloc =
+  match aloc with
+  | Local (_stmt,cs) -> Some cs
+  | Global _ -> None
+
 let pretty_loc fmt aloc =
   match aloc with
   | Local l -> Local.pretty_loc fmt l
