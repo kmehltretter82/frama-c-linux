@@ -211,6 +211,7 @@ and tlval_to_lval kf env (host, offset) =
    that have already been converted to "\sum". *)
 and extended_quantifier_to_exp ~adata ~loc kf env t t_min t_max lambda name =
   let logic_env = Env.Logic_env.get env in
+  let t = Logic_normalizer.get_term t in
   match lambda.term_node with
   | Tlambda([ k ] ,lt)
     when name.lv_name = "\\product" || name.lv_name = "\\sum"
@@ -331,8 +332,6 @@ and context_insensitive_term_to_exp_il ?inplace t =
   | TBinOp((Lt | Gt | Le | Ge | Eq | Ne) as bop, t1, t2) ->
     let* logic_env = M.read_logic_env in
     let ity =
-      let t1 = Logic_normalizer.get_term t1 in
-      let t2 = Logic_normalizer.get_term t2 in
       Typing.join
         (Typing.get_effective_ty ~logic_env t1)
         (Typing.get_effective_ty ~logic_env t2)
@@ -415,7 +414,6 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
     else
       Cil.new_exp ~loc (UnOp(op, e, ty)), adata, env, Analyses_types.C_number, ""
   | TUnOp(LNot, t) ->
-    let t = Logic_normalizer.get_term t in
     let ty = Typing.get_effective_typ ~logic_env t in
     if Gmp_types.Z.is_t ty then
       (* [!t] is converted into [t == 0] *)
@@ -530,8 +528,6 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
     end
   | TBinOp(Lt | Gt | Le | Ge | Eq | Ne as bop, t1, t2) ->
     (* comparison operators *)
-    let t1 = Logic_normalizer.get_term t1 in
-    let t2 = Logic_normalizer.get_term t2 in
     let ity =
       Typing.join
         (Typing.get_effective_ty ~logic_env t1)
@@ -968,7 +964,6 @@ and to_exp_il ?inplace t =
       (Env.generate_rte env)
       (M.not_covered ~pre:"with RTE" Printer.pp_term t)
   in
-  let t = Logic_normalizer.get_term t in
   let* e = context_insensitive_term_to_exp_il ?inplace t in
   Options.debug ~dkey ~level:4 "to_exp_il {%a} %a = %a"
     Profile.pretty (Env.Logic_env.get_profile env)
