@@ -26,6 +26,7 @@ module type S = sig
   include Datatype.S_with_collections
   val loc : t -> Cil_types.location
   val pos : t -> Filepath.position
+  val kinstr : t -> Cil_types.kinstr
   val pretty_loc : Format.formatter -> t -> unit
 end
 
@@ -58,11 +59,12 @@ struct
   let pos aloc =
     fst (loc aloc)
 
-  let pretty_loc fmt (stmt, cs) =
+  let kinstr aloc =
+    Cil_types.Kstmt (fst aloc)
+
+  let pretty_loc fmt (stmt, _cs) =
     let stmt_loc = Stmt.loc stmt in
-    Format.fprintf fmt "%a <-@ %a"
-      Printer.pp_location stmt_loc
-      Callstack.pretty cs
+    Printer.pp_location fmt stmt_loc
 end
 
 module Global = struct
@@ -71,6 +73,9 @@ module Global = struct
 
   let pos gloc =
     fst (loc gloc)
+
+  let kinstr _gloc =
+    Cil_types.Kglobal
 
   let pretty_loc fmt gloc =
     let global_loc = Global.loc gloc in
@@ -110,6 +115,24 @@ let pos aloc =
   | Local l -> Local.pos l
   | Global g -> Global.pos g
 
+let kinstr aloc =
+  match aloc with
+  | Local l -> Local.kinstr l
+  | Global g -> Global.kinstr g
+
+let stmt aloc =
+  match aloc with
+  | Local (stmt,_cs) -> Some stmt
+  | Global _ -> None
+
+let kf aloc =
+  match aloc with
+  | Local (_stmt, cs) -> Some (Callstack.top_kf cs)
+  | Global (GFun ({ svar = vi }, _))
+  | Global (GFunDecl (_, vi, _)) ->
+    (try Some (Globals.Functions.get vi) with Not_found -> None)
+  | Global _ -> None
+
 let callstack aloc =
   match aloc with
   | Local (_stmt,cs) -> Some cs
@@ -123,28 +146,42 @@ let pretty_loc fmt aloc =
 type global = Global.t
 type local = Local.t
 
-let of_stmt stmt : t = Local (stmt, Eva_utils.current_call_stack ())
+let local stmt callstack =
+  Local (stmt, callstack)
+
+let is_local = function
+  | Local _ -> true
+  | Global _ -> false
+
+let global global =
+  Global global
+
+let is_global = function
+  | Local _ -> false
+  | Global _ -> true
 
 let of_varinfo vi : t =
   let initinfo = Globals.Vars.find vi in
   Global (GVar (vi, initinfo, vi.vdecl))
-let of_kf kf : t = Global (Kernel_function.get_global kf)
+
+let of_kf kf =
+  Global (Kernel_function.get_global kf)
 
 let of_call (call : ('a, 'b) Eval.call) =
-  let (kf, callsite), caller_stack = Callstack.pop_call call.callstack in
+  let kf, lloc = Callstack.pop_call call.callstack in
   assert (Kernel_function.equal kf call.kf);
-  match callsite, call.return with
-  | Kglobal, Some vi -> of_varinfo vi
-  | Kglobal, None -> of_kf call.kf
-  | Kstmt stmt, _ -> Local (stmt, Option.get caller_stack)
+  match lloc, call.return with
+  | None, Some vi -> of_varinfo vi
+  | None, None -> of_kf call.kf
+  | Some (stmt, caller_stack), _ -> Local (stmt, caller_stack)
 
-let of_kinstr_lval (kinstr : Cil_types.kinstr) (lval : Eva_ast.lval) =
-  match kinstr, lval with
-  | Kglobal, { node = (Var vi, _) } -> of_varinfo vi
-  | Kstmt stmt, _ -> of_stmt stmt
-  | _ ->
-    Self.fatal ~current:true
-      "Incompatible combination. The only possible `kinstr/lval' couples are \
-       `Kglobal/Var' or `Kstmt/_'@;kinstr: %a@ lval: %a"
-      Kinstr.pretty kinstr
-      Eva_ast.Lval.pretty lval
+let of_kinstr kinstr callstack =
+  match kinstr with
+  | Cil_types.Kstmt stmt ->
+    Local (stmt, callstack)
+  | Kglobal ->
+    match Callstack.pop_call callstack with
+    | kf, None ->
+      of_kf kf
+    | _kf, Some (stmt, callstack) ->
+      Local (stmt, callstack)

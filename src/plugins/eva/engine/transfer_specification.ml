@@ -316,7 +316,7 @@ module Make
 
   (* Applies the [assigns] list of assigns, allocates and frees clauses to
      the state [state]. *)
-  let apply_assigns_and_allocations aloc evaluated_clauses state =
+  let apply_assigns_and_allocations ~aloc evaluated_clauses state =
     let pre = state in
     let transfer state (clause, location) =
       Transfer_inout.add_logic_assign aloc clause location;
@@ -324,11 +324,10 @@ module Make
     in
     List.fold_left transfer state evaluated_clauses
 
-  let treat_statement_assigns stmt assigns state =
-    let aloc = Analysis_location.of_stmt stmt in
+  let treat_statement_assigns ~aloc assigns state =
     let assigns = get_assigns assigns in
     let evaluated_assigns = evaluate_assigns state None assigns in
-    apply_assigns_and_allocations aloc evaluated_assigns state
+    apply_assigns_and_allocations ~aloc evaluated_assigns state
 
   (* After reduction by the postconditions, checks that the locations assigned
      by assigns clauses are not garbled mixes — and warn otherwise. *)
@@ -367,21 +366,23 @@ module Make
      by the ensures clauses of all [behaviors]. [kf] is the called function,
      [spec] is its specification, [result] is the \result varinfo it returns,
      and [status] the status of the behaviors. *)
-  let compute_effects ~warn aloc kf spec result behaviors status states =
+  let compute_effects ~warn call spec behaviors status states =
+    let kf = Callstack.top_kf call.callstack in
+    let aloc = Analysis_location.of_call call in
     Bottom.of_list ~join:Domain.join states >>- fun pre_state ->
     let behavior = List.hd behaviors in
-    let retres_loc = Option.map Location.eval_varinfo result in
+    let retres_loc = Option.map Location.eval_varinfo call.return in
     let assigns = get_assigns_for_behavior spec behavior in
     let allocs = get_allocation_for_behavior spec behavior in
     let compute state =
       let assigns = evaluate_assigns state retres_loc assigns
       and allocs = evaluate_free_alloc state retres_loc allocs in
-      apply_assigns_and_allocations aloc (assigns @ allocs) state
+      apply_assigns_and_allocations ~aloc (assigns @ allocs) state
     in
     let states = List.map compute states in
     let states =
       Logic.check_fct_postconditions_for_behaviors kf behaviors status
-        ~result ~pre_state ~post_states:states
+        ~result:call.return ~pre_state ~post_states:states
     in
     (* Warn on garbled mixes created by specifications, except on builtins. *)
     if warn
@@ -408,7 +409,7 @@ module Make
      All behaviors in [behaviors] must have an Unknown status. False behaviors
      should have been removed, and true behaviors should be interpreted by
      [compute_true_behaviors]. *)
-  let compute_complete_behaviors ~warn aloc kinstr kf spec result behaviors states =
+  let compute_complete_behaviors ~warn call spec behaviors states =
     (* As a behavior may be included in several complete sets, we use a local
        cache for the interpretation of each behavior. *)
     let cache = HashBehaviors.create 3 in
@@ -416,10 +417,9 @@ module Make
       try HashBehaviors.find cache behavior
       with Not_found ->
         let s = Alarmset.Unknown in
+        let kf, kinstr = Callstack.top_call call.callstack in
         let states = reduce_by_preconditions kinstr kf [behavior] s states in
-        let states =
-          compute_effects ~warn aloc kf spec result [behavior] s states
-        in
+        let states = compute_effects ~warn call spec [behavior] s states in
         HashBehaviors.add cache behavior states;
         states
     in
@@ -430,10 +430,11 @@ module Make
      behavior. Uses all the preconditions and postconditinos at once to
      reduce the states, and uses the assigns clauses of the first behavior
      only (ideally, we want the intersection of assigns clauses). *)
-  let compute_true_behaviors ~warn aloc kinstr kf spec result behaviors states =
+  let compute_true_behaviors ~warn call spec behaviors states =
     let status = Alarmset.True in
+    let kf, kinstr = Callstack.top_call call.callstack in
     let states = reduce_by_preconditions kinstr kf behaviors status states in
-    compute_effects ~warn aloc kf spec result behaviors status states
+    compute_effects ~warn call spec behaviors status states
 
   (* Auxiliary function for promote_complete_behaviors. Replaces the status of
      a behavior in an association list binding behaviors to statuses. *)
@@ -536,7 +537,9 @@ module Make
      To obtain the highest precision, the states resulting from the
      interpretation of any true behavior and of any complete set should be
      intersected. *)
-  let compute_specification ~warn aloc kinstr kf result spec state =
+  let compute_specification ~warn call spec state =
+    let kf = call.kf
+    and kinstr = Callstack.top_callsite call.callstack in
     if warn then warn_allocates kf spec.spec_behavior;
     (* The default behavior, and the list of other behaviors. *)
     let default_bhv, behaviors = extract_default_behavior spec.spec_behavior in
@@ -562,9 +565,7 @@ module Make
     (* Without any true behaviors or complete sets, compute the effects of
        the default behavior. *)
     if true_behaviors = [] && spec.spec_complete_behaviors = []
-    then
-      compute_effects
-        ~warn aloc kf spec result [default_bhv] Alarmset.True states
+    then compute_effects ~warn call spec [default_bhv] Alarmset.True states
     else
       (* Remove complete sets that contain a true behavior: such behaviors are
          treated afterwards. *)
@@ -576,8 +577,7 @@ module Make
          state sets, one for each set. The join of each state set is a sound
          approximation at the end of the function call. *)
       let complete_states =
-        compute_complete_behaviors
-          ~warn aloc kinstr kf spec result complete_behaviors states
+        compute_complete_behaviors ~warn call spec complete_behaviors states
       in
       (* If there is some true behaviors, interpret them and add the resulting
          state set to the list. All true behaviors have their clauses computed
@@ -587,8 +587,7 @@ module Make
         then complete_states
         else
           let true_states =
-            compute_true_behaviors
-              ~warn aloc kinstr kf spec result true_behaviors states
+            compute_true_behaviors ~warn call spec true_behaviors states
           in
           true_states :: complete_states
       in
@@ -600,7 +599,8 @@ module Make
      evaluates the assigns, and finally reduces by the post-conditions.
      [warn] is false for the specification of cvalue builtins — in this case,
      some warnings are disabled, such as warnings about new garbled mixes. *)
-  let compute_using_specification ~warn kinstr call spec state =
+  let compute_using_specification ~warn call spec state =
+    let kinstr = Callstack.top_callsite call.callstack in
     let vi = Kernel_function.get_vi call.kf in
     if Ast_types.has_attribute "noreturn" vi.vtype
     then []
@@ -616,8 +616,7 @@ module Make
           Domain.initialize_variable_using_type var_kind retres_vi state
       in
       let states =
-        let aloc = Analysis_location.of_call call in
-        compute_specification ~warn aloc kinstr call.kf call.return spec state
+        compute_specification ~warn call spec state
       in
       let add_key behavior_id state =
         let branch = Partition.Spec_behavior (call.kf, kinstr, behavior_id) in

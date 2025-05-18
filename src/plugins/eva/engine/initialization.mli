@@ -35,7 +35,8 @@ module type S = sig
 
   (** Initializes a local variable in the current state. *)
   val initialize_local_variable:
-    Cil_types.stmt -> varinfo -> init -> state -> state or_bottom
+    aloc:Analysis_location.t ->
+    varinfo -> init -> state -> state or_bottom
 end
 
 module Make

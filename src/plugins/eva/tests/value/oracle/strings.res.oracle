@@ -71,7 +71,7 @@
   out of bounds write.
   assert \valid(tmp_unfold_46);
   (tmp_unfold_46 from ldst++)
-[kernel] strings.i:23: Warning: 
+[eva] strings.i:23: Warning: 
   all target addresses were invalid. This path is assumed to be dead.
 [eva] Recording results for strcpy
 [eva] Done for function strcpy

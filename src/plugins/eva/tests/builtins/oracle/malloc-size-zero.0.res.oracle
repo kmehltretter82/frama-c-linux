@@ -70,7 +70,7 @@
   ==END OF DUMP==
 [eva:alarm] malloc-size-zero.c:35: Warning: 
   out of bounds write. assert \valid(p1);
-[kernel] malloc-size-zero.c:35: Warning: 
+[eva] malloc-size-zero.c:35: Warning: 
   all target addresses were invalid. This path is assumed to be dead.
 [eva] malloc-size-zero.c:37: Call to builtin free
 [eva] malloc-size-zero.c:37: 
@@ -86,7 +86,7 @@
   accessing uninitialized left-value. assert \initialized(&q1);
 [eva:alarm] malloc-size-zero.c:42: Warning: 
   out of bounds write. assert \valid(q1);
-[kernel] malloc-size-zero.c:42: Warning: 
+[eva] malloc-size-zero.c:42: Warning: 
   all target addresses were invalid. This path is assumed to be dead.
 [eva:alarm] malloc-size-zero.c:44: Warning: 
   accessing uninitialized left-value. assert \initialized(&q1);

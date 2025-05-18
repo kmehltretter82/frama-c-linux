@@ -145,7 +145,7 @@
   Called from reduce_index.i:144.
 [eva:alarm] reduce_index.i:126: Warning: 
   out of bounds write. assert \valid((int *)0 + nulli);
-[kernel] reduce_index.i:126: Warning: 
+[eva] reduce_index.i:126: Warning: 
   all target addresses were invalid. This path is assumed to be dead.
 [eva] Recording results for null_index
 [eva] Done for function null_index

@@ -26,23 +26,15 @@ open Cil_types
 
 let current_callstack : Callstack.t option ref = ref None
 
-let reset_call_stack () =
-  current_callstack := None;
-  Eva_perf.reset ()
-
-let clear_call_stack () =
-  match !current_callstack with
-  | None -> ()
-  | Some cs ->
-    Callstack.iter Eva_perf.stop cs; (* Stop the whole remaining stack *)
-    current_callstack := None
-
-let init_call_stack kf =
-  assert (!current_callstack = None);
-  let cs = Callstack.init kf in
-  current_callstack := Some cs;
-  Eva_perf.start cs;
-  cs
+let with_callstack callstack job x =
+  let previous_callstack = !current_callstack in
+  current_callstack := Some callstack;
+  Eva_perf.start callstack;
+  let finally () =
+    Eva_perf.stop callstack;
+    current_callstack := previous_callstack
+  in
+  Fun.protect ~finally (fun () -> job x)
 
 let current_call_stack_opt () = !current_callstack
 
@@ -54,17 +46,6 @@ let current_call_stack () =
 let current_kf () =
   let cs = current_call_stack () in
   Callstack.top_kf cs
-
-let push_call_stack kf stmt =
-  let cs = current_call_stack () in
-  let new_cs = Callstack.push kf stmt cs in
-  current_callstack := Some new_cs;
-  Eva_perf.start new_cs
-
-let pop_call_stack () =
-  let cs = current_call_stack () in
-  Eva_perf.stop cs;
-  current_callstack := Callstack.pop cs
 
 let pp_callstack fmt =
   if Parameters.PrintCallstacks.get () then

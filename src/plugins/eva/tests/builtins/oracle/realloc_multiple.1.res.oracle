@@ -10,13 +10,13 @@
 [eva:malloc:new] realloc_multiple.c:9: allocating variable __malloc_main1_l9
 [eva:alarm] realloc_multiple.c:10: Warning: 
   out of bounds write. assert \valid(q + i);
-[kernel] realloc_multiple.c:10: Warning: 
+[eva] realloc_multiple.c:10: Warning: 
   all target addresses were invalid. This path is assumed to be dead.
 [eva] realloc_multiple.c:12: Call to builtin malloc
 [eva:malloc:new] realloc_multiple.c:12: allocating variable __malloc_main1_l12
 [eva:alarm] realloc_multiple.c:13: Warning: 
   out of bounds write. assert \valid(r + i_0);
-[kernel] realloc_multiple.c:13: Warning: 
+[eva] realloc_multiple.c:13: Warning: 
   all target addresses were invalid. This path is assumed to be dead.
 [eva] computing for function Frama_C_interval <- main1 <- main.
   Called from realloc_multiple.c:16.
@@ -104,13 +104,13 @@
 [eva:malloc:new] realloc_multiple.c:30: allocating variable __malloc_main2_l30
 [eva:alarm] realloc_multiple.c:31: Warning: 
   out of bounds write. assert \valid(q + i);
-[kernel] realloc_multiple.c:31: Warning: 
+[eva] realloc_multiple.c:31: Warning: 
   all target addresses were invalid. This path is assumed to be dead.
 [eva] realloc_multiple.c:33: Call to builtin malloc
 [eva:malloc:new] realloc_multiple.c:33: allocating variable __malloc_main2_l33
 [eva:alarm] realloc_multiple.c:34: Warning: 
   out of bounds write. assert \valid(r + i_0);
-[kernel] realloc_multiple.c:34: Warning: 
+[eva] realloc_multiple.c:34: Warning: 
   all target addresses were invalid. This path is assumed to be dead.
 [eva] computing for function Frama_C_interval <- main2 <- main.
   Called from realloc_multiple.c:37.
@@ -209,11 +209,11 @@
 [eva:malloc:new] realloc_multiple.c:53: allocating variable __malloc_main3_l53_0
 [eva:alarm] realloc_multiple.c:57: Warning: 
   out of bounds write. assert \valid(p);
-[kernel] realloc_multiple.c:57: Warning: 
+[eva] realloc_multiple.c:57: Warning: 
   all target addresses were invalid. This path is assumed to be dead.
 [eva:alarm] realloc_multiple.c:58: Warning: 
   out of bounds write. assert \valid(q);
-[kernel] realloc_multiple.c:58: Warning: 
+[eva] realloc_multiple.c:58: Warning: 
   all target addresses were invalid. This path is assumed to be dead.
 [eva] computing for function Frama_C_interval <- main3 <- main.
   Called from realloc_multiple.c:59.
@@ -254,7 +254,7 @@
   weak free on bases: {__malloc_main3_l52, __malloc_main3_l53_0}
 [eva:alarm] realloc_multiple.c:66: Warning: 
   out of bounds read. assert \valid_read(s);
-[kernel] realloc_multiple.c:66: Warning: 
+[eva] realloc_multiple.c:66: Warning: 
   all target addresses were invalid. This path is assumed to be dead.
 [eva:alarm] realloc_multiple.c:66: Warning: 
   accessing uninitialized left-value. assert \initialized(s);

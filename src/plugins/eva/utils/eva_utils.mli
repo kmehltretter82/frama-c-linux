@@ -26,22 +26,8 @@ open Cil_types
 
 (** Functions dealing with call stacks. *)
 
-(** Reset the current callstack: future accesses to the current callstack
-    will fail. *)
-val reset_call_stack : unit -> unit
-
-(** Same as {!reset_call_stack}, but records and keep perfs (see
-    {!Eva_perf}). *)
-val clear_call_stack : unit -> unit
-
-(** Initializes the current callstack with the main entry point. *)
-val init_call_stack : kernel_function -> Callstack.t
-
-(** Push a new call to the current callstack. *)
-val push_call_stack : kernel_function -> stmt -> unit
-
-(** Removes the topmost call from the current callstack. *)
-val pop_call_stack : unit -> unit
+(** Set the current call stack for the duration of a job. *)
+val with_callstack : Callstack.t -> ('a -> 'b) -> 'a -> 'b
 
 (** Returns the current function, at the top of the current callstack.
     Fails if no callstack has been initialized. This should only be called

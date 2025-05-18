@@ -45,13 +45,13 @@ module Computer
     (_ : Transfer_logic.S with type state = Engine.Dom.t)
     (_: sig
        val treat_statement_assigns:
-         stmt -> assigns -> Engine.Dom.t -> Engine.Dom.t
+         aloc:Analysis_location.t -> assigns -> Engine.Dom.t -> Engine.Dom.t
      end)
   : sig
 
     val compute:
       save_results:bool ->
-      kernel_function -> kinstr -> Engine.Dom.t ->
+      Callstack.t -> Engine.Dom.t ->
       (Partition.key * Engine.Dom.t) list * Eval.cacheable
 
   end

@@ -1,5 +1,5 @@
 53a54,55
-> [kernel] struct2.i:78: Warning: 
+> [eva] struct2.i:78: Warning: 
 >   all target addresses were invalid. This path is assumed to be dead.
 57,58d58
 <   accessing out of bounds index. assert 0 ≤ (int)(tab2[i] + j);

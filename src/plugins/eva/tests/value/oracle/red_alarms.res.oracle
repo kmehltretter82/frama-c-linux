@@ -58,12 +58,12 @@
   accessing out of bounds index. assert i < 32;
 [eva:alarm] red_alarms.i:57: Warning: 
   accessing out of bounds index. assert i < 32;
-[kernel] red_alarms.i:57: Warning: 
+[eva] red_alarms.i:57: Warning: 
   all target addresses were invalid. This path is assumed to be dead.
 [eva:partition] red_alarms.i:60: starting to merge loop iterations
 [eva:alarm] red_alarms.i:61: Warning: 
   accessing out of bounds index. assert i < 32;
-[kernel] red_alarms.i:61: Warning: 
+[eva] red_alarms.i:61: Warning: 
   all target addresses were invalid. This path is assumed to be dead.
 [eva:alarm] red_alarms.i:64: Warning: 
   division by zero. assert (int)(i - 5) ≢ 0;

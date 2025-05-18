@@ -95,7 +95,7 @@ module RW = struct
     match rw with
     | Read -> Format.fprintf fmt "<noloc>"
     | Write l -> Locations.Location.pretty fmt l
-    | ReadAloc aloc | WriteAloc aloc -> ALoc.pretty_loc fmt aloc
+    | ReadAloc aloc | WriteAloc aloc -> ALoc.pretty fmt aloc
 end
 
 (* -------------------------------------------------------------------------- *)

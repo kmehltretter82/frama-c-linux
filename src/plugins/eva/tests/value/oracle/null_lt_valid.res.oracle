@@ -13,7 +13,7 @@
   pointer comparison.
   assert \pointer_comparable((void *)p, (void *)((int *)t));
 [eva:alarm] null_lt_valid.i:6: Warning: out of bounds write. assert \valid(p);
-[kernel] null_lt_valid.i:6: Warning: 
+[eva] null_lt_valid.i:6: Warning: 
   all target addresses were invalid. This path is assumed to be dead.
 [eva] Recording results for f
 [eva] Done for function f

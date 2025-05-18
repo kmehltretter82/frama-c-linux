@@ -63,7 +63,7 @@
   function fill_array: precondition got status unknown.
 [eva:alarm] recursion.c:202: Warning: 
   out of bounds write. assert \valid(data + start);
-[kernel] recursion.c:202: Warning: 
+[eva] recursion.c:202: Warning: 
   all target addresses were invalid. This path is assumed to be dead.
 [eva:alarm] recursion.c:197: Warning: 
   function fill_array: postcondition got status unknown.
@@ -93,7 +93,7 @@
 [eva:alarm] recursion.c:282: Warning: 
   accessing left-value that contains escaping addresses.
   assert ¬\dangling(&p);
-[kernel] recursion.c:282: Warning: 
+[eva] recursion.c:282: Warning: 
   all target addresses were invalid. This path is assumed to be dead.
 [eva:recursion] recursion.c:295: 
   detected recursive call of function escaping_formal.
@@ -103,7 +103,7 @@
 [eva:alarm] recursion.c:297: Warning: 
   accessing left-value that contains escaping addresses.
   assert ¬\dangling(&p);
-[kernel] recursion.c:297: Warning: 
+[eva] recursion.c:297: Warning: 
   all target addresses were invalid. This path is assumed to be dead.
 [eva:recursion] recursion.c:311: 
   detected recursive call of function escaping_stack.
@@ -114,7 +114,7 @@
 [eva:alarm] recursion.c:313: Warning: 
   accessing left-value that contains escaping addresses.
   assert ¬\dangling(&p);
-[kernel] recursion.c:313: Warning: 
+[eva] recursion.c:313: Warning: 
   all target addresses were invalid. This path is assumed to be dead.
 [eva:recursion] recursion.c:327: detected recursive call of function decr.
 [eva] recursion.c:327: Warning: 

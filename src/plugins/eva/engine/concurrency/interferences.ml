@@ -276,7 +276,8 @@ struct
     in
     ThreadTable.fold add_thread current.states_by_mutexes `Bottom
 
-  let inject kf (v1 : Eva_automata.vertex) _v2 (state : state) : state =
+  let inject ~aloc (v1 : Eva_automata.vertex) _v2 (state : state) : state =
+    let kf = Analysis_location.kf aloc |> Option.get in
     let need_injection =
       let automaton = Eva_automata.get_automaton kf in
       if not (Thread.is_main (Thread.current ())) &&
@@ -290,8 +291,7 @@ struct
            intersects with shared variables. *)
         match v1.vertex_start_of with
         | None -> false
-        | Some stmt -> begin
-            let aloc = Analysis_location.of_stmt stmt in
+        | Some _stmt -> begin
             let filter = Inout_access.keep_globals_only in
             let accesses = Inout_access.at ~filter aloc in
             let zone = Locations.Zone.join accesses.read accesses.write in

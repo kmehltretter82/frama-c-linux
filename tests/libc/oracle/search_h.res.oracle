@@ -60,7 +60,7 @@
   out of bounds read. assert \valid_read((struct element **)node);
 [eva:alarm] search_h.c:42: Warning: 
   out of bounds write. assert \valid(&(*((struct element **)node))->count);
-[kernel] search_h.c:42: Warning: 
+[eva] search_h.c:42: Warning: 
   all target addresses were invalid. This path is assumed to be dead.
 [eva] computing for function fprintf_va_1 <- main.
   Called from search_h.c:36.
