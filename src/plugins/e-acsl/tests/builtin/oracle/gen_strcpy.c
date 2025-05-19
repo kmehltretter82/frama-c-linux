@@ -75,35 +75,6 @@ pid_t __gen_e_acsl_waitpid(pid_t pid, int *stat_loc, int options);
  */
 pid_t __gen_e_acsl_fork(void);
 
-/*@ requires valid_string_s: valid_read_string(s);
-    assigns \result;
-    assigns \result
-      \from (indirect: *(s + (0 .. strlen{Old}(s)))),
-            (indirect: __fc_heap_status);
-    allocates \result;
-    
-    behavior allocation:
-      assumes can_allocate: is_allocable(strlen(s) + 1);
-      ensures allocation: \fresh{Old, Here}(\result,strlen(\old(s)) + 1);
-      ensures
-        result_valid_string_and_same_contents:
-          valid_string(\result) && strcmp(\result, \old(s)) == 0;
-      assigns __fc_heap_status, \result;
-      assigns __fc_heap_status
-        \from __fc_heap_status, (indirect: *(s + (0 .. strlen{Old}(s))));
-      assigns \result
-        \from (indirect: *(s + (0 .. strlen{Old}(s)))),
-              (indirect: __fc_heap_status);
-    
-    behavior no_allocation:
-      assumes cannot_allocate: !is_allocable(strlen(s) + 1);
-      ensures result_null: \result == \null;
-      assigns \result;
-      assigns \result \from \nothing;
-      allocates \nothing;
- */
-char *__gen_e_acsl_strdup(char const *s);
-
 void test_memory_tracking(void)
 {
   {
@@ -542,65 +513,6 @@ void test_memory_tracking(void)
   return;
 }
 
-/*@ requires valid_string_s: valid_read_string(s);
-    assigns \result;
-    assigns \result
-      \from (indirect: *(s + (0 .. strlen{Old}(s)))),
-            (indirect: __fc_heap_status);
-    allocates \result;
-    
-    behavior allocation:
-      assumes can_allocate: is_allocable(strlen(s) + 1);
-      ensures allocation: \fresh{Old, Here}(\result,strlen(\old(s)) + 1);
-      ensures
-        result_valid_string_and_same_contents:
-          valid_string(\result) && strcmp(\result, \old(s)) == 0;
-      assigns __fc_heap_status, \result;
-      assigns __fc_heap_status
-        \from __fc_heap_status, (indirect: *(s + (0 .. strlen{Old}(s))));
-      assigns \result
-        \from (indirect: *(s + (0 .. strlen{Old}(s)))),
-              (indirect: __fc_heap_status);
-    
-    behavior no_allocation:
-      assumes cannot_allocate: !is_allocable(strlen(s) + 1);
-      ensures result_null: \result == \null;
-      assigns \result;
-      assigns \result \from \nothing;
-      allocates \nothing;
- */
-char *__gen_e_acsl_strdup(char const *s)
-{
-  __e_acsl_contract_t *__gen_e_acsl_contract;
-  char const *__gen_e_acsl_at;
-  char *__retres;
-  __gen_e_acsl_at = s;
-  __gen_e_acsl_contract = __e_acsl_contract_init(2UL);
-  __retres = strdup(s);
-  {
-    int __gen_e_acsl_assumes_value;
-    __gen_e_acsl_assumes_value = __e_acsl_contract_get_behavior_assumes
-    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,1UL);
-    if (__gen_e_acsl_assumes_value) {
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
-        {.values = (void *)0};
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,"\\result",
-                                   (void *)__retres);
-      __gen_e_acsl_assert_data_4.blocking = 1;
-      __gen_e_acsl_assert_data_4.kind = "Postcondition";
-      __gen_e_acsl_assert_data_4.pred_txt = "\\result == \\null";
-      __gen_e_acsl_assert_data_4.file = "FRAMAC_SHARE/libc/string.h";
-      __gen_e_acsl_assert_data_4.fct = "strdup";
-      __gen_e_acsl_assert_data_4.line = 590;
-      __gen_e_acsl_assert_data_4.name = "no_allocation/result_null";
-      __e_acsl_assert(__retres == (char *)0,& __gen_e_acsl_assert_data_4);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
-    }
-    __e_acsl_contract_clean(__gen_e_acsl_contract);
-    return __retres;
-  }
-}
-
 /*@ ensures
       result_ok_child_or_error: \result == 0 || \result > 0 || \result == -1;
     assigns \result;
@@ -923,7 +835,7 @@ int main(int argc, char const **argv)
   __e_acsl_globals_init();
   char empty_str[1] = {(char)'\000'};
   char *const_str = (char *)__gen_e_acsl_literal_string_6;
-  char *src = __gen_e_acsl_strdup(__gen_e_acsl_literal_string_6);
+  char *src = eacsl_test_strdup(__gen_e_acsl_literal_string_6,(size_t)5);
   char *dest1 = malloc((size_t)5);
   char *dest2 = malloc((size_t)4);
   char dest3[256] =
