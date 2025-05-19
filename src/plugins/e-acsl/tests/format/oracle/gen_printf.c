@@ -891,6 +891,7 @@ char *__gen_e_acsl_strchr(char const *s, int c)
       __gen_e_acsl_assert_data_4.name = "mem_access";
       __e_acsl_assert(__gen_e_acsl_and,& __gen_e_acsl_assert_data_4);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
+      /*@ assert Eva: mem_access: \valid_read(__retres); */
       __e_acsl_assert_register_char(& __gen_e_acsl_assert_data_3,"*\\result",
                                     0,*__retres);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,"\\old(c)",0,
@@ -7144,6 +7145,7 @@ int main(int argc, char const **argv)
   {
     pid_t pid_237 = __gen_e_acsl_fork();
     if (! pid_237) {
+      /*@ assert Eva: initialization: \initialized(&s2); */
       __e_acsl_builtin_printf("s",__gen_e_acsl_literal_string_407,s2);
       __gen_e_acsl_exit(0);
     }

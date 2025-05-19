@@ -118,3 +118,76 @@
 [eva:alarm] str.c:16: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] str.c:16: Warning: assertion got status unknown.
+[eva:alarm] FRAMAC_SHARE/libc/string.h:442: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] FRAMAC_SHARE/libc/string.h:444: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] FRAMAC_SHARE/libc/string.h:448: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] FRAMAC_SHARE/libc/string.h:454: Warning: 
+  function __gen_e_acsl_strncpy, behavior partial: postcondition 'equal_prefix' got status unknown.
+[eva:alarm] FRAMAC_SHARE/libc/string.h:451: Warning: 
+  function __gen_e_acsl_strncpy, behavior complete: postcondition 'equal_after_copy' got status unknown.
+[eva:alarm] str.c:43: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] str.c:43: Warning: assertion got status unknown.
+[eva:alarm] str.c:47: Warning: 
+  function __gen_e_acsl_strcat: precondition 'valid_string_dest' got status unknown.
+[eva:alarm] str.c:47: Warning: 
+  function __gen_e_acsl_strcat: precondition 'room_string' got status unknown.
+[eva:alarm] FRAMAC_SHARE/libc/string.h:485: Warning: 
+  function strcat: precondition 'valid_string_dest' got status unknown.
+[eva:alarm] FRAMAC_SHARE/libc/string.h:485: Warning: 
+  function strcat: precondition 'room_string' got status unknown.
+[eva:alarm] FRAMAC_SHARE/libc/string.h:485: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] FRAMAC_SHARE/libc/string.h:493: Warning: 
+  function __gen_e_acsl_strcat: postcondition 'sum_of_lengths' got status unknown.
+[eva:alarm] FRAMAC_SHARE/libc/string.h:496: Warning: 
+  function __gen_e_acsl_strcat: postcondition 'initialization,dest' got status unknown.
+[eva:alarm] FRAMAC_SHARE/libc/string.h:497: Warning: 
+  function __gen_e_acsl_strcat: postcondition 'dest_null_terminated' got status unknown.
+[eva:alarm] str.c:48: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] str.c:48: Warning: assertion got status unknown.
+[eva:alarm] str.c:49: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] str.c:49: Warning: assertion got status unknown.
+[eva:alarm] str.c:55: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] str.c:55: Warning: assertion got status unknown.
+[eva:alarm] str.c:59: Warning: 
+  function __gen_e_acsl_strncat: precondition 'valid_string_dest' got status unknown.
+[eva:alarm] str.c:59: Warning: 
+  function __gen_e_acsl_strncat, behavior partial: precondition 'room_string' got status unknown.
+[eva:alarm] FRAMAC_SHARE/libc/string.h:506: Warning: 
+  function strncat: precondition 'valid_string_dest' got status unknown.
+[eva:alarm] FRAMAC_SHARE/libc/string.h:506: Warning: 
+  function strncat, behavior partial: precondition 'room_string' got status unknown.
+[eva:alarm] FRAMAC_SHARE/libc/string.h:506: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] FRAMAC_SHARE/libc/string.h:528: Warning: 
+  function __gen_e_acsl_strncat, behavior partial: postcondition 'sum_of_bounded_lengths' got status unknown.
+[eva:alarm] str.c:60: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] str.c:60: Warning: assertion got status unknown.
+[eva:alarm] str.c:61: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] str.c:61: Warning: assertion got status unknown.
+[eva:alarm] str.c:67: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] str.c:67: Warning: assertion got status unknown.
+[eva:alarm] str.c:71: Warning: 
+  function __gen_e_acsl_strncat: precondition 'valid_string_dest' got status unknown.
+[eva:alarm] str.c:71: Warning: 
+  function __gen_e_acsl_strncat, behavior complete: precondition 'room_string' got status unknown.
+[eva:alarm] FRAMAC_SHARE/libc/string.h:506: Warning: 
+  function strncat, behavior complete: precondition 'room_string' got status unknown.
+[eva:alarm] FRAMAC_SHARE/libc/string.h:521: Warning: 
+  function __gen_e_acsl_strncat, behavior complete: postcondition 'sum_of_lengths' got status unknown.
+[eva:alarm] str.c:72: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] str.c:72: Warning: assertion got status unknown.
+[eva:alarm] str.c:73: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] str.c:73: Warning: assertion got status unknown.

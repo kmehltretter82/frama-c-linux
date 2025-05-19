@@ -674,6 +674,7 @@ int main(int argc, char const **argv)
     if (! pid_8) {
       int tmp_29;
       int tmp_30;
+      /*@ assert Eva: dangling_pointer: !\dangling(&dl); */
       tmp_29 = __e_acsl_builtin_strcmp((char const *)dl,(char const *)(ar));
       tmp_30 = __e_acsl_builtin_strcmp((char const *)dl,(char const *)(ar));
       fail_ncomp(tmp_30 != 0,(char *)__gen_e_acsl_literal_string_7,tmp_29,0);
@@ -693,6 +694,7 @@ int main(int argc, char const **argv)
     if (! pid_9) {
       int tmp_32;
       int tmp_33;
+      /*@ assert Eva: dangling_pointer: !\dangling(&dr); */
       tmp_32 = __e_acsl_builtin_strcmp((char const *)(al),(char const *)dr);
       tmp_33 = __e_acsl_builtin_strcmp((char const *)(al),(char const *)dr);
       fail_ncomp(tmp_33 != 0,(char *)__gen_e_acsl_literal_string_7,tmp_32,0);

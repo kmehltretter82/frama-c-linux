@@ -501,6 +501,7 @@ int main(int argc, char const **argv)
     pid_t pid_5 = __gen_e_acsl_fork();
     if (! pid_5) {
       size_t tmp_13;
+      /*@ assert Eva: dangling_pointer: !\dangling(&heap_str); */
       tmp_13 = __e_acsl_builtin_strlen((char const *)heap_str);
       len = tmp_13 != (size_t)7;
       if (len) __gen_e_acsl_abort();

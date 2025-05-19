@@ -11,6 +11,7 @@
   __e_acsl_heap_allocation_size IN [--..--]
   __e_acsl_heap_allocated_blocks IN [--..--]
   __fc_eacsl_assert_data_value_base[0..2147483646] IN {0}
+  __fc_eacsl_contract_base[0..2147483646] IN {0}
   __e_acsl_math_HUGE_VAL IN [-1.79769313486e+308 .. 1.79769313486e+308]
   __e_acsl_math_HUGE_VALF IN [-3.40282346639e+38 .. 3.40282346639e+38]
   __e_acsl_math_INFINITY IN [-1.79769313486e+308 .. 1.79769313486e+308]

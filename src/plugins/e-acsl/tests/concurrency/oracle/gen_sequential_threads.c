@@ -542,6 +542,7 @@ int main(void)
     while (i_0 < 10) {
       __gen_e_acsl_pthread_create(& t,(pthread_attr_t const *)0,& read_value,
                                   (void *)(& args[i_0]));
+      /*@ assert Eva: initialization: \initialized(&t); */
       __gen_e_acsl_pthread_join(t,(void **)0);
       __e_acsl_full_init((void *)(& i_0));
       i_0 ++;

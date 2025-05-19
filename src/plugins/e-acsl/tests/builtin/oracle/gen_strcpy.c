@@ -892,6 +892,7 @@ int main(int argc, char const **argv)
   {
     pid_t pid_2 = __gen_e_acsl_fork();
     if (! pid_2) {
+      /*@ assert Eva: dangling_pointer: !\dangling(&unalloc_str); */
       __e_acsl_builtin_strcpy(unalloc_str,(char const *)src);
       __gen_e_acsl_exit(0);
     }
@@ -1012,6 +1013,7 @@ int main(int argc, char const **argv)
   {
     pid_t pid_10 = __gen_e_acsl_fork();
     if (! pid_10) {
+      /*@ assert Eva: dangling_pointer: !\dangling(&unalloc_str); */
       __e_acsl_builtin_strncpy(unalloc_str,(char const *)src,(size_t)5);
       __gen_e_acsl_exit(0);
     }
