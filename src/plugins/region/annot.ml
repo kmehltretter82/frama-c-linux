@@ -31,6 +31,7 @@ open Logic
 
 module Vmap = Cil_datatype.Varinfo.Map
 
+let iadd_term env t = ignore @@ add_term env t
 let iadd_iterm env = function { it_content = t } -> ignore @@ add_term env t
 
 let add_ipred env ip = add_predicate env ip.ip_content.tp_statement
@@ -112,6 +113,21 @@ let add_spec ~kf ~ki ?(formal=Vmap.empty) ?result (map:map) (s:spec) =
 (* ---  Process Function Body                                             --- *)
 (* -------------------------------------------------------------------------- *)
 
+let rec add_acsl_extension ~kf ~stmt ?(formal=Vmap.empty) ?result ~ca map =
+  function { ext_kind = acsl } -> match acsl with
+    | Ext_id _ -> ()
+    | Ext_terms ts ->
+      let property = Property.ip_of_code_annot_single kf stmt ca in
+      let env = { map ; property ; formal ; result } in
+      List.iter (iadd_term env) ts
+    | Ext_preds ps ->
+      let property = Property.ip_of_code_annot_single kf stmt ca in
+      let env = { map ; property ; formal ; result } in
+      List.iter (add_predicate env) ps
+    | Ext_annot (_,acsls) ->
+      List.iter (add_acsl_extension ~kf ~stmt ~formal ?result ~ca map) acsls
+
+
 let add_code_annot ~kf ~stmt ?(formal=Vmap.empty) ?result map c =
   match c.annot_content with
   | AAssert (_,{ tp_statement = p }) ->
@@ -140,4 +156,5 @@ let add_code_annot ~kf ~stmt ?(formal=Vmap.empty) ?result map c =
     let property = Option.get @@ Property.ip_of_allocation kf ki bol alloc in
     List.iter (iadd_iterm { map ; property ; formal ; result }) its1 ;
     List.iter (iadd_iterm { map ; property ; formal ; result }) its2
-  | AExtended (_,_,_) -> assert false
+  | AExtended (_,_, acsl) ->
+    add_acsl_extension ~kf ~stmt ~formal ?result ~ca:c map acsl
