@@ -89,7 +89,7 @@ export function useRequestStatus<Kd extends Server.RqKind, In, Out>(
   const updateStable = Dome.useProtected(setStable);
   const updateResponse = Dome.useProtected(setResponse);
   const updateError = Dome.useProtected(setError);
-  const last = React.useRef('');
+  const last = React.useRef<string | null>(null);
 
   // Fetch Request
   const trigger = Dome.useProtected<void>(
@@ -126,12 +126,12 @@ export function useRequestStatus<Kd extends Server.RqKind, In, Out>(
   );
 
   // Server & Cache Management
-  const running = Server.isRunningStatus(Server.useStatus());
-  const cached = running ? JSON.stringify([rq.name, prm]) : null;
+  const server = Server.isRunningStatus(Server.useStatus());
+  const cached = server ? JSON.stringify([rq.name, prm]) : null;
   React.useEffect(() => {
+    last.current = cached;
     if (cached !== null) {
       trigger();
-      last.current = cached;
     } else {
       fallback();
     }
@@ -146,19 +146,28 @@ export function useRequestStatus<Kd extends Server.RqKind, In, Out>(
     };
   });
 
-  const changed = cached !== last.current;
+  if (cached !== last.current)
+    return {
+      pending: server,
+      error: undefined,
+      response: undefined,
+      value: rq.fallback,
+      stable,
+      kill: NOP,
+    };
 
   // Full Response
+
   const pending =
-    changed ||
-    (running &&
-      prm !== undefined &&
-      response === undefined &&
-      error === undefined);
+    server &&
+    prm !== undefined &&
+    response === undefined &&
+    error === undefined;
+
   const value = response ?? rq.fallback;
+
   return {
-    response: (changed ? undefined : response),
-    value, stable, error, pending,
+    response, value, stable, error, pending,
     kill: killer.current,
   };
 }
