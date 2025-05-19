@@ -72,11 +72,9 @@ let add_allocation ~map ~kf ~ki ~bhv ~formal ?result alloc =
     List.iter (iadd_iterm env) its2
 
 let add_post_cond ~map ~kf ~ki ~bhv ~formal ?result cs =
-  let add_post_cond property (_,ip) =
-    add_ipred { map ; property ; formal ; result } ip
-  in
-  let post_conds = Property.ip_post_cond_of_behavior kf ki ~active:[] bhv in
-  List.iter2 add_post_cond post_conds cs
+  let property = Property.ip_of_behavior kf ki ~active:[] bhv in
+  let add_pc (_,ip) = add_ipred { map ; property ; formal ; result } ip in
+  List.iter add_pc cs
 
 let add_extension _ = ()
 
