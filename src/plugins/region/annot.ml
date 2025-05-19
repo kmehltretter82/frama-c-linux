@@ -42,7 +42,9 @@ let add_ipred env ip = add_predicate env ip.ip_content.tp_statement
 
 let iadd_from env (it,from) = match from with
   | FromAny -> iadd_iterm env it
-  | From its -> List.iter (iadd_iterm env) its ; iadd_iterm env it
+  | From its ->
+    List.iter (iadd_iterm env) its ;
+    iadd_iterm env it
 
 let add_requires ~map ~kf ~ki ~bhv ~formal ?result ip =
   let property = Property.ip_of_requires kf ki bhv ip in
@@ -76,7 +78,22 @@ let add_post_cond ~map ~kf ~ki ~bhv ~formal ?result cs =
   let add_pc (_,ip) = add_ipred { map ; property ; formal ; result } ip in
   List.iter add_pc cs
 
-let add_extension _ = ()
+let rec add_extension ~kf ?stmt ?(formal=Vmap.empty) ?result map acsl =
+  let extended_loc = match stmt with
+    | None -> Property.ELContract kf
+    | Some stmt -> Property.ELStmt (kf, stmt)
+  in let property = Property.ip_of_extended extended_loc acsl in
+  match acsl.ext_kind with
+  | Ext_id _ -> ()
+  | Ext_terms ts ->
+    let env = { map ; property ; formal ; result } in
+    List.iter (iadd_term env) ts
+  | Ext_preds ps ->
+    let env = { map ; property ; formal ; result } in
+    List.iter (add_predicate env) ps
+  | Ext_annot (_,acsls) ->
+    List.iter (add_extension ~kf ?stmt ~formal ?result map) acsls
+
 
 let add_behavior ~kf ~ki ?(formal=Vmap.empty) ?result map bhv =
   List.iter (add_requires ~map ~kf ~ki ~bhv ~formal ?result) bhv.b_requires ;
@@ -84,7 +101,7 @@ let add_behavior ~kf ~ki ?(formal=Vmap.empty) ?result map bhv =
   add_post_cond ~map ~kf ~ki ~bhv ~formal ?result            bhv.b_post_cond ;
   add_assigns ~map ~kf ~ki ~bhv ~formal ?result              bhv.b_assigns ;
   add_allocation ~map ~kf ~ki ~bhv ~formal ?result           bhv.b_allocation ;
-  List.iter (add_extension)                                  bhv.b_extended
+  List.iter (add_extension ~kf ~formal ?result map)          bhv.b_extended
 
 (* -------------------------------------------------------------------------- *)
 (* ---  Process Code Annotation                                           --- *)
@@ -110,21 +127,6 @@ let add_spec ~kf ~ki ?(formal=Vmap.empty) ?result (map:map) (s:spec) =
 (* -------------------------------------------------------------------------- *)
 (* ---  Process Function Body                                             --- *)
 (* -------------------------------------------------------------------------- *)
-
-let rec add_acsl_extension ~kf ~stmt ?(formal=Vmap.empty) ?result ~ca map =
-  function { ext_kind = acsl } -> match acsl with
-    | Ext_id _ -> ()
-    | Ext_terms ts ->
-      let property = Property.ip_of_code_annot_single kf stmt ca in
-      let env = { map ; property ; formal ; result } in
-      List.iter (iadd_term env) ts
-    | Ext_preds ps ->
-      let property = Property.ip_of_code_annot_single kf stmt ca in
-      let env = { map ; property ; formal ; result } in
-      List.iter (add_predicate env) ps
-    | Ext_annot (_,acsls) ->
-      List.iter (add_acsl_extension ~kf ~stmt ~formal ?result ~ca map) acsls
-
 
 let add_code_annot ~kf ~stmt ?(formal=Vmap.empty) ?result map c =
   match c.annot_content with
@@ -155,4 +157,4 @@ let add_code_annot ~kf ~stmt ?(formal=Vmap.empty) ?result map c =
     List.iter (iadd_iterm { map ; property ; formal ; result }) its1 ;
     List.iter (iadd_iterm { map ; property ; formal ; result }) its2
   | AExtended (_,_, acsl) ->
-    add_acsl_extension ~kf ~stmt ~formal ?result ~ca:c map acsl
+    add_extension ~kf ~stmt ~formal ?result map acsl

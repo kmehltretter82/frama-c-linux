@@ -30,6 +30,3 @@ val add_behavior : kf:kernel_function -> ki:kinstr ->
 val add_code_annot : kf:kernel_function -> stmt:stmt ->
   ?formal:domain Cil_datatype.Varinfo.Map.t -> ?result:node ->
   map -> code_annotation -> unit
-val add_acsl_extension : kf:kernel_function -> stmt:stmt ->
-  ?formal:domain Cil_datatype.Varinfo.Map.t -> ?result:node ->
-  ca:code_annotation -> map -> acsl_extension -> unit
