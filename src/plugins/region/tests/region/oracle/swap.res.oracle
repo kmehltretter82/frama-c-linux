@@ -4,10 +4,10 @@
   R0004: R-- a (int *) 64b (*R0007) ;
   R0007: RW- R: (int) 32b ;
   R0001: R-- b (int *) 64b (*R0007) ;
-  R0008: RW- tmp (int) 32b ;
+  R0019: RW- tmp (int) 32b ;
 [region] Function swap_separated:
   R0001: R-- a (int *) 64b (*R0004) ;
   R0004: RW- A: (int) 32b ;
   R0005: R-- b (int *) 64b (*R0008) ;
   R0008: RW- B: (int) 32b ;
-  R0009: RW- tmp (int) 32b ;
+  R001b: RW- tmp (int) 32b ;
