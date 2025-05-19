@@ -8,9 +8,6 @@
 [wp] [Valid] Goal init_terminates (Cfg) (Trivial)
 [wp] [Valid] Goal swap_exits (Cfg) (Unreachable)
 [wp] [Valid] Goal swap_terminates (Cfg) (Trivial)
-[region] compound_assigns.i:82: Warning: Annotations not analyzed
-[region] compound_assigns.i:84: Warning: Annotations not analyzed
-[region] compound_assigns.i:98: Warning: Annotations not analyzed
 [wp] 22 goals scheduled
 [wp] [Valid] region_swap_ensures_P (Alt-Ergo) (Cached)
 [wp] [Valid] region_swap_ensures_Q (Alt-Ergo) (Cached)
