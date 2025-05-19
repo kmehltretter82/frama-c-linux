@@ -66,14 +66,20 @@ typedef struct contract_t {
   char *assumes;
 } __attribute__((FC_BUILTIN)) contract_t;
 
+// Use an array of arbitrary length to serve as dynamic allocation base in the
+// specifications so that Eva can better interpret contracts in this file.
+//@ ghost contract_t __fc_eacsl_contract_base[INT32_MAX];
+
 /*! \brief Allocate and initialize a structure to hold pieces of information
  * about `size` behaviors.
  *
  * \param size Number of behaviors that the structure should support.
  * \return A structure to hold pieces of information about contracts at runtime.
  */
-/*@ assigns \result \from indirect:__fc_heap_status, indirect:size;
-  @ admit ensures \valid(\result); */
+/*@ allocates \result;
+  @ assigns __fc_heap_status \from __fc_heap_status;
+  @ assigns \result \from &__fc_eacsl_contract_base, indirect:size;
+  @ ensures \valid(\result); */
 contract_t *contract_init(size_t size) __attribute__((FC_BUILTIN));
 
 /*! \brief Cleanup the structure `c` previously allocated by
