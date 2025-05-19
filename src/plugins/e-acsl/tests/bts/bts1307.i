@@ -8,13 +8,13 @@
 
   @ behavior OverEstimate_Motoring:
   @ assumes \true;
-  @ ensures *Mtmax_out != *Mtmax_in + (5 - (((5 / 80) * *Mwmax) * 0.4));
+  @ ensures *Mtmax_out != *Mtmax_in + (5.0 - (((5.0 / 80.0) * *Mwmax) * 0.4));
   @*/
 void foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out) {
   /* Real semantics and floating-point semantics give different results because:
      1) Mtmax_out is 5.975 is in R
      2) The float closest to 5.975 is 5.97499999999999964472863211995 */
-  *Mtmax_out = *Mtmax_in + (5 - (((5 / 80) * *Mwmax) * 0.4));
+  *Mtmax_out = *Mtmax_in + (5.0f - (((5.0f / 80.0f) * *Mwmax) * 0.4f));
 }
 
 /*@ requires \valid(Mtmin_in);
@@ -26,7 +26,7 @@ void foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out) {
   @ ensures *Mtmin_out == *Mtmin_in < 0.85 * *Mwmin ? *Mtmin_in : 0.85 * *Mwmin;
   @*/
 void bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out) {
-  *Mtmin_out = 0.85 * *Mwmin;
+  *Mtmin_out = 0.85f * *Mwmin;
 }
 
 int main(void) {
