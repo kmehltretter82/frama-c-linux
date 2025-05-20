@@ -20,70 +20,25 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cil_types
+module Make (H : Hashtbl.S) = struct
+  let head_tbl = H.create 7
+  let tail_tbl = H.create 7
 
-type scope =
-  | Global
-  | Function
-  | Block
+  let clear () =
+    H.clear head_tbl;
+    H.clear tail_tbl
 
-module H = Datatype.String.Hashtbl
-let tbl = H.create 7
-let globals = H.create 7
+  let add head tail =
+    H.add head_tbl head tail;
+    H.add tail_tbl tail head
 
-let get ~scope s =
-  let _, u =
-    Extlib.make_unique_name
-      (fun s -> H.mem tbl s || H.mem globals s)
-      ~sep:"_"
-      s
-  in
-  let add = match scope with
-    | Global -> H.add globals
-    | Function | Block -> H.add tbl
-  in
-  add u ();
-  u
+  let tails head = H.find_all head_tbl head
+  let tail head = H.find head_tbl head
+  let tail_opt head = H.find_opt head_tbl head
+  let heads tail = H.find_all tail_tbl tail
+  let head tail = H.find tail_tbl tail
+  let head_opt tail = H.find_opt tail_tbl tail
 
-let clear_locals () = H.clear tbl
-
-let of_binop = function
-  | PlusA -> "plus"
-  | PlusPI -> "plus"
-  | MinusA -> "minus"
-  | MinusPI -> "minus"
-  | MinusPP -> "minus"
-  | Mult -> "mult"
-  | Div -> "div"
-  | Mod -> "mod"
-  | Shiftlt -> "shiftl"
-  | Shiftrt -> "shiftr"
-  | Lt -> "lt"
-  | Gt -> "gt"
-  | Le -> "le"
-  | Ge -> "ge"
-  | Eq -> "eq"
-  | Ne -> "ne"
-  | BAnd -> "and"
-  | BXor -> "xor"
-  | BOr -> "or"
-  | LAnd -> "and"
-  | LOr -> "or"
-
-let of_unop = function
-  | Neg -> "neg"
-  | BNot -> "not"
-  | LNot -> "not"
-
-let rec of_exp ?default exp = match exp.enode with
-  | Lval (Var {vorig_name}, NoOffset) -> vorig_name
-  | Const (CInt64 (i, _, _)) -> "const_" ^ Integer.to_string i
-  | BinOp (op, x, y, _) -> of_binop op ^ of_exp x ^ "_" ^ of_exp y
-  | UnOp (op, x, _) -> of_unop op ^ of_exp x
-  | e ->
-    match default with
-    | None ->
-      Options.debug "Varname.of_exp: supply default or extend this function \
-                     to handle enodes like: %a" Cil_types_debug.pp_exp_node e;
-      "exp"
-    | Some default -> default
+  let tail_or_self head = try tail head with Not_found -> head
+  let head_or_self tail = try head tail with Not_found -> tail
+end

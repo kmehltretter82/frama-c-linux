@@ -475,7 +475,9 @@ let raise_errors = function
       "logic functions or predicates with no definition nor reads clause"
   | LBreads _ ->
     Error.not_yet "logic functions or predicates performing read accesses"
-  | LBinductive _ -> Error.not_yet "inductive logic functions"
+  | LBinductive _ ->
+    Error.not_yet "inductive definitions outside of \
+                   subset described in the reference manual"
   | LBterm _
   | LBpred _ -> ()
 

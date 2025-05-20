@@ -211,6 +211,7 @@ and tlval_to_lval kf env (host, offset) =
    that have already been converted to "\sum". *)
 and extended_quantifier_to_exp ~adata ~loc kf env t t_min t_max lambda name =
   let logic_env = Env.Logic_env.get env in
+  let t = Logic_normalizer.get_term t in
   match lambda.term_node with
   | Tlambda([ k ] ,lt)
     when name.lv_name = "\\product" || name.lv_name = "\\sum"
@@ -331,8 +332,6 @@ and context_insensitive_term_to_exp_il ?inplace t =
   | TBinOp((Lt | Gt | Le | Ge | Eq | Ne) as bop, t1, t2) ->
     let* logic_env = M.read_logic_env in
     let ity =
-      let t1 = Logic_normalizer.get_term t1 in
-      let t2 = Logic_normalizer.get_term t2 in
       Typing.join
         (Typing.get_effective_ty ~logic_env t1)
         (Typing.get_effective_ty ~logic_env t2)
@@ -415,7 +414,6 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
     else
       Cil.new_exp ~loc (UnOp(op, e, ty)), adata, env, Analyses_types.C_number, ""
   | TUnOp(LNot, t) ->
-    let t = Logic_normalizer.get_term t in
     let ty = Typing.get_effective_typ ~logic_env t in
     if Gmp_types.Z.is_t ty then
       (* [!t] is converted into [t == 0] *)
@@ -444,6 +442,8 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
       e, adata, env, Analyses_types.C_number, ""
     end
   | TBinOp(PlusA | MinusA | Mult as bop, t1, t2) ->
+    let t1 = Logic_normalizer.get_term t1 in
+    let t2 = Logic_normalizer.get_term t2 in
     let ty = Typing.get_typ ~logic_env t in
     let e1, adata, env = to_exp ~adata kf env t1 in
     let e2, adata, env = to_exp ~adata kf env t2 in
@@ -530,8 +530,6 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
     end
   | TBinOp(Lt | Gt | Le | Ge | Eq | Ne as bop, t1, t2) ->
     (* comparison operators *)
-    let t1 = Logic_normalizer.get_term t1 in
-    let t2 = Logic_normalizer.get_term t2 in
     let ity =
       Typing.join
         (Typing.get_effective_ty ~logic_env t1)
@@ -824,6 +822,7 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
         assert false
     end
   | TCast (false, Ctype ty, t') ->
+    let t' = Logic_normalizer.get_term t' in
     let e, adata, env = to_exp ~adata kf env t' in
     let e, env =
       Typed_number.add_cast
@@ -836,6 +835,23 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
         (Some t)
         e
     in
+    e, adata, env, Analyses_types.C_number, ""
+  | TCast (true, _, _) when Inductive.is_fallthrough_term t ->
+    let e = Cil.zero ~loc in
+    let annot_kind = Env.annotation_kind env in
+    let stmt, env =
+      Assert.runtime_check_with_msg
+        ~adata
+        ~loc
+        "Incomplete axiomatic function"
+        ~pred_kind:Assert
+        annot_kind
+        kf
+        env
+        e
+    in
+    let env = Env.add_stmt env stmt in
+    let adata = Assert.register_term ~loc t e adata in
     e, adata, env, Analyses_types.C_number, ""
   | TCast (true, _, t) -> context_insensitive_term_to_exp_old ~adata kf env t
   | TCast (false, _,_) -> assert false
@@ -852,12 +868,15 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
   | Tapp(li, _, [ t1; t2; {term_node = Tlambda([ _ ], _)} as lambda ])
     when li.l_body = LBnone && (li.l_var_info.lv_name = "\\sum" ||
                                 li.l_var_info.lv_name = "\\product")->
+    let t1 = Logic_normalizer.get_term t1 in
+    let t2 = Logic_normalizer.get_term t2 in
     extended_quantifier_to_exp ~adata ~loc kf env t t1 t2 lambda li.l_var_info
   | Tapp(li, _, _)
     when li.l_body = LBnone && li.l_var_info.lv_name = "\\numof" ->
     assert false
   | Tapp(li, [], args)
   | Tapp(li, [BuiltinLabel Here], args) ->
+    let args = List.map Logic_normalizer.get_term args in
     let e, adata, env =
       Logic_functions.app_to_exp ~adata ~loc ~tapp:t kf env li args
     in
@@ -870,6 +889,9 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
     exp, adata, env, Analyses_types.C_number, ""
   | TDataCons _ -> Env.not_yet env "constructor"
   | Tif(t1, t2, t3) ->
+    let t1 = Logic_normalizer.get_term t1 in
+    let t2 = Logic_normalizer.get_term t2 in
+    let t3 = Logic_normalizer.get_term t3 in
     let e, adata, env =
       Extlib.flatten
         (Env.with_params_and_result
@@ -950,6 +972,7 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
   | Tcomprehension _ -> Env.not_yet env "tset comprehension"
   | Trange _ -> Env.not_yet env "range"
   | Tlet(li, t) ->
+    let t = Logic_normalizer.get_term t in
     (* Translate the term registered to the \let logic variable *)
     let adata, env = Translate_utils.env_of_li ~adata ~loc kf env li in
     (* Register the logic var to the logic scope *)
@@ -968,7 +991,6 @@ and to_exp_il ?inplace t =
       (Env.generate_rte env)
       (M.not_covered ~pre:"with RTE" Printer.pp_term t)
   in
-  let t = Logic_normalizer.get_term t in
   let* e = context_insensitive_term_to_exp_il ?inplace t in
   Options.debug ~dkey ~level:4 "to_exp_il {%a} %a = %a"
     Profile.pretty (Env.Logic_env.get_profile env)

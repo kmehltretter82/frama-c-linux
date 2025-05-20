@@ -22,68 +22,22 @@
 
 open Cil_types
 
-type scope =
-  | Global
-  | Function
-  | Block
+(** A unified signature for building terms and expressions.
+    Not to be confused with [Analyses_types.pred_or_term], which
+    simply is the sum of both types, while here separate modules are provided
+    for predicates and terms. *)
+module type S = sig
+  type t
 
-module H = Datatype.String.Hashtbl
-let tbl = H.create 7
-let globals = H.create 7
+  val mk_false : logic_type option -> t
+  val mk_true : logic_type option -> t
+  val mk_logic_body : t -> logic_body
+  val mk_let : ?loc:location -> logic_info -> t -> t
+  val mk_if : ?loc:location -> predicate -> t -> t -> t
+  val mk_at : logic_label -> t -> t
 
-let get ~scope s =
-  let _, u =
-    Extlib.make_unique_name
-      (fun s -> H.mem tbl s || H.mem globals s)
-      ~sep:"_"
-      s
-  in
-  let add = match scope with
-    | Global -> H.add globals
-    | Function | Block -> H.add tbl
-  in
-  add u ();
-  u
+  val visit : Visitor.frama_c_visitor -> t -> t
+end
 
-let clear_locals () = H.clear tbl
-
-let of_binop = function
-  | PlusA -> "plus"
-  | PlusPI -> "plus"
-  | MinusA -> "minus"
-  | MinusPI -> "minus"
-  | MinusPP -> "minus"
-  | Mult -> "mult"
-  | Div -> "div"
-  | Mod -> "mod"
-  | Shiftlt -> "shiftl"
-  | Shiftrt -> "shiftr"
-  | Lt -> "lt"
-  | Gt -> "gt"
-  | Le -> "le"
-  | Ge -> "ge"
-  | Eq -> "eq"
-  | Ne -> "ne"
-  | BAnd -> "and"
-  | BXor -> "xor"
-  | BOr -> "or"
-  | LAnd -> "and"
-  | LOr -> "or"
-
-let of_unop = function
-  | Neg -> "neg"
-  | BNot -> "not"
-  | LNot -> "not"
-
-let rec of_exp ?default exp = match exp.enode with
-  | Lval (Var {vorig_name}, NoOffset) -> vorig_name
-  | Const (CInt64 (i, _, _)) -> "const_" ^ Integer.to_string i
-  | BinOp (op, x, y, _) -> of_binop op ^ of_exp x ^ "_" ^ of_exp y
-  | UnOp (op, x, _) -> of_unop op ^ of_exp x
-  | e ->
-    match default with
-    | None ->
-      Options.debug "Varname.of_exp: supply default or extend this function \
-                     to handle enodes like: %a" Cil_types_debug.pp_exp_node e;
-      "exp"
-    | Some default -> default
+module Predicate : S with type t = predicate
+module Term : S with type t = term
