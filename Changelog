@@ -24,10 +24,17 @@ Open Source Release <next-release>
               instead of 'specified', its default value is now 'user-specified':
               unused libc functions with specifications are now removed during
               normalization.
+-   Eva       [2025-04-28] Improved -eva-partition-history option, which can now
+              keep states separated from builtin calls, function specifications
+              and disjunctions in ACSL assertions.
 *!  Kernel    [2025-04-25] Init is always available in logic annotations
 o!  Kernel    [2025-04-23] Remove allegedly unused optionnal normalizations on
               while loops and conditionals (`setDoTransformWhile` and
               `setDoAlternateConditional`).
+o   Eva       [2025-04-23] In the Eva API, exports statistics about an analysis
+              in the new Statistics module.
+-   Eva       [2025-04-18] New option -eva-partition-history-function which
+              overrides the value of -eva-partition-history on given functions.
 -*  Kernel    [2025-04-14] Add support for initializer overrides in
               structures using compound litterals (fix #@1514).
 -   Kernel    [2025-04-14] Unused static or inline functions are now removed
@@ -45,6 +52,8 @@ o   Kernel    [2025-04-11] Removed files in share/compliance.
               in a separate file.
 -*  Kernel    [2025-04-10] Fix Frama-C normalization which could in specific
               cases result in an ill-formed AST (Fix ##2716).
+-*  Eva       [2025-03-17] Fix a crash when using Frama_C_domain_show_each on a
+              memory location of unknown size.
 -   Kernel    [2025-03-12] Fix handling of qualifiers in array formals during
               typing phase (fix #@998).
 o   Kernel    [2025-02-25] Frama-C now uses OCamlmig (see developer manual) to
@@ -62,6 +71,8 @@ o!  Kernel    [2025-02-17] New module Ast_attributes for attribute related
               provided it can be evaluated to an integer constant.
               Fixes ##2695 and #@1413
 o!  Kernel    [2025-02-13] Move some functions from Logic_typing to Logic_utils
+-*  Eva       [2025-02-12] Fix interpretation of from clauses referring to
+              addresses, such as "assigns X \from &g".
 -   Alias     [2025-02-07] New message key printer:show-libc-vars for
               including variables stemming from the C library in the console
               output (now disabled by default).
@@ -75,6 +86,9 @@ o!  Kernel    [2025-02-05] Remove attributes annotations (Cil.AttrAnnot). Use
               normal attributes instead.
 o!  Kernel    [2025-01-31] Use a record to represent `Cil_types.typ` with two
               fields `tnode` and `tattr` for its `typ_node` and `attributes`.
+-   Kernel    [2025-01-31] New option -cache-size to control the amount of
+              memory allocated for some internal caches; it replaces the
+              environment variable FRAMA_C_MEMORY_FOOTPRINT.
 -   Ivette    [2025-01-23] New sidebar listing functions and global variables
               for each source file.
 -   Eva       [2025-01-23] Rename warning key `invalid-assigns` to
