@@ -455,12 +455,15 @@ let temp_file ~prefix ~suffix =
   with Filesystem.Temp_file_error s ->
     abort "cannot create temporary file: %s" s
 
-let save_projects selection projects filename =
+let save_projects ?compress selection projects (filename : Filepath.t) =
+  let compress =
+    Option.value ~default:Cmdline.compress_saved_session compress
+  in
   let open Filesystem.Operators in
-  let$ cout = Filesystem.with_open_out_exn ~binary:true filename in
-  output_value cout System_config.Version.id;
-  output_value cout magic;
-  output_value cout !Graph.Blocks.cpt_vertex;
+  let$ cout = Filesystem.Compressed.with_open_out_exn ~compress filename in
+  Channel.output_value cout System_config.Version.id;
+  Channel.output_value cout magic;
+  Channel.output_value cout !Graph.Blocks.cpt_vertex;
   let states : (t * (string * State.state_on_disk) list) list =
     Q.fold
       (fun acc p ->
@@ -472,17 +475,17 @@ let save_projects selection projects filename =
   (* projects are stored on disk from the current one to the last project.
      !last_created_by_copy_ref must be saved at the same time to share the
      project on disk *)
-  output_value cout (List.rev states, !last_created_by_copy_ref)
+  Channel.output_value cout (List.rev states, !last_created_by_copy_ref)
 
-let save ?(selection=State_selection.full) ?(project=current()) filename =
+let save ?compress ?(selection=State_selection.full) ?(project=current()) filename =
   guarded_feedback selection 2 "saving project %S into file %a"
     project.unique_name Filepath.pretty filename;
-  save_projects selection (Q.singleton project) filename
+  save_projects ?compress selection (Q.singleton project) filename
 
-let save_all ?(selection=State_selection.full) filename =
+let save_all ?compress ?(selection=State_selection.full) filename =
   guarded_feedback selection 2 "saving the current session into file %a"
     Filepath.pretty filename;
-  save_projects selection projects filename
+  save_projects ?compress selection projects filename
 
 module Descr = struct
 
@@ -598,13 +601,13 @@ module Descr = struct
 
 end
 
-let load_projects ~project_under_copy selection ?name filename =
+let load_projects ~project_under_copy selection ?name (filename : Filepath.t) =
   let open Filesystem.Operators in
   let ocamlgraph_counter, pre_existing_projects, loaded_states, last_created =
     try
-      let$ cin = Filesystem.with_open_in_exn ~binary:true filename in
+      let$ cin = Filesystem.Compressed.with_open_in_exn filename in
       let check_magic format current =
-        let old = input_value cin in
+        let old = Channel.input_value cin in
         if old <> current then begin
           let s =
             Format.asprintf
@@ -618,7 +621,7 @@ let load_projects ~project_under_copy selection ?name filename =
       in
       check_magic "%S" System_config.Version.id;
       check_magic "magic number %d" magic;
-      let ocamlgraph_counter = input_value cin in
+      let ocamlgraph_counter = Channel.input_value cin in
       let pre_existing_projects = Descr.init project_under_copy in
       let loaded_states, last_created =
         Descr.input_val cin (Descr.global_state name selection)
@@ -684,7 +687,7 @@ let create_by_copy
   guarded_feedback selection 2 "creating project %S by copying project %S"
     name (src.unique_name);
   let filename = temp_file ~prefix:"frama_c_create_by_copy" ~suffix:".sav" in
-  save ~selection ~project:src filename;
+  save ~compress:false ~selection ~project:src filename;
   try
     let prj = load_with_copy ~project_under_copy:src ~selection ~name filename in
     Filesystem.remove_file filename;

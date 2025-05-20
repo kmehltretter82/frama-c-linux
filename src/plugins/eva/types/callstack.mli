@@ -66,6 +66,9 @@ val push : Cil_types.kernel_function -> Cil_types.stmt -> t -> t
 (** Removes the topmost call from the callstack. *)
 val pop : t -> t option
 
+(** Removes the topmost call from the callstack and returns it. *)
+val pop_call : t -> (Cil_types.kernel_function * Cil_types.kinstr) * t option
+
 val top : t -> (Cil_types.kernel_function * Cil_types.stmt) option
 val top_kf : t -> Cil_types.kernel_function
 val top_callsite : t -> Cil_types.kinstr

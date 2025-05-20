@@ -45,6 +45,9 @@ module PLoc = struct
 
   let size loc = Precise_locs.loc_size loc
 
+  let enumerate_valid_bits access loc =
+    Precise_locs.enumerate_valid_bits access loc
+
   let make loc =
     let ploc_bits = Precise_locs.inject_location_bits loc.Locations.loc in
     Precise_locs.make_precise_loc ploc_bits ~size:loc.Locations.size

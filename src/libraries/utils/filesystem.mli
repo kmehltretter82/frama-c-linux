@@ -248,6 +248,32 @@ val with_formatter: Filepath.t -> (Format.formatter, 'a) safe_processor
     [Command.print_file] *)
 val with_formatter_exn: Filepath.t -> (Format.formatter, 'a) exn_processor
 
+module Compressed : sig
+  (** [with_open_in_exn path f] calls [f] with a new input channel on the file
+      [path] opened for reading in binary mode. If the file is compressed, then
+      the input channel is uncompressed. The file is closed when [f] returns or
+      whenever an exception is thrown by [f].
+
+      Note: this function should be merged with existing [with_open_in...]
+      functions at some point. *)
+  val with_open_in_exn :
+    Filepath.t ->
+    (Channel.input, 'a) exn_processor
+
+  (** [with_open_out_bin_exn ?compress path f] calls [f] with a new output
+      channel on the file [path] opened for writing in binary mode. If
+      [compress] is [true] then then content of the file will be compressed by
+      [Compression]. The file is closed when [f] returns or whenever an
+      exception is thrown by [f].
+
+      Note: this function should be merged with existing [with_open_out...]
+      functions at some point. *)
+  val with_open_out_exn :
+    ?compress:bool ->
+    Filepath.t ->
+    (Channel.output, 'a) exn_processor
+end
+
 (** Opening this module allows to use shorter syntax to deal with files.
 
     {[

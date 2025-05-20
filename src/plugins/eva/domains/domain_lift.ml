@@ -105,10 +105,11 @@ module Make
     let open Abstract_domain in
     let find expr = valuation.find expr >>> lift_record in
     let find_loc lval = valuation.find_loc lval >>> lift_loc_record in
+    let find_loc_def lval = valuation.find_loc_def lval |> Loc.restrict in
     let fold f acc =
       valuation.fold (fun exp record acc -> f exp (lift_record record) acc) acc
     in
-    { find; fold; find_loc; }
+    { find; fold; find_loc; find_loc_def }
 
   let update valuation = Domain.update (lift_valuation valuation)
 

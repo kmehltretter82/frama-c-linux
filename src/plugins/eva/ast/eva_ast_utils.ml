@@ -197,58 +197,6 @@ let vars_in_exp, vars_in_lval =
   visit_exp ~neutral ~combine folder, visit_lval ~neutral ~combine folder
 
 
-(* Dependencies *)
-
-let rec deps_of_exp find_loc exp =
-  let rec process exp = match exp.node with
-    | Lval lval ->
-      deps_of_lval find_loc lval
-    | UnOp (_, e, _) | CastE (_, e) ->
-      process e
-    | BinOp (_, e1, e2, _) ->
-      Deps.join (process e1) (process e2)
-    | StartOf lv | AddrOf lv ->
-      Deps.data (indirect_zone_of_lval find_loc lv)
-    | Const _ ->
-      Deps.bottom
-  in
-  process exp
-
-and zone_of_exp find_loc exp = Deps.to_zone (deps_of_exp find_loc exp)
-
-and deps_of_lval find_loc lval =
-  let ploc = find_loc lval in
-  (* dereference of an lvalue: first, its address must be computed,
-     then its contents themselves are read *)
-  let indirect = indirect_zone_of_lval find_loc lval in
-  let data = Precise_locs.enumerate_valid_bits Read ploc in
-  { Deps.data ; indirect }
-
-and zone_of_lval find_loc lval = Deps.to_zone (deps_of_lval find_loc lval)
-
-(* Computations of the inputs of a lvalue : union of the "host" part and
-   the offset. *)
-and indirect_zone_of_lval find_loc lval =
-  let lhost, offset = lval.node in
-  let lhost_zone = zone_of_lhost find_loc lhost
-  and offset_zone = zone_of_offset find_loc offset in
-  Locations.Zone.join lhost_zone offset_zone
-
-(* Computation of the inputs of a host. Nothing for a variable, and the
-   inputs of [e] for a dereference [*e]. *)
-and zone_of_lhost find_loc = function
-  | Var _ -> Locations.Zone.bottom
-  | Mem e -> zone_of_exp find_loc e
-
-
-(* Computation of the inputs of an offset. *)
-and zone_of_offset find_loc = function
-  | NoOffset -> Locations.Zone.bottom
-  | Field (_, o) -> zone_of_offset find_loc o
-  | Index (e, o) ->
-    Locations.Zone.join
-      (zone_of_exp find_loc e) (zone_of_offset find_loc o)
-
 let rec to_integer e =
   match e.node with
   | Const (CInt64 (n,_,_)) -> Some n

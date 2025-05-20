@@ -220,10 +220,13 @@ type ('value, 'location, 'origin) valuation =
         the evaluated (sub)expressions and r1 ... rN are the computed records
         for each of these expressions. The record of an expression contains its
         value, reduction status, origin and alarms. *)
-    find_loc: lval -> 'location record_loc or_top
+    find_loc: lval -> 'location record_loc or_top;
     (** Finds the location computed for an lvalue. The returned record also
         contains the lvalue type and the alarms emitted by its evaluation.
         Returns `Top if the lvalue has not been evaluated. *)
+    find_loc_def: lval -> 'location
+    (** Finds the location computed for an lvalue. Returns the given top if the
+        lvalue has not been evaluated. *)
   }
 
 (** Transfer function of the domain. *)

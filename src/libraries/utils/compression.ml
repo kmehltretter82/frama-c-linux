@@ -20,41 +20,36 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cil_types
+(** File compression *)
 
-(** Mark the analysis as aborted: it will be stopped at the next safe point. *)
-val signal_abort: kill:bool -> unit
+let input_value chan =
+  let bufsize = Marshal.header_size + (4 * 1024) in
+  let buffer = Bytes.create bufsize in
+  Gzip.really_input chan buffer 0 Marshal.header_size;
+  let data_size = Marshal.data_size buffer 0 in
+  let buffer =
+    if data_size > bufsize then
+      Bytes.extend buffer 0 (bufsize - data_size)
+    else
+      buffer
+  in
+  Gzip.really_input chan buffer Marshal.header_size data_size;
+  Marshal.from_bytes buffer 0
 
-(** Reset the signal sent by [signal_abort], if any. *)
-val signal_reset: unit -> unit
+let unsafe_really_input chan buf ofs len =
+  (* Gzip.unsafe_really_input does not exist but Unmarshal uses this function to
+     copy bytes into an array "created" with Obj.obj, i.e. with its length
+     incorrectly reported. Since the length of the array is incorrectly reported
+     we cannot juste use really_input instead. This function creates first a
+     bytes array of the correct length to be able to use really_input, then copy
+     the content to buf with unsafe_blit so that the length of buf is not
+     checked. *)
+  let bytes = Bytes.create len in
+  Gzip.really_input chan bytes 0 len;
+  Bytes.unsafe_blit bytes 0 buf ofs len
 
-(** Provided [stmt] is an 'if' construct, [fst (condition_truth_value stmt)]
-    (resp. snd) is true if and only if the condition of the 'if' has been
-    evaluated to true (resp. false) at least once during the analysis. *)
-val condition_truth_value: stmt -> bool * bool
+let output_value chan value =
+  let bytes = Marshal.to_bytes value [] in
+  Gzip.output chan bytes 0 (Bytes.length bytes)
 
-module Computer
-    (* Abstractions with the evaluator. *)
-    (Engine: Engine_sig.S)
-    (* Set of states of abstract domain. *)
-    (States : Powerset.S with type state = Engine.Dom.t)
-    (* Transfer functions for statement on the Engine domain. *)
-    (_ : Transfer_stmt.S with type state = Engine.Dom.t
-                          and type value = Engine.Val.t)
-    (* Initialization of local variables. *)
-    (_: Initialization.S with type state := Engine.Dom.t)
-    (* Transfer functions for the logic on the Engine domain. *)
-    (_ : Transfer_logic.S with type state = Engine.Dom.t
-                           and type states = States.t)
-    (_: sig
-       val treat_statement_assigns:
-         stmt -> assigns -> Engine.Dom.t -> Engine.Dom.t
-     end)
-  : sig
-
-    val compute:
-      save_results:bool ->
-      kernel_function -> kinstr -> Engine.Dom.t ->
-      (Partition.key * Engine.Dom.t) list * Eval.cacheable
-
-  end
+include Gzip

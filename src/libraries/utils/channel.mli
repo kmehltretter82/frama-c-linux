@@ -20,41 +20,42 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cil_types
+type input
+(** The type of input channel. *)
 
-(** Mark the analysis as aborted: it will be stopped at the next safe point. *)
-val signal_abort: kill:bool -> unit
+type output
+(** The type of output channel. *)
 
-(** Reset the signal sent by [signal_abort], if any. *)
-val signal_reset: unit -> unit
+val open_in_bin : string -> input
+(** Open the given file for reading in binary mode, and return a new input
+    channel on that file, positioned at the beginning of the file. *)
 
-(** Provided [stmt] is an 'if' construct, [fst (condition_truth_value stmt)]
-    (resp. snd) is true if and only if the condition of the 'if' has been
-    evaluated to true (resp. false) at least once during the analysis. *)
-val condition_truth_value: stmt -> bool * bool
+val close_in : input -> unit
+(** Close the given channel. *)
 
-module Computer
-    (* Abstractions with the evaluator. *)
-    (Engine: Engine_sig.S)
-    (* Set of states of abstract domain. *)
-    (States : Powerset.S with type state = Engine.Dom.t)
-    (* Transfer functions for statement on the Engine domain. *)
-    (_ : Transfer_stmt.S with type state = Engine.Dom.t
-                          and type value = Engine.Val.t)
-    (* Initialization of local variables. *)
-    (_: Initialization.S with type state := Engine.Dom.t)
-    (* Transfer functions for the logic on the Engine domain. *)
-    (_ : Transfer_logic.S with type state = Engine.Dom.t
-                           and type states = States.t)
-    (_: sig
-       val treat_statement_assigns:
-         stmt -> assigns -> Engine.Dom.t -> Engine.Dom.t
-     end)
-  : sig
+val input_value : input -> 'a
+(** Read the representation of a structured value, as produced by
+    [output_value], and return the corresponding value. *)
 
-    val compute:
-      save_results:bool ->
-      kernel_function -> kinstr -> Engine.Dom.t ->
-      (Partition.key * Engine.Dom.t) list * Eval.cacheable
+val input_char : input -> char
+(** Read one character from the given input channel.
+    @raise End_of_file if there are no more characters to read. *)
 
-  end
+val unsafe_really_input : input -> bytes -> int -> int -> unit
+(** [unsafe_really_input ic buf pos len] reads [len] characters from channel
+    [ic], storing them in byte sequence [buf], starting at character number
+    [pos]. The function is unsafe as no verification is done that [0 <= pos],
+    [0 <= len] or [Bytes.length buf > pos + len]. *)
+
+val open_out_bin : ?compress:bool -> string -> output
+(** Open the given file for writing in binary mode, and return a new output
+    channel on that file, positioned at the beginning of the file. If
+    [compress] is true then the content of the file will be compressed by
+    [Compression]. *)
+
+val close_out : output -> unit
+(** Close the given channel. *)
+
+val output_value : output -> 'a -> unit
+(** Write the representation of a structured value of any type to a channel. The
+    object can be read back by [input_value]. *)

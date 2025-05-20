@@ -25,5 +25,6 @@ include Eva_ast_typing
 include Eva_ast_printer
 include Eva_ast_datatype
 include Eva_ast_builder
+include Eva_ast_deps
 include Eva_ast_utils
 include Eva_ast_visitor

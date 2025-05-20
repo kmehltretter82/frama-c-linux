@@ -73,6 +73,7 @@ let dkey = Kernel_log.register_category "cmdline"
 let quiet_ref = ref false
 let deterministic = ref false
 let permissive = ref false
+let compress_saved_session = ref true
 
 let last_project_created_by_copy = ref (fun () -> assert false)
 
@@ -501,7 +502,11 @@ let () =
         "-kernel-debug", Int (fun n -> Kernel_debug_level.set n);
         "-deterministic", Unit (fun () -> deterministic := true);
         "-permissive", Unit (fun () -> permissive := true);
-        "-memory-footprint", Int configure_ocaml_gc
+        "-memory-footprint", Int configure_ocaml_gc;
+        "-compress-saved-session", Unit (fun () ->
+            compress_saved_session := true);
+        "-no-compress-saved-session", Unit (fun () ->
+            compress_saved_session := false)
       ]
       false
       all_options
@@ -519,6 +524,7 @@ let () =
 let quiet = !quiet_ref
 let deterministic = !deterministic
 let permissive = !permissive
+let compress_saved_session = !compress_saved_session
 
 (* ************************************************************************* *)
 (** {2 Plugin} *)

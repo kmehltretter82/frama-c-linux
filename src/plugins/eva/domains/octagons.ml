@@ -160,7 +160,8 @@ module Variable : Variable = struct
     | StartOf _ ->
       { data = Locations.Zone.bottom ; indirect = Locations.Zone.bottom }
     | Lval lval ->
-      Eva_ast.deps_of_lval eval_loc (Option.get (HCE.to_lval lval))
+      Eva_ast.PreciseDepsOf.deps_of_lval
+        eval_loc (Option.get (HCE.to_lval lval))
 end
 
 module VarSet = Hptset.Make (Variable) (Hptmap_Info)
@@ -1614,11 +1615,7 @@ module Domain = struct
         | `Value (Cvalue.V.Top _) -> `Top
         | `Value cvalue -> `Value cvalue
     in
-    let eval_loc lval =
-      match valuation.Abstract_domain.find_loc lval with
-      | `Top -> Precise_locs.loc_top
-      | `Value record -> record.loc
-    in
+    let eval_loc lval = valuation.Abstract_domain.find_loc_def lval in
     let eval_deps var =
       Variable.deps ~eval_loc var
     in

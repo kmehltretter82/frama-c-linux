@@ -378,6 +378,11 @@ val permissive: bool
 
     @since 22.0-Titanium *)
 
+val compress_saved_session: bool
+(** Indicates whether the saved sessions should be compressed or not.
+
+    @since Frama-C+dev *)
+
 val last_project_created_by_copy: (unit -> string option) ref
 
 val load_all_plugins: (unit -> unit) ref

@@ -20,41 +20,15 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cil_types
+(** File compression. *)
 
-(** Mark the analysis as aborted: it will be stopped at the next safe point. *)
-val signal_abort: kill:bool -> unit
+include module type of Gzip
 
-(** Reset the signal sent by [signal_abort], if any. *)
-val signal_reset: unit -> unit
+(** Implementation of {!Stdlib.input_value} for a {!Gzip.in_channel}. *)
+val input_value : in_channel -> 'a
 
-(** Provided [stmt] is an 'if' construct, [fst (condition_truth_value stmt)]
-    (resp. snd) is true if and only if the condition of the 'if' has been
-    evaluated to true (resp. false) at least once during the analysis. *)
-val condition_truth_value: stmt -> bool * bool
+(** Implementation of {!Stdlib.unsafe_really_input} for a {!Gzip.in_channel}. *)
+val unsafe_really_input : in_channel -> bytes -> int -> int -> unit
 
-module Computer
-    (* Abstractions with the evaluator. *)
-    (Engine: Engine_sig.S)
-    (* Set of states of abstract domain. *)
-    (States : Powerset.S with type state = Engine.Dom.t)
-    (* Transfer functions for statement on the Engine domain. *)
-    (_ : Transfer_stmt.S with type state = Engine.Dom.t
-                          and type value = Engine.Val.t)
-    (* Initialization of local variables. *)
-    (_: Initialization.S with type state := Engine.Dom.t)
-    (* Transfer functions for the logic on the Engine domain. *)
-    (_ : Transfer_logic.S with type state = Engine.Dom.t
-                           and type states = States.t)
-    (_: sig
-       val treat_statement_assigns:
-         stmt -> assigns -> Engine.Dom.t -> Engine.Dom.t
-     end)
-  : sig
-
-    val compute:
-      save_results:bool ->
-      kernel_function -> kinstr -> Engine.Dom.t ->
-      (Partition.key * Engine.Dom.t) list * Eval.cacheable
-
-  end
+(** Implementation of {!Stdlib.output_value} for a {!Gzip.out_channel}. *)
+val output_value : out_channel -> 'a -> unit

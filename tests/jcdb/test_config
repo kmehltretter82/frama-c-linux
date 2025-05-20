@@ -1,2 +1,2 @@
 PLUGIN:
-ENABLED_IF: %{read:../../../python-3.7-available}
+ENABLED_IF: %{read:../../../python-3.10-available}

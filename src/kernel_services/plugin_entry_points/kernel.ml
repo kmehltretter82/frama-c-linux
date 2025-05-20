@@ -910,6 +910,18 @@ module SaveState =
       let help = "at exit, save the session into file <filename>"
     end)
 
+let () =
+  Cmdline.add_option_without_action
+    "-compress-saved-session"
+    ~plugin:""
+    ~group:saveload
+    ~help:"at exit, the session saved by the -save option is compressed. \
+           No effect if the -save option is not used. \
+           (set by default, opposite option is -no-compress-saved-session)"
+    ~visible:true
+    ~ext_help:""
+    ()
+
 let () = Parameter_customize.set_group saveload
 let () = Parameter_customize.set_cmdline_stage Cmdline.Loading
 (* must be projectified: when loading, this option will be automatically
