@@ -102,6 +102,8 @@ int fact(int n)
     __gen_e_acsl_old_variant = n;
     if (! (n > 1)) break;
     {
+      /*@ assert Eva: signed_overflow: result * (int)(n - 1) <= 2147483647;
+      */
       result *= n - 1;
       n --;
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =

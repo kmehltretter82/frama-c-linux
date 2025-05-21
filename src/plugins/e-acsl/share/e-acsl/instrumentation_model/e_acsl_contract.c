@@ -59,21 +59,6 @@ static inline int normalize_to_boolean(int value) {
 }
 
 /* Documented in e_acsl.h */
-struct contract_t {
-  /*! \brief Number of cells in the char array used to store the results of
-     * the assumes clauses.
-     */
-  size_t char_count;
-
-  /*! \brief Char array to store the results of the assumes clauses. One bit
-     * per behavior.
-     *
-     * The functions \ref find_char_index() and \ref find_bit_index() can be
-     * used to find the location of the bit for a specific behavior. */
-  char *assumes;
-};
-
-/* Documented in e_acsl.h */
 contract_t *contract_init(size_t size) {
   // Allocate memory for the structure
   contract_t *c = malloc(sizeof(contract_t));

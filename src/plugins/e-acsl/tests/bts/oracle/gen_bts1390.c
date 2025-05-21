@@ -37,6 +37,7 @@ void *memchr(void const *buf, int c, size_t n)
   __e_acsl_full_init((void *)(& s));
   i = 0;
   while ((size_t)i < n) {
+    /*@ assert Eva: mem_access: \valid_read(s); */
     if ((int)*s == c) {
       __e_acsl_full_init((void *)(& __retres));
       __retres = (void *)s;

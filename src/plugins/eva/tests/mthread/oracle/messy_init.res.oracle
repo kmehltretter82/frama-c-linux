@@ -43,7 +43,9 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  lock: read by job at FRAMAC_SHARE/mthread_pthread.c:56
+  lock:
+    read by job at FRAMAC_SHARE/mthread_pthread.c:56 <-
+      pthread_mutex_lock :: messy_init.c:10 <- fjob
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:

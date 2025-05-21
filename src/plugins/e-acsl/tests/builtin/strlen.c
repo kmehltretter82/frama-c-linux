@@ -1,14 +1,14 @@
 /* run.config
- COMMENT: Test `strlen` E-ACSL built-ins
- DEPS: @PTEST_DEPS@ utils/signalled.h
+   COMMENT: Test `strlen` E-ACSL built-ins
+   DEPS: @PTEST_DEPS@ utils/signalled.h utils/eacsl_test_strdup.h
    STDOPT:
 */
 /* run.config_dev
-   MACRO: INCLUDED_HEADERS utils/signalled.h
+   MACRO: INCLUDED_HEADERS utils/signalled.h utils/eacsl_test_strdup.h
    COMMENT: This part is blank on purpose (test stability + Dune)
-
 */
 
+#include "utils/eacsl_test_strdup.h"
 #include "utils/signalled.h"
 #include <stdlib.h>
 #include <string.h>
@@ -20,7 +20,7 @@
 int main(int argc, const char **argv) {
   int len;
   char *empty_str = "";
-  char *heap_str = strdup("the cat");
+  char *heap_str = eacsl_test_strdup("the cat", 8);
   char stack_str[] = "the dog";
   char *const_str = "the hog";
 

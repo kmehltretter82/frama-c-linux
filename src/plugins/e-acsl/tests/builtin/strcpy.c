@@ -1,14 +1,14 @@
 /* run.config
- COMMENT: Test `strcpy` and `strncpy` E-ACSL built-ins
- DEPS: @PTEST_DEPS@ utils/signalled.h
+   COMMENT: Test `strcpy` and `strncpy` E-ACSL built-ins
+   DEPS: @PTEST_DEPS@ utils/signalled.h utils/eacsl_test_strdup.h
    STDOPT:
 */
 /* run.config_dev
-   MACRO: INCLUDED_HEADERS utils/signalled.h
+   MACRO: INCLUDED_HEADERS utils/signalled.h utils/eacsl_test_strdup.h
    COMMENT: This part is blank on purpose (test stability + Dune)
-
 */
 
+#include "utils/eacsl_test_strdup.h"
 #include "utils/signalled.h"
 #include <stdlib.h>
 #include <string.h>
@@ -49,7 +49,7 @@ void test_memory_tracking() {
 int main(int argc, const char **argv) {
   char empty_str[1] = "";
   char *const_str = "abcd";
-  char *src = strdup("abcd");
+  char *src = eacsl_test_strdup("abcd", 5);
   char *dest1 = malloc(5);
   char *dest2 = malloc(4);
   char dest3[256] = "abcd";

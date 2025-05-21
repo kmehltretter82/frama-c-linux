@@ -356,62 +356,62 @@ digraph G {
 digraph G {
   fontsize=9;
   center=1;
-  v439 [URL="#", fillcolor="#00000000", shape=box, color="#00000055",
+  v321 [URL="#", fillcolor="#00000000", shape=box, color="#00000055",
         label="Start: f2", style="filled", ];
-  v423 [URL="code.html#sid26", fillcolor="#FFFFFFFF", shape=box,
+  v305 [URL="code.html#sid26", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="Call pthread_mutex_lock(& lock);",
         style="filled", ];
-  v436 [URL="code.html#sid93", fillcolor="#FFFFFFFF", shape=box,
+  v318 [URL="code.html#sid93", fillcolor="#FFFFFFFF", shape=box,
         color="#FF0000FF", label="Lock lock", style="filled", ];
-  v438 [URL="code.html#sid98", fillcolor="#FFFFFFFF", shape=box,
+  v320 [URL="code.html#sid98", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="return", style="filled", ];
-  v424 [URL="code.html#sid27", fillcolor="#FFFFFFFF", shape=box,
+  v306 [URL="code.html#sid27", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="Call g4();", style="filled", ];
-  v435 [URL="code.html#sid27", fillcolor="#CCCCFFFF", shape=diamond,
+  v317 [URL="code.html#sid27", fillcolor="#CCCCFFFF", shape=diamond,
         color="#000000FF", label="reads a,\nwrites b", style="filled", ];
-  v425 [URL="code.html#sid28", fillcolor="#FFFFFFFF", shape=box,
+  v307 [URL="code.html#sid28", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="Call pthread_mutex_unlock(& lock);",
         style="filled", ];
-  v432 [URL="code.html#sid107", fillcolor="#FFFFFFFF", shape=box,
+  v314 [URL="code.html#sid107", fillcolor="#FFFFFFFF", shape=box,
         color="#FF0000FF", label="Release lock", style="filled", ];
-  v434 [URL="code.html#sid112", fillcolor="#FFFFFFFF", shape=box,
+  v316 [URL="code.html#sid112", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="return", style="filled", ];
-  v426 [URL="code.html#sid29", fillcolor="#FFFFFFFF", shape=box,
+  v308 [URL="code.html#sid29", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="Call g5(& d,& c);", style="filled", ];
-  v431 [URL="code.html#sid29", fillcolor="#CCCCFFFF", shape=diamond,
+  v313 [URL="code.html#sid29", fillcolor="#CCCCFFFF", shape=diamond,
         color="#000000FF", label="reads c,\nwrites d", style="filled", ];
-  v427 [URL="code.html#sid30", fillcolor="#CCCCFFFF", shape=box,
+  v309 [URL="code.html#sid30", fillcolor="#CCCCFFFF", shape=box,
         color="#AAAAAAFF", label="Call f = g6(& e);\nwrites f",
         style="filled", ];
-  v429 [URL="code.html#sid17", fillcolor="#CCCCFFFF", shape=box,
+  v311 [URL="code.html#sid17", fillcolor="#CCCCFFFF", shape=box,
         color="#000000FF", label="__retres = *from;\nreads e",
         style="filled", ];
-  v430 [URL="code.html#sid148", fillcolor="#FFFFFFFF", shape=box,
+  v312 [URL="code.html#sid148", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="return", style="filled", ];
-  v428 [URL="code.html#sid152", fillcolor="#FFFFFFFF", shape=box,
+  v310 [URL="code.html#sid152", fillcolor="#FFFFFFFF", shape=box,
         color="#000000FF", label="exit", style="filled", ];
-  v422 [URL="#", fillcolor="#FFFFFFFF", shape=plaintext, color="#000000FF",
+  v304 [URL="#", fillcolor="#FFFFFFFF", shape=plaintext, color="#000000FF",
         label="", style="invis", ];
   
   
-  v439 -> v423 [dir=forward, ];
-  v423 -> v436 [weight=200, dir=forward, ];
-  v436 -> v438 [dir=forward, ];
-  v438 -> v424 [dir=forward, ];
-  v423 -> v438 [weight=1, dir=none, style="dotted", ];
-  v424 -> v435 [weight=200, dir=none, ];
-  v435 -> v425 [dir=forward, ];
-  v425 -> v432 [weight=200, dir=forward, ];
-  v432 -> v434 [dir=forward, ];
-  v434 -> v426 [dir=forward, ];
-  v425 -> v434 [weight=1, dir=none, style="dotted", ];
-  v426 -> v431 [weight=200, dir=none, ];
-  v431 -> v427 [dir=forward, ];
-  v427 -> v429 [weight=200, dir=forward, ];
-  v429 -> v430 [dir=forward, ];
-  v430 -> v428 [dir=forward, ];
-  v427 -> v430 [weight=1, dir=none, style="dotted", ];
-  v428 -> v422 [dir=forward, ];
+  v321 -> v305 [dir=forward, ];
+  v305 -> v318 [weight=200, dir=forward, ];
+  v318 -> v320 [dir=forward, ];
+  v320 -> v306 [dir=forward, ];
+  v305 -> v320 [weight=1, dir=none, style="dotted", ];
+  v306 -> v317 [weight=200, dir=none, ];
+  v317 -> v307 [dir=forward, ];
+  v307 -> v314 [weight=200, dir=forward, ];
+  v314 -> v316 [dir=forward, ];
+  v316 -> v308 [dir=forward, ];
+  v307 -> v316 [weight=1, dir=none, style="dotted", ];
+  v308 -> v313 [weight=200, dir=none, ];
+  v313 -> v309 [dir=forward, ];
+  v309 -> v311 [weight=200, dir=forward, ];
+  v311 -> v312 [dir=forward, ];
+  v312 -> v310 [dir=forward, ];
+  v309 -> v312 [weight=1, dir=none, style="dotted", ];
+  v310 -> v304 [dir=forward, ];
   
   }
 

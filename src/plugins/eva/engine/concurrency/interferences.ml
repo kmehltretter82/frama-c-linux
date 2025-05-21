@@ -188,7 +188,7 @@ struct
                 Printer.pp_location (Cil_datatype.Stmt.loc stmt);
               `Bottom
           in
-          Dom.filter `Print shared_bases state
+          Dom.project shared_bases state
         in
         match state with
         | `Bottom -> acc_map (* no interference to add *)
@@ -274,25 +274,36 @@ struct
     in
     ThreadTable.fold add_thread current.states_by_mutexes `Bottom
 
-  let inject (state : state) : state =
+  let inject kf (v1 : Eva_automata.vertex) _v2 (state : state) : state =
     let need_injection =
-      match Dom.get Mt_domain.Domain.key with
-      (* Domain disabled, no interference injection *)
-      | None -> false
-      (* Domain enabled *)
-      | Some extract ->
-        let mt_state = extract state in
-        let memory = Mt_domain.Domain.memory mt_state in
-        let zone = Locations.Zone.join memory.read memory.written in
-        match Locations.Zone.get_bases zone with
-        | Top ->
-          (* Shared memory is Top, always inject *)
-          Self.warning ~current:true ~once:true
-            "imprecise memory footprint computed at this point";
-          true
-        | Set bases ->
-          (* Inject only if the read/written memory intersects shared memory *)
-          Base.Hptset.intersects bases current.shared_bases
+      let automaton = Eva_automata.get_automaton kf in
+      if not (Thread.is_main (Thread.current ())) &&
+         Kernel_function.is_entry_point kf &&
+         Eva_automata.Vertex.equal automaton.entry_point v1 then
+        (* If we are at the entry-point of the current non-main thread,
+           always inject interferences. *)
+        true
+      else
+        (* Only inject if global memory read or written at this point
+           intersects with shared variables. *)
+        match v1.vertex_start_of with
+        | None -> false
+        | Some stmt -> begin
+            let aloc = Analysis_location.of_stmt stmt in
+            let filter = Inout_memory.keep_globals_only in
+            let memory = Inout_memory.memory_at ~filter aloc in
+            let zone = Locations.Zone.join memory.read memory.written in
+            match Locations.Zone.get_bases zone with
+            | Top ->
+              (* Shared memory is Top, always inject *)
+              Self.warning ~current:true ~once:true
+                "imprecise memory footprint computed at this point";
+              true
+            | Set bases ->
+              (* Inject only if the read/written memory intersects
+                 shared memory *)
+              Base.Hptset.intersects bases current.shared_bases
+          end
     in
     if not need_injection
     then state
@@ -303,10 +314,8 @@ struct
       | `Top -> Dom.top
       | `Bottom -> state
       | `Value interferences_state ->
-        let dummy_kf = Kernel_function.dummy () in
         let result =
-          Dom.reuse dummy_kf current.shared_bases
-            ~current_input:state ~previous_output:interferences_state
+          Dom.overwrite current.shared_bases ~on:state ~by:interferences_state
         in
         Dom.join state result
     end

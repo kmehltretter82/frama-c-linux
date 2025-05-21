@@ -61,14 +61,11 @@ sig
     ('a * Set.t) list -> unit
 end
 
-
-val read_written_by_function :
+val read_written_by_thread :
+  ?watch_only:Locations.Zone.t ->
   (Cil_types.stmt -> bool) ->
   Thread.t ->
-  Mt_memory.Types.state_accesser ->
-  ?watch_only:Locations.Zone.t ->
-  Kernel_function.Hptset.elt ->
-  Cil_types.kinstr -> Mt_shared_vars_types.AccessesByZone.map
+  Mt_shared_vars_types.AccessesByZone.map
 
 val register_concurrent_var_accesses :
   Mt_thread.analysis_state ->

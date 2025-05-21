@@ -29,7 +29,23 @@ open Mt_memory.Types
 (** Kind of access to zones *)
 
 type rw = Read | Write of Locations.location
-module RW: Datatype.S with type t = rw
+        | ReadAloc of Analysis_location.t | WriteAloc of Analysis_location.t
+module RW: sig
+  include Datatype.S with type t = rw
+
+  val loc : t -> location
+  (** [loc op] returns the source location of the operation *)
+
+  val is_read : t -> bool
+  (** [is_read op] returns true if [op] is a read operation. *)
+
+  val pretty_op : Format.formatter -> t -> unit
+  (** Pretty-print the name of the operation (i.e. "read" or "write"). *)
+
+  val pretty_loc : Format.formatter -> t -> unit
+  (** Pretty-print the source location of the operation and its callstack if
+      applicable. *)
+end
 
 
 (** Multithread events *)

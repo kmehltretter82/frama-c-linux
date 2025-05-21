@@ -338,58 +338,74 @@ type variable_kind =
 (** Value for the initialization of variables. Can be either zero or top. *)
 type init_value = Zero | Top
 
-(** MemExec is a global cache for the complete analysis of functions.
-    It avoids repeating the analysis of a function in equivalent entry states.
-    It uses an over-approximation of the locations possibly read and written
-    by a function, and compare the entry states for these locations. *)
-module type Reuse = sig
+(** Functions used to interpret at once multiple effects on abstract states:
+    - the MemExec analysis cache avoids repeating analyses of a same function
+      in equivalent entry states, by directly computing the new final state.
+    - the analysis of concurrent programs injects in abstract states all
+      potential interferences coming from other threads. *)
+module type Caching = sig
   type t (** Type of states. *)
 
-  (** [relate kf bases state] returns the set of bases [bases] in relation with
-      [bases] in [state] — i.e. all bases other than [bases] whose value may
-      affect the properties inferred on [bases] in [state].
-      [state] is the initial state of an analysis of [kf].
-      For a non-relational domain, it is always safe to return [empty].
-      For a relational domain, it is always safe to return [top], but it
-      disables MemExec. *)
-  val relate: kernel_function -> Base.Hptset.t -> t -> Base.SetLattice.t
+  (** [relate bases state] returns the set of bases in relation with [bases]
+      in [state] — i.e. all bases (other than [bases]) whose value may affect
+      the properties inferred on [bases] in [state].
+      For a non-relational domain, it is always sound to return [empty].
+      For a relational domain, it is always sound to return [top], but this
+      disables the MemExec cache. *)
+  val relate: Base.Hptset.t -> t -> Base.SetLattice.t
 
-  (** [filter kind bases states] reduces the state [state] to only keep
-      properties about [bases] — it is a projection on the set of [bases].
-      It allows reusing an analysis of [kf] from an initial state [pre] to a
-      final state [post].
-      If [kind] is [`Pre kf], [state] is the initial state of function [kf],
-      and [bases] includes all inputs of [kf] and satisfies
-      [relate kf bases state = bases].
-      If [kind] is [`Post kf], [state] is the final state of [kf], and [bases]
-      includes all inputs and outputs of [kf].
-      Afterwards, the two resulting states [reduced_pre] and [reduced_post] are
-      used as follow: when [kf] should be analyzed with the initial state [s],
-      if [filter kf `Pre s = reduced_pre], then the analysis is skipped, and
-      [reuse kf s reduced_post] is used as its final state instead.
-      If [kind] is [`Print], the state is reduced before printing it for the
-      end-user. *)
-  val filter:
-    [`Pre of kernel_function | `Post of kernel_function | `Print ] ->
-    Base.Hptset.t -> t -> t
+  (** [filter bases state] returns a state that must contain exactly the
+      same properties about [bases] as [state]. All properties about other
+      bases can be removed from the state.
+      If S' = filter B S, S' must satisfy proj(γ(S'), B) = proj(γ(S), B).
+      Defined by {!Domain_builder.Complete} as the identity, which is sound
+      but decreases the performance of the MemExec cache. If you implement
+      [filter], you must also provide a sound implementation of [reuse]. *)
+  val filter: Base.Hptset.t -> t -> t
 
-  (** [reuse kf bases current_input previous_output] merges the initial state
-      [current_input] with a final state [previous_output] from a previous
-      analysis of [kf] started with an equivalent initial state.
-      [reuse] must overwrite the properties on [bases] in [current_input] with
-      the ones in [previous_output]. Properties on other bases must be left
-      unchanged from [current_input]. *)
-  val reuse:
-    kernel_function -> Base.Hptset.t ->
-    current_input:t -> previous_output:t -> t
+  (** [reuse bases ~current_input ~previous_output] returns a state equal to
+      [current_input], except that all properties about [bases] must be replaced
+      by the ones in [previous_output].
+      It must be exact to ensure that the MemExec cache does not impact the
+      analysis precision.
+      [reuse] is only applied to re-interpret a code <C> already analyzed with
+      an equivalent initial state. [current_input] is the new input state for
+      the analysis of <C>, and [previous_output] was the final state of the
+      former analysis of <C>. See below for details.
+      Defined by {!Domain_builder.Complete} with a naive implementation which
+      is only sound when [filter] is implemented as the identity. *)
+  val reuse: Base.Hptset.t -> current_input:t -> previous_output:t -> t
 
-  (** {!Domain_builtin.Complete} provides the simplest implementation of
-      [filter] and [reuse], which is:
-        let filter _ _ _ state = state
-        let reuse _ _ ~current_input:_ ~previous_output = previous_output
-      This is correct as the cache will be triggered only for an initial state
-      exactly equal to the previous initial state, in which case the previous
-      output state is indeed a correct final state on its own. *)
+  (** [project bases state] returns an over-approximation of the projection
+      of [state] on [bases].
+      If S' = project B S, S' must satisfy proj(γ(S), B) ⊆ γ(S').
+      Defined by {!Domain_builder.Complete} by always returning top.  *)
+  val project: Base.Hptset.t -> t -> t
+
+  (** [overwrite bases ~on ~by] returns a state equal to [on], except that
+      all properties about [bases] are replaced by the ones in [by].
+      Unlike [reuse], [overwrite] can compute an over-approximation, but cannot
+      use any assumption about state [on]. State [by] is the result of a
+      projection on bases [bases].
+      A sound but imprecise implementation can remove all properties about
+      [bases] from state [on] (and ignore state [by]).
+      More formally, this function must compute an over-approximation of
+      proj(γ(on), complement(bases)) ∩ proj(γ(by), bases),
+      where complement(bases) are all memory bases other than [bases]. *)
+  val overwrite: Base.Hptset.t -> on:t -> by:t -> t
+
+  (** About the MemExec cache:
+      Assuming a former analysis of function [F] has computed [F(S1) = S1']
+      by reading only bases [R] and writing only bases [W]
+      (S1 is the initial state, S1' the final state).
+      For a new initial state [S2], if [filter R S1 = filter R S2] (the new
+      entry state is exactly the same as the previous one on all read bases),
+      then the analysis [S2' = F(S2)] is skipped and the final state is computed
+      as [S2' = reuse W S2 (filter W S1')].
+
+      The implementation of [reuse] can use these assumptions on the set of
+      written bases [W], the new initial state [S2] and the former final
+      state [S1'] to compute its result [S2']. *)
 end
 
 (** Signature for the abstract domains of the analysis. *)
@@ -498,7 +514,7 @@ module type S = sig
   val incr_loop_counter: stmt -> state -> state
   val leave_loop: stmt -> state -> state
 
-  include Reuse with type t := t
+  include Caching with type t := t
 
   (** Category for the messages about the domain.
       Created by {!Domain_builder.Complete} using the domain name. *)

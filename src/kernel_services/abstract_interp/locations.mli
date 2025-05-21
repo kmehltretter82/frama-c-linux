@@ -260,6 +260,9 @@ module Zone : sig
   (** Returns the bases contained by the given zone. Never fails, but
       may return [Base.SetLattice.Top]. *)
 
+  val of_bases : Base.Hptset.t -> t
+  (** Returns the memory zone of a set of bases. *)
+
   val intersects : t -> t -> bool
 
   (** Assuming that [z1] and [z2] only contain valid bases,

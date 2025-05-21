@@ -335,7 +335,7 @@ struct
       let state =
         match filter with
         | None -> state
-        | Some bases -> Domain.filter `Print bases state
+        | Some bases -> Domain.filter bases state
       in
       let str = Format.asprintf "%a" Domain.pretty state in
       (name, str) :: acc

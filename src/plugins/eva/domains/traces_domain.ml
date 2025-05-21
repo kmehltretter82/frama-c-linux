@@ -1155,7 +1155,7 @@ module D = struct
 
   (* Memexec *)
   (* This domains infers no relation between variables. *)
-  let relate _kf _bases _state = Base.SetLattice.bottom
+  let relate _bases _state = Base.SetLattice.bottom
 
   let empty () = Traces.empty
   let initialize_variable lv _ ~initialized:_ _ state =
@@ -1243,6 +1243,8 @@ module D = struct
 
   let leave_scope kf vars state =
     Traces.add_trans state (LeaveScope (kf, vars))
+
+  let overwrite _bases ~on: state ~by:_ = state
 
   let output_dot (filename : Filepath.t) state =
     let out = open_out (filename :> string) in

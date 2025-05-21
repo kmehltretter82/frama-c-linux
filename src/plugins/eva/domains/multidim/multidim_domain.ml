@@ -447,18 +447,19 @@ struct
     in
     base_map, tracked
 
+  let remove_base_references ~oracle base state =
+    match Base.to_varinfo base with
+    | exception Base.Not_a_C_variable -> state (* only references to variables are kept *)
+    | vi -> update_var_references ~oracle vi None state
+
   let update_references ~oracle (dst : mdlocation)
       (src : Eva_ast.exp option) (state : t) =
-    let remove_references b state =
-      match Base.to_varinfo b with
-      | exception Base.Not_a_C_variable -> state (* only references to variables are kept *)
-      | vi -> update_var_references ~oracle vi None state
-    in
     match Location.to_singleton_var dst with
     | Some vi ->
       update_var_references ~oracle vi src state
     | None -> (* Weak update of referee, remove references *)
-      Location.fold (fun b _offset state -> remove_references b state) dst state
+      Location.fold
+        (fun b _offset state -> remove_base_references ~oracle b state) dst state
 
 
   (* Accesses *)
@@ -581,7 +582,6 @@ struct
     let state = update_var_references ~oracle vi None state in
     let map, tracked = state in
     BaseMap.remove (Base.of_varinfo vi) map, tracked
-
 
   (* Lattice *)
 
@@ -744,7 +744,7 @@ struct
           let b = Value_or_Uninitialized.(to_bit (from_flagged value)) in
           erase ~oracle state dst b
         | `Value src ->
-          overwrite ~oracle state dst src
+          DomainLattice.overwrite ~oracle state dst src
 
   let assign _kinstr { lval=dst } src assigned_value valuation state =
     if Int_Base.is_zero (Bit_utils.sizeof dst.typ)
@@ -907,19 +907,25 @@ struct
       let oracle = mk_oracle state in (* Since dst has no offset, oracle is actually useless *)
       erase ~oracle state dst Abstract_memory.Bit.top
 
-  let relate _kf _bases _state = Base.SetLattice.empty
+  let relate _bases _state = Base.SetLattice.empty
 
-  let filter _kind bases (base_map, tracked : t) =
+  let filter bases (base_map, tracked : t) =
     BaseMap.inter_with_shape bases base_map,
     Option.map (Tracking.inter bases) tracked
 
-  let reuse =
-    let cache = cache_name "reuse" in
+  let project = filter
+
+  let overwrite =
+    let cache = cache_name "overwrite" in
     let decide _key _v1 v2 = v2 in
-    let reuse = BaseMap.join ~cache ~symmetric:false ~idempotent:true ~decide in
-    fun _kf bases ~current_input:(m1,t1)  ~previous_output:(m2,t2) ->
+    let join = BaseMap.join ~cache ~symmetric:false ~idempotent:true ~decide in
+    fun bases ~on:(m1,t1) ~by:(m2,t2) ->
       let m1 = BaseMap.diff_with_shape bases m1 in
-      reuse m1 m2, join_tracked t1 t2
+      join m1 m2, join_tracked t1 t2
+
+  let reuse bases ~current_input ~previous_output =
+    overwrite bases ~on:current_input ~by:previous_output
+
 end
 
 include Domain

@@ -32,7 +32,7 @@ int main(void) {
   // mix requires and assumes
   /*@ behavior b1:
     @   assumes x == 1;
-    @   requires x == 0;
+    @   requires x == 0; // expected Eva invalid (inactive behavior)
     @ behavior b2:
     @   assumes x == 3;
     @   assumes y == 2;
@@ -56,7 +56,7 @@ int main(void) {
 
     behavior neg:
       assumes x < 0;
-      ensures z == -x;
+      ensures z == -x; // expected Eva invalid (inactive behavior)
 
     complete behaviors;
     disjoint behaviors;

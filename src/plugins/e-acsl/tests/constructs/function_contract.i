@@ -45,7 +45,7 @@ void j(void) {
 // mix requires and assumes
 /*@ behavior b1:
   @   assumes X == 1;
-  @   requires X == 0;
+  @   requires X == 0; // expected Eva invalid (inactive behavior)
   @ behavior b2:
   @   assumes X == 3;
   @   assumes Y == 2;
@@ -65,7 +65,7 @@ int l() {
 // mix ensures and assumes
 /*@ behavior b1:
   @   assumes X == 7;
-  @   ensures X == 95;
+  @   ensures X == 95; // expected Eva invalid (inactive behavior)
   @ behavior b2:
   @   assumes X == 5;
   @   assumes Y == 2;
@@ -83,7 +83,7 @@ void m(void) {
   @   ensures X == 8;
   @ behavior b2:
   @   assumes X == 5;
-  @   ensures X == 98; */
+  @   ensures X == 98; // expected Eva invalid (inactive behavior) */
 void n(void) {
   X++;
 }
@@ -95,7 +95,7 @@ void n(void) {
 
     behavior neg:
         assumes Y < 0;
-        requires Y < 1;
+        requires Y < 1; // expected Eva invalid (inactive behavior)
         ensures X == \old(Y);
 
     behavior pos:
@@ -105,7 +105,7 @@ void n(void) {
 
     behavior odd:
         assumes Y % 2 == 1;
-        requires (Y % 2) - 1 == 0;
+        requires (Y % 2) - 1 == 0; // expected Eva invalid (inactive behavior)
         ensures X == \old(Y);
 
     behavior even:

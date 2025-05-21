@@ -27,11 +27,14 @@ let concurrent_writes shared_bases =
   (* Domain disabled, no information about writes *)
   | None -> ALoc.Local.Set.empty
   (* Domain enabled *)
-  | Some extract ->
-    let add_aloc stmt cs state acc =
-      let mt_state = extract state in
-      let { Mt_domain.written } = Mt_domain.Domain.memory mt_state in
-      let written_bases = Locations.Zone.get_bases written in
+  | Some _extract ->
+    let add_aloc stmt cs _state acc =
+      let aloc = ALoc.Local (stmt, cs) in
+      (* TODO: Maybe take the memory read/written for all callstacks of the
+         given statement? (can be done directly by Inout_memory). *)
+      let filter = Inout_memory.keep_globals_only in
+      let memory = Inout_memory.memory_at ~filter aloc in
+      let written_bases = Locations.Zone.get_bases memory.written in
       if Base.SetLattice.(intersects (inject shared_bases) written_bases)
       then ALoc.Local.Set.add (stmt, cs) acc
       else acc

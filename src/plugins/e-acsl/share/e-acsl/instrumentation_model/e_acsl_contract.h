@@ -52,7 +52,23 @@
 
 /*! \brief Structure to hold pieces of information about function and statement
  * contracts at runtime. */
-typedef struct contract_t __attribute__((FC_BUILTIN)) contract_t;
+typedef struct contract_t {
+  /*! \internal Number of cells in the char array used to store the results of
+     * the assumes clauses.
+     */
+  size_t char_count;
+
+  /*! \internal Char array to store the results of the assumes clauses. One bit
+     * per behavior.
+     *
+     * The functions \ref find_char_index() and \ref find_bit_index() can be
+     * used to find the location of the bit for a specific behavior. */
+  char *assumes;
+} __attribute__((FC_BUILTIN)) contract_t;
+
+// Use an array of arbitrary length to serve as dynamic allocation base in the
+// specifications so that Eva can better interpret contracts in this file.
+//@ ghost contract_t __fc_eacsl_contract_base[INT32_MAX];
 
 /*! \brief Allocate and initialize a structure to hold pieces of information
  * about `size` behaviors.
@@ -60,8 +76,10 @@ typedef struct contract_t __attribute__((FC_BUILTIN)) contract_t;
  * \param size Number of behaviors that the structure should support.
  * \return A structure to hold pieces of information about contracts at runtime.
  */
-/*@ assigns \result \from indirect:__fc_heap_status, indirect:size;
-  @ admit ensures \valid(\result); */
+/*@ allocates \result;
+  @ assigns __fc_heap_status \from __fc_heap_status;
+  @ assigns \result \from &__fc_eacsl_contract_base, indirect:size;
+  @ ensures \valid(\result); */
 contract_t *contract_init(size_t size) __attribute__((FC_BUILTIN));
 
 /*! \brief Cleanup the structure `c` previously allocated by

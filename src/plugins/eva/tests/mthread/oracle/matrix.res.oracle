@@ -37,104 +37,128 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  matrix[0][0..99]: read by <main> at matrix.c:59
-  matrix[1][0..99]: read by <main> at matrix.c:59
-  matrix[2][0..99]: read by <main> at matrix.c:59
-  matrix[3][0..99]: read by <main> at matrix.c:59
-  matrix[4][0..99]: read by <main> at matrix.c:59
-  matrix[5][0..99]: read by <main> at matrix.c:59
-  matrix[6][0..99]: read by <main> at matrix.c:59
-  matrix[7][0..99]: read by <main> at matrix.c:59
-  matrix[8][0..99]: read by <main> at matrix.c:59
-  matrix[9][0..99]: read by <main> at matrix.c:59
-  matrix[10][0..99]: read by <main> at matrix.c:59
-  matrix[11][0..99]: read by <main> at matrix.c:59
-  matrix[12][0..99]: read by <main> at matrix.c:59
-  matrix[13][0..99]: read by <main> at matrix.c:59
-  matrix[14][0..99]: read by <main> at matrix.c:59
-  matrix[15][0..99]: read by <main> at matrix.c:59
-  matrix[16][0..99]: read by <main> at matrix.c:59
-  matrix[17][0..99]: read by <main> at matrix.c:59
-  matrix[18][0..99]: read by <main> at matrix.c:59
-  matrix[19][0..99]: read by <main> at matrix.c:59
-  matrix[20][0..99]: read by <main> at matrix.c:59
-  matrix[21][0..99]: read by <main> at matrix.c:59
-  matrix[22][0..99]: read by <main> at matrix.c:59
-  matrix[23][0..99]: read by <main> at matrix.c:59
-  matrix[24][0..99]: read by <main> at matrix.c:59
-  matrix[25][0..99]: read by <main> at matrix.c:59
-  matrix[26][0..99]: read by <main> at matrix.c:59
-  matrix[27][0..99]: read by <main> at matrix.c:59
-  matrix[28][0..99]: read by <main> at matrix.c:59
-  matrix[29][0..99]: read by <main> at matrix.c:59
+  matrix[0][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[1][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[2][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[3][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[4][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[5][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[6][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[7][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[8][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[9][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[10][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[11][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[12][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[13][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[14][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[15][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[16][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[17][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[18][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[19][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[20][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[21][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[22][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[23][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[24][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[25][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[26][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[27][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[28][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[29][0..99]: read by <main> at matrix.c:59 <- main
   psum[0..99]:
-    read by <main> at matrix.c:64
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    write by <main> at matrix.c:51
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-  result: read by <main> at matrix.c:49
-  locks[0..4]:
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66
-  jobs[0..4]: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+    read by <main> at matrix.c:64 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:51 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+  result: read by <main> at matrix.c:49 <- main
+  locks[0]:
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56 <-
+      pthread_mutex_lock :: matrix.c:55 <- main
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66 <-
+      pthread_mutex_unlock :: matrix.c:60 <- main
+  locks[1]:
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56 <-
+      pthread_mutex_lock :: matrix.c:55 <- main
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66 <-
+      pthread_mutex_unlock :: matrix.c:60 <- main
+  locks[2]:
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56 <-
+      pthread_mutex_lock :: matrix.c:55 <- main
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66 <-
+      pthread_mutex_unlock :: matrix.c:60 <- main
+  locks[3]:
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56 <-
+      pthread_mutex_lock :: matrix.c:55 <- main
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66 <-
+      pthread_mutex_unlock :: matrix.c:60 <- main
+  locks[4]:
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56 <-
+      pthread_mutex_lock :: matrix.c:55 <- main
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66 <-
+      pthread_mutex_unlock :: matrix.c:60 <- main
+  jobs[0..4]:
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+      pthread_create :: matrix.c:46 <- main
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -157,21 +181,23 @@
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[0][0..99]:
-    read by jobs[0] at matrix.c:29
-    read by jobs[0] at matrix.c:29
-    read by jobs[0] at matrix.c:29
-    read by jobs[0] at matrix.c:29
-    read by jobs[0] at matrix.c:29
-    read by jobs[0] at matrix.c:29
-    write by jobs[0] at matrix.c:29
-  matrix[5][0..99]: write by jobs[0] at matrix.c:29
-  matrix[10][0..99]: write by jobs[0] at matrix.c:29
-  matrix[15][0..99]: write by jobs[0] at matrix.c:29
-  matrix[20][0..99]: write by jobs[0] at matrix.c:29
-  matrix[25][0..99]: write by jobs[0] at matrix.c:29
+    read by jobs[0] at matrix.c:29 <- job
+    read by jobs[0] at matrix.c:29 <- job
+    read by jobs[0] at matrix.c:29 <- job
+    read by jobs[0] at matrix.c:29 <- job
+    read by jobs[0] at matrix.c:29 <- job
+    read by jobs[0] at matrix.c:29 <- job
+    write by jobs[0] at matrix.c:29 <- job
+  matrix[5][0..99]: write by jobs[0] at matrix.c:29 <- job
+  matrix[10][0..99]: write by jobs[0] at matrix.c:29 <- job
+  matrix[15][0..99]: write by jobs[0] at matrix.c:29 <- job
+  matrix[20][0..99]: write by jobs[0] at matrix.c:29 <- job
+  matrix[25][0..99]: write by jobs[0] at matrix.c:29 <- job
   locks[0]:
-    read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:56
-    read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:66
+    read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+      pthread_mutex_lock :: matrix.c:25 <- job
+    read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+      pthread_mutex_unlock :: matrix.c:30 <- job
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -190,21 +216,23 @@
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[1][0..99]:
-    read by jobs[1] at matrix.c:29
-    read by jobs[1] at matrix.c:29
-    read by jobs[1] at matrix.c:29
-    read by jobs[1] at matrix.c:29
-    read by jobs[1] at matrix.c:29
-    read by jobs[1] at matrix.c:29
-    write by jobs[1] at matrix.c:29
-  matrix[6][0..99]: write by jobs[1] at matrix.c:29
-  matrix[11][0..99]: write by jobs[1] at matrix.c:29
-  matrix[16][0..99]: write by jobs[1] at matrix.c:29
-  matrix[21][0..99]: write by jobs[1] at matrix.c:29
-  matrix[26][0..99]: write by jobs[1] at matrix.c:29
+    read by jobs[1] at matrix.c:29 <- job
+    read by jobs[1] at matrix.c:29 <- job
+    read by jobs[1] at matrix.c:29 <- job
+    read by jobs[1] at matrix.c:29 <- job
+    read by jobs[1] at matrix.c:29 <- job
+    read by jobs[1] at matrix.c:29 <- job
+    write by jobs[1] at matrix.c:29 <- job
+  matrix[6][0..99]: write by jobs[1] at matrix.c:29 <- job
+  matrix[11][0..99]: write by jobs[1] at matrix.c:29 <- job
+  matrix[16][0..99]: write by jobs[1] at matrix.c:29 <- job
+  matrix[21][0..99]: write by jobs[1] at matrix.c:29 <- job
+  matrix[26][0..99]: write by jobs[1] at matrix.c:29 <- job
   locks[1]:
-    read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:56
-    read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:66
+    read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+      pthread_mutex_lock :: matrix.c:25 <- job
+    read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+      pthread_mutex_unlock :: matrix.c:30 <- job
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -223,21 +251,23 @@
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[2][0..99]:
-    read by jobs[2] at matrix.c:29
-    read by jobs[2] at matrix.c:29
-    read by jobs[2] at matrix.c:29
-    read by jobs[2] at matrix.c:29
-    read by jobs[2] at matrix.c:29
-    read by jobs[2] at matrix.c:29
-    write by jobs[2] at matrix.c:29
-  matrix[7][0..99]: write by jobs[2] at matrix.c:29
-  matrix[12][0..99]: write by jobs[2] at matrix.c:29
-  matrix[17][0..99]: write by jobs[2] at matrix.c:29
-  matrix[22][0..99]: write by jobs[2] at matrix.c:29
-  matrix[27][0..99]: write by jobs[2] at matrix.c:29
+    read by jobs[2] at matrix.c:29 <- job
+    read by jobs[2] at matrix.c:29 <- job
+    read by jobs[2] at matrix.c:29 <- job
+    read by jobs[2] at matrix.c:29 <- job
+    read by jobs[2] at matrix.c:29 <- job
+    read by jobs[2] at matrix.c:29 <- job
+    write by jobs[2] at matrix.c:29 <- job
+  matrix[7][0..99]: write by jobs[2] at matrix.c:29 <- job
+  matrix[12][0..99]: write by jobs[2] at matrix.c:29 <- job
+  matrix[17][0..99]: write by jobs[2] at matrix.c:29 <- job
+  matrix[22][0..99]: write by jobs[2] at matrix.c:29 <- job
+  matrix[27][0..99]: write by jobs[2] at matrix.c:29 <- job
   locks[2]:
-    read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:56
-    read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:66
+    read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+      pthread_mutex_lock :: matrix.c:25 <- job
+    read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+      pthread_mutex_unlock :: matrix.c:30 <- job
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -256,21 +286,23 @@
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[3][0..99]:
-    read by jobs[3] at matrix.c:29
-    read by jobs[3] at matrix.c:29
-    read by jobs[3] at matrix.c:29
-    read by jobs[3] at matrix.c:29
-    read by jobs[3] at matrix.c:29
-    read by jobs[3] at matrix.c:29
-    write by jobs[3] at matrix.c:29
-  matrix[8][0..99]: write by jobs[3] at matrix.c:29
-  matrix[13][0..99]: write by jobs[3] at matrix.c:29
-  matrix[18][0..99]: write by jobs[3] at matrix.c:29
-  matrix[23][0..99]: write by jobs[3] at matrix.c:29
-  matrix[28][0..99]: write by jobs[3] at matrix.c:29
+    read by jobs[3] at matrix.c:29 <- job
+    read by jobs[3] at matrix.c:29 <- job
+    read by jobs[3] at matrix.c:29 <- job
+    read by jobs[3] at matrix.c:29 <- job
+    read by jobs[3] at matrix.c:29 <- job
+    read by jobs[3] at matrix.c:29 <- job
+    write by jobs[3] at matrix.c:29 <- job
+  matrix[8][0..99]: write by jobs[3] at matrix.c:29 <- job
+  matrix[13][0..99]: write by jobs[3] at matrix.c:29 <- job
+  matrix[18][0..99]: write by jobs[3] at matrix.c:29 <- job
+  matrix[23][0..99]: write by jobs[3] at matrix.c:29 <- job
+  matrix[28][0..99]: write by jobs[3] at matrix.c:29 <- job
   locks[3]:
-    read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:56
-    read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:66
+    read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+      pthread_mutex_lock :: matrix.c:25 <- job
+    read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+      pthread_mutex_unlock :: matrix.c:30 <- job
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -289,21 +321,23 @@
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[4][0..99]:
-    read by jobs[4] at matrix.c:29
-    read by jobs[4] at matrix.c:29
-    read by jobs[4] at matrix.c:29
-    read by jobs[4] at matrix.c:29
-    read by jobs[4] at matrix.c:29
-    read by jobs[4] at matrix.c:29
-    write by jobs[4] at matrix.c:29
-  matrix[9][0..99]: write by jobs[4] at matrix.c:29
-  matrix[14][0..99]: write by jobs[4] at matrix.c:29
-  matrix[19][0..99]: write by jobs[4] at matrix.c:29
-  matrix[24][0..99]: write by jobs[4] at matrix.c:29
-  matrix[29][0..99]: write by jobs[4] at matrix.c:29
+    read by jobs[4] at matrix.c:29 <- job
+    read by jobs[4] at matrix.c:29 <- job
+    read by jobs[4] at matrix.c:29 <- job
+    read by jobs[4] at matrix.c:29 <- job
+    read by jobs[4] at matrix.c:29 <- job
+    read by jobs[4] at matrix.c:29 <- job
+    write by jobs[4] at matrix.c:29 <- job
+  matrix[9][0..99]: write by jobs[4] at matrix.c:29 <- job
+  matrix[14][0..99]: write by jobs[4] at matrix.c:29 <- job
+  matrix[19][0..99]: write by jobs[4] at matrix.c:29 <- job
+  matrix[24][0..99]: write by jobs[4] at matrix.c:29 <- job
+  matrix[29][0..99]: write by jobs[4] at matrix.c:29 <- job
   locks[4]:
-    read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:56
-    read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:66
+    read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+      pthread_mutex_lock :: matrix.c:25 <- job
+    read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+      pthread_mutex_unlock :: matrix.c:30 <- job
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -361,104 +395,128 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  matrix[0][0..99]: read by <main> at matrix.c:59
-  matrix[1][0..99]: read by <main> at matrix.c:59
-  matrix[2][0..99]: read by <main> at matrix.c:59
-  matrix[3][0..99]: read by <main> at matrix.c:59
-  matrix[4][0..99]: read by <main> at matrix.c:59
-  matrix[5][0..99]: read by <main> at matrix.c:59
-  matrix[6][0..99]: read by <main> at matrix.c:59
-  matrix[7][0..99]: read by <main> at matrix.c:59
-  matrix[8][0..99]: read by <main> at matrix.c:59
-  matrix[9][0..99]: read by <main> at matrix.c:59
-  matrix[10][0..99]: read by <main> at matrix.c:59
-  matrix[11][0..99]: read by <main> at matrix.c:59
-  matrix[12][0..99]: read by <main> at matrix.c:59
-  matrix[13][0..99]: read by <main> at matrix.c:59
-  matrix[14][0..99]: read by <main> at matrix.c:59
-  matrix[15][0..99]: read by <main> at matrix.c:59
-  matrix[16][0..99]: read by <main> at matrix.c:59
-  matrix[17][0..99]: read by <main> at matrix.c:59
-  matrix[18][0..99]: read by <main> at matrix.c:59
-  matrix[19][0..99]: read by <main> at matrix.c:59
-  matrix[20][0..99]: read by <main> at matrix.c:59
-  matrix[21][0..99]: read by <main> at matrix.c:59
-  matrix[22][0..99]: read by <main> at matrix.c:59
-  matrix[23][0..99]: read by <main> at matrix.c:59
-  matrix[24][0..99]: read by <main> at matrix.c:59
-  matrix[25][0..99]: read by <main> at matrix.c:59
-  matrix[26][0..99]: read by <main> at matrix.c:59
-  matrix[27][0..99]: read by <main> at matrix.c:59
-  matrix[28][0..99]: read by <main> at matrix.c:59
-  matrix[29][0..99]: read by <main> at matrix.c:59
+  matrix[0][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[1][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[2][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[3][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[4][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[5][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[6][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[7][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[8][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[9][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[10][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[11][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[12][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[13][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[14][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[15][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[16][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[17][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[18][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[19][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[20][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[21][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[22][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[23][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[24][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[25][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[26][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[27][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[28][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[29][0..99]: read by <main> at matrix.c:59 <- main
   psum[0..99]:
-    read by <main> at matrix.c:64
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    write by <main> at matrix.c:51
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-  result: read by <main> at matrix.c:49
-  locks[0..4]:
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66
-  jobs[0..4]: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+    read by <main> at matrix.c:64 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:51 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+  result: read by <main> at matrix.c:49 <- main
+  locks[0]:
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56 <-
+      pthread_mutex_lock :: matrix.c:55 <- main
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66 <-
+      pthread_mutex_unlock :: matrix.c:60 <- main
+  locks[1]:
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56 <-
+      pthread_mutex_lock :: matrix.c:55 <- main
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66 <-
+      pthread_mutex_unlock :: matrix.c:60 <- main
+  locks[2]:
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56 <-
+      pthread_mutex_lock :: matrix.c:55 <- main
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66 <-
+      pthread_mutex_unlock :: matrix.c:60 <- main
+  locks[3]:
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56 <-
+      pthread_mutex_lock :: matrix.c:55 <- main
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66 <-
+      pthread_mutex_unlock :: matrix.c:60 <- main
+  locks[4]:
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56 <-
+      pthread_mutex_lock :: matrix.c:55 <- main
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66 <-
+      pthread_mutex_unlock :: matrix.c:60 <- main
+  jobs[0..4]:
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+      pthread_create :: matrix.c:46 <- main
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -477,33 +535,140 @@
     (potential shared vars changed, interferences changed)
 [mt] * Computing value analysis for thread jobs[0]
 [mt] matrix.c:25: Lock locks[0]
+[eva:interferences] matrix.c:29: inject threads interferences at this point
 [mt] matrix.c:30: Release locks[0]
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[0][0..99]:
-    read by jobs[0] at matrix.c:29
-    read by jobs[0] at matrix.c:29
-    read by jobs[0] at matrix.c:29
-    read by jobs[0] at matrix.c:29
-    read by jobs[0] at matrix.c:29
-    read by jobs[0] at matrix.c:29
-    write by jobs[0] at matrix.c:29
-  matrix[5][0..99]: write by jobs[0] at matrix.c:29
-  matrix[10][0..99]: write by jobs[0] at matrix.c:29
-  matrix[15][0..99]: write by jobs[0] at matrix.c:29
-  matrix[20][0..99]: write by jobs[0] at matrix.c:29
-  matrix[25][0..99]: write by jobs[0] at matrix.c:29
+    read by jobs[0] at matrix.c:29 <- job
+    read by jobs[0] at matrix.c:29 <- job
+    read by jobs[0] at matrix.c:29 <- job
+    read by jobs[0] at matrix.c:29 <- job
+    read by jobs[0] at matrix.c:29 <- job
+    read by jobs[0] at matrix.c:29 <- job
+    write by jobs[0] at matrix.c:29 <- job
+  matrix[5][0..99]: write by jobs[0] at matrix.c:29 <- job
+  matrix[10][0..99]: write by jobs[0] at matrix.c:29 <- job
+  matrix[15][0..99]: write by jobs[0] at matrix.c:29 <- job
+  matrix[20][0..99]: write by jobs[0] at matrix.c:29 <- job
+  matrix[25][0..99]: write by jobs[0] at matrix.c:29 <- job
   locks[0]:
-    read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:56
-    read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:66
+    read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+      pthread_mutex_lock :: matrix.c:25 <- job
+    read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+      pthread_mutex_unlock :: matrix.c:30 <- job
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
   shared bases: {matrix}
   interferences by location:
+    matrix.c:29:
+      # cvalue:
+      matrix[0][0..99] ∈ [--..--]
+            [1..4][0..99] ∈ {0}
+            [5][0..99] ∈ [--..--]
+            [6..9][0..99] ∈ {0}
+            [10][0..99] ∈ [--..--]
+            [11..14][0..99] ∈ {0}
+            [15][0..99] ∈ [--..--]
+            [16..19][0..99] ∈ {0}
+            [20][0..99] ∈ [--..--]
+            [21..24][0..99] ∈ {0}
+            [25][0..99] ∈ [--..--]
+            [26..29][0..99] ∈ {0} 
+    matrix.c:29:
+      # cvalue:
+      matrix[0][0..99] ∈ [--..--]
+            [1..4][0..99] ∈ {0}
+            [5][0..99] ∈ [--..--]
+            [6..9][0..99] ∈ {0}
+            [10][0..99] ∈ [--..--]
+            [11..14][0..99] ∈ {0}
+            [15][0..99] ∈ [--..--]
+            [16..19][0..99] ∈ {0}
+            [20][0..99] ∈ [--..--]
+            [21..24][0..99] ∈ {0}
+            [25][0..99] ∈ [--..--]
+            [26..29][0..99] ∈ {0} 
+    matrix.c:29:
+      # cvalue:
+      matrix[0][0..99] ∈ [--..--]
+            [1..4][0..99] ∈ {0}
+            [5][0..99] ∈ [--..--]
+            [6..9][0..99] ∈ {0}
+            [10][0..99] ∈ [--..--]
+            [11..14][0..99] ∈ {0}
+            [15][0..99] ∈ [--..--]
+            [16..19][0..99] ∈ {0}
+            [20][0..99] ∈ [--..--]
+            [21..24][0..99] ∈ {0}
+            [25][0..99] ∈ [--..--]
+            [26..29][0..99] ∈ {0} 
+    matrix.c:29:
+      # cvalue:
+      matrix[0][0..99] ∈ [--..--]
+            [1..4][0..99] ∈ {0}
+            [5][0..99] ∈ [--..--]
+            [6..9][0..99] ∈ {0}
+            [10][0..99] ∈ [--..--]
+            [11..14][0..99] ∈ {0}
+            [15][0..99] ∈ [--..--]
+            [16..19][0..99] ∈ {0}
+            [20][0..99] ∈ [--..--]
+            [21..24][0..99] ∈ {0}
+            [25][0..99] ∈ [--..--]
+            [26..29][0..99] ∈ {0} 
+    matrix.c:29:
+      # cvalue:
+      matrix[0][0..99] ∈ [--..--]
+            [1..4][0..99] ∈ {0}
+            [5][0..99] ∈ [--..--]
+            [6..9][0..99] ∈ {0}
+            [10][0..99] ∈ [--..--]
+            [11..14][0..99] ∈ {0}
+            [15][0..99] ∈ [--..--]
+            [16..19][0..99] ∈ {0}
+            [20][0..99] ∈ [--..--]
+            [21..24][0..99] ∈ {0}
+            [25][0..99] ∈ [--..--]
+            [26..29][0..99] ∈ {0} 
+    matrix.c:29:
+      # cvalue:
+      matrix[0][0..99] ∈ [--..--]
+            [1..4][0..99] ∈ {0}
+            [5][0..99] ∈ [--..--]
+            [6..9][0..99] ∈ {0}
+            [10][0..99] ∈ [--..--]
+            [11..14][0..99] ∈ {0}
+            [15][0..99] ∈ [--..--]
+            [16..19][0..99] ∈ {0}
+            [20][0..99] ∈ [--..--]
+            [21..24][0..99] ∈ {0}
+            [25][0..99] ∈ [--..--]
+            [26..29][0..99] ∈ {0} 
   interferences by mutexes:
+    { locks[0] }:
+      # cvalue:
+      matrix[0][0..99] ∈ [--..--]
+            [1..4][0..99] ∈ {0}
+            [5][0..99] ∈ [--..--]
+            [6..9][0..99] ∈ {0}
+            [10][0..99] ∈ [--..--]
+            [11..14][0..99] ∈ {0}
+            [15][0..99] ∈ [--..--]
+            [16..19][0..99] ∈ {0}
+            [20][0..99] ∈ [--..--]
+            [21..24][0..99] ∈ {0}
+            [25][0..99] ∈ [--..--]
+            [26..29][0..99] ∈ {0}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[0] computed
@@ -511,33 +676,140 @@
     (potential shared vars changed, interferences changed)
 [mt] * Computing value analysis for thread jobs[1]
 [mt] matrix.c:25: Lock locks[1]
+[eva:interferences] matrix.c:29: inject threads interferences at this point
 [mt] matrix.c:30: Release locks[1]
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[1][0..99]:
-    read by jobs[1] at matrix.c:29
-    read by jobs[1] at matrix.c:29
-    read by jobs[1] at matrix.c:29
-    read by jobs[1] at matrix.c:29
-    read by jobs[1] at matrix.c:29
-    read by jobs[1] at matrix.c:29
-    write by jobs[1] at matrix.c:29
-  matrix[6][0..99]: write by jobs[1] at matrix.c:29
-  matrix[11][0..99]: write by jobs[1] at matrix.c:29
-  matrix[16][0..99]: write by jobs[1] at matrix.c:29
-  matrix[21][0..99]: write by jobs[1] at matrix.c:29
-  matrix[26][0..99]: write by jobs[1] at matrix.c:29
+    read by jobs[1] at matrix.c:29 <- job
+    read by jobs[1] at matrix.c:29 <- job
+    read by jobs[1] at matrix.c:29 <- job
+    read by jobs[1] at matrix.c:29 <- job
+    read by jobs[1] at matrix.c:29 <- job
+    read by jobs[1] at matrix.c:29 <- job
+    write by jobs[1] at matrix.c:29 <- job
+  matrix[6][0..99]: write by jobs[1] at matrix.c:29 <- job
+  matrix[11][0..99]: write by jobs[1] at matrix.c:29 <- job
+  matrix[16][0..99]: write by jobs[1] at matrix.c:29 <- job
+  matrix[21][0..99]: write by jobs[1] at matrix.c:29 <- job
+  matrix[26][0..99]: write by jobs[1] at matrix.c:29 <- job
   locks[1]:
-    read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:56
-    read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:66
+    read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+      pthread_mutex_lock :: matrix.c:25 <- job
+    read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+      pthread_mutex_unlock :: matrix.c:30 <- job
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
   shared bases: {matrix}
   interferences by location:
+    matrix.c:29:
+      # cvalue:
+      matrix[0..1][0..99] ∈ [--..--]
+            [2..4][0..99] ∈ {0}
+            [5..6][0..99] ∈ [--..--]
+            [7..9][0..99] ∈ {0}
+            [10..11][0..99] ∈ [--..--]
+            [12..14][0..99] ∈ {0}
+            [15..16][0..99] ∈ [--..--]
+            [17..19][0..99] ∈ {0}
+            [20..21][0..99] ∈ [--..--]
+            [22..24][0..99] ∈ {0}
+            [25..26][0..99] ∈ [--..--]
+            [27..29][0..99] ∈ {0} 
+    matrix.c:29:
+      # cvalue:
+      matrix[0..1][0..99] ∈ [--..--]
+            [2..4][0..99] ∈ {0}
+            [5..6][0..99] ∈ [--..--]
+            [7..9][0..99] ∈ {0}
+            [10..11][0..99] ∈ [--..--]
+            [12..14][0..99] ∈ {0}
+            [15..16][0..99] ∈ [--..--]
+            [17..19][0..99] ∈ {0}
+            [20..21][0..99] ∈ [--..--]
+            [22..24][0..99] ∈ {0}
+            [25..26][0..99] ∈ [--..--]
+            [27..29][0..99] ∈ {0} 
+    matrix.c:29:
+      # cvalue:
+      matrix[0..1][0..99] ∈ [--..--]
+            [2..4][0..99] ∈ {0}
+            [5..6][0..99] ∈ [--..--]
+            [7..9][0..99] ∈ {0}
+            [10..11][0..99] ∈ [--..--]
+            [12..14][0..99] ∈ {0}
+            [15..16][0..99] ∈ [--..--]
+            [17..19][0..99] ∈ {0}
+            [20..21][0..99] ∈ [--..--]
+            [22..24][0..99] ∈ {0}
+            [25..26][0..99] ∈ [--..--]
+            [27..29][0..99] ∈ {0} 
+    matrix.c:29:
+      # cvalue:
+      matrix[0..1][0..99] ∈ [--..--]
+            [2..4][0..99] ∈ {0}
+            [5..6][0..99] ∈ [--..--]
+            [7..9][0..99] ∈ {0}
+            [10..11][0..99] ∈ [--..--]
+            [12..14][0..99] ∈ {0}
+            [15..16][0..99] ∈ [--..--]
+            [17..19][0..99] ∈ {0}
+            [20..21][0..99] ∈ [--..--]
+            [22..24][0..99] ∈ {0}
+            [25..26][0..99] ∈ [--..--]
+            [27..29][0..99] ∈ {0} 
+    matrix.c:29:
+      # cvalue:
+      matrix[0..1][0..99] ∈ [--..--]
+            [2..4][0..99] ∈ {0}
+            [5..6][0..99] ∈ [--..--]
+            [7..9][0..99] ∈ {0}
+            [10..11][0..99] ∈ [--..--]
+            [12..14][0..99] ∈ {0}
+            [15..16][0..99] ∈ [--..--]
+            [17..19][0..99] ∈ {0}
+            [20..21][0..99] ∈ [--..--]
+            [22..24][0..99] ∈ {0}
+            [25..26][0..99] ∈ [--..--]
+            [27..29][0..99] ∈ {0} 
+    matrix.c:29:
+      # cvalue:
+      matrix[0..1][0..99] ∈ [--..--]
+            [2..4][0..99] ∈ {0}
+            [5..6][0..99] ∈ [--..--]
+            [7..9][0..99] ∈ {0}
+            [10..11][0..99] ∈ [--..--]
+            [12..14][0..99] ∈ {0}
+            [15..16][0..99] ∈ [--..--]
+            [17..19][0..99] ∈ {0}
+            [20..21][0..99] ∈ [--..--]
+            [22..24][0..99] ∈ {0}
+            [25..26][0..99] ∈ [--..--]
+            [27..29][0..99] ∈ {0} 
   interferences by mutexes:
+    { locks[1] }:
+      # cvalue:
+      matrix[0..1][0..99] ∈ [--..--]
+            [2..4][0..99] ∈ {0}
+            [5..6][0..99] ∈ [--..--]
+            [7..9][0..99] ∈ {0}
+            [10..11][0..99] ∈ [--..--]
+            [12..14][0..99] ∈ {0}
+            [15..16][0..99] ∈ [--..--]
+            [17..19][0..99] ∈ {0}
+            [20..21][0..99] ∈ [--..--]
+            [22..24][0..99] ∈ {0}
+            [25..26][0..99] ∈ [--..--]
+            [27..29][0..99] ∈ {0}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[1] computed
@@ -545,33 +817,140 @@
     (potential shared vars changed, interferences changed)
 [mt] * Computing value analysis for thread jobs[2]
 [mt] matrix.c:25: Lock locks[2]
+[eva:interferences] matrix.c:29: inject threads interferences at this point
 [mt] matrix.c:30: Release locks[2]
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[2][0..99]:
-    read by jobs[2] at matrix.c:29
-    read by jobs[2] at matrix.c:29
-    read by jobs[2] at matrix.c:29
-    read by jobs[2] at matrix.c:29
-    read by jobs[2] at matrix.c:29
-    read by jobs[2] at matrix.c:29
-    write by jobs[2] at matrix.c:29
-  matrix[7][0..99]: write by jobs[2] at matrix.c:29
-  matrix[12][0..99]: write by jobs[2] at matrix.c:29
-  matrix[17][0..99]: write by jobs[2] at matrix.c:29
-  matrix[22][0..99]: write by jobs[2] at matrix.c:29
-  matrix[27][0..99]: write by jobs[2] at matrix.c:29
+    read by jobs[2] at matrix.c:29 <- job
+    read by jobs[2] at matrix.c:29 <- job
+    read by jobs[2] at matrix.c:29 <- job
+    read by jobs[2] at matrix.c:29 <- job
+    read by jobs[2] at matrix.c:29 <- job
+    read by jobs[2] at matrix.c:29 <- job
+    write by jobs[2] at matrix.c:29 <- job
+  matrix[7][0..99]: write by jobs[2] at matrix.c:29 <- job
+  matrix[12][0..99]: write by jobs[2] at matrix.c:29 <- job
+  matrix[17][0..99]: write by jobs[2] at matrix.c:29 <- job
+  matrix[22][0..99]: write by jobs[2] at matrix.c:29 <- job
+  matrix[27][0..99]: write by jobs[2] at matrix.c:29 <- job
   locks[2]:
-    read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:56
-    read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:66
+    read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+      pthread_mutex_lock :: matrix.c:25 <- job
+    read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+      pthread_mutex_unlock :: matrix.c:30 <- job
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
   shared bases: {matrix}
   interferences by location:
+    matrix.c:29:
+      # cvalue:
+      matrix[0..2][0..99] ∈ [--..--]
+            [3..4][0..99] ∈ {0}
+            [5..7][0..99] ∈ [--..--]
+            [8..9][0..99] ∈ {0}
+            [10..12][0..99] ∈ [--..--]
+            [13..14][0..99] ∈ {0}
+            [15..17][0..99] ∈ [--..--]
+            [18..19][0..99] ∈ {0}
+            [20..22][0..99] ∈ [--..--]
+            [23..24][0..99] ∈ {0}
+            [25..27][0..99] ∈ [--..--]
+            [28..29][0..99] ∈ {0} 
+    matrix.c:29:
+      # cvalue:
+      matrix[0..2][0..99] ∈ [--..--]
+            [3..4][0..99] ∈ {0}
+            [5..7][0..99] ∈ [--..--]
+            [8..9][0..99] ∈ {0}
+            [10..12][0..99] ∈ [--..--]
+            [13..14][0..99] ∈ {0}
+            [15..17][0..99] ∈ [--..--]
+            [18..19][0..99] ∈ {0}
+            [20..22][0..99] ∈ [--..--]
+            [23..24][0..99] ∈ {0}
+            [25..27][0..99] ∈ [--..--]
+            [28..29][0..99] ∈ {0} 
+    matrix.c:29:
+      # cvalue:
+      matrix[0..2][0..99] ∈ [--..--]
+            [3..4][0..99] ∈ {0}
+            [5..7][0..99] ∈ [--..--]
+            [8..9][0..99] ∈ {0}
+            [10..12][0..99] ∈ [--..--]
+            [13..14][0..99] ∈ {0}
+            [15..17][0..99] ∈ [--..--]
+            [18..19][0..99] ∈ {0}
+            [20..22][0..99] ∈ [--..--]
+            [23..24][0..99] ∈ {0}
+            [25..27][0..99] ∈ [--..--]
+            [28..29][0..99] ∈ {0} 
+    matrix.c:29:
+      # cvalue:
+      matrix[0..2][0..99] ∈ [--..--]
+            [3..4][0..99] ∈ {0}
+            [5..7][0..99] ∈ [--..--]
+            [8..9][0..99] ∈ {0}
+            [10..12][0..99] ∈ [--..--]
+            [13..14][0..99] ∈ {0}
+            [15..17][0..99] ∈ [--..--]
+            [18..19][0..99] ∈ {0}
+            [20..22][0..99] ∈ [--..--]
+            [23..24][0..99] ∈ {0}
+            [25..27][0..99] ∈ [--..--]
+            [28..29][0..99] ∈ {0} 
+    matrix.c:29:
+      # cvalue:
+      matrix[0..2][0..99] ∈ [--..--]
+            [3..4][0..99] ∈ {0}
+            [5..7][0..99] ∈ [--..--]
+            [8..9][0..99] ∈ {0}
+            [10..12][0..99] ∈ [--..--]
+            [13..14][0..99] ∈ {0}
+            [15..17][0..99] ∈ [--..--]
+            [18..19][0..99] ∈ {0}
+            [20..22][0..99] ∈ [--..--]
+            [23..24][0..99] ∈ {0}
+            [25..27][0..99] ∈ [--..--]
+            [28..29][0..99] ∈ {0} 
+    matrix.c:29:
+      # cvalue:
+      matrix[0..2][0..99] ∈ [--..--]
+            [3..4][0..99] ∈ {0}
+            [5..7][0..99] ∈ [--..--]
+            [8..9][0..99] ∈ {0}
+            [10..12][0..99] ∈ [--..--]
+            [13..14][0..99] ∈ {0}
+            [15..17][0..99] ∈ [--..--]
+            [18..19][0..99] ∈ {0}
+            [20..22][0..99] ∈ [--..--]
+            [23..24][0..99] ∈ {0}
+            [25..27][0..99] ∈ [--..--]
+            [28..29][0..99] ∈ {0} 
   interferences by mutexes:
+    { locks[2] }:
+      # cvalue:
+      matrix[0..2][0..99] ∈ [--..--]
+            [3..4][0..99] ∈ {0}
+            [5..7][0..99] ∈ [--..--]
+            [8..9][0..99] ∈ {0}
+            [10..12][0..99] ∈ [--..--]
+            [13..14][0..99] ∈ {0}
+            [15..17][0..99] ∈ [--..--]
+            [18..19][0..99] ∈ {0}
+            [20..22][0..99] ∈ [--..--]
+            [23..24][0..99] ∈ {0}
+            [25..27][0..99] ∈ [--..--]
+            [28..29][0..99] ∈ {0}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[2] computed
@@ -579,33 +958,140 @@
     (potential shared vars changed, interferences changed)
 [mt] * Computing value analysis for thread jobs[3]
 [mt] matrix.c:25: Lock locks[3]
+[eva:interferences] matrix.c:29: inject threads interferences at this point
 [mt] matrix.c:30: Release locks[3]
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[3][0..99]:
-    read by jobs[3] at matrix.c:29
-    read by jobs[3] at matrix.c:29
-    read by jobs[3] at matrix.c:29
-    read by jobs[3] at matrix.c:29
-    read by jobs[3] at matrix.c:29
-    read by jobs[3] at matrix.c:29
-    write by jobs[3] at matrix.c:29
-  matrix[8][0..99]: write by jobs[3] at matrix.c:29
-  matrix[13][0..99]: write by jobs[3] at matrix.c:29
-  matrix[18][0..99]: write by jobs[3] at matrix.c:29
-  matrix[23][0..99]: write by jobs[3] at matrix.c:29
-  matrix[28][0..99]: write by jobs[3] at matrix.c:29
+    read by jobs[3] at matrix.c:29 <- job
+    read by jobs[3] at matrix.c:29 <- job
+    read by jobs[3] at matrix.c:29 <- job
+    read by jobs[3] at matrix.c:29 <- job
+    read by jobs[3] at matrix.c:29 <- job
+    read by jobs[3] at matrix.c:29 <- job
+    write by jobs[3] at matrix.c:29 <- job
+  matrix[8][0..99]: write by jobs[3] at matrix.c:29 <- job
+  matrix[13][0..99]: write by jobs[3] at matrix.c:29 <- job
+  matrix[18][0..99]: write by jobs[3] at matrix.c:29 <- job
+  matrix[23][0..99]: write by jobs[3] at matrix.c:29 <- job
+  matrix[28][0..99]: write by jobs[3] at matrix.c:29 <- job
   locks[3]:
-    read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:56
-    read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:66
+    read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+      pthread_mutex_lock :: matrix.c:25 <- job
+    read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+      pthread_mutex_unlock :: matrix.c:30 <- job
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
   shared bases: {matrix}
   interferences by location:
+    matrix.c:29:
+      # cvalue:
+      matrix[0..3][0..99] ∈ [--..--]
+            [4][0..99] ∈ {0}
+            [5..8][0..99] ∈ [--..--]
+            [9][0..99] ∈ {0}
+            [10..13][0..99] ∈ [--..--]
+            [14][0..99] ∈ {0}
+            [15..18][0..99] ∈ [--..--]
+            [19][0..99] ∈ {0}
+            [20..23][0..99] ∈ [--..--]
+            [24][0..99] ∈ {0}
+            [25..28][0..99] ∈ [--..--]
+            [29][0..99] ∈ {0} 
+    matrix.c:29:
+      # cvalue:
+      matrix[0..3][0..99] ∈ [--..--]
+            [4][0..99] ∈ {0}
+            [5..8][0..99] ∈ [--..--]
+            [9][0..99] ∈ {0}
+            [10..13][0..99] ∈ [--..--]
+            [14][0..99] ∈ {0}
+            [15..18][0..99] ∈ [--..--]
+            [19][0..99] ∈ {0}
+            [20..23][0..99] ∈ [--..--]
+            [24][0..99] ∈ {0}
+            [25..28][0..99] ∈ [--..--]
+            [29][0..99] ∈ {0} 
+    matrix.c:29:
+      # cvalue:
+      matrix[0..3][0..99] ∈ [--..--]
+            [4][0..99] ∈ {0}
+            [5..8][0..99] ∈ [--..--]
+            [9][0..99] ∈ {0}
+            [10..13][0..99] ∈ [--..--]
+            [14][0..99] ∈ {0}
+            [15..18][0..99] ∈ [--..--]
+            [19][0..99] ∈ {0}
+            [20..23][0..99] ∈ [--..--]
+            [24][0..99] ∈ {0}
+            [25..28][0..99] ∈ [--..--]
+            [29][0..99] ∈ {0} 
+    matrix.c:29:
+      # cvalue:
+      matrix[0..3][0..99] ∈ [--..--]
+            [4][0..99] ∈ {0}
+            [5..8][0..99] ∈ [--..--]
+            [9][0..99] ∈ {0}
+            [10..13][0..99] ∈ [--..--]
+            [14][0..99] ∈ {0}
+            [15..18][0..99] ∈ [--..--]
+            [19][0..99] ∈ {0}
+            [20..23][0..99] ∈ [--..--]
+            [24][0..99] ∈ {0}
+            [25..28][0..99] ∈ [--..--]
+            [29][0..99] ∈ {0} 
+    matrix.c:29:
+      # cvalue:
+      matrix[0..3][0..99] ∈ [--..--]
+            [4][0..99] ∈ {0}
+            [5..8][0..99] ∈ [--..--]
+            [9][0..99] ∈ {0}
+            [10..13][0..99] ∈ [--..--]
+            [14][0..99] ∈ {0}
+            [15..18][0..99] ∈ [--..--]
+            [19][0..99] ∈ {0}
+            [20..23][0..99] ∈ [--..--]
+            [24][0..99] ∈ {0}
+            [25..28][0..99] ∈ [--..--]
+            [29][0..99] ∈ {0} 
+    matrix.c:29:
+      # cvalue:
+      matrix[0..3][0..99] ∈ [--..--]
+            [4][0..99] ∈ {0}
+            [5..8][0..99] ∈ [--..--]
+            [9][0..99] ∈ {0}
+            [10..13][0..99] ∈ [--..--]
+            [14][0..99] ∈ {0}
+            [15..18][0..99] ∈ [--..--]
+            [19][0..99] ∈ {0}
+            [20..23][0..99] ∈ [--..--]
+            [24][0..99] ∈ {0}
+            [25..28][0..99] ∈ [--..--]
+            [29][0..99] ∈ {0} 
   interferences by mutexes:
+    { locks[3] }:
+      # cvalue:
+      matrix[0..3][0..99] ∈ [--..--]
+            [4][0..99] ∈ {0}
+            [5..8][0..99] ∈ [--..--]
+            [9][0..99] ∈ {0}
+            [10..13][0..99] ∈ [--..--]
+            [14][0..99] ∈ {0}
+            [15..18][0..99] ∈ [--..--]
+            [19][0..99] ∈ {0}
+            [20..23][0..99] ∈ [--..--]
+            [24][0..99] ∈ {0}
+            [25..28][0..99] ∈ [--..--]
+            [29][0..99] ∈ {0}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[3] computed
@@ -613,33 +1099,56 @@
     (potential shared vars changed, interferences changed)
 [mt] * Computing value analysis for thread jobs[4]
 [mt] matrix.c:25: Lock locks[4]
+[eva:interferences] matrix.c:29: inject threads interferences at this point
 [mt] matrix.c:30: Release locks[4]
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[4][0..99]:
-    read by jobs[4] at matrix.c:29
-    read by jobs[4] at matrix.c:29
-    read by jobs[4] at matrix.c:29
-    read by jobs[4] at matrix.c:29
-    read by jobs[4] at matrix.c:29
-    read by jobs[4] at matrix.c:29
-    write by jobs[4] at matrix.c:29
-  matrix[9][0..99]: write by jobs[4] at matrix.c:29
-  matrix[14][0..99]: write by jobs[4] at matrix.c:29
-  matrix[19][0..99]: write by jobs[4] at matrix.c:29
-  matrix[24][0..99]: write by jobs[4] at matrix.c:29
-  matrix[29][0..99]: write by jobs[4] at matrix.c:29
+    read by jobs[4] at matrix.c:29 <- job
+    read by jobs[4] at matrix.c:29 <- job
+    read by jobs[4] at matrix.c:29 <- job
+    read by jobs[4] at matrix.c:29 <- job
+    read by jobs[4] at matrix.c:29 <- job
+    read by jobs[4] at matrix.c:29 <- job
+    write by jobs[4] at matrix.c:29 <- job
+  matrix[9][0..99]: write by jobs[4] at matrix.c:29 <- job
+  matrix[14][0..99]: write by jobs[4] at matrix.c:29 <- job
+  matrix[19][0..99]: write by jobs[4] at matrix.c:29 <- job
+  matrix[24][0..99]: write by jobs[4] at matrix.c:29 <- job
+  matrix[29][0..99]: write by jobs[4] at matrix.c:29 <- job
   locks[4]:
-    read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:56
-    read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:66
+    read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+      pthread_mutex_lock :: matrix.c:25 <- job
+    read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+      pthread_mutex_unlock :: matrix.c:30 <- job
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
   shared bases: {matrix}
   interferences by location:
+    matrix.c:29:
+      # cvalue: matrix[0..29][0..99] ∈ [--..--] 
+    matrix.c:29:
+      # cvalue: matrix[0..29][0..99] ∈ [--..--] 
+    matrix.c:29:
+      # cvalue: matrix[0..29][0..99] ∈ [--..--] 
+    matrix.c:29:
+      # cvalue: matrix[0..29][0..99] ∈ [--..--] 
+    matrix.c:29:
+      # cvalue: matrix[0..29][0..99] ∈ [--..--] 
+    matrix.c:29:
+      # cvalue: matrix[0..29][0..99] ∈ [--..--] 
   interferences by mutexes:
+    { locks[4] }:
+      # cvalue: matrix[0..29][0..99] ∈ [--..--]
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[4] computed
@@ -923,7 +1432,8 @@
   matrix[0][0..99]: Read by <main>, Write by jobs[0]: protected by locks[0]
 [mt] ***** Shared variables computed
 [mt] ***** Iteration 3
-[mt] *** Computing thread <main>, iteration 3 (shared vars values changed)
+[mt] *** Computing thread <main>, iteration 3
+    (shared vars values changed, interferences changed)
 [mt] * Computing value analysis for thread <main>
 [mt] Thread <main>, fun main
 [mt] matrix.c:38: Initializing mutex locks[0]
@@ -934,6 +1444,7 @@
 [eva:interferences] matrix.c:43: inject threads interferences at this point
 [mt] matrix.c:46: Thread jobs[0], fun job, parent <main>, args {0}
 [mt] matrix.c:46: Start thread jobs[0]
+[mt] matrix.c:46: New context for jobs[0], fun job, parent <main>, args {0}
 [mt] matrix.c:46: Thread jobs[1], fun job, parent <main>, args {1}
 [mt] matrix.c:46: Start thread jobs[1]
 [mt] matrix.c:46: New context for jobs[1], fun job, parent <main>, args {1}
@@ -961,104 +1472,128 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  matrix[0][0..99]: read by <main> at matrix.c:59
-  matrix[1][0..99]: read by <main> at matrix.c:59
-  matrix[2][0..99]: read by <main> at matrix.c:59
-  matrix[3][0..99]: read by <main> at matrix.c:59
-  matrix[4][0..99]: read by <main> at matrix.c:59
-  matrix[5][0..99]: read by <main> at matrix.c:59
-  matrix[6][0..99]: read by <main> at matrix.c:59
-  matrix[7][0..99]: read by <main> at matrix.c:59
-  matrix[8][0..99]: read by <main> at matrix.c:59
-  matrix[9][0..99]: read by <main> at matrix.c:59
-  matrix[10][0..99]: read by <main> at matrix.c:59
-  matrix[11][0..99]: read by <main> at matrix.c:59
-  matrix[12][0..99]: read by <main> at matrix.c:59
-  matrix[13][0..99]: read by <main> at matrix.c:59
-  matrix[14][0..99]: read by <main> at matrix.c:59
-  matrix[15][0..99]: read by <main> at matrix.c:59
-  matrix[16][0..99]: read by <main> at matrix.c:59
-  matrix[17][0..99]: read by <main> at matrix.c:59
-  matrix[18][0..99]: read by <main> at matrix.c:59
-  matrix[19][0..99]: read by <main> at matrix.c:59
-  matrix[20][0..99]: read by <main> at matrix.c:59
-  matrix[21][0..99]: read by <main> at matrix.c:59
-  matrix[22][0..99]: read by <main> at matrix.c:59
-  matrix[23][0..99]: read by <main> at matrix.c:59
-  matrix[24][0..99]: read by <main> at matrix.c:59
-  matrix[25][0..99]: read by <main> at matrix.c:59
-  matrix[26][0..99]: read by <main> at matrix.c:59
-  matrix[27][0..99]: read by <main> at matrix.c:59
-  matrix[28][0..99]: read by <main> at matrix.c:59
-  matrix[29][0..99]: read by <main> at matrix.c:59
+  matrix[0][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[1][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[2][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[3][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[4][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[5][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[6][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[7][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[8][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[9][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[10][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[11][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[12][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[13][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[14][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[15][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[16][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[17][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[18][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[19][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[20][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[21][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[22][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[23][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[24][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[25][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[26][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[27][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[28][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[29][0..99]: read by <main> at matrix.c:59 <- main
   psum[0..99]:
-    read by <main> at matrix.c:64
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    read by <main> at matrix.c:59
-    write by <main> at matrix.c:51
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-    write by <main> at matrix.c:59
-  result: read by <main> at matrix.c:49
-  locks[0..4]:
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66
-  jobs[0..4]: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+    read by <main> at matrix.c:64 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:51 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+  result: read by <main> at matrix.c:49 <- main
+  locks[0]:
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56 <-
+      pthread_mutex_lock :: matrix.c:55 <- main
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66 <-
+      pthread_mutex_unlock :: matrix.c:60 <- main
+  locks[1]:
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56 <-
+      pthread_mutex_lock :: matrix.c:55 <- main
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66 <-
+      pthread_mutex_unlock :: matrix.c:60 <- main
+  locks[2]:
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56 <-
+      pthread_mutex_lock :: matrix.c:55 <- main
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66 <-
+      pthread_mutex_unlock :: matrix.c:60 <- main
+  locks[3]:
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56 <-
+      pthread_mutex_lock :: matrix.c:55 <- main
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66 <-
+      pthread_mutex_unlock :: matrix.c:60 <- main
+  locks[4]:
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56 <-
+      pthread_mutex_lock :: matrix.c:55 <- main
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66 <-
+      pthread_mutex_unlock :: matrix.c:60 <- main
+  jobs[0..4]:
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+      pthread_create :: matrix.c:46 <- main
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -1066,179 +1601,300 @@
   shared bases: {matrix}
   interferences by location:
     matrix.c:43:
-      # cvalue: matrix[0..29][0..99] ∈ {0} 
+      # cvalue: matrix[0..29][0..99] ∈ [--..--] 
   interferences by mutexes:
     {  }:
-      # cvalue: matrix[0..29][0..99] ∈ {0}
+      # cvalue: matrix[0..29][0..99] ∈ [--..--]
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
-[mt] *** Computing thread jobs[0], iteration 3 (shared vars values changed)
+[mt] *** Computing thread jobs[0], iteration 3
+    (shared vars values changed, thread initial memory state changed,
+     interferences changed)
 [mt] * Computing value analysis for thread jobs[0]
 [mt] matrix.c:25: Lock locks[0]
+[eva:interferences] matrix.c:29: inject threads interferences at this point
 [mt] matrix.c:30: Release locks[0]
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[0][0..99]:
-    read by jobs[0] at matrix.c:29
-    read by jobs[0] at matrix.c:29
-    read by jobs[0] at matrix.c:29
-    read by jobs[0] at matrix.c:29
-    read by jobs[0] at matrix.c:29
-    read by jobs[0] at matrix.c:29
-    write by jobs[0] at matrix.c:29
-  matrix[5][0..99]: write by jobs[0] at matrix.c:29
-  matrix[10][0..99]: write by jobs[0] at matrix.c:29
-  matrix[15][0..99]: write by jobs[0] at matrix.c:29
-  matrix[20][0..99]: write by jobs[0] at matrix.c:29
-  matrix[25][0..99]: write by jobs[0] at matrix.c:29
+    read by jobs[0] at matrix.c:29 <- job
+    read by jobs[0] at matrix.c:29 <- job
+    read by jobs[0] at matrix.c:29 <- job
+    read by jobs[0] at matrix.c:29 <- job
+    read by jobs[0] at matrix.c:29 <- job
+    read by jobs[0] at matrix.c:29 <- job
+    write by jobs[0] at matrix.c:29 <- job
+  matrix[5][0..99]: write by jobs[0] at matrix.c:29 <- job
+  matrix[10][0..99]: write by jobs[0] at matrix.c:29 <- job
+  matrix[15][0..99]: write by jobs[0] at matrix.c:29 <- job
+  matrix[20][0..99]: write by jobs[0] at matrix.c:29 <- job
+  matrix[25][0..99]: write by jobs[0] at matrix.c:29 <- job
   locks[0]:
-    read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:56
-    read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:66
+    read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+      pthread_mutex_lock :: matrix.c:25 <- job
+    read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+      pthread_mutex_unlock :: matrix.c:30 <- job
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
   shared bases: {matrix}
   interferences by location:
+    matrix.c:29:
+      # cvalue: matrix[0..29][0..99] ∈ [--..--] 
+    matrix.c:29:
+      # cvalue: matrix[0..29][0..99] ∈ [--..--] 
+    matrix.c:29:
+      # cvalue: matrix[0..29][0..99] ∈ [--..--] 
+    matrix.c:29:
+      # cvalue: matrix[0..29][0..99] ∈ [--..--] 
+    matrix.c:29:
+      # cvalue: matrix[0..29][0..99] ∈ [--..--] 
+    matrix.c:29:
+      # cvalue: matrix[0..29][0..99] ∈ [--..--] 
   interferences by mutexes:
+    { locks[0] }:
+      # cvalue: matrix[0..29][0..99] ∈ [--..--]
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[0] computed
 [mt] *** Computing thread jobs[1], iteration 3
-    (shared vars values changed, thread initial memory state changed)
+    (shared vars values changed, thread initial memory state changed,
+     interferences changed)
 [mt] * Computing value analysis for thread jobs[1]
 [mt] matrix.c:25: Lock locks[1]
+[eva:interferences] matrix.c:29: inject threads interferences at this point
 [mt] matrix.c:30: Release locks[1]
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[1][0..99]:
-    read by jobs[1] at matrix.c:29
-    read by jobs[1] at matrix.c:29
-    read by jobs[1] at matrix.c:29
-    read by jobs[1] at matrix.c:29
-    read by jobs[1] at matrix.c:29
-    read by jobs[1] at matrix.c:29
-    write by jobs[1] at matrix.c:29
-  matrix[6][0..99]: write by jobs[1] at matrix.c:29
-  matrix[11][0..99]: write by jobs[1] at matrix.c:29
-  matrix[16][0..99]: write by jobs[1] at matrix.c:29
-  matrix[21][0..99]: write by jobs[1] at matrix.c:29
-  matrix[26][0..99]: write by jobs[1] at matrix.c:29
+    read by jobs[1] at matrix.c:29 <- job
+    read by jobs[1] at matrix.c:29 <- job
+    read by jobs[1] at matrix.c:29 <- job
+    read by jobs[1] at matrix.c:29 <- job
+    read by jobs[1] at matrix.c:29 <- job
+    read by jobs[1] at matrix.c:29 <- job
+    write by jobs[1] at matrix.c:29 <- job
+  matrix[6][0..99]: write by jobs[1] at matrix.c:29 <- job
+  matrix[11][0..99]: write by jobs[1] at matrix.c:29 <- job
+  matrix[16][0..99]: write by jobs[1] at matrix.c:29 <- job
+  matrix[21][0..99]: write by jobs[1] at matrix.c:29 <- job
+  matrix[26][0..99]: write by jobs[1] at matrix.c:29 <- job
   locks[1]:
-    read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:56
-    read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:66
+    read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+      pthread_mutex_lock :: matrix.c:25 <- job
+    read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+      pthread_mutex_unlock :: matrix.c:30 <- job
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
   shared bases: {matrix}
   interferences by location:
+    matrix.c:29:
+      # cvalue: matrix[0..29][0..99] ∈ [--..--] 
+    matrix.c:29:
+      # cvalue: matrix[0..29][0..99] ∈ [--..--] 
+    matrix.c:29:
+      # cvalue: matrix[0..29][0..99] ∈ [--..--] 
+    matrix.c:29:
+      # cvalue: matrix[0..29][0..99] ∈ [--..--] 
+    matrix.c:29:
+      # cvalue: matrix[0..29][0..99] ∈ [--..--] 
+    matrix.c:29:
+      # cvalue: matrix[0..29][0..99] ∈ [--..--] 
   interferences by mutexes:
+    { locks[1] }:
+      # cvalue: matrix[0..29][0..99] ∈ [--..--]
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[1] computed
 [mt] *** Computing thread jobs[2], iteration 3
-    (shared vars values changed, thread initial memory state changed)
+    (shared vars values changed, thread initial memory state changed,
+     interferences changed)
 [mt] * Computing value analysis for thread jobs[2]
 [mt] matrix.c:25: Lock locks[2]
+[eva:interferences] matrix.c:29: inject threads interferences at this point
 [mt] matrix.c:30: Release locks[2]
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[2][0..99]:
-    read by jobs[2] at matrix.c:29
-    read by jobs[2] at matrix.c:29
-    read by jobs[2] at matrix.c:29
-    read by jobs[2] at matrix.c:29
-    read by jobs[2] at matrix.c:29
-    read by jobs[2] at matrix.c:29
-    write by jobs[2] at matrix.c:29
-  matrix[7][0..99]: write by jobs[2] at matrix.c:29
-  matrix[12][0..99]: write by jobs[2] at matrix.c:29
-  matrix[17][0..99]: write by jobs[2] at matrix.c:29
-  matrix[22][0..99]: write by jobs[2] at matrix.c:29
-  matrix[27][0..99]: write by jobs[2] at matrix.c:29
+    read by jobs[2] at matrix.c:29 <- job
+    read by jobs[2] at matrix.c:29 <- job
+    read by jobs[2] at matrix.c:29 <- job
+    read by jobs[2] at matrix.c:29 <- job
+    read by jobs[2] at matrix.c:29 <- job
+    read by jobs[2] at matrix.c:29 <- job
+    write by jobs[2] at matrix.c:29 <- job
+  matrix[7][0..99]: write by jobs[2] at matrix.c:29 <- job
+  matrix[12][0..99]: write by jobs[2] at matrix.c:29 <- job
+  matrix[17][0..99]: write by jobs[2] at matrix.c:29 <- job
+  matrix[22][0..99]: write by jobs[2] at matrix.c:29 <- job
+  matrix[27][0..99]: write by jobs[2] at matrix.c:29 <- job
   locks[2]:
-    read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:56
-    read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:66
+    read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+      pthread_mutex_lock :: matrix.c:25 <- job
+    read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+      pthread_mutex_unlock :: matrix.c:30 <- job
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
   shared bases: {matrix}
   interferences by location:
+    matrix.c:29:
+      # cvalue: matrix[0..29][0..99] ∈ [--..--] 
+    matrix.c:29:
+      # cvalue: matrix[0..29][0..99] ∈ [--..--] 
+    matrix.c:29:
+      # cvalue: matrix[0..29][0..99] ∈ [--..--] 
+    matrix.c:29:
+      # cvalue: matrix[0..29][0..99] ∈ [--..--] 
+    matrix.c:29:
+      # cvalue: matrix[0..29][0..99] ∈ [--..--] 
+    matrix.c:29:
+      # cvalue: matrix[0..29][0..99] ∈ [--..--] 
   interferences by mutexes:
+    { locks[2] }:
+      # cvalue: matrix[0..29][0..99] ∈ [--..--]
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[2] computed
 [mt] *** Computing thread jobs[3], iteration 3
-    (shared vars values changed, thread initial memory state changed)
+    (shared vars values changed, thread initial memory state changed,
+     interferences changed)
 [mt] * Computing value analysis for thread jobs[3]
 [mt] matrix.c:25: Lock locks[3]
+[eva:interferences] matrix.c:29: inject threads interferences at this point
 [mt] matrix.c:30: Release locks[3]
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[3][0..99]:
-    read by jobs[3] at matrix.c:29
-    read by jobs[3] at matrix.c:29
-    read by jobs[3] at matrix.c:29
-    read by jobs[3] at matrix.c:29
-    read by jobs[3] at matrix.c:29
-    read by jobs[3] at matrix.c:29
-    write by jobs[3] at matrix.c:29
-  matrix[8][0..99]: write by jobs[3] at matrix.c:29
-  matrix[13][0..99]: write by jobs[3] at matrix.c:29
-  matrix[18][0..99]: write by jobs[3] at matrix.c:29
-  matrix[23][0..99]: write by jobs[3] at matrix.c:29
-  matrix[28][0..99]: write by jobs[3] at matrix.c:29
+    read by jobs[3] at matrix.c:29 <- job
+    read by jobs[3] at matrix.c:29 <- job
+    read by jobs[3] at matrix.c:29 <- job
+    read by jobs[3] at matrix.c:29 <- job
+    read by jobs[3] at matrix.c:29 <- job
+    read by jobs[3] at matrix.c:29 <- job
+    write by jobs[3] at matrix.c:29 <- job
+  matrix[8][0..99]: write by jobs[3] at matrix.c:29 <- job
+  matrix[13][0..99]: write by jobs[3] at matrix.c:29 <- job
+  matrix[18][0..99]: write by jobs[3] at matrix.c:29 <- job
+  matrix[23][0..99]: write by jobs[3] at matrix.c:29 <- job
+  matrix[28][0..99]: write by jobs[3] at matrix.c:29 <- job
   locks[3]:
-    read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:56
-    read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:66
+    read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+      pthread_mutex_lock :: matrix.c:25 <- job
+    read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+      pthread_mutex_unlock :: matrix.c:30 <- job
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
   shared bases: {matrix}
   interferences by location:
+    matrix.c:29:
+      # cvalue: matrix[0..29][0..99] ∈ [--..--] 
+    matrix.c:29:
+      # cvalue: matrix[0..29][0..99] ∈ [--..--] 
+    matrix.c:29:
+      # cvalue: matrix[0..29][0..99] ∈ [--..--] 
+    matrix.c:29:
+      # cvalue: matrix[0..29][0..99] ∈ [--..--] 
+    matrix.c:29:
+      # cvalue: matrix[0..29][0..99] ∈ [--..--] 
+    matrix.c:29:
+      # cvalue: matrix[0..29][0..99] ∈ [--..--] 
   interferences by mutexes:
+    { locks[3] }:
+      # cvalue: matrix[0..29][0..99] ∈ [--..--]
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[3] computed
 [mt] *** Computing thread jobs[4], iteration 3
-    (shared vars values changed, thread initial memory state changed)
+    (shared vars values changed, thread initial memory state changed,
+     interferences changed)
 [mt] * Computing value analysis for thread jobs[4]
 [mt] matrix.c:25: Lock locks[4]
+[eva:interferences] matrix.c:29: inject threads interferences at this point
 [mt] matrix.c:30: Release locks[4]
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[4][0..99]:
-    read by jobs[4] at matrix.c:29
-    read by jobs[4] at matrix.c:29
-    read by jobs[4] at matrix.c:29
-    read by jobs[4] at matrix.c:29
-    read by jobs[4] at matrix.c:29
-    read by jobs[4] at matrix.c:29
-    write by jobs[4] at matrix.c:29
-  matrix[9][0..99]: write by jobs[4] at matrix.c:29
-  matrix[14][0..99]: write by jobs[4] at matrix.c:29
-  matrix[19][0..99]: write by jobs[4] at matrix.c:29
-  matrix[24][0..99]: write by jobs[4] at matrix.c:29
-  matrix[29][0..99]: write by jobs[4] at matrix.c:29
+    read by jobs[4] at matrix.c:29 <- job
+    read by jobs[4] at matrix.c:29 <- job
+    read by jobs[4] at matrix.c:29 <- job
+    read by jobs[4] at matrix.c:29 <- job
+    read by jobs[4] at matrix.c:29 <- job
+    read by jobs[4] at matrix.c:29 <- job
+    write by jobs[4] at matrix.c:29 <- job
+  matrix[9][0..99]: write by jobs[4] at matrix.c:29 <- job
+  matrix[14][0..99]: write by jobs[4] at matrix.c:29 <- job
+  matrix[19][0..99]: write by jobs[4] at matrix.c:29 <- job
+  matrix[24][0..99]: write by jobs[4] at matrix.c:29 <- job
+  matrix[29][0..99]: write by jobs[4] at matrix.c:29 <- job
   locks[4]:
-    read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:56
-    read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:66
+    read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+      pthread_mutex_lock :: matrix.c:25 <- job
+    read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+      pthread_mutex_unlock :: matrix.c:30 <- job
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
   shared bases: {matrix}
   interferences by location:
+    matrix.c:29:
+      # cvalue: matrix[0..29][0..99] ∈ [--..--] 
+    matrix.c:29:
+      # cvalue: matrix[0..29][0..99] ∈ [--..--] 
+    matrix.c:29:
+      # cvalue: matrix[0..29][0..99] ∈ [--..--] 
+    matrix.c:29:
+      # cvalue: matrix[0..29][0..99] ∈ [--..--] 
+    matrix.c:29:
+      # cvalue: matrix[0..29][0..99] ∈ [--..--] 
+    matrix.c:29:
+      # cvalue: matrix[0..29][0..99] ∈ [--..--] 
   interferences by mutexes:
+    { locks[4] }:
+      # cvalue: matrix[0..29][0..99] ∈ [--..--]
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[4] computed
@@ -1517,4 +2173,618 @@
   matrix[1][0..99]: Read by <main>, Write by jobs[1]: protected by locks[1]
   matrix[0][0..99]: Read by <main>, Write by jobs[0]: protected by locks[0]
 [mt] ***** Shared variables computed
-[mt] ******* Analysis performed, 3 iterations
+[mt] ***** Iteration 4
+[mt] *** Computing thread <main>, iteration 4 (interferences changed)
+[mt] * Computing value analysis for thread <main>
+[mt] Thread <main>, fun main
+[mt] matrix.c:38: Initializing mutex locks[0]
+[mt] matrix.c:38: Initializing mutex locks[1]
+[mt] matrix.c:38: Initializing mutex locks[2]
+[mt] matrix.c:38: Initializing mutex locks[3]
+[mt] matrix.c:38: Initializing mutex locks[4]
+[eva:interferences] matrix.c:43: inject threads interferences at this point
+[mt] matrix.c:46: Thread jobs[0], fun job, parent <main>, args {0}
+[mt] matrix.c:46: Start thread jobs[0]
+[mt] matrix.c:46: Thread jobs[1], fun job, parent <main>, args {1}
+[mt] matrix.c:46: Start thread jobs[1]
+[mt] matrix.c:46: Thread jobs[2], fun job, parent <main>, args {2}
+[mt] matrix.c:46: Start thread jobs[2]
+[mt] matrix.c:46: Thread jobs[3], fun job, parent <main>, args {3}
+[mt] matrix.c:46: Start thread jobs[3]
+[mt] matrix.c:46: Thread jobs[4], fun job, parent <main>, args {4}
+[mt] matrix.c:46: Start thread jobs[4]
+[mt] matrix.c:55: Lock locks[0]
+[eva:interferences] matrix.c:59: inject threads interferences at this point
+[mt] matrix.c:60: Release locks[0]
+[mt] matrix.c:55: Lock locks[1]
+[mt] matrix.c:60: Release locks[1]
+[mt] matrix.c:55: Lock locks[2]
+[mt] matrix.c:60: Release locks[2]
+[mt] matrix.c:55: Lock locks[3]
+[mt] matrix.c:60: Release locks[3]
+[mt] matrix.c:55: Lock locks[4]
+[mt] matrix.c:60: Release locks[4]
+[mt] * Starting to save the state of the value analysis
+[mt] * state saved
+[mt] * Computing shared variables
+[mt] Globals accessed by thread:
+  matrix[0][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[1][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[2][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[3][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[4][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[5][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[6][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[7][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[8][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[9][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[10][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[11][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[12][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[13][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[14][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[15][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[16][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[17][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[18][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[19][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[20][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[21][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[22][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[23][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[24][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[25][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[26][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[27][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[28][0..99]: read by <main> at matrix.c:59 <- main
+  matrix[29][0..99]: read by <main> at matrix.c:59 <- main
+  psum[0..99]:
+    read by <main> at matrix.c:64 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    read by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:51 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+    write by <main> at matrix.c:59 <- main
+  result: read by <main> at matrix.c:49 <- main
+  locks[0]:
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56 <-
+      pthread_mutex_lock :: matrix.c:55 <- main
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66 <-
+      pthread_mutex_unlock :: matrix.c:60 <- main
+  locks[1]:
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56 <-
+      pthread_mutex_lock :: matrix.c:55 <- main
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66 <-
+      pthread_mutex_unlock :: matrix.c:60 <- main
+  locks[2]:
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56 <-
+      pthread_mutex_lock :: matrix.c:55 <- main
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66 <-
+      pthread_mutex_unlock :: matrix.c:60 <- main
+  locks[3]:
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56 <-
+      pthread_mutex_lock :: matrix.c:55 <- main
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66 <-
+      pthread_mutex_unlock :: matrix.c:60 <- main
+  locks[4]:
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56 <-
+      pthread_mutex_lock :: matrix.c:55 <- main
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66 <-
+      pthread_mutex_unlock :: matrix.c:60 <- main
+  jobs[0..4]:
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+      pthread_create :: matrix.c:46 <- main
+[mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes:
+    matrix[i][j] = (unsigned int)0; matrix.c:43 <- main
+  shared bases: {matrix}
+  interferences by location:
+    matrix.c:43:
+      # cvalue: matrix[0..29][0..99] ∈ [--..--] 
+  interferences by mutexes:
+    {  }:
+      # cvalue: matrix[0..29][0..99] ∈ [--..--]
+[mt] * Computing cfg
+[mt] * Cfg computed
+[mt] *** Thread <main> computed
+[mt] *** Computing thread jobs[0], iteration 4 (interferences changed)
+[mt] * Computing value analysis for thread jobs[0]
+[mt] matrix.c:25: Lock locks[0]
+[eva:interferences] matrix.c:29: inject threads interferences at this point
+[mt] matrix.c:30: Release locks[0]
+[mt] * Starting to save the state of the value analysis
+[mt] * state saved
+[mt] * Computing shared variables
+[mt] Globals accessed by thread:
+  matrix[0][0..99]:
+    read by jobs[0] at matrix.c:29 <- job
+    read by jobs[0] at matrix.c:29 <- job
+    read by jobs[0] at matrix.c:29 <- job
+    read by jobs[0] at matrix.c:29 <- job
+    read by jobs[0] at matrix.c:29 <- job
+    read by jobs[0] at matrix.c:29 <- job
+    write by jobs[0] at matrix.c:29 <- job
+  matrix[5][0..99]: write by jobs[0] at matrix.c:29 <- job
+  matrix[10][0..99]: write by jobs[0] at matrix.c:29 <- job
+  matrix[15][0..99]: write by jobs[0] at matrix.c:29 <- job
+  matrix[20][0..99]: write by jobs[0] at matrix.c:29 <- job
+  matrix[25][0..99]: write by jobs[0] at matrix.c:29 <- job
+  locks[0]:
+    read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+      pthread_mutex_lock :: matrix.c:25 <- job
+    read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+      pthread_mutex_unlock :: matrix.c:30 <- job
+[mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes:
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
+  shared bases: {matrix}
+  interferences by location:
+    matrix.c:29:
+      # cvalue: matrix[0..29][0..99] ∈ [--..--] 
+    matrix.c:29:
+      # cvalue: matrix[0..29][0..99] ∈ [--..--] 
+    matrix.c:29:
+      # cvalue: matrix[0..29][0..99] ∈ [--..--] 
+    matrix.c:29:
+      # cvalue: matrix[0..29][0..99] ∈ [--..--] 
+    matrix.c:29:
+      # cvalue: matrix[0..29][0..99] ∈ [--..--] 
+    matrix.c:29:
+      # cvalue: matrix[0..29][0..99] ∈ [--..--] 
+  interferences by mutexes:
+    { locks[0] }:
+      # cvalue: matrix[0..29][0..99] ∈ [--..--]
+[mt] * Computing cfg
+[mt] * Cfg computed
+[mt] *** Thread jobs[0] computed
+[mt] *** Computing thread jobs[1], iteration 4 (interferences changed)
+[mt] * Computing value analysis for thread jobs[1]
+[mt] matrix.c:25: Lock locks[1]
+[eva:interferences] matrix.c:29: inject threads interferences at this point
+[mt] matrix.c:30: Release locks[1]
+[mt] * Starting to save the state of the value analysis
+[mt] * state saved
+[mt] * Computing shared variables
+[mt] Globals accessed by thread:
+  matrix[1][0..99]:
+    read by jobs[1] at matrix.c:29 <- job
+    read by jobs[1] at matrix.c:29 <- job
+    read by jobs[1] at matrix.c:29 <- job
+    read by jobs[1] at matrix.c:29 <- job
+    read by jobs[1] at matrix.c:29 <- job
+    read by jobs[1] at matrix.c:29 <- job
+    write by jobs[1] at matrix.c:29 <- job
+  matrix[6][0..99]: write by jobs[1] at matrix.c:29 <- job
+  matrix[11][0..99]: write by jobs[1] at matrix.c:29 <- job
+  matrix[16][0..99]: write by jobs[1] at matrix.c:29 <- job
+  matrix[21][0..99]: write by jobs[1] at matrix.c:29 <- job
+  matrix[26][0..99]: write by jobs[1] at matrix.c:29 <- job
+  locks[1]:
+    read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+      pthread_mutex_lock :: matrix.c:25 <- job
+    read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+      pthread_mutex_unlock :: matrix.c:30 <- job
+[mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes:
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
+  shared bases: {matrix}
+  interferences by location:
+    matrix.c:29:
+      # cvalue: matrix[0..29][0..99] ∈ [--..--] 
+    matrix.c:29:
+      # cvalue: matrix[0..29][0..99] ∈ [--..--] 
+    matrix.c:29:
+      # cvalue: matrix[0..29][0..99] ∈ [--..--] 
+    matrix.c:29:
+      # cvalue: matrix[0..29][0..99] ∈ [--..--] 
+    matrix.c:29:
+      # cvalue: matrix[0..29][0..99] ∈ [--..--] 
+    matrix.c:29:
+      # cvalue: matrix[0..29][0..99] ∈ [--..--] 
+  interferences by mutexes:
+    { locks[1] }:
+      # cvalue: matrix[0..29][0..99] ∈ [--..--]
+[mt] * Computing cfg
+[mt] * Cfg computed
+[mt] *** Thread jobs[1] computed
+[mt] *** Computing thread jobs[2], iteration 4 (interferences changed)
+[mt] * Computing value analysis for thread jobs[2]
+[mt] matrix.c:25: Lock locks[2]
+[eva:interferences] matrix.c:29: inject threads interferences at this point
+[mt] matrix.c:30: Release locks[2]
+[mt] * Starting to save the state of the value analysis
+[mt] * state saved
+[mt] * Computing shared variables
+[mt] Globals accessed by thread:
+  matrix[2][0..99]:
+    read by jobs[2] at matrix.c:29 <- job
+    read by jobs[2] at matrix.c:29 <- job
+    read by jobs[2] at matrix.c:29 <- job
+    read by jobs[2] at matrix.c:29 <- job
+    read by jobs[2] at matrix.c:29 <- job
+    read by jobs[2] at matrix.c:29 <- job
+    write by jobs[2] at matrix.c:29 <- job
+  matrix[7][0..99]: write by jobs[2] at matrix.c:29 <- job
+  matrix[12][0..99]: write by jobs[2] at matrix.c:29 <- job
+  matrix[17][0..99]: write by jobs[2] at matrix.c:29 <- job
+  matrix[22][0..99]: write by jobs[2] at matrix.c:29 <- job
+  matrix[27][0..99]: write by jobs[2] at matrix.c:29 <- job
+  locks[2]:
+    read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+      pthread_mutex_lock :: matrix.c:25 <- job
+    read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+      pthread_mutex_unlock :: matrix.c:30 <- job
+[mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes:
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
+    matrix[(int)i + 5 * l][j] = f(i,matrix[i][j]); matrix.c:29 <- job
+  shared bases: {matrix}
+  interferences by location:
+    matrix.c:29:
+      # cvalue: matrix[0..29][0..99] ∈ [--..--] 
+    matrix.c:29:
+      # cvalue: matrix[0..29][0..99] ∈ [--..--] 
+    matrix.c:29:
+      # cvalue: matrix[0..29][0..99] ∈ [--..--] 
+    matrix.c:29:
+      # cvalue: matrix[0..29][0..99] ∈ [--..--] 
+    matrix.c:29:
+      # cvalue: matrix[0..29][0..99] ∈ [--..--] 
+    matrix.c:29:
+      # cvalue: matrix[0..29][0..99] ∈ [--..--] 
+  interferences by mutexes:
+    { locks[2] }:
+      # cvalue: matrix[0..29][0..99] ∈ [--..--]
+[mt] * Computing cfg
+[mt] * Cfg computed
+[mt] *** Thread jobs[2] computed
+[mt] ***** Threads computed for iteration 4.
+[mt] * Computing live threads and locked mutexes
+[mt] * threads and mutexes computed
+[mt] ***** Computing shared variables
+[mt] Imprecise locations to watch: matrix[0..29][0..99]
+[mt] <main> reads  matrix[0][0..99] ∈ [--..--]  // matrix.c:59 main
+[mt] jobs[0] reads  matrix[0][0..99] ∈ [--..--]  // matrix.c:29 job
+[mt] <main> reads  matrix[1][0..99] ∈ [--..--]  // matrix.c:59 main
+[mt] jobs[1] reads  matrix[1][0..99] ∈ [--..--]  // matrix.c:29 job
+[mt] <main> reads  matrix[2][0..99] ∈ [--..--]  // matrix.c:59 main
+[mt] jobs[2] reads  matrix[2][0..99] ∈ [--..--]  // matrix.c:29 job
+[mt] jobs[3] reads  matrix[3][0..99] ∈ [--..--]  // matrix.c:29 job
+[mt] <main> reads  matrix[3][0..99] ∈ [--..--]  // matrix.c:59 main
+[mt] jobs[4] reads  matrix[4][0..99] ∈ [--..--]  // matrix.c:29 job
+[mt] <main> reads  matrix[4][0..99] ∈ [--..--]  // matrix.c:59 main
+[mt] <main> reads  matrix[5][0..99] ∈ [--..--]  // matrix.c:59 main
+[mt] <main> reads  matrix[6][0..99] ∈ [--..--]  // matrix.c:59 main
+[mt] <main> reads  matrix[7][0..99] ∈ [--..--]  // matrix.c:59 main
+[mt] <main> reads  matrix[8][0..99] ∈ [--..--]  // matrix.c:59 main
+[mt] <main> reads  matrix[9][0..99] ∈ [--..--]  // matrix.c:59 main
+[mt] <main> reads  matrix[10][0..99] ∈ [--..--]  // matrix.c:59 main
+[mt] <main> reads  matrix[11][0..99] ∈ [--..--]  // matrix.c:59 main
+[mt] <main> reads  matrix[12][0..99] ∈ [--..--]  // matrix.c:59 main
+[mt] <main> reads  matrix[13][0..99] ∈ [--..--]  // matrix.c:59 main
+[mt] <main> reads  matrix[14][0..99] ∈ [--..--]  // matrix.c:59 main
+[mt] <main> reads  matrix[15][0..99] ∈ [--..--]  // matrix.c:59 main
+[mt] <main> reads  matrix[16][0..99] ∈ [--..--]  // matrix.c:59 main
+[mt] <main> reads  matrix[17][0..99] ∈ [--..--]  // matrix.c:59 main
+[mt] <main> reads  matrix[18][0..99] ∈ [--..--]  // matrix.c:59 main
+[mt] <main> reads  matrix[19][0..99] ∈ [--..--]  // matrix.c:59 main
+[mt] <main> reads  matrix[20][0..99] ∈ [--..--]  // matrix.c:59 main
+[mt] <main> reads  matrix[21][0..99] ∈ [--..--]  // matrix.c:59 main
+[mt] <main> reads  matrix[22][0..99] ∈ [--..--]  // matrix.c:59 main
+[mt] <main> reads  matrix[23][0..99] ∈ [--..--]  // matrix.c:59 main
+[mt] <main> reads  matrix[24][0..99] ∈ [--..--]  // matrix.c:59 main
+[mt] <main> reads  matrix[25][0..99] ∈ [--..--]  // matrix.c:59 main
+[mt] <main> reads  matrix[26][0..99] ∈ [--..--]  // matrix.c:59 main
+[mt] <main> reads  matrix[27][0..99] ∈ [--..--]  // matrix.c:59 main
+[mt] <main> reads  matrix[28][0..99] ∈ [--..--]  // matrix.c:59 main
+[mt] <main> reads  matrix[29][0..99] ∈ [--..--]  // matrix.c:59 main
+[mt] jobs[0] writes  matrix[0][0..99] ∈ [--..--]  // matrix.c:29 job
+[mt] jobs[1] writes  matrix[1][0..99] ∈ [--..--]  // matrix.c:29 job
+[mt] jobs[2] writes  matrix[2][0..99] ∈ [--..--]  // matrix.c:29 job
+[mt] jobs[3] writes  matrix[3][0..99] ∈ [--..--]  // matrix.c:29 job
+[mt] jobs[4] writes  matrix[4][0..99] ∈ [--..--]  // matrix.c:29 job
+[mt] jobs[0] writes  matrix[5][0..99] ∈ [--..--]  // matrix.c:29 job
+[mt] jobs[1] writes  matrix[6][0..99] ∈ [--..--]  // matrix.c:29 job
+[mt] jobs[2] writes  matrix[7][0..99] ∈ [--..--]  // matrix.c:29 job
+[mt] jobs[3] writes  matrix[8][0..99] ∈ [--..--]  // matrix.c:29 job
+[mt] jobs[4] writes  matrix[9][0..99] ∈ [--..--]  // matrix.c:29 job
+[mt] jobs[0] writes  matrix[10][0..99] ∈ [--..--]  // matrix.c:29 job
+[mt] jobs[1] writes  matrix[11][0..99] ∈ [--..--]  // matrix.c:29 job
+[mt] jobs[2] writes  matrix[12][0..99] ∈ [--..--]  // matrix.c:29 job
+[mt] jobs[3] writes  matrix[13][0..99] ∈ [--..--]  // matrix.c:29 job
+[mt] jobs[4] writes  matrix[14][0..99] ∈ [--..--]  // matrix.c:29 job
+[mt] jobs[0] writes  matrix[15][0..99] ∈ [--..--]  // matrix.c:29 job
+[mt] jobs[1] writes  matrix[16][0..99] ∈ [--..--]  // matrix.c:29 job
+[mt] jobs[2] writes  matrix[17][0..99] ∈ [--..--]  // matrix.c:29 job
+[mt] jobs[3] writes  matrix[18][0..99] ∈ [--..--]  // matrix.c:29 job
+[mt] jobs[4] writes  matrix[19][0..99] ∈ [--..--]  // matrix.c:29 job
+[mt] jobs[0] writes  matrix[20][0..99] ∈ [--..--]  // matrix.c:29 job
+[mt] jobs[1] writes  matrix[21][0..99] ∈ [--..--]  // matrix.c:29 job
+[mt] jobs[2] writes  matrix[22][0..99] ∈ [--..--]  // matrix.c:29 job
+[mt] jobs[3] writes  matrix[23][0..99] ∈ [--..--]  // matrix.c:29 job
+[mt] jobs[4] writes  matrix[24][0..99] ∈ [--..--]  // matrix.c:29 job
+[mt] jobs[0] writes  matrix[25][0..99] ∈ [--..--]  // matrix.c:29 job
+[mt] jobs[1] writes  matrix[26][0..99] ∈ [--..--]  // matrix.c:29 job
+[mt] jobs[2] writes  matrix[27][0..99] ∈ [--..--]  // matrix.c:29 job
+[mt] jobs[3] writes  matrix[28][0..99] ∈ [--..--]  // matrix.c:29 job
+[mt] jobs[4] writes  matrix[29][0..99] ∈ [--..--]  // matrix.c:29 job
+[mt] Possible read/write data races:
+  matrix[29][0..99]:
+    read by <main> at matrix.c:59, protected by locks[4]
+    write by jobs[4] at matrix.c:29, protected by locks[4]
+  matrix[28][0..99]:
+    read by <main> at matrix.c:59, protected by locks[3]
+    write by jobs[3] at matrix.c:29, protected by locks[3]
+  matrix[27][0..99]:
+    read by <main> at matrix.c:59, protected by locks[2]
+    write by jobs[2] at matrix.c:29, protected by locks[2]
+  matrix[26][0..99]:
+    read by <main> at matrix.c:59, protected by locks[1]
+    write by jobs[1] at matrix.c:29, protected by locks[1]
+  matrix[25][0..99]:
+    read by <main> at matrix.c:59, protected by locks[0]
+    write by jobs[0] at matrix.c:29, protected by locks[0]
+  matrix[24][0..99]:
+    read by <main> at matrix.c:59, protected by locks[4]
+    write by jobs[4] at matrix.c:29, protected by locks[4]
+  matrix[23][0..99]:
+    read by <main> at matrix.c:59, protected by locks[3]
+    write by jobs[3] at matrix.c:29, protected by locks[3]
+  matrix[22][0..99]:
+    read by <main> at matrix.c:59, protected by locks[2]
+    write by jobs[2] at matrix.c:29, protected by locks[2]
+  matrix[21][0..99]:
+    read by <main> at matrix.c:59, protected by locks[1]
+    write by jobs[1] at matrix.c:29, protected by locks[1]
+  matrix[20][0..99]:
+    read by <main> at matrix.c:59, protected by locks[0]
+    write by jobs[0] at matrix.c:29, protected by locks[0]
+  matrix[19][0..99]:
+    read by <main> at matrix.c:59, protected by locks[4]
+    write by jobs[4] at matrix.c:29, protected by locks[4]
+  matrix[18][0..99]:
+    read by <main> at matrix.c:59, protected by locks[3]
+    write by jobs[3] at matrix.c:29, protected by locks[3]
+  matrix[17][0..99]:
+    read by <main> at matrix.c:59, protected by locks[2]
+    write by jobs[2] at matrix.c:29, protected by locks[2]
+  matrix[16][0..99]:
+    read by <main> at matrix.c:59, protected by locks[1]
+    write by jobs[1] at matrix.c:29, protected by locks[1]
+  matrix[15][0..99]:
+    read by <main> at matrix.c:59, protected by locks[0]
+    write by jobs[0] at matrix.c:29, protected by locks[0]
+  matrix[14][0..99]:
+    read by <main> at matrix.c:59, protected by locks[4]
+    write by jobs[4] at matrix.c:29, protected by locks[4]
+  matrix[13][0..99]:
+    read by <main> at matrix.c:59, protected by locks[3]
+    write by jobs[3] at matrix.c:29, protected by locks[3]
+  matrix[12][0..99]:
+    read by <main> at matrix.c:59, protected by locks[2]
+    write by jobs[2] at matrix.c:29, protected by locks[2]
+  matrix[11][0..99]:
+    read by <main> at matrix.c:59, protected by locks[1]
+    write by jobs[1] at matrix.c:29, protected by locks[1]
+  matrix[10][0..99]:
+    read by <main> at matrix.c:59, protected by locks[0]
+    write by jobs[0] at matrix.c:29, protected by locks[0]
+  matrix[9][0..99]:
+    read by <main> at matrix.c:59, protected by locks[4]
+    write by jobs[4] at matrix.c:29, protected by locks[4]
+  matrix[8][0..99]:
+    read by <main> at matrix.c:59, protected by locks[3]
+    write by jobs[3] at matrix.c:29, protected by locks[3]
+  matrix[7][0..99]:
+    read by <main> at matrix.c:59, protected by locks[2]
+    write by jobs[2] at matrix.c:29, protected by locks[2]
+  matrix[6][0..99]:
+    read by <main> at matrix.c:59, protected by locks[1]
+    write by jobs[1] at matrix.c:29, protected by locks[1]
+  matrix[5][0..99]:
+    read by <main> at matrix.c:59, protected by locks[0]
+    write by jobs[0] at matrix.c:29, protected by locks[0]
+  matrix[4][0..99]:
+    read by jobs[4] at matrix.c:29, protected by locks[4]
+    read by jobs[4] at matrix.c:29, protected by locks[4]
+    read by jobs[4] at matrix.c:29, protected by locks[4]
+    read by jobs[4] at matrix.c:29, protected by locks[4]
+    read by jobs[4] at matrix.c:29, protected by locks[4]
+    read by jobs[4] at matrix.c:29, protected by locks[4]
+    read by <main> at matrix.c:59, protected by locks[4]
+    write by jobs[4] at matrix.c:29, protected by locks[4]
+  matrix[3][0..99]:
+    read by jobs[3] at matrix.c:29, protected by locks[3]
+    read by jobs[3] at matrix.c:29, protected by locks[3]
+    read by jobs[3] at matrix.c:29, protected by locks[3]
+    read by jobs[3] at matrix.c:29, protected by locks[3]
+    read by jobs[3] at matrix.c:29, protected by locks[3]
+    read by jobs[3] at matrix.c:29, protected by locks[3]
+    read by <main> at matrix.c:59, protected by locks[3]
+    write by jobs[3] at matrix.c:29, protected by locks[3]
+  matrix[2][0..99]:
+    read by <main> at matrix.c:59, protected by locks[2]
+    read by jobs[2] at matrix.c:29, protected by locks[2]
+    read by jobs[2] at matrix.c:29, protected by locks[2]
+    read by jobs[2] at matrix.c:29, protected by locks[2]
+    read by jobs[2] at matrix.c:29, protected by locks[2]
+    read by jobs[2] at matrix.c:29, protected by locks[2]
+    read by jobs[2] at matrix.c:29, protected by locks[2]
+    write by jobs[2] at matrix.c:29, protected by locks[2]
+  matrix[1][0..99]:
+    read by <main> at matrix.c:59, protected by locks[1]
+    read by jobs[1] at matrix.c:29, protected by locks[1]
+    read by jobs[1] at matrix.c:29, protected by locks[1]
+    read by jobs[1] at matrix.c:29, protected by locks[1]
+    read by jobs[1] at matrix.c:29, protected by locks[1]
+    read by jobs[1] at matrix.c:29, protected by locks[1]
+    read by jobs[1] at matrix.c:29, protected by locks[1]
+    write by jobs[1] at matrix.c:29, protected by locks[1]
+  matrix[0][0..99]:
+    read by <main> at matrix.c:59, protected by locks[0]
+    read by jobs[0] at matrix.c:29, protected by locks[0]
+    read by jobs[0] at matrix.c:29, protected by locks[0]
+    read by jobs[0] at matrix.c:29, protected by locks[0]
+    read by jobs[0] at matrix.c:29, protected by locks[0]
+    read by jobs[0] at matrix.c:29, protected by locks[0]
+    read by jobs[0] at matrix.c:29, protected by locks[0]
+    write by jobs[0] at matrix.c:29, protected by locks[0]
+[mt] Shared memory: matrix[0..29][0..99]
+[mt] Write summary for jobs[0]:
+  matrix[0][0..99] ∈ [--..--]
+        [5][0..99] ∈ [--..--]
+        [10][0..99] ∈ [--..--]
+        [15][0..99] ∈ [--..--]
+        [20][0..99] ∈ [--..--]
+        [25][0..99] ∈ [--..--]
+[mt] Write summary for jobs[1]:
+  matrix[1][0..99] ∈ [--..--]
+        [6][0..99] ∈ [--..--]
+        [11][0..99] ∈ [--..--]
+        [16][0..99] ∈ [--..--]
+        [21][0..99] ∈ [--..--]
+        [26][0..99] ∈ [--..--]
+[mt] Write summary for jobs[2]:
+  matrix[2][0..99] ∈ [--..--]
+        [7][0..99] ∈ [--..--]
+        [12][0..99] ∈ [--..--]
+        [17][0..99] ∈ [--..--]
+        [22][0..99] ∈ [--..--]
+        [27][0..99] ∈ [--..--]
+[mt] Write summary for jobs[3]:
+  matrix[3][0..99] ∈ [--..--]
+        [8][0..99] ∈ [--..--]
+        [13][0..99] ∈ [--..--]
+        [18][0..99] ∈ [--..--]
+        [23][0..99] ∈ [--..--]
+        [28][0..99] ∈ [--..--]
+[mt] Write summary for jobs[4]:
+  matrix[4][0..99] ∈ [--..--]
+        [9][0..99] ∈ [--..--]
+        [14][0..99] ∈ [--..--]
+        [19][0..99] ∈ [--..--]
+        [24][0..99] ∈ [--..--]
+        [29][0..99] ∈ [--..--]
+[mt] Mutexes for concurrent accesses:
+  matrix{[0][0..99]; [5][0..99]; [10][0..99]; [15][0..99]; [20][0..99];
+         [25][0..99]}
+         protected by locks[0]
+        {[1][0..99]; [6][0..99]; [11][0..99]; [16][0..99]; [21][0..99];
+         [26][0..99]}
+         protected by locks[1]
+        {[2][0..99]; [7][0..99]; [12][0..99]; [17][0..99]; [22][0..99];
+         [27][0..99]}
+         protected by locks[2]
+        {[3][0..99]; [8][0..99]; [13][0..99]; [18][0..99]; [23][0..99];
+         [28][0..99]}
+         protected by locks[3]
+        {[4][0..99]; [9][0..99]; [14][0..99]; [19][0..99]; [24][0..99];
+         [29][0..99]}
+         protected by locks[4]
+[mt] Detailed shared zones protections
+  matrix[29][0..99]: Read by <main>, Write by jobs[4]: protected by locks[4]
+  matrix[28][0..99]: Read by <main>, Write by jobs[3]: protected by locks[3]
+  matrix[27][0..99]: Read by <main>, Write by jobs[2]: protected by locks[2]
+  matrix[26][0..99]: Read by <main>, Write by jobs[1]: protected by locks[1]
+  matrix[25][0..99]: Read by <main>, Write by jobs[0]: protected by locks[0]
+  matrix[24][0..99]: Read by <main>, Write by jobs[4]: protected by locks[4]
+  matrix[23][0..99]: Read by <main>, Write by jobs[3]: protected by locks[3]
+  matrix[22][0..99]: Read by <main>, Write by jobs[2]: protected by locks[2]
+  matrix[21][0..99]: Read by <main>, Write by jobs[1]: protected by locks[1]
+  matrix[20][0..99]: Read by <main>, Write by jobs[0]: protected by locks[0]
+  matrix[19][0..99]: Read by <main>, Write by jobs[4]: protected by locks[4]
+  matrix[18][0..99]: Read by <main>, Write by jobs[3]: protected by locks[3]
+  matrix[17][0..99]: Read by <main>, Write by jobs[2]: protected by locks[2]
+  matrix[16][0..99]: Read by <main>, Write by jobs[1]: protected by locks[1]
+  matrix[15][0..99]: Read by <main>, Write by jobs[0]: protected by locks[0]
+  matrix[14][0..99]: Read by <main>, Write by jobs[4]: protected by locks[4]
+  matrix[13][0..99]: Read by <main>, Write by jobs[3]: protected by locks[3]
+  matrix[12][0..99]: Read by <main>, Write by jobs[2]: protected by locks[2]
+  matrix[11][0..99]: Read by <main>, Write by jobs[1]: protected by locks[1]
+  matrix[10][0..99]: Read by <main>, Write by jobs[0]: protected by locks[0]
+  matrix[9][0..99]: Read by <main>, Write by jobs[4]: protected by locks[4]
+  matrix[8][0..99]: Read by <main>, Write by jobs[3]: protected by locks[3]
+  matrix[7][0..99]: Read by <main>, Write by jobs[2]: protected by locks[2]
+  matrix[6][0..99]: Read by <main>, Write by jobs[1]: protected by locks[1]
+  matrix[5][0..99]: Read by <main>, Write by jobs[0]: protected by locks[0]
+  matrix[4][0..99]: Read by <main>, Write by jobs[4]: protected by locks[4]
+  matrix[3][0..99]: Read by <main>, Write by jobs[3]: protected by locks[3]
+  matrix[2][0..99]: Read by <main>, Write by jobs[2]: protected by locks[2]
+  matrix[1][0..99]: Read by <main>, Write by jobs[1]: protected by locks[1]
+  matrix[0][0..99]: Read by <main>, Write by jobs[0]: protected by locks[0]
+[mt] ***** Shared variables computed
+[mt] ******* Analysis performed, 4 iterations

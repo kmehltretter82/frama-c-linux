@@ -1268,10 +1268,13 @@ module D : Abstract_domain.Leaf
 
   (* Memexec *)
 
-  let relate _kf _bases _state = match function_calls_handling with
+  let relate _bases _state = match function_calls_handling with
     | FullInterprocedural -> Base.SetLattice.top
     | IntraproceduralAll
     | IntraproceduralNonReferenced -> Base.SetLattice.empty
+
+  let overwrite bases ~on:state ~by:_ =
+    Base.Hptset.fold G.kill_base bases state
 
   (* Initial state *)
   let initialize_variable_using_type _ _ state = state

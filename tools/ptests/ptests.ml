@@ -670,6 +670,9 @@ module Test_config: sig
      returns a getter of the PTEST_xxx variables including the one depending on the test number *)
   val ptest_vars: env:env_t -> SubDir.t -> file:string -> config -> string * config * (nth:int -> Macros.t -> Macros.t)
 
+  (** Split a string on spaces, tabs and commas, except if they are escaped with
+      '\'. *)
+  val split_list: string -> string list
 end = struct
 
   let ptest_vars ~env _directory ~file config =
@@ -1288,6 +1291,10 @@ let get_home_env () =
 let deps_regexp = Str.regexp "^\\([^:]*\\):\\(.*\\)"
 
 let pp_list_deps fmt l =
+  let l =
+    List.map Test_config.split_list l
+    |> List.flatten
+  in
   List.iter (fun s ->
       let s = Filename.sanitize_with_space s in
       let s = match str_string_match2 home_regexp s 0 with

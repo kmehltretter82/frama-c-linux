@@ -10,6 +10,8 @@
   __e_acsl_sound_verdict IN [--..--]
   __e_acsl_heap_allocation_size IN [--..--]
   __e_acsl_heap_allocated_blocks IN [--..--]
+  __fc_eacsl_assert_data_value_base[0..2147483646] IN {0}
+  __fc_eacsl_contract_base[0..2147483646] IN {0}
   __e_acsl_math_HUGE_VAL IN [-1.79769313486e+308 .. 1.79769313486e+308]
   __e_acsl_math_HUGE_VALF IN [-3.40282346639e+38 .. 3.40282346639e+38]
   __e_acsl_math_INFINITY IN [-1.79769313486e+308 .. 1.79769313486e+308]
@@ -18,17 +20,8 @@
 [eva] using specification for function __e_acsl_full_init
 [eva] using specification for function __e_acsl_valid
 [eva] using specification for function __e_acsl_assert_register_ptr
-[eva:garbled-mix:assigns] issue-eacsl-145.c:9: 
-  The specification of function __e_acsl_assert_register_ptr
-  has generated a garbled mix of addresses for assigns clause data->values.
 [eva] using specification for function __e_acsl_assert_register_ulong
-[eva:alarm] issue-eacsl-145.c:9: Warning: 
-  function __e_acsl_assert_register_ulong: precondition data->values == \null ||
-                                                        \valid(data->values) got status unknown.
 [eva] using specification for function __e_acsl_assert_register_int
-[eva:alarm] issue-eacsl-145.c:9: Warning: 
-  function __e_acsl_assert_register_int: precondition data->values == \null ||
-                                                      \valid(data->values) got status unknown.
 [eva] using specification for function __e_acsl_assert
 [eva] using specification for function __e_acsl_assert_clean
 [eva] using specification for function __e_acsl_delete_block
@@ -45,6 +38,6 @@
   ----------------------------------------------------------------------------
   Evaluation of the logical properties reached by the analysis:
     Assertions        1 valid     0 unknown     0 invalid      1 total
-    Preconditions     8 valid     2 unknown     0 invalid     10 total
-  81% of the logical properties reached have been proven.
+    Preconditions    11 valid     0 unknown     0 invalid     11 total
+  100% of the logical properties reached have been proven.
   ----------------------------------------------------------------------------

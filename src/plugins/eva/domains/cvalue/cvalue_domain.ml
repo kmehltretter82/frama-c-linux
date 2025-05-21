@@ -217,13 +217,18 @@ module State = struct
   (*                                 Mem Exec                                 *)
   (* ------------------------------------------------------------------------ *)
 
-  let relate _kf _bases _state = Base.SetLattice.empty
+  let relate _bases _state = Base.SetLattice.empty
 
   (* Auxiliary function that keeps only some bases inside a memory state *)
-  let filter _kind bases (state, clob) =
+  let filter bases (state, clob) =
     Cvalue.Model.filter_by_shape bases state, clob
 
-  let reuse _ _ ~current_input:(state, _) ~previous_output:(output, clob) =
+  let project = filter
+
+  let reuse _bases ~current_input:(state, _) ~previous_output:(output, clob) =
+    Cvalue.Model.merge ~into:state output, clob
+
+  let overwrite _bases ~on:(state, clob) ~by:(output, _) =
     Cvalue.Model.merge ~into:state output, clob
 
   (* ------------------------------------------------------------------------ *)

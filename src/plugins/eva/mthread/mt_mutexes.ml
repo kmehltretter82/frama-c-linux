@@ -41,6 +41,10 @@ let mutexes_protecting_zones' accesses =
                        mutexes_for_read = Mutexes mutexes }
            | Write _ -> { mutexes_for_read = Unaccessed;
                           mutexes_for_write = Mutexes mutexes }
+           | ReadAloc _ -> { mutexes_for_read = Mutexes mutexes;
+                             mutexes_for_write = Unaccessed }
+           | WriteAloc _ -> { mutexes_for_read = Unaccessed;
+                              mutexes_for_write = Mutexes mutexes }
          in
          MutexesByZone.add_binding ~exact:false acc z mut
       ) set MutexesByZone.empty
@@ -107,6 +111,8 @@ let check_protection analysis (l: Mt_shared_vars.Precise.list_accesses) : zone_p
       match op with
       | Read ->    m_read  := add th n !m_read
       | Write _ -> m_write := add th n !m_write
+      | ReadAloc _ -> m_read := add th n !m_read
+      | WriteAloc _ -> m_write := add th n !m_write
     in
     SetNodeIdAccess.iter aux_nodes s;
     let classify_access th_read read th_write write classified =
