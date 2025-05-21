@@ -31,10 +31,10 @@ let concurrent_writes shared_bases =
     let add_aloc stmt cs _state acc =
       let aloc = ALoc.Local (stmt, cs) in
       (* TODO: Maybe take the memory read/written for all callstacks of the
-         given statement? (can be done directly by Inout_memory). *)
-      let filter = Inout_memory.keep_globals_only in
-      let memory = Inout_memory.memory_at ~filter aloc in
-      let written_bases = Locations.Zone.get_bases memory.written in
+         given statement? (can be done directly by Inout_access). *)
+      let filter = Inout_access.keep_globals_only in
+      let accesses = Inout_access.at ~filter aloc in
+      let written_bases = Locations.Zone.get_bases accesses.written in
       if Base.SetLattice.(intersects (inject shared_bases) written_bases)
       then ALoc.Local.Set.add (stmt, cs) acc
       else acc

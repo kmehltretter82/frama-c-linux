@@ -724,7 +724,7 @@ module Make (Engine: Engine_sig.S) = struct
       (* Create the call. *)
       let eval, alarms = make_call ~subdivnb stmt kf args valuation state in
       let _ =
-        (* Register call arguments to Inout_memory *)
+        (* Register call arguments to Inout_access *)
         let aloc = Analysis_location.of_stmt stmt in
         let+ call, _, valuation = eval in
         Transfer_inout.add_call_args aloc valuation call

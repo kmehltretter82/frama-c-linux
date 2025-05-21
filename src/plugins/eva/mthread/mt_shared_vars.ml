@@ -79,7 +79,7 @@ let error_io_whole_memory op =
      but the analysis will not be correct.@]"
     RW.pretty op
 
-let filter_inout_memory =
+let filter_inout_access =
   let is_mthread_shared base =
     try
       (* Skip variable "__fc_mthread_shared", as it is only used to prevent
@@ -92,7 +92,7 @@ let filter_inout_memory =
   let filter_base base =
     Base.is_global base && not (is_mthread_shared base)
   in
-  Inout_memory.mk_filter ~filter_base
+  Inout_access.mk_filter ~filter_base
 
 let read_written_by_thread ?(watch_only=Locations.Zone.top) sm th =
   let open Current_loc.Operators in
@@ -114,8 +114,8 @@ let read_written_by_thread ?(watch_only=Locations.Zone.top) sm th =
       | AccessesByZone.Map m -> m
   in
 
-  Inout_memory.fold
-    ~filter:filter_inout_memory
+  Inout_access.fold
+    ~filter:filter_inout_access
     (fun aloc memory acc ->
        match aloc with
        | Global _ ->

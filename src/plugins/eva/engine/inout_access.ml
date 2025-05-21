@@ -25,10 +25,10 @@ type t = {
   written : Locations.Zone.t;
 }
 
-module Memory = struct
+module Access = struct
   include Datatype.Make(struct
       type nonrec t = t
-      let name = "Eva.Variables.Memory"
+      let name = "Eva.Variables.Access"
       let reprs =
         List.fold_left
           (fun acc read ->
@@ -43,21 +43,21 @@ module Memory = struct
     end)
   let bottom = { read = Locations.Zone.bottom; written = Locations.Zone.bottom }
 
-  let is_bottom memory =
-    Locations.Zone.is_bottom memory.read &&
-    Locations.Zone.is_bottom memory.written
+  let is_bottom access =
+    Locations.Zone.is_bottom access.read &&
+    Locations.Zone.is_bottom access.written
 
-  let add_read zone memory =
-    { memory with read = Locations.Zone.join memory.read zone }
+  let add_read zone access =
+    { access with read = Locations.Zone.join access.read zone }
 
-  let add_write zone memory =
-    { memory with written = Locations.Zone.join memory.written zone }
+  let add_write zone access =
+    { access with written = Locations.Zone.join access.written zone }
 end
 
-let pretty_debug fmt memory =
+let pretty_debug fmt access =
   Format.fprintf fmt "@[{ read: %a;@ written: %a; }@]"
-    Locations.Zone.pretty memory.read
-    Locations.Zone.pretty memory.written
+    Locations.Zone.pretty access.read
+    Locations.Zone.pretty access.written
 
 module Cache : sig
   (** Get read/written memory zones for an analysis location. *)
@@ -79,16 +79,16 @@ end = struct
   module State =
     State_builder.Hashtbl
       (Analysis_location.Hashtbl)
-      (Memory)
+      (Access)
       (struct
-        let name = "Eva.Inout_memory.Cache.State"
+        let name = "Eva.Inout_access.Cache.State"
         let size = 11
         let dependencies = [ Self.state ]
       end)
 
   let get (aloc : Analysis_location.t) =
     try State.find aloc
-    with Not_found -> Memory.bottom
+    with Not_found -> Access.bottom
 
   let change aloc f =
     State.replace aloc (f (get aloc))
@@ -97,42 +97,42 @@ end = struct
 
   let dump ~filter fmt =
     State.iter
-      (fun aloc memory ->
-         let memory = filter memory in
-         if not @@ Memory.is_bottom memory then
+      (fun aloc access ->
+         let access = filter access in
+         if not @@ Access.is_bottom access then
            Format.fprintf fmt ">>> %a: %a"
              Analysis_location.pretty aloc
-             pretty_debug memory)
+             pretty_debug access)
 end
 
 let add_read aloc zone =
-  Cache.change aloc (Memory.add_read zone)
+  Cache.change aloc (Access.add_read zone)
 
 let add_write aloc zone =
-  Cache.change aloc (Memory.add_write zone)
+  Cache.change aloc (Access.add_write zone)
 
 let mk_filter ~filter_base =
   let filter_zone = Locations.Zone.filter_base filter_base in
-  (fun memory ->
-     { read = filter_zone memory.read;
-       written = filter_zone memory.written })
+  (fun access ->
+     { read = filter_zone access.read;
+       written = filter_zone access.written })
 let keep_globals_only = mk_filter ~filter_base:Base.is_global
 
-let memory_at ?(filter=Fun.id) aloc = Cache.get aloc |> filter
+let at ?(filter=Fun.id) aloc = Cache.get aloc |> filter
 
 let fold ?(filter=Fun.id) f init_acc =
   Cache.fold
-    (fun aloc memory acc ->
-       let memory = filter memory in
-       if not (Memory.is_bottom memory) then
-         f aloc memory acc
+    (fun aloc access acc ->
+       let access = filter access in
+       if not (Access.is_bottom access) then
+         f aloc access acc
        else
          acc)
     init_acc
 
 let iter ?(filter=Fun.id) f =
   fold ~filter
-    (fun aloc memory () -> f aloc memory)
+    (fun aloc access () -> f aloc access)
     ()
 
 let dump ?(filter=Fun.id) fmt =

@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Helper module to register read and written memory zones to {!Inout_memory}
+(** Helper module to register read and written memory zones to {!Inout_access}
     in {!Transfer_stmt} and {!Transfer_specification} *)
 
 module type S = sig
@@ -28,13 +28,13 @@ module type S = sig
   type value
   type valuation
 
-  (** [add_logc_assign aloc clause location] registers to [Inout_memory] the
+  (** [add_logc_assign aloc clause location] registers to [Inout_access] the
       read and written memory zones at [aloc] for the logic assign [clause] to
       the [location]. *)
   val add_logic_assign :
     Analysis_location.t -> location Eval.logic_assign -> location -> unit
 
-  (** [add_assign_lval aloc valuation lval exp] registers to [Inout_memory] the
+  (** [add_assign_lval aloc valuation lval exp] registers to [Inout_access] the
       read and written memory zones at [aloc] for the assignment from [exp] to
       [lval] with a given [valuation]. *)
   val add_assign_lval :
@@ -42,7 +42,7 @@ module type S = sig
     Eva_ast.lval -> Eva_ast.exp ->
     unit
 
-  (** [add_assign_var aloc valuation vi exp] registers to [Inout_memory] the
+  (** [add_assign_var aloc valuation vi exp] registers to [Inout_access] the
       read and written memory zones at [aloc] for the assignment from [exp] to
       [vi] with a given [valuation]. *)
   val add_assign_var :
@@ -50,7 +50,7 @@ module type S = sig
     Eva_ast.varinfo -> Eva_ast.exp ->
     unit
 
-  (** [add_read_exp aloc valuation exp] registers to [Inout_memory] the read
+  (** [add_read_exp aloc valuation exp] registers to [Inout_access] the read
       memory zones at [aloc] for reading the expression [exp] with a given
       [valuation]. *)
   val add_read_exp :
@@ -58,7 +58,7 @@ module type S = sig
     Eva_ast.exp ->
     unit
 
-  (** [add_call_args aloc valuation call] registers to [Inout_memory] the read
+  (** [add_call_args aloc valuation call] registers to [Inout_access] the read
       and written memory zones at [aloc] for the arguments of the given [call]
       with a given [valuation]. *)
   val add_call_args :
