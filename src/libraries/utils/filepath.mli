@@ -127,17 +127,17 @@ val to_quoted_string: t -> string
     @since 23.0-Vanadium *)
 val to_string_list: t list -> string list
 
-(** [to_base_uri path] returns a pair [prefix, rest], according to the
+(** [to_base_uri path] returns a pair [base, rest], according to the
     prettified value of [path]:
-    - if it starts with symbolic path SYMB, prefix is Some "SYMB";
-    - if it is a relative path, prefix is Some "PWD";
-    - else (an absolute path), prefix is None.
+    - if it starts with symbolic path SYMB, prefix is Hpath.Name "SYMB";
+    - if it is a relative path, prefix is Hpath.Cwd;
+    - else (an absolute path), prefix is Hpath.Absolute.
       [rest] contains everything after the '/' following the prefix.
       E.g. for the path "FRAMAC_SHARE/libc/string.h", returns
-      ("FRAMAC_SHARE", "libc/string.h").
+      (Name "FRAMAC_SHARE", "libc/string.h").
 
     @since 22.0-Titanium *)
-val to_base_uri: t -> string option * string
+val to_base_uri: t -> Hpath.base * string
 
 (** Equivalent to [Filename.basename].
     @since 28.0-Nickel *)

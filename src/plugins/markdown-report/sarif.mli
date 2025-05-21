@@ -58,7 +58,7 @@ module ArtifactLocation: sig
     uriBaseId: string
   } [@@ deriving of_yojson]
 
-  val create: uri:string -> ?uriBaseId:string -> unit -> t
+  val create: uri:string -> ?base:Hpath.base -> unit -> t
 
   val of_loc: Cil_datatype.Location.t -> t
 

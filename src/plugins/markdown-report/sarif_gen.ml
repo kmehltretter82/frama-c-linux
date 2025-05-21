@@ -213,8 +213,8 @@ let gen_statuses () =
 
 let gen_artifacts () =
   let add_src_file f =
-    let uriBaseId, uri = Filepath.to_base_uri f in
-    let location = ArtifactLocation.create ~uri ?uriBaseId () in
+    let base, uri = Filepath.to_base_uri f in
+    let location = ArtifactLocation.create ~uri ~base () in
     let roles = [ Role.analysisTarget ] in
     let mimeType = "text/x-csrc" in
     Artifact.create ~location ~roles ~mimeType ()

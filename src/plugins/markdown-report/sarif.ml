@@ -102,13 +102,19 @@ module ArtifactLocation = struct
 
   type _t = t
 
-  let create ~uri ?(uriBaseId = "") () = { uri; uriBaseId }
+  let create ~uri ?(base=Hpath.Absolute) () =
+    let uriBaseId = match base with
+      | Absolute -> ""
+      | Cwd -> "PWD"
+      | Name (n,_) -> n
+    in
+    { uri; uriBaseId }
 
   let default = create ~uri:"" ()
 
   let of_loc loc =
-    let uriBaseId, uri = Filepath.(to_base_uri (fst loc).pos_path) in
-    create ~uri ?uriBaseId ()
+    let base, uri = Filepath.(to_base_uri (fst loc).pos_path) in
+    create ~uri ~base ()
 end
 
 module ArtifactLocationDictionary = Json_dictionary(ArtifactLocation)

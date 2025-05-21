@@ -121,9 +121,9 @@ let to_pretty_string p =
     skip_dot p
   else
     let s = match to_base_uri p with
-      | None, uri -> uri
-      | Some "PWD", uri -> if uri = "" then "." else uri
-      | Some symb, uri -> if uri = "" then symb else  symb ^ "/" ^ uri
+      | Absolute, uri -> uri
+      | Cwd, uri -> if uri = "" then "." else uri
+      | Name (name,_), uri -> if uri = "" then name else  name ^ "/" ^ uri
     in
     skip_dot s
 
@@ -274,6 +274,6 @@ module Normalized = struct
   let pp_abs = pp_abs
   let is_file p =
     try (Unix.stat (p :> string)).Unix.st_kind = Unix.S_REG with _ -> false
-  let to_base_uri = to_base_uri
+  let to_base_uri _ = failwith "deprecated"
 end
 

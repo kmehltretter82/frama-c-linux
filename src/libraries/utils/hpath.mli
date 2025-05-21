@@ -30,7 +30,10 @@ val cwd : t
 
 val of_string : ?base:string -> string -> t
 val to_string : t -> string
-val to_uri : t -> string option * string
+
+type base = Absolute | Cwd | Name of string * t
+
+val to_uri : t -> base * string
 
 module Names  : sig
   val reset : unit -> unit

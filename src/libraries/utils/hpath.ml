@@ -147,20 +147,22 @@ let of_string ?base path_name =
 let to_string path =
   path.path_name
 
+type base = Absolute | Cwd | Name of string * t
+
 let to_uri path =
   let buffer = Buffer.create 80 in
   let rec add_component path =
     match path.symbolic_name with
-    | Some sn -> Some sn
-    | None when path == cwd (* hconsed *) -> Some "PWD"
+    | Some sn -> Name (sn, path)
+    | None when path == cwd (* hconsed *) -> Cwd
     | None ->
       match path.dir with
       | None -> (* root *)
         Buffer.add_string buffer path.path_name;
-        None
+        Absolute
       | Some parent ->
         let base = add_component parent in
-        if Buffer.length buffer > 0 || base = None then
+        if Buffer.length buffer > 0 || base = Absolute then
           Buffer.add_char buffer '/';
         Buffer.add_string buffer path.base_name;
         base
