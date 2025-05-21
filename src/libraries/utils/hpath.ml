@@ -20,13 +20,26 @@
 (*                                                                        *)
 (**************************************************************************)
 
-type t = {
-  hash : int ;
-  path_name : string ;
-  base_name : string ; (* Filename.basename *)
-  dir : t option ; (* path whose path_name is Filename.dirname *)
-  mutable symbolic_name : string option ; (* Symbolic name *)
-}
+(* --- Type definition --- *)
+
+module Prototype = struct
+  type t = {
+    hash : int ;
+    path_name : string ;
+    base_name : string ; (* Filename.basename *)
+    dir : t option ; (* path whose path_name is Filename.dirname *)
+    mutable symbolic_name : string option ; (* Symbolic name *)
+  }
+  let hash p = p.hash
+  let equal p q = p.path_name = q.path_name
+end
+
+include Prototype
+
+module Table = Hashtbl.Make (Prototype)
+
+
+(* --- Construction --- *)
 
 let empty = {
   path_name = "";
@@ -51,12 +64,6 @@ module Hcons : sig
   val merge : t -> t
 end =
 struct
-  module Table = Hashtbl.Make
-      (struct
-        type nonrec t = t
-        let hash p = p.hash
-        let equal p q = p.path_name = q.path_name
-      end)
   let table = Table.create 128
   let find = Table.find table
   let merge p =
@@ -130,6 +137,9 @@ let cwd =
   Unix.(realpath (getcwd ()))
   |> insert ~base:empty
 
+
+(* --- Conversion --- *)
+
 let of_string ?base path_name =
   let base = Option.fold ~none:cwd ~some:(insert ~base:cwd) base in
   insert ~base path_name
@@ -167,19 +177,17 @@ let to_uri path =
 (* Note: Symbolic directories are not currently projectified *)
 
 module Names = struct
-  module Table = Hashtbl
-
-  let table : (string, t) Table.t = Table.create 3
+  let table : string Table.t = Table.create 3
 
   let reset () =
     Table.clear table
 
   let add path name =
-    Table.replace table path.path_name path;
+    Table.replace table path name;
     path.symbolic_name <- Some name
 
   let remove path =
-    Table.remove table path.path_name;
+    Table.remove table path;
     path.symbolic_name <- None
 
   let all () =
@@ -188,8 +196,7 @@ module Names = struct
       if c <> 0 then c
       else String.compare p1.path_name p2.path_name
     in
-    Table.to_seq_values table
-    |> Seq.map (fun p -> p, Option.get p.symbolic_name)
+    Table.to_seq table
     |> List.of_seq
     |> List.sort compare
 end
