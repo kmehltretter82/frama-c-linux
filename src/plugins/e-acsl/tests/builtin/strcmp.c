@@ -1,14 +1,14 @@
 /* run.config
- COMMENT: Test `strcmp` and `strncmp` E-ACSL built-ins
- DEPS: @PTEST_DEPS@ utils/signalled.h
+   COMMENT: Test `strcmp` and `strncmp` E-ACSL built-ins
+   DEPS: @PTEST_DEPS@ utils/signalled.h utils/eacsl_test_strdup.h
    STDOPT:
 */
 /* run.config_dev
-   MACRO: INCLUDED_HEADERS utils/signalled.h
+   MACRO: INCLUDED_HEADERS utils/signalled.h utils/eacsl_test_strdup.h
    COMMENT: This part is blank on purpose (test stability + Dune)
-
 */
 
+#include "utils/eacsl_test_strdup.h"
 #include "utils/signalled.h"
 #include <stdlib.h>
 #include <string.h>
@@ -28,7 +28,7 @@ int main(int argc, const char **argv) {
 
   char al[4] = "abc", ar[4] = "abc";
 
-  char *dl = strdup("abc"), *dr = strdup("abc");
+  char *dl = eacsl_test_strdup("abc", 4), *dr = eacsl_test_strdup("abc", 4);
 
   int res;
   /* strcmp {{{ */
@@ -61,7 +61,7 @@ int main(int argc, const char **argv) {
 
   /* strncmp {{{ */
 
-  dl = strdup("abc"), dr = strdup("abc");
+  dl = eacsl_test_strdup("abc", 4), dr = eacsl_test_strdup("abc", 4);
 
   char nal[4] = "abc", nar[4] = "abc";
 

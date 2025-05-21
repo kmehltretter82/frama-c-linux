@@ -71,6 +71,7 @@ int main(int argc, char const **argv)
   __e_acsl_full_init((void *)(& memptr));
   int res2 =
     __gen_e_acsl_posix_memalign((void **)memptr,(size_t)256,(size_t)15);
+  /*@ assert Eva: initialization: \initialized(memptr); */
   char *p = *memptr;
   __e_acsl_store_block((void *)(& p),8UL);
   __e_acsl_full_init((void *)(& p));
@@ -104,7 +105,7 @@ int main(int argc, char const **argv)
     __gen_e_acsl_assert_data.pred_txt = "\\valid(p)";
     __gen_e_acsl_assert_data.file = "memalign.c";
     __gen_e_acsl_assert_data.fct = "main";
-    __gen_e_acsl_assert_data.line = 15;
+    __gen_e_acsl_assert_data.line = 18;
     __e_acsl_assert(__gen_e_acsl_and,& __gen_e_acsl_assert_data);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
   }
@@ -123,7 +124,7 @@ int main(int argc, char const **argv)
     __gen_e_acsl_assert_data_2.pred_txt = "\\block_length(p) == 15";
     __gen_e_acsl_assert_data_2.file = "memalign.c";
     __gen_e_acsl_assert_data_2.fct = "main";
-    __gen_e_acsl_assert_data_2.line = 16;
+    __gen_e_acsl_assert_data_2.line = 19;
     __e_acsl_assert(__gen_e_acsl_block_length == 15UL,
                     & __gen_e_acsl_assert_data_2);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
@@ -142,7 +143,7 @@ int main(int argc, char const **argv)
     __gen_e_acsl_assert_data_3.pred_txt = "\\freeable(p)";
     __gen_e_acsl_assert_data_3.file = "memalign.c";
     __gen_e_acsl_assert_data_3.fct = "main";
-    __gen_e_acsl_assert_data_3.line = 17;
+    __gen_e_acsl_assert_data_3.line = 20;
     __e_acsl_assert(__gen_e_acsl_freeable,& __gen_e_acsl_assert_data_3);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
   }
@@ -180,7 +181,7 @@ int main(int argc, char const **argv)
     __gen_e_acsl_assert_data_4.pred_txt = "!\\valid(p)";
     __gen_e_acsl_assert_data_4.file = "memalign.c";
     __gen_e_acsl_assert_data_4.fct = "main";
-    __gen_e_acsl_assert_data_4.line = 19;
+    __gen_e_acsl_assert_data_4.line = 22;
     __e_acsl_assert(! __gen_e_acsl_and_2,& __gen_e_acsl_assert_data_4);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
   }
@@ -196,7 +197,7 @@ int main(int argc, char const **argv)
     __gen_e_acsl_assert_data_5.pred_txt = "a == \\null";
     __gen_e_acsl_assert_data_5.file = "memalign.c";
     __gen_e_acsl_assert_data_5.fct = "main";
-    __gen_e_acsl_assert_data_5.line = 23;
+    __gen_e_acsl_assert_data_5.line = 26;
     __e_acsl_assert(a == (char *)0,& __gen_e_acsl_assert_data_5);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
   }
@@ -212,7 +213,7 @@ int main(int argc, char const **argv)
     __gen_e_acsl_assert_data_6.pred_txt = "a == \\null";
     __gen_e_acsl_assert_data_6.file = "memalign.c";
     __gen_e_acsl_assert_data_6.fct = "main";
-    __gen_e_acsl_assert_data_6.line = 26;
+    __gen_e_acsl_assert_data_6.line = 29;
     __e_acsl_assert(a == (char *)0,& __gen_e_acsl_assert_data_6);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
   }
@@ -228,7 +229,7 @@ int main(int argc, char const **argv)
     __gen_e_acsl_assert_data_7.pred_txt = "a == \\null";
     __gen_e_acsl_assert_data_7.file = "memalign.c";
     __gen_e_acsl_assert_data_7.fct = "main";
-    __gen_e_acsl_assert_data_7.line = 29;
+    __gen_e_acsl_assert_data_7.line = 32;
     __e_acsl_assert(a == (char *)0,& __gen_e_acsl_assert_data_7);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
   }
@@ -244,7 +245,7 @@ int main(int argc, char const **argv)
     __gen_e_acsl_assert_data_8.pred_txt = "a != \\null";
     __gen_e_acsl_assert_data_8.file = "memalign.c";
     __gen_e_acsl_assert_data_8.fct = "main";
-    __gen_e_acsl_assert_data_8.line = 32;
+    __gen_e_acsl_assert_data_8.line = 35;
     __e_acsl_assert(a != (char *)0,& __gen_e_acsl_assert_data_8);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_8);
   }
@@ -281,7 +282,7 @@ int main(int argc, char const **argv)
     __gen_e_acsl_assert_data_9.pred_txt = "\\valid(a)";
     __gen_e_acsl_assert_data_9.file = "memalign.c";
     __gen_e_acsl_assert_data_9.fct = "main";
-    __gen_e_acsl_assert_data_9.line = 33;
+    __gen_e_acsl_assert_data_9.line = 36;
     __e_acsl_assert(__gen_e_acsl_and_3,& __gen_e_acsl_assert_data_9);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_9);
   }
@@ -300,7 +301,7 @@ int main(int argc, char const **argv)
     __gen_e_acsl_assert_data_10.pred_txt = "\\block_length(a) == 512";
     __gen_e_acsl_assert_data_10.file = "memalign.c";
     __gen_e_acsl_assert_data_10.fct = "main";
-    __gen_e_acsl_assert_data_10.line = 34;
+    __gen_e_acsl_assert_data_10.line = 37;
     __e_acsl_assert(__gen_e_acsl_block_length_2 == 512UL,
                     & __gen_e_acsl_assert_data_10);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_10);
@@ -319,7 +320,7 @@ int main(int argc, char const **argv)
     __gen_e_acsl_assert_data_11.pred_txt = "\\freeable(a)";
     __gen_e_acsl_assert_data_11.file = "memalign.c";
     __gen_e_acsl_assert_data_11.fct = "main";
-    __gen_e_acsl_assert_data_11.line = 35;
+    __gen_e_acsl_assert_data_11.line = 38;
     __e_acsl_assert(__gen_e_acsl_freeable_2,& __gen_e_acsl_assert_data_11);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_11);
   }
@@ -357,7 +358,7 @@ int main(int argc, char const **argv)
     __gen_e_acsl_assert_data_12.pred_txt = "!\\valid(a)";
     __gen_e_acsl_assert_data_12.file = "memalign.c";
     __gen_e_acsl_assert_data_12.fct = "main";
-    __gen_e_acsl_assert_data_12.line = 38;
+    __gen_e_acsl_assert_data_12.line = 41;
     __e_acsl_assert(! __gen_e_acsl_and_4,& __gen_e_acsl_assert_data_12);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_12);
   }

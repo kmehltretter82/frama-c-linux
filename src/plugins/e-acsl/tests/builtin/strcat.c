@@ -1,6 +1,6 @@
 /* run.config
- COMMENT: Test `strcat` and `strncat` E-ACSL built-ins
- DEPS: @PTEST_DEPS@ utils/signalled.h
+   COMMENT: Test `strcat` and `strncat` E-ACSL built-ins
+   DEPS: @PTEST_DEPS@ utils/signalled.h
    STDOPT: +"-eva-precision=1"
 */
 /* run.config_dev
@@ -14,6 +14,11 @@
 #include <string.h>
 
 void test_memory_tracking() {
+  // /!\ In the following tests, Eva will not be able to check \initialized on
+  // the calls with E-ACSL builtins. Indeed since E-ACSL specs cannot use
+  // definitions in __fc_string_axiomatic.h to be able to work outside of
+  // Frama-C's stdlib, the specs of E-ACSL builtins are not complete and Eva
+  // will not be able to verify that the destination strings are initialized.
   {
     char dest[4];
     strcpy(dest, "a");

@@ -67,7 +67,7 @@ typedef struct pt_struct pt_struct_t;
   @ allocates \result;
   @ assigns *\result \from get_ptr_fct, contains_ptr_fct, clean_leaf_fct,
                            print_leaf_fct;
-  @ admit ensures \valid(\result); */
+  @ ensures \valid(\result); */
 pt_struct_t *pt_create(get_ptr_fct_t get_ptr_fct,
                        contains_ptr_fct_t contains_ptr_fct,
                        clean_leaf_fct_t clean_leaf_fct,

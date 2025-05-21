@@ -20,3 +20,13 @@
 [e-acsl] FRAMAC_SHARE/libc/stdlib.h:834: Warning: 
   E-ACSL construct `\fresh' is not yet supported. Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
+[eva] FRAMAC_SHARE/libc/stdlib.h:818: Warning: 
+  ignoring unsupported allocates clause
+[eva:alarm] FRAMAC_SHARE/libc/stdlib.h:827: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status invalid.
+[eva:alarm] FRAMAC_SHARE/libc/stdlib.h:841: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status invalid.
+[eva:alarm] FRAMAC_SHARE/libc/stdlib.h:834: Warning: 
+  function __gen_e_acsl_posix_memalign, behavior allocation: postcondition 'allocation' got status unknown.
+[eva:alarm] memalign.c:17: Warning: 
+  accessing uninitialized left-value. assert \initialized(memptr);

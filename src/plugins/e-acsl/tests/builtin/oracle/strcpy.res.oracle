@@ -1,36 +1,4 @@
 [e-acsl] beginning translation.
-[e-acsl] Warning: annotating undefined function `strdup':
-  the generated program may miss memory instrumentation
-  if there are memory-related annotations.
-[e-acsl] FRAMAC_SHARE/libc/string.h:574: Warning: 
-  E-ACSL construct `\fresh' is not yet supported. Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:575: Warning: 
-  no assigns clause generated for function valid_read_string because pointers as arguments is not yet supported
-[e-acsl] FRAMAC_SHARE/libc/__fc_string_axiomatic.h:277: Warning: 
-  E-ACSL construct `logic functions or predicates performing read accesses'
-  is not yet supported.
-  Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:579: Warning: 
-  E-ACSL construct `logic functions or predicates performing read accesses'
-  is not yet supported.
-  Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:587: Warning: 
-  E-ACSL construct `logic functions or predicates performing read accesses'
-  is not yet supported.
-  Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:574: Warning: 
-  Some assumes clauses could not be translated.
-  Ignoring complete and disjoint behaviors annotations.
-[e-acsl] FRAMAC_SHARE/libc/string.h:574: Warning: 
-  E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:583: Warning: 
-  E-ACSL construct `\fresh' is not yet supported. Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:585: Warning: 
-  no assigns clause generated for function valid_string because pointers as arguments is not yet supported
-[e-acsl] FRAMAC_SHARE/libc/__fc_string_axiomatic.h:274: Warning: 
-  E-ACSL construct `logic functions or predicates performing read accesses'
-  is not yet supported.
-  Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/unistd.h:914: Warning: 
   E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/sys/wait.h:85: Warning: 
@@ -45,3 +13,25 @@
   is not yet supported.
   Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
+[eva:alarm] FRAMAC_SHARE/libc/unistd.h:917: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] FRAMAC_SHARE/libc/unistd.h:917: Warning: 
+  function __gen_e_acsl_fork: postcondition 'result_ok_child_or_error' got status unknown.
+[eva:alarm] strcpy.c:66: Warning: 
+  accessing left-value that contains escaping addresses.
+  assert !\dangling(&unalloc_str);
+[eva:alarm] strcpy.c:76: Warning: 
+  accessing left-value that contains escaping addresses.
+  assert !\dangling(&unalloc_str);
+[eva:alarm] strcpy.c:24: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] strcpy.c:24: Warning: assertion got status unknown.
+[eva:alarm] strcpy.c:25: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] strcpy.c:25: Warning: assertion got status unknown.
+[eva:alarm] strcpy.c:34: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] strcpy.c:34: Warning: assertion got status unknown.
+[eva:alarm] strcpy.c:44: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] strcpy.c:44: Warning: assertion got status unknown.

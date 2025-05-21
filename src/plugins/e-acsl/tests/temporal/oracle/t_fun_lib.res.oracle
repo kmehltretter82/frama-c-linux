@@ -29,30 +29,13 @@
   is not yet supported.
   Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
-[eva:alarm] t_fun_lib.c:15: Warning: 
-  function __e_acsl_assert_register_ulong: precondition data->values == \null ||
-                                                        \valid(data->values) got status unknown.
-[eva:alarm] t_fun_lib.c:15: Warning: 
-  function __e_acsl_assert_register_int: precondition data->values == \null ||
-                                                      \valid(data->values) got status unknown.
-[eva:alarm] t_fun_lib.c:15: Warning: 
-  function __e_acsl_assert_register_ptr: precondition data->values == \null ||
-                                                      \valid(data->values) got status unknown.
-[eva:alarm] t_fun_lib.c:15: Warning: 
-  function __e_acsl_assert_register_ulong: precondition data->values == \null ||
-                                                        \valid(data->values) got status unknown.
-[eva:alarm] t_fun_lib.c:15: Warning: 
-  function __e_acsl_assert_register_ptr: precondition data->values == \null ||
-                                                      \valid(data->values) got status unknown.
-[eva:alarm] t_fun_lib.c:15: Warning: 
-  function __e_acsl_assert_register_ulong: precondition data->values == \null ||
-                                                        \valid(data->values) got status unknown.
-[eva:alarm] t_fun_lib.c:15: Warning: 
-  function __e_acsl_assert_register_int: precondition data->values == \null ||
-                                                      \valid(data->values) got status unknown.
-[eva:alarm] t_fun_lib.c:15: Warning: 
-  function __e_acsl_assert_register_ptr: precondition data->values == \null ||
-                                                      \valid(data->values) got status unknown.
-[eva:alarm] t_fun_lib.c:15: Warning: 
-  function __e_acsl_assert_register_ulong: precondition data->values == \null ||
-                                                        \valid(data->values) got status unknown.
+[eva:assigns:missing-result] FRAMAC_SHARE/libc/stdlib.h:954: Warning: 
+  no 'assigns \result \from ...' clause specified for function realpath
+[eva] FRAMAC_SHARE/libc/stdlib.h:902: Warning: 
+  ignoring unsupported allocates clause
+[eva:ensures-false] FRAMAC_SHARE/libc/stdlib.h:950: Warning: 
+  function realpath, behavior filesystem_error: this postcondition evaluates to
+  false in this context. If it is valid, either a precondition was not verified
+  for this call, or some assigns/from clauses are incomplete (or incorrect).
+[inout] FRAMAC_SHARE/libc/stdlib.h:902: Warning: 
+  failed to interpret assigns clause '*(\result + (0 .. 4096 - 1))'

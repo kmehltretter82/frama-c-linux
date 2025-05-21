@@ -38,7 +38,7 @@ void signal_eval(int status, int expect_signal, const char *at) {
       code;                                                                    \
       exit(0);                                                                 \
     } else {                                                                   \
-      int process_status;                                                      \
+      int process_status = 0;                                                  \
       waitpid(pid, &process_status, 0);                                        \
       signal_eval(process_status, expect_signal, at);                          \
     }                                                                          \
