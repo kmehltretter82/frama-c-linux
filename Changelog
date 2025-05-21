@@ -24,10 +24,17 @@ Open Source Release <next-release>
               instead of 'specified', its default value is now 'user-specified':
               unused libc functions with specifications are now removed during
               normalization.
+-   Eva       [2025-04-28] Improved -eva-partition-history option, which can now
+              keep states separated from builtin calls, function specifications
+              and disjunctions in ACSL assertions.
 *!  Kernel    [2025-04-25] Init is always available in logic annotations
 o!  Kernel    [2025-04-23] Remove allegedly unused optionnal normalizations on
               while loops and conditionals (`setDoTransformWhile` and
               `setDoAlternateConditional`).
+o   Eva       [2025-04-23] In the Eva API, exports statistics about an analysis
+              in the new Statistics module.
+-   Eva       [2025-04-18] New option -eva-partition-history-function which
+              overrides the value of -eva-partition-history on given functions.
 -*  Kernel    [2025-04-14] Add support for initializer overrides in
               structures using compound litterals (fix #@1514).
 -   Kernel    [2025-04-14] Unused static or inline functions are now removed
@@ -37,16 +44,34 @@ o!  Kernel    [2025-04-14] Building types via `Cil_const` now uses
               qualifiers to the array elements, unless stated otherwise.
 o   Kernel    [2025-04-11] Removed files in share/compliance.
               Compiler builtin JSON files were moved to share/machdeps.
+-*  Kernel    [2025-04-10] Fix Frama-C normalization which could in specific
+              cases result in an ill-formed AST (Fix ##2716).
+-   Ivette    [2025-03-28] Add support for the Impact plug-in, which can be
+              invoked by right-clicking on a statement in the AST view.
+-   Ivette    [2025-03-28] View tabs can be reordered via Ctrl-Shift-PageUp/Down
+              and closed with middle-click.
+-   Ivette    [2025-03-26] In Eva results (in the values table and Inspector),
+              when Eva displays the address of a variable, one can click on the
+              variable to select it.
+-   Ivette    [2025-03-24] Fix Studia menu on ACSL term lvalue.
 -!  Kernel    [2025-03-21] Change API to register attributes, with now the
               possibility to ignore an attribute when comparing types, and
               to print or not the attribute in the AST. AttrIgnored was replaced
               by AttrUnknown which by default has the same behavior.
+-*  Eva       [2025-03-17] Fix a crash when using Frama_C_domain_show_each on a
+              memory location of unknown size.
+-   Ivette    [2025-03-14] Various fixes to the Eva sidebar.
 -   Kernel    [2025-03-13] Add option `-commands-file` to group Frama-C options
               in a separate file.
--*  Kernel    [2025-04-10] Fix Frama-C normalization which could in specific
-              cases result in an ill-formed AST (Fix ##2716).
 -   Kernel    [2025-03-12] Fix handling of qualifiers in array formals during
               typing phase (fix #@998).
+-   Eva       [2025-03-10] Mthread now supports interrupt handlers. New option
+              -mt-interrupt-handlers can be used to declare a list of interrupt
+              handlers to be included in the analysis of the given C program.
+-   Eva       [2025-03-10] The Mthread plug-in, which uses Eva to analyze
+              concurrent C programs, is now embedded within Eva. It is still
+              experimental and under heavy development.
+-   Ivette    [2025-03-07] New Ivette documentation available via the Help menu.
 o   Kernel    [2025-02-25] Frama-C now uses OCamlmig (see developer manual) to
               perform migrations between versions.
 o!  Kernel    [2025-02-25] New module Ast_types for type related functions. Most
@@ -54,6 +79,7 @@ o!  Kernel    [2025-02-25] New module Ast_types for type related functions. Most
 o!  Kernel    [2025-02-17] New module Ast_attributes for attribute related
               functions. Most functions migrated from Cil, where they have been
               deprecated.
+-   Ivette    [2025-02-14] New About and Credits information via the Help menu.
 -   Libc      [2025-02-14] Add __fc_gcc_builtin_macros.h to improve analyses
               for code using GCC libc builtins (e.g. __builtin_strlen).
 -*  Kernel    [2025-02-14] Proper support for forwarded enum as gcc extension
@@ -62,6 +88,8 @@ o!  Kernel    [2025-02-17] New module Ast_attributes for attribute related
               provided it can be evaluated to an integer constant.
               Fixes ##2695 and #@1413
 o!  Kernel    [2025-02-13] Move some functions from Logic_typing to Logic_utils
+-*  Eva       [2025-02-12] Fix interpretation of from clauses referring to
+              addresses, such as "assigns X \from &g".
 -   Alias     [2025-02-07] New message key printer:show-libc-vars for
               including variables stemming from the C library in the console
               output (now disabled by default).
@@ -69,12 +97,15 @@ o   Kernel    [2025-02-05] New parameter builder `Float` for decimal
               command-line parameters.
 o!  Kernel    [2025-02-05] Remove the parameter `Functor_info` for every
               `Datatype` functor building collection(s).
--!  Kernel    [2025-02-04] Undefine some predefined GCC macros, to minimize
-              parsing errors due to unsupported compiler extensions.
 o!  Kernel    [2025-02-05] Remove attributes annotations (Cil.AttrAnnot). Use
               normal attributes instead.
+-!  Kernel    [2025-02-04] Undefine some predefined GCC macros, to minimize
+              parsing errors due to unsupported compiler extensions.
 o!  Kernel    [2025-01-31] Use a record to represent `Cil_types.typ` with two
               fields `tnode` and `tattr` for its `typ_node` and `attributes`.
+-   Kernel    [2025-01-31] New option -cache-size to control the amount of
+              memory allocated for some internal caches; it replaces the
+              environment variable FRAMA_C_MEMORY_FOOTPRINT.
 -   Ivette    [2025-01-23] New sidebar listing functions and global variables
               for each source file.
 -   Eva       [2025-01-23] Rename warning key `invalid-assigns` to
@@ -85,6 +116,7 @@ o!  Kernel    [2025-01-31] Use a record to represent `Cil_types.typ` with two
 -   Kernel    [2025-01-17] New option -memory-footprint to configure the memory
               usage of analyses.
 o!  Kernel    [2024-12-20] Remove Cabs.SEQUENCE statement
+-   Ivette    [2024-11-24] Allow searching text in the AST component.
 
 ###############################################################################
 Open Source Release 30.0 (Zinc)
