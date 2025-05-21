@@ -23,7 +23,6 @@
 open Eval
 open Mt_utils
 open Eva_ast
-open Locations
 open Concurrency
 
 
@@ -84,14 +83,12 @@ end
 
 
 
-type memory = { read : Zone.t ; written : Zone.t }
 type return = { standard : Value.t }
 
 module State = struct
   type state =
     { threads : Mt_thread.Register.t
     ; mutexes : Mt_mutex.Register.t
-    ; memory  : memory
     ; return  : return
     ; results : BuiltinsResults.t
     }
@@ -99,7 +96,6 @@ module State = struct
   let default =
     { threads = Mt_thread.Register.empty
     ; mutexes = Mt_mutex.Register.empty
-    ; memory  = Zone.{ read = bottom ; written = bottom }
     ; return  = Value.{ standard = bottom }
     ; results = BuiltinsResults.empty
     }
@@ -107,7 +103,6 @@ module State = struct
   let top =
     { threads = Mt_thread.Register.top
     ; mutexes = Mt_mutex.Register.top
-    ; memory  = Zone.{ read = top ; written = top }
     ; return  = Value.{ standard = top }
     ; results = BuiltinsResults.top
     }
@@ -120,36 +115,26 @@ module State = struct
       let copy state =
         let threads  = Mt_thread.Register.copy state.threads in
         let mutexes  = Mt_mutex.Register.copy state.mutexes in
-        let written  = Zone.copy state.memory.written in
-        let read     = Zone.copy state.memory.read in
-        let memory   = { read ; written } in
         let standard = Value.copy state.return.standard in
         let return   = { standard } in
         let results  = BuiltinsResults.copy state.results in
-        { threads ; mutexes ; memory ; return ; results }
+        { threads ; mutexes ; return ; results }
 
       let structural_descr =
         let open Structural_descr in
         let ths = Mt_thread.Register.packed_descr in
         let mxs = Mt_mutex.Register.packed_descr in
-        let mem = pack (t_record Zone.[| packed_descr ; packed_descr |]) in
         let ret = pack (t_record Value.[| packed_descr |]) in
         let results = BuiltinsResults.packed_descr in
-        t_record [| ths ; mxs ; mem ; ret ; results |]
+        t_record [| ths ; mxs ; ret ; results |]
 
       let pretty fmt state =
         Format.fprintf fmt "Threads :@.  @[<v>%a@]@."
           Mt_thread.Register.pretty state.threads ;
         Format.fprintf fmt "Mutexes :@.  @[<v>%a@]@."
           Mt_mutex.Register.pretty state.mutexes ;
-        Format.fprintf fmt "Memory  :@.  Read    : %a@.  Written : %a@."
-          Zone.pretty state.memory.read Zone.pretty state.memory.written ;
         Format.fprintf fmt "Return  :@.  Standard : %a@."
           Value.pretty state.return.standard
-
-      let compare_memory l r =
-        let open Locations.Zone in
-        compare l.read r.read <?> lazy (compare l.written r.written)
 
       let compare_return l r =
         let open Value in
@@ -158,14 +143,10 @@ module State = struct
       let compare l r =
         Mt_thread.Register.compare l.threads r.threads
         <?> lazy (Mt_mutex.Register.compare l.mutexes r.mutexes)
-        <?> lazy (compare_memory l.memory r.memory)
         <?> lazy (compare_return l.return r.return)
         <?> lazy (BuiltinsResults.compare l.results r.results)
 
       let equal l r = compare l r = 0
-
-      let hash_memory t =
-        Hashtbl.hash (Locations.Zone.hash t.read, Locations.Zone.hash t.written)
 
       let hash_return t =
         Value.hash t.standard
@@ -174,7 +155,6 @@ module State = struct
         Hashtbl.hash (
           Mt_thread.Register.hash t.threads,
           Mt_mutex.Register.hash t.mutexes,
-          hash_memory t.memory,
           hash_return t.return,
           BuiltinsResults.hash t.results)
       let rehash = Datatype.identity
@@ -183,7 +163,6 @@ module State = struct
 
   let threads t = t.threads
   let mutexes t = t.mutexes
-  let memory t = t.memory
   let return t = t.return
 end
 
@@ -191,9 +170,8 @@ end
 
 let reset state =
   let open State in
-  let memory = Zone.{ read = bottom ; written = bottom } in
   let return = { standard = Value.bottom } in
-  { state with memory ; return }
+  { state with return }
 
 
 
@@ -203,44 +181,33 @@ module Datatype_with_Lattice = struct
   let is_included l r =
     Mt_thread.Register.is_included l.threads r.threads
     && Mt_mutex.Register.is_included l.mutexes r.mutexes
-    && Zone.is_included l.memory.read r.memory.read
-    && Zone.is_included l.memory.written r.memory.written
     && Value.is_included l.return.standard r.return.standard
     && BuiltinsResults.is_included l.results r.results
 
   let join l r =
     let threads = Mt_thread.Register.join l.threads r.threads in
     let mutexes = Mt_mutex.Register.join l.mutexes r.mutexes in
-    let read = Zone.join l.memory.read r.memory.read in
-    let written = Zone.join l.memory.written r.memory.written in
-    let memory = { read ; written } in
     let standard = Value.join l.return.standard r.return.standard in
     let return = { standard } in
     let results = BuiltinsResults.join l.results r.results in
-    { threads ; mutexes ; memory ; return ; results }
+    { threads ; mutexes ; return ; results }
 
   let widen _ _ pre post =
     let threads = Mt_thread.Register.join pre.threads post.threads in
     let mutexes = Mt_mutex.Register.join pre.mutexes post.mutexes in
-    let read = Locations.Zone.join pre.memory.read post.memory.read in
-    let written = Locations.Zone.join pre.memory.written post.memory.written in
-    let memory = { read ; written } in
     let standard = Value.widen pre.return.standard post.return.standard in
     let return = { standard } in
     let results = BuiltinsResults.join pre.results post.results in
-    { threads ; mutexes ; memory ; return ; results }
+    { threads ; mutexes ; return ; results }
 
   let narrow l r =
     let open Lattice_bounds.Bottom.Operators in
     let threads = Mt_thread.Register.narrow l.threads r.threads in
     let mutexes = Mt_mutex.Register.narrow l.mutexes r.mutexes in
-    let read = Zone.narrow l.memory.read r.memory.read in
-    let written = Zone.narrow l.memory.written r.memory.written in
-    let memory = { read ; written } in
     let standard = Value.narrow l.return.standard r.return.standard in
     let return = { standard } in
     let+ results = BuiltinsResults.narrow l.results r.results in
-    { threads ; mutexes ; memory ; return ; results }
+    { threads ; mutexes ; return ; results }
 end
 
 
@@ -254,13 +221,10 @@ module Cache = struct
   let merge l r =
     let threads = Mt_thread.Register.narrow l.threads r.threads in
     let mutexes = Mt_mutex.Register.narrow l.mutexes r.mutexes in
-    let read = Zone.join l.memory.read r.memory.read in
-    let written = Zone.join l.memory.written r.memory.written in
-    let memory = { read ; written } in
     let standard = Value.join l.return.standard r.return.standard in
     let return = { standard } in
     let results = BuiltinsResults.join l.results r.results in
-    { threads ; mutexes ; memory ; return ; results }
+    { threads ; mutexes ; return ; results }
   let add stmt state =
     match find_opt cache stmt with
     | None -> add cache stmt state
@@ -296,48 +260,6 @@ module Transfer = struct
 
   let update _ state = `Value state
 
-  let loc_of_lval valuation lv =
-    match valuation.Abstract_domain.find_loc lv with
-    | `Value loc -> loc.loc
-    | `Top -> Precise_locs.loc_top
-
-  (* Internal function filtering a zone to only keep global bases. *)
-  let keep_globals_only zone =
-    let test f v = Option.(map f v |> value ~default:false) in
-    let volatile b =
-      Base.typeof b
-      |> test (Ast_types.has_qualifier "volatile")
-    in
-    let keep b = Base.is_global b && not (volatile b) in
-    try Locations.Zone.filter_base keep zone
-    with Abstract_interp.Error_Top -> Locations.Zone.top
-
-  (* Internal function computing written and indirectly read zones of a
-     lvalue. *)
-  let compute_zones lval to_loc =
-    match lval.node with
-    | Var vi, NoOffset ->
-      Locations.(zone_of_varinfo vi |> keep_globals_only, Zone.bottom)
-    | _ ->
-      let ploc = to_loc lval in
-      let loc = Precise_locs.imprecise_location ploc in
-      let lv_zone = Locations.(enumerate_valid_bits Write loc) in
-      let lv_indirect_zone =
-        Eva_ast.PreciseDepsOf.indirect_zone_of_lval to_loc lval
-      in
-      keep_globals_only lv_zone, keep_globals_only lv_indirect_zone
-
-  let assign_memory lval exp valuation memory =
-    let to_loc = loc_of_lval valuation in
-    let written_zone, lv_indirect_zone = compute_zones lval to_loc in
-    let exp_zone =
-      Eva_ast.PreciseDepsOf.zone_of_exp to_loc exp |> keep_globals_only
-    in
-    let read_zone = Locations.Zone.join lv_indirect_zone exp_zone in
-    let read = Locations.Zone.join memory.read read_zone in
-    let written = Locations.Zone.join memory.written written_zone in
-    { read ; written }
-
   let assign_return lval result return =
     let main_return = Mt_thread.return_lval (Thread.current ()) in
     if Option.equal Eva_ast.Lval.equal main_return (Some lval) then
@@ -346,34 +268,18 @@ module Transfer = struct
       Bottom.(map f result |> value ~bottom)
     else return
 
-  let assign kinstr { lval } exp assigned valuation state =
+  let assign kinstr { lval } _exp assigned _valuation state =
     match kinstr with
     | Cil_types.Kglobal -> `Value state
     | Kstmt stmt ->
-      let { memory ; return } = reset state in
+      let { return } = reset state in
       let return = assign_return lval (Eval.value_assigned assigned) return in
-      let memory = assign_memory lval exp valuation memory in
-      let state = { state with memory ; return } in
+      let state = { state with return } in
       Cache.save stmt state
 
-  let assume stmt exp _ valuation state =
-    let to_loc = loc_of_lval valuation in
-    let { memory } = reset state in
-    let read_zone =
-      Eva_ast.PreciseDepsOf.zone_of_exp to_loc exp |> keep_globals_only
-    in
-    let read = Locations.Zone.join memory.read read_zone in
-    let state = { state with memory = { memory with read } } in
-    Cache.save stmt state
+  let assume stmt _ _ _ state = Cache.save stmt state
 
-  let start_call stmt call _ valuation state =
-    let { memory } = reset state in
-    let var = Eva_ast.Build.var in
-    let assign varinfo exp = assign_memory (var varinfo) exp valuation in
-    let f s { formal ; concrete } = assign formal concrete s in
-    let memory = List.fold_left f memory call.arguments in
-    let state = { state with memory } in
-    Cache.save stmt state
+  let start_call stmt _ _ _ state = Cache.save stmt state
 
   let map_non_bottom f xs =
     let module E = struct exception Bottom end in

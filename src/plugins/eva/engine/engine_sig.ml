@@ -88,7 +88,9 @@ sig
       the Mthread domain helps filtering applicable interferences. This function
       is the identity if the Mthread domain can infer that no shared memory has
       been read or written during the last transfer function. *)
-  val inject : state -> state
+  val inject :
+    Cil_types.kernel_function -> Eva_automata.vertex -> Eva_automata.vertex ->
+    state -> state
 
   (** Are there any interferences to inject after the given transition? *)
   val is_empty : Eva_automata.transition -> bool

@@ -33,7 +33,7 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  job1: read by job2 at late_start.c:26
+  job1: read by job2 at late_start.c:26 <- f2
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:

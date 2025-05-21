@@ -27,7 +27,9 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  jobs[0..4]: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  jobs[0..4]:
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+      pthread_create :: philo_nofifo.c:37 <- main
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -48,9 +50,24 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  locks{[1]; [4]}:
-    read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:56
-    read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:66
+  locks[1]:
+    read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+      pthread_mutex_lock :: philo_nofifo.c:13 <-
+      aux :: philo_nofifo.c:24 <-
+      job
+    read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+      pthread_mutex_unlock :: philo_nofifo.c:14 <-
+      aux :: philo_nofifo.c:24 <-
+      job
+  locks[4]:
+    read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+      pthread_mutex_lock :: philo_nofifo.c:12 <-
+      aux :: philo_nofifo.c:24 <-
+      job
+    read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+      pthread_mutex_unlock :: philo_nofifo.c:15 <-
+      aux :: philo_nofifo.c:24 <-
+      job
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -70,9 +87,24 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  locks{[0]; [2]}:
-    read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:56
-    read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:66
+  locks[0]:
+    read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+      pthread_mutex_lock :: philo_nofifo.c:12 <-
+      aux :: philo_nofifo.c:24 <-
+      job
+    read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+      pthread_mutex_unlock :: philo_nofifo.c:15 <-
+      aux :: philo_nofifo.c:24 <-
+      job
+  locks[2]:
+    read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+      pthread_mutex_lock :: philo_nofifo.c:13 <-
+      aux :: philo_nofifo.c:24 <-
+      job
+    read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+      pthread_mutex_unlock :: philo_nofifo.c:14 <-
+      aux :: philo_nofifo.c:24 <-
+      job
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -92,9 +124,24 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  locks{[1]; [3]}:
-    read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:56
-    read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:66
+  locks[1]:
+    read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+      pthread_mutex_lock :: philo_nofifo.c:12 <-
+      aux :: philo_nofifo.c:24 <-
+      job
+    read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+      pthread_mutex_unlock :: philo_nofifo.c:15 <-
+      aux :: philo_nofifo.c:24 <-
+      job
+  locks[3]:
+    read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+      pthread_mutex_lock :: philo_nofifo.c:13 <-
+      aux :: philo_nofifo.c:24 <-
+      job
+    read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+      pthread_mutex_unlock :: philo_nofifo.c:14 <-
+      aux :: philo_nofifo.c:24 <-
+      job
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -114,9 +161,24 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  locks{[2]; [4]}:
-    read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:56
-    read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:66
+  locks[2]:
+    read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+      pthread_mutex_lock :: philo_nofifo.c:12 <-
+      aux :: philo_nofifo.c:24 <-
+      job
+    read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+      pthread_mutex_unlock :: philo_nofifo.c:15 <-
+      aux :: philo_nofifo.c:24 <-
+      job
+  locks[4]:
+    read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+      pthread_mutex_lock :: philo_nofifo.c:13 <-
+      aux :: philo_nofifo.c:24 <-
+      job
+    read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+      pthread_mutex_unlock :: philo_nofifo.c:14 <-
+      aux :: philo_nofifo.c:24 <-
+      job
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
@@ -136,9 +198,24 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  locks{[0]; [3]}:
-    read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:56
-    read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:66
+  locks[0]:
+    read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+      pthread_mutex_lock :: philo_nofifo.c:13 <-
+      aux :: philo_nofifo.c:24 <-
+      job
+    read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+      pthread_mutex_unlock :: philo_nofifo.c:14 <-
+      aux :: philo_nofifo.c:24 <-
+      job
+  locks[3]:
+    read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+      pthread_mutex_lock :: philo_nofifo.c:12 <-
+      aux :: philo_nofifo.c:24 <-
+      job
+    read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+      pthread_mutex_unlock :: philo_nofifo.c:15 <-
+      aux :: philo_nofifo.c:24 <-
+      job
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
