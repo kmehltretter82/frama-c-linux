@@ -66,8 +66,8 @@ let lines () =
   List.sort_uniq Stdlib.compare l
 
 let output file =
-  let ch = open_out file in
-  let fmt = Format.formatter_of_out_channel ch in
+  let open Filesystem.Operators in
+  let$ fmt = Filesystem.with_formatter_exn file in
   Format.pp_set_margin fmt 1000000;
   Format.fprintf fmt "@[<v>";
   Format.fprintf fmt
@@ -86,14 +86,14 @@ let print_csv =
   Dynamic.register
     ~plugin:"Report"
     "print_csv"
-    (Datatype.func Datatype.string Datatype.unit)
+    (Datatype.func Filepath.ty Datatype.unit)
     output
 
 let print_csv_once () =
   let file = Report_parameters.CSVFile.get () in
   Report_parameters.feedback "Dumping properties in '%a'"
     Filepath.pretty file;
-  print_csv (file:>string)
+  print_csv file
 
 let print_csv, _ =
   State_builder.apply_once
