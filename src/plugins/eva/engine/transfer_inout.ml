@@ -69,7 +69,7 @@ module Make (Engine : Engine_sig.S) = struct
 
   let add_logic_assign aloc clause location =
     let written = Location.enumerate_valid_bits Write location in
-    Inout_access.add_write aloc written;
+    Inout_access.register_write aloc written;
     let read =
       match clause with
       | Assigns (_, from_deps) ->
@@ -85,17 +85,17 @@ module Make (Engine : Engine_sig.S) = struct
           from_deps
       | _ -> Locations.Zone.bottom
     in
-    Inout_access.add_read aloc read
+    Inout_access.register_read aloc read
 
   let find_loc valuation = Eval.Valuation.find_loc_def valuation
 
   let add_assign_lval aloc valuation lval exp =
     let to_loc = find_loc valuation in
     let written_zone, lv_indirect_zone = compute_zones to_loc lval in
-    Inout_access.add_write aloc written_zone;
+    Inout_access.register_write aloc written_zone;
     let exp_zone = EvaAstDeps.zone_of_exp to_loc exp in
     let read_zone = Locations.Zone.join lv_indirect_zone exp_zone in
-    Inout_access.add_read aloc read_zone
+    Inout_access.register_read aloc read_zone
 
   let add_assign_var aloc valuation vi exp =
     let lval = Eva_ast.Build.var vi in
@@ -104,7 +104,7 @@ module Make (Engine : Engine_sig.S) = struct
   let add_read_exp aloc valuation exp =
     let to_loc = find_loc valuation in
     let read_zone = EvaAstDeps.zone_of_exp to_loc exp in
-    Inout_access.add_read aloc read_zone
+    Inout_access.register_read aloc read_zone
 
   let add_call_args aloc valuation call =
     (* Register read and written zone for named arguments. *)

@@ -24,19 +24,39 @@
 
     The data is projectified and depends on the analysis state. *)
 
-(** Represents read and written memory zones. *)
-type t = {
+(** Represents a read and write access. *)
+type t = private {
   read : Locations.Zone.t;
-  written : Locations.Zone.t;
+  write : Locations.Zone.t;
 }
 
-val add_read : Analysis_location.t -> Locations.Zone.t -> unit
-(** [add_read aloc zone] adds the given [zone] as a "read" memory location to
-    the given [aloc]. *)
+module Access : sig
+  include Lattice_type.Bounded_Join_Semi_Lattice with type t := t
 
-val add_write : Analysis_location.t -> Locations.Zone.t -> unit
-(** [add_write aloc zone] adds the given [zone] as a "written" memory location
-    to the given [aloc]. *)
+  val make : ?read:Locations.Zone.t -> ?write:Locations.Zone.t -> unit -> t
+  (** [make ?read ?write ()] creates an [access] with the given [read] and
+      [write] as read and written memory locations. *)
+
+  val add_read : Locations.Zone.t -> t -> t
+  (** [add_read zone access] adds [zone] to the read memory locations in
+      [access]. *)
+
+  val add_write : Locations.Zone.t -> t -> t
+  (** [add_write zone access] adds [zone] to the written memory locations in
+      [access]. *)
+end
+
+val register_read : Analysis_location.t -> Locations.Zone.t -> unit
+(** [register_read aloc zone] adds the given [zone] as a "read" memory location
+    at the given [aloc]. *)
+
+val register_write : Analysis_location.t -> Locations.Zone.t -> unit
+(** [register_write aloc zone] adds the given [zone] as a "written" memory
+    location at the given [aloc]. *)
+
+val register : Analysis_location.t -> t -> unit
+(** [register aloc access] adds the given [access] to the accesses at the
+    given [aloc]. *)
 
 val mk_filter : filter_base:(Base.base -> bool) -> (t -> t)
 (** [mk_filter ~filter_base] creates a filter function for the functions below
@@ -62,9 +82,6 @@ val fold : ?filter:(t -> t) ->
 (** [fold ?filter f acc] folds over all analysis location where a read or write
     access occurs and applies [f] on that access. The access is filtered by
     [filter] before being passed to [f]. *)
-
-val pretty_debug : Format.formatter -> t -> unit
-(** Pretty print read and written memory zones. *)
 
 val dump : ?filter:(t -> t) -> Format.formatter -> unit
 (** Dump the internal state regarding the read and written memory zones. The

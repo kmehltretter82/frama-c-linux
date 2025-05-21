@@ -294,7 +294,7 @@ struct
             let aloc = Analysis_location.of_stmt stmt in
             let filter = Inout_access.keep_globals_only in
             let accesses = Inout_access.at ~filter aloc in
-            let zone = Locations.Zone.join accesses.read accesses.written in
+            let zone = Locations.Zone.join accesses.read accesses.write in
             match Locations.Zone.get_bases zone with
             | Top ->
               (* Shared memory is Top, always inject *)

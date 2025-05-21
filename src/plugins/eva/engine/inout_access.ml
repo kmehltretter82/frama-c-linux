@@ -22,42 +22,54 @@
 
 type t = {
   read : Locations.Zone.t;
-  written : Locations.Zone.t;
+  write : Locations.Zone.t;
 }
 
 module Access = struct
   include Datatype.Make(struct
       type nonrec t = t
-      let name = "Eva.Variables.Access"
+      let name = "Eva.Inout_access.Access"
       let reprs =
         List.fold_left
           (fun acc read ->
              List.fold_left
-               (fun acc written ->
-                  { read ; written } :: acc)
+               (fun acc write ->
+                  { read ; write } :: acc)
                acc
                Locations.Zone.reprs)
           []
           Locations.Zone.reprs
       include Datatype.Serializable_undefined
+      let pretty fmt access =
+        Format.fprintf fmt "@[{ read: %a;@ write: %a; }@]"
+          Locations.Zone.pretty access.read
+          Locations.Zone.pretty access.write
     end)
-  let bottom = { read = Locations.Zone.bottom; written = Locations.Zone.bottom }
+  let bottom = { read = Locations.Zone.bottom; write = Locations.Zone.bottom }
 
   let is_bottom access =
     Locations.Zone.is_bottom access.read &&
-    Locations.Zone.is_bottom access.written
+    Locations.Zone.is_bottom access.write
+
+  let is_included l r =
+    Locations.Zone.is_included l.read r.read
+    && Locations.Zone.is_included l.write r.write
+
+  let join l r =
+    { read = Locations.Zone.join l.read r.read;
+      write = Locations.Zone.join l.write r.write }
+
+  let make ?read ?write () =
+    let default = Locations.Zone.bottom in
+    { read = Option.value ~default read;
+      write = Option.value ~default write; }
 
   let add_read zone access =
     { access with read = Locations.Zone.join access.read zone }
 
   let add_write zone access =
-    { access with written = Locations.Zone.join access.written zone }
+    { access with write = Locations.Zone.join access.write zone }
 end
-
-let pretty_debug fmt access =
-  Format.fprintf fmt "@[{ read: %a;@ written: %a; }@]"
-    Locations.Zone.pretty access.read
-    Locations.Zone.pretty access.written
 
 module Cache : sig
   (** Get read/written memory zones for an analysis location. *)
@@ -102,20 +114,23 @@ end = struct
          if not @@ Access.is_bottom access then
            Format.fprintf fmt ">>> %a: %a"
              Analysis_location.pretty aloc
-             pretty_debug access)
+             Access.pretty access)
 end
 
-let add_read aloc zone =
+let register_read aloc zone =
   Cache.change aloc (Access.add_read zone)
 
-let add_write aloc zone =
+let register_write aloc zone =
   Cache.change aloc (Access.add_write zone)
+
+let register aloc access =
+  Cache.change aloc (Access.join access)
 
 let mk_filter ~filter_base =
   let filter_zone = Locations.Zone.filter_base filter_base in
   (fun access ->
      { read = filter_zone access.read;
-       written = filter_zone access.written })
+       write = filter_zone access.write })
 let keep_globals_only = mk_filter ~filter_base:Base.is_global
 
 let at ?(filter=Fun.id) aloc = Cache.get aloc |> filter

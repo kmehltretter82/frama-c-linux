@@ -127,7 +127,7 @@ let read_written_by_thread ?(watch_only=Locations.Zone.top) sm th =
          if sm stmt then
            acc
            |> add stmt (ReadAloc aloc) memory.read
-           |> add stmt (WriteAloc aloc) memory.written
+           |> add stmt (WriteAloc aloc) memory.write
          else
            acc)
     AccessesByZone.empty_map

@@ -34,7 +34,7 @@ let concurrent_writes shared_bases =
          given statement? (can be done directly by Inout_access). *)
       let filter = Inout_access.keep_globals_only in
       let accesses = Inout_access.at ~filter aloc in
-      let written_bases = Locations.Zone.get_bases accesses.written in
+      let written_bases = Locations.Zone.get_bases accesses.write in
       if Base.SetLattice.(intersects (inject shared_bases) written_bases)
       then ALoc.Local.Set.add (stmt, cs) acc
       else acc
