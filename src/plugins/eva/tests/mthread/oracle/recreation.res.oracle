@@ -37,10 +37,11 @@
       pthread_create :: recreation.c:66 <- main
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread <main>
+    concurrent writes:
+    shared bases: {}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] ******* Starting to iterate
@@ -65,10 +66,11 @@
       pthread_create :: recreation.c:25 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread jobs[0]
+    concurrent writes:
+    shared bases: {}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[0] computed
@@ -92,10 +94,11 @@
       pthread_create :: recreation.c:25 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread jobs[1]
+    concurrent writes:
+    shared bases: {}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[1] computed
@@ -119,10 +122,11 @@
       pthread_create :: recreation.c:25 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread jobs[2]
+    concurrent writes:
+    shared bases: {}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[2] computed
@@ -174,10 +178,11 @@
       pthread_mutex_unlock :: recreation.c:49 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread jobs[3]
+    concurrent writes:
+    shared bases: {}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[3] computed
@@ -214,10 +219,11 @@
       pthread_mutex_unlock :: recreation.c:49 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread jobs[4]
+    concurrent writes:
+    shared bases: {}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[4] computed
@@ -254,10 +260,11 @@
       pthread_mutex_unlock :: recreation.c:49 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread jobs[5]
+    concurrent writes:
+    shared bases: {}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[5] computed
@@ -294,10 +301,11 @@
       pthread_mutex_unlock :: recreation.c:49 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread jobs[6]
+    concurrent writes:
+    shared bases: {}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[6] computed
@@ -334,10 +342,11 @@
       pthread_mutex_unlock :: recreation.c:49 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread jobs[7]
+    concurrent writes:
+    shared bases: {}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[7] computed
@@ -374,10 +383,11 @@
       pthread_mutex_unlock :: recreation.c:49 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread jobs[8]
+    concurrent writes:
+    shared bases: {}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[8] computed
@@ -414,10 +424,11 @@
       pthread_mutex_unlock :: recreation.c:49 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread jobs[9]
+    concurrent writes:
+    shared bases: {}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[9] computed
@@ -454,10 +465,11 @@
       pthread_mutex_unlock :: recreation.c:49 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread jobs[10]
+    concurrent writes:
+    shared bases: {}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[10] computed
@@ -499,10 +511,11 @@
       pthread_mutex_unlock :: recreation.c:48 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread jobs[11]
+    concurrent writes:
+    shared bases: {}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[11] computed
@@ -555,10 +568,11 @@
       pthread_create :: recreation.c:66 <- main
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {end}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread <main>
+    concurrent writes:
+    shared bases: {end}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
@@ -584,10 +598,11 @@
       pthread_create :: recreation.c:25 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {end}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread jobs[0]
+    concurrent writes:
+    shared bases: {end}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[0] computed
@@ -613,10 +628,11 @@
       pthread_create :: recreation.c:25 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {end}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread jobs[1]
+    concurrent writes:
+    shared bases: {end}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[1] computed
@@ -642,10 +658,11 @@
       pthread_create :: recreation.c:25 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {end}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread jobs[2]
+    concurrent writes:
+    shared bases: {end}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[2] computed
@@ -684,15 +701,16 @@
       pthread_mutex_unlock :: recreation.c:49 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    end = 1; recreation.c:40 <- job
-  shared bases: {end}
-  interferences by location:
-    recreation.c:40:
-      # cvalue: end ∈ {1} 
-  interferences by mutexes:
-    { locks[2]; locks[4] }:
-      # cvalue: end ∈ {1}
+  Interferences from thread jobs[3]
+    concurrent writes:
+      end = 1; recreation.c:40 <- job
+    shared bases: {end}
+    interferences by location:
+      recreation.c:40:
+        # cvalue: end ∈ {1} 
+    interferences by mutexes:
+      { locks[2]; locks[4] }:
+        # cvalue: end ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[3] computed
@@ -731,15 +749,16 @@
       pthread_mutex_unlock :: recreation.c:49 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    end = 1; recreation.c:40 <- job
-  shared bases: {end}
-  interferences by location:
-    recreation.c:40:
-      # cvalue: end ∈ {1} 
-  interferences by mutexes:
-    { locks[3]; locks[5] }:
-      # cvalue: end ∈ {1}
+  Interferences from thread jobs[4]
+    concurrent writes:
+      end = 1; recreation.c:40 <- job
+    shared bases: {end}
+    interferences by location:
+      recreation.c:40:
+        # cvalue: end ∈ {1} 
+    interferences by mutexes:
+      { locks[3]; locks[5] }:
+        # cvalue: end ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[4] computed
@@ -778,15 +797,16 @@
       pthread_mutex_unlock :: recreation.c:49 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    end = 1; recreation.c:40 <- job
-  shared bases: {end}
-  interferences by location:
-    recreation.c:40:
-      # cvalue: end ∈ {1} 
-  interferences by mutexes:
-    { locks[4]; locks[6] }:
-      # cvalue: end ∈ {1}
+  Interferences from thread jobs[5]
+    concurrent writes:
+      end = 1; recreation.c:40 <- job
+    shared bases: {end}
+    interferences by location:
+      recreation.c:40:
+        # cvalue: end ∈ {1} 
+    interferences by mutexes:
+      { locks[4]; locks[6] }:
+        # cvalue: end ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[5] computed
@@ -825,15 +845,16 @@
       pthread_mutex_unlock :: recreation.c:49 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    end = 1; recreation.c:40 <- job
-  shared bases: {end}
-  interferences by location:
-    recreation.c:40:
-      # cvalue: end ∈ {1} 
-  interferences by mutexes:
-    { locks[5]; locks[7] }:
-      # cvalue: end ∈ {1}
+  Interferences from thread jobs[6]
+    concurrent writes:
+      end = 1; recreation.c:40 <- job
+    shared bases: {end}
+    interferences by location:
+      recreation.c:40:
+        # cvalue: end ∈ {1} 
+    interferences by mutexes:
+      { locks[5]; locks[7] }:
+        # cvalue: end ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[6] computed
@@ -872,15 +893,16 @@
       pthread_mutex_unlock :: recreation.c:49 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    end = 1; recreation.c:40 <- job
-  shared bases: {end}
-  interferences by location:
-    recreation.c:40:
-      # cvalue: end ∈ {1} 
-  interferences by mutexes:
-    { locks[6]; locks[8] }:
-      # cvalue: end ∈ {1}
+  Interferences from thread jobs[7]
+    concurrent writes:
+      end = 1; recreation.c:40 <- job
+    shared bases: {end}
+    interferences by location:
+      recreation.c:40:
+        # cvalue: end ∈ {1} 
+    interferences by mutexes:
+      { locks[6]; locks[8] }:
+        # cvalue: end ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[7] computed
@@ -919,15 +941,16 @@
       pthread_mutex_unlock :: recreation.c:49 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    end = 1; recreation.c:40 <- job
-  shared bases: {end}
-  interferences by location:
-    recreation.c:40:
-      # cvalue: end ∈ {1} 
-  interferences by mutexes:
-    { locks[7]; locks[9] }:
-      # cvalue: end ∈ {1}
+  Interferences from thread jobs[8]
+    concurrent writes:
+      end = 1; recreation.c:40 <- job
+    shared bases: {end}
+    interferences by location:
+      recreation.c:40:
+        # cvalue: end ∈ {1} 
+    interferences by mutexes:
+      { locks[7]; locks[9] }:
+        # cvalue: end ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[8] computed
@@ -966,15 +989,16 @@
       pthread_mutex_unlock :: recreation.c:49 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    end = 1; recreation.c:40 <- job
-  shared bases: {end}
-  interferences by location:
-    recreation.c:40:
-      # cvalue: end ∈ {1} 
-  interferences by mutexes:
-    { locks[8]; locks[10] }:
-      # cvalue: end ∈ {1}
+  Interferences from thread jobs[9]
+    concurrent writes:
+      end = 1; recreation.c:40 <- job
+    shared bases: {end}
+    interferences by location:
+      recreation.c:40:
+        # cvalue: end ∈ {1} 
+    interferences by mutexes:
+      { locks[8]; locks[10] }:
+        # cvalue: end ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[9] computed
@@ -1013,15 +1037,16 @@
       pthread_mutex_unlock :: recreation.c:49 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    end = 1; recreation.c:40 <- job
-  shared bases: {end}
-  interferences by location:
-    recreation.c:40:
-      # cvalue: end ∈ {1} 
-  interferences by mutexes:
-    { locks[9]; locks[11] }:
-      # cvalue: end ∈ {1}
+  Interferences from thread jobs[10]
+    concurrent writes:
+      end = 1; recreation.c:40 <- job
+    shared bases: {end}
+    interferences by location:
+      recreation.c:40:
+        # cvalue: end ∈ {1} 
+    interferences by mutexes:
+      { locks[9]; locks[11] }:
+        # cvalue: end ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[10] computed
@@ -1065,15 +1090,16 @@
       pthread_mutex_unlock :: recreation.c:48 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    end = 1; recreation.c:40 <- job
-  shared bases: {end}
-  interferences by location:
-    recreation.c:40:
-      # cvalue: end ∈ {1} 
-  interferences by mutexes:
-    { locks[0]; locks[10] }:
-      # cvalue: end ∈ {1}
+  Interferences from thread jobs[11]
+    concurrent writes:
+      end = 1; recreation.c:40 <- job
+    shared bases: {end}
+    interferences by location:
+      recreation.c:40:
+        # cvalue: end ∈ {1} 
+    interferences by mutexes:
+      { locks[0]; locks[10] }:
+        # cvalue: end ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[11] computed
@@ -1208,10 +1234,11 @@
       pthread_create :: recreation.c:66 <- main
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {end}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread <main>
+    concurrent writes:
+    shared bases: {end}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
@@ -1239,10 +1266,11 @@
       pthread_create :: recreation.c:25 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {end}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread jobs[0]
+    concurrent writes:
+    shared bases: {end}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[0] computed
@@ -1272,10 +1300,11 @@
       pthread_create :: recreation.c:25 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {end}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread jobs[1]
+    concurrent writes:
+    shared bases: {end}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[1] computed
@@ -1307,10 +1336,11 @@
       pthread_create :: recreation.c:25 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {end}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread jobs[2]
+    concurrent writes:
+    shared bases: {end}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[2] computed
@@ -1348,15 +1378,16 @@
       pthread_mutex_unlock :: recreation.c:49 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    end = 1; recreation.c:40 <- job
-  shared bases: {end}
-  interferences by location:
-    recreation.c:40:
-      # cvalue: end ∈ {1} 
-  interferences by mutexes:
-    { locks[2]; locks[4] }:
-      # cvalue: end ∈ {1}
+  Interferences from thread jobs[3]
+    concurrent writes:
+      end = 1; recreation.c:40 <- job
+    shared bases: {end}
+    interferences by location:
+      recreation.c:40:
+        # cvalue: end ∈ {1} 
+    interferences by mutexes:
+      { locks[2]; locks[4] }:
+        # cvalue: end ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[3] computed
@@ -1395,15 +1426,16 @@
       pthread_mutex_unlock :: recreation.c:49 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    end = 1; recreation.c:40 <- job
-  shared bases: {end}
-  interferences by location:
-    recreation.c:40:
-      # cvalue: end ∈ {1} 
-  interferences by mutexes:
-    { locks[3]; locks[5] }:
-      # cvalue: end ∈ {1}
+  Interferences from thread jobs[4]
+    concurrent writes:
+      end = 1; recreation.c:40 <- job
+    shared bases: {end}
+    interferences by location:
+      recreation.c:40:
+        # cvalue: end ∈ {1} 
+    interferences by mutexes:
+      { locks[3]; locks[5] }:
+        # cvalue: end ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[4] computed
@@ -1442,15 +1474,16 @@
       pthread_mutex_unlock :: recreation.c:49 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    end = 1; recreation.c:40 <- job
-  shared bases: {end}
-  interferences by location:
-    recreation.c:40:
-      # cvalue: end ∈ {1} 
-  interferences by mutexes:
-    { locks[4]; locks[6] }:
-      # cvalue: end ∈ {1}
+  Interferences from thread jobs[5]
+    concurrent writes:
+      end = 1; recreation.c:40 <- job
+    shared bases: {end}
+    interferences by location:
+      recreation.c:40:
+        # cvalue: end ∈ {1} 
+    interferences by mutexes:
+      { locks[4]; locks[6] }:
+        # cvalue: end ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[5] computed
@@ -1489,15 +1522,16 @@
       pthread_mutex_unlock :: recreation.c:49 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    end = 1; recreation.c:40 <- job
-  shared bases: {end}
-  interferences by location:
-    recreation.c:40:
-      # cvalue: end ∈ {1} 
-  interferences by mutexes:
-    { locks[5]; locks[7] }:
-      # cvalue: end ∈ {1}
+  Interferences from thread jobs[6]
+    concurrent writes:
+      end = 1; recreation.c:40 <- job
+    shared bases: {end}
+    interferences by location:
+      recreation.c:40:
+        # cvalue: end ∈ {1} 
+    interferences by mutexes:
+      { locks[5]; locks[7] }:
+        # cvalue: end ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[6] computed
@@ -1536,15 +1570,16 @@
       pthread_mutex_unlock :: recreation.c:49 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    end = 1; recreation.c:40 <- job
-  shared bases: {end}
-  interferences by location:
-    recreation.c:40:
-      # cvalue: end ∈ {1} 
-  interferences by mutexes:
-    { locks[6]; locks[8] }:
-      # cvalue: end ∈ {1}
+  Interferences from thread jobs[7]
+    concurrent writes:
+      end = 1; recreation.c:40 <- job
+    shared bases: {end}
+    interferences by location:
+      recreation.c:40:
+        # cvalue: end ∈ {1} 
+    interferences by mutexes:
+      { locks[6]; locks[8] }:
+        # cvalue: end ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[7] computed
@@ -1583,15 +1618,16 @@
       pthread_mutex_unlock :: recreation.c:49 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    end = 1; recreation.c:40 <- job
-  shared bases: {end}
-  interferences by location:
-    recreation.c:40:
-      # cvalue: end ∈ {1} 
-  interferences by mutexes:
-    { locks[7]; locks[9] }:
-      # cvalue: end ∈ {1}
+  Interferences from thread jobs[8]
+    concurrent writes:
+      end = 1; recreation.c:40 <- job
+    shared bases: {end}
+    interferences by location:
+      recreation.c:40:
+        # cvalue: end ∈ {1} 
+    interferences by mutexes:
+      { locks[7]; locks[9] }:
+        # cvalue: end ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[8] computed
@@ -1630,15 +1666,16 @@
       pthread_mutex_unlock :: recreation.c:49 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    end = 1; recreation.c:40 <- job
-  shared bases: {end}
-  interferences by location:
-    recreation.c:40:
-      # cvalue: end ∈ {1} 
-  interferences by mutexes:
-    { locks[8]; locks[10] }:
-      # cvalue: end ∈ {1}
+  Interferences from thread jobs[9]
+    concurrent writes:
+      end = 1; recreation.c:40 <- job
+    shared bases: {end}
+    interferences by location:
+      recreation.c:40:
+        # cvalue: end ∈ {1} 
+    interferences by mutexes:
+      { locks[8]; locks[10] }:
+        # cvalue: end ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[9] computed
@@ -1677,15 +1714,16 @@
       pthread_mutex_unlock :: recreation.c:49 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    end = 1; recreation.c:40 <- job
-  shared bases: {end}
-  interferences by location:
-    recreation.c:40:
-      # cvalue: end ∈ {1} 
-  interferences by mutexes:
-    { locks[9]; locks[11] }:
-      # cvalue: end ∈ {1}
+  Interferences from thread jobs[10]
+    concurrent writes:
+      end = 1; recreation.c:40 <- job
+    shared bases: {end}
+    interferences by location:
+      recreation.c:40:
+        # cvalue: end ∈ {1} 
+    interferences by mutexes:
+      { locks[9]; locks[11] }:
+        # cvalue: end ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[10] computed
@@ -1729,15 +1767,16 @@
       pthread_mutex_unlock :: recreation.c:48 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    end = 1; recreation.c:40 <- job
-  shared bases: {end}
-  interferences by location:
-    recreation.c:40:
-      # cvalue: end ∈ {1} 
-  interferences by mutexes:
-    { locks[0]; locks[10] }:
-      # cvalue: end ∈ {1}
+  Interferences from thread jobs[11]
+    concurrent writes:
+      end = 1; recreation.c:40 <- job
+    shared bases: {end}
+    interferences by location:
+      recreation.c:40:
+        # cvalue: end ∈ {1} 
+    interferences by mutexes:
+      { locks[0]; locks[10] }:
+        # cvalue: end ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[11] computed

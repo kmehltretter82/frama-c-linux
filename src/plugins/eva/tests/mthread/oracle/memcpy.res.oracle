@@ -45,10 +45,11 @@
   d: write by <main> at memcpy.c:43 <- main
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread <main>
+    concurrent writes:
+    shared bases: {}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] ******* Starting to iterate
@@ -63,10 +64,11 @@
 [mt] Globals accessed by thread:
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread tjob0
+    concurrent writes:
+    shared bases: {}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread tjob0 computed
@@ -82,10 +84,11 @@
   c: read by tjob1 at memcpy.c:26 <- job1
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread tjob1
+    concurrent writes:
+    shared bases: {}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread tjob1 computed
@@ -101,10 +104,11 @@
   d: read by tjob2 at memcpy.c:31 <- job2
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread tjob2
+    concurrent writes:
+    shared bases: {}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread tjob2 computed
@@ -165,51 +169,52 @@
   d: write by <main> at memcpy.c:43 <- main
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    memcpy((void *)(& a),(void *)(& x),sizeof(int)); memcpy.c:40 <- main
-    memcpy((void *)(& b),(void *)(& x),sizeof(int)); memcpy.c:41 <- main
-    memcpy((void *)(& c),(void *)(& x),sizeof(int)); memcpy.c:42 <- main
-    memcpy((void *)(& d),(void *)(& x),sizeof(int)); memcpy.c:43 <- main
-    memcpy((void *)(& a),(void *)(& x),sizeof(int)); memcpy.c:48 <- main
-    memcpy((void *)(& b),(void *)(& x),sizeof(int)); memcpy.c:49 <- main
-  shared bases: {a, b, c, d}
-  interferences by location:
-    memcpy.c:40:
-      # cvalue: a ∈ {3}
-                b ∈ {0}
-                c ∈ {0}
-                d ∈ {0} 
-    memcpy.c:41:
-      # cvalue: a ∈ {3}
-                b ∈ {3}
-                c ∈ {0}
-                d ∈ {0} 
-    memcpy.c:42:
-      # cvalue: a ∈ {3}
-                b ∈ {3}
-                c ∈ {3}
-                d ∈ {0} 
-    memcpy.c:43:
-      # cvalue: a ∈ {3}
-                b ∈ {3}
-                c ∈ {3}
-                d ∈ {3} 
-    memcpy.c:48:
-      # cvalue: a ∈ {3}
-                b ∈ {3}
-                c ∈ {3}
-                d ∈ {3} 
-    memcpy.c:49:
-      # cvalue: a ∈ {3}
-                b ∈ {3}
-                c ∈ {3}
-                d ∈ {3} 
-  interferences by mutexes:
-    {  }:
-      # cvalue: a ∈ {3}
-                b ∈ {0; 3}
-                c ∈ {0; 3}
-                d ∈ {0; 3}
+  Interferences from thread <main>
+    concurrent writes:
+      memcpy((void *)(& a),(void *)(& x),sizeof(int)); memcpy.c:40 <- main
+      memcpy((void *)(& b),(void *)(& x),sizeof(int)); memcpy.c:41 <- main
+      memcpy((void *)(& c),(void *)(& x),sizeof(int)); memcpy.c:42 <- main
+      memcpy((void *)(& d),(void *)(& x),sizeof(int)); memcpy.c:43 <- main
+      memcpy((void *)(& a),(void *)(& x),sizeof(int)); memcpy.c:48 <- main
+      memcpy((void *)(& b),(void *)(& x),sizeof(int)); memcpy.c:49 <- main
+    shared bases: {a, b, c, d}
+    interferences by location:
+      memcpy.c:40:
+        # cvalue: a ∈ {3}
+                  b ∈ {0}
+                  c ∈ {0}
+                  d ∈ {0} 
+      memcpy.c:41:
+        # cvalue: a ∈ {3}
+                  b ∈ {3}
+                  c ∈ {0}
+                  d ∈ {0} 
+      memcpy.c:42:
+        # cvalue: a ∈ {3}
+                  b ∈ {3}
+                  c ∈ {3}
+                  d ∈ {0} 
+      memcpy.c:43:
+        # cvalue: a ∈ {3}
+                  b ∈ {3}
+                  c ∈ {3}
+                  d ∈ {3} 
+      memcpy.c:48:
+        # cvalue: a ∈ {3}
+                  b ∈ {3}
+                  c ∈ {3}
+                  d ∈ {3} 
+      memcpy.c:49:
+        # cvalue: a ∈ {3}
+                  b ∈ {3}
+                  c ∈ {3}
+                  d ∈ {3} 
+    interferences by mutexes:
+      {  }:
+        # cvalue: a ∈ {3}
+                  b ∈ {0; 3}
+                  c ∈ {0; 3}
+                  d ∈ {0; 3}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
@@ -223,10 +228,11 @@
 [mt] Globals accessed by thread:
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {a, b, c, d}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread tjob0
+    concurrent writes:
+    shared bases: {a, b, c, d}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread tjob0 computed
@@ -244,10 +250,11 @@
   c: read by tjob1 at memcpy.c:26 <- job1
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {a, b, c, d}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread tjob1
+    concurrent writes:
+    shared bases: {a, b, c, d}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread tjob1 computed
@@ -265,10 +272,11 @@
   d: read by tjob2 at memcpy.c:31 <- job2
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {a, b, c, d}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread tjob2
+    concurrent writes:
+    shared bases: {a, b, c, d}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread tjob2 computed
@@ -321,10 +329,11 @@
   c: read by tjob1 at memcpy.c:26 <- job1
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {a, b, c, d}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread tjob1
+    concurrent writes:
+    shared bases: {a, b, c, d}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread tjob1 computed
@@ -341,10 +350,11 @@
   d: read by tjob2 at memcpy.c:31 <- job2
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {a, b, c, d}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread tjob2
+    concurrent writes:
+    shared bases: {a, b, c, d}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread tjob2 computed

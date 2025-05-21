@@ -36,10 +36,11 @@
       main
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread <main>
+    concurrent writes:
+    shared bases: {}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] unhandled_calls.c:42: User Error: 
   simultaneous call to a mthread function and to another function: very

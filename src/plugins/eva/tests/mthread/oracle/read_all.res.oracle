@@ -34,10 +34,11 @@
   r: write by <main> at read_all.c:29 <- main
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread <main>
+    concurrent writes:
+    shared bases: {}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] ******* Starting to iterate
@@ -62,10 +63,11 @@
   r: write by jobs at read_all.c:19 <- f
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread jobs
+    concurrent writes:
+    shared bases: {}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs computed
@@ -114,15 +116,16 @@
   r: write by <main> at read_all.c:29 <- main
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    r = g(); read_all.c:29 <- main
-  shared bases: {r}
-  interferences by location:
-    read_all.c:29:
-      # cvalue: r ∈ [--..--] 
-  interferences by mutexes:
-    {  }:
-      # cvalue: r ∈ [--..--]
+  Interferences from thread <main>
+    concurrent writes:
+      r = g(); read_all.c:29 <- main
+    shared bases: {r}
+    interferences by location:
+      read_all.c:29:
+        # cvalue: r ∈ [--..--] 
+    interferences by mutexes:
+      {  }:
+        # cvalue: r ∈ [--..--]
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
@@ -148,15 +151,16 @@
   r: write by jobs at read_all.c:19 <- f
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    g(); read_all.c:19 <- f
-  shared bases: {r}
-  interferences by location:
-    read_all.c:19:
-      # cvalue: r ∈ [--..--] 
-  interferences by mutexes:
-    {  }:
-      # cvalue: r ∈ [--..--]
+  Interferences from thread jobs
+    concurrent writes:
+      g(); read_all.c:19 <- f
+    shared bases: {r}
+    interferences by location:
+      read_all.c:19:
+        # cvalue: r ∈ [--..--] 
+    interferences by mutexes:
+      {  }:
+        # cvalue: r ∈ [--..--]
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs computed
@@ -216,15 +220,16 @@
   r: write by <main> at read_all.c:29 <- main
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    r = g(); read_all.c:29 <- main
-  shared bases: {r}
-  interferences by location:
-    read_all.c:29:
-      # cvalue: r ∈ [--..--] 
-  interferences by mutexes:
-    {  }:
-      # cvalue: r ∈ [--..--]
+  Interferences from thread <main>
+    concurrent writes:
+      r = g(); read_all.c:29 <- main
+    shared bases: {r}
+    interferences by location:
+      read_all.c:29:
+        # cvalue: r ∈ [--..--] 
+    interferences by mutexes:
+      {  }:
+        # cvalue: r ∈ [--..--]
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed

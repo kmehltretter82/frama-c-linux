@@ -226,10 +226,12 @@ struct
       ALoc.Set.iter (pp fmt) set
     in
     Self.debug ~dkey
-      "@[<v 2>concurrent writes:%a@]@.\
-       @[<hov 2>shared bases:@ %a@]@.\
-       @[<v 2>interferences by location:%a@]@.\
-       @[<v 2>interferences by mutexes:%a@]@."
+      "@[<v 2>Interferences from thread %a@ \
+       @[<v 2>concurrent writes:%a@]@ \
+       @[<hov 2>shared bases:@ %a@]@ \
+       @[<v 2>interferences by location:%a@]@ \
+       @[<v 2>interferences by mutexes:%a@]@]"
+      Thread.pretty thread
       pp_write_set concurrent_writes
       Base.Hptset.pretty shared_bases
       ByAnalysisLocation.pretty new_states_by_aloc

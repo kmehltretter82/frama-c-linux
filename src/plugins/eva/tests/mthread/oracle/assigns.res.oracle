@@ -25,10 +25,11 @@
       pthread_create :: assigns.c:31 <- main
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread <main>
+    concurrent writes:
+    shared bases: {}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] ******* Starting to iterate
@@ -46,10 +47,11 @@
   b: read by jobs1 at assigns.c:20 <- f1
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread jobs1
+    concurrent writes:
+    shared bases: {}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs1 computed
@@ -66,10 +68,11 @@
   b: write by jobs2 at assigns.c:25 <- f2
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread jobs2
+    concurrent writes:
+    shared bases: {}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs2 computed
@@ -110,10 +113,11 @@
       pthread_create :: assigns.c:31 <- main
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {a, b}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread <main>
+    concurrent writes:
+    shared bases: {a, b}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
@@ -132,17 +136,18 @@
   b: read by jobs1 at assigns.c:20 <- f1
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    g1(); assigns.c:20 <- f1
-  shared bases: {a, b}
-  interferences by location:
-    assigns.c:20:
-      # cvalue: a ∈ [--..--]
-                b ∈ {0} 
-  interferences by mutexes:
-    {  }:
-      # cvalue: a ∈ [--..--]
-                b ∈ {0}
+  Interferences from thread jobs1
+    concurrent writes:
+      g1(); assigns.c:20 <- f1
+    shared bases: {a, b}
+    interferences by location:
+      assigns.c:20:
+        # cvalue: a ∈ [--..--]
+                  b ∈ {0} 
+    interferences by mutexes:
+      {  }:
+        # cvalue: a ∈ [--..--]
+                  b ∈ {0}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs1 computed
@@ -161,17 +166,18 @@
   b: write by jobs2 at assigns.c:25 <- f2
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    g2(); assigns.c:25 <- f2
-  shared bases: {a, b}
-  interferences by location:
-    assigns.c:25:
-      # cvalue: a ∈ [--..--]
-                b ∈ [--..--] 
-  interferences by mutexes:
-    {  }:
-      # cvalue: a ∈ [--..--]
-                b ∈ [--..--]
+  Interferences from thread jobs2
+    concurrent writes:
+      g2(); assigns.c:25 <- f2
+    shared bases: {a, b}
+    interferences by location:
+      assigns.c:25:
+        # cvalue: a ∈ [--..--]
+                  b ∈ [--..--] 
+    interferences by mutexes:
+      {  }:
+        # cvalue: a ∈ [--..--]
+                  b ∈ [--..--]
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs2 computed
@@ -231,10 +237,11 @@
       pthread_create :: assigns.c:31 <- main
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {a, b}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread <main>
+    concurrent writes:
+    shared bases: {a, b}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
@@ -253,17 +260,18 @@
   b: read by jobs1 at assigns.c:20 <- f1
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    g1(); assigns.c:20 <- f1
-  shared bases: {a, b}
-  interferences by location:
-    assigns.c:20:
-      # cvalue: a ∈ [--..--]
-                b ∈ [--..--] 
-  interferences by mutexes:
-    {  }:
-      # cvalue: a ∈ [--..--]
-                b ∈ [--..--]
+  Interferences from thread jobs1
+    concurrent writes:
+      g1(); assigns.c:20 <- f1
+    shared bases: {a, b}
+    interferences by location:
+      assigns.c:20:
+        # cvalue: a ∈ [--..--]
+                  b ∈ [--..--] 
+    interferences by mutexes:
+      {  }:
+        # cvalue: a ∈ [--..--]
+                  b ∈ [--..--]
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs1 computed
@@ -283,17 +291,18 @@
   b: write by jobs2 at assigns.c:25 <- f2
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    g2(); assigns.c:25 <- f2
-  shared bases: {a, b}
-  interferences by location:
-    assigns.c:25:
-      # cvalue: a ∈ [--..--]
-                b ∈ [--..--] 
-  interferences by mutexes:
-    {  }:
-      # cvalue: a ∈ [--..--]
-                b ∈ [--..--]
+  Interferences from thread jobs2
+    concurrent writes:
+      g2(); assigns.c:25 <- f2
+    shared bases: {a, b}
+    interferences by location:
+      assigns.c:25:
+        # cvalue: a ∈ [--..--]
+                  b ∈ [--..--] 
+    interferences by mutexes:
+      {  }:
+        # cvalue: a ∈ [--..--]
+                  b ∈ [--..--]
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs2 computed
@@ -348,10 +357,11 @@
       pthread_create :: assigns.c:31 <- main
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {a, b}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread <main>
+    concurrent writes:
+    shared bases: {a, b}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed

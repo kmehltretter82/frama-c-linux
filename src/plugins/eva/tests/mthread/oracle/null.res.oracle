@@ -21,10 +21,11 @@
   v: read by <main> at null.c:25 <- main
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread <main>
+    concurrent writes:
+    shared bases: {}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] ******* Starting to iterate
@@ -42,10 +43,11 @@
   v: read by tjob0 at null.c:14 <- job0
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread tjob0
+    concurrent writes:
+    shared bases: {}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread tjob0 computed
@@ -82,10 +84,11 @@
   v: read by <main> at null.c:25 <- main
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {NULL}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread <main>
+    concurrent writes:
+    shared bases: {NULL}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
@@ -104,16 +107,17 @@
   v: read by tjob0 at null.c:14 <- job0
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    /*@ assert Eva: mem_access: \valid((char *)i); */
-    *((char *)i) = (char)1; null.c:15 <- job0
-  shared bases: {NULL}
-  interferences by location:
-    null.c:15:
-      # cvalue: NULL[rbits 800 to 1607] ∈ [--..--] 
-  interferences by mutexes:
-    {  }:
-      # cvalue: NULL[rbits 800 to 1607] ∈ [--..--]
+  Interferences from thread tjob0
+    concurrent writes:
+      /*@ assert Eva: mem_access: \valid((char *)i); */
+      *((char *)i) = (char)1; null.c:15 <- job0
+    shared bases: {NULL}
+    interferences by location:
+      null.c:15:
+        # cvalue: NULL[rbits 800 to 1607] ∈ [--..--] 
+    interferences by mutexes:
+      {  }:
+        # cvalue: NULL[rbits 800 to 1607] ∈ [--..--]
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread tjob0 computed
@@ -159,10 +163,11 @@
   v: read by <main> at null.c:25 <- main
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {NULL}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread <main>
+    concurrent writes:
+    shared bases: {NULL}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed

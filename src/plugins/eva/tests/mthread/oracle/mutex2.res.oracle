@@ -53,10 +53,11 @@
       pthread_mutex_unlock :: mutex2.c:61 <- main
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread <main>
+    concurrent writes:
+    shared bases: {}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] ******* Starting to iterate
@@ -79,10 +80,11 @@
       pthread_mutex_unlock :: mutex2.c:22 <- f1
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread jobs1
+    concurrent writes:
+    shared bases: {}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs1 computed
@@ -104,10 +106,11 @@
       pthread_mutex_unlock :: mutex2.c:29 <- f2
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread jobs2
+    concurrent writes:
+    shared bases: {}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs2 computed
@@ -122,10 +125,11 @@
   s2: write by jobs3 at mutex2.c:34 <- f3
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread jobs3
+    concurrent writes:
+    shared bases: {}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs3 computed
@@ -147,10 +151,11 @@
       pthread_mutex_unlock :: mutex2.c:42 <- f4
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread jobs4
+    concurrent writes:
+    shared bases: {}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs4 computed
@@ -219,10 +224,11 @@
       pthread_mutex_unlock :: mutex2.c:61 <- main
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {s1, s2}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread <main>
+    concurrent writes:
+    shared bases: {s1, s2}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
@@ -246,17 +252,18 @@
       pthread_mutex_unlock :: mutex2.c:22 <- f1
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    s1 = 1; mutex2.c:21 <- f1
-  shared bases: {s1, s2}
-  interferences by location:
-    mutex2.c:21:
-      # cvalue: s1 ∈ {1}
-                s2 ∈ {0} 
-  interferences by mutexes:
-    { m1 }:
-      # cvalue: s1 ∈ {1}
-                s2 ∈ {0}
+  Interferences from thread jobs1
+    concurrent writes:
+      s1 = 1; mutex2.c:21 <- f1
+    shared bases: {s1, s2}
+    interferences by location:
+      mutex2.c:21:
+        # cvalue: s1 ∈ {1}
+                  s2 ∈ {0} 
+    interferences by mutexes:
+      { m1 }:
+        # cvalue: s1 ∈ {1}
+                  s2 ∈ {0}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs1 computed
@@ -280,17 +287,18 @@
       pthread_mutex_unlock :: mutex2.c:29 <- f2
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    s1 = 2; mutex2.c:28 <- f2
-  shared bases: {s1, s2}
-  interferences by location:
-    mutex2.c:28:
-      # cvalue: s1 ∈ {1; 2}
-                s2 ∈ {0} 
-  interferences by mutexes:
-    { m2 }:
-      # cvalue: s1 ∈ {1; 2}
-                s2 ∈ {0}
+  Interferences from thread jobs2
+    concurrent writes:
+      s1 = 2; mutex2.c:28 <- f2
+    shared bases: {s1, s2}
+    interferences by location:
+      mutex2.c:28:
+        # cvalue: s1 ∈ {1; 2}
+                  s2 ∈ {0} 
+    interferences by mutexes:
+      { m2 }:
+        # cvalue: s1 ∈ {1; 2}
+                  s2 ∈ {0}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs2 computed
@@ -307,17 +315,18 @@
   s2: write by jobs3 at mutex2.c:34 <- f3
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    s2 = 3; mutex2.c:34 <- f3
-  shared bases: {s1, s2}
-  interferences by location:
-    mutex2.c:34:
-      # cvalue: s1 ∈ {0; 1; 2}
-                s2 ∈ {0; 3} 
-  interferences by mutexes:
-    {  }:
-      # cvalue: s1 ∈ {0; 1; 2}
-                s2 ∈ {0; 3}
+  Interferences from thread jobs3
+    concurrent writes:
+      s2 = 3; mutex2.c:34 <- f3
+    shared bases: {s1, s2}
+    interferences by location:
+      mutex2.c:34:
+        # cvalue: s1 ∈ {0; 1; 2}
+                  s2 ∈ {0; 3} 
+    interferences by mutexes:
+      {  }:
+        # cvalue: s1 ∈ {0; 1; 2}
+                  s2 ∈ {0; 3}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs3 computed
@@ -341,17 +350,18 @@
       pthread_mutex_unlock :: mutex2.c:42 <- f4
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    s2 = 3; mutex2.c:41 <- f4
-  shared bases: {s1, s2}
-  interferences by location:
-    mutex2.c:41:
-      # cvalue: s1 ∈ {0; 1; 2}
-                s2 ∈ {0; 3} 
-  interferences by mutexes:
-    { m2 }:
-      # cvalue: s1 ∈ {0; 1; 2}
-                s2 ∈ {0; 3}
+  Interferences from thread jobs4
+    concurrent writes:
+      s2 = 3; mutex2.c:41 <- f4
+    shared bases: {s1, s2}
+    interferences by location:
+      mutex2.c:41:
+        # cvalue: s1 ∈ {0; 1; 2}
+                  s2 ∈ {0; 3} 
+    interferences by mutexes:
+      { m2 }:
+        # cvalue: s1 ∈ {0; 1; 2}
+                  s2 ∈ {0; 3}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs4 computed
@@ -453,10 +463,11 @@
       pthread_mutex_unlock :: mutex2.c:61 <- main
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {s1, s2}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread <main>
+    concurrent writes:
+    shared bases: {s1, s2}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
@@ -479,17 +490,18 @@
       pthread_mutex_unlock :: mutex2.c:22 <- f1
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    s1 = 1; mutex2.c:21 <- f1
-  shared bases: {s1, s2}
-  interferences by location:
-    mutex2.c:21:
-      # cvalue: s1 ∈ {0; 1; 2}
-                s2 ∈ {0; 3} 
-  interferences by mutexes:
-    { m1 }:
-      # cvalue: s1 ∈ {0; 1; 2}
-                s2 ∈ {0; 3}
+  Interferences from thread jobs1
+    concurrent writes:
+      s1 = 1; mutex2.c:21 <- f1
+    shared bases: {s1, s2}
+    interferences by location:
+      mutex2.c:21:
+        # cvalue: s1 ∈ {0; 1; 2}
+                  s2 ∈ {0; 3} 
+    interferences by mutexes:
+      { m1 }:
+        # cvalue: s1 ∈ {0; 1; 2}
+                  s2 ∈ {0; 3}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs1 computed
@@ -513,17 +525,18 @@
       pthread_mutex_unlock :: mutex2.c:29 <- f2
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    s1 = 2; mutex2.c:28 <- f2
-  shared bases: {s1, s2}
-  interferences by location:
-    mutex2.c:28:
-      # cvalue: s1 ∈ {0; 1; 2}
-                s2 ∈ {0; 3} 
-  interferences by mutexes:
-    { m2 }:
-      # cvalue: s1 ∈ {0; 1; 2}
-                s2 ∈ {0; 3}
+  Interferences from thread jobs2
+    concurrent writes:
+      s1 = 2; mutex2.c:28 <- f2
+    shared bases: {s1, s2}
+    interferences by location:
+      mutex2.c:28:
+        # cvalue: s1 ∈ {0; 1; 2}
+                  s2 ∈ {0; 3} 
+    interferences by mutexes:
+      { m2 }:
+        # cvalue: s1 ∈ {0; 1; 2}
+                  s2 ∈ {0; 3}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs2 computed
@@ -540,17 +553,18 @@
   s2: write by jobs3 at mutex2.c:34 <- f3
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    s2 = 3; mutex2.c:34 <- f3
-  shared bases: {s1, s2}
-  interferences by location:
-    mutex2.c:34:
-      # cvalue: s1 ∈ {0; 1; 2}
-                s2 ∈ {0; 3} 
-  interferences by mutexes:
-    {  }:
-      # cvalue: s1 ∈ {0; 1; 2}
-                s2 ∈ {0; 3}
+  Interferences from thread jobs3
+    concurrent writes:
+      s2 = 3; mutex2.c:34 <- f3
+    shared bases: {s1, s2}
+    interferences by location:
+      mutex2.c:34:
+        # cvalue: s1 ∈ {0; 1; 2}
+                  s2 ∈ {0; 3} 
+    interferences by mutexes:
+      {  }:
+        # cvalue: s1 ∈ {0; 1; 2}
+                  s2 ∈ {0; 3}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs3 computed
@@ -574,17 +588,18 @@
       pthread_mutex_unlock :: mutex2.c:42 <- f4
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    s2 = 3; mutex2.c:41 <- f4
-  shared bases: {s1, s2}
-  interferences by location:
-    mutex2.c:41:
-      # cvalue: s1 ∈ {0; 1; 2}
-                s2 ∈ {0; 3} 
-  interferences by mutexes:
-    { m2 }:
-      # cvalue: s1 ∈ {0; 1; 2}
-                s2 ∈ {0; 3}
+  Interferences from thread jobs4
+    concurrent writes:
+      s2 = 3; mutex2.c:41 <- f4
+    shared bases: {s1, s2}
+    interferences by location:
+      mutex2.c:41:
+        # cvalue: s1 ∈ {0; 1; 2}
+                  s2 ∈ {0; 3} 
+    interferences by mutexes:
+      { m2 }:
+        # cvalue: s1 ∈ {0; 1; 2}
+                  s2 ∈ {0; 3}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs4 computed
@@ -679,10 +694,11 @@
       pthread_mutex_unlock :: mutex2.c:61 <- main
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {s1, s2}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread <main>
+    concurrent writes:
+    shared bases: {s1, s2}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
@@ -705,17 +721,18 @@
       pthread_mutex_unlock :: mutex2.c:22 <- f1
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    s1 = 1; mutex2.c:21 <- f1
-  shared bases: {s1, s2}
-  interferences by location:
-    mutex2.c:21:
-      # cvalue: s1 ∈ {0; 1; 2}
-                s2 ∈ {0; 3} 
-  interferences by mutexes:
-    { m1 }:
-      # cvalue: s1 ∈ {0; 1; 2}
-                s2 ∈ {0; 3}
+  Interferences from thread jobs1
+    concurrent writes:
+      s1 = 1; mutex2.c:21 <- f1
+    shared bases: {s1, s2}
+    interferences by location:
+      mutex2.c:21:
+        # cvalue: s1 ∈ {0; 1; 2}
+                  s2 ∈ {0; 3} 
+    interferences by mutexes:
+      { m1 }:
+        # cvalue: s1 ∈ {0; 1; 2}
+                  s2 ∈ {0; 3}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs1 computed

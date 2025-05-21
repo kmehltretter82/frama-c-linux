@@ -37,10 +37,11 @@
   queue: read by <main> at philo.c:58 <- main
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread <main>
+    concurrent writes:
+    shared bases: {}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] ******* Starting to iterate
@@ -78,10 +79,11 @@
   queue: read by jobs[0] at philo.c:29 <- aux :: philo.c:41 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread jobs[0]
+    concurrent writes:
+    shared bases: {}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[0] computed
@@ -110,10 +112,11 @@
       pthread_mutex_unlock :: philo.c:31 <- aux :: philo.c:41 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread jobs[1]
+    concurrent writes:
+    shared bases: {}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[1] computed
@@ -147,10 +150,11 @@
   queue: read by jobs[2] at philo.c:29 <- aux :: philo.c:41 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread jobs[2]
+    concurrent writes:
+    shared bases: {}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[2] computed
@@ -184,10 +188,11 @@
   queue: read by jobs[3] at philo.c:29 <- aux :: philo.c:41 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread jobs[3]
+    concurrent writes:
+    shared bases: {}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[3] computed
@@ -221,10 +226,11 @@
   queue: read by jobs[4] at philo.c:29 <- aux :: philo.c:41 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread jobs[4]
+    concurrent writes:
+    shared bases: {}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[4] computed
@@ -281,10 +287,11 @@
   queue: read by <main> at philo.c:58 <- main
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread <main>
+    concurrent writes:
+    shared bases: {}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
@@ -345,10 +352,11 @@
   queue: read by <main> at philo.c:58 <- main
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {end2}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread <main>
+    concurrent writes:
+    shared bases: {end2}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
@@ -384,15 +392,16 @@
   queue: read by jobs[0] at philo.c:29 <- aux :: philo.c:41 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    end2 = 1; philo.c:28 <- aux :: philo.c:41 <- job
-  shared bases: {end2}
-  interferences by location:
-    philo.c:28:
-      # cvalue: end2 ∈ {1} 
-  interferences by mutexes:
-    { locks[1]; locks[4] }:
-      # cvalue: end2 ∈ {1}
+  Interferences from thread jobs[0]
+    concurrent writes:
+      end2 = 1; philo.c:28 <- aux :: philo.c:41 <- job
+    shared bases: {end2}
+    interferences by location:
+      philo.c:28:
+        # cvalue: end2 ∈ {1} 
+    interferences by mutexes:
+      { locks[1]; locks[4] }:
+        # cvalue: end2 ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[0] computed
@@ -422,10 +431,11 @@
       pthread_mutex_unlock :: philo.c:31 <- aux :: philo.c:41 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {end2}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread jobs[1]
+    concurrent writes:
+    shared bases: {end2}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[1] computed
@@ -461,15 +471,16 @@
   queue: read by jobs[2] at philo.c:29 <- aux :: philo.c:41 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    end2 = 1; philo.c:28 <- aux :: philo.c:41 <- job
-  shared bases: {end2}
-  interferences by location:
-    philo.c:28:
-      # cvalue: end2 ∈ {1} 
-  interferences by mutexes:
-    { locks[1]; locks[3] }:
-      # cvalue: end2 ∈ {1}
+  Interferences from thread jobs[2]
+    concurrent writes:
+      end2 = 1; philo.c:28 <- aux :: philo.c:41 <- job
+    shared bases: {end2}
+    interferences by location:
+      philo.c:28:
+        # cvalue: end2 ∈ {1} 
+    interferences by mutexes:
+      { locks[1]; locks[3] }:
+        # cvalue: end2 ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[2] computed
@@ -505,15 +516,16 @@
   queue: read by jobs[3] at philo.c:29 <- aux :: philo.c:41 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    end2 = 1; philo.c:28 <- aux :: philo.c:41 <- job
-  shared bases: {end2}
-  interferences by location:
-    philo.c:28:
-      # cvalue: end2 ∈ {1} 
-  interferences by mutexes:
-    { locks[2]; locks[4] }:
-      # cvalue: end2 ∈ {1}
+  Interferences from thread jobs[3]
+    concurrent writes:
+      end2 = 1; philo.c:28 <- aux :: philo.c:41 <- job
+    shared bases: {end2}
+    interferences by location:
+      philo.c:28:
+        # cvalue: end2 ∈ {1} 
+    interferences by mutexes:
+      { locks[2]; locks[4] }:
+        # cvalue: end2 ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[3] computed
@@ -549,15 +561,16 @@
   queue: read by jobs[4] at philo.c:29 <- aux :: philo.c:41 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    end2 = 1; philo.c:28 <- aux :: philo.c:41 <- job
-  shared bases: {end2}
-  interferences by location:
-    philo.c:28:
-      # cvalue: end2 ∈ {1} 
-  interferences by mutexes:
-    { locks[0]; locks[3] }:
-      # cvalue: end2 ∈ {1}
+  Interferences from thread jobs[4]
+    concurrent writes:
+      end2 = 1; philo.c:28 <- aux :: philo.c:41 <- job
+    shared bases: {end2}
+    interferences by location:
+      philo.c:28:
+        # cvalue: end2 ∈ {1} 
+    interferences by mutexes:
+      { locks[0]; locks[3] }:
+        # cvalue: end2 ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[4] computed
@@ -645,10 +658,11 @@
   queue: read by <main> at philo.c:58 <- main
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {end2}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread <main>
+    concurrent writes:
+    shared bases: {end2}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
@@ -683,15 +697,16 @@
   queue: read by jobs[0] at philo.c:29 <- aux :: philo.c:41 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    end2 = 1; philo.c:28 <- aux :: philo.c:41 <- job
-  shared bases: {end2}
-  interferences by location:
-    philo.c:28:
-      # cvalue: end2 ∈ {1} 
-  interferences by mutexes:
-    { locks[1]; locks[4] }:
-      # cvalue: end2 ∈ {1}
+  Interferences from thread jobs[0]
+    concurrent writes:
+      end2 = 1; philo.c:28 <- aux :: philo.c:41 <- job
+    shared bases: {end2}
+    interferences by location:
+      philo.c:28:
+        # cvalue: end2 ∈ {1} 
+    interferences by mutexes:
+      { locks[1]; locks[4] }:
+        # cvalue: end2 ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[0] computed
@@ -721,10 +736,11 @@
       pthread_mutex_unlock :: philo.c:31 <- aux :: philo.c:41 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {end2}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread jobs[1]
+    concurrent writes:
+    shared bases: {end2}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[1] computed
@@ -760,15 +776,16 @@
   queue: read by jobs[2] at philo.c:29 <- aux :: philo.c:41 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    end2 = 1; philo.c:28 <- aux :: philo.c:41 <- job
-  shared bases: {end2}
-  interferences by location:
-    philo.c:28:
-      # cvalue: end2 ∈ {1} 
-  interferences by mutexes:
-    { locks[1]; locks[3] }:
-      # cvalue: end2 ∈ {1}
+  Interferences from thread jobs[2]
+    concurrent writes:
+      end2 = 1; philo.c:28 <- aux :: philo.c:41 <- job
+    shared bases: {end2}
+    interferences by location:
+      philo.c:28:
+        # cvalue: end2 ∈ {1} 
+    interferences by mutexes:
+      { locks[1]; locks[3] }:
+        # cvalue: end2 ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[2] computed
@@ -804,15 +821,16 @@
   queue: read by jobs[3] at philo.c:29 <- aux :: philo.c:41 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    end2 = 1; philo.c:28 <- aux :: philo.c:41 <- job
-  shared bases: {end2}
-  interferences by location:
-    philo.c:28:
-      # cvalue: end2 ∈ {1} 
-  interferences by mutexes:
-    { locks[2]; locks[4] }:
-      # cvalue: end2 ∈ {1}
+  Interferences from thread jobs[3]
+    concurrent writes:
+      end2 = 1; philo.c:28 <- aux :: philo.c:41 <- job
+    shared bases: {end2}
+    interferences by location:
+      philo.c:28:
+        # cvalue: end2 ∈ {1} 
+    interferences by mutexes:
+      { locks[2]; locks[4] }:
+        # cvalue: end2 ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[3] computed
@@ -848,15 +866,16 @@
   queue: read by jobs[4] at philo.c:29 <- aux :: philo.c:41 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    end2 = 1; philo.c:28 <- aux :: philo.c:41 <- job
-  shared bases: {end2}
-  interferences by location:
-    philo.c:28:
-      # cvalue: end2 ∈ {1} 
-  interferences by mutexes:
-    { locks[0]; locks[3] }:
-      # cvalue: end2 ∈ {1}
+  Interferences from thread jobs[4]
+    concurrent writes:
+      end2 = 1; philo.c:28 <- aux :: philo.c:41 <- job
+    shared bases: {end2}
+    interferences by location:
+      philo.c:28:
+        # cvalue: end2 ∈ {1} 
+    interferences by mutexes:
+      { locks[0]; locks[3] }:
+        # cvalue: end2 ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[4] computed

@@ -51,10 +51,11 @@
       pthread_create :: sharedvars.c:103 <- main
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread <main>
+    concurrent writes:
+    shared bases: {}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] ******* Starting to iterate
@@ -73,10 +74,11 @@
     write by jobs1 at sharedvars.c:31 <- f1
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread jobs1
+    concurrent writes:
+    shared bases: {}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs1 computed
@@ -90,10 +92,11 @@
 [mt] Globals accessed by thread:
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread jobs2
+    concurrent writes:
+    shared bases: {}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs2 computed
@@ -113,10 +116,11 @@
       pthread_create :: sharedvars.c:47 <- f3
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread jobs3
+    concurrent writes:
+    shared bases: {}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs3 computed
@@ -136,10 +140,11 @@
     write by jobs4 at sharedvars.c:57 <- f4
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread jobs4
+    concurrent writes:
+    shared bases: {}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs4 computed
@@ -159,10 +164,11 @@
       pthread_create :: sharedvars.c:68 <- f5
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread jobs5
+    concurrent writes:
+    shared bases: {}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs5 computed
@@ -179,10 +185,11 @@
     write by jobs6 at sharedvars.c:76 <- f6
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread jobs6
+    concurrent writes:
+    shared bases: {}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs6 computed
@@ -249,21 +256,22 @@
       pthread_create :: sharedvars.c:103 <- main
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    s4 = -1; sharedvars.c:98 <- main
-    s4 = 1; sharedvars.c:100 <- main
-  shared bases: {s4, s6}
-  interferences by location:
-    sharedvars.c:98:
-      # cvalue: s4 ∈ {-1}
-                s6 ∈ {0} 
-    sharedvars.c:100:
-      # cvalue: s4 ∈ {1}
-                s6 ∈ {0} 
-  interferences by mutexes:
-    {  }:
-      # cvalue: s4 ∈ {-1; 1}
-                s6 ∈ {0}
+  Interferences from thread <main>
+    concurrent writes:
+      s4 = -1; sharedvars.c:98 <- main
+      s4 = 1; sharedvars.c:100 <- main
+    shared bases: {s4, s6}
+    interferences by location:
+      sharedvars.c:98:
+        # cvalue: s4 ∈ {-1}
+                  s6 ∈ {0} 
+      sharedvars.c:100:
+        # cvalue: s4 ∈ {1}
+                  s6 ∈ {0} 
+    interferences by mutexes:
+      {  }:
+        # cvalue: s4 ∈ {-1; 1}
+                  s6 ∈ {0}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
@@ -282,10 +290,11 @@
     write by jobs1 at sharedvars.c:31 <- f1
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {s4, s6}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread jobs1
+    concurrent writes:
+    shared bases: {s4, s6}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs1 computed
@@ -299,10 +308,11 @@
 [mt] Globals accessed by thread:
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {s4, s6}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread jobs2
+    concurrent writes:
+    shared bases: {s4, s6}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs2 computed
@@ -323,10 +333,11 @@
       pthread_create :: sharedvars.c:47 <- f3
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {s4, s6}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread jobs3
+    concurrent writes:
+    shared bases: {s4, s6}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs3 computed
@@ -351,21 +362,22 @@
     write by jobs4 at sharedvars.c:57 <- f4
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    s4 = 4; sharedvars.c:54 <- f4
-    s6 = 4; sharedvars.c:57 <- f4
-  shared bases: {s4, s6}
-  interferences by location:
-    sharedvars.c:54:
-      # cvalue: s4 ∈ {-1; 1; 4}
-                s6 ∈ {0} 
-    sharedvars.c:57:
-      # cvalue: s4 ∈ {-1; 1; 4}
-                s6 ∈ {0; 4} 
-  interferences by mutexes:
-    {  }:
-      # cvalue: s4 ∈ {-1; 1; 4}
-                s6 ∈ {0; 4}
+  Interferences from thread jobs4
+    concurrent writes:
+      s4 = 4; sharedvars.c:54 <- f4
+      s6 = 4; sharedvars.c:57 <- f4
+    shared bases: {s4, s6}
+    interferences by location:
+      sharedvars.c:54:
+        # cvalue: s4 ∈ {-1; 1; 4}
+                  s6 ∈ {0} 
+      sharedvars.c:57:
+        # cvalue: s4 ∈ {-1; 1; 4}
+                  s6 ∈ {0; 4} 
+    interferences by mutexes:
+      {  }:
+        # cvalue: s4 ∈ {-1; 1; 4}
+                  s6 ∈ {0; 4}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs4 computed
@@ -386,10 +398,11 @@
       pthread_create :: sharedvars.c:68 <- f5
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {s4, s6}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread jobs5
+    concurrent writes:
+    shared bases: {s4, s6}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs5 computed
@@ -409,17 +422,18 @@
     write by jobs6 at sharedvars.c:76 <- f6
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    s6 = 6; sharedvars.c:76 <- f6
-  shared bases: {s4, s6}
-  interferences by location:
-    sharedvars.c:76:
-      # cvalue: s4 ∈ {-1; 1; 4}
-                s6 ∈ {0; 4; 6} 
-  interferences by mutexes:
-    {  }:
-      # cvalue: s4 ∈ {-1; 1; 4}
-                s6 ∈ {0; 4; 6}
+  Interferences from thread jobs6
+    concurrent writes:
+      s6 = 6; sharedvars.c:76 <- f6
+    shared bases: {s4, s6}
+    interferences by location:
+      sharedvars.c:76:
+        # cvalue: s4 ∈ {-1; 1; 4}
+                  s6 ∈ {0; 4; 6} 
+    interferences by mutexes:
+      {  }:
+        # cvalue: s4 ∈ {-1; 1; 4}
+                  s6 ∈ {0; 4; 6}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs6 computed
@@ -436,10 +450,11 @@
     write by jobs31 at sharedvars.c:41 <- f31
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {s4, s6}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread jobs31
+    concurrent writes:
+    shared bases: {s4, s6}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs31 computed
@@ -456,10 +471,11 @@
     write by jobs51 at sharedvars.c:63 <- f51
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {s4, s6}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread jobs51
+    concurrent writes:
+    shared bases: {s4, s6}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs51 computed
@@ -567,33 +583,34 @@
       pthread_create :: sharedvars.c:103 <- main
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    u3 = 1; sharedvars.c:88 <- main
-    s4 = -1; sharedvars.c:98 <- main
-    s4 = 1; sharedvars.c:100 <- main
-  shared bases: {u3, s4, s5, s6}
-  interferences by location:
-    sharedvars.c:88:
-      # cvalue: u3 ∈ {1}
-                s4 ∈ {0}
-                s5 ∈ {0}
-                s6 ∈ {0} 
-    sharedvars.c:98:
-      # cvalue: u3 ∈ {1}
-                s4 ∈ {-1; 1; 4}
-                s5 ∈ {0}
-                s6 ∈ {0; 4; 6} 
-    sharedvars.c:100:
-      # cvalue: u3 ∈ {1}
-                s4 ∈ {-1; 1; 4}
-                s5 ∈ {0}
-                s6 ∈ {0; 4; 6} 
-  interferences by mutexes:
-    {  }:
-      # cvalue: u3 ∈ {1}
-                s4 ∈ {-1; 0; 1; 4}
-                s5 ∈ {0}
-                s6 ∈ {0; 4; 6}
+  Interferences from thread <main>
+    concurrent writes:
+      u3 = 1; sharedvars.c:88 <- main
+      s4 = -1; sharedvars.c:98 <- main
+      s4 = 1; sharedvars.c:100 <- main
+    shared bases: {u3, s4, s5, s6}
+    interferences by location:
+      sharedvars.c:88:
+        # cvalue: u3 ∈ {1}
+                  s4 ∈ {0}
+                  s5 ∈ {0}
+                  s6 ∈ {0} 
+      sharedvars.c:98:
+        # cvalue: u3 ∈ {1}
+                  s4 ∈ {-1; 1; 4}
+                  s5 ∈ {0}
+                  s6 ∈ {0; 4; 6} 
+      sharedvars.c:100:
+        # cvalue: u3 ∈ {1}
+                  s4 ∈ {-1; 1; 4}
+                  s5 ∈ {0}
+                  s6 ∈ {0; 4; 6} 
+    interferences by mutexes:
+      {  }:
+        # cvalue: u3 ∈ {1}
+                  s4 ∈ {-1; 0; 1; 4}
+                  s5 ∈ {0}
+                  s6 ∈ {0; 4; 6}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
@@ -612,10 +629,11 @@
     write by jobs1 at sharedvars.c:31 <- f1
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {u3, s4, s5, s6}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread jobs1
+    concurrent writes:
+    shared bases: {u3, s4, s5, s6}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs1 computed
@@ -630,10 +648,11 @@
 [mt] Globals accessed by thread:
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {u3, s4, s5, s6}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread jobs2
+    concurrent writes:
+    shared bases: {u3, s4, s5, s6}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs2 computed
@@ -657,21 +676,24 @@
       pthread_create :: sharedvars.c:47 <- f3
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    u3 = 3; sharedvars.c:46 <- f3
-  shared bases: {u3, s4, s5, s6}
-  interferences by location:
-    sharedvars.c:46:
-      # cvalue: u3 ∈ {1; 3}
-                s4 ∈ {-1; 0; 1; 4}
-                s5 ∈ {0}
-                s6 ∈ {0; 4; 6} 
-  interferences by mutexes:
-    {  }:
-      # cvalue: u3 ∈ {1; 3}
-                s4 ∈ {-1; 0; 1; 4}
-                s5 ∈ {0}
-                s6 ∈ {0; 4; 6}
+  Interferences from thread jobs3
+    concurrent writes:
+      u3 = 3; sharedvars.c:46 <- f3
+    shared bases: {u3, s4, s5, s6}
+    interferences by location:
+      sharedvars.c:46:
+        # cvalue:
+        u3 ∈ {1; 3}
+        s4 ∈ {-1; 0; 1; 4}
+        s5 ∈ {0}
+        s6 ∈ {0; 4; 6} 
+    interferences by mutexes:
+      {  }:
+        # cvalue:
+        u3 ∈ {1; 3}
+        s4 ∈ {-1; 0; 1; 4}
+        s5 ∈ {0}
+        s6 ∈ {0; 4; 6}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs3 computed
@@ -697,27 +719,31 @@
     write by jobs4 at sharedvars.c:57 <- f4
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    s4 = 4; sharedvars.c:54 <- f4
-    s6 = 4; sharedvars.c:57 <- f4
-  shared bases: {u3, s4, s5, s6}
-  interferences by location:
-    sharedvars.c:54:
-      # cvalue: u3 ∈ {1; 3}
-                s4 ∈ {-1; 0; 1; 4}
-                s5 ∈ {0}
-                s6 ∈ {0; 4; 6} 
-    sharedvars.c:57:
-      # cvalue: u3 ∈ {1; 3}
-                s4 ∈ {-1; 0; 1; 4}
-                s5 ∈ {0}
-                s6 ∈ {0; 4; 6} 
-  interferences by mutexes:
-    {  }:
-      # cvalue: u3 ∈ {1; 3}
-                s4 ∈ {-1; 0; 1; 4}
-                s5 ∈ {0}
-                s6 ∈ {0; 4; 6}
+  Interferences from thread jobs4
+    concurrent writes:
+      s4 = 4; sharedvars.c:54 <- f4
+      s6 = 4; sharedvars.c:57 <- f4
+    shared bases: {u3, s4, s5, s6}
+    interferences by location:
+      sharedvars.c:54:
+        # cvalue:
+        u3 ∈ {1; 3}
+        s4 ∈ {-1; 0; 1; 4}
+        s5 ∈ {0}
+        s6 ∈ {0; 4; 6} 
+      sharedvars.c:57:
+        # cvalue:
+        u3 ∈ {1; 3}
+        s4 ∈ {-1; 0; 1; 4}
+        s5 ∈ {0}
+        s6 ∈ {0; 4; 6} 
+    interferences by mutexes:
+      {  }:
+        # cvalue:
+        u3 ∈ {1; 3}
+        s4 ∈ {-1; 0; 1; 4}
+        s5 ∈ {0}
+        s6 ∈ {0; 4; 6}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs4 computed
@@ -741,23 +767,24 @@
       pthread_create :: sharedvars.c:68 <- f5
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    s5 = 5; sharedvars.c:69 <- f5
-  shared bases: {u3, s4, s5, s6}
-  interferences by location:
-    sharedvars.c:69:
-      # cvalue:
-      u3 ∈ {1; 3}
-      s4 ∈ {-1; 0; 1; 4}
-      s5 ∈ {0; 5}
-      s6 ∈ {0; 4; 6} 
-  interferences by mutexes:
-    {  }:
-      # cvalue:
-      u3 ∈ {1; 3}
-      s4 ∈ {-1; 0; 1; 4}
-      s5 ∈ {0; 5}
-      s6 ∈ {0; 4; 6}
+  Interferences from thread jobs5
+    concurrent writes:
+      s5 = 5; sharedvars.c:69 <- f5
+    shared bases: {u3, s4, s5, s6}
+    interferences by location:
+      sharedvars.c:69:
+        # cvalue:
+        u3 ∈ {1; 3}
+        s4 ∈ {-1; 0; 1; 4}
+        s5 ∈ {0; 5}
+        s6 ∈ {0; 4; 6} 
+    interferences by mutexes:
+      {  }:
+        # cvalue:
+        u3 ∈ {1; 3}
+        s4 ∈ {-1; 0; 1; 4}
+        s5 ∈ {0; 5}
+        s6 ∈ {0; 4; 6}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs5 computed
@@ -778,23 +805,24 @@
     write by jobs6 at sharedvars.c:76 <- f6
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    s6 = 6; sharedvars.c:76 <- f6
-  shared bases: {u3, s4, s5, s6}
-  interferences by location:
-    sharedvars.c:76:
-      # cvalue:
-      u3 ∈ {1; 3}
-      s4 ∈ {-1; 0; 1; 4}
-      s5 ∈ {0; 5}
-      s6 ∈ {0; 4; 6} 
-  interferences by mutexes:
-    {  }:
-      # cvalue:
-      u3 ∈ {1; 3}
-      s4 ∈ {-1; 0; 1; 4}
-      s5 ∈ {0; 5}
-      s6 ∈ {0; 4; 6}
+  Interferences from thread jobs6
+    concurrent writes:
+      s6 = 6; sharedvars.c:76 <- f6
+    shared bases: {u3, s4, s5, s6}
+    interferences by location:
+      sharedvars.c:76:
+        # cvalue:
+        u3 ∈ {1; 3}
+        s4 ∈ {-1; 0; 1; 4}
+        s5 ∈ {0; 5}
+        s6 ∈ {0; 4; 6} 
+    interferences by mutexes:
+      {  }:
+        # cvalue:
+        u3 ∈ {1; 3}
+        s4 ∈ {-1; 0; 1; 4}
+        s5 ∈ {0; 5}
+        s6 ∈ {0; 4; 6}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs6 computed
@@ -815,23 +843,24 @@
     write by jobs31 at sharedvars.c:41 <- f31
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    u3 = 31; sharedvars.c:41 <- f31
-  shared bases: {u3, s4, s5, s6}
-  interferences by location:
-    sharedvars.c:41:
-      # cvalue:
-      u3 ∈ {1; 3; 31}
-      s4 ∈ {-1; 0; 1; 4}
-      s5 ∈ {0; 5}
-      s6 ∈ {0; 4; 6} 
-  interferences by mutexes:
-    {  }:
-      # cvalue:
-      u3 ∈ {1; 3; 31}
-      s4 ∈ {-1; 0; 1; 4}
-      s5 ∈ {0; 5}
-      s6 ∈ {0; 4; 6}
+  Interferences from thread jobs31
+    concurrent writes:
+      u3 = 31; sharedvars.c:41 <- f31
+    shared bases: {u3, s4, s5, s6}
+    interferences by location:
+      sharedvars.c:41:
+        # cvalue:
+        u3 ∈ {1; 3; 31}
+        s4 ∈ {-1; 0; 1; 4}
+        s5 ∈ {0; 5}
+        s6 ∈ {0; 4; 6} 
+    interferences by mutexes:
+      {  }:
+        # cvalue:
+        u3 ∈ {1; 3; 31}
+        s4 ∈ {-1; 0; 1; 4}
+        s5 ∈ {0; 5}
+        s6 ∈ {0; 4; 6}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs31 computed
@@ -852,23 +881,24 @@
     write by jobs51 at sharedvars.c:63 <- f51
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    s5 = 51; sharedvars.c:63 <- f51
-  shared bases: {u3, s4, s5, s6}
-  interferences by location:
-    sharedvars.c:63:
-      # cvalue:
-      u3 ∈ {1; 3; 31}
-      s4 ∈ {-1; 0; 1; 4}
-      s5 ∈ {0; 5; 51}
-      s6 ∈ {0; 4; 6} 
-  interferences by mutexes:
-    {  }:
-      # cvalue:
-      u3 ∈ {1; 3; 31}
-      s4 ∈ {-1; 0; 1; 4}
-      s5 ∈ {0; 5; 51}
-      s6 ∈ {0; 4; 6}
+  Interferences from thread jobs51
+    concurrent writes:
+      s5 = 51; sharedvars.c:63 <- f51
+    shared bases: {u3, s4, s5, s6}
+    interferences by location:
+      sharedvars.c:63:
+        # cvalue:
+        u3 ∈ {1; 3; 31}
+        s4 ∈ {-1; 0; 1; 4}
+        s5 ∈ {0; 5; 51}
+        s6 ∈ {0; 4; 6} 
+    interferences by mutexes:
+      {  }:
+        # cvalue:
+        u3 ∈ {1; 3; 31}
+        s4 ∈ {-1; 0; 1; 4}
+        s5 ∈ {0; 5; 51}
+        s6 ∈ {0; 4; 6}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs51 computed
@@ -986,37 +1016,38 @@
       pthread_create :: sharedvars.c:103 <- main
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    u3 = 1; sharedvars.c:88 <- main
-    s4 = -1; sharedvars.c:98 <- main
-    s4 = 1; sharedvars.c:100 <- main
-  shared bases: {u3, s4, s5, s6}
-  interferences by location:
-    sharedvars.c:88:
-      # cvalue:
-      u3 ∈ {1; 3; 31}
-      s4 ∈ {-1; 0; 1; 4}
-      s5 ∈ {0; 5; 51}
-      s6 ∈ {0; 4; 6} 
-    sharedvars.c:98:
-      # cvalue:
-      u3 ∈ {1; 3; 31}
-      s4 ∈ {-1; 0; 1; 4}
-      s5 ∈ {0; 5; 51}
-      s6 ∈ [0..2147483646],0%2 
-    sharedvars.c:100:
-      # cvalue:
-      u3 ∈ {1; 3; 31}
-      s4 ∈ {-1; 0; 1; 4}
-      s5 ∈ {0; 5; 51}
-      s6 ∈ [0..2147483646],0%2 
-  interferences by mutexes:
-    {  }:
-      # cvalue:
-      u3 ∈ {1; 3; 31}
-      s4 ∈ {-1; 0; 1; 4}
-      s5 ∈ {0; 5; 51}
-      s6 ∈ [0..2147483646],0%2
+  Interferences from thread <main>
+    concurrent writes:
+      u3 = 1; sharedvars.c:88 <- main
+      s4 = -1; sharedvars.c:98 <- main
+      s4 = 1; sharedvars.c:100 <- main
+    shared bases: {u3, s4, s5, s6}
+    interferences by location:
+      sharedvars.c:88:
+        # cvalue:
+        u3 ∈ {1; 3; 31}
+        s4 ∈ {-1; 0; 1; 4}
+        s5 ∈ {0; 5; 51}
+        s6 ∈ {0; 4; 6} 
+      sharedvars.c:98:
+        # cvalue:
+        u3 ∈ {1; 3; 31}
+        s4 ∈ {-1; 0; 1; 4}
+        s5 ∈ {0; 5; 51}
+        s6 ∈ [0..2147483646],0%2 
+      sharedvars.c:100:
+        # cvalue:
+        u3 ∈ {1; 3; 31}
+        s4 ∈ {-1; 0; 1; 4}
+        s5 ∈ {0; 5; 51}
+        s6 ∈ [0..2147483646],0%2 
+    interferences by mutexes:
+      {  }:
+        # cvalue:
+        u3 ∈ {1; 3; 31}
+        s4 ∈ {-1; 0; 1; 4}
+        s5 ∈ {0; 5; 51}
+        s6 ∈ [0..2147483646],0%2
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
@@ -1035,10 +1066,11 @@
     write by jobs1 at sharedvars.c:31 <- f1
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {u3, s4, s5, s6}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread jobs1
+    concurrent writes:
+    shared bases: {u3, s4, s5, s6}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs1 computed
@@ -1053,10 +1085,11 @@
 [mt] Globals accessed by thread:
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {u3, s4, s5, s6}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread jobs2
+    concurrent writes:
+    shared bases: {u3, s4, s5, s6}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs2 computed
@@ -1079,23 +1112,24 @@
       pthread_create :: sharedvars.c:47 <- f3
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    u3 = 3; sharedvars.c:46 <- f3
-  shared bases: {u3, s4, s5, s6}
-  interferences by location:
-    sharedvars.c:46:
-      # cvalue:
-      u3 ∈ {1; 3; 31}
-      s4 ∈ {-1; 0; 1; 2; 3; 4}
-      s5 ∈ {0; 5; 51}
-      s6 ∈ [0..2147483646],0%2 
-  interferences by mutexes:
-    {  }:
-      # cvalue:
-      u3 ∈ {1; 3; 31}
-      s4 ∈ {-1; 0; 1; 2; 3; 4}
-      s5 ∈ {0; 5; 51}
-      s6 ∈ [0..2147483646],0%2
+  Interferences from thread jobs3
+    concurrent writes:
+      u3 = 3; sharedvars.c:46 <- f3
+    shared bases: {u3, s4, s5, s6}
+    interferences by location:
+      sharedvars.c:46:
+        # cvalue:
+        u3 ∈ {1; 3; 31}
+        s4 ∈ {-1; 0; 1; 2; 3; 4}
+        s5 ∈ {0; 5; 51}
+        s6 ∈ [0..2147483646],0%2 
+    interferences by mutexes:
+      {  }:
+        # cvalue:
+        u3 ∈ {1; 3; 31}
+        s4 ∈ {-1; 0; 1; 2; 3; 4}
+        s5 ∈ {0; 5; 51}
+        s6 ∈ [0..2147483646],0%2
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs3 computed
@@ -1121,30 +1155,31 @@
     write by jobs4 at sharedvars.c:57 <- f4
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    s4 = 4; sharedvars.c:54 <- f4
-    s6 = 4; sharedvars.c:57 <- f4
-  shared bases: {u3, s4, s5, s6}
-  interferences by location:
-    sharedvars.c:54:
-      # cvalue:
-      u3 ∈ {1; 3; 31}
-      s4 ∈ {-1; 0; 1; 2; 3; 4}
-      s5 ∈ {0; 5; 51}
-      s6 ∈ [0..2147483646],0%2 
-    sharedvars.c:57:
-      # cvalue:
-      u3 ∈ {1; 3; 31}
-      s4 ∈ {-1; 0; 1; 2; 3; 4}
-      s5 ∈ {0; 5; 51}
-      s6 ∈ [0..2147483646],0%2 
-  interferences by mutexes:
-    {  }:
-      # cvalue:
-      u3 ∈ {1; 3; 31}
-      s4 ∈ {-1; 0; 1; 2; 3; 4}
-      s5 ∈ {0; 5; 51}
-      s6 ∈ [0..2147483646],0%2
+  Interferences from thread jobs4
+    concurrent writes:
+      s4 = 4; sharedvars.c:54 <- f4
+      s6 = 4; sharedvars.c:57 <- f4
+    shared bases: {u3, s4, s5, s6}
+    interferences by location:
+      sharedvars.c:54:
+        # cvalue:
+        u3 ∈ {1; 3; 31}
+        s4 ∈ {-1; 0; 1; 2; 3; 4}
+        s5 ∈ {0; 5; 51}
+        s6 ∈ [0..2147483646],0%2 
+      sharedvars.c:57:
+        # cvalue:
+        u3 ∈ {1; 3; 31}
+        s4 ∈ {-1; 0; 1; 2; 3; 4}
+        s5 ∈ {0; 5; 51}
+        s6 ∈ [0..2147483646],0%2 
+    interferences by mutexes:
+      {  }:
+        # cvalue:
+        u3 ∈ {1; 3; 31}
+        s4 ∈ {-1; 0; 1; 2; 3; 4}
+        s5 ∈ {0; 5; 51}
+        s6 ∈ [0..2147483646],0%2
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs4 computed
@@ -1167,23 +1202,24 @@
       pthread_create :: sharedvars.c:68 <- f5
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    s5 = 5; sharedvars.c:69 <- f5
-  shared bases: {u3, s4, s5, s6}
-  interferences by location:
-    sharedvars.c:69:
-      # cvalue:
-      u3 ∈ {1; 3; 31}
-      s4 ∈ {-1; 0; 1; 2; 3; 4}
-      s5 ∈ {0; 5; 51}
-      s6 ∈ [0..2147483646],0%2 
-  interferences by mutexes:
-    {  }:
-      # cvalue:
-      u3 ∈ {1; 3; 31}
-      s4 ∈ {-1; 0; 1; 2; 3; 4}
-      s5 ∈ {0; 5; 51}
-      s6 ∈ [0..2147483646],0%2
+  Interferences from thread jobs5
+    concurrent writes:
+      s5 = 5; sharedvars.c:69 <- f5
+    shared bases: {u3, s4, s5, s6}
+    interferences by location:
+      sharedvars.c:69:
+        # cvalue:
+        u3 ∈ {1; 3; 31}
+        s4 ∈ {-1; 0; 1; 2; 3; 4}
+        s5 ∈ {0; 5; 51}
+        s6 ∈ [0..2147483646],0%2 
+    interferences by mutexes:
+      {  }:
+        # cvalue:
+        u3 ∈ {1; 3; 31}
+        s4 ∈ {-1; 0; 1; 2; 3; 4}
+        s5 ∈ {0; 5; 51}
+        s6 ∈ [0..2147483646],0%2
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs5 computed
@@ -1204,23 +1240,24 @@
     write by jobs6 at sharedvars.c:76 <- f6
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    s6 = 6; sharedvars.c:76 <- f6
-  shared bases: {u3, s4, s5, s6}
-  interferences by location:
-    sharedvars.c:76:
-      # cvalue:
-      u3 ∈ {1; 3; 31}
-      s4 ∈ {-1; 0; 1; 2; 3; 4}
-      s5 ∈ {0; 5; 51}
-      s6 ∈ [0..2147483646],0%2 
-  interferences by mutexes:
-    {  }:
-      # cvalue:
-      u3 ∈ {1; 3; 31}
-      s4 ∈ {-1; 0; 1; 2; 3; 4}
-      s5 ∈ {0; 5; 51}
-      s6 ∈ [0..2147483646],0%2
+  Interferences from thread jobs6
+    concurrent writes:
+      s6 = 6; sharedvars.c:76 <- f6
+    shared bases: {u3, s4, s5, s6}
+    interferences by location:
+      sharedvars.c:76:
+        # cvalue:
+        u3 ∈ {1; 3; 31}
+        s4 ∈ {-1; 0; 1; 2; 3; 4}
+        s5 ∈ {0; 5; 51}
+        s6 ∈ [0..2147483646],0%2 
+    interferences by mutexes:
+      {  }:
+        # cvalue:
+        u3 ∈ {1; 3; 31}
+        s4 ∈ {-1; 0; 1; 2; 3; 4}
+        s5 ∈ {0; 5; 51}
+        s6 ∈ [0..2147483646],0%2
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs6 computed
@@ -1240,23 +1277,24 @@
     write by jobs31 at sharedvars.c:41 <- f31
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    u3 = 31; sharedvars.c:41 <- f31
-  shared bases: {u3, s4, s5, s6}
-  interferences by location:
-    sharedvars.c:41:
-      # cvalue:
-      u3 ∈ {1; 3; 31}
-      s4 ∈ {-1; 0; 1; 2; 3; 4}
-      s5 ∈ {0; 5; 51}
-      s6 ∈ [0..2147483646],0%2 
-  interferences by mutexes:
-    {  }:
-      # cvalue:
-      u3 ∈ {1; 3; 31}
-      s4 ∈ {-1; 0; 1; 2; 3; 4}
-      s5 ∈ {0; 5; 51}
-      s6 ∈ [0..2147483646],0%2
+  Interferences from thread jobs31
+    concurrent writes:
+      u3 = 31; sharedvars.c:41 <- f31
+    shared bases: {u3, s4, s5, s6}
+    interferences by location:
+      sharedvars.c:41:
+        # cvalue:
+        u3 ∈ {1; 3; 31}
+        s4 ∈ {-1; 0; 1; 2; 3; 4}
+        s5 ∈ {0; 5; 51}
+        s6 ∈ [0..2147483646],0%2 
+    interferences by mutexes:
+      {  }:
+        # cvalue:
+        u3 ∈ {1; 3; 31}
+        s4 ∈ {-1; 0; 1; 2; 3; 4}
+        s5 ∈ {0; 5; 51}
+        s6 ∈ [0..2147483646],0%2
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs31 computed
@@ -1277,23 +1315,24 @@
     write by jobs51 at sharedvars.c:63 <- f51
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    s5 = 51; sharedvars.c:63 <- f51
-  shared bases: {u3, s4, s5, s6}
-  interferences by location:
-    sharedvars.c:63:
-      # cvalue:
-      u3 ∈ {1; 3; 31}
-      s4 ∈ {-1; 0; 1; 2; 3; 4}
-      s5 ∈ {0; 5; 51}
-      s6 ∈ [0..2147483646],0%2 
-  interferences by mutexes:
-    {  }:
-      # cvalue:
-      u3 ∈ {1; 3; 31}
-      s4 ∈ {-1; 0; 1; 2; 3; 4}
-      s5 ∈ {0; 5; 51}
-      s6 ∈ [0..2147483646],0%2
+  Interferences from thread jobs51
+    concurrent writes:
+      s5 = 51; sharedvars.c:63 <- f51
+    shared bases: {u3, s4, s5, s6}
+    interferences by location:
+      sharedvars.c:63:
+        # cvalue:
+        u3 ∈ {1; 3; 31}
+        s4 ∈ {-1; 0; 1; 2; 3; 4}
+        s5 ∈ {0; 5; 51}
+        s6 ∈ [0..2147483646],0%2 
+    interferences by mutexes:
+      {  }:
+        # cvalue:
+        u3 ∈ {1; 3; 31}
+        s4 ∈ {-1; 0; 1; 2; 3; 4}
+        s5 ∈ {0; 5; 51}
+        s6 ∈ [0..2147483646],0%2
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs51 computed
@@ -1407,37 +1446,38 @@
       pthread_create :: sharedvars.c:103 <- main
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    u3 = 1; sharedvars.c:88 <- main
-    s4 = -1; sharedvars.c:98 <- main
-    s4 = 1; sharedvars.c:100 <- main
-  shared bases: {u3, s4, s5, s6}
-  interferences by location:
-    sharedvars.c:88:
-      # cvalue:
-      u3 ∈ {1; 3; 31}
-      s4 ∈ {-1; 0; 1; 2; 3; 4}
-      s5 ∈ {0; 5; 51}
-      s6 ∈ [0..2147483646],0%2 
-    sharedvars.c:98:
-      # cvalue:
-      u3 ∈ {1; 3; 31}
-      s4 ∈ {-1; 0; 1; 2; 3; 4}
-      s5 ∈ [0..2147483647]
-      s6 ∈ [0..2147483646],0%2 
-    sharedvars.c:100:
-      # cvalue:
-      u3 ∈ {1; 3; 31}
-      s4 ∈ {-1; 0; 1; 2; 3; 4}
-      s5 ∈ [0..2147483647]
-      s6 ∈ [0..2147483646],0%2 
-  interferences by mutexes:
-    {  }:
-      # cvalue:
-      u3 ∈ {1; 3; 31}
-      s4 ∈ {-1; 0; 1; 2; 3; 4}
-      s5 ∈ [0..2147483647]
-      s6 ∈ [0..2147483646],0%2
+  Interferences from thread <main>
+    concurrent writes:
+      u3 = 1; sharedvars.c:88 <- main
+      s4 = -1; sharedvars.c:98 <- main
+      s4 = 1; sharedvars.c:100 <- main
+    shared bases: {u3, s4, s5, s6}
+    interferences by location:
+      sharedvars.c:88:
+        # cvalue:
+        u3 ∈ {1; 3; 31}
+        s4 ∈ {-1; 0; 1; 2; 3; 4}
+        s5 ∈ {0; 5; 51}
+        s6 ∈ [0..2147483646],0%2 
+      sharedvars.c:98:
+        # cvalue:
+        u3 ∈ {1; 3; 31}
+        s4 ∈ {-1; 0; 1; 2; 3; 4}
+        s5 ∈ [0..2147483647]
+        s6 ∈ [0..2147483646],0%2 
+      sharedvars.c:100:
+        # cvalue:
+        u3 ∈ {1; 3; 31}
+        s4 ∈ {-1; 0; 1; 2; 3; 4}
+        s5 ∈ [0..2147483647]
+        s6 ∈ [0..2147483646],0%2 
+    interferences by mutexes:
+      {  }:
+        # cvalue:
+        u3 ∈ {1; 3; 31}
+        s4 ∈ {-1; 0; 1; 2; 3; 4}
+        s5 ∈ [0..2147483647]
+        s6 ∈ [0..2147483646],0%2
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
@@ -1456,10 +1496,11 @@
     write by jobs1 at sharedvars.c:31 <- f1
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {u3, s4, s5, s6}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread jobs1
+    concurrent writes:
+    shared bases: {u3, s4, s5, s6}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs1 computed
@@ -1474,10 +1515,11 @@
 [mt] Globals accessed by thread:
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {u3, s4, s5, s6}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread jobs2
+    concurrent writes:
+    shared bases: {u3, s4, s5, s6}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs2 computed
@@ -1500,23 +1542,24 @@
       pthread_create :: sharedvars.c:47 <- f3
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    u3 = 3; sharedvars.c:46 <- f3
-  shared bases: {u3, s4, s5, s6}
-  interferences by location:
-    sharedvars.c:46:
-      # cvalue:
-      u3 ∈ {1; 3; 31}
-      s4 ∈ {-1; 0; 1; 2; 3; 4}
-      s5 ∈ [0..2147483647]
-      s6 ∈ [0..2147483646],0%2 
-  interferences by mutexes:
-    {  }:
-      # cvalue:
-      u3 ∈ {1; 3; 31}
-      s4 ∈ {-1; 0; 1; 2; 3; 4}
-      s5 ∈ [0..2147483647]
-      s6 ∈ [0..2147483646],0%2
+  Interferences from thread jobs3
+    concurrent writes:
+      u3 = 3; sharedvars.c:46 <- f3
+    shared bases: {u3, s4, s5, s6}
+    interferences by location:
+      sharedvars.c:46:
+        # cvalue:
+        u3 ∈ {1; 3; 31}
+        s4 ∈ {-1; 0; 1; 2; 3; 4}
+        s5 ∈ [0..2147483647]
+        s6 ∈ [0..2147483646],0%2 
+    interferences by mutexes:
+      {  }:
+        # cvalue:
+        u3 ∈ {1; 3; 31}
+        s4 ∈ {-1; 0; 1; 2; 3; 4}
+        s5 ∈ [0..2147483647]
+        s6 ∈ [0..2147483646],0%2
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs3 computed
@@ -1542,30 +1585,31 @@
     write by jobs4 at sharedvars.c:57 <- f4
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    s4 = 4; sharedvars.c:54 <- f4
-    s6 = 4; sharedvars.c:57 <- f4
-  shared bases: {u3, s4, s5, s6}
-  interferences by location:
-    sharedvars.c:54:
-      # cvalue:
-      u3 ∈ {1; 3; 31}
-      s4 ∈ {-1; 0; 1; 2; 3; 4}
-      s5 ∈ [0..2147483647]
-      s6 ∈ [0..2147483646],0%2 
-    sharedvars.c:57:
-      # cvalue:
-      u3 ∈ {1; 3; 31}
-      s4 ∈ {-1; 0; 1; 2; 3; 4}
-      s5 ∈ [0..2147483647]
-      s6 ∈ [0..2147483646],0%2 
-  interferences by mutexes:
-    {  }:
-      # cvalue:
-      u3 ∈ {1; 3; 31}
-      s4 ∈ {-1; 0; 1; 2; 3; 4}
-      s5 ∈ [0..2147483647]
-      s6 ∈ [0..2147483646],0%2
+  Interferences from thread jobs4
+    concurrent writes:
+      s4 = 4; sharedvars.c:54 <- f4
+      s6 = 4; sharedvars.c:57 <- f4
+    shared bases: {u3, s4, s5, s6}
+    interferences by location:
+      sharedvars.c:54:
+        # cvalue:
+        u3 ∈ {1; 3; 31}
+        s4 ∈ {-1; 0; 1; 2; 3; 4}
+        s5 ∈ [0..2147483647]
+        s6 ∈ [0..2147483646],0%2 
+      sharedvars.c:57:
+        # cvalue:
+        u3 ∈ {1; 3; 31}
+        s4 ∈ {-1; 0; 1; 2; 3; 4}
+        s5 ∈ [0..2147483647]
+        s6 ∈ [0..2147483646],0%2 
+    interferences by mutexes:
+      {  }:
+        # cvalue:
+        u3 ∈ {1; 3; 31}
+        s4 ∈ {-1; 0; 1; 2; 3; 4}
+        s5 ∈ [0..2147483647]
+        s6 ∈ [0..2147483646],0%2
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs4 computed
@@ -1588,23 +1632,24 @@
       pthread_create :: sharedvars.c:68 <- f5
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    s5 = 5; sharedvars.c:69 <- f5
-  shared bases: {u3, s4, s5, s6}
-  interferences by location:
-    sharedvars.c:69:
-      # cvalue:
-      u3 ∈ {1; 3; 31}
-      s4 ∈ {-1; 0; 1; 2; 3; 4}
-      s5 ∈ [0..2147483647]
-      s6 ∈ [0..2147483646],0%2 
-  interferences by mutexes:
-    {  }:
-      # cvalue:
-      u3 ∈ {1; 3; 31}
-      s4 ∈ {-1; 0; 1; 2; 3; 4}
-      s5 ∈ [0..2147483647]
-      s6 ∈ [0..2147483646],0%2
+  Interferences from thread jobs5
+    concurrent writes:
+      s5 = 5; sharedvars.c:69 <- f5
+    shared bases: {u3, s4, s5, s6}
+    interferences by location:
+      sharedvars.c:69:
+        # cvalue:
+        u3 ∈ {1; 3; 31}
+        s4 ∈ {-1; 0; 1; 2; 3; 4}
+        s5 ∈ [0..2147483647]
+        s6 ∈ [0..2147483646],0%2 
+    interferences by mutexes:
+      {  }:
+        # cvalue:
+        u3 ∈ {1; 3; 31}
+        s4 ∈ {-1; 0; 1; 2; 3; 4}
+        s5 ∈ [0..2147483647]
+        s6 ∈ [0..2147483646],0%2
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs5 computed
@@ -1624,23 +1669,24 @@
     write by jobs6 at sharedvars.c:76 <- f6
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    s6 = 6; sharedvars.c:76 <- f6
-  shared bases: {u3, s4, s5, s6}
-  interferences by location:
-    sharedvars.c:76:
-      # cvalue:
-      u3 ∈ {1; 3; 31}
-      s4 ∈ {-1; 0; 1; 2; 3; 4}
-      s5 ∈ [0..2147483647]
-      s6 ∈ [0..2147483646],0%2 
-  interferences by mutexes:
-    {  }:
-      # cvalue:
-      u3 ∈ {1; 3; 31}
-      s4 ∈ {-1; 0; 1; 2; 3; 4}
-      s5 ∈ [0..2147483647]
-      s6 ∈ [0..2147483646],0%2
+  Interferences from thread jobs6
+    concurrent writes:
+      s6 = 6; sharedvars.c:76 <- f6
+    shared bases: {u3, s4, s5, s6}
+    interferences by location:
+      sharedvars.c:76:
+        # cvalue:
+        u3 ∈ {1; 3; 31}
+        s4 ∈ {-1; 0; 1; 2; 3; 4}
+        s5 ∈ [0..2147483647]
+        s6 ∈ [0..2147483646],0%2 
+    interferences by mutexes:
+      {  }:
+        # cvalue:
+        u3 ∈ {1; 3; 31}
+        s4 ∈ {-1; 0; 1; 2; 3; 4}
+        s5 ∈ [0..2147483647]
+        s6 ∈ [0..2147483646],0%2
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs6 computed
@@ -1660,23 +1706,24 @@
     write by jobs31 at sharedvars.c:41 <- f31
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    u3 = 31; sharedvars.c:41 <- f31
-  shared bases: {u3, s4, s5, s6}
-  interferences by location:
-    sharedvars.c:41:
-      # cvalue:
-      u3 ∈ {1; 3; 31}
-      s4 ∈ {-1; 0; 1; 2; 3; 4}
-      s5 ∈ [0..2147483647]
-      s6 ∈ [0..2147483646],0%2 
-  interferences by mutexes:
-    {  }:
-      # cvalue:
-      u3 ∈ {1; 3; 31}
-      s4 ∈ {-1; 0; 1; 2; 3; 4}
-      s5 ∈ [0..2147483647]
-      s6 ∈ [0..2147483646],0%2
+  Interferences from thread jobs31
+    concurrent writes:
+      u3 = 31; sharedvars.c:41 <- f31
+    shared bases: {u3, s4, s5, s6}
+    interferences by location:
+      sharedvars.c:41:
+        # cvalue:
+        u3 ∈ {1; 3; 31}
+        s4 ∈ {-1; 0; 1; 2; 3; 4}
+        s5 ∈ [0..2147483647]
+        s6 ∈ [0..2147483646],0%2 
+    interferences by mutexes:
+      {  }:
+        # cvalue:
+        u3 ∈ {1; 3; 31}
+        s4 ∈ {-1; 0; 1; 2; 3; 4}
+        s5 ∈ [0..2147483647]
+        s6 ∈ [0..2147483646],0%2
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs31 computed
@@ -1697,23 +1744,24 @@
     write by jobs51 at sharedvars.c:63 <- f51
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    s5 = 51; sharedvars.c:63 <- f51
-  shared bases: {u3, s4, s5, s6}
-  interferences by location:
-    sharedvars.c:63:
-      # cvalue:
-      u3 ∈ {1; 3; 31}
-      s4 ∈ {-1; 0; 1; 2; 3; 4}
-      s5 ∈ [0..2147483647]
-      s6 ∈ [0..2147483646],0%2 
-  interferences by mutexes:
-    {  }:
-      # cvalue:
-      u3 ∈ {1; 3; 31}
-      s4 ∈ {-1; 0; 1; 2; 3; 4}
-      s5 ∈ [0..2147483647]
-      s6 ∈ [0..2147483646],0%2
+  Interferences from thread jobs51
+    concurrent writes:
+      s5 = 51; sharedvars.c:63 <- f51
+    shared bases: {u3, s4, s5, s6}
+    interferences by location:
+      sharedvars.c:63:
+        # cvalue:
+        u3 ∈ {1; 3; 31}
+        s4 ∈ {-1; 0; 1; 2; 3; 4}
+        s5 ∈ [0..2147483647]
+        s6 ∈ [0..2147483646],0%2 
+    interferences by mutexes:
+      {  }:
+        # cvalue:
+        u3 ∈ {1; 3; 31}
+        s4 ∈ {-1; 0; 1; 2; 3; 4}
+        s5 ∈ [0..2147483647]
+        s6 ∈ [0..2147483646],0%2
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs51 computed
@@ -1822,37 +1870,38 @@
       pthread_create :: sharedvars.c:103 <- main
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    u3 = 1; sharedvars.c:88 <- main
-    s4 = -1; sharedvars.c:98 <- main
-    s4 = 1; sharedvars.c:100 <- main
-  shared bases: {u3, s4, s5, s6}
-  interferences by location:
-    sharedvars.c:88:
-      # cvalue:
-      u3 ∈ {1; 3; 31}
-      s4 ∈ {-1; 0; 1; 2; 3; 4}
-      s5 ∈ [0..2147483647]
-      s6 ∈ [0..2147483646],0%2 
-    sharedvars.c:98:
-      # cvalue:
-      u3 ∈ {1; 3; 31}
-      s4 ∈ {-1; 0; 1; 2; 3; 4}
-      s5 ∈ [0..2147483647]
-      s6 ∈ [0..2147483646],0%2 
-    sharedvars.c:100:
-      # cvalue:
-      u3 ∈ {1; 3; 31}
-      s4 ∈ {-1; 0; 1; 2; 3; 4}
-      s5 ∈ [0..2147483647]
-      s6 ∈ [0..2147483646],0%2 
-  interferences by mutexes:
-    {  }:
-      # cvalue:
-      u3 ∈ {1; 3; 31}
-      s4 ∈ {-1; 0; 1; 2; 3; 4}
-      s5 ∈ [0..2147483647]
-      s6 ∈ [0..2147483646],0%2
+  Interferences from thread <main>
+    concurrent writes:
+      u3 = 1; sharedvars.c:88 <- main
+      s4 = -1; sharedvars.c:98 <- main
+      s4 = 1; sharedvars.c:100 <- main
+    shared bases: {u3, s4, s5, s6}
+    interferences by location:
+      sharedvars.c:88:
+        # cvalue:
+        u3 ∈ {1; 3; 31}
+        s4 ∈ {-1; 0; 1; 2; 3; 4}
+        s5 ∈ [0..2147483647]
+        s6 ∈ [0..2147483646],0%2 
+      sharedvars.c:98:
+        # cvalue:
+        u3 ∈ {1; 3; 31}
+        s4 ∈ {-1; 0; 1; 2; 3; 4}
+        s5 ∈ [0..2147483647]
+        s6 ∈ [0..2147483646],0%2 
+      sharedvars.c:100:
+        # cvalue:
+        u3 ∈ {1; 3; 31}
+        s4 ∈ {-1; 0; 1; 2; 3; 4}
+        s5 ∈ [0..2147483647]
+        s6 ∈ [0..2147483646],0%2 
+    interferences by mutexes:
+      {  }:
+        # cvalue:
+        u3 ∈ {1; 3; 31}
+        s4 ∈ {-1; 0; 1; 2; 3; 4}
+        s5 ∈ [0..2147483647]
+        s6 ∈ [0..2147483646],0%2
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
@@ -1871,10 +1920,11 @@
     write by jobs1 at sharedvars.c:31 <- f1
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {u3, s4, s5, s6}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread jobs1
+    concurrent writes:
+    shared bases: {u3, s4, s5, s6}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs1 computed
@@ -1888,10 +1938,11 @@
 [mt] Globals accessed by thread:
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {u3, s4, s5, s6}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread jobs2
+    concurrent writes:
+    shared bases: {u3, s4, s5, s6}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs2 computed
@@ -1912,23 +1963,24 @@
       pthread_create :: sharedvars.c:47 <- f3
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    u3 = 3; sharedvars.c:46 <- f3
-  shared bases: {u3, s4, s5, s6}
-  interferences by location:
-    sharedvars.c:46:
-      # cvalue:
-      u3 ∈ {1; 3; 31}
-      s4 ∈ {-1; 0; 1; 2; 3; 4}
-      s5 ∈ [0..2147483647]
-      s6 ∈ [0..2147483646],0%2 
-  interferences by mutexes:
-    {  }:
-      # cvalue:
-      u3 ∈ {1; 3; 31}
-      s4 ∈ {-1; 0; 1; 2; 3; 4}
-      s5 ∈ [0..2147483647]
-      s6 ∈ [0..2147483646],0%2
+  Interferences from thread jobs3
+    concurrent writes:
+      u3 = 3; sharedvars.c:46 <- f3
+    shared bases: {u3, s4, s5, s6}
+    interferences by location:
+      sharedvars.c:46:
+        # cvalue:
+        u3 ∈ {1; 3; 31}
+        s4 ∈ {-1; 0; 1; 2; 3; 4}
+        s5 ∈ [0..2147483647]
+        s6 ∈ [0..2147483646],0%2 
+    interferences by mutexes:
+      {  }:
+        # cvalue:
+        u3 ∈ {1; 3; 31}
+        s4 ∈ {-1; 0; 1; 2; 3; 4}
+        s5 ∈ [0..2147483647]
+        s6 ∈ [0..2147483646],0%2
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs3 computed
@@ -1952,30 +2004,31 @@
     write by jobs4 at sharedvars.c:57 <- f4
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    s4 = 4; sharedvars.c:54 <- f4
-    s6 = 4; sharedvars.c:57 <- f4
-  shared bases: {u3, s4, s5, s6}
-  interferences by location:
-    sharedvars.c:54:
-      # cvalue:
-      u3 ∈ {1; 3; 31}
-      s4 ∈ {-1; 0; 1; 2; 3; 4}
-      s5 ∈ [0..2147483647]
-      s6 ∈ [0..2147483646],0%2 
-    sharedvars.c:57:
-      # cvalue:
-      u3 ∈ {1; 3; 31}
-      s4 ∈ {-1; 0; 1; 2; 3; 4}
-      s5 ∈ [0..2147483647]
-      s6 ∈ [0..2147483646],0%2 
-  interferences by mutexes:
-    {  }:
-      # cvalue:
-      u3 ∈ {1; 3; 31}
-      s4 ∈ {-1; 0; 1; 2; 3; 4}
-      s5 ∈ [0..2147483647]
-      s6 ∈ [0..2147483646],0%2
+  Interferences from thread jobs4
+    concurrent writes:
+      s4 = 4; sharedvars.c:54 <- f4
+      s6 = 4; sharedvars.c:57 <- f4
+    shared bases: {u3, s4, s5, s6}
+    interferences by location:
+      sharedvars.c:54:
+        # cvalue:
+        u3 ∈ {1; 3; 31}
+        s4 ∈ {-1; 0; 1; 2; 3; 4}
+        s5 ∈ [0..2147483647]
+        s6 ∈ [0..2147483646],0%2 
+      sharedvars.c:57:
+        # cvalue:
+        u3 ∈ {1; 3; 31}
+        s4 ∈ {-1; 0; 1; 2; 3; 4}
+        s5 ∈ [0..2147483647]
+        s6 ∈ [0..2147483646],0%2 
+    interferences by mutexes:
+      {  }:
+        # cvalue:
+        u3 ∈ {1; 3; 31}
+        s4 ∈ {-1; 0; 1; 2; 3; 4}
+        s5 ∈ [0..2147483647]
+        s6 ∈ [0..2147483646],0%2
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs4 computed
@@ -1996,23 +2049,24 @@
       pthread_create :: sharedvars.c:68 <- f5
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    s5 = 5; sharedvars.c:69 <- f5
-  shared bases: {u3, s4, s5, s6}
-  interferences by location:
-    sharedvars.c:69:
-      # cvalue:
-      u3 ∈ {1; 3; 31}
-      s4 ∈ {-1; 0; 1; 2; 3; 4}
-      s5 ∈ [0..2147483647]
-      s6 ∈ [0..2147483646],0%2 
-  interferences by mutexes:
-    {  }:
-      # cvalue:
-      u3 ∈ {1; 3; 31}
-      s4 ∈ {-1; 0; 1; 2; 3; 4}
-      s5 ∈ [0..2147483647]
-      s6 ∈ [0..2147483646],0%2
+  Interferences from thread jobs5
+    concurrent writes:
+      s5 = 5; sharedvars.c:69 <- f5
+    shared bases: {u3, s4, s5, s6}
+    interferences by location:
+      sharedvars.c:69:
+        # cvalue:
+        u3 ∈ {1; 3; 31}
+        s4 ∈ {-1; 0; 1; 2; 3; 4}
+        s5 ∈ [0..2147483647]
+        s6 ∈ [0..2147483646],0%2 
+    interferences by mutexes:
+      {  }:
+        # cvalue:
+        u3 ∈ {1; 3; 31}
+        s4 ∈ {-1; 0; 1; 2; 3; 4}
+        s5 ∈ [0..2147483647]
+        s6 ∈ [0..2147483646],0%2
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs5 computed
@@ -2031,23 +2085,24 @@
     write by jobs6 at sharedvars.c:76 <- f6
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    s6 = 6; sharedvars.c:76 <- f6
-  shared bases: {u3, s4, s5, s6}
-  interferences by location:
-    sharedvars.c:76:
-      # cvalue:
-      u3 ∈ {1; 3; 31}
-      s4 ∈ {-1; 0; 1; 2; 3; 4}
-      s5 ∈ [0..2147483647]
-      s6 ∈ [0..2147483646],0%2 
-  interferences by mutexes:
-    {  }:
-      # cvalue:
-      u3 ∈ {1; 3; 31}
-      s4 ∈ {-1; 0; 1; 2; 3; 4}
-      s5 ∈ [0..2147483647]
-      s6 ∈ [0..2147483646],0%2
+  Interferences from thread jobs6
+    concurrent writes:
+      s6 = 6; sharedvars.c:76 <- f6
+    shared bases: {u3, s4, s5, s6}
+    interferences by location:
+      sharedvars.c:76:
+        # cvalue:
+        u3 ∈ {1; 3; 31}
+        s4 ∈ {-1; 0; 1; 2; 3; 4}
+        s5 ∈ [0..2147483647]
+        s6 ∈ [0..2147483646],0%2 
+    interferences by mutexes:
+      {  }:
+        # cvalue:
+        u3 ∈ {1; 3; 31}
+        s4 ∈ {-1; 0; 1; 2; 3; 4}
+        s5 ∈ [0..2147483647]
+        s6 ∈ [0..2147483646],0%2
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs6 computed
@@ -2066,23 +2121,24 @@
     write by jobs31 at sharedvars.c:41 <- f31
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    u3 = 31; sharedvars.c:41 <- f31
-  shared bases: {u3, s4, s5, s6}
-  interferences by location:
-    sharedvars.c:41:
-      # cvalue:
-      u3 ∈ {1; 3; 31}
-      s4 ∈ {-1; 0; 1; 2; 3; 4}
-      s5 ∈ [0..2147483647]
-      s6 ∈ [0..2147483646],0%2 
-  interferences by mutexes:
-    {  }:
-      # cvalue:
-      u3 ∈ {1; 3; 31}
-      s4 ∈ {-1; 0; 1; 2; 3; 4}
-      s5 ∈ [0..2147483647]
-      s6 ∈ [0..2147483646],0%2
+  Interferences from thread jobs31
+    concurrent writes:
+      u3 = 31; sharedvars.c:41 <- f31
+    shared bases: {u3, s4, s5, s6}
+    interferences by location:
+      sharedvars.c:41:
+        # cvalue:
+        u3 ∈ {1; 3; 31}
+        s4 ∈ {-1; 0; 1; 2; 3; 4}
+        s5 ∈ [0..2147483647]
+        s6 ∈ [0..2147483646],0%2 
+    interferences by mutexes:
+      {  }:
+        # cvalue:
+        u3 ∈ {1; 3; 31}
+        s4 ∈ {-1; 0; 1; 2; 3; 4}
+        s5 ∈ [0..2147483647]
+        s6 ∈ [0..2147483646],0%2
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs31 computed
