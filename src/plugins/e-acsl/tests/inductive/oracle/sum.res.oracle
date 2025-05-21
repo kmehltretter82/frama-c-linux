@@ -8,14 +8,8 @@
   no assigns clause generated for function sum because pointers as arguments is not yet supported
 [e-acsl] translation done in project "e-acsl".
 [eva:alarm] sum.c:26: Warning: 
-  function __e_acsl_assert_register_int: precondition data->values == \null ||
-                                                      \valid(data->values) got status unknown.
-[eva:alarm] sum.c:26: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] sum.c:26: Warning: assertion got status unknown.
-[eva:alarm] sum.c:27: Warning: 
-  function __e_acsl_assert_register_int: precondition data->values == \null ||
-                                                      \valid(data->values) got status unknown.
 [eva:alarm] sum.c:27: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] sum.c:27: Warning: assertion got status unknown.
