@@ -88,6 +88,9 @@ module Equality : sig
 
   val elements: t -> elt list
   (** Returns the list of all elements of the given set. *)
+
+  val to_set: t -> Hcexprs.HCESet.t
+  (** Returns the equality as a set of elements. *)
 end
 
 type equality = Equality.t

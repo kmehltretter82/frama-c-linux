@@ -537,8 +537,6 @@
 [mt] matrix.c:25: Lock locks[0]
 [eva:interferences] matrix.c:29: inject threads interferences at this point
 [mt] matrix.c:30: Release locks[0]
-[eva] FRAMAC_SHARE/mthread_pthread.c:66: Warning: 
-  The mutex locks[0] is already unlocked.
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -657,7 +655,7 @@
             [25][0..99] ∈ [--..--]
             [26..29][0..99] ∈ {0} 
   interferences by mutexes:
-    {  }:
+    { locks[0] }:
       # cvalue:
       matrix[0][0..99] ∈ [--..--]
             [1..4][0..99] ∈ {0}
@@ -798,7 +796,7 @@
             [25..26][0..99] ∈ [--..--]
             [27..29][0..99] ∈ {0} 
   interferences by mutexes:
-    {  }:
+    { locks[1] }:
       # cvalue:
       matrix[0..1][0..99] ∈ [--..--]
             [2..4][0..99] ∈ {0}
@@ -939,7 +937,7 @@
             [25..27][0..99] ∈ [--..--]
             [28..29][0..99] ∈ {0} 
   interferences by mutexes:
-    {  }:
+    { locks[2] }:
       # cvalue:
       matrix[0..2][0..99] ∈ [--..--]
             [3..4][0..99] ∈ {0}
@@ -1080,7 +1078,7 @@
             [25..28][0..99] ∈ [--..--]
             [29][0..99] ∈ {0} 
   interferences by mutexes:
-    {  }:
+    { locks[3] }:
       # cvalue:
       matrix[0..3][0..99] ∈ [--..--]
             [4][0..99] ∈ {0}
@@ -1149,7 +1147,7 @@
     matrix.c:29:
       # cvalue: matrix[0..29][0..99] ∈ [--..--] 
   interferences by mutexes:
-    {  }:
+    { locks[4] }:
       # cvalue: matrix[0..29][0..99] ∈ [--..--]
 [mt] * Computing cfg
 [mt] * Cfg computed
@@ -1663,7 +1661,7 @@
     matrix.c:29:
       # cvalue: matrix[0..29][0..99] ∈ [--..--] 
   interferences by mutexes:
-    {  }:
+    { locks[0] }:
       # cvalue: matrix[0..29][0..99] ∈ [--..--]
 [mt] * Computing cfg
 [mt] * Cfg computed
@@ -1721,7 +1719,7 @@
     matrix.c:29:
       # cvalue: matrix[0..29][0..99] ∈ [--..--] 
   interferences by mutexes:
-    {  }:
+    { locks[1] }:
       # cvalue: matrix[0..29][0..99] ∈ [--..--]
 [mt] * Computing cfg
 [mt] * Cfg computed
@@ -1779,7 +1777,7 @@
     matrix.c:29:
       # cvalue: matrix[0..29][0..99] ∈ [--..--] 
   interferences by mutexes:
-    {  }:
+    { locks[2] }:
       # cvalue: matrix[0..29][0..99] ∈ [--..--]
 [mt] * Computing cfg
 [mt] * Cfg computed
@@ -1837,7 +1835,7 @@
     matrix.c:29:
       # cvalue: matrix[0..29][0..99] ∈ [--..--] 
   interferences by mutexes:
-    {  }:
+    { locks[3] }:
       # cvalue: matrix[0..29][0..99] ∈ [--..--]
 [mt] * Computing cfg
 [mt] * Cfg computed
@@ -1895,7 +1893,7 @@
     matrix.c:29:
       # cvalue: matrix[0..29][0..99] ∈ [--..--] 
   interferences by mutexes:
-    {  }:
+    { locks[4] }:
       # cvalue: matrix[0..29][0..99] ∈ [--..--]
 [mt] * Computing cfg
 [mt] * Cfg computed
@@ -2397,7 +2395,7 @@
     matrix.c:29:
       # cvalue: matrix[0..29][0..99] ∈ [--..--] 
   interferences by mutexes:
-    {  }:
+    { locks[0] }:
       # cvalue: matrix[0..29][0..99] ∈ [--..--]
 [mt] * Computing cfg
 [mt] * Cfg computed
@@ -2453,7 +2451,7 @@
     matrix.c:29:
       # cvalue: matrix[0..29][0..99] ∈ [--..--] 
   interferences by mutexes:
-    {  }:
+    { locks[1] }:
       # cvalue: matrix[0..29][0..99] ∈ [--..--]
 [mt] * Computing cfg
 [mt] * Cfg computed
@@ -2509,7 +2507,7 @@
     matrix.c:29:
       # cvalue: matrix[0..29][0..99] ∈ [--..--] 
   interferences by mutexes:
-    {  }:
+    { locks[2] }:
       # cvalue: matrix[0..29][0..99] ∈ [--..--]
 [mt] * Computing cfg
 [mt] * Cfg computed

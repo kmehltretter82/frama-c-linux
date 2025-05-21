@@ -362,17 +362,23 @@ module Domain = struct
 
 
   (* MemExec cache. *)
-  let relate _kf _bases _state = Base.SetLattice.empty
+  let relate _bases _state = Base.SetLattice.empty
 
-  let filter _kind bases state =
+  let filter bases state =
     let filter_base = Zone.filter_base (fun b -> Base.Hptset.mem b bases) in
     { state with locs_data = filter_base state.locs_data;
                  locs_control = filter_base state.locs_control;
                  assume_stmts = Stmt.Set.empty; }
 
-  let reuse _kf bases ~current_input ~previous_output =
-    let state = remove_bases bases current_input in
-    join state previous_output
+  let project = filter
+
+  let overwrite bases ~on:state ~by =
+    let state = remove_bases bases state in
+    { state with locs_data = Zone.join state.locs_data by.locs_data;
+                 locs_control = Zone.join state.locs_control by.locs_control; }
+
+  let reuse bases ~current_input ~previous_output =
+    overwrite bases ~on:current_input ~by:previous_output
 end
 
 include Domain

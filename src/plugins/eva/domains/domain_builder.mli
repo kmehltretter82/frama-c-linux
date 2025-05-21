@@ -27,8 +27,8 @@ open Cil_types
 open Eval
 
 module type InputDomain = sig
-  (* The [name] value from Datatype should be the domain name and will be used
-     in some logs and in the GUI for the end-user. *)
+  (** The [name] value from Datatype should be the domain name and will be used
+      in some logs and in the GUI for the end-user. *)
   include Datatype.S
   val top: t
   val join: t -> t -> t
@@ -58,12 +58,9 @@ module type LeafDomain = sig
   val incr_loop_counter: stmt -> t -> t
   val leave_loop: stmt -> t -> t
 
-  val filter:
-    [`Pre of kernel_function | `Post of kernel_function | `Print ] ->
-    Base.Hptset.t -> t -> t
-  val reuse:
-    kernel_function -> Base.Hptset.t ->
-    current_input:t -> previous_output:t -> t
+  val project: Base.Hptset.t -> t -> t
+  val filter: Base.Hptset.t -> t -> t
+  val reuse: Base.Hptset.t -> current_input:t -> previous_output:t -> t
 
   val show_expr: 'a -> t -> Format.formatter -> exp -> unit
   val post_analysis: t Lattice_bounds.or_bottom -> unit

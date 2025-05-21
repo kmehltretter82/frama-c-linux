@@ -250,7 +250,7 @@ module Domain = struct
   let update _valuation state = `Value state
 
   (* Memexec *)
-  let relate _kf _bases _state = Base.SetLattice.empty
+  let relate _bases _state = Base.SetLattice.empty
 
   (* Initial state. Initializers are singletons, so we store nothing. *)
   let empty () = LatticeInout.empty
@@ -264,6 +264,10 @@ module Domain = struct
 
   let extract_expr ~oracle:_ _context _state _expr = top_query
   let extract_lval ~oracle:_ _context _state _lv _locs = top_query
+
+  let overwrite bases ~on:state ~by:_ =
+    let zone = Zone.of_bases bases in
+    { state with over_outputs = Zone.join state.over_outputs zone; }
 end
 
 include Domain

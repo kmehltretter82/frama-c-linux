@@ -1845,7 +1845,7 @@ module Domain = struct
   let initialize_variable _lval _location ~initialized:_ _value state = state
   let initialize_variable_using_type _kind _varinfo state = state
 
-  let relate _kf bases state =
+  let relate bases state =
     if intraprocedural ()
     then Base.SetLattice.empty
     else
@@ -1863,7 +1863,7 @@ module Domain = struct
       in
       Base.Hptset.fold aux bases Base.SetLattice.empty
 
-  let filter _kind bases state =
+  let filter bases state =
     if intraprocedural ()
     then state
     else
@@ -1886,7 +1886,7 @@ module Domain = struct
     let join_oct = Octagons.internal_join ~cache ~symmetric ~idempotent ~decide
     and join_itv = Intervals.internal_join ~cache ~symmetric ~idempotent ~decide
     and join_rel = Relations.union in
-    fun kf ~current_input ~previous_output ->
+    fun ~current_input ~previous_output ->
       let current_input = kill previous_output.modified current_input in
       let intervals = join_itv previous_output.intervals current_input.intervals
       and deps = Deps.narrow previous_output.deps current_input.deps in
@@ -1904,10 +1904,9 @@ module Domain = struct
           | `Value state -> state
           | `Bottom ->
             Self.failure ~current:true ~once:true
-              "Octagon domain: the use of the memexec cache for function %a
-              unexpectedly led to bottom, which could be a bug. The analysis
-              continues by ignoring the relations leading to bottom."
-              Kernel_function.pretty kf;
+              "Octagon domain: the use of the memexec cache unexpectedly \
+               led to bottom, which could be a bug. The analysis continues \
+               by ignoring the relations leading to bottom.";
             acc
         in
         Octagons.fold add_diamond previous_output.octagons state
@@ -1917,12 +1916,18 @@ module Domain = struct
           modified = current_input.modified;
           intervals; deps; }
 
-  let reuse kf _bases ~current_input ~previous_output =
+  let reuse _bases ~current_input ~previous_output =
     if intraprocedural ()
     then previous_output
     else
-      let t = interprocedural_reuse kf ~current_input ~previous_output in
+      let t = interprocedural_reuse ~current_input ~previous_output in
       check "reuse result" t
+
+  (* Could be optimized by sharing code with [filter] below. *)
+  let overwrite bases ~on:state ~by:_ =
+    let base_deps base = Deps.intersects_base state.deps base in
+    let vars = List.concat_map base_deps (Base.Hptset.elements bases) in
+    List.fold_left remove state vars
 end
 
 include Domain

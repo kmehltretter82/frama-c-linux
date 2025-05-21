@@ -1,0 +1,4 @@
+187a188
+> [eva] interrupt.c:20: Frama_C_show_each: {1}
+295a297
+> [eva] interrupt.c:20: Frama_C_show_each: {0; 1}

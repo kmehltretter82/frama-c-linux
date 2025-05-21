@@ -273,7 +273,7 @@
       # cvalue: s1 ∈ {1; 2}
                 s2 ∈ {0} 
   interferences by mutexes:
-    {  }:
+    { m2 }:
       # cvalue: s1 ∈ {1; 2}
                 s2 ∈ {0}
 [mt] * Computing cfg
@@ -330,7 +330,7 @@
       # cvalue: s1 ∈ {0; 1; 2}
                 s2 ∈ {0; 3} 
   interferences by mutexes:
-    {  }:
+    { m2 }:
       # cvalue: s1 ∈ {0; 1; 2}
                 s2 ∈ {0; 3}
 [mt] * Computing cfg
@@ -464,7 +464,7 @@
       # cvalue: s1 ∈ {0; 1; 2}
                 s2 ∈ {0; 3} 
   interferences by mutexes:
-    {  }:
+    { m1 }:
       # cvalue: s1 ∈ {0; 1; 2}
                 s2 ∈ {0; 3}
 [mt] * Computing cfg
@@ -496,7 +496,7 @@
       # cvalue: s1 ∈ {0; 1; 2}
                 s2 ∈ {0; 3} 
   interferences by mutexes:
-    {  }:
+    { m2 }:
       # cvalue: s1 ∈ {0; 1; 2}
                 s2 ∈ {0; 3}
 [mt] * Computing cfg
@@ -553,7 +553,7 @@
       # cvalue: s1 ∈ {0; 1; 2}
                 s2 ∈ {0; 3} 
   interferences by mutexes:
-    {  }:
+    { m2 }:
       # cvalue: s1 ∈ {0; 1; 2}
                 s2 ∈ {0; 3}
 [mt] * Computing cfg
@@ -680,7 +680,7 @@
       # cvalue: s1 ∈ {0; 1; 2}
                 s2 ∈ {0; 3} 
   interferences by mutexes:
-    {  }:
+    { m1 }:
       # cvalue: s1 ∈ {0; 1; 2}
                 s2 ∈ {0; 3}
 [mt] * Computing cfg
