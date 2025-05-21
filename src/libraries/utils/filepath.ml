@@ -122,8 +122,8 @@ let to_pretty_string p =
   else
     let s = match to_base_uri p with
       | None, uri -> uri
-      | Some "PWD", uri -> uri
-      | Some symb, uri -> symb ^ "/" ^ uri
+      | Some "PWD", uri -> if uri = "" then "." else uri
+      | Some symb, uri -> if uri = "" then symb else  symb ^ "/" ^ uri
     in
     skip_dot s
 

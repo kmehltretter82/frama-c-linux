@@ -140,22 +140,20 @@ let to_string path =
 let to_uri path =
   let buffer = Buffer.create 80 in
   let rec add_component path =
-    let open Buffer in
-    match path.dir with
-    | None -> (* root *)
-      add_string buffer path.path_name;
-      None
-    | Some parent ->
-      let base = match parent.symbolic_name with
-        | Some sn -> Some sn
-        | None when parent == cwd (* hconsed *) -> Some "PWD"
-        | None ->
-          let base = add_component parent in
-          add_char buffer '/';
-          base
-      in
-      add_string buffer path.base_name;
-      base
+    match path.symbolic_name with
+    | Some sn -> Some sn
+    | None when path == cwd (* hconsed *) -> Some "PWD"
+    | None ->
+      match path.dir with
+      | None -> (* root *)
+        Buffer.add_string buffer path.path_name;
+        None
+      | Some parent ->
+        let base = add_component parent in
+        if Buffer.length buffer > 0 || base = None then
+          Buffer.add_char buffer '/';
+        Buffer.add_string buffer path.base_name;
+        base
   in
   let base = add_component path in
   let uri = Buffer.contents buffer in
