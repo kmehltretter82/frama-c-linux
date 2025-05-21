@@ -28,43 +28,47 @@ module type S = sig
   type value
   type valuation
 
-  (** [add_logc_assign aloc clause location] registers to [Inout_access] the
-      read and written memory zones at [aloc] for the logic assign [clause] to
-      the [location]. *)
-  val add_logic_assign :
-    Position.t -> location Eval.logic_assign -> location -> unit
+  (** [register_logc_assign pos clause location] registers to [Inout_access]
+      the read and written memory zones at [pos] for the logic assign [clause]
+      to the [location]. The memory accessed by the logic assign is returned. *)
+  val register_logic_assign :
+    Position.t -> location Eval.logic_assign -> location ->
+    Inout_access.t
 
-  (** [add_assign_lval aloc valuation lval exp] registers to [Inout_access] the
-      read and written memory zones at [aloc] for the assignment from [exp] to
-      [lval] with a given [valuation]. *)
-  val add_assign_lval :
+  (** [register_assign_lval pos valuation lval exp] registers to [Inout_access]
+      the read and written memory zones at [pos] for the assignment from [exp]
+      to [lval] with a given [valuation]. The memory accessed by the assignment
+      is returned. *)
+  val register_assign_lval :
     Position.t -> valuation ->
     Eva_ast.lval -> Eva_ast.exp ->
-    unit
+    Inout_access.t
 
-  (** [add_assign_var aloc valuation vi exp] registers to [Inout_access] the
-      read and written memory zones at [aloc] for the assignment from [exp] to
-      [vi] with a given [valuation]. *)
-  val add_assign_var :
+  (** [register_assign_var pos valuation vi exp] registers to [Inout_access]
+      the read and written memory zones at [pos] for the assignment from [exp]
+      to [vi] with a given [valuation]. The memory accessed by the assignment is
+      returned. *)
+  val register_assign_var :
     Position.t -> valuation ->
     Eva_ast.varinfo -> Eva_ast.exp ->
-    unit
+    Inout_access.t
 
-  (** [add_read_exp aloc valuation exp] registers to [Inout_access] the read
-      memory zones at [aloc] for reading the expression [exp] with a given
-      [valuation]. *)
-  val add_read_exp :
+  (** [register_read_exp pos valuation exp] registers to [Inout_access] the
+      read memory zones at [pos] for reading the expression [exp] with a given
+      [valuation]. The memory accessed by the read is returned. *)
+  val register_read_exp :
     Position.t -> valuation ->
     Eva_ast.exp ->
-    unit
+    Inout_access.t
 
-  (** [add_call_args aloc valuation call] registers to [Inout_access] the read
-      and written memory zones at [aloc] for the arguments of the given [call]
-      with a given [valuation]. *)
-  val add_call_args :
+  (** [register_call_args pos valuation call] registers to [Inout_access] the
+      read and written memory zones at [pos] for the arguments of the given
+      [call] with a given [valuation]. The memory accessed by the call arguments
+      is returned. *)
+  val register_call_args :
     Position.t -> valuation ->
     (location, value) Eval.call ->
-    unit
+    Inout_access.t
 end
 
 module Make (Engine : Engine_sig.S)

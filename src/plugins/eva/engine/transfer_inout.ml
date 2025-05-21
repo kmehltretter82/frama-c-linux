@@ -28,48 +28,43 @@ module type S = sig
   type location
   type value
   type valuation
-  val add_logic_assign :
-    Position.t -> location Eval.logic_assign -> location -> unit
-  val add_assign_lval :
+  val register_logic_assign :
+    Position.t -> location Eval.logic_assign -> location ->
+    Inout_access.t
+  val register_assign_lval :
     Position.t -> valuation ->
     Eva_ast.lval -> Eva_ast.exp ->
-    unit
-  val add_assign_var :
+    Inout_access.t
+  val register_assign_var :
     Position.t -> valuation ->
     Eva_ast.varinfo -> Eva_ast.exp ->
-    unit
-  val add_read_exp :
+    Inout_access.t
+  val register_read_exp :
     Position.t -> valuation ->
     Eva_ast.exp ->
-    unit
-  val add_call_args :
+    Inout_access.t
+  val register_call_args :
     Position.t -> valuation ->
     (location, value) Eval.call ->
-    unit
+    Inout_access.t
 end
 
 module Make (Engine : Engine_sig.S) = struct
   module Location = Engine.Loc
   module Eval = Engine.Eval
   module EvaAstDeps = Eva_ast.MakeDepsOf (Location)
+  module Interferences = Engine.Interferences
 
   type location = Location.location
   type value = Engine.Val.t
   type valuation = Eval.Valuation.t
 
-  let compute_zones to_loc (lval : Eva_ast.lval) =
-    match lval.node with
-    | Var vi, NoOffset ->
-      Locations.(zone_of_varinfo vi, Zone.bottom)
-    | _ ->
-      let loc = to_loc lval in
-      let lv_zone = Location.enumerate_valid_bits Write loc in
-      let lv_indirect_zone = EvaAstDeps.indirect_zone_of_lval to_loc lval in
-      lv_zone, lv_indirect_zone
+  let register_and_return_access pos access =
+    Inout_access.register pos access;
+    access
 
-  let add_logic_assign pos clause location =
-    let written = Location.enumerate_valid_bits Write location in
-    Inout_access.register_write pos written;
+  let logic_assign_access clause location =
+    let write = Location.enumerate_valid_bits Write location in
     let read =
       match clause with
       | Assigns (_, from_deps) ->
@@ -85,37 +80,69 @@ module Make (Engine : Engine_sig.S) = struct
           from_deps
       | _ -> Locations.Zone.bottom
     in
-    Inout_access.register_read pos read
+    Inout_access.Access.make ~read ~write ()
+
+  let register_logic_assign pos clause location =
+    logic_assign_access clause location
+    |> register_and_return_access pos
 
   let find_loc valuation = Eval.Valuation.find_loc_def valuation
 
-  let add_assign_lval pos valuation lval exp =
+  let compute_zones to_loc (lval : Eva_ast.lval) =
+    match lval.node with
+    | Var vi, NoOffset ->
+      Locations.(zone_of_varinfo vi, Zone.bottom)
+    | _ ->
+      let loc = to_loc lval in
+      let lv_zone = Location.enumerate_valid_bits Write loc in
+      let lv_indirect_zone = EvaAstDeps.indirect_zone_of_lval to_loc lval in
+      lv_zone, lv_indirect_zone
+
+  let assign_lval_access valuation lval exp =
     let to_loc = find_loc valuation in
     let written_zone, lv_indirect_zone = compute_zones to_loc lval in
-    Inout_access.register_write pos written_zone;
     let exp_zone = EvaAstDeps.zone_of_exp to_loc exp in
     let read_zone = Locations.Zone.join lv_indirect_zone exp_zone in
-    Inout_access.register_read pos read_zone
+    Inout_access.Access.make ~read:read_zone ~write:written_zone ()
 
-  let add_assign_var pos valuation vi exp =
+  let register_assign_lval pos valuation lval exp =
+    assign_lval_access valuation lval exp
+    |> register_and_return_access pos
+
+  let assign_var_access valuation vi exp =
     let lval = Eva_ast.Build.var vi in
-    add_assign_lval pos valuation lval exp
+    assign_lval_access valuation lval exp
 
-  let add_read_exp pos valuation exp =
+  let register_assign_var pos valuation vi exp =
+    assign_var_access valuation vi exp
+    |> register_and_return_access pos
+
+  let read_exp_access valuation exp =
     let to_loc = find_loc valuation in
-    let read_zone = EvaAstDeps.zone_of_exp to_loc exp in
-    Inout_access.register_read pos read_zone
+    let read = EvaAstDeps.zone_of_exp to_loc exp in
+    Inout_access.Access.make ~read ()
 
-  let add_call_args pos valuation call =
+  let register_read_exp pos valuation exp =
+    read_exp_access valuation exp
+    |> register_and_return_access pos
+
+  let call_args_access valuation call =
+    let access = Inout_access.Access.bottom in
     (* Register read and written zone for named arguments. *)
-    let f { formal; concrete } =
-      add_assign_var pos valuation formal concrete
+    let f acc { formal; concrete } =
+      let access = assign_var_access valuation formal concrete in
+      Inout_access.Access.join acc access
     in
-    List.iter f call.arguments;
+    let access = List.fold_left f access call.arguments in
     (* Register read zones for the rest of the arguments. *)
-    let f (concrete, _) =
-      add_read_exp pos valuation concrete
+    let f acc (concrete, _) =
+      let access = read_exp_access valuation concrete in
+      Inout_access.Access.join acc access
     in
-    List.iter f call.rest
+    List.fold_left f access call.rest
+
+  let register_call_args pos valuation call =
+    call_args_access valuation call
+    |> register_and_return_access pos
 
 end

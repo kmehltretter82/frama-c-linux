@@ -83,6 +83,8 @@
 [mt] * Computing value analysis for thread jobs
 [eva] Analyzing a complete application starting at f
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of f for thread jobs
 [mt] manysharedvars.c:28: Lock lock
 [mt] manysharedvars.c:31: Release lock
 [mt] * Starting to save the state of the value analysis
@@ -247,6 +249,8 @@
 [mt] * Computing value analysis for thread jobs
 [eva] Analyzing a complete application starting at f
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of f for thread jobs
 [mt] manysharedvars.c:28: Lock lock
 [eva:interferences] manysharedvars.c:29: 
   inject threads interferences at this point

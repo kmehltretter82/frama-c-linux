@@ -38,6 +38,8 @@
 [mt] * Computing value analysis for thread th1
 [eva] Analyzing a complete application starting at t1
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of t1 for thread th1
 [mt] join.c:11: Thread exiting with value {1}
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
@@ -57,6 +59,8 @@
 [mt] * Computing value analysis for thread th2
 [eva] Analyzing a complete application starting at t2
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of t2 for thread th2
 [mt] join.c:15: Thread exiting with value {2}
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved

@@ -40,6 +40,8 @@
 [mt] * Computing value analysis for thread <main>
 [eva] Analyzing a complete application starting at main_interrupt_cross_incr
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of main_interrupt_cross_incr for thread <main>
 [mt] Thread <main>, fun main_interrupt_cross_incr
 [eva] interrupt.c:49: Frama_C_show_each_a: {0}
 [eva] interrupt.c:52: Frama_C_show_each_b: {0}
@@ -66,6 +68,8 @@
 [mt] * Computing value analysis for thread <interrupt_handler interrupt_cross_incr1>
 [eva] Analyzing a complete application starting at interrupt_cross_incr1
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of interrupt_cross_incr1 for thread <interrupt_handler interrupt_cross_incr1>
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -91,6 +95,8 @@
 [mt] * Computing value analysis for thread <interrupt_handler interrupt_cross_incr2>
 [eva] Analyzing a complete application starting at interrupt_cross_incr2
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of interrupt_cross_incr2 for thread <interrupt_handler interrupt_cross_incr2>
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -131,6 +137,8 @@
 [mt] * Computing value analysis for thread <main>
 [eva] Analyzing a complete application starting at main_interrupt_cross_incr
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of main_interrupt_cross_incr for thread <main>
 [mt] Thread <main>, fun main_interrupt_cross_incr
 [eva] interrupt.c:49: Frama_C_show_each_a: {0}
 [eva] interrupt.c:52: Frama_C_show_each_b: {0}
@@ -157,6 +165,8 @@
 [mt] * Computing value analysis for thread <interrupt_handler interrupt_cross_incr1>
 [eva] Analyzing a complete application starting at interrupt_cross_incr1
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of interrupt_cross_incr1 for thread <interrupt_handler interrupt_cross_incr1>
 [eva:interferences] interrupt.c:41: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
@@ -191,6 +201,8 @@
 [mt] * Computing value analysis for thread <interrupt_handler interrupt_cross_incr2>
 [eva] Analyzing a complete application starting at interrupt_cross_incr2
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of interrupt_cross_incr2 for thread <interrupt_handler interrupt_cross_incr2>
 [eva:interferences] interrupt.c:45: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
@@ -287,11 +299,13 @@
 [mt] * Computing value analysis for thread <main>
 [eva] Analyzing a complete application starting at main_interrupt_cross_incr
 [eva] Initial state supplied by user
-[mt] Thread <main>, fun main_interrupt_cross_incr
-[eva] interrupt.c:49: Frama_C_show_each_a: {0}
+[eva:interferences] 
+  inject threads interferences at the start of main_interrupt_cross_incr for thread <main>
+[mt] New context for <main>, fun main_interrupt_cross_incr
 [eva:interferences] interrupt.c:58: inject threads interferences at this point
-[eva] interrupt.c:52: Frama_C_show_each_b: {0; 1; 2}
+[eva] interrupt.c:49: Frama_C_show_each_a: {0; 1}
 [eva:interferences] interrupt.c:59: inject threads interferences at this point
+[eva] interrupt.c:52: Frama_C_show_each_b: {0; 1; 2}
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -315,6 +329,8 @@
 [mt] * Computing value analysis for thread <interrupt_handler interrupt_cross_incr1>
 [eva] Analyzing a complete application starting at interrupt_cross_incr1
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of interrupt_cross_incr1 for thread <interrupt_handler interrupt_cross_incr1>
 [eva:interferences] interrupt.c:41: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
@@ -351,6 +367,8 @@
 [mt] * Computing value analysis for thread <interrupt_handler interrupt_cross_incr2>
 [eva] Analyzing a complete application starting at interrupt_cross_incr2
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of interrupt_cross_incr2 for thread <interrupt_handler interrupt_cross_incr2>
 [eva:interferences] interrupt.c:45: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
@@ -387,7 +405,7 @@
 [mt] * threads and mutexes computed
 [mt] ***** Computing shared variables
 [mt] Imprecise locations to watch: interrupt_received_a; interrupt_received_b
-[mt] <main> reads  interrupt_received_a ∈ {0}  // interrupt.c:58
+[mt] <main> reads  interrupt_received_a ∈ {0; 1}  // interrupt.c:58
   main_interrupt_cross_incr
 [mt] <interrupt_handler interrupt_cross_incr2> reads 
   interrupt_received_a ∈ {0; 1; 2; 3}  // interrupt.c:45 interrupt_cross_incr2
@@ -444,11 +462,13 @@
 [mt] * Computing value analysis for thread <main>
 [eva] Analyzing a complete application starting at main_interrupt_cross_incr
 [eva] Initial state supplied by user
-[mt] Thread <main>, fun main_interrupt_cross_incr
-[eva] interrupt.c:49: Frama_C_show_each_a: {0}
+[eva:interferences] 
+  inject threads interferences at the start of main_interrupt_cross_incr for thread <main>
+[mt] New context for <main>, fun main_interrupt_cross_incr
 [eva:interferences] interrupt.c:58: inject threads interferences at this point
-[eva] interrupt.c:52: Frama_C_show_each_b: {0; 1; 2; 3; 4}
+[eva] interrupt.c:49: Frama_C_show_each_a: {0; 1; 2; 3}
 [eva:interferences] interrupt.c:59: inject threads interferences at this point
+[eva] interrupt.c:52: Frama_C_show_each_b: {0; 1; 2; 3; 4}
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -472,6 +492,8 @@
 [mt] * Computing value analysis for thread <interrupt_handler interrupt_cross_incr1>
 [eva] Analyzing a complete application starting at interrupt_cross_incr1
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of interrupt_cross_incr1 for thread <interrupt_handler interrupt_cross_incr1>
 [eva:interferences] interrupt.c:41: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
@@ -508,6 +530,8 @@
 [mt] * Computing value analysis for thread <interrupt_handler interrupt_cross_incr2>
 [eva] Analyzing a complete application starting at interrupt_cross_incr2
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of interrupt_cross_incr2 for thread <interrupt_handler interrupt_cross_incr2>
 [eva:interferences] interrupt.c:45: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
@@ -544,7 +568,7 @@
 [mt] * threads and mutexes computed
 [mt] ***** Computing shared variables
 [mt] Imprecise locations to watch: interrupt_received_a; interrupt_received_b
-[mt] <main> reads  interrupt_received_a ∈ {0}  // interrupt.c:58
+[mt] <main> reads  interrupt_received_a ∈ {0; 1; 2; 3}  // interrupt.c:58
   main_interrupt_cross_incr
 [mt] <interrupt_handler interrupt_cross_incr2> reads 
   interrupt_received_a ∈ {0; 1; 2; 3; 4; 5}  // interrupt.c:45
@@ -604,11 +628,13 @@
 [mt] * Computing value analysis for thread <main>
 [eva] Analyzing a complete application starting at main_interrupt_cross_incr
 [eva] Initial state supplied by user
-[mt] Thread <main>, fun main_interrupt_cross_incr
-[eva] interrupt.c:49: Frama_C_show_each_a: {0}
+[eva:interferences] 
+  inject threads interferences at the start of main_interrupt_cross_incr for thread <main>
+[mt] New context for <main>, fun main_interrupt_cross_incr
 [eva:interferences] interrupt.c:58: inject threads interferences at this point
-[eva] interrupt.c:52: Frama_C_show_each_b: {0; 1; 2; 3; 4; 5; 6}
+[eva] interrupt.c:49: Frama_C_show_each_a: {0; 1; 2; 3; 4; 5}
 [eva:interferences] interrupt.c:59: inject threads interferences at this point
+[eva] interrupt.c:52: Frama_C_show_each_b: {0; 1; 2; 3; 4; 5; 6}
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -632,6 +658,8 @@
 [mt] * Computing value analysis for thread <interrupt_handler interrupt_cross_incr1>
 [eva] Analyzing a complete application starting at interrupt_cross_incr1
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of interrupt_cross_incr1 for thread <interrupt_handler interrupt_cross_incr1>
 [eva:interferences] interrupt.c:41: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
@@ -668,9 +696,11 @@
 [mt] * Computing value analysis for thread <interrupt_handler interrupt_cross_incr2>
 [eva] Analyzing a complete application starting at interrupt_cross_incr2
 [eva] Initial state supplied by user
-[eva:interferences] interrupt.c:45: inject threads interferences at this point
+[eva:interferences] 
+  inject threads interferences at the start of interrupt_cross_incr2 for thread <interrupt_handler interrupt_cross_incr2>
 [eva:alarm] interrupt.c:45: Warning: 
   signed overflow. assert interrupt_received_a + 1 ≤ 2147483647;
+[eva:interferences] interrupt.c:45: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -708,7 +738,7 @@
 [mt] * threads and mutexes computed
 [mt] ***** Computing shared variables
 [mt] Imprecise locations to watch: interrupt_received_a; interrupt_received_b
-[mt] <main> reads  interrupt_received_a ∈ {0}  // interrupt.c:58
+[mt] <main> reads  interrupt_received_a ∈ {0; 1; 2; 3; 4; 5}  // interrupt.c:58
   main_interrupt_cross_incr
 [mt] <interrupt_handler interrupt_cross_incr2> reads 
   interrupt_received_a ∈ [0..2147483647]  // interrupt.c:45
@@ -767,11 +797,13 @@
 [mt] * Computing value analysis for thread <main>
 [eva] Analyzing a complete application starting at main_interrupt_cross_incr
 [eva] Initial state supplied by user
-[mt] Thread <main>, fun main_interrupt_cross_incr
-[eva] interrupt.c:49: Frama_C_show_each_a: {0}
+[eva:interferences] 
+  inject threads interferences at the start of main_interrupt_cross_incr for thread <main>
+[mt] New context for <main>, fun main_interrupt_cross_incr
 [eva:interferences] interrupt.c:58: inject threads interferences at this point
-[eva] interrupt.c:52: Frama_C_show_each_b: [0..2147483647]
+[eva] interrupt.c:49: Frama_C_show_each_a: [0..2147483647]
 [eva:interferences] interrupt.c:59: inject threads interferences at this point
+[eva] interrupt.c:52: Frama_C_show_each_b: [0..2147483647]
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -795,9 +827,11 @@
 [mt] * Computing value analysis for thread <interrupt_handler interrupt_cross_incr1>
 [eva] Analyzing a complete application starting at interrupt_cross_incr1
 [eva] Initial state supplied by user
-[eva:interferences] interrupt.c:41: inject threads interferences at this point
+[eva:interferences] 
+  inject threads interferences at the start of interrupt_cross_incr1 for thread <interrupt_handler interrupt_cross_incr1>
 [eva:alarm] interrupt.c:41: Warning: 
   signed overflow. assert interrupt_received_b + 1 ≤ 2147483647;
+[eva:interferences] interrupt.c:41: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -838,7 +872,7 @@
 [mt] <interrupt_handler interrupt_cross_incr2> reads 
   interrupt_received_a ∈ [0..2147483647]  // interrupt.c:45
   interrupt_cross_incr2
-[mt] <main> reads  interrupt_received_a ∈ {0}  // interrupt.c:58
+[mt] <main> reads  interrupt_received_a ∈ [0..2147483647]  // interrupt.c:58
   main_interrupt_cross_incr
 [mt] <main> reads  interrupt_received_b ∈ [0..2147483647]  // interrupt.c:59
   main_interrupt_cross_incr

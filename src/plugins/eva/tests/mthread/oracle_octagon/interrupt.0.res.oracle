@@ -1,4 +1,6 @@
-192a193
+198a199,200
+> [eva] interrupt.c:18: Frama_C_show_each_locked: {0; 1}
 > [eva] interrupt.c:20: Frama_C_show_each: {1}
-302a304
+308a311,312
+> [eva] interrupt.c:18: Frama_C_show_each_locked: {0; 1}
 > [eva] interrupt.c:20: Frama_C_show_each: {0; 1}

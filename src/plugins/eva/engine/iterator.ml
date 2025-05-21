@@ -451,13 +451,6 @@ module Make_Dataflow
     let flow =
       Partitioning.transfer (transfer_transition ~pos transition) flow
     in
-    let flow =
-      if Engine.Interferences.is_empty transition
-      then flow
-      else
-        let inject_interferences = Engine.Interferences.inject ~pos v1 v2 in
-        Partitioning.transfer (lift inject_interferences) flow
-    in
     let flow = process_partitioning_transitions v1 v2 transition flow in
     if not (Partitioning.is_empty_flow flow) then
       record_fireable e;

@@ -68,6 +68,8 @@
 [mt] * Computing value analysis for thread jobs[0]
 [eva] Analyzing a complete application starting at fjob
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of fjob for thread jobs[0]
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -88,6 +90,8 @@
 [mt] * Computing value analysis for thread jobs[1]
 [eva] Analyzing a complete application starting at fjob
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of fjob for thread jobs[1]
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -108,6 +112,8 @@
 [mt] * Computing value analysis for thread jobs[2]
 [eva] Analyzing a complete application starting at fjob
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of fjob for thread jobs[2]
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -128,6 +134,8 @@
 [mt] * Computing value analysis for thread jobs[3]
 [eva] Analyzing a complete application starting at fjob
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of fjob for thread jobs[3]
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -148,6 +156,8 @@
 [mt] * Computing value analysis for thread job_f1
 [eva] Analyzing a complete application starting at f1
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of f1 for thread job_f1
 [mt] ccfg.c:53: Lock lock
 [eva] using specification for function g3
 [mt] ccfg.c:55: Release lock
@@ -181,6 +191,8 @@
 [mt] * Computing value analysis for thread job_f2
 [eva] Analyzing a complete application starting at f2
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of f2 for thread job_f2
 [mt] ccfg.c:62: Lock lock
 [eva] using specification for function g4
 [mt] ccfg.c:64: Release lock
@@ -400,6 +412,8 @@
 [mt] * Computing value analysis for thread jobs[0]
 [eva] Analyzing a complete application starting at fjob
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of fjob for thread jobs[0]
 [eva:interferences] ccfg.c:18: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
@@ -422,6 +436,8 @@
 [mt] * Computing value analysis for thread jobs[1]
 [eva] Analyzing a complete application starting at fjob
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of fjob for thread jobs[1]
 [eva:interferences] ccfg.c:18: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
@@ -444,6 +460,8 @@
 [mt] * Computing value analysis for thread jobs[2]
 [eva] Analyzing a complete application starting at fjob
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of fjob for thread jobs[2]
 [eva:interferences] ccfg.c:18: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
@@ -466,6 +484,8 @@
 [mt] * Computing value analysis for thread jobs[3]
 [eva] Analyzing a complete application starting at fjob
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of fjob for thread jobs[3]
 [eva:interferences] ccfg.c:18: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
@@ -488,6 +508,8 @@
 [mt] * Computing value analysis for thread job_f1
 [eva] Analyzing a complete application starting at f1
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of f1 for thread job_f1
 [mt] ccfg.c:53: Lock lock
 [eva] using specification for function g3
 [eva:interferences] ccfg.c:54: inject threads interferences at this point
@@ -584,6 +606,8 @@
 [mt] * Computing value analysis for thread job_f2
 [eva] Analyzing a complete application starting at f2
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of f2 for thread job_f2
 [mt] ccfg.c:62: Lock lock
 [eva] using specification for function g4
 [eva:interferences] ccfg.c:63: inject threads interferences at this point
@@ -680,22 +704,22 @@
 [mt] * threads and mutexes computed
 [mt] ***** Computing shared variables
 [mt] Imprecise locations to watch: global1; global2[0..1]; a; b; c; d; e; f
-[mt] jobs[0] reads  global1 ∈ {0}  // ccfg.c:18 fjob
-[mt] jobs[1] reads  global1 ∈ {0}  // ccfg.c:18 fjob
-[mt] jobs[2] reads  global1 ∈ {0}  // ccfg.c:18 fjob
-[mt] jobs[3] reads  global1 ∈ {0}  // ccfg.c:18 fjob
-[mt] jobs[0] reads  global2[0] ∈ {0}  // ccfg.c:18 fjob
-[mt] jobs[1] reads  global2[0] ∈ {0}  // ccfg.c:18 fjob
+[mt] jobs[0] reads  global1 ∈ {0; 1}  // ccfg.c:18 fjob
+[mt] jobs[1] reads  global1 ∈ {0; 1}  // ccfg.c:18 fjob
+[mt] jobs[2] reads  global1 ∈ {0; 1}  // ccfg.c:18 fjob
+[mt] jobs[3] reads  global1 ∈ {0; 1}  // ccfg.c:18 fjob
+[mt] jobs[0] reads  global2[0] ∈ {0; 1}  // ccfg.c:18 fjob
+[mt] jobs[1] reads  global2[0] ∈ {0; 1}  // ccfg.c:18 fjob
 [mt] jobs[2] reads  global2[0] ∈ {0; 1}  // ccfg.c:18 fjob
 [mt] jobs[3] reads  global2[0] ∈ {0; 1}  // ccfg.c:18 fjob
-[mt] jobs[0] reads  global2[1] ∈ {0}  // ccfg.c:18 fjob
-[mt] jobs[1] reads  global2[1] ∈ {0}  // ccfg.c:18 fjob
+[mt] jobs[0] reads  global2[1] ∈ {0; 2}  // ccfg.c:18 fjob
+[mt] jobs[1] reads  global2[1] ∈ {0; 2}  // ccfg.c:18 fjob
 [mt] jobs[2] reads  global2[1] ∈ {0; 2}  // ccfg.c:18 fjob
 [mt] jobs[3] reads  global2[1] ∈ {0; 2}  // ccfg.c:18 fjob
 [mt] <main> reads  a ∈ {1}  // ccfg.c:90 main
-[mt] job_f2 reads  a ∈ {1}  // ccfg.c:63 g4 :: ccfg.c:63 <- f2
+[mt] job_f2 reads  a ∈ [--..--]  // ccfg.c:63 g4 :: ccfg.c:63 <- f2
 [mt] <main> reads  b ∈ {1}  // ccfg.c:91 main
-[mt] job_f1 reads  b ∈ {1}  // ccfg.c:54 g3 :: ccfg.c:54 <- f1
+[mt] job_f1 reads  b ∈ {0; 1}  // ccfg.c:54 g3 :: ccfg.c:54 <- f1
 [mt] <main> reads  c ∈ {1}  // ccfg.c:93 main
 [mt] job_f2 reads  c ∈ [--..--]  // ccfg.c:65 g5 :: ccfg.c:65 <- f2
 [mt] <main> reads  d ∈ {1}  // ccfg.c:94 main
@@ -1033,6 +1057,8 @@
 [mt] * Computing value analysis for thread jobs[0]
 [eva] Analyzing a complete application starting at fjob
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of fjob for thread jobs[0]
 [eva:interferences] ccfg.c:18: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
@@ -1056,6 +1082,8 @@
 [mt] * Computing value analysis for thread jobs[1]
 [eva] Analyzing a complete application starting at fjob
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of fjob for thread jobs[1]
 [eva:interferences] ccfg.c:18: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
@@ -1079,6 +1107,8 @@
 [mt] * Computing value analysis for thread jobs[2]
 [eva] Analyzing a complete application starting at fjob
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of fjob for thread jobs[2]
 [eva:interferences] ccfg.c:18: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
@@ -1102,6 +1132,8 @@
 [mt] * Computing value analysis for thread jobs[3]
 [eva] Analyzing a complete application starting at fjob
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of fjob for thread jobs[3]
 [eva:interferences] ccfg.c:18: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
@@ -1125,6 +1157,8 @@
 [mt] * Computing value analysis for thread job_f1
 [eva] Analyzing a complete application starting at f1
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of f1 for thread job_f1
 [mt] ccfg.c:53: Lock lock
 [eva] using specification for function g3
 [eva:interferences] ccfg.c:54: inject threads interferences at this point
@@ -1222,6 +1256,8 @@
 [mt] * Computing value analysis for thread job_f2
 [eva] Analyzing a complete application starting at f2
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of f2 for thread job_f2
 [mt] ccfg.c:62: Lock lock
 [eva] using specification for function g4
 [eva:interferences] ccfg.c:63: inject threads interferences at this point
@@ -1318,16 +1354,16 @@
 [mt] * threads and mutexes computed
 [mt] ***** Computing shared variables
 [mt] Imprecise locations to watch: global1; global2[0..1]; a; b; c; d; e; f
-[mt] jobs[0] reads  global1 ∈ {0}  // ccfg.c:18 fjob
-[mt] jobs[1] reads  global1 ∈ {0}  // ccfg.c:18 fjob
+[mt] jobs[0] reads  global1 ∈ {0; 1}  // ccfg.c:18 fjob
+[mt] jobs[1] reads  global1 ∈ {0; 1}  // ccfg.c:18 fjob
 [mt] jobs[2] reads  global1 ∈ {0; 1}  // ccfg.c:18 fjob
 [mt] jobs[3] reads  global1 ∈ {0; 1}  // ccfg.c:18 fjob
-[mt] jobs[0] reads  global2[0] ∈ {0}  // ccfg.c:18 fjob
-[mt] jobs[1] reads  global2[0] ∈ {0}  // ccfg.c:18 fjob
+[mt] jobs[0] reads  global2[0] ∈ {0; 1}  // ccfg.c:18 fjob
+[mt] jobs[1] reads  global2[0] ∈ {0; 1}  // ccfg.c:18 fjob
 [mt] jobs[2] reads  global2[0] ∈ {0; 1}  // ccfg.c:18 fjob
 [mt] jobs[3] reads  global2[0] ∈ {0; 1}  // ccfg.c:18 fjob
-[mt] jobs[0] reads  global2[1] ∈ {0}  // ccfg.c:18 fjob
-[mt] jobs[1] reads  global2[1] ∈ {0}  // ccfg.c:18 fjob
+[mt] jobs[0] reads  global2[1] ∈ {0; 2}  // ccfg.c:18 fjob
+[mt] jobs[1] reads  global2[1] ∈ {0; 2}  // ccfg.c:18 fjob
 [mt] jobs[2] reads  global2[1] ∈ {0; 2}  // ccfg.c:18 fjob
 [mt] jobs[3] reads  global2[1] ∈ {0; 2}  // ccfg.c:18 fjob
 [mt] <main> reads  a ∈ [--..--]  // ccfg.c:90 main
@@ -1662,6 +1698,8 @@
 [mt] * Computing value analysis for thread jobs[0]
 [eva] Analyzing a complete application starting at fjob
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of fjob for thread jobs[0]
 [eva:interferences] ccfg.c:18: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
@@ -1684,6 +1722,8 @@
 [mt] * Computing value analysis for thread jobs[1]
 [eva] Analyzing a complete application starting at fjob
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of fjob for thread jobs[1]
 [eva:interferences] ccfg.c:18: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
@@ -1706,6 +1746,8 @@
 [mt] * Computing value analysis for thread jobs[2]
 [eva] Analyzing a complete application starting at fjob
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of fjob for thread jobs[2]
 [eva:interferences] ccfg.c:18: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
@@ -1728,6 +1770,8 @@
 [mt] * Computing value analysis for thread jobs[3]
 [eva] Analyzing a complete application starting at fjob
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of fjob for thread jobs[3]
 [eva:interferences] ccfg.c:18: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
@@ -1749,6 +1793,8 @@
 [mt] * Computing value analysis for thread job_f1
 [eva] Analyzing a complete application starting at f1
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of f1 for thread job_f1
 [mt] ccfg.c:53: Lock lock
 [eva] using specification for function g3
 [eva:interferences] ccfg.c:54: inject threads interferences at this point
@@ -1845,16 +1891,16 @@
 [mt] * threads and mutexes computed
 [mt] ***** Computing shared variables
 [mt] Imprecise locations to watch: global1; global2[0..1]; a; b; c; d; e; f
-[mt] jobs[0] reads  global1 ∈ {0}  // ccfg.c:18 fjob
-[mt] jobs[1] reads  global1 ∈ {0}  // ccfg.c:18 fjob
+[mt] jobs[0] reads  global1 ∈ {0; 1}  // ccfg.c:18 fjob
+[mt] jobs[1] reads  global1 ∈ {0; 1}  // ccfg.c:18 fjob
 [mt] jobs[2] reads  global1 ∈ {0; 1}  // ccfg.c:18 fjob
 [mt] jobs[3] reads  global1 ∈ {0; 1}  // ccfg.c:18 fjob
-[mt] jobs[0] reads  global2[0] ∈ {0}  // ccfg.c:18 fjob
-[mt] jobs[1] reads  global2[0] ∈ {0}  // ccfg.c:18 fjob
+[mt] jobs[0] reads  global2[0] ∈ {0; 1}  // ccfg.c:18 fjob
+[mt] jobs[1] reads  global2[0] ∈ {0; 1}  // ccfg.c:18 fjob
 [mt] jobs[2] reads  global2[0] ∈ {0; 1}  // ccfg.c:18 fjob
 [mt] jobs[3] reads  global2[0] ∈ {0; 1}  // ccfg.c:18 fjob
-[mt] jobs[0] reads  global2[1] ∈ {0}  // ccfg.c:18 fjob
-[mt] jobs[1] reads  global2[1] ∈ {0}  // ccfg.c:18 fjob
+[mt] jobs[0] reads  global2[1] ∈ {0; 2}  // ccfg.c:18 fjob
+[mt] jobs[1] reads  global2[1] ∈ {0; 2}  // ccfg.c:18 fjob
 [mt] jobs[2] reads  global2[1] ∈ {0; 2}  // ccfg.c:18 fjob
 [mt] jobs[3] reads  global2[1] ∈ {0; 2}  // ccfg.c:18 fjob
 [mt] job_f2 reads  a ∈ [--..--]  // ccfg.c:63 g4 :: ccfg.c:63 <- f2

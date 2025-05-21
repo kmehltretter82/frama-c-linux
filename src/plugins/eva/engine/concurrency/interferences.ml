@@ -280,59 +280,55 @@ struct
     in
     ThreadTable.fold add_thread current.states_by_mutexes `Bottom
 
-  let inject ~pos (v1 : Eva_automata.vertex) _v2 (state : state) : state =
-    let kf = Position.kf pos |> Option.get in
-    let need_injection =
-      let automaton = Eva_automata.get_automaton kf in
-      if not (Thread.is_main (Thread.current ())) &&
-         Kernel_function.is_entry_point kf &&
-         Eva_automata.Vertex.equal automaton.entry_point v1 then
-        (* If we are at the entry-point of the current non-main thread,
-           always inject interferences. *)
+  let inject state =
+    match applicable state with
+    | `Top -> Dom.top
+    | `Bottom -> state
+    | `Value interferences_state ->
+      let result =
+        Dom.overwrite current.shared_bases ~on:state ~by:interferences_state
+      in
+      Dom.join state result
+
+  let inject_init_state th kf state =
+    if is_empty () ||
+       (Thread.is_main th &&
+        (Thread.interrupt_handlers () = [])) then
+      (* Identity if there are no interferences or if we are analyzing the main
+         thread and there are no interrupt handlers declared. *)
+      state
+    else begin
+      Self.debug ~dkey ~once:true
+        "inject threads interferences at the start of %a for thread %a"
+        Kernel_function.pretty kf
+        Thread.pretty th;
+      inject state
+    end
+
+  let inject_after_change access state =
+    let need_injection () =
+      let access = Inout_access.keep_globals_only access in
+      let zone = Locations.Zone.join access.read access.write in
+      match Locations.Zone.get_bases zone with
+      | Top ->
+        (* Shared memory is Top, always inject *)
+        Self.warning ~current:true ~once:true
+          "imprecise memory footprint computed at this point";
         true
-      else
-        (* Only inject if global memory read or written at this point
-           intersects with shared variables. *)
-        match v1.vertex_start_of with
-        | None -> false
-        | Some _stmt -> begin
-            let filter = Inout_access.keep_globals_only in
-            let accesses = Inout_access.at ~filter pos in
-            let zone = Locations.Zone.join accesses.read accesses.write in
-            match Locations.Zone.get_bases zone with
-            | Top ->
-              (* Shared memory is Top, always inject *)
-              Self.warning ~current:true ~once:true
-                "imprecise memory footprint computed at this point";
-              true
-            | Set bases ->
-              (* Inject only if the read/written memory intersects
-                 shared memory *)
-              Base.Hptset.intersects bases current.shared_bases
-          end
+      | Set bases ->
+        (* Inject only if the read/written memory intersects
+           shared memory *)
+        Base.Hptset.intersects bases current.shared_bases
     in
-    if not need_injection
-    then state
+    if is_empty () || not (need_injection ())
+    then
+      (* Identity if there are no interferences or if we know that the last
+         transfer function did not interact with shared memory. *)
+      state
     else begin
       Self.debug ~dkey ~current:true ~once:true
         "inject threads interferences at this point";
-      match applicable state with
-      | `Top -> Dom.top
-      | `Bottom -> state
-      | `Value interferences_state ->
-        let result =
-          Dom.overwrite current.shared_bases ~on:state ~by:interferences_state
-        in
-        Dom.join state result
+      inject state
     end
-
-  (* No need to inject interferences on transitions that cannot have any effect
-     on global variables. *)
-  let is_uninterfering_transition: Eva_automata.transition -> bool = function
-    | Skip | Enter _ | Leave _ | Return _ -> true
-    | Guard _ | Assign _ | Call _ | Init _ | Asm _ -> false
-
-  let is_empty transition =
-    is_uninterfering_transition transition || is_empty ()
 
 end

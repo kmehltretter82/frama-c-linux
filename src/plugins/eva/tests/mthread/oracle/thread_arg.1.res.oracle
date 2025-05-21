@@ -47,6 +47,8 @@
 [mt] * Computing value analysis for thread jobs[0]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[0]
 [mt] thread_arg.c:25: Lock locks[0]
 [eva] using specification for function Frama_C_interval
 [mt] thread_arg.c:27: Release locks[0]
@@ -79,6 +81,8 @@
 [mt] * Computing value analysis for thread jobs[1]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[1]
 [mt] thread_arg.c:25: Lock locks[1]
 [eva] using specification for function Frama_C_interval
 [mt] thread_arg.c:27: Release locks[1]
@@ -166,6 +170,8 @@
 [mt] * Computing value analysis for thread jobs[0]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[0]
 [mt] thread_arg.c:25: Lock locks[0]
 [eva] using specification for function Frama_C_interval
 [eva:interferences] thread_arg.c:26: inject threads interferences at this point
@@ -214,6 +220,8 @@
 [mt] * Computing value analysis for thread jobs[1]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[1]
 [mt] thread_arg.c:25: Lock locks[1]
 [eva] using specification for function Frama_C_interval
 [eva:interferences] thread_arg.c:26: inject threads interferences at this point
@@ -360,6 +368,8 @@
 [mt] * Computing value analysis for thread jobs[0]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[0]
 [mt] thread_arg.c:25: Lock locks[0]
 [eva] using specification for function Frama_C_interval
 [eva:interferences] thread_arg.c:26: inject threads interferences at this point
@@ -411,6 +421,8 @@
 [mt] * Computing value analysis for thread jobs[1]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[1]
 [mt] thread_arg.c:25: Lock locks[1]
 [eva] using specification for function Frama_C_interval
 [eva:interferences] thread_arg.c:26: inject threads interferences at this point
@@ -556,6 +568,8 @@
 [mt] * Computing value analysis for thread jobs[0]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[0]
 [mt] thread_arg.c:25: Lock locks[0]
 [eva] using specification for function Frama_C_interval
 [eva:interferences] thread_arg.c:26: inject threads interferences at this point
@@ -609,6 +623,8 @@
 [mt] * Computing value analysis for thread jobs[1]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[1]
 [mt] thread_arg.c:25: Lock locks[1]
 [eva] using specification for function Frama_C_interval
 [eva:interferences] thread_arg.c:26: inject threads interferences at this point
@@ -757,6 +773,8 @@
 [mt] * Computing value analysis for thread jobs[0]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[0]
 [mt] thread_arg.c:25: Lock locks[0]
 [eva] using specification for function Frama_C_interval
 [eva:interferences] thread_arg.c:26: inject threads interferences at this point
@@ -810,6 +828,8 @@
 [mt] * Computing value analysis for thread jobs[1]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[1]
 [mt] thread_arg.c:25: Lock locks[1]
 [eva] using specification for function Frama_C_interval
 [eva:interferences] thread_arg.c:26: inject threads interferences at this point

@@ -34,6 +34,8 @@
 [mt] * Computing value analysis for thread tjob0
 [eva] Analyzing a complete application starting at job0
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of job0 for thread tjob0
 [eva:alarm] null.c:15: Warning: out of bounds write. assert \valid((char *)i);
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
@@ -97,6 +99,8 @@
 [mt] * Computing value analysis for thread tjob0
 [eva] Analyzing a complete application starting at job0
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of job0 for thread tjob0
 [eva:alarm] null.c:15: Warning: out of bounds write. assert \valid((char *)i);
 [eva:interferences] null.c:15: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis

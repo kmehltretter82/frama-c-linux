@@ -50,6 +50,8 @@
 [mt] * Computing value analysis for thread jobs[0]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[0]
 [mt] recreation.c:25: New thread: jobs[3], fun job, parent jobs[0], args {3}
 [mt] recreation.c:25: Start thread jobs[3]
 [mt] recreation.c:25: New thread: jobs[4], fun job, parent jobs[0], args {4}
@@ -78,6 +80,8 @@
 [mt] * Computing value analysis for thread jobs[1]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[1]
 [mt] recreation.c:25: New thread: jobs[6], fun job, parent jobs[1], args {6}
 [mt] recreation.c:25: Start thread jobs[6]
 [mt] recreation.c:25: New thread: jobs[7], fun job, parent jobs[1], args {7}
@@ -106,6 +110,8 @@
 [mt] * Computing value analysis for thread jobs[2]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[2]
 [mt] recreation.c:25: New thread: jobs[9], fun job, parent jobs[2], args {9}
 [mt] recreation.c:25: Start thread jobs[9]
 [mt] recreation.c:25: New thread: jobs[10], fun job, parent jobs[2], args {10}
@@ -146,6 +152,8 @@
 [mt] * Computing value analysis for thread jobs[3]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[3]
 [mt] recreation.c:37: Lock locks[2]
 [mt] recreation.c:38: Lock locks[4]
 [kernel:annot:missing-spec] recreation.c:40: Warning: 
@@ -190,6 +198,8 @@
 [mt] * Computing value analysis for thread jobs[4]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[4]
 [mt] recreation.c:37: Lock locks[3]
 [mt] recreation.c:38: Lock locks[5]
 [eva] using specification for function random
@@ -231,6 +241,8 @@
 [mt] * Computing value analysis for thread jobs[5]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[5]
 [mt] recreation.c:37: Lock locks[4]
 [mt] recreation.c:38: Lock locks[6]
 [eva] using specification for function random
@@ -272,6 +284,8 @@
 [mt] * Computing value analysis for thread jobs[6]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[6]
 [mt] recreation.c:37: Lock locks[5]
 [mt] recreation.c:38: Lock locks[7]
 [eva] using specification for function random
@@ -313,6 +327,8 @@
 [mt] * Computing value analysis for thread jobs[7]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[7]
 [mt] recreation.c:37: Lock locks[6]
 [mt] recreation.c:38: Lock locks[8]
 [eva] using specification for function random
@@ -354,6 +370,8 @@
 [mt] * Computing value analysis for thread jobs[8]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[8]
 [mt] recreation.c:37: Lock locks[7]
 [mt] recreation.c:38: Lock locks[9]
 [eva] using specification for function random
@@ -395,6 +413,8 @@
 [mt] * Computing value analysis for thread jobs[9]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[9]
 [mt] recreation.c:37: Lock locks[8]
 [mt] recreation.c:38: Lock locks[10]
 [eva] using specification for function random
@@ -436,6 +456,8 @@
 [mt] * Computing value analysis for thread jobs[10]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[10]
 [mt] recreation.c:37: Lock locks[9]
 [mt] recreation.c:38: Lock locks[11]
 [eva] using specification for function random
@@ -477,6 +499,8 @@
 [mt] * Computing value analysis for thread jobs[11]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[11]
 [mt] recreation.c:37: Lock locks[10]
 [mt] recreation.c:38: Lock locks[0]
 [eva] using specification for function random
@@ -583,6 +607,9 @@
 [mt] * Computing value analysis for thread jobs[0]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] recreation.c:10: inject threads interferences at this point
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[0]
 [mt] recreation.c:25: Thread jobs[3], fun job, parent jobs[0], args {3}
 [mt] recreation.c:25: Start thread jobs[3]
 [mt] recreation.c:25: Thread jobs[4], fun job, parent jobs[0], args {4}
@@ -613,6 +640,9 @@
 [mt] * Computing value analysis for thread jobs[1]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] recreation.c:10: inject threads interferences at this point
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[1]
 [mt] recreation.c:25: Thread jobs[6], fun job, parent jobs[1], args {6}
 [mt] recreation.c:25: Start thread jobs[6]
 [mt] recreation.c:25: Thread jobs[7], fun job, parent jobs[1], args {7}
@@ -643,6 +673,9 @@
 [mt] * Computing value analysis for thread jobs[2]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] recreation.c:10: inject threads interferences at this point
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[2]
 [mt] recreation.c:25: Thread jobs[9], fun job, parent jobs[2], args {9}
 [mt] recreation.c:25: Start thread jobs[9]
 [mt] recreation.c:25: Thread jobs[10], fun job, parent jobs[2], args {10}
@@ -673,6 +706,9 @@
 [mt] * Computing value analysis for thread jobs[3]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] recreation.c:10: inject threads interferences at this point
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[3]
 [mt] recreation.c:37: Lock locks[2]
 [mt] recreation.c:38: Lock locks[4]
 [eva] using specification for function random
@@ -721,6 +757,9 @@
 [mt] * Computing value analysis for thread jobs[4]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] recreation.c:10: inject threads interferences at this point
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[4]
 [mt] recreation.c:37: Lock locks[3]
 [mt] recreation.c:38: Lock locks[5]
 [eva] using specification for function random
@@ -769,6 +808,9 @@
 [mt] * Computing value analysis for thread jobs[5]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] recreation.c:10: inject threads interferences at this point
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[5]
 [mt] recreation.c:37: Lock locks[4]
 [mt] recreation.c:38: Lock locks[6]
 [eva] using specification for function random
@@ -817,6 +859,9 @@
 [mt] * Computing value analysis for thread jobs[6]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] recreation.c:10: inject threads interferences at this point
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[6]
 [mt] recreation.c:37: Lock locks[5]
 [mt] recreation.c:38: Lock locks[7]
 [eva] using specification for function random
@@ -865,6 +910,9 @@
 [mt] * Computing value analysis for thread jobs[7]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] recreation.c:10: inject threads interferences at this point
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[7]
 [mt] recreation.c:37: Lock locks[6]
 [mt] recreation.c:38: Lock locks[8]
 [eva] using specification for function random
@@ -913,6 +961,9 @@
 [mt] * Computing value analysis for thread jobs[8]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] recreation.c:10: inject threads interferences at this point
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[8]
 [mt] recreation.c:37: Lock locks[7]
 [mt] recreation.c:38: Lock locks[9]
 [eva] using specification for function random
@@ -961,6 +1012,9 @@
 [mt] * Computing value analysis for thread jobs[9]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] recreation.c:10: inject threads interferences at this point
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[9]
 [mt] recreation.c:37: Lock locks[8]
 [mt] recreation.c:38: Lock locks[10]
 [eva] using specification for function random
@@ -1009,6 +1063,9 @@
 [mt] * Computing value analysis for thread jobs[10]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] recreation.c:10: inject threads interferences at this point
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[10]
 [mt] recreation.c:37: Lock locks[9]
 [mt] recreation.c:38: Lock locks[11]
 [eva] using specification for function random
@@ -1057,6 +1114,9 @@
 [mt] * Computing value analysis for thread jobs[11]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] recreation.c:10: inject threads interferences at this point
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[11]
 [mt] recreation.c:37: Lock locks[10]
 [mt] recreation.c:38: Lock locks[0]
 [eva] using specification for function random
@@ -1206,6 +1266,7 @@
 [mt] * Computing value analysis for thread <main>
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
+[eva:interferences] recreation.c:10: inject threads interferences at this point
 [mt] Thread <main>, fun main
 [mt] recreation.c:63: Initializing mutex locks[0]
 [mt] recreation.c:63: Initializing mutex locks[1]
@@ -1251,8 +1312,12 @@
 [mt] * Computing value analysis for thread jobs[0]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] recreation.c:10: inject threads interferences at this point
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[0]
 [mt] recreation.c:25: Thread jobs[3], fun job, parent jobs[0], args {3}
 [mt] recreation.c:25: Start thread jobs[3]
+[mt] recreation.c:25: New context for jobs[3], fun job, parent jobs[0], args {3}
 [mt] recreation.c:25: Thread jobs[4], fun job, parent jobs[0], args {4}
 [mt] recreation.c:25: Start thread jobs[4]
 [mt] recreation.c:25: New context for jobs[4], fun job, parent jobs[0], args {4}
@@ -1284,6 +1349,9 @@
 [mt] * Computing value analysis for thread jobs[1]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] recreation.c:10: inject threads interferences at this point
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[1]
 [mt] recreation.c:25: Thread jobs[6], fun job, parent jobs[1], args {6}
 [mt] recreation.c:25: Start thread jobs[6]
 [mt] recreation.c:25: New context for jobs[6], fun job, parent jobs[1], args {6}
@@ -1318,6 +1386,9 @@
 [mt] * Computing value analysis for thread jobs[2]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] recreation.c:10: inject threads interferences at this point
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[2]
 [mt] recreation.c:25: Thread jobs[9], fun job, parent jobs[2], args {9}
 [mt] recreation.c:25: Start thread jobs[9]
 [mt] recreation.c:25: New context for jobs[9], fun job, parent jobs[2], args {9}
@@ -1348,10 +1419,14 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[2] computed
-[mt] *** Computing thread jobs[3], iteration 4 (interferences changed)
+[mt] *** Computing thread jobs[3], iteration 4
+    (thread initial memory state changed, interferences changed)
 [mt] * Computing value analysis for thread jobs[3]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] recreation.c:10: inject threads interferences at this point
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[3]
 [mt] recreation.c:37: Lock locks[2]
 [mt] recreation.c:38: Lock locks[4]
 [eva] using specification for function random
@@ -1400,6 +1475,9 @@
 [mt] * Computing value analysis for thread jobs[4]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] recreation.c:10: inject threads interferences at this point
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[4]
 [mt] recreation.c:37: Lock locks[3]
 [mt] recreation.c:38: Lock locks[5]
 [eva] using specification for function random
@@ -1448,6 +1526,9 @@
 [mt] * Computing value analysis for thread jobs[5]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] recreation.c:10: inject threads interferences at this point
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[5]
 [mt] recreation.c:37: Lock locks[4]
 [mt] recreation.c:38: Lock locks[6]
 [eva] using specification for function random
@@ -1496,6 +1577,9 @@
 [mt] * Computing value analysis for thread jobs[6]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] recreation.c:10: inject threads interferences at this point
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[6]
 [mt] recreation.c:37: Lock locks[5]
 [mt] recreation.c:38: Lock locks[7]
 [eva] using specification for function random
@@ -1544,6 +1628,9 @@
 [mt] * Computing value analysis for thread jobs[7]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] recreation.c:10: inject threads interferences at this point
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[7]
 [mt] recreation.c:37: Lock locks[6]
 [mt] recreation.c:38: Lock locks[8]
 [eva] using specification for function random
@@ -1592,6 +1679,9 @@
 [mt] * Computing value analysis for thread jobs[8]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] recreation.c:10: inject threads interferences at this point
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[8]
 [mt] recreation.c:37: Lock locks[7]
 [mt] recreation.c:38: Lock locks[9]
 [eva] using specification for function random
@@ -1640,6 +1730,9 @@
 [mt] * Computing value analysis for thread jobs[9]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] recreation.c:10: inject threads interferences at this point
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[9]
 [mt] recreation.c:37: Lock locks[8]
 [mt] recreation.c:38: Lock locks[10]
 [eva] using specification for function random
@@ -1688,6 +1781,9 @@
 [mt] * Computing value analysis for thread jobs[10]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] recreation.c:10: inject threads interferences at this point
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[10]
 [mt] recreation.c:37: Lock locks[9]
 [mt] recreation.c:38: Lock locks[11]
 [eva] using specification for function random
@@ -1736,6 +1832,9 @@
 [mt] * Computing value analysis for thread jobs[11]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] recreation.c:10: inject threads interferences at this point
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[11]
 [mt] recreation.c:37: Lock locks[10]
 [mt] recreation.c:38: Lock locks[0]
 [eva] using specification for function random

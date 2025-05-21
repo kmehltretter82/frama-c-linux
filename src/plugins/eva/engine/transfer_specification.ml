@@ -198,6 +198,7 @@ module Make
   module Domain = Engine.Dom
   module Location = Engine.Loc
   module Transfer_inout = Transfer_inout.Make (Engine)
+  module Interferences = Engine.Interferences
   include Cvalue_domain.Getters (Domain)
 
   (* Most transfer functions about logic return a list of states instead of a
@@ -319,8 +320,9 @@ module Make
   let apply_assigns_and_allocations ~pos evaluated_clauses state =
     let pre = state in
     let transfer state (clause, location) =
-      Transfer_inout.add_logic_assign pos clause location;
+      let access = Transfer_inout.register_logic_assign pos clause location in
       Domain.logic_assign (Some (clause, pre)) location state
+      |> Interferences.inject_after_change access
     in
     List.fold_left transfer state evaluated_clauses
 
