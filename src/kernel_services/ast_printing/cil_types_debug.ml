@@ -100,7 +100,7 @@ and pp_assigns fmt = function
 
 
 and pp_file fmt file = Format.fprintf fmt "{fileName=%a;globals=%a;globinit=%a;globinitcalled=%a}"
-    Filepath.pp_abs file.fileName (pp_list pp_global) file.globals (pp_option pp_fundec) file.globinit pp_bool file.globinitcalled
+    Filepath.pretty_abs file.fileName (pp_list pp_global) file.globals (pp_option pp_fundec) file.globinit pp_bool file.globinitcalled
 
 and pp_global fmt = function
   | GType(typeinfo,location) -> Format.fprintf fmt "GType(%a,%a)"  pp_typeinfo typeinfo  pp_location location

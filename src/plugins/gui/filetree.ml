@@ -947,7 +947,7 @@ let make (tree_view:GTree.view) =
                 true, "Unknown file", strike, false
               else
                 let path = Filepath.of_string m in
-                false, Filepath.to_pretty_string path, strike, false
+                false, Filepath.to_string path, strike, false
             | MYTREE.MGlobal ({MYTREE.name=m; strikethrough=strike}) as s ->
               false, m, strike, MYTREE.is_function s
           in

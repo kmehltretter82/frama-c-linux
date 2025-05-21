@@ -23,7 +23,7 @@
 (* Split the location into 'dir,file,line number,char number' in this order *)
 let split_loc loc =
   let file = loc.Filepath.pos_path in
-  let dir = Filepath.(dirname file |> to_pretty_relative) in
+  let dir = Filepath.(dirname file |> to_string) in
   let file = Filepath.basename file in
   dir, file, loc.Filepath.pos_lnum, loc.Filepath.pos_cnum
 

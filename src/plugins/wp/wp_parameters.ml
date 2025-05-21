@@ -1203,7 +1203,7 @@ let has_print_generated () = has_dkey cat_print_generated
 
 let print_generated ?header file =
   let header = match header with
-    | None -> Fc_Filepath.to_pretty_string file
+    | None -> Fc_Filepath.to_string file
     | Some head -> head in
   debug ~dkey:cat_print_generated "%S@\n%t@." header
     begin fun fmt ->

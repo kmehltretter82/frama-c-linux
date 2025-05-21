@@ -68,11 +68,6 @@ let of_string ?(existence=Indifferent) ?base s =
   check_existence ~existence p;
   p
 
-let to_string_list l = l
-
-let to_quoted_string s =
-  Filename.quote s
-
 
 (* -------------------------------------------------------------------------- *)
 (* --- Datatype                                                           --- *)
@@ -107,39 +102,38 @@ let is_special_stdout fp = equal fp special_stdout
 let to_base_uri name =
   Hpath.(of_string name |> to_uri)
 
-let to_pretty_string p =
-  let rec skip_dot s =
-    if String.starts_with ~prefix:"./" s then
-      skip_dot (String.sub s 2 (String.length s - 2))
-    else s
-  in
+let to_string p =
   if is_special_stdout p then
     "<stdout>"
   else if is_empty p then
     "<unknown location>"
-  else if Filename.is_relative p then
-    skip_dot p
   else
-    let s = match to_base_uri p with
-      | Absolute, uri -> uri
-      | Cwd, uri -> if uri = "" then "." else uri
-      | Name (name,_), uri -> if uri = "" then name else  name ^ "/" ^ uri
-    in
-    skip_dot s
+    match to_base_uri p with
+    | Absolute, uri -> uri
+    | (Cwd | Name (".",_)), uri -> if uri = "" then "." else uri
+    | Name (name,_), uri -> if uri = "" then name else name ^ "/" ^ uri
 
 let pretty fmt p =
-  Format.pp_print_string fmt (to_pretty_string p)
+  Format.pp_print_string fmt (to_string p)
 
 let compare_pretty ?(case_sensitive=false) s1 s2 =
-  let s1 = to_pretty_string s1 in
-  let s2 = to_pretty_string s2 in
+  let s1 = to_string s1 in
+  let s2 = to_string s2 in
   if case_sensitive then String.compare s1 s2
   else
     String.compare
       (String.lowercase_ascii s1)
       (String.lowercase_ascii s2)
 
-let pp_abs fmt p = Format.fprintf fmt "%s" p
+let to_string_abs ?(quoted=false) s =
+  if quoted
+  then Filename.quote s
+  else s
+
+let pretty_abs fmt p =
+  Format.fprintf fmt "%s" p
+
+let to_string_list l = l
 
 
 (* -------------------------------------------------------------------------- *)
@@ -169,22 +163,23 @@ let chop_suffix p suffix = Filename.chop_suffix p suffix
 (* --- Relative Paths                                                     --- *)
 (* -------------------------------------------------------------------------- *)
 
-let relativize ?(base=Hpath.(cwd |> to_string)) p =
-  if base = p then "." else
-    let base = base ^ Filename.dir_sep in
-    if String.starts_with ~prefix:base p then
-      let n = String.length base in
-      let p = String.sub p n (String.length p - n) in
-      if p = "" then "." else p
-    else p
+let to_string_rel ?(quoted=false) ?(base=Hpath.(cwd |> to_string)) p =
+  let r =
+    if base = p then "." else
+      let base = base ^ Filename.dir_sep in
+      if String.starts_with ~prefix:base p then
+        let n = String.length base in
+        let p = String.sub p n (String.length p - n) in
+        if p = "" then "." else p
+      else p
+  in
+  if quoted then Filename.quote r else r
+
+let pretty_rel fmt p =
+  Format.pp_print_string fmt (to_string_rel p)
 
 let is_relative ?(base=Hpath.(cwd |> to_string)) p =
   String.equal base p || String.starts_with ~prefix:(base ^ Filename.dir_sep) p
-
-let to_pretty_relative ?base p =
-  if is_relative ?base p
-  then relativize ?base p
-  else to_pretty_string p
 
 
 (* -------------------------------------------------------------------------- *)
@@ -243,6 +238,7 @@ let is_empty_pos pos = pos == empty_pos
 (* -------------------------------------------------------------------------- *)
 
 let normalize ?existence ?base_name s = of_string ?existence ?base:base_name s
+let relativize ?base s = to_string_rel ?base s
 
 let exists _ = failwith "deprecated"
 let is_file _ = failwith "deprecated"
@@ -262,7 +258,7 @@ module Normalized = struct
   let extend = extend
   let concat = concat
   let concats = concats
-  let to_pretty_string = to_pretty_string
+  let to_pretty_string = to_string
   let to_string_list = to_string_list
   let equal = equal
   let compare = compare
@@ -271,7 +267,7 @@ module Normalized = struct
   let is_empty = is_empty
   let is_special_stdout = is_special_stdout
   let pretty = pretty
-  let pp_abs = pp_abs
+  let pp_abs = pretty_abs
   let is_file p =
     try (Unix.stat (p :> string)).Unix.st_kind = Unix.S_REG with _ -> false
   let to_base_uri _ = failwith "deprecated"

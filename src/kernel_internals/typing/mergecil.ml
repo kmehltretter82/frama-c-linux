@@ -1238,10 +1238,10 @@ let combines = {
       let pre_msg =
         Format.asprintf
           "Conflicting definitions for types '%a' and '%a' \
-           (previous definition was in file %s)."
+           (previous definition was in file %a)."
           Cil_printer.pp_typ t1
           Cil_printer.pp_typ t2
-          (Filepath.to_pretty_string old_file)
+          Filepath.pretty old_file
       in
       let emitwith _ =
         if (not !conflict_detected) && oldfidx <> fidx
@@ -1576,7 +1576,7 @@ let oneFilePass1 (f:file) : unit =
   let open Current_loc.Operators in
   H.add fileNames !currentFidx f.fileName;
   Kernel.feedback ~dkey:Kernel.dkey_linker
-    "Pre-merging (%d) %a" !currentFidx Filepath.pp_abs f.fileName ;
+    "Pre-merging (%d) %a" !currentFidx Filepath.pretty_abs f.fileName ;
   currentDeclIdx := 0;
   if f.globinitcalled || f.globinit <> None then
     Kernel.warning ~current:true
