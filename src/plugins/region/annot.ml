@@ -33,6 +33,7 @@ module Vmap = Cil_datatype.Varinfo.Map
 
 let iadd_term env t = ignore @@ add_term env t
 let iadd_iterm env = function { it_content = t } -> ignore @@ add_term env t
+let add_iterm env = function { it_content = t } -> add_term env t
 
 let add_ipred env ip = add_predicate env ip.ip_content.tp_statement
 
@@ -40,11 +41,14 @@ let add_ipred env ip = add_predicate env ip.ip_content.tp_statement
 (* ---  Process Behaviors                                                 --- *)
 (* -------------------------------------------------------------------------- *)
 
-let iadd_from env (it,from) = match from with
-  | FromAny -> iadd_iterm env it
-  | From its ->
-    List.iter (iadd_iterm env) its ;
-    iadd_iterm env it
+let iadd_from env (it,_from) =
+  iadd_iterm env it
+(* ; match from with
+   | FromAny -> ()
+   | From its ->
+   let add_from d t = merge_domain env.map d @@ add_iterm env t in
+   ignore @@ List.fold_left add_from Ldomain.pure its
+*)
 
 let add_requires ~map ~kf ~ki ~bhv ~formal ?result ip =
   let property = Property.ip_of_requires kf ki bhv ip in
@@ -70,8 +74,12 @@ let add_allocation ~map ~kf ~ki ~bhv ~formal ?result alloc =
     let bhv = Property.Id_contract (Datatype.String.Set.empty,bhv) in
     let property = Option.get @@ Property.ip_of_allocation kf ki bhv alloc in
     let env = { map ; property ; formal ; result } in
-    List.iter (iadd_iterm env) its1 ;
-    List.iter (iadd_iterm env) its2
+    let add_alloc env it1 it2 =
+      let d1 = add_iterm env it1 in
+      let d2 = add_iterm env it2 in
+      ignore @@ merge_domain env.map d1 d2
+    in
+    List.iter2 (add_alloc env) its1 its2
 
 let add_post_cond ~map ~kf ~ki ~bhv ~formal ?result cs =
   let property = Property.ip_of_behavior kf ki ~active:[] bhv in
@@ -84,7 +92,11 @@ let rec add_extension ~kf ?stmt ?(formal=Vmap.empty) ?result map acsl =
     | Some stmt -> Property.ELStmt (kf, stmt)
   in let property = Property.ip_of_extended extended_loc acsl in
   match acsl.ext_kind with
-  | Ext_id _ -> ()
+  | Ext_id _ ->
+    if String.compare acsl.ext_plugin "region" != 0
+    || String.compare acsl.ext_name "region" != 0
+    then Options.warning "unhandled extension @[%s@]::@[%s@]@."
+        acsl.ext_plugin acsl.ext_name
   | Ext_terms ts ->
     let env = { map ; property ; formal ; result } in
     List.iter (iadd_term env) ts
@@ -151,10 +163,16 @@ let add_code_annot ~kf ~stmt ?(formal=Vmap.empty) ?result map c =
     List.iter (iadd_from { map ; property ; formal ; result }) asgn
   | AAllocation (_,FreeAllocAny) -> ()
   | AAllocation (_,(FreeAlloc (its1,its2) as alloc)) ->
+    if List.compare_lengths its1 its2 != 0 then
+      Options.warning "FreeAlloc lengths not equal" ;
     let bol = Property.Id_loop c in
     let ki = Cil_datatype.Kinstr.kinstr_of_opt_stmt (Some stmt) in
     let property = Option.get @@ Property.ip_of_allocation kf ki bol alloc in
-    List.iter (iadd_iterm { map ; property ; formal ; result }) its1 ;
-    List.iter (iadd_iterm { map ; property ; formal ; result }) its2
+    let add_alloc env it1 it2 =
+      let d1 = add_iterm env it1 in
+      let d2 = add_iterm env it2 in
+      ignore @@ merge_domain env.map d1 d2
+    in
+    List.iter2 (add_alloc { map ; property ; formal ; result }) its1 its2
   | AExtended (_,_, acsl) ->
     add_extension ~kf ~stmt ~formal ?result map acsl
