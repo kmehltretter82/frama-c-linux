@@ -44,25 +44,25 @@ o!  Kernel    [2025-04-14] Building types via `Cil_const` now uses
               qualifiers to the array elements, unless stated otherwise.
 o   Kernel    [2025-04-11] Removed files in share/compliance.
               Compiler builtin JSON files were moved to share/machdeps.
--   Ivette    [2025-03-26] In Eva results (in the values table and Inspector),
-              when Eva displays the address of a variable, one can click on the
-              variable to select it.
--!  Kernel    [2025-03-21] Change API to register attributes, with now the
-              possibility to ignore an attribute when comparing types, and
-              to print or not the attribute in the AST. AttrIgnored was replaced
-              by AttrUnknown which by default has the same behavior.
--   Kernel    [2025-03-13] Add option `-commands-file` to group Frama-C options
-              in a separate file.
 -*  Kernel    [2025-04-10] Fix Frama-C normalization which could in specific
               cases result in an ill-formed AST (Fix ##2716).
 -   Ivette    [2025-03-28] Add support for the Impact plug-in, which can be
               invoked by right-clicking on a statement in the AST view.
--   Ivette    [2025-03-24] Fix Studia menu on ACSL term lvalue.
 -   Ivette    [2025-03-28] View tabs can be reordered via Ctrl-Shift-PageUp/Down
               and closed with middle-click.
+-   Ivette    [2025-03-26] In Eva results (in the values table and Inspector),
+              when Eva displays the address of a variable, one can click on the
+              variable to select it.
+-   Ivette    [2025-03-24] Fix Studia menu on ACSL term lvalue.
+-!  Kernel    [2025-03-21] Change API to register attributes, with now the
+              possibility to ignore an attribute when comparing types, and
+              to print or not the attribute in the AST. AttrIgnored was replaced
+              by AttrUnknown which by default has the same behavior.
 -*  Eva       [2025-03-17] Fix a crash when using Frama_C_domain_show_each on a
               memory location of unknown size.
 -   Ivette    [2025-03-14] Various fixes to the Eva sidebar.
+-   Kernel    [2025-03-13] Add option `-commands-file` to group Frama-C options
+              in a separate file.
 -   Kernel    [2025-03-12] Fix handling of qualifiers in array formals during
               typing phase (fix #@998).
 -   Eva       [2025-03-10] Mthread now supports interrupt handlers. New option
@@ -97,10 +97,10 @@ o   Kernel    [2025-02-05] New parameter builder `Float` for decimal
               command-line parameters.
 o!  Kernel    [2025-02-05] Remove the parameter `Functor_info` for every
               `Datatype` functor building collection(s).
--!  Kernel    [2025-02-04] Undefine some predefined GCC macros, to minimize
-              parsing errors due to unsupported compiler extensions.
 o!  Kernel    [2025-02-05] Remove attributes annotations (Cil.AttrAnnot). Use
               normal attributes instead.
+-!  Kernel    [2025-02-04] Undefine some predefined GCC macros, to minimize
+              parsing errors due to unsupported compiler extensions.
 o!  Kernel    [2025-01-31] Use a record to represent `Cil_types.typ` with two
               fields `tnode` and `tattr` for its `typ_node` and `attributes`.
 -   Kernel    [2025-01-31] New option -cache-size to control the amount of
