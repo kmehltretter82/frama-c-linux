@@ -1,0 +1,15 @@
+25d24
+< [eva] interferences.c:135: Frama_C_show_each_main_end: {0}, {0}
+138d136
+< [eva] interferences.c:135: Frama_C_show_each_main_end: {0}, {0}
+343d340
+< [eva] interferences.c:135: Frama_C_show_each_main_end: {0; 1}, {0; 1}
+550,551d546
+< [eva] interferences.c:135: 
+<   Frama_C_show_each_main_end: {0; 1; 2}, [0..2147483647]
+774,775d768
+< [eva] interferences.c:135: 
+<   Frama_C_show_each_main_end: [0..2147483647], [0..2147483647]
+1004,1005d996
+< [eva] interferences.c:135: 
+<   Frama_C_show_each_main_end: [0..2147483647], [0..2147483647]
