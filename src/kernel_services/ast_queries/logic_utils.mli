@@ -72,11 +72,11 @@ val remove_logic_function : logic_info -> unit
 val is_instance_of: string list -> logic_type -> logic_type -> bool
 
 (** {3 tests and extraction of element type}
-    @before Frama-C+dev these function were in {!Logic_typing}
+    @before 31.0-Gallium these function were in {!Logic_typing}
 *)
 (** {4 tests for an individual (non set) type}
     [plain_xxx t] returns [true] iff [t] is a [xxx]
-    @before Frama-C+dev these functions were not exported
+    @before 31.0-Gallium these functions were not exported
 *)
 
 val plain_arithmetic_type: Cil_types.logic_type -> bool

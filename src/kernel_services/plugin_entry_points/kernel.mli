@@ -362,7 +362,7 @@ module PrintMachdepHeader : Parameter_sig.Bool
 
 module PrintMachdepBuiltinMacros: Parameter_sig.Bool
 (** Behavior of option "-print-machdep-builtin-macros"
-    @since Frama-C+dev *)
+    @since 31.0-Gallium *)
 
 module PrintLibc: Parameter_sig.Bool
 (** Behavior of option "-print-libc"
@@ -480,17 +480,17 @@ module Machdep: sig
   include Parameter_sig.String
 
   (** [get_dir] returns the directory containing default machdeps.
-      @since Frama-C+dev *)
+      @since 31.0-Gallium *)
   val get_dir : unit -> LoadState.t
 
   (** [get_default_file] return the file with the name format of machdep from
       the default machdep directory.
-      @since Frama-C+dev *)
+      @since 31.0-Gallium *)
   val get_default_file : string -> LoadState.t
 
   (** [is_default] decides if the parameter refers to a default machdep or a
       user file.
-      @since Frama-C+dev *)
+      @since 31.0-Gallium *)
   val is_default : string -> bool
 end
 

@@ -169,7 +169,7 @@ val pobject_pointer: ?loc:location -> logic_label -> term -> predicate
     Parameters:
     - [ptr] must be a term of pointer type.
 
-    @since Frama-C+dev
+    @since 31.0-Gallium
 *)
 val pvalid_len_bytes: ?loc:location -> logic_label -> term -> term -> predicate
 

@@ -25,7 +25,7 @@
     numbers. The signature also provides several functions that are not
     directly part of fields definition, but are useful nonetheless, in
     particular when using fields to model floating point computations.
-    @since Frama-C+dev *)
+    @since 31.0-Gallium *)
 
 (** This type is used to return bounds for mathematical functions that
     cannot be exactly computed using rationals, like the square root

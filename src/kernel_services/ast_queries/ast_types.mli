@@ -21,8 +21,8 @@
 (**************************************************************************)
 
 (** This file contains types related types/functions/values.
-    @since Frama-C+dev
-    @before Frama-C+dev Most of these functions were in {!Cil}
+    @since 31.0-Gallium
+    @before 31.0-Gallium Most of these functions were in {!Cil}
 *)
 
 open Cil_types
@@ -42,7 +42,7 @@ val get_attributes : typ -> attributes
     [push_qualifiers] is turned off when typing array formals before they are
     changed into pointers.
 
-    @before Frama-C+dev In Cil [push_qualifiers] was not present, which caused a
+    @before 31.0-Gallium In Cil [push_qualifiers] was not present, which caused a
     bug in cabs2cil. Also [combine] was present and allowed to chose the
     function used to combine attributes, now it only uses
     {!Ast_attributes.add_list}.
@@ -315,7 +315,7 @@ val pointed_type : typ -> typ
 (** Returns the type of the array elements of the given type, and the size
     of the array, if any.
     @raise AbortFatal it is not an array type.
-    @before Frama-C+dev In Cil this function applied {!Cil.constFoldToInt} on
+    @before 31.0-Gallium In Cil this function applied {!Cil.constFoldToInt} on
     array's size and returned a [Z.t option].
 *)
 val array_elem_type_and_size : typ -> typ * exp option

@@ -18,6 +18,10 @@
 Open Source Release <next-release>
 ###############################################################################
 
+###############################################################################
+Open Source Release 31.0 (Gallium)
+###############################################################################
+
 -   Kernel    [2025-05-15] Transparently compress and decompress when using
               -save/-load (still supports loading uncompressed files).
 -!  Kernel    [2025-05-07] Changed default behavior of -keep-unused-functions:

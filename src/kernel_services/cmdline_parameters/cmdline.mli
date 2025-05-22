@@ -381,7 +381,7 @@ val permissive: bool
 val compress_saved_session: bool
 (** Indicates whether the saved sessions should be compressed or not.
 
-    @since Frama-C+dev *)
+    @since 31.0-Gallium *)
 
 val last_project_created_by_copy: (unit -> string option) ref
 

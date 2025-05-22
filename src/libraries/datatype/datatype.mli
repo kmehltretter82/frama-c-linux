@@ -269,7 +269,7 @@ module type Hashtbl = sig
 end
 
 (** A datatype for a type [t] extended with predefined hashtbl over [t].
-    @since Frama-C+dev
+    @since 31.0-Gallium
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
 *)
 module type S_with_hashtbl = sig
@@ -279,7 +279,7 @@ module type S_with_hashtbl = sig
 end
 
 (** A datatype for a type [t] extended with predefined set and map over [t].
-    @since Frama-C+dev
+    @since 31.0-Gallium
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
 *)
 module type S_with_set_and_map = sig
@@ -307,25 +307,25 @@ end
 
 (** Generic comparable datatype builder: functions [equal] and [compare] must
     not be {!undefined}.
-    @since Frama-C+dev *)
+    @since 31.0-Gallium *)
 module Make_with_set_and_map(X: Make_input):
   S_with_set_and_map with type t = X.t
 
 (** Add sets and maps to an existing datatype, provided the [equal] and
     [compare] are not {!undefined}.
-    @since Frama-C+dev *)
+    @since 31.0-Gallium *)
 module With_set_and_map(X: S):
   S_with_set_and_map with type t = X.t
 
 (** Generic comparable datatype builder: functions [equal] and [hash] must not
     be {!undefined}.
-    @since Frama-C+dev *)
+    @since 31.0-Gallium *)
 module Make_with_hashtbl(X: Make_input):
   S_with_hashtbl with type t = X.t
 
 (** Add hashtables modules to an existing datatype, provided the [equal] and
     [hash] functions are not {!undefined}.
-    @since Frama-C+dev *)
+    @since 31.0-Gallium *)
 module With_hashtbl(X: S):
   S_with_hashtbl with type t = X.t
 

@@ -127,7 +127,7 @@ val allowed_machdep: string -> string
     built-in macros of the current machdep.
     @param censored_macros prevents the generation of directives for the
     builtin macros in [mach.custom_defs] whose names match. empty by default.
-    @since Frama-C+dev (existed, but was not exported before)
+    @since 31.0-Gallium (existed, but was not exported before)
 *)
 val gen_define_custom_macros:
   Format.formatter -> Datatype.String.Set.t -> mach -> unit
@@ -135,7 +135,7 @@ val gen_define_custom_macros:
 (** Prints on the given formatter all [#define] directives
     required by [share/libc/features.h] and other system-dependent headers.
     @before 29.0-Copper [censored_macros] did not exist
-    @before Frama-C+dev [censored_macros] was necessary to filter builtin
+    @before 31.0-Gallium [censored_macros] was necessary to filter builtin
     macros, that are now handled independently by {!gen_define_custom_macros}
 *)
 val gen_all_defines: Format.formatter -> mach -> unit

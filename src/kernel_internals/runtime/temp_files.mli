@@ -31,15 +31,15 @@
 (** [cleanup_at_exit file] indicates that [file] must be removed when the
     program exits (except if exit is caused by a signal).
     If [file] does not exist, nothing happens.
-    @since Frama-C+dev
-    @before Frama-C+dev was in Extlib and used a string instead of
+    @since 31.0-Gallium
+    @before 31.0-Gallium was in Extlib and used a string instead of
     [Filepath.t] *)
 val cleanup_at_exit: Filepath.t -> unit
 
 (** Similar to [Filename.temp_file] except that the temporary file will be
     deleted at the end of the execution (see above).
     @raise Temp_file_error if the temp file cannot be created.
-    @before Frama-C+dev was in Extlib and returned a string instead of
+    @before 31.0-Gallium was in Extlib and returned a string instead of
     [Filepath.t], raised Temp_file_error, [keep] was named [debug] and [prefix]
     and [suffix] arguments were not named. *)
 val file: ?keep:bool -> prefix:string -> suffix:string -> unit -> Filepath.t
@@ -47,6 +47,6 @@ val file: ?keep:bool -> prefix:string -> suffix:string -> unit -> Filepath.t
 (** Similar to [Filename.temp_dir] except that the temporary directory will be
     deleted at the end of the execution (see above).
     @before 28.0-Nickel returned a string instead of [Filepath.t]
-    @before Frama-C+dev was in Extlib, raised Temp_file_error and [keep] was named [debug] and [prefix]
+    @before 31.0-Gallium was in Extlib, raised Temp_file_error and [keep] was named [debug] and [prefix]
     and [suffix] arguments were not named. *)
 val dir: ?keep:bool -> prefix:string -> suffix:string -> unit -> Filepath.t
