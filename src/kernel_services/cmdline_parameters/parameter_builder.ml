@@ -1640,7 +1640,8 @@ struct
             P.L.abort "file '%s' not found" s
           | Fc_Filepath.File_exists ->
             P.L.abort "file '%s' already exists" s
-        let to_string = Fc_Filepath.to_string
+        let to_string p = Fc_Filepath.to_string_rel p
+        let pretty = Fc_Filepath.pretty_rel
       end)
       (V)
       (struct include X let dependencies = [] end)
