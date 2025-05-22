@@ -52,7 +52,7 @@
     3. ∀x: 'a S.t S.t T.t, [swap (T.map S.flatten x) ≣ S.flatten (S.map swap (swap x))]
     4. ∀x: 'a S.t T.t T.t, [swap (T.flatten x) ≣ S.map T.flatten (swap (T.map swap x))]
     More details on this at the end of this file.
-    @since Frama-C+dev *)
+    @since 31.0-Gallium *)
 
 module type Axiom = sig
   type 'a interior and 'a exterior

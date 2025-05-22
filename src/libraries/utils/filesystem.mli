@@ -44,15 +44,15 @@ val readdir: Filepath.t -> string array
 [@@deprecated "Use iter_dir or fold_dir instead"]
 
 (** Contents of a directory.
-    @since Frama-C+dev *)
+    @since 31.0-Gallium *)
 val list_dir: Filepath.t -> string list
 
 (** Iter through the contents of a directory.
-    @since Frama-C+dev *)
+    @since 31.0-Gallium *)
 val iter_dir: (string -> unit) -> Filepath.t -> unit
 
 (** Fold over the contents of a directory.
-    @since Frama-C+dev *)
+    @since 31.0-Gallium *)
 val fold_dir: (string -> 'a -> 'a) -> Filepath.t -> 'a -> 'a
 
 (** [make_dir ?parents name perm] creates directory [name] with permission
@@ -71,11 +71,11 @@ val fold_dir: (string -> 'a -> 'a) -> Filepath.t -> 'a -> 'a
 val make_dir : ?parents:bool -> Filepath.t -> Unix.file_perm -> bool
 
 (** Tries to delete a file and never fails.
-    @before Frama-C+dev it was Extlib.safe_remove *)
+    @before 31.0-Gallium it was Extlib.safe_remove *)
 val remove_file: Filepath.t -> unit
 
 (** Tries to delete a directory and never fails.
-    @before Frama-C+dev it was Extlib.safe_remove_dir *)
+    @before 31.0-Gallium it was Extlib.safe_remove_dir *)
 val remove_dir: Filepath.t -> unit
 
 (** Equivalent to [Sys.rename].
@@ -93,12 +93,12 @@ exception Temp_file_error of string
 
 (** Similar to [Filename.temp_file].
     @raise Temp_file_error if the temp file cannot be created.
-    @since Frama-C+dev *)
+    @since 31.0-Gallium *)
 val temp_file: prefix:string -> suffix:string -> Filepath.t
 
 (** Similar to [Filename.temp_dir].
     @raise Temp_file_error if the temp dir cannot be created.
-    @since Frama-C+dev *)
+    @since 31.0-Gallium *)
 val temp_dir: prefix:string -> suffix:string -> Filepath.t
 
 
@@ -107,12 +107,12 @@ val temp_dir: prefix:string -> suffix:string -> Filepath.t
 (* ************************************************************************* *)
 
 (** [digest p] computes the hash of a file [p] using {!Stdlib.Digest.file}.
-    @since Frama-C+dev *)
+    @since 31.0-Gallium *)
 val digest: Filepath.t -> string
 
 (** [same_digest p1 p2] compares the hashes of two files [p1] and [p2] using
     {!Stdlib.Digest.file} and returns [true] if they have the same.
-    @since Frama-C+dev *)
+    @since 31.0-Gallium *)
 val same_digest: Filepath.t -> Filepath.t -> bool
 
 
@@ -128,13 +128,13 @@ val bincopy : bytes -> in_channel -> out_channel -> unit
 [@@deprecated "This function is only used locally and is not exported anymore."]
 
 (** [copy_file source target] copies source file to target file.
-    @since Frama-C+dev
-    @before Frama-C+dev this function was [Command.copy] *)
+    @since 31.0-Gallium
+    @before 31.0-Gallium this function was [Command.copy] *)
 val copy_file : Filepath.t -> Filepath.t -> unit
 
 (** Iter over all text lines in the file
-    @since Frama-C+dev
-    @before Frama-C+dev this function was [Command.read_lines] *)
+    @since 31.0-Gallium
+    @before 31.0-Gallium this function was [Command.read_lines] *)
 val iter_lines : Filepath.t -> (string -> unit) -> unit
 
 
@@ -177,7 +177,7 @@ type ('ch,'a) exn_processor = ('ch -> 'a) -> 'a
     @return [Ok (f input_channel)] if no exceptions are thrown, or [Error s]
     if a [Sys_error s] is thrown during the execution of [f] or during the
     closing of the file.
-    @since Frama-C+dev *)
+    @since 31.0-Gallium *)
 val with_open_in:
   ?if_missing:action_if_missing ->
   ?binary:bool ->
@@ -186,8 +186,8 @@ val with_open_in:
   (in_channel, 'a) safe_processor
 
 (** Same as {!with_open_in} but raises [Sys_error] instead of returning [Error].
-    @since Frama-C+dev
-    @before Frama-C+dev this function was [Command.read_file] *)
+    @since 31.0-Gallium
+    @before 31.0-Gallium this function was [Command.read_file] *)
 val with_open_in_exn :
   ?if_missing:action_if_missing ->
   ?binary:bool ->
@@ -210,7 +210,7 @@ val with_open_in_exn :
     @return [Ok (f output_channel)] if no exceptions are thrown, or [Error s]
     if a [Sys_error s] is thrown during the execution of [f] or during the
     closing the file.
-    @since Frama-C+dev *)
+    @since 31.0-Gallium *)
 val with_open_out:
   ?if_missing:action_if_missing ->
   ?if_exists:action_if_exists ->
@@ -220,8 +220,8 @@ val with_open_out:
   (out_channel, 'a) safe_processor
 
 (** Same as {!with_open_out} but raises [Sys_error] instead of returning [Error].
-    @since Frama-C+dev
-    @before Frama-C+dev this function was [Command.write_file] *)
+    @since 31.0-Gallium
+    @before 31.0-Gallium this function was [Command.write_file] *)
 val with_open_out_exn:
   ?if_missing:action_if_missing ->
   ?if_exists:action_if_exists ->
@@ -238,13 +238,13 @@ val with_open_out_exn:
     @return [Ok (f fmt)] if no exceptions are thrown, or [Error s]
     if a [Sys_error s] is thrown during the execution of [f] or when
     closing the file.
-    @since Frama-C+dev *)
+    @since 31.0-Gallium *)
 val with_formatter: Filepath.t -> (Format.formatter, 'a) safe_processor
 
 (** Same as {!with_formatter} but raises [Sys_error] instead of returning
     [Error].
-    @since Frama-C+dev
-    @before Frama-C+dev this function was [Command.pp_to_file] and
+    @since 31.0-Gallium
+    @before 31.0-Gallium this function was [Command.pp_to_file] and
     [Command.print_file] *)
 val with_formatter_exn: Filepath.t -> (Format.formatter, 'a) exn_processor
 

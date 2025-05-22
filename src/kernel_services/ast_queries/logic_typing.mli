@@ -54,7 +54,7 @@ module Lenv : sig
   (** Note that empty still contains the label Init since it is always
       available.
 
-      @before Frama-C+dev Init was not available in the environment.
+      @before 31.0-Gallium Init was not available in the environment.
   *)
 
   val add_var: string -> Cil_types.logic_var -> t -> t

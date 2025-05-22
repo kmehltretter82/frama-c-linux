@@ -21,6 +21,6 @@
 (**************************************************************************)
 
 (** Implementation of the {!Field} signature based on rational numbers.
-    @since Frama-C+dev *)
+    @since 31.0-Gallium *)
 
 include Field.S with type t = Q.t

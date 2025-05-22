@@ -102,7 +102,7 @@ exception File_exists
       but [normalize] may accept them.
 
     @before 21.0-Scandium no [existence] argument.
-    @before Frama-C+dev this function was [normalize] *)
+    @before 31.0-Gallium this function was [normalize] *)
 val of_string: ?existence:existence -> ?base:t -> string -> t
 
 (** [to_pretty_string p] returns [p] prettified,
@@ -114,12 +114,12 @@ val to_pretty_string: t -> string
 
 (** [to_pretty_relative p] returns [p] relativized if it is relative,
     or returns the same thing as {!to_pretty_string} otherwise.
-    @since Frama-C+dev *)
+    @since 31.0-Gallium *)
 val to_pretty_relative: ?base:t -> t -> string
 
 (** [to_quoted_string p] returns [p] but quoted, suitable for use as
     one argument in a command line. See [Filename.quoted]
-    @since Frama-C+dev *)
+    @since 31.0-Gallium *)
 val to_quoted_string: t -> string
 
 (** [to_string_list l] returns [l] as a list of strings containing the
@@ -152,7 +152,7 @@ val dirname: t -> t
     The resulting path must respect [existence].
 
     @since 29.0-Copper
-    @before Frama-C+dev this function was [Normalize.extend] *)
+    @before 31.0-Gallium this function was [Normalize.extend] *)
 val extend: ?existence:existence -> t -> string -> t
 
 (** [concat ~existence dir file] returns the normalized path
@@ -173,12 +173,12 @@ val (/): t -> string -> t
 val concats: ?existence:existence -> t -> string list -> t
 
 (** Same as [Filename.check_suffix].
-    @since Frama-C+dev *)
+    @since 31.0-Gallium *)
 val has_suffix: t -> string -> bool
 
 (** Same as [Filename.chop_suffix].
     @raise Invalid_argument if the suffix does not appear in the filepath.
-    @since Frama-C+dev *)
+    @since 31.0-Gallium *)
 val chop_suffix: t -> string -> t
 
 (** @return true if the file is relative to [base]
@@ -186,7 +186,7 @@ val chop_suffix: t -> string -> t
     working directory if no base is specified.
     @since Aluminium-20160501
     @before 23.0-Vanadium argument types were string instead of t.
-    @before Frama-C+dev named argument was [base_name] *)
+    @before 31.0-Gallium named argument was [base_name] *)
 val is_relative: ?base:t -> t -> bool
 
 (** [relativize base file_name] returns a relative path name of
@@ -194,7 +194,7 @@ val is_relative: ?base:t -> t -> bool
     otherwise, returns [file_name] unchanged.
     The default base name is the current working directory name.
     @since Aluminium-20160501
-    @before Frama-C+dev argument types were string instead of t and named
+    @before 31.0-Gallium argument types were string instead of t and named
     argument was [base_name] *)
 val relativize: ?base:t -> t -> string
 
@@ -225,7 +225,7 @@ val add_symbolic_dir: string -> t -> unit
 val add_symbolic_dir_list: string -> t list -> unit
 
 (** Remove all symbolic dirs that have been added earlier.
-    @since Frama-C+dev *)
+    @since 31.0-Gallium *)
 val remove_symbolic_dir: t -> unit
 
 (** Remove all symbolic dirs that have been added earlier.

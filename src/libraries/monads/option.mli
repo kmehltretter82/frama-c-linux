@@ -23,7 +23,7 @@
 (** Extend the [option] type to a full fleshed monad. Be wary that the
     parameters order of the [bind] function are reversed compared to
     the standard library.
-    @since Frama-C+dev *)
+    @since 31.0-Gallium *)
 
 include Monad.S_with_product with type 'a t = 'a option
 include module type of Stdlib.Option

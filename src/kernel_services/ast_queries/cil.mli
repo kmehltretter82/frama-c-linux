@@ -2202,14 +2202,14 @@ val frama_c_inlined: string
 (* ************************************************************************* *)
 
 (** Returns the attributes of a type.
-    @deprecated Frama-C+dev *)
+    @deprecated 31.0-Gallium *)
 val typeAttr: typ -> attributes
 [@@deprecated "Use [t.tattr] instead."]
 [@@migrate { repl = (fun t -> t.tattr) } ]
 
 (** Sets the attributes of the type to the given list. Previous attributes
     are discarded.
-    @deprecated Frama-C+dev *)
+    @deprecated 31.0-Gallium *)
 val setTypeAttrs: typ -> attributes -> typ
 [@@deprecated "Use [{t with tattr = ...}] instead."]
 [@@migrate { repl = (fun t tattr -> {t with tattr}) } ]
@@ -2368,7 +2368,7 @@ val unrollType: typ -> typ
 
 (** Same than {!Cil.unrollType} but discard the final type attributes and only
     return its node.
-    @since Frama-c+Dev *)
+    @since 31.0-Gallium *)
 val unrollTypeNode: typ -> typ_node
 [@@deprecated "Use Ast_types.unroll_node instead."]
 [@@migrate { repl = Ast_types.unroll_node } ]
@@ -2573,7 +2573,7 @@ val typeOf_array_elem_size : typ -> typ * exp option
 (** Returns the type of the array elements of the given type, and the size
     of the array, if any.
     Asserts it is an array type.
-    @before Frama-C+dev This function applied {!Cil.constFoldToInt} on array's
+    @before 31.0-Gallium This function applied {!Cil.constFoldToInt} on array's
     size and returned a [Z.t option].
     @since 30.0-Zinc *)
 [@@deprecated "Use Ast_types.array_elem_type_and_size instead."]

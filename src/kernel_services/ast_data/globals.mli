@@ -345,7 +345,7 @@ val get_annotation_name: global_annotation -> string option
     (e.g. for axiomatics, predicates, etc), or [None] if no such name exists
     (e.g. for volatile blocks).
 
-    @since Frama-C+dev
+    @since 31.0-Gallium
 *)
 
 val get_name: global -> string option
@@ -353,7 +353,7 @@ val get_name: global -> string option
     functions, types, etc), or [None] if no such name exists
     (e.g. for assembly statements).
 
-    @since Frama-C+dev
+    @since 31.0-Gallium
 *)
 
 (* **/** *)

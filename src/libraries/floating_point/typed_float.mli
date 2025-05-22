@@ -32,7 +32,7 @@
     function, which returns a witness that specifies the format one would like
     to use and the one actually used to encode the parsed floating point number.
 
-    @since Frama-C+dev *)
+    @since 31.0-Gallium *)
 
 
 

@@ -146,7 +146,7 @@ val never_remove_global: string -> unit
     even if unused, overriding any command-line options.
     Must be called before Rmtmps is run.
 
-    @since Frama-C+dev
+    @since 31.0-Gallium
 *)
 
 (* ************************************************************************* *)

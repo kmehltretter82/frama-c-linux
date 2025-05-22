@@ -79,7 +79,7 @@ module type Value_datatype_with_collections = sig
       Should return a list of one element for most uses, except if one string
       can represent several elements.
       @raise Cannot_build if the string is invalid.
-      @before Frama-C+dev This function returned only one element, and function
+      @before 31.0-Gallium This function returned only one element, and function
       [of_singleton_string] was used to return a set of elements. *)
 
   val to_string: t -> string
@@ -211,7 +211,7 @@ module type Int = sig
 end
 
 (** Signature for a floating-point parameter.
-    @since Frama-C+dev *)
+    @since 31.0-Gallium *)
 module type Float = sig
 
   include S with type t = float
@@ -586,7 +586,7 @@ module type Builder = sig
   module Zero(_: Input_with_arg): Int
 
   (** Parameter with an optional decimal point converted to an Ocaml float
-      @since Frama-C+dev *)
+      @since 31.0-Gallium *)
   module Float(_: sig include Input_with_arg val default: float end): Float
 
   (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
@@ -659,7 +659,7 @@ module type Builder = sig
       a variant with only a finite number of possible constructions.
       Note that [t] must be comparable with structural equality
       @since 29.0-Copper
-      @before Frama-C+dev it required [all_values : t list] and
+      @before 31.0-Gallium it required [all_values : t list] and
       [to_string : t -> string] *)
   module Enum(X : sig
       include Input
