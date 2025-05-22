@@ -45,8 +45,17 @@ void interrupt_cross_incr2(void) {
   interrupt_received_b = interrupt_received_a + 1;
 }
 
+void print_a(int a) {
+  Frama_C_show_each_a(a);
+}
+void print_b(int b) {
+  Frama_C_show_each_b(b);
+}
+
 int main_interrupt_cross_incr() {
-  Frama_C_show_each_a(interrupt_received_a);
-  Frama_C_show_each_b(interrupt_received_b);
+  // Check that the interferences are correctly passed through function
+  // parameters, even when the main function does not explicitely start threads.
+  print_a(interrupt_received_a);
+  print_b(interrupt_received_b);
   return 0;
 }
