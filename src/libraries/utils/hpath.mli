@@ -36,7 +36,6 @@ type base = Absolute | Cwd | Name of string * t
 val to_uri : t -> base * string
 
 module Names  : sig
-  val reset : unit -> unit
   val add : t -> string -> unit
   val remove : t -> unit
   val all : unit -> (t * string) list
