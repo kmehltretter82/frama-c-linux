@@ -41,11 +41,6 @@ struct A {
 */
 void swap(struct A *p, struct A *q)
 {
-   // Populate region map with struct fields
-   /*@ ghost int a = p->f[0]; */
-   /*@ ghost int b = q->f[0]; */
-   /*@ ghost double c = p->g; */
-   /*@ ghost double d = q->g; */
    struct A tmp = *p;
    *p = *q;
    *q = tmp;
@@ -68,13 +63,6 @@ void swap(struct A *p, struct A *q)
 */
 void copy(int side, struct A *p, struct A *q, struct A *r)
 {
-   // Populate region map with struct fields
-   /*@ ghost int a = p->f[0]; */
-   /*@ ghost int b = q->f[0]; */
-   /*@ ghost int c = r->f[0]; */
-   /*@ ghost double d = p->g; */
-   /*@ ghost double e = q->g; */
-   /*@ ghost double f = r->g; */
    struct A *w = side ? r : q;
    struct A *s = side ? q : r;
    /*@ ghost L: ; */

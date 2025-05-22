@@ -113,17 +113,13 @@ Cluster S1_A {
   
 }
 
-Goal Assertion 'Kept' (file compound_assigns.i, line 82):
+Goal Assertion 'Kept' (file compound_assigns.i, line 70):
 Let a = memcpy(Mint_0, tmp_0, Mint_0, p, 5).
 Let a_1 = memcpy(Mf64_0, tmp_0, Mf64_0, p, 5).
 Let a_2 = Load_S1_A(s, Mint_0, Mf64_0).
 Let a_3 = Load_S1_A(s, a, a_1).
 Assume {
-  Type: is_sint32(side_0) /\ IsS1_A(a_2) /\
-      is_sint32(Mint_0[shift_sint32(shiftfield_F1_A_f(p), 0)]) /\
-      is_sint32(Mint_0[shift_sint32(shiftfield_F1_A_f(q), 0)]) /\
-      is_sint32(Mint_0[shift_sint32(shiftfield_F1_A_f(r), 0)]) /\
-      IsS1_A(a_3).
+  Type: is_sint32(side_0) /\ IsS1_A(a_2) /\ IsS1_A(a_3).
   (* Heap *)
   Type: (region(p.base) <= 0) /\ (region(q.base) <= 0) /\
       (region(r.base) <= 0).
@@ -142,7 +138,7 @@ Prove: EqS1_A(a_3, a_2).
 
 ------------------------------------------------------------
 
-Goal Assertion 'Kept' (file compound_assigns.i, line 84):
+Goal Assertion 'Kept' (file compound_assigns.i, line 72):
 Let a = memcpy(Mint_0, tmp_0, Mint_0, p, 5).
 Let a_1 = memcpy(a, p, a, s, 5).
 Let a_2 = memcpy(Mf64_0, tmp_0, Mf64_0, p, 5).
@@ -151,11 +147,7 @@ Let a_4 = Load_S1_A(s, a, a_2).
 Let a_5 = Load_S1_A(s, Mint_0, Mf64_0).
 Let a_6 = Load_S1_A(s, a_1, a_3).
 Assume {
-  Type: is_sint32(side_0) /\ IsS1_A(a_5) /\
-      is_sint32(Mint_0[shift_sint32(shiftfield_F1_A_f(p), 0)]) /\
-      is_sint32(Mint_0[shift_sint32(shiftfield_F1_A_f(q), 0)]) /\
-      is_sint32(Mint_0[shift_sint32(shiftfield_F1_A_f(r), 0)]) /\
-      IsS1_A(a_4) /\ IsS1_A(a_6).
+  Type: is_sint32(side_0) /\ IsS1_A(a_5) /\ IsS1_A(a_4) /\ IsS1_A(a_6).
   (* Heap *)
   Type: (region(p.base) <= 0) /\ (region(q.base) <= 0) /\
       (region(r.base) <= 0).
@@ -177,38 +169,38 @@ Prove: EqS1_A(a_6, a_5).
 
 ------------------------------------------------------------
 
-Goal Assigns (file compound_assigns.i, line 57) in 'copy' (1/6):
-Effect at line 78
+Goal Assigns (file compound_assigns.i, line 52) in 'copy' (1/6):
+Effect at line 66
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file compound_assigns.i, line 57) in 'copy' (2/6):
-Effect at line 78
+Goal Assigns (file compound_assigns.i, line 52) in 'copy' (2/6):
+Effect at line 66
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file compound_assigns.i, line 57) in 'copy' (3/6):
-Effect at line 79
+Goal Assigns (file compound_assigns.i, line 52) in 'copy' (3/6):
+Effect at line 67
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file compound_assigns.i, line 57) in 'copy' (4/6):
-Effect at line 79
+Goal Assigns (file compound_assigns.i, line 52) in 'copy' (4/6):
+Effect at line 67
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file compound_assigns.i, line 57) in 'copy' (5/6):
-Effect at line 81
+Goal Assigns (file compound_assigns.i, line 52) in 'copy' (5/6):
+Effect at line 69
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file compound_assigns.i, line 57) in 'copy' (6/6):
-Effect at line 83
+Goal Assigns (file compound_assigns.i, line 52) in 'copy' (6/6):
+Effect at line 71
 Prove: true.
 
 ------------------------------------------------------------
@@ -227,12 +219,8 @@ Let a_6 = Load_S1_A(p, a_1, a_3).
 Let a_7 = Load_S1_A(q, a, a_2).
 Let a_8 = Load_S1_A(p, Mint_0, Mf64_0).
 Assume {
-  Type: is_sint32(side_0) /\ IsS1_A(a_8) /\ IsS1_A(a_5) /\
-      is_sint32(Mint_0[shift_sint32(shiftfield_F1_A_f(p), 0)]) /\
-      is_sint32(Mint_0[shift_sint32(shiftfield_F1_A_f(q), 0)]) /\
-      is_sint32(Mint_0[shift_sint32(shiftfield_F1_A_f(r), 0)]) /\
-      IsS1_A(a_7) /\ IsS1_A(a_6) /\ IsS1_A(a_4) /\
-      IsS1_A(Load_S1_A(r, a_1, a_3)).
+  Type: is_sint32(side_0) /\ IsS1_A(a_8) /\ IsS1_A(a_5) /\ IsS1_A(a_7) /\
+      IsS1_A(a_6) /\ IsS1_A(a_4) /\ IsS1_A(Load_S1_A(r, a_1, a_3)).
   (* Heap *)
   Type: (region(p.base) <= 0) /\ (region(q.base) <= 0) /\
       (region(r.base) <= 0).
@@ -263,12 +251,8 @@ Let a_6 = Load_S1_A(p, a_1, a_3).
 Let a_7 = Load_S1_A(q, a, a_2).
 Let a_8 = Load_S1_A(p, Mint_0, Mf64_0).
 Assume {
-  Type: is_sint32(side_0) /\ IsS1_A(a_8) /\ IsS1_A(a_5) /\
-      is_sint32(Mint_0[shift_sint32(shiftfield_F1_A_f(p), 0)]) /\
-      is_sint32(Mint_0[shift_sint32(shiftfield_F1_A_f(q), 0)]) /\
-      is_sint32(Mint_0[shift_sint32(shiftfield_F1_A_f(r), 0)]) /\
-      IsS1_A(a_7) /\ IsS1_A(a_6) /\ IsS1_A(a_4) /\
-      IsS1_A(Load_S1_A(r, a_1, a_3)).
+  Type: is_sint32(side_0) /\ IsS1_A(a_8) /\ IsS1_A(a_5) /\ IsS1_A(a_7) /\
+      IsS1_A(a_6) /\ IsS1_A(a_4) /\ IsS1_A(Load_S1_A(r, a_1, a_3)).
   (* Heap *)
   Type: (region(p.base) <= 0) /\ (region(q.base) <= 0) /\
       (region(r.base) <= 0).
@@ -300,11 +284,8 @@ Let a_7 = Load_S1_A(q, a, a_2).
 Let a_8 = Load_S1_A(p, Mint_0, Mf64_0).
 Let a_9 = Load_S1_A(r, a_1, a_3).
 Assume {
-  Type: is_sint32(side_0) /\ IsS1_A(a_8) /\ IsS1_A(a_5) /\
-      is_sint32(Mint_0[shift_sint32(shiftfield_F1_A_f(p), 0)]) /\
-      is_sint32(Mint_0[shift_sint32(shiftfield_F1_A_f(q), 0)]) /\
-      is_sint32(Mint_0[shift_sint32(shiftfield_F1_A_f(r), 0)]) /\
-      IsS1_A(a_7) /\ IsS1_A(a_6) /\ IsS1_A(a_4) /\ IsS1_A(a_9).
+  Type: is_sint32(side_0) /\ IsS1_A(a_8) /\ IsS1_A(a_5) /\ IsS1_A(a_7) /\
+      IsS1_A(a_6) /\ IsS1_A(a_4) /\ IsS1_A(a_9).
   (* Heap *)
   Type: (region(p.base) <= 0) /\ (region(q.base) <= 0) /\
       (region(r.base) <= 0).
@@ -338,12 +319,8 @@ Let a_6 = Load_S1_A(p, a_1, a_3).
 Let a_7 = Load_S1_A(r, a, a_2).
 Let a_8 = Load_S1_A(p, Mint_0, Mf64_0).
 Assume {
-  Type: IsS1_A(a_8) /\ IsS1_A(a_5) /\
-      is_sint32(Mint_0[shift_sint32(shiftfield_F1_A_f(p), 0)]) /\
-      is_sint32(Mint_0[shift_sint32(shiftfield_F1_A_f(q), 0)]) /\
-      is_sint32(Mint_0[shift_sint32(shiftfield_F1_A_f(r), 0)]) /\
-      IsS1_A(a_7) /\ IsS1_A(a_6) /\ IsS1_A(Load_S1_A(q, a_1, a_3)) /\
-      IsS1_A(a_4).
+  Type: IsS1_A(a_8) /\ IsS1_A(a_5) /\ IsS1_A(a_7) /\ IsS1_A(a_6) /\
+      IsS1_A(Load_S1_A(q, a_1, a_3)) /\ IsS1_A(a_4).
   (* Heap *)
   Type: (region(p.base) <= 0) /\ (region(q.base) <= 0) /\
       (region(r.base) <= 0).
@@ -373,11 +350,8 @@ Let a_7 = Load_S1_A(r, a, a_2).
 Let a_8 = Load_S1_A(p, Mint_0, Mf64_0).
 Let a_9 = Load_S1_A(q, a_1, a_3).
 Assume {
-  Type: IsS1_A(a_8) /\ IsS1_A(a_5) /\
-      is_sint32(Mint_0[shift_sint32(shiftfield_F1_A_f(p), 0)]) /\
-      is_sint32(Mint_0[shift_sint32(shiftfield_F1_A_f(q), 0)]) /\
-      is_sint32(Mint_0[shift_sint32(shiftfield_F1_A_f(r), 0)]) /\
-      IsS1_A(a_7) /\ IsS1_A(a_6) /\ IsS1_A(a_9) /\ IsS1_A(a_4).
+  Type: IsS1_A(a_8) /\ IsS1_A(a_5) /\ IsS1_A(a_7) /\ IsS1_A(a_6) /\
+      IsS1_A(a_9) /\ IsS1_A(a_4).
   (* Heap *)
   Type: (region(p.base) <= 0) /\ (region(q.base) <= 0) /\
       (region(r.base) <= 0).
@@ -406,12 +380,8 @@ Let a_6 = Load_S1_A(p, a_1, a_3).
 Let a_7 = Load_S1_A(r, a, a_2).
 Let a_8 = Load_S1_A(p, Mint_0, Mf64_0).
 Assume {
-  Type: IsS1_A(a_8) /\ IsS1_A(a_5) /\
-      is_sint32(Mint_0[shift_sint32(shiftfield_F1_A_f(p), 0)]) /\
-      is_sint32(Mint_0[shift_sint32(shiftfield_F1_A_f(q), 0)]) /\
-      is_sint32(Mint_0[shift_sint32(shiftfield_F1_A_f(r), 0)]) /\
-      IsS1_A(a_7) /\ IsS1_A(a_6) /\ IsS1_A(Load_S1_A(q, a_1, a_3)) /\
-      IsS1_A(a_4).
+  Type: IsS1_A(a_8) /\ IsS1_A(a_5) /\ IsS1_A(a_7) /\ IsS1_A(a_6) /\
+      IsS1_A(Load_S1_A(q, a_1, a_3)) /\ IsS1_A(a_4).
   (* Heap *)
   Type: (region(p.base) <= 0) /\ (region(q.base) <= 0) /\
       (region(r.base) <= 0).
@@ -556,7 +526,7 @@ Cluster S1_A {
   
 }
 
-Goal Post-condition (file compound_assigns.i, line 91) in 'init':
+Goal Post-condition (file compound_assigns.i, line 79) in 'init':
 Let a = Load_S1_A(p, memcpy(Mint_0, p, Mint_0, q, 5),
           memcpy(Mf64_0, p, Mf64_0, q, 5)).
 Let a_1 = Load_S1_A(q, Mint_0, Mf64_0).
@@ -572,7 +542,7 @@ Prove: EqS1_A(a, a_1).
 
 ------------------------------------------------------------
 
-Goal Post-condition (file compound_assigns.i, line 92) in 'init':
+Goal Post-condition (file compound_assigns.i, line 80) in 'init':
 Let a = memcpy(Init_0, p, Init_0, q, 5).
 Let a_1 = Load_S1_A(p, memcpy(Mint_0, p, Mint_0, q, 5),
             memcpy(Mf64_0, p, Mf64_0, q, 5)).
@@ -594,7 +564,7 @@ Prove: IsInit_S1_A(p, a).
 
 ------------------------------------------------------------
 
-Goal Assertion 'PF,Z3_only' (file compound_assigns.i, line 99):
+Goal Assertion 'PF,Z3_only' (file compound_assigns.i, line 87):
 Let a = memcpy(Init_0, p, Init_0, q, 5).
 Let a_1 = Load_S1_A(p, memcpy(Mint_0, p, Mint_0, q, 5),
             memcpy(Mf64_0, p, Mf64_0, q, 5)).
@@ -615,8 +585,8 @@ Prove: (a[shift_sint32(shiftfield_F1_A_f(p), i)]=true).
 
 ------------------------------------------------------------
 
-Goal Assigns (file compound_assigns.i, line 90) in 'init':
-Effect at line 96
+Goal Assigns (file compound_assigns.i, line 78) in 'init':
+Effect at line 84
 Prove: true.
 
 ------------------------------------------------------------
@@ -735,10 +705,7 @@ Let a_5 = Load_S1_A(q, a_3, a_4).
 Let a_6 = Load_S1_A(p, Mint_0, Mf64_0).
 Let a_7 = Load_S1_A(p, a_3, a_4).
 Assume {
-  Type: IsS1_A(a_6) /\ IsS1_A(a_2) /\
-      is_sint32(Mint_0[shift_sint32(shiftfield_F1_A_f(p), 0)]) /\
-      is_sint32(Mint_0[shift_sint32(shiftfield_F1_A_f(q), 0)]) /\
-      IsS1_A(a_7) /\ IsS1_A(a_5).
+  Type: IsS1_A(a_6) /\ IsS1_A(a_2) /\ IsS1_A(a_7) /\ IsS1_A(a_5).
   (* Heap *)
   Type: (region(p.base) <= 0) /\ (region(q.base) <= 0).
   (* Pre-condition *)
@@ -760,10 +727,8 @@ Let a_4 = memcpy(a_1, q, Mf64_undef_0, q, 5).
 Let a_5 = Load_S1_A(q, a_3, a_4).
 Let a_6 = Load_S1_A(p, Mint_0, Mf64_0).
 Assume {
-  Type: IsS1_A(a_6) /\ IsS1_A(a_2) /\
-      is_sint32(Mint_0[shift_sint32(shiftfield_F1_A_f(p), 0)]) /\
-      is_sint32(Mint_0[shift_sint32(shiftfield_F1_A_f(q), 0)]) /\
-      IsS1_A(Load_S1_A(p, a_3, a_4)) /\ IsS1_A(a_5).
+  Type: IsS1_A(a_6) /\ IsS1_A(a_2) /\ IsS1_A(Load_S1_A(p, a_3, a_4)) /\
+      IsS1_A(a_5).
   (* Heap *)
   Type: (region(p.base) <= 0) /\ (region(q.base) <= 0).
   (* Pre-condition *)
@@ -777,13 +742,13 @@ Prove: EqS1_A(a_5, a_6).
 ------------------------------------------------------------
 
 Goal Assigns (file compound_assigns.i, line 37) in 'swap' (1/2):
-Effect at line 50
+Effect at line 45
 Prove: true.
 
 ------------------------------------------------------------
 
 Goal Assigns (file compound_assigns.i, line 37) in 'swap' (2/2):
-Effect at line 51
+Effect at line 46
 Prove: true.
 
 ------------------------------------------------------------

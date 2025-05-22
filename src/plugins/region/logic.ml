@@ -93,22 +93,26 @@ let logic_var env lv =
       try VAL (Varinfo.Map.find x env.formal) with Not_found -> VAR x
     else VAR x
 
-let rec load env acs (ty:typ) r : domain =
-  match ty.tnode with
-  | TVoid | TInt _ | TFloat _ | TEnum _ | TBuiltin_va_list | TPtr _ | TFun _ ->
-    Memory.add_read env.map r acs ;
-    Ldomain.scalar @@ Memory.add_value env.map r ty
+let rec load env lv (ty:typ) r : domain =
+  match Ast_types.unroll_node ty with
   | TArray(te,_) ->
     let r' = Memory.add_index env.map r ty in
-    array (load env acs te r')
-  | TNamed _ -> Options.abort "logic.load: TNamed not implemented"
+    let ofs = TIndex (Logic_const.trange (None,None), TNoOffset) in
+    let lv = Logic_const.addTermOffsetLval ofs lv in
+    array (load env lv te r')
   | TComp { cfields } ->
     let add_field d fd =
+      let ofs = TField (fd,TNoOffset) in
+      let lv = Logic_const.addTermOffsetLval ofs lv in
       merge_domain env.map d
       @@ Ldomain.field fd
-      @@ load env acs fd.ftype
+      @@ load env lv fd.ftype
       @@ Memory.add_field env.map r fd
     in List.fold_left add_field pure @@ Option.value ~default:[] cfields
+  | _ ->
+    let acs = Access.Term (env.property, lv) in
+    Memory.add_read env.map r acs ;
+    Ldomain.scalar @@ Memory.add_value env.map r ty
 
 let rterm = ref (fun _ _ -> assert false)
 
@@ -136,21 +140,20 @@ let get_result env = match env.result with
   | Some r -> r
 
 let add_term_lval (env:env) lv =
-  let acs = Access.Term (env.property, lv) in
   let (lhost,loffset) = lv in
   match lhost with
   | TResult ty ->
-    load env acs ty @@ addr_offset env ty (get_result env) loffset
+    load env lv ty @@ addr_offset env ty (get_result env) loffset
   | TMem e ->
     let rh = pointer env (!rterm env e) in
     let te = Logic_typing.ctype_of_pointed e.term_type in
-    load env acs te @@ addr_offset env te rh loffset
-  | TVar lv ->
-    begin match logic_var env lv with
+    load env lv te @@ addr_offset env te rh loffset
+  | TVar v ->
+    begin match logic_var env v with
       | VAL d -> term_offset env d loffset
       | VAR x ->
         let rh = Memory.add_cvar env.map x in
-        load env acs x.vtype @@ addr_offset env x.vtype rh loffset
+        load env lv x.vtype @@ addr_offset env x.vtype rh loffset
     end
 
 let add_addr_lval (env:env) (lhost,loffset) : node =

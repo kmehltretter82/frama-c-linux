@@ -31,6 +31,6 @@ type acs =
 val compare : acs -> acs -> int
 val pretty : Format.formatter -> acs -> unit
 
-val typeof : acs -> logic_type
+val typeof : acs -> typ
 
 module Set : Set.S with type elt = acs

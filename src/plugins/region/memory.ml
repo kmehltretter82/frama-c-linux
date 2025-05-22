@@ -82,12 +82,7 @@ let cpointed = function Blob | Compound _ -> None | Cell(_,p) -> p
 let ctypes (m : chunk) : typ list =
   let pool = ref Typ.Set.empty in
   let add acs =
-    pool :=
-      match Access.typeof acs with
-      | Ctype typ -> Typ.Set.add (Ast_types.unroll @@ typ) !pool
-      | lt ->
-        Options.warning "Access type of %a:%a could not be resolved.@."
-          Access.pretty acs Printer.pp_logic_type lt; !pool in
+    pool := Typ.Set.add (Ast_types.unroll @@ Access.typeof acs) !pool in
   Access.Set.iter add m.creads ;
   Access.Set.iter add m.cwrites ;
   Typ.Set.elements !pool
@@ -465,33 +460,28 @@ let add_value (m:map) (rv:node) (ty:typ) : node option =
 (* -------------------------------------------------------------------------- *)
 
 let sized (m:map) (a:node) (ty: typ) =
-  let sr = sizeof (get m a).clayout in
-  let size = Ranges.gcd sr (Cil.bitsSizeOf ty) in
-  if sr <> size then ignore (merge m a (new_chunk m ~size ()))
+  if Ast_types.is_scalar ty then
+    let sr = sizeof (get m a).clayout in
+    let size = Ranges.gcd sr (Cil.bitsSizeOf ty) in
+    if sr <> size then ignore (merge m a (new_chunk m ~size ()))
 
 let add_read (m: map) (a: node) acs =
   failwith_locked m "Region.Memory.read" ;
   let r = get m a in
   Ufind.set m.store a { r with creads = Access.Set.add acs r.creads } ;
-  match Access.typeof acs with
-  | Ctype typ -> sized m a typ
-  | _ -> ()
+  sized m a @@ Access.typeof acs
 
 let add_write (m: map) (a: node) acs =
   failwith_locked m "Region.Memory.write" ;
   let r = get m a in
   Ufind.set m.store a { r with cwrites = Access.Set.add acs r.cwrites } ;
-  match Access.typeof acs with
-  | Ctype typ -> sized m a typ
-  | _ -> ()
+  sized m a @@ Access.typeof acs
 
 let add_shift (m: map) (a: node) acs =
   failwith_locked m "Region.Memory.shift" ;
   let r = get m a in
   Ufind.set m.store a { r with cshifts = Access.Set.add acs r.cshifts } ;
-  match Access.typeof acs with
-  | Ctype typ -> sized m a typ
-  | _ -> ()
+  sized m a @@ Access.typeof acs
 
 (* -------------------------------------------------------------------------- *)
 (* --- Lookup                                                            ---- *)
@@ -635,21 +625,17 @@ let rec singleton m r =
 
 (* -------------------------------------------------------------------------- *)
 
-let access_typeof acs = match Access.typeof acs with
-  | Ctype t -> Some t
-  | _ -> None
-
 let reads (m:map) (r:node) =
   let node = Ufind.get m.store r in
-  List.filter_map access_typeof @@ Access.Set.elements node.creads
+  List.map Access.typeof @@ Access.Set.elements node.creads
 
 let writes (m:map) (r:node) =
   let node = Ufind.get m.store r in
-  List.filter_map access_typeof @@ Access.Set.elements node.cwrites
+  List.map Access.typeof @@ Access.Set.elements node.cwrites
 
 let shifts (m:map) (r:node) =
   let node = Ufind.get m.store r in
-  List.filter_map access_typeof @@ Access.Set.elements node.cshifts
+  List.map Access.typeof @@ Access.Set.elements node.cshifts
 
 let types (m:map) (r:node) = ctypes @@ Ufind.get m.store r
 
@@ -659,14 +645,11 @@ let typed (m:map) (r:node) =
   let size = sizeof node.clayout in
   try
     let check acs =
-      match Access.typeof acs with
-      | Ctype t ->
-        begin if Cil.bitsSizeOf t > size then raise Exit ;
-          match !types with
-          | None -> types := Some t
-          | Some t0 -> if not @@ Cil_datatype.Typ.equal t0 t then raise Exit
-        end
-      | _ -> ()
+      let t = Access.typeof acs in
+      if Cil.bitsSizeOf t > size then raise Exit ;
+      match !types with
+      | None -> types := Some t
+      | Some t0 -> if not @@ Cil_datatype.Typ.equal t0 t then raise Exit
     in
     Access.Set.iter check node.creads ;
     Access.Set.iter check node.cwrites ;
