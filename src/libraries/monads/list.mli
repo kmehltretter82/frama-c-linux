@@ -22,7 +22,7 @@
 
 (** Extend the [list] type to a full fleshed monad. This monad can be used
     to represent non-deterministic computations.
-    @since Frama-C+dev *)
+    @since 31.0-Gallium *)
 
 include Monad.S_with_product with type 'a t = 'a list
 include module type of Stdlib.List

@@ -133,7 +133,7 @@ val async :
     When this function returns a Result, the stdout and stderr of the child
     process will be filled into the arguments buffer.
     @raise Sys_error when a system error occurs
-    @before Frama-C+dev this function was named [command_async] *)
+    @before 31.0-Gallium this function was named [command_async] *)
 
 val command_async :
   ?stdout:Buffer.t ->
@@ -155,7 +155,7 @@ val spawn :
     @raise Sys_error when a system error occurs
     @raise Async.Cancel when the computation is interrupted or on timeout
     @before 29.0-Copper Async.Cancel was Db.Cancel
-    @before Frama-C+dev this function was named [command]
+    @before 31.0-Gallium this function was named [command]
 *)
 
 val command :

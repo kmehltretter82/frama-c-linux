@@ -22,7 +22,7 @@
 
 (** This module should not be used outside of the Project library.
     @since Carbon-20101201
-    @before Frama-C+dev it was Project_skeleton.Output *)
+    @before 31.0-Gallium it was Project_skeleton.Output *)
 
 include Log.Messages
 val dkey: category

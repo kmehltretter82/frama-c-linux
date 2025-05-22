@@ -282,7 +282,7 @@ val is_function_type : varinfo -> bool
 [@@migrate { repl = (fun vi -> Ast_types.is_fun vi.vtype) } ]
 
 val array_type: ?length:exp -> ?attr:attributes -> typ -> typ
-(** @deprecated Frama-C+dev *)
+(** @deprecated 31.0-Gallium *)
 [@@deprecated "Use Cil_const.mk_tarray instead."]
 [@@migrate { repl = (fun ?length ~attr:tattr t -> Cil_const.mk_tarray ~tattr t length) } ]
 

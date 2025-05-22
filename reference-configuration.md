@@ -1,5 +1,5 @@
 The following set of packages is known to be a working configuration for
-compiling Frama-C 30.0.
+compiling Frama-C 31.0.
 
 - OCaml 4.14.2
 - dune.3.16.1

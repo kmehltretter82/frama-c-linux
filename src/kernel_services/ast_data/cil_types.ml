@@ -299,7 +299,7 @@ and global =
     functions do not take into account the [packed] attributes and pragmas. *)
 
 (** The representation of a Cil type.
-    @before Frama-C+dev This type was not a record but a variant like
+    @before 31.0-Gallium This type was not a record but a variant like
     {!typ_node} with attributes being part of the tuples. *)
 and typ = {
   tnode : typ_node;
@@ -309,7 +309,7 @@ and typ = {
   (** A list of attributes associated with the type, including its qualifiers. *)
 }
 
-(** @since Frama-C+dev *)
+(** @since 31.0-Gallium *)
 and typ_node =
   | TVoid (** Void type. Also predefined as {!Cil_const.voidType} *)
 

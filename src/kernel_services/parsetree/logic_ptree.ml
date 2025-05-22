@@ -44,7 +44,7 @@ type constant =
   | WStringConstant of string (** wide string constant *)
 
 (** size of logic array.
-    @before Frama-C+dev was a sum type with only integer constants and variables
+    @before 31.0-Gallium was a sum type with only integer constants and variables
 *)
 type array_size = lexpr option
 

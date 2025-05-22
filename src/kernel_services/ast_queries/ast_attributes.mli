@@ -21,8 +21,8 @@
 (**************************************************************************)
 
 (** This file contains attribute related types/functions/values.
-    @since Frama-C+dev
-    @before Frama-C+dev Most of these functions were in {!Cil}
+    @since 31.0-Gallium
+    @before 31.0-Gallium Most of these functions were in {!Cil}
 *)
 
 open Cil_types
