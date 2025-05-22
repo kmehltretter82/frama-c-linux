@@ -278,7 +278,7 @@ let rec walk h m (f: node -> unit) n =
 
 let iter (m:map) (f: node -> unit) =
   let h = Hashtbl.create 0 in
-  Vmap.iter (fun _x n -> walk h m f n) m.cvars
+  Vmap.iter (fun _x n -> walk h m f n) m.cvars (* TODO : lvars etc....*)
 
 let size (m: map) (r: node) =
   sizeof (Ufind.get m.store r).clayout
