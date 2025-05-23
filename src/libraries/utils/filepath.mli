@@ -53,8 +53,11 @@ include Datatype.S_with_collections with type t := t
     case sensitivity (by default, [case_sensitive = false]). *)
 val compare_pretty : ?case_sensitive:bool -> t -> t -> int
 
-(** Pretty-prints the normalized (absolute) path. *)
-val pp_abs: Format.formatter -> t -> unit
+(** Pretty-prints the path (absolute) *)
+val pretty_abs: Format.formatter -> t -> unit
+
+(** Pretty-prints the path (relative to current working dir) *)
+val pretty_rel: Format.formatter -> t -> unit
 
 
 (* ************************************************************************* *)
@@ -105,39 +108,43 @@ exception File_exists
     @before 31.0-Gallium this function was [normalize] *)
 val of_string: ?existence:existence -> ?base:t -> string -> t
 
-(** [to_pretty_string p] returns [p] prettified,
-    that is, a relative path-like string.
+(** [to_string p] returns [p] prettified, that is, a relative path-like string.
     Note that this prettified string may contain symbolic dirs and is thus
-    is not a path.
-    See [pretty] for details about usage. *)
-val to_pretty_string: t -> string
+    is not a path. *)
+val to_string: t -> string
 
-(** [to_pretty_relative p] returns [p] relativized if it is relative,
-    or returns the same thing as {!to_pretty_string} otherwise.
-    @since 31.0-Gallium *)
-val to_pretty_relative: ?base:t -> t -> string
+(** [to_string_rel ?quoted p] returns [p] relativized if it is relative,
+    or returns the absolute path otherwise.
+    @param ?quoted if set the string will be suitable for use as one argument
+           in a command line, defaults to false
+    @param ?base the base directory to be relative to, defaults to cwd
+    @since Aluminium-20160501
+    @before 31.0-Gallium was named relativize, argument types were string instead
+    of t and the named argument was [base_name] *)
+val to_string_rel: ?quoted:bool -> ?base:t -> t -> string
 
-(** [to_quoted_string p] returns [p] but quoted, suitable for use as
-    one argument in a command line. See [Filename.quoted]
+(** [to_string_rel p] returns [p] absolutized.
+    @param ?quoted if set the string will be suitable for use as one argument
+           in a command line, defaults to false
     @since 31.0-Gallium *)
-val to_quoted_string: t -> string
+val to_string_abs: ?quoted:bool -> t -> string
 
 (** [to_string_list l] returns [l] as a list of strings containing the
     absolute paths to the elements of [l].
     @since 23.0-Vanadium *)
 val to_string_list: t list -> string list
 
-(** [to_base_uri path] returns a pair [prefix, rest], according to the
+(** [to_base_uri path] returns a pair [base, rest], according to the
     prettified value of [path]:
-    - if it starts with symbolic path SYMB, prefix is Some "SYMB";
-    - if it is a relative path, prefix is Some "PWD";
-    - else (an absolute path), prefix is None.
+    - if it starts with symbolic path SYMB, prefix is Hpath.Name "SYMB";
+    - if it is a relative path, prefix is Hpath.Cwd;
+    - else (an absolute path), prefix is Hpath.Absolute.
       [rest] contains everything after the '/' following the prefix.
       E.g. for the path "FRAMAC_SHARE/libc/string.h", returns
-      ("FRAMAC_SHARE", "libc/string.h").
+      (Name "FRAMAC_SHARE", "libc/string.h").
 
     @since 22.0-Titanium *)
-val to_base_uri: t -> string option * string
+val to_base_uri: t -> Hpath.base * string
 
 (** Equivalent to [Filename.basename].
     @since 28.0-Nickel *)
@@ -189,14 +196,7 @@ val chop_suffix: t -> string -> t
     @before 31.0-Gallium named argument was [base_name] *)
 val is_relative: ?base:t -> t -> bool
 
-(** [relativize base file_name] returns a relative path name of
-    [file_name] w.r.t. [base], if [base] is a prefix of [file];
-    otherwise, returns [file_name] unchanged.
-    The default base name is the current working directory name.
-    @since Aluminium-20160501
-    @before 31.0-Gallium argument types were string instead of t and named
-    argument was [base_name] *)
-val relativize: ?base:t -> t -> string
+
 
 
 (* ************************************************************************* *)
@@ -271,6 +271,9 @@ val is_empty_pos : position -> bool
 
 val normalize: ?existence:existence -> ?base_name:string -> string -> string
 [@@deprecated "Use Filepath.of_string instead."]
+
+val relativize: ?base:t -> t -> string
+[@@deprecated "Use Filepath.to_string_rel instead."]
 
 val exists: t -> bool
 [@@deprecated "Use Filesystem.exists instead"]

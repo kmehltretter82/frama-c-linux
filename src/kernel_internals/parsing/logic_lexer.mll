@@ -210,7 +210,7 @@
         "__FC_FILENAME__",
         (fun loc ->
            let filename =
-             Filepath.(to_pretty_string (fst loc).pos_path)
+             Filepath.(to_string (fst loc).pos_path)
            in
            STRING_LITERAL (false,filename));
       ];

@@ -324,7 +324,7 @@ let process_stdlib_pragma name args =
     | [ ACons ("pop",_) ] -> pop_stdheader (); None
     | [ ACons ("push",_); AStr s ] ->
       let base = System_config.Share.libc in
-      let relative_name = Filepath.relativize ~base (Filepath.of_string s) in
+      let relative_name = Filepath.(to_string_rel ~base (of_string s)) in
       push_stdheader relative_name;
       None
     | _ -> Some (name, args)

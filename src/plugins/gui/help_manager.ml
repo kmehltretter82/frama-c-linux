@@ -36,6 +36,7 @@ let show main_ui =
     "Quentin Bouillaguet";
     "David Bühler";
     "Zakaria Chihani";
+    "Sylvain Chiron";
     "Loïc Correnson";
     "Julien Crétin";
     "Pascal Cuoq";
@@ -44,6 +45,7 @@ let show main_ui =
     "Jean-Christophe Filliâtre";
     "Philippe Herrmann";
     "Maxime Jacquemin";
+    "Benjamin Jorge";
     "Florent Kirchner";
     "Alexander Kogtenkov";
     "Remi Lazarini";

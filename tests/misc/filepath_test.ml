@@ -16,12 +16,12 @@ let () =
     (Filepath.of_string "/tmp/inexistent_directory/.." :> string );
   Kernel.feedback "normalize(): %s"
     (Filepath.of_string "" :> string );
-  Kernel.feedback "relativize(.): %s"
-    (Filepath.(relativize (of_string ".")));
-  Kernel.feedback "relativize(./tests/..): %s"
-    (Filepath.(relativize (of_string "./tests/..")));
-  Kernel.feedback "relativize(/a/bc/d,base_name:/a/b/): %s"
-    (Filepath.(relativize ~base:(of_string "/a/b/") (of_string "/a/bc/d")));
+  Kernel.feedback "to_string_rel(.): %s"
+    (Filepath.(to_string_rel (of_string ".")));
+  Kernel.feedback "to_string_rel(./tests/..): %s"
+    (Filepath.(to_string_rel (of_string "./tests/..")));
+  Kernel.feedback "to_string_rel(/a/bc/d,base_name:/a/b/): %s"
+    (Filepath.(to_string_rel ~base:(of_string "/a/b/") (of_string "/a/bc/d")));
   Filepath.add_symbolic_dir "SYMB" (Filepath.of_string "/tmp/symb/");
   Kernel.feedback "pretty with symbolic path: %a"
     Filepath.pretty (Filepath.of_string "/tmp/symb/file.c")

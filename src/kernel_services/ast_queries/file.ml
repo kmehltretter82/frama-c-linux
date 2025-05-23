@@ -66,7 +66,7 @@ let get_suffixes () =
     [ ".c"; ".i"; ".h" ]
 
 let get_filepath = function NeedCPP (s, _, _, _) | NoCPP s | External (s, _) -> s
-let get_name s = Filepath.to_pretty_string (get_filepath s)
+let get_name s = Filepath.to_string (get_filepath s)
 
 (* ************************************************************************* *)
 (** {2 Preprocessor command} *)
@@ -404,8 +404,8 @@ let cpp_name cmd =
 let replace_in_cpp_cmd cmdl supp_args in_file out_file =
   (* using Filename.quote for filenames which contain space or shell
      metacharacters *)
-  let in_file = Filepath.to_quoted_string in_file
-  and out_file = Filepath.to_quoted_string out_file in
+  let in_file = Filepath.to_string_abs ~quoted:true in_file
+  and out_file = Filepath.to_string_abs ~quoted:true out_file in
   let substitute s =
     match Str.matched_string s with
     | "%%" -> "%"
@@ -589,7 +589,7 @@ let abort_with_detailed_pp_message f cpp_command =
     "failed to run: %s\n(PWD: %a)@\n\
      %sSee chapter \"Preparing the Sources\" in the Frama-C user manual \
      for more details."
-    cpp_command Filepath.pretty (Filepath.pwd ()) possible_cause
+    cpp_command Filepath.pretty_abs (Filepath.pwd ()) possible_cause
 
 let parse_cabs cpp_command = function
   | NoCPP f ->
@@ -1701,7 +1701,7 @@ let add_included_sources tbl file =
 let print_all_sources out all_sources_tbl =
   let elems =
     Hashtbl.fold (fun f hash acc ->
-        (Filepath.to_pretty_string f, hash) :: acc)
+        (Filepath.to_string f, hash) :: acc)
       all_sources_tbl []
   in
   let sorted_elems =
@@ -1773,7 +1773,7 @@ let source_hashes_of_json path =
 let check_source_hashes expected actual_table =
   let checked, diffs =
     Hashtbl.fold (fun fp hash (acc_checked, acc_diffs) ->
-        let fp = Filepath.to_pretty_string fp in
+        let fp = Filepath.to_string fp in
         let expected_hash = List.assoc_opt fp expected in
         let checked = Datatype.String.Set.add fp acc_checked in
         let diffs =

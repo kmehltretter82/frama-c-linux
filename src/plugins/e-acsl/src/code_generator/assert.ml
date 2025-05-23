@@ -254,7 +254,7 @@ let runtime_check_with_msg ~adata ~loc ?(name="") msg ~pred_kind kind kf env pre
   let file =
     Cil.mkString
       ~loc
-      (Filepath.to_pretty_string start_pos.Filepath.pos_path)
+      (Filepath.to_string start_pos.Filepath.pos_path)
   in
   let fct = Cil.mkString ~loc (Functions.RTL.get_original_name kf) in
   let line = Cil.integer ~loc start_pos.Filepath.pos_lnum in

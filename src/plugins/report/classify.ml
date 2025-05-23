@@ -220,8 +220,8 @@ let json_of_source = function
   | Some pos ->
     let file =
       if R.AbsolutePath.get ()
-      then (pos.Filepath.pos_path :> string)
-      else Filepath.to_pretty_string pos.Filepath.pos_path
+      then Filepath.to_string_abs pos.Filepath.pos_path
+      else Filepath.to_string_rel pos.Filepath.pos_path
     in
     [
       "file" , Json.of_string file ;

@@ -15,6 +15,11 @@
 )
 
 (cram
+  (applies_to symbolic_path)
+  (deps (package frama-c-eva) (package frama-c-report))
+)
+
+(cram
   (applies_to log-truncation)
   (enabled_if %{bin-available:socat})
 )

@@ -69,7 +69,7 @@ struct
         ])
 
   let to_json p =
-    let path = Filepath.(to_pretty_string p.pos_path) in
+    let path = Filepath.(to_string p.pos_path) in
     let file =
       if Server_parameters.has_relative_filepath ()
       then path
