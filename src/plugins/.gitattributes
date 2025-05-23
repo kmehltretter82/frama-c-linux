@@ -1,50 +1,49 @@
 ########################################
-# HEADER_SPEC: CEA_LGPL_OR_PROPRIETARY #
+# HEADER_SPEC: CEA_LGPL #
 ########################################
 
-dune-project header_spec=CEA_LGPL_OR_PROPRIETARY
-dune header_spec=CEA_LGPL_OR_PROPRIETARY
+dune-project header_spec=CEA_LGPL
+dune header_spec=CEA_LGPL
 
-config* header_spec=CEA_LGPL_OR_PROPRIETARY
-makefile* header_spec=CEA_LGPL_OR_PROPRIETARY
-Make* header_spec=CEA_LGPL_OR_PROPRIETARY
-*.mk header_spec=CEA_LGPL_OR_PROPRIETARY
+config* header_spec=CEA_LGPL
+makefile* header_spec=CEA_LGPL
+Make* header_spec=CEA_LGPL
+*.mk header_spec=CEA_LGPL
 
 
-*.c header_spec=CEA_LGPL_OR_PROPRIETARY
-*.h header_spec=CEA_LGPL_OR_PROPRIETARY
+*.c header_spec=CEA_LGPL
+*.h header_spec=CEA_LGPL
 
-*.htm header_spec=CEA_LGPL_OR_PROPRIETARY
-*.html header_spec=CEA_LGPL_OR_PROPRIETARY
+*.htm header_spec=CEA_LGPL
+*.html header_spec=CEA_LGPL
 
-*.js header_spec=CEA_LGPL_OR_PROPRIETARY
+*.js header_spec=CEA_LGPL
 
-*.ml header_spec=CEA_LGPL_OR_PROPRIETARY
-*.ml.in header_spec=CEA_LGPL_OR_PROPRIETARY
-*.mli header_spec=CEA_LGPL_OR_PROPRIETARY
-*.mli.in header_spec=CEA_LGPL_OR_PROPRIETARY
-*.mll header_spec=CEA_LGPL_OR_PROPRIETARY
-*.mly header_spec=CEA_LGPL_OR_PROPRIETARY
+*.ml header_spec=CEA_LGPL
+*.ml.in header_spec=CEA_LGPL
+*.mli header_spec=CEA_LGPL
+*.mli.in header_spec=CEA_LGPL
+*.mll header_spec=CEA_LGPL
+*.mly header_spec=CEA_LGPL
 
-*.xml header_spec=CEA_LGPL_OR_PROPRIETARY
+*.xml header_spec=CEA_LGPL
 
-*.pl header_spec=CEA_LGPL_OR_PROPRIETARY
+*.pl header_spec=CEA_LGPL
 
-*.py header_spec=CEA_LGPL_OR_PROPRIETARY
+*.py header_spec=CEA_LGPL
 
-*.rc header_spec=CEA_LGPL_OR_PROPRIETARY
+*.rc header_spec=CEA_LGPL
 
-*.sh header_spec=CEA_LGPL_OR_PROPRIETARY
-*.zsh header_spec=CEA_LGPL_OR_PROPRIETARY
+*.sh header_spec=CEA_LGPL
+*.zsh header_spec=CEA_LGPL
 
-*.css header_spec=CEA_LGPL_OR_PROPRIETARY
+*.css header_spec=CEA_LGPL
 
-*.ts header_spec=CEA_LGPL_OR_PROPRIETARY
-*.tsx header_spec=CEA_LGPL_OR_PROPRIETARY
+*.ts header_spec=CEA_LGPL
+*.tsx header_spec=CEA_LGPL
 
 ########################
 # HEADER_SPEC: .ignore #
 ########################
 
 /*/tests/**/* header_spec=.ignore
-

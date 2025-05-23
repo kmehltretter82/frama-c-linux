@@ -30,8 +30,8 @@
 (*  invalidate any other reasons why the executable file might be            *)
 (*  covered by the GNU Library General Public License.                       *)
 (*                                                                           *)
-(*  File modified by CEA (Commissariat à l'énergie atomique et aux           *)
-(*                        énergies alternatives).                            *)
+(*  File modified by                                                         *)
+(*  CEA (Commissariat à l'énergie atomique et aux énergies alternatives).    *)
 (*                                                                           *)
 (*****************************************************************************)
 

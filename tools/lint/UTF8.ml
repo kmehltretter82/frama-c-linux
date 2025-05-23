@@ -37,8 +37,8 @@
 (*  yoriyuki.y@gmail.com                                                   *)
 (*                                                                         *)
 (*                                                                         *)
-(*  File modified by CEA (Commissariat à l'énergie atomique et aux         *)
-(*                        énergies alternatives).                          *)
+(*  File modified by                                                       *)
+(*  CEA (Commissariat à l'énergie atomique et aux énergies alternatives).  *)
 (*                                                                         *)
 (***************************************************************************)
 

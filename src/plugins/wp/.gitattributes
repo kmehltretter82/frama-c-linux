@@ -1,24 +1,15 @@
-#######################
-# HEADER_SPEC: CEA_WP #
-#######################
+#########################
+# HEADER_SPEC: CEA_LGPL #
+#########################
 
-*.ml header_spec=CEA_WP
-*.mli header_spec=CEA_WP
-*.mll header_spec=CEA_WP
+*.mlw header_spec=CEA_LGPL
+*.driver header_spec=CEA_LGPL
+*.v header_spec=CEA_LGPL
+*.css header_spec=CEA_LGPL
 
-*.mlw header_spec=CEA_WP
-*.driver header_spec=CEA_WP
-*.v header_spec=CEA_WP
-*.css header_spec=CEA_WP
-
-configure.ac header_spec=CEA_WP
-
-Makefile header_spec=CEA_WP
-Makefile.in header_spec=CEA_WP
-Makefile.resources header_spec=CEA_WP
-MakeDoc header_spec=CEA_WP
-
-/intro_wp.txt header_spec=CEA_WP
+Makefile header_spec=CEA_LGPL
+Makefile.resources header_spec=CEA_LGPL
+MakeDoc header_spec=CEA_LGPL
 
 #######################
 # HEADER_SPEC: others #
