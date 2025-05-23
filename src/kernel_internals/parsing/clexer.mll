@@ -121,7 +121,7 @@ let thread_keyword () =
 let filename_keyword () =
   let convert acc c = int64_of_char c :: acc in
   let path (loc : Cil_types.location) = (fst loc).pos_path in
-  let filename loc = Filepath.to_pretty_string (path loc) in
+  let filename loc = Filepath.to_string (path loc) in
   let ints loc = List.rev (String.fold_left convert [] (filename loc)) in
   add "__FC_FILENAME__" (fun loc -> CST_STRING (ints loc, loc))
 
