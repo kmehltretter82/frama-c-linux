@@ -62,117 +62,92 @@ struct
   let kinstr aloc =
     Cil_types.Kstmt (fst aloc)
 
-  let pretty_loc fmt (stmt, _cs) =
-    let stmt_loc = Stmt.loc stmt in
-    Printer.pp_location fmt stmt_loc
+  let pretty_loc fmt aloc =
+    Printer.pp_location fmt (loc aloc)
 end
 
-module Global = struct
-  include Cil_datatype.Global
-  let name = "Analysis_location.Global"
-
-  let pos gloc =
-    fst (loc gloc)
-
-  let kinstr _gloc =
-    Cil_types.Kglobal
-
-  let pretty_loc fmt gloc =
-    let global_loc = Global.loc gloc in
-    Printer.pp_location fmt global_loc
-end
+type local = Local.t
 
 (* Datatype for Analysis_location *)
 module Prototype = struct
   include Datatype.Serializable_undefined
 
   type t =
-    | Global of Global.t
+    | RootCall of Kernel_function.t
+    | GlobalInit of Varinfo.t
     | Local of Local.t
   [@@deriving eq, ord]
 
   let name = "Analysis_location"
   let reprs =
-    List.map (fun global -> Global global) Global.reprs @
+    List.map (fun kf -> RootCall kf) Kernel_function.reprs @
+    List.map (fun vi -> GlobalInit vi) Varinfo.reprs @
     List.map (fun local -> Local local) Local.reprs
   let hash = function
+    | RootCall kf -> Hashtbl.hash (1, Kernel_function.hash kf)
+    | GlobalInit vi -> Hashtbl.hash (2, Varinfo.hash vi)
     | Local l -> Hashtbl.hash (1, Local.hash l)
-    | Global g -> Hashtbl.hash (2, Global.hash g)
   let pretty fmt = function
+    | RootCall kf -> Format.pp_print_string fmt (Kernel_function.get_name kf)
+    | GlobalInit vi -> Format.pp_print_string fmt vi.vname
     | Local l -> Local.pretty fmt l
-    | Global g -> Global.pretty fmt g
 end
 include Datatype.Make_with_collections (Prototype)
 include Prototype
 
-let loc aloc =
-  match aloc with
-  | Local l -> Local.loc l
-  | Global g -> Global.loc g
-
-let pos aloc =
-  match aloc with
-  | Local l -> Local.pos l
-  | Global g -> Global.pos g
-
-let kinstr aloc =
-  match aloc with
-  | Local l -> Local.kinstr l
-  | Global g -> Global.kinstr g
-
-let stmt aloc =
-  match aloc with
-  | Local (stmt,_cs) -> Some stmt
-  | Global _ -> None
-
-let kf aloc =
-  match aloc with
-  | Local (_stmt, cs) -> Some (Callstack.top_kf cs)
-  | Global (GFun ({ svar = vi }, _))
-  | Global (GFunDecl (_, vi, _)) ->
-    (try Some (Globals.Functions.get vi) with Not_found -> None)
-  | Global _ -> None
-
-let callstack aloc =
-  match aloc with
-  | Local (_stmt,cs) -> Some cs
-  | Global _ -> None
-
-let pretty_loc fmt aloc =
-  match aloc with
-  | Local l -> Local.pretty_loc fmt l
-  | Global g -> Global.pretty_loc fmt g
-
-type global = Global.t
-type local = Local.t
-
 let local stmt callstack =
   Local (stmt, callstack)
 
+let root_call kf =
+  RootCall kf
+
+let global_init vi =
+  GlobalInit vi
+
 let is_local = function
+  | RootCall _ | GlobalInit _ -> false
   | Local _ -> true
-  | Global _ -> false
 
-let global global =
-  Global global
+let loc aloc =
+  match aloc with
+  | RootCall kf -> Kernel_function.get_location kf
+  | GlobalInit vi -> vi.vdecl
+  | Local l -> Local.loc l
 
-let is_global = function
-  | Local _ -> false
-  | Global _ -> true
+let pos aloc =
+  loc aloc |> fst
 
-let of_varinfo vi : t =
-  let initinfo = Globals.Vars.find vi in
-  Global (GVar (vi, initinfo, vi.vdecl))
+let kinstr aloc =
+  match aloc with
+  | RootCall _ | GlobalInit _ -> Cil_types.Kglobal
+  | Local l -> Local.kinstr l
 
-let of_kf kf =
-  Global (Kernel_function.get_global kf)
+let stmt aloc =
+  match aloc with
+  | RootCall _ | GlobalInit _ -> None
+  | Local (stmt,_cs) -> Some stmt
+
+let kf aloc =
+  match aloc with
+  | RootCall kf -> Some kf
+  | GlobalInit _ -> None
+  | Local (_stmt, cs) -> Some (Callstack.top_kf cs)
+
+let callstack aloc =
+  match aloc with
+  | RootCall kf -> Some (Callstack.init kf)
+  | GlobalInit _vi -> None
+  | Local (_stmt,cs) -> Some cs
+
+let pretty_loc fmt aloc =
+  Printer.pp_location fmt (loc aloc)
 
 let of_call (call : ('a, 'b) Eval.call) =
   let kf, lloc = Callstack.pop_call call.callstack in
   assert (Kernel_function.equal kf call.kf);
   match lloc, call.return with
-  | None, Some vi -> of_varinfo vi
-  | None, None -> of_kf call.kf
+  | None, Some vi -> GlobalInit vi
+  | None, None -> RootCall call.kf
   | Some (stmt, caller_stack), _ -> Local (stmt, caller_stack)
 
 let of_kinstr kinstr callstack =
@@ -182,6 +157,6 @@ let of_kinstr kinstr callstack =
   | Kglobal ->
     match Callstack.pop_call callstack with
     | kf, None ->
-      of_kf kf
+      RootCall kf
     | _kf, Some (stmt, callstack) ->
       Local (stmt, callstack)

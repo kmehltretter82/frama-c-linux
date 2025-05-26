@@ -22,15 +22,13 @@
 
 (** Analysis locations. *)
 
-(** Analysis location of globals. *)
-type global = Cil_types.global
-
 (** Analysis location of locals: a statement and its associated callstack. *)
 type local = Cil_types.stmt * Callstack.t
 
 (** Analysis location. *)
 type t =
-  | Global of global
+  | RootCall of Cil_types.kernel_function
+  | GlobalInit of Cil_types.varinfo
   | Local of local
 
 module type S = sig
@@ -51,41 +49,23 @@ module type S = sig
       location is also printed. *)
 end
 
-module Global : S with type t = global
 module Local : S with type t = local
 include S with type t := t
 
-val kf : t -> Cil_types.kernel_function option
-(** [kf aloc] returns the kernel function of a local analysis location or [None] 
-   if it is a global localion. *)
-
-val stmt : t -> Cil_types.stmt option
-(** [stmt aloc] returns the stmt of a local analysis location or [None] 
-   if it is a global localion. *)
-
-val callstack : t -> Callstack.t option
-(** [callstack aloc] returns the callstack of a local analysis location or
-    [None] if it is a global localion. *)
+(** {2 Constructors} *)
 
 val local : Cil_types.stmt -> Callstack.t -> t
 (** [local stmt cs] creates a local analysis location. *)
 
-val global : Cil_types.global -> t
-(** [global g] creates a global analysis location. *)
+val root_call : Cil_types.kernel_function -> t
+(** [root_call g] creates an analysis location pointing to the root call of
+    the analysis. *)
 
-val is_local : t -> bool
-(** [is_local aloc] returns true if aloc is a local analysis location. *)
+val global_init : Cil_types.varinfo -> t
+(** [global_init vi] creates an analysis location pointing to the global
+    variable [vi]'s initialization. *)
 
-val is_global : t -> bool
-(** [is_global aloc] returns true if aloc is a global analysis location. *)
-
-val of_varinfo : Cil_types.varinfo -> t
-(** [of_varinfo vi] creates a global analysis location poiting to the
-    variable definition of [vi]. *)
-
-val of_kf : Cil_types.kernel_function -> t
-(** [of_kf kf] creates a global analysis location poiting to the
-    function definition of [kf] or its declaration if it is never defined. *)
+(** {2 Conversions} *)
 
 val of_call : ('a, 'b) Eval.call -> t
 (** [of_call call] creates the global or local analysis location from the call
@@ -98,3 +78,20 @@ val of_kinstr : Cil_types.kinstr -> Callstack.t -> t
     and the given callstack. If [kinstr] is [Kstmt], it will be a local
     analysis location. Otherwise, the analysis location will be the top
     of the callstack or a global location if the callstack is empty. *)
+
+(** {2 Accessors} *)
+
+val is_local : t -> bool
+(** [is_local aloc] returns true if aloc is a local analysis location. *)
+
+val kf : t -> Cil_types.kernel_function option
+(** [kf aloc] returns the kernel function of a local analysis location or [None] 
+   if it is a global localion. *)
+
+val stmt : t -> Cil_types.stmt option
+(** [stmt aloc] returns the stmt of a local analysis location or [None] 
+   if it is a global localion. *)
+
+val callstack : t -> Callstack.t option
+(** [callstack aloc] returns the callstack of a local analysis location or
+    [None] if it is a global localion. *)

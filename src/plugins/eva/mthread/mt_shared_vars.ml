@@ -118,10 +118,8 @@ let read_written_by_thread ?(watch_only=Locations.Zone.top) sm th =
     ~filter:filter_inout_access
     (fun aloc memory acc ->
        match aloc with
-       | Global _ ->
-         (* A Global analysis location represents the initialization state and
-            is never multithreaded. *)
-         acc
+       | RootCall _ -> acc
+       | GlobalInit _ -> acc (* never multithreaded. *)
        | Local (stmt, _) ->
          let<> UpdatedCurrentLoc = Stmt.loc stmt in
          if sm stmt then

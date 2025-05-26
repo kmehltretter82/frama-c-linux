@@ -127,7 +127,7 @@ module Make
   let apply_eva_single_initializer ~aloc state lval expr =
     match Transfer.assign ~aloc state lval expr with
     | `Bottom ->
-      if Analysis_location.is_global aloc then
+      if not (Analysis_location.is_local aloc) then
         Eva_log.warning ~aloc ~once:true
           "evaluation of initializer '%a' failed@." Eva_ast.pp_exp expr;
       raise Initialization_failed
@@ -318,7 +318,7 @@ module Make
   let initialize_global_variable ~lib_entry vi init state =
     let open Current_loc.Operators in
     let<> UpdatedCurrentLoc = vi.vdecl in
-    let aloc = Analysis_location.of_varinfo vi in
+    let aloc = Analysis_location.global_init vi in
     let state = Domain.enter_scope Abstract_domain.Global [vi] state in
     if vi.vsource then
       if lib_entry || (vi.vstorage = Extern)
