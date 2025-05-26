@@ -75,6 +75,7 @@ struct
 
   module DomOrTop =
   struct
+    let is_included = Top.is_included Dom.is_included
     let top_join join = Top.join (fun s1 s2 -> `Value (join s1 s2))
     let join = top_join Dom.join
     let widen kf stmt = top_join (Dom.widen kf stmt)
@@ -87,21 +88,24 @@ struct
         Some { state ; widening_counter = widening_delay - 1 }
 
       | Some previous -> (* Some previous entry *)
-        let state = DomOrTop.join previous.state state in
-        let state, widening_counter =
-          if previous.widening_counter > 0 then
-            (* No widening *)
-            state, previous.widening_counter
-          else begin
-            (* Widen the interferences between the previous and current
-               state. *)
-            let widening_period = Parameters.WideningPeriod.get () in
-            let stmt, cs = pos in
-            let kf = Callstack.top_kf cs in
-            DomOrTop.widen kf stmt previous.state state, widening_period
-          end
-        in
-        Some { state ; widening_counter = widening_counter - 1 }
+        if DomOrTop.is_included state previous.state then
+          Some previous
+        else
+          let state = DomOrTop.join previous.state state in
+          let state, widening_counter =
+            if previous.widening_counter > 0 then
+              (* No widening *)
+              state, previous.widening_counter
+            else begin
+              (* Widen the interferences between the previous and current
+                 state. *)
+              let widening_period = Parameters.WideningPeriod.get () in
+              let stmt, cs = pos in
+              let kf = Callstack.top_kf cs in
+              DomOrTop.widen kf stmt previous.state state, widening_period
+            end
+          in
+          Some { state ; widening_counter = widening_counter - 1 }
     in
     PosMap.update pos update
 
