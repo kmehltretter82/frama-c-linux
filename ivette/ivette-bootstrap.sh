@@ -37,6 +37,7 @@ function InstallHelp()
     echo "  - yarn (any version)"
     echo "Recommanded Installation:"
     echo "  - install nvm (https://github.com/nvm-sh/nvm)"
+    echo "  - run 'nvm install 22'"
     echo "  - run 'nvm use 22'"
     echo "  - run 'npm install --global yarn'"
     echo "  - run 'ivette'"

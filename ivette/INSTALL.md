@@ -8,7 +8,7 @@ Required package to be installed:
 ## Linux
 
 ```sh
-$ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
+$ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
 $ nvm install 22
 $ nvm use 22
 $ npm install --global yarn
