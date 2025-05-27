@@ -46,7 +46,7 @@ async function computeStudiaSelection(
   const data = await Server.send(request, marker).catch(handleError);
   const markers = data?.direct ?? [];
   if (markers.length > 0) {
-    const label = `${kind} to ${descr}`;
+    const label = (kind === 'Reads' ? 'Reads of ' : 'Writes to ') + `${descr}`;
     const access = kind === 'Reads' ? 'accessing' : 'modifying';
     const title =
       `Statements ${access} the memory location pointed by ${descr}.`;
@@ -74,7 +74,7 @@ export function buildMenu(
         onClick: () => computeStudiaSelection('Reads', marker, attr.descr)
       });
       menu.push({
-        label: 'Studia: select writes of l-value',
+        label: 'Studia: select writes to l-value',
         onClick: () => computeStudiaSelection('Writes', marker, attr.descr)
       });
       return;
@@ -87,7 +87,7 @@ export function buildMenu(
           onClick: () => computeStudiaSelection('Reads', marker, name)
         });
         menu.push({
-          label: `Studia: select writes of ${name}`,
+          label: `Studia: select writes to ${name}`,
           onClick: () => computeStudiaSelection('Writes', marker, name)
         });
       }
@@ -98,7 +98,7 @@ export function buildMenu(
         onClick: () => Ivette.focusSearchMode(studiaReadsMode.id)
       });
       menu.push({
-        label: `Studia: select writes of …`,
+        label: `Studia: select writes to …`,
         onClick: () => Ivette.focusSearchMode(studiaWritesMode.id)
       });
       return;
