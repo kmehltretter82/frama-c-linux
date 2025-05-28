@@ -642,8 +642,8 @@ function showSettingsWindow(): void {
     PreferenceWindow = createBrowserWindow(
       false, {
       title: `${appName} Preferences`,
-      width: 256,
-      height: 248,
+      width: 375,
+      height: 270,
       fullscreen: false,
       maximizable: false,
       minimizable: false,
