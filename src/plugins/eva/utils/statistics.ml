@@ -326,6 +326,8 @@ let stmt_coverage =
   register_global_stat "stmt-coverage" Float
 let fun_coverage =
   register_global_stat "fun-coverage" Float
+let analysis_duration =
+  register_global_stat "analysis-time" Float
 let iterations =
   register_statement_stat "iterations" Int
 let memexec_hits =
