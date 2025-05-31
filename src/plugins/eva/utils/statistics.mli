@@ -34,6 +34,9 @@ type ('k, 'ty) t
 
 (** {2 Registered statistics } *)
 
+val alarm_count : (unit, int) t
+val stmt_coverage : (unit, float) t
+val fun_coverage : (unit, float) t
 val iterations : (Cil_types.stmt, int) t
 val memexec_hits : (Cil_types.kernel_function, int) t
 val memexec_misses : (Cil_types.kernel_function, int) t
@@ -54,7 +57,7 @@ val register_global_stat : string -> 'ty typ -> (unit,'ty) t
 
 (** Registers a statistic tied to functions. *)
 val register_function_stat :
-    string -> 'ty typ ->(Cil_types.kernel_function, 'ty) t
+  string -> 'ty typ ->(Cil_types.kernel_function, 'ty) t
 
 (** Registers a statistic tied to statements. *)
 val register_statement_stat : string -> 'ty typ -> (Cil_types.stmt, 'ty) t

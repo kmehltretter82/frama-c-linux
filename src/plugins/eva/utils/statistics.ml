@@ -320,6 +320,12 @@ let export_as_csv ?filename () =
 
 (* Centralized statistics registration *)
 
+let alarm_count =
+  register_global_stat "alarm_count" Int
+let stmt_coverage =
+  register_global_stat "stmt-coverage" Float
+let fun_coverage =
+  register_global_stat "fun-coverage" Float
 let iterations =
   register_statement_stat "iterations" Int
 let memexec_hits =

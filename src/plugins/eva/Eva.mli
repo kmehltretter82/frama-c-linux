@@ -986,6 +986,10 @@ module Statistics: sig
 
   (** {2 Registered statistics } *)
 
+  val alarm_count : (unit, int) t
+  val stmt_coverage : (unit, float) t
+  val fun_coverage : (unit, float) t
+  val analysis_time : (unit, float) t
   val iterations : (Cil_types.stmt, int) t
   val memexec_hits : (Cil_types.kernel_function, int) t
   val memexec_misses : (Cil_types.kernel_function, int) t
