@@ -52,6 +52,11 @@
             "compiler":"!msvc",
             "rettype":"void",
             "args": ["__builtin_va_list"]
+        },
+        "__builtin_c23_va_start": {
+            "compiler":"!msvc",
+            "rettype":"void",
+            "args": ["__builtin_va_list"]
         }
     }
 }

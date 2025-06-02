@@ -82,7 +82,8 @@ let () = add_special_builtin_family
 
 let () = List.iter add_special_builtin
     [ "__builtin_stdarg_start"; "__builtin_va_arg"; "__builtin_va_end";
-      "__builtin_va_start"; "__builtin_expect"; "__builtin_next_arg"; ]
+      "__builtin_va_start"; "__builtin_c23_va_start"; "__builtin_expect";
+      "__builtin_next_arg"; ]
 
 module Builtin_functions =
   State_builder.Hashtbl

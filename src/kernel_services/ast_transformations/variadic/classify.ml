@@ -115,6 +115,7 @@ let is_frama_c_builtin name =
   String.starts_with ~prefix:"__FRAMAC_" name (* Mthread prefixes *)
 
 let va_builtins = [
+  "__builtin_c23_va_start";
   "__builtin_va_start";
   "__builtin_va_copy";
   "__builtin_va_arg";
