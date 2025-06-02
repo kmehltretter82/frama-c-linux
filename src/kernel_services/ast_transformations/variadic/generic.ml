@@ -21,7 +21,6 @@
 (**************************************************************************)
 
 open Cil_types
-open Options
 module List = Extends.List
 module Typ = Extends.Typ
 module Build = Cil_builder.Pure
@@ -80,11 +79,11 @@ let translate_va_builtin caller inst =
   let translate_va_start () =
     let va_list = match args with
       | [{enode=Lval va_list}] -> va_list
-      | _ -> Self.abort "Unexpected arguments to va_start"
+      | _ -> Kernel.abort "Unexpected arguments to va_start"
     and varg =
       try Extlib.last (Cil.getFormalsDecl caller.svar)
       with Invalid_argument _ ->
-        Self.abort "Using va_start macro in a function which is not variadic."
+        Kernel.abort "Using va_start macro in a function which is not variadic."
     in
     [ Set (va_list, Cil.evar ~loc varg, loc) ]
   in
@@ -92,7 +91,7 @@ let translate_va_builtin caller inst =
   let translate_va_copy () =
     let dest, src = match args with
       | [{enode=Lval dest}; src] -> dest, src
-      | _ -> Self.abort "Unexpected arguments to va_copy"
+      | _ -> Kernel.abort "Unexpected arguments to va_copy"
     in
     [ Set (dest, src, loc) ]
   in
@@ -102,13 +101,13 @@ let translate_va_builtin caller inst =
       | [{enode=Lval va_list};
          {enode=SizeOf ty};
          {enode=CastE(_, {enode=AddrOf lv})}] -> va_list, ty, lv
-      | _ -> Self.abort "Unexpected arguments to va_arg"
+      | _ -> Kernel.abort "Unexpected arguments to va_arg"
     in
     (* Check validity of type *)
     if Ast_types.is_integral ty then begin
       let promoted_type = Cil.integralPromotion ty in
       if promoted_type <> ty then
-        Self.warning ~current:true ~wkey:wkey_typing
+        Kernel.warning ~current:true ~wkey:Kernel.wkey_typing
           "Wrong type argument in va_start: %a is promoted to %a when used \
            in the variadic part of the arguments. (You should pass %a to \
            va_start)"
@@ -140,7 +139,7 @@ let translate_call ~builder callee pars =
   Build.start_translation ();
 
   (* Log translation *)
-  Self.result ~current:true ~level:2
+  Kernel.result ~current:true ~dkey:Kernel.dkey_variadic
     "Generic translation of call to variadic function.";
 
   (* Split params into static, variadic and ghost part *)

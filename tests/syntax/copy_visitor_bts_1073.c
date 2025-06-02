@@ -1,5 +1,4 @@
 /* run.config
-PLUGIN: variadic
  MODULE: @PTEST_NAME@
    OPT:
  MODULE: @PTEST_NAME@_bis

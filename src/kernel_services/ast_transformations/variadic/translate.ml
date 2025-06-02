@@ -22,7 +22,6 @@
 
 open Cil_types
 open Va_types
-open Options
 module Typ = Extends.Typ
 
 (* List of builtin function names to translate *)
@@ -86,7 +85,7 @@ let translate_variadics (file : file) =
 
     method private enclosing_block () =
       try Stack.top curr_block
-      with Stack.Empty -> Options.Self.fatal "No enclosing block here"
+      with Stack.Empty -> Kernel.fatal "No enclosing block here"
 
     method private make_builder ~loc ~fundec ~ghost ~mk_call =
       let module B =
@@ -123,7 +122,7 @@ let translate_variadics (file : file) =
           (match Table.find_opt classification vi with
            | None -> Cil.DoChildren (* may transform the type *)
            | Some { vf_class = Builtin } ->
-             Self.result ~level:2 ~current:true
+             Kernel.result ~current:true ~dkey:Kernel.dkey_variadic
                "Variadic builtin %s left untransformed." vi.vname;
              Cil.SkipChildren
            | Some { vf_class = NoTranslation } ->
@@ -209,7 +208,7 @@ let translate_variadics (file : file) =
         | Aggregator a -> cover_failure (Standard.aggregator_call a vf)
         | FormatFun f -> cover_failure (Standard.format_fun_call env f vf)
         | Builtin ->
-          Self.result ~level:2 ~current:true
+          Kernel.result ~current:true ~dkey:Kernel.dkey_variadic
             "Call to variadic builtin %s left untransformed." f.vname;
           raise Not_found
         | NoTranslation ->
@@ -255,7 +254,7 @@ let translate_variadics (file : file) =
                 let args =
                   match kind, args with
                   | Constructor, [] ->
-                    Options.Self.fatal
+                    Kernel.fatal
                       "Constructor %a is expected to have at least one argument"
                       Cil_printer.pp_varinfo c
                   | Constructor, _::tl -> tl
@@ -265,7 +264,7 @@ let translate_variadics (file : file) =
                   match f.enode with
                   | Lval (Var f, NoOffset) -> f
                   | _ ->
-                    Options.Self.fatal
+                    Kernel.fatal
                       "Constructor cannot be translated as indirect call"
                 in
                 Local_init(v,ConsInit(f,args,kind),loc)
@@ -288,7 +287,7 @@ let translate_variadics (file : file) =
       begin match exp.enode with
         | AddrOf (Var vi, NoOffset)
           when Classify.is_variadic_function vi && is_framac_builtin vi ->
-          Self.not_yet_implemented
+          Kernel.not_yet_implemented
             ~source:(fst exp.eloc)
             "The variadic plugin doesn't handle calls to a pointer to the \
              variadic builtin %s."

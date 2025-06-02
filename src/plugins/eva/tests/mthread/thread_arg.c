@@ -4,7 +4,7 @@
    MACRO: SRC2 @PTEST_NAME@.1.res.log
    MACRO: DIFF @PTEST_NAME@.variadic.diff
 
-   STDOPT: +"-variadic-no-translation"
+   STDOPT: +"-no-variadic-translation"
    STDOPT:
 
    COMMENT: The two outputs should be identical

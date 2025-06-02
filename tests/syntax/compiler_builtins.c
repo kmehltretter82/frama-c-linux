@@ -1,7 +1,7 @@
 /* run.config
-   STDOPT:
-   STDOPT: +"-machdep gcc_x86_32"
-   STDOPT: +"-machdep msvc_x86_64"
+   STDOPT: +"-no-variadic-translation"
+   STDOPT: +"-no-variadic-translation -machdep gcc_x86_32"
+   STDOPT: +"-no-variadic-translation -machdep msvc_x86_64"
  */
 
 #include <stdarg.h>

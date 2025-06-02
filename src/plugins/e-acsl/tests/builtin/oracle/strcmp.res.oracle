@@ -1,4 +1,4 @@
-[variadic] strcmp.c:18: Warning: 
+[kernel] strcmp.c:18: Warning: 
   Call to function fprintf with non-static format argument: assuming that parameters are coherent with the format, and that no %n specifiers are present in the actual string.
 [e-acsl] beginning translation.
 [e-acsl] FRAMAC_SHARE/libc/unistd.h:914: Warning: 

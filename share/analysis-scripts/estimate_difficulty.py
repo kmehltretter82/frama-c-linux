@@ -320,7 +320,7 @@ problematic_posix_functions = [
     "sigsetjmp",
 ]
 
-handled_by_variadic_plugin = [
+handled_by_variadic = [
     "dprintf",
     "execl",
     "execle",
@@ -366,8 +366,8 @@ for callee in sorted(callees):
     elif callee in libc_defined_functions:
         callee_status("ok", "is defined in Frama-C's libc")
     else:
-        if callee in handled_by_variadic_plugin:
-            callee_status("ok", "is handled by the Variadic plug-in")
+        if callee in handled_by_variadic:
+            callee_status("ok", "is handled by the Variadic library")
 
 logging.info("Function-related warnings: %d", warnings)
 score["libc"] = warnings

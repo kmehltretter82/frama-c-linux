@@ -22,7 +22,6 @@
 
 open Cil_types
 open Va_types
-open Options
 module List = Extends.List
 module Typ = Extends.Typ
 
@@ -45,7 +44,8 @@ module Fallback_counts =
     (struct
       let size = 17
       let name = "fallback_counts"
-      let dependencies = [ Options.Enabled.self; Options.Strict.self ]
+      let dependencies =
+        [ Kernel.VariadicTranslation.self; Kernel.VariadicStrict.self ]
     end)
 
 (* ************************************************************************ *)
@@ -127,14 +127,14 @@ let cast_arg i paramtyp exp =
   if not (does_fit exp paramtyp) then
     begin match can_cast argtyp paramtyp with
       | Strict | Tolerated -> ()
-      | (NonPortable | NonStrict) when not (Strict.get ()) -> ()
+      | (NonPortable | NonStrict) when not (Kernel.VariadicStrict.get ()) -> ()
       | NonPortable ->
-        Self.warning ~current:true ~wkey:wkey_typing
+        Kernel.warning ~current:true ~wkey:Kernel.wkey_typing
           "Possible portability issues with enum type for argument %d \
-           (use -variadic-no-strict to avoid this warning)."
+           (use -no-variadic-strict to avoid this warning)."
           (i + 1)
       | NonStrict | Never ->
-        Self.warning ~current:true ~wkey:wkey_typing
+        Kernel.warning ~current:true ~wkey:Kernel.wkey_typing
           "Incorrect type for argument %d. \
            The argument will be cast from %a to %a."
           (i + 1)
@@ -149,12 +149,12 @@ let match_args ~callee tparams args =
   let paramcount = List.length tparams
   and argcount = List.length args in
   if argcount > paramcount  then
-    Self.warning ~current:true ~wkey:wkey_typing
+    Kernel.warning ~current:true ~wkey:Kernel.wkey_typing
       "Too many arguments: expected %d, given %d. \
        Superfluous arguments will be removed."
       paramcount argcount
   else if argcount < paramcount then (
-    Self.warning ~current:true ~wkey:wkey_typing
+    Kernel.warning ~current:true ~wkey:Kernel.wkey_typing
       "Not enough arguments: expected %d, given %d."
       paramcount argcount;
     raise (Translate_call_exn callee)
@@ -245,7 +245,7 @@ let fallback_fun_call ~builder ~callee env vf args =
 
   (* Translate the call *)
   Build.start_translation ();
-  Self.result ~current:true ~level:2
+  Kernel.result ~current:true ~dkey:Kernel.dkey_variadic
     "Fallback translation of call %s to a call to the specialized version %a."
     vf.vf_decl.vorig_name Build.pretty new_callee;
   Build.(translated_call new_callee (List.map of_exp args))
@@ -271,7 +271,7 @@ let aggregator_call ~builder aggregator vf args =
   let argcount = List.length args
   and paramcount = List.length tparams in
   if argcount < paramcount then begin
-    Self.warning ~current:true ~wkey:wkey_typing
+    Kernel.warning ~current:true ~wkey:Kernel.wkey_typing
       "Not enough arguments: expected %d, given %d."
       paramcount argcount;
     raise (Translate_call_exn vf.vf_decl);
@@ -283,7 +283,7 @@ let aggregator_call ~builder aggregator vf args =
       begin try
           find_null (List.drop a_pos args) + 1
         with Not_found ->
-          Self.warning ~current:true
+          Kernel.warning ~current:true
             "Failed to find a sentinel (NULL pointer) in the argument list.";
           raise (Translate_call_exn vf.vf_decl);
       end
@@ -300,7 +300,7 @@ let aggregator_call ~builder aggregator vf args =
   let args_middle, args_right = List.break size args_rem in
 
   (* Create the call code  *)
-  Self.result ~current:true ~level:2
+  Kernel.result ~current:true ~dkey:Kernel.dkey_variadic
     "Translating call to %s to a call to %s."
     name a_target.vorig_name;
   let pname = if pname = "" then "param" else pname in
@@ -359,7 +359,7 @@ let overloaded_call ~builder overload vf args =
   let tparams, new_callee =
     match filter_matching_prototypes overload args with
     | [] -> (* No matching prototype *)
-      Self.warning ~current:true ~wkey:wkey_prototype
+      Kernel.warning ~current:true ~wkey:Kernel.wkey_prototype
         "@[No matching prototype found for this call to %s.@.\
          Expected candidates:@.\
          @[<v>       %a@]@.\
@@ -371,7 +371,7 @@ let overloaded_call ~builder overload vf args =
     | [(tparams,vi)] -> (* Exactly one matching prototype *)
       tparams, vi
     | l -> (* Several matching prototypes *)
-      Self.warning ~current:true ~wkey:wkey_prototype
+      Kernel.warning ~current:true ~wkey:Kernel.wkey_prototype
         "Ambiguous call to %s. Matching candidates are: \
          %a"
         name
@@ -383,7 +383,7 @@ let overloaded_call ~builder overload vf args =
   Replacements.add new_callee vf.vf_decl;
 
   (* Rebuild the call *)
-  Self.result ~current:true ~level:2
+  Kernel.result ~current:true ~dkey:Kernel.dkey_variadic
     "Translating call to the specialized version %a."
     (pp_prototype name) tparams;
   match_call ~builder new_callee tparams args
@@ -406,7 +406,7 @@ let find_global env name =
   try
     Some (Environment.find_global env name)
   with Not_found ->
-    Self.warning ~once:true ~wkey:wkey_libc_framac
+    Kernel.warning ~once:true ~wkey:Kernel.wkey_libc_framac
       "Unable to locate global %s which should be in the Frama-C LibC. \
        Correct specifications can't be generated."
       name;
@@ -416,7 +416,7 @@ let find_predicate name =
   match Logic_env.find_all_logic_functions name with
   | f :: _q -> f (* TODO: should we warn in case of overloading? *)
   | [] ->
-    Self.warning ~once:true ~wkey:wkey_libc_framac
+    Kernel.warning ~once:true ~wkey:Kernel.wkey_libc_framac
       "Unable to locate ACSL predicate %s which should be in the Frama-C LibC. \
        Correct specifications can't be generated."
       name;
@@ -427,7 +427,7 @@ let find_field env structname fieldname =
     let compinfo = Environment.find_struct env structname in
     Cil.getCompField compinfo fieldname
   with Not_found ->
-    Self.warning ~once:true
+    Kernel.warning ~once:true
       "Unable to locate %s field %s."
       structname fieldname;
     raise Not_found
@@ -442,7 +442,7 @@ let find_predicate_by_width typ narrow_name wide_name =
         (Machine.wchar_type ()) ->
     find_predicate wide_name
   | _ ->
-    Self.warning ~current:true ~wkey:wkey_typing
+    Kernel.warning ~current:true ~wkey:Kernel.wkey_typing
       "expected single/wide character pointer type, got %a (%a, unrolled %a)"
       Printer.pp_typ typ
       Cil_types_debug.pp_typ typ
@@ -587,7 +587,7 @@ let build_specialized_fun ~builder env vf format_fun tvparams =
     with
     | Not_found -> Build.requires left_pred
     | Build.NotAFunction li ->
-      Self.abort ~current:true
+      Kernel.abort ~current:true
         "%a should be a logic function, not a predicate"
         Printer.pp_logic_var li.l_var_info
   in
@@ -720,7 +720,7 @@ let infer_format_from_args vf format_fun args =
       | ScanfLike ->
         if not (Ast_types.is_ptr t) then begin
           let source = fst arg.eloc in
-          Self.warning ~source ~wkey:wkey_typing
+          Kernel.warning ~source ~wkey:Kernel.wkey_typing
             "Expecting pointer as parameter of scanf function. \
              Argument %a has type %a"
             Printer.pp_exp arg Printer.pp_typ t;
@@ -742,7 +742,7 @@ let format_fun_call ~builder env format_fun vf args =
       let format_arg = List.nth args format_fun.f_format_pos in
       match static_string format_arg with
       | None ->
-        Self.warning ~current:true
+        Kernel.warning ~current:true
           "Call to function %s with non-static format argument: \
            assuming that parameters are coherent with the format, and that \
            no %%n specifiers are present in the actual string."
@@ -759,7 +759,7 @@ let format_fun_call ~builder env format_fun vf args =
     try
       Format_typer.type_format ~find_typedef format
     with Format_typer.Type_not_found (type_name) ->
-      Self.warning ~current:true
+      Kernel.warning ~current:true
         "Unable to find type %s in the source code which should be used in \
          this call:@ no specification will be generated.@ \
          Note that due to cleanup, the type may have been defined in the \
@@ -775,7 +775,7 @@ let format_fun_call ~builder env format_fun vf args =
   Replacements.add new_callee vf.vf_decl;
 
   (* Translate the call *)
-  Self.result ~current:true ~level:2
+  Kernel.result ~current:true ~dkey:Kernel.dkey_variadic
     "Translating call to %s to a call to the specialized version %s."
     vf.vf_decl.vorig_name new_callee.vname;
   let tparams = Typ.params_types new_callee.vtype in

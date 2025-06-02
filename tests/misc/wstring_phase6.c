@@ -1,7 +1,6 @@
 /* run.config
-PLUGIN: variadic
  MODULE: @PTEST_NAME@
-   OPT: -print -variadic-no-translation
+   OPT: -print -no-variadic-translation
 */
 #include <stdio.h>
 // See http://stackoverflow.com/questions/18102502/mixing-wide-and-narrow-string-literals-in-c

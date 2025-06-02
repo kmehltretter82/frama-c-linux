@@ -1,9 +1,9 @@
 [kernel] Parsing function-types-compatible.i (no preprocessing)
-[kernel:typing:no-proto] function-types-compatible.i:8: Warning: 
+[kernel:typing:no-proto] function-types-compatible.i:7: Warning: 
   Function f is declared without prototype.
   Its formals will be inferred from actual arguments at first call.
   Declare it as f(void) if the function does not take any parameters.
-[kernel:typing:incompatible-types-call] function-types-compatible.i:11: Warning: 
+[kernel:typing:incompatible-types-call] function-types-compatible.i:10: Warning: 
   implicit conversion between incompatible function types:
   void (*)()
   and

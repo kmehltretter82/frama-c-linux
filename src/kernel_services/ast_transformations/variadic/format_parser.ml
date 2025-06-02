@@ -26,7 +26,7 @@ open Format_pprint
 exception Invalid_format
 
 
-let warn f = Options.Self.warning ~current:true ~wkey:Options.wkey_format f
+let warn f = Kernel.warning ~current:true ~wkey:Kernel.wkey_format f
 
 (* ************************************************************************ *)
 (* printf format verification                                               *)

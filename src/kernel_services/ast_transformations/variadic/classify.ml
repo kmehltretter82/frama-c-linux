@@ -23,7 +23,6 @@
 open Cil_types
 open Format_types
 open Va_types
-open Options
 module Typ = Extends.Typ
 
 
@@ -35,7 +34,7 @@ let find_function env s =
   try
     Some (Environment.find_function env s)
   with Not_found ->
-    Self.warning ~wkey:wkey_libc_framac
+    Kernel.warning ~wkey:Kernel.wkey_libc_framac
       "Unable to locate function %s which should be in the Frama-C LibC."
       s;
     None
@@ -56,7 +55,7 @@ let mk_aggregator env fun_name a_pos pname a_type =
       (* Check that pos is a valid position in the list *)
       assert (a_pos >= 0);
       if a_pos >= List.length params then begin
-        Self.warning ~current:true ~wkey:wkey_libc
+        Kernel.warning ~current:true ~wkey:Kernel.wkey_libc
           "The standard function %s should have at least %d parameters."
           fun_name
           (a_pos + 1);
@@ -69,7 +68,7 @@ let mk_aggregator env fun_name a_pos pname a_type =
         | TArray (typ, _)
         | TPtr typ -> typ
         | _ ->
-          Self.warning ~current:true ~wkey:wkey_libc
+          Kernel.warning ~current:true ~wkey:Kernel.wkey_libc
             "The parameter %d of standard function %s should be \
              of array type."
             (a_pos + 1)
@@ -93,7 +92,7 @@ let mk_format_fun vi f_kind f_buffer ~format_pos =
   and n_actual_args = List.length (Typ.params vi.vtype) in
   if n_actual_args < n_expected_args then
     begin
-      Self.warning ~current:true ~wkey:wkey_libc
+      Kernel.warning ~current:true ~wkey:Kernel.wkey_libc
         "The standard function %s was expected to have at least %d fixed \
          parameters but only has %d.@ \
          No variadic translation will be performed."
@@ -178,7 +177,7 @@ let is_variadic_function vi =
 
 let classify env vi =
   if is_variadic_function vi then begin
-    Self.result ~level:2 ~current:true
+    Kernel.result ~current:true ~dkey:Kernel.dkey_variadic
       "Declaration of variadic function %s." vi.vname;
     Some {
       vf_decl = vi;

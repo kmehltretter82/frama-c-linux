@@ -251,7 +251,7 @@ extern wchar_t * wcsstr(const wchar_t *haystack, const wchar_t *needle);
 extern wchar_t *fgetws(wchar_t * restrict ws, int n, FILE * restrict stream);
 
 /*@
-  // Axiomatic used by the Variadic plugin to generate specifications
+  // Axiomatic used by the Variadic library to generate specifications
   // for some functions, e.g. swprintf().
   axiomatic wformat_length {
     //TODO: this logic function will be extended to handle variadic formats

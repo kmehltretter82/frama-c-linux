@@ -236,7 +236,7 @@ extern int setvbuf(FILE * restrict stream,
      int mode, size_t size);
 
 /*@
-  // Axiomatic used by the Variadic plugin to generate specifications
+  // Axiomatic used by the Variadic library to generate specifications
   // for some functions, e.g. snprintf().
   axiomatic format_length {
     //TODO: this logic function will be extended to handle variadic formats
@@ -245,7 +245,7 @@ extern int setvbuf(FILE * restrict stream,
 */
 
 // Direct specifications for variadic functions are unsupported;
-// use the Variadic plug-in instead.
+// use the Variadic library instead.
 extern int fprintf(FILE * restrict stream,
      const char * restrict format, ...);
 extern int fscanf(FILE * restrict stream,

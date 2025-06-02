@@ -20,12 +20,23 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module Self : Plugin.General_services
-module Enabled : Parameter_sig.Bool
-module Strict : Parameter_sig.Bool
+(* State to store the association between a replaced function and the original
+   function. *)
+module Replacements =
+  Cil_state_builder.Varinfo_hashtbl
+    (Cil_datatype.Varinfo)
+    (struct
+      let size = 17
+      let name = "replacements"
+      let dependencies =
+        [ Kernel.VariadicTranslation.self; Kernel.VariadicStrict.self ]
+    end)
 
-val wkey_format: Self.warn_category
-val wkey_libc: Self.warn_category
-val wkey_libc_framac: Self.warn_category
-val wkey_prototype: Self.warn_category
-val wkey_typing: Self.warn_category
+let add new_vi old_vi =
+  Replacements.add new_vi old_vi
+
+let find new_vi =
+  Replacements.find new_vi
+
+let mem new_vi =
+  Replacements.mem new_vi

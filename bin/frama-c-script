@@ -227,7 +227,7 @@ case "$command" in
         # to avoid a slow startup, we only load plugins which perform syntactic
         # transformations. This may trigger annotation errors due to missing
         # plugins, so we disable those
-        "${DIR}/frama-c" "$@" -no-autoload-plugins -load-module variadic,instantiate,frama-c.analysis-scripts -kernel-warn-key annot-error=inactive -kernel-verbose 0;
+        "${DIR}/frama-c" "$@" -no-autoload-plugins -load-module instantiate,frama-c.analysis-scripts -kernel-warn-key annot-error=inactive -kernel-verbose 0;
         ;;
     "find-fun")
         shift;

@@ -1,5 +1,4 @@
 /* run.config
-  PLUGIN: variadic
    STDOPT: +"-machdep gcc_x86_32"
  */
 #include "stdint.h"

@@ -8,7 +8,7 @@ MACRO: EVA -eva -eva-no-alloc-returns-null -eva-no-results -eva-no-print -eva-wa
 
 MACRO: EVENTUALLY -print -ocode @DEST@.c
 
-PLUGIN: e-acsl eva,scope,inout,variadic rtegen
+PLUGIN: e-acsl eva,scope,inout rtegen
 
 LIBS: @PTEST_SUITE_DIR@/../E_ACSL_test
 LOG: gen_@PTEST_NAME@.c

@@ -57,20 +57,20 @@ let change_printer =
       Printer.update_printer (module Printer_class: Printer.PrinterExtension)
     end
 
+let translate file =
+  if Kernel.VariadicTranslation.get () then begin
+    change_printer ();
+    Translate.translate_variadics file
+  end
+
 let () =
   Cmdline.run_after_extended_stage
     begin fun () ->
       State_dependency_graph.add_dependencies
-        ~from:Options.Enabled.self
+        ~from:Kernel.VariadicTranslation.self
         [ Ast.self ]
     end;
   Cmdline.run_after_configuring_stage
     begin fun () ->
-      let translate file =
-        if Options.Enabled.get () then begin
-          change_printer ();
-          Translate.translate_variadics file
-        end
-      in
       File.add_code_transformation_before_cleanup category translate
     end
