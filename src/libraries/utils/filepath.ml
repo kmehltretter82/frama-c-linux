@@ -165,7 +165,8 @@ let chop_suffix p suffix = Filename.chop_suffix p suffix
 
 let to_string_rel ?(quoted=false) ?(base=Hpath.(cwd |> to_string)) p =
   let r =
-    if base = p then "." else
+    if base = p then "."
+    else
       let base = base ^ Filename.dir_sep in
       if String.starts_with ~prefix:base p then
         let n = String.length base in
