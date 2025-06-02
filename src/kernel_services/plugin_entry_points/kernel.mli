@@ -592,6 +592,14 @@ module C11: Parameter_sig.Bool
 module JsonCompilationDatabase: Parameter_sig.Filepath
 (** Behavior of option "-json-compilation-database" *)
 
+module GeneratedSpecMode: Parameter_sig.String
+(** Behavior of option "-generated-spec-mode". *)
+
+module GeneratedSpecCustom: Parameter_sig.Map
+  with type key = string
+   and type value = string
+(** Behavior of option "-generated-spec-custom". *)
+
 (* ************************************************************************* *)
 (** {3 Customizing cabs2cil options} *)
 (* ************************************************************************* *)
@@ -613,14 +621,6 @@ module DoCollapseCallCast: Parameter_sig.Bool
 
     This is false by default.  Set to true to replicate the behavior
     of CIL 1.3.5 and earlier. *)
-
-module GeneratedSpecMode: Parameter_sig.String
-(** Behavior of option "-generated-spec-mode". *)
-
-module GeneratedSpecCustom: Parameter_sig.Map
-  with type key = string
-   and type value = string
-(** Behavior of option "-generated-spec-custom". *)
 
 (* ************************************************************************* *)
 (** {2 Analysis Behavior of options} *)
