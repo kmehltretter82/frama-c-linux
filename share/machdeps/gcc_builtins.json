@@ -1092,10 +1092,6 @@
             "args": ["char const *","char const *"],
             "variadic":true
         },
-        "__builtin_stdarg_start": {
-            "rettype":"void",
-            "args": ["__builtin_va_list"]
-        },
         "__builtin_stpcpy": {
             "rettype":"char *",
             "args": ["char *","char const *"]
