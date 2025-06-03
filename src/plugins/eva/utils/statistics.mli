@@ -34,16 +34,40 @@ type ('k, 'ty) t
 
 (** {2 Registered statistics } *)
 
+(** Alarm count, computed when the summary is print. *)
 val alarm_count : (unit, int) t
+
+(** Statements covered by the analysis across function analzed, in [0, 1],
+    computed when the summary is print. *)
 val stmt_coverage : (unit, float) t
+
+(** Functions covered by the analysis in [0, 1], computed when the summary
+    is print. *)
 val fun_coverage : (unit, float) t
+
+(** Analysis time of the main function, including children. *)
 val analysis_duration : (unit, float) t
+
+(** Number of times each statement have been interpreted. *)
 val iterations : (Cil_types.stmt, int) t
+
+(** Count of memexec cache hits. *)
 val memexec_hits : (Cil_types.kernel_function, int) t
+
+(** Count of memexec cache misses. *)
 val memexec_misses : (Cil_types.kernel_function, int) t
+
+(** Maximum number of successive widening computed at each widening
+    statement. *)
 val max_widenings : (Cil_types.stmt, int) t
+
+(** Maximum number of loop unrolling computed at each loop statement. *)
 val max_unrolling : (Cil_types.stmt, int) t
+
+(** Count of state index hits. *)
 val partitioning_index_hits : (unit, int) t
+
+(** Count of state index misses. *)
 val partitioning_index_misses : (unit, int) t
 
 
