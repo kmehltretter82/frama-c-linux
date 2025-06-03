@@ -50,7 +50,7 @@ CURRENT=$(cat VERSION)
 CURRENT_MAJOR=$(echo "$CURRENT" | $SED -e s/\\\([0-9]*\\\).[0-9]*.*/\\1/)
 CURRENT_MINOR=$(echo "$CURRENT" | $SED -e s/[0-9]*.\\\([0-9]*\\\).*/\\1/)
 CURRENT_SUFFIX=$(echo "$CURRENT"| $SED -e s/[0-9]*.[0-9]*\\\(.*\\\)/\\1/)
-CURRENT_CODENAME=$(grep "$CURRENT_MAJOR " ./doc/release/periodic-elements.txt | cut -d " " -f2)
+CURRENT_CODENAME=$(grep "$CURRENT_MAJOR " ./doc/periodic-elements.txt | cut -d " " -f2)
 
 if [[ $NEXT == "dev" ]]; then
   echo "Set VERSION to $CURRENT_MAJOR.$CURRENT_MINOR+dev"
@@ -69,7 +69,7 @@ else
   NEXT_MAJOR=$(echo "$NEXT" | $SED -e s/\\\([0-9]*\\\).[0-9]*.*/\\1/)
   NEXT_MINOR=$(echo "$NEXT" | $SED -e s/[0-9]*.\\\([0-9]*\\\).*/\\1/)
   NEXT_SUFFIX=$(echo "$NEXT"| $SED -e s/[0-9]*.[0-9]*\\\(.*\\\)/\\1/)
-  NEXT_CODENAME=$(grep "$NEXT_MAJOR " ./doc/release/periodic-elements.txt | cut -d " " -f2)
+  NEXT_CODENAME=$(grep "$NEXT_MAJOR " ./doc/periodic-elements.txt | cut -d " " -f2)
 
   echo "NEXT VERSION is:"
   echo "- MAJOR:    $NEXT_MAJOR"
