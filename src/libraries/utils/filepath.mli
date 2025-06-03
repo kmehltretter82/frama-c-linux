@@ -21,7 +21,7 @@
 (**************************************************************************)
 
 (** Functions manipulating normalized filepaths.
-    In these functions, references *he current working directory refer
+    In these functions, references to the current working directory refer
     to the result given by function Sys.getcwd.
 *)
 
@@ -37,15 +37,14 @@ type t = private string
     [hash] and [pretty] functions.
 
     Pretty-print is done according to these rules:
-    - relative filenames are kept, except for leading './',
-      which are stripped;
+    - relative filenames are kept, except for leading './', which is stripped;
     - absolute filenames are relativized if their prefix is included in the
       current working directory; also, symbolic names are resolved,
       i.e. the result may be prefixed by known aliases (e.g. FRAMAC_SHARE).
       See {!add_symbolic_dir} for more details.
       Therefore, the result of this function may not designate a valid name
       in the filesystem and must ONLY be used to pretty-print information;
-      it must NEVER to be converted back to a filepath later on. *)
+      it must NEVER be converted back to a filepath later on. *)
 
 include Datatype.S_with_collections with type t := t
 
@@ -53,10 +52,11 @@ include Datatype.S_with_collections with type t := t
     case sensitivity (by default, [case_sensitive = false]). *)
 val compare_pretty : ?case_sensitive:bool -> t -> t -> int
 
-(** Pretty-prints the path (absolute) *)
+(** Pretty-prints as absolute path, without symbolic names. *)
 val pretty_abs: Format.formatter -> t -> unit
 
-(** Pretty-prints the path (relative to current working dir) *)
+(** Pretty-prints as relative path relative to current working directory,
+    without symbolic names. *)
 val pretty_rel: Format.formatter -> t -> unit
 
 
@@ -109,21 +109,23 @@ exception File_exists
 val of_string: ?existence:existence -> ?base:t -> string -> t
 
 (** [to_string p] returns [p] prettified, that is, a relative path-like string.
-    Note that this prettified string may contain symbolic dirs and is thus
-    is not a path. *)
+    The resulting string may contain symbolic dirs, thus it is not a path. *)
 val to_string: t -> string
 
-(** [to_string_rel ?quoted p] returns [p] relativized if it is relative,
-    or returns the absolute path otherwise.
+(** [to_string_rel ?quoted ?base p] returns [p] relativized, if relative to
+    [base], or its absolute path otherwise. The resulting string has no symbolic
+    names, thus it can be converted back to [Filepath.t].
     @param ?quoted if set the string will be suitable for use as one argument
-           in a command line, defaults to false
-    @param ?base the base directory to be relative to, defaults to cwd
+           in a command line, defaults to false.
+    @param ?base the base directory to be relative to, defaults to current
+           working directory.
     @since Aluminium-20160501
     @before 31.0-Gallium was named relativize, argument types were string instead
     of t and the named argument was [base_name] *)
 val to_string_rel: ?quoted:bool -> ?base:t -> t -> string
 
-(** [to_string_rel p] returns [p] absolutized.
+(** [to_string_abs p] returns [p] absolutized. The resulting string has no
+    symbolic names, thus it can be converted back to [Filepath.t].
     @param ?quoted if set the string will be suitable for use as one argument
            in a command line, defaults to false
     @since 31.0-Gallium *)
@@ -195,8 +197,6 @@ val chop_suffix: t -> string -> t
     @before 23.0-Vanadium argument types were string instead of t.
     @before 31.0-Gallium named argument was [base_name] *)
 val is_relative: ?base:t -> t -> bool
-
-
 
 
 (* ************************************************************************* *)

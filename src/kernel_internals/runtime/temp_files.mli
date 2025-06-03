@@ -21,9 +21,9 @@
 (**************************************************************************)
 
 (** This module provides a layer above the {!Filesystem} module to handle
-    automatic removal of temporary files when the program exits, except if exit
-    is caused by a signal and except if [keep] is given and set to true. If
-    [keep] is omitted, the files are only kept if the debug key
+    automatic removal of temporary files when the program exits, except when
+    exit is caused by a signal or [keep] is given and set to true. If [keep] is
+    omitted, the files are kept only if the debug key
     {!Kernel.dkey_pp_keep_temp_files} is set. If the file is kept, a message
     with the path of the preserved file or directory is emitted. When the
     temporary file or directory cannot be created, these functions abort. *)
@@ -47,6 +47,6 @@ val file: ?keep:bool -> prefix:string -> suffix:string -> unit -> Filepath.t
 (** Similar to [Filename.temp_dir] except that the temporary directory will be
     deleted at the end of the execution (see above).
     @before 28.0-Nickel returned a string instead of [Filepath.t]
-    @before 31.0-Gallium was in Extlib, raised Temp_file_error and [keep] was named [debug] and [prefix]
-    and [suffix] arguments were not named. *)
+    @before 31.0-Gallium was in Extlib, raised Temp_file_error, [keep] was
+    named [debug] and [prefix] and [suffix] arguments were not named. *)
 val dir: ?keep:bool -> prefix:string -> suffix:string -> unit -> Filepath.t
