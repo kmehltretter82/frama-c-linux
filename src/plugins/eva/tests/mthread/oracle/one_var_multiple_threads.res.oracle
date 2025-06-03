@@ -298,21 +298,19 @@
       one_var_multiple_threads.c:30:
         # cvalue: s1.data ∈ {0; 1}
                     .data2 ∈ {0; 3}
-                  s2.data ∈ {0; 1}
+                  s2.data ∈ {1}
                     .data2 ∈ {0} 
       one_var_multiple_threads.c:31:
-        # cvalue:
-        s1.data ∈ {0; 1}
-          .data2 ∈ {0; 3}
-        s2.data ∈ {0; 1}
-          .data2 ∈ {0; 3} 
+        # cvalue: s1.data ∈ {0; 1}
+                    .data2 ∈ {0; 3}
+                  s2.data ∈ {1}
+                    .data2 ∈ {3} 
     interferences by mutexes:
       { lock2 }:
-        # cvalue:
-        s1.data ∈ {0; 1}
-          .data2 ∈ {0; 3}
-        s2.data ∈ {0; 1}
-          .data2 ∈ {0; 3}
+        # cvalue: s1.data ∈ {0; 1}
+                    .data2 ∈ {0; 3}
+                  s2.data ∈ {1}
+                    .data2 ∈ {0; 3}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs computed
@@ -331,8 +329,8 @@
 [mt] jobs reads  s2.data2 ∈ {0}  // one_var_multiple_threads.c:31 g
 [mt] jobs writes  s1.data ∈ {1}  // one_var_multiple_threads.c:22 f
 [mt] jobs writes  s1.data2 ∈ {3}  // one_var_multiple_threads.c:23 f
-[mt] jobs writes  s2.data ∈ {0; 1}  // one_var_multiple_threads.c:30 g
-[mt] jobs writes  s2.data2 ∈ {0; 3}  // one_var_multiple_threads.c:31 g
+[mt] jobs writes  s2.data ∈ {1}  // one_var_multiple_threads.c:30 g
+[mt] jobs writes  s2.data2 ∈ {3}  // one_var_multiple_threads.c:31 g
 [mt] Possible read/write data races:
   s2.data2:
     read by <main> at one_var_multiple_threads.c:55, protected by lock2
@@ -357,8 +355,8 @@
     s1; s2
 [mt] Write summary for jobs (updated): s1.data ∈ {1}
                                       .data2 ∈ {3}
-[mt] Write summary for jobs (updated): s2.data ∈ {0; 1}
-                                      .data2 ∈ {0; 3}
+[mt] Write summary for jobs (updated): s2.data ∈ {1}
+                                      .data2 ∈ {3}
 [mt] Mutexes for concurrent accesses:
   s1  protected by lock1
   s2  protected by lock2
@@ -473,20 +471,20 @@
     interferences by location:
       one_var_multiple_threads.c:22:
         # cvalue:
-        s1.data ∈ {0; 1; 2}
+        s1.data ∈ {1; 2}
           .data2 ∈ {0; 3}
         s2.data ∈ {0; 1}
           .data2 ∈ {0; 3} 
       one_var_multiple_threads.c:23:
         # cvalue:
-        s1.data ∈ {0; 1; 2}
-          .data2 ∈ {0; 3; 6}
+        s1.data ∈ {1; 2}
+          .data2 ∈ {3; 6}
         s2.data ∈ {0; 1}
           .data2 ∈ {0; 3} 
     interferences by mutexes:
       { lock1 }:
         # cvalue:
-        s1.data ∈ {0; 1; 2}
+        s1.data ∈ {1; 2}
           .data2 ∈ {0; 3; 6}
         s2.data ∈ {0; 1}
           .data2 ∈ {0; 3}
@@ -535,20 +533,20 @@
         # cvalue:
         s1.data ∈ {0; 1; 2}
           .data2 ∈ {0; 3; 6}
-        s2.data ∈ {0; 1; 2}
+        s2.data ∈ {1; 2}
           .data2 ∈ {0; 3} 
       one_var_multiple_threads.c:31:
         # cvalue:
         s1.data ∈ {0; 1; 2}
           .data2 ∈ {0; 3; 6}
-        s2.data ∈ {0; 1; 2}
-          .data2 ∈ {0; 3; 6} 
+        s2.data ∈ {1; 2}
+          .data2 ∈ {3; 6} 
     interferences by mutexes:
       { lock2 }:
         # cvalue:
         s1.data ∈ {0; 1; 2}
           .data2 ∈ {0; 3; 6}
-        s2.data ∈ {0; 1; 2}
+        s2.data ∈ {1; 2}
           .data2 ∈ {0; 3; 6}
 [mt] * Computing cfg
 [mt] * Cfg computed
@@ -566,10 +564,10 @@
 [mt] jobs reads  s2.data ∈ {0; 1}  // one_var_multiple_threads.c:30 g
 [mt] <main> reads  s2.data2 ∈ {0; 3}  // one_var_multiple_threads.c:55 main
 [mt] jobs reads  s2.data2 ∈ {0; 3}  // one_var_multiple_threads.c:31 g
-[mt] jobs writes  s1.data ∈ {0; 1; 2}  // one_var_multiple_threads.c:22 f
-[mt] jobs writes  s1.data2 ∈ {0; 3; 6}  // one_var_multiple_threads.c:23 f
-[mt] jobs writes  s2.data ∈ {0; 1; 2}  // one_var_multiple_threads.c:30 g
-[mt] jobs writes  s2.data2 ∈ {0; 3; 6}  // one_var_multiple_threads.c:31 g
+[mt] jobs writes  s1.data ∈ {1; 2}  // one_var_multiple_threads.c:22 f
+[mt] jobs writes  s1.data2 ∈ {3; 6}  // one_var_multiple_threads.c:23 f
+[mt] jobs writes  s2.data ∈ {1; 2}  // one_var_multiple_threads.c:30 g
+[mt] jobs writes  s2.data2 ∈ {3; 6}  // one_var_multiple_threads.c:31 g
 [mt] Possible read/write data races:
   s2.data2:
     read by <main> at one_var_multiple_threads.c:55, protected by lock2
@@ -588,11 +586,10 @@
     read by jobs at one_var_multiple_threads.c:22, protected by lock1
     write by jobs at one_var_multiple_threads.c:22, protected by lock1
 [mt] Shared memory: s1; s2
-[mt] Write summary for jobs (updated): s1.data ∈ {0; 1; 2}
-                                      .data2 ∈ {0; 3; 6}
-[mt] Write summary for jobs (updated):
-  s2.data ∈ [0..2147483647]
-    .data2 ∈ [0..2147483646],0%3
+[mt] Write summary for jobs (updated): s1.data ∈ {1; 2}
+                                      .data2 ∈ {3; 6}
+[mt] Write summary for jobs (updated): s2.data ∈ {1; 2}
+                                      .data2 ∈ {3; 6}
 [mt] Mutexes for concurrent accesses:
   s1  protected by lock1
   s2  protected by lock2
@@ -630,12 +627,8 @@
   inject threads interferences at this point
 [mt] one_var_multiple_threads.c:52: Release lock1
 [mt] one_var_multiple_threads.c:53: Lock lock2
-[eva:alarm] one_var_multiple_threads.c:54: Warning: 
-  signed overflow. assert t + s2.data ≤ 2147483647;
 [eva:interferences] one_var_multiple_threads.c:54: 
   inject threads interferences at this point
-[eva:alarm] one_var_multiple_threads.c:55: Warning: 
-  signed overflow. assert t + s2.data2 ≤ 2147483647;
 [eva:interferences] one_var_multiple_threads.c:55: 
   inject threads interferences at this point
 [mt] one_var_multiple_threads.c:56: Release lock2
@@ -711,23 +704,23 @@
     interferences by location:
       one_var_multiple_threads.c:22:
         # cvalue:
-        s1.data ∈ {0; 1; 2; 3}
+        s1.data ∈ {1; 2; 3}
           .data2 ∈ {0; 3; 6}
-        s2.data ∈ [0..2147483647]
-          .data2 ∈ [0..2147483646],0%3 
+        s2.data ∈ {0; 1; 2}
+          .data2 ∈ {0; 3; 6} 
       one_var_multiple_threads.c:23:
         # cvalue:
-        s1.data ∈ {0; 1; 2; 3}
-          .data2 ∈ {0; 3; 6; 9}
-        s2.data ∈ [0..2147483647]
-          .data2 ∈ [0..2147483646],0%3 
+        s1.data ∈ {1; 2; 3}
+          .data2 ∈ {3; 6; 9}
+        s2.data ∈ {0; 1; 2}
+          .data2 ∈ {0; 3; 6} 
     interferences by mutexes:
       { lock1 }:
         # cvalue:
-        s1.data ∈ {0; 1; 2; 3}
+        s1.data ∈ {1; 2; 3}
           .data2 ∈ {0; 3; 6; 9}
-        s2.data ∈ [0..2147483647]
-          .data2 ∈ [0..2147483646],0%3
+        s2.data ∈ {0; 1; 2}
+          .data2 ∈ {0; 3; 6}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs computed
@@ -739,12 +732,8 @@
 [eva:interferences] 
   inject threads interferences at the start of g for thread jobs
 [mt] one_var_multiple_threads.c:29: Lock lock2
-[eva:alarm] one_var_multiple_threads.c:30: Warning: 
-  signed overflow. assert s2.data + 1 ≤ 2147483647;
 [eva:interferences] one_var_multiple_threads.c:30: 
   inject threads interferences at this point
-[eva:alarm] one_var_multiple_threads.c:31: Warning: 
-  signed overflow. assert s2.data2 + 3 ≤ 2147483647;
 [eva:interferences] one_var_multiple_threads.c:31: 
   inject threads interferences at this point
 [mt] one_var_multiple_threads.c:32: Release lock2
@@ -769,9 +758,7 @@
 [eva:interferences] 
   Interferences from thread jobs
     concurrent writes:
-      /*@ assert Eva: signed_overflow: s2.data + 1 ≤ 2147483647; */
       (s2.data) ++; one_var_multiple_threads.c:30 <- g
-      /*@ assert Eva: signed_overflow: s2.data2 + 3 ≤ 2147483647; */
       s2.data2 += 3; one_var_multiple_threads.c:31 <- g
     shared bases: {s1, s2}
     interferences by location:
@@ -779,21 +766,21 @@
         # cvalue:
         s1.data ∈ {0; 1; 2; 3}
           .data2 ∈ {0; 3; 6; 9}
-        s2.data ∈ [0..2147483647]
-          .data2 ∈ [0..2147483646],0%3 
+        s2.data ∈ {1; 2; 3}
+          .data2 ∈ {0; 3; 6} 
       one_var_multiple_threads.c:31:
         # cvalue:
         s1.data ∈ {0; 1; 2; 3}
           .data2 ∈ {0; 3; 6; 9}
-        s2.data ∈ [0..2147483647]
-          .data2 ∈ [0..2147483646],0%3 
+        s2.data ∈ {1; 2; 3}
+          .data2 ∈ {3; 6; 9} 
     interferences by mutexes:
       { lock2 }:
         # cvalue:
         s1.data ∈ {0; 1; 2; 3}
           .data2 ∈ {0; 3; 6; 9}
-        s2.data ∈ [0..2147483647]
-          .data2 ∈ [0..2147483646],0%3
+        s2.data ∈ {1; 2; 3}
+          .data2 ∈ {0; 3; 6; 9}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs computed
@@ -806,18 +793,14 @@
 [mt] jobs reads  s1.data ∈ {0; 1; 2}  // one_var_multiple_threads.c:22 f
 [mt] <main> reads  s1.data2 ∈ {0; 3; 6}  // one_var_multiple_threads.c:51 main
 [mt] jobs reads  s1.data2 ∈ {0; 3; 6}  // one_var_multiple_threads.c:23 f
-[mt] <main> reads  s2.data ∈ [0..2147483647]  // one_var_multiple_threads.c:54
-  main
-[mt] jobs reads  s2.data ∈ [0..2147483647]  // one_var_multiple_threads.c:30 g
-[mt] <main> reads  s2.data2 ∈ [0..2147483646],0%3 
-  // one_var_multiple_threads.c:55 main
-[mt] jobs reads  s2.data2 ∈ [0..2147483646],0%3  // one_var_multiple_threads.c:31
-  g
-[mt] jobs writes  s1.data ∈ {0; 1; 2; 3}  // one_var_multiple_threads.c:22 f
-[mt] jobs writes  s1.data2 ∈ {0; 3; 6; 9}  // one_var_multiple_threads.c:23 f
-[mt] jobs writes  s2.data ∈ [0..2147483647]  // one_var_multiple_threads.c:30 g
-[mt] jobs writes  s2.data2 ∈ [0..2147483646],0%3  // one_var_multiple_threads.c:31
-  g
+[mt] <main> reads  s2.data ∈ {0; 1; 2}  // one_var_multiple_threads.c:54 main
+[mt] jobs reads  s2.data ∈ {0; 1; 2}  // one_var_multiple_threads.c:30 g
+[mt] <main> reads  s2.data2 ∈ {0; 3; 6}  // one_var_multiple_threads.c:55 main
+[mt] jobs reads  s2.data2 ∈ {0; 3; 6}  // one_var_multiple_threads.c:31 g
+[mt] jobs writes  s1.data ∈ {1; 2; 3}  // one_var_multiple_threads.c:22 f
+[mt] jobs writes  s1.data2 ∈ {3; 6; 9}  // one_var_multiple_threads.c:23 f
+[mt] jobs writes  s2.data ∈ {1; 2; 3}  // one_var_multiple_threads.c:30 g
+[mt] jobs writes  s2.data2 ∈ {3; 6; 9}  // one_var_multiple_threads.c:31 g
 [mt] Possible read/write data races:
   s2.data2:
     read by <main> at one_var_multiple_threads.c:55, protected by lock2
@@ -837,10 +820,11 @@
     write by jobs at one_var_multiple_threads.c:22, protected by lock1
 [mt] Shared memory: s1; s2
 [mt] Write summary for jobs (updated):
-  s1.data ∈ [0..2147483647]
-    .data2 ∈ [0..2147483646],0%3
-[mt] Write summary for jobs: s2.data ∈ [0..2147483647]
-                            .data2 ∈ [0..2147483646],0%3
+  s1.data ∈ [1..2147483647]
+    .data2 ∈ [3..2147483646],0%3
+[mt] Write summary for jobs (updated):
+  s2.data ∈ [1..2147483647]
+    .data2 ∈ [3..2147483646],0%3
 [mt] Mutexes for concurrent accesses:
   s1  protected by lock1
   s2  protected by lock2
@@ -967,20 +951,20 @@
     interferences by location:
       one_var_multiple_threads.c:22:
         # cvalue:
-        s1.data ∈ [0..2147483647]
+        s1.data ∈ [1..2147483647]
           .data2 ∈ [0..2147483646],0%3
         s2.data ∈ [0..2147483647]
           .data2 ∈ [0..2147483646],0%3 
       one_var_multiple_threads.c:23:
         # cvalue:
-        s1.data ∈ [0..2147483647]
-          .data2 ∈ [0..2147483646],0%3
+        s1.data ∈ [1..2147483647]
+          .data2 ∈ [3..2147483646],0%3
         s2.data ∈ [0..2147483647]
           .data2 ∈ [0..2147483646],0%3 
     interferences by mutexes:
       { lock1 }:
         # cvalue:
-        s1.data ∈ [0..2147483647]
+        s1.data ∈ [1..2147483647]
           .data2 ∈ [0..2147483646],0%3
         s2.data ∈ [0..2147483647]
           .data2 ∈ [0..2147483646],0%3
@@ -1035,20 +1019,20 @@
         # cvalue:
         s1.data ∈ [0..2147483647]
           .data2 ∈ [0..2147483646],0%3
-        s2.data ∈ [0..2147483647]
+        s2.data ∈ [1..2147483647]
           .data2 ∈ [0..2147483646],0%3 
       one_var_multiple_threads.c:31:
         # cvalue:
         s1.data ∈ [0..2147483647]
           .data2 ∈ [0..2147483646],0%3
-        s2.data ∈ [0..2147483647]
-          .data2 ∈ [0..2147483646],0%3 
+        s2.data ∈ [1..2147483647]
+          .data2 ∈ [3..2147483646],0%3 
     interferences by mutexes:
       { lock2 }:
         # cvalue:
         s1.data ∈ [0..2147483647]
           .data2 ∈ [0..2147483646],0%3
-        s2.data ∈ [0..2147483647]
+        s2.data ∈ [1..2147483647]
           .data2 ∈ [0..2147483646],0%3
 [mt] * Computing cfg
 [mt] * Cfg computed
@@ -1072,11 +1056,11 @@
   // one_var_multiple_threads.c:55 main
 [mt] jobs reads  s2.data2 ∈ [0..2147483646],0%3  // one_var_multiple_threads.c:31
   g
-[mt] jobs writes  s1.data ∈ [0..2147483647]  // one_var_multiple_threads.c:22 f
-[mt] jobs writes  s1.data2 ∈ [0..2147483646],0%3  // one_var_multiple_threads.c:23
+[mt] jobs writes  s1.data ∈ [1..2147483647]  // one_var_multiple_threads.c:22 f
+[mt] jobs writes  s1.data2 ∈ [3..2147483646],0%3  // one_var_multiple_threads.c:23
   f
-[mt] jobs writes  s2.data ∈ [0..2147483647]  // one_var_multiple_threads.c:30 g
-[mt] jobs writes  s2.data2 ∈ [0..2147483646],0%3  // one_var_multiple_threads.c:31
+[mt] jobs writes  s2.data ∈ [1..2147483647]  // one_var_multiple_threads.c:30 g
+[mt] jobs writes  s2.data2 ∈ [3..2147483646],0%3  // one_var_multiple_threads.c:31
   g
 [mt] Possible read/write data races:
   s2.data2:
@@ -1096,10 +1080,10 @@
     read by jobs at one_var_multiple_threads.c:22, protected by lock1
     write by jobs at one_var_multiple_threads.c:22, protected by lock1
 [mt] Shared memory: s1; s2
-[mt] Write summary for jobs: s1.data ∈ [0..2147483647]
-                            .data2 ∈ [0..2147483646],0%3
-[mt] Write summary for jobs: s2.data ∈ [0..2147483647]
-                            .data2 ∈ [0..2147483646],0%3
+[mt] Write summary for jobs: s1.data ∈ [1..2147483647]
+                            .data2 ∈ [3..2147483646],0%3
+[mt] Write summary for jobs: s2.data ∈ [1..2147483647]
+                            .data2 ∈ [3..2147483646],0%3
 [mt] Mutexes for concurrent accesses:
   s1  protected by lock1
   s2  protected by lock2
@@ -1220,20 +1204,20 @@
     interferences by location:
       one_var_multiple_threads.c:22:
         # cvalue:
-        s1.data ∈ [0..2147483647]
+        s1.data ∈ [1..2147483647]
           .data2 ∈ [0..2147483646],0%3
         s2.data ∈ [0..2147483647]
           .data2 ∈ [0..2147483646],0%3 
       one_var_multiple_threads.c:23:
         # cvalue:
-        s1.data ∈ [0..2147483647]
-          .data2 ∈ [0..2147483646],0%3
+        s1.data ∈ [1..2147483647]
+          .data2 ∈ [3..2147483646],0%3
         s2.data ∈ [0..2147483647]
           .data2 ∈ [0..2147483646],0%3 
     interferences by mutexes:
       { lock1 }:
         # cvalue:
-        s1.data ∈ [0..2147483647]
+        s1.data ∈ [1..2147483647]
           .data2 ∈ [0..2147483646],0%3
         s2.data ∈ [0..2147483647]
           .data2 ∈ [0..2147483646],0%3
@@ -1259,11 +1243,11 @@
   g
 [mt] <main> reads  s2.data2 ∈ [0..2147483646],0%3 
   // one_var_multiple_threads.c:55 main
-[mt] jobs writes  s1.data ∈ [0..2147483647]  // one_var_multiple_threads.c:22 f
-[mt] jobs writes  s1.data2 ∈ [0..2147483646],0%3  // one_var_multiple_threads.c:23
+[mt] jobs writes  s1.data ∈ [1..2147483647]  // one_var_multiple_threads.c:22 f
+[mt] jobs writes  s1.data2 ∈ [3..2147483646],0%3  // one_var_multiple_threads.c:23
   f
-[mt] jobs writes  s2.data ∈ [0..2147483647]  // one_var_multiple_threads.c:30 g
-[mt] jobs writes  s2.data2 ∈ [0..2147483646],0%3  // one_var_multiple_threads.c:31
+[mt] jobs writes  s2.data ∈ [1..2147483647]  // one_var_multiple_threads.c:30 g
+[mt] jobs writes  s2.data2 ∈ [3..2147483646],0%3  // one_var_multiple_threads.c:31
   g
 [mt] Possible read/write data races:
   s2.data2:
@@ -1283,10 +1267,10 @@
     read by jobs at one_var_multiple_threads.c:22, protected by lock1
     write by jobs at one_var_multiple_threads.c:22, protected by lock1
 [mt] Shared memory: s1; s2
-[mt] Write summary for jobs: s1.data ∈ [0..2147483647]
-                            .data2 ∈ [0..2147483646],0%3
-[mt] Write summary for jobs: s2.data ∈ [0..2147483647]
-                            .data2 ∈ [0..2147483646],0%3
+[mt] Write summary for jobs: s1.data ∈ [1..2147483647]
+                            .data2 ∈ [3..2147483646],0%3
+[mt] Write summary for jobs: s2.data ∈ [1..2147483647]
+                            .data2 ∈ [3..2147483646],0%3
 [mt] Mutexes for concurrent accesses:
   s1  protected by lock1
   s2  protected by lock2

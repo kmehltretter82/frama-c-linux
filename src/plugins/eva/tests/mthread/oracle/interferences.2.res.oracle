@@ -213,7 +213,7 @@
   inject threads interferences at this point
 [eva:interferences] interferences.c:120: 
   inject threads interferences at this point
-[eva] interferences.c:121: Frama_C_show_each_fjoblooped_end: {0; 1}, {0; 1}
+[eva] interferences.c:121: Frama_C_show_each_fjoblooped_end: {0; 1}, {1}
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -237,11 +237,11 @@
     interferences by location:
       interferences.c:120:
         # cvalue: shared_a ∈ {0; 1}
-                  shared_b ∈ {0; 1} 
+                  shared_b ∈ {1} 
     interferences by mutexes:
       {  }:
         # cvalue: shared_a ∈ {0; 1}
-                  shared_b ∈ {0; 1}
+                  shared_b ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread joblooped computed
@@ -265,9 +265,9 @@
 [mt] joblooped reads  shared_b ∈ {0}  // interferences.c:118 fjoblooped
 [mt] joblooped reads  shared_b ∈ {0}  // interferences.c:119 fjoblooped
 [mt] joblooped reads  shared_b ∈ {0}  // interferences.c:120 fjoblooped
-[mt] joblooped reads  shared_b ∈ {0; 1}  // interferences.c:121 fjoblooped
+[mt] joblooped reads  shared_b ∈ {1}  // interferences.c:121 fjoblooped
 [mt] joboneshot writes  shared_a ∈ {1}  // interferences.c:112 fjoboneshot
-[mt] joblooped writes  shared_b ∈ {0; 1}  // interferences.c:120 fjoblooped
+[mt] joblooped writes  shared_b ∈ {1}  // interferences.c:120 fjoblooped
 [mt] Possible read/write data races:
   shared_b:
     read by <main> at interferences.c:135, unprotected
@@ -295,7 +295,7 @@
   vs.
     shared_a; shared_b
 [mt] Write summary for joboneshot (updated): shared_a ∈ {1}
-[mt] Write summary for joblooped (updated): shared_b ∈ {0; 1}
+[mt] Write summary for joblooped (updated): shared_b ∈ {1}
 [mt] Mutexes for concurrent accesses:
   shared_a  unprotected
   shared_b  unprotected
@@ -361,12 +361,12 @@
 [eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of fjoboneshot for thread joboneshot
-[eva] interferences.c:110: Frama_C_show_each_fjoboneshot_start: {0; 1}, {0; 1}
+[eva] interferences.c:110: Frama_C_show_each_fjoboneshot_start: {0}, {0; 1}
 [eva:interferences] interferences.c:111: 
   inject threads interferences at this point
 [eva:interferences] interferences.c:112: 
   inject threads interferences at this point
-[eva] interferences.c:113: Frama_C_show_each_fjoboneshot_end: {0; 1; 2}, {0; 1}
+[eva] interferences.c:113: Frama_C_show_each_fjoboneshot_end: {1}, {0; 1}
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -389,11 +389,11 @@
     shared bases: {shared_a, shared_b}
     interferences by location:
       interferences.c:112:
-        # cvalue: shared_a ∈ {0; 1; 2}
+        # cvalue: shared_a ∈ {1}
                   shared_b ∈ {0; 1} 
     interferences by mutexes:
       {  }:
-        # cvalue: shared_a ∈ {0; 1; 2}
+        # cvalue: shared_a ∈ {1}
                   shared_b ∈ {0; 1}
 [mt] * Computing cfg
 [mt] * Cfg computed
@@ -406,13 +406,12 @@
 [eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of fjoblooped for thread joblooped
-[eva] interferences.c:118: Frama_C_show_each_fjoblooped_start: {0; 1; 2}, {0; 1}
+[eva] interferences.c:118: Frama_C_show_each_fjoblooped_start: {0; 1}, {0; 1}
 [eva:interferences] interferences.c:119: 
   inject threads interferences at this point
 [eva:interferences] interferences.c:120: 
   inject threads interferences at this point
-[eva] interferences.c:121: 
-  Frama_C_show_each_fjoblooped_end: {0; 1; 2}, {0; 1; 2}
+[eva] interferences.c:121: Frama_C_show_each_fjoblooped_end: {0; 1}, {1; 2}
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -435,12 +434,12 @@
     shared bases: {shared_a, shared_b}
     interferences by location:
       interferences.c:120:
-        # cvalue: shared_a ∈ {0; 1; 2}
-                  shared_b ∈ {0; 1; 2} 
+        # cvalue: shared_a ∈ {0; 1}
+                  shared_b ∈ {1; 2} 
     interferences by mutexes:
       {  }:
-        # cvalue: shared_a ∈ {0; 1; 2}
-                  shared_b ∈ {0; 1; 2}
+        # cvalue: shared_a ∈ {0; 1}
+                  shared_b ∈ {1; 2}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread joblooped computed
@@ -450,13 +449,13 @@
 [mt] ***** Computing shared variables
 [mt] Imprecise locations to watch: shared_a; shared_b
 [mt] <main> reads  shared_a ∈ {0; 1}  // interferences.c:135 main_thread_loop
-[mt] joboneshot reads  shared_a ∈ {0; 1}  // interferences.c:110 fjoboneshot
-[mt] joboneshot reads  shared_a ∈ {0; 1}  // interferences.c:111 fjoboneshot
-[mt] joboneshot reads  shared_a ∈ {0; 1}  // interferences.c:112 fjoboneshot
-[mt] joboneshot reads  shared_a ∈ {0; 1; 2}  // interferences.c:113 fjoboneshot
-[mt] joblooped reads  shared_a ∈ {0; 1; 2}  // interferences.c:118 fjoblooped
-[mt] joblooped reads  shared_a ∈ {0; 1; 2}  // interferences.c:119 fjoblooped
-[mt] joblooped reads  shared_a ∈ {0; 1; 2}  // interferences.c:121 fjoblooped
+[mt] joboneshot reads  shared_a ∈ {0}  // interferences.c:110 fjoboneshot
+[mt] joboneshot reads  shared_a ∈ {0}  // interferences.c:111 fjoboneshot
+[mt] joboneshot reads  shared_a ∈ {0}  // interferences.c:112 fjoboneshot
+[mt] joboneshot reads  shared_a ∈ {1}  // interferences.c:113 fjoboneshot
+[mt] joblooped reads  shared_a ∈ {0; 1}  // interferences.c:118 fjoblooped
+[mt] joblooped reads  shared_a ∈ {0; 1}  // interferences.c:119 fjoblooped
+[mt] joblooped reads  shared_a ∈ {0; 1}  // interferences.c:121 fjoblooped
 [mt] <main> reads  shared_b ∈ {0; 1}  // interferences.c:135 main_thread_loop
 [mt] joboneshot reads  shared_b ∈ {0; 1}  // interferences.c:110 fjoboneshot
 [mt] joboneshot reads  shared_b ∈ {0; 1}  // interferences.c:111 fjoboneshot
@@ -464,9 +463,9 @@
 [mt] joblooped reads  shared_b ∈ {0; 1}  // interferences.c:118 fjoblooped
 [mt] joblooped reads  shared_b ∈ {0; 1}  // interferences.c:119 fjoblooped
 [mt] joblooped reads  shared_b ∈ {0; 1}  // interferences.c:120 fjoblooped
-[mt] joblooped reads  shared_b ∈ {0; 1; 2}  // interferences.c:121 fjoblooped
-[mt] joboneshot writes  shared_a ∈ {0; 1; 2}  // interferences.c:112 fjoboneshot
-[mt] joblooped writes  shared_b ∈ {0; 1; 2}  // interferences.c:120 fjoblooped
+[mt] joblooped reads  shared_b ∈ {1; 2}  // interferences.c:121 fjoblooped
+[mt] joboneshot writes  shared_a ∈ {1}  // interferences.c:112 fjoboneshot
+[mt] joblooped writes  shared_b ∈ {1; 2}  // interferences.c:120 fjoblooped
 [mt] Possible read/write data races:
   shared_b:
     read by <main> at interferences.c:135, unprotected
@@ -489,8 +488,8 @@
     read by joblooped at interferences.c:121, unprotected
     write by joboneshot at interferences.c:112, unprotected
 [mt] Shared memory: shared_a; shared_b
-[mt] Write summary for joboneshot (updated): shared_a ∈ {0; 1; 2}
-[mt] Write summary for joblooped (updated): shared_b ∈ [0..2147483647]
+[mt] Write summary for joboneshot: shared_a ∈ {1}
+[mt] Write summary for joblooped (updated): shared_b ∈ {1; 2}
 [mt] Mutexes for concurrent accesses:
   shared_a  unprotected
   shared_b  unprotected
@@ -530,10 +529,8 @@
   The thread joblooped is already registered.
 [eva] FRAMAC_SHARE/mthread_pthread.c:30: Warning: 
   The thread joblooped is already running.
-[eva] interferences.c:135: 
-  Frama_C_show_each_main_end: {0; 1; 2}, [0..2147483647]
-[eva] interferences.c:135: 
-  Frama_C_show_each_main_end: {0; 1; 2}, [0..2147483647]
+[eva] interferences.c:135: Frama_C_show_each_main_end: {0; 1}, {0; 1; 2}
+[eva] interferences.c:135: Frama_C_show_each_main_end: {0; 1}, {0; 1; 2}
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -558,14 +555,12 @@
 [eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of fjoboneshot for thread joboneshot
-[eva] interferences.c:110: 
-  Frama_C_show_each_fjoboneshot_start: {0; 1; 2}, {0; 1; 2}
+[eva] interferences.c:110: Frama_C_show_each_fjoboneshot_start: {0}, {0; 1; 2}
 [eva:interferences] interferences.c:111: 
   inject threads interferences at this point
 [eva:interferences] interferences.c:112: 
   inject threads interferences at this point
-[eva] interferences.c:113: 
-  Frama_C_show_each_fjoboneshot_end: {0; 1; 2; 3}, {0; 1; 2}
+[eva] interferences.c:113: Frama_C_show_each_fjoboneshot_end: {1}, {0; 1; 2}
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -588,35 +583,28 @@
     shared bases: {shared_a, shared_b}
     interferences by location:
       interferences.c:112:
-        # cvalue: shared_a ∈ {0; 1; 2; 3}
+        # cvalue: shared_a ∈ {1}
                   shared_b ∈ {0; 1; 2} 
     interferences by mutexes:
       {  }:
-        # cvalue: shared_a ∈ {0; 1; 2; 3}
+        # cvalue: shared_a ∈ {1}
                   shared_b ∈ {0; 1; 2}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread joboneshot computed
 [mt] *** Computing thread joblooped, iteration 4
-    (shared vars values changed, thread initial memory state changed,
-     interferences changed)
+    (thread initial memory state changed, interferences changed)
 [mt] * Computing value analysis for thread joblooped
 [eva] Analyzing a complete application starting at fjoblooped
 [eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of fjoblooped for thread joblooped
-[eva] interferences.c:118: 
-  Frama_C_show_each_fjoblooped_start: {0; 1; 2; 3}, [0..2147483647]
-[eva:alarm] interferences.c:119: Warning: 
-  signed overflow. assert shared_a + shared_b ≤ 2147483647;
+[eva] interferences.c:118: Frama_C_show_each_fjoblooped_start: {0; 1}, {0; 1; 2}
 [eva:interferences] interferences.c:119: 
   inject threads interferences at this point
-[eva:alarm] interferences.c:120: Warning: 
-  signed overflow. assert shared_b + 1 ≤ 2147483647;
 [eva:interferences] interferences.c:120: 
   inject threads interferences at this point
-[eva] interferences.c:121: 
-  Frama_C_show_each_fjoblooped_end: {0; 1; 2; 3}, [0..2147483647]
+[eva] interferences.c:121: Frama_C_show_each_fjoblooped_end: {0; 1}, {1; 2; 3}
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -635,17 +623,16 @@
 [eva:interferences] 
   Interferences from thread joblooped
     concurrent writes:
-      /*@ assert Eva: signed_overflow: shared_b + 1 ≤ 2147483647; */
       shared_b ++; interferences.c:120 <- fjoblooped
     shared bases: {shared_a, shared_b}
     interferences by location:
       interferences.c:120:
-        # cvalue: shared_a ∈ {0; 1; 2; 3}
-                  shared_b ∈ [0..2147483647] 
+        # cvalue: shared_a ∈ {0; 1}
+                  shared_b ∈ {1; 2; 3} 
     interferences by mutexes:
       {  }:
-        # cvalue: shared_a ∈ {0; 1; 2; 3}
-                  shared_b ∈ [0..2147483647]
+        # cvalue: shared_a ∈ {0; 1}
+                  shared_b ∈ {1; 2; 3}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread joblooped computed
@@ -654,31 +641,24 @@
 [mt] * threads and mutexes computed
 [mt] ***** Computing shared variables
 [mt] Imprecise locations to watch: shared_a; shared_b
-[mt] <main> reads  shared_a ∈ {0; 1; 2}  // interferences.c:135 main_thread_loop
-[mt] joboneshot reads  shared_a ∈ {0; 1; 2}  // interferences.c:110 fjoboneshot
-[mt] joboneshot reads  shared_a ∈ {0; 1; 2}  // interferences.c:111 fjoboneshot
-[mt] joboneshot reads  shared_a ∈ {0; 1; 2}  // interferences.c:112 fjoboneshot
-[mt] joboneshot reads  shared_a ∈ {0; 1; 2; 3}  // interferences.c:113 fjoboneshot
-[mt] joblooped reads  shared_a ∈ {0; 1; 2; 3}  // interferences.c:118 fjoblooped
-[mt] joblooped reads  shared_a ∈ {0; 1; 2; 3}  // interferences.c:119 fjoblooped
-[mt] joblooped reads  shared_a ∈ {0; 1; 2; 3}  // interferences.c:121 fjoblooped
-[mt] <main> reads  shared_b ∈ [0..2147483647]  // interferences.c:135
-  main_thread_loop
+[mt] <main> reads  shared_a ∈ {0; 1}  // interferences.c:135 main_thread_loop
+[mt] joboneshot reads  shared_a ∈ {0}  // interferences.c:110 fjoboneshot
+[mt] joboneshot reads  shared_a ∈ {0}  // interferences.c:111 fjoboneshot
+[mt] joboneshot reads  shared_a ∈ {0}  // interferences.c:112 fjoboneshot
+[mt] joboneshot reads  shared_a ∈ {1}  // interferences.c:113 fjoboneshot
+[mt] joblooped reads  shared_a ∈ {0; 1}  // interferences.c:118 fjoblooped
+[mt] joblooped reads  shared_a ∈ {0; 1}  // interferences.c:119 fjoblooped
+[mt] joblooped reads  shared_a ∈ {0; 1}  // interferences.c:121 fjoblooped
+[mt] <main> reads  shared_b ∈ {0; 1; 2}  // interferences.c:135 main_thread_loop
 [mt] joboneshot reads  shared_b ∈ {0; 1; 2}  // interferences.c:110 fjoboneshot
 [mt] joboneshot reads  shared_b ∈ {0; 1; 2}  // interferences.c:111 fjoboneshot
 [mt] joboneshot reads  shared_b ∈ {0; 1; 2}  // interferences.c:113 fjoboneshot
-[mt] joblooped reads  shared_b ∈ [0..2147483647]  // interferences.c:118
-  fjoblooped
-[mt] joblooped reads  shared_b ∈ [0..2147483647]  // interferences.c:119
-  fjoblooped
-[mt] joblooped reads  shared_b ∈ [0..2147483647]  // interferences.c:120
-  fjoblooped
-[mt] joblooped reads  shared_b ∈ [0..2147483647]  // interferences.c:121
-  fjoblooped
-[mt] joboneshot writes  shared_a ∈ {0; 1; 2; 3}  // interferences.c:112
-  fjoboneshot
-[mt] joblooped writes  shared_b ∈ [0..2147483647]  // interferences.c:120
-  fjoblooped
+[mt] joblooped reads  shared_b ∈ {0; 1; 2}  // interferences.c:118 fjoblooped
+[mt] joblooped reads  shared_b ∈ {0; 1; 2}  // interferences.c:119 fjoblooped
+[mt] joblooped reads  shared_b ∈ {0; 1; 2}  // interferences.c:120 fjoblooped
+[mt] joblooped reads  shared_b ∈ {1; 2; 3}  // interferences.c:121 fjoblooped
+[mt] joboneshot writes  shared_a ∈ {1}  // interferences.c:112 fjoboneshot
+[mt] joblooped writes  shared_b ∈ {1; 2; 3}  // interferences.c:120 fjoblooped
 [mt] Possible read/write data races:
   shared_b:
     read by <main> at interferences.c:135, unprotected
@@ -701,8 +681,8 @@
     read by joblooped at interferences.c:121, unprotected
     write by joboneshot at interferences.c:112, unprotected
 [mt] Shared memory: shared_a; shared_b
-[mt] Write summary for joboneshot (updated): shared_a ∈ [0..2147483647]
-[mt] Write summary for joblooped: shared_b ∈ [0..2147483647]
+[mt] Write summary for joboneshot: shared_a ∈ {1}
+[mt] Write summary for joblooped (updated): shared_b ∈ [1..2147483647]
 [mt] Mutexes for concurrent accesses:
   shared_a  unprotected
   shared_b  unprotected
@@ -742,10 +722,8 @@
   The thread joblooped is already registered.
 [eva] FRAMAC_SHARE/mthread_pthread.c:30: Warning: 
   The thread joblooped is already running.
-[eva] interferences.c:135: 
-  Frama_C_show_each_main_end: [0..2147483647], [0..2147483647]
-[eva] interferences.c:135: 
-  Frama_C_show_each_main_end: [0..2147483647], [0..2147483647]
+[eva] interferences.c:135: Frama_C_show_each_main_end: {0; 1}, [0..2147483647]
+[eva] interferences.c:135: Frama_C_show_each_main_end: {0; 1}, [0..2147483647]
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -763,22 +741,20 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
-[mt] *** Computing thread joboneshot, iteration 5 (interferences changed)
+[mt] *** Computing thread joboneshot, iteration 5
+    (shared vars values changed, interferences changed)
 [mt] * Computing value analysis for thread joboneshot
 [eva] Analyzing a complete application starting at fjoboneshot
 [eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of fjoboneshot for thread joboneshot
 [eva] interferences.c:110: 
-  Frama_C_show_each_fjoboneshot_start: {0; 1; 2; 3}, [0..2147483647]
-[eva:alarm] interferences.c:111: Warning: 
-  signed overflow. assert shared_a + shared_b ≤ 2147483647;
+  Frama_C_show_each_fjoboneshot_start: {0}, {0; 1; 2; 3}
 [eva:interferences] interferences.c:111: 
   inject threads interferences at this point
 [eva:interferences] interferences.c:112: 
   inject threads interferences at this point
-[eva] interferences.c:113: 
-  Frama_C_show_each_fjoboneshot_end: {0; 1; 2; 3; 4}, [0..2147483647]
+[eva] interferences.c:113: Frama_C_show_each_fjoboneshot_end: {1}, {0; 1; 2; 3}
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -801,25 +777,24 @@
     shared bases: {shared_a, shared_b}
     interferences by location:
       interferences.c:112:
-        # cvalue: shared_a ∈ [0..2147483647]
+        # cvalue: shared_a ∈ {1}
                   shared_b ∈ [0..2147483647] 
     interferences by mutexes:
       {  }:
-        # cvalue: shared_a ∈ [0..2147483647]
+        # cvalue: shared_a ∈ {1}
                   shared_b ∈ [0..2147483647]
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread joboneshot computed
 [mt] *** Computing thread joblooped, iteration 5
-    (shared vars values changed, thread initial memory state changed,
-     interferences changed)
+    (thread initial memory state changed, interferences changed)
 [mt] * Computing value analysis for thread joblooped
 [eva] Analyzing a complete application starting at fjoblooped
 [eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of fjoblooped for thread joblooped
 [eva] interferences.c:118: 
-  Frama_C_show_each_fjoblooped_start: [0..2147483647], [0..2147483647]
+  Frama_C_show_each_fjoblooped_start: {0; 1}, [0..2147483647]
 [eva:alarm] interferences.c:119: Warning: 
   signed overflow. assert shared_a + shared_b ≤ 2147483647;
 [eva:interferences] interferences.c:119: 
@@ -829,7 +804,7 @@
 [eva:interferences] interferences.c:120: 
   inject threads interferences at this point
 [eva] interferences.c:121: 
-  Frama_C_show_each_fjoblooped_end: [0..2147483647], [0..2147483647]
+  Frama_C_show_each_fjoblooped_end: {0; 1}, [1..2147483647]
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -853,12 +828,12 @@
     shared bases: {shared_a, shared_b}
     interferences by location:
       interferences.c:120:
-        # cvalue: shared_a ∈ [0..2147483647]
-                  shared_b ∈ [0..2147483647] 
+        # cvalue: shared_a ∈ {0; 1}
+                  shared_b ∈ [1..2147483647] 
     interferences by mutexes:
       {  }:
-        # cvalue: shared_a ∈ [0..2147483647]
-                  shared_b ∈ [0..2147483647]
+        # cvalue: shared_a ∈ {0; 1}
+                  shared_b ∈ [1..2147483647]
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread joblooped computed
@@ -867,38 +842,29 @@
 [mt] * threads and mutexes computed
 [mt] ***** Computing shared variables
 [mt] Imprecise locations to watch: shared_a; shared_b
-[mt] <main> reads  shared_a ∈ [0..2147483647]  // interferences.c:135
-  main_thread_loop
-[mt] joboneshot reads  shared_a ∈ {0; 1; 2; 3}  // interferences.c:110 fjoboneshot
-[mt] joboneshot reads  shared_a ∈ {0; 1; 2; 3}  // interferences.c:111 fjoboneshot
-[mt] joboneshot reads  shared_a ∈ {0; 1; 2; 3}  // interferences.c:112 fjoboneshot
-[mt] joboneshot reads  shared_a ∈ {0; 1; 2; 3; 4}  // interferences.c:113
-  fjoboneshot
-[mt] joblooped reads  shared_a ∈ [0..2147483647]  // interferences.c:118
-  fjoblooped
-[mt] joblooped reads  shared_a ∈ [0..2147483647]  // interferences.c:119
-  fjoblooped
-[mt] joblooped reads  shared_a ∈ [0..2147483647]  // interferences.c:121
-  fjoblooped
+[mt] <main> reads  shared_a ∈ {0; 1}  // interferences.c:135 main_thread_loop
+[mt] joboneshot reads  shared_a ∈ {0}  // interferences.c:110 fjoboneshot
+[mt] joboneshot reads  shared_a ∈ {0}  // interferences.c:111 fjoboneshot
+[mt] joboneshot reads  shared_a ∈ {0}  // interferences.c:112 fjoboneshot
+[mt] joboneshot reads  shared_a ∈ {1}  // interferences.c:113 fjoboneshot
+[mt] joblooped reads  shared_a ∈ {0; 1}  // interferences.c:118 fjoblooped
+[mt] joblooped reads  shared_a ∈ {0; 1}  // interferences.c:119 fjoblooped
+[mt] joblooped reads  shared_a ∈ {0; 1}  // interferences.c:121 fjoblooped
 [mt] <main> reads  shared_b ∈ [0..2147483647]  // interferences.c:135
   main_thread_loop
-[mt] joboneshot reads  shared_b ∈ [0..2147483647]  // interferences.c:110
-  fjoboneshot
-[mt] joboneshot reads  shared_b ∈ [0..2147483647]  // interferences.c:111
-  fjoboneshot
-[mt] joboneshot reads  shared_b ∈ [0..2147483647]  // interferences.c:113
-  fjoboneshot
+[mt] joboneshot reads  shared_b ∈ {0; 1; 2; 3}  // interferences.c:110 fjoboneshot
+[mt] joboneshot reads  shared_b ∈ {0; 1; 2; 3}  // interferences.c:111 fjoboneshot
+[mt] joboneshot reads  shared_b ∈ {0; 1; 2; 3}  // interferences.c:113 fjoboneshot
 [mt] joblooped reads  shared_b ∈ [0..2147483647]  // interferences.c:118
   fjoblooped
 [mt] joblooped reads  shared_b ∈ [0..2147483647]  // interferences.c:119
   fjoblooped
 [mt] joblooped reads  shared_b ∈ [0..2147483647]  // interferences.c:120
   fjoblooped
-[mt] joblooped reads  shared_b ∈ [0..2147483647]  // interferences.c:121
+[mt] joblooped reads  shared_b ∈ [1..2147483647]  // interferences.c:121
   fjoblooped
-[mt] joboneshot writes  shared_a ∈ {0; 1; 2; 3; 4}  // interferences.c:112
-  fjoboneshot
-[mt] joblooped writes  shared_b ∈ [0..2147483647]  // interferences.c:120
+[mt] joboneshot writes  shared_a ∈ {1}  // interferences.c:112 fjoboneshot
+[mt] joblooped writes  shared_b ∈ [1..2147483647]  // interferences.c:120
   fjoblooped
 [mt] Possible read/write data races:
   shared_b:
@@ -922,8 +888,8 @@
     read by joblooped at interferences.c:121, unprotected
     write by joboneshot at interferences.c:112, unprotected
 [mt] Shared memory: shared_a; shared_b
-[mt] Write summary for joboneshot: shared_a ∈ [0..2147483647]
-[mt] Write summary for joblooped: shared_b ∈ [0..2147483647]
+[mt] Write summary for joboneshot: shared_a ∈ {1}
+[mt] Write summary for joblooped: shared_b ∈ [1..2147483647]
 [mt] Mutexes for concurrent accesses:
   shared_a  unprotected
   shared_b  unprotected
@@ -960,10 +926,8 @@
   The thread joblooped is already registered.
 [eva] FRAMAC_SHARE/mthread_pthread.c:30: Warning: 
   The thread joblooped is already running.
-[eva] interferences.c:135: 
-  Frama_C_show_each_main_end: [0..2147483647], [0..2147483647]
-[eva] interferences.c:135: 
-  Frama_C_show_each_main_end: [0..2147483647], [0..2147483647]
+[eva] interferences.c:135: Frama_C_show_each_main_end: {0; 1}, [0..2147483647]
+[eva] interferences.c:135: Frama_C_show_each_main_end: {0; 1}, [0..2147483647]
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -988,17 +952,13 @@
 [eva:interferences] 
   inject threads interferences at the start of fjoboneshot for thread joboneshot
 [eva] interferences.c:110: 
-  Frama_C_show_each_fjoboneshot_start: [0..2147483647], [0..2147483647]
-[eva:alarm] interferences.c:111: Warning: 
-  signed overflow. assert shared_a + shared_b ≤ 2147483647;
+  Frama_C_show_each_fjoboneshot_start: {0}, [0..2147483647]
 [eva:interferences] interferences.c:111: 
   inject threads interferences at this point
-[eva:alarm] interferences.c:112: Warning: 
-  signed overflow. assert shared_a + 1 ≤ 2147483647;
 [eva:interferences] interferences.c:112: 
   inject threads interferences at this point
 [eva] interferences.c:113: 
-  Frama_C_show_each_fjoboneshot_end: [0..2147483647], [0..2147483647]
+  Frama_C_show_each_fjoboneshot_end: {1}, [0..2147483647]
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -1017,16 +977,15 @@
 [eva:interferences] 
   Interferences from thread joboneshot
     concurrent writes:
-      /*@ assert Eva: signed_overflow: shared_a + 1 ≤ 2147483647; */
       shared_a ++; interferences.c:112 <- fjoboneshot
     shared bases: {shared_a, shared_b}
     interferences by location:
       interferences.c:112:
-        # cvalue: shared_a ∈ [0..2147483647]
+        # cvalue: shared_a ∈ {1}
                   shared_b ∈ [0..2147483647] 
     interferences by mutexes:
       {  }:
-        # cvalue: shared_a ∈ [0..2147483647]
+        # cvalue: shared_a ∈ {1}
                   shared_b ∈ [0..2147483647]
 [mt] * Computing cfg
 [mt] * Cfg computed
@@ -1036,29 +995,21 @@
 [mt] * threads and mutexes computed
 [mt] ***** Computing shared variables
 [mt] Imprecise locations to watch: shared_a; shared_b
-[mt] joblooped reads  shared_a ∈ [0..2147483647]  // interferences.c:118
-  fjoblooped
-[mt] joblooped reads  shared_a ∈ [0..2147483647]  // interferences.c:119
-  fjoblooped
-[mt] joblooped reads  shared_a ∈ [0..2147483647]  // interferences.c:121
-  fjoblooped
-[mt] <main> reads  shared_a ∈ [0..2147483647]  // interferences.c:135
-  main_thread_loop
-[mt] joboneshot reads  shared_a ∈ [0..2147483647]  // interferences.c:110
-  fjoboneshot
-[mt] joboneshot reads  shared_a ∈ [0..2147483647]  // interferences.c:111
-  fjoboneshot
-[mt] joboneshot reads  shared_a ∈ [0..2147483647]  // interferences.c:112
-  fjoboneshot
-[mt] joboneshot reads  shared_a ∈ [0..2147483647]  // interferences.c:113
-  fjoboneshot
+[mt] joblooped reads  shared_a ∈ {0; 1}  // interferences.c:118 fjoblooped
+[mt] joblooped reads  shared_a ∈ {0; 1}  // interferences.c:119 fjoblooped
+[mt] joblooped reads  shared_a ∈ {0; 1}  // interferences.c:121 fjoblooped
+[mt] <main> reads  shared_a ∈ {0; 1}  // interferences.c:135 main_thread_loop
+[mt] joboneshot reads  shared_a ∈ {0}  // interferences.c:110 fjoboneshot
+[mt] joboneshot reads  shared_a ∈ {0}  // interferences.c:111 fjoboneshot
+[mt] joboneshot reads  shared_a ∈ {0}  // interferences.c:112 fjoboneshot
+[mt] joboneshot reads  shared_a ∈ {1}  // interferences.c:113 fjoboneshot
 [mt] joblooped reads  shared_b ∈ [0..2147483647]  // interferences.c:118
   fjoblooped
 [mt] joblooped reads  shared_b ∈ [0..2147483647]  // interferences.c:119
   fjoblooped
 [mt] joblooped reads  shared_b ∈ [0..2147483647]  // interferences.c:120
   fjoblooped
-[mt] joblooped reads  shared_b ∈ [0..2147483647]  // interferences.c:121
+[mt] joblooped reads  shared_b ∈ [1..2147483647]  // interferences.c:121
   fjoblooped
 [mt] <main> reads  shared_b ∈ [0..2147483647]  // interferences.c:135
   main_thread_loop
@@ -1068,9 +1019,8 @@
   fjoboneshot
 [mt] joboneshot reads  shared_b ∈ [0..2147483647]  // interferences.c:113
   fjoboneshot
-[mt] joboneshot writes  shared_a ∈ [0..2147483647]  // interferences.c:112
-  fjoboneshot
-[mt] joblooped writes  shared_b ∈ [0..2147483647]  // interferences.c:120
+[mt] joboneshot writes  shared_a ∈ {1}  // interferences.c:112 fjoboneshot
+[mt] joblooped writes  shared_b ∈ [1..2147483647]  // interferences.c:120
   fjoblooped
 [mt] Possible read/write data races:
   shared_b:
@@ -1094,8 +1044,8 @@
     read by joboneshot at interferences.c:113, unprotected
     write by joboneshot at interferences.c:112, unprotected
 [mt] Shared memory: shared_a; shared_b
-[mt] Write summary for joboneshot: shared_a ∈ [0..2147483647]
-[mt] Write summary for joblooped: shared_b ∈ [0..2147483647]
+[mt] Write summary for joboneshot: shared_a ∈ {1}
+[mt] Write summary for joblooped: shared_b ∈ [1..2147483647]
 [mt] Mutexes for concurrent accesses:
   shared_a  unprotected
   shared_b  unprotected

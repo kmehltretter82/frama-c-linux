@@ -4,12 +4,9 @@
 < [eva] interferences.c:135: Frama_C_show_each_main_end: {0}, {0}
 339d336
 < [eva] interferences.c:135: Frama_C_show_each_main_end: {0; 1}, {0; 1}
-535,536d531
-< [eva] interferences.c:135: 
-<   Frama_C_show_each_main_end: {0; 1; 2}, [0..2147483647]
-747,748d741
-< [eva] interferences.c:135: 
-<   Frama_C_show_each_main_end: [0..2147483647], [0..2147483647]
-963,964d955
-< [eva] interferences.c:135: 
-<   Frama_C_show_each_main_end: [0..2147483647], [0..2147483647]
+533d529
+< [eva] interferences.c:135: Frama_C_show_each_main_end: {0; 1}, {0; 1; 2}
+726d721
+< [eva] interferences.c:135: Frama_C_show_each_main_end: {0; 1}, [0..2147483647]
+929d923
+< [eva] interferences.c:135: Frama_C_show_each_main_end: {0; 1}, [0..2147483647]

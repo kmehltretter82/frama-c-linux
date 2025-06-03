@@ -36,20 +36,77 @@ let pp_map iteri pp_key pp_val fmt map =
   in
   iteri (pp fmt) map
 
+(** An interference from on or several threads. *)
+module Interference (Dom : Abstract.Domain.External) =
+struct
+  type t = {
+    (** The interference state. *)
+    state : Dom.t or_top;
+
+    (** The accesses that are the cause of the interference. *)
+    access : Inout_access.t;
+  }
+
+  (** [is_included l r] returns [true] if the interference state of [l] is
+      included in the interference state of [r].
+      By construction, the accesses are included if the states are included. *)
+  let is_included l r =
+    Top.is_included Dom.is_included l.state r.state
+
+  (** [join l r] joins the interfence. *)
+  let join l r =
+    let dom_join l r = `Value (Dom.join l r) in
+    { state = Top.join dom_join l.state r.state;
+      access = Inout_access.Access.join l.access r.access }
+
+  (** [widen kf stmt l r] is the over-approximation of [join l r]. Assumes that
+      [l] is included in [r] so the accesses are taken from [r] directly. *)
+  let widen kf stmt l r =
+    let dom_widen l r = `Value (Dom.widen kf stmt l r) in
+    { r with state = Top.join dom_widen l.state r.state }
+
+  (** [locked_mutexes interference] returns the set of mutexes locked in the
+      interference state. *)
+  let locked_mutexes { state; _ } =
+    match state with
+    | `Top -> Mutex.Set.empty
+    | `Value state ->
+      match Dom.get Mt_domain.Domain.key with
+      | None -> Mutex.Set.empty
+      | Some extract ->
+        Mt_domain.Domain.mutexes (extract state)
+        |> Mt_mutex.Register.locked_mutexes
+
+  (** [equal ~bases l r] returns [true] if the state and accesses of [l] and [r]
+      are equal. The states are [project]ed on [bases] before the comparison. *)
+  let equal ~bases l r =
+    let lstate = Top.map (Dom.project bases) l.state in
+    let rstate = Top.map (Dom.project bases) r.state in
+    Top.equal Dom.equal lstate rstate
+    && Inout_access.Access.equal l.access r.access
+
+  (** Pretty-printer for an interference. The state is projected on [bases]
+      before printing. *)
+  let pretty ~bases fmt { state; _ } =
+    let state = Top.map (Dom.project bases) state in
+    Top.pretty Dom.pretty fmt state
+
+end
 
 (* Set of interferences stored as a map from the set of mutexes surely
    locked to the corresponding interferences states. *)
 
 module ByMutexes (Dom : Abstract.Domain.External) =
 struct
-  type t = Dom.t or_top MutexesMap.t
+  module Interference = Interference (Dom)
+  type t = Interference.t MutexesMap.t
 
-  let pretty : Format.formatter -> t -> unit =
-    let pp_val = Top.pretty Dom.pretty
-    and pp_key = Mutex.Set.pretty in
-    pp_map MutexesMap.iter pp_key pp_val
+  let pretty ~bases : Format.formatter -> t -> unit =
+    let pp_key = Mutex.Set.pretty in
+    pp_map MutexesMap.iter pp_key (Interference.pretty ~bases)
 
-  let equal : t -> t -> bool = MutexesMap.equal (Top.equal Dom.equal)
+  let equal ~bases : t -> t -> bool =
+    MutexesMap.equal (Interference.equal ~bases)
 end
 
 
@@ -58,72 +115,62 @@ end
 
 module ByPosition (Dom : Abstract.Domain.External) =
 struct
+  module Interference = Interference (Dom)
+
   type elt =
     {
-      state : Dom.t or_top;
+      interference : Interference.t;
       widening_counter : int;
     }
 
   type t = elt PosMap.t
 
-  let pretty : Format.formatter -> t -> unit =
-    let pp_val fmt { state; _ } = Top.pretty Dom.pretty fmt state
+  let pretty ~bases fmt map =
+    let pp_val fmt { interference; _ } = Interference.pretty ~bases fmt interference
     and pp_key = Pos.pretty_loc in
-    pp_map PosMap.iter pp_key pp_val
+    pp_map PosMap.iter pp_key pp_val fmt map
 
   let empty : t = PosMap.empty
 
-  module DomOrTop =
-  struct
-    let is_included = Top.is_included Dom.is_included
-    let top_join join = Top.join (fun s1 s2 -> `Value (join s1 s2))
-    let join = top_join Dom.join
-    let widen kf stmt = top_join (Dom.widen kf stmt)
-  end
-
-  let add_and_widen (pos : Pos.t) (state : Dom.t or_top) : t -> t =
+  let add_and_widen (pos : Pos.t) (interference : Interference.t) : t -> t =
     let update = function
       | None -> (* No previous entry *)
         let widening_delay = Parameters.WideningDelay.get () in
-        Some { state ; widening_counter = widening_delay - 1 }
+        Some { interference ; widening_counter = widening_delay - 1 }
 
       | Some previous -> (* Some previous entry *)
-        if DomOrTop.is_included state previous.state then
+        if Interference.is_included interference previous.interference then
           Some previous
         else
-          let state = DomOrTop.join previous.state state in
-          let state, widening_counter =
+          let interference =
+            Interference.join previous.interference interference
+          in
+          let interference, widening_counter =
             if previous.widening_counter > 0 then
               (* No widening *)
-              state, previous.widening_counter
+              interference, previous.widening_counter
             else begin
               (* Widen the interferences between the previous and current
                  state. *)
               let widening_period = Parameters.WideningPeriod.get () in
               let stmt, cs = pos in
               let kf = Callstack.top_kf cs in
-              DomOrTop.widen kf stmt previous.state state, widening_period
+              Interference.widen kf stmt previous.interference interference,
+              widening_period
             end
           in
-          Some { state ; widening_counter = widening_counter - 1 }
+          Some { interference ; widening_counter = widening_counter - 1 }
     in
     PosMap.update pos update
 
-  let group_by_mutexes (map : t) : (Dom.t or_top) MutexesMap.t =
-    let add _pos { state ; _ } acc_map =
-      let locked_mutexes =
-        match state with
-        | `Top -> Mutex.Set.empty
-        | `Value state ->
-          match Dom.get Mt_domain.Domain.key with
-          | None -> Mutex.Set.empty
-          | Some extract ->
-            Mt_domain.Domain.mutexes (extract state)
-            |> Mt_mutex.Register.locked_mutexes
-      in
+  let group_by_mutexes (map : t) : Interference.t MutexesMap.t =
+    let add _pos { interference ; _ } acc_map =
+      let locked_mutexes = Interference.locked_mutexes interference in
       let update = function
-        | None -> Some state
-        | Some previous -> Some (DomOrTop.join previous state)
+        | None -> Some interference
+        | Some previous ->
+          let interference = Interference.join previous interference in
+          Some interference
       in
       MutexesMap.update locked_mutexes update acc_map
     in
@@ -139,28 +186,29 @@ struct
   module ThreadTable = Thread.Hashtbl
   module ByPosition = ByPosition (Dom)
   module ByMutexes = ByMutexes (Dom)
+  module Interference = Interference (Dom)
 
   type state = Dom.t
 
   type t = {
-    states_by_pos : ByPosition.t ThreadTable.t;
-    states_by_mutexes :  ByMutexes.t ThreadTable.t;
+    interferences_by_pos : ByPosition.t ThreadTable.t;
+    interferences_by_mutexes :  ByMutexes.t ThreadTable.t;
     mutable shared_bases : Base.Hptset.t;
   }
 
   let current = {
-    states_by_pos = ThreadTable.create 13;
-    states_by_mutexes = ThreadTable.create 13;
+    interferences_by_pos = ThreadTable.create 13;
+    interferences_by_mutexes = ThreadTable.create 13;
     shared_bases = Base.Hptset.empty;
   }
 
   let reset () =
-    ThreadTable.reset current.states_by_pos;
-    ThreadTable.reset current.states_by_mutexes;
+    ThreadTable.reset current.interferences_by_pos;
+    ThreadTable.reset current.interferences_by_mutexes;
     current.shared_bases <- Base.Hptset.empty
 
   let is_empty () =
-    ThreadTable.length current.states_by_pos = 0
+    ThreadTable.length current.interferences_by_pos = 0
 
   (* Interference registration *)
 
@@ -170,11 +218,11 @@ struct
 
   let add_last_analysis thread concurrent_writes shared_bases =
     (* Retrieve the interferences  *)
-    let old_states_by_pos =
-      ThreadTable.find_def current.states_by_pos thread
+    let old_interferences_by_pos =
+      ThreadTable.find_def current.interferences_by_pos thread
         ByPosition.empty
     in
-    let new_states_by_pos =
+    let new_interferences_by_pos =
       let add (stmt, cs as pos) acc_map =
         let source = Pos.pos pos in
         let open TopBottom.Operators in
@@ -192,34 +240,45 @@ struct
                 Printer.pp_location (Cil_datatype.Stmt.loc stmt);
               `Bottom
           in
-          Dom.project shared_bases state
+          state
         in
         match state with
         | `Bottom -> acc_map (* no interference to add *)
         | `Top | `Value _ as state ->
+          let filter =
+            Inout_access.mk_filter
+              ~filter_base:(fun base -> Base.Hptset.mem base shared_bases)
+          in
+          let access = Inout_access.at ~filter (Position.of_local pos) in
           if Top.is_top state then
             Self.warning ~once:false ~source
               "Imprecise interference computed";
-          ByPosition.add_and_widen pos state acc_map
+          let interference : Interference.t = { state; access } in
+          ByPosition.add_and_widen pos interference acc_map
       in
-      Pos.Set.fold add concurrent_writes old_states_by_pos
+      Pos.Set.fold add concurrent_writes old_interferences_by_pos
     in
     (* Check for changes *)
-    let new_states_by_mutexes =
-      ByPosition.group_by_mutexes new_states_by_pos
-    and old_states_by_mutexes =
-      ThreadTable.find_opt current.states_by_mutexes thread
+    let new_interferences_by_mutexes =
+      ByPosition.group_by_mutexes new_interferences_by_pos
+    and old_interferences_by_mutexes =
+      ThreadTable.find_opt current.interferences_by_mutexes thread
     in
-    let same_interferences = match old_states_by_mutexes with
-      | None -> MutexesMap.is_empty new_states_by_mutexes
-      | Some old -> ByMutexes.equal new_states_by_mutexes old
+    let same_interferences = match old_interferences_by_mutexes with
+      | None -> MutexesMap.is_empty new_interferences_by_mutexes
+      | Some old ->
+        (* Project interferences on current shared bases to check equality so
+           that unshared memory do not contribute to the test. *)
+        ByMutexes.equal ~bases:shared_bases new_interferences_by_mutexes old
     in
     let same_shared_bases =
       Base.Hptset.equal current.shared_bases shared_bases
     in
     (* Update the record *)
-    ThreadTable.replace current.states_by_pos thread new_states_by_pos;
-    ThreadTable.replace current.states_by_mutexes thread new_states_by_mutexes;
+    ThreadTable.replace current.interferences_by_pos
+      thread new_interferences_by_pos;
+    ThreadTable.replace current.interferences_by_mutexes
+      thread new_interferences_by_mutexes;
     current.shared_bases <- shared_bases;
     (* Debug printing *)
     let pp_write fmt (stmt, _cs as pos)  =
@@ -238,15 +297,15 @@ struct
       Thread.pretty thread
       pp_write_set concurrent_writes
       Base.Hptset.pretty shared_bases
-      ByPosition.pretty new_states_by_pos
-      ByMutexes.pretty new_states_by_mutexes;
+      (ByPosition.pretty ~bases:shared_bases) new_interferences_by_pos
+      (ByMutexes.pretty ~bases:shared_bases) new_interferences_by_mutexes;
     if not (same_interferences && same_shared_bases)
     then Updated
     else NoChanges
 
   (* Interference injection *)
 
-  let applicable (state : state) : state or_top_bottom =
+  let applicable (state : state) : Interference.t or_bottom =
     let threads, mutexes = match Dom.get Mt_domain.Domain.key with
       (* Domain disabled, no information about threads and mutexes *)
       | None -> Mt_thread.Register.empty, Mutex.Set.empty
@@ -256,15 +315,15 @@ struct
         Mt_domain.Domain.threads mt_state,
         Mt_domain.Domain.mutexes mt_state |> Mt_mutex.Register.locked_mutexes
     in
-    let dom_join s1 s2 = `Value (Dom.join s1 s2) in
-    let add mutexes' state' acc_state =
-      if Mutex.Set.disjoint mutexes mutexes'
-      (* No mutexes in common, this interference is applicable *)
-      then TopBottom.join dom_join acc_state (state' :> _ or_top_bottom)
-      (* At least one mutex in common, this interfence cannot apply *)
-      else acc_state
+    let add mutexes' interference' acc_interference =
+      if Mutex.Set.disjoint mutexes mutexes' then
+        (* No mutexes in common, this interference is applicable *)
+        Bottom.join Interference.join acc_interference (`Value interference')
+      else
+        (* At least one mutex in common, this interfence cannot apply *)
+        acc_interference
     in
-    let add_thread thread state_map acc_state =
+    let add_thread thread interferences_map acc_interference =
       let is_current_thread = Thread.(equal thread (current ())) in
       let maybe_running =
         match Mt_thread.Register.find thread threads with
@@ -275,18 +334,27 @@ struct
       in
       let can_thread_interfere = maybe_running && not is_current_thread in
       if can_thread_interfere
-      then MutexesMap.fold add state_map acc_state
-      else acc_state
+      then MutexesMap.fold add interferences_map acc_interference
+      else acc_interference
     in
-    ThreadTable.fold add_thread current.states_by_mutexes `Bottom
+    ThreadTable.fold
+      add_thread
+      current.interferences_by_mutexes
+      `Bottom
 
   let inject state =
     match applicable state with
-    | `Top -> Dom.top
     | `Bottom -> state
-    | `Value interferences_state ->
+    | `Value { state = `Top; _ } -> Dom.top
+    | `Value { state = `Value interferences_state; access; _ } ->
+      let written_shared_bases =
+        let written_bases = Locations.Zone.get_bases access.write in
+        Base.SetLattice.(inject current.shared_bases
+                         |> inter written_bases
+                         |> project)
+      in
       let result =
-        Dom.overwrite current.shared_bases ~on:state ~by:interferences_state
+        Dom.overwrite written_shared_bases ~on:state ~by:interferences_state
       in
       Dom.join state result
 
