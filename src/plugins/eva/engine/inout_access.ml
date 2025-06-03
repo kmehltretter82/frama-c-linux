@@ -20,14 +20,19 @@
 (*                                                                        *)
 (**************************************************************************)
 
-type t = {
-  read : Locations.Zone.t;
-  write : Locations.Zone.t;
-}
+module Prototype = struct
+  type t = {
+    read : Locations.Zone.t;
+    write : Locations.Zone.t;
+  }
+  [@@deriving eq,ord]
+end
+include Prototype
 
 module Access = struct
   include Datatype.Make(struct
-      type nonrec t = t
+      include Datatype.Serializable_undefined
+      include Prototype
       let name = "Eva.Inout_access.Access"
       let reprs =
         List.fold_left
@@ -39,7 +44,6 @@ module Access = struct
                Locations.Zone.reprs)
           []
           Locations.Zone.reprs
-      include Datatype.Serializable_undefined
       let pretty fmt access =
         Format.fprintf fmt "@[{ read: %a;@ write: %a; }@]"
           Locations.Zone.pretty access.read
