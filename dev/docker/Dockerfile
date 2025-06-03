@@ -14,7 +14,10 @@ RUN sudo ln -f /usr/bin/opam-${OPAM} /usr/bin/opam && opam init --reinit -ni
 COPY reference-configuration.md /init/
 COPY install.sh /init/
 RUN sudo chmod +x /init/install.sh
+# grep needs to be explicitly installed in Alpine to replace busybox with
+# GNU grep, for option '-z'
 RUN /init/install.sh \
+  grep \
   time \
   wget
 
