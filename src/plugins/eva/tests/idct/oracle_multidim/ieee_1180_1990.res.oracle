@@ -213,7 +213,7 @@
 762d621
 <   S___fc_stdout[0..1] ∈ [--..--]
 766c625
-<   In these functions, 588 statements reached (out of 626): 93% coverage.
+<   In these functions, 588 statements reached (out of 626): 94% coverage.
 ---
 >   In these functions, 585 statements reached (out of 626): 93% coverage.
 769c628

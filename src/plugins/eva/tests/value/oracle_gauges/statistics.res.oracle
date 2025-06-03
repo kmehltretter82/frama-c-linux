@@ -1,21 +1,4 @@
-32,34c32,43
-< [eva] statistics.i:17: Reusing old results for call to g
-< [eva] statistics.i:17: Reusing old results for call to g
-< [eva] statistics.i:17: Reusing old results for call to g
----
-> [eva] computing for function g <- f <- main.
->   Called from statistics.i:17.
-> [eva] Recording results for g
-> [eva] Done for function g
-> [eva] computing for function g <- f <- main.
->   Called from statistics.i:17.
-> [eva] Recording results for g
-> [eva] Done for function g
-> [eva] computing for function g <- f <- main.
->   Called from statistics.i:17.
-> [eva] Recording results for g
-> [eva] Done for function g
-56,67d64
+56,67d55
 < [eva:summary] ====== ANALYSIS SUMMARY ======
 <   ----------------------------------------------------------------------------
 <   4 functions analyzed (out of 4): 100% coverage.

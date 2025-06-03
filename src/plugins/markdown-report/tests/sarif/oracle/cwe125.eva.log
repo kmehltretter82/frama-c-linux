@@ -20,7 +20,7 @@
 [eva:summary] ====== ANALYSIS SUMMARY ======
   ----------------------------------------------------------------------------
   2 functions analyzed (out of 2): 100% coverage.
-  In these functions, 8 statements reached (out of 9): 88% coverage.
+  In these functions, 8 statements reached (out of 9): 89% coverage.
   ----------------------------------------------------------------------------
   Some errors and warnings have been raised during the analysis:
     by the Eva analyzer:      0 errors    0 warnings
