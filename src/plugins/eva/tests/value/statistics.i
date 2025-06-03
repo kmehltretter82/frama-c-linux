@@ -1,10 +1,14 @@
 /* run.config
    LOG: @PTEST_NAME@.csv
-   STDOPT: +" -eva-statistics-file ./@PTEST_NAME@.csv"
+   STDOPT: +" -eva-statistics-file ./@PTEST_NAME@.csv" -eva-msg-key=summary -deterministic
 */
 
 /* This test only dump statistics in the default configuration
-   to avoid oracle duplication. */
+   to avoid oracle duplication.
+   
+   -eva-msg-key=summary is required to have summary statistics
+   -deterministic is required for "analysis-time" stat as it will vary
+*/
 
 void g(int i) {}
 
