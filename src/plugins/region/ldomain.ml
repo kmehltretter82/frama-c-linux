@@ -127,6 +127,15 @@ let get_field f d fd =
   | Record mf -> (try Fmap.find fd mf with Not_found -> Pure)
   | _ -> get f d
 
+let rec iter f = function
+  | Pure -> ()
+  | Dvar _ -> ()
+  | Ptr n -> f n
+  | Array d -> iter f d
+  | Record m -> Fmap.iter (fun _ -> iter f) m
+  | Logic (_,ds) -> List.iter (iter f) ds
+  | Arrow (ds,d) -> List.iter (iter f) ds ; iter f d
+
 (* -------------------------------------------------------------------------- *)
 (* ---  Transform type into domain                                        --- *)
 (* -------------------------------------------------------------------------- *)

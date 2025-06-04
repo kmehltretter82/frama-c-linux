@@ -53,6 +53,8 @@ val pointed : ('a -> 'a -> 'a) -> 'a t -> 'a option
 val get_field : ('a -> 'a -> 'a) -> 'a t -> fieldinfo -> 'a t
 val get_index : ('a -> 'a -> 'a) -> 'a t -> 'a t
 
+val iter : ('a -> unit) -> 'a t -> unit
+
 type 'a context
 
 val empty : 'a context
