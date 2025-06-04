@@ -1147,7 +1147,7 @@ pid_t __gen_e_acsl_waitpid(pid_t pid, int *stat_loc, int options)
     __gen_e_acsl_assert_data.pred_txt = "\\false";
     __gen_e_acsl_assert_data.file = "FRAMAC_SHARE/libc/stdlib.h";
     __gen_e_acsl_assert_data.fct = "exit";
-    __gen_e_acsl_assert_data.line = 556;
+    __gen_e_acsl_assert_data.line = 704;
     __gen_e_acsl_assert_data.name = "never_terminates";
     __e_acsl_assert(0,& __gen_e_acsl_assert_data);
     return;
@@ -1170,7 +1170,7 @@ pid_t __gen_e_acsl_waitpid(pid_t pid, int *stat_loc, int options)
     __gen_e_acsl_assert_data.pred_txt = "\\false";
     __gen_e_acsl_assert_data.file = "FRAMAC_SHARE/libc/stdlib.h";
     __gen_e_acsl_assert_data.fct = "abort";
-    __gen_e_acsl_assert_data.line = 542;
+    __gen_e_acsl_assert_data.line = 690;
     __gen_e_acsl_assert_data.name = "never_terminates";
     __e_acsl_assert(0,& __gen_e_acsl_assert_data);
     return;
