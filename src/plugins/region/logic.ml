@@ -141,19 +141,20 @@ let get_result env = match env.result with
 
 let add_term_lval (env:env) lv =
   let (lhost,loffset) = lv in
+  let lvh = (lhost,TNoOffset) in
   match lhost with
   | TResult ty ->
-    load env lv ty @@ addr_offset env ty (get_result env) loffset
+    load env lvh ty @@ addr_offset env ty (get_result env) loffset
   | TMem e ->
     let rh = pointer env (!rterm env e) in
     let te = Logic_typing.ctype_of_pointed e.term_type in
-    load env lv te @@ addr_offset env te rh loffset
+    load env lvh te @@ addr_offset env te rh loffset
   | TVar v ->
     begin match logic_var env v with
       | VAL d -> term_offset env d loffset
       | VAR x ->
         let rh = Memory.add_cvar env.map x in
-        load env lv x.vtype @@ addr_offset env x.vtype rh loffset
+        load env lvh x.vtype @@ addr_offset env x.vtype rh loffset
     end
 
 let add_addr_lval (env:env) (lhost,loffset) : node =
