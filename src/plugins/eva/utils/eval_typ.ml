@@ -61,7 +61,7 @@ let is_compatible_function ~typ_pointed ~typ_fun =
      - all pointers types are considered compatible
      - enums and integer types with the same signedness and size are equal *)
   let weak_compatible t1 t2 =
-    Cabs2cil.areCompatibleTypes t1 t2 ||
+    Cil.areCompatibleTypes t1 t2 ||
     match Ast_types.unroll_node t1, Ast_types.unroll_node t2 with
     | TVoid, TVoid -> true
     | TPtr _, TPtr _ -> true
@@ -74,7 +74,7 @@ let is_compatible_function ~typ_pointed ~typ_fun =
       Cil_datatype.Compinfo.equal ci1 ci2
     | _ -> false
   in
-  if Cabs2cil.areCompatibleTypes typ_fun typ_pointed then Compatible
+  if Cil.areCompatibleTypes typ_fun typ_pointed then Compatible
   else
     let continue =
       match Ast_types.unroll_node typ_pointed, Ast_types.unroll_node typ_fun with

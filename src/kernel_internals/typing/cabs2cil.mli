@@ -212,6 +212,8 @@ val areCompatibleTypes: Cil_types.typ -> Cil_types.typ -> bool
 
     @since Neon-20140301
 *)
+[@@deprecated "use Cil.areCompatibleTypes instead."]
+[@@migrate { repl = Cil.areCompatibleTypes }]
 
 val stmtFallsThrough: Cil_types.stmt -> bool
 (** returns [true] if the given statement can fall through the next
