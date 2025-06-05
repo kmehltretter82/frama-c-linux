@@ -1,3 +1,20 @@
+/*
+  THIS FILE IS USED AS AN EXAMPLE FOR THE WEBSITE. DO NOT FORGET TO UPDATE THE
+  EXAMPLES ON THE WEBSITE IF IT IS EDITED.
+  When updating the examples, copy the file in a new folder, remove comments
+  until the ---- line and then run the following command to generate the log
+  file and the HTML summary:
+
+  frama-c -mthread -eva-domains mthread -mt-shared-values 2 \
+    -mt-shared-accesses-synchronization \
+    -cpp-extra-args="-I$(frama-c-config -print-share-path)/mt" \
+    $(frama-c-config -print-share-path)/mt/mthread_pthread.c \
+    -eva-verbose 0 -eva-msg-key="-summary" -mt-extract html \
+    -eva-slevel 15 \
+    -mt-non-concurrent-accesses -mt-non-shared-accesses \
+    sharedvars.c > output.txt
+*/
+/* -------------------------------------------------------------------------- */
 /* This example tests the detection of global vars, and the options
    -mt-non-concurrent-accesses and -mt-non-shared-accesses. The variables
    whose name start by u (resp. s) are unshared (resp. shared) */
@@ -44,7 +61,7 @@ void *f31(void* x) {
 
 void *f3(void *_) {
   u3 = 3;
-  pthread_create( &jobs31 , NULL, f31, NULL);    
+  pthread_create( &jobs31 , NULL, f31, NULL);
   return NULL;
 }
 
