@@ -6,6 +6,7 @@
 [mt] Warning: Mthread is an experimental plugin and is still in development.
 [mt] ******* Starting mthread
 [mt] *** Computing value analysis for main thread
+[eva] Analyzing a complete application starting at main
 [mt] New thread: <main>, fun main
 [mt] late_start.c:31: New thread: job1, fun f1, parent <main>, args {0}
 [mt] late_start.c:32: New thread: job2, fun f2, parent <main>, args {0}
@@ -17,10 +18,11 @@
 [mt] Globals accessed by thread:
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread <main>
+    concurrent writes:
+    shared bases: {}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] ******* Starting to iterate
@@ -28,6 +30,8 @@
 [mt] *** Thread job1 has been created but not started. Skipping.
 [mt] *** Computing thread job2, iteration 1 (first iteration)
 [mt] * Computing value analysis for thread job2
+[eva] Analyzing a complete application starting at f2
+[eva] Initial state supplied by user
 [mt] late_start.c:26: Start thread job1
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
@@ -36,10 +40,11 @@
   job1: read by job2 at late_start.c:26 <- f2
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread job2
+    concurrent writes:
+    shared bases: {}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread job2 computed
@@ -57,16 +62,19 @@
 [mt] ***** Iteration 2
 [mt] *** Computing thread job1, iteration 2 (thread initial memory state changed)
 [mt] * Computing value analysis for thread job1
+[eva] Analyzing a complete application starting at f1
+[eva] Initial state supplied by user
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread job1
+    concurrent writes:
+    shared bases: {}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread job1 computed

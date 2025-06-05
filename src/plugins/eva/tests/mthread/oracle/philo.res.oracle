@@ -6,6 +6,7 @@
 [mt] Warning: Mthread is an experimental plugin and is still in development.
 [mt] ******* Starting mthread
 [mt] *** Computing value analysis for main thread
+[eva] Analyzing a complete application starting at main
 [mt] New thread: <main>, fun main
 [mt] philo.c:50: Initializing mutex locks[0]
 [mt] philo.c:50: Initializing mutex locks[1]
@@ -36,21 +37,25 @@
   queue: read by <main> at philo.c:58 <- main
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread <main>
+    concurrent writes:
+    shared bases: {}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] ******* Starting to iterate
 [mt] ***** Iteration 1
 [mt] *** Computing thread jobs[0], iteration 1 (first iteration)
 [mt] * Computing value analysis for thread jobs[0]
+[eva] Analyzing a complete application starting at job
+[eva] Initial state supplied by user
 [mt] philo.c:23: Lock locks[4]
 [mt] philo.c:24: Lock locks[1]
 [kernel:annot:missing-spec] philo.c:25: Warning: 
   Neither code nor specification for function random,
    generating default assigns. See -generated-spec-* options for more info
+[eva] using specification for function random
 [mt] philo.c:29: 
   Sending message on queue, content [0] ∈ {1}
                                     [1] ∈ UNINITIALIZED
@@ -74,17 +79,21 @@
   queue: read by jobs[0] at philo.c:29 <- aux :: philo.c:41 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread jobs[0]
+    concurrent writes:
+    shared bases: {}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[0] computed
 [mt] *** Computing thread jobs[1], iteration 1 (first iteration)
 [mt] * Computing value analysis for thread jobs[1]
+[eva] Analyzing a complete application starting at job
+[eva] Initial state supplied by user
 [mt] philo.c:23: Lock locks[0]
 [mt] philo.c:24: Lock locks[2]
+[eva] using specification for function random
 [mt] philo.c:31: Release locks[2]
 [mt] philo.c:32: Release locks[0]
 [mt] * Starting to save the state of the value analysis
@@ -103,17 +112,21 @@
       pthread_mutex_unlock :: philo.c:31 <- aux :: philo.c:41 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread jobs[1]
+    concurrent writes:
+    shared bases: {}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[1] computed
 [mt] *** Computing thread jobs[2], iteration 1 (first iteration)
 [mt] * Computing value analysis for thread jobs[2]
+[eva] Analyzing a complete application starting at job
+[eva] Initial state supplied by user
 [mt] philo.c:23: Lock locks[1]
 [mt] philo.c:24: Lock locks[3]
+[eva] using specification for function random
 [mt] philo.c:29: 
   Sending message on queue, content [0] ∈ {3}
                                     [1] ∈ UNINITIALIZED
@@ -137,17 +150,21 @@
   queue: read by jobs[2] at philo.c:29 <- aux :: philo.c:41 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread jobs[2]
+    concurrent writes:
+    shared bases: {}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[2] computed
 [mt] *** Computing thread jobs[3], iteration 1 (first iteration)
 [mt] * Computing value analysis for thread jobs[3]
+[eva] Analyzing a complete application starting at job
+[eva] Initial state supplied by user
 [mt] philo.c:23: Lock locks[2]
 [mt] philo.c:24: Lock locks[4]
+[eva] using specification for function random
 [mt] philo.c:29: 
   Sending message on queue, content [0] ∈ {4}
                                     [1] ∈ UNINITIALIZED
@@ -171,17 +188,21 @@
   queue: read by jobs[3] at philo.c:29 <- aux :: philo.c:41 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread jobs[3]
+    concurrent writes:
+    shared bases: {}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[3] computed
 [mt] *** Computing thread jobs[4], iteration 1 (first iteration)
 [mt] * Computing value analysis for thread jobs[4]
+[eva] Analyzing a complete application starting at job
+[eva] Initial state supplied by user
 [mt] philo.c:23: Lock locks[3]
 [mt] philo.c:24: Lock locks[0]
+[eva] using specification for function random
 [mt] philo.c:29: 
   Sending message on queue, content [0] ∈ {5}
                                     [1] ∈ UNINITIALIZED
@@ -205,10 +226,11 @@
   queue: read by jobs[4] at philo.c:29 <- aux :: philo.c:41 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread jobs[4]
+    concurrent writes:
+    shared bases: {}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[4] computed
@@ -226,6 +248,8 @@
 [mt] ***** Iteration 2
 [mt] *** Computing thread <main>, iteration 2 (new message received)
 [mt] * Computing value analysis for thread <main>
+[eva] Analyzing a complete application starting at main
+[eva] Initial state supplied by user
 [mt] Thread <main>, fun main
 [mt] philo.c:50: Initializing mutex locks[0]
 [mt] philo.c:50: Initializing mutex locks[1]
@@ -263,10 +287,11 @@
   queue: read by <main> at philo.c:58 <- main
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread <main>
+    concurrent writes:
+    shared bases: {}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
@@ -288,6 +313,8 @@
 [mt] ***** Iteration 3
 [mt] *** Computing thread <main>, iteration 3 (potential shared vars changed)
 [mt] * Computing value analysis for thread <main>
+[eva] Analyzing a complete application starting at main
+[eva] Initial state supplied by user
 [mt] Thread <main>, fun main
 [mt] philo.c:50: Initializing mutex locks[0]
 [mt] philo.c:50: Initializing mutex locks[1]
@@ -325,18 +352,22 @@
   queue: read by <main> at philo.c:58 <- main
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {end2}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread <main>
+    concurrent writes:
+    shared bases: {end2}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
 [mt] *** Computing thread jobs[0], iteration 3
     (potential shared vars changed, interferences changed)
 [mt] * Computing value analysis for thread jobs[0]
+[eva] Analyzing a complete application starting at job
+[eva] Initial state supplied by user
 [mt] philo.c:23: Lock locks[4]
 [mt] philo.c:24: Lock locks[1]
+[eva] using specification for function random
 [eva:interferences] philo.c:28: inject threads interferences at this point
 [mt] philo.c:29: 
   Sending message on queue, content [0] ∈ {1}
@@ -361,23 +392,27 @@
   queue: read by jobs[0] at philo.c:29 <- aux :: philo.c:41 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    end2 = 1; philo.c:28 <- aux :: philo.c:41 <- job
-  shared bases: {end2}
-  interferences by location:
-    philo.c:28:
-      # cvalue: end2 ∈ {1} 
-  interferences by mutexes:
-    { locks[1]; locks[4] }:
-      # cvalue: end2 ∈ {1}
+  Interferences from thread jobs[0]
+    concurrent writes:
+      end2 = 1; philo.c:28 <- aux :: philo.c:41 <- job
+    shared bases: {end2}
+    interferences by location:
+      philo.c:28:
+        # cvalue: end2 ∈ {1} 
+    interferences by mutexes:
+      { locks[1]; locks[4] }:
+        # cvalue: end2 ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[0] computed
 [mt] *** Computing thread jobs[1], iteration 3
     (potential shared vars changed, interferences changed)
 [mt] * Computing value analysis for thread jobs[1]
+[eva] Analyzing a complete application starting at job
+[eva] Initial state supplied by user
 [mt] philo.c:23: Lock locks[0]
 [mt] philo.c:24: Lock locks[2]
+[eva] using specification for function random
 [mt] philo.c:31: Release locks[2]
 [mt] philo.c:32: Release locks[0]
 [mt] * Starting to save the state of the value analysis
@@ -396,18 +431,22 @@
       pthread_mutex_unlock :: philo.c:31 <- aux :: philo.c:41 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {end2}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread jobs[1]
+    concurrent writes:
+    shared bases: {end2}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[1] computed
 [mt] *** Computing thread jobs[2], iteration 3
     (potential shared vars changed, interferences changed)
 [mt] * Computing value analysis for thread jobs[2]
+[eva] Analyzing a complete application starting at job
+[eva] Initial state supplied by user
 [mt] philo.c:23: Lock locks[1]
 [mt] philo.c:24: Lock locks[3]
+[eva] using specification for function random
 [eva:interferences] philo.c:28: inject threads interferences at this point
 [mt] philo.c:29: 
   Sending message on queue, content [0] ∈ {3}
@@ -432,23 +471,27 @@
   queue: read by jobs[2] at philo.c:29 <- aux :: philo.c:41 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    end2 = 1; philo.c:28 <- aux :: philo.c:41 <- job
-  shared bases: {end2}
-  interferences by location:
-    philo.c:28:
-      # cvalue: end2 ∈ {1} 
-  interferences by mutexes:
-    { locks[1]; locks[3] }:
-      # cvalue: end2 ∈ {1}
+  Interferences from thread jobs[2]
+    concurrent writes:
+      end2 = 1; philo.c:28 <- aux :: philo.c:41 <- job
+    shared bases: {end2}
+    interferences by location:
+      philo.c:28:
+        # cvalue: end2 ∈ {1} 
+    interferences by mutexes:
+      { locks[1]; locks[3] }:
+        # cvalue: end2 ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[2] computed
 [mt] *** Computing thread jobs[3], iteration 3
     (potential shared vars changed, interferences changed)
 [mt] * Computing value analysis for thread jobs[3]
+[eva] Analyzing a complete application starting at job
+[eva] Initial state supplied by user
 [mt] philo.c:23: Lock locks[2]
 [mt] philo.c:24: Lock locks[4]
+[eva] using specification for function random
 [eva:interferences] philo.c:28: inject threads interferences at this point
 [mt] philo.c:29: 
   Sending message on queue, content [0] ∈ {4}
@@ -473,23 +516,27 @@
   queue: read by jobs[3] at philo.c:29 <- aux :: philo.c:41 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    end2 = 1; philo.c:28 <- aux :: philo.c:41 <- job
-  shared bases: {end2}
-  interferences by location:
-    philo.c:28:
-      # cvalue: end2 ∈ {1} 
-  interferences by mutexes:
-    { locks[2]; locks[4] }:
-      # cvalue: end2 ∈ {1}
+  Interferences from thread jobs[3]
+    concurrent writes:
+      end2 = 1; philo.c:28 <- aux :: philo.c:41 <- job
+    shared bases: {end2}
+    interferences by location:
+      philo.c:28:
+        # cvalue: end2 ∈ {1} 
+    interferences by mutexes:
+      { locks[2]; locks[4] }:
+        # cvalue: end2 ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[3] computed
 [mt] *** Computing thread jobs[4], iteration 3
     (potential shared vars changed, interferences changed)
 [mt] * Computing value analysis for thread jobs[4]
+[eva] Analyzing a complete application starting at job
+[eva] Initial state supplied by user
 [mt] philo.c:23: Lock locks[3]
 [mt] philo.c:24: Lock locks[0]
+[eva] using specification for function random
 [eva:interferences] philo.c:28: inject threads interferences at this point
 [mt] philo.c:29: 
   Sending message on queue, content [0] ∈ {5}
@@ -514,15 +561,16 @@
   queue: read by jobs[4] at philo.c:29 <- aux :: philo.c:41 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    end2 = 1; philo.c:28 <- aux :: philo.c:41 <- job
-  shared bases: {end2}
-  interferences by location:
-    philo.c:28:
-      # cvalue: end2 ∈ {1} 
-  interferences by mutexes:
-    { locks[0]; locks[3] }:
-      # cvalue: end2 ∈ {1}
+  Interferences from thread jobs[4]
+    concurrent writes:
+      end2 = 1; philo.c:28 <- aux :: philo.c:41 <- job
+    shared bases: {end2}
+    interferences by location:
+      philo.c:28:
+        # cvalue: end2 ∈ {1} 
+    interferences by mutexes:
+      { locks[0]; locks[3] }:
+        # cvalue: end2 ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[4] computed
@@ -566,6 +614,8 @@
 [mt] *** Computing thread <main>, iteration 4
     (shared vars values changed, interferences changed)
 [mt] * Computing value analysis for thread <main>
+[eva] Analyzing a complete application starting at main
+[eva] Initial state supplied by user
 [mt] Thread <main>, fun main
 [mt] philo.c:50: Initializing mutex locks[0]
 [mt] philo.c:50: Initializing mutex locks[1]
@@ -608,17 +658,21 @@
   queue: read by <main> at philo.c:58 <- main
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {end2}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread <main>
+    concurrent writes:
+    shared bases: {end2}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
 [mt] *** Computing thread jobs[0], iteration 4 (interferences changed)
 [mt] * Computing value analysis for thread jobs[0]
+[eva] Analyzing a complete application starting at job
+[eva] Initial state supplied by user
 [mt] philo.c:23: Lock locks[4]
 [mt] philo.c:24: Lock locks[1]
+[eva] using specification for function random
 [eva:interferences] philo.c:28: inject threads interferences at this point
 [mt] philo.c:29: 
   Sending message on queue, content [0] ∈ {1}
@@ -643,23 +697,27 @@
   queue: read by jobs[0] at philo.c:29 <- aux :: philo.c:41 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    end2 = 1; philo.c:28 <- aux :: philo.c:41 <- job
-  shared bases: {end2}
-  interferences by location:
-    philo.c:28:
-      # cvalue: end2 ∈ {1} 
-  interferences by mutexes:
-    { locks[1]; locks[4] }:
-      # cvalue: end2 ∈ {1}
+  Interferences from thread jobs[0]
+    concurrent writes:
+      end2 = 1; philo.c:28 <- aux :: philo.c:41 <- job
+    shared bases: {end2}
+    interferences by location:
+      philo.c:28:
+        # cvalue: end2 ∈ {1} 
+    interferences by mutexes:
+      { locks[1]; locks[4] }:
+        # cvalue: end2 ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[0] computed
 [mt] *** Computing thread jobs[1], iteration 4
     (thread initial memory state changed, interferences changed)
 [mt] * Computing value analysis for thread jobs[1]
+[eva] Analyzing a complete application starting at job
+[eva] Initial state supplied by user
 [mt] philo.c:23: Lock locks[0]
 [mt] philo.c:24: Lock locks[2]
+[eva] using specification for function random
 [mt] philo.c:31: Release locks[2]
 [mt] philo.c:32: Release locks[0]
 [mt] * Starting to save the state of the value analysis
@@ -678,18 +736,22 @@
       pthread_mutex_unlock :: philo.c:31 <- aux :: philo.c:41 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {end2}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread jobs[1]
+    concurrent writes:
+    shared bases: {end2}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[1] computed
 [mt] *** Computing thread jobs[2], iteration 4
     (thread initial memory state changed, interferences changed)
 [mt] * Computing value analysis for thread jobs[2]
+[eva] Analyzing a complete application starting at job
+[eva] Initial state supplied by user
 [mt] philo.c:23: Lock locks[1]
 [mt] philo.c:24: Lock locks[3]
+[eva] using specification for function random
 [eva:interferences] philo.c:28: inject threads interferences at this point
 [mt] philo.c:29: 
   Sending message on queue, content [0] ∈ {3}
@@ -714,23 +776,27 @@
   queue: read by jobs[2] at philo.c:29 <- aux :: philo.c:41 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    end2 = 1; philo.c:28 <- aux :: philo.c:41 <- job
-  shared bases: {end2}
-  interferences by location:
-    philo.c:28:
-      # cvalue: end2 ∈ {1} 
-  interferences by mutexes:
-    { locks[1]; locks[3] }:
-      # cvalue: end2 ∈ {1}
+  Interferences from thread jobs[2]
+    concurrent writes:
+      end2 = 1; philo.c:28 <- aux :: philo.c:41 <- job
+    shared bases: {end2}
+    interferences by location:
+      philo.c:28:
+        # cvalue: end2 ∈ {1} 
+    interferences by mutexes:
+      { locks[1]; locks[3] }:
+        # cvalue: end2 ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[2] computed
 [mt] *** Computing thread jobs[3], iteration 4
     (thread initial memory state changed, interferences changed)
 [mt] * Computing value analysis for thread jobs[3]
+[eva] Analyzing a complete application starting at job
+[eva] Initial state supplied by user
 [mt] philo.c:23: Lock locks[2]
 [mt] philo.c:24: Lock locks[4]
+[eva] using specification for function random
 [eva:interferences] philo.c:28: inject threads interferences at this point
 [mt] philo.c:29: 
   Sending message on queue, content [0] ∈ {4}
@@ -755,23 +821,27 @@
   queue: read by jobs[3] at philo.c:29 <- aux :: philo.c:41 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    end2 = 1; philo.c:28 <- aux :: philo.c:41 <- job
-  shared bases: {end2}
-  interferences by location:
-    philo.c:28:
-      # cvalue: end2 ∈ {1} 
-  interferences by mutexes:
-    { locks[2]; locks[4] }:
-      # cvalue: end2 ∈ {1}
+  Interferences from thread jobs[3]
+    concurrent writes:
+      end2 = 1; philo.c:28 <- aux :: philo.c:41 <- job
+    shared bases: {end2}
+    interferences by location:
+      philo.c:28:
+        # cvalue: end2 ∈ {1} 
+    interferences by mutexes:
+      { locks[2]; locks[4] }:
+        # cvalue: end2 ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[3] computed
 [mt] *** Computing thread jobs[4], iteration 4
     (thread initial memory state changed)
 [mt] * Computing value analysis for thread jobs[4]
+[eva] Analyzing a complete application starting at job
+[eva] Initial state supplied by user
 [mt] philo.c:23: Lock locks[3]
 [mt] philo.c:24: Lock locks[0]
+[eva] using specification for function random
 [eva:interferences] philo.c:28: inject threads interferences at this point
 [mt] philo.c:29: 
   Sending message on queue, content [0] ∈ {5}
@@ -796,15 +866,16 @@
   queue: read by jobs[4] at philo.c:29 <- aux :: philo.c:41 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    end2 = 1; philo.c:28 <- aux :: philo.c:41 <- job
-  shared bases: {end2}
-  interferences by location:
-    philo.c:28:
-      # cvalue: end2 ∈ {1} 
-  interferences by mutexes:
-    { locks[0]; locks[3] }:
-      # cvalue: end2 ∈ {1}
+  Interferences from thread jobs[4]
+    concurrent writes:
+      end2 = 1; philo.c:28 <- aux :: philo.c:41 <- job
+    shared bases: {end2}
+    interferences by location:
+      philo.c:28:
+        # cvalue: end2 ∈ {1} 
+    interferences by mutexes:
+      { locks[0]; locks[3] }:
+        # cvalue: end2 ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[4] computed

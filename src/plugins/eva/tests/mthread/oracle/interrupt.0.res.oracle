@@ -19,10 +19,11 @@
 [mt] Globals accessed by thread:
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread <main>
+    concurrent writes:
+    shared bases: {}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] ******* Starting to iterate
@@ -43,10 +44,11 @@
     read by <main> at interrupt.c:19 <- main_interrupt_one_shot
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread <main>
+    concurrent writes:
+    shared bases: {}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
@@ -64,10 +66,11 @@
       interrupt_oneshot
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread <interrupt_handler interrupt_oneshot>
+    concurrent writes:
+    shared bases: {}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <interrupt_handler interrupt_oneshot> computed
@@ -102,10 +105,11 @@
     read by <main> at interrupt.c:19 <- main_interrupt_one_shot
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {interrupt_received}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread <main>
+    concurrent writes:
+    shared bases: {interrupt_received}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
@@ -124,15 +128,16 @@
       interrupt_oneshot
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    interrupt_received = 1; interrupt.c:9 <- interrupt_oneshot
-  shared bases: {interrupt_received}
-  interferences by location:
-    interrupt.c:9:
-      # cvalue: interrupt_received ∈ {1} 
-  interferences by mutexes:
-    {  }:
-      # cvalue: interrupt_received ∈ {1}
+  Interferences from thread <interrupt_handler interrupt_oneshot>
+    concurrent writes:
+      interrupt_received = 1; interrupt.c:9 <- interrupt_oneshot
+    shared bases: {interrupt_received}
+    interferences by location:
+      interrupt.c:9:
+        # cvalue: interrupt_received ∈ {1} 
+    interferences by mutexes:
+      {  }:
+        # cvalue: interrupt_received ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <interrupt_handler interrupt_oneshot> computed
@@ -197,15 +202,16 @@
     write by <main> at interrupt.c:21 <- main_interrupt_one_shot
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    interrupt_received = 0; interrupt.c:21 <- main_interrupt_one_shot
-  shared bases: {interrupt_received}
-  interferences by location:
-    interrupt.c:21:
-      # cvalue: interrupt_received ∈ {0; 1} 
-  interferences by mutexes:
-    {  }:
-      # cvalue: interrupt_received ∈ {0; 1}
+  Interferences from thread <main>
+    concurrent writes:
+      interrupt_received = 0; interrupt.c:21 <- main_interrupt_one_shot
+    shared bases: {interrupt_received}
+    interferences by location:
+      interrupt.c:21:
+        # cvalue: interrupt_received ∈ {0; 1} 
+    interferences by mutexes:
+      {  }:
+        # cvalue: interrupt_received ∈ {0; 1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
@@ -224,15 +230,16 @@
       interrupt_oneshot
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    interrupt_received = 1; interrupt.c:9 <- interrupt_oneshot
-  shared bases: {interrupt_received}
-  interferences by location:
-    interrupt.c:9:
-      # cvalue: interrupt_received ∈ {0; 1} 
-  interferences by mutexes:
-    {  }:
-      # cvalue: interrupt_received ∈ {0; 1}
+  Interferences from thread <interrupt_handler interrupt_oneshot>
+    concurrent writes:
+      interrupt_received = 1; interrupt.c:9 <- interrupt_oneshot
+    shared bases: {interrupt_received}
+    interferences by location:
+      interrupt.c:9:
+        # cvalue: interrupt_received ∈ {0; 1} 
+    interferences by mutexes:
+      {  }:
+        # cvalue: interrupt_received ∈ {0; 1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <interrupt_handler interrupt_oneshot> computed
@@ -305,15 +312,16 @@
     write by <main> at interrupt.c:21 <- main_interrupt_one_shot
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    interrupt_received = 0; interrupt.c:21 <- main_interrupt_one_shot
-  shared bases: {interrupt_received}
-  interferences by location:
-    interrupt.c:21:
-      # cvalue: interrupt_received ∈ {0; 1} 
-  interferences by mutexes:
-    {  }:
-      # cvalue: interrupt_received ∈ {0; 1}
+  Interferences from thread <main>
+    concurrent writes:
+      interrupt_received = 0; interrupt.c:21 <- main_interrupt_one_shot
+    shared bases: {interrupt_received}
+    interferences by location:
+      interrupt.c:21:
+        # cvalue: interrupt_received ∈ {0; 1} 
+    interferences by mutexes:
+      {  }:
+        # cvalue: interrupt_received ∈ {0; 1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed

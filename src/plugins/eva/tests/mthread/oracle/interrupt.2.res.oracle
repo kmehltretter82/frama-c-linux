@@ -26,10 +26,11 @@
 [mt] Globals accessed by thread:
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread <main>
+    concurrent writes:
+    shared bases: {}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] ******* Starting to iterate
@@ -52,10 +53,11 @@
     read by <main> at interrupt.c:50 <- main_interrupt_cross_incr
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread <main>
+    concurrent writes:
+    shared bases: {}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
@@ -76,10 +78,11 @@
       interrupt_cross_incr1
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread <interrupt_handler interrupt_cross_incr1>
+    concurrent writes:
+    shared bases: {}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <interrupt_handler interrupt_cross_incr1> computed
@@ -100,10 +103,11 @@
       interrupt_cross_incr2
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread <interrupt_handler interrupt_cross_incr2>
+    concurrent writes:
+    shared bases: {}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <interrupt_handler interrupt_cross_incr2> computed
@@ -140,10 +144,11 @@
     read by <main> at interrupt.c:50 <- main_interrupt_cross_incr
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {interrupt_received_a, interrupt_received_b}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread <main>
+    concurrent writes:
+    shared bases: {interrupt_received_a, interrupt_received_b}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
@@ -165,18 +170,19 @@
       interrupt_cross_incr1
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    interrupt_received_a = interrupt_received_b + 1; interrupt.c:41 <-
-      interrupt_cross_incr1
-  shared bases: {interrupt_received_a, interrupt_received_b}
-  interferences by location:
-    interrupt.c:41:
-      # cvalue: interrupt_received_a ∈ {1}
-                interrupt_received_b ∈ {0} 
-  interferences by mutexes:
-    {  }:
-      # cvalue: interrupt_received_a ∈ {1}
-                interrupt_received_b ∈ {0}
+  Interferences from thread <interrupt_handler interrupt_cross_incr1>
+    concurrent writes:
+      interrupt_received_a = interrupt_received_b + 1; interrupt.c:41 <-
+        interrupt_cross_incr1
+    shared bases: {interrupt_received_a, interrupt_received_b}
+    interferences by location:
+      interrupt.c:41:
+        # cvalue: interrupt_received_a ∈ {1}
+                  interrupt_received_b ∈ {0} 
+    interferences by mutexes:
+      {  }:
+        # cvalue: interrupt_received_a ∈ {1}
+                  interrupt_received_b ∈ {0}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <interrupt_handler interrupt_cross_incr1> computed
@@ -198,20 +204,21 @@
       interrupt_cross_incr2
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    interrupt_received_b = interrupt_received_a + 1; interrupt.c:45 <-
-      interrupt_cross_incr2
-  shared bases: {interrupt_received_a, interrupt_received_b}
-  interferences by location:
-    interrupt.c:45:
-      # cvalue:
-      interrupt_received_a ∈ {0; 1}
-      interrupt_received_b ∈ {0; 1; 2} 
-  interferences by mutexes:
-    {  }:
-      # cvalue:
-      interrupt_received_a ∈ {0; 1}
-      interrupt_received_b ∈ {0; 1; 2}
+  Interferences from thread <interrupt_handler interrupt_cross_incr2>
+    concurrent writes:
+      interrupt_received_b = interrupt_received_a + 1; interrupt.c:45 <-
+        interrupt_cross_incr2
+    shared bases: {interrupt_received_a, interrupt_received_b}
+    interferences by location:
+      interrupt.c:45:
+        # cvalue:
+        interrupt_received_a ∈ {0; 1}
+        interrupt_received_b ∈ {0; 1; 2} 
+    interferences by mutexes:
+      {  }:
+        # cvalue:
+        interrupt_received_a ∈ {0; 1}
+        interrupt_received_b ∈ {0; 1; 2}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <interrupt_handler interrupt_cross_incr2> computed
@@ -295,10 +302,11 @@
     read by <main> at interrupt.c:50 <- main_interrupt_cross_incr
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {interrupt_received_a, interrupt_received_b}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread <main>
+    concurrent writes:
+    shared bases: {interrupt_received_a, interrupt_received_b}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
@@ -320,20 +328,21 @@
       interrupt_cross_incr1
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    interrupt_received_a = interrupt_received_b + 1; interrupt.c:41 <-
-      interrupt_cross_incr1
-  shared bases: {interrupt_received_a, interrupt_received_b}
-  interferences by location:
-    interrupt.c:41:
-      # cvalue:
-      interrupt_received_a ∈ {0; 1; 2; 3}
-      interrupt_received_b ∈ {0; 1; 2} 
-  interferences by mutexes:
-    {  }:
-      # cvalue:
-      interrupt_received_a ∈ {0; 1; 2; 3}
-      interrupt_received_b ∈ {0; 1; 2}
+  Interferences from thread <interrupt_handler interrupt_cross_incr1>
+    concurrent writes:
+      interrupt_received_a = interrupt_received_b + 1; interrupt.c:41 <-
+        interrupt_cross_incr1
+    shared bases: {interrupt_received_a, interrupt_received_b}
+    interferences by location:
+      interrupt.c:41:
+        # cvalue:
+        interrupt_received_a ∈ {0; 1; 2; 3}
+        interrupt_received_b ∈ {0; 1; 2} 
+    interferences by mutexes:
+      {  }:
+        # cvalue:
+        interrupt_received_a ∈ {0; 1; 2; 3}
+        interrupt_received_b ∈ {0; 1; 2}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <interrupt_handler interrupt_cross_incr1> computed
@@ -355,20 +364,21 @@
       interrupt_cross_incr2
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    interrupt_received_b = interrupt_received_a + 1; interrupt.c:45 <-
-      interrupt_cross_incr2
-  shared bases: {interrupt_received_a, interrupt_received_b}
-  interferences by location:
-    interrupt.c:45:
-      # cvalue:
-      interrupt_received_a ∈ {0; 1; 2; 3}
-      interrupt_received_b ∈ {0; 1; 2; 3; 4} 
-  interferences by mutexes:
-    {  }:
-      # cvalue:
-      interrupt_received_a ∈ {0; 1; 2; 3}
-      interrupt_received_b ∈ {0; 1; 2; 3; 4}
+  Interferences from thread <interrupt_handler interrupt_cross_incr2>
+    concurrent writes:
+      interrupt_received_b = interrupt_received_a + 1; interrupt.c:45 <-
+        interrupt_cross_incr2
+    shared bases: {interrupt_received_a, interrupt_received_b}
+    interferences by location:
+      interrupt.c:45:
+        # cvalue:
+        interrupt_received_a ∈ {0; 1; 2; 3}
+        interrupt_received_b ∈ {0; 1; 2; 3; 4} 
+    interferences by mutexes:
+      {  }:
+        # cvalue:
+        interrupt_received_a ∈ {0; 1; 2; 3}
+        interrupt_received_b ∈ {0; 1; 2; 3; 4}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <interrupt_handler interrupt_cross_incr2> computed
@@ -451,10 +461,11 @@
     read by <main> at interrupt.c:50 <- main_interrupt_cross_incr
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {interrupt_received_a, interrupt_received_b}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread <main>
+    concurrent writes:
+    shared bases: {interrupt_received_a, interrupt_received_b}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
@@ -476,20 +487,21 @@
       interrupt_cross_incr1
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    interrupt_received_a = interrupt_received_b + 1; interrupt.c:41 <-
-      interrupt_cross_incr1
-  shared bases: {interrupt_received_a, interrupt_received_b}
-  interferences by location:
-    interrupt.c:41:
-      # cvalue:
-      interrupt_received_a ∈ {0; 1; 2; 3; 4; 5}
-      interrupt_received_b ∈ {0; 1; 2; 3; 4} 
-  interferences by mutexes:
-    {  }:
-      # cvalue:
-      interrupt_received_a ∈ {0; 1; 2; 3; 4; 5}
-      interrupt_received_b ∈ {0; 1; 2; 3; 4}
+  Interferences from thread <interrupt_handler interrupt_cross_incr1>
+    concurrent writes:
+      interrupt_received_a = interrupt_received_b + 1; interrupt.c:41 <-
+        interrupt_cross_incr1
+    shared bases: {interrupt_received_a, interrupt_received_b}
+    interferences by location:
+      interrupt.c:41:
+        # cvalue:
+        interrupt_received_a ∈ {0; 1; 2; 3; 4; 5}
+        interrupt_received_b ∈ {0; 1; 2; 3; 4} 
+    interferences by mutexes:
+      {  }:
+        # cvalue:
+        interrupt_received_a ∈ {0; 1; 2; 3; 4; 5}
+        interrupt_received_b ∈ {0; 1; 2; 3; 4}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <interrupt_handler interrupt_cross_incr1> computed
@@ -511,20 +523,21 @@
       interrupt_cross_incr2
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    interrupt_received_b = interrupt_received_a + 1; interrupt.c:45 <-
-      interrupt_cross_incr2
-  shared bases: {interrupt_received_a, interrupt_received_b}
-  interferences by location:
-    interrupt.c:45:
-      # cvalue:
-      interrupt_received_a ∈ {0; 1; 2; 3; 4; 5}
-      interrupt_received_b ∈ {0; 1; 2; 3; 4; 5; 6} 
-  interferences by mutexes:
-    {  }:
-      # cvalue:
-      interrupt_received_a ∈ {0; 1; 2; 3; 4; 5}
-      interrupt_received_b ∈ {0; 1; 2; 3; 4; 5; 6}
+  Interferences from thread <interrupt_handler interrupt_cross_incr2>
+    concurrent writes:
+      interrupt_received_b = interrupt_received_a + 1; interrupt.c:45 <-
+        interrupt_cross_incr2
+    shared bases: {interrupt_received_a, interrupt_received_b}
+    interferences by location:
+      interrupt.c:45:
+        # cvalue:
+        interrupt_received_a ∈ {0; 1; 2; 3; 4; 5}
+        interrupt_received_b ∈ {0; 1; 2; 3; 4; 5; 6} 
+    interferences by mutexes:
+      {  }:
+        # cvalue:
+        interrupt_received_a ∈ {0; 1; 2; 3; 4; 5}
+        interrupt_received_b ∈ {0; 1; 2; 3; 4; 5; 6}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <interrupt_handler interrupt_cross_incr2> computed
@@ -608,10 +621,11 @@
     read by <main> at interrupt.c:50 <- main_interrupt_cross_incr
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {interrupt_received_a, interrupt_received_b}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread <main>
+    concurrent writes:
+    shared bases: {interrupt_received_a, interrupt_received_b}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
@@ -633,20 +647,21 @@
       interrupt_cross_incr1
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    interrupt_received_a = interrupt_received_b + 1; interrupt.c:41 <-
-      interrupt_cross_incr1
-  shared bases: {interrupt_received_a, interrupt_received_b}
-  interferences by location:
-    interrupt.c:41:
-      # cvalue:
-      interrupt_received_a ∈ [0..2147483647]
-      interrupt_received_b ∈ [0..2147483647] 
-  interferences by mutexes:
-    {  }:
-      # cvalue:
-      interrupt_received_a ∈ [0..2147483647]
-      interrupt_received_b ∈ [0..2147483647]
+  Interferences from thread <interrupt_handler interrupt_cross_incr1>
+    concurrent writes:
+      interrupt_received_a = interrupt_received_b + 1; interrupt.c:41 <-
+        interrupt_cross_incr1
+    shared bases: {interrupt_received_a, interrupt_received_b}
+    interferences by location:
+      interrupt.c:41:
+        # cvalue:
+        interrupt_received_a ∈ [0..2147483647]
+        interrupt_received_b ∈ [0..2147483647] 
+    interferences by mutexes:
+      {  }:
+        # cvalue:
+        interrupt_received_a ∈ [0..2147483647]
+        interrupt_received_b ∈ [0..2147483647]
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <interrupt_handler interrupt_cross_incr1> computed
@@ -670,22 +685,23 @@
       interrupt_cross_incr2
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    /*@ assert Eva: signed_overflow: interrupt_received_a + 1 ≤ 2147483647;
-    */
-    interrupt_received_b = interrupt_received_a + 1; interrupt.c:45 <-
-      interrupt_cross_incr2
-  shared bases: {interrupt_received_a, interrupt_received_b}
-  interferences by location:
-    interrupt.c:45:
-      # cvalue:
-      interrupt_received_a ∈ [0..2147483647]
-      interrupt_received_b ∈ [0..2147483647] 
-  interferences by mutexes:
-    {  }:
-      # cvalue:
-      interrupt_received_a ∈ [0..2147483647]
-      interrupt_received_b ∈ [0..2147483647]
+  Interferences from thread <interrupt_handler interrupt_cross_incr2>
+    concurrent writes:
+      /*@ assert Eva: signed_overflow: interrupt_received_a + 1 ≤ 2147483647;
+      */
+      interrupt_received_b = interrupt_received_a + 1; interrupt.c:45 <-
+        interrupt_cross_incr2
+    shared bases: {interrupt_received_a, interrupt_received_b}
+    interferences by location:
+      interrupt.c:45:
+        # cvalue:
+        interrupt_received_a ∈ [0..2147483647]
+        interrupt_received_b ∈ [0..2147483647] 
+    interferences by mutexes:
+      {  }:
+        # cvalue:
+        interrupt_received_a ∈ [0..2147483647]
+        interrupt_received_b ∈ [0..2147483647]
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <interrupt_handler interrupt_cross_incr2> computed
@@ -768,10 +784,11 @@
     read by <main> at interrupt.c:50 <- main_interrupt_cross_incr
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {interrupt_received_a, interrupt_received_b}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread <main>
+    concurrent writes:
+    shared bases: {interrupt_received_a, interrupt_received_b}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
@@ -795,22 +812,23 @@
       interrupt_cross_incr1
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    /*@ assert Eva: signed_overflow: interrupt_received_b + 1 ≤ 2147483647;
-    */
-    interrupt_received_a = interrupt_received_b + 1; interrupt.c:41 <-
-      interrupt_cross_incr1
-  shared bases: {interrupt_received_a, interrupt_received_b}
-  interferences by location:
-    interrupt.c:41:
-      # cvalue:
-      interrupt_received_a ∈ [0..2147483647]
-      interrupt_received_b ∈ [0..2147483647] 
-  interferences by mutexes:
-    {  }:
-      # cvalue:
-      interrupt_received_a ∈ [0..2147483647]
-      interrupt_received_b ∈ [0..2147483647]
+  Interferences from thread <interrupt_handler interrupt_cross_incr1>
+    concurrent writes:
+      /*@ assert Eva: signed_overflow: interrupt_received_b + 1 ≤ 2147483647;
+      */
+      interrupt_received_a = interrupt_received_b + 1; interrupt.c:41 <-
+        interrupt_cross_incr1
+    shared bases: {interrupt_received_a, interrupt_received_b}
+    interferences by location:
+      interrupt.c:41:
+        # cvalue:
+        interrupt_received_a ∈ [0..2147483647]
+        interrupt_received_b ∈ [0..2147483647] 
+    interferences by mutexes:
+      {  }:
+        # cvalue:
+        interrupt_received_a ∈ [0..2147483647]
+        interrupt_received_b ∈ [0..2147483647]
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <interrupt_handler interrupt_cross_incr1> computed

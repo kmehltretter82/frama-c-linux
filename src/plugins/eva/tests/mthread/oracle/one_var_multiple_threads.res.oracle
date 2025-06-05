@@ -8,6 +8,7 @@
 [mt] Warning: Mthread is an experimental plugin and is still in development.
 [mt] ******* Starting mthread
 [mt] *** Computing value analysis for main thread
+[eva] Analyzing a complete application starting at main
 [mt] New thread: <main>, fun main
 [mt] one_var_multiple_threads.c:37: Initializing mutex lock1
 [mt] one_var_multiple_threads.c:38: Initializing mutex lock2
@@ -58,16 +59,19 @@
   nondet: read by <main> at one_var_multiple_threads.c:40 <- main
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread <main>
+    concurrent writes:
+    shared bases: {}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] ******* Starting to iterate
 [mt] ***** Iteration 1
 [mt] *** Computing thread jobs, iteration 1 (first iteration)
 [mt] * Computing value analysis for thread jobs
+[eva] Analyzing a complete application starting at f
+[eva] Initial state supplied by user
 [mt] one_var_multiple_threads.c:20: Lock lock1
 [mt] one_var_multiple_threads.c:23: Release lock1
 [mt] * Starting to save the state of the value analysis
@@ -87,15 +91,18 @@
       pthread_mutex_unlock :: one_var_multiple_threads.c:23 <- f
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread jobs
+    concurrent writes:
+    shared bases: {}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs computed
 [mt] *** Computing thread jobs, iteration 1 (first iteration)
 [mt] * Computing value analysis for thread jobs
+[eva] Analyzing a complete application starting at g
+[eva] Initial state supplied by user
 [mt] one_var_multiple_threads.c:28: Lock lock2
 [mt] one_var_multiple_threads.c:31: Release lock2
 [eva:alarm] one_var_multiple_threads.c:32: Warning: 
@@ -117,10 +124,11 @@
       pthread_mutex_unlock :: one_var_multiple_threads.c:31 <- g
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread jobs
+    concurrent writes:
+    shared bases: {}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs computed
@@ -142,6 +150,8 @@
 [mt] ***** Iteration 2
 [mt] *** Computing thread <main>, iteration 2 (potential shared vars changed)
 [mt] * Computing value analysis for thread <main>
+[eva] Analyzing a complete application starting at main
+[eva] Initial state supplied by user
 [mt] Thread <main>, fun main
 [mt] one_var_multiple_threads.c:37: Initializing mutex lock1
 [mt] one_var_multiple_threads.c:38: Initializing mutex lock2
@@ -183,16 +193,19 @@
   nondet: read by <main> at one_var_multiple_threads.c:40 <- main
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {s1, s2}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread <main>
+    concurrent writes:
+    shared bases: {s1, s2}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
 [mt] *** Computing thread jobs, iteration 2
     (potential shared vars changed, interferences changed)
 [mt] * Computing value analysis for thread jobs
+[eva] Analyzing a complete application starting at f
+[eva] Initial state supplied by user
 [mt] one_var_multiple_threads.c:20: Lock lock1
 [eva:interferences] one_var_multiple_threads.c:21: 
   inject threads interferences at this point
@@ -216,30 +229,33 @@
       pthread_mutex_unlock :: one_var_multiple_threads.c:23 <- f
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    (s1.data) ++; one_var_multiple_threads.c:21 <- f
-    s1.data2 += 3; one_var_multiple_threads.c:22 <- f
-  shared bases: {s1, s2}
-  interferences by location:
-    one_var_multiple_threads.c:21:
-      # cvalue: s1.data ∈ {1}
-                  .data2 ∈ {0}
-                s2 ∈ {0} 
-    one_var_multiple_threads.c:22:
-      # cvalue: s1.data ∈ {1}
-                  .data2 ∈ {3}
-                s2 ∈ {0} 
-  interferences by mutexes:
-    { lock1 }:
-      # cvalue: s1.data ∈ {1}
-                  .data2 ∈ {0; 3}
-                s2 ∈ {0}
+  Interferences from thread jobs
+    concurrent writes:
+      (s1.data) ++; one_var_multiple_threads.c:21 <- f
+      s1.data2 += 3; one_var_multiple_threads.c:22 <- f
+    shared bases: {s1, s2}
+    interferences by location:
+      one_var_multiple_threads.c:21:
+        # cvalue: s1.data ∈ {1}
+                    .data2 ∈ {0}
+                  s2 ∈ {0} 
+      one_var_multiple_threads.c:22:
+        # cvalue: s1.data ∈ {1}
+                    .data2 ∈ {3}
+                  s2 ∈ {0} 
+    interferences by mutexes:
+      { lock1 }:
+        # cvalue: s1.data ∈ {1}
+                    .data2 ∈ {0; 3}
+                  s2 ∈ {0}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs computed
 [mt] *** Computing thread jobs, iteration 2
     (potential shared vars changed, interferences changed)
 [mt] * Computing value analysis for thread jobs
+[eva] Analyzing a complete application starting at g
+[eva] Initial state supplied by user
 [mt] one_var_multiple_threads.c:28: Lock lock2
 [eva:interferences] one_var_multiple_threads.c:29: 
   inject threads interferences at this point
@@ -265,30 +281,31 @@
       pthread_mutex_unlock :: one_var_multiple_threads.c:31 <- g
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    (s2.data) ++; one_var_multiple_threads.c:29 <- g
-    s2.data2 += 3; one_var_multiple_threads.c:30 <- g
-  shared bases: {s1, s2}
-  interferences by location:
-    one_var_multiple_threads.c:29:
-      # cvalue:
-      s1.data ∈ {0; 1}
-        .data2 ∈ {0; 3}
-      s2.data ∈ {0; 1}
-        .data2 ∈ {0} 
-    one_var_multiple_threads.c:30:
-      # cvalue:
-      s1.data ∈ {0; 1}
-        .data2 ∈ {0; 3}
-      s2.data ∈ {0; 1}
-        .data2 ∈ {0; 3} 
-  interferences by mutexes:
-    { lock2 }:
-      # cvalue:
-      s1.data ∈ {0; 1}
-        .data2 ∈ {0; 3}
-      s2.data ∈ {0; 1}
-        .data2 ∈ {0; 3}
+  Interferences from thread jobs
+    concurrent writes:
+      (s2.data) ++; one_var_multiple_threads.c:29 <- g
+      s2.data2 += 3; one_var_multiple_threads.c:30 <- g
+    shared bases: {s1, s2}
+    interferences by location:
+      one_var_multiple_threads.c:29:
+        # cvalue:
+        s1.data ∈ {0; 1}
+          .data2 ∈ {0; 3}
+        s2.data ∈ {0; 1}
+          .data2 ∈ {0} 
+      one_var_multiple_threads.c:30:
+        # cvalue:
+        s1.data ∈ {0; 1}
+          .data2 ∈ {0; 3}
+        s2.data ∈ {0; 1}
+          .data2 ∈ {0; 3} 
+    interferences by mutexes:
+      { lock2 }:
+        # cvalue:
+        s1.data ∈ {0; 1}
+          .data2 ∈ {0; 3}
+        s2.data ∈ {0; 1}
+          .data2 ∈ {0; 3}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs computed
@@ -348,6 +365,8 @@
 [mt] *** Computing thread <main>, iteration 3
     (shared vars values changed, interferences changed)
 [mt] * Computing value analysis for thread <main>
+[eva] Analyzing a complete application starting at main
+[eva] Initial state supplied by user
 [mt] Thread <main>, fun main
 [mt] one_var_multiple_threads.c:37: Initializing mutex lock1
 [mt] one_var_multiple_threads.c:38: Initializing mutex lock2
@@ -401,16 +420,19 @@
   nondet: read by <main> at one_var_multiple_threads.c:40 <- main
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {s1, s2}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread <main>
+    concurrent writes:
+    shared bases: {s1, s2}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
 [mt] *** Computing thread jobs, iteration 3
     (thread initial memory state changed, interferences changed)
 [mt] * Computing value analysis for thread jobs
+[eva] Analyzing a complete application starting at f
+[eva] Initial state supplied by user
 [mt] one_var_multiple_threads.c:20: Lock lock1
 [eva:interferences] one_var_multiple_threads.c:21: 
   inject threads interferences at this point
@@ -434,36 +456,39 @@
       pthread_mutex_unlock :: one_var_multiple_threads.c:23 <- f
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    (s1.data) ++; one_var_multiple_threads.c:21 <- f
-    s1.data2 += 3; one_var_multiple_threads.c:22 <- f
-  shared bases: {s1, s2}
-  interferences by location:
-    one_var_multiple_threads.c:21:
-      # cvalue:
-      s1.data ∈ {0; 1; 2}
-        .data2 ∈ {0; 3}
-      s2.data ∈ {0; 1}
-        .data2 ∈ {0; 3} 
-    one_var_multiple_threads.c:22:
-      # cvalue:
-      s1.data ∈ {0; 1; 2}
-        .data2 ∈ {0; 3; 6}
-      s2.data ∈ {0; 1}
-        .data2 ∈ {0; 3} 
-  interferences by mutexes:
-    { lock1 }:
-      # cvalue:
-      s1.data ∈ {0; 1; 2}
-        .data2 ∈ {0; 3; 6}
-      s2.data ∈ {0; 1}
-        .data2 ∈ {0; 3}
+  Interferences from thread jobs
+    concurrent writes:
+      (s1.data) ++; one_var_multiple_threads.c:21 <- f
+      s1.data2 += 3; one_var_multiple_threads.c:22 <- f
+    shared bases: {s1, s2}
+    interferences by location:
+      one_var_multiple_threads.c:21:
+        # cvalue:
+        s1.data ∈ {0; 1; 2}
+          .data2 ∈ {0; 3}
+        s2.data ∈ {0; 1}
+          .data2 ∈ {0; 3} 
+      one_var_multiple_threads.c:22:
+        # cvalue:
+        s1.data ∈ {0; 1; 2}
+          .data2 ∈ {0; 3; 6}
+        s2.data ∈ {0; 1}
+          .data2 ∈ {0; 3} 
+    interferences by mutexes:
+      { lock1 }:
+        # cvalue:
+        s1.data ∈ {0; 1; 2}
+          .data2 ∈ {0; 3; 6}
+        s2.data ∈ {0; 1}
+          .data2 ∈ {0; 3}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs computed
 [mt] *** Computing thread jobs, iteration 3
     (thread initial memory state changed, interferences changed)
 [mt] * Computing value analysis for thread jobs
+[eva] Analyzing a complete application starting at g
+[eva] Initial state supplied by user
 [mt] one_var_multiple_threads.c:28: Lock lock2
 [eva:interferences] one_var_multiple_threads.c:29: 
   inject threads interferences at this point
@@ -489,30 +514,31 @@
       pthread_mutex_unlock :: one_var_multiple_threads.c:31 <- g
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    (s2.data) ++; one_var_multiple_threads.c:29 <- g
-    s2.data2 += 3; one_var_multiple_threads.c:30 <- g
-  shared bases: {s1, s2}
-  interferences by location:
-    one_var_multiple_threads.c:29:
-      # cvalue:
-      s1.data ∈ {0; 1; 2}
-        .data2 ∈ {0; 3; 6}
-      s2.data ∈ {0; 1; 2}
-        .data2 ∈ {0; 3} 
-    one_var_multiple_threads.c:30:
-      # cvalue:
-      s1.data ∈ {0; 1; 2}
-        .data2 ∈ {0; 3; 6}
-      s2.data ∈ {0; 1; 2}
-        .data2 ∈ {0; 3; 6} 
-  interferences by mutexes:
-    { lock2 }:
-      # cvalue:
-      s1.data ∈ {0; 1; 2}
-        .data2 ∈ {0; 3; 6}
-      s2.data ∈ {0; 1; 2}
-        .data2 ∈ {0; 3; 6}
+  Interferences from thread jobs
+    concurrent writes:
+      (s2.data) ++; one_var_multiple_threads.c:29 <- g
+      s2.data2 += 3; one_var_multiple_threads.c:30 <- g
+    shared bases: {s1, s2}
+    interferences by location:
+      one_var_multiple_threads.c:29:
+        # cvalue:
+        s1.data ∈ {0; 1; 2}
+          .data2 ∈ {0; 3; 6}
+        s2.data ∈ {0; 1; 2}
+          .data2 ∈ {0; 3} 
+      one_var_multiple_threads.c:30:
+        # cvalue:
+        s1.data ∈ {0; 1; 2}
+          .data2 ∈ {0; 3; 6}
+        s2.data ∈ {0; 1; 2}
+          .data2 ∈ {0; 3; 6} 
+    interferences by mutexes:
+      { lock2 }:
+        # cvalue:
+        s1.data ∈ {0; 1; 2}
+          .data2 ∈ {0; 3; 6}
+        s2.data ∈ {0; 1; 2}
+          .data2 ∈ {0; 3; 6}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs computed
@@ -569,6 +595,8 @@
 [mt] *** Computing thread <main>, iteration 4
     (shared vars values changed, interferences changed)
 [mt] * Computing value analysis for thread <main>
+[eva] Analyzing a complete application starting at main
+[eva] Initial state supplied by user
 [mt] Thread <main>, fun main
 [mt] one_var_multiple_threads.c:37: Initializing mutex lock1
 [mt] one_var_multiple_threads.c:38: Initializing mutex lock2
@@ -626,16 +654,19 @@
   nondet: read by <main> at one_var_multiple_threads.c:40 <- main
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {s1, s2}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread <main>
+    concurrent writes:
+    shared bases: {s1, s2}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
 [mt] *** Computing thread jobs, iteration 4
     (thread initial memory state changed, interferences changed)
 [mt] * Computing value analysis for thread jobs
+[eva] Analyzing a complete application starting at f
+[eva] Initial state supplied by user
 [mt] one_var_multiple_threads.c:20: Lock lock1
 [eva:interferences] one_var_multiple_threads.c:21: 
   inject threads interferences at this point
@@ -659,36 +690,39 @@
       pthread_mutex_unlock :: one_var_multiple_threads.c:23 <- f
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    (s1.data) ++; one_var_multiple_threads.c:21 <- f
-    s1.data2 += 3; one_var_multiple_threads.c:22 <- f
-  shared bases: {s1, s2}
-  interferences by location:
-    one_var_multiple_threads.c:21:
-      # cvalue:
-      s1.data ∈ {0; 1; 2; 3}
-        .data2 ∈ {0; 3; 6}
-      s2.data ∈ [0..2147483647]
-        .data2 ∈ [0..2147483646],0%3 
-    one_var_multiple_threads.c:22:
-      # cvalue:
-      s1.data ∈ {0; 1; 2; 3}
-        .data2 ∈ {0; 3; 6; 9}
-      s2.data ∈ [0..2147483647]
-        .data2 ∈ [0..2147483646],0%3 
-  interferences by mutexes:
-    { lock1 }:
-      # cvalue:
-      s1.data ∈ {0; 1; 2; 3}
-        .data2 ∈ {0; 3; 6; 9}
-      s2.data ∈ [0..2147483647]
-        .data2 ∈ [0..2147483646],0%3
+  Interferences from thread jobs
+    concurrent writes:
+      (s1.data) ++; one_var_multiple_threads.c:21 <- f
+      s1.data2 += 3; one_var_multiple_threads.c:22 <- f
+    shared bases: {s1, s2}
+    interferences by location:
+      one_var_multiple_threads.c:21:
+        # cvalue:
+        s1.data ∈ {0; 1; 2; 3}
+          .data2 ∈ {0; 3; 6}
+        s2.data ∈ [0..2147483647]
+          .data2 ∈ [0..2147483646],0%3 
+      one_var_multiple_threads.c:22:
+        # cvalue:
+        s1.data ∈ {0; 1; 2; 3}
+          .data2 ∈ {0; 3; 6; 9}
+        s2.data ∈ [0..2147483647]
+          .data2 ∈ [0..2147483646],0%3 
+    interferences by mutexes:
+      { lock1 }:
+        # cvalue:
+        s1.data ∈ {0; 1; 2; 3}
+          .data2 ∈ {0; 3; 6; 9}
+        s2.data ∈ [0..2147483647]
+          .data2 ∈ [0..2147483646],0%3
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs computed
 [mt] *** Computing thread jobs, iteration 4
     (thread initial memory state changed, interferences changed)
 [mt] * Computing value analysis for thread jobs
+[eva] Analyzing a complete application starting at g
+[eva] Initial state supplied by user
 [mt] one_var_multiple_threads.c:28: Lock lock2
 [eva:alarm] one_var_multiple_threads.c:29: Warning: 
   signed overflow. assert s2.data + 1 ≤ 2147483647;
@@ -718,32 +752,33 @@
       pthread_mutex_unlock :: one_var_multiple_threads.c:31 <- g
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    /*@ assert Eva: signed_overflow: s2.data + 1 ≤ 2147483647; */
-    (s2.data) ++; one_var_multiple_threads.c:29 <- g
-    /*@ assert Eva: signed_overflow: s2.data2 + 3 ≤ 2147483647; */
-    s2.data2 += 3; one_var_multiple_threads.c:30 <- g
-  shared bases: {s1, s2}
-  interferences by location:
-    one_var_multiple_threads.c:29:
-      # cvalue:
-      s1.data ∈ {0; 1; 2; 3}
-        .data2 ∈ {0; 3; 6; 9}
-      s2.data ∈ [0..2147483647]
-        .data2 ∈ [0..2147483646],0%3 
-    one_var_multiple_threads.c:30:
-      # cvalue:
-      s1.data ∈ {0; 1; 2; 3}
-        .data2 ∈ {0; 3; 6; 9}
-      s2.data ∈ [0..2147483647]
-        .data2 ∈ [0..2147483646],0%3 
-  interferences by mutexes:
-    { lock2 }:
-      # cvalue:
-      s1.data ∈ {0; 1; 2; 3}
-        .data2 ∈ {0; 3; 6; 9}
-      s2.data ∈ [0..2147483647]
-        .data2 ∈ [0..2147483646],0%3
+  Interferences from thread jobs
+    concurrent writes:
+      /*@ assert Eva: signed_overflow: s2.data + 1 ≤ 2147483647; */
+      (s2.data) ++; one_var_multiple_threads.c:29 <- g
+      /*@ assert Eva: signed_overflow: s2.data2 + 3 ≤ 2147483647; */
+      s2.data2 += 3; one_var_multiple_threads.c:30 <- g
+    shared bases: {s1, s2}
+    interferences by location:
+      one_var_multiple_threads.c:29:
+        # cvalue:
+        s1.data ∈ {0; 1; 2; 3}
+          .data2 ∈ {0; 3; 6; 9}
+        s2.data ∈ [0..2147483647]
+          .data2 ∈ [0..2147483646],0%3 
+      one_var_multiple_threads.c:30:
+        # cvalue:
+        s1.data ∈ {0; 1; 2; 3}
+          .data2 ∈ {0; 3; 6; 9}
+        s2.data ∈ [0..2147483647]
+          .data2 ∈ [0..2147483646],0%3 
+    interferences by mutexes:
+      { lock2 }:
+        # cvalue:
+        s1.data ∈ {0; 1; 2; 3}
+          .data2 ∈ {0; 3; 6; 9}
+        s2.data ∈ [0..2147483647]
+          .data2 ∈ [0..2147483646],0%3
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs computed
@@ -805,6 +840,8 @@
 [mt] *** Computing thread <main>, iteration 5
     (shared vars values changed, interferences changed)
 [mt] * Computing value analysis for thread <main>
+[eva] Analyzing a complete application starting at main
+[eva] Initial state supplied by user
 [mt] Thread <main>, fun main
 [mt] one_var_multiple_threads.c:37: Initializing mutex lock1
 [mt] one_var_multiple_threads.c:38: Initializing mutex lock2
@@ -864,16 +901,19 @@
   nondet: read by <main> at one_var_multiple_threads.c:40 <- main
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {s1, s2}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread <main>
+    concurrent writes:
+    shared bases: {s1, s2}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
 [mt] *** Computing thread jobs, iteration 5
     (thread initial memory state changed, interferences changed)
 [mt] * Computing value analysis for thread jobs
+[eva] Analyzing a complete application starting at f
+[eva] Initial state supplied by user
 [mt] one_var_multiple_threads.c:20: Lock lock1
 [eva:alarm] one_var_multiple_threads.c:21: Warning: 
   signed overflow. assert s1.data + 1 ≤ 2147483647;
@@ -901,38 +941,41 @@
       pthread_mutex_unlock :: one_var_multiple_threads.c:23 <- f
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    /*@ assert Eva: signed_overflow: s1.data + 1 ≤ 2147483647; */
-    (s1.data) ++; one_var_multiple_threads.c:21 <- f
-    /*@ assert Eva: signed_overflow: s1.data2 + 3 ≤ 2147483647; */
-    s1.data2 += 3; one_var_multiple_threads.c:22 <- f
-  shared bases: {s1, s2}
-  interferences by location:
-    one_var_multiple_threads.c:21:
-      # cvalue:
-      s1.data ∈ [0..2147483647]
-        .data2 ∈ [0..2147483646],0%3
-      s2.data ∈ [0..2147483647]
-        .data2 ∈ [0..2147483646],0%3 
-    one_var_multiple_threads.c:22:
-      # cvalue:
-      s1.data ∈ [0..2147483647]
-        .data2 ∈ [0..2147483646],0%3
-      s2.data ∈ [0..2147483647]
-        .data2 ∈ [0..2147483646],0%3 
-  interferences by mutexes:
-    { lock1 }:
-      # cvalue:
-      s1.data ∈ [0..2147483647]
-        .data2 ∈ [0..2147483646],0%3
-      s2.data ∈ [0..2147483647]
-        .data2 ∈ [0..2147483646],0%3
+  Interferences from thread jobs
+    concurrent writes:
+      /*@ assert Eva: signed_overflow: s1.data + 1 ≤ 2147483647; */
+      (s1.data) ++; one_var_multiple_threads.c:21 <- f
+      /*@ assert Eva: signed_overflow: s1.data2 + 3 ≤ 2147483647; */
+      s1.data2 += 3; one_var_multiple_threads.c:22 <- f
+    shared bases: {s1, s2}
+    interferences by location:
+      one_var_multiple_threads.c:21:
+        # cvalue:
+        s1.data ∈ [0..2147483647]
+          .data2 ∈ [0..2147483646],0%3
+        s2.data ∈ [0..2147483647]
+          .data2 ∈ [0..2147483646],0%3 
+      one_var_multiple_threads.c:22:
+        # cvalue:
+        s1.data ∈ [0..2147483647]
+          .data2 ∈ [0..2147483646],0%3
+        s2.data ∈ [0..2147483647]
+          .data2 ∈ [0..2147483646],0%3 
+    interferences by mutexes:
+      { lock1 }:
+        # cvalue:
+        s1.data ∈ [0..2147483647]
+          .data2 ∈ [0..2147483646],0%3
+        s2.data ∈ [0..2147483647]
+          .data2 ∈ [0..2147483646],0%3
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs computed
 [mt] *** Computing thread jobs, iteration 5
     (thread initial memory state changed, interferences changed)
 [mt] * Computing value analysis for thread jobs
+[eva] Analyzing a complete application starting at g
+[eva] Initial state supplied by user
 [mt] one_var_multiple_threads.c:28: Lock lock2
 [eva:alarm] one_var_multiple_threads.c:29: Warning: 
   signed overflow. assert s2.data + 1 ≤ 2147483647;
@@ -962,32 +1005,33 @@
       pthread_mutex_unlock :: one_var_multiple_threads.c:31 <- g
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    /*@ assert Eva: signed_overflow: s2.data + 1 ≤ 2147483647; */
-    (s2.data) ++; one_var_multiple_threads.c:29 <- g
-    /*@ assert Eva: signed_overflow: s2.data2 + 3 ≤ 2147483647; */
-    s2.data2 += 3; one_var_multiple_threads.c:30 <- g
-  shared bases: {s1, s2}
-  interferences by location:
-    one_var_multiple_threads.c:29:
-      # cvalue:
-      s1.data ∈ [0..2147483647]
-        .data2 ∈ [0..2147483646],0%3
-      s2.data ∈ [0..2147483647]
-        .data2 ∈ [0..2147483646],0%3 
-    one_var_multiple_threads.c:30:
-      # cvalue:
-      s1.data ∈ [0..2147483647]
-        .data2 ∈ [0..2147483646],0%3
-      s2.data ∈ [0..2147483647]
-        .data2 ∈ [0..2147483646],0%3 
-  interferences by mutexes:
-    { lock2 }:
-      # cvalue:
-      s1.data ∈ [0..2147483647]
-        .data2 ∈ [0..2147483646],0%3
-      s2.data ∈ [0..2147483647]
-        .data2 ∈ [0..2147483646],0%3
+  Interferences from thread jobs
+    concurrent writes:
+      /*@ assert Eva: signed_overflow: s2.data + 1 ≤ 2147483647; */
+      (s2.data) ++; one_var_multiple_threads.c:29 <- g
+      /*@ assert Eva: signed_overflow: s2.data2 + 3 ≤ 2147483647; */
+      s2.data2 += 3; one_var_multiple_threads.c:30 <- g
+    shared bases: {s1, s2}
+    interferences by location:
+      one_var_multiple_threads.c:29:
+        # cvalue:
+        s1.data ∈ [0..2147483647]
+          .data2 ∈ [0..2147483646],0%3
+        s2.data ∈ [0..2147483647]
+          .data2 ∈ [0..2147483646],0%3 
+      one_var_multiple_threads.c:30:
+        # cvalue:
+        s1.data ∈ [0..2147483647]
+          .data2 ∈ [0..2147483646],0%3
+        s2.data ∈ [0..2147483647]
+          .data2 ∈ [0..2147483646],0%3 
+    interferences by mutexes:
+      { lock2 }:
+        # cvalue:
+        s1.data ∈ [0..2147483647]
+          .data2 ∈ [0..2147483646],0%3
+        s2.data ∈ [0..2147483647]
+          .data2 ∈ [0..2147483646],0%3
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs computed
@@ -1052,6 +1096,8 @@
 [mt] ***** Iteration 6
 [mt] *** Computing thread <main>, iteration 6 (interferences changed)
 [mt] * Computing value analysis for thread <main>
+[eva] Analyzing a complete application starting at main
+[eva] Initial state supplied by user
 [mt] Thread <main>, fun main
 [mt] one_var_multiple_threads.c:37: Initializing mutex lock1
 [mt] one_var_multiple_threads.c:38: Initializing mutex lock2
@@ -1107,15 +1153,18 @@
   nondet: read by <main> at one_var_multiple_threads.c:40 <- main
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {s1, s2}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread <main>
+    concurrent writes:
+    shared bases: {s1, s2}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
 [mt] *** Computing thread jobs, iteration 6 (interferences changed)
 [mt] * Computing value analysis for thread jobs
+[eva] Analyzing a complete application starting at f
+[eva] Initial state supplied by user
 [mt] one_var_multiple_threads.c:20: Lock lock1
 [eva:alarm] one_var_multiple_threads.c:21: Warning: 
   signed overflow. assert s1.data + 1 ≤ 2147483647;
@@ -1143,32 +1192,33 @@
       pthread_mutex_unlock :: one_var_multiple_threads.c:23 <- f
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    /*@ assert Eva: signed_overflow: s1.data + 1 ≤ 2147483647; */
-    (s1.data) ++; one_var_multiple_threads.c:21 <- f
-    /*@ assert Eva: signed_overflow: s1.data2 + 3 ≤ 2147483647; */
-    s1.data2 += 3; one_var_multiple_threads.c:22 <- f
-  shared bases: {s1, s2}
-  interferences by location:
-    one_var_multiple_threads.c:21:
-      # cvalue:
-      s1.data ∈ [0..2147483647]
-        .data2 ∈ [0..2147483646],0%3
-      s2.data ∈ [0..2147483647]
-        .data2 ∈ [0..2147483646],0%3 
-    one_var_multiple_threads.c:22:
-      # cvalue:
-      s1.data ∈ [0..2147483647]
-        .data2 ∈ [0..2147483646],0%3
-      s2.data ∈ [0..2147483647]
-        .data2 ∈ [0..2147483646],0%3 
-  interferences by mutexes:
-    { lock1 }:
-      # cvalue:
-      s1.data ∈ [0..2147483647]
-        .data2 ∈ [0..2147483646],0%3
-      s2.data ∈ [0..2147483647]
-        .data2 ∈ [0..2147483646],0%3
+  Interferences from thread jobs
+    concurrent writes:
+      /*@ assert Eva: signed_overflow: s1.data + 1 ≤ 2147483647; */
+      (s1.data) ++; one_var_multiple_threads.c:21 <- f
+      /*@ assert Eva: signed_overflow: s1.data2 + 3 ≤ 2147483647; */
+      s1.data2 += 3; one_var_multiple_threads.c:22 <- f
+    shared bases: {s1, s2}
+    interferences by location:
+      one_var_multiple_threads.c:21:
+        # cvalue:
+        s1.data ∈ [0..2147483647]
+          .data2 ∈ [0..2147483646],0%3
+        s2.data ∈ [0..2147483647]
+          .data2 ∈ [0..2147483646],0%3 
+      one_var_multiple_threads.c:22:
+        # cvalue:
+        s1.data ∈ [0..2147483647]
+          .data2 ∈ [0..2147483646],0%3
+        s2.data ∈ [0..2147483647]
+          .data2 ∈ [0..2147483646],0%3 
+    interferences by mutexes:
+      { lock1 }:
+        # cvalue:
+        s1.data ∈ [0..2147483647]
+          .data2 ∈ [0..2147483646],0%3
+        s2.data ∈ [0..2147483647]
+          .data2 ∈ [0..2147483646],0%3
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs computed

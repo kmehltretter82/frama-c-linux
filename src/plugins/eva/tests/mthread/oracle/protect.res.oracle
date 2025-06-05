@@ -6,6 +6,7 @@
 [mt] Warning: Mthread is an experimental plugin and is still in development.
 [mt] ******* Starting mthread
 [mt] *** Computing value analysis for main thread
+[eva] Analyzing a complete application starting at main
 [mt] New thread: <main>, fun main
 [mt] protect.c:19: Initializing mutex lock1
 [mt] protect.c:20: Initializing mutex lock2
@@ -34,16 +35,19 @@
   t[3]: write by <main> at protect.c:29 <- main
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread <main>
+    concurrent writes:
+    shared bases: {}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] ******* Starting to iterate
 [mt] ***** Iteration 1
 [mt] *** Computing thread tjob, iteration 1 (first iteration)
 [mt] * Computing value analysis for thread tjob
+[eva] Analyzing a complete application starting at job
+[eva] Initial state supplied by user
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -51,10 +55,11 @@
   t[0..9]: read by tjob at protect.c:12 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread tjob
+    concurrent writes:
+    shared bases: {}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread tjob computed
@@ -76,6 +81,8 @@
 [mt] ***** Iteration 2
 [mt] *** Computing thread <main>, iteration 2 (potential shared vars changed)
 [mt] * Computing value analysis for thread <main>
+[eva] Analyzing a complete application starting at main
+[eva] Initial state supplied by user
 [mt] Thread <main>, fun main
 [mt] protect.c:19: Initializing mutex lock1
 [mt] protect.c:20: Initializing mutex lock2
@@ -103,38 +110,41 @@
   t[3]: write by <main> at protect.c:29 <- main
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    t[1] = 1; protect.c:25 <- main
-    t[3] = 4; protect.c:29 <- main
-  shared bases: {t}
-  interferences by location:
-    protect.c:25:
-      # cvalue: t[0] ∈ {0}
-                 [1] ∈ {1}
-                 [2..9] ∈ {0} 
-    protect.c:29:
-      # cvalue: t[0] ∈ {0}
-                 [1] ∈ {1}
-                 [2] ∈ {0}
-                 [3] ∈ {4}
-                 [4..9] ∈ {0} 
-  interferences by mutexes:
-    { lock1 }:
-      # cvalue: t[0] ∈ {0}
-                 [1] ∈ {1}
-                 [2..9] ∈ {0} 
-    { lock2 }:
-      # cvalue: t[0] ∈ {0}
-                 [1] ∈ {1}
-                 [2] ∈ {0}
-                 [3] ∈ {4}
-                 [4..9] ∈ {0}
+  Interferences from thread <main>
+    concurrent writes:
+      t[1] = 1; protect.c:25 <- main
+      t[3] = 4; protect.c:29 <- main
+    shared bases: {t}
+    interferences by location:
+      protect.c:25:
+        # cvalue: t[0] ∈ {0}
+                   [1] ∈ {1}
+                   [2..9] ∈ {0} 
+      protect.c:29:
+        # cvalue: t[0] ∈ {0}
+                   [1] ∈ {1}
+                   [2] ∈ {0}
+                   [3] ∈ {4}
+                   [4..9] ∈ {0} 
+    interferences by mutexes:
+      { lock1 }:
+        # cvalue: t[0] ∈ {0}
+                   [1] ∈ {1}
+                   [2..9] ∈ {0} 
+      { lock2 }:
+        # cvalue: t[0] ∈ {0}
+                   [1] ∈ {1}
+                   [2] ∈ {0}
+                   [3] ∈ {4}
+                   [4..9] ∈ {0}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
 [mt] *** Computing thread tjob, iteration 2
     (potential shared vars changed, interferences changed)
 [mt] * Computing value analysis for thread tjob
+[eva] Analyzing a complete application starting at job
+[eva] Initial state supplied by user
 [eva:interferences] protect.c:12: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
@@ -143,10 +153,11 @@
   t[0..9]: read by tjob at protect.c:12 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {t}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread tjob
+    concurrent writes:
+    shared bases: {t}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread tjob computed
@@ -185,6 +196,8 @@
 [mt] ***** Iteration 3
 [mt] *** Computing thread tjob, iteration 3 (shared vars values changed)
 [mt] * Computing value analysis for thread tjob
+[eva] Analyzing a complete application starting at job
+[eva] Initial state supplied by user
 [eva:interferences] protect.c:12: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
@@ -193,10 +206,11 @@
   t[0..9]: read by tjob at protect.c:12 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {t}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread tjob
+    concurrent writes:
+    shared bases: {t}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread tjob computed

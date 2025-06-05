@@ -6,6 +6,7 @@
 [mt] Warning: Mthread is an experimental plugin and is still in development.
 [mt] ******* Starting mthread
 [mt] *** Computing value analysis for main thread
+[eva] Analyzing a complete application starting at main
 [mt] New thread: <main>, fun main
 [mt] thread_arg.c:33: Initializing mutex locks[0]
 [mt] thread_arg.c:33: Initializing mutex locks[1]
@@ -33,17 +34,21 @@
   vars[0..1]: read by <main> at thread_arg.c:45 <- main
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread <main>
+    concurrent writes:
+    shared bases: {}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] ******* Starting to iterate
 [mt] ***** Iteration 1
 [mt] *** Computing thread jobs[0], iteration 1 (first iteration)
 [mt] * Computing value analysis for thread jobs[0]
+[eva] Analyzing a complete application starting at job
+[eva] Initial state supplied by user
 [mt] thread_arg.c:25: Lock locks[0]
+[eva] using specification for function Frama_C_interval
 [mt] thread_arg.c:27: Release locks[0]
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
@@ -62,16 +67,20 @@
     write by jobs[0] at thread_arg.c:26 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread jobs[0]
+    concurrent writes:
+    shared bases: {}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[0] computed
 [mt] *** Computing thread jobs[1], iteration 1 (first iteration)
 [mt] * Computing value analysis for thread jobs[1]
+[eva] Analyzing a complete application starting at job
+[eva] Initial state supplied by user
 [mt] thread_arg.c:25: Lock locks[1]
+[eva] using specification for function Frama_C_interval
 [mt] thread_arg.c:27: Release locks[1]
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
@@ -90,10 +99,11 @@
     write by jobs[1] at thread_arg.c:26 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread jobs[1]
+    concurrent writes:
+    shared bases: {}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[1] computed
@@ -115,6 +125,8 @@
 [mt] ***** Iteration 2
 [mt] *** Computing thread <main>, iteration 2 (potential shared vars changed)
 [mt] * Computing value analysis for thread <main>
+[eva] Analyzing a complete application starting at main
+[eva] Initial state supplied by user
 [mt] Thread <main>, fun main
 [mt] thread_arg.c:33: Initializing mutex locks[0]
 [mt] thread_arg.c:33: Initializing mutex locks[1]
@@ -141,17 +153,21 @@
   vars[0..1]: read by <main> at thread_arg.c:45 <- main
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {Frama_C_entropy_source, vars}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread <main>
+    concurrent writes:
+    shared bases: {Frama_C_entropy_source, vars}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
 [mt] *** Computing thread jobs[0], iteration 2
     (potential shared vars changed, interferences changed)
 [mt] * Computing value analysis for thread jobs[0]
+[eva] Analyzing a complete application starting at job
+[eva] Initial state supplied by user
 [mt] thread_arg.c:25: Lock locks[0]
+[eva] using specification for function Frama_C_interval
 [eva:interferences] thread_arg.c:26: inject threads interferences at this point
 [eva:interferences] thread_arg.c:26: inject threads interferences at this point
 [mt] thread_arg.c:27: Release locks[0]
@@ -172,32 +188,36 @@
     write by jobs[0] at thread_arg.c:26 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    tmp = Frama_C_interval(0,10); thread_arg.c:26 <- job
-    vars[i] += tmp; thread_arg.c:26 <- job
-  shared bases: {Frama_C_entropy_source, vars}
-  interferences by location:
-    thread_arg.c:26:
-      # cvalue: Frama_C_entropy_source ∈ [--..--]
-                vars[0..1] ∈ {0} 
-    thread_arg.c:26:
-      # cvalue:
-      Frama_C_entropy_source ∈ [--..--]
-      vars[0] ∈ [0..10]
-          [1] ∈ {0} 
-  interferences by mutexes:
-    { locks[0] }:
-      # cvalue:
-      Frama_C_entropy_source ∈ [--..--]
-      vars[0] ∈ [0..10]
-          [1] ∈ {0}
+  Interferences from thread jobs[0]
+    concurrent writes:
+      tmp = Frama_C_interval(0,10); thread_arg.c:26 <- job
+      vars[i] += tmp; thread_arg.c:26 <- job
+    shared bases: {Frama_C_entropy_source, vars}
+    interferences by location:
+      thread_arg.c:26:
+        # cvalue: Frama_C_entropy_source ∈ [--..--]
+                  vars[0..1] ∈ {0} 
+      thread_arg.c:26:
+        # cvalue:
+        Frama_C_entropy_source ∈ [--..--]
+        vars[0] ∈ [0..10]
+            [1] ∈ {0} 
+    interferences by mutexes:
+      { locks[0] }:
+        # cvalue:
+        Frama_C_entropy_source ∈ [--..--]
+        vars[0] ∈ [0..10]
+            [1] ∈ {0}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[0] computed
 [mt] *** Computing thread jobs[1], iteration 2
     (potential shared vars changed, interferences changed)
 [mt] * Computing value analysis for thread jobs[1]
+[eva] Analyzing a complete application starting at job
+[eva] Initial state supplied by user
 [mt] thread_arg.c:25: Lock locks[1]
+[eva] using specification for function Frama_C_interval
 [eva:interferences] thread_arg.c:26: inject threads interferences at this point
 [eva:interferences] thread_arg.c:26: inject threads interferences at this point
 [mt] thread_arg.c:27: Release locks[1]
@@ -218,23 +238,24 @@
     write by jobs[1] at thread_arg.c:26 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    tmp = Frama_C_interval(0,10); thread_arg.c:26 <- job
-    vars[i] += tmp; thread_arg.c:26 <- job
-  shared bases: {Frama_C_entropy_source, vars}
-  interferences by location:
-    thread_arg.c:26:
-      # cvalue:
-      Frama_C_entropy_source ∈ [--..--]
-      vars[0] ∈ [0..10]
-          [1] ∈ {0} 
-    thread_arg.c:26:
-      # cvalue: Frama_C_entropy_source ∈ [--..--]
-                vars[0..1] ∈ [0..10] 
-  interferences by mutexes:
-    { locks[1] }:
-      # cvalue: Frama_C_entropy_source ∈ [--..--]
-                vars[0..1] ∈ [0..10]
+  Interferences from thread jobs[1]
+    concurrent writes:
+      tmp = Frama_C_interval(0,10); thread_arg.c:26 <- job
+      vars[i] += tmp; thread_arg.c:26 <- job
+    shared bases: {Frama_C_entropy_source, vars}
+    interferences by location:
+      thread_arg.c:26:
+        # cvalue:
+        Frama_C_entropy_source ∈ [--..--]
+        vars[0] ∈ [0..10]
+            [1] ∈ {0} 
+      thread_arg.c:26:
+        # cvalue: Frama_C_entropy_source ∈ [--..--]
+                  vars[0..1] ∈ [0..10] 
+    interferences by mutexes:
+      { locks[1] }:
+        # cvalue: Frama_C_entropy_source ∈ [--..--]
+                  vars[0..1] ∈ [0..10]
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[1] computed
@@ -299,6 +320,8 @@
 [mt] *** Computing thread <main>, iteration 3
     (shared vars values changed, interferences changed)
 [mt] * Computing value analysis for thread <main>
+[eva] Analyzing a complete application starting at main
+[eva] Initial state supplied by user
 [mt] Thread <main>, fun main
 [mt] thread_arg.c:33: Initializing mutex locks[0]
 [mt] thread_arg.c:33: Initializing mutex locks[1]
@@ -327,17 +350,21 @@
   vars[0..1]: read by <main> at thread_arg.c:45 <- main
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {Frama_C_entropy_source, vars}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread <main>
+    concurrent writes:
+    shared bases: {Frama_C_entropy_source, vars}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
 [mt] *** Computing thread jobs[0], iteration 3
     (shared vars values changed, interferences changed)
 [mt] * Computing value analysis for thread jobs[0]
+[eva] Analyzing a complete application starting at job
+[eva] Initial state supplied by user
 [mt] thread_arg.c:25: Lock locks[0]
+[eva] using specification for function Frama_C_interval
 [eva:interferences] thread_arg.c:26: inject threads interferences at this point
 [eva:interferences] thread_arg.c:26: inject threads interferences at this point
 [mt] thread_arg.c:27: Release locks[0]
@@ -358,25 +385,26 @@
     write by jobs[0] at thread_arg.c:26 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    tmp = Frama_C_interval(0,10); thread_arg.c:26 <- job
-    vars[i] += tmp; thread_arg.c:26 <- job
-  shared bases: {Frama_C_entropy_source, vars}
-  interferences by location:
-    thread_arg.c:26:
-      # cvalue: Frama_C_entropy_source ∈ [--..--]
-                vars[0..1] ∈ [0..10] 
-    thread_arg.c:26:
-      # cvalue:
-      Frama_C_entropy_source ∈ [--..--]
-      vars[0] ∈ [0..20]
-          [1] ∈ [0..10] 
-  interferences by mutexes:
-    { locks[0] }:
-      # cvalue:
-      Frama_C_entropy_source ∈ [--..--]
-      vars[0] ∈ [0..20]
-          [1] ∈ [0..10]
+  Interferences from thread jobs[0]
+    concurrent writes:
+      tmp = Frama_C_interval(0,10); thread_arg.c:26 <- job
+      vars[i] += tmp; thread_arg.c:26 <- job
+    shared bases: {Frama_C_entropy_source, vars}
+    interferences by location:
+      thread_arg.c:26:
+        # cvalue: Frama_C_entropy_source ∈ [--..--]
+                  vars[0..1] ∈ [0..10] 
+      thread_arg.c:26:
+        # cvalue:
+        Frama_C_entropy_source ∈ [--..--]
+        vars[0] ∈ [0..20]
+            [1] ∈ [0..10] 
+    interferences by mutexes:
+      { locks[0] }:
+        # cvalue:
+        Frama_C_entropy_source ∈ [--..--]
+        vars[0] ∈ [0..20]
+            [1] ∈ [0..10]
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[0] computed
@@ -384,7 +412,10 @@
     (shared vars values changed, thread initial memory state changed,
      interferences changed)
 [mt] * Computing value analysis for thread jobs[1]
+[eva] Analyzing a complete application starting at job
+[eva] Initial state supplied by user
 [mt] thread_arg.c:25: Lock locks[1]
+[eva] using specification for function Frama_C_interval
 [eva:interferences] thread_arg.c:26: inject threads interferences at this point
 [eva:interferences] thread_arg.c:26: inject threads interferences at this point
 [mt] thread_arg.c:27: Release locks[1]
@@ -405,23 +436,24 @@
     write by jobs[1] at thread_arg.c:26 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    tmp = Frama_C_interval(0,10); thread_arg.c:26 <- job
-    vars[i] += tmp; thread_arg.c:26 <- job
-  shared bases: {Frama_C_entropy_source, vars}
-  interferences by location:
-    thread_arg.c:26:
-      # cvalue:
-      Frama_C_entropy_source ∈ [--..--]
-      vars[0] ∈ [0..20]
-          [1] ∈ [0..10] 
-    thread_arg.c:26:
-      # cvalue: Frama_C_entropy_source ∈ [--..--]
-                vars[0..1] ∈ [0..20] 
-  interferences by mutexes:
-    { locks[1] }:
-      # cvalue: Frama_C_entropy_source ∈ [--..--]
-                vars[0..1] ∈ [0..20]
+  Interferences from thread jobs[1]
+    concurrent writes:
+      tmp = Frama_C_interval(0,10); thread_arg.c:26 <- job
+      vars[i] += tmp; thread_arg.c:26 <- job
+    shared bases: {Frama_C_entropy_source, vars}
+    interferences by location:
+      thread_arg.c:26:
+        # cvalue:
+        Frama_C_entropy_source ∈ [--..--]
+        vars[0] ∈ [0..20]
+            [1] ∈ [0..10] 
+      thread_arg.c:26:
+        # cvalue: Frama_C_entropy_source ∈ [--..--]
+                  vars[0..1] ∈ [0..20] 
+    interferences by mutexes:
+      { locks[1] }:
+        # cvalue: Frama_C_entropy_source ∈ [--..--]
+                  vars[0..1] ∈ [0..20]
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[1] computed
@@ -482,6 +514,8 @@
 [mt] *** Computing thread <main>, iteration 4
     (shared vars values changed, interferences changed)
 [mt] * Computing value analysis for thread <main>
+[eva] Analyzing a complete application starting at main
+[eva] Initial state supplied by user
 [mt] Thread <main>, fun main
 [mt] thread_arg.c:33: Initializing mutex locks[0]
 [mt] thread_arg.c:33: Initializing mutex locks[1]
@@ -512,17 +546,21 @@
   vars[0..1]: read by <main> at thread_arg.c:45 <- main
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {Frama_C_entropy_source, vars}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread <main>
+    concurrent writes:
+    shared bases: {Frama_C_entropy_source, vars}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
 [mt] *** Computing thread jobs[0], iteration 4
     (shared vars values changed, interferences changed)
 [mt] * Computing value analysis for thread jobs[0]
+[eva] Analyzing a complete application starting at job
+[eva] Initial state supplied by user
 [mt] thread_arg.c:25: Lock locks[0]
+[eva] using specification for function Frama_C_interval
 [eva:interferences] thread_arg.c:26: inject threads interferences at this point
 [eva:interferences] thread_arg.c:26: inject threads interferences at this point
 [mt] thread_arg.c:27: Release locks[0]
@@ -543,27 +581,28 @@
     write by jobs[0] at thread_arg.c:26 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    tmp = Frama_C_interval(0,10); thread_arg.c:26 <- job
-    vars[i] += tmp; thread_arg.c:26 <- job
-  shared bases: {Frama_C_entropy_source, vars}
-  interferences by location:
-    thread_arg.c:26:
-      # cvalue:
-      Frama_C_entropy_source ∈ [--..--]
-      vars[0] ∈ [0..20]
-          [1] ∈ [0..2147483647] 
-    thread_arg.c:26:
-      # cvalue:
-      Frama_C_entropy_source ∈ [--..--]
-      vars[0] ∈ [0..30]
-          [1] ∈ [0..2147483647] 
-  interferences by mutexes:
-    { locks[0] }:
-      # cvalue:
-      Frama_C_entropy_source ∈ [--..--]
-      vars[0] ∈ [0..30]
-          [1] ∈ [0..2147483647]
+  Interferences from thread jobs[0]
+    concurrent writes:
+      tmp = Frama_C_interval(0,10); thread_arg.c:26 <- job
+      vars[i] += tmp; thread_arg.c:26 <- job
+    shared bases: {Frama_C_entropy_source, vars}
+    interferences by location:
+      thread_arg.c:26:
+        # cvalue:
+        Frama_C_entropy_source ∈ [--..--]
+        vars[0] ∈ [0..20]
+            [1] ∈ [0..2147483647] 
+      thread_arg.c:26:
+        # cvalue:
+        Frama_C_entropy_source ∈ [--..--]
+        vars[0] ∈ [0..30]
+            [1] ∈ [0..2147483647] 
+    interferences by mutexes:
+      { locks[0] }:
+        # cvalue:
+        Frama_C_entropy_source ∈ [--..--]
+        vars[0] ∈ [0..30]
+            [1] ∈ [0..2147483647]
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[0] computed
@@ -571,7 +610,10 @@
     (shared vars values changed, thread initial memory state changed,
      interferences changed)
 [mt] * Computing value analysis for thread jobs[1]
+[eva] Analyzing a complete application starting at job
+[eva] Initial state supplied by user
 [mt] thread_arg.c:25: Lock locks[1]
+[eva] using specification for function Frama_C_interval
 [eva:interferences] thread_arg.c:26: inject threads interferences at this point
 [eva:alarm] thread_arg.c:26: Warning: 
   signed overflow.
@@ -596,25 +638,26 @@
     write by jobs[1] at thread_arg.c:26 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    tmp = Frama_C_interval(0,10); thread_arg.c:26 <- job
-    /*@ assert Eva: signed_overflow: vars[i] + tmp ≤ 2147483647; */
-    vars[i] += tmp; thread_arg.c:26 <- job
-  shared bases: {Frama_C_entropy_source, vars}
-  interferences by location:
-    thread_arg.c:26:
-      # cvalue:
-      Frama_C_entropy_source ∈ [--..--]
-      vars[0..1] ∈ [0..2147483647] 
-    thread_arg.c:26:
-      # cvalue:
-      Frama_C_entropy_source ∈ [--..--]
-      vars[0..1] ∈ [0..2147483647] 
-  interferences by mutexes:
-    { locks[1] }:
-      # cvalue:
-      Frama_C_entropy_source ∈ [--..--]
-      vars[0..1] ∈ [0..2147483647]
+  Interferences from thread jobs[1]
+    concurrent writes:
+      tmp = Frama_C_interval(0,10); thread_arg.c:26 <- job
+      /*@ assert Eva: signed_overflow: vars[i] + tmp ≤ 2147483647; */
+      vars[i] += tmp; thread_arg.c:26 <- job
+    shared bases: {Frama_C_entropy_source, vars}
+    interferences by location:
+      thread_arg.c:26:
+        # cvalue:
+        Frama_C_entropy_source ∈ [--..--]
+        vars[0..1] ∈ [0..2147483647] 
+      thread_arg.c:26:
+        # cvalue:
+        Frama_C_entropy_source ∈ [--..--]
+        vars[0..1] ∈ [0..2147483647] 
+    interferences by mutexes:
+      { locks[1] }:
+        # cvalue:
+        Frama_C_entropy_source ∈ [--..--]
+        vars[0..1] ∈ [0..2147483647]
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[1] computed
@@ -674,6 +717,8 @@
 [mt] ***** Iteration 5
 [mt] *** Computing thread <main>, iteration 5 (interferences changed)
 [mt] * Computing value analysis for thread <main>
+[eva] Analyzing a complete application starting at main
+[eva] Initial state supplied by user
 [mt] Thread <main>, fun main
 [mt] thread_arg.c:33: Initializing mutex locks[0]
 [mt] thread_arg.c:33: Initializing mutex locks[1]
@@ -703,16 +748,20 @@
   vars[0..1]: read by <main> at thread_arg.c:45 <- main
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {Frama_C_entropy_source, vars}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread <main>
+    concurrent writes:
+    shared bases: {Frama_C_entropy_source, vars}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
 [mt] *** Computing thread jobs[0], iteration 5 (interferences changed)
 [mt] * Computing value analysis for thread jobs[0]
+[eva] Analyzing a complete application starting at job
+[eva] Initial state supplied by user
 [mt] thread_arg.c:25: Lock locks[0]
+[eva] using specification for function Frama_C_interval
 [eva:interferences] thread_arg.c:26: inject threads interferences at this point
 [eva:alarm] thread_arg.c:26: Warning: 
   signed overflow.
@@ -737,31 +786,35 @@
     write by jobs[0] at thread_arg.c:26 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    tmp = Frama_C_interval(0,10); thread_arg.c:26 <- job
-    /*@ assert Eva: signed_overflow: vars[i] + tmp ≤ 2147483647; */
-    vars[i] += tmp; thread_arg.c:26 <- job
-  shared bases: {Frama_C_entropy_source, vars}
-  interferences by location:
-    thread_arg.c:26:
-      # cvalue:
-      Frama_C_entropy_source ∈ [--..--]
-      vars[0..1] ∈ [0..2147483647] 
-    thread_arg.c:26:
-      # cvalue:
-      Frama_C_entropy_source ∈ [--..--]
-      vars[0..1] ∈ [0..2147483647] 
-  interferences by mutexes:
-    { locks[0] }:
-      # cvalue:
-      Frama_C_entropy_source ∈ [--..--]
-      vars[0..1] ∈ [0..2147483647]
+  Interferences from thread jobs[0]
+    concurrent writes:
+      tmp = Frama_C_interval(0,10); thread_arg.c:26 <- job
+      /*@ assert Eva: signed_overflow: vars[i] + tmp ≤ 2147483647; */
+      vars[i] += tmp; thread_arg.c:26 <- job
+    shared bases: {Frama_C_entropy_source, vars}
+    interferences by location:
+      thread_arg.c:26:
+        # cvalue:
+        Frama_C_entropy_source ∈ [--..--]
+        vars[0..1] ∈ [0..2147483647] 
+      thread_arg.c:26:
+        # cvalue:
+        Frama_C_entropy_source ∈ [--..--]
+        vars[0..1] ∈ [0..2147483647] 
+    interferences by mutexes:
+      { locks[0] }:
+        # cvalue:
+        Frama_C_entropy_source ∈ [--..--]
+        vars[0..1] ∈ [0..2147483647]
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[0] computed
 [mt] *** Computing thread jobs[1], iteration 5 (interferences changed)
 [mt] * Computing value analysis for thread jobs[1]
+[eva] Analyzing a complete application starting at job
+[eva] Initial state supplied by user
 [mt] thread_arg.c:25: Lock locks[1]
+[eva] using specification for function Frama_C_interval
 [eva:interferences] thread_arg.c:26: inject threads interferences at this point
 [eva:alarm] thread_arg.c:26: Warning: 
   signed overflow.
@@ -786,25 +839,26 @@
     write by jobs[1] at thread_arg.c:26 <- job
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    tmp = Frama_C_interval(0,10); thread_arg.c:26 <- job
-    /*@ assert Eva: signed_overflow: vars[i] + tmp ≤ 2147483647; */
-    vars[i] += tmp; thread_arg.c:26 <- job
-  shared bases: {Frama_C_entropy_source, vars}
-  interferences by location:
-    thread_arg.c:26:
-      # cvalue:
-      Frama_C_entropy_source ∈ [--..--]
-      vars[0..1] ∈ [0..2147483647] 
-    thread_arg.c:26:
-      # cvalue:
-      Frama_C_entropy_source ∈ [--..--]
-      vars[0..1] ∈ [0..2147483647] 
-  interferences by mutexes:
-    { locks[1] }:
-      # cvalue:
-      Frama_C_entropy_source ∈ [--..--]
-      vars[0..1] ∈ [0..2147483647]
+  Interferences from thread jobs[1]
+    concurrent writes:
+      tmp = Frama_C_interval(0,10); thread_arg.c:26 <- job
+      /*@ assert Eva: signed_overflow: vars[i] + tmp ≤ 2147483647; */
+      vars[i] += tmp; thread_arg.c:26 <- job
+    shared bases: {Frama_C_entropy_source, vars}
+    interferences by location:
+      thread_arg.c:26:
+        # cvalue:
+        Frama_C_entropy_source ∈ [--..--]
+        vars[0..1] ∈ [0..2147483647] 
+      thread_arg.c:26:
+        # cvalue:
+        Frama_C_entropy_source ∈ [--..--]
+        vars[0..1] ∈ [0..2147483647] 
+    interferences by mutexes:
+      { locks[1] }:
+        # cvalue:
+        Frama_C_entropy_source ∈ [--..--]
+        vars[0..1] ∈ [0..2147483647]
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[1] computed
@@ -864,6 +918,8 @@
 [mt] ***** Iteration 6
 [mt] *** Computing thread <main>, iteration 6 (interferences changed)
 [mt] * Computing value analysis for thread <main>
+[eva] Analyzing a complete application starting at main
+[eva] Initial state supplied by user
 [mt] Thread <main>, fun main
 [mt] thread_arg.c:33: Initializing mutex locks[0]
 [mt] thread_arg.c:33: Initializing mutex locks[1]
@@ -893,10 +949,11 @@
   vars[0..1]: read by <main> at thread_arg.c:45 <- main
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {Frama_C_entropy_source, vars}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread <main>
+    concurrent writes:
+    shared bases: {Frama_C_entropy_source, vars}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed

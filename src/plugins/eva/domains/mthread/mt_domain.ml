@@ -109,7 +109,7 @@ module State = struct
 
   include Datatype.Make_with_collections (struct
       type t = state
-      let name = "Mthread.state"
+      let name = "mthread"
       let reprs = [ default ; top ]
 
       let copy state =
@@ -212,28 +212,6 @@ end
 
 
 
-module Cache = struct
-  open Datatype_with_Lattice
-  include Cil_datatype.Stmt.Hashtbl
-  let cache : State.t t = create 17
-  let copy () = copy cache
-  let reset () = reset cache
-  let merge l r =
-    let threads = Mt_thread.Register.narrow l.threads r.threads in
-    let mutexes = Mt_mutex.Register.narrow l.mutexes r.mutexes in
-    let standard = Value.join l.return.standard r.return.standard in
-    let return = { standard } in
-    let results = BuiltinsResults.join l.results r.results in
-    { threads ; mutexes ; return ; results }
-  let add stmt state =
-    match find_opt cache stmt with
-    | None -> add cache stmt state
-    | Some state' -> replace cache stmt (merge state state')
-  let save stmt state = add stmt state ; `Value state
-end
-
-
-
 module Queries = struct
   let extract_expr ~oracle:_ _ _ _ = `Value (Value.top, None), Alarmset.all
   let extract_lval ~oracle:_ _ state lval _ =
@@ -271,15 +249,14 @@ module Transfer = struct
   let assign kinstr { lval } _exp assigned _valuation state =
     match kinstr with
     | Cil_types.Kglobal -> `Value state
-    | Kstmt stmt ->
+    | Kstmt _stmt ->
       let { return } = reset state in
       let return = assign_return lval (Eval.value_assigned assigned) return in
-      let state = { state with return } in
-      Cache.save stmt state
+      `Value { state with return }
 
-  let assume stmt _ _ _ state = Cache.save stmt state
+  let assume _ _ _ _ state = `Value state
 
-  let start_call stmt _ _ _ state = Cache.save stmt state
+  let start_call _ _ _ _ state = `Value state
 
   let map_non_bottom f xs =
     let module E = struct exception Bottom end in
@@ -289,7 +266,7 @@ module Transfer = struct
   let finalize_call stmt call _ ~pre:_ ~post =
     let name = Kernel_function.get_name call.kf in
     match find_builtin name with
-    | None -> Cache.save stmt post
+    | None -> `Value post
     | Some f ->
       let open Lattice_bounds.Bottom.Operators in
       let extract_arg arg = arg.concrete, arg.avalue in
@@ -299,7 +276,7 @@ module Transfer = struct
       let error = (post, Value.top) in
       let (state, ret) = f post stmt params |> Result.log ~error in
       let results = BuiltinsResults.write call.return ret state.results in
-      { state with results } |> Cache.save stmt
+      `Value { state with results }
 
 end
 
@@ -354,15 +331,6 @@ module Domain = struct
   (* This domain only infers information about the current analyzed thread:
      it must not inject interferences from other threads. *)
   let overwrite _bases ~on ~by:_ = on
-
-  let post_analysis _ =
-    let pp stmt state =
-      Self.debug ~dkey:log_category
-        "At statement %a@.  @[%a@]@."
-        Cil_datatype.Stmt.pretty stmt
-        State.pretty state
-    in
-    Cache.iter pp Cache.cache
 
   let enter_scope kind vars state =
     let state = reset state in

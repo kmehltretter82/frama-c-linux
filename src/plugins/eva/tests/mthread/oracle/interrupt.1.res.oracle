@@ -19,10 +19,11 @@
 [mt] Globals accessed by thread:
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread <main>
+    concurrent writes:
+    shared bases: {}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] ******* Starting to iterate
@@ -41,10 +42,11 @@
   interrupt_received: read by <main> at interrupt.c:33 <- main_interrupt_incr
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread <main>
+    concurrent writes:
+    shared bases: {}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
@@ -66,10 +68,11 @@
       interrupt_incr
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread <interrupt_handler interrupt_incr>
+    concurrent writes:
+    shared bases: {}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <interrupt_handler interrupt_incr> computed
@@ -102,10 +105,11 @@
   interrupt_received: read by <main> at interrupt.c:33 <- main_interrupt_incr
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {interrupt_received}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread <main>
+    concurrent writes:
+    shared bases: {interrupt_received}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
@@ -128,16 +132,18 @@
       interrupt_incr
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-    /*@ assert Eva: signed_overflow: interrupt_received + 1 ≤ 2147483647; */
-    interrupt_received ++; interrupt.c:29 <- interrupt_incr
-  shared bases: {interrupt_received}
-  interferences by location:
-    interrupt.c:29:
-      # cvalue: interrupt_received ∈ [1..2147483647] 
-  interferences by mutexes:
-    {  }:
-      # cvalue: interrupt_received ∈ [1..2147483647]
+  Interferences from thread <interrupt_handler interrupt_incr>
+    concurrent writes:
+      /*@ assert Eva: signed_overflow: interrupt_received + 1 ≤ 2147483647;
+      */
+      interrupt_received ++; interrupt.c:29 <- interrupt_incr
+    shared bases: {interrupt_received}
+    interferences by location:
+      interrupt.c:29:
+        # cvalue: interrupt_received ∈ [1..2147483647] 
+    interferences by mutexes:
+      {  }:
+        # cvalue: interrupt_received ∈ [1..2147483647]
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <interrupt_handler interrupt_incr> computed
@@ -189,10 +195,11 @@
   interrupt_received: read by <main> at interrupt.c:33 <- main_interrupt_incr
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes:
-  shared bases: {interrupt_received}
-  interferences by location:
-  interferences by mutexes:
+  Interferences from thread <main>
+    concurrent writes:
+    shared bases: {interrupt_received}
+    interferences by location:
+    interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed

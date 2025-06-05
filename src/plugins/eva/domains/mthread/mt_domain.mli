@@ -33,10 +33,4 @@ module Domain : sig
   val empty : unit -> t
 end
 
-module Cache : sig
-  type 'a t = 'a Cil_datatype.Stmt.Hashtbl.t
-  val copy : unit -> Domain.t t
-  val reset : unit -> unit
-end
-
 val domain : Abstractions.Domain.registered
