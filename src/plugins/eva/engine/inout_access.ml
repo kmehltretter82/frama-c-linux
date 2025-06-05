@@ -77,14 +77,14 @@ end
 
 module Cache : sig
   (** Get read/written memory zones for an analysis location. *)
-  val get : Analysis_location.t -> t
+  val get : Position.t -> t
 
   (** Change read/written memory zones for an analysis location. I.e. get the
       value, apply the given function then set the result. *)
-  val change : Analysis_location.t -> (t -> t) -> unit
+  val change : Position.t -> (t -> t) -> unit
 
   (** Fold over all analysis locations and their read/written memory zones. *)
-  val fold : (Analysis_location.t -> t -> 'acc -> 'acc) -> 'acc -> 'acc
+  val fold : (Position.t -> t -> 'acc -> 'acc) -> 'acc -> 'acc
 
   (** Dump the internal state regarding the read/written memory zones. Before
       dumping the memory zones are [filter]ed. *)
@@ -94,7 +94,7 @@ end = struct
       location. *)
   module State =
     State_builder.Hashtbl
-      (Analysis_location.Hashtbl)
+      (Position.Hashtbl)
       (Access)
       (struct
         let name = "Eva.Inout_access.Cache.State"
@@ -102,33 +102,33 @@ end = struct
         let dependencies = [ Self.state ]
       end)
 
-  let get (aloc : Analysis_location.t) =
-    try State.find aloc
+  let get (pos : Position.t) =
+    try State.find pos
     with Not_found -> Access.bottom
 
-  let change aloc f =
-    State.replace aloc (f (get aloc))
+  let change pos f =
+    State.replace pos (f (get pos))
 
   let fold = State.fold
 
   let dump ~filter fmt =
     State.iter
-      (fun aloc access ->
+      (fun pos access ->
          let access = filter access in
          if not @@ Access.is_bottom access then
            Format.fprintf fmt ">>> %a: %a"
-             Analysis_location.pretty aloc
+             Position.pretty pos
              Access.pretty access)
 end
 
-let register_read aloc zone =
-  Cache.change aloc (Access.add_read zone)
+let register_read pos zone =
+  Cache.change pos (Access.add_read zone)
 
-let register_write aloc zone =
-  Cache.change aloc (Access.add_write zone)
+let register_write pos zone =
+  Cache.change pos (Access.add_write zone)
 
-let register aloc access =
-  Cache.change aloc (Access.join access)
+let register pos access =
+  Cache.change pos (Access.join access)
 
 let mk_filter ~filter_base =
   let filter_zone = Locations.Zone.filter_base filter_base in
@@ -137,21 +137,21 @@ let mk_filter ~filter_base =
        write = filter_zone access.write })
 let keep_globals_only = mk_filter ~filter_base:Base.is_global
 
-let at ?(filter=Fun.id) aloc = Cache.get aloc |> filter
+let at ?(filter=Fun.id) pos = Cache.get pos |> filter
 
 let fold ?(filter=Fun.id) f init_acc =
   Cache.fold
-    (fun aloc access acc ->
+    (fun pos access acc ->
        let access = filter access in
        if not (Access.is_bottom access) then
-         f aloc access acc
+         f pos access acc
        else
          acc)
     init_acc
 
 let iter ?(filter=Fun.id) f =
   fold ~filter
-    (fun aloc access () -> f aloc access)
+    (fun pos access () -> f pos access)
     ()
 
 let dump ?(filter=Fun.id) fmt =

@@ -29,7 +29,7 @@ module Make
   : sig
 
     val treat_statement_assigns:
-      aloc:Analysis_location.t -> assigns -> Engine.Dom.t -> Engine.Dom.t
+      pos:Position.t -> assigns -> Engine.Dom.t -> Engine.Dom.t
 
     val compute_using_specification:
       warn:bool ->

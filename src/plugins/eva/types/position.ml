@@ -108,39 +108,39 @@ let is_local = function
   | RootCall _ | GlobalInit _ -> false
   | Local _ -> true
 
-let loc aloc =
-  match aloc with
+let loc pos =
+  match pos with
   | RootCall kf -> Kernel_function.get_location kf
   | GlobalInit vi -> vi.vdecl
   | Local l -> Local.loc l
 
-let pos aloc =
-  loc aloc |> fst
+let pos pos =
+  loc pos |> fst
 
-let kinstr aloc =
-  match aloc with
+let kinstr pos =
+  match pos with
   | RootCall _ | GlobalInit _ -> Cil_types.Kglobal
   | Local l -> Local.kinstr l
 
-let stmt aloc =
-  match aloc with
+let stmt pos =
+  match pos with
   | RootCall _ | GlobalInit _ -> None
   | Local (stmt,_cs) -> Some stmt
 
-let kf aloc =
-  match aloc with
+let kf pos =
+  match pos with
   | RootCall kf -> Some kf
   | GlobalInit _ -> None
   | Local (_stmt, cs) -> Some (Callstack.top_kf cs)
 
-let callstack aloc =
-  match aloc with
+let callstack pos =
+  match pos with
   | RootCall kf -> Some (Callstack.init kf)
   | GlobalInit _vi -> None
   | Local (_stmt,cs) -> Some cs
 
-let pretty_loc fmt aloc =
-  Printer.pp_location fmt (loc aloc)
+let pretty_loc fmt pos =
+  Printer.pp_location fmt (loc pos)
 
 let of_call (call : ('a, 'b) Eval.call) =
   let kf, lloc = Callstack.pop_call call.callstack in

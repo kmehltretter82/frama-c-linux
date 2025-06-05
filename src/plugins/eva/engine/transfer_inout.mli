@@ -32,13 +32,13 @@ module type S = sig
       read and written memory zones at [aloc] for the logic assign [clause] to
       the [location]. *)
   val add_logic_assign :
-    Analysis_location.t -> location Eval.logic_assign -> location -> unit
+    Position.t -> location Eval.logic_assign -> location -> unit
 
   (** [add_assign_lval aloc valuation lval exp] registers to [Inout_access] the
       read and written memory zones at [aloc] for the assignment from [exp] to
       [lval] with a given [valuation]. *)
   val add_assign_lval :
-    Analysis_location.t -> valuation ->
+    Position.t -> valuation ->
     Eva_ast.lval -> Eva_ast.exp ->
     unit
 
@@ -46,7 +46,7 @@ module type S = sig
       read and written memory zones at [aloc] for the assignment from [exp] to
       [vi] with a given [valuation]. *)
   val add_assign_var :
-    Analysis_location.t -> valuation ->
+    Position.t -> valuation ->
     Eva_ast.varinfo -> Eva_ast.exp ->
     unit
 
@@ -54,7 +54,7 @@ module type S = sig
       memory zones at [aloc] for reading the expression [exp] with a given
       [valuation]. *)
   val add_read_exp :
-    Analysis_location.t -> valuation ->
+    Position.t -> valuation ->
     Eva_ast.exp ->
     unit
 
@@ -62,7 +62,7 @@ module type S = sig
       and written memory zones at [aloc] for the arguments of the given [call]
       with a given [valuation]. *)
   val add_call_args :
-    Analysis_location.t -> valuation ->
+    Position.t -> valuation ->
     (location, value) Eval.call ->
     unit
 end

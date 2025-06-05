@@ -36,8 +36,8 @@ module SetZoneAccess = struct
       match rw with
       | Read -> (Locations.Zone.join r z, w)
       | Write _ -> (r, Locations.Zone.join w z)
-      | ReadAloc _ -> (Locations.Zone.join r z, w)
-      | WriteAloc _ -> (r, Locations.Zone.join w z)
+      | ReadPos _ -> (Locations.Zone.join r z, w)
+      | WritePos _ -> (r, Locations.Zone.join w z)
     in
     fold aux s (Locations.Zone.bottom, Locations.Zone.bottom)
 
@@ -67,7 +67,7 @@ module StmtIdAccess = struct
     | Read | Write _ ->
       Format.fprintf fmt "%a@ by %a@ at %a"
         RW.pretty op Thread.pretty th Printer.pp_location loc
-    | ReadAloc _ | WriteAloc _ ->
+    | ReadPos _ | WritePos _ ->
       Format.fprintf fmt "%a@ by %a@ at %a"
         RW.pretty_op op
         Thread.pretty th

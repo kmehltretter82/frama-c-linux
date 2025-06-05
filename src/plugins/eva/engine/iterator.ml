@@ -79,7 +79,7 @@ module Make_Dataflow
     (Logic : Transfer_logic.S with type state = Engine.Dom.t)
     (Spec: sig
        val treat_statement_assigns:
-         aloc:Analysis_location.t -> assigns -> Engine.Dom.t -> Engine.Dom.t
+         pos:Position.t -> assigns -> Engine.Dom.t -> Engine.Dom.t
      end)
     (AnalysisParam : sig
        val kf: Cil_types.kernel_function
@@ -257,8 +257,8 @@ module Make_Dataflow
 
 
   (* Tries to evaluate \assigns … \from … clauses for assembly code. *)
-  let transfer_asm ~lloc : transfer_function =
-    let asm_contracts = Annotations.code_annot (fst lloc) in
+  let transfer_asm ~pos : transfer_function =
+    let asm_contracts = Annotations.code_annot (fst pos) in
     match Logic_utils.extract_contract asm_contracts with
     | [] ->
       Self.warning ~current:true ~once:true
@@ -268,17 +268,17 @@ module Make_Dataflow
     (* There should be only one statement contract, if any. *)
     | (_, spec) :: _ ->
       let assigns = Ast_info.merge_assigns_from_spec ~warn:false spec in
-      let aloc = Analysis_location.Local lloc in
-      lift (Spec.treat_statement_assigns ~aloc assigns)
+      let pos = Position.Local pos in
+      lift (Spec.treat_statement_assigns ~pos assigns)
 
-  let transfer_assume ~aloc (exp : exp) (kind : guard_kind)
+  let transfer_assume ~pos (exp : exp) (kind : guard_kind)
     : transfer_function =
     let positive = (kind = Then) in
-    lift' (fun s -> Transfer.assume ~aloc s exp positive)
+    lift' (fun s -> Transfer.assume ~pos s exp positive)
 
-  let transfer_assign ~aloc (dest : lval) (exp : exp)
+  let transfer_assign ~pos (dest : lval) (exp : exp)
     : transfer_function =
-    lift' (fun s -> Transfer.assign ~aloc s dest exp)
+    lift' (fun s -> Transfer.assign ~pos s dest exp)
 
   (* All variables local to a block are introduced in domain states when
      entering the block. Variables explicitly initialized at declaration time
@@ -287,24 +287,24 @@ module Make_Dataflow
      However, goto statements can skip their declaration/initialization, so it
      is safer to always introduce all local variables (without initialize them)
      when entering a block. *)
-  let transfer_enter ~aloc (block : block) : transfer_function =
+  let transfer_enter ~pos (block : block) : transfer_function =
     let vars = block.blocals in
-    if vars = [] then id else lift (Transfer.enter_scope ~aloc vars)
+    if vars = [] then id else lift (Transfer.enter_scope ~pos vars)
 
-  let transfer_leave ~aloc:_ (block : block) : transfer_function =
+  let transfer_leave ~pos:_ (block : block) : transfer_function =
     let vars = block.blocals in
     if vars = [] then id else lift (Domain.leave_scope kf vars)
 
-  let transfer_call ~lloc (dest : lval option) (callee : lhost)
+  let transfer_call ~pos (dest : lval option) (callee : lhost)
       (args : exp list) (key, state : key * state) : (key * state) list =
-    let result = Transfer.call ~lloc dest callee args state in
+    let result = Transfer.call ~pos dest callee args state in
     if result.cacheable = Eval.NoCacheCallers then
       (* Propagate info that the current call cannot be cached either *)
       cacheable := Eval.NoCacheCallers;
     (* Recombine callee partitioning keys with caller key *)
     Partitioning.call_return ~caller:key result.kind result.states
 
-  let transfer_return ~aloc (return_exp : exp option)
+  let transfer_return ~pos (return_exp : exp option)
     : transfer_function =
     (* Deconstruct return statement *)
     let return_var = match return_exp with
@@ -331,39 +331,39 @@ module Make_Dataflow
         fun state ->
           let kind = Abstract_domain.Result kf in
           let state = Domain.enter_scope kind [vi_ret] state in
-          let state' = Transfer.assign ~aloc state return_lval return_exp in
+          let state' = Transfer.assign ~pos state return_lval return_exp in
           Bottom.to_list state'
     in
     sequence (lift'' check_postconditions) (lift'' assign_retval)
 
-  let transfer_transition ~aloc (t : transition) : transfer_function =
+  let transfer_transition ~pos (t : transition) : transfer_function =
     match t with
     | Skip ->
       id
     | Return (return_exp,_stmt) ->
-      transfer_return ~aloc return_exp
+      transfer_return ~pos return_exp
     | Guard (exp,kind,_stmt) ->
-      transfer_assume ~aloc exp kind
+      transfer_assume ~pos exp kind
     | Init (vi, exp, _stmt) ->
       let transfer state =
-        Init.initialize_local_variable ~aloc vi exp state
+        Init.initialize_local_variable ~pos vi exp state
       in
       lift' transfer
     | Assign (dest, exp, _stmt) ->
-      transfer_assign ~aloc dest exp
+      transfer_assign ~pos dest exp
     | Call (dest, callee, args, stmt) ->
-      let lloc = (stmt, callstack) in
-      transfer_call ~lloc dest callee args
+      let pos = (stmt, callstack) in
+      transfer_call ~pos dest callee args
     | Asm (_,_,_,stmt) ->
-      let lloc = (stmt, callstack) in
-      transfer_asm ~lloc
+      let pos = (stmt, callstack) in
+      transfer_asm ~pos
     | Enter (block) ->
-      transfer_enter ~aloc block
+      transfer_enter ~pos block
     | Leave (block) when blocks_share_locals fundec.sbody block ->
       (* The variables from the toplevel block will be removed by the caller *)
       id
     | Leave (block) ->
-      transfer_leave ~aloc block
+      transfer_leave ~pos block
 
   let transfer_annotations (stmt : stmt) ~(record : bool)
     : state -> state list =
@@ -396,8 +396,8 @@ module Make_Dataflow
         in
         let seq = List.map translate_elt seq in
         let check s =
-          let aloc = Analysis_location.local stmt callstack in
-          Transfer.check_unspecified_sequence ~aloc s seq = `Value ()
+          let pos = Position.local stmt callstack in
+          Transfer.check_unspecified_sequence ~pos s seq = `Value ()
         in
         List.filter check states
       | _ -> states
@@ -447,15 +447,15 @@ module Make_Dataflow
     current_ki := kinstr;
     let open Current_loc.Operators in
     let<> UpdatedCurrentLoc = e.edge_loc in
-    let aloc = Analysis_location.of_kinstr e.edge_kinstr callstack in
+    let pos = Position.of_kinstr e.edge_kinstr callstack in
     let flow =
-      Partitioning.transfer (transfer_transition ~aloc transition) flow
+      Partitioning.transfer (transfer_transition ~pos transition) flow
     in
     let flow =
       if Engine.Interferences.is_empty transition
       then flow
       else
-        let inject_interferences = Engine.Interferences.inject ~aloc v1 v2 in
+        let inject_interferences = Engine.Interferences.inject ~pos v1 v2 in
         Partitioning.transfer (lift inject_interferences) flow
     in
     let flow = process_partitioning_transitions v1 v2 transition flow in
@@ -711,7 +711,7 @@ module Computer
     (Logic : Transfer_logic.S with type state = Engine.Dom.t)
     (Spec: sig
        val treat_statement_assigns:
-         aloc:Analysis_location.t -> assigns -> Engine.Dom.t -> Engine.Dom.t
+         pos:Position.t -> assigns -> Engine.Dom.t -> Engine.Dom.t
      end)
 = struct
 

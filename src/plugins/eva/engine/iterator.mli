@@ -45,7 +45,7 @@ module Computer
     (_ : Transfer_logic.S with type state = Engine.Dom.t)
     (_: sig
        val treat_statement_assigns:
-         aloc:Analysis_location.t -> assigns -> Engine.Dom.t -> Engine.Dom.t
+         pos:Position.t -> assigns -> Engine.Dom.t -> Engine.Dom.t
      end)
   : sig
 

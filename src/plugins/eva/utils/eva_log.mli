@@ -21,20 +21,18 @@
 (**************************************************************************)
 
 (** This modules adapt the interface of {!Log.Messages} to be usable with
-    {!Analysis_location.t}.
+    {!Position.t}.
 
     [stacktrace] optional parameters controls wheter the call stack must
     be printed at the end of the message and always default to false. *)
 
 type 'a pretty_printer =
   ?emitwith:(Log.event -> unit) -> ?once:bool ->
-  aloc:Analysis_location.t -> ?stacktrace:bool ->
-  ?echo:bool ->
+  pos:Position.t -> ?stacktrace:bool -> ?echo:bool ->
   ('a,Format.formatter,unit) format -> 'a
 
 type ('a,'b) pretty_aborter =
-  aloc:Analysis_location.t -> ?stacktrace:bool ->
-  ?echo:bool ->
+  pos:Position.t -> ?stacktrace:bool -> ?echo:bool ->
   ('a,Format.formatter,unit,'b) format4 -> 'a
 
 (** see {!Log.Messages} for documentation **)

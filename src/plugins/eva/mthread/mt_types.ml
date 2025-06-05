@@ -21,11 +21,9 @@
 (**************************************************************************)
 
 open Cil_types
-open Cil_datatype
 open Mt_cil
 open Mt_memory.Types
 open Mt_lib
-module ALoc = Analysis_location
 
 
 (* -------------------------------------------------------------------------- *)
@@ -34,7 +32,7 @@ module ALoc = Analysis_location
 
 
 type rw = Read | Write of Locations.location
-        | ReadAloc of ALoc.t | WriteAloc of ALoc.t
+        | ReadPos of Position.t | WritePos of Position.t
 
 module RW = struct
   include Datatype.Make(
@@ -47,47 +45,47 @@ module RW = struct
         | Read, Read -> true
         | Write l1, Write l2 -> Locations.Location.equal l1 l2
         | Read, Write _ | Write _, Read -> false
-        | ReadAloc aloc1, ReadAloc aloc2
-        | WriteAloc aloc1, WriteAloc aloc2 -> ALoc.equal aloc1 aloc2
-        | ReadAloc _, WriteAloc _ | WriteAloc _, ReadAloc _ -> false
-        | (Read | Write _), (ReadAloc _ | WriteAloc _)
-        | (ReadAloc _ | WriteAloc _), (Read | Write _) -> false
+        | ReadPos pos1, ReadPos pos2
+        | WritePos pos1, WritePos pos2 -> Position.equal pos1 pos2
+        | ReadPos _, WritePos _ | WritePos _, ReadPos _ -> false
+        | (Read | Write _), (ReadPos _ | WritePos _)
+        | (ReadPos _ | WritePos _), (Read | Write _) -> false
       let compare rw1 rw2 = match rw1, rw2 with
         | Read, Read -> 0
         | Write l1, Write l2 -> Locations.Location.compare l1 l2
         | Read, Write _ -> -1
         | Write _, Read -> 1
-        | ReadAloc aloc1, ReadAloc aloc2
-        | WriteAloc aloc1, WriteAloc aloc2 -> ALoc.compare aloc1 aloc2
-        | ReadAloc _, WriteAloc _ -> -1
-        | WriteAloc _, ReadAloc _ -> +1
-        | (Read | Write _), (ReadAloc _ | WriteAloc _) -> -2
-        | (ReadAloc _ | WriteAloc _), (Read | Write _) -> +2
+        | ReadPos pos1, ReadPos pos2
+        | WritePos pos1, WritePos pos2 -> Position.compare pos1 pos2
+        | ReadPos _, WritePos _ -> -1
+        | WritePos _, ReadPos _ -> +1
+        | (Read | Write _), (ReadPos _ | WritePos _) -> -2
+        | (ReadPos _ | WritePos _), (Read | Write _) -> +2
       let hash = function
-        | ReadAloc aloc -> 1 + Hashtbl.hash (1, ALoc.hash aloc)
-        | WriteAloc aloc -> 1 + Hashtbl.hash (2, ALoc.hash aloc)
+        | ReadPos pos -> 1 + Hashtbl.hash (1, Position.hash pos)
+        | WritePos pos -> 1 + Hashtbl.hash (2, Position.hash pos)
         | Write l -> 1 + Hashtbl.hash (3, Locations.Location.hash l)
         | Read -> 0
       let pretty fmt rw = Format.fprintf fmt "%s"
           (match rw with
            | Read -> "read"
            | Write _ -> "write"
-           | ReadAloc _ -> "read"
-           | WriteAloc _ -> "write"
+           | ReadPos _ -> "read"
+           | WritePos _ -> "write"
           )
     end)
 
   let loc op =
     match op with
-    | Read | Write _ -> Location.unknown
-    | ReadAloc aloc | WriteAloc aloc -> ALoc.loc aloc
+    | Read | Write _ -> Cil_datatype.Location.unknown
+    | ReadPos pos | WritePos pos -> Position.loc pos
 
   let is_read op =
     match op with
     | Read -> true
     | Write _ -> false
-    | ReadAloc _ -> true
-    | WriteAloc _ -> false
+    | ReadPos _ -> true
+    | WritePos _ -> false
 
   let pretty_op fmt rw = pretty fmt rw
 
@@ -95,7 +93,7 @@ module RW = struct
     match rw with
     | Read -> Format.fprintf fmt "<noloc>"
     | Write l -> Locations.Location.pretty fmt l
-    | ReadAloc aloc | WriteAloc aloc -> ALoc.pretty fmt aloc
+    | ReadPos pos | WritePos pos -> Position.pretty fmt pos
 end
 
 (* -------------------------------------------------------------------------- *)
@@ -240,8 +238,8 @@ struct
 
   type data = {
     trace_events: events_set;
-    trace_states: state Stmt.Map.t;
-    trace_states_after: state Stmt.Map.t;
+    trace_states: state Cil_datatype.Stmt.Map.t;
+    trace_states_after: state Cil_datatype.Stmt.Map.t;
   }
 
   let join_data d1 d2 = {
@@ -259,8 +257,8 @@ struct
 
   let default = {
     trace_events = EventsSet.empty;
-    trace_states = Stmt.Map.empty;
-    trace_states_after = Stmt.Map.empty;
+    trace_states = Cil_datatype.Stmt.Map.empty;
+    trace_states_after = Cil_datatype.Stmt.Map.empty;
   }
 
   let union = TriesStacks.union (fun _ d1 d2 -> Some (join_data d1 d2))

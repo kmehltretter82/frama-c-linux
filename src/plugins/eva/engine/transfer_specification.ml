@@ -316,18 +316,18 @@ module Make
 
   (* Applies the [assigns] list of assigns, allocates and frees clauses to
      the state [state]. *)
-  let apply_assigns_and_allocations ~aloc evaluated_clauses state =
+  let apply_assigns_and_allocations ~pos evaluated_clauses state =
     let pre = state in
     let transfer state (clause, location) =
-      Transfer_inout.add_logic_assign aloc clause location;
+      Transfer_inout.add_logic_assign pos clause location;
       Domain.logic_assign (Some (clause, pre)) location state
     in
     List.fold_left transfer state evaluated_clauses
 
-  let treat_statement_assigns ~aloc assigns state =
+  let treat_statement_assigns ~pos assigns state =
     let assigns = get_assigns assigns in
     let evaluated_assigns = evaluate_assigns state None assigns in
-    apply_assigns_and_allocations ~aloc evaluated_assigns state
+    apply_assigns_and_allocations ~pos evaluated_assigns state
 
   (* After reduction by the postconditions, checks that the locations assigned
      by assigns clauses are not garbled mixes — and warn otherwise. *)
@@ -368,7 +368,7 @@ module Make
      and [status] the status of the behaviors. *)
   let compute_effects ~warn call spec behaviors status states =
     let kf = Callstack.top_kf call.callstack in
-    let aloc = Analysis_location.of_call call in
+    let pos = Position.of_call call in
     Bottom.of_list ~join:Domain.join states >>- fun pre_state ->
     let behavior = List.hd behaviors in
     let retres_loc = Option.map Location.eval_varinfo call.return in
@@ -377,7 +377,7 @@ module Make
     let compute state =
       let assigns = evaluate_assigns state retres_loc assigns
       and allocs = evaluate_free_alloc state retres_loc allocs in
-      apply_assigns_and_allocations ~aloc (assigns @ allocs) state
+      apply_assigns_and_allocations ~pos (assigns @ allocs) state
     in
     let states = List.map compute states in
     let states =

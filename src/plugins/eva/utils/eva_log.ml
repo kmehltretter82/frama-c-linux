@@ -22,28 +22,28 @@
 
 type 'a pretty_printer =
   ?emitwith:(Log.event -> unit) -> ?once:bool ->
-  aloc:Analysis_location.t -> ?stacktrace:bool ->
+  pos:Position.t -> ?stacktrace:bool ->
   ?echo:bool ->
   ('a,Format.formatter,unit) format -> 'a
 
 type ('a,'b) pretty_aborter =
-  aloc:Analysis_location.t -> ?stacktrace:bool ->
+  pos:Position.t -> ?stacktrace:bool ->
   ?echo:bool ->
   ('a,Format.formatter,unit,'b) format4 -> 'a
 
-let append_callstack ~aloc ?(stacktrace=false) fmt =
+let append_callstack ~pos ?(stacktrace=false) fmt =
   if stacktrace && Parameters.PrintCallstacks.get () then
-    match Analysis_location.callstack aloc with
+    match Position.callstack pos with
     | None -> ()
     | Some cs -> Format.fprintf fmt "@ stack: %a" Callstack.pretty cs
 
 let lift_aborter (aborter : ('a,'b) Log.pretty_aborter)
   : ('a,'b) pretty_aborter =
-  fun ~aloc ?stacktrace ->
+  fun ~pos ?stacktrace ->
   (* Extract source location from analysis location *)
-  let source = Analysis_location.pos aloc
+  let source = Position.pos pos
   (* Append callstack if requested *)
-  and append = append_callstack ~aloc ?stacktrace in
+  and append = append_callstack ~pos ?stacktrace in
   aborter ?current:None ~source ~append
 
 let lift_printer (printer : 'a Log.pretty_printer) : 'a pretty_printer =
@@ -67,11 +67,11 @@ let alarm ?emitwith =
 let error ?emitwith =
   lift_printer Self.error ?emitwith
 
-let abort ~aloc =
-  lift_aborter Self.abort ~aloc
+let abort ~pos =
+  lift_aborter Self.abort ~pos
 
 let failure ?emitwith =
   lift_printer Self.failure ?emitwith
 
-let fatal ~aloc =
-  lift_aborter Self.fatal ~aloc
+let fatal ~pos =
+  lift_aborter Self.fatal ~pos

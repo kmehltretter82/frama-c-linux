@@ -31,29 +31,22 @@ module type S = sig
   type value
   type loc
 
-  val assign:
-    aloc:Analysis_location.t ->
-    state -> lval -> exp -> state or_bottom
+  val assign: pos:Position.t -> state -> lval -> exp -> state or_bottom
 
-  val assume:
-    aloc:Analysis_location.t ->
-    state -> exp -> bool -> state or_bottom
+  val assume: pos:Position.t -> state -> exp -> bool -> state or_bottom
 
   val call:
-    lloc:Analysis_location.local ->
-    lval option -> lhost -> exp list -> state ->
-    state Engine_sig.call_result
+    pos:Position.local ->
+    lval option -> lhost -> exp list -> state -> state Engine_sig.call_result
 
   val check_unspecified_sequence:
-    aloc:Analysis_location.t ->
+    pos:Position.t ->
     state ->
     (* TODO *)
     (stmt * lval list * lval list * lval list * stmt ref list) list ->
     unit or_bottom
 
-  val enter_scope:
-    aloc:Analysis_location.t ->
-    varinfo list -> state -> state
+  val enter_scope: pos:Position.t -> varinfo list -> state -> state
 end
 
 module Make (Abstract: Engine_sig.S)

@@ -255,12 +255,12 @@ module Make (Engine: Engine_sig.S) = struct
      specification or body according to [target]. If [-eva-show-progress] is
      true, the callstack and additional information are printed. *)
   let compute_using_spec_or_body target call state =
-    let aloc = Analysis_location.of_call call in
-    if Analysis_location.is_local aloc && Parameters.ValShowProgress.get () then
+    let pos = Position.of_call call in
+    if Position.is_local pos && Parameters.ValShowProgress.get () then
       Self.feedback
         "@[computing for function %a.@\nCalled from %a.@]"
         Callstack.pretty_short call.callstack
-        Analysis_location.pretty_loc aloc;
+        Position.pretty_loc pos;
     let compute, kind =
       match target with
       | `Body (fundec, save_results) ->

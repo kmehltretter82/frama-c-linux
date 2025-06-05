@@ -82,14 +82,14 @@ sig
   (** Add the last Eva analysis results to the given interferences abstract
       representation. *)
   val add_last_analysis :
-    Thread.t -> Analysis_location.Local.Set.t -> Base.Hptset.t -> add_result
+    Thread.t -> Position.Local.Set.t -> Base.Hptset.t -> add_result
 
   (** Inject current interferences to an abstract state. If activated,
       the Mthread domain helps filtering applicable interferences. This function
       is the identity if the Mthread domain can infer that no shared memory has
       been read or written during the last transfer function. *)
   val inject :
-    aloc:Analysis_location.t -> Eva_automata.vertex -> Eva_automata.vertex ->
+    pos:Position.t -> Eva_automata.vertex -> Eva_automata.vertex ->
     state -> state
 
   (** Are there any interferences to inject after the given transition? *)

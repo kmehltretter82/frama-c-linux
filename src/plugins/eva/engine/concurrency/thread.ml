@@ -107,20 +107,20 @@ struct
   struct
     type t =
       | ByName of Concurrency.Name.t
-      | BySpawnPoint of Analysis_location.Local.t
+      | BySpawnPoint of Position.Local.t
       | ByInterruptHandler of Kernel_function.t
     [@@deriving eq, ord]
 
     let reprs =
       List.map (fun n -> ByName n) Concurrency.Name.reprs @
-      List.map (fun al -> BySpawnPoint al) Analysis_location.Local.reprs @
+      List.map (fun al -> BySpawnPoint al) Position.Local.reprs @
       List.map (fun kf -> ByInterruptHandler kf) Kernel_function.reprs
 
     let hash = function
       | ByName name ->
         Stdlib.Hashtbl.hash(1, Concurrency.Name.hash name)
       | BySpawnPoint al ->
-        Stdlib.Hashtbl.hash(2, Analysis_location.Local.hash al)
+        Stdlib.Hashtbl.hash(2, Position.Local.hash al)
       | ByInterruptHandler kf ->
         Stdlib.Hashtbl.hash(3, Kernel_function.hash kf)
   end
@@ -164,13 +164,13 @@ module Identities = State_builder.Hashtbl (Identity.Hashtbl) (Thread)
 (* The thread state is all the information learned about the threads during
    the analysis *)
 
-module ALSet = Analysis_location.Local.Set
+module ALSet = Position.Local.Set
 
 module Properties =
 struct
   module Prototype =
   struct
-    open Cil_datatype
+    module Varinfo = Cil_datatype.Varinfo
 
     include Datatype.Serializable_undefined
 
@@ -191,7 +191,7 @@ struct
       let pp_sep fmt () = Format.fprintf fmt ";@ " in
       let pp_var = Varinfo.pretty in
       let pp_val = Cvalue.V.pretty in
-      let pp_al = Analysis_location.Local.pretty in
+      let pp_al = Position.Local.pretty in
       let pp_arg fmt (vi, v) = Format.fprintf fmt "%a: %a" pp_var vi pp_val v in
       Format.fprintf fmt
         "@[<v 2>Entry point  :@ @[<hov>%a@]@]@\n\
