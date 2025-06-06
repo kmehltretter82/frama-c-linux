@@ -15,75 +15,22 @@ inductive Q(integer x, integer y, integer z) {
  */
 /*@ predicate Q(integer x, integer y, integer z) = y == 0 && z == 0;
  */
-/*@ logic integer Q_fun3(integer x, integer y) = y == 0 ? 0 : 0;
- */
 /*@
 inductive P(integer x, integer y) {
   case c: \forall integer b, integer c; Q(0, 0, c) ==> P(b, c);
   }
  */
-/*@ predicate P(integer x, integer y) = \true;
+/*@ predicate P(integer x, integer y) = Q(0, 0, y);
 
 */
-int __gen_e_acsl_P_3(int x, int y);
-
-int __gen_e_acsl_P(int x, int y);
-
 int main(void)
 {
   int __retres;
   __e_acsl_memory_init((int *)0,(char ***)0,8UL);
-  {
-    int __gen_e_acsl_P_2;
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
-    __gen_e_acsl_P_2 = __gen_e_acsl_P(0,0);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"P(0, 0)",0,
-                                 __gen_e_acsl_P_2);
-    __gen_e_acsl_assert_data.blocking = 1;
-    __gen_e_acsl_assert_data.kind = "Assertion";
-    __gen_e_acsl_assert_data.pred_txt = "P(0, 0)";
-    __gen_e_acsl_assert_data.file = "foreign_complete.c";
-    __gen_e_acsl_assert_data.fct = "main";
-    __gen_e_acsl_assert_data.line = 21;
-    __e_acsl_assert(__gen_e_acsl_P_2,& __gen_e_acsl_assert_data);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
-  }
   /*@ assert P(0, 0); */ ;
-  {
-    int __gen_e_acsl_P_4;
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
-      {.values = (void *)0};
-    __gen_e_acsl_P_4 = __gen_e_acsl_P_3(1,2);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,"P(1, 2)",0,
-                                 __gen_e_acsl_P_4);
-    __gen_e_acsl_assert_data_2.blocking = 1;
-    __gen_e_acsl_assert_data_2.kind = "Assertion";
-    __gen_e_acsl_assert_data_2.pred_txt = "!P(1, 2)";
-    __gen_e_acsl_assert_data_2.file = "foreign_complete.c";
-    __gen_e_acsl_assert_data_2.fct = "main";
-    __gen_e_acsl_assert_data_2.line = 22;
-    __e_acsl_assert(! __gen_e_acsl_P_4,& __gen_e_acsl_assert_data_2);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
-  }
   /*@ assert !P(1, 2); */ ;
   __retres = 0;
   __e_acsl_memory_clean();
-  return __retres;
-}
-
-/*@ assigns \result;
-    assigns \result \from x, y; */
-int __gen_e_acsl_P(int x, int y)
-{
-  int __retres = 1;
-  return __retres;
-}
-
-/*@ assigns \result;
-    assigns \result \from x, y; */
-int __gen_e_acsl_P_3(int x, int y)
-{
-  int __retres = 1;
   return __retres;
 }
 
