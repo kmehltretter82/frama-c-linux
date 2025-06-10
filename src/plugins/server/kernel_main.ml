@@ -195,8 +195,12 @@ let _project_list =
     ~get:Project.get_name;
 
   let add_update_hook f =
+    Project.register_create_hook f;
     let f (p, _) = f p in
     Project.register_after_set_name_hook f
+  in
+  let add_remove_hook f =
+    Project.register_before_remove_hook f
   in
   States.register_array ~package
     ~name:"projectList"
@@ -204,6 +208,7 @@ let _project_list =
     ~key:Project.get_unique_name
     ~iter:Project.iter_on_projects
     ~add_update_hook
+    ~add_remove_hook
     model
 
 (* -------------------------------------------------------------------------- *)
