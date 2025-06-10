@@ -287,7 +287,11 @@ let establish_server fd =
   let socket = { socket = fd ; channel = None } in
   try
     Unix.listen fd 1 ;
-    ignore (Sys.signal Sys.sigpipe Signal_ignore) ;
+    begin
+      try
+        ignore (Sys.signal Sys.sigpipe Signal_ignore) ;
+      with _ -> Senv.debug "sigpipe unsupported in this OS, ignoring"
+    end;
     let pretty = Format.pp_print_string in
     let server = Main.create ~pretty ~fetch:(fetch socket) () in
     Extlib.safe_at_exit
