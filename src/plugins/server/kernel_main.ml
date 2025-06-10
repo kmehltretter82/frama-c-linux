@@ -174,6 +174,86 @@ let () = Request.register
     ~input:(module Jstring) ~output:(module Junit)
     (fun name -> Project.create name |> Project.set_current)
 
+let no_project_found unique_name =
+  Format.asprintf "No project with unique name %s found." unique_name
+
+let () = Request.register
+    ~package ~kind:`SET ~name:"renameProject"
+    ~descr:(Md.plain "Rename project")
+    ~input:(module Jpair (Jproject) (Jstring))
+    ~output:(module Joption (Jstring))
+    (fun (project_name, new_name) ->
+       try
+         let project = Project.from_unique_name project_name in
+         Project.set_name project new_name;
+         None
+       with Project.Unknown_project ->
+         let err = no_project_found project_name in
+         Some err)
+
+let () = Request.register
+    ~package ~kind:`SET ~name:"removeProject"
+    ~descr:(Md.plain "Remove project from the session")
+    ~input:(module Jproject) ~output:(module Joption (Jstring))
+    (fun project_name ->
+       try
+         let project = Project.from_unique_name project_name in
+         Project.remove ~project ();
+         None
+       with
+       | Project.Unknown_project ->
+         let err = no_project_found project_name in
+         Some err
+       | Project.Cannot_remove p ->
+         let err = Format.asprintf "Cannot remove project %s." p in
+         Some err)
+
+let () = Request.register
+    ~package ~kind:`SET ~name:"duplicateProject"
+    ~descr:(Md.plain "Duplicate project")
+    ~input:(module Jproject) ~output:(module Joption (Jstring))
+    (fun project_name ->
+       try
+         let project = Project.from_unique_name project_name in
+         let _ =
+           Project.create_by_copy
+             ~last:false
+             ~src:project
+             (Project.get_name project)
+         in
+         None
+       with Project.Unknown_project ->
+         let err = no_project_found project_name in
+         Some err)
+
+let () = Request.register
+    ~package ~kind:`SET ~name:"loadProject"
+    ~descr:(Md.plain "Load a saved project")
+    ~input:(module Jfile) ~output:(module Joption (Jstring))
+    (fun filepath ->
+       try
+         Project.load filepath
+         |> Project.set_current;
+         None
+       with Project.IOError err ->
+         Some err)
+
+let () = Request.register
+    ~package ~kind:`SET ~name:"saveProject"
+    ~descr:(Md.plain "Save a project on disk")
+    ~input:(module Jpair (Jproject) (Jfile)) ~output:(module Joption (Jstring))
+    (fun (project_name, filepath) ->
+       try
+         let project = Project.from_unique_name project_name in
+         Project.save ~project filepath;
+         None
+       with
+       | Project.Unknown_project ->
+         let err = no_project_found project_name in
+         Some err
+       | Project.IOError err ->
+         Some err)
+
 let _project_list =
   let model = States.model () in
 
