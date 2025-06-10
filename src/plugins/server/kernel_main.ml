@@ -147,11 +147,13 @@ let () =
 (* --- Frama-C Projects                                                   --- *)
 (* -------------------------------------------------------------------------- *)
 
+module Jproject = Jstring
+
 let _current_project_signal =
   States.register_state ~package
     ~name:"currentProject"
     ~descr:(Md.plain "Current Frama-C project")
-    ~data:(module Jstring)
+    ~data:(module Jproject)
     ~get:(fun () -> Project.(current () |> get_unique_name))
     ~set:(fun unique_name -> Project.(from_unique_name unique_name |> set_current))
     ~add_hook:(Project.register_after_set_current_hook ~user_only:false)
@@ -163,7 +165,7 @@ let get_project_list () =
 let () = Request.register
     ~package ~kind:`GET ~name:"getProjects"
     ~descr:(Md.plain "Returns the list of Frama-C projects")
-    ~input:(module Junit) ~output:(module Jlist (Jstring))
+    ~input:(module Junit) ~output:(module Jlist (Jproject))
     get_project_list
 
 let () = Request.register
@@ -177,7 +179,7 @@ let _project_list =
 
   States.column model ~name:"uniqueName"
     ~descr:(Md.plain "Project unique name")
-    ~data:(module Jstring)
+    ~data:(module Jproject)
     ~get:Project.get_unique_name;
 
   States.column model ~name:"name"
