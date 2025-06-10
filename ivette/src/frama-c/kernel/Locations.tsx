@@ -37,7 +37,7 @@ import { TitleBar } from 'ivette';
 import * as Display from 'ivette/display';
 import * as Ast from 'frama-c/kernel/api/ast';
 import * as Server from 'frama-c/server';
-import { projectChanged } from 'frama-c/kernel/api/services';
+import { currentProject } from 'frama-c/kernel/api/services';
 
 // --------------------------------------------------------------------------
 // --- Global Multi-Selection
@@ -126,7 +126,7 @@ function gotoIndex(index: number): void {
 
 {
   Server.onReady(clearSelection);
-  Server.onSignal(projectChanged, clearSelection);
+  Server.onSignal(currentProject.signal, clearSelection);
   Server.onShutdown(clearSelection);
 }
 

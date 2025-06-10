@@ -33,7 +33,7 @@ import * as Ast from 'frama-c/kernel/api/ast';
 import * as Eva from 'frama-c/plugins/eva/api/general';
 import * as Values from 'frama-c/plugins/eva/api/values';
 import { EvaReady, EvaStatus } from './components/AnalysisStatus';
-import { projectChanged } from 'frama-c/kernel/api/services';
+import { currentProject } from 'frama-c/kernel/api/services';
 
 import { classes } from 'dome/misc/utils';
 import { Icon } from 'dome/controls/icons';
@@ -977,7 +977,7 @@ export function clearGlobalState(): void {
 }
 
 {
-  Server.onSignal(projectChanged, clearGlobalState);
+  Server.onSignal(currentProject.signal, clearGlobalState);
 }
 
 /* Component */

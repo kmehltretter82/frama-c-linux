@@ -37,7 +37,7 @@ import { GlobalState, useGlobalState } from 'dome/data/states';
 import { Client, useModel } from 'dome/table/models';
 import { CompactModel } from 'dome/table/arrays';
 import { FieldState, FieldError, isValid } from 'dome/layout/forms';
-import { projectChanged } from 'frama-c/kernel/api/services';
+import { currentProject } from 'frama-c/kernel/api/services';
 import * as Ast from 'frama-c/kernel/api/ast';
 import * as Server from './server';
 
@@ -729,7 +729,7 @@ async function resetHistory(): Promise<void> {
 
 {
   Server.onReady(resetHistory);
-  Server.onSignal(projectChanged, resetHistory);
+  Server.onSignal(currentProject.signal, resetHistory);
   Server.onShutdown(clearHistory);
   onSyncArray(Ast.markerAttributes, syncCurrentSelection);
   onSyncArray(Ast.declAttributes, syncCurrentSelection);

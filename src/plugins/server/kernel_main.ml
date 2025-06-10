@@ -147,14 +147,15 @@ let () =
 (* --- Frama-C Projects                                                   --- *)
 (* -------------------------------------------------------------------------- *)
 
-let project_changed_signal =
-  Request.signal ~package ~name:"projectChanged"
-    ~descr:(Md.plain "Emitted each time the current project changes")
-
-let () =
-  Project.register_after_set_current_hook ~user_only:false
-    (fun _ -> Request.emit project_changed_signal)
-
+let _current_project_signal =
+  States.register_state ~package
+    ~name:"currentProject"
+    ~descr:(Md.plain "Current Frama-C project")
+    ~data:(module Jstring)
+    ~get:(fun () -> Project.(current () |> get_unique_name))
+    ~set:(fun unique_name -> Project.(from_unique_name unique_name |> set_current))
+    ~add_hook:(Project.register_after_set_current_hook ~user_only:false)
+    ()
 
 let get_project_list () =
   Project.fold_on_projects (fun acc t -> Project.get_unique_name t :: acc) []
@@ -170,16 +171,6 @@ let () = Request.register
     ~descr:(Md.plain "Creates a new Frama-C project with the given name")
     ~input:(module Jstring) ~output:(module Junit)
     (fun name -> Project.create name |> Project.set_current)
-
-let _current_project_signal =
-  States.register_state ~package
-    ~name:"currentProject"
-    ~descr:(Md.plain "Current Frama-C project")
-    ~data:(module Jstring)
-    ~get:(fun () -> Project.(current () |> get_unique_name))
-    ~set:(fun unique_name -> Project.(from_unique_name unique_name |> set_current))
-    ~add_hook:(Project.register_after_set_current_hook ~user_only:false)
-    ()
 
 let _project_list =
   let model = States.model () in
