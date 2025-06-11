@@ -1551,6 +1551,24 @@ module VariadicTranslation =
 
 let () = Parameter_customize.set_group normalisation
 let () = Parameter_customize.do_not_reset_on_copy ()
+let () = Parameter_customize.is_invisible ()
+let () = Parameter_customize.set_negative_option_name ""
+module NoVariadicTranslation =
+  False (struct
+    let option_name = "-variadic-no-translation"
+    let module_name = "NoVariadicTranslation"
+    let help = "[DEPRECATED: Use -no-variadic-translation instead.]"
+  end)
+
+let () =
+  NoVariadicTranslation.add_update_hook (fun _old _new ->
+      warning "Option -variadic-no-translation is deprecated. \
+               Use -no-variadic-translation instead.";
+      VariadicTranslation.off ()
+    )
+
+let () = Parameter_customize.set_group normalisation
+let () = Parameter_customize.do_not_reset_on_copy ()
 module VariadicStrict =
   True (struct
     let option_name = "-variadic-strict"
@@ -1560,6 +1578,24 @@ module VariadicStrict =
                 distinct integral types which have the same size and \
                 signedness"
   end)
+
+let () = Parameter_customize.set_group normalisation
+let () = Parameter_customize.do_not_reset_on_copy ()
+let () = Parameter_customize.is_invisible ()
+let () = Parameter_customize.set_negative_option_name ""
+module NoVariadicStrict =
+  False (struct
+    let option_name = "-variadic-no-strict"
+    let module_name = "NoVariadicStrict"
+    let help = "[DEPRECATED: Use -no-variadic-strict instead.]"
+  end)
+
+let () =
+  NoVariadicStrict.add_update_hook (fun _old _new ->
+      warning "Option -variadic-no-strict is deprecated. \
+               Use -no-variadic-strict instead.";
+      VariadicStrict.off ()
+    )
 
 (* ************************************************************************* *)
 (** {2 Analysis Options} *)
