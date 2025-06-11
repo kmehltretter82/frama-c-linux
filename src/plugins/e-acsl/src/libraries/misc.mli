@@ -42,7 +42,7 @@ val is_fc_or_compiler_builtin: varinfo -> bool
 
 val is_fc_stdlib_generated: varinfo -> bool
 (** Returns true if the [varinfo] is a generated stdlib function. (For instance
-    generated function by the Variadic library. *)
+    generated function by the Variadic module. *)
 
 val cty: logic_type -> typ
 (** Assume that the logic type is indeed a C type. Just return it. *)

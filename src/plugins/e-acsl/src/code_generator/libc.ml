@@ -26,7 +26,7 @@ open Cil_types
 
 (* Retrieve the name of the caller function. [vorig_name] is used instead of
    [vname] because some code transformations may change the value of [vname]
-   for some functions like [sprintf] with variadic library. *)
+   for some functions like [sprintf] with the Variadic module. *)
 let get_caller_name caller =
   caller.vorig_name
 

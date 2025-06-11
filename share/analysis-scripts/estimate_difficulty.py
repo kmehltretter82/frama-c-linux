@@ -367,7 +367,7 @@ for callee in sorted(callees):
         callee_status("ok", "is defined in Frama-C's libc")
     else:
         if callee in handled_by_variadic:
-            callee_status("ok", "is handled by the Variadic library")
+            callee_status("ok", "is handled by the Variadic module")
 
 logging.info("Function-related warnings: %d", warnings)
 score["libc"] = warnings
