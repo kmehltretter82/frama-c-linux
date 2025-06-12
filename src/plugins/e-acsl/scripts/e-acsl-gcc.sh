@@ -1034,7 +1034,7 @@ FRAMAC_FLAGS="$FRAMAC_FLAGS \
 
 if [ -n "$OPTION_VALIDATE_FORMAT_STRINGS" ]; then
   FRAMAC_FLAGS="$FRAMAC_FLAGS \
-    -variadic-no-translation"
+    -no-variadic-translation"
 fi
 
 # C, CPP and LD flags for compilation of E-ACSL-generated sources

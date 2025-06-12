@@ -1,6 +1,6 @@
 /*run.config*
   STDOPT:
-  STDOPT: #"-variadic-no-translation"
+  STDOPT: #"-no-variadic-translation"
 */
 #include "stdarg.h"
 

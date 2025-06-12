@@ -184,7 +184,6 @@ SHELL        := $(shell which bash)
 	  $(call time_with_output,$@/stats.txt) \
 	    $(PARSE) \
 	      -kernel-log w:$@/warnings.log \
-	      -variadic-log w:$@/warnings.log \
 	      -metrics -metrics-log a:$@/metrics.log \
 	      -save $@/framac.sav \
 	      -print -ocode $@/framac.ast -then -no-print \

@@ -1,6 +1,6 @@
 /*run.config
   STDOPT: #"-machdep x86_32 -eva-slevel 12" #"-eva-split-return auto"
-  STDOPT: #"-machdep x86_32 -variadic-no-translation" #"-eva-slevel 12" #"-eva-split-return auto"
+  STDOPT: #"-machdep x86_32 -no-variadic-translation" #"-eva-slevel 12" #"-eva-split-return auto"
 */
 #define _GNU_SOURCE
 #define _XOPEN_SOURCE 600

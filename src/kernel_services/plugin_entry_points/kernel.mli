@@ -144,6 +144,8 @@ val dkey_ulevel: category
 
 val dkey_visitor: category
 
+val dkey_variadic: category
+
 val wkey_annot_error: warn_category
 (** error in annotation. If only a warning, annotation will just be ignored. *)
 
@@ -249,6 +251,12 @@ val wkey_line_directive: warn_category
 
 val wkey_unknown_attribute: warn_category
 (** Warning emitted when an unknown attribute is encountered during parsing. *)
+
+val wkey_format: warn_category
+val wkey_libc: warn_category
+val wkey_libc_framac: warn_category
+val wkey_prototype: warn_category
+val wkey_typing: warn_category
 
 (* ************************************************************************* *)
 (** {2 Functors for late option registration}                                *)
@@ -592,6 +600,20 @@ module C11: Parameter_sig.Bool
 module JsonCompilationDatabase: Parameter_sig.Filepath
 (** Behavior of option "-json-compilation-database" *)
 
+module GeneratedSpecMode: Parameter_sig.String
+(** Behavior of option "-generated-spec-mode". *)
+
+module GeneratedSpecCustom: Parameter_sig.Map
+  with type key = string
+   and type value = string
+(** Behavior of option "-generated-spec-custom". *)
+
+module VariadicTranslation: Parameter_sig.Bool
+(** Behavior of option "-variadic-translation". *)
+
+module VariadicStrict: Parameter_sig.Bool
+(** Behavior of option "-variadic-strict". *)
+
 (* ************************************************************************* *)
 (** {3 Customizing cabs2cil options} *)
 (* ************************************************************************* *)
@@ -613,14 +635,6 @@ module DoCollapseCallCast: Parameter_sig.Bool
 
     This is false by default.  Set to true to replicate the behavior
     of CIL 1.3.5 and earlier. *)
-
-module GeneratedSpecMode: Parameter_sig.String
-(** Behavior of option "-generated-spec-mode". *)
-
-module GeneratedSpecCustom: Parameter_sig.Map
-  with type key = string
-   and type value = string
-(** Behavior of option "-generated-spec-custom". *)
 
 (* ************************************************************************* *)
 (** {2 Analysis Behavior of options} *)

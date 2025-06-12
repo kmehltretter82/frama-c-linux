@@ -240,6 +240,8 @@ README* header_spec=.ignore
 /share/machdeps/machdep_*.yaml header_spec=.ignore
 /tests/**/* header_spec=.ignore
 
+/src/kernel_services/ast_transformations/variadic/todo.txt header_spec=.ignore
+
 #######################
 # HEADER_SPEC: others #
 #######################

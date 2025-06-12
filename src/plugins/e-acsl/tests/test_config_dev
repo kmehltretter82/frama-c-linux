@@ -13,7 +13,7 @@ ENABLED_IF: (= %{architecture} amd64)
 COMMENT: e-acsl-gcc.sh is not currently compatible with macos' getopt
 ENABLED_IF: (<> %{system} macosx)
 
-PLUGIN: e-acsl eva,scope,variadic rtegen
+PLUGIN: e-acsl eva,scope rtegen
 
 COMMENT: The dependency to the plugin share directory has not to be explicited
 DEPS: @PTEST_SUITE_DIR@/../wrapper.sh @INCLUDED_HEADERS@

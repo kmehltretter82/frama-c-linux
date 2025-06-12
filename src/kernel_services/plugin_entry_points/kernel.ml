@@ -154,6 +154,8 @@ let dkey_ulevel = register_category "ulevel"
 
 let dkey_visitor = register_category "visitor"
 
+let dkey_variadic = register_category "variadic"
+
 let wkey_annot_error = register_warn_category "annot-error"
 let () = set_warn_status wkey_annot_error Log.Wabort
 
@@ -259,6 +261,12 @@ let () = set_warn_status wkey_c11 Log.Winactive
 let wkey_line_directive = register_warn_category "pp:line-directive"
 
 let wkey_unknown_attribute = register_warn_category "unknown-attribute"
+
+let wkey_libc = register_warn_category "libc"
+let wkey_format = register_warn_category "libc:format"
+let wkey_libc_framac = register_warn_category "libc:frama-c"
+let wkey_prototype = register_warn_category "prototype"
+let wkey_typing = register_warn_category "typing:variadic"
 
 (* ************************************************************************* *)
 (** {2 Specialised functors for building kernel parameters} *)
@@ -1526,6 +1534,68 @@ let normalization_parameters () =
   let kernel = Plugin.get_from_name "" in
   Hashtbl.find kernel.Plugin.p_parameters norm
 
+
+(* ************************************************************************* *)
+(** {2 Variadic Normalization} *)
+(* ************************************************************************* *)
+
+let () = Parameter_customize.set_group normalisation
+let () = Parameter_customize.do_not_reset_on_copy ()
+module VariadicTranslation =
+  True (struct
+    let option_name = "-variadic-translation"
+    let module_name = "VariadicTranslation"
+    let help = "translate variadic functions and calls to semantic \
+                equivalents with only a fixed list of formal parameters"
+  end)
+
+let () = Parameter_customize.set_group normalisation
+let () = Parameter_customize.do_not_reset_on_copy ()
+let () = Parameter_customize.is_invisible ()
+let () = Parameter_customize.set_negative_option_name ""
+module NoVariadicTranslation =
+  False (struct
+    let option_name = "-variadic-no-translation"
+    let module_name = "NoVariadicTranslation"
+    let help = "[DEPRECATED: Use -no-variadic-translation instead.]"
+  end)
+
+let () =
+  NoVariadicTranslation.add_update_hook (fun _old _new ->
+      warning "Option -variadic-no-translation is deprecated. \
+               Use -no-variadic-translation instead.";
+      VariadicTranslation.off ()
+    )
+
+let () = Parameter_customize.set_group normalisation
+let () = Parameter_customize.do_not_reset_on_copy ()
+module VariadicStrict =
+  True (struct
+    let option_name = "-variadic-strict"
+    let module_name = "VariadicStrict"
+    let help = "display warnings about non-portable implicit casts in the \
+                calls of standard variadic functions, i.e. casts between \
+                distinct integral types which have the same size and \
+                signedness"
+  end)
+
+let () = Parameter_customize.set_group normalisation
+let () = Parameter_customize.do_not_reset_on_copy ()
+let () = Parameter_customize.is_invisible ()
+let () = Parameter_customize.set_negative_option_name ""
+module NoVariadicStrict =
+  False (struct
+    let option_name = "-variadic-no-strict"
+    let module_name = "NoVariadicStrict"
+    let help = "[DEPRECATED: Use -no-variadic-strict instead.]"
+  end)
+
+let () =
+  NoVariadicStrict.add_update_hook (fun _old _new ->
+      warning "Option -variadic-no-strict is deprecated. \
+               Use -no-variadic-strict instead.";
+      VariadicStrict.off ()
+    )
 
 (* ************************************************************************* *)
 (** {2 Analysis Options} *)

@@ -1,5 +1,4 @@
 /* run.config
- PLUGIN: variadic
    STDOPT:
 */
 

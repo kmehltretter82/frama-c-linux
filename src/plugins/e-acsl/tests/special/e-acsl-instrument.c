@@ -41,7 +41,7 @@ L:
   return 0;
 }
 
-/* test combination of -e-acsl-instrument and -variadic-no-translation;
+/* test combination of -e-acsl-instrument and -no-variadic-translation;
    see gitlab's issue #88 */
 int vol(int n, ...) {
   va_list vl;

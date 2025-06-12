@@ -1,5 +1,4 @@
 /* run.config
-PLUGIN: variadic
   OPT: %{dep:./@PTEST_NAME@_aux.i} -print
 */
 int open (const char* file, int flags, int mode) {
