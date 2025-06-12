@@ -147,20 +147,65 @@ let () =
 (* --- Frama-C Projects                                                   --- *)
 (* -------------------------------------------------------------------------- *)
 
-module Jproject = Jstring
+module Jproject_id = Jstring
+
+module Jproject = struct
+  type record
+  let record : record Record.signature = Record.signature ()
+
+  let pid = Record.field record ~name:"pid"
+      ~descr:(Md.plain "Id of the project")
+      (module Jint)
+  let name = Record.field record ~name:"name"
+      ~descr:(Md.plain "Display name of the project")
+      (module Jstring)
+  let unique_name = Record.field record ~name:"unique_name"
+      ~descr:(Md.plain "Unique name of the project")
+      (module Jstring)
+
+  let data = Record.publish record ~package ~name:"project"
+      ~descr:(Md.plain "Frama-C project")
+
+  module R : Record.S with type r = record = (val data)
+  type t = Project.project
+
+  let jtype = R.jtype
+
+  let to_json (p : t) =
+    R.default
+    |> R.set pid p.pid
+    |> R.set name p.name
+    |> R.set unique_name p.unique_name
+    |> R.to_json
+
+  let of_json _ = failure "Jproject.of_json not implemented"
+end
+
 
 let _current_project_signal =
   States.register_state ~package
     ~name:"currentProject"
     ~descr:(Md.plain "Current Frama-C project")
-    ~data:(module Jproject)
+    ~data:(module Jproject_id)
     ~get:(fun () -> Project.(current () |> get_unique_name))
     ~set:(fun unique_name -> Project.(from_unique_name unique_name |> set_current))
     ~add_hook:(Project.register_after_set_current_hook ~user_only:false)
     ()
 
+let () = Request.register
+    ~package ~kind:`GET ~name:"getProject"
+    ~descr:(Md.plain "Returns the project corresponding to the given id")
+    ~input:(module Jproject_id)
+    ~output:(module Jpair (Joption(Jproject)) (Joption(Jstring)))
+    (fun project_name ->
+       try
+         let project = Project.from_unique_name project_name in
+         (Some project, None)
+       with Project.Unknown_project ->
+         (None, Some "erreur"))
+
 let get_project_list () =
-  Project.fold_on_projects (fun acc t -> Project.get_unique_name t :: acc) []
+  Project.fold_on_projects (fun acc t -> t :: acc) []
 
 let () = Request.register
     ~package ~kind:`GET ~name:"getProjects"
@@ -180,7 +225,7 @@ let no_project_found unique_name =
 let () = Request.register
     ~package ~kind:`SET ~name:"renameProject"
     ~descr:(Md.plain "Rename project")
-    ~input:(module Jpair (Jproject) (Jstring))
+    ~input:(module Jpair (Jproject_id) (Jstring))
     ~output:(module Joption (Jstring))
     (fun (project_name, new_name) ->
        try
@@ -194,7 +239,7 @@ let () = Request.register
 let () = Request.register
     ~package ~kind:`SET ~name:"removeProject"
     ~descr:(Md.plain "Remove project from the session")
-    ~input:(module Jproject) ~output:(module Joption (Jstring))
+    ~input:(module Jproject_id) ~output:(module Joption (Jstring))
     (fun project_name ->
        try
          let project = Project.from_unique_name project_name in
@@ -211,7 +256,7 @@ let () = Request.register
 let () = Request.register
     ~package ~kind:`SET ~name:"duplicateProject"
     ~descr:(Md.plain "Duplicate project")
-    ~input:(module Jpair (Jproject) (Jstring)) ~output:(module Joption (Jstring))
+    ~input:(module Jpair (Jproject_id) (Jstring)) ~output:(module Joption (Jstring))
     (fun (project_name, new_name) ->
        try
          let project = Project.from_unique_name project_name in
@@ -241,7 +286,7 @@ let () = Request.register
 let () = Request.register
     ~package ~kind:`SET ~name:"saveProject"
     ~descr:(Md.plain "Save a project on disk")
-    ~input:(module Jpair (Jproject) (Jfile)) ~output:(module Joption (Jstring))
+    ~input:(module Jpair (Jproject_id) (Jfile)) ~output:(module Joption (Jstring))
     (fun (project_name, filepath) ->
        try
          let project = Project.from_unique_name project_name in
@@ -259,7 +304,7 @@ let _project_list =
 
   States.column model ~name:"uniqueName"
     ~descr:(Md.plain "Project unique name")
-    ~data:(module Jproject)
+    ~data:(module Jproject_id)
     ~get:Project.get_unique_name;
 
   States.column model ~name:"name"
