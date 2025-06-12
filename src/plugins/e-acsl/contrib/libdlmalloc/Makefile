@@ -36,6 +36,8 @@ EACSL_DLMALLOC_FLAGS = \
   -DUSE_LOCKS=1 \
   -DUSE_SPIN_LOCKS=1
 
+RANLIB ?= ranlib
+
 # Caution: don't use $< here if you want to stay compatible with BSD make
 # (See https://stackoverflow.com/questions/12904011/bmake-proper-use-of-automatic-variables)
 $(EACSL_DLMALLOC_LIB): $(EACSL_DLMALLOC_SRC)
@@ -44,4 +46,4 @@ $(EACSL_DLMALLOC_LIB): $(EACSL_DLMALLOC_SRC)
 	@echo 'AR           $@'
 	@$(AR) crus $@ $(EACSL_DLMALLOC_OBJ)
 	@echo 'RANLIB       $@'
-	@ranlib $@
+	@$(RANLIB) $@
