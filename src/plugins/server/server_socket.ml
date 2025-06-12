@@ -26,7 +26,9 @@
 
 module Senv = Server_parameters
 
-let socket_group = Senv.add_group "Protocol Unix Sockets"
+let dkey = Senv.register_category ~help:"messages about sockets" "socket"
+
+let socket_group = Senv.add_group "Sockets"
 
 let () = Parameter_customize.set_group socket_group
 module Socket = Senv.String
@@ -35,10 +37,11 @@ module Socket = Senv.String
       let arg_name = "url"
       let default = ""
       let help =
-        "Launch the UnixSocket server (in background).\n\
+        "Launch the Socket server (in background).\n\
          The server can handle GET requests during the\n\
          execution of the frama-c command line.\n\
-         Finally, the server is executed until shutdown."
+         Finally, the server is executed until shutdown.\n\
+         For the Internet socket domain, the default url is '127.0.0.1'."
     end)
 
 let () = Parameter_customize.set_group socket_group
@@ -50,8 +53,32 @@ module SocketSize = Senv.Int
       let help = "Control the size of socket buffers (in ko, default 256)."
     end)
 
+let () = Parameter_customize.set_group socket_group
+module SocketDomain = Senv.String
+    (struct
+      let option_name = "-server-socket-domain"
+      let arg_name = "unix|internet"
+      let default = "unix"
+      let help = "Socket domain to be used: 'unix' or 'internet'.\n\
+                  'unix' is faster, but does not work on Windows\n\
+                  nor between different machines."
+    end)
+let () = SocketDomain.set_possible_values ["unix"; "internet"]
+
+let () = Parameter_customize.set_group socket_group
+module SocketPort = Senv.Int
+    (struct
+      let option_name = "-server-socket-port"
+      let arg_name = "n"
+      let default = 9225
+      let help = "Socket port to be used, if the domain\n\
+                  (-server-socket-domain) is 'internet'.\n\
+                  The default port is 9225 (9-22-5, I-V-E)."
+    end)
+let () = SocketPort.set_range ~min:1 ~max:65535
+
 let _ = Server_doc.protocol
-    ~title:"Unix Socket Protocol"
+    ~title:"Socket Protocol"
     ~readme:"server_socket.md"
 
 (* -------------------------------------------------------------------------- *)
@@ -164,7 +191,8 @@ let decode (data : string) : string Main.request =
     | "SIGOFF" -> `SigOff (jfield "id" js)
     | "KILL" -> `Kill (jfield "id" js)
     | _ ->
-      Senv.debug ~level:2 "Invalid socket command:@ @[<hov 2>%a@]"
+      Senv.feedback ~dkey
+        "Invalid socket command:@ @[<hov 2>%a@]"
         Json.pp js ;
       raise Not_found
 
@@ -212,7 +240,8 @@ let callback ch rs =
        match encode r with
        | data -> write_data ch data
        | exception err ->
-         Senv.debug "Socket: encoding error %S@." (Printexc.to_string err)
+         Senv.feedback ~dkey "Socket: encoding error %S@."
+           (Printexc.to_string err)
     ) rs ;
   send_bytes ch
 
@@ -259,7 +288,7 @@ let channel (s: socket) =
       let size = SocketSize.get () in
       let rcv = set_socket_size sock SO_RCVBUF size in
       let snd = set_socket_size sock SO_SNDBUF size in
-      Senv.debug ~level:2 "Socket size in:%d out:%d@." rcv snd ;
+      Senv.feedback ~dkey ~level:2 "Socket size in:%d out:%d@." rcv snd ;
       Senv.debug "Client connected" ;
       let ch = Some {
           sock ;
@@ -287,10 +316,11 @@ let establish_server fd =
   let socket = { socket = fd ; channel = None } in
   try
     Unix.listen fd 1 ;
+    Senv.feedback ~dkey "Socket server: listening up to 1 pending request";
     begin
       try
         ignore (Sys.signal Sys.sigpipe Signal_ignore) ;
-      with _ -> Senv.debug "sigpipe unsupported in this OS, ignoring"
+      with _ -> Senv.debug "SIGPIPE unsupported in this OS, ignoring"
     end;
     let pretty = Format.pp_print_string in
     let server = Main.create ~pretty ~fetch:(fetch socket) () in
@@ -313,32 +343,75 @@ let establish_server fd =
 (* --- Synchronous Server                                                 --- *)
 (* -------------------------------------------------------------------------- *)
 
-let server = ref None
+(* address of the currently-running server, if any *)
+let server_addr = ref None
+
+(* port of the currently-running server, if any (Internet domain only) *)
+let server_port = ref None
 
 let cmdline () =
-  let option = match Socket.get () with "" -> None | a -> Some a in
-  match !server, option with
-  | _ , None -> ()
-  | Some addr0, Some addr ->
-    if addr0 <> addr then
-      Senv.warning "Socket server already running on [%s]." addr0
-  | None, Some addr ->
-    begin
-      try
-        server := option ;
-        let addr_path = Filepath.of_string addr in
-        if Filesystem.exists addr_path then Unix.unlink addr ;
-        let fd = Unix.socket PF_UNIX SOCK_STREAM 0 in
-        Unix.bind fd (ADDR_UNIX addr) ;
-        if Senv.debug_atleast 1 then
-          Senv.feedback "Socket server running on [%s]." addr
-        else
-          Senv.feedback "Socket server running." ;
-        establish_server fd ;
-      with exn ->
-        Senv.fatal "Server socket failed.@\nError: %s@"
-          (Printexc.to_string exn)
-    end
+  match Socket.get () with
+  | "" -> ()
+  | addr ->
+    match (SocketDomain.get ()) with
+    | "unix" ->
+      begin
+        match !server_addr with
+        | Some addr0 ->
+          begin
+            if addr0 <> addr then
+              Senv.warning "Socket server already running on [%s]." addr0
+          end
+        | None ->
+          try
+            server_addr := Some addr;
+            let addr_path = Filepath.of_string addr in
+            if Filesystem.exists addr_path then Unix.unlink addr ;
+            let fd = Unix.socket PF_UNIX SOCK_STREAM 0 in
+            Unix.bind fd (ADDR_UNIX addr) ;
+            if Senv.is_debug_key_enabled dkey then
+              Senv.feedback ~dkey "Socket server running on [%s]." addr
+            else
+              Senv.feedback "Socket server running." ;
+            establish_server fd ;
+          with exn ->
+            Senv.fatal "Server Unix socket failed.@\nError: %s"
+              (Printexc.to_string exn)
+      end
+    | "internet" ->
+      begin
+        let addr = if addr = "" then "127.0.0.1" else addr in
+        let port = SocketPort.get () in
+        match !server_addr, !server_port with
+        | Some addr0, Some port0 ->
+          begin
+            if addr0 <> addr || port0 <> port then
+              Senv.warning "Socket server already running on [%s:%d]." addr0 port0
+          end
+        | _ ->
+          try
+            server_addr := Some addr ;
+            server_port := Some port ;
+            let fd = Unix.socket PF_INET SOCK_STREAM 0 in
+            let addr_inet = Unix.inet_addr_of_string addr in
+            Senv.feedback ~dkey "Socket server will bind on %s:%d..." addr port;
+            Unix.bind fd (Unix.ADDR_INET (addr_inet, port)) ;
+            if Senv.is_debug_key_enabled dkey then
+              Senv.feedback ~dkey "Socket server running on [%s:%d]." addr port
+            else
+              Senv.feedback "Socket server running.";
+            establish_server fd ;
+          with exn ->
+          match exn with
+          | Unix.Unix_error (Unix.EADDRINUSE, "bind", _) ->
+            (* Note: this does not happen when SO_REUSEPORT is used *)
+            Senv.abort "bind failed: EADDRINUSE. Terminate all previous \
+                        Frama-C server processes and restart Ivette."
+          | _ ->
+            Senv.fatal "Server Internet socket failed.@\nError: %s"
+              (Printexc.to_string exn)
+      end
+    | _ -> assert false
 
 let () = Boot.Main.extend cmdline
 

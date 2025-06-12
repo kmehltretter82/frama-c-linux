@@ -24,6 +24,7 @@ import Net from 'net';
 import { Debug } from 'dome';
 import { json } from 'dome/data/json';
 import { Client } from './client';
+import { SocketDomain, defaultInetPort } from './server';
 
 const D = new Debug('SocketServer');
 
@@ -33,6 +34,11 @@ const TIMEOUT = 200;
 // --------------------------------------------------------------------------
 // --- Frama-C Server API
 // --------------------------------------------------------------------------
+
+function rsplit(s: string, delim: string): string[] {
+  const i = s.lastIndexOf(delim);
+  return i === -1 ? [s] : [s.slice(0, i), s.slice(i+1)];
+}
 
 class SocketClient extends Client {
 
@@ -44,12 +50,37 @@ class SocketClient extends Client {
   buffer: Buffer = Buffer.from('');
 
   /** Server CLI */
-  commandLine(sockaddr: string, params: string[]): string[] {
-    return ['-server-socket', sockaddr].concat(params);
+  commandLine(domain: SocketDomain, sockaddr: string, params: string[]):
+  string[] {
+    switch (domain) {
+      case 'internet': {
+        let addr, port;
+        if (sockaddr.includes(":")) {
+          [addr, port] = rsplit(sockaddr, ":");
+        } else {
+          addr = sockaddr;
+          port = defaultInetPort.toString();
+        }
+        const args = ['-server-socket-domain', domain,
+                      '-server-socket', addr, '-server-socket-port', port];
+        return args.concat(params);
+      }
+      case 'unix':
+        return ['-server-socket', sockaddr].concat(params);
+    }
+  }
+
+  createSocketConnection(sockaddr: string | [string, number],
+                         connectListener: () => void): Net.Socket {
+    if (sockaddr instanceof Array) { // internet socket: [host, port]
+      return Net.createConnection(sockaddr[1], sockaddr[0], connectListener);
+    } else { // unix socket: path
+      return Net.createConnection(sockaddr, connectListener);
+    }
   }
 
   /** Connection */
-  connect(sockaddr: string): void {
+  connect(sockaddr: string | [string, number]): void {
     this.retries++;
     if (this.socket) {
       this.socket.destroy();
@@ -58,7 +89,7 @@ class SocketClient extends Client {
       clearTimeout(this.timer);
       this.timer = undefined;
     }
-    const s = Net.createConnection(sockaddr, () => {
+    const s = this.createSocketConnection(sockaddr, () => {
       this.running = true;
       this.retries = 0;
       this.buffer = Buffer.from('');

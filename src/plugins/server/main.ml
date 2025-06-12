@@ -486,7 +486,7 @@ let start server =
 (* public API ; can be invoked to force server shutdown *)
 let stop server =
   begin
-    Senv.debug ~level:2 "Server stopped (was %a)"
+    Senv.debug ~level:2 "Stopping server (was %a)"
       (pp_running server.pretty) server.running ;
     kill_running server ;
     emitter := nop ;

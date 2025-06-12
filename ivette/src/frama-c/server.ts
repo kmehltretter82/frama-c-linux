@@ -124,12 +124,13 @@ const pending = new Map<string, PendingRequest>();
 /** Server process. */
 let process: ChildProcess | undefined;
 
-/** Polling timeout when server is busy. */
-const pollingTimeout = 50;
+/** Polling timeout when server is busy.
+    Note: Inet sockets are more prone to timeouts than Unix sockets. */
+const pollingTimeout = 200;
 let pollingTimer: NodeJS.Timeout | undefined;
 
 /** Killing timeout and timer for server process hard kill. */
-const killingTimeout = 500;
+const killingTimeout = 1000;
 let killingTimer: NodeJS.Timeout | undefined;
 
 // --------------------------------------------------------------------------
@@ -413,6 +414,10 @@ export function clear(): void {
 // --- Server Configure
 // --------------------------------------------------------------------------
 
+export const defaultInetAddress = '127.0.0.1';
+export const defaultInetPort = 9225;
+export type SocketDomain = 'internet' | 'unix';
+
 /** Server configuration. */
 export interface Configuration {
   /** Process environment variables (default: `undefined`). */
@@ -423,10 +428,14 @@ export interface Configuration {
   command?: string;
   /** Additional server arguments (default: empty). */
   params: string[];
-  /** Server socket (default: `ipc:///tmp/ivette.frama-c.<pid>.io`). */
+  /** Server socket domain (default: `unix`, except on Windows, where it
+      is `internet`). */
+  sockdomain?: SocketDomain;
+  /** Server socket (default: `ipc:///tmp/ivette.frama-c.<pid>.io` for Unix
+      sockets, or `127.0.0.1:9225` for Inet sockets). */
   sockaddr?: string;
   /** Shutdown timeout before server is hard killed, in milliseconds
-   *  (default: 300ms). */
+   *  (default: 1000ms). */
   timeout?: number;
   /** Server polling period in milliseconds (default: 200ms). */
   polling?: number;
@@ -468,23 +477,48 @@ export function getPath(path: string): string {
 // --- Low-level Launching
 // --------------------------------------------------------------------------
 
+function rsplit(s: string, delim: string): string[] {
+  const i = s.lastIndexOf(delim);
+  return i === -1 ? [s] : [s.slice(0, i), s.slice(i+1)];
+}
+
 async function _launch(): Promise<void> {
   let {
     env,
     working,
     command = 'frama-c',
     params,
+    sockdomain,
     sockaddr,
     logout,
     logerr,
   } = config;
 
-  if (!sockaddr) {
-    const tmp = Dome.getTempDir();
-    const pid = Dome.getPID();
-    sockaddr = System.join(tmp, `ivette.frama-c.${pid}.io`);
+  if (!sockdomain) {
+    /* Note: we were unable to get Unix sockets working on Windows,
+       despite the fact that it should be possible.
+       For now, Windows uses Inet sockets by default. */
+    sockdomain = System.platform === 'windows' ? 'internet' : 'unix';
+  } else {
+    // ensure that sockdomain has a valid value
+    if (sockdomain !== 'internet' && sockdomain !== 'unix') {
+      throw new Error("expected 'unix' or 'internet', got: " + sockdomain);
+    }
   }
-  params = client.commandLine(sockaddr, params);
+
+  if (!sockaddr) {
+    switch (sockdomain) {
+      case 'internet':
+        sockaddr = '127.0.0.1:9225';
+        break;
+      case 'unix': {
+        const tmp = Dome.getTempDir();
+        const pid = Dome.getPID();
+        sockaddr = System.join(tmp, `ivette.frama-c.${pid}.io`);
+      }
+    }
+  }
+  params = client.commandLine(sockdomain, sockaddr, params);
 
   buffer.clear();
   buffer.append('$', command);
@@ -540,7 +574,23 @@ async function _launch(): Promise<void> {
   });
   logModel.registerFeedback('Socket server is running');
   // Connect to Server
-  client.connect(sockaddr);
+  switch (sockdomain) {
+    case 'internet': {
+      // For TCP, Net.createConnection's parameters are port, then host
+      let host, port, portStr, inetSockaddr : [string, number];
+      if (sockaddr.includes(":")) {
+        [host, portStr] = rsplit(sockaddr, ":");
+        port = parseInt(portStr);
+        inetSockaddr = [host, port];
+      } else {
+        inetSockaddr = [sockaddr, defaultInetPort];
+      }
+      client.connect(inetSockaddr);
+      break;
+    }
+    case 'unix':
+      client.connect(sockaddr);
+  }
 }
 
 // --------------------------------------------------------------------------
