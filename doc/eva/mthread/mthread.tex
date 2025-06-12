@@ -230,7 +230,7 @@ example \verb+tests/ccfg.c+, reprinted below, is given in
 Figure~\ref{fig:ccfg}. How to generate this graph is explained in
 \S\ref{sec:html}.
 
-\lstinputlisting[firstline=3,numbers=left,language={[ANSI]C}]{\testdir/ccfg.c}
+\lstinputlisting[firstline=7,numbers=left,language={[ANSI]C}]{\testdir/ccfg.c}
 
 Let us illustrate through our example the characteristics of concurrent
 control-flow graphs that have been mentioned above. The options we hint at
@@ -619,7 +619,7 @@ below.\footnote{Prototypes for queue-related functions are not
   actually part of \pthread, and are in \texttt{mthread\_queue.c}.}
 
 %% CHECKRELEASE
-\lstinputlisting[breaklines=true,firstline=7,lastline=30,language={[ANSI]C}]{\sharedir/mthread_pthread.h}
+\lstinputlisting[breaklines=true,firstline=29,lastline=52,language={[ANSI]C}]{\sharedir/mthread_pthread.h}
 
 Except for the \verb+typedef+ declarations, everything can be taken
 verbatim from a system header for \pthread. Thus, since the included
@@ -659,7 +659,7 @@ library can be found in \verb+mthread_pthread.c+. Its interesting
 parts are reprinted below.
 
 %% CHECKRELEASE
-\lstinputlisting[breaklines=true,language={[ANSI]C}]{\sharedir/mthread_pthread.c}
+\lstinputlisting[breaklines=true,firstline=23,lastline=68,language={[ANSI]C}]{\sharedir/mthread_pthread.c}
 Notice the recurring pattern \verb+*obj = obj_init(&obj, ...)+ (with proper
 error-handling) used in
 both functions \verb+pthread_create+ and \verb+pthread_mutex_init+.
@@ -715,7 +715,7 @@ to exemplify some uses of \mthread. It is taken from the file
 {\tt tests/\cfile}, and contains a modified version of the
 classic philosophers problem.
 
-\lstinputlisting[firstline=3,numbers=left,language={[ANSI]C}]{\testdir/\cfile}
+\lstinputlisting[firstline=8,numbers=left,language={[ANSI]C}]{\testdir/\cfile}
 
 This code presents some interesting challenges. First, the ids for the
 threads and mutexes of the program are stored in two arrays,
@@ -838,7 +838,7 @@ Although it is seldom useful for the \Eva analysis, it may be for \mthread
 itself. Let us consider the file
 \verb+tests/init.c+ of \mthread, which is reproduced below.
 %
-\lstinputlisting[breaklines=true,firstline=4,numbers=left,language={[ANSI]C}]{\testdir/init.c}
+\lstinputlisting[breaklines=true,firstline=6,numbers=left,language={[ANSI]C}]{\testdir/init.c}
 %
 This example try to initialize 12 mutexes, using four different
 mechanisms. In the first loop, the mutexes are named using
