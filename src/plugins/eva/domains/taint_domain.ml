@@ -350,7 +350,7 @@ module TransferSingleTaint = struct
            of [exp] depends on is data-tainted. *)
         to_loc
     in
-    let exp_zone = Eva_ast.zone_of_exp to_loc_choosen exp in
+    let exp_zone = Eva_ast.PreciseDepsOf.zone_of_exp to_loc_choosen exp in
     let data_tainted = Zone.intersects state.locs_data exp_zone in
     (* [lval] becomes control-tainted if:
        - the current call depends on a tainted assume statements of a caller;
@@ -507,7 +507,7 @@ module TransferSingleTaint = struct
 
   let show_expr valuation state fmt exp =
     let to_loc = loc_of_lval valuation in
-    let exp_zone = Eva_ast.zone_of_exp to_loc exp in
+    let exp_zone = Eva_ast.PreciseDepsOf.zone_of_exp to_loc exp in
     Format.fprintf fmt "%B" (LatticeSingleTaint.intersects state exp_zone)
 end
 
