@@ -1,48 +1,33 @@
-\documentclass[web]{frama-c-book}
-\usepackage{xspace}
+\documentclass{frama-c-book}
+
 \usepackage{macros}
-\usepackage[english]{babel}
-%\usepackage{mathabx}
+\usepackage{ifthen}
 
+\input{fc-macros.tex}
 
-\begin{document}
+\newcommand{\framacversion}%
+           {\input{../../../VERSION} (\input{../../../VERSION_CODENAME}\unskip)}
 
-\newbox\carriagereturn
-\setbox\carriagereturn\hbox{}
-
-\coverpage{The Mthread plugin}
-
-
-\begin{titlepage}
-\begin{flushleft}
-\includegraphics[height=14mm]{cealistlogo.jpg}
-\end{flushleft}
-\vfill
-\title{Frama-C's Mthread plug-in}{Version 0.9}
+\title{The Mthread plug-in}
 \author{Boris Yakobowski with Richard Bonichon}
-\begin{tabular}{l}
-CEA LIST, Software Reliability Laboratory, Saclay, F-91191 \\
-\end{tabular}
-\vfill
-\begin{flushleft}
-  \textcopyright 2011-2021 CEA LIST
 
-  This work has been supported by the ANR project Veridyc
-  (ANR-09-SEGI-016).
-\end{flushleft}
-\end{titlepage}
+\fcversion{\framacversion}
 
+\cclicence{by-sa}
+\copyrightstarts{2011}
 
+%==============================================================================
+\begin{document}
+\sloppy
+\emergencystretch 3em
+
+\maketitle
 \tableofcontents
-\lstset{style=c}
 
-\selectlanguage{english}
 
 \chapter{An introduction to \mthread}
 
 \section{What is \mthread?}
-
-
 \label{sec:mthread}
 
 \mthread is a \framac plug-in dedicated to the analysis of concurrent
