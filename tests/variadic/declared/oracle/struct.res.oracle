@@ -1,5 +1,6 @@
-[variadic] struct.i:5: Declaration of variadic function f.
-[variadic] struct.i:10: Generic translation of call to variadic function.
+[kernel] Parsing struct.i (no preprocessing)
+[kernel:variadic] struct.i:5: Declaration of variadic function f.
+[kernel:variadic] struct.i:10: Generic translation of call to variadic function.
 [eva] Analyzing a complete application starting at main
 [kernel:annot:missing-spec] struct.i:10: Warning: 
   Neither code nor specification for function f,

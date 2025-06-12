@@ -1,7 +1,8 @@
-[variadic] multi.i:1: Declaration of variadic function f.
-[variadic] multi.i:12: Declaration of variadic function g.
-[variadic] multi.i:9: Generic translation of call to variadic function.
-[variadic] multi.i:18: Generic translation of call to variadic function.
+[kernel] Parsing multi.i (no preprocessing)
+[kernel:variadic] multi.i:1: Declaration of variadic function f.
+[kernel:variadic] multi.i:12: Declaration of variadic function g.
+[kernel:variadic] multi.i:9: Generic translation of call to variadic function.
+[kernel:variadic] multi.i:18: Generic translation of call to variadic function.
 [eva] Analyzing a complete application starting at main
 [kernel:annot:missing-spec] multi.i:18: Warning: 
   Neither code nor explicit assigns for function g,

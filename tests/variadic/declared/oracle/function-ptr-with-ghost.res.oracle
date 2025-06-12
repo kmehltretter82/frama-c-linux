@@ -1,5 +1,7 @@
-[variadic] function-ptr-with-ghost.i:4: Declaration of variadic function va_f.
-[variadic] function-ptr-with-ghost.i:2: 
+[kernel] Parsing function-ptr-with-ghost.i (no preprocessing)
+[kernel:variadic] function-ptr-with-ghost.i:4: 
+  Declaration of variadic function va_f.
+[kernel:variadic] function-ptr-with-ghost.i:2: 
   Generic translation of call to variadic function.
 [eva] Analyzing a complete application starting at main
 [kernel:annot:missing-spec] function-ptr-with-ghost.i:2: Warning: 

@@ -1,15 +1,17 @@
-[variadic] FRAMAC_SHARE/libc/fcntl.h:115: 
+[kernel] Parsing fcntl.c (with preprocessing)
+[kernel:variadic] FRAMAC_SHARE/libc/fcntl.h:115: 
   Declaration of variadic function fcntl.
-[variadic] FRAMAC_SHARE/libc/fcntl.h:118: Declaration of variadic function open.
-[variadic] FRAMAC_SHARE/libc/fcntl.h:125: 
+[kernel:variadic] FRAMAC_SHARE/libc/fcntl.h:118: 
+  Declaration of variadic function open.
+[kernel:variadic] FRAMAC_SHARE/libc/fcntl.h:125: 
   Declaration of variadic function openat.
-[variadic] fcntl.c:8: 
+[kernel:variadic] fcntl.c:8: 
   Translating call to the specialized version fcntl(int, int).
-[variadic] fcntl.c:9: 
+[kernel:variadic] fcntl.c:9: 
   Translating call to the specialized version fcntl(int, int, int).
-[variadic] fcntl.c:10: 
+[kernel:variadic] fcntl.c:10: 
   Translating call to the specialized version fcntl(int, int, struct flock *).
-[variadic:prototype] fcntl.c:16: Warning: 
+[kernel:prototype] fcntl.c:16: Warning: 
   No matching prototype found for this call to fcntl.
   Expected candidates:
          fcntl(int, int)
@@ -17,13 +19,13 @@
          fcntl(int, int, struct flock *)
   Given arguments:
          fcntl(int, int, int, int)
-[variadic] fcntl.c:16: 
+[kernel:variadic] fcntl.c:16: 
   Fallback translation of call fcntl to a call to the specialized version fcntl_fallback_1.
-[variadic] fcntl.c:20: 
+[kernel:variadic] fcntl.c:20: 
   Translating call to the specialized version fcntl(int, int).
-[variadic] fcntl.c:24: 
+[kernel:variadic] fcntl.c:24: 
   Translating call to the specialized version fcntl(int, int, struct flock *).
-[variadic:prototype] fcntl.c:28: Warning: 
+[kernel:prototype] fcntl.c:28: Warning: 
   No matching prototype found for this call to fcntl.
   Expected candidates:
          fcntl(int, int)
@@ -31,7 +33,7 @@
          fcntl(int, int, struct flock *)
   Given arguments:
          fcntl(int, int, double)
-[variadic] fcntl.c:28: 
+[kernel:variadic] fcntl.c:28: 
   Fallback translation of call fcntl to a call to the specialized version fcntl_fallback_2.
 [eva] Analyzing a complete application starting at main
 [eva] using specification for function __va_fcntl_void

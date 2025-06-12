@@ -1,50 +1,51 @@
-[variadic] FRAMAC_SHARE/libc/stdio.h:249: 
+[kernel] Parsing stdio_print.c (with preprocessing)
+[kernel:variadic] FRAMAC_SHARE/libc/stdio.h:249: 
   Declaration of variadic function fprintf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:251: 
+[kernel:variadic] FRAMAC_SHARE/libc/stdio.h:251: 
   Declaration of variadic function fscanf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:253: 
+[kernel:variadic] FRAMAC_SHARE/libc/stdio.h:253: 
   Declaration of variadic function printf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:254: 
+[kernel:variadic] FRAMAC_SHARE/libc/stdio.h:254: 
   Declaration of variadic function scanf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:255: 
+[kernel:variadic] FRAMAC_SHARE/libc/stdio.h:255: 
   Declaration of variadic function snprintf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:257: 
+[kernel:variadic] FRAMAC_SHARE/libc/stdio.h:257: 
   Declaration of variadic function sprintf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:259: 
+[kernel:variadic] FRAMAC_SHARE/libc/stdio.h:259: 
   Declaration of variadic function sscanf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:620: 
+[kernel:variadic] FRAMAC_SHARE/libc/stdio.h:620: 
   Declaration of variadic function dprintf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:682: 
+[kernel:variadic] FRAMAC_SHARE/libc/stdio.h:682: 
   Declaration of variadic function asprintf.
-[variadic] stdio_print.c:9: Warning: 
+[kernel] stdio_print.c:9: Warning: 
   Call to function fprintf with non-static format argument: assuming that parameters are coherent with the format, and that no %n specifiers are present in the actual string.
-[variadic] stdio_print.c:9: 
+[kernel:variadic] stdio_print.c:9: 
   Translating call to fprintf to a call to the specialized version fprintf_va_1.
-[variadic] stdio_print.c:10: Warning: 
+[kernel] stdio_print.c:10: Warning: 
   Call to function printf with non-static format argument: assuming that parameters are coherent with the format, and that no %n specifiers are present in the actual string.
-[variadic] stdio_print.c:10: 
+[kernel:variadic] stdio_print.c:10: 
   Translating call to printf to a call to the specialized version printf_va_1.
-[variadic] stdio_print.c:11: Warning: 
+[kernel] stdio_print.c:11: Warning: 
   Call to function snprintf with non-static format argument: assuming that parameters are coherent with the format, and that no %n specifiers are present in the actual string.
-[variadic] stdio_print.c:11: 
+[kernel:variadic] stdio_print.c:11: 
   Translating call to snprintf to a call to the specialized version snprintf_va_1.
-[variadic] stdio_print.c:12: Warning: 
+[kernel] stdio_print.c:12: Warning: 
   Call to function sprintf with non-static format argument: assuming that parameters are coherent with the format, and that no %n specifiers are present in the actual string.
-[variadic] stdio_print.c:12: 
+[kernel:variadic] stdio_print.c:12: 
   Translating call to sprintf to a call to the specialized version sprintf_va_1.
-[variadic] stdio_print.c:13: Warning: 
+[kernel] stdio_print.c:13: Warning: 
   Call to function dprintf with non-static format argument: assuming that parameters are coherent with the format, and that no %n specifiers are present in the actual string.
-[variadic] stdio_print.c:13: 
+[kernel:variadic] stdio_print.c:13: 
   Translating call to dprintf to a call to the specialized version dprintf_va_1.
-[variadic] stdio_print.c:15: 
+[kernel:variadic] stdio_print.c:15: 
   Translating call to fprintf to a call to the specialized version fprintf_va_2.
-[variadic] stdio_print.c:16: 
+[kernel:variadic] stdio_print.c:16: 
   Translating call to printf to a call to the specialized version printf_va_2.
-[variadic] stdio_print.c:17: 
+[kernel:variadic] stdio_print.c:17: 
   Translating call to snprintf to a call to the specialized version snprintf_va_2.
-[variadic] stdio_print.c:18: 
+[kernel:variadic] stdio_print.c:18: 
   Translating call to sprintf to a call to the specialized version sprintf_va_2.
-[variadic] stdio_print.c:19: 
+[kernel:variadic] stdio_print.c:19: 
   Translating call to dprintf to a call to the specialized version dprintf_va_2.
 [eva] Analyzing a complete application starting at main
 [eva:alarm] stdio_print.c:9: Warning: 

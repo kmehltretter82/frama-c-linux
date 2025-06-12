@@ -1,5 +1,6 @@
-[variadic] va_list-as-arg.c:15: Declaration of variadic function sum.
-[variadic] va_list-as-arg.c:25: 
+[kernel] Parsing va_list-as-arg.c (with preprocessing)
+[kernel:variadic] va_list-as-arg.c:15: Declaration of variadic function sum.
+[kernel:variadic] va_list-as-arg.c:25: 
   Generic translation of call to variadic function.
 [eva] Analyzing a complete application starting at main
 [eva] ====== VALUES COMPUTED ======

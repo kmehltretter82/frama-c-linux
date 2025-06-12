@@ -1,16 +1,18 @@
-[variadic] FRAMAC_SHARE/libc/fcntl.h:115: 
+[kernel] Parsing open_wrong.c (with preprocessing)
+[kernel:variadic] FRAMAC_SHARE/libc/fcntl.h:115: 
   Declaration of variadic function fcntl.
-[variadic] FRAMAC_SHARE/libc/fcntl.h:118: Declaration of variadic function open.
-[variadic] FRAMAC_SHARE/libc/fcntl.h:125: 
+[kernel:variadic] FRAMAC_SHARE/libc/fcntl.h:118: 
+  Declaration of variadic function open.
+[kernel:variadic] FRAMAC_SHARE/libc/fcntl.h:125: 
   Declaration of variadic function openat.
-[variadic:prototype] open_wrong.c:13: Warning: 
+[kernel:prototype] open_wrong.c:13: Warning: 
   No matching prototype found for this call to open.
   Expected candidates:
          open(char const *, int)
          open(char const *, int, mode_t)
   Given arguments:
          open(char const *, int, char const *)
-[variadic] open_wrong.c:13: 
+[kernel:variadic] open_wrong.c:13: 
   Fallback translation of call open to a call to the specialized version open_fallback_1.
 [eva] Analyzing a complete application starting at main
 [kernel:annot:missing-spec] open_wrong.c:13: Warning: 

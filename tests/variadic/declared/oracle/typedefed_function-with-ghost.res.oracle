@@ -1,6 +1,7 @@
-[variadic] typedefed_function-with-ghost.i:2: 
+[kernel] Parsing typedefed_function-with-ghost.i (no preprocessing)
+[kernel:variadic] typedefed_function-with-ghost.i:2: 
   Declaration of variadic function f.
-[variadic] typedefed_function-with-ghost.i:5: 
+[kernel:variadic] typedefed_function-with-ghost.i:5: 
   Generic translation of call to variadic function.
 [eva] Analyzing a complete application starting at main
 [kernel:annot:missing-spec] typedefed_function-with-ghost.i:5: Warning: 

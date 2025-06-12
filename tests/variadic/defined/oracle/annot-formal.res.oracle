@@ -1,5 +1,7 @@
-[variadic] annot-formal.c:4: Declaration of variadic function sum.
-[variadic] annot-formal.c:20: Generic translation of call to variadic function.
+[kernel] Parsing annot-formal.c (with preprocessing)
+[kernel:variadic] annot-formal.c:4: Declaration of variadic function sum.
+[kernel:variadic] annot-formal.c:20: 
+  Generic translation of call to variadic function.
 [eva] Analyzing a complete application starting at main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function sum:

@@ -1,6 +1,9 @@
-[variadic] recursive.i:4: Declaration of variadic function f.
-[variadic] recursive.i:8: Generic translation of call to variadic function.
-[variadic] recursive.i:12: Generic translation of call to variadic function.
+[kernel] Parsing recursive.i (no preprocessing)
+[kernel:variadic] recursive.i:4: Declaration of variadic function f.
+[kernel:variadic] recursive.i:8: 
+  Generic translation of call to variadic function.
+[kernel:variadic] recursive.i:12: 
+  Generic translation of call to variadic function.
 [eva] Analyzing a complete application starting at main
 [eva:recursion] recursive.i:8: detected recursive call of function f.
 [eva] ====== VALUES COMPUTED ======

@@ -1,3 +1,4 @@
+[kernel] Parsing no-va-with-ghost.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [kernel:annot:missing-spec] no-va-with-ghost.i:4: Warning: 
   Neither code nor specification for function f,

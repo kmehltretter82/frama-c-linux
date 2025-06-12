@@ -1,12 +1,13 @@
-[variadic] FRAMAC_SHARE/libc/stropts.h:164: 
+[kernel] Parsing ioctl.c (with preprocessing)
+[kernel:variadic] FRAMAC_SHARE/libc/stropts.h:164: 
   Declaration of variadic function ioctl.
-[variadic] ioctl.c:13: 
+[kernel:variadic] ioctl.c:13: 
   Translating call to the specialized version ioctl(int, int).
-[variadic] ioctl.c:15: 
+[kernel:variadic] ioctl.c:15: 
   Translating call to the specialized version ioctl(int, int, void *).
-[variadic] ioctl.c:17: 
+[kernel:variadic] ioctl.c:17: 
   Translating call to the specialized version ioctl(int, int, void *).
-[variadic] ioctl.c:18: 
+[kernel:variadic] ioctl.c:18: 
   Translating call to the specialized version ioctl(int, int, int).
 [eva] Analyzing a complete application starting at main
 [eva] using specification for function __va_ioctl_void

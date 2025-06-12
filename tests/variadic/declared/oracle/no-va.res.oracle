@@ -1,3 +1,4 @@
+[kernel] Parsing no-va.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
 [kernel:annot:missing-spec] no-va.i:4: Warning: 
   Neither code nor specification for function f,

@@ -1,5 +1,6 @@
-[variadic] multiple-va_start.c:9: Declaration of variadic function pack.
-[variadic] multiple-va_start.c:32: 
+[kernel] Parsing multiple-va_start.c (with preprocessing)
+[kernel:variadic] multiple-va_start.c:9: Declaration of variadic function pack.
+[kernel:variadic] multiple-va_start.c:32: 
   Generic translation of call to variadic function.
 [eva] Analyzing a complete application starting at main
 [eva:malloc:new] multiple-va_start.c:20: allocating variable __malloc_pack_l20

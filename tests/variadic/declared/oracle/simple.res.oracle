@@ -1,5 +1,6 @@
-[variadic] simple.i:1: Declaration of variadic function f.
-[variadic] simple.i:9: Generic translation of call to variadic function.
+[kernel] Parsing simple.i (no preprocessing)
+[kernel:variadic] simple.i:1: Declaration of variadic function f.
+[kernel:variadic] simple.i:9: Generic translation of call to variadic function.
 [eva] Analyzing a complete application starting at main
 [kernel:annot:missing-spec] simple.i:9: Warning: 
   Neither code nor explicit assigns for function f,

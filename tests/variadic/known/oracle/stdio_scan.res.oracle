@@ -1,38 +1,39 @@
-[variadic] FRAMAC_SHARE/libc/stdio.h:249: 
+[kernel] Parsing stdio_scan.c (with preprocessing)
+[kernel:variadic] FRAMAC_SHARE/libc/stdio.h:249: 
   Declaration of variadic function fprintf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:251: 
+[kernel:variadic] FRAMAC_SHARE/libc/stdio.h:251: 
   Declaration of variadic function fscanf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:253: 
+[kernel:variadic] FRAMAC_SHARE/libc/stdio.h:253: 
   Declaration of variadic function printf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:254: 
+[kernel:variadic] FRAMAC_SHARE/libc/stdio.h:254: 
   Declaration of variadic function scanf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:255: 
+[kernel:variadic] FRAMAC_SHARE/libc/stdio.h:255: 
   Declaration of variadic function snprintf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:257: 
+[kernel:variadic] FRAMAC_SHARE/libc/stdio.h:257: 
   Declaration of variadic function sprintf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:259: 
+[kernel:variadic] FRAMAC_SHARE/libc/stdio.h:259: 
   Declaration of variadic function sscanf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:620: 
+[kernel:variadic] FRAMAC_SHARE/libc/stdio.h:620: 
   Declaration of variadic function dprintf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:682: 
+[kernel:variadic] FRAMAC_SHARE/libc/stdio.h:682: 
   Declaration of variadic function asprintf.
-[variadic] stdio_scan.c:10: Warning: 
+[kernel] stdio_scan.c:10: Warning: 
   Call to function fscanf with non-static format argument: assuming that parameters are coherent with the format, and that no %n specifiers are present in the actual string.
-[variadic] stdio_scan.c:10: 
+[kernel:variadic] stdio_scan.c:10: 
   Translating call to fscanf to a call to the specialized version fscanf_va_1.
-[variadic] stdio_scan.c:11: Warning: 
+[kernel] stdio_scan.c:11: Warning: 
   Call to function scanf with non-static format argument: assuming that parameters are coherent with the format, and that no %n specifiers are present in the actual string.
-[variadic] stdio_scan.c:11: 
+[kernel:variadic] stdio_scan.c:11: 
   Translating call to scanf to a call to the specialized version scanf_va_1.
-[variadic] stdio_scan.c:12: Warning: 
+[kernel] stdio_scan.c:12: Warning: 
   Call to function sscanf with non-static format argument: assuming that parameters are coherent with the format, and that no %n specifiers are present in the actual string.
-[variadic] stdio_scan.c:12: 
+[kernel:variadic] stdio_scan.c:12: 
   Translating call to sscanf to a call to the specialized version sscanf_va_1.
-[variadic] stdio_scan.c:14: 
+[kernel:variadic] stdio_scan.c:14: 
   Translating call to fscanf to a call to the specialized version fscanf_va_2.
-[variadic] stdio_scan.c:15: 
+[kernel:variadic] stdio_scan.c:15: 
   Translating call to scanf to a call to the specialized version scanf_va_2.
-[variadic] stdio_scan.c:16: 
+[kernel:variadic] stdio_scan.c:16: 
   Translating call to sscanf to a call to the specialized version sscanf_va_2.
 [eva] Analyzing a complete application starting at main
 [eva:alarm] stdio_scan.c:10: Warning: 

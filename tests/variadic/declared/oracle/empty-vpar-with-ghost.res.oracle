@@ -1,5 +1,6 @@
-[variadic] empty-vpar-with-ghost.i:1: Declaration of variadic function f.
-[variadic] empty-vpar-with-ghost.i:8: 
+[kernel] Parsing empty-vpar-with-ghost.i (no preprocessing)
+[kernel:variadic] empty-vpar-with-ghost.i:1: Declaration of variadic function f.
+[kernel:variadic] empty-vpar-with-ghost.i:8: 
   Generic translation of call to variadic function.
 [eva] Analyzing a complete application starting at main
 [kernel:annot:missing-spec] empty-vpar-with-ghost.i:8: Warning: 

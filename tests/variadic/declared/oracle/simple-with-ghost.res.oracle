@@ -1,5 +1,6 @@
-[variadic] simple-with-ghost.i:1: Declaration of variadic function f.
-[variadic] simple-with-ghost.i:9: 
+[kernel] Parsing simple-with-ghost.i (no preprocessing)
+[kernel:variadic] simple-with-ghost.i:1: Declaration of variadic function f.
+[kernel:variadic] simple-with-ghost.i:9: 
   Generic translation of call to variadic function.
 [eva] Analyzing a complete application starting at main
 [kernel:annot:missing-spec] simple-with-ghost.i:9: Warning: 

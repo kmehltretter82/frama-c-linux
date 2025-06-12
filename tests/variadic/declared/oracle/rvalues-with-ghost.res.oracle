@@ -1,5 +1,6 @@
-[variadic] rvalues-with-ghost.i:1: Declaration of variadic function f.
-[variadic] rvalues-with-ghost.i:5: 
+[kernel] Parsing rvalues-with-ghost.i (no preprocessing)
+[kernel:variadic] rvalues-with-ghost.i:1: Declaration of variadic function f.
+[kernel:variadic] rvalues-with-ghost.i:5: 
   Generic translation of call to variadic function.
 [eva] Analyzing a complete application starting at main
 [kernel:annot:missing-spec] rvalues-with-ghost.i:5: Warning: 

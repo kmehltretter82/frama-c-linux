@@ -1,4 +1,5 @@
-[variadic] sum_with_unspecified_sequence.c:8: 
+[kernel] Parsing sum_with_unspecified_sequence.c (with preprocessing)
+[kernel:variadic] sum_with_unspecified_sequence.c:8: 
   Declaration of variadic function sum.
 [eva] Analyzing a complete application starting at sum
 [eva:alarm] sum_with_unspecified_sequence.c:14: Warning: 

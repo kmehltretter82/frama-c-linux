@@ -1,5 +1,7 @@
-[variadic] va_copy.c:9: Declaration of variadic function pack.
-[variadic] va_copy.c:32: Generic translation of call to variadic function.
+[kernel] Parsing va_copy.c (with preprocessing)
+[kernel:variadic] va_copy.c:9: Declaration of variadic function pack.
+[kernel:variadic] va_copy.c:32: 
+  Generic translation of call to variadic function.
 [eva] Analyzing a complete application starting at main
 [eva:malloc:new] va_copy.c:21: allocating variable __malloc_pack_l21
 [eva] ====== VALUES COMPUTED ======

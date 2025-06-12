@@ -1,5 +1,6 @@
-[variadic] struct.c:18: Declaration of variadic function inter.
-[variadic] struct.c:41: Generic translation of call to variadic function.
+[kernel] Parsing struct.c (with preprocessing)
+[kernel:variadic] struct.c:18: Declaration of variadic function inter.
+[kernel:variadic] struct.c:41: Generic translation of call to variadic function.
 [eva] Analyzing a complete application starting at main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function max:

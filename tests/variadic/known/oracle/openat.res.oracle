@@ -1,22 +1,24 @@
-[variadic] FRAMAC_SHARE/libc/fcntl.h:115: 
+[kernel] Parsing openat.c (with preprocessing)
+[kernel:variadic] FRAMAC_SHARE/libc/fcntl.h:115: 
   Declaration of variadic function fcntl.
-[variadic] FRAMAC_SHARE/libc/fcntl.h:118: Declaration of variadic function open.
-[variadic] FRAMAC_SHARE/libc/fcntl.h:125: 
+[kernel:variadic] FRAMAC_SHARE/libc/fcntl.h:118: 
+  Declaration of variadic function open.
+[kernel:variadic] FRAMAC_SHARE/libc/fcntl.h:125: 
   Declaration of variadic function openat.
-[variadic] openat.c:8: 
+[kernel:variadic] openat.c:8: 
   Translating call to the specialized version openat(int, char const *, int, mode_t).
-[variadic] openat.c:9: 
+[kernel:variadic] openat.c:9: 
   Translating call to the specialized version openat(int, char const *, int, mode_t).
-[variadic:typing] openat.c:9: Warning: 
+[kernel:typing:variadic] openat.c:9: Warning: 
   Incorrect type for argument 4. The argument will be cast from int to mode_t.
-[variadic:prototype] openat.c:10: Warning: 
+[kernel:prototype] openat.c:10: Warning: 
   No matching prototype found for this call to openat.
   Expected candidates:
          openat(int, char const *, int)
          openat(int, char const *, int, mode_t)
   Given arguments:
          openat(int, char const *, int, double)
-[variadic] openat.c:10: 
+[kernel:variadic] openat.c:10: 
   Fallback translation of call openat to a call to the specialized version openat_fallback_1.
 [eva] Analyzing a complete application starting at main
 [eva] using specification for function __va_openat_mode_t
