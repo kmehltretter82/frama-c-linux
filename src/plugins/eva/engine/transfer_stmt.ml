@@ -432,7 +432,7 @@ module Make (Engine: Engine_sig.S) = struct
       let* state = Domain.finalize_call stmt call recursion ~pre ~post in
       (* Backward propagates the [reductions] on the concrete arguments. *)
       let* state = reduce_arguments reductions state in
-      treat_return ~pos:(Position.Local pos) ~kf_callee lv call.return state
+      treat_return ~pos:(Position.of_local pos) ~kf_callee lv call.return state
     in
     (* Partitioning key remains unchanged. *)
     let process (key, state) =
@@ -658,7 +658,7 @@ module Make (Engine: Engine_sig.S) = struct
 
   (** Applies the show_each or dump_each directives. *)
   let apply_special_directives ~pos ~subdivnb kf arguments state =
-    let pos = Position.Local pos in
+    let pos = Position.of_local pos in
     let name = Kernel_function.get_name kf in
     if Ast_info.start_with_frama_c name
     then
@@ -721,7 +721,7 @@ module Make (Engine: Engine_sig.S) = struct
       let _ =
         (* Register call arguments to Inout_access *)
         let+ call, _, valuation = eval in
-        Transfer_inout.add_call_args (Position.Local pos) valuation call
+        Transfer_inout.add_call_args (Position.of_local pos) valuation call
       in
       (* The special Frama_C_ functions to print states are handled here. *)
       if apply_special_directives ~pos ~subdivnb kf args state

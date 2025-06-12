@@ -26,7 +26,7 @@
 type local = Cil_types.stmt * Callstack.t
 
 (** General position. *)
-type t =
+type t = private
   | RootCall of Cil_types.kernel_function
   | GlobalInit of Cil_types.varinfo
   | Local of local
@@ -92,6 +92,10 @@ val of_kinstr : Cil_types.kinstr -> Callstack.t -> t
     and the given callstack. If [kinstr] is [Kstmt], it will be a local
     position. Otherwise, the position will be the top
     of the callstack or a global position if the callstack is empty. *)
+
+val of_local : local -> t
+(** [of_local lpos] coerces a local position into a general position. *)
+
 
 (** {2 Accessors} *)
 

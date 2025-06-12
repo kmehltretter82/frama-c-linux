@@ -169,3 +169,6 @@ let of_kinstr kinstr callstack =
       RootCall kf
     | _kf, Some (stmt, callstack) ->
       Local (stmt, callstack)
+
+let of_local lpos =
+  Local lpos

@@ -268,7 +268,7 @@ module Make_Dataflow
     (* There should be only one statement contract, if any. *)
     | (_, spec) :: _ ->
       let assigns = Ast_info.merge_assigns_from_spec ~warn:false spec in
-      let pos = Position.Local pos in
+      let pos = Position.of_local pos in
       lift (Spec.treat_statement_assigns ~pos assigns)
 
   let transfer_assume ~pos (exp : exp) (kind : guard_kind)

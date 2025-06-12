@@ -28,7 +28,7 @@ let concurrent_writes shared_bases =
   (* Domain enabled *)
   | Some _extract ->
     let add_pos stmt cs _state acc =
-      let pos = Position.Local (stmt, cs) in
+      let pos = Position.local stmt cs in
       (* TODO: Maybe take the memory read/written for all callstacks of the
          given statement? (can be done directly by Inout_access). *)
       let filter = Inout_access.keep_globals_only in
