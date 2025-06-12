@@ -49,7 +49,21 @@ module type S = sig
       position is also printed. *)
 end
 
-module Local : S with type t = local
+module Local :
+sig
+  include S with type t = local
+
+  val kf : t -> Cil_types.kernel_function
+  (** [kf aloc] returns the kernel function of a local position. *)
+
+  val stmt : t -> Cil_types.stmt
+  (** [stmt aloc] returns the stmt of a local position. *)
+
+  val callstack : t -> Callstack.t
+  (** [callstack aloc] returns the callstack of a local position. *)
+end
+
+
 include S with type t := t
 
 (** {2 Constructors} *)

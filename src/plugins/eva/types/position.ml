@@ -56,14 +56,23 @@ struct
   let loc (stmt, _cs) =
     Cil_datatype.Stmt.loc stmt
 
-  let pos aloc =
-    fst (loc aloc)
+  let pos lpos =
+    fst (loc lpos)
 
-  let kinstr aloc =
-    Cil_types.Kstmt (fst aloc)
+  let kinstr lpos =
+    Cil_types.Kstmt (fst lpos)
 
-  let pretty_loc fmt aloc =
-    Printer.pp_location fmt (loc aloc)
+  let pretty_loc fmt lpos =
+    Printer.pp_location fmt (loc lpos)
+
+  let kf (_stmt, cs) =
+    Callstack.top_kf cs
+
+  let stmt (stmt, _cs) =
+    stmt
+
+  let callstack (_stmt, cs) =
+    cs
 end
 
 type local = Local.t
@@ -131,13 +140,13 @@ let kf pos =
   match pos with
   | RootCall kf -> Some kf
   | GlobalInit _ -> None
-  | Local (_stmt, cs) -> Some (Callstack.top_kf cs)
+  | Local lpos -> Some (Local.kf lpos)
 
 let callstack pos =
   match pos with
   | RootCall kf -> Some (Callstack.init kf)
   | GlobalInit _vi -> None
-  | Local (_stmt,cs) -> Some cs
+  | Local lpos -> Some (Local.callstack lpos)
 
 let pretty_loc fmt pos =
   Printer.pp_location fmt (loc pos)
