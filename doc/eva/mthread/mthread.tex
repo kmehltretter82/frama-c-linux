@@ -30,7 +30,7 @@
 \section{What is \mthread?}
 \label{sec:mthread}
 
-\mthread is a \framac plug-in dedicated to the analysis of concurrent
+\mthread is a \FramaC plug-in dedicated to the analysis of concurrent
 \C programs. It finds and displays multithreaded events,
 such as thread creation, mutex
 locking, access to shared variables, \etc. \mthread then gives a very
@@ -46,7 +46,7 @@ are reported.
 \label{sec:mt_desc}
 
 \mthread performs sound and precise analyzes of concurrent
-programs. It is built on top of the \Eva analysis of \framac, and uses
+programs. It is built on top of the \Eva analysis of \FramaC, and uses
 the latter to derive sound values (hence sometimes over-approximated) for
 all the variables of the program, including those that are shared
 between multiple threads. Schematically, \mthread's behavior can be summarized as
@@ -87,7 +87,7 @@ More details on how \mthread works are given in \mychap{mthread-theory}.
 
 \section{Running \mthread}
 
-\mthread is a \framac plug-in, and is activated when launching \framac
+\mthread is a \FramaC plug-in, and is activated when launching \FramaC
 by turning on the {\tt -mthread} switch at your shell prompt, as follows:
 \begin{shell}
 % frama-c <C files> -mthread <mthread options>
@@ -119,7 +119,7 @@ Although the approach outlined above is simple, obtaining precise
 results is not. Indeed, we must be careful not to compute too general
 behaviors for the various threads, the risk being to get unusable
 results. % For example,
-% the \nom{inout} plugin of \framac is able to compute memory zones
+% the \nom{inout} plugin of \FramaC is able to compute memory zones
 % accessed by a program. However,
 %
 \mthread uses some callbacks made available by the \Eva analysis to
@@ -154,7 +154,7 @@ always affected the value 1 (\resp. 2). This is much more precise than
 the information available by only inspecting the state of the \Eva
 analysis at the end of the execution, which merges together all the calls
 to a function. (This can be easily verified by querying the
-possible values for \verb+p+ and \verb+v+ in the GUI of \framac, which
+possible values for \verb+p+ and \verb+v+ in the GUI of \FramaC, which
 would lead to conclude that \verb+x+ and \verb+y+ are affected
 either 1 or 2, without the possibility to know which one).
 
@@ -195,7 +195,7 @@ to another, and this is captured by our use of calling contexts.
 
 Notice that the concurrent control-flow graph of a thread is very
 different from what would be obtained with the \nom{slicing} plugin of
-\framac.  In particular, our control-flow graph does not represent
+\FramaC.  In particular, our control-flow graph does not represent
 executable code at all. (For example, incrementations of loop indices
 are generally removed from the graph.) Conversely, our graph can be more
 precise when a function is called multiple times, and roughly corresponds
@@ -250,7 +250,7 @@ are documented in \myappdx{options}.
 
 \item \verb+Loop+ nodes represent \verb+while(1)+ loops;
   \verb+for+ loops are automatically desugared into \verb+while+
-  ones by \framac.
+  ones by \FramaC.
 
 \item Diamond nodes  or appear for a function \verb+f+ without
   definition.  They represent all the events that occur
@@ -322,7 +322,7 @@ which a race condition between at least two threads can occur.
 %
 \mthread performs a fine-grained analysis to detect those
 regions. % A simple solution to do so
-% would be to reuse \nom{inout} plugin of \framac. By calling it on a
+% would be to reuse \nom{inout} plugin of \FramaC. By calling it on a
 % thread, we would obtain the list of globals it accesses.  Then it
 % would suffice to intersect the results for all distinct threads,
 % and keep all memory zones that are in any intersection.
@@ -330,7 +330,7 @@ It proceeds as follows:
 \begin{enumerate}
 \item Once a thread is evaluated by the \Eva analysis, we compute the
   global variables it reads and writes, using the \nom{inout} plugin
-  of \framac. This plugin uses the results of the \Eva analysis,
+  of \FramaC. This plugin uses the results of the \Eva analysis,
   thus giving us a sound but quite imprecise over-approximation
   of the shared zones accessed by this thread. Let us call
   $\ri{j}$ (\resp. $\wi{j}$) the zones that are read
@@ -649,7 +649,7 @@ Notice the recurring pattern \verb+*obj = obj_init(&obj, ...)+ (with proper
 error-handling) used in
 both functions \verb+pthread_create+ and \verb+pthread_mutex_init+.
 The address holding the object is used as name hint during the
-creation. % (it is casted to \verb+framac_mthread_name+ by \framac parser)
+creation. % (it is casted to \verb+framac_mthread_name+ by \FramaC parser)
 Then the \mthread initialization function returns the id of the object, which
 is stored at the given address. The functions that use this id
 either dereference their argument if the id is passed as a pointer
@@ -664,7 +664,7 @@ a thread, are not given a body; for now, we implicitly assume that
 thread. For functions
 that do not initialize values, there is little differences between
 not stubbing a function, and giving it a trivial body; the latter
-approach however silences a few \framac warnings.  For functions that
+approach however silences a few \FramaC warnings.  For functions that
 initialize a structure used later, a stub is however mandatory.
 % (We have not yet stubbed functions such as \verb+pthread_attr_init+ for this
 % reason.)
@@ -717,11 +717,11 @@ those two objects.
 \subsection{A first try}
 \label{sec:philo-no-slevel}
 
-Let us start \mthread on this program. We need to start \framac
+Let us start \mthread on this program. We need to start \FramaC
 on both \verb+philo.c+ and on our stubbed \pthread library. In order
 to use our own headers, a proper \verb+-I+ directive must be given
 to our \C preprocessor. The \verb+-nostdinc+ option is also a good idea
-to ensure that \framac will not use any unwanted system header.
+to ensure that \FramaC will not use any unwanted system header.
 Finally, the \Eva analysis is by default very verbose, and it is a
 good idea to partially silence it using \verb+-eva-verbose 0+.
 Thus, a complete invocation of \mthread would be
@@ -730,7 +730,7 @@ Thus, a complete invocation of \mthread would be
    -mthread  $MTSHARE/mthread_pthread.c $MTSHARE/mthread_queue.c philo.c
    -eva-verbose 0
 \end{shell}
-(\framac assumes the main function is called \verb+main+, which is the
+(\FramaC assumes the main function is called \verb+main+, which is the
 case here)
 
 \smallskip
@@ -760,7 +760,7 @@ of course due to the presence of the loop, which is executed symbolically,
 but imprecisely. While the first iteration of the body proceeds as
 expected (and initializes \verb+locks[0]+), the next ones do not. Instead,
 during the analysis of the loop, the value \verb+i+ ranges over the sets
-\verb+{0}+ \ldots \verb+{0, 1, 2, 3, 4}+. By default, \framac simulates
+\verb+{0}+ \ldots \verb+{0, 1, 2, 3, 4}+. By default, \FramaC simulates
 a 32 bits architecture, on which an \verb+int+ is 4 bytes. Thus, the
 expression \verb#&locks[i]# ranges over the locations \verb+&locks+, \ldots
 \verb#&locks+{0;4;8;12;16}#, exactly as indicated by the \Eva analysis.
@@ -865,11 +865,11 @@ err on the side of caution, and refuses the subsequent
 initializations. A possible solution (other than changing the calls to
 \verb+mutex_init+ in the code) is to syntactically unroll the loop, as
 was done for the third one. The instruction
-\verb+//@ loop unfold N;+ instructs \framac to unroll a loop
+\verb+//@ loop unfold N;+ instructs \FramaC to unroll a loop
 \verb+N+ times.\footnote{If {\tt N} is a \C macro (expansed by the
   preprocessor according to a \lstinline{#define} instruction) and
   not a \C constant,
-  \framac must be invoked with the \lstinline{-pp-annot} option.}
+  \FramaC must be invoked with the \lstinline{-pp-annot} option.}
 Afterward, \mthread sees some mutex initializations at different
 statements, and accepts them. Internally however, those statements point to
 the same initial line number, hence the messages for the third loop
@@ -1201,7 +1201,7 @@ philo.c:54:[mt] Receiving message on &queue, max size 2, stored in &end.
 \end{logs}
 \mthread is quite accommodating about the content of the message,
 and tolerates the fact that a part of the source buffer is uninitialized.
-Inspecting the value of \verb+end+\footnote{For example using \framac's GUI}
+Inspecting the value of \verb+end+\footnote{For example using \FramaC's GUI}
 after line 54 of \verb+philo.c+ reveals that the possible values are
 \begin{logs}
 end[0] $\in$ {1; 3; 4; 5}
@@ -1297,7 +1297,7 @@ As a reminder, the generic options for \mthread are the following:
 \item[{\tt -mt-help}] Display a short summary of all the \mthread
   options available.
 
-  (The options for \framac in general can be obtained through
+  (The options for \FramaC in general can be obtained through
   \verb+frama-c -kernel-help+, while those for the \Eva analysis are
   invoked by \verb+frama-c -eva-help+.)
 
