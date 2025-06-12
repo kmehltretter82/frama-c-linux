@@ -151,14 +151,6 @@ let callstack pos =
 let pretty_loc fmt pos =
   Printer.pp_location fmt (loc pos)
 
-let of_call (call : ('a, 'b) Eval.call) =
-  let kf, lloc = Callstack.pop_call call.callstack in
-  assert (Kernel_function.equal kf call.kf);
-  match lloc, call.return with
-  | None, Some vi -> GlobalInit vi
-  | None, None -> RootCall call.kf
-  | Some (stmt, caller_stack), _ -> Local (stmt, caller_stack)
-
 let of_kinstr kinstr callstack =
   match kinstr with
   | Cil_types.Kstmt stmt ->

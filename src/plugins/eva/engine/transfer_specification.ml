@@ -368,7 +368,7 @@ module Make
      and [status] the status of the behaviors. *)
   let compute_effects ~warn call spec behaviors status states =
     let kf = Callstack.top_kf call.callstack in
-    let pos = Position.of_call call in
+    let pos = Eval.position_of_call call in
     Bottom.of_list ~join:Domain.join states >>- fun pre_state ->
     let behavior = List.hd behaviors in
     let retres_loc = Option.map Location.eval_varinfo call.return in

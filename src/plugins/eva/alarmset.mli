@@ -101,7 +101,7 @@ val fold : (alarm -> status -> 'a -> 'a) -> 'a -> t -> 'a
 
 (** Emits the alarms according to the given warn mode, at the given
     instruction. *)
-val emit: Cil_types.kinstr -> t -> unit
+val emit: pos:Position.t -> t -> unit
 
 val pretty : Format.formatter -> t -> unit
 val pretty_status : Format.formatter -> status -> unit

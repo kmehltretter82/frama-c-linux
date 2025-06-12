@@ -221,8 +221,7 @@ module Make (Engine: Engine_sig.S) = struct
     let for_writing = for_writing ~pos in
     let subdivnb = subdivide_pos ~pos in
     let eval, alarms = lvaluate_and_check ~for_writing ~subdivnb state lval in
-    let kinstr = Position.kinstr pos in
-    Alarmset.emit kinstr alarms;
+    Alarmset.emit ~pos alarms;
     match eval with
     | `Bottom ->
       Eva_log.warning ~pos ~stacktrace:true ~once:true
@@ -255,7 +254,7 @@ module Make (Engine: Engine_sig.S) = struct
           else assign_by_eval ~subdivnb state valuation expr
       in
       if is_ret then assert (Alarmset.is_empty alarms);
-      Alarmset.emit kinstr alarms;
+      Alarmset.emit ~pos alarms;
       let* assigned, valuation = eval in
       Transfer_inout.add_assign_lval pos valuation lval expr;
       let domain_valuation = Eval.to_domain_valuation valuation in
@@ -273,7 +272,7 @@ module Make (Engine: Engine_sig.S) = struct
   let assume ~pos state expr positive =
     let eval, alarms = Eval.reduce state expr positive in
     (* TODO: check not comparable. *)
-    Alarmset.emit (Position.kinstr pos) alarms;
+    Alarmset.emit ~pos alarms;
     let* valuation = eval in
     Transfer_inout.add_read_exp pos valuation expr;
     Domain.assume ~pos expr positive (Eval.to_domain_valuation valuation) state
@@ -702,13 +701,12 @@ module Make (Engine: Engine_sig.S) = struct
 
   let call ~pos lval_option funclv args state =
     let stmt = fst pos in
-    let ki_call = Kstmt stmt in
     let subdivnb = subdivide_stmt stmt in
     (* Resolve [funclv] into the called kernel functions. *)
     let functions, alarms =
       Eval.eval_function ~subdivnb funclv ~args state
     in
-    Alarmset.emit ki_call alarms;
+    Alarmset.emit ~pos:(Position.of_local pos) alarms;
     let bottom =
       Engine_sig.{ states = []; cacheable = Cacheable; kind = `Bottom }
     in
@@ -727,7 +725,7 @@ module Make (Engine: Engine_sig.S) = struct
         let states = [(Partition.Key.empty, state)] in
         Engine_sig.{ states; cacheable = Cacheable; kind = `Internal }
       else begin
-        Alarmset.emit ki_call alarms;
+        Alarmset.emit ~pos:(Position.of_local pos) alarms;
         match eval with
         | `Bottom -> bottom
         | `Value (call, recursion, valuation) ->
@@ -796,7 +794,6 @@ module Make (Engine: Engine_sig.S) = struct
   (* Not currently taking advantage of calls information. But see
      plugin Undefined Order by VP. *)
   let check_unspecified_sequence ~pos state seq =
-    let kinstr = Position.kinstr pos in
     let check_stmt_pair acc statement1 statement2 =
       let stmt1, _, writes1, _, _ = statement1 in
       let stmt2, modified2, writes2, reads2, _ = statement2 in
@@ -819,9 +816,9 @@ module Make (Engine: Engine_sig.S) = struct
     in
     try
       let alarms = Extlib.product_fold check_stmt_pair Alarmset.none seq seq in
-      Alarmset.emit kinstr alarms;
+      Alarmset.emit ~pos alarms;
       `Value ()
-    with EBottom alarms -> Alarmset.emit kinstr alarms; `Bottom
+    with EBottom alarms -> Alarmset.emit ~pos alarms; `Bottom
 
   (* ------------------------------------------------------------------------ *)
   (*                               Enter Scope                                *)

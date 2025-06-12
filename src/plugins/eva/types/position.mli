@@ -81,12 +81,6 @@ val global_init : Cil_types.varinfo -> t
 
 (** {2 Conversions} *)
 
-val of_call : ('a, 'b) Eval.call -> t
-(** [of_call call] creates the global or local position from the call
-    information [call]. If this is the entry point of the analysis (i.e. the
-    callsite is [Kglobal]) then the position will be global. If there
-    is a statement callsite then the position will be local. *)
-
 val of_kinstr : Cil_types.kinstr -> Callstack.t -> t
 (** [of_kinstr ki callstack] creates a position at the given kinstr
     and the given callstack. If [kinstr] is [Kstmt], it will be a local
