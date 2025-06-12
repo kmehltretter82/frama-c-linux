@@ -1,5 +1,5 @@
 /* run.config
-STDOPT: +"-then -variadic-no-translation -then -variadic-translation -variadic-no-strict"
+STDOPT: +"-then -no-variadic-translation -then -variadic-translation -no-variadic-strict"
 */
 
 typedef enum { OK, ERROR } RC;

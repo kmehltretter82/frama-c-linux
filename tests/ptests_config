@@ -5,7 +5,8 @@
 ### Tests of kernel
 
 DEFAULT_SUITES= cil dynamic jcdb libc misc
-DEFAULT_SUITES= pretty_printing saveload spec syntax variadic
+DEFAULT_SUITES= pretty_printing saveload spec syntax
+DEFAULT_SUITES= variadic/known variadic/declared variadic/defined variadic/erroneous
 
 ### Tests of small plugins
 
