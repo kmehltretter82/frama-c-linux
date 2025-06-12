@@ -211,15 +211,15 @@ let () = Request.register
 let () = Request.register
     ~package ~kind:`SET ~name:"duplicateProject"
     ~descr:(Md.plain "Duplicate project")
-    ~input:(module Jproject) ~output:(module Joption (Jstring))
-    (fun project_name ->
+    ~input:(module Jpair (Jproject) (Jstring)) ~output:(module Joption (Jstring))
+    (fun (project_name, new_name) ->
        try
          let project = Project.from_unique_name project_name in
          let _ =
            Project.create_by_copy
              ~last:false
              ~src:project
-             (Project.get_name project)
+             new_name
          in
          None
        with Project.Unknown_project ->
