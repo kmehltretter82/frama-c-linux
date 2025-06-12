@@ -593,7 +593,7 @@ module Make (Man : Input) = struct
     then `Value state
     else meet_with_constraints env state constraints
 
-  let assign _stmt lvalue expr _value valuation state =
+  let assign ~pos:_ lvalue expr _value valuation state =
     update valuation state >>- fun state ->
     try
       let state =
@@ -616,7 +616,7 @@ module Make (Man : Input) = struct
     with Manager.Error exclog -> abort exclog
 
 
-  let assume _stmt exp bool valuation state =
+  let assume ~pos:_ exp bool valuation state =
     update valuation state >>- fun state ->
     try
       let env = Abstract1.env state in
@@ -630,7 +630,7 @@ module Make (Man : Input) = struct
     with
     | Out_of_Scope _ -> `Value state
 
-  let start_call _stmt call recursion valuation state =
+  let start_call ~pos:_ call recursion valuation state =
     if recursion <> None
     then
       Self.abort ~current:true
@@ -669,7 +669,7 @@ module Make (Man : Input) = struct
     then `Bottom
     else `Value state
 
-  let finalize_call _stmt _call _recursion ~pre:_ ~post = `Value post
+  let finalize_call ~pos:_ _call _recursion ~pre:_ ~post = `Value post
 
   let logic_assign _assigns location state = kill_location location state
 

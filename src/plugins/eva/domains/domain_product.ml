@@ -154,29 +154,29 @@ module Make
     Right.update (right_val valuation) right >>-: fun right ->
     left, right
 
-  let assign stmt lv expr value valuation (left, right) =
-    Left.assign stmt lv expr value (left_val valuation) left >>- fun left ->
-    Right.assign stmt lv expr value (right_val valuation) right >>-: fun right ->
+  let assign ~pos lv expr value valuation (left, right) =
+    Left.assign ~pos lv expr value (left_val valuation) left >>- fun left ->
+    Right.assign ~pos lv expr value (right_val valuation) right >>-: fun right ->
     left, right
 
-  let assume stmt expr positive valuation (left, right) =
-    Left.assume stmt expr positive (left_val valuation) left >>- fun left ->
-    Right.assume stmt expr positive (right_val valuation) right >>-: fun right ->
+  let assume ~pos expr positive valuation (left, right) =
+    Left.assume ~pos expr positive (left_val valuation) left >>- fun left ->
+    Right.assume ~pos expr positive (right_val valuation) right >>-: fun right ->
     left, right
 
-  let finalize_call stmt call recursion ~pre ~post =
+  let finalize_call ~pos call recursion ~pre ~post =
     let pre_left, pre_right = pre
     and left_state, right_state = post in
-    Left.finalize_call stmt call recursion ~pre:pre_left ~post:left_state
+    Left.finalize_call ~pos call recursion ~pre:pre_left ~post:left_state
     >>- fun left ->
-    Right.finalize_call stmt call recursion ~pre:pre_right ~post:right_state
+    Right.finalize_call ~pos call recursion ~pre:pre_right ~post:right_state
     >>-: fun right ->
     left, right
 
-  let start_call stmt call recursion valuation (left, right) =
-    Left.start_call stmt call recursion (left_val valuation) left
+  let start_call ~pos call recursion valuation (left, right) =
+    Left.start_call ~pos call recursion (left_val valuation) left
     >>- fun left ->
-    Right.start_call stmt call recursion (right_val valuation) right
+    Right.start_call ~pos call recursion (right_val valuation) right
     >>-: fun right ->
     left, right
 

@@ -117,10 +117,10 @@ module Make (Abstract: Abstractions.S) = struct
     let eval_function state ?args lv =
       Eval.eval_function lv ?args state >>=: (List.map fst)
 
-    let assume_cond stmt state cond positive =
+    let assume_cond ~pos state cond positive =
       fst (Eval.reduce state cond positive) >>- fun valuation ->
       let dval = Eval.to_domain_valuation valuation in
-      Dom.assume stmt cond positive dval state
+      Dom.assume ~pos cond positive dval state
   end
 
   include Engine

@@ -255,8 +255,9 @@ module type Transfer = sig
         for the evaluation of [lval] and [expr]; it can also be used to reduce
         the state. *)
   val assign :
-    kinstr -> location left_value -> exp -> (location, value) assigned ->
-    (value, location, origin) valuation -> state -> state or_bottom
+    pos:Position.t -> location left_value -> exp ->
+    (location, value) assigned -> (value, location, origin) valuation ->
+    state -> state or_bottom
 
   (** Transfer function for an assumption.
       [assume stmt expr bool valuation state] returns a state in which the
@@ -266,7 +267,7 @@ module type Transfer = sig
         for the evaluation and the reduction of [expr]; it can also be used
         to reduce the state. *)
   val assume :
-    stmt -> exp -> bool ->
+    pos:Position.t -> exp -> bool ->
     (value, location, origin) valuation -> state -> state or_bottom
 
   (** [start_call stmt call recursion valuation state] returns an initial state
@@ -289,7 +290,7 @@ module type Transfer = sig
       information from the [valuation] on a recursive call, it must apply the
       substitution on it. *)
   val start_call:
-    stmt -> (location, value) call -> recursion option ->
+    pos:Position.local -> (location, value) call -> recursion option ->
     (value, location, origin) valuation -> state -> state or_bottom
 
   (** [finalize_call stmt call ~pre ~post] computes the state after a function
@@ -302,7 +303,7 @@ module type Transfer = sig
       - [pre] and [post] are the states before and at the end of the call
         respectively. *)
   val finalize_call:
-    stmt -> (location, value) call -> recursion option ->
+    pos:Position.local -> (location, value) call -> recursion option ->
     pre:state -> post:state -> state or_bottom
 
   (** Called on the Frama_C_domain_show_each directive. Prints the internal

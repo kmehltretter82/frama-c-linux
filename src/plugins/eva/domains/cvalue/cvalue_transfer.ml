@@ -190,7 +190,7 @@ let copy_right_lval state left_lv right_lv copied_value =
         Do_assign_imprecise_copy ->
         write_abstract_value state (lval, loc) copied_value
 
-let assign _stmt { lval; lloc } _expr assigned valuation state =
+let assign ~pos:_ { lval; lloc } _expr assigned valuation state =
   let state = update valuation state in
   let assign_one_loc =
     match assigned with
@@ -223,10 +223,10 @@ let actualize_formals state arguments =
   in
   List.fold_left treat_one_formal state arguments
 
-let start_call _stmt call _recursion _valuation state =
+let start_call ~pos:_ call _recursion _valuation state =
   `Value (actualize_formals state call.arguments)
 
-let finalize_call _stmt _call _recursion ~pre:_ ~post:state =
+let finalize_call ~pos:_ _call _recursion ~pre:_ ~post:state =
   `Value state
 
 let show_expr valuation state fmt expr =
@@ -244,4 +244,4 @@ let show_expr valuation state fmt expr =
 (* ----------------- Export assumption functions -------------------------- *)
 
 let update valuation state = `Value (update valuation state)
-let assume _stmt _expr _positive = update
+let assume ~pos:_ _expr _positive = update

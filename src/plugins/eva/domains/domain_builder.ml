@@ -153,23 +153,23 @@ module Make_Minimal
 
   let update _valuation state = `Value state
 
-  let assign kinstr lv expr _value _valuation state =
-    Domain.assign kinstr lv.Eval.lval expr state
+  let assign ~pos lv expr _value _valuation state =
+    Domain.assign ~pos lv.Eval.lval expr state
 
-  let assume stmt expr positive _valuation state =
-    Domain.assume stmt expr positive state
+  let assume ~pos expr positive _valuation state =
+    Domain.assume ~pos expr positive state
 
-  let start_call stmt call recursion _valuation state =
+  let start_call ~pos call recursion _valuation state =
     match recursion with
-    | None -> `Value (Domain.start_call stmt (simplify_call call) state)
+    | None -> `Value (Domain.start_call ~pos (simplify_call call) state)
     | Some _ ->
       (* TODO *)
       Self.abort
         "The domain %s does not support recursive call." Domain.name
 
-  let finalize_call stmt call recursion ~pre ~post =
+  let finalize_call ~pos call recursion ~pre ~post =
     assert (recursion = None);
-    Domain.finalize_call stmt (simplify_call call) ~pre ~post
+    Domain.finalize_call ~pos (simplify_call call) ~pre ~post
 
   let initialize_variable lval _location ~initialized value state =
     Domain.initialize_variable lval ~initialized value state
@@ -281,22 +281,22 @@ module Complete_Simple_Cvalue (Domain: Simpler_domains.Simple_Cvalue)
                              find_loc = find_loc valuation; }
 
     let update _valuation state = `Value state
-    let assign kinstr lv expr value valuation state =
-      Domain.assign kinstr lv expr value (record valuation) state
-    let assume stmt expr positive valuation state =
-      Domain.assume stmt expr positive (record valuation) state
+    let assign ~pos lv expr value valuation state =
+      Domain.assign ~pos lv expr value (record valuation) state
+    let assume ~pos expr positive valuation state =
+      Domain.assume ~pos expr positive (record valuation) state
 
-    let start_call stmt call recursion valuation state =
+    let start_call ~pos call recursion valuation state =
       match recursion with
-      | None -> `Value (Domain.start_call stmt call (record valuation) state)
+      | None -> `Value (Domain.start_call ~pos call (record valuation) state)
       | Some _ ->
         (* TODO *)
         Self.abort
           "The domain %s does not support recursive call." Domain.name
 
-    let finalize_call stmt call recursion =
+    let finalize_call ~pos call recursion =
       assert (recursion = None);
-      Domain.finalize_call stmt call
+      Domain.finalize_call ~pos call
 
     let initialize_variable lval _location ~initialized value state =
       Domain.initialize_variable lval ~initialized value state
@@ -474,18 +474,18 @@ module Restrict
       else `Value (Some (state, mode))
 
   let update valuation = make_transfer (Domain.update valuation)
-  let assume stmt expr positive valuation =
-    make_transfer (Domain.assume stmt expr positive valuation)
+  let assume ~pos expr positive valuation =
+    make_transfer (Domain.assume ~pos expr positive valuation)
 
   (* Applies the [assign] transfer function according to the current mode.
      In any case, removes from the state the properties depending on the memory
      location modified by the assignment. *)
-  let assign kinstr lvalue expr assigned valuation = function
+  let assign ~pos lvalue expr assigned valuation = function
     | None -> `Value None
     | Some (state, mode) ->
       if mode.current.write
       then
-        Domain.assign kinstr lvalue expr assigned valuation state >>-: fun s ->
+        Domain.assign ~pos lvalue expr assigned valuation state >>-: fun s ->
         Some (s, mode)
       else
         let state = Domain.logic_assign None lvalue.lloc state in
@@ -510,7 +510,7 @@ module Restrict
      - otherwise, only propagate the state from the call site to kill the
        properties that depend on locations written in the called functions. *)
 
-  let start_call stmt call recursion valuation state =
+  let start_call ~pos call recursion valuation state =
     (* Starts the call with mode [new_mode]. [previous_mode] is the current mode
        of the caller. *)
     let start_call_with_mode ?previous_mode ~new_mode state =
@@ -518,7 +518,7 @@ module Restrict
       then
         match previous_mode with
         | Some mode when mode.current.write ->
-          Domain.start_call stmt call recursion valuation state >>-: fun state ->
+          Domain.start_call ~pos call recursion valuation state >>-: fun state ->
           Some (state, new_mode)
         | _ ->
           `Value (Some (start_analysis call state, new_mode))
@@ -539,13 +539,13 @@ module Restrict
     | None, None ->
       `Value None
 
-  let finalize_call stmt call recursion ~pre ~post =
+  let finalize_call ~pos call recursion ~pre ~post =
     match pre, post with
     | None, _ | _, None -> `Value None
     | Some (pre, pre_mode), Some (post, post_mode) ->
       if post_mode.current.write
       then
-        Domain.finalize_call stmt call recursion ~pre ~post >>-: fun state ->
+        Domain.finalize_call ~pos call recursion ~pre ~post >>-: fun state ->
         Some (state, pre_mode)
       else
         `Value (Some (post, pre_mode))

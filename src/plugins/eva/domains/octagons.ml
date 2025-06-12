@@ -1780,8 +1780,8 @@ module Domain = struct
     in
     state >>-: check "precise assign"
 
-  let assign kinstr left_value expr assigned valuation state =
-    if kinstr <> Cil_types.Kglobal
+  let assign ~pos left_value expr assigned valuation state =
+    if Position.is_local pos
     && Ast_types.is_integral_or_pointer left_value.lval.typ
     && not (Eva_ast.lval_contains_volatile left_value.lval)
     then assign_variable left_value.lval expr assigned valuation state
@@ -1793,7 +1793,7 @@ module Domain = struct
       let state = kill written_zone state in
       `Value (check "imprecise assign" state)
 
-  let assume _stmt _exp _bool = update
+  let assume ~pos:_ _exp _bool = update
 
   let start_recursive_call recursion state =
     let vars = List.map fst recursion.substitution @ recursion.withdrawal in
@@ -1801,7 +1801,7 @@ module Domain = struct
     let vars = List.flatten (List.map var_deps vars) in
     List.fold_left State.remove state vars
 
-  let start_call _stmt call recursion valuation state =
+  let start_call ~pos:_ call recursion valuation state =
     if intraprocedural ()
     then `Value (empty ())
     else
@@ -1822,7 +1822,7 @@ module Domain = struct
         in
         List.fold_left assign_formal (`Value state) call.arguments
 
-  let finalize_call _stmt _call _recursion ~pre ~post =
+  let finalize_call ~pos:_ _call _recursion ~pre ~post =
     if intraprocedural ()
     then `Value (kill post.modified pre)
     else

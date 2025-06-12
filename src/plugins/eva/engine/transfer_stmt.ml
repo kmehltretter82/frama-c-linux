@@ -260,7 +260,7 @@ module Make (Engine: Engine_sig.S) = struct
       Transfer_inout.add_assign_lval pos valuation lval expr;
       let domain_valuation = Eval.to_domain_valuation valuation in
       let lvalue = { lval; lloc } in
-      Domain.assign kinstr lvalue expr assigned domain_valuation state
+      Domain.assign ~pos lvalue expr assigned domain_valuation state
 
   let assign = assign_lv_or_ret ~is_ret:false
   let assign_ret = assign_lv_or_ret ~is_ret:true
@@ -275,9 +275,8 @@ module Make (Engine: Engine_sig.S) = struct
     (* TODO: check not comparable. *)
     Alarmset.emit (Position.kinstr pos) alarms;
     let* valuation = eval in
-    let stmt = Position.stmt pos |> Option.get in
     Transfer_inout.add_read_exp pos valuation expr;
-    Domain.assume stmt expr positive (Eval.to_domain_valuation valuation) state
+    Domain.assume ~pos expr positive (Eval.to_domain_valuation valuation) state
 
 
   (* ------------------------------------------------------------------------ *)
@@ -286,11 +285,10 @@ module Make (Engine: Engine_sig.S) = struct
 
   (* Returns the result of a call. *)
   let process_call ~pos call recursion valuation state =
-    let stmt = fst pos in
     let process () =
       let domain_valuation = Eval.to_domain_valuation valuation in
       (* Process the call according to the domain decision. *)
-      match Domain.start_call stmt call recursion domain_valuation state with
+      match Domain.start_call ~pos call recursion domain_valuation state with
       | `Value state ->
         Domain.Store.register_initial_state call.callstack call.kf state;
         Engine.Compute.compute_call call recursion state
@@ -412,7 +410,6 @@ module Make (Engine: Engine_sig.S) = struct
 
   (* Do the call to one function. *)
   let do_one_call ~pos valuation lv call recursion state =
-    let stmt = fst pos in
     let kf_callee = call.kf in
     let pre = state in
     (* Process the call according to the domain decision. *)
@@ -429,7 +426,7 @@ module Make (Engine: Engine_sig.S) = struct
       let recursion = Option.map Recursion.revert recursion in
       (* Computes the state after the call, from the post state at the end of
          the called function, and the pre state at the call site. *)
-      let* state = Domain.finalize_call stmt call recursion ~pre ~post in
+      let* state = Domain.finalize_call ~pos call recursion ~pre ~post in
       (* Backward propagates the [reductions] on the concrete arguments. *)
       let* state = reduce_arguments reductions state in
       treat_return ~pos:(Position.of_local pos) ~kf_callee lv call.return state

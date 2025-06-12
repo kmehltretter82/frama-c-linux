@@ -549,24 +549,24 @@ module D : Abstract_domain.Leaf
       store_indeterminate state loc
 
   (* perform [lv = e] in [state] *)
-  let assign _kinstr lv _e v valuation state =
+  let assign ~pos:_ lv _e v valuation state =
     update valuation state >>- fun state ->
     match v with
     | Copy (_, vc) -> store_copy valuation lv lv.lloc state vc
     | Assign v -> store_value valuation lv.lval lv.lloc state v
 
-  let assume _stmt _exp _pos valuation state = update valuation state
+  let assume ~pos:_ _exp _pos valuation state = update valuation state
 
   let start_recursive_call recursion state =
     let vars = List.map fst recursion.substitution @ recursion.withdrawal in
     Memory.remove_variables vars state
 
-  let start_call _stmt _call recursion valuation state =
+  let start_call ~pos:_ _call recursion valuation state =
     update valuation state >>-: fun state ->
     let start_recursive_call r = start_recursive_call r state in
     Option.fold ~some:start_recursive_call ~none:state recursion
 
-  let finalize_call _stmt _call _recursion ~pre:_ ~post = `Value post
+  let finalize_call ~pos:_ _call _recursion ~pre:_ ~post = `Value post
 
   let top_query = `Value (V.top, None), Alarmset.all
 

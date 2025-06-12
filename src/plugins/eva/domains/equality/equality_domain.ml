@@ -416,7 +416,7 @@ struct
       in
       (equalities, deps, modified_zone: t)
 
-  let assign _stmt left_value right_expr value valuation state =
+  let assign ~pos:_ left_value right_expr value valuation state =
     let open Locations in
     let left_loc = Precise_locs.imprecise_location left_value.lloc in
     let direct_left_zone = Locations.(enumerate_valid_bits Write left_loc) in
@@ -466,7 +466,7 @@ struct
      with different object representations may be equal, invalidating this
      reasoning. This is the case for equalities between 0. and -0., and
      between non-comparable pointers, so we need to skip such equalities. *)
-  let assume _stmt expr positive valuation (eqs, deps, modified_zone as state) =
+  let assume ~pos:_ expr positive valuation (eqs, deps, modified_zone as state) =
     match positive, (expr : Eva_ast.exp).node with
     | true,  BinOp (Eq, e1, e2, _)
     | false, BinOp (Ne, e1, e2, _) ->
@@ -498,7 +498,7 @@ struct
     let vars = List.map fst recursion.substitution @ recursion.withdrawal in
     unscope state vars
 
-  let start_call _stmt call recursion valuation state =
+  let start_call ~pos:_ call recursion valuation state =
     let state =
       match recursion with
       | Some recursion ->
@@ -515,7 +515,7 @@ struct
     in
     `Value state
 
-  let finalize_call _stmt call _recursion ~pre ~post =
+  let finalize_call ~pos:_ call _recursion ~pre ~post =
     if call_init_state call.kf = ISCaller then
       `Value post (* [pre] was the state inferred in the caller, and it
                      has been updated during the analysis of [kf] into

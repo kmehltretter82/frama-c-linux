@@ -171,7 +171,7 @@ module type Results = sig
       by assuming [exp] evaluates to:
       - a non-zero value if [b] is true;
       - zero if [b] is false. *)
-  val assume_cond : stmt -> state -> exp -> bool -> state or_bottom
+  val assume_cond : pos:Position.t -> state -> exp -> bool -> state or_bottom
 end
 
 module type S_with_results = sig

@@ -493,8 +493,10 @@ module Proxy(A : Analysis.Engine) : EvaProxy = struct
     match next_steps eval_point with
     | `Condition (stmt, cond) ->
       let cond' = Eva_ast.translate_exp cond in
-      let then_state = (A.assume_cond stmt state cond' true :> dstate) in
-      let else_state = (A.assume_cond stmt state cond' false :> dstate) in
+      let kf = Kernel_function.find_englobing_kf stmt in
+      let pos = Position.local stmt (Callstack.init kf)  in
+      let then_state = (A.assume_cond ~pos state cond' true :> dstate) in
+      let else_state = (A.assume_cond ~pos state cond' false :> dstate) in
       Cond (eval then_state, eval else_state)
     | `Effect stmt ->
       let after_state = get_stmt_state ~after:true stmt callstack in

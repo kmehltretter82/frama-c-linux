@@ -245,7 +245,7 @@ module Make_Domain (Info: sig val name: string end) (Value: Value) = struct
     valuation.Abstract_domain.fold (assume_exp valuation) state
 
   (* Abstraction of an assignment. *)
-  let assign _kinstr lv _expr value valuation state =
+  let assign ~pos:_ lv _expr value valuation state =
     (* Update the state with the information obtained from evaluating
        [lv] and [e] *)
     let state = assume_valuation valuation state in
@@ -260,7 +260,7 @@ module Make_Domain (Info: sig val name: string end) (Value: Value) = struct
   (* Abstraction of a conditional. All information inferred by the engine
      is present in the valuation, and must be stored in the memory
      abstraction of the domain itself. *)
-  let assume _stmt _expr _pos = update
+  let assume ~pos:_ _expr _pos = update
 
   let start_recursive_call recursion state =
     let state = remove_variables recursion.withdrawal state in
@@ -268,7 +268,7 @@ module Make_Domain (Info: sig val name: string end) (Value: Value) = struct
     let decide _key _v1 _v2 = assert false in
     snd (replace_key ~decide recursion.base_substitution state)
 
-  let start_call _stmt call recursion _valuation state =
+  let start_call ~pos:_ call recursion _valuation state =
     let state =
       let start_recursive_call r = start_recursive_call r state in
       Option.fold ~some:start_recursive_call ~none:state recursion in
@@ -288,7 +288,7 @@ module Make_Domain (Info: sig val name: string end) (Value: Value) = struct
     let decide _key _v1 _v2 = assert false in
     snd (replace_key ~decide recursion.base_substitution state)
 
-  let finalize_call _stmt call recursion ~pre ~post =
+  let finalize_call ~pos:_ call recursion ~pre ~post =
     let kf_name = Kernel_function.get_name call.kf in
     let finalize a = finalize_recursive_call ~pre a post in
     let post = Option.fold ~some:finalize ~none:post recursion in

@@ -74,26 +74,26 @@ module Simple : Simpler_domains.Simple_Cvalue = struct
       Eva_ast.pp_exp arg.concrete
       pp_cvalue_assigned arg.avalue
 
-  let assign _kinstr loc exp cvalue_assigned _valuation state =
+  let assign ~pos:_ loc exp cvalue_assigned _valuation state =
     feedback "assign %a with %a = %a"
       Eva_ast.pp_lval loc.lval
       Eva_ast.pp_exp exp
       pp_cvalue_assigned cvalue_assigned;
     `Value state
 
-  let assume _stmt exp truth _valuation state =
+  let assume ~pos:_ exp truth _valuation state =
     feedback "assume %a is %b"
       Eva_ast.pp_exp exp
       truth;
     `Value state
 
-  let start_call _stmt call _valuation state =
+  let start_call ~pos:_ call _valuation state =
     feedback "start call %s(%a)"
       (Kernel_function.get_name call.kf)
       (pp_list pp_arg) call.arguments;
     state
 
-  let finalize_call _stmt call ~pre:_ ~post =
+  let finalize_call ~pos:_ call ~pre:_ ~post =
     feedback  "finalize call to %s" (Kernel_function.get_name call.kf);
     `Value post
 
