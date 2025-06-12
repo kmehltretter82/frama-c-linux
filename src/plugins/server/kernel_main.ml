@@ -313,12 +313,17 @@ let _project_list =
     ~get:Project.get_name;
 
   let add_update_hook f =
-    Project.register_create_hook f;
-    let f (p, _) = f p in
-    Project.register_after_set_name_hook f
+    Project.register_create_hook f
   in
   let add_remove_hook f =
     Project.register_before_remove_hook f
+  in
+  let add_reload_hook f =
+    (* Since Project.set_name changes the unique_name of the project, which is
+       the key of this array, the whole array needs to be reloaded when a
+       project is renamed. *)
+    let f _ = f () in
+    Project.register_after_set_name_hook f
   in
   States.register_array ~package
     ~name:"projectList"
@@ -327,6 +332,7 @@ let _project_list =
     ~iter:Project.iter_on_projects
     ~add_update_hook
     ~add_remove_hook
+    ~add_reload_hook
     model
 
 (* -------------------------------------------------------------------------- *)
