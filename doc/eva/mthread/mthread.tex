@@ -572,15 +572,15 @@ implementation, the source code of which is rarely available.
 The next steps consists in stubbing the existing concurrency \verb+.h+ files.
 The primary responsibility of this step is to define all the types
 in the prototypes of the functions in terms of either
-\verb+framac_mthread_id+ or \verb+framac_mthread_name+. Both types are
+\verb+__fc_mthread_id+ or \verb+__fc_mthread_name+. Both types are
 defined in the \mthread header \verb+mthread.h+ as
 
 \begin{lstlisting}[language={[ANSI]C}]
-typedef void* framac_mthread_name;
-typedef int framac_mthread_id;
+typedef void *__fc_mthread_name;
+typedef int __fc_mthread_id;
 \end{lstlisting}
 
-In general, \verb+framac_mthread_id+ is the return type of the initialization
+In general, \verb+__fc_mthread_id+ is the return type of the initialization
 functions, and also the type used by functions that {\it use} an object.
 During execution, they are simply sequential non-null offsets to an array
 allocated by \mthread, that itself holds the state of the object. The non-null
@@ -592,7 +592,7 @@ type; returning short integers (unless the code allocates an inordinate
 amount of \eg. mutexes) ensures that our ids can safely be cast to
 \verb+short+, or even \verb+char+
 
-By contrast, \verb+framac_mthread_name+ is the input type used by
+By contrast, \verb+__fc_mthread_name+ is the input type used by
 initialization functions. It is used as a hint to name the mutex, thread,
 or queue. It can be either \verb+NULL+, in which case \mthread will
 use an internal name, a constant string, or the address of a global variable,
@@ -603,13 +603,13 @@ prototypes of the primitive \mthread functions. The lines below are
 also an excerpt of \verb+mthread.h+. (The entire file is given in
 \myappdx{stubbed-functions}.)
 \begin{lstlisting}[language={[ANSI]C}]
-framac_mthread_id __FRAMAC_THREAD_CREATE(framac_mthread_name,
+__fc_mthread_id Frama_C_thread_create(__fc_mthread_name,
                                          void *(*)(void *),
                                          ...);
-int __FRAMAC_THREAD_CANCEL(framac_mthread_id);
+int Frama_C_thread_cancel(__fc_mthread_id);
 
-framac_mthread_id __FRAMAC_MUTEX_INIT(framac_mthread_name);
-int __FRAMAC_MUTEX_LOCK(framac_mthread_id);
+__fc_mthread_id Frama_C_mutex_init(__fc_mthread_name);
+int Frama_C_mutex_lock(__fc_mthread_id);
 \end{lstlisting}
 
 \medskip
@@ -630,7 +630,7 @@ writing new stubs consists essentially in writing the \verb+pthread.c+
 file, as explained in the next section.
 
 Both \verb+pthread_t+ and \verb+pthread_mutex_t+ are
-defined as type aliases to \verb+framac_mthread_id+. Indeed, the
+defined as type aliases to \verb+__fc_mthread_id+. Indeed, the
 interface of the \pthread library does not lend itself to the
 separation we use in \mthread. Instead, as the next
 section will show, the initialization primitives use the address of
@@ -666,7 +666,7 @@ Notice the recurring pattern \verb+*obj = obj_init(&obj, ...)+ (with proper
 error-handling) used in
 both functions \verb+pthread_create+ and \verb+pthread_mutex_init+.
 The address holding the object is used as name hint during the
-creation. % (it is casted to \verb+framac_mthread_name+ by \FramaC parser)
+creation. % (it is casted to \verb+__fc_mthread_name+ by \FramaC parser)
 Then the \mthread initialization function returns the id of the object, which
 is stored at the given address. The functions that use this id
 either dereference their argument if the id is passed as a pointer
@@ -903,7 +903,7 @@ be partitioned in the categories below.
 \begin{description}
 \item[Erroneous or imprecise arguments.]
 \mthread systematically sanitizes the arguments it receives from
-the \verb+__FRAMAC_*+ functions defined in \verb+mthread.h+, and ignores the
+the \verb+Frama_C_*+ functions defined in \verb+mthread.h+, and ignores the
 entire call (with a warning) when it cannot give a sense to them.
 %
 We have already given an example in \mysec{philo-no-slevel} with an
@@ -912,7 +912,7 @@ are emitted with imprecise names or ids, for threads, mutexes or queues.
 
 Other similar errors can include passing a function without a body to
 the thread creation function
-\verb+__FRAMAC_THREAD_CREATE+, or too few arguments. The corresponding
+\verb+Frama_C_thread_create+, or too few arguments. The corresponding
 messages are given below.\footnote{The messages are obtained by simple
 modifications of our examples and stubs, not shown in this document.}
 \begin{logs}
@@ -984,7 +984,7 @@ philo.c:25:[mt] Sending message on &queue, content [0..1] $\in$ {{}}
 \end{logs}
 The indicated line is inside the function \verb+msgsnd+:
 \begin{lstlisting}
-  int result =__FRAMAC_MESSAGE_SEND(msgqid, mess, size);
+  int result = Frama_C_queue_send(msgqid, mess, size);
 \end{lstlisting}
 Here we have \verb+mess=buf+, \verb+size=2+, and the program is defined only
 if  \verb+buf[0..(2-1)]+ is a valid array slice. This
@@ -1013,10 +1013,10 @@ actually not really relevant here, and should be ignored. Next,
 \mthread adds a more precise warning about which buffer is too small,
 and warns that messages of length 2 are too long. This means that any
 message of at least that size will be ignored by
-\verb+__FRAMAC_MESSAGE_RECEIVE+.  Since all messages are of size 2,
+\verb+Frama_C_queue_receive+.  Since all messages are of size 2,
 there is nothing valid to receive (hence the last line of the log),
 and \mthread instructs the \Eva analysis to stop when evaluating the
-call to \verb+__FRAMAC_MESSAGE_RECEIVE+.
+call to \verb+Frama_C_queue_receive+.
 
 
 \item[Too many objects.]
@@ -1400,10 +1400,10 @@ detect and handle.  Their prototypes can be found in the file
 \item[Thread-related primitives] \
 
   \begin{itemize}
-  \item Thread creation, through function \verb+__FRAMAC_THREAD_CREATE+
-  \item Thread immediate exit, through function \verb+__FRAMAC_THREAD_EXIT+
-  \item Current thread id, through function \verb+__FRAMAC_THREAD_ID+
-  \item Thread canceling, through function \verb+__FRAMAC_THREAD_CANCEL+
+  \item Thread creation, through function \verb+Frama_C_thread_create+
+  \item Thread immediate exit, through function \verb+Frama_C_thread_exit+
+  \item Current thread id, through function \verb+Frama_C_thread_id+
+  \item Thread canceling, through function \verb+Frama_C_thread_cancel+
 
     \it (This functions currently cancels the thread regardless of any
     potential cancelability state notion, such as the one available in
@@ -1414,23 +1414,23 @@ detect and handle.  Their prototypes can be found in the file
 \item[Mutex-related primitives] \
 
   \begin{itemize}
-  \item Mutex initializing, through function \verb+__FRAMAC_MUTEX_INIT+
-  \item Mutex locking, through function \verb+__FRAMAC_MUTEX_LOCK+
-  \item Mutex release, through function \verb+__FRAMAC_MUTEX_UNLOCK+
+  \item Mutex initializing, through function \verb+Frama_C_mutex_init+
+  \item Mutex locking, through function \verb+Frama_C_mutex_lock+
+  \item Mutex release, through function \verb+Frama_C_mutex_unlock+
   \end{itemize}
 
 \item[Queue-related primitives] \
 
   \begin{itemize}
-  \item Queue initializing, through function \verb+__FRAMAC_QUEUE_INIT+
-  \item Message sending, through function \verb+__FRAMAC_MESSAGE_SEND+
-  \item Message reception, through function \verb+__FRAMAC_MESSAGE_RECEIVE+
+  \item Queue initializing, through function \verb+Frama_C_queue_init+
+  \item Message sending, through function \verb+Frama_C_queue_send+
+  \item Message reception, through function \verb+Frama_C_queue_receive+
   \end{itemize}
 
 \item[Miscellaneous functions] \
 
   \begin{itemize}
-  \item Logging, through function \verb+__FRAMAC_MTHREAD_SHOW+
+  \item Logging, through function \verb+Frama_C_mthread_show+
 
     This function takes as first argument a constant string will be
     used as a message, and a number of \C values that will be printed
@@ -1438,7 +1438,7 @@ detect and handle.  Their prototypes can be found in the file
     relevant to the analysis, and does not modify the memory state at all.
 
   \item Forcing synchronization of unprotected shared values, through
-    the use of the function \verb+__FRAMAC_MTHREAD_SYNC+.
+    the use of the function \verb+Frama_C_mthread_sync+.
 
   \end{itemize}
 
