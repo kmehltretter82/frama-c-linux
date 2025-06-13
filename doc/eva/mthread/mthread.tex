@@ -6,7 +6,7 @@
 
 \newcommand{\mthread}{\plugin{Mthread}}
 \newcommand{\html}{\lang{HTML}}
-\newcommand{\pthread}{\library{pthread}}
+\newcommand{\pthreads}{\library{pthreads}}
 
 % this is for compilation purposes
 \def\evadir{../../../src/plugins/eva}
@@ -551,7 +551,7 @@ symbolic execution of the program, \mthread makes the hypothesis
 that those primitives invoke low-level \mthread functions. Hence,
 the first step in using \mthread consists in properly stubbing
 the thread library of the program. This work has already been done
-for parts of the \pthread library.
+for parts of the \pthreads library.
 The functions currently supported by
 \mthread are detailed in the next sections.
 
@@ -633,23 +633,23 @@ int Frama_C_mutex_lock(__fc_mthread_id);
 \medskip
 
 To conclude this section, let us consider excerpts of the stubbing that has been
-done for the \pthread library.  The prototypes can be found
+done for the \pthreads library.  The prototypes can be found
 in the file \verb+mthread_pthread.h+, and are reprinted
 below.\footnote{Prototypes for queue-related functions are not
-  actually part of \pthread, and are in \texttt{mthread\_queue.c}.}
+  actually part of \pthreads, and are in \texttt{mthread\_queue.c}.}
 
 %% CHECKRELEASE
 \lstinputlisting[breaklines=true,firstline=29,lastline=52,language={[ANSI]C}]{\sharedir/mthread_pthread.h}
 
 Except for the \verb+typedef+ declarations, everything can be taken
-verbatim from a system header for \pthread. Thus, since the included
+verbatim from a system header for \pthreads. Thus, since the included
 file \verb+mthread.h+ is a generic header the user should not modify,
 writing new stubs consists essentially in writing the \verb+pthread.c+
 file, as explained in the next section.
 
 Both \verb+pthread_t+ and \verb+pthread_mutex_t+ are
 defined as type aliases to \verb+__fc_mthread_id+. Indeed, the
-interface of the \pthread library does not lend itself to the
+interface of the \pthreads library does not lend itself to the
 separation we use in \mthread. Instead, as the next
 section will show, the initialization primitives use the address of
 the object they create when naming them.
@@ -672,9 +672,9 @@ Stubs are generally very easy to write, as most of the time they consist in:
 \end{itemize}
 
 
-\subsection{\pthread library}
+\subsection{\pthreads library}
 
-The stubbing for the \pthread
+The stubbing for the \pthreads
 library can be found in \verb+mthread_pthread.c+. Its interesting
 parts are reprinted below.
 
@@ -753,7 +753,7 @@ those two objects.
 \label{sec:philo-no-slevel}
 
 Let us start \mthread on this program. We need to start \FramaC
-on both \verb+philo.c+ and on our stubbed \pthread library. In order
+on both \verb+philo.c+ and on our stubbed \pthreads library. In order
 to use our own headers, a proper \verb+-I+ directive must be given
 to our \C preprocessor. The \verb+-nostdinc+ option is also a good idea
 to ensure that \FramaC will not use any unwanted system header.
@@ -1425,7 +1425,7 @@ detect and handle.  Their prototypes can be found in the file
 
     \it (This functions currently cancels the thread regardless of any
     potential cancelability state notion, such as the one available in
-    \pthread.)
+    \pthreads.)
   \end{itemize}
 
 
