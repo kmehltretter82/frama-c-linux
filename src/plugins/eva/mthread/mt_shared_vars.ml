@@ -51,9 +51,14 @@ let is_model_base b =
     Ast_attributes.contains "FRAMA_C_MODEL" vi.vattr
   with Base.Not_a_C_variable -> false
 
+let is_frama_c_base = function
+  | Base.Var (v, _) | Base.Allocated (v, _, _) ->
+    String.starts_with ~prefix:"__FRAMAC_MTHREAD" v.vname
+  | _ -> false
+
 let keep_base b =
   not (Base.is_any_formal_or_local b ||
-       Mt_memory.is_frama_c_base b ||
+       is_frama_c_base b ||
        is_model_base b ||
        (Mt_options.IgnoreNull.get () && Base.(equal b null))
       )
