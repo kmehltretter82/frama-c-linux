@@ -360,6 +360,10 @@ meter::-webkit-meter-even-less-good-value  {
 .dome-xIconButton:hover {
   fill: var(--text) ;
   background: var(--background-profound-hover) ;
+
+  &:not(.dome-control-disabled) {
+    cursor: pointer;
+  }
 }
 
 .dome-xIconButton-default { fill: var(--info-text) ; }

@@ -30,11 +30,12 @@ import * as Json from 'dome/data/json';
 import { classes } from 'dome/misc/utils';
 import { alpha } from 'dome/data/compare';
 import { Section, Item, SidebarTitle } from 'dome/frame/sidebars';
-import { Button } from 'dome/controls/buttons';
+import { Button, IconButton } from 'dome/controls/buttons';
 import { Label } from 'dome/controls/labels';
 import * as Toolbar from 'dome/frame/toolbars';
 import { Hbox } from 'dome/layout/boxes';
 import { useModel } from 'dome/table/models';
+import * as Dialogs from 'dome/dialogs';
 import InfiniteScroll from 'react-infinite-scroller';
 
 import * as Ivette from 'ivette';
@@ -45,6 +46,8 @@ import * as Locations from 'frama-c/kernel/Locations';
 import { computationState } from 'frama-c/plugins/eva/api/general';
 import * as Eva from 'frama-c/plugins/eva/api/general';
 import * as Services from './api/services';
+import { FieldState, TextField, useState } from 'dome/layout/forms';
+import { Icon } from 'dome/controls/icons';
 
 
 // --------------------------------------------------------------------------
@@ -837,6 +840,153 @@ export function GlobalDeclarations(): JSX.Element {
 // --- Globals Projects
 // --------------------------------------------------------------------------
 
+function showError(title: string, error: string): void {
+  Dialogs.showModal(<Dialogs.Modal label={title}>
+    <div className='project-error'>
+      <Icon id='WARNING' kind="warning" size={18}/>
+      {error}
+    </div>
+  </Dialogs.Modal>);
+}
+
+/** Create a new project */
+export function newProject(): void {
+  Dialogs.showModal(<Dialogs.Modal label={'Create project'}>
+    <ProjectField  onValidate={async (name: string) => {
+        const error = await Server.send(Services.createProject, name);
+        if(!error) Dialogs.closeModal();
+        else showError('Error Creating project', error);
+      }}
+  /></Dialogs.Modal>);
+}
+
+/** Rename a project */
+export function renameProject(
+  id: string, title: string, project?: string
+): void {
+  Dialogs.showModal(<Dialogs.Modal label={title}>
+    <ProjectField project={project || ''} onValidate={async (name: string) => {
+          const error = await Server.send(Services.renameProject, [id, name]);
+          if(!error) Dialogs.closeModal();
+          else showError('Error: '+title, error);
+        }
+      }
+    />
+  </Dialogs.Modal>);
+}
+
+/** Remove a project */
+export async function removeProject(id: string): Promise<void> {
+  const projects = await Server.send(Services.getProjects, null);
+  if(projects.length === 1) {
+    showError("Error - deleting project",
+      "The last project cannot be removed");
+    return;
+  }
+
+  const confirm = await Dialogs.showMessageBox({
+    buttons: [
+      { label: "Cancel" },
+      { label: "Ok", value: true }
+    ],
+    details: ("Confirm to delete the project."),
+    message: 'Delete project',
+  });
+
+  if(confirm === true) {
+    const error = await Server.send(Services.removeProject, id);
+    if(!error) Dialogs.closeModal();
+    else showError("Error - deleting project", error);
+  }
+}
+
+/** Duplicate a project */
+export function duplicateProject(
+  id: string, title: string, project?: string
+): void {
+  Dialogs.showModal(<Dialogs.Modal label={title}>
+    <ProjectField project={project} onValidate={async (name: string) => {
+        const error = await Server.send(Services.duplicateProject, [id, name]);
+        if(!error) Dialogs.closeModal();
+        else showError('Error: '+title, error);
+      }}
+    />
+  </Dialogs.Modal>);
+}
+
+/** Save a project */
+export async function saveProject(id: string): Promise<void> {
+  const file = await Dialogs.showSaveFile({});
+  const error = await Server.send(Services.saveProject, [id, file]);
+  if(error) showError("Error saving project", error);
+}
+
+/** Load a project */
+export async function loadProject(): Promise<void> {
+  const file = await Dialogs.showOpenFile({});
+  const error = await Server.send(Services.loadProject, file);
+  if(error) showError("Error loading project", error);
+}
+
+/** ************************************************************************ */
+
+interface ProjectFieldProps {
+  project?: string,
+  fieldName?: string,
+  placeholder?: string,
+  onValidate: (name: string) => void
+}
+
+function ProjectField(props: ProjectFieldProps): React.JSX.Element {
+  const {
+    project = "", fieldName, placeholder = 'New name', onValidate
+  } = props;
+  const state = useState(project);
+
+  return <div className='project-field'>
+    <TextField
+      label={fieldName || ''}
+      placeholder={placeholder}
+      state={state as FieldState<string | undefined>}
+      latency={0}
+    />
+    <Button label='Valid' onClick={() => onValidate(state.value)} />
+  </div>;
+}
+
+function getActions(id: string, name: string): React.JSX.Element {
+  return (
+    <>
+      <IconButton
+        icon='EDIT'
+        size={14}
+        title='Rename'
+        onClick={() => renameProject(id, `Rename project: ${name}`, name)}
+      />
+      <IconButton
+        icon='DUPLICATE'
+        size={14}
+        title='Duplicate'
+        onClick={() =>
+          duplicateProject(id, `Duplicate project: ${name}`, name)
+        }
+      />
+      <IconButton
+        icon='SAVE'
+        size={14}
+        title='Save'
+        onClick={() => saveProject(id)}
+      />
+      <IconButton
+        icon='TRASH'
+        size={14}
+        title='Delete'
+        onClick={() => removeProject(id)}
+      />
+    </>
+  );
+}
+
 export function GlobalProjects(): JSX.Element {
   const scrollableArea = React.useRef<HTMLDivElement>(null);
   const [ current, setCurrent ] = States.useSyncState(Services.currentProject);
@@ -844,33 +994,37 @@ export function GlobalProjects(): JSX.Element {
   const model = useModel(modelProjects);
 
   const projectsList = React.useMemo(() => {
-    void model;
     const list: React.JSX.Element[] = [];
     modelProjects.forEach(elt => {
       list.push(<Item
         key={elt.uniqueName}
         label={elt.name}
+        title={`unique name: ${elt.uniqueName}`}
         selected={elt.uniqueName === current}
         onSelection={() => setCurrent(elt.uniqueName) }
-      />);
+      >{getActions(elt.uniqueName, elt.name)}</Item>);
     });
     return list;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [modelProjects, model, current, setCurrent]);
 
   return (<>
-    <SidebarTitle label='Projects' />
-      {/* { projectsList && projectsList.length > 0 && */}
+    <SidebarTitle
+      className='projects'
+      label='Projects'
+    >
+      <Hbox>
+        <IconButton
+          icon="CIRC.PLUS"
+          title="Add a new project"
+          size={18}
+          onClick={newProject}
+        />
+      </Hbox>
+    </SidebarTitle>
       <div ref={scrollableArea} className="globals-scrollable-area">
-        <List
-          name="project"
-          total={projectsList.length}
-          filteringMenuItems={[]}
-          scrollableParent={scrollableArea}
-        >
-          { projectsList }
-        </List>
+        { projectsList }
       </div>
-      {/* // } */}
     </>
   );
 }
