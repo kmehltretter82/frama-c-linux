@@ -51,9 +51,10 @@ let is_model_base b =
     Ast_attributes.contains "FRAMA_C_MODEL" vi.vattr
   with Base.Not_a_C_variable -> false
 
+(* Skip Mthread variables such as __fc_mthread_threads. *)
 let is_frama_c_base = function
   | Base.Var (v, _) | Base.Allocated (v, _, _) ->
-    String.starts_with ~prefix:"__FRAMAC_MTHREAD" v.vname
+    String.starts_with ~prefix:"__fc_mthread" v.vname
   | _ -> false
 
 let keep_base b =
