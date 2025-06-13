@@ -479,6 +479,13 @@ async function _launch(): Promise<void> {
     logerr,
   } = config;
 
+  if (!sockaddr) {
+    const tmp = Dome.getTempDir();
+    const pid = Dome.getPID();
+    sockaddr = System.join(tmp, `ivette.frama-c.${pid}.io`);
+  }
+  params = client.commandLine(sockaddr, params);
+
   buffer.clear();
   buffer.append('$', command);
   const size = params.reduce((n, p) => n + p.length, 0);
@@ -496,15 +503,9 @@ async function _launch(): Promise<void> {
   }
   buffer.append('\n');
 
-  if (!sockaddr) {
-    const tmp = Dome.getTempDir();
-    const pid = Dome.getPID();
-    sockaddr = System.join(tmp, `ivette.frama-c.${pid}.io`);
-  }
   if (!working) working = System.getWorkingDir();
   logout = logout && System.join(working, logout);
   logerr = logerr && System.join(working, logerr);
-  params = client.commandLine(sockaddr, params);
   const options = {
     cwd: working,
     stdout: { path: logout, pipe: true },

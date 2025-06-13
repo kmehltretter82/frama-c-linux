@@ -45,7 +45,7 @@ class SocketClient extends Client {
 
   /** Server CLI */
   commandLine(sockaddr: string, params: string[]): string[] {
-    return ['-server-socket', sockaddr, '-then'].concat(params);
+    return ['-server-socket', sockaddr].concat(params);
   }
 
   /** Connection */
