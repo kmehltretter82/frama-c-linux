@@ -1,9 +1,27 @@
 \documentclass{frama-c-book}
 
-\usepackage{macros}
 \usepackage{ifthen}
 
 \input{fc-macros.tex}
+
+\newcommand{\mthread}{\plugin{Mthread}}
+\newcommand{\html}{\lang{HTML}}
+\newcommand{\pthread}{\library{pthread}}
+
+% this is for compilation purposes
+\def\evadir{../../../src/plugins/eva}
+\def\sharedir{\evadir/share/mthread}
+\def\testdir{\evadir/tests/mthread}
+
+\def\etc{\emph{etc}\ldots}
+\def\eg.{\emph{eg}.}
+\def\ie.{\emph{ie}.}
+\def\resp.{\emph{resp}.}
+
+\def\mysec#1{\S{\ref{sec:#1}}}
+\def\mychap#1{Chapter~{\ref{chap:#1}}}
+\def\myfig#1{Figure~{\ref{fig:#1}}}
+\def\myappdx#1{Appendix~{\ref{sec:#1}}}
 
 \newcommand{\framacversion}%
            {\input{../../../VERSION} (\input{../../../VERSION_CODENAME}\unskip)}
@@ -136,7 +154,7 @@ Although the approach outlined above is simple, obtaining precise
 results is not. Indeed, we must be careful not to compute too general
 behaviors for the various threads, the risk being to get unusable
 results. % For example,
-% the \nom{inout} plugin of \FramaC is able to compute memory zones
+% the \inout plugin of \FramaC is able to compute memory zones
 % accessed by a program. However,
 %
 \mthread uses some callbacks made available by the \Eva analysis to
@@ -211,7 +229,7 @@ statements executed by a function can be very different from one call
 to another, and this is captured by our use of calling contexts.
 
 Notice that the concurrent control-flow graph of a thread is very
-different from what would be obtained with the \nom{slicing} plugin of
+different from what would be obtained with the \slicing plugin of
 \FramaC.  In particular, our control-flow graph does not represent
 executable code at all. (For example, incrementations of loop indices
 are generally removed from the graph.) Conversely, our graph can be more
@@ -339,14 +357,14 @@ which a race condition between at least two threads can occur.
 %
 \mthread performs a fine-grained analysis to detect those
 regions. % A simple solution to do so
-% would be to reuse \nom{inout} plugin of \FramaC. By calling it on a
+% would be to reuse \inout plugin of \FramaC. By calling it on a
 % thread, we would obtain the list of globals it accesses.  Then it
 % would suffice to intersect the results for all distinct threads,
 % and keep all memory zones that are in any intersection.
 It proceeds as follows:
 \begin{enumerate}
 \item Once a thread is evaluated by the \Eva analysis, we compute the
-  global variables it reads and writes, using the \nom{inout} plugin
+  global variables it reads and writes, using the \inout plugin
   of \FramaC. This plugin uses the results of the \Eva analysis,
   thus giving us a sound but quite imprecise over-approximation
   of the shared zones accessed by this thread. Let us call
@@ -510,12 +528,12 @@ pertinent here. Some examples of protection outputs are given in
 Ferrara \cite{Ferr09} uses a fixpoint-based approach very similar to
 our one to analyze Java bytecode.
 %
-The static analyzer \nom{Locksmith} \cite{hicks06lockinference}, which
+The static analyzer \tool{Locksmith} \cite{hicks06lockinference}, which
 is dedicated to finding data races in multithreaded \C programs, possess
 some similarities with our shared zones detection
 algorithm.
 %
-The \nom{Goblint} \cite{VVojVVen07} is race-detection tool using some
+The \tool{Goblint} \cite{VVojVVen07} is race-detection tool using some
 fixpoint computation (resolved by a constraint solver): it offers a
 path-sensitive analysis of data-races, based upon conditional
 constraint propagation and points-to analysis.
@@ -671,7 +689,7 @@ Then the \mthread initialization function returns the id of the object, which
 is stored at the given address. The functions that use this id
 either dereference their argument if the id is passed as a pointer
 (\verb+pthread_mutex_lock+) or use it directly otherwise
-(\verb+pthread_cancel+), depending on their \nom{POSIX} prototype.
+(\verb+pthread_cancel+), depending on their POSIX prototype.
 
 
 As hinted by the comments, not all functions are properly stubbed. The
@@ -1034,7 +1052,7 @@ philo.c:51:[mt] warning: During thread creation. Too many thread ids,
   objects is defined by the \C
   macro \verb+MTHREAD_NUMBER_IDS+. Thus, it suffices to increase its
   value in the preprocessing directive \verb+-cpp-command+, \eg. by
-  adding \verb+-DMTHREAD_NUMBER_IDS=40+ for \nom{gcc} or \nom{cpp}.
+  adding \verb+-DMTHREAD_NUMBER_IDS=40+ for \gcc or \tool{cpp}.
 
 
 \item[Unrecognized id.] The ids returned by \mthread for threads,
@@ -1326,7 +1344,7 @@ The \mthread results printed as \html for further study.
 \begin{description}
 \item[{\tt -mt-extract html}] Extracts a partial version of the
   results found by \mthread as HTML.  All results can be
-  browsed\footnote{A navigator with support for \nom{SVG} files
+  browsed\footnote{A navigator with support for \tool{SVG} files
     is required to display the control-flow graphs.}
   starting from the file \verb+./html_summary/index.html+.
 \end{description}
