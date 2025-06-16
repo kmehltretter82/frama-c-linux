@@ -183,13 +183,20 @@ end
 
 
 let _current_project_signal =
+  let add_hook f =
+    Project.register_after_set_current_hook ~user_only:false f;
+    (* Since Project.set_name changes the unique_name of the project, which is
+       used as internal state for the current project in Ivette, the state needs
+       to be reloaded when it is renamed. *)
+    Project.register_after_set_name_hook (fun (p, _) -> f p);
+  in
   States.register_state ~package
     ~name:"currentProject"
     ~descr:(Md.plain "Current Frama-C project")
     ~data:(module Jproject_id)
     ~get:(fun () -> Project.(current () |> get_unique_name))
     ~set:(fun unique_name -> Project.(from_unique_name unique_name |> set_current))
-    ~add_hook:(Project.register_after_set_current_hook ~user_only:false)
+    ~add_hook
     ()
 
 let () = Request.register
