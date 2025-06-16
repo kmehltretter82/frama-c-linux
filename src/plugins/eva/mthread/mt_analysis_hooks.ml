@@ -55,11 +55,11 @@ let log_poly ?(pop_stack=true) ?(kind=Log.Result) analysis =
   let ki = Callstack.top_callsite stack in
   let source = kinstr_to_source ki in
   let pp_callstack =
-    Mt_options.PrintCallstacks.get () || Mt_options.debug_level () > 1 in
+    Mt_options.PrintCallstacks.get () || Mt_self.Debug.get () > 1 in
   let append = (fun fmt -> if pp_callstack then
                    Format.fprintf fmt "@.%a" Callstack.pretty stack)
   in { ppp = fun fmt ->
-      Mt_options.MThread.log ~kind ~once:true ?source ~append
+      Mt_self.log ~kind ~once:true ?source ~append
         ("@[" ^^ fmt ^^ "@]")
     }
 
@@ -318,7 +318,7 @@ let sync_values analysis state =
       (fun b offsm state ->
          let offsm' = Cvalue.Model.find_base_or_default b state in
          match offsm' with
-         | `Top -> Mt_options.fatal "Top state"
+         | `Top -> Mt_self.fatal "Top state"
          | `Bottom -> state
          | `Value offsm' ->
            let offsm'' = Cvalue.V_Offsetmap.join offsm offsm' in
@@ -427,7 +427,7 @@ let spawn_thread analysis eva_thread stack func state params parent =
 let standalone_thread th kf initial_state =
   match kf.Cil_types.fundec with
   | Declaration (_, f, _, _) ->
-    Mt_options.fatal "Entry point '%s' has no definition : cannot run %a."
+    Mt_self.fatal "Entry point '%s' has no definition : cannot run %a."
       f.vname
       Thread.pretty th
   | Definition (fundec, _) ->
@@ -493,7 +493,7 @@ let hook_thread_creation analysis state : hook_sig = function
     Mt_ids.write_id_state state (Mt_ids.of_thread eva_thread) 2,
     wrap_res (Thread.id eva_thread)
 
-  | _ -> Mt_options.fatal "Incorrect mthread binding for thread creation"
+  | _ -> Mt_self.fatal "Incorrect mthread binding for thread creation"
 (* By typing, Frama_C_thread_create must receive at least those
    arguments *)
 
@@ -537,7 +537,7 @@ let hook_thread_start_suspend fname check v aux_state evt analysis state : hook_
         "Trying to@ %(%)@ unknown thread.@ Ignoring." fname;
       hook_fail ~code:(-1) ())
 
-  | _ -> Mt_options.fatal "Incorrect mthread binding for thread %(%)" fname
+  | _ -> Mt_self.fatal "Incorrect mthread binding for thread %(%)" fname
 
 (** Hook registered in the value analysis when a thread is started *)
 let hook_thread_start =
@@ -569,8 +569,8 @@ let hook_thread_cancellation analysis state : hook_sig = function
         "Trying to@ cancel@ unknown thread.@ Ignoring.";
       hook_fail ~code:(-1) ())
 
-  | _ -> Mt_options.fatal "Incorrect mthread binding for thread cancellation \
-                           (only the thread id is expected)"
+  | _ -> Mt_self.fatal "Incorrect mthread binding for thread cancellation \
+                        (only the thread id is expected)"
 
 let hook_thread_exit analysis (_state: state) : hook_sig = function
   | [_, v]  ->
@@ -584,8 +584,8 @@ let hook_thread_exit analysis (_state: state) : hook_sig = function
         Cvalue.V.pretty v;
       Cvalue.Model.bottom, no_res)
 
-  | _ -> Mt_options.fatal "Incorrect mthread binding for thread exit \
-                           (only the return value is expected)"
+  | _ -> Mt_self.fatal "Incorrect mthread binding for thread exit \
+                        (only the return value is expected)"
 
 let hook_thread_id analysis state : hook_sig = fun _ ->
   state, wrap_res (Thread.id analysis.curr_thread.th_eva_thread)
@@ -617,8 +617,8 @@ let hook_thread_priority analysis state : hook_sig = function
       end;
       state, wrap_res 0
     end
-  | _ -> Mt_options.fatal "Incorrect mthread binding for thread priority \
-                           (only a non negative integer is expected)"
+  | _ -> Mt_self.fatal "Incorrect mthread binding for thread priority \
+                        (only a non negative integer is expected)"
 
 (* -------------------------------------------------------------------------- *)
 (** --- Hook registered in the value analysis related to messages         --- *)
@@ -641,7 +641,7 @@ let hook_queue_init analysis state : hook_sig = function
     Mt_ids.write_id_state state (Mt_ids.of_queue q) 1,
     wrap_res (Mqueue.id q)
 
-  | _ -> Mt_options.fatal "Incorrect mthread binding for queue creation"
+  | _ -> Mt_self.fatal "Incorrect mthread binding for queue creation"
 
 let hook_send_msg analysis state : hook_sig = function
   | [(_, offset); (_exp_content, content); (_exp_size, size)] ->
@@ -668,7 +668,7 @@ let hook_send_msg analysis state : hook_sig = function
          Ignoring@]";
       state, wrap_res (-1))
 
-  | _ -> Mt_options.fatal "Incorrect mthread binding for message sending"
+  | _ -> Mt_self.fatal "Incorrect mthread binding for message sending"
 
 
 let find_msg_content analysis q =
@@ -752,7 +752,7 @@ let hook_receive_msg analysis state : hook_sig = function
         "Trying@ to@ receive@ value@ on@ non-initialized@ queue. Ignoring.";
       state, wrap_res (-2))
 
-  | _ -> Mt_options.fatal "Incorrect mthread binding for message reception"
+  | _ -> Mt_self.fatal "Incorrect mthread binding for message reception"
 
 
 (* Auxiliary functions for the functions that act on mutexes (currently
@@ -786,7 +786,7 @@ let aux_mutex ~operation:op ~check ~event analysis state : hook_sig = function
 
   | _ -> (* really unlikely unless the code and/or the C binding
             are really strange *)
-    Mt_options.fatal "Incorrect mthread binding for mutex function"
+    Mt_self.fatal "Incorrect mthread binding for mutex function"
 
 let hook_init_mutex analysis state : hook_sig = function
   | [_, name] ->
@@ -802,7 +802,7 @@ let hook_init_mutex analysis state : hook_sig = function
 
   | _ -> (* really unlikely unless the code and/or the C binding
             are really strange *)
-    Mt_options.fatal "Incorrect mthread binding for mutex function"
+    Mt_self.fatal "Incorrect mthread binding for mutex function"
 
 
 let hook_lock_mutex =
@@ -831,7 +831,7 @@ let hook_dummy_message analysis state : hook_sig = function
       "Monitored event:@ %a" Event.pretty evt;
     state, no_res
 
-  | _ -> Mt_options.fatal "Incorrect mthread binding for unknown event"
+  | _ -> Mt_self.fatal "Incorrect mthread binding for unknown event"
 
 
 (* -------------------------------------------------------------------------- *)
@@ -893,8 +893,8 @@ let catch_functions_calls analysis (stack : Callstack.callstack) kf state kind =
                   the stack has only one element (ie. pthread_* has
                   been called has main, but the error message arrives
                   too late, and is not really readable *)
-       Mt_options.abort "Thread function %s called as starting thread \
-                         function" f
+       Mt_self.abort "Thread function %s called as starting thread \
+                      function" f
 
      | Some stack ->
        (* For mthread builtin functions, we may remove the top of the stack.

@@ -20,23 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let () = Plugin.is_share_visible ()
-module MThread = Plugin.Register (
-  struct
-    let name = "mthread"
-    let shortname = "mt"
-    let help = "Experimental tools for multi-threaded programs"
-  end)
-;;
-(* Including this module directly is a bad idea, as this hides the
-   "String" module of the standard library... *)
-
-(* Reexport useful values *)
-include (MThread: Log.Messages)
-
-let debug_level () = MThread.Debug.get ()
-
-open MThread
+open Mt_self
 
 let grp_models = add_group "Extraction of models"
 let grp_debug = add_group "Debug"

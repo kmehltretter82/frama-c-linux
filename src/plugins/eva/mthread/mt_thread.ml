@@ -244,7 +244,7 @@ let threads analysis =
 
 let thread_state analysis th =
   try Thread.Hashtbl.find analysis.all_threads th
-  with Not_found -> Mt_options.fatal "Unknown thread %a" Thread.pretty th
+  with Not_found -> Mt_self.fatal "Unknown thread %a" Thread.pretty th
 
 let fold_threads analysis v f =
   List.fold_left (fun acc th -> f th acc) v (threads analysis)
@@ -257,12 +257,12 @@ let current_fun analysis = Callstack.top_kf analysis.curr_stack
 
 let curr_events analysis =
   match analysis.curr_events_stack with
-  | [] -> Mt_options.fatal "Invalid analysis stack"
+  | [] -> Mt_self.fatal "Invalid analysis stack"
   | h :: _ -> h
 
 let on_current_trace analysis f =
   match analysis.curr_events_stack with
-  | [] -> Mt_options.fatal "Invalid analysis stack"
+  | [] -> Mt_self.fatal "Invalid analysis stack"
   | h :: q ->
     analysis.curr_events_stack <- f h q :: q
 
@@ -279,7 +279,7 @@ let register_multiple_events analysis evts =
 
 (* Store the memory state for the function which we finished analyzing *)
 let register_memory_states analysis ~before ~after =
-  Mt_options.debug ~level:2 "Recording states for %a"
+  Mt_self.debug ~level:2 "Recording states for %a"
     Kernel_function.pretty (current_fun analysis);
   on_current_trace analysis (fun cur _ ->  Trace.add_states cur ~before ~after);
 ;;
@@ -295,7 +295,7 @@ let pop_function_call analysis =
     on_current_trace analysis (fun cur _ -> Trace.add_prefix top cur);
   | _ :: _ ->
     match analysis.curr_events_stack with
-    | [] | [_] -> Mt_options.fatal "Invalid analysis stack when popping calling"
+    | [] | [_] -> Mt_self.fatal "Invalid analysis stack when popping calling"
     | trace_callee :: trace_caller :: q ->
       let trace_callee' = Trace.add_prefix top trace_callee in
       let new_trace = Trace.union trace_caller trace_callee' in

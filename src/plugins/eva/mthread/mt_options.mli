@@ -20,11 +20,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module MThread: Plugin.S
-
-include Log.Messages
-val debug_level: unit -> int
-
 (** behavior of option -mthread. *)
 module Enabled: Parameter_sig.Bool
 
