@@ -9,9 +9,10 @@
 \newcommand{\pthreads}{\library{pthreads}}
 
 % this is for compilation purposes
-\def\evadir{../../../src/plugins/eva}
+\def\evadir{../../src/plugins/eva}
 \def\sharedir{\evadir/share/mthread}
 \def\testdir{\evadir/tests/mthread}
+\def\mthreadtexdir{./mthread}
 
 \def\etc{\emph{etc}\ldots}
 \def\eg.{\emph{eg}.}
@@ -24,7 +25,7 @@
 \def\myappdx#1{Appendix~{\ref{sec:#1}}}
 
 \newcommand{\framacversion}%
-           {\input{../../../VERSION} (\input{../../../VERSION_CODENAME}\unskip)}
+           {\input{../../VERSION} (\input{../../VERSION_CODENAME}\unskip)}
 
 \title{The Mthread plug-in}
 \author{Boris Yakobowski with Richard Bonichon}
@@ -240,7 +241,7 @@ to the specialization obtained by \verb+-slicing-level 3+.
 
 \begin{figure}[htb]
   \centering
-    \includegraphics[scale=0.4]{./ccfg.pdf}
+    \includegraphics[scale=0.4]{\mthreadtexdir/ccfg.pdf}
   \caption{Concurrent control-flow graph for the main thread of our example}
   \label{fig:ccfg}
 \end{figure}
@@ -1265,7 +1266,7 @@ directory {\tt html\_summary} by typing :
 
 \begin{figure}[htb]
   \centering
-  \includegraphics[scale=.45]{./html_summary.png}
+  \includegraphics[scale=.45]{\mthreadtexdir/html_summary.png}
 %  \medskip
 %  \hrule
   \caption{\html summary of dining philosophers}
@@ -1284,7 +1285,7 @@ control-flow graph of the thread (\mysec{mthread-cfg}).
 
 \begin{figure}[htb]
   \centering
-  \includegraphics[scale=.35]{./thread_summary.png}
+  \includegraphics[scale=.35]{\mthreadtexdir/thread_summary.png}
 %  \medskip
 %  \hrule
   \caption{Excerpt from the first philosopher's control-flow graph}
@@ -1303,7 +1304,7 @@ function to function.
 
 \begin{figure}[htb]
   \centering
-  \includegraphics[scale=.35]{./thread_code.png}
+  \includegraphics[scale=.35]{\mthreadtexdir/thread_code.png}
 %  \medskip
 %  \hrule
   \caption{Excerpt from the philosophers' source code}

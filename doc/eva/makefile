@@ -1,6 +1,6 @@
-all: main.pdf
+all: main.pdf mthread.pdf
 
-.PHONY: main.pdf
+.PHONY: main.pdf mthread.pdf
 
 include ../MakeLaTeXModern
 
@@ -18,9 +18,17 @@ else
 	@echo "Generated OPEN-SOURCE Eva manual (OPENSOURCE=$(OPENSOURCE))"
 endif
 
+mthread.pdf:
+	$(MAKE) $(FRAMAC_MODERN)
+	latexmk -pdf mthread/mthread.tex
+	@echo "Generated Mthread manual"
+
 clean:
 	latexmk -C -bibtex
+	latexmk -C -bibtex mthread/mthread.tex
 
 install:
 	rm -f ../manuals/eva-manual.pdf
+	rm -f ../manuals/mthread-manual.pdf
 	cp main.pdf ../manuals/eva-manual.pdf
+	cp mthread.pdf ../manuals/mthread-manual.pdf
