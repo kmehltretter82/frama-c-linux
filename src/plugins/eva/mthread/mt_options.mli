@@ -83,6 +83,3 @@ module KeepGreenNodes: Parameter_sig.Bool
 
 (** behavior of option -mt-return-edges. *)
 module ShowReturnEdges: Parameter_sig.Bool
-
-(** behavior of option -mt-inline-callbacks. *)
-module PopTopFunctionForCallbacks: Parameter_sig.Bool

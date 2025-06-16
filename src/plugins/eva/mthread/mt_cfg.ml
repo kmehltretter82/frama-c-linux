@@ -137,29 +137,19 @@ let stmt_mt_status subtrace get_state stmt =
          (* Some mthreads events deeper in the stack. *)
          MTIndirectCall !deep_calls
        | false, false ->
-         (* This case is supposed to handle [*p(...)], with
-            [p] pointing to both an Mthread function and a non-Mthread
-            one. If we inline callbacks, it also catches
-            calls to Mthread functions that access global variables,
-            which is often the case (eg. the index of a mutex, etc). *)
-         if Mt_options.PopTopFunctionForCallbacks.get () then
-           Mt_self.abort ?source:(Mt_cil.kinstr_to_source (Kstmt stmt))
-             "Unhandled@ case@ during@ cfg@ building.@ Try@ to@ \
-              deactivate@ option %s"
-             Mt_options.PopTopFunctionForCallbacks.option_name
-         else (
-           Mt_self.debug "%a"
-             (Pretty_utils.pp_list
-                (fun fmt (selt, subtrace) ->
-                   Format.fprintf fmt "@[<v>-- %a@.%a@]"
-                     Mt_cil.StackElt.pretty selt
-                     Trace.pretty subtrace
-                )) callsites;
-           Mt_self.abort ?source:(Mt_cil.kinstr_to_source (Kstmt stmt))
-             "@[simultaneous@ call@ to@ a@ mthread@ function@ and@ \
-              to@ another@ function:@ very@ strangely@ written@ \
-              mthread@ binding?@]";
-         )
+         (* This case is supposed to handle [*p(...)], with [p] pointing to
+            both an Mthread function and a non-Mthread one. *)
+         Mt_self.debug "%a"
+           (Pretty_utils.pp_list
+              (fun fmt (selt, subtrace) ->
+                 Format.fprintf fmt "@[<v>-- %a@.%a@]"
+                   Mt_cil.StackElt.pretty selt
+                   Trace.pretty subtrace
+              )) callsites;
+         Mt_self.abort ?source:(Mt_cil.kinstr_to_source (Kstmt stmt))
+           "@[simultaneous@ call@ to@ a@ mthread@ function@ and@ \
+            to@ another@ function:@ very@ strangely@ written@ \
+            mthread@ binding?@]";
       )
     | Instr _ ->
       maybe_basic ()

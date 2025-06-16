@@ -47,11 +47,7 @@ let current_loc analysis =
 
 let log_poly ?(kind=Log.Result) analysis =
   let stack = analysis.curr_stack in
-  let stack =
-    if Mt_options.PopTopFunctionForCallbacks.get ()
-    then stack
-    else Option.value (Callstack.pop stack) ~default:stack
-  in
+  let stack = Option.value (Callstack.pop stack) ~default:stack in
   let ki = Callstack.top_callsite stack in
   let source = kinstr_to_source ki in
   let pp_callstack =
@@ -871,31 +867,19 @@ let is_mthread_builtin s =
 (* Function to register as a callback of the Eva analysis if Mthread
    is enabled *)
 let catch_functions_calls analysis (stack : Callstack.callstack) kf state kind =
+  let f = Kernel_function.get_name kf in
+  (* If an Mthread builtin has been called as main, we fail immediately.
+     In fact, this case should not happen, because we reject calls to __FRAMA_C_*
+     functions as main or during thread spawning. We could detect when the stack
+     has only one element (i.e. pthread_* has been called as main), but the error
+     message arrives too late, and is not really readable *)
+  if is_mthread_builtin f && Option.is_none (Callstack.pop stack) then
+    Mt_self.abort "Thread function %s called as starting thread function" f;
   analysis.curr_stack <- stack;
   if Callstack.is_empty stack then
     (* This is the entry point of the analysis, the events stack needs to be
        empty. *)
     analysis.curr_events_stack <- [];
-  let f = Kernel_function.get_name kf in
-  (if is_mthread_builtin f then
-     match Callstack.pop analysis.curr_stack with
-     | None -> (* A thread function has been called as main, and we fail
-                  immediately. In fact, this case should not happen,
-                  because we reject calls to __FRAMA_C_* functions as
-                  main or during thread spawning. We could detect when
-                  the stack has only one element (ie. pthread_* has
-                  been called has main, but the error message arrives
-                  too late, and is not really readable *)
-       Mt_self.abort "Thread function %s called as starting thread \
-                      function" f
-
-     | Some stack ->
-       (* For mthread builtin functions, we may remove the top of the stack.
-          This way, the mthread events appear at the level of the C
-          function, instead of inside a function with a strange name *)
-       if Mt_options.PopTopFunctionForCallbacks.get () then
-         analysis.curr_stack <- stack;
-  );
   if Callstack.is_empty analysis.curr_stack &&
      Thread.is_main analysis.curr_thread.th_eva_thread then begin
     (* Beginning of the main thread (kf being the entry point). For the main

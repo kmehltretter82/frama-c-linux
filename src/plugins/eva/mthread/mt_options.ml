@@ -222,11 +222,3 @@ module ShowReturnEdges =
     let help = "Show link between a call an a return instruction as a dotted line"
   end)
 ;;
-
-let () = Parameter_customize.set_group grp_cfg
-module PopTopFunctionForCallbacks =
-  False (struct
-    let option_name = "-mt-inline-callbacks"
-    let help = "Do not show the names of concurrent primitives, only their effect"
-  end)
-;;
