@@ -45,10 +45,10 @@ let current_loc analysis =
 (* To be used only inside hooks, as it makes pretty bold assumptions on
    the shape of the stack *)
 
-let log_poly ?(pop_stack=true) ?(kind=Log.Result) analysis =
+let log_poly ?(kind=Log.Result) analysis =
   let stack = analysis.curr_stack in
   let stack =
-    if not pop_stack || Mt_options.PopTopFunctionForCallbacks.get ()
+    if Mt_options.PopTopFunctionForCallbacks.get ()
     then stack
     else Option.value (Callstack.pop stack) ~default:stack
   in
@@ -63,8 +63,8 @@ let log_poly ?(pop_stack=true) ?(kind=Log.Result) analysis =
         ("@[" ^^ fmt ^^ "@]")
     }
 
-let log ?(pop_stack=true) ?(kind=Log.Result) analysis =
-  (log_poly ~pop_stack ~kind analysis).ppp
+let log ?(kind=Log.Result) analysis =
+  (log_poly ~kind analysis).ppp
 
 exception Hook_failure of int
 let default_err_code = -255
@@ -73,13 +73,13 @@ let hook_fail ?(code=default_err_code) () =
 
 (* Auxiliary function that aborts a hook when a conversion of something
    into a proper value fails *)
-let catch_conversion analysis msg_main v ?(pop_stack=true) ?(code=default_err_code) ?msg () =
+let catch_conversion analysis msg_main v ?(code=default_err_code) ?msg () =
   let warn fm msg_end =
     let msg = match msg with
       | Some msg -> ":@ " ^^ msg
       | None -> ""
     in
-    log ~kind:Log.Warning analysis ~pop_stack "@[%(%)%(%).@ %t%(%)@]"
+    log ~kind:Log.Warning analysis "@[%(%)%(%).@ %t%(%)@]"
       msg_main msg fm msg_end;
   in
   match v with
@@ -821,13 +821,12 @@ let hook_release_mutex =
 
 let hook_dummy_message analysis state : hook_sig = function
   | (_, name) :: args ->
-    let conv v = catch_conversion analysis ~pop_stack:false
-        "During@ unknown@ event" v in
-    let name = conv (Mt_memory.extract_constant_string name)
-        ~msg:"invalid@ event@ name" () in
+    let conv v = catch_conversion analysis "During@ unknown@ event" v in
+    let name = Mt_memory.extract_constant_string name in
+    let name = conv name ~msg:"invalid@ event@ name" () in
     let evt = Dummy (name, List.map snd args) in
     register_event analysis evt;
-    log ~pop_stack:false ~kind:Log.Result analysis
+    log ~kind:Log.Result analysis
       "Monitored event:@ %a" Event.pretty evt;
     state, no_res
 
@@ -844,35 +843,30 @@ let hook_dummy_message analysis state : hook_sig = function
 let mthread_builtins =
   [
     (* Threads *)
-    "Frama_C_thread_create", hook_thread_creation, `Pop;
-    "Frama_C_thread_start", hook_thread_start, `Pop;
-    "Frama_C_thread_suspend", hook_thread_suspend, `Pop;
-    "Frama_C_thread_cancel", hook_thread_cancellation, `Pop;
-    "Frama_C_thread_exit", hook_thread_exit, `Pop;
-    "Frama_C_thread_id", hook_thread_id, `Pop;
-    "Frama_C_thread_priority", hook_thread_priority, `Pop;
+    "Frama_C_thread_create", hook_thread_creation;
+    "Frama_C_thread_start", hook_thread_start;
+    "Frama_C_thread_suspend", hook_thread_suspend;
+    "Frama_C_thread_cancel", hook_thread_cancellation;
+    "Frama_C_thread_exit", hook_thread_exit;
+    "Frama_C_thread_id", hook_thread_id;
+    "Frama_C_thread_priority", hook_thread_priority;
     (* Mutexes *)
-    "Frama_C_mutex_init", hook_init_mutex, `Pop;
-    "Frama_C_mutex_lock", hook_lock_mutex, `Pop;
-    "Frama_C_mutex_unlock", hook_release_mutex, `Pop;
+    "Frama_C_mutex_init", hook_init_mutex;
+    "Frama_C_mutex_lock", hook_lock_mutex;
+    "Frama_C_mutex_unlock", hook_release_mutex;
     (* Message queues *)
-    "Frama_C_queue_init", hook_queue_init, `Pop;
-    "Frama_C_queue_send", hook_send_msg, `Pop;
-    "Frama_C_queue_receive", hook_receive_msg, `Pop;
+    "Frama_C_queue_init", hook_queue_init;
+    "Frama_C_queue_send", hook_send_msg;
+    "Frama_C_queue_receive", hook_receive_msg;
     (* Misc *)
-    "Frama_C_mthread_show", hook_dummy_message, `NoPop;
+    "Frama_C_mthread_show", hook_dummy_message;
     (* Shared values *)
-    "Frama_C_mthread_sync", hook_sync, `Pop;
+    "Frama_C_mthread_sync", hook_sync;
   ]
 ;;
 
 let is_mthread_builtin s =
-  try
-    let (_, _, pop) = List.find (fun (s', _, _) -> s = s') mthread_builtins in
-    pop
-  with Not_found -> `NotBuiltin
-
-let mthread_builtins = List.map (fun (n, f, _) -> (n, f)) mthread_builtins
+  List.exists (fun (s', _) -> s = s') mthread_builtins
 
 (* Function to register as a callback of the Eva analysis if Mthread
    is enabled *)
@@ -883,8 +877,7 @@ let catch_functions_calls analysis (stack : Callstack.callstack) kf state kind =
        empty. *)
     analysis.curr_events_stack <- [];
   let f = Kernel_function.get_name kf in
-  let built = is_mthread_builtin f in
-  (if built <> `NotBuiltin then
+  (if is_mthread_builtin f then
      match Callstack.pop analysis.curr_stack with
      | None -> (* A thread function has been called as main, and we fail
                   immediately. In fact, this case should not happen,
@@ -900,7 +893,7 @@ let catch_functions_calls analysis (stack : Callstack.callstack) kf state kind =
        (* For mthread builtin functions, we may remove the top of the stack.
           This way, the mthread events appear at the level of the C
           function, instead of inside a function with a strange name *)
-       if Mt_options.PopTopFunctionForCallbacks.get () && built = `Pop then
+       if Mt_options.PopTopFunctionForCallbacks.get () then
          analysis.curr_stack <- stack;
   );
   if Callstack.is_empty analysis.curr_stack &&
