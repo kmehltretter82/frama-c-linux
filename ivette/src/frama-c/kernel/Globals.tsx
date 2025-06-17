@@ -25,6 +25,8 @@
 // --------------------------------------------------------------------------
 
 import React from 'react';
+import InfiniteScroll from 'react-infinite-scroller';
+
 import * as Dome from 'dome';
 import * as Json from 'dome/data/json';
 import { classes } from 'dome/misc/utils';
@@ -36,7 +38,8 @@ import * as Toolbar from 'dome/frame/toolbars';
 import { Hbox } from 'dome/layout/boxes';
 import { useModel } from 'dome/table/models';
 import * as Dialogs from 'dome/dialogs';
-import InfiniteScroll from 'react-infinite-scroller';
+import { FieldState, TextField, useState } from 'dome/layout/forms';
+import { Icon } from 'dome/controls/icons';
 
 import * as Ivette from 'ivette';
 import * as Server from 'frama-c/server';
@@ -45,9 +48,8 @@ import * as Ast from 'frama-c/kernel/api/ast';
 import * as Locations from 'frama-c/kernel/Locations';
 import { computationState } from 'frama-c/plugins/eva/api/general';
 import * as Eva from 'frama-c/plugins/eva/api/general';
+import { addProjectMenu } from 'frama-c/menu';
 import * as Services from './api/services';
-import { FieldState, TextField, useState } from 'dome/layout/forms';
-import { Icon } from 'dome/controls/icons';
 
 
 // --------------------------------------------------------------------------
@@ -993,20 +995,47 @@ export function GlobalProjects(): JSX.Element {
   const modelProjects = States.useSyncArrayModel(Services.projectList);
   const model = useModel(modelProjects);
 
+  const projectsListSorted = React.useMemo(() => {
+    return modelProjects.getArray().sort((a, b) => alpha(a.name, b.name));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [modelProjects, model]);
+
+  /** Re-Build the project menu */
+  React.useEffect(() => {
+    const timeout = setTimeout(() => {
+      Dome.delMenu('Project');
+      const others: Dome.MenuItemProps[] = [
+        { menu: 'Project', id: 'project_separator', kind: 'separator' }
+      ];
+      projectsListSorted.forEach(elt => others.push({
+          menu: 'Project',
+          label: elt.name,
+          id: `Project_${elt.uniqueName}`,
+          kind: 'checkbox',
+          checked: Boolean(current === elt.uniqueName),
+          onClick: () => setCurrent(elt.uniqueName)
+        })
+      );
+      addProjectMenu(others);
+    }, 100);
+    return () => clearTimeout(timeout);
+  }, [projectsListSorted, current, setCurrent]);
+
+  /** Build item components for project sidebar */
   const projectsList = React.useMemo(() => {
     const list: React.JSX.Element[] = [];
-    modelProjects.forEach(elt => {
-      list.push(<Item
-        key={elt.uniqueName}
-        label={elt.name}
-        title={`unique name: ${elt.uniqueName}`}
-        selected={elt.uniqueName === current}
-        onSelection={() => setCurrent(elt.uniqueName) }
-      >{getActions(elt.uniqueName, elt.name)}</Item>);
-    });
+    projectsListSorted.forEach(elt => {
+        list.push(<Item
+          key={elt.uniqueName}
+          label={elt.name}
+          title={`unique name: ${elt.uniqueName}`}
+          selected={elt.uniqueName === current}
+          onSelection={() => setCurrent(elt.uniqueName) }
+        >{getActions(elt.uniqueName, elt.name)}</Item>);
+      }
+    );
     return list;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [modelProjects, model, current, setCurrent]);
+  }, [projectsListSorted, current, setCurrent]);
 
   return (<>
     <SidebarTitle

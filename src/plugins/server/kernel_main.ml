@@ -199,18 +199,6 @@ let _current_project_signal =
     ~add_hook
     ()
 
-let () = Request.register
-    ~package ~kind:`GET ~name:"getProject"
-    ~descr:(Md.plain "Returns the project corresponding to the given id")
-    ~input:(module Jproject_id)
-    ~output:(module Jpair (Joption(Jproject)) (Joption(Jstring)))
-    (fun project_name ->
-       try
-         let project = Project.from_unique_name project_name in
-         (Some project, None)
-       with Project.Unknown_project ->
-         (None, Some "erreur"))
-
 let get_project_list () =
   Project.fold_on_projects (fun acc t -> t :: acc) []
 

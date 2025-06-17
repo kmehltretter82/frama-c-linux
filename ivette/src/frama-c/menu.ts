@@ -203,7 +203,7 @@ async function renameCurrentProject(): Promise<void> {
   Globals.renameProject(current, "Rename current project");
 }
 
-export function addProjectMenu(): void {
+export function addProjectMenu(others?: Dome.MenuItemProps[]): void {
   Dome.addMenu('Project');
   Dome.addMenuItem({
     menu: 'Project',
@@ -240,6 +240,7 @@ export function addProjectMenu(): void {
     onClick: () => renameCurrentProject(),
     kind: 'normal',
   });
+  others?.forEach(e => Dome.addMenuItem(e));
 }
 
 export function init(): void {
