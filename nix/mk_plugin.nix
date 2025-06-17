@@ -111,7 +111,7 @@ stdenv.mkDerivation {
   # __FILE__ macro.
   checkPhase = ''
     runHook preCheck
-    make run-ptests
+    dune exec -- frama-c-ptests -never-disabled tests
     export NIX_GCC_DONT_MANGLE_PREFIX_MAP=
     dune build -j1 @tests/ptests
   '';
