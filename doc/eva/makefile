@@ -18,7 +18,8 @@ else
 	@echo "Generated OPEN-SOURCE Eva manual (OPENSOURCE=$(OPENSOURCE))"
 endif
 
-mthread.pdf:
+mthread.pdf: ../../VERSION ../../VERSION_CODENAME examples/mthread/**.c
+	$(MAKE) -C examples/mthread
 	$(MAKE) $(FRAMAC_MODERN)
 	latexmk -pdf mthread/mthread.tex
 	@echo "Generated Mthread manual"
