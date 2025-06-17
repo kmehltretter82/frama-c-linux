@@ -15,7 +15,8 @@
 [mt] init.c:25: Initializing mutex mu2
 [mt] init.c:25: Initializing mutex mu3
 [mt] init.c:29: Initializing mutex 0
-[mt] init.c:29: Warning: Mutex 0 might be already initialized
+[mt] init.c:29: Warning: 
+  Trying to initialize mutex 0, but it might already be unlocked (and initialized).
 [eva] init.c:15: Warning: The mutex 0 is already registered.
 [mt] *** First value analysis for main thread done.
 [mt] * Starting to save the state of the value analysis

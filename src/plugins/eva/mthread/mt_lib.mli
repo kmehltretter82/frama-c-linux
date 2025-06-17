@@ -20,18 +20,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** {1 Auxiliary definitions and functions for pretty-printing } *)
-
-(** Partially applied format-like function missing a "%a" argument *)
-type poly_format_quote_a =
-  { pf: 'a. (Format.formatter -> 'a -> unit) -> 'a -> unit }
-
-(** Partially applied Log.pretty_printer value, missing its entire formatter
-    (and the arguments) *)
-type poly_pretty_printer =
-  { ppp: 'a. ('a, Format.formatter, unit) format -> 'a }
-
-
 
 (** Compare the tags of two OCaml values (or their values if they are
     integers). Can be used to implement the generic cases of compare functions

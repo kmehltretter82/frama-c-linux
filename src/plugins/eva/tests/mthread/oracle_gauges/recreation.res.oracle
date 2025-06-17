@@ -1,12 +1,9 @@
-492a493,495
+494a495,496
 > [mt] recreation.c:49: Warning: 
->   Unable to check that mutex locks[0] has already been locked;
->   {1; 2} should be 2
-1071a1075,1077
+>   Trying to unlock mutex locks[0], but unable to check its precise status (internal value {1; 2} should be 2).
+1075a1078,1079
 > [mt] recreation.c:49: Warning: 
->   Unable to check that mutex locks[0] has already been locked;
->   {1; 2} should be 2
-1748a1755,1757
+>   Trying to unlock mutex locks[0], but unable to check its precise status (internal value {1; 2} should be 2).
+1754a1759,1760
 > [mt] recreation.c:49: Warning: 
->   Unable to check that mutex locks[0] has already been locked;
->   {1; 2} should be 2
+>   Trying to unlock mutex locks[0], but unable to check its precise status (internal value {1; 2} should be 2).
