@@ -994,6 +994,14 @@ export function GlobalProjects(): JSX.Element {
   const [ current, setCurrent ] = States.useSyncState(Services.currentProject);
   const modelProjects = States.useSyncArrayModel(Services.projectList);
   const model = useModel(modelProjects);
+  /** By clicking on a checkbox item in the menu,
+   * the item is checked or unchecked even if there is no effect.
+   * The current project is therefore unchecked on click
+   * and the event cannot be intercepted.
+   * The menu is therefore recalculated.
+   * the style of the radio buttons isn't pretty.
+   * */
+  const [recalcMenu, setRecalcMenu] = React.useState(true);
 
   const projectsListSorted = React.useMemo(() => {
     return modelProjects.getArray().sort((a, b) => alpha(a.name, b.name));
@@ -1013,13 +1021,15 @@ export function GlobalProjects(): JSX.Element {
           id: `Project_${elt.uniqueName}`,
           kind: 'checkbox',
           checked: Boolean(current === elt.uniqueName),
-          onClick: () => setCurrent(elt.uniqueName)
+          onClick: current === elt.uniqueName ?
+            () => setRecalcMenu(v => !v) :
+            () => setCurrent(elt.uniqueName)
         })
       );
       addProjectMenu(others);
     }, 100);
     return () => clearTimeout(timeout);
-  }, [projectsListSorted, current, setCurrent]);
+  }, [projectsListSorted, current, setCurrent, recalcMenu]);
 
   /** Build item components for project sidebar */
   const projectsList = React.useMemo(() => {

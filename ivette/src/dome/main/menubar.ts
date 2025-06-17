@@ -393,7 +393,6 @@ export function addMenuItem(custom: CustomMenuItemSpec): void {
       if (entry.spec) Object.assign(entry.spec, spec);
       if (entry.item) Object.assign(entry.item, { ...spec, menu });
     } else {
-      console.warn(spec);
       if (!spec.click && !spec.role)
         spec.click = (
           _item: MenuItem,
