@@ -747,7 +747,7 @@ module Html = struct
     Format.pp_set_formatter_stag_functions fmt html_stag_functions;
     Format.pp_set_tags fmt true;
     let pp = new tagPrinterClass in
-    Format.fprintf fmt "@{<pre>@.%a@}@?" pp#file (Ast.get ());
+    Format.fprintf fmt "<pre>@,%a</pre>@?" pp#file (Ast.get ());
     pp_page page
   ;;
 
