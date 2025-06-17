@@ -72,10 +72,10 @@ let hook_fail ?(code=default_err_code) () =
 let catch_conversion analysis msg_main v ?(code=default_err_code) ?msg () =
   let warn fm msg_end =
     let msg = match msg with
-      | Some msg -> ":@ " ^^ msg
+      | Some msg -> ": " ^ msg
       | None -> ""
     in
-    log ~kind:Log.Warning analysis "@[%(%)%(%).@ %t%(%)@]"
+    log ~kind:Log.Warning analysis "@[%s%s.@ %t%s@]"
       msg_main msg fm msg_end;
   in
   match v with
@@ -84,7 +84,7 @@ let catch_conversion analysis msg_main v ?(code=default_err_code) ?msg () =
     warn w "";
     v
   | `Failure w ->
-    warn w "@ Ignoring.";
+    warn w " Ignoring.";
     hook_fail ~code ()
 
 (* -------------------------------------------------------------------------- *)
@@ -94,7 +94,7 @@ let catch_conversion analysis msg_main v ?(code=default_err_code) ?msg () =
 let find_failure kind id =
   let pp fmt =
     Format.fprintf fmt
-      "Id %d for %s does not exists@ (incrementation@ inside@ program?)."
+      "Id %d for %s does not exists (incrementation inside program?)."
       id kind
   in
   `Failure pp
@@ -372,8 +372,8 @@ let spawn_thread analysis eva_thread stack func state params parent =
     if Option.equal ThreadState.equal parent th'.th_parent = false
     then (
       let pp_parent = Pretty_utils.pp_opt ~none:"<none>" ThreadState.pretty in
-      log ~kind:Log.Error analysis "Thread '%a' is launched@ by two different \
-                                    threads@ (%a and %a).@ Ignoring"
+      log ~kind:Log.Error analysis "Thread '%a' is launched by two different \
+                                    threads (%a and %a). Ignoring"
         Thread.pretty eva_thread
         pp_parent parent
         pp_parent th'.th_parent;
@@ -391,8 +391,8 @@ let spawn_thread analysis eva_thread stack func state params parent =
     else if Kernel_function.get_id func <> Kernel_function.get_id th'.th_fun
     then (
       log ~kind:Log.Error analysis
-        "Thread '%a' can be two different functions@ \
-         (%s and %s).@ Imprecise pointer?@ Ignoring."
+        "Thread '%a' can be two different functions \
+         (%s and %s). Imprecise pointer? Ignoring."
         Thread.pretty eva_thread
         (Kernel_function.get_name func)
         (Kernel_function.get_name th'.th_fun);
@@ -452,10 +452,10 @@ let thread_is_running state =
 (** Hook registered in the value analysis for the creation of thread *)
 let hook_thread_creation analysis state : hook_sig = function
   | (_, name) :: (_, f) :: params ->
-    let conv v = catch_conversion analysis "During@ thread@ creation" v in
+    let conv v = catch_conversion analysis "During thread creation" v in
     (* We clean the state that will be used by the created thread *)
     let kf = conv (Mt_memory.extract_fun f)
-        ~msg:"invalid@ thread@ function" () in
+        ~msg:"invalid thread function" () in
     let formals = Kernel_function.get_formals kf in
     let rec trunc_params = function
       | [], [] -> []
@@ -463,15 +463,15 @@ let hook_thread_creation analysis state : hook_sig = function
       | [], (_ :: _ as params) ->
         if Mt_options.ModerateWarnings.get () then
           log ~kind:Log.Warning analysis
-            "@[During thread@ creation,@ mismatch@ between@ function \
-             '%s'@ signature and@ actual arguments.@ Ignoring@ last \
-             %d argument(s)@ and@ continuing.@]"
+            "During thread creation, mismatch between function \
+             '%s' signature and actual arguments. Ignoring last \
+             %d argument(s) and continuing."
             (Kernel_function.get_name kf) (List.length params);
         []
       | _ :: _, [] ->
         log ~kind:Log.Error analysis
-          "@[When creating@ thread@ from@ function %s:@ too@ few@ \
-           arguments,@ %d expected@ but@ %d given.@ Ignoring.@]"
+          "When creating thread from function %s: too few \
+           arguments, %d expected but %d given. Ignoring.]"
           (Kernel_function.get_name kf)
           (List.length formals) (List.length params);
         hook_fail ()
@@ -516,12 +516,12 @@ let update_initial_state analysis th state =
 
 let hook_thread_start_suspend fname check v aux_state evt analysis state : hook_sig = function
   | [_, offset]  ->
-    let conv v = catch_conversion analysis ("During@ thread@ " ^^ fname) v in
+    let conv v = catch_conversion analysis ("During thread " ^ fname) v in
     let offset = conv (Mt_memory.extract_int offset)
-        ~msg:"invalid@ thread@ id" () in
+        ~msg:"invalid thread id" () in
     if offset <> 0 then
       let th = conv (find_thread offset)
-          ~msg:"unkonwn@ thread" () in
+          ~msg:"unknown thread" () in
       (check (log_poly ~kind:Log.Warning analysis) th state : unit);
       let evt = evt th in
       log ~kind:Log.Result analysis "@[%a@]" Event.pretty evt;
@@ -530,10 +530,10 @@ let hook_thread_start_suspend fname check v aux_state evt analysis state : hook_
       Mt_ids.write_id_state state_started (Mt_ids.of_thread th) v, wrap_res 0
     else (
       log ~kind:Log.Warning analysis
-        "Trying to@ %(%)@ unknown thread.@ Ignoring." fname;
+        "Trying to %s unknown thread. Ignoring." fname;
       hook_fail ~code:(-1) ())
 
-  | _ -> Mt_self.fatal "Incorrect mthread binding for thread %(%)" fname
+  | _ -> Mt_self.fatal "Incorrect mthread binding for thread %s" fname
 
 (** Hook registered in the value analysis when a thread is started *)
 let hook_thread_start =
@@ -550,19 +550,19 @@ let hook_thread_suspend =
 
 let hook_thread_cancellation analysis state : hook_sig = function
   | [_, offset]  ->
-    let conv v = catch_conversion analysis "During@ thread@ cancellation" v in
+    let conv v = catch_conversion analysis "During thread cancellation" v in
     let offset = conv (Mt_memory.extract_int offset)
-        ~msg:"invalid@ thread@ id" () in
+        ~msg:"invalid thread id" () in
     if offset <> 0 then
       let th = conv (find_thread offset)
-          ~msg:"unkonwn@ thread" () in
+          ~msg:"unknown thread" () in
       check_thread_not_already_cancelled
         (log_poly ~kind:Log.Warning analysis) th state;
       register_event analysis (CancelThread th);
       Mt_ids.write_id_state state (Mt_ids.of_thread th) 2, wrap_res 0
     else (
       log ~kind:Log.Warning analysis
-        "Trying to@ cancel@ unknown thread.@ Ignoring.";
+        "Trying to cancel unknown thread. Ignoring.";
       hook_fail ~code:(-1) ())
 
   | _ -> Mt_self.fatal "Incorrect mthread binding for thread cancellation \
@@ -572,11 +572,11 @@ let hook_thread_exit analysis (_state: state) : hook_sig = function
   | [_, v]  ->
     if ThreadState.is_main analysis.curr_thread then (
       log ~kind:Log.Error analysis
-        "Call@ to@ thread@ exit@ primitive@ inside@ main@ thread. Ignoring";
+        "Call to thread exit primitive inside main thread. Ignoring";
       hook_fail ())
     else (
       register_event analysis (ThreadExit v);
-      log ~kind:Log.Result analysis "Thread@ exiting@ with@ value %a"
+      log ~kind:Log.Result analysis "Thread exiting with value %a"
         Cvalue.V.pretty v;
       Cvalue.Model.bottom, no_res)
 
@@ -591,8 +591,8 @@ let hook_thread_priority analysis state : hook_sig = function
   |[ _, p] ->
     begin
       let p = catch_conversion analysis
-          "During@ thread@ priority@ definition" (Mt_memory.extract_int p)
-          ~msg:"invalid@ thread@ id" ()
+          "During thread priority definition" (Mt_memory.extract_int p)
+          ~msg:"invalid thread id" ()
       in
       begin
         match analysis.curr_thread.th_priority with
@@ -623,11 +623,11 @@ let hook_thread_priority analysis state : hook_sig = function
 let hook_queue_init analysis state : hook_sig = function
   | [_, name; _, size] ->
     let conv v =
-      catch_conversion analysis "During@ queue@ initialization" v
+      catch_conversion analysis "During queue initialization" v
     in
     let aloc = current_loc analysis
     and name = Concurrency.Name.of_cvalue name
-    and size = conv (Mt_memory.extract_int size) ~msg:"invalid@ size" () in
+    and size = conv (Mt_memory.extract_int size) ~msg:"invalid size" () in
     let q = Mqueue.create aloc name in
     analysis.all_queues <- Mqueue.Set.add q analysis.all_queues;
     check_queue_not_already_initialized
@@ -641,12 +641,12 @@ let hook_queue_init analysis state : hook_sig = function
 
 let hook_send_msg analysis state : hook_sig = function
   | [(_, offset); (_exp_content, content); (_exp_size, size)] ->
-    let conv v = catch_conversion analysis "During@ message@ sending" v in
+    let conv v = catch_conversion analysis "During message sending" v in
     let offset = conv (Mt_memory.extract_int offset)
-        ~msg:"invalid@ queue@ id" () in
+        ~msg:"invalid queue id" () in
     if offset <> 0 then
       let sbytes = conv (Mt_memory.extract_int size)
-          ~msg:"invalid@ message@ size" () in
+          ~msg:"invalid message size" () in
       if sbytes <= 0 then
         conv (`Failure (fun fmt -> Format.fprintf fmt
                            "Invalid message length %d." sbytes)) ();
@@ -660,8 +660,7 @@ let hook_send_msg analysis state : hook_sig = function
       state, wrap_res 0
     else (
       log ~kind:Log.Warning analysis
-        "@[<hov>Trying to@ send@ message@ on@ uninitialized@ queue.@ \
-         Ignoring@]";
+        "Trying to send message on uninitialized queue. Ignoring.";
       state, wrap_res (-1))
 
   | _ -> Mt_self.fatal "Incorrect mthread binding for message sending"
@@ -679,13 +678,13 @@ let find_msg_content analysis q =
 
 let hook_receive_msg analysis state : hook_sig = function
   | [(_,offset); (_e_size, size); (e_loc, loc)] ->
-    let conv v = catch_conversion analysis "During@ message@ reception" v in
+    let conv v = catch_conversion analysis "During message reception" v in
     let offset = conv (Mt_memory.extract_int offset)
-        ~msg:"invalid@ queue@ id" () in
+        ~msg:"invalid queue id" () in
     if offset <> 0 then
-      let smax = conv (Mt_memory.extract_int size) ~msg:"invalid@ size" ()
+      let smax = conv (Mt_memory.extract_int size) ~msg:"invalid size" ()
       and p = conv (Mt_memory.extract_pointer loc)
-          ~msg:"invalid@ destination@ buffer" () in
+          ~msg:"invalid destination buffer" () in
       let q = conv (find_queue offset) () in
       check_queue_already_initialized
         (log_poly ~kind:Log.Warning analysis) q state;
@@ -708,9 +707,9 @@ let hook_receive_msg analysis state : hook_sig = function
                    length', mess :: kept_mess, false, state'
                  else (
                    log ~kind:Log.Warning analysis
-                     "Found message@ of length %d,@ which is@ too long@ \
-                      for buffer '%a'. Execution@ will@ continue@ without@ \
-                      those@ messages.@.(Ignore \"This path is assumed to \
+                     "Found message of length %d, which is too long \
+                      for buffer '%a'. Execution will continue without \
+                      those messages.(Ignore \"This path is assumed to \
                       be dead message if any\".)"
                      smess pp_exp e_loc;
                    length, kept_mess, exact, state)
@@ -721,7 +720,7 @@ let hook_receive_msg analysis state : hook_sig = function
           | [] ->
             Cvalue.Model.bottom,
             no_res,
-            (fun fmt -> Format.fprintf fmt "No valid value@ to receive.")
+            (fun fmt -> Format.fprintf fmt "No valid value to receive.")
           | _ :: _ ->
             let pp fmt =
               Format.fprintf fmt "Possible %s values:@.%a"
@@ -738,14 +737,14 @@ let hook_receive_msg analysis state : hook_sig = function
         else
           Cvalue.Model.bottom,
           no_res,
-          (fun fmt -> Format.fprintf fmt "No value@ to receive (yet?).")
+          (fun fmt -> Format.fprintf fmt "No value to receive (yet?).")
       in
       log ~kind:Log.Result analysis "@[<hov>%a@ %t@]"
         Event.pretty action pp;
       state, res
     else (
       log ~kind:Log.Warning analysis
-        "Trying@ to@ receive@ value@ on@ non-initialized@ queue. Ignoring.";
+        "Trying to receive value on non-initialized queue. Ignoring.";
       state, wrap_res (-2))
 
   | _ -> Mt_self.fatal "Incorrect mthread binding for message reception"
@@ -759,11 +758,11 @@ let hook_receive_msg analysis state : hook_sig = function
 let aux_mutex ~operation:op ~check ~event analysis state : hook_sig = function
   | [_, offset] ->
     let f_check, value = check in
-    let conv v = catch_conversion analysis ("During@ mutex@ " ^^ op) v in
+    let conv v = catch_conversion analysis ("During mutex " ^ op) v in
     let offset, exact = conv (Mt_memory.extract_int_possibly_zero offset)
-        ~msg:"invalid@ mutex@ id" () in
+        ~msg:"invalid mutex id" () in
     if exact = `WithZero then log ~kind:Log.Warning analysis
-        "@[<hov>Trying to@ %(%)@ a possibly@ uninitialized@ mutex.@]" op;
+        "Trying to %s a possibly uninitialized mutex." op;
     if offset <> 0 then
       let m = conv (find_mutex offset) () in
       f_check (log_poly ~kind:Log.Warning analysis) m state;
@@ -777,7 +776,7 @@ let aux_mutex ~operation:op ~check ~event analysis state : hook_sig = function
       with_external, wrap_res  0
     else (
       log ~kind:Log.Warning analysis
-        "@[<hov>Trying to@ %(%)@ uninitialized@ mutex.@ Ignoring@]" op;
+        "Trying to %s uninitialized mutex. Ignoring" op;
       state, wrap_res (-1))
 
   | _ -> (* really unlikely unless the code and/or the C binding
@@ -817,13 +816,13 @@ let hook_release_mutex =
 
 let hook_dummy_message analysis state : hook_sig = function
   | (_, name) :: args ->
-    let conv v = catch_conversion analysis "During@ unknown@ event" v in
+    let conv v = catch_conversion analysis "During unknown event" v in
     let name = Mt_memory.extract_constant_string name in
-    let name = conv name ~msg:"invalid@ event@ name" () in
+    let name = conv name ~msg:"invalid event name" () in
     let evt = Dummy (name, List.map snd args) in
     register_event analysis evt;
     log ~kind:Log.Result analysis
-      "Monitored event:@ %a" Event.pretty evt;
+      "Monitored event: %a" Event.pretty evt;
     state, no_res
 
   | _ -> Mt_self.fatal "Incorrect mthread binding for unknown event"

@@ -24,8 +24,8 @@
 [mt] philo.c:56: New thread: jobs[4], fun job, parent <main>, args {4}
 [mt] philo.c:56: Start thread jobs[4]
 [mt] philo.c:59: 
-  Receiving message on queue, max size 2, stored in &end. No value
-  to receive (yet?).
+  Receiving message on queue, max size 2, stored in &end.
+  No value to receive (yet?).
 [mt] *** First value analysis for main thread done.
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
