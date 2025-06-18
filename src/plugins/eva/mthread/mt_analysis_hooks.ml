@@ -74,22 +74,12 @@ let hook_fail ?(code=default_err_code) () =
 
 (* Auxiliary function that aborts a hook when a conversion of something
    into a proper value fails *)
-let catch_conversion analysis msg_main v ?(code=default_err_code) ?msg () =
-  let warn fm msg_end =
-    let msg = match msg with
-      | Some msg -> ": " ^ msg
-      | None -> ""
-    in
-    warning analysis "@[%s%s.@ %t%s@]" msg_main msg fm msg_end;
-  in
+let catch_conversion analysis ~prefix v msg =
   match v with
   | `Success v -> v
-  | `WithWarning (w, v) ->
-    warn w "";
-    v
   | `Failure w ->
-    warn w " Ignoring.";
-    hook_fail ~code ()
+    warning analysis "@[%s: %s.%t Ignoring.@]" prefix msg w;
+    hook_fail ()
 
 (* -------------------------------------------------------------------------- *)
 (* --- Specialization of id function                                          *)
@@ -405,9 +395,9 @@ let thread_is_running state =
 (** Hook registered in the value analysis for the creation of thread *)
 let hook_thread_creation analysis state : hook_sig = function
   | (_, name) :: (_, f) :: params ->
-    let conv v = catch_conversion analysis "During thread creation" v in
+    let conv = catch_conversion analysis ~prefix:"During thread creation" in
     (* We clean the state that will be used by the created thread *)
-    let kf = conv (Mt_memory.extract_fun f) ~msg:"invalid thread function" () in
+    let kf = conv (Mt_memory.extract_fun f) "invalid thread function" in
     let formals = Kernel_function.get_formals kf in
     let rec trunc_params = function
       | [], [] -> []
@@ -468,10 +458,11 @@ let update_initial_state analysis th state =
 
 let hook_thread_start_suspend operation aux_state evt analysis state : hook_sig = function
   | [_, offset]  ->
-    let conv v = catch_conversion analysis ("During thread " ^ operation.name) v in
-    let offset = conv (Mt_memory.extract_int offset) ~msg:"invalid thread id" () in
+    let prefix = "During thread " ^ operation.name in
+    let conv v = catch_conversion analysis ~prefix v in
+    let offset = conv (Mt_memory.extract_int offset) "invalid thread id" in
     if offset <> 0 then
-      let th = conv (find_thread offset) ~msg:"unknown thread" () in
+      let th = conv (find_thread offset) "unknown thread" in
       let state = ThreadOp.check_and_write analysis state th operation in
       let evt = evt th in
       result analysis "@[%a@]" Event.pretty evt;
@@ -497,10 +488,11 @@ let hook_thread_suspend =
 
 let hook_thread_cancellation analysis state : hook_sig = function
   | [_, offset]  ->
-    let conv v = catch_conversion analysis "During thread cancellation" v in
-    let offset = conv (Mt_memory.extract_int offset) ~msg:"invalid thread id" () in
+    let prefix = "During thread cancellation" in
+    let conv v = catch_conversion analysis ~prefix v in
+    let offset = conv (Mt_memory.extract_int offset) "invalid thread id" in
     if offset <> 0 then
-      let th = conv (find_thread offset) ~msg:"unknown thread" () in
+      let th = conv (find_thread offset) "unknown thread" in
       register_event analysis (CancelThread th);
       let state = ThreadOp.check_and_write analysis state th ThreadOp.cancel in
       state, wrap_res 0
@@ -533,8 +525,9 @@ let hook_thread_priority analysis state : hook_sig = function
   |[ _, p] ->
     begin
       let p = catch_conversion analysis
-          "During thread priority definition" (Mt_memory.extract_int p)
-          ~msg:"invalid thread id" ()
+          ~prefix:"During thread priority definition"
+          (Mt_memory.extract_int p)
+          "invalid thread id"
       in
       begin
         match analysis.curr_thread.th_priority with
@@ -564,12 +557,11 @@ let hook_thread_priority analysis state : hook_sig = function
 
 let hook_queue_init analysis state : hook_sig = function
   | [_, name; _, size] ->
-    let conv v =
-      catch_conversion analysis "During queue initialization" v
-    in
+    let prefix = "During queue initialization" in
+    let conv v = catch_conversion analysis ~prefix v in
     let aloc = current_loc analysis
     and name = Concurrency.Name.of_cvalue name
-    and size = conv (Mt_memory.extract_int size) ~msg:"invalid size" () in
+    and size = conv (Mt_memory.extract_int size) "invalid size" in
     let q = Mqueue.create aloc name in
     analysis.all_queues <- Mqueue.Set.add q analysis.all_queues;
     let state = QueueOp.check_and_write analysis state q QueueOp.initialize in
@@ -581,16 +573,16 @@ let hook_queue_init analysis state : hook_sig = function
 
 let hook_send_msg analysis state : hook_sig = function
   | [(_, offset); (_exp_content, content); (_exp_size, size)] ->
-    let conv v = catch_conversion analysis "During message sending" v in
-    let offset = conv (Mt_memory.extract_int offset)
-        ~msg:"invalid queue id" () in
+    let conv v = catch_conversion analysis ~prefix:"During message sending" v in
+    let offset = conv (Mt_memory.extract_int offset) "invalid queue id" in
     if offset <> 0 then
-      let sbytes = conv (Mt_memory.extract_int size)
-          ~msg:"invalid message size" () in
+      let sbytes = conv (Mt_memory.extract_int size) "invalid message size" in
       if sbytes <= 0 then
-        conv (`Failure (fun fmt -> Format.fprintf fmt
-                           "Invalid message length %d." sbytes)) ();
-      let q = conv (find_queue offset) () in
+        begin
+          let failure = `Failure (fun fmt -> Format.fprintf fmt "%d." sbytes) in
+          conv failure "invalid message length";
+        end;
+      let q = conv (find_queue offset) "unkwown queue" in
       let content = Mt_memory.read_slice ~p:content ~sbytes state in
       let state = QueueOp.check_and_write analysis state q QueueOp.send in
       let action = SendMsg (q, (content, sbytes)) in
@@ -617,14 +609,13 @@ let find_msg_content analysis q =
 
 let hook_receive_msg analysis state : hook_sig = function
   | [(_,offset); (_e_size, size); (e_loc, loc)] ->
-    let conv v = catch_conversion analysis "During message reception" v in
-    let offset = conv (Mt_memory.extract_int offset)
-        ~msg:"invalid queue id" () in
+    let prefix = "During message reception" in
+    let conv v = catch_conversion analysis ~prefix v in
+    let offset = conv (Mt_memory.extract_int offset) "invalid queue id" in
     if offset <> 0 then
-      let smax = conv (Mt_memory.extract_int size) ~msg:"invalid size" ()
-      and p = conv (Mt_memory.extract_pointer loc)
-          ~msg:"invalid destination buffer" () in
-      let q = conv (find_queue offset) () in
+      let smax = conv (Mt_memory.extract_int size) "invalid size"
+      and p = conv (Mt_memory.extract_pointer loc) "invalid destination buffer"
+      and q = conv (find_queue offset) "unknown queue" in
       let state = QueueOp.check_and_write analysis state q QueueOp.receive in
       let action = ReceiveMsg (q, p, smax) in
       register_event analysis action;
@@ -694,13 +685,14 @@ let hook_receive_msg analysis state : hook_sig = function
    [evt] returns the corresponding mthread event. *)
 let aux_mutex ~operation:op ~event analysis state : hook_sig = function
   | [_, offset] ->
-    let conv v = catch_conversion analysis ("During mutex " ^ op.name) v in
-    let offset, exact = conv (Mt_memory.extract_int_possibly_zero offset)
-        ~msg:"invalid mutex id" () in
+    let prefix = "During mutex " ^ op.name in
+    let conv v = catch_conversion analysis ~prefix v in
+    let offset_conversion = Mt_memory.extract_int_possibly_zero offset in
+    let offset, exact = conv offset_conversion "invalid mutex id" in
     if exact = `WithZero then
       warning analysis "Trying to %s a possibly uninitialized mutex." op.name;
     if offset <> 0 then
-      let m = conv (find_mutex offset) () in
+      let m = conv (find_mutex offset) "unknown mutex" in
       let state = MutexOp.check_and_write analysis state m op in
       let evt : event = event m in
       result analysis "%a" Event.pretty evt;
@@ -745,9 +737,9 @@ let hook_release_mutex =
 
 let hook_dummy_message analysis state : hook_sig = function
   | (_, name) :: args ->
-    let conv v = catch_conversion analysis "During unknown event" v in
+    let conv v = catch_conversion analysis ~prefix:"During unknown event" v in
     let name = Mt_memory.extract_constant_string name in
-    let name = conv name ~msg:"invalid event name" () in
+    let name = conv name "invalid event name" in
     let evt = Dummy (name, List.map snd args) in
     register_event analysis evt;
     result analysis "Monitored event: %a" Event.pretty evt;

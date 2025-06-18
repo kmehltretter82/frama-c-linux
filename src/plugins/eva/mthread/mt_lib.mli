@@ -39,7 +39,7 @@ type 'a conversion_with_warning = [
 ]
 
 type 'a conversion = [
-  | 'a conversion_with_warning
+  | `Success of 'a
   | `Failure of (Format.formatter -> unit)
 ]
 

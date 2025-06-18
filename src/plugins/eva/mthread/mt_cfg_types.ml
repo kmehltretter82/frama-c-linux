@@ -125,7 +125,7 @@ module NodeValueState = struct
 
   let aux_presence default raw_id f state : _ Mt_lib.conversion_with_warning =
     match Mt_ids.read_id_state_enumerate 4 state raw_id with
-    | `Failure mess | `WithWarning (mess, _) ->
+    | `Failure mess ->
       `WithWarning(mess, default)
     | `Success l ->
       match f (List.sort compare l) with
