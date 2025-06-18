@@ -181,9 +181,6 @@ let to_uri path =
 module Names = struct
   let table : string Table.t = Table.create 3
 
-  let reset () =
-    Table.clear table
-
   let add path name =
     Table.replace table path name;
     path.symbolic_name <- Some name
