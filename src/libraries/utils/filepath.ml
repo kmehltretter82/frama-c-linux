@@ -196,9 +196,6 @@ let add_symbolic_dir_list name l =
 let remove_symbolic_dir p =
   Hpath.Names.remove (Hpath.of_string p)
 
-let reset_symbolic_dirs () =
-  Hpath.Names.reset ()
-
 let all_symbolic_dirs () =
   Hpath.Names.all ()
   |> List.map (fun (path, name) -> (name, Hpath.to_string path))

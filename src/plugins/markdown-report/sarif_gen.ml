@@ -253,15 +253,18 @@ let gen_run remarks =
   in
   let pwd = (Filepath.pwd () :> string) in
   let uriBases = ("PWD", pwd) :: symbolicDirs in
+  let uriBases =
+    if not (Mdr_params.SarifDeterministic.get ())
+    then uriBases
+    else
+      uriBases
+      |> List.map (fun (name, _) -> (name, "/omitted-for-deterministic-output"))
+      |> List.sort_uniq Extlib.compare_basic
+  in
   let uriBasesJson =
-    List.fold_left (fun acc (name, dir) ->
-        let baseUri =
-          if Mdr_params.SarifDeterministic.get () then
-            "file:///omitted-for-deterministic-output/"
-          else  "file://" ^ dir ^ "/"
-        in
-        (name, `Assoc [("uri", `String baseUri)]) :: acc
-      ) [] uriBases
+    List.map (fun (name, dir) ->
+        (name, `Assoc [("uri", `String ("file://" ^ dir ^ "/"))]))
+      uriBases
   in
   let originalUriBaseIds =
     match ArtifactLocationDictionary.of_yojson (`Assoc uriBasesJson) with

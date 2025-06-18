@@ -29,6 +29,12 @@
       ],
       "originalUriBaseIds": {
         ".": { "uri": "file:///omitted-for-deterministic-output/" },
+        "FRAMAC_PLUGIN": {
+          "uri": "file:///omitted-for-deterministic-output/"
+        },
+        "FRAMAC_SHARE": {
+          "uri": "file:///omitted-for-deterministic-output/"
+        },
         "PWD": { "uri": "file:///omitted-for-deterministic-output/" }
       },
       "artifacts": [

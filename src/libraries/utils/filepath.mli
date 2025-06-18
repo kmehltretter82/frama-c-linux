@@ -228,10 +228,6 @@ val add_symbolic_dir_list: string -> t list -> unit
     @since 31.0-Gallium *)
 val remove_symbolic_dir: t -> unit
 
-(** Remove all symbolic dirs that have been added earlier.
-    @since 23.0-Vanadium *)
-val reset_symbolic_dirs: unit -> unit
-
 (** Returns the list of symbolic dirs added via [add_symbolic_dir], plus
     preexisting ones (e.g. FRAMAC_SHARE), as pairs (name, dir).
     @since 22.0-Titanium *)
