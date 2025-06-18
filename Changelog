@@ -22,6 +22,9 @@ Open Source Release <next-release>
 Open Source Release 31.0 (Gallium)
 ###############################################################################
 
+-!  Variadic  [2025-06-12] Internalize Variadic in Frama-C's kernel. No major
+              changes; Option -variadic-no-translation becomes
+              -no-variadic-translation.
 -   Kernel    [2025-05-15] Transparently compress and decompress when using
               -save/-load (still supports loading uncompressed files).
 -!  Kernel    [2025-05-07] Changed default behavior of -keep-unused-functions:
