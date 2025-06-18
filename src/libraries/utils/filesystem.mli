@@ -38,11 +38,6 @@ val is_file: Filepath.t -> bool
     @since 28.0-Nickel *)
 val is_dir: Filepath.t -> bool
 
-(** Equivalent to [Sys.readdir].
-    @since 28.0-Nickel *)
-val readdir: Filepath.t -> string array
-[@@deprecated "Use iter_dir or fold_dir instead"]
-
 (** Contents of a directory.
     @since 31.0-Gallium *)
 val list_dir: Filepath.t -> string list
@@ -119,13 +114,6 @@ val same_digest: Filepath.t -> Filepath.t -> bool
 (* ************************************************************************* *)
 (** {2 High level Input/Output} *)
 (* ************************************************************************* *)
-
-val bincopy : bytes -> in_channel -> out_channel -> unit
-(** [bincopy buffer cin cout] reads [cin] until end-of-file
-    and copy it in [cout].
-    [buffer] is a temporary string used during the copy.
-    Recommended size is [2048]. *)
-[@@deprecated "This function is only used locally and is not exported anymore."]
 
 (** [copy_file source target] copies source file to target file.
     @since 31.0-Gallium

@@ -10306,12 +10306,3 @@ let convFile (path, f) =
 
 (* export function without internal `relaxed' argument. *)
 let areCompatibleTypes t1 t2 = areCompatibleTypes t1 t2
-
-(* Deprecated definitions *)
-
-let frama_c_keep_block = Ast_attributes.frama_c_keep_block
-let frama_c_destructor = Ast_attributes.frama_c_destructor
-let fc_local_static    = Ast_attributes.fc_local_static
-
-let setDoAlternateConditional () = ()
-let setDoTransformWhile () = ()

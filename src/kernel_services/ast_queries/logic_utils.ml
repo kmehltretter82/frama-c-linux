@@ -2727,5 +2727,3 @@ class simplify_const_lval global_find_init = object (self)
       end
     | _ -> Cil.DoChildren
 end
-
-let unroll_logic_type = Ast_types.unroll_logic

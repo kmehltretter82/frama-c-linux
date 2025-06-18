@@ -388,14 +388,6 @@ val integer: Integer.t Type.t
 module Rational: S_with_collections with type t = Q.t
 val rational : Rational.t Type.t
 
-(** Type-safe strings representing normalized filepaths.
-    See module {!Filepath}.
-    @since 18.0-Argon *)
-module Filepath: S_with_collections
-[@@deprecated "Use Filepath directly instead."]
-val filepath : Filepath.t Type.t [@alert "-deprecated"]
-[@@deprecated "Use Filepath.ty instead."]
-
 (* ****************************************************************************)
 (** {2 Generic functors for polymorphic types} *)
 (* ****************************************************************************)

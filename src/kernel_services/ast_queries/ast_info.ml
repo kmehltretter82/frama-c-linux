@@ -468,18 +468,3 @@ let () = Cil_builtins.add_special_builtin_family start_with_frama_c_builtin
 
 let is_frama_c_builtin v =
   Cil_builtins.has_fc_builtin_attr v || start_with_frama_c_builtin v.vname
-
-(* Deprecated *)
-
-let is_function_type vi = Ast_types.is_fun vi.vtype
-
-let array_type ?length ?(attr=[]) ty =
-  Cil_const.mk_tarray ~tattr:attr ty length
-
-let direct_element_type = Ast_types.direct_element_type
-
-let element_type = Ast_types.element_type
-
-let direct_pointed_type = Ast_types.direct_pointed_type
-
-let pointed_type = Ast_types.pointed_type

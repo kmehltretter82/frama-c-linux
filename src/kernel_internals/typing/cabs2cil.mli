@@ -241,34 +241,3 @@ val fieldsToInit: Cil_types.compinfo -> string option -> Cil_types.offset list
    @since 25.0-Manganese
 *)
 val func_locs : unit -> (Filepath.position * Filepath.position * string) list
-
-(** Name of the attribute inserted by the elaboration to prevent user blocks
-    from disappearing. It can be removed whenever block contracts have been
-    processed. *)
-val frama_c_keep_block: string
-[@@deprecated "use Ast_attributes.frama_c_keep_block instead."]
-[@@migrate { repl = Ast_attributes.frama_c_keep_block }]
-
-(** Name of the attribute used to store the function that should be called
-    when the corresponding variable exits its scope. *)
-val frama_c_destructor: string
-[@@deprecated "use Ast_attributes.frama_c_destructor instead."]
-[@@migrate { repl = Ast_attributes.frama_c_destructor }]
-
-(** Name of the attribute used to indicate that a given static variable has a
-    local syntactic scope (despite a global lifetime).
-    @since Chlorine-20180501
-*)
-val fc_local_static: string
-[@@deprecated "use Ast_attributes.fc_local_static instead."]
-[@@migrate { repl = Ast_attributes.fc_local_static }]
-
-(** If called, sets a flag so that [continue] in while loops get transformed
-    into forward gotos, like it is already done in do-while and for loops. *)
-val setDoTransformWhile : unit -> unit
-[@@deprecated "Frama-C does not support this normalisation anymore"]
-
-(** If called, sets a flag so that translation of conditionals does not result
-    in forward ingoing gotos (from the if-branch to the else-branch). *)
-val setDoAlternateConditional : unit -> unit
-[@@deprecated "Frama-C does not support this normalisation anymore."]

@@ -271,33 +271,3 @@ val is_frama_c_builtin: varinfo -> bool
     {!Cil_builtins.has_fc_builtin_attr} are true.
     @before 29.0-Copper Behave like {!start_with_frama_c_builtin}.
 *)
-
-(* ************************************************************************** *)
-(** {2 Deprecated functions} *)
-(* ************************************************************************** *)
-
-val is_function_type : varinfo -> bool
-(** Return [true] iff the type of the given varinfo is a function type. *)
-[@@deprecated "Use Ast_types.is_fun on the varinfo type instead."]
-[@@migrate { repl = (fun vi -> Ast_types.is_fun vi.vtype) } ]
-
-val array_type: ?length:exp -> ?attr:attributes -> typ -> typ
-(** @deprecated 31.0-Gallium *)
-[@@deprecated "Use Cil_const.mk_tarray instead."]
-[@@migrate { repl = (fun ?length ~attr:tattr t -> Cil_const.mk_tarray ~tattr t length) } ]
-
-val direct_element_type: typ -> typ
-[@@deprecated "Use Ast_types.direct_element_type instead."]
-[@@migrate { repl = Ast_types.direct_element_type } ]
-
-val element_type: typ -> typ
-[@@deprecated "Use Ast_types.element_type instead."]
-[@@migrate { repl = Ast_types.element_type } ]
-
-val direct_pointed_type: typ -> typ
-[@@deprecated "Use Ast_types.direct_pointed_type instead."]
-[@@migrate { repl = Ast_types.direct_pointed_type } ]
-
-val pointed_type: typ -> typ
-[@@deprecated "Use Ast_types.pointed_type instead."]
-[@@migrate { repl = Ast_types.pointed_type } ]

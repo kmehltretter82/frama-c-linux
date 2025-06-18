@@ -419,10 +419,6 @@ module Lenv = struct
 
 end
 
-let append_init_label env =
-  (* for compatibility *)
-  env
-
 let append_here_label env =
   let env = Lenv.add_logic_label "Here" Logic_const.here_label env in
   Lenv.set_current_logic_label Logic_const.here_label env
@@ -4494,17 +4490,3 @@ struct
       (fun _ -> rollback_transaction ())
 
 end
-
-(* deprecated functions *)
-
-let is_arithmetic_type = Logic_utils.is_arithmetic_type
-let is_integral_type = Logic_utils.is_integral_type
-let is_fun_ptr = Logic_utils.is_fun_ptr
-let is_array_type = Logic_utils.is_array_type
-let is_pointer_type = Logic_utils.is_pointer_type
-let is_set_type = Logic_utils.is_set_type
-let is_list_type = Logic_utils.is_list_type
-let type_of_set_elem = Logic_utils.type_of_set_elem
-let type_of_list_elem = Logic_utils.type_of_list_elem
-let type_of_pointed = Logic_utils.type_of_pointed
-let type_of_array_elem = Logic_utils.type_of_array_elem
