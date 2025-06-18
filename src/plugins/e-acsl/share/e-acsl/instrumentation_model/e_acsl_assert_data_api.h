@@ -40,7 +40,7 @@
 
 // Use an array of arbitrary length to serve as dynamic allocation base in the
 // specifications so that Eva can better interpret contracts in this file.
-//@ ghost eacsl_assert_data_value_t __fc_eacsl_assert_data_value_base[INT32_MAX];
+//@ ghost static eacsl_assert_data_value_t __fc_eacsl_assert_data_value_base[INT32_MAX];
 
 #define eacsl_assert_register_bool      export_alias(assert_register_bool)
 #define eacsl_assert_register_char      export_alias(assert_register_char)

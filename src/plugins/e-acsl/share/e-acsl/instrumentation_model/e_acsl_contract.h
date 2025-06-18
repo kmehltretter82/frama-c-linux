@@ -68,7 +68,7 @@ typedef struct contract_t {
 
 // Use an array of arbitrary length to serve as dynamic allocation base in the
 // specifications so that Eva can better interpret contracts in this file.
-//@ ghost contract_t __fc_eacsl_contract_base[INT32_MAX];
+//@ ghost static contract_t __fc_eacsl_contract_base[INT32_MAX];
 
 /*! \brief Allocate and initialize a structure to hold pieces of information
  * about `size` behaviors.
