@@ -1395,14 +1395,6 @@ and simplified.
   (\mysec{shared-vars}). Set by default, those accesses are shown in
   green in the control-flow graph.
 
-\item[{\tt -mt-inline-callbacks}] Simplify the control-flow graph
-  so that multithreaded functions no longer appear in it,
-  only their effect. Although
-  this option generates simpler control-flow graph, it may fail if the
-  callbacks access global variables\footnote{This typically happens
-    with mutex or queue ids if all the initializations of the programs
-    are not done by the main thread.}. Not set by default.
-
 \item[{\tt -mt-full-cfg}] Do not simplify the bodies of functions that
   contain multithreaded events. All the statements of those functions
   will be reflected in the control-flow graphs, which can result in very
