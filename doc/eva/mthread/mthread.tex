@@ -553,10 +553,10 @@ The functions currently supported by
 \mthread are detailed in the next sections.
 
 In this chapter, and unless stated otherwise, the files we refer to
-are located in the \verb+share/mt+ directory of the \mthread sources, or
-alternatively in the \verb+share/mt+ of the Frama-C installation. After
-installation this directory can be found by running the command
-\verb+echo $(frama-c-config -print-share-path)/mt+ and this will be
+are located in the \verb+src/plugins/eva/share/mthread/+ directory of \FramaC
+sources, or alternatively in the \verb+share/mt+ of the Frama-C installation.
+After installation, this directory can be found by running the command
+\verb+echo $(frama-c-config -print-share-path)/mt+. This directory will be
 abbreviated as \verb+$MTSHARE+ in the rest of this document.
 
 \section{First steps}
@@ -608,7 +608,7 @@ some concurrenct library assume that thread ids are no bigger than the
 \verb+short+
 type; returning short integers (unless the code allocates an inordinate
 amount of \eg. mutexes) ensures that our ids can safely be cast to
-\verb+short+, or even \verb+char+
+\verb+short+, or even \verb+char+.
 
 By contrast, \verb+__fc_mthread_name+ is the input type used by
 initialization functions. It is used as a hint to name the mutex, thread,
