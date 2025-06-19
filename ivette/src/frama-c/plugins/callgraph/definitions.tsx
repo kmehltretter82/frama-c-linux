@@ -33,13 +33,8 @@ import {
 import { IThreeStateButton } from "./components/buttons";
 
 export type ModeDisplay = "all" | "linked" | "selected"
-
-export type SelectedNodesData = Set<string>
-export interface SelectedNodes {
-  tic: boolean;
-  set: SelectedNodesData;
-}
-export type SetSelectedNodes = (s: SelectedNodesData) => void
+export type SelectedNodes = Set<string>
+export type SetSelectedNodes = (s: SelectedNodes) => void
 
 export interface CGNode extends Node {
   /** Coverage of the Eva analysis */
@@ -70,19 +65,6 @@ export function getIDFromLink(link: LinkObject3D<CGNode, CGLink>)
   const targetId = typeof link.target === 'string' ?
     link.target : (link.target as NodeObject3D<CGNode>).id;
   return { sourceId, targetId };
-}
-
-export function useSelectedNodes(): [SelectedNodes, SetSelectedNodes] {
-  const [selectedNodes, setSelectedNodes] = React.useState<SelectedNodes>({
-    tic: false,
-    set: new Set<string>()
-  });
-  const updateSelectedNodes = (newSet: SelectedNodesData): void => {
-    setSelectedNodes((elt) => {
-      return { tic: !elt.tic, set: new Set(newSet) };
-    });
-  };
-  return [selectedNodes, updateSelectedNodes];
 }
 
 export function getNodeVisibility(
@@ -134,7 +116,7 @@ function getNodes(
   type: nodeType,
   depth?: number
 ): string[] {
-  let ids: string[] = Array.from(selectedNodes.set);
+  let ids: string[] = Array.from(selectedNodes);
   if (depth === 0) return ids;
   let nodes = ids;
   let i = 0;
@@ -176,7 +158,7 @@ export function onNodeClickMultiSelect(
   event: MouseEvent | React.MouseEvent
 ): void {
   const [selectedNodes, SetSelectedNodes] = selectedNodesState;
-  const s = selectedNodes.set;
+  const s = selectedNodes;
   if (event.ctrlKey) { // multi-selection
     s.has(id) ? s.delete(id) : s.add(id);
   } else if (event.altKey) {
@@ -186,7 +168,7 @@ export function onNodeClickMultiSelect(
     s.clear();
     s.add(id);
   }
-  SetSelectedNodes(s);
+  SetSelectedNodes(new Set(s));
 }
 
 /** Links */
@@ -197,8 +179,8 @@ export function getLinkColor(
 ): string {
   const { sourceId, targetId } = getIDFromLink(node);
   let color = "grey";
-  const isDst = selectedNodes.set.has(targetId);
-  const isSrc = selectedNodes.set.has(sourceId);
+  const isDst = selectedNodes.has(targetId);
+  const isSrc = selectedNodes.has(sourceId);
 
   if(isDst && isSrc)
     color = style.getPropertyValue('--graph-ed-color-green');
@@ -234,7 +216,7 @@ export function getLinkWidth(
   linkThickness: number
 ): number {
   const { sourceId, targetId } = getIDFromLink(node);
-  return (selectedNodes.set.has(sourceId) || selectedNodes.set.has(targetId)) ?
+  return (selectedNodes.has(sourceId) || selectedNodes.has(targetId)) ?
     (linkThickness + 1):
     linkThickness;
 }

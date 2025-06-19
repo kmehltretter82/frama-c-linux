@@ -67,7 +67,7 @@ export const getNode = (
   const [selectedNodes, ] = selectedNodesState;
   const className = classes(
     'node-graph',
-    selectedNodes.set.has(node.id) && "node-selected"
+    selectedNodes.has(node.id) && "node-selected"
   );
 
   const select = (event: React.MouseEvent): void => {

@@ -217,7 +217,7 @@ function getElementList(
 
   const list: JSX.Element[] = [];
 
-  selectedNodes.set.forEach((elt: string) => {
+  selectedNodes.forEach((elt: string) => {
     const propsKeys: string[] = [];
     const prs = properties.filter((prop) => {
       if(prop.scope === elt) {
@@ -266,7 +266,7 @@ export function Panel(
     visibleNodes, visibleLinks, panelVisibleState } = props;
   const countNodes = graphData.nodes.length;
   const countLinks = graphData.links.length;
-  const countSelected = selectedNodes.set.size;
+  const countSelected = selectedNodes.size;
   const [ panelVisible, flipPanelVisible ] = panelVisibleState;
 
   const [ positionDefault, flipPositionDefault ] =

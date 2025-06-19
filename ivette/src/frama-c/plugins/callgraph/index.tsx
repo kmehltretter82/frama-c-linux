@@ -41,18 +41,16 @@ import * as States from 'frama-c/states';
 import * as Eva from 'frama-c/plugins/eva/api/general';
 import {
   CGNode, CGLink, CGData,
-  SelectedNodesData,
+  SelectedNodes,
   getIDFromLink,
   getNodeVisibility,
   getSuccessor,
   getPredecessors,
-  useSelectedNodes,
   onNodeClickMultiSelect,
   getLinkWidth,
   getLinkColor,
   getLinkVisibility,
-  ModeDisplay,
-  SelectedNodes
+  ModeDisplay
 } from "frama-c/plugins/callgraph/definitions";
 
 import './callgraph.css';
@@ -225,7 +223,7 @@ function Callgraph(): JSX.Element {
   }, [properties, evaps]);
 
   const unprovenPropertiesFunctions = React.useMemo<Set<string>>(() => {
-    const ids: SelectedNodesData = new Set();
+    const ids: SelectedNodes = new Set();
     alarms.forEach(elt => {
       if (elt.alarmCount.length > 0) ids.add(elt.key);
     });
@@ -242,7 +240,7 @@ function Callgraph(): JSX.Element {
   }, [graphData, filteredFunctions]);
 
   /** Selected */
-  const selectedNodesState = useSelectedNodes();
+  const selectedNodesState = React.useState<SelectedNodes>(new Set());
   const [selectedNodes, setSelectedNodes] = selectedNodesState;
 
   /** Predecessors of all selected nodes */

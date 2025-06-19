@@ -29,7 +29,7 @@ import { Spinner } from 'dome/controls/buttons';
 import { ToolBar, ButtonGroup, Button, Filler } from 'dome/frame/toolbars';
 
 import {
-  ModeDisplay, SelectedNodesData
+  ModeDisplay, SelectedNodes
 } from "frama-c/plugins/callgraph/definitions";
 
 import { IThreeStateButton, ThreeStateButton } from "./buttons";
@@ -50,12 +50,12 @@ interface CallgraphToolsBarProps {
   horizontalSpacingState: State<number>,
   linkThicknessState: State<number>,
   showParticlesState: [boolean, React.Dispatch<React.SetStateAction<boolean>>],
-  selectedFunctions:SelectedNodesData,
+  selectedFunctions:SelectedNodes,
   taintedFunctions: string[],
-  unprovenPropertiesFunctions: SelectedNodesData,
+  unprovenPropertiesFunctions: SelectedNodes,
   cycleFunctions: string[],
   dagMode?: string;
-  updateNodes: (newSet: SelectedNodesData) => void;
+  updateNodes: (newSet: SelectedNodes) => void;
   /* eslint-enable max-len */
 }
 
