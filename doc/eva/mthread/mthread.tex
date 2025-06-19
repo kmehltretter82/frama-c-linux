@@ -1437,8 +1437,10 @@ detect and handle.  Their prototypes can be found in the file
 
   \begin{itemize}
   \item Thread creation, through function \verb+Frama_C_thread_create+
+  \item Thread start, through function \verb+Frama_C_thread_start+
   \item Thread immediate exit, through function \verb+Frama_C_thread_exit+
   \item Current thread id, through function \verb+Frama_C_thread_id+
+  \item Thread suspension, through function \verb+Frama_C_thread_suspend+
   \item Thread canceling, through function \verb+Frama_C_thread_cancel+
 
     \it (This functions currently cancels the thread regardless of any
