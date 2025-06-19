@@ -73,12 +73,6 @@ val join_zone : zone -> zone -> zone * bool
 (** Remove all the values that are not global variables from the state *)
 val clear_non_globals : state -> state
 
-(** {1 Functions dealing with frama-c special variables} *)
-val is_frama_c_var : varinfo -> bool
-val is_frama_c_base : Base.t -> bool
-val remove_frama_c_var_from_zone : zone -> zone
-val remove_frama_c_var_from_mem : state -> state
-
 
 (** {1 Reading and writing in memory} *)
 

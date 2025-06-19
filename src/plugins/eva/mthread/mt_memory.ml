@@ -314,21 +314,4 @@ let join_zone z1 z2 =
   let r = Zone.join z1 z2 in
   r, Zone.equal r z1 = false
 
-
-(* *)
-
-let is_frama_c_var v =
-  String.starts_with ~prefix:"__FRAMAC_MTHREAD" v.vname
-
-let is_frama_c_base = function
-  | Base.Var (v, _) | Base.Allocated (v, _, _) -> is_frama_c_var v
-  | _ -> false
-
-let remove_frama_c_var_from_zone =
-  Zone.filter_base (fun b -> not (is_frama_c_base b))
-
-let remove_frama_c_var_from_mem  =
-  Cvalue.Model.filter_base (fun b -> not (is_frama_c_base b))
-
-
 let int_to_value i = Cvalue.V.inject_ival (Ival.of_int i)
