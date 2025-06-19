@@ -202,6 +202,7 @@ README* header_spec=.ignore
 /doc/*.hva header_spec=.ignore
 
 /doc/eva/examples/parametrizing/*.log header_spec=.ignore
+/doc/eva/examples/mthread/*.log header_spec=.ignore
 /doc/**/make* header_spec=.ignore
 /doc/**/TODO header_spec=.ignore
 /doc/**/*.bnf header_spec=.ignore

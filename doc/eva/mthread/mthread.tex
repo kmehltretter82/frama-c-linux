@@ -1,0 +1,1494 @@
+\documentclass{frama-c-book}
+
+\usepackage{ifthen}
+
+\input{fc-macros.tex}
+
+\newcommand{\mthread}{\plugin{Mthread}}
+\newcommand{\html}{\lang{HTML}}
+\newcommand{\pthreads}{\library{pthreads}}
+
+% this is for compilation purposes
+\def\evadir{../../src/plugins/eva}
+\def\sharedir{\evadir/share/mthread}
+\def\testdir{\evadir/tests/mthread}
+\def\mthreadtexdir{./mthread}
+\def\examplesdir{./examples/mthread}
+
+\def\etc{\emph{etc}\ldots}
+\def\eg.{\emph{eg}.}
+\def\ie.{\emph{ie}.}
+\def\resp.{\emph{resp}.}
+
+\def\mysec#1{\S{\ref{sec:#1}}}
+\def\mychap#1{Chapter~{\ref{chap:#1}}}
+\def\myfig#1{Figure~{\ref{fig:#1}}}
+\def\myappdx#1{Appendix~{\ref{sec:#1}}}
+
+\newcommand{\framacversion}%
+           {\input{../../VERSION} (\input{../../VERSION_CODENAME}\unskip)}
+
+\title{The Mthread plug-in}
+\author{Boris Yakobowski \\
+with Richard Bonichon, David Bühler and Basile Desloges}
+
+\fcversion{\framacversion}
+
+\cclicence{by-sa}
+\copyrightstarts{2011}
+
+%==============================================================================
+\begin{document}
+\sloppy
+\emergencystretch 3em
+
+\maketitle
+\tableofcontents
+
+
+\chapter*{Foreword}
+\markright{}
+\addcontentsline{toc}{chapter}{Foreword}
+
+This is the documentation of the \FramaC plug-in \mthread.
+
+The content of this document corresponds to the version \framacversion of \FramaC.
+However the development of the \mthread plug-in is still ongoing:
+features described here may evolve in the future.
+
+\section*{Acknowledgements}
+
+\medskip
+
+\acknowledgeANR{the ANR project Veridyc (ANR-09-SEGI-016)}
+
+
+\chapter{An introduction to \mthread}
+
+\section{What is \mthread?}
+\label{sec:mthread}
+
+\mthread is a \FramaC plug-in dedicated to the analysis of concurrent
+\C programs. It finds and displays multithreaded events,
+such as thread creation, mutex
+locking, access to shared variables, \etc. \mthread then gives a very
+simplified view of the source code, in which only source statements
+relevant to the concurrent behavior of the program are left. It also
+displays variables that are shared between threads, as well as data sent by
+threads on messages queues. For each shared memory zone, the mutexes
+that may protect it are automatically inferred, and possible race conditions
+are reported.
+
+
+\section{How \mthread works}
+\label{sec:mt_desc}
+
+\mthread performs sound and precise analyzes of concurrent
+programs. It is built on top of the \Eva analysis of \FramaC, and uses
+the latter to derive sound values (hence sometimes over-approximated) for
+all the variables of the program, including those that are shared
+between multiple threads. Schematically, \mthread's behavior can be summarized as
+follows:
+\begin{itemize}
+\item Do a symbolic execution of the main thread; find the threads
+  it launches.
+
+\item Do a symbolic execution of the new threads, possibly discovering
+  other new threads, which are then also executed symbolically.
+
+\item From each thread, compute the set of variables it reads
+  and writes, as well as the messages it tries to receive and send.
+
+\item Compute the shared variables of the program, by detecting
+  variables that are accessed concurrently (\ie. by at least two
+  threads that are live at the same time). On such concurrent
+  accesses, record which mutexes are being hold by the various threads.
+
+\item Restart the whole process, reinjecting the results obtained so far:
+  \begin{itemize}
+  \item threads receiving messages from a message queue are given the
+    values sent to this queue by the other threads;
+
+  \item threads reading shared variables ``see'' the values they write
+    in those variables, but also those written by the other threads.
+
+  \end{itemize}
+
+\item Iterate the process above until all threads agree on the
+  information sent and exchanged during the execution of the program.
+\end{itemize}
+
+Reaching  a fixpoint of the above process means that a sound approximation
+of the behavior of the program has been obtained, by construction.
+More details on how \mthread works are given in \mychap{mthread-theory}.
+
+
+\section{Running \mthread}
+
+\mthread is a \FramaC plug-in, and is activated when launching \FramaC
+by turning on the {\tt -mthread} switch and enabling the \mthread domain
+with {\tt -eva-domains mthread} at your shell prompt, as follows:
+\begin{shell}
+% frama-c <C files> -mthread -eva-domains mthread <mthread options>
+\end{shell}
+
+The various options that configure the behavior of \mthread will be
+given throughout this document, and are summarized in
+\myappdx{options}. In order to be really useful,
+\mthread however requires you to instrument the thread library used
+in your \C project, as explained in \mysec{instrumentation}.
+
+
+\chapter{\mthread theory}
+\label{chap:mthread-theory}
+
+The schema given in \S\ref{sec:mt_desc} already gives a faithful
+representation of \mthread fixpoint-based approach.  Through the \Eva
+analysis, we obtain information about a thread; we then reinject those
+information into (future) analyzes of the other threads. Reaching a
+fixpoint guarantees that all threads agree on the concurrent part of
+the program, and that we have found an over-approximation of their
+behavior. The sections below detail some of the computations \mthread
+does during the iterations.
+
+
+\section{Calling contexts}
+
+Although the approach outlined above is simple, obtaining precise
+results is not. Indeed, we must be careful not to compute too general
+behaviors for the various threads, the risk being to get unusable
+results. % For example,
+% the \inout plugin of \FramaC is able to compute memory zones
+% accessed by a program. However,
+%
+\mthread uses some callbacks made available by the \Eva analysis to
+record the state of each function at the end of its evaluation.
+In order to avoid losing precision, \mthread fuses
+those states only when the \emph{calling contexts} are the same.
+%
+% In order to achieve this result, given a function \verb+f+, \mthread
+% carefully distinguishes between two different calls to \verb+f+ if
+% they occur in two different \emph{calling contexts}.
+Formally, a calling context is the callstack that lead to
+the execution of \verb+f+, taking the statements at which the
+calls originated into account.
+\begin{lstlisting}[numbers=left]
+main () {
+  g ();
+}
+void g () {
+  int x, y;
+  f(&x, 1);
+  f(&y, 2);
+}
+void f (int *p, int v) {
+  *p = v;
+}
+\end{lstlisting}
+In the example above, there are two distinct calling contexts for the
+function \verb+f+, namely \verb+<main, 2>:<g, 6>+ and
+\verb+<main, 2>:<g, 7>+.  By making a distinction between those two
+calls, \mthread is able to detect that \verb+x+ (\resp. \verb+y+) is
+always affected the value 1 (\resp. 2). This is much more precise than
+the information available by only inspecting the state of the \Eva
+analysis at the end of the execution, which merges together all the calls
+to a function. (This can be easily verified by querying the
+possible values for \verb+p+ and \verb+v+ in the GUI of \FramaC, which
+would lead to conclude that \verb+x+ and \verb+y+ are affected
+either 1 or 2, without the possibility to know which one).
+
+
+\section{Concurrent control-flow graphs}
+\label{sec:mthread-cfg}
+
+\subsection{General idea}
+
+One result of the analyzes done by \mthread is the \emph{concurrent
+  control-flow graph} of each thread. Those graphs aim at
+displaying all the following \emph{events}:
+
+\begin{itemize}
+\item calls to a \verb+mthread.h+ primitive;
+\item accesses to a shared memory zone (see \S\ref{sec:shared-vars}).
+\end{itemize}
+
+Basically, we build a very high-level view of the
+functions called by a thread, with the following characteristics:
+\begin{enumerate}
+\item only function calls that contain an event, or that transitively
+  lead (through another call) to such an event, appear in the graph;
+
+\item functions are duplicated for each calling context they appear in;
+
+\item inside the body of a function, only events
+  and high-level control-flow statements such as \verb+if+ and
+  \verb+loop+ appear. Control-flow statements that do not lead to
+  an event are also removed.
+\end{enumerate}
+Points~1 and~3 guarantee that the graph keeps a reasonable size,
+even with very big programs. Indeed, most of the code is typically
+not related to its concurrent structure. Conversely, point~2 expands
+the size of the graph, but increases its precision. Indeed, the
+statements executed by a function can be very different from one call
+to another, and this is captured by our use of calling contexts.
+
+Notice that the concurrent control-flow graph of a thread is very
+different from what would be obtained with the \slicing plugin of
+\FramaC.  In particular, our control-flow graph does not represent
+executable code at all. (For example, incrementations of loop indices
+are generally removed from the graph.) Conversely, our graph can be more
+precise when a function is called multiple times, and roughly corresponds
+to the specialization obtained by \verb+-slicing-level 3+.
+
+\subsection{Example}
+
+\begin{figure}[htb]
+  \centering
+    \includegraphics[scale=0.4]{\examplesdir/ccfg.pdf}
+  \caption{Concurrent control-flow graph for the main thread of our example}
+  \label{fig:ccfg}
+\end{figure}
+
+The concurrent control-flow graph for the main thread of the
+example \verb+doc/eva/examples/mthread/ccfg.c+, reprinted below, is given in
+Figure~\ref{fig:ccfg}. How to generate this graph is explained in
+\S\ref{sec:html}.
+
+\lstinputlisting[numbers=left,language={[ANSI]C}]{\examplesdir/ccfg.c}
+
+Let us illustrate through our example the characteristics of concurrent
+control-flow graphs that have been mentioned above. The options we hint at
+are documented in \myappdx{options}.
+\begin{itemize}
+\item The topmost node contains the name of the function
+  the thread starts with, here \verb+main+.
+
+\item Calls to other functions are inlined within the graph, as can be seen
+  \eg. for \verb+g1+. A dotted grey edge links \verb+Call+ nodes to
+  the corresponding \verb+return+ ones. (Option \verb+-return-edges+.)
+
+\item Functions called twice in two different calling contexts,
+  \eg. \verb+g1+, are inlined twice. Each body shown represents
+  precisely the execution of the corresponding call. For \verb+g1+,
+  the first call creates the first thread, while the second call has a
+  behavior that depends on \verb+i+.
+
+\item For function calls occurring through pointers \eg. the second
+  call to \verb+g1+, the real name of the function is printed between
+  the \verb+Call+ node and the body of the function.
+
+\item Calls to functions that do not lead to an event are removed. For
+  example, the call \verb+g2(arr)+ does not appear anywhere.
+
+\item Nodes with a red border represent immediate calls to one or more
+  \verb+mthread.h+ primitives, that are listed in the node. (In this
+  case, only thread creations occur.)
+
+\item Nodes with a blue or green background represent accesses to
+  a shared zone of the memory, and are discussed in \S\ref{sec:shared-vars}.
+
+\item \verb+Loop+ nodes represent \verb+while(1)+ loops;
+  \verb+for+ loops are automatically desugared into \verb+while+
+  ones by \FramaC.
+
+\item Diamond nodes appear for a function without
+  definition, \eg. \verb+g2+.  They represent all the events that occur
+  during the call to the function inside a single node. Functions
+  without definition use their  ACSL prototype to specify the data
+  they read and write.
+
+\item \verb+if+ constructs for which the condition is either
+  completely true or completely false in the given context are
+  removed. This is the case for the \verb+if (!x)+, as \verb+x+ is
+  always equal to 0 in the program. Similarly, loops whose body do not
+  contain an event are removed. Those simplifications can be
+  deactivated with \verb+-mt-full-cfg+.
+
+\item The \verb+exit+ node represent the end of the thread, hence
+  the outgoing edge that goes nowhere.
+
+\item Although this is not shown here, the \mthread graph simplifier
+  is sometimes forced to leave some nodes that do not really
+  contribute to the concurrent structure of the program. This is
+  typically the case for functions that use \verb+goto+s. Those nodes
+  will not have any border or background.
+
+\end{itemize}
+
+
+\subsection{Understanding loops in concurrent control flow graphs}
+
+A word must be said on the composite node \verb|Create thread jobs[1..3]|
+of our example. It must \emph{not} be understood as ``at each iteration
+of the loop, three threads are created''. This is indeed impossible:
+\begin{itemize}
+\item each node corresponds to a single statement,
+  and no \verb+mthread.h+ primitive can create three threads in a single
+  statement;
+\item \mthread does not allow the same thread to be launched  more than once,
+  as indicated in \mysec{mthread-warnings}.
+\end{itemize}
+
+The correct way to read the graph is the following: at each iteration
+of the loop, a different thread is created, with some iterations
+possibly spawning none. (In fact, in our case the
+iteration for $i=4$ does not create a thread.)
+
+
+\section{Shared zones}
+\begingroup
+\label{sec:shared-vars}
+
+\def \ifempty #1#2#3{\ifthenelse{\equal{#1}{}}{#2}{#3}}
+\def\ri#1{\mathsf{Ri}(#1)}
+\def\wi#1{\mathsf{Wi}(#1)}
+\def\Zi{\mathsf{RWi}}
+\def\Wp#1#2{\mathsf{Wp}^{#1}(#2)}
+\def\Rp#1#2{\mathsf{Rp}^{#1}(#2)}
+\def\live#1#2{\mathsf{live}(#1@#2)}
+\def\shared#1{\mathsf{shared}\ifempty{#1}{}{(#1)}}
+
+
+In this section, we call \emph{shared zone} a region of the memory on
+which a race condition between at least two threads can occur.
+%
+\mthread performs a fine-grained analysis to detect those
+regions. % A simple solution to do so
+% would be to reuse \inout plugin of \FramaC. By calling it on a
+% thread, we would obtain the list of globals it accesses.  Then it
+% would suffice to intersect the results for all distinct threads,
+% and keep all memory zones that are in any intersection.
+It proceeds as follows:
+\begin{enumerate}
+\item Once a thread is evaluated by the \Eva analysis, we compute the
+  global variables it reads and writes, using the \inout plugin
+  of \FramaC. This plugin uses the results of the \Eva analysis,
+  thus giving us a sound but quite imprecise over-approximation
+  of the shared zones accessed by this thread. Let us call
+  $\ri{j}$ (\resp. $\wi{j}$) the zones that are read
+  (\resp. written) by the thread $j$.
+
+\item After a full iteration (once all threads have been computed),
+  we find all the zones that are read by at least one thread and written by
+  at least one another.
+  $$\Zi=\bigcup_{j,k,j\neq k}(\ri{j} \cap \wi{k})$$
+  This set over-approximates the shared zones, and we
+  call it \emph{potential shared zones}.
+
+\item For each thread that accesses a zone in $\Zi$
+  we start another \Eva analysis, and \emph{watch}
+  the zones above: at the end of the execution of any
+  function, if it reads or writes a zone in $\Zi$,
+  we record a \mthread event for this access. This
+  event will thus appear in the control-flow graph for the current
+  thread.
+
+  Let $\Rp z j$ (\resp. $\Wp z j$) be the set of those precise
+  read (\resp. write) events relative to the zone  $z$, for the thread $j$.
+
+\item Once all the needed threads have been recomputed, we compute
+  the threads that are live on each point of the control-flow graphs.
+  Let us note $\live j e$ the fact that the thread $j$
+  is live at the node containing the event $e$.
+
+  By definition, there is potentially a race condition on a zone $z$
+  if it is written by one thread and read by another, both threads being
+  live at the same time.
+  %
+  Thus,  for each zone z of $\Zi$, we define the fact it is shared by:
+%
+  $$\shared z=\exists {j,k},\ j\neq k \land \big(
+       \exists e_j \in \Rp z j,\
+        \exists e_k \in \Wp z k,\
+       \live j {e_k} \land \live k {e_j}\big)
+  $$
+
+\end{enumerate}
+(Of course, this is only the mathematical definition of the
+$\shared{}$ predicate. The computations themselves are done
+efficiently, to avoid the cubic complexity of the formulas
+above.) % Moreover, we do not recompute the threads each time
+% $\Zi$ changes. Instead, it is needed
+
+\smallskip The definition of $\shared{}$ is as precise as possible given
+the information available to \mthread,
+while remaining sound. In particular, it avoids flagging as shared an
+important set of variables, those that are only initialized (\ie. written)
+by the main thread, and used (\ie. read) afterward by the various threads.
+As long as the initialization occurs before the creation of any
+of the threads that access the variable, this variable is \emph{not}
+shared.\footnote{In fact, to reduce the time spent computing shared
+zones, \mthread completely ignores all the accesses that occur before
+the creation of the first thread.}
+
+\smallskip
+
+Once all the analyzes are finished, \mthread classifies the events
+representing accesses to potential shared zones in three categories.
+Let us consider an event $e$ for an access to a zone $z$.
+\begin{description}
+
+\item [Non-shared access]
+
+  This means that $z$ is in fact \emph{not} a shared zone.
+  Although $z$ was in $\Zi$, there is never any race condition
+  when accessing this zone. Since those zones are not
+  important, $e$ is not shown in the control-flow graph by default.
+  This can be overridden by the option \verb+-mt-non-shared-accesses+
+  if desired.
+
+\item [Shared, non-concurrent access]
+
+  \mthread has determined that $z$ is indeed a shared zone. However,
+  the particular event represented by $e$ is not concurrent, because
+  all the other threads that access $z$ are either not created yet, or
+  canceled. This is typically the case for most initializations of
+  shared zones by the main thread. In the control-flow graph,
+  those events are shown in green. The option
+  \verb+-mt-no-non-concurrent-accesses+ can be used to hide them if desired.
+
+\item [Concurrent access]
+
+  The zone $z$ is indeed a shared zone, and the access is concurrent.
+  That is, a race condition is possible at $e$. It is shown in
+  blue in the control-flow graph.
+\end{description}
+%
+An example of the various cases above can be found in the file
+\verb+src/plugins/eva/tests/mthread/sharedvars.c+,
+which we do not reproduce below for space consideration.
+Of the 6 variables of the programs, 3 are shared (those starting by \verb+'s'+)
+and 3 are not (those starting by \verb+'u'+).
+Running \mthread on it with the option \verb+-mt-verbose 3+ is concluded by
+%
+% Taken from tests/sharedvars.res.oracle
+\begin{logs}
+[mt] Imprecise locations to watch: u3; s4; s5; s6
+[mt] Possible read/write data races:
+  s6:
+    read by jobs4 at sharedvars.c:56, unprotected
+    read by jobs6 at sharedvars.c:75, unprotected
+    write by jobs4 at sharedvars.c:57, unprotected
+    write by jobs6 at sharedvars.c:76, unprotected
+  s5:
+    read by jobs51 at sharedvars.c:62, unprotected
+    write by jobs51 at sharedvars.c:63, unprotected
+    write by jobs5 at sharedvars.c:69, unprotected
+  s4:
+    read by jobs4 at sharedvars.c:53, unprotected
+    write by <main> at sharedvars.c:100, unprotected
+    write by jobs4 at sharedvars.c:54, unprotected
+[mt] Shared memory: s4; s5; s6
+\end{logs}
+The line ``Imprecise locations to watch'' indicates that the
+potential shared zones are the variables \verb+u3+, \verb+s4+,
+\verb+s5+ and \verb+s6+ . The section ``Possible read/write data races'' and
+the line ``Shared memory'' however indicates that \verb+u3+ is not
+really shared.
+
+Also, examining the control-flow graph of the main thread shows a
+non-concurrent access to \verb+s4+ before the creation of
+\verb+&jobs4+.  This access is not listed above, as it is not
+concurrent ---and thus must not be taken into account when examining
+the mutexes that protect \verb+s4+.
+
+\subsection{Protecting shared zones through mutexes}
+
+The race conditions evoked in the previous section are theoretical.
+That is, they can be prevented using an appropriate use of mutexes.
+However, once all the shared zones have been found, \mthread needs
+to do very little more to have this information.
+
+Indeed, for each access to a shared zone (\ie. an event in the
+control-flow graph), we known which mutexes are locked, and which are
+not. Thus, in its final output, when \mthread lists all the shared
+zones it has detected, it adds the information it possesses about
+mutexes. Mutexes that are guaranteed to be locked are written
+directly.  Mutexes that may or may not be locked (\eg. that are locked
+in one branch of the program, but not in another) are prefixed by
+\verb+(?)+.
+
+In a second time, \mthread combines those information together and
+list for each zone the mutexes that are either possibly or
+systematically locked when the zone is accessed. A shared zone that is
+protected by at least one guaranteed mutex will not be subject to a race
+condition.
+
+Since \verb+sharedvars.c+ does not use mutexes at all, it is not very
+pertinent here. Some examples of protection outputs are given in
+\S\ref{sec:results-philo}.
+
+
+\endgroup
+
+\section{Related works}
+
+Ferrara \cite{Ferr09} uses a fixpoint-based approach very similar to
+ours to analyze Java bytecode.
+%
+The static analyzer \tool{Locksmith} \cite{hicks06lockinference}, which
+is dedicated to finding data races in multithreaded \C programs, possess
+some similarities with our shared zones detection
+algorithm.
+%
+The \tool{Goblint} \cite{VVojVVen07} is race-detection tool using some
+fixpoint computation (resolved by a constraint solver): it offers a
+path-sensitive analysis of data-races, based upon conditional
+constraint propagation and points-to analysis.
+%
+Miné~\cite{mine-LMCS12} builds an analyzer for concurrent code on
+top of the Astree abstract interpreter. Apart from the use of two
+distinct base analysers, our approach and his are very similar.
+
+
+\chapter{Instrumenting the \C concurrent primitives}
+\label{sec:instrumentation}
+
+To precisely detect calls to concurrent primitives during the
+symbolic execution of the program, \mthread makes the hypothesis
+that those primitives invoke low-level \mthread functions. Hence,
+the first step in using \mthread consists in properly stubbing
+the thread library of the program. This work has already been done
+for parts of the \pthreads library.
+The functions currently supported by
+\mthread are detailed in the next sections.
+
+In this chapter, and unless stated otherwise, the files we refer to
+are located in the \verb+src/plugins/eva/share/mthread/+ directory of \FramaC
+sources, or alternatively in the \verb+share/mt+ of the Frama-C installation.
+After installation, this directory can be found by running the command
+\verb+echo $(frama-c-config -print-share-path)/mt+. This directory will be
+abbreviated as \verb+$MTSHARE+ in the rest of this document.
+
+\section{First steps}
+
+For a new project, the first step consists in finding within
+the \C sources the {\sf .h} file containing the declarations
+for the various multithreaded primitives used in the code.
+In general, those functions include at least
+\begin{itemize}
+\item thread creation (and possibly cancellation);
+\item mutex locking and release;
+\item emission and reception on/from a message queue.
+\end{itemize}
+Other interesting primitives are those initializing the
+structures used to refer to the objects above (threads, mutexes,
+queues), functions using more evolved concurrency primitives
+(spinlocks,\ldots) \etc. A detailed status of which functions
+are currently handled by \mthread is given in
+\myappdx{stubbed-functions}.
+
+Once the prototypes of the functions above have been found, any
+potential implementation must be removed from the source, for example
+by using well-placed \verb+#ifdef 0+ lines. This step is however
+typically not needed, as these functions usually belong to the OS
+implementation, the source code of which is rarely available.
+
+
+
+\section{Stubbing the header (\texttt{.h}) files}
+
+The next steps consists in stubbing the existing concurrency \verb+.h+ files.
+The primary responsibility of this step is to define all the types
+in the prototypes of the functions in terms of either
+\verb+__fc_mthread_id+ or \verb+__fc_mthread_name+. Both types are
+defined in the \mthread header \verb+mthread.h+ as
+
+\begin{lstlisting}[language={[ANSI]C}]
+typedef void *__fc_mthread_name;
+typedef int __fc_mthread_id;
+\end{lstlisting}
+
+In general, \verb+__fc_mthread_id+ is the return type of the initialization
+functions, and also the type used by functions that {\it use} an object.
+During execution, they are simply sequential non-null offsets to an array
+allocated by \mthread, that itself holds the state of the object. The non-null
+information is important, as some code uses the convention \verb+ v == 0+ to
+test whether an object is initialized. Also, we cannot return a pointer, as
+some concurrenct library assume that thread ids are no bigger than the
+\verb+short+
+type; returning short integers (unless the code allocates an inordinate
+amount of \eg. mutexes) ensures that our ids can safely be cast to
+\verb+short+, or even \verb+char+.
+
+By contrast, \verb+__fc_mthread_name+ is the input type used by
+initialization functions. It is used as a hint to name the mutex, thread,
+or queue. It can be either \verb+NULL+, in which case \mthread will
+use an internal name, a constant string, or the address of a global variable,
+with possibly an offset (if the variable is an array cell).
+
+As an example, let us show how those two types are used in the
+prototypes of the primitive \mthread functions. The lines below are
+also an excerpt of \verb+mthread.h+. (The entire file is given in
+\myappdx{stubbed-functions}.)
+\begin{lstlisting}[language={[ANSI]C}]
+__fc_mthread_id Frama_C_thread_create(__fc_mthread_name,
+                                         void *(*)(void *),
+                                         ...);
+int Frama_C_thread_cancel(__fc_mthread_id);
+
+__fc_mthread_id Frama_C_mutex_init(__fc_mthread_name);
+int Frama_C_mutex_lock(__fc_mthread_id);
+\end{lstlisting}
+
+\medskip
+
+To conclude this section, let us consider excerpts of the stubbing that has been
+done for the \pthreads library.  The prototypes can be found
+in the file \verb+mthread_pthread.h+, and are reprinted
+below.\footnote{Prototypes for queue-related functions are not
+  actually part of \pthreads, and are in \texttt{mthread\_queue.c}.}
+
+%% CHECKRELEASE
+\lstinputlisting[breaklines=true,firstline=29,lastline=52,language={[ANSI]C}]{\sharedir/mthread_pthread.h}
+
+Except for the \verb+typedef+ declarations, everything can be taken
+verbatim from a system header for \pthreads. Thus, since the included
+file \verb+mthread.h+ is a generic header the user should not modify,
+writing new stubs consists essentially in writing the \verb+pthread.c+
+file, as explained in the next section.
+
+Both \verb+pthread_t+ and \verb+pthread_mutex_t+ are
+defined as type aliases to \verb+__fc_mthread_id+. Indeed, the
+interface of the \pthreads library does not lend itself to the
+separation we use in \mthread. Instead, as the next
+section will show, the initialization primitives use the address of
+the object they create when naming them.
+
+
+\section{Stubbing the source (\texttt{.c}) files}
+
+The bulk of the stubbing work consists in implementing the concurrent
+\C primitives in terms of the low-level \mthread ones.
+Stubs are generally very easy to write, as most of the time they consist in:
+\begin{itemize}
+\item disregarding useless arguments (such as initialization options
+  \mthread may not handle yet), or swapping some arguments around;
+\item dereferencing pointers, if a pointer is supplied while
+  \mthread needs the value it points to;
+\item for initialization functions, storing or returning the result of the call
+  to the low-level \mthread primitive (which will be the id of
+  the thread, mutex or queue for \mthread);
+\item translating the \mthread return codes into those of the OS library.
+\end{itemize}
+
+
+\subsection{\pthreads library}
+
+The stubbing for the \pthreads
+library can be found in \verb+mthread_pthread.c+. Its interesting
+parts are reprinted below.
+
+%% CHECKRELEASE
+\lstinputlisting[breaklines=true,firstline=23,lastline=68,language={[ANSI]C}]{\sharedir/mthread_pthread.c}
+Notice the recurring pattern \verb+*obj = obj_init(&obj, ...)+ (with proper
+error-handling) used in
+both functions \verb+pthread_create+ and \verb+pthread_mutex_init+.
+The address holding the object is used as name hint during the
+creation. % (it is casted to \verb+__fc_mthread_name+ by \FramaC parser)
+Then the \mthread initialization function returns the id of the object, which
+is stored at the given address. The functions that use this id
+either dereference their argument if the id is passed as a pointer
+(\verb+pthread_mutex_lock+) or use it directly otherwise
+(\verb+pthread_cancel+), depending on their POSIX prototype.
+
+
+As hinted by the comments, not all functions are properly stubbed. The
+\verb+*setcancel+ functions, which are related to the cancelability of
+a thread, are not given a body; for now, we implicitly assume that
+\verb+pthread_cancel+ always succeed in stopping a
+thread. For functions
+that do not initialize values, there is little differences between
+not stubbing a function, and giving it a trivial body; the latter
+approach however silences a few \FramaC warnings.  For functions that
+initialize a structure used later, a stub is however mandatory.
+% (We have not yet stubbed functions such as \verb+pthread_attr_init+ for this
+% reason.)
+
+Also, thread return codes are not stored yet, which means that
+\verb+pthread_join+ is not modeled as precisely as possible.
+
+
+\chapter{Analyzing a full project without warnings}
+
+This chapter explains the warning or error messages emitted by
+\mthread during its analysis.  \mthread's own analysis can only be as
+precise as the one done by \Eva for each thread. Thus, setting up
+the latter correctly is important; relevant information can be found
+in its own manual:
+\begin{center}
+\url{https://frama-c.com/eva.html}
+\end{center}
+
+During the analysis, the first hint that something might have gone
+awry resides in the warnings sent back to the user. As a general rule
+of thumb, it is good to eliminate those messages.  How to read the
+\emph{results} of \mthread will be explained in \mychap{results}.
+
+
+\section{The philosophers example}
+\label{sec:philo}
+
+\def\cfile{philo.c}
+
+In the remainder of this document, we will use the source code below
+to exemplify some uses of \mthread. It is taken from the file
+{\tt doc/eva/examples/mthread/\cfile}, and contains a modified version of the
+classic philosophers problem.
+
+\lstinputlisting[firstline=3,numbers=left,language={[ANSI]C}]{\examplesdir/\cfile}
+
+This code presents some interesting challenges. First, the ids for the
+threads and mutexes of the program are stored in two arrays,
+\verb+jobs+ and \verb+locks+ respectively. Both arrays are initialized
+through loops --- a challenge for any analyzer. Moreover, the
+behavior of the various threads is governed by a unique function: the
+only difference between them lies in the argument they initially
+receive. Finally, the various threads write in the global variable
+\verb+end2+, and send a partially initialized message on the queue
+\verb+queue+. The termination of the main thread is influenced by
+those two objects.
+
+
+\subsection{A first try}
+\label{sec:philo-no-slevel}
+
+Let us start \mthread on this program. We need to start \FramaC
+on both \verb+philo.c+ and on our stubbed \pthreads library. In order
+to use our own headers, a proper \verb+-I+ directive must be given
+to our \C preprocessor. Additionally, the \mthread domain for \Eva should be
+enabled.
+Finally, the \Eva analysis is by default very verbose, and it is a
+good idea to partially silence it using \verb+-eva-verbose 0+.
+Thus, a complete invocation of \mthread would be
+\begin{shell}
+% frama-c -cpp-extra-args="-I$MTSHARE" \
+   -mthread -eva-domains mthread \
+   $MTSHARE/mthread_pthread.c $MTSHARE/mthread_queue.c philo.c \
+   -eva-verbose 0
+\end{shell}
+(\FramaC assumes the main function is called \verb+main+, which is the
+case here)
+
+\smallskip
+
+While \mthread's output is also rapidly verbose (we will only reproduce
+snippets below), it is quite apparent that something has gone awry.
+Many lines start by \verb+philo.c:ll[mt] warning:+, where \verb+ll+ is
+a line number. The prefix \verb+[mt]+ being a short-name for \mthread,
+let us examine a few of those warning lines.
+
+The first one is
+% Taken from examples/mthread/philo.noslevel.log
+\begin{logs}
+[mt] philo.c:46: Initializing mutex #2
+[mt] philo.c:46: Warning:
+  Unable to check that mutex #2 has not been already initialized;
+  {0; 1} should be 0
+\end{logs}
+
+By contrast, the previous line was
+% Taken from examples/mthread/philo.noslevel.log
+\begin{logs}
+[mt] philo.c:46: Initializing mutex locks[0]
+\end{logs}
+
+Since line 46 is a call to \verb+pthread_mutex_init+, it is clear
+that the mutex initialization did not succeed in all cases. This is
+of course due to the presence of the loop, which is executed symbolically,
+but imprecisely. While the first iteration of the body proceeds as
+expected (and initializes \verb+locks[0]+), the next ones do not. Instead,
+during the analysis of the loop, the value \verb+i+ ranges over the sets
+\verb+{0}+ \ldots \verb+{0, 1, 2, 3, 4}+. While in the first iteration, \Eva can
+reduce the value of \verb+locks[i]+ to a single value, this is not the case for
+the following iterations where the expression ranges over the locations
+\verb|&locks[1 ... 4]|. \mthread cannot distinguish one mutex from the other and
+uses a generic name \verb+#2+ for the set of locks. Moreover, \mthread cannot
+know which mutex is really being initialized at each iteration and accordingly
+warns that it is unable to check if the mutex has not already been initialized.
+
+In this particular case, since the initialization is in a loop, increasing
+the \verb#-eva-slevel# option of the \Eva analysis should help. Indeed this
+option controls, among others, the symbolic execution of loops. By default,
+no \verb#-eva-slevel# is used, and variables modified inside loops become
+imprecise immediately.
+
+Before increasing this option, let us consider the other warnings.
+For line 19, we actually get two different warnings depending on which thread
+is analyzed.
+
+The first warning which occurs during the analysis of thread \verb+jobs[0]+ is:
+% Taken from examples/mthread/philo.noslevel.log
+\begin{logs}
+[mt] philo.c:19: Warning: Trying to lock a possibly uninitialized mutex.
+[mt] philo.c:19: Warning:
+  Unable to check that mutex #2 has not already been locked; {0; 1} should be 1
+\end{logs}
+This is the same problem as before: mutex \verb+#2+ is actually a set of mutexes
+and \mthread is not able to know which of the concrete mutexes is being locked.
+
+The second warning occurs during the analysis of thread \verb+#3+:
+% Taken from examples/mthread/philo.noslevel.log
+\begin{logs}
+[mt] philo.c:19: Warning:
+  During mutex lock: invalid mutex id. Non-integer value: {0; 1; 2} Ignoring.
+\end{logs}
+This is similar to the previous warning in that \mthread cannot know which mutex
+is being locked, but this time this is due to the fact that the threads too have
+been merged into an abstract thread representing several concrete threads. We
+can see that by checking the logs for the line 51 that creates the threads:
+% Taken from examples/mthread/philo.noslevel.log
+\begin{logs}
+[mt] philo.c:51: New thread: jobs[0], fun job, parent <main>, args {0}
+[mt] philo.c:51: Start thread jobs[0]
+[mt] philo.c:51: New thread: #3, fun job, parent <main>, args {0; 1}
+[mt] philo.c:51: Start thread #3
+[mt] philo.c:51: New context for #3, fun job, parent <main>, args {0; 1; 2}
+[mt] philo.c:51:
+  New context for #3, fun job, parent <main>, args {0; 1; 2; 3; 4}
+[mt] philo.c:51: Thread #3, fun job, parent <main>, args {0; 1; 2; 3; 4}
+\end{logs}
+Here we see that after creating a thread for \verb+jobs[0]+, \Eva starts merging
+the states for several threads and \mthread creates a second thread generically
+called \verb+#3+. Instead of creating several new threads, the context of this
+abstract thread is updated to support more arguments until the set
+\verb+{0; 1; 2; 3; 4}+ is used. Since this argument is used to select the
+mutexes to lock and unlock in function \verb+aux+, \mthread cannot know which
+mutex is being used.
+
+
+\subsection{Unrolling loops}
+\label{sec:slevel}
+
+Let us increase the \verb+slevel+ to separate the states of the loops in the
+\Eva analysis. Here, it suffices to execute loops precisely 5 times. Thus, we
+add option \verb+-eva-slevel 5+ to the command-line used above. In this
+case, it is sufficient to make all warnings disappear.
+
+Alternatively, it is also possible to \emph{syntactically} unroll loops.
+Although it is seldom useful for the \Eva analysis, it may be for \mthread
+itself. Let us consider the file
+\verb+doc/eva/examples/mthread/init.c+ of \mthread, which is reproduced below.
+%
+\lstinputlisting[breaklines=true,numbers=left,language={[ANSI]C}]{\examplesdir/init.c}
+%
+This example try to initialize 12 mutexes, using three different
+mechanisms. In the first loop, the mutexes are named using
+a location in an array. In the second loop, third and fourth loops, they are
+named using constant strings in increasingly large loops. The result of the
+analysis of the main thread by \mthread are given below (with a proper
+\verb+-eva-slevel+ 3):
+% Taken from examples/mthread/init.log
+\begin{logs}
+[mt] *** Computing value analysis for main thread
+[mt] New thread: <main>, fun main
+[mt] init.c:20: Initializing mutex locks[0]
+[mt] init.c:20: Initializing mutex locks[1]
+[mt] init.c:20: Initializing mutex locks[2]
+[mt] init.c:23: Initializing mutex mu1
+[mt] init.c:23: Initializing mutex mu2
+[mt] init.c:23: Initializing mutex mu3
+[mt] init.c:28: Initializing mutex mu4
+[mt] init.c:28: Initializing mutex mu5
+[mt] init.c:28: Initializing mutex mu6
+[mt] init.c:32: Initializing mutex mu7
+[mt] init.c:32: Initializing mutex #11
+[mt] init.c:32: Warning:
+  Unable to check that mutex #11 has not been already initialized;
+  {0; 1} should be 0
+[mt] *** First value analysis for main thread done.
+\end{logs}
+As can be seen, the first 9 initializations succeed without
+problem. The mutexes created in the first loop are named after the array
+passed as hint (and the index of the mutex in the array), while the
+exact names contained in \verb+names+ are used for the mutexes 4 to 9 in the
+second and third loops.
+
+Problems however arise in the last loop, although it is very similar
+to the third one. \mthread initializes the tenth mutex on the first
+iteration, but complains in the second that it cannot determine if the mutex has
+already been initialized. Indeed the number of iterations of the loop is greater
+than the value given to \verb+-eva-slevel+ and \mthread is not able to separate
+the different mutexes. A possible solution (other than increasing the
+\verb+-eva-slevel+ value) is to syntactically unroll the loop, as was done for
+the third one. The instruction \verb+//@ loop unfold N;+ instructs \FramaC to
+unroll a loop \verb+N+ times. Afterward, \mthread sees some mutex
+initializations at different statements, and accepts them. Internally however,
+those statements point to the same initial line number, hence the messages for
+the third loop in the log.
+
+\section{Other \mthread warnings}
+\label{sec:mthread-warnings}
+
+In this section, we give a short survey of some the warnings emitted by
+\mthread.  In a log output, those warnings contain the string
+\verb+[mt]+.  Most of the time, the warnings are self-explanatory, and
+they sometimes contain their own solution. Roughly speaking, they can
+be partitioned in the categories below.
+\begin{description}
+\item[Erroneous or imprecise arguments.]
+\mthread systematically sanitizes the arguments it receives from
+the \verb+Frama_C_*+ functions defined in \verb+mthread.h+, and ignores the
+entire call (with a warning) when it cannot give a sense to them.
+%
+We have already given an example in \mysec{philo-no-slevel} with an
+imprecise name for a mutex initialization. Nearly identical warnings
+are emitted with imprecise names or ids, for threads, mutexes or queues.
+
+Other similar errors can include passing a function without a body to
+the thread creation function
+\verb+Frama_C_thread_create+, or too few arguments. The corresponding
+messages are given below.\footnote{The messages are obtained by simple
+modifications of our examples and stubs, not shown in this document.}
+\begin{logs}
+philo.c:51:[mt] warning: During thread creation: invalid thread function.
+                Missing definition for function 'job'. Ignoring.
+\end{logs}
+\begin{logs}
+philo.c:51:[mt] user error: When creating thread &jobs[0] from function
+                job: too few arguments, 1 expected but 0 given. Ignoring.
+\end{logs}
+
+\item[Multiple creation of a unique thread.]
+
+\mthread is quite tolerant when it encounters code that would initialize
+again a mutex or a queue potentially already initialized:
+\begin{logs}
+philo.c:46:[mt] warning: Mutex &locks might be already initialized
+\end{logs}
+
+We cannot be as lenient for threads, however, to preserve the
+correctness of our analyzes. Thus, when we detect a thread that seems
+to be started twice, we immediately fail.  Of course, it remains
+possible to launch two threads with exactly the same arguments, but
+the program must use two different names.
+\begin{logs}
+philo.c:51:[mt] Thread &jobs[0], fun job, parent _main_, args {0; }
+philo.c:51:[mt] user error: Thread &jobs[0] has already been created
+                previously in the current thread.
+\end{logs}
+
+
+
+\item[Read or write of the entire memory.]  If the \Eva analysis
+  dereferences a very imprecise pointer, it can access the whole
+  memory.  This completely invalidates the assumptions made by
+  \mthread when it searches for shared memory, and can make it very
+  imprecise. We therefore entirely ignore the access. Since such an
+  imprecise pointer almost always comes from an erroneous stubbing, or
+  a very buggy original code, this is not a limitation in practice.
+
+  The directory \verb+tests+ contains an example designed to test this
+  case, called \verb+read_all.c+. The \Eva analysis
+  prints a warning when the faulty pointer \verb+p+ is being dereferenced
+  (line~4). The \mthread warning is on line~7.
+
+  \begin{logs}[numbers=left]
+read_all.c:26:[mt] New thread: &jobs, fun f, parent <main>,
+                   args [0..4294967295]
+read_all.c:26:[mt] Start thread &jobs
+read_all.c:28:[mt] user error: read of the whole memory. Ignoring to allow
+     Mthread to continue, but the  analysis will not be correct.
+read_all.c:28:[eva] warning: Completely invalid destination for assigns
+      clause *p. Ignoring.
+  \end{logs}
+
+\item[Buffer overflow in message sending or receiving.]
+\mthread send and receive functions take as input either a source
+buffer, or a destination one, as well as its size. Of course, the
+\Eva analysis must be wary of buffer overflow. Let us successively
+change the declaration of the buffers \verb+buf+ and \verb+end+ of
+\verb+philo.c+ to \verb+char[1]+ (lines 31 and 42).
+%
+
+\subsubsection{Small buffer during emission}
+\begin{logs}
+../share/mthread_queue.c:10:[kernel] warning: out of bounds read.
+                assert \valid(mess+(0..size-1));
+philo.c:25:[mt] Sending message on &queue, content [0..1] $\in$ {{}}
+\end{logs}
+The indicated line is inside the function \verb+msgsnd+:
+\begin{lstlisting}
+  int result = Frama_C_queue_send(msgqid, mess, size);
+\end{lstlisting}
+Here we have \verb+mess=buf+, \verb+size=2+, and the program is defined only
+if  \verb+buf[0..(2-1)]+ is a valid array slice. This
+is indeed false in the modified program, as \verb+buf+ has size 1. In
+this case, the \Eva analysis is sure that the range is always
+invalid, as there is no approximation on either \verb+buf+ or
+\verb+size+, and the read fails. This can be verified with the
+empty message content in the second line of the log.
+
+\subsubsection{Small buffer during reception}
+\nopagebreak[4]
+\begin{logs}
+../share/mthread_queue.c:16:[kernel] warning: out of bounds write.
+          assert \valid(mess+(0..size-1));
+../share/mthread_queue.c:16:[kernel] warning: all target addresses were
+        invalid. This path is assumed to be dead.
+philo.c:54:[mt] warning: Found message of length 2, which is too long for
+        buffer 'mess'. Execution will continue without those messages.
+       (Ignore "This path is assumed to be dead message if any".)
+philo.c:54:[mt] Receiving message on &queue, max size 2, stored in &end.
+        No valid value to receive.
+\end{logs}
+Again, the \Eva analysis detects that we are accessing past the end
+of an array.  The warning ``This path is assumed to be dead'' is
+actually not really relevant here, and should be ignored. Next,
+\mthread adds a more precise warning about which buffer is too small,
+and warns that messages of length 2 are too long. This means that any
+message of at least that size will be ignored by
+\verb+Frama_C_queue_receive+.  Since all messages are of size 2,
+there is nothing valid to receive (hence the last line of the log),
+and \mthread instructs the \Eva analysis to stop when evaluating the
+call to \verb+Frama_C_queue_receive+.
+
+
+\item[Too many objects.]
+  By default, \mthread allows the creation of 32 threads, mutexes or queues,
+  with different counters for each kind of object. This value
+  is hard-coded in \verb+mthread.h+, in order to have valid~\C.
+  If \mthread detects that a program wants to allocate more than this
+  number of objects, it issues a warning.
+  \begin{logs}
+philo.c:51:[mt] warning: During thread creation. Too many thread ids,
+         unable to register another one. Try to increase MTHREAD_NUMBER_IDS
+         above 32 in the preprocessing directive. Ignoring.
+  \end{logs}
+  As hinted by the message, the number of possible distinct \mthread
+  objects is defined by the \C
+  macro \verb+MTHREAD_NUMBER_IDS+. Thus, it suffices to increase its
+  value in the preprocessing directive \verb+-cpp-command+, \eg. by
+  adding \verb+-DMTHREAD_NUMBER_IDS=40+ for \gcc or \tool{cpp}.
+
+
+\item[Unrecognized id.] The ids returned by \mthread for threads,
+  mutexes and queues are \C \verb+int+s, unless they are cast to
+  another type by the program itself. If the code does strange things
+  with those \verb+int+s, \eg. incrementing them, it can build precise
+  but incorrect ids. \mthread will then fail with a message similar to
+  the one below.
+  \begin{logs}
+philo.c:29:[mt] warning: During mutex lock. Id 13 for mutexes does not
+                exists (incrementation inside program?). Ignoring.
+  \end{logs}
+
+\item[Uninitialized concurrency structures.]
+
+Primitives receiving an id as argument can be passed the value 0. This
+typically corresponds to non-initialized mutexes, queues \etc Either
+this is a mistake in the code (the programmer forgot the initialization),
+or the initialization will be done later, by another thread, and the
+warning should disappear in later iterations of the analysis.
+
+\begin{logs}
+philo.c:38:[mt] warning: Trying to unlock uninitialized mutex. Ignoring
+\end{logs}
+
+\end{description}
+
+
+
+
+\chapter{Reading \mthread results}
+\label{chap:results}
+
+This chapter explains how to interpret the results output by
+\mthread, on the  philosophers example.
+
+
+\section{Reading the results of the philosophers examples}
+\label{sec:results-philo}
+
+Running \mthread on \verb+philo.c+ goes smoothly once a proper
+\verb+slevel+ (of at least 5) is used. No warning is emitted
+during the analysis.
+%
+\mthread reports it
+stops after 4 iterations, having reached the fixpoint.  However,
+not all threads are executed at each iteration. For example,
+\mthread detects it would learn nothing by analyzing the thread \verb+main+
+during its second step,
+and thus skips this analysis. If we read more finely
+the output, for example by setting \verb+-mt-verbose 2+, the iteration
+structure looks like this:
+\begin{description}
+\item[Initial run of the main thread]
+  This analysis detects the five secondary threads. Receiving
+  a message on \verb+&queue+ fails. No potential shared zone
+  is detected --- quite logically, as only one thread was running.
+
+\item[First iteration]
+  The five secondary threads are executed. Messages sent on
+  \verb+&queue+ are memorized for an eventual use in another thread.
+  % Taken from examples/mthread/philo.mtverbose2.log
+  \begin{logs}
+[mt] philo.c:25:
+  Sending message on queue, content [0] $\in$ {1}
+                                    [1] $\in$ UNINITIALIZED
+  \end{logs}
+
+\item[Second iteration]
+
+The main thread is recomputed, because \mthread detects that some
+messages can be received on \verb+&queue+.
+% Taken from examples/mthread/philo.mtverbose2.log
+\begin{logs}
+[mt] *** Computing thread <main>, iteration 2 (new message received)
+\end{logs}
+During this iteration, the call to \verb+msgrcv+ succeeds, and the
+value \verb+end[0]+ becomes possibly non-null. As a result, a new
+shared memory zone is detected, the variable \verb+end2+.
+% Taken from examples/mthread/philo.mtverbose2.log
+\begin{logs}
+[mt] Concurrent imprecise accesses have changed: before
+    \nothing
+  vs.
+    end2
+\end{logs}
+
+\item[Third iteration]
+
+  All threads are recomputed because we want to monitor the accesses to
+the potential shared variable \verb+end2+:
+  % Taken from examples/mthread/philo.mtverbose2.log
+  \begin{logs}
+[mt] *** Computing thread jobs[0], iteration 3
+    (potential shared vars changed, interferences changed)
+  \end{logs}
+
+At the end of the iteration, \verb+end2+ is detected as being a (really) shared
+zone, not just a potential one:
+% Taken from examples/mthread/philo.mtverbose2.log
+\begin{logs}
+[mt] Shared memory: end2
+[mt] Concurrent precise var accesses have changed: before
+    \nothing
+  vs.
+    end2
+\end{logs}
+\mthread also detects that \verb+end2+ is not protected in a coherent way,
+\ie. that there might be a race condition on it.
+% Taken from examples/mthread/philo.mtverbose2.log
+\begin{logs}
+[mt] Possible read/write data races:
+  end2:
+    read by <main> at philo.c:53, unprotected
+    write by jobs[0] at philo.c:24, protected by locks[1] locks[4]
+    write by jobs[2] at philo.c:24, protected by locks[1] locks[3]
+    write by jobs[3] at philo.c:24, protected by locks[2] locks[4]
+    write by jobs[4] at philo.c:24, protected by locks[0] locks[3]
+[mt] Mutexes for concurrent accesses:
+  end2  write protected by (?)locks[0] (?)locks[1] (?)locks[2] (?)locks[3]
+        (?)locks[4], read unprotected
+\end{logs}
+\mthread does not report any new potential shared variable however, which is
+coherent with the program.
+
+
+\item[Fourth iteration]
+
+During this iteration, the thread \verb+main+ is recomputed. Indeed, new
+possible values for \verb+end2+ (coming from the other threads), have been
+found in iteration 3.
+% Taken from examples/mthread/philo.mtverbose2.log
+\begin{logs}
+[mt] *** Computing thread <main>, iteration 4 (shared vars values changed)
+\end{logs}
+During this iteration, the return statement of the \verb+main+ function
+becomes reachable.
+
+As this state of the analysis, there is no reason to recompute
+any of the threads, and \mthread detects that a fixpoint is reached.
+% Taken from examples/mthread/philo.mtverbose2.log
+\begin{logs}
+[mt] ******* Analysis performed, 4 iterations
+\end{logs}
+\end{description}
+%
+Not all the logs given above are available with the default verbosity
+level of~1. Indeed, they are not important to understand the
+\emph{results} of the analysis, only the way it proceeded.
+
+\medskip
+
+Let us point out a few more information. For example, the information
+on the mutexes protecting the accesses to \verb+end2+ are two-fold.
+First, we have an exhaustive account, with all accesses by each thread;
+each  access is listed together with the mutex
+contexts at those points of the analyzes. In this example, the
+information is as precise as possible. Second, we have a summary, that
+aggregates the exhaustive listing.
+% Taken from examples/mthread/philo.mtverbose2.log
+\begin{logs}
+[mt] Mutexes for concurrent accesses:
+  end2  write protected by (?)locks[0] (?)locks[1] (?)locks[2] (?)locks[3]
+        (?)locks[4], read unprotected
+\end{logs}
+This shows that \verb+end2+ is not protected at all when it is read.
+Conversely, it is protected by various mutexes when it is written, but
+never in a consistent way: there is always a \verb+(?)+ in front of
+the mutex name, indicating that in at least one case, the mutex
+was not locked. This indicates possible race conditions both when reading
+and writing \verb+end2+, which is indeed the case in the program.
+
+\smallskip
+
+Finally, let us discuss the values of the messages sent and received
+on \verb+&queue+. We reprint some relevant messages below.
+% Taken from examples/mthread/philo.mtverbose2.log
+\begin{logs}
+[mt] philo.c:25:
+  Sending message on queue, content [0] $\in$ {1}
+                                    [1] $\in$ UNINITIALIZED
+\end{logs}
+\begin{logs}
+[mt] philo.c:54:
+  Receiving message on queue, max size 2, stored in &end. Possible  values:
+  From thread jobs[0]: [0] $\in$ {1}
+                       [1] $\in$ UNINITIALIZED
+  From thread jobs[2]: [0] $\in$ {3}
+                       [1] $\in$ UNINITIALIZED
+  From thread jobs[3]: [0] $\in$ {4}
+                       [1] $\in$ UNINITIALIZED
+  From thread jobs[4]: [0] $\in$ {5}
+                       [1] $\in$ UNINITIALIZED
+\end{logs}
+\mthread is quite accommodating about the content of the message,
+and tolerates the fact that a part of the source buffer is uninitialized.
+Inspecting the value of \verb+end+\footnote{For example using \FramaC's GUI}
+after line 54 of \verb+philo.c+ reveals that the possible values are
+\begin{logs}
+end[0] $\in$ {1; 3; 4; 5}
+   [1] $\in$ UNINITIALIZED
+\end{logs}
+This is also the most precise approximation possible.
+
+
+\section{\html}
+\label{sec:html}
+
+\mthread \html output, triggered by option \verb+-mt-extract html+,
+produces a summary of the concurrent program, as well as control-flow
+graphs of each thread as analyzed by \mthread.
+%
+Let us start by the first representation extracted from \mthread's internal
+control-flow-graph model: a set of \html pages. This allows easy browsing through the
+various information computed by \mthread.
+
+For our simple dining philosophers' example, these pages can be produced in the
+directory {\tt html\_summary} by typing :
+\begin{shell}
+% frama-c -mthread -eva-domains mthread -mt-extract html \
+  -cpp-extra-args="-I$MTSHARE" \
+  $MTSHARE/mthread_pthread.c $MTSHARE/mthread_queue.c \
+  -eva-slevel 256 philo.c
+\end{shell}
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[scale=.45]{\mthreadtexdir/html_summary.png}
+%  \medskip
+%  \hrule
+  \caption{\html summary of dining philosophers}
+  \label{fig:html_summary}
+\end{figure}
+
+An \html summary of the code (\myfig{html_summary}) is displayed at {\tt
+  html\_summary/index.html},  providing information about thread creations,
+lock and unlock directives as well  as message queue uses. There also are links
+to the various threads encountered in the program. Clicking on one of those
+links leads to a summary concerning the given thread.
+This thread-focused summary (\myfig{thread_summary}) shows the concurrent
+control-flow graph of the thread (\mysec{mthread-cfg}).
+
+
+
+\begin{figure}[htb]
+  \centering
+  % You can "Inspect" the page to edit the svg in the browser and increase the
+  % scale of the SVG to be able to read something in the screenshot.
+  \includegraphics[scale=.35]{\mthreadtexdir/thread_summary.png}
+%  \medskip
+%  \hrule
+  \caption{Excerpt from the first philosopher's control-flow graph}
+  \label{fig:thread_summary}
+\end{figure}
+
+The precision and details
+shown on this graph can be controlled by \mthread's options detailed in
+\ref{sec:mthread-cfg} and \myappdx{options}.
+Links to all the other threads are provided but one important
+feature here is that the control-flow graph is clickable. A click on the
+{\tt Call aux} node yields the source code behind this node
+(\myfig{thread_code}). Most of the expressions in the source
+code page are themselves clickable, for example to navigate from
+function to function.
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[scale=.35]{\mthreadtexdir/thread_code.png}
+%  \medskip
+%  \hrule
+  \caption{Excerpt from the philosophers' source code}
+  \label{fig:thread_code}
+\end{figure}
+
+
+\chapter{Command-line options}
+\label{sec:options}
+
+This section describes the list of options available to finely
+tune the behavior of \mthread. They can also be manually found
+using {\tt frama-c -mt-help}. Some experimental options are intentionally
+left undocumented.
+
+\paragraph{Basics.}
+As a reminder, the generic options for \mthread are the following:
+\begin{description}
+\item[{\tt -mthread}] This enables the \mthread plug-in. This option is
+  mandatory for any use of \mthread and launches the \mthread analysis.
+
+\item[{\tt -eva-domains mthread}] This enables the \mthread domain for \Eva.
+  This option is strongly recommended to compute more precise interferences.
+
+\item[{\tt -mt-verbose n}] Change the verbosity of \mthread. Default is
+  1. Any value strictly above 1 will show the internal state of the
+  analysis at the end of each iteration.
+
+\item[{\tt -mt-help}] Display a short summary of all the \mthread
+  options available.
+
+  (The options for \FramaC in general can be obtained through
+  \verb+frama-c -kernel-help+, while those for the \Eva analysis are
+  invoked by \verb+frama-c -eva-help+.)
+
+
+\end{description}
+
+\paragraph{External outputs.}
+The \mthread results printed as \html for further study.
+\begin{description}
+\item[{\tt -mt-extract html}] Extracts a partial version of the
+  results found by \mthread as HTML.  All results can be
+  browsed\footnote{A navigator with support for \tool{SVG} files
+    is required to display the control-flow graphs.}
+  starting from the file \verb+./html_summary/index.html+.
+\end{description}
+
+\paragraph{Control-flow graph options.}
+
+The options below control how the concurrent control-flow graphs are displayed
+and simplified.
+\begin{description}
+
+\item[{\tt -mt-return-edges}] Link nodes for function calls to
+  their corresponding {\tt return} nodes. This makes it easier
+  to see nested calls of big functions. (Set by default)
+
+\item[{\tt -mt-non-shared-accesses}] Do not remove nodes corresponding
+  to accesses to false shared accesses (\mysec{shared-vars}). Not set
+  by default; if the option is set, the accesses are shown in white
+  in the control-flow graph.
+
+\item[{\tt -mt-non-concurrent-accesses}] Do not remove nodes corresponding
+  to accesses to shared accesses that occur in a non-concurrent context
+  (\mysec{shared-vars}). Set by default, those accesses are shown in
+  green in the control-flow graph.
+
+\item[{\tt -mt-full-cfg}] Do not simplify the bodies of functions that
+  contain multithreaded events. All the statements of those functions
+  will be reflected in the control-flow graphs, which can result in very
+  big graphs:
+  use this option with caution. Calls to functions that do not contain
+  multithreaded events are however never inlined in the control-flow graphs.
+  Not set by default.
+
+
+\end{description}
+
+
+\paragraph{Debug  options.}
+
+Those debug options are not intended for general use, but can
+sometimes be useful to diagnose a strange behavior of \mthread. Other
+debug options are unintentionally not described.
+
+\begin{description}
+\item[{\tt -mt-stop-after <i>}] Instructs \mthread to only perform
+  at most {\tt i} iterations of the analysis. If the analysis has
+  not converged by then, it is stopped, and the remaining steps
+  to perform are shown on the log.
+
+\end{description}
+
+
+\appendix
+
+\chapter{\mthread functions for stubbing}
+\label{sec:stubbed-functions}
+\label{appendix:stubbed-functions}
+
+This appendix details the concurrent functions \mthread is able to
+detect and handle.  Their prototypes can be found in the file
+\verb+$MTSHARE\mthread.h+.
+
+\begin{description}
+\item[Thread-related primitives] \
+
+  \begin{itemize}
+  \item Thread creation, through function \verb+Frama_C_thread_create+
+  \item Thread start, through function \verb+Frama_C_thread_start+
+  \item Thread immediate exit, through function \verb+Frama_C_thread_exit+
+  \item Current thread id, through function \verb+Frama_C_thread_id+
+  \item Thread suspension, through function \verb+Frama_C_thread_suspend+
+  \item Thread canceling, through function \verb+Frama_C_thread_cancel+
+
+    \it (This functions currently cancels the thread regardless of any
+    potential cancelability state notion, such as the one available in
+    \pthreads.)
+  \end{itemize}
+
+
+\item[Mutex-related primitives] \
+
+  \begin{itemize}
+  \item Mutex initializing, through function \verb+Frama_C_mutex_init+
+  \item Mutex locking, through function \verb+Frama_C_mutex_lock+
+  \item Mutex release, through function \verb+Frama_C_mutex_unlock+
+  \end{itemize}
+
+\item[Queue-related primitives] \
+
+  \begin{itemize}
+  \item Queue initializing, through function \verb+Frama_C_queue_init+
+  \item Message sending, through function \verb+Frama_C_queue_send+
+  \item Message reception, through function \verb+Frama_C_queue_receive+
+  \end{itemize}
+
+\item[Miscellaneous functions] \
+
+  \begin{itemize}
+  \item Logging, through function \verb+Frama_C_mthread_show+
+
+    This function takes as first argument a constant string will be
+    used as a message, and a number of \C values that will be printed
+    after the message. It can be used to show in the control-flow graph any information
+    relevant to the analysis, and does not modify the memory state at all.
+
+  \item Forcing synchronization of unprotected shared values, through
+    the use of the function \verb+Frama_C_mthread_sync+.
+
+  \end{itemize}
+
+
+\end{description}
+
+More involved concurrency primitives, such as spinlocks \etc. are not
+currently supported. They may be added to \mthread later.
+
+
+\bibliographystyle{alpha}
+\bibliography{biblio}
+
+\end{document}
