@@ -249,7 +249,7 @@ to the specialization obtained by \verb+-slicing-level 3+.
 \end{figure}
 
 The concurrent control-flow graph for the main thread of the
-example \verb+examples/mthread/ccfg.c+, reprinted below, is given in
+example \verb+doc/eva/examples/mthread/ccfg.c+, reprinted below, is given in
 Figure~\ref{fig:ccfg}. How to generate this graph is explained in
 \S\ref{sec:html}.
 
@@ -454,11 +454,11 @@ Let us consider an event $e$ for an access to a zone $z$.
 \end{description}
 %
 An example of the various cases above can be found in the file
-\verb+tests/sharedvars.c+, which we do not reproduce below for space
-consideration. Of the 6 variables of the programs, 3 are shared (those
-starting by \verb+'s'+) and 3 are not (those starting by \verb+'u'+).
-Running \mthread on it with the option \verb+-mt-verbose 3+
-is concluded by
+\verb+src/plugins/eva/tests/mthread/sharedvars.c+,
+which we do not reproduce below for space consideration.
+Of the 6 variables of the programs, 3 are shared (those starting by \verb+'s'+)
+and 3 are not (those starting by \verb+'u'+).
+Running \mthread on it with the option \verb+-mt-verbose 3+ is concluded by
 %
 % Taken from tests/sharedvars.res.oracle
 \begin{logs}
@@ -732,7 +732,7 @@ of thumb, it is good to eliminate those messages.  How to read the
 
 In the remainder of this document, we will use the source code below
 to exemplify some uses of \mthread. It is taken from the file
-{\tt examples/mthread/\cfile}, and contains a modified version of the
+{\tt doc/eva/examples/mthread/\cfile}, and contains a modified version of the
 classic philosophers problem.
 
 \lstinputlisting[firstline=3,numbers=left,language={[ANSI]C}]{\examplesdir/\cfile}
@@ -867,7 +867,7 @@ case, it is sufficient to make all warnings disappear.
 Alternatively, it is also possible to \emph{syntactically} unroll loops.
 Although it is seldom useful for the \Eva analysis, it may be for \mthread
 itself. Let us consider the file
-\verb+examples/mthread/init.c+ of \mthread, which is reproduced below.
+\verb+doc/eva/examples/mthread/init.c+ of \mthread, which is reproduced below.
 %
 \lstinputlisting[breaklines=true,numbers=left,language={[ANSI]C}]{\examplesdir/init.c}
 %
