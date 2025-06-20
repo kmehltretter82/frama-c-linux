@@ -58,13 +58,19 @@ export interface CGData {
 
 type nodeType = "parents" | "children";
 
-export function getIDFromLink(link: LinkObject3D<CGNode, CGLink>)
-: {sourceId:string, targetId: string} {
-  const sourceId = typeof link.source === 'string' ?
+export function getSourceId(link: LinkObject3D<CGNode, CGLink>): string {
+  return typeof link.source === 'string' ?
     link.source : (link.source as NodeObject3D<CGNode>).id;
-  const targetId = typeof link.target === 'string' ?
+}
+
+export function getTargetId(link: LinkObject3D<CGNode, CGLink>): string {
+  return typeof link.target === 'string' ?
     link.target : (link.target as NodeObject3D<CGNode>).id;
-  return { sourceId, targetId };
+}
+
+export function getIDFromLink(link: LinkObject3D<CGNode, CGLink>)
+: {sourceId: string, targetId: string} {
+  return { sourceId: getSourceId(link), targetId: getTargetId(link) };
 }
 
 export function getNodeVisibility(
@@ -75,16 +81,11 @@ export function getNodeVisibility(
   predecessors: string[]
 ): boolean {
   switch(mode) {
-    case "linked":
-      if(!links.find((elt:LinkObject3D<CGNode, CGLink>) => {
-        const { sourceId, targetId } = getIDFromLink(elt);
-          return Boolean(sourceId === id || targetId === id);
-        }
-      )) return false;
-      return true;
+    case "linked": return links.some((elt: CGLink) => (
+        id === getSourceId(elt) || id === getTargetId(elt)));
     case "selected":
       return successor.includes(id) || predecessors.includes(id);
-    default: return true;
+    case "all": return true;
   }
 }
 

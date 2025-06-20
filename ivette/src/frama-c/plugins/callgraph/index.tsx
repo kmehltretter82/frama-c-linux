@@ -113,8 +113,7 @@ function convertGraph(
   return { nodes, links };
 }
 
-function getFilteredGraph(graph?: CGData, ids: string[] = []): CGData {
-  if (!graph) return { nodes: [], links: [] };
+function getFilteredGraph(graph: CGData, ids: string[] = []): CGData {
   return {
     nodes: graph.nodes.filter(elt => ids.includes(elt.id)),
     links: graph.links.filter(elt => {
@@ -131,9 +130,8 @@ function getStyledGraph(
   selectedNodes: SelectedNodes,
   style: CSSStyleDeclaration,
   linkThickness: number,
-  graph?: CGData,
+  graph: CGData,
 ): CGData {
-  if (!graph) return { nodes: [], links: [] };
   return {
     nodes: graph.nodes.map(node => ({
       ...node,
@@ -186,24 +184,30 @@ function Callgraph(): JSX.Element {
   } = functionFilter;
 
   const filteredFunctions =  React.useMemo(() => {
-    return functions ? functions.filter(showFunction) : [];
+    return functions.filter(showFunction);
   }, [functions, showFunction]);
 
   /** Control */
-  /* eslint-disable max-len */
   const [ displayMode, setDisplayMode ] = useDMButton();
-  const [ selectedParents, setSelectedParents ] = useTSButton('selectedparents');
-  const [ selectedChildren, setSelectedChildren ]  = useTSButton('selectedChildren');
+  const [ selectedParents, setSelectedParents ] =
+    useTSButton('selectedparents');
+  const [ selectedChildren, setSelectedChildren ] =
+    useTSButton('selectedChildren');
 
   const showParticlesState = React.useState(true);
   const [ showParticles, setShowParticles ] = showParticlesState;
-  const panelVisibleState = Dome.useFlipSettings("ivette.callgraph.panelVisible", true);
-  const [ verticalSpacing, setVerticalSpacing ] = Dome.useNumberSettings("ivette.callgraph.verticalspacing", 75);
-  const [ horizontalSpacing, setHorizontalSpacing ] = Dome.useNumberSettings("ivette.callgraph.horizontalspacing", 500);
-  const [ linkThickness, setLinkThickness ] = Dome.useNumberSettings("ivette.callgraph.linkThickness", 1);
-  const [ autoCenter, flipAutoCenter ] = Dome.useFlipSettings("eva.callgraph.autocenter", true);
-  const [ autoSelect, flipAutoSelect ] = Dome.useFlipSettings('eva.callgraph.autoselect', true);
-  /* eslint-enable max-len */
+  const panelVisibleState =
+    Dome.useFlipSettings("ivette.callgraph.panelVisible", true);
+  const [ verticalSpacing, setVerticalSpacing ] =
+    Dome.useNumberSettings("ivette.callgraph.verticalspacing", 75);
+  const [ horizontalSpacing, setHorizontalSpacing ] =
+    Dome.useNumberSettings("ivette.callgraph.horizontalspacing", 500);
+  const [ linkThickness, setLinkThickness ] =
+    Dome.useNumberSettings("ivette.callgraph.linkThickness", 1);
+  const [ autoCenter, flipAutoCenter ] =
+    Dome.useFlipSettings("ivette.callgraph.autocenter", true);
+  const [ autoSelect, flipAutoSelect ] =
+    Dome.useFlipSettings('ivette.callgraph.autoselect', true);
 
   /** Specific nodes*/
   const selectedFunctions = React.useMemo<Set<string>>(() => {
@@ -255,13 +259,11 @@ function Callgraph(): JSX.Element {
 
   /** Filtered and styled graph */
   const filteredAndStyledGraph = React.useMemo<CGData>(() => {
-    selectedChildren && selectedParents && showParticles;
     return getStyledGraph(
       displayMode, predecessors, successors, selectedNodes,
       style, linkThickness, filteredGraph );
-  }, [filteredGraph, displayMode, showParticles,
-      linkThickness, predecessors, successors,
-      selectedNodes, selectedParents, selectedChildren, style]);
+  }, [filteredGraph, displayMode, linkThickness, predecessors, successors,
+      selectedNodes, style]);
 
   const getNode = React.useMemo(() => {
     return (node: NodeObject3D<CGNode>): React.JSX.Element => {
@@ -374,7 +376,6 @@ function Callgraph(): JSX.Element {
             edges={filteredAndStyledGraph.links}
             selected={undefined}
             options3D={options3D}
-            refresh={showParticles}
           />
           <Panel
             graphData={filteredAndStyledGraph}

@@ -232,9 +232,6 @@ export interface GraphProps {
 
   /** Options graph 3D */
   options3D?: IGraphOptions3D;
-
-  /** refresh graph */
-  refresh?: boolean;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -312,19 +309,22 @@ function getForceGraphOptions(
     directionalArrow, directionalParticle,
     particleWidth, particleColor
   } = linkOptions || {};
-  /* eslint-disable max-len */
+
   ret.linkWidth = width ?? ((link) => link?.width ?? 1);
-  ret.linkColor = color ?? ((link) => link?.color ?? style.getPropertyValue('--graph-ed-color-default'));
+  ret.linkColor = color ?? ((link) =>
+    link?.color ?? style.getPropertyValue('--graph-ed-color-default'));
   ret.linkVisibility = visibility ?? ((link) => link?.visible ?? true);
-  ret.linkDirectionalArrowLength = directionalArrow ?? ((link) => ((link?.width ?? 1) * 2));
+  ret.linkDirectionalArrowLength = directionalArrow ?? ((link) =>
+    ((link?.width ?? 1) * 2));
   ret.linkDirectionalParticles = directionalParticle;
-  ret.linkDirectionalParticleWidth = particleWidth ?? ((link) => ((link?.width ?? 1) * 150 / 100));
+  ret.linkDirectionalParticleWidth = particleWidth ?? ((link) =>
+    ((link?.width ?? 1) * 150 / 100));
   ret.linkDirectionalParticleColor = particleColor ?? ((link) => transformColor(
       link?.color ?? "black", theme === "light" ? -50 : 50
     ));
 
-  ret.nodeVisibility = nodesOptions?.visibility ?? ((link) => link?.visible ?? true);
-  /* eslint-enable max-len */
+  ret.nodeVisibility = nodesOptions?.visibility ?? ((link) =>
+    link?.visible ?? true);
 
   if(options) {
     const {
@@ -456,7 +456,7 @@ function Graph3D(props: IGProps3D): JSX.Element {
 /* -------------------------------------------------------------------------- */
 
 export function Graph(props: GraphProps): JSX.Element {
-  const { nodes, edges, onSelection, refresh,
+  const { nodes, edges, onSelection,
           display = true, selected, options3D } = props;
   const data: GData = React.useMemo(
     () => ({
@@ -473,7 +473,7 @@ export function Graph(props: GraphProps): JSX.Element {
           {(size: Size) => (
             <div className={props.className}>
               <Graph2D
-                key={refresh ? '2D' : '_2D'}
+                key='2D'
                 data={data}
                 onSelection={onSelection}
                 selected={selected}
@@ -488,7 +488,7 @@ export function Graph(props: GraphProps): JSX.Element {
           {(size: Size) => (
             <div className={props.className}>
               <Graph3D
-                key={refresh ? '3D' : '_3D'}
+                key='3D'
                 data={data}
                 onSelection={onSelection}
                 selected={selected}
