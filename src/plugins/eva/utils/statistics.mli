@@ -78,11 +78,11 @@ type _ typ =
   | Float : float typ
 
 (** Registers a statistic tied to the whole program. *)
-val register_global_stat : string -> 'ty typ -> (unit,'ty) t
+val register_global_stat : string -> 'ty typ -> (unit, 'ty) t
 
 (** Registers a statistic tied to functions. *)
 val register_function_stat :
-  string -> 'ty typ ->(Cil_types.kernel_function, 'ty) t
+  string -> 'ty typ -> (Cil_types.kernel_function, 'ty) t
 
 (** Registers a statistic tied to statements. *)
 val register_statement_stat : string -> 'ty typ -> (Cil_types.stmt, 'ty) t

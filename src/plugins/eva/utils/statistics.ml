@@ -41,7 +41,7 @@ type _ kind =
   | Function : Cil_types.kernel_function kind
   | Statement : Cil_types.stmt kind
 
-let equal_kind (type a) (type b) (k1 : a kind) (k2 : b kind): (a, b) cmp =
+let equal_kind (type a) (type b) (k1 : a kind) (k2 : b kind) : (a, b) cmp =
   match k1, k2 with
   | Global, Global -> Eq
   | Function, Function -> Eq
@@ -60,7 +60,7 @@ type _ typ =
   | Int : int typ
   | Float : float typ
 
-let equal_ty (type a) (type b) (t1 : a typ) (t2 : b typ): (a, b) cmp =
+let equal_ty (type a) (type b) (t1 : a typ) (t2 : b typ) : (a, b) cmp =
   match t1, t2 with
   | Int, Int -> Eq
   | Float, Float -> Eq
@@ -89,7 +89,7 @@ let register
   try
     (* If the stat is already registered, return the previous one *)
     let Registered stat = Hashtbl.find registry name in
-    match equal_kind stat.kind kind,  equal_ty stat.ty ty with
+    match equal_kind stat.kind kind, equal_ty stat.ty ty with
     | Eq, Eq -> stat
     | Neq, _ ->
       Self.fatal
@@ -122,7 +122,7 @@ type key = Key : ('k,'ty) t * 'k -> key
 
 module Key = struct
 
-  type cmp = { cmp : 'k1 'k2 'ty1 'ty2. ('k1,'ty1) t -> ('k2,'ty2) t -> int }
+  type cmp = { cmp : 'k1 'k2 'ty1 'ty2. ('k1, 'ty1) t -> ('k2, 'ty2) t -> int }
 
   let compare_key (cmp: cmp) (Key (s1, x1)) (Key (s2, x2)) =
     let c = cmp.cmp s1 s2 in
@@ -238,8 +238,8 @@ let set (type k ty) (stat : (k, ty) t) (x : k) (value : ty) =
   | Float ->
     FloatState.replace k value
 
-let update (type k ty) (stat : (k, ty) t) (x :k ) (f : ty -> ty) =
-  let k = Key (stat,x) in
+let update (type k ty) (stat : (k, ty) t) (x : k) (f : ty -> ty) =
+  let k = Key (stat, x) in
   match stat.ty with
   | Int ->
     IntState.replace k (f (get stat x))
@@ -277,10 +277,10 @@ type value = Value : 'ty typ * 'ty -> value
 let export_as_list () =
   let int_bindings =
     IntState.to_seq ()
-    |> Seq.map (fun (k,v) -> k, Value (Int, v))
+    |> Seq.map (fun (k, v) -> k, Value (Int, v))
   and float_bindings =
     FloatState.to_seq ()
-    |> Seq.map (fun (k,v) -> k, Value (Float, v))
+    |> Seq.map (fun (k, v) -> k, Value (Float, v))
   in
   Seq.append int_bindings float_bindings
   |> List.of_seq
