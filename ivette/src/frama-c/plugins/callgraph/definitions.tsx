@@ -159,7 +159,8 @@ export function onNodeClickMultiSelect(
   event: MouseEvent | React.MouseEvent
 ): void {
   const [selectedNodes, SetSelectedNodes] = selectedNodesState;
-  const s = selectedNodes;
+
+  const s = new Set(selectedNodes);
   if (event.ctrlKey) { // multi-selection
     s.has(id) ? s.delete(id) : s.add(id);
   } else if (event.altKey) {
@@ -169,7 +170,7 @@ export function onNodeClickMultiSelect(
     s.clear();
     s.add(id);
   }
-  SetSelectedNodes(new Set(s));
+  SetSelectedNodes(s);
 }
 
 /** Links */

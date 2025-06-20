@@ -49,8 +49,8 @@ interface CallgraphToolsBarProps {
   verticalSpacingState: State<number>,
   horizontalSpacingState: State<number>,
   linkThicknessState: State<number>,
-  showParticlesState: [boolean, React.Dispatch<React.SetStateAction<boolean>>],
-  selectedFunctions:SelectedNodes,
+  showParticlesState: [boolean, (forced?: boolean) => void],
+  selectedFunctions: SelectedNodes,
   taintedFunctions: string[],
   unprovenPropertiesFunctions: SelectedNodes,
   cycleFunctions: string[],
@@ -75,7 +75,7 @@ export function CallgraphToolsBar(props: CallgraphToolsBarProps): JSX.Element {
   const [verticalSpacing, setVerticalSpacing] = verticalSpacingState;
   const [horizontalSpacing, setHorizontalSpacing] = horizontalSpacingState;
   const [linkThickness, setLinkThickness] = linkThicknessState;
-  const [showParticles, setShowParticles] = showParticlesState;
+  const [showParticles, flipShowParticles] = showParticlesState;
 
   function menuItem(label: string, onClick: ()=>void, enabled?: boolean)
     : Dome.PopupMenuItem {
@@ -88,10 +88,10 @@ export function CallgraphToolsBar(props: CallgraphToolsBarProps): JSX.Element {
 
   const selectMenuItems: Dome.PopupMenuItem[] = [
     menuItem('Select functions with unproven properties',
-      () => updateNodes(unprovenPropertiesFunctions),
+      () => updateNodes(new Set(unprovenPropertiesFunctions)),
       unprovenPropertiesFunctions.size !== 0),
     menuItem('Select functions listed in the Locations panel',
-      () => updateNodes(selectedFunctions),
+      () => updateNodes(new Set(selectedFunctions)),
       selectedFunctions.size !== 0),
     menuItem('Select functions with tainted properties',
       () => updateNodes(new Set(taintedFunctions)),
@@ -153,7 +153,7 @@ export function CallgraphToolsBar(props: CallgraphToolsBarProps): JSX.Element {
       <Button
         label="Show particles"
         selected={showParticles}
-        onClick={() => setShowParticles(v => !v)}
+        onClick={() => flipShowParticles()}
         />
       <div className='cg-spinner'>
         Edges: <Spinner

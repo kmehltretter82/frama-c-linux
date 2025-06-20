@@ -194,8 +194,8 @@ function Callgraph(): JSX.Element {
   const [ selectedChildren, setSelectedChildren ] =
     useTSButton('selectedChildren');
 
-  const showParticlesState = React.useState(true);
-  const [ showParticles, setShowParticles ] = showParticlesState;
+  const showParticlesState = Dome.useFlipState(true);
+  const [ showParticles, flipShowParticles ] = showParticlesState;
   const panelVisibleState =
     Dome.useFlipSettings("ivette.callgraph.panelVisible", true);
   const [ verticalSpacing, setVerticalSpacing ] =
@@ -283,11 +283,11 @@ function Callgraph(): JSX.Element {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         link => (link as any).__lineObj?.visible).length;
       setVisibleLink(countLinks);
-      if(countLinks > 1000) setShowParticles(false);
+      if(countLinks > 1000) flipShowParticles(false);
       }, 100);
 
     return () => clearTimeout(timeout);
-  }, [filteredAndStyledGraph, displayMode, setShowParticles,
+  }, [filteredAndStyledGraph, displayMode, flipShowParticles,
       selectedNodes, selectedParents, selectedChildren]
   );
 
