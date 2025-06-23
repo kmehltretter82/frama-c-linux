@@ -48,11 +48,6 @@ let equal_kind (type a) (type b) (k1 : a kind) (k2 : b kind) : (a, b) cmp =
   | Statement, Statement -> Eq
   | _, _ -> Neq
 
-let kind_to_string : type a. a kind -> string = function
-  | Global -> "global"
-  | Function  -> "function"
-  | Statement -> "statement"
-
 
 (* --- Type --- *)
 
@@ -91,14 +86,10 @@ let register
     let Registered stat = Hashtbl.find registry name in
     match equal_kind stat.kind kind, equal_ty stat.ty ty with
     | Eq, Eq -> stat
-    | Neq, _ ->
+    | Neq, _ | _, Neq ->
       Self.fatal
-        "%s statistic \"%s\" was already registered as a %s statistic"
-        name (kind_to_string kind) (kind_to_string stat.kind)
-    | _, Neq ->
-      Self.fatal
-        "%s statistic \"%s\" was already registered with different type"
-        name (kind_to_string kind) (kind_to_string stat.kind)
+        "statistic \"%s\" was already registered with a different type or kind"
+        name
   with Not_found ->
     (* Otherwise, create a new record for the stat *)
     incr last_id;
