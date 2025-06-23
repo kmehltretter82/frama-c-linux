@@ -50,7 +50,8 @@ import {
   getLinkWidth,
   getLinkColor,
   getLinkVisibility,
-  ModeDisplay
+  ModeDisplay,
+  useSelectedNodes
 } from "frama-c/plugins/callgraph/definitions";
 
 import './callgraph.css';
@@ -244,7 +245,7 @@ function Callgraph(): JSX.Element {
   }, [graphData, filteredFunctions]);
 
   /** Selected */
-  const selectedNodesState = React.useState<SelectedNodes>(new Set());
+  const selectedNodesState = useSelectedNodes();
   const [selectedNodes, setSelectedNodes] = selectedNodesState;
 
   /** Predecessors of all selected nodes */
@@ -275,6 +276,8 @@ function Callgraph(): JSX.Element {
   const [ visibleNodes, setVisibleNodes ] = React.useState(0);
   const [ visibleLinks, setVisibleLink ] = React.useState(0);
   React.useEffect(() => {
+    /** Calculating the number of visible nodes and links
+     * has to wait for rendering, so we add a timeout. */
     const timeout = setTimeout(() => {
       setVisibleNodes(filteredAndStyledGraph.nodes.filter(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -293,7 +296,7 @@ function Callgraph(): JSX.Element {
 
   React.useEffect(() => {
     if(autoSelect && scope)
-      setSelectedNodes(new Set([scope]));
+      setSelectedNodes([scope]);
   }, [scope, autoSelect, setSelectedNodes]);
 
   React.useEffect(() => {
@@ -317,7 +320,7 @@ function Callgraph(): JSX.Element {
     };
     if(!isAlreadySave()) {
       cycles.current.push(val);
-      setSelectedNodes(new Set(cycles.current.flat()));
+      setSelectedNodes(cycles.current.flat());
     }
   };
 

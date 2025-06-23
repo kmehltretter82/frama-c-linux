@@ -42,6 +42,10 @@ On the left:
 
 On the right:
 
+* The button `Show particles` determines whether particles are emitted to highlight
+  the direction of the links. If more than 1000 edges are visible,
+  they are automatically disabled.
+* Edges defines the thickness of the links.
 * Horizontal and vertical distance management between graph nodes.
 * [icon-sidebar]: opens or closes the side [panel](#callgraph-panel).
 

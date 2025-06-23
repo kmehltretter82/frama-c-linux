@@ -29,7 +29,7 @@ import { Spinner } from 'dome/controls/buttons';
 import { ToolBar, ButtonGroup, Button, Filler } from 'dome/frame/toolbars';
 
 import {
-  ModeDisplay, SelectedNodes
+  ModeDisplay, SelectedNodes, SetSelectedNodes
 } from "frama-c/plugins/callgraph/definitions";
 
 import { IThreeStateButton, ThreeStateButton } from "./buttons";
@@ -55,7 +55,7 @@ interface CallgraphToolsBarProps {
   unprovenPropertiesFunctions: SelectedNodes,
   cycleFunctions: string[],
   dagMode?: string;
-  updateNodes: (newSet: SelectedNodes) => void;
+  updateNodes: SetSelectedNodes;
   /* eslint-enable max-len */
 }
 
@@ -88,16 +88,16 @@ export function CallgraphToolsBar(props: CallgraphToolsBarProps): JSX.Element {
 
   const selectMenuItems: Dome.PopupMenuItem[] = [
     menuItem('Select functions with unproven properties',
-      () => updateNodes(new Set(unprovenPropertiesFunctions)),
+      () => updateNodes(unprovenPropertiesFunctions),
       unprovenPropertiesFunctions.size !== 0),
     menuItem('Select functions listed in the Locations panel',
-      () => updateNodes(new Set(selectedFunctions)),
+      () => updateNodes(selectedFunctions),
       selectedFunctions.size !== 0),
     menuItem('Select functions with tainted properties',
-      () => updateNodes(new Set(taintedFunctions)),
+      () => updateNodes(taintedFunctions),
       taintedFunctions.length !== 0),
     menuItem('Select cycles',
-      () => updateNodes(new Set(cycleFunctions)),
+      () => updateNodes(cycleFunctions),
       cycleFunctions.length !== 0),
   ];
 
@@ -113,7 +113,7 @@ export function CallgraphToolsBar(props: CallgraphToolsBarProps): JSX.Element {
             />
           <Button
             label='linked'
-            title='only show nodes linked to the selected ones'
+            title='show only nodes linked to at least one other node'
             selected={displayMode === 'linked'}
             onClick={() => setDisplayMode("linked")}
             />

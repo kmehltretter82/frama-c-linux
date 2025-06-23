@@ -34,7 +34,16 @@ import { IThreeStateButton } from "./components/buttons";
 
 export type ModeDisplay = "all" | "linked" | "selected"
 export type SelectedNodes = Set<string>
-export type SetSelectedNodes = (s: SelectedNodes) => void
+export type SetSelectedNodes = (s: SelectedNodes | string[]) => void
+export type SelectedNodesState = [SelectedNodes, SetSelectedNodes]
+
+export function useSelectedNodes(): SelectedNodesState {
+  const [selected, setSelected] = React.useState<SelectedNodes>(new Set());
+  const update = React.useCallback((newSet: SelectedNodes | string[])
+  : void => { setSelected(new Set(newSet)); }, []);
+
+  return [selected, update];
+}
 
 export interface CGNode extends Node {
   /** Coverage of the Eva analysis */
