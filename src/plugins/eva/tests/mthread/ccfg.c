@@ -1,8 +1,10 @@
 /* run.config*
+   ENABLED_IF: %{bin-available:dot}
    LOG: @LOG_MT_DOT_FILES_FILENAME@
    STDOPT: +"-mt-non-shared-accesses @LOG_MT_DOT_FILES_OPTS@"
 */
 /* This file is used to give an example of a cfg with many features */
+
 #include "mthread_pthread.h"
 #define NULL ((void*)0)
 

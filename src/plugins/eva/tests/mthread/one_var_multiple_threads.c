@@ -1,4 +1,5 @@
-/* run.config
+/* run.config*
+   ENABLED_IF: %{bin-available:dot}
    LOG: @LOG_MT_DOT_FILES_FILENAME@
    STDOPT: +"-mt-non-shared-accesses @LOG_MT_DOT_FILES_OPTS@"
 */
