@@ -879,7 +879,7 @@ export function renameProject(
 
 /** Remove a project */
 export async function removeProject(id: string): Promise<void> {
-  const projects = await Server.send(Project.getList, null);
+  const projects = States.getSyncArrayData(Project.list);
   if(projects.length === 1) {
     showError("Error - deleting project",
       "The last project cannot be removed");

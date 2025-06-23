@@ -22,47 +22,12 @@
 
 open Data
 module Md = Markdown
-module Js = Yojson.Basic.Util
-module Pkg = Package
 
-let package = Pkg.package ~name:"project"
+let package = Package.package ~name:"project"
     ~title:"Project Management" ~readme:"project.md" ()
 
 
 module Jproject_id = Jstring
-
-module Jproject = struct
-  type record
-  let record : record Record.signature = Record.signature ()
-
-  let pid = Record.field record ~name:"pid"
-      ~descr:(Md.plain "Id of the project")
-      (module Jint)
-  let name = Record.field record ~name:"name"
-      ~descr:(Md.plain "Display name of the project")
-      (module Jstring)
-  let unique_name = Record.field record ~name:"unique_name"
-      ~descr:(Md.plain "Unique name of the project")
-      (module Jstring)
-
-  let data = Record.publish record ~package ~name:"project"
-      ~descr:(Md.plain "Frama-C project")
-
-  module R : Record.S with type r = record = (val data)
-  type t = Project.project
-
-  let jtype = R.jtype
-
-  let to_json (p : t) =
-    R.default
-    |> R.set pid p.pid
-    |> R.set name p.name
-    |> R.set unique_name p.unique_name
-    |> R.to_json
-
-  let of_json _ = failure "Jproject.of_json not implemented"
-end
-
 
 let _current_project_signal =
   let add_hook f =
@@ -80,15 +45,6 @@ let _current_project_signal =
     ~set:(fun unique_name -> Project.(from_unique_name unique_name |> set_current))
     ~add_hook
     ()
-
-let get_project_list () =
-  Project.fold_on_projects (fun acc t -> t :: acc) []
-
-let () = Request.register
-    ~package ~kind:`GET ~name:"getList"
-    ~descr:(Md.plain "Returns the list of Frama-C projects")
-    ~input:(module Junit) ~output:(module Jlist (Jproject))
-    get_project_list
 
 let () = Request.register
     ~package ~kind:`SET ~name:"create"
