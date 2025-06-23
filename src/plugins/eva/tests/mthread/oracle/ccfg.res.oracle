@@ -8,25 +8,25 @@
 [mt] *** Computing value analysis for main thread
 [eva] Analyzing a complete application starting at main
 [mt] New thread: <main>, fun main
-[mt] ccfg.c:22: New thread: jobs[0], fun fjob, parent <main>, args {0}
-[mt] ccfg.c:22: Start thread jobs[0]
-[kernel:annot:missing-spec] ccfg.c:28: Warning: 
+[mt] ccfg.c:24: New thread: jobs[0], fun fjob, parent <main>, args {0}
+[mt] ccfg.c:24: Start thread jobs[0]
+[kernel:annot:missing-spec] ccfg.c:30: Warning: 
   Neither code nor specification for function random,
    generating default assigns. See -generated-spec-* options for more info
 [eva] using specification for function random
-[mt] ccfg.c:22: New thread: jobs[1], fun fjob, parent <main>, args {0}
-[mt] ccfg.c:22: Start thread jobs[1]
-[mt] ccfg.c:22: New thread: jobs[2], fun fjob, parent <main>, args {0}
-[mt] ccfg.c:22: Start thread jobs[2]
-[mt] ccfg.c:22: New thread: jobs[3], fun fjob, parent <main>, args {0}
-[mt] ccfg.c:22: Start thread jobs[3]
-[mt] ccfg.c:83: Initializing mutex lock
-[mt] ccfg.c:84: New thread: job_f1, fun f1, parent <main>, args {0}
-[mt] ccfg.c:84: Start thread job_f1
-[mt] ccfg.c:85: New thread: job_f2, fun f2, parent <main>, args {0}
-[mt] ccfg.c:85: Start thread job_f2
-[mt] ccfg.c:87: Lock lock
-[mt] ccfg.c:90: Release lock
+[mt] ccfg.c:24: New thread: jobs[1], fun fjob, parent <main>, args {0}
+[mt] ccfg.c:24: Start thread jobs[1]
+[mt] ccfg.c:24: New thread: jobs[2], fun fjob, parent <main>, args {0}
+[mt] ccfg.c:24: Start thread jobs[2]
+[mt] ccfg.c:24: New thread: jobs[3], fun fjob, parent <main>, args {0}
+[mt] ccfg.c:24: Start thread jobs[3]
+[mt] ccfg.c:85: Initializing mutex lock
+[mt] ccfg.c:86: New thread: job_f1, fun f1, parent <main>, args {0}
+[mt] ccfg.c:86: Start thread job_f1
+[mt] ccfg.c:87: New thread: job_f2, fun f2, parent <main>, args {0}
+[mt] ccfg.c:87: Start thread job_f2
+[mt] ccfg.c:89: Lock lock
+[mt] ccfg.c:92: Release lock
 [mt] *** First value analysis for main thread done.
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
@@ -34,25 +34,25 @@
 [mt] Globals accessed by thread:
   jobs[0]:
     write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
-      pthread_create :: ccfg.c:22 <- g1 :: ccfg.c:73 <- main
+      pthread_create :: ccfg.c:24 <- g1 :: ccfg.c:75 <- main
   jobs[1..3]:
     write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
-      pthread_create :: ccfg.c:22 <- g1 :: ccfg.c:77 <- main
-  x: read by <main> at ccfg.c:76 <- main
-  global1: write by <main> at ccfg.c:24 <- g1 :: ccfg.c:77 <- main
-  global2[0]: write by <main> at ccfg.c:29 <- g2 :: ccfg.c:78 <- main
-  global2[1]: write by <main> at ccfg.c:31 <- g2 :: ccfg.c:78 <- main
-  a: read by <main> at ccfg.c:88 <- main
-  b: read by <main> at ccfg.c:89 <- main
-  c: read by <main> at ccfg.c:91 <- main
-  d: read by <main> at ccfg.c:92 <- main
-  e: read by <main> at ccfg.c:93 <- main
-  f: read by <main> at ccfg.c:94 <- main
+      pthread_create :: ccfg.c:24 <- g1 :: ccfg.c:79 <- main
+  x: read by <main> at ccfg.c:78 <- main
+  global1: write by <main> at ccfg.c:26 <- g1 :: ccfg.c:79 <- main
+  global2[0]: write by <main> at ccfg.c:31 <- g2 :: ccfg.c:80 <- main
+  global2[1]: write by <main> at ccfg.c:33 <- g2 :: ccfg.c:80 <- main
+  a: read by <main> at ccfg.c:90 <- main
+  b: read by <main> at ccfg.c:91 <- main
+  c: read by <main> at ccfg.c:93 <- main
+  d: read by <main> at ccfg.c:94 <- main
+  e: read by <main> at ccfg.c:95 <- main
+  f: read by <main> at ccfg.c:96 <- main
   lock:
     read by <main> at FRAMAC_SHARE/mthread_pthread.c:56 <-
-      pthread_mutex_lock :: ccfg.c:87 <- main
+      pthread_mutex_lock :: ccfg.c:89 <- main
     read by <main> at FRAMAC_SHARE/mthread_pthread.c:66 <-
-      pthread_mutex_unlock :: ccfg.c:90 <- main
+      pthread_mutex_unlock :: ccfg.c:92 <- main
 [mt] * shared variables computed
 [eva:interferences] 
   Interferences from thread <main>
@@ -72,8 +72,8 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  global1: read by jobs[0] at ccfg.c:16 <- fjob
-  global2[0..1]: read by jobs[0] at ccfg.c:16 <- fjob
+  global1: read by jobs[0] at ccfg.c:18 <- fjob
+  global2[0..1]: read by jobs[0] at ccfg.c:18 <- fjob
 [mt] * shared variables computed
 [eva:interferences] 
   Interferences from thread jobs[0]
@@ -92,8 +92,8 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  global1: read by jobs[1] at ccfg.c:16 <- fjob
-  global2[0..1]: read by jobs[1] at ccfg.c:16 <- fjob
+  global1: read by jobs[1] at ccfg.c:18 <- fjob
+  global2[0..1]: read by jobs[1] at ccfg.c:18 <- fjob
 [mt] * shared variables computed
 [eva:interferences] 
   Interferences from thread jobs[1]
@@ -112,8 +112,8 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  global1: read by jobs[2] at ccfg.c:16 <- fjob
-  global2[0..1]: read by jobs[2] at ccfg.c:16 <- fjob
+  global1: read by jobs[2] at ccfg.c:18 <- fjob
+  global2[0..1]: read by jobs[2] at ccfg.c:18 <- fjob
 [mt] * shared variables computed
 [eva:interferences] 
   Interferences from thread jobs[2]
@@ -132,8 +132,8 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  global1: read by jobs[3] at ccfg.c:16 <- fjob
-  global2[0..1]: read by jobs[3] at ccfg.c:16 <- fjob
+  global1: read by jobs[3] at ccfg.c:18 <- fjob
+  global2[0..1]: read by jobs[3] at ccfg.c:18 <- fjob
 [mt] * shared variables computed
 [eva:interferences] 
   Interferences from thread jobs[3]
@@ -148,25 +148,25 @@
 [mt] * Computing value analysis for thread job_f1
 [eva] Analyzing a complete application starting at f1
 [eva] Initial state supplied by user
-[mt] ccfg.c:51: Lock lock
+[mt] ccfg.c:53: Lock lock
 [eva] using specification for function g3
-[mt] ccfg.c:53: Release lock
+[mt] ccfg.c:55: Release lock
 [eva] using specification for function g5
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  a: write by job_f1 at ccfg.c:52 <- f1
-  b: read by job_f1 at ccfg.c:52 <- f1
-  c: write by job_f1 at ccfg.c:54 <- f1
-  d: read by job_f1 at ccfg.c:54 <- f1
-  e: write by job_f1 at ccfg.c:55 <- f1
-  f: read by job_f1 at ccfg.c:47 <- g6 :: ccfg.c:55 <- f1
+  a: write by job_f1 at ccfg.c:54 <- f1
+  b: read by job_f1 at ccfg.c:54 <- f1
+  c: write by job_f1 at ccfg.c:56 <- f1
+  d: read by job_f1 at ccfg.c:56 <- f1
+  e: write by job_f1 at ccfg.c:57 <- f1
+  f: read by job_f1 at ccfg.c:49 <- g6 :: ccfg.c:57 <- f1
   lock:
     read by job_f1 at FRAMAC_SHARE/mthread_pthread.c:56 <-
-      pthread_mutex_lock :: ccfg.c:51 <- f1
+      pthread_mutex_lock :: ccfg.c:53 <- f1
     read by job_f1 at FRAMAC_SHARE/mthread_pthread.c:66 <-
-      pthread_mutex_unlock :: ccfg.c:53 <- f1
+      pthread_mutex_unlock :: ccfg.c:55 <- f1
 [mt] * shared variables computed
 [eva:interferences] 
   Interferences from thread job_f1
@@ -181,25 +181,25 @@
 [mt] * Computing value analysis for thread job_f2
 [eva] Analyzing a complete application starting at f2
 [eva] Initial state supplied by user
-[mt] ccfg.c:60: Lock lock
+[mt] ccfg.c:62: Lock lock
 [eva] using specification for function g4
-[mt] ccfg.c:62: Release lock
+[mt] ccfg.c:64: Release lock
 [eva] using specification for function g5
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  a: read by job_f2 at ccfg.c:61 <- f2
-  b: write by job_f2 at ccfg.c:61 <- f2
-  c: read by job_f2 at ccfg.c:63 <- f2
-  d: write by job_f2 at ccfg.c:63 <- f2
-  e: read by job_f2 at ccfg.c:47 <- g6 :: ccfg.c:64 <- f2
-  f: write by job_f2 at ccfg.c:64 <- f2
+  a: read by job_f2 at ccfg.c:63 <- f2
+  b: write by job_f2 at ccfg.c:63 <- f2
+  c: read by job_f2 at ccfg.c:65 <- f2
+  d: write by job_f2 at ccfg.c:65 <- f2
+  e: read by job_f2 at ccfg.c:49 <- g6 :: ccfg.c:66 <- f2
+  f: write by job_f2 at ccfg.c:66 <- f2
   lock:
     read by job_f2 at FRAMAC_SHARE/mthread_pthread.c:56 <-
-      pthread_mutex_lock :: ccfg.c:60 <- f2
+      pthread_mutex_lock :: ccfg.c:62 <- f2
     read by job_f2 at FRAMAC_SHARE/mthread_pthread.c:66 <-
-      pthread_mutex_unlock :: ccfg.c:62 <- f2
+      pthread_mutex_unlock :: ccfg.c:64 <- f2
 [mt] * shared variables computed
 [eva:interferences] 
   Interferences from thread job_f2
@@ -231,63 +231,63 @@
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
 [mt] Thread <main>, fun main
-[mt] ccfg.c:22: Thread jobs[0], fun fjob, parent <main>, args {0}
-[mt] ccfg.c:22: Start thread jobs[0]
+[mt] ccfg.c:24: Thread jobs[0], fun fjob, parent <main>, args {0}
+[mt] ccfg.c:24: Start thread jobs[0]
 [eva] using specification for function random
-[mt] ccfg.c:22: Thread jobs[1], fun fjob, parent <main>, args {0}
-[mt] ccfg.c:22: Start thread jobs[1]
-[mt] ccfg.c:22: Thread jobs[2], fun fjob, parent <main>, args {0}
-[mt] ccfg.c:22: Start thread jobs[2]
-[mt] ccfg.c:22: Thread jobs[3], fun fjob, parent <main>, args {0}
-[mt] ccfg.c:22: Start thread jobs[3]
-[mt] ccfg.c:83: Initializing mutex lock
-[mt] ccfg.c:84: Thread job_f1, fun f1, parent <main>, args {0}
-[mt] ccfg.c:84: Start thread job_f1
-[mt] ccfg.c:85: Thread job_f2, fun f2, parent <main>, args {0}
-[mt] ccfg.c:85: Start thread job_f2
-[mt] ccfg.c:87: Lock lock
-[mt] ccfg.c:90: Release lock
+[mt] ccfg.c:24: Thread jobs[1], fun fjob, parent <main>, args {0}
+[mt] ccfg.c:24: Start thread jobs[1]
+[mt] ccfg.c:24: Thread jobs[2], fun fjob, parent <main>, args {0}
+[mt] ccfg.c:24: Start thread jobs[2]
+[mt] ccfg.c:24: Thread jobs[3], fun fjob, parent <main>, args {0}
+[mt] ccfg.c:24: Start thread jobs[3]
+[mt] ccfg.c:85: Initializing mutex lock
+[mt] ccfg.c:86: Thread job_f1, fun f1, parent <main>, args {0}
+[mt] ccfg.c:86: Start thread job_f1
+[mt] ccfg.c:87: Thread job_f2, fun f2, parent <main>, args {0}
+[mt] ccfg.c:87: Start thread job_f2
+[mt] ccfg.c:89: Lock lock
+[mt] ccfg.c:92: Release lock
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   jobs[0]:
     write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
-      pthread_create :: ccfg.c:22 <- g1 :: ccfg.c:73 <- main
+      pthread_create :: ccfg.c:24 <- g1 :: ccfg.c:75 <- main
   jobs[1..3]:
     write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
-      pthread_create :: ccfg.c:22 <- g1 :: ccfg.c:77 <- main
-  x: read by <main> at ccfg.c:76 <- main
-  global1: write by <main> at ccfg.c:24 <- g1 :: ccfg.c:77 <- main
-  global2[0]: write by <main> at ccfg.c:29 <- g2 :: ccfg.c:78 <- main
-  global2[1]: write by <main> at ccfg.c:31 <- g2 :: ccfg.c:78 <- main
-  a: read by <main> at ccfg.c:88 <- main
-  b: read by <main> at ccfg.c:89 <- main
-  c: read by <main> at ccfg.c:91 <- main
-  d: read by <main> at ccfg.c:92 <- main
-  e: read by <main> at ccfg.c:93 <- main
-  f: read by <main> at ccfg.c:94 <- main
+      pthread_create :: ccfg.c:24 <- g1 :: ccfg.c:79 <- main
+  x: read by <main> at ccfg.c:78 <- main
+  global1: write by <main> at ccfg.c:26 <- g1 :: ccfg.c:79 <- main
+  global2[0]: write by <main> at ccfg.c:31 <- g2 :: ccfg.c:80 <- main
+  global2[1]: write by <main> at ccfg.c:33 <- g2 :: ccfg.c:80 <- main
+  a: read by <main> at ccfg.c:90 <- main
+  b: read by <main> at ccfg.c:91 <- main
+  c: read by <main> at ccfg.c:93 <- main
+  d: read by <main> at ccfg.c:94 <- main
+  e: read by <main> at ccfg.c:95 <- main
+  f: read by <main> at ccfg.c:96 <- main
   lock:
     read by <main> at FRAMAC_SHARE/mthread_pthread.c:56 <-
-      pthread_mutex_lock :: ccfg.c:87 <- main
+      pthread_mutex_lock :: ccfg.c:89 <- main
     read by <main> at FRAMAC_SHARE/mthread_pthread.c:66 <-
-      pthread_mutex_unlock :: ccfg.c:90 <- main
+      pthread_mutex_unlock :: ccfg.c:92 <- main
 [mt] * shared variables computed
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
-      *v = 1; ccfg.c:24 <- g1 :: ccfg.c:77 <- main
-      *v = 1; ccfg.c:29 <- g2 :: ccfg.c:78 <- main
-      *(v + 1) = 2; ccfg.c:31 <- g2 :: ccfg.c:78 <- main
-      a = 1; ccfg.c:82 <- main
-      b = 1; ccfg.c:82 <- main
-      c = 1; ccfg.c:82 <- main
-      d = 1; ccfg.c:82 <- main
-      e = 1; ccfg.c:82 <- main
-      f = 1; ccfg.c:82 <- main
+      *v = 1; ccfg.c:26 <- g1 :: ccfg.c:79 <- main
+      *v = 1; ccfg.c:31 <- g2 :: ccfg.c:80 <- main
+      *(v + 1) = 2; ccfg.c:33 <- g2 :: ccfg.c:80 <- main
+      a = 1; ccfg.c:84 <- main
+      b = 1; ccfg.c:84 <- main
+      c = 1; ccfg.c:84 <- main
+      d = 1; ccfg.c:84 <- main
+      e = 1; ccfg.c:84 <- main
+      f = 1; ccfg.c:84 <- main
     shared bases: {global1, global2, a, b, c, d, e, f}
     interferences by location:
-      ccfg.c:24:
+      ccfg.c:26:
         # cvalue:
         global1 ∈ {1}
         global2[0] ∈ {0; 1}
@@ -298,7 +298,7 @@
         d ∈ {0}
         e ∈ {0}
         f ∈ {0} 
-      ccfg.c:29:
+      ccfg.c:31:
         # cvalue:
         global1 ∈ {0}
         global2[0] ∈ {1}
@@ -309,7 +309,7 @@
         d ∈ {0}
         e ∈ {0}
         f ∈ {0} 
-      ccfg.c:31:
+      ccfg.c:33:
         # cvalue:
         global1 ∈ {0}
         global2[0] ∈ {0; 1}
@@ -320,7 +320,7 @@
         d ∈ {0}
         e ∈ {0}
         f ∈ {0} 
-      ccfg.c:82:
+      ccfg.c:84:
         # cvalue:
         global1 ∈ {0}
         global2[0..1] ∈ {0}
@@ -330,7 +330,7 @@
         d ∈ {0}
         e ∈ {0}
         f ∈ {0} 
-      ccfg.c:82:
+      ccfg.c:84:
         # cvalue:
         global1 ∈ {0}
         global2[0..1] ∈ {0}
@@ -340,7 +340,7 @@
         d ∈ {0}
         e ∈ {0}
         f ∈ {0} 
-      ccfg.c:82:
+      ccfg.c:84:
         # cvalue:
         global1 ∈ {0}
         global2[0..1] ∈ {0}
@@ -350,7 +350,7 @@
         d ∈ {0}
         e ∈ {0}
         f ∈ {0} 
-      ccfg.c:82:
+      ccfg.c:84:
         # cvalue:
         global1 ∈ {0}
         global2[0..1] ∈ {0}
@@ -360,7 +360,7 @@
         d ∈ {1}
         e ∈ {0}
         f ∈ {0} 
-      ccfg.c:82:
+      ccfg.c:84:
         # cvalue:
         global1 ∈ {0}
         global2[0..1] ∈ {0}
@@ -370,7 +370,7 @@
         d ∈ {1}
         e ∈ {1}
         f ∈ {0} 
-      ccfg.c:82:
+      ccfg.c:84:
         # cvalue:
         global1 ∈ {0}
         global2[0..1] ∈ {0}
@@ -400,13 +400,13 @@
 [mt] * Computing value analysis for thread jobs[0]
 [eva] Analyzing a complete application starting at fjob
 [eva] Initial state supplied by user
-[eva:interferences] ccfg.c:16: inject threads interferences at this point
+[eva:interferences] ccfg.c:18: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  global1: read by jobs[0] at ccfg.c:16 <- fjob
-  global2[0..1]: read by jobs[0] at ccfg.c:16 <- fjob
+  global1: read by jobs[0] at ccfg.c:18 <- fjob
+  global2[0..1]: read by jobs[0] at ccfg.c:18 <- fjob
 [mt] * shared variables computed
 [eva:interferences] 
   Interferences from thread jobs[0]
@@ -422,13 +422,13 @@
 [mt] * Computing value analysis for thread jobs[1]
 [eva] Analyzing a complete application starting at fjob
 [eva] Initial state supplied by user
-[eva:interferences] ccfg.c:16: inject threads interferences at this point
+[eva:interferences] ccfg.c:18: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  global1: read by jobs[1] at ccfg.c:16 <- fjob
-  global2[0..1]: read by jobs[1] at ccfg.c:16 <- fjob
+  global1: read by jobs[1] at ccfg.c:18 <- fjob
+  global2[0..1]: read by jobs[1] at ccfg.c:18 <- fjob
 [mt] * shared variables computed
 [eva:interferences] 
   Interferences from thread jobs[1]
@@ -444,13 +444,13 @@
 [mt] * Computing value analysis for thread jobs[2]
 [eva] Analyzing a complete application starting at fjob
 [eva] Initial state supplied by user
-[eva:interferences] ccfg.c:16: inject threads interferences at this point
+[eva:interferences] ccfg.c:18: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  global1: read by jobs[2] at ccfg.c:16 <- fjob
-  global2[0..1]: read by jobs[2] at ccfg.c:16 <- fjob
+  global1: read by jobs[2] at ccfg.c:18 <- fjob
+  global2[0..1]: read by jobs[2] at ccfg.c:18 <- fjob
 [mt] * shared variables computed
 [eva:interferences] 
   Interferences from thread jobs[2]
@@ -466,13 +466,13 @@
 [mt] * Computing value analysis for thread jobs[3]
 [eva] Analyzing a complete application starting at fjob
 [eva] Initial state supplied by user
-[eva:interferences] ccfg.c:16: inject threads interferences at this point
+[eva:interferences] ccfg.c:18: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  global1: read by jobs[3] at ccfg.c:16 <- fjob
-  global2[0..1]: read by jobs[3] at ccfg.c:16 <- fjob
+  global1: read by jobs[3] at ccfg.c:18 <- fjob
+  global2[0..1]: read by jobs[3] at ccfg.c:18 <- fjob
 [mt] * shared variables computed
 [eva:interferences] 
   Interferences from thread jobs[3]
@@ -488,39 +488,39 @@
 [mt] * Computing value analysis for thread job_f1
 [eva] Analyzing a complete application starting at f1
 [eva] Initial state supplied by user
-[mt] ccfg.c:51: Lock lock
+[mt] ccfg.c:53: Lock lock
 [eva] using specification for function g3
-[eva:interferences] ccfg.c:52: inject threads interferences at this point
-[mt] ccfg.c:53: Release lock
-[eva] using specification for function g5
 [eva:interferences] ccfg.c:54: inject threads interferences at this point
-[eva:interferences] ccfg.c:47: inject threads interferences at this point
-[eva:interferences] ccfg.c:55: inject threads interferences at this point
+[mt] ccfg.c:55: Release lock
+[eva] using specification for function g5
+[eva:interferences] ccfg.c:56: inject threads interferences at this point
+[eva:interferences] ccfg.c:49: inject threads interferences at this point
+[eva:interferences] ccfg.c:57: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  a: write by job_f1 at ccfg.c:52 <- f1
-  b: read by job_f1 at ccfg.c:52 <- f1
-  c: write by job_f1 at ccfg.c:54 <- f1
-  d: read by job_f1 at ccfg.c:54 <- f1
-  e: write by job_f1 at ccfg.c:55 <- f1
-  f: read by job_f1 at ccfg.c:47 <- g6 :: ccfg.c:55 <- f1
+  a: write by job_f1 at ccfg.c:54 <- f1
+  b: read by job_f1 at ccfg.c:54 <- f1
+  c: write by job_f1 at ccfg.c:56 <- f1
+  d: read by job_f1 at ccfg.c:56 <- f1
+  e: write by job_f1 at ccfg.c:57 <- f1
+  f: read by job_f1 at ccfg.c:49 <- g6 :: ccfg.c:57 <- f1
   lock:
     read by job_f1 at FRAMAC_SHARE/mthread_pthread.c:56 <-
-      pthread_mutex_lock :: ccfg.c:51 <- f1
+      pthread_mutex_lock :: ccfg.c:53 <- f1
     read by job_f1 at FRAMAC_SHARE/mthread_pthread.c:66 <-
-      pthread_mutex_unlock :: ccfg.c:53 <- f1
+      pthread_mutex_unlock :: ccfg.c:55 <- f1
 [mt] * shared variables computed
 [eva:interferences] 
   Interferences from thread job_f1
     concurrent writes:
-      g3(); ccfg.c:52 <- f1
-      g5(& c,& d); ccfg.c:54 <- f1
-      e = g6(& f); ccfg.c:55 <- f1
+      g3(); ccfg.c:54 <- f1
+      g5(& c,& d); ccfg.c:56 <- f1
+      e = g6(& f); ccfg.c:57 <- f1
     shared bases: {global1, global2, a, b, c, d, e, f}
     interferences by location:
-      ccfg.c:52:
+      ccfg.c:54:
         # cvalue:
         global1 ∈ {0; 1}
         global2[0] ∈ {0; 1}
@@ -531,7 +531,7 @@
         d ∈ {0; 1}
         e ∈ {0; 1}
         f ∈ {0; 1} 
-      ccfg.c:54:
+      ccfg.c:56:
         # cvalue:
         global1 ∈ {0; 1}
         global2[0] ∈ {0; 1}
@@ -542,7 +542,7 @@
         d ∈ {0; 1}
         e ∈ {0; 1}
         f ∈ {0; 1} 
-      ccfg.c:55:
+      ccfg.c:57:
         # cvalue:
         global1 ∈ {0; 1}
         global2[0] ∈ {0; 1}
@@ -584,39 +584,39 @@
 [mt] * Computing value analysis for thread job_f2
 [eva] Analyzing a complete application starting at f2
 [eva] Initial state supplied by user
-[mt] ccfg.c:60: Lock lock
+[mt] ccfg.c:62: Lock lock
 [eva] using specification for function g4
-[eva:interferences] ccfg.c:61: inject threads interferences at this point
-[mt] ccfg.c:62: Release lock
-[eva] using specification for function g5
 [eva:interferences] ccfg.c:63: inject threads interferences at this point
-[eva:interferences] ccfg.c:47: inject threads interferences at this point
-[eva:interferences] ccfg.c:64: inject threads interferences at this point
+[mt] ccfg.c:64: Release lock
+[eva] using specification for function g5
+[eva:interferences] ccfg.c:65: inject threads interferences at this point
+[eva:interferences] ccfg.c:49: inject threads interferences at this point
+[eva:interferences] ccfg.c:66: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  a: read by job_f2 at ccfg.c:61 <- f2
-  b: write by job_f2 at ccfg.c:61 <- f2
-  c: read by job_f2 at ccfg.c:63 <- f2
-  d: write by job_f2 at ccfg.c:63 <- f2
-  e: read by job_f2 at ccfg.c:47 <- g6 :: ccfg.c:64 <- f2
-  f: write by job_f2 at ccfg.c:64 <- f2
+  a: read by job_f2 at ccfg.c:63 <- f2
+  b: write by job_f2 at ccfg.c:63 <- f2
+  c: read by job_f2 at ccfg.c:65 <- f2
+  d: write by job_f2 at ccfg.c:65 <- f2
+  e: read by job_f2 at ccfg.c:49 <- g6 :: ccfg.c:66 <- f2
+  f: write by job_f2 at ccfg.c:66 <- f2
   lock:
     read by job_f2 at FRAMAC_SHARE/mthread_pthread.c:56 <-
-      pthread_mutex_lock :: ccfg.c:60 <- f2
+      pthread_mutex_lock :: ccfg.c:62 <- f2
     read by job_f2 at FRAMAC_SHARE/mthread_pthread.c:66 <-
-      pthread_mutex_unlock :: ccfg.c:62 <- f2
+      pthread_mutex_unlock :: ccfg.c:64 <- f2
 [mt] * shared variables computed
 [eva:interferences] 
   Interferences from thread job_f2
     concurrent writes:
-      g4(); ccfg.c:61 <- f2
-      g5(& d,& c); ccfg.c:63 <- f2
-      f = g6(& e); ccfg.c:64 <- f2
+      g4(); ccfg.c:63 <- f2
+      g5(& d,& c); ccfg.c:65 <- f2
+      f = g6(& e); ccfg.c:66 <- f2
     shared bases: {global1, global2, a, b, c, d, e, f}
     interferences by location:
-      ccfg.c:61:
+      ccfg.c:63:
         # cvalue:
         global1 ∈ {0; 1}
         global2[0] ∈ {0; 1}
@@ -627,7 +627,7 @@
         d ∈ {0; 1}
         e ∈ {0; 1}
         f ∈ {0; 1} 
-      ccfg.c:63:
+      ccfg.c:65:
         # cvalue:
         global1 ∈ {0; 1}
         global2[0] ∈ {0; 1}
@@ -638,7 +638,7 @@
         d ∈ [--..--]
         e ∈ {0; 1}
         f ∈ {0; 1} 
-      ccfg.c:64:
+      ccfg.c:66:
         # cvalue:
         global1 ∈ {0; 1}
         global2[0] ∈ {0; 1}
@@ -680,82 +680,82 @@
 [mt] * threads and mutexes computed
 [mt] ***** Computing shared variables
 [mt] Imprecise locations to watch: global1; global2[0..1]; a; b; c; d; e; f
-[mt] jobs[0] reads  global1 ∈ {0}  // ccfg.c:16 fjob
-[mt] jobs[1] reads  global1 ∈ {0}  // ccfg.c:16 fjob
-[mt] jobs[2] reads  global1 ∈ {0}  // ccfg.c:16 fjob
-[mt] jobs[3] reads  global1 ∈ {0}  // ccfg.c:16 fjob
-[mt] jobs[0] reads  global2[0] ∈ {0}  // ccfg.c:16 fjob
-[mt] jobs[1] reads  global2[0] ∈ {0}  // ccfg.c:16 fjob
-[mt] jobs[2] reads  global2[0] ∈ {0; 1}  // ccfg.c:16 fjob
-[mt] jobs[3] reads  global2[0] ∈ {0; 1}  // ccfg.c:16 fjob
-[mt] jobs[0] reads  global2[1] ∈ {0}  // ccfg.c:16 fjob
-[mt] jobs[1] reads  global2[1] ∈ {0}  // ccfg.c:16 fjob
-[mt] jobs[2] reads  global2[1] ∈ {0; 2}  // ccfg.c:16 fjob
-[mt] jobs[3] reads  global2[1] ∈ {0; 2}  // ccfg.c:16 fjob
-[mt] <main> reads  a ∈ {1}  // ccfg.c:88 main
-[mt] job_f2 reads  a ∈ {1}  // ccfg.c:61 g4 :: ccfg.c:61 <- f2
-[mt] <main> reads  b ∈ {1}  // ccfg.c:89 main
-[mt] job_f1 reads  b ∈ {1}  // ccfg.c:52 g3 :: ccfg.c:52 <- f1
-[mt] <main> reads  c ∈ {1}  // ccfg.c:91 main
-[mt] job_f2 reads  c ∈ [--..--]  // ccfg.c:63 g5 :: ccfg.c:63 <- f2
-[mt] <main> reads  d ∈ {1}  // ccfg.c:92 main
-[mt] job_f1 reads  d ∈ {0; 1}  // ccfg.c:54 g5 :: ccfg.c:54 <- f1
-[mt] <main> reads  e ∈ {1}  // ccfg.c:93 main
-[mt] job_f2 reads  e ∈ {0; 1}  // ccfg.c:47 g6 :: ccfg.c:64 <- f2
-[mt] <main> reads  f ∈ {1}  // ccfg.c:94 main
-[mt] job_f1 reads  f ∈ {0; 1}  // ccfg.c:47 g6 :: ccfg.c:55 <- f1
-[mt] <main> writes  global1 ∈ {1}  // ccfg.c:24 g1 :: ccfg.c:77 <- main
-[mt] <main> writes  global2[0] ∈ {1}  // ccfg.c:29 g2 :: ccfg.c:78 <- main
-[mt] <main> writes  global2[1] ∈ {2}  // ccfg.c:31 g2 :: ccfg.c:78 <- main
-[mt] job_f1 writes  a ∈ [--..--]  // ccfg.c:52 g3 :: ccfg.c:52 <- f1
-[mt] job_f2 writes  b ∈ [--..--]  // ccfg.c:61 g4 :: ccfg.c:61 <- f2
-[mt] job_f1 writes  c ∈ [--..--]  // ccfg.c:54 g5 :: ccfg.c:54 <- f1
-[mt] job_f2 writes  d ∈ [--..--]  // ccfg.c:63 g5 :: ccfg.c:63 <- f2
-[mt] job_f1 writes  e ∈ {0; 1}  // ccfg.c:55 f1
-[mt] job_f2 writes  f ∈ {0; 1}  // ccfg.c:64 f2
+[mt] jobs[0] reads  global1 ∈ {0}  // ccfg.c:18 fjob
+[mt] jobs[1] reads  global1 ∈ {0}  // ccfg.c:18 fjob
+[mt] jobs[2] reads  global1 ∈ {0}  // ccfg.c:18 fjob
+[mt] jobs[3] reads  global1 ∈ {0}  // ccfg.c:18 fjob
+[mt] jobs[0] reads  global2[0] ∈ {0}  // ccfg.c:18 fjob
+[mt] jobs[1] reads  global2[0] ∈ {0}  // ccfg.c:18 fjob
+[mt] jobs[2] reads  global2[0] ∈ {0; 1}  // ccfg.c:18 fjob
+[mt] jobs[3] reads  global2[0] ∈ {0; 1}  // ccfg.c:18 fjob
+[mt] jobs[0] reads  global2[1] ∈ {0}  // ccfg.c:18 fjob
+[mt] jobs[1] reads  global2[1] ∈ {0}  // ccfg.c:18 fjob
+[mt] jobs[2] reads  global2[1] ∈ {0; 2}  // ccfg.c:18 fjob
+[mt] jobs[3] reads  global2[1] ∈ {0; 2}  // ccfg.c:18 fjob
+[mt] <main> reads  a ∈ {1}  // ccfg.c:90 main
+[mt] job_f2 reads  a ∈ {1}  // ccfg.c:63 g4 :: ccfg.c:63 <- f2
+[mt] <main> reads  b ∈ {1}  // ccfg.c:91 main
+[mt] job_f1 reads  b ∈ {1}  // ccfg.c:54 g3 :: ccfg.c:54 <- f1
+[mt] <main> reads  c ∈ {1}  // ccfg.c:93 main
+[mt] job_f2 reads  c ∈ [--..--]  // ccfg.c:65 g5 :: ccfg.c:65 <- f2
+[mt] <main> reads  d ∈ {1}  // ccfg.c:94 main
+[mt] job_f1 reads  d ∈ {0; 1}  // ccfg.c:56 g5 :: ccfg.c:56 <- f1
+[mt] <main> reads  e ∈ {1}  // ccfg.c:95 main
+[mt] job_f2 reads  e ∈ {0; 1}  // ccfg.c:49 g6 :: ccfg.c:66 <- f2
+[mt] <main> reads  f ∈ {1}  // ccfg.c:96 main
+[mt] job_f1 reads  f ∈ {0; 1}  // ccfg.c:49 g6 :: ccfg.c:57 <- f1
+[mt] <main> writes  global1 ∈ {1}  // ccfg.c:26 g1 :: ccfg.c:79 <- main
+[mt] <main> writes  global2[0] ∈ {1}  // ccfg.c:31 g2 :: ccfg.c:80 <- main
+[mt] <main> writes  global2[1] ∈ {2}  // ccfg.c:33 g2 :: ccfg.c:80 <- main
+[mt] job_f1 writes  a ∈ [--..--]  // ccfg.c:54 g3 :: ccfg.c:54 <- f1
+[mt] job_f2 writes  b ∈ [--..--]  // ccfg.c:63 g4 :: ccfg.c:63 <- f2
+[mt] job_f1 writes  c ∈ [--..--]  // ccfg.c:56 g5 :: ccfg.c:56 <- f1
+[mt] job_f2 writes  d ∈ [--..--]  // ccfg.c:65 g5 :: ccfg.c:65 <- f2
+[mt] job_f1 writes  e ∈ {0; 1}  // ccfg.c:57 f1
+[mt] job_f2 writes  f ∈ {0; 1}  // ccfg.c:66 f2
 [mt] Possible read/write data races:
   f:
-    read by <main> at ccfg.c:94, unprotected
-    read by job_f1 at ccfg.c:47, unprotected
-    write by job_f2 at ccfg.c:64, unprotected
+    read by <main> at ccfg.c:96, unprotected
+    read by job_f1 at ccfg.c:49, unprotected
+    write by job_f2 at ccfg.c:66, unprotected
   e:
-    read by <main> at ccfg.c:93, unprotected
-    read by job_f2 at ccfg.c:47, unprotected
-    write by job_f1 at ccfg.c:55, unprotected
+    read by <main> at ccfg.c:95, unprotected
+    read by job_f2 at ccfg.c:49, unprotected
+    write by job_f1 at ccfg.c:57, unprotected
   d:
-    read by <main> at ccfg.c:92, unprotected
-    read by job_f1 at ccfg.c:54, unprotected
-    write by job_f2 at ccfg.c:63, unprotected
+    read by <main> at ccfg.c:94, unprotected
+    read by job_f1 at ccfg.c:56, unprotected
+    write by job_f2 at ccfg.c:65, unprotected
   c:
-    read by <main> at ccfg.c:91, unprotected
-    read by job_f2 at ccfg.c:63, unprotected
-    write by job_f1 at ccfg.c:54, unprotected
+    read by <main> at ccfg.c:93, unprotected
+    read by job_f2 at ccfg.c:65, unprotected
+    write by job_f1 at ccfg.c:56, unprotected
   b:
-    read by <main> at ccfg.c:89, protected by lock
-    read by job_f1 at ccfg.c:52, protected by lock
-    write by job_f2 at ccfg.c:61, protected by lock
+    read by <main> at ccfg.c:91, protected by lock
+    read by job_f1 at ccfg.c:54, protected by lock
+    write by job_f2 at ccfg.c:63, protected by lock
   a:
-    read by <main> at ccfg.c:88, protected by lock
-    read by job_f2 at ccfg.c:61, protected by lock
-    write by job_f1 at ccfg.c:52, protected by lock
+    read by <main> at ccfg.c:90, protected by lock
+    read by job_f2 at ccfg.c:63, protected by lock
+    write by job_f1 at ccfg.c:54, protected by lock
   global2[1]:
-    read by jobs[0] at ccfg.c:16, unprotected
-    read by jobs[1] at ccfg.c:16, unprotected
-    read by jobs[2] at ccfg.c:16, unprotected
-    read by jobs[3] at ccfg.c:16, unprotected
-    write by <main> at ccfg.c:31, unprotected
+    read by jobs[0] at ccfg.c:18, unprotected
+    read by jobs[1] at ccfg.c:18, unprotected
+    read by jobs[2] at ccfg.c:18, unprotected
+    read by jobs[3] at ccfg.c:18, unprotected
+    write by <main> at ccfg.c:33, unprotected
   global2[0]:
-    read by jobs[0] at ccfg.c:16, unprotected
-    read by jobs[1] at ccfg.c:16, unprotected
-    read by jobs[2] at ccfg.c:16, unprotected
-    read by jobs[3] at ccfg.c:16, unprotected
-    write by <main> at ccfg.c:29, unprotected
+    read by jobs[0] at ccfg.c:18, unprotected
+    read by jobs[1] at ccfg.c:18, unprotected
+    read by jobs[2] at ccfg.c:18, unprotected
+    read by jobs[3] at ccfg.c:18, unprotected
+    write by <main> at ccfg.c:31, unprotected
   global1:
-    read by jobs[0] at ccfg.c:16, unprotected
-    read by jobs[1] at ccfg.c:16, unprotected
-    read by jobs[2] at ccfg.c:16, unprotected
-    read by jobs[3] at ccfg.c:16, unprotected
-    write by <main> at ccfg.c:24, unprotected
+    read by jobs[0] at ccfg.c:18, unprotected
+    read by jobs[1] at ccfg.c:18, unprotected
+    read by jobs[2] at ccfg.c:18, unprotected
+    read by jobs[3] at ccfg.c:18, unprotected
+    write by <main> at ccfg.c:26, unprotected
 [mt] Shared memory: global1; global2[0..1]; a; b; c; d; e; f
 [mt] Concurrent precise var accesses have changed: before
     \nothing
@@ -817,14 +817,14 @@
     Read by jobs[1], Write by <main>: unprotected
     Read by jobs[0], Write by <main>: unprotected
 [mt] Statements needing manual synchronisation
-  ccfg.c:92 (for d)
-  ccfg.c:91 (for c)
-  ccfg.c:63 (for c)
-  ccfg.c:54 (for d)
-  ccfg.c:47 (for e; f)
-  ccfg.c:94 (for f)
-  ccfg.c:16 (for global1; global2[0..1])
-  ccfg.c:93 (for e)
+  ccfg.c:94 (for d)
+  ccfg.c:93 (for c)
+  ccfg.c:65 (for c)
+  ccfg.c:56 (for d)
+  ccfg.c:49 (for e; f)
+  ccfg.c:96 (for f)
+  ccfg.c:18 (for global1; global2[0..1])
+  ccfg.c:95 (for e)
 [mt] ***** Shared variables computed
 [mt] ***** Iteration 3
 [mt] *** Computing thread <main>, iteration 3
@@ -833,102 +833,91 @@
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
 [mt] Thread <main>, fun main
-[mt] ccfg.c:22: Thread jobs[0], fun fjob, parent <main>, args {0}
-[mt] ccfg.c:22: Start thread jobs[0]
+[mt] ccfg.c:24: Thread jobs[0], fun fjob, parent <main>, args {0}
+[mt] ccfg.c:24: Start thread jobs[0]
 [eva] using specification for function random
-[mt] ccfg.c:22: Thread jobs[1], fun fjob, parent <main>, args {0}
-[mt] ccfg.c:22: Start thread jobs[1]
-[mt] ccfg.c:22: New context for jobs[1], fun fjob, parent <main>, args {0}
-[eva:interferences] ccfg.c:29: inject threads interferences at this point
+[mt] ccfg.c:24: Thread jobs[1], fun fjob, parent <main>, args {0}
+[mt] ccfg.c:24: Start thread jobs[1]
+[mt] ccfg.c:24: New context for jobs[1], fun fjob, parent <main>, args {0}
 [eva:interferences] ccfg.c:31: inject threads interferences at this point
-[mt] ccfg.c:22: Thread jobs[2], fun fjob, parent <main>, args {0}
-[mt] ccfg.c:22: Start thread jobs[2]
-[mt] ccfg.c:22: New context for jobs[2], fun fjob, parent <main>, args {0}
-[mt] ccfg.c:22: Thread jobs[3], fun fjob, parent <main>, args {0}
-[mt] ccfg.c:22: Start thread jobs[3]
-[mt] ccfg.c:22: New context for jobs[3], fun fjob, parent <main>, args {0}
-[eva:interferences] ccfg.c:24: inject threads interferences at this point
-[eva:interferences] ccfg.c:82: inject threads interferences at this point
-[eva:interferences] ccfg.c:82: inject threads interferences at this point
-[eva:interferences] ccfg.c:82: inject threads interferences at this point
-[eva:interferences] ccfg.c:82: inject threads interferences at this point
-[eva:interferences] ccfg.c:82: inject threads interferences at this point
-[eva:interferences] ccfg.c:82: inject threads interferences at this point
-[mt] ccfg.c:83: Initializing mutex lock
-[mt] ccfg.c:84: Thread job_f1, fun f1, parent <main>, args {0}
-[mt] ccfg.c:84: Start thread job_f1
-[mt] ccfg.c:84: New context for job_f1, fun f1, parent <main>, args {0}
-[mt] ccfg.c:85: Thread job_f2, fun f2, parent <main>, args {0}
-[mt] ccfg.c:85: Start thread job_f2
-[mt] ccfg.c:85: New context for job_f2, fun f2, parent <main>, args {0}
-[mt] ccfg.c:87: Lock lock
-[eva:interferences] ccfg.c:88: inject threads interferences at this point
-[eva:alarm] ccfg.c:89: Warning: signed overflow. assert -2147483648 ≤ sum + b;
-[eva:alarm] ccfg.c:89: Warning: signed overflow. assert sum + b ≤ 2147483647;
-[eva:interferences] ccfg.c:89: inject threads interferences at this point
-[mt] ccfg.c:90: Release lock
-[eva:alarm] ccfg.c:91: Warning: signed overflow. assert -2147483648 ≤ sum + c;
-[eva:alarm] ccfg.c:91: Warning: signed overflow. assert sum + c ≤ 2147483647;
+[eva:interferences] ccfg.c:33: inject threads interferences at this point
+[mt] ccfg.c:24: Thread jobs[2], fun fjob, parent <main>, args {0}
+[mt] ccfg.c:24: Start thread jobs[2]
+[mt] ccfg.c:24: New context for jobs[2], fun fjob, parent <main>, args {0}
+[mt] ccfg.c:24: Thread jobs[3], fun fjob, parent <main>, args {0}
+[mt] ccfg.c:24: Start thread jobs[3]
+[mt] ccfg.c:24: New context for jobs[3], fun fjob, parent <main>, args {0}
+[eva:interferences] ccfg.c:26: inject threads interferences at this point
+[eva:interferences] ccfg.c:84: inject threads interferences at this point
+[eva:interferences] ccfg.c:84: inject threads interferences at this point
+[eva:interferences] ccfg.c:84: inject threads interferences at this point
+[eva:interferences] ccfg.c:84: inject threads interferences at this point
+[eva:interferences] ccfg.c:84: inject threads interferences at this point
+[eva:interferences] ccfg.c:84: inject threads interferences at this point
+[mt] ccfg.c:85: Initializing mutex lock
+[mt] ccfg.c:86: Thread job_f1, fun f1, parent <main>, args {0}
+[mt] ccfg.c:86: Start thread job_f1
+[mt] ccfg.c:86: New context for job_f1, fun f1, parent <main>, args {0}
+[mt] ccfg.c:87: Thread job_f2, fun f2, parent <main>, args {0}
+[mt] ccfg.c:87: Start thread job_f2
+[mt] ccfg.c:87: New context for job_f2, fun f2, parent <main>, args {0}
+[mt] ccfg.c:89: Lock lock
+[eva:interferences] ccfg.c:90: inject threads interferences at this point
+[eva:alarm] ccfg.c:91: Warning: signed overflow. assert -2147483648 ≤ sum + b;
+[eva:alarm] ccfg.c:91: Warning: signed overflow. assert sum + b ≤ 2147483647;
 [eva:interferences] ccfg.c:91: inject threads interferences at this point
-[eva:alarm] ccfg.c:92: Warning: signed overflow. assert -2147483648 ≤ sum + d;
-[eva:alarm] ccfg.c:92: Warning: signed overflow. assert sum + d ≤ 2147483647;
-[eva:interferences] ccfg.c:92: inject threads interferences at this point
-[eva:alarm] ccfg.c:93: Warning: signed overflow. assert sum + e ≤ 2147483647;
+[mt] ccfg.c:92: Release lock
+[eva:alarm] ccfg.c:93: Warning: signed overflow. assert -2147483648 ≤ sum + c;
+[eva:alarm] ccfg.c:93: Warning: signed overflow. assert sum + c ≤ 2147483647;
 [eva:interferences] ccfg.c:93: inject threads interferences at this point
-[eva:alarm] ccfg.c:94: Warning: signed overflow. assert sum + f ≤ 2147483647;
+[eva:alarm] ccfg.c:94: Warning: signed overflow. assert -2147483648 ≤ sum + d;
+[eva:alarm] ccfg.c:94: Warning: signed overflow. assert sum + d ≤ 2147483647;
 [eva:interferences] ccfg.c:94: inject threads interferences at this point
+[eva:alarm] ccfg.c:95: Warning: signed overflow. assert sum + e ≤ 2147483647;
+[eva:interferences] ccfg.c:95: inject threads interferences at this point
+[eva:alarm] ccfg.c:96: Warning: signed overflow. assert sum + f ≤ 2147483647;
+[eva:interferences] ccfg.c:96: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   jobs[0]:
     write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
-      pthread_create :: ccfg.c:22 <- g1 :: ccfg.c:73 <- main
+      pthread_create :: ccfg.c:24 <- g1 :: ccfg.c:75 <- main
   jobs[1..3]:
     write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
-      pthread_create :: ccfg.c:22 <- g1 :: ccfg.c:77 <- main
-  x: read by <main> at ccfg.c:76 <- main
-  global1: write by <main> at ccfg.c:24 <- g1 :: ccfg.c:77 <- main
-  global2[0]: write by <main> at ccfg.c:29 <- g2 :: ccfg.c:78 <- main
-  global2[1]: write by <main> at ccfg.c:31 <- g2 :: ccfg.c:78 <- main
-  a: read by <main> at ccfg.c:88 <- main
-  b: read by <main> at ccfg.c:89 <- main
-  c: read by <main> at ccfg.c:91 <- main
-  d: read by <main> at ccfg.c:92 <- main
-  e: read by <main> at ccfg.c:93 <- main
-  f: read by <main> at ccfg.c:94 <- main
+      pthread_create :: ccfg.c:24 <- g1 :: ccfg.c:79 <- main
+  x: read by <main> at ccfg.c:78 <- main
+  global1: write by <main> at ccfg.c:26 <- g1 :: ccfg.c:79 <- main
+  global2[0]: write by <main> at ccfg.c:31 <- g2 :: ccfg.c:80 <- main
+  global2[1]: write by <main> at ccfg.c:33 <- g2 :: ccfg.c:80 <- main
+  a: read by <main> at ccfg.c:90 <- main
+  b: read by <main> at ccfg.c:91 <- main
+  c: read by <main> at ccfg.c:93 <- main
+  d: read by <main> at ccfg.c:94 <- main
+  e: read by <main> at ccfg.c:95 <- main
+  f: read by <main> at ccfg.c:96 <- main
   lock:
     read by <main> at FRAMAC_SHARE/mthread_pthread.c:56 <-
-      pthread_mutex_lock :: ccfg.c:87 <- main
+      pthread_mutex_lock :: ccfg.c:89 <- main
     read by <main> at FRAMAC_SHARE/mthread_pthread.c:66 <-
-      pthread_mutex_unlock :: ccfg.c:90 <- main
+      pthread_mutex_unlock :: ccfg.c:92 <- main
 [mt] * shared variables computed
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
-      *v = 1; ccfg.c:24 <- g1 :: ccfg.c:77 <- main
-      *v = 1; ccfg.c:29 <- g2 :: ccfg.c:78 <- main
-      *(v + 1) = 2; ccfg.c:31 <- g2 :: ccfg.c:78 <- main
-      a = 1; ccfg.c:82 <- main
-      b = 1; ccfg.c:82 <- main
-      c = 1; ccfg.c:82 <- main
-      d = 1; ccfg.c:82 <- main
-      e = 1; ccfg.c:82 <- main
-      f = 1; ccfg.c:82 <- main
+      *v = 1; ccfg.c:26 <- g1 :: ccfg.c:79 <- main
+      *v = 1; ccfg.c:31 <- g2 :: ccfg.c:80 <- main
+      *(v + 1) = 2; ccfg.c:33 <- g2 :: ccfg.c:80 <- main
+      a = 1; ccfg.c:84 <- main
+      b = 1; ccfg.c:84 <- main
+      c = 1; ccfg.c:84 <- main
+      d = 1; ccfg.c:84 <- main
+      e = 1; ccfg.c:84 <- main
+      f = 1; ccfg.c:84 <- main
     shared bases: {global1, global2, a, b, c, d, e, f}
     interferences by location:
-      ccfg.c:24:
-        # cvalue:
-        global1 ∈ {0; 1}
-        global2[0] ∈ {0; 1}
-               [1] ∈ {0; 2}
-        a ∈ [--..--]
-        b ∈ [--..--]
-        c ∈ [--..--]
-        d ∈ [--..--]
-        e ∈ {0; 1}
-        f ∈ {0; 1} 
-      ccfg.c:29:
+      ccfg.c:26:
         # cvalue:
         global1 ∈ {0; 1}
         global2[0] ∈ {0; 1}
@@ -950,7 +939,7 @@
         d ∈ [--..--]
         e ∈ {0; 1}
         f ∈ {0; 1} 
-      ccfg.c:82:
+      ccfg.c:33:
         # cvalue:
         global1 ∈ {0; 1}
         global2[0] ∈ {0; 1}
@@ -961,7 +950,7 @@
         d ∈ [--..--]
         e ∈ {0; 1}
         f ∈ {0; 1} 
-      ccfg.c:82:
+      ccfg.c:84:
         # cvalue:
         global1 ∈ {0; 1}
         global2[0] ∈ {0; 1}
@@ -972,7 +961,7 @@
         d ∈ [--..--]
         e ∈ {0; 1}
         f ∈ {0; 1} 
-      ccfg.c:82:
+      ccfg.c:84:
         # cvalue:
         global1 ∈ {0; 1}
         global2[0] ∈ {0; 1}
@@ -983,7 +972,7 @@
         d ∈ [--..--]
         e ∈ {0; 1}
         f ∈ {0; 1} 
-      ccfg.c:82:
+      ccfg.c:84:
         # cvalue:
         global1 ∈ {0; 1}
         global2[0] ∈ {0; 1}
@@ -994,7 +983,7 @@
         d ∈ [--..--]
         e ∈ {0; 1}
         f ∈ {0; 1} 
-      ccfg.c:82:
+      ccfg.c:84:
         # cvalue:
         global1 ∈ {0; 1}
         global2[0] ∈ {0; 1}
@@ -1005,7 +994,18 @@
         d ∈ [--..--]
         e ∈ {0; 1}
         f ∈ {0; 1} 
-      ccfg.c:82:
+      ccfg.c:84:
+        # cvalue:
+        global1 ∈ {0; 1}
+        global2[0] ∈ {0; 1}
+               [1] ∈ {0; 2}
+        a ∈ [--..--]
+        b ∈ [--..--]
+        c ∈ [--..--]
+        d ∈ [--..--]
+        e ∈ {0; 1}
+        f ∈ {0; 1} 
+      ccfg.c:84:
         # cvalue:
         global1 ∈ {0; 1}
         global2[0] ∈ {0; 1}
@@ -1036,13 +1036,13 @@
 [mt] * Computing value analysis for thread jobs[0]
 [eva] Analyzing a complete application starting at fjob
 [eva] Initial state supplied by user
-[eva:interferences] ccfg.c:16: inject threads interferences at this point
+[eva:interferences] ccfg.c:18: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  global1: read by jobs[0] at ccfg.c:16 <- fjob
-  global2[0..1]: read by jobs[0] at ccfg.c:16 <- fjob
+  global1: read by jobs[0] at ccfg.c:18 <- fjob
+  global2[0..1]: read by jobs[0] at ccfg.c:18 <- fjob
 [mt] * shared variables computed
 [eva:interferences] 
   Interferences from thread jobs[0]
@@ -1059,13 +1059,13 @@
 [mt] * Computing value analysis for thread jobs[1]
 [eva] Analyzing a complete application starting at fjob
 [eva] Initial state supplied by user
-[eva:interferences] ccfg.c:16: inject threads interferences at this point
+[eva:interferences] ccfg.c:18: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  global1: read by jobs[1] at ccfg.c:16 <- fjob
-  global2[0..1]: read by jobs[1] at ccfg.c:16 <- fjob
+  global1: read by jobs[1] at ccfg.c:18 <- fjob
+  global2[0..1]: read by jobs[1] at ccfg.c:18 <- fjob
 [mt] * shared variables computed
 [eva:interferences] 
   Interferences from thread jobs[1]
@@ -1082,13 +1082,13 @@
 [mt] * Computing value analysis for thread jobs[2]
 [eva] Analyzing a complete application starting at fjob
 [eva] Initial state supplied by user
-[eva:interferences] ccfg.c:16: inject threads interferences at this point
+[eva:interferences] ccfg.c:18: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  global1: read by jobs[2] at ccfg.c:16 <- fjob
-  global2[0..1]: read by jobs[2] at ccfg.c:16 <- fjob
+  global1: read by jobs[2] at ccfg.c:18 <- fjob
+  global2[0..1]: read by jobs[2] at ccfg.c:18 <- fjob
 [mt] * shared variables computed
 [eva:interferences] 
   Interferences from thread jobs[2]
@@ -1105,13 +1105,13 @@
 [mt] * Computing value analysis for thread jobs[3]
 [eva] Analyzing a complete application starting at fjob
 [eva] Initial state supplied by user
-[eva:interferences] ccfg.c:16: inject threads interferences at this point
+[eva:interferences] ccfg.c:18: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  global1: read by jobs[3] at ccfg.c:16 <- fjob
-  global2[0..1]: read by jobs[3] at ccfg.c:16 <- fjob
+  global1: read by jobs[3] at ccfg.c:18 <- fjob
+  global2[0..1]: read by jobs[3] at ccfg.c:18 <- fjob
 [mt] * shared variables computed
 [eva:interferences] 
   Interferences from thread jobs[3]
@@ -1128,49 +1128,38 @@
 [mt] * Computing value analysis for thread job_f1
 [eva] Analyzing a complete application starting at f1
 [eva] Initial state supplied by user
-[mt] ccfg.c:51: Lock lock
+[mt] ccfg.c:53: Lock lock
 [eva] using specification for function g3
-[eva:interferences] ccfg.c:52: inject threads interferences at this point
-[mt] ccfg.c:53: Release lock
-[eva] using specification for function g5
 [eva:interferences] ccfg.c:54: inject threads interferences at this point
-[eva:interferences] ccfg.c:47: inject threads interferences at this point
-[eva:interferences] ccfg.c:55: inject threads interferences at this point
+[mt] ccfg.c:55: Release lock
+[eva] using specification for function g5
+[eva:interferences] ccfg.c:56: inject threads interferences at this point
+[eva:interferences] ccfg.c:49: inject threads interferences at this point
+[eva:interferences] ccfg.c:57: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  a: write by job_f1 at ccfg.c:52 <- f1
-  b: read by job_f1 at ccfg.c:52 <- f1
-  c: write by job_f1 at ccfg.c:54 <- f1
-  d: read by job_f1 at ccfg.c:54 <- f1
-  e: write by job_f1 at ccfg.c:55 <- f1
-  f: read by job_f1 at ccfg.c:47 <- g6 :: ccfg.c:55 <- f1
+  a: write by job_f1 at ccfg.c:54 <- f1
+  b: read by job_f1 at ccfg.c:54 <- f1
+  c: write by job_f1 at ccfg.c:56 <- f1
+  d: read by job_f1 at ccfg.c:56 <- f1
+  e: write by job_f1 at ccfg.c:57 <- f1
+  f: read by job_f1 at ccfg.c:49 <- g6 :: ccfg.c:57 <- f1
   lock:
     read by job_f1 at FRAMAC_SHARE/mthread_pthread.c:56 <-
-      pthread_mutex_lock :: ccfg.c:51 <- f1
+      pthread_mutex_lock :: ccfg.c:53 <- f1
     read by job_f1 at FRAMAC_SHARE/mthread_pthread.c:66 <-
-      pthread_mutex_unlock :: ccfg.c:53 <- f1
+      pthread_mutex_unlock :: ccfg.c:55 <- f1
 [mt] * shared variables computed
 [eva:interferences] 
   Interferences from thread job_f1
     concurrent writes:
-      g3(); ccfg.c:52 <- f1
-      g5(& c,& d); ccfg.c:54 <- f1
-      e = g6(& f); ccfg.c:55 <- f1
+      g3(); ccfg.c:54 <- f1
+      g5(& c,& d); ccfg.c:56 <- f1
+      e = g6(& f); ccfg.c:57 <- f1
     shared bases: {global1, global2, a, b, c, d, e, f}
     interferences by location:
-      ccfg.c:52:
-        # cvalue:
-        global1 ∈ {0; 1}
-        global2[0] ∈ {0; 1}
-               [1] ∈ {0; 2}
-        a ∈ [--..--]
-        b ∈ [--..--]
-        c ∈ [--..--]
-        d ∈ [--..--]
-        e ∈ {0; 1}
-        f ∈ {0; 1} 
       ccfg.c:54:
         # cvalue:
         global1 ∈ {0; 1}
@@ -1182,7 +1171,18 @@
         d ∈ [--..--]
         e ∈ {0; 1}
         f ∈ {0; 1} 
-      ccfg.c:55:
+      ccfg.c:56:
+        # cvalue:
+        global1 ∈ {0; 1}
+        global2[0] ∈ {0; 1}
+               [1] ∈ {0; 2}
+        a ∈ [--..--]
+        b ∈ [--..--]
+        c ∈ [--..--]
+        d ∈ [--..--]
+        e ∈ {0; 1}
+        f ∈ {0; 1} 
+      ccfg.c:57:
         # cvalue:
         global1 ∈ {0; 1}
         global2[0] ∈ {0; 1}
@@ -1225,49 +1225,38 @@
 [mt] * Computing value analysis for thread job_f2
 [eva] Analyzing a complete application starting at f2
 [eva] Initial state supplied by user
-[mt] ccfg.c:60: Lock lock
+[mt] ccfg.c:62: Lock lock
 [eva] using specification for function g4
-[eva:interferences] ccfg.c:61: inject threads interferences at this point
-[mt] ccfg.c:62: Release lock
-[eva] using specification for function g5
 [eva:interferences] ccfg.c:63: inject threads interferences at this point
-[eva:interferences] ccfg.c:47: inject threads interferences at this point
-[eva:interferences] ccfg.c:64: inject threads interferences at this point
+[mt] ccfg.c:64: Release lock
+[eva] using specification for function g5
+[eva:interferences] ccfg.c:65: inject threads interferences at this point
+[eva:interferences] ccfg.c:49: inject threads interferences at this point
+[eva:interferences] ccfg.c:66: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  a: read by job_f2 at ccfg.c:61 <- f2
-  b: write by job_f2 at ccfg.c:61 <- f2
-  c: read by job_f2 at ccfg.c:63 <- f2
-  d: write by job_f2 at ccfg.c:63 <- f2
-  e: read by job_f2 at ccfg.c:47 <- g6 :: ccfg.c:64 <- f2
-  f: write by job_f2 at ccfg.c:64 <- f2
+  a: read by job_f2 at ccfg.c:63 <- f2
+  b: write by job_f2 at ccfg.c:63 <- f2
+  c: read by job_f2 at ccfg.c:65 <- f2
+  d: write by job_f2 at ccfg.c:65 <- f2
+  e: read by job_f2 at ccfg.c:49 <- g6 :: ccfg.c:66 <- f2
+  f: write by job_f2 at ccfg.c:66 <- f2
   lock:
     read by job_f2 at FRAMAC_SHARE/mthread_pthread.c:56 <-
-      pthread_mutex_lock :: ccfg.c:60 <- f2
+      pthread_mutex_lock :: ccfg.c:62 <- f2
     read by job_f2 at FRAMAC_SHARE/mthread_pthread.c:66 <-
-      pthread_mutex_unlock :: ccfg.c:62 <- f2
+      pthread_mutex_unlock :: ccfg.c:64 <- f2
 [mt] * shared variables computed
 [eva:interferences] 
   Interferences from thread job_f2
     concurrent writes:
-      g4(); ccfg.c:61 <- f2
-      g5(& d,& c); ccfg.c:63 <- f2
-      f = g6(& e); ccfg.c:64 <- f2
+      g4(); ccfg.c:63 <- f2
+      g5(& d,& c); ccfg.c:65 <- f2
+      f = g6(& e); ccfg.c:66 <- f2
     shared bases: {global1, global2, a, b, c, d, e, f}
     interferences by location:
-      ccfg.c:61:
-        # cvalue:
-        global1 ∈ {0; 1}
-        global2[0] ∈ {0; 1}
-               [1] ∈ {0; 2}
-        a ∈ [--..--]
-        b ∈ [--..--]
-        c ∈ [--..--]
-        d ∈ [--..--]
-        e ∈ {0; 1}
-        f ∈ {0; 1} 
       ccfg.c:63:
         # cvalue:
         global1 ∈ {0; 1}
@@ -1279,7 +1268,18 @@
         d ∈ [--..--]
         e ∈ {0; 1}
         f ∈ {0; 1} 
-      ccfg.c:64:
+      ccfg.c:65:
+        # cvalue:
+        global1 ∈ {0; 1}
+        global2[0] ∈ {0; 1}
+               [1] ∈ {0; 2}
+        a ∈ [--..--]
+        b ∈ [--..--]
+        c ∈ [--..--]
+        d ∈ [--..--]
+        e ∈ {0; 1}
+        f ∈ {0; 1} 
+      ccfg.c:66:
         # cvalue:
         global1 ∈ {0; 1}
         global2[0] ∈ {0; 1}
@@ -1321,82 +1321,82 @@
 [mt] * threads and mutexes computed
 [mt] ***** Computing shared variables
 [mt] Imprecise locations to watch: global1; global2[0..1]; a; b; c; d; e; f
-[mt] jobs[0] reads  global1 ∈ {0}  // ccfg.c:16 fjob
-[mt] jobs[1] reads  global1 ∈ {0}  // ccfg.c:16 fjob
-[mt] jobs[2] reads  global1 ∈ {0; 1}  // ccfg.c:16 fjob
-[mt] jobs[3] reads  global1 ∈ {0; 1}  // ccfg.c:16 fjob
-[mt] jobs[0] reads  global2[0] ∈ {0}  // ccfg.c:16 fjob
-[mt] jobs[1] reads  global2[0] ∈ {0}  // ccfg.c:16 fjob
-[mt] jobs[2] reads  global2[0] ∈ {0; 1}  // ccfg.c:16 fjob
-[mt] jobs[3] reads  global2[0] ∈ {0; 1}  // ccfg.c:16 fjob
-[mt] jobs[0] reads  global2[1] ∈ {0}  // ccfg.c:16 fjob
-[mt] jobs[1] reads  global2[1] ∈ {0}  // ccfg.c:16 fjob
-[mt] jobs[2] reads  global2[1] ∈ {0; 2}  // ccfg.c:16 fjob
-[mt] jobs[3] reads  global2[1] ∈ {0; 2}  // ccfg.c:16 fjob
-[mt] <main> reads  a ∈ [--..--]  // ccfg.c:88 main
-[mt] job_f2 reads  a ∈ [--..--]  // ccfg.c:61 g4 :: ccfg.c:61 <- f2
-[mt] <main> reads  b ∈ [--..--]  // ccfg.c:89 main
-[mt] job_f1 reads  b ∈ [--..--]  // ccfg.c:52 g3 :: ccfg.c:52 <- f1
-[mt] <main> reads  c ∈ [--..--]  // ccfg.c:91 main
-[mt] job_f2 reads  c ∈ [--..--]  // ccfg.c:63 g5 :: ccfg.c:63 <- f2
-[mt] <main> reads  d ∈ [--..--]  // ccfg.c:92 main
-[mt] job_f1 reads  d ∈ [--..--]  // ccfg.c:54 g5 :: ccfg.c:54 <- f1
-[mt] <main> reads  e ∈ {0; 1}  // ccfg.c:93 main
-[mt] job_f2 reads  e ∈ {0; 1}  // ccfg.c:47 g6 :: ccfg.c:64 <- f2
-[mt] <main> reads  f ∈ {0; 1}  // ccfg.c:94 main
-[mt] job_f1 reads  f ∈ {0; 1}  // ccfg.c:47 g6 :: ccfg.c:55 <- f1
-[mt] <main> writes  global1 ∈ {0; 1}  // ccfg.c:24 g1 :: ccfg.c:77 <- main
-[mt] <main> writes  global2[0] ∈ {0; 1}  // ccfg.c:29 g2 :: ccfg.c:78 <- main
-[mt] <main> writes  global2[1] ∈ {0; 2}  // ccfg.c:31 g2 :: ccfg.c:78 <- main
-[mt] job_f1 writes  a ∈ [--..--]  // ccfg.c:52 g3 :: ccfg.c:52 <- f1
-[mt] job_f2 writes  b ∈ [--..--]  // ccfg.c:61 g4 :: ccfg.c:61 <- f2
-[mt] job_f1 writes  c ∈ [--..--]  // ccfg.c:54 g5 :: ccfg.c:54 <- f1
-[mt] job_f2 writes  d ∈ [--..--]  // ccfg.c:63 g5 :: ccfg.c:63 <- f2
-[mt] job_f1 writes  e ∈ {0; 1}  // ccfg.c:55 f1
-[mt] job_f2 writes  f ∈ {0; 1}  // ccfg.c:64 f2
+[mt] jobs[0] reads  global1 ∈ {0}  // ccfg.c:18 fjob
+[mt] jobs[1] reads  global1 ∈ {0}  // ccfg.c:18 fjob
+[mt] jobs[2] reads  global1 ∈ {0; 1}  // ccfg.c:18 fjob
+[mt] jobs[3] reads  global1 ∈ {0; 1}  // ccfg.c:18 fjob
+[mt] jobs[0] reads  global2[0] ∈ {0}  // ccfg.c:18 fjob
+[mt] jobs[1] reads  global2[0] ∈ {0}  // ccfg.c:18 fjob
+[mt] jobs[2] reads  global2[0] ∈ {0; 1}  // ccfg.c:18 fjob
+[mt] jobs[3] reads  global2[0] ∈ {0; 1}  // ccfg.c:18 fjob
+[mt] jobs[0] reads  global2[1] ∈ {0}  // ccfg.c:18 fjob
+[mt] jobs[1] reads  global2[1] ∈ {0}  // ccfg.c:18 fjob
+[mt] jobs[2] reads  global2[1] ∈ {0; 2}  // ccfg.c:18 fjob
+[mt] jobs[3] reads  global2[1] ∈ {0; 2}  // ccfg.c:18 fjob
+[mt] <main> reads  a ∈ [--..--]  // ccfg.c:90 main
+[mt] job_f2 reads  a ∈ [--..--]  // ccfg.c:63 g4 :: ccfg.c:63 <- f2
+[mt] <main> reads  b ∈ [--..--]  // ccfg.c:91 main
+[mt] job_f1 reads  b ∈ [--..--]  // ccfg.c:54 g3 :: ccfg.c:54 <- f1
+[mt] <main> reads  c ∈ [--..--]  // ccfg.c:93 main
+[mt] job_f2 reads  c ∈ [--..--]  // ccfg.c:65 g5 :: ccfg.c:65 <- f2
+[mt] <main> reads  d ∈ [--..--]  // ccfg.c:94 main
+[mt] job_f1 reads  d ∈ [--..--]  // ccfg.c:56 g5 :: ccfg.c:56 <- f1
+[mt] <main> reads  e ∈ {0; 1}  // ccfg.c:95 main
+[mt] job_f2 reads  e ∈ {0; 1}  // ccfg.c:49 g6 :: ccfg.c:66 <- f2
+[mt] <main> reads  f ∈ {0; 1}  // ccfg.c:96 main
+[mt] job_f1 reads  f ∈ {0; 1}  // ccfg.c:49 g6 :: ccfg.c:57 <- f1
+[mt] <main> writes  global1 ∈ {0; 1}  // ccfg.c:26 g1 :: ccfg.c:79 <- main
+[mt] <main> writes  global2[0] ∈ {0; 1}  // ccfg.c:31 g2 :: ccfg.c:80 <- main
+[mt] <main> writes  global2[1] ∈ {0; 2}  // ccfg.c:33 g2 :: ccfg.c:80 <- main
+[mt] job_f1 writes  a ∈ [--..--]  // ccfg.c:54 g3 :: ccfg.c:54 <- f1
+[mt] job_f2 writes  b ∈ [--..--]  // ccfg.c:63 g4 :: ccfg.c:63 <- f2
+[mt] job_f1 writes  c ∈ [--..--]  // ccfg.c:56 g5 :: ccfg.c:56 <- f1
+[mt] job_f2 writes  d ∈ [--..--]  // ccfg.c:65 g5 :: ccfg.c:65 <- f2
+[mt] job_f1 writes  e ∈ {0; 1}  // ccfg.c:57 f1
+[mt] job_f2 writes  f ∈ {0; 1}  // ccfg.c:66 f2
 [mt] Possible read/write data races:
   f:
-    read by <main> at ccfg.c:94, unprotected
-    read by job_f1 at ccfg.c:47, unprotected
-    write by job_f2 at ccfg.c:64, unprotected
+    read by <main> at ccfg.c:96, unprotected
+    read by job_f1 at ccfg.c:49, unprotected
+    write by job_f2 at ccfg.c:66, unprotected
   e:
-    read by <main> at ccfg.c:93, unprotected
-    read by job_f2 at ccfg.c:47, unprotected
-    write by job_f1 at ccfg.c:55, unprotected
+    read by <main> at ccfg.c:95, unprotected
+    read by job_f2 at ccfg.c:49, unprotected
+    write by job_f1 at ccfg.c:57, unprotected
   d:
-    read by <main> at ccfg.c:92, unprotected
-    read by job_f1 at ccfg.c:54, unprotected
-    write by job_f2 at ccfg.c:63, unprotected
+    read by <main> at ccfg.c:94, unprotected
+    read by job_f1 at ccfg.c:56, unprotected
+    write by job_f2 at ccfg.c:65, unprotected
   c:
-    read by <main> at ccfg.c:91, unprotected
-    read by job_f2 at ccfg.c:63, unprotected
-    write by job_f1 at ccfg.c:54, unprotected
+    read by <main> at ccfg.c:93, unprotected
+    read by job_f2 at ccfg.c:65, unprotected
+    write by job_f1 at ccfg.c:56, unprotected
   b:
-    read by <main> at ccfg.c:89, protected by lock
-    read by job_f1 at ccfg.c:52, protected by lock
-    write by job_f2 at ccfg.c:61, protected by lock
+    read by <main> at ccfg.c:91, protected by lock
+    read by job_f1 at ccfg.c:54, protected by lock
+    write by job_f2 at ccfg.c:63, protected by lock
   a:
-    read by <main> at ccfg.c:88, protected by lock
-    read by job_f2 at ccfg.c:61, protected by lock
-    write by job_f1 at ccfg.c:52, protected by lock
+    read by <main> at ccfg.c:90, protected by lock
+    read by job_f2 at ccfg.c:63, protected by lock
+    write by job_f1 at ccfg.c:54, protected by lock
   global2[1]:
-    read by jobs[0] at ccfg.c:16, unprotected
-    read by jobs[1] at ccfg.c:16, unprotected
-    read by jobs[2] at ccfg.c:16, unprotected
-    read by jobs[3] at ccfg.c:16, unprotected
-    write by <main> at ccfg.c:31, unprotected
+    read by jobs[0] at ccfg.c:18, unprotected
+    read by jobs[1] at ccfg.c:18, unprotected
+    read by jobs[2] at ccfg.c:18, unprotected
+    read by jobs[3] at ccfg.c:18, unprotected
+    write by <main> at ccfg.c:33, unprotected
   global2[0]:
-    read by jobs[0] at ccfg.c:16, unprotected
-    read by jobs[1] at ccfg.c:16, unprotected
-    read by jobs[2] at ccfg.c:16, unprotected
-    read by jobs[3] at ccfg.c:16, unprotected
-    write by <main> at ccfg.c:29, unprotected
+    read by jobs[0] at ccfg.c:18, unprotected
+    read by jobs[1] at ccfg.c:18, unprotected
+    read by jobs[2] at ccfg.c:18, unprotected
+    read by jobs[3] at ccfg.c:18, unprotected
+    write by <main> at ccfg.c:31, unprotected
   global1:
-    read by jobs[0] at ccfg.c:16, unprotected
-    read by jobs[1] at ccfg.c:16, unprotected
-    read by jobs[2] at ccfg.c:16, unprotected
-    read by jobs[3] at ccfg.c:16, unprotected
-    write by <main> at ccfg.c:24, unprotected
+    read by jobs[0] at ccfg.c:18, unprotected
+    read by jobs[1] at ccfg.c:18, unprotected
+    read by jobs[2] at ccfg.c:18, unprotected
+    read by jobs[3] at ccfg.c:18, unprotected
+    write by <main> at ccfg.c:26, unprotected
 [mt] Shared memory: global1; global2[0..1]; a; b; c; d; e; f
 [mt] Write summary for <main> (updated):
   global1 ∈ {0; 1}
@@ -1452,14 +1452,14 @@
     Read by jobs[1], Write by <main>: unprotected
     Read by jobs[0], Write by <main>: unprotected
 [mt] Statements needing manual synchronisation
-  ccfg.c:92 (for d)
-  ccfg.c:91 (for c)
-  ccfg.c:63 (for c)
-  ccfg.c:54 (for d)
-  ccfg.c:47 (for e; f)
-  ccfg.c:94 (for f)
-  ccfg.c:16 (for global1; global2[0..1])
-  ccfg.c:93 (for e)
+  ccfg.c:94 (for d)
+  ccfg.c:93 (for c)
+  ccfg.c:65 (for c)
+  ccfg.c:56 (for d)
+  ccfg.c:49 (for e; f)
+  ccfg.c:96 (for f)
+  ccfg.c:18 (for global1; global2[0..1])
+  ccfg.c:95 (for e)
 [mt] ***** Shared variables computed
 [mt] ***** Iteration 4
 [mt] *** Computing thread <main>, iteration 4 (interferences changed)
@@ -1467,97 +1467,86 @@
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
 [mt] Thread <main>, fun main
-[mt] ccfg.c:22: Thread jobs[0], fun fjob, parent <main>, args {0}
-[mt] ccfg.c:22: Start thread jobs[0]
+[mt] ccfg.c:24: Thread jobs[0], fun fjob, parent <main>, args {0}
+[mt] ccfg.c:24: Start thread jobs[0]
 [eva] using specification for function random
-[mt] ccfg.c:22: Thread jobs[1], fun fjob, parent <main>, args {0}
-[mt] ccfg.c:22: Start thread jobs[1]
-[eva:interferences] ccfg.c:29: inject threads interferences at this point
+[mt] ccfg.c:24: Thread jobs[1], fun fjob, parent <main>, args {0}
+[mt] ccfg.c:24: Start thread jobs[1]
 [eva:interferences] ccfg.c:31: inject threads interferences at this point
-[mt] ccfg.c:22: Thread jobs[2], fun fjob, parent <main>, args {0}
-[mt] ccfg.c:22: Start thread jobs[2]
-[mt] ccfg.c:22: Thread jobs[3], fun fjob, parent <main>, args {0}
-[mt] ccfg.c:22: Start thread jobs[3]
-[eva:interferences] ccfg.c:24: inject threads interferences at this point
-[eva:interferences] ccfg.c:82: inject threads interferences at this point
-[eva:interferences] ccfg.c:82: inject threads interferences at this point
-[eva:interferences] ccfg.c:82: inject threads interferences at this point
-[eva:interferences] ccfg.c:82: inject threads interferences at this point
-[eva:interferences] ccfg.c:82: inject threads interferences at this point
-[eva:interferences] ccfg.c:82: inject threads interferences at this point
-[mt] ccfg.c:83: Initializing mutex lock
-[mt] ccfg.c:84: Thread job_f1, fun f1, parent <main>, args {0}
-[mt] ccfg.c:84: Start thread job_f1
-[mt] ccfg.c:85: Thread job_f2, fun f2, parent <main>, args {0}
-[mt] ccfg.c:85: Start thread job_f2
-[mt] ccfg.c:87: Lock lock
-[eva:interferences] ccfg.c:88: inject threads interferences at this point
-[eva:alarm] ccfg.c:89: Warning: signed overflow. assert -2147483648 ≤ sum + b;
-[eva:alarm] ccfg.c:89: Warning: signed overflow. assert sum + b ≤ 2147483647;
-[eva:interferences] ccfg.c:89: inject threads interferences at this point
-[mt] ccfg.c:90: Release lock
-[eva:alarm] ccfg.c:91: Warning: signed overflow. assert -2147483648 ≤ sum + c;
-[eva:alarm] ccfg.c:91: Warning: signed overflow. assert sum + c ≤ 2147483647;
+[eva:interferences] ccfg.c:33: inject threads interferences at this point
+[mt] ccfg.c:24: Thread jobs[2], fun fjob, parent <main>, args {0}
+[mt] ccfg.c:24: Start thread jobs[2]
+[mt] ccfg.c:24: Thread jobs[3], fun fjob, parent <main>, args {0}
+[mt] ccfg.c:24: Start thread jobs[3]
+[eva:interferences] ccfg.c:26: inject threads interferences at this point
+[eva:interferences] ccfg.c:84: inject threads interferences at this point
+[eva:interferences] ccfg.c:84: inject threads interferences at this point
+[eva:interferences] ccfg.c:84: inject threads interferences at this point
+[eva:interferences] ccfg.c:84: inject threads interferences at this point
+[eva:interferences] ccfg.c:84: inject threads interferences at this point
+[eva:interferences] ccfg.c:84: inject threads interferences at this point
+[mt] ccfg.c:85: Initializing mutex lock
+[mt] ccfg.c:86: Thread job_f1, fun f1, parent <main>, args {0}
+[mt] ccfg.c:86: Start thread job_f1
+[mt] ccfg.c:87: Thread job_f2, fun f2, parent <main>, args {0}
+[mt] ccfg.c:87: Start thread job_f2
+[mt] ccfg.c:89: Lock lock
+[eva:interferences] ccfg.c:90: inject threads interferences at this point
+[eva:alarm] ccfg.c:91: Warning: signed overflow. assert -2147483648 ≤ sum + b;
+[eva:alarm] ccfg.c:91: Warning: signed overflow. assert sum + b ≤ 2147483647;
 [eva:interferences] ccfg.c:91: inject threads interferences at this point
-[eva:alarm] ccfg.c:92: Warning: signed overflow. assert -2147483648 ≤ sum + d;
-[eva:alarm] ccfg.c:92: Warning: signed overflow. assert sum + d ≤ 2147483647;
-[eva:interferences] ccfg.c:92: inject threads interferences at this point
-[eva:alarm] ccfg.c:93: Warning: signed overflow. assert sum + e ≤ 2147483647;
+[mt] ccfg.c:92: Release lock
+[eva:alarm] ccfg.c:93: Warning: signed overflow. assert -2147483648 ≤ sum + c;
+[eva:alarm] ccfg.c:93: Warning: signed overflow. assert sum + c ≤ 2147483647;
 [eva:interferences] ccfg.c:93: inject threads interferences at this point
-[eva:alarm] ccfg.c:94: Warning: signed overflow. assert sum + f ≤ 2147483647;
+[eva:alarm] ccfg.c:94: Warning: signed overflow. assert -2147483648 ≤ sum + d;
+[eva:alarm] ccfg.c:94: Warning: signed overflow. assert sum + d ≤ 2147483647;
 [eva:interferences] ccfg.c:94: inject threads interferences at this point
+[eva:alarm] ccfg.c:95: Warning: signed overflow. assert sum + e ≤ 2147483647;
+[eva:interferences] ccfg.c:95: inject threads interferences at this point
+[eva:alarm] ccfg.c:96: Warning: signed overflow. assert sum + f ≤ 2147483647;
+[eva:interferences] ccfg.c:96: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   jobs[0]:
     write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
-      pthread_create :: ccfg.c:22 <- g1 :: ccfg.c:73 <- main
+      pthread_create :: ccfg.c:24 <- g1 :: ccfg.c:75 <- main
   jobs[1..3]:
     write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
-      pthread_create :: ccfg.c:22 <- g1 :: ccfg.c:77 <- main
-  x: read by <main> at ccfg.c:76 <- main
-  global1: write by <main> at ccfg.c:24 <- g1 :: ccfg.c:77 <- main
-  global2[0]: write by <main> at ccfg.c:29 <- g2 :: ccfg.c:78 <- main
-  global2[1]: write by <main> at ccfg.c:31 <- g2 :: ccfg.c:78 <- main
-  a: read by <main> at ccfg.c:88 <- main
-  b: read by <main> at ccfg.c:89 <- main
-  c: read by <main> at ccfg.c:91 <- main
-  d: read by <main> at ccfg.c:92 <- main
-  e: read by <main> at ccfg.c:93 <- main
-  f: read by <main> at ccfg.c:94 <- main
+      pthread_create :: ccfg.c:24 <- g1 :: ccfg.c:79 <- main
+  x: read by <main> at ccfg.c:78 <- main
+  global1: write by <main> at ccfg.c:26 <- g1 :: ccfg.c:79 <- main
+  global2[0]: write by <main> at ccfg.c:31 <- g2 :: ccfg.c:80 <- main
+  global2[1]: write by <main> at ccfg.c:33 <- g2 :: ccfg.c:80 <- main
+  a: read by <main> at ccfg.c:90 <- main
+  b: read by <main> at ccfg.c:91 <- main
+  c: read by <main> at ccfg.c:93 <- main
+  d: read by <main> at ccfg.c:94 <- main
+  e: read by <main> at ccfg.c:95 <- main
+  f: read by <main> at ccfg.c:96 <- main
   lock:
     read by <main> at FRAMAC_SHARE/mthread_pthread.c:56 <-
-      pthread_mutex_lock :: ccfg.c:87 <- main
+      pthread_mutex_lock :: ccfg.c:89 <- main
     read by <main> at FRAMAC_SHARE/mthread_pthread.c:66 <-
-      pthread_mutex_unlock :: ccfg.c:90 <- main
+      pthread_mutex_unlock :: ccfg.c:92 <- main
 [mt] * shared variables computed
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
-      *v = 1; ccfg.c:24 <- g1 :: ccfg.c:77 <- main
-      *v = 1; ccfg.c:29 <- g2 :: ccfg.c:78 <- main
-      *(v + 1) = 2; ccfg.c:31 <- g2 :: ccfg.c:78 <- main
-      a = 1; ccfg.c:82 <- main
-      b = 1; ccfg.c:82 <- main
-      c = 1; ccfg.c:82 <- main
-      d = 1; ccfg.c:82 <- main
-      e = 1; ccfg.c:82 <- main
-      f = 1; ccfg.c:82 <- main
+      *v = 1; ccfg.c:26 <- g1 :: ccfg.c:79 <- main
+      *v = 1; ccfg.c:31 <- g2 :: ccfg.c:80 <- main
+      *(v + 1) = 2; ccfg.c:33 <- g2 :: ccfg.c:80 <- main
+      a = 1; ccfg.c:84 <- main
+      b = 1; ccfg.c:84 <- main
+      c = 1; ccfg.c:84 <- main
+      d = 1; ccfg.c:84 <- main
+      e = 1; ccfg.c:84 <- main
+      f = 1; ccfg.c:84 <- main
     shared bases: {global1, global2, a, b, c, d, e, f}
     interferences by location:
-      ccfg.c:24:
-        # cvalue:
-        global1 ∈ {0; 1}
-        global2[0] ∈ {0; 1}
-               [1] ∈ {0; 2}
-        a ∈ [--..--]
-        b ∈ [--..--]
-        c ∈ [--..--]
-        d ∈ [--..--]
-        e ∈ {0; 1}
-        f ∈ {0; 1} 
-      ccfg.c:29:
+      ccfg.c:26:
         # cvalue:
         global1 ∈ {0; 1}
         global2[0] ∈ {0; 1}
@@ -1579,7 +1568,7 @@
         d ∈ [--..--]
         e ∈ {0; 1}
         f ∈ {0; 1} 
-      ccfg.c:82:
+      ccfg.c:33:
         # cvalue:
         global1 ∈ {0; 1}
         global2[0] ∈ {0; 1}
@@ -1590,7 +1579,7 @@
         d ∈ [--..--]
         e ∈ {0; 1}
         f ∈ {0; 1} 
-      ccfg.c:82:
+      ccfg.c:84:
         # cvalue:
         global1 ∈ {0; 1}
         global2[0] ∈ {0; 1}
@@ -1601,7 +1590,7 @@
         d ∈ [--..--]
         e ∈ {0; 1}
         f ∈ {0; 1} 
-      ccfg.c:82:
+      ccfg.c:84:
         # cvalue:
         global1 ∈ {0; 1}
         global2[0] ∈ {0; 1}
@@ -1612,7 +1601,7 @@
         d ∈ [--..--]
         e ∈ {0; 1}
         f ∈ {0; 1} 
-      ccfg.c:82:
+      ccfg.c:84:
         # cvalue:
         global1 ∈ {0; 1}
         global2[0] ∈ {0; 1}
@@ -1623,7 +1612,7 @@
         d ∈ [--..--]
         e ∈ {0; 1}
         f ∈ {0; 1} 
-      ccfg.c:82:
+      ccfg.c:84:
         # cvalue:
         global1 ∈ {0; 1}
         global2[0] ∈ {0; 1}
@@ -1634,7 +1623,18 @@
         d ∈ [--..--]
         e ∈ {0; 1}
         f ∈ {0; 1} 
-      ccfg.c:82:
+      ccfg.c:84:
+        # cvalue:
+        global1 ∈ {0; 1}
+        global2[0] ∈ {0; 1}
+               [1] ∈ {0; 2}
+        a ∈ [--..--]
+        b ∈ [--..--]
+        c ∈ [--..--]
+        d ∈ [--..--]
+        e ∈ {0; 1}
+        f ∈ {0; 1} 
+      ccfg.c:84:
         # cvalue:
         global1 ∈ {0; 1}
         global2[0] ∈ {0; 1}
@@ -1665,13 +1665,13 @@
 [mt] * Computing value analysis for thread jobs[0]
 [eva] Analyzing a complete application starting at fjob
 [eva] Initial state supplied by user
-[eva:interferences] ccfg.c:16: inject threads interferences at this point
+[eva:interferences] ccfg.c:18: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  global1: read by jobs[0] at ccfg.c:16 <- fjob
-  global2[0..1]: read by jobs[0] at ccfg.c:16 <- fjob
+  global1: read by jobs[0] at ccfg.c:18 <- fjob
+  global2[0..1]: read by jobs[0] at ccfg.c:18 <- fjob
 [mt] * shared variables computed
 [eva:interferences] 
   Interferences from thread jobs[0]
@@ -1687,13 +1687,13 @@
 [mt] * Computing value analysis for thread jobs[1]
 [eva] Analyzing a complete application starting at fjob
 [eva] Initial state supplied by user
-[eva:interferences] ccfg.c:16: inject threads interferences at this point
+[eva:interferences] ccfg.c:18: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  global1: read by jobs[1] at ccfg.c:16 <- fjob
-  global2[0..1]: read by jobs[1] at ccfg.c:16 <- fjob
+  global1: read by jobs[1] at ccfg.c:18 <- fjob
+  global2[0..1]: read by jobs[1] at ccfg.c:18 <- fjob
 [mt] * shared variables computed
 [eva:interferences] 
   Interferences from thread jobs[1]
@@ -1709,13 +1709,13 @@
 [mt] * Computing value analysis for thread jobs[2]
 [eva] Analyzing a complete application starting at fjob
 [eva] Initial state supplied by user
-[eva:interferences] ccfg.c:16: inject threads interferences at this point
+[eva:interferences] ccfg.c:18: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  global1: read by jobs[2] at ccfg.c:16 <- fjob
-  global2[0..1]: read by jobs[2] at ccfg.c:16 <- fjob
+  global1: read by jobs[2] at ccfg.c:18 <- fjob
+  global2[0..1]: read by jobs[2] at ccfg.c:18 <- fjob
 [mt] * shared variables computed
 [eva:interferences] 
   Interferences from thread jobs[2]
@@ -1731,13 +1731,13 @@
 [mt] * Computing value analysis for thread jobs[3]
 [eva] Analyzing a complete application starting at fjob
 [eva] Initial state supplied by user
-[eva:interferences] ccfg.c:16: inject threads interferences at this point
+[eva:interferences] ccfg.c:18: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  global1: read by jobs[3] at ccfg.c:16 <- fjob
-  global2[0..1]: read by jobs[3] at ccfg.c:16 <- fjob
+  global1: read by jobs[3] at ccfg.c:18 <- fjob
+  global2[0..1]: read by jobs[3] at ccfg.c:18 <- fjob
 [mt] * shared variables computed
 [eva:interferences] 
   Interferences from thread jobs[3]
@@ -1752,49 +1752,38 @@
 [mt] * Computing value analysis for thread job_f1
 [eva] Analyzing a complete application starting at f1
 [eva] Initial state supplied by user
-[mt] ccfg.c:51: Lock lock
+[mt] ccfg.c:53: Lock lock
 [eva] using specification for function g3
-[eva:interferences] ccfg.c:52: inject threads interferences at this point
-[mt] ccfg.c:53: Release lock
-[eva] using specification for function g5
 [eva:interferences] ccfg.c:54: inject threads interferences at this point
-[eva:interferences] ccfg.c:47: inject threads interferences at this point
-[eva:interferences] ccfg.c:55: inject threads interferences at this point
+[mt] ccfg.c:55: Release lock
+[eva] using specification for function g5
+[eva:interferences] ccfg.c:56: inject threads interferences at this point
+[eva:interferences] ccfg.c:49: inject threads interferences at this point
+[eva:interferences] ccfg.c:57: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  a: write by job_f1 at ccfg.c:52 <- f1
-  b: read by job_f1 at ccfg.c:52 <- f1
-  c: write by job_f1 at ccfg.c:54 <- f1
-  d: read by job_f1 at ccfg.c:54 <- f1
-  e: write by job_f1 at ccfg.c:55 <- f1
-  f: read by job_f1 at ccfg.c:47 <- g6 :: ccfg.c:55 <- f1
+  a: write by job_f1 at ccfg.c:54 <- f1
+  b: read by job_f1 at ccfg.c:54 <- f1
+  c: write by job_f1 at ccfg.c:56 <- f1
+  d: read by job_f1 at ccfg.c:56 <- f1
+  e: write by job_f1 at ccfg.c:57 <- f1
+  f: read by job_f1 at ccfg.c:49 <- g6 :: ccfg.c:57 <- f1
   lock:
     read by job_f1 at FRAMAC_SHARE/mthread_pthread.c:56 <-
-      pthread_mutex_lock :: ccfg.c:51 <- f1
+      pthread_mutex_lock :: ccfg.c:53 <- f1
     read by job_f1 at FRAMAC_SHARE/mthread_pthread.c:66 <-
-      pthread_mutex_unlock :: ccfg.c:53 <- f1
+      pthread_mutex_unlock :: ccfg.c:55 <- f1
 [mt] * shared variables computed
 [eva:interferences] 
   Interferences from thread job_f1
     concurrent writes:
-      g3(); ccfg.c:52 <- f1
-      g5(& c,& d); ccfg.c:54 <- f1
-      e = g6(& f); ccfg.c:55 <- f1
+      g3(); ccfg.c:54 <- f1
+      g5(& c,& d); ccfg.c:56 <- f1
+      e = g6(& f); ccfg.c:57 <- f1
     shared bases: {global1, global2, a, b, c, d, e, f}
     interferences by location:
-      ccfg.c:52:
-        # cvalue:
-        global1 ∈ {0; 1}
-        global2[0] ∈ {0; 1}
-               [1] ∈ {0; 2}
-        a ∈ [--..--]
-        b ∈ [--..--]
-        c ∈ [--..--]
-        d ∈ [--..--]
-        e ∈ {0; 1}
-        f ∈ {0; 1} 
       ccfg.c:54:
         # cvalue:
         global1 ∈ {0; 1}
@@ -1806,7 +1795,18 @@
         d ∈ [--..--]
         e ∈ {0; 1}
         f ∈ {0; 1} 
-      ccfg.c:55:
+      ccfg.c:56:
+        # cvalue:
+        global1 ∈ {0; 1}
+        global2[0] ∈ {0; 1}
+               [1] ∈ {0; 2}
+        a ∈ [--..--]
+        b ∈ [--..--]
+        c ∈ [--..--]
+        d ∈ [--..--]
+        e ∈ {0; 1}
+        f ∈ {0; 1} 
+      ccfg.c:57:
         # cvalue:
         global1 ∈ {0; 1}
         global2[0] ∈ {0; 1}
@@ -1848,82 +1848,82 @@
 [mt] * threads and mutexes computed
 [mt] ***** Computing shared variables
 [mt] Imprecise locations to watch: global1; global2[0..1]; a; b; c; d; e; f
-[mt] jobs[0] reads  global1 ∈ {0}  // ccfg.c:16 fjob
-[mt] jobs[1] reads  global1 ∈ {0}  // ccfg.c:16 fjob
-[mt] jobs[2] reads  global1 ∈ {0; 1}  // ccfg.c:16 fjob
-[mt] jobs[3] reads  global1 ∈ {0; 1}  // ccfg.c:16 fjob
-[mt] jobs[0] reads  global2[0] ∈ {0}  // ccfg.c:16 fjob
-[mt] jobs[1] reads  global2[0] ∈ {0}  // ccfg.c:16 fjob
-[mt] jobs[2] reads  global2[0] ∈ {0; 1}  // ccfg.c:16 fjob
-[mt] jobs[3] reads  global2[0] ∈ {0; 1}  // ccfg.c:16 fjob
-[mt] jobs[0] reads  global2[1] ∈ {0}  // ccfg.c:16 fjob
-[mt] jobs[1] reads  global2[1] ∈ {0}  // ccfg.c:16 fjob
-[mt] jobs[2] reads  global2[1] ∈ {0; 2}  // ccfg.c:16 fjob
-[mt] jobs[3] reads  global2[1] ∈ {0; 2}  // ccfg.c:16 fjob
-[mt] job_f2 reads  a ∈ [--..--]  // ccfg.c:61 g4 :: ccfg.c:61 <- f2
-[mt] <main> reads  a ∈ [--..--]  // ccfg.c:88 main
-[mt] <main> reads  b ∈ [--..--]  // ccfg.c:89 main
-[mt] job_f1 reads  b ∈ [--..--]  // ccfg.c:52 g3 :: ccfg.c:52 <- f1
-[mt] job_f2 reads  c ∈ [--..--]  // ccfg.c:63 g5 :: ccfg.c:63 <- f2
-[mt] <main> reads  c ∈ [--..--]  // ccfg.c:91 main
-[mt] <main> reads  d ∈ [--..--]  // ccfg.c:92 main
-[mt] job_f1 reads  d ∈ [--..--]  // ccfg.c:54 g5 :: ccfg.c:54 <- f1
-[mt] job_f2 reads  e ∈ {0; 1}  // ccfg.c:47 g6 :: ccfg.c:64 <- f2
-[mt] <main> reads  e ∈ {0; 1}  // ccfg.c:93 main
-[mt] <main> reads  f ∈ {0; 1}  // ccfg.c:94 main
-[mt] job_f1 reads  f ∈ {0; 1}  // ccfg.c:47 g6 :: ccfg.c:55 <- f1
-[mt] <main> writes  global1 ∈ {0; 1}  // ccfg.c:24 g1 :: ccfg.c:77 <- main
-[mt] <main> writes  global2[0] ∈ {0; 1}  // ccfg.c:29 g2 :: ccfg.c:78 <- main
-[mt] <main> writes  global2[1] ∈ {0; 2}  // ccfg.c:31 g2 :: ccfg.c:78 <- main
-[mt] job_f1 writes  a ∈ [--..--]  // ccfg.c:52 g3 :: ccfg.c:52 <- f1
-[mt] job_f2 writes  b ∈ [--..--]  // ccfg.c:61 g4 :: ccfg.c:61 <- f2
-[mt] job_f1 writes  c ∈ [--..--]  // ccfg.c:54 g5 :: ccfg.c:54 <- f1
-[mt] job_f2 writes  d ∈ [--..--]  // ccfg.c:63 g5 :: ccfg.c:63 <- f2
-[mt] job_f1 writes  e ∈ {0; 1}  // ccfg.c:55 f1
-[mt] job_f2 writes  f ∈ {0; 1}  // ccfg.c:64 f2
+[mt] jobs[0] reads  global1 ∈ {0}  // ccfg.c:18 fjob
+[mt] jobs[1] reads  global1 ∈ {0}  // ccfg.c:18 fjob
+[mt] jobs[2] reads  global1 ∈ {0; 1}  // ccfg.c:18 fjob
+[mt] jobs[3] reads  global1 ∈ {0; 1}  // ccfg.c:18 fjob
+[mt] jobs[0] reads  global2[0] ∈ {0}  // ccfg.c:18 fjob
+[mt] jobs[1] reads  global2[0] ∈ {0}  // ccfg.c:18 fjob
+[mt] jobs[2] reads  global2[0] ∈ {0; 1}  // ccfg.c:18 fjob
+[mt] jobs[3] reads  global2[0] ∈ {0; 1}  // ccfg.c:18 fjob
+[mt] jobs[0] reads  global2[1] ∈ {0}  // ccfg.c:18 fjob
+[mt] jobs[1] reads  global2[1] ∈ {0}  // ccfg.c:18 fjob
+[mt] jobs[2] reads  global2[1] ∈ {0; 2}  // ccfg.c:18 fjob
+[mt] jobs[3] reads  global2[1] ∈ {0; 2}  // ccfg.c:18 fjob
+[mt] job_f2 reads  a ∈ [--..--]  // ccfg.c:63 g4 :: ccfg.c:63 <- f2
+[mt] <main> reads  a ∈ [--..--]  // ccfg.c:90 main
+[mt] <main> reads  b ∈ [--..--]  // ccfg.c:91 main
+[mt] job_f1 reads  b ∈ [--..--]  // ccfg.c:54 g3 :: ccfg.c:54 <- f1
+[mt] job_f2 reads  c ∈ [--..--]  // ccfg.c:65 g5 :: ccfg.c:65 <- f2
+[mt] <main> reads  c ∈ [--..--]  // ccfg.c:93 main
+[mt] <main> reads  d ∈ [--..--]  // ccfg.c:94 main
+[mt] job_f1 reads  d ∈ [--..--]  // ccfg.c:56 g5 :: ccfg.c:56 <- f1
+[mt] job_f2 reads  e ∈ {0; 1}  // ccfg.c:49 g6 :: ccfg.c:66 <- f2
+[mt] <main> reads  e ∈ {0; 1}  // ccfg.c:95 main
+[mt] <main> reads  f ∈ {0; 1}  // ccfg.c:96 main
+[mt] job_f1 reads  f ∈ {0; 1}  // ccfg.c:49 g6 :: ccfg.c:57 <- f1
+[mt] <main> writes  global1 ∈ {0; 1}  // ccfg.c:26 g1 :: ccfg.c:79 <- main
+[mt] <main> writes  global2[0] ∈ {0; 1}  // ccfg.c:31 g2 :: ccfg.c:80 <- main
+[mt] <main> writes  global2[1] ∈ {0; 2}  // ccfg.c:33 g2 :: ccfg.c:80 <- main
+[mt] job_f1 writes  a ∈ [--..--]  // ccfg.c:54 g3 :: ccfg.c:54 <- f1
+[mt] job_f2 writes  b ∈ [--..--]  // ccfg.c:63 g4 :: ccfg.c:63 <- f2
+[mt] job_f1 writes  c ∈ [--..--]  // ccfg.c:56 g5 :: ccfg.c:56 <- f1
+[mt] job_f2 writes  d ∈ [--..--]  // ccfg.c:65 g5 :: ccfg.c:65 <- f2
+[mt] job_f1 writes  e ∈ {0; 1}  // ccfg.c:57 f1
+[mt] job_f2 writes  f ∈ {0; 1}  // ccfg.c:66 f2
 [mt] Possible read/write data races:
   f:
-    read by <main> at ccfg.c:94, unprotected
-    read by job_f1 at ccfg.c:47, unprotected
-    write by job_f2 at ccfg.c:64, unprotected
+    read by <main> at ccfg.c:96, unprotected
+    read by job_f1 at ccfg.c:49, unprotected
+    write by job_f2 at ccfg.c:66, unprotected
   e:
-    read by job_f2 at ccfg.c:47, unprotected
-    read by <main> at ccfg.c:93, unprotected
-    write by job_f1 at ccfg.c:55, unprotected
+    read by job_f2 at ccfg.c:49, unprotected
+    read by <main> at ccfg.c:95, unprotected
+    write by job_f1 at ccfg.c:57, unprotected
   d:
-    read by <main> at ccfg.c:92, unprotected
-    read by job_f1 at ccfg.c:54, unprotected
-    write by job_f2 at ccfg.c:63, unprotected
+    read by <main> at ccfg.c:94, unprotected
+    read by job_f1 at ccfg.c:56, unprotected
+    write by job_f2 at ccfg.c:65, unprotected
   c:
-    read by job_f2 at ccfg.c:63, unprotected
-    read by <main> at ccfg.c:91, unprotected
-    write by job_f1 at ccfg.c:54, unprotected
+    read by job_f2 at ccfg.c:65, unprotected
+    read by <main> at ccfg.c:93, unprotected
+    write by job_f1 at ccfg.c:56, unprotected
   b:
-    read by <main> at ccfg.c:89, protected by lock
-    read by job_f1 at ccfg.c:52, protected by lock
-    write by job_f2 at ccfg.c:61, protected by lock
+    read by <main> at ccfg.c:91, protected by lock
+    read by job_f1 at ccfg.c:54, protected by lock
+    write by job_f2 at ccfg.c:63, protected by lock
   a:
-    read by job_f2 at ccfg.c:61, protected by lock
-    read by <main> at ccfg.c:88, protected by lock
-    write by job_f1 at ccfg.c:52, protected by lock
+    read by job_f2 at ccfg.c:63, protected by lock
+    read by <main> at ccfg.c:90, protected by lock
+    write by job_f1 at ccfg.c:54, protected by lock
   global2[1]:
-    read by jobs[0] at ccfg.c:16, unprotected
-    read by jobs[1] at ccfg.c:16, unprotected
-    read by jobs[2] at ccfg.c:16, unprotected
-    read by jobs[3] at ccfg.c:16, unprotected
-    write by <main> at ccfg.c:31, unprotected
+    read by jobs[0] at ccfg.c:18, unprotected
+    read by jobs[1] at ccfg.c:18, unprotected
+    read by jobs[2] at ccfg.c:18, unprotected
+    read by jobs[3] at ccfg.c:18, unprotected
+    write by <main> at ccfg.c:33, unprotected
   global2[0]:
-    read by jobs[0] at ccfg.c:16, unprotected
-    read by jobs[1] at ccfg.c:16, unprotected
-    read by jobs[2] at ccfg.c:16, unprotected
-    read by jobs[3] at ccfg.c:16, unprotected
-    write by <main> at ccfg.c:29, unprotected
+    read by jobs[0] at ccfg.c:18, unprotected
+    read by jobs[1] at ccfg.c:18, unprotected
+    read by jobs[2] at ccfg.c:18, unprotected
+    read by jobs[3] at ccfg.c:18, unprotected
+    write by <main> at ccfg.c:31, unprotected
   global1:
-    read by jobs[0] at ccfg.c:16, unprotected
-    read by jobs[1] at ccfg.c:16, unprotected
-    read by jobs[2] at ccfg.c:16, unprotected
-    read by jobs[3] at ccfg.c:16, unprotected
-    write by <main> at ccfg.c:24, unprotected
+    read by jobs[0] at ccfg.c:18, unprotected
+    read by jobs[1] at ccfg.c:18, unprotected
+    read by jobs[2] at ccfg.c:18, unprotected
+    read by jobs[3] at ccfg.c:18, unprotected
+    write by <main> at ccfg.c:26, unprotected
 [mt] Shared memory: global1; global2[0..1]; a; b; c; d; e; f
 [mt] Write summary for <main>:
   global1 ∈ {0; 1}
@@ -1979,14 +1979,14 @@
     Read by jobs[1], Write by <main>: unprotected
     Read by jobs[0], Write by <main>: unprotected
 [mt] Statements needing manual synchronisation
-  ccfg.c:92 (for d)
-  ccfg.c:91 (for c)
-  ccfg.c:63 (for c)
-  ccfg.c:54 (for d)
-  ccfg.c:47 (for e; f)
-  ccfg.c:94 (for f)
-  ccfg.c:16 (for global1; global2[0..1])
-  ccfg.c:93 (for e)
+  ccfg.c:94 (for d)
+  ccfg.c:93 (for c)
+  ccfg.c:65 (for c)
+  ccfg.c:56 (for d)
+  ccfg.c:49 (for e; f)
+  ccfg.c:96 (for f)
+  ccfg.c:18 (for global1; global2[0..1])
+  ccfg.c:95 (for e)
 [mt] ***** Shared variables computed
 [mt] ******* Analysis performed, 4 iterations
 [mt] ******* Outputting model for html

@@ -8,22 +8,22 @@
 [mt] *** Computing value analysis for main thread
 [eva] Analyzing a complete application starting at main
 [mt] New thread: <main>, fun main
-[mt] philo.c:50: Initializing mutex locks[0]
-[mt] philo.c:50: Initializing mutex locks[1]
-[mt] philo.c:50: Initializing mutex locks[2]
-[mt] philo.c:50: Initializing mutex locks[3]
-[mt] philo.c:50: Initializing mutex locks[4]
-[mt] philo.c:55: New thread: jobs[0], fun job, parent <main>, args {0}
-[mt] philo.c:55: Start thread jobs[0]
-[mt] philo.c:55: New thread: jobs[1], fun job, parent <main>, args {1}
-[mt] philo.c:55: Start thread jobs[1]
-[mt] philo.c:55: New thread: jobs[2], fun job, parent <main>, args {2}
-[mt] philo.c:55: Start thread jobs[2]
-[mt] philo.c:55: New thread: jobs[3], fun job, parent <main>, args {3}
-[mt] philo.c:55: Start thread jobs[3]
-[mt] philo.c:55: New thread: jobs[4], fun job, parent <main>, args {4}
-[mt] philo.c:55: Start thread jobs[4]
-[mt] philo.c:58: 
+[mt] philo.c:51: Initializing mutex locks[0]
+[mt] philo.c:51: Initializing mutex locks[1]
+[mt] philo.c:51: Initializing mutex locks[2]
+[mt] philo.c:51: Initializing mutex locks[3]
+[mt] philo.c:51: Initializing mutex locks[4]
+[mt] philo.c:56: New thread: jobs[0], fun job, parent <main>, args {0}
+[mt] philo.c:56: Start thread jobs[0]
+[mt] philo.c:56: New thread: jobs[1], fun job, parent <main>, args {1}
+[mt] philo.c:56: Start thread jobs[1]
+[mt] philo.c:56: New thread: jobs[2], fun job, parent <main>, args {2}
+[mt] philo.c:56: Start thread jobs[2]
+[mt] philo.c:56: New thread: jobs[3], fun job, parent <main>, args {3}
+[mt] philo.c:56: Start thread jobs[3]
+[mt] philo.c:56: New thread: jobs[4], fun job, parent <main>, args {4}
+[mt] philo.c:56: Start thread jobs[4]
+[mt] philo.c:59: 
   Receiving message on queue, max size 2, stored in &end. No value
   to receive (yet?).
 [mt] *** First value analysis for main thread done.
@@ -33,8 +33,8 @@
 [mt] Globals accessed by thread:
   jobs[0..4]:
     write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
-      pthread_create :: philo.c:55 <- main
-  queue: read by <main> at philo.c:58 <- main
+      pthread_create :: philo.c:56 <- main
+  queue: read by <main> at philo.c:59 <- main
 [mt] * shared variables computed
 [eva:interferences] 
   Interferences from thread <main>
@@ -50,33 +50,33 @@
 [mt] * Computing value analysis for thread jobs[0]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[mt] philo.c:23: Lock locks[4]
-[mt] philo.c:24: Lock locks[1]
-[kernel:annot:missing-spec] philo.c:25: Warning: 
+[mt] philo.c:24: Lock locks[4]
+[mt] philo.c:25: Lock locks[1]
+[kernel:annot:missing-spec] philo.c:26: Warning: 
   Neither code nor specification for function random,
    generating default assigns. See -generated-spec-* options for more info
 [eva] using specification for function random
-[mt] philo.c:29: 
+[mt] philo.c:30: 
   Sending message on queue, content [0] ∈ {1}
                                     [1] ∈ UNINITIALIZED
-[mt] philo.c:31: Release locks[1]
-[mt] philo.c:32: Release locks[4]
+[mt] philo.c:32: Release locks[1]
+[mt] philo.c:33: Release locks[4]
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  end2: write by jobs[0] at philo.c:28 <- aux :: philo.c:41 <- job
+  end2: write by jobs[0] at philo.c:29 <- aux :: philo.c:42 <- job
   locks[1]:
     read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:56 <-
-      pthread_mutex_lock :: philo.c:24 <- aux :: philo.c:41 <- job
+      pthread_mutex_lock :: philo.c:25 <- aux :: philo.c:42 <- job
     read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:66 <-
-      pthread_mutex_unlock :: philo.c:31 <- aux :: philo.c:41 <- job
+      pthread_mutex_unlock :: philo.c:32 <- aux :: philo.c:42 <- job
   locks[4]:
     read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:56 <-
-      pthread_mutex_lock :: philo.c:23 <- aux :: philo.c:41 <- job
+      pthread_mutex_lock :: philo.c:24 <- aux :: philo.c:42 <- job
     read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:66 <-
-      pthread_mutex_unlock :: philo.c:32 <- aux :: philo.c:41 <- job
-  queue: read by jobs[0] at philo.c:29 <- aux :: philo.c:41 <- job
+      pthread_mutex_unlock :: philo.c:33 <- aux :: philo.c:42 <- job
+  queue: read by jobs[0] at philo.c:30 <- aux :: philo.c:42 <- job
 [mt] * shared variables computed
 [eva:interferences] 
   Interferences from thread jobs[0]
@@ -91,25 +91,25 @@
 [mt] * Computing value analysis for thread jobs[1]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[mt] philo.c:23: Lock locks[0]
-[mt] philo.c:24: Lock locks[2]
+[mt] philo.c:24: Lock locks[0]
+[mt] philo.c:25: Lock locks[2]
 [eva] using specification for function random
-[mt] philo.c:31: Release locks[2]
-[mt] philo.c:32: Release locks[0]
+[mt] philo.c:32: Release locks[2]
+[mt] philo.c:33: Release locks[0]
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[0]:
     read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:56 <-
-      pthread_mutex_lock :: philo.c:23 <- aux :: philo.c:41 <- job
+      pthread_mutex_lock :: philo.c:24 <- aux :: philo.c:42 <- job
     read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:66 <-
-      pthread_mutex_unlock :: philo.c:32 <- aux :: philo.c:41 <- job
+      pthread_mutex_unlock :: philo.c:33 <- aux :: philo.c:42 <- job
   locks[2]:
     read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:56 <-
-      pthread_mutex_lock :: philo.c:24 <- aux :: philo.c:41 <- job
+      pthread_mutex_lock :: philo.c:25 <- aux :: philo.c:42 <- job
     read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:66 <-
-      pthread_mutex_unlock :: philo.c:31 <- aux :: philo.c:41 <- job
+      pthread_mutex_unlock :: philo.c:32 <- aux :: philo.c:42 <- job
 [mt] * shared variables computed
 [eva:interferences] 
   Interferences from thread jobs[1]
@@ -124,30 +124,30 @@
 [mt] * Computing value analysis for thread jobs[2]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[mt] philo.c:23: Lock locks[1]
-[mt] philo.c:24: Lock locks[3]
+[mt] philo.c:24: Lock locks[1]
+[mt] philo.c:25: Lock locks[3]
 [eva] using specification for function random
-[mt] philo.c:29: 
+[mt] philo.c:30: 
   Sending message on queue, content [0] ∈ {3}
                                     [1] ∈ UNINITIALIZED
-[mt] philo.c:31: Release locks[3]
-[mt] philo.c:32: Release locks[1]
+[mt] philo.c:32: Release locks[3]
+[mt] philo.c:33: Release locks[1]
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  end2: write by jobs[2] at philo.c:28 <- aux :: philo.c:41 <- job
+  end2: write by jobs[2] at philo.c:29 <- aux :: philo.c:42 <- job
   locks[1]:
     read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:56 <-
-      pthread_mutex_lock :: philo.c:23 <- aux :: philo.c:41 <- job
+      pthread_mutex_lock :: philo.c:24 <- aux :: philo.c:42 <- job
     read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:66 <-
-      pthread_mutex_unlock :: philo.c:32 <- aux :: philo.c:41 <- job
+      pthread_mutex_unlock :: philo.c:33 <- aux :: philo.c:42 <- job
   locks[3]:
     read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:56 <-
-      pthread_mutex_lock :: philo.c:24 <- aux :: philo.c:41 <- job
+      pthread_mutex_lock :: philo.c:25 <- aux :: philo.c:42 <- job
     read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:66 <-
-      pthread_mutex_unlock :: philo.c:31 <- aux :: philo.c:41 <- job
-  queue: read by jobs[2] at philo.c:29 <- aux :: philo.c:41 <- job
+      pthread_mutex_unlock :: philo.c:32 <- aux :: philo.c:42 <- job
+  queue: read by jobs[2] at philo.c:30 <- aux :: philo.c:42 <- job
 [mt] * shared variables computed
 [eva:interferences] 
   Interferences from thread jobs[2]
@@ -162,30 +162,30 @@
 [mt] * Computing value analysis for thread jobs[3]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[mt] philo.c:23: Lock locks[2]
-[mt] philo.c:24: Lock locks[4]
+[mt] philo.c:24: Lock locks[2]
+[mt] philo.c:25: Lock locks[4]
 [eva] using specification for function random
-[mt] philo.c:29: 
+[mt] philo.c:30: 
   Sending message on queue, content [0] ∈ {4}
                                     [1] ∈ UNINITIALIZED
-[mt] philo.c:31: Release locks[4]
-[mt] philo.c:32: Release locks[2]
+[mt] philo.c:32: Release locks[4]
+[mt] philo.c:33: Release locks[2]
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  end2: write by jobs[3] at philo.c:28 <- aux :: philo.c:41 <- job
+  end2: write by jobs[3] at philo.c:29 <- aux :: philo.c:42 <- job
   locks[2]:
     read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:56 <-
-      pthread_mutex_lock :: philo.c:23 <- aux :: philo.c:41 <- job
+      pthread_mutex_lock :: philo.c:24 <- aux :: philo.c:42 <- job
     read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:66 <-
-      pthread_mutex_unlock :: philo.c:32 <- aux :: philo.c:41 <- job
+      pthread_mutex_unlock :: philo.c:33 <- aux :: philo.c:42 <- job
   locks[4]:
     read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:56 <-
-      pthread_mutex_lock :: philo.c:24 <- aux :: philo.c:41 <- job
+      pthread_mutex_lock :: philo.c:25 <- aux :: philo.c:42 <- job
     read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:66 <-
-      pthread_mutex_unlock :: philo.c:31 <- aux :: philo.c:41 <- job
-  queue: read by jobs[3] at philo.c:29 <- aux :: philo.c:41 <- job
+      pthread_mutex_unlock :: philo.c:32 <- aux :: philo.c:42 <- job
+  queue: read by jobs[3] at philo.c:30 <- aux :: philo.c:42 <- job
 [mt] * shared variables computed
 [eva:interferences] 
   Interferences from thread jobs[3]
@@ -200,30 +200,30 @@
 [mt] * Computing value analysis for thread jobs[4]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[mt] philo.c:23: Lock locks[3]
-[mt] philo.c:24: Lock locks[0]
+[mt] philo.c:24: Lock locks[3]
+[mt] philo.c:25: Lock locks[0]
 [eva] using specification for function random
-[mt] philo.c:29: 
+[mt] philo.c:30: 
   Sending message on queue, content [0] ∈ {5}
                                     [1] ∈ UNINITIALIZED
-[mt] philo.c:31: Release locks[0]
-[mt] philo.c:32: Release locks[3]
+[mt] philo.c:32: Release locks[0]
+[mt] philo.c:33: Release locks[3]
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  end2: write by jobs[4] at philo.c:28 <- aux :: philo.c:41 <- job
+  end2: write by jobs[4] at philo.c:29 <- aux :: philo.c:42 <- job
   locks[0]:
     read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:56 <-
-      pthread_mutex_lock :: philo.c:24 <- aux :: philo.c:41 <- job
+      pthread_mutex_lock :: philo.c:25 <- aux :: philo.c:42 <- job
     read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:66 <-
-      pthread_mutex_unlock :: philo.c:31 <- aux :: philo.c:41 <- job
+      pthread_mutex_unlock :: philo.c:32 <- aux :: philo.c:42 <- job
   locks[3]:
     read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:56 <-
-      pthread_mutex_lock :: philo.c:23 <- aux :: philo.c:41 <- job
+      pthread_mutex_lock :: philo.c:24 <- aux :: philo.c:42 <- job
     read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:66 <-
-      pthread_mutex_unlock :: philo.c:32 <- aux :: philo.c:41 <- job
-  queue: read by jobs[4] at philo.c:29 <- aux :: philo.c:41 <- job
+      pthread_mutex_unlock :: philo.c:33 <- aux :: philo.c:42 <- job
+  queue: read by jobs[4] at philo.c:30 <- aux :: philo.c:42 <- job
 [mt] * shared variables computed
 [eva:interferences] 
   Interferences from thread jobs[4]
@@ -251,22 +251,22 @@
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
 [mt] Thread <main>, fun main
-[mt] philo.c:50: Initializing mutex locks[0]
-[mt] philo.c:50: Initializing mutex locks[1]
-[mt] philo.c:50: Initializing mutex locks[2]
-[mt] philo.c:50: Initializing mutex locks[3]
-[mt] philo.c:50: Initializing mutex locks[4]
-[mt] philo.c:55: Thread jobs[0], fun job, parent <main>, args {0}
-[mt] philo.c:55: Start thread jobs[0]
-[mt] philo.c:55: Thread jobs[1], fun job, parent <main>, args {1}
-[mt] philo.c:55: Start thread jobs[1]
-[mt] philo.c:55: Thread jobs[2], fun job, parent <main>, args {2}
-[mt] philo.c:55: Start thread jobs[2]
-[mt] philo.c:55: Thread jobs[3], fun job, parent <main>, args {3}
-[mt] philo.c:55: Start thread jobs[3]
-[mt] philo.c:55: Thread jobs[4], fun job, parent <main>, args {4}
-[mt] philo.c:55: Start thread jobs[4]
-[mt] philo.c:58: 
+[mt] philo.c:51: Initializing mutex locks[0]
+[mt] philo.c:51: Initializing mutex locks[1]
+[mt] philo.c:51: Initializing mutex locks[2]
+[mt] philo.c:51: Initializing mutex locks[3]
+[mt] philo.c:51: Initializing mutex locks[4]
+[mt] philo.c:56: Thread jobs[0], fun job, parent <main>, args {0}
+[mt] philo.c:56: Start thread jobs[0]
+[mt] philo.c:56: Thread jobs[1], fun job, parent <main>, args {1}
+[mt] philo.c:56: Start thread jobs[1]
+[mt] philo.c:56: Thread jobs[2], fun job, parent <main>, args {2}
+[mt] philo.c:56: Start thread jobs[2]
+[mt] philo.c:56: Thread jobs[3], fun job, parent <main>, args {3}
+[mt] philo.c:56: Start thread jobs[3]
+[mt] philo.c:56: Thread jobs[4], fun job, parent <main>, args {4}
+[mt] philo.c:56: Start thread jobs[4]
+[mt] philo.c:59: 
   Receiving message on queue, max size 2, stored in &end. Possible  values:
   From thread jobs[0]: [0] ∈ {1}
                        [1] ∈ UNINITIALIZED
@@ -280,11 +280,11 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  end2: read by <main> at philo.c:57 <- main
+  end2: read by <main> at philo.c:58 <- main
   jobs[0..4]:
     write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
-      pthread_create :: philo.c:55 <- main
-  queue: read by <main> at philo.c:58 <- main
+      pthread_create :: philo.c:56 <- main
+  queue: read by <main> at philo.c:59 <- main
 [mt] * shared variables computed
 [eva:interferences] 
   Interferences from thread <main>
@@ -316,22 +316,22 @@
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
 [mt] Thread <main>, fun main
-[mt] philo.c:50: Initializing mutex locks[0]
-[mt] philo.c:50: Initializing mutex locks[1]
-[mt] philo.c:50: Initializing mutex locks[2]
-[mt] philo.c:50: Initializing mutex locks[3]
-[mt] philo.c:50: Initializing mutex locks[4]
-[mt] philo.c:55: Thread jobs[0], fun job, parent <main>, args {0}
-[mt] philo.c:55: Start thread jobs[0]
-[mt] philo.c:55: Thread jobs[1], fun job, parent <main>, args {1}
-[mt] philo.c:55: Start thread jobs[1]
-[mt] philo.c:55: Thread jobs[2], fun job, parent <main>, args {2}
-[mt] philo.c:55: Start thread jobs[2]
-[mt] philo.c:55: Thread jobs[3], fun job, parent <main>, args {3}
-[mt] philo.c:55: Start thread jobs[3]
-[mt] philo.c:55: Thread jobs[4], fun job, parent <main>, args {4}
-[mt] philo.c:55: Start thread jobs[4]
-[mt] philo.c:58: 
+[mt] philo.c:51: Initializing mutex locks[0]
+[mt] philo.c:51: Initializing mutex locks[1]
+[mt] philo.c:51: Initializing mutex locks[2]
+[mt] philo.c:51: Initializing mutex locks[3]
+[mt] philo.c:51: Initializing mutex locks[4]
+[mt] philo.c:56: Thread jobs[0], fun job, parent <main>, args {0}
+[mt] philo.c:56: Start thread jobs[0]
+[mt] philo.c:56: Thread jobs[1], fun job, parent <main>, args {1}
+[mt] philo.c:56: Start thread jobs[1]
+[mt] philo.c:56: Thread jobs[2], fun job, parent <main>, args {2}
+[mt] philo.c:56: Start thread jobs[2]
+[mt] philo.c:56: Thread jobs[3], fun job, parent <main>, args {3}
+[mt] philo.c:56: Start thread jobs[3]
+[mt] philo.c:56: Thread jobs[4], fun job, parent <main>, args {4}
+[mt] philo.c:56: Start thread jobs[4]
+[mt] philo.c:59: 
   Receiving message on queue, max size 2, stored in &end. Possible  values:
   From thread jobs[0]: [0] ∈ {1}
                        [1] ∈ UNINITIALIZED
@@ -345,11 +345,11 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  end2: read by <main> at philo.c:57 <- main
+  end2: read by <main> at philo.c:58 <- main
   jobs[0..4]:
     write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
-      pthread_create :: philo.c:55 <- main
-  queue: read by <main> at philo.c:58 <- main
+      pthread_create :: philo.c:56 <- main
+  queue: read by <main> at philo.c:59 <- main
 [mt] * shared variables computed
 [eva:interferences] 
   Interferences from thread <main>
@@ -365,39 +365,39 @@
 [mt] * Computing value analysis for thread jobs[0]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[mt] philo.c:23: Lock locks[4]
-[mt] philo.c:24: Lock locks[1]
+[mt] philo.c:24: Lock locks[4]
+[mt] philo.c:25: Lock locks[1]
 [eva] using specification for function random
-[eva:interferences] philo.c:28: inject threads interferences at this point
-[mt] philo.c:29: 
+[eva:interferences] philo.c:29: inject threads interferences at this point
+[mt] philo.c:30: 
   Sending message on queue, content [0] ∈ {1}
                                     [1] ∈ UNINITIALIZED
-[mt] philo.c:31: Release locks[1]
-[mt] philo.c:32: Release locks[4]
+[mt] philo.c:32: Release locks[1]
+[mt] philo.c:33: Release locks[4]
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  end2: write by jobs[0] at philo.c:28 <- aux :: philo.c:41 <- job
+  end2: write by jobs[0] at philo.c:29 <- aux :: philo.c:42 <- job
   locks[1]:
     read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:56 <-
-      pthread_mutex_lock :: philo.c:24 <- aux :: philo.c:41 <- job
+      pthread_mutex_lock :: philo.c:25 <- aux :: philo.c:42 <- job
     read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:66 <-
-      pthread_mutex_unlock :: philo.c:31 <- aux :: philo.c:41 <- job
+      pthread_mutex_unlock :: philo.c:32 <- aux :: philo.c:42 <- job
   locks[4]:
     read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:56 <-
-      pthread_mutex_lock :: philo.c:23 <- aux :: philo.c:41 <- job
+      pthread_mutex_lock :: philo.c:24 <- aux :: philo.c:42 <- job
     read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:66 <-
-      pthread_mutex_unlock :: philo.c:32 <- aux :: philo.c:41 <- job
-  queue: read by jobs[0] at philo.c:29 <- aux :: philo.c:41 <- job
+      pthread_mutex_unlock :: philo.c:33 <- aux :: philo.c:42 <- job
+  queue: read by jobs[0] at philo.c:30 <- aux :: philo.c:42 <- job
 [mt] * shared variables computed
 [eva:interferences] 
   Interferences from thread jobs[0]
     concurrent writes:
-      end2 = 1; philo.c:28 <- aux :: philo.c:41 <- job
+      end2 = 1; philo.c:29 <- aux :: philo.c:42 <- job
     shared bases: {end2}
     interferences by location:
-      philo.c:28:
+      philo.c:29:
         # cvalue: end2 ∈ {1} 
     interferences by mutexes:
       { locks[1]; locks[4] }:
@@ -410,25 +410,25 @@
 [mt] * Computing value analysis for thread jobs[1]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[mt] philo.c:23: Lock locks[0]
-[mt] philo.c:24: Lock locks[2]
+[mt] philo.c:24: Lock locks[0]
+[mt] philo.c:25: Lock locks[2]
 [eva] using specification for function random
-[mt] philo.c:31: Release locks[2]
-[mt] philo.c:32: Release locks[0]
+[mt] philo.c:32: Release locks[2]
+[mt] philo.c:33: Release locks[0]
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[0]:
     read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:56 <-
-      pthread_mutex_lock :: philo.c:23 <- aux :: philo.c:41 <- job
+      pthread_mutex_lock :: philo.c:24 <- aux :: philo.c:42 <- job
     read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:66 <-
-      pthread_mutex_unlock :: philo.c:32 <- aux :: philo.c:41 <- job
+      pthread_mutex_unlock :: philo.c:33 <- aux :: philo.c:42 <- job
   locks[2]:
     read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:56 <-
-      pthread_mutex_lock :: philo.c:24 <- aux :: philo.c:41 <- job
+      pthread_mutex_lock :: philo.c:25 <- aux :: philo.c:42 <- job
     read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:66 <-
-      pthread_mutex_unlock :: philo.c:31 <- aux :: philo.c:41 <- job
+      pthread_mutex_unlock :: philo.c:32 <- aux :: philo.c:42 <- job
 [mt] * shared variables computed
 [eva:interferences] 
   Interferences from thread jobs[1]
@@ -444,39 +444,39 @@
 [mt] * Computing value analysis for thread jobs[2]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[mt] philo.c:23: Lock locks[1]
-[mt] philo.c:24: Lock locks[3]
+[mt] philo.c:24: Lock locks[1]
+[mt] philo.c:25: Lock locks[3]
 [eva] using specification for function random
-[eva:interferences] philo.c:28: inject threads interferences at this point
-[mt] philo.c:29: 
+[eva:interferences] philo.c:29: inject threads interferences at this point
+[mt] philo.c:30: 
   Sending message on queue, content [0] ∈ {3}
                                     [1] ∈ UNINITIALIZED
-[mt] philo.c:31: Release locks[3]
-[mt] philo.c:32: Release locks[1]
+[mt] philo.c:32: Release locks[3]
+[mt] philo.c:33: Release locks[1]
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  end2: write by jobs[2] at philo.c:28 <- aux :: philo.c:41 <- job
+  end2: write by jobs[2] at philo.c:29 <- aux :: philo.c:42 <- job
   locks[1]:
     read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:56 <-
-      pthread_mutex_lock :: philo.c:23 <- aux :: philo.c:41 <- job
+      pthread_mutex_lock :: philo.c:24 <- aux :: philo.c:42 <- job
     read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:66 <-
-      pthread_mutex_unlock :: philo.c:32 <- aux :: philo.c:41 <- job
+      pthread_mutex_unlock :: philo.c:33 <- aux :: philo.c:42 <- job
   locks[3]:
     read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:56 <-
-      pthread_mutex_lock :: philo.c:24 <- aux :: philo.c:41 <- job
+      pthread_mutex_lock :: philo.c:25 <- aux :: philo.c:42 <- job
     read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:66 <-
-      pthread_mutex_unlock :: philo.c:31 <- aux :: philo.c:41 <- job
-  queue: read by jobs[2] at philo.c:29 <- aux :: philo.c:41 <- job
+      pthread_mutex_unlock :: philo.c:32 <- aux :: philo.c:42 <- job
+  queue: read by jobs[2] at philo.c:30 <- aux :: philo.c:42 <- job
 [mt] * shared variables computed
 [eva:interferences] 
   Interferences from thread jobs[2]
     concurrent writes:
-      end2 = 1; philo.c:28 <- aux :: philo.c:41 <- job
+      end2 = 1; philo.c:29 <- aux :: philo.c:42 <- job
     shared bases: {end2}
     interferences by location:
-      philo.c:28:
+      philo.c:29:
         # cvalue: end2 ∈ {1} 
     interferences by mutexes:
       { locks[1]; locks[3] }:
@@ -489,39 +489,39 @@
 [mt] * Computing value analysis for thread jobs[3]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[mt] philo.c:23: Lock locks[2]
-[mt] philo.c:24: Lock locks[4]
+[mt] philo.c:24: Lock locks[2]
+[mt] philo.c:25: Lock locks[4]
 [eva] using specification for function random
-[eva:interferences] philo.c:28: inject threads interferences at this point
-[mt] philo.c:29: 
+[eva:interferences] philo.c:29: inject threads interferences at this point
+[mt] philo.c:30: 
   Sending message on queue, content [0] ∈ {4}
                                     [1] ∈ UNINITIALIZED
-[mt] philo.c:31: Release locks[4]
-[mt] philo.c:32: Release locks[2]
+[mt] philo.c:32: Release locks[4]
+[mt] philo.c:33: Release locks[2]
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  end2: write by jobs[3] at philo.c:28 <- aux :: philo.c:41 <- job
+  end2: write by jobs[3] at philo.c:29 <- aux :: philo.c:42 <- job
   locks[2]:
     read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:56 <-
-      pthread_mutex_lock :: philo.c:23 <- aux :: philo.c:41 <- job
+      pthread_mutex_lock :: philo.c:24 <- aux :: philo.c:42 <- job
     read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:66 <-
-      pthread_mutex_unlock :: philo.c:32 <- aux :: philo.c:41 <- job
+      pthread_mutex_unlock :: philo.c:33 <- aux :: philo.c:42 <- job
   locks[4]:
     read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:56 <-
-      pthread_mutex_lock :: philo.c:24 <- aux :: philo.c:41 <- job
+      pthread_mutex_lock :: philo.c:25 <- aux :: philo.c:42 <- job
     read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:66 <-
-      pthread_mutex_unlock :: philo.c:31 <- aux :: philo.c:41 <- job
-  queue: read by jobs[3] at philo.c:29 <- aux :: philo.c:41 <- job
+      pthread_mutex_unlock :: philo.c:32 <- aux :: philo.c:42 <- job
+  queue: read by jobs[3] at philo.c:30 <- aux :: philo.c:42 <- job
 [mt] * shared variables computed
 [eva:interferences] 
   Interferences from thread jobs[3]
     concurrent writes:
-      end2 = 1; philo.c:28 <- aux :: philo.c:41 <- job
+      end2 = 1; philo.c:29 <- aux :: philo.c:42 <- job
     shared bases: {end2}
     interferences by location:
-      philo.c:28:
+      philo.c:29:
         # cvalue: end2 ∈ {1} 
     interferences by mutexes:
       { locks[2]; locks[4] }:
@@ -534,39 +534,39 @@
 [mt] * Computing value analysis for thread jobs[4]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[mt] philo.c:23: Lock locks[3]
-[mt] philo.c:24: Lock locks[0]
+[mt] philo.c:24: Lock locks[3]
+[mt] philo.c:25: Lock locks[0]
 [eva] using specification for function random
-[eva:interferences] philo.c:28: inject threads interferences at this point
-[mt] philo.c:29: 
+[eva:interferences] philo.c:29: inject threads interferences at this point
+[mt] philo.c:30: 
   Sending message on queue, content [0] ∈ {5}
                                     [1] ∈ UNINITIALIZED
-[mt] philo.c:31: Release locks[0]
-[mt] philo.c:32: Release locks[3]
+[mt] philo.c:32: Release locks[0]
+[mt] philo.c:33: Release locks[3]
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  end2: write by jobs[4] at philo.c:28 <- aux :: philo.c:41 <- job
+  end2: write by jobs[4] at philo.c:29 <- aux :: philo.c:42 <- job
   locks[0]:
     read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:56 <-
-      pthread_mutex_lock :: philo.c:24 <- aux :: philo.c:41 <- job
+      pthread_mutex_lock :: philo.c:25 <- aux :: philo.c:42 <- job
     read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:66 <-
-      pthread_mutex_unlock :: philo.c:31 <- aux :: philo.c:41 <- job
+      pthread_mutex_unlock :: philo.c:32 <- aux :: philo.c:42 <- job
   locks[3]:
     read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:56 <-
-      pthread_mutex_lock :: philo.c:23 <- aux :: philo.c:41 <- job
+      pthread_mutex_lock :: philo.c:24 <- aux :: philo.c:42 <- job
     read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:66 <-
-      pthread_mutex_unlock :: philo.c:32 <- aux :: philo.c:41 <- job
-  queue: read by jobs[4] at philo.c:29 <- aux :: philo.c:41 <- job
+      pthread_mutex_unlock :: philo.c:33 <- aux :: philo.c:42 <- job
+  queue: read by jobs[4] at philo.c:30 <- aux :: philo.c:42 <- job
 [mt] * shared variables computed
 [eva:interferences] 
   Interferences from thread jobs[4]
     concurrent writes:
-      end2 = 1; philo.c:28 <- aux :: philo.c:41 <- job
+      end2 = 1; philo.c:29 <- aux :: philo.c:42 <- job
     shared bases: {end2}
     interferences by location:
-      philo.c:28:
+      philo.c:29:
         # cvalue: end2 ∈ {1} 
     interferences by mutexes:
       { locks[0]; locks[3] }:
@@ -579,18 +579,18 @@
 [mt] * threads and mutexes computed
 [mt] ***** Computing shared variables
 [mt] Imprecise locations to watch: end2
-[mt] <main> reads  end2 ∈ {0}  // philo.c:57 main
-[mt] jobs[0] writes  end2 ∈ {1}  // philo.c:28 aux :: philo.c:41 <- job
-[mt] jobs[2] writes  end2 ∈ {1}  // philo.c:28 aux :: philo.c:41 <- job
-[mt] jobs[3] writes  end2 ∈ {1}  // philo.c:28 aux :: philo.c:41 <- job
-[mt] jobs[4] writes  end2 ∈ {1}  // philo.c:28 aux :: philo.c:41 <- job
+[mt] <main> reads  end2 ∈ {0}  // philo.c:58 main
+[mt] jobs[0] writes  end2 ∈ {1}  // philo.c:29 aux :: philo.c:42 <- job
+[mt] jobs[2] writes  end2 ∈ {1}  // philo.c:29 aux :: philo.c:42 <- job
+[mt] jobs[3] writes  end2 ∈ {1}  // philo.c:29 aux :: philo.c:42 <- job
+[mt] jobs[4] writes  end2 ∈ {1}  // philo.c:29 aux :: philo.c:42 <- job
 [mt] Possible read/write data races:
   end2:
-    read by <main> at philo.c:57, unprotected
-    write by jobs[0] at philo.c:28, protected by locks[1] locks[4]
-    write by jobs[2] at philo.c:28, protected by locks[1] locks[3]
-    write by jobs[3] at philo.c:28, protected by locks[2] locks[4]
-    write by jobs[4] at philo.c:28, protected by locks[0] locks[3]
+    read by <main> at philo.c:58, unprotected
+    write by jobs[0] at philo.c:29, protected by locks[1] locks[4]
+    write by jobs[2] at philo.c:29, protected by locks[1] locks[3]
+    write by jobs[3] at philo.c:29, protected by locks[2] locks[4]
+    write by jobs[4] at philo.c:29, protected by locks[0] locks[3]
 [mt] Shared memory: end2
 [mt] Concurrent precise var accesses have changed: before
     \nothing
@@ -617,26 +617,26 @@
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
 [mt] Thread <main>, fun main
-[mt] philo.c:50: Initializing mutex locks[0]
-[mt] philo.c:50: Initializing mutex locks[1]
-[mt] philo.c:50: Initializing mutex locks[2]
-[mt] philo.c:50: Initializing mutex locks[3]
-[mt] philo.c:50: Initializing mutex locks[4]
-[mt] philo.c:55: Thread jobs[0], fun job, parent <main>, args {0}
-[mt] philo.c:55: Start thread jobs[0]
-[mt] philo.c:55: Thread jobs[1], fun job, parent <main>, args {1}
-[mt] philo.c:55: Start thread jobs[1]
-[mt] philo.c:55: New context for jobs[1], fun job, parent <main>, args {1}
-[mt] philo.c:55: Thread jobs[2], fun job, parent <main>, args {2}
-[mt] philo.c:55: Start thread jobs[2]
-[mt] philo.c:55: New context for jobs[2], fun job, parent <main>, args {2}
-[mt] philo.c:55: Thread jobs[3], fun job, parent <main>, args {3}
-[mt] philo.c:55: Start thread jobs[3]
-[mt] philo.c:55: New context for jobs[3], fun job, parent <main>, args {3}
-[mt] philo.c:55: Thread jobs[4], fun job, parent <main>, args {4}
-[mt] philo.c:55: Start thread jobs[4]
-[mt] philo.c:55: New context for jobs[4], fun job, parent <main>, args {4}
-[mt] philo.c:58: 
+[mt] philo.c:51: Initializing mutex locks[0]
+[mt] philo.c:51: Initializing mutex locks[1]
+[mt] philo.c:51: Initializing mutex locks[2]
+[mt] philo.c:51: Initializing mutex locks[3]
+[mt] philo.c:51: Initializing mutex locks[4]
+[mt] philo.c:56: Thread jobs[0], fun job, parent <main>, args {0}
+[mt] philo.c:56: Start thread jobs[0]
+[mt] philo.c:56: Thread jobs[1], fun job, parent <main>, args {1}
+[mt] philo.c:56: Start thread jobs[1]
+[mt] philo.c:56: New context for jobs[1], fun job, parent <main>, args {1}
+[mt] philo.c:56: Thread jobs[2], fun job, parent <main>, args {2}
+[mt] philo.c:56: Start thread jobs[2]
+[mt] philo.c:56: New context for jobs[2], fun job, parent <main>, args {2}
+[mt] philo.c:56: Thread jobs[3], fun job, parent <main>, args {3}
+[mt] philo.c:56: Start thread jobs[3]
+[mt] philo.c:56: New context for jobs[3], fun job, parent <main>, args {3}
+[mt] philo.c:56: Thread jobs[4], fun job, parent <main>, args {4}
+[mt] philo.c:56: Start thread jobs[4]
+[mt] philo.c:56: New context for jobs[4], fun job, parent <main>, args {4}
+[mt] philo.c:59: 
   Receiving message on queue, max size 2, stored in &end. Possible  values:
   From thread jobs[0]: [0] ∈ {1}
                        [1] ∈ UNINITIALIZED
@@ -646,16 +646,16 @@
                        [1] ∈ UNINITIALIZED
   From thread jobs[4]: [0] ∈ {5}
                        [1] ∈ UNINITIALIZED
-[eva:interferences] philo.c:57: inject threads interferences at this point
+[eva:interferences] philo.c:58: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  end2: read by <main> at philo.c:57 <- main
+  end2: read by <main> at philo.c:58 <- main
   jobs[0..4]:
     write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
-      pthread_create :: philo.c:55 <- main
-  queue: read by <main> at philo.c:58 <- main
+      pthread_create :: philo.c:56 <- main
+  queue: read by <main> at philo.c:59 <- main
 [mt] * shared variables computed
 [eva:interferences] 
   Interferences from thread <main>
@@ -670,39 +670,39 @@
 [mt] * Computing value analysis for thread jobs[0]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[mt] philo.c:23: Lock locks[4]
-[mt] philo.c:24: Lock locks[1]
+[mt] philo.c:24: Lock locks[4]
+[mt] philo.c:25: Lock locks[1]
 [eva] using specification for function random
-[eva:interferences] philo.c:28: inject threads interferences at this point
-[mt] philo.c:29: 
+[eva:interferences] philo.c:29: inject threads interferences at this point
+[mt] philo.c:30: 
   Sending message on queue, content [0] ∈ {1}
                                     [1] ∈ UNINITIALIZED
-[mt] philo.c:31: Release locks[1]
-[mt] philo.c:32: Release locks[4]
+[mt] philo.c:32: Release locks[1]
+[mt] philo.c:33: Release locks[4]
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  end2: write by jobs[0] at philo.c:28 <- aux :: philo.c:41 <- job
+  end2: write by jobs[0] at philo.c:29 <- aux :: philo.c:42 <- job
   locks[1]:
     read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:56 <-
-      pthread_mutex_lock :: philo.c:24 <- aux :: philo.c:41 <- job
+      pthread_mutex_lock :: philo.c:25 <- aux :: philo.c:42 <- job
     read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:66 <-
-      pthread_mutex_unlock :: philo.c:31 <- aux :: philo.c:41 <- job
+      pthread_mutex_unlock :: philo.c:32 <- aux :: philo.c:42 <- job
   locks[4]:
     read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:56 <-
-      pthread_mutex_lock :: philo.c:23 <- aux :: philo.c:41 <- job
+      pthread_mutex_lock :: philo.c:24 <- aux :: philo.c:42 <- job
     read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:66 <-
-      pthread_mutex_unlock :: philo.c:32 <- aux :: philo.c:41 <- job
-  queue: read by jobs[0] at philo.c:29 <- aux :: philo.c:41 <- job
+      pthread_mutex_unlock :: philo.c:33 <- aux :: philo.c:42 <- job
+  queue: read by jobs[0] at philo.c:30 <- aux :: philo.c:42 <- job
 [mt] * shared variables computed
 [eva:interferences] 
   Interferences from thread jobs[0]
     concurrent writes:
-      end2 = 1; philo.c:28 <- aux :: philo.c:41 <- job
+      end2 = 1; philo.c:29 <- aux :: philo.c:42 <- job
     shared bases: {end2}
     interferences by location:
-      philo.c:28:
+      philo.c:29:
         # cvalue: end2 ∈ {1} 
     interferences by mutexes:
       { locks[1]; locks[4] }:
@@ -715,25 +715,25 @@
 [mt] * Computing value analysis for thread jobs[1]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[mt] philo.c:23: Lock locks[0]
-[mt] philo.c:24: Lock locks[2]
+[mt] philo.c:24: Lock locks[0]
+[mt] philo.c:25: Lock locks[2]
 [eva] using specification for function random
-[mt] philo.c:31: Release locks[2]
-[mt] philo.c:32: Release locks[0]
+[mt] philo.c:32: Release locks[2]
+[mt] philo.c:33: Release locks[0]
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[0]:
     read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:56 <-
-      pthread_mutex_lock :: philo.c:23 <- aux :: philo.c:41 <- job
+      pthread_mutex_lock :: philo.c:24 <- aux :: philo.c:42 <- job
     read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:66 <-
-      pthread_mutex_unlock :: philo.c:32 <- aux :: philo.c:41 <- job
+      pthread_mutex_unlock :: philo.c:33 <- aux :: philo.c:42 <- job
   locks[2]:
     read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:56 <-
-      pthread_mutex_lock :: philo.c:24 <- aux :: philo.c:41 <- job
+      pthread_mutex_lock :: philo.c:25 <- aux :: philo.c:42 <- job
     read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:66 <-
-      pthread_mutex_unlock :: philo.c:31 <- aux :: philo.c:41 <- job
+      pthread_mutex_unlock :: philo.c:32 <- aux :: philo.c:42 <- job
 [mt] * shared variables computed
 [eva:interferences] 
   Interferences from thread jobs[1]
@@ -749,39 +749,39 @@
 [mt] * Computing value analysis for thread jobs[2]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[mt] philo.c:23: Lock locks[1]
-[mt] philo.c:24: Lock locks[3]
+[mt] philo.c:24: Lock locks[1]
+[mt] philo.c:25: Lock locks[3]
 [eva] using specification for function random
-[eva:interferences] philo.c:28: inject threads interferences at this point
-[mt] philo.c:29: 
+[eva:interferences] philo.c:29: inject threads interferences at this point
+[mt] philo.c:30: 
   Sending message on queue, content [0] ∈ {3}
                                     [1] ∈ UNINITIALIZED
-[mt] philo.c:31: Release locks[3]
-[mt] philo.c:32: Release locks[1]
+[mt] philo.c:32: Release locks[3]
+[mt] philo.c:33: Release locks[1]
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  end2: write by jobs[2] at philo.c:28 <- aux :: philo.c:41 <- job
+  end2: write by jobs[2] at philo.c:29 <- aux :: philo.c:42 <- job
   locks[1]:
     read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:56 <-
-      pthread_mutex_lock :: philo.c:23 <- aux :: philo.c:41 <- job
+      pthread_mutex_lock :: philo.c:24 <- aux :: philo.c:42 <- job
     read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:66 <-
-      pthread_mutex_unlock :: philo.c:32 <- aux :: philo.c:41 <- job
+      pthread_mutex_unlock :: philo.c:33 <- aux :: philo.c:42 <- job
   locks[3]:
     read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:56 <-
-      pthread_mutex_lock :: philo.c:24 <- aux :: philo.c:41 <- job
+      pthread_mutex_lock :: philo.c:25 <- aux :: philo.c:42 <- job
     read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:66 <-
-      pthread_mutex_unlock :: philo.c:31 <- aux :: philo.c:41 <- job
-  queue: read by jobs[2] at philo.c:29 <- aux :: philo.c:41 <- job
+      pthread_mutex_unlock :: philo.c:32 <- aux :: philo.c:42 <- job
+  queue: read by jobs[2] at philo.c:30 <- aux :: philo.c:42 <- job
 [mt] * shared variables computed
 [eva:interferences] 
   Interferences from thread jobs[2]
     concurrent writes:
-      end2 = 1; philo.c:28 <- aux :: philo.c:41 <- job
+      end2 = 1; philo.c:29 <- aux :: philo.c:42 <- job
     shared bases: {end2}
     interferences by location:
-      philo.c:28:
+      philo.c:29:
         # cvalue: end2 ∈ {1} 
     interferences by mutexes:
       { locks[1]; locks[3] }:
@@ -794,39 +794,39 @@
 [mt] * Computing value analysis for thread jobs[3]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[mt] philo.c:23: Lock locks[2]
-[mt] philo.c:24: Lock locks[4]
+[mt] philo.c:24: Lock locks[2]
+[mt] philo.c:25: Lock locks[4]
 [eva] using specification for function random
-[eva:interferences] philo.c:28: inject threads interferences at this point
-[mt] philo.c:29: 
+[eva:interferences] philo.c:29: inject threads interferences at this point
+[mt] philo.c:30: 
   Sending message on queue, content [0] ∈ {4}
                                     [1] ∈ UNINITIALIZED
-[mt] philo.c:31: Release locks[4]
-[mt] philo.c:32: Release locks[2]
+[mt] philo.c:32: Release locks[4]
+[mt] philo.c:33: Release locks[2]
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  end2: write by jobs[3] at philo.c:28 <- aux :: philo.c:41 <- job
+  end2: write by jobs[3] at philo.c:29 <- aux :: philo.c:42 <- job
   locks[2]:
     read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:56 <-
-      pthread_mutex_lock :: philo.c:23 <- aux :: philo.c:41 <- job
+      pthread_mutex_lock :: philo.c:24 <- aux :: philo.c:42 <- job
     read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:66 <-
-      pthread_mutex_unlock :: philo.c:32 <- aux :: philo.c:41 <- job
+      pthread_mutex_unlock :: philo.c:33 <- aux :: philo.c:42 <- job
   locks[4]:
     read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:56 <-
-      pthread_mutex_lock :: philo.c:24 <- aux :: philo.c:41 <- job
+      pthread_mutex_lock :: philo.c:25 <- aux :: philo.c:42 <- job
     read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:66 <-
-      pthread_mutex_unlock :: philo.c:31 <- aux :: philo.c:41 <- job
-  queue: read by jobs[3] at philo.c:29 <- aux :: philo.c:41 <- job
+      pthread_mutex_unlock :: philo.c:32 <- aux :: philo.c:42 <- job
+  queue: read by jobs[3] at philo.c:30 <- aux :: philo.c:42 <- job
 [mt] * shared variables computed
 [eva:interferences] 
   Interferences from thread jobs[3]
     concurrent writes:
-      end2 = 1; philo.c:28 <- aux :: philo.c:41 <- job
+      end2 = 1; philo.c:29 <- aux :: philo.c:42 <- job
     shared bases: {end2}
     interferences by location:
-      philo.c:28:
+      philo.c:29:
         # cvalue: end2 ∈ {1} 
     interferences by mutexes:
       { locks[2]; locks[4] }:
@@ -839,39 +839,39 @@
 [mt] * Computing value analysis for thread jobs[4]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[mt] philo.c:23: Lock locks[3]
-[mt] philo.c:24: Lock locks[0]
+[mt] philo.c:24: Lock locks[3]
+[mt] philo.c:25: Lock locks[0]
 [eva] using specification for function random
-[eva:interferences] philo.c:28: inject threads interferences at this point
-[mt] philo.c:29: 
+[eva:interferences] philo.c:29: inject threads interferences at this point
+[mt] philo.c:30: 
   Sending message on queue, content [0] ∈ {5}
                                     [1] ∈ UNINITIALIZED
-[mt] philo.c:31: Release locks[0]
-[mt] philo.c:32: Release locks[3]
+[mt] philo.c:32: Release locks[0]
+[mt] philo.c:33: Release locks[3]
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  end2: write by jobs[4] at philo.c:28 <- aux :: philo.c:41 <- job
+  end2: write by jobs[4] at philo.c:29 <- aux :: philo.c:42 <- job
   locks[0]:
     read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:56 <-
-      pthread_mutex_lock :: philo.c:24 <- aux :: philo.c:41 <- job
+      pthread_mutex_lock :: philo.c:25 <- aux :: philo.c:42 <- job
     read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:66 <-
-      pthread_mutex_unlock :: philo.c:31 <- aux :: philo.c:41 <- job
+      pthread_mutex_unlock :: philo.c:32 <- aux :: philo.c:42 <- job
   locks[3]:
     read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:56 <-
-      pthread_mutex_lock :: philo.c:23 <- aux :: philo.c:41 <- job
+      pthread_mutex_lock :: philo.c:24 <- aux :: philo.c:42 <- job
     read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:66 <-
-      pthread_mutex_unlock :: philo.c:32 <- aux :: philo.c:41 <- job
-  queue: read by jobs[4] at philo.c:29 <- aux :: philo.c:41 <- job
+      pthread_mutex_unlock :: philo.c:33 <- aux :: philo.c:42 <- job
+  queue: read by jobs[4] at philo.c:30 <- aux :: philo.c:42 <- job
 [mt] * shared variables computed
 [eva:interferences] 
   Interferences from thread jobs[4]
     concurrent writes:
-      end2 = 1; philo.c:28 <- aux :: philo.c:41 <- job
+      end2 = 1; philo.c:29 <- aux :: philo.c:42 <- job
     shared bases: {end2}
     interferences by location:
-      philo.c:28:
+      philo.c:29:
         # cvalue: end2 ∈ {1} 
     interferences by mutexes:
       { locks[0]; locks[3] }:
@@ -884,18 +884,18 @@
 [mt] * threads and mutexes computed
 [mt] ***** Computing shared variables
 [mt] Imprecise locations to watch: end2
-[mt] <main> reads  end2 ∈ {0; 1}  // philo.c:57 main
-[mt] jobs[0] writes  end2 ∈ {1}  // philo.c:28 aux :: philo.c:41 <- job
-[mt] jobs[2] writes  end2 ∈ {1}  // philo.c:28 aux :: philo.c:41 <- job
-[mt] jobs[3] writes  end2 ∈ {1}  // philo.c:28 aux :: philo.c:41 <- job
-[mt] jobs[4] writes  end2 ∈ {1}  // philo.c:28 aux :: philo.c:41 <- job
+[mt] <main> reads  end2 ∈ {0; 1}  // philo.c:58 main
+[mt] jobs[0] writes  end2 ∈ {1}  // philo.c:29 aux :: philo.c:42 <- job
+[mt] jobs[2] writes  end2 ∈ {1}  // philo.c:29 aux :: philo.c:42 <- job
+[mt] jobs[3] writes  end2 ∈ {1}  // philo.c:29 aux :: philo.c:42 <- job
+[mt] jobs[4] writes  end2 ∈ {1}  // philo.c:29 aux :: philo.c:42 <- job
 [mt] Possible read/write data races:
   end2:
-    read by <main> at philo.c:57, unprotected
-    write by jobs[0] at philo.c:28, protected by locks[1] locks[4]
-    write by jobs[2] at philo.c:28, protected by locks[1] locks[3]
-    write by jobs[3] at philo.c:28, protected by locks[2] locks[4]
-    write by jobs[4] at philo.c:28, protected by locks[0] locks[3]
+    read by <main> at philo.c:58, unprotected
+    write by jobs[0] at philo.c:29, protected by locks[1] locks[4]
+    write by jobs[2] at philo.c:29, protected by locks[1] locks[3]
+    write by jobs[3] at philo.c:29, protected by locks[2] locks[4]
+    write by jobs[4] at philo.c:29, protected by locks[0] locks[3]
 [mt] Shared memory: end2
 [mt] Write summary for jobs[0]: end2 ∈ {1}
 [mt] Write summary for jobs[2]: end2 ∈ {1}
