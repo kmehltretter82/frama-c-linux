@@ -93,12 +93,7 @@ let () = Request.register
     (fun (project_name, new_name) ->
        try
          let project = Project.from_unique_name project_name in
-         let _ =
-           Project.create_by_copy
-             ~last:false
-             ~src:project
-             new_name
-         in
+         let _ = Project.create_by_copy ~last:false ~src:project new_name in
          None
        with Project.Unknown_project ->
          let err = no_project_found project_name in
@@ -155,8 +150,7 @@ let _project_list =
     (* Since Project.set_name changes the unique_name of the project, which is
        the key of this array, the whole array needs to be reloaded when a
        project is renamed. *)
-    let f _ = f () in
-    Project.register_after_set_name_hook f
+    Project.register_after_set_name_hook (fun _ -> f ())
   in
   States.register_array ~package
     ~name:"list"
