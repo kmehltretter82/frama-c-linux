@@ -316,6 +316,9 @@ module MakeGraph (Vertex : Datatype.S_with_hashtbl) (Edge : Datatype.S) = struct
     (* Instanciate Dot module *)
     let module Dot = Graph.Graphviz.Dot (
       struct
+        type t = G.t
+        module V = G.V
+        module E = G.E
         let graph_attributes _g = [`Fontname "fixed"]
         let default_vertex_attributes _g = (* [`Shape `Point] *) [`Shape `Circle]
         let vertex_name v = "cp" ^ (string_of_int (tag v))
@@ -335,7 +338,14 @@ module MakeGraph (Vertex : Datatype.S_with_hashtbl) (Edge : Datatype.S) = struct
             let (_,_,c2,head2) = VTable.find subgraphs v2 in
             if head2 && c2 <= c1 then [`Constraint false] else []
           else if wto = None then [] else [`Style `Dashed]
-        include G
+        let iter_vertex f g = (* Sort the vertices for output determinism *)
+          G.fold_vertex (fun v l -> v :: l) g []
+          |> List.sort V.compare
+          |> List.iter f
+        let iter_edges_e f g = (* Sort the vertices for output determinism *)
+          G.fold_edges_e (fun e l -> e :: l) g []
+          |> List.sort E.compare
+          |> List.iter f
       end)
     in
     Dot.output_graph out_channel graph
