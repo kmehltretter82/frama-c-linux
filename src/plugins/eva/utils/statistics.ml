@@ -20,8 +20,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* Statistics are stored in a dictionary, implemented as an hashtable from
-   keys to integers.
+(* Statistics are stored in a dictionary, implemented as two hashtables from
+   keys to integers and floating-point numbers respectively.
 
    [Key] is the representation of the dictionary keys: a couple of a registered
    statistic (type [('k,'ty) t]) accompanied by the function or the statement
@@ -321,7 +321,7 @@ let export_as_csv ?filename () =
 (* Centralized statistics registration *)
 
 let alarm_count =
-  register_global_stat "alarm_count" Int
+  register_global_stat "alarm-count" Int
 let stmt_coverage =
   register_global_stat "stmt-coverage" Float
 let fun_coverage =

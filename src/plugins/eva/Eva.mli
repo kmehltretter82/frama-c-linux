@@ -986,21 +986,22 @@ module Statistics: sig
 
   (** {2 Registered statistics } *)
 
-  (** Alarm count, computed when the summary is print. *)
+  (** Number of alarms emitted by the analysis, only computed when the summary
+      is printed. *)
   val alarm_count : (unit, int) t
 
-  (** Statements covered by the analysis across function analzed, in [0, 1],
-      computed when the summary is print. *)
+  (** Ratio in [0, 1] of statements reached by the analysis to all statements in
+      analyzed functions, only computed when the summary is printed. *)
   val stmt_coverage : (unit, float) t
 
-  (** Functions covered by the analysis in [0, 1], computed when the summary
-      is print. *)
+  (** Ratio in [0, 1] of functions reached by the analysis to all functions in
+      source files, only computed when the summary is printed. *)
   val fun_coverage : (unit, float) t
 
   (** Analysis time of the main function, including children. *)
   val analysis_duration : (unit, float) t
 
-  (** Number of times each statement have been interpreted. *)
+  (** Number of times each statement has been interpreted. *)
   val iterations : (Cil_types.stmt, int) t
 
   (** Count of memexec cache hits. *)
