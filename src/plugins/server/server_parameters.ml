@@ -81,3 +81,10 @@ let use_relative_filepath = register_category "use-relative-filepath"
 let has_relative_filepath () = is_debug_key_enabled use_relative_filepath
 
 (* -------------------------------------------------------------------------- *)
+(* --- Debug Keys                                                         --- *)
+(* -------------------------------------------------------------------------- *)
+
+let dkey_protocol = register_category "protocol"
+    ~help:"protocol-related messages"
+
+(* -------------------------------------------------------------------------- *)

@@ -26,7 +26,7 @@
 
 module Senv = Server_parameters
 
-let dkey = Senv.register_category ~help:"messages about sockets" "socket"
+let dkey = Senv.dkey_protocol
 
 let socket_group = Senv.add_group "Sockets"
 
