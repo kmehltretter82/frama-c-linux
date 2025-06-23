@@ -92,4 +92,4 @@ end
 val compute_stats: unit -> program_stats
 
 (** Prints a summary of the analysis. *)
-val print_summary: unit -> unit
+val print: unit -> unit

@@ -986,16 +986,15 @@ module Statistics: sig
 
   (** {2 Registered statistics } *)
 
-  (** Number of alarms emitted by the analysis, only computed when the summary
-      is printed. *)
+  (** Number of alarms emitted by the analysis. *)
   val alarm_count : (unit, int) t
 
   (** Ratio in [0, 1] of statements reached by the analysis to all statements in
-      analyzed functions, only computed when the summary is printed. *)
+      analyzed functions. *)
   val stmt_coverage : (unit, float) t
 
   (** Ratio in [0, 1] of functions reached by the analysis to all functions in
-      source files, only computed when the summary is printed. *)
+      source files. *)
   val fun_coverage : (unit, float) t
 
   (** Analysis time of the main function, including children. *)

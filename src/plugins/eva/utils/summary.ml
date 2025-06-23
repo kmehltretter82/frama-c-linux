@@ -421,9 +421,8 @@ let print_statuses fmt {assertions_statuses; preconds_statuses} =
     Format.fprintf fmt
       "%i%% of the logical properties reached have been proven.@;" proven
 
-let print_summary fmt =
+let print_stats fmt stats =
   let bar = String.make 76 '-' in
-  let stats = compute_stats () in
   Format.fprintf fmt "%s@;" bar;
   print_coverage fmt stats;
   Format.fprintf fmt "%s@;" bar;
@@ -434,10 +433,11 @@ let print_summary fmt =
   print_statuses fmt stats;
   Format.fprintf fmt "%s" bar
 
-let print_summary () =
+let print () =
+  let stats = compute_stats () in
   let dkey = Self.dkey_summary in
   let level =
     if Parameters.ForcePrintSummary.get () then 0 else 1
   in
   let header fmt = Format.fprintf fmt " ====== ANALYSIS SUMMARY ======" in
-  Self.printf ~header ~dkey ~level "  @[<v>%t@]" print_summary
+  Self.printf ~header ~dkey ~level "  @[<v>%a@]" print_stats stats
