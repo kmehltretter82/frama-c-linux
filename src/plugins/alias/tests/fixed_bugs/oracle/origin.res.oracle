@@ -1,6 +1,8 @@
 [kernel] Parsing origin.c (with preprocessing)
 [kernel:typing:int-conversion] origin.c:8: Warning: 
   Conversion from a pointer to an integer without an explicit cast
+[alias] analysing global variable definition: v = {};
+[alias] May-aliases after global variable definition  v  are  <none>
 [alias] analysing function: f
 [alias] analysing instruction: tmp = & f;
 [alias] May-aliases after instruction  tmp = & f;  are  <none>

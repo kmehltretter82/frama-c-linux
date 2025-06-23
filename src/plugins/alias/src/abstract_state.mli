@@ -59,7 +59,7 @@ val assert_invariants : t -> unit
 val join : t -> v -> v -> t
 
 (** transfert functions for different kinds of assignments *)
-val assignment : t -> lval -> exp -> t
+val assignment : t -> lval -> exp option -> t
 
 (** transfert function for malloc calls *)
 val assignment_x_allocate_y : t -> lval -> t

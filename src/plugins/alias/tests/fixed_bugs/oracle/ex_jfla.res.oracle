@@ -1,7 +1,15 @@
 [kernel] Parsing ex_jfla.c (with preprocessing)
+[alias] analysing global variable definition: __fc_errno = {};
+[alias] May-aliases after global variable definition  __fc_errno  are  <none>
+[alias] analysing global variable definition: __fc_stdin = {};
+[alias] May-aliases after global variable definition  __fc_stdin  are  <none>
+[alias] analysing global variable definition: __fc_heap_status = {};
+[alias] May-aliases after global variable definition  __fc_heap_status  are  <none>
 [alias] analysing global variable definition: __fc_rand_max =
   (unsigned long)2147483647;
 [alias] May-aliases after global variable definition  __fc_rand_max  are  <none>
+[alias] analysing global variable definition: __fc_random48_init = {};
+[alias] May-aliases after global variable definition  __fc_random48_init  are  <none>
 [alias] analysing global variable definition: __fc_lit_string1 = "a=%d\n";
 [alias] May-aliases after global variable definition  __fc_lit_string1  are  <none>
 [alias] analysing global variable definition: __fc_lit_string2 = "b=%d\n";

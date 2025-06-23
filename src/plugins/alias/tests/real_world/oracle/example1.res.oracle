@@ -1,7 +1,13 @@
 [kernel] Parsing example1.c (with preprocessing)
+[alias] analysing global variable definition: __fc_heap_status = {};
+[alias] May-aliases after global variable definition  __fc_heap_status  are  <none>
+[alias] analysing global variable definition: __fc_errno = {};
+[alias] May-aliases after global variable definition  __fc_errno  are  <none>
 [alias] analysing global variable definition: __fc_rand_max =
   (unsigned long)2147483647;
 [alias] May-aliases after global variable definition  __fc_rand_max  are  <none>
+[alias] analysing global variable definition: __fc_random48_init = {};
+[alias] May-aliases after global variable definition  __fc_random48_init  are  <none>
 [alias] analysing function: f1
 [alias] analysing instruction: ty *tmp = x;
 [alias] May-aliases after instruction  ty *tmp = x;  are  { x; tmp }
@@ -43,15 +49,23 @@
 [alias] May-aliases at the end of function swap: <none>
 [alias] May-aliases after instruction  swap(tmp->n1);  are
   { x->t1[0..]; tmp->t1[0..]; odata }  { x->t1; tmp->t1 }
-  { x->t2[0..]; tmp->t2[0..]; idata }  { x->t2; tmp->t2 }  { x; tmp }
+  { x->t2[0..]; tmp->t2[0..]; idata }  { x->t2; tmp->t2 }  { x->n1; tmp->n1 }
+  { x; tmp }
 [alias] analysing instruction: idata = tmp->t2[*(tmp->n2)];
 [alias] May-aliases after instruction  idata = tmp->t2[*(tmp->n2)];  are
   { x->t1[0..]; tmp->t1[0..]; odata }  { x->t1; tmp->t1 }
-  { x->t2[0..]; tmp->t2[0..]; idata }  { x->t2; tmp->t2 }  { x; tmp }
+  { x->t2[0..]; tmp->t2[0..]; idata }  { x->t2; tmp->t2 }  { x->n1; tmp->n1 }
+  { x; tmp }
 [alias] analysing instruction: odata = tmp->t1[*(tmp->n1)];
 [alias] May-aliases after instruction  odata = tmp->t1[*(tmp->n1)];  are
   { x->t1[0..]; tmp->t1[0..]; odata }  { x->t1; tmp->t1 }
-  { x->t2[0..]; tmp->t2[0..]; idata }  { x->t2; tmp->t2 }  { x; tmp }
+  { x->t2[0..]; tmp->t2[0..]; idata }  { x->t2; tmp->t2 }  { x->n1; tmp->n1 }
+  { x; tmp }
+[alias] analysing instruction: idx = 0;
+[alias] May-aliases after instruction  idx = 0;  are
+  { x->t1[0..]; tmp->t1[0..]; odata }  { x->t1; tmp->t1 }
+  { x->t2[0..]; tmp->t2[0..]; idata }  { x->t2; tmp->t2 }  { x->n1; tmp->n1 }
+  { x; tmp }
 [alias:no-return] example1.c:29: Warning: 
   function f1 does not return; analysis may be unsound
 [alias] May-aliases at the end of function f1: <none>
@@ -87,15 +101,23 @@
 [alias] analysing instruction: swap(tmp->n2);
 [alias] May-aliases after instruction  swap(tmp->n2);  are
   { x->t1[0..]; tmp->t1[0..]; idata }  { x->t1; tmp->t1 }
-  { x->t2[0..]; tmp->t2[0..]; odata }  { x->t2; tmp->t2 }  { x; tmp }
+  { x->t2[0..]; tmp->t2[0..]; odata }  { x->t2; tmp->t2 }  { x->n2; tmp->n2 }
+  { x; tmp }
 [alias] analysing instruction: idata = tmp->t1[*(tmp->n1)];
 [alias] May-aliases after instruction  idata = tmp->t1[*(tmp->n1)];  are
   { x->t1[0..]; tmp->t1[0..]; idata }  { x->t1; tmp->t1 }
-  { x->t2[0..]; tmp->t2[0..]; odata }  { x->t2; tmp->t2 }  { x; tmp }
+  { x->t2[0..]; tmp->t2[0..]; odata }  { x->t2; tmp->t2 }  { x->n2; tmp->n2 }
+  { x; tmp }
 [alias] analysing instruction: odata = tmp->t2[*(tmp->n2)];
 [alias] May-aliases after instruction  odata = tmp->t2[*(tmp->n2)];  are
   { x->t1[0..]; tmp->t1[0..]; idata }  { x->t1; tmp->t1 }
-  { x->t2[0..]; tmp->t2[0..]; odata }  { x->t2; tmp->t2 }  { x; tmp }
+  { x->t2[0..]; tmp->t2[0..]; odata }  { x->t2; tmp->t2 }  { x->n2; tmp->n2 }
+  { x; tmp }
+[alias] analysing instruction: idx = 0;
+[alias] May-aliases after instruction  idx = 0;  are
+  { x->t1[0..]; tmp->t1[0..]; idata }  { x->t1; tmp->t1 }
+  { x->t2[0..]; tmp->t2[0..]; odata }  { x->t2; tmp->t2 }  { x->n2; tmp->n2 }
+  { x; tmp }
 [alias:no-return] example1.c:53: Warning: 
   function f2 does not return; analysis may be unsound
 [alias] May-aliases at the end of function f2: <none>

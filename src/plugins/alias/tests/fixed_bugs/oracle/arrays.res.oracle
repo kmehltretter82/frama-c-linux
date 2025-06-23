@@ -1,4 +1,20 @@
 [kernel] Parsing arrays.c (with preprocessing)
+[alias] analysing global variable definition: __fc_stdin = {};
+[alias] May-aliases after global variable definition  __fc_stdin  are  <none>
+[alias] analysing global variable definition: __fc_heap_status = {};
+[alias] May-aliases after global variable definition  __fc_heap_status  are  <none>
+[alias] analysing global variable definition: a = {};
+[alias] May-aliases after global variable definition  a  are  <none>
+[alias] analysing global variable definition: b = {};
+[alias] May-aliases after global variable definition  b  are  <none>
+[alias] analysing global variable definition: n = {};
+[alias] May-aliases after global variable definition  n  are  <none>
+[alias] analysing global variable definition: z = {};
+[alias] May-aliases after global variable definition  z  are  <none>
+[alias] analysing global variable definition: q = {};
+[alias] May-aliases after global variable definition  q  are  <none>
+[alias] analysing global variable definition: t = {};
+[alias] May-aliases after global variable definition  t  are  <none>
 [alias] analysing global variable definition: __fc_lit_string1 = "%d\n%d\n";
 [alias] May-aliases after global variable definition  __fc_lit_string1  are  <none>
 [alias] analysing function: main

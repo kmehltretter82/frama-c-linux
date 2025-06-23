@@ -1,4 +1,8 @@
 [kernel] Parsing fun_side_effect.c (with preprocessing)
+[alias] analysing global variable definition: a = {};
+[alias] May-aliases after global variable definition  a  are  <none>
+[alias] analysing global variable definition: b = {};
+[alias] May-aliases after global variable definition  b  are  <none>
 [alias] analysing function: f
 [alias] analysing instruction: b = a;
 [alias] May-aliases after instruction  b = a;  are  { a; b }

@@ -609,21 +609,24 @@ let set_type s v1 v2 : state =
   let new_g = G.add_edge g v1 v2 in
   asserting_invariants {s with graph = new_g; vmap = new_vmap}
 
-let assignment s lv (e:exp) : state =
+let assignment s lv exp : state =
   assert_invariants s;
-  match Ast_types.is_ptr (Cil.typeOf e), LvalOrRef.from_exp e with
-  | false, _ | _, None -> s
-  | true, Some y ->
-    let v1, s = find_or_create_lval_vertex (Lval.simplify lv) s in
-    let v2, s = find_or_create_lval_or_ref_vertex y s in
-    if List.mem v2 (G.psucc s.graph v1) || List.mem v1 (G.psucc s.graph v2)
-    then
-      let () =
-        Options.warning ~source:(fst e.eloc)
-          "ignoring assignment of the form: %a = %a"
-          Printer.pp_lval lv Printer.pp_exp e;
-      in s
-    else asserting_invariants @@ join s v1 v2
+  let v1, s = find_or_create_lval_vertex (Lval.simplify lv) s in
+  match exp with
+  | None -> s
+  | Some e ->
+    match Ast_types.is_ptr (Cil.typeOf e), LvalOrRef.from_exp e with
+    | false, _ | _, None -> s
+    | true, Some y ->
+      let v2, s = find_or_create_lval_or_ref_vertex y s in
+      if List.mem v2 (G.psucc s.graph v1) || List.mem v1 (G.psucc s.graph v2)
+      then
+        let () =
+          Options.warning ~source:(fst e.eloc)
+            "ignoring assignment of the form: %a = %a"
+            Printer.pp_lval lv Printer.pp_exp e;
+        in s
+      else asserting_invariants @@ join s v1 v2
 
 (* assignment x = allocate(y) *)
 let assignment_x_allocate_y s lv : state =

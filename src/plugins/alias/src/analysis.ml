@@ -66,24 +66,27 @@ let warn_unsupported_explicit_pointer pp_obj obj loc =
   Options.warning ~source:(fst loc) ~wkey:Options.Warn.unsupported_address
     "unsupported feature: explicit pointer address: %a; analysis may be unsound" pp_obj obj
 
-let do_assignment (lv:lval) (exp:exp) (a:Abstract_state.t) : Abstract_state.t =
-  try Abstract_state.assignment a lv exp
+let do_assignment (lv:lval) exp_o (s:Abstract_state.t) : Abstract_state.t =
+  try Abstract_state.assignment s lv exp_o
   with Simplified.Explicit_pointer_address loc ->
-    warn_unsupported_explicit_pointer  Printer.pp_exp exp loc;
-    a
+    warn_unsupported_explicit_pointer (Pretty_utils.pp_opt Printer.pp_exp) exp_o loc;
+    s
 
-let do_init (lv:lval) (init:init_or_str) state =
+let do_init (lv:lval) (init : init_or_str option) state =
   let rec aux lv init state =
     match init with
-    | SingleInit e -> Option.map (do_assignment lv e) state
-    | CompoundInit (_, l) ->
-      List.fold_left
-        (fun state (o, init) -> aux (Cil.addOffsetLval o lv) init state) state l
+    | None -> Option.map (do_assignment lv None) state
+    | Some (SingleInit e) -> Option.map (do_assignment lv (Some e)) state
+    | Some (CompoundInit (_, l)) ->
+      List.fold_left (fun state (o, init) -> aux (Cil.addOffsetLval o lv) (Some init) state) state l
   in
   match init with
-  | CInit init -> aux lv init state
-  | StrInit _ -> state
-(* TODO: consider potential aliases for literal with common suffixes. *)
+  | Some (CInit init) -> aux lv (Some init) state
+  | Some StrInit _ ->
+    (* TODO: consider potential aliases for literal with common suffixes. *)
+    state
+  | None -> aux lv None state
+
 
 let pp_abstract_state_opt ?(debug=false) fmt v =
   match v with
@@ -91,23 +94,20 @@ let pp_abstract_state_opt ?(debug=false) fmt v =
   | Some a -> Abstract_state.pretty ~debug fmt a
 
 let analyse_global_var v initinfo st =
-  match initinfo.init with
-  | None -> st
-  | Some init ->
-    Options.feedback ~level:3
-      "@[analysing global variable definition:@ @[%a@]@ =@ @[%a@];@]"
-      Printer.pp_varinfo v
-      Printer.pp_initinfo initinfo;
-    let result = do_init (Var v, NoOffset) init st in
-    Options.feedback ~level:3
-      "@[May-aliases after global variable definition@;<2>@[%a@]@;<2>are@;<2>@[%a@]@]"
-      Printer.pp_varinfo v
-      (pp_abstract_state_opt ~debug:false) result;
-    Options.debug ~level:3
-      "@[May-alias graph after global variable definition@;<2>@[%a@]@;<2>is@;<4>@[%a@]@]"
-      Printer.pp_varinfo v
-      (pp_abstract_state_opt ~debug:true) result;
-    result
+  Options.feedback ~level:3
+    "@[analysing global variable definition:@ @[%a@]@ =@ @[%a@];@]"
+    Printer.pp_varinfo v
+    Printer.pp_initinfo initinfo;
+  let result = do_init (Var v, NoOffset) initinfo.init st in
+  Options.feedback ~level:3
+    "@[May-aliases after global variable definition@;<2>@[%a@]@;<2>are@;<2>@[%a@]@]"
+    Printer.pp_varinfo v
+    (pp_abstract_state_opt ~debug:false) result;
+  Options.debug ~level:3
+    "@[May-alias graph after global variable definition@;<2>@[%a@]@;<2>is@;<4>@[%a@]@]"
+    Printer.pp_varinfo v
+    (pp_abstract_state_opt ~debug:true) result;
+  result
 
 let do_function_call (stmt:stmt) state (res : lval option) (f : lhost) (args: exp list) loc =
   let is_malloc (s:string) : bool =
@@ -163,8 +163,8 @@ let do_cons_init (s:stmt) (v:varinfo) f arg t loc state =
 
 let analyse_instr (s:stmt) (i:instr) (a:Abstract_state.t option) : Abstract_state.t option =
   match i with
-  | Set (lv,exp,_) -> Option.map (do_assignment lv exp) a
-  | Local_init (v,AssignInit i,_) -> do_init (Var v, NoOffset) (CInit i) a
+  | Set (lv,exp,_) -> Option.map (do_assignment lv (Some exp)) a
+  | Local_init (v,AssignInit i,_) -> do_init (Var v, NoOffset) (Some (CInit i)) a
   | Local_init (v,ConsInit (f,arg,t),loc) -> do_cons_init s v f arg t loc a
   | Code_annot _ -> a
   | Skip _ -> a

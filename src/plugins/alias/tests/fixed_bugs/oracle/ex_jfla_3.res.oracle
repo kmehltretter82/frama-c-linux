@@ -1,4 +1,8 @@
 [kernel] Parsing ex_jfla_3.c (with preprocessing)
+[alias] analysing global variable definition: __fc_stdin = {};
+[alias] May-aliases after global variable definition  __fc_stdin  are  <none>
+[alias] analysing global variable definition: __fc_heap_status = {};
+[alias] May-aliases after global variable definition  __fc_heap_status  are  <none>
 [alias] analysing global variable definition: __fc_lit_string1 = "a=%d\n";
 [alias] May-aliases after global variable definition  __fc_lit_string1  are  <none>
 [alias] analysing global variable definition: __fc_lit_string2 = "b=%d\n";
