@@ -33,7 +33,7 @@ import * as Ast from 'frama-c/kernel/api/ast';
 import * as Eva from 'frama-c/plugins/eva/api/general';
 import * as Values from 'frama-c/plugins/eva/api/values';
 import { EvaReady, EvaStatus } from './components/AnalysisStatus';
-import { currentProject } from 'frama-c/kernel/api/services';
+import { current as currentProject } from 'frama-c/kernel/api/project';
 
 import { classes } from 'dome/misc/utils';
 import { Icon } from 'dome/controls/icons';

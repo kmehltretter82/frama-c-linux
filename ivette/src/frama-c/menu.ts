@@ -30,6 +30,7 @@ import { showHelp } from 'dome/help';
 import * as Display from 'ivette/display';
 import * as Server from 'frama-c/server';
 import * as Services from 'frama-c/kernel/api/services';
+import * as Project from 'frama-c/kernel/api/project';
 import * as Ast from 'frama-c/kernel/api/ast';
 import * as States from 'frama-c/states';
 import * as Globals from 'frama-c/kernel/Globals';
@@ -189,17 +190,17 @@ function addHelpMenuItems(): void {
 }
 
 async function duplicateCurrentProject(): Promise<void> {
-  const current = await Server.send(Services.getCurrentProject, null);
+  const current = await Server.send(Project.getCurrent, null);
   Globals.duplicateProject(current, "Duplicate current project");
 }
 
 async function deleteCurrentProject(): Promise<void> {
-  const current = await Server.send(Services.getCurrentProject, null);
+  const current = await Server.send(Project.getCurrent, null);
   Globals.removeProject(current);
 }
 
 async function renameCurrentProject(): Promise<void> {
-  const current = await Server.send(Services.getCurrentProject, null);
+  const current = await Server.send(Project.getCurrent, null);
   Globals.renameProject(current, "Rename current project");
 }
 

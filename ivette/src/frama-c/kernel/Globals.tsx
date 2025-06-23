@@ -49,7 +49,7 @@ import * as Locations from 'frama-c/kernel/Locations';
 import { computationState } from 'frama-c/plugins/eva/api/general';
 import * as Eva from 'frama-c/plugins/eva/api/general';
 import { addProjectMenu } from 'frama-c/menu';
-import * as Services from './api/services';
+import * as Project from './api/project';
 
 
 // --------------------------------------------------------------------------
@@ -855,7 +855,7 @@ function showError(title: string, error: string): void {
 export function newProject(): void {
   Dialogs.showModal(<Dialogs.Modal label={'Create project'}>
     <ProjectField  onValidate={async (name: string) => {
-        const error = await Server.send(Services.createProject, name);
+        const error = await Server.send(Project.create, name);
         if(!error) Dialogs.closeModal();
         else showError('Error Creating project', error);
       }}
@@ -868,7 +868,7 @@ export function renameProject(
 ): void {
   Dialogs.showModal(<Dialogs.Modal label={title}>
     <ProjectField project={project || ''} onValidate={async (name: string) => {
-          const error = await Server.send(Services.renameProject, [id, name]);
+          const error = await Server.send(Project.rename, [id, name]);
           if(!error) Dialogs.closeModal();
           else showError('Error: '+title, error);
         }
@@ -879,7 +879,7 @@ export function renameProject(
 
 /** Remove a project */
 export async function removeProject(id: string): Promise<void> {
-  const projects = await Server.send(Services.getProjects, null);
+  const projects = await Server.send(Project.getList, null);
   if(projects.length === 1) {
     showError("Error - deleting project",
       "The last project cannot be removed");
@@ -896,7 +896,7 @@ export async function removeProject(id: string): Promise<void> {
   });
 
   if(confirm === true) {
-    const error = await Server.send(Services.removeProject, id);
+    const error = await Server.send(Project.remove, id);
     if(!error) Dialogs.closeModal();
     else showError("Error - deleting project", error);
   }
@@ -908,7 +908,7 @@ export function duplicateProject(
 ): void {
   Dialogs.showModal(<Dialogs.Modal label={title}>
     <ProjectField project={project} onValidate={async (name: string) => {
-        const error = await Server.send(Services.duplicateProject, [id, name]);
+        const error = await Server.send(Project.copy, [id, name]);
         if(!error) Dialogs.closeModal();
         else showError('Error: '+title, error);
       }}
@@ -919,14 +919,14 @@ export function duplicateProject(
 /** Save a project */
 export async function saveProject(id: string): Promise<void> {
   const file = await Dialogs.showSaveFile({});
-  const error = await Server.send(Services.saveProject, [id, file]);
+  const error = await Server.send(Project.save, [id, file]);
   if(error) showError("Error saving project", error);
 }
 
 /** Load a project */
 export async function loadProject(): Promise<void> {
   const file = await Dialogs.showOpenFile({});
-  const error = await Server.send(Services.loadProject, file);
+  const error = await Server.send(Project.load, file);
   if(error) showError("Error loading project", error);
 }
 
@@ -991,8 +991,8 @@ function getActions(id: string, name: string): React.JSX.Element {
 
 export function GlobalProjects(): JSX.Element {
   const scrollableArea = React.useRef<HTMLDivElement>(null);
-  const [ current, setCurrent ] = States.useSyncState(Services.currentProject);
-  const modelProjects = States.useSyncArrayModel(Services.projectList);
+  const [ current, setCurrent ] = States.useSyncState(Project.current);
+  const modelProjects = States.useSyncArrayModel(Project.list);
   const model = useModel(modelProjects);
   /** By clicking on a checkbox item in the menu,
    * the item is checked or unchecked even if there is no effect.

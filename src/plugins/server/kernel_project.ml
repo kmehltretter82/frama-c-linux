@@ -28,127 +28,186 @@ module Pkg = Package
 let package = Pkg.package ~name:"project"
     ~title:"Project Management" ~readme:"project.md" ()
 
-(* -------------------------------------------------------------------------- *)
-(* --- Project Info                                                       --- *)
-(* -------------------------------------------------------------------------- *)
 
-module ProjectId = (val jkey ~kind:"project")
+module Jproject_id = Jstring
 
-module ProjectInfo =
-struct
-  type t = Project.t
-  let jtype = Data.declare ~package
-      ~name:"projectInfo"
-      ~descr:(Md.plain "Project informations")
-      Pkg.(Jrecord [
-          "id",ProjectId.jtype;
-          "name",Jalpha;
-          "current",Jboolean;
-        ])
+module Jproject = struct
+  type record
+  let record : record Record.signature = Record.signature ()
 
-  let of_json js =
-    Js.member "id" js |> Js.to_string |> Project.from_unique_name
+  let pid = Record.field record ~name:"pid"
+      ~descr:(Md.plain "Id of the project")
+      (module Jint)
+  let name = Record.field record ~name:"name"
+      ~descr:(Md.plain "Display name of the project")
+      (module Jstring)
+  let unique_name = Record.field record ~name:"unique_name"
+      ~descr:(Md.plain "Unique name of the project")
+      (module Jstring)
 
-  let to_json p =
-    `Assoc [
-      "id", `String (Project.get_unique_name p) ;
-      "name", `String (Project.get_name p) ;
-      "current", `Bool (Project.is_current p) ;
-    ]
+  let data = Record.publish record ~package ~name:"project"
+      ~descr:(Md.plain "Frama-C project")
+
+  module R : Record.S with type r = record = (val data)
+  type t = Project.project
+
+  let jtype = R.jtype
+
+  let to_json (p : t) =
+    R.default
+    |> R.set pid p.pid
+    |> R.set name p.name
+    |> R.set unique_name p.unique_name
+    |> R.to_json
+
+  let of_json _ = failure "Jproject.of_json not implemented"
 end
 
-(* -------------------------------------------------------------------------- *)
-(* --- Project Requests                                                   --- *)
-(* -------------------------------------------------------------------------- *)
 
-(*
-module ProjectRequest =
-struct
+let _current_project_signal =
+  let add_hook f =
+    Project.register_after_set_current_hook ~user_only:false f;
+    (* Since Project.set_name changes the unique_name of the project, which is
+       used as internal state for the current project in Ivette, the state needs
+       to be reloaded when it is renamed. *)
+    Project.register_after_set_name_hook (fun (p, _) -> f p);
+  in
+  States.register_state ~package
+    ~name:"current"
+    ~descr:(Md.plain "Current Frama-C project")
+    ~data:(module Jproject_id)
+    ~get:(fun () -> Project.(current () |> get_unique_name))
+    ~set:(fun unique_name -> Project.(from_unique_name unique_name |> set_current))
+    ~add_hook
+    ()
 
-  (* forward request on a given project *)
+let get_project_list () =
+  Project.fold_on_projects (fun acc t -> t :: acc) []
 
-  type t = Project.t * string * json
+let () = Request.register
+    ~package ~kind:`GET ~name:"getList"
+    ~descr:(Md.plain "Returns the list of Frama-C projects")
+    ~input:(module Junit) ~output:(module Jlist (Jproject))
+    get_project_list
 
-  let jtype = Data.declare ~package ~name:"projectRequest"
-      ~descr:(Md.plain "Request to be executed on the specified project.")
-      (Jrecord [
-          "project",ProjectId.jtype;
-          "request",Jstring;
-          "data",Jany;
-        ])
+let () = Request.register
+    ~package ~kind:`SET ~name:"create"
+    ~descr:(Md.plain "Creates a new Frama-C project with the given name")
+    ~input:(module Jstring) ~output:(module Junit)
+    (fun name -> Project.create name |> Project.set_current)
 
-  let of_json js =
-    begin
-      Project.from_unique_name Js.(member "project" js |> to_string) ,
-      Js.(member "request" js |> to_string) ,
-      Js.(member "data" js)
-    end
+let no_project_found unique_name =
+  Format.asprintf "No project with unique name %s found." unique_name
 
-  let process kind (project,request,data) =
-    match Main.find request with
-    | Some(kd,handler) when kd = kind -> Project.on project handler data
-    | Some _ -> failwith (Printf.sprintf "Incompatible kind for '%s'" request)
-    | None -> failwith (Printf.sprintf "Request '%s' undefined" request)
+let () = Request.register
+    ~package ~kind:`SET ~name:"rename"
+    ~descr:(Md.plain "Rename a project")
+    ~input:(module Jpair (Jproject_id) (Jstring))
+    ~output:(module Joption (Jstring))
+    (fun (project_name, new_name) ->
+       try
+         let project = Project.from_unique_name project_name in
+         Project.set_name project new_name;
+         None
+       with Project.Unknown_project ->
+         let err = no_project_found project_name in
+         Some err)
 
-end
-*)
+let () = Request.register
+    ~package ~kind:`SET ~name:"remove"
+    ~descr:(Md.plain "Remove a project from the session")
+    ~input:(module Jproject_id) ~output:(module Joption (Jstring))
+    (fun project_name ->
+       try
+         let project = Project.from_unique_name project_name in
+         Project.remove ~project ();
+         None
+       with
+       | Project.Unknown_project ->
+         let err = no_project_found project_name in
+         Some err
+       | Project.Cannot_remove p ->
+         let err = Format.asprintf "Cannot remove project %s." p in
+         Some err)
 
-(* -------------------------------------------------------------------------- *)
-(* --- Project Requests                                                   --- *)
-(* -------------------------------------------------------------------------- *)
+let () = Request.register
+    ~package ~kind:`SET ~name:"copy"
+    ~descr:(Md.plain "Duplicate a project")
+    ~input:(module Jpair (Jproject_id) (Jstring)) ~output:(module Joption (Jstring))
+    (fun (project_name, new_name) ->
+       try
+         let project = Project.from_unique_name project_name in
+         let _ =
+           Project.create_by_copy
+             ~last:false
+             ~src:project
+             new_name
+         in
+         None
+       with Project.Unknown_project ->
+         let err = no_project_found project_name in
+         Some err)
 
-(*
-let () = Request.register ~package
-    ~kind:`GET ~name:"getCurrent"
-    ~descr:(Md.plain "Returns the current project")
-    ~input:(module Junit) ~output:(module ProjectInfo)
-    Project.current
+let () = Request.register
+    ~package ~kind:`SET ~name:"load"
+    ~descr:(Md.plain "Load a saved project")
+    ~input:(module Jfile) ~output:(module Joption (Jstring))
+    (fun filepath ->
+       try
+         Project.load filepath
+         |> Project.set_current;
+         None
+       with Project.IOError err ->
+         Some err)
 
-let () = Request.register ~package
-    ~kind:`SET ~name:"setCurrent"
-    ~descr:(Md.plain "Switches the current project")
-    ~input:(module ProjectId) ~output:(module Junit)
-    (fun pid -> Project.(set_current (from_unique_name pid)))
-*)
+let () = Request.register
+    ~package ~kind:`SET ~name:"save"
+    ~descr:(Md.plain "Save a project on disk")
+    ~input:(module Jpair (Jproject_id) (Jfile)) ~output:(module Joption (Jstring))
+    (fun (project_name, filepath) ->
+       try
+         let project = Project.from_unique_name project_name in
+         Project.save ~project filepath;
+         None
+       with
+       | Project.Unknown_project ->
+         let err = no_project_found project_name in
+         Some err
+       | Project.IOError err ->
+         Some err)
 
-let () = Request.register ~package
-    ~kind:`GET ~name:"getList"
-    ~descr:(Md.plain "Returns the list of all projects")
-    ~input:(module Junit) ~output:(module Jlist(ProjectInfo))
-    (fun () -> Project.fold_on_projects (fun ids p -> p :: ids) [])
+let _project_list =
+  let model = States.model () in
 
-(*
-let () = Request.register ~package
-    ~kind:`GET ~name:"getOn"
-    ~descr:(Md.plain "Execute a GET request within the given project")
-    ~input:(module ProjectRequest) ~output:(module Jany)
-    (ProjectRequest.process `GET)
+  States.column model ~name:"uniqueName"
+    ~descr:(Md.plain "Project unique name")
+    ~data:(module Jproject_id)
+    ~get:Project.get_unique_name;
 
-let () = Request.register ~package
-    ~kind:`SET ~name:"setOn"
-    ~descr:(Md.plain "Execute a SET request within the given project")
-    ~input:(module ProjectRequest) ~output:(module Jany)
-    (ProjectRequest.process `SET)
+  States.column model ~name:"name"
+    ~descr:(Md.plain "Project name")
+    ~data:(module Jstring)
+    ~get:Project.get_name;
 
-let () = Request.register ~package
-    ~kind:`EXEC ~name:"execOn"
-    ~descr:(Md.plain "Execute an EXEC request within the given project")
-    ~input:(module ProjectRequest) ~output:(module Jany)
-    (ProjectRequest.process `EXEC)
-*)
-
-(* -------------------------------------------------------------------------- *)
-(* --- Project Management                                                 --- *)
-(* -------------------------------------------------------------------------- *)
-
-let () =
-  Request.register
-    ~package
-    ~descr:(Md.plain "Create a new project")
-    ~kind:`SET
-    ~name:"create"
-    ~input:(module Jstring)
-    ~output:(module ProjectInfo)
-    Project.create
-
-(* -------------------------------------------------------------------------- *)
+  let add_update_hook f =
+    Project.register_create_hook f
+  in
+  let add_remove_hook f =
+    Project.register_before_remove_hook f
+  in
+  let add_reload_hook f =
+    (* Since Project.set_name changes the unique_name of the project, which is
+       the key of this array, the whole array needs to be reloaded when a
+       project is renamed. *)
+    let f _ = f () in
+    Project.register_after_set_name_hook f
+  in
+  States.register_array ~package
+    ~name:"list"
+    ~descr:(Md.plain "List of Frama-C projects")
+    ~key:Project.get_unique_name
+    ~iter:Project.iter_on_projects
+    ~add_update_hook
+    ~add_remove_hook
+    ~add_reload_hook
+    model

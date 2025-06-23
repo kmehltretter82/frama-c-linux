@@ -37,7 +37,7 @@ import { TitleBar } from 'ivette';
 import * as Display from 'ivette/display';
 import * as Ast from 'frama-c/kernel/api/ast';
 import * as Server from 'frama-c/server';
-import { currentProject } from 'frama-c/kernel/api/services';
+import { current as currentProject } from 'frama-c/kernel/api/project';
 
 // --------------------------------------------------------------------------
 // --- Global Multi-Selection

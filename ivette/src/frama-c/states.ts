@@ -37,7 +37,7 @@ import { GlobalState, useGlobalState } from 'dome/data/states';
 import { Client, useModel } from 'dome/table/models';
 import { CompactModel } from 'dome/table/arrays';
 import { FieldState, FieldError, isValid } from 'dome/layout/forms';
-import { currentProject } from 'frama-c/kernel/api/services';
+import { current as currentProject } from 'frama-c/kernel/api/project';
 import * as Ast from 'frama-c/kernel/api/ast';
 import * as Server from './server';
 
