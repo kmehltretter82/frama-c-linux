@@ -833,7 +833,7 @@ let call s (res : lval option) (args : exp list) (summary : Summary.t) : state =
   assert_invariants s;
   let formals = summary.Summary.formals in
   assert (List.length args = List.length formals);
-  let sum_state = shift @@ Option.get summary.state in
+  let summary_state = shift @@ Option.get summary.state in
 
   (* pair up formals and their corresponding arguments,
      as well as the bound result with the returned value *)
@@ -869,7 +869,7 @@ let call s (res : lval option) (args : exp list) (summary : Summary.t) : state =
     let s = ref s in
     let find_vertex (lv1, lv2) =
       try
-        let v2 = find_lval_vertex lv2 sum_state in
+        let v2 = find_lval_vertex lv2 summary_state in
         let v1, new_state = find_or_create_lval_or_ref_vertex lv1 !s in
         s := new_state;
         Some (v1, v2)
@@ -885,11 +885,11 @@ let call s (res : lval option) (args : exp list) (summary : Summary.t) : state =
       List.fold_left
         (fun g e -> G.add_edge_e g @@ E.create v1 (E.label e) (E.dst e))
         g
-        (G.succ_e sum_state.graph v2)
+        (G.succ_e summary_state.graph v2)
     in
     let g = s.graph in
-    let g = G.fold_vertex (fun i g -> G.add_vertex g i) sum_state.graph g in
-    let g = G.fold_edges_e (fun e g -> G.add_edge_e g e) sum_state.graph g in
+    let g = G.fold_vertex (fun i g -> G.add_vertex g i) summary_state.graph g in
+    let g = G.fold_edges_e (fun e g -> G.add_edge_e g e) summary_state.graph g in
     List.fold_left transfer_succs g vertex_pairs
   in
 
@@ -901,7 +901,7 @@ let call s (res : lval option) (args : exp list) (summary : Summary.t) : state =
       then let () = g := G.remove_vertex !g v in None
       else Some VarSet.empty
     in
-    let remaining_vertices = VMap.filter_map remove_if_leaf sum_state.vmap in
+    let remaining_vertices = VMap.filter_map remove_if_leaf summary_state.vmap in
     remaining_vertices, !g
   in
 

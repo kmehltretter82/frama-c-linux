@@ -102,7 +102,7 @@ let analyse_global_var v initinfo st =
   | None -> st
   | Some init ->
     Options.feedback ~level:3
-      "@[analysing global variable definiton:@ @[%a@]@ =@ @[%a@];@]"
+      "@[analysing global variable definition:@ @[%a@]@ =@ @[%a@];@]"
       Printer.pp_varinfo v
       Printer.pp_initinfo initinfo;
     let result = do_init (Var v, NoOffset) init st in
