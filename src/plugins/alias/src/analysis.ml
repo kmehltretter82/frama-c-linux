@@ -54,7 +54,14 @@ module Function_table = Make_table (Kernel_function.Hashtbl) (struct
     let size = 7
   end)
 
-let function_compute_ref = Extlib.mk_fun "function_compute"
+let analyse_function_ref = Extlib.mk_fun "analyse_function"
+
+let function_summary kf =
+  try Function_table.find kf
+  with Not_found ->
+    let result = !analyse_function_ref kf in
+    Function_table.add kf result;
+    result
 
 (* In Stmt_table, value None means abstract state = Bottom *)
 module Stmt_table = struct
@@ -109,8 +116,6 @@ let analyse_global_var v initinfo st =
       (pp_abstract_state_opt ~debug:true) result;
     result
 
-let analyse_function f = !function_compute_ref f
-
 let do_function_call (stmt:stmt) state (res : lval option) (ef : exp) (args: exp list) loc =
   let is_malloc (s:string) : bool =
     (s = "malloc") || (s = "calloc") (* todo : add all function names *)
@@ -128,13 +133,10 @@ let do_function_call (stmt:stmt) state (res : lval option) (ef : exp) (args: exp
           Some a
     end
   | _ -> (* general case *)
-    let get_function kf =
-      try Function_table.find kf
-      with Not_found -> analyse_function kf in
     let summaries =
       match Kernel_function.get_called ef with
       | Some kf when Kernel_function.is_main kf -> []
-      | Some kf -> [get_function kf]
+      | Some kf -> [function_summary kf]
       | None -> (* dereference function pointer using the results of the points-to analysis *)
         begin match ef, Stmt_table.find stmt with
           | {enode = Lval lv; _}, Some state ->
@@ -146,7 +148,7 @@ let do_function_call (stmt:stmt) state (res : lval option) (ef : exp) (args: exp
               try Some (Globals.Functions.find_def_by_name vname) with Not_found -> None
             in
             let kfs = Seq.filter_map kf_of_var @@ Abstract_state.VarSet.to_seq targets in
-            List.of_seq @@ Seq.map get_function kfs
+            List.of_seq @@ Seq.map function_summary kfs
           | _ ->
             Options.fatal "unsupported call to function pointer: %a" Exp.pretty ef
         end
@@ -284,21 +286,14 @@ let analyse_function (kf:kernel_function) =
     | _, None -> ()
     | fname, Some final_state -> Abstract_state.print_dot fname final_state
   end;
-  Function_table.add kf result;
   result
 
-let () = function_compute_ref := analyse_function
+let () = analyse_function_ref := analyse_function
 
 let make_summary (state:Abstract_state.t) (kf:kernel_function) =
-  try begin match Function_table.find kf with
-    | Some s -> (state, s)
-    | None -> Options.fatal "not implemented"
-  end
-  with Not_found ->
-    begin match analyse_function kf with
-      | Some s -> (state, s)
-      | None -> Options.fatal "not implemented"
-    end
+  match function_summary kf with
+  | Some s -> (state, s)
+  | None -> Options.fatal "not implemented"
 
 let computed_flag = ref false
 
@@ -325,7 +320,7 @@ let print_function_table_elt fmt kf s : unit =
 let compute () =
   Ast.compute ();
   initial_state := Globals.Vars.fold_in_file_order analyse_global_var (Some Abstract_state.empty);
-  Globals.Functions.iter (fun kf -> ignore @@ analyse_function kf);
+  Globals.Functions.iter (fun kf -> ignore @@ function_summary kf);
   computed_flag := true;
   if Options.ShowStmtTable.get () then
     Stmt_table.iter (print_stmt_table_elt Format.std_formatter);

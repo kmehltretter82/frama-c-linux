@@ -404,10 +404,4 @@
   106:{  } → 104:{  }   108:{  } → 109:{  }   110:{  } → 108:{  }
 [alias] Summary of function main:
   formals:     returns: __retres    state: { a->n1; b->n1 }  { a->n2; b->n2 }
-[alias] analysing function: swap
-[alias] May-aliases at the end of function swap: <none>
-[alias] May-alias graph at the end of function swap:
-  0:{  } → 1:{  }
-[alias] Summary of function swap:
-  formals: n    returns: <none>    state: <none>
 [alias] Analysis complete

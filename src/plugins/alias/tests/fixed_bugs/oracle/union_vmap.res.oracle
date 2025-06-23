@@ -29,10 +29,4 @@
   4:{ s2; s3 } → 3:{  }   10:{ key } → 4:{ s2; s3 }
 [alias] Summary of function CPS_ParseKey:
   formals:     returns: <none>    state: { *key; s2; s3 }
-[alias] analysing function: CPS_SplitWord
-[alias] May-aliases at the end of function CPS_SplitWord: <none>
-[alias] May-alias graph at the end of function CPS_SplitWord:
-  <empty>
-[alias] Summary of function CPS_SplitWord:
-  formals: line    returns: line    state: <none>
 [alias] Analysis complete

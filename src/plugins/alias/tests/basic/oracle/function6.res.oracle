@@ -43,12 +43,4 @@
   <empty>
 [alias] Summary of function main:
   formals:     returns: __retres    state: <none>
-[alias] analysing function: swap
-[alias] analysing instruction: int z = 0;
-[alias] May-aliases after instruction  int z = 0;  are  <none>
-[alias] May-alias graph after instruction  int z = 0;  is    <empty>
-[alias] May-aliases at the end of function swap: <none>
-[alias] May-alias graph at the end of function swap:
-  <empty>
-[alias] Summary of function swap:
 [alias] Analysis complete
