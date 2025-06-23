@@ -27,11 +27,11 @@
 [alias] May-aliases after instruction  __retres = 0;  are
   { a; b }  { *a; *b; c }  { *(*a); *(*b); *c; d }
 [alias] May-alias graph after instruction  __retres = 0;  is
-  13:{ a; b } → 14:{ c }   14:{ c } → 15:{ d }   15:{ d } → 16:{ e }
+  0:{ a; b } → 14:{ c }   14:{ c } → 15:{ d }   15:{ d } → 16:{ e }
 [alias] May-aliases at the end of function main:
   { a; b }  { *a; *b; c }  { *(*a); *(*b); *c; d }
 [alias] May-alias graph at the end of function main:
-  13:{ a; b } → 14:{ c }   14:{ c } → 15:{ d }   15:{ d } → 16:{ e }
+  0:{ a; b } → 14:{ c }   14:{ c } → 15:{ d }   15:{ d } → 16:{ e }
 [alias] Summary of function main:
   formals:     returns: __retres
   state: { a; b }  { *a; *b; c }  { *(*a); *(*b); *c; d }

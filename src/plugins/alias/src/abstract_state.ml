@@ -651,10 +651,7 @@ let is_included s s' =
       let check_succs _ succ1 succ2 = match succ1, succ2 with
         | None, _ -> None
         | Some _, None -> raise Not_included
-        | Some v1p, Some v2p ->
-          if VarSet.subset (VMap.find v1p s.vmap) (VMap.find v2p s'.vmap)
-          then None
-          else raise Not_included
+        | Some v1p, Some v2p -> if V.equal v1p v2p then None else raise Not_included
       in
       ignore @@ E.Map.merge check_succs succs succs'
     in
