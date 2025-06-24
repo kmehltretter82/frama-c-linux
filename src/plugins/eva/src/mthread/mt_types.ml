@@ -396,6 +396,8 @@ module type Presence = sig
   val combine: t -> t -> t
 
   val only_present: t -> KeySet.t
+
+  val all_present: t -> KeySet.t
 end
 
 
@@ -458,7 +460,13 @@ module MakePresence (Key: Datatype.S_with_collections) = struct
     in
     M.fold aux m KeySet.empty
 
-
+  let all_present m =
+    let aux id flag acc =
+      match flag with
+      | NotPresent -> (* Should not happen as NotPresent is not stored *) acc
+      | MaybePresent | Present -> Key.Set.add id acc
+    in
+    M.fold aux m KeySet.empty
 end
 
 

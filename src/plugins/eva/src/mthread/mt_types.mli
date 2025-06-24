@@ -147,7 +147,11 @@ module type Presence = sig
 
   val combine: t -> t -> t
 
+  (** Returns only [Present] keys. *)
   val only_present: t -> KeySet.t
+
+  (** Returns [Present] and [MaybePresent] keys. *)
+  val all_present: t -> KeySet.t
 end
 
 module ThreadPresence: Presence
