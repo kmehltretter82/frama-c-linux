@@ -1,10 +1,10 @@
 [kernel] Parsing while_for1.c (with preprocessing)
-[alias] analysing global variable definiton: __fc_rand_max =
+[alias] analysing global variable definition: __fc_rand_max =
   (unsigned long)2147483647;
 [alias] May-aliases after global variable definition  __fc_rand_max  are  <none>
 [alias] May-alias graph after global variable definition  __fc_rand_max  is
   <empty>
-[alias] analysing global variable definiton: __fc_p_random48_counter =
+[alias] analysing global variable definition: __fc_p_random48_counter =
   __fc_random48_counter;
 [alias] May-aliases after global variable definition  __fc_p_random48_counter  are
   <none>

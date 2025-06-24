@@ -1,28 +1,28 @@
 [kernel] Parsing ex_jfla_2.c (with preprocessing)
-[alias] analysing global variable definiton: __fc_p_fopen = __fc_fopen;
+[alias] analysing global variable definition: __fc_p_fopen = __fc_fopen;
 [alias] May-aliases after global variable definition  __fc_p_fopen  are  <none>
 [alias] May-alias graph after global variable definition  __fc_p_fopen  is
   0:{  } → 1:{  }
-[alias] analysing global variable definiton: __fc_p_tmpnam = __fc_tmpnam;
+[alias] analysing global variable definition: __fc_p_tmpnam = __fc_tmpnam;
 [alias] May-aliases after global variable definition  __fc_p_tmpnam  are  <none>
 [alias] May-alias graph after global variable definition  __fc_p_tmpnam  is
   0:{  } → 1:{  }   4:{  } → 5:{  }
-[alias] analysing global variable definiton: __fc_p_ctermid = __fc_ctermid;
+[alias] analysing global variable definition: __fc_p_ctermid = __fc_ctermid;
 [alias] May-aliases after global variable definition  __fc_p_ctermid  are  <none>
 [alias] May-alias graph after global variable definition  __fc_p_ctermid  is
   0:{  } → 1:{  }   4:{  } → 5:{  }   8:{  } → 9:{  }
-[alias] analysing global variable definiton: __fc_p_cuserid = __fc_cuserid;
+[alias] analysing global variable definition: __fc_p_cuserid = __fc_cuserid;
 [alias] May-aliases after global variable definition  __fc_p_cuserid  are  <none>
 [alias] May-alias graph after global variable definition  __fc_p_cuserid  is
   0:{  } → 1:{  }   4:{  } → 5:{  }   8:{  } → 9:{  }
   12:{  } → 13:{  }
-[alias] analysing global variable definiton: __fc_rand_max =
+[alias] analysing global variable definition: __fc_rand_max =
   (unsigned long)2147483647;
 [alias] May-aliases after global variable definition  __fc_rand_max  are  <none>
 [alias] May-alias graph after global variable definition  __fc_rand_max  is
   0:{  } → 1:{  }   4:{  } → 5:{  }   8:{  } → 9:{  }
   12:{  } → 13:{  }
-[alias] analysing global variable definiton: __fc_p_random48_counter =
+[alias] analysing global variable definition: __fc_p_random48_counter =
   __fc_random48_counter;
 [alias] May-aliases after global variable definition  __fc_p_random48_counter  are
   <none>

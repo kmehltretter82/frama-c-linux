@@ -50,13 +50,4 @@
   16:{ d } → 13:{  }
 [alias] Summary of function main:
   formals:     returns: __retres    state: { a; b }  { c; d }
-[alias] analysing function: swap
-[alias] analysing instruction: int *z = (int *)0;
-[alias] May-aliases after instruction  int *z = (int *)0;  are  <none>
-[alias] May-alias graph after instruction  int *z = (int *)0;  is    <empty>
-[alias] May-aliases at the end of function swap: { x; y; z }
-[alias] May-alias graph at the end of function swap:
-  0:{ x; y; z } → 1:{  }
-[alias] Summary of function swap:
-  formals: x  y    returns: <none>    state: { x; y; z }
 [alias] Analysis complete
