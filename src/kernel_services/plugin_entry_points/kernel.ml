@@ -1561,7 +1561,7 @@ module NoVariadicTranslation =
   end)
 
 let () =
-  NoVariadicTranslation.add_update_hook (fun _old _new ->
+  NoVariadicTranslation.add_set_hook (fun _old _new ->
       warning "Option -variadic-no-translation is deprecated. \
                Use -no-variadic-translation instead.";
       VariadicTranslation.off ()
@@ -1591,7 +1591,7 @@ module NoVariadicStrict =
   end)
 
 let () =
-  NoVariadicStrict.add_update_hook (fun _old _new ->
+  NoVariadicStrict.add_set_hook (fun _old _new ->
       warning "Option -variadic-no-strict is deprecated. \
                Use -no-variadic-strict instead.";
       VariadicStrict.off ()
