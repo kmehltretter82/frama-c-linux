@@ -278,17 +278,11 @@ module Set_Name_Hook = Hook.Build(struct type t = project * string end)
 
 let register_after_set_name_hook = Set_Name_Hook.extend
 
-let set_name =
-  let apply_hook = ref false in
-  fun p s ->
-    feedback ~dkey ~level:2 "renaming project %S to %S" p.unique_name s;
-    let old_name = p.name in
-    Setter.set_name p s;
-    if not !apply_hook then begin
-      apply_hook := true;
-      Set_Name_Hook.apply (p, old_name);
-      apply_hook := false;
-    end
+let set_name p s =
+  feedback ~dkey ~level:2 "renaming project %S to %S" p.unique_name s;
+  let old_name = p.name in
+  Setter.set_name p s;
+  Set_Name_Hook.apply (p, old_name);
 
 module Create_Hook = Hook.Build(struct type t = project end)
 let register_create_hook = Create_Hook.extend
