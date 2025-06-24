@@ -433,8 +433,8 @@ export function addMenu(label: string): void {
 
    @param label - the menu title
  */
-export function delMenu(label: string): void {
-  ipcRenderer.send('dome.ipc.menu.delmenu', label);
+export function delSubMenu(label: string): void {
+  ipcRenderer.send('dome.ipc.menu.delsubmenu', label);
 }
 
 export type MenuName = 'File' | 'Edit' | 'View' | 'Help' | string;

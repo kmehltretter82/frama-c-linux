@@ -325,10 +325,10 @@ export function addMenu(label: string): void {
   requestUpdate();
 }
 
-export function delMenu(label: string): void {
+export function delSubMenu(label: string): void {
   const cmi = customMenus.findIndex((m) => m.label === label);
   if (cmi !== -1) {
-    customMenus.splice(cmi, 1);
+    customMenus[cmi].submenu = [];
     const itemIds: string[] = Array.from(customItems)
       .filter(item => item[1].menu === label)
       .map(item => item[0]);

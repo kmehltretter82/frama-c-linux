@@ -204,8 +204,7 @@ async function renameCurrentProject(): Promise<void> {
   Projects.renameProject(current, "Rename current project");
 }
 
-export function addProjectMenu(others?: Dome.MenuItemProps[]): void {
-  Dome.addMenu('Project');
+export function addProjectSubMenu(others?: Dome.MenuItemProps[]): void {
   Dome.addMenuItem({
     menu: 'Project',
     label: 'New project',
@@ -241,13 +240,19 @@ export function addProjectMenu(others?: Dome.MenuItemProps[]): void {
     onClick: () => renameCurrentProject(),
     kind: 'normal',
   });
+  Dome.addMenuItem({
+    menu: 'Project',
+    id: 'project_separator',
+    kind: 'separator'
+  });
   others?.forEach(e => Dome.addMenuItem(e));
 }
 
 export function init(): void {
   addFileMenuItems();
   addHelpMenuItems();
-  addProjectMenu();
+  Dome.addMenu('Project');
+  addProjectSubMenu();
 }
 
 /* --------------------------------------------------------------------------*/

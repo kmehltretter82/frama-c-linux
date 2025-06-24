@@ -34,7 +34,7 @@ import { Icon } from 'dome/controls/icons';
 
 import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
-import { addProjectMenu } from 'frama-c/menu';
+import { addProjectSubMenu } from 'frama-c/menu';
 import * as Project from './api/project';
 
 
@@ -226,10 +226,8 @@ export function Projects(): JSX.Element {
   /** Re-Build the project menu */
   React.useEffect(() => {
     const timeout = setTimeout(() => {
-      Dome.delMenu('Project');
-      const others: Dome.MenuItemProps[] = [
-        { menu: 'Project', id: 'project_separator', kind: 'separator' }
-      ];
+      Dome.delSubMenu('Project');
+      const others: Dome.MenuItemProps[] = [];
       projectsListSorted.forEach(elt => others.push({
           menu: 'Project',
           label: elt.name,
@@ -241,7 +239,7 @@ export function Projects(): JSX.Element {
             () => setCurrent(elt.uniqueName)
         })
       );
-      addProjectMenu(others);
+      addProjectSubMenu(others);
     }, 100);
     return () => clearTimeout(timeout);
   }, [projectsListSorted, current, setCurrent, recalcMenu]);
