@@ -92,3 +92,71 @@ let _thread_summary =
     ~descr:(Markdown.plain "Data for Mthread summary")
     ~key:(fun th -> Format.asprintf "%d" (Thread.id th))
     model (module Mt_summary.ThreadTable)
+
+let _shared_var_summary =
+  let open Mt_shared_vars_types in
+
+  let model = States.model () in
+
+  States.column model ~name:"bases"
+    ~descr:(Markdown.plain "")
+    ~data:(module Data.Jlist (Data.Jstring))
+    ~get:(fun ((protected_access : Mt_summary.protected_access), _) ->
+        let bases = Locations.Zone.get_bases protected_access.zone in
+        Base.SetLattice.fold
+          (fun base acc ->
+             Format.asprintf "%a" Base.pretty base :: acc)
+          bases
+          []);
+
+  States.column model ~name:"zones"
+    ~descr:(Markdown.plain "")
+    ~data:(module Data.Jstring)
+    ~get:(fun ((protected_access : Mt_summary.protected_access), _) ->
+        Format.asprintf "%a" Locations.Zone.pretty protected_access.zone);
+
+  States.column model ~name:"accessKind"
+    ~descr:(Markdown.plain "")
+    ~data:(module Data.Jstring)
+    ~get:(fun ((protected_access : Mt_summary.protected_access), _) ->
+        match protected_access.access_kind with
+        | AccessRead -> "read"
+        | AccessWrite -> "write");
+
+  States.column model ~name:"protectionKind"
+    ~descr:(Markdown.plain "")
+    ~data:(module Data.Jstring)
+    ~get:(fun ((protected_access : Mt_summary.protected_access), _) ->
+        match protected_access.protection_kind with
+        | Unprotected -> "unprotected"
+        | MaybeProtected _ -> "maybe protected"
+        | Protected _ -> "protected");
+
+  States.column model ~name:"protectionMutexes"
+    ~descr:(Markdown.plain "")
+    ~data:(module Jlist_of_keyed_value)
+    ~get:(fun ((protected_access : Mt_summary.protected_access), _) ->
+        match protected_access.protection_kind with
+        | Unprotected -> []
+        | MaybeProtected mutexes | Protected mutexes ->
+          lockset_to_keyed_stringlist mutexes);
+
+  States.column model ~name:"markers"
+    ~descr:(Markdown.plain "")
+    ~data:(module Data.Jlist (Kernel_ast.Marker))
+    ~get:(fun (_, locations) ->
+        AccessLocationSet.fold
+          (fun location acc ->
+             let pos = fst location in
+             let marker = Printer_tag.loc_to_localizable pos in
+             match marker with
+             | Some marker -> marker :: acc
+             | None -> acc)
+          locations
+          []);
+
+  States.register_framac_array ~package
+    ~name:"mtSharedVarsSummary"
+    ~descr:(Markdown.plain "Data for Mthread shared var summary")
+    ~key:(fun protected_access -> Format.asprintf "%a" Mt_summary.ProtectedAccessDatatype.pretty protected_access)
+    model (module Mt_summary.AccessTable)
