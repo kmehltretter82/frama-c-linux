@@ -345,7 +345,7 @@ end = struct
         unsupported ~loc:p.pred_loc
           "deep recursive occurrence of %a in incomplete mode"
           Printer.pp_logic_var lv_rec;
-      | Pimplies ({pred_content = Papp (li, _, args)}, pr) when is_inductive li ->
+      | Pimplies ({pred_content = Papp (li, _, args)}, pr) when is_inductive li -> (* foreign predicate *)
         let try_with_mode {Modus.mode = m} = predicate_call ~mode:m args pr in
         let modi = List.filter_map try_with_mode (InductiveDefinition.analyze_modes li) in
         Modus.preferred_opt modi
@@ -636,14 +636,12 @@ end = functor (Out : Out_language) -> struct
                     (fun m -> m.Modus.mode)
                     (InductiveDefinition.analyze_modes li)
                 in
-                let incomplete_modes =
-                  (* foreign predicates can only be used in incomplete mode *)
-                  List.filter ((<>) Complete) available_modes
-                in
-                Mode.select_mode ~usable_vars ~li args incomplete_modes
+                Mode.select_mode ~usable_vars ~li args available_modes
               in
               Mode.in_out_args ~mode:mode' args,
-              FunctionExtractor.extract ~mode:mode' li
+              match mode' with
+              | Complete -> li
+              | _ -> FunctionExtractor.extract ~mode:mode' li
           in
           begin match in_out_args with
             | _, None -> (* complete mode *)

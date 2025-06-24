@@ -136,7 +136,7 @@ module Html = struct
   }
   ;;
 
-  let empty_string = "&nbsp;"
+  let empty_string = ""
 
   let mk_div s =
     let b, fmt = Utilities.mk_buffer_formatter () in
@@ -228,6 +228,9 @@ module Html = struct
 
     (* Pretty print a html table *)
     let pretty ~pp_row_head ~pp_col_head ~pp_cell ~caption ~legend fmt table =
+      let pp_row_head = pretty_escaped pp_row_head in
+      let pp_col_head = pretty_escaped pp_col_head in
+      let pp_cell = pretty_escaped pp_cell in
       let pp_row fmt i =
         let row =
           try
@@ -747,7 +750,7 @@ module Html = struct
     Format.pp_set_formatter_stag_functions fmt html_stag_functions;
     Format.pp_set_tags fmt true;
     let pp = new tagPrinterClass in
-    Format.fprintf fmt "@{<pre>@.%a@}@?" pp#file (Ast.get ());
+    Format.fprintf fmt "<pre>@,%a</pre>@?" pp#file (Ast.get ());
     pp_page page
   ;;
 
