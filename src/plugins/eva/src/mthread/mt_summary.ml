@@ -10,6 +10,7 @@
 
 open Mt_types
 open Mt_thread
+open Mt_shared_vars_types
 
 type mutex_summary = {
   taken : Mutex.Set.t;
@@ -105,6 +106,35 @@ module ThreadSummary = struct
 end
 
 module ThreadSummaryDatatype = Datatype.Make (ThreadSummary)
+
+
+(** Map of zone to protected accesses. *)
+module ProtectedAccessesByZone = struct
+  module Lattice = struct
+    include Eval.Top.Make_Datatype (LocationsByAccess)
+    let top = `Top
+    let default = `Value LocationsByAccess.empty
+    let default_is_bottom = true
+    let join l r =
+      match l, r with
+      | `Top, _ | _, `Top -> `Top
+      | `Value l, `Value r -> `Value (LocationsByAccess.join l r)
+    let is_included l r =
+      match l, r with
+      | _, `Top -> true
+      | `Top, _ -> false
+      | `Value l, `Value r ->
+        LocationsByAccess.for_all
+          (fun key l ->
+             try
+               let r = LocationsByAccess.find key r in
+               AccessLocationSet.subset l r
+             with Not_found -> false)
+          l
+  end
+
+  include Lmap_bitwise.Make_bitwise (Lattice)
+end
 
 
 (* ----- Computation of the summary of one thread --------------------------- *)

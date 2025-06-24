@@ -40,3 +40,39 @@ module AccessesByZone: sig
 
   val pretty_map: map Pretty_utils.formatter
 end
+
+(** Kind of protected access, read or write. *)
+module AccessKind : sig
+  type t = AccessRead | AccessWrite
+  include Datatype.S_with_collections with type t := t
+end
+
+(** Kind of protection, unprotected, maybe protected with associated mutexes or
+    fully protected with associated mutexes. *)
+module ProtectionKind : sig
+  type t =
+    | Unprotected
+    | MaybeProtected of Mutex.Set.t
+    | Protected of Mutex.Set.t
+  include Datatype.S_with_collections with type t := t
+end
+
+(** Protected access: the association of a kind of access and a kind of
+    protection. *)
+module ProtectedAccess : sig
+  type t = AccessKind.t * ProtectionKind.t
+  include Datatype.S_with_collections with type t := t
+end
+
+(** Set of Cil locations as [Hptset]. *)
+module AccessLocationSet : Hptset.S with type elt = Cil_datatype.Location.t
+
+(** Map of protected access to Cil locations. *)
+module LocationsByAccess : sig
+  include Hptmap_sig.S
+    with type key = ProtectedAccess.t
+     and type v = AccessLocationSet.t
+
+  val join : t -> t -> t
+end
+
