@@ -55,7 +55,7 @@ framework, based on analyzers, called "plug-ins", that can build upon the \
 results computed by other analyzers of the platform.\n\
 Thanks to this approach, Frama-C provides sophisticated tools, including:\n\
 - Eva, an analyzer based on abstract interpretation;\n\
-- Wp, a program proof framework based on weakest precondition calculus;\n\
+- WP, a program proof framework based on weakest precondition calculus;\n\
 - E-ACSL, a runtime verification tool;\n\
 - Aoraï, a tool for the verification of automata-based properties;\n\
 - several tools for code base exploration and dependency analysis: \
