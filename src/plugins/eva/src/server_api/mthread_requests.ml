@@ -15,29 +15,28 @@ let package =
     ~title:"Eva Mthread Services"
     ()
 
-let _mthread_summary =
-  let module Jkeyed_value = Data.Jpair (Data.Jint) (Data.Jstring) in
-  let module Jlist_of_keyed_value = Data.Jlist (Jkeyed_value) in
+module Jkeyed_value = Data.Jpair (Data.Jint) (Data.Jstring)
+module Jlist_of_keyed_value = Data.Jlist (Jkeyed_value)
 
-  let lockset_to_keyed_stringlist lockset =
-    Mutex.Set.fold
-      (fun mutex acc -> (Mutex.id mutex, Mutex.label mutex) :: acc)
-      lockset
-      []
-  in
-  let mqueueset_to_keyed_stringlist mqueueset =
-    Mqueue.Set.fold
-      (fun mqueue acc -> (Mqueue.id mqueue, Mqueue.label mqueue) :: acc)
-      mqueueset
-      []
-  in
-  let zoneset_to_stringlist zoneset =
-    Locations.Zone.Set.fold
-      (fun zone acc -> Format.asprintf "%a" Locations.Zone.pretty zone :: acc)
-      zoneset
-      []
-  in
+let lockset_to_keyed_stringlist lockset =
+  Mutex.Set.fold
+    (fun mutex acc -> (Mutex.id mutex, Mutex.label mutex) :: acc)
+    lockset
+    []
 
+let mqueueset_to_keyed_stringlist mqueueset =
+  Mqueue.Set.fold
+    (fun mqueue acc -> (Mqueue.id mqueue, Mqueue.label mqueue) :: acc)
+    mqueueset
+    []
+
+let zoneset_to_stringlist zoneset =
+  Locations.Zone.Set.fold
+    (fun zone acc -> Format.asprintf "%a" Locations.Zone.pretty zone :: acc)
+    zoneset
+    []
+
+let _thread_summary =
   let model = States.model () in
 
   States.column model ~name:"thread"
@@ -89,7 +88,7 @@ let _mthread_summary =
 
   States.register_framac_array
     ~package
-    ~name:"mtSummary"
+    ~name:"mtThreadsSummary"
     ~descr:(Markdown.plain "Data for Mthread summary")
     ~key:(fun th -> Format.asprintf "%d" (Thread.id th))
     model (module Mt_summary.ThreadTable)

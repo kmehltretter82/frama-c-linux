@@ -20,7 +20,7 @@ import { Icon, IconKind } from 'dome/controls/icons';
 import * as States from 'frama-c/states';
 
 import { EvaReady, EvaStatus } from './components/AnalysisStatus';
-import { mtSummary, mtSummaryData } from './api/mthread';
+import { mtThreadsSummary, mtThreadsSummaryData } from './api/mthread';
 
 type Thread = [number, string];
 interface MtContext {
@@ -141,7 +141,7 @@ function getSubElement(
 }
 
 interface ContentProps {
-  data:  mtSummaryData;
+  data:  mtThreadsSummaryData;
   showEmpty: boolean;
 }
 
@@ -268,7 +268,7 @@ function MThreadComponent(): JSX.Element {
   context.selectedMessage = React.useState("");
   context.selectedVar = React.useState("");
 
-  const model = States.useSyncArrayModel(mtSummary);
+  const model = States.useSyncArrayModel(mtThreadsSummary);
   const syncModel = useModel(model);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const threads = React.useMemo(() => model.getArray(), [syncModel, model]);
@@ -438,7 +438,7 @@ function AnimatedElement(props: AnimatedElementProps): React.JSX.Element  {
 // --------------------------------------------------------------------------
 // --- Filtering function
 // --------------------------------------------------------------------------
-function isErrorInMutex(thread: mtSummaryData): boolean {
+function isErrorInMutex(thread: mtThreadsSummaryData): boolean {
   const taken = thread.locksTaken;
   const released = thread.locksReleased;
   return !taken.every(
@@ -446,11 +446,15 @@ function isErrorInMutex(thread: mtSummaryData): boolean {
   ) || released.length !== taken.length;
 }
 
-function filteringErrorMutex(datas: mtSummaryData[]): mtSummaryData[] {
+function filteringErrorMutex(
+  datas: mtThreadsSummaryData[]
+): mtThreadsSummaryData[] {
   return datas.filter((mt) => isErrorInMutex(mt));
 }
 
-function filteringNoMutex(datas: mtSummaryData[]): mtSummaryData[] {
+function filteringNoMutex(
+  datas: mtThreadsSummaryData[]
+): mtThreadsSummaryData[] {
   return datas.filter((mt) => {
     return mt.locksReleased.length !== 0 || mt.locksTaken.length !== 0;
   });
