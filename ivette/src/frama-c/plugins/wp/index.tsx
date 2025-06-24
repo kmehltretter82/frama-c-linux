@@ -141,6 +141,7 @@ function WPGoals(): JSX.Element {
       <Ivette.TitleBar
         label={tip ? 'WP — TIP' : 'WP — Goals'}
         title={tip ? 'Interactive Proof Transformer' : 'Generated Goals'}
+        help={tip ? 'wp-tip' : 'wp-goals'}
       >
         <Label display={goals < total}>
           {goals} / {total}
