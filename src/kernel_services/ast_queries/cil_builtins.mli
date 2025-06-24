@@ -85,10 +85,6 @@ val add_special_builtin: string -> unit
 *)
 val add_special_builtin_family: (string -> bool) -> unit
 
-(** initialize the C built-ins. Should be called once per project, after the
-    machine has been set. *)
-val init_builtins: unit -> unit
-
 (** A list of the built-in functions for the current compiler (GCC or
     MSVC, depending on [!Machine.msvcMode]).  Maps the name to the
     result and argument types, and whether it is vararg.
@@ -132,3 +128,11 @@ val add_custom_builtin: (unit -> (string * typ * typ list * bool)) -> unit
 
 (** This is used as the location of the prototypes of builtin functions. *)
 val builtinLoc: location
+
+(** DEPRECATED: does nothing.
+    @before Frama-C+dev initialize the C built-ins. Should be called once per
+    project, after the machine has been set.
+*)
+val init_builtins: unit -> unit
+[@@deprecated "This function is obsolete and does nothing. Builtins are \
+               initialized via Machine.init."]

@@ -285,13 +285,15 @@ let init ~initLogicBuiltins machdep =
     the_machine.ptrdiffKind  <- findIkindName (ptrdiff_t ());
     the_machine.ptrdiffType  <- Cil_const.mk_tint the_machine.ptrdiffKind;
     the_machine.useLogicalOperators <- Kernel.LogicalOperators.get ();
-    (* Have to be marked before calling [init*Builtins] below. *)
-    TheMachine.mark_as_computed ();
+
     (* projectify theMachine *)
     copy_machine the_machine !theMachineProject;
 
+    (* Initialize Cil builtins. *)
     !init_builtins_ref ();
 
     Logic_env.Builtins.extend initLogicBuiltins;
+
+    TheMachine.mark_as_computed ()
 
   end

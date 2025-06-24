@@ -1253,10 +1253,7 @@ let prepare_cil_file ast =
   Ast.set_file ast
 
 let fill_built_ins () =
-  if Machine.is_computed () then begin
-    Kernel.debug "Machine is computed, just fill the built-ins";
-    Cil_builtins.init_builtins ();
-  end else begin
+  if not (Machine.is_computed ()) then begin
     Kernel.debug "Machine is not computed, initialize everything";
     Machine.init ~initLogicBuiltins:(Logic_builtin.init()) (get_machdep ());
   end;

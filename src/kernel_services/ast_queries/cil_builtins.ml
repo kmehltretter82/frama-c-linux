@@ -411,10 +411,9 @@ let init_builtins_from_json () =
       List.iter add_builtin_if_active builtins
     )
 
+(** Initialize the C built-ins. Called by {!Machine.init} via
+    {!Machine.init_builtins_ref}. *)
 let init_builtins () =
-  if not (Machine.is_computed ()) then
-    Kernel.fatal ~current:true
-      "You must call Machine.init before init_builtins" ;
   if Builtin_functions.length () <> 0 then
     Kernel.fatal ~current:true "Cil builtins already initialized." ;
   init_builtins_from_json ();
@@ -426,3 +425,6 @@ let builtinLoc: location = Location.unknown
 let () =
   Machine.init_builtins_ref := init_builtins
 [@@alert "-machine_init_builtins_ref"]
+
+(* Foward deprecated function. *)
+let init_builtins () = ()
