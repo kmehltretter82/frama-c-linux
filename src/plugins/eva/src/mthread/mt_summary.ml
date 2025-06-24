@@ -38,6 +38,13 @@ type thread_summary = {
 }
 [@@deriving eq, ord]
 
+type protected_access = {
+  zone : Locations.Zone.t;
+  access_kind : AccessKind.t;
+  protection_kind : ProtectionKind.t;
+}
+[@@deriving eq, ord]
+
 
 (* ----- Datatypes for all above types. ----------------------------------- *)
 
@@ -136,6 +143,44 @@ module ProtectedAccessesByZone = struct
   include Lmap_bitwise.Make_bitwise (Lattice)
 end
 
+module ProtectedAccess = struct
+  include Datatype.Serializable_undefined
+
+  type t = protected_access [@@deriving eq, ord]
+
+  let name = "Eva.Mthread.Mt_summary.ProtectedAccessSummary"
+  let reprs =
+    List.fold_left
+      (fun acc zone ->
+         List.fold_left
+           (fun acc access_kind ->
+              List.fold_left
+                (fun acc protection_kind ->
+                   { zone; access_kind; protection_kind } :: acc)
+                acc
+                ProtectionKind.reprs)
+           acc
+           AccessKind.reprs)
+      []
+      Locations.Zone.reprs
+  let structural_descr =
+    Structural_descr.t_record [| Locations.Zone.packed_descr;
+                                 AccessKind.packed_descr;
+                                 ProtectionKind.packed_descr; |]
+  let hash { zone; access_kind; protection_kind } =
+    Hashtbl.hash
+      (Locations.Zone.hash zone,
+       AccessKind.hash access_kind,
+       ProtectionKind.hash protection_kind)
+  let pretty fmt { zone; access_kind; protection_kind } =
+    Format.fprintf fmt "%a>%a>%a"
+      Locations.Zone.pretty zone
+      AccessKind.pretty access_kind
+      ProtectionKind.pretty protection_kind
+end
+
+module ProtectedAccessDatatype = Datatype.Make_with_collections (ProtectedAccess)
+
 
 (* ----- Computation of the summary of one thread --------------------------- *)
 
@@ -190,6 +235,76 @@ let compute_thread_summary thread =
     ThreadSummary.empty
 
 
+(* ----- Computation of the summary of one access node set ------------------ *)
+
+let get_access_kind (rw, _, _) : AccessKind.t =
+  match rw with
+  | Read | ReadPos _ -> AccessRead
+  | Write _ | WritePos _ -> AccessWrite
+
+let get_mutexes_for_access mutexes (rw, _, _) =
+  let open Mt_mutexes_types in
+  let mutexes =
+    match rw with
+    | Read | ReadPos _ -> mutexes.mutexes_for_read
+    | Write _ | WritePos _ -> mutexes.mutexes_for_write
+  in
+  match mutexes with
+  | Unaccessed ->
+    Mt_self.fatal "By construction, we are considering actual accesses"
+  | Mutexes m -> m
+
+let get_access_locs (_, node, _) =
+  Mt_cfg_types.CfgNode.node_stmt node
+  |> List.map Cil_datatype.Stmt.loc
+  |> AccessLocationSet.of_list
+
+let get_locked_mutexes_for_access (_, node, _) =
+  node.Mt_cfg_types.cfgn_context.locked_mutexes
+
+let compute_node_access_summary mutexes_by_zone (zone, node_access_set) =
+  let open Mt_mutexes_types in
+  let open Mt_cfg_types in
+  let mutexes = MutexesByZone.find mutexes_by_zone zone in
+  (* By construction, the zone is in the MutexesByZone *)
+  let mutexes = Eval.Bottom.non_bottom mutexes in
+  SetNodeIdAccess.fold
+    (fun node_id_access acc ->
+       let access_kind = get_access_kind node_id_access in
+       let protection_mutexes = get_mutexes_for_access mutexes node_id_access in
+       let locs = get_access_locs node_id_access in
+       let protection_kinds : ProtectionKind.t list =
+         let locked_mutexes = get_locked_mutexes_for_access node_id_access in
+         if MutexPresence.is_empty locked_mutexes then
+           [ Unprotected ]
+         else
+           MutexPresence.KeySet.fold
+             (fun mutex acc ->
+                let presence = MutexPresence.find protection_mutexes mutex in
+                let protection : ProtectionKind.t =
+                  match presence with
+                  | NotPresent ->
+                    Mt_self.fatal
+                      "By construction, the mutexes from the access are present"
+                  | MaybePresent -> MaybeProtected (Mutex.Set.singleton mutex)
+                  | Present -> Protected (Mutex.Set.singleton mutex)
+                in
+                protection :: acc)
+             (MutexPresence.all_present locked_mutexes)
+             []
+       in
+       let lba =
+         List.fold_left
+           (fun acc protection ->
+              LocationsByAccess.add (access_kind, protection) locs acc)
+           LocationsByAccess.empty
+           protection_kinds
+       in
+       ProtectedAccessesByZone.add_binding ~exact:false acc zone (`Value lba))
+    node_access_set
+    ProtectedAccessesByZone.empty
+
+
 (* ----- Summary for all threads -------------------------------------------- *)
 
 module ThreadTable =
@@ -202,7 +317,7 @@ module ThreadTable =
       let dependencies = [ Ast.self ]
     end)
 
-let compute analysis =
+let compute_threads_summary analysis =
   ThreadTable.clear ();
   let all_threads = Mt_thread.threads analysis in
   let threads = List.filter Mt_thread.should_compute_thread all_threads in
@@ -213,4 +328,60 @@ let compute analysis =
     threads;
   ThreadTable.mark_as_computed ()
 
-let clear = ThreadTable.clear
+
+(* ----- Summary for all accesses ------------------------------------------- *)
+
+module AccessTable =
+  State_builder.Hashtbl
+    (ProtectedAccessDatatype.Hashtbl)
+    (AccessLocationSet)
+    (struct
+      let name = "Eva.Mthread.Mt_summary.AccessSummary"
+      let size = 11
+      let dependencies = [ Ast.self ]
+    end)
+
+let compute_access_summary analysis =
+  let accesses = analysis.concurrent_accesses_by_nodes in
+  let mutexes_by_zone =
+    Mt_mutexes.mutexes_protecting_zones' accesses
+  in
+  let aux = compute_node_access_summary mutexes_by_zone in
+  let r1 = List.map aux accesses in
+  let accesses_by_zone =
+    List.fold_left
+      (fun r r' -> ProtectedAccessesByZone.join r r')
+      ProtectedAccessesByZone.empty
+      r1
+  in
+  let accesses_by_zone =
+    match accesses_by_zone with
+    | Top | Bottom ->
+      Mt_self.fatal
+        "By construction, accesses_by_zone cannot be Top or Bottom"
+    | Map m -> m
+
+  in
+  AccessTable.clear ();
+  ProtectedAccessesByZone.fold
+    (fun zone accesses () ->
+       let accesses = Eval.Top.non_top accesses in
+       LocationsByAccess.iter
+         (fun (access_kind, protection_kind) locations ->
+            let access_key = { zone; access_kind; protection_kind } in
+            AccessTable.add access_key locations)
+         accesses)
+    accesses_by_zone
+    ();
+  AccessTable.mark_as_computed ()
+
+
+(* ----- Summary for everything --------------------------------------------- *)
+
+let compute analysis =
+  compute_threads_summary analysis;
+  compute_access_summary analysis
+
+let clear () =
+  ThreadTable.clear ();
+  AccessTable.clear ();

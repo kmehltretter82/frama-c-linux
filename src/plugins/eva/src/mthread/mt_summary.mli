@@ -37,8 +37,21 @@ type thread_summary = {
   shared_vars : shared_var_summary;
 }
 
+type protected_access = {
+  zone : Locations.Zone.t;
+  access_kind : Mt_shared_vars_types.AccessKind.t;
+  protection_kind : Mt_shared_vars_types.ProtectionKind.t;
+}
+module ProtectedAccessDatatype : Datatype.S_with_collections
+  with type t = protected_access
+
 module ThreadTable : State_builder.Hashtbl with type key = Thread.t
                                             and type data = thread_summary
+
+module AccessTable : State_builder.Hashtbl
+  with type key = ProtectedAccessDatatype.t
+   and type data = Mt_shared_vars_types.AccessLocationSet.t
+
 
 (** Computes the summary from an analysis state. *)
 val compute : Mt_thread.analysis_state -> unit
