@@ -19,5 +19,9 @@ declare module '*.png' {
 
 declare module 'react-flame-graph';
 declare module 'react-pivottable/PivotTableUI';
+declare module 'react-pivottable/PivotTable';
+declare module 'react-pivottable/Utilities';
+
+declare module 'react-pivottable/TableRenderers';
 declare module 'three/examples/jsm/renderers/CSS2DRenderer';
 declare module 'react-cytoscapejs';
