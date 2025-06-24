@@ -332,6 +332,11 @@ label.locations {
 /* --- Projects                                                           --- */
 /* -------------------------------------------------------------------------- */
 
+.projects-title-actions {
+    gap: 5px;
+    margin-right: 5px;
+}
+
 .project-error {
     padding: 10px 20px;
     font-size: 1.2em;

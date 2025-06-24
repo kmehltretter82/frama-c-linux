@@ -33,7 +33,7 @@ import * as Services from 'frama-c/kernel/api/services';
 import * as Project from 'frama-c/kernel/api/project';
 import * as Ast from 'frama-c/kernel/api/ast';
 import * as States from 'frama-c/states';
-import * as Globals from 'frama-c/kernel/Globals';
+import * as Projects from 'frama-c/kernel/Projects';
 import { showAboutModal, showCreditsModal } from './help';
 
 const cFilter = {
@@ -191,17 +191,17 @@ function addHelpMenuItems(): void {
 
 async function duplicateCurrentProject(): Promise<void> {
   const current = await Server.send(Project.getCurrent, null);
-  Globals.duplicateProject(current, "Duplicate current project");
+  Projects.duplicateProject(current, "Duplicate current project");
 }
 
 async function deleteCurrentProject(): Promise<void> {
   const current = await Server.send(Project.getCurrent, null);
-  Globals.removeProject(current);
+  Projects.removeProject(current);
 }
 
 async function renameCurrentProject(): Promise<void> {
   const current = await Server.send(Project.getCurrent, null);
-  Globals.renameProject(current, "Rename current project");
+  Projects.renameProject(current, "Rename current project");
 }
 
 export function addProjectMenu(others?: Dome.MenuItemProps[]): void {
@@ -210,14 +210,14 @@ export function addProjectMenu(others?: Dome.MenuItemProps[]): void {
     menu: 'Project',
     label: 'New project',
     id: 'project_new',
-    onClick: () => Globals.newProject(),
+    onClick: () => Projects.newProject(),
     kind: 'normal',
   });
   Dome.addMenuItem({
     menu: 'Project',
     label: 'Load project',
     id: 'project_load',
-    onClick: Globals.loadProject,
+    onClick: Projects.loadProject,
     kind: 'normal',
   });
   Dome.addMenuItem({

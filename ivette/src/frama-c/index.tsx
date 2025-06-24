@@ -28,9 +28,8 @@ import React from 'react';
 import * as Ivette from 'ivette';
 
 import History from 'frama-c/kernel/History';
-import {
-  GlobalDeclarations, GlobalByFiles, GlobalProjects
-} from 'frama-c/kernel/Globals';
+import { GlobalDeclarations, GlobalByFiles } from 'frama-c/kernel/Globals';
+import { Projects } from  'frama-c/kernel/Projects';
 import ASTview from 'frama-c/kernel/ASTview';
 import ASTinfo from 'frama-c/kernel/ASTinfo';
 import SourceCode from 'frama-c/kernel/SourceCode';
@@ -70,7 +69,7 @@ Ivette.registerSidebar({
   label: 'Projects',
   icon: 'PROJECT',
   title: 'Projects',
-  children: <GlobalProjects />
+  children: <Projects />
 });
 
 Ivette.registerToolbar({

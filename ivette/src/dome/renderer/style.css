@@ -265,16 +265,21 @@ input[type="checkbox"]:checked {
     }
 
     .dome-xModal-body {
+        position: relative;
         flex:1;
         max-height: 100%;
         overflow-y: hidden;
         background-color: var(--background);
 
-        .dome-xModal-waiting {
+        .dome-xModal-loader {
+          position: absolute;
+          height: 100%;
+          width: 100%;
           display: flex;
           justify-content: center;
           align-items: center;
-          padding: 20px;
+          z-index: 10;
+          background-color: rgba(70, 70, 70, 0.7);
 
           svg { bottom: 0 !important; }
         }
