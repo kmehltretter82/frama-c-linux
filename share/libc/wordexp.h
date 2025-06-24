@@ -58,7 +58,7 @@ extern int wordexp(const char *restrict words, wordexp_t *restrict pwordexp,
                    int flags);
 
 /*@
-  frees pwordexp->we_wordv;
+  frees pwordexp->we_wordv[0..], pwordexp->we_wordv;
   assigns *pwordexp \from *pwordexp;
  */
 extern void wordfree(wordexp_t *pwordexp);
