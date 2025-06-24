@@ -141,12 +141,14 @@ let _project_list =
     ~get:Project.get_name;
 
   let add_update_hook f =
-    Project.register_create_hook f
+    Project.register_create_hook f;
+    Project.register_after_load_hook f;
   in
   let add_remove_hook f =
     Project.register_before_remove_hook f
   in
   let add_reload_hook f =
+    Project.register_after_global_load_hook f;
     (* Since Project.set_name changes the unique_name of the project, which is
        the key of this array, the whole array needs to be reloaded when a
        project is renamed. *)
