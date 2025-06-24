@@ -22,6 +22,9 @@
 
 import React from 'react';
 import { Button, ButtonGroup } from 'dome/frame/toolbars';
+import { useWindowSettings, useWindowSettingsData } from 'dome/data/settings';
+import { Decoder, Encoder, json, JsonTypeError } from 'dome/data/json';
+import { ModeDisplay } from '../definitions';
 
 /* -------------------------------------------------------------------------- */
 /* --- ThreeStateButton component                                         --- */
@@ -42,6 +45,22 @@ interface ThreeStateButtonProps {
   icon?: string;
   title?: string;
   buttonState: TThreesButtonState;
+}
+
+const encodeButton: Encoder<IThreeStateButton> = (js: IThreeStateButton) => {
+  return JSON.stringify(js);
+};
+const decodeButton: Decoder<IThreeStateButton> = (js: json) => {
+  if (typeof js === 'string') return JSON.parse(js);
+  else throw new JsonTypeError("string", js);
+};
+
+export function useTSButton(id: string): TThreesButtonState {
+  return useWindowSettingsData<IThreeStateButton>(
+    `ivette.callgraph.${id}`,
+    decodeButton, encodeButton,
+    { active: true, max: true, value: 1 }
+  );
 }
 
 export function ThreeStateButton(
@@ -78,5 +97,17 @@ export function ThreeStateButton(
         <Button icon='PLUS'  className='cg-plus-minus' onClick={onUpVal} />
       </ButtonGroup>
     </div>
+  );
+}
+
+/** Other buttons */
+export const decodeMode: Decoder<ModeDisplay> = (js: json) => {
+  if (js === 'all' || js === "linked" || js === "selected" ) return js;
+  else throw new JsonTypeError("ModeDisplay", js);
+};
+
+export function useDMButton(): [ModeDisplay, (newValue: ModeDisplay) => void] {
+  return useWindowSettings<ModeDisplay>(
+    "ivette.callgraph.displaymode", decodeMode, "all"
   );
 }

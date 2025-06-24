@@ -29,13 +29,10 @@ import * as Ivette from 'ivette';
 
 import * as Dome from 'dome';
 import {
-  Graph, IGraphOptions3D, ILinksOptions, INodesOptions
+  Graph, IGraphOptions3D, ILinksOptions,
 } from 'dome/graph/graph';
 import { Icon } from 'dome/controls/icons';
 import * as Themes from 'dome/themes';
-import { Decoder, Encoder, json, JsonTypeError } from 'dome/data/json';
-import { useWindowSettingsData } from 'dome/data/settings';
-
 import * as Server from 'frama-c/server';
 import { computeFcts, useFunctionFilter } from 'frama-c/kernel/Globals';
 import * as Ast from 'frama-c/kernel/api/ast';
@@ -43,17 +40,25 @@ import * as Properties from 'frama-c/kernel/api/properties';
 import * as States from 'frama-c/states';
 import * as Eva from 'frama-c/plugins/eva/api/general';
 import {
-  callGraphFunction, SelectedNodes, ModeDisplay,
   CGNode, CGLink, CGData,
-  CallGraphFunc, SelectedNodesData,
-  transformColor
+  SelectedNodes,
+  getIDFromLink,
+  getNodeVisibility,
+  getSuccessor,
+  getPredecessors,
+  onNodeClickMultiSelect,
+  getLinkWidth,
+  getLinkColor,
+  getLinkVisibility,
+  ModeDisplay,
+  useSelectedNodes
 } from "frama-c/plugins/callgraph/definitions";
 
 import './callgraph.css';
 import * as Node from "./components/node";
 import { Panel } from './components/panel';
 import { CallgraphToolsBar } from "./components/toolbar";
-import { IThreeStateButton } from "./components/threeStateButton";
+import { useDMButton, useTSButton } from "./components/buttons";
 import { CallgraphTitleBar, docCallgraph } from "./components/titlebar";
 
 import * as CgAPI from './api';
@@ -109,12 +114,43 @@ function convertGraph(
   return { nodes, links };
 }
 
-function filterGraph(graph?: CgAPI.graph, ids: string[] = []): CgAPI.graph {
-  if (!graph) return { vertices: [], edges: [] };
+function getFilteredGraph(graph: CGData, ids: string[] = []): CGData {
   return {
-    vertices: graph.vertices.filter(elt => ids.includes(elt.decl)),
-    edges: graph.edges.filter(elt =>
-      Boolean(ids.includes(elt.src) && ids.includes(elt.dst)))
+    nodes: graph.nodes.filter(elt => ids.includes(elt.id)),
+    links: graph.links.filter(elt => {
+      const { sourceId, targetId } = getIDFromLink(elt);
+      return Boolean(ids.includes(sourceId) && ids.includes(targetId));
+    })
+  };
+}
+
+function getStyledGraph(
+  displayMode: ModeDisplay,
+  predecessors: string[],
+  successors: string[],
+  selectedNodes: SelectedNodes,
+  style: CSSStyleDeclaration,
+  linkThickness: number,
+  graph: CGData,
+): CGData {
+  return {
+    nodes: graph.nodes.map(node => ({
+      ...node,
+      visible: getNodeVisibility(
+        graph.links,
+        displayMode,
+        node.id,
+        predecessors, successors
+      )
+    })),
+    links: graph.links.map(link => {
+      return {
+        ...link,
+        visible: getLinkVisibility(link, displayMode, predecessors, successors),
+        color: getLinkColor(link, selectedNodes, style),
+        width: getLinkWidth(link, selectedNodes, linkThickness),
+      };
+    })
   };
 }
 
@@ -126,6 +162,13 @@ function Callgraph(): JSX.Element {
   const isComputed = States.useSyncValue(CgAPI.isComputed);
   if(isComputed === false) Server.send(CgAPI.compute, null);
 
+  /** Current location */
+  const { scope } = States.useCurrentLocation();
+
+  /** Style */
+  const style = Themes.useStyle();
+
+  /** data */
   const graph = States.useSyncValue(CgAPI.callgraph);
   const alarms = States.useSyncArrayData(Eva.functionStats);
 
@@ -142,12 +185,30 @@ function Callgraph(): JSX.Element {
   } = functionFilter;
 
   const filteredFunctions =  React.useMemo(() => {
-    const test = functions ? functions.filter(showFunction) : [];
-    return test;
+    return functions.filter(showFunction);
   }, [functions, showFunction]);
 
-  /** Current location */
-  const { scope } = States.useCurrentLocation();
+  /** Control */
+  const [ displayMode, setDisplayMode ] = useDMButton();
+  const [ selectedParents, setSelectedParents ] =
+    useTSButton('selectedparents');
+  const [ selectedChildren, setSelectedChildren ] =
+    useTSButton('selectedChildren');
+
+  const showParticlesState = Dome.useFlipState(true);
+  const [ showParticles, flipShowParticles ] = showParticlesState;
+  const panelVisibleState =
+    Dome.useFlipSettings("ivette.callgraph.panelVisible", true);
+  const [ verticalSpacing, setVerticalSpacing ] =
+    Dome.useNumberSettings("ivette.callgraph.verticalspacing", 75);
+  const [ horizontalSpacing, setHorizontalSpacing ] =
+    Dome.useNumberSettings("ivette.callgraph.horizontalspacing", 500);
+  const [ linkThickness, setLinkThickness ] =
+    Dome.useNumberSettings("ivette.callgraph.linkThickness", 1);
+  const [ autoCenter, flipAutoCenter ] =
+    Dome.useFlipSettings("ivette.callgraph.autocenter", true);
+  const [ autoSelect, flipAutoSelect ] =
+    Dome.useFlipSettings('ivette.callgraph.autoselect', true);
 
   /** Specific nodes*/
   const selectedFunctions = React.useMemo<Set<string>>(() => {
@@ -167,7 +228,7 @@ function Callgraph(): JSX.Element {
   }, [properties, evaps]);
 
   const unprovenPropertiesFunctions = React.useMemo<Set<string>>(() => {
-    const ids: SelectedNodesData = new Set();
+    const ids: SelectedNodes = new Set();
     alarms.forEach(elt => {
       if (elt.alarmCount.length > 0) ids.add(elt.key);
     });
@@ -175,87 +236,73 @@ function Callgraph(): JSX.Element {
   }, [alarms]);
 
   /** Graph */
-  const filteredGraph = React.useMemo<CgAPI.graph>(() => {
-    return filterGraph(graph, filteredFunctions.map(elt => elt.decl));
-  }, [graph, filteredFunctions]);
-
   const graphData = React.useMemo<CGData>(() => {
-    return convertGraph(filteredGraph, alarms, properties, evaps);
-  }, [filteredGraph, alarms, properties, evaps]);
+    return convertGraph(graph, alarms, properties, evaps);
+  }, [graph, alarms, properties, evaps]);
 
-  const [selectedNodes, setSelectedNodes] = React.useState<SelectedNodes>({
-    tic: false,
-    set: new Set<string>()
-  });
+  const filteredGraph = React.useMemo<CGData>(() => {
+    return getFilteredGraph(graphData, filteredFunctions.map(elt => elt.decl));
+  }, [graphData, filteredFunctions]);
 
-  /** Control */
-  /* eslint-disable max-len */
-  const decodeMode: Decoder<ModeDisplay> = (js: json) => {
-    if (js === 'all' || js === "linked" || js === "selected" ) return js;
-    else throw new JsonTypeError("ModeDisplay", js);
-  };
-  const [ displayMode, setDisplayMode ] = Dome.useWindowSettings<ModeDisplay>(
-    "ivette.callgraph.displaymode", decodeMode, "all"
-  );
-  const encodeButton: Encoder<IThreeStateButton> = (js: IThreeStateButton) => {
-    return JSON.stringify(js);
-  };
-  const decodeButton: Decoder<IThreeStateButton> = (js: json) => {
-    if (typeof js === 'string') return JSON.parse(js);
-    else throw new JsonTypeError("string", js);
-  };
-  const [ selectedParents, setSelectedParents ] =
-    useWindowSettingsData<IThreeStateButton>(
-      "ivette.callgraph.selectedparents",
-      decodeButton, encodeButton,
-      { active: true, max: true, value: 1 }
-  );
-  const [ selectedChildren, setSelectedChildren ] =
-    useWindowSettingsData<IThreeStateButton>(
-      "ivette.callgraph.selectedChildren",
-      decodeButton, encodeButton,
-      { active: true, max: true, value: 1 }
-  );
+  /** Selected */
+  const selectedNodesState = useSelectedNodes();
+  const [selectedNodes, setSelectedNodes] = selectedNodesState;
 
-  const panelVisibleState = Dome.useFlipSettings("ivette.callgraph.panelVisible", true);
-  const [ verticalSpacing, setVerticalSpacing ] = Dome.useNumberSettings("ivette.callgraph.verticalspacing", 75);
-  const [ horizontalSpacing, setHorizontalSpacing ] = Dome.useNumberSettings("ivette.callgraph.horizontalspacing", 500);
-  const [ linkThickness, setLinkThickness ] = Dome.useNumberSettings("ivette.callgraph.linkThickness", 1);
-  const [ autoCenter, flipAutoCenter ] = Dome.useFlipSettings("eva.callgraph.autocenter", true);
-  const [ autoSelect, flipAutoSelect ] = Dome.useFlipSettings('eva.callgraph.autoselect', true);
-  /* eslint-enable max-len */
+  /** Predecessors of all selected nodes */
+  const predecessors = React.useMemo(() => {
+    return getPredecessors(filteredGraph.links, selectedNodes, selectedParents);
+  }, [filteredGraph, selectedNodes, selectedParents]);
 
-  const style = Themes.useStyle();
-  const theme = Themes.useColorTheme();
+  /** Successors of all selected nodes */
+  const successors = React.useMemo(() => {
+    return getSuccessor(filteredGraph.links, selectedNodes, selectedChildren);
+  }, [filteredGraph, selectedNodes, selectedChildren]);
 
-  const C = React.useMemo<CallGraphFunc>(() => {
-    return callGraphFunction(
-      [selectedNodes, setSelectedNodes],
-       graphData, displayMode, style,
-       selectedParents, selectedChildren
-    );
-  }, [ selectedNodes, setSelectedNodes, graphData, displayMode,
-     style, selectedChildren, selectedParents ]);
+  /** Filtered and styled graph */
+  const filteredAndStyledGraph = React.useMemo<CGData>(() => {
+    return getStyledGraph(
+      displayMode, predecessors, successors, selectedNodes,
+      style, linkThickness, filteredGraph );
+  }, [filteredGraph, displayMode, linkThickness, predecessors, successors,
+      selectedNodes, style]);
 
   const getNode = React.useMemo(() => {
-    return (node: NodeObject3D<CGNode>) => {
-      return Node.getNode(node, selectedNodes, C.onNodeClickMultiSelect);
+    return (node: NodeObject3D<CGNode>): React.JSX.Element => {
+      return Node.getNode(node, selectedNodesState, onNodeClickMultiSelect);
     };
-  }, [selectedNodes, C.onNodeClickMultiSelect]);
+  }, [selectedNodesState]);
+
+  /** Count visible links and nodes */
+  const [ visibleNodes, setVisibleNodes ] = React.useState(0);
+  const [ visibleLinks, setVisibleLink ] = React.useState(0);
+  React.useEffect(() => {
+    /** Calculating the number of visible nodes and links
+     * has to wait for rendering, so we add a timeout. */
+    const timeout = setTimeout(() => {
+      setVisibleNodes(filteredAndStyledGraph.nodes.filter(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        node => (node as any).__threeObj?.visible).length);
+      const countLinks = filteredAndStyledGraph.links.filter(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        link => (link as any).__lineObj?.visible).length;
+      setVisibleLink(countLinks);
+      if(countLinks > 1000) flipShowParticles(false);
+      }, 100);
+
+    return () => clearTimeout(timeout);
+  }, [filteredAndStyledGraph, displayMode, flipShowParticles,
+      selectedNodes, selectedParents, selectedChildren]
+  );
 
   React.useEffect(() => {
     if(autoSelect && scope)
-      setSelectedNodes((elt) => {
-        return { tic: !elt.tic, set: new Set([scope]) };
-      });
-  }, [scope, autoSelect]);
+      setSelectedNodes([scope]);
+  }, [scope, autoSelect, setSelectedNodes]);
 
   React.useEffect(() => {
     if(autoSelect && selectedFunctions.size > 0)
-      setSelectedNodes((elt) => {
-    return { tic: !elt.tic, set: selectedFunctions };
-  });
-  }, [selectedFunctions, autoSelect]);
+      setSelectedNodes(selectedFunctions);
+  }, [selectedFunctions, autoSelect, setSelectedNodes]);
 
   const cycles = React.useRef<string[][]>([]);
 
@@ -273,28 +320,12 @@ function Callgraph(): JSX.Element {
     };
     if(!isAlreadySave()) {
       cycles.current.push(val);
-      C.updateSelectedNodes(new Set(cycles.current.flat()));
+      setSelectedNodes(cycles.current.flat());
     }
   };
 
-  const nodesOptions: INodesOptions = {
-    visibility: (node) => { return C.getNodeVisibility(node.id); },
-  };
-
   const linkOptions: ILinksOptions = {
-    width: (link) => { return C.getLinkWidth(link, linkThickness); },
-    color: (link) => { return C.getLinkColor(link); },
-    visibility: (link) => { return C.getLinkVisibility(link); },
-    directionalArrow: 3,
-    directionalParticle: 3,
-    particleWidth: (link) => {
-      return (C.getLinkWidth(link, linkThickness) * 150 / 100);
-    },
-    particleColor: (link) => {
-      return transformColor(
-        C.getLinkColor(link), theme[0] === "light" ? -50 : 50
-      );
-    },
+    directionalParticle: showParticles ? 3 : 0,
   };
 
   const options3D: IGraphOptions3D = {
@@ -305,10 +336,8 @@ function Callgraph(): JSX.Element {
     horizontalSpacing: horizontalSpacing,
     onDagError,
     htmlNode: getNode,
-    linkOptions,
-    nodesOptions,
+    linkOptions
   };
-
 
   return (
     <>
@@ -325,12 +354,13 @@ function Callgraph(): JSX.Element {
         verticalSpacingState={[ verticalSpacing, setVerticalSpacing ]}
         horizontalSpacingState={[ horizontalSpacing, setHorizontalSpacing ]}
         linkThicknessState={[ linkThickness, setLinkThickness ]}
+        showParticlesState={showParticlesState}
         selectedFunctions={selectedFunctions}
         taintedFunctions={taintedFunctions}
         unprovenPropertiesFunctions={unprovenPropertiesFunctions}
         cycleFunctions={cycles.current.flat()}
         dagMode={displayMode}
-        updateNodes={C.updateSelectedNodes}
+        updateNodes={setSelectedNodes}
       />
 
       {!isComputed &&
@@ -345,19 +375,21 @@ function Callgraph(): JSX.Element {
         <div className='cg-graph-container'>
           <Graph
             layout='3D'
-            nodes={graphData.nodes}
-            edges={graphData.links}
+            nodes={filteredAndStyledGraph.nodes}
+            edges={filteredAndStyledGraph.links}
             selected={undefined}
             options3D={options3D}
           />
           <Panel
-            graphData={graphData}
+            graphData={filteredAndStyledGraph}
             selectedNodes={selectedNodes}
             tainted={taintedFunctions.length}
             properties={properties}
             evaProperties={evaps}
             style={style}
             panelVisibleState={panelVisibleState}
+            visibleNodes={visibleNodes}
+            visibleLinks={visibleLinks}
           />
         </div>
       }

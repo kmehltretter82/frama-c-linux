@@ -94,3 +94,35 @@ export function useColor(): IHookColors  {
   );
   return colors;
 }
+
+/**
+ * Each RGB component of the color is modified by :
+ * - adding a percentage of the (255 - component value) for lighten
+ * - removing a percentage of the component value for darken.
+ *
+ * A negative percentage darkens and a positive percentage lightens the color.
+ *
+ * @param hex color to transform
+ * @param amount percentage in [-100, 100]
+ * @returns new hexadecimal color
+*/
+export function transformColor(hex: string, amount: number): string {
+  const percentage =  Math.max(-100, Math.min(100, amount));
+
+  function hexToRgb(hex: string): [number, number, number] {
+    hex = hex.replace('#', '');
+    const bigint = parseInt(hex, 16);
+    return [(bigint >> 16) & 255, (bigint >> 8) & 255, bigint & 255];
+  }
+  function rgbToHex(r: number, g: number, b: number): string {
+    return `#${((1 << 24) + (r << 16) + (g << 8) + b)
+      .toString(16).slice(1).toUpperCase()}`;
+  }
+  function newColor(color: number): number {
+    const base = percentage < 0 ? color : (255 - color);
+    return color + Math.floor(base * percentage / 100);
+  }
+
+  const [r, g, b] = hexToRgb(hex).map(color => newColor(color));
+  return rgbToHex(r, g, b);
+}

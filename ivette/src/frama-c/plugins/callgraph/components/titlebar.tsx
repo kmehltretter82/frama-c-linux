@@ -31,9 +31,8 @@ import * as Themes from 'dome/themes';
 import { Pattern } from 'dome/text/markdown';
 import doc from '../callgraph.md?raw';
 import { ModeDisplay } from '../definitions';
-import {
-  IThreeStateButton, ThreeStateButton, TThreesButtonState
-} from './threeStateButton';
+import { IThreeStateButton, ThreeStateButton, TThreesButtonState
+} from './buttons';
 
 /* -------------------------------------------------------------------------- */
 /* --- Callgraph titlebar component                                       --- */
@@ -175,9 +174,9 @@ export function DocShowNodesButton(): JSX.Element {
   ):JSX.Element {
     function getDocTSB(name: string, tsb: IThreeStateButton):string {
       return !tsb.active ? '' :
-        tsb.max ? ` all ${name}` :
+        tsb.max ? ` all their ${name}` :
           tsb.value > 0 ?
-            (tsb.value+' level'+(tsb.value > 1 ? 's':'')+` of ${name}`):
+            (tsb.value+' level'+(tsb.value > 1 ? 's':'')+` of their ${name}`):
             "";
     }
     const p = getDocTSB('parents', parent);
@@ -185,15 +184,17 @@ export function DocShowNodesButton(): JSX.Element {
 
     return (
       <div style={infosStyle}>
-        Selected nodes displayed { (p || c) && " with " }
+        Show selected nodes { (p || c) && " with " }
         { p }{ p && c && " and " }{ c }
         { !p && !c && " only " }.
       </div>
     );
   }
 
-  const docAll = <div style={infosStyle}>All nodes displayed.</div>;
-  const docLinked = <div style={infosStyle}>Hide unlinked nodes.</div>;
+  const docAll = <div style={infosStyle}>Show all nodes.</div>;
+  const docLinked = <div style={infosStyle}>
+    Show only nodes linked to at least one other node.
+    </div>;
   const docSelected = getDocSelected(parent, children);
 
   return (
