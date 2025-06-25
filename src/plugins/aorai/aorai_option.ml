@@ -30,6 +30,11 @@ include Plugin.Register
       let help = "verification of behavioral properties (experimental)"
     end)
 
+let not_aorai_wkey =
+  register_warn_category
+    ~help:"call a built-in on a non-aorai project"
+    "not-aorai"
+
 module Ya =
   Filepath
     (struct

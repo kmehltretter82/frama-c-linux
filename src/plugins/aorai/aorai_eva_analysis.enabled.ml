@@ -64,20 +64,27 @@ let show_non_det_state fmt state =
 let show_aorai_state = "Frama_C_show_aorai_state"
 
 let builtin_show_aorai_state state args =
-  if not (Aorai_option.Deterministic.get()) then begin
-    Aorai_option.result ~current:true
-      "@[<hv 2>Possible states:@ %a@]" show_non_det_state state;
+  if Aorai_option.is_on() then begin
+    if not (Aorai_option.Deterministic.get()) then begin
+      Aorai_option.result ~current:true
+        "@[<hv 2>Possible states:@ %a@]" show_non_det_state state;
+    end else begin
+      let history = Data_for_aorai.(curState :: (whole_history ())) in
+      Aorai_option.result ~current:true "@[<hv>%a@]"
+        (Pretty_utils.pp_list ~sep:" <- " (show_aorai_variable state)) history;
+    end;
+    if args <> [] then begin
+      Aorai_option.result ~current:true "@[<hv>%a@]"
+        (Pretty_utils.pp_list ~sep:"," show_val) args
+    end;
   end else begin
-    let history = Data_for_aorai.(curState :: (whole_history ())) in
-    Aorai_option.result ~current:true "@[<hv>%a@]"
-      (Pretty_utils.pp_list ~sep:" <- " (show_aorai_variable state)) history;
-  end;
-  if args <> [] then begin
-    Aorai_option.result ~current:true "@[<hv>%a@]"
-      (Pretty_utils.pp_list ~sep:"," show_val) args
+    Aorai_option.(warning ~wkey:not_aorai_wkey)
+      "Calling %s builtin without Aorai instrumentation"
+      show_aorai_state
   end;
   (* Return value : returns nothing, changes nothing *)
   Eva.Builtins.States [state]
+
 
 let () =
   Cil_builtins.add_custom_builtin

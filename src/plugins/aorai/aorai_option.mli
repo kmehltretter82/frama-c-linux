@@ -25,6 +25,8 @@
 
 include Plugin.S
 
+val not_aorai_wkey: warn_category
+
 module Ya: Parameter_sig.Filepath
 module Dot: Parameter_sig.Bool
 module DotSeparatedLabels: Parameter_sig.Bool
