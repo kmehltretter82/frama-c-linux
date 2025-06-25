@@ -45,10 +45,17 @@ __BEGIN_DECLS
     // - 0 if the initial portion of [s] cannot be converted to an integer in
     //   base [b].
 
+    axiom StrToIntRes:
+      \forall char* s, ℤ min, max, b; valid_read_string(s) ==>
+        0 <= str_to_integer(s, min, max, b) <= 2;
+
     logic ℤ wcs_to_integer{L}(wchar_t *s, ℤ min, ℤ max, ℤ b)
         reads s[0 .. wcslen(s)];
     // Behaves just as [str_to_integer], but for wide strings
 
+    axiom WcsToIntRes:
+      \forall wchar_t* s, ℤ min, max, b; valid_read_wstring(s) ==>
+        0 <= wcs_to_integer(s, min, max, b) <= 2;
   }
 */
 
