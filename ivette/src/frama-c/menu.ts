@@ -209,7 +209,7 @@ export function addProjectSubMenu(others?: Dome.MenuItemProps[]): void {
     menu: 'Project',
     label: 'New project',
     id: 'project_new',
-    onClick: () => Projects.newProject(),
+    onClick: Projects.newProject,
     kind: 'normal',
   });
   Dome.addMenuItem({
@@ -230,14 +230,14 @@ export function addProjectSubMenu(others?: Dome.MenuItemProps[]): void {
     menu: 'Project',
     label: 'Delete current project',
     id: 'project_delete_current',
-    onClick: () => deleteCurrentProject(),
+    onClick: deleteCurrentProject,
     kind: 'normal',
   });
   Dome.addMenuItem({
     menu: 'Project',
     label: 'Rename current project',
     id: 'project_rename_current',
-    onClick: () => renameCurrentProject(),
+    onClick: renameCurrentProject,
     kind: 'normal',
   });
   Dome.addMenuItem({

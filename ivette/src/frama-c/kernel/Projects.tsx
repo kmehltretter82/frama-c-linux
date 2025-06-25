@@ -41,99 +41,6 @@ import * as Project from './api/project';
 // --------------------------------------------------------------------------
 // --- Projects
 // --------------------------------------------------------------------------
-
-function showError(title: string, error: string): void {
-  Dialogs.showModal(<Dialogs.Modal label={title}>
-    <div className='project-error'>
-      <Icon id='WARNING' kind="warning" size={18}/>
-      {error}
-    </div>
-  </Dialogs.Modal>);
-}
-
-/** Create a new project */
-export function newProject(): void {
-  Dialogs.showModal(<Dialogs.Modal label={'Create project'}>
-    <ProjectField  onValidate={async (name: string) => {
-        const error = await Server.send(Project.create, name);
-        if(!error) Dialogs.closeModal();
-        else showError('Error Creating project', error);
-      }}
-  /></Dialogs.Modal>);
-}
-
-/** Rename a project */
-export function renameProject(
-  id: string, title: string, project?: string
-): void {
-  Dialogs.showModal(<Dialogs.Modal label={title}>
-    <ProjectField project={project || ''} onValidate={async (name: string) => {
-          const error = await Server.send(Project.rename, [id, name]);
-          if(!error) Dialogs.closeModal();
-          else showError('Error: '+title, error);
-        }
-      }
-    />
-  </Dialogs.Modal>);
-}
-
-/** Remove a project */
-export async function removeProject(id: string): Promise<void> {
-  const projects = States.getSyncArrayData(Project.list);
-  if(projects.length === 1) {
-    showError("Error - deleting project",
-      "The last project cannot be removed");
-    return;
-  }
-
-  const confirm = await Dialogs.showMessageBox({
-    buttons: [
-      { label: "Cancel" },
-      { label: "Ok", value: true }
-    ],
-    details: ("Confirm to delete the project."),
-    message: 'Delete project',
-  });
-
-  if(confirm === true) {
-    const error = await Server.send(Project.remove, id);
-    if(error) showError("Error - deleting project", error);
-  }
-}
-
-/** Duplicate a project */
-export function duplicateProject(
-  id: string, title: string, project?: string
-): void {
-  Dialogs.showModal(<Dialogs.Modal label={title}>
-    <ProjectField project={project} onValidate={(name: string) => {
-        Server.send(Project.copy, [id, name])
-          .then((error) => {
-            if(!error) Dialogs.closeModal();
-            else showError('Error: '+title, error);
-          });
-        Dialogs.modalLoader.setValue(true);
-      }}
-    />
-  </Dialogs.Modal>);
-}
-
-/** Save a project */
-export async function saveProject(id: string): Promise<void> {
-  const file = await Dialogs.showSaveFile({});
-  const error = await Server.send(Project.save, [id, file]);
-  if(error) showError("Error saving project", error);
-}
-
-/** Load a project */
-export async function loadProject(): Promise<void> {
-  const file = await Dialogs.showOpenFile({});
-  const error = await Server.send(Project.load, file);
-  if(error) showError("Error loading project", error);
-}
-
-/** ************************************************************************ */
-
 interface ProjectFieldProps {
   project?: string,
   fieldName?: string,
@@ -143,7 +50,7 @@ interface ProjectFieldProps {
 
 function ProjectField(props: ProjectFieldProps): React.JSX.Element {
   const {
-    project = "", fieldName, placeholder = 'New name', onValidate
+    project = '', fieldName, placeholder = 'New name', onValidate
   } = props;
   const state = useState(project);
 
@@ -170,6 +77,100 @@ function ProjectField(props: ProjectFieldProps): React.JSX.Element {
     />
   </div>;
 }
+
+function showError(title: string, error: string): void {
+  Dialogs.showModal(<Dialogs.Modal label={title}>
+    <div className='project-error'>
+      <Icon id='WARNING' kind='warning' size={18}/>
+      {error}
+    </div>
+  </Dialogs.Modal>);
+}
+
+function showModalProject(
+  title: string,
+  onValidate: (v: string) => void,
+  project?: string
+): void {
+  Dialogs.showModal(<Dialogs.Modal label={title}>
+    <ProjectField project={project || ''} onValidate={onValidate} />
+  </Dialogs.Modal>);
+}
+
+/** Create a new project */
+export function newProject(): void {
+  const onValidate = (name: string): void => {
+    Server.send(Project.create, name).then(() => Dialogs.closeModal());
+  };
+  showModalProject('Create project', onValidate);
+}
+
+/** Rename a project */
+export function renameProject(
+  id: string, title: string, project?: string
+): void {
+  const onValidate = (name: string): void => {
+    Server.send(Project.rename, [id, name]).then((error) => {
+      if(!error) Dialogs.closeModal();
+      else showError('Error while renaming project', error);
+    });
+  };
+  showModalProject(title, onValidate, project);
+}
+
+/** Remove a project */
+export async function removeProject(id: string): Promise<void> {
+  const projects = States.getSyncArrayData(Project.list);
+  if(projects.length === 1) {
+    showError('Error while deleting project',
+      'The last project cannot be removed');
+    return;
+  }
+
+  const confirm = await Dialogs.showMessageBox({
+    buttons: [
+      { label: 'Cancel' },
+      { label: 'Ok', value: true }
+    ],
+    details: 'Confirm to delete the project.',
+    message: 'Delete project',
+  });
+
+  if(confirm === true) {
+    const error = await Server.send(Project.remove, id);
+    if(error) showError('Error while deleting project', error);
+  }
+}
+
+/** Duplicate a project */
+export function duplicateProject(
+  id: string, title: string, project?: string
+): void {
+  const onValidate = (name: string): void => {
+    Server.send(Project.copy, [id, name]).then((error) => {
+      if(!error) Dialogs.closeModal();
+      else showError('Error while duplicating project', error);
+    });
+    Dialogs.modalLoader.setValue(true);
+  };
+  showModalProject(title, onValidate, project);
+}
+
+/** Save a project */
+export async function saveProject(id: string): Promise<void> {
+  const file = await Dialogs.showSaveFile({});
+  const error = await Server.send(Project.save, [id, file]);
+  if(error) showError('Error while saving project', error);
+}
+
+/** Load a project */
+export async function loadProject(): Promise<void> {
+  const file = await Dialogs.showOpenFile({});
+  const error = await Server.send(Project.load, file);
+  if(error) showError('Error while loading project', error);
+}
+
+/** ************************************************************************ */
 
 function getActions(id: string, name: string): React.JSX.Element {
   return (
@@ -209,14 +210,6 @@ export function Projects(): JSX.Element {
   const [ current, setCurrent ] = States.useSyncState(Project.current);
   const modelProjects = States.useSyncArrayModel(Project.list);
   const model = useModel(modelProjects);
-  /** By clicking on a checkbox item in the menu,
-   * the item is checked or unchecked even if there is no effect.
-   * The current project is therefore unchecked on click
-   * and the event cannot be intercepted.
-   * The menu is therefore recalculated.
-   * the style of the radio buttons isn't pretty.
-   * */
-  const [recalcMenu, setRecalcMenu] = React.useState(true);
 
   const projectsListSorted = React.useMemo(() => {
     return modelProjects.getArray().sort((a, b) => alpha(a.name, b.name));
@@ -227,37 +220,33 @@ export function Projects(): JSX.Element {
   React.useEffect(() => {
     const timeout = setTimeout(() => {
       Dome.delSubMenu('Project');
-      const others: Dome.MenuItemProps[] = [];
-      projectsListSorted.forEach(elt => others.push({
+      const others: Dome.MenuItemProps[] = projectsListSorted.map(elt => {
+        return {
           menu: 'Project',
           label: elt.name,
           id: `Project_${elt.uniqueName}`,
           kind: 'checkbox',
-          checked: Boolean(current === elt.uniqueName),
-          onClick: current === elt.uniqueName ?
-            () => setRecalcMenu(v => !v) :
-            () => setCurrent(elt.uniqueName)
-        })
-      );
+          checked: current === elt.uniqueName,
+          enabled: current !== elt.uniqueName,
+          onClick: () => setCurrent(elt.uniqueName)
+        };
+      });
       addProjectSubMenu(others);
     }, 100);
     return () => clearTimeout(timeout);
-  }, [projectsListSorted, current, setCurrent, recalcMenu]);
+  }, [projectsListSorted, current, setCurrent]);
 
   /** Build item components for project sidebar */
   const projectsList = React.useMemo(() => {
-    const list: React.JSX.Element[] = [];
-    projectsListSorted.forEach(elt => {
-        list.push(<Item
+    return projectsListSorted.map(elt => {
+      return <Item
           key={elt.uniqueName}
           label={elt.name}
           title={`unique name: ${elt.uniqueName}`}
           selected={elt.uniqueName === current}
           onSelection={() => setCurrent(elt.uniqueName) }
-        >{getActions(elt.uniqueName, elt.name)}</Item>);
-      }
-    );
-    return list;
+        >{getActions(elt.uniqueName, elt.name)}</Item>;
+    });
   }, [projectsListSorted, current, setCurrent]);
 
   return (<>
@@ -267,20 +256,20 @@ export function Projects(): JSX.Element {
     >
       <Hbox className='projects-title-actions'>
         <IconButton
-          icon="DOWNLOAD"
-          title="Load a project"
+          icon='DOWNLOAD'
+          title='Load a project'
           size={18}
           onClick={loadProject}
         />
         <IconButton
-          icon="CIRC.PLUS"
-          title="Add a new project"
+          icon='CIRC.PLUS'
+          title='Create a new empty project'
           size={18}
           onClick={newProject}
         />
       </Hbox>
     </SidebarTitle>
-      <div ref={scrollableArea} className="globals-scrollable-area">
+      <div ref={scrollableArea} className='globals-scrollable-area'>
         { projectsList }
       </div>
     </>
