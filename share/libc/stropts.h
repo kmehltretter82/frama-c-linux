@@ -154,14 +154,43 @@ struct str_list {
 #define MSG_BAND 0x04
 #define MSG_HIPRI 0x01
 
-extern int    fattach(int, const char *);
-extern int    fdetach(const char *);
-extern int    getmsg(int, struct strbuf *restrict, struct strbuf *restrict,
-                     int *restrict);
-extern int    getpmsg(int, struct strbuf *restrict, struct strbuf *restrict,
-                      int *restrict, int *restrict);
+/*@
+  assigns \result \from indirect:fildes, indirect:path[0..];
+    //missign: assigns 'filesystem' \from 'filesystem'
+*/
+extern int fattach(int fildes, const char *path);
 
-extern int    ioctl(int, int, ...);
+/*@
+  assigns \result \from indirect:path[0..];
+    //missign: assigns 'filesystem' \from 'filesystem'
+*/
+extern int fdetach(const char *path);
+
+/*@
+  //missing, for all clauses below: \from 'STREAMS-based file'
+  assigns \result \from indirect:fildes, indirect:ctlptr->maxlen,
+                        indirect:dataptr->maxlen, indirect:*flagsp;
+  assigns *ctlptr \from indirect:fildes, *ctlptr, indirect:*flagsp;
+  assigns *dataptr \from indirect:fildes, *dataptr, indirect:*flagsp;
+  assigns *flagsp \from indirect:fildes, *flagsp;
+*/
+extern int getmsg(int fildes, struct strbuf *restrict ctlptr,
+                  struct strbuf *restrict dataptr, int *restrict flagsp);
+
+/*@
+  //missing, for all clauses below: \from 'STREAMS-based file'
+  assigns \result \from indirect:fildes, indirect:ctlptr->maxlen,
+                        indirect:dataptr->maxlen, indirect:*flagsp;
+  assigns *ctlptr \from indirect:fildes, *ctlptr, indirect:*flagsp;
+  assigns *dataptr \from indirect:fildes, *dataptr, indirect:*flagsp;
+  assigns *flagsp \from indirect:fildes, *flagsp;
+*/
+extern int getpmsg(int fildes, struct strbuf *restrict ctlptr,
+                   struct strbuf *restrict dataptr, int *restrict bandp,
+                   int *restrict flagsp);
+
+// Variadic function: specifications are given below, at each specialized form
+extern int ioctl(int, int, ...);
 
 // for Variadic
 /*@ assigns \result \from indirect:fd, indirect:request; */
@@ -176,10 +205,26 @@ extern int    __va_ioctl_int(int fd, int request, int arg);
       indirect:fd, indirect:request, ((char*)argp)[0..]; */
 extern int    __va_ioctl_ptr(int fd, int request, void* argp);
 
-extern int    isastream(int);
-extern int    putmsg(int, const struct strbuf *, const struct strbuf *, int);
-extern int    putpmsg(int, const struct strbuf *, const struct strbuf *, int,
-                      int);
+/*@
+  assigns \result \from indirect:fildes; //missing: \from 'STREAMS-based file'
+*/
+extern int isastream(int fildes);
+
+/*@
+  //missing, for all clauses below: assigns + \from 'STREAMS-based file'
+  assigns \result \from indirect:fildes, indirect:*ctlptr, indirect:*dataptr,
+                        indirect:flags;
+*/
+extern int putmsg(int fildes, const struct strbuf *ctlptr,
+           const struct strbuf *dataptr, int flags);
+
+/*@
+  //missing, for all clauses below: assigns + \from 'STREAMS-based file'
+  assigns \result \from indirect:fildes, indirect:*ctlptr, indirect:*dataptr,
+                        indirect:band, indirect:flags;
+*/
+extern int putpmsg(int fildes, const struct strbuf *ctlptr,
+            const struct strbuf *dataptr, int band, int flags);
 
 __END_DECLS
 __POP_FC_STDLIB

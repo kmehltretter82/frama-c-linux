@@ -35,7 +35,11 @@ __BEGIN_DECLS
 #define FNM_PERIOD (1 << 2)
 #define FNM_NOESCAPE (1 << 1)
 
-extern int fnmatch(const char *, const char *, int);
+/*@
+  assigns \result \from indirect:pattern[0..], indirect:string[0..],
+    indirect:flags; //missing: from 'filesystem'
+*/
+extern int fnmatch(const char *pattern, const char *string, int flags);
 
 __END_DECLS
 __POP_FC_STDLIB
