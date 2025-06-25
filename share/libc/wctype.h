@@ -33,42 +33,99 @@ __BEGIN_DECLS
 
 typedef const int32_t *wctrans_t;
 
+/*@
+  assigns \result \from wc;
+*/
 extern int iswalnum(wint_t wc);
 
+/*@
+  assigns \result \from wc;
+*/
 extern int iswalpha(wint_t wc);
 
+/*@
+  assigns \result \from wc;
+*/
 extern int iswascii(wint_t wc);
 
+/*@
+  assigns \result \from wc;
+*/
 extern int iswblank(wint_t wc);
 
+/*@
+  assigns \result \from wc;
+*/
 extern int iswcntrl(wint_t wc);
 
+/*@
+  assigns \result \from wc;
+*/
 extern int iswdigit(wint_t wc);
 
+/*@
+  assigns \result \from wc;
+*/
 extern int iswgraph(wint_t wc);
 
+/*@
+  assigns \result \from wc;
+*/
 extern int iswhexnumber(wint_t wc);
 
+/*@
+  assigns \result \from wc;
+*/
 extern int iswideogram(wint_t wc);
 
+/*@
+  assigns \result \from wc;
+*/
 extern int iswlower(wint_t wc);
 
+/*@
+  assigns \result \from wc;
+*/
 extern int iswnumber(wint_t wc);
 
+/*@
+  assigns \result \from wc;
+*/
 extern int iswphonogram(wint_t wc);
 
+/*@
+  assigns \result \from wc;
+*/
 extern int iswprint(wint_t wc);
 
+/*@
+  assigns \result \from wc;
+*/
 extern int iswpunct(wint_t wc);
 
+/*@
+  assigns \result \from wc;
+*/
 extern int iswrune(wint_t wc);
 
+/*@
+  assigns \result \from wc;
+*/
 extern int iswspace(wint_t wc);
 
+/*@
+  assigns \result \from wc;
+*/
 extern int iswspecial(wint_t wc);
 
+/*@
+  assigns \result \from wc;
+*/
 extern int iswupper(wint_t wc);
 
+/*@
+  assigns \result \from wc;
+*/
 extern int iswxdigit(wint_t wc);
 
 __END_DECLS

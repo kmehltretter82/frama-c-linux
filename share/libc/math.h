@@ -609,24 +609,79 @@ extern float acoshf(float x);
  */
 extern long double acoshl(long double x);
 
+/*@
+  assigns errno, \result \from x;
+*/
 extern double asinh(double x);
+
+/*@
+  assigns errno, \result \from x;
+*/
 extern float asinhf(float x);
+
+/*@
+  assigns errno, \result \from x;
+*/
 extern long double asinhl(long double x);
 
+/*@
+  assigns errno, \result \from x;
+*/
 extern double atanh(double x);
+
+/*@
+  assigns errno, \result \from x;
+*/
 extern float atanhf(float x);
+
+/*@
+  assigns errno, \result \from x;
+*/
 extern long double atanhl(long double x);
 
+/*@
+  assigns errno, \result \from x;
+*/
 extern double cosh(double x);
+
+/*@
+  assigns errno, \result \from x;
+*/
 extern float coshf(float x);
+
+/*@
+  assigns errno, \result \from x;
+*/
 extern long double coshl(long double x);
 
+/*@
+  assigns errno, \result \from x;
+*/
 extern double sinh(double x);
+
+/*@
+  assigns errno, \result \from x;
+*/
 extern float sinhf(float x);
+
+/*@
+  assigns errno, \result \from x;
+*/
 extern long double sinhl(long double x);
 
+/*@
+  assigns errno, \result \from x;
+*/
 extern double tanh(double x);
+
+/*@
+  assigns errno, \result \from x;
+*/
 extern float tanhf(float x);
+
+/*@
+  assigns errno, \result \from x;
+*/
 extern long double tanhl(long double x);
 
 /*@
@@ -703,14 +758,39 @@ extern double exp(double x);
 */
 extern float expf(float x);
 
+/*@
+  assigns errno, \result \from x;
+*/
 extern long double expl(long double x);
 
+/*@
+  assigns errno, \result \from x;
+*/
 extern double exp2(double x);
+
+/*@
+  assigns errno, \result \from x;
+*/
 extern float exp2f(float x);
+
+/*@
+  assigns errno, \result \from x;
+*/
 extern long double exp2l(long double x);
 
+/*@
+  assigns errno, \result \from x;
+*/
 extern double expm1(double x);
+
+/*@
+  assigns errno, \result \from x;
+*/
 extern float expm1f(float x);
+
+/*@
+  assigns errno, \result \from x;
+*/
 extern long double expm1l(long double x);
 
 /*@
@@ -794,8 +874,19 @@ extern float frexpf(float x, int *exp);
 */
 extern long double frexpl(long double x, int *exp);
 
+/*@
+  assigns errno, \result \from x;
+*/
 extern int ilogb(double x);
+
+/*@
+  assigns errno, \result \from x;
+*/
 extern int ilogbf(float x);
+
+/*@
+  assigns errno, \result \from x;
+*/
 extern int ilogbl(long double x);
 
 /*@
@@ -838,6 +929,9 @@ extern double ldexp(double x, int exp);
 */
 extern float ldexpf(float x, int exp);
 
+/*@
+  assigns errno, \result \from x, exp;
+*/
 extern long double ldexpl(long double x, int exp);
 
 /*@
@@ -1026,8 +1120,19 @@ extern float log10f(float x);
 */
 extern long double log10l(long double x);
 
+/*@
+  assigns errno, \result \from x;
+*/
 extern double log1p(double x);
+
+/*@
+  assigns errno, \result \from x;
+*/
 extern float log1pf(float x);
+
+/*@
+  assigns errno, \result \from x;
+*/
 extern long double log1pl(long double x);
 
 /*@
@@ -1123,24 +1228,79 @@ extern float log2f(float x);
 */
 extern long double log2l(long double x);
 
+/*@
+  assigns errno, \result \from x;
+*/
 extern double logb(double x);
+
+/*@
+  assigns errno, \result \from x;
+*/
 extern float logbf(float x);
+
+/*@
+  assigns errno, \result \from x;
+*/
 extern long double logbl(long double x);
 
+/*@
+  assigns errno, \result, *iptr \from value;
+*/
 extern double modf(double value, double *iptr);
+
+/*@
+  assigns errno, \result, *iptr \from value;
+*/
 extern float modff(float value, float *iptr);
+
+/*@
+  assigns errno, \result, *iptr \from value;
+*/
 extern long double modfl(long double value, long double *iptr);
 
+/*@
+  assigns errno, \result \from x, n;
+*/
 extern double scalbn(double x, int n);
+
+/*@
+  assigns errno, \result \from x, n;
+*/
 extern float scalbnf(float x, int n);
+
+/*@
+  assigns errno, \result \from x, n;
+*/
 extern long double scalbnl(long double x, int n);
 
+/*@
+  assigns errno, \result \from x, n;
+*/
 extern double scalbln(double x, long int n);
+
+/*@
+  assigns errno, \result \from x, n;
+*/
 extern float scalblnf(float x, long int n);
+
+/*@
+  assigns errno, \result \from x, n;
+*/
 extern long double scalblnl(long double x, long int n);
 
+/*@
+  assigns \result \from x;
+*/
 extern double cbrt(double x);
+
+/*@
+  assigns \result \from x;
+*/
 extern float cbrtf(float x);
+
+/*@
+  assigns \result \from x;
+*/
 extern long double cbrtl(long double x);
 
 /*@
@@ -1197,8 +1357,19 @@ extern float fabsf(float x);
 */
 extern long double fabsl(long double x);
 
+/*@
+  assigns errno, \result \from x, y;
+*/
 extern double hypot(double x, double y);
+
+/*@
+  assigns errno, \result \from x, y;
+*/
 extern float hypotf(float x, float y);
+
+/*@
+  assigns errno, \result \from x, y;
+*/
 extern long double hypotl(long double x, long double y);
 
 /*@
@@ -1231,6 +1402,9 @@ extern double pow(double x, double y);
 */
 extern float powf(float x, float y);
 
+/*@
+  assigns errno, \result \from x, y;
+*/
 extern long double powl(long double x, long double y);
 
 /*@
@@ -1319,20 +1493,65 @@ extern float sqrtf(float x);
 */
 extern long double sqrtl(long double x);
 
+/*@
+  assigns errno, \result \from x;
+*/
 extern double erf(double x);
+
+/*@
+  assigns errno, \result \from x;
+*/
 extern float erff(float x);
+
+/*@
+  assigns errno, \result \from x;
+*/
 extern long double erfl(long double x);
 
+/*@
+  assigns errno, \result \from x;
+*/
 extern double erfc(double x);
+
+/*@
+  assigns errno, \result \from x;
+*/
 extern float erfcf(float x);
+
+/*@
+  assigns errno, \result \from x;
+*/
 extern long double erfcl(long double x);
 
+/*@
+  assigns errno, \result \from x;
+*/
 extern double lgamma(double x);
+
+/*@
+  assigns errno, \result \from x;
+*/
 extern float lgammaf(float x);
+
+/*@
+  assigns errno, \result \from x;
+*/
 extern long double lgammal(long double x);
 
+
+/*@
+  assigns errno, \result \from x;
+*/
 extern double tgamma(double x);
+
+/*@
+  assigns errno, \result \from x;
+*/
 extern float tgammaf(float x);
+
+/*@
+  assigns errno, \result \from x;
+*/
 extern long double tgammal(long double x);
 
 /*@
@@ -1437,20 +1656,64 @@ extern float floorf(float x);
 */
 extern long double floorl(long double x);
 
+/*@
+  assigns \result \from x;
+*/
 extern double nearbyint(double x);
+
+/*@
+  assigns \result \from x;
+*/
 extern float nearbyintf(float x);
+
+/*@
+  assigns \result \from x;
+*/
 extern long double nearbyintl(long double x);
 
+/*@
+  assigns \result \from x;
+*/
 extern double rint(double x);
+
+/*@
+  assigns \result \from x;
+*/
 extern float rintf(float x);
+
+/*@
+  assigns \result \from x;
+*/
 extern long double rintl(long double x);
 
+/*@
+  assigns errno, \result \from x;
+*/
 extern long int lrint(double x);
+
+/*@
+  assigns errno, \result \from x;
+*/
 extern long int lrintf(float x);
+
+/*@
+  assigns errno, \result \from x;
+*/
 extern long int lrintl(long double x);
 
+/*@
+  assigns errno, \result \from x;
+*/
 extern long long int llrint(double x);
+
+/*@
+  assigns errno, \result \from x;
+*/
 extern long long int llrintf(float x);
+
+/*@
+  assigns errno, \result \from x;
+*/
 extern long long int llrintl(long double x);
 
 /*@
@@ -1504,12 +1767,34 @@ extern float roundf(float x);
 */
 extern long double roundl(long double x);
 
+/*@
+  assigns errno, \result \from x;
+*/
 extern long int lround(double x);
+
+/*@
+  assigns errno, \result \from x;
+*/
 extern long int lroundf(float x);
+
+/*@
+  assigns errno, \result \from x;
+*/
 extern long int lroundl(long double x);
 
+/*@
+  assigns errno, \result \from x;
+*/
 extern long long int llround(double x);
+
+/*@
+  assigns errno, \result \from x;
+*/
 extern long long int llroundf(float x);
+
+/*@
+  assigns errno, \result \from x;
+*/
 extern long long int llroundl(long double x);
 
 /*@
@@ -1605,18 +1890,54 @@ extern double fmod(double x, double y);
 */
 extern float fmodf(float x, float y);
 
+/*@
+  assigns errno, \result \from x, y;
+*/
 extern long double fmodl(long double x, long double y);
 
+/*@
+  assigns errno, \result \from x, y;
+*/
 extern double remainder(double x, double y);
+
+/*@
+  assigns errno, \result \from x, y;
+*/
 extern float remainderf(float x, float y);
+
+/*@
+  assigns errno, \result \from x, y;
+*/
 extern long double remainderl(long double x, long double y);
 
+/*@
+  assigns errno, \result, *quo \from x, y;
+*/
 extern double remquo(double x, double y, int *quo);
+
+/*@
+  assigns errno, \result, *quo \from x, y;
+*/
 extern float remquof(float x, float y, int *quo);
+
+/*@
+  assigns errno, \result, *quo \from x, y;
+*/
 extern long double remquol(long double x, long double y, int *quo);
 
+/*@
+  assigns \result \from x, y;
+*/
 extern double copysign(double x, double y);
+
+/*@
+  assigns \result \from x, y;
+*/
 extern float copysignf(float x, float y);
+
+/*@
+  assigns \result \from x, y;
+*/
 extern long double copysignl(long double x, long double y);
 
 /*@
@@ -1640,28 +1961,94 @@ extern float nanf(const char *tagp);
  */
 extern long double nanl(const char *tagp);
 
+/*@
+  assigns errno, \result \from x, y;
+*/
 extern double nextafter(double x, double y);
+
+/*@
+  assigns errno, \result \from x, y;
+*/
 extern float nextafterf(float x, float y);
+
+/*@
+  assigns errno, \result \from x, y;
+*/
 extern long double nextafterl(long double x, long double y);
 
+/*@
+  assigns errno, \result \from x, y;
+*/
 extern double nexttoward(double x, long double y);
+
+/*@
+  assigns errno, \result \from x, y;
+*/
 extern float nexttowardf(float x, long double y);
+
+/*@
+  assigns errno, \result \from x, y;
+*/
 extern long double nexttowardl(long double x, long double y);
 
+/*@
+  assigns errno, \result \from x, y;
+*/
 extern double fdim(double x, double y);
+
+/*@
+  assigns errno, \result \from x, y;
+*/
 extern float fdimf(float x, float y);
+
+/*@
+  assigns errno, \result \from x, y;
+*/
 extern long double fdiml(long double x, long double y);
 
+/*@
+  assigns \result \from x, y;
+*/
 extern double fmax(double x, double y);
+
+/*@
+  assigns \result \from x, y;
+*/
 extern float fmaxf(float x, float y);
+
+/*@
+  assigns \result \from x, y;
+*/
 extern long double fmaxl(long double x, long double y);
 
+/*@
+  assigns \result \from x, y;
+*/
 extern double fmin(double x, double y);
+
+/*@
+  assigns \result \from x, y;
+*/
 extern float fminf(float x, float y);
+
+/*@
+  assigns \result \from x, y;
+*/
 extern long double fminl(long double x, long double y);
 
+/*@
+  assigns errno, \result \from x, y, z;
+*/
 extern double fma(double x, double y, double z);
+
+/*@
+  assigns errno, \result \from x, y, z;
+*/
 extern float fmaf(float x, float y, float z);
+
+/*@
+  assigns errno, \result \from x, y, z;
+*/
 extern long double fmal(long double x, long double y, long double z);
 
 /*@

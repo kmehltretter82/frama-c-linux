@@ -32,9 +32,6 @@
 [eva] gcc_builtin_macros.c:13: 
   function isalnum: precondition 'c_uchar_or_eof_or_EOF' got status valid.
 [eva] Done for function isalnum
-[kernel:annot:missing-spec] gcc_builtin_macros.c:13: Warning: 
-  Neither code nor specification for function iswlower,
-   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function iswlower <- main.
   Called from gcc_builtin_macros.c:13.
 [eva] using specification for function iswlower

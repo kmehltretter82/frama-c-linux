@@ -26,6 +26,7 @@
 __PUSH_FC_STDLIB
 #include "__fc_define_uid_and_gid.h"
 #include "__fc_define_size_t.h"
+#include "errno.h"
 
 __BEGIN_DECLS
 
@@ -35,18 +36,64 @@ struct group {
   char  **gr_mem;
 };
 
-extern struct group  *getgrgid(gid_t);
-extern struct group  *getgrnam(const char *);
-extern int getgrgid_r(gid_t, struct group *, char *,
- size_t, struct group **);
-extern int getgrnam_r(const char *, struct group *, char *,
- size_t , struct group **);
+volatile struct group __fc_grp;
+
+/*@
+  //missing: assigns <all below> \from 'group database';
+  assigns \result \from indirect:gid, &__fc_grp;
+  assigns errno \from indirect:gid;
+*/
+extern struct group *getgrgid(gid_t gid);
+
+/*@
+  //missing: assigns <all below> \from 'group database';
+  assigns \result \from indirect:name[0..], &__fc_grp;
+  assigns errno \from indirect:name[0..];
+*/
+extern struct group *getgrnam(const char *name);
+
+/*@
+  //missing: assigns <all below> \from 'group database';
+  assigns \result \from indirect:gid, indirect:bufsize;
+  assigns *grp \from gid, indirect:bufsize;
+  assigns buffer[0 .. bufsize-1] \from gid, indirect:bufsize;
+  assigns *result \from grp;
+  assigns errno \from indirect:gid, indirect:bufsize;
+*/
+extern int getgrgid_r(gid_t gid, struct group *grp, char *buffer,
+                      size_t bufsize, struct group **result);
+
+/*@
+  //missing: assigns <all below> \from 'group database';
+  assigns \result \from indirect:name[0..], indirect:bufsize;
+  assigns *grp \from name[0..], indirect:bufsize;
+  assigns buffer[0 .. bufsize-1] \from name[0..], indirect:bufsize;
+  assigns *result \from grp;
+  assigns errno \from indirect:name[0..], indirect:bufsize;
+*/
+extern int getgrnam_r(const char *name, struct group *grp, char *buffer,
+                      size_t bufsize, struct group **result);
+
+/*@
+  //missing: assigns <all below> \from 'group database';
+  assigns \result \from &__fc_grp;
+  assigns errno \from indirect:__fc_grp;
+*/
 extern struct group *getgrent(void);
+
+/*@
+  //missing: assigns <all below> \from 'group database';
+  assigns errno \from indirect:__fc_grp;
+*/
 extern void endgrent(void);
+
+/*@
+  //missing: assigns <all below> \from 'group database';
+  assigns errno \from indirect:__fc_grp;
+*/
 extern void setgrent(void);
 
 /* BSD function */
-extern int initgroups (const char *user, gid_t group);
 /*@
   // missing: ... \from groups database
   assigns \result \from indirect:user[0..], indirect:group, indirect:*ngroups;
@@ -55,6 +102,13 @@ extern int initgroups (const char *user, gid_t group);
 */
 extern int getgrouplist(const char *user, gid_t group,
                         gid_t *groups, int *ngroups);
+
+/*@
+  //missing: assigns <all below> \from 'group database';
+  assigns \result \from indirect:user[0..], indirect:group;
+  assigns errno \from indirect:user[0..], indirect:group;
+*/
+extern int initgroups(const char *user, gid_t group);
 
 __END_DECLS
 
