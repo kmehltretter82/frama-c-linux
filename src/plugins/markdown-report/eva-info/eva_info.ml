@@ -239,4 +239,5 @@ let domains_md_gen () =
 let () =
   Markdown_report.Md_gen.Eva_info.coverage_md_gen := coverage_md_gen;
   Markdown_report.Md_gen.Eva_info.domains_md_gen := domains_md_gen;
-  Markdown_report.Md_gen.Eva_info.loaded := true
+  Markdown_report.Md_gen.Eva_info.loaded := true;
+  Markdown_report.Md_gen.Eva_info.computed := Eva.Analysis.is_computed

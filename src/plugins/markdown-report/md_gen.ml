@@ -25,9 +25,12 @@ open Markdown
 
 module Eva_info = struct
   let loaded = ref false
-  let coverage_md_gen: (unit -> elements) ref = Extlib.mk_fun "coverage_md_gen"
+  let computed: (unit -> bool) ref = Extlib.mk_fun "Eva_info.computed"
+  let coverage_md_gen: (unit -> elements) ref =
+    Extlib.mk_fun "Eva_info.coverage_md_gen"
   let domains_md_gen: (unit -> (text * text) list) ref=
-    Extlib.mk_fun "domains_md_gen"
+    Extlib.mk_fun "Eva_info.domains_md_gen"
+  let available () = !loaded && !computed ()
 end
 
 type env =
@@ -263,7 +266,7 @@ let gen_context env =
   H1 (plain "Context of the analysis", Some "context")
   :: gen_inputs env
   @ gen_config env
-  @ (if !Eva_info.loaded then section_domains env else [])
+  @ (if Eva_info.available () then section_domains env else [])
   @ H3 (plain "Stubbed Functions", Some "stubs")
     :: (
       if env.is_draft then
@@ -574,7 +577,7 @@ let gen_report ~draft:is_draft () =
   let remarks = mk_remarks is_draft in
   let env = { remarks; is_draft } in
   let context = gen_context env in
-  let coverage = if !Eva_info.loaded then gen_coverage env else [] in
+  let coverage = if Eva_info.available() then gen_coverage env else [] in
   let alarms = gen_alarms env in
   let title = Mdr_params.Title.get () in
   let title =
