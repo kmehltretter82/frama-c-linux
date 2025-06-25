@@ -2,9 +2,9 @@ The following set of packages is known to be a working configuration for
 compiling Frama-C 31.0.
 
 - OCaml 4.14.2
-- dune.3.16.1
-- dune-configurator.3.16.1
-- dune-site.3.16.1
+- dune.3.19.1
+- dune-configurator.3.19.1
+- dune-site.3.19.1
 - lablgtk3.3.1.5
 - lablgtk3-sourceview3.3.1.5
 - menhir.20240715
