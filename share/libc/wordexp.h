@@ -47,9 +47,20 @@ typedef struct __fc_wordexp_t {
 #define WRDE_CMDSUB 4
 #define WRDE_SYNTAX 5
 
+/*@
+  allocates pwordexp->we_wordv;
+  //missing: assigns from 'filesystem', 'environment'
+  assigns \result \from indirect:words[0..], indirect:pwordexp, indirect:flags;
+  assigns pwordexp->we_wordc, pwordexp->we_wordv[0..][0..] \from words[0..],
+                                                                 indirect:flags;
+ */
 extern int wordexp(const char *restrict words, wordexp_t *restrict pwordexp,
                    int flags);
 
+/*@
+  frees pwordexp->we_wordv[0..], pwordexp->we_wordv;
+  assigns *pwordexp \from *pwordexp;
+ */
 extern void wordfree(wordexp_t *pwordexp);
 
 __END_DECLS

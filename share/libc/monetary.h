@@ -30,9 +30,17 @@ __PUSH_FC_STDLIB
 
 __BEGIN_DECLS
 
+/*@
+  assigns s[0 .. maxsize-1] \from format[0..];
+  assigns \result \from indirect:format[0..];
+*/
 extern ssize_t strfmon(char *restrict s, size_t maxsize,
                        const char *restrict format, ...);
 
+/*@
+  assigns s[0 .. maxsize-1] \from format[0..], indirect:locale;
+  assigns \result \from indirect:format[0..], indirect:locale;
+*/
 extern ssize_t strfmon_l(char *restrict s, size_t maxsize, locale_t locale,
                          const char *restrict format, ...);
 

@@ -55,6 +55,12 @@ __BEGIN_DECLS
 #define MM_NOMSG 1
 #define MM_NOCON 4
 
+/*@
+  // missing: assigns 'device' \from 'hardware'
+  assigns \result \from indirect:classification, indirect:label[0..],
+                        indirect:severity, indirect:text[0..],
+                        indirect:action[0..], indirect:tag[0..];
+ */
 extern int fmtmsg(long classification, const char *label, int severity,
                   const char *text, const char *action, const char *tag);
 

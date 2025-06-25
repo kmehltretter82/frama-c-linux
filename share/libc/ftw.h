@@ -24,6 +24,10 @@
 #define __FC_FTW_H
 #include "features.h"
 __PUSH_FC_STDLIB
+#include "errno.h"
+// From POSIX 1.2008: "Inclusion of the <ftw.h> header may also make visible
+//                     all symbols from <sys/stat.h>".
+#include "sys/stat.h"
 
 __BEGIN_DECLS
 
@@ -63,13 +67,20 @@ enum __fc_nftw
 #define NFTW_CHDIR NFTW_CHDIR
 };
 
-// From POSIX 1.2008: "Inclusion of the <ftw.h> header may also make visible
-//                     all symbols from <sys/stat.h>".
-#include "sys/stat.h"
-
+/*@
+  // missing: assigns 'filesystem', \from 'filesystem', and also everything
+  //          that fn can assign to.
+  assigns \result, errno \from indirect:path[0..], indirect:fn, indirect:ndirs;
+ */
 int ftw(const char *path,
         int (*fn)(const char *, const struct stat *ptr, int flag), int ndirs);
 
+/*@
+  // missing: assigns 'filesystem', \from 'filesystem', and also everything
+  //          that fn can assign to.
+  assigns \result, errno \from indirect:path[0..], indirect:fn,
+                               indirect:fd_limit, indirect:flags;
+ */
 int nftw(const char *path,
          int (*fn)(const char *, const struct stat *, int, struct FTW *),
          int fd_limit, int flags);
