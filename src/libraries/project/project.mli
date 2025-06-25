@@ -109,8 +109,8 @@ val set_name: t -> string -> unit
 
 val register_after_set_name_hook: (t * string -> unit) -> unit
 (** [register_after_set_name_hook f] adds a hook on function {!set_name}.
-    The project given as argument to [f] is the current project, while the
-    string is the old name for the current project. *)
+    The project given as argument to [f] is the modified project, while the
+    string is the old name for this project. *)
 
 exception Unknown_project
 val from_unique_name: string -> t
