@@ -12,8 +12,9 @@ ARG OPAM
 
 RUN sudo ln -f /usr/bin/opam-${OPAM} /usr/bin/opam && opam init --reinit -ni
 COPY reference-configuration.md /init/
+RUN sudo chmod a+r /init/reference-configuration.md
 COPY install.sh /init/
-RUN sudo chmod +x /init/install.sh
+RUN sudo chmod a+rx /init/install.sh
 # grep needs to be explicitly installed in Alpine to replace busybox with
 # GNU grep, for option '-z'
 RUN /init/install.sh \
@@ -23,7 +24,7 @@ RUN /init/install.sh \
 
 # Install Frama-C depexts and dependencies
 COPY opam-install-fc-deps-from-ref-config.sh /init/
-RUN sudo chmod +x /init/opam-install-fc-deps-from-ref-config.sh
+RUN sudo chmod a+rx /init/opam-install-fc-deps-from-ref-config.sh
 RUN /init/opam-install-fc-deps-from-ref-config.sh
 
 RUN eval $(opam env) && why3 config detect
