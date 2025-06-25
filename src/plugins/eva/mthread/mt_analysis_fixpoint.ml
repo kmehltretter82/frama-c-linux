@@ -294,7 +294,7 @@ let store_written_value analysis lw =
     let written = Mt_shared_vars.Precise.join_shared_values l in
     (* XXX: temporary *)
     let priority, hint =
-      Widen_type.hints_from_keys Cil.dummyStmt (Widen_type.default ())
+      Widen_type.hints_from_keys Cil_datatype.Stmt.dummy (Widen_type.default ())
     in
     let written = Cvalue.Model.widen ~priority ~hint old_written written in
     let changed = not (Cvalue.Model.equal written old_written) in

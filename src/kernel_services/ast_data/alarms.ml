@@ -766,7 +766,7 @@ let unsafe_remove ?filter ?kinstr e =
     try
       let tbl = Usable_emitter.Hashtbl.find by_emitter usable_e in
       let to_be_removed = D.Hashtbl.create 7 in
-      let stmt_ref = ref Cil.dummyStmt in
+      let stmt_ref = ref Cil_datatype.Stmt.dummy in
       let extend_del a (annot, _, stmt, _ as t) =
         D.Hashtbl.add to_be_removed a t;
         Alarm_of_annot.remove annot;

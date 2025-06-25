@@ -217,7 +217,7 @@ let dummy_project =
     actions = [] }
 
 let dummy_fct_info = {
-  fi_kf = Kernel_function.dummy () ;
+  fi_kf = Cil_datatype.Kf.dummy ;
   fi_def = None;
   fi_top = None;
   fi_level_option = DontSlice;
@@ -229,7 +229,7 @@ let dummy_fct_info = {
 
 let dummy_marks_index = PdgIndex.FctIndex.create 0
 
-let dummy_ff_marks = (PdgTypes.Pdg.top (Kernel_function.dummy ()),
+let dummy_ff_marks = (PdgTypes.Pdg.top Cil_datatype.Kf.dummy,
                       dummy_marks_index)
 
 let dummy_fct_slice = {

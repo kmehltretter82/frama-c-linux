@@ -89,10 +89,8 @@ type 'vertex edge = {
 
 (* --- Dummy representatives --- *)
 
-let dummy_kf = List.hd (Cil_datatype.Kf.reprs)
-
 let dummy_vertex = {
-  vertex_kf = dummy_kf;
+  vertex_kf = Cil_datatype.Kf.dummy;
   vertex_key = -1;
   vertex_blocks = [];
   vertex_start_of = None;
@@ -102,7 +100,7 @@ let dummy_vertex = {
 }
 
 let dummy_edge = {
-  edge_kf = dummy_kf;
+  edge_kf = Cil_datatype.Kf.dummy;
   edge_key = -1;
   edge_kinstr = Kglobal;
   edge_transition = Skip;

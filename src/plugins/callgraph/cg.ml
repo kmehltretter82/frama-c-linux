@@ -46,7 +46,7 @@ end
 module G =
   Graph.Imperative.Digraph.ConcreteBidirectionalLabeled
     (Kf_sorted)
-    (struct include Cil_datatype.Stmt let default = Cil.dummyStmt end)
+    (struct include Cil_datatype.Stmt let default = Cil_datatype.Stmt.dummy end)
 
 module D =
   Datatype.Make(struct

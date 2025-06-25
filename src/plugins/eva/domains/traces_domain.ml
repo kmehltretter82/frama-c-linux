@@ -848,7 +848,7 @@ let rec complete_graph (graph:Graph.t) =
     ) graph Graph.empty
 
 
-let dummy_loc = Location.unknown
+let dummy_loc = Location.dummy
 
 let subst_in_full var_mapping =
   let visit = Visitor_behavior.copy (Project.current ()) in

@@ -71,10 +71,7 @@ let is_ghost kf = (get_vi kf).vghost
 
 include Cil_datatype.Kf
 
-let dummy () = {
-  fundec = Definition (Cil.emptyFunction "@dummy@", Cil_datatype.Location.unknown);
-  spec = List.hd Cil_datatype.Funspec.reprs
-}
+let dummy () = Cil_datatype.Kf.dummy
 
 (* ************************************************************************* *)
 (** {2 Searching} *)

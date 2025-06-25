@@ -127,7 +127,7 @@ let convert kf env loc ~is_forall quantif =
              let lv = var v in
              [ Smart_stmt.assigns ~loc ~result:lv init_val ])
       in
-      let end_loop_ref = ref dummyStmt in
+      let end_loop_ref = ref Cil_datatype.Stmt.dummy in
       (* innermost block *)
       let mk_innermost_block env =
         (* innermost loop body: store the result in [res] and go out according

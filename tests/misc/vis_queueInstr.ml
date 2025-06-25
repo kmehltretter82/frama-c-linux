@@ -1,6 +1,8 @@
 class vis prj = object(this)
   inherit Visitor.frama_c_copy prj
-  method! vstmt_aux _ = this#queueInstr [ Cil.dummyInstr ] ; Cil.DoChildren
+  method! vstmt_aux _ =
+    this#queueInstr [ Cil_datatype.Instr.dummy ];
+    Cil.DoChildren
 end
 
 let () =

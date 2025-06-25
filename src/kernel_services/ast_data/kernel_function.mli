@@ -219,6 +219,8 @@ val is_return_stmt: t -> stmt -> bool
 
 val dummy: unit -> t
 (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+[@@deprecated "use Cil_datatype.Kf.dummy instead."]
+[@@migrate { repl = Cil_datatype.Kf.dummy } ]
 
 val get_vi : t -> varinfo
 val get_id: t -> int

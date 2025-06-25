@@ -89,7 +89,7 @@ module Stack = struct
       end)
 
   let fun_access_vars () =
-    FunAccessVars.memo (fun () -> Kernel_function.dummy ())
+    FunAccessVars.memo (fun () -> Cil_datatype.Kf.dummy)
 
   let access_to_var stmt : stack_elt = fun_access_vars (), Kstmt stmt
   let is_access_to_var (kf, _) =

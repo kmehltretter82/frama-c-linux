@@ -68,7 +68,7 @@ let () = Ast.add_monotonic_state Dynamic_Alloc_Bases.self
 
 let current_call_site () =
   match Callstack.top_callsite (Eva_utils.current_call_stack ()) with
-  | Kglobal -> Cil.dummyStmt
+  | Kglobal -> Cil_datatype.Stmt.dummy
   | Kstmt stmt -> stmt
 
 (* Remove some parts of the callstack:

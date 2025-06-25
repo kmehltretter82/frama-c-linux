@@ -1075,7 +1075,7 @@ let untyped_to_exp typ t =
   let env = Env.push Env.empty in
   let env = Env.set_rte env false in
   let e, _, env =
-    try to_exp ~adata:Assert.no_data (Kernel_function.dummy ()) env t
+    try to_exp ~adata:Assert.no_data Cil_datatype.Kf.dummy env t
     with Rtl.Symbols.Unregistered _ -> raise (No_simple_translation t)
   in
   if not (Env.has_no_new_stmt env) then raise (No_simple_translation t);
