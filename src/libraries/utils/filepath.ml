@@ -73,11 +73,13 @@ let of_string ?(existence=Indifferent) ?base s =
 (* --- Datatype                                                           --- *)
 (* -------------------------------------------------------------------------- *)
 
+let dummy = of_string "@dummy_filepath@"
+
 include Datatype.Make_with_collections (struct
     include Datatype.Serializable_undefined
     type nonrec t = string
     let name = "Filepath"
-    let reprs = [ of_string "/" ]
+    let reprs = [ dummy ]
     let equal = String.equal
     let compare = String.compare
     let hash = Hashtbl.hash (* String.hash only introduced in OCaml 5.0 *)

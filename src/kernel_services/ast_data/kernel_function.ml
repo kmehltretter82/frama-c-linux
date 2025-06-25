@@ -26,11 +26,6 @@ open Cil_types
 (** {2 Getters} *)
 (* ************************************************************************* *)
 
-let dummy () = {
-  fundec = Definition (Cil.emptyFunction "@dummy@", Cil_datatype.Location.unknown);
-  spec = List.hd Cil_datatype.Funspec.reprs
-}
-
 let get_vi kf = Ast_info.Function.get_vi kf.fundec
 let get_id kf = (get_vi kf).vid
 let get_name kf = (get_vi kf).vname
@@ -75,6 +70,11 @@ let is_ghost kf = (get_vi kf).vghost
 (* ************************************************************************* *)
 
 include Cil_datatype.Kf
+
+let dummy () = {
+  fundec = Definition (Cil.emptyFunction "@dummy@", Cil_datatype.Location.unknown);
+  spec = List.hd Cil_datatype.Funspec.reprs
+}
 
 (* ************************************************************************* *)
 (** {2 Searching} *)

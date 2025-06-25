@@ -147,11 +147,11 @@ let string_of_compiler = function
 
 module Builtin_template = struct
   let dummy =
-    { name = "";
+    { name     = "@dummy_builtin_template@";
       compiler = None;
-      rettype = "";
-      args = [];
-      types = None;
+      rettype  = "";
+      args     = [];
+      types    = None;
       variadic = false;
     }
   include Datatype.Make_with_collections
