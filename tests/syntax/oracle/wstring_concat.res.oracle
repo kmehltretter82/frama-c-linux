@@ -3,6 +3,19 @@
 [eva:initial-state] Values of globals at initialization
   test[0..65535] ∈ {97}
       [65536] ∈ {0}
+  __fc_lit_string1[0] ∈ {108}
+                  [1] ∈ {101}
+                  [2] ∈ {110}
+                  [3] ∈ {103}
+                  [4] ∈ {116}
+                  [5] ∈ {104}
+                  [6] ∈ {58}
+                  [7] ∈ {32}
+                  [8] ∈ {37}
+                  [9] ∈ {122}
+                  [10] ∈ {117}
+                  [11] ∈ {10}
+                  [12] ∈ {0}
 [eva] using specification for function printf
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
