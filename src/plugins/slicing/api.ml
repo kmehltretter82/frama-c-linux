@@ -57,8 +57,8 @@ module Project = struct
   let extract ?(f_slice_names=default_slice_names) new_proj_name =
     SlicingTransform.extract ~f_slice_names new_proj_name
 
-  let print_dot ~filename ~title =
-    PrintSlice.build_dot_project filename title
+  let print_dot ~filepath ~title =
+    PrintSlice.build_dot_project filepath title
 
   let change_slicing_level = SlicingMacros.change_slicing_level
 

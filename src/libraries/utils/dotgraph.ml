@@ -118,21 +118,26 @@ let close dot =
       dot.out <- None ;
     end
 
-let layout ?(force=false) ?(target="pdf") ?(engine="dot") ?output dot =
+type target = Command.Dot.format = Jpeg | Pdf | Png | Svg
+
+let layout ?(force=false) ?(target=Pdf) ?(engine="dot") ?output dot =
   begin
     if dot.out <> None then raise (Invalid_argument "DotGraph: not closed") ;
-    let input = dot.file in
-    let output =
+    let input = Filepath.of_string dot.file in
+    let output_filename =
       match output with Some f -> f | None ->
-        Printf.sprintf "%s.%s" (basename dot.file) target in
-    let cmd = Printf.sprintf "dot -K%s -T%s %s -o %s"
-        engine target input output in
-    let status = Sys.command cmd in
-    if status=0 then output else
-    if force then
+        let file_ext = Command.Dot.format_to_string target in
+        Printf.sprintf "%s.%s" (basename dot.file) file_ext
+    in
+    let output = Filepath.of_string output_filename in
+    let status = Command.Dot.(spawn ~layout:engine ~format:target ~output input)
+    in
+    match status with
+    | Unix.WEXITED 0 -> output_filename
+    | Unix.WEXITED status when force ->
       let msg = Printf.sprintf "dot failed with status %d" status in
       raise (Invalid_argument msg)
-    else dot.file
+    | _ -> dot.file
   end
 
 let printf dot msg = Format.fprintf dot.fmt msg

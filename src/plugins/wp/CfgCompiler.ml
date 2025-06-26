@@ -381,10 +381,12 @@ let output_dot : type a b. out_channel -> ?checks:_ -> (a,b) env -> unit =
   Dot.output_graph cout g
 
 let dump_env : type a. name:string -> (_, a) env -> unit = fun ~name env ->
+  let open Filesystem.Operators in
   let file = (Filename.get_temp_dir_name ()) ^ "/cfg_" ^ name in
-  let fout = open_out (file ^ ".dot") in
+  let dot_file = Filepath.of_string (file ^ ".dot")
+  and pdf_file = Filepath.of_string (file ^ ".pdf") in
   if false then begin
-    let out = Format.formatter_of_out_channel fout in
+    let$ out = Filesystem.with_formatter_exn dot_file in
     Format.fprintf out "digraph %s {@\n" name;
     Format.fprintf out "  rankdir = TB ;@\n";
     Format.fprintf out "  node [ style = filled, shape = circle ] ;@\n";
@@ -393,11 +395,10 @@ let dump_env : type a. name:string -> (_, a) env -> unit = fun ~name env ->
     Format.fprintf out "}@.";
   end
   else begin
+    let$ fout = Filesystem.with_open_out_exn dot_file in
     output_dot fout env;
   end;
-  close_out fout;
-  ignore (Sys.command
-            (Printf.sprintf "dot -Tpdf %s.dot > %s.pdf" file file));
+  ignore (Command.Dot.(spawn ~format:Pdf ~output:pdf_file dot_file));
   Wp_parameters.debug ~dkey:dumpkey "Saving dump %s into %s.pdf" name file
 
 let env_union env1 env2 =

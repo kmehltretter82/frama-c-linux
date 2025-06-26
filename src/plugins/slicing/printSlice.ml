@@ -314,11 +314,11 @@ end
 
 module PrintProjGraph = Graph.Graphviz.Dot(PrintProject)
 
-let build_dot_project filename title =
+let build_dot_project filepath title =
+  let open Filesystem.Operators in
   let project = SlicingState.get () in
-  let file = open_out filename in
-  PrintProjGraph.output_graph file (title, project);
-  close_out file
+  let$ file = Filesystem.with_open_out_exn filepath in
+  PrintProjGraph.output_graph file (title, project)
 
 let print_fct_stmts fmt kf =
   try
