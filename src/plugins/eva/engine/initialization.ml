@@ -127,21 +127,99 @@ module Make
     then initialize_top_volatile lval state
     else begin
       let rec aux lval init state =
-      match init with
-      | SingleInit (exp, loc) ->
-        let source = fst loc in
-        apply_eva_single_initializer ~pos ~source state lval exp
-      | CompoundInit (_typ, l) ->
-        let doinit state (off, init) =
-          let lval = Eva_ast.add_offset lval off in
-          aux lval init state
-        in
-        List.fold_left doinit state l
+        match init with
+        | SingleInit (exp, loc) ->
+          let source = fst loc in
+          apply_eva_single_initializer ~pos ~source state lval exp
+        | CompoundInit (_typ, l) ->
+          let doinit state (off, init) =
+            let lval = Eva_ast.add_offset lval off in
+            aux lval init state
+          in
+          List.fold_left doinit state l
       in
       match init with
       | CInit init -> aux lval init state
-      | StrInit _ -> Self.not_yet_implemented "StrInit"
-      | WStrInit _ -> Self.not_yet_implemented "WStrInit"
+      | StrInit s ->
+        if Ast_types.is_any_char_array lval.typ then begin
+          let _, size = Ast_types.array_elem_type_and_size lval.typ in
+          let open Option.Operators in
+          let str_len = Z.of_int (String.length s) in
+          let arr_len =
+            match size >>- (Cil.constFoldToInt ~machdep:true) with
+            | None -> Z.(succ str_len)
+            | Some z -> z
+          in
+          (* TODO: provide appropriate loc in AST *)
+          let source = fst Cil_datatype.Location.unknown in
+          let init_element state i =
+            let c = if Z.leq str_len i then '\000' else s.[Z.to_int i] in
+            let open Eva_ast in
+            let idx_exp = Eva_ast_builder.mk_exp
+                (Const (CInt64(i,Machine.sizeof_kind(),None)))
+            in
+            let idx = Index(idx_exp,NoOffset) in
+            let lval = Eva_ast.(add_offset lval idx) in
+            let v = Eva_ast_builder.mk_exp (Const (CChr c)) in
+            apply_eva_single_initializer ~pos ~source state lval v
+          in
+          let seq =
+            Seq.unfold
+              (fun cnt ->
+                 if Z.lt cnt arr_len then (Some (cnt, Z.succ cnt)) else None)
+              Z.zero
+          in
+          Seq.fold_left init_element state seq
+        end else
+          Self.fatal
+            "String literal can only be used to initialize a char array"
+      | WStrInit a ->
+        let error () =
+          Self.fatal
+            "Initialization of %a of type %a with wide string literal"
+            Eva_ast_printer.pp_lval lval Printer.pp_typ lval.typ
+        in
+        if not (Ast_types.is_array lval.typ) then error();
+        let elem, size = Ast_types.array_elem_type_and_size lval.typ in
+        if not (Cil_datatype.TypNoAttrs.equal elem (Machine.wchar_type())) then error();
+        let open Option.Operators in
+        let str_len = Z.of_int (List.length a) in
+        let arr_len =
+          match size >>- (Cil.constFoldToInt ~machdep:true) with
+          | None -> Z.(succ str_len)
+          | Some z -> z
+        in
+        (* TODO: provide appropriate loc in AST *)
+        let source = fst Cil_datatype.Location.unknown in
+        let init_element state (i,c) =
+          let c = Z.of_int64 c in
+          let open Eva_ast in
+          let idx_exp = Eva_ast_builder.mk_exp
+              (Const (CInt64(i,Machine.sizeof_kind(),None)))
+          in
+          let idx = Index(idx_exp,NoOffset) in
+          let lval = Eva_ast.(add_offset lval idx) in
+          let v =
+            Eva_ast_builder.mk_exp (Const (CInt64(c,Machine.wchar_kind(),None)))
+          in
+          apply_eva_single_initializer ~pos ~source state lval v
+        in
+        let seq =
+          Seq.unfold
+            (fun (cnt,l) ->
+               if Z.lt cnt arr_len then
+                 begin
+                   let c,tl =
+                     match l with
+                     | [] -> Int64.zero,[]
+                     | c :: tl -> c,tl
+                   in
+                   Some ((cnt,c),(Z.succ cnt, tl))
+                 end
+               else None)
+            (Z.zero,a)
+        in
+        Seq.fold_left init_element state seq
     end
 
   (* Field by field initialization of a variable to zero, or top if volatile.
@@ -189,25 +267,25 @@ module Make
      attributes 'const' are initialized. *)
   let apply_cil_const_initializer ~pos state lval i =
     let rec aux state lval = function
-    | Cil_types.SingleInit exp ->
-      let typ_lval = Cil.typeOfLval lval in
-      if Ast_types.has_qualifier "const" typ_lval &&
-         not (Ast_types.has_qualifier "volatile" typ_lval)
-         && not (Cil.is_mutable_or_initialized lval)
-      then
-        let lval = Eva_ast.translate_lval lval
-        and exp = Eva_ast.translate_exp exp
-        and source = fst exp.eloc in
-        apply_eva_single_initializer ~pos ~source state lval exp
-      else state
-    | CompoundInit (typ, l) ->
-      if Ast_types.has_qualifier "volatile" typ || not (Ast_types.is_const typ)
-      then state (* initializer is not useful *)
-      else
-        let doinit off init _typ state =
-          aux state (Cil.addOffsetLval off lval) init
-        in
-        Cil.foldLeftCompound ~implicit:true ~doinit ~ct:typ ~initl:l ~acc:state
+      | Cil_types.SingleInit exp ->
+        let typ_lval = Cil.typeOfLval lval in
+        if Ast_types.has_qualifier "const" typ_lval &&
+           not (Ast_types.has_qualifier "volatile" typ_lval)
+           && not (Cil.is_mutable_or_initialized lval)
+        then
+          let lval = Eva_ast.translate_lval lval
+          and exp = Eva_ast.translate_exp exp
+          and source = fst exp.eloc in
+          apply_eva_single_initializer ~pos ~source state lval exp
+        else state
+      | CompoundInit (typ, l) ->
+        if Ast_types.has_qualifier "volatile" typ || not (Ast_types.is_const typ)
+        then state (* initializer is not useful *)
+        else
+          let doinit off init _typ state =
+            aux state (Cil.addOffsetLval off lval) init
+          in
+          Cil.foldLeftCompound ~implicit:true ~doinit ~ct:typ ~initl:l ~acc:state
     in
     match i with
     | Cil_types.CInit i -> aux state lval i
@@ -329,7 +407,6 @@ module Make
         let init = Option.map Eva_ast.translate_init_or_str init.init in
         initialize_var_not_lib_entry ~pos ~local:false vi init state
     else state
-
 
   (* Compute the initial state with all global variable initialized. *)
   let compute_global_state ~lib_entry () =
