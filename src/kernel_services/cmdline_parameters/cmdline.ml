@@ -957,14 +957,37 @@ let play_in_toplevel_one_shot nb_used play options =
   play ();
   then_options_extended
 
-let play_in_toplevel on_from_name nb_used play options =
+type project_functions = {
+  current: unit -> int;
+  on_from_pid: 'a. int -> (unit -> 'a) -> 'a;
+  pid_to_name: int -> string;
+  name_to_pid: string -> int;
+}
+
+let project_functions =
+  let current () =
+    Extlib.mk_labeled_fun "Cmdline.project_functions.current"
+  in
+  let on_from_pid _ _ =
+    Extlib.mk_labeled_fun "Cmdline.project_functions.on_from_pid"
+  in
+  let pid_to_name _ =
+    Extlib.mk_labeled_fun "Cmdline.project_functions.pid_to_name"
+  in
+  let name_to_pid _ =
+    Extlib.mk_labeled_fun "Cmdline.project_functions.name_to_pid"
+  in
+  ref { current; on_from_pid; pid_to_name; name_to_pid }
+
+let play_in_toplevel nb_used play options =
+  let prj_funs = !project_functions in
   (* [aux then_opts] handles the following "-then" options *)
   let rec aux current = function
     | None -> ()
     | Some(options, then_argument) ->
       let play_on options p =
         p,
-        on_from_name
+        prj_funs.on_from_pid
           p
           (fun () -> play_in_toplevel_one_shot nb_used play options)
       in
@@ -978,19 +1001,21 @@ let play_in_toplevel on_from_name nb_used play options =
           (match !last_project_created_by_copy () with
            | None -> Kernel_log.abort "no known last created project."
            | Some p ->
+             let current = prj_funs.pid_to_name current in
              play_on (("-remove-projects=-@all,+" ^ current) :: options) p)
-        | Name p -> play_on options p
+        | Name p_name ->
+          let pid = prj_funs.name_to_pid p_name in
+          play_on options pid
       in
       aux last_current then_opts
   in
   (* play the first shot before the first "-then" *)
   let then_opts = play_in_toplevel_one_shot nb_used play options in
   (* play the "-then" options *)
-  aux "default" then_opts
+  let current = prj_funs.current () in
+  aux current then_opts
 
-type on_from_name = { on_from_name: 'a. string -> (unit -> 'a) -> 'a }
-
-let parse_and_boot ~on_from_name ~get_toplevel ~play_analysis =
+let parse_and_boot ~get_toplevel ~play_analysis =
   let options, nb_used_early, then_options_early =
     Early_Stage.parse !non_initial_options_ref
   in
@@ -1006,7 +1031,6 @@ let parse_and_boot ~on_from_name ~get_toplevel ~play_analysis =
        provides the good one. *)
     (fun () ->
        play_in_toplevel
-         on_from_name.on_from_name
          (nb_used_early + nb_used_extending)
          play_analysis
          options)

@@ -256,7 +256,7 @@ let () =
   Cmdline.last_project_created_by_copy :=
     (fun () -> match !last_created_by_copy_ref with
        | None -> None
-       | Some p -> Some p.unique_name)
+       | Some p -> Some p.pid)
 
 let iter_on_projects f = Q.iter f projects
 let fold_on_projects f acc = Q.fold f acc projects
@@ -734,6 +734,37 @@ module Undo = struct
     filename := temp_file ~prefix:short_filename ~suffix:".sav"
 
 end
+
+
+(* ************************************************************************** *)
+(** {2 Special Cmdline functions} *)
+(* ************************************************************************** *)
+
+let () =
+  let project_functions : Cmdline.project_functions =
+    let current () = current () |> get_pid in
+    let on_from_pid pid f =
+      try on (from_pid pid) f ()
+      with Unknown_project -> abort "no project with id `%d'." pid
+    in
+    let pid_to_name pid = from_pid pid |> get_name in
+    let name_to_pid p_name =
+      let project =
+        match find_all p_name with
+        | [ p ] -> p
+        | _ :: _ as projects ->
+          warning
+            "multiple projects named `%s', choosing most recently created"
+            p_name;
+          pick_most_recently_created projects
+        | [] -> abort "no project named `%s'" p_name
+      in
+      get_pid project
+    in
+    { current; on_from_pid; pid_to_name; name_to_pid }
+  in
+  Cmdline.project_functions := project_functions
+
 
 (* Exporting Datatype for an easy external use *)
 module Datatype = D
