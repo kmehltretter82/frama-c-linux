@@ -1158,7 +1158,7 @@ let base_output () =
 let get_output () =
   let base = base_output () in
   let project = Project.current () in
-  let name = Project.get_unique_name project in
+  let name = Project.get_name project in
   if name = "default" then base
   else
     let dir = Fc_Filepath.(base / name) in

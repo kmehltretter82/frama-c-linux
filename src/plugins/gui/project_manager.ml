@@ -27,7 +27,7 @@ let projects_list ?(filter=fun _ -> true) () =
   let projects =
     Project.fold_on_projects
       (fun acc p ->
-         if filter p then ((p, Project.get_unique_name p) :: acc) else acc)
+         if filter p then ((p, Project.get_name p) :: acc) else acc)
       []
   in
   List.sort compare_prj projects
@@ -59,7 +59,7 @@ let new_project main_ui =
        Project.set_current project)
 
 let delete_project project =
-  let name = Project.get_unique_name project in
+  let name = Project.get_name project in
   let ok =
     GToolbox.question_box
       ~title:(Format.sprintf "Deleting project %S" name)
@@ -90,7 +90,7 @@ let save_project_as (main_ui: Design.main_window_extension_points) project =
   let dialog =
     GWindow.file_chooser_dialog
       ~action:`SAVE
-      ~title:("Save project " ^ Project.get_unique_name project)
+      ~title:("Save project " ^ Project.get_name project)
       ~parent:main_ui#main_window ()
   in
   (*dialog#set_do_overwrite_confirmation true ; only in later lablgtk2 *)
@@ -140,7 +140,7 @@ let load_project (host_window: Design.main_window_extension_points) =
   dialog#destroy ()
 
 let mk_project_markup p =
-  let name = Extlib.html_escape (Project.get_unique_name p) in
+  let name = Extlib.html_escape (Project.get_name p) in
   if Project.is_current p then "<b>" ^ name ^ "</b>" else name
 
 let reset ?filter (menu: GMenu.menu) =
@@ -198,7 +198,7 @@ let duplicate_project project =
 let rec rename_project
     (main_ui: Design.main_window_extension_points) menu project
   =
-  let old = Project.get_unique_name project in
+  let old = Project.get_name project in
   let s =
     Gtk_helper.input_string
       ~parent:main_ui#main_window
@@ -208,15 +208,16 @@ let rec rename_project
   (match s with
    | None -> ()
    | Some s ->
-     try
-       ignore (Project.from_unique_name s);
+     let projects = Project.find_all s in
+     match projects with
+     | _ :: _ ->
        main_ui#error "Project of name %S already exists" s
-     with Project.Unknown_project ->
+     | [] ->
        Project.set_name project s);
   recompute main_ui menu
 
 and mk_project_entry window menu ?group p =
-  let pname = Project.get_unique_name p in
+  let pname = Project.get_name p in
   let markup = mk_project_markup p in
   let item = GMenu.menu_item ~packing:menu#append () in
   let _label = GMisc.label ~markup ~xalign:0. ~packing:item#add () in

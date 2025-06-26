@@ -94,7 +94,10 @@ let extend () =
       let () =
         let open Filesystem.Operators in
         let$ fmt = Filesystem.with_formatter_exn tmpfile in
-        let aorai_prj = Project.from_unique_name "aorai" in
+        let aorai_prj =
+          Project.find_all "aorai"
+          |> List.hd
+        in
         Project.on aorai_prj Kernel.PrintLibc.on ();
         File.pretty_ast ~prj:aorai_prj ~fmt ();
       in

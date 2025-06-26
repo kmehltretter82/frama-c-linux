@@ -1846,10 +1846,11 @@ module Remove_projects =
     (struct
       include Project.Datatype
       let of_string s =
-        try [ Project.from_unique_name s ]
-        with Project.Unknown_project ->
-          raise (P.Cannot_build ("no project '" ^ s ^ "'"))
-      let to_string = Project.get_unique_name
+        let projects = Project.find_all s in
+        if projects = [] then
+          raise (P.Cannot_build ("no project '" ^ s ^ "'"));
+        projects
+      let to_string = Project.get_name
     end)
     (struct
       let option_name = "-remove-projects"

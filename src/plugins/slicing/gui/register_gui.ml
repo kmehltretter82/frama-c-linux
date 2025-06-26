@@ -83,7 +83,7 @@ let gui_mk_slice (main_ui:Design.main_window_extension_points) selection ~info =
   let new_project = mk_slice selection in (* ... slicing computation *)
   gui_annot_info main_ui
     (fun fmt -> Format.fprintf fmt "Slice exported to project: %s"
-        (Project.get_unique_name new_project));
+        (Project.get_name new_project));
   main_ui#rehighlight ()
 
 let msg_help_enable_gui = "Enables/Disables the Slicing GUI."
