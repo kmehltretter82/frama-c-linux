@@ -81,9 +81,7 @@ let parse ~original path =
   Kernel.feedback ~level:2 "Parsing %a to Cabs" Filepath.pretty path;
   let cabs = parse_to_cabs ~original path in
   let cabs = Syntactic_transformations.apply cabs in
-  (* Now (return a function that will) convert to CIL *)
-  fun _ ->
-    Kernel.feedback ~level:2 "Converting %a from Cabs to CIL"
-      Filepath.pretty path;
-    let cil = Cabs2cil.convFile cabs in
-    cil,cabs
+  Kernel.feedback ~level:2 "Converting %a from Cabs to CIL"
+    Filepath.pretty path;
+  let cil = Cabs2cil.convFile cabs in
+  cil, cabs

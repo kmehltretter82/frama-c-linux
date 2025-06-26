@@ -53,5 +53,4 @@ val add_syntactic_transformation: (Cabs.file -> Cabs.file) -> unit
 
     @raise Parse_error if a parsing error occurs
 *)
-val parse:
-  original:Filepath.t -> Filepath.t -> (unit -> Cil_types.file*Cabs.file)
+val parse: original:Filepath.t -> Filepath.t -> Cil_types.file * Cabs.file

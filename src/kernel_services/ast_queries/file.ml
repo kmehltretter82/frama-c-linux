@@ -598,7 +598,7 @@ let parse_cabs cpp_command = function
         Filepath.pretty f;
     Kernel.feedback "Parsing %a (no preprocessing)"
       Filepath.pretty f;
-    Frontc.parse ~original:f f ()
+    Frontc.parse ~original:f f
   | NeedCPP (f, cmdl, _extra_for_this_file, is_gnu_like) ->
     let cpp_command, ppf = Option.get cpp_command in
     Kernel.feedback "Parsing %a (with preprocessing)"
@@ -639,7 +639,7 @@ let parse_cabs cpp_command = function
         ppf'
       end else ppf
     in
-    let (cil,(_,defs)) = Frontc.parse ~original:f ppf () in
+    let (cil,(_,defs)) = Frontc.parse ~original:f ppf in
     cil.fileName <- f;
     safe_remove_file ppf;
     (cil,(f,defs))
@@ -684,7 +684,7 @@ let () =
           (Printexc.to_string e)
     in
     let path = Filepath.of_string f in
-    let (cil,(_,defs)) = Frontc.parse ~original:path ppf () in
+    let (cil,(_,defs)) = Frontc.parse ~original:path ppf in
     cil.fileName <- path;
     safe_remove_file ppf;
     (cil,(path,defs))
