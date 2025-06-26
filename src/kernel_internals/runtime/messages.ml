@@ -49,11 +49,11 @@ module Messages =
 let () = Ast.add_monotonic_state Messages.self
 
 let hooks = ref []
+
 let add_message m =
-  begin
-    Messages.add m;
-    List.iter (fun fn -> fn()) !hooks ;
-  end
+  let i = Messages.length () in
+  Messages.add m;
+  List.iter (fun fn -> fn (m, i)) !hooks
 
 let nb_errors () =
   Messages.fold
@@ -100,4 +100,4 @@ let () = Log.check_not_yet := check_not_yet
 
 let reset_once_flag () = OnceTable.clear ()
 
-let add_global_hook fn = hooks := !hooks @ [fn]
+let add_hook fn = hooks := !hooks @ [fn]

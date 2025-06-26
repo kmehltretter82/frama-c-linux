@@ -229,14 +229,18 @@ let () = States.option model ~name:"decl"
 
 let iter f = ignore (Messages.fold (fun i evt -> f (evt, i); succ i) 0)
 
+let add_reload_hook f =
+  Project.register_after_set_current_hook ~user_only:false (fun _ -> f ())
+
 let _array =
   States.register_array
     ~package
     ~name:"message"
     ~descr:(Md.plain "Log messages")
     ~key:(fun (_evt, i) -> string_of_int i)
-    ~iter:iter
-    ~add_reload_hook:Messages.add_global_hook
+    ~iter
+    ~add_update_hook:Messages.add_hook
+    ~add_reload_hook
     model
 
 (* -------------------------------------------------------------------------- *)
