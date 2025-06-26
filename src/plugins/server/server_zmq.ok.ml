@@ -31,6 +31,7 @@ module Socket = Senv.String
     end)
 
 let () = Parameter_customize.set_group zmq_group
+let () = Parameter_customize.is_unsafe ()
 module Client = Senv.String
     (struct
       let option_name = "-server-gui"
