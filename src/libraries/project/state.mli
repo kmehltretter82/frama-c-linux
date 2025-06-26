@@ -102,8 +102,6 @@ val dummy: t
     @since Carbon-20101201
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
-val dummy_unique_name: string
-
 val is_dummy: t -> bool
 (** @return true if the given state is {!dummy}.
     @since Carbon-20101201 *)

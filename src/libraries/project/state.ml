@@ -85,11 +85,9 @@ let dummy_state_on_disk =
     on_disk_saved = false;
     on_disk_digest = "" }
 
-let dummy_unique_name = ""
-
 let dummy =
   { name = "";
-    unique_name = dummy_unique_name;
+    unique_name = "";
     private_ops = dummy_private_ops () }
 
 include Datatype.Make_with_collections
