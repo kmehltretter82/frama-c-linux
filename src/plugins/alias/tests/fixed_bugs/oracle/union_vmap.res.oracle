@@ -8,12 +8,14 @@
 [alias] analysing function: CPS_SplitWord
 [alias] May-aliases at the end of function CPS_SplitWord: <none>
 [alias] May-aliases after instruction  char *s2 = CPS_SplitWord((char *)"a");  are
-  <none>
+  { s2; "a" }
 [alias] analysing instruction: char *s3 = CPS_SplitWord((char *)"b");
 [alias] May-aliases after instruction  char *s3 = CPS_SplitWord((char *)"b");  are
-  <none>
+  { s2; "a" }  { s3; "b" }
 [alias] analysing instruction: *key = s3;
-[alias] May-aliases after instruction  *key = s3;  are  { *key; s3 }
+[alias] May-aliases after instruction  *key = s3;  are
+  { *key; s3; "b" }  { s2; "a" }
 [alias] analysing instruction: *key = s2;
-[alias] May-aliases after instruction  *key = s2;  are  { *key; s2 }
-[alias] May-aliases at the end of function CPS_ParseKey: { *key; s2; s3 }
+[alias] May-aliases after instruction  *key = s2;  are
+  { *key; s2; "a" }  { s3; "b" }
+[alias] May-aliases at the end of function CPS_ParseKey: { *key; s2; "a"; s3; "b" }
