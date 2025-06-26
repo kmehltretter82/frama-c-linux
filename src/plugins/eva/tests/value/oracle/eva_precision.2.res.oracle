@@ -5,7 +5,7 @@
     option -eva-auto-loop-unroll already set to 20 (not modified).
     option -eva-widening-delay set to 2.
     option -eva-partition-history set to 0 (default value).
-    option -eva-slevel set to 35.
+    option -eva-slevel already set to 0 (not modified).
     option -eva-ilevel set to 24.
     option -eva-plevel set to 70.
     option -eva-subdivide-non-linear set to 60.
@@ -30,8 +30,7 @@
 [scope:rm_asserts] removing 1 assertion(s)
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
-  t[0..34] ∈ [0..99]
-   [35..63] ∈ [0..99] or UNINITIALIZED
+  t[0..63] ∈ [0..99] or UNINITIALIZED
   index ∈ [0..63]
   r ∈ [0..99]
   k ∈ [0..162]

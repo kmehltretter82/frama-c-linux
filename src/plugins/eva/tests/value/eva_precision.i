@@ -1,7 +1,7 @@
 /* run.config
   STDOPT: +"-eva-precision 0"
   STDOPT: +"-eva-precision 3"
-  STDOPT: +"-eva-precision 3 -eva-auto-loop-unroll 20 -eva-domains octagon"
+  STDOPT: +"-eva-precision 3 -eva-auto-loop-unroll 20 -eva-slevel 0 -eva-domains octagon"
   STDOPT: +"-eva-precision 3 -eva-msg-key=-precision-settings"
 */
 /* run.config*
@@ -11,7 +11,7 @@
 
 /* Tests the meta-option -eva-precision.
    The third run tests that -eva-precision does not overwrite a specified
-   parameter. */
+   parameter — even if the specified parameter is set to its default value. */
 
 volatile unsigned int nondet;
 
