@@ -14,6 +14,7 @@ type t
 val from_file : Cil_types.file -> t
 
 val find_global : t -> string -> Cil_types.varinfo
+val find_global_init: t -> string -> Cil_types.init_or_str option
 val find_function : t -> string ->  Cil_types.varinfo
 val find_typedef : t -> string ->  Cil_types.typeinfo
 val find_struct : t -> string ->  Cil_types.compinfo

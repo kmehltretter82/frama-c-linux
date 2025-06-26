@@ -382,15 +382,16 @@ let overloaded_call ~builder overload vf args =
 
 (* --- Specification building --- *)
 
-let rec static_string a = match a.enode with
+let rec static_string env a = match a.enode with
   | StartOf(Var s, NoOffset) ->
-    (match (Globals.Vars.find s).init with
+    (match Environment.find_global_init env s.vname with
      | None -> None
      | Some (StrInit s) -> Some (Format_string.String s)
      | Some (WStrInit s) -> Some (Format_string.WString s)
-     | _ | exception Not_found -> None)
-  | CastE (_, e) -> static_string e
-  | _ -> None
+     | Some (CInit _) | exception Not_found -> None)
+  | CastE (_, e) -> static_string env e
+  | _ ->
+    None
 
 let find_global env name =
   try
@@ -730,7 +731,7 @@ let format_fun_call ~builder env format_fun vf args =
   let format =
     try
       let format_arg = List.nth args format_fun.f_format_pos in
-      match static_string format_arg with
+      match static_string env format_arg with
       | None ->
         Kernel.warning ~current:true
           ~wkey:Kernel.wkey_variadic_format_nonliteral
