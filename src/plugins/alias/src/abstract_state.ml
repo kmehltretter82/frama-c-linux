@@ -850,7 +850,7 @@ let call s (res : lval option) (args : exp list) (summary : Summary.t) : state =
   in
 
   (* for each pair (lv1,lv2) find (or create) the corresponding vertices *)
-  let s, vertex_pairs =
+  let s, arg_formal_vertex_pairs =
     let s = ref s in
     let find_vertex (lv1, lv2) =
       try
@@ -862,6 +862,16 @@ let call s (res : lval option) (args : exp list) (summary : Summary.t) : state =
     in
     !s, List.filter_map find_vertex arg_formal_pairs
   in
+
+  let find_global (vi, v1) =
+    try
+      ignore @@ Globals.Vars.find vi;
+      Some (VarMap.find vi s.varmap, v1)
+    with Not_found -> None
+  in
+  let global_pairs = List.filter_map find_global @@ VarMap.bindings summary_state.varmap in
+
+  let vertex_pairs = arg_formal_vertex_pairs @ global_pairs in
 
   (* merge the function graph;
      for every arg/formal vertex pair (v1,v2) and every edge v2→v create edge v1→v. *)

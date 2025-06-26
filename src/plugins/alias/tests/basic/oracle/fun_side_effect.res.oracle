@@ -9,7 +9,7 @@
 [alias] May-aliases at the end of function f: { a; b }
 [alias] analysing function: main
 [alias] analysing instruction: f();
-[alias] May-aliases after instruction  f();  are  <none>
+[alias] May-aliases after instruction  f();  are  { a; b }
 [alias] analysing instruction: __retres = 0;
-[alias] May-aliases after instruction  __retres = 0;  are  <none>
-[alias] May-aliases at the end of function main: <none>
+[alias] May-aliases after instruction  __retres = 0;  are  { a; b }
+[alias] May-aliases at the end of function main: { a; b }

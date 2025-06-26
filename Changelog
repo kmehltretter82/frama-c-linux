@@ -22,6 +22,7 @@ Open Source Release <next-release>
 Open Source Release 32.0 (Germanium)
 ###############################################################################
 
+-   Alias     [2025-06-23] Recognise aliases created as side effect of function
 o!  Kernel    [2025-10-09] Create aliases for all internal libraries modules
               via `Fclib` module.
 o!  Kernel    [2025-10-06] Renamed the module FCHashtbl to Hashtbl, the old
