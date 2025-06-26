@@ -96,7 +96,7 @@ let extend () =
         let$ fmt = Filesystem.with_formatter_exn tmpfile in
         let aorai_prj =
           Project.find_all "aorai"
-          |> List.hd
+          |> Project.pick_most_recently_created
         in
         Project.on aorai_prj Kernel.PrintLibc.on ();
         File.pretty_ast ~prj:aorai_prj ~fmt ();

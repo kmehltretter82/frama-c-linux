@@ -162,4 +162,4 @@ int main(void)
 }
 
 
-[scf] constant propagation done, result is in project `propagated 2`
+[scf] constant propagation done

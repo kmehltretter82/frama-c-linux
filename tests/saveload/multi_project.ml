@@ -1,7 +1,7 @@
 let check name test =
   Kernel.log "Checking %S@." name;
   Project.on
-    (Project.from_unique_name name)
+    (Project.find_all name |> List.hd)
     (fun () -> assert (test (Kernel.Files.get ()) [])) ()
 
 let main ~compress () =
@@ -17,8 +17,13 @@ let main ~compress () =
   Project.load_all fp;
   Filesystem.remove_file fp;
   ignore (Project.create_by_copy ~last:false "bar");
-  assert
-    (Project.equal (Project.current ()) (Project.from_unique_name "default"));
+  let default_prj =
+    let projects = Project.find_all "default" in
+    (* Only one default project after loading *)
+    assert (List.length projects = 1);
+    List.hd projects
+  in
+  assert (Project.equal (Project.current()) default_prj);
   check "foo" (<>);
   check "foobar" (=);
   check "default" (<>);
