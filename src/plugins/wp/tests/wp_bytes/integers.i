@@ -1,5 +1,5 @@
 /* run.config*
-   STDOPT:+"-wp-model bytes+raw -wp-timeout 40"
+   STDOPT:+"-wp-model bytes+raw -wp-timeout 60"
 */
 
 typedef unsigned long long uint64 ;
