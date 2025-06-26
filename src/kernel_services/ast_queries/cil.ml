@@ -2819,7 +2819,7 @@ let typeOf_string_literal ?(loc=Cil_datatype.Location.unknown) s =
   { tnode = TArray(t,Some len); tattr = [] }
 
 let typeOf_wstring_literal ?(loc=Cil_datatype.Location.unknown) l =
-  let len = kinteger ~loc (Machine.sizeof_kind()) (8*(List.length l + 1)) in
+  let len = kinteger ~loc (Machine.sizeof_kind()) (List.length l + 1) in
   let t = Ast_types.add_attributes ["const",[]] (Machine.wchar_type()) in
   { tnode = TArray(t,Some len); tattr = [] }
 
