@@ -15,6 +15,48 @@ let package =
     ~title:"Eva Mthread Services"
     ()
 
+module Enum (X: sig type t end) =
+struct
+  module Enum = Data.Enum
+  let dictionary: X.t Enum.dictionary = Enum.dictionary ()
+  let tag name descr = Enum.tag ~name ~descr:(Markdown.plain descr) dictionary
+  let publish lookup name descr =
+    Enum.set_lookup dictionary lookup;
+    Request.dictionary ~package ~name ~descr:(Markdown.plain descr) dictionary
+end
+
+module Jaccess_kind = struct
+  module AccessKind = Mt_shared_vars_types.AccessKind
+  include Enum (struct type t = AccessKind.t end)
+
+  let access_read = tag "read" "Read access"
+  let access_write = tag "write" "Write access"
+
+  let lookup (access_kind : AccessKind.t) =
+    match access_kind with
+    | AccessRead -> access_read
+    | AccessWrite -> access_write
+
+  include (val publish lookup "accessKind" "Kind of access")
+end
+
+module Jprotection_kind = struct
+  module ProtectionKind = Mt_shared_vars_types.ProtectionKind
+  include Enum (struct type t = ProtectionKind.t end)
+
+  let unprotected = tag "unprotected" "Unprotected access"
+  let maybe_protected = tag "maybe_protected" "Maybe protected access"
+  let protected = tag "protected" "Protected access"
+
+  let lookup (protection_kind : ProtectionKind.t) =
+    match protection_kind with
+    | Unprotected -> unprotected
+    | MaybeProtected _ -> maybe_protected
+    | Protected _ -> protected
+
+  include (val publish lookup "protectionKind" "Kind of access protection")
+end
+
 module Jkeyed_value = Data.Jpair (Data.Jint) (Data.Jstring)
 module Jlist_of_keyed_value = Data.Jlist (Jkeyed_value)
 
@@ -117,20 +159,15 @@ let _shared_var_summary =
 
   States.column model ~name:"accessKind"
     ~descr:(Markdown.plain "")
-    ~data:(module Data.Jstring)
+    ~data:(module Jaccess_kind)
     ~get:(fun ((protected_access : Mt_summary.protected_access), _) ->
-        match protected_access.access_kind with
-        | AccessRead -> "read"
-        | AccessWrite -> "write");
+        protected_access.access_kind);
 
   States.column model ~name:"protectionKind"
     ~descr:(Markdown.plain "")
-    ~data:(module Data.Jstring)
+    ~data:(module Jprotection_kind)
     ~get:(fun ((protected_access : Mt_summary.protected_access), _) ->
-        match protected_access.protection_kind with
-        | Unprotected -> "unprotected"
-        | MaybeProtected _ -> "maybe protected"
-        | Protected _ -> "protected");
+        protected_access.protection_kind);
 
   States.column model ~name:"protectionMutexes"
     ~descr:(Markdown.plain "")
