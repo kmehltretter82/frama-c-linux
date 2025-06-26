@@ -255,6 +255,12 @@ let option_setting_and_warn warn = function
   | Float f -> Float (fun x -> warn (); f x)
   | String f -> String (fun s -> warn (); f s)
 
+let option_setting_and_abort abort = function
+  | Unit _ -> Unit (fun _ -> abort ())
+  | Int _ -> Int (fun _ -> abort ())
+  | Float _ -> Float (fun _ -> abort ())
+  | String _ -> String (fun _ -> abort ())
+
 exception Cannot_parse of string * string
 let raise_error name because = raise (Cannot_parse(name, because))
 
@@ -718,10 +724,23 @@ struct
 
   let add_for_parsing option = Hashtbl.add options option.oname option
 
-  let add name plugin ?(argname="") help visible ext_help setting =
+  let add name plugin ?(argname="") help visible safe ext_help setting =
     (*    L.debug ~level:4 "Cmdline: [%s] registers %S for stage %s."
           plugin name S.name;*)
     let help = if help = "" then "undocumented" else help in
+    (* Prevent unsafe functions from being used in sandbox mode *)
+    let sandbox_mode = Sys.getenv_opt "FRAMAC_SANDBOX" |> Option.is_some in
+    let setting =
+      if safe || not sandbox_mode
+      then setting
+      else
+        let abort () =
+          Kernel_log.abort
+            "%s cannot be used in sandbox mode."
+            name
+        in
+        option_setting_and_abort abort setting
+    in
     let o =
       { oname = name;
         argname = argname;
@@ -815,7 +834,7 @@ let run_after_setting_files = After_setting.extend
 type stage = Early | Extending | Extended | Exiting | Loading | Configuring
 
 let add_option
-    name ~plugin ~group stage ?argname ~help ~visible ~ext_help setting =
+    name ~plugin ~group stage ?argname ~help ~visible ~safe ~ext_help setting =
   if name <> "" then
     let add = match stage with
       | Early -> Early_Stage.add
@@ -825,7 +844,7 @@ let add_option
       | Loading -> Loading_Stage.add
       | Configuring -> Configuring_Stage.add
     in
-    add name plugin ~group ?argname help visible ext_help setting
+    add name plugin ~group ?argname help visible safe ext_help setting
 
 let add_option_without_action
     name ~plugin ~group ?(argname="") ~help ~visible ~ext_help () =
