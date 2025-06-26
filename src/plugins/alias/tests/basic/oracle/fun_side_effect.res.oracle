@@ -1,0 +1,11 @@
+[kernel] Parsing fun_side_effect.c (with preprocessing)
+[alias] analysing function: f
+[alias] analysing instruction: b = a;
+[alias] May-aliases after instruction  b = a;  are  { a; b }
+[alias] May-aliases at the end of function f: { a; b }
+[alias] analysing function: main
+[alias] analysing instruction: f();
+[alias] May-aliases after instruction  f();  are  <none>
+[alias] analysing instruction: __retres = 0;
+[alias] May-aliases after instruction  __retres = 0;  are  <none>
+[alias] May-aliases at the end of function main: <none>
