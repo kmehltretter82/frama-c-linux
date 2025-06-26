@@ -986,7 +986,7 @@ end
 
 module Make_compare_strict(M: Make_cmp_input) = struct
   let dummy = M.dummy
-  include Datatype.Make_with_collections(struct
+  include Make_with_collections(struct
       include M
       let compare = M.compare ~structural:false ~strict:true
       let name = M.name ^ "Strict"
@@ -995,7 +995,7 @@ end
 
 module Make_compare_strict_sized(M: Make_cmp_input) = struct
   let dummy = M.dummy
-  include Datatype.Make_with_collections(struct
+  include Make_with_collections(struct
       include M
       let compare = M.compare ~structural:true ~strict:true
       let name = M.name ^ "StrictSized"
@@ -1004,7 +1004,7 @@ end
 
 module Make_compare_non_strict_sized(M: Make_cmp_input) = struct
   let dummy = M.dummy
-  include Datatype.Make_with_collections(struct
+  include Make_with_collections(struct
       include M
       let compare = M.compare ~structural:true ~strict:false
       let name = M.name ^ "Sized"
@@ -1204,7 +1204,6 @@ module ExpStructEq_input = struct
   include Datatype.Serializable_undefined
   type t = exp
   let name = "ExpStructEq"
-  let structural_descr = Structural_descr.t_abstract
   let dummy = Exp.dummy
   let reprs = [ dummy ]
   let compare = StructEq.compare_exp
@@ -1323,7 +1322,6 @@ module LvalStructEq_input = struct
   let name = "LvalStructEq"
   let dummy = Lval.dummy
   let reprs = List.map (fun v -> Var v, NoOffset) Varinfo.reprs
-  let structural_descr = Structural_descr.t_abstract
   let compare = StructEq.compare_lval
   let equal = Datatype.from_compare
   let hash = StructEq.hash_lval 13598
@@ -1360,7 +1358,6 @@ module OffsetStructEq_input = struct
   let name = "OffsetStructEq"
   let dummy = Offset.dummy
   let reprs = [ dummy ]
-  let structural_descr = Structural_descr.t_abstract
   let compare = StructEq.compare_offset
   let equal = Datatype.from_compare
   let hash = StructEq.hash_offset 75489
@@ -2667,7 +2664,7 @@ module Funbehavior = struct
     b_extended   = [];
   }
 
-  include Datatype.Make
+  include Make
       (struct
         include Datatype.Serializable_undefined
         type t = funbehavior
@@ -2682,7 +2679,6 @@ module Funbehavior = struct
                b_allocation = FreeAllocAny;
                b_extended = []; } ]
         let pretty fmt x = !pretty_ref fmt x
-        let mem_project = Datatype.never_any_project
       end)
 end
 
@@ -2696,7 +2692,7 @@ module Funspec = struct
     spec_disjoint_behaviors = [];
   }
 
-  include Datatype.Make
+  include Make
       (struct
         include Datatype.Serializable_undefined
         type t = funspec
@@ -2708,7 +2704,6 @@ module Funspec = struct
               spec_complete_behaviors = [];
               spec_disjoint_behaviors = [] } ]
         let pretty fmt x = !pretty_ref fmt x
-        let mem_project = Datatype.never_any_project
       end)
 end
 
@@ -2743,19 +2738,16 @@ module Fundec = struct
           ) acc Funspec.reprs
       ) [] Varinfo.reprs
 
-  include Datatype.Make_with_collections
+  include Make_with_collections
       (struct
         type t = fundec
         let name = "Fundec"
         let reprs = reprs
-        let structural_descr = Structural_descr.t_abstract
         let compare v1 v2 = Datatype.Int.compare v1.svar.vid v2.svar.vid
         let hash v = v.svar.vid
         let equal v1 v2 = v1.svar.vid = v2.svar.vid
-        let rehash = Datatype.identity
         let copy = Datatype.undefined
         let pretty fmt f = !pretty_ref fmt f
-        let mem_project = Datatype.never_any_project
       end)
 end
 
@@ -2861,7 +2853,8 @@ end
 
 module Syntactic_scope = struct
   let dummy = Program
-  include Datatype.Make_with_collections
+
+  include Make_with_collections
       (struct
         include Datatype.Serializable_undefined
         type t = syntactic_scope
