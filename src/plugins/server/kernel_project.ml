@@ -27,7 +27,7 @@ let package = Package.package ~name:"project"
     ~title:"Project Management" ~readme:"project.md" ()
 
 
-module Jproject_id = Jstring
+module Jproject_id = Jint
 
 let _current_project_signal =
   let add_hook f =
@@ -41,8 +41,8 @@ let _current_project_signal =
     ~name:"current"
     ~descr:(Md.plain "Current Frama-C project")
     ~data:(module Jproject_id)
-    ~get:(fun () -> Project.(current () |> get_unique_name))
-    ~set:(fun unique_name -> Project.(from_unique_name unique_name |> set_current))
+    ~get:(fun () -> Project.(current () |> get_pid))
+    ~set:(fun pid -> Project.(from_pid pid |> set_current))
     ~add_hook
     ()
 
@@ -52,35 +52,35 @@ let () = Request.register
     ~input:(module Jstring) ~output:(module Junit)
     (fun name -> Project.create name |> Project.set_current)
 
-let no_project_found unique_name =
-  Format.asprintf "No project with unique name %s found." unique_name
+let no_project_found pid =
+  Format.asprintf "No project with id %d found." pid
 
 let () = Request.register
     ~package ~kind:`SET ~name:"rename"
     ~descr:(Md.plain "Rename a project")
     ~input:(module Jpair (Jproject_id) (Jstring))
     ~output:(module Joption (Jstring))
-    (fun (project_name, new_name) ->
+    (fun (project_id, new_name) ->
        try
-         let project = Project.from_unique_name project_name in
+         let project = Project.from_pid project_id in
          Project.set_name project new_name;
          None
        with Project.Unknown_project ->
-         let err = no_project_found project_name in
+         let err = no_project_found project_id in
          Some err)
 
 let () = Request.register
     ~package ~kind:`SET ~name:"remove"
     ~descr:(Md.plain "Remove a project from the session")
     ~input:(module Jproject_id) ~output:(module Joption (Jstring))
-    (fun project_name ->
+    (fun project_id ->
        try
-         let project = Project.from_unique_name project_name in
+         let project = Project.from_pid project_id in
          Project.remove ~project ();
          None
        with
        | Project.Unknown_project ->
-         let err = no_project_found project_name in
+         let err = no_project_found project_id in
          Some err
        | Project.Cannot_remove p ->
          let err = Format.asprintf "Cannot remove project %s." p in
@@ -90,13 +90,13 @@ let () = Request.register
     ~package ~kind:`SET ~name:"copy"
     ~descr:(Md.plain "Duplicate a project")
     ~input:(module Jpair (Jproject_id) (Jstring)) ~output:(module Joption (Jstring))
-    (fun (project_name, new_name) ->
+    (fun (project_id, new_name) ->
        try
-         let project = Project.from_unique_name project_name in
+         let project = Project.from_pid project_id in
          let _ = Project.create_by_copy ~last:false ~src:project new_name in
          None
        with Project.Unknown_project ->
-         let err = no_project_found project_name in
+         let err = no_project_found project_id in
          Some err)
 
 let () = Request.register
@@ -115,14 +115,14 @@ let () = Request.register
     ~package ~kind:`SET ~name:"save"
     ~descr:(Md.plain "Save a project on disk")
     ~input:(module Jpair (Jproject_id) (Jfile)) ~output:(module Joption (Jstring))
-    (fun (project_name, filepath) ->
+    (fun (project_id, filepath) ->
        try
-         let project = Project.from_unique_name project_name in
+         let project = Project.from_pid project_id in
          Project.save ~project filepath;
          None
        with
        | Project.Unknown_project ->
-         let err = no_project_found project_name in
+         let err = no_project_found project_id in
          Some err
        | Project.IOError err ->
          Some err)
@@ -130,10 +130,10 @@ let () = Request.register
 let _project_list =
   let model = States.model () in
 
-  States.column model ~name:"uniqueName"
-    ~descr:(Md.plain "Project unique name")
+  States.column model ~name:"id"
+    ~descr:(Md.plain "Project ID")
     ~data:(module Jproject_id)
-    ~get:Project.get_unique_name;
+    ~get:Project.get_pid;
 
   States.column model ~name:"name"
     ~descr:(Md.plain "Project name")
@@ -143,21 +143,18 @@ let _project_list =
   let add_update_hook f =
     Project.register_create_hook f;
     Project.register_after_load_hook f;
+    Project.register_after_set_name_hook (fun (p, _) -> f p);
   in
   let add_remove_hook f =
     Project.register_before_remove_hook f
   in
   let add_reload_hook f =
     Project.register_after_global_load_hook f;
-    (* Since Project.set_name changes the unique_name of the project, which is
-       the key of this array, the whole array needs to be reloaded when a
-       project is renamed. *)
-    Project.register_after_set_name_hook (fun _ -> f ())
   in
   States.register_array ~package
     ~name:"list"
     ~descr:(Md.plain "List of Frama-C projects")
-    ~key:Project.get_unique_name
+    ~key:(fun p -> Project.get_pid p |> string_of_int)
     ~iter:Project.iter_on_projects
     ~add_update_hook
     ~add_remove_hook
