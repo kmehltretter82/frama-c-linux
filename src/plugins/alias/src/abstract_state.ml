@@ -875,8 +875,8 @@ let call s (res : lval option) (args : exp list) (summary : Summary.t) : state =
     List.fold_left transfer_succs g vertex_pairs
   in
 
-  (* garbage collect: remove leaf vertices from g that originate from sum_state *)
-  let vertices_to_add_to_g, g =
+  (* garbage collect: remove leaf vertices from g that originate from summary_state *)
+  let vertices_added_to_g, g =
     let g = ref g in
     let remove_if_leaf v _ =
       if G.in_degree !g v = 0
@@ -892,7 +892,7 @@ let call s (res : lval option) (args : exp list) (summary : Summary.t) : state =
     varmap = s.varmap;
     vmap =
       let left_bias _ l _ = Some l in
-      VMap.union left_bias s.vmap vertices_to_add_to_g}
+      VMap.union left_bias s.vmap vertices_added_to_g}
   in
 
   asserting_invariants
