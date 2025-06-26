@@ -46,6 +46,7 @@ sig
   val group: Cmdline.Group.t
   val stage: Cmdline.stage
   val is_visible: bool
+  val is_safe: bool
   val is_dynamic: bool
   val register_dynamic:
     string -> 'arg Type.t -> 'ret Type.t -> ('arg -> 'ret) -> 'arg -> 'ret

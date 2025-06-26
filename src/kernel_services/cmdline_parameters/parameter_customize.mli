@@ -71,6 +71,11 @@ val is_invisible: unit -> unit
     @since Carbon-20101201
 *)
 
+val is_unsafe: unit -> unit
+(** Prevent the parameter from being changed from default in sandbox mode.
+    @since Frama-C+dev
+*)
+
 val argument_is_function_name: unit -> unit
 (** Indicate that the string argument of the parameter must be a valid function
     name. A valid function name is the name of a function defined in the
@@ -187,6 +192,7 @@ val argument_must_be_existing_fun_ref: bool ref
 val group_ref: Cmdline.Group.t ref
 val is_reconfigurable_ref: bool option ref
 val is_visible_ref: bool ref
+val is_safe_ref: bool ref
 val module_name_ref: string ref
 val use_category_ref: bool ref
 

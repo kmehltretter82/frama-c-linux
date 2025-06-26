@@ -36,6 +36,7 @@ type parameter = private
     accessor: typed_accessor; (** How to get and set the value of the
                                   parameter *)
     visible: bool; (** Is visible to the user, e.g. in the command-line help *)
+    safe: bool; (** Can be used in sandbox mode *)
     reconfigurable: bool; (** Can be reconfigured, e.g. in the GUI *)
     is_set: unit -> bool (** Is this option really set? *) }
 
@@ -54,6 +55,7 @@ val create:
   help:string ->
   accessor:typed_accessor ->
   visible:bool ->
+  safe:bool ->
   reconfigurable:bool ->
   is_set: (unit -> bool) ->
   t

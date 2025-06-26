@@ -66,6 +66,10 @@ let is_invisible () =
   is_visible_ref := false;
   is_not_reconfigurable ()
 
+let is_safe_ref = ref true
+let is_unsafe () =
+  is_safe_ref := false
+
 let use_category_ref = ref true
 let no_category () = use_category_ref := false
 
@@ -101,6 +105,7 @@ let reset () =
   group_ref := Cmdline.Group.default;
   is_reconfigurable_ref := None;
   is_visible_ref := true;
+  is_safe_ref := true;
   argument_is_function_name_ref := false;
   argument_may_be_fundecl_ref := false;
   argument_must_be_fundecl_ref := false;

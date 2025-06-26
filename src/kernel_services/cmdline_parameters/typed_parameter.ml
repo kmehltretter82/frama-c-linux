@@ -25,6 +25,7 @@ type parameter =
     help: string;
     accessor: typed_accessor;
     visible: bool;
+    safe: bool;
     reconfigurable: bool;
     is_set: unit -> bool }
 
@@ -46,6 +47,7 @@ include
                    add_update_hook = (fun _ -> ()) },
                  None);
             visible = false ;
+            safe = false;
             reconfigurable = false ;
             is_set = fun () -> false }
         ]
@@ -59,8 +61,8 @@ include
 
 let parameters = Datatype.String.Hashtbl.create 97
 
-let create ~name ~help ~accessor ~visible ~reconfigurable ~is_set =
-  let p = { name; help; accessor; visible; reconfigurable; is_set } in
+let create ~name ~help ~accessor ~visible ~safe ~reconfigurable ~is_set =
+  let p = { name; help; accessor; visible; safe; reconfigurable; is_set } in
   (* parameter name unicity already checks in [Plugin]. *)
   assert (not (Datatype.String.Hashtbl.mem parameters name));
   Datatype.String.Hashtbl.add parameters name p;

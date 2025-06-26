@@ -74,6 +74,7 @@ struct
   let reset_on_copy = !Parameter_customize.reset_on_copy_ref
   let must_save = !Parameter_customize.must_save_ref
   let is_visible = !Parameter_customize.is_visible_ref
+  let is_safe = !Parameter_customize.is_safe_ref
   let group = !Parameter_customize.group_ref
   let stage = !Parameter_customize.cmdline_stage_ref
 
