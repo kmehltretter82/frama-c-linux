@@ -42,7 +42,7 @@
 (*                                                                          *)
 (****************************************************************************)
 
-let parse_to_cabs (path : Filepath.t) =
+let parse_to_cabs ~original (path : Filepath.t) =
   try
     Kernel.feedback ~level:2 "Parsing %a" Filepath.pretty path;
     Errorloc.clear_errors () ;
@@ -63,7 +63,7 @@ let parse_to_cabs (path : Filepath.t) =
     Clexer.finish ();
     if Errorloc.had_errors () then begin
       Kernel.abort "There were parsing errors in %a"
-        Filepath.pretty path
+        Filepath.pretty original
     end;
 
     (path, cabs)
@@ -77,9 +77,9 @@ let parse_to_cabs (path : Filepath.t) =
 module Syntactic_transformations = Hook.Fold(struct type t = Cabs.file end)
 let add_syntactic_transformation = Syntactic_transformations.extend
 
-let parse path =
+let parse ~original path =
   Kernel.feedback ~level:2 "Parsing %a to Cabs" Filepath.pretty path;
-  let cabs = parse_to_cabs path in
+  let cabs = parse_to_cabs ~original path in
   let cabs = Syntactic_transformations.apply cabs in
   (* Now (return a function that will) convert to CIL *)
   fun _ ->
