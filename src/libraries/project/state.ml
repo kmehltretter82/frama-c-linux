@@ -162,12 +162,9 @@ let add s =
        "state should have a non-empty name");
   Datatype.String.Hashtbl.add states uname s
 
-let unique_name_from_name =
-  let module M =
-    Project_skeleton.Make_setter
-      (struct let mem s = Datatype.String.Hashtbl.mem states s end)
-  in
-  M.make_unique_name
+let unique_name_from_name name =
+  let mem s = Datatype.String.Hashtbl.mem states s in
+  snd (Extlib.make_unique_name mem ~sep:" " name)
 
 (* ************************************************************************** *)
 (** {3 State generators} *)
