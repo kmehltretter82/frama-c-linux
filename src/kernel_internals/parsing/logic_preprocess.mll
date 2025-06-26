@@ -36,22 +36,10 @@
    *)
   let blacklisted_macros = [
     (* 6.10.8.1 mandatory macros. *)
-    "__DATE__"; "__FILE"; "__LINE__"; "__STDC__"; "__STDC_HOSTED__";
-    "__STDC_VERSION__"; "__TIME__";
-    (* 6.10.8.2 environment macros *)
-    "__STDC_ISO_10646__"; "__STDC_MB_MIGHT_NEQ_WC__";
-    "__STDC_UTF_16__"; "__STDC_UTF_32__";
-    (* 6.10.8.3 conditional feature macros *)
-    "__STDC_ANALYZABLE__"; "__STDC_IEC_559__"; "__STDC_IEC_559_COMPLEX__";
-    "__STDC_LIB_EXT1__"; "__STDC_NO_ATOMICS__"; "__STDC_NO_COMPLEX__";
-    "__STDC_NO_THREADS__"; "__STDC_NO_VLA__";
+    "__DATE__"; "__FILE__"; "__LINE__"; "__TIME__";
 
-    (* from TS 18661-1:2014 (for glibc >=2.35) *)
-    "__STDC_IEC_60559_BFP__"; "__STDC_IEC_60559_COMPLEX__";
-
-    (* Defined by gcc 15 and C23. *)
-    "__STDC_EMBED_NOT_FOUND__"; "__STDC_EMBED_FOUND__";
-    "__STDC_EMBED_EMPTY__";
+    (* each new standard adds more macros starting with __STDC_ *)
+    "__STDC_.*";
 
     (* expanding assert, an ACSL keyword, is not a good idea. *)
     "assert";
@@ -221,14 +209,18 @@
 let utf8 = ['\128'-'\255']
 
 rule main = parse
-  | ("#define"|"#undef") [' ''\t']* ((['a'-'z''A'-'Z''0'-'9''_'])* as m)
+  | ("#define"|"#undef") [' ''\t']+ ((['a'-'z''A'-'Z''0'-'9''_'])* as m)
       {
-        let blacklisted = List.mem m blacklisted_macros in
+        let m_matches macro =
+          let re = Str.regexp ("^" ^ macro ^ "$") in
+          Str.string_match re m 0
+        in
+        let blacklisted = List.exists m_matches blacklisted_macros in
         if not blacklisted then
           Buffer.add_string preprocess_buffer (lexeme lexbuf);
         macro blacklisted lexbuf
       }
-  | "#"  [' ''\t']* "line"?  [' ''\t']* (['0'-'9']+ as line)
+  | "#"  [' ''\t']* "line"?  [' ''\t']+ (['0'-'9']+ as line)
     [' ''\t']* (('"' [^'"']+ '"') as file)  [^'\n']* "\n"
     { (try
         curr_line := (int_of_string line) -1
