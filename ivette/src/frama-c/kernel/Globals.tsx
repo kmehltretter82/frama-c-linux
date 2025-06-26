@@ -25,6 +25,8 @@
 // --------------------------------------------------------------------------
 
 import React from 'react';
+import InfiniteScroll from 'react-infinite-scroller';
+
 import * as Dome from 'dome';
 import * as Json from 'dome/data/json';
 import { classes } from 'dome/misc/utils';
@@ -34,7 +36,6 @@ import { Button } from 'dome/controls/buttons';
 import { Label } from 'dome/controls/labels';
 import * as Toolbar from 'dome/frame/toolbars';
 import { Hbox } from 'dome/layout/boxes';
-import InfiniteScroll from 'react-infinite-scroller';
 
 import * as Ivette from 'ivette';
 import * as Server from 'frama-c/server';
@@ -43,6 +44,7 @@ import * as Ast from 'frama-c/kernel/api/ast';
 import * as Locations from 'frama-c/kernel/Locations';
 import { computationState } from 'frama-c/plugins/eva/api/general';
 import * as Eva from 'frama-c/plugins/eva/api/general';
+
 
 // --------------------------------------------------------------------------
 // --- Global Search Hints
@@ -829,5 +831,3 @@ export function GlobalDeclarations(): JSX.Element {
     </>
   );
 }
-
-// --------------------------------------------------------------------------

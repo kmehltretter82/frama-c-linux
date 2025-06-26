@@ -792,6 +792,9 @@ function isPrimary(evt: IpcMainEvent): boolean {
 ipcMain.on('dome.ipc.menu.addmenu', (evt, label) =>
   isPrimary(evt) && Menubar.addMenu(label)
 );
+ipcMain.on('dome.ipc.menu.delsubmenu', (evt, label) =>
+  isPrimary(evt) && Menubar.delSubMenu(label)
+);
 ipcMain.on('dome.ipc.menu.addmenuitem', (evt, spec) =>
   isPrimary(evt) && Menubar.addMenuItem(spec)
 );

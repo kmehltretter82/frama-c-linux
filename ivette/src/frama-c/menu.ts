@@ -30,8 +30,10 @@ import { showHelp } from 'dome/help';
 import * as Display from 'ivette/display';
 import * as Server from 'frama-c/server';
 import * as Services from 'frama-c/kernel/api/services';
+import * as Project from 'frama-c/kernel/api/project';
 import * as Ast from 'frama-c/kernel/api/ast';
 import * as States from 'frama-c/states';
+import * as Projects from 'frama-c/kernel/Projects';
 import { showAboutModal, showCreditsModal } from './help';
 
 const cFilter = {
@@ -114,7 +116,7 @@ async function saveSession(): Promise<void> {
   return;
 }
 
-export function init(): void {
+function addFileMenuItems(): void {
   Dome.addMenuItem({
     menu: 'File',
     label: 'Set source files…',
@@ -155,6 +157,9 @@ export function init(): void {
     onClick: saveSession,
     kind: 'normal',
   });
+}
+
+function addHelpMenuItems(): void {
   Dome.addMenuItem({
     menu: 'Help',
     label: 'Documentation',
@@ -182,6 +187,72 @@ export function init(): void {
     onClick: showCreditsModal,
     kind: 'normal',
   });
+}
+
+async function duplicateCurrentProject(): Promise<void> {
+  const current = await Server.send(Project.getCurrent, null);
+  Projects.duplicateProject(current, "Duplicate current project");
+}
+
+async function deleteCurrentProject(): Promise<void> {
+  const current = await Server.send(Project.getCurrent, null);
+  Projects.removeProject(current);
+}
+
+async function renameCurrentProject(): Promise<void> {
+  const current = await Server.send(Project.getCurrent, null);
+  Projects.renameProject(current, "Rename current project");
+}
+
+export function addProjectSubMenu(others?: Dome.MenuItemProps[]): void {
+  Dome.addMenuItem({
+    menu: 'Project',
+    label: 'New project',
+    id: 'project_new',
+    onClick: Projects.newProject,
+    kind: 'normal',
+  });
+  Dome.addMenuItem({
+    menu: 'Project',
+    label: 'Load project',
+    id: 'project_load',
+    onClick: Projects.loadProject,
+    kind: 'normal',
+  });
+  Dome.addMenuItem({
+    menu: 'Project',
+    label: 'Duplicate current project',
+    id: 'project_duplicate_current',
+    onClick: duplicateCurrentProject,
+    kind: 'normal',
+  });
+  Dome.addMenuItem({
+    menu: 'Project',
+    label: 'Delete current project',
+    id: 'project_delete_current',
+    onClick: deleteCurrentProject,
+    kind: 'normal',
+  });
+  Dome.addMenuItem({
+    menu: 'Project',
+    label: 'Rename current project',
+    id: 'project_rename_current',
+    onClick: renameCurrentProject,
+    kind: 'normal',
+  });
+  Dome.addMenuItem({
+    menu: 'Project',
+    id: 'project_separator',
+    kind: 'separator'
+  });
+  others?.forEach(e => Dome.addMenuItem(e));
+}
+
+export function init(): void {
+  addFileMenuItems();
+  addHelpMenuItems();
+  Dome.addMenu('Project');
+  addProjectSubMenu();
 }
 
 /* --------------------------------------------------------------------------*/

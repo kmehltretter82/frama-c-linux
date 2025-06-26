@@ -299,7 +299,7 @@ interface CustomMenu extends Electron.MenuItemConstructorOptions {
 
 const customMenus: CustomMenu[] = [];
 
-type ItemEntry = { spec: MenuItemSpec; item?: MenuItem };
+type ItemEntry = { menu: string; spec: MenuItemSpec; item?: MenuItem };
 
 const customItems = new Map<string, ItemEntry>();
 
@@ -321,6 +321,20 @@ export function addMenu(label: string): void {
     console.warn(`Already defined menu '${label}'`);
   } else {
     customMenus.push({ label, submenu: [] });
+  }
+  requestUpdate();
+}
+
+export function delSubMenu(label: string): void {
+  const cmi = customMenus.findIndex((m) => m.label === label);
+  if (cmi !== -1) {
+    customMenus[cmi].submenu = [];
+    const itemIds: string[] = Array.from(customItems)
+      .filter(item => item[1].menu === label)
+      .map(item => item[0]);
+    itemIds.forEach(id => customItems.delete(id));
+  } else {
+    console.warn(`Menu '${label}' doesn't exist`);
   }
   requestUpdate();
 }
@@ -347,7 +361,7 @@ export function addMenuItem(custom: CustomMenuItemSpec): void {
   if (custom.type === 'separator') {
     menuSpec.push(Separator);
   } else {
-    const { id, key, ...spec } = custom;
+    const { id, key, menu, ...spec } = custom;
     if (key) {
       switch (System.platform) {
         case 'macos':
@@ -377,7 +391,7 @@ export function addMenuItem(custom: CustomMenuItemSpec): void {
         return;
       }
       if (entry.spec) Object.assign(entry.spec, spec);
-      if (entry.item) Object.assign(entry.item, spec);
+      if (entry.item) Object.assign(entry.item, { ...spec, menu });
     } else {
       if (!spec.click && !spec.role)
         spec.click = (
@@ -385,7 +399,7 @@ export function addMenuItem(custom: CustomMenuItemSpec): void {
           window: BrowserWindow | undefined,
           _evt: KeyboardEvent,
         ) => window?.webContents.send('dome.ipc.menu.clicked', id);
-      customItems.set(id, { spec });
+      customItems.set(id, { menu, spec });
       menuSpec.push(spec);
     }
   }

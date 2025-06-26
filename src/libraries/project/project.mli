@@ -107,6 +107,11 @@ val set_name: t -> string -> unit
 (** Set the name of the given project.
     @since Boron-20100401 *)
 
+val register_after_set_name_hook: (t * string -> unit) -> unit
+(** [register_after_set_name_hook f] adds a hook on function {!set_name}.
+    The project given as argument to [f] is the modified project, while the
+    string is the old name for this project. *)
+
 exception Unknown_project
 val from_unique_name: string -> t
 (** Return a project based on {!unique_name}.
@@ -235,7 +240,7 @@ val load_all: ?selection:State_selection.t -> Filepath.t -> unit
     [register_after_set_current_hook] are applied.
     @raise IOError if a project cannot be loaded. *)
 
-val register_before_load_hook: (unit -> unit) -> unit
+val register_before_load_hook: (Project_skeleton.t -> unit) -> unit
 (** [register_before_load_hook f] adds a hook called just before loading
     **each project** (more precisely, the project exists and but is empty
     while the hook is applied): if [n] projects are on disk, the same hook
@@ -244,7 +249,7 @@ val register_before_load_hook: (unit -> unit) -> unit
     Besides, for each project, the order in which the hooks are applied is
     the same than the order in which hooks are registered. *)
 
-val register_after_load_hook: (unit -> unit) -> unit
+val register_after_load_hook: (Project_skeleton.t -> unit) -> unit
 (** [register_after_load_hook f] adds a hook called just after loading
     **each project**: if [n] projects are on disk, the same hook will be
     called [n] times (one call by project).

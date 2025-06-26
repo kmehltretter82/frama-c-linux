@@ -37,6 +37,7 @@ import { Code } from 'dome/controls/labels';
 import { IconButton } from 'dome/controls/buttons';
 import * as Boxes from 'dome/layout/boxes';
 import { TitleBar } from 'ivette';
+import { current as currentProject } from 'frama-c/kernel/api/project';
 
 // --------------------------------------------------------------------------
 // --- Marker Utility
@@ -265,6 +266,7 @@ export default function ASTinfo(): JSX.Element {
   });
   const clearMarkers = React.useCallback(() => setMarkers([]), []);
   Server.useShutdown(clearMarkers);
+  Server.onSignal(currentProject.signal, clearMarkers);
     // Scrolling Hooks
   const [inside, setInside] = React.useState(false);
   const scroll = React.useRef<HTMLDivElement>(null);

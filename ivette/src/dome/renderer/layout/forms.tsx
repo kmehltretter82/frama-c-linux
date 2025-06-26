@@ -1071,6 +1071,8 @@ export interface TextFieldProps extends FieldProps<string | undefined> {
   className?: string;
   style?: React.CSSProperties;
   latency?: number;
+  autoFocus?: boolean;
+  onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
 }
 
 function useTextInputField(
@@ -1093,6 +1095,12 @@ export function TextField(props: TextFieldProps): JSX.Element {
   const id = useHtmlFor();
   const css = Utils.classes('dome-xForm-text-field', props.className);
   const [value, error, onChange] = useTextInputField(props, 600);
+
+  const inputRef = React.useRef<HTMLInputElement>(null);
+  React.useEffect(() => {
+    if(props.autoFocus) inputRef.current?.focus();
+  }, [props.autoFocus]);
+
   return (
     <Field
       {...props}
@@ -1101,6 +1109,7 @@ export function TextField(props: TextFieldProps): JSX.Element {
       error={error}
     >
       <input
+        ref={inputRef}
         id={id}
         type="text"
         value={value}
@@ -1109,6 +1118,7 @@ export function TextField(props: TextFieldProps): JSX.Element {
         disabled={disabled}
         placeholder={props.placeholder}
         onChange={onChange}
+        onKeyDown={props.onKeyDown}
       />
     </Field>
   );

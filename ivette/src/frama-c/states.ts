@@ -37,6 +37,7 @@ import { GlobalState, useGlobalState } from 'dome/data/states';
 import { Client, useModel } from 'dome/table/models';
 import { CompactModel } from 'dome/table/arrays';
 import { FieldState, FieldError, isValid } from 'dome/layout/forms';
+import { current as currentProject } from 'frama-c/kernel/api/project';
 import * as Ast from 'frama-c/kernel/api/ast';
 import * as Server from './server';
 
@@ -721,12 +722,17 @@ async function selectMainFunction(): Promise<void> {
   if (decl !== undefined) setCurrentScope(decl);
 }
 
+async function resetHistory(): Promise<void> {
+  clearHistory();
+  selectMainFunction();
+}
+
 {
-  Server.onReady(clearHistory);
+  Server.onReady(resetHistory);
+  Server.onSignal(currentProject.signal, resetHistory);
   Server.onShutdown(clearHistory);
   onSyncArray(Ast.markerAttributes, syncCurrentSelection);
   onSyncArray(Ast.declAttributes, syncCurrentSelection);
-  Server.onReady(selectMainFunction);
 }
 
 // --------------------------------------------------------------------------

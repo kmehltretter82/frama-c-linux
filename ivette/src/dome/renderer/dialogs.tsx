@@ -34,6 +34,8 @@ import * as System from 'dome/system';
 import { classes } from 'dome/misc/utils';
 import { Label } from './controls/labels';
 import { IconButton } from './controls/buttons';
+import { GlobalState, useGlobalState } from './data/states';
+import { Icon } from './controls/icons';
 
 // --------------------------------------------------------------------------
 // --- Message Box
@@ -312,7 +314,11 @@ export async function showOpenDir(
 // --- Modal
 // --------------------------------------------------------------------------
 
-export function showModal(val: React.ReactNode): void { modal.setValue(val); }
+export const modalLoader = new GlobalState<boolean>(false);
+export function showModal(val: React.ReactNode): void {
+  modalLoader.setValue(false);
+  modal.setValue(val);
+}
 export function closeModal(): void { showModal(undefined); }
 
 export interface ModalProps {
@@ -336,6 +342,7 @@ export function Modal(
   props: ModalProps
 ): JSX.Element {
   const { label, title, icon, className, actions, onClose, children } = props;
+  const [ isLoader, ] = useGlobalState(modalLoader);
 
   const contentClasses = classes('dome-xModal-content', className);
   const onCloseModal = React.useCallback((): void => {
@@ -366,6 +373,11 @@ export function Modal(
         </div>
       </div>
       <div className='dome-xModal-body dome-xBoxes-vbox dome-xBoxes-box'>
+        { isLoader &&
+          <div className='dome-xModal-loader'>
+            <Icon id='SPINNER' size={30}/>
+          </div>
+        }
         {children}
       </div>
     </div>

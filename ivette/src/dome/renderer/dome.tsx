@@ -412,8 +412,7 @@ const customItemCallbacks = new Map<string, callback>();
 
 
    This function shall be called statically, although calls from _secondary_
-   windows would be ignored. It is also possible to call this function from the
-   main process.
+   windows would be ignored.
 
    It is also possible to call this function from the main process.
 
@@ -421,6 +420,21 @@ const customItemCallbacks = new Map<string, callback>();
  */
 export function addMenu(label: string): void {
   ipcRenderer.send('dome.ipc.menu.addmenu', label);
+}
+
+/**
+   Delete a custom menu in the menu bar.
+
+
+   This function shall be called statically, although calls from _secondary_
+   windows would be ignored.
+
+   It is also possible to call this function from the main process.
+
+   @param label - the menu title
+ */
+export function delSubMenu(label: string): void {
+  ipcRenderer.send('dome.ipc.menu.delsubmenu', label);
 }
 
 export type MenuName = 'File' | 'Edit' | 'View' | 'Help' | string;

@@ -329,3 +329,37 @@ label.locations {
 }
 
 /* -------------------------------------------------------------------------- */
+/* --- Projects                                                           --- */
+/* -------------------------------------------------------------------------- */
+
+.projects-title-actions {
+    gap: 5px;
+    margin-right: 5px;
+}
+
+.project-error {
+    padding: 10px 20px;
+    font-size: 1.2em;
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    svg { bottom: -1px !important; }
+}
+
+.project-field {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 15px;
+    align-content: center;
+    align-items: center;
+    padding: 10px;
+    font-size: 1.1em;
+
+    input {
+        color: var(--text);
+        padding: 5px 12px;
+    }
+}
+
+/* -------------------------------------------------------------------------- */

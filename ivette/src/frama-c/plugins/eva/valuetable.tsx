@@ -33,6 +33,7 @@ import * as Ast from 'frama-c/kernel/api/ast';
 import * as Eva from 'frama-c/plugins/eva/api/general';
 import * as Values from 'frama-c/plugins/eva/api/values';
 import { EvaReady, EvaStatus } from './components/AnalysisStatus';
+import { current as currentProject } from 'frama-c/kernel/api/project';
 
 import { classes } from 'dome/misc/utils';
 import { Icon } from 'dome/controls/icons';
@@ -967,6 +968,17 @@ function useEvaluationMode(props: EvaluationModeProps): void {
 export const CallstackState = new GlobalState<callstack>('Summary');
 const ScopesManagerState = new GlobalState(new ScopesManager());
 const FocusState = new GlobalState<Probe | undefined>(undefined);
+
+
+export function clearGlobalState(): void {
+  CallstackState.setValue('Summary');
+  ScopesManagerState.setValue(new ScopesManager());
+  FocusState.setValue(undefined);
+}
+
+{
+  Server.onSignal(currentProject.signal, clearGlobalState);
+}
 
 /* Component */
 function EvaTable(): JSX.Element {

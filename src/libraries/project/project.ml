@@ -274,9 +274,15 @@ module Mem = struct
 end
 module Setter = Make_setter(Mem)
 
+module Set_Name_Hook = Hook.Build(struct type t = project * string end)
+
+let register_after_set_name_hook = Set_Name_Hook.extend
+
 let set_name p s =
   feedback ~dkey ~level:2 "renaming project %S to %S" p.unique_name s;
-  Setter.set_name p s
+  let old_name = p.name in
+  Setter.set_name p s;
+  Set_Name_Hook.apply (p, old_name);
 
 module Create_Hook = Hook.Build(struct type t = project end)
 let register_create_hook = Create_Hook.extend
@@ -435,10 +441,10 @@ let clear_all () =
 
 exception IOError = Sys_error
 
-module Before_load = Hook.Make()
+module Before_load = Hook.Build (struct type t = project end)
 let register_before_load_hook = Before_load.extend
 
-module After_load = Hook.Make()
+module After_load = Hook.Build (struct type t = project end)
 let register_after_load_hook = After_load.extend
 
 module After_global_load = Hook.Make()
@@ -573,7 +579,7 @@ module Descr = struct
              (* Local states must be up-to-date according to [p] when
                 unmarshalling states of [p] *)
              force_set_current true selection p;
-             Before_load.apply ();
+             Before_load.apply p;
              Descr.t_list tbl_on_disk)
       in
       Descr.dependent_pair descr unmarshal_states
@@ -590,7 +596,7 @@ module Descr = struct
               to the current project, since we load first the old current
               project *)
            States_operations.unserialize ~selection p s;
-           After_load.apply ();
+           After_load.apply p;
            c)
     in
     Descr.t_pair

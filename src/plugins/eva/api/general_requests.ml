@@ -71,6 +71,10 @@ let () = Request.register ~package
     ~output:(module Data.Junit)
     Analysis.abort
 
+let register_computation_hook f =
+  Self.ComputationState.add_hook_on_change (fun _ -> f ());
+  Self.ComputationState.add_hook_on_update (fun _ -> f ())
+
 (* ----- Callers & Callees -------------------------------------------------- *)
 
 module CallSite =
@@ -146,8 +150,7 @@ struct
       ~name:"functions"
       ~descr:(Markdown.plain "AST Functions")
       ~iter:Server.Kernel_ast.Functions.iter
-      ~add_reload_hook:(fun f ->
-          Analysis.register_computation_hook (fun _ -> f () ))
+      ~add_reload_hook:register_computation_hook
 end
 
 
@@ -434,8 +437,7 @@ module EvaTaints = struct
       ~id:"eva.taint" ~label:"Taint" ~title: "Taint status according to Eva"
       ~descr:eva_taints_descr ~enable print_taint
 
-  let update = Server.Kernel_ast.Information.update
-  let () = Analysis.register_computation_hook (fun _ -> update ())
+  let () = register_computation_hook Server.Kernel_ast.Information.update
 end
 
 
@@ -597,9 +599,7 @@ module PropertiesData = struct
       ~descr:(Markdown.plain descr)
       ~data:(module TaintStatus)
       ~get:is_tainted_property ;
-    let add_reload_hook hook =
-      Analysis.register_computation_hook ~on:Computed (fun _ -> hook ())
-    and add_update_hook hook =
+    let add_update_hook hook =
       Red_statuses.register_hook (function Prop p -> hook p | Alarm _ -> ())
     in
     ignore @@ States.register_array
@@ -610,7 +610,7 @@ module PropertiesData = struct
       ~keyType:Kernel_ast.Marker.jtype
       ~iter:Property_status.iter
       ~add_update_hook
-      ~add_reload_hook
+      ~add_reload_hook:register_computation_hook
       model
 end
 
@@ -791,7 +791,7 @@ let _computed_signal =
               "Statistics about the last Eva analysis for the whole program")
     ~output:(module Statistics)
     ~get:Summary.compute_stats
-    ~add_hook:(Analysis.register_computation_hook ~on:Computed)
+    ~add_hook:register_computation_hook
     ()
 
 let _functionStats =

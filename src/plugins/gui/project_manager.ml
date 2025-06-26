@@ -298,9 +298,10 @@ let () =
          recompute ~filter window menu
        in
        let hook () = recompute window menu in
+       let hook_prj _ = hook () in
        Project.register_create_hook callback_prj;
        Project.register_after_set_current_hook ~user_only:true callback_prj;
        Project.register_before_remove_hook callback_rm_prj;
-       Project.register_after_load_hook hook;
+       Project.register_after_load_hook hook_prj;
        Project.register_after_global_load_hook hook;
        recompute window menu)
