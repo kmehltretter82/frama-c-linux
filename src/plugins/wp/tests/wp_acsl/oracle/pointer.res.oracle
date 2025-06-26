@@ -27,11 +27,11 @@
 Goal Post-condition 'qed_ko,Base_oracle_ko' in 'absurd':
 Assume {
   (* Heap *)
-  Type: (region(G_t_21) <= 0) /\ (region(q.base) <= 0).
+  Type: (region(G_t_23) <= 0) /\ (region(q.base) <= 0).
   (* Goal *)
   When: q.offset < p.offset.
   (* Pre-condition *)
-  Have: p.base = G_t_21.
+  Have: p.base = G_t_23.
 }
 Prove: addr_lt(q, p).
 
@@ -40,11 +40,11 @@ Prove: addr_lt(q, p).
 Goal Post-condition 'qed_ko,Comp_oracle_ko' in 'absurd':
 Assume {
   (* Heap *)
-  Type: region(G_t_21) <= 0.
+  Type: region(G_t_23) <= 0.
   (* Goal *)
   When: i_1 <= i.
   (* Pre-condition *)
-  Have: p.base = G_t_21.
+  Have: p.base = G_t_23.
 }
 Prove: i <= i_1.
 
@@ -125,13 +125,13 @@ pointer.i:45: warning from Reference Variable Model:
    Reason: Uncomparable locations p_0 and mem:t.(0)
 Assume {
   (* Heap *)
-  Type: region(G_t_21) <= 0.
+  Type: region(G_t_23) <= 0.
   (* Goal *)
   When: 0 < w.
   (* Pre-condition *)
-  Have: p.base = G_t_21.
+  Have: p.base = G_t_23.
 }
-Prove: addr_lt(shift_sint32(global(G_t_21), 0), p).
+Prove: addr_lt(shift_sint32(global(G_t_23), 0), p).
 
 ------------------------------------------------------------
 
@@ -141,13 +141,13 @@ pointer.i:46: warning from Reference Variable Model:
    Reason: Uncomparable locations p_0 and mem:t.(0)
 Assume {
   (* Heap *)
-  Type: region(G_t_21) <= 0.
+  Type: region(G_t_23) <= 0.
   (* Goal *)
   When: 0 <= w.
   (* Pre-condition *)
-  Have: p.base = G_t_21.
+  Have: p.base = G_t_23.
 }
-Prove: addr_le(shift_sint32(global(G_t_21), 0), p).
+Prove: addr_le(shift_sint32(global(G_t_23), 0), p).
 
 ------------------------------------------------------------
 
@@ -157,11 +157,11 @@ pointer.i:47: warning from Reference Variable Model:
    Reason: Uncomparable locations p_0 and mem:t.(0)
 Assume {
   (* Heap *)
-  Type: region(G_t_21) <= 0.
+  Type: region(G_t_23) <= 0.
   (* Pre-condition *)
-  Have: p.base = G_t_21.
+  Have: p.base = G_t_23.
 }
-Prove: shift_sint32(global(G_t_21), 0) = p.
+Prove: shift_sint32(global(G_t_23), 0) = p.
 
 ------------------------------------------------------------
 
@@ -171,13 +171,13 @@ pointer.i:48: warning from Reference Variable Model:
    Reason: Uncomparable locations p_0 and mem:t.(0)
 Assume {
   (* Heap *)
-  Type: region(G_t_21) <= 0.
+  Type: region(G_t_23) <= 0.
   (* Goal *)
   When: w != 0.
   (* Pre-condition *)
-  Have: p.base = G_t_21.
+  Have: p.base = G_t_23.
 }
-Prove: shift_sint32(global(G_t_21), 0) != p.
+Prove: shift_sint32(global(G_t_23), 0) != p.
 
 ------------------------------------------------------------
 
@@ -187,13 +187,13 @@ pointer.i:49: warning from Reference Variable Model:
    Reason: Uncomparable locations p_0 and mem:t.(0)
 Assume {
   (* Heap *)
-  Type: region(G_t_21) <= 0.
+  Type: region(G_t_23) <= 0.
   (* Goal *)
   When: 0 <= w.
   (* Pre-condition *)
-  Have: p.base = G_t_21.
+  Have: p.base = G_t_23.
 }
-Prove: addr_lt(shift_sint32(global(G_t_21), 0), p).
+Prove: addr_lt(shift_sint32(global(G_t_23), 0), p).
 
 ------------------------------------------------------------
 
@@ -203,13 +203,13 @@ pointer.i:50: warning from Reference Variable Model:
    Reason: Uncomparable locations p_0 and mem:t.(0)
 Assume {
   (* Heap *)
-  Type: region(G_t_21) <= 0.
+  Type: region(G_t_23) <= 0.
   (* Goal *)
   When: 0 < w.
   (* Pre-condition *)
-  Have: p.base = G_t_21.
+  Have: p.base = G_t_23.
 }
-Prove: addr_le(p, shift_sint32(global(G_t_21), 0)).
+Prove: addr_le(p, shift_sint32(global(G_t_23), 0)).
 
 ------------------------------------------------------------
 ------------------------------------------------------------

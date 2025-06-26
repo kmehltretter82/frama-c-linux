@@ -170,7 +170,7 @@ Assume {
   (* Heap *)
   Type: (region(a.base) <= 0) /\ (region(b.base) <= 0) /\ linked(alloc_0).
   (* Goal *)
-  When: !invalid(alloc_0[P_a_24 <- 8][P_b_25 <- 8], a_3, 4).
+  When: !invalid(alloc_0[P_a_26 <- 8][P_b_27 <- 8], a_3, 4).
   (* Pre-condition *)
   Have: separated(a_1, x, shift_sint32(b, 0), x).
   (* Invariant 'Range' *)

@@ -33,8 +33,8 @@
 
 Goal Call point f1 f2 in 'call' at instruction (file dynamic.i, line 32):
 Let a = Mptr_0[shiftfield_F1_S_f(closure_0)].
-Let a_1 = global(G_f2_30).
-Let a_2 = global(G_f1_22).
+Let a_1 = global(G_f2_32).
+Let a_2 = global(G_f1_24).
 Let x = Mint_0[shiftfield_F1_S_param(closure_0)].
 Assume {
   Type: is_sint32(x).
@@ -88,7 +88,7 @@ Assume {
   Have: IAbs.abs(x) <= 5.
   (* Instance of 'f1' *)
   (* Call point f1 f2 *)
-  Have: Mptr_0[shiftfield_F1_S_f(closure_0)] = global(G_f1_22).
+  Have: Mptr_0[shiftfield_F1_S_f(closure_0)] = global(G_f1_24).
 }
 Prove: ((-10) <= x) /\ (x <= 10).
 
@@ -151,7 +151,7 @@ Prove: true.
 
 Goal Call point h1 h2 in 'behavior' at instruction (file dynamic.i, line 67):
 Assume { (* Heap *) Type: region(p.base) <= 0. }
-Prove: (global(G_h1_61) = p) \/ (global(G_h2_67) = p).
+Prove: (global(G_h1_63) = p) \/ (global(G_h2_69) = p).
 
 ------------------------------------------------------------
 
@@ -341,7 +341,7 @@ Prove: false.
 
 Goal Call point h1 in 'missing_context' at instruction (file dynamic.i, line 89):
 Assume { (* Heap *) Type: region(p.base) <= 0. }
-Prove: global(G_h1_61) = p.
+Prove: global(G_h1_63) = p.
 
 ------------------------------------------------------------
 

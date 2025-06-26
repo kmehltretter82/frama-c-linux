@@ -21,13 +21,13 @@ Assume {
   (* Pre-condition *)
   Have: (0 <= k) /\ (k <= 19).
 }
-Prove: (comp_0[k].F1_ptr) != global(L_m_28).
+Prove: (comp_0[k].F1_ptr) != global(L_m_30).
 
 ------------------------------------------------------------
 
 Goal Assertion 'RES' (file frame.i, line 11):
 Let a = comp_0[k].F1_ptr.
-Let a_1 = global(L_m_28).
+Let a_1 = global(L_m_30).
 Let x = Mint_0[a <- 4][a_1].
 Assume {
   Type: is_sint32(k) /\ is_sint32(x).
@@ -49,26 +49,26 @@ Prove: x = 1.
 ------------------------------------------------------------
 
 Goal Assertion 'A,X' (file frame.i, line 34):
-Let a = Mptr_0[global(L_x_37)].
+Let a = Mptr_0[global(L_x_39)].
 Assume {
   (* Heap *)
   Type: linked(Malloc_0) /\ framed(Mptr_0).
   (* Initializer *)
-  Init: a = shiftfield_F2_S_b(global(P_s_36)).
+  Init: a = shiftfield_F2_S_b(global(P_s_38)).
 }
-Prove: valid_rd(Malloc_0[P_s_36 <- 1][L_x_37 <- 1], a, 1).
+Prove: valid_rd(Malloc_0[P_s_38 <- 1][L_x_39 <- 1], a, 1).
 
 ------------------------------------------------------------
 
 Goal Assertion 'A,Y' (file frame.i, line 35):
-Let a = Mptr_0[global(L_x_37)].
+Let a = Mptr_0[global(L_x_39)].
 Assume {
   (* Heap *)
   Type: linked(Malloc_0) /\ framed(Mptr_0).
   (* Initializer *)
-  Init: a = shiftfield_F2_S_b(global(P_s_36)).
+  Init: a = shiftfield_F2_S_b(global(P_s_38)).
   (* Assertion 'A,X' *)
-  Have: valid_rd(Malloc_0[P_s_36 <- 1][L_x_37 <- 1], a, 1).
+  Have: valid_rd(Malloc_0[P_s_38 <- 1][L_x_39 <- 1], a, 1).
 }
 Prove: false.
 
@@ -78,26 +78,26 @@ Prove: false.
 ------------------------------------------------------------
 
 Goal Assertion 'A,X' (file frame.i, line 25):
-Let a = Mptr_0[global(L_x_32)].
+Let a = Mptr_0[global(L_x_34)].
 Assume {
   (* Heap *)
   Type: linked(Malloc_0) /\ framed(Mptr_0).
   (* Initializer *)
-  Init: a = shift_sint8(global(L_b_31), 0).
+  Init: a = shift_sint8(global(L_b_33), 0).
 }
-Prove: valid_rd(Malloc_0[L_b_31 <- 4][L_x_32 <- 1], a, 4).
+Prove: valid_rd(Malloc_0[L_b_33 <- 4][L_x_34 <- 1], a, 4).
 
 ------------------------------------------------------------
 
 Goal Assertion 'A,Y' (file frame.i, line 26):
-Let a = Mptr_0[global(L_x_32)].
+Let a = Mptr_0[global(L_x_34)].
 Assume {
   (* Heap *)
   Type: linked(Malloc_0) /\ framed(Mptr_0).
   (* Initializer *)
-  Init: a = shift_sint8(global(L_b_31), 0).
+  Init: a = shift_sint8(global(L_b_33), 0).
   (* Assertion 'A,X' *)
-  Have: valid_rd(Malloc_0[L_b_31 <- 4][L_x_32 <- 1], a, 4).
+  Have: valid_rd(Malloc_0[L_b_33 <- 4][L_x_34 <- 1], a, 4).
 }
 Prove: false.
 
