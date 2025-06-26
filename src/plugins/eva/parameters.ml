@@ -1345,12 +1345,19 @@ let () = add_precision_dep Precision.parameter
 (* Sets a parameter [P] to [t], unless it has already been set by any other
    means. *)
 let set (type t) (module P: Parameter_sig.S with type t = t) =
-  let previous = ref (P.get ()) in
+  (* Last value set by this function. *)
+  let previous = ref None in
+  let equal_current t = P.equal (P.get ()) t in
+  (* Is the current value of the parameter equal to !previous, and thus has
+     been set by this function? *)
+  let last_set_by_us () =
+    Option.fold !previous ~none:false ~some:equal_current
+  in
   fun ~default t ->
-    let already_set = P.is_set () && not (P.equal !previous (P.get ())) in
+    let already_set = P.is_set () && not (last_set_by_us ()) in
     if not already_set then begin
-      if default then P.clear () else P.set t;
-      previous := P.get ();
+      if default then P.clear ()
+      else (P.set t; previous := Some t)
     end;
     let str = Typed_parameter.get_value P.parameter in
     let str = match P.parameter.Typed_parameter.accessor with
@@ -1360,7 +1367,7 @@ let set (type t) (module P: Parameter_sig.S with type t = t) =
     let dkey = dkey_precision_settings in
     printf ~dkey "    option %s %sset to %s%s." P.name
       (if already_set then "already " else "") str
-      (if already_set && not (P.equal t (P.get ())) then " (not modified)"
+      (if already_set && not (equal_current t) then " (not modified)"
        else if P.is_default () then " (default value)" else "")
 
 (* List of configure functions to be called for -eva-precision. *)
