@@ -31,20 +31,23 @@ type project = t
 (** {2 Constructor} *)
 (* ************************************************************************** *)
 
-let dummy = { pid = 0; name = ""; unique_name = ""}
+let dummy = { pid = 0; name = ""; unique_name = "(id: 0)"}
 
-module Make_setter(X: sig val mem: string -> bool end) = struct
+module Make_setter () = struct
 
-  let make_unique_name s = snd (Extlib.make_unique_name X.mem ~sep:" " s)
+  let make_unique_name s id = Format.asprintf "%s (id: %d)" s id
 
   let make =
     let pid = ref 0 in
     fun name ->
       incr pid;
-      { pid = !pid; name = name; unique_name = make_unique_name name }
+      { pid = !pid; name = name; unique_name = make_unique_name name !pid }
 
   let set_name p s =
-    p.unique_name <- make_unique_name s;
+    p.unique_name <- make_unique_name s p.pid;
     p.name <- s
 
 end
+
+let get_project_debug_name p =
+  Format.asprintf "%s (id: %d)" p.name p.pid

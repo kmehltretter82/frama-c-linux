@@ -41,7 +41,9 @@ type project = Project_skeleton.t =
   private
   { pid : int;
     mutable name : string;
-    mutable unique_name : string }
+    mutable unique_name : string
+                          [@deprecated "use pid or Project.get_debug_name"] }
+
 (** Type of a project. *)
 
 (* ************************************************************************* *)
@@ -80,7 +82,14 @@ val fold_on_projects: ('a -> t -> 'a) -> 'a -> 'a
     @since Boron-20100401 *)
 
 val find_all: string -> t list
-(** Find all projects with the given name. *)
+(** Find all projects with the given name. The list is ordered from most
+    recently used (i.e. used as current) to least recently used.
+    {!Project.pick_most_recently_created} can be used to extract the most
+    recently created project from that list. *)
+
+val pick_most_recently_created: t list -> t
+(** @return the project most recently created from the given list of projects.
+    @raise Failure if the list is empty. *)
 
 val clear_all: unit -> unit
 (** Clear all the projects: all the internal states of all the projects are
@@ -96,12 +105,22 @@ val clear_all: unit -> unit
     become inconsistent if your selection is incorrect. *)
 (* ************************************************************************* *)
 
+val get_pid: t -> int
+(** Project ID. Recommended way of identifying a project.
+    @since Frama-C+dev *)
+
 val get_name: t -> string
 (** Project name. Two projects may have the same name. *)
 
 val get_unique_name: t -> string
 (** @return a project name based on {!field:name} but different of each others
     [unique_name]. *)
+[@@deprecated "use Project.get_pid or Project.get_debug_name instead, \
+               depending on the intended usage."]
+
+val get_debug_name: t -> string
+(** @return a project name appended with its id.
+    @since Frama-C+dev *)
 
 val set_name: t -> string -> unit
 (** Set the name of the given project.
@@ -113,9 +132,17 @@ val register_after_set_name_hook: (t * string -> unit) -> unit
     string is the old name for this project. *)
 
 exception Unknown_project
+
+val from_pid: int -> t
+(** Return a project based on {!pid}.
+    @raise Unknown_project if no project has this unique name.
+    @since Frama-C+dev *)
+
 val from_unique_name: string -> t
 (** Return a project based on {!unique_name}.
     @raise Unknown_project if no project has this unique name. *)
+[@@deprecated "use Project.from_pid or Project.find_all instead, depending on \
+               the intended usage."]
 
 val set_current: ?on:bool -> ?selection:State_selection.t -> t -> unit
 (** Set the current project with the given one.
