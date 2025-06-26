@@ -218,6 +218,8 @@ export function Projects(): JSX.Element {
 
   /** Re-Build the project menu */
   React.useEffect(() => {
+    /** The timeout is used for optimisation, * avoiding unnecessary
+     * calculations when projects change very frequently. */
     const timeout = setTimeout(() => {
       Dome.delSubMenu('Project');
       const others: Dome.MenuItemProps[] = projectsListSorted.map(elt => {

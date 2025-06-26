@@ -315,11 +315,11 @@ export async function showOpenDir(
 // --------------------------------------------------------------------------
 
 export const modalLoader = new GlobalState<boolean>(false);
-export function showModal(val: React.ReactNode): void { modal.setValue(val); }
-export function closeModal(): void {
-  showModal(undefined);
+export function showModal(val: React.ReactNode): void {
   modalLoader.setValue(false);
+  modal.setValue(val);
 }
+export function closeModal(): void { showModal(undefined); }
 
 export interface ModalProps {
   /** Text of the label. Prepend to other children elements. */
