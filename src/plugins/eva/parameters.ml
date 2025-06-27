@@ -1347,18 +1347,18 @@ let () = add_precision_dep Precision.parameter
 let set (type t) (module P: Parameter_sig.S with type t = t) =
   (* Last value set by this function. *)
   let previous = ref None in
+  let set_value value = P.set value; previous := Some value in
   let equal_current t = P.equal (P.get ()) t in
-  (* Is the current value of the parameter equal to !previous, and thus has
-     been set by this function? *)
-  let last_set_by_us () =
+  (* We avoid overwriting a parameter already set, except if the current value
+     is equal to !previous, the last value set by this function — in which case
+     the parameter has probably been set by this function and not by the user. *)
+  let is_unchanged () =
     Option.fold !previous ~none:false ~some:equal_current
   in
   fun ~default t ->
-    let already_set = P.is_set () && not (last_set_by_us ()) in
-    if not already_set then begin
-      if default then P.clear ()
-      else (P.set t; previous := Some t)
-    end;
+    let already_set = P.is_set () && not (is_unchanged ()) in
+    if not already_set then
+      if default then P.clear () else set_value t;
     let str = Typed_parameter.get_value P.parameter in
     let str = match P.parameter.Typed_parameter.accessor with
       | Typed_parameter.String _ -> "\'" ^ str ^ "\'"
