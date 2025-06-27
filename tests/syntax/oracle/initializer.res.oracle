@@ -58,7 +58,7 @@ static unsigned char main_STR[7] =
    (unsigned char)'\000'};
 void main(void)
 {
-  char ch[3] = {(char)'h', (char)'e', (char)'l'};
+  char ch[3] = "hello";
   int i = (int)main_STR[2];
   return;
 }
