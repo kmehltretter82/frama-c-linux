@@ -6,40 +6,108 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Summary of the analysis *)
+(* Summary of an Mthread analysis, stored on disk for the Ivette component. *)
 
 open Mt_types
 open Mt_thread
 
-type lock_summary = {
+type mutex_summary = {
   taken : Mutex.Set.t;
   released : Mutex.Set.t;
 }
-type mqueue_summary = {
+[@@deriving eq, ord]
+
+type queue_summary = {
   created : Mqueue.Set.t;
   receivers : Mqueue.Set.t;
   senders : Mqueue.Set.t;
 }
+[@@deriving eq, ord]
+
 type shared_var_summary = {
   read : Locations.Zone.Set.t;
   written : Locations.Zone.Set.t;
 }
+[@@deriving eq, ord]
+
 type thread_summary = {
-  locks : lock_summary;
-  mqueues : mqueue_summary;
+  locks : mutex_summary;
+  mqueues : queue_summary;
   shared_vars : shared_var_summary;
 }
-type t = thread_summary Thread.Map.t
+[@@deriving eq, ord]
 
-let empty_summary = {
-  locks = { taken = Mutex.Set.empty ;
-            released = Mutex.Set.empty };
-  mqueues = { created = Mqueue.Set.empty ;
-              receivers = Mqueue.Set.empty ;
-              senders = Mqueue.Set.empty };
-  shared_vars = { read = Locations.Zone.Set.empty ;
-                  written = Locations.Zone.Set.empty };
-}
+
+(* ----- Datatypes for all above types. ----------------------------------- *)
+
+module MutexSummary = struct
+  include Datatype.Serializable_undefined
+
+  type t = mutex_summary [@@deriving eq, ord]
+
+  let empty = Mutex.Set.{ taken = empty; released = empty }
+
+  let name = "Mt_summary.MutexSummary"
+  let reprs = [ empty ]
+  let structural_descr =
+    let descr = Mutex.Set.packed_descr in
+    Structural_descr.t_record [| descr; descr; |]
+end
+
+module QueueSummary = struct
+  include Datatype.Serializable_undefined
+
+  type t = queue_summary [@@deriving eq, ord]
+
+  let empty = Mqueue.Set.{ created = empty; receivers = empty; senders = empty }
+
+  let name = "Mt_summary.QueueSummary"
+  let reprs = [ empty ]
+  let structural_descr =
+    let descr = Mqueue.Set.packed_descr in
+    Structural_descr.t_record [| descr; descr; descr; |]
+end
+
+module SharedVarSummary = struct
+  include Datatype.Serializable_undefined
+
+  type t = shared_var_summary [@@deriving eq, ord]
+
+  let empty = Locations.Zone.Set.{ read = empty; written = empty }
+
+  let name = "Mt_summary.SharedVarSummary"
+  let reprs = [ empty ]
+  let structural_descr =
+    let descr = Locations.Zone.Set.packed_descr in
+    Structural_descr.t_record [| descr; descr; |]
+end
+
+module MutexSummaryDatatype = Datatype.Make (MutexSummary)
+module QueueSummaryDatatype = Datatype.Make (QueueSummary)
+module SharedVarSummaryDatatype = Datatype.Make (SharedVarSummary)
+
+module ThreadSummary = struct
+  include Datatype.Serializable_undefined
+
+  type t = thread_summary [@@deriving eq, ord]
+
+  let empty =
+    { locks = MutexSummary.empty;
+      mqueues = QueueSummary.empty;
+      shared_vars = SharedVarSummary.empty; }
+
+  let name = "Mt_summary.ThreadSummary"
+  let reprs = [ empty ]
+  let structural_descr =
+    Structural_descr.t_record [| MutexSummaryDatatype.packed_descr;
+                                 QueueSummaryDatatype.packed_descr;
+                                 SharedVarSummaryDatatype.packed_descr; |]
+end
+
+module ThreadSummaryDatatype = Datatype.Make (ThreadSummary)
+
+
+(* ----- Computation of the summary of one thread --------------------------- *)
 
 let add_lock_taken id th_summary =
   let taken = Mutex.Set.add id th_summary.locks.taken in
@@ -76,29 +144,43 @@ let add_shared_var_written zone th_summary =
   let shared_vars = { th_summary.shared_vars with written } in
   { th_summary with shared_vars }
 
-let compute analysis =
-  let th_list = List.filter should_compute_thread (threads analysis) in
-  List.fold_left
-    (fun summary th ->
-        let th_summary =
-          Trace.fold' th.th_amap
-            (fun action acc ->
-              match action with
-              | MutexLock id -> add_lock_taken id acc
-              | MutexRelease id -> add_lock_released id acc
-              | CreateQueue (id, _) -> add_mqueue_created id acc
-              | ReceiveMsg (id, _, _) -> add_mqueue_received_from id acc
-              | SendMsg (id, _) -> add_mqueue_sent_to id acc
-              | VarAccess (Read, zone) -> add_shared_var_read zone acc
-              | VarAccess (Write _, zone) -> add_shared_var_written zone acc
-              | _ -> acc)
-            empty_summary
-        in
-        Thread.Map.add th.th_eva_thread th_summary summary)
-    Thread.Map.empty
-    th_list
 
-let iter f summary =
-  Thread.Map.iter
-    (fun th th_summary -> f (th, th_summary))
-    summary
+let compute_thread_summary thread =
+  Trace.fold' thread.Mt_thread.th_amap
+    (fun action acc ->
+       match action with
+       | MutexLock id -> add_lock_taken id acc
+       | MutexRelease id -> add_lock_released id acc
+       | CreateQueue (id, _) -> add_mqueue_created id acc
+       | ReceiveMsg (id, _, _) -> add_mqueue_received_from id acc
+       | SendMsg (id, _) -> add_mqueue_sent_to id acc
+       | VarAccess (Read, zone) -> add_shared_var_read zone acc
+       | VarAccess (Write _, zone) -> add_shared_var_written zone acc
+       | _ -> acc)
+    ThreadSummary.empty
+
+
+(* ----- Summary for all threads -------------------------------------------- *)
+
+module ThreadTable =
+  State_builder.Hashtbl
+    (Thread.Hashtbl)
+    (ThreadSummaryDatatype)
+    (struct
+      let name = "Mt_summary.Summary"
+      let size = 7
+      let dependencies = [ Ast.self ]
+    end)
+
+let compute analysis =
+  ThreadTable.clear ();
+  let all_threads = Mt_thread.threads analysis in
+  let threads = List.filter Mt_thread.should_compute_thread all_threads in
+  List.iter
+    (fun thread ->
+       let thread_summary = compute_thread_summary thread in
+       ThreadTable.replace thread.th_eva_thread thread_summary)
+    threads;
+  ThreadTable.mark_as_computed ()
+
+let clear = ThreadTable.clear

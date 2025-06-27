@@ -15,41 +15,6 @@ let package =
     ~title:"Eva Mthread Services"
     ()
 
-module SummaryState : sig
-  val add_reload_hook : (unit -> unit) -> unit
-
-  val key : Thread.t * Mt_summary.thread_summary -> string
-  val iter : (Thread.t * Mt_summary.thread_summary -> unit) -> unit
-end = struct
-  module ReloadHook = Hook.Make()
-
-  let ref_analysis = ref None
-  let ref_summary = ref None
-
-  let key (th, _) = Format.asprintf "%d" (Thread.id th)
-
-  let add_reload_hook = ReloadHook.extend
-
-  let get_summary () =
-    match !ref_summary with
-    | Some summary -> Some summary
-    | None ->
-      ref_summary := Option.map Mt_summary.compute !ref_analysis;
-      !ref_summary
-
-  let iter f =
-    let summary = get_summary () in
-    Option.iter (Mt_summary.iter f) summary
-
-  let mthread_analysis_hook analysis =
-    ref_summary := None;
-    ref_analysis := Some analysis;
-    ReloadHook.apply ()
-
-  let () =
-    Mt_main.register_analysis_hook mthread_analysis_hook
-end
-
 let _mthread_summary =
   let module Jkeyed_value = Data.Jpair (Data.Jint) (Data.Jstring) in
   let module Jlist_of_keyed_value = Data.Jlist (Jkeyed_value) in
@@ -122,10 +87,9 @@ let _mthread_summary =
     ~get:(fun (_, (th_summary : Mt_summary.thread_summary)) ->
         zoneset_to_stringlist th_summary.shared_vars.written);
 
-  States.register_array ~package
+  States.register_framac_array
+    ~package
     ~name:"mtSummary"
     ~descr:(Markdown.plain "Data for Mthread summary")
-    ~key:SummaryState.key
-    ~iter:SummaryState.iter
-    ~add_reload_hook:SummaryState.add_reload_hook
-    model
+    ~key:(fun th -> Format.asprintf "%d" (Thread.id th))
+    model (module Mt_summary.ThreadTable)

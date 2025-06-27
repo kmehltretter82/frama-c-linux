@@ -134,6 +134,7 @@ let mthread_run project =
 
   (* Cleanup function, called at the end or in case of failure or success. *)
   let cleanup () =
+    Mt_summary.compute analysis;
     hook_builtins None;
     Project.set_current old_project;
   in
@@ -146,6 +147,7 @@ let mthread_run project =
     Thread.reset_state ();
     Mutex.reset_state ();
     Mqueue.reset_state ();
+    Mt_summary.clear ();
 
     (* Let Eva know about interrupt handlers. *)
     Thread.register_interrupt_handlers (Mt_options.InterruptHandlers.get ());

@@ -6,18 +6,16 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Summary of the analysis *)
+(** Summary of an Mthread analysis. *)
 
-type t
-
-type lock_summary = {
+type mutex_summary = {
   taken : Mutex.Set.t;
   (** Set of locks taken. *)
   released : Mutex.Set.t;
   (** Set of locks released. *)
 }
 
-type mqueue_summary = {
+type queue_summary = {
   created : Mqueue.Set.t;
   (** Set of message queues created. *)
   receivers : Mqueue.Set.t;
@@ -34,13 +32,16 @@ type shared_var_summary = {
 }
 
 type thread_summary = {
-  locks : lock_summary;
-  mqueues : mqueue_summary;
+  locks : mutex_summary;
+  mqueues : queue_summary;
   shared_vars : shared_var_summary;
 }
 
-(** Compute the summary from an analysis state. *)
-val compute : Mt_thread.analysis_state -> t
+module ThreadTable : State_builder.Hashtbl with type key = Thread.t
+                                            and type data = thread_summary
 
-(** Iterate over all thread summaries for the given summary. *)
-val iter : (Thread.t * thread_summary -> unit) -> t -> unit
+(** Computes the summary from an analysis state. *)
+val compute : Mt_thread.analysis_state -> unit
+
+(** Clears summary. *)
+val clear : unit -> unit
