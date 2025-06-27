@@ -7858,15 +7858,30 @@ and doInitializer loc local_env (vi: varinfo) (inite: Cabs.init_expression)
     "@\nStarting a new initializer for %s : %a@\n"
     vi.vname Cil_datatype.Typ.pretty vi.vtype;
   if Ast_types.is_array vi.vtype then begin
+    let cst_elem =
+      Ast_types.(is_const (fst (array_elem_type_and_size vi.vtype)))
+    in
     match inite with
     | NO_INIT | COMPOUND_INIT _ -> normal_init vi inite
     | SINGLE_INIT e ->
       (match (stripParen e).expr_node with
        | CONSTANT (CONST_STRING s) ->
+         let typ = Cil.typeOf_string_literal s in
+         let typ =
+           if not cst_elem then
+             Ast_types.remove_qualifiers_deep typ
+           else typ
+         in
          (* TODO: check type matches and update if needed *)
-         empty, StrInit s, Cil.typeOf_string_literal s, Lval.Set.empty
+         empty, StrInit s, typ, Lval.Set.empty
        | CONSTANT (CONST_WSTRING l) ->
-         empty, WStrInit l, Cil.typeOf_wstring_literal l, Lval.Set.empty
+         let typ = Cil.typeOf_wstring_literal l in
+         let typ =
+           if not cst_elem then
+             Ast_types.remove_qualifiers_deep typ
+           else typ
+         in
+         empty, WStrInit l, typ, Lval.Set.empty
        | _ -> array_error ())
   end else normal_init vi inite
 
