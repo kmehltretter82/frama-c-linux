@@ -148,10 +148,16 @@ class printer_with_annot () = object (self)
     end;
     (* Out of tree global annotations are pretty printed before the first
        variable declaration of the first function definition. *)
-    (match glob with
-     | GFunDecl _ | GFun _ -> print_spec <- Ast.is_def_or_last_decl glob;
-     | _ -> ());
-    super#global fmt glob
+    match glob with
+    | GFunDecl _ | GFun _ ->
+      print_spec <- Ast.is_def_or_last_decl glob; super#global fmt glob
+    | GVar (v,_,_) | GVarDecl(v,_)
+      when
+        Ast_attributes.(contains fc_literal v.vattr)
+        && not (Kernel.PrintAsIs.get()) ->
+      ()
+    | _ -> super#global fmt glob
+
 
   method private begin_annotation fmt =
     self#pp_open_annotation ~block:false fmt
@@ -238,6 +244,19 @@ class printer_with_annot () = object (self)
           when Kernel.PrintReturn.get () -> return
         | _ -> skind
       end
+
+  method! lval fmt lv =
+    match lv with
+    | Var v, NoOffset
+      when Ast_info.is_string_literal lv && not (Kernel.PrintAsIs.get()) ->
+      let init = Globals.Vars.find v in
+      (match init.init with
+       | Some (StrInit _ | WStrInit _ as i) -> self#init_or_str fmt i
+       | _ ->
+         Kernel.fatal
+           "Variable %s is supposed to be a (wide)string literal but is not \
+            initialized as such" v.vname)
+    | _ -> super#lval fmt lv
 
 end (* class printer_with_annot *)
 

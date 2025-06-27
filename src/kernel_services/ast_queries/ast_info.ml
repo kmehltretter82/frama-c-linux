@@ -55,6 +55,11 @@ let is_non_null_expr e =
     not (Integer.equal (value_of_integral_const c) Integer.zero)
   | _ -> false
 
+let is_string_literal =
+  function
+  | Var vi, NoOffset -> Ast_attributes.(contains fc_literal vi.vattr)
+  | _ -> false
+
 (* ************************************************************************** *)
 (** {2 Logical terms} *)
 (* ************************************************************************** *)

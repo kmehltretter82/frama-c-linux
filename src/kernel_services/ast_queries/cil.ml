@@ -4248,7 +4248,9 @@ let create_string_literal =
     let i = StrLitCounter.next() in
     let vname = "__fc_lit_string" ^ (string_of_int i) in
     let typ = typeOf_string_literal ~loc s in
-    makeGlobalVar ~source:true ~temp:false ~loc vname typ
+    let var = makeGlobalVar ~source:true ~temp:false ~loc vname typ in
+    var.vattr <- Ast_attributes.(add (fc_literal,[]) var.vattr);
+    var
 
 let create_wstring_literal =
   let module WStrLitCounter =
@@ -4258,7 +4260,9 @@ let create_wstring_literal =
     let i = WStrLitCounter.next() in
     let vname = "__fc_lit_wstring" ^ (string_of_int i) in
     let typ = typeOf_wstring_literal ~loc l in
-    makeGlobalVar ~source:true ~temp:false ~loc vname typ
+    let var = makeGlobalVar ~source:true ~temp:false ~loc vname typ in
+    var.vattr <- Ast_attributes.(add (fc_literal,[]) var.vattr);
+    var
 
 let mkPureExprInstr ~fundec ~scope ?loc e =
   let loc = match loc with None -> e.eloc | Some l -> l in
