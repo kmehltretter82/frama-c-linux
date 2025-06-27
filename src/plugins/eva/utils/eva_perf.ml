@@ -307,12 +307,9 @@ let last_time_displayed = ref 0.0
 let stop callstack =
   let current_time = Sys.time () in
   register_stop callstack current_time;
-  (* Export stats *)
+  (* Export the analysis duration stat, only at the end of the analysis. *)
   if Callstack.is_empty callstack then begin
-    let d =
-      if Cmdline.deterministic then 0.0
-      else analysis_duration current_time
-    in
+    let d = analysis_duration current_time in
     Statistics.(set analysis_duration () d)
   end;
   (* Print perfs *)
