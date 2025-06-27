@@ -85,21 +85,21 @@
   Called from time_h.c:36.
 [eva] time_h.c:36: 
   function clock_nanosleep: precondition 'valid_request' got status valid.
-[eva:alarm] time_h.c:36: Warning: 
-  function clock_nanosleep: precondition 'initialization,initialized_request' got status invalid.
-[eva] time_h.c:36: 
-  function clock_nanosleep: no state left, precondition 'valid_nanosecs' got status valid.
-[eva] time_h.c:36: 
-  function clock_nanosleep: no state left, precondition 'valid_remaining_or_null' got status valid.
-[eva] Done for function clock_nanosleep
-[eva] computing for function clock_nanosleep <- main.
-  Called from time_h.c:36.
 [eva] time_h.c:36: 
   function clock_nanosleep: precondition 'initialization,initialized_request' got status valid.
 [eva] time_h.c:36: 
   function clock_nanosleep: precondition 'valid_nanosecs' got status valid.
 [eva] time_h.c:36: 
   function clock_nanosleep: precondition 'valid_remaining_or_null' got status valid.
+[eva] Done for function clock_nanosleep
+[eva] computing for function clock_nanosleep <- main.
+  Called from time_h.c:36.
+[eva:alarm] time_h.c:36: Warning: 
+  function clock_nanosleep: precondition 'initialization,initialized_request' got status invalid.
+[eva] time_h.c:36: 
+  function clock_nanosleep: no state left, precondition 'valid_nanosecs' got status valid.
+[eva] time_h.c:36: 
+  function clock_nanosleep: no state left, precondition 'valid_remaining_or_null' got status valid.
 [eva] Done for function clock_nanosleep
 [eva] computing for function clock_nanosleep <- main.
   Called from time_h.c:36.
