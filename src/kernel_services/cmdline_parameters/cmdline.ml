@@ -527,6 +527,7 @@ type cmdline_option =
     argname: string;
     mutable ohelp: string;
     ovisible: bool;
+    osafe: bool;
     ext_help: (unit,Format.formatter,unit) format;
     mutable setting: option_setting }
 
@@ -622,11 +623,23 @@ end = struct
 
   end
 
+  let check_sandbox option =
+    (* Prevent unsafe functions from being used in sandbox mode *)
+    let sandbox_mode = Sys.getenv_opt "FRAMAC_SANDBOX" |> Option.is_some in
+    if sandbox_mode && not option.osafe then
+      let abort () =
+        Kernel_log.abort
+          "%s cannot be used in sandbox mode."
+          option.oname
+      in
+      option.setting <- option_setting_and_abort abort option.setting
+
   let add_option shortname ~group option =
     assert (option.oname <> "");
     Hashtbl.replace all_options option.oname option;
     Option_names.add option.oname false;
     let g = find_group shortname group in
+    check_sandbox option;
     g := option :: !g
 
   (* table name_of_the_original_option --> aliases *)
@@ -685,7 +698,9 @@ end = struct
       replace !options_in_group
 
   let replace_option_setting option ~plugin ~group setting =
-    change_option option ~plugin ~group (fun o -> o.setting <- setting)
+    change_option option ~plugin ~group
+      (fun o -> o.setting <- setting;
+        check_sandbox o)
 
   let replace_option_help option ~plugin ~group help =
     change_option option ~plugin ~group (fun o -> o.ohelp <- help)
@@ -728,25 +743,13 @@ struct
     (*    L.debug ~level:4 "Cmdline: [%s] registers %S for stage %s."
           plugin name S.name;*)
     let help = if help = "" then "undocumented" else help in
-    (* Prevent unsafe functions from being used in sandbox mode *)
-    let sandbox_mode = Sys.getenv_opt "FRAMAC_SANDBOX" |> Option.is_some in
-    let setting =
-      if safe || not sandbox_mode
-      then setting
-      else
-        let abort () =
-          Kernel_log.abort
-            "%s cannot be used in sandbox mode."
-            name
-        in
-        option_setting_and_abort abort setting
-    in
     let o =
       { oname = name;
         argname = argname;
         ohelp = help;
         ext_help = ext_help;
         ovisible = visible;
+        osafe = safe;
         setting = setting }
     in
     add_for_parsing o;
@@ -852,7 +855,7 @@ let add_option_without_action
     plugin
     ~group
     { oname = name; argname = argname;
-      ohelp = help; ext_help = ext_help; ovisible = visible;
+      ohelp = help; ext_help = ext_help; ovisible = visible; osafe = true;
       setting = Unit (fun () -> assert false) }
 
 let add_aliases orig ~plugin ~group ?visible ?deprecated stage aliases =
