@@ -209,9 +209,10 @@ let example_msg =
      # The oracle will be compared from the standard output of the command: cat <test-output-file> | <cmd> .@ \
      # Chaining multiple filter commands is possible in defining several FILTER directives.@ \
      # An empty command drops the previous FILTER directives.@ \
-     # Note: in such a command, the macro @@PTEST_ORACLE@@ is set to the basename of the oracle.@ \
-     # This allows running a 'diff' command with the oracle of another test configuration:@ \
-     #    FILTER: diff --new-file %%{dep:@@PTEST_SUITE_DIR@@/oracle_configuration/@@PTEST_ORACLE@@} - @]@  \
+     # Note: in such a command, the macros @@PTEST_ORACLE@@ and @@PTEST_RESULT_FILE@@ are set respectively to the basename of the oracle and the basename of the result.@ \
+     # This allows running a 'diff' command with the oracle/result of another test configuration:@ \
+     #    FILTER: diff --new-file %%{dep:@@PTEST_SUITE_DIR@@/result_configuration/@@PTEST_RESULT_FILE@@} - @]@  \
+     # It is recommended to diff against the result of another configuration so that the dependencies between configurations are correctly set up.
      TIMEOUT: <delay>    @[<v 0># Set a timeout for all sub-test.@]@  \
      NOFRAMAC:           @[<v 0># Drops previous sub-test definitions and considers that there is no defined default sub-test.@]@  \
      GCC:                @[<v 0># Deprecated.@]@  \
@@ -227,6 +228,7 @@ let example_msg =
      @@PTEST_SUITE_DIR@@       # Path to the directory contained the source of the test file (../).@  \
      @@PTEST_RESULT_DIR@@      # Shorthand alias to @@PTEST_SUITE_DIR@@/result@@PTEST_CONFIG@@ (the result directory dedicated to the tested configuration).@  \
      @@PTEST_ORACLE@@          # Basename of the current oracle file (macro only usable in FILTER directives).@  \
+     @@PTEST_RESULT_FILE@@     # Basename of the current result file (macro only usable in FILTER directives).@  \
      @@PTEST_DEFAULT_OPTIONS@@ # The default option list: %s@  \
      @@PTEST_LIBS@@            # The current list of modules defined by the LIBS directive.@  \
      @@PTEST_LIBRARY@@         # The current list of modules defined by the LIBRARY directive.@  \
@@ -1472,13 +1474,19 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
     match command.filter with
     | None -> "","",default_wtest
     | Some filter ->
-      let regexp = Str.regexp "@PTEST_ORACLE@" in
-      let filter_cmd funfiltred foracle =
-        let filter = Str.global_replace regexp foracle filter in
+      let oracle_regexp = Str.regexp "@PTEST_ORACLE@" in
+      let result_regexp = Str.regexp "@PTEST_RESULT_FILE@" in
+      let filter_cmd funfiltred foracle fresult =
+        let filter = Str.global_replace oracle_regexp foracle filter in
+        let filter = Str.global_replace result_regexp fresult filter in
         Format.sprintf "cat %s | %s" funfiltred filter
       in
-      let filter_res = filter_cmd cmdreslog (log_prefix ^ ".res.oracle") in
-      let filter_err = filter_cmd cmderrlog (log_prefix ^ ".err.oracle") in
+      let filter_res =
+        filter_cmd cmdreslog (log_prefix ^ ".res.oracle") reslog
+      in
+      let filter_err =
+        filter_cmd cmderrlog (log_prefix ^ ".err.oracle") errlog
+      in
       filter_res,filter_err, { default_wtest with
                                sedout = redirection ~reslog filter_res ;
                                sederr = redirection ~reslog:errlog filter_err ;
