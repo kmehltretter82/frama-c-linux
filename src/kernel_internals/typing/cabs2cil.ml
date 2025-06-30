@@ -7851,7 +7851,7 @@ and doInitializer loc local_env (vi: varinfo) (inite: Cabs.init_expression)
     empty @@@ (acc, local_env.is_ghost), CInit init, typ'', reads
   in
   let array_error () =
-    Kernel.abort ~current:true ~once:true
+    Kernel.error ~current:true ~once:true
       "Array initializer must be an initializer list or string literal";
   in
   Kernel.debug ~dkey:Kernel.dkey_typing_init
@@ -7898,7 +7898,9 @@ and doInitializer loc local_env (vi: varinfo) (inite: Cabs.init_expression)
              { vi.vtype with tnode = TArray(telem,Some size) }
          in
          empty, WStrInit l, typ, Lval.Set.empty
-       | _ -> array_error ())
+       | _ ->
+         array_error ();
+         empty, (CInit (CompoundInit(vi.vtype,[]))), vi.vtype,Lval.Set.empty)
   end else normal_init vi inite
 
 (* Consume some initializers. This is used by both global and local variables
