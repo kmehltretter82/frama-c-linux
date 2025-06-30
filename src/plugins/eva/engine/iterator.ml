@@ -252,7 +252,7 @@ module Make_Dataflow
 
   let sequence (f1 : transfer_function) (f2 : transfer_function)
     : transfer_function =
-    fun x -> List.fold_left (fun acc y -> f2 y @ acc) [] (f1 x)
+    fun x -> List.concat_map f2 (f1 x)
 
 
   (* Tries to evaluate \assigns … \from … clauses for assembly code. *)
