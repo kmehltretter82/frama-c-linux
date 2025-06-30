@@ -81,7 +81,3 @@ val set_extension_handler:
 *)
 [@@alert acsl_extension_handler
     "This function can only be called by Acsl_extension"]
-
-val register_shallow_attribute: string -> unit
-(** Register an attribute that will never be pretty printed. *)
-[@@deprecated "Register your attribute with Ast_attributes.register_noprint instead."]

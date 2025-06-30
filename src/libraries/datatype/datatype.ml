@@ -1603,9 +1603,6 @@ module Integer =
     end)
 let integer = Integer.ty
 
-module Filepath = String
-let filepath = Filepath.ty
-
 module Rational =
   Make_with_collections
     (struct

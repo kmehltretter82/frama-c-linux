@@ -594,9 +594,6 @@ val normalization_parameters: unit -> Typed_parameter.t list
     changing one will reset the AST entirely.contents
 *)
 
-module C11: Parameter_sig.Bool
-(** Behavior of option "-c11" *)
-
 module JsonCompilationDatabase: Parameter_sig.Filepath
 (** Behavior of option "-json-compilation-database" *)
 

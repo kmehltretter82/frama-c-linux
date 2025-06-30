@@ -338,15 +338,3 @@ let compare_ignore_case s1 s2 =
   String.compare
     (String.lowercase_ascii s1)
     (String.lowercase_ascii s2)
-
-
-(* ************************************************************************* *)
-(** Deprecated functions *)
-(* ************************************************************************* *)
-
-let mkdir ?parents:_ _ = failwith "deprecated"
-let safe_remove _ = failwith "deprecated"
-let safe_remove_dir _ = failwith "deprecated"
-let cleanup_at_exit _ = failwith "deprecated"
-let temp_file_cleanup_at_exit ?debug:_ _ = failwith "deprecated"
-let temp_dir_cleanup_at_exit ?debug:_ _ = failwith "deprecated"

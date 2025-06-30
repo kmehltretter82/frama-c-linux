@@ -3463,13 +3463,3 @@ let () = Cil.pp_identified_term_ref := pp_identified_term
 let () = Cil.pp_location_ref := pp_location
 let () = Cil.pp_from_ref := pp_from
 let () = Cil.pp_behavior_ref := pp_behavior
-
-(* Deprecated *)
-
-let register_shallow_attribute name =
-  match Ast_attributes.find_known name with
-  | None -> Kernel.warning ~once:true "Attribute '%s' is not registered" name
-  | Some info when not info.attr_print -> ()
-  | Some info ->
-    Ast_attributes.register_noprint ~ignore:info.attr_ignore
-      info.attr_class name

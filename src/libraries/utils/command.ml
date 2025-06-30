@@ -71,29 +71,6 @@ let _pp_status fmt = function
   | Unix.WSIGNALED s -> Format.fprintf fmt "sig[%d]" s
   | Unix.WSTOPPED s -> Format.fprintf fmt "stop[%d]" s
 
-let full_command cmd args ~stdin ~stdout ~stderr =
-  let pid =
-    Unix.create_process cmd (Array.concat [[|cmd|];args]) stdin stdout stderr
-  in
-  let _,status = Unix.waitpid [Unix.WUNTRACED] pid in
-  status
-
-let full_command_async cmd args ~stdin ~stdout ~stderr =
-  let pid =
-    Unix.create_process cmd (Array.concat [[|cmd|];args]) stdin stdout stderr
-  in
-  let last_result= ref(Not_ready (fun () -> Unix.kill pid Sys.sigkill))
-  in
-  (fun () ->
-     match !last_result with
-     | Result _ as r -> r
-     | Not_ready _ as r ->
-       let child_id,status =
-         Unix.waitpid [Unix.WNOHANG; Unix.WUNTRACED] pid
-       in
-       if child_id = 0 then r
-       else (last_result := Result status; !last_result))
-
 let flush b f =
   match b with
   | None -> ()
@@ -198,18 +175,3 @@ let spawn ?(timeout=0) ?stdout ?stderr cmd args =
     match f () with
     | Result r -> r
     | Not_ready _ -> assert false
-
-let command_async = async
-let command = spawn
-
-(* -------------------------------------------------------------------------- *)
-(* --- Deprecated file Utilities                                          --- *)
-(* -------------------------------------------------------------------------- *)
-
-let bincopy = Filesystem.bincopy [@alert "-deprecated"]
-let copy = Filesystem.copy_file
-let read_file p = Filesystem.with_open_in_exn p
-let read_lines = Filesystem.iter_lines
-let write_file p = Filesystem.with_open_out_exn p
-let pp_to_file = Filesystem.with_formatter_exn
-let print_file = Filesystem.with_formatter_exn

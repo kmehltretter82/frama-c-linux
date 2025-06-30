@@ -248,25 +248,6 @@ val safe_at_exit : (unit -> unit) -> unit
     for non-child process (fork). The order of execution is preserved
     {i wrt} ordinary calls to [Stdlib.at_exit]. *)
 
-val cleanup_at_exit: string -> unit
-[@@deprecated "Use Temp_files.cleanup_at_exit instead"]
-
-val temp_file_cleanup_at_exit: ?debug:bool -> string -> string -> string
-[@@deprecated "Use Temp_files.file instead"]
-
-val temp_dir_cleanup_at_exit: ?debug:bool -> string -> 'filepath
-[@@deprecated "Use Temp_files.dir instead"]
-
-val mkdir : ?parents:bool -> 'f -> Unix.file_perm -> bool
-[@@deprecated "Use Filesystem.make_dir instead"]
-
-val safe_remove: string -> unit
-[@@deprecated "Use Filesystem.remove_file instead"]
-
-val safe_remove_dir: string -> unit
-[@@deprecated "Use Filesystem.remove_dir instead"]
-
-
 (* ************************************************************************* *)
 (** {2 Comparison functions} *)
 (* ************************************************************************* *)
