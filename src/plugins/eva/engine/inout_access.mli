@@ -24,47 +24,64 @@
 
     The data is projectified and depends on the analysis state. *)
 
-(** Represents read and written memory zones. *)
-type t = {
+(** Represents a read and write access. *)
+type t = private {
   read : Locations.Zone.t;
-  written : Locations.Zone.t;
+  write : Locations.Zone.t;
 }
 
-val add_read : Analysis_location.t -> Locations.Zone.t -> unit
-(** [add_read aloc zone] adds the given [zone] as a "read" memory location to
-    the given [aloc]. *)
+module Access : sig
+  include Lattice_type.Bounded_Join_Semi_Lattice with type t := t
 
-val add_write : Analysis_location.t -> Locations.Zone.t -> unit
-(** [add_write aloc zone] adds the given [zone] as a "written" memory location
-    to the given [aloc]. *)
+  val make : ?read:Locations.Zone.t -> ?write:Locations.Zone.t -> unit -> t
+  (** [make ?read ?write ()] creates an [access] with the given [read] and
+      [write] as read and written memory locations. *)
+
+  val add_read : Locations.Zone.t -> t -> t
+  (** [add_read zone access] adds [zone] to the read memory locations in
+      [access]. *)
+
+  val add_write : Locations.Zone.t -> t -> t
+  (** [add_write zone access] adds [zone] to the written memory locations in
+      [access]. *)
+end
+
+val register_read : Analysis_location.t -> Locations.Zone.t -> unit
+(** [register_read aloc zone] adds the given [zone] as a "read" memory location
+    at the given [aloc]. *)
+
+val register_write : Analysis_location.t -> Locations.Zone.t -> unit
+(** [register_write aloc zone] adds the given [zone] as a "written" memory
+    location at the given [aloc]. *)
+
+val register : Analysis_location.t -> t -> unit
+(** [register aloc access] adds the given [access] to the accesses at the
+    given [aloc]. *)
 
 val mk_filter : filter_base:(Base.base -> bool) -> (t -> t)
-(** [mk_filter ~filter_base] creates a filter function for [Inout_memory] from
-    a function that filter bases. *)
+(** [mk_filter ~filter_base] creates a filter function for the functions below
+    from a function that filter bases. *)
 
 val keep_globals_only : t -> t
-(** [keep_globals_only memory] filters the given memory locations to only keep
+(** [keep_globals_only access] filters the given memory locations to only keep
     those coming from global bases (cf. {!Base.is_global}). *)
 
-val memory_at : ?filter:(t -> t) -> Analysis_location.t -> t
-(** [memory_at ?filter aloc] returns the read and written zones for the given
-    [aloc], filtered by [filter]. *)
+val at : ?filter:(t -> t) -> Analysis_location.t -> t
+(** [at ?filter aloc] returns the read and written zones for the given [aloc],
+    filtered by [filter]. *)
 
 val iter : ?filter:(t -> t) -> (Analysis_location.t -> t -> unit) -> unit
 (** [iter ?filter f] iterates over all analysis location where a read or write
-    of the memory occur and applies [f] on that memory. The memory is filtered
-    by [filter] before being passed to [f]. *)
+    access occurs and applies [f] on that access. The access is filtered by
+    [filter] before being passed to [f]. *)
 
 val fold : ?filter:(t -> t) ->
   (Analysis_location.t -> t -> 'acc -> 'acc) ->
   'acc ->
   'acc
 (** [fold ?filter f acc] folds over all analysis location where a read or write
-    of the memory occur and applies [f] on that memory. The memory is filtered
-    by [filter] being passed to [f]. *)
-
-val pretty_debug : Format.formatter -> t -> unit
-(** Pretty print read and written memory zones. *)
+    access occurs and applies [f] on that access. The access is filtered by
+    [filter] before being passed to [f]. *)
 
 val dump : ?filter:(t -> t) -> Format.formatter -> unit
 (** Dump the internal state regarding the read and written memory zones. The
