@@ -142,14 +142,15 @@ let _shared_var_summary =
 
   States.column model ~name:"bases"
     ~descr:(Markdown.plain "")
-    ~data:(module Data.Jlist (Data.Jstring))
+    ~data:(module Data.Jstring)
     ~get:(fun ((protected_access : Mt_summary.protected_access), _) ->
         let bases = Locations.Zone.get_bases protected_access.zone in
-        Base.SetLattice.fold
-          (fun base acc ->
-             Format.asprintf "%a" Base.pretty base :: acc)
-          bases
-          []);
+        match bases with
+        | Set bases ->
+          let base = Base.Hptset.choose bases in
+          Format.asprintf "%a" Base.pretty base
+        | Top ->
+          Format.asprintf "%t" Eval.Top.pretty_top);
 
   States.column model ~name:"zones"
     ~descr:(Markdown.plain "")

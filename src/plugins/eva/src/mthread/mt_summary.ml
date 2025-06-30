@@ -363,14 +363,25 @@ let compute_access_summary analysis =
 
   in
   AccessTable.clear ();
+  let add_zone_accesses zone accesses =
+    LocationsByAccess.iter
+      (fun (access_kind, protection_kind) locations ->
+         let access_key = { zone; access_kind; protection_kind } in
+         AccessTable.add access_key locations)
+      accesses
+  in
   ProtectedAccessesByZone.fold
-    (fun zone accesses () ->
+    (fun zones accesses () ->
        let accesses = Eval.Top.non_top accesses in
-       LocationsByAccess.iter
-         (fun (access_kind, protection_kind) locations ->
-            let access_key = { zone; access_kind; protection_kind } in
-            AccessTable.add access_key locations)
-         accesses)
+       try
+         Locations.Zone.fold_i
+           (fun base ivals () ->
+              let zone = Locations.Zone.inject base ivals in
+              add_zone_accesses zone accesses)
+           zones
+           ()
+       with Abstract_interp.Error_Top ->
+         add_zone_accesses Locations.Zone.top accesses)
     accesses_by_zone
     ();
   AccessTable.mark_as_computed ()
