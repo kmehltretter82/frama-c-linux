@@ -200,9 +200,9 @@ module Make
   module Transfer_inout = Transfer_inout.Make (Engine)
   include Cvalue_domain.Getters (Domain)
 
-  (* Most transfer functions about logic return a set of states instead of a
-     single state, and States.empty instead of bottom. We thus use this monad
-     to turn `Bottom into States.empty in the following for consistency. *)
+  (* Most transfer functions about logic return a list of states instead of a
+     single state, and an empty list instead of bottom. We thus use this monad
+     to turn `Bottom into [] in the following for consistency. *)
   let (>>-) state f = match state with
     | `Bottom -> []
     | `Value state -> f state
