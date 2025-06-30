@@ -11,50 +11,31 @@
 [eva] narrow_behaviors.i:56: 
   Frama_C_dump_each:
   # cvalue:
-  nondet ∈ {0}
-  p{.x; .y} ∈ {1}
-  q ∈ UNINITIALIZED
-  __retres ∈ UNINITIALIZED
-  ==END OF DUMP==
-[eva] narrow_behaviors.i:56: 
-  Frama_C_dump_each:
-  # cvalue:
   nondet ∈ [--..--]
   p.x ∈ {2}
    .y ∈ {1; 2}
   q ∈ UNINITIALIZED
   __retres ∈ UNINITIALIZED
   ==END OF DUMP==
+[eva] narrow_behaviors.i:56: 
+  Frama_C_dump_each:
+  # cvalue:
+  nondet ∈ {0}
+  p{.x; .y} ∈ {1}
+  q ∈ UNINITIALIZED
+  __retres ∈ UNINITIALIZED
+  ==END OF DUMP==
 [eva] computing for function f2 <- main.
   Called from narrow_behaviors.i:57.
 [eva] using specification for function f2
+[eva] Done for function f2
+[eva] computing for function f2 <- main.
+  Called from narrow_behaviors.i:57.
 [eva] narrow_behaviors.i:57: 
   function f2, behavior b: assumes got status invalid; behavior not evaluated.
 [eva] narrow_behaviors.i:57: 
   function f2, behavior c: assumes got status invalid; behavior not evaluated.
 [eva] Done for function f2
-[eva] computing for function f2 <- main.
-  Called from narrow_behaviors.i:57.
-[eva] Done for function f2
-[eva] narrow_behaviors.i:57: 
-  Frama_C_dump_each:
-  # cvalue:
-  nondet ∈ {0}
-  p{.x; .y} ∈ {1}
-  q.x ∈ {1; 2}
-   .y ∈ {1}
-  __retres ∈ UNINITIALIZED
-  ==END OF DUMP==
-[eva] narrow_behaviors.i:57: 
-  Frama_C_dump_each:
-  # cvalue:
-  nondet ∈ {0}
-  p.x ∈ {2}
-   .y ∈ {1; 2}
-  q.x ∈ {1; 2}
-   .y ∈ {1}
-  __retres ∈ UNINITIALIZED
-  ==END OF DUMP==
 [eva] narrow_behaviors.i:57: 
   Frama_C_dump_each:
   # cvalue:
@@ -65,7 +46,25 @@
    .y ∈ {1; 2}
   __retres ∈ UNINITIALIZED
   ==END OF DUMP==
-[eva] narrow_behaviors.i:61: assertion got status valid.
+[eva] narrow_behaviors.i:57: 
+  Frama_C_dump_each:
+  # cvalue:
+  nondet ∈ {0}
+  p.x ∈ {2}
+   .y ∈ {1; 2}
+  q.x ∈ {1; 2}
+   .y ∈ {1}
+  __retres ∈ UNINITIALIZED
+  ==END OF DUMP==
+[eva] narrow_behaviors.i:57: 
+  Frama_C_dump_each:
+  # cvalue:
+  nondet ∈ {0}
+  p{.x; .y} ∈ {1}
+  q.x ∈ {1; 2}
+   .y ∈ {1}
+  __retres ∈ UNINITIALIZED
+  ==END OF DUMP==
 [eva:alarm] narrow_behaviors.i:61: Warning: assertion got status unknown.
 [eva] computing for function f1 <- main.
   Called from narrow_behaviors.i:62.
