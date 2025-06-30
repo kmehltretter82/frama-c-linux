@@ -18,6 +18,8 @@
 Open Source Release <next-release>
 ###############################################################################
 
+-*  Kernel    [2025-06-30] Do not define __STDC_* macros in logic_preprocess,
+              avoiding spurious warnings from preprocessor (fix #@1536)
 -*  Alias     [2025-06-23] Fix bug in fixpoint condition of dataflow analysis
 
 ###############################################################################
