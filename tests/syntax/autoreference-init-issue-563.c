@@ -26,7 +26,6 @@ void f() {
       { 0, &arr_1[1], &arr_1[1] },
       { 1, &arr_1[0], &arr_1[0] }
     };
-  // A temporary variable is created here, even if not needed.
   struct s *x = malloc(sizeof(x) + sizeof(int)*10);
   #endif
 

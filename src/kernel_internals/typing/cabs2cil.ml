@@ -8625,8 +8625,9 @@ and createGlobal loc ghost logic_spec ((t,s,b,attr_list) : (typ * storage * bool
    There are some cases where the evaluation will succeed, though, e.g. with
    size_t x = sizeof(x) > 6 ? sizeof(x): 6;
 *)
-and cleanup_autoreference vi chunk =
+and cleanup_autoreference vi chunk ie =
   let open Current_loc.Operators in
+  let exception Ignore in
   let temp = ref None in
   let calls = ref [] in
   let extract_calls () =
@@ -8644,6 +8645,21 @@ and cleanup_autoreference vi chunk =
         | Call _ | Local_init(_,ConsInit _,_) ->
           calls := ref (Option.get self#current_stmt) :: !calls;
           DoChildren
+        | _ -> DoChildren
+
+      method! vstmt s =
+        (* No need to check/cleanup autoreferences if this call is collapsed
+           later. We raise an exception to make sure lvalues from the chunk are
+           not visited either. *)
+        match s.skind, ie with
+        | Instr (Call (Some (Var v1, NoOffset), f, _, _)),
+          SingleInit { enode = Lval (Var v1', NoOffset) }
+          when can_collapse v1 v1' (Cil.var vi) vi.vtype f ->
+          raise Ignore
+        | Instr (Call (Some (Var v1, NoOffset), f, _, _)),
+          SingleInit { enode = CastE(newt, { enode = Lval(Var v1', NoOffset)}) }
+          when can_collapse v1 v1' (Cil.var vi) newt f ->
+          raise Ignore
         | _ -> DoChildren
 
       method! vexpr e =
@@ -8677,14 +8693,16 @@ and cleanup_autoreference vi chunk =
   let transform_lvals ~update l =
     List.map (visitCilLval (vis ~update)) l
   in
-  let treat_one (s, m, w, r, _) =
+  let treat_one (s, m, w, r, c) =
     let<> UpdatedCurrentLoc = Cil_datatype.Stmt.loc s in
-    let s' = visitCilStmt (vis ~update:false) s in
-    let m' = transform_lvals ~update:true m in
-    let w' = transform_lvals ~update:true w in
-    let r' = transform_lvals ~update:false r in
-    let c' = extract_calls () in
-    (s', m', w', r', c')
+    try
+      let s' = visitCilStmt (vis ~update:false) s in
+      let m' = transform_lvals ~update:true m in
+      let w' = transform_lvals ~update:true w in
+      let r' = transform_lvals ~update:false r in
+      let c' = extract_calls () in
+      (s', m', w', r', c')
+    with Ignore -> (s, m, w, r, c)
   in
   let stmts = List.map treat_one chunk.stmts in
   match !temp with
@@ -8928,7 +8946,7 @@ and createLocal ghost ((_, sto, _, _) as specs)
       let se4, ie', et, r =
         doInitializer loc (ghost_local_env ghost) vi inite
       in
-      let se4 = cleanup_autoreference vi se4 in
+      let se4 = cleanup_autoreference vi se4 ie' in
       (* Fix the length *)
       if Ast_types.is_unsized_array vi.vtype && Ast_types.is_sized_array et
       then
