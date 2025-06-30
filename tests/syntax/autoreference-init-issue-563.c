@@ -2,7 +2,6 @@
    STDOPT: #"-cpp-extra-args=-DCORRECTINIT"
    EXIT: 1
    STDOPT: #"-cpp-extra-args=-DAUTOINIT"
-   EXIT: 0
    STDOPT: #"-cpp-extra-args=-DADDREFFECTS"
 */
 
@@ -43,10 +42,11 @@ void f() {
   #endif
 
   #ifdef ADDREFFECTS
-  // The side-effect to affect 'y' is done outside the initialization for the
-  // same reason than 'b'. Since 'arr_2' does not exist at this point it's
-  // replaced by a temporary variable, thus the addresses won't match.
-  // The solution suggested above would also fix this case.
+  // Unsupported by Frama-C.
+  //
+  // The address of 'arr_2' needs to be available before its initialization for
+  // the same reasons than the exampe above. The suggested solution would also
+  // fix this case.
   struct _cell *y;
   struct _cell arr_2[2] = {
       { 0, (y = &arr_2[1], &arr_2[1]), &arr_2[1] },

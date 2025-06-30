@@ -8646,6 +8646,15 @@ and cleanup_autoreference vi chunk =
           DoChildren
         | _ -> DoChildren
 
+      method! vexpr e =
+        match e.enode with
+        | AddrOf (Var v, _) when Cil_datatype.Varinfo.equal v vi ->
+          Errorloc.abort_context
+            "Attempting to take %s address ('%a') inside its own initialization \
+             with side effects (not supported by frama-c)."
+            vi.vname Cil_printer.pp_exp e
+        | _ -> DoChildren
+
       method! vvrbl v =
         if Cil_datatype.Varinfo.equal v vi then begin
           if update then
