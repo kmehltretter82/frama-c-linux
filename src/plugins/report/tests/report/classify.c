@@ -1,5 +1,5 @@
 /* run.config
-   CMD: @frama-c@ -kernel-warn-key=annot-error=active -report-output @PTEST_RESULT@/classified.@PTEST_NUMBER@.json -wp -wp-msg-key shell
+   CMD: @frama-c@ -kernel-warn-key=annot-error=active -report-output @PTEST_RESULT_DIR@/classified.@PTEST_NUMBER@.json -wp -wp-msg-key shell
 PLUGIN: wp,rtegen,report
    LOG: classified.@PTEST_NUMBER@.json
    OPT: -wp-prover qed -report-unclassified-untried REVIEW -then -report-classify

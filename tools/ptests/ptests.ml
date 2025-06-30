@@ -225,7 +225,7 @@ let example_msg =
      @@PTEST_NUMBER@@          # Test command number.@  \
      @@PTEST_CONFIG@@          # Test configuration suffix.@  \
      @@PTEST_SUITE_DIR@@       # Path to the directory contained the source of the test file (../).@  \
-     @@PTEST_RESULT@@          # Shorthand alias to @@PTEST_SUITE_DIR@@/result@@PTEST_CONFIG@@ (the result directory dedicated to the tested configuration).@  \
+     @@PTEST_RESULT_DIR@@      # Shorthand alias to @@PTEST_SUITE_DIR@@/result@@PTEST_CONFIG@@ (the result directory dedicated to the tested configuration).@  \
      @@PTEST_ORACLE@@          # Basename of the current oracle file (macro only usable in FILTER directives).@  \
      @@PTEST_DEFAULT_OPTIONS@@ # The default option list: %s@  \
      @@PTEST_LIBS@@            # The current list of modules defined by the LIBS directive.@  \
@@ -490,6 +490,16 @@ module Macros = struct
 
   let empty = StringMap.empty
 
+  let deprecated =
+    StringMap.empty
+    |> StringMap.add "PTEST_RESULT" "Please use PTEST_RESULT_DIR instead"
+
+  let warn_if_deprecated file macro =
+    try
+      let msg = StringMap.find macro deprecated in
+      Format.printf "%% %s: Macro %s is deprecated. %s.\n" file macro msg
+    with Not_found -> ()
+
   let pp_macros fmt macros =
     Format.fprintf fmt "Macros (%d):@."  (StringMap.cardinal macros);
     StringMap.iter (fun key data -> Format.fprintf fmt "- %s -> %s@." key data) macros;
@@ -521,6 +531,7 @@ module Macros = struct
           | Str.Delim s ->
             match str_string_match1 macro_regex s 0  with
             | Some macro -> begin
+                warn_if_deprecated file macro;
                 (match macro with
                  | "PTEST_FILE" -> has_ptest_file := true
                  | "PTEST_OPT" -> has_ptest_opt := true
@@ -687,6 +698,7 @@ end = struct
         "PTEST_DIR", ".";
         "PTEST_SHARE_DIR", "../../../share";
         "PTEST_RESULT", ".";
+        "PTEST_RESULT_DIR", ".";
         "PTEST_SUITE_DIR", "..";
         "PTEST_FILE", ptest_file;
         "PTEST_NAME", ptest_name;

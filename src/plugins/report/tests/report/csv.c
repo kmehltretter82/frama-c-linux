@@ -1,7 +1,7 @@
 /* run.config
 PLUGIN: report from,inout,scope,eva
    LOG: csv.csv
-   OPT: -eva-warn-copy-indeterminate=-main4 -eva -eva-show-progress -eva-remove-redundant-alarms -eva-warn-key=alarm=inactive -then -report-csv @PTEST_RESULT@/csv.csv -report-no-proven -then -report-csv= -eva-warn-key=alarm -eva-slevel 1
+   OPT: -eva-warn-copy-indeterminate=-main4 -eva -eva-show-progress -eva-remove-redundant-alarms -eva-warn-key=alarm=inactive -then -report-csv @PTEST_RESULT_DIR@/csv.csv -report-no-proven -then -report-csv= -eva-warn-key=alarm -eva-slevel 1
    COMMENT: first, do an analysis without any message, but check that the .csv is complete. Then, redo the analysis with value warnings. slevel 1 is just there to force Value to restart
 */
 volatile int v;
@@ -33,9 +33,9 @@ void main3() {
   double r = pow(f1, f2);
 }
 
-/*@ 
+/*@
   requires \false;
-  terminates \false; 
+  terminates \false;
   assigns \nothing;
 */
 void __FC_assert(const char* file,int line,const char*expr);

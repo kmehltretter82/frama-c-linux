@@ -31,7 +31,7 @@ help() {
 Usage: $0 framac_exe result_dir test_name test_file output_name opts fc_opts filter_cmd
 Args:
   framac_exe    @frama-c-exe@ in test_config
-  result_dir    @PTEST_RESULT@ in test_config
+  result_dir    @PTEST_RESULT_DIR@ in test_config
   test_name     @PTEST_NAME@ in test_config
   test_file     @PTEST_FILE@ in test_config
   output_name   Output file given to LOG in test_config
