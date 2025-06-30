@@ -299,6 +299,7 @@ module Precedence = struct
     (* Multiplicative *)
     | BinOp((Div|Mod|Mult),_,_,_) -> multiplicativeLevel
     (* Unary *)
+    | StartOf(lv) when Ast_info.is_string_literal lv -> 0
     | CastE(_,_)
     | AddrOf(_)
     | StartOf(_)
@@ -918,7 +919,7 @@ class cil_printer () = object (self)
   method init_or_str fmt i =
     match i with
     | CInit i -> self#init fmt i
-    | StrInit s -> Format.fprintf fmt "%S" s
+    | StrInit s -> Format.fprintf fmt "\"%s\"" (Escape.escape_string s)
     | WStrInit l -> pp_wstring fmt l
 
   (** What terminator to print after an instruction. sometimes we want to
