@@ -1,8 +1,9 @@
 /* run.config
    STDOPT: #"-cpp-extra-args=-DCORRECTINIT"
-   STDOPT: #"-cpp-extra-args=-DAUTOINIT"
-   STDOPT: #"-cpp-extra-args=-DADDREFFECTS"
    EXIT: 1
+   STDOPT: #"-cpp-extra-args=-DAUTOINIT"
+   EXIT: 0
+   STDOPT: #"-cpp-extra-args=-DADDREFFECTS"
 */
 
 #include <stdlib.h>
@@ -31,13 +32,13 @@ void f() {
   #endif
 
   #ifdef AUTOINIT
+  // Unsupported by Frama-C
+  //
   // The side-effect to affect 'b' needs to be done outside the initialization
   // because Frama-C's internal AST does not allow side-effects in expressions.
   // Ideally we would like to declare 'b' and then do a undefined sequence
   // between the affectation and the initialization, but Frama-C does not allow
   // to do that trivially.
-  // At the moment a temporary variable is created to do the affectation but
-  // is not used affterward, so the transformation is erroneous.
   int b[4]={ b[2], 42, b[3] = 1 };
   #endif
 

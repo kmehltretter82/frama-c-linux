@@ -8626,6 +8626,7 @@ and createGlobal loc ghost logic_spec ((t,s,b,attr_list) : (typ * storage * bool
    size_t x = sizeof(x) > 6 ? sizeof(x): 6;
 *)
 and cleanup_autoreference vi chunk =
+  let open Current_loc.Operators in
   let temp = ref None in
   let calls = ref [] in
   let extract_calls () =
@@ -8633,7 +8634,9 @@ and cleanup_autoreference vi chunk =
     calls := [];
     res
   in
-  let vis =
+  (* [update] is used to know if the current lvalue is being updated
+     (modified/write) in the chunk. *)
+  let vis ~update =
     object(self)
       inherit Cil.nopCilVisitor
 
@@ -8645,6 +8648,10 @@ and cleanup_autoreference vi chunk =
 
       method! vvrbl v =
         if Cil_datatype.Varinfo.equal v vi then begin
+          if update then
+            Errorloc.abort_context
+              "Attempting to write %s inside its own initialization \
+               (not supported by frama-c)." vi.vname;
           match !temp with
           | Some v' -> ChangeTo v'
           | None ->
@@ -8658,12 +8665,15 @@ and cleanup_autoreference vi chunk =
         end else SkipChildren
     end
   in
-  let transform_lvals l = List.map (visitCilLval vis) l in
+  let transform_lvals ~update l =
+    List.map (visitCilLval (vis ~update)) l
+  in
   let treat_one (s, m, w, r, _) =
-    let s' = visitCilStmt vis s in
-    let m' = transform_lvals m in
-    let w' = transform_lvals w in
-    let r' = transform_lvals r in
+    let<> UpdatedCurrentLoc = Cil_datatype.Stmt.loc s in
+    let s' = visitCilStmt (vis ~update:false) s in
+    let m' = transform_lvals ~update:true m in
+    let w' = transform_lvals ~update:true w in
+    let r' = transform_lvals ~update:false r in
     let c' = extract_calls () in
     (s', m', w', r', c')
   in
