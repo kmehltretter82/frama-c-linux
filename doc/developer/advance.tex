@@ -582,8 +582,9 @@ modify or disable test cases.
 \hline
 \texttt{FILTER}\nscodeidxdef{Test!Directive}{FILTER}
 & Command reading the standard input used to filter results.
-In such a command, the predefined macro \texttt{@PTEST\_ORACLE@} is set to the
-basename of the oracle.
+  In such a command, the predefined macros \texttt{@PTEST\_ORACLE@} and
+  \texttt{@PTEST\_RESULT\_FILE@} are set respectively to the basename of the
+  oracle and the result.
 & \textit{None}
 \\
 \hline
@@ -754,13 +755,17 @@ In the following, we detail some aspects of several directives.
   a transformation on the test result files before the comparison to the oracles.
   The filtering command read the result from the standard input and the oracle
   will be compared with the standard output of that command.
-  In such a directive, the predefined macro \texttt{@PTEST\_ORACLE@} is set to the
-  basename of the oracle.
-  That allows running a \texttt{diff} command with the oracle of another
-  test configuration \texttt{config}:
+  In such a directive, the predefined macros \texttt{@PTEST\_ORACLE@} and
+  \texttt{@PTEST\_RESULT\_FILE@} are set respectively to the basename of the
+  oracle and the result.
+  That allows running a \texttt{diff} command with the oracle or result of
+  another test configuration \texttt{config}:
   \begin{code}
-FILTER: diff --new-file @PTEST_DIR@/oracle_config/@PTEST_ORACLE@ -
+FILTER: diff --new-file %{dep:@PTEST_SUITE_DIR@/result_config/@PTEST_RESULT_FILE@} -
   \end{code}
+  It is recommended to run \texttt{diff} against \texttt{@PTEST\_RESULT\_FILE@}
+  so that the dependencies between test configuration are correctly set up by
+  the build system.
   Chaining multiple filter commands is possible by defining several \texttt{FILTER} directives (they are applied in the reverse order),
   and an empty command drops the previous \texttt{FILTER} directives.
 \item The \texttt{DEPS}\nscodeidx{Test!Directive}{DEPS} directive takes a set
@@ -835,10 +840,12 @@ name of the current alternative configuration
 fact two independent numbering schemes: one for \verb|EXECNOW| commands and
 one for regular tests (if more than one \verb|OPT|).\\
 \hline
-\verb|PTEST_RESULT| & shorthand alias to \verb|@PTEST_DIR@/result@PTEST_CONFIG@|
+\verb|PTEST_RESULT_DIR| & shorthand alias to \verb|@PTEST_DIR@/result@PTEST_CONFIG@|
 (the result directory dedicated to the tested configuration)\\
 \hline
 \verb|PTEST_ORACLE| & basename of the current oracle file (macro only usable in FILTER directives)\\
+\hline
+\verb|PTEST_RESULT_FILE| & basename of the current result file (macro only usable in FILTER directives)\\
 \hline
 \verb|PTEST_DEFAULT_OPTIONS| & the default option list: \verb|-check| \verb|-no-autoload-plugins|\\
 \hline

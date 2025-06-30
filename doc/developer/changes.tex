@@ -7,7 +7,14 @@ This chapter summarizes the major changes in this documentation between each
 
 % \section*{Frama-C+dev}
 
-%\section*{Frama-C+dev}
+\section*{Frama-C+dev}
+\begin{itemize}
+  \item \textbf{Ptests}: Deprecate \texttt{PTEST\_RESULT} and introduce
+    \texttt{PTEST\_RESULT\_DIR} instead.
+  \item \textbf{Ptests}: Introduce \texttt{PTEST\_RESULT\_FILE} representing the
+    basename of the result file of the current test (only usable in
+    \texttt{FILTER} macro).
+\end{itemize}
 
 \section*{31.0 (Gallium)}
 \begin{itemize}
