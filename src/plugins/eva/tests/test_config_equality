@@ -7,7 +7,7 @@ MACRO: EVA_TEST -eva @EVA_CONFIG@ -out -input -deps
 MACRO: RTE_TEST -rte -no-warn-invalid-pointer
 
 # Compare the result with the oracle of the default config.
-FILTER: diff --new-file %{dep:@PTEST_SUITE_DIR@/oracle/@PTEST_ORACLE@} -
+FILTER: diff --new-file %{dep:@PTEST_SUITE_DIR@/result/@PTEST_RESULT_FILE@} -
 
 PLUGIN: @EVA_PLUGINS@
 OPT: @EVA_TEST@
