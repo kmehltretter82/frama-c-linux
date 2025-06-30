@@ -5,6 +5,13 @@
    STDOPT: #"-cpp-extra-args=-DADDREFFECTS"
 */
 
+/* This file test several forms of autoreferences in initializations.
+   Autoreferences are technically allowed and useful in some cases, but it can
+   lead to undefined behaviors. As of now it is difficult to handle certain
+   cases in Frama-C, which rarely occur in real code, so we reject these codes
+   for now.
+*/
+
 #include <stdlib.h>
 
 struct s {

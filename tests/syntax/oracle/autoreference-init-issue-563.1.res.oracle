@@ -1,10 +1,10 @@
 [kernel] Parsing autoreference-init-issue-563.c (with preprocessing)
-[kernel] autoreference-init-issue-563.c:40: User Error: 
+[kernel] autoreference-init-issue-563.c:47: User Error: 
   Attempting to write b inside its own initialization (not supported by frama-c).
-  38      // between the affectation and the initialization, but Frama-C does not allow
-  39      // to do that trivially.
-  40      int b[4]={ b[2], 42, b[3] = 1 };
+  45      // between the affectation and the initialization, but Frama-C does not allow
+  46      // to do that trivially.
+  47      int b[4]={ b[2], 42, b[3] = 1 };
                                       ^
-  41      #endif
-  42
+  48      #endif
+  49
 [kernel] Frama-C aborted: invalid user input.
