@@ -137,29 +137,19 @@ let stmt_mt_status subtrace get_state stmt =
          (* Some mthreads events deeper in the stack. *)
          MTIndirectCall !deep_calls
        | false, false ->
-         (* This case is supposed to handle [*p(...)], with
-            [p] pointing to both an Mthread function and a non-Mthread
-            one. If we inline callbacks, it also catches
-            calls to Mthread functions that access global variables,
-            which is often the case (eg. the index of a mutex, etc). *)
-         if Mt_options.PopTopFunctionForCallbacks.get () then
-           Mt_options.abort ?source:(Mt_cil.kinstr_to_source (Kstmt stmt))
-             "Unhandled@ case@ during@ cfg@ building.@ Try@ to@ \
-              deactivate@ option %s"
-             Mt_options.PopTopFunctionForCallbacks.option_name
-         else (
-           Mt_options.debug "%a"
-             (Pretty_utils.pp_list
-                (fun fmt (selt, subtrace) ->
-                   Format.fprintf fmt "@[<v>-- %a@.%a@]"
-                     Mt_cil.StackElt.pretty selt
-                     Trace.pretty subtrace
-                )) callsites;
-           Mt_options.abort ?source:(Mt_cil.kinstr_to_source (Kstmt stmt))
-             "@[simultaneous@ call@ to@ a@ mthread@ function@ and@ \
-              to@ another@ function:@ very@ strangely@ written@ \
-              mthread@ binding?@]";
-         )
+         (* This case is supposed to handle [*p(...)], with [p] pointing to
+            both an Mthread function and a non-Mthread one. *)
+         Mt_self.debug "%a"
+           (Pretty_utils.pp_list
+              (fun fmt (selt, subtrace) ->
+                 Format.fprintf fmt "@[<v>-- %a@.%a@]"
+                   Mt_cil.StackElt.pretty selt
+                   Trace.pretty subtrace
+              )) callsites;
+         Mt_self.abort ?source:(Mt_cil.kinstr_to_source (Kstmt stmt))
+           "@[simultaneous@ call@ to@ a@ mthread@ function@ and@ \
+            to@ another@ function:@ very@ strangely@ written@ \
+            mthread@ binding?@]";
       )
     | Instr _ ->
       maybe_basic ()
@@ -176,7 +166,7 @@ let stmt_mt_status subtrace get_state stmt =
       Complex
 
     | TryFinally _ | TryExcept _ | Throw _ | TryCatch _ ->
-      Mt_options.not_yet_implemented "try finally/except/throw/catch"
+      Mt_self.not_yet_implemented "try finally/except/throw/catch"
 ;;
 
 let rec make_cfg_aux ~eop ~subtrace ~caller_succ callstack =
@@ -191,7 +181,7 @@ let rec make_cfg_aux ~eop ~subtrace ~caller_succ callstack =
     | None -> (* Can happen in the root thread function, if
                  nothing multithreaded happens, but we handle this case
                  explicitly *)
-      Mt_options.fatal "No events at subtrace %a" Callstack.pretty callstack
+      Mt_self.fatal "No events at subtrace %a" Callstack.pretty callstack
     | Some { Trace.trace_states = states;
              Trace.trace_states_after = states_after } ->
       assert (Stmt.Map.cardinal states > 0);
@@ -229,12 +219,12 @@ let rec make_cfg_aux ~eop ~subtrace ~caller_succ callstack =
          call it *)
       let next () =
         match stmt.succs with
-        | [] -> Mt_options.fatal
+        | [] -> Mt_self.fatal
                   ?source:(Mt_cil.kinstr_to_source (Kstmt stmt))
                   "Statement with no successor encountered at \
                    an unexpected place (sid %d)" stmt.sid
         | [stmt'] -> aux stmt'
-        | _ :: _ :: _ -> Mt_options.fatal
+        | _ :: _ :: _ -> Mt_self.fatal
                            ?source:(Mt_cil.kinstr_to_source (Kstmt stmt))
                            "Statement with more than one successor encountered at an \
                             unexpected place: (sid %d), succs %a"
@@ -329,7 +319,7 @@ let rec make_cfg_aux ~eop ~subtrace ~caller_succ callstack =
               st, se
             | [], [], [s; s'] when s.sid = s'.sid ->
               s, s
-            | _ -> Mt_options.fatal
+            | _ -> Mt_self.fatal
                      "Strange looking if: %a, (%a) as succs"
                      Printer.pp_stmt stmt pretty_succs stmt
           in
@@ -387,10 +377,10 @@ let rec make_cfg_aux ~eop ~subtrace ~caller_succ callstack =
           set (NSwitch (stmt, e, l))
 
         | TryFinally _ | TryExcept _ | Throw _ | TryCatch _ ->
-          Mt_options.not_yet_implemented "try finally/try except"
+          Mt_self.not_yet_implemented "try finally/try except"
   in
   match (Kernel_function.get_definition f).sbody.bstmts with
-  | [] -> Mt_options.abort "Function with empty body: %s"
+  | [] -> Mt_self.abort "Function with empty body: %s"
             (Kernel_function.get_name f)
   | s :: _ -> aux s
 ;;
@@ -517,7 +507,7 @@ let remove_node ~keep a =
       if l' = [] then
         (* All subcalls are been recursively removed: remove [a] too *)
         match !succ with
-        | None -> Mt_options.fatal "Impossible case in cfg NCall removal"
+        | None -> Mt_self.fatal "Impossible case in cfg NCall removal"
         | Some succ -> replace_by_succ succ
       else
         (a.cfgn_kind <- NCall (stmt, List.split l');
@@ -746,7 +736,7 @@ let dot_fprint_graph fmt start_tg link_stmt =
                let caller = caller_in_stack 0 prevs in
                do_edge ~etype:Return caller
              with NoCaller ->
-               Mt_options.error "Strange stack in cfg, please report@.%a"
+               Mt_self.error "Strange stack in cfg, please report@.%a"
                  CfgNode.pretty_kinds_node_list prevs
           )
 
@@ -830,7 +820,7 @@ let compute_node_context th mutexes iter state node =
   let extract v = match v with
     | `Success v -> v
     | `WithWarning (mess, v) ->
-      Mt_options.warning "%a: %t" CfgNode.pretty_with_stmts node mess; v
+      Mt_self.warning "%a: %t" CfgNode.pretty_with_stmts node mess; v
   in
   let mutexes =
     Mutex.Set.fold

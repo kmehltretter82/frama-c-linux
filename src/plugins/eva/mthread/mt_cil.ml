@@ -26,7 +26,7 @@ open Cil_types
 let mthread_global_var var_name () =
   try Globals.Vars.find_from_astinfo var_name Global
   with Not_found ->
-    Mt_options.fatal
+    Mt_self.fatal
       "Variable@ %s@ not@ found.@ It@ should@ be@ in@ %a."
       var_name Filepath.pretty (Mt_lib.mthread_h ())
 

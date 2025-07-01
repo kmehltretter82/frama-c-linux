@@ -20,17 +20,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** {1 Auxiliary definitions and functions for pretty-printing } *)
-
-(** Partially applied format-like function missing a "%a" argument *)
-type poly_format_quote_a =
-  { pf: 'a. (Format.formatter -> 'a -> unit) -> 'a -> unit }
-
-(** Partially applied Log.pretty_printer value, missing its entire formatter
-    (and the arguments) *)
-type poly_pretty_printer =
-  { ppp: 'a. ('a, Format.formatter, unit) format -> 'a }
-
 
 let compare_tag (v1 : 'a) (v2 : 'a) =
   let o1 = Obj.repr v1 and o2 = Obj.repr v2 in
@@ -55,7 +44,7 @@ type 'a conversion_with_warning = [
 ]
 
 type 'a conversion = [
-  | 'a conversion_with_warning
+  | `Success of 'a
   | `Failure of (Format.formatter -> unit)
 ]
 
@@ -115,7 +104,7 @@ let clear_value_results () =
 ;;
 
 let mthread_h () =
-  Mt_options.MThread.Share.get_file "mthread.h";;
+  Mt_self.Share.get_file "mthread.h";;
 
 
 let sanitize_filename ?(char='_') s =

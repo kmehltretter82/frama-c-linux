@@ -4,8 +4,8 @@
  */
 /* This example tests a very specific error message withing message, a call
    through a function pointer calls simultaneously a standard function
-   and an mthread function. Indirectly, this also tests option
-   -mt-inline-callbacks */
+   and an mthread function. */
+
 #include "mthread_pthread.h"
 #include "mthread_queue.h"
 #define NULL ((void*)0)

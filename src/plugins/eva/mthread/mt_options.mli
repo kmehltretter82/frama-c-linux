@@ -20,11 +20,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module MThread: Plugin.S
-
-include Log.Messages
-val debug_level: unit -> int
-
 (** behavior of option -mthread. *)
 module Enabled: Parameter_sig.Bool
 
@@ -88,6 +83,3 @@ module KeepGreenNodes: Parameter_sig.Bool
 
 (** behavior of option -mt-return-edges. *)
 module ShowReturnEdges: Parameter_sig.Bool
-
-(** behavior of option -mt-inline-callbacks. *)
-module PopTopFunctionForCallbacks: Parameter_sig.Bool

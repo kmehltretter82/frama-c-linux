@@ -237,7 +237,7 @@ module Html = struct
             Hashtbl.find table.rows.from_id i
           with
           | Not_found ->
-            Mt_options.fatal "@[Row %d not found@]@." i
+            Mt_self.fatal "@[Row %d not found@]@." i
         in
 
         let pp_cells fmt cell_array =
@@ -360,7 +360,7 @@ module Html = struct
         List.map snd
       in
       assert ((Thread.Hashtbl.length mq_table) > 0);
-      Mt_options.debug "%d queues found@." (Thread.Hashtbl.length mq_table);
+      Mt_self.debug "%d queues found@." (Thread.Hashtbl.length mq_table);
       Some (mq_table, QueueTable.mk queue_olist (List.map (fun th -> th.th_eva_thread) th_list));
     end
   ;;
@@ -506,7 +506,7 @@ module Html = struct
     let with_open_out = Out_channel.with_open_gen flags 0o666 output in
     try with_open_out (fun cout -> with_open_in (fun cin -> copy cin cout))
     with e ->
-      Mt_options.error
+      Mt_self.error
         "Error while appending dot file %s to %s: %s"
         input output (Printexc.to_string e)
 
@@ -529,8 +529,8 @@ module Html = struct
     let output_file = Filename.concat default_dir link_fname in
     let args = [ "-Tsvg"; tmp_file; "-o"; output_file ] in
     let fail s =
-      Mt_options.error "%s when generating graph for thread %a. \
-                        Run 'dot %s' to restart generation"
+      Mt_self.error "%s when generating graph for thread %a. \
+                     Run 'dot %s' to restart generation"
         s ThreadState.pretty th (String.concat " " args)
     in
     begin
@@ -538,7 +538,7 @@ module Html = struct
         let ret = Command.spawn ~timeout:60 "dot" args in
         match ret with
         | Unix.WEXITED 0 ->
-          Mt_options.debug "remove %s\n" tmp_file;
+          Mt_self.debug "remove %s\n" tmp_file;
           Sys.remove tmp_file
         | Unix.WEXITED code ->
           fail (Printf.sprintf "Error (code %d)" code)
@@ -580,7 +580,7 @@ module Html = struct
     let unicode = suspend_unicode () in
     let name = "thread_inheritance_graph" in
     let tmp_file, otmp = Filename.open_temp_file name ".dot" in
-    Mt_options.debug "Open %s for writing@." tmp_file;
+    Mt_self.debug "Open %s for writing@." tmp_file;
     let fmt = Format.formatter_of_out_channel otmp in
     TGDot.fprint_graph fmt graph;
     close_out otmp;
@@ -591,8 +591,8 @@ module Html = struct
         dot_output_format tmp_file output_file in
     let ret = Sys.command cmd in
     if ret <> 0 then
-      Mt_options.error "Something bad happened when running %s" cmd;
-    Mt_options.debug "remove %s\n" tmp_file;
+      Mt_self.error "Something bad happened when running %s" cmd;
+    Mt_self.debug "remove %s\n" tmp_file;
     Sys.remove tmp_file;
     Kernel.Unicode.set unicode;
     link_fname
@@ -649,7 +649,7 @@ module Html = struct
   let css_content =
     lazy (
       let css_file =
-        (Mt_options.MThread.Share.get_file "mthread.css" :> string)
+        (Mt_self.Share.get_file "mthread.css" :> string)
       in
       try
         let ic = open_in css_file in
@@ -659,7 +659,7 @@ module Html = struct
         close_in ic;
         Buffer.contents b
       with Sys_error _ ->
-        Mt_options.warning "Cannot open mthread css '%s'" css_file;
+        Mt_self.warning "Cannot open mthread css '%s'" css_file;
         ""
     )
   ;;
@@ -667,7 +667,7 @@ module Html = struct
 
   let pp_page page =
     let file = Filename.concat default_dir page.page_name ^ ".html" in
-    Mt_options.debug "Open %s@." file;
+    Mt_self.debug "Open %s@." file;
     let ofile = open_out file in
     let fmt = Format.formatter_of_out_channel ofile in
     Format.pp_set_formatter_stag_functions fmt html_stag_functions;
@@ -833,7 +833,7 @@ module Eva_results = struct
     in
     let all_results = Thread.Hashtbl.fold aux_th ths [] in
     match all_results with
-    | [] -> Mt_options.error "No results recorded. Nothing to display"
+    | [] -> Mt_self.error "No results recorded. Nothing to display"
     | r :: qr ->
       let all = List.fold_left Eva_results.merge r qr in
       Eva_results.set_results all

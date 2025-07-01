@@ -96,12 +96,12 @@ let apply_analysis_hooks () =
 (* Perform an entire mthread execution, based on the ast and options of the
    given project *)
 let mthread_run project =
-  Mt_options.warning
+  Mt_self.warning
     "Mthread is an experimental plugin and is still in development.";
 
   if not (Mt_options.ConcatDotFilesTo.is_empty ()) &&
      not (Mt_options.ExtractModels.mem "html") then
-    Mt_options.error "Option %S needs option \"%s html\" to work."
+    Mt_self.error "Option %S needs option \"%s html\" to work."
       Mt_options.ConcatDotFilesTo.option_name
       Mt_options.ExtractModels.option_name;
 
@@ -109,7 +109,7 @@ let mthread_run project =
   Project.set_current project;
   let hook_builtins = Lazy.force hook_builtins in
 
-  Mt_options.feedback "******* Starting mthread";
+  Mt_self.feedback "******* Starting mthread";
 
   (* We force the computation of the AST before this stage, so that it does not
      get recomputed in some other projects later *)
@@ -128,7 +128,7 @@ let mthread_run project =
   let f_main =
     try fst (Globals.entry_point ())
     with Globals.No_such_entry_point s ->
-      Mt_options.abort "%s Mthread cannot run" s
+      Mt_self.abort "%s Mthread cannot run" s
   in
   let dummy_main_thread =
     Mt_analysis_hooks.main_thread f_main Cvalue.Model.empty_map in
@@ -172,9 +172,9 @@ let mthread_run project =
     (* Let Eva know about interrupt handlers. *)
     Thread.register_interrupt_handlers (Mt_options.InterruptHandlers.get ());
 
-    Mt_options.feedback "*** Computing value analysis for main thread";
+    Mt_self.feedback "*** Computing value analysis for main thread";
     Analysis.compute ();
-    Mt_options.feedback "*** First value analysis for main thread done." ;
+    Mt_self.feedback "*** First value analysis for main thread done." ;
 
     (* The hooks of the value analysis have now found the real main thread *)
     let main_th = analysis.curr_thread in
@@ -196,12 +196,12 @@ let mthread_run project =
     (* Printing results to files *)
     Mt_options.ExtractModels.iter
       (fun s ->
-         Mt_options.feedback "******* Outputting model for %s" s;
+         Mt_self.feedback "******* Outputting model for %s" s;
          (match s with
           | "html" -> Mt_outputs.Html.output_threads analysis;
-          | _ -> Mt_options.error "Unknown model %s specified" s;
+          | _ -> Mt_self.error "Unknown model %s specified" s;
          );
-         Mt_options.feedback "******* %s output done."
+         Mt_self.feedback "******* %s output done."
            (String.capitalize_ascii s);
       );
 

@@ -40,8 +40,7 @@
 [eva] Initial state supplied by user
 [mt] messy_init.c:10: Warning: Trying to lock a possibly uninitialized mutex.
 [mt] messy_init.c:10: Warning: 
-  Unable to check that mutex lock has not already been locked;
-  {0; 1} should be 1
+  Trying to lock mutex lock, but unable to check its precise status (internal value {0; 1} should be 1).
 [mt] messy_init.c:10: Lock lock
 [eva] FRAMAC_SHARE/mthread_pthread.c:56: Warning: Not a valid mutex id '0'.
 [mt] * Starting to save the state of the value analysis
