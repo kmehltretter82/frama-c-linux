@@ -11,5 +11,5 @@
 set -o pipefail
 
 dune exec --cache=disabled -- \
-     frama-c -commands-file with_error.txt src_empty.c -then -print \
+     frama-c -no-autoload-plugins -load-module eva,inout,scope -commands-file with_error.txt src_empty.c -then -print \
     | sed 's/^\(\s*use `\).*\(frama-c -help.*\)$/\1\2/g'

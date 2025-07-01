@@ -1,5 +1,5 @@
 -no-autoload-plugins
 -load saved_in_commands_file.sav
 -then
--load-plugin eva,inout
+-load-plugin eva,inout,scope
 -eva
