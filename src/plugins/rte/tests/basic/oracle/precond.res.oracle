@@ -166,10 +166,12 @@ int main(void)
   set(& c,10);
   set(& c,20);
   V = (void *)(& c);
+  /*@ assert rte: pointer_alignment: \aligned(V,alignof(cell)); */
   set((cell *)V,20);
   next_val(c);
   /*@ assert rte: mem_access: \valid_read(pc); */
   next_val(*pc);
+  /*@ assert rte: pointer_alignment: \aligned(V,alignof(cell)); */
   /*@ assert rte: mem_access: \valid_read((cell *)V); */
   next_val(*((cell *)V));
   T.pred = & c;

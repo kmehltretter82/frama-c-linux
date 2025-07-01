@@ -6723,6 +6723,9 @@ let typeDeepDropAllAttributes t =
   let vis = new dropAttributes () in
   visitCilType vis t
 
+let int_of_enumitem ei =
+  Option.get @@ constFoldToInt ei.eival
+
 (* ****************************** *)
 (* Forward deprecated definitions *)
 (* ****************************** *)

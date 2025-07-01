@@ -82,6 +82,7 @@ _Bool ko1(void)
 _Bool ko2(void)
 {
   _Bool b;
+  /*@ assert rte: pointer_alignment: \aligned(&b,alignof(char)); */
   char *p = (char *)(& b);
   /*@ assert rte: mem_access: \valid(p); */
   *p = (char)17;

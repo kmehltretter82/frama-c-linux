@@ -74,6 +74,14 @@ module Mem_access =
       let additional_parameters = [ Kernel.SafeArrays.parameter ]
     end)
 
+module Pointer_alignment =
+  Make
+    (struct
+      let name = "pointer_alignment"
+      let parameter = Kernel.UnalignedPointer.parameter
+      let additional_parameters = []
+    end)
+
 module Pointer_value =
   Make
     (struct

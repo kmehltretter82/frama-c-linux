@@ -421,6 +421,56 @@ let pointer_value ~remove_trivial ~on_alarm expr =
   if not (remove_trivial && is_safe_pointer_value expr.enode)
   then on_alarm ~invalid:false (Alarms.Invalid_pointer expr)
 
+type verdict = Yes | No | Maybe
+
+let trivially_aligned (expr: Cil_types.exp) target =
+  if Ast_types.is_void target
+  || Ast_types.is_fun target
+  then
+    (* - From an alignment point of view, casting to void* is always OK
+         (except for function pointers, but anyway, the problem is not
+         alignment)
+       - Alignment does not make sense for functions *)
+    Yes
+  else
+    (* we can safely compute this now *)
+    let target_align = Cil.bytesAlignOf target in
+    let expr = Cil.stripCasts expr in
+    let orig_t = Cil.typeOf expr in
+    if Ast_types.is_void_ptr orig_t || Ast_types.is_fun_ptr orig_t
+    then Maybe
+    else
+    if Ast_types.is_integral orig_t
+    then match Cil.constFoldToInt expr with
+      | None -> Maybe
+      | Some value when Z.(zero = (value mod of_int target_align)) -> Yes
+      | _ -> No
+    else
+      let orig_align = Cil.bytesAlignOf @@ Ast_types.direct_pointed_type orig_t in
+      if target_align <= orig_align
+      then Yes
+      else
+        match expr.enode with
+        | AddrOf (Var vi, NoOffset) | StartOf (Var vi, NoOffset) ->
+          if 0 = Cil.bytesAlignOfVarinfo vi mod target_align
+          then Yes
+          else Maybe
+        | _ -> (* probably more cases to optimize here *)
+          Maybe
+
+let pointer_alignment ~remove_trivial ~on_alarm (expr, t) =
+  assert (Ast_types.is_ptr t) ;
+  let pointed = Ast_types.direct_pointed_type t in
+  match trivially_aligned expr pointed with
+  | Yes ->
+    if not remove_trivial
+    then on_alarm ~invalid:false (Alarms.Unaligned_pointer (expr, pointed))
+  | No ->
+    on_alarm ~invalid:true (Alarms.Unaligned_pointer (expr, pointed))
+  | Maybe ->
+    on_alarm ~invalid:false (Alarms.Unaligned_pointer (expr, pointed))
+
+
 let bool_value ~remove_trivial ~on_alarm lv =
   match remove_trivial, lv with
   | true, (Var vi, NoOffset)

@@ -1,0 +1,16 @@
+[kernel] Parsing unaligned_pointer.c (with preprocessing)
+[kernel:typing:incompatible-pointer-types] unaligned_pointer.c:118: Warning: 
+  casting function to int *
+[rte:annot] annotating function addrof_to_ptr
+[rte:annot] annotating function int_constant_to_ptr
+[rte] unaligned_pointer.c:7: Warning: 
+  guaranteed RTE: assert pointer_alignment: \aligned((int)1,alignof(int32_t));
+[rte:annot] annotating function int_to_ptr
+[rte:annot] annotating function int_to_ptr_caller
+[rte:annot] annotating function main
+[rte:annot] annotating function malloc_ok_for_any_type
+[rte:annot] annotating function must_not_trigger_failure
+[rte:annot] annotating function ptr_to_ptr_sem
+[rte:annot] annotating function ptr_to_ptr_sem_caller
+[rte:annot] annotating function ptr_to_ptr_syn
+[rte:annot] annotating function startof_to_ptr

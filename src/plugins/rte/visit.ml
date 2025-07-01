@@ -86,6 +86,9 @@ class annot_visitor kf flags on_alarm = object (self)
   method private do_pointer_call () =
     flags.Flags.pointer_call && not (Generator.Pointer_call.is_computed kf)
 
+  method private do_pointer_alignment () =
+    flags.Flags.pointer_alignment && not (Generator.Pointer_alignment.is_computed kf)
+
   method private do_pointer_value () =
     flags.Flags.pointer_value && not (Generator.Pointer_value.is_computed kf)
 
@@ -302,8 +305,16 @@ class annot_visitor kf flags on_alarm = object (self)
            (* to , from *)
            | TInt _, TPtr _ when self#do_pointer_downcast () ->
              self#generate_assertion Rte.downcast_assertion (ty, e)
-           | TPtr _, TInt _ when self#do_pointer_value () ->
-             self#generate_assertion Rte.pointer_value exp
+
+           | TPtr _, TInt _ ->
+             if self#do_pointer_value () then
+               self#generate_assertion Rte.pointer_value exp ;
+             if self#do_pointer_alignment () then
+               self#generate_assertion Rte.pointer_alignment (e, ty)
+
+           | TPtr _, TPtr _ ->
+             if self#do_pointer_alignment () then
+               self#generate_assertion Rte.pointer_alignment (e, ty)
 
            | TInt kind, TInt _ ->
              let signed = Cil.isSigned kind in
