@@ -2,15 +2,29 @@
 (cram
   (enabled_if %{read:../../python-3.10-available})
   (deps
-    %{bin:frama-c}
-    %{bin:frama-c-script}
-    (glob_files "../../share/analysis-scripts/*")
-    (glob_files "../../share/machdeps/*")
-    (glob_files "../../share/machdeps/make_machdep/*")
+    (package frama-c) ; needed for the installed files specified in share/dune,
+                      ; such as all Python and Perl scripts, among others.
   )
 )
 
 (cram
   (applies_to make-machdep)
   (enabled_if (and %{bin-available:clang} %{bin-available:yq}))
+)
+
+(cram
+  (applies_to make-wrapper)
+  (deps
+    (package frama-c-eva)
+    (package frama-c-inout)
+    (package frama-c-metrics)
+    (package frama-c-scope)
+  )
+)
+
+(cram
+  (applies_to list-functions)
+  (deps
+    (package frama-c-instantiate)
+  )
 )

@@ -2,7 +2,11 @@
 
 include $(shell frama-c-config -print-lib-path)/analysis-scripts/prologue.mk
 
+# Note: the -no-autoload-plugins line is necessary for Cram testing, otherwise
+#       the test dependencies would need to explicitly enumerate each
+#       internalized Frama-C plug-in.
 FCFLAGS     += \
+  -no-autoload-plugins -load-module eva,inout,metrics,scope \
   -kernel-warn-key annot:missing-spec=abort \
   -kernel-warn-key typing:implicit-function-declaration=abort \
 
