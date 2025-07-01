@@ -156,6 +156,12 @@ module Bottom = struct
     | None -> `Bottom
     | Some v -> `Value v
 
+  (** List operations *)
+
+  let of_list ~join = function
+    | [] -> `Bottom
+    | x :: list -> `Value (Stdlib.List.fold_left join x list)
+
   let to_list = function
     | `Bottom  -> []
     | `Value v -> [v]

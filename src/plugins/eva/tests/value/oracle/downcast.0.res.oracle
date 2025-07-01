@@ -53,12 +53,12 @@
 [eva] downcast.c:85: assertion got status valid.
 [eva] downcast.c:89: 
   Frama_C_show_each:
-  [100000..2147483502], [100145..2147483647], [100145..2147483647]
-[eva] downcast.c:89: 
-  Frama_C_show_each:
   [2147483503..2147483647],
   [2147483648..2147483792],
   [-2147483648..-2147483504]
+[eva] downcast.c:89: 
+  Frama_C_show_each:
+  [100000..2147483502], [100145..2147483647], [100145..2147483647]
 [eva] downcast.c:90: assertion got status valid.
 [eva] Recording results for main5_wrap_signed
 [eva] Done for function main5_wrap_signed

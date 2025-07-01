@@ -36,16 +36,13 @@ val condition_truth_value: stmt -> bool * bool
 module Computer
     (* Abstractions with the evaluator. *)
     (Engine: Engine_sig.S)
-    (* Set of states of abstract domain. *)
-    (States : Powerset.S with type state = Engine.Dom.t)
     (* Transfer functions for statement on the Engine domain. *)
     (_ : Transfer_stmt.S with type state = Engine.Dom.t
                           and type value = Engine.Val.t)
     (* Initialization of local variables. *)
     (_: Initialization.S with type state := Engine.Dom.t)
     (* Transfer functions for the logic on the Engine domain. *)
-    (_ : Transfer_logic.S with type state = Engine.Dom.t
-                           and type states = States.t)
+    (_ : Transfer_logic.S with type state = Engine.Dom.t)
     (_: sig
        val treat_statement_assigns:
          stmt -> assigns -> Engine.Dom.t -> Engine.Dom.t

@@ -65,24 +65,6 @@ module Status = struct
     | True, True -> `Value True
     | False, False -> `Value False
     | True, False | False, True -> `Inconsistent
-
-  exception Stop
-
-  let join_list l =
-    try
-      let r =
-        List.fold_left
-          (fun acc e ->
-             match e, acc with
-             | Unknown, _ -> raise Stop
-             | e, None -> Some e
-             | e, Some eacc -> Some (join eacc e)
-          ) None l
-      in
-      match r with
-      | None -> True
-      | Some r -> r
-    with Stop -> Unknown
 end
 
 module D = Alarms.Map.Make (Status)
