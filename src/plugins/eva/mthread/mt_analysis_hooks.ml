@@ -190,7 +190,7 @@ module MutexOp = struct
   let locked = 2
 
   let possible_values =
-    [ not_init, "it might have not been initialized";
+    [ not_init, "it might not be initialized yet";
       unlocked, "it might already be unlocked (and initialized)";
       locked, "it might already be locked (and initialized)"; ]
 
@@ -215,7 +215,7 @@ module QueueOp = struct
   let initialized = 1
 
   let possible_values =
-    [ not_init, "it might be uninitialized";
+    [ not_init, "it might not be initialized yet";
       initialized, "it might be already initialized"; ]
 
   let initialize =
@@ -229,7 +229,7 @@ module QueueOp = struct
     let id = Mt_ids.of_queue queue in
     let value = Mt_ids.read_id_state state id in
     let warn failure_reason =
-      warning analysis "Trying to %s mutex %a, but %s."
+      warning analysis "Trying to %s message queue %a, but %s."
         operation.name Mqueue.pretty queue failure_reason
     in
     check_value warn possible_values operation value;

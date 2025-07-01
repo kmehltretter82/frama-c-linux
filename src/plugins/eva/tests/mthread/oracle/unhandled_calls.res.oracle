@@ -14,7 +14,7 @@
 [eva] using specification for function random
 [mt] unhandled_calls.c:18: New thread: th2, fun t, parent <main>, args {0}
 [mt] unhandled_calls.c:18: Start thread th2
-[mt] Warning: Trying to initialize mutex q, but it might be already initialized.
+[mt] Warning: Trying to initialize message queue q, but it might be already initialized.
 [mt] unhandled_calls.c:23: New thread: th1, fun t, parent <main>, args {0}
 [mt] unhandled_calls.c:23: Start thread th1
 [mt] unhandled_calls.c:23: Thread th1, fun t, parent <main>, args {0}
