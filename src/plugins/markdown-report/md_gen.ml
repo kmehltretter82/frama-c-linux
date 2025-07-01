@@ -56,8 +56,13 @@ let insert_marks env anchor =
 
 let plural l s =
   match l with
-  | [] | [ _ ] -> s
-  | _::_::_ -> s ^ "s"
+  | [ _ ] -> s
+  | [] | _::_::_ -> s ^ "s"
+
+let plural_has l =
+  match l with
+  | [ _ ] -> "have"
+  | [] | _::_::_ -> "has"
 
 let section_domains env =
   let anchor = "domains" in
@@ -420,7 +425,8 @@ let gen_section_warnings env =
         [Block (
             (text @@ glue [
                 plain ("The table below lists the " ^ plural warnings "warning");
-                plain "that have been emitted by the analyzer.";
+                plain ("that " ^ plural_has warnings ^
+                       " been emitted by the analyzer.");
                 plain "They might put additional assumptions on the relevance";
                 plain "of the analysis results and must be reviewed carefully";
               ]) @
@@ -476,7 +482,7 @@ let gen_section_alarms env =
         Comment "No alarm!" :: insert_marks env anchor
       else
         Block (text @@ glue [
-            bold "No alarm"; plain "was found during the analysis";
+            bold "No alarm"; plain "was found during the analysis.";
             plain "Any execution starting from";
             code (Kernel.MainFunction.get_function_name ());
             plain "in a context matching the one used for the analysis";
@@ -486,7 +492,7 @@ let gen_section_alarms env =
     in
     H1 (plain "Results of the analysis", Some anchor) :: text_content
   | _ :: l ->
-    let alarm = if l = [] then "alarm" else "alarms" in
+    let alarm = plural l "alarm" in
     let caption =
       Some (plain (String.capitalize_ascii alarm ^ " emitted by the analysis"))
     in
