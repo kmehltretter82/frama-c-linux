@@ -417,7 +417,7 @@ module Make (Engine: Engine_sig.S) = struct
       Self.(ComputationState.set Computed);
       post_analysis ();
       Engine.Dom.post_analysis final_state;
-      Summary.print_summary ();
+      Summary.print ();
       Statistics.export_as_csv ();
       restore_signals ()
     in

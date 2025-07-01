@@ -123,6 +123,8 @@ module Coverage = struct
   let add c1 c2 =
     c1.reachable <- c1.reachable + c2.reachable;
     c1.dead <- c1.dead + c2.dead
+  let ratio c =
+    float_of_int c.reachable /. float_of_int (total c)
 end
 
 module Statuses = struct
@@ -280,6 +282,11 @@ let compute_statuses ()  =
   Property_status.iter do_property;
   alarms, assertions, preconds
 
+let export_stats stats =
+  Coverage.ratio stats.prog_stmt_coverage |> Statistics.(set stmt_coverage ());
+  Coverage.ratio stats.prog_fun_coverage |> Statistics.(set fun_coverage ());
+  Statuses.total stats.alarms_statuses |> Statistics.(set alarm_count ())
+
 let compute_stats () =
   let prog_fun_coverage = Coverage.make ()
   and prog_stmt_coverage = Coverage.make ()
@@ -303,14 +310,18 @@ let compute_stats () =
   let alarms_statuses, assertions_statuses, preconds_statuses =
     compute_statuses ()
   and eva_events, kernel_events = compute_events () in
-  { prog_fun_coverage;
-    prog_stmt_coverage;
-    prog_alarms=AlarmsStats.to_list prog_alarms;
-    eva_events;
-    kernel_events;
-    alarms_statuses;
-    assertions_statuses;
-    preconds_statuses; }
+  let stats =
+    { prog_fun_coverage;
+      prog_stmt_coverage;
+      prog_alarms=AlarmsStats.to_list prog_alarms;
+      eva_events;
+      kernel_events;
+      alarms_statuses;
+      assertions_statuses;
+      preconds_statuses; }
+  in
+  export_stats stats;
+  stats
 
 
 (* --- Printing --- *)
@@ -324,15 +335,15 @@ let print_coverage fmt {prog_fun_coverage=funs; prog_stmt_coverage=stmts} =
   then Format.fprintf fmt "No function to be analyzed.@;"
   else
     Format.fprintf fmt
-      "%i function%s analyzed (out of %i): %i%% coverage.@;"
+      "%i function%s analyzed (out of %i): %.0f%% coverage.@;"
       funs.reachable (plural funs.reachable) funs_total
-      (funs.reachable * 100 / funs_total);
+      (Coverage.ratio funs *. 100.0);
   if funs_total > 0 && stmts_total > 0 then
     Format.fprintf fmt
-      "In %s, %i statements reached (out of %i): %i%% coverage.@;"
+      "In %s, %i statements reached (out of %i): %.0f%% coverage.@;"
       (if funs.reachable > 1 then "these functions" else "this function")
       stmts.reachable stmts_total
-      (stmts.reachable * 100 / stmts_total)
+      (Coverage.ratio stmts *. 100.0)
 
 let print_events fmt stats =
   if Events.total stats.eva_events + Events.total stats.kernel_events = 0
@@ -410,9 +421,8 @@ let print_statuses fmt {assertions_statuses; preconds_statuses} =
     Format.fprintf fmt
       "%i%% of the logical properties reached have been proven.@;" proven
 
-let print_summary fmt =
+let print_stats fmt stats =
   let bar = String.make 76 '-' in
-  let stats = compute_stats () in
   Format.fprintf fmt "%s@;" bar;
   print_coverage fmt stats;
   Format.fprintf fmt "%s@;" bar;
@@ -423,10 +433,11 @@ let print_summary fmt =
   print_statuses fmt stats;
   Format.fprintf fmt "%s" bar
 
-let print_summary () =
+let print () =
+  let stats = compute_stats () in
   let dkey = Self.dkey_summary in
   let level =
     if Parameters.ForcePrintSummary.get () then 0 else 1
   in
   let header fmt = Format.fprintf fmt " ====== ANALYSIS SUMMARY ======" in
-  Self.printf ~header ~dkey ~level "  @[<v>%t@]" print_summary
+  Self.printf ~header ~dkey ~level "  @[<v>%a@]" print_stats stats

@@ -20,60 +20,80 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* Statistics are stored in a dictionary, implemented as an hashtable from
-   keys to integers.
+(* Statistics are stored in a dictionary, implemented as two hashtables from
+   keys to integers and floating-point numbers respectively.
 
    [Key] is the representation of the dictionary keys: a couple of a registered
-   statistic (type ['a t]) accompanied by the function or the statement the stat
-   is about (type ['a]).
+   statistic (type [('k,'ty) t]) accompanied by the function or the statement
+   the stat is about (kind ['k], type ['ty]).
 
    Statistics must be registered before usage. The registry keeps track of the
    registered statistics and allow the reloading of projects by matching the
    previous stats to the current ones.
 *)
 
-(* --- Type --- *)
+type ('a,'b) cmp = Eq : ('a, 'a) cmp | Neq : ('a, 'b) cmp
+
+(* --- Kind --- *)
 
 type _ kind =
   | Global : unit kind
   | Function : Cil_types.kernel_function kind
   | Statement : Cil_types.stmt kind
 
-type 'a t = {
+let equal_kind (type a) (type b) (k1 : a kind) (k2 : b kind) : (a, b) cmp =
+  match k1, k2 with
+  | Global, Global -> Eq
+  | Function, Function -> Eq
+  | Statement, Statement -> Eq
+  | _, _ -> Neq
+
+
+(* --- Type --- *)
+
+type _ typ =
+  | Int : int typ
+  | Float : float typ
+
+let equal_ty (type a) (type b) (t1 : a typ) (t2 : b typ) : (a, b) cmp =
+  match t1, t2 with
+  | Int, Int -> Eq
+  | Float, Float -> Eq
+  | _, _ -> Neq
+
+
+(* Statistics keys *)
+
+type ('k,'ty) t = {
   id: int;
   name: string;
-  kind: 'a kind;
+  kind: 'k kind;
+  ty: 'ty typ;
 }
 
 
 (* --- Registry --- *)
 
-type registered_stat = Registered : 'a t -> registered_stat [@@unboxed]
-
-let kind_to_string : type a. a kind -> string = function
-  | Global -> "global"
-  | Function  -> "function"
-  | Statement -> "statement"
+type registered_stat = Registered : ('k, 'v) t -> registered_stat [@@unboxed]
 
 let registry = Hashtbl.create 13
 let last_id = ref 0
 
-let register (type a) (name : string) (kind : a kind) : a t =
+let register
+    (type k ty) (name : string) (kind : k kind) (ty : ty typ) : (k, ty) t =
   try
     (* If the stat is already registered, return the previous one *)
     let Registered stat = Hashtbl.find registry name in
-    match stat.kind, kind with (* equality must be ensured to return the right type of stat *)
-    | Global, Global -> stat
-    | Function, Function -> stat
-    | Statement, Statement -> stat
-    | _ ->
+    match equal_kind stat.kind kind, equal_ty stat.ty ty with
+    | Eq, Eq -> stat
+    | Neq, _ | _, Neq ->
       Self.fatal
-        "%s statistic \"%s\" was already registered with as a %s statistic"
-        name (kind_to_string kind) (kind_to_string stat.kind)
+        "statistic \"%s\" was already registered with a different type or kind"
+        name
   with Not_found ->
     (* Otherwise, create a new record for the stat *)
     incr last_id;
-    let stat = { id = !last_id; name; kind } in
+    let stat = { id = !last_id; name; kind; ty } in
     Hashtbl.add registry name (Registered stat);
     stat
 
@@ -89,11 +109,11 @@ let register_statement_stat name =
 
 (* --- Keys --- *)
 
-type key = Key : 'a t * 'a -> key
+type key = Key : ('k,'ty) t * 'k -> key
 
 module Key = struct
 
-  type cmp = { cmp : 'a 'b. 'a t -> 'b t -> int }
+  type cmp = { cmp : 'k1 'k2 'ty1 'ty2. ('k1, 'ty1) t -> ('k2, 'ty2) t -> int }
 
   let compare_key (cmp: cmp) (Key (s1, x1)) (Key (s2, x2)) =
     let c = cmp.cmp s1 s2 in
@@ -137,13 +157,14 @@ module Key = struct
     include Datatype.Serializable_undefined
     type t = key
     let name = "Statistics.Key"
-    let reprs = [Key ({ id = 0; name="dummy"; kind=Global }, ())]
+    let reprs =
+      [ Key ({ id = 0; name="dummy"; kind=Global; ty=Int }, ())]
     let compare = compare_opt
     let equal = Datatype.from_compare
     let hash = hash_key
     let pretty = pretty_key
     let copy k = k
-    let rehash (Key (s, x)) = (Key (register s.name s.kind, x))
+    let rehash (Key (s, x)) = (Key (register s.name s.kind s.ty, x))
   end
 
   include Datatype.Make_with_collections (Prototype)
@@ -164,12 +185,22 @@ end
 
 (* --- Projectified state --- *)
 
-module State =
+module IntState =
   State_builder.Hashtbl
     (Key.Hashtbl)
     (Datatype.Int)
     (struct
-      let name = "Eva.Statistics.State"
+      let name = "Eva.Statistics.IntState"
+      let dependencies = [ Self.state ]
+      let size = 17
+    end)
+
+module FloatState =
+  State_builder.Hashtbl
+    (Key.Hashtbl)
+    (Datatype.Float)
+    (struct
+      let name = "Eva.Statistics.FloatState"
       let dependencies = [ Self.state ]
       let size = 17
     end)
@@ -177,47 +208,88 @@ module State =
 
 (* --- Statistics retrieval --- *)
 
-let get (type a) (stat : a t) (x : a) =
-  let k = Key (stat,x) in
-  State.find_opt k
-  |> Option.value ~default: 0
+let get (type k ty) (stat : (k, ty) t) (x : k) : ty =
+  let key = Key (stat, x) in
+  match stat.ty with
+  | Int ->
+    IntState.find_opt key
+    |> Option.value ~default:0
+  | Float ->
+    FloatState.find_opt key
+    |> Option.value ~default:0.0
 
 
 (* --- Statistics update --- *)
 
-let set (type a) (stat : a t) (x : a) value =
-  let k = Key (stat,x) in
-  State.replace k value
+let set (type k ty) (stat : (k, ty) t) (x : k) (value : ty) =
+  let k = Key (stat, x) in
+  match stat.ty with
+  | Int ->
+    IntState.replace k value
+  | Float ->
+    FloatState.replace k value
 
-let update (type a) (stat : a t) (x : a) (f : int -> int) =
-  let k = Key (stat,x) in
-  State.replace k (f (get stat x))
+let update (type k ty) (stat : (k, ty) t) (x : k) (f : ty -> ty) =
+  let k = Key (stat, x) in
+  match stat.ty with
+  | Int ->
+    IntState.replace k (f (get stat x))
+  | Float ->
+    FloatState.replace k (f (get stat x))
 
-let incr (type a) (stat : a t) (x : a) =
-  update stat x (fun v -> v + 1)
+let incr (type k) (stat : (k, int) t) (x : k) =
+  update stat x Int.succ
 
-let grow (type a) (stat : a t) (x : a) value =
-  update stat x (fun v -> max v value)
+let add (type k ty) (stat : (k, ty) t) (x : k) (value : ty) =
+  let f : ty -> ty -> ty =
+    match stat.ty with
+    | Int -> Int.add
+    | Float -> Float.add
+  in
+  update stat x (f value)
+
+let grow (type k ty) (stat : (k, ty) t) (x : k) (value : ty) =
+  let f : ty -> ty -> ty =
+    match stat.ty with
+    | Int -> Int.max
+    | Float -> Float.max
+  in
+  update stat x (f value)
 
 let reset_all () =
-  State.clear ()
+  IntState.clear ();
+  FloatState.clear ()
 
 
 (* -- Export --- *)
 
+type value = Value : 'ty typ * 'ty -> value
+
 let export_as_list () =
-  State.to_seq () |> List.of_seq |>
-  List.sort (fun (k1,_v1) (k2,_v2) -> Key.compare_lex k1 k2)
+  let int_bindings =
+    IntState.to_seq ()
+    |> Seq.map (fun (k, v) -> k, Value (Int, v))
+  and float_bindings =
+    FloatState.to_seq ()
+    |> Seq.map (fun (k, v) -> k, Value (Float, v))
+  in
+  Seq.append int_bindings float_bindings
+  |> List.of_seq
+  |> List.sort (fun (k1,_v1) (k2,_v2) -> Key.compare_lex k1 k2)
 
 let export_as_csv_to_channel out_channel =
   let fmt = Format.formatter_of_out_channel out_channel in
   let l = export_as_list () in
+  let pp_value fmt = function
+    | Value (Int, x) -> Format.pp_print_int fmt x
+    | Value (Float, x) -> Format.pp_print_float fmt x
+  in
   let pp_stat fmt (key, value) =
-    Format.fprintf fmt "%s\t%a\t%a\t%d\n"
+    Format.fprintf fmt "%s\t%a\t%a\t%a\n"
       (Key.name key)
       Key.pretty_kf key
       Key.pretty_stmt key
-      value
+      pp_value value
   in
   List.iter (pp_stat fmt) l
 
@@ -239,10 +311,25 @@ let export_as_csv ?filename () =
 
 (* Centralized statistics registration *)
 
-let iterations = register_statement_stat "iterations"
-let memexec_hits = register_function_stat "memexec-hits"
-let memexec_misses = register_function_stat "memexec-misses"
-let max_widenings = register_statement_stat "max-widenings"
-let max_unrolling = register_statement_stat "max-unrolling"
-let partitioning_index_hits = register_global_stat "partitioning-index-hits"
-let partitioning_index_misses = register_global_stat "partitioning-index-misses"
+let alarm_count =
+  register_global_stat "alarm-count" Int
+let stmt_coverage =
+  register_global_stat "stmt-coverage" Float
+let fun_coverage =
+  register_global_stat "fun-coverage" Float
+let analysis_duration =
+  register_global_stat "analysis-time" Float
+let iterations =
+  register_statement_stat "iterations" Int
+let memexec_hits =
+  register_function_stat "memexec-hits" Int
+let memexec_misses =
+  register_function_stat "memexec-misses" Int
+let max_widenings =
+  register_statement_stat "max-widenings" Int
+let max_unrolling =
+  register_statement_stat "max-unrolling" Int
+let partitioning_index_hits =
+  register_global_stat "partitioning-index-hits" Int
+let partitioning_index_misses =
+  register_global_stat "partitioning-index-misses" Int
