@@ -103,7 +103,7 @@ module States_operations = struct
       (fun s -> (private_ops s).update)
 
   let clear ?(selection=State_selection.full) p =
-    debug ~dkey ~level:2 "clearing following selection:@.  @[%a@]@.%a"
+    debug ~dkey "clearing following selection:@.  @[%a@]@.%a"
       State_selection.pretty_witness selection State_selection.pretty selection;
     let clear s = (private_ops s).clear in
     if State_selection.is_full selection then
@@ -226,22 +226,19 @@ module States_operations = struct
 
 end
 
-let guarded_feedback selection level fmt_msg =
-  if verbose_atleast level then
-    if State_selection.is_full selection then
-      feedback ~dkey ~level fmt_msg
-    else
-      let n = State_selection.cardinal selection in
-      if n = 0 then
-        Pretty_utils.nullprintf fmt_msg
-      else
-        let states fmt =
-          if n > 1 then Format.fprintf fmt " (for %d states)" n
-          else Format.fprintf fmt " (for 1 state)"
-        in
-        feedback ~dkey ~level ~append:states fmt_msg;
+let guarded_feedback selection fmt_msg =
+  if State_selection.is_full selection then
+    feedback ~dkey fmt_msg
   else
-    Pretty_utils.nullprintf fmt_msg
+    let n = State_selection.cardinal selection in
+    if n = 0 then
+      Pretty_utils.nullprintf fmt_msg
+    else
+      let states fmt =
+        if n > 1 then Format.fprintf fmt " (for %d states)" n
+        else Format.fprintf fmt " (for 1 state)"
+      in
+      feedback ~dkey ~append:states fmt_msg
 
 module Q = Qstack.Make(struct type t = project let equal = equal end)
 
@@ -284,7 +281,7 @@ module Set_Name_Hook = Hook.Build(struct type t = project * string end)
 let register_after_set_name_hook = Set_Name_Hook.extend
 
 let set_name p s =
-  feedback ~dkey ~level:2 "renaming project %S to %S" p.name s;
+  feedback ~dkey "renaming project %S to %S" p.name s;
   let old_name = p.name in
   Setter.set_name p s;
   Set_Name_Hook.apply (p, old_name);
@@ -293,9 +290,9 @@ module Create_Hook = Hook.Build(struct type t = project end)
 let register_create_hook = Create_Hook.extend
 
 let create name =
-  feedback ~dkey ~level:2 "creating project %S" name;
+  feedback ~dkey "creating project %S" name;
   let p = Setter.make name in
-  feedback ~dkey ~level:3 "its unique name is %S" (get_project_debug_name p);
+  feedback ~dkey "its unique name is %S" (get_project_debug_name p);
   Q.add_at_end p projects;
   States_operations.create p;
   Create_Hook.apply p;
@@ -321,10 +318,7 @@ let force_set_current =
     let old = current () in
     States_operations.commit ~selection old;
     (try Q.move_at_top p projects with Invalid_argument _ -> assert false);
-    let level = if on then 3 else 2 in
-    guarded_feedback selection level
-      "%S is now the current project"
-      p.name;
+    guarded_feedback selection "%S is now the current project" p.name;
     assert (equal p (current ()));
     States_operations.update ~selection p;
     (* do not apply hook if an hook calls [set_current] *)
@@ -388,8 +382,7 @@ module Before_remove = Hook.Build(struct type t = project end)
 let register_before_remove_hook = Before_remove.extend
 
 let remove ?(project=current()) () =
-  feedback ~dkey ~level:2
-    "removing project %S" project.name;
+  feedback ~dkey "removing project %S" project.name;
   if Q.length projects = 1 then raise (Cannot_remove project.name);
   Before_remove.apply project;
   States_operations.remove project;
@@ -410,7 +403,7 @@ let remove ?(project=current()) () =
   Q.iter (States_operations.clear_some_projects (equal project)) projects
 
 let remove_all () =
-  feedback ~dkey ~level:2 "removing all existing projects";
+  feedback ~dkey "removing all existing projects";
   try
     iter_on_projects Before_remove.apply;
     States_operations.clean ();
@@ -421,7 +414,7 @@ let remove_all () =
     ()
 
 let copy ?(selection=State_selection.full) ?(src=current()) dst =
-  guarded_feedback selection 2 "copying project from %S to %S"
+  guarded_feedback selection "copying project from %S to %S"
     src.name dst.name;
   States_operations.commit ~selection src;
   States_operations.copy ~selection src dst
@@ -433,7 +426,7 @@ module After_Clear_Hook = Hook.Build(struct type t = project end)
 let register_todo_after_clear = After_Clear_Hook.extend
 
 let clear ?(selection=State_selection.full) ?(project=current()) () =
-  guarded_feedback selection 2 "clearing project %S" project.name;
+  guarded_feedback selection "clearing project %S" project.name;
   Before_Clear_Hook.apply project;
   States_operations.clear ~selection project;
   After_Clear_Hook.apply project
@@ -491,12 +484,12 @@ let save_projects ?compress selection projects (filename : Filepath.t) =
   Channel.output_value cout (List.rev states, !last_created_by_copy_ref)
 
 let save ?compress ?(selection=State_selection.full) ?(project=current()) filename =
-  guarded_feedback selection 2 "saving project %S into file %a"
+  guarded_feedback selection "saving project %S into file %a"
     project.name Filepath.pretty filename;
   save_projects ?compress selection (Q.singleton project) filename
 
 let save_all ?compress ?(selection=State_selection.full) filename =
-  guarded_feedback selection 2 "saving the current session into file %a"
+  guarded_feedback selection "saving the current session into file %a"
     Filepath.pretty filename;
   save_projects ?compress selection projects filename
 
@@ -673,7 +666,7 @@ let load_projects ~project_under_copy selection ?name (filename : Filepath.t) =
 
 let load_with_copy
     ?project_under_copy ?(selection=State_selection.full) ?name filename =
-  guarded_feedback selection 2 "loading the project saved in file %a"
+  guarded_feedback selection "loading the project saved in file %a"
     Filepath.pretty filename;
   match load_projects ~project_under_copy selection ?name filename with
   | [ p ] -> p
@@ -683,7 +676,7 @@ let load = load_with_copy ?project_under_copy:None
 
 let load_all ?(selection=State_selection.full) filename =
   remove_all ();
-  guarded_feedback selection 2 "loading the session saved in file %a"
+  guarded_feedback selection "loading the session saved in file %a"
     Filepath.pretty filename;
   try
     ignore (load_projects ~project_under_copy:None selection filename)
@@ -697,7 +690,7 @@ let create_by_copy_hook f =
 
 let create_by_copy
     ?(selection=State_selection.full) ?(src=current()) ~last name =
-  guarded_feedback selection 2 "creating project %S by copying project %S"
+  guarded_feedback selection "creating project %S by copying project %S"
     name (src.name);
   let filename = temp_file ~prefix:"frama_c_create_by_copy" ~suffix:".sav" in
   save ~compress:false ~selection ~project:src filename;
