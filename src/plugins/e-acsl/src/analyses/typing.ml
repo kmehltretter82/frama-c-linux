@@ -843,6 +843,9 @@ and type_predicate ~profile p =
   | Pobject_pointer(_,t)
   | Pvalid_function t ->
     ignore (type_term ~use_gmp_opt:false ~ctx:Nan ~profile t)
+  | Paligned (t, n) ->
+    ignore (type_term ~use_gmp_opt:false ~ctx:Nan ~profile t) ;
+    ignore (type_term ~use_gmp_opt:true ~ctx:Nan (* ? *) ~profile n)
   | Pat(p, _) -> type_predicate ~profile p
   | Pfresh _ -> Error.not_yet "\\fresh"
 

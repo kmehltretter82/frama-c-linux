@@ -406,7 +406,8 @@ module rec Transfer
     method !vpredicate_node = function
       | Pvalid(_, t) | Pvalid_read(_, t)
       | Pobject_pointer(_, t) | Pvalid_function t
-      | Pinitialized(_, t) | Pfreeable(_, t) ->
+      | Pinitialized(_, t) | Pfreeable(_, t)
+      | Paligned (t, _) ->
         (* Options.feedback "REGISTER %a" Cil.d_term t;*)
         state_ref := register_term kf !state_ref t;
         Cil.DoChildren

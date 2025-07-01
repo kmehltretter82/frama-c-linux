@@ -241,7 +241,7 @@ and add_predicate (env:env) (p:predicate) = match p.pred_content with
     iadd_term env c ;
     add_predicate env pt ;
     add_predicate env pf ;
-  | Pobject_pointer(_,t) | Pvalid(_,t) | Pvalid_read(_,t)
+  | Pobject_pointer(_,t) | Pvalid(_,t) | Pvalid_read(_,t) | Paligned(t, _)
   | Pvalid_function t | Pinitialized(_,t) | Pdangling(_,t)
   | Pallocable(_,t) | Pfreeable(_,t) -> iadd_term env t
   | Pforall (q,p) | Pexists (q,p) ->

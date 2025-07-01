@@ -139,6 +139,7 @@ let rank_predicate = function
   | Pallocable _ -> 22
   | Pfreeable _ -> 23
   | Pfresh _ -> 24
+  | Paligned _ -> 25
 
 
 (**************************************************************************)
@@ -1938,12 +1939,16 @@ and compare_predicate p1 p2 =
           let c = compare_term t1 t2 in
           if c <> 0 then c
           else compare_term n1 n2
+    | Paligned (t1,n1), Paligned (t2,n2) ->
+      let c = compare_term t1 t2 in
+      if c <> 0 then c
+      else compare_term n1 n2
     | Pseparated(seps1), Pseparated(seps2) ->
       compare_list compare_term seps1 seps2
     | (Pfalse | Ptrue | Papp _ | Prel _ | Pand _ | Por _ | Pimplies _
       | Piff _ | Pnot _ | Pif _ | Plet _ | Pforall _ | Pexists _
       | Pat _ | Pvalid _ | Pvalid_read _ | Pobject_pointer _ | Pvalid_function _
-      | Pinitialized _ | Pdangling _
+      | Pinitialized _ | Pdangling _ | Paligned _
       | Pfresh _ | Pallocable _ | Pfreeable _ | Pxor _ | Pseparated _
       ), _ -> assert false
 
@@ -2191,6 +2196,9 @@ and hash_predicate (acc, depth, tot) p =
         hash_one_term
         (acc + 97, tot - 1)
         seps
+    | Paligned (t,n) ->
+      let hasht, tott = hash_term (acc + 101 , depth - 1, tot - 3) t in
+      hash_term (hasht, depth - 1, tott) n
   end
 
 let hash_fct f t = try fst (f (0,10,100) t) with StopRecursion n -> n

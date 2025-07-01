@@ -127,6 +127,7 @@ and lexpr_node =
                                                initialized *)
   | PLdangling of string option * lexpr (** pointer is guaranteed to be
                                             dangling  *)
+  | PLaligned of lexpr * lexpr (** \aligned(p, v) p is aligned mod v *)
   | PLfresh of (string * string) option * lexpr * lexpr (** expression points to a newly allocated block. *)
   | PLseparated of lexpr list
   (** separation predicate. *)

@@ -185,6 +185,9 @@ val pinitialized: ?loc:location -> logic_label * term -> predicate
 (** \dangling *)
 val pdangling: ?loc:location -> logic_label * term -> predicate
 
+(** \aligned *)
+val paligned: ?loc:location -> term * term -> predicate
+
 (** \at *)
 val pat: ?loc:location -> predicate * logic_label -> predicate
 

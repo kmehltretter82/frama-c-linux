@@ -1335,6 +1335,10 @@ and childrenPredicateNode vis p =
     let s' = visitCilLogicLabel vis s in
     let t' = vTerm t in
     if t' != t || s != s' then Pdangling (s',t') else p
+  | Paligned (t,n) ->
+    let t' = vTerm t in
+    let n' = vTerm n in
+    if t' != t || n' != n then Paligned (t',n') else p
   | Pseparated seps ->
     let seps' = Extlib.map_no_copy vTerm seps in
     if seps' != seps then Pseparated seps' else p
@@ -6484,6 +6488,10 @@ and free_vars_predicate bound_vars p = match p.pred_content with
   | Pvalid (_,t) | Pvalid_read (_,t) | Pobject_pointer (_, t) | Pvalid_function t
   | Pinitialized (_,t) | Pdangling (_,t) ->
     free_vars_term bound_vars t
+  | Paligned(t, n) ->
+    Logic_var.Set.union
+      (free_vars_term bound_vars t)
+      (free_vars_term bound_vars n)
   | Pseparated seps ->
     List.fold_left
       (fun free_vars tset ->

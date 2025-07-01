@@ -251,6 +251,7 @@ module Precedence = struct
     | Pvalid_function _
     | Pinitialized _
     | Pdangling _
+    | Paligned _
     | Pseparated _
     | Pat _
     | Pfresh _ -> 0
@@ -2920,6 +2921,10 @@ class cil_printer () = object (self)
       fprintf fmt "@[%a%a(@[%a@])@]"
         self#pp_acsl_keyword "\\dangling"
         self#labels [l] self#term p
+    | Paligned (p, n) ->
+      fprintf fmt "@[%a(@[%a@],@[%a@])@]"
+        self#pp_acsl_keyword "\\aligned"
+        self#term p self#term n
     | Pfresh (l1,l2,e1,e2) ->
       fprintf fmt "@[%a%a(@[%a@],@[%a@])@]"
         self#pp_acsl_keyword "\\fresh"

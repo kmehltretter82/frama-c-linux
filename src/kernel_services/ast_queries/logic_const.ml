@@ -441,9 +441,11 @@ let pinitialized ?loc (l,p) =
 let pdangling ?loc (l,p) =
   unnamed ?loc (Pdangling (l,p))
 
-let pseparated  ?loc seps =
+let pseparated ?loc seps =
   unnamed ?loc (Pseparated seps)
 
+let paligned ?loc (p, n) =
+  unnamed ?loc (Paligned(p, n))
 
 (* Deprecated *)
 

@@ -2264,6 +2264,8 @@ and reduce_by_predicate ~alarm_mode env positive p =
 
     | _,Pvalid_function _tsets -> env (* TODO *)
 
+    | _,Paligned(_t, _n) -> env (* TODO *)
+
     | _,(Pinitialized (lbl_initialized,tsets)
         | Pdangling (lbl_initialized,tsets)) ->
       begin
@@ -2495,6 +2497,9 @@ and eval_predicate env pred =
           else
             True
       end
+
+    | Paligned (_t, _n) ->
+      Unknown (* TODO *)
 
     | Pinitialized (label,tsets) | Pdangling (label,tsets) -> begin
         (* Create [*tsets] and compute its location. This is important in
@@ -2756,6 +2761,9 @@ and predicate_deps env pred =
     | Pvalid (_, tsets) | Pvalid_read (_, tsets)
     | Pobject_pointer (_, tsets) | Pvalid_function tsets ->
       term_deps tsets
+
+    | Paligned (_t, _n) ->
+      unsupported (Format.asprintf "TODO \\aligned")
 
     | Pinitialized (lbl, tsets) | Pdangling (lbl, tsets) ->
       tsets_deps lbl tsets

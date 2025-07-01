@@ -306,7 +306,7 @@
 %token ALIGNOF SIZEOF LAMBDA LET
 %token TYPEOF BSTYPE
 %token WITH CONST GHOST
-%token INITIALIZED DANGLING
+%token INITIALIZED DANGLING ALIGNED
 %token LSQUAREPIPE RSQUAREPIPE
 %token IN
 %token PI
@@ -497,6 +497,7 @@ lexpr_inner:
 }
 | INITIALIZED opt_label_1 LPAR lexpr RPAR { info $sloc (PLinitialized ($2,$4)) }
 | DANGLING opt_label_1 LPAR lexpr RPAR { info $sloc (PLdangling ($2,$4)) }
+| ALIGNED LPAR lexpr COMMA lexpr RPAR { info $sloc (PLaligned ($3,$5)) }
 | FRESH opt_label_2 LPAR lexpr COMMA lexpr RPAR { info $sloc (PLfresh ($2,$4, $6)) }
 | BASE_ADDR opt_label_1 LPAR lexpr RPAR { info $sloc (PLbase_addr ($2,$4)) }
 | BLOCK_LENGTH opt_label_1 LPAR lexpr RPAR { info $sloc (PLblock_length ($2,$4)) }
@@ -2105,6 +2106,7 @@ bs_keyword:
 | VALID_FUNCTION { () }
 | INITIALIZED { () }
 | DANGLING { () }
+| ALIGNED { () }
 | WITH { () }
 ;
 

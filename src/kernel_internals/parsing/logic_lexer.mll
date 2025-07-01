@@ -241,6 +241,7 @@
         "\\ghost", GHOST;
         "\\initialized", INITIALIZED;
         "\\dangling", DANGLING;
+        "\\aligned", ALIGNED;
         "\\in", IN;
         "\\inter", INTER;
         "\\lambda", LAMBDA;

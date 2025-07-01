@@ -288,6 +288,10 @@ let rec predicate_content_to_exp_old ?(inplace=false) ?name ~loc ~adata ~env ~kf
     in
     let adata = Assert.register_pred ~loc env p e adata in
     e, adata, env
+
+  | Paligned _ ->
+    Env.not_yet env "\\aligned"
+
   | Pinitialized(BuiltinLabel Here, t) ->
     begin
       match Memory_tracking.SpecialPointers.pointer_of_term t with

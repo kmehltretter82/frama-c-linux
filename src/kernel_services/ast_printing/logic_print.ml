@@ -49,7 +49,7 @@ let getParenthLevel e =
   | PLoffset _ | PLbase_addr _ | PLblock_length _
   | PLupdate _  | PLinitField _ | PLinitIndex _
   | PLvalid _ | PLvalid_read _ | PLobject_pointer _ | PLvalid_function _
-  | PLinitialized _ | PLdangling _
+  | PLinitialized _ | PLdangling _ | PLaligned _
   | PLallocable _ | PLfreeable _ | PLfresh _
   | PLseparated _ | PLunion _ | PLinter _ -> 10
   | PLvar _ | PLconstant _ | PLresult | PLnull | PLtypeof _ | PLtype _
@@ -241,6 +241,8 @@ and print_lexpr_level n fmt e =
     | PLdangling (l,e) ->
       fprintf fmt "\\dangling%a(@;@[%a@]@;)"
         print_label_1 l print_lexpr_plain e
+    | PLaligned (e1,e2) ->
+      fprintf fmt "\\aligned(@;@[%a@],@[%a@]@;)" print_lexpr_plain e1 print_lexpr_plain e2
     | PLseparated l ->
       fprintf fmt "\\separated(@;@[%a@]@;)"
         (pp_list ~sep:",@ " print_lexpr_plain) l

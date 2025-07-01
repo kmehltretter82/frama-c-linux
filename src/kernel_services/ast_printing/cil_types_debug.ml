@@ -863,6 +863,8 @@ and pp_predicate_node fmt = function
     Format.fprintf fmt "Pinitialized(%a,%a)"  pp_logic_label logic_label  pp_term term
   | Pdangling(logic_label,term) ->
     Format.fprintf fmt "Pdangling(%a,%a)"  pp_logic_label logic_label  pp_term term
+  | Paligned(term1,term2) ->
+    Format.fprintf fmt "Paligned(%a,%a)"  pp_term term1  pp_term term2
   | Pallocable(logic_label,term) ->
     Format.fprintf fmt "Pallocable(%a,%a)"  pp_logic_label logic_label  pp_term term
   | Pfreeable(logic_label,term) ->

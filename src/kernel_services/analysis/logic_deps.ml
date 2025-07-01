@@ -348,6 +348,7 @@ let populate_zone ctx visit cil_node current_zones =
       | Pfalse | Ptrue | Prel _ | Pand _ | Por _ | Pxor _ | Pimplies _
       | Piff _ | Pnot _ | Pif _ | Plet _ | Pforall _ | Pexists _
       | Papp (_, [], _) (* No label, thus cannot access memory *)
+      | Paligned (_, _) (* No label, thus cannot access memory *)
       | Pseparated _ (* need only to preserve the values of each pointer *)
         -> DoChildren
 
