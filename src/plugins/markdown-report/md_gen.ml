@@ -197,7 +197,7 @@ let get_files () =
            else acc)
         Datatype.String.Set.empty dir_files
     in
-    if Datatype.String.Set.subset dir_files files then
+    if Datatype.String.Set.(cardinal files > 1 && subset dir_files files) then
       (dir ^ "/*" ^ suf) :: l
     else
       Datatype.String.Set.elements files @ l

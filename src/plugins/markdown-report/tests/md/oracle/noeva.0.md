@@ -14,7 +14,7 @@ date: now
 The C source files (not including the headers `.h` files)
 that have been considered during the analysis are the following:
 
-* `./*.c`
+* `noeva.c`
 
 
 
