@@ -61,7 +61,10 @@ Ivette.registerView({
 Ivette.registerView({
   id: 'fc.eva.mthread',
   label: 'Eva MThread',
-  layout: { 'ABCD': 'fc.eva.mthread' }
+  layout: {
+    'A': 'fc.kernel.astview',
+    'B': 'fc.kernel.locations',
+    'CD': 'fc.eva.mthread' }
 });
 
 

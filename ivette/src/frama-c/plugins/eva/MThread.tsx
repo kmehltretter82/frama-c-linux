@@ -7,22 +7,36 @@
 /* ************************************************************************ */
 
 import React from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
 import * as Ivette from 'ivette';
 
-import { useFlipSettings } from 'dome';
+import { useFlipSettings, useStringSettings } from 'dome';
 import { Button, ButtonGroup, ToolBar } from 'dome/frame/toolbars';
 import { useModel } from 'dome/table/models';
 import { Label } from 'dome/controls/labels';
-import { classes } from 'dome/misc/utils';
-import { Icon, IconKind } from 'dome/controls/icons';
+import { Icon } from 'dome/controls/icons';
+import { IconButton } from 'dome/controls/buttons';
+import { State } from 'dome/data/states';
+import * as Forms from 'dome/layout/forms';
+import { LED, LEDstatus } from 'dome/controls/displays';
+import { useColorTheme, useStyle } from 'dome/themes';
+import { HelpButton } from 'dome/help';
 
 import * as States from 'frama-c/states';
+import * as Locations from 'frama-c/kernel/Locations';
+import { marker } from 'frama-c/kernel/api/ast';
+
+import {
+  mtSharedVarsSummary,
+  mtSharedVarsSummaryData,
+  mtThreadsSummary,
+  mtThreadsSummaryData,
+  protectionKind
+} from './api/mthread';
 
 import { EvaReady, EvaStatus } from './components/AnalysisStatus';
-import { mtThreadsSummary, mtThreadsSummaryData } from './api/mthread';
+import { AnimatePresence, motion } from 'framer-motion';
+import { classes } from 'dome/misc/utils';
 
-type Thread = [number, string];
 interface MtContext {
   selectedThread?: [string, (v: string) => void];
   selectedMutex?: [string, (v: string) => void];
@@ -31,20 +45,37 @@ interface MtContext {
 }
 
 const MTCONTEXT = React.createContext<MtContext>({});
+const animateOption = {
+  layout: true,
+  initial: { opacity: 0, scale: .5 },
+  animate: { opacity: 1, scale: 1 },
+  exit: { opacity: 0, scale: .5 },
+  transition: { duration: .5 },
+};
+
+// ----------------------------------------------------------------------------
+// --- MThread buttons
+// ----------------------------------------------------------------------------
 
 interface MtButtonProps {
   label: string;
   id: number | string;
   selectedState?: [string, (v: string) => void];
+  onClick?: () => void;
 }
 
 function MtButton(props: MtButtonProps): React.JSX.Element {
   const { label, id, selectedState } = props;
   const strId = typeof id === 'number' ? id.toString() : id;
 
+  /** If a table or table element is selected,
+    all the elements in the table are highlighted. */
   const selected = selectedState &&
     selectedState[0].replace(/\[.*\]$/, "") === strId.replace(/\[.*\]$/, "");
-  const onClick = (): void => selectedState && selectedState[1](strId);
+  const onClick = (): void => {
+    selectedState && selectedState[1](strId);
+    if(props.onClick) props.onClick();
+  };
 
   return <Button
     key={strId}
@@ -54,90 +85,93 @@ function MtButton(props: MtButtonProps): React.JSX.Element {
   />;
 }
 
-// --------------------------------------------------------------------------
-// --- subElement read, write, taken, released ...
-// --------------------------------------------------------------------------
+function getMtButtons(
+  data: [number, string][] | string[],
+  selectedState?: [string, (v: string) => void],
+  onClick?: () => void
+): React.JSX.Element[] {
+  return data.map(val => {
+    const isArray = Array.isArray(val);
+    const id = isArray ? val[0] : val;
+    const label = isArray ? val[1] : val;
+    return <MtButton key={id} id={id} label={label}
+      selectedState={selectedState}
+      onClick={onClick}
+      />;
+    }
+  );
+}
 
-interface subElementProps {
-  label: string;
+// ----------------------------------------------------------------------------
+// --- MThread Element
+// ----------------------------------------------------------------------------
+
+interface ElementProps {
+  depth?: 'primary' | 'secondary',
+  mode?: 'row' | 'column';
+  className?: string;
+  title?: React.ReactNode;
+  separate?: boolean;
+  animate?: boolean;
   children?: React.ReactNode;
 }
 
-function SubElement(props: subElementProps): React.JSX.Element {
-  const { label, children } = props;
+function Element(props: ElementProps): React.JSX.Element {
+  const { title, mode, className, depth,
+    separate, animate = false, children } = props;
+  const style = useStyle();
+  const isDark = useColorTheme()[0] === 'dark';
 
-  return (
-    <div className={'thumb-subcontent'}>
-      <Label label={label} className='thumb-subcontent-title' />
-      <div className={'thumb-subcontent-infos'} >
-        { children }
-      </div>
-    </div>
+  const bgColor = !depth ? undefined : depth === 'primary' ?
+    style.getPropertyValue('--background-intense'):
+    isDark ?
+      style.getPropertyValue('--background-block-form'):
+      style.getPropertyValue('--background-alterning-odd');
+
+  const classesElt = classes('mthread-element', className);
+  const classesContent = classes(
+    'mthread-element-content',
+    `mthread-element-content-${mode}`,
+    Boolean(title && separate) && 'mthread-element-content-separator'
+  );
+  const options = {
+    className: classesElt,
+    style: { backgroundColor: bgColor }
+  };
+
+  const content = <>
+    { title && <div className='mthread-element-title'>{ title }</div> }
+    { children && <div className={classesContent}>{ children }</div> }
+  </>;
+
+  return (<>
+    { animate
+      ? <motion.div {...animateOption} {...options}>{ content }</motion.div>
+      : <div {...options}>{ content }</div>
+    }
+  </>
   );
 }
 
-// --------------------------------------------------------------------------
-// --- first element level error | mutex | message | variable
-// --------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+// --- Thread Content
+// ----------------------------------------------------------------------------
 
-interface ElementProps {
-  label: string;
-  icon?: string;
-  iconKind?: IconKind;
-  mode?: 'row' | 'column';
-  className?: string;
-  children: React.ReactNode;
+function isErrorInMutex(thread: mtThreadsSummaryData): boolean {
+  const taken = thread.locksTaken;
+  const released = thread.locksReleased;
+  return !taken.every(
+    (lock) => released.find(e => e[0] === lock[0])
+  ) || released.length !== taken.length;
 }
 
-function Element(props: ElementProps): React.JSX.Element | null {
-  const { label, icon, iconKind, mode = 'row', className, children } = props;
-  const classInfos = classes(
-    'thumb-content-infos', `thumb-content-${mode}`
-  );
-  const classContent = classes(
-    'thumb-content', className
-  );
-
-  return (
-    <div className={classContent}>
-      <Label label={label} className='thumb-content-title'>
-        { icon && <Icon id={icon} kind={iconKind} /> }
-      </Label>
-      { children &&
-        <div className={classInfos} >
-          { children }
-        </div>
-      }
-    </div>
-  );
-}
-
-// --------------------------------------------------------------------------
-// --- Elements Error, Mutex, Message, variable
-// --------------------------------------------------------------------------
-
-function getSubElement(
-  label: string,
-  data: [number, string][] | string[],
-  selectedState?: [string, (v: string) => void]
-): React.JSX.Element {
-  return (
-    <SubElement label={label}>
-      {
-        data.map(val => {
-          const isArray = Array.isArray(val);
-          const id = isArray ? val[0] : val;
-          const label = isArray ? val[1] : val;
-          return <MtButton
-            key={id}
-            id={id}
-            label={label}
-            selectedState={selectedState} />;
-          }
-        )
-      }
-    </SubElement>
-  );
+function getFilteredThread(
+  threads: mtThreadsSummaryData[],
+  filterErrorMutexState: [boolean, () => void],
+): mtThreadsSummaryData[] {
+    return !filterErrorMutexState[0]
+      ? threads
+      : threads.filter((mt) => isErrorInMutex(mt));
 }
 
 interface ContentProps {
@@ -148,19 +182,22 @@ interface ContentProps {
 function ErrorContent(props: ContentProps): React.JSX.Element | null {
   const errors: string[] = [];
   if(isErrorInMutex(props.data))
-    errors.push(
-      "Mutex: the mutexes taken and released are not the same "
-    );
-  const label = errors.length > 0 ?
-    'Error':
-    `No errors in ${props.data.thread[1]}`;
+    errors.push("Mutex: the mutexes taken and released are not the same ");
+  const label = errors.length > 0 ? 'Error'
+    : `No errors in ${props.data.thread[1]}`;
   const icon = errors.length > 0 ? "WARNING" : undefined;
   const iconKind = errors.length > 0 ? "negative" : undefined;
+  const title = <>
+    <Label label={label} />
+    { icon && <Icon id={icon} kind={iconKind} /> }
+  </>;
+  const content = errors.map((error, i) =>
+    <Element  key={i} title={error} mode='row' depth='secondary' />);
 
   if(!props.showEmpty && errors.length === 0) return null;
   return (
-    <Element label={label} icon={icon} iconKind={iconKind} >
-      { errors.map((error, i) => <SubElement key={i} label={error} />)}
+    <Element title={title} depth='primary'>
+      { content.length > 0 ? content : null }
     </Element>
   );
 }
@@ -170,14 +207,22 @@ function MutexContent(props: ContentProps): React.JSX.Element | null {
   const { selectedMutex } = React.useContext(MTCONTEXT);
   const isTaken = locksTaken.length > 0;
   const isReleased = locksReleased.length > 0;
-  const emptyContent = Boolean(!isTaken && !isReleased);
-  const label = !emptyContent ? 'Mutex': 'Mutex: no mutex taken or released';
+  const nonEmpty = Boolean(isTaken || isReleased);
+  const label = nonEmpty ? 'Mutex': 'Mutex: no mutex taken or released';
 
-  if(!showEmpty && emptyContent) return null;
+  if(!showEmpty && !nonEmpty) return null;
+  const takenContent = isTaken ?
+    <Element title='Taken' mode='row' depth='secondary' separate={true}>
+      {getMtButtons(locksTaken, selectedMutex)}
+    </Element> : null;
+  const releasedContent = isReleased ?
+    <Element title='Released' mode='row' depth='secondary' separate={true}>
+      {getMtButtons(locksReleased, selectedMutex)}
+    </Element> : null;
+
   return (
-    <Element label={label} className='mthread-thumb-mutex'>
-      { isTaken && getSubElement('Taken', locksTaken, selectedMutex) }
-      { isReleased && getSubElement('Released', locksReleased, selectedMutex) }
+    <Element title={label} depth='primary' className='mthread-element-mutex'>
+      { nonEmpty ? <>{ takenContent }{ releasedContent }</> : null }
     </Element>
   );
 }
@@ -188,15 +233,28 @@ function MessageContent(props: ContentProps): React.JSX.Element | null {
   const isCreate = mqueuesCreated.length > 0;
   const isReceived = mqueuesReceivers.length > 0;
   const isSend = mqueuesSenders.length > 0;
-  const emptyContent = Boolean(!isCreate && !isReceived && !isSend);
-  const label = !emptyContent ? 'Message': 'Message: no message';
+  const nonEmpty = Boolean(isCreate || isReceived || isSend);
+  const label = nonEmpty ? 'Message': 'Message: no message';
 
-  if(!showEmpty && emptyContent) return null;
+  if(!showEmpty && !nonEmpty) return null;
+
+  const creContent = isCreate ?
+    <Element title='Create' mode='row' depth='secondary' separate={true}>
+      {getMtButtons(mqueuesCreated)}
+    </Element> : null;
+  const recContent = isReceived ?
+    <Element title='Receive' mode='row' depth='secondary' separate={true}>
+      {getMtButtons(mqueuesReceivers)}
+    </Element>  : null;
+  const sendContent = isSend ?
+    <Element title='Send' mode='row' depth='secondary' separate={true}>
+      {getMtButtons(mqueuesSenders)}
+    </Element> : null;
+
   return (
-    <Element label={label} mode='column' className='mthread-thumb-message'>
-      { isCreate && getSubElement('Create', mqueuesCreated)}
-      { isReceived && getSubElement('Receive', mqueuesReceivers)}
-      { isSend && getSubElement('Send', mqueuesSenders)}
+    <Element title={label} depth='primary'
+      className='mthread-element-message'
+    >{ nonEmpty ? <>{ creContent }{ recContent }{ sendContent }</> : null }
     </Element>
   );
 }
@@ -206,61 +264,524 @@ function VariableContent(props: ContentProps): React.JSX.Element | null {
   const { selectedVar } = React.useContext(MTCONTEXT);
   const isVarRead = sharedVarsRead.length > 0;
   const isVarWrite = sharedVarsWritten.length > 0;
-  const emptyContent = Boolean(!isVarRead && !isVarWrite);
-  const label = !emptyContent ?
+  const nonEmpty = Boolean(isVarRead || isVarWrite);
+  const label = nonEmpty ?
     'Variable':
     'Variable: no variable read or write';
 
-  if(!showEmpty && emptyContent) return null;
+  if(!showEmpty && !nonEmpty) return null;
+  const readContent = isVarRead ?
+    <Element title='Read' mode='row' depth='secondary' separate={true}>
+     {getMtButtons(sharedVarsRead, selectedVar)}
+   </Element> : null;
+  const writeContent = isVarWrite ?
+    <Element title='Write' mode='row' depth='secondary' separate={true}>
+      {getMtButtons(sharedVarsWritten, selectedVar)}
+    </Element> : null;
+
   return (
-    <Element label={label}  className='mthread-thumb-variable'>
-      { isVarRead && getSubElement('Read', sharedVarsRead, selectedVar) }
-      { isVarWrite && getSubElement('Write', sharedVarsWritten, selectedVar) }
+    <Element title={label} depth='primary' mode='row'
+      className='mthread-element-variable'
+    >{ nonEmpty ? <> { readContent }{ writeContent }</> : null }</Element>
+  );
+}
+
+interface ThreadsProps {
+  threads: mtThreadsSummaryData[],
+  showEmpty: boolean,
+  errors: boolean,
+  mutex: boolean,
+  message: boolean,
+  variable: boolean,
+}
+
+function Threads(props: ThreadsProps): React.ReactNode {
+  const { threads, showEmpty, errors, mutex, message, variable } = props;
+  return threads.map((t) => {
+      const data = { data: t, showEmpty: showEmpty };
+      const [ id, name ] = t.thread;
+      return (
+        <Element key={id} title={name} animate={true}>
+          {errors && <ErrorContent {...data} />}
+          {mutex && <MutexContent {...data} />}
+          {message && <MessageContent {...data} />}
+          {variable && <VariableContent {...data} />}
+        </Element>
+      );
+  });
+}
+
+// ----------------------------------------------------------------------------
+// --- Variables
+// ----------------------------------------------------------------------------
+
+type ProtectionKind =  keyof typeof protectionKind ;
+interface ProtectionKindInfos {
+  label: string,
+  LEDStatus: LEDstatus
+}
+
+const protectionKindInfos: {[key in protectionKind]: ProtectionKindInfos} = {
+    protected: {
+      label: 'Protected',
+      LEDStatus: 'positive'
+    },
+    // eslint-disable-next-line camelcase
+    maybe_protected: {
+      label: 'Maybe protected',
+      LEDStatus: 'warning'
+    },
+    unprotected: {
+      label: 'Unprotected',
+      LEDStatus: 'negative'
+    }
+};
+
+type VarsByBase = { [base: string] : VarsByBaseContent }
+type VarsByZone = { [zone: string] : VarsByZoneContent }
+type VarsByZoneContent = Omit<VarsByBaseContent, 'zoneNames'>
+interface VarsByBaseContent {
+  read: mtSharedVarsSummaryData[];
+  write: mtSharedVarsSummaryData[];
+  protectionKind: ProtectionKind;
+  zoneNames: Set<string>;
+  zones?: VarsByZone;
+}
+
+interface VariableProps {
+  vars: VarsByBase;
+  varPinState: State<string | undefined>;
+  showProtected: boolean;
+  showMProtected: boolean;
+  showUnProtected: boolean;
+  showVar: boolean;
+  showArray: boolean;
+  searchVarName: string | undefined;
+}
+
+interface varContentProps {
+  base: string;
+  data: mtSharedVarsSummaryData[];
+  accessKind: "read" | "write";
+}
+
+interface ItemVarByProtectionKind extends varContentProps {
+  kind: ProtectionKind;
+}
+
+function ItemVarByProtectionKind(
+  props: ItemVarByProtectionKind
+): React.JSX.Element | null {
+  const { base, kind, accessKind } = props;
+  const data = props.data.filter(e => e.protectionKind === kind);
+  const allMarkers = data.map(e => e.markers).flat();
+  const kindLabel = protectionKindInfos[kind].label;
+
+  const onClick = (m: marker[], label: string): () => void => {
+    return () => Locations.setSelection({
+      plugin: 'MThread',
+      label: label,
+      markers: m
+    });
+  };
+
+  const buttons: React.JSX.Element[] = [];
+  data.forEach(val => {
+    if(!val.protectionMutexes) return;
+    else val.protectionMutexes.forEach(v => {
+      const id = v[0];
+      const zoneLabel = base !== val.zones ? `(${val.zones})` : "";
+      const label = `${v[1]} ${zoneLabel}`;
+      const locationLabel = `${base} : ${accessKind} : ${kindLabel} : ${label}`;
+      buttons.push(<MtButton
+        key={`${id}-${zoneLabel}`}
+        id={id}
+        label={label}
+        onClick={onClick(val.markers || [], locationLabel)}
+      />
+      );
+    });
+  });
+
+  function getActions(): React.JSX.Element {
+    return (<>
+      { allMarkers.length > 0 &&
+        <IconButton
+        icon='MULTICHECK'
+        title={`Select all "${kindLabel}" access`}
+        onClick={onClick(allMarkers, `${base} : ${accessKind} : ${kindLabel}`)}
+        />
+      }
+      </>
+    );
+  }
+
+  if(allMarkers.length === 0) return null;
+  return (
+    <Element title={<>{ kindLabel }{ getActions() }</>}
+      mode='row'
+      depth='secondary'
+      separate={true}
+    >{ buttons.length > 0 && buttons }</Element>
+  );
+}
+
+function VarContent(props: varContentProps): React.JSX.Element | null {
+  const emptyContent = props.data.length === 0;
+  const ledStatus = protectionKindInfos[getProtectionByAccesskind(props.data)]
+    .LEDStatus;
+  const label = (): string => {
+    if(props.accessKind === "read") return !emptyContent ?
+    'Read' : 'the variable is never read';
+    else return !emptyContent ?
+    'Write' : 'the variable is never written';
+  };
+  const title = <>
+      <Label label={label()} />
+      { ledStatus && <LED status={ledStatus} /> }
+    </>;
+
+  return (
+    <Element title={title} depth='primary' >
+      <ItemVarByProtectionKind kind={'protected'} {...props} />
+      <ItemVarByProtectionKind kind={'maybe_protected'} {...props} />
+      <ItemVarByProtectionKind kind={'unprotected'} {...props} />
     </Element>
   );
 }
 
-interface VarContentProps {
-  data: [string, {read: Thread[], write: Thread[]}];
-  showEmpty: boolean;
+function getMarker(
+  vars: VarsByBaseContent, access: 'all' | 'read' | 'write'
+): marker[] {
+  let markers: marker[] = [];
+  function getByAccessKind(access: 'read' | 'write'): void {
+    const t = vars[access].flatMap(v => v.markers);
+    markers = markers.concat(t);
+  }
+  switch(access) {
+    case 'all':
+      getByAccessKind('read');
+      getByAccessKind('write');
+      break;
+    case 'read': getByAccessKind('read'); break;
+    case 'write': getByAccessKind('write'); break;
+  }
+  return [...new Set(markers)];
 }
 
-function ThreadContent(props: VarContentProps): React.JSX.Element | null {
-  const { selectedThread } = React.useContext(MTCONTEXT);
-  const [ , { read, write }] = props.data;
-  const isThreadRead = read.length > 0;
-  const isThreadWrite = write.length > 0;
-  const emptyContent = Boolean(!isThreadRead && !isThreadWrite);
-  const label = !emptyContent ?
-    'Threads':
-    'Threads: thread doesn\'t read or write';
+// --- Check protection
+interface ProtectionData {
+  protected: Set<number>;
+  maybe_protected: Set<number>;
+  unprotected: number;
+}
 
-  if(!props.showEmpty && emptyContent) return null;
+function checkBaseProtection(v: VarsByBaseContent): ProtectionKind {
+  if(!v.zones) return checkZoneProtection(v);
+  return Object.entries(v.zones).every(e =>
+    e[1].protectionKind === 'protected') ? 'protected' : 'maybe_protected';
+}
+
+function fillProtectionData(
+  line: mtSharedVarsSummaryData, p: ProtectionData
+): void {
+  switch(line.protectionKind) {
+    case 'protected': line.protectionMutexes.forEach(([id,]) =>
+      p.protected.add(id)); break;
+    case 'maybe_protected': line.protectionMutexes.forEach(([id,]) =>
+      p.maybe_protected.add(id)); break;
+    case 'unprotected':
+      p.unprotected++; break;
+  }
+}
+
+function getProtectiondata(data: mtSharedVarsSummaryData[]): ProtectionData {
+  const protection: ProtectionData = {
+    // eslint-disable-next-line camelcase
+    protected: new Set(), maybe_protected: new Set(), unprotected: 0
+  };
+  data.forEach(e => fillProtectionData(e, protection));
+  return protection;
+}
+
+function getProtectionByAccesskind(
+  data: mtSharedVarsSummaryData[]
+): ProtectionKind {
+  const protection = getProtectiondata(data);
+  function isProtected(): boolean { return protection.protected.size > 0; }
+  function isMaybeProtected(): boolean {
+    return protection.maybe_protected.size > 0;
+  }
+  return isProtected() ? 'protected'
+    : isMaybeProtected() ? 'maybe_protected'
+    : 'unprotected';
+}
+
+function checkZoneProtection(v: VarsByZoneContent): ProtectionKind {
+  const pRead = getProtectiondata(v.read);
+  const pWrite = getProtectiondata(v.write);
+
+  function isProtected(): boolean {
+    return pRead.protected.size > 0 && pWrite.protected.size > 0
+        && [...pRead.protected].some(id => pWrite.protected.has(id));
+    }
+
+  function isMaybeProtected(): boolean {
+    return pRead.unprotected === 0 && pWrite.unprotected === 0;
+  }
+
+  return isProtected() ? 'protected'
+    : isMaybeProtected() ? 'maybe_protected' : 'unprotected';
+}
+
+// --- get structured data
+function getByZone(v: VarsByBaseContent): VarsByZone {
+  const vars = v.read.concat(v.write);
+  const byZones: VarsByZone = {};
+
+  vars.forEach(line => {
+    if(!byZones[line.zones]) byZones[line.zones] = {
+      read: [], write: [], protectionKind: 'unprotected'
+    };
+    byZones[line.zones][line.accessKind].push(line);
+  });
+
+  Object.entries(byZones).forEach(e => {
+    byZones[e[0]].protectionKind = checkZoneProtection(e[1]);
+  });
+
+  return byZones;
+}
+
+function getByBase(v: mtSharedVarsSummaryData[]): VarsByBase {
+  const byBases: VarsByBase = {};
+  v.forEach(line => {
+    if(!byBases[line.bases]) byBases[line.bases] = {
+      read: [], write: [], protectionKind: 'unprotected',
+      zoneNames: new Set<string>()
+    };
+    byBases[line.bases][line.accessKind].push(line);
+    byBases[line.bases].zoneNames.add(line.zones);
+  });
+
+  Object.entries(byBases).forEach(e => {
+    if(e[1].zoneNames.size > 1) byBases[e[0]].zones = getByZone(e[1]);
+    byBases[e[0]].protectionKind = checkBaseProtection(e[1]);
+  });
+
+  return byBases;
+}
+
+// --- hook for variable
+function useVariables(): VarsByBase {
+  const modelVars = States.useSyncArrayModel(mtSharedVarsSummary);
+  const syncModelVars = useModel(modelVars);
+
+  const newVars = React.useMemo(() => {
+    return getByBase(modelVars.getArray());
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [modelVars, syncModelVars]);
+  return newVars;
+}
+
+function Variable(props: VariableProps): React.ReactNode {
+  const { vars, varPinState, showProtected, showMProtected,
+    showUnProtected, showArray, showVar, searchVarName } = props;
+  const [ varPin, setvarPin ] = varPinState;
+
+  /** The content change if an array is pined */
+  const filterVars: VarsByBase = React.useMemo(() => {
+    if(!varPin) return vars;
+    const newVars = {};
+    const content = vars[varPin];
+    if(!content.zones) return vars;
+    const base = Object.fromEntries([[varPin, content]]);
+    Object.assign(newVars, base, content.zones);
+    return newVars;
+  }, [vars, varPin]);
+
+  const isVisible = React.useCallback(
+    (base: string, content: VarsByBaseContent ) => {
+      return !(searchVarName && !base.includes(searchVarName)
+        || !showArray && content.zones
+        || !showVar && !content.zones
+        || !showProtected && content.protectionKind === 'protected'
+        || !showMProtected && content.protectionKind === 'maybe_protected'
+        || !showUnProtected && content.protectionKind === 'unprotected'
+      );
+  }, [ searchVarName, showArray, showVar,
+    showProtected, showMProtected, showUnProtected ]);
+
+  function getSelectionButton(base: string, data: VarsByBaseContent)
+  : React.JSX.Element {
+    return <IconButton icon='MULTICHECK' title='Select all access'
+      onClick={() => Locations.setSelection({
+          plugin: 'MThread',
+          label: `Access for ${base}`,
+          markers: getMarker(data, 'all')
+        })
+      }
+    />;
+  }
+
+  function getPinButton(base: string): React.JSX.Element {
+    return <IconButton icon='TABLE' title={`Filter on base ${base}`}
+        kind={varPin === base ? 'selected' : 'default'}
+        onClick={() => setvarPin(varPin === base ? undefined : base)
+      }
+    />;
+  }
+
+  return Object.entries(filterVars).map((v) => {
+    const [ base, data ] = v;
+    const varStatus = protectionKindInfos[data.protectionKind].LEDStatus;
+    const isArray = Boolean(data.zones);
+    const label = isArray ? `${base}[ ]` : base;
+    const title = <>
+      <LED status={varStatus} />
+      <div>{label}</div>
+      <div>
+        { getSelectionButton(base, data) }
+        { isArray && getPinButton(base) }
+      </div>
+    </>;
+    return isVisible(base, data) ?
+      <Element key={base} title={title} animate={true}>
+        <VarContent accessKind='read' base={base} data={data.read} />
+        <VarContent accessKind='write' base={base} data={data.write} />
+      </Element>
+      : null;
+  });
+}
+
+// ----------------------------------------------------------------------------
+// --- MThread Toolbar
+// ----------------------------------------------------------------------------
+
+interface ThreadToolbarProps {
+  showEmptyState: [boolean, () => void];
+  showErrorsState: [boolean, () => void];
+  showMutexState: [boolean, () => void];
+  showMessageState: [boolean, () => void];
+  showVariableState: [boolean, () => void];
+  showThreadWithErrorOnlyState: [boolean, () => void];
+}
+
+function ThreadToolbar(props: ThreadToolbarProps)
+: React.JSX.Element {
+  const [ showEmpty, setshowEmpty ] = props.showEmptyState;
+  const [ errors, setErrors ] = props.showErrorsState;
+  const [ mutex, setMutex ] = props.showMutexState;
+  const [ message, setMessage ] = props.showMessageState;
+  const [ variable, setVariable ] = props.showVariableState;
+  const [ showThreadWithErrorOnly, setShowThreadWithErrorOnly ] =
+    props.showThreadWithErrorOnlyState;
+
+  return <>
+    <div>
+      <Button label={'Show empty'} title='show Errors' selected={showEmpty}
+        onClick={() => setshowEmpty()} />
+      <ButtonGroup>
+        <Button label='Errors' title='show Errors' selected={errors}
+          onClick={() => setErrors()} />
+        <Button label='Mutex' title='show mutex' selected={mutex}
+          onClick={() => setMutex()}  />
+        <Button label='Message' title='show message' selected={message}
+          onClick={() => setMessage()} />
+        <Button label='Variable' title='show variable' selected={variable}
+          onClick={() => setVariable()} />
+      </ButtonGroup>
+    </div>
+    <Button label='Thread with error only' title='Show only thread with error'
+      selected={showThreadWithErrorOnly}
+      onClick={() => setShowThreadWithErrorOnly()} />
+  </>;
+}
+
+interface  VarToolbarProps {
+  varNameState: Forms.FieldState<string | undefined>,
+  showProtectedState: [boolean, () => void];
+  showMProtectedState: [boolean, () => void];
+  showUnProtectedState: [boolean, () => void];
+  showVarState: [boolean, () => void];
+  showArrayState: [boolean, () => void];
+}
+
+function VarToolbar(props: VarToolbarProps)
+: React.JSX.Element {
+  const { varNameState, showArrayState, showVarState,
+    showProtectedState, showMProtectedState, showUnProtectedState } = props;
+  const [ showArray, flipShowArray ] = showArrayState;
+  const [ showVar, flipShowVar ] = showVarState;
+  const [ showProtected, flipShowProtected ] = showProtectedState;
+  const [ showMProtected, flipShowMProtected ] = showMProtectedState;
+  const [ showUnProtected, flipShowUnProtected ] = showUnProtectedState;
+
+  return <>
+    <div className='mthread-variable-filter'>
+      <Forms.TextField
+        label=''
+        placeholder='Search by name'
+        state={varNameState}
+        actions={<IconButton
+          icon='TRASH'
+          onClick={() => varNameState.onChanged(undefined, undefined, false)}
+        />}
+      />
+      <ButtonGroup>
+        <Button icon='VARIABLE' title='show variable' selected={showVar}
+          onClick={() => flipShowVar()} />
+        <Button icon='TABLE' title='show array' selected={showArray}
+          onClick={() => flipShowArray()} />
+      </ButtonGroup>
+      <ButtonGroup>
+        <Button label='Protected' title='show protected variable'
+          selected={showProtected}
+          onClick={() => flipShowProtected()} />
+        <Button label='Maybe protected' title='show maybe protected variable'
+          selected={showMProtected}
+          onClick={() => flipShowMProtected()} />
+        <Button label='Unprotected' title='show unprotected variable'
+          selected={showUnProtected}
+          onClick={() => flipShowUnProtected()} />
+      </ButtonGroup>
+    </div>
+  </>;
+}
+
+interface  MThreadToolbarProps
+extends ThreadToolbarProps, VarToolbarProps {
+  displayModeState: State<string>;
+}
+
+function MThreadToolbar(props: MThreadToolbarProps)
+: React.JSX.Element {
+  const [ displayMode, setDisplayMode] = props.displayModeState;
+
   return (
-    <Element label={label}  className='mthread-thumb-thread'>
-      { isThreadRead && getSubElement('Read', read, selectedThread) }
-      { isThreadWrite && getSubElement('Write', write, selectedThread) }
-    </Element>
+    <ToolBar className={'eva-mthread-toolbar'}>
+      <ButtonGroup>
+        <Button label='Thread' title='Thread mode'
+          selected={displayMode === 'thread'}
+          onClick={() => setDisplayMode('thread')} />
+        <Button label='Variable' title='variable mode'
+          selected={displayMode === 'variable'}
+          onClick={() => setDisplayMode('variable')} />
+      </ButtonGroup>
+      { displayMode === 'thread' && <ThreadToolbar {...props} /> }
+      { displayMode === 'variable' && <VarToolbar {...props} /> }
+    </ToolBar>
   );
 }
+
+// ----------------------------------------------------------------------------
+// --- MThread component
+// ----------------------------------------------------------------------------
 
 function MThreadComponent(): JSX.Element {
-  const [ displayMode, setDisplayMode] =
-    React.useState<'thread' | 'variable'>('thread');
-  const [ hideEmpty, setHideEmpty ] =
-    useFlipSettings('ivette.mthread.display.show-empty', true);
-  const [ errors, setErrors ] =
-    useFlipSettings('ivette.mthread.display.errors', true);
-  const [ mutex, setMutex ] =
-    useFlipSettings('ivette.mthread.display.mutex', true);
-  const [ message, setMessage ] =
-    useFlipSettings('ivette.mthread.display.message', true);
-  const [ variable, setVariable ] =
-    useFlipSettings('ivette.mthread.display.variable', true);
-  const [ filterErrorMutex, setFilterErrorMutex ] =
-    useFlipSettings('ivette.mthread.display.filterErrorMutex', false);
-  const [ filterNoMutex, setFilterNoMutex ] =
-    useFlipSettings('ivette.mthread.display.filterNoMutex', false);
+  const base = 'ivette.mthread.show';
+  const displayModeState = useStringSettings(`${base}.mode`, 'thread');
+  const [ displayMode, ] = displayModeState;
 
   const context = React.useContext(MTCONTEXT);
   context.selectedThread = React.useState("");
@@ -268,139 +789,83 @@ function MThreadComponent(): JSX.Element {
   context.selectedMessage = React.useState("");
   context.selectedVar = React.useState("");
 
-  const model = States.useSyncArrayModel(mtThreadsSummary);
-  const syncModel = useModel(model);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const threads = React.useMemo(() => model.getArray(), [syncModel, model]);
+  // --- Threads
+  const showEmptyState = useFlipSettings(`${base}.empty`, false);
+  const showErrorsState = useFlipSettings(`${base}.errors`, false);
+  const showMutexState = useFlipSettings(`${base}.mutex`, false);
+  const showMessageState = useFlipSettings(`${base}.message`, false);
+  const showVariableState = useFlipSettings(`${base}.variable`, false);
+  const showThreadWithErrorOnlyState =
+    useFlipSettings(`${base}.thread.with.error.only`, false);
+  const modelThread = States.useSyncArrayModel(mtThreadsSummary);
+  const syncModelThread = useModel(modelThread);
+  const threads = React.useMemo(() =>
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    modelThread.getArray(), [syncModelThread, modelThread]);
 
   const threadsFiltering = React.useMemo(() => {
-    syncModel;
-    let news = !filterErrorMutex ? threads : filteringErrorMutex(threads);
-    if(filterNoMutex) news = filteringNoMutex(news);
-    return news;
-  }, [syncModel, threads, filterErrorMutex, filterNoMutex]);
+    syncModelThread;
+    return getFilteredThread(threads, showThreadWithErrorOnlyState);
+  }, [syncModelThread, threads, showThreadWithErrorOnlyState]);
 
-  const vars = React.useMemo(() => {
-    const newVars: {[key: string]: {read: Thread[], write: Thread[]}} = {};
-
-    threads.forEach((thread) => {
-      thread.sharedVarsRead.forEach((v) => {
-        if(!(v in newVars)) newVars[v] = { read: [], write: [] };
-        newVars[v].read.push(thread.thread);
-      });
-      thread.sharedVarsWritten.forEach((v) => {
-        if(!(v in newVars)) newVars[v] = { read: [], write: [] };
-        newVars[v].write.push(thread.thread);
-      });
-    });
-
-    return Object.entries(newVars);
-  }, [threads]);
+  // --- Variables
+  const vars = useVariables();
+  const baseFilterState = React.useState<string | undefined>();
+  const varNameState = Forms.useState<string|undefined>(undefined);
+  const showProtected = useFlipSettings(`${base}.protected`, true);
+  const showMProtected = useFlipSettings(`${base}.mprotected`, true);
+  const showUnProtected = useFlipSettings(`${base}.unprotected`, true);
+  const showVar = useFlipSettings(`${base}.array`, true);
+  const showArray = useFlipSettings(`${base}.variable`, true);
 
   return (
     <div className='eva-mthread'>
-      <Ivette.TitleBar><EvaStatus /></Ivette.TitleBar>
-        <ToolBar className={'eva-mthread-toolbar'}>
-        <div>
-          <Button
-            label={'Hide empty'}
-            title='show Errors'
-            selected={hideEmpty}
-            onClick={() => setHideEmpty()}
-            />
-          <ButtonGroup>
-            <Button
-              label='Errors'
-              title='show Errors'
-              selected={errors}
-              onClick={() => setErrors()}
-              />
-            <Button
-              label='Mutex'
-              title='show mutex table'
-              selected={mutex}
-              onClick={() => setMutex()}
-              />
-            <Button
-              label='Message'
-              title='show message table'
-              selected={message}
-              onClick={() => setMessage()}
-              />
-            <Button
-              label='Variable'
-              title='show variable table'
-              selected={variable}
-              onClick={() => setVariable()}
-              />
-          </ButtonGroup>
-        </div>
-        <ButtonGroup>
-          <Button
-            label='Thread'
-            title='Thread mode'
-            selected={displayMode === 'thread'}
-            onClick={() => setDisplayMode('thread')}
-            />
-          <Button
-            label='Variable'
-            title='variable mode'
-            selected={displayMode === 'variable'}
-            onClick={() => setDisplayMode('variable')}
-            />
-        </ButtonGroup>
-        <div>
-          <Button
-            label='Filter Error Mutex'
-            title='filter error mutex'
-            disabled={displayMode === 'variable'}
-            selected={filterErrorMutex}
-            onClick={() => setFilterErrorMutex()}
-            />
-          <Button
-            label='Filter No Mutex'
-            title='filter no mutex'
-            disabled={displayMode === 'variable'}
-            selected={filterNoMutex}
-            onClick={() => setFilterNoMutex()}
-            />
-        </div>
-      </ToolBar>
+      <Ivette.TitleBar>
+        <EvaStatus />
+        <HelpButton id={'eva-mthread'} />
+      </Ivette.TitleBar>
+      <MThreadToolbar
+        displayModeState={displayModeState}
+        showEmptyState={showEmptyState}
+        showErrorsState={showErrorsState}
+        showMutexState={showMutexState}
+        showMessageState={showMessageState}
+        showVariableState={showVariableState}
+        showThreadWithErrorOnlyState={showThreadWithErrorOnlyState}
+        varNameState={varNameState}
+        showProtectedState={showProtected}
+        showMProtectedState={showMProtected}
+        showUnProtectedState={showUnProtected}
+        showVarState={showVar}
+        showArrayState={showArray}
+      />
       <EvaReady>
-        <motion.div layout style={{ height: '100%' }}><AnimatePresence>
-          <MTCONTEXT.Provider value={context}>
-            <div className='eva-mthread-thumbs'>
-              {
-                displayMode === 'thread' &&
-                  threadsFiltering.map((t) => {
-                    const data = { data: t, showEmpty: !hideEmpty };
-                    const [ , name ] = t.thread;
-                    return (
-                      <AnimatedElement key={t.key} className='mthread-thumb'>
-                        <div className='mthread-thumb-title'>{ name }</div>
-                        {errors && <ErrorContent {...data} />}
-                        {mutex && <MutexContent {...data} />}
-                        {message && <MessageContent {...data} />}
-                        {variable && <VariableContent {...data} />}
-                      </AnimatedElement>
-                    );
-                })
+        <motion.div className={'eva-mthread-elements'}>
+          <AnimatePresence>
+            <MTCONTEXT.Provider value={context}>
+              { displayMode === 'thread' && <Threads
+                  threads={threadsFiltering}
+                  showEmpty={showEmptyState[0]}
+                  errors={showErrorsState[0]}
+                  mutex={showMutexState[0]}
+                  message={showMessageState[0]}
+                  variable={showVariableState[0]}
+                />
               }
-              {
-                displayMode === 'variable' &&
-                  vars.map((v) => {
-                    const data = { data: v, showEmpty: !hideEmpty };
-                    return (
-                      <AnimatedElement key={v[0]} className='mthread-thumb'>
-                        <div className='mthread-thumb-title'>{v[0]}</div>
-                        <ThreadContent {...data} />
-                      </AnimatedElement>
-                    );
-                })
+              { displayMode === 'variable' && <Variable
+                  vars={vars}
+                  varPinState={baseFilterState}
+                  showProtected = {showProtected[0]}
+                  showMProtected = {showMProtected[0]}
+                  showUnProtected = {showUnProtected[0]}
+                  showVar = {showVar[0]}
+                  showArray = {showArray[0]}
+                  searchVarName={varNameState.value}
+                />
               }
-            </div>
-          </MTCONTEXT.Provider>
-        </AnimatePresence></motion.div>
+            </MTCONTEXT.Provider>
+          </AnimatePresence>
+        </motion.div>
       </EvaReady>
     </div>
   );
@@ -413,51 +878,4 @@ Ivette.registerComponent({
   children: <MThreadComponent />,
 });
 
-// --------------------------------------------------------------------------
-// --- MThread Animated Element
-// --------------------------------------------------------------------------
-
-interface AnimatedElementProps {
-  className?: string;
-  children?: React.ReactNode;
-}
-
-function AnimatedElement(props: AnimatedElementProps): React.JSX.Element  {
-  const { className, children } = props;
-
-  return <motion.div
-    layout
-    initial={{ opacity: 0, scale: 0.8 }}
-    animate={{ opacity: 1, scale: 1 }}
-    exit={{ opacity: 1, scale: 0.8 }}
-    transition={{ duration: .3 }}
-    className={className}
-  >{ children }</motion.div>;
-}
-
-// --------------------------------------------------------------------------
-// --- Filtering function
-// --------------------------------------------------------------------------
-function isErrorInMutex(thread: mtThreadsSummaryData): boolean {
-  const taken = thread.locksTaken;
-  const released = thread.locksReleased;
-  return !taken.every(
-    (lock) => released.find(e => e[0] === lock[0])
-  ) || released.length !== taken.length;
-}
-
-function filteringErrorMutex(
-  datas: mtThreadsSummaryData[]
-): mtThreadsSummaryData[] {
-  return datas.filter((mt) => isErrorInMutex(mt));
-}
-
-function filteringNoMutex(
-  datas: mtThreadsSummaryData[]
-): mtThreadsSummaryData[] {
-  return datas.filter((mt) => {
-    return mt.locksReleased.length !== 0 || mt.locksTaken.length !== 0;
-  });
-}
-
-// --------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
