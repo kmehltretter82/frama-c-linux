@@ -720,6 +720,9 @@ module InvalidBool: Parameter_sig.Bool
 module InvalidPointer: Parameter_sig.Bool
 (** Behavior of option "-warn-invalid-pointer" *)
 
+module UnalignedPointer: Parameter_sig.Bool
+(** Behavior of option "-warn-unaligned-pointer" *)
+
 module AbsoluteValidRange: Parameter_sig.String
 (** Behavior of option "-absolute-valid-range" *)
 

@@ -309,6 +309,9 @@ let emit_alarm ~pos alarm (status:status) =
   | Alarms.Index_out_of_bound _ ->
     register_alarm "accessing out of bounds index"
 
+  | Alarms.Unaligned_pointer _ ->
+    register_alarm "unaligned pointer creation"
+
   | Alarms.Invalid_pointer _ ->
     register_alarm "invalid pointer creation"
 
@@ -344,6 +347,7 @@ let emit_alarm ~pos alarm (status:status) =
 let height_alarm = let open Eva_utils in function
     | Alarms.Division_by_zero e
     | Alarms.Index_out_of_bound (e,_)
+    | Alarms.Unaligned_pointer (e,_)
     | Alarms.Invalid_pointer e
     | Alarms.Invalid_shift (e,_)
     | Alarms.Overflow (_,e,_,_)

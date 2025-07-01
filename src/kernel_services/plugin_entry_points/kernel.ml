@@ -1916,6 +1916,16 @@ module InvalidPointer =
       let help = "generate alarms when invalid pointers are created."
     end)
 
+let () = Parameter_customize.set_group analysis_options
+let () = Parameter_customize.do_not_reset_on_copy ()
+module UnalignedPointer =
+  True
+    (struct
+      let module_name = "UnalignedPointer"
+      let option_name = "-warn-unaligned-pointer"
+      let help = "generate alarms when unaligned pointers are created."
+    end)
+
 (* ************************************************************************* *)
 (** {2 Sequencing options} *)
 (* ************************************************************************* *)

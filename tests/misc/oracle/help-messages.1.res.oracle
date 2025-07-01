@@ -62,6 +62,9 @@ Options taking a string as argument should preferably be written
                     floats are produced: never, only on NaN, or on infinite
                     floats and NaN (by default). (preferably use
                     -warn-special-float="none|nan|non-finite")
+-warn-unaligned-pointer  generate alarms when unaligned pointers are created.
+                    (set by default, opposite option is
+                    -no-warn-unaligned-pointer)
 -warn-unsigned-downcast  generate alarms when unsigned downcasts may exceed
                     the destination range (opposite option is
                     -no-warn-unsigned-downcast)

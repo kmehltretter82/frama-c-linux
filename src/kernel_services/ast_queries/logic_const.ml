@@ -303,6 +303,9 @@ let tcast ?loc t ct =
 let tlogic_coerce ?loc t lt =
   term ?loc (TCast (true, lt, t)) lt
 
+let talignof ?loc ct =
+  term ?loc (TAlignOf ct) Linteger
+
 let tvar ?loc lv =
   term ?loc (TLval(TVar lv,TNoOffset)) lv.lv_type
 

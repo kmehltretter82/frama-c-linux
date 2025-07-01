@@ -331,6 +331,9 @@ val tcast: ?loc:Location.t -> term -> typ -> term
 (** coercion to the given logic type *)
 val tlogic_coerce: ?loc:Location.t -> term -> logic_type -> term
 
+(** [alignof(t)] *)
+val talignof: ?loc:Location.t -> typ -> term
+
 (** [true] if the term is \result (potentially enclosed in \at)*)
 val is_result: term -> bool
 
