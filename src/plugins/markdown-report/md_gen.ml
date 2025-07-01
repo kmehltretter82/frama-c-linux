@@ -102,34 +102,36 @@ let section_stubs env =
       )
   in
   let stubbed_kf = List.filter Kernel_function.is_definition stubbed_kf in
-  let opt = Dynamic.Parameter.String.get "-eva-use-spec" () in
-  let l = String.split_on_char ',' opt in
   let use_spec =
-    List.filter_map
-      (* The option can include categories in Frama-C's List/Set/Map sense,
-         which begins with a '@'. In particular, @default is included by
-         default. Theoretically, there could also be some '-' to suppress
-         the inclusion of a function
-      *)
-      (fun s ->
-         if String.length s <> 0 && s.[0] <> '@' && s.[0] <> '-'
-         then
-           let kf = Globals.Functions.find_by_name s in
-           let anchor = sanitize_anchor s in
-           let content =
-             if env.is_draft then insert_marks env anchor
-             else
-               let intro = Markdown.text @@ Markdown.format
-                   "`%s` has the following specification" s in
-               let funspec =
-                 Populate_spec.populate_funspec kf [`Assigns];
-                 Markdown.codeblock ~lang:"acsl" "%a"
-                   Printer.pp_funspec (Annotations.funspec kf) in
-               Block ( intro @ funspec ) :: insert_remark env anchor
-           in
-           Some (H4 (code s, Some anchor) :: content)
-         else None)
-      l
+    if Eva_info.available () then begin
+      let opt = Dynamic.Parameter.String.get "-eva-use-spec" () in
+      let l = String.split_on_char ',' opt in
+      List.filter_map
+        (* The option can include categories in Frama-C's List/Set/Map sense,
+             which begins with a '@'. In particular, @default is included by
+             default. Theoretically, there could also be some '-' to suppress
+             the inclusion of a function
+        *)
+        (fun s ->
+           if String.length s <> 0 && s.[0] <> '@' && s.[0] <> '-'
+           then
+             let kf = Globals.Functions.find_by_name s in
+             let anchor = sanitize_anchor s in
+             let content =
+               if env.is_draft then insert_marks env anchor
+               else
+                 let intro = Markdown.text @@ Markdown.format
+                     "`%s` has the following specification" s in
+                 let funspec =
+                   Populate_spec.populate_funspec kf [`Assigns];
+                   Markdown.codeblock ~lang:"acsl" "%a"
+                     Printer.pp_funspec (Annotations.funspec kf) in
+                 Block ( intro @ funspec ) :: insert_remark env anchor
+             in
+             Some (H4 (code s, Some anchor) :: content)
+           else None)
+        l
+    end else []
   in
   let describe_func kf =
     let name = Kernel_function.get_name kf in
@@ -475,14 +477,14 @@ let gen_section_alarms env =
   let _,sections, content = Alarms.fold treat_alarm (0,[],[]) in
   let content = List.rev content in
   match content with
-  | [] ->
+  | [] when Eva_info.available () ->
     let anchor = "alarms" in
     let text_content =
       if env.is_draft then
-        Comment "No alarm!" :: insert_marks env anchor
+        Comment "No alarms!" :: insert_marks env anchor
       else
         Block (text @@ glue [
-            bold "No alarm"; plain "was found during the analysis.";
+            bold "No alarms"; plain "were found during the analysis.";
             plain "Any execution starting from";
             code (Kernel.MainFunction.get_function_name ());
             plain "in a context matching the one used for the analysis";
@@ -491,6 +493,7 @@ let gen_section_alarms env =
         :: insert_remark env anchor
     in
     H1 (plain "Results of the analysis", Some anchor) :: text_content
+  | [] -> [] (* nothing to report in this section *)
   | _ :: l ->
     let alarm = plural l "alarm" in
     let caption =
