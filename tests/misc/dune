@@ -23,3 +23,17 @@
   (applies_to log-truncation)
   (enabled_if %{bin-available:socat})
 )
+
+(cram
+  (applies_to share_directory)
+  (deps
+    (package frama-c)
+  )
+)
+
+(cram
+  (applies_to commands_file)
+  (deps
+    (package frama-c-eva)
+  )
+)
