@@ -33,7 +33,7 @@ void f() {
       { 0, &arr_1[1], &arr_1[1] },
       { 1, &arr_1[0], &arr_1[0] }
     };
-  struct s *x = malloc(sizeof(x) + sizeof(int)*10);
+  struct s *x = malloc(sizeof(*x) + sizeof(int)*10);
   size_t x2 = sizeof(x2) > 6 ? sizeof(x2): 6;
   #endif
 
