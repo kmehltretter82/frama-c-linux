@@ -8615,7 +8615,7 @@ and createGlobal loc ghost logic_spec ((t,s,b,attr_list) : (typ * storage * bool
       n docAlphaTable)
     *)
 
-(* it can happen that the variable to be initialized appears in the
+(* It can happen that the variable to be initialized appears in the
    auxiliary statements that contribute to its initialization (and thus
    are meant to occur before the corresponding Local_init statement. In
    that case, this function creates an auxiliary variable that is never
@@ -8624,6 +8624,20 @@ and createGlobal loc ghost logic_spec ((t,s,b,attr_list) : (typ * storage * bool
    the variable (either original or placeholder), the behavior is undefined.
    There are some cases where the evaluation will succeed, though, e.g. with
    size_t x = sizeof(x) > 6 ? sizeof(x): 6;
+
+   There are some cases that are harder to handle correctly. these cases are
+   not supported by Frama-C :
+   - Taking the address of the object being initialized in a side-effect
+     expression. The side-effect will be moved before the initialization, at
+     which point the address does not exist yet. We could use a tmp variable
+     like other cases, but then the address would not be the same.
+   - Affecting the object being initialized inside its initialization, like
+     int array[2]={ array[1] = 42 };
+     These cases could be solved by inlining the Cil_types.init like, for example :
+     int array[2];
+     // undefined sequence
+     { array[2] = 42; array[0] = array[1]; }
+     array[1] = 0;
 *)
 and cleanup_autoreference vi chunk ie =
   let open Current_loc.Operators in
@@ -8636,7 +8650,7 @@ and cleanup_autoreference vi chunk ie =
     res
   in
   (* [update] is used to know if the current lvalue is being updated
-     (modified/write) in the chunk. *)
+     (modified/written) in the chunk. *)
   let vis ~update =
     object(self)
       inherit Cil.nopCilVisitor
@@ -8665,7 +8679,7 @@ and cleanup_autoreference vi chunk ie =
       method! vexpr e =
         match e.enode with
         | AddrOf (Var v, _) when Cil_datatype.Varinfo.equal v vi ->
-          Errorloc.abort_context
+          Kernel.not_yet_implemented ~current:true
             "Attempting to take %s address ('%a') inside its own initialization \
              with side effects (not supported by frama-c)."
             vi.vname Cil_printer.pp_exp e
@@ -8674,7 +8688,7 @@ and cleanup_autoreference vi chunk ie =
       method! vvrbl v =
         if Cil_datatype.Varinfo.equal v vi then begin
           if update then
-            Errorloc.abort_context
+            Kernel.not_yet_implemented ~current:true
               "Attempting to write %s inside its own initialization \
                (not supported by frama-c)." vi.vname;
           match !temp with

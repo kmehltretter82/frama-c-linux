@@ -1,10 +1,4 @@
 [kernel] Parsing autoreference-init-issue-563.c (with preprocessing)
-[kernel] autoreference-init-issue-563.c:58: User Error: 
-  Attempting to take arr_2 address ('& arr_2[1]') inside its own initialization with side effects (not supported by frama-c).
-  56      struct _cell *y;
-  57      struct _cell arr_2[2] = {
-  58          { 0, (y = &arr_2[1], &arr_2[1]), &arr_2[1] },
-                        ^^^^^^^^^
-  59          { 1, &arr_2[0], &arr_2[0] }
-  60        };
-[kernel] Frama-C aborted: invalid user input.
+[kernel] autoreference-init-issue-563.c:59: Frama-C aborted: unimplemented feature.
+  You may send a feature request at https://git.frama-c.com/pub/frama-c/issues with:
+  '[Frama-C] Attempting to take arr_2 address ('& arr_2[1]') inside its own initialization with side effects (not supported by frama-c).'.

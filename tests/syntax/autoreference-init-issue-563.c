@@ -1,6 +1,6 @@
 /* run.config
    STDOPT: #"-cpp-extra-args=-DCORRECTINIT"
-   EXIT: 1
+   EXIT: 3
    STDOPT: #"-cpp-extra-args=-DAUTOINIT"
    STDOPT: #"-cpp-extra-args=-DADDREFFECTS"
 */
@@ -34,6 +34,7 @@ void f() {
       { 1, &arr_1[0], &arr_1[0] }
     };
   struct s *x = malloc(sizeof(x) + sizeof(int)*10);
+  size_t x2 = sizeof(x2) > 6 ? sizeof(x2): 6;
   #endif
 
   #ifdef AUTOINIT
