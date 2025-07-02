@@ -33,8 +33,12 @@ void f() {
       { 0, &arr_1[1], &arr_1[1] },
       { 1, &arr_1[0], &arr_1[0] }
     };
-  struct s *x = malloc(sizeof(*x) + sizeof(int)*10);
-  size_t x2 = sizeof(x2) > 6 ? sizeof(x2): 6;
+  // This will be collapsed so we can keep the mention of x1.
+  struct s *x1 = malloc(sizeof(*x1) + sizeof(int)*10);
+  // Here the normalization will transform the expression into a block, so
+  // collapse won't happen: keep the tmp variable.
+  struct s *x2 = (a[0] = 1, malloc(sizeof(*x2) + sizeof(int)*10));
+  size_t x3 = sizeof(x3) > 6 ? sizeof(x3): 6;
   #endif
 
   #ifdef AUTOINIT

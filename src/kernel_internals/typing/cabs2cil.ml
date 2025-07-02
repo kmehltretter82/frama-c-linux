@@ -8642,6 +8642,7 @@ and createGlobal loc ghost logic_spec ((t,s,b,attr_list) : (typ * storage * bool
 and cleanup_autoreference vi chunk ie =
   let open Current_loc.Operators in
   let exception Ignore in
+  let is_last_stmt = ref true in
   let temp = ref None in
   let calls = ref [] in
   let extract_calls () =
@@ -8663,18 +8664,22 @@ and cleanup_autoreference vi chunk ie =
 
       method! vstmt s =
         (* No need to check/cleanup autoreferences if this call is collapsed
-           later. We raise an exception to make sure lvalues from the chunk are
+           later. A collapse can happen only if the statement is the last one of
+           the chunk (so the first in the list of statement, and not inside a
+           block. We raise an exception to make sure lvalues from the chunk are
            not visited either. *)
         match s.skind, ie with
         | Instr (Call (Some (Var v1, NoOffset), f, _, _)),
           SingleInit { enode = Lval (Var v1', NoOffset) }
-          when can_collapse v1 v1' (Cil.var vi) vi.vtype f ->
+          when !is_last_stmt && can_collapse v1 v1' (Cil.var vi) vi.vtype f ->
           raise Ignore
         | Instr (Call (Some (Var v1, NoOffset), f, _, _)),
           SingleInit { enode = CastE(newt, { enode = Lval(Var v1', NoOffset)}) }
-          when can_collapse v1 v1' (Cil.var vi) newt f ->
+          when !is_last_stmt && can_collapse v1 v1' (Cil.var vi) newt f ->
           raise Ignore
-        | _ -> DoChildren
+        | _ ->
+          is_last_stmt := false;
+          DoChildren
 
       method! vexpr e =
         match e.enode with
