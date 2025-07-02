@@ -1,6 +1,6 @@
 /* run.config
-   EXECNOW: LOG save_load.sav.res LOG save_load.sav.err BIN @PTEST_NAME@.sav @frama-c@ -wp-warn-key pedantic-assigns=inactive -wp-share @PTEST_SHARE_DIR@ -wp -wp-print -wp-prover none @PTEST_FILE@ -save @PTEST_RESULT@/@PTEST_NAME@.sav > @PTEST_RESULT@/@PTEST_NAME@.sav.res 2> @PTEST_RESULT@/@PTEST_NAME@.sav.err
-   CMD: @frama-c@ -load %{dep:@PTEST_RESULT@/@PTEST_NAME@.sav} -wp-warn-key pedantic-assigns=inactive
+   EXECNOW: LOG save_load.sav.res LOG save_load.sav.err BIN @PTEST_NAME@.sav @frama-c@ -wp-warn-key pedantic-assigns=inactive -wp-share @PTEST_SHARE_DIR@ -wp -wp-print -wp-prover none @PTEST_FILE@ -save @PTEST_RESULT_DIR@/@PTEST_NAME@.sav > @PTEST_RESULT_DIR@/@PTEST_NAME@.sav.res 2> @PTEST_RESULT_DIR@/@PTEST_NAME@.sav.err
+   CMD: @frama-c@ -load %{dep:@PTEST_RESULT_DIR@/@PTEST_NAME@.sav} -wp-warn-key pedantic-assigns=inactive
    OPT: -print
    OPT: -wp -wp-prover none -wp-print
 */
