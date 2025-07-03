@@ -99,18 +99,42 @@ let () =
 (* --- Prepare builtins for an analysis                                   --- *)
 (* -------------------------------------------------------------------------- *)
 
+let warn_incompatible_type ~source name kf =
+  let kf_typ = Kernel_function.get_type kf in
+  let machdep_name = Machine.machdep_name () in
+  Self.warning ~wkey:Self.wkey_builtins_override ~source ~once:true
+    "The builtin %s will not be used for function %a of incompatible type.@ \
+     (got: %a. Machdep is %s)."
+    name Kernel_function.pretty kf Printer.pp_typ kf_typ machdep_name
+
+let warn_user_specification ~source kf =
+  Self.warning ~wkey:Self.wkey_builtins_missing_spec ~source ~once:true
+    "No Frama-C libc specification found for function %a, for which a \
+     builtin is used; its soundness relies on the specification provided \
+     by the user."
+    Kernel_function.pretty kf
+
+let warn_no_specification ~source kf =
+  Self.warning ~source ~once:true
+    ~wkey:Self.wkey_builtins_missing_spec
+    "The builtin for function %a will not be used, as its frama-c libc \
+     specification is not available."
+    Kernel_function.pretty kf
+
+let is_frama_c_builtin kf =
+  let vi = Kernel_function.get_vi kf in
+  Ast_info.start_with_frama_c vi.vname || Cil_builtins.has_fc_builtin_attr vi
+
 (* Returns the specification of a builtin, used to evaluate preconditions
    and to transfer the states of other domains. *)
 let find_builtin_specification kf =
   (* Functions for which a builtin is used should have a specification, except
      Frama_C_* builtins such as Frama_C_assert, for which we generate an empty
      specification with assigns clauses. *)
-  if String.starts_with ~prefix:"Frama_C" (Kernel_function.get_name kf)
+  if is_frama_c_builtin kf
   then Populate_spec.populate_funspec kf [`Assigns];
   let spec = Annotations.funspec kf in
-  (* The specification can be empty if [kf] has a body but no specification,
-     in which case [Annotations.funspec] does not generate a specification.
-     TODO: check that the specification is the frama-c libc specification? *)
+  (* The specification can be empty if [kf] has a body but no specification. *)
   if spec.spec_behavior <> [] then Some spec else None
 
 (* Returns [true] if the function [kf] is incompatible with the expected type
@@ -150,23 +174,13 @@ let warn_builtin_override kf source bname =
 let prepare_builtin kf (name, builtin, cacheable, expected_typ) =
   let source = fst (Kernel_function.get_location kf) in
   if inconsistent_builtin_typ kf expected_typ
-  then
-    Self.warning ~source ~once:true
-      ~wkey:Self.wkey_builtins_override
-      "The builtin %s will not be used for function %a of incompatible type.@ \
-       (got: %a. Machdep is %s)."
-      name Kernel_function.pretty kf
-      Printer.pp_typ (Kernel_function.get_type kf)
-      (Machine.machdep_name ())
+  then warn_incompatible_type ~source name kf
   else
     match find_builtin_specification kf with
-    | None ->
-      Self.warning ~source ~once:true
-        ~wkey:Self.wkey_builtins_missing_spec
-        "The builtin for function %a will not be used, as its frama-c libc \
-         specification is not available."
-        Kernel_function.pretty kf
+    | None -> warn_no_specification ~source kf
     | Some spec ->
+      if not (Kernel_function.is_in_libc kf) && not (is_frama_c_builtin kf)
+      then warn_user_specification ~source kf;
       warn_builtin_override kf source name;
       BuiltinsOverride.add kf;
       Hashtbl.replace builtins_table kf (name, builtin, cacheable, spec)

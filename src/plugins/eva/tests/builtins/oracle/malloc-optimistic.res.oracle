@@ -1,4 +1,8 @@
 [kernel] Parsing malloc-optimistic.c (with preprocessing)
+[eva:builtins:missing-spec] malloc-optimistic.c:6: Warning: 
+  No Frama-C libc specification found for function malloc, for which a builtin is used; its soundness relies on the specification provided by the user.
+[eva:builtins:missing-spec] malloc-optimistic.c:9: Warning: 
+  No Frama-C libc specification found for function free, for which a builtin is used; its soundness relies on the specification provided by the user.
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
