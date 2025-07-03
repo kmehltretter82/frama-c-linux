@@ -8633,13 +8633,14 @@ and createGlobal loc ghost logic_spec ((t,s,b,attr_list) : (typ * storage * bool
      like other cases, but then the address would not be the same.
    - Affecting the object being initialized inside its initialization, like
      int array[2]={ array[1] = 42 };
-     These cases could be solved by inlining the Cil_types.init like, for example :
+     These cases could be solved by inlining the Cil_types.init but it's not
+     trivial to do. For example :
      int array[2];
      // undefined sequence
      { array[2] = 42; array[0] = array[1]; }
      array[1] = 0;
 *)
-and cleanup_autoreference vi chunk ie =
+and handle_autoreference vi chunk ie =
   let open Current_loc.Operators in
   let exception Ignore in
   let is_last_stmt = ref true in
@@ -8666,8 +8667,8 @@ and cleanup_autoreference vi chunk ie =
         (* No need to check/cleanup autoreferences if this call is collapsed
            later. A collapse can happen only if the statement is the last one of
            the chunk (so the first in the list of statement, and not inside a
-           block. We raise an exception to make sure lvalues from the chunk are
-           not visited either. *)
+           block). We raise an exception instead of just skipping children to
+           make sure lvalues from the chunk are not visited either. *)
         match s.skind, ie with
         | Instr (Call (Some (Var v1, NoOffset), f, _, _)),
           SingleInit { enode = Lval (Var v1', NoOffset) }
@@ -8712,7 +8713,7 @@ and cleanup_autoreference vi chunk ie =
   let transform_lvals ~update l =
     List.map (visitCilLval (vis ~update)) l
   in
-  let treat_one (s, m, w, r, c) =
+  let treat_one ((s, m, w, r, _) as stmt) =
     let<> UpdatedCurrentLoc = Cil_datatype.Stmt.loc s in
     try
       let s' = visitCilStmt (vis ~update:false) s in
@@ -8721,7 +8722,7 @@ and cleanup_autoreference vi chunk ie =
       let r' = transform_lvals ~update:false r in
       let c' = extract_calls () in
       (s', m', w', r', c')
-    with Ignore -> (s, m, w, r, c)
+    with Ignore -> stmt
   in
   let stmts = List.map treat_one chunk.stmts in
   match !temp with
@@ -8965,7 +8966,7 @@ and createLocal ghost ((_, sto, _, _) as specs)
       let se4, ie', et, r =
         doInitializer loc (ghost_local_env ghost) vi inite
       in
-      let se4 = cleanup_autoreference vi se4 ie' in
+      let se4 = handle_autoreference vi se4 ie' in
       (* Fix the length *)
       if Ast_types.is_unsized_array vi.vtype && Ast_types.is_sized_array et
       then
