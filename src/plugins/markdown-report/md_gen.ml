@@ -25,9 +25,12 @@ open Markdown
 
 module Eva_info = struct
   let loaded = ref false
-  let coverage_md_gen: (unit -> elements) ref = Extlib.mk_fun "coverage_md_gen"
+  let computed: (unit -> bool) ref = Extlib.mk_fun "Eva_info.computed"
+  let coverage_md_gen: (unit -> elements) ref =
+    Extlib.mk_fun "Eva_info.coverage_md_gen"
   let domains_md_gen: (unit -> (text * text) list) ref=
-    Extlib.mk_fun "domains_md_gen"
+    Extlib.mk_fun "Eva_info.domains_md_gen"
+  let available () = !loaded && !computed ()
 end
 
 type env =
@@ -53,8 +56,13 @@ let insert_marks env anchor =
 
 let plural l s =
   match l with
-  | [] | [ _ ] -> s
-  | _::_::_ -> s ^ "s"
+  | [ _ ] -> s
+  | [] | _::_::_ -> s ^ "s"
+
+let plural_has l =
+  match l with
+  | [ _ ] -> "have"
+  | [] | _::_::_ -> "has"
 
 let section_domains env =
   let anchor = "domains" in
@@ -94,34 +102,36 @@ let section_stubs env =
       )
   in
   let stubbed_kf = List.filter Kernel_function.is_definition stubbed_kf in
-  let opt = Dynamic.Parameter.String.get "-eva-use-spec" () in
-  let l = String.split_on_char ',' opt in
   let use_spec =
-    List.filter_map
-      (* The option can include categories in Frama-C's List/Set/Map sense,
-         which begins with a '@'. In particular, @default is included by
-         default. Theoretically, there could also be some '-' to suppress
-         the inclusion of a function
-      *)
-      (fun s ->
-         if String.length s <> 0 && s.[0] <> '@' && s.[0] <> '-'
-         then
-           let kf = Globals.Functions.find_by_name s in
-           let anchor = sanitize_anchor s in
-           let content =
-             if env.is_draft then insert_marks env anchor
-             else
-               let intro = Markdown.text @@ Markdown.format
-                   "`%s` has the following specification" s in
-               let funspec =
-                 Populate_spec.populate_funspec kf [`Assigns];
-                 Markdown.codeblock ~lang:"acsl" "%a"
-                   Printer.pp_funspec (Annotations.funspec kf) in
-               Block ( intro @ funspec ) :: insert_remark env anchor
-           in
-           Some (H4 (code s, Some anchor) :: content)
-         else None)
-      l
+    if Eva_info.available () then begin
+      let opt = Dynamic.Parameter.String.get "-eva-use-spec" () in
+      let l = String.split_on_char ',' opt in
+      List.filter_map
+        (* The option can include categories in Frama-C's List/Set/Map sense,
+             which begins with a '@'. In particular, @default is included by
+             default. Theoretically, there could also be some '-' to suppress
+             the inclusion of a function
+        *)
+        (fun s ->
+           if String.length s <> 0 && s.[0] <> '@' && s.[0] <> '-'
+           then
+             let kf = Globals.Functions.find_by_name s in
+             let anchor = sanitize_anchor s in
+             let content =
+               if env.is_draft then insert_marks env anchor
+               else
+                 let intro = Markdown.text @@ Markdown.format
+                     "`%s` has the following specification" s in
+                 let funspec =
+                   Populate_spec.populate_funspec kf [`Assigns];
+                   Markdown.codeblock ~lang:"acsl" "%a"
+                     Printer.pp_funspec (Annotations.funspec kf) in
+                 Block ( intro @ funspec ) :: insert_remark env anchor
+             in
+             Some (H4 (code s, Some anchor) :: content)
+           else None)
+        l
+    end else []
   in
   let describe_func kf =
     let name = Kernel_function.get_name kf in
@@ -187,7 +197,7 @@ let get_files () =
            else acc)
         Datatype.String.Set.empty dir_files
     in
-    if Datatype.String.Set.subset dir_files files then
+    if Datatype.String.Set.(cardinal files > 1 && subset dir_files files) then
       (dir ^ "/*" ^ suf) :: l
     else
       Datatype.String.Set.elements files @ l
@@ -263,7 +273,7 @@ let gen_context env =
   H1 (plain "Context of the analysis", Some "context")
   :: gen_inputs env
   @ gen_config env
-  @ (if !Eva_info.loaded then section_domains env else [])
+  @ (if Eva_info.available () then section_domains env else [])
   @ H3 (plain "Stubbed Functions", Some "stubs")
     :: (
       if env.is_draft then
@@ -417,7 +427,8 @@ let gen_section_warnings env =
         [Block (
             (text @@ glue [
                 plain ("The table below lists the " ^ plural warnings "warning");
-                plain "that have been emitted by the analyzer.";
+                plain ("that " ^ plural_has warnings ^
+                       " been emitted by the analyzer.");
                 plain "They might put additional assumptions on the relevance";
                 plain "of the analysis results and must be reviewed carefully";
               ]) @
@@ -466,14 +477,14 @@ let gen_section_alarms env =
   let _,sections, content = Alarms.fold treat_alarm (0,[],[]) in
   let content = List.rev content in
   match content with
-  | [] ->
+  | [] when Eva_info.available () ->
     let anchor = "alarms" in
     let text_content =
       if env.is_draft then
-        Comment "No alarm!" :: insert_marks env anchor
+        Comment "No alarms!" :: insert_marks env anchor
       else
         Block (text @@ glue [
-            bold "No alarm"; plain "was found during the analysis";
+            bold "No alarms"; plain "were found during the analysis.";
             plain "Any execution starting from";
             code (Kernel.MainFunction.get_function_name ());
             plain "in a context matching the one used for the analysis";
@@ -482,8 +493,9 @@ let gen_section_alarms env =
         :: insert_remark env anchor
     in
     H1 (plain "Results of the analysis", Some anchor) :: text_content
+  | [] -> [] (* nothing to report in this section *)
   | _ :: l ->
-    let alarm = if l = [] then "alarm" else "alarms" in
+    let alarm = plural l "alarm" in
     let caption =
       Some (plain (String.capitalize_ascii alarm ^ " emitted by the analysis"))
     in
@@ -574,7 +586,7 @@ let gen_report ~draft:is_draft () =
   let remarks = mk_remarks is_draft in
   let env = { remarks; is_draft } in
   let context = gen_context env in
-  let coverage = if !Eva_info.loaded then gen_coverage env else [] in
+  let coverage = if Eva_info.available() then gen_coverage env else [] in
   let alarms = gen_alarms env in
   let title = Mdr_params.Title.get () in
   let title =
