@@ -1302,6 +1302,15 @@ module Orig_name =
 
 let () = Parameter_customize.set_group parsing
 let () = Parameter_customize.do_not_reset_on_copy ()
+module C23 =
+  False(struct
+    let option_name = "-c23"
+    let help = "allow C13 constructs (experimental; partial support only)"
+    let module_name = "C23"
+  end)
+
+let () = Parameter_customize.set_group parsing
+let () = Parameter_customize.do_not_reset_on_copy ()
 module JsonCompilationDatabase =
   P.Filepath
     (struct

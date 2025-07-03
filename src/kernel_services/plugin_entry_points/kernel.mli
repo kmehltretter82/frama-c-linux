@@ -597,6 +597,9 @@ val normalization_parameters: unit -> Typed_parameter.t list
     changing one will reset the AST entirely.contents
 *)
 
+module C23: Parameter_sig.Bool
+(** Behavior of option "-c23" *)
+
 module JsonCompilationDatabase: Parameter_sig.Filepath
 [@@ ocaml.deprecated "Use CompilationDb instead"]
 (** Deprecated; use "-compilation-db" instead *)
