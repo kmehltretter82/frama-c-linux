@@ -172,7 +172,10 @@ class annot_visitor kf flags on_alarm = object (self)
           let kf = Globals.Functions.get vinfo in
           let frama_b = Ast_info.start_with_frama_c_builtin (Kernel_function.get_name kf)
           in
-          let va_start = Kernel_function.get_name kf = "__builtin_va_start" in
+          let fname = Kernel_function.get_name kf in
+          let va_start =
+            fname = "__builtin_va_start" || fname = "__builtin_c23_va_start"
+          in
           (frama_b, va_start)
         | _ -> (false, false)
       in

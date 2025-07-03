@@ -582,7 +582,8 @@ let is_variadic_function vi =
 (* set of functions that must never be duplicated *)
 let unduplicable_functions =
   let white_list =
-    [ "__builtin_va_arg";
+    [ "__builtin_c23_va_arg";
+      "__builtin_va_arg";
       "__builtin_va_end";
       "__builtin_va_start";
       "__builtin_va_copy";

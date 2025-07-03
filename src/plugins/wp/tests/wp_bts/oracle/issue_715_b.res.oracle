@@ -22,7 +22,7 @@ Prove: true.
 Goal Instance of 'Pre-condition (file issue_715_b.i, line 4) in 'dummy'' in 'foo' at call 'dummy' (file issue_715_b.i, line 11)
 :
 Assume { (* Heap *) Type: linked(Malloc_0). }
-Prove: P_isValid(Malloc_0[L_p_30 <- 1], shift_sint32(global(L_p_30), 0)).
+Prove: P_isValid(Malloc_0[L_p_32 <- 1], shift_sint32(global(L_p_32), 0)).
 
 ------------------------------------------------------------
 

@@ -135,7 +135,7 @@ Prove: true.
 Goal Assigns (file memory_hypotheses_checking.i, line 83) in 'call_add_return_ok' (3/3):
 Effect at line 87
 Assume { (* Heap *) Type: linked(Malloc_0). }
-Prove: invalid(Malloc_0, global(L_l_71), 1).
+Prove: invalid(Malloc_0, global(L_l_73), 1).
 
 ------------------------------------------------------------
 
@@ -255,7 +255,7 @@ Prove: true.
 Goal Instance of 'Pre-condition for 'wp_typed_ref' (file memory_hypotheses_checking.i, line 39) in 'gptr_sep'' in 'call_gptr_sep_bad' at call 'gptr_sep' (file memory_hypotheses_checking.i, line 53)
 :
 Assume { (* Heap *) Type: linked(Malloc_0). }
-Prove: valid_rw(Malloc_0, global(G_g_20), 1).
+Prove: valid_rw(Malloc_0, global(G_g_22), 1).
 
 ------------------------------------------------------------
 
@@ -291,7 +291,7 @@ Prove: true.
 Goal Instance of 'Pre-condition for 'wp_typed_ref' (file memory_hypotheses_checking.i, line 39) in 'gptr_sep'' in 'call_gptr_sep_ok' at call 'gptr_sep' (file memory_hypotheses_checking.i, line 47)
 :
 Assume { (* Heap *) Type: linked(Malloc_0). }
-Prove: valid_rw(Malloc_0[L_l_46 <- 1], global(L_l_46), 1).
+Prove: valid_rw(Malloc_0[L_l_48 <- 1], global(L_l_48), 1).
 
 ------------------------------------------------------------
 
@@ -374,7 +374,7 @@ Prove: true.
 Goal Instance of 'Pre-condition for 'wp_typed_ref' (file memory_hypotheses_checking.i, line 12) in 'sep'' in 'call_sep_bad_valid' at call 'sep' (file memory_hypotheses_checking.i, line 34)
 :
 Assume { (* Heap *) Type: linked(Malloc_0). }
-Prove: valid_rw(Malloc_0[L_l_37 <- 0], global(L_l_37), 1).
+Prove: valid_rw(Malloc_0[L_l_39 <- 0], global(L_l_39), 1).
 
 ------------------------------------------------------------
 

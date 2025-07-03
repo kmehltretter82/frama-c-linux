@@ -33,7 +33,7 @@ Prove: true.
 
 Goal Post-condition (file unit_alloc.i, line 33) in 'h':
 Assume { (* Heap *) Type: linked(Malloc_0). }
-Prove: !valid_rw(Malloc_0[P_x_40 <- 0], global(P_x_40), 1).
+Prove: !valid_rw(Malloc_0[P_x_42 <- 0], global(P_x_42), 1).
 
 ------------------------------------------------------------
 ------------------------------------------------------------
@@ -47,7 +47,7 @@ Prove: true.
 
 Goal Assertion (file unit_alloc.i, line 21):
 Assume { (* Heap *) Type: linked(Malloc_0). }
-Prove: valid_rw(Malloc_0[L_y_25 <- 1], global(L_y_25), 1).
+Prove: valid_rw(Malloc_0[L_y_27 <- 1], global(L_y_27), 1).
 
 ------------------------------------------------------------
 
@@ -57,14 +57,14 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Assertion (file unit_alloc.i, line 24):
-Let a = global(L_y_25).
+Let a = global(L_y_27).
 Assume {
   (* Heap *)
   Type: linked(Malloc_0).
   (* Assertion *)
-  Have: valid_rw(Malloc_0[L_y_25 <- 1], a, 1).
+  Have: valid_rw(Malloc_0[L_y_27 <- 1], a, 1).
 }
-Prove: !valid_rw(Malloc_0[L_y_25 <- 0], a, 1).
+Prove: !valid_rw(Malloc_0[L_y_27 <- 0], a, 1).
 
 ------------------------------------------------------------
 [wp] unit_alloc.i:34: Warning: 

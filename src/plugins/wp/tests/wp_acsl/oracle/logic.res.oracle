@@ -39,7 +39,7 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Post-condition (file logic.i, line 21) in 'h':
-Let a = global(G_t_29).
+Let a = global(G_t_31).
 Let m = Array_S1(shift_S1(a, 0), 3, Mint_0).
 Let m_1 = Array_S1(a, 3, Mint_0).
 Assume { Type: IsArray_S1(m_1) /\ IsArray_S1(m). (* Call 'f' *) Have: P_P(m).
@@ -72,7 +72,7 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Pre-condition 'qed_ok' in 'main':
-Let a = global(G_tr_35).
+Let a = global(G_tr_37).
 Let a_1 = shift_S1(a, 2).
 Let a_2 = shift_S1(a, 1).
 Let a_3 = shift_S1(a, 0).
@@ -80,7 +80,7 @@ Let m = Array_S1(a, 3, Mint_0).
 Assume {
   Type: IsArray_S1(m) /\ IsArray_S1(Array_S1(a_3, 3, Mint_0)).
   (* Heap *)
-  Type: region(G_tr_35) <= 0.
+  Type: region(G_tr_37) <= 0.
   (* Initializer *)
   Init: Mint_0[shiftfield_F1_x(a_3)] = 10.
   (* Initializer *)
@@ -99,7 +99,7 @@ Prove: P_P(m).
 ------------------------------------------------------------
 
 Goal Pre-condition 'qed_ok' in 'main':
-Let a = global(G_tr_35).
+Let a = global(G_tr_37).
 Let a_1 = shift_S1(a, 2).
 Let a_2 = shift_S1(a, 1).
 Let a_3 = shift_S1(a, 0).
@@ -107,7 +107,7 @@ Let m = Array_S1(a, 3, Mint_0).
 Assume {
   Type: IsArray_S1(m) /\ IsArray_S1(Array_S1(a_3, 3, Mint_0)).
   (* Heap *)
-  Type: region(G_tr_35) <= 0.
+  Type: region(G_tr_37) <= 0.
   (* Initializer *)
   Init: Mint_0[shiftfield_F1_x(a_3)] = 10.
   (* Initializer *)
@@ -126,7 +126,7 @@ Prove: P_P(m).
 ------------------------------------------------------------
 
 Goal Pre-condition 'qed_ok' in 'main':
-Let a = global(G_tr_35).
+Let a = global(G_tr_37).
 Let a_1 = shift_S1(a, 2).
 Let a_2 = shift_S1(a, 1).
 Let a_3 = shift_S1(a, 0).
@@ -134,7 +134,7 @@ Let m = Array_S1(a_3, 3, Mint_0).
 Assume {
   Type: IsArray_S1(Array_S1(a, 3, Mint_0)) /\ IsArray_S1(m).
   (* Heap *)
-  Type: region(G_tr_35) <= 0.
+  Type: region(G_tr_37) <= 0.
   (* Initializer *)
   Init: Mint_0[shiftfield_F1_x(a_3)] = 10.
   (* Initializer *)
@@ -156,7 +156,7 @@ Goal Pre-condition 'qed_ok' in 'main':
 logic.i:49: warning from wp:
  - Warning: Hide sub-term definition
    Reason: Logic cast from struct (Tint2) not implemented yet
-Assume { (* Heap *) Type: region(G_tr_35) <= 0. }
+Assume { (* Heap *) Type: region(G_tr_37) <= 0. }
 Prove: (w.F1_y) = 11.
 
 ------------------------------------------------------------
@@ -165,7 +165,7 @@ Goal Pre-condition 'qed_ok' in 'main':
 logic.i:50: warning from wp:
  - Warning: Hide sub-term definition
    Reason: Logic cast from struct (Point) not implemented yet
-Assume { (* Heap *) Type: region(G_tr_35) <= 0. }
+Assume { (* Heap *) Type: region(G_tr_37) <= 0. }
 Prove: (w.F3_tab)[1] = 11.
 
 ------------------------------------------------------------
@@ -174,7 +174,7 @@ Goal Pre-condition 'qed_ok' in 'main':
 logic.i:51: warning from wp:
  - Warning: Hide sub-term definition
    Reason: Logic cast to struct (Point) from (int [2]) not implemented yet
-Assume { (* Heap *) Type: region(G_tr_35) <= 0. }
+Assume { (* Heap *) Type: region(G_tr_37) <= 0. }
 Prove: (w.F1_y) = 11.
 
 ------------------------------------------------------------
@@ -183,7 +183,7 @@ Goal Pre-condition 'qed_ok' in 'main':
 logic.i:52: warning from wp:
  - Warning: Hide sub-term definition
    Reason: Logic cast from struct (Point) not implemented yet
-Assume { (* Heap *) Type: region(G_tr_35) <= 0. }
+Assume { (* Heap *) Type: region(G_tr_37) <= 0. }
 Prove: w[1] = 11.
 
 ------------------------------------------------------------
@@ -192,7 +192,7 @@ Goal Pre-condition 'qed_ok' in 'main':
 logic.i:53: warning from wp:
  - Warning: Hide sub-term definition
    Reason: Logic cast from struct (Tint2) not implemented yet
-Assume { (* Heap *) Type: region(G_tr_35) <= 0. }
+Assume { (* Heap *) Type: region(G_tr_37) <= 0. }
 Prove: w[1] = 11.
 
 ------------------------------------------------------------
@@ -201,7 +201,7 @@ Goal Pre-condition 'qed_ok' in 'main':
 logic.i:54: warning from wp:
  - Warning: Hide sub-term definition
    Reason: Logic cast from struct (Buint) not implemented yet
-Assume { (* Heap *) Type: region(G_tr_35) <= 0. }
+Assume { (* Heap *) Type: region(G_tr_37) <= 0. }
 Prove: w = 134480385.
 
 ------------------------------------------------------------
@@ -210,13 +210,13 @@ Goal Pre-condition 'qed_ok' in 'main':
 logic.i:55: warning from wp:
  - Warning: Hide sub-term definition
    Reason: Logic cast to struct (Buint) from (unsigned int) not implemented yet
-Let a = global(G_buint_41).
+Let a = global(G_buint_43).
 Let a_1 = shiftfield_F4_bytes(a).
 Let a_2 = Load_S4(a, Mint_0).
 Assume {
   Type: IsS4(a_2).
   (* Heap *)
-  Type: region(G_tr_35) <= 0.
+  Type: region(G_tr_37) <= 0.
   (* Initializer *)
   Init: Mint_0[shift_uint8(a_1, 0)] = 1.
   (* Initializer *)
@@ -234,7 +234,7 @@ Goal Pre-condition 'qed_ok' in 'main':
 logic.i:56: warning from wp:
  - Warning: Hide sub-term definition
    Reason: Logic cast from struct (Tint6) not implemented yet
-Assume { (* Heap *) Type: region(G_tr_35) <= 0. }
+Assume { (* Heap *) Type: region(G_tr_37) <= 0. }
 Prove: (w[1].F1_y) = 21.
 
 ------------------------------------------------------------
@@ -243,7 +243,7 @@ Goal Pre-condition 'qed_ok' in 'main':
 logic.i:57: warning from wp:
  - Warning: Hide sub-term definition
    Reason: Logic cast to sized array (Triangle) from (int [6]) not implemented yet
-Assume { (* Heap *) Type: region(G_tr_35) <= 0. }
+Assume { (* Heap *) Type: region(G_tr_37) <= 0. }
 Prove: (w[1].F1_y) = 21.
 
 ------------------------------------------------------------
@@ -252,7 +252,7 @@ Goal Pre-condition 'qed_ok' in 'main':
 logic.i:58: warning from wp:
  - Warning: Hide sub-term definition
    Reason: Logic cast from struct (Tint6) not implemented yet
-Assume { (* Heap *) Type: region(G_tr_35) <= 0. }
+Assume { (* Heap *) Type: region(G_tr_37) <= 0. }
 Prove: w[4] = 30.
 
 ------------------------------------------------------------
@@ -261,7 +261,7 @@ Goal Pre-condition 'qed_ok' in 'main':
 logic.i:59: warning from wp:
  - Warning: Hide sub-term definition
    Reason: Logic cast from struct (Tint6) not implemented yet
-Assume { (* Heap *) Type: region(G_tr_35) <= 0. }
+Assume { (* Heap *) Type: region(G_tr_37) <= 0. }
 Prove: w[1] = 11.
 
 ------------------------------------------------------------
@@ -270,7 +270,7 @@ Goal Pre-condition 'qed_ok' in 'main':
 logic.i:60: warning from wp:
  - Warning: Hide sub-term definition
    Reason: Logic cast to sized array (int [2]) from (int [6]) not implemented yet
-Assume { (* Heap *) Type: region(G_tr_35) <= 0. }
+Assume { (* Heap *) Type: region(G_tr_37) <= 0. }
 Prove: w[1] = 11.
 
 ------------------------------------------------------------
@@ -279,7 +279,7 @@ Goal Pre-condition 'qed_ok' in 'main':
 logic.i:61: warning from wp:
  - Warning: Hide sub-term definition
    Reason: Logic cast from struct (Tint6) not implemented yet
-Assume { (* Heap *) Type: region(G_tr_35) <= 0. }
+Assume { (* Heap *) Type: region(G_tr_37) <= 0. }
 Prove: (w.F3_tab)[1] = 11.
 
 ------------------------------------------------------------
@@ -288,7 +288,7 @@ Goal Pre-condition 'qed_ok' in 'main':
 logic.i:62: warning from wp:
  - Warning: Hide sub-term definition
    Reason: Logic cast to struct (Tint2) from (int [6]) not implemented yet
-Assume { (* Heap *) Type: region(G_tr_35) <= 0. }
+Assume { (* Heap *) Type: region(G_tr_37) <= 0. }
 Prove: (w.F3_tab)[1] = 11.
 
 ------------------------------------------------------------

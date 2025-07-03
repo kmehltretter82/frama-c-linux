@@ -41,7 +41,7 @@ Tags: Call function.
 Assume {
   Type: is_uint32(n).
   (* Heap *)
-  Type: region(G_function_58) <= 0.
+  Type: region(G_function_60) <= 0.
   (* Then *)
   Have: n != 0.
 }

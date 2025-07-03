@@ -82,7 +82,8 @@ let () = add_special_builtin_family
 
 let () = List.iter add_special_builtin
     [ "__builtin_stdarg_start"; "__builtin_va_arg"; "__builtin_va_end";
-      "__builtin_va_start"; "__builtin_expect"; "__builtin_next_arg"; ]
+      "__builtin_va_start"; "__builtin_c23_va_start"; "__builtin_expect";
+      "__builtin_next_arg"; ]
 
 module Builtin_functions =
   State_builder.Hashtbl
@@ -411,10 +412,9 @@ let init_builtins_from_json () =
       List.iter add_builtin_if_active builtins
     )
 
+(** Initialize the C built-ins. Called by {!Machine.init} via
+    {!Machine.init_builtins_ref}. *)
 let init_builtins () =
-  if not (Machine.is_computed ()) then
-    Kernel.fatal ~current:true
-      "You must call Machine.init before init_builtins" ;
   if Builtin_functions.length () <> 0 then
     Kernel.fatal ~current:true "Cil builtins already initialized." ;
   init_builtins_from_json ();
@@ -426,3 +426,9 @@ let builtinLoc: location = Location.unknown
 let () =
   Machine.init_builtins_ref := init_builtins
 [@@alert "-machine_init_builtins_ref"]
+
+(* init_builtins should only be called through mechanism above.
+   The dummy definition below ought to be removed together with
+   its deprecated export in the .mli.
+*)
+let init_builtins = Extlib.nop

@@ -29,7 +29,7 @@ Prove: true.
 
 Goal Assigns (file bts0843.i, line 14) in 'g3':
 Call Effect at line 16
-Let a = Mptr_0[global(G_p_20)].
+Let a = Mptr_0[global(G_p_22)].
 Let a_1 = shiftfield_F1_a(a).
 Assume {
   (* Heap *)

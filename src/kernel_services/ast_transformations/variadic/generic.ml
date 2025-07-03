@@ -124,7 +124,7 @@ let translate_va_builtin caller inst =
   in
 
   begin match vi.vname with
-    | "__builtin_va_start" -> translate_va_start ()
+    | "__builtin_va_start" | "__builtin_c23_va_start" -> translate_va_start ()
     | "__builtin_va_copy" -> translate_va_copy ()
     | "__builtin_va_arg" -> translate_va_arg ()
     | "__builtin_va_end" -> [] (* No need to do anything for va_end *)

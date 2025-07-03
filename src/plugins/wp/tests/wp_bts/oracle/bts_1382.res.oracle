@@ -74,7 +74,7 @@ Assume {
   (* Then *)
   Have: i <= 99.
 }
-Prove: global(G_dest_45) = w.
+Prove: global(G_dest_47) = w.
 
 ------------------------------------------------------------
 
@@ -99,7 +99,7 @@ Assume {
   (* Then *)
   Have: i <= 99.
 }
-Prove: included(a, 4, global(G_dest_45), 1).
+Prove: included(a, 4, global(G_dest_47), 1).
 
 ------------------------------------------------------------
 

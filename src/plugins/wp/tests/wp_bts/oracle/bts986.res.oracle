@@ -10,6 +10,6 @@
 
 Goal Assertion 'A' (file bts986.i, line 12):
 Assume { (* Heap *) Type: linked(Malloc_0). }
-Prove: !valid_rw(Malloc_0[L_x_23 <- 0], global(L_x_23), 1).
+Prove: !valid_rw(Malloc_0[L_x_25 <- 0], global(L_x_25), 1).
 
 ------------------------------------------------------------

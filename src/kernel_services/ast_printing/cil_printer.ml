@@ -1071,10 +1071,11 @@ class cil_printer () = object (self)
         instr_terminator
 
     (* In cabs2cil we have dropped the last argument in the call to
-       __builtin_va_start and __builtin_stdarg_start. *)
+       __builtin_va_start, __builtin_stdarg_start, __builtin_c23_va_start. *)
     | Call(None, {enode = Lval(Var vi, NoOffset)}, [marker], l)
       when ((vi.vname = "__builtin_stdarg_start" ||
-             vi.vname = "__builtin_va_start")
+             vi.vname = "__builtin_va_start" ||
+             vi.vname = "__builtin_c23_va_start")
             && not state.print_cil_as_is) ->
       let last = self#getLastNamedArgument () in
       self#instr fmt (Call(None, Cil.dummy_exp(Lval(Var vi,NoOffset)),

@@ -6689,7 +6689,8 @@ and doExp local_env
                  Kernel.warning ~current:true "Invalid call to %s\n" fv.vname;
              end
 
-           | "__builtin_va_start" ->
+           | "__builtin_va_start"
+           | "__builtin_c23_va_start" ->
              let variad = match (!currentFunctionFDEC).svar.vtype.tnode with
                | TFun (_, _, t) -> t
                | _ -> assert false
@@ -6708,13 +6709,15 @@ and doExp local_env
                    in
                    if not isOk && variad then
                      Kernel.error ~current:true
-                       "The last argument in call to __builtin_va_start \
-                        should be the last formal argument of %s" name;
+                       "The last argument in call to %s \
+                        should be the last formal argument of %s"
+                       fv.vname name;
 
                    if not isOk && not variad then
                      Kernel.error ~current:true
-                       "Invalid call to __builtin_va_start \
+                       "Invalid call to %s \
                         in non-variadic function %s"
+                       fv.vname
                        name;
 
                    (* Check that "lastv" is indeed the last variable in the
