@@ -71,6 +71,7 @@
         "typing:incompatible-types-call", "typing:inconsistent-specifier",
         "typing:initializer-overrides", "typing:int-conversion",
         "typing:merge-conversion", "typing:no-proto", "typing:variadic",
+        "typing:variadic:format", "typing:variadic:format:nonliteral",
         "unknown-attribute"
       ],
       "disabled": [

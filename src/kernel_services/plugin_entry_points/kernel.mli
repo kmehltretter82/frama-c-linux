@@ -257,6 +257,7 @@ val wkey_libc: warn_category
 val wkey_libc_framac: warn_category
 val wkey_prototype: warn_category
 val wkey_typing: warn_category
+val wkey_variadic_format_nonliteral: warn_category
 
 (* ************************************************************************* *)
 (** {2 Functors for late option registration}                                *)

@@ -743,6 +743,7 @@ let format_fun_call ~builder env format_fun vf args =
       match static_string format_arg with
       | None ->
         Kernel.warning ~current:true
+          ~wkey:Kernel.wkey_variadic_format_nonliteral
           "Call to function %s with non-static format argument: \
            assuming that parameters are coherent with the format, and that \
            no %%n specifiers are present in the actual string."

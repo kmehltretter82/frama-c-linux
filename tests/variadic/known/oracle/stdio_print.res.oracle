@@ -17,23 +17,23 @@
   Declaration of variadic function dprintf.
 [kernel:variadic] FRAMAC_SHARE/libc/stdio.h:682: 
   Declaration of variadic function asprintf.
-[kernel] stdio_print.c:9: Warning: 
+[kernel:typing:variadic:format:nonliteral] stdio_print.c:9: Warning: 
   Call to function fprintf with non-static format argument: assuming that parameters are coherent with the format, and that no %n specifiers are present in the actual string.
 [kernel:variadic] stdio_print.c:9: 
   Translating call to fprintf to a call to the specialized version fprintf_va_1.
-[kernel] stdio_print.c:10: Warning: 
+[kernel:typing:variadic:format:nonliteral] stdio_print.c:10: Warning: 
   Call to function printf with non-static format argument: assuming that parameters are coherent with the format, and that no %n specifiers are present in the actual string.
 [kernel:variadic] stdio_print.c:10: 
   Translating call to printf to a call to the specialized version printf_va_1.
-[kernel] stdio_print.c:11: Warning: 
+[kernel:typing:variadic:format:nonliteral] stdio_print.c:11: Warning: 
   Call to function snprintf with non-static format argument: assuming that parameters are coherent with the format, and that no %n specifiers are present in the actual string.
 [kernel:variadic] stdio_print.c:11: 
   Translating call to snprintf to a call to the specialized version snprintf_va_1.
-[kernel] stdio_print.c:12: Warning: 
+[kernel:typing:variadic:format:nonliteral] stdio_print.c:12: Warning: 
   Call to function sprintf with non-static format argument: assuming that parameters are coherent with the format, and that no %n specifiers are present in the actual string.
 [kernel:variadic] stdio_print.c:12: 
   Translating call to sprintf to a call to the specialized version sprintf_va_1.
-[kernel] stdio_print.c:13: Warning: 
+[kernel:typing:variadic:format:nonliteral] stdio_print.c:13: Warning: 
   Call to function dprintf with non-static format argument: assuming that parameters are coherent with the format, and that no %n specifiers are present in the actual string.
 [kernel:variadic] stdio_print.c:13: 
   Translating call to dprintf to a call to the specialized version dprintf_va_1.

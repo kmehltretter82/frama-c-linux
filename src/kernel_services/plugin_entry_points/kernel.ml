@@ -267,6 +267,10 @@ let wkey_format = register_warn_category "libc:format"
 let wkey_libc_framac = register_warn_category "libc:frama-c"
 let wkey_prototype = register_warn_category "prototype"
 let wkey_typing = register_warn_category "typing:variadic"
+let wkey_variadic_format_nonliteral =
+  register_warn_category "typing:variadic:format:nonliteral"
+    ~help:("warns about scanf/printf with non-literal strings; " ^
+           "similar to GCC's [-Wformat-nonliteral]")
 
 (* ************************************************************************* *)
 (** {2 Specialised functors for building kernel parameters} *)
