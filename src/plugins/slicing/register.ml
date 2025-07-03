@@ -22,6 +22,24 @@
 
 (* Basic plug-in internal documentation at the end of this file. *)
 
+(** Find a unique name to export the sliced project into.
+    The name is derived from the given [project_name] and the
+    [ExportedProjectPostfix] parameter. *)
+let get_sliced_project_name project_name =
+  let sliced_project_name =
+    project_name ^ (SlicingParameters.ExportedProjectPostfix.get ())
+  in
+  let rec aux s idx =
+    match Project.find_all s with
+    | [] -> s
+    | _ :: _ ->
+      let idx = succ idx in
+      let s = Format.asprintf "%s %d" s idx in
+      aux s idx
+  in
+  aux sliced_project_name 1
+
+
 let main () =
   if SlicingParameters.is_on () then begin
     SlicingParameters.feedback ~level:1 "slicing requests in progress...";
@@ -50,9 +68,7 @@ let main () =
 
     if SlicingParameters.Mode.Callers.get () then
       Api.Slice.remove_uncalled ();
-    let sliced_project_name =
-      project_name ^ (SlicingParameters.ExportedProjectPostfix.get ())
-    in
+    let sliced_project_name = get_sliced_project_name project_name in
     SlicingParameters.set_off ();
     let sliced_project = Api.Project.extract sliced_project_name in
     Project.on sliced_project SlicingParameters.clear ();

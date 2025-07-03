@@ -85,11 +85,9 @@ let dummy_state_on_disk =
     on_disk_saved = false;
     on_disk_digest = "" }
 
-let dummy_unique_name = ""
-
 let dummy =
   { name = "";
-    unique_name = dummy_unique_name;
+    unique_name = "";
     private_ops = dummy_private_ops () }
 
 include Datatype.Make_with_collections
@@ -162,12 +160,9 @@ let add s =
        "state should have a non-empty name");
   Datatype.String.Hashtbl.add states uname s
 
-let unique_name_from_name =
-  let module M =
-    Project_skeleton.Make_setter
-      (struct let mem s = Datatype.String.Hashtbl.mem states s end)
-  in
-  M.make_unique_name
+let unique_name_from_name name =
+  let mem s = Datatype.String.Hashtbl.mem states s in
+  snd (Extlib.make_unique_name mem ~sep:" " name)
 
 (* ************************************************************************** *)
 (** {3 State generators} *)

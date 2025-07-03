@@ -139,7 +139,7 @@ struct
     debug ~dkey ~level "%s %S (project %s)"
       op_name
       !internal_name
-      (Project.get_unique_name p)
+      (Project.get_debug_name p)
 
   module Datatype = D
   module Tbl = Hashtbl.Make(Project)
@@ -168,7 +168,7 @@ struct
         fatal
           "state %S not associated with project %S; program will fail"
           name
-          (Project.get_unique_name p)
+          (Project.get_debug_name p)
 
   module Update_hook = Hook.Build(Datatype)
   let add_hook_on_update = Update_hook.extend
@@ -228,7 +228,7 @@ struct
     has_cleared
 
   let copy src dst =
-    debug ~level:4 ("copying to " ^ Project.get_unique_name dst) src;
+    debug ~level:4 ("copying to " ^ Project.get_debug_name dst) src;
     let v = find src in
     if Datatype.copy == FCDatatype.undefined then
       abort "cannot copy project: unimplemented `copy' function in datatype \
@@ -275,7 +275,7 @@ struct
           try (find p).state, false
           with Not_found ->
             fatal "unknown project '%s' in state '%s'"
-              (Project.get_unique_name p)
+              (Project.get_debug_name p)
               !internal_name
       in
       change ~force:true p { state = s; computed = computed };

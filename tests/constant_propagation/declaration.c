@@ -1,5 +1,5 @@
 /* run.config
-   OPT: -eva @EVA_OPTIONS@ -then -scf -then-on propagated -scf @EVA_OPTIONS@
+   OPT: -eva @EVA_OPTIONS@ -then -scf -then-on propagated -scf-project-name "propagated 2" -scf @EVA_OPTIONS@
 */
 
 void f(int *x, int *y, void (*p)(int *x, int *y)) {

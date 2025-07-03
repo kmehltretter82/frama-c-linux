@@ -4,9 +4,9 @@
 let run () =
   let p_default =
     Project.create_by_copy
-      ~src:(Project.from_unique_name "default")
+      ~src:(Project.find_all "default" |> List.hd)
       ~last:false
-      "default"
+      "default 2"
   in
   Eva.Analysis.compute ();
   Project.set_current p_default;

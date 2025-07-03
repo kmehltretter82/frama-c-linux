@@ -31,7 +31,8 @@ open Project_output
 type project = t = private
   { pid : int;
     mutable name : string;
-    mutable unique_name : string }
+    mutable unique_name : string
+                          [@deprecated "use pid or Project.get_debug_name"] }
 
 let rehash_ref = ref (fun _ -> assert false)
 
@@ -51,7 +52,7 @@ module D =
       let hash p = p.pid
       let rehash x = !rehash_ref x
       let copy = Datatype.undefined
-      let pretty fmt p = Format.fprintf fmt "project %S" p.unique_name
+      let pretty fmt p = Format.fprintf fmt "project %S" p.name
       let mem_project f x = f x
     end)
 include (D: Datatype.S_no_copy with type t = Project_skeleton.t)
@@ -102,7 +103,7 @@ module States_operations = struct
       (fun s -> (private_ops s).update)
 
   let clear ?(selection=State_selection.full) p =
-    debug ~dkey ~level:2 "clearing following selection:@.  @[%a@]@.%a"
+    debug ~dkey "clearing following selection:@.  @[%a@]@.%a"
       State_selection.pretty_witness selection State_selection.pretty selection;
     let clear s = (private_ops s).clear in
     if State_selection.is_full selection then
@@ -128,7 +129,7 @@ module States_operations = struct
         State_selection.empty
     in
     if not (State_selection.is_empty states_to_clear) then begin
-      warning "clearing dangling project pointers in project %S" p.unique_name;
+      warning "clearing dangling project pointers in project %S" p.name;
       debug ~dkey ~once:true ~append:(fun fmt -> Format.fprintf fmt "@]")
         "@[the involved states are:%t"
         (fun fmt ->
@@ -225,22 +226,19 @@ module States_operations = struct
 
 end
 
-let guarded_feedback selection level fmt_msg =
-  if verbose_atleast level then
-    if State_selection.is_full selection then
-      feedback ~dkey ~level fmt_msg
-    else
-      let n = State_selection.cardinal selection in
-      if n = 0 then
-        Pretty_utils.nullprintf fmt_msg
-      else
-        let states fmt =
-          if n > 1 then Format.fprintf fmt " (for %d states)" n
-          else Format.fprintf fmt " (for 1 state)"
-        in
-        feedback ~dkey ~level ~append:states fmt_msg;
+let guarded_feedback selection fmt_msg =
+  if State_selection.is_full selection then
+    feedback ~dkey fmt_msg
   else
-    Pretty_utils.nullprintf fmt_msg
+    let n = State_selection.cardinal selection in
+    if n = 0 then
+      Pretty_utils.nullprintf fmt_msg
+    else
+      let states fmt =
+        if n > 1 then Format.fprintf fmt " (for %d states)" n
+        else Format.fprintf fmt " (for 1 state)"
+      in
+      feedback ~dkey ~append:states fmt_msg
 
 module Q = Qstack.Make(struct type t = project let equal = equal end)
 
@@ -255,31 +253,35 @@ let () =
   Cmdline.last_project_created_by_copy :=
     (fun () -> match !last_created_by_copy_ref with
        | None -> None
-       | Some p -> Some p.unique_name)
+       | Some p -> Some p.pid)
 
 let iter_on_projects f = Q.iter f projects
 let fold_on_projects f acc = Q.fold f acc projects
 
 let find_all name = Q.filter (fun p -> p.name = name) projects
 
+let pick_most_recently_created projects =
+  (* Since the IDs of projects are monotonically increasing, we can order the
+     list from the greatest to least pid and return the first project to get the
+     most recently created one. *)
+  let compare { pid = lpid; _ } { pid = rpid; _ } =
+    Int.compare rpid lpid
+  in
+  List.sort compare projects |> List.hd
+
 exception Unknown_project
-let from_unique_name uname =
-  try Q.find (fun p -> p.unique_name = uname) projects
+let from_pid pid =
+  try Q.find (fun p -> p.pid = pid) projects
   with Not_found -> raise Unknown_project
 
-module Mem = struct
-  let mem s =
-    try ignore (from_unique_name s); true
-    with Unknown_project -> false
-end
-module Setter = Make_setter(Mem)
+module Setter = Make_setter ()
 
 module Set_Name_Hook = Hook.Build(struct type t = project * string end)
 
 let register_after_set_name_hook = Set_Name_Hook.extend
 
 let set_name p s =
-  feedback ~dkey ~level:2 "renaming project %S to %S" p.unique_name s;
+  feedback ~dkey "renaming project %S to %S" p.name s;
   let old_name = p.name in
   Setter.set_name p s;
   Set_Name_Hook.apply (p, old_name);
@@ -288,16 +290,17 @@ module Create_Hook = Hook.Build(struct type t = project end)
 let register_create_hook = Create_Hook.extend
 
 let create name =
-  feedback ~dkey ~level:2 "creating project %S" name;
+  feedback ~dkey "creating project %S" name;
   let p = Setter.make name in
-  feedback ~dkey ~level:3 "its unique name is %S" p.unique_name;
+  feedback ~dkey "its unique name is %S" (get_project_debug_name p);
   Q.add_at_end p projects;
   States_operations.create p;
   Create_Hook.apply p;
   p
 
+let get_pid p = p.pid
 let get_name p = p.name
-let get_unique_name p = p.unique_name
+let get_debug_name = get_project_debug_name
 
 exception NoProject = Q.Empty
 
@@ -311,14 +314,11 @@ let force_set_current =
   let apply_hook = ref false in
   fun on selection p ->
     if not (Q.mem p projects) then
-      invalid_arg ("Project.set_current: " ^ p.unique_name ^ " does not exist");
+      invalid_arg ("Project.set_current: " ^ p.name ^ " does not exist");
     let old = current () in
     States_operations.commit ~selection old;
     (try Q.move_at_top p projects with Invalid_argument _ -> assert false);
-    let level = if on then 3 else 2 in
-    guarded_feedback selection level
-      "%S is now the current project"
-      p.unique_name;
+    guarded_feedback selection "%S is now the current project" p.name;
     assert (equal p (current ()));
     States_operations.update ~selection p;
     (* do not apply hook if an hook calls [set_current] *)
@@ -356,8 +356,8 @@ let on ?selection p f x =
              one, if any *)
           if Q.length projects < 2 then
             warning "cannot restore project '%s'. Keep '%s' as default project."
-              old_current.unique_name
-              (current ()).unique_name
+              old_current.name
+              (current ()).name
           else
             set_to_old (Q.nth 1 projects)
     in
@@ -382,8 +382,8 @@ module Before_remove = Hook.Build(struct type t = project end)
 let register_before_remove_hook = Before_remove.extend
 
 let remove ?(project=current()) () =
-  feedback ~dkey ~level:2 "removing project %S" project.unique_name;
-  if Q.length projects = 1 then raise (Cannot_remove project.unique_name);
+  feedback ~dkey "removing project %S" project.name;
+  if Q.length projects = 1 then raise (Cannot_remove project.name);
   Before_remove.apply project;
   States_operations.remove project;
   let old_current = current () in
@@ -403,7 +403,7 @@ let remove ?(project=current()) () =
   Q.iter (States_operations.clear_some_projects (equal project)) projects
 
 let remove_all () =
-  feedback ~dkey ~level:2 "removing all existing projects";
+  feedback ~dkey "removing all existing projects";
   try
     iter_on_projects Before_remove.apply;
     States_operations.clean ();
@@ -414,8 +414,8 @@ let remove_all () =
     ()
 
 let copy ?(selection=State_selection.full) ?(src=current()) dst =
-  guarded_feedback selection 2 "copying project from %S to %S"
-    src.unique_name dst.unique_name;
+  guarded_feedback selection "copying project from %S to %S"
+    src.name dst.name;
   States_operations.commit ~selection src;
   States_operations.copy ~selection src dst
 
@@ -426,7 +426,7 @@ module After_Clear_Hook = Hook.Build(struct type t = project end)
 let register_todo_after_clear = After_Clear_Hook.extend
 
 let clear ?(selection=State_selection.full) ?(project=current()) () =
-  guarded_feedback selection 2 "clearing project %S" project.unique_name;
+  guarded_feedback selection "clearing project %S" project.name;
   Before_Clear_Hook.apply project;
   States_operations.clear ~selection project;
   After_Clear_Hook.apply project
@@ -484,12 +484,12 @@ let save_projects ?compress selection projects (filename : Filepath.t) =
   Channel.output_value cout (List.rev states, !last_created_by_copy_ref)
 
 let save ?compress ?(selection=State_selection.full) ?(project=current()) filename =
-  guarded_feedback selection 2 "saving project %S into file %a"
-    project.unique_name Filepath.pretty filename;
+  guarded_feedback selection "saving project %S into file %a"
+    project.name Filepath.pretty filename;
   save_projects ?compress selection (Q.singleton project) filename
 
 let save_all ?compress ?(selection=State_selection.full) filename =
-  guarded_feedback selection 2 "saving the current session into file %a"
+  guarded_feedback selection "saving the current session into file %a"
     Filepath.pretty filename;
   save_projects ?compress selection projects filename
 
@@ -666,7 +666,7 @@ let load_projects ~project_under_copy selection ?name (filename : Filepath.t) =
 
 let load_with_copy
     ?project_under_copy ?(selection=State_selection.full) ?name filename =
-  guarded_feedback selection 2 "loading the project saved in file %a"
+  guarded_feedback selection "loading the project saved in file %a"
     Filepath.pretty filename;
   match load_projects ~project_under_copy selection ?name filename with
   | [ p ] -> p
@@ -676,7 +676,7 @@ let load = load_with_copy ?project_under_copy:None
 
 let load_all ?(selection=State_selection.full) filename =
   remove_all ();
-  guarded_feedback selection 2 "loading the session saved in file %a"
+  guarded_feedback selection "loading the session saved in file %a"
     Filepath.pretty filename;
   try
     ignore (load_projects ~project_under_copy:None selection filename)
@@ -690,8 +690,8 @@ let create_by_copy_hook f =
 
 let create_by_copy
     ?(selection=State_selection.full) ?(src=current()) ~last name =
-  guarded_feedback selection 2 "creating project %S by copying project %S"
-    name (src.unique_name);
+  guarded_feedback selection "creating project %S by copying project %S"
+    name (src.name);
   let filename = temp_file ~prefix:"frama_c_create_by_copy" ~suffix:".sav" in
   save ~compress:false ~selection ~project:src filename;
   try
@@ -728,5 +728,53 @@ module Undo = struct
 
 end
 
+
+(* ************************************************************************** *)
+(** {2 Special Cmdline functions} *)
+(* ************************************************************************** *)
+
+let () =
+  let project_functions : Cmdline.project_functions =
+    let current () = current () |> get_pid in
+    let on_from_pid pid f =
+      try on (from_pid pid) f ()
+      with Unknown_project -> abort "no project with id `%d'." pid
+    in
+    let pid_to_name pid = from_pid pid |> get_name in
+    let name_to_pid p_name =
+      let project =
+        match find_all p_name with
+        | [ p ] -> p
+        | _ :: _ as projects ->
+          warning
+            "multiple projects named `%s', choosing most recently created"
+            p_name;
+          pick_most_recently_created projects
+        | [] -> abort "no project named `%s'" p_name
+      in
+      get_pid project
+    in
+    { current; on_from_pid; pid_to_name; name_to_pid }
+  in
+  Cmdline.project_functions := project_functions
+
+
 (* Exporting Datatype for an easy external use *)
 module Datatype = D
+
+
+(** {2 Deprecated functions }*)
+
+let get_unique_name p =
+  begin[@alert "-deprecated"]
+    p.unique_name
+  end
+
+let from_unique_name uname =
+  let is_uname p =
+    begin[@alert "-deprecated"]
+      p.unique_name = uname
+    end
+  in
+  try Q.find is_uname projects
+  with Not_found -> raise Unknown_project

@@ -107,7 +107,7 @@ export function newProject(): void {
 
 /** Rename a project */
 export function renameProject(
-  id: string, title: string, project?: string
+  id: number, title: string, project?: string
 ): void {
   const onValidate = (name: string): void => {
     Server.send(Project.rename, [id, name]).then((error) => {
@@ -119,7 +119,7 @@ export function renameProject(
 }
 
 /** Remove a project */
-export async function removeProject(id: string): Promise<void> {
+export async function removeProject(id: number): Promise<void> {
   const projects = States.getSyncArrayData(Project.list);
   if(projects.length === 1) {
     showError('Error while deleting project',
@@ -144,7 +144,7 @@ export async function removeProject(id: string): Promise<void> {
 
 /** Duplicate a project */
 export function duplicateProject(
-  id: string, title: string, project?: string
+  id: number, title: string, project?: string
 ): void {
   const onValidate = (name: string): void => {
     Server.send(Project.copy, [id, name]).then((error) => {
@@ -157,7 +157,7 @@ export function duplicateProject(
 }
 
 /** Save a project */
-export async function saveProject(id: string): Promise<void> {
+export async function saveProject(id: number): Promise<void> {
   const file = await Dialogs.showSaveFile({});
   const error = await Server.send(Project.save, [id, file]);
   if(error) showError('Error while saving project', error);
@@ -172,7 +172,7 @@ export async function loadProject(): Promise<void> {
 
 /** ************************************************************************ */
 
-function getActions(id: string, name: string): React.JSX.Element {
+function getActions(id: number, name: string): React.JSX.Element {
   return (
     <>
       <IconButton
@@ -226,11 +226,11 @@ export function Projects(): JSX.Element {
         return {
           menu: 'Project',
           label: elt.name,
-          id: `Project_${elt.uniqueName}`,
+          id: `Project_${elt.id}`,
           kind: 'checkbox',
-          checked: current === elt.uniqueName,
-          enabled: current !== elt.uniqueName,
-          onClick: () => setCurrent(elt.uniqueName)
+          checked: current === elt.id,
+          enabled: current !== elt.id,
+          onClick: () => setCurrent(elt.id)
         };
       });
       addProjectSubMenu(others);
@@ -242,12 +242,12 @@ export function Projects(): JSX.Element {
   const projectsList = React.useMemo(() => {
     return projectsListSorted.map(elt => {
       return <Item
-          key={elt.uniqueName}
+          key={elt.id}
           label={elt.name}
-          title={`unique name: ${elt.uniqueName}`}
-          selected={elt.uniqueName === current}
-          onSelection={() => setCurrent(elt.uniqueName) }
-        >{getActions(elt.uniqueName, elt.name)}</Item>;
+          title={`${elt.name} (id: ${elt.id})`}
+          selected={elt.id === current}
+          onSelection={() => setCurrent(elt.id) }
+        >{getActions(elt.id, elt.name)}</Item>;
     });
   }, [projectsListSorted, current, setCurrent]);
 

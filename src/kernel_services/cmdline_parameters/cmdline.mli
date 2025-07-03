@@ -201,17 +201,13 @@ val bail_out: unit -> 'a
 
     These functions should not be used by a standard plug-in developer. *)
 
-type on_from_name = { on_from_name: 'a. string -> (unit -> 'a) -> 'a }
-
 val parse_and_boot:
-  on_from_name:on_from_name ->
   get_toplevel:(unit -> (unit -> unit) -> unit) ->
   play_analysis:(unit -> unit) -> unit
 (** Not for casual users.
-    [parse_and_boot on_from_name get_toplevel play] performs the
+    [parse_and_boot get_toplevel play] performs the
     parsing of the command line, then play the analysis with the good
-    toplevel provided by [get_toplevel]. [on_from_name] is [Project.on] on the
-    project corresponding to the given (unique) name.
+    toplevel provided by [get_toplevel].
     @since Beryllium-20090901
 *)
 
@@ -383,7 +379,15 @@ val compress_saved_session: bool
 
     @since 31.0-Gallium *)
 
-val last_project_created_by_copy: (unit -> string option) ref
+val last_project_created_by_copy: (unit -> int option) ref
+
+type project_functions = {
+  current: unit -> int;
+  on_from_pid: 'a. int -> (unit -> 'a) -> 'a;
+  pid_to_name: int -> string;
+  name_to_pid: string -> int;
+}
+val project_functions : project_functions ref
 
 val load_all_plugins: (unit -> unit) ref
 

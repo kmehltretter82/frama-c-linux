@@ -204,7 +204,7 @@ type 'a array = {
      The two following fields allow to keep an array in sync
      with the current project and still have a polymorphic data type. *)
   mutable current : 'a content option ; (* fast access to current project *)
-  projects : (string , 'a content) Hashtbl.t ; (* indexed by project *)
+  projects : (int , 'a content) Hashtbl.t ; (* indexed by project *)
 }
 
 let synchronize array =
@@ -212,7 +212,7 @@ let synchronize array =
     Project.register_after_set_current_hook
       ~user_only:false (fun _ -> array.current <- None) ;
     let cleanup p =
-      Hashtbl.remove array.projects (Project.get_unique_name p) in
+      Hashtbl.remove array.projects (Project.get_pid p) in
     Project.register_before_remove_hook cleanup ;
     Project.register_todo_before_clear cleanup ;
     Request.on_signal array.signal
@@ -226,15 +226,15 @@ let content array =
   match array.current with
   | Some w -> w
   | None ->
-    let prj = Project.(current () |> get_unique_name) in
+    let prj_id = Project.(current () |> get_pid) in
     let content =
-      try Hashtbl.find array.projects prj
+      try Hashtbl.find array.projects prj_id
       with Not_found ->
         let w = {
           cleared = true ;
           updates = Kmap.empty ;
         } in
-        Hashtbl.add array.projects prj w ; w
+        Hashtbl.add array.projects prj_id w ; w
     in
     array.current <- Some content ;
     Request.emit array.signal ;

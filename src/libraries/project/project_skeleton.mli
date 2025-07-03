@@ -28,7 +28,10 @@
 (* ************************************************************************** *)
 
 type t = private
-  { pid: int; mutable name: string; mutable unique_name: string }
+  { pid: int;
+    mutable name: string;
+    mutable unique_name: string
+                         [@deprecated "use pid or get_project_debug_name"] }
 (** @since Carbon-20101201
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
@@ -43,11 +46,7 @@ val dummy: t
 (** @since Carbon-20101201 *)
 
 (** @since Carbon-20101201 *)
-module Make_setter(_: sig val mem: string -> bool end) : sig
-
-  val make_unique_name: string -> string
-  (** @return a fresh name from the given string according to [X.mem].
-      @since Nitrogen-20111001 *)
+module Make_setter () : sig
 
   val make: string -> t
   (** @since Carbon-20101201 *)
@@ -56,3 +55,7 @@ module Make_setter(_: sig val mem: string -> bool end) : sig
   (** @since Carbon-20101201 *)
 
 end
+
+val get_project_debug_name: t -> string
+(** @return a project name appended with its id.
+    @since Frama-C+dev *)

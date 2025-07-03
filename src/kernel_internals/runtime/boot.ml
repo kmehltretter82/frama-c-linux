@@ -49,18 +49,12 @@ let play_analysis () =
   with Globals.No_such_entry_point msg ->
     Kernel.abort "%s" msg
 
-let on_from_name name f =
-  try Project.on (Project.from_unique_name name) f ()
-  with Project.Unknown_project -> Kernel.abort "no project `%s'." name
-
 let boot () =
   (* Main: let's go! *)
   Sys.catch_break true;
   let f () =
     ignore (Project.create "default");
-    let on_from_name = { Cmdline.on_from_name } in
     Cmdline.parse_and_boot
-      ~on_from_name
       ~get_toplevel:(fun () -> !toplevel)
       ~play_analysis
   in

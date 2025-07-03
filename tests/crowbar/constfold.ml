@@ -171,12 +171,9 @@ let () = Dynamic.set_module_load_path [ "lib/plugins" ]
 
 let () = Dynamic.load_module "frama-c-eva"
 
-let on_from_name s f = Project.on (Project.from_unique_name s) f ()
-
 let () =
   Cmdline.(
     parse_and_boot
-      ~on_from_name:{ on_from_name }
       ~get_toplevel:(fun () f -> f ())
       ~play_analysis:(fun _ -> ()))
 

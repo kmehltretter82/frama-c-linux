@@ -371,7 +371,7 @@ let compute () =
   let propagated = get fnames ~cast_intro in
   if PropagationParameters.SemanticConstFolding.get () then
     FC_file.pretty_ast ~prj:propagated ();
-  let project_name = Project.get_unique_name propagated in
+  let project_name = Project.get_name propagated in
   PropagationParameters.feedback  "@[constant propagation done%t@]"
     (fun fmt ->
        if project_name <> PropagationParameters.Project_name.get () then
