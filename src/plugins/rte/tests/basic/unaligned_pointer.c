@@ -1,10 +1,14 @@
 #include <stdlib.h>
 #include <stdint.h>
 
+volatile int nondet;
+
 void int_constant_to_ptr(void){
   int32_t* p1 = (int32_t*) 4 ; // OK
   int32_t* p2 = (int32_t*) 8 ; // OK
-  int32_t* p3 = (int32_t*) 1 ; // KO
+  if (nondet) {
+    int32_t* p3 = (int32_t*) 1 ; // KO
+  }
 }
 
 void int_to_ptr(int32_t vunknown, int32_t vok, int32_t vko){
@@ -13,7 +17,9 @@ void int_to_ptr(int32_t vunknown, int32_t vok, int32_t vko){
 
   int32_t* p1 = (int32_t*) vunknown ;
   int32_t* p2 = (int32_t*) vok ;
-  int32_t* p3 = (int32_t*) vko ;
+  if (nondet) {
+    int32_t *p3 = (int32_t *)vko;
+  }
 }
 
 void int_to_ptr_caller(int32_t unknown){
@@ -33,16 +39,16 @@ void addrof_to_ptr(void){
   int8_t* pc3 = &i ;
   int8_t* pc4 = &i8 ;
 
-  int32_t* pi1 = &c ; // unknown
+  if (nondet) {int32_t* pi1 = &c ;} // unknown
   // all OK
   int32_t* pi2 = &c4 ;
   int32_t* pi3 = &i ;
   int32_t* pi4 = &i8 ;
 
   // all unknown
-  int64_t* pl1 = &c ;
-  int64_t* pl2 = &c4 ;
-  int64_t* pl3 = &i ;
+  if (nondet) {int64_t* pl1 = &c ;}
+  if (nondet) {int64_t* pl2 = &c4 ;}
+  if (nondet) {int64_t* pl3 = &i ;}
   int64_t* pl4 = &i8 ; // except this one: OK
 }
 
@@ -59,36 +65,36 @@ void startof_to_ptr(void){
   int8_t* pc3 = i ;
   int8_t* pc4 = i8 ;
 
-  int32_t* pi1 = c ; // unknown
+  if (nondet) {int32_t* pi1 = c ;} // unknown
   // all OK
   int32_t* pi2 = c4 ;
   int32_t* pi3 = i ;
   int32_t* pi4 = i8 ;
 
   // all unknown
-  int64_t* pl1 = c ;
-  int64_t* pl2 = c4 ;
-  int64_t* pl3 = i ;
+  if (nondet) {int64_t* pl1 = c ;}
+  if (nondet) {int64_t* pl2 = c4 ;}
+  if (nondet) {int64_t* pl3 = i ;}
   int64_t* pl4 = i8 ; // except this one: OK
 }
 
 void ptr_to_ptr_syn(int16_t* p){
   uint8_t*  p1 = p ; // OK
-  uint32_t* p2 = p ; // unknown
+  if (nondet) {uint32_t* p2 = p ;} // unknown
 }
 
 void ptr_to_ptr_sem(int8_t* cu, int8_t* c4){ // we expect c8 to be aligned on 4
   // syntactic: all unknown
   // semantic: unknown except for indicated lines
 
-  int16_t* i1 = cu ;
+  if (nondet) {int16_t* i1 = cu ;}
   int16_t* i2 = c4 ; // semantic: OK
 
-  int32_t* i3 = cu ;
+  if (nondet) {int32_t* i3 = cu ;}
   int32_t* i4 = c4 ; // semantic: OK
 
-  int64_t* i5 = cu ;
-  int64_t* i6 = c4 ;
+  if (nondet) {int64_t* i5 = cu ;}
+  if (nondet) {int64_t* i6 = c4 ;}
 }
 
 void ptr_to_ptr_sem_caller(int8_t* p){
@@ -118,6 +124,16 @@ void must_not_trigger_failure(void){
   int *p = (int*) malloc_ok_for_any_type ;
 }
 
-int main(void){
 
+volatile int32_t i32_nondet;
+
+int main(void){
+  int_constant_to_ptr();
+  int_to_ptr_caller(i32_nondet);
+  addrof_to_ptr();
+  startof_to_ptr();
+  int16_t x;
+  ptr_to_ptr_syn(&x);
+  int8_t a;
+  ptr_to_ptr_sem_caller(&a);
 }
