@@ -4,8 +4,20 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
+[eva] computing for function wctype <- main.
+  Called from wctype_h.c:4.
+[eva] using specification for function wctype
+[eva] wctype_h.c:4: 
+  function wctype: precondition 'valid_property' got status valid.
+[eva] Done for function wctype
+[eva] computing for function iswctype <- main.
+  Called from wctype_h.c:5.
+[eva] using specification for function iswctype
+[eva] Done for function iswctype
 [eva] Recording results for main
 [eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
+  wt ∈ [--..--]
+  b ∈ [--..--]
   __retres ∈ {-1}
