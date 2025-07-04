@@ -33,6 +33,8 @@ __BEGIN_DECLS
 
 typedef const int32_t *wctrans_t;
 
+typedef unsigned long wctype_t;
+
 /*@
   assigns \result \from wc;
 */
@@ -57,6 +59,16 @@ extern int iswblank(wint_t wc);
   assigns \result \from wc;
 */
 extern int iswcntrl(wint_t wc);
+
+/*@
+  assigns \result \from wc, indirect:charclass;
+*/
+extern int iswctype(wint_t wc, wctype_t charclass);
+
+/*@
+  assigns \result \from wc, indirect:charclass, indirect:locale;
+*/
+int iswctype_l(wint_t wc, wctype_t charclass, locale_t locale);
 
 /*@
   assigns \result \from wc;
@@ -127,6 +139,19 @@ extern int iswupper(wint_t wc);
   assigns \result \from wc;
 */
 extern int iswxdigit(wint_t wc);
+
+/*@
+  requires valid_property: valid_read_string(property);
+  assigns \result \from indirect:property[0..strlen(property)];
+*/
+wctype_t wctype(const char *property);
+
+/*@
+  requires valid_property: valid_read_string(property);
+  assigns \result \from indirect:property[0..strlen(property)],
+                        indirect:locale;
+*/
+wctype_t wctype_l(const char *property, locale_t locale);
 
 __END_DECLS
 
