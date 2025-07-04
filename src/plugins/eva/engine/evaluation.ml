@@ -461,6 +461,25 @@ module Make
     | "non-finite" -> restrict_float ~assume_finite:true expr fk value
     | _            -> assert false
 
+  (* Casts to void* are always safe, and no alignment for functions. *)
+  let check_alignment target =
+    Kernel.UnalignedPointer.get ()
+    && not (Ast_types.is_void target)
+    && not (Ast_types.is_fun target)
+
+  let assume_aligned expr typ value =
+    let target = Ast_types.direct_pointed_type typ in
+    if check_alignment target then
+      let target_align = Cil.bytesAlignOf target in
+      if target_align > 1 then
+        let truth = Value.assume_aligned target_align value in
+        let alarm () =
+          Alarms.Unaligned_pointer (Eva_ast.to_cil_exp expr, target)
+        in
+        interpret_truth ~alarm value truth
+      else return value
+    else return value
+
   let assume_pointer context expr value =
     let open Evaluated.Operators in
     let+ value =
@@ -508,7 +527,8 @@ module Make
       new_value, origin
     | TPtr _ ->
       let expr = Eva_ast.Build.lval lval in
-      let+ new_value = assume_pointer context expr value in
+      let* new_value = assume_pointer context expr value in
+      let+ new_value = assume_aligned expr lval.typ new_value in
       new_value, origin
     | _ -> res
 
@@ -955,7 +975,10 @@ module Make
       let v = forward_cast env.context ~dst_typ e value in
       let v = match Ast_types.unroll_node dst_typ with
         | TFloat fkind -> let* v in remove_special_float expr fkind v
-        | TPtr _ -> let* v in assume_pointer env.context expr v
+        | TPtr _ ->
+          let* v in
+          let* v = assume_pointer env.context expr v in
+          assume_aligned e dst_typ v
         | _ -> v
       in
       compute_reduction v volatile
