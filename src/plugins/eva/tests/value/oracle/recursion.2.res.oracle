@@ -7,7 +7,7 @@
 [eva] recursion.c:433: Frama_C_show_each_10: {10}
 [eva] recursion.c:438: Frama_C_show_each_36: {36}
 [eva] using specification for function Frama_C_interval
-[eva:assigns:missing] recursion.c:426: Warning: 
+[eva:assigns:missing] recursion.c:426: User Error: 
   Recursive call to sum_nospec without assigns clause.
   Generating probably incomplete assigns to interpret the call.
   Try to increase the -eva-unroll-recursive-calls parameter or write a correct specification for function sum_nospec.

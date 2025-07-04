@@ -1128,8 +1128,9 @@ struct
     let kind =
       match status with
       | Wfeedback | Wfeedback_once -> Feedback
-      | (Wactive | Werror | Wabort | Wonce | Werror_once | Winactive) ->
-        Warning
+      | Wactive | Wonce | Winactive -> Warning
+      | Werror | Werror_once -> Error
+      | Wabort -> Failure
     in
     if status <> Winactive && (kind <> Feedback || verbose_atleast 1)  then
       begin

@@ -48,8 +48,9 @@
 val add_syntactic_transformation: (Cabs.file -> Cabs.file) -> unit
 
 (** the main command to parse a file. Return a thunk that can be used to
-    convert the AST to CIL.
+    convert the AST to CIL. [original] is the original C file before
+    preprocessing, used to print user-friendly filepath in error messages.
 
     @raise Parse_error if a parsing error occurs
 *)
-val parse: Filepath.t -> (unit -> Cil_types.file*Cabs.file)
+val parse: original:Filepath.t -> Filepath.t -> Cil_types.file * Cabs.file
