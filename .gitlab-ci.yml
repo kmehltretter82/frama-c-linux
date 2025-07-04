@@ -274,6 +274,17 @@ external-plugins:
           "volatile"
         ]
 
+ivette-plugins:
+  stage: tests
+  <<: *ivette_setup
+  script:
+    # Following command is needed due to recent git releases which enforce stricter
+    # permission controls w.r.t ownership of '.git'
+    - git config --global --add safe.directory $PWD
+    - ./nix/ivette-plugins-ci.sh
+  tags:
+    - docker
+
 ################################################################################
 ### DISTRIB
 

@@ -1,0 +1,1 @@
+minimal frama-c/minimal.git none
