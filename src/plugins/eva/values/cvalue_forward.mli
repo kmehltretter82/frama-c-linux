@@ -18,6 +18,7 @@ val assume_non_zero: V.t -> V.t truth
 val assume_bounded: bound_kind -> bound -> V.t -> V.t truth
 val assume_not_nan: assume_finite:bool -> fkind -> V.t -> V.t truth
 val assume_pointer: V.t -> V.t truth
+val assume_aligned: int -> V.t -> V.t truth
 val assume_comparable: pointer_comparison -> V.t -> V.t -> (V.t * V.t) truth
 
 val forward_binop_int: typ: typ -> V.t -> Eva_ast.binop -> V.t -> V.t

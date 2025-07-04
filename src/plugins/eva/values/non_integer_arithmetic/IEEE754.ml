@@ -491,6 +491,7 @@ module Make (Model : Modeling) = struct
   let assume_bounded _ _ v = `Unknown v
   let assume_not_nan ~assume_finite:_ _ v = `Unknown v
   let assume_pointer v = `Unknown v
+  let assume_aligned _ v = `Unknown v
   let assume_comparable _ l r = `Unknown (l, r)
   let rewrap_integer _ _ _ = top
   let resolve_functions _ = `Top, true

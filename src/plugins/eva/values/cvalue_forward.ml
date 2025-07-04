@@ -265,6 +265,42 @@ let assume_pointer loc =
     else if ok then `True else `Unknown loc
   with Abstract_interp.Error_Top -> `Unknown loc
 
+let rec gcd a b =
+  if b = 0 then abs a else gcd b (a mod b)
+
+let assume_aligned modulo loc =
+  let rem = Integer.zero in
+  let modu = Integer.of_int modulo in
+  let target = Ival.inject_interval ~min:None ~max:None ~rem ~modu in
+  (* Returns the reduced ival (if possible) and a boolean for alarm. *)
+  let assume_aligned_ival (base: Base.t) ival =
+    let base_alignof = Base.alignof base in
+    if base_alignof mod modulo = 0 then
+      if Ival.is_included ival target
+      then ival, false
+      else Ival.narrow ival target, true
+    else
+      let modu = Integer.of_int (gcd modulo base_alignof) in
+      let target = Ival.inject_interval ~min:None ~max:None ~rem ~modu in
+      Ival.narrow ival target, true
+  in
+  let aux base ival (loc_acc, alarm_acc) =
+    let reduced_ival, alarm = assume_aligned_ival base ival in
+    (* If [ival] has been reduced, reduce the current value. *)
+    let reduced_loc =
+      if reduced_ival == ival
+      then loc_acc
+      else Locations.Location_Bytes.add base reduced_ival loc_acc
+    in
+    reduced_loc, alarm || alarm_acc
+  in
+  try
+    let reduced_loc, alarm = Cvalue.V.fold_topset_ok aux loc (loc, false) in
+    if Cvalue.V.is_bottom reduced_loc then `False
+    else if alarm then `Unknown reduced_loc
+    else `True
+  with Abstract_interp.Error_Top -> `Unknown loc
+
 (* --------------------------------------------------------------------------
                               Integer overflow
    -------------------------------------------------------------------------- *)
