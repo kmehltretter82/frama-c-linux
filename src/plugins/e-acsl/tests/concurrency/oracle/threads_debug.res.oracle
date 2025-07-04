@@ -8,12 +8,12 @@
   if there are memory-related annotations.
 [e-acsl] FRAMAC_SHARE/libc/unistd.h:1313: Warning: 
   E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:552: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:700: Warning: 
   E-ACSL construct `terminates clause' is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:552: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:700: Warning: 
   E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:555: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:703: Warning: 
   E-ACSL construct `abnormal termination case in behavior'
   is not yet supported.
   Ignoring annotation.

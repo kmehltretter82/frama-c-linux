@@ -94,7 +94,6 @@ extern long int atol(const char *nptr);
 extern long long int atoll(const char *nptr);
 
 /* See ISO C: 7.20.1.3 to complete these specifications */
-
 /*@
   requires valid_string_nptr: valid_read_string(nptr);
   requires separation: \separated(nptr, endptr);
@@ -166,7 +165,8 @@ extern float strtof(const char * restrict nptr,
 extern long double strtold(const char * restrict nptr,
      char ** restrict endptr);
 
-/* TODO: See ISO C 7.20.1.4 to complete these specifications */
+#include "__fc_strto_axiomatic.h"
+
 /*@
   requires valid_string_nptr: valid_read_string(nptr);
   requires separation: \separated(nptr, endptr);
@@ -175,11 +175,48 @@ extern long double strtold(const char * restrict nptr,
                         indirect:base;
   assigns *endptr \from nptr, indirect:nptr[0 .. strlen(nptr)],
                         indirect:endptr, indirect:base;
-  behavior no_storage:
+  assigns __fc_errno \from indirect:nptr[0 .. strlen(nptr)], indirect:base;
+  behavior cannot_convert:
+    assumes
+      no_conversion: str_to_integer(nptr, LONG_MIN, LONG_MAX, base) == 0;
+    assigns \result \from indirect:nptr, indirect:nptr[0 .. strlen(nptr)],
+                          indirect:base;
+    assigns __fc_errno \from indirect:nptr[0 .. strlen(nptr)], indirect:base;
+    ensures result_no_conversion: \result == 0;
+    ensures errno_set: __fc_errno == EINVAL;
+  behavior out_of_range_null_endptr:
+    assumes
+      out_of_range: str_to_integer(nptr, LONG_MIN, LONG_MAX, base) == 2;
     assumes null_endptr: endptr == \null;
     assigns \result \from indirect:nptr, indirect:nptr[0 .. strlen(nptr)],
                           indirect:base;
-  behavior store_position:
+    assigns __fc_errno \from indirect:nptr[0 .. strlen(nptr)], indirect:base;
+    ensures result_out_of_range: \result == LONG_MIN || \result == LONG_MAX;
+    ensures errno_set: __fc_errno == ERANGE;
+  behavior out_of_range_nonnull_endptr:
+    // Note: the standard does not state that endptr is definitively assigned
+    //       to in this case, so we assume it may be.
+    assumes
+      out_of_range: str_to_integer(nptr, LONG_MIN, LONG_MAX, base) == 2;
+    assumes nonnull_endptr: endptr != \null;
+    requires valid_endptr: \valid(endptr);
+    assigns \result \from indirect:nptr, indirect:nptr[0 .. strlen(nptr)],
+                          indirect:base;
+    assigns *endptr \from nptr, indirect:nptr[0 .. strlen(nptr)],
+                          indirect:endptr, indirect:base;
+    ensures initialization: \initialized(endptr);
+    ensures valid_endptr_content: \valid_read(*endptr);
+    ensures endptr_same_base: \base_addr(*endptr) == \base_addr(nptr);
+    assigns __fc_errno \from indirect:nptr[0 .. strlen(nptr)], indirect:base;
+    ensures result_out_of_range: \result == LONG_MIN || \result == LONG_MAX;
+    ensures errno_set: __fc_errno == ERANGE;
+  behavior in_range_null_endptr:
+    assumes in_range: str_to_integer(nptr, LONG_MIN, LONG_MAX, base) == 1;
+    assumes null_endptr: endptr == \null;
+    assigns \result \from indirect:nptr, indirect:nptr[0 .. strlen(nptr)],
+                          indirect:base;
+  behavior in_range_nonnull_endptr:
+    assumes in_range: str_to_integer(nptr, LONG_MIN, LONG_MAX, base) == 1;
     assumes nonnull_endptr: endptr != \null;
     requires valid_endptr: \valid(endptr);
     assigns \result \from indirect:nptr, indirect:nptr[0 .. strlen(nptr)],
@@ -205,11 +242,48 @@ extern long int strtol(
                         indirect:base;
   assigns *endptr \from nptr, indirect:nptr[0 .. strlen(nptr)],
                         indirect:endptr, indirect:base;
-  behavior no_storage:
+  assigns __fc_errno \from indirect:nptr[0 .. strlen(nptr)], indirect:base;
+  behavior cannot_convert:
+    assumes
+      no_conversion: str_to_integer(nptr, LLONG_MIN, LLONG_MAX, base) == 0;
+    assigns \result \from indirect:nptr, indirect:nptr[0 .. strlen(nptr)],
+                          indirect:base;
+    assigns __fc_errno \from indirect:nptr[0 .. strlen(nptr)], indirect:base;
+    ensures result_no_conversion: \result == 0;
+    ensures errno_set: __fc_errno == EINVAL;
+  behavior out_of_range_null_endptr:
+    assumes
+      out_of_range: str_to_integer(nptr, LLONG_MIN, LLONG_MAX, base) == 2;
     assumes null_endptr: endptr == \null;
     assigns \result \from indirect:nptr, indirect:nptr[0 .. strlen(nptr)],
                           indirect:base;
-  behavior store_position:
+    assigns __fc_errno \from indirect:nptr[0 .. strlen(nptr)], indirect:base;
+    ensures result_out_of_range: \result == LLONG_MIN || \result == LLONG_MAX;
+    ensures errno_set: __fc_errno == ERANGE;
+  behavior out_of_range_nonnull_endptr:
+    // Note: the standard does not state that endptr is definitively assigned
+    //       to in this case, so we assume it may be.
+    assumes
+      out_of_range: str_to_integer(nptr, LLONG_MIN, LLONG_MAX, base) == 2;
+    assumes nonnull_endptr: endptr != \null;
+    requires valid_endptr: \valid(endptr);
+    assigns \result \from indirect:nptr, indirect:nptr[0 .. strlen(nptr)],
+                          indirect:base;
+    assigns *endptr \from nptr, indirect:nptr[0 .. strlen(nptr)],
+                          indirect:endptr, indirect:base;
+    ensures initialization: \initialized(endptr);
+    ensures valid_endptr_content: \valid_read(*endptr);
+    ensures endptr_same_base: \base_addr(*endptr) == \base_addr(nptr);
+    assigns __fc_errno \from indirect:nptr[0 .. strlen(nptr)], indirect:base;
+    ensures result_out_of_range: \result == LLONG_MIN || \result == LLONG_MAX;
+    ensures errno_set: __fc_errno == ERANGE;
+  behavior in_range_null_endptr:
+    assumes in_range: str_to_integer(nptr, LLONG_MIN, LLONG_MAX, base) == 1;
+    assumes null_endptr: endptr == \null;
+    assigns \result \from indirect:nptr, indirect:nptr[0 .. strlen(nptr)],
+                          indirect:base;
+  behavior in_range_nonnull_endptr:
+    assumes in_range: str_to_integer(nptr, LLONG_MIN, LLONG_MAX, base) == 1;
     assumes nonnull_endptr: endptr != \null;
     requires valid_endptr: \valid(endptr);
     assigns \result \from indirect:nptr, indirect:nptr[0 .. strlen(nptr)],
@@ -235,11 +309,48 @@ extern long long int strtoll(
                         indirect:base;
   assigns *endptr \from nptr, indirect:nptr[0 .. strlen(nptr)],
                         indirect:endptr, indirect:base;
-  behavior no_storage:
+  assigns __fc_errno \from indirect:nptr[0 .. strlen(nptr)], indirect:base;
+  behavior cannot_convert:
+    assumes
+      no_conversion: str_to_integer(nptr, 0, ULONG_MAX, base) == 0;
+    assigns \result \from indirect:nptr, indirect:nptr[0 .. strlen(nptr)],
+                          indirect:base;
+    assigns __fc_errno \from indirect:nptr[0 .. strlen(nptr)], indirect:base;
+    ensures result_no_conversion: \result == 0;
+    ensures errno_set: __fc_errno == EINVAL;
+  behavior out_of_range_null_endptr:
+    assumes
+      out_of_range: str_to_integer(nptr, 0, ULONG_MAX, base) == 2;
     assumes null_endptr: endptr == \null;
     assigns \result \from indirect:nptr, indirect:nptr[0 .. strlen(nptr)],
                           indirect:base;
-  behavior store_position:
+    assigns __fc_errno \from indirect:nptr[0 .. strlen(nptr)], indirect:base;
+    ensures result_out_of_range: \result == ULONG_MAX;
+    ensures errno_set: __fc_errno == ERANGE;
+  behavior out_of_range_nonnull_endptr:
+    // Note: the standard does not state that endptr is definitively assigned
+    //       to in this case, so we assume it may be.
+    assumes
+      out_of_range: str_to_integer(nptr, 0, ULONG_MAX, base) == 2;
+    assumes nonnull_endptr: endptr != \null;
+    requires valid_endptr: \valid(endptr);
+    assigns \result \from indirect:nptr, indirect:nptr[0 .. strlen(nptr)],
+                          indirect:base;
+    assigns *endptr \from nptr, indirect:nptr[0 .. strlen(nptr)],
+                          indirect:endptr, indirect:base;
+    ensures initialization: \initialized(endptr);
+    ensures valid_endptr_content: \valid_read(*endptr);
+    ensures endptr_same_base: \base_addr(*endptr) == \base_addr(nptr);
+    assigns __fc_errno \from indirect:nptr[0 .. strlen(nptr)], indirect:base;
+    ensures result_out_of_range: \result == ULONG_MAX;
+    ensures errno_set: __fc_errno == ERANGE;
+  behavior in_range_null_endptr:
+    assumes in_range: str_to_integer(nptr, 0, ULONG_MAX, base) == 1;
+    assumes null_endptr: endptr == \null;
+    assigns \result \from indirect:nptr, indirect:nptr[0 .. strlen(nptr)],
+                          indirect:base;
+  behavior in_range_nonnull_endptr:
+    assumes in_range: str_to_integer(nptr, 0, ULONG_MAX, base) == 1;
     assumes nonnull_endptr: endptr != \null;
     requires valid_endptr: \valid(endptr);
     assigns \result \from indirect:nptr, indirect:nptr[0 .. strlen(nptr)],
@@ -265,11 +376,48 @@ extern unsigned long int strtoul(
                         indirect:base;
   assigns *endptr \from nptr, indirect:nptr[0 .. strlen(nptr)],
                         indirect:endptr, indirect:base;
-  behavior no_storage:
+  assigns __fc_errno \from indirect:nptr[0 .. strlen(nptr)], indirect:base;
+  behavior cannot_convert:
+    assumes
+      no_conversion: str_to_integer(nptr, 0, ULLONG_MAX, base) == 0;
+    assigns \result \from indirect:nptr, indirect:nptr[0 .. strlen(nptr)],
+                          indirect:base;
+    assigns __fc_errno \from indirect:nptr[0 .. strlen(nptr)], indirect:base;
+    ensures result_no_conversion: \result == 0;
+    ensures errno_set: __fc_errno == EINVAL;
+  behavior out_of_range_null_endptr:
+    assumes
+      out_of_range: str_to_integer(nptr, 0, ULLONG_MAX, base) == 2;
     assumes null_endptr: endptr == \null;
     assigns \result \from indirect:nptr, indirect:nptr[0 .. strlen(nptr)],
                           indirect:base;
-  behavior store_position:
+    assigns __fc_errno \from indirect:nptr[0 .. strlen(nptr)], indirect:base;
+    ensures result_out_of_range: \result == ULLONG_MAX;
+    ensures errno_set: __fc_errno == ERANGE;
+  behavior out_of_range_nonnull_endptr:
+    // Note: the standard does not state that endptr is definitively assigned
+    //       to in this case, so we assume it may be.
+    assumes
+      out_of_range: str_to_integer(nptr, 0, ULLONG_MAX, base) == 2;
+    assumes nonnull_endptr: endptr != \null;
+    requires valid_endptr: \valid(endptr);
+    assigns \result \from indirect:nptr, indirect:nptr[0 .. strlen(nptr)],
+                          indirect:base;
+    assigns *endptr \from nptr, indirect:nptr[0 .. strlen(nptr)],
+                          indirect:endptr, indirect:base;
+    ensures initialization: \initialized(endptr);
+    ensures valid_endptr_content: \valid_read(*endptr);
+    ensures endptr_same_base: \base_addr(*endptr) == \base_addr(nptr);
+    assigns __fc_errno \from indirect:nptr[0 .. strlen(nptr)], indirect:base;
+    ensures result_out_of_range: \result == ULLONG_MAX;
+    ensures errno_set: __fc_errno == ERANGE;
+  behavior in_range_null_endptr:
+    assumes in_range: str_to_integer(nptr, 0, ULLONG_MAX, base) == 1;
+    assumes null_endptr: endptr == \null;
+    assigns \result \from indirect:nptr, indirect:nptr[0 .. strlen(nptr)],
+                          indirect:base;
+  behavior in_range_nonnull_endptr:
+    assumes in_range: str_to_integer(nptr, 0, ULLONG_MAX, base) == 1;
     assumes nonnull_endptr: endptr != \null;
     requires valid_endptr: \valid(endptr);
     assigns \result \from indirect:nptr, indirect:nptr[0 .. strlen(nptr)],

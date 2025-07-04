@@ -2,31 +2,31 @@
 [e-acsl] Warning: annotating undefined function `posix_memalign':
   the generated program may miss memory instrumentation
   if there are memory-related annotations.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:818: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:966: Warning: 
   E-ACSL construct `\fresh' is not yet supported. Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:830: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:978: Warning: 
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:838: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:986: Warning: 
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:818: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:966: Warning: 
   Some assumes clauses could not be translated.
   Ignoring complete and disjoint behaviors annotations.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:818: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:966: Warning: 
   E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:834: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:982: Warning: 
   E-ACSL construct `\fresh' is not yet supported. Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
-[eva] FRAMAC_SHARE/libc/stdlib.h:818: Warning: 
+[eva] FRAMAC_SHARE/libc/stdlib.h:966: Warning: 
   ignoring unsupported allocates clause
-[eva:alarm] FRAMAC_SHARE/libc/stdlib.h:827: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/stdlib.h:975: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status invalid.
-[eva:alarm] FRAMAC_SHARE/libc/stdlib.h:841: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/stdlib.h:989: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status invalid.
-[eva:alarm] FRAMAC_SHARE/libc/stdlib.h:834: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/stdlib.h:982: Warning: 
   function __gen_e_acsl_posix_memalign, behavior allocation: postcondition 'allocation' got status unknown.
 [eva:alarm] memalign.c:17: Warning: 
   accessing uninitialized left-value. assert \initialized(memptr);
