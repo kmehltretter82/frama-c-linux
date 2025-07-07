@@ -74,6 +74,11 @@ type map = {
 (* --- Accessors                                                          --- *)
 (* -------------------------------------------------------------------------- *)
 
+let bitsSizeOf ty =
+  try Cil.bitsSizeOf ty with
+  | Cil.SizeOfError (_, { tnode = TFun _ }) -> Machine.sizeof_fun () * 8
+  | Cil.SizeOfError (_, { tnode = TVoid  }) -> Machine.sizeof_void () * 8
+
 let sizeof = function Blob -> 0 | Cell(s,_) | Compound(s,_,_) -> s
 let cranges = function Blob | Cell _ -> [] | Compound(_,_,R rs) -> rs
 let cfields = function Blob | Cell _ -> Fields.empty | Compound(_,fds,_) -> fds
@@ -214,7 +219,7 @@ let new_chunk (m: map) ?parent ?(size=0) ?ptr ?pointed () =
     match ptr with
     | None -> if size = 0 then Blob else Cell(size,None)
     | Some _ ->
-      Cell(Ranges.gcd size (Cil.bitsSizeOf Cil_const.voidPtrType), ptr)
+      Cell(Ranges.gcd size (bitsSizeOf Cil_const.voidPtrType), ptr)
   in
   let cparents = match parent with None -> [] | Some root -> [root] in
   let cpointed = match pointed with None -> [] | Some ptr -> [ptr] in
@@ -425,7 +430,7 @@ let merge_domain (m:map) = Ldomain.merge (fun a b -> merge m a b ; min a b)
 let add_field (m:map) (r:node) (fd:fieldinfo) : node =
   let ci = fd.fcomp in
   if not ci.cstruct then r else
-    let size = Cil.bitsSizeOf (Cil_const.mk_tcomp ci) in
+    let size = bitsSizeOf (Cil_const.mk_tcomp ci) in
     let offset, length = Cil.fieldBitsOffset fd in
     if offset = 0 && size = length then r else
       let data = new_chunk m ~parent:r () in
@@ -436,7 +441,7 @@ let add_field (m:map) (r:node) (fd:fieldinfo) : node =
       merge m r nc ; data
 
 let add_index (m:map) (r:node) (ty:typ) : node =
-  let size = Cil.bitsSizeOf ty in
+  let size = bitsSizeOf ty in
   let re = new_chunk m ~size () in
   merge m r re ; re
 
@@ -465,7 +470,7 @@ let add_value (m:map) (rv:node) (ty:typ) : node option =
 let sized (m:map) (a:node) (ty: typ) =
   if Ast_types.is_scalar ty then
     let sr = sizeof (get m a).clayout in
-    let size = Ranges.gcd sr (Cil.bitsSizeOf ty) in
+    let size = Ranges.gcd sr (bitsSizeOf ty) in
     if sr <> size then ignore (merge m a (new_chunk m ~size ()))
 
 let add_read (m: map) (a: node) acs =
@@ -519,7 +524,7 @@ let rec move (m: map) (r: node) (p: int) (s: int) =
 
 let field (m: map) (r: node) (fd: fieldinfo) : node =
   if fd.fcomp.cstruct then
-    let s = Cil.bitsSizeOf fd.ftype in
+    let s = bitsSizeOf fd.ftype in
     let (p,_) = Cil.fieldBitsOffset fd in
     move m r p s
   else r
@@ -540,7 +545,7 @@ let footprint (m: map) (r: node) : node list =
   with Not_found -> []
 
 let index (m : map) (r: node) (ty:typ) : node =
-  move m r 0 (Cil.bitsSizeOf ty)
+  move m r 0 (bitsSizeOf ty)
 
 let rec lval (m: map) (h,ofs) : node =
   offset m (lhost m h) (Cil.typeOfLhost h) ofs
@@ -649,10 +654,13 @@ let typed (m:map) (r:node) =
   try
     let check acs =
       let t = Access.typeof acs in
-      if Cil.bitsSizeOf t > size then raise Exit ;
-      match !types with
-      | None -> types := Some t
-      | Some t0 -> if not @@ Cil_datatype.Typ.equal t0 t then raise Exit
+      match Ast_types.unroll_skel t with
+      | TVoid | TFun _ -> ()
+      | _ ->
+        if bitsSizeOf t > size then raise Exit ;
+        match !types with
+        | None -> types := Some t
+        | Some t0 -> if not @@ Cil_datatype.Typ.equal t0 t then raise Exit
     in
     Access.Set.iter check node.creads ;
     Access.Set.iter check node.cwrites ;
@@ -766,7 +774,7 @@ let pp_region fmt (m: region) =
 (* -------------------------------------------------------------------------- *)
 
 let make_root s (v : Cil_types.varinfo) : root =
-  let cells = if s = 0 then 0 else Cil.bitsSizeOf v.vtype / s in
+  let cells = if s = 0 then 0 else bitsSizeOf v.vtype / s in
   let label = Format.asprintf "%a%a" Varinfo.pretty v pp_cells cells in
   Root { cvar = v ; cells ; label }
 

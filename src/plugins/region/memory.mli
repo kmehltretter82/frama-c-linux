@@ -138,3 +138,5 @@ val writes : map -> node -> typ list
 val shifts : map -> node -> typ list
 val types : map -> node -> typ list
 val typed : map -> node -> typ option
+
+val bitsSizeOf : typ -> int

@@ -32,7 +32,6 @@ open Logic
 module Vmap = Cil_datatype.Varinfo.Map
 
 let iadd_term env t = ignore @@ add_term env t
-let iadd_iterm env = function { it_content = t } -> ignore @@ add_term env t
 let add_iterm env = function { it_content = t } -> add_term env t
 
 let add_ipred env ip = add_predicate env ip.ip_content.tp_statement
@@ -41,14 +40,21 @@ let add_ipred env ip = add_predicate env ip.ip_content.tp_statement
 (* ---  Process Behaviors                                                 --- *)
 (* -------------------------------------------------------------------------- *)
 
-let iadd_from env (it,_from) =
-  iadd_iterm env it
-(* ; match from with
-   | FromAny -> ()
-   | From its ->
-   let add_from d t = merge_domain env.map d @@ add_iterm env t in
-   ignore @@ List.fold_left add_from Ldomain.pure its
-*)
+let iadd_from ~iscalled env (tgt,from) =
+  let d = add_iterm env tgt in
+  match from with
+  | FromAny -> ()
+  | From srcs ->
+    let _ = Format.eprintf "+++ iadd_from: tgt:%a in:%a@."
+        Printer.pp_identified_term tgt (Ldomain.pretty Memory.pp_node) d in
+    if iscalled then
+      let add_iterm env a it =
+        let d = add_iterm env it in
+        Format.eprintf "+ srcs:@[%a in:%a@]@." Printer.pp_identified_term it
+          (Ldomain.pretty Memory.pp_node) d ;
+        merge_domain env.map a d
+      in ignore @@ List.fold_left (add_iterm env) d srcs ;
+    else List.iter (Format.eprintf "+ srcs:@[%a@]@." Printer.pp_identified_term) srcs
 
 let add_requires ~map ~kf ~ki ~bhv ~formal ?result ip =
   let property = Property.ip_of_requires kf ki bhv ip in
@@ -58,14 +64,14 @@ let add_assumes ~map ~kf ~ki ~bhv ~formal ?result ip =
   let property = Property.ip_of_assumes kf ki bhv ip in
   add_ipred { map ; property ; formal ; result } ip
 
-let add_assigns ~map ~kf ~ki ~bhv ~formal ?result asgn =
+let add_assigns ~iscalled ~map ~kf ~ki ~bhv ~formal ?result asgn =
   match asgn with
   | WritesAny -> ()
   | Writes ws ->
     let bhv = Property.Id_contract (Datatype.String.Set.empty,bhv) in
     let property = Option.get @@ Property.ip_of_assigns kf ki bhv asgn in
     let env = { map ; property ; formal ; result } in
-    List.iter (iadd_from env) ws
+    List.iter (iadd_from ~iscalled env) ws
 
 let add_allocation ~map ~kf ~ki ~bhv ~formal ?result alloc =
   match alloc with
@@ -107,11 +113,11 @@ let rec add_extension ~kf ?stmt ?(formal=Vmap.empty) ?result map acsl =
     List.iter (add_extension ~kf ?stmt ~formal ?result map) acsls
 
 
-let add_behavior ~kf ~ki ?(formal=Vmap.empty) ?result map bhv =
+let add_behavior ~kf ~ki ?(formal=Vmap.empty) ?result ~iscalled map bhv =
   List.iter (add_requires ~map ~kf ~ki ~bhv ~formal ?result) bhv.b_requires ;
   List.iter (add_assumes ~map ~kf ~ki ~bhv ~formal ?result)  bhv.b_assumes  ;
   add_post_cond ~map ~kf ~ki ~bhv ~formal ?result            bhv.b_post_cond ;
-  add_assigns ~map ~kf ~ki ~bhv ~formal ?result              bhv.b_assigns ;
+  add_assigns ~iscalled ~map ~kf ~ki ~bhv ~formal ?result    bhv.b_assigns ;
   add_allocation ~map ~kf ~ki ~bhv ~formal ?result           bhv.b_allocation ;
   List.iter (add_extension ~kf ~formal ?result map)          bhv.b_extended
 
@@ -129,18 +135,18 @@ let add_variant ~kf ~ki ?(formal=Vmap.empty) ?result map variant =
   Option.iter add_variant_relation @@ snd variant ;
   ignore @@ add_term env @@ fst variant
 
-let add_spec ~kf ~ki ?(formal=Vmap.empty) ?result (map:map) (s:spec) =
+let add_spec ~kf ~ki ?(formal=Vmap.empty) ?result ~iscalled (map:map) (s:spec) =
   let p_term = Property.ip_terminates_of_spec kf ki s in
   let env_term op = { map ; property = Option.get op ; formal ; result } in
   Option.iter (add_ipred (env_term p_term)) s.spec_terminates ;
   Option.iter (add_variant ~kf ~ki ~formal ?result map) s.spec_variant ;
-  List.iter (add_behavior ~kf ~ki ~formal ?result map) s.spec_behavior
+  List.iter (add_behavior ~iscalled ~kf ~ki ~formal ?result map) s.spec_behavior
 
 (* -------------------------------------------------------------------------- *)
 (* ---  Process Function Body                                             --- *)
 (* -------------------------------------------------------------------------- *)
 
-let add_code_annot ~kf ~stmt ?(formal=Vmap.empty) ?result map c =
+let add_code_annot ~kf ~stmt ?(formal=Vmap.empty) ?result ~iscalled map c =
   match c.annot_content with
   | AAssert (_,{ tp_statement = p }) ->
     let property = Property.ip_of_code_annot_single kf stmt c in
@@ -148,7 +154,7 @@ let add_code_annot ~kf ~stmt ?(formal=Vmap.empty) ?result map c =
     add_predicate env p
   | AStmtSpec (_,s) ->
     let ki = Cil_datatype.Kinstr.kinstr_of_opt_stmt (Some stmt) in
-    add_spec ~kf ~ki ~formal ?result map s
+    add_spec ~iscalled ~kf ~ki ~formal ?result map s
   | AInvariant (_,_,{ tp_statement = p }) ->
     let property = Property.ip_of_code_annot_single kf stmt c in
     let env = { map ; property ; formal ; result } in
@@ -160,7 +166,7 @@ let add_code_annot ~kf ~stmt ?(formal=Vmap.empty) ?result map c =
   | AAssigns (_,Writes asgn) ->
     let ki = Cil_datatype.Kinstr.kinstr_of_opt_stmt (Some stmt) in
     let property = Option.get @@ Property.ip_assigns_of_code_annot kf ki c in
-    List.iter (iadd_from { map ; property ; formal ; result }) asgn
+    List.iter (iadd_from ~iscalled { map ; property ; formal ; result }) asgn
   | AAllocation (_,FreeAllocAny) -> ()
   | AAllocation (_,(FreeAlloc (its1,its2) as alloc)) ->
     if List.compare_lengths its1 its2 != 0 then
