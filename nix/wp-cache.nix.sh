@@ -21,7 +21,7 @@
 #                                                                        #
 ##########################################################################
 
-commit="$(git ls-remote git@git.frama-c.com:frama-c/wp-cache.git HEAD)"
+commit="$(git ls-remote https://git-token:$TOKEN_FOR_API@git.frama-c.com/frama-c/wp-cache.git HEAD)"
 if [ $? != 0 ]; then exit 1; fi
 
 commit=$(echo "$commit" | cut -f1)
