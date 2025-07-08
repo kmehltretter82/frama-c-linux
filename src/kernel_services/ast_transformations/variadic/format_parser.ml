@@ -256,6 +256,7 @@ let parse_brackets_interior b =
 
 let parse_f_cs b =
   match Buffer.get b with
+  | 'b' | 'B' -> `b
   | 'd' -> `d
   | 'i' -> `i
   | 'o' -> `o

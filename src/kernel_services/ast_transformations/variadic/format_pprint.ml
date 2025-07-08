@@ -64,6 +64,7 @@ let string_of_lm = function
 let pp_lm ff lm = Format.fprintf ff "%s" (string_of_lm lm)
 
 let string_of_cs = function
+  | `b -> "b"
   | `d -> "d"
   | `i -> "i"
   | `o -> "o"

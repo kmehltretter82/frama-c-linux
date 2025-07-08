@@ -3,9 +3,9 @@
 #include <wchar.h>
 #include <stddef.h>
 #include <stdio.h>
-
+#ifdef __FRAMAC__
 #include <stdio.c>
-
+#endif
 
 int main()
 {
@@ -78,4 +78,9 @@ int main()
   printf("%4c", '#'); // ok
   printf("%*p", 20, (void*)string); // ok
   printf("%20p", (void*)string); // ok
+
+  // new C23 modifiers
+  printf("%b ", ui);
+  printf("%bi ", ui);
+  printf("%B ", ui);
 }

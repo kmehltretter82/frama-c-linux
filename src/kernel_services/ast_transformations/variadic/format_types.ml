@@ -34,12 +34,12 @@ type precision = PStar | PInt of int
 type length_modifier = [ `hh | `h | `l | `ll | `j | `z | `t | `L ]
 
 type signed_specifier = [ `d | `i ]
-type unsigned_specifier = [ `u | `o | `x ]
+type unsigned_specifier = [ `b | `o | `u | `x ]
 type integer_specifier = [ signed_specifier | unsigned_specifier ]
 type float_specifier = [ `f | `e | `g | `a  ]
 type numeric_specifier = [ integer_specifier | float_specifier ]
-type capitalizable = [ `x | `f | `e | `g | `a  ]
-type has_alternative_form = [ `o | `x | `f | `e | `g | `a  ]
+type capitalizable = [ `b | `x | `f | `e | `g | `a  ]
+type has_alternative_form = [ `b | `o | `x | `f | `e | `g | `a  ]
 
 type f_conversion_specifier =
   [ numeric_specifier | `c | `s | `p | `n ]
