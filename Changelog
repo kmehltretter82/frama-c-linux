@@ -23,14 +23,14 @@ o   Kernel    [2025-07-03] Deprecate `Project.unique_name`. Use `pid` or  `name`
 -*  Kernel    [2025-06-30] Do not define __STDC_* macros in logic_preprocess,
               avoiding spurious warnings from preprocessor (fix #@1536)
 -*  Alias     [2025-06-23] Fix bug in fixpoint condition of dataflow analysis
+-!  Variadic  [2025-06-12] Internalize Variadic in Frama-C's kernel. No major
+              changes; Option -variadic-no-translation becomes
+              -no-variadic-translation.
 
 ###############################################################################
 Open Source Release 31.0 (Gallium)
 ###############################################################################
 
--!  Variadic  [2025-06-12] Internalize Variadic in Frama-C's kernel. No major
-              changes; Option -variadic-no-translation becomes
-              -no-variadic-translation.
 -   Kernel    [2025-05-15] Transparently compress and decompress when using
               -save/-load (still supports loading uncompressed files).
 -!  Kernel    [2025-05-07] Changed default behavior of -keep-unused-functions:
