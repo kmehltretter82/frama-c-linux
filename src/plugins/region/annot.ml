@@ -45,16 +45,12 @@ let iadd_from ~iscalled env (tgt,from) =
   match from with
   | FromAny -> ()
   | From srcs ->
-    let _ = Format.eprintf "+++ iadd_from: tgt:%a in:%a@."
-        Printer.pp_identified_term tgt (Ldomain.pretty Memory.pp_node) d in
     if iscalled then
-      let add_iterm env a it =
-        let d = add_iterm env it in
-        Format.eprintf "+ srcs:@[%a in:%a@]@." Printer.pp_identified_term it
-          (Ldomain.pretty Memory.pp_node) d ;
-        merge_domain env.map a d
-      in ignore @@ List.fold_left (add_iterm env) d srcs ;
-    else List.iter (Format.eprintf "+ srcs:@[%a@]@." Printer.pp_identified_term) srcs
+      let merge_from env a it =
+        merge_domain env.map a @@ add_iterm env it
+      in ignore @@ List.fold_left (merge_from env) d srcs ;
+    else
+      List.iter (fun it -> ignore @@ add_iterm env it) srcs
 
 let add_requires ~map ~kf ~ki ~bhv ~formal ?result ip =
   let property = Property.ip_of_requires kf ki bhv ip in

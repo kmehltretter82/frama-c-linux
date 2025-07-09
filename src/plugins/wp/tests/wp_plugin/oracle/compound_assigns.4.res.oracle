@@ -99,189 +99,96 @@ Cluster Compound {
 
 Cluster Globals {
   
-<<<<<<< HEAD
-  Function L_tmp_0_55 : int = 55
+  Function L_tmp_0_45 : int = 45
   
-  Function L_s_54 : int = 54
+  Function L_s_44 : int = 44
   
-  Function L_tmp_53 : int = 53
+  Function L_tmp_43 : int = 43
   
-  Function L_w_52 : int = 52
+  Function L_w_42 : int = 42
   
-  Function P_r_44 : int = 44
+  Function P_r_40 : int = 40
   
-  Function P_q_43 : int = 43
+  Function P_q_39 : int = 39
   
-  Function P_p_42 : int = 42
+  Function P_p_38 : int = 38
   
-  Axiom L_tmp_0_55_is_pointer:
-    (statically_allocated L_tmp_0_55)
-    -> (is_uint64 (int_of_addr (global L_tmp_0_55)))
+  Axiom L_tmp_0_45_is_pointer:
+    (statically_allocated L_tmp_0_45)
+    -> (is_uint64 (int_of_addr (global L_tmp_0_45)))
   
-  Axiom L_tmp_0_55_linked:
-    forall t_0:int[]. (linked t_0) -> (t_0[L_tmp_0_55]=0)
+  Axiom L_tmp_0_45_linked:
+    forall t_0:int[]. (linked t_0) -> (t_0[L_tmp_0_45]=0)
   
-  Axiom L_tmp_0_55_region: (region L_tmp_0_55)=1
+  Axiom L_tmp_0_45_region: (region L_tmp_0_45)=1
   
-  Axiom L_tmp_0_55_static_alloc: (statically_allocated L_tmp_0_55)
+  Axiom L_tmp_0_45_static_alloc: (statically_allocated L_tmp_0_45)
   
-  Axiom L_s_54_is_pointer:
-    (statically_allocated L_s_54)
-    -> (is_uint64 (int_of_addr (global L_s_54)))
+  Axiom L_s_44_is_pointer:
+    (statically_allocated L_s_44)
+    -> (is_uint64 (int_of_addr (global L_s_44)))
   
-  Axiom L_s_54_linked: forall t_0:int[]. (linked t_0) -> (t_0[L_s_54]=0)
+  Axiom L_s_44_linked: forall t_0:int[]. (linked t_0) -> (t_0[L_s_44]=0)
   
-  Axiom L_s_54_region: (region L_s_54)=1
+  Axiom L_s_44_region: (region L_s_44)=1
   
-  Axiom L_s_54_static_alloc: (statically_allocated L_s_54)
+  Axiom L_s_44_static_alloc: (statically_allocated L_s_44)
   
-  Axiom L_tmp_53_is_pointer:
-    (statically_allocated L_tmp_53)
-    -> (is_uint64 (int_of_addr (global L_tmp_53)))
+  Axiom L_tmp_43_is_pointer:
+    (statically_allocated L_tmp_43)
+    -> (is_uint64 (int_of_addr (global L_tmp_43)))
   
-  Axiom L_tmp_53_linked: forall t_0:int[]. (linked t_0) -> (t_0[L_tmp_53]=0)
+  Axiom L_tmp_43_linked: forall t_0:int[]. (linked t_0) -> (t_0[L_tmp_43]=0)
   
-  Axiom L_tmp_53_region: (region L_tmp_53)=1
+  Axiom L_tmp_43_region: (region L_tmp_43)=1
   
-  Axiom L_tmp_53_static_alloc: (statically_allocated L_tmp_53)
+  Axiom L_tmp_43_static_alloc: (statically_allocated L_tmp_43)
   
-  Axiom L_w_52_is_pointer:
-    (statically_allocated L_w_52)
-    -> (is_uint64 (int_of_addr (global L_w_52)))
+  Axiom L_w_42_is_pointer:
+    (statically_allocated L_w_42)
+    -> (is_uint64 (int_of_addr (global L_w_42)))
   
-  Axiom L_w_52_linked: forall t_0:int[]. (linked t_0) -> (t_0[L_w_52]=0)
+  Axiom L_w_42_linked: forall t_0:int[]. (linked t_0) -> (t_0[L_w_42]=0)
   
-  Axiom L_w_52_region: (region L_w_52)=1
+  Axiom L_w_42_region: (region L_w_42)=1
   
-  Axiom L_w_52_static_alloc: (statically_allocated L_w_52)
+  Axiom L_w_42_static_alloc: (statically_allocated L_w_42)
   
-  Axiom P_r_44_is_pointer:
-    (statically_allocated P_r_44)
-    -> (is_uint64 (int_of_addr (global P_r_44)))
+  Axiom P_r_40_is_pointer:
+    (statically_allocated P_r_40)
+    -> (is_uint64 (int_of_addr (global P_r_40)))
   
-  Axiom P_r_44_binit: (binit P_r_44)
+  Axiom P_r_40_binit: (binit P_r_40)
   
-  Axiom P_r_44_linked: forall t_0:int[]. (linked t_0) -> (t_0[P_r_44]=0)
+  Axiom P_r_40_linked: forall t_0:int[]. (linked t_0) -> (t_0[P_r_40]=0)
   
-  Axiom P_r_44_region: (region P_r_44)=2
+  Axiom P_r_40_region: (region P_r_40)=2
   
-  Axiom P_r_44_static_alloc: (statically_allocated P_r_44)
+  Axiom P_r_40_static_alloc: (statically_allocated P_r_40)
   
-  Axiom P_q_43_is_pointer:
-    (statically_allocated P_q_43)
-    -> (is_uint64 (int_of_addr (global P_q_43)))
+  Axiom P_q_39_is_pointer:
+    (statically_allocated P_q_39)
+    -> (is_uint64 (int_of_addr (global P_q_39)))
   
-  Axiom P_q_43_binit: (binit P_q_43)
+  Axiom P_q_39_binit: (binit P_q_39)
   
-  Axiom P_q_43_linked: forall t_0:int[]. (linked t_0) -> (t_0[P_q_43]=0)
+  Axiom P_q_39_linked: forall t_0:int[]. (linked t_0) -> (t_0[P_q_39]=0)
   
-  Axiom P_q_43_region: (region P_q_43)=2
+  Axiom P_q_39_region: (region P_q_39)=2
   
-  Axiom P_q_43_static_alloc: (statically_allocated P_q_43)
+  Axiom P_q_39_static_alloc: (statically_allocated P_q_39)
   
-  Axiom P_p_42_is_pointer:
-    (statically_allocated P_p_42)
-    -> (is_uint64 (int_of_addr (global P_p_42)))
+  Axiom P_p_38_is_pointer:
+    (statically_allocated P_p_38)
+    -> (is_uint64 (int_of_addr (global P_p_38)))
   
-  Axiom P_p_42_binit: (binit P_p_42)
+  Axiom P_p_38_binit: (binit P_p_38)
   
-  Axiom P_p_42_linked: forall t_0:int[]. (linked t_0) -> (t_0[P_p_42]=0)
+  Axiom P_p_38_linked: forall t_0:int[]. (linked t_0) -> (t_0[P_p_38]=0)
   
-  Axiom P_p_42_region: (region P_p_42)=2
+  Axiom P_p_38_region: (region P_p_38)=2
   
-  Axiom P_p_42_static_alloc: (statically_allocated P_p_42)
-=======
-  Function L_tmp_0_43 : int = 43
-  
-  Function L_s_42 : int = 42
-  
-  Function L_tmp_41 : int = 41
-  
-  Function L_w_40 : int = 40
-  
-  Function P_r_38 : int = 38
-  
-  Function P_q_37 : int = 37
-  
-  Function P_p_36 : int = 36
-  
-  Axiom L_tmp_0_43_is_pointer:
-    (statically_allocated L_tmp_0_43)
-    -> (is_uint64 (int_of_addr (global L_tmp_0_43)))
-  
-  Axiom L_tmp_0_43_linked:
-    forall t_0:int[]. (linked t_0) -> (t_0[L_tmp_0_43]=0)
-  
-  Axiom L_tmp_0_43_region: (region L_tmp_0_43)=1
-  
-  Axiom L_tmp_0_43_static_alloc: (statically_allocated L_tmp_0_43)
-  
-  Axiom L_s_42_is_pointer:
-    (statically_allocated L_s_42)
-    -> (is_uint64 (int_of_addr (global L_s_42)))
-  
-  Axiom L_s_42_linked: forall t_0:int[]. (linked t_0) -> (t_0[L_s_42]=0)
-  
-  Axiom L_s_42_region: (region L_s_42)=1
-  
-  Axiom L_s_42_static_alloc: (statically_allocated L_s_42)
-  
-  Axiom L_tmp_41_is_pointer:
-    (statically_allocated L_tmp_41)
-    -> (is_uint64 (int_of_addr (global L_tmp_41)))
-  
-  Axiom L_tmp_41_linked: forall t_0:int[]. (linked t_0) -> (t_0[L_tmp_41]=0)
-  
-  Axiom L_tmp_41_region: (region L_tmp_41)=1
-  
-  Axiom L_tmp_41_static_alloc: (statically_allocated L_tmp_41)
-  
-  Axiom L_w_40_is_pointer:
-    (statically_allocated L_w_40)
-    -> (is_uint64 (int_of_addr (global L_w_40)))
-  
-  Axiom L_w_40_linked: forall t_0:int[]. (linked t_0) -> (t_0[L_w_40]=0)
-  
-  Axiom L_w_40_region: (region L_w_40)=1
-  
-  Axiom L_w_40_static_alloc: (statically_allocated L_w_40)
-  
-  Axiom P_r_38_is_pointer:
-    (statically_allocated P_r_38)
-    -> (is_uint64 (int_of_addr (global P_r_38)))
-  
-  Axiom P_r_38_binit: (binit P_r_38)
-  
-  Axiom P_r_38_linked: forall t_0:int[]. (linked t_0) -> (t_0[P_r_38]=0)
-  
-  Axiom P_r_38_region: (region P_r_38)=2
-  
-  Axiom P_r_38_static_alloc: (statically_allocated P_r_38)
-  
-  Axiom P_q_37_is_pointer:
-    (statically_allocated P_q_37)
-    -> (is_uint64 (int_of_addr (global P_q_37)))
-  
-  Axiom P_q_37_binit: (binit P_q_37)
-  
-  Axiom P_q_37_linked: forall t_0:int[]. (linked t_0) -> (t_0[P_q_37]=0)
-  
-  Axiom P_q_37_region: (region P_q_37)=2
-  
-  Axiom P_q_37_static_alloc: (statically_allocated P_q_37)
-  
-  Axiom P_p_36_is_pointer:
-    (statically_allocated P_p_36)
-    -> (is_uint64 (int_of_addr (global P_p_36)))
-  
-  Axiom P_p_36_binit: (binit P_p_36)
-  
-  Axiom P_p_36_linked: forall t_0:int[]. (linked t_0) -> (t_0[P_p_36]=0)
-  
-  Axiom P_p_36_region: (region P_p_36)=2
-  
-  Axiom P_p_36_static_alloc: (statically_allocated P_p_36)
->>>>>>> 49ff3d4e42 ([region] fix access type bug)
+  Axiom P_p_38_static_alloc: (statically_allocated P_p_38)
   
 }
 
@@ -303,529 +210,6 @@ Cluster MemBytes.PointersProperties {
       -> ((region (base (addr_of_int (read_uint64 m_0 a_0))))<=0)
   
   Axiom pointers_int_range:
-<<<<<<< HEAD
-    forall a_2: addr.
-    (statically_allocated (base a_2)) -> (is_uint64 (int_of_addr a_2))
-  
-}
-
-Cluster S1_A {
-  
-  Type S1_A = { F1_A_f : int[]; F1_A_g : f64; }
-  
-  Predicate EqS1_A (S_0 : S1_A) (S_1 : S1_A)
-    = (S_1.F1_A_g=S_0.F1_A_g) /\ (EqArray_int 4 S_0.F1_A_f S_1.F1_A_f)
-  
-  Predicate IsS1_A (S_0 : S1_A) = (IsArray_sint32 S_0.F1_A_f)
-  
-}
-
-Cluster Shifts {
-  
-  Function shiftfield_F1_A_g (p_1 : addr) : addr = (shift p_1 16)
-  
-  Function shift_sint32 (p_0 : addr) (k_0 : int) : addr = (shift p_0 (4*k_0))
-  
-  Function shiftfield_F1_A_f (p_0 : addr) : addr = (shift p_0 0)
-  
-}
-
-Goal Assertion 'Kept' (file compound_assigns.i, line 82):
-Let a = memcpy(M0019_sint32_0, tmp_0, M0019_sint32_0, p, 24).
-Let a_1 = memcpy(M002e_float64_0, tmp_0, M002e_float64_0, p, 24).
-Let a_2 = Load_R0017_S1_A(s, M0019_sint32_0, M002e_float64_0).
-Let a_3 = Load_R0017_S1_A(s, a, a_1).
-Assume {
-  Type: is_sint32(side_0) /\ IsS1_A(a_2) /\
-      is_sint32(M0019_sint32_0[shift_sint32(shiftfield_F1_A_f(p), 0)]) /\
-      is_sint32(M0019_sint32_0[shift_sint32(shiftfield_F1_A_f(q), 0)]) /\
-      is_sint32(M0019_sint32_0[shift_sint32(shiftfield_F1_A_f(r), 0)]) /\
-      IsS1_A(a_3).
-  (* Heap *)
-  Type: (region(p.base) <= 0) /\ (region(q.base) <= 0) /\
-      (region(r.base) <= 0) /\ (region(s.base) <= 0) /\
-      (region(tmp_0.base) <= 0).
-  (* Pre-condition *)
-  Have: separated(p, 24, q, 24) /\ separated(p, 24, r, 24) /\
-      separated(q, 24, r, 24).
-  If side_0 != 0
-  Then { Have: tmp_0 = r. }
-  Else { Have: tmp_0 = q. }
-  If side_0 != 0
-  Then { Have: s = q. }
-  Else { Have: s = r. }
-  Have: Load_R0017_S1_A(tmp_0, a, a_1) =
-      Load_R0017_S1_A(p, M0019_sint32_0, M002e_float64_0).
-}
-Prove: EqS1_A(a_3, a_2).
-
-------------------------------------------------------------
-
-Goal Assertion 'Kept' (file compound_assigns.i, line 84):
-Let a = memcpy(M0019_sint32_0, tmp_0, M0019_sint32_0, p, 24).
-Let a_1 = memcpy(a, p, a, s, 24).
-Let a_2 = memcpy(M002e_float64_0, tmp_0, M002e_float64_0, p, 24).
-Let a_3 = memcpy(a_2, p, a_2, s, 24).
-Let a_4 = Load_R0017_S1_A(s, a, a_2).
-Let a_5 = Load_R0017_S1_A(s, M0019_sint32_0, M002e_float64_0).
-Let a_6 = Load_R0017_S1_A(s, a_1, a_3).
-Assume {
-  Type: is_sint32(side_0) /\ IsS1_A(a_5) /\
-      is_sint32(M0019_sint32_0[shift_sint32(shiftfield_F1_A_f(p), 0)]) /\
-      is_sint32(M0019_sint32_0[shift_sint32(shiftfield_F1_A_f(q), 0)]) /\
-      is_sint32(M0019_sint32_0[shift_sint32(shiftfield_F1_A_f(r), 0)]) /\
-      IsS1_A(a_4) /\ IsS1_A(a_6).
-  (* Heap *)
-  Type: (region(p.base) <= 0) /\ (region(q.base) <= 0) /\
-      (region(r.base) <= 0) /\ (region(s.base) <= 0) /\
-      (region(tmp_0.base) <= 0).
-  (* Pre-condition *)
-  Have: separated(p, 24, q, 24) /\ separated(p, 24, r, 24) /\
-      separated(q, 24, r, 24).
-  If side_0 != 0
-  Then { Have: tmp_0 = r. }
-  Else { Have: tmp_0 = q. }
-  If side_0 != 0
-  Then { Have: s = q. }
-  Else { Have: s = r. }
-  Have: Load_R0017_S1_A(tmp_0, a, a_2) =
-      Load_R0017_S1_A(p, M0019_sint32_0, M002e_float64_0).
-  (* Assertion 'Kept' *)
-  Have: a_4 = a_5.
-  Have: Load_R0017_S1_A(p, a_1, a_3) = a_4.
-}
-Prove: EqS1_A(a_6, a_5).
-
-------------------------------------------------------------
-
-Goal Assigns (file compound_assigns.i, line 57) in 'copy' (1/6):
-Effect at line 78
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Assigns (file compound_assigns.i, line 57) in 'copy' (2/6):
-Effect at line 78
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Assigns (file compound_assigns.i, line 57) in 'copy' (3/6):
-Effect at line 79
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Assigns (file compound_assigns.i, line 57) in 'copy' (4/6):
-Effect at line 79
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Assigns (file compound_assigns.i, line 57) in 'copy' (5/6):
-Effect at line 81
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Assigns (file compound_assigns.i, line 57) in 'copy' (6/6):
-Effect at line 83
-Prove: true.
-
-------------------------------------------------------------
-------------------------------------------------------------
-  Function copy with behavior Left
-------------------------------------------------------------
-
-Goal Post-condition for 'Left' 'CopyQ' in 'copy':
-Let a = memcpy(M0019_sint32_0, r, M0019_sint32_0, p, 24).
-Let a_1 = memcpy(a, p, a, q, 24).
-Let a_2 = memcpy(M002e_float64_0, r, M002e_float64_0, p, 24).
-Let a_3 = memcpy(a_2, p, a_2, q, 24).
-Let a_4 = Load_R0017_S1_A(q, a_1, a_3).
-Let a_5 = Load_R0017_S1_A(q, M0019_sint32_0, M002e_float64_0).
-Let a_6 = Load_R0017_S1_A(p, a_1, a_3).
-Let a_7 = Load_R0017_S1_A(q, a, a_2).
-Let a_8 = Load_R0017_S1_A(p, M0019_sint32_0, M002e_float64_0).
-Assume {
-  Type: is_sint32(side_0) /\ IsS1_A(a_8) /\ IsS1_A(a_5) /\
-      is_sint32(M0019_sint32_0[shift_sint32(shiftfield_F1_A_f(p), 0)]) /\
-      is_sint32(M0019_sint32_0[shift_sint32(shiftfield_F1_A_f(q), 0)]) /\
-      is_sint32(M0019_sint32_0[shift_sint32(shiftfield_F1_A_f(r), 0)]) /\
-      IsS1_A(a_7) /\ IsS1_A(a_6) /\ IsS1_A(a_4) /\
-      IsS1_A(Load_R0017_S1_A(r, a_1, a_3)).
-  (* Heap *)
-  Type: (region(p.base) <= 0) /\ (region(q.base) <= 0) /\
-      (region(r.base) <= 0).
-  (* Pre-condition *)
-  Have: separated(p, 24, q, 24) /\ separated(p, 24, r, 24) /\
-      separated(q, 24, r, 24).
-  (* Pre-condition for 'Left' *)
-  Have: side_0 != 0.
-  Have: Load_R0017_S1_A(r, a, a_2) = a_8.
-  (* Assertion 'Kept' *)
-  Have: a_7 = a_5.
-  Have: a_6 = a_7.
-  (* Assertion 'Kept' *)
-  Have: a_4 = a_5.
-}
-Prove: EqS1_A(a_6, a_5).
-
-------------------------------------------------------------
-
-Goal Post-condition for 'Left' 'KeepQ' in 'copy':
-Let a = memcpy(M0019_sint32_0, r, M0019_sint32_0, p, 24).
-Let a_1 = memcpy(a, p, a, q, 24).
-Let a_2 = memcpy(M002e_float64_0, r, M002e_float64_0, p, 24).
-Let a_3 = memcpy(a_2, p, a_2, q, 24).
-Let a_4 = Load_R0017_S1_A(q, a_1, a_3).
-Let a_5 = Load_R0017_S1_A(q, M0019_sint32_0, M002e_float64_0).
-Let a_6 = Load_R0017_S1_A(p, a_1, a_3).
-Let a_7 = Load_R0017_S1_A(q, a, a_2).
-Let a_8 = Load_R0017_S1_A(p, M0019_sint32_0, M002e_float64_0).
-Assume {
-  Type: is_sint32(side_0) /\ IsS1_A(a_8) /\ IsS1_A(a_5) /\
-      is_sint32(M0019_sint32_0[shift_sint32(shiftfield_F1_A_f(p), 0)]) /\
-      is_sint32(M0019_sint32_0[shift_sint32(shiftfield_F1_A_f(q), 0)]) /\
-      is_sint32(M0019_sint32_0[shift_sint32(shiftfield_F1_A_f(r), 0)]) /\
-      IsS1_A(a_7) /\ IsS1_A(a_6) /\ IsS1_A(a_4) /\
-      IsS1_A(Load_R0017_S1_A(r, a_1, a_3)).
-  (* Heap *)
-  Type: (region(p.base) <= 0) /\ (region(q.base) <= 0) /\
-      (region(r.base) <= 0).
-  (* Pre-condition *)
-  Have: separated(p, 24, q, 24) /\ separated(p, 24, r, 24) /\
-      separated(q, 24, r, 24).
-  (* Pre-condition for 'Left' *)
-  Have: side_0 != 0.
-  Have: Load_R0017_S1_A(r, a, a_2) = a_8.
-  (* Assertion 'Kept' *)
-  Have: a_7 = a_5.
-  Have: a_6 = a_7.
-  (* Assertion 'Kept' *)
-  Have: a_4 = a_5.
-}
-Prove: EqS1_A(a_4, a_5).
-
-------------------------------------------------------------
-
-Goal Post-condition for 'Left' 'SaveR' in 'copy':
-Let a = memcpy(M0019_sint32_0, r, M0019_sint32_0, p, 24).
-Let a_1 = memcpy(a, p, a, q, 24).
-Let a_2 = memcpy(M002e_float64_0, r, M002e_float64_0, p, 24).
-Let a_3 = memcpy(a_2, p, a_2, q, 24).
-Let a_4 = Load_R0017_S1_A(q, a_1, a_3).
-Let a_5 = Load_R0017_S1_A(q, M0019_sint32_0, M002e_float64_0).
-Let a_6 = Load_R0017_S1_A(p, a_1, a_3).
-Let a_7 = Load_R0017_S1_A(q, a, a_2).
-Let a_8 = Load_R0017_S1_A(p, M0019_sint32_0, M002e_float64_0).
-Let a_9 = Load_R0017_S1_A(r, a_1, a_3).
-Assume {
-  Type: is_sint32(side_0) /\ IsS1_A(a_8) /\ IsS1_A(a_5) /\
-      is_sint32(M0019_sint32_0[shift_sint32(shiftfield_F1_A_f(p), 0)]) /\
-      is_sint32(M0019_sint32_0[shift_sint32(shiftfield_F1_A_f(q), 0)]) /\
-      is_sint32(M0019_sint32_0[shift_sint32(shiftfield_F1_A_f(r), 0)]) /\
-      IsS1_A(a_7) /\ IsS1_A(a_6) /\ IsS1_A(a_4) /\ IsS1_A(a_9).
-  (* Heap *)
-  Type: (region(p.base) <= 0) /\ (region(q.base) <= 0) /\
-      (region(r.base) <= 0).
-  (* Pre-condition *)
-  Have: separated(p, 24, q, 24) /\ separated(p, 24, r, 24) /\
-      separated(q, 24, r, 24).
-  (* Pre-condition for 'Left' *)
-  Have: side_0 != 0.
-  Have: Load_R0017_S1_A(r, a, a_2) = a_8.
-  (* Assertion 'Kept' *)
-  Have: a_7 = a_5.
-  Have: a_6 = a_7.
-  (* Assertion 'Kept' *)
-  Have: a_4 = a_5.
-}
-Prove: EqS1_A(a_9, a_8).
-
-------------------------------------------------------------
-------------------------------------------------------------
-  Function copy with behavior Right
-------------------------------------------------------------
-
-Goal Post-condition for 'Right' 'CopyR' in 'copy':
-Let a = memcpy(M0019_sint32_0, q, M0019_sint32_0, p, 24).
-Let a_1 = memcpy(a, p, a, r, 24).
-Let a_2 = memcpy(M002e_float64_0, q, M002e_float64_0, p, 24).
-Let a_3 = memcpy(a_2, p, a_2, r, 24).
-Let a_4 = Load_R0017_S1_A(r, a_1, a_3).
-Let a_5 = Load_R0017_S1_A(r, M0019_sint32_0, M002e_float64_0).
-Let a_6 = Load_R0017_S1_A(p, a_1, a_3).
-Let a_7 = Load_R0017_S1_A(r, a, a_2).
-Let a_8 = Load_R0017_S1_A(p, M0019_sint32_0, M002e_float64_0).
-Assume {
-  Type: IsS1_A(a_8) /\ IsS1_A(a_5) /\
-      is_sint32(M0019_sint32_0[shift_sint32(shiftfield_F1_A_f(p), 0)]) /\
-      is_sint32(M0019_sint32_0[shift_sint32(shiftfield_F1_A_f(q), 0)]) /\
-      is_sint32(M0019_sint32_0[shift_sint32(shiftfield_F1_A_f(r), 0)]) /\
-      IsS1_A(a_7) /\ IsS1_A(a_6) /\ IsS1_A(Load_R0017_S1_A(q, a_1, a_3)) /\
-      IsS1_A(a_4).
-  (* Heap *)
-  Type: (region(p.base) <= 0) /\ (region(q.base) <= 0) /\
-      (region(r.base) <= 0).
-  (* Pre-condition *)
-  Have: separated(p, 24, q, 24) /\ separated(p, 24, r, 24) /\
-      separated(q, 24, r, 24).
-  Have: Load_R0017_S1_A(q, a, a_2) = a_8.
-  (* Assertion 'Kept' *)
-  Have: a_7 = a_5.
-  Have: a_6 = a_7.
-  (* Assertion 'Kept' *)
-  Have: a_4 = a_5.
-}
-Prove: EqS1_A(a_6, a_5).
-
-------------------------------------------------------------
-
-Goal Post-condition for 'Right' 'SaveQ' in 'copy':
-Let a = memcpy(M0019_sint32_0, q, M0019_sint32_0, p, 24).
-Let a_1 = memcpy(a, p, a, r, 24).
-Let a_2 = memcpy(M002e_float64_0, q, M002e_float64_0, p, 24).
-Let a_3 = memcpy(a_2, p, a_2, r, 24).
-Let a_4 = Load_R0017_S1_A(r, a_1, a_3).
-Let a_5 = Load_R0017_S1_A(r, M0019_sint32_0, M002e_float64_0).
-Let a_6 = Load_R0017_S1_A(p, a_1, a_3).
-Let a_7 = Load_R0017_S1_A(r, a, a_2).
-Let a_8 = Load_R0017_S1_A(p, M0019_sint32_0, M002e_float64_0).
-Let a_9 = Load_R0017_S1_A(q, a_1, a_3).
-Assume {
-  Type: IsS1_A(a_8) /\ IsS1_A(a_5) /\
-      is_sint32(M0019_sint32_0[shift_sint32(shiftfield_F1_A_f(p), 0)]) /\
-      is_sint32(M0019_sint32_0[shift_sint32(shiftfield_F1_A_f(q), 0)]) /\
-      is_sint32(M0019_sint32_0[shift_sint32(shiftfield_F1_A_f(r), 0)]) /\
-      IsS1_A(a_7) /\ IsS1_A(a_6) /\ IsS1_A(a_9) /\ IsS1_A(a_4).
-  (* Heap *)
-  Type: (region(p.base) <= 0) /\ (region(q.base) <= 0) /\
-      (region(r.base) <= 0).
-  (* Pre-condition *)
-  Have: separated(p, 24, q, 24) /\ separated(p, 24, r, 24) /\
-      separated(q, 24, r, 24).
-  Have: Load_R0017_S1_A(q, a, a_2) = a_8.
-  (* Assertion 'Kept' *)
-  Have: a_7 = a_5.
-  Have: a_6 = a_7.
-  (* Assertion 'Kept' *)
-  Have: a_4 = a_5.
-}
-Prove: EqS1_A(a_9, a_8).
-
-------------------------------------------------------------
-
-Goal Post-condition for 'Right' 'KeepR' in 'copy':
-Let a = memcpy(M0019_sint32_0, q, M0019_sint32_0, p, 24).
-Let a_1 = memcpy(a, p, a, r, 24).
-Let a_2 = memcpy(M002e_float64_0, q, M002e_float64_0, p, 24).
-Let a_3 = memcpy(a_2, p, a_2, r, 24).
-Let a_4 = Load_R0017_S1_A(r, a_1, a_3).
-Let a_5 = Load_R0017_S1_A(r, M0019_sint32_0, M002e_float64_0).
-Let a_6 = Load_R0017_S1_A(p, a_1, a_3).
-Let a_7 = Load_R0017_S1_A(r, a, a_2).
-Let a_8 = Load_R0017_S1_A(p, M0019_sint32_0, M002e_float64_0).
-Assume {
-  Type: IsS1_A(a_8) /\ IsS1_A(a_5) /\
-      is_sint32(M0019_sint32_0[shift_sint32(shiftfield_F1_A_f(p), 0)]) /\
-      is_sint32(M0019_sint32_0[shift_sint32(shiftfield_F1_A_f(q), 0)]) /\
-      is_sint32(M0019_sint32_0[shift_sint32(shiftfield_F1_A_f(r), 0)]) /\
-      IsS1_A(a_7) /\ IsS1_A(a_6) /\ IsS1_A(Load_R0017_S1_A(q, a_1, a_3)) /\
-      IsS1_A(a_4).
-  (* Heap *)
-  Type: (region(p.base) <= 0) /\ (region(q.base) <= 0) /\
-      (region(r.base) <= 0).
-  (* Pre-condition *)
-  Have: separated(p, 24, q, 24) /\ separated(p, 24, r, 24) /\
-      separated(q, 24, r, 24).
-  Have: Load_R0017_S1_A(q, a, a_2) = a_8.
-  (* Assertion 'Kept' *)
-  Have: a_7 = a_5.
-  Have: a_6 = a_7.
-  (* Assertion 'Kept' *)
-  Have: a_4 = a_5.
-}
-Prove: EqS1_A(a_4, a_5).
-
-------------------------------------------------------------
-------------------------------------------------------------
-  Function init
-------------------------------------------------------------
-
-Cluster Compound {
-  
-  Function Load_R0003_Init_S1_A (p_2 : addr) (init_0 : bool[][]) : Init_S1_A
-    = {
-         Init_F1_A_f =
-           (Array_R0003_sint32_init (shiftfield_F1_A_f p_2) 4 init_0) ;
-         Init_F1_A_g = (read_init64 init_0 (shiftfield_F1_A_g p_2))
-      }
-  
-  Function Array_R0003_sint32_init (p_2 : addr) (n_2 : int)
-    (init_0 : bool[][]) : bool[]
-  
-  Function Load_R0003_S1_A (p_2 : addr) (mem_0 : int[][]) : S1_A
-    = {
-         F1_A_f = (Array_R0003_sint32 (shiftfield_F1_A_f p_2) 4 mem_0) ;
-         F1_A_g =
-           (int_to_float64 (read_uint64 mem_0 (shiftfield_F1_A_g p_2)))
-      }
-  
-  Function Array_R0003_sint32 (p_2 : addr) (n_2 : int)
-    (mem_0 : int[][]) : int[]
-  
-  Predicate IsInit_S1_A_R0003 (p_0 : addr) (init_0 : bool[][])
-    = (read_init64 init_0 (shiftfield_F1_A_g p_0))
-      /\ (IsInitArray_R0003_sint32 (shiftfield_F1_A_f p_0) 4 init_0)
-  
-  Predicate IsInitArray_R0003_sint32 (p_0 : addr) (n_0 : int)
-    (init_0 : bool[][])
-    = forall i_0:int.
-      (0<=i_0) -> (i_0<n_0) -> (read_init32 init_0 (shift_sint32 p_0 i_0))
-  
-  Axiom Load_R0003_Init_S1_A_framed:
-    forall init_1: bool[][].
-    forall init_2: bool[][].
-    forall p_2: addr.
-    (eqmem init_1 init_2 p_2 24)
-    -> ((Load_R0003_Init_S1_A p_2 init_2)=(Load_R0003_Init_S1_A p_2 init_1))
-  
-  Axiom Array_R0003_sint32_init_framed:
-    forall init_1: bool[][].
-    forall init_2: bool[][].
-    forall n_2: int.
-    forall p_2: addr.
-    (eqmem init_1 init_2 p_2 (4*n_2))
-    -> ((Array_R0003_sint32_init p_2 n_2 init_2)=
-        (Array_R0003_sint32_init p_2 n_2 init_1))
-  
-  Axiom Array_R0003_sint32_init_access:
-    forall i_2: int.
-    forall init_0: bool[][].
-    forall n_2: int.
-    forall p_2: addr.
-    [ (Array_R0003_sint32_init p_2 n_2 init_0)[i_2] ]
-    (0<=i_2) -> (i_2<n_2)
-    -> ((Array_R0003_sint32_init p_2 n_2 init_0)[i_2]=
-        (read_init32 init_0 (shift_sint32 p_2 i_2)))
-  
-  Axiom Load_R0003_S1_A_framed:
-    forall mem_1: int[][].
-    forall mem_2: int[][].
-    forall p_2: addr.
-    (eqmem mem_1 mem_2 p_2 24)
-    -> ((Load_R0003_S1_A p_2 mem_2)=(Load_R0003_S1_A p_2 mem_1))
-  
-  Axiom Array_R0003_sint32_framed:
-    forall mem_1: int[][].
-    forall mem_2: int[][].
-    forall n_2: int.
-    forall p_2: addr.
-    (eqmem mem_1 mem_2 p_2 (4*n_2))
-    -> ((Array_R0003_sint32 p_2 n_2 mem_2)=
-        (Array_R0003_sint32 p_2 n_2 mem_1))
-  
-  Axiom Array_R0003_sint32_access:
-    forall i_2: int.
-    forall mem_0: int[][].
-    forall n_2: int.
-    forall p_2: addr.
-    [ (Array_R0003_sint32 p_2 n_2 mem_0)[i_2] ]
-    (0<=i_2) -> (i_2<n_2)
-    -> ((Array_R0003_sint32 p_2 n_2 mem_0)[i_2]=
-        (read_sint32 mem_0 (shift_sint32 p_2 i_2)))
-  
-  Axiom IsInit_S1_A_R0003_framed:
-    forall init_1: bool[][].
-    forall init_2: bool[][].
-    forall p_0: addr.
-    (eqmem init_1 init_2 p_0 24)
-    -> ((IsInit_S1_A_R0003 p_0 init_2) <-> (IsInit_S1_A_R0003 p_0 init_1))
-  
-  Axiom IsInitArray_R0003_sint32_framed:
-    forall init_1: bool[][].
-    forall init_2: bool[][].
-    forall n_0: int.
-    forall p_0: addr.
-    (eqmem init_1 init_2 p_0 (4*n_0))
-    -> ((IsInitArray_R0003_sint32 p_0 n_0 init_2)
-        <-> (IsInitArray_R0003_sint32 p_0 n_0 init_1))
-  
-}
-
-Cluster Globals {
-  
-  Function P_q_60 : int = 60
-  
-  Function P_p_59 : int = 59
-  
-  Axiom P_q_60_is_pointer:
-    (statically_allocated P_q_60)
-    -> (is_uint64 (int_of_addr (global P_q_60)))
-  
-  Axiom P_q_60_binit: (binit P_q_60)
-  
-  Axiom P_q_60_linked: forall t_0:int[]. (linked t_0) -> (t_0[P_q_60]=0)
-  
-  Axiom P_q_60_region: (region P_q_60)=2
-  
-  Axiom P_q_60_static_alloc: (statically_allocated P_q_60)
-  
-  Axiom P_p_59_is_pointer:
-    (statically_allocated P_p_59)
-    -> (is_uint64 (int_of_addr (global P_p_59)))
-  
-  Axiom P_p_59_binit: (binit P_p_59)
-  
-  Axiom P_p_59_linked: forall t_0:int[]. (linked t_0) -> (t_0[P_p_59]=0)
-  
-  Axiom P_p_59_region: (region P_p_59)=2
-  
-  Axiom P_p_59_static_alloc: (statically_allocated P_p_59)
-  
-}
-
-Cluster Matrix {
-  
-  Predicate EqArray_int (n_0 : int) (T_0 : int[]) (T_1 : int[])
-    = forall i_0:int. (0<=i_0) -> (i_0<n_0) -> (T_1[i_0]=T_0[i_0])
-  
-  Predicate IsArray_sint32 (T_0 : int[])
-    = forall i_0:int. (is_sint32 T_0[i_0])
-  
-}
-
-Cluster MemBytes.Float {
-  
-  Function int_to_float64 (f_1 : int) : f64
-  
-  Function float64_to_int (f_0 : f64) : int
-  
-  Axiom encode_bounds_float64:
-    forall f_3: f64.
-    (is_uint64 (float64_to_int f_3))
-  
-  Axiom decode_encode_float64:
-    forall f_2: f64.
-    (int_to_float64 (float64_to_int f_2))=f_2
-  
-  Axiom encode_decode_float64:
-    forall i_0: int.
-    (float64_to_int (int_to_float64 i_0))=i_0
-  
-}
-
-Cluster MemBytes.PointersProperties {
-  
-  Predicate framed (m_0 : int[][])
-    = forall a_0:addr.
-      ((region (base a_0))<=0)
-      -> ((region (base (addr_of_int (read_uint64 m_0 a_0))))<=0)
-  
-  Axiom pointers_int_range:
-=======
->>>>>>> 49ff3d4e42 ([region] fix access type bug)
     forall a_1: addr.
     (statically_allocated (base a_1)) -> (is_uint64 (int_of_addr a_1))
   
@@ -1261,33 +645,33 @@ Cluster Compound {
 
 Cluster Globals {
   
-  Function P_q_48 : int = 48
+  Function P_q_50 : int = 50
   
-  Function P_p_47 : int = 47
+  Function P_p_49 : int = 49
   
-  Axiom P_q_48_is_pointer:
-    (statically_allocated P_q_48)
-    -> (is_uint64 (int_of_addr (global P_q_48)))
+  Axiom P_q_50_is_pointer:
+    (statically_allocated P_q_50)
+    -> (is_uint64 (int_of_addr (global P_q_50)))
   
-  Axiom P_q_48_binit: (binit P_q_48)
+  Axiom P_q_50_binit: (binit P_q_50)
   
-  Axiom P_q_48_linked: forall t_0:int[]. (linked t_0) -> (t_0[P_q_48]=0)
+  Axiom P_q_50_linked: forall t_0:int[]. (linked t_0) -> (t_0[P_q_50]=0)
   
-  Axiom P_q_48_region: (region P_q_48)=2
+  Axiom P_q_50_region: (region P_q_50)=2
   
-  Axiom P_q_48_static_alloc: (statically_allocated P_q_48)
+  Axiom P_q_50_static_alloc: (statically_allocated P_q_50)
   
-  Axiom P_p_47_is_pointer:
-    (statically_allocated P_p_47)
-    -> (is_uint64 (int_of_addr (global P_p_47)))
+  Axiom P_p_49_is_pointer:
+    (statically_allocated P_p_49)
+    -> (is_uint64 (int_of_addr (global P_p_49)))
   
-  Axiom P_p_47_binit: (binit P_p_47)
+  Axiom P_p_49_binit: (binit P_p_49)
   
-  Axiom P_p_47_linked: forall t_0:int[]. (linked t_0) -> (t_0[P_p_47]=0)
+  Axiom P_p_49_linked: forall t_0:int[]. (linked t_0) -> (t_0[P_p_49]=0)
   
-  Axiom P_p_47_region: (region P_p_47)=2
+  Axiom P_p_49_region: (region P_p_49)=2
   
-  Axiom P_p_47_static_alloc: (statically_allocated P_p_47)
+  Axiom P_p_49_static_alloc: (statically_allocated P_p_49)
   
 }
 
