@@ -48,7 +48,7 @@ let iadd_from ~iscalled env (tgt,from) =
     if iscalled then
       let merge_from env a it =
         merge_domain env.map a @@ add_iterm env it
-      in ignore @@ List.fold_left (merge_from env) d srcs ;
+      in ignore @@ List.fold_left (merge_from env) d srcs
     else
       List.iter (fun it -> ignore @@ add_iterm env it) srcs
 

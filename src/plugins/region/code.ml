@@ -144,8 +144,8 @@ let add_kf_call ~kf ~stmt map ?property ?result args kfct =
       let d = Logic.add_term env @@ Logic_utils.expr_to_term e in
       Vmap.add arg d formal in
     let formal = List.fold_left2 add_formal Vmap.empty args fargs in
-    Annot.add_behavior ~kf ~ki ~formal map bhv
-  in List.iter (add_called_behavior ~iscalled:true) funspec.spec_behavior
+    Annot.add_behavior ~iscalled:true ~kf ~ki ~formal ?result map bhv
+  in List.iter add_called_behavior funspec.spec_behavior
 
 let add_call ~kf ~stmt map ?result fct (args: exp list) =
   match Kernel_function.get_called fct with
@@ -163,7 +163,7 @@ let add_instr ~kf (m:map) (s:stmt) (instr:instr) =
   match instr with
   | Skip _ -> ()
   | Code_annot (annot,_) ->
-    Annot.add_code_annot ~iscalled:true ~kf ~stmt:s m annot
+    Annot.add_code_annot ~iscalled:false ~kf ~stmt:s m annot
 
   | Set(lv,e,_) ->
     let r = add_lval m s lv in
@@ -173,9 +173,15 @@ let add_instr ~kf (m:map) (s:stmt) (instr:instr) =
     let acs = Access.Init(s,x) in
     add_init m s acs (Var x,NoOffset) iv
 
-  | Local_init(_,ConsInit _,_) ->
-    Options.warning ~source:(fst @@ Stmt.loc s)
-      "Constructor init not yet implemented"
+  | Local_init(x,ConsInit (vf,args,kind), loc) ->
+    let r = add_cvar m x in
+    Memory.add_write m r (Lval (s,Cil.var x)) ;
+    Cil.treat_constructor_as_func
+      begin fun _res fct args _loc ->
+        add_value m s fct ;
+        List.iter (add_value m s) args ;
+        add_call ~kf ~stmt:s m ~result:r fct args
+      end x vf args kind loc
 
   | Call(lr,e,es,_) ->
     add_value m s e ;
@@ -207,7 +213,7 @@ let store rmap m s =
 
 let rec add_stmt ~kf (r:rmap) (m:map) (s:stmt) =
   let add_block = add_block ~kf in
-  let add_annot = Annot.add_code_annot ~iscalled:true ~kf ~stmt:s m in
+  let add_annot = Annot.add_code_annot ~iscalled:false ~kf ~stmt:s m in
   List.iter add_annot @@ Annotations.code_annot s ;
   match s.skind with
   | Instr ki -> add_instr ~kf m s ki ; store r m s
