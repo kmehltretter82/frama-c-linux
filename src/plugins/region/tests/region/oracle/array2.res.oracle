@@ -8,3 +8,4 @@
   R0008: R-A Q: (int) 32b ;
   R0009: RW- s (int) 32b ;
   R000b: RW- k (int) 32b ;
+  R0017: -W- (int) 32b ;

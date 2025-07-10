@@ -6,3 +6,4 @@
   R0003: R-- q (int *) 64b (*R0005) ;
   R0005: R-- (int) 32b ;
   R0001: RW- __retres (float) 32b ;
+  R000f: -W- (float) 32b ;

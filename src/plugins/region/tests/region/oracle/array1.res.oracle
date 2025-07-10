@@ -7,3 +7,4 @@
   R0001: R-- q (int *) 64b (*R0002) ;
   R0007: RW- s (int) 32b ;
   R0009: RW- k (int) 32b ;
+  R0013: -W- (int) 32b ;

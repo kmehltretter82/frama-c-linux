@@ -43,3 +43,4 @@
   R000b: RW- out (SN *) 64b (*R000f) ;
   R0013: RW- idx (SL *) 64b (*R0017) ;
   R001b: RW- i (int) 32b ;
+  R0083: --- 0b ;
