@@ -270,6 +270,7 @@ external-plugins:
           "minimal",
           "pathcrawler",
           "security",
+          "unitcheck",
           "volatile"
         ]
 
