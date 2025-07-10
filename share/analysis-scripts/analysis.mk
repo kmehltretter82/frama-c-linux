@@ -96,7 +96,11 @@ endif
 
 # --- Utilities ---
 
-define display_command =
+ifeq ($(SILENT),yes)
+define display_command
+endef
+else
+define display_command
   @{
     echo '';
     [ -t 1 ] && tput setaf 4;
@@ -105,6 +109,7 @@ define display_command =
     echo '';
   }
 endef
+endif
 
 empty :=
 space := $(empty) $(empty)
