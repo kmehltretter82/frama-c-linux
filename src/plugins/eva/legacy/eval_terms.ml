@@ -699,6 +699,12 @@ let is_true = function
   | `True | `TrueReduced _ -> true
   | `Unknown _ | `False | `Unreachable -> false
 
+let truth_to_status = function
+  | `True | `TrueReduced _ -> True
+  | `Unknown _ -> Unknown
+  | `False -> False
+  | `Unreachable -> assert false (* Should not happen with only cvalue *)
+
 (* Check "logic alarms" when evaluating [v1 op v2]. All operators shifts are
    defined unambiguously in ACSL. *)
 let check_logic_alarms ~alarm_mode typ (_v1: V.t eval_result) op v2 =
@@ -2264,7 +2270,22 @@ and reduce_by_predicate ~alarm_mode env positive p =
 
     | _,Pvalid_function _tsets -> env (* TODO *)
 
-    | _,Paligned(_t, _n) -> env (* TODO *)
+    | _, Paligned (t, n) -> begin
+        let align = eval_term ~alarm_mode env n in
+        let to_int v =
+          try Cvalue.V.project_ival v |> Ival.project_int |> Integer.to_int_opt
+          with Cvalue.V.Not_based_on_null | Ival.Not_Singleton_Int -> None
+        in
+        match to_int align.eover with
+        | Some align when align > 0 ->
+          let reduce _typ v =
+            match Cvalue_forward.assume_aligned align v with
+            | `TrueReduced v | `Unknown v -> v
+            | `True | `False | `Unreachable -> v
+          in
+          reduce_exact_location ~alarm_mode env reduce t
+        | Some _ | None -> env
+      end
 
     | _,(Pinitialized (lbl_initialized,tsets)
         | Pdangling (lbl_initialized,tsets)) ->
@@ -2498,8 +2519,19 @@ and eval_predicate env pred =
             True
       end
 
-    | Paligned (_t, _n) ->
-      Unknown (* TODO *)
+    | Paligned (t, n) -> begin
+        let align = eval_term ~alarm_mode env n in
+        let to_int v =
+          try Cvalue.V.project_ival v |> Ival.project_int |> Integer.to_int_opt
+          with Cvalue.V.Not_based_on_null | Ival.Not_Singleton_Int -> None
+        in
+        match to_int align.eover with
+        | Some align when align > 0 ->
+          let pointer = eval_term ~alarm_mode env t in
+          let truth = Cvalue_forward.assume_aligned align pointer.eover in
+          truth_to_status truth
+        | Some _ | None -> Unknown
+      end
 
     | Pinitialized (label,tsets) | Pdangling (label,tsets) -> begin
         (* Create [*tsets] and compute its location. This is important in
@@ -2762,8 +2794,7 @@ and predicate_deps env pred =
     | Pobject_pointer (_, tsets) | Pvalid_function tsets ->
       term_deps tsets
 
-    | Paligned (_t, _n) ->
-      unsupported (Format.asprintf "TODO \\aligned")
+    | Paligned (t, n) -> join_logic_deps (term_deps t) (term_deps n)
 
     | Pinitialized (lbl, tsets) | Pdangling (lbl, tsets) ->
       tsets_deps lbl tsets

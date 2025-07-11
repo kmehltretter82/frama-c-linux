@@ -467,6 +467,8 @@
   ==END OF DUMP==
 [eva] computing for function malloc <- main.
   Called from linked_list.c:41.
+[eva] FRAMAC_SHARE/libc/stdlib.h:625: 
+  function malloc, behavior allocation: postcondition 'aligned' got status valid.
 [eva] Recording results for malloc
 [eva] Done for function malloc
 [eva] linked_list.c:42: 
