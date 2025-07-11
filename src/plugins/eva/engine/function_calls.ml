@@ -44,16 +44,12 @@ module StmtSet = Cil_datatype.Stmt.Set
 module Callers = Kernel_function.Map.Make (StmtSet)
 module CallersTable = Kernel_function.Make_Table (Callers) (val info "Callers")
 
-let register_call kinstr kf =
-  let callstack = Callstack.get_current () in
-  let kf', kinstr' = Callstack.top_call callstack in
-  assert (Kernel_function.equal kf kf');
-  assert (Cil_datatype.Kinstr.equal kinstr kinstr');
-  match kinstr, Callstack.top_caller callstack with
-  | Kglobal, _ -> CallersTable.add kf Kernel_function.Map.empty
-  | Kstmt _, None -> assert false
-  | Kstmt stmt, Some caller ->
-    let callsite = StmtSet.singleton stmt in
+let register_call call =
+  let kf = Callstack.top_kf call.callstack in
+  match Callstack.top_caller call.callstack with
+  | None -> CallersTable.add kf Kernel_function.Map.empty
+  | Some (callsite, caller) ->
+    let callsite = StmtSet.singleton callsite in
     let change calls =
       let prev_stmts = Kernel_function.Map.find_opt caller calls in
       let new_stmts =
@@ -163,7 +159,9 @@ let get_funspec callsite kf =
   Populate_spec.populate_funspec ?loc ~do_body:true kf [`Assigns];
   Annotations.funspec kf
 
-let analysis_target ~recursion_depth callsite kf =
+let analysis_target ~recursion_depth call =
+  let callsite = Callstack.top_callsite call.callstack
+  and kf = call.kf in
   match Builtins.find_builtin_override kf with
   | Some (name, builtin, cache, spec) ->
     `Builtin (name, builtin, cache, spec)
@@ -181,10 +179,10 @@ let analysis_target ~recursion_depth callsite kf =
         then `Spec (get_funspec callsite kf)
         else `Body (def, save_results def)
 
-let define_analysis_target ?(recursion_depth = -1) callsite kf  =
-  let kind = analysis_target callsite kf ~recursion_depth in
-  register_call callsite kf;
-  register_status kf kind;
+let define_analysis_target ?(recursion_depth = -1) call  =
+  let kind = analysis_target ~recursion_depth call in
+  register_call call;
+  register_status call.kf kind;
   kind
 
 

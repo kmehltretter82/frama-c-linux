@@ -127,8 +127,8 @@ let top_call cs =
 
 let top_caller cs =
   match cs.stack with
-  | _ :: (kf, _) :: _ -> Some kf
-  | [_] -> Some cs.entry_point
+  | (_,stmt) :: (kf, _) :: _ -> Some (stmt, kf)
+  | [(_,stmt)] -> Some (stmt, cs.entry_point)
   | [] -> None
 
 (* Conversion *)

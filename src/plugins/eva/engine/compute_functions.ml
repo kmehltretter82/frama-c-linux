@@ -353,11 +353,8 @@ module Make (Engine: Engine_sig.S) = struct
      interpreting a call statement. *)
   let compute_call call recursion =
     with_callstack call.callstack @@ fun state ->
-    let kinstr = Callstack.top_callsite call.callstack in
     let recursion_depth = Option.map (fun r -> r.depth) recursion in
-    let target =
-      Function_calls.define_analysis_target ?recursion_depth kinstr call.kf
-    in
+    let target = Function_calls.define_analysis_target ?recursion_depth call in
     match target with
     | `Builtin builtin_info -> compute_builtin builtin_info call state
     | `Spec _ as spec -> compute_using_spec_or_body spec call state

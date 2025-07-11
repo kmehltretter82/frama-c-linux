@@ -73,8 +73,9 @@ val top_kf : t -> Cil_types.kernel_function
 val top_callsite : t -> Cil_types.kinstr
 val top_call : t -> Cil_types.kernel_function * Cil_types.kinstr
 
-(** Returns the function that called the topmost function of the callstack. *)
-val top_caller : t -> Cil_types.kernel_function option
+(** Returns the function that called the topmost function of the callstack and
+    the top callsite. *)
+val top_caller : t -> (Cil_types.stmt * Cil_types.kernel_function) option
 
 (** {2 Conversion} *)
 
