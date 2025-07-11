@@ -92,9 +92,8 @@ let pretty_current_cfunction_name fmt =
   Kernel_function.pretty fmt (current_kf())
 
 (* Emit alarms in "non-warning" mode *)
-let alarm_report ?current ?source ?emitwith ?echo ?once ?append =
-  Self.warning ~wkey:Self.wkey_alarm
-    ?current ?source ?emitwith ?echo ?once ?append
+let alarm_report ?emitwith =
+  Self.warning ~wkey:Self.wkey_alarm ?emitwith
 
 module DegenerationPoints =
   Cil_state_builder.Stmt_hashtbl

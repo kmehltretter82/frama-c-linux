@@ -224,7 +224,7 @@ module Make (Engine: Engine_sig.S) = struct
     Alarmset.emit ~pos alarms;
     match eval with
     | `Bottom ->
-      Eva_log.warning ~pos ~stacktrace:true ~once:true
+      Self.warning ~pos ~stacktrace:true ~once:true
         "@[all target addresses were invalid. This path is \
          assumed to be dead.@]";
       `Bottom
@@ -544,7 +544,7 @@ module Make (Engine: Engine_sig.S) = struct
 
   (* Frama_C_dump_each functions. *)
   let dump_state ~pos name state =
-    Eva_log.result ~pos ~stacktrace:true
+    Self.result ~pos ~stacktrace:true
       "%s:@\n@[<v>%a@]==END OF DUMP=="
       name print_state state
 
@@ -572,7 +572,7 @@ module Make (Engine: Engine_sig.S) = struct
       Format.fprintf fmt "%a : @[<h>%t@]" Eva_ast.pp_exp expr pp
     in
     let pp = Pretty_utils.pp_list ~pre:"@[<v>" ~sep:"@ " ~suf:"@]" pretty in
-    Eva_log.result ~pos ~stacktrace:true
+    Self.result ~pos ~stacktrace:true
       "@[<v>%s:@ %a@]"
       name pp arguments
 
@@ -616,7 +616,7 @@ module Make (Engine: Engine_sig.S) = struct
 
   (* Frama_C_show_each functions. *)
   let show_each ~pos ~subdivnb name arguments state =
-    Eva_log.result ~pos ~stacktrace:true
+    Self.result ~pos ~stacktrace:true
       "@[<hv>%s:@ %a@]"
       name (pretty_arguments ~subdivnb state) arguments
 
@@ -635,7 +635,7 @@ module Make (Engine: Engine_sig.S) = struct
     let open Filesystem.Operators in
     let$ fmt = Filesystem.with_formatter_exn file in
     let l = fst (Current_loc.get ()) in
-    Eva_log.feedback ~pos ~stacktrace:true "Dumping state in file '%a'"
+    Self.feedback ~pos ~stacktrace:true "Dumping state in file '%a'"
       Filepath.pretty file;
     Format.fprintf fmt "DUMPING STATE at file %a line %d@."
       Filepath.pretty l.Filepath.pos_path
@@ -648,7 +648,7 @@ module Make (Engine: Engine_sig.S) = struct
   let dump_state_file ~pos ~subdivnb name arguments state =
     try dump_state_file_exc ~pos ~subdivnb name arguments state
     with e ->
-      Eva_log.warning ~pos ~once:true
+      Self.warning ~pos ~once:true
         "Error during, or invalid call to Frama_C_dump_each_file (%s). Ignoring"
         (Printexc.to_string e)
 

@@ -56,7 +56,7 @@ val pretty_current_cfunction_name : Format.formatter -> unit
 
 (** Emit an alarm, either as warning or as a result, according to
     status associated to {!Self.wkey_alarm} *)
-val alarm_report: 'a Log.pretty_printer
+val alarm_report: 'a Self.pretty_printer
 
 (** [protect f ~cleanup] runs [f]. On a user interruption or a Frama-C error,
     if option -save is set, applies [cleanup]. This is used to clean up and

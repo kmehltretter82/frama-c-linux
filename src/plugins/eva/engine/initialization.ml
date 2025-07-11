@@ -128,7 +128,7 @@ module Make
     match Transfer.assign ~pos state lval expr with
     | `Bottom ->
       if not (Position.is_local pos) then
-        Eva_log.warning ~pos ~once:true
+        Self.warning ~pos ~once:true
           "evaluation of initializer '%a' failed@." Eva_ast.pp_exp expr;
       raise Initialization_failed
     | `Value v -> v

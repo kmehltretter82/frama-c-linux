@@ -179,7 +179,7 @@ let base58_of_int n =
   Bytes.to_string buf
 
 let pretty_hash fmt callstack =
-  Format.fprintf fmt "<%s> " (base58_of_int (stable_hash callstack))
+  Format.fprintf fmt "%s" (base58_of_int (stable_hash callstack))
 
 let pretty_short fmt callstack =
   let list = List.rev (to_kf_list callstack) in

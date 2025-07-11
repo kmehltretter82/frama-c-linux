@@ -254,7 +254,7 @@ let pretty_callstack fmt cs =
     in
     Format.fprintf fmt "@[<hv>";
     if Self.(is_debug_key_enabled dkey_callstack_hash)
-    then Callstack.pretty_hash fmt cs;
+    then Format.fprintf fmt "<%a> " Callstack.pretty_hash cs;
     aux stmt caller q;
     Format.fprintf fmt "@]"
 
