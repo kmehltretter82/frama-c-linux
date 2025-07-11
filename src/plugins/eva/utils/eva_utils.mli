@@ -22,11 +22,6 @@
 
 open Cil_types
 
-(** {2 Callstacks related types and functions} *)
-
-(** Prints the current callstack. *)
-val pp_callstack : Format.formatter -> unit
-
 (** {2 Others} *)
 
 (* TODO: Document the rest of this file. *)

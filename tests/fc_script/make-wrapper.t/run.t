@@ -15,10 +15,10 @@ to get a more verbose output for Make.
     Recursive call to large_name_to_force_line_break_in_stack_msg without assigns clause.
     Generating probably incomplete assigns to interpret the call.
     Try to increase the -eva-unroll-recursive-calls parameter or write a correct specification for function large_name_to_force_line_break_in_stack_msg.
-     stack: large_name_to_force_line_break_in_stack_msg :: make-wrapper.c:17 <-
-            large_name_to_force_line_break_in_stack_msg :: make-wrapper.c:21 <-
-            rec :: make-wrapper.c:26 <-
-            main
+    stack: large_name_to_force_line_break_in_stack_msg :: make-wrapper.c:17 <-
+           large_name_to_force_line_break_in_stack_msg :: make-wrapper.c:21 <-
+           rec :: make-wrapper.c:26 <-
+           main
   [eva] using specification for function large_name_to_force_line_break_in_stack_msg
   [eva] using specification for function specified
   [kernel:annot:missing-spec] make-wrapper.c:29: Failure: 
@@ -32,10 +32,10 @@ to get a more verbose output for Make.
   *** recommendation #1 ***
   
   1. Found recursive call at:
-     stack: large_name_to_force_line_break_in_stack_msg :: make-wrapper.c:17 <-
-            large_name_to_force_line_break_in_stack_msg :: make-wrapper.c:21 <-
-            rec :: make-wrapper.c:26 <-
-            main
+    stack: large_name_to_force_line_break_in_stack_msg :: make-wrapper.c:17 <-
+           large_name_to_force_line_break_in_stack_msg :: make-wrapper.c:21 <-
+           rec :: make-wrapper.c:26 <-
+           main
   
   Consider patching, stubbing or adding an ACSL specification to the recursive call, then re-run the analysis.
   

@@ -114,10 +114,10 @@ let watch_hook _callstack stmt states =
          if watching
          then begin
            Self.warning ~wkey:Self.wkey_watchpoint ~once:true ~current:true
-             "%a %a%t"
+             ~stacktrace:true
+             "%a %a"
              Eva_ast.pp_exp name
-             V.pretty vs
-             Eva_utils.pp_callstack;
+             V.pretty vs;
            if Integer.is_zero current ||
               (Cil_datatype.Stmt.Set.mem stmt set)
            then ()

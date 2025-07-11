@@ -79,9 +79,9 @@ let reduce_to_valid_loc dst size access =
 let warn_indeterminate_value ~name ?(precise = false) = function
   | V_Or_Uninitialized.C_init_noesc _ -> ()
   | _ ->
-    Self.result ~dkey ~current:true ~once:true
-      "@[In %s builtin:@ %sprecise copy@ of indeterminate values.@]%t"
-      name (if precise then "" else "im") Eva_utils.pp_callstack
+    Self.result ~dkey ~current:true ~once:true ~stacktrace:true
+      "@[In %s builtin:@ %sprecise copy@ of indeterminate values.@]"
+      name (if precise then "" else "im")
 
 (*  Warns when the offsetmap contains an indeterminate value. *)
 let check_indeterminate_offsetmap ~name offsm =
@@ -554,10 +554,9 @@ let frama_c_memset state actuals =
       let state, sure_output, over_output =
         try frama_c_memset_precise state dst_expr dst v (exp_size, size)
         with ImpreciseMemset reason ->
-          Self.debug ~dkey ~current:true
-            "Call to builtin precise_memset(%a) failed; %s%t"
-            Eva_utils.pretty_actuals actuals (imprecision_descr reason)
-            Eva_utils.pp_callstack;
+          Self.debug ~dkey ~current:true ~stacktrace:true
+            "Call to builtin precise_memset(%a) failed; %s"
+            Eva_utils.pretty_actuals actuals (imprecision_descr reason);
           frama_c_memset_imprecise state dst_expr dst v size
       in
       let assigns =

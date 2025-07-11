@@ -95,13 +95,13 @@ let emit_status ppt status =
   Property_status.emit ~distinct:true Eva_utils.emitter ~hyps:[] ppt status
 
 (* Display the message as result/warning depending on [status] *)
-let msg_status status ?current ?once ?source fmt =
+let msg_status status ?current ?once ?source ?stacktrace fmt =
   if status = Alarmset.True then
     if Parameters.ValShowProgress.get ()
     then Self.result ?current ?once ?source fmt
     else Self.result ?current ?once ?source ~level:2 fmt
   else
-    Self.warning ~wkey:Self.wkey_alarm ?current ?once ?source fmt
+    Self.warning ~wkey:Self.wkey_alarm ?current ?once ?source ?stacktrace fmt
 
 let behavior_inactive fmt =
   Format.fprintf fmt " (Behavior may be inactive, no reduction performed.)"
@@ -139,14 +139,13 @@ let emit_contract_status kind kf behavior ~active ~empty property named_pred sta
   let source = fst (Property.location property) in
   match kind with
   | Precondition | Postcondition PostBody ->
-    msg_status status ~once:true ~source
-      "%a: %s%a got status %a.%t%t"
+    msg_status status ~once:true ~source ~stacktrace:true
+      "%a: %s%a got status %a.%t"
       (pp_header kf) behavior
       (if empty then "no state left, " else "")
       pp_predicate named_pred
       Alarmset.Status.pretty status
-      (if active then (fun _ -> ()) else behavior_inactive)
-      Eva_utils.pp_callstack;
+      (if active then (fun _ -> ()) else behavior_inactive);
     emit_status property status;
   | Postcondition postk ->
     (* Do not emit a status for leaf functions or builtins. Otherwise, we would
@@ -214,9 +213,9 @@ let process_inactive_behavior kf call_ki behavior =
       end
     ) behavior.b_requires;
   if !emitted then
-    Self.result ~once:true ~current:true ~level:2
-      "%a: assumes got status invalid; behavior not evaluated.%t"
-      (pp_header kf) behavior Eva_utils.pp_callstack
+    Self.result ~once:true ~current:true ~level:2 ~stacktrace:true
+      "%a: assumes got status invalid; behavior not evaluated."
+      (pp_header kf) behavior
 
 let process_inactive_behaviors call_ki kf behaviors =
   List.iter (process_inactive_behavior kf call_ki) behaviors
@@ -236,9 +235,9 @@ let process_inactive_postconds kf inactive_bhvs =
            end
          ) b.b_post_cond;
        if !emitted then
-         Self.result ~once:true ~current:true ~level:2
-           "%a: requires got status invalid; postconditions not evaluated.%t"
-           (pp_header kf) b Eva_utils.pp_callstack;
+         Self.result ~once:true ~current:true ~level:2 ~stacktrace:true
+           "%a: requires got status invalid; postconditions not evaluated."
+           (pp_header kf) b;
     ) inactive_bhvs
 
 
@@ -433,13 +432,13 @@ module Make (Domain: LogicDomain) = struct
         Format.fprintf fmt ",@ the behavior@ was@ inactive"
       in
       Self.warning ~once:true ~source ~wkey:Self.wkey_ensures_false
+        ~stacktrace:true
         "@[%a:@ this postcondition@ evaluates to@ false@ in this@ context.\
          @ If it is valid,@ either@ a precondition@ was not@ verified@ \
          for this@ call%t,@ or some assigns/from@ clauses@ are \
-         incomplete@ (or incorrect).@]%t"
+         incomplete@ (or incorrect).@]"
         pp_header behavior
         (if active then (fun _ -> ()) else pp_behavior_inactive)
-        Eva_utils.pp_callstack
 
   (* [per_behavior] indicates if we are processing each behavior separately.
      If this is the case, then [Unknown] and [True] behaviors are treated

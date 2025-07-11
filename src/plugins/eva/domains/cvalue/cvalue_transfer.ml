@@ -41,9 +41,9 @@ let warn_imprecise_value ?prefix lval value =
     if Origin.register_write bases origin then
       let prefix = Option.fold ~none:"A" ~some:(fun s -> s ^ ": a") prefix in
       Self.warning ~wkey:Self.wkey_garbled_mix_write ~once:true ~current:true
-        "@[%sssigning imprecise value to %a@ because of %s.@]%t"
+        ~stacktrace:true
+        "@[%sssigning imprecise value to %a@ because of %s.@]"
         prefix Eva_ast.pp_lval lval (Origin.descr origin)
-        Eva_utils.pp_callstack
   | _ -> ()
 
 let warn_imprecise_location ?prefix loc =

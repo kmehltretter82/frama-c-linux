@@ -22,16 +22,6 @@
 
 open Cil_types
 
-(* Callstacks related functions *)
-
-let pp_callstack fmt =
-  if Parameters.PrintCallstacks.get () then
-    match !Callstack.current with
-    | None -> () (* Stack not initialized; happens when handling global initializations *)
-    | Some cs ->
-      Format.fprintf fmt "@ stack: %a" Callstack.pretty cs
-
-
 (* Assertions emitted during the analysis *)
 
 let emitter =
