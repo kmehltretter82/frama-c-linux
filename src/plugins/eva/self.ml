@@ -120,6 +120,10 @@ let dkey_precision_settings =
     ~help:"messages about the automatic configuration of the analysis by \
            option -eva-precision"
 
+let dkey_callstacks =
+  register_category "callstacks"
+    ~help:"print the current callstack alongside some messages"
+
 let () =
   let activate dkey = add_debug_keys dkey in
   List.iter activate

@@ -32,7 +32,7 @@ type ('a,'b) pretty_aborter =
   ('a,Format.formatter,unit,'b) format4 -> 'a
 
 let append_callstack ~pos ?(stacktrace=false) fmt =
-  if stacktrace && Parameters.PrintCallstacks.get () then
+  if stacktrace && Self.(is_debug_key_enabled dkey_callstacks) then
     match Position.callstack pos with
     | None -> ()
     | Some cs -> Format.fprintf fmt "@ stack: %a" Callstack.pretty cs
