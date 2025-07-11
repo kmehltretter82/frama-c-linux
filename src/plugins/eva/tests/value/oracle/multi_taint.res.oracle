@@ -1,0 +1,81 @@
+[kernel] Parsing multi_taint.c (with preprocessing)
+[eva:experimental] Warning: The taint domain is experimental.
+[eva] Analyzing a complete application starting at main
+[eva] Computing initial state
+[eva] Initial state computed
+[eva:initial-state] Values of globals at initialization
+  
+[eva] computing for function scanf_va_1 <- main.
+  Called from multi_taint.c:35.
+[eva] using specification for function scanf
+[eva] multi_taint.c:35: 
+  function scanf_va_1: precondition \valid(param0) got status valid.
+[eva] multi_taint.c:35: 
+  function scanf_va_1: precondition valid_read_string(format) got status valid.
+[eva] Done for function scanf_va_1
+[eva:alarm] multi_taint.c:36: Warning: check got status unknown.
+[eva] computing for function taint_simplify_singletons <- main.
+  Called from multi_taint.c:38.
+[eva:alarm] multi_taint.c:12: Warning: assertion got status unknown.
+[eva] multi_taint.c:16: check got status valid.
+[eva] multi_taint.c:17: check got status valid.
+[eva] Recording results for taint_simplify_singletons
+[eva] Done for function taint_simplify_singletons
+[eva] multi_taint.c:39: check got status valid.
+[eva] computing for function multi_taint_test <- main.
+  Called from multi_taint.c:41.
+[eva:alarm] multi_taint.c:25: Warning: check got status unknown.
+[eva:alarm] multi_taint.c:26: Warning: check got status unknown.
+[eva] multi_taint.c:30: check got status valid.
+[eva] Recording results for multi_taint_test
+[eva] Done for function multi_taint_test
+[eva:alarm] multi_taint.c:42: Warning: check got status unknown.
+[eva] Recording results for main
+[eva] Done for function main
+[eva] ====== VALUES COMPUTED ======
+[eva:final-states] Values at end of function multi_taint_test:
+  t ∈ [--..--]
+  y ∈ {10}
+[eva:final-states] Values at end of function taint_simplify_singletons:
+  x ∈ {0}
+  y ∈ {4}
+[eva:final-states] Values at end of function main:
+  taint_var ∈ [--..--]
+  __retres ∈ {0}
+  S___fc_stdin[0..1] ∈ [--..--]
+[from] Computing for function multi_taint_test
+[from] Done for function multi_taint_test
+[from] Computing for function taint_simplify_singletons
+[from] Done for function taint_simplify_singletons
+[from] Computing for function main
+[from] Computing for function scanf_va_1 <-main
+[from] Done for function scanf_va_1
+[from] Done for function main
+[from] ====== DEPENDENCIES COMPUTED ======
+  These dependencies hold at termination for the executions that terminate:
+[from] Function multi_taint_test:
+  NO EFFECTS
+[from] Function scanf_va_1:
+  taint_var FROM S___fc_stdin[0]; "%d"[bits 0 to 23]
+  S___fc_stdin[0].__fc_FILE_data
+              FROM S___fc_stdin[0]; "%d"[bits 0 to 23] (and SELF)
+  \result FROM S___fc_stdin[0]; "%d"[bits 0 to 23]
+[from] Function taint_simplify_singletons:
+  NO EFFECTS
+[from] Function main:
+  S___fc_stdin[0].__fc_FILE_data
+              FROM S___fc_stdin[0]; "%d"[bits 0 to 23] (and SELF)
+  \result FROM \nothing
+[from] ====== END OF DEPENDENCIES ======
+[inout] Out (internal) for function multi_taint_test:
+    t; y
+[inout] Inputs for function multi_taint_test:
+    taint_var
+[inout] Out (internal) for function taint_simplify_singletons:
+    x; y
+[inout] Inputs for function taint_simplify_singletons:
+    \nothing
+[inout] Out (internal) for function main:
+    taint_var; __retres; S___fc_stdin[0].__fc_FILE_data
+[inout] Inputs for function main:
+    S___fc_stdin[0]; "%d"[bits 0 to 23]

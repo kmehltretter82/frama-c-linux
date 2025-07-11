@@ -38,6 +38,9 @@ module EqualityCallFunction:
 
 module OctagonCall: Parameter_sig.Bool
 
+module AutoTaint: Parameter_sig.Bool
+module TaintSingletons: Parameter_sig.Bool
+
 module TracesUnrollLoop: Parameter_sig.Bool
 module TracesUnifyLoop: Parameter_sig.Bool
 module TracesDot: Parameter_sig.Filepath

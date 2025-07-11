@@ -10,7 +10,7 @@
 > [eva] Done for function Frama_C_interval
 > [eva] Recording results for taints
 > [eva] Done for function taints
-149c154,160
+150c155,161
 < [eva] taint.c:211: Reusing old results for call to taints
 ---
 > [eva] computing for function taints <- main.
@@ -20,20 +20,10 @@
 > [eva] Done for function Frama_C_interval
 > [eva] Recording results for taints
 > [eva] Done for function taints
-169c180,186
-< [eva] taint.c:214: Reusing old results for call to taints
----
-> [eva] computing for function taints <- main.
->   Called from taint.c:214.
-> [eva] computing for function Frama_C_interval <- taints <- main.
->   Called from taint.c:187.
-> [eva] Done for function Frama_C_interval
-> [eva] Recording results for taints
-> [eva] Done for function taints
-172,173d188
+180,181d190
 < [eva:loop-unroll:auto] taint.c:157: Automatic loop unrolling.
 < [eva:loop-unroll:partial] taint.c:157: loop not completely unrolled
-186c201,207
+194c203,209
 < [eva] taint.c:217: Reusing old results for call to taints
 ---
 > [eva] computing for function taints <- main.

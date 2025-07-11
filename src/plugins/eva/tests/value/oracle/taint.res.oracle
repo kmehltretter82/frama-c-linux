@@ -22,8 +22,8 @@
 [eva] taint.c:35: 
   Frama_C_dump_each:
   # taint:
-  Locations (data):
-    tainted; t; u; x
+  default: Locations (data):
+             tainted; t; u; x
   Locations (control):
     w; buf[0..1]
   ==END OF DUMP==
@@ -35,56 +35,56 @@
 [eva] taint.c:50: 
   Frama_C_dump_each:
   # taint:
-  Locations (data):
-    \nothing
+  default: Locations (data):
+             \nothing
   Locations (control):
     \nothing
   ==END OF DUMP==
 [eva] taint.c:53: 
   Frama_C_dump_each:
   # taint:
-  Locations (data):
-    \nothing
+  default: Locations (data):
+             \nothing
   Locations (control):
     \nothing
   ==END OF DUMP==
 [eva] taint.c:50: 
   Frama_C_dump_each:
   # taint:
-  Locations (data):
-    x
+  default: Locations (data):
+             x
   Locations (control):
     \nothing
   ==END OF DUMP==
 [eva] taint.c:53: 
   Frama_C_dump_each:
   # taint:
-  Locations (data):
-    x
+  default: Locations (data):
+             x
   Locations (control):
     y
   ==END OF DUMP==
 [eva] taint.c:50: 
   Frama_C_dump_each:
   # taint:
-  Locations (data):
-    x
+  default: Locations (data):
+             x
   Locations (control):
     x; y
   ==END OF DUMP==
 [eva] taint.c:53: 
   Frama_C_dump_each:
   # taint:
-  Locations (data):
-    x
+  default: Locations (data):
+             x
   Locations (control):
     x; y
   ==END OF DUMP==
 [eva] taint.c:63: 
   Frama_C_dump_each:
   # taint:
-  Locations (data):
-    x
+  default: Locations (data):
+             x
   Locations (control):
     x; y
   ==END OF DUMP==
@@ -95,8 +95,8 @@
 [eva] taint.c:79: 
   Frama_C_dump_each:
   # taint:
-  Locations (data):
-    x
+  default: Locations (data):
+             x
   Locations (control):
     x; y
   ==END OF DUMP==
@@ -107,8 +107,8 @@
 [eva] taint.c:91: 
   Frama_C_dump_each:
   # taint:
-  Locations (data):
-    x; y; t
+  default: Locations (data):
+             x; y; t
   Locations (control):
     \nothing
   ==END OF DUMP==
@@ -121,14 +121,15 @@
 [eva] Done for function taint_spec_assigns
 [eva] taint.c:205: 
   Frama_C_domain_show_each:
-  l : # taint: true
+  l : # taint: default
+  true
 [eva] computing for function taint_goto_1 <- main.
   Called from taint.c:208.
 [eva] taint.c:110: 
   Frama_C_dump_each:
   # taint:
-  Locations (data):
-    t
+  default: Locations (data):
+             t
   Locations (control):
     x
   ==END OF DUMP==
@@ -139,8 +140,8 @@
 [eva] taint.c:130: 
   Frama_C_dump_each:
   # taint:
-  Locations (data):
-    t
+  default: Locations (data):
+             t
   Locations (control):
     x; y
   ==END OF DUMP==
@@ -154,8 +155,8 @@
 [eva] taint.c:35: 
   Frama_C_dump_each:
   # taint:
-  Locations (data):
-    tainted; t; u; x; t
+  default: Locations (data):
+             tainted; t; u; x; t
   Locations (control):
     t; u; w; x; y; buf[0..1]
   ==END OF DUMP==
@@ -163,10 +164,17 @@
 [eva] Done for function taint_basic
 [eva] taint.c:141: 
   Frama_C_domain_show_each:
-  x : # taint: false
+  x : # taint: default
+  false
 [eva] Recording results for taint_call
 [eva] Done for function taint_call
-[eva] taint.c:214: Reusing old results for call to taints
+[eva] computing for function taints <- main.
+  Called from taint.c:214.
+[eva] computing for function Frama_C_interval <- taints <- main.
+  Called from taint.c:187.
+[eva] Done for function Frama_C_interval
+[eva] Recording results for taints
+[eva] Done for function taints
 [eva] computing for function taint_infinite_while <- main.
   Called from taint.c:215.
 [eva:loop-unroll:auto] taint.c:157: Automatic loop unrolling.
@@ -176,8 +184,8 @@
 [eva] taint.c:165: 
   Frama_C_dump_each:
   # taint:
-  Locations (data):
-    tainted; t; y
+  default: Locations (data):
+             tainted; t; y
   Locations (control):
     w
   ==END OF DUMP==
