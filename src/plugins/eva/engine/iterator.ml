@@ -259,16 +259,16 @@ module Make_Dataflow
   (* Tries to evaluate \assigns … \from … clauses for assembly code. *)
   let transfer_asm ~pos : transfer_function =
     let asm_contracts = Annotations.code_annot (fst pos) in
+    let pos = Position.of_local pos in
     match Logic_utils.extract_contract asm_contracts with
     | [] ->
-      Self.warning ~current:true ~once:true
+      Self.warning ~pos ~once:true
         "assuming assembly code has no effects in function %t"
         Eva_utils.pretty_current_cfunction_name;
       id
     (* There should be only one statement contract, if any. *)
     | (_, spec) :: _ ->
       let assigns = Ast_info.merge_assigns_from_spec ~warn:false spec in
-      let pos = Position.of_local pos in
       lift (Spec.treat_statement_assigns ~pos assigns)
 
   let transfer_assume ~pos (exp : exp) (kind : guard_kind)

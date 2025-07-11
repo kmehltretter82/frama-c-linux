@@ -170,9 +170,8 @@ let create_new_var stack prefix type_base weak =
    created by one of the functions of this module. Mutating variables name
    is not a good idea in general, but we take the risk here. *)
 let mutate_name_to_weak vi =
-  Self.warning ~wkey:wkey_weak_alloc ~current:true ~once:false
-    "@[marking variable `%s' as weak@]%t" vi.vname
-    Eva_utils.pp_callstack;
+  Self.warning ~wkey:wkey_weak_alloc ~current:true ~once:false ~stacktrace:true
+    "@[marking variable `%s' as weak@]" vi.vname;
   try
     let prefix, remainder =
       Scanf.sscanf vi.vname "__%s@_%s" (fun s1 s2 -> (s1, s2))
@@ -331,10 +330,9 @@ let alloc_fresh weak deallocation prefix sizev _state =
   let tsize = guess_intended_malloc_type stack sizev (weak = Strong) in
   let type_base = type_from_nb_elems tsize in
   let var = create_new_var stack prefix type_base weak in
-  Self.result ~dkey:dkey_new ~current:true ~once:true
-    "@[allocating %svariable %a@]%t"
-    (if weak = Weak then "weak " else "") Printer.pp_varinfo var
-    Eva_utils.pp_callstack;
+  Self.result ~dkey:dkey_new ~current:true ~once:true ~stacktrace:true
+    "@[allocating %svariable %a@]"
+    (if weak = Weak then "weak " else "") Printer.pp_varinfo var;
   let size_char = Bit_utils.sizeofchar () in
   (* Sizes are in bits *)
   let min_alloc = Int.(pred (mul size_char tsize.min_bytes)) in

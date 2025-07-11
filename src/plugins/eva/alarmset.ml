@@ -248,8 +248,9 @@ let loc = function
   | Cil_types.Kstmt s -> Cil_datatype.Stmt.loc s
 
 let report_alarm ~pos annot msg =
-  Self.warning ~wkey:Self.wkey_alarm ~pos "@[%s.@ @[<hov 2>%a@]@]%t"
-    msg pr_annot annot Eva_utils.pp_callstack
+  Self.warning ~wkey:Self.wkey_alarm ~pos ~stacktrace:true
+    "@[%s.@ @[<hov 2>%a@]@]"
+    msg pr_annot annot
 
 let string_fkind = function
   | Cil_types.FFloat -> "float"
