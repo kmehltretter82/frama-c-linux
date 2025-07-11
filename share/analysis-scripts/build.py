@@ -427,7 +427,7 @@ if jbdb_path:
     insert_lines_after(
         template,
         "^FCFLAGS",
-        [f"  -json-compilation-database {rel_path(jbdb_path, base)} \\"],
+        [f"  -compilation-db {rel_path(jbdb_path, base)} \\"],
     )
 
 targets_eva = [f"  {make_target_name(target)}.eva \\" for target in sorted(targets)]

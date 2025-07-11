@@ -145,7 +145,7 @@ end = struct
           [ Kernel.CppCommand.self;
             Kernel.CppExtraArgs.self;
             Kernel.CppExtraArgsPerFile.self;
-            Kernel.JsonCompilationDatabase.self;
+            Kernel.CompilationDb.self;
             Kernel.Files.self ]
         let name = "Files for preprocessing"
       end)
@@ -417,7 +417,7 @@ let concat_strs ?(pre="") ?(sep=" ") l =
   else pre ^ (String.concat sep l)
 
 let adjust_pwd fp cpp_command =
-  if Kernel.JsonCompilationDatabase.is_set () then
+  if Kernel.CompilationDb.is_set () then
     let cwd = Filepath.pwd () in
     let dir =
       match Json_compilation_database.get_dir fp with
@@ -552,11 +552,11 @@ let build_cpp_cmd = function
 
 let abort_with_detailed_pp_message f cpp_command =
   let possible_cause =
-    if Kernel.JsonCompilationDatabase.is_set () then
+    if Kernel.CompilationDb.is_set () then
       if not (Json_compilation_database.has_entry f) then
         Format.asprintf "note: %s is set but \
                          contains no entries for '%a'.@ "
-          Kernel.JsonCompilationDatabase.option_name
+          Kernel.CompilationDb.option_name
           Filepath.pretty f
       else ""
     else
@@ -567,7 +567,7 @@ let abort_with_detailed_pp_message f cpp_command =
         "this is possibly due to missing preprocessor flags;@ \
          consider options %s, %s or %s.@ "
         Kernel.CppExtraArgs.option_name
-        Kernel.JsonCompilationDatabase.option_name
+        Kernel.CompilationDb.option_name
         Kernel.CppCommand.option_name
     else ""
   in

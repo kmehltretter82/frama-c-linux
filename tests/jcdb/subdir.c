@@ -1,7 +1,7 @@
 /* run.config
    NOFRAMAC:
    DEPS: subdir1/header.h subdir2/included.h subdir.json subdir.c included2.h
-   EXECNOW: LOG subdir.res LOG subdir.err (cd subdir1 && @frama-c@ -add-symbolic-path $PWD/..:PWD/.. -json-compilation-database ../subdir.json ../subdir.c) > ./subdir.res 2> ./subdir.err
+   EXECNOW: LOG subdir.res LOG subdir.err (cd subdir1 && @frama-c@ -add-symbolic-path $PWD/..:PWD/.. -compilation-db ../subdir.json ../subdir.c) > ./subdir.res 2> ./subdir.err
 */
 
 // this test must be run with PWD in subdir1

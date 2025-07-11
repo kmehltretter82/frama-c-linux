@@ -585,7 +585,10 @@ val normalization_parameters: unit -> Typed_parameter.t list
 *)
 
 module JsonCompilationDatabase: Parameter_sig.Filepath
-(** Behavior of option "-json-compilation-database" *)
+(** Deprecated; use "-compilation-db" instead *)
+
+module CompilationDb: Parameter_sig.Filepath
+(** Behavior of option "-compilation-db" *)
 
 module GeneratedSpecMode: Parameter_sig.String
 (** Behavior of option "-generated-spec-mode". *)

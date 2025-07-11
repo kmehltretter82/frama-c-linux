@@ -240,7 +240,7 @@ Use **@inline** to select all functions with attribute *inline*.
 Recursive functions are inlined only at the first level.
 Calls via function pointers are not inlined.
 
--json-compilation-database *path*
+-compilation-db *path*
 : use *path* as a JSON compilation database
 (see <https://clang.llvm.org/docs/JSONCompilationDatabase.html>
 for more information): each file preprocessed by Frama-C will include

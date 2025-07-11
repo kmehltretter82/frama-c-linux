@@ -1235,6 +1235,29 @@ module JsonCompilationDatabase =
          '<path>/compile_commands.json'. Disabled by default."
     end)
 
+let () = Parameter_customize.set_group parsing
+let () = Parameter_customize.do_not_reset_on_copy ()
+module CompilationDb =
+  P.Filepath
+    (struct
+      let option_name = "-compilation-db"
+      let arg_name = "path"
+      let file_kind = "directory or json"
+      let existence = Filepath.Must_exist
+      let help =
+        "when set, preprocessing of each file will include corresponding \
+         flags (e.g. -I, -D) from the JSON compilation database \
+         specified by <path>. If <path> is a directory, use \
+         '<path>/compile_commands.json'. Disabled by default."
+    end)
+
+let () =
+  JsonCompilationDatabase.add_set_hook (fun _old new_ ->
+      warning "Option -json-compilation-database is deprecated. \
+               Use -compilation-db instead.";
+      CompilationDb.set new_
+    )
+
 (* ************************************************************************* *)
 (** {2 Customizing Normalization} *)
 (* ************************************************************************* *)

@@ -24,7 +24,7 @@ module PreprocessingWorkdir =
     (struct
       let name = "PreprocessingWorkdir"
       let dependencies =
-        [ Kernel.Files.self; Kernel.JsonCompilationDatabase.self ]
+        [ Kernel.Files.self; Kernel.CompilationDb.self ]
       let size = 2
     end)
 
