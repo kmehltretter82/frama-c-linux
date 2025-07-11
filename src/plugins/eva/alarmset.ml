@@ -247,8 +247,8 @@ let loc = function
     Current_loc.get ()
   | Cil_types.Kstmt s -> Cil_datatype.Stmt.loc s
 
-let report_alarm ki annot msg =
-  Eva_utils.alarm_report ~source:(fst (loc ki)) "@[%s.@ @[<hov 2>%a@]@]%t"
+let report_alarm ~pos annot msg =
+  Self.warning ~wkey:Self.wkey_alarm ~pos "@[%s.@ @[<hov 2>%a@]@]%t"
     msg pr_annot annot Eva_utils.pp_callstack
 
 let string_fkind = function
@@ -276,7 +276,7 @@ let register_alarm ~pos alarm status str =
   (* Report each alarm only once per analysis. The boolean [is_new] returned
      by {{Alarms.register}} is inadequate, as an alarm emitted by another
      plugin or by a previous run of Eva would be considered as not new. *)
-  Alarm_cache.memo (fun (_ki,_alarm) -> report_alarm ki annot str) (ki, alarm)
+  Alarm_cache.memo (fun (_ki,_alarm) -> report_alarm ~pos annot str) (ki, alarm)
 
 let emit_alarm ~pos alarm (status:status) =
   let register_alarm = register_alarm ~pos alarm status in

@@ -101,7 +101,7 @@ let msg_status status ?current ?once ?source fmt =
     then Self.result ?current ?once ?source fmt
     else Self.result ?current ?once ?source ~level:2 fmt
   else
-    Eva_utils.alarm_report ?current ?once ?source fmt
+    Self.warning ~wkey:Self.wkey_alarm ?current ?once ?source fmt
 
 let behavior_inactive fmt =
   Format.fprintf fmt " (Behavior may be inactive, no reduction performed.)"
