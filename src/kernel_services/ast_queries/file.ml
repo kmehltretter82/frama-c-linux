@@ -176,6 +176,10 @@ end = struct
 
   let pre_register_state = Pre_files.self
 
+  let () =
+    State_dependency_graph.add_dependencies ~from:Kernel.MopsaDb.self
+      [pre_register_state]
+
   (* Allow to register files in advance, e.g. prolog files for plugins *)
   let pre_register file =
     let prev_files = Pre_files.get () in Pre_files.set (prev_files @ [file])

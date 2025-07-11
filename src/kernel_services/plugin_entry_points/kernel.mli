@@ -39,6 +39,8 @@ val dkey_comments: category
 
 val dkey_compilation_db: category
 
+val dkey_mopsa_db: category
+
 val dkey_dataflow: category
 
 val dkey_dataflow_scc: category
@@ -191,6 +193,10 @@ val wkey_cert_exp_10: warn_category
 val wkey_check_volatile: warn_category
 
 val wkey_jcdb: warn_category
+
+val wkey_mopsa_db: warn_category
+
+val wkey_mopsa_db_non_c: warn_category
 
 val wkey_implicit_function_declaration: warn_category
 
@@ -589,6 +595,21 @@ module JsonCompilationDatabase: Parameter_sig.Filepath
 
 module CompilationDb: Parameter_sig.Filepath
 (** Behavior of option "-compilation-db" *)
+
+module MopsaDb: Parameter_sig.Filepath
+(** Behavior of option "-mopsa-db" *)
+
+module MopsaListDeps: Parameter_sig.String_list
+(** Behavior of option "-mopsa-list-deps" *)
+
+module MopsaTarget: Parameter_sig.String_list
+(** Behavior of option "-mopsa-target" *)
+
+module MopsaExcludeSources: Parameter_sig.Filepath_list
+(** Behavior of option "-mopsa-exclude-sources" *)
+
+module MopsaPermissive: Parameter_sig.Bool
+(** Behavior of option "-mopsa-permissive" *)
 
 module GeneratedSpecMode: Parameter_sig.String
 (** Behavior of option "-generated-spec-mode". *)
