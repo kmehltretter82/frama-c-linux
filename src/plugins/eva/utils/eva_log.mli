@@ -23,16 +23,22 @@
 (** This modules adapt the interface of {!Log.Messages} to be usable with
     {!Position.t}.
 
-    [stacktrace] optional parameters controls wheter the call stack must
-    be printed at the end of the message and always default to false. *)
+    If [position] is given, then message will be located at this position.
+    Otherwise if [current] or [source] are given, then the current position
+    tracked by the kernel or the given location will respectively be used.
+    [stacktrace] optional parameter controls wheter the call stack must
+    be printed at the end of the message and always default to false. It is
+    ignored if position is not given. *)
 
 type 'a pretty_printer =
   ?emitwith:(Log.event -> unit) -> ?once:bool ->
-  pos:Position.t -> ?stacktrace:bool -> ?echo:bool ->
+  ?pos:Position.t -> ?current:bool -> ?source:Filepath.position ->
+  ?stacktrace:bool -> ?echo:bool ->
   ('a,Format.formatter,unit) format -> 'a
 
 type ('a,'b) pretty_aborter =
-  pos:Position.t -> ?stacktrace:bool -> ?echo:bool ->
+  ?pos:Position.t -> ?current:bool -> ?source:Filepath.position ->
+  ?stacktrace:bool -> ?echo:bool ->
   ('a,Format.formatter,unit,'b) format4 -> 'a
 
 (** see {!Log.Messages} for documentation **)
@@ -62,4 +68,4 @@ val abort : ('a,'b) pretty_aborter
 val failure : 'a pretty_printer
 
 (** Internal error stopping the plug-in. *)
-val fatal   : ('a,'b) pretty_aborter
+val fatal : ('a,'b) pretty_aborter
