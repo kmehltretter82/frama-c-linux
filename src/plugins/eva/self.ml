@@ -124,6 +124,10 @@ let dkey_callstacks =
   register_category "callstacks"
     ~help:"print the current callstack alongside some messages"
 
+let dkey_callstack_hash =
+  register_category "callstack"
+    ~help:"additionally print the current callstack hash in some messages"
+
 let () =
   let activate dkey = add_debug_keys dkey in
   List.iter activate

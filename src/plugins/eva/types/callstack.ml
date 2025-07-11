@@ -22,9 +22,6 @@
 
 let stable_hash x = Hashtbl.seeded_hash 0 x
 
-let dkey_callstack = Self.register_category "callstack"
-    ~help:"additionally print the current callstack in some messages"
-
 module Thread = Int (* Threads are identified by integers *)
 module Kf = Kernel_function
 module Stmt = Cil_datatype.Stmt
@@ -182,18 +179,10 @@ let base58_of_int n =
   Bytes.to_string buf
 
 let pretty_hash fmt callstack =
-  if Self.is_debug_key_enabled dkey_callstack then
-    Format.fprintf fmt "<%s> " (base58_of_int (stable_hash callstack))
-  else Format.ifprintf fmt ""
+  Format.fprintf fmt "<%s> " (base58_of_int (stable_hash callstack))
 
 let pretty_short fmt callstack =
-  Format.fprintf fmt "%a" pretty_hash callstack;
   let list = List.rev (to_kf_list callstack) in
   Pretty_utils.pp_flowlist ~left:"" ~sep:" <- " ~right:""
     (fun fmt kf -> Kernel_function.pretty fmt kf)
     fmt list
-
-let pretty fmt callstack =
-  Format.fprintf fmt "@[<hv>%a" pretty_hash callstack;
-  pretty fmt callstack;
-  Format.fprintf fmt "@]"

@@ -133,8 +133,7 @@ module Callstack: sig
   (** Prints a callstack without displaying call sites. *)
   val pretty_short : Format.formatter -> t -> unit
 
-  (** Prints a hash of the callstack when '-kernel-msg-key callstack'
-      is enabled (prints nothing otherwise). *)
+  (** Prints a hash of the callstack. *)
   val pretty_hash : Format.formatter -> t -> unit
 
   (** [compare_lex] compares callstack lexicographically, slightly slower
