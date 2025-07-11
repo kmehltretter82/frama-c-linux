@@ -45,7 +45,7 @@ module Callers = Kernel_function.Map.Make (StmtSet)
 module CallersTable = Kernel_function.Make_Table (Callers) (val info "Callers")
 
 let register_call kinstr kf =
-  let callstack = Eva_utils.current_call_stack () in
+  let callstack = Callstack.get_current () in
   let kf', kinstr' = Callstack.top_call callstack in
   assert (Kernel_function.equal kf kf');
   assert (Cil_datatype.Kinstr.equal kinstr kinstr');

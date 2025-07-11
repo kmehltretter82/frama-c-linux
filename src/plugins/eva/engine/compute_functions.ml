@@ -334,13 +334,25 @@ module Make (Engine: Engine_sig.S) = struct
 
   (* ----- Call computation ------------------------------------------------- *)
 
+  (* Execute the function [job] with the current callstack set to [callstack],
+     and update [Eva_perf] accordingly *)
+  let with_callstack callstack job x =
+    let previous_callstack = !Callstack.current in
+    Callstack.current := Some callstack;
+    Eva_perf.start callstack;
+    let finally () =
+      Eva_perf.stop callstack;
+      Callstack.current := previous_callstack
+    in
+    Fun.protect ~finally (fun () -> job x)
+
   (* Interprets a [call] in the state [state],
      using a builtin, the specification or the body of the called function,
      according to [Function_calls.register].
      Exported in [Engine_sig.Compute] and used by [Transfer_stmt] when
      interpreting a call statement. *)
   let compute_call call recursion =
-    Eva_utils.with_callstack call.callstack @@ fun state ->
+    with_callstack call.callstack @@ fun state ->
     let kinstr = Callstack.top_callsite call.callstack in
     let recursion_depth = Option.map (fun r -> r.depth) recursion in
     let target =

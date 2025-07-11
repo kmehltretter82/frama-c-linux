@@ -24,23 +24,6 @@ open Cil_types
 
 (** {2 Callstacks related types and functions} *)
 
-(** Functions dealing with call stacks. *)
-
-(** Set the current call stack for the duration of a job. *)
-val with_callstack : Callstack.t -> ('a -> 'b) -> 'a -> 'b
-
-(** Returns the current function, at the top of the current callstack.
-    Fails if no callstack has been initialized. This should only be called
-    during the analysis of a function. *)
-val current_kf : unit -> kernel_function
-
-(** Returns the current callstack; fails if it has not been initialized.
-    This should only be called during the analysis of a function. *)
-val current_call_stack : unit -> Callstack.t
-
-(** Returns the current callstack, or [None] if it has not been initialized. *)
-val current_call_stack_opt : unit -> Callstack.t option
-
 (** Prints the current callstack. *)
 val pp_callstack : Format.formatter -> unit
 
@@ -52,7 +35,6 @@ val get_slevel : Kernel_function.t -> Parameters.SlevelFunction.value
 val get_subdivision: stmt -> int
 val pretty_actuals :
   Format.formatter -> (Eva_ast.exp * Cvalue.V.t) list -> unit
-val pretty_current_cfunction_name : Format.formatter -> unit
 
 (** [protect f ~cleanup] runs [f]. On a user interruption or a Frama-C error,
     if option -save is set, applies [cleanup]. This is used to clean up and

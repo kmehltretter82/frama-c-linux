@@ -263,8 +263,8 @@ module Make_Dataflow
     match Logic_utils.extract_contract asm_contracts with
     | [] ->
       Self.warning ~pos ~once:true
-        "assuming assembly code has no effects in function %t"
-        Eva_utils.pretty_current_cfunction_name;
+        "assuming assembly code has no effects in function %a"
+        Kernel_function.pretty kf;
       id
     (* There should be only one statement contract, if any. *)
     | (_, spec) :: _ ->

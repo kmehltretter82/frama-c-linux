@@ -24,32 +24,9 @@ open Cil_types
 
 (* Callstacks related functions *)
 
-let current_callstack : Callstack.t option ref = ref None
-
-let with_callstack callstack job x =
-  let previous_callstack = !current_callstack in
-  current_callstack := Some callstack;
-  Eva_perf.start callstack;
-  let finally () =
-    Eva_perf.stop callstack;
-    current_callstack := previous_callstack
-  in
-  Fun.protect ~finally (fun () -> job x)
-
-let current_call_stack_opt () = !current_callstack
-
-let current_call_stack () =
-  match !current_callstack with
-  | None -> Self.fatal "Callstack not initialized"
-  | Some cs -> cs
-
-let current_kf () =
-  let cs = current_call_stack () in
-  Callstack.top_kf cs
-
 let pp_callstack fmt =
   if Parameters.PrintCallstacks.get () then
-    match !current_callstack with
+    match !Callstack.current with
     | None -> () (* Stack not initialized; happens when handling global initializations *)
     | Some cs ->
       Format.fprintf fmt "@ stack: %a" Callstack.pretty cs
@@ -87,9 +64,6 @@ let get_subdivision stmt =
 let pretty_actuals fmt actuals =
   let pp fmt (e,x) = Cvalue.V.pretty_typ (Some (e.Eva_ast.typ)) fmt x in
   Pretty_utils.pp_flowlist pp fmt actuals
-
-let pretty_current_cfunction_name fmt =
-  Kernel_function.pretty fmt (current_kf())
 
 module DegenerationPoints =
   Cil_state_builder.Stmt_hashtbl

@@ -96,3 +96,12 @@ val to_call_list : t -> (Cil_types.kernel_function * Cil_types.kinstr) list
 (** [iter f cs] calls [f] on [cs] and all the callstacks obtained by successful
     calls to {!pop} until the result of the call is [None]. *)
 val iter : (t -> unit) -> t -> unit
+
+(** {2 Callstack tracking} *)
+
+(** The current callstack of the analysis. *)
+val current : t option ref
+
+(** Returns the current callstack; fails if it has not been initialized.
+    This should only be called during the analysis of a function. *)
+val get_current : unit -> t

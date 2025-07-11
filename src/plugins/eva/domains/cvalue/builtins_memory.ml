@@ -56,7 +56,7 @@ let plevel = Parameters.ArrayPrecisionLevel.get
 (* Create a dependency [\from arg_n] where n is the nth argument of the
    currently called function. *)
 let deps_nth_arg n =
-  let kf = Callstack.top_kf (Eva_utils.current_call_stack ()) in
+  let kf = Callstack.top_kf (Callstack.get_current ()) in
   try
     let vi = List.nth (Kernel_function.get_formals kf) n in
     Deps.add_data Deps.bottom (Locations.zone_of_varinfo vi)

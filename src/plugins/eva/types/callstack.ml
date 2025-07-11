@@ -186,3 +186,12 @@ let pretty_short fmt callstack =
   Pretty_utils.pp_flowlist ~left:"" ~sep:" <- " ~right:""
     (fun fmt kf -> Kernel_function.pretty fmt kf)
     fmt list
+
+(* Callstack tracking *)
+
+let current : t option ref = ref None
+
+let get_current () =
+  match !current with
+  | None -> invalid_arg "callstack not initialized"
+  | Some cs -> cs
