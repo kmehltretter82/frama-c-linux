@@ -743,7 +743,7 @@ let rec parse_lval names kind typing_context loc arg =
   match arg.Logic_ptree.lexpr_node with
   | PLnamed (name, node) ->
     (* name:x to taint variable x in 'name' namespace *)
-    let names = name :: names in
+    let names = if List.mem name names then names else name :: names in
     parse_lval names kind typing_context loc node
   | PLconstant (StringConstant str) ->
     Logic_const.tstring ~loc str
