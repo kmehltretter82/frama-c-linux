@@ -206,7 +206,9 @@ let lift_aborter (aborter : ('a,'b) Log.pretty_aborter)
     and append = append_callstack ?stacktrace ~callstack in
     aborter ?current:None ~source ~append
   | None ->
-    aborter ?current ?source ?append:None
+    let callstack = !Callstack.current in
+    let append = append_callstack ?stacktrace ~callstack in
+    aborter ?current ?source ~append
 
 let lift_printer (printer : 'a Log.pretty_printer) : 'a pretty_printer =
   fun ?emitwith ?once -> lift_aborter (printer ?emitwith ?once)

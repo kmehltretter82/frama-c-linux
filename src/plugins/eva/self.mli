@@ -90,8 +90,7 @@ val wkey_recursion : warn_category
     Otherwise if [current] or [source] are given, then the current position
     tracked by the kernel or the given location will respectively be used.
     [stacktrace] optional parameter controls wheter the call stack must
-    be printed at the end of the message and always default to false. It is
-    ignored if position is not given.
+    be printed at the end of the message and always default to false.
 
     See {!Log.Messages} for documentation *)
 
