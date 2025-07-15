@@ -89,7 +89,6 @@
 [eva] sys_sem_h.c:61: assertion 'Eva,initialization' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
-  __fc_stdout ∈ {{ NULL ; &S___fc_stdout[0] }}
   semkey ∈ [0..4294967294]
   semid ∈ [--..--]
   sbuf.sem_num ∈ {0}
@@ -97,3 +96,4 @@
       .sem_flg ∈ {4096}
   arg ∈ {0}
   __retres ∈ {0}
+  S___fc_stdout[0..1] ∈ [--..--]
