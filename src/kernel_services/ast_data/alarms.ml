@@ -494,7 +494,7 @@ let create_predicate ?(loc=Location.unknown) alarm =
       let loc = best_loc ~loc e.eloc in
       let t = Logic_utils.expr_to_term e in
       let align = Logic_const.talignof ~loc typ in
-      Logic_const.paligned (t, align)
+      Logic_const.paligned ~loc (t, align)
 
     | Invalid_pointer e ->
       let loc = best_loc ~loc e.eloc in
