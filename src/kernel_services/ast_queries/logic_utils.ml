@@ -2179,7 +2179,7 @@ let merge_behaviors ?(oldloc=Cil_datatype.Location.unknown) ~silent old_behavior
                 pp_old_loc oldloc
                 (fun fmt ->
                    if Kernel.debug_atleast 1 then
-                     Format.fprintf fmt ":@ @[%a@] vs. @[%a@]"
+                     Format.fprintf fmt ":@ @[%a@]@ vs.@ @[%a@]"
                        !Cil.pp_behavior_ref b !Cil.pp_behavior_ref old_b)
             ;
             old_b.b_assumes <- merge_ip_list old_b.b_assumes b.b_assumes;
