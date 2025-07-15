@@ -140,9 +140,11 @@ let update_var_type v t =
 
 (* Make a varinfo. Used mostly as a helper function below  *)
 let makeVarinfo
-    ?(source=true) ?(temp=false) ?(referenced=false) ?(ghost=false) ?(loc=Location.unknown)
+    ?(source=true) ?(temp=false) ?(referenced=false) ?(ghost=false) ?alignas
+    ?(loc=Location.unknown)
     global formal name typ
   =
+
   let vi =
     { vorig_name = name;
       vname = name;
@@ -156,7 +158,7 @@ let makeVarinfo
       vinline = false;
       vattr = [];
       vstorage = NoStorage;
-      valignas = None;
+      valignas = alignas;
       vaddrof = false;
       vreferenced = referenced;
       vdescr = None;
@@ -4271,8 +4273,8 @@ let makeFormalVar fdec ?(ghost=fdec.svar.vghost) ?(where = "$") ?loc name typ : 
 
 (* Make a global variable. Your responsibility to make sure that the name
  * is unique *)
-let makeGlobalVar ?source ?temp ?referenced ?ghost ?loc name typ =
-  makeVarinfo ?source ?temp ?referenced ?ghost ?loc true false name typ
+let makeGlobalVar ?source ?temp ?referenced ?ghost ?alignas ?loc name typ =
+  makeVarinfo ?source ?temp ?referenced ?ghost ?alignas ?loc true false name typ
 
 let create_string_literal =
   let module StrLitCounter =
