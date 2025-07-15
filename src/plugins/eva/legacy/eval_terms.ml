@@ -696,14 +696,19 @@ let positive_cvalue = Cvalue.V.inject_int Integer.one
 let negative_cvalue = Cvalue.V.inject_int Integer.minus_one
 
 let is_true = function
-  | `True | `TrueReduced _ -> true
-  | `Unknown _ | `False | `Unreachable -> false
+  | `True -> true
+  | `Unknown _ | `False -> false
 
 let truth_to_status = function
-  | `True | `TrueReduced _ -> True
+  | `True -> True
   | `Unknown _ -> Unknown
   | `False -> False
-  | `Unreachable -> assert false (* Should not happen with only cvalue *)
+
+let reduce_value_with_truth assume value =
+  match assume value with
+  | `True -> value
+  | `Unknown v -> v
+  | `False -> Cvalue.V.bottom
 
 (* Check "logic alarms" when evaluating [v1 op v2]. All operators shifts are
    defined unambiguously in ACSL. *)
@@ -2279,9 +2284,7 @@ and reduce_by_predicate ~alarm_mode env positive p =
         match to_int align.eover with
         | Some align when align > 0 ->
           let reduce _typ v =
-            match Cvalue_forward.assume_aligned align v with
-            | `TrueReduced v | `Unknown v -> v
-            | `True | `False | `Unreachable -> v
+            reduce_value_with_truth (Cvalue_forward.assume_aligned align) v
           in
           reduce_exact_location ~alarm_mode env reduce t
         | Some _ | None -> env

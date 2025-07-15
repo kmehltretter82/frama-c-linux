@@ -27,12 +27,23 @@ module CVal = struct
     then `Bottom
     else `Value n
 
-  let assume_non_zero = Cvalue_forward.assume_non_zero
-  let assume_bounded = Cvalue_forward.assume_bounded
-  let assume_not_nan = Cvalue_forward.assume_not_nan
-  let assume_pointer = Cvalue_forward.assume_pointer
-  let assume_aligned = Cvalue_forward.assume_aligned
-  let assume_comparable = Cvalue_forward.assume_comparable
+  let assume_non_zero v =
+    (Cvalue_forward.assume_non_zero v :> t Abstract_value.truth)
+
+  let assume_bounded kind bound v =
+    (Cvalue_forward.assume_bounded kind bound v :> t Abstract_value.truth)
+
+  let assume_not_nan ~assume_finite fkind v =
+    (Cvalue_forward.assume_not_nan ~assume_finite fkind v :> t Abstract_value.truth)
+
+  let assume_pointer v =
+    (Cvalue_forward.assume_pointer v :> t Abstract_value.truth)
+
+  let assume_aligned align v =
+    (Cvalue_forward.assume_aligned align v :> t Abstract_value.truth)
+
+  let assume_comparable cmp v1 v2 =
+    (Cvalue_forward.assume_comparable cmp v1 v2 :> (t * t) Abstract_value.truth)
 
   let constant _context _exp = function
     | Eva_ast.CTopInt _ -> Cvalue.V.top_int

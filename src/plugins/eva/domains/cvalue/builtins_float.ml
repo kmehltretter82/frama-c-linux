@@ -14,7 +14,6 @@ let restrict_float ~assume_finite fkind value =
   | `True -> value
   | `Unknown reduced_value -> reduced_value
   | `False -> Cvalue.V.bottom
-  | _ -> assert false
 
 (* Alarms should be handled by the preconditions of the builtin. This function
    only removes the forbidden floating-point values. *)

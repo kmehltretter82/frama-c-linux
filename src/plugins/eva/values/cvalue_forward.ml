@@ -208,6 +208,9 @@ let are_comparable op ev1 ev2 =
                                     Alarms
    -------------------------------------------------------------------------- *)
 
+(* Subtype of {!Abstract_value.truth}. *)
+type 'a truth = [ `False | `Unknown of 'a | `True ]
+
 let assume_non_zero value =
   if Cvalue.V.contains_zero value
   then
