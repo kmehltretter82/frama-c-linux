@@ -492,14 +492,29 @@ module Macros = struct
 
   let empty = StringMap.empty
 
+  type deprecation =
+    { macro: string;
+      msg: string;
+      action: [ `Fail | `Continue ]; }
+  let pretty_deprecation fmt deprecation =
+    Format.fprintf fmt "Macro %s is deprecated. %s."
+      deprecation.macro deprecation.msg
   let deprecated =
+    let deprecate macro msg action deprecated =
+      StringMap.add macro { macro; msg; action; } deprecated
+    in
     StringMap.empty
-    |> StringMap.add "PTEST_RESULT" "Please use PTEST_RESULT_DIR instead"
+    |> deprecate "PTEST_RESULT" "Please use PTEST_RESULT_DIR instead" `Fail
+    |> deprecate "PTEST_SCRIPT" "Please use PTEST_MODULE instead" `Continue
 
   let warn_if_deprecated file macro =
     try
-      let msg = StringMap.find macro deprecated in
-      Format.printf "%% %s: Macro %s is deprecated. %s.\n" file macro msg
+      let deprecation = StringMap.find macro deprecated in
+      Format.eprintf "%% %s: %a\n" file pretty_deprecation deprecation;
+      if deprecation.action = `Fail then begin
+        Format.eprintf "%% Exiting ptests. Please fix deprecation issue.\n";
+        exit 1
+      end
     with Not_found -> ()
 
   let pp_macros fmt macros =
