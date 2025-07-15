@@ -1,6 +1,6 @@
 # Ivette {#ivette}
 
-Welcome into the documentation of Frama-C user interface. This chapter
+Welcome to the documentation of the Frama-C user interface. This chapter
 introduces basic concepts for using **Ivette**. Each plug-in may provide its own
 dedicated documentation chapter, consult them for more information.
 
@@ -13,7 +13,7 @@ by opening the [Console](#ivette-console) view.
 
 ## General Organization {#ivette-general}
 
-The **Ivette** user-interface is decomposed into the following main areas:
+The **Ivette** user interface is decomposed into the following main areas:
 
  - The left sidebar, which can be used to navigate between the different views
    and plug-ins of the platform.
@@ -24,11 +24,11 @@ The **Ivette** user-interface is decomposed into the following main areas:
  - The bottom status bar, which provides general feedback on currently running
    tasks.
 
- - The « Laboratory » central area, where the different views and Frama-C
+ - The "Laboratory" (central area), where the different views and Frama-C
    components are displayed.
 
 Each registered Frama-C plug-in might extend Ivette with additional views,
-laboratory components, sidebars panels, status bar items and menus. Consult
+laboratory components, sidebar panels, status bar items and menus. Consult
 the associated documentation chapters for more details.
 
 ## The Sidebar {#ivette-sidebar}
@@ -47,13 +47,13 @@ sidebars. Among them, two sidebars are especially dedicated to Ivette:
 ## The Laboratory {#ivette-laboratory}
 
 The Ivette principal area consists of one to four panels that you can arrange as
-you want. Each panels can be resized and configured to display any available
+you want. Each panel can be resized and configured to display available
 _Components_ from the Frama-C kernel and the registered plug-ins.
 
-The [icon-display] sidebar provides an access to all registered _Components_
-and also provides access to some predefined combination of components as
+The [icon-display] sidebar provides access to all registered _Components_
+and also provides access to some predefined combinations of components, as
 _Views_. When you select a _View_, the Laboratory layout is updated to display
-the relevant predefined components. The main Ivette toolbar provides a quick
+the relevant predefined components. The main Ivette toolbar provides quick
 access to the _Views_ you already visited. You can also duplicate views and
 configure them independently.
 
@@ -65,19 +65,19 @@ registered layout.
 Each component displayed in the Laboratory can be moved or resized from one
 panel to the others: simply right-click on the _Component_ title bar to show its
 layout menu. Components can also be docked in the status bar for later use.
-The layout of docked components can changed by right-clicking them.
+The layout of docked components can be changed by right-clicking them.
 
 You can resize the different panels by dragging the splitters. You may resize
-the two top panels independently from the two bottom panels by dragging the
+the two top panels independently of the two bottom panels by dragging the
 upper part and the lower part of the vertical splitter. Dragging the horizontal
 splitter resizes the left and right panels synchronously. Dragging the
-intersection of the horizontal and vertical splitters resize all panels
+intersection of the horizontal and vertical splitters resizes all panels
 synchronously.
 
 ## The Toolbar {#ivette-toolbar}
 
-The top most toolbar of Ivette provides you quick access to Tab Views.
-Right-clicking on tabs allow you to restore initial view layout or close tabs.
+The top-most toolbar of Ivette provides you quick access to Tab Views.
+Right-clicking on tabs allows you to restore initial view layout or close tabs.
 When restoring a _View_ to its initial layout, the extra components you may have
 added to the laboratory are docked into the status bar for quick access.
 
@@ -104,7 +104,7 @@ to the toolbar's search widget.
 
 This area is used to provide summarized feedback on activity and running tasks
 in the current Frama-C session. In case of errors, warnings or special events,
-messages are raised from the status bar and may provides you with quick links to
+messages are raised from the status bar and may provide you with quick links to
 relevant components. Docked components are also accessible from the status bar.
 
 ## The Console {#ivette-console}
