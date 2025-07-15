@@ -129,7 +129,7 @@ let add_write ~map ~stmt ~acs (r:node) (e:exp) =
     let v = add_exp map stmt e in
     Option.iter (Memory.add_points_to map r) v
 
-let add_kf_call ~kf ~stmt map ?property ?result args kfct =
+let add_kf_call ~kf ~stmt map ?property ~result args kfct =
   let module Vmap = Cil_datatype.Varinfo.Map in
   let funspec = Annotations.funspec kfct in
   let fargs = Kernel_function.get_formals kfct in
@@ -144,16 +144,16 @@ let add_kf_call ~kf ~stmt map ?property ?result args kfct =
       let d = Logic.add_term env @@ Logic_utils.expr_to_term e in
       Vmap.add arg d formal in
     let formal = List.fold_left2 add_formal Vmap.empty args fargs in
-    Annot.add_behavior ~iscalled:true ~kf ~ki ~formal ?result map bhv
+    Annot.add_behavior ~iscalled:true ~kf ~ki ~formal ~result map bhv
   in List.iter add_called_behavior funspec.spec_behavior
 
-let add_call ~kf ~stmt map ?result fct (args: exp list) =
+let add_call ~kf ~stmt map ~result fct (args: exp list) =
   match Kernel_function.get_called fct with
-  | Some kfct -> add_kf_call ~kf ~stmt map ?result args kfct
+  | Some kfct -> add_kf_call ~kf ~stmt map ~result args kfct
   | None ->
     begin match Dyncall.get stmt with
       | Some(property,kfcts) ->
-        List.iter (add_kf_call ~kf ~stmt map ~property ?result args) kfcts
+        List.iter (add_kf_call ~kf ~stmt map ~property ~result args) kfcts
       | None ->
         Options.abort "Cannot resolve dynamic call for stmt:%a@."
           Printer.pp_stmt stmt
@@ -163,7 +163,7 @@ let add_instr ~kf (m:map) (s:stmt) (instr:instr) =
   match instr with
   | Skip _ -> ()
   | Code_annot (annot,_) ->
-    Annot.add_code_annot ~iscalled:false ~kf ~stmt:s m annot
+    Annot.add_code_annot ~iscalled:false ~kf ~stmt:s ~result:None m annot
 
   | Set(lv,e,_) ->
     let r = add_lval m s lv in
@@ -180,7 +180,7 @@ let add_instr ~kf (m:map) (s:stmt) (instr:instr) =
       begin fun _res fct args _loc ->
         add_value m s fct ;
         List.iter (add_value m s) args ;
-        add_call ~kf ~stmt:s m ~result:r fct args
+        add_call ~kf ~stmt:s m ~result:(Some r) fct args
       end x vf args kind loc
 
   | Call(lr,e,es,_) ->
@@ -191,12 +191,7 @@ let add_instr ~kf (m:map) (s:stmt) (instr:instr) =
            let r = add_lval m s lv in
            Memory.add_write m r (Lval(s,lv)) ; r
         ) lr
-    in add_call ~kf ~stmt:s m ?result e es
-      (*
-      use some of the code in : cfgCalculus.ml:~335 & LogicSemantics:~909
-    let result = Option.fold ~none:pure ~some:(Ldomain.of_lval) lv in
-    let ofun = Kernel_function.(Option.map get_vi @@ get_called e) in
-    add_call ~kf m result e es ; *)
+    in add_call ~kf ~stmt:s m ~result e es
 
   | Asm _ ->
     Options.warning ~source:(fst @@ Stmt.loc s)
@@ -213,7 +208,8 @@ let store rmap m s =
 
 let rec add_stmt ~kf (r:rmap) (m:map) (s:stmt) =
   let add_block = add_block ~kf in
-  let add_annot = Annot.add_code_annot ~iscalled:false ~kf ~stmt:s m in
+  let add_annot =
+    Annot.add_code_annot ~iscalled:false ~kf ~stmt:s ~result:None m in
   List.iter add_annot @@ Annotations.code_annot s ;
   match s.skind with
   | Instr ki -> add_instr ~kf m s ki ; store r m s
@@ -296,7 +292,8 @@ let domain ?global kf =
       let funspec = Annotations.funspec kf in
       List.iter (add_bhv ~kf ~result s m) funspec.spec_behavior ;
       let ki = Kinstr.kinstr_of_opt_stmt None in
-      List.iter (Annot.add_behavior ~iscalled:false ~kf ~ki m) funspec.spec_behavior ;
+      List.iter (Annot.add_behavior ~iscalled:false ~kf ~ki ~result:None m)
+        funspec.spec_behavior ;
     with Annotations.No_funspec _ -> ()
   end ;
   begin

@@ -1,15 +1,18 @@
 
+int B[64];
+
 /*@
     assigns *p \from q, k ;
 */
-void modify_by_ref(int** p, int* q, int k, int* b) {
-    *p = b == 0 ? q + k : q ;
+void modify_by_ref(int** p, int* q, int k) {
+    *p = q + k ;
 }
 
-void caller_by_ref () {
-    int *a, b, k;
-    modify_by_ref(&a,&b,k,0);
-    *a = 0;
+int caller_by_ref (int k) {
+    int *a;
+    modify_by_ref(&a,B,k);
+    //*a = 0;
+    return *a;
 }
 
 /*@
@@ -19,8 +22,8 @@ int* modify_result(int* q, int k) {
     return q + k ;
 }
 
-void caller_result () {
-    int b, k;
-    int *a = modify_result(&b,k);
-    *a = 0;
+int caller_result (int k) {
+    int *a = modify_result(B,k);
+    //*a = 0;
+    return *a;
 }

@@ -192,7 +192,7 @@ let rec add_term (env:env) (t:term) : domain = match t.term_node with
   | Tnull | Tempty_set | Ttypeof _ | Ttype _  | Trange _ -> pure
   | TLval lval -> add_term_lval env lval
   | TAddrOf lval | TStartOf lval -> ptr @@ add_addr_lval env lval
-  | Tif (b,ct, cf) ->
+  | Tif (b,ct,cf) ->
     iadd_term env b ;
     let dt = add_term env ct in
     let df = add_term env cf in
@@ -286,5 +286,5 @@ let add_logic_info_body (env:env) (l:logic_info) : domain = match l.l_body with
   | LBpred p -> add_predicate env p ; pure
   | LBterm t -> add_term env t
   | LBreads ts -> List.iter (fun t -> iadd_term env t.it_content) ts ; pure
-  | LBinductive _ ->
-    Options.abort "Logic.add_logic_info: inductive not implemented yet"
+  | LBinductive l ->
+    List.iter (fun (_,_,_,t) -> add_predicate env t) l ; pure
