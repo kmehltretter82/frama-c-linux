@@ -91,3 +91,38 @@ plug-ins. By default, it only shows warning, error and failure messages.
 The right panel, toggled by the [icon-clipboard] button in the component
 titlebar, allows you to filter the displayed messages, and to search for
 a given text in all messages.
+
+## Project {#framac-project}
+
+A Frama-C project groups together one source code with the states (parameters, results, etc) of the Frama-C kernel and analyzers. In one Frama-C session, several projects may exist at the same time, while there is always one and
+only one so-called current project in which analyses are performed. Thus projects help to structure a
+code analysis session into well-defined entities. For instance, it is possible to perform an analysis on the
+same code with different parameters and to compare the obtained results.
+
+you can manage projects via the [menu](#framac-project-menu) and the associated [sidebar](#framac-project-sidebar) [icon-project].
+
+### Project Menu {#framac-project-menu}
+
+The project menu is divided into 2 parts:
+
+* Actions:
+  * New project: creates a new project, which becomes the current project.
+  * Load project: Loads an existing project, making it the current project.
+  * Duplicate current project.
+  * Delete current project.
+  * Rename current project.
+* The list of projects: At the very least, the default project will appear. The current project will be selected,
+by clicking on another project, the current project will be modified.
+
+### Project sidebar {#framac-project-sidebar}
+
+The project sidebar icon is [icon-project].
+
+In the sidebar title, you can create a new project [icon-CIRC.PLUS] , load an existing project [icon-download] and show this documentation [icon-help].
+
+The list of projects and possible actions for each is shown below:
+
+* [icon-edit]: rename the project.
+* [icon-duplicate]: duplicate the project.
+* [icon-save]: save the project.
+* [icon-trash]: delete the project. Confirmation will be requested.

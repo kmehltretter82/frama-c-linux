@@ -31,6 +31,7 @@ import { useModel } from 'dome/table/models';
 import * as Dialogs from 'dome/dialogs';
 import { FieldState, TextField, useState } from 'dome/layout/forms';
 import { Icon } from 'dome/controls/icons';
+import { HelpButton } from 'dome/help';
 
 import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
@@ -268,6 +269,10 @@ export function Projects(): JSX.Element {
           title='Create a new empty project'
           size={18}
           onClick={newProject}
+        />
+        <HelpButton
+          id={'framac-project'}
+          size={18}
         />
       </Hbox>
     </SidebarTitle>
