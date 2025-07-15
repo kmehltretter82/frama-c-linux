@@ -82,8 +82,10 @@ let register_new_var v typ =
   else
     Globals.Vars.add_decl v
 
-let create_new_var name typ =
-  let vi = Cil.makeGlobalVar ~source:false ~temp:false name typ in
+let create_new_var ?alignas name typ =
+  let loc = Cil_datatype.Location.unknown in
+  let alignas = Option.map (Cil.integer ~loc) alignas in
+  let vi = Cil.makeGlobalVar ~source:false ~temp:false ?alignas name typ in
   register_new_var vi typ;
   vi
 

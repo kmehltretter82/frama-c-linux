@@ -156,7 +156,8 @@ let create_new_var stack prefix type_base weak =
     | Strong -> prefix
   in
   let name = Cabs2cil.fresh_global (base_name prefix stack) in
-  Eva_utils.create_new_var name type_base
+  let alignas = Machine.Alignof.max () in
+  Eva_utils.create_new_var ~alignas name type_base
 
 (* This function adds a "_w" information to a variable. It should be used
    when a variable becomes weak, and supposes that the variable has been

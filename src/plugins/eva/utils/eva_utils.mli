@@ -36,7 +36,7 @@ module DegenerationPoints:
   State_builder.Hashtbl with type key = stmt and type data = bool
 
 
-val create_new_var: string -> typ -> varinfo
+val create_new_var: ?alignas:int -> string -> typ -> varinfo
 (** Create and register a new variable inside Frama-C. The variable
     has its [vlogic] field set, meaning it is not a source variable. The
     freshness of the name must be ensured by the user. *)
