@@ -61,6 +61,22 @@ let register_computation_hook f =
   Self.ComputationState.add_hook_on_change (fun _ -> f ());
   Self.ComputationState.add_hook_on_update (fun _ -> f ())
 
+let clear () =
+  if Self.ComputationState.get () <> Computing then
+    let selection = State_selection.with_dependencies Self.state in
+    Project.clear ~selection ();
+    Emitter.clear Eva_utils.emitter;
+    Emitter.clear Eva_utils.export_emitter
+
+let () = Request.register ~package
+    ~kind:`SET
+    ~name:"clear"
+    ~descr:(Markdown.plain "removes all results from previous Eva analyses, \
+                            including emitted alarms, annotations and statuses")
+    ~input:(module Data.Junit)
+    ~output:(module Data.Junit)
+    clear
+
 (* ----- Callers & Callees -------------------------------------------------- *)
 
 module CallSite =
