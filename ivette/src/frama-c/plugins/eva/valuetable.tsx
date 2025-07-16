@@ -462,8 +462,7 @@ function ProbeValues(props: ProbeValuesProps): Request<callstack, JSX.Element> {
       const onItemClick = (): void => onSelected(lvalMarker, 'NORMAL');
       items.push({ label, onClick: onItemClick });
     });
-    // TODO: this context menu conflicts with the marker menu.
-    if (items.length < 0) Dome.popupMenu(items);
+    if (items.length > 0) Dome.popupMenu(items);
   };
 
   return async (callstack: callstack): Promise<JSX.Element> => {

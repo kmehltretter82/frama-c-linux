@@ -34,6 +34,7 @@ import * as Dome from 'dome';
 import * as States from 'frama-c/states';
 import * as KernelData from 'frama-c/kernel/api/data';
 import * as Ast from 'frama-c/kernel/api/ast';
+import { getMarkerMenuItems, getContextMenuCopy } from './kernel/ASTview';
 import { classes } from 'dome/misc/utils';
 
 // --------------------------------------------------------------------------
@@ -185,8 +186,8 @@ export function Marker(props: MarkerProps): JSX.Element {
     evt.stopPropagation();
     onSelected && onSelected(marker, evt.altKey ? 'META' : 'NORMAL');
   };
-  // TODO: better name.
-  const onContextMenu2 = (): void => {
+  const onRightClick = (evt: React.MouseEvent): void => {
+    evt.stopPropagation();
     onContextMenu && onContextMenu(marker);
   };
   return (
@@ -194,7 +195,7 @@ export function Marker(props: MarkerProps): JSX.Element {
       className={className}
       onClick={onClick}
       onDoubleClick={onDoubleClick}
-      onContextMenu={onContextMenu2}
+      onContextMenu={onRightClick}
       onMouseEnter={() => onHovered && onHovered(marker)}
       onMouseLeave={() => onHovered && onHovered(undefined)}
     >
@@ -281,17 +282,10 @@ export function MarkerText(props: MarkerTextProps): JSX.Element {
       States.setHovered(marker);
   };
   const onContextMenu = (m: string): void => {
-    const marker = Ast.jMarker(m);
-    const attributes = States.getMarker(marker);
-    const { labelKind, name, definition } = attributes;
-    /* TODO: shared menu with AST view, with all entries registered via
-       registerMarkerMenuExtender (probably in a dedicated file?). */
-    if (definition) {
-      const label = `Go to ${name} (${labelKind.toLowerCase()})`;
-      const onClick = (): void => States.setSelected(definition);
-      const items: Dome.PopupMenuItem[] = [{ label, onClick }];
-      Dome.popupMenu(items);
-    }
+    const attributes = States.getMarker(Ast.jMarker(m));
+    const items: Dome.PopupMenuItem[] = getMarkerMenuItems(attributes);
+    if(attributes.name) items.push(getContextMenuCopy(attributes.name));
+    Dome.popupMenu(items);
   };
   return  <Text {...props} onSelected={onSelected} onHovered={onHovered}
                            onContextMenu={onContextMenu} />;
