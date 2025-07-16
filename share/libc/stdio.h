@@ -526,7 +526,7 @@ extern int ferror(FILE *stream);
 
 /*@
   requires valid_string_s: valid_read_string(s);
-  assigns __fc_stdout \from __fc_errno, s[0..strlen(s)];
+  assigns *__fc_stdout \from __fc_errno, s[0..strlen(s)];
  */
 extern void perror(const char *s);
 

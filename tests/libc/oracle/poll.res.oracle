@@ -20,7 +20,6 @@
 [eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
-  __fc_stdout ∈ {{ NULL + [--..--] ; &S___fc_stdout[0] }}
   ufds.fd ∈ {0}
       .events ∈ {3}
       .revents ∈ [--..--]
@@ -29,3 +28,4 @@
   can_read_out_of_band ∈ {0; 2} or UNINITIALIZED
   invalid_fd ∈ {0; 32} or UNINITIALIZED
   __retres ∈ [0..127]
+  S___fc_stdout[0..1] ∈ [--..--]

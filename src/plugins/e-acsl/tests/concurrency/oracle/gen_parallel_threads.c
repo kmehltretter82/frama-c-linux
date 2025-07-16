@@ -128,8 +128,8 @@ int __gen_e_acsl_pthread_mutex_trylock(pthread_mutex_t *mutex);
 int __gen_e_acsl_pthread_mutex_unlock(pthread_mutex_t *mutex);
 
 /*@ requires valid_string_s: valid_read_string(s);
-    assigns __fc_stdout;
-    assigns __fc_stdout \from __fc_errno, *(s + (0 .. strlen{Old}(s)));
+    assigns *__fc_stdout;
+    assigns *__fc_stdout \from __fc_errno, *(s + (0 .. strlen{Old}(s)));
  */
 void __gen_e_acsl_perror(char const *s);
 
@@ -794,8 +794,8 @@ int __gen_e_acsl_usleep(useconds_t usec)
 }
 
 /*@ requires valid_string_s: valid_read_string(s);
-    assigns __fc_stdout;
-    assigns __fc_stdout \from __fc_errno, *(s + (0 .. strlen{Old}(s)));
+    assigns *__fc_stdout;
+    assigns *__fc_stdout \from __fc_errno, *(s + (0 .. strlen{Old}(s)));
  */
 void __gen_e_acsl_perror(char const *s)
 {
