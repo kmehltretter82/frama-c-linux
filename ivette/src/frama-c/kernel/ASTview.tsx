@@ -498,18 +498,14 @@ const Callers = Editor.createField<Eva.CallSite[]>([]);
 // as inferred by Eva.
 const Callees = Editor.createField<Ast.decl[]>([]);
 
-export function getContextMenuCopy(text: string): Dome.PopupMenuItem {
-  return {
-    label: 'Copy to clipboard',
-    onClick: () => { if (text !== '') navigator.clipboard.writeText(text); }
-  };
-}
 
 export function getMarkerMenuItems(
-  attributes: Ast.markerAttributesData,
+  marker: Ast.marker,
   callers?: Eva.CallSite[],
-  callees?: Ast.decl[]
+  callees?: Ast.decl[],
+  markerText?: string
 ): Dome.PopupMenuItem[] {
+  const attributes = States.getMarker(marker);
   const items: Dome.PopupMenuItem[] = [];
   const { kind, name, labelKind, definition } = attributes;
   if (kind === 'DFUN') {
@@ -544,6 +540,12 @@ export function getMarkerMenuItems(
     });
   }
   MarkerMenuExtenders.forEach((ext) => ext(items, attributes));
+  const text = markerText ?? attributes.name;
+  if (text) {
+    const label = 'Copy to clipboard';
+    const onClick = (): Promise<void> => navigator.clipboard.writeText(text);
+    items.push({ label, onClick });
+  }
   return items;
 }
 
@@ -561,10 +563,9 @@ function createContextMenuHandler(): Editor.Extension {
       const position = view.posAtCoords(coords); if (!position) return;
       const node = coveringNode(tree, position);
       if (!node || !node.marker) return;
-      const attributes = States.getMarker(node.marker);
-      const items: Dome.PopupMenuItem[] = getMarkerMenuItems(
-        attributes, callers, callees);
-      items.push(getContextMenuCopy(view.state.sliceDoc(node.from, node.to)));
+      const markerText = view.state.sliceDoc(node.from, node.to);
+      const items: Dome.PopupMenuItem[] =
+        getMarkerMenuItems(node.marker, callers, callees, markerText);
       Dome.popupMenu(items);
       return;
     }

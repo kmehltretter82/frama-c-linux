@@ -34,7 +34,7 @@ import * as Dome from 'dome';
 import * as States from 'frama-c/states';
 import * as KernelData from 'frama-c/kernel/api/data';
 import * as Ast from 'frama-c/kernel/api/ast';
-import { getMarkerMenuItems, getContextMenuCopy } from './kernel/ASTview';
+import { getMarkerMenuItems } from './kernel/ASTview';
 import { classes } from 'dome/misc/utils';
 
 // --------------------------------------------------------------------------
@@ -282,9 +282,8 @@ export function MarkerText(props: MarkerTextProps): JSX.Element {
       States.setHovered(marker);
   };
   const onContextMenu = (m: string): void => {
-    const attributes = States.getMarker(Ast.jMarker(m));
-    const items: Dome.PopupMenuItem[] = getMarkerMenuItems(attributes);
-    if(attributes.name) items.push(getContextMenuCopy(attributes.name));
+    const marker = Ast.jMarker(m);
+    const items: Dome.PopupMenuItem[] = getMarkerMenuItems(marker);
     Dome.popupMenu(items);
   };
   return  <Text {...props} onSelected={onSelected} onHovered={onHovered}
