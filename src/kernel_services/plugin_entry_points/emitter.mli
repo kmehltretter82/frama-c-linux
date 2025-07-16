@@ -42,6 +42,10 @@ val get_name: t -> string
 val correctness_parameters: t -> string list
 val tuning_parameters: t -> string list
 
+val clear: t -> unit
+(** Removes annotations and status emitted by the given emitter, as if a
+    correctness parameter had changed. *)
+
 val end_user: t
 (** The special emitter corresponding to the end-user. Only the kernel should
     use this emitter when emitting annotations or statuses.
