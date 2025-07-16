@@ -89,5 +89,9 @@ val fold : (alarm -> status -> 'a -> 'a) -> 'a -> t -> 'a
     instruction. *)
 val emit: pos:Position.t -> t -> unit
 
+(** Has the given alarm already been emitted at the given statement
+    by the current analysis? *)
+val already_emitted: Cil_types.stmt -> alarm -> bool
+
 val pretty : Format.formatter -> t -> unit
 val pretty_status : Format.formatter -> status -> unit

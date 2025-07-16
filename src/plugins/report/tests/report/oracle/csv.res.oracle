@@ -95,12 +95,17 @@
   v ∈ [--..--]
 [eva] computing for function main1 <- main.
   Called from csv.c:54.
+[eva:alarm] csv.c:11: Warning: 
+  assertion 'Eva,signed_overflow' got status unknown.
 [eva:alarm] csv.c:11: Warning: signed overflow. assert -2147483648 ≤ x * x;
 [eva:alarm] csv.c:11: Warning: signed overflow. assert x * x ≤ 2147483647;
-[eva:alarm] csv.c:12: Warning: accessing out of bounds index. assert 0 ≤ x;
-[eva:alarm] csv.c:12: Warning: accessing out of bounds index. assert x < 15;
+[eva:alarm] csv.c:12: Warning: assertion 'Eva,index_bound' got status unknown.
+[eva:alarm] csv.c:13: Warning: 
+  assertion 'Eva,initialization' got status unknown.
 [eva:alarm] csv.c:13: Warning: 
   accessing uninitialized left-value. assert \initialized(&u[x]);
+[eva:alarm] csv.c:14: Warning: 
+  assertion 'Eva,initialization' got status unknown.
 [eva:alarm] csv.c:14: Warning: 
   accessing uninitialized left-value. assert \initialized(&u[x]);
 [eva] Recording results for main1
@@ -136,7 +141,8 @@
 [eva] computing for function any_double <- main4 <- main.
   Called from csv.c:49.
 [eva] Done for function any_double
-[eva:alarm] csv.c:50: Warning: non-finite double value. assert \is_finite(d);
+[eva:alarm] csv.c:50: Warning: 
+  assertion 'Eva,is_nan_or_infinite' got status unknown.
 [eva] computing for function __FC_assert <- main4 <- main.
   Called from csv.c:50.
 [eva:alarm] csv.c:50: Warning: 

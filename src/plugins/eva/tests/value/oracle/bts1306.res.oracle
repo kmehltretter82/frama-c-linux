@@ -42,6 +42,8 @@ int main(double x)
 [eva] computing for function g <- main.
   Called from bts1306.i:10.
 [eva:alarm] bts1306.i:6: Warning: 
+  assertion 'Eva,is_nan_or_infinite' got status unknown.
+[eva:alarm] bts1306.i:6: Warning: 
   non-finite double value. assert \is_finite(\mul_double(x, x));
 [eva] Recording results for g
 [eva] Done for function g
