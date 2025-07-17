@@ -1,7 +1,7 @@
 /* run.config
-  SCRIPT: one_hyp
+  MODULE: one_hyp
    OPT:
-  SCRIPT: several_hyps
+  MODULE: several_hyps
    OPT:
 */
 void f(void);

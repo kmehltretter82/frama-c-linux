@@ -1,5 +1,5 @@
 /* run.config_qualif
-  SCRIPT: @PTEST_NAME@
+  MODULE: @PTEST_NAME@
    OPT: -wp-msg-key shell
 */
 int empty (int c){

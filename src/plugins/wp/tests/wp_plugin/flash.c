@@ -1,12 +1,12 @@
 /* run.config
    OPT:
-SCRIPT: flash
+MODULE: flash
    OPT: -wp-driver %{dep:@PTEST_DIR@/flash.driver}
 */
 
 /* run.config_qualif
    OPT: -wp-timeout 1
-SCRIPT: @PTEST_NAME@
+MODULE: @PTEST_NAME@
    OPT: -wp-driver %{dep:@PTEST_DIR@/flash.driver}
 */
 

@@ -1,5 +1,5 @@
 /* run.config
- SCRIPT: @PTEST_NAME@
+ MODULE: @PTEST_NAME@
    OPT: -kernel-warn-key ghost:bad-use=inactive -print
 */
 // Note: we deactivate "ghost:bad-use" to check that printing goes right
