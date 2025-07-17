@@ -564,7 +564,7 @@ class internal_genericCilVisitor current_func behavior queue: cilVisitor =
     method vvdec (_v:varinfo) = DoChildren
     method vexpr (_e:exp) = DoChildren
     method vlval (_l:lval) = DoChildren
-    method vlhost _h = DoChildren
+    method vlhost (_h:lhost) = DoChildren
     method voffs (_o:offset) = DoChildren
     method vinitoffs (_o:offset) = DoChildren
     method vinst (_i:instr) = DoChildren
@@ -1684,7 +1684,7 @@ and visitCilInit (vis: cilVisitor) (forglob: varinfo)
 
 and visitCilLval (vis: cilVisitor) (lv: lval) : lval =
   doVisitCil vis id vis#vlval childrenLval lv
-and childrenLval (vis: cilVisitor) (h,off as lv): lval =
+and childrenLval (vis: cilVisitor) (h,off as lv : lval): lval =
   (* and visit its subexpressions *)
   let h' = visitCilLhost vis h in
   let off' = visitCilOffset vis off in
