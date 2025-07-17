@@ -134,7 +134,7 @@ let pp_stmt kloc fmt stmt =
   match stmt.skind with
   | Instr (Local_init (v,_,loc)) ->
     Format.fprintf fmt "initialization of '%s'%a" v.vname (pp_kloc kloc) loc
-  | Instr (Call(_,(Var v,_),_,loc)) ->
+  | Instr (Call(_,Var v,_,loc)) ->
     Format.fprintf fmt "call '%s'%a" v.vname (pp_kloc kloc) loc
   | Instr (Set(_,_,loc)|Call(_,_,_,loc)) ->
     Format.fprintf fmt "instruction%a" (pp_kloc kloc) loc

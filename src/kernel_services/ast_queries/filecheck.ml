@@ -1255,7 +1255,7 @@ module Base_checker = struct
       method! vinst i =
         let treat_call lvopt f args _loc =
           match f with
-          | Var f, NoOffset ->
+          | Var f ->
             let (treturn,targs,is_variadic,_) = Cil.splitFunctionTypeVI f in
             if Ast_types.is_void treturn && lvopt != None then
               check_abort

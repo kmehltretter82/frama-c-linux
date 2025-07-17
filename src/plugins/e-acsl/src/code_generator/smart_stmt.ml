@@ -102,7 +102,7 @@ let block stmt b = match b.bstmts with
 (* ********************************************************************** *)
 
 let do_call ~loc ?result vi args =
-  let f = Cil.var vi in
+  let f = Var vi in
   vi.vreferenced <- true;
   let make_args ~variadic args param_ty =
     let rec make_rev_args res args param_ty =

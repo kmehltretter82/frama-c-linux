@@ -195,7 +195,7 @@ class exn_visit =
 
     method! vinst =
       function
-      | Call(_, (Var f, NoOffset), _, _)
+      | Call(_, Var f, _, _)
       | Local_init(_, ConsInit(f, _, _), _) ->
         let kf = Globals.Functions.get f in
         if self#recursive_call kf then begin
@@ -410,8 +410,8 @@ let find_exns_func v =
 
 let find_exns lv =
   match lv with
-  | Var v, NoOffset -> find_exns_func v
-  | _, _ -> all_exn ()
+  | Var v -> find_exns_func v
+  | _ -> all_exn ()
 
 class erase_exn =
   object(self)

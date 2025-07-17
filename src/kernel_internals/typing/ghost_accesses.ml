@@ -50,10 +50,10 @@ module Error = struct
       "'%a' is a non-ghost lvalue, it cannot be assigned in ghost code"
       Cil_printer.pp_lval lv
 
-  let bad_cast_on_return ?source ?once ?current flv ret_type lv =
+  let bad_cast_on_return ?source ?once ?current f ret_type lv =
     error ?source ?once ?current
       "Cannot cast return of '%a' from '%a' to '%a'"
-      Cil_printer.pp_lval flv
+      Cil_printer.pp_lhost f
       Cil_printer.pp_typ ret_type
       Cil_printer.pp_typ (typeOfLval lv)
 
@@ -165,9 +165,9 @@ class visitor = object(self)
       (* Non ghost code has already been checked by Cabs2Cil *)
       Cil.DoChildren
     else begin
-      let error_if_incompatible lv ret_type flv =
+      let error_if_incompatible lv ret_type f =
         if self#ghost_incompatible (typeOfLval lv) ret_type then
-          Error.bad_cast_on_return ~current:true flv ret_type lv
+          Error.bad_cast_on_return ~current:true f ret_type lv
       in
       let error_if_not_writable lv =
         if not (Ast_types.is_ghost (typeOfLval lv)) then
@@ -194,14 +194,14 @@ class visitor = object(self)
           | Some lv -> begin
               error_if_not_writable lv ;
               match i with
-              | Call(_, flv, _, _) ->
+              | Call(_, f, _, _) ->
                 let vi =
-                  Kernel_function.(get_vi @@ Option.get @@ get_called flv) in
+                  Kernel_function.(get_vi @@ Option.get @@ get_called f) in
                 if not (Ast_info.is_frama_c_builtin vi) then
-                  error_if_incompatible lv (getReturnType (typeOfLval flv)) flv
+                  error_if_incompatible lv (getReturnType (typeOfLhost f)) f
               | Local_init(_, ConsInit(fct, _, _), _) ->
                 if not (Ast_info.is_frama_c_builtin fct) then
-                  error_if_incompatible lv (getReturnType fct.vtype) (var fct)
+                  error_if_incompatible lv (getReturnType fct.vtype) (Var fct)
               | _ -> ()
             end
           (* Note that we do not check "assigns" for a ghost function call since

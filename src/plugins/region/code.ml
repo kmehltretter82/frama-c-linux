@@ -178,13 +178,13 @@ let add_instr ~kf (m:map) (s:stmt) (instr:instr) =
     Memory.add_write m r (Lval (s,Cil.var x)) ;
     Cil.treat_constructor_as_func
       begin fun _res fct args _loc ->
-        ignore (add_lval m s fct);
+        ignore (add_lhost m s fct);
         List.iter (add_value m s) args ;
         add_call ~kf ~stmt:s m ~result:(Some r) fct args
       end x vf args kind loc
 
   | Call(lr,f,es,_) ->
-    ignore (add_lval m s f);
+    ignore (add_lhost m s f);
     List.iter (add_value m s) es ;
     let result = Option.map
         (fun lv ->

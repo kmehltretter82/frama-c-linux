@@ -326,9 +326,9 @@ let inliner functions_to_inline = object (self)
            s)
     | Instr(Call(return, f, args, _)) ->
       (match f with
-       | Var vi, NoOffset ->
+       | Var vi ->
          self#inline stmt None return vi args
-       | _, _ ->
+       | _ ->
          Kernel.warning ~wkey ~current:true ~once:true
            "Ignoring call via function pointer";
          Cil.DoChildren)

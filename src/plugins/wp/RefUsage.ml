@@ -628,7 +628,7 @@ let cfun_code env kf = (* Visits term/pred of code annotations and C exp *)
         do_lval_opt lval_opt ;
         match Kernel_function.get_called fun_lv with
         | None ->
-          do_lval fun_lv; List.iter do_exp args_list
+          do_lval (fun_lv,NoOffset); List.iter do_exp args_list
         | Some called_kf -> do_args called_kf args_list
       end
     | Instr(Local_init (v,AssignInit i,_)) -> update_code_env (cinit v i)

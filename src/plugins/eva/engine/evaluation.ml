@@ -1718,21 +1718,22 @@ module Make
     let expr = Eva_ast.Build.(ne expr (var_addr vi_f)) in
     fst (reduce ~valuation state expr false)
 
-  let eval_function ?subdivnb funclv ?args state =
-    match funclv.node with
-    | Var vinfo, NoOffset ->
+  let eval_function ?subdivnb func ?args state =
+    match func with
+    | Var vinfo ->
       `Value [Globals.Functions.get vinfo, Valuation.empty], Alarmset.none
-    | Mem v, NoOffset ->
+    | Mem v ->
       begin
         let open Evaluated.Operators in
         let* valuation, value = evaluate ?subdivnb state v in
         let kfs, alarm = Value.resolve_functions value in
         match kfs with
-        | `Top -> top_function_pointer funclv
+        | `Top -> top_function_pointer (Eva_ast.mk_lval (func,NoOffset))
         | `Value kfs ->
           let open Bottom.Operators in
           let args_types = Option.map (List.map (fun e -> e.typ)) args in
-          let compatible_funcs = Eval_typ.compatible_functions funclv.typ in
+          let ftyp = Eva_ast.type_of_lhost func in
+          let compatible_funcs = Eval_typ.compatible_functions ftyp in
           let kfs, alarm' = compatible_funcs ?args:args_types kfs in
           let reduce = backward_function_pointer valuation state v in
           let reduce kf = let+ value = reduce kf in (kf, value) in
@@ -1748,5 +1749,4 @@ module Make
           let alarms = Alarmset.singleton ~status alarm in
           res, alarms
       end
-    | _ -> assert false
 end

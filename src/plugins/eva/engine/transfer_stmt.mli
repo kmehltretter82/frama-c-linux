@@ -36,7 +36,7 @@ module type S = sig
   val assume: state -> stmt -> exp -> bool -> state or_bottom
 
   val call:
-    stmt -> lval option -> lval -> exp list -> state ->
+    stmt -> lval option -> lhost -> exp list -> state ->
     state Engine_sig.call_result
 
   val check_unspecified_sequence:

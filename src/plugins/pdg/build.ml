@@ -697,7 +697,7 @@ let call_outputs  pdg state_before_call state_with_inputs stmt
     Use the state at ki (before the call)
     and returns the new state (after the call).
 *)
-let process_call pdg state stmt lvaloption funclv argl _loc =
+let process_call pdg state stmt lvaloption func argl _loc =
   let state_before_call = state in
   (* add a simple node for each call in order to have something in the PDG
      for this statement even if there are no input/output *)
@@ -705,7 +705,7 @@ let process_call pdg state stmt lvaloption funclv argl _loc =
   let arg_nodes = process_args pdg state_before_call stmt argl in
   let state_with_args = state in
   let called_functions = Eva.Results.callee stmt in
-  let funclv_dpds = Eva.Results.(before stmt |> address_deps funclv) in
+  let func_dpds = Eva.Results.(before stmt |> address_deps (func,NoOffset)) in
   let mixed_froms =
     try let froms = From.Callwise.find (Kstmt stmt) in Some froms
     with Not_found -> None (* don't have callwise analysis (-calldeps option) *)
@@ -721,7 +721,7 @@ let process_call pdg state stmt lvaloption funclv argl _loc =
         let froms = From.get called_kf in
         let state_for_this_call =
           call_outputs pdg state_before_call state_with_inputs
-            stmt lvaloption froms funclv_dpds
+            stmt lvaloption froms func_dpds
         in state_for_this_call
     in r :: acc
   in
@@ -745,7 +745,7 @@ let process_call pdg state stmt lvaloption funclv argl _loc =
     | None -> new_state
     | Some froms ->
       call_outputs pdg state_before_call new_state
-        stmt lvaloption froms funclv_dpds
+        stmt lvaloption froms func_dpds
   in
   new_state
 
@@ -878,9 +878,9 @@ module Computer
       Cil.treat_constructor_as_func
         (process_call current_pdg state stmt) v f args kind loc
     | Set (lv, exp, _) -> process_asgn current_pdg state stmt lv exp
-    | Call (lvaloption,funclv,argl,loc) ->
+    | Call (lvaloption,func,argl,loc) ->
       Async.yield ();
-      process_call current_pdg state stmt lvaloption funclv argl loc
+      process_call current_pdg state stmt lvaloption func argl loc
     | Code_annot _
     | Skip _ -> process_skip current_pdg state stmt
     | Asm  _ -> process_asm current_pdg state stmt

@@ -207,9 +207,9 @@ class collector =
       | Set(lv,e,_) ->
         self#add_lhs lv ;
         self#add_expr e
-      | Call(lvopt,lv,es,_) ->
+      | Call(lvopt,f,es,_) ->
         Option.iter self#add_lhs lvopt ;
-        ignore (self#add lv) ;
+        ignore (self#add (f,NoOffset)) ;
         List.iter self#add_expr es
       | instr ->
         ignore @@ Visitor.visitFramacInstr (self :> visitor) instr

@@ -152,10 +152,10 @@ let process_one_call data stmt lvaloption froms =
   let used = res_used || out_used in
   used, data
 
-let process_call data_after stmt lvaloption funclv args _loc =
-  let funclv_dpds = Eva.Results.(before stmt |> lval_deps funclv)
+let process_call data_after stmt lvaloption func args _loc =
+  let funclv_dpds = Eva.Results.(before stmt |> lval_deps (func,NoOffset))
   and called_functions =
-    Eva.Results.(before stmt |> eval_callee funclv |> default [])
+    Eva.Results.(before stmt |> eval_callee func |> default [])
   in
   let used, data =
     try

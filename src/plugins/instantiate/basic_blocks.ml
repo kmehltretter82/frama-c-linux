@@ -46,7 +46,7 @@ let call_function lval vi args =
     else Cil.mkCast ~newt:typ exp
   in
   let args = List.map2 gen_arg args typs in
-  Call(lval, (Cil.var vi), args, loc)
+  Call(lval, (Var vi), args, loc)
 
 let rec string_of_typ_aux t =
   match t.tnode with

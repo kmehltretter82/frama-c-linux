@@ -45,7 +45,7 @@ let strip_prefix p s =
 
 (* True if a named function has a definition and false otherwise *)
 let has_fundef = function
-  | Var vi, _ ->
+  | Var vi ->
     let kf =
       try Globals.Functions.get vi
       with Not_found -> Options.fatal "[has_fundef] not a function"
@@ -108,7 +108,7 @@ module Libc = struct
   let is_memset_name name = name = "memset"
 
   let apply_fn f = function
-    | Var vi, _ -> f vi.vname
+    | Var vi -> f vi.vname
     | _  (* function pointer *) -> false
 
   let is_vla_free exp = apply_fn is_vla_free_name exp

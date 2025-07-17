@@ -1083,10 +1083,10 @@ val block_from_unspecified_sequence:
     the parameters corresponding to the call to [f], of kind [kind],
     initializing [v] with arguments [args].
     @since Phosphorus-20170501-beta1
-    @before Frama-C+dev [action] took an expression instead of an lval.
+    @before Frama-C+dev [action] took an expression instead of an lhost.
 *)
 val treat_constructor_as_func:
-  (lval option -> lval -> exp list -> location -> 'a) ->
+  (lval option -> lhost -> exp list -> location -> 'a) ->
   varinfo -> varinfo -> exp list -> constructor_kind -> location -> 'a
 
 (** [find_def_stmt b v] returns the [Local_init] instruction within [b] that
@@ -1323,6 +1323,11 @@ class type cilVisitor = object
 
   method vlval: lval -> lval visitAction
   (** Invoked on each lvalue occurrence *)
+
+  method vlhost: lhost -> lhost visitAction
+  (** Invoked on each lhost occurrence.
+      @since Frama-C+dev
+  *)
 
   method voffs: offset -> offset visitAction
   (** Invoked on each offset occurrence that is *not* as part of an
@@ -1576,6 +1581,11 @@ val visitCilEnumInfo: cilVisitor -> enuminfo -> enuminfo
 
 (** Visit an lvalue *)
 val visitCilLval: cilVisitor -> lval -> lval
+
+(** Visit an lhost.
+    @since Frama-C+dev
+*)
+val visitCilLhost: cilVisitor -> lhost -> lhost
 
 (** Visit an lvalue or recursive offset *)
 val visitCilOffset: cilVisitor -> offset -> offset

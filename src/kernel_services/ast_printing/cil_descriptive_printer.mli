@@ -30,3 +30,4 @@
 open Cil_types
 val pp_exp: Format.formatter -> exp -> unit
 val pp_lval: Format.formatter -> lval -> unit
+val pp_lhost: Format.formatter -> lhost -> unit

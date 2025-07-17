@@ -165,7 +165,7 @@ module type Results = sig
 
   (** Evaluates the function argument of a [Call] constructor. *)
   val eval_function:
-    state -> ?args:exp list -> lval -> kernel_function list evaluated
+    state -> ?args:exp list -> lhost -> kernel_function list evaluated
 
   (** [assume_cond stmt state expr b] reduces the given abstract state
       by assuming [exp] evaluates to:

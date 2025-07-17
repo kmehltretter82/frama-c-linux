@@ -151,6 +151,11 @@ val visitFramacExpr: frama_c_visitor -> exp -> exp
 (** Visit an lvalue *)
 val visitFramacLval: frama_c_visitor -> lval -> lval
 
+(** Visit a lhost.
+    @since Frama-C+dev.
+*)
+val visitFramacLhost: frama_c_visitor -> lhost -> lhost
+
 (** Visit an lvalue or recursive offset *)
 val visitFramacOffset: frama_c_visitor -> offset -> offset
 

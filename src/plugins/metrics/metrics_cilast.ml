@@ -351,8 +351,8 @@ class slocVisitor ~libc : sloc_visitor = object(self)
       | Call(v, lv, _, _) ->
         self#incr_both_metrics incr_calls;
         (match lv with
-         | Var vinfo, NoOffset -> self#update_call_maps vinfo 1
-         | _, _ -> ());
+         | Var vinfo -> self#update_call_maps vinfo 1
+         | _ -> ());
         (match v with
          | Some _ -> self#incr_both_metrics incr_assigns
          | None -> ());
@@ -774,7 +774,7 @@ class locals_size_visitor kf callstack = object
   inherit Visitor.frama_c_inplace
 
   method! vinst i = match i with
-    | Call (_, (Var vi, NoOffset), _, _)
+    | Call (_, Var vi, _, _)
     | Local_init(_, ConsInit(vi,_,_),_) ->
       begin
         try

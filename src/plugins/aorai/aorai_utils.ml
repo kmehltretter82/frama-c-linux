@@ -557,7 +557,7 @@ let mk_behavior_call generated_kf kf bhv =
       ~valid_sid:true
       (Cil_types.Call (
           Some (Var res, NoOffset),
-          Cil.var aux,
+          Var aux,
           List.map (fun x -> Cil.evar x) (Kernel_function.get_formals kf),
           Cil_datatype.Location.unknown))
   in

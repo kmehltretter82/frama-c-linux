@@ -392,7 +392,7 @@ struct
       @^ exit_status (env_call @* [(Clabels.here, exit_stop);
                                    (Clabels.next, env @: Clabels.exit)])
 
-  and call : env -> lval option -> lval -> exp list -> paths =
+  and call : env -> lval option -> lhost -> exp list -> paths =
     fun env dest f es ->
     match Kernel_function.get_called f with
     | Some kf -> call_kf env dest kf es

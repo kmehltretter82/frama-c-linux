@@ -433,8 +433,8 @@ let build_node_writes context node =
   and build_call_deps ~origin ~callstack stmt callee args : deps_builder =
     let gstmt = Local (stmt, callstack) in
     let callee_deps = match callee with
-      | Var _vi, _offset -> Seq.empty
-      | Mem exp, _offset ->
+      | Var _vi -> Seq.empty
+      | Mem exp ->
         build_exp_deps ~origin gstmt Callee exp
     and return_deps =
       List.to_seq (Eval.to_kf_list (Kstmt stmt) callee) |>

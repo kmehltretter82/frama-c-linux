@@ -53,9 +53,9 @@ module ReturnUsage = struct
 
   (* Treat a [Call] instruction. Immediate calls (no functions pointers)
      are added to the current usage store *)
-  let add_call (uf: return_usage_per_fun) lv_opt lv_fun =
-    match lv_fun, lv_opt with
-    | (Var vi, NoOffset), Some lv
+  let add_call (uf: return_usage_per_fun) lv_opt f =
+    match f, lv_opt with
+    | Var vi, Some lv
       when Ast_types.is_integral_or_pointer (Cil.typeOfLval lv) ->
       let kf = Globals.Functions.get vi in
       let u = find_or_default uf lv in
@@ -187,7 +187,7 @@ module ReturnUsage = struct
          in
          aux (Cil.var v) i
        | Local_init(v, ConsInit(f,_,Plain_func), _) ->
-         usage <- add_call usage (Some (Cil.var v)) (Cil.var f)
+         usage <- add_call usage (Some (Cil.var v)) (Var f)
        | Local_init(_, ConsInit _,_) -> () (* not a real assignment. *)
        | Asm _ | Skip _ | Code_annot _ -> ()
       );

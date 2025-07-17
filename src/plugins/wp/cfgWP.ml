@@ -1071,7 +1071,7 @@ struct
   let call_dynamic wenv stmt gpid fct calls = L.in_frame wenv.frame
       begin fun () ->
         let sigma = Sigma.create () in
-        let called = call_pointer sigma fct in
+        let called = call_pointer sigma (fct,NoOffset) in
         let vcs_calls = List.map (call_contract stmt sigma gpid called) calls in
         let vcs = merge_all_vcs vcs_calls in
         let vcs = call_instance_of gpid called (List.map fst calls) vcs in

@@ -221,7 +221,7 @@ class visit_adding_code_for_synchronisation =
       Cil_datatype.Varinfo.Set.iter (Aux_funcs.add_aux kf) aux_funcs;
       fundec.sbody.bstmts <-
         Cil.mkStmtOneInstr ~ghost:true
-          (Call(None,Cil.var vi_pre,
+          (Call(None, Var vi_pre,
                 List.map (fun x -> Cil.evar ~loc x)
                   (Kernel_function.get_formals kf),
                 loc))
@@ -263,7 +263,7 @@ class visit_adding_code_for_synchronisation =
           in
           let call =
             mkStmtOneInstr
-              ~ghost:true (Call (None, Cil.var aux_vi, args, loc))
+              ~ghost:true (Call (None, Var aux_vi, args, loc))
           in
           let new_return = mkStmt ~valid_sid:true stmt.skind in
           let new_stmts = [call; new_return] in

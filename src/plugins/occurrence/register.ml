@@ -158,7 +158,7 @@ let classify_accesses (_kf, ki, lv) =
   let vis = new is_sub_lval lv in
   let aux f v = try ignore (f vis v); false with Exit -> true in
   let is_lv = Cil_datatype.Lval.equal lv in
-  let contained_lval = aux Cil.visitCilLval in
+  let contained_lhost = aux Cil.visitCilLhost in
   let contained_exp = aux Cil.visitCilExpr in
   match ki with
   | Kglobal -> (* Probably initializers *) Read
@@ -173,7 +173,7 @@ let classify_accesses (_kf, ki, lv) =
 
      | Call (Some lv', f, args, _) ->
        if is_lv lv' then
-         if contained_lval f || List.exists contained_exp args then Both
+         if contained_lhost f || List.exists contained_exp args then Both
          else Write
        else Read
 

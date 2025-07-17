@@ -445,10 +445,10 @@ let find_label kf label =
   Datatype.String.Map.find label labels
 
 let get_called = function
-  | Var vkf, _ ->
+  | Var vkf ->
     (try Some (Globals.Functions.get vkf)
      with Not_found -> None)
-  | _, _ -> None
+  | _ -> None
 
 (* ************************************************************************* *)
 (** {2 CallSites} *)
@@ -464,9 +464,9 @@ module KfCallers =
     end)
 
 let called_kernel_function = function
-  | Var vinfo, _ ->
+  | Var vinfo ->
     (try Some(Globals.Functions.get vinfo) with Not_found -> None)
-  | _, _ -> None
+  | _ -> None
 
 class callsite_visitor hmap = object (self)
   inherit Cil.nopCilVisitor

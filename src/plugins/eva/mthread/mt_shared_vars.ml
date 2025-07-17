@@ -241,7 +241,7 @@ class do_it cp =
 
     method private do_call lv =
       cp.iter_requests self#cur_stmt (fun request ->
-          let deps = Results.address_deps lv request in
+          let deps = Results.address_deps (lv,NoOffset) request in
           self#add_access Read deps;
           (* In global mode, we treat the recursive calls. In precise
              mode, they are done elsewhere in the construction of the cfg *)
@@ -260,7 +260,7 @@ class do_it cp =
         | Local_init(v, AssignInit i, _) -> self#do_init v i; Cil.SkipChildren
         | Local_init(v, ConsInit (f, args, _), _) ->
           self#do_assign (Cil.var v);
-          self#do_call (Cil.var f);
+          self#do_call (Var f);
           List.iter visit_expr args;
           Cil.SkipChildren
         | Call (lv_opt,lv,args,_) ->

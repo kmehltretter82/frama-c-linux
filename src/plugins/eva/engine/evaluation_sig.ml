@@ -119,7 +119,7 @@ module type S = sig
     state -> exp -> value -> Valuation.t or_bottom
 
   val eval_function:
-    ?subdivnb:int -> lval -> ?args:exp list -> state ->
+    ?subdivnb:int -> lhost -> ?args:exp list -> state ->
     (Kernel_function.t * Valuation.t) list evaluated
   (** Evaluation of the function argument of a [Call] constructor. *)
 

@@ -163,12 +163,12 @@ class annot_visitor kf flags on_alarm = object (self)
   (* assigned left values are checked for valid access *)
   method! vinst = function
     | Set (lval,_,_) -> self#check_assigned lval
-    | Call (ret_opt,funclv,argl,_) ->
+    | Call (ret_opt,func,argl,_) ->
       (* Do not emit alarms on Eva builtins such as Frama_C_show_each, that should
          have no effect on analyses. *)
       let is_builtin, is_va_start =
-        match funclv with
-        | Var vinfo, NoOffset ->
+        match func with
+        | Var vinfo ->
           let kf = Globals.Functions.get vinfo in
           let frama_b = Ast_info.start_with_frama_c_builtin (Kernel_function.get_name kf)
           in
@@ -177,7 +177,7 @@ class annot_visitor kf flags on_alarm = object (self)
             fname = "__builtin_va_start" || fname = "__builtin_c23_va_start"
           in
           (frama_b, va_start)
-        | _, _ -> (false, false)
+        | _ -> (false, false)
       in
       if is_va_start then begin
         match (List.nth argl 0).enode with
@@ -192,9 +192,9 @@ class annot_visitor kf flags on_alarm = object (self)
            more pleasant ordering of annotations. *)
         let do_ptr () =
           if self#do_pointer_call () then
-            match funclv with
-            | Mem e, _ -> self#generate_assertion Rte.pointer_call (e, argl)
-            | _, _ -> ()
+            match func with
+            | Mem e -> self#generate_assertion Rte.pointer_call (e, argl)
+            | _ -> ()
         in
         Cil.DoChildrenPost (fun res -> do_ptr (); res)
       end

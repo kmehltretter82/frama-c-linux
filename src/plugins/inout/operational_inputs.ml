@@ -316,7 +316,7 @@ module Computer(Fenv:Dataflows.FUNCTION_ENV)(X:sig
   let transfer_call ~for_writing s dest f args _loc data =
     let request = X.stmt_request s in
     (* Join the inputs of [args] and of the function expression. *)
-    let f_inputs = Eva.Results.lval_deps f request in
+    let f_inputs = Eva.Results.lval_deps (f,NoOffset) request in
     let eval_deps acc e = Zone.join acc (Eva.Results.expr_deps e request) in
     let f_args_inputs = List.fold_left eval_deps f_inputs args in
     let data =

@@ -86,7 +86,7 @@ struct
     in
     let call_process lv f args _loc =
       (* returns  [Zone.t read] by [lv, f, args], [Zone.t written] by [lv] *)
-      let read_zone = Eva.Results.(before stmt |> lval_deps f) in
+      let read_zone = Eva.Results.(before stmt |> lval_deps (f,NoOffset)) in
       let add_args arg inputs =
         Locations.Zone.join inputs Eva.Results.(before stmt |> expr_deps arg)
       in
@@ -117,8 +117,8 @@ struct
       in
       let read_zone = collect Locations.Zone.bottom i in
       lval_process read_zone stmt (Cil.var v)
-    | Instr (Call (lvaloption,funclv,argl,l)) ->
-      call_process lvaloption funclv argl l
+    | Instr (Call (lvaloption,func,argl,l)) ->
+      call_process lvaloption func argl l
     | Instr (Local_init(v, ConsInit(f, args, k),l)) ->
       Cil.treat_constructor_as_func call_process v f args k l
     | _ -> Locations.Zone.bottom, Locations.Zone.bottom

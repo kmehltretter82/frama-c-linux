@@ -454,10 +454,10 @@ let function_to_exp ~loc ?tapp fname env kf li params_ty profile args =
     in
     if result_as_extra_argument ret_ty then
       let args = mk_args fvi.vtype (Cil.mkAddrOf ~loc (Cil.var vi) :: args) in
-      Call(None, Cil.var fvi, args, loc)
+      Call(None, Var fvi, args, loc)
     else
       let args = mk_args fvi.vtype args in
-      Call(Some (Cil.var vi), Cil.var fvi, args, loc)
+      Call(Some (Cil.var vi), Var fvi, args, loc)
   in
   (* generate the varinfo storing the result of the call *)
   Env.new_var

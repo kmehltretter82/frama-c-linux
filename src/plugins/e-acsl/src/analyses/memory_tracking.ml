@@ -651,7 +651,7 @@ module rec Transfer
       do_call (Some (Cil.var v)) f args state
     | Call(result, f_lv, l, _) ->
       (match f_lv with
-       | Var vi, NoOffset -> do_call result vi l state
+       | Var vi -> do_call result vi l state
        | _ ->
          Options.warning ~current:true
            "function pointers may introduce too limited instrumentation.";

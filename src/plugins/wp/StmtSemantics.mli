@@ -99,7 +99,7 @@ module Make : Memory.Compiler ->
     val assume : Cfg.P.t -> paths
 
     val call_kf : env -> lval option -> kernel_function -> exp list -> paths
-    val call : env -> lval option -> lval -> exp list -> paths
+    val call : env -> lval option -> lhost -> exp list -> paths
 
     (** {2 ACSL Compilation}  *)
 

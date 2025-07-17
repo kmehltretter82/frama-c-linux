@@ -1022,7 +1022,7 @@ and is_same_instr i i' env: body_correspondence*is_same_env =
        is_same_list is_same_exp args args' env
     then begin
       match f, f' with
-      | (Var f,NoOffset), (Var f', NoOffset) ->
+      | Var f, Var f' ->
         (match gfun_correspondence f env with
          | `Partial _ | `Not_present -> `Callees_changed, env
          | `Same f'' ->

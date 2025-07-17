@@ -256,7 +256,7 @@ class stmt_collector = object
   method! vstmt stmt =
     begin
       match stmt.skind with
-      | (Instr (Call (_, (Var vi, _), _, _))
+      | (Instr (Call (_, Var vi, _, _))
         | Instr (Local_init (_, ConsInit(vi,_,_), _))) when
           (ignore_kf vi.vname) -> ()
       | _ -> instr_stmts := stmt :: !instr_stmts

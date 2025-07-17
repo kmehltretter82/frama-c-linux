@@ -465,7 +465,7 @@ end = struct
       | None -> call_stmt.skind
       | Some (called_kf, called_finfo) ->
         let var_slice = ff_var fun_vars called_kf called_finfo in
-        let new_funclv = Cil.var var_slice in
+        let new_func = Var var_slice in
         let new_args = filter_params called_finfo args in
         let need_lval = Info.res_call_visible finfo call_stmt in
         let new_lval = if need_lval then lval else None in
@@ -480,16 +480,16 @@ end = struct
                 | _ -> assert false (* We have kept the first argument. *)
               end else begin
                 (* variable is useless. *)
-                Call(None, new_funclv, new_args, loc)
+                Call(None, new_func, new_args, loc)
               end
             | Some _ ->
               (match new_lval with
-               | None -> Call (None, new_funclv, new_args, loc)
+               | None -> Call (None, new_func, new_args, loc)
                | Some (Var v, NoOffset) ->
                  Local_init(v, ConsInit(var_slice, new_args, Plain_func), loc)
                | Some _ -> assert false (* destination must be a variable *))
           end
-          else Call (new_lval, new_funclv, new_args, loc)
+          else Call (new_lval, new_func, new_args, loc)
         in
         debug "[process_call] call %s@." var_slice.vname;
         Instr (new_call)

@@ -62,7 +62,7 @@ let add_called_function stmt kf =
 
 let all_functions_with_preconditions stmt =
   match stmt with
-  | { skind=Instr (Call(_,(Var vkf, NoOffset),_,_)
+  | { skind=Instr (Call(_,Var vkf,_,_)
                   |Local_init(_,ConsInit(vkf,_,_),_)) } ->
     let kf = Globals.Functions.get vkf in
     Kernel_function.Hptset.singleton kf
@@ -192,7 +192,7 @@ module PreCondAt =
 (* Transposes the precondition property [pid] of the called function [kf]
    at call site [stmt], with arguments [args], result assigned in [result],
    and function lvalue [funclv]. *)
-let rec transpose_precondition stmt pid kf funclv args =
+let rec transpose_precondition stmt pid kf func args =
   let formals = Kernel_function.get_formals kf in
   let ip = match pid with
     | Property.IPPredicate {Property.ip_pred} -> ip_pred
@@ -202,10 +202,10 @@ let rec transpose_precondition stmt pid kf funclv args =
   let kf_call = Kernel_function.find_englobing_kf stmt in
   let p = Property.ip_property_instance kf_call stmt ip pid in
   PreCondAt.add (pid, stmt) p;
-  (match funclv with
-   | Var vkf, NoOffset ->
+  (match func with
+   | Var vkf ->
      assert (Cil_datatype.Varinfo.equal vkf (Kernel_function.get_vi kf))
-   | _, _ ->
+   | _ ->
      let loc = Cil_datatype.Stmt.loc stmt in
      Kernel.debug ~source:(fst loc)
        "Adding precondition for call to %a through pointer"
@@ -220,7 +220,7 @@ and precondition_at_call kf pid stmt =
   with Not_found ->
     let do_call = transpose_precondition stmt pid kf in
     match stmt.skind with
-    | Instr (Call (_, funclv, args, _)) -> do_call funclv args
+    | Instr (Call (_, func, args, _)) -> do_call func args
     | Instr (Local_init (v, ConsInit (f, args, kind), loc)) ->
       let do_call _result funclv args _loc = do_call funclv args in
       Cil.treat_constructor_as_func do_call v f args kind loc

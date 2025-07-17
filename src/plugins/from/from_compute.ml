@@ -325,7 +325,7 @@ struct
       Async.yield ();
       let request = To_Use.stmt_request stmt in
       let called_vinfos = Eva.Results.(eval_callee f request |> default []) in
-      let f_deps = Eva.Results.lval_deps f request in
+      let f_deps = Eva.Results.lval_deps (f,NoOffset) request in
       (* dependencies for the evaluation of [f] *)
       let f_deps = Eva.Assigns.Memory.find state.deps_table f_deps in
       let additional_deps =
