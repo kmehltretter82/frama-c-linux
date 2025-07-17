@@ -78,7 +78,7 @@ module Name = WpContext.Generator(R)
         match Region.labels map r with
         | label::_ -> Some label
         | [] ->
-          match Region.roots map r with
+          match Region.cvars map r with
           | v::_ -> Some v.vorig_name
           | _ -> None
     end)

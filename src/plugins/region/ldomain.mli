@@ -20,36 +20,49 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* -------------------------------------------------------------------------- *)
-(* --- Region Analysis API                                                --- *)
-(* -------------------------------------------------------------------------- *)
+open Format
+open Cil_types
+open Cil_datatype
 
-type map = Memory.map
-type node = Memory.node
-let map kf = (Analysis.get kf).map
-let id n = Memory.id n
-let uid m n = Memory.id @@ Memory.node m n
-let iter = Memory.iter
-let find m id = Memory.node m @@ Memory.forge id
-let node = Memory.node
-let nodes = Memory.nodes
-let equal = Memory.equal
-let included = Memory.included
-let separated = Memory.separated
-let singleton = Memory.singleton
-let size = Memory.size
-let cvars = Memory.cvars
-let labels = Memory.labels
-let reads = Memory.reads
-let writes = Memory.writes
-let shifts = Memory.shifts
-let typed = Memory.typed
-let parents m n = Memory.nodes m @@ Memory.parents m n
-let points_to m n = Option.map (Memory.node m) @@ Memory.points_to m n
-let pointed_by m n = Memory.nodes m @@ Memory.pointed_by m n
-let lval m l = Memory.node m @@ Memory.lval m l
-let exp m e = Option.map (Memory.node m) @@ Memory.exp m e
-let cvar = Memory.cvar
-let field = Memory.field
-let index = Memory.index
-let footprint = Memory.footprint
+type 'a t = private
+  | Pure
+  | Dvar   of string
+  | Ptr    of 'a
+  | Array  of 'a t
+  | Record of 'a t Fieldinfo.Map.t
+  | Logic  of logic_type_info * 'a t list
+  | Arrow  of 'a t list * 'a t
+
+val is_pure : 'a t -> bool
+val pretty : (formatter -> 'a -> unit) -> formatter -> 'a t -> unit
+
+val pure : 'a t
+val ptr : 'a -> 'a t
+val scalar : 'a option -> 'a t
+val array : 'a t -> 'a t
+val field : fieldinfo -> 'a t -> 'a t
+val record : 'a t Fieldinfo.Map.t -> 'a t
+val logic : logic_type_info -> 'a t list -> 'a t
+val arrow : 'a t list -> 'a t -> 'a t
+
+val merge : ('a -> 'a -> 'a) -> 'a t -> 'a t -> 'a t
+
+(** Flattens and merge all pointed regions in the domain *)
+val pointed : ('a -> 'a -> 'a) -> 'a t -> 'a option
+
+val get_field : ('a -> 'a -> 'a) -> 'a t -> fieldinfo -> 'a t
+val get_index : ('a -> 'a -> 'a) -> 'a t -> 'a t
+
+val iter : ('a -> unit) -> 'a t -> unit
+
+type 'a context
+
+val empty : 'a context
+val make : (string * 'a t) list -> 'a context
+
+val of_ltype : (unit -> 'a) -> logic_type -> 'a t
+val of_typ : (unit -> 'a) -> typ -> 'a t
+
+type 'a sigma = 'a context ref
+val unify : ('a -> 'a -> 'a) -> 'a sigma -> 'a t -> 'a t -> unit
+val subst : 'a context -> 'a t -> 'a t

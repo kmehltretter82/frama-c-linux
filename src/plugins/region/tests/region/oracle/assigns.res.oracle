@@ -1,0 +1,29 @@
+[kernel] Parsing assigns.i (no preprocessing)
+[region] Analyzing regions
+[region] Function caller_by_ref:
+  R0007: R-- B[64] (int) 32b ;
+  R0001: R-- modify_by_ref[…] (void (int **p, int *q, int k)) 0b ;
+  R0004: R-- k (int) 32b ;
+  R0002: R-- a (int *) 64b (*R0007) ;
+  R0009: RW- __retres (int) 32b ;
+  R000e: -W- (int) 32b ;
+[region] Function caller_result:
+  R0007: R-- B[64] (int) 32b ;
+  R0003: R-- modify_result[…] (int *(int *q, int k)) 0b ;
+  R0005: R-- k (int) 32b ;
+  R0001: RW- a (int *) 64b (*R0007) ;
+  R0009: RW- __retres (int) 32b ;
+  R000e: -W- (int) 32b ;
+[region] Function modify_by_ref:
+  R0001: R-- p (int **) 64b (*R0003) ;
+  R0003: RW- (int *) 64b (*R000a) ;
+  R000a: --A 64b ;
+  R0008: R-- q (int *) 64b (*R000a) ;
+  R000c: R-- k (int) 32b ;
+  R0015: --- 0b ;
+[region] Function modify_result:
+  R0005: R-- q (int *) 64b (*R0007) ;
+  R0007: --A 64b ;
+  R0009: R-- k (int) 32b ;
+  R000b: RW- __retres (int *) 64b (*R0007) ;
+  R0001: RW- (int *) 64b (*R0007) ;

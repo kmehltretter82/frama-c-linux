@@ -55,7 +55,7 @@ struct
   let title (Memory.Root r) =
     Format.asprintf "%a (%db) (%d cells)"
       Typ.pretty r.cvar.vtype
-      (Cil.bitsSizeOf r.cvar.vtype)
+      (Memory.bitsSizeOf r.cvar.vtype)
       r.cells
 
   let to_json (Memory.Root r as root) =
@@ -152,7 +152,7 @@ struct
     Buffer.contents buffer
 
   let pp_typ_layout s0 fmt ty =
-    let s = Cil.bitsSizeOf ty in
+    let s = Memory.bitsSizeOf ty in
     if s <> s0 then
       Format.fprintf fmt "(%a)%%%db" Typ.pretty ty s
     else
@@ -162,7 +162,7 @@ struct
     Format.asprintf "%t (%db)%t"
       begin fun fmt ->
         match m.types with
-        | [] -> Format.pp_print_string fmt "Compound"
+        | [] -> Format.pp_print_string fmt "Compound (empty)"
         | [ty] -> pp_typ_layout m.sizeof fmt ty ;
         | ty::ts ->
           pp_typ_layout 0 fmt ty ;
@@ -193,7 +193,7 @@ struct
   let to_json (m: Memory.region) =
     Json.of_fields [
       "node", Node.to_json m.node ;
-      "roots", Roots.to_json m.roots ;
+      "roots", Roots.to_json m.cvars ;
       "labels", labels_to_json m.labels ;
       "parents", NodeList.to_json m.parents ;
       "sizeof", Json.of_int @@ m.sizeof ;

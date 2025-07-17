@@ -27,6 +27,8 @@ module Vmap = Varinfo.Map
 module Vset = Varinfo.Set
 module Lmap = Map.Make(String)
 module Lset = Set.Make(String)
+module LVmap = Logic_var.Map
+module LVImap = Logic_info.Map
 
 (* -------------------------------------------------------------------------- *)
 (* --- Region Maps                                                        --- *)
@@ -45,7 +47,7 @@ and layout =
 and chunk = {
   cparents: node list ;
   cpointed: node list ;
-  croots: Vset.t ;
+  ccvars: Vset.t ;
   clabels: Lset.t ;
   creads: Access.Set.t ;
   cwrites: Access.Set.t ;
@@ -55,16 +57,27 @@ and chunk = {
 
 type rg = node Ranges.range
 
+type domain = node Ldomain.t
+type context = node Ldomain.context
+
 type map = {
   store: chunk Ufind.store ;
-  mutable locked: bool ;
-  mutable roots: node Vmap.t ;
   mutable labels: node Lmap.t ;
+  mutable locked: bool ;
+  mutable cvars: node Vmap.t ;
+  mutable lvars: domain LVmap.t ;
+  mutable logics: domain LVImap.t ;
+  mutable result: node option ;
 }
 
 (* -------------------------------------------------------------------------- *)
 (* --- Accessors                                                          --- *)
 (* -------------------------------------------------------------------------- *)
+
+let bitsSizeOf ty =
+  try Cil.bitsSizeOf ty with
+  | Cil.SizeOfError (_, { tnode = TFun _ }) -> Machine.sizeof_fun () * 8
+  | Cil.SizeOfError (_, { tnode = TVoid  }) -> Machine.sizeof_void () * 8
 
 let sizeof = function Blob -> 0 | Cell(s,_) | Compound(s,_,_) -> s
 let cranges = function Blob | Cell _ -> [] | Compound(_,_,R rs) -> rs
@@ -92,21 +105,27 @@ let unlock m = m.locked <- false
 let create () = {
   locked = false ;
   store = Ufind.new_store () ;
-  roots = Vmap.empty ;
+  cvars = Vmap.empty ;
   labels = Lmap.empty ;
+  lvars = LVmap.empty ;
+  logics = LVImap.empty ;
+  result = None;
 }
 
 let copy ?locked m = {
   locked = (match locked with None -> m.locked | Some l -> l) ;
   store = Ufind.copy m.store ;
-  roots = m.roots ;
+  cvars = m.cvars ;
   labels = m.labels ;
+  lvars = m.lvars ;
+  logics = m.logics ;
+  result = m.result ;
 }
 
 let empty = {
   cparents = [] ;
   cpointed = [] ;
-  croots = Vset.empty ;
+  ccvars = Vset.empty ;
   clabels = Lset.empty ;
   creads = Access.Set.empty ;
   cwrites = Access.Set.empty ;
@@ -165,7 +184,7 @@ let pp_chunk name fmt (m: chunk) =
       (acs 'R' m.creads) (acs 'W' m.cwrites) (acs 'A' m.cshifts) ;
     List.iter (Format.fprintf fmt "@ (%a)" Typ.pretty) (ctypes m) ;
     Lset.iter (Format.fprintf fmt "@ %s:") m.clabels ;
-    Vset.iter (Format.fprintf fmt "@ %a" Varinfo.pretty) m.croots ;
+    Vset.iter (Format.fprintf fmt "@ %a" Varinfo.pretty) m.ccvars ;
     if Options.debug_atleast 1 then
       begin
         Access.Set.iter (Format.fprintf fmt "@ R:%a" Access.pretty) m.creads ;
@@ -200,18 +219,11 @@ let new_chunk (m: map) ?parent ?(size=0) ?ptr ?pointed () =
     match ptr with
     | None -> if size = 0 then Blob else Cell(size,None)
     | Some _ ->
-      Cell(Ranges.gcd size (Cil.bitsSizeOf Cil_const.voidPtrType), ptr)
+      Cell(Ranges.gcd size (bitsSizeOf Cil_const.voidPtrType), ptr)
   in
   let cparents = match parent with None -> [] | Some root -> [root] in
   let cpointed = match pointed with None -> [] | Some ptr -> [ptr] in
   Ufind.make m.store  { empty with clayout ; cpointed ; cparents }
-
-let add_root (m: map) v =
-  try Vmap.find v m.roots with Not_found ->
-    failwith_locked m "Region.Memory.add_root" ;
-    let n = new_chunk m () in
-    update m n (fun d -> { d with croots = Vset.singleton v }) ;
-    m.roots <- Vmap.add v n m.roots ; n
 
 let add_label (m: map) a =
   try Lmap.find a m.labels with Not_found ->
@@ -219,6 +231,39 @@ let add_label (m: map) a =
     let n = new_chunk m () in
     update m n (fun d -> { d with clabels = Lset.singleton a }) ;
     m.labels <- Lmap.add a n m.labels ; n
+
+let add_cvar (m: map) v =
+  try Vmap.find v m.cvars with Not_found ->
+    failwith_locked m "Region.Memory.add_varinfo" ;
+    let n = new_chunk m () in
+    update m n (fun d -> { d with ccvars = Vset.singleton v }) ;
+    m.cvars <- Vmap.add v n m.cvars ; n
+
+let add_logic_info (m: map) f =
+  try LVImap.find f m.logics with Not_found ->
+    failwith_locked m "Region.Memory.add_logic_info" ;
+    let get_type t = Ldomain.of_ltype (new_chunk m) t in
+    let d = Option.fold ~none:Ldomain.pure ~some:get_type f.l_type in
+    m.logics <- LVImap.add f d m.logics ; d
+
+let add_logic_var (m: map) lv =
+  try LVmap.find lv m.lvars with Not_found ->
+    failwith_locked m "Region.Memory.add_logic_var" ;
+    assert (lv.lv_origin = None);
+    let d = Ldomain.of_ltype (new_chunk m) lv.lv_type in
+    m.lvars <- LVmap.add lv d m.lvars ; d
+
+let add_result (m: map) =
+  let result = match m.result with
+    | None -> new_chunk m ()
+    | Some r -> r
+  in m.result <- Some result ; result
+
+let domain_of_typ (m:map) (typ:typ) = Ldomain.of_typ (new_chunk m) typ
+
+let domain_of_ltyp (m:map) ?(ctxt) (lt:logic_type) =
+  let d : domain = Ldomain.of_ltype (new_chunk m) lt in
+  Option.fold ~none:d ~some:(fun (c:context) -> Ldomain.subst c d) ctxt
 
 (* -------------------------------------------------------------------------- *)
 (* --- Iterator                                                           --- *)
@@ -238,7 +283,10 @@ let rec walk h m (f: node -> unit) n =
 
 let iter (m:map) (f: node -> unit) =
   let h = Hashtbl.create 0 in
-  Vmap.iter (fun _x n -> walk h m f n) m.roots
+  Vmap.iter   (fun _x n ->           walk h m f n) m.cvars ;
+  LVmap.iter  (fun _ -> Ldomain.iter (walk h m f)) m.lvars ;
+  LVImap.iter (fun _ -> Ldomain.iter (walk h m f)) m.logics ;
+  Option.iter (walk h m f) m.result
 
 let size (m: map) (r: node) =
   sizeof (Ufind.get m.store r).clayout
@@ -246,8 +294,8 @@ let size (m: map) (r: node) =
 let parents (m: map) (r: node) =
   nodes m (Ufind.get m.store r).cparents
 
-let roots (m: map) (r: node) =
-  Vset.elements (Ufind.get m.store r).croots
+let cvars (m: map) (r: node) =
+  Vset.elements (Ufind.get m.store r).ccvars
 
 let labels (m: map) (r: node) =
   Lset.elements (Ufind.get m.store r).clabels
@@ -341,7 +389,7 @@ let merge_chunk (m: map) (q:queue) (root:node)
     cparents = nodes m @@ Store.bag a.cparents b.cparents ;
     cpointed = nodes m @@ Store.bag a.cpointed b.cpointed ;
     clabels = Lset.union a.clabels b.clabels ;
-    croots = Vset.union a.croots b.croots ;
+    ccvars = Vset.union a.ccvars b.ccvars ;
     creads = Access.Set.union a.creads b.creads ;
     cwrites = Access.Set.union a.cwrites b.cwrites ;
     cshifts = Access.Set.union a.cshifts b.cshifts ;
@@ -373,6 +421,8 @@ let merge (m: map) (a: node) (b: node) : unit =
   failwith_locked m "Region.Memory.merge" ;
   merge_all m [a;b]
 
+let merge_domain (m:map) = Ldomain.merge (fun a b -> merge m a b ; min a b)
+
 (* -------------------------------------------------------------------------- *)
 (* --- Offset                                                             --- *)
 (* -------------------------------------------------------------------------- *)
@@ -380,7 +430,7 @@ let merge (m: map) (a: node) (b: node) : unit =
 let add_field (m:map) (r:node) (fd:fieldinfo) : node =
   let ci = fd.fcomp in
   if not ci.cstruct then r else
-    let size = Cil.bitsSizeOf (Cil_const.mk_tcomp ci) in
+    let size = bitsSizeOf (Cil_const.mk_tcomp ci) in
     let offset, length = Cil.fieldBitsOffset fd in
     if offset = 0 && size = length then r else
       let data = new_chunk m ~parent:r () in
@@ -391,7 +441,7 @@ let add_field (m:map) (r:node) (fd:fieldinfo) : node =
       merge m r nc ; data
 
 let add_index (m:map) (r:node) (ty:typ) : node =
-  let size = Cil.bitsSizeOf ty in
+  let size = bitsSizeOf ty in
   let re = new_chunk m ~size () in
   merge m r re ; re
 
@@ -418,27 +468,28 @@ let add_value (m:map) (rv:node) (ty:typ) : node option =
 (* -------------------------------------------------------------------------- *)
 
 let sized (m:map) (a:node) (ty: typ) =
-  let sr = sizeof (get m a).clayout in
-  let size = Ranges.gcd sr (Cil.bitsSizeOf ty) in
-  if sr <> size then ignore (merge m a (new_chunk m ~size ()))
+  if Ast_types.is_scalar ty then
+    let sr = sizeof (get m a).clayout in
+    let size = Ranges.gcd sr (bitsSizeOf ty) in
+    if sr <> size then ignore (merge m a (new_chunk m ~size ()))
 
 let add_read (m: map) (a: node) acs =
   failwith_locked m "Region.Memory.read" ;
   let r = get m a in
   Ufind.set m.store a { r with creads = Access.Set.add acs r.creads } ;
-  sized m a (Access.typeof acs)
+  sized m a @@ Access.typeof acs
 
 let add_write (m: map) (a: node) acs =
   failwith_locked m "Region.Memory.write" ;
   let r = get m a in
   Ufind.set m.store a { r with cwrites = Access.Set.add acs r.cwrites } ;
-  sized m a (Access.typeof acs)
+  sized m a @@ Access.typeof acs
 
 let add_shift (m: map) (a: node) acs =
   failwith_locked m "Region.Memory.shift" ;
   let r = get m a in
   Ufind.set m.store a { r with cshifts = Access.Set.add acs r.cshifts } ;
-  sized m a (Access.typeof acs)
+  sized m a @@ Access.typeof acs
 
 (* -------------------------------------------------------------------------- *)
 (* --- Lookup                                                            ---- *)
@@ -454,7 +505,13 @@ let pointed_by m (r : node) =
   let rg = Ufind.get m.store r in rg.cpointed
 
 let cvar (m: map) (v: varinfo) : node =
-  Ufind.find m.store @@ Vmap.find v m.roots
+  Ufind.find m.store @@ Vmap.find v m.cvars
+
+let logic_info (m: map) (l: logic_info) =
+  LVImap.find l m.logics
+
+let lvar (m: map) (v: logic_var) =
+  LVmap.find v m.lvars
 
 let rec move (m: map) (r: node) (p: int) (s: int) =
   let c = Ufind.get m.store r in
@@ -467,7 +524,7 @@ let rec move (m: map) (r: node) (p: int) (s: int) =
 
 let field (m: map) (r: node) (fd: fieldinfo) : node =
   if fd.fcomp.cstruct then
-    let s = Cil.bitsSizeOf fd.ftype in
+    let s = bitsSizeOf fd.ftype in
     let (p,_) = Cil.fieldBitsOffset fd in
     move m r p s
   else r
@@ -488,7 +545,7 @@ let footprint (m: map) (r: node) : node list =
   with Not_found -> []
 
 let index (m : map) (r: node) (ty:typ) : node =
-  move m r 0 (Cil.bitsSizeOf ty)
+  move m r 0 (bitsSizeOf ty)
 
 let rec lval (m: map) (h,ofs) : node =
   offset m (lhost m h) (Cil.typeOfLhost h) ofs
@@ -519,6 +576,8 @@ and exp (m: map) (e: exp) : node option =
   | CastE(_, e) -> exp m e
   | BinOp((PlusPI|MinusPI),p,_,_) -> exp m p
   | UnOp (_, _, _) | BinOp (_, _, _, _) -> None
+
+let result (m: map) = m.result
 
 (* -------------------------------------------------------------------------- *)
 
@@ -564,9 +623,9 @@ let rec singleton m r =
   let node = Ufind.get m.store r in
   (* normalized parents *)
   match nodes m node.cparents with
-  | [] -> Vset.cardinal node.croots = 1
+  | [] -> Vset.cardinal node.ccvars = 1
   | [r0] ->
-    Vset.is_empty node.croots &&
+    Vset.is_empty node.ccvars &&
     single_path m r0 r (sizeof node.clayout) &&
     (* r != r0 && (* This test may be useful to prevent infinity loops. *) *)
     singleton m r0
@@ -595,14 +654,16 @@ let typed (m:map) (r:node) =
   try
     let check acs =
       let t = Access.typeof acs in
-      if Cil.bitsSizeOf t > size then raise Exit ;
-      match !types with
-      | None -> types := Some t
-      | Some t0 -> if not @@ Cil_datatype.Typ.equal t0 t then raise Exit
+      match Ast_types.unroll_skel t with
+      | TVoid | TFun _ -> ()
+      | _ ->
+        if bitsSizeOf t > size then raise Exit ;
+        match !types with
+        | None -> types := Some t
+        | Some t0 -> if not @@ Cil_datatype.Typ.equal t0 t then raise Exit
     in
     Access.Set.iter check node.creads ;
     Access.Set.iter check node.cwrites ;
-    Access.Set.iter check node.cshifts ;
     !types
   with Exit -> None
 
@@ -627,7 +688,7 @@ type range = Range of {
 type region = {
   node: node ;
   parents: node list ;
-  roots: root list ;
+  cvars: root list ;
   labels: string list ;
   types: typ list ;
   typed : typ option ;
@@ -686,7 +747,7 @@ let pp_region fmt (m: region) =
       pp_node m.node
       (acs 'R' m.reads) (acs 'W' m.writes) (acs 'A' m.shifts) ;
     List.iter (Format.fprintf fmt "@ %s:") m.labels ;
-    List.iter (Format.fprintf fmt "@ %a" pp_root) m.roots ;
+    List.iter (Format.fprintf fmt "@ %a" pp_root) m.cvars ;
     List.iter (Format.fprintf fmt "@ (%a)" Typ.pretty) m.types ;
     Format.fprintf fmt "@ %db" m.sizeof ;
     Option.iter (Format.fprintf fmt "@ (*%a)" pp_node) m.pointed ;
@@ -713,7 +774,7 @@ let pp_region fmt (m: region) =
 (* -------------------------------------------------------------------------- *)
 
 let make_root s (v : Cil_types.varinfo) : root =
-  let cells = if s = 0 then 0 else Cil.bitsSizeOf v.vtype / s in
+  let cells = if s = 0 then 0 else bitsSizeOf v.vtype / s in
   let label = Format.asprintf "%a%a" Varinfo.pretty v pp_cells cells in
   Root { cvar = v ; cells ; label }
 
@@ -738,7 +799,7 @@ let make_region (m: map) (n: node) (r: chunk) : region =
   {
     node = n ;
     parents = nodes m r.cparents ;
-    roots = List.map (make_root sizeof) @@ Vset.elements r.croots ;
+    cvars = List.map (make_root sizeof) @@ Vset.elements r.ccvars ;
     labels = Lset.elements r.clabels ;
     reads = Access.Set.elements r.creads ;
     writes = Access.Set.elements r.cwrites ;

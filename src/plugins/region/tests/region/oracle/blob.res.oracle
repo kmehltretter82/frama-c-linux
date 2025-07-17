@@ -3,10 +3,13 @@
 [region] Function array_blob:
   R0003: --- arr[3] 32b ;
   R0001: -W- p (int *) 64b (*R0003) ;
+  R0007: --- 0b ;
 [region] Function struct_blob:
   R0003: --- y 64b { .f: R0004[…]; #32b; } ;
   R0004: --- 0b ;
   R0001: -W- p (int *) 64b (*R0004) ;
+  R0008: --- 0b ;
 [region] Function var_blob:
   R0003: --- x[…] 0b ;
   R0001: -W- p (int *) 64b (*R0003) ;
+  R0006: --- 0b ;

@@ -123,8 +123,8 @@ Cluster MemBytes.PointersProperties {
       -> ((region (base (addr_of_int (read_uint64 m_0 a_0))))<=0)
   
   Axiom pointers_int_range:
-    forall a_2: addr.
-    (statically_allocated (base a_2)) -> (is_uint64 (int_of_addr a_2))
+    forall a_1: addr.
+    (statically_allocated (base a_1)) -> (is_uint64 (int_of_addr a_1))
   
 }
 
@@ -149,16 +149,12 @@ Cluster Shifts {
   
 }
 
-Goal Assertion 'Kept' (file compound_assigns.i, line 82):
+Goal Assertion 'Kept' (file compound_assigns.i, line 70):
 Let a = memcpy(mem_0, tmp_0, mem_0, p, 24).
 Let a_1 = Load_S1_A(s, mem_0).
 Let a_2 = Load_S1_A(s, a).
 Assume {
-  Type: is_sint32(side_0) /\ IsS1_A(a_1) /\
-      is_sint32(read_sint32(mem_0, shift_sint32(shiftfield_F1_A_f(p), 0))) /\
-      is_sint32(read_sint32(mem_0, shift_sint32(shiftfield_F1_A_f(q), 0))) /\
-      is_sint32(read_sint32(mem_0, shift_sint32(shiftfield_F1_A_f(r), 0))) /\
-      IsS1_A(a_2).
+  Type: is_sint32(side_0) /\ IsS1_A(a_1) /\ IsS1_A(a_2).
   (* Heap *)
   Type: (region(p.base) <= 0) /\ (region(q.base) <= 0) /\
       (region(r.base) <= 0) /\ framed(mem_0) /\ sconst(mem_0).
@@ -177,18 +173,14 @@ Prove: EqS1_A(a_2, a_1).
 
 ------------------------------------------------------------
 
-Goal Assertion 'Kept' (file compound_assigns.i, line 84):
+Goal Assertion 'Kept' (file compound_assigns.i, line 72):
 Let a = memcpy(mem_0, tmp_0, mem_0, p, 24).
 Let a_1 = memcpy(a, p, a, s, 24).
 Let a_2 = Load_S1_A(s, a).
 Let a_3 = Load_S1_A(s, mem_0).
 Let a_4 = Load_S1_A(s, a_1).
 Assume {
-  Type: is_sint32(side_0) /\ IsS1_A(a_3) /\
-      is_sint32(read_sint32(mem_0, shift_sint32(shiftfield_F1_A_f(p), 0))) /\
-      is_sint32(read_sint32(mem_0, shift_sint32(shiftfield_F1_A_f(q), 0))) /\
-      is_sint32(read_sint32(mem_0, shift_sint32(shiftfield_F1_A_f(r), 0))) /\
-      IsS1_A(a_2) /\ IsS1_A(a_4).
+  Type: is_sint32(side_0) /\ IsS1_A(a_3) /\ IsS1_A(a_2) /\ IsS1_A(a_4).
   (* Heap *)
   Type: (region(p.base) <= 0) /\ (region(q.base) <= 0) /\
       (region(r.base) <= 0) /\ framed(mem_0) /\ sconst(mem_0).
@@ -210,38 +202,38 @@ Prove: EqS1_A(a_4, a_3).
 
 ------------------------------------------------------------
 
-Goal Assigns (file compound_assigns.i, line 57) in 'copy' (1/6):
-Effect at line 78
+Goal Assigns (file compound_assigns.i, line 52) in 'copy' (1/6):
+Effect at line 66
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file compound_assigns.i, line 57) in 'copy' (2/6):
-Effect at line 78
+Goal Assigns (file compound_assigns.i, line 52) in 'copy' (2/6):
+Effect at line 66
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file compound_assigns.i, line 57) in 'copy' (3/6):
-Effect at line 79
+Goal Assigns (file compound_assigns.i, line 52) in 'copy' (3/6):
+Effect at line 67
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file compound_assigns.i, line 57) in 'copy' (4/6):
-Effect at line 79
+Goal Assigns (file compound_assigns.i, line 52) in 'copy' (4/6):
+Effect at line 67
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file compound_assigns.i, line 57) in 'copy' (5/6):
-Effect at line 81
+Goal Assigns (file compound_assigns.i, line 52) in 'copy' (5/6):
+Effect at line 69
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file compound_assigns.i, line 57) in 'copy' (6/6):
-Effect at line 83
+Goal Assigns (file compound_assigns.i, line 52) in 'copy' (6/6):
+Effect at line 71
 Prove: true.
 
 ------------------------------------------------------------
@@ -258,11 +250,8 @@ Let a_4 = Load_S1_A(p, a_1).
 Let a_5 = Load_S1_A(q, a).
 Let a_6 = Load_S1_A(p, mem_0).
 Assume {
-  Type: is_sint32(side_0) /\ IsS1_A(a_6) /\ IsS1_A(a_3) /\
-      is_sint32(read_sint32(mem_0, shift_sint32(shiftfield_F1_A_f(p), 0))) /\
-      is_sint32(read_sint32(mem_0, shift_sint32(shiftfield_F1_A_f(q), 0))) /\
-      is_sint32(read_sint32(mem_0, shift_sint32(shiftfield_F1_A_f(r), 0))) /\
-      IsS1_A(a_5) /\ IsS1_A(a_4) /\ IsS1_A(a_2) /\ IsS1_A(Load_S1_A(r, a_1)).
+  Type: is_sint32(side_0) /\ IsS1_A(a_6) /\ IsS1_A(a_3) /\ IsS1_A(a_5) /\
+      IsS1_A(a_4) /\ IsS1_A(a_2) /\ IsS1_A(Load_S1_A(r, a_1)).
   (* Heap *)
   Type: (region(p.base) <= 0) /\ (region(q.base) <= 0) /\
       (region(r.base) <= 0) /\ framed(mem_0) /\ sconst(mem_0).
@@ -291,11 +280,8 @@ Let a_4 = Load_S1_A(p, a_1).
 Let a_5 = Load_S1_A(q, a).
 Let a_6 = Load_S1_A(p, mem_0).
 Assume {
-  Type: is_sint32(side_0) /\ IsS1_A(a_6) /\ IsS1_A(a_3) /\
-      is_sint32(read_sint32(mem_0, shift_sint32(shiftfield_F1_A_f(p), 0))) /\
-      is_sint32(read_sint32(mem_0, shift_sint32(shiftfield_F1_A_f(q), 0))) /\
-      is_sint32(read_sint32(mem_0, shift_sint32(shiftfield_F1_A_f(r), 0))) /\
-      IsS1_A(a_5) /\ IsS1_A(a_4) /\ IsS1_A(a_2) /\ IsS1_A(Load_S1_A(r, a_1)).
+  Type: is_sint32(side_0) /\ IsS1_A(a_6) /\ IsS1_A(a_3) /\ IsS1_A(a_5) /\
+      IsS1_A(a_4) /\ IsS1_A(a_2) /\ IsS1_A(Load_S1_A(r, a_1)).
   (* Heap *)
   Type: (region(p.base) <= 0) /\ (region(q.base) <= 0) /\
       (region(r.base) <= 0) /\ framed(mem_0) /\ sconst(mem_0).
@@ -325,11 +311,8 @@ Let a_5 = Load_S1_A(q, a).
 Let a_6 = Load_S1_A(p, mem_0).
 Let a_7 = Load_S1_A(r, a_1).
 Assume {
-  Type: is_sint32(side_0) /\ IsS1_A(a_6) /\ IsS1_A(a_3) /\
-      is_sint32(read_sint32(mem_0, shift_sint32(shiftfield_F1_A_f(p), 0))) /\
-      is_sint32(read_sint32(mem_0, shift_sint32(shiftfield_F1_A_f(q), 0))) /\
-      is_sint32(read_sint32(mem_0, shift_sint32(shiftfield_F1_A_f(r), 0))) /\
-      IsS1_A(a_5) /\ IsS1_A(a_4) /\ IsS1_A(a_2) /\ IsS1_A(a_7).
+  Type: is_sint32(side_0) /\ IsS1_A(a_6) /\ IsS1_A(a_3) /\ IsS1_A(a_5) /\
+      IsS1_A(a_4) /\ IsS1_A(a_2) /\ IsS1_A(a_7).
   (* Heap *)
   Type: (region(p.base) <= 0) /\ (region(q.base) <= 0) /\
       (region(r.base) <= 0) /\ framed(mem_0) /\ sconst(mem_0).
@@ -361,11 +344,8 @@ Let a_4 = Load_S1_A(p, a_1).
 Let a_5 = Load_S1_A(r, a).
 Let a_6 = Load_S1_A(p, mem_0).
 Assume {
-  Type: IsS1_A(a_6) /\ IsS1_A(a_3) /\
-      is_sint32(read_sint32(mem_0, shift_sint32(shiftfield_F1_A_f(p), 0))) /\
-      is_sint32(read_sint32(mem_0, shift_sint32(shiftfield_F1_A_f(q), 0))) /\
-      is_sint32(read_sint32(mem_0, shift_sint32(shiftfield_F1_A_f(r), 0))) /\
-      IsS1_A(a_5) /\ IsS1_A(a_4) /\ IsS1_A(Load_S1_A(q, a_1)) /\ IsS1_A(a_2).
+  Type: IsS1_A(a_6) /\ IsS1_A(a_3) /\ IsS1_A(a_5) /\ IsS1_A(a_4) /\
+      IsS1_A(Load_S1_A(q, a_1)) /\ IsS1_A(a_2).
   (* Heap *)
   Type: (region(p.base) <= 0) /\ (region(q.base) <= 0) /\
       (region(r.base) <= 0) /\ framed(mem_0) /\ sconst(mem_0).
@@ -393,11 +373,8 @@ Let a_5 = Load_S1_A(r, a).
 Let a_6 = Load_S1_A(p, mem_0).
 Let a_7 = Load_S1_A(q, a_1).
 Assume {
-  Type: IsS1_A(a_6) /\ IsS1_A(a_3) /\
-      is_sint32(read_sint32(mem_0, shift_sint32(shiftfield_F1_A_f(p), 0))) /\
-      is_sint32(read_sint32(mem_0, shift_sint32(shiftfield_F1_A_f(q), 0))) /\
-      is_sint32(read_sint32(mem_0, shift_sint32(shiftfield_F1_A_f(r), 0))) /\
-      IsS1_A(a_5) /\ IsS1_A(a_4) /\ IsS1_A(a_7) /\ IsS1_A(a_2).
+  Type: IsS1_A(a_6) /\ IsS1_A(a_3) /\ IsS1_A(a_5) /\ IsS1_A(a_4) /\
+      IsS1_A(a_7) /\ IsS1_A(a_2).
   (* Heap *)
   Type: (region(p.base) <= 0) /\ (region(q.base) <= 0) /\
       (region(r.base) <= 0) /\ framed(mem_0) /\ sconst(mem_0).
@@ -424,11 +401,8 @@ Let a_4 = Load_S1_A(p, a_1).
 Let a_5 = Load_S1_A(r, a).
 Let a_6 = Load_S1_A(p, mem_0).
 Assume {
-  Type: IsS1_A(a_6) /\ IsS1_A(a_3) /\
-      is_sint32(read_sint32(mem_0, shift_sint32(shiftfield_F1_A_f(p), 0))) /\
-      is_sint32(read_sint32(mem_0, shift_sint32(shiftfield_F1_A_f(q), 0))) /\
-      is_sint32(read_sint32(mem_0, shift_sint32(shiftfield_F1_A_f(r), 0))) /\
-      IsS1_A(a_5) /\ IsS1_A(a_4) /\ IsS1_A(Load_S1_A(q, a_1)) /\ IsS1_A(a_2).
+  Type: IsS1_A(a_6) /\ IsS1_A(a_3) /\ IsS1_A(a_5) /\ IsS1_A(a_4) /\
+      IsS1_A(Load_S1_A(q, a_1)) /\ IsS1_A(a_2).
   (* Heap *)
   Type: (region(p.base) <= 0) /\ (region(q.base) <= 0) /\
       (region(r.base) <= 0) /\ framed(mem_0) /\ sconst(mem_0).
@@ -610,7 +584,7 @@ Cluster Shifts {
   
 }
 
-Goal Post-condition (file compound_assigns.i, line 91) in 'init':
+Goal Post-condition (file compound_assigns.i, line 79) in 'init':
 Let a = Load_S1_A(p, memcpy(mem_0, p, mem_0, q, 24)).
 Let a_1 = Load_S1_A(q, mem_0).
 Assume {
@@ -626,7 +600,7 @@ Prove: EqS1_A(a, a_1).
 
 ------------------------------------------------------------
 
-Goal Post-condition (file compound_assigns.i, line 92) in 'init':
+Goal Post-condition (file compound_assigns.i, line 80) in 'init':
 Let a = memcpy(init_0, p, init_0, q, 24).
 Let a_1 = Load_S1_A(p, memcpy(mem_0, p, mem_0, q, 24)).
 Let a_2 = Load_S1_A(q, mem_0).
@@ -648,7 +622,7 @@ Prove: IsInit_S1_A(p, a).
 
 ------------------------------------------------------------
 
-Goal Assertion 'PF,Z3_only' (file compound_assigns.i, line 99):
+Goal Assertion 'PF,Z3_only' (file compound_assigns.i, line 87):
 Let a = memcpy(init_0, p, init_0, q, 24).
 Let a_1 = Load_S1_A(p, memcpy(mem_0, p, mem_0, q, 24)).
 Let a_2 = Load_S1_A(q, mem_0).
@@ -669,8 +643,8 @@ Prove: (read_init32(a, shift_sint32(shiftfield_F1_A_f(p), i))=true).
 
 ------------------------------------------------------------
 
-Goal Assigns (file compound_assigns.i, line 90) in 'init':
-Effect at line 96
+Goal Assigns (file compound_assigns.i, line 78) in 'init':
+Effect at line 84
 Prove: true.
 
 ------------------------------------------------------------
@@ -789,8 +763,8 @@ Cluster MemBytes.PointersProperties {
       -> ((region (base (addr_of_int (read_uint64 m_0 a_0))))<=0)
   
   Axiom pointers_int_range:
-    forall a_2: addr.
-    (statically_allocated (base a_2)) -> (is_uint64 (int_of_addr a_2))
+    forall a_1: addr.
+    (statically_allocated (base a_1)) -> (is_uint64 (int_of_addr a_1))
   
 }
 
@@ -823,10 +797,7 @@ Let a_3 = Load_S1_A(q, a_2).
 Let a_4 = Load_S1_A(p, mem_0).
 Let a_5 = Load_S1_A(p, a_2).
 Assume {
-  Type: IsS1_A(a_4) /\ IsS1_A(a_1) /\
-      is_sint32(read_sint32(mem_0, shift_sint32(shiftfield_F1_A_f(p), 0))) /\
-      is_sint32(read_sint32(mem_0, shift_sint32(shiftfield_F1_A_f(q), 0))) /\
-      IsS1_A(a_5) /\ IsS1_A(a_3).
+  Type: IsS1_A(a_4) /\ IsS1_A(a_1) /\ IsS1_A(a_5) /\ IsS1_A(a_3).
   (* Heap *)
   Type: (region(p.base) <= 0) /\ (region(q.base) <= 0) /\ framed(mem_0) /\
       sconst(mem_0).
@@ -847,10 +818,8 @@ Let a_2 = memcpy(a, q, mem_undef_0, q, 24).
 Let a_3 = Load_S1_A(q, a_2).
 Let a_4 = Load_S1_A(p, mem_0).
 Assume {
-  Type: IsS1_A(a_4) /\ IsS1_A(a_1) /\
-      is_sint32(read_sint32(mem_0, shift_sint32(shiftfield_F1_A_f(p), 0))) /\
-      is_sint32(read_sint32(mem_0, shift_sint32(shiftfield_F1_A_f(q), 0))) /\
-      IsS1_A(Load_S1_A(p, a_2)) /\ IsS1_A(a_3).
+  Type: IsS1_A(a_4) /\ IsS1_A(a_1) /\ IsS1_A(Load_S1_A(p, a_2)) /\
+      IsS1_A(a_3).
   (* Heap *)
   Type: (region(p.base) <= 0) /\ (region(q.base) <= 0) /\ framed(mem_0) /\
       sconst(mem_0).
@@ -865,13 +834,13 @@ Prove: EqS1_A(a_3, a_4).
 ------------------------------------------------------------
 
 Goal Assigns (file compound_assigns.i, line 37) in 'swap' (1/2):
-Effect at line 50
+Effect at line 45
 Prove: true.
 
 ------------------------------------------------------------
 
 Goal Assigns (file compound_assigns.i, line 37) in 'swap' (2/2):
-Effect at line 51
+Effect at line 46
 Prove: true.
 
 ------------------------------------------------------------

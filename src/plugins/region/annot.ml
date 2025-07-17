@@ -20,244 +20,161 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Logic_ptree
 open Cil_types
-open Cil_datatype
+
+open Memory
+open Logic
 
 (* -------------------------------------------------------------------------- *)
-(* ---  Region Specifications                                             --- *)
+(* ---  Utils                                                             --- *)
 (* -------------------------------------------------------------------------- *)
 
-type path = {
-  loc : location ;
-  typ : typ ;
-  step: step ;
-}
+module Vmap = Cil_datatype.Varinfo.Map
 
-and step =
-  | Var of varinfo
-  | AddrOf of path
-  | Star of path
-  | Shift of path
-  | Index of path * int
-  | Field of path * fieldinfo
-  | Cast of typ * path
+let iadd_term env t = ignore @@ add_term env t
+let add_iterm env = function { it_content = t } -> add_term env t
 
-type region = {
-  rname: string option ;
-  rpath: path list ;
-}
+let add_ipred env ip = add_predicate env ip.ip_content.tp_statement
 
 (* -------------------------------------------------------------------------- *)
-(* ---  Printers                                                          --- *)
+(* ---  Process Behaviors                                                 --- *)
 (* -------------------------------------------------------------------------- *)
 
-let atomic = function
-  | Var _ | AddrOf _ | Star _ | Index _ | Field _ -> true
-  | Shift _ | Cast _ -> false
-
-let rec pp_step fmt = function
-  | Var x -> Varinfo.pretty fmt x
-  | Field(p,f) -> pfield p f fmt
-  | Index(a,n) -> Format.fprintf fmt "%a[%d]" pp_atom a n
-  | Shift a -> Format.fprintf fmt "%a+(..)" pp_atom a
-  | Star a -> Format.fprintf fmt "*%a" pp_atom a
-  | AddrOf a -> Format.fprintf fmt "&%a" pp_atom a
-  | Cast(t,a) -> Format.fprintf fmt "(%a)@,%a" Typ.pretty t pp_atom a
-
-and pfield p fd fmt =
-  match p.step with
-  | Star p -> Format.fprintf fmt "%a->%a" pp_atom p Fieldinfo.pretty fd
-  | _ -> Format.fprintf fmt "%a.%a" pp_atom p Fieldinfo.pretty fd
-
-and pp_atom fmt a =
-  if atomic a.step then pp_step fmt a.step
-  else Format.fprintf fmt "@[<hov 2>(%a)@]" pp_step a.step
-
-and pp_path fmt a = pp_step fmt a.step
-
-let pp_named fmt = function None -> () | Some a -> Format.fprintf fmt "%s: " a
-
-let pp_region fmt r =
-  match r.rpath with
-  | [] -> Format.pp_print_string fmt "\null"
-  | p::ps ->
-    begin
-      Format.fprintf fmt "@[<hov 2>" ;
-      pp_named fmt r.rname ;
-      pp_path fmt p ;
-      List.iter (Format.fprintf fmt ",@ %a" pp_path) ps ;
-      Format.fprintf fmt "@]" ;
-    end
-
-let pp_regions fmt = function
-  | [] -> Format.pp_print_string fmt "\null"
-  | r::rs ->
-    begin
-      Format.fprintf fmt "@[<hv 0>" ;
-      pp_region fmt r ;
-      List.iter (Format.fprintf fmt ",@ %a" pp_region) rs ;
-      Format.fprintf fmt "@]" ;
-    end
-
-(* -------------------------------------------------------------------------- *)
-(* ---  Parsers                                                           --- *)
-(* -------------------------------------------------------------------------- *)
-
-type env = {
-  context: Logic_typing.typing_context ;
-  mutable named: string option ;
-  mutable paths: path list ;
-  mutable specs: region list ;
-}
-
-let error (env:env) ~loc msg = env.context.error loc msg
-
-let parse_variable (env:env) ~loc x =
-  match env.context.find_var x with
-  | { lv_origin = Some v } -> { loc ; typ = v.vtype ; step = Var v }
-  | _ -> error env ~loc "Variable '%s' is not a C-variable" x
-
-let parse_field env ~loc comp f =
-  try Cil.getCompField comp f with Not_found ->
-    error env ~loc "No field '%s' in compound type '%s'" f comp.cname
-
-let parse_compinfo env ~loc typ =
-  try Cil.getCompType typ with Not_found ->
-    error env ~loc "Expected compound type for term"
-
-let parse_lrange (env: env) (e : lexpr) =
-  match e.lexpr_node with
-  | PLrange(None,None) -> ()
-  | _ ->
-    error env ~loc:e.lexpr_loc "Unexpected index (use unspecified range only)"
-
-let parse_typ env ~loc t =
-  let open Logic_typing in
-  let g = env.context in
-  let t = g.logic_type g loc g.pre_state t in
-  match Ast_types.unroll_logic t with
-  | Ctype typ -> typ
-  | _ -> error env ~loc "C-type expected for casting l-values"
-
-let rec parse_lpath (env:env) (e: lexpr) =
-  let loc = e.lexpr_loc in
-  match e.lexpr_node with
-  | PLvar x -> parse_variable env ~loc x
-  | PLunop( Ustar , p ) ->
-    let lv = parse_lpath env p in
-    if Ast_types.is_ptr lv.typ then
-      let te = Ast_types.direct_pointed_type lv.typ in
-      { loc ; step = Star lv ; typ = te }
+let iadd_from ~iscalled env (tgt,from) =
+  let d = add_iterm env tgt in
+  match from with
+  | FromAny -> ()
+  | From srcs ->
+    if iscalled then
+      let merge_from env a it =
+        merge_domain env.map a @@ add_iterm env it
+      in ignore @@ List.fold_left (merge_from env) d srcs
     else
-      error env ~loc "Pointer-type expected for operator '*'"
-  | PLunop( Uamp , p ) ->
-    let lv = parse_lpath env p in
-    let typ = Cil_const.mk_tptr lv.typ in
-    { loc ; step = AddrOf lv ; typ }
-  | PLbinop( p , Badd , rg ) ->
-    parse_lrange env rg ;
-    let { typ } as lv = parse_lpath env p in
-    if Ast_types.is_ptr typ then
-      { loc ; step = Shift lv ; typ = typ }
-    else
-    if Ast_types.is_array typ then
-      let te = Ast_types.direct_element_type typ in
-      { loc ; step = Shift lv ; typ =  Cil_const.mk_tptr te }
-    else
-      error env ~loc "Pointer-type expected for operator '+'"
-  | PLdot( p , f ) ->
-    let lv = parse_lpath env p in
-    let comp = parse_compinfo env ~loc:lv.loc lv.typ in
-    let fd = parse_field env ~loc comp f in
-    { loc ; step = Field(lv,fd) ; typ = fd.ftype }
-  | PLarrow( p , f ) ->
-    let sp = { lexpr_loc = loc ; lexpr_node = PLunop(Ustar,p) } in
-    let pf = { lexpr_loc = loc ; lexpr_node = PLdot(sp,f) } in
-    parse_lpath env pf
-  | PLarrget( p , rg ) ->
-    parse_lrange env rg ;
-    let { typ } as lv = parse_lpath env p in
-    if Ast_types.is_ptr typ then
-      let pointed = Ast_types.direct_pointed_type typ in
-      let ls = { loc ; step = Shift lv ; typ } in
-      { loc ; step = Star ls ; typ = pointed }
-    else
-    if Ast_types.is_array typ then
-      let elt,size = Ast_types.array_elem_type_and_size typ in
-      let size =
-        match Option.bind Cil.constFoldToInt size with
-        | Some size -> size
-        | None ->
-          Kernel.fatal "parse_lpath: array type %a without a size"
-            Cil_printer.pp_typ typ
-      in
-      { loc ; step = Index(lv,Z.to_int size) ; typ = elt }
-    else
-      error env ~loc:lv.loc "Pointer or array type expected"
-  | PLcast( t , a ) ->
-    let lv = parse_lpath env a in
-    let ty = parse_typ env ~loc t in
-    { loc ; step = Cast(ty,lv) ; typ = ty }
-  | _ ->
-    error env ~loc "Unexpected expression for region spec"
+      List.iter (fun it -> ignore @@ add_iterm env it) srcs
 
-let rec parse_named_lpath (env:env) p =
-  match p.lexpr_node with
-  | PLnamed( name , p ) ->
-    if env.named <> None && env.paths <> [] then
-      begin
-        env.specs <- { rname = env.named ; rpath = env.paths } :: env.specs ;
-        env.paths <- [] ;
-      end ;
-    env.named <- Some name ;
-    parse_named_lpath env p
-  | _ ->
-    let path = parse_lpath env p in
-    env.paths <- path :: env.paths
+let add_requires ~map ~kf ~ki ~bhv ~formal ~result ip =
+  let property = Property.ip_of_requires kf ki bhv ip in
+  add_ipred { map ; property ; formal ; result } ip
 
-(* -------------------------------------------------------------------------- *)
-(* --- Spec Typechecking & Printing                                       --- *)
-(* -------------------------------------------------------------------------- *)
+let add_assumes ~map ~kf ~ki ~bhv ~formal ~result ip =
+  let property = Property.ip_of_assumes kf ki bhv ip in
+  add_ipred { map ; property ; formal ; result } ip
 
-let kspec = ref 0
-let registry = Hashtbl.create 0
+let add_assigns ~iscalled ~map ~kf ~ki ~bhv ~formal ~result asgn =
+  match asgn with
+  | WritesAny -> ()
+  | Writes ws ->
+    let bhv = Property.Id_contract (Datatype.String.Set.empty,bhv) in
+    let property = Option.get @@ Property.ip_of_assigns kf ki bhv asgn in
+    let env = { map ; property ; formal ; result } in
+    List.iter (iadd_from ~iscalled env) ws
 
-let of_extid id = try Hashtbl.find registry id with Not_found -> []
-let of_extension = function
-  | { ext_name="region" ; ext_kind = Ext_id k } -> of_extid k
-  | _ -> []
-let of_code_annot = function
-  | { annot_content = AExtended(_,_,e) } -> of_extension e
-  | _ -> []
+let add_allocation ~map ~kf ~ki ~bhv ~formal ~result alloc =
+  match alloc with
+  | FreeAllocAny -> ()
+  | FreeAlloc (its1, its2) ->
+    let bhv = Property.Id_contract (Datatype.String.Set.empty,bhv) in
+    let property = Option.get @@ Property.ip_of_allocation kf ki bhv alloc in
+    let env = { map ; property ; formal ; result } in
+    let add_alloc env it1 it2 =
+      let d1 = add_iterm env it1 in
+      let d2 = add_iterm env it2 in
+      ignore @@ merge_domain env.map d1 d2
+    in
+    List.iter2 (add_alloc env) its1 its2
 
-let of_behavior bhv = List.concat_map of_extension bhv.b_extended
+let add_post_cond ~map ~kf ~ki ~bhv ~formal ~result cs =
+  let property = Property.ip_of_behavior kf ki ~active:[] bhv in
+  let add_pc (_,ip) = add_ipred { map ; property ; formal ; result } ip in
+  List.iter add_pc cs
 
-let typecheck typing_context _loc ps =
-  let env = {
-    named = None ;
-    context = typing_context ;
-    paths = [] ; specs = [] ;
-  } in
-  List.iter (parse_named_lpath env) ps ;
-  let id = !kspec in incr kspec ;
-  let specs = { rname = env.named ; rpath = env.paths } :: env.specs in
-  Hashtbl.add registry id @@ List.rev specs ;
-  Ext_id id
+let rec add_extension ~kf ?stmt ?(formal=Vmap.empty) ~result map acsl =
+  let extended_loc = match stmt with
+    | None -> Property.ELContract kf
+    | Some stmt -> Property.ELStmt (kf, stmt)
+  in let property = Property.ip_of_extended extended_loc acsl in
+  match acsl.ext_kind with
+  | Ext_id _ ->
+    if String.compare acsl.ext_plugin "region" != 0
+    || String.compare acsl.ext_name "region" != 0
+    then Options.warning "unhandled extension @[%s@]::@[%s@]@."
+        acsl.ext_plugin acsl.ext_name
+  | Ext_terms ts ->
+    let env = { map ; property ; formal ; result } in
+    List.iter (iadd_term env) ts
+  | Ext_preds ps ->
+    let env = { map ; property ; formal ; result } in
+    List.iter (add_predicate env) ps
+  | Ext_annot (_,acsls) ->
+    List.iter (add_extension ~kf ?stmt ~formal ~result map) acsls
 
-let printer _pp fmt = function
-  | Ext_id k ->
-    let rs  = try Hashtbl.find registry k with Not_found -> [] in
-    pp_regions fmt rs
-  | _ -> ()
 
-let () =
-  begin
-    Acsl_extension.register_behavior
-      ~plugin:"region" "region" typecheck ~printer false ;
-    Acsl_extension.register_code_annot
-      ~plugin:"region" "alias" typecheck ~printer false ;
-  end
-
+let add_behavior ~kf ~ki ?(formal=Vmap.empty) ~result ~iscalled map bhv =
+  List.iter (add_requires ~map ~kf ~ki ~bhv ~formal ~result) bhv.b_requires ;
+  List.iter (add_assumes ~map ~kf ~ki ~bhv ~formal ~result)  bhv.b_assumes  ;
+  add_post_cond ~map ~kf ~ki ~bhv ~formal ~result            bhv.b_post_cond ;
+  add_assigns ~iscalled ~map ~kf ~ki ~bhv ~formal ~result    bhv.b_assigns ;
+  add_allocation ~map ~kf ~ki ~bhv ~formal ~result           bhv.b_allocation ;
+  List.iter (add_extension ~kf ~formal ~result map)          bhv.b_extended
 
 (* -------------------------------------------------------------------------- *)
+(* ---  Process Code Annotation                                           --- *)
+(* -------------------------------------------------------------------------- *)
+
+let add_variant ~kf ~ki ?(formal=Vmap.empty) ~result map variant =
+  let property = Property.ip_of_decreases kf ki variant in
+  let env = { map ; property ; formal ; result } in
+  let add_variant_relation rel =
+    ignore @@ Memory.add_logic_info map rel ;
+    (* ignore @@ Logic.add_logic_info_body env rel ; *)
+  in
+  Option.iter add_variant_relation @@ snd variant ;
+  ignore @@ add_term env @@ fst variant
+
+let add_spec ~kf ~ki ?(formal=Vmap.empty) ~result ~iscalled (map:map) (s:spec) =
+  let p_term = Property.ip_terminates_of_spec kf ki s in
+  let env_term op = { map ; property = Option.get op ; formal ; result } in
+  Option.iter (add_ipred (env_term p_term)) s.spec_terminates ;
+  Option.iter (add_variant ~kf ~ki ~formal ~result map) s.spec_variant ;
+  List.iter (add_behavior ~iscalled ~kf ~ki ~formal ~result map) s.spec_behavior
+
+(* -------------------------------------------------------------------------- *)
+(* ---  Process Function Body                                             --- *)
+(* -------------------------------------------------------------------------- *)
+
+let add_code_annot ~kf ~stmt ?(formal=Vmap.empty) ~result ~iscalled map c =
+  match c.annot_content with
+  | AAssert (_,{ tp_statement = p }) ->
+    let property = Property.ip_of_code_annot_single kf stmt c in
+    let env = { map ; property ; formal ; result } in
+    add_predicate env p
+  | AStmtSpec (_,s) ->
+    let ki = Cil_datatype.Kinstr.kinstr_of_opt_stmt (Some stmt) in
+    add_spec ~iscalled ~kf ~ki ~formal ~result map s
+  | AInvariant (_,_,{ tp_statement = p }) ->
+    let property = Property.ip_of_code_annot_single kf stmt c in
+    let env = { map ; property ; formal ; result } in
+    add_predicate env p
+  | AVariant v ->
+    let ki = Cil_datatype.Kinstr.kinstr_of_opt_stmt (Some stmt) in
+    add_variant ~kf ~ki ~formal ~result map v
+  | AAssigns (_,WritesAny) -> ()
+  | AAssigns (_,Writes asgn) ->
+    let ki = Cil_datatype.Kinstr.kinstr_of_opt_stmt (Some stmt) in
+    let property = Option.get @@ Property.ip_assigns_of_code_annot kf ki c in
+    List.iter (iadd_from ~iscalled { map ; property ; formal ; result }) asgn
+  | AAllocation (_,FreeAllocAny) -> ()
+  | AAllocation (_,(FreeAlloc (its1,its2) as alloc)) ->
+    if List.compare_lengths its1 its2 != 0 then
+      Options.warning "FreeAlloc lengths not equal" ;
+    let bol = Property.Id_loop c in
+    let ki = Cil_datatype.Kinstr.kinstr_of_opt_stmt (Some stmt) in
+    let property = Option.get @@ Property.ip_of_allocation kf ki bol alloc in
+    let add_alloc env it1 it2 =
+      let d1 = add_iterm env it1 in
+      let d2 = add_iterm env it2 in
+      ignore @@ merge_domain env.map d1 d2
+    in
+    List.iter2 (add_alloc { map ; property ; formal ; result }) its1 its2
+  | AExtended (_,_, acsl) ->
+    add_extension ~kf ~stmt ~formal ~result map acsl

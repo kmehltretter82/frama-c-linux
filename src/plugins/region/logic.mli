@@ -20,8 +20,27 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Cil_types
+open Cil_datatype
+
 open Memory
 
-val add_lval : map -> Annot.path -> node
-val add_exp : map -> Annot.path -> node option
-val add_region : map -> Annot.region -> unit
+val add_path : map -> Spec.path -> node
+val add_region : map -> Spec.region -> unit
+
+
+type result = node option
+type env = {
+  map : map ;
+  result : result ;
+  formal : domain Varinfo.Map.t ;
+  property : Property.t ;
+}
+val add_addr_lval : env -> term_lval -> node
+val add_term_lval : env -> term_lval -> domain
+val add_term      : env -> term      -> domain
+val add_predicate : env -> predicate -> unit
+
+val get_result : env -> node
+
+val add_logic_info_body : env -> logic_info -> domain

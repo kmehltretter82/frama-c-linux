@@ -4,9 +4,6 @@
 [wp] [Valid] Goal copy_exits (Cfg) (Unreachable)
 [wp] [Valid] Goal copy_terminates (Cfg) (Trivial)
 [wp] Warning: Missing RTE guards
-[region] copy_array.c:15: Warning: Annotations not analyzed
-[region] copy_array.c:18: Warning: Annotations not analyzed
-[region] copy_array.c:19: Warning: Annotations not analyzed
 ------------------------------------------------------------
   Function copy
 ------------------------------------------------------------

@@ -77,7 +77,7 @@ val pointed_by : map -> node -> node list
 
 val size : map -> node -> int
 val parents : map -> node -> node list
-val roots : map -> node -> varinfo list
+val cvars : map -> node -> varinfo list
 val labels: map -> node -> string list
 val reads : map -> node -> typ list
 val writes : map -> node -> typ list

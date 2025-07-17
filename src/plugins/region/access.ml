@@ -71,13 +71,15 @@ let pretty fmt = function
     Format.fprintf fmt "%a@%s" Term_lval.pretty l
       (Property.Names.get_prop_name_id s)
 
+let ctype_of = function
+  | Ctype t -> t
+  | _ -> Cil_const.voidType
+
 let typeof = function
   | Init(_,x) -> x.vtype
   | Lval(_,lv) -> Cil.typeOfLval lv
   | Exp(_,e) -> Cil.typeOf e
-  | Term(_,lt) ->
-    match Cil.typeOfTermLval lt with
-    | Ctype ty -> ty
-    | _ -> Cil_const.voidType
+  | Term(_,lv) ->
+    Logic_const.plain_or_set ctype_of @@ Cil.typeOfTermLval lv
 
 module Set = Set.Make(struct type t = acs let compare = compare end)

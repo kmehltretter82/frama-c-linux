@@ -41,7 +41,7 @@ type range = Range of {
 type region = {
   node: node ;
   parents: node list ;
-  roots: root list ;
+  cvars: root list ;
   labels: string list ;
   types: typ list ;
   typed : typ option ;
@@ -54,6 +54,9 @@ type region = {
   ranges: range list ;
   pointed: node option ;
 }
+
+type domain = node Ldomain.t
+type context = node Ldomain.context
 
 type map
 
@@ -80,7 +83,7 @@ val nodes : map -> node list -> node list
 
 val size : map -> node -> int
 val parents : map -> node -> node list
-val roots : map -> node -> varinfo list
+val cvars : map -> node -> varinfo list
 val labels : map -> node -> string list
 val region : map -> node -> region
 val regions : map -> region list
@@ -90,7 +93,10 @@ val new_chunk : map ->
   ?parent:node -> ?size:int -> ?ptr:node -> ?pointed:node ->
   unit -> node
 
-val add_root : map -> Cil_types.varinfo -> node
+val add_cvar : map -> Cil_types.varinfo -> node
+val add_logic_var : map -> Cil_types.logic_var -> domain
+val add_logic_info : map -> Cil_types.logic_info -> domain
+val add_result : map -> node
 val add_label : map -> string -> node
 val add_field : map -> node -> fieldinfo -> node
 val add_index : map -> node -> typ -> node
@@ -101,14 +107,21 @@ val add_read : map -> node -> Access.acs -> unit
 val add_write : map -> node -> Access.acs -> unit
 val add_shift : map -> node -> Access.acs -> unit
 
+val domain_of_typ : map -> typ -> domain
+val domain_of_ltyp : map -> ?ctxt:context -> logic_type -> domain
+
 val merge : map -> node -> node -> unit
 val merge_all : map -> node list -> unit
+val merge_domain : map -> domain -> domain -> domain
 
 val cvar : map -> varinfo -> node
+val lvar : map -> logic_var -> domain
+val logic_info : map -> logic_info -> domain
 val field : map -> node -> fieldinfo -> node
 val index : map -> node -> typ -> node
 val lval : map -> lval -> node
 val exp : map -> exp -> node option
+val result : map -> node option
 
 val ranges : map -> node -> range list
 val points_to : map -> node -> node option
@@ -125,3 +138,5 @@ val writes : map -> node -> typ list
 val shifts : map -> node -> typ list
 val types : map -> node -> typ list
 val typed : map -> node -> typ option
+
+val bitsSizeOf : typ -> int

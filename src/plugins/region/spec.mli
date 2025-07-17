@@ -20,36 +20,34 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* -------------------------------------------------------------------------- *)
-(* --- Region Analysis API                                                --- *)
-(* -------------------------------------------------------------------------- *)
+open Cil_types
 
-type map = Memory.map
-type node = Memory.node
-let map kf = (Analysis.get kf).map
-let id n = Memory.id n
-let uid m n = Memory.id @@ Memory.node m n
-let iter = Memory.iter
-let find m id = Memory.node m @@ Memory.forge id
-let node = Memory.node
-let nodes = Memory.nodes
-let equal = Memory.equal
-let included = Memory.included
-let separated = Memory.separated
-let singleton = Memory.singleton
-let size = Memory.size
-let cvars = Memory.cvars
-let labels = Memory.labels
-let reads = Memory.reads
-let writes = Memory.writes
-let shifts = Memory.shifts
-let typed = Memory.typed
-let parents m n = Memory.nodes m @@ Memory.parents m n
-let points_to m n = Option.map (Memory.node m) @@ Memory.points_to m n
-let pointed_by m n = Memory.nodes m @@ Memory.pointed_by m n
-let lval m l = Memory.node m @@ Memory.lval m l
-let exp m e = Option.map (Memory.node m) @@ Memory.exp m e
-let cvar = Memory.cvar
-let field = Memory.field
-let index = Memory.index
-let footprint = Memory.footprint
+type path = {
+  loc : location ;
+  typ : typ ;
+  step: step ;
+}
+
+and step =
+  | Var of varinfo
+  | AddrOf of path
+  | Star of path
+  | Shift of path
+  | Index of path * int
+  | Field of path * fieldinfo
+  | Cast of typ * path
+
+type region = {
+  rname: string option ;
+  rpath: path list ;
+}
+
+val pp_step : Format.formatter -> step -> unit
+val pp_atom : Format.formatter -> path -> unit
+val pp_path : Format.formatter -> path -> unit
+val pp_region : Format.formatter -> region -> unit
+val pp_regions : Format.formatter -> region list -> unit
+
+val of_extension : acsl_extension -> region list
+val of_code_annot : code_annotation -> region list
+val of_behavior : behavior -> region list
