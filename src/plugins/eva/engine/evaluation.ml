@@ -1738,7 +1738,7 @@ module Make
           let reduce kf = let+ value = reduce kf in (kf, value) in
           let process acc kf = Bottom.add_to_list (reduce kf) acc in
           let res, status =
-            let res = `Value (List.fold_left process [] kfs) in
+            let res = `Value (List.rev (List.fold_left process [] kfs)) in
             if kfs = [] then `Bottom, Alarmset.False
             else if alarm || alarm' then res, Alarmset.Unknown
             else res, Alarmset.True

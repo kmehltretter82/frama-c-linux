@@ -14,40 +14,40 @@
 [eva] Recording results for decr
 [eva] Done for function decr
 [eva] calls_annotation.i:52: calls annotation got status valid.
-[eva] computing for function square <- main.
-  Called from calls_annotation.i:52.
-[eva] Recording results for square
-[eva] Done for function square
-[eva] computing for function decr <- main.
-  Called from calls_annotation.i:52.
-[eva] Recording results for decr
-[eva] Done for function decr
 [eva] computing for function incr <- main.
   Called from calls_annotation.i:52.
 [eva] Recording results for incr
 [eva] Done for function incr
+[eva] computing for function decr <- main.
+  Called from calls_annotation.i:52.
+[eva] Recording results for decr
+[eva] Done for function decr
+[eva] computing for function square <- main.
+  Called from calls_annotation.i:52.
+[eva] Recording results for square
+[eva] Done for function square
 [eva] calls_annotation.i:54: calls annotation got status valid.
+[eva] computing for function incr <- main.
+  Called from calls_annotation.i:54.
+[eva] Recording results for incr
+[eva] Done for function incr
+[eva] computing for function decr <- main.
+  Called from calls_annotation.i:54.
+[eva] Recording results for decr
+[eva] Done for function decr
 [eva] computing for function square <- main.
   Called from calls_annotation.i:54.
 [eva] Recording results for square
 [eva] Done for function square
-[eva] computing for function decr <- main.
-  Called from calls_annotation.i:54.
-[eva] Recording results for decr
-[eva] Done for function decr
-[eva] computing for function incr <- main.
-  Called from calls_annotation.i:54.
-[eva] Recording results for incr
-[eva] Done for function incr
 [eva:alarm] calls_annotation.i:59: Warning: calls annotation got status unknown.
-[eva] computing for function decr <- main.
-  Called from calls_annotation.i:59.
-[eva] Recording results for decr
-[eva] Done for function decr
 [eva] computing for function incr <- main.
   Called from calls_annotation.i:59.
 [eva] Recording results for incr
 [eva] Done for function incr
+[eva] computing for function decr <- main.
+  Called from calls_annotation.i:59.
+[eva] Recording results for decr
+[eva] Done for function decr
 [eva] calls_annotation.i:60: Frama_C_show_each_0_1: {0; 1}
 [eva:alarm] calls_annotation.i:65: Warning: 
   calls annotation got status invalid (stopping propagation).
@@ -88,8 +88,8 @@
   calls annotation got status invalid (stopping propagation).
 [eva] calls_annotation.i:80: Reusing old results for call to incr
 [eva] calls_annotation.i:82: Reusing old results for call to decr
-[eva] calls_annotation.i:85: Reusing old results for call to decr
 [eva] calls_annotation.i:85: Reusing old results for call to incr
+[eva] calls_annotation.i:85: Reusing old results for call to decr
 [eva] computing for function decr <- main.
   Called from calls_annotation.i:88.
 [eva] Recording results for decr
@@ -108,15 +108,15 @@
 [eva] Done for function apply
 [eva] calls_annotation.i:80: Reusing old results for call to incr
 [eva] calls_annotation.i:82: Reusing old results for call to incr
-[eva] computing for function square <- main.
-  Called from calls_annotation.i:85.
-[eva] Recording results for square
-[eva] Done for function square
+[eva] calls_annotation.i:85: Reusing old results for call to incr
 [eva] computing for function decr <- main.
   Called from calls_annotation.i:85.
 [eva] Recording results for decr
 [eva] Done for function decr
-[eva] calls_annotation.i:85: Reusing old results for call to incr
+[eva] computing for function square <- main.
+  Called from calls_annotation.i:85.
+[eva] Recording results for square
+[eva] Done for function square
 [eva] computing for function square <- main.
   Called from calls_annotation.i:88.
 [eva] Recording results for square
@@ -136,9 +136,9 @@
 [eva] calls_annotation.i:80: Reusing old results for call to incr
 [eva] calls_annotation.i:82: Reusing old results for call to decr
 [eva:alarm] calls_annotation.i:85: Warning: calls annotation got status unknown.
-[eva] calls_annotation.i:85: Reusing old results for call to square
-[eva] calls_annotation.i:85: Reusing old results for call to decr
 [eva] calls_annotation.i:85: Reusing old results for call to incr
+[eva] calls_annotation.i:85: Reusing old results for call to decr
+[eva] calls_annotation.i:85: Reusing old results for call to square
 [eva:alarm] calls_annotation.i:88: Warning: 
   calls annotation got status invalid (stopping propagation).
 [eva] computing for function apply <- main.

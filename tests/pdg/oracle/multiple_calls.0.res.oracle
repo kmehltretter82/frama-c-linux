@@ -7,14 +7,14 @@
   G2 ∈ [--..--]
   G3 ∈ [--..--]
   G4 ∈ [--..--]
-[eva] computing for function fct2 <- appel_ptr_fct.
-  Called from multiple_calls.c:23.
-[eva] Recording results for fct2
-[eva] Done for function fct2
 [eva] computing for function fct1 <- appel_ptr_fct.
   Called from multiple_calls.c:23.
 [eva] Recording results for fct1
 [eva] Done for function fct1
+[eva] computing for function fct2 <- appel_ptr_fct.
+  Called from multiple_calls.c:23.
+[eva] Recording results for fct2
+[eva] Done for function fct2
 [eva:alarm] multiple_calls.c:24: Warning: 
   signed overflow. assert x + G1 ≤ 2147483647;
 [eva:alarm] multiple_calls.c:24: Warning: 

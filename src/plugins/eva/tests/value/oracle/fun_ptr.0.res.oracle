@@ -32,11 +32,11 @@
 [eva:alarm] fun_ptr.i:33: Warning: 
   pointer to function with incompatible type.
   assert \valid_function((int (*)(int , int ))t[nd]);
+[eva] fun_ptr.i:33: Reusing old results for call to f
 [eva] computing for function g <- test2 <- main.
   Called from fun_ptr.i:33.
 [eva] Recording results for g
 [eva] Done for function g
-[eva] fun_ptr.i:33: Reusing old results for call to f
 [eva] Recording results for test2
 [eva] Done for function test2
 [eva] computing for function test3 <- main.
