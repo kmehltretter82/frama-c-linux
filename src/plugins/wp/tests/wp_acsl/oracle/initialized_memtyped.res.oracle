@@ -19,12 +19,12 @@
 ------------------------------------------------------------
 
 Goal Assertion 'provable' (file initialized_memtyped.i, line 115):
-Let a = global(L_y_72).
+Let a = global(L_y_71).
 Let a_1 = shiftfield_F3_X_x(a).
 Let m = Init_0[a_1 <- true].
-Let a_2 = global(L_z_73).
+Let a_2 = global(L_z_72).
 Let a_3 = memcpy(m, a_2, m, a, 2).
-Let a_4 = global(L_x_71).
+Let a_4 = global(L_x_70).
 Let a_5 = memcpy(a_3, a, a_3, a_4, 2).
 Let m_1 = Mint_0[a_1 <- 1].
 Let a_6 = memcpy(m_1, a_2, m_1, a, 2).
@@ -61,11 +61,11 @@ Prove: IsInit_S3_X(a_4, a_5).
 ------------------------------------------------------------
 
 Goal Assertion 'provable' (file initialized_memtyped.i, line 116):
-Let a = global(L_x_71).
-Let a_1 = global(L_y_72).
+Let a = global(L_x_70).
+Let a_1 = global(L_y_71).
 Let a_2 = shiftfield_F3_X_x(a_1).
 Let m = Init_0[a_2 <- true].
-Let a_3 = global(L_z_73).
+Let a_3 = global(L_z_72).
 Let a_4 = memcpy(m, a_3, m, a_1, 2).
 Let a_5 = memcpy(a_4, a_1, a_4, a, 2).
 Let m_1 = Mint_0[a_2 <- 1].
@@ -105,12 +105,12 @@ Prove: IsInit_S3_X(a_1, a_5).
 ------------------------------------------------------------
 
 Goal Assertion 'not_provable' (file initialized_memtyped.i, line 117):
-Let a = global(L_y_72).
+Let a = global(L_y_71).
 Let a_1 = shiftfield_F3_X_x(a).
 Let m = Init_0[a_1 <- true].
-Let a_2 = global(L_z_73).
+Let a_2 = global(L_z_72).
 Let a_3 = memcpy(m, a_2, m, a, 2).
-Let a_4 = global(L_x_71).
+Let a_4 = global(L_x_70).
 Let a_5 = memcpy(a_3, a, a_3, a_4, 2).
 Let m_1 = Mint_0[a_1 <- 1].
 Let a_6 = memcpy(m_1, a_2, m_1, a, 2).
@@ -158,9 +158,9 @@ Assume {
   (* Heap *)
   Type: scinit(Init_0).
   (* Initializer *)
-  Init: (Init_0[global(L_l_62)]=true).
+  Init: (Init_0[global(L_l_61)]=true).
 }
-Prove: (Init_0[global(P_x_61)]=true).
+Prove: (Init_0[global(P_x_60)]=true).
 
 ------------------------------------------------------------
 
@@ -175,18 +175,18 @@ Prove: true.
 Goal Post-condition 'provable' in 'glob_arr':
 Assume {
   (* Heap *)
-  Type: (region(G_ga_49) <= 0) /\ scinit(Init_0).
+  Type: (region(G_ga_48) <= 0) /\ scinit(Init_0).
   (* Goal *)
   When: (0 <= i) /\ (i <= 4).
 }
-Prove: (Init_0[shift_sint32(global(G_ga_49), i)]=true).
+Prove: (Init_0[shift_sint32(global(G_ga_48), i)]=true).
 
 ------------------------------------------------------------
 
 Goal Post-condition 'unknown' in 'glob_arr':
 Assume {
   (* Heap *)
-  Type: (region(G_ga_49) <= 0) /\ (region(pga_0.base) <= 0) /\
+  Type: (region(G_ga_48) <= 0) /\ (region(pga_0.base) <= 0) /\
       scinit(Init_0).
   (* Goal *)
   When: (0 <= i) /\ (i <= 4).
@@ -199,15 +199,15 @@ Prove: (Init_0[shift_sint32(pga_0, i)]=true).
 ------------------------------------------------------------
 
 Goal Post-condition 'provable' in 'glob_var':
-Assume { (* Heap *) Type: (region(G_gx_43) <= 0) /\ scinit(Init_0). }
-Prove: (Init_0[global(G_gx_43)]=true).
+Assume { (* Heap *) Type: (region(G_gx_42) <= 0) /\ scinit(Init_0). }
+Prove: (Init_0[global(G_gx_42)]=true).
 
 ------------------------------------------------------------
 
 Goal Post-condition 'unknown' in 'glob_var':
 Assume {
   (* Heap *)
-  Type: (region(G_gx_43) <= 0) /\ (region(px_0.base) <= 0) /\ scinit(Init_0).
+  Type: (region(G_gx_42) <= 0) /\ (region(px_0.base) <= 0) /\ scinit(Init_0).
 }
 Prove: (Init_0[px_0]=true).
 
@@ -217,7 +217,7 @@ Prove: (Init_0[px_0]=true).
 ------------------------------------------------------------
 
 Goal Assertion 'provable' (file initialized_memtyped.i, line 95):
-Let a = global(L_x_67).
+Let a = global(L_x_66).
 Assume {
   (* Heap *)
   Type: scinit(Init_0).

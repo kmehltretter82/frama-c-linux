@@ -11,8 +11,8 @@
       "data": {
         "updated": [
           {
-            "key": "kf#26",
-            "decl": "#F26",
+            "key": "kf#25",
+            "decl": "#F25",
             "name": "g",
             "signature": "int g(int y);",
             "defined": true,
@@ -24,8 +24,8 @@
             }
           },
           {
-            "key": "kf#22",
-            "decl": "#F22",
+            "key": "kf#21",
+            "decl": "#F21",
             "name": "f",
             "signature": "int f(int x);",
             "defined": true,

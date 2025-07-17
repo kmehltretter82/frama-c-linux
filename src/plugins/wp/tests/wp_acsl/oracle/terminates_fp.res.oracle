@@ -34,7 +34,7 @@ Prove: true.
 Goal Termination-condition (generated) in 'no_t_spec' (2/2):
 Call terminates at line 44
 Tags: Call gnt.
-Assume { (* Heap *) Type: region(G_gnt_34) <= 0. }
+Assume { (* Heap *) Type: region(G_gnt_33) <= 0. }
 Prove: false.
 
 ------------------------------------------------------------
@@ -55,7 +55,7 @@ Prove: true.
 Goal Termination-condition (generated) in 'no_t_spec_cond' (2/2):
 Call terminates at line 64
 Tags: Call hnt.
-Assume { (* Heap *) Type: region(G_hnt_39) <= 0. }
+Assume { (* Heap *) Type: region(G_hnt_38) <= 0. }
 Prove: false.
 
 ------------------------------------------------------------
@@ -88,7 +88,7 @@ Prove: true.
 Goal Termination-condition (generated) in 'no_t_spec_cond_m' (2/3):
 Call terminates at line 75
 Tags: Call gt Call hnt.
-Assume { (* Heap *) Type: (region(G_gt_24) <= 0) /\ (region(G_hnt_39) <= 0).
+Assume { (* Heap *) Type: (region(G_gt_23) <= 0) /\ (region(G_hnt_38) <= 0).
 }
 Prove: false.
 
@@ -97,7 +97,7 @@ Prove: false.
 Goal Termination-condition (generated) in 'no_t_spec_cond_m' (3/3):
 Call terminates at line 75
 Tags: Call ht Call hnt.
-Assume { (* Heap *) Type: (region(G_hnt_39) <= 0) /\ (region(G_ht_29) <= 0).
+Assume { (* Heap *) Type: (region(G_hnt_38) <= 0) /\ (region(G_ht_28) <= 0).
 }
 Prove: false.
 
@@ -107,8 +107,8 @@ Prove: false.
 ------------------------------------------------------------
 
 Goal Call point gnt hnt in 'no_t_spec_in_bhv' at instruction (file terminates_fp.i, line 58):
-Let a = global(G_hnt_39).
-Let a_1 = global(G_gnt_34).
+Let a = global(G_hnt_38).
+Let a_1 = global(G_gnt_33).
 Assume {
   Type: is_sint32(x).
   (* Heap *)
@@ -140,7 +140,7 @@ Prove: true.
 Goal Termination-condition (generated) in 'no_t_spec_in_bhv' (2/2):
 Call terminates at line 58
 Tags: Call gnt.
-Assume { (* Heap *) Type: region(G_gnt_34) <= 0. }
+Assume { (* Heap *) Type: region(G_gnt_33) <= 0. }
 Prove: false.
 
 ------------------------------------------------------------
@@ -178,8 +178,8 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Call point gt hnt in 't_spec_in_bhv' at instruction (file terminates_fp.i, line 38):
-Let a = global(G_gt_24).
-Let a_1 = global(G_hnt_39).
+Let a = global(G_gt_23).
+Let a_1 = global(G_hnt_38).
 Assume {
   Type: is_sint32(x).
   (* Heap *)

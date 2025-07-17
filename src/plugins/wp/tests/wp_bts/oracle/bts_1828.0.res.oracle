@@ -66,7 +66,7 @@ Assume {
   (* Pre-condition *)
   Have: valid_rw(Malloc_0, one_0, 1).
 }
-Prove: global(L_two_26) != one_0.
+Prove: global(L_two_25) != one_0.
 
 ------------------------------------------------------------
 [wp] bts_1828.i:56: Warning: 

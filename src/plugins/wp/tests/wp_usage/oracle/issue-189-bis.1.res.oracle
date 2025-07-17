@@ -6,10 +6,10 @@
 [wp] Warning: Missing RTE guards
 
 Goal Post-condition 'memcpy,ok' in 'memcpy_context_vars':
-Let a = global(G_dst_50).
+Let a = global(G_dst_49).
 Let a_1 = shift_uint8(a, 0).
 Let a_2 = memcpy(Mint_0, a_1, Mint_undef_0, a_1, len_0).
-Let a_3 = global(G_src_49).
+Let a_3 = global(G_src_48).
 Assume {
   Type: is_sint32(len_0) /\ is_sint32(len_1).
   (* Goal *)
@@ -43,10 +43,10 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Preservation of Invariant 'ok,cpy' (file issue-189-bis.i, line 56):
-Let a = global(G_dst_50).
+Let a = global(G_dst_49).
 Let a_1 = shift_uint8(a, 0).
 Let a_2 = memcpy(Mint_0, a_1, Mint_undef_0, a_1, len_0).
-Let a_3 = global(G_src_49).
+Let a_3 = global(G_src_48).
 Let a_4 = a_2[dst2_0 <- a_2[src2_0]].
 Assume {
   Type: is_sint32(len_0) /\ is_sint32(len_1) /\ is_sint32(len_1 - 1).
@@ -88,9 +88,9 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Preservation of Invariant 'ok,len' (file issue-189-bis.i, line 52):
-Let a = global(G_dst_50).
+Let a = global(G_dst_49).
 Let a_1 = shift_uint8(a, 0).
-Let a_2 = global(G_src_49).
+Let a_2 = global(G_src_48).
 Assume {
   Type: is_sint32(len_1) /\ is_sint32(len_0) /\ is_sint32(len_0 - 1).
   (* Pre-condition 'write_access' *)
@@ -141,11 +141,11 @@ Prove: true.
 
 Goal Loop assigns (file issue-189-bis.i, line 55) (4/4):
 Effect at line 62
-Let a = global(G_dst_50).
+Let a = global(G_dst_49).
 Let a_1 = shift_uint8(a, 0).
 Let a_2 = memcpy(Mint_0, a_1, Mint_undef_0, a_1, len_0).
 Let a_3 = a_2[tmp_0 <- a_2[src2_0]].
-Let a_4 = global(G_src_49).
+Let a_4 = global(G_src_48).
 Assume {
   Type: is_sint32(len_0) /\ is_sint32(len_1) /\ is_sint32(len_1 - 1).
   (* Heap *)

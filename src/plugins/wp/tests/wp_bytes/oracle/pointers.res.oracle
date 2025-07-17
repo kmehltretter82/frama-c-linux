@@ -19,8 +19,8 @@
 ------------------------------------------------------------
 
 Goal Check (file pointers.i, line 26):
-Let a = shift_uint8(global(L_buffer_36), 0).
-Let a_1 = global(P_f_35).
+Let a = shift_uint8(global(L_buffer_35), 0).
+Let a_1 = global(P_f_34).
 Assume { (* Heap *) Type: framed(mem_0) /\ sconst(mem_0). }
 Prove: addr_of_int(read_uint64(write_uint64(mem_0, a, int_of_addr(a_1)), a)) =
     a_1.
@@ -31,8 +31,8 @@ Prove: addr_of_int(read_uint64(write_uint64(mem_0, a, int_of_addr(a_1)), a)) =
 ------------------------------------------------------------
 
 Goal Check (file pointers.i, line 18):
-Let a = shift_uint8(global(L_buffer_31), 0).
-Let a_1 = global(G_g_28).
+Let a = shift_uint8(global(L_buffer_30), 0).
+Let a_1 = global(G_g_27).
 Assume { (* Heap *) Type: framed(mem_0) /\ sconst(mem_0). }
 Prove: addr_of_int(read_uint64(write_uint64(mem_0, a, int_of_addr(a_1)), a)) =
     a_1.
@@ -43,12 +43,12 @@ Prove: addr_of_int(read_uint64(write_uint64(mem_0, a, int_of_addr(a_1)), a)) =
 ------------------------------------------------------------
 
 Goal Check (file pointers.i, line 48):
-Let a = shift_uint8(global(L_buffer_45), 0).
+Let a = shift_uint8(global(L_buffer_44), 0).
 Assume { (* Heap *) Type: framed(mem_0) /\ linked(alloc_0) /\ sconst(mem_0).
 }
-Prove: !valid_rw(alloc_0[L_buffer_45 <- 8][L_l_46 <- 0],
+Prove: !valid_rw(alloc_0[L_buffer_44 <- 8][L_l_45 <- 0],
           addr_of_int(read_uint64(write_uint64(mem_0, a,
-                                    int_of_addr(global(L_l_46))), a)), 4).
+                                    int_of_addr(global(L_l_45))), a)), 4).
 
 ------------------------------------------------------------
 ------------------------------------------------------------
@@ -56,8 +56,8 @@ Prove: !valid_rw(alloc_0[L_buffer_45 <- 8][L_l_46 <- 0],
 ------------------------------------------------------------
 
 Goal Check 'P' (file pointers.i, line 36):
-Let a = global(L_l_40).
-Let a_1 = shift_uint8(global(L_buffer_41), 0).
+Let a = global(L_l_39).
+Let a_1 = shift_uint8(global(L_buffer_40), 0).
 Assume {
   (* Heap *)
   Type: framed(mem_0) /\ sconst(mem_0).
@@ -73,7 +73,7 @@ Prove: addr_of_int(read_uint64(write_uint64(mem_0, a_1, int_of_addr(a)), a_1)) =
 ------------------------------------------------------------
 
 Goal Check (file pointers.i, line 8):
-Let a = shift_uint8(global(L_buffer_24), 0).
+Let a = shift_uint8(global(L_buffer_23), 0).
 Assume { (* Heap *) Type: framed(mem_0) /\ sconst(mem_0). }
 Prove: addr_of_int(read_uint64(write_uint64(mem_0, a, 0), a)) = null.
 
@@ -83,7 +83,7 @@ Prove: addr_of_int(read_uint64(write_uint64(mem_0, a, 0), a)) = null.
 ------------------------------------------------------------
 
 Goal Check (file pointers.i, line 57):
-Let a = shift_uint8(global(L_buffer_52), 0).
+Let a = shift_uint8(global(L_buffer_51), 0).
 Assume {
   (* Heap *)
   Type: (region(f.base) <= 0) /\ framed(mem_0) /\ linked(alloc_0) /\

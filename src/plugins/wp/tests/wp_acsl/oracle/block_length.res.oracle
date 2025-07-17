@@ -66,11 +66,11 @@ Prove: true.
 Goal Post-condition 'Pt' in 'g':
 Assume {
   (* Heap *)
-  Type: (region(G_mat_23) <= 0) /\ (region(G_s_25) <= 0) /\
-      (region(G_t_22) <= 0) /\ (region(G_ts_26) <= 0) /\
-      (region(G_x_24) <= 0) /\ linked(Malloc_0).
+  Type: (region(G_mat_22) <= 0) /\ (region(G_s_24) <= 0) /\
+      (region(G_t_21) <= 0) /\ (region(G_ts_25) <= 0) /\
+      (region(G_x_23) <= 0) /\ linked(Malloc_0).
 }
-Prove: (Malloc_0[G_t_22] / 20) = 1.
+Prove: (Malloc_0[G_t_21] / 20) = 1.
 
 ------------------------------------------------------------
 
@@ -82,11 +82,11 @@ Prove: true.
 Goal Post-condition 'Pmat1' in 'g':
 Assume {
   (* Heap *)
-  Type: (region(G_mat_23) <= 0) /\ (region(G_s_25) <= 0) /\
-      (region(G_t_22) <= 0) /\ (region(G_ts_26) <= 0) /\
-      (region(G_x_24) <= 0) /\ linked(Malloc_0).
+  Type: (region(G_mat_22) <= 0) /\ (region(G_s_24) <= 0) /\
+      (region(G_t_21) <= 0) /\ (region(G_ts_25) <= 0) /\
+      (region(G_x_23) <= 0) /\ linked(Malloc_0).
 }
-Prove: (Malloc_0[G_mat_23] / 5) = 10.
+Prove: (Malloc_0[G_mat_22] / 5) = 10.
 
 ------------------------------------------------------------
 
@@ -98,65 +98,65 @@ Prove: true.
 Goal Post-condition 'Pmat2' in 'g':
 Assume {
   (* Heap *)
-  Type: (region(G_mat_23) <= 0) /\ (region(G_s_25) <= 0) /\
-      (region(G_t_22) <= 0) /\ (region(G_ts_26) <= 0) /\
-      (region(G_x_24) <= 0) /\ linked(Malloc_0).
+  Type: (region(G_mat_22) <= 0) /\ (region(G_s_24) <= 0) /\
+      (region(G_t_21) <= 0) /\ (region(G_ts_25) <= 0) /\
+      (region(G_x_23) <= 0) /\ linked(Malloc_0).
 }
-Prove: (Malloc_0[G_mat_23] / 50) = 1.
+Prove: (Malloc_0[G_mat_22] / 50) = 1.
 
 ------------------------------------------------------------
 
 Goal Post-condition 'Ps' in 'g':
 Assume {
   (* Heap *)
-  Type: (region(G_mat_23) <= 0) /\ (region(G_s_25) <= 0) /\
-      (region(G_t_22) <= 0) /\ (region(G_ts_26) <= 0) /\
-      (region(G_x_24) <= 0) /\ linked(Malloc_0).
+  Type: (region(G_mat_22) <= 0) /\ (region(G_s_24) <= 0) /\
+      (region(G_t_21) <= 0) /\ (region(G_ts_25) <= 0) /\
+      (region(G_x_23) <= 0) /\ linked(Malloc_0).
 }
-Prove: (4 + Malloc_0[G_x_24]) = (5 * (Malloc_0[G_s_25] / 5)).
+Prove: (4 + Malloc_0[G_x_23]) = (5 * (Malloc_0[G_s_24] / 5)).
 
 ------------------------------------------------------------
 
 Goal Post-condition 'Pts' in 'g':
 Assume {
   (* Heap *)
-  Type: (region(G_mat_23) <= 0) /\ (region(G_s_25) <= 0) /\
-      (region(G_t_22) <= 0) /\ (region(G_ts_26) <= 0) /\
-      (region(G_x_24) <= 0) /\ linked(Malloc_0).
+  Type: (region(G_mat_22) <= 0) /\ (region(G_s_24) <= 0) /\
+      (region(G_t_21) <= 0) /\ (region(G_ts_25) <= 0) /\
+      (region(G_x_23) <= 0) /\ linked(Malloc_0).
 }
-Prove: (Malloc_0[G_ts_26] / 20) = (Malloc_0[G_s_25] / 5).
+Prove: (Malloc_0[G_ts_25] / 20) = (Malloc_0[G_s_24] / 5).
 
 ------------------------------------------------------------
 
 Goal Post-condition 'Pt1' in 'g':
 Assume {
   (* Heap *)
-  Type: (region(G_mat_23) <= 0) /\ (region(G_s_25) <= 0) /\
-      (region(G_t_22) <= 0) /\ (region(G_ts_26) <= 0) /\
-      (region(G_x_24) <= 0) /\ linked(Malloc_0).
+  Type: (region(G_mat_22) <= 0) /\ (region(G_s_24) <= 0) /\
+      (region(G_t_21) <= 0) /\ (region(G_ts_25) <= 0) /\
+      (region(G_x_23) <= 0) /\ linked(Malloc_0).
 }
-Prove: Malloc_0[G_t_22] = 20.
+Prove: Malloc_0[G_t_21] = 20.
 
 ------------------------------------------------------------
 
 Goal Post-condition 'Pmat12' in 'g':
 Assume {
   (* Heap *)
-  Type: (region(G_mat_23) <= 0) /\ (region(G_s_25) <= 0) /\
-      (region(G_t_22) <= 0) /\ (region(G_ts_26) <= 0) /\
-      (region(G_x_24) <= 0) /\ linked(Malloc_0).
+  Type: (region(G_mat_22) <= 0) /\ (region(G_s_24) <= 0) /\
+      (region(G_t_21) <= 0) /\ (region(G_ts_25) <= 0) /\
+      (region(G_x_23) <= 0) /\ linked(Malloc_0).
 }
-Prove: Malloc_0[G_mat_23] = 50.
+Prove: Malloc_0[G_mat_22] = 50.
 
 ------------------------------------------------------------
 
 Goal Post-condition 'Pts1' in 'g':
 Assume {
   (* Heap *)
-  Type: (region(G_mat_23) <= 0) /\ (region(G_s_25) <= 0) /\
-      (region(G_t_22) <= 0) /\ (region(G_ts_26) <= 0) /\
-      (region(G_x_24) <= 0) /\ linked(Malloc_0).
+  Type: (region(G_mat_22) <= 0) /\ (region(G_s_24) <= 0) /\
+      (region(G_t_21) <= 0) /\ (region(G_ts_25) <= 0) /\
+      (region(G_x_23) <= 0) /\ linked(Malloc_0).
 }
-Prove: (Malloc_0[G_ts_26] / 5) = (4 * (Malloc_0[G_s_25] / 5)).
+Prove: (Malloc_0[G_ts_25] / 5) = (4 * (Malloc_0[G_s_24] / 5)).
 
 ------------------------------------------------------------
