@@ -120,8 +120,8 @@ module Block: S_with_pretty with type t = block
 (* Blocks cannot compared or hashed, so collections are not available *)
 
 module Compinfo: S_with_collections_pretty with type t = compinfo
-module Enuminfo: S_with_collections_pretty with type t = enuminfo
-module Enumitem: S_with_collections_pretty with type t = enumitem
+module Enuminfo: S_with_collections with type t = enuminfo
+module Enumitem: S_with_collections with type t = enumitem
 
 (**
    @since Fluorine-20130401
@@ -353,7 +353,7 @@ module Term_lhost: S_with_collections_pretty with type t = term_lhost
 module Term_offset: S_with_collections_pretty with type t = term_offset
 module Term_lval: S_with_collections_pretty with type t = term_lval
 
-module Logic_real: S_with_collections_pretty with type t = logic_real
+module Logic_real: S_with_collections with type t = logic_real
 
 module Predicate: S_with_pretty with type t = predicate
 module Toplevel_predicate: S_with_pretty with type t = toplevel_predicate
@@ -361,7 +361,7 @@ module Identified_predicate:
   S_with_collections_pretty with type t = identified_predicate
 (** @since Neon-20140301 *)
 
-module PredicateStructEq: S_with_collections_pretty with type t = predicate
+module PredicateStructEq: S_with_collections with type t = predicate
 (** @since 24.0-Chromium *)
 
 (**************************************************************************)

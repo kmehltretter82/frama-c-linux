@@ -186,6 +186,13 @@ struct
   let descr, packed_descr = mk_full_descr (Descr.of_type T.ty)
   let reprs = T.reprs (* [Type.reprs] is not usable in the "no-obj" mode *)
 
+  let %test _ =
+    if pretty != undefined then (* Test defined pretty functions *)
+      at_exit (* Do not test now as some pretty printers are not yet defined *)
+        (fun () ->
+           List.iter (pretty Format.str_formatter) reprs;
+           ignore (Format.flush_str_formatter ()));
+    true
 end
 
 module type Make_input = sig
@@ -974,16 +981,19 @@ module Poly_array =
         !acc
       ;;
       let map = Array.map
-      let mk_pretty f fmt a =
-        Format.fprintf fmt "(@[<hv 2>[| %t |]@])"
-          (fun fmt ->
-             let length = Array.length a in
-             match length with
-             | 0 -> ()
-             | _ -> (Format.fprintf fmt "%a" f a.(0);
-                     for i = 1 to (length - 1) do
-                       Format.fprintf fmt ";@;%a" f a.(i)
-                     done))
+      let mk_pretty f =
+        if f == undefined
+        then undefined
+        else fun fmt a ->
+          Format.fprintf fmt "(@[<hv 2>[| %t |]@])"
+            (fun fmt ->
+               let length = Array.length a in
+               match length with
+               | 0 -> ()
+               | _ -> (Format.fprintf fmt "%a" f a.(0);
+                       for i = 1 to (length - 1) do
+                         Format.fprintf fmt ";@;%a" f a.(i)
+                       done))
       let mk_mem_project mem f a =
         try
           for i = 0 to (Array.length a - 1) do
@@ -1096,13 +1106,16 @@ struct
           (*      if E.copy == identity then identity
                   else*) fun s -> S.fold (fun x -> S.add (E.copy x)) s S.empty
 
-        let pretty fmt s =
-          let pp_elt pp fmt v =
-            Format.fprintf fmt "@[%a@]" pp v
-          in
-          Pretty_utils.pp_iter
-            ~pre:"@[<hov 2>{@ " ~sep:";@ " ~suf:"@ }@]"
-            S.iter (pp_elt E.pretty) fmt s
+        let pretty =
+          if E.pretty == undefined
+          then undefined
+          else fun fmt s ->
+            let pp_elt pp fmt v =
+              Format.fprintf fmt "@[%a@]" pp v
+            in
+            Pretty_utils.pp_iter
+              ~pre:"@[<hov 2>{@ " ~sep:";@ " ~suf:"@ }@]"
+              S.iter (pp_elt E.pretty) fmt s
 
         let mem_project p s =
           try S.iter (fun x -> if E.mem_project p x then raise Exit) s; false
@@ -1150,15 +1163,18 @@ struct
         let mk_equal = M.equal
         let mk_hash = undefined
         let map = M.map
-        let mk_pretty f_value fmt map =
-          Format.fprintf fmt  "@[{{ ";
-          M.iter
-            (fun k v ->
-               Format.fprintf fmt "@[@[%a@] -> @[%a@]@];@ "
-                 Key.pretty k
-                 f_value v)
-            map;
-          Format.fprintf fmt  " }}@]"
+        let mk_pretty f_value =
+          if Key.pretty == undefined || f_value == undefined
+          then undefined
+          else fun fmt map ->
+            Format.fprintf fmt  "@[{{ ";
+            M.iter
+              (fun k v ->
+                 Format.fprintf fmt "@[@[%a@] -> @[%a@]@];@ "
+                   Key.pretty k
+                   f_value v)
+              map;
+            Format.fprintf fmt  " }}@]"
         let mk_mem_project =
           if Key.mem_project == undefined then undefined
           else
