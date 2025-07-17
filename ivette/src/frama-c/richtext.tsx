@@ -30,9 +30,11 @@
  */
 
 import React from 'react';
+import * as Dome from 'dome';
 import * as States from 'frama-c/states';
 import * as KernelData from 'frama-c/kernel/api/data';
 import * as Ast from 'frama-c/kernel/api/ast';
+import { getMarkerMenuItems } from './kernel/ASTview';
 import { classes } from 'dome/misc/utils';
 
 // --------------------------------------------------------------------------
@@ -168,11 +170,12 @@ export interface MarkerProps {
   marker: string;
   onSelected?: (marker: string, meta: Modifier) => void;
   onHovered?: (marker: string | undefined) => void;
+  onContextMenu?: (marker: string) => void;
   children?: React.ReactNode;
 }
 
 export function Marker(props: MarkerProps): JSX.Element {
-  const { marker, onSelected, onHovered, children } = props;
+  const { marker, onSelected, onHovered, onContextMenu, children } = props;
   const className = classes(
     (onSelected || onHovered) && 'kernel-text-marker'
   );
@@ -183,11 +186,16 @@ export function Marker(props: MarkerProps): JSX.Element {
     evt.stopPropagation();
     onSelected && onSelected(marker, evt.altKey ? 'META' : 'NORMAL');
   };
+  const onRightClick = (evt: React.MouseEvent): void => {
+    evt.stopPropagation();
+    onContextMenu && onContextMenu(marker);
+  };
   return (
     <span
       className={className}
       onClick={onClick}
       onDoubleClick={onDoubleClick}
+      onContextMenu={onRightClick}
       onMouseEnter={() => onHovered && onHovered(marker)}
       onMouseLeave={() => onHovered && onHovered(undefined)}
     >
@@ -200,6 +208,7 @@ export interface TextProps {
   text: KernelData.text;
   onSelected?: (marker: string, meta: Modifier) => void;
   onHovered?: (marker: string | undefined) => void;
+  onContextMenu?: (marker: string) => void;
   className?: string;
 }
 
@@ -217,6 +226,7 @@ export function Text(props: TextProps): JSX.Element {
             marker={tag}
             onSelected={props.onSelected}
             onHovered={props.onHovered}
+            onContextMenu={props.onContextMenu}
           >
             {contents}
           </Marker>
@@ -271,7 +281,13 @@ export function MarkerText(props: MarkerTextProps): JSX.Element {
     else
       States.setHovered(marker);
   };
-  return <Text {...props} onSelected={onSelected} onHovered={onHovered} />;
+  const onContextMenu = (m: string): void => {
+    const marker = Ast.jMarker(m);
+    const items: Dome.PopupMenuItem[] = getMarkerMenuItems(marker);
+    Dome.popupMenu(items);
+  };
+  return  <Text {...props} onSelected={onSelected} onHovered={onHovered}
+                           onContextMenu={onContextMenu} />;
 }
 
 

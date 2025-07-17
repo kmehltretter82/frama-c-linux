@@ -384,7 +384,9 @@ let definition_of_type t =
 let definition_of_localizable = function
   | PLval(kf,ki,(Var vi,NoOffset))
   | PTermLval(kf,ki,_,(TVar { lv_origin = Some vi },TNoOffset)) ->
-    if vi.vglob then
+    if not vi.vsource then
+      None (* No definition for variables that do not appear in the AST. *)
+    else if vi.vglob then
       let kf = try Some(Globals.Functions.get vi) with Not_found -> None in
       Some (PVDecl(kf,Kglobal,vi))
     else

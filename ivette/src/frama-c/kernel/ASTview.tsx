@@ -498,6 +498,57 @@ const Callers = Editor.createField<Eva.CallSite[]>([]);
 // as inferred by Eva.
 const Callees = Editor.createField<Ast.decl[]>([]);
 
+
+export function getMarkerMenuItems(
+  marker: Ast.marker,
+  callers?: Eva.CallSite[],
+  callees?: Ast.decl[],
+  markerText?: string
+): Dome.PopupMenuItem[] {
+  const attributes = States.getMarker(marker);
+  const items: Dome.PopupMenuItem[] = [];
+  const { kind, name, labelKind, definition } = attributes;
+  if (kind === 'DFUN') {
+    if(callers) {
+      const groupedCallers = Lodash.groupBy(callers, ({ call }) => call);
+      const markers = callers.map(({ stmt }) => stmt);
+      const descr = `Calls to ${name}`;
+      Lodash.forEach(groupedCallers, (group) => {
+        const n = group.length;
+        const { call }: Eva.CallSite = group[0];
+        const { name: fct } = States.getDeclaration(call);
+        const caller = `caller ${fct}`;
+        const nsites = n > 1 ? `s (${n} call sites)` : '';
+        const label = `Go to ${caller}${nsites}`;
+        const index = callers.findIndex(({ call: f }) => f === call);
+        const onClick = (): void => Locations.setSelection({
+          label: descr, markers, index, plugin: 'Callers',
+        });
+        items.push({ label, onClick });
+      });
+    }
+  } else if (definition) {
+    const label = `Go to ${name} (${labelKind.toLowerCase()})`;
+    const onClick = (): void => States.setSelected(definition);
+    items.push({ label, onClick });
+  } else if (callees && callees.length > 0) {
+    callees.forEach((decl) => {
+      const { name: fct } = States.getDeclaration(decl);
+      const onClick = (): void => States.setCurrentScope(decl);
+      const label = `Go to ${fct} (indirect call)`;
+      items.push({ label, onClick });
+    });
+  }
+  MarkerMenuExtenders.forEach((ext) => ext(items, attributes));
+  const text = markerText ?? attributes.name;
+  if (text) {
+    const label = 'Copy to clipboard';
+    const onClick = (): Promise<void> => navigator.clipboard.writeText(text);
+    items.push({ label, onClick });
+  }
+  return items;
+}
+
 const ContextMenuHandler = createContextMenuHandler();
 function createContextMenuHandler(): Editor.Extension {
   const deps = {
@@ -512,46 +563,9 @@ function createContextMenuHandler(): Editor.Extension {
       const position = view.posAtCoords(coords); if (!position) return;
       const node = coveringNode(tree, position);
       if (!node || !node.marker) return;
-      const items: Dome.PopupMenuItem[] = [];
-      const attributes = States.getMarker(node.marker);
-      const { kind, labelKind, name, definition } = attributes;
-      if (kind === 'DFUN') {
-        const groupedCallers = Lodash.groupBy(callers, ({ call }) => call);
-        const markers = callers.map(({ stmt }) => stmt);
-        const descr = `Calls to ${name}`;
-        Lodash.forEach(groupedCallers, (group) => {
-          const n = group.length;
-          const { call }: Eva.CallSite = group[0];
-          const { name: fct } = States.getDeclaration(call);
-          const caller = `caller ${fct}`;
-          const nsites = n > 1 ? `s (${n} call sites)` : '';
-          const label = `Go to ${caller}${nsites}`;
-          const index = callers.findIndex(({ call: f }) => f === call);
-          const onClick = (): void => Locations.setSelection({
-            label: descr, markers, index, plugin: 'Callers',
-          });
-          items.push({ label, onClick });
-        });
-      } else if (definition) {
-        const label = `Go to ${name} (${labelKind.toLowerCase()})`;
-        const onClick = (): void => States.setSelected(definition);
-        items.push({ label, onClick });
-      } else if (callees.length > 0) {
-        callees.forEach((decl) => {
-          const { name: fct } = States.getDeclaration(decl);
-          const onClick = (): void => States.setCurrentScope(decl);
-          const label = `Go to ${fct} (indirect call)`;
-          items.push({ label, onClick });
-        });
-      }
-      MarkerMenuExtenders.forEach((ext) => ext(items, attributes));
-      items.push({
-        label: 'Copy to clipboard',
-        onClick: () => {
-          const text = view.state.sliceDoc(node.from, node.to);
-          if (text !== '') navigator.clipboard.writeText(text);
-        }
-      });
+      const markerText = view.state.sliceDoc(node.from, node.to);
+      const items: Dome.PopupMenuItem[] =
+        getMarkerMenuItems(node.marker, callers, callees, markerText);
       Dome.popupMenu(items);
       return;
     }
