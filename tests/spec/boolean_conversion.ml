@@ -8,7 +8,7 @@ let run () =
     inherit Visitor.frama_c_inplace
     method! vinst =
       function
-      | Call(_,(Var f, _),[arg],_)
+      | Call(_,Var f,[arg],_)
         when f.vname = "__FC_assert" ->
         let p = Logic_utils.expr_to_predicate arg in
         Annotations.add_assert e (Option.get self#current_stmt) p;

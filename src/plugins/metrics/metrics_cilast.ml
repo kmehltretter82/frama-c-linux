@@ -250,7 +250,7 @@ class slocVisitor ~libc : sloc_visitor = object(self)
       end
     else Cil.SkipChildren
 
-  method! vlval (host, _) =
+  method! vlhost host =
     begin
       match host with
       | Mem _ -> self#incr_both_metrics incr_ptrs;
