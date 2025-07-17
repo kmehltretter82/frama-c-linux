@@ -109,14 +109,14 @@
 [eva:nonlin] nonlin.c:66: subdividing on x
 [eva:nonlin] nonlin.c:66: subdividing on y
 [eva:nonlin] nonlin.c:68: non-linear 'x * y - y * x', lv 'y, x'
-[eva:nonlin] nonlin.c:68: subdividing on x, y
+[eva:nonlin] nonlin.c:68: subdividing on y, x
 [eva:nonlin] nonlin.c:71: non-linear '(x * x - (2 * x) * y) + y * y', lv 'y, x'
-[eva:nonlin] nonlin.c:71: subdividing on x, y
+[eva:nonlin] nonlin.c:71: subdividing on y, x
 [eva:nonlin] nonlin.c:72: non-linear '(x * x + y * y) - (2 * x) * y', lv 'y, x'
-[eva:nonlin] nonlin.c:72: subdividing on x, y
+[eva:nonlin] nonlin.c:72: subdividing on y, x
 [eva:nonlin] nonlin.c:74: non-linear '(z * x + x * y) + y * z', lv 'z, y, x'
 [eva:nonlin] nonlin.c:74: non-linear 'w * w', lv 'w'
-[eva:nonlin] nonlin.c:74: subdividing on x, y, z
+[eva:nonlin] nonlin.c:74: subdividing on z, y, x
 [eva:nonlin] nonlin.c:74: subdividing on w
 [eva] Recording results for subdivide_several_variables
 [eva] Done for function subdivide_several_variables
@@ -150,9 +150,9 @@
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva:nonlin] nonlin.c:118: non-linear '(x * x - (2 * x) * y) + y * y', lv 'y, x'
-[eva:nonlin] nonlin.c:118: subdividing on x, y
-[eva:nonlin] nonlin.c:119: subdividing on x, y
-[eva:nonlin] nonlin.c:121: subdividing on x, y
+[eva:nonlin] nonlin.c:118: subdividing on y, x
+[eva:nonlin] nonlin.c:119: subdividing on y, x
+[eva:nonlin] nonlin.c:121: subdividing on y, x
 [eva] Recording results for local_subdivide
 [eva] Done for function local_subdivide
 [eva] Recording results for main

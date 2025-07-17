@@ -444,10 +444,10 @@ module Make (Engine: Engine_sig.S) = struct
     in
     (* Partitioning key remains unchanged. *)
     let process (key, state) =
-      let opt_state = Bottom.to_option (process_resulting_state state) in
-      Option.map (fun s -> key, s) opt_state
+      let+ state' = process_resulting_state state in
+      key, state'
     in
-    let states = List.filter_map process call_result.states in
+    let states = Bottom.list_filter_map process call_result.states in
     InOutCallback.clear ();
     { call_result with states }
 

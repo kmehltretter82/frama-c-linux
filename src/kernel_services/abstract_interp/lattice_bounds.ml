@@ -174,6 +174,10 @@ module Bottom = struct
   let list_values l =
     Stdlib.List.fold_left (fun l elt -> add_to_list elt l) [] l
 
+  let list_filter_map f l =
+    let f' x = to_option (f x) in
+    Stdlib.List.filter_map f' l
+
   (** Datatype construction *)
 
   let counter = ref 0

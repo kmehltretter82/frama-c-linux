@@ -236,10 +236,7 @@ module Make
       | hd :: tl -> List.fold_left (Bottom.narrow Domain.narrow) hd tl
     in
     narrowed_state >>- fun narrowed_state ->
-    List.fold_left
-      (fun acc state ->
-         Bottom.add_to_list (Domain.narrow state narrowed_state) acc)
-      [] (List.hd states_list)
+    Bottom.list_filter_map (Domain.narrow narrowed_state) (List.hd states_list)
 
 
   (* Narrowing of a list of disjunctive sets of states. *)

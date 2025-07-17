@@ -1736,9 +1736,8 @@ module Make
           let kfs, alarm' = compatible_funcs ?args:args_types kfs in
           let reduce = backward_function_pointer valuation state v in
           let reduce kf = let+ value = reduce kf in (kf, value) in
-          let process acc kf = Bottom.add_to_list (reduce kf) acc in
           let res, status =
-            let res = `Value (List.rev (List.fold_left process [] kfs)) in
+            let res = `Value (Bottom.list_filter_map reduce kfs) in
             if kfs = [] then `Bottom, Alarmset.False
             else if alarm || alarm' then res, Alarmset.Unknown
             else res, Alarmset.True

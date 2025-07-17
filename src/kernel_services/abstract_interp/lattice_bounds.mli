@@ -79,6 +79,10 @@ module Bottom : sig
   (** Filters the given list to remove Bottom elements. *)
   val list_values : 'a t list -> 'a list
 
+  (** [list_filter_map f l] maps the function [f] to the list [l] and does not
+      keep bottoms. *)
+  val list_filter_map : ('a -> 'b t) -> 'a list -> 'b list
+
   (** [add_to_list elt list] adds [elt] to the [list] if it is not bottom. *)
   val add_to_list : 'a t -> 'a list -> 'a list
 
