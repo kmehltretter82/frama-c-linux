@@ -1288,7 +1288,7 @@ and instr =
       return [false]) to the one of the formals of the function.
       If the type of the result variable is not the same as the declared type of
       the function result then an implicit cast exists.
-      @before Frama-C+dev the function was an expression instead of lval.
+      @before Frama-C+dev the function was an expression instead of a lval.
   *)
   | Local_init of varinfo * local_init * location
   (** initialization of a local variable. The corresponding varinfo must
