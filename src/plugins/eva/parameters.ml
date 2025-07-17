@@ -827,9 +827,10 @@ module SplitReturnFunction =
     (Split_strategy)
     (struct
       let option_name = "-eva-split-return-function"
-      let arg_name = "f:n"
+      let arg_name = "f:full|f:auto|f:N|f:"
       let help = "Override the global option -eva-split-return at the return \
-                  of function <f>"
+                  of function <f>. <f:> reverts to the the default strategy \
+                  where all states are joined at the return point of <f>."
       let default = Kernel_function.Map.empty
     end)
 let () = add_precision_dep SplitReturnFunction.parameter
@@ -845,14 +846,14 @@ module SplitReturn =
       let help =
         "Control the propagation of states separated by option -eva-slevel \
          at the return of a function. \
-         By default, all inferred states at a return point are joined into one
-         single state, which is fast but imprecise.
+         By default, all inferred states at a return point are joined into one \
+         single state, which is fast but imprecise. \
          With 'full', all inferred states are propagated back to the callsite, \
          which is costly but precise. \
          With 'auto', states inferred at a return point are automatically \
          joined or kept separate according to the function return code. \
-         With a number <N>, states in which the return code is exactly equal \
-         to <N> are kept separate; others are joined together."
+         With a number <N>, keep states distinct only according to the value \
+         of the predicate \\result == N."
     end)
 let () = add_precision_dep SplitReturn.parameter
 
