@@ -159,6 +159,11 @@ let add_call ~kf ~stmt map ~result fct (args: exp list) =
           Printer.pp_stmt stmt
     end
 
+let add_function (m:map) (s:stmt) (f:lhost) =
+  match f with
+  | Var _vf -> ()
+  | Mem e -> add_value m s e
+
 let add_instr ~kf (m:map) (s:stmt) (instr:instr) =
   match instr with
   | Skip _ -> ()
@@ -178,13 +183,13 @@ let add_instr ~kf (m:map) (s:stmt) (instr:instr) =
     Memory.add_write m r (Lval (s,Cil.var x)) ;
     Cil.treat_constructor_as_func
       begin fun _res fct args _loc ->
-        ignore (add_lhost m s fct);
+        add_function m s fct;
         List.iter (add_value m s) args ;
         add_call ~kf ~stmt:s m ~result:(Some r) fct args
       end x vf args kind loc
 
   | Call(lr,f,es,_) ->
-    ignore (add_lhost m s f);
+    add_function m s f;
     List.iter (add_value m s) es ;
     let result = Option.map
         (fun lv ->
