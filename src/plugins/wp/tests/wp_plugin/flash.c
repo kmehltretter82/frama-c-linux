@@ -1,6 +1,6 @@
 /* run.config
    OPT:
-MODULE: flash
+MODULE: @PTEST_NAME@
    OPT: -wp-driver %{dep:@PTEST_DIR@/flash.driver}
 */
 
