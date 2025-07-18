@@ -2,14 +2,14 @@
 [region] Analyzing regions
 [region] Function caller_by_ref:
   R0007: R-- B[64] (int) 32b ;
-  R0001: R-- modify_by_ref[…] (void (int **p, int *q, int k)) 0b ;
+  R0001: --- modify_by_ref[…] 0b ;
   R0004: R-- k (int) 32b ;
   R0002: R-- a (int *) 64b (*R0007) ;
   R0009: RW- __retres (int) 32b ;
   R000e: -W- (int) 32b ;
 [region] Function caller_result:
   R0007: R-- B[64] (int) 32b ;
-  R0003: R-- modify_result[…] (int *(int *q, int k)) 0b ;
+  R0003: --- modify_result[…] 0b ;
   R0005: R-- k (int) 32b ;
   R0001: RW- a (int *) 64b (*R0007) ;
   R0009: RW- __retres (int) 32b ;
