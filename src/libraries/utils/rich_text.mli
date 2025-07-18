@@ -21,26 +21,11 @@ val tags_at : message -> int -> (Format.stag * int * int) list
 (** Returns the list of tags at the given position.
     Inner tags come first, outer tags last. *)
 
-val visit :
-  ?output:(string -> int -> int -> unit) ->
-  ?open_tag:(Format.stag -> int -> int -> unit) ->
-  ?close_tag:(Format.stag -> int -> int -> unit) ->
-  message -> unit
-(** Visit the message, with depth-first recursion on tags.
-    All methods are called with text or tag, position and length. *)
-
-val pretty : ?vbox:int -> Format.formatter -> message -> unit
+val pretty : Format.formatter -> message -> unit
 (** Pretty-print the message onto the given formatter, with the tags.
     The original message has been {i already} laidout with respect to
     horizontal and vertical boxes, and this layout will be output as-it-is
-    into the formatter.
-
-    Here, you have two different strategies to render the message properly.
-    If [~vbox] is specified, a vertical box is opened around the message,
-    and newlines are emitted with a ["@\n"] and the given indentation.
-    Otherwise, no box is used and newlines are emitted as
-    ["\n"], which only makes sense if there is no current indentation in the
-    output formatter. *)
+    into the formatter. *)
 
 (* -------------------------------------------------------------------------- *)
 (** Message Buffer  *)

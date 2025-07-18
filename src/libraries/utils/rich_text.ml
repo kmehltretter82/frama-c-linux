@@ -33,59 +33,23 @@ let rec lookup acc k = function
 
 let tags_at (_,tags) k = lookup [] k tags
 
-type env = {
-  text : string ;
-  output : (string -> int -> int -> unit) option ;
-  open_tag : (Format.stag -> int -> int -> unit) option ;
-  close_tag : (Format.stag -> int -> int -> unit) option ;
-}
+let pretty fmt (text, tags) =
+  let output p q = Format.pp_print_string fmt (String.sub text p (q + 1 - p)) in
+  let rec aux fmt p q = function
+    | [] -> output p q
+    | { tag ; p=tp ; q=tq ; children } :: tags ->
+      if q < tp then output p q else
+      if tq < q then aux fmt p q tags else
+        begin
+          if tp>p then output p (tp-p) ;
+          Format.pp_open_stag fmt tag ;
+          aux fmt tp tq children ;
+          Format.pp_close_stag fmt () ;
+          aux fmt (succ tq) q tags ;
+        end
+  in
+  aux fmt 0 (String.length text) tags
 
-let signal f tag p q =
-  match f with None -> () | Some f -> f tag p (q+1-p)
-
-let rec aux env p q = function
-  | [] -> signal env.output env.text p q
-  | { tag ; p=tp ; q=tq ; children } :: tags ->
-    if q < tp then signal env.output env.text p q else
-    if tq < q then aux env p q tags else
-      begin
-        if tp>p then signal env.output env.text p (tp-p) ;
-        signal env.open_tag tag tp tq ;
-        aux env tp tq children ;
-        signal env.close_tag tag tp tq ;
-        aux env (succ tq) q tags ;
-      end
-
-let visit ?output ?open_tag ?close_tag (text , tags) =
-  aux { text ; output ; open_tag ; close_tag } 0 (String.length text) tags
-
-let rec output_vbox fmt text k n =
-  if n>0 then
-    let p = try String.index_from text k '\n' with Not_found -> (-1) in
-    if p < 0 || p >= k + n then
-      Format.pp_print_string fmt (String.sub text k n)
-    else
-      begin
-        Format.pp_print_string fmt (String.sub text k (p-k)) ;
-        Format.pp_print_newline fmt () ;
-        output_vbox fmt text (p+1) (n-p+k-1) ;
-      end
-
-let output_fmt fmt text k n = Format.pp_print_string fmt (String.sub text k n)
-let open_tag fmt tag _k _n = Format.pp_open_stag fmt tag
-let close_tag fmt _tag _k _n = Format.pp_close_stag fmt ()
-
-let pretty ?vbox fmt message =
-  let open_tag = open_tag fmt in
-  let close_tag = close_tag fmt in
-  match vbox with
-  | None -> visit ~output:(output_fmt fmt) ~open_tag ~close_tag message
-  | Some n ->
-    begin
-      Format.pp_open_vbox fmt n ;
-      visit ~output:(output_vbox fmt) ~open_tag ~close_tag message ;
-      Format.pp_close_box fmt () ;
-    end
 
 (* -------------------------------------------------------------------------- *)
 (* --- Extended Buffer with Tags                                          --- *)
