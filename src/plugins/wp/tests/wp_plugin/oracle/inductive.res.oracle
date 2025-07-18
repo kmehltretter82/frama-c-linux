@@ -50,10 +50,10 @@ end
     (* use Compound *)
     
     inductive P_reachable (int -> int) (addr -> addr) addr addr =
-      | Q_root_reachable :
+      | Q_P_reachable_root_reachable :
           forall malloc:int -> int, mptr:addr -> addr, root:addr.
            P_reachable malloc mptr root root
-      | Q_next_reachable :
+      | Q_P_reachable_next_reachable :
           forall malloc:int -> int, mptr:addr -> addr, root:addr, node:addr.
            valid_rw malloc root 2 ->
            P_reachable malloc mptr (get mptr (shiftfield_F1__list_next root))
@@ -87,17 +87,17 @@ end
         get mint1 (shift_sint32 a i1) = get mint (shift_sint32 b i1))
     
     inductive P_same_elements (addr -> int) (addr -> int) addr addr int int =
-      | Q_refl :
+      | Q_P_same_elements_refl :
           forall mint:addr -> int, mint1:addr -> int, a:addr, b:addr, begin1:
            int, end1:int.
            P_same_array mint mint1 a b begin1 end1 ->
            P_same_elements mint mint1 a b begin1 end1
-      | Q_swap :
+      | Q_P_same_elements_swap :
           forall mint:addr -> int, mint1:addr -> int, a:addr, b:addr, begin1:
            int, i:int, j:int, end1:int.
            P_swap mint mint1 a b begin1 i j end1 ->
            P_same_elements mint mint1 a b begin1 end1
-      | Q_trans :
+      | Q_P_same_elements_trans :
           forall mint:addr -> int, mint1:addr -> int, mint2:addr -> int, a:
            addr, b:addr, c:addr, begin1:int, end1:int.
            P_same_elements mint mint1 b c begin1 end1 ->
@@ -133,10 +133,10 @@ end
     (* use Compound *)
     
     inductive P_reachable1 (int -> int) (addr -> addr) addr addr =
-      | Q_root_reachable1 :
+      | Q_P_reachable_root_reachable1 :
           forall malloc:int -> int, mptr:addr -> addr, root:addr.
            P_reachable1 malloc mptr root root
-      | Q_next_reachable1 :
+      | Q_P_reachable_next_reachable1 :
           forall malloc:int -> int, mptr:addr -> addr, root:addr, node:addr.
            valid_rw malloc root 2 ->
            P_reachable1 malloc mptr (get mptr (shiftfield_F1__list_next root))
