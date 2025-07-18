@@ -168,12 +168,29 @@ let trim buffer =
   let q = trim_end buffer in
   p , q
 
-let contents buffer =
-  Buffer.contents buffer.content
+let contents ?(trim=true) buffer =
+  if trim then
+    let p = trim_begin buffer in
+    let q = trim_end buffer in
+    if p <= q
+    then Buffer.sub buffer.content p (q+1-p)
+    else ""
+  else
+    Buffer.contents buffer.content
 
-let message buffer =
-  { plain = Buffer.contents buffer.content ;
-    tags = List.rev buffer.revtags }
+let rec offset_tag n tag =
+  { p = tag.p - n;
+    q = tag.q - n;
+    tag = tag.tag;
+    children = offset_tags n tag.children
+  }
+and offset_tags n tags =
+  List.map (offset_tag n) tags
+
+let message ?trim buffer =
+  let plain = contents ?trim buffer in
+  let tags = List.rev buffer.revtags |> offset_tags (trim_begin buffer) in
+  { plain ; tags }
 
 let sub buffer p n = Buffer.sub buffer.content p n
 let range buffer p q = Buffer.sub buffer.content p (q+1-p)

@@ -47,8 +47,10 @@ type buffer
 *)
 val create : ?indent:int -> ?margin:int -> unit -> buffer
 
-val message : buffer -> message
-(** Buffer contents, with its formatting tags. *)
+val message : ?trim:bool -> buffer -> message
+(** Buffer contents, with its formatting tags.
+    @param trim if sets to true, remove leading and trailing whitespases
+    (including tabulations, line feed and carriage returns) *)
 
 val add_char : buffer -> char -> unit (** Buffer-like *)
 
@@ -62,8 +64,11 @@ val kprintf :
   (Format.formatter -> 'a) ->
   buffer -> ('b,Format.formatter,unit,'a) format4 -> 'b
 
-(** Similar to [Buffer.contents] *)
-val contents : buffer -> string
+(** Similar to {!Buffer.contents}, returns the plain contents of the buffer
+    as a string.
+    @param trim if sets to true, remove leading and trailing whitespases
+    (including tabulations, line feed and carriage returns) *)
+val contents : ?trim:bool -> buffer -> string
 
 (** Similar to [Buffer.sub] *)
 val sub : buffer -> int -> int -> string
