@@ -44,10 +44,10 @@ void f() {
   #ifdef AUTOINIT
   // Unsupported by Frama-C
   //
-  // The side-effect to affect 'b' needs to be done outside the initialization
+  // The side-effect to assign 'b' needs to be done outside the initialization
   // because Frama-C's internal AST does not allow side-effects in expressions.
   // Ideally we would like to declare 'b' and then do a undefined sequence
-  // between the affectation and the initialization, but Frama-C does not allow
+  // between the assignment and the initialization, but Frama-C does not allow
   // to do that trivially.
   int b[4]={ b[2], 42, b[3] = 1 };
   #endif
@@ -56,7 +56,7 @@ void f() {
   // Unsupported by Frama-C.
   //
   // The address of 'arr_2' needs to be available before its initialization for
-  // the same reasons than the exampe above. The suggested solution would also
+  // the same reasons than the example above. The suggested solution would also
   // fix this case.
   struct _cell *y;
   struct _cell arr_2[2] = {

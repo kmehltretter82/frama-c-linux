@@ -8631,7 +8631,7 @@ and createGlobal loc ghost logic_spec ((t,s,b,attr_list) : (typ * storage * bool
      expression. The side-effect will be moved before the initialization, at
      which point the address does not exist yet. We could use a tmp variable
      like other cases, but then the address would not be the same.
-   - Affecting the object being initialized inside its initialization, like
+   - Assigning the object being initialized inside its initialization, like
      int array[2]={ array[1] = 42 };
      These cases could be solved by inlining the Cil_types.init but it's not
      trivial to do. For example :
