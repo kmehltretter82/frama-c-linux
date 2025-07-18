@@ -186,13 +186,12 @@ struct
   let descr, packed_descr = mk_full_descr (Descr.of_type T.ty)
   let reprs = T.reprs (* [Type.reprs] is not usable in the "no-obj" mode *)
 
-  let %test _ =
+  let %test_unit _ =
     if pretty != undefined then (* Test defined pretty functions *)
       at_exit (* Do not test now as some pretty printers are not yet defined *)
         (fun () ->
            List.iter (pretty Format.str_formatter) reprs;
-           ignore (Format.flush_str_formatter ()));
-    true
+           ignore (Format.flush_str_formatter ()))
 end
 
 module type Make_input = sig
