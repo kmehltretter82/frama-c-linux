@@ -7,153 +7,158 @@
 (**************************************************************************)
 
 (* -------------------------------------------------------------------------- *)
-(** Text with Tags *)
+(** {2 Text enriched with semantic tags}                                      *)
 (* -------------------------------------------------------------------------- *)
 
-type message (** Message with tags *)
+(** This module provides a rich text type that represents a string of characters
+    enriched by semantic tags. It is intended to provide a way to store texts
+    that can be output in several format, for instance in html or using ANSI
+    sequences in terminals. When the text is pretty printed, the semantic
+    tags are output in the usual way on the formatter (which can translate the
+    semantic tags to html markup for instance). See {!Format} for more details
+    about semantic tags. *)
 
-(** [empty] is the empty message, containing neither plain text nor tags. *)
-val empty : message
+type t (** Text with tags *)
 
-(** [is_empty message] Returns true if [message] is empty. A buffer containing
+(** [empty] is the empty text, containing neither plain text nor tags. *)
+val empty : t
+
+(** [is_empty text] returns true if [text] is empty. A rich text containing
     only semantic tags is not considered empty. *)
-val is_empty : message -> bool
+val is_empty : t -> bool
 
-val of_string : string -> message
-val size : message -> int
-val char_at : message -> int -> char
-val substring : message -> int -> int -> string
-val contains : message -> char -> bool
+(** [of_string s] returns a plain text equal to [s] with no semantic tags. *)
+val of_string : string -> t
 
-val tags_at : message -> int -> (Format.stag * int * int) list
-(** Returns the list of tags at the given position.
-    Inner tags come first, outer tags last. *)
+(** [length text] returns the number of characters in the text. *)
+val size : t -> int
 
+(** [contains text c] returns whether [text] contains the character [c]. *)
+val contains : t -> char -> bool
 
-(** [pretty fmt buffer] pretty-prints the message onto the given formatter
+(** [pretty fmt text] pretty-prints the text onto the given formatter
     [fmt], with the semantic tags.
-    The original text has been {i already} laidout with respect to
+    The original text has been {i already} laid out with respect to
     horizontal and vertical boxes, and this layout will be output as-it-is
     into the formatter.
     @param truncate do not print more than [truncate] characters; if the text
-    size is bigger than this number, than the middle part of the text is
-    replaced by [ellipsis]
-    @param ellipsis when [truncate] is given and the text size is bigger than
+    length is bigger than this number, than the middle part of the text is
+    replaced by [ellipsis].
+    @param ellipsis when [truncate] is given and the text length is bigger than
     [truncate], then [ellipsis] is printed instead of the truncated middle
-    part *)
+    part. *)
 val pretty :
   ?truncate:int ->
   ?ellipsis:string ->
   Format.formatter ->
-  message ->
+  t ->
   unit
 
-(** Pretty prints the message into a string
-    @param prefix a pretty printing function called at the begining of the print
+(** Pretty prints the text into a string
+    @param prefix a pretty printing function called at the beginning of the
+    print
     @param suffix a pretty printing function called at the end of the print
     @param truncate do not print more than [truncate] characters; if the
-    message size is bigger than this number, than the middle part of the
-    message is replaced by [ellipsis]
-    @param ellipsis when [truncate] is given and the message size is
+    text length is bigger than this number, than the middle part of the
+    text is replaced by [ellipsis]
+    @param ellipsis when [truncate] is given and the text length is
     bigger than [truncate], then [ellipsis] is printed instead of the truncated
     middle part *)
 val to_string :
-  ?prefix:(Format.formatter -> unit) -> ?suffix:(Format.formatter -> unit) ->
-  ?truncate:int -> ?ellipsis:string ->
-  message -> string
+  ?prefix:(Format.formatter -> unit) ->
+  ?suffix:(Format.formatter -> unit) ->
+  ?truncate:int ->
+  ?ellipsis:string ->
+  t -> string
+
 
 (** [need_truncation ?truncate text] returns whether
     [to_string ?truncate text] or [pretty ?truncate fmt text] will truncate
     the text. *)
-val need_truncation : ?truncate:int -> message -> bool
+val need_truncation : ?truncate:int -> t -> bool
 
 
 (* -------------------------------------------------------------------------- *)
-(** Message Buffer  *)
+(** {2 Buffers for building rich text}                                        *)
 (* -------------------------------------------------------------------------- *)
 
-(** Buffer for creating messages.
+(** Buffer for creating rich text.
 
     The buffer grows on demand, but is protected against huge messages.
-    Maximal size is around 2 billions ASCII characters, which sould be enough
+    Maximal size is around 2 billions ASCII characters, which should be enough
     to store more than 25kloc source text. *)
 type buffer
 
-(** Create a buffer.
+module Buffer :
+sig
+  (** Create a buffer.
 
-    The right-margin is set to [~margin] and
-    maximum indentation to [~indent].
-    Default values are those of [Format.make_formatter], which are
-    [~indent:68] and [~margin:78] in OCaml 4.05.
-*)
-val create : ?indent:int -> ?margin:int -> unit -> buffer
+      The right-margin is set to [~margin] and
+      maximum indentation to [~indent].
+      Default values are those of [Format.make_formatter], which are
+      [~indent:68] and [~margin:78] in OCaml 4.05.
+  *)
+  val create : ?indent:int -> ?margin:int -> unit -> buffer
 
-val message : ?trim:bool -> buffer -> message
-(** Buffer contents, with its formatting tags.
-    @param trim if sets to true, remove leading and trailing whitespases
-    (including tabulations, line feed and carriage returns) *)
+  (** Reset the buffer to its initial empty state. *)
+  val reset : buffer -> unit
 
-val add_char : buffer -> char -> unit (** Buffer-like *)
+  (** Buffer contents, with its semantic tags.
+      @param trim if set to true, remove leading and trailing whitespaces
+      (including tabulations, line feed and carriage returns) *)
+  val contents : ?trim:bool -> buffer -> t
 
-val add_string : buffer -> string -> unit (** Buffer-like *)
+  val add_char : buffer -> char -> unit (** Buffer-like *)
+  val add_string : buffer -> string -> unit (** Buffer-like *)
+  val add_substring : buffer -> string -> int -> int -> unit (** Buffer-like *)
 
-val add_substring : buffer -> string -> int -> int -> unit (** Buffer-like *)
+  (** Pretty printing into the buffer. Similar to {!Format.fprintf}. *)
+  val bprintf : buffer -> ('a,Format.formatter,unit) format -> 'a
 
-val formatter : buffer -> Format.formatter
+  (** Same as [bprintf] above, but instead of returning immediately,
+      passes a formatter to the continuation given as first argument at the end
+      of printing. *)
+  val kbprintf :
+    (Format.formatter -> 'a) ->
+    buffer ->
+    ('b,Format.formatter,unit,'a) format4 ->
+    'b
+end
 
-val bprintf : buffer -> ('a,Format.formatter,unit) format -> 'a
-val kbprintf :
-  (Format.formatter -> 'a) ->
-  buffer -> ('b,Format.formatter,unit,'a) format4 -> 'b
-
-(** Pretty prints to a string using a [Rich_text.buffer].
-    @param indent defines the maximum indentiation as in {!create}, defaults to
-    20
-    @param margin defines the right-margin as in {!create}, defaults to 40
-    @param truncate do not print more than [truncate] characters; if the
-    (trimed) buffer size is bigger than this number, than the middle part of the
-    buffer is replaced by [ellipsis]
-    @param ellipsis when [truncate] is given and the (trimed) buffer size is
-    bigger than [truncate], then [ellipsis] is printed instead of the truncated
-    middle part
-    @param trim if sets to true, remove leading and trailing whitespace
-    (including tabulations, line feed and carriage returns) *)
-val sprintf  :
-  ?indent:int -> ?margin:int ->
-  ?trim:bool ->
-  ?truncate:int -> ?ellipsis:string ->
-  ('a, Format.formatter,unit,string) format4 -> 'a
-
-(** Pretty prints to a rich text using a [Rich_text.buffer].
-    @param indent defines the maximum indentiation as in {!create}
-    @param margin defines the right-margin as in {!create}
-    @param trim if sets to true, remove leading and trailing whitespace
-    (including tabulations, line feed and carriage returns) *)
-val mprintf  :
-  ?indent:int -> ?margin:int ->
-  ?trim:bool ->
-  ('a, Format.formatter,unit,message) format4 -> 'a
-
-(** Similar to {!Buffer.contents}, returns the plain contents of the buffer
-    as a string.
-    @param trim if sets to true, remove leading and trailing whitespases
-    (including tabulations, line feed and carriage returns) *)
-val contents : ?trim:bool -> buffer -> string
-
-(** Similar to [Buffer.sub] *)
-val sub : buffer -> int -> int -> string
-
-(** Sub-string with range. [range b p q] is [sub b p (q+1-p)] *)
-val range : buffer -> int -> int -> string
-
-(** Range of non-blank leading and trailing characters. *)
-val trim : buffer -> int * int
-
-(** Reset the buffer to its initial empty state. *)
-val reset : buffer -> unit
-
-(** [truncate buffer size] truncates the content of [buffer] if longer than
-    [size] characters. Returns true if the buffer has been truncated. *)
-val truncate : buffer -> int -> bool
 
 (* -------------------------------------------------------------------------- *)
+(** {2 Direct formatting}                                                     *)
+(* -------------------------------------------------------------------------- *)
+
+(** Pretty prints to a string.
+    @param indent defines the maximum indentation as in {!create}, defaults
+    to 20
+    @param margin defines the right-margin as in {!create}, defaults to 40
+    @param truncate do not print more than [truncate] characters; if the
+    (trimed) text length is bigger than this number, than the middle part of
+    the text is replaced by [ellipsis]
+    @param ellipsis when [truncate] is given and the (trimmed) text length is
+    bigger than [truncate], then [ellipsis] is printed instead of the
+    truncated middle part
+    @param trim if set to true, remove leading and trailing whitespace
+    (including tabulations, line feed and carriage returns) *)
+val sprintf  :
+  ?indent:int ->
+  ?margin:int ->
+  ?trim:bool ->
+  ?truncate:int ->
+  ?ellipsis:string ->
+  ('a, Format.formatter,unit,string) format4 ->
+  'a
+
+(** Pretty prints to a rich text.
+    @param indent defines the maximum indentation as in {!create}
+    @param margin defines the right-margin as in {!create}
+    @param trim if set to true, remove leading and trailing whitespace
+    (including tabulations, line feed and carriage returns) *)
+val mprintf  :
+  ?indent:int ->
+  ?margin:int ->
+  ?trim:bool ->
+  ('a, Format.formatter,unit,t) format4 ->
+  'a

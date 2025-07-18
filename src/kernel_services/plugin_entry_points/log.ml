@@ -28,7 +28,7 @@ type event = {
   evt_plugin : string ;
   evt_category : string option;
   evt_source : Filepath.position option ;
-  evt_message : Rich_text.message ;
+  evt_message : Rich_text.t ;
 }
 
 let kernel_channel_name = "kernel"
@@ -391,7 +391,7 @@ let new_channel plugin =
     let c = {
       plugin = plugin ;
       stack = 0 ;
-      locked_buffer = Rich_text.create () ;
+      locked_buffer = Rich_text.Buffer.create () ;
       emitters = emitters ;
       terminal = stdout ;
     } in
@@ -451,7 +451,7 @@ let notify e =
 
 let open_buffer c =
   if c.stack > 0 then
-    ( c.stack <- succ c.stack ; Rich_text.create () )
+    ( c.stack <- succ c.stack ; Rich_text.Buffer.create () )
   else
     ( c.stack <- 1 ; c.locked_buffer )
 
@@ -459,14 +459,14 @@ let close_buffer c =
   if c.stack > 1 then
     c.stack <- pred c.stack
   else
-    Rich_text.reset c.locked_buffer
+    Rich_text.Buffer.reset c.locked_buffer
 
 let logtransient channel format =
   let buffer = open_buffer channel in
-  Rich_text.kbprintf
+  Rich_text.Buffer.kbprintf
     (fun _fmt ->
        try
-         let message = Rich_text.message buffer in
+         let message = Rich_text.Buffer.contents buffer in
          do_transient channel.terminal message ;
          close_buffer channel
        with e ->
@@ -489,15 +489,15 @@ let logwithfinal finally channel
     text =
   let source = get_source current source in
   let buffer = open_buffer channel in
-  Format.pp_open_vbox (Rich_text.formatter buffer) 0 ;
-  Rich_text.kbprintf
+  Rich_text.Buffer.bprintf buffer "%a" Format.pp_open_vbox 0 ;
+  Rich_text.Buffer.kbprintf
     (fun fmt ->
        try
          append fmt;
          Format.pp_close_box fmt () ;
          Format.pp_print_newline fmt () ;
          Format.pp_print_flush fmt () ;
-         let message = Rich_text.message buffer in
+         let message = Rich_text.Buffer.contents buffer in
          let output =
            if not (Rich_text.is_empty message) then
              let event = {

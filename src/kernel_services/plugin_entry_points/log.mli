@@ -19,7 +19,7 @@ type event = {
   evt_plugin : string ;
   evt_category : string option ; (** message or warning category *)
   evt_source : Filepath.position option ;
-  evt_message : Rich_text.message ;
+  evt_message : Rich_text.t ;
 }
 (** @since Beryllium-20090601-beta1 *)
 
