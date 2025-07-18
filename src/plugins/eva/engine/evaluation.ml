@@ -1692,7 +1692,7 @@ module Make
      ------------------------------------------------------------------------ *)
 
   (* Aborts the analysis when a function pointer is completely imprecise. *)
-  let top_function_pointer funclv =
+  let top_function_pointer func =
     if not (Parameters.Domains.mem "cvalue") then
       Self.abort ~current:true
         "Calls through function pointers are not supported without the cvalue \
@@ -1704,7 +1704,7 @@ module Make
     else
       Self.fatal ~current:true
         "Function pointer evaluates to anything. function %a"
-        Eva_ast.pp_lval funclv
+        Eva_ast.pp_lhost func
 
   (* For pointer calls, we retro-propagate which function is being called
      in the abstract state. This may be useful:
@@ -1728,7 +1728,7 @@ module Make
         let* valuation, value = evaluate ?subdivnb state v in
         let kfs, alarm = Value.resolve_functions value in
         match kfs with
-        | `Top -> top_function_pointer (Eva_ast.mk_lval (func,NoOffset))
+        | `Top -> top_function_pointer func
         | `Value kfs ->
           let open Bottom.Operators in
           let args_types = Option.map (List.map (fun e -> e.typ)) args in

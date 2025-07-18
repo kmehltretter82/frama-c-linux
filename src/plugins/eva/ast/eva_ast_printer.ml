@@ -24,6 +24,10 @@ open Eva_ast_types
 
 module Precedence =
 struct
+  let lhost_level = function
+    | Var _ -> 0
+    | Mem _ -> 20
+
   let lval_level lv = match lv.node with
     | Mem _, _
     | Var _, (Field _|Index _) -> 20
@@ -61,6 +65,14 @@ and pp_lval' ~precedence fmt lval =
     Format.fprintf fmt "(%a)" pp_lval lval
   else
     pp_lval fmt lval
+
+and pp_lhost fmt lhost =
+  match lhost with
+  | Var vi ->
+    Format.fprintf fmt "%s" vi.vname
+  | Mem e ->
+    let pp_exp' = pp_exp' ~precedence:(Precedence.lhost_level lhost) in
+    Format.fprintf fmt "*%a" pp_exp' e
 
 and pp_offset fmt = function
   | NoOffset -> ()

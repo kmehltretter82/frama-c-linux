@@ -23,6 +23,7 @@
 open Eva_ast_types
 
 val pp_lval : Format.formatter -> lval -> unit
+val pp_lhost : Format.formatter -> lhost -> unit
 val pp_offset : Format.formatter -> offset -> unit
 val pp_exp : Format.formatter -> exp -> unit
 val pp_constant : Format.formatter -> constant -> unit
