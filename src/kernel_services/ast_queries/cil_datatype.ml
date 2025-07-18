@@ -1550,7 +1550,7 @@ module Logic_var = struct
   let pretty_ref = ref (fun _ _ -> assert false)
   let dummy = {
     lv_name   = "@dummy_logic_var@";
-    lv_kind   = LVC;
+    lv_kind   = LVQuant;
     lv_id     = -1;
     lv_type   = Logic_type.dummy;
     lv_origin = None;
@@ -2200,7 +2200,7 @@ let hash_fct f t = try fst (f (0,10,100) t) with StopRecursion n -> n
 
 module Logic_constant = struct
   let pretty_ref = ref (fun _ _ -> assert false)
-  let dummy = LStr "@dummy_logic_constant"
+  let dummy = LStr "@dummy_logic_constant@"
 
   include Make_with_collections
       (struct

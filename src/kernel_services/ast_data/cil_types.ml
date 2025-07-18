@@ -179,8 +179,8 @@ type termination_kind = Normal | Exits | Breaks | Continues | Returns
     {!Cil.iterGlobals} and {!Cil.foldGlobals}. You can also use the
     {!Cil_datatype.File.dummy} when you need a {!Cil_types.file} as a
     placeholder. For each global item CIL stores the source location where it
-    appears (using the type {!Cil_types.location}) @see
-    <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
+    appears (using the type {!Cil_types.location})
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 type file = {
   mutable fileName: Filepath.t;   (** The complete file name *)
 
