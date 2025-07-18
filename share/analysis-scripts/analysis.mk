@@ -85,13 +85,19 @@ SED_UNBUFFERED:=sed$(shell sed --unbuffered //p /dev/null 2>/dev/null && echo " 
 # (-f and -o), use them; otherwise, ignore it.
 # 'env' allows bypassing shell builtins (if they exist),
 # since they usually don't have the required options.
-ifeq (OK,$(shell env time -f 'test' -o '/dev/null' echo OK || echo KO))
+# Also try using 'gtime' if it exists.
+ifeq (OK,$(shell env time -f 'test' -o '/dev/null' echo OK 2>/dev/null || echo KO))
 define time_with_output
   env time -f 'user_time=%U\nmemory=%M' -o "$(1)"
 endef
 else
+ifeq (OK,$(shell gtime -f 'test' -o '/dev/null' echo OK 2>/dev/null || echo KO))
+define time_with_output
+  gtime -f 'user_time=%U\nmemory=%M' -o "$(1)"
+endef
 define time_with_output
 endef
+endif
 endif
 
 # --- Utilities ---
