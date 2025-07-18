@@ -44,16 +44,16 @@
   Called from zones.c:67.
 [eva] Recording results for g
 [eva] Done for function g
-[eva] computing for function g <- caller <- main.
-  Called from zones.c:68.
-[eva:alarm] zones.c:60: Warning: signed overflow. assert a + b ≤ 2147483647;
-[eva] Recording results for g
-[eva] Done for function g
 [eva] computing for function f <- caller <- main.
   Called from zones.c:68.
 [eva:alarm] zones.c:54: Warning: signed overflow. assert x + y ≤ 2147483647;
 [eva] Recording results for f
 [eva] Done for function f
+[eva] computing for function g <- caller <- main.
+  Called from zones.c:68.
+[eva:alarm] zones.c:60: Warning: signed overflow. assert a + b ≤ 2147483647;
+[eva] Recording results for g
+[eva] Done for function g
 [eva] Recording results for caller
 [eva] Done for function caller
 [eva] Recording results for main

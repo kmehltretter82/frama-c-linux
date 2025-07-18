@@ -717,8 +717,7 @@ module Make
      such values. *)
   let make_info_list environment valuation lvals =
     let get_info = get_info environment valuation in
-    let get_info acc lval = Bottom.add_to_list (get_info lval) acc in
-    let list = List.fold_left get_info [] lvals in
+    let list = Bottom.list_filter_map get_info lvals in
     List.filter (fun info -> can_be_subdivided (get_cval info.lv_value)) list
 
   (* Before any subdivision, a first evaluation is needed. If it leads to

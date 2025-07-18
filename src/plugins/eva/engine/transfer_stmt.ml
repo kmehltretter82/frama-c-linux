@@ -426,8 +426,8 @@ module Make (Engine: Engine_sig.S) = struct
     (* Process the call according to the domain decision. *)
     let call_result = process_call stmt call recursion valuation state in
     let leaving_vars = leaving_vars kf_callee in
-    (* Treat each result one by one. *)
-    let process state =
+    (* Treat each resulting state one by one. *)
+    let process_resulting_state state =
       (* Gathers the possible reductions on the value of the concrete arguments
          at the call site, according to the value of the formals at the post
          state of the called function. *)
@@ -442,11 +442,12 @@ module Make (Engine: Engine_sig.S) = struct
       let* state = reduce_arguments reductions state in
       treat_return ~kf_callee lv call.return stmt state
     in
-    let states =
-      List.fold_left
-        (fun acc (k,x) -> Bottom.add_to_list (process x >>-: fun y -> k,y) acc)
-        [] call_result.states
+    (* Partitioning key remains unchanged. *)
+    let process (key, state) =
+      let+ state' = process_resulting_state state in
+      key, state'
     in
+    let states = Bottom.list_filter_map process call_result.states in
     InOutCallback.clear ();
     { call_result with states }
 

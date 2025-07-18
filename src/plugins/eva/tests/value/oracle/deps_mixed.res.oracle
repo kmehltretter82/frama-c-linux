@@ -20,14 +20,14 @@
   accessing out of bounds index. assert 0 ≤ i0;
 [eva:alarm] deps_mixed.i:22: Warning: 
   accessing out of bounds index. assert i0 < 2;
-[eva] computing for function g <- main.
-  Called from deps_mixed.i:22.
-[eva] Recording results for g
-[eva] Done for function g
 [eva] computing for function f <- main.
   Called from deps_mixed.i:22.
 [eva] Recording results for f
 [eva] Done for function f
+[eva] computing for function g <- main.
+  Called from deps_mixed.i:22.
+[eva] Recording results for g
+[eva] Done for function g
 [eva:alarm] deps_mixed.i:24: Warning: 
   pointer downcast. assert (unsigned int)q ≤ 2147483647;
 [eva:alarm] deps_mixed.i:24: Warning: 

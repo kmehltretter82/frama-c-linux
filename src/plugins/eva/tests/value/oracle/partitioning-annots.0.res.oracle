@@ -162,10 +162,10 @@
                           main.
   Called from partitioning-annots.c:365.
 [eva] Done for function more_complex_disjunction
-[eva] partitioning-annots.c:366: Frama_C_show_each: {0}, {-2}
-[eva] partitioning-annots.c:366: Frama_C_show_each: [-99..-1], {-1}
-[eva] partitioning-annots.c:366: Frama_C_show_each: [11..99], {1}
 [eva] partitioning-annots.c:366: Frama_C_show_each: [1..10], {0}
+[eva] partitioning-annots.c:366: Frama_C_show_each: [11..99], {1}
+[eva] partitioning-annots.c:366: Frama_C_show_each: [-99..-1], {-1}
+[eva] partitioning-annots.c:366: Frama_C_show_each: {0}, {-2}
 [eva] computing for function more_complex_disjunction <- test_logic_disjunction <- 
                           main.
   Called from partitioning-annots.c:369.

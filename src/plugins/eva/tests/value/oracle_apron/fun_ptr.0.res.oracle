@@ -1,4 +1,4 @@
-39c39,42
+35c35,38
 < [eva] fun_ptr.i:33: Reusing old results for call to f
 ---
 > [eva] computing for function f <- test2 <- main.
