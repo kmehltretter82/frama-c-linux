@@ -1,5 +1,5 @@
 /* run.config
- SCRIPT: @PTEST_NAME@
+ MODULE: @PTEST_NAME@
    OPT: -instantiate -check -print
 */
 void mine(void* parameter) ;

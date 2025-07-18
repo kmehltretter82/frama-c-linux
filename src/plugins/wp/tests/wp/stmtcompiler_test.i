@@ -1,5 +1,5 @@
 /* run.config
- SCRIPT: @PTEST_NAME@
+ MODULE: @PTEST_NAME@
    DONTRUN: OPT: -wp-msg-key shell
 */
 int empty (int c){

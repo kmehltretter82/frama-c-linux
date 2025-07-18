@@ -1,9 +1,9 @@
 /* run.config
- SCRIPT: projectified_status
+ MODULE: projectified_status
    OPT:
- SCRIPT: no_hyp
+ MODULE: no_hyp
    OPT:
- SCRIPT: multi_emitters
+ MODULE: multi_emitters
    OPT:
 */
 

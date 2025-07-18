@@ -202,7 +202,7 @@ let example_msg =
      PLUGIN: <plugin>... @[<v 0># Adds a dependency and set the macro @@PTEST_PLUGIN@@ defining the '-load-plugins' option used in the macro @@PTEST_LOAD_OPTIONS@@.@]@  \
      LIBRARY: <pkg.lib>... @[<v 0># Adds a dependency and set the macro @@PTEST_LIBRARY@@ defining the '-load-library' option used in the macro @@PTEST_LOAD_OPTIONS@@.@]@  \
      MODULE: <module>... @[<v 0># Adds a dependency and adds the corresponding '-load-module' option into the macro @@PTEST_LOAD_OPTIONS@@.@]@  \
-     SCRIPT: <module>... @[alias 'MODULE' directive.@]@  \
+     SCRIPT: <module>... @[alias 'MODULE' directive (DEPRECATED).@]@  \
      LIBS: <module>...   @[<v 0># Like 'MODULE' directive but for modules that can be shared between several test files.@]@  \
      EXIT: <number>      @[<v 0># Defines the exit code required for the next sub-test commands.@]@  \
      FILTER: <cmd>       @[<v 0># Performs a transformation on the test result files before the comparison from the oracles.@ \
@@ -492,14 +492,32 @@ module Macros = struct
 
   let empty = StringMap.empty
 
+  type deprecation =
+    { macro: string;
+      msg: string;
+      action: [ `Fail | `Continue ]; }
+  let pretty_deprecation fmt deprecation =
+    Format.fprintf fmt "Macro %s is deprecated. %s."
+      deprecation.macro deprecation.msg
   let deprecated =
+    let deprecate macro msg action deprecated =
+      StringMap.add macro { macro; msg; action; } deprecated
+    in
     StringMap.empty
-    |> StringMap.add "PTEST_RESULT" "Please use PTEST_RESULT_DIR instead"
+    |> deprecate "PTEST_RESULT" "Please use PTEST_RESULT_DIR instead" `Fail
+    |> deprecate "PTEST_SCRIPT"
+      "Please use PTEST_MODULE macro instead (or MODULE: directive instead of \
+       SCRIPT:)"
+      `Continue
 
   let warn_if_deprecated file macro =
     try
-      let msg = StringMap.find macro deprecated in
-      Format.printf "%% %s: Macro %s is deprecated. %s.\n" file macro msg
+      let deprecation = StringMap.find macro deprecated in
+      Format.eprintf "%% %s: %a\n" file pretty_deprecation deprecation;
+      if deprecation.action = `Fail then begin
+        Format.eprintf "%% Exiting ptests. Please fix deprecation issue.\n";
+        exit 1
+      end
     with Not_found -> ()
 
   let pp_macros fmt macros =
@@ -891,6 +909,7 @@ end = struct
 
   let config_gen var_name update_field =
     fun ~drop:_ ~file ~dir:_ s current ->
+    Macros.warn_if_deprecated file var_name;
     let s = Macros.expand ~file current.dc_macros s in
     let l = split_list s in
     let current = update_field current (Some l) in
@@ -906,6 +925,7 @@ end = struct
     config_gen "PTEST_LIBRARY" (fun c dc_library -> { c with dc_library })
 
   let config_module macro_name ~drop:_ ~file ~dir:_ s current =
+    Macros.warn_if_deprecated file macro_name;
     let s = Macros.expand ~file current.dc_macros s in
     let l = List.map (fun s -> (Filename.remove_extension_opt [".cmxs"; ".cmxo"; ".ml"] s) ^ ".cmxs") (split_list s) in
     { current with
