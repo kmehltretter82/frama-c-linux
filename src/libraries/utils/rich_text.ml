@@ -122,8 +122,6 @@ let pop_tag buffer tag =
     let children = List.rev buffer.revtags in
     buffer.revtags <- { p ; q ; tag ; children } :: tags
 
-let no_mark _tag = ""
-
 (* -------------------------------------------------------------------------- *)
 (* --- External API                                                       --- *)
 (* -------------------------------------------------------------------------- *)
@@ -152,13 +150,12 @@ let create ?indent ?margin () =
   end ;
   let open Format in
   Format.pp_set_formatter_stag_functions fmt {
-    Format.print_open_stag = push_tag buffer ;
-    print_close_stag = pop_tag buffer ;
-    mark_open_stag = no_mark ;
-    mark_close_stag = no_mark ;
+    Format.print_open_stag = ignore ;
+    print_close_stag = ignore ;
+    mark_open_stag = (fun stag -> push_tag buffer stag; "") ;
+    mark_close_stag = (fun stag -> pop_tag buffer stag; "") ;
   } ;
-  pp_set_print_tags fmt true ;
-  pp_set_mark_tags fmt false ;
+  pp_set_mark_tags fmt true ;
   buffer
 
 let trim buffer =
