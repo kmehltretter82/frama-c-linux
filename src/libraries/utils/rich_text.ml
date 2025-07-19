@@ -108,10 +108,6 @@ let truncate buffer size =
     end;
   !truncated
 
-(* All text added shall go through this function *)
-let append buffer s k n =
-  Buffer.add_substring buffer.content s k n
-
 let push_tag buffer _tag =
   let p = Buffer.length buffer.content in
   buffer.stack <- ( p , buffer.revtags ) :: buffer.stack ;
@@ -139,7 +135,7 @@ let create ?indent ?margin () =
     revtags = [] ;
     stack = [] ;
   } in
-  let fmt = Format.make_formatter (append buffer) (fun () -> ()) in
+  let fmt = Format.formatter_of_buffer buffer.content in
   buffer.formatter <- fmt ;
   begin match indent , margin with
     | None , None -> ()
