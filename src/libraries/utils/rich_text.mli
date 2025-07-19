@@ -21,11 +21,24 @@ val tags_at : message -> int -> (Format.stag * int * int) list
 (** Returns the list of tags at the given position.
     Inner tags come first, outer tags last. *)
 
-val pretty : Format.formatter -> message -> unit
-(** Pretty-print the message onto the given formatter, with the tags.
-    The original message has been {i already} laidout with respect to
+(** [pretty fmt buffer] pretty-prints the message onto the given formatter
+    [fmt], with the semantic tags.
+    The original text has been {i already} laidout with respect to
     horizontal and vertical boxes, and this layout will be output as-it-is
-    into the formatter. *)
+    into the formatter.
+    @param truncate do not print more than [truncate] characters; if the text
+    size is bigger than this number, than the middle part of the text is
+    replaced by [ellipsis]
+    @param ellipsis when [truncate] is given and the text size is bigger than
+    [truncate], then [ellipsis] is printed instead of the truncated middle
+    part *)
+val pretty :
+  ?truncate:int ->
+  ?ellipsis:string ->
+  Format.formatter ->
+  message ->
+  unit
+
 
 (* -------------------------------------------------------------------------- *)
 (** Message Buffer  *)

@@ -36,24 +36,69 @@ let rec lookup acc k = function
 
 let tags_at message k = lookup [] k message.tags
 
-let pretty fmt message =
-  let output p q =
-    Format.pp_print_string fmt (String.sub message.plain p (q + 1 - p))
+let pretty ?truncate ?(ellipsis="[...]") fmt message =
+  (* Compute buffer length *)
+  let length = String.length message.plain in
+  (* Truncate the buffer if requested *)
+  let truncate_start, truncate_end =
+    match truncate with
+    | Some size when size < length ->
+      let ellipsis_length = String.length ellipsis in
+      if ellipsis_length >= size
+      then (0, length)
+      else
+        let size_left = (size - ellipsis_length) / 2 in
+        let size_right = ((size - ellipsis_length) - size_left) in
+        (size_left, length - size_right)
+    | _ ->
+      max_int, max_int (* Do not truncate until max_int, hopefully never *)
   in
-  let rec aux fmt p q = function
-    | [] -> output p q
+  (* Output of a substring of the buffer from p (included) to q (excluded) *)
+  (* Do replace by Format.pp_print_substring_as as soon as OCaml 5.1 is
+     the minimal version supported by Frama-C *)
+  let output_sub p q =
+    if p < q then
+      let s = String.sub message.plain p (q - p) in
+      Format.pp_print_string fmt s
+  in
+  (* Output of a substring of the buffer, but with truncated contents if
+     required. *)
+  let output_truncated ~force_ellipsis p q =
+    (* Is there no untersection between [p..q[ and
+       [truncate_start..truncate_end[ ? *)
+    if p >= truncate_end || q <= truncate_start then
+      output_sub p q
+    else begin
+      output_sub p truncate_start;
+      if force_ellipsis || p <= truncate_start && q >= truncate_end then
+        Format.pp_print_string fmt ellipsis;
+      output_sub truncate_end q;
+    end
+  in
+  (* Iteration over the semantic tags of the buffer *)
+  (* [with_ellipsis] tells whether to output ellpsis when truncating *)
+  let rec aux ~force_ellipsis p q =
+    function
+    | [] -> output_truncated ~force_ellipsis p q
     | { tag ; p=tp ; q=tq ; children } :: tags ->
-      if q < tp then output p q else
-      if tq < q then aux fmt p q tags else
-        begin
-          if tp>p then output p (tp-p) ;
-          Format.pp_open_stag fmt tag ;
-          aux fmt tp tq children ;
-          Format.pp_close_stag fmt () ;
-          aux fmt (succ tq) q tags ;
-        end
+      if tp >= truncate_start && tq <= truncate_end then
+        aux ~force_ellipsis p q tags
+      else if q < tp then
+        output_truncated ~force_ellipsis p q
+      else if tq < p then
+        aux ~force_ellipsis p q tags
+      else begin
+        output_truncated ~force_ellipsis p tp;
+        Format.pp_open_stag fmt tag;
+        aux ~force_ellipsis:false tp tq children;
+        Format.pp_close_stag fmt ();
+        let force_ellipsis =
+          force_ellipsis || p <= truncate_start && q >= truncate_end
+        in
+        aux ~force_ellipsis tq q tags;
+      end
   in
-  aux fmt 0 (String.length message.plain) message.tags
+  aux ~force_ellipsis:true 0 (String.length message.plain) message.tags
 
 
 (* -------------------------------------------------------------------------- *)
