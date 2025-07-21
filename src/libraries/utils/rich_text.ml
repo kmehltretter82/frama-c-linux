@@ -223,6 +223,7 @@ let trim buffer =
   p , q
 
 let contents ?(trim=true) buffer =
+  Format.pp_print_flush buffer.formatter ();
   if trim then
     let p = trim_begin buffer in
     let q = trim_end buffer in
@@ -242,7 +243,8 @@ and offset_tags n tags =
   List.map (offset_tag n) tags
 
 let message ?trim buffer =
-  let plain = contents ?trim buffer in
+  let plain = contents ?trim buffer in (* flushes the formatter *)
+  (* The following lines requires that the formatter have been flushed *)
   pop_all buffer;
   let tags = List.rev buffer.revtags |> offset_tags (trim_begin buffer) in
   { plain ; tags }
@@ -263,8 +265,7 @@ let kbprintf kjob buffer format =
   Format.kfprintf kjob buffer.formatter format
 let sprintf ?prefix ?suffix ?indent ?margin ?trim ?truncate ?ellipsis format =
   let buffer = create ?indent ?margin () in
-  let to_string fmt =
-    Format.pp_print_flush fmt ();
+  let to_string _fmt =
     let message = message ?trim buffer in
     let length = Option.value ~default:(size message) truncate in
     let string_buffer = Buffer.create length in
