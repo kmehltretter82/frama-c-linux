@@ -246,19 +246,26 @@ let add_substring buffer s k n =
   Format.pp_print_string buffer.formatter (String.sub s k n)
 
 let formatter buffer = buffer.formatter
-let bprintf buffer text = Format.fprintf buffer.formatter text
-let kprintf kjob buffer text = Format.kfprintf kjob buffer.formatter text
+
+let bprintf buffer format =
+  Format.fprintf buffer.formatter format
+let kbprintf kjob buffer format =
+  Format.kfprintf kjob buffer.formatter format
+let sprintf ?prefix ?suffix ?indent ?margin ?trim ?truncate ?ellipsis format =
+  let buffer = create ?indent ?margin () in
+  let to_string fmt =
+    Format.pp_print_flush fmt ();
+    let message = message ?trim buffer in
+    let length = Option.value ~default:(size message) truncate in
+    let string_buffer = Buffer.create length in
+    let fmt = Format.formatter_of_buffer string_buffer in
+    Option.iter (fun f -> f fmt) prefix;
+    pretty ?truncate ?ellipsis fmt message;
+    Option.iter (fun f -> f fmt) suffix;
+    Format.pp_print_flush fmt ();
+    Buffer.contents string_buffer
+  in
+  kbprintf to_string buffer format
 
 let to_string ?(indent=20) ?(margin=40) ?(trim=true) pp data =
-  let buffer = create ~indent ~margin () in
-  let fmt = formatter buffer in
-  pp fmt data ;
-  Format.pp_print_flush fmt () ;
-  if trim then
-    let p = trim_begin buffer in
-    let q = trim_end buffer in
-    Buffer.sub buffer.content p (q+1-p)
-  else
-    Buffer.contents buffer.content
-
-(* -------------------------------------------------------------------------- *)
+  sprintf ~indent ~margin ~trim "%a" pp data

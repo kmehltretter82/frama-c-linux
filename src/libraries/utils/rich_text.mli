@@ -72,10 +72,17 @@ val add_string : buffer -> string -> unit (** Buffer-like *)
 val add_substring : buffer -> string -> int -> int -> unit (** Buffer-like *)
 
 val formatter : buffer -> Format.formatter
+
 val bprintf : buffer -> ('a,Format.formatter,unit) format -> 'a
-val kprintf :
+val kbprintf :
   (Format.formatter -> 'a) ->
   buffer -> ('b,Format.formatter,unit,'a) format4 -> 'b
+val sprintf  :
+  ?prefix:(Format.formatter -> unit) -> ?suffix:(Format.formatter -> unit) ->
+  ?indent:int -> ?margin:int ->
+  ?trim:bool ->
+  ?truncate:int -> ?ellipsis:string ->
+  ('a, Format.formatter,unit,string) format4 -> 'a
 
 (** Similar to {!Buffer.contents}, returns the plain contents of the buffer
     as a string.

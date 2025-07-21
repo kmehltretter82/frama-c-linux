@@ -447,7 +447,7 @@ let close_buffer c =
 
 let logtransient channel text =
   let buffer = open_buffer channel in
-  Rich_text.kprintf
+  Rich_text.kbprintf
     (fun fmt ->
        try
          Format.pp_print_newline fmt () ;
@@ -476,7 +476,7 @@ let logwithfinal finally channel
     text =
   let buffer = open_buffer channel in
   Format.pp_open_vbox (Rich_text.formatter buffer) 0 ;
-  Rich_text.kprintf
+  Rich_text.kbprintf
     (fun fmt ->
        try
          (match append with None -> () | Some k -> k fmt) ;
