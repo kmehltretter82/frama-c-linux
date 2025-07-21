@@ -229,4 +229,5 @@ module type Lattice_Set = sig
   val filter: (O.elt -> bool) -> t -> t
   val project : t -> O.t
   val mem : O.elt -> t -> bool
+  val inter: t -> t -> t
 end

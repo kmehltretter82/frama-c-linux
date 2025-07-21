@@ -134,6 +134,12 @@ module Make_Generic_Lattice_Set
     | _, Top | Top, _ -> true
     | Set s1 , Set s2 -> Set.exists (fun e -> Set.mem e s2) s1
 
+  let inter e1 e2 =
+    match e1, e2 with
+    | Top, Top -> Top
+    | Top, Set s | Set s, Top -> Set s
+    | Set s1, Set s2 -> Set (Set.inter s1 s2)
+
   let cardinal_less_than s n =
     match s with
     | Top -> raise Not_less_than
