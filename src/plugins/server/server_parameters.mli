@@ -44,4 +44,6 @@ val wname : warn_category
 
 val has_relative_filepath: unit -> bool
 
+val dkey_protocol : category
+
 (**************************************************************************)

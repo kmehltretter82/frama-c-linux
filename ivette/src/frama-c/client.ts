@@ -30,10 +30,11 @@ import { json } from 'dome/data/json';
 export abstract class Client {
 
   /** Server CLI */
-  abstract commandLine(sockaddr: string, params: string[]): string[];
+  abstract commandLine(domain: string, sockaddr: string, params: string[]):
+  string[];
 
   /** Connection */
-  abstract connect(addr: string): void;
+  abstract connect(addr: string | [string, number]): void;
 
   /** Disconnection */
   abstract disconnect(): void;
