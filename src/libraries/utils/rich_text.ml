@@ -280,3 +280,70 @@ let sprintf ?prefix ?suffix ?indent ?margin ?trim ?truncate ?ellipsis format =
 
 let to_string ?(indent=20) ?(margin=40) ?(trim=true) pp data =
   sprintf ~indent ~margin ~trim "%a" pp data
+
+(* -------------------------------------------------------------------------- *)
+(* --- Tests                                                              --- *)
+(* -------------------------------------------------------------------------- *)
+
+let test_pretty ?(truncate=12) format output =
+  let prefix fmt = Format.pp_set_mark_tags fmt true in
+  let result = sprintf ~prefix ~truncate format in
+  let success = result = output in
+  if not success then
+    Format.eprintf "wrong output: '%s' given, '%s' expected@."
+      result output;
+  success
+
+(* Test empty format *)
+let%test _ = test_pretty "" ""
+
+(* Basic test *)
+let%test _ = test_pretty "01234" "01234"
+
+(* Truncate size < ellipsis length *)
+let%test _ = test_pretty ~truncate:2 "0123456789" "[...]"
+
+(* truncation basic test *)
+let%test _ = test_pretty "01234567890123456789" "012[...]6789"
+
+(* Blank string *)
+let%test _ = test_pretty " \t\r\n " ""
+
+(* Basic trim *)
+let%test _ = test_pretty "   01234  " "01234"
+
+(* Basic trim and truncation *)
+let%test _ = test_pretty "   01234567890123456789  " "012[...]6789"
+
+(* Basic stag usage *)
+let%test _ = test_pretty "0@{<a>12345678@}9" "0<a>12345678</a>9"
+
+(* Missing closing stag *)
+let%test _ = test_pretty "0@{<a>123456789" "0<a>123456789</a>"
+
+(* Truncation with stags *)
+let%test _ = test_pretty "0@{<a>123456789012345678@}9" "0<a>12[...]678</a>9"
+let%test _ =
+  test_pretty "0@{<a>123456@{<b>7890@}12345678@}9" "0<a>12[...]678</a>9"
+let%test _ =
+  test_pretty "012345@{<a>6@{<b>7890@}1@}23456789" "012[...]6789"
+let%test _ =
+  test_pretty "0@{<a>123456@}78901@{<b>2345678@}9" "0<a>12</a>[...]<b>678</b>9"
+let%test _ =
+  test_pretty ~truncate:17
+    "0@{<a>1@{<b>2@{<c>3@{<d>4@}5@}6@}789012@{<e>3@{<f>4@{<g>5@}6@}7@}8@}9"
+    "0<a>1<b>2<c>3<d>4</d>5</c></b>[...]<e><f>4<g>5</g>6</f>7</e>8</a>9"
+let%test _ =
+  test_pretty ~truncate:17
+    "0@{<a>1@{<b>2@{<c>3@{<d>4@}5@}6@}789012@{<e>@{<f>@{<g>345@}6@}7@}8@}9"
+    "0<a>1<b>2<c>3<d>4</d>5</c></b>[...]<e><f><g>45</g>6</f>7</e>8</a>9"
+let%test _ =
+  test_pretty ~truncate:17
+    "0@{<a>1@{<b>2@{<c>3@{<d>456@}@}@}789012@{<e>3@{<f>4@{<g>5@}6@}7@}8@}9"
+    "0<a>1<b>2<c>3<d>45</d></c></b>[...]<e><f>4<g>5</g>6</f>7</e>8</a>9"
+
+(* Trim with stags *)
+let%test _ = test_pretty "  0@{<a>12345678@}9   " "0<a>12345678</a>9"
+
+(* Trim and truncate with stags *)
+let%test _ = test_pretty "0@{<a>123456789012345678@}9" "0<a>12[...]678</a>9"
