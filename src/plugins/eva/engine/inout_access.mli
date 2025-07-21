@@ -31,7 +31,7 @@ type t = private {
 }
 
 module Access : sig
-  include Lattice_type.Bounded_Join_Semi_Lattice with type t := t
+  include Lattice_type.Bottom_Bounded_Join_Semi_Lattice with type t := t
 
   val make : ?read:Locations.Zone.t -> ?write:Locations.Zone.t -> unit -> t
   (** [make ?read ?write ()] creates an [access] with the given [read] and

@@ -38,7 +38,7 @@ module Bottom : sig
 
   (** Bounds a semi-lattice *)
   module Bound_Lattice (Lattice: Lattice_type.Join_Semi_Lattice) :
-    Lattice_type.Bounded_Join_Semi_Lattice with type t = Lattice.t or_bottom
+    Lattice_type.Bottom_Bounded_Join_Semi_Lattice with type t = Lattice.t or_bottom
 
   (** Access *)
   val is_bottom : 'a t -> bool
@@ -98,10 +98,8 @@ module Top : sig
     Datatype.S with type t = Domain.t or_top
 
   (** Bounds a semi-lattice *)
-  module Bound_Lattice (Lattice: Lattice_type.Join_Semi_Lattice) : sig
-    include Lattice_type.Join_Semi_Lattice with type t = Lattice.t or_top
-    include Lattice_type.With_Top with type t := t
-  end
+  module Bound_Lattice (Lattice: Lattice_type.Join_Semi_Lattice) :
+    Lattice_type.Top_Bounded_Join_Semi_Lattice with type t = Lattice.t or_top
 
   (** Access *)
   val is_top : 'a t -> bool

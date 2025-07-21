@@ -30,7 +30,7 @@ module type Value = sig
 end
 
 module type Lattice = sig
-  include Lattice_type.Bounded_Join_Semi_Lattice
+  include Lattice_type.Bottom_Bounded_Join_Semi_Lattice
   include Lattice_type.With_Narrow with type t := t
   include Lattice_type.With_Under_Approximation with type t := t
   include Lattice_type.With_Intersects with type t := t
