@@ -261,11 +261,19 @@ let reset_all () =
   FloatState.clear ()
 
 
+(* --- Hook to compute statistics when requested --- *)
+
+module ComputeHook = Hook.Make ()
+
+let add_compute_hook = ComputeHook.extend
+
+
 (* -- Export --- *)
 
 type value = Value : 'ty typ * 'ty -> value
 
 let export_as_list () =
+  ComputeHook.apply ();
   let int_bindings =
     IntState.to_seq ()
     |> Seq.map (fun (k, v) -> k, Value (Int, v))
@@ -311,6 +319,8 @@ let export_as_csv ?filename () =
 
 (* Centralized statistics registration *)
 
+let memory_usage =
+  register_global_stat "memory-usage" Int
 let alarm_count =
   register_global_stat "alarm-count" Int
 let stmt_coverage =
@@ -333,3 +343,13 @@ let partitioning_index_hits =
   register_global_stat "partitioning-index-hits" Int
 let partitioning_index_misses =
   register_global_stat "partitioning-index-misses" Int
+
+(* Memory usage computation *)
+
+let compute_memory_usage () =
+  let stats = Gc.stat () and control = Gc.get () in
+  let words = stats.top_heap_words + control.minor_heap_size in
+  let kilobytes = words * (Sys.word_size / 8) / 1024 in
+  set memory_usage () kilobytes
+
+let () = add_compute_hook compute_memory_usage

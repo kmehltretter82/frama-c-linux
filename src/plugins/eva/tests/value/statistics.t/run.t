@@ -31,6 +31,7 @@ Run Eva and save statistics file.
 
 Filter out the analysis time to have a deterministic oracle.
   $ sed -i 's|analysis-time			.*|analysis-time			<TIME>|' stats.csv
+  $ sed -i 's|memory-usage			.*|memory-usage			<MEMORY>|' stats.csv
 
 Print statistics file.
   $ cat stats.csv
@@ -48,5 +49,6 @@ Print statistics file.
   memexec-misses	f		2
   memexec-misses	h		1
   memexec-misses	main		1
+  memory-usage			<MEMORY>
   partitioning-index-misses			162
   stmt-coverage			1.
