@@ -99,7 +99,7 @@ module LatticeSingleTaint = struct
       t.dependent_call
 
   (* Frama-C "datatype" for type [taint]. *)
-  include Datatype.Make_with_collections(struct
+  include Datatype.Make_with_collections (struct
       include Datatype.Serializable_undefined
 
       type t = taint_state
@@ -187,7 +187,7 @@ end
 (* Maps a taint namespace to corresponding taint state. *)
 module TaintNamespace = struct
   include Datatype.String.Map
-  include Datatype.String.Map.Make(LatticeSingleTaint)
+  include Datatype.String.Map.Make (LatticeSingleTaint)
 
   let find_or_empty key map =
     try find key map
@@ -221,9 +221,9 @@ end
 
 module LatticeMultiTaint = struct
 
-  include Datatype.Make_with_collections(struct
+  include Datatype.Make_with_collections (struct
       include Datatype.Serializable_undefined
-      include Lattice_bounds.Top.Make_Datatype(TaintNamespace)
+      include Lattice_bounds.Top.Make_Datatype (TaintNamespace)
       let name = "taint"
     end)
 
@@ -235,8 +235,10 @@ module LatticeMultiTaint = struct
     let join_taint t1 t2 =
       let merge_per_key _key maybe_state1 maybe_state2 =
         match maybe_state1, maybe_state2 with
-        | state, None | None, state -> state
-        | Some state1, Some state2 -> Some (LatticeSingleTaint.join state1 state2)
+        | state, None | None, state ->
+          state
+        | Some state1, Some state2 ->
+          Some (LatticeSingleTaint.join state1 state2)
       in
       `Value (TaintNamespace.merge merge_per_key t1 t2)
     in
