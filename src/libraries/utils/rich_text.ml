@@ -111,7 +111,7 @@ type buffer = {
   mutable formatter : Format.formatter ; (* formatter on self (recursive) *)
   content : Buffer.t ;
   mutable revtags : tag list ; (* in reverse order *)
-  mutable stack : (int * tag list) list ; (* opened tag positions *)
+  mutable stack : (int * Format.stag * tag list) list ; (* opened tag positions *)
 }
 
 let is_blank = function
@@ -158,19 +158,27 @@ let truncate buffer size =
     end;
   !truncated
 
-let push_tag buffer _tag =
+let push_tag buffer tag =
   let p = Buffer.length buffer.content in
-  buffer.stack <- ( p , buffer.revtags ) :: buffer.stack ;
+  buffer.stack <- ( p , tag, buffer.revtags ) :: buffer.stack ;
   buffer.revtags <- []
 
 let pop_tag buffer tag =
   match buffer.stack with
   | [] -> ()
-  | (p,tags)::stack ->
+  | (p,tag',tags)::stack ->
+    assert (tag = tag');
     let q = Buffer.length buffer.content in
     buffer.stack <- stack ;
     let children = List.rev buffer.revtags in
     buffer.revtags <- { p ; q ; tag ; children } :: tags
+
+let rec pop_all buffer =
+  match buffer.stack with
+  | [] -> ()
+  | (_,tag,_) :: _ ->
+    pop_tag buffer tag;
+    pop_all buffer
 
 (* -------------------------------------------------------------------------- *)
 (* --- External API                                                       --- *)
@@ -234,6 +242,7 @@ and offset_tags n tags =
 
 let message ?trim buffer =
   let plain = contents ?trim buffer in
+  pop_all buffer;
   let tags = List.rev buffer.revtags |> offset_tags (trim_begin buffer) in
   { plain ; tags }
 
