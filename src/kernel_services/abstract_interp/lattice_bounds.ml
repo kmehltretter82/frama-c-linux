@@ -276,6 +276,14 @@ module Top = struct
       let mem_project = Datatype.never_any_project
     end)
 
+  (* Bound lattice *)
+
+  module Bound_Lattice (Lattice: Lattice_type.Join_Semi_Lattice) = struct
+    include Make_Datatype (Lattice)
+    let top = `Top
+    let join = join (fun a b -> `Value (Lattice.join a b))
+    let is_included = is_included Lattice.is_included
+  end
 end
 
 

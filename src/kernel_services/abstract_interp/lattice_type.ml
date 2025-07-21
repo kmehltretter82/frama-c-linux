@@ -30,7 +30,7 @@ module type Join_Semi_Lattice = sig
   (** over-approximation of union *)
 
   val is_included: t -> t -> bool
-  (**is first argument included in the second?*)
+  (** is first argument included in the second? *)
 end
 
 module type Bounded_Join_Semi_Lattice = sig

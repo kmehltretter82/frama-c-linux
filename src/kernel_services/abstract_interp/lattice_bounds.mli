@@ -97,6 +97,12 @@ module Top : sig
   module Make_Datatype (Domain: Datatype.S) :
     Datatype.S with type t = Domain.t or_top
 
+  (** Bounds a semi-lattice *)
+  module Bound_Lattice (Lattice: Lattice_type.Join_Semi_Lattice) : sig
+    include Lattice_type.Join_Semi_Lattice with type t = Lattice.t or_top
+    include Lattice_type.With_Top with type t := t
+  end
+
   (** Access *)
   val is_top : 'a t -> bool
   val non_top : 'a t -> 'a
