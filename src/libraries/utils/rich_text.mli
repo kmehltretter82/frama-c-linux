@@ -99,8 +99,8 @@ val range : buffer -> int -> int -> string
 (** Range of non-blank leading and trailing characters. *)
 val trim : buffer -> int * int
 
-(** Resize the buffer to roughly fit its actual content. *)
-val shrink : buffer -> unit
+(** Reset the buffer to its initial empty state. *)
+val reset : buffer -> unit
 
 (** [truncate buffer size] truncates the content of [buffer] if longer than
     [size] characters. Returns true if the buffer has been truncated. *)

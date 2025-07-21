@@ -443,7 +443,7 @@ let close_buffer c =
   if c.stack > 1 then
     c.stack <- pred c.stack
   else
-    Rich_text.shrink c.locked_buffer
+    Rich_text.reset c.locked_buffer
 
 let logtransient channel text =
   let buffer = open_buffer channel in

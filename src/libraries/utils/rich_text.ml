@@ -130,9 +130,10 @@ let trim_end buffer =
       lookup_bwd text (pred k) else k
   in lookup_bwd buffer.content (pred (Buffer.length buffer.content))
 
-let shrink buffer =
-  if Buffer.length buffer.content > min_buffer then
-    Buffer.reset buffer.content
+let reset buffer =
+  Buffer.reset buffer.content;
+  buffer.revtags <- [];
+  buffer.stack <- []
 
 let truncate buffer size =
   let truncated = ref false in
@@ -142,7 +143,7 @@ let truncate buffer size =
       let q = trim_end buffer in
       let n = q+1-p in
       if n <= 0 then
-        shrink buffer
+        reset buffer
       else if n <= size then
         Buffer.blit buffer.content p (Buffer.to_bytes buffer.content) 0 n
       else
