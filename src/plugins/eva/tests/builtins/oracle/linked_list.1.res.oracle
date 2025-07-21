@@ -14,19 +14,13 @@
   __fc_stdin ∈ {{ &__fc_initial_stdin }}
   __fc_stdout ∈ {{ &__fc_initial_stdout }}
   __fc_fopen[0..15] ∈ {0}
-  __fc_p_fopen ∈ {{ &__fc_fopen[0] }}
   __fc_tmpnam[0..19] ∈ {0}
-  __fc_p_tmpnam ∈ {{ &__fc_tmpnam[0] }}
   __fc_heap_status ∈ [--..--]
   __fc_ctermid[0..8] ∈ {0}
-  __fc_p_ctermid ∈ {{ &__fc_ctermid[0] }}
   __fc_cuserid[0..8] ∈ {0}
-  __fc_p_cuserid ∈ {{ &__fc_cuserid[0] }}
   Frama_C_entropy_source ∈ [--..--]
   __fc_rand_max ∈ {0x7FFFFFFF}
   __fc_random48_init ∈ {0}
-  __fc_random48_counter[0..2] ∈ [--..--]
-  __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
   __fc_initial_stdout.__fc_FILE_id ∈ {1}
                      .__fc_FILE_data ∈ {0}
   __fc_initial_stderr.__fc_FILE_id ∈ {2}
@@ -39,9 +33,9 @@
   ==END OF DUMP==
 [eva] computing for function malloc <- main.
   Called from linked_list.c:41.
-[eva:alarm] FRAMAC_SHARE/libc/stdlib.h:577: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/stdlib.h:576: Warning: 
   function malloc, behavior allocation: postcondition 'allocation' got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/stdlib.h:578: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/stdlib.h:577: Warning: 
   function malloc, behavior allocation: postcondition 'errno_same' got status unknown.
 [eva] Recording results for malloc
 [eva] Done for function malloc
@@ -54,19 +48,13 @@
   __fc_stdin ∈ {{ &__fc_initial_stdin }}
   __fc_stdout ∈ {{ &__fc_initial_stdout }}
   __fc_fopen[0..15] ∈ {0}
-  __fc_p_fopen ∈ {{ &__fc_fopen[0] }}
   __fc_tmpnam[0..19] ∈ {0}
-  __fc_p_tmpnam ∈ {{ &__fc_tmpnam[0] }}
   __fc_heap_status ∈ [--..--]
   __fc_ctermid[0..8] ∈ {0}
-  __fc_p_ctermid ∈ {{ &__fc_ctermid[0] }}
   __fc_cuserid[0..8] ∈ {0}
-  __fc_p_cuserid ∈ {{ &__fc_cuserid[0] }}
   Frama_C_entropy_source ∈ [--..--]
   __fc_rand_max ∈ {0x7FFFFFFF}
   __fc_random48_init ∈ {0}
-  __fc_random48_counter[0..2] ∈ [--..--]
-  __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
   __fc_initial_stdout.__fc_FILE_id ∈ {1}
                      .__fc_FILE_data ∈ {0}
   __fc_initial_stderr.__fc_FILE_id ∈ {2}
@@ -88,19 +76,13 @@
   __fc_stdin ∈ {{ &__fc_initial_stdin }}
   __fc_stdout ∈ {{ &__fc_initial_stdout }}
   __fc_fopen[0..15] ∈ {0}
-  __fc_p_fopen ∈ {{ &__fc_fopen[0] }}
   __fc_tmpnam[0..19] ∈ {0}
-  __fc_p_tmpnam ∈ {{ &__fc_tmpnam[0] }}
   __fc_heap_status ∈ [--..--]
   __fc_ctermid[0..8] ∈ {0}
-  __fc_p_ctermid ∈ {{ &__fc_ctermid[0] }}
   __fc_cuserid[0..8] ∈ {0}
-  __fc_p_cuserid ∈ {{ &__fc_cuserid[0] }}
   Frama_C_entropy_source ∈ [--..--]
   __fc_rand_max ∈ {0x7FFFFFFF}
   __fc_random48_init ∈ {0}
-  __fc_random48_counter[0..2] ∈ [--..--]
-  __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
   __fc_initial_stdout.__fc_FILE_id ∈ {1}
                      .__fc_FILE_data ∈ {0}
   __fc_initial_stderr.__fc_FILE_id ∈ {2}
@@ -125,19 +107,13 @@
   __fc_stdin ∈ {{ &__fc_initial_stdin }}
   __fc_stdout ∈ {{ &__fc_initial_stdout }}
   __fc_fopen[0..15] ∈ {0}
-  __fc_p_fopen ∈ {{ &__fc_fopen[0] }}
   __fc_tmpnam[0..19] ∈ {0}
-  __fc_p_tmpnam ∈ {{ &__fc_tmpnam[0] }}
   __fc_heap_status ∈ [--..--]
   __fc_ctermid[0..8] ∈ {0}
-  __fc_p_ctermid ∈ {{ &__fc_ctermid[0] }}
   __fc_cuserid[0..8] ∈ {0}
-  __fc_p_cuserid ∈ {{ &__fc_cuserid[0] }}
   Frama_C_entropy_source ∈ [--..--]
   __fc_rand_max ∈ {0x7FFFFFFF}
   __fc_random48_init ∈ {0}
-  __fc_random48_counter[0..2] ∈ [--..--]
-  __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
   __fc_initial_stdout.__fc_FILE_id ∈ {1}
                      .__fc_FILE_data ∈ {0}
   __fc_initial_stderr.__fc_FILE_id ∈ {2}
@@ -161,19 +137,13 @@
   __fc_stdin ∈ {{ &__fc_initial_stdin }}
   __fc_stdout ∈ {{ &__fc_initial_stdout }}
   __fc_fopen[0..15] ∈ {0}
-  __fc_p_fopen ∈ {{ &__fc_fopen[0] }}
   __fc_tmpnam[0..19] ∈ {0}
-  __fc_p_tmpnam ∈ {{ &__fc_tmpnam[0] }}
   __fc_heap_status ∈ [--..--]
   __fc_ctermid[0..8] ∈ {0}
-  __fc_p_ctermid ∈ {{ &__fc_ctermid[0] }}
   __fc_cuserid[0..8] ∈ {0}
-  __fc_p_cuserid ∈ {{ &__fc_cuserid[0] }}
   Frama_C_entropy_source ∈ [--..--]
   __fc_rand_max ∈ {0x7FFFFFFF}
   __fc_random48_init ∈ {0}
-  __fc_random48_counter[0..2] ∈ [--..--]
-  __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
   __fc_initial_stdout.__fc_FILE_id ∈ {1}
                      .__fc_FILE_data ∈ {0}
   __fc_initial_stderr.__fc_FILE_id ∈ {2}
@@ -201,19 +171,13 @@
   __fc_stdin ∈ {{ &__fc_initial_stdin }}
   __fc_stdout ∈ {{ &__fc_initial_stdout }}
   __fc_fopen[0..15] ∈ {0}
-  __fc_p_fopen ∈ {{ &__fc_fopen[0] }}
   __fc_tmpnam[0..19] ∈ {0}
-  __fc_p_tmpnam ∈ {{ &__fc_tmpnam[0] }}
   __fc_heap_status ∈ [--..--]
   __fc_ctermid[0..8] ∈ {0}
-  __fc_p_ctermid ∈ {{ &__fc_ctermid[0] }}
   __fc_cuserid[0..8] ∈ {0}
-  __fc_p_cuserid ∈ {{ &__fc_cuserid[0] }}
   Frama_C_entropy_source ∈ [--..--]
   __fc_rand_max ∈ {0x7FFFFFFF}
   __fc_random48_init ∈ {0}
-  __fc_random48_counter[0..2] ∈ [--..--]
-  __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
   __fc_initial_stdout.__fc_FILE_id ∈ {1}
                      .__fc_FILE_data ∈ {0}
   __fc_initial_stderr.__fc_FILE_id ∈ {2}
@@ -239,19 +203,13 @@
   __fc_stdin ∈ {{ &__fc_initial_stdin }}
   __fc_stdout ∈ {{ &__fc_initial_stdout }}
   __fc_fopen[0..15] ∈ {0}
-  __fc_p_fopen ∈ {{ &__fc_fopen[0] }}
   __fc_tmpnam[0..19] ∈ {0}
-  __fc_p_tmpnam ∈ {{ &__fc_tmpnam[0] }}
   __fc_heap_status ∈ [--..--]
   __fc_ctermid[0..8] ∈ {0}
-  __fc_p_ctermid ∈ {{ &__fc_ctermid[0] }}
   __fc_cuserid[0..8] ∈ {0}
-  __fc_p_cuserid ∈ {{ &__fc_cuserid[0] }}
   Frama_C_entropy_source ∈ [--..--]
   __fc_rand_max ∈ {0x7FFFFFFF}
   __fc_random48_init ∈ {0}
-  __fc_random48_counter[0..2] ∈ [--..--]
-  __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
   __fc_initial_stdout.__fc_FILE_id ∈ {1}
                      .__fc_FILE_data ∈ {0}
   __fc_initial_stderr.__fc_FILE_id ∈ {2}
@@ -281,19 +239,13 @@
   __fc_stdin ∈ {{ &__fc_initial_stdin }}
   __fc_stdout ∈ {{ &__fc_initial_stdout }}
   __fc_fopen[0..15] ∈ {0}
-  __fc_p_fopen ∈ {{ &__fc_fopen[0] }}
   __fc_tmpnam[0..19] ∈ {0}
-  __fc_p_tmpnam ∈ {{ &__fc_tmpnam[0] }}
   __fc_heap_status ∈ [--..--]
   __fc_ctermid[0..8] ∈ {0}
-  __fc_p_ctermid ∈ {{ &__fc_ctermid[0] }}
   __fc_cuserid[0..8] ∈ {0}
-  __fc_p_cuserid ∈ {{ &__fc_cuserid[0] }}
   Frama_C_entropy_source ∈ [--..--]
   __fc_rand_max ∈ {0x7FFFFFFF}
   __fc_random48_init ∈ {0}
-  __fc_random48_counter[0..2] ∈ [--..--]
-  __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
   __fc_initial_stdout.__fc_FILE_id ∈ {1}
                      .__fc_FILE_data ∈ {0}
   __fc_initial_stderr.__fc_FILE_id ∈ {2}
@@ -321,19 +273,13 @@
   __fc_stdin ∈ {{ &__fc_initial_stdin }}
   __fc_stdout ∈ {{ &__fc_initial_stdout }}
   __fc_fopen[0..15] ∈ {0}
-  __fc_p_fopen ∈ {{ &__fc_fopen[0] }}
   __fc_tmpnam[0..19] ∈ {0}
-  __fc_p_tmpnam ∈ {{ &__fc_tmpnam[0] }}
   __fc_heap_status ∈ [--..--]
   __fc_ctermid[0..8] ∈ {0}
-  __fc_p_ctermid ∈ {{ &__fc_ctermid[0] }}
   __fc_cuserid[0..8] ∈ {0}
-  __fc_p_cuserid ∈ {{ &__fc_cuserid[0] }}
   Frama_C_entropy_source ∈ [--..--]
   __fc_rand_max ∈ {0x7FFFFFFF}
   __fc_random48_init ∈ {0}
-  __fc_random48_counter[0..2] ∈ [--..--]
-  __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
   __fc_initial_stdout.__fc_FILE_id ∈ {1}
                      .__fc_FILE_data ∈ {0}
   __fc_initial_stderr.__fc_FILE_id ∈ {2}
@@ -365,19 +311,13 @@
   __fc_stdin ∈ {{ &__fc_initial_stdin }}
   __fc_stdout ∈ {{ &__fc_initial_stdout }}
   __fc_fopen[0..15] ∈ {0}
-  __fc_p_fopen ∈ {{ &__fc_fopen[0] }}
   __fc_tmpnam[0..19] ∈ {0}
-  __fc_p_tmpnam ∈ {{ &__fc_tmpnam[0] }}
   __fc_heap_status ∈ [--..--]
   __fc_ctermid[0..8] ∈ {0}
-  __fc_p_ctermid ∈ {{ &__fc_ctermid[0] }}
   __fc_cuserid[0..8] ∈ {0}
-  __fc_p_cuserid ∈ {{ &__fc_cuserid[0] }}
   Frama_C_entropy_source ∈ [--..--]
   __fc_rand_max ∈ {0x7FFFFFFF}
   __fc_random48_init ∈ {0}
-  __fc_random48_counter[0..2] ∈ [--..--]
-  __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
   __fc_initial_stdout.__fc_FILE_id ∈ {1}
                      .__fc_FILE_data ∈ {0}
   __fc_initial_stderr.__fc_FILE_id ∈ {2}
@@ -408,19 +348,13 @@
   __fc_stdin ∈ {{ &__fc_initial_stdin }}
   __fc_stdout ∈ {{ &__fc_initial_stdout }}
   __fc_fopen[0..15] ∈ {0}
-  __fc_p_fopen ∈ {{ &__fc_fopen[0] }}
   __fc_tmpnam[0..19] ∈ {0}
-  __fc_p_tmpnam ∈ {{ &__fc_tmpnam[0] }}
   __fc_heap_status ∈ [--..--]
   __fc_ctermid[0..8] ∈ {0}
-  __fc_p_ctermid ∈ {{ &__fc_ctermid[0] }}
   __fc_cuserid[0..8] ∈ {0}
-  __fc_p_cuserid ∈ {{ &__fc_cuserid[0] }}
   Frama_C_entropy_source ∈ [--..--]
   __fc_rand_max ∈ {0x7FFFFFFF}
   __fc_random48_init ∈ {0}
-  __fc_random48_counter[0..2] ∈ [--..--]
-  __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
   __fc_initial_stdout.__fc_FILE_id ∈ {1}
                      .__fc_FILE_data ∈ {0}
   __fc_initial_stderr.__fc_FILE_id ∈ {2}
@@ -455,19 +389,13 @@
   __fc_stdin ∈ {{ &__fc_initial_stdin }}
   __fc_stdout ∈ {{ &__fc_initial_stdout }}
   __fc_fopen[0..15] ∈ {0}
-  __fc_p_fopen ∈ {{ &__fc_fopen[0] }}
   __fc_tmpnam[0..19] ∈ {0}
-  __fc_p_tmpnam ∈ {{ &__fc_tmpnam[0] }}
   __fc_heap_status ∈ [--..--]
   __fc_ctermid[0..8] ∈ {0}
-  __fc_p_ctermid ∈ {{ &__fc_ctermid[0] }}
   __fc_cuserid[0..8] ∈ {0}
-  __fc_p_cuserid ∈ {{ &__fc_cuserid[0] }}
   Frama_C_entropy_source ∈ [--..--]
   __fc_rand_max ∈ {0x7FFFFFFF}
   __fc_random48_init ∈ {0}
-  __fc_random48_counter[0..2] ∈ [--..--]
-  __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
   __fc_initial_stdout.__fc_FILE_id ∈ {1}
                      .__fc_FILE_data ∈ {0}
   __fc_initial_stderr.__fc_FILE_id ∈ {2}
@@ -497,19 +425,13 @@
   __fc_stdin ∈ {{ &__fc_initial_stdin }}
   __fc_stdout ∈ {{ &__fc_initial_stdout }}
   __fc_fopen[0..15] ∈ {0}
-  __fc_p_fopen ∈ {{ &__fc_fopen[0] }}
   __fc_tmpnam[0..19] ∈ {0}
-  __fc_p_tmpnam ∈ {{ &__fc_tmpnam[0] }}
   __fc_heap_status ∈ [--..--]
   __fc_ctermid[0..8] ∈ {0}
-  __fc_p_ctermid ∈ {{ &__fc_ctermid[0] }}
   __fc_cuserid[0..8] ∈ {0}
-  __fc_p_cuserid ∈ {{ &__fc_cuserid[0] }}
   Frama_C_entropy_source ∈ [--..--]
   __fc_rand_max ∈ {0x7FFFFFFF}
   __fc_random48_init ∈ {0}
-  __fc_random48_counter[0..2] ∈ [--..--]
-  __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
   __fc_initial_stdout.__fc_FILE_id ∈ {1}
                      .__fc_FILE_data ∈ {0}
   __fc_initial_stderr.__fc_FILE_id ∈ {2}
@@ -537,19 +459,13 @@
   __fc_stdin ∈ {{ &__fc_initial_stdin }}
   __fc_stdout ∈ {{ &__fc_initial_stdout }}
   __fc_fopen[0..15] ∈ {0}
-  __fc_p_fopen ∈ {{ &__fc_fopen[0] }}
   __fc_tmpnam[0..19] ∈ {0}
-  __fc_p_tmpnam ∈ {{ &__fc_tmpnam[0] }}
   __fc_heap_status ∈ [--..--]
   __fc_ctermid[0..8] ∈ {0}
-  __fc_p_ctermid ∈ {{ &__fc_ctermid[0] }}
   __fc_cuserid[0..8] ∈ {0}
-  __fc_p_cuserid ∈ {{ &__fc_cuserid[0] }}
   Frama_C_entropy_source ∈ [--..--]
   __fc_rand_max ∈ {0x7FFFFFFF}
   __fc_random48_init ∈ {0}
-  __fc_random48_counter[0..2] ∈ [--..--]
-  __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
   __fc_initial_stdout.__fc_FILE_id ∈ {1}
                      .__fc_FILE_data ∈ {0}
   __fc_initial_stderr.__fc_FILE_id ∈ {2}
@@ -573,19 +489,13 @@
   __fc_stdin ∈ {{ &__fc_initial_stdin }}
   __fc_stdout ∈ {{ &__fc_initial_stdout }}
   __fc_fopen[0..15] ∈ {0}
-  __fc_p_fopen ∈ {{ &__fc_fopen[0] }}
   __fc_tmpnam[0..19] ∈ {0}
-  __fc_p_tmpnam ∈ {{ &__fc_tmpnam[0] }}
   __fc_heap_status ∈ [--..--]
   __fc_ctermid[0..8] ∈ {0}
-  __fc_p_ctermid ∈ {{ &__fc_ctermid[0] }}
   __fc_cuserid[0..8] ∈ {0}
-  __fc_p_cuserid ∈ {{ &__fc_cuserid[0] }}
   Frama_C_entropy_source ∈ [--..--]
   __fc_rand_max ∈ {0x7FFFFFFF}
   __fc_random48_init ∈ {0}
-  __fc_random48_counter[0..2] ∈ [--..--]
-  __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
   __fc_initial_stdout.__fc_FILE_id ∈ {1}
                      .__fc_FILE_data ∈ {0}
   __fc_initial_stderr.__fc_FILE_id ∈ {2}
@@ -613,19 +523,13 @@
   __fc_stdin ∈ {{ &__fc_initial_stdin }}
   __fc_stdout ∈ {{ &__fc_initial_stdout }}
   __fc_fopen[0..15] ∈ {0}
-  __fc_p_fopen ∈ {{ &__fc_fopen[0] }}
   __fc_tmpnam[0..19] ∈ {0}
-  __fc_p_tmpnam ∈ {{ &__fc_tmpnam[0] }}
   __fc_heap_status ∈ [--..--]
   __fc_ctermid[0..8] ∈ {0}
-  __fc_p_ctermid ∈ {{ &__fc_ctermid[0] }}
   __fc_cuserid[0..8] ∈ {0}
-  __fc_p_cuserid ∈ {{ &__fc_cuserid[0] }}
   Frama_C_entropy_source ∈ [--..--]
   __fc_rand_max ∈ {0x7FFFFFFF}
   __fc_random48_init ∈ {0}
-  __fc_random48_counter[0..2] ∈ [--..--]
-  __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
   __fc_initial_stdout.__fc_FILE_id ∈ {1}
                      .__fc_FILE_data ∈ {0}
   __fc_initial_stderr.__fc_FILE_id ∈ {2}
@@ -652,19 +556,13 @@
   __fc_stdin ∈ {{ &__fc_initial_stdin }}
   __fc_stdout ∈ {{ &__fc_initial_stdout }}
   __fc_fopen[0..15] ∈ {0}
-  __fc_p_fopen ∈ {{ &__fc_fopen[0] }}
   __fc_tmpnam[0..19] ∈ {0}
-  __fc_p_tmpnam ∈ {{ &__fc_tmpnam[0] }}
   __fc_heap_status ∈ [--..--]
   __fc_ctermid[0..8] ∈ {0}
-  __fc_p_ctermid ∈ {{ &__fc_ctermid[0] }}
   __fc_cuserid[0..8] ∈ {0}
-  __fc_p_cuserid ∈ {{ &__fc_cuserid[0] }}
   Frama_C_entropy_source ∈ [--..--]
   __fc_rand_max ∈ {0x7FFFFFFF}
   __fc_random48_init ∈ {0}
-  __fc_random48_counter[0..2] ∈ [--..--]
-  __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
   __fc_initial_stdout.__fc_FILE_id ∈ {1}
                      .__fc_FILE_data ∈ {0}
   __fc_initial_stderr.__fc_FILE_id ∈ {2}
@@ -691,19 +589,13 @@
   __fc_stdin ∈ {{ &__fc_initial_stdin }}
   __fc_stdout ∈ {{ &__fc_initial_stdout }}
   __fc_fopen[0..15] ∈ {0}
-  __fc_p_fopen ∈ {{ &__fc_fopen[0] }}
   __fc_tmpnam[0..19] ∈ {0}
-  __fc_p_tmpnam ∈ {{ &__fc_tmpnam[0] }}
   __fc_heap_status ∈ [--..--]
   __fc_ctermid[0..8] ∈ {0}
-  __fc_p_ctermid ∈ {{ &__fc_ctermid[0] }}
   __fc_cuserid[0..8] ∈ {0}
-  __fc_p_cuserid ∈ {{ &__fc_cuserid[0] }}
   Frama_C_entropy_source ∈ [--..--]
   __fc_rand_max ∈ {0x7FFFFFFF}
   __fc_random48_init ∈ {0}
-  __fc_random48_counter[0..2] ∈ [--..--]
-  __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
   __fc_initial_stdout.__fc_FILE_id ∈ {1}
                      .__fc_FILE_data ∈ {0}
   __fc_initial_stderr.__fc_FILE_id ∈ {2}

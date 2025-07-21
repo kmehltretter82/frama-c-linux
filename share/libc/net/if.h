@@ -33,7 +33,7 @@ struct if_nameidx {unsigned if_index; char *if_name;};
 #define IF_NAMESIZE 16
 
 // represents the state of 'system hardware interfaces'
-extern volatile int __fc_net_if;
+//@ ghost __FC_EXTERN volatile int __fc_net_if;
 
 /*@
   assigns __fc_net_if \from __fc_net_if;
@@ -145,7 +145,7 @@ struct ifreq {
   union __fc_ifr_ifrn {
     char ifrn_name[IFNAMSIZ];	/* Interface name, e.g. "en0".  */
   } ifr_ifrn;
-  
+
   union __fc_ifr_ifru {
     struct sockaddr ifru_addr;
     struct sockaddr ifru_dstaddr;

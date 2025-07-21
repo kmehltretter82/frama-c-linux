@@ -34,8 +34,6 @@
   __fc_errno ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
   __fc_random48_init ∈ {0}
-  __fc_random48_counter[0..2] ∈ [--..--]
-  __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
   foo ∈ [--..--]
   p1 ∈ {{ &__malloc_main_l16[0] }}
   q1 ∈ {{ &__malloc_w_main_l29[0] }} or UNINITIALIZED

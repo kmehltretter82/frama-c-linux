@@ -180,7 +180,8 @@ enum aorai_OpStatusList {
 };
 /* compiler builtin: 
    void Frama_C_show_aorai_state(...);   */
-/*@ ghost extern int __fc_heap_status; */
+/*@ ghost
+extern int __fc_heap_status __attribute__((__fc_stdlib_internal__)); */
 
 /*@
 axiomatic dynamic_allocation {
@@ -192,7 +193,8 @@ axiomatic dynamic_allocation {
   
 }
  */
-extern int volatile Frama_C_entropy_source __attribute__((__unused__));
+extern int volatile Frama_C_entropy_source __attribute__((__unused__,
+                                                          __fc_stdlib_internal__));
 
 /*@ requires order: min ≤ max;
     ensures result_bounded: \old(min) ≤ \result ≤ \old(max);

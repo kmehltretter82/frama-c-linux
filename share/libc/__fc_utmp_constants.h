@@ -57,10 +57,10 @@ __BEGIN_DECLS
 #define ut_addr ut_addr_v6[0]
 
 // represents the user accounting database, /var/run/utmp
-extern FILE __fc_utmp;
+__FC_EXTERN FILE __fc_utmp;
 
 // represents the user accounting database, /var/run/wtmp
-extern FILE __fc_wtmp;
+__FC_EXTERN FILE __fc_wtmp;
 
 __END_DECLS
 __POP_FC_STDLIB

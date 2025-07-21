@@ -45,11 +45,10 @@ extern void *dlsym(void *handle, const char *name);
 */
 extern int dlclose(void *handle);
 
-extern char __fc_dlerror[64];
-char * const __fc_p_dlerror = __fc_dlerror;
+__FC_EXTERN char __fc_dlerror[64];
 
 /*@
-  assigns \result \from __fc_p_dlerror; //missing: from 'filesystem';
+  assigns \result \from &__fc_dlerror; //missing: from 'filesystem';
 */
 extern char *dlerror(void);
 

@@ -6,24 +6,24 @@
 [e-acsl] Warning: annotating undefined function `pthread_cond_init':
   the generated program may miss memory instrumentation
   if there are memory-related annotations.
-[e-acsl] FRAMAC_SHARE/libc/unistd.h:1313: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/unistd.h:1309: Warning: 
   E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:700: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:699: Warning: 
   E-ACSL construct `terminates clause' is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:700: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:699: Warning: 
   E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:703: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:702: Warning: 
   E-ACSL construct `abnormal termination case in behavior'
   is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdio.h:528: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdio.h:526: Warning: 
   no assigns clause generated for function valid_read_string because pointers as arguments is not yet supported
 [e-acsl] FRAMAC_SHARE/libc/__fc_string_axiomatic.h:277: Warning: 
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdio.h:527: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdio.h:525: Warning: 
   E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/pthread.h:504: Warning: 
   E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.

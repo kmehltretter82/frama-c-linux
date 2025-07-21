@@ -17,8 +17,6 @@
   __fc_errno ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
   __fc_random48_init ∈ {0}
-  __fc_random48_counter[0..2] ∈ [--..--]
-  __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
   v ∈ [--..--]
   p ∈ {{ &__malloc_main1_l8[0] }}
   q ∈ {{ &__malloc_main1_l10[0] }}

@@ -48,13 +48,13 @@ typedef void (*__fc_sighandler_t) (int);
 typedef __fc_sighandler_t sig_t;
 
 /*@ assigns \nothing; */
-extern void __fc_sig_dfl(int);
+__FC_EXTERN_FOR_MACRO(SIG_DFL) void __fc_sig_dfl(int);
 
 /*@ assigns \nothing; */
-extern void __fc_sig_ign(int);
+__FC_EXTERN_FOR_MACRO(SIG_IGN) void __fc_sig_ign(int);
 
 /*@ assigns \nothing; */
-extern void __fc_sig_err(int);
+__FC_EXTERN_FOR_MACRO(SIG_ERR) void __fc_sig_err(int);
 
 #define SIG_DFL (&__fc_sig_dfl)     /* default signal handling */
 #define SIG_IGN (&__fc_sig_ign)     /* ignore signal */
@@ -250,20 +250,19 @@ extern int sigdelset(sigset_t *set, int signum);
 extern int sigismember(const sigset_t *set, int signum);
 
 __FC_EXTERN struct sigaction __fc_sigaction[SIGRTMAX+1];
-struct sigaction * const __fc_p_sigaction = __fc_sigaction;
 
 /*@ // missing: errno may be set to EINVAL when trying to set some signals
   requires valid_signal: 0 <= signum <= SIGRTMAX;
   requires valid_oldact_or_null: oldact == \null || \valid(oldact);
   requires valid_read_act_or_null: act == \null || \valid_read(act);
   requires separation:separated_acts: \separated(act, oldact);
-  assigns *oldact \from __fc_p_sigaction;
-  assigns __fc_p_sigaction[signum] \from *act;
+  assigns *oldact \from &__fc_sigaction;
+  assigns __fc_sigaction[signum] \from *act;
   assigns \result \from indirect:signum, indirect:act, indirect:*act,
                         indirect:oldact, indirect:*oldact;
-  ensures act_changed: act == \null || \subset(__fc_p_sigaction[signum], *act);
+  ensures act_changed: act == \null || \subset(__fc_sigaction[signum], *act);
   ensures oldact_assigned: oldact == \null ||
-                           \subset({*oldact}, __fc_p_sigaction[signum]);
+                           \subset({*oldact}, __fc_sigaction[signum]);
   ensures result_ok_or_error: \result == 0 || \result == -1;
  */
 extern int sigaction(int signum, const struct sigaction *restrict act,

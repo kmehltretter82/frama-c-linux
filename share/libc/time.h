@@ -98,7 +98,7 @@ struct itimerspec {
 #define CLOCKS_MONO CLOCK_MONOTONIC
 
 
-//@ ghost volatile unsigned int __fc_time;
+__FC_EXTERN unsigned int __fc_time;
 
 /*@ assigns \result \from __fc_time; */
 extern clock_t clock(void);
@@ -129,34 +129,32 @@ extern time_t mktime(struct tm *timeptr);
 extern time_t time(time_t *timer);
 
 __FC_EXTERN char __fc_ctime[26];
-char * const  __fc_p_ctime = __fc_ctime;
 
 /*@
   requires valid_timeptr: \valid_read(timeptr);
   requires initialization:init_timeptr: \initialized(timeptr);
-  assigns __fc_ctime[0..25] \from indirect:*timeptr, indirect:__fc_time;
-  assigns \result \from indirect:*timeptr, indirect:__fc_time, __fc_p_ctime;
-  ensures result_points_to_ctime: \result == __fc_p_ctime;
-  ensures result_valid_string: valid_read_string(__fc_p_ctime);
+  assigns __fc_ctime[0..25] \from __fc_ctime[0..25], indirect:*timeptr, indirect:__fc_time;
+  assigns \result \from indirect:*timeptr, indirect:__fc_time, &__fc_ctime;
+  ensures result_points_to_ctime: \result == &__fc_ctime[0];
+  ensures result_valid_string: valid_read_string(&__fc_ctime[0]);
  */
 extern char *asctime(const struct tm *timeptr);
 
 /*@
   requires valid_timer: \valid_read(timer);
   requires initialization:init_timer: \initialized(timer);
-  assigns __fc_ctime[0..25] \from indirect:*timer, indirect:__fc_time;
-  assigns \result \from indirect:*timer, indirect:__fc_time, __fc_p_ctime;
-  ensures result_points_to_ctime: \result == __fc_p_ctime;
-  ensures result_valid_string: valid_read_string(__fc_p_ctime);
+  assigns __fc_ctime[0..25] \from __fc_ctime[0..25], indirect:*timer, indirect:__fc_time;
+  assigns \result \from indirect:*timer, indirect:__fc_time, &__fc_ctime;
+  ensures result_points_to_ctime: \result == &__fc_ctime[0];
+  ensures result_valid_string: valid_read_string(&__fc_ctime[0]);
 */
 extern char *ctime(const time_t *timer);
 
 __FC_EXTERN struct tm __fc_time_tm;
-struct tm * const  __fc_p_time_tm = &__fc_time_tm;
 
 /*@
   requires valid_timer: \valid_read(timer);
-  assigns \result \from __fc_p_time_tm;
+  assigns \result \from &__fc_time_tm;
   assigns __fc_time_tm \from *timer;
   ensures result_null_or_internal_tm:
     \result == &__fc_time_tm || \result == \null ;
@@ -165,7 +163,7 @@ extern struct tm *gmtime(const time_t *timer);
 
 /*@
   requires valid_timer: \valid_read(timer);
-  assigns \result \from __fc_p_time_tm;
+  assigns \result \from &__fc_time_tm;
   assigns __fc_time_tm \from *timer;
   ensures result_null_or_internal_tm:
     \result == &__fc_time_tm || \result == \null;
@@ -245,7 +243,7 @@ extern int clock_gettime(clockid_t clk_id, struct timespec *tp);
   @ }                                           // calling thread
 */
 
-/*@ ghost volatile int __fc_interrupted; */
+/*@ ghost __FC_EXTERN volatile int __fc_interrupted; */
 
 /*@ // missing: may assign to errno: EINTR, EINVAL, ENOTSUP
     // missing: assigns \result, rmtp \from 'clock having id clock_id'
@@ -316,10 +314,9 @@ extern char *ctime_r(const time_t *timep, char *buf);
 extern int getdate_err;
 
 __FC_EXTERN struct tm __fc_getdate;
-struct tm * const __fc_p_getdate = &__fc_getdate;
 
 /*@
-  assigns \result \from __fc_p_getdate;
+  assigns \result \from &__fc_getdate;
   assigns __fc_getdate \from __fc_getdate;
   assigns getdate_err \from string[0..];
 */

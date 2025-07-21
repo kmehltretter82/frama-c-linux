@@ -1,4 +1,4 @@
-512a513,753
+482a483,699
 > [eva] realloc.c:152: Call to builtin realloc
 > [eva:malloc] bases_to_realloc: {__realloc_w_main10_l152}
 > [eva:malloc] realloc.c:152: weak free on bases: {__realloc_w_main10_l152}
@@ -10,8 +10,6 @@
 >   __fc_errno ∈ [--..--]
 >   __fc_rand_max ∈ {2147483647}
 >   __fc_random48_init ∈ {0}
->   __fc_random48_counter[0..2] ∈ [--..--]
->   __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
 >   Frama_C_entropy_source ∈ [--..--]
 >   v ∈ [--..--]
 >   p ∈ {{ &__realloc_w_main10_l152[0] }}
@@ -30,8 +28,6 @@
 >   __fc_errno ∈ [--..--]
 >   __fc_rand_max ∈ {2147483647}
 >   __fc_random48_init ∈ {0}
->   __fc_random48_counter[0..2] ∈ [--..--]
->   __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
 >   Frama_C_entropy_source ∈ [--..--]
 >   v ∈ [--..--]
 >   p ∈ {{ &__realloc_w_main10_l152[0] }}
@@ -50,8 +46,6 @@
 >   __fc_errno ∈ [--..--]
 >   __fc_rand_max ∈ {2147483647}
 >   __fc_random48_init ∈ {0}
->   __fc_random48_counter[0..2] ∈ [--..--]
->   __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
 >   Frama_C_entropy_source ∈ [--..--]
 >   v ∈ [--..--]
 >   p ∈ {{ &__realloc_w_main10_l152[0] }}
@@ -70,8 +64,6 @@
 >   __fc_errno ∈ [--..--]
 >   __fc_rand_max ∈ {2147483647}
 >   __fc_random48_init ∈ {0}
->   __fc_random48_counter[0..2] ∈ [--..--]
->   __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
 >   Frama_C_entropy_source ∈ [--..--]
 >   v ∈ [--..--]
 >   p ∈ {{ &__realloc_w_main10_l152[0] }}
@@ -90,8 +82,6 @@
 >   __fc_errno ∈ [--..--]
 >   __fc_rand_max ∈ {2147483647}
 >   __fc_random48_init ∈ {0}
->   __fc_random48_counter[0..2] ∈ [--..--]
->   __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
 >   Frama_C_entropy_source ∈ [--..--]
 >   v ∈ [--..--]
 >   p ∈ {{ &__realloc_w_main10_l152[0] }}
@@ -110,8 +100,6 @@
 >   __fc_errno ∈ [--..--]
 >   __fc_rand_max ∈ {2147483647}
 >   __fc_random48_init ∈ {0}
->   __fc_random48_counter[0..2] ∈ [--..--]
->   __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
 >   Frama_C_entropy_source ∈ [--..--]
 >   v ∈ [--..--]
 >   p ∈ {{ &__realloc_w_main10_l152[0] }}
@@ -130,8 +118,6 @@
 >   __fc_errno ∈ [--..--]
 >   __fc_rand_max ∈ {2147483647}
 >   __fc_random48_init ∈ {0}
->   __fc_random48_counter[0..2] ∈ [--..--]
->   __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
 >   Frama_C_entropy_source ∈ [--..--]
 >   v ∈ [--..--]
 >   p ∈ {{ &__realloc_w_main10_l152[0] }}
@@ -150,8 +136,6 @@
 >   __fc_errno ∈ [--..--]
 >   __fc_rand_max ∈ {2147483647}
 >   __fc_random48_init ∈ {0}
->   __fc_random48_counter[0..2] ∈ [--..--]
->   __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
 >   Frama_C_entropy_source ∈ [--..--]
 >   v ∈ [--..--]
 >   p ∈ {{ &__realloc_w_main10_l152[0] }}
@@ -170,8 +154,6 @@
 >   __fc_errno ∈ [--..--]
 >   __fc_rand_max ∈ {2147483647}
 >   __fc_random48_init ∈ {0}
->   __fc_random48_counter[0..2] ∈ [--..--]
->   __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
 >   Frama_C_entropy_source ∈ [--..--]
 >   v ∈ [--..--]
 >   p ∈ {{ &__realloc_w_main10_l152[0] }}
@@ -191,8 +173,6 @@
 >   __fc_errno ∈ [--..--]
 >   __fc_rand_max ∈ {2147483647}
 >   __fc_random48_init ∈ {0}
->   __fc_random48_counter[0..2] ∈ [--..--]
->   __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
 >   Frama_C_entropy_source ∈ [--..--]
 >   v ∈ [--..--]
 >   p ∈ {{ &__realloc_w_main10_l152[0] }}
@@ -211,8 +191,6 @@
 >   __fc_errno ∈ [--..--]
 >   __fc_rand_max ∈ {2147483647}
 >   __fc_random48_init ∈ {0}
->   __fc_random48_counter[0..2] ∈ [--..--]
->   __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
 >   Frama_C_entropy_source ∈ [--..--]
 >   v ∈ [--..--]
 >   p ∈ {{ &__realloc_w_main10_l152[0] }}
@@ -231,8 +209,6 @@
 >   __fc_errno ∈ [--..--]
 >   __fc_rand_max ∈ {2147483647}
 >   __fc_random48_init ∈ {0}
->   __fc_random48_counter[0..2] ∈ [--..--]
->   __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
 >   Frama_C_entropy_source ∈ [--..--]
 >   v ∈ [--..--]
 >   p ∈ {{ &__realloc_w_main10_l152[0] }}
@@ -240,7 +216,7 @@
 >   __realloc_w_main10_l152[0] ∈ {4}
 >                          [1] ∈ UNINITIALIZED
 >   ==END OF DUMP==
-579a821,885
+549a767,831
 > [eva] realloc.c:167: Call to builtin reallocarray
 > [eva] realloc.c:167: Call to builtin reallocarray
 > [eva] computing for function Frama_C_interval <- main11 <- main.
@@ -306,7 +282,7 @@
 > [eva:malloc] bases_to_realloc: {}
 > [eva:malloc] realloc.c:171: strong free on bases: {}
 > [eva] realloc.c:172: Frama_C_show_each_p: {{ NULL ; &__realloc_w_main11_l171 }}
-658,659c964,966
+628,629c910,912
 <   p ∈ {{ NULL ; &__malloc_main11_l160 ; (int *)&__realloc_main11_l171 }}
 <   q ∈ {0} or UNINITIALIZED or ESCAPINGADDR
 ---

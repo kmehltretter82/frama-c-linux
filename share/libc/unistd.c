@@ -25,6 +25,7 @@
 #include "string.h"
 __PUSH_FC_STDLIB
 
+volatile char __fc_hostname[HOST_NAME_MAX];
 volatile char __fc_ttyname[TTY_NAME_MAX];
 char __fc_crypt[256];
 char __fc_getlogin[LOGIN_NAME_MAX];

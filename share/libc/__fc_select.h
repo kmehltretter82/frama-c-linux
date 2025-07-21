@@ -33,7 +33,7 @@ __BEGIN_DECLS
 
 // __fc_fds_state is a very coarse model for the state of all
 // file descriptor sets; it is sound, but very imprecise.
-//@ ghost volatile int __fc_fds_state;
+//@ ghost __FC_EXTERN volatile int __fc_fds_state;
 
 /*@
   requires nfds: nfds >= 0;

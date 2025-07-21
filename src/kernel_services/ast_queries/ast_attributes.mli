@@ -50,6 +50,10 @@ val anonymous_attribute : attribute
 (** Internal attributes of Frama-C.  *)
 val fc_internal_attributes : string list
 
+(** Attribute for globals in Frama-C's libc (extern or not) that are internal to
+    Frama-C. *)
+val fc_stdlib_internal : string
+
 (** Qualifiers and internal attributes to remove when doing a C cast. *)
 val cast_irrelevant_attributes : string list
 
@@ -265,3 +269,8 @@ val split_array_attributes : attributes -> attributes * attributes
 
 (** Separate out the storage-modifier name attributes *)
 val split_storage_modifiers : attributes -> attributes * attributes
+
+(** Find the name of the replaced macro for extern globals in Frama-C's libc
+    that are replacing an existing macro. For instance [stdout] for
+    [__fc_stdout]. *)
+val find_fc_stdlib_extern_replacement : attributes -> string option

@@ -514,7 +514,7 @@
   function stpncpy: precondition 'valid_dest' got status valid.
 [eva] string_h.c:209: 
   function stpncpy: precondition 'separation' got status valid.
-[eva] FRAMAC_SHARE/libc/string.h:637: 
+[eva] FRAMAC_SHARE/libc/string.h:636: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function strncmp
 [eva] Done for function stpncpy
 [eva] string_h.c:210: check got status valid.
@@ -527,7 +527,7 @@
   function stpncpy: precondition 'valid_dest' got status valid.
 [eva] string_h.c:213: 
   function stpncpy: precondition 'separation' got status valid.
-[eva] FRAMAC_SHARE/libc/string.h:631: 
+[eva] FRAMAC_SHARE/libc/string.h:630: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function strcmp
 [eva] Done for function stpncpy
 [eva:alarm] string_h.c:214: Warning: check got status unknown.

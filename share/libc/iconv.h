@@ -25,13 +25,13 @@
 #include "features.h"
 __PUSH_FC_STDLIB
 #include "__fc_define_size_t.h"
+#include "errno.h"
 
 __BEGIN_DECLS
 
 typedef void * iconv_t;
 
-extern int __fc_errno;
-/*@ assigns *outbuf[0 .. *outbytesleft-1] \from *inbuf[0 .. *inbytesleft-1]; 
+/*@ assigns *outbuf[0 .. *outbytesleft-1] \from *inbuf[0 .. *inbytesleft-1];
   assigns __fc_errno ; */
 extern size_t  iconv(iconv_t cd, char **restrict inbuf, size_t *restrict inbytesleft,
             char **restrict outbuf, size_t *restrict outbytesleft);

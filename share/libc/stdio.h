@@ -62,13 +62,13 @@ __PUSH_FC_STDLIB
 
 __BEGIN_DECLS
 
-extern FILE * __fc_stderr;
+__FC_EXTERN_FOR_MACRO(stderr) FILE * __fc_stderr;
 #define stderr (__fc_stderr)
 
-extern FILE * __fc_stdin;
+__FC_EXTERN_FOR_MACRO(stdin) FILE * __fc_stdin;
 #define stdin (__fc_stdin)
 
-extern FILE * __fc_stdout;
+__FC_EXTERN_FOR_MACRO(stdout) FILE * __fc_stdout;
 #define stdout (__fc_stdout)
 
 /*
@@ -130,30 +130,28 @@ extern int renameat2(int olddirfd, const char *old_name,
                      int newdirfd, const char *new_name,
                      int flags);
 
-FILE __fc_fopen[__FC_FOPEN_MAX];
-FILE* const __fc_p_fopen = __fc_fopen;
+__FC_EXTERN FILE __fc_fopen[__FC_FOPEN_MAX];
 
 /*@
-  assigns \result \from __fc_p_fopen;
+  assigns \result \from &__fc_fopen;
   ensures result_null_or_valid_fd:
     \result == \null || (\subset(\result,&__fc_fopen[0 .. __FC_FOPEN_MAX-1]));
 */
 extern FILE *tmpfile(void);
 
 __FC_EXTERN char __fc_tmpnam[L_tmpnam];
-char * const __fc_p_tmpnam = __fc_tmpnam;
 
 /*@
   // Note: the tmpnam example in POSIX uses an array of size L_tmpnam+1
-  // missing: assigns __fc_p_tmpnam[0..L_tmpnam] \from 'PRNG and internal state'
+  // missing: assigns __fc_tmpnam[0..L_tmpnam] \from 'PRNG and internal state'
   // missing: if called more than TMP_MAX, behavior is implementation-defined
   requires valid_s_or_null: s == \null || \valid(s+(0 .. L_tmpnam));
-  assigns __fc_p_tmpnam[0 .. L_tmpnam] \from __fc_p_tmpnam[0 .. L_tmpnam],
+  assigns __fc_tmpnam[0 .. L_tmpnam - 1] \from __fc_tmpnam[0 .. L_tmpnam - 1],
                                              indirect:s;
-  assigns s[0 .. L_tmpnam] \from indirect:s, __fc_p_tmpnam[0 .. L_tmpnam];
-  assigns \result \from s, __fc_p_tmpnam;
+  assigns s[0 .. L_tmpnam] \from indirect:s, __fc_tmpnam[0 .. L_tmpnam - 1];
+  assigns \result \from s, &__fc_tmpnam;
   ensures result_string_or_null: \result == \null || \result == s ||
-                                 \result == __fc_p_tmpnam;
+                                 \result == &__fc_tmpnam[0];
 */
 extern char *tmpnam(char *s);
 
@@ -192,7 +190,7 @@ extern int fflush(FILE *stream);
   requires valid_filename: valid_read_string(filename);
   requires valid_mode: valid_read_string(mode);
   assigns \result \from indirect:filename[0..strlen(filename)],
-                        indirect:mode[0..strlen(mode)], __fc_p_fopen;
+                        indirect:mode[0..strlen(mode)], &__fc_fopen;
   ensures result_null_or_valid_fd:
     \result==\null || (\subset(\result,&__fc_fopen[0 .. __FC_FOPEN_MAX-1])) ;
 */
@@ -203,7 +201,7 @@ extern FILE *fopen(const char * restrict filename,
   requires valid_mode: valid_read_string(mode);
   assigns \result, __fc_fopen[fd] \from indirect:fd,
                                         indirect:mode[0..strlen(mode)],
-                                        indirect:__fc_fopen[fd], __fc_p_fopen;
+                                        indirect:__fc_fopen[fd], &__fc_fopen;
   ensures result_null_or_valid_fd:
     \result == \null || (\subset(\result,&__fc_fopen[0 .. __FC_FOPEN_MAX-1])) ;
  */
@@ -213,9 +211,9 @@ extern FILE *fdopen(int fd, const char *mode);
   requires valid_filename: valid_read_string(filename);
   requires valid_mode: valid_read_string(mode);
   requires valid_stream: \valid(stream);
-  assigns \result \from indirect:filename[..], indirect:mode[..], __fc_p_fopen,
+  assigns \result \from indirect:filename[..], indirect:mode[..], &__fc_fopen,
                         indirect:stream;
-  assigns *stream \from indirect:filename[..], indirect:mode[..], __fc_p_fopen,
+  assigns *stream \from indirect:filename[..], indirect:mode[..], &__fc_fopen,
                         indirect:stream;
   ensures result_null_or_valid_fd:
     \result==\null || \result \in &__fc_fopen[0 .. __FC_FOPEN_MAX-1];
@@ -630,7 +628,7 @@ extern int dprintf(int fd, const char *restrict format, ...);
   requires valid_command: valid_read_string(command);
   requires valid_type: valid_read_string(type);
   assigns \result \from indirect:*command, indirect:*type,
-    __fc_p_fopen;
+    &__fc_fopen;
   assigns __fc_fopen[0..] \from indirect:*command, indirect:*type,
     __fc_fopen[0..];
   ensures result_error_or_valid_open_pipe:
@@ -664,7 +662,7 @@ extern ssize_t getdelim(char **lineptr, size_t *n, int delim, FILE *stream);
   allocates buf;
   assigns __fc_errno \from indirect: buf, indirect: size,
                            indirect: mode[0..strlen(mode)];
-  assigns \result \from __fc_p_fopen,
+  assigns \result \from &__fc_fopen,
   indirect: buf, indirect: size, indirect: mode[0..strlen(mode)];
   ensures result_error_or_valid:
     \result == \null || \result \in &__fc_fopen[0 .. __FC_FOPEN_MAX-1];
@@ -707,10 +705,9 @@ extern int vasprintf(char **restrict strp, const char *restrict fmt,
                      va_list ap);
 
 __FC_EXTERN char __fc_ctermid[L_ctermid];
-char* const __fc_p_ctermid = __fc_ctermid;
 
 /*@
-  assigns \result \from __fc_p_ctermid, s;
+  assigns \result \from &__fc_ctermid, s;
   assigns __fc_ctermid[0..] \from __fc_ctermid[0..];
 */
 extern char *ctermid(char *s);
@@ -718,10 +715,9 @@ extern char *ctermid(char *s);
 // Note: since L_cuserid has been removed from POSIX since Issue 6,
 // we will not add it to our machdep.
 __FC_EXTERN char __fc_cuserid[9];
-char* const __fc_p_cuserid = __fc_cuserid;
 
 /*@
-  assigns \result \from __fc_p_cuserid, s;
+  assigns \result \from &__fc_cuserid, s;
   assigns __fc_cuserid[0..] \from __fc_cuserid[0..];
 */
 extern char *cuserid(char *s);

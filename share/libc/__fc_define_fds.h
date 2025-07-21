@@ -29,7 +29,7 @@ __BEGIN_DECLS
 #include "__fc_define_max_open_files.h"
 
 // __fc_fds represents the state of open file descriptors.
-extern volatile int __fc_fds[__FC_MAX_OPEN_FILES];
+__FC_EXTERN volatile int __fc_fds[__FC_MAX_OPEN_FILES];
 
 __END_DECLS
 

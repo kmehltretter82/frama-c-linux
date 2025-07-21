@@ -33,11 +33,11 @@ __BEGIN_DECLS
 
 __FC_EXTERN int __fc_mthread_shared;
 
-int __fc_mthread_threads_running = 0;
+__FC_INTERN int __fc_mthread_threads_running = 0;
 
-int __fc_mthread_threads[MTHREAD_NUMBER_IDS];
-int __fc_mthread_mutexes[MTHREAD_NUMBER_IDS];
-int __fc_mthread_queues[MTHREAD_NUMBER_IDS];
+__FC_INTERN int __fc_mthread_threads[MTHREAD_NUMBER_IDS];
+__FC_INTERN int __fc_mthread_mutexes[MTHREAD_NUMBER_IDS];
+__FC_INTERN int __fc_mthread_queues[MTHREAD_NUMBER_IDS];
 
 typedef void *__fc_mthread_name;
 

@@ -30,6 +30,8 @@
 #include "__fc_builtin.h"
 __PUSH_FC_STDLIB
 
+const char *__fc_gai_strerror = "<error message reported by gai_strerror>";
+
 /* dummy implementation of getaddrinfo. Returns at most one addrinfo.
  */
 int getaddrinfo(

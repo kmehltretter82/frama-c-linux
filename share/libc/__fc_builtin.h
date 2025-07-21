@@ -31,7 +31,7 @@ __PUSH_FC_STDLIB
 
 __BEGIN_DECLS
 
-extern volatile int Frama_C_entropy_source __attribute__((unused));
+__FC_EXTERN volatile int Frama_C_entropy_source __attribute__((unused));
 
 /*@ requires valid_p: \valid(p + (0 .. l-1));
     assigns p[0 .. l-1] \from Frama_C_entropy_source;

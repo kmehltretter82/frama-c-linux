@@ -36,11 +36,10 @@ typedef unsigned long nl_item;
 */
 extern int catclose(nl_catd catd);
 
-char __fc_catgets[256]; // arbitrary size
-char* const __fc_p_catgets = __fc_catgets;
+__FC_EXTERN char __fc_catgets[256]; // arbitrary size
 
 /*@
-  assigns \result \from __fc_p_catgets, s, indirect:catd, indirect:set_id,
+  assigns \result \from &__fc_catgets, s, indirect:catd, indirect:set_id,
   indirect:msg_id;
   assigns __fc_catgets[0..] \from __fc_catgets[0..];
 */

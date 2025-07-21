@@ -20,8 +20,8 @@
 [eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
-  __fc_inet_ntoa_array[0..14] ∈ [--..--]
-                      [15] ∈ {0}
+  __fc_inet_ntoa[0..14] ∈ [--..--]
+                [15] ∈ {0}
   addr ∈ {0}
   sockaddr6_any ∈ {0}
   sockaddr6_loopback{.sin6_family; .sin6_port; .sin6_flowinfo; .sin6_addr.s6_addr[0..14]} ∈

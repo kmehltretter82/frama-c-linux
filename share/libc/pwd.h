@@ -50,31 +50,24 @@ __FC_EXTERN char __fc_getpw_pw_gecos[64];
 __FC_EXTERN char __fc_getpw_pw_dir[64];
 __FC_EXTERN char __fc_getpw_pw_shell[64];
 
-struct passwd __fc_pwd =
-  {.pw_name = __fc_getpw_pw_name,
-   .pw_passwd = __fc_getpw_pw_passwd,
-   .pw_gecos = __fc_getpw_pw_gecos,
-   .pw_dir = __fc_getpw_pw_dir,
-   .pw_shell = __fc_getpw_pw_shell};
-
-struct passwd * const __fc_p_pwd = &__fc_pwd;
+__FC_EXTERN struct passwd __fc_pwd;
 
 /*@
   // missing: may assign to errno: EIO, EINTR, EMFILE, ENFILE
   // missing: assigns \result, __fc_pwd[0..] \from 'password database'
   requires valid_name: valid_read_string(name);
-  assigns \result \from __fc_p_pwd, indirect:name[0..];
+  assigns \result \from &__fc_pwd, indirect:name[0..];
   assigns __fc_pwd \from indirect:name[0..];
   ensures result_null_or_internal_struct:
-    \result == \null || \result == __fc_p_pwd;
+    \result == \null || \result == &__fc_pwd;
 */
 extern struct passwd *getpwnam(const char *name);
 
 /*@ // missing: assigns \result, __fc_pwd[0..] \from 'password database'
-  assigns \result \from __fc_p_pwd, indirect:uid;
+  assigns \result \from &__fc_pwd, indirect:uid;
   assigns __fc_pwd \from indirect:uid;
   ensures result_null_or_internal_struct:
-    \result == \null || \result == __fc_p_pwd;
+    \result == \null || \result == &__fc_pwd;
 */
 extern struct passwd *getpwuid(uid_t uid);
 
@@ -84,10 +77,10 @@ extern struct passwd *getpwuid(uid_t uid);
   requires valid_buf: \valid(buf+(0 .. buflen-1));
   requires valid_pwd: \valid(pwd);
   requires valid_result: \valid(result);
-  assigns \result \from indirect:__fc_p_pwd, indirect:name[0..];
+  assigns \result \from indirect:&__fc_pwd, indirect:name[0..];
   assigns __fc_pwd \from indirect:name[0..];
-  assigns *pwd, *result \from __fc_p_pwd;
-  assigns buf[0 .. buflen-1] \from indirect:*__fc_p_pwd;
+  assigns *pwd, *result \from &__fc_pwd;
+  assigns buf[0 .. buflen-1] \from indirect:__fc_pwd;
   ensures result_null_or_assigned:
     *result == \null || *result == pwd;
   ensures result_ok_or_error:
@@ -101,10 +94,10 @@ extern int getpwnam_r(const char *name, struct passwd *pwd,
   requires valid_buf: \valid(buf+(0 .. buflen-1));
   requires valid_pwd: \valid(pwd);
   requires valid_result: \valid(result);
-  assigns \result \from indirect:__fc_p_pwd;
+  assigns \result \from indirect:&__fc_pwd;
   assigns __fc_pwd \from indirect:uid;
-  assigns *pwd, *result \from __fc_p_pwd;
-  assigns buf[0 .. buflen-1] \from indirect:*__fc_p_pwd;
+  assigns *pwd, *result \from &__fc_pwd;
+  assigns buf[0 .. buflen-1] \from indirect:__fc_pwd;
   ensures result_null_or_assigned:
     *result == \null || *result == pwd;
   ensures result_ok_or_error:
