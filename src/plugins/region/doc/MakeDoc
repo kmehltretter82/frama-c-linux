@@ -1,0 +1,60 @@
+##########################################################################
+#                                                                        #
+#  This file is part of WP plug-in of Frama-C.                           #
+#                                                                        #
+#  Copyright (C) 2007-2025                                               #
+#    CEA (Commissariat a l'energie atomique et aux energies              #
+#         alternatives)                                                  #
+#                                                                        #
+#  you can redistribute it and/or modify it under the terms of the GNU   #
+#  Lesser General Public License as published by the Free Software       #
+#  Foundation, version 2.1.                                              #
+#                                                                        #
+#  It is distributed in the hope that it will be useful,                 #
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of        #
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         #
+#  GNU Lesser General Public License for more details.                   #
+#                                                                        #
+#  See the GNU Lesser General Public License version 2.1                 #
+#  for more details (enclosed in the file licenses/LGPLv2.1).            #
+#                                                                        #
+##########################################################################
+
+# --------------------------------------------------------------------------
+# ---  Resources                                                         ---
+# --------------------------------------------------------------------------
+FRAMAC_DOC= .make-class .make-icons VERSION VERSION_CODENAME
+# --------------------------------------------------------------------------
+FRAMAC_CLASS=frama-c-book.cls fc-macros.tex logos anr-logo.png
+FRAMAC_BULLETS=never_tried.png unknown.png valid_under_hyp.png surely_valid.png
+# --------------------------------------------------------------------------
+FRAMAC_TRUNK?=../../../../..
+# --------------------------------------------------------------------------
+
+RES_CLASS=$(addprefix $(FRAMAC_TRUNK)/doc/,$(FRAMAC_CLASS))
+.make-class: $(RES_CLASS)
+	@echo "Import Frama-C Class"
+	@cp -rfv $(RES_CLASS) .
+	@touch .make-class
+
+RES_ICONS=$(addprefix $(FRAMAC_TRUNK)/share/theme/default/,$(FRAMAC_BULLETS))
+.make-icons: $(RES_ICONS)
+	@echo "Import Frama-C Icons"
+	@mkdir -p feedback
+	@cp -fv $(RES_ICONS) feedback/
+	@touch .make-icons
+
+VERSION: $(FRAMAC_TRUNK)/VERSION
+	@echo "Importing Frama-C Version"
+	@cp -fv $< $@
+	@chmod a-w $@
+
+VERSION_CODENAME: $(FRAMAC_TRUNK)/VERSION_CODENAME
+	@echo "Importing Frama-C Version Codename"
+	@cp -fv $< $@
+	@chmod a-w $@
+
+clean::
+	@echo "Cleaning resources"
+	@rm -f $(FRAMAC_DOC)
+	@rm -fr feedback

@@ -1,0 +1,11 @@
+/feedback
+/VERSION
+/VERSION_CODENAME
+/region.pdf
+/*.log-file
+/region.fls
+/region.fdb_latexmk
+/logos
+/macros.tex
+/anr-logo.png
+/fc-macros.tex

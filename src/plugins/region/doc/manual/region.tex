@@ -1,0 +1,47 @@
+\documentclass{frama-c-book}
+\usepackage{amsmath}
+\usepackage{longtable}
+\usepackage{pifont}
+
+\input{fc-macros}
+
+\newcommand{\FCVERSION}{\input{VERSION}(\input{VERSION_CODENAME}\unskip)}
+\newcommand{\region}{\textsf{Region}}
+
+\title{Region Plug-in Manual}
+\author{Cécile Ruet-Cros, Loïc Correnson, Allan Blanchard}
+\fcversion{\FCVERSION}
+
+\cclicence{by}
+\copyrightstarts{2010}
+
+%\anticopyCEA{} % To comments for public version.
+\begin{document}
+\sloppy
+\emergencystretch 3em
+
+\maketitle
+\tableofcontents
+
+\chapter*{Foreword}
+\markright{}
+\addcontentsline{toc}{chapter}{Foreword}
+
+This is the user manual of the Region plug-in of \FramaC\footnote{\url{http://frama-c.com}}.
+The content of this document corresponds to the version \FCVERSION, released on \today, of
+\FramaC.
+
+\section*{Acknowledgements}
+
+\medskip
+
+\acknowledgeANR{the French ANR project U3CAT~(08-SEGI-021-01)}
+
+
+\input{region_intro.tex}
+\input{region_plugin.tex}
+
+\bibliographystyle{alpha}
+\bibliography{region}
+
+\end{document}
