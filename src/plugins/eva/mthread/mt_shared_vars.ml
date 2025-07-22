@@ -246,7 +246,7 @@ class do_it cp =
           (* In global mode, we treat the recursive calls. In precise
              mode, they are done elsewhere in the construction of the cfg *)
           if cp.mode = VGlobal then
-            let callees = Results.(eval_callee lv request |> default []) in
+            let callees = Results.(eval_callee f request |> default []) in
             List.iter self#rw_fun callees
         )
 

@@ -102,7 +102,6 @@ let block stmt b = match b.bstmts with
 (* ********************************************************************** *)
 
 let do_call ~loc ?result vi args =
-  let f = Var vi in
   vi.vreferenced <- true;
   let make_args ~variadic args param_ty =
     let rec make_rev_args res args param_ty =
@@ -131,7 +130,7 @@ let do_call ~loc ?result vi args =
     | TFun (_, None, _) -> []
     | _ -> assert false
   in
-  call_instr ~loc ?result f args
+  call_instr ~loc ?result (Var vi) args
 
 let call ~loc ?result fname args =
   let kf =
