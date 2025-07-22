@@ -238,7 +238,7 @@ let loop_step w = tag "InLoop" w
 let call_dynamic _env _stmt _pid fct calls =
   let u = node () in
   Format.fprintf !out "  %a [ color=red , label=\"CallPtr %a\" ];@." pretty u
-    Printer.pp_exp fct ;
+    Printer.pp_lhost fct ;
   List.iter (fun (_,k) -> link u k) calls ; u
 
 let call_goal_precond env _stmt kf _es ~pre k =

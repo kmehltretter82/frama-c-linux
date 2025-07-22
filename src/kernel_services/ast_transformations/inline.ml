@@ -325,8 +325,8 @@ let inliner functions_to_inline = object (self)
               | k -> k);
            s)
     | Instr(Call(return, f, args, _)) ->
-      (match f.enode with
-       | Lval (Var vi, NoOffset) ->
+      (match f with
+       | Var vi ->
          self#inline stmt None return vi args
        | _ ->
          Kernel.warning ~wkey ~current:true ~once:true

@@ -44,7 +44,7 @@ type transition =
   | Return of exp option * stmt
   | Guard of exp * guard_kind * stmt
   | Assign of lval * exp * stmt
-  | Call of lval option * exp * exp list * stmt
+  | Call of lval option * lhost * exp list * stmt
   | Init of varinfo * init * stmt
   | Asm of attributes * string list * extended_asm option * stmt
 
@@ -189,7 +189,7 @@ let build_wto graph entry_point =
 let translate_instr stmt instr =
   let translate_call dest callee args _loc =
     let dest' = Option.map translate_lval dest in
-    let callee' = translate_exp callee in
+    let callee' = translate_host callee in
     let args' = List.map translate_exp args in
     Call (dest', callee', args', stmt)
   in

@@ -222,7 +222,7 @@ val eval_address : ?for_writing:bool ->
     without offset.
     Also see [callee] for a function which applies directly on Call
     statements. *)
-val eval_callee : Cil_types.exp -> request -> Kernel_function.t list result
+val eval_callee : Cil_types.lhost -> request -> Kernel_function.t list result
 
 
 (** Evaluated values conversion *)

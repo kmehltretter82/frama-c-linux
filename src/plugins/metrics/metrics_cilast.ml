@@ -250,7 +250,7 @@ class slocVisitor ~libc : sloc_visitor = object(self)
       end
     else Cil.SkipChildren
 
-  method! vlval (host, _) =
+  method! vlhost host =
     begin
       match host with
       | Mem _ -> self#incr_both_metrics incr_ptrs;
@@ -348,10 +348,10 @@ class slocVisitor ~libc : sloc_visitor = object(self)
 
   method! vinst i =
     begin match i with
-      | Call(v, e, _, _) ->
+      | Call(v, lv, _, _) ->
         self#incr_both_metrics incr_calls;
-        (match e.enode with
-         | Lval(Var vinfo, NoOffset) -> self#update_call_maps vinfo 1
+        (match lv with
+         | Var vinfo -> self#update_call_maps vinfo 1
          | _ -> ());
         (match v with
          | Some _ -> self#incr_both_metrics incr_assigns
@@ -774,7 +774,7 @@ class locals_size_visitor kf callstack = object
   inherit Visitor.frama_c_inplace
 
   method! vinst i = match i with
-    | Call (_, { enode = Lval(Var vi, NoOffset) }, _, _)
+    | Call (_, Var vi, _, _)
     | Local_init(_, ConsInit(vi,_,_),_) ->
       begin
         try

@@ -116,12 +116,12 @@ let analyse_global_var v initinfo st =
       (pp_abstract_state_opt ~debug:true) result;
     result
 
-let do_function_call (stmt:stmt) state (res : lval option) (ef : exp) (args: exp list) loc =
+let do_function_call (stmt:stmt) state (res : lval option) (f : lhost) (args: exp list) loc =
   let is_malloc (s:string) : bool =
     (s = "malloc") || (s = "calloc") (* todo : add all function names *)
   in
-  match ef with
-  | {enode=Lval (Var v, _);_}  when is_malloc v.vname ->
+  match f with
+  | Var v  when is_malloc v.vname ->
     (* special case for malloc *)
     begin match (state, res) with
       | (None, _) -> None
@@ -134,13 +134,14 @@ let do_function_call (stmt:stmt) state (res : lval option) (ef : exp) (args: exp
     end
   | _ -> (* general case *)
     let summaries =
-      match Kernel_function.get_called ef with
+      match Kernel_function.get_called f with
       | Some kf when Kernel_function.is_main kf -> []
       | Some kf -> [function_summary kf]
       | None -> (* dereference function pointer using the results of the points-to analysis *)
-        begin match ef, Stmt_table.find stmt with
-          | {enode = Lval lv; _}, Some state ->
-            let targets = Abstract_state.find_vars lv state in
+        let lvf = f,NoOffset in
+        begin match Stmt_table.find stmt with
+          | Some state ->
+            let targets = Abstract_state.find_vars lvf state in
             Options.feedback ~level:3 "%a is an indirect function call to one of %a"
               Printer.pp_stmt stmt
               Abstract_state.VarSet.pretty targets;
@@ -150,7 +151,7 @@ let do_function_call (stmt:stmt) state (res : lval option) (ef : exp) (args: exp
             let kfs = Seq.filter_map kf_of_var @@ Abstract_state.VarSet.to_seq targets in
             List.of_seq @@ Seq.map function_summary kfs
           | _ ->
-            Options.fatal "unsupported call to function pointer: %a" Exp.pretty ef
+            Options.fatal "unsupported call to function pointer: %a" Lval.pretty lvf
         end
     in
     let apply_summary state summary =
@@ -159,7 +160,7 @@ let do_function_call (stmt:stmt) state (res : lval option) (ef : exp) (args: exp
       | (Some a, Some summary) -> Some (Abstract_state.call a res args summary)
       | (Some a, None) ->
         Options.warning ~wkey:Options.Warn.undefined_function ~once:true ~source:(fst loc)
-          "function %a has no definition" Exp.pretty ef;
+          "function %a has no definition" Printer.pp_lhost f;
         Some a
     in
     List.fold_left apply_summary state summaries

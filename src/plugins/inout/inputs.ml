@@ -58,7 +58,7 @@ class virtual do_it_ = object(self)
     Cil.SkipChildren
 
   method private do_arg_calls stmt f args =
-    let deps = Eva.Results.(before stmt |> expr_deps f) in
+    let deps = Eva.Results.(before stmt |> lval_deps (f,NoOffset)) in
     self#join deps;
     let () =
       match Eva.Results.(before stmt |> eval_callee f) with
@@ -96,16 +96,16 @@ class virtual do_it_ = object(self)
         aux (Cil.var v) i;
         Cil.SkipChildren
 
-      | Call (lv_opt,exp,args,_) ->
+      | Call (lv_opt,lv,args,_) ->
         Option.iter self#read_address lv_opt;
-        self#do_arg_calls stmt exp args;
+        self#do_arg_calls stmt lv args;
         Cil.SkipChildren
       | Local_init(v, ConsInit(f, args, Plain_func), _) ->
         self#read_address (Cil.var v);
-        self#do_arg_calls stmt (Cil.evar f) args;
+        self#do_arg_calls stmt (Var f) args;
         Cil.SkipChildren
       | Local_init(v, ConsInit(f, args, Constructor), _) ->
-        self#do_arg_calls stmt (Cil.evar f) (Cil.mkAddrOfVi v :: args);
+        self#do_arg_calls stmt (Var f) (Cil.mkAddrOfVi v :: args);
         Cil.SkipChildren
       | Skip _ | Asm _ | Code_annot _ -> Cil.DoChildren
     end

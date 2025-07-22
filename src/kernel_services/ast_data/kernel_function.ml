@@ -444,8 +444,8 @@ let find_label kf label =
   let labels = label_table kf in
   Datatype.String.Map.find label labels
 
-let get_called fct = match fct.enode with
-  | Lval (Var vkf, NoOffset) ->
+let get_called = function
+  | Var vkf ->
     (try Some (Globals.Functions.get vkf)
      with Not_found -> None)
   | _ -> None
@@ -463,9 +463,8 @@ module KfCallers =
       let dependencies = [ Ast.self ]
     end)
 
-let called_kernel_function fct =
-  match fct.enode with
-  | Lval (Var vinfo,NoOffset) ->
+let called_kernel_function = function
+  | Var vinfo ->
     (try Some(Globals.Functions.get vinfo) with Not_found -> None)
   | _ -> None
 

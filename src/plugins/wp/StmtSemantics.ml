@@ -392,12 +392,11 @@ struct
       @^ exit_status (env_call @* [(Clabels.here, exit_stop);
                                    (Clabels.next, env @: Clabels.exit)])
 
-  and call
-    : env -> lval option -> exp -> exp list -> paths
-    = fun env lv e es ->
-      match Kernel_function.get_called e with
-      | Some kf -> call_kf env lv kf es
-      | None -> not_yet "[StmtSemantics] Call through a function pointer."
+  and call : env -> lval option -> lhost -> exp list -> paths =
+    fun env dest f es ->
+    match Kernel_function.get_called f with
+    | Some kf -> call_kf env dest kf es
+    | None -> not_yet "[StmtSemantics] Call through a function pointer."
 
   (* -------------------------------------------------------------------------- *)
   (* --- Compiler: Instruction                                              --- *)

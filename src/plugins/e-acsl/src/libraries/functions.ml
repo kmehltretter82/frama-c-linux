@@ -44,17 +44,14 @@ let strip_prefix p s =
     s
 
 (* True if a named function has a definition and false otherwise *)
-let has_fundef exp = match exp.enode with
-  | Lval(Var vi, _) ->
+let has_fundef = function
+  | Var vi ->
     let kf =
       try Globals.Functions.get vi
       with Not_found -> Options.fatal "[has_fundef] not a function"
     in
     Kernel_function.is_definition kf
-  | Lval _ (* function pointer *) ->
-    false
-  | _ ->
-    Options.fatal "[has_fundef] not a left-value: '%a'" Printer.pp_exp exp
+  | _ (* function pointer *) -> false
 
 (* ************************************************************************** *)
 (* RTL functions *)
@@ -110,10 +107,9 @@ module Libc = struct
   let is_memcpy_name name = name = "memcpy"
   let is_memset_name name = name = "memset"
 
-  let apply_fn f exp = match exp.enode with
-    | Lval(Var vi, _) -> f vi.vname
-    | Lval _  (* function pointer *) -> false
-    | _ -> Options.fatal "[Functions.Rtl.apply_fn] not a left-value"
+  let apply_fn f = function
+    | Var vi -> f vi.vname
+    | _  (* function pointer *) -> false
 
   let is_vla_free exp = apply_fn is_vla_free_name exp
   let is_memcpy exp = apply_fn is_memcpy_name exp

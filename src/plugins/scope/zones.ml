@@ -152,10 +152,10 @@ let process_one_call data stmt lvaloption froms =
   let used = res_used || out_used in
   used, data
 
-let process_call data_after stmt lvaloption funcexp args _loc =
-  let funcexp_dpds = Eva.Results.(before stmt |> expr_deps funcexp)
+let process_call data_after stmt lvaloption func args _loc =
+  let funclv_dpds = Eva.Results.(before stmt |> lval_deps (func,NoOffset))
   and called_functions =
-    Eva.Results.(before stmt |> eval_callee funcexp |> default [])
+    Eva.Results.(before stmt |> eval_callee func |> default [])
   in
   let used, data =
     try
@@ -180,7 +180,7 @@ let process_call data_after stmt lvaloption funcexp args _loc =
         (fun data kf -> process_call_args data kf stmt args)
         data called_functions
     in
-    let data =  Data.merge funcexp_dpds data in
+    let data =  Data.merge funclv_dpds data in
     used, data
   else begin
     assert (R.verify (Data.equal data data_after)
@@ -240,8 +240,8 @@ module Computer (Param:sig val states : Ctx.t end) = struct
           Cil.foldLeftCompound ~implicit ~doinit ~ct ~initl ~acc
       in
       Dataflow2.Done (aux (Cil.var v) i data)
-    |  Call (lvaloption,funcexp,args,loc) ->
-      let used, data = process_call data stmt lvaloption funcexp args loc in
+    |  Call (lvaloption,funclv,args,loc) ->
+      let used, data = process_call data stmt lvaloption funclv args loc in
       let _ = if used then add_used_stmt stmt in
       Dataflow2.Done data
     | Local_init(v, ConsInit(f, args, k), l) ->

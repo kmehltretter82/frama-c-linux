@@ -18,6 +18,8 @@
 Open Source Release <next-release>
 ###############################################################################
 
+o!  Kernel    [2025-07-22] Cil_types.Call now takes a lhost instead of an
+              expression as node for the function being called.
 o!  Kernel    [2025-07-22] Uniformization of dummies for Cil datatypes. All
               dummies are now exported from Cil_datatype, other sources for
               dummies are deprecated (from Kernel_function and Cil modules).

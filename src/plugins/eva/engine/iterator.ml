@@ -293,7 +293,7 @@ module Make_Dataflow
     let vars = block.blocals in
     if vars = [] then id else lift (Domain.leave_scope kf vars)
 
-  let transfer_call (stmt : stmt) (dest : lval option) (callee : exp)
+  let transfer_call (stmt : stmt) (dest : lval option) (callee : lhost)
       (args : exp list) (key, state : key * state) : (key * state) list =
     let result = Transfer.call stmt dest callee args state in
     if result.cacheable = Eval.NoCacheCallers then

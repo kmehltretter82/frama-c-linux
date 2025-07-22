@@ -893,6 +893,10 @@ let visitFramacLval vis l =
   let l' = visitCilLval (vis:>cilVisitor) l in
   vis#fill_global_tables; l'
 
+let visitFramacLhost vis h =
+  let h' = visitCilLhost (vis:>cilVisitor) h in
+  vis#fill_global_tables; h'
+
 let visitFramacOffset vis o =
   let o' = visitCilOffset (vis:>cilVisitor) o in
   vis#fill_global_tables; o'

@@ -85,6 +85,7 @@ sig
 
   type const'
   type var'
+  type lhost'
   type lval'
   type exp'
   type init'
@@ -92,7 +93,8 @@ sig
   type label
   type const = [ `const of const' ]
   type var = [ `var of var' ]
-  type lval = [  var | `lval of lval' ]
+  type lhost = [ var | `lhost of lhost' ]
+  type lval = [ lhost | `lval of lval' ]
   type exp = [ const | lval | `exp of exp' ]
   type init = [ exp | `init of init']
 
@@ -134,6 +136,7 @@ sig
   (* Lvalues *)
 
   val var : Cil_types.varinfo -> [> var]
+  val of_lhost: Cil_types.lhost -> [> lhost]
   val of_lval : Cil_types.lval -> [> lval]
 
   (* Expressions *)
@@ -229,10 +232,13 @@ sig
   val cil_logic_label : label -> Cil_types.logic_label
   val cil_constant : [< const] -> Cil_types.constant
   val cil_varinfo : [< var] -> Cil_types.varinfo
+  val cil_lhost: loc:Cil_types.location -> [< lhost] -> Cil_types.lhost
   val cil_lval : loc:Cil_types.location -> [< lval] -> Cil_types.lval
   val cil_exp : loc:Cil_types.location -> [< exp] -> Cil_types.exp
   val cil_term_lval : loc:Cil_types.location -> ?restyp:Cil_types.typ ->
     [< lval] -> Cil_types.term_lval
+  val cil_term_lhost: loc:Cil_types.location -> ?restyp: Cil_types.typ ->
+    [< lhost] -> Cil_types.term_lhost
   val cil_term : loc:Cil_types.location -> ?restyp:Cil_types.typ ->
     [< exp] -> Cil_types.term
   val cil_iterm : loc:Cil_types.location -> ?restyp:Cil_types.typ ->
@@ -255,6 +261,7 @@ sig
     with type ('v,'s) typ = ('v,'s) Type.typ
      and type const' = Exp.const'
      and type var' = Exp.var'
+     and type lhost' = Exp.lhost'
      and type lval' = Exp.lval'
      and type exp' = Exp.exp'
      and type init' = Exp.init'
@@ -274,7 +281,7 @@ sig
   val assign : [< lval] -> [< exp | call] -> [> instr]
   val incr : [< lval] -> [> instr]
   val call : Cil_types.kernel_function -> [< exp] list -> [> call]
-  val call_ptr : [< exp] -> [< exp] list -> [> call]
+  val call_ptr : [< lhost] -> [< exp] list -> [> call]
 
   val local : ?ghost:bool -> ?init:'v -> (init,'v) typ -> string ->
     [> var] * [> instr]
@@ -324,6 +331,7 @@ sig
     with type ('v,'s) typ = ('v,'s) Type.typ
      and type const' = Exp.const'
      and type var' = Exp.var'
+     and type lhost' = Exp.lhost'
      and type lval' = Exp.lval'
      and type exp' = Exp.exp'
      and type init' = Exp.init'
@@ -387,7 +395,7 @@ sig
   val incr : [< lval] -> unit
   val call : [< lval | `none] -> Cil_types.kernel_function -> [< exp] list ->
     unit
-  val call_ptr : [< lval | `none] -> [< exp] -> [< exp] list -> unit
+  val call_ptr : [< lval | `none] -> [< lhost] -> [< exp] list -> unit
   val pure : [< exp ] -> unit
 
   (* Operators *)

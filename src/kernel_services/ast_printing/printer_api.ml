@@ -145,6 +145,8 @@ class type extensible_printer_type = object
   method varinfo: Format.formatter -> varinfo -> unit
   (** Invoked on each variable use. *)
 
+  method lhost: Format.formatter -> lhost -> unit
+
   method lval: Format.formatter -> lval -> unit
   (** Invoked on each lvalue occurrence *)
 
@@ -426,6 +428,7 @@ module type S_pp = sig
   val pp_exp: Format.formatter -> exp -> unit
   val pp_vdecl: Format.formatter -> varinfo -> unit
   val pp_varinfo: Format.formatter -> varinfo -> unit
+  val pp_lhost: Format.formatter -> lhost -> unit
   val pp_lval: Format.formatter -> lval -> unit
   val pp_field: Format.formatter -> fieldinfo -> unit
   val pp_offset: Format.formatter -> offset -> unit

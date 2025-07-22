@@ -101,7 +101,7 @@ class eva_coverage_vis ~from_entry_point = object(self)
 
   method! vinst i =
     match i with
-    | Call(_, { enode = Lval (Var vi, NoOffset)},_,_)
+    | Call(_, Var vi,_,_)
     | Local_init(_,ConsInit (vi,_,_),_) ->
       if Cil_datatype.Varinfo.Hashtbl.mem calls vi then begin
         let info = Cil_datatype.Varinfo.Hashtbl.find calls vi in
@@ -112,7 +112,7 @@ class eva_coverage_vis ~from_entry_point = object(self)
           calls vi (is_analyzed_info vi direct_call)
       end;
       Cil.SkipChildren
-    | Call(_,{ enode = Lval (Mem _,NoOffset)},_,_) ->
+    | Call(_, Mem _,_,_) ->
       let s = Option.get self#current_stmt in
       let kfs = Eva.Results.callee s in
       let handle_one kf =

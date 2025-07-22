@@ -1692,7 +1692,7 @@ module Make
      ------------------------------------------------------------------------ *)
 
   (* Aborts the analysis when a function pointer is completely imprecise. *)
-  let top_function_pointer funcexp =
+  let top_function_pointer func =
     if not (Parameters.Domains.mem "cvalue") then
       Self.abort ~current:true
         "Calls through function pointers are not supported without the cvalue \
@@ -1704,7 +1704,7 @@ module Make
     else
       Self.fatal ~current:true
         "Function pointer evaluates to anything. function %a"
-        Eva_ast.pp_exp funcexp
+        Eva_ast.pp_lhost func
 
   (* For pointer calls, we retro-propagate which function is being called
      in the abstract state. This may be useful:
@@ -1718,21 +1718,22 @@ module Make
     let expr = Eva_ast.Build.(ne expr (var_addr vi_f)) in
     fst (reduce ~valuation state expr false)
 
-  let eval_function_exp ?subdivnb funcexp ?args state =
-    match funcexp.node with
-    | Lval { node = (Var vinfo, NoOffset) } ->
+  let eval_function ?subdivnb func ?args state =
+    match func with
+    | Var vinfo ->
       `Value [Globals.Functions.get vinfo, Valuation.empty], Alarmset.none
-    | Lval { node = (Mem v, NoOffset) } ->
+    | Mem v ->
       begin
         let open Evaluated.Operators in
         let* valuation, value = evaluate ?subdivnb state v in
         let kfs, alarm = Value.resolve_functions value in
         match kfs with
-        | `Top -> top_function_pointer funcexp
+        | `Top -> top_function_pointer func
         | `Value kfs ->
           let open Bottom.Operators in
           let args_types = Option.map (List.map (fun e -> e.typ)) args in
-          let compatible_funcs = Eval_typ.compatible_functions funcexp.typ in
+          let ftyp = Eva_ast.type_of_lhost func in
+          let compatible_funcs = Eval_typ.compatible_functions ftyp in
           let kfs, alarm' = compatible_funcs ?args:args_types kfs in
           let reduce = backward_function_pointer valuation state v in
           let reduce kf = let+ value = reduce kf in (kf, value) in
@@ -1748,5 +1749,4 @@ module Make
           let alarms = Alarmset.singleton ~status alarm in
           res, alarms
       end
-    | _ -> assert false
 end

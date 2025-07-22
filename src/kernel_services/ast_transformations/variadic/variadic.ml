@@ -41,12 +41,12 @@ let change_printer =
             match i with
             (* If the instruction calls a function that have been replaced,
                then build an instruction with the old function. *)
-            | Call(res, ({ enode = Lval(Var vi, o) } as fct), args, loc)
+            | Call(res, Var vi, args, loc)
               when Replacements.mem vi ->
               let old_vi = Replacements.find vi in
               let old_vi = { vi with vname = old_vi.vname } in
               let old_instr =
-                Call(res, { fct with enode = Lval(Var old_vi, o) }, args, loc)
+                Call(res, Var old_vi, args, loc)
               in
               Format.fprintf fmt "%a /* %s */" super#instr old_instr vi.vname
             (* Otherwise keep the instruction. *)

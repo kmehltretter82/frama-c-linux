@@ -140,7 +140,7 @@ let syntactic_compute g =
 
     (* add edges from callers to callees into the graph *)
     method !vinst = function
-      | Call(_, { enode = Lval(Var vi, NoOffset) }, _, _) ->
+      | Call(_, Var vi, _, _) ->
         (* direct function call *)
         let callee =
           try Globals.Functions.get vi

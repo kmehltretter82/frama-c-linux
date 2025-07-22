@@ -106,7 +106,7 @@ let register_modified_zones lmap stmt =
        let kf = Globals.Functions.get f in
        let out = aux_out Locations.Zone.bottom kf in
        register lmap_init out)
-  | Instr (Call (dst,funcexp,_args,_)) ->
+  | Instr (Call (dst,funclv,_args,_)) ->
     begin
       let lmap = match dst with
         | None -> lmap
@@ -115,7 +115,7 @@ let register_modified_zones lmap stmt =
           register lmap zone
       in
       let kfs =
-        Eva.Results.(before stmt |> eval_callee funcexp |> default [])
+        Eva.Results.(before stmt |> eval_callee funclv |> default [])
       in
       let out =
         List.fold_left aux_out Locations.Zone.bottom kfs

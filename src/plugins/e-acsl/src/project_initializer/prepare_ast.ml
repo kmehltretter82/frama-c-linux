@@ -146,7 +146,7 @@ let dup_fundec loc spec sound_verdict_vi kf vi new_vi =
     let l =
       [ Cil.mkStmtOneInstr ~valid_sid:true
           (Call(Option.map Cil.var res,
-                Cil.evar ~loc vi,
+                Var vi,
                 List.map (Cil.evar ~loc) new_formals,
                 loc));
         return ]

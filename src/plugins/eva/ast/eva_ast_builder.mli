@@ -31,6 +31,7 @@ val mk_lval : lval_node -> lval
 (* Translation from Cil *)
 
 val translate_exp : Cil_types.exp -> exp
+val translate_host: Cil_types.lhost -> lhost
 val translate_lval : Cil_types.lval -> lval
 val translate_offset : Cil_types.offset -> offset
 val translate_unop : Cil_types.unop -> unop

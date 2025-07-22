@@ -239,17 +239,14 @@ class do_it cp =
       in
       aux (Cil.var v) i
 
-    method private do_call exp =
+    method private do_call f =
       cp.iter_requests self#cur_stmt (fun request ->
-          let deps = match exp.enode with
-            | Lval lv -> Results.address_deps lv request
-            | _ -> assert false
-          in
+          let deps = Results.address_deps (f,NoOffset) request in
           self#add_access Read deps;
           (* In global mode, we treat the recursive calls. In precise
              mode, they are done elsewhere in the construction of the cfg *)
           if cp.mode = VGlobal then
-            let callees = Results.(eval_callee exp request |> default []) in
+            let callees = Results.(eval_callee f request |> default []) in
             List.iter self#rw_fun callees
         )
 
@@ -263,12 +260,12 @@ class do_it cp =
         | Local_init(v, AssignInit i, _) -> self#do_init v i; Cil.SkipChildren
         | Local_init(v, ConsInit (f, args, _), _) ->
           self#do_assign (Cil.var v);
-          self#do_call (Cil.evar f);
+          self#do_call (Var f);
           List.iter visit_expr args;
           Cil.SkipChildren
-        | Call (lv_opt,exp,args,_) ->
+        | Call (lv_opt,lv,args,_) ->
           Option.iter self#do_assign lv_opt;
-          self#do_call exp;
+          self#do_call lv;
           List.iter visit_expr args;
           Cil.SkipChildren
         | _ -> Cil.DoChildren

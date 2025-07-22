@@ -169,7 +169,7 @@ class deadCallsVisitor fmt ~libc cov_metrics =
               | Some
                   {skind =
                      Instr (
-                       Call (_, {enode = Lval (Var v, NoOffset)}, _, _)
+                       Call (_, Var v, _, _)
                      | Local_init (_, ConsInit(v, _, _),_))}
                 when Varinfo.equal v vi -> "calls"
               | _ -> "references"

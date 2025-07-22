@@ -316,13 +316,21 @@ class propagate project fnames ~cast_intro = object(self)
     in
     Cil.DoChildrenPost add_decls
 
-  method! vlval lv =
-    let simplify (host,off as lv) = match host with
-      | Mem e -> Cil.mkMem ~addr:e ~off (* canonize in case the propagation
-                                           simplified [lv] *)
-      | Var _ -> lv
+  method! vlhost h =
+    let simplify_lhost =
+      function
+      | Mem e -> fst (Cil.mkMem ~addr:e ~off:NoOffset)
+      | h -> h
     in
-    Cil.ChangeDoChildrenPost(lv, simplify)
+    Cil.ChangeDoChildrenPost(h, simplify_lhost)
+
+  method! vlval (h,off) =
+    match h with
+    | Mem e ->
+      let addr = Cil.visitCilExpr (self:>Cil.cilVisitor) e in
+      let off = Cil.visitCilOffset (self:>Cil.cilVisitor) off in
+      Cil.ChangeTo (Cil.mkMem ~addr ~off)
+    | Var _ -> Cil.DoChildren
 
 end
 

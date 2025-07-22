@@ -161,11 +161,14 @@ struct
   and var' =
     | CilVar of Cil_types.varinfo
     | NewVar of Scope.id * string * Cil_types.typ
+  and lhost' =
+    | CilLhost of Cil_types.lhost
+    | Var of var'
+    | Mem of exp'
   and lval' =
     | CilLval of Cil_types.lval
-    | Var of var'
+    | Lhost of lhost'
     | Result
-    | Mem of exp'
     | Index of lval' * exp'
     | Field of lval' * Cil_types.fieldinfo
     | FieldNamed of lval' * string
@@ -199,7 +202,8 @@ struct
 
   type const = [ `const of const' ]
   type var = [ `var of var' ]
-  type lval = [  var | `lval of lval' ]
+  type lhost = [ var | `lhost of lhost' ]
+  type lval = [  lhost | `lval of lval' ]
   type exp = [ const | lval | `exp of exp' ]
   type init = [ exp | `init of init']
 
@@ -212,11 +216,14 @@ struct
   and pretty_var fmt = function
     | CilVar vi -> Printer.pp_varinfo fmt vi
     | NewVar (_id,name,_typ) -> Format.pp_print_string fmt name
+  and pretty_lhost fmt = function
+    | CilLhost h -> Printer.pp_lhost fmt h
+    | Var v -> pretty_var fmt v
+    | Mem e -> Format.fprintf fmt "*(%a)" pretty_exp e
   and pretty_lval fmt = function
     | CilLval lv -> Printer.pp_lval fmt lv
-    | Var v -> pretty_var fmt v
+    | Lhost h -> pretty_lhost fmt h
     | Result -> Format.fprintf fmt "%s" "\result"
-    | Mem e -> Format.fprintf fmt "*(%a)" pretty_exp e
     | Index (lv,e) -> Format.fprintf fmt "%a[%a]" pretty_lval lv pretty_exp e
     | Field (lv,fi) ->
       Format.fprintf fmt "%a.%s" pretty_lval lv fi.Cil_types.fname
@@ -270,9 +277,11 @@ struct
     | `none -> ()
     | `const c -> pretty_const fmt c
     | `var v -> pretty_var fmt v
+    | `lhost h -> pretty_lhost fmt h
     | `lval lv -> pretty_lval fmt lv
     | `exp e -> pretty_exp fmt e
     | `init i -> pretty_init fmt i
+    | `mem e -> Format.fprintf fmt "*(%a)" pretty_exp e
 
   (* Depolymorphize *)
 
@@ -284,9 +293,14 @@ struct
     match (v :> var) with
     | `var var -> var
 
+  let harden_lhost h =
+    match (h :> lhost) with
+    | #var as var -> Var (harden_var var)
+    | `lhost h -> h
+
   let harden_lval lv =
     match (lv :> lval) with
-    | #var as var -> Var (harden_var var)
+    | #lhost as h -> Lhost (harden_lhost h)
     | `lval lval -> lval
 
   let harden_lval_opt = function
@@ -353,6 +367,8 @@ struct
   let var v = `var (CilVar v)
   let of_lval lv = `lval (CilLval lv)
 
+  let of_lhost h = `lhost (CilLhost h)
+
   (* Expressions *)
 
   let of_exp e = `exp (CilExp e)
@@ -386,7 +402,7 @@ struct
   let cast' t e = `exp (Cast (Cil_types.Ctype t, harden_exp e))
   let cast (_,t) e = `exp (Cast (t, harden_exp e))
   let addr lv = `exp (Addr (harden_lval lv))
-  let mem e = `lval (Mem (harden_exp e))
+  let mem e = `lhost (Mem (harden_exp e))
   let index lv e = `lval (Index (harden_lval lv, harden_exp e))
   let field lv fi = `lval (Field (harden_lval lv, fi))
   let fieldnamed lv s = `lval (FieldNamed (harden_lval lv, s))
@@ -490,13 +506,19 @@ struct
     | CilVar vi -> vi
     | NewVar (vid, name,_typ) -> Scope.resolve scope vid name
 
+  and build_lhost ~scope ~loc = function
+    | CilLhost h -> h
+    | Var v -> Cil_types.Var (build_var ~scope v)
+    | Mem e ->
+      let e' = build_exp ~scope ~loc e in
+      fst (Cil.mkMem ~addr:e' ~off:Cil_types.NoOffset)
+
   and build_lval ~scope ~loc = function
     | Result as lv -> raise (LogicInC (`lval lv))
     | CilLval lval -> lval
-    | Var v -> Cil_types.(Var (build_var ~scope v), NoOffset)
-    | Mem e ->
-      let e' = build_exp ~scope ~loc e in
-      Cil.mkMem ~addr:e' ~off:Cil_types.NoOffset
+    | Lhost h ->
+      let h' = build_lhost ~scope ~loc h in
+      (h', NoOffset)
     | Index (lv, e) ->
       let (host, offset) as lv' = build_lval ~scope ~loc lv
       and e' = build_exp ~scope ~loc e in
@@ -567,11 +589,9 @@ struct
   let rec build_term_lval ~scope ~loc ~restyp = function
     | Result -> Cil_types.(TResult (Option.get restyp), TNoOffset)
     | CilLval lv -> Logic_utils.lval_to_term_lval lv
-    | Var v ->
-      Cil_types.(TVar (Cil.cvar_to_lvar (build_var ~scope v)), TNoOffset)
-    | Mem t ->
-      let t' = build_term ~scope ~loc ~restyp t in
-      Cil_types.(TMem t', TNoOffset)
+    | Lhost h ->
+      let h' = build_term_lhost ~scope ~loc ~restyp h in
+      h', TNoOffset
     | Index (tlv, t) ->
       let (host, offset) as tlv' = build_term_lval ~scope ~loc ~restyp tlv
       and t' = build_term ~scope ~loc ~restyp t in
@@ -607,6 +627,15 @@ struct
       in
       let offset'' = Cil_types.(TField (f, TNoOffset)) in
       host', Logic_const.addTermOffset offset'' offset'
+
+  and build_term_lhost ~scope ~loc ~restyp = function
+    | CilLhost h -> Logic_utils.host_to_term_lhost h
+    | Var v ->
+      Cil_types.(TVar (Cil.cvar_to_lvar (build_var ~scope v)))
+    | Mem t ->
+      let t' = build_term ~scope ~loc ~restyp t in
+      Cil_types.TMem t'
+
 
   and build_term ~scope ~loc ~restyp = function
     | Const (CilConstant c) ->
@@ -741,6 +770,7 @@ struct
   let cil_logic_label label = label
   let cil_constant c = build_constant (harden_const c)
   let cil_varinfo v = build_var ~scope:Scope.empty (harden_var v)
+  let cil_lhost ~loc h = build_lhost ~scope:Scope.empty ~loc (harden_lhost h)
   let cil_lval ~loc lv = build_lval ~scope:Scope.empty ~loc (harden_lval lv)
   let cil_lval_opt ~loc lv =
     Option.map (build_lval ~scope:Scope.empty ~loc) (harden_lval_opt lv)
@@ -750,6 +780,8 @@ struct
   let cil_exp_list ~loc l = List.map (cil_exp ~loc) l
   let cil_term_lval ~loc ?restyp lv =
     build_term_lval ~scope:Scope.empty ~loc ~restyp (harden_lval lv)
+  let cil_term_lhost ~loc ?restyp h =
+    build_term_lhost ~scope:Scope.empty ~loc ~restyp (harden_lhost h)
   let cil_term ~loc ?restyp e =
     build_term ~scope:Scope.empty ~loc ~restyp (harden_exp e)
   let cil_iterm ~loc ?restyp e =
@@ -777,7 +809,7 @@ struct
 
   type ghost = NoGhost | Ghost
 
-  type call' = exp' * exp' list
+  type call' = lhost' * exp' list
 
   type instr' =
     | CilInstr of Cil_types.instr
@@ -829,7 +861,7 @@ struct
     | #exp as src -> `instr (Assign (harden_lval dest, harden_exp src))
     | #call as call -> `instr (Call (Some (harden_lval dest), harden_call call))
   let incr dest = `instr (Assign (harden_lval dest, harden_exp (add dest one)))
-  let call_ptr callee args = `call (harden_exp callee, harden_exp_list args)
+  let call_ptr callee args = `call (harden_lhost callee, harden_exp_list args)
   let call callee args = call_ptr (var (Kernel_function.get_vi callee)) args
   let of_stmtkind sk = `stmt (CilStmtkind sk)
   let of_stmt s = `stmt (CilStmt s)
@@ -922,7 +954,7 @@ struct
       Cil_types.Set (dest', src', loc), scope
     | Call (dest,(callee,args)) ->
       let dest' = Option.map (build_lval ~scope ~loc) dest
-      and callee' = build_exp ~scope ~loc callee
+      and callee' = build_lhost ~scope ~loc callee
       and args' = List.map (build_exp ~scope ~loc) args in
       Cil_types.Call (dest', callee', args', loc), scope
     | Local (v, init, ghost) ->
@@ -1488,7 +1520,7 @@ struct
   let call_ptr dest callee args =
     let loc = current_loc () in
     let dest' = cil_lval_opt ~loc dest
-    and callee' = cil_exp ~loc callee
+    and callee' = cil_lhost ~loc callee
     and args' = cil_exp_list ~loc args in
     of_instr (Cil_types.Call (dest', callee', args', loc))
 

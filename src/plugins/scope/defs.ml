@@ -198,7 +198,7 @@ let compute_with_def_type_zone kf stmt zone =
            change s (true, false) (* defined by formal v in 'f(v)' *)
          | PdgIndex.Signature.Out (PdgIndex.Signature.OutLoc _) -> begin
              match s.skind with
-             | Instr (Call (_, { enode = Lval (Var vi, NoOffset)}, _, _)
+             | Instr (Call (_, Var vi, _, _)
                      | Local_init (_, ConsInit(vi,_,_),_))
                when let kf = Globals.Functions.get vi in
                  Eva.Analysis.use_spec_instead_of_definition kf

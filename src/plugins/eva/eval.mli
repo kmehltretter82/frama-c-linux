@@ -23,6 +23,7 @@
 open Cil_types
 
 type lval = Eva_ast.lval
+type lhost = Eva_ast.lhost
 type exp = Eva_ast.exp
 
 (** Types and functions related to evaluations.

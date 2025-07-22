@@ -38,6 +38,7 @@ struct
   let pp_exp fmt x = (printer ())#exp fmt x
   let pp_vdecl fmt x = (printer ())#vdecl fmt x
   let pp_varinfo fmt x = (printer ())#varinfo fmt x
+  let pp_lhost fmt x = (printer())#lhost fmt x
   let pp_lval fmt x = (printer ())#lval fmt x
   let pp_field fmt x = (printer())#field fmt x
   let pp_offset fmt x = (printer ())#offset fmt x

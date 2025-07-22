@@ -42,7 +42,7 @@ sig
   val start_translation : unit -> unit
   (* Build a call or a Local_init with constructor depending on the currently
       translated instruction *)
-  val translated_call : [< exp] -> [< exp] list -> unit
+  val translated_call : [< lhost] -> [< exp] list -> unit
 end
 
 type t = (module S)

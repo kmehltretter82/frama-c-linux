@@ -1021,8 +1021,8 @@ and is_same_instr i i' env: body_correspondence*is_same_env =
     if is_same_opt is_same_lval lv lv' env &&
        is_same_list is_same_exp args args' env
     then begin
-      match f.enode, f'.enode with
-      | Lval(Var f,NoOffset), Lval(Var f', NoOffset) ->
+      match f, f' with
+      | Var f, Var f' ->
         (match gfun_correspondence f env with
          | `Partial _ | `Not_present -> `Callees_changed, env
          | `Same f'' ->

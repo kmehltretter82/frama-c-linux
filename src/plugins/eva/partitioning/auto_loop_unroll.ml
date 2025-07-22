@@ -144,9 +144,9 @@ let add_written_var vi loop_effect =
   let written_vars = Cil_datatype.Varinfo.Set.add vi loop_effect.written_vars in
   { loop_effect with written_vars }
 
-let is_frama_c_builtin (exp : Eva_ast.exp) =
-  match exp.node with
-  | Lval { node = Var vi, NoOffset } ->
+let is_frama_c_builtin (f:Eva_ast.lhost) =
+  match f with
+  | Var vi ->
     Ast_info.start_with_frama_c_builtin vi.vname
   | _ -> false
 
@@ -159,7 +159,7 @@ let compute_transition_effect loop_effect = function
     { (add_written_var varinfo loop_effect) with call = true; }
   | Call (Some {node = Mem _, _}, _, _, _) ->
     { loop_effect with pointer_writes = true; call = true; }
-  | Call (None, exp, _, _) when not (is_frama_c_builtin exp) ->
+  | Call (None, f, _, _) when not (is_frama_c_builtin f) ->
     { loop_effect with call = true }
   | Asm _ ->
     { loop_effect with assembly = true }

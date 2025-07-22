@@ -173,17 +173,17 @@ let inject_in_instr env kf stmt = function
   | Call(result, caller, args, loc) ->
     let args, env = replace_literal_strings_in_args env (Some kf) args in
     let caller, args =
-      match caller.enode with
-      | Lval (Var fvi, _) ->
+      match caller with
+      | Var fvi ->
         let fvi, args = rename_caller ~loc fvi args in
-        Cil.evar fvi, args
+        Var fvi, args
       | _ -> caller, args
     in
     (* if this is a call to a libc function that writes into a memory block then
        manually update the memory model *)
     let result, env =
-      match caller.enode with
-      | Lval (Var cvi, _) when Libc.is_writing_memory cvi ->
+      match caller with
+      | Var cvi when Libc.is_writing_memory cvi ->
         Libc.update_memory_model ~loc env kf ?result cvi args
       | _ -> result, env
     in
@@ -712,10 +712,9 @@ let inject_global_handler file main =
     match main with
     | Some main ->
       let mk_fct_call vi =
-        let exp = Cil.evar ~loc:Location.unknown vi in
         let stmt =
           Cil.mkStmtOneInstr ~valid_sid:true
-            (Call(None, exp, [], Location.unknown))
+            (Call(None, Var vi, [], Location.unknown))
         in
         vi.vreferenced <- true;
         stmt

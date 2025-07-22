@@ -66,7 +66,7 @@ class transform prj = object(_self)
     | GAnnot _ -> Cil.DoChildren
 
   method! vinst = function
-    | Call(_,{ Cil_types.enode = Lval (Var _, NoOffset)},_,_) as i ->
+    | Call(_,Var _,_,_) as i ->
       let add_zero = function
         | [Call(res,f,args,loc)] ->
           let args =

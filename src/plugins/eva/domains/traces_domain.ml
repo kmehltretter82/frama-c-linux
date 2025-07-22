@@ -943,7 +943,7 @@ let rec stmts_of_cfg cfg current var_map locals return_exp acc =
       | CallDeclared (kf,exps,lval) ->
         let exps = List.map (subst_in_exp var_map) exps in
         let lval = Option.map (subst_in_lval var_map) lval in
-        let call = Cil.evar ~loc:dummy_loc (subst_in_varinfo var_map (Kernel_function.get_vi kf)) in
+        let call = Var (subst_in_varinfo var_map (Kernel_function.get_vi kf)) in
         let stmt = Cil.mkStmtOneInstr ~valid_sid (Cil_types.Call(lval,call,exps,dummy_loc)) in
         stmts_of_cfg cfg n var_map locals return_exp (stmt::acc)
 
