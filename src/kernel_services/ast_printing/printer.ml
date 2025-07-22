@@ -247,11 +247,12 @@ class printer_with_annot () = object (self)
 
   method! lval fmt lv =
     match lv with
-    | Var v, NoOffset
-      when Ast_info.is_string_literal lv && not (Kernel.PrintAsIs.get()) ->
+    | Var v, (NoOffset | Index _ as o)
+      when Ast_info.is_string_literal v && not (Kernel.PrintAsIs.get()) ->
       let init = Globals.Vars.find v in
       (match init.init with
-       | Some (StrInit _ | WStrInit _ as i) -> self#init_or_str fmt i
+       | Some (StrInit _ | WStrInit _ as i) ->
+         Format.fprintf fmt "%a%a" self#init_or_str i self#offset o
        | _ ->
          Kernel.fatal
            "Variable %s is supposed to be a (wide)string literal but is not \

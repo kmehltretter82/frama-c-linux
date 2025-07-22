@@ -299,7 +299,7 @@ module Precedence = struct
     (* Multiplicative *)
     | BinOp((Div|Mod|Mult),_,_,_) -> multiplicativeLevel
     (* Unary *)
-    | StartOf(lv) when Ast_info.is_string_literal lv -> 0
+    | StartOf((Var v,_)) when Ast_info.is_string_literal v -> 0
     | CastE(_,_)
     | AddrOf(_)
     | StartOf(_)

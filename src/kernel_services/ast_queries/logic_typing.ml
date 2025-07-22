@@ -2640,10 +2640,10 @@ struct
       let t = Logic_utils.parse_float ~loc s in
       t.term_node , t.term_type
     | PLconstant (StringConstant s) ->
-      TConst (LStr (unescape s)), Ctype Cil_const.charPtrType
+      TConst (LStr (unescape s)), Ctype (Cil.typeOf_string_literal s)
     | PLconstant (WStringConstant s) ->
-      TConst (LWStr (wcharlist_of_string s)),
-      Ctype (Cil_const.mk_tptr (Machine.wchar_type ()))
+      let l = wcharlist_of_string s in
+      TConst (LWStr l), Ctype (Cil.typeOf_wstring_literal l)
     | PLvar x ->
       let old_val info =
         let typ =

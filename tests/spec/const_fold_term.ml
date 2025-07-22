@@ -2,7 +2,7 @@ open Cil_types
 
 let fold t =
   match t.term_node with
-  | TSizeOf _ | TSizeOfStr _ | TSizeOfE _ |  TAlignOf _ | TAlignOfE _
+  | TSizeOf _ | TSizeOfE _ |  TAlignOf _ | TAlignOfE _
   | TUnOp _ | TBinOp _ ->
     let t' = Cil.constFoldTerm t in
     Format.printf "  %a folds to %a@." Cil_printer.pp_term t Cil_printer.pp_term t'

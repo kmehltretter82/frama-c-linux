@@ -69,11 +69,11 @@ val is_null_expr: exp -> bool
 *)
 val is_non_null_expr: exp -> bool
 
-(** [true] if the lval is the start of a global variable representing a
+(** [true] if the varinfo is a global variable representing a
     string literal.
     @since Frama-C+dev
 *)
-val is_string_literal: lval -> bool
+val is_string_literal: varinfo -> bool
 
 (* ************************************************************************** *)
 (** {2 Logical terms} *)
