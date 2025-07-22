@@ -623,12 +623,12 @@ let cfun_code env kf = (* Visits term/pred of code annotations and C exp *)
       Wp_parameters.warning "RefUsage: throw/try-catch not implemented"
 
     | Instr(Set(lval,exp,_)) -> do_lval lval ; do_exp exp
-    | Instr(Call(lval_opt,fun_lv,args_list,_)) ->
+    | Instr(Call(lval_opt,func,args_list,_)) ->
       begin
         do_lval_opt lval_opt ;
-        match Kernel_function.get_called fun_lv with
+        match Kernel_function.get_called func with
         | None ->
-          do_lval (fun_lv,NoOffset); List.iter do_exp args_list
+          do_lval (func,NoOffset); List.iter do_exp args_list
         | Some called_kf -> do_args called_kf args_list
       end
     | Instr(Local_init (v,AssignInit i,_)) -> update_code_env (cinit v i)

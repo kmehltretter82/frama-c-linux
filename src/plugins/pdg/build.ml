@@ -693,7 +693,7 @@ let call_outputs  pdg state_before_call state_with_inputs stmt
         ~l_loc ~exact ~l_dpds ~l_decl
         ~r_dpds fct_dpds
 
-(** process call : {v lvaloption = funclv (argl); v}
+(** process call : {v lvaloption = func (argl); v}
     Use the state at ki (before the call)
     and returns the new state (after the call).
 *)

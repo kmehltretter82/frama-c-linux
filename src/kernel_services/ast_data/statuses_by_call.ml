@@ -191,7 +191,7 @@ module PreCondAt =
 
 (* Transposes the precondition property [pid] of the called function [kf]
    at call site [stmt], with arguments [args], result assigned in [result],
-   and function lvalue [funclv]. *)
+   and function [func]. *)
 let rec transpose_precondition stmt pid kf func args =
   let formals = Kernel_function.get_formals kf in
   let ip = match pid with

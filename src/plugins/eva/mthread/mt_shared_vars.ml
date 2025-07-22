@@ -239,9 +239,9 @@ class do_it cp =
       in
       aux (Cil.var v) i
 
-    method private do_call lv =
+    method private do_call f =
       cp.iter_requests self#cur_stmt (fun request ->
-          let deps = Results.address_deps (lv,NoOffset) request in
+          let deps = Results.address_deps (f,NoOffset) request in
           self#add_access Read deps;
           (* In global mode, we treat the recursive calls. In precise
              mode, they are done elsewhere in the construction of the cfg *)

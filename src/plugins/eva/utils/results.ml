@@ -360,10 +360,10 @@ struct
     let access = if for_writing then Locations.Write else Read in
     Address (Response.map eval (get req), access)
 
-  let eval_callee h req =
+  let eval_callee f req =
     let join = (@)
     and extract state =
-      let r,_alarms = A.Eval.eval_function h state in
+      let r,_alarms = A.Eval.eval_function f state in
       r >>-: List.map fst
     in
     get req |> Response.map_join' extract join |> convert |>
