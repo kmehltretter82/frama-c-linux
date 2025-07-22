@@ -386,7 +386,9 @@ module Make (Engine: Engine_sig.S) = struct
             (* No widening *)
             counter, current
           else
-            let widened = Engine.Dom.widen kf Cil.dummyStmt previous current in
+            let widened =
+              Engine.Dom.widen kf Cil_datatype.Stmt.dummy previous current
+            in
             widening_period, widened
         in
         counter - 1, next

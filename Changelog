@@ -18,6 +18,9 @@
 Open Source Release <next-release>
 ###############################################################################
 
+o!  Kernel    [2025-07-22] Uniformization of dummies for Cil datatypes. All
+              dummies are now exported from Cil_datatype, other sources for
+              dummies are deprecated (from Kernel_function and Cil modules).
 -*  Kernel    [2025-07-22] Improve auto-reference support in initializations,
               and remove support for few variations like auto-affectation during
               initialization (fix #@563)

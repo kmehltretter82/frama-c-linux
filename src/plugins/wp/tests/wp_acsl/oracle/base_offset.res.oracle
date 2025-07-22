@@ -38,12 +38,12 @@ Prove: table_to_offset(a, 1 + i + x_1) <= table_to_offset(a, 1 + i_1 + x_1).
 ------------------------------------------------------------
 
 Goal Check 'KO' (file base_offset.i, line 29):
-Prove: table_of_base(G_z_35) = table_of_base(G_x_33).
+Prove: table_of_base(G_z_34) = table_of_base(G_x_32).
 
 ------------------------------------------------------------
 
 Goal Check 'KO' (file base_offset.i, line 30):
-Assume { (* Goal *) When: table_of_base(G_y_34) = table_of_base(G_x_33). }
+Assume { (* Goal *) When: table_of_base(G_y_33) = table_of_base(G_x_32). }
 Prove: false.
 
 ------------------------------------------------------------

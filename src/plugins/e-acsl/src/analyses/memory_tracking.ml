@@ -153,7 +153,7 @@ end = struct
     type data = Varinfo.Hptset.t option
     let apply f =
       try
-        let kf = Option.value ~default:(Kernel_function.dummy()) !current_kf in
+        let kf = Option.value ~default:Cil_datatype.Kf.dummy !current_kf in
         let h = Kernel_function.Hashtbl.find tbl kf in
         f h
       with Not_found ->

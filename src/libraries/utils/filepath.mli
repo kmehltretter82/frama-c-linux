@@ -59,6 +59,10 @@ val pretty_abs: Format.formatter -> t -> unit
     without symbolic names. *)
 val pretty_rel: Format.formatter -> t -> unit
 
+(** Dummy filepath.
+    @since Frama-C+dec *)
+val dummy: t
+
 
 (* ************************************************************************* *)
 (** {2 Constant paths} *)

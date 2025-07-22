@@ -18,7 +18,7 @@
 ------------------------------------------------------------
 
 Goal Assertion (file array_initialized.c, line 71):
-Let a = global(K_g_22).
+Let a = global(K_g_21).
 Assume {
   (* Goal *)
   When: (0 <= i) /\ (i <= 499).
@@ -34,8 +34,8 @@ Prove: Mint_0[shift_sint32(a, i)] = 0.
 ------------------------------------------------------------
 
 Goal Assertion (file array_initialized.c, line 185):
-Let a = global(K_h2_29).
-Let a_1 = global(K_h1_28).
+Let a = global(K_h2_28).
+Let a_1 = global(K_h1_27).
 Assume {
   (* Goal *)
   When: (0 <= i) /\ (i <= 499).
@@ -262,7 +262,7 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Assertion (file array_initialized.c, line 283):
-Let a = global(K_p_36).
+Let a = global(K_p_35).
 Assume {
   (* Heap *)
   Type: linked(Malloc_0) /\ framed(Mptr_0).
@@ -270,7 +270,7 @@ Assume {
   When: (0 <= i) /\ (i <= 499).
   (* Initializer *)
   Init: forall i_1 : Z. ((0 <= i_1) -> ((i_1 <= 499) ->
-      (Mptr_0[shift_PTR(a, i_1)] = global(G_p0_35)))).
+      (Mptr_0[shift_PTR(a, i_1)] = global(G_p0_34)))).
 }
 Prove: valid_rw(Malloc_0, Mptr_0[shift_PTR(a, i)], 1).
 

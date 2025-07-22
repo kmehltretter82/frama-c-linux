@@ -14,7 +14,7 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Post-condition 'KO' in 'alias':
-Let a = global(P_r_43).
+Let a = global(P_r_42).
 Let x = Mint_1[a].
 Let x_1 = Mint_0[a].
 Assume { Type: is_sint32(x) /\ is_sint32(x_1). }

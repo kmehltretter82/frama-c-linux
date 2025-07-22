@@ -32,7 +32,7 @@ module D =
     (struct
       type t = callstack
       let name = "Callstack.t"
-      let reprs = [ empty; [ Kernel_function.dummy (), Cil.dummyStmt ] ]
+      let reprs = [ empty; [ Cil_datatype.Kf.dummy, Cil_datatype.Stmt.dummy ] ]
       include Datatype.Serializable_undefined
     end)
 

@@ -1,16 +1,16 @@
 [kernel] Parsing syntactic_hook.i (no preprocessing)
-[kernel] syntactic_hook.i:8: New global node introducing identifier f(24)
+[kernel] syntactic_hook.i:8: New global node introducing identifier f(23)
 [kernel] First occurrence of f
-[kernel] syntactic_hook.i:10: New global node introducing identifier k(27)
+[kernel] syntactic_hook.i:10: New global node introducing identifier k(26)
 [kernel] First occurrence of k
-[kernel] syntactic_hook.i:12: New global node introducing identifier k(27)
+[kernel] syntactic_hook.i:12: New global node introducing identifier k(26)
 [kernel] New occurrence of existing identifier k
-[kernel] syntactic_hook.i:14: New global node introducing identifier main(33)
+[kernel] syntactic_hook.i:14: New global node introducing identifier main(32)
 [kernel] First occurrence of main
-[kernel] syntactic_hook.i:16: New global node introducing identifier t(37)
+[kernel] syntactic_hook.i:16: New global node introducing identifier t(36)
 [kernel] First occurrence of t
 [kernel] syntactic_hook.i:16: Warning: [SH]: definition of local function t
-[kernel] syntactic_hook.i:20: New global node introducing identifier g(39)
+[kernel] syntactic_hook.i:20: New global node introducing identifier g(38)
 [kernel] First occurrence of g
 [kernel:typing:implicit-function-declaration] syntactic_hook.i:20: Warning: 
   Calling undeclared function g. Old style K&R code?

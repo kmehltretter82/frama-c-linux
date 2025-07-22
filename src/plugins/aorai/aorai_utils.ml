@@ -640,7 +640,7 @@ let crosscond_to_exp generated_kf curr_f curr_status loc cond res =
 (** {b Globals management} *)
 
 (** Local copy of the file pointer *)
-let file = ref Cil.dummyFile
+let file = ref Cil_datatype.File.dummy
 
 let initFunction kf =
   let fname = Kernel_function.get_name kf in

@@ -478,7 +478,7 @@ let untyped_to_exp p =
   let e, _, env =
     try generalized_untyped_to_exp
           ~adata:Assert.no_data
-          (Kernel_function.dummy ())
+          Cil_datatype.Kf.dummy
           env
           p
     with Rtl.Symbols.Unregistered _ -> raise (No_simple_translation p)

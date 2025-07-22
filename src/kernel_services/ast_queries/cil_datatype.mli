@@ -28,7 +28,22 @@
 module UtilsFilepath = Filepath
 
 open Cil_types
-open Datatype
+
+(** All datatypes in this module include a dummy.
+    @since Frama-C+dev
+*)
+module type S_with_collections = sig
+  include Datatype.S_with_collections
+  val dummy: t
+end
+
+(** All datatypes in this module include a dummy.
+    @since Frama-C+dev
+*)
+module type S = sig
+  include Datatype.S
+  val dummy: t
+end
 
 (** Auxiliary module for datatypes that can be pretty-printed. For those that
     do not have this signature, module {!Printer} must be used. *)
@@ -102,8 +117,7 @@ module Location: sig
   val equal_start_semantic : location -> location -> bool
 end
 
-module Syntactic_scope:
-  Datatype.S_with_collections with type t = syntactic_scope
+module Syntactic_scope: S_with_collections with type t = syntactic_scope
 
 (**************************************************************************)
 (** {3 Cabs types} *)
@@ -132,10 +146,7 @@ module Wide_string: S_with_collections with type t = int64 list
 (**
    @since Oxygen-20120901
 *)
-module Constant: sig
-  include S_with_collections with type t = constant
-  val pretty_ref: (Format.formatter -> t -> unit) ref
-end
+module Constant: S_with_collections_pretty with type t = constant
 
 (**
    Same as {!Constant}, but comparison is strict, in the sense that it will take
@@ -146,10 +157,7 @@ module ConstantStrict: S_with_collections with type t = constant
 
 (** Note that the equality is based on eid. For structural equality, use
     {!ExpStructEq} *)
-module Exp: sig
-  include S_with_collections_pretty with type t = exp
-  val dummy: exp (** @since Nitrogen-20111001 *)
-end
+module Exp: S_with_collections_pretty with type t = exp
 
 module ExpStructEq: S_with_collections with type t = exp
 
@@ -279,11 +287,10 @@ module Varinfo: sig
                       and type 'a map = 'a Hptmap.Shape(Varinfo_Id).t
     val self: State.t
   end
-  val dummy: t
 end
 
 module Kf: sig
-  include Datatype.S_with_collections with type t = kernel_function
+  include S_with_collections with type t = kernel_function
   val vi: t -> varinfo
   val id: t -> int
 

@@ -270,9 +270,9 @@ let oneret ?(callback: callback option) (f: fundec) : unit =
   (* Remember if we have introduced goto's *)
   let haveGoto = ref false in
   (* Memoize the return statement *)
-  let retStmt : stmt ref = ref dummyStmt in
+  let retStmt : stmt ref = ref Cil_datatype.Stmt.dummy in
   let getRetStmt (_x: unit) : stmt =
-    if !retStmt == dummyStmt then begin
+    if !retStmt == Cil_datatype.Stmt.dummy then begin
       let sr =
         let getLastLoc () = (* CEA modified to have a good [!lastloc] *)
           let rec setLastLoc = function
@@ -500,5 +500,6 @@ let oneret ?(callback: callback option) (f: fundec) : unit =
   (*CEA so, [scanBlock] will set [lastloc] when necessary
     lastloc := !currentLoc ;  *) (* last location in the function *)
   f.sbody <- scanBlock true f.sbody ;
-  if !haveGoto && !retStmt != dummyStmt then encapsulate_local_vars f;
+  if !haveGoto && !retStmt != Cil_datatype.Stmt.dummy then
+    encapsulate_local_vars f;
   Option.iter do_callback callback

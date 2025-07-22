@@ -1074,7 +1074,7 @@ let gnu_body_result : (Cabs.statement * ((exp * typ) option ref)) ref
   = ref ({stmt_ghost = false; stmt_node = Cabs.NOP (None, cabslu "_NOP")}, ref None)
 
 (*** When we do statements we need to know the current return type *)
-let dummy_function = emptyFunction "@dummy@"
+let dummy_function = Cil_datatype.Fundec.dummy
 let currentReturnType : typ ref = ref voidType
 let currentFunctionFDEC: fundec ref = ref dummy_function
 
@@ -2089,7 +2089,9 @@ struct
     }
 
   let gotoChunk ~ghost (ln: string) (l: location) : chunk =
-    let dummy = {dummyStmt with labels = [Label (ln, l, false)]} in
+    let dummy = {
+      Cil_datatype.Stmt.dummy with labels = [ Label (ln, l, false) ]
+    } in
     let gref = ref dummy in
     addGoto ln gref;
     { stmts = [ mkStmt ~ghost ~valid_sid (Goto (gref, l)),[],[],[],[] ];
@@ -10216,7 +10218,7 @@ and doStatement local_env (s : Cabs.statement) : chunk =
           List.map
             (fun label ->
                let label = lookupLabel ghost label in
-               let gref = ref dummyStmt in
+               let gref = ref Cil_datatype.Stmt.dummy in
                addGoto label gref;
                gref)
             alabels

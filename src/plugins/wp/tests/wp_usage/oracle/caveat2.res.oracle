@@ -18,7 +18,7 @@ Goal Post-condition 'A' in 'job':
 caveat2.i:14: warning from Typed Model:
  - Warning: No allocation size for variable 'b'
    Reason: Undefined array-size (sint32[])
-Let a = global(G_b_28).
+Let a = global(G_b_27).
 Assume {
   Type: is_sint32(i_1) /\ is_sint32(n).
   (* Goal *)
@@ -55,7 +55,7 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Preservation of Invariant (file caveat2.i, line 22):
-Let a = global(G_b_28).
+Let a = global(G_b_27).
 Assume {
   Type: is_sint32(i) /\ is_sint32(n) /\ is_sint32(1 + i).
   (* Goal *)

@@ -73,11 +73,18 @@ let of_string ?(existence=Indifferent) ?base s =
 (* --- Datatype                                                           --- *)
 (* -------------------------------------------------------------------------- *)
 
+(** Avoid using {!of_string} here because {!Hpath.of_string} prefixes the string
+    with the current working directory. We need to make sure the path is the
+    same for all executions of Frama-C because {!dummy} is used in the reprs
+    of the datatype and having different dummies can break loads/saves.
+*)
+let dummy = "@dummy_filepath@"
+
 include Datatype.Make_with_collections (struct
     include Datatype.Serializable_undefined
     type nonrec t = string
     let name = "Filepath"
-    let reprs = [ of_string "/" ]
+    let reprs = [ dummy ]
     let equal = String.equal
     let compare = String.compare
     let hash = Hashtbl.hash (* String.hash only introduced in OCaml 5.0 *)

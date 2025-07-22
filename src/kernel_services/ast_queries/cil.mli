@@ -126,9 +126,6 @@ val iterFormalsDecl: (varinfo -> varinfo list -> unit) -> unit
 *)
 val getFormalsDecl: varinfo -> varinfo list
 
-(** A dummy file *)
-val dummyFile: file
-
 (** Iterate over all globals, including the global initializer *)
 val iterGlobals: file -> (global -> unit) -> unit
 
@@ -1020,13 +1017,6 @@ val mkStmtOneInstr: ?ghost:bool -> ?valid_sid:bool -> ?sattr:attributes ->
 *)
 val mkEmptyStmt: ?ghost:bool -> ?valid_sid:bool -> ?sattr:attributes ->
   ?loc:location -> unit -> stmt
-
-(** A instr to serve as a placeholder *)
-val dummyInstr: instr
-
-(** A statement consisting of just [dummyInstr].
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
-val dummyStmt: stmt
 
 (** Create an instruction equivalent to a pure expression. The new instruction
     corresponds to the initialization of a new fresh variable, i.e.
@@ -2024,3 +2014,23 @@ val set_extension_handler:
     @since 21.0-Scandium
     @before 30.0-Zinc This function did not take a [plugin:string] parameter
 *)
+
+(* ************************************************************************* *)
+(** {2 Deprecated definitions}                                               *)
+(* ************************************************************************* *)
+
+(** A instr to serve as a placeholder *)
+val dummyInstr: instr
+[@@deprecated "Use Cil_datatype.Instr.dummy instead."]
+[@@migrate { repl = Cil_datatype.Instr.dummy } ]
+
+(** A statement consisting of just [dummyInstr].
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
+val dummyStmt: stmt
+[@@deprecated "Use Cil_datatype.Stmt.dummy instead."]
+[@@migrate { repl = Cil_datatype.Stmt.dummy } ]
+
+(** A dummy file *)
+val dummyFile: file
+[@@deprecated "Use Cil_datatype.Stmt.dummy instead."]
+[@@migrate { repl = Cil_datatype.Stmt.dummy } ]

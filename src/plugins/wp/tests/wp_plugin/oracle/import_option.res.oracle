@@ -23,7 +23,7 @@ Prove: L_to_opt_t(p) != option.Option.None.
 ------------------------------------------------------------
 
 Goal Post-condition for 'other' (file import_option.i, line 19) in 'f':
-Let a = global(G_g_33).
+Let a = global(G_g_32).
 Assume { Type: is_sint32(i). (* Pre-condition for 'other' *) Have: i != 0. }
 Prove: L_to_opt(Mint_0[a <- 42], a) = option.Option.Some(42).
 

@@ -56,7 +56,7 @@ module CyclomaticMetricsGUI = struct
 
   class cyclo_class ~libc (main_ui:Design.main_window_extension_points) = object(self)
 
-    val mutable checked_fun = Kernel_function.dummy ()
+    val mutable checked_fun = Cil_datatype.Kf.dummy
 
     method get_data =
       let checker = (new Metrics__Metrics_cilast.slocVisitor ~libc) in

@@ -10,21 +10,21 @@
 
 Goal Post-condition 'LOCAL' in 'job':
 Assume { (* Heap *) Type: linked(Malloc_0). }
-Prove: !valid_rw(Malloc_0[P_formal_28 <- 1][L_local_30 <- 0][P_formal_28
-                   <- 0], global(L_local_30), 1).
+Prove: !valid_rw(Malloc_0[P_formal_27 <- 1][L_local_29 <- 0][P_formal_27
+                   <- 0], global(L_local_29), 1).
 
 ------------------------------------------------------------
 
 Goal Post-condition 'FORMAL' in 'job':
 Assume { (* Heap *) Type: linked(Malloc_0). }
-Prove: valid_rw(Malloc_0[P_formal_28 <- 1][L_local_30 <- 0][P_formal_28 <- 0],
-         global(P_formal_28), 1).
+Prove: valid_rw(Malloc_0[P_formal_27 <- 1][L_local_29 <- 0][P_formal_27 <- 0],
+         global(P_formal_27), 1).
 
 ------------------------------------------------------------
 
 Goal Post-condition 'GLOBAL' in 'job':
 Assume { (* Heap *) Type: linked(Malloc_0). }
-Prove: valid_rw(Malloc_0[P_formal_28 <- 1][L_local_30 <- 0][P_formal_28 <- 0],
-         global(G_global_22), 1).
+Prove: valid_rw(Malloc_0[P_formal_27 <- 1][L_local_29 <- 0][P_formal_27 <- 0],
+         global(G_global_21), 1).
 
 ------------------------------------------------------------

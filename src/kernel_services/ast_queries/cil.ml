@@ -2728,9 +2728,6 @@ let mkEmptyStmt ?ghost ?valid_sid ?sattr ?(loc=Location.unknown) () =
 let mkStmtOneInstr ?ghost ?valid_sid ?sattr i =
   mkStmt ?ghost ?valid_sid ?sattr (Instr i)
 
-let dummyInstr = Asm([], ["dummy statement!!"], None, Location.unknown)
-let dummyStmt = mkStmt (Instr dummyInstr)
-
 let isSignedInteger ty =
   match Ast_types.unroll_skel ty with
   | TInt ik | TEnum {ekind=ik} -> isSigned ik
@@ -4306,12 +4303,6 @@ let emptyFunction name =
   let vi =
     makeGlobalVar ~temp:false name Cil_const.(mk_tfun voidType (Some []) false)
   in emptyFunctionFromVI vi
-
-let dummyFile =
-  { globals = [];
-    fileName = Filepath.of_string "<dummy>";
-    globinit = None;
-    globinitcalled = false;}
 
 let rec lastOffset (off: offset) : offset =
   match off with
@@ -6703,3 +6694,11 @@ end
 let typeDeepDropAllAttributes t =
   let vis = new dropAttributes () in
   visitCilType vis t
+
+(* ****************************** *)
+(* Forward deprecated definitions *)
+(* ****************************** *)
+
+let dummyInstr = Cil_datatype.Instr.dummy
+let dummyStmt  = Cil_datatype.Stmt.dummy
+let dummyFile  = Cil_datatype.File.dummy

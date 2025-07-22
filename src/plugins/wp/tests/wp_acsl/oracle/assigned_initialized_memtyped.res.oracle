@@ -51,8 +51,8 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Check 'FAILS' (file assigned_initialized_memtyped.i, line 126):
-Assume { (* Heap *) Type: (region(G_glob_84) <= 0) /\ scinit(Init_0). }
-Prove: IsInit_S1_S(global(G_glob_84), Init_0).
+Assume { (* Heap *) Type: (region(G_glob_83) <= 0) /\ scinit(Init_0). }
+Prove: IsInit_S1_S(global(G_glob_83), Init_0).
 
 ------------------------------------------------------------
 
@@ -69,7 +69,7 @@ Let a_2 = memcpy(Init_0[shiftfield_F1_S_i(pg_0) <- true], a_1, Init_undef_0,
 Assume {
   Type: is_sint32(i) /\ is_sint32(1 + i).
   (* Heap *)
-  Type: (region(G_glob_84) <= 0) /\ (region(pg_0.base) <= 0) /\
+  Type: (region(G_glob_83) <= 0) /\ (region(pg_0.base) <= 0) /\
       scinit(Init_0).
   (* Invariant 'CHECK' *)
   Have: (0 <= i) /\ (i <= 10) /\
@@ -92,7 +92,7 @@ Let a_2 = memcpy(Init_0[shiftfield_F1_S_i(pg_0) <- true], a_1, Init_undef_0,
 Assume {
   Type: is_sint32(i) /\ is_sint32(i_1).
   (* Heap *)
-  Type: (region(G_glob_84) <= 0) /\ (region(pg_0.base) <= 0) /\
+  Type: (region(G_glob_83) <= 0) /\ (region(pg_0.base) <= 0) /\
       scinit(Init_0).
   (* Invariant 'CHECK' *)
   Have: (0 <= i) /\ (i <= 10) /\
@@ -117,7 +117,7 @@ Let a_2 = memcpy(Init_0[shiftfield_F1_S_i(pg_0) <- true], a_1, Init_undef_0,
 Assume {
   Type: is_sint32(i) /\ is_sint32(i_1).
   (* Heap *)
-  Type: (region(G_glob_84) <= 0) /\ (region(pg_0.base) <= 0) /\
+  Type: (region(G_glob_83) <= 0) /\ (region(pg_0.base) <= 0) /\
       scinit(Init_0).
   (* Invariant 'CHECK' *)
   Have: (0 <= i) /\ (i <= 10) /\
@@ -130,7 +130,7 @@ Assume {
   (* Else *)
   Have: 10 <= i_1.
 }
-Prove: IsInit_S1_S(global(G_glob_84),
+Prove: IsInit_S1_S(global(G_glob_83),
          memcpy(a_2, pg_0, Init_undef_1, pg_0, 11)).
 
 ------------------------------------------------------------

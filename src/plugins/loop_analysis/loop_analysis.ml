@@ -256,7 +256,7 @@ module Store(* (B:sig *)
     Format.fprintf fmt "@]}@ conds=@ (%a)@]]" B.pretty_conds conds
   ;;
 
-  let bottom = (Varinfo.Map.empty,[],Cil.dummyStmt)
+  let bottom = (Varinfo.Map.empty,[],Cil_datatype.Stmt.dummy)
   let init stmt = (Varinfo.Map.empty,[],stmt)
 
   let load map = let open Cil_types in function
@@ -267,12 +267,12 @@ module Store(* (B:sig *)
       | _ -> None
 
   let join2_stmts stmt1 stmt2 =
-    (* Cil.dummyStmt is bottom for statements. *)
+    (* Cil_datatype.Stmt.dummy is bottom for statements. *)
     if Cil_datatype.Stmt.equal stmt1 stmt2
     then stmt1
-    else if Cil_datatype.Stmt.equal stmt1 Cil.dummyStmt
+    else if Cil_datatype.Stmt.equal stmt1 Cil_datatype.Stmt.dummy
     then stmt2
-    else if Cil_datatype.Stmt.equal stmt2 Cil.dummyStmt
+    else if Cil_datatype.Stmt.equal stmt2 Cil_datatype.Stmt.dummy
     then stmt1
     else assert false
   ;;
@@ -324,7 +324,7 @@ module Store(* (B:sig *)
     match stmt.skind with
     | Instr(i) -> map_on_all_succs (do_instr i (mem,conds))
     | Return _ ->
-      [Region_analysis_sig.Exit stmt, (mem,conds,Cil.dummyStmt)]
+      [Region_analysis_sig.Exit stmt, (mem,conds,Cil_datatype.Stmt.dummy)]
     | Loop _ | Goto _ | Break _ | Continue _ | Block _ | UnspecifiedSequence _ ->
       map_on_all_succs value
     | If _ ->
