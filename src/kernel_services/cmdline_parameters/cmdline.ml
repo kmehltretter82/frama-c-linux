@@ -1082,7 +1082,11 @@ let low_print_option_help fmt print_invisible o =
     in
     let name = o.oname in
     if print_invisible || o.ovisible then begin
-      print_helpline fmt (name ^ ty) o.ohelp o.ext_help;
+      let help =
+        if o.osafe then o.ohelp else
+          o.ohelp ^ " [unsafe in sandbox mode]"
+      in
+      print_helpline fmt (name ^ ty) help o.ext_help;
       List.iter
         (fun o ->
            if print_invisible || o.ovisible then
@@ -1232,13 +1236,18 @@ let list_plugins () =
 let pp_option_help name =
   try
     let option = Hashtbl.find Plugin.all_options name in
-    let help =
-      if option.oname = name then option.ohelp else
-        "alias for " ^ option.oname ^ "\n" ^ option.ohelp
+    let help = option.ohelp in
+    let help = (* Add alias information *)
+      if option.oname = name then help else
+        "alias for " ^ option.oname ^ "\n" ^ help
+    in
+    let help = (* Add sandbox mode information *)
+      if option.osafe then help else
+        help ^ "\nThis function is unsafe in sandbox mode."
     in
     let argname = option.argname in
     let name = if argname = "" then name else name ^ " <" ^ argname ^ ">" in
-    let print fmt = print_helpline fmt name help option.ext_help in
+    let print fmt = print_helpline fmt name help (option.ext_help) in
     Log.print_on_output print
   with Not_found ->
     let print fmt = Format.fprintf fmt "Invalid option %s@." name in
