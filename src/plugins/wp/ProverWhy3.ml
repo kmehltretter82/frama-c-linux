@@ -962,8 +962,12 @@ class visitor (ctx:context) c =
     method on_comp = self#on_comp_gen KValue
     method on_icomp = self#on_comp_gen KInit
 
-    method private make_lemma cnv (l: Definitions.dlemma) =
-      let id = Why3.Ident.id_fresh (Lang.lemma_id l.l_name) in
+    method private make_lemma cnv ?prefix (l: Definitions.dlemma) =
+      let name = match prefix with
+        | None -> l.l_name
+        | Some p -> p ^ "_" ^ l.l_name
+      in
+      let id = Why3.Ident.id_fresh (Lang.lemma_id name) in
       let id = Why3.Decl.create_prsymbol id in
       List.iter (Lang.F.add_var cnv.pool) l.l_forall;
       let cnv, vars = Lang.For_export.in_state (mk_binders cnv) l.l_forall in
@@ -1078,7 +1082,7 @@ class visitor (ctx:context) c =
           let make_case (l:Definitions.dlemma) =
             let cnv = empty_cnv ctx in
             Hashtbl.add cnv.incomplete_symbols fname fid ;
-            self#make_lemma cnv l
+            self#make_lemma cnv ~prefix:fname l
           in
           let ind_decl = (fid, List.map make_case dl) in
           ctx.th <- Why3.Theory.add_ind_decl ctx.th Why3.Decl.Ind [ind_decl]

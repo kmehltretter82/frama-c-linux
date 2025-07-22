@@ -29,9 +29,11 @@ theory A_A
   (* use frama_c_wp.cint.Cint *)
   
   inductive is_InAxiomatic A_InAxiomatic =
-    | Q_IAu : forall p:int. is_uint32 p -> is_InAxiomatic (C_IAu p)
-    | Q_IAc : forall p:int. is_sint8 p -> is_InAxiomatic (C_IAc p)
-    | Q_IAi : forall p:int. is_InAxiomatic (C_IAi p)
+    | Q_is_InAxiomatic_IAu :
+        forall p:int. is_uint32 p -> is_InAxiomatic (C_IAu p)
+    | Q_is_InAxiomatic_IAc :
+        forall p:int. is_sint8 p -> is_InAxiomatic (C_IAc p)
+    | Q_is_InAxiomatic_IAi : forall p:int. is_InAxiomatic (C_IAi p)
   
   predicate P_P A_InAxiomatic
   
@@ -85,9 +87,11 @@ theory Axiomatic1
   (* use frama_c_wp.cint.Cint *)
   
   inductive is_AtTopLevel A_AtTopLevel =
-    | Q_TLu : forall p:int. is_uint32 p -> is_AtTopLevel (C_TLu p)
-    | Q_TLc : forall p:int. is_sint8 p -> is_AtTopLevel (C_TLc p)
-    | Q_TLi : forall p:int. is_AtTopLevel (C_TLi p)
+    | Q_is_AtTopLevel_TLu :
+        forall p:int. is_uint32 p -> is_AtTopLevel (C_TLu p)
+    | Q_is_AtTopLevel_TLc :
+        forall p:int. is_sint8 p -> is_AtTopLevel (C_TLc p)
+    | Q_is_AtTopLevel_TLi : forall p:int. is_AtTopLevel (C_TLi p)
   
   (* use A_A *)
   
@@ -168,8 +172,8 @@ theory Axiomatic2
   (* use frama_c_wp.cint.Cint *)
   
   inductive is_Rec A_Rec =
-    | Q_Nil : is_Rec C_Nil
-    | Q_C :
+    | Q_is_Rec_Nil : is_Rec C_Nil
+    | Q_is_Rec_C :
         forall p:int, p1:A_Rec. is_Rec p1 -> is_sint32 p -> is_Rec (C_C p p1)
   
   (* use Axiomatic1 *)
