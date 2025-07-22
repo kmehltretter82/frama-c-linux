@@ -8615,7 +8615,7 @@ and createGlobal loc ghost logic_spec ((t,s,b,attr_list) : (typ * storage * bool
       n docAlphaTable)
     *)
 
-(* it can happen that the variable to be initialized appears in the
+(* It can happen that the variable to be initialized appears in the
    auxiliary statements that contribute to its initialization (and thus
    are meant to occur before the corresponding Local_init statement. In
    that case, this function creates an auxiliary variable that is never
@@ -8624,8 +8624,26 @@ and createGlobal loc ghost logic_spec ((t,s,b,attr_list) : (typ * storage * bool
    the variable (either original or placeholder), the behavior is undefined.
    There are some cases where the evaluation will succeed, though, e.g. with
    size_t x = sizeof(x) > 6 ? sizeof(x): 6;
+
+   There are some cases that are harder to handle correctly. these cases are
+   not supported by Frama-C :
+   - Taking the address of the object being initialized in a side-effect
+     expression. The side-effect will be moved before the initialization, at
+     which point the address does not exist yet. We could use a tmp variable
+     like other cases, but then the address would not be the same.
+   - Assigning the object being initialized inside its initialization, like
+     int array[2]={ array[1] = 42 };
+     These cases could be solved by inlining the Cil_types.init but it's not
+     trivial to do. For example :
+     int array[2];
+     // undefined sequence
+     { array[2] = 42; array[0] = array[1]; }
+     array[1] = 0;
 *)
-and cleanup_autoreference vi chunk =
+and handle_autoreference vi chunk ie =
+  let open Current_loc.Operators in
+  let exception Ignore in
+  let is_last_stmt = ref true in
   let temp = ref None in
   let calls = ref [] in
   let extract_calls () =
@@ -8633,7 +8651,9 @@ and cleanup_autoreference vi chunk =
     calls := [];
     res
   in
-  let vis =
+  (* [update] is used to know if the current lvalue is being updated
+     (modified/written) in the chunk. *)
+  let vis ~update =
     object(self)
       inherit Cil.nopCilVisitor
 
@@ -8643,8 +8663,40 @@ and cleanup_autoreference vi chunk =
           DoChildren
         | _ -> DoChildren
 
+      method! vstmt s =
+        (* No need to check/cleanup autoreferences if this call is collapsed
+           later. A collapse can happen only if the statement is the last one of
+           the chunk (so the first in the list of statement, and not inside a
+           block). We raise an exception instead of just skipping children to
+           make sure lvalues from the chunk are not visited either. *)
+        match s.skind, ie with
+        | Instr (Call (Some (Var v1, NoOffset), f, _, _)),
+          SingleInit { enode = Lval (Var v1', NoOffset) }
+          when !is_last_stmt && can_collapse v1 v1' (Cil.var vi) vi.vtype f ->
+          raise Ignore
+        | Instr (Call (Some (Var v1, NoOffset), f, _, _)),
+          SingleInit { enode = CastE(newt, { enode = Lval(Var v1', NoOffset)}) }
+          when !is_last_stmt && can_collapse v1 v1' (Cil.var vi) newt f ->
+          raise Ignore
+        | _ ->
+          is_last_stmt := false;
+          DoChildren
+
+      method! vexpr e =
+        match e.enode with
+        | AddrOf (Var v, _) when Cil_datatype.Varinfo.equal v vi ->
+          Kernel.not_yet_implemented ~current:true
+            "Attempting to take %s address ('%a') inside its own initialization \
+             with side effects (not supported by frama-c)."
+            vi.vname Cil_printer.pp_exp e
+        | _ -> DoChildren
+
       method! vvrbl v =
         if Cil_datatype.Varinfo.equal v vi then begin
+          if update then
+            Kernel.not_yet_implemented ~current:true
+              "Attempting to write %s inside its own initialization \
+               (not supported by frama-c)." vi.vname;
           match !temp with
           | Some v' -> ChangeTo v'
           | None ->
@@ -8658,14 +8710,19 @@ and cleanup_autoreference vi chunk =
         end else SkipChildren
     end
   in
-  let transform_lvals l = List.map (visitCilLval vis) l in
-  let treat_one (s, m, w, r, _) =
-    let s' = visitCilStmt vis s in
-    let m' = transform_lvals m in
-    let w' = transform_lvals w in
-    let r' = transform_lvals r in
-    let c' = extract_calls () in
-    (s', m', w', r', c')
+  let transform_lvals ~update l =
+    List.map (visitCilLval (vis ~update)) l
+  in
+  let treat_one ((s, m, w, r, _) as stmt) =
+    let<> UpdatedCurrentLoc = Cil_datatype.Stmt.loc s in
+    try
+      let s' = visitCilStmt (vis ~update:false) s in
+      let m' = transform_lvals ~update:true m in
+      let w' = transform_lvals ~update:true w in
+      let r' = transform_lvals ~update:false r in
+      let c' = extract_calls () in
+      (s', m', w', r', c')
+    with Ignore -> stmt
   in
   let stmts = List.map treat_one chunk.stmts in
   match !temp with
@@ -8909,7 +8966,7 @@ and createLocal ghost ((_, sto, _, _) as specs)
       let se4, ie', et, r =
         doInitializer loc (ghost_local_env ghost) vi inite
       in
-      let se4 = cleanup_autoreference vi se4 in
+      let se4 = handle_autoreference vi se4 ie' in
       (* Fix the length *)
       if Ast_types.is_unsized_array vi.vtype && Ast_types.is_sized_array et
       then

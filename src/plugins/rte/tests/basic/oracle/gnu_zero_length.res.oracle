@@ -10,9 +10,8 @@ struct S {
 int main(void)
 {
   int __retres;
-  struct S *tmp_0;
   unsigned int l = (unsigned int)3;
-  struct S *s = malloc(sizeof(*tmp_0) + sizeof(int) * l);
+  struct S *s = malloc(sizeof(*s) + sizeof(int) * l);
   if (s) {
     /*@ assert rte: mem_access: \valid(&s->length); */
     s->length = l;

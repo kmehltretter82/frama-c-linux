@@ -15,9 +15,8 @@ struct fam {
 int main(void)
 {
   int __retres;
-  struct fam *tmp_0;
   struct st st1 = {.a = 2, .b = (char)0, .p = (void *)0};
-  struct fam *fam = malloc(sizeof(tmp_0) + sizeof(int) * (unsigned int)10);
+  struct fam *fam = malloc(sizeof(*fam) + sizeof(int) * (unsigned int)10);
   fam->fam[9] = 0;
   __retres = (int)st1.b + fam->fam[9];
   return __retres;

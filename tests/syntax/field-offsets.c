@@ -18,7 +18,7 @@ struct fam {
 
 int main() {
   struct st st1 = { 2 };
-  struct fam *fam = malloc(sizeof(fam) + sizeof(int)*10);
+  struct fam *fam = malloc(sizeof(*fam) + sizeof(int)*10);
   fam->fam[9] = 0;
   return st1.b + fam->fam[9];
 }

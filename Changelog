@@ -18,6 +18,9 @@
 Open Source Release <next-release>
 ###############################################################################
 
+-*  Kernel    [2025-07-22] Improve auto-reference support in initializations,
+              and remove support for few variations like auto-affectation during
+              initialization (fix #@563)
 o   Kernel    [2025-07-03] Deprecate `Project.unique_name`. Use `pid` or  `name`
               instead depending on the use-case.
 -*  Kernel    [2025-06-30] Do not define __STDC_* macros in logic_preprocess,
