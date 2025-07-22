@@ -354,6 +354,15 @@ let get_status g =
     verdict = (ProofEngine.consolidated g).best ;
   }
 
+let get_ast_dependencies g =
+  let open Wpo in
+  let module Stmts = Cil_datatype.Stmt.Set in
+  let module Props = Property.Set in
+  let add_stmt s l = Printer_tag.localizable_of_stmt s :: l in
+  let add_prop p l = Printer_tag.PIP p :: l in
+  Stmts.fold add_stmt g.po_formula.path @@
+  Props.fold add_prop g.po_formula.deps []
+
 let () = S.column gmodel ~name:"marker"
     ~descr:(Md.plain "Associated Marker")
     ~data:(module AST.Marker) ~get:get_marker
@@ -417,6 +426,11 @@ let () = S.column gmodel ~name:"saved"
     ~data:(module D.Jbool)
     ~get:(fun wpo -> ProofEngine.get wpo = `Saved)
 
+let () = S.column gmodel ~name:"deps"
+    ~descr:(Md.plain "Dependencies")
+    ~data:(module D.Jlist(AST.Marker))
+    ~get:get_ast_dependencies
+
 let filter hook fn = hook (fun g -> if not @@ Wpo.is_tactic g then fn g)
 let (++) h1 h2 fn = h1 fn ; h2 fn
 
@@ -437,6 +451,30 @@ let goals =
     ~add_update_hook
     ~add_reload_hook
     gmodel
+
+let () =
+  R.register ~package ~kind:`GET ~name:"getGoalsFromASTMarker"
+    ~descr:(Md.plain "Get goals from AST marker")
+    ~input:(module AST.Marker)
+    ~output:(module D.Jlist(Goal))
+    begin fun marker ->
+      let open Printer_tag in
+      let has_marker g =
+        let is_marker = Localizable.equal marker in
+        let in_stmt = match g.Wpo.po_formula.source with
+          | Some(stmt,_) -> is_marker @@ localizable_of_stmt stmt
+          | None -> false
+        in
+        in_stmt ||
+        match WpPropId.property_of_id g.Wpo.po_pid with
+        | IPOther {io_loc = OLStmt(_,s)} -> is_marker @@ localizable_of_stmt s
+        | ip -> is_marker @@ Printer_tag.PIP ip
+      in
+      let select g = has_marker g && not @@ Wpo.is_tactic g in
+      let l = ref [] in
+      Wpo.iter_on_goals(fun g -> if select g then l := g :: !l) ;
+      List.sort Wpo.S.compare !l
+    end
 
 (* -------------------------------------------------------------------------- *)
 (* --- Generate RTEs                                                      --- *)
