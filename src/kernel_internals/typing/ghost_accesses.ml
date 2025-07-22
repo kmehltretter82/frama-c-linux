@@ -174,8 +174,8 @@ class visitor = object(self)
           Error.assigns_non_ghost_lvalue ~current:true lv
       in
       let failed = match i with
-        | Call(_, flv, _, _) ->
-          begin match Kernel_function.(Option.map get_vi @@ get_called flv) with
+        | Call(_, f, _, _) ->
+          begin match Kernel_function.(Option.map get_vi @@ get_called f) with
             | Some fct
               when not (Ast_info.is_frama_c_builtin fct) && not fct.vghost ->
               Error.non_ghost_function_call_in_ghost ~current:true () ; true

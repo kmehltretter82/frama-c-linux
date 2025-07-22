@@ -493,7 +493,7 @@ module Computer(I: Init) = struct
     match i with
     | Call (_, Var v, args, _) ->
       do_call s v args d
-    | Call (_,lv,args,loc) ->
+    | Call (_,f,args,loc) ->
       (match Dyncall.get s with
        | Some (_,l) ->
          let (state,loops) = d in
@@ -508,7 +508,7 @@ module Computer(I: Init) = struct
        | None ->
          Aorai_option.not_yet_implemented
            ~source:(fst loc)
-           "Indirect call to %a is not handled yet" Printer.pp_lhost lv)
+           "Indirect call to %a is not handled yet" Printer.pp_lhost f)
     | Local_init (v, ConsInit(f,args,kind),_) ->
       let args =
         match kind with
@@ -836,7 +836,7 @@ struct
   let doInstr s instr state =
     match instr with
     | Call (_, Var f,_,_) -> do_call s f state
-    | Call (_,lv,_,loc) ->
+    | Call (_,f,_,loc) ->
       (match Dyncall.get s with
        | Some (_,l) ->
          List.fold_left
@@ -846,7 +846,7 @@ struct
        | None ->
          Aorai_option.not_yet_implemented
            ~source:(fst loc)
-           "Indirect call to %a is not handled yet" Printer.pp_lhost lv)
+           "Indirect call to %a is not handled yet" Printer.pp_lhost f)
     | Local_init (_,ConsInit(f,_,_),_) -> do_call s f state
     | Local_init (_,AssignInit _,_)
     | Set _ | Asm _ | Skip _ | Code_annot _ -> Dataflow2.Default

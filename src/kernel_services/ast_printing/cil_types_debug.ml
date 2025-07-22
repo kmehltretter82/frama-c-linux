@@ -562,8 +562,8 @@ and pp_local_init fmt = function
 
 and pp_instr fmt = function
   | Set(lval,exp,location) -> Format.fprintf fmt "Set(%a,%a,%a)"  pp_lval lval  pp_exp exp  pp_location location
-  | Call(lval_option,lv,exp_list,location) ->
-    Format.fprintf fmt "Call(%a,%a,%a,%a)"  (pp_option pp_lval) lval_option  pp_lhost lv
+  | Call(lval_option,f,exp_list,location) ->
+    Format.fprintf fmt "Call(%a,%a,%a,%a)"  (pp_option pp_lval) lval_option  pp_lhost f
       (pp_list pp_exp) exp_list  pp_location location
   | Asm(attributes,string_list,extended_asm_option,location) ->
     Format.fprintf fmt "Asm(%a,%a,%a,%a)"  pp_attributes attributes  (pp_list pp_string) string_list
