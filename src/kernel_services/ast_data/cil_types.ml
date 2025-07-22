@@ -904,14 +904,14 @@ and init =
       GCC since MSVC does not understand this. You can scan an initializer list
       with {!Cil.foldLeftCompound}. *)
 
-and init_or_str =
-  | CInit of init (** standard initialisation. *)
-  | StrInit of string
-  (** Initialization of a const char array representing a string literal.
+(** since @Frama-C+dev *)
+and str_literal =
+  | Lit_str of string
+  (** a const char array representing a string literal.
       The escape characters inside the string have been already
-      interpreted. This constant has array of characters type *)
-
-  | WStrInit of int64 list
+      interpreted.
+  *)
+  | Lit_wstr of int64 list
   (** Initialization of a const wide character string literal.
       Note that the local interpretation of such
       a literal depends on {!Machine.wchar_type} and
@@ -921,6 +921,11 @@ and init_or_str =
       "A\xabcd" rather than being represented as the wide character list with
       two elements: 65 and 43981. That "interpretation" depends on the
       underlying wide character type. *)
+
+(** since @Frama-C+dev *)
+and init_or_str =
+  | CInit of init (** standard initialisation. *)
+  | StrInit of str_literal
 
 (** We want to be able to update an initializer in a global variable, so we
     define it as a mutable field *)

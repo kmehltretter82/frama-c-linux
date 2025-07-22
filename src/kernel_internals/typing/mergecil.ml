@@ -2501,13 +2501,18 @@ and equalLvals (x: lval) (y: lval) : bool =
     | _,_ -> false
   end
 
+let equal_str_literal lit1 lit2 =
+  match lit1, lit2 with
+  | Lit_str s1, Lit_str s2 -> String.equal s1 s2
+  | Lit_wstr l1, Lit_wstr l2 ->
+    list_compare Int64.compare l1 l2 = 0
+  | (Lit_str _ | Lit_wstr _), _ -> false
+
 let equal_init_or_str i1 i2 =
   match i1, i2 with
   | CInit i1, CInit i2 -> equalInits i1 i2
-  | StrInit s1, StrInit s2 -> String.equal s1 s2
-  | WStrInit l1, WStrInit l2 ->
-    list_compare Int64.compare l1 l2 = 0
-  | (CInit _ | StrInit _ | WStrInit _), _ -> false
+  | StrInit lit1, StrInit lit2 -> equal_str_literal lit1 lit2
+  | (CInit _ | StrInit _), _ -> false
 
 let equalInitOpts x y =
   match x,y with

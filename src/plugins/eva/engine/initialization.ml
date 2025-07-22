@@ -140,7 +140,7 @@ module Make
       in
       match init with
       | CInit init -> aux lval init state
-      | StrInit s ->
+      | StrInit (Lit_str s) ->
         if Ast_types.is_any_char_array lval.typ then begin
           let _, size = Ast_types.array_elem_type_and_size lval.typ in
           let open Option.Operators in
@@ -173,7 +173,7 @@ module Make
         end else
           Self.fatal
             "String literal can only be used to initialize a char array"
-      | WStrInit a ->
+      | StrInit (Lit_wstr a) ->
         let error () =
           Self.fatal
             "Initialization of %a of type %a with wide string literal"
@@ -290,7 +290,6 @@ module Make
     match i with
     | Cil_types.CInit i -> aux state lval i
     | StrInit _ -> Self.not_yet_implemented "StrInit"
-    | WStrInit _ -> Self.not_yet_implemented "WStrInit"
 
   (* Initializes [vi] as if in [-lib-entry] mode. Active when [-lib-entry] is
      set, or when [vi] is extern. [const] initializers, explicit or implicit,

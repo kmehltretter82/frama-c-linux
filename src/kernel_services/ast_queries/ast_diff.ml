@@ -898,10 +898,10 @@ and is_same_init i i' env =
 and is_same_init_or_str i i' env =
   match i,i' with
   | CInit i, CInit i' -> is_same_init i i' env
-  | StrInit s, StrInit s' -> String.equal s s'
-  | WStrInit s, WStrInit s' ->
+  | StrInit (Lit_str s), StrInit (Lit_str s') -> String.equal s s'
+  | StrInit (Lit_wstr s), StrInit (Lit_wstr s') ->
     is_same_list (fun v v' _ -> Int64.equal v v') s s' env
-  | (CInit _ | StrInit _ | WStrInit _), _ -> false
+  | (CInit _ | StrInit _), _ -> false
 
 and is_same_initinfo i i' env =
   is_same_opt is_same_init_or_str i.init i'.init env

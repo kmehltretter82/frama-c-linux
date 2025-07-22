@@ -177,8 +177,8 @@ let add_instr ~kf (m:map) (s:stmt) (instr:instr) =
     add_function m s f;
     List.iter (add_value m s) es ;
     let result = Option.map
-        (fun lv ->
-           let r = add_lval m s lv in
+      (fun lv ->
+         let r = add_lval m s lv in
            Memory.add_write r (Lval(s,lv)) ; r
         ) lr
     in add_call ~kf ~stmt:s m ~result f es

@@ -52,6 +52,16 @@ module Vars = struct
 
   exception AlreadyExists of varinfo * initinfo
 
+  let get_literal_string vi =
+    match find vi with
+    | { init = Some (StrInit lit) } -> lit
+    | _ ->
+      Kernel.fatal
+        "Variable %a is not a string literal" Cil_printer.pp_varinfo vi
+    | exception Not_found ->
+      Kernel.fatal
+        "Variable %a is not a known global" Cil_printer.pp_varinfo vi
+
   let add vi info =
     ignore
       (memo

@@ -82,7 +82,6 @@ let inject_in_init env vi off i =
   match i with
   | CInit i -> aux env off i
   | StrInit _ -> Options.not_yet_implemented "StrInit"
-  | WStrInit _ -> Options.not_yet_implemented "WStrInit"
 
 let inject_in_local_init ~loc env kf vi = function
   | ConsInit (fvi, sz :: _, _) as init

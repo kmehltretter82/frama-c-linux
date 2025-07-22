@@ -434,7 +434,6 @@ let build_node_writes context node =
       match init with
       | CInit (CompoundInit _) -> None (* Do not generate nodes for Compounds for now *)
       | StrInit _ -> None (* same as a compound init *)
-      | WStrInit _ -> None (* same a a compound init *)
       | CInit (SingleInit exp) -> Some exp
     in
     build_lvals_deps ~origin gstmt Data ?exp lvals

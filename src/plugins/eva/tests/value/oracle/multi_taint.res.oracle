@@ -131,16 +131,14 @@
 [from] Function multi_taint_test:
   Frama_C_entropy_source FROM Frama_C_entropy_source (and SELF)
 [from] Function scanf_va_1:
-  taint_var FROM S___fc_stdin[0]; "%d"[bits 0 to 23]
-  S___fc_stdin[0].__fc_FILE_data
-              FROM S___fc_stdin[0]; "%d"[bits 0 to 23] (and SELF)
-  \result FROM S___fc_stdin[0]; "%d"[bits 0 to 23]
+  taint_var FROM "%d"[0..2]; S___fc_stdin[0]
+  S___fc_stdin[0].__fc_FILE_data FROM "%d"[0..2]; S___fc_stdin[0] (and SELF)
+  \result FROM "%d"[0..2]; S___fc_stdin[0]
 [from] Function taint_simplify_singletons:
   NO EFFECTS
 [from] Function main:
   Frama_C_entropy_source FROM Frama_C_entropy_source (and SELF)
-  S___fc_stdin[0].__fc_FILE_data
-              FROM S___fc_stdin[0]; "%d"[bits 0 to 23] (and SELF)
+  S___fc_stdin[0].__fc_FILE_data FROM "%d"[0..2]; S___fc_stdin[0] (and SELF)
   \result FROM \nothing
 [from] ====== END OF DEPENDENCIES ======
 [inout] Out (internal) for function multi_taint_test:
@@ -154,4 +152,4 @@
 [inout] Out (internal) for function main:
     Frama_C_entropy_source; taint_var; __retres; S___fc_stdin[0].__fc_FILE_data
 [inout] Inputs for function main:
-    Frama_C_entropy_source; undet; S___fc_stdin[0]; "%d"[bits 0 to 23]
+    Frama_C_entropy_source; undet; "%d"[0..2]; S___fc_stdin[0]

@@ -1659,7 +1659,7 @@ and visitCilInit_or_str vis vi i =
     | CInit init ->
       let init' = visitCilInit vis vi NoOffset init in
       if init != init' then CInit init' else i
-    | StrInit _ | WStrInit _ -> i
+    | StrInit _ -> i
   in
   doVisitCil vis id (vis#vinit_or_str vi) childrenInit_or_str i
 

@@ -88,7 +88,7 @@ class constGlobSubstVisitorClass : cilVisitor = object
            | CInit i,_ ->
              let newexp = find_replace NoOffset i zero_exp in
              ChangeTo newexp
-           | StrInit s, Index (i,NoOffset) ->
+           | StrInit (Lit_str s), Index (i,NoOffset) ->
              let l = Z.of_int (String.length s) in
              (match Cil.constFoldToInt i with
               | Some z when Z.geq Z.zero z && Z.lt z l ->
@@ -98,7 +98,7 @@ class constGlobSubstVisitorClass : cilVisitor = object
                 ChangeTo (Cil.new_exp ~loc (Const (CChr '\000')))
               | Some _ | None -> DoChildren
              )
-           | WStrInit l, Index(i,NoOffset) ->
+           | StrInit (Lit_wstr l), Index(i,NoOffset) ->
              let len = Z.of_int (List.length l) in
              (match Cil.constFoldToInt i with
               | Some z when Z.geq Z.zero z && Z.lt z len ->
@@ -108,7 +108,7 @@ class constGlobSubstVisitorClass : cilVisitor = object
               | Some z when Z.equal z len ->
                 ChangeTo (Cil.kinteger64 ~loc ~kind:(Machine.wchar_kind()) Z.zero)
               | Some _ | None -> DoChildren)
-           | (StrInit _ | WStrInit _), _ -> DoChildren)
+           | StrInit _, _ -> DoChildren)
         | exception Not_found ->
           DoChildren
       end

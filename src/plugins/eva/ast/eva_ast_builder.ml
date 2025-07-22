@@ -103,7 +103,6 @@ let translate_init_or_str : Cil_types.init_or_str -> Eva_ast_types.init_or_str =
   function
   | CInit i -> CInit (translate_init i)
   | StrInit s -> StrInit s
-  | WStrInit l -> WStrInit l
 
 (* --- Relations --- *)
 

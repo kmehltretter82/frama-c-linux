@@ -12,7 +12,6 @@ let type_of_const : constant -> typ = function
   | CTopInt ik -> Cil_const.mk_tint ik
   | CInt64 (_, ik, _) -> Cil_const.mk_tint ik
   | CChr _ -> Cil_const.intType
-  | CString (_) -> assert false (* it must be a String base*)
   | CReal (_, fk, _) -> Cil_const.mk_tfloat fk
   | CEnum (_ei, e) -> e.typ
 

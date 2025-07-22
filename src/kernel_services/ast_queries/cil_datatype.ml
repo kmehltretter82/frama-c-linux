@@ -677,19 +677,19 @@ module Typeinfo = struct
   }
 
   include Make_with_collections
-    (struct
-      include Datatype.Undefined
-      type t = typeinfo
-      let name = "Type_info"
-      let reprs =
-        [ { torig_name = "";
-            tname = "";
+      (struct
+        include Datatype.Undefined
+        type t = typeinfo
+        let name = "Type_info"
+        let reprs =
+          [ { torig_name = "";
+              tname = "";
               ttype = List.hd Typ.reprs;
-            treferenced = false } ]
-      let compare v1 v2 = String.compare v1.tname v2.tname
-      let hash v = Hashtbl.hash v.tname
-      let equal v1 v2 = v1.tname = v2.tname
-    end)
+              treferenced = false } ]
+        let compare v1 v2 = String.compare v1.tname v2.tname
+        let hash v = Hashtbl.hash v.tname
+        let equal v1 v2 = v1.tname = v2.tname
+      end)
 end
 
 module Exp = struct
@@ -751,21 +751,21 @@ module Varinfo_Id = struct
     vname = "@dummy_varinfo@";
     vorig_name = "@dummy_varinfo@";
     vtype    = Typ.dummy;
-      vattr = [];
-      vstorage = NoStorage;
-      vglob = false;
-      vdefined = false;
-      vformal = false;
-      vinline = false;
+    vattr = [];
+    vstorage = NoStorage;
+    vglob = false;
+    vdefined = false;
+    vformal = false;
+    vinline = false;
     vdecl    = Location.dummy;
-      vid = -1;
-      vaddrof = false;
-      vreferenced = false;
-      vtemp = false;
-      vdescr = None;
-      vdescrpure = false;
-      vghost = false;
-      vsource = false;
+    vid = -1;
+    vaddrof = false;
+    vreferenced = false;
+    vtemp = false;
+    vdescr = None;
+    vdescrpure = false;
+    vghost = false;
+    vsource = false;
     vlogic_var_assoc = None;
   }
 
@@ -964,36 +964,36 @@ end
 module Make_compare_non_strict(M: Make_cmp_input) = struct
   let dummy = M.dummy
   include Make_with_collections(struct
-    include M
-    let compare = M.compare ~structural:false ~strict:false
-  end)
+      include M
+      let compare = M.compare ~structural:false ~strict:false
+    end)
 end
 
 module Make_compare_strict(M: Make_cmp_input) = struct
   let dummy = M.dummy
   include Make_with_collections(struct
-    include M
-    let compare = M.compare ~structural:false ~strict:true
-    let name = M.name ^ "Strict"
-  end)
+      include M
+      let compare = M.compare ~structural:false ~strict:true
+      let name = M.name ^ "Strict"
+    end)
 end
 
 module Make_compare_strict_sized(M: Make_cmp_input) = struct
   let dummy = M.dummy
   include Make_with_collections(struct
-    include M
-    let compare = M.compare ~structural:true ~strict:true
-    let name = M.name ^ "StrictSized"
-  end)
+      include M
+      let compare = M.compare ~structural:true ~strict:true
+      let name = M.name ^ "StrictSized"
+    end)
 end
 
 module Make_compare_non_strict_sized(M: Make_cmp_input) = struct
   let dummy = M.dummy
   include Make_with_collections(struct
-    include M
-    let compare = M.compare ~structural:true ~strict:false
-    let name = M.name ^ "Sized"
-  end)
+      include M
+      let compare = M.compare ~structural:true ~strict:false
+      let name = M.name ^ "Sized"
+    end)
 end
 
 module StructEq =
@@ -1359,7 +1359,7 @@ module Builtin_logic_info = struct
     bl_params  = [];
     bl_type    = None;
     bl_profile = [];
-            }
+  }
 
   include Make_with_collections
       (struct
@@ -1678,12 +1678,12 @@ module Model_info = struct
       let equal = Datatype.from_compare
       let hash mi = Hashtbl.hash mi.mi_name + 3 * Typ.hash mi.mi_base_type
       let copy mi = {
-          mi_name = mi.mi_name;
-          mi_base_type = Typ.copy mi.mi_base_type;
-          mi_field_type = Logic_type.copy mi.mi_field_type;
-          mi_decl = Location.copy mi.mi_decl;
-          mi_attr = List.map Attribute.copy mi.mi_attr
-        }
+        mi_name = mi.mi_name;
+        mi_base_type = Typ.copy mi.mi_base_type;
+        mi_field_type = Logic_type.copy mi.mi_field_type;
+        mi_decl = Location.copy mi.mi_decl;
+        mi_attr = List.map Attribute.copy mi.mi_attr
+      }
       let pretty fmt t = !pretty_ref fmt t
     end)
 end
@@ -2830,51 +2830,51 @@ module Syntactic_scope = struct
   let dummy = Program
 
   include Make_with_collections
-    (struct
-      include Datatype.Serializable_undefined
-      type t = syntactic_scope
-      let name = "Syntactic_scope"
+      (struct
+        include Datatype.Serializable_undefined
+        type t = syntactic_scope
+        let name = "Syntactic_scope"
         let reprs = [ dummy ]
-      let compare s1 s2 =
-        match s1, s2 with
-        | Global, Global -> 0
-        | Global, _ -> 1
-        | _, Global -> -1
-        | Program, Program -> 0
-        | Program, _ -> 1
-        | _, Program -> -1
-        | Translation_unit s1, Translation_unit s2 ->
-          Filepath.compare s1 s2
-        | Translation_unit _, _ -> 1
-        | _, Translation_unit _ -> -1
-        | Formal kf1, Formal kf2 -> Kf.compare kf1 kf2
-        | Formal _, _ -> 1
-        | _, Formal _ -> -1
-        | Whole_function kf1, Whole_function kf2 -> Kf.compare kf1 kf2
-        | Whole_function _, _ -> 1
-        | _, Whole_function _ -> -1
-        | Block_scope s1, Block_scope s2 -> Stmt_Id.compare s1 s2
-      let equal = Datatype.from_compare
-      let hash s =
-        match s with
-        | Global -> 3
-        | Program -> 5
-        | Translation_unit s -> 7 * Filepath.hash s + 11
-        | Block_scope s -> 13 * Stmt_Id.hash s  + 17
-        | Whole_function kf -> 19 * Kf.hash kf + 23
-        | Formal kf -> 29 * Kf.hash kf + 31
-      let pretty fmt = function
-        | Global | Program -> Format.pp_print_string fmt "<Whole Program>"
-        | Translation_unit s ->
-          Format.fprintf fmt "File %a" Filepath.pretty s
-        | Formal kf ->
-          Format.fprintf fmt "Parameter of %a" Kf.pretty kf
-        | Whole_function kf ->
-          Format.fprintf fmt "Local variable of %a" Kf.pretty kf
-        | Block_scope s ->
-          Format.fprintf fmt "Statement at %a:@\n@[%a@]"
-            Location.pretty (Stmt.loc s) Stmt.pretty s
-    end)
+        let compare s1 s2 =
+          match s1, s2 with
+          | Global, Global -> 0
+          | Global, _ -> 1
+          | _, Global -> -1
+          | Program, Program -> 0
+          | Program, _ -> 1
+          | _, Program -> -1
+          | Translation_unit s1, Translation_unit s2 ->
+            Filepath.compare s1 s2
+          | Translation_unit _, _ -> 1
+          | _, Translation_unit _ -> -1
+          | Formal kf1, Formal kf2 -> Kf.compare kf1 kf2
+          | Formal _, _ -> 1
+          | _, Formal _ -> -1
+          | Whole_function kf1, Whole_function kf2 -> Kf.compare kf1 kf2
+          | Whole_function _, _ -> 1
+          | _, Whole_function _ -> -1
+          | Block_scope s1, Block_scope s2 -> Stmt_Id.compare s1 s2
+        let equal = Datatype.from_compare
+        let hash s =
+          match s with
+          | Global -> 3
+          | Program -> 5
+          | Translation_unit s -> 7 * Filepath.hash s + 11
+          | Block_scope s -> 13 * Stmt_Id.hash s  + 17
+          | Whole_function kf -> 19 * Kf.hash kf + 23
+          | Formal kf -> 29 * Kf.hash kf + 31
+        let pretty fmt = function
+          | Global | Program -> Format.pp_print_string fmt "<Whole Program>"
+          | Translation_unit s ->
+            Format.fprintf fmt "File %a" Filepath.pretty s
+          | Formal kf ->
+            Format.fprintf fmt "Parameter of %a" Kf.pretty kf
+          | Whole_function kf ->
+            Format.fprintf fmt "Local variable of %a" Kf.pretty kf
+          | Block_scope s ->
+            Format.fprintf fmt "Statement at %a:@\n@[%a@]"
+              Location.pretty (Stmt.loc s) Stmt.pretty s
+      end)
 end
 
 (* -------------------------------------------------------------------------- *)

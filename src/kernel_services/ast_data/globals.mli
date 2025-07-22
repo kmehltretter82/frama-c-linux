@@ -21,6 +21,8 @@ module Vars: sig
 
   val find: varinfo -> initinfo
 
+  val get_literal_string: varinfo -> str_literal
+
   val find_from_astinfo: string -> syntactic_scope -> varinfo
   (** Finds a variable from its [vname] according to its localisation (which
       might be a local). If you wish to search for a symbol according to its

@@ -91,7 +91,7 @@ and to_cil_const : Eva_ast_types.constant -> Cil_types.constant = function
   | CChr c -> CChr c
   | CReal (f, fk, s) -> CReal (f, fk, s)
   | CEnum (ei, _) -> CEnum ei
-  | CTopInt _ | CString _ as constant ->
+  | CTopInt _ as constant ->
     Self.fatal "The Eva constant %a cannot be converted to cil"
       Eva_ast_printer.pp_constant constant
 
@@ -255,7 +255,7 @@ let rec const_fold (exp: exp) : exp =
   match exp.node with
   | Const (CChr c) -> Build.integer ~ikind:IInt (Cil.charConstToInt c)
   | Const (CEnum (_ei, e)) -> const_fold e
-  | Const (CTopInt _ | CReal _ | CString _ | CInt64 _) -> exp
+  | Const (CTopInt _ | CReal _ | CInt64 _) -> exp
   | Lval lv -> mk_exp (Lval (const_fold_lval lv))
   | AddrOf lv -> mk_exp (AddrOf (const_fold_lval lv))
   | StartOf lv -> mk_exp (StartOf (const_fold_lval lv))

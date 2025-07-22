@@ -579,6 +579,5 @@ struct
     | None -> [init_value ~sigma (Cil.var v) v.vtype None]
     | Some (CInit init) -> List.rev (init_variable ~sigma (Cil.var v) init [])
     | Some (StrInit _s) -> Wp_parameters.not_yet_implemented "StrInit"
-    | Some (WStrInit _g) -> Wp_parameters.not_yet_implemented "WStrInit"
 
 end

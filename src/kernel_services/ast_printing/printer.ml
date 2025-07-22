@@ -251,7 +251,7 @@ class printer_with_annot () = object (self)
       when Ast_info.is_string_literal v && not (Kernel.PrintAsIs.get()) ->
       let init = Globals.Vars.find v in
       (match init.init with
-       | Some (StrInit _ | WStrInit _ as i) ->
+       | Some (StrInit _ as i) ->
          Format.fprintf fmt "%a%a" self#init_or_str i self#offset o
        | _ ->
          Kernel.fatal

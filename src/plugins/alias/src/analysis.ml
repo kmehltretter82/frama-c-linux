@@ -82,7 +82,7 @@ let do_init (lv:lval) (init:init_or_str) state =
   in
   match init with
   | CInit init -> aux lv init state
-  | StrInit _ | WStrInit _ -> state
+  | StrInit _ -> state
 (* TODO: consider potential aliases for literal with common suffixes. *)
 
 let pp_abstract_state_opt ?(debug=false) fmt v =

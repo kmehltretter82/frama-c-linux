@@ -30,6 +30,7 @@ struct
   let pp_offset fmt x = (printer ())#offset fmt x
   let pp_init fmt x = (printer ())#init fmt x
   let pp_init_or_str fmt x = (printer())#init_or_str fmt x
+  let pp_str_literal fmt x = (printer())#str_literal fmt x
   let pp_binop fmt x = (printer ())#binop fmt x
   let pp_unop fmt x = (printer ())#unop fmt x
   let pp_attribute fmt x = ignore ((printer ())#attribute fmt x)

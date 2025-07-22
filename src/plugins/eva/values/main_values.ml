@@ -38,8 +38,6 @@ module CVal = struct
     | Eva_ast.CTopInt _ -> Cvalue.V.top_int
     | CInt64 (i,_k,_s) -> Cvalue.V.inject_int i
     | CChr c           -> Cvalue.V.inject_int (Cil.charConstToInt c)
-    | CString base ->
-      Cvalue.V.inject base Ival.zero
     | CReal (f, fkind, fstring) ->
       Cvalue_forward.eval_float_constant f fkind fstring
     | CEnum _ -> assert false

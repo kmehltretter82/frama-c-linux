@@ -479,7 +479,6 @@ module rec Transfer
     match init with
     | CInit i -> aux i state
     | StrInit _ -> Options.not_yet_implemented "StrInit"
-    | WStrInit _ -> Options.not_yet_implemented "WStrInit"
 
   let register_initializers state =
     let do_one vi init state = match init.init with

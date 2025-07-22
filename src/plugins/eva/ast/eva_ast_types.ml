@@ -56,7 +56,6 @@ and constant =
   | CTopInt of ikind (* an unknown integer; currently introduced when
                         sizeof/alignof cannot be evaluated as a constant *)
   | CInt64 of Integer.t * ikind * string option
-  | CString of Base.t (* the base must be [Base.String _] *)
   | CChr of char
   | CReal of float * fkind * string option
   | CEnum of Enumitem.t * exp (* the translated expression that this enumitem refers to *)
@@ -110,8 +109,7 @@ type init =
 
 type init_or_str =
   | CInit of init
-  | StrInit of string
-  | WStrInit of int64 list
+  | StrInit of Cil_types.str_literal
 
 (* Optimization of comparaison functions on lvalues and expressions. *)
 let compare_exp e1 e2 = if e1 == e2 then 0 else compare_exp e1 e2

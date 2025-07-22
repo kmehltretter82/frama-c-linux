@@ -916,11 +916,14 @@ class cil_printer () = object (self)
         Format.fprintf fmt "@]}"
       end
 
+  method str_literal fmt = function
+    | Lit_str s -> Format.fprintf fmt "\"%s\"" (Escape.escape_string s)
+    | Lit_wstr l -> pp_wstring fmt l
+
   method init_or_str fmt i =
     match i with
     | CInit i -> self#init fmt i
-    | StrInit s -> Format.fprintf fmt "\"%s\"" (Escape.escape_string s)
-    | WStrInit l -> pp_wstring fmt l
+    | StrInit lit -> self#str_literal fmt lit
 
   (** What terminator to print after an instruction. sometimes we want to
       print sequences of instructions separated by comma *)
