@@ -91,3 +91,51 @@ plug-ins. By default, it only shows warning, error and failure messages.
 The right panel, toggled by the [icon-clipboard] button in the component
 titlebar, allows you to filter the displayed messages, and to search for
 a given text in all messages.
+
+## Projects {#framac-project}
+
+A Frama-C project groups together one source code with the results obtained
+on this code for one given set of parameters.
+In one Frama-C session, several projects can be created to work on several
+versions of a source code, on different source codes, or with different
+analysis parameters.
+For instance, it is possible to analyze the same code with different parameters
+in different projects, and to compare the obtained results.
+
+At any time, there is only one _current_ project: all information shown
+in Ivette relates to the current project, and all actions are applied to
+the current project.
+
+You can manage projects and change the current project via the
+[menu](#framac-project-menu) and the project [sidebar](#framac-project-sidebar).
+
+By default, a Frama-C session contains only one project named _default_.
+
+### Project Menu {#framac-project-menu}
+
+The project menu is divided into 2 parts:
+
+* Actions:
+  * _New project_: creates a new empty project, which becomes the current project.
+  * _Load project_: loads an existing project from a file, making it the current project.
+  * Duplicate the current project.
+  * Delete the current project.
+  * Rename the current project.
+* The list of projects.
+It always contains the current project, which is selected.
+Selecting another project (if any) changes the current project.
+
+### Project sidebar {#framac-project-sidebar}
+
+The project sidebar icon is [icon-project].
+
+In the sidebar title, you can:
+* [icon-CIRC.PLUS]: create a new empty project;
+* [icon-download]: load an existing project from a file;
+* [icon-help]: open this documentation.
+
+The list of projects is shown below, and these actions are available:
+* [icon-edit]: rename the project.
+* [icon-duplicate]: duplicate the project.
+* [icon-save]: save the project onto a save file.
+* [icon-trash]: delete the project; confirmation will be requested.
