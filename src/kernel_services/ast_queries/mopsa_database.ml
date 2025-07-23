@@ -7,29 +7,15 @@
 (**************************************************************************)
 
 type object_entry = {
-  (*filename: Filepath.t;*)
   source: Filepath.t;
   lang: string;
   args: string list;
-  (*path: string;*)
 }
-
-(*type library_kind = Static | Dynamic*)
 
 (* a 'target' is an executable or a library *)
 type target_entry = {
-  (*filename: Filepath.t;*)
   contents: Filepath.t list;
-  (*kind_opt: library_kind option; (* None = executable *)*)
 }
-
-(*let pp_target_entry_kind fmt te =
-  match te.kind_opt with
-  | None -> Format.fprintf fmt "executable"
-  | Some Static -> Format.fprintf fmt "static library"
-  | Some Dynamic -> Format.fprintf fmt "dynamic library"*)
-
-(*type entry = Object of object_entry | Target of target_entry*)
 
 let tables_from_json json =
   let open Yojson.Basic in
@@ -48,7 +34,7 @@ let tables_from_json json =
         in
         let args = entry |> member "args" |> to_list |> List.map to_string in
         let _path = entry |> member "path" |> to_string in
-        let entry = { (*filename;*) lang; source; args(*; path*) } in
+        let entry = { lang; source; args } in
         Kernel.debug
           ~dkey:Kernel.dkey_mopsa_db
           "object_map: adding '%s'" (filename :> string);
@@ -58,7 +44,7 @@ let tables_from_json json =
           entry |> member "contents" |> to_list |>
           List.map (fun d -> to_string d |> Filepath.of_string)
         in
-        let entry = { (*filename;*) contents(*; kind_opt*) } in
+        let entry = { contents } in
         Kernel.debug
           ~dkey:Kernel.dkey_mopsa_db
           "target_map: adding '%s'" (filename :> string);
@@ -148,7 +134,7 @@ let calc_deps db_json (module Targets : Parameter_sig.String_list) =
             Filepath.pretty_abs path
         | Some _entry -> path :: acc) []
   in
-  let r = acc_deps object_map (*source_map*) target_map targets in
+  let r = acc_deps object_map target_map targets in
   List.sort (fun (fp1, _) (fp2, _) -> Filepath.compare_pretty fp1 fp2) r
 
 let join_filtered_args args =
@@ -175,12 +161,6 @@ let join_filtered_args args =
       end
     ) args;
   Buffer.contents buf
-
-(*let escape_for_fc_cmdline s =
-  let s = String.escaped s in
-  let s = Str.global_replace (Str.regexp ",") "\\," s in
-  Format.printf "escape_for_fc: [%s]@." s;
-  s*)
 
 let run () =
   let open Yojson.Basic in
