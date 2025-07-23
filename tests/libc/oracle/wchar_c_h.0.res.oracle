@@ -307,12 +307,12 @@
   n ∈ {5}
   r ∈ [--..--] or UNINITIALIZED
   i ∈ [--..--]
-  res ∈ {{ NULL ; &buf[0] ; L"Needle" + [0..--],0%4 }}
+  res ∈ {{ NULL ; L"Needle" + [0..--],0%4 ; &buf[0] }}
   wc_0 ∈ {{ L"ABC" }} or UNINITIALIZED
-  p ∈ {{ L"ABC" + {4} }} or UNINITIALIZED
-  wcr ∈ {{ L"ABC" + {8} }} or UNINITIALIZED
+  p ∈ {{ L"ABC" + {1} }} or UNINITIALIZED
+  wcr ∈ {{ L"ABC" + {2} }} or UNINITIALIZED
   wmr1 ∈ {0} or UNINITIALIZED
-  wmr2 ∈ {{ L"ABC" + {8} }} or UNINITIALIZED
+  wmr2 ∈ {{ L"ABC" + {2} }} or UNINITIALIZED
   dupbuf ∈
         {{ NULL ; &__malloc_wcsdup_l85_0[0] }} or UNINITIALIZED or ESCAPINGADDR
   __retres ∈ {0}

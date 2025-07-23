@@ -46,7 +46,7 @@
     .d ∈ {3.125}
   n ∈ {501}
   d ∈ {5.5}
-  iov[0].iov_base ∈ {{ "message" }}
+  iov[0].iov_base ∈ {{ (void *)"message" }}
      [0].iov_len ∈ {7}
      [1].iov_base ∈ {{ (void *)&s1 }}
      [1].iov_len ∈ {8}

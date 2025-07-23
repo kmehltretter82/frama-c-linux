@@ -277,20 +277,20 @@
 [eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function __fc_initenv:
-  __fc_env[0..4095] ∈ {{ NULL ; &__fc_env_strings + [0..63] ; "BLA=1" }}
+  __fc_env[0..4095] ∈ {{ NULL ; "BLA=1" ; &__fc_env_strings + [0..63] }}
   Frama_C_entropy_source ∈ [--..--]
   __fc_env_strings[0..62] ∈ [--..--]
                   [63] ∈ {0}
   __fc_initenv_init ∈ {1}
 [eva:final-states] Values at end of function getenv:
   Frama_C_entropy_source ∈ [--..--]
-  __retres ∈ {{ NULL ; &s[0] ; &__fc_env_strings + [0..63] ; "BLA=1" }}
+  __retres ∈ {{ NULL ; "BLA=1" ; &s[0] ; &__fc_env_strings + [0..63] }}
 [eva:final-states] Values at end of function putenv:
   __fc_errno ∈ [--..--]
   __fc_env[0..4095] ∈
-          {{ NULL ; &s[0] ; &__fc_env_strings + [0..63] ; "BLA=1" }}
+          {{ NULL ; "BLA=1" ; &s[0] ; &__fc_env_strings + [0..63] }}
   Frama_C_entropy_source ∈ [--..--]
-  separator ∈ {{ &s[4] ; "BLA=1" + {3} }}
+  separator ∈ {{ "BLA=1" + {3} ; &s[4] }}
   __fc_env_strings[0..62] ∈ [--..--]
                   [63] ∈ {0}
   __fc_initenv_init ∈ {1}
@@ -298,7 +298,7 @@
 [eva:final-states] Values at end of function setenv:
   __fc_errno ∈ [--..--]
   __fc_env[0..4095] ∈
-          {{ NULL ; &s[0] ; &__fc_env_strings + [0..63] ; "BLA=1" }}
+          {{ NULL ; "BLA=1" ; &s[0] ; &__fc_env_strings + [0..63] }}
   Frama_C_entropy_source ∈ [--..--]
   namelen ∈ [0..63] or UNINITIALIZED
   __fc_env_strings[0..62] ∈ [--..--]
@@ -307,29 +307,29 @@
 [eva:final-states] Values at end of function unsetenv:
   __fc_errno ∈ [--..--]
   __fc_env[0..4095] ∈
-          {{ NULL ; &s[0] ; &__fc_env_strings + [0..63] ; "BLA=1" }}
+          {{ NULL ; "BLA=1" ; &s[0] ; &__fc_env_strings + [0..63] }}
   Frama_C_entropy_source ∈ [--..--]
   namelen ∈ [0..63] or UNINITIALIZED
   __retres ∈ {-1; 0}
 [eva:final-states] Values at end of function main:
   __fc_errno ∈ {22}
   __fc_env[0..4095] ∈
-          {{ NULL ; &s[0] ; &__fc_env_strings + [0..63] ; "BLA=1" }}
+          {{ NULL ; "BLA=1" ; &s[0] ; &__fc_env_strings + [0..63] }}
   Frama_C_entropy_source ∈ [--..--]
   env0 ∈ {{ "BLA=1" }}
   i1 ∈ [--..--]
   s[0..7] ∈ [--..--]
    [8..9] ∈ {0}
   i2 ∈ [--..--]
-  r1 ∈ {{ NULL ; &s[0] ; &__fc_env_strings + [0..63] ; "BLA=1" }}
-  r2 ∈ {{ &s[0] ; &__fc_env_strings + [0..63] ; "BLA=1" }}
+  r1 ∈ {{ NULL ; "BLA=1" ; &s[0] ; &__fc_env_strings + [0..63] }}
+  r2 ∈ {{ "BLA=1" ; &s[0] ; &__fc_env_strings + [0..63] }}
   i3 ∈ {-1; 0}
   i4 ∈ {-1; 0}
   i5 ∈ {-1; 0}
   i6 ∈ {0}
   i7 ∈ {-1}
   i8 ∈ {-1; 0}
-  r3 ∈ {{ NULL ; &s[0] ; &__fc_env_strings + [0..63] ; "BLA=1" }}
+  r3 ∈ {{ NULL ; "BLA=1" ; &s[0] ; &__fc_env_strings + [0..63] }}
   i9 ∈ {-1}
   i10 ∈ {-1}
   __fc_env_strings[0..62] ∈ [--..--]
