@@ -48,15 +48,17 @@ let may_be_shared str1 off1 str2 off2 =
   may_be_shared_within s1 s2 || may_be_shared_within s2 s1
 
 (* Checks if all string bases of [v] satisfy [f]. *)
-let for_all_string _v _f =
-  Self.not_yet_implemented "for_all_string"
-(*  Locations.Location_Bytes.for_all
+let for_all_string v f =
+  Locations.Location_Bytes.for_all
     (fun base off -> match base with
-       | Base.String (_, Base.CSString str) -> f base str off
-       | Base.String (_, Base.CSWstring _ ) -> false (* Not implemented yet *)
+       | Base.Var (vi, _) when Ast_info.is_string_literal vi ->
+         (match Globals.Vars.get_literal_string vi with
+          | Lit_str str -> f base str off
+          | Lit_wstr _ -> false (* Not implemented yet *)
+         )
        | _ -> true)
     v
-*)
+
 (* Literal strings can only be compared if their contents are recognizably
    different (or the strings are physically the same). *)
 let are_comparable_string v1 v2 =

@@ -117,7 +117,8 @@ struct
            let typ = Base.typeof base in
            Format.fprintf fmt "@[%a@[%a@]@]" Base.pretty base
              (Offsetmap.pretty_generic ?typ ()) offs)
-        fmt m
+        fmt
+        (filter (fun x -> not (Base.is_string_literal x)) m)
 
     (* TODO: can be improved in quite a few ways. *)
     let filter_base f m =

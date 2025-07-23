@@ -107,14 +107,21 @@ let null = Null
 
 let is_null x = match x with Null -> true | _ -> false
 
+let is_string_literal = function
+  | Var(v, _) -> Ast_info.is_string_literal v
+  | _ -> false
+
 let pretty fmt t =
   match t with
+  | Var(v,_) when Ast_info.is_string_literal v ->
+    Printer.pp_str_literal fmt (Globals.Vars.get_literal_string v)
   | Var (t,_) | Allocated (t,_,_) -> Printer.pp_varinfo fmt t
   | CLogic_Var (lvi, _, _) -> Printer.pp_logic_var fmt lvi
   | Null -> Format.pp_print_string fmt "NULL"
 
 let pretty_addr fmt t =
   (match t with
+   | Var (v,_) when Ast_info.is_string_literal v -> ()
    | Var _ | CLogic_Var _ | Allocated _ ->
      Format.pp_print_string fmt "&"
    | Null -> ()

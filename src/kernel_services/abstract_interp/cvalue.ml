@@ -123,6 +123,24 @@ module V = struct
     else
       Format.fprintf fmt "@[%a +@ %a@]" Base.pretty_addr b Ival.pretty i
 
+  let pretty_string_literal fmt (b, o) =
+    match b with
+    | Base.Var(v, _) ->
+      let lit = Globals.Vars.get_literal_string v in
+      (match o with
+       | NoOffset -> Printer.pp_str_literal fmt lit
+       | Index(i,NoOffset) when Cil.isZero i ->
+         Printer.pp_str_literal fmt lit
+       | Index(i,NoOffset) ->
+         Format.fprintf fmt "%a + {%a}"
+           Printer.pp_str_literal lit
+           Printer.pp_exp i
+       | _ ->
+         Kernel.fatal "Unexpected offset for a string literal: '%a'"
+           Printer.pp_offset o
+      )
+    | _ -> Kernel.fatal "Expecting a string literal base, got %a" Base.pretty b
+
   (* Pretty the partial address [b(base)+i(offsets)], supposing it has type
      [typ]. Whenever possible, we print real addresses instead of bytes
      offsets. *)
@@ -164,7 +182,10 @@ module V = struct
         (* One single offset. Use a short notation, and an even shorter one
            if we represent [&b] *)
         let o, ok = conv_offset o in
-        if o = NoOffset then
+        if Base.is_string_literal b then
+          Format.fprintf fmt "@[%a%a@]"
+            pretty_cast ok pretty_string_literal (b, o)
+        else if o = NoOffset then
           Format.fprintf fmt "@[%a%a@]" pretty_cast ok Base.pretty_addr b
         else
           Format.fprintf fmt "@[%a%a%a@]"

@@ -108,16 +108,118 @@ module Make
     let init_value = Abstract_domain.Top in
     Domain.initialize_variable lval location ~initialized:true init_value state
 
+  let get_string_literal e =
+    match e.node with
+    | Lval { node = Var v, NoOffset } ->
+      Some (Globals.Vars.get_literal_string v)
+    | _ -> None
+
+  let rec init_char_array ~pos lval s state =
+    if Ast_types.is_any_char_array lval.typ then begin
+      let _, size = Ast_types.array_elem_type_and_size lval.typ in
+      let open Option.Operators in
+      let str_len = Z.of_int (String.length s) in
+      let arr_len =
+        match size >>- (Cil.constFoldToInt ~machdep:true) with
+        | None -> Z.(succ str_len)
+        | Some z -> z
+      in
+      (* TODO: provide appropriate loc in AST *)
+      let source = fst Cil_datatype.Location.unknown in
+      let init_element state i =
+        let c = if Z.leq str_len i then '\000' else s.[Z.to_int i] in
+        let open Eva_ast in
+        let idx_exp =
+          Eva_ast_builder.mk_exp
+            (Const (CInt64(i,Machine.sizeof_kind(),None)))
+        in
+        let idx = Index(idx_exp,NoOffset) in
+        let lval = Eva_ast.(add_offset lval idx) in
+        let v = Eva_ast_builder.mk_exp (Const (CChr c)) in
+        apply_eva_single_initializer ~pos ~source state lval v
+      in
+      let seq =
+        Seq.unfold
+          (fun cnt ->
+             if Z.lt cnt arr_len then (Some (cnt, Z.succ cnt)) else None)
+          Z.zero
+      in
+      Seq.fold_left init_element state seq
+    end else
+      Self.fatal
+        "String literal can only be used to initialize a char array"
+
+  and init_wchar_array ~pos lval wstr state =
+    let error () =
+      Self.fatal
+        "Initialization of %a of type %a with wide string literal"
+        Eva_ast_printer.pp_lval lval Printer.pp_typ lval.typ
+    in
+    if not (Ast_types.is_array lval.typ) then error();
+    let elem, size = Ast_types.array_elem_type_and_size lval.typ in
+    if not (Cil_datatype.TypNoAttrs.equal elem (Machine.wchar_type())) then error();
+    let open Option.Operators in
+    let str_len = Z.of_int (List.length wstr) in
+    let arr_len =
+      match size >>- (Cil.constFoldToInt ~machdep:true) with
+      | None -> Z.(succ str_len)
+      | Some z -> z
+    in
+    (* TODO: provide appropriate loc in AST *)
+    let source = fst Cil_datatype.Location.unknown in
+    let init_element state (i,c) =
+      let c = Z.of_int64 c in
+      let open Eva_ast in
+      let idx_exp =
+        Eva_ast_builder.mk_exp
+          (Const (CInt64(i,Machine.sizeof_kind(),None)))
+      in
+      let idx = Index(idx_exp,NoOffset) in
+      let lval = Eva_ast.(add_offset lval idx) in
+      let v =
+        Eva_ast_builder.mk_exp (Const (CInt64(c,Machine.wchar_kind(),None)))
+      in
+      apply_eva_single_initializer ~pos ~source state lval v
+    in
+    let seq =
+      Seq.unfold
+        (fun (cnt,l) ->
+           if Z.lt cnt arr_len then
+             begin
+               let c,tl =
+                 match l with
+                 | [] -> Int64.zero,[]
+                 | c :: tl -> c,tl
+               in
+               Some ((cnt,c),(Z.succ cnt, tl))
+             end
+           else None)
+        (Z.zero,wstr)
+    in
+    Seq.fold_left init_element state seq
+
   (* Applies a single initializer, using the standard transfer function on
      assignments. Warns if the results is bottom. *)
-  let apply_eva_single_initializer ~source ~pos state lval expr =
-    match Transfer.assign ~pos state lval expr with
-    | `Bottom ->
-      if not (Position.is_local pos) then
-        Self.warning ~pos ~source ~once:true
-          "evaluation of initializer '%a' failed@." Eva_ast.pp_exp expr;
-      raise Initialization_failed
-    | `Value v -> v
+  and apply_eva_single_initializer ~source ~pos state lval expr =
+    if Ast_types.is_any_char_array lval.typ then begin
+      match get_string_literal expr with
+      | Some (Lit_str s) -> init_char_array ~pos lval s state
+      | None | Some (Lit_wstr _) ->
+        Self.fatal "Single init of a char array can only be a string literal"
+    end else if Ast_types.is_wchar_array lval.typ then begin
+      match get_string_literal expr with
+      | Some (Lit_wstr ws) -> init_wchar_array ~pos lval ws state
+      | None | Some (Lit_str _) ->
+        Self.fatal "Single init of a wchar array can only be a wide string literal"
+    end else begin
+      match Transfer.assign state ~pos lval expr with
+      | `Bottom ->
+        if not (Position.is_local pos) then
+          Self.warning ~pos ~source ~once:true
+            "evaluation of initializer '%a' failed@." Eva_ast.pp_exp expr;
+        raise Initialization_failed
+      | `Value v -> v
+    end
 
   (* Applies an initializer. If [top_volatile] is true, sets volatile locations
      to top without applying the initializer. Otherwise, lets the standard
@@ -140,86 +242,8 @@ module Make
       in
       match init with
       | CInit init -> aux lval init state
-      | StrInit (Lit_str s) ->
-        if Ast_types.is_any_char_array lval.typ then begin
-          let _, size = Ast_types.array_elem_type_and_size lval.typ in
-          let open Option.Operators in
-          let str_len = Z.of_int (String.length s) in
-          let arr_len =
-            match size >>- (Cil.constFoldToInt ~machdep:true) with
-            | None -> Z.(succ str_len)
-            | Some z -> z
-          in
-          (* TODO: provide appropriate loc in AST *)
-          let source = fst Cil_datatype.Location.unknown in
-          let init_element state i =
-            let c = if Z.leq str_len i then '\000' else s.[Z.to_int i] in
-            let open Eva_ast in
-            let idx_exp = Eva_ast_builder.mk_exp
-                (Const (CInt64(i,Machine.sizeof_kind(),None)))
-            in
-            let idx = Index(idx_exp,NoOffset) in
-            let lval = Eva_ast.(add_offset lval idx) in
-            let v = Eva_ast_builder.mk_exp (Const (CChr c)) in
-            apply_eva_single_initializer ~pos ~source state lval v
-          in
-          let seq =
-            Seq.unfold
-              (fun cnt ->
-                 if Z.lt cnt arr_len then (Some (cnt, Z.succ cnt)) else None)
-              Z.zero
-          in
-          Seq.fold_left init_element state seq
-        end else
-          Self.fatal
-            "String literal can only be used to initialize a char array"
-      | StrInit (Lit_wstr a) ->
-        let error () =
-          Self.fatal
-            "Initialization of %a of type %a with wide string literal"
-            Eva_ast_printer.pp_lval lval Printer.pp_typ lval.typ
-        in
-        if not (Ast_types.is_array lval.typ) then error();
-        let elem, size = Ast_types.array_elem_type_and_size lval.typ in
-        if not (Cil_datatype.TypNoAttrs.equal elem (Machine.wchar_type())) then error();
-        let open Option.Operators in
-        let str_len = Z.of_int (List.length a) in
-        let arr_len =
-          match size >>- (Cil.constFoldToInt ~machdep:true) with
-          | None -> Z.(succ str_len)
-          | Some z -> z
-        in
-        (* TODO: provide appropriate loc in AST *)
-        let source = fst Cil_datatype.Location.unknown in
-        let init_element state (i,c) =
-          let c = Z.of_int64 c in
-          let open Eva_ast in
-          let idx_exp = Eva_ast_builder.mk_exp
-              (Const (CInt64(i,Machine.sizeof_kind(),None)))
-          in
-          let idx = Index(idx_exp,NoOffset) in
-          let lval = Eva_ast.(add_offset lval idx) in
-          let v =
-            Eva_ast_builder.mk_exp (Const (CInt64(c,Machine.wchar_kind(),None)))
-          in
-          apply_eva_single_initializer ~pos ~source state lval v
-        in
-        let seq =
-          Seq.unfold
-            (fun (cnt,l) ->
-               if Z.lt cnt arr_len then
-                 begin
-                   let c,tl =
-                     match l with
-                     | [] -> Int64.zero,[]
-                     | c :: tl -> c,tl
-                   in
-                   Some ((cnt,c),(Z.succ cnt, tl))
-                 end
-               else None)
-            (Z.zero,a)
-        in
-        Seq.fold_left init_element state seq
+      | StrInit (Lit_str s) -> init_char_array ~pos lval s state
+      | StrInit (Lit_wstr a) -> init_wchar_array ~pos lval a state
     end
 
   (* Field by field initialization of a variable to zero, or top if volatile.
