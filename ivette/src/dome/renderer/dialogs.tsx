@@ -75,8 +75,9 @@ const isCancel = ({ value, label }: DialogButton<unknown>): boolean => (
 export type MessageKind = 'none' | 'info' | 'error' | 'warning';
 
 export interface MessageProps<A> {
-  /** synchronous if true */
-  sync?: boolean;
+  /** Block the interface until the message window is closed
+      (default is false) */
+  block?: boolean;
   /** Dialog window icon (default is `'none'`. */
   kind?: MessageKind;
   /** Message text (short sentence). */
@@ -100,7 +101,7 @@ export interface MessageProps<A> {
    - or the value of the clicked button otherwised.
 
    The promise is asynchronously resolved by defaut.
-   For synchronous resolution, you need to use the `sync` option.
+   For synchronous resolution, you need to use the `block` option.
 
    The default buttons are `"Ok"` and `"Cancel"` associated to values `true` and
    `undefined`, which are also associated to the enter and cancel keys.
@@ -113,7 +114,7 @@ export async function showMessageBox<A>(
   props: MessageProps<A>,
 ): Promise<A | boolean | undefined> {
   const {
-    sync,
+    block,
     kind,
     message,
     details,
@@ -142,7 +143,7 @@ export async function showMessageBox<A>(
       buttons: labels,
     };
 
-  if(sync) return ipcRenderer.invoke('dome.dialog.showMessageBoxSync', options)
+  if(block) return ipcRenderer.invoke('dome.dialog.showMessageBoxSync', options)
     .then((result) => result ? buttons[result].value : cancelValue);
 
   return ipcRenderer.invoke('dome.dialog.showMessageBox', options)

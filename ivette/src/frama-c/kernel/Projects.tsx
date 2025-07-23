@@ -112,9 +112,7 @@ function getProject(id?: number): Project.listData | undefined {
 }
 
 /** Rename a project */
-export function renameProject(
-  id: number, project?: string
-): void {
+export function renameProject(id: number, project?: string): void {
   const name = project || getProject(id)?.name;
   const title = `Rename project "${name}" (id:${id})`;
   const onValidate = (name: string): void => {
@@ -143,7 +141,7 @@ export async function removeProject(id: number): Promise<void> {
   }
 
   const confirm = await Dialogs.showMessageBox({
-    sync: true,
+    block: true,
     buttons: [
       { label: 'Cancel' },
       { label: 'Ok', value: true }
@@ -159,9 +157,7 @@ export async function removeProject(id: number): Promise<void> {
 }
 
 /** Duplicate a project */
-export function duplicateProject(
-  id: number, project?: string
-): void {
+export function duplicateProject(id: number, project?: string): void {
   const name = project || getProject(id)?.name;
   const title = `Duplicate project "${name}" (id:${id})`;
   const onValidate = (name: string): void => {
