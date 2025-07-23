@@ -88,7 +88,7 @@ class callableFunctionsVisitor ~libc = object(self)
   method! visit_non_function_var vi =
     let r = super#visit_non_function_var vi in
     (match r with
-     | None -> ()
+     | None | Some (StrInit _) -> ()
      | Some init -> initializers <- (vi, init) :: initializers
     );
     r
