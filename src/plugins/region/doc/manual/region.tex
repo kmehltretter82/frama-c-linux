@@ -1,3 +1,5 @@
+%rubber: watch region.bbl region.bib
+
 \documentclass{frama-c-book}
 \usepackage{amsmath}
 \usepackage{longtable}
@@ -6,10 +8,10 @@
 \input{fc-macros}
 
 \newcommand{\FCVERSION}{\input{VERSION}(\input{VERSION_CODENAME}\unskip)}
-\newcommand{\region}{\textsf{Region}}
+\newcommand{\Region}{\textsf{Region}\xspace}
 
 \title{Region Plug-in Manual}
-\author{Cécile Ruet-Cros, Loïc Correnson, Allan Blanchard}
+\author{Cécile Ruet-Cros}
 \fcversion{\FCVERSION}
 
 \cclicence{by}
@@ -40,6 +42,7 @@ The content of this document corresponds to the version \FCVERSION, released on 
 
 \input{region_intro.tex}
 \input{region_plugin.tex}
+\input{region_api.tex}
 
 \bibliographystyle{alpha}
 \bibliography{region}
