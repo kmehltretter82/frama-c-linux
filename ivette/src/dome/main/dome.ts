@@ -813,6 +813,15 @@ ipcMain.handle(
 );
 
 ipcMain.handle(
+  'dome.dialog.showMessageBoxSync',
+  (evt, props) => {
+    const browser = BrowserWindow.fromId(evt.sender.id);
+    if(browser) return dialog.showMessageBoxSync(browser, props);
+    else return dialog.showMessageBoxSync(props);
+  }
+);
+
+ipcMain.handle(
   'dome.dialog.showOpenDialog',
   (_evt, props) => dialog.showOpenDialog(props),
 );

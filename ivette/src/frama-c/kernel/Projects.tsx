@@ -143,6 +143,7 @@ export async function removeProject(id: number): Promise<void> {
   }
 
   const confirm = await Dialogs.showMessageBox({
+    sync: true,
     buttons: [
       { label: 'Cancel' },
       { label: 'Ok', value: true }
