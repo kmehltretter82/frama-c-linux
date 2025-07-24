@@ -40,7 +40,8 @@ else
 endif
 
 all: $(TARGET).pdf
-$(TARGET).pdf: $(TARGET).tex $(FRAMAC_MODERN)
+$(TARGET).pdf: $(TARGET).tex $(FRAMAC_MODERN) examples/*.c examples/*/*.c
+	$(MAKE) -C examples
 	latexmk $(SILENT) -f -pdf $<
 
 install:
