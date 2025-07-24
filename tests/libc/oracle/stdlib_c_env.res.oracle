@@ -290,7 +290,7 @@
   __fc_env[0..4095] ∈
           {{ NULL ; "BLA=1" ; &s[0] ; &__fc_env_strings + [0..63] }}
   Frama_C_entropy_source ∈ [--..--]
-  separator ∈ {{ "BLA=1" + {3} ; &s[4] }}
+  separator ∈ {{ "BLA=1"[3] ; &s[4] }}
   __fc_env_strings[0..62] ∈ [--..--]
                   [63] ∈ {0}
   __fc_initenv_init ∈ {1}

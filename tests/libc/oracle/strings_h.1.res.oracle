@@ -1,4 +1,5 @@
 [kernel] Parsing strings_h.c (with preprocessing)
+[kernel] strings_h.c:14: Warning: Too many initializers for character array s
 [kernel] strings_h.c:29: User Error: 
   Inconsistent storage specification for index. Previous declaration: FRAMAC_SHARE/libc/strings.h:47
 [kernel] strings_h.c:29: User Error: 

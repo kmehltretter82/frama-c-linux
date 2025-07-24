@@ -190,9 +190,8 @@
   i ∈ [0..255]
   __retres ∈
           {{ NULL ; &s{[0], [1], [9], [10], [126], [127], [254], [255]} ;
-             "" ; "a" ; "a" ; "a" + {1} ; "abb" + {1} ; "aabb" + {2} ;
-             "aaabb" + {3} ; "aaaabb" + {4} ; "aaaaabb" + {5} ;
-             "aaaaaabb" + {6} ; "abc abc" + {2} }}
+             "" ; "a" ; "a" ; "a"[1] ; "abb"[1] ; "aabb"[2] ; "aaabb"[3] ;
+             "aaaabb"[4] ; "aaaaabb"[5] ; "aaaaaabb"[6] ; "abc abc"[2] }}
 [eva:final-states] Values at end of function main:
   i ∈ {256}
   a[0] ∈ {1}

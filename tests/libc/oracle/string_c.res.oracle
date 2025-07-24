@@ -1224,7 +1224,7 @@
   p ∈ {{ &s[0] }}
 [eva:final-states] Values at end of function test_strchr:
   s ∈ {{ "hello" }}
-  p ∈ {{ "hello" + {5} }}
+  p ∈ {{ "hello"[5] }}
 [eva:final-states] Values at end of function test_strcmp:
   hello[0] ∈ {104}
        [1] ∈ {97}
@@ -1274,7 +1274,7 @@
   n ∈ {0}
 [eva:final-states] Values at end of function test_strrchr:
   s ∈ {{ "hello" }}
-  p ∈ {{ "hello" + {5} }}
+  p ∈ {{ "hello"[5] }}
 [eva:final-states] Values at end of function test_strstr:
   s ∈ {{ "hello" }}
   p ∈ {{ "hello" }}
