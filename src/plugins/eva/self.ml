@@ -201,7 +201,7 @@ let lift_aborter (aborter : ('a,'b) Log.pretty_aborter)
   match pos with
   | Some pos ->
     let callstack = Position.callstack pos in
-    let source = Position.pos pos
+    let source = Option.value ~default:(Position.pos pos) source
     (* Append callstack if requested *)
     and append = append_callstack ?stacktrace ~callstack in
     aborter ?current:None ~source ~append

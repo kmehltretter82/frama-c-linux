@@ -124,11 +124,11 @@ module Make
 
   (* Applies a single initializer, using the standard transfer function on
      assignments. Warns if the results is bottom. *)
-  let apply_eva_single_initializer ~pos state lval expr =
+  let apply_eva_single_initializer ~source ~pos state lval expr =
     match Transfer.assign ~pos state lval expr with
     | `Bottom ->
       if not (Position.is_local pos) then
-        Self.warning ~pos ~once:true
+        Self.warning ~pos ~source ~once:true
           "evaluation of initializer '%a' failed@." Eva_ast.pp_exp expr;
       raise Initialization_failed
     | `Value v -> v
@@ -141,8 +141,9 @@ module Make
     then initialize_top_volatile lval state
     else
       match init with
-      | SingleInit (exp, _loc) ->
-        apply_eva_single_initializer ~pos state lval exp
+      | SingleInit (exp, loc) ->
+        let source = fst loc in
+        apply_eva_single_initializer ~pos ~source state lval exp
       | CompoundInit (_typ, l) ->
         let doinit state (off, init) =
           let lval = Eva_ast.add_offset lval off in
@@ -201,8 +202,9 @@ module Make
          && not (Cil.is_mutable_or_initialized lval)
       then
         let lval = Eva_ast.translate_lval lval
-        and exp = Eva_ast.translate_exp exp in
-        apply_eva_single_initializer ~pos state lval exp
+        and exp = Eva_ast.translate_exp exp
+        and source = fst exp.eloc in
+        apply_eva_single_initializer ~pos ~source state lval exp
       else state
     | CompoundInit (typ, l) ->
       if Ast_types.has_qualifier "volatile" typ || not (Ast_types.is_const typ)
