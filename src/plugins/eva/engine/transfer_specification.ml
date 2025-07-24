@@ -538,8 +538,7 @@ module Make
      interpretation of any true behavior and of any complete set should be
      intersected. *)
   let compute_specification ~warn call spec state =
-    let kf = call.kf
-    and kinstr = Callstack.top_callsite call.callstack in
+    let kf, kinstr = Callstack.top_call call.callstack in
     if warn then warn_allocates kf spec.spec_behavior;
     (* The default behavior, and the list of other behaviors. *)
     let default_bhv, behaviors = extract_default_behavior spec.spec_behavior in
