@@ -25,13 +25,6 @@ HEADER_STRICT?=yes
 # Defines where to find the header directories
 HEADER_DIRS?=headers $(wildcard src/plugins/*/headers)
 
-# Can be set to unset/yes/no/<relative sub-directory>
-# - unset: look at $(HEADER_DIRS)
-# - yes:   look at $(HEADER_DIRS)/open-source
-# - no:    look at $(HEADER_DIRS)/closed-source
-# - <dir>: look at $(HEADER_DIRS)/<dir>
-HEADER_OPEN_SOURCE?=
-
 # Can be set to a directory
 # - <dir>: directory containing the files to manage
 HEADER_REPO?=
@@ -95,19 +88,7 @@ endif
 ##########################################################################
 ## Identifies where are the headers and updates HDRCK.OPTS variable
 
-ifeq ($(HEADER_OPEN_SOURCE),yes)
-HDRCK.OPTS+= $(addprefix -header-dirs=,$(addsuffix /open-source,$(HEADER_DIRS)))
-else
-ifeq ($(HEADER_OPEN_SOURCE),no)
-HDRCK.OPTS+= $(addprefix -header-dirs=,$(addsuffix /closed-source,$(HEADER_DIRS)))
-else
-ifeq ($(HEADER_OPEN_SOURCE),)
 HDRCK.OPTS+= $(addprefix -header-dirs=,$(HEADER_DIRS))
-else
-HDRCK.OPTS+= $(addprefix -header-dirs=,$(addsuffix /$(HEADER_OPEN_SOURCE),$(HEADER_DIRS)))
-endif
-endif
-endif
 
 ##########################################################################
 ## HDRCK
