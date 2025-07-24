@@ -375,7 +375,7 @@ let standalone_thread th kf initial_state =
       Results.(in_cvalue_state initial_state |> eval_var vi |> as_cvalue)
     in
     let args = List.map eval_arg formals in
-    let stack = Callstack.init kf in
+    let stack = Callstack.init ~thread:(Thread.id th) ~entry_point:kf in
     basic_thread th stack kf initial_state args None
 
 let main_thread k_main initial_state =

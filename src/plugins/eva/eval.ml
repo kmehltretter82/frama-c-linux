@@ -277,6 +277,9 @@ let position_of_call call =
   let kf, lloc = Callstack.pop_call call.callstack in
   assert (Kernel_function.equal kf call.kf);
   match lloc, call.return with
-  | None, Some vi -> Position.global_init vi
-  | None, None -> Position.root_call call.kf
-  | Some (stmt, caller_stack), _ -> Position.local stmt caller_stack
+  | None, Some vi ->
+    Position.global_init vi
+  | None, None ->
+    Position.root_call ~thread:call.callstack.thread ~entry_point:call.kf
+  | Some (stmt, caller_stack), _ ->
+    Position.local stmt caller_stack

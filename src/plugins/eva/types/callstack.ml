@@ -90,7 +90,7 @@ let is_empty cs =
 
 (* Stack manipulation *)
 
-let init ?(thread=0) kf = { thread; entry_point=kf; stack = [] }
+let init ~thread ~entry_point = { thread; entry_point; stack = [] }
 
 let push kf stmt cs =
   { cs with stack = (kf, stmt) :: cs.stack }

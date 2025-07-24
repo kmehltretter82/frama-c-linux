@@ -148,7 +148,7 @@ module Callstack: sig
   (*** {2 Stack manipulation} *)
 
   (*** Constructor *)
-  val init : ?thread:int -> Cil_types.kernel_function -> t
+  val init : thread:int -> entry_point:Cil_types.kernel_function -> t
 
   (** Adds a new call to the top of the callstack. *)
   val push : Cil_types.kernel_function -> Cil_types.stmt -> t -> t

@@ -27,7 +27,7 @@ type local = Cil_types.stmt * Callstack.t
 
 (** General position. *)
 type t = private
-  | RootCall of Cil_types.kernel_function
+  | RootCall of { thread: int; entry_point: Kernel_function.t }
   | GlobalInit of Cil_types.varinfo
   | Local of local
 
@@ -71,9 +71,9 @@ include S with type t := t
 val local : Cil_types.stmt -> Callstack.t -> t
 (** [local stmt cs] creates a local position. *)
 
-val root_call : Cil_types.kernel_function -> t
-(** [root_call g] creates a position pointing to the root call of
-    the analysis. *)
+val root_call : thread:int -> entry_point:Cil_types.kernel_function -> t
+(** [root_call ~thread ~entry_point] creates a position pointing to the root
+    call of the analysis. *)
 
 val global_init : Cil_types.varinfo -> t
 (** [global_init vi] creates a position pointing to the global

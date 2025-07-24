@@ -82,22 +82,26 @@ module Prototype = struct
   include Datatype.Serializable_undefined
 
   type t =
-    | RootCall of Kernel_function.t
+    | RootCall of { thread: int; entry_point: Kernel_function.t }
     | GlobalInit of Varinfo.t
     | Local of Local.t
   [@@deriving eq, ord]
 
   let name = "Analysis_location"
   let reprs =
-    List.map (fun kf -> RootCall kf) Kernel_function.reprs @
+    List.map
+      (fun kf -> RootCall { thread=0; entry_point=kf; })
+      Kernel_function.reprs @
     List.map (fun vi -> GlobalInit vi) Varinfo.reprs @
     List.map (fun local -> Local local) Local.reprs
   let hash = function
-    | RootCall kf -> Hashtbl.hash (1, Kernel_function.hash kf)
+    | RootCall { thread; entry_point } ->
+      Hashtbl.hash (1, thread, Kernel_function.hash entry_point)
     | GlobalInit vi -> Hashtbl.hash (2, Varinfo.hash vi)
     | Local l -> Hashtbl.hash (1, Local.hash l)
   let pretty fmt = function
-    | RootCall kf -> Format.pp_print_string fmt (Kernel_function.get_name kf)
+    | RootCall { entry_point; _ } ->
+      Format.pp_print_string fmt (Kernel_function.get_name entry_point)
     | GlobalInit vi -> Format.pp_print_string fmt vi.vname
     | Local l -> Local.pretty fmt l
 end
@@ -107,8 +111,8 @@ include Prototype
 let local stmt callstack =
   Local (stmt, callstack)
 
-let root_call kf =
-  RootCall kf
+let root_call ~thread ~entry_point =
+  RootCall { thread; entry_point }
 
 let global_init vi =
   GlobalInit vi
@@ -119,7 +123,8 @@ let is_local = function
 
 let loc pos =
   match pos with
-  | RootCall kf -> Kernel_function.get_location kf
+  | RootCall { entry_point: Kernel_function.t; _ } ->
+    Kernel_function.get_location entry_point
   | GlobalInit vi -> vi.vdecl
   | Local l -> Local.loc l
 
@@ -138,13 +143,14 @@ let stmt pos =
 
 let kf pos =
   match pos with
-  | RootCall kf -> Some kf
+  | RootCall { entry_point } -> Some entry_point
   | GlobalInit _ -> None
   | Local lpos -> Some (Local.kf lpos)
 
 let callstack pos =
   match pos with
-  | RootCall kf -> Some (Callstack.init kf)
+  | RootCall { thread; entry_point } ->
+    Some (Callstack.init ~thread ~entry_point)
   | GlobalInit _vi -> None
   | Local lpos -> Some (Local.callstack lpos)
 
@@ -157,8 +163,8 @@ let of_kinstr kinstr callstack =
     Local (stmt, callstack)
   | Kglobal ->
     match Callstack.pop_call callstack with
-    | kf, None ->
-      RootCall kf
+    | entry_point, None ->
+      RootCall { thread=callstack.thread; entry_point }
     | _kf, Some (stmt, callstack) ->
       Local (stmt, callstack)
 

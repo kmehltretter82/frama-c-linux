@@ -213,7 +213,7 @@ module CfgNode = struct
   }
 
   let dead =
-    let stack = Callstack.init Cil_datatype.Kf.dummy in
+    let stack = Callstack.init ~thread:0 ~entry_point:Cil_datatype.Kf.dummy in
     make_aux (-1) stack NDead
 
   include Datatype.Make_with_collections(

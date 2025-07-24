@@ -543,7 +543,8 @@ let remove_superfluous_nodes ~keep start =
 let make_cfg th =
   let events = th.th_amap in
   let init_call = th.th_fun, Kglobal in
-  let callstack = Callstack.init th.th_fun in
+  let th_id = Thread.id th.th_eva_thread in
+  let callstack = Callstack.init ~thread:th_id ~entry_point:th.th_fun in
   let tg = CfgNode.new_node callstack in (* Originally an empty stack, is that important ? *)
   tg.cfgn_kind <- NEOP;
   let subtrace = Trace.subtrace_at_call events init_call in
