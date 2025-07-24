@@ -98,12 +98,17 @@ let generate_code =
 
 (* The Frama-C standard library contains specific built-in variables prefixed by
    "__fc_" and declared as extern: they prevent the generated code to be
-   linked. This modification of the default printer replaces them by their
-   original version from the stdlib. For instance, [__fc_stdout] is replaced by
-   [stdout]. That is very hackish since it modifies the default Frama-C
-   printer.
+   linked. Some are used to represent internal states of the specifications and
+   should not be printed. Others are used as targets of standard library
+   macros like stdout or errno and in that case the original macro should be
+   printed instead.
+   Moreover, the builtins for VLA allocation and deallocation are specific to
+   Frama-C. This printer reprint the original builtins (or nothing for the
+   deallocation).
 
-   TODO: should be done by the Frama-C default printer at some points. *)
+   TODO: could be done by the Frama-C default printer at some points, but since
+   the transformation is very specific to E-ACSL it should probably be
+   configurable. *)
 let change_printer =
   (* not projectified on purpose: this printer change is common to each
      project. *)
@@ -111,7 +116,6 @@ let change_printer =
   fun () ->
     if !first then begin
       first := false;
-      let r = Str.regexp "^__fc_" in
       let module Printer_class(X: Printer.PrinterClass) = struct
         class printer = object
           inherit X.printer as super
@@ -120,14 +124,18 @@ let change_printer =
             if Functions.Libc.is_vla_alloc_name vi.Cil_types.vname then
               (* Replace VLA allocation with calls to [__builtin_alloca] *)
               Format.fprintf fmt "%s" Functions.Libc.actual_alloca
-            else if (not vi.vghost) && vi.vstorage == Cil_types.Extern then
-              (* Replace calls to Frama-C builtins with calls to their original
-                 version from the libc *)
-              let s = Str.replace_first r "" vi.Cil_types.vname in
-              Format.fprintf fmt "%s" s
             else
-              (* Otherwise use the original printer *)
-              super#varinfo fmt vi
+              let replacement =
+                Ast_attributes.find_fc_stdlib_extern_replacement vi.vattr
+              in
+              match replacement with
+              | Some replacement ->
+                (* The varinfo is replacing a libc macro, print the replaced
+                   name. *)
+                Format.pp_print_string fmt replacement
+              | None ->
+                (* Otherwise use the original printer *)
+                super#varinfo fmt vi
 
           method !instr fmt i =
             match i with
@@ -145,10 +153,17 @@ let change_printer =
               Functions.Libc.is_vla_alloc_name vi.Cil_types.vname ||
               Functions.Libc.is_vla_free_name vi.Cil_types.vname
             in
+            let is_fc_internal (vi : Cil_types.varinfo) =
+              vi.vstorage == Cil_types.Extern &&
+              Ast_attributes.(contains fc_stdlib_internal vi.vattr)
+            in
             match g with
             | GFunDecl (_, vi, _) when is_vla_builtin vi ->
               (* Nothing to print: the VLA builtins don't have an original libc
                  version. *)
+              ()
+            | GFunDecl (_, vi, _) | GVarDecl (vi, _) when is_fc_internal vi ->
+              (* Do not print definitions internal to Frama-C's libc. *)
               ()
             | _ ->
               super#global fmt g

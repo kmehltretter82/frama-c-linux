@@ -74,10 +74,15 @@ let must_never_monitor vi =
   (* E-ACSL, please do not monitor yourself! *)
   Rtl.Symbols.mem_vi vi.vname
   ||
-  (* extern ghost variables are usually used (by the Frama-C libc) to
-       represent some internal invisible states in ACSL specifications. They do
-       not correspond to something concrete *)
+  (* extern ghost variables are usually used to represent some internal
+     invisible states in ACSL specifications. They do not correspond to
+     something concrete *)
   (vi.vghost && vi.vstorage = Extern)
+  ||
+  (* The fc_stdlib_internal attribute is used by the Frama-C libc to declare
+     internal states in the specification that are implemented with stubs. They
+     should not be monitored by E-ACSL *)
+  Ast_attributes.(contains fc_stdlib_internal vi.vattr)
   ||
   (* incomplete types cannot be properly monitored. See BTS #2406. *)
   not (Cil.isCompleteType vi.vtype)
@@ -759,9 +764,9 @@ end = struct
 
 end
 
-let consolidated_must_monitor_vi vi =
+let consolidate_env () =
   if Env.is_consolidated () then
-    Env.consolidated_mem vi
+    ()
   else begin
     Options.feedback ~level:2 "performing pre-analysis for minimal memory \
                                instrumentation.";
@@ -777,8 +782,11 @@ let consolidated_must_monitor_vi vi =
           if there are memory-related annotations.@]"
          s);
     Options.feedback ~level:2 "pre-analysis done.";
-    Env.consolidated_mem vi
   end
+
+let consolidated_must_monitor_vi vi =
+  consolidate_env ();
+  Env.consolidated_mem vi
 
 let concurrent_function_ref = ref None
 
@@ -883,9 +891,13 @@ let must_monitor_exp ?kf ?stmt exp =
    || Error.generic_handle (must_monitor_exp ?kf ?stmt) false exp)
 
 let use_monitoring () =
-  not (Env.is_empty ())
-  || Options.Full_mtracking.get ()
-  || Env.has_heap_allocations ()
+  if Options.Full_mtracking.get () then
+    true
+  else begin
+    consolidate_env ();
+    not (Env.is_empty ())
+    || Env.has_heap_allocations ()
+  end
 
 let found_concurrent_function ~loc vi =
   if use_monitoring () then

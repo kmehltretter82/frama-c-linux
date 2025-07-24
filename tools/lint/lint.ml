@@ -42,7 +42,7 @@ let external_formatters = [
     available_cmd = "clang-format --version > /dev/null 2> /dev/null";
     check_cmd = "clang-format --dry-run -Werror" ;
     update_cmd = "clang-format -i" ;
-    version_cmd = "clang-format --version | grep -E '1[1-9]'"
+    version_cmd = "clang-format --version | grep -E '1[1-9]|20'"
   }
   ;
   { kind = "Python";

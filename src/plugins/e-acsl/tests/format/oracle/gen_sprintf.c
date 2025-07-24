@@ -63,7 +63,7 @@ int main(void)
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
     }
     /*@ assert !\initialized(&buf[0 .. 3]); */ ;
-    __e_acsl_builtin_sprintf("d",buf,"%d",10);
+    __e_acsl_builtin_sprintf("d",buf,__gen_e_acsl_literal_string,10);
     {
       int __gen_e_acsl_size_2;
       int __gen_e_acsl_if_2;
