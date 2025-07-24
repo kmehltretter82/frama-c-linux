@@ -112,6 +112,7 @@ module Mode : sig
 
   val compare : t -> t -> int
   val pretty : Format.formatter -> t -> unit
+  val to_int : t -> int
 
   val in_out_args : mode:t -> 'a list -> 'a list * 'a option
   val out_arg : mode:t -> 'a list -> 'a option
@@ -129,6 +130,10 @@ end = struct
     | Complete, _ -> -1
     | _, Complete -> 1
     | Incomplete i, Incomplete j -> compare j i
+
+  let to_int = function
+    | Complete -> 0
+    | Incomplete m -> m
 
   let preferred_opt modes =
     match List.sort compare modes with
@@ -581,11 +586,24 @@ module Derived_functions = struct
   let clear () = Logic_info.Hashtbl.clear tbl
 end
 
+module Extractions = struct
+  open Datatype.Pair_with_collections (Logic_info) (Datatype.Int)
+  let tbl = Hashtbl.create 9
+  let clear () = Hashtbl.clear tbl
+  let memo ~mode li f =
+    let m = Mode.to_int mode in
+    Hashtbl.memo tbl
+      (li, m)
+      (fun (li, _) -> f ~mode li)
+  let find ~mode li = Hashtbl.find tbl (li, Mode.to_int mode)
+  let get ~mode li = try find ~mode li with Not_found -> li
+end
+
 module rec Make_extractor : functor (Out : Out_language) -> sig
   val extract : ?name:string -> mode:mode -> logic_info -> logic_info
 end = functor (Out : Out_language) -> struct
 
-  let extract ?name ~mode li =
+  let extract ?name ~mode li = Extractions.memo ~mode li @@ fun ~mode li ->
     Options.debug ~dkey ~level:2
       "@[<2>extracting data from inductive using mode %a:@ @[%a@]@]"
       Mode.pretty mode pp_logic_info li;
@@ -642,11 +660,12 @@ end = functor (Out : Out_language) -> struct
               in
               Mode.in_out_args ~mode:mode' args,
               match mode' with
-              | Complete -> li
+              | Complete -> Extractions.get ~mode:Complete li
               | _ -> FunctionExtractor.extract ~mode:mode' li
           in
           begin match in_out_args with
             | _, None -> (* complete mode *)
+              let pl = {pl with pred_content = Papp (li, labels, args)} in
               recurse ~conds:(pl :: conds) pr
             | args, Some res ->
               let rec_call =
@@ -699,9 +718,6 @@ end
 
 and FunctionExtractor : sig
   val extract : mode:mode -> logic_info -> logic_info
-  (** memoized; mode has to be incomplete *)
-
-  val clear : unit -> unit
 end = struct
   module Extractor = Make_extractor (struct
       include Build_pred_or_term.Term
@@ -724,24 +740,15 @@ end = struct
     Derived_functions.add li f;
     f
 
-  module Function_with_mode = struct
-    include Datatype.Pair_with_collections (Logic_info) (Datatype.Int)
-    let memo_tbl = Hashtbl.create 9
-    let clear () = Hashtbl.clear memo_tbl
-  end
-
-  let clear = Function_with_mode.clear
-
   let extract ~mode li = match mode with
     | Complete -> Options.fatal "function extraction in complete mode"
-    | Incomplete m ->
-      Function_with_mode.Hashtbl.memo
-        Function_with_mode.memo_tbl
-        (li, m)
-        (fun (li, _) -> extract_with_mode ~mode:m li)
+    | Incomplete m -> extract_with_mode ~mode:m li
 end
 
-module PredicateExtractor = struct
+module PredicateExtractor : sig
+  val extract : logic_info -> logic_info
+end
+= struct
   module Extractor = Make_extractor (struct
       include Build_pred_or_term.Predicate
       let mk_concl ~mode:_ _ = mk_true None
@@ -749,7 +756,8 @@ module PredicateExtractor = struct
 
   let extract_with_mode ~mode li =
     match mode.Modus.mode with
-    | Complete -> Extractor.extract ~mode:mode.Modus.mode li
+    | Complete ->
+      Extractor.extract ~mode:mode.Modus.mode li
     | Incomplete i ->
       let f = FunctionExtractor.extract ~mode:mode.mode li in
       let args, res = Mode.incomplete_in_out_args ~mode:i li.l_profile in
@@ -775,6 +783,6 @@ let extract_predicate = PredicateExtractor.extract
 
 let clear () =
   Fallthrough_terms.clear ();
-  FunctionExtractor.clear ();
+  Extractions.clear ();
   Derived_functions.clear ();
   InductiveDefinition.clear ()
