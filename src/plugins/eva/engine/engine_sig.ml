@@ -167,7 +167,7 @@ module type Results = sig
   val eval_function:
     state -> ?args:exp list -> lhost -> kernel_function list evaluated
 
-  (** [assume_cond stmt state expr b] reduces the given abstract state
+  (** [assume_cond ~pos state expr b] reduces the given abstract state
       by assuming [exp] evaluates to:
       - a non-zero value if [b] is true;
       - zero if [b] is false. *)

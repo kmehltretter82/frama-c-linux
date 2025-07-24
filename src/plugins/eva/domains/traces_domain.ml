@@ -1113,9 +1113,9 @@ module D = struct
     let trans = Assign (Position.kinstr pos, cil_lval, lv.lval.typ, cil_exp) in
     `Value (Traces.add_trans state trans)
 
-  let assume ~pos e b _valuation state =
+  let assume ~pos e positive _valuation state =
     let cil_exp = Eva_ast.to_cil_exp e in
-    let trans = Assume (Position.stmt pos |> Option.get, cil_exp, b) in
+    let trans = Assume (Position.stmt pos |> Option.get, cil_exp, positive) in
     `Value (Traces.add_trans state trans)
 
   let start_call ~pos call _recursion _valuation state =

@@ -125,7 +125,7 @@ let dkey_callstacks =
     ~help:"print the current callstack alongside some messages"
 
 let dkey_callstack_hash =
-  register_category "callstack"
+  register_category "callstack-hash"
     ~help:"additionally print the current callstack hash in some messages"
 
 let () =

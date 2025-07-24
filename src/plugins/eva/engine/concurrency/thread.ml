@@ -164,7 +164,7 @@ module Identities = State_builder.Hashtbl (Identity.Hashtbl) (Thread)
 (* The thread state is all the information learned about the threads during
    the analysis *)
 
-module ALSet = Position.Local.Set
+module PosSet = Position.Local.Set
 
 module Properties =
 struct
@@ -176,18 +176,18 @@ struct
 
     type t = {
       entry_point : Kernel_function.t;
-      spawn_points : ALSet.t;
+      spawn_points : PosSet.t;
       arguments : (Varinfo.t * Cvalue.V.t) list;
     }
 
     let name = "Eva.Thread.Properties"
     let reprs = [{
         entry_point = List.hd Kernel_function.reprs;
-        spawn_points = List.hd ALSet.reprs;
+        spawn_points = List.hd PosSet.reprs;
         arguments = [List.hd Varinfo.reprs, List.hd Cvalue.V.reprs];
       }]
     let pretty fmt properties =
-      let spawn_points = ALSet.elements properties.spawn_points in
+      let spawn_points = PosSet.elements properties.spawn_points in
       let pp_sep fmt () = Format.fprintf fmt ";@ " in
       let pp_var = Varinfo.pretty in
       let pp_val = Cvalue.V.pretty in
@@ -220,21 +220,21 @@ struct
   let create spawn_point entry_point arguments =
     {
       entry_point;
-      spawn_points = ALSet.singleton spawn_point;
+      spawn_points = PosSet.singleton spawn_point;
       arguments = map_arguments entry_point arguments
     }
 
   let main_properties () =
     {
       entry_point = Globals.entry_point () |> fst;
-      spawn_points = ALSet.empty;
+      spawn_points = PosSet.empty;
       arguments = [];
     }
 
   let interrupt_properties kf =
     {
       entry_point = kf;
-      spawn_points = ALSet.empty;
+      spawn_points = PosSet.empty;
       arguments = [];
     }
 
@@ -242,7 +242,7 @@ struct
     assert (Kernel_function.equal entry_point properties.entry_point);
     {
       entry_point;
-      spawn_points = ALSet.add spawn_point properties.spawn_points;
+      spawn_points = PosSet.add spawn_point properties.spawn_points;
       arguments =
         (* Join a thread argument as varinfo * cvalue with a new cvalue *)
         let join_argument (vi, v1) v2 = (vi, Cvalue.V.join v1 v2) in

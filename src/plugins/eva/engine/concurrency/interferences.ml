@@ -68,7 +68,7 @@ struct
 
   let pretty : Format.formatter -> t -> unit =
     let pp_val fmt { state; _ } = Top.pretty Dom.pretty fmt state
-    and pp_key = Position.Local.pretty_loc in
+    and pp_key = Pos.pretty_loc in
     pp_map PosMap.iter pp_key pp_val
 
   let empty : t = PosMap.empty

@@ -98,12 +98,12 @@ val is_local : t -> bool
 
 val kf : t -> Cil_types.kernel_function option
 (** [kf p] returns the kernel function of a local position [p] or [None]
-    if it is a global localion. *)
+    if it is a global position. *)
 
 val stmt : t -> Cil_types.stmt option
 (** [stmt p] returns the stmt of a local position [p] or [None] if it is a
-    global localion. *)
+    global position. *)
 
 val callstack : t -> Callstack.t option
 (** [callstack p] returns the callstack of a local position or [None] if it is a
-    global location. *)
+    global position. *)

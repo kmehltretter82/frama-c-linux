@@ -98,7 +98,7 @@ module Prototype = struct
     | RootCall { thread; entry_point } ->
       Hashtbl.hash (1, thread, Kernel_function.hash entry_point)
     | GlobalInit vi -> Hashtbl.hash (2, Varinfo.hash vi)
-    | Local l -> Hashtbl.hash (1, Local.hash l)
+    | Local l -> Hashtbl.hash (3, Local.hash l)
   let pretty fmt = function
     | RootCall { entry_point; _ } ->
       Format.pp_print_string fmt (Kernel_function.get_name entry_point)
