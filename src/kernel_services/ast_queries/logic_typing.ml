@@ -1736,6 +1736,14 @@ struct
     in
     env, t, e
 
+  let typeOf_string_literal loc s =
+    let typ = Cil.typeOf_string_literal ~loc s in
+    Ctype (Ast_types.remove_qualifiers_deep typ)
+
+  let typeOf_wstring_literal loc w =
+    let typ = Cil.typeOf_wstring_literal ~loc w in
+    Ctype (Ast_types.remove_qualifiers_deep typ)
+
   let convertible (t1,t) (t2,_) =
     let res =
       try
@@ -2640,10 +2648,10 @@ struct
       let t = Logic_utils.parse_float ~loc s in
       t.term_node , t.term_type
     | PLconstant (StringConstant s) ->
-      TConst (LStr (unescape s)), Ctype (Cil.typeOf_string_literal s)
+      TConst (LStr (unescape s)), typeOf_string_literal loc s
     | PLconstant (WStringConstant s) ->
       let l = wcharlist_of_string s in
-      TConst (LWStr l), Ctype (Cil.typeOf_wstring_literal l)
+      TConst (LWStr l), typeOf_wstring_literal loc l
     | PLvar x ->
       let old_val info =
         let typ =
