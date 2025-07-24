@@ -191,7 +191,9 @@ let append_callstack ?(stacktrace=false) ?append ~callstack fmt =
     match callstack with
     | None -> ()
     | Some cs ->
-      Format.fprintf fmt "@ stack: @[<hv>%a%a@]"
+      (* note: the "\n" before the pretty print of the stack is required by:
+         FRAMAC_LIB/analysis-scripts/make_wrapper.py *)
+      Format.fprintf fmt "@\nstack: @[<hv>%a%a@]"
         pretty_hash cs
         Callstack.pretty cs
 

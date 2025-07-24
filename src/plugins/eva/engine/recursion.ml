@@ -53,9 +53,6 @@ let check_spec kinstr kf =
        Generating probably incomplete assigns to interpret the call.@ \
        Try to increase the %s parameter \
        or write a correct specification for function %a.@]"
-      (* note: the "\n" before the pretty print of the stack is required by:
-         FRAMAC_LIB/analysis-scripts/make_wrapper.py
-      *)
       Kernel_function.pretty kf
       Parameters.RecursiveUnroll.name
       Kernel_function.pretty kf
