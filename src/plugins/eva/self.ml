@@ -173,19 +173,20 @@ let () = set_warn_status wkey_recursion Log.Wfeedback
 type 'a pretty_printer =
   ?emitwith:(Log.event -> unit) -> ?once:bool ->
   ?pos:Position.t -> ?current:bool -> ?source:Fc_Filepath.position ->
-  ?stacktrace:bool -> ?echo:bool ->
+  ?stacktrace:bool ->  ?append:(Format.formatter -> unit) -> ?echo:bool ->
   ('a,Format.formatter,unit) format -> 'a
 
 type ('a,'b) pretty_aborter =
   ?pos:Position.t -> ?current:bool -> ?source:Fc_Filepath.position ->
-  ?stacktrace:bool -> ?echo:bool ->
+  ?stacktrace:bool -> ?append:(Format.formatter -> unit) -> ?echo:bool ->
   ('a,Format.formatter,unit,'b) format4 -> 'a
 
-let append_callstack ?(stacktrace=false) ~callstack fmt =
+let append_callstack ?(stacktrace=false) ?append ~callstack fmt =
   let pretty_hash fmt cs =
     if is_debug_key_enabled dkey_callstack_hash then
       Format.fprintf fmt "<%a> " Callstack.pretty_hash cs
   in
+  Option.iter (fun append -> append fmt) append;
   if stacktrace && is_debug_key_enabled dkey_callstacks then
     match callstack with
     | None -> ()
@@ -196,19 +197,20 @@ let append_callstack ?(stacktrace=false) ~callstack fmt =
 
 let lift_aborter (aborter : ('a,'b) Log.pretty_aborter)
   : ('a,'b) pretty_aborter =
-  fun ?pos ?current ?source ?stacktrace ->
+  fun ?pos ?current ?source ?stacktrace ?append ->
   (* Extract source location *)
   match pos with
   | Some pos ->
     let callstack = Position.callstack pos in
     let source = Option.value ~default:(Position.pos pos) source
     (* Append callstack if requested *)
-    and append = append_callstack ?stacktrace ~callstack in
+    and append = append_callstack ?stacktrace ?append ~callstack in
     aborter ?current:None ~source ~append
   | None ->
     let callstack = !Callstack.current in
-    let append = append_callstack ?stacktrace ~callstack in
+    let append = append_callstack ?stacktrace ?append ~callstack in
     aborter ?current ?source ~append
+
 
 let lift_printer (printer : 'a Log.pretty_printer) : 'a pretty_printer =
   fun ?emitwith ?once -> lift_aborter (printer ?emitwith ?once)

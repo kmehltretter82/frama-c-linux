@@ -97,12 +97,12 @@ val wkey_recursion : warn_category
 type 'a pretty_printer =
   ?emitwith:(Log.event -> unit) -> ?once:bool ->
   ?pos:Position.t -> ?current:bool -> ?source:Fc_Filepath.position ->
-  ?stacktrace:bool -> ?echo:bool ->
+  ?stacktrace:bool ->  ?append:(Format.formatter -> unit) -> ?echo:bool ->
   ('a,Format.formatter,unit) format -> 'a
 
 type ('a,'b) pretty_aborter =
   ?pos:Position.t -> ?current:bool -> ?source:Fc_Filepath.position ->
-  ?stacktrace:bool -> ?echo:bool ->
+  ?stacktrace:bool ->  ?append:(Format.formatter -> unit) -> ?echo:bool ->
   ('a,Format.formatter,unit,'b) format4 -> 'a
 
 (** Results of analysis. *)
