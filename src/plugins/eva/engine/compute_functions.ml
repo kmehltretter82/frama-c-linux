@@ -370,7 +370,10 @@ module Make (Engine: Engine_sig.S) = struct
 
     let compute_call_and_join init_state =
       let thread = Thread.(id (current ())) in
-      let callstack =  Callstack.init ~thread ~entry_point:kf in
+      let callstack = Callstack.init ~thread ~entry_point:kf in
+      assert (!Callstack.current = None);
+      Callstack.current := Some callstack;
+      Fun.protect ~finally:(fun () -> Callstack.current := None) @@ fun () ->
       Engine.Dom.Store.register_initial_state callstack kf init_state;
       let call = { kf; callstack; arguments = []; rest = []; return = None; } in
       let final_result = compute_call call None init_state in
