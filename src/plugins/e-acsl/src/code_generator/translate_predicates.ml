@@ -422,19 +422,11 @@ let generalized_untyped_to_exp ~adata ?name kf ?rte env p =
   let env = Env.Logic_scope.reset env in
   e, adata, env
 
-let do_it ?pred_to_print kf env p =
+let do_it kf env p =
   match p.tp_kind with
   | Assert | Check ->
     Options.feedback ~dkey ~level:3 "translating predicate %a"
       Printer.pp_toplevel_predicate p;
-    let pred_to_print =
-      match pred_to_print with
-      | Some pred ->
-        Options.feedback ~dkey ~level:3 "(predicate to print %a)"
-          Printer.pp_predicate pred;
-        pred
-      | None -> p.tp_statement
-    in
     let adata, env = Assert.empty ~loc:p.tp_statement.pred_loc kf env in
     let e, adata, env =
       generalized_untyped_to_exp ~adata kf env p.tp_statement
@@ -447,7 +439,7 @@ let do_it ?pred_to_print kf env p =
         kf
         env
         e
-        pred_to_print
+        p.tp_statement
     in
     Env.add_stmt env stmt
   | Admit -> env
