@@ -289,7 +289,8 @@ let register_locking_machinery ?(lock_last=false) ~lock ~unlock () =
 
 let log_redirector ?(flush=fun () -> ()) emit_string =
   let output s offset length = emit_string (String.sub s offset length) in
-  Log.set_output ~isatty:false output flush
+  let fmt = Format.make_formatter output flush in
+  Log.set_formatter ~isatty:false fmt
 
 let make_string_list ~packing =
   let (model,column) =

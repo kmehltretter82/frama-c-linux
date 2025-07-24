@@ -223,10 +223,7 @@ let catch_toplevel_run ~f ~at_normal_exit ~on_error =
   try
     f ();
     (* write again on stdout *)
-    Log.set_output
-      ~isatty:(Unix.isatty Unix.stdout)
-      (output_substring stdout)
-      (fun () -> flush stdout);
+    Log.set_formatter ~isatty:(Unix.isatty Unix.stdout) Format.std_formatter;
     cleanup ();
   with
   | Exit ->

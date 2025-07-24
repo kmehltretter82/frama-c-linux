@@ -459,10 +459,12 @@ val get_current_source : unit -> Filepath.position
 val clean : unit -> unit
 (** Flushes the last transient message if necessary. *)
 
-val set_output : ?isatty:bool -> (string -> int -> int -> unit) ->
-  (unit -> unit) -> unit
-(** This function has the same parameters as Format.make_formatter.
+val set_formatter : ?isatty:bool -> Format.formatter -> unit
+(** Set the formatter for log outputs. This formatter is {!Format.std_formatter}
+    by default and can be changed if the log output must be redirected.
     @since Beryllium-20090901
+    @before Frama-C+dev was [set_output] and took formatter output functions as
+    arguments
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 val print_on_output : (Format.formatter -> unit) -> unit

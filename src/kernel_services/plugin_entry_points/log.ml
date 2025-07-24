@@ -58,10 +58,7 @@ type terminal = {
   mutable isatty : bool ;
   mutable clean : bool ;
   mutable delayed : (terminal -> unit) list ;
-  mutable output : string -> int -> int -> unit ;
-  (* Same as Format.make_formatter *)
-  mutable flush : unit -> unit ;
-  (* Same as Format.make_formatter *)
+  mutable formatter : Format.formatter ;
 }
 
 let delayed_echo t =
@@ -88,19 +85,18 @@ let term_clean t =
          "\027[K" is CSI command EL 'Erase in Line' ;
          See https://en.wikipedia.org/wiki/ANSI_escape_code
       *)
-      t.output u 0 (String.length u) ;
+      Format.pp_print_string t.formatter u;
       t.clean <- true ;
     end
 
-let set_terminal t isatty output flush =
+let set_terminal t isatty formatter =
   begin
     (* Ensures previous terminal state is clean *)
     assert (is_ready t) ;
     term_clean t ;
     (* Now reconfigure the terminal *)
     t.isatty <- isatty ;
-    t.output <- output ;
-    t.flush <- flush ;
+    t.formatter <- formatter;
     t.clean <- true ;
   end
 
@@ -109,22 +105,17 @@ let stdout = {
   clean = true ;
   delayed = [] ;
   isatty = Unix.isatty Unix.stdout ;
-  output = output_substring stdout ;
-  flush =  (fun () -> flush stdout);
+  formatter = Format.std_formatter ;
 }
 
 let clean () = term_clean stdout
 
-let set_output ?(isatty=false) output flush =
-  set_terminal stdout isatty output flush
+let set_formatter ?(isatty=false) formatter =
+  set_terminal stdout isatty formatter
 
 (* -------------------------------------------------------------------------- *)
 (* --- Locked Formatter                                                   --- *)
 (* -------------------------------------------------------------------------- *)
-
-type delayed =
-  | Delayed of terminal
-  | Formatter of (string -> int -> int -> unit) * (unit -> unit)
 
 let lock_terminal t =
   begin
@@ -132,7 +123,7 @@ let lock_terminal t =
       failwith "Console is already locked" ;
     term_clean t ;
     t.lock <- Locked ;
-    Format.make_formatter t.output t.flush ;
+    t.formatter
   end
 
 let unlock_terminal t fmt =
@@ -156,26 +147,38 @@ let print_on_output job =
 (* --- Delayed Lock until first write                                     --- *)
 (* -------------------------------------------------------------------------- *)
 
+let formatter_with ?output:new_output ?flush:new_flush fmt =
+  let old_output, old_flush = Format.pp_get_formatter_output_functions fmt () in
+  let output = match new_output with
+    | None -> old_output
+    | Some output -> output old_output
+  and flush = match new_flush with
+    | None -> old_flush
+    | Some flush -> flush old_flush
+  in
+  let new_fmt = Format.make_formatter output flush in
+  let stag_functions =  Format.pp_get_formatter_stag_functions fmt () in
+  Format.pp_set_formatter_stag_functions new_fmt stag_functions;
+  Format.pp_set_mark_tags new_fmt (Format.pp_get_mark_tags fmt ());
+  Format.pp_set_print_tags new_fmt (Format.pp_get_print_tags fmt ());
+  new_fmt
+
 let delayed_terminal terminal =
   if is_locked terminal then
     failwith "Console is already locked" ;
   terminal.lock <- DelayedLock ;
-  let d = ref (Delayed terminal) in
-  let d_output d text k n =
-    match !d with
-    | Delayed t ->
-      t.lock <- Locked ;
-      d := Formatter( t.output , t.flush ) ;
-      t.output text k n
-    | Formatter(out,_) ->
-      out text k n
+  let delayed = ref true in
+  let output regular_output text k n =
+    if !delayed then begin
+      terminal.lock <- Locked ;
+      delayed := false ;
+    end;
+    regular_output text k n
+  and flush regular_flush () =
+    if not !delayed then (* otherwise, nothing to flush yet ! *)
+      regular_flush ()
   in
-  let d_flush d () =
-    match !d with
-    | Delayed _ -> () (* nothing to flush yet ! *)
-    | Formatter(_,flush) -> flush ()
-  in
-  Format.make_formatter (d_output d) (d_flush d)
+  formatter_with ~output ~flush terminal.formatter
 
 let print_delayed job =
   let fmt = delayed_terminal stdout in
@@ -195,32 +198,38 @@ let is_single_line text =
   try ignore (String.index_from text 0 '\n') ; false
   with Not_found -> true
 
-let echo_firstline output text p q width =
+let echo_substring fmt text pos len =
+  (* Do replace by Format.pp_print_substring_as as soon as OCaml 5.1 is
+     the minimal version supported by Frama-C *)
+  let s = String.sub text pos len in
+  Format.pp_print_string fmt s
+
+let echo_firstline fmt text p q width =
   let t = try String.index_from text p '\n' with Not_found -> succ q in
   let n = min width (t-p) in
-  output text p n
+  echo_substring fmt text p n
 
-let echo_newline output =
-  output "\n" 0 1
+let echo_newline fmt =
+  Format.fprintf fmt "\n"
 
 (* output indentation unless the first line is along the prefix. *)
-let echo_line output ~is_prefixed text k n =
-  if not is_prefixed then output "  " 0 2;
-  output text k n
+let echo_line fmt ~is_prefixed text k n =
+  if not is_prefixed then Format.fprintf fmt "  ";
+  echo_substring fmt text k n
 
 (* [is_prefixed] can only be true for the first line. *)
-let rec echo_lines ?(is_prefixed=false) output text p q =
+let rec echo_lines ?(is_prefixed=false) fmt text p q =
   if p <= q then
     let t = try String.index_from text p '\n' with Not_found -> (-1) in
     if t < 0 || t > q then begin
       (* incomplete, last line *)
-      echo_line output ~is_prefixed text p (q+1-p) ;
-      echo_newline output ;
+      echo_line fmt ~is_prefixed text p (q+1-p) ;
+      echo_newline fmt ;
     end
     else begin
       (* complete line *)
-      echo_line output ~is_prefixed text p (t+1-p) ;
-      echo_lines output text (t+1) q ;
+      echo_line fmt ~is_prefixed text p (t+1-p) ;
+      echo_lines fmt text (t+1) q ;
     end
 
 (* -------------------------------------------------------------------------- *)
@@ -256,18 +265,17 @@ let echo_event evt terminal =
   let header_length = String.length header in
   let text = evt.evt_message in
   let size = String.length text in
-  let output = terminal.output in
-  output header 0 header_length ;
+  let fmt = terminal.formatter in
+  Format.pp_print_string fmt header ;
   if header_length + size <= 80 && is_single_line text then begin
-    output text 0 size;
-    echo_newline output
-  end
-  else begin
+    Format.pp_print_string fmt text;
+    Format.pp_print_newline fmt ();
+  end else begin
     let is_prefixed = is_first_line_prefixed evt in
-    if not is_prefixed then echo_newline output;
-    echo_lines output ~is_prefixed text 0 (String.length text - 1)
+    if not is_prefixed then Format.fprintf fmt "\n";
+    echo_lines fmt ~is_prefixed text 0 (String.length text - 1)
   end;
-  terminal.flush ()
+  Format.pp_print_flush fmt ()
 
 let do_echo terminal evt =
   if delayed_echo terminal then
@@ -279,11 +287,12 @@ let do_transient terminal text p q =
   if p <= q && not (delayed_echo terminal) then
     begin
       term_clean terminal ;
-      echo_firstline terminal.output text p q 80 ;
+      let fmt = terminal.formatter in
+      echo_firstline fmt text p q 80 ;
       if terminal.isatty
       then terminal.clean <- false
-      else terminal.output "\n" 0 1 ;
-      terminal.flush () ;
+      else Format.fprintf fmt "\n" ;
+      Format.pp_print_flush fmt () ;
     end
 
 (* -------------------------------------------------------------------------- *)
@@ -1218,13 +1227,12 @@ struct
         logwithfinal finally_unit channel ~fire:false ~kind:Result
           ?category:dkey ?current ?source  "%t" header;
         let bol = ref true in
-        let stdout = { stdout with output = spynewline bol stdout.output } in
         let fmt = delayed_terminal stdout in
+        let fmt = formatter_with ~output:(spynewline bol) fmt in
         try
           Format.kfprintf
             begin fun fmt ->
               append fmt ;
-              Format.pp_print_flush fmt () ;
               unlock_terminal stdout fmt ;
               if not !bol then Format.pp_print_newline fmt () ;
             end
