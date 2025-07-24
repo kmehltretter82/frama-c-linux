@@ -337,14 +337,9 @@ module Make (Engine: Engine_sig.S) = struct
   (* Execute the function [job] with the current callstack set to [callstack],
      and update [Eva_perf] accordingly *)
   let with_callstack callstack job x =
-    let previous_callstack = !Callstack.current in
-    Callstack.current := Some callstack;
     Eva_perf.start callstack;
-    let finally () =
-      Eva_perf.stop callstack;
-      Callstack.current := previous_callstack
-    in
-    Fun.protect ~finally (fun () -> job x)
+    let finally () = Eva_perf.stop callstack in
+    Callstack.with_callstack ~finally callstack job x
 
   (* Interprets a [call] in the state [state],
      using a builtin, the specification or the body of the called function,
@@ -368,12 +363,10 @@ module Make (Engine: Engine_sig.S) = struct
 
   let compute_main_call kf init_state =
 
-    let compute_call_and_join init_state =
+    let compute_call_and_join =
       let thread = Thread.(id (current ())) in
       let callstack = Callstack.init ~thread ~entry_point:kf in
-      assert (!Callstack.current = None);
-      Callstack.current := Some callstack;
-      Fun.protect ~finally:(fun () -> Callstack.current := None) @@ fun () ->
+      Callstack.with_callstack callstack @@ fun init_state ->
       Engine.Dom.Store.register_initial_state callstack kf init_state;
       let call = { kf; callstack; arguments = []; rest = []; return = None; } in
       let final_result = compute_call call None init_state in

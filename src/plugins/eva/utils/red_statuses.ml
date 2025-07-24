@@ -82,7 +82,7 @@ let add_red_ap kinstr ap =
     try AlarmOrProp.Map.find ap current_map
     with Not_found -> Callstacks.empty
   in
-  let new_callstacks = Callstacks.add !Callstack.current callstacks in
+  let new_callstacks = Callstacks.add (Callstack.get_current ()) callstacks in
   let new_map = AlarmOrProp.Map.add ap new_callstacks current_map in
   RedStatusesTable.replace kinstr new_map;
   Hook.apply ap

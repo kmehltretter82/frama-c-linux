@@ -100,9 +100,16 @@ val iter : (t -> unit) -> t -> unit
 
 (** {2 Callstack tracking} *)
 
-(** The current callstack of the analysis. *)
-val current : t option ref
+(** Returns the current callstack or None if it has not been initialized. *)
+val get_current : unit -> t option
 
 (** Returns the current callstack; fails if it has not been initialized.
     This should only be called during the analysis of a function. *)
-val get_current : unit -> t
+val get_current_exn : unit -> t
+
+(** [with_callstack ~finally cs job] creates a wrapper arround [job] such that
+    the wrapped executions happen in environnement where the current callstack
+    returned by {!get_current} is set to [cs]. When [job] returns or raises an
+    exception, [finally] is called and the then the current callstack is
+    restored to its previous value. *)
+val with_callstack : ?finally:(unit -> unit) -> t -> ('a -> 'b) -> 'a -> 'b
