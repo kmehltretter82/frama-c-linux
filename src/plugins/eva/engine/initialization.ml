@@ -153,7 +153,7 @@ module Make
   (* Field by field initialization of a variable to zero, or top if volatile.
      Very inefficient. *)
   let initialize_var_zero_or_volatile ~pos vi state =
-    let loc = Cil_datatype.Location.unknown in
+    let loc = Position.loc pos in
     let init = Eva_ast.translate_init (Cil.makeZeroInit ~loc vi.vtype) in
     let lval = Eva_ast.Build.var vi in
     apply_eva_initializer ~pos ~top_volatile:true lval init state
