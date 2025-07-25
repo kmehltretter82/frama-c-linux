@@ -1,4 +1,8 @@
 [kernel] Parsing records.c (with preprocessing)
+[alias] analysing global variable definition: __fc_lit_string1 = "%d\n%d\n";
+[alias] May-aliases after global variable definition  __fc_lit_string1  are  <none>
+[alias] May-alias graph after global variable definition  __fc_lit_string1  is
+  <empty>
 [alias] analysing function: main
 [alias] analysing instruction: a = & x;
 [alias] May-aliases after instruction  a = & x;  are  <none>
