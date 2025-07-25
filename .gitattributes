@@ -220,6 +220,7 @@ README* header_spec=.ignore
 /doc/**/*.sh header_spec=.ignore
 
 /headers/* header_spec=.ignore
+/headers/dune header_spec=CEA_LGPL
 
 /licenses/* header_spec=.ignore
 
