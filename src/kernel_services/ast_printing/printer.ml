@@ -245,19 +245,23 @@ class printer_with_annot () = object (self)
         | _ -> skind
       end
 
+  method private var_as_str_literal fmt v =
+    let s = Globals.Vars.get_literal_string v in
+    self#str_literal fmt s
+
   method! lval fmt lv =
     match lv with
     | Var v, (NoOffset | Index _ as o)
       when Ast_info.is_string_literal v && not (Kernel.PrintAsIs.get()) ->
-      let init = Globals.Vars.find v in
-      (match init.init with
-       | Some (StrInit _ as i) ->
-         Format.fprintf fmt "%a%a" self#init_or_str i self#offset o
-       | _ ->
-         Kernel.fatal
-           "Variable %s is supposed to be a (wide)string literal but is not \
-            initialized as such" v.vname)
+      Format.fprintf fmt "%a%a" self#var_as_str_literal v self#offset o
     | _ -> super#lval fmt lv
+
+  method! term_lval fmt lv =
+    match lv with
+    | TVar { lv_origin = Some v }, (TNoOffset | TIndex _ as o)
+      when Ast_info.is_string_literal v && not (Kernel.PrintAsIs.get()) ->
+      Format.fprintf fmt "%a%a" self#var_as_str_literal v self#term_offset o
+    | _ -> super#term_lval fmt lv
 
 end (* class printer_with_annot *)
 

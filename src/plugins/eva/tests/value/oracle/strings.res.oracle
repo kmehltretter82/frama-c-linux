@@ -149,7 +149,7 @@
 [eva] Done for function u
 [eva:alarm] strings.i:99: Warning: 
   pointer comparison.
-  assert \pointer_comparable((void *)("oh, hello" + 4), (void *)s7);
+  assert \pointer_comparable((void *)(&"oh, hello"[4]), (void *)s7);
 [eva] Recording results for string_comparison
 [eva] Done for function string_comparison
 [eva] computing for function wide_string_comparison <- main.
