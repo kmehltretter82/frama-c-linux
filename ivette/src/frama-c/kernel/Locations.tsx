@@ -124,6 +124,23 @@ function gotoIndex(index: number): void {
     updateSelection({ ...selection, index });
 }
 
+function goToNextVisibleIndex(currentIndex: number, model: Model): void {
+  const selection = MultiSelection.getValue();
+  const nextIndex = currentIndex + 1;
+  if (nextIndex >= selection.markers.length) return;
+  const iTab = model.getIndexOf(selection.markers[nextIndex]);
+  if(iTab !== undefined) updateSelection({ ...selection, index: nextIndex });
+  else return goToNextVisibleIndex(nextIndex, model);
+}
+
+function goToPrevVisibleIndex(currentIndex: number, model: Model): void {
+  const selection = MultiSelection.getValue();
+  const prevIndex = currentIndex - 1;
+  if (prevIndex < 0) return;
+  const iTab = model.getIndexOf(selection.markers[prevIndex]);
+  if(iTab !== undefined) updateSelection({ ...selection, index: prevIndex });
+  else return goToPrevVisibleIndex(prevIndex, model);
+}
 
 {
   Server.onReady(clearSelection);
@@ -197,13 +214,13 @@ export default function LocationsTable(): JSX.Element {
           icon='ANGLE.LEFT'
           title='Previous location'
           enabled={0 < kindex}
-          onClick={() => gotoIndex(kindex - 1)}
+          onClick={() => goToPrevVisibleIndex(kindex, model)}
         />
         <IconButton
           icon='ANGLE.RIGHT'
           title='Next location'
           enabled={(-1) <= kindex && kindex + 1 < size}
-          onClick={() => gotoIndex(kindex + 1)}
+          onClick={() => goToNextVisibleIndex(kindex, model)}
         />
         <Space />
         <Label
@@ -223,7 +240,7 @@ export default function LocationsTable(): JSX.Element {
         model={model}
         display={size > 0}
         selection={selected}
-        onSelection={(_row, _key, index) => gotoIndex(index)}
+        onSelection={(row) => gotoIndex(row.index) }
         settings="ivette.locations.table"
       >
         <Column
