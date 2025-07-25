@@ -44,7 +44,7 @@ module type S = sig
   (** [kinstr p] returns the kinstr associated to the position. *)
 
   val pretty_loc : Format.formatter -> t -> unit
-  (** Pretty-print the [Analysis_location] as a location in a source file. In
+  (** Pretty-print the position as a location in a source file. In
       the case of a local position, the short callstack leading to that
       position is also printed. *)
 end

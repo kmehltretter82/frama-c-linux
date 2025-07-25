@@ -38,7 +38,7 @@ struct
 
     type t = Stmt.t * Callstack.t [@@deriving eq, ord]
 
-    let name = "Analysis_location.Local"
+    let name = "Position.Local"
     let reprs =
       List.concat_map
         (fun stmt -> List.map (fun cs -> (stmt,cs)) Callstack.reprs)
@@ -77,7 +77,7 @@ end
 
 type local = Local.t
 
-(* Datatype for Analysis_location *)
+(* Datatype for Position.t *)
 module Prototype = struct
   include Datatype.Serializable_undefined
 
@@ -87,7 +87,7 @@ module Prototype = struct
     | Local of Local.t
   [@@deriving eq, ord]
 
-  let name = "Analysis_location"
+  let name = "Position"
   let reprs =
     List.map
       (fun kf -> RootCall { thread=0; entry_point=kf; })

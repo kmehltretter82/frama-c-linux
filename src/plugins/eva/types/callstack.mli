@@ -110,6 +110,6 @@ val get_current_exn : unit -> t
 (** [with_callstack ~finally cs job] creates a wrapper arround [job] such that
     the wrapped executions happen in environnement where the current callstack
     returned by {!get_current} is set to [cs]. When [job] returns or raises an
-    exception, [finally] is called and the then the current callstack is
-    restored to its previous value. *)
+    exception, [finally] is called and then the current callstack is restored to
+    its previous value. *)
 val with_callstack : ?finally:(unit -> unit) -> t -> ('a -> 'b) -> 'a -> 'b
