@@ -57,7 +57,7 @@ export function useSelection(): MultiSelection {
       });
       setScopes([...newScopes]);
     }
-  }, [s, setScopes, getAttr])
+  }, [s, setScopes, getAttr]);
 
   return { ...s, scopes };
 }
@@ -206,6 +206,13 @@ export default function LocationsTable(): JSX.Element {
   const indexLabel = index === undefined ? '…' : index + 1;
   const positionLabel = `${indexLabel} / ${size}`;
 
+  // Filter on the scope of the selected element in the Locations table
+  const [targetedScope, setTargetedScope] = React.useState<Ast.decl>();
+  React.useEffect(() => {
+    if(!targetedScope) model.setFilter(undefined);
+    else model.setFilter(({ decl }, ) => decl.decl === targetedScope);
+  }, [model, targetedScope]);
+
   // Component
   return (
     <>
@@ -229,6 +236,14 @@ export default function LocationsTable(): JSX.Element {
           label={positionLabel}
           title='Current location index / Number of locations' />
         <Space />
+        <IconButton
+          icon='FILTER'
+          selected={targetedScope !== undefined}
+          title='Filtered on the scope of the
+            selected element in the Locations table'
+          onClick={() =>
+            setTargetedScope(v => v ? undefined : getAttr(selected)?.scope)}
+        />
         <IconButton
           icon='TRASH'
           title='Cancel selected locations'
