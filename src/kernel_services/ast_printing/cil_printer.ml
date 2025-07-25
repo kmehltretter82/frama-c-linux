@@ -491,18 +491,8 @@ type annot_ctxt =
   | In_simple_annot  (** in /*@ ... */ annotation *)
   | In_nested_annot  (** in /@ ... @/ annotation *)
 
-let pp_wchar fmt c =
-  if Int64.unsigned_compare c 256L < 0 then
-    Format.pp_print_char fmt (Char.unsafe_chr @@ Int64.to_int c)
-  else if Int64.unsigned_compare c 0x10000L < 0 then
-    Format.fprintf fmt "\\u%04Lx" c
-  else if Int64.unsigned_compare c 0x100000000L < 0 then
-    Format.fprintf fmt "\\U%08Lx" c
-  else (* are there extended character sets of more than 32 bits in the wild? *)
-    Kernel.fatal "Unexpected wide character: %Lx" c
-
 let pp_wstring fmt s =
-  Format.fprintf fmt "L\"%a\"" (Pretty_utils.pp_list ~sep:"" pp_wchar) s
+  Format.fprintf fmt "L\"%s\"" (Escape.escape_wstring s)
 
 class cil_printer () = object (self)
 

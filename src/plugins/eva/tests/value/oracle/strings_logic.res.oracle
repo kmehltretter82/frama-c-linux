@@ -273,12 +273,14 @@
     s_partially_valid[0..31]; i_1; s_imprecise[0..31]; i_2; s_unknown[0..31];
     i_3; anything{.ptr; .d; .c}; p; offset; tmp; tmp_0
 [inout] Inputs for function reduce_by_valid_string:
-    nondet
+    nondet; "hello\000 world!"[0..13]; "hello world!"[0..12];
+    "const char array"[0..16]
 [inout] Out (internal) for function reduce_by_valid_wstring:
     ws1[0..18]; ws_zero[0..31]; wchar; ws_with_hole[0..1]; wp
 [inout] Inputs for function reduce_by_valid_wstring:
-    nondet
+    nondet; L"hello\000 wide world!"[0..18]; L"hi"[0..2]
 [inout] Out (internal) for function main:
     \nothing
 [inout] Inputs for function main:
-    nondet
+    nondet; "hello\000 world!"[0..13]; "hello world!"[0..12];
+    "const char array"[0..16]; L"hello\000 wide world!"[0..18]; L"hi"[0..2]
