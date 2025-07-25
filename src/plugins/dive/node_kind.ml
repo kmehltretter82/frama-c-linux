@@ -108,9 +108,9 @@ let to_lval = function
 
 let pretty fmt = function
   | (Scalar _ | Composite _ | Scattered _ | Unknown _) as kind ->
-    Cil_printer.pp_lval fmt (Option.get (to_lval kind))
+    Printer.pp_lval fmt (Option.get (to_lval kind))
   | Alarm (_stmt,alarm) ->
-    Cil_printer.pp_predicate fmt (Alarms.create_predicate alarm)
+    Printer.pp_predicate fmt (Alarms.create_predicate alarm)
   | AbsoluteMemory ->
     Format.fprintf fmt "%s" (Kernel.AbsoluteValidRange.get ())
   | Const e ->
