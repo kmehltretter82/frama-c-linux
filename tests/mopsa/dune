@@ -1,5 +1,15 @@
-; Generic dependencies for all tests
 (cram
+  (applies_to polarssl-cmake)
+  (enabled_if (and %{bin-available:mopsa-build} %{bin-available:mopsa-db}
+    %{bin-available:cmake}))
+  (deps
+    ../../src/init/boot/empty_file.exe
+    (package mopsa)
+  )
+)
+
+(cram
+  (applies_to polarssl)
   (enabled_if (and %{bin-available:mopsa-build} %{bin-available:mopsa-db}))
   (deps
     ../../src/init/boot/empty_file.exe
@@ -8,6 +18,8 @@
 )
 
 (cram
-  (applies_to polarssl-cmake)
-  (enabled_if %{bin-available:cmake})
+  (applies_to cjson)
+  (deps
+    ../../src/init/boot/empty_file.exe
+  )
 )
