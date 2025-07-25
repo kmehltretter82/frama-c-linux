@@ -1,4 +1,6 @@
 [kernel] Parsing strings_logic.c (with preprocessing)
+[kernel] strings_logic.c:180: Warning: 
+  Too many initializers for character array ws_with_hole
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed

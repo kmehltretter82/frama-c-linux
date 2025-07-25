@@ -1,4 +1,5 @@
 [kernel] Parsing strnlen.c (with preprocessing)
+[kernel] strnlen.c:4: Warning: Too many initializers for character array t1
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed

@@ -619,7 +619,7 @@
   NON TERMINATING FUNCTION
 [from] ====== DISPLAYING CALLWISE DEPENDENCIES ======
 [from] call to memcpy at memcpy.c:32 (by buggy):
-  c FROM "d"[bits 0 to 7]
+  c FROM "d"[0]
   \result FROM dest
 [from] call to memcpy at memcpy.c:221 (by copy_0):
   \result FROM dest
@@ -637,10 +637,10 @@
 [from] call to buggy at memcpy.c:65 (by test):
   NO EFFECTS
 [from] call to many at memcpy.c:67 (by test):
-  tm[0] FROM \nothing
-    [1..999] FROM \nothing (and SELF)
-  um[0] FROM \nothing
-    {[1..998]; [999][bits 0 to 15]} FROM \nothing (and SELF)
+  tm[0] FROM "abcd"[0..4]
+    [1..999] FROM "abcd"[0..4] (and SELF)
+  um[0] FROM "abcd"[0..4]
+    {[1..998]; [999][bits 0 to 15]} FROM "abcd"[0..4] (and SELF)
   ttyp[0] FROM \nothing
       [1..999] FROM \nothing (and SELF)
 [from] call to init at memcpy.c:69 (by test):
@@ -782,10 +782,10 @@
       [40] FROM src[0] (and SELF)
       {[41..69]; [71..88]} FROM src[1..18] (and SELF)
       [70] FROM src[0..18] (and SELF)
-  tm[0] FROM \nothing
-    [1..999] FROM \nothing (and SELF)
-  um[0] FROM \nothing
-    {[1..998]; [999][bits 0 to 15]} FROM \nothing (and SELF)
+  tm[0] FROM "abcd"[0..4]
+    [1..999] FROM "abcd"[0..4] (and SELF)
+  um[0] FROM "abcd"[0..4]
+    {[1..998]; [999][bits 0 to 15]} FROM "abcd"[0..4] (and SELF)
   ttyp[0] FROM \nothing
       [1..999] FROM \nothing (and SELF)
   v1{.x; .y} FROM \nothing
@@ -821,12 +821,12 @@
 [inout] Out (internal) for function buggy:
     c; p; tmp
 [inout] Inputs for function buggy:
-    maybe; "d"[bits 0 to 7]
+    maybe; "d"[0]
 [inout] InOut (internal) for function buggy:
   Operational inputs:
-    maybe; "d"[bits 0 to 7]
+    maybe; "d"[0]
   Operational inputs on termination:
-    maybe; "d"[bits 0 to 7]
+    maybe; "d"[0]
   Sure outputs:
     c; p; tmp
 [inout] Out (internal) for function copy_0:
@@ -844,12 +844,12 @@
     tm[0..999]; um{[0..998]; [999][bits 0 to 15]}; ttyp[0..999]; s[0..4]; 
     p; ty{.ts; .ti}
 [inout] Inputs for function many:
-    maybe
+    maybe; "abcd"[0..4]
 [inout] InOut (internal) for function many:
   Operational inputs:
-    maybe; ty.[bits 16 to 31]
+    maybe; "abcd"[0..4]; ty.[bits 16 to 31]
   Operational inputs on termination:
-    maybe; ty.[bits 16 to 31]
+    maybe; "abcd"[0..4]; ty.[bits 16 to 31]
   Sure outputs:
     tm[0]; um[0]; ttyp[0]; s[0..4]; p; ty{.ts; .ti}
 [inout] Out (internal) for function test:
@@ -859,15 +859,15 @@
     ptop2[2..749]; ptop3[2..797]; ptop4[2..798]; garbledsize[10..99];
     pgarbledsize; dstmaybesize1[0..14]; dstmaybesize2[0..5]; maybesize
 [inout] Inputs for function test:
-    i; src[0..19]; maybe; v1; v2; v4{.x; .y; .p; .padding[0..3]}; t[0..3];
-    "d"[bits 0 to 7]
+    i; src[0..19]; maybe; "d"[0]; "abcd"[0..4]; v1; v2;
+    v4{.x; .y; .p; .padding[0..3]}; t[0..3]
 [inout] InOut (internal) for function test:
   Operational inputs:
-    i; src[0..19]; maybe; v1{.p; .padding[0..23]}; v2;
-    v4{.x; {.p; .padding[0..3]}}; t{[0]; [3]}; a; b; "d"[bits 0 to 7]
+    i; src[0..19]; maybe; "d"[0]; "abcd"[0..4]; v1{.p; .padding[0..23]}; 
+    v2; v4{.x; {.p; .padding[0..3]}}; t{[0]; [3]}; a; b
   Operational inputs on termination:
-    src[0..19]; maybe; v1{.p; .padding[0..23]}; v2;
-    v4{.x; {.p; .padding[0..3]}}; t{[0]; [3]}; a; b; "d"[bits 0 to 7]
+    src[0..19]; maybe; "d"[0]; "abcd"[0..4]; v1{.p; .padding[0..23]}; v2;
+    v4{.x; {.p; .padding[0..3]}}; t{[0]; [3]}; a; b
   Sure outputs:
     dst1[1..5]; dst2[1..10]; dst3[5..9]; dst4[5..14]; tm[0]; um[0]; ttyp[0];
     v1{.x; .y}; v2; v3; v4.y; t[1..2]; b; p; pptop; pgarbledsize; maybesize
@@ -898,12 +898,12 @@
     dst5[0..99]; tm[0..999]; um{[0..998]; [999][bits 0 to 15]}; ttyp[0..999];
     v1{.x; .y}; v2; v3; v4; v5; t[1..3]
 [inout] Inputs for function main:
-    i; src[0..19]; maybe; v1; v2; v4{.x; .y; .p; .padding[0..3]}; t[0..3];
-    "d"[bits 0 to 7]
+    i; src[0..19]; maybe; "d"[0]; "abcd"[0..4]; v1; v2;
+    v4{.x; .y; .p; .padding[0..3]}; t[0..3]
 [inout] InOut (internal) for function main:
   Operational inputs:
-    i; src[0..19]; maybe; v1{.p; .padding[0..23]}; v2;
-    v4{.x; {.p; .padding[0..3]}}; t{[0]; [3]}; "d"[bits 0 to 7]
+    i; src[0..19]; maybe; "d"[0]; "abcd"[0..4]; v1{.p; .padding[0..23]}; 
+    v2; v4{.x; {.p; .padding[0..3]}}; t{[0]; [3]}
   Operational inputs on termination:
     \nothing
   Sure outputs:

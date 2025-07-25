@@ -94,15 +94,15 @@ int main(void)
   size_t tmp_0;
   wmemset(data,65,(size_t)99);
   data[99] = 0;
-  wchar_t dest[50] = {0};
+  wchar_t dest[50] = L"";
   if (nondet) {
     size_t tmp;
     tmp = wcslen((wchar_t const *)(data));
-    swprintf(dest,tmp,L"%" "l" "s" ,data); /* swprintf_va_1 */
+    swprintf(dest,tmp,L"%ls",data); /* swprintf_va_1 */
     /*@ assert \false; */ ;
   }
   tmp_0 = wcslen((wchar_t const *)(data));
-  swprintf(dest,tmp_0 / (size_t)2,L"%" "l" "s" ,data); /* swprintf_va_2 */
+  swprintf(dest,tmp_0 / (size_t)2,L"%ls",data); /* swprintf_va_2 */
   __retres = 0;
   return __retres;
 }

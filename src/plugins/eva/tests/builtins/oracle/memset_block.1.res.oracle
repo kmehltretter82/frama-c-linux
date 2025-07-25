@@ -1,4 +1,5 @@
 [kernel] Parsing memset_block.i (no preprocessing)
+[kernel] memset_block.i:7: Warning: Too many initializers for character array S
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
