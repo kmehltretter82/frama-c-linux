@@ -39,6 +39,7 @@ import {
   ModeDisplay,
   useSelectedNodes
 } from "frama-c/plugins/callgraph/definitions";
+import { useSelection } from 'frama-c/kernel/Locations';
 
 import './callgraph.css';
 import * as Node from "./components/node";
@@ -195,6 +196,7 @@ function Callgraph(): JSX.Element {
 
   /** Specific nodes*/
   const selectedFunctions = React.useMemo<Set<string>>(() => {
+    if(!multipleSelection) return new Set();
     return new Set(multipleSelection.map(elt => elt as string));
   }, [multipleSelection]);
 
