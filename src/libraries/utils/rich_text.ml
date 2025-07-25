@@ -24,7 +24,6 @@ type message = {
 
 let size message = String.length message.plain
 let char_at message k = String.get message.plain k
-let string message = message.plain
 let substring message k n = String.sub message.plain k n
 
 let rec lookup acc k = function
@@ -99,6 +98,16 @@ let pretty ?truncate ?(ellipsis="[...]") fmt message =
       end
   in
   aux ~force_ellipsis:true 0 (String.length message.plain) message.tags
+
+let to_string ?prefix ?suffix ?truncate ?ellipsis message =
+  let length = Option.value ~default:(size message) truncate in
+  let string_buffer = Buffer.create length in
+  let fmt = Format.formatter_of_buffer string_buffer in
+  Option.iter (fun f -> f fmt) prefix;
+  pretty ?truncate ?ellipsis fmt message;
+  Option.iter (fun f -> f fmt) suffix;
+  Format.pp_print_flush fmt ();
+  Buffer.contents string_buffer
 
 
 (* -------------------------------------------------------------------------- *)
@@ -255,24 +264,18 @@ let formatter buffer = buffer.formatter
 
 let bprintf buffer format =
   Format.fprintf buffer.formatter format
+
 let kbprintf kjob buffer format =
   Format.kfprintf kjob buffer.formatter format
-let sprintf ?prefix ?suffix ?(indent=20) ?(margin=40) ?trim
-    ?truncate ?ellipsis format =
+
+let sprintf ?prefix ?suffix ?(indent=20) ?(margin=40)
+    ?trim ?truncate ?ellipsis format =
   let buffer = create ~indent ~margin () in
   let to_string _fmt =
     let message = message ?trim buffer in
-    let length = Option.value ~default:(size message) truncate in
-    let string_buffer = Buffer.create length in
-    let fmt = Format.formatter_of_buffer string_buffer in
-    Option.iter (fun f -> f fmt) prefix;
-    pretty ?truncate ?ellipsis fmt message;
-    Option.iter (fun f -> f fmt) suffix;
-    Format.pp_print_flush fmt ();
-    Buffer.contents string_buffer
+    to_string ?prefix ?suffix ?truncate ?ellipsis message
   in
   kbprintf to_string buffer format
-
 
 (* -------------------------------------------------------------------------- *)
 (* --- Tests                                                              --- *)

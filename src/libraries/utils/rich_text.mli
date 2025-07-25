@@ -14,7 +14,6 @@ type message (** Message with tags *)
 
 val size : message -> int
 val char_at : message -> int -> char
-val string : message -> string
 val substring : message -> int -> int -> string
 
 val tags_at : message -> int -> (Format.stag * int * int) list
@@ -39,6 +38,19 @@ val pretty :
   message ->
   unit
 
+(** Pretty prints the message into a string
+    @param prefix a pretty printing function called at the begining of the print
+    @param suffix a pretty printing function called at the end of the print
+    @param truncate do not print more than [truncate] characters; if the
+    message size is bigger than this number, than the middle part of the
+    message is replaced by [ellipsis]
+    @param ellipsis when [truncate] is given and the message size is
+    bigger than [truncate], then [ellipsis] is printed instead of the truncated
+    middle part *)
+val to_string :
+  ?prefix:(Format.formatter -> unit) -> ?suffix:(Format.formatter -> unit) ->
+  ?truncate:int -> ?ellipsis:string ->
+  message -> string
 
 (* -------------------------------------------------------------------------- *)
 (** Message Buffer  *)
