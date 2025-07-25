@@ -32,7 +32,7 @@
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   jobs[0..4]:
-    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:15 <-
       pthread_create :: philo.c:56 <- main
   queue: read by <main> at philo.c:59 <- main
 [mt] * shared variables computed
@@ -69,14 +69,14 @@
 [mt] Globals accessed by thread:
   end2: write by jobs[0] at philo.c:29 <- aux :: philo.c:42 <- job
   locks[1]:
-    read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: philo.c:25 <- aux :: philo.c:42 <- job
-    read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: philo.c:32 <- aux :: philo.c:42 <- job
   locks[4]:
-    read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: philo.c:24 <- aux :: philo.c:42 <- job
-    read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: philo.c:33 <- aux :: philo.c:42 <- job
   queue: read by jobs[0] at philo.c:30 <- aux :: philo.c:42 <- job
 [mt] * shared variables computed
@@ -105,14 +105,14 @@
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[0]:
-    read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: philo.c:24 <- aux :: philo.c:42 <- job
-    read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: philo.c:33 <- aux :: philo.c:42 <- job
   locks[2]:
-    read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: philo.c:25 <- aux :: philo.c:42 <- job
-    read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: philo.c:32 <- aux :: philo.c:42 <- job
 [mt] * shared variables computed
 [eva:interferences] 
@@ -144,14 +144,14 @@
 [mt] Globals accessed by thread:
   end2: write by jobs[2] at philo.c:29 <- aux :: philo.c:42 <- job
   locks[1]:
-    read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: philo.c:24 <- aux :: philo.c:42 <- job
-    read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: philo.c:33 <- aux :: philo.c:42 <- job
   locks[3]:
-    read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: philo.c:25 <- aux :: philo.c:42 <- job
-    read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: philo.c:32 <- aux :: philo.c:42 <- job
   queue: read by jobs[2] at philo.c:30 <- aux :: philo.c:42 <- job
 [mt] * shared variables computed
@@ -184,14 +184,14 @@
 [mt] Globals accessed by thread:
   end2: write by jobs[3] at philo.c:29 <- aux :: philo.c:42 <- job
   locks[2]:
-    read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: philo.c:24 <- aux :: philo.c:42 <- job
-    read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: philo.c:33 <- aux :: philo.c:42 <- job
   locks[4]:
-    read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: philo.c:25 <- aux :: philo.c:42 <- job
-    read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: philo.c:32 <- aux :: philo.c:42 <- job
   queue: read by jobs[3] at philo.c:30 <- aux :: philo.c:42 <- job
 [mt] * shared variables computed
@@ -224,14 +224,14 @@
 [mt] Globals accessed by thread:
   end2: write by jobs[4] at philo.c:29 <- aux :: philo.c:42 <- job
   locks[0]:
-    read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: philo.c:25 <- aux :: philo.c:42 <- job
-    read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: philo.c:32 <- aux :: philo.c:42 <- job
   locks[3]:
-    read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: philo.c:24 <- aux :: philo.c:42 <- job
-    read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: philo.c:33 <- aux :: philo.c:42 <- job
   queue: read by jobs[4] at philo.c:30 <- aux :: philo.c:42 <- job
 [mt] * shared variables computed
@@ -292,7 +292,7 @@
 [mt] Globals accessed by thread:
   end2: read by <main> at philo.c:58 <- main
   jobs[0..4]:
-    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:15 <-
       pthread_create :: philo.c:56 <- main
   queue: read by <main> at philo.c:59 <- main
 [mt] * shared variables computed
@@ -357,7 +357,7 @@
 [mt] Globals accessed by thread:
   end2: read by <main> at philo.c:58 <- main
   jobs[0..4]:
-    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:15 <-
       pthread_create :: philo.c:56 <- main
   queue: read by <main> at philo.c:59 <- main
 [mt] * shared variables computed
@@ -393,14 +393,14 @@
 [mt] Globals accessed by thread:
   end2: write by jobs[0] at philo.c:29 <- aux :: philo.c:42 <- job
   locks[1]:
-    read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: philo.c:25 <- aux :: philo.c:42 <- job
-    read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: philo.c:32 <- aux :: philo.c:42 <- job
   locks[4]:
-    read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: philo.c:24 <- aux :: philo.c:42 <- job
-    read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: philo.c:33 <- aux :: philo.c:42 <- job
   queue: read by jobs[0] at philo.c:30 <- aux :: philo.c:42 <- job
 [mt] * shared variables computed
@@ -436,14 +436,14 @@
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[0]:
-    read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: philo.c:24 <- aux :: philo.c:42 <- job
-    read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: philo.c:33 <- aux :: philo.c:42 <- job
   locks[2]:
-    read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: philo.c:25 <- aux :: philo.c:42 <- job
-    read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: philo.c:32 <- aux :: philo.c:42 <- job
 [mt] * shared variables computed
 [eva:interferences] 
@@ -478,14 +478,14 @@
 [mt] Globals accessed by thread:
   end2: write by jobs[2] at philo.c:29 <- aux :: philo.c:42 <- job
   locks[1]:
-    read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: philo.c:24 <- aux :: philo.c:42 <- job
-    read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: philo.c:33 <- aux :: philo.c:42 <- job
   locks[3]:
-    read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: philo.c:25 <- aux :: philo.c:42 <- job
-    read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: philo.c:32 <- aux :: philo.c:42 <- job
   queue: read by jobs[2] at philo.c:30 <- aux :: philo.c:42 <- job
 [mt] * shared variables computed
@@ -526,14 +526,14 @@
 [mt] Globals accessed by thread:
   end2: write by jobs[3] at philo.c:29 <- aux :: philo.c:42 <- job
   locks[2]:
-    read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: philo.c:24 <- aux :: philo.c:42 <- job
-    read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: philo.c:33 <- aux :: philo.c:42 <- job
   locks[4]:
-    read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: philo.c:25 <- aux :: philo.c:42 <- job
-    read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: philo.c:32 <- aux :: philo.c:42 <- job
   queue: read by jobs[3] at philo.c:30 <- aux :: philo.c:42 <- job
 [mt] * shared variables computed
@@ -574,14 +574,14 @@
 [mt] Globals accessed by thread:
   end2: write by jobs[4] at philo.c:29 <- aux :: philo.c:42 <- job
   locks[0]:
-    read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: philo.c:25 <- aux :: philo.c:42 <- job
-    read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: philo.c:32 <- aux :: philo.c:42 <- job
   locks[3]:
-    read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: philo.c:24 <- aux :: philo.c:42 <- job
-    read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: philo.c:33 <- aux :: philo.c:42 <- job
   queue: read by jobs[4] at philo.c:30 <- aux :: philo.c:42 <- job
 [mt] * shared variables computed
@@ -679,7 +679,7 @@
 [mt] Globals accessed by thread:
   end2: read by <main> at philo.c:58 <- main
   jobs[0..4]:
-    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:15 <-
       pthread_create :: philo.c:56 <- main
   queue: read by <main> at philo.c:59 <- main
 [mt] * shared variables computed
@@ -714,14 +714,14 @@
 [mt] Globals accessed by thread:
   end2: write by jobs[0] at philo.c:29 <- aux :: philo.c:42 <- job
   locks[1]:
-    read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: philo.c:25 <- aux :: philo.c:42 <- job
-    read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: philo.c:32 <- aux :: philo.c:42 <- job
   locks[4]:
-    read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: philo.c:24 <- aux :: philo.c:42 <- job
-    read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: philo.c:33 <- aux :: philo.c:42 <- job
   queue: read by jobs[0] at philo.c:30 <- aux :: philo.c:42 <- job
 [mt] * shared variables computed
@@ -757,14 +757,14 @@
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[0]:
-    read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: philo.c:24 <- aux :: philo.c:42 <- job
-    read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: philo.c:33 <- aux :: philo.c:42 <- job
   locks[2]:
-    read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: philo.c:25 <- aux :: philo.c:42 <- job
-    read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: philo.c:32 <- aux :: philo.c:42 <- job
 [mt] * shared variables computed
 [eva:interferences] 
@@ -799,14 +799,14 @@
 [mt] Globals accessed by thread:
   end2: write by jobs[2] at philo.c:29 <- aux :: philo.c:42 <- job
   locks[1]:
-    read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: philo.c:24 <- aux :: philo.c:42 <- job
-    read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: philo.c:33 <- aux :: philo.c:42 <- job
   locks[3]:
-    read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: philo.c:25 <- aux :: philo.c:42 <- job
-    read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: philo.c:32 <- aux :: philo.c:42 <- job
   queue: read by jobs[2] at philo.c:30 <- aux :: philo.c:42 <- job
 [mt] * shared variables computed
@@ -847,14 +847,14 @@
 [mt] Globals accessed by thread:
   end2: write by jobs[3] at philo.c:29 <- aux :: philo.c:42 <- job
   locks[2]:
-    read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: philo.c:24 <- aux :: philo.c:42 <- job
-    read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: philo.c:33 <- aux :: philo.c:42 <- job
   locks[4]:
-    read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: philo.c:25 <- aux :: philo.c:42 <- job
-    read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: philo.c:32 <- aux :: philo.c:42 <- job
   queue: read by jobs[3] at philo.c:30 <- aux :: philo.c:42 <- job
 [mt] * shared variables computed
@@ -895,14 +895,14 @@
 [mt] Globals accessed by thread:
   end2: write by jobs[4] at philo.c:29 <- aux :: philo.c:42 <- job
   locks[0]:
-    read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: philo.c:25 <- aux :: philo.c:42 <- job
-    read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: philo.c:32 <- aux :: philo.c:42 <- job
   locks[3]:
-    read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: philo.c:24 <- aux :: philo.c:42 <- job
-    read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: philo.c:33 <- aux :: philo.c:42 <- job
   queue: read by jobs[4] at philo.c:30 <- aux :: philo.c:42 <- job
 [mt] * shared variables computed

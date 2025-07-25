@@ -18,10 +18,10 @@
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   jobs1:
-    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:15 <-
       pthread_create :: assigns.c:30 <- main
   jobs2:
-    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:15 <-
       pthread_create :: assigns.c:31 <- main
 [mt] * shared variables computed
 [eva:interferences] 
@@ -110,10 +110,10 @@
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   jobs1:
-    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:15 <-
       pthread_create :: assigns.c:30 <- main
   jobs2:
-    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:15 <-
       pthread_create :: assigns.c:31 <- main
 [mt] * shared variables computed
 [eva:interferences] 
@@ -238,10 +238,10 @@
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   jobs1:
-    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:15 <-
       pthread_create :: assigns.c:30 <- main
   jobs2:
-    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:15 <-
       pthread_create :: assigns.c:31 <- main
 [mt] * shared variables computed
 [eva:interferences] 
@@ -362,10 +362,10 @@
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   jobs1:
-    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:15 <-
       pthread_create :: assigns.c:30 <- main
   jobs2:
-    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:15 <-
       pthread_create :: assigns.c:31 <- main
 [mt] * shared variables computed
 [eva:interferences] 

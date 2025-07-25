@@ -1086,7 +1086,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/math.h, line 342)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/math.h, line 328)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -1118,7 +1118,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/math.h, line 1415)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/math.h, line 1401)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -1414,12 +1414,12 @@
             assert Eva: initialization: \initialized(&res[i].pme[j][k]);
             By RedundantAlarms, with pending:
              - Assertion 'Eva,initialization' (file ieee_1180_1990.c, line 368)
-[  Valid  ] Instance of 'Pre-condition (file FRAMAC_SHARE/libc/stdio.h, line 251)' at call 'printf_va_1' (file ieee_1180_1990.c, line 195)
+[  Valid  ] Instance of 'Pre-condition (file FRAMAC_SHARE/libc/stdio.h, line 237)' at call 'printf_va_1' (file ieee_1180_1990.c, line 195)
 
             status of 'requires
             valid_read_string(format)' of printf_va_1 at stmt 238
             by Eva.
-[  Valid  ] Instance of 'Pre-condition (file FRAMAC_SHARE/libc/stdio.h, line 251)' at call 'printf_va_2' (file ieee_1180_1990.c, line 196)
+[  Valid  ] Instance of 'Pre-condition (file FRAMAC_SHARE/libc/stdio.h, line 237)' at call 'printf_va_2' (file ieee_1180_1990.c, line 196)
 
             status of 'requires
             valid_read_string(format)' of printf_va_2 at stmt 239
@@ -1429,19 +1429,19 @@
 --- Properties of Function 'printf_va_1'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Pre-condition (file FRAMAC_SHARE/libc/stdio.h, line 251)
+[  Valid  ] Pre-condition (file FRAMAC_SHARE/libc/stdio.h, line 237)
             requires valid_read_string(format)
             by Call Preconditions.
-[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 251)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 237)
             assigns \result, __fc_stdout->__fc_FILE_data;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 251)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 237)
             assigns \result
               \from (indirect: __fc_stdout->__fc_FILE_id),
                     (indirect: __fc_stdout->__fc_FILE_data),
                     (indirect: *(format + (0 ..)));
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 251)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 237)
             assigns __fc_stdout->__fc_FILE_data
               \from (indirect: __fc_stdout->__fc_FILE_id),
                     __fc_stdout->__fc_FILE_data,
@@ -1455,19 +1455,19 @@
 --- Properties of Function 'printf_va_2'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Pre-condition (file FRAMAC_SHARE/libc/stdio.h, line 251)
+[  Valid  ] Pre-condition (file FRAMAC_SHARE/libc/stdio.h, line 237)
             requires valid_read_string(format)
             by Call Preconditions.
-[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 251)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 237)
             assigns \result, __fc_stdout->__fc_FILE_data;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 251)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 237)
             assigns \result
               \from (indirect: __fc_stdout->__fc_FILE_id),
                     (indirect: __fc_stdout->__fc_FILE_data),
                     (indirect: *(format + (0 ..)));
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 251)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 237)
             assigns __fc_stdout->__fc_FILE_data
               \from (indirect: __fc_stdout->__fc_FILE_id),
                     __fc_stdout->__fc_FILE_data,

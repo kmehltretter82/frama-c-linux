@@ -121,7 +121,7 @@ int __gen_e_acsl_isupper(int c)
     __gen_e_acsl_assert_data.pred_txt = "(0 <= c <= 255) || c == -1";
     __gen_e_acsl_assert_data.file = "FRAMAC_SHARE/libc/ctype.h";
     __gen_e_acsl_assert_data.fct = "isupper";
-    __gen_e_acsl_assert_data.line = 174;
+    __gen_e_acsl_assert_data.line = 160;
     __gen_e_acsl_assert_data.name = "c_uchar_or_eof";
     __e_acsl_assert(__gen_e_acsl_or,& __gen_e_acsl_assert_data);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
@@ -153,7 +153,7 @@ int __gen_e_acsl_isupper(int c)
     __gen_e_acsl_assert_data_3.pred_txt = "all behaviors disjoint";
     __gen_e_acsl_assert_data_3.file = "FRAMAC_SHARE/libc/ctype.h";
     __gen_e_acsl_assert_data_3.fct = "isupper";
-    __gen_e_acsl_assert_data_3.line = 173;
+    __gen_e_acsl_assert_data_3.line = 159;
     __e_acsl_assert(__gen_e_acsl_active_bhvrs <= 1,
                     & __gen_e_acsl_assert_data_3);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
@@ -180,7 +180,7 @@ int __gen_e_acsl_isupper(int c)
       __gen_e_acsl_assert_data_4.pred_txt = "\\result < 0 || \\result > 0";
       __gen_e_acsl_assert_data_4.file = "FRAMAC_SHARE/libc/ctype.h";
       __gen_e_acsl_assert_data_4.fct = "isupper";
-      __gen_e_acsl_assert_data_4.line = 178;
+      __gen_e_acsl_assert_data_4.line = 164;
       __gen_e_acsl_assert_data_4.name = "definitely_match/nonzero_result";
       __e_acsl_assert(__gen_e_acsl_or_4,& __gen_e_acsl_assert_data_4);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
@@ -197,7 +197,7 @@ int __gen_e_acsl_isupper(int c)
       __gen_e_acsl_assert_data_5.pred_txt = "\\result == 0";
       __gen_e_acsl_assert_data_5.file = "FRAMAC_SHARE/libc/ctype.h";
       __gen_e_acsl_assert_data_5.fct = "isupper";
-      __gen_e_acsl_assert_data_5.line = 181;
+      __gen_e_acsl_assert_data_5.line = 167;
       __gen_e_acsl_assert_data_5.name = "definitely_not_match/zero_result";
       __e_acsl_assert(__retres == 0,& __gen_e_acsl_assert_data_5);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);

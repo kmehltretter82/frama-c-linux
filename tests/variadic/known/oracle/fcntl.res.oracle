@@ -1,9 +1,9 @@
 [kernel] Parsing fcntl.c (with preprocessing)
-[kernel:variadic] FRAMAC_SHARE/libc/fcntl.h:115: 
+[kernel:variadic] FRAMAC_SHARE/libc/fcntl.h:101: 
   Declaration of variadic function fcntl.
-[kernel:variadic] FRAMAC_SHARE/libc/fcntl.h:118: 
+[kernel:variadic] FRAMAC_SHARE/libc/fcntl.h:104: 
   Declaration of variadic function open.
-[kernel:variadic] FRAMAC_SHARE/libc/fcntl.h:125: 
+[kernel:variadic] FRAMAC_SHARE/libc/fcntl.h:111: 
   Declaration of variadic function openat.
 [kernel:variadic] fcntl.c:8: 
   Translating call to the specialized version fcntl(int, int).

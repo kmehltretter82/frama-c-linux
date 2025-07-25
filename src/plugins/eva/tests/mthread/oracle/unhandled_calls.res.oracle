@@ -25,12 +25,12 @@
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   th1:
-    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:15 <-
       pthread_create :: unhandled_calls.c:23 <-
       f2 :: unhandled_calls.c:42 <-
       main
   th2:
-    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:15 <-
       pthread_create :: unhandled_calls.c:18 <-
       f1 :: unhandled_calls.c:35 <-
       main

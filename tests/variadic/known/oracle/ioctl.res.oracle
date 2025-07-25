@@ -1,5 +1,5 @@
 [kernel] Parsing ioctl.c (with preprocessing)
-[kernel:variadic] FRAMAC_SHARE/libc/stropts.h:193: 
+[kernel:variadic] FRAMAC_SHARE/libc/stropts.h:179: 
   Declaration of variadic function ioctl.
 [kernel:variadic] ioctl.c:13: 
   Translating call to the specialized version ioctl(int, int).

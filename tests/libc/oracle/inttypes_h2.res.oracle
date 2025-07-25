@@ -56,15 +56,15 @@
   function strtoimax: precondition 'separation' got status valid.
 [eva] inttypes_h2.c:35: 
   function strtoimax: precondition 'base_range' got status valid.
-[eva] FRAMAC_SHARE/libc/inttypes.h:288: 
+[eva] FRAMAC_SHARE/libc/inttypes.h:274: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function str_to_integer
-[eva] FRAMAC_SHARE/libc/inttypes.h:296: 
+[eva] FRAMAC_SHARE/libc/inttypes.h:282: 
+  cannot evaluate ACSL term, unsupported ACSL construct: logic function str_to_integer
+[eva] FRAMAC_SHARE/libc/inttypes.h:293: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function str_to_integer
 [eva] FRAMAC_SHARE/libc/inttypes.h:307: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function str_to_integer
-[eva] FRAMAC_SHARE/libc/inttypes.h:321: 
-  cannot evaluate ACSL term, unsupported ACSL construct: logic function str_to_integer
-[eva] FRAMAC_SHARE/libc/inttypes.h:326: 
+[eva] FRAMAC_SHARE/libc/inttypes.h:312: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function str_to_integer
 [eva] inttypes_h2.c:35: 
   function strtoimax, behavior in_range_nonnull_endptr: precondition 'valid_endptr' got status valid.
@@ -80,15 +80,15 @@
   function strtoumax: precondition 'separation' got status valid.
 [eva] inttypes_h2.c:36: 
   function strtoumax: precondition 'base_range' got status valid.
-[eva] FRAMAC_SHARE/libc/inttypes.h:353: 
+[eva] FRAMAC_SHARE/libc/inttypes.h:339: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function str_to_integer
-[eva] FRAMAC_SHARE/libc/inttypes.h:361: 
+[eva] FRAMAC_SHARE/libc/inttypes.h:347: 
+  cannot evaluate ACSL term, unsupported ACSL construct: logic function str_to_integer
+[eva] FRAMAC_SHARE/libc/inttypes.h:358: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function str_to_integer
 [eva] FRAMAC_SHARE/libc/inttypes.h:372: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function str_to_integer
-[eva] FRAMAC_SHARE/libc/inttypes.h:386: 
-  cannot evaluate ACSL term, unsupported ACSL construct: logic function str_to_integer
-[eva] FRAMAC_SHARE/libc/inttypes.h:391: 
+[eva] FRAMAC_SHARE/libc/inttypes.h:377: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function str_to_integer
 [eva] inttypes_h2.c:36: 
   function strtoumax, behavior in_range_nonnull_endptr: precondition 'valid_endptr' got status valid.
@@ -104,15 +104,15 @@
   function wcstoimax: precondition 'separation' got status valid.
 [eva] inttypes_h2.c:40: 
   function wcstoimax: precondition 'base_range' got status valid.
-[eva] FRAMAC_SHARE/libc/inttypes.h:418: 
+[eva] FRAMAC_SHARE/libc/inttypes.h:404: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function wcs_to_integer
-[eva] FRAMAC_SHARE/libc/inttypes.h:426: 
+[eva] FRAMAC_SHARE/libc/inttypes.h:412: 
+  cannot evaluate ACSL term, unsupported ACSL construct: logic function wcs_to_integer
+[eva] FRAMAC_SHARE/libc/inttypes.h:423: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function wcs_to_integer
 [eva] FRAMAC_SHARE/libc/inttypes.h:437: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function wcs_to_integer
-[eva] FRAMAC_SHARE/libc/inttypes.h:451: 
-  cannot evaluate ACSL term, unsupported ACSL construct: logic function wcs_to_integer
-[eva] FRAMAC_SHARE/libc/inttypes.h:456: 
+[eva] FRAMAC_SHARE/libc/inttypes.h:442: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function wcs_to_integer
 [eva] inttypes_h2.c:40: 
   function wcstoimax, behavior in_range_nonnull_endptr: precondition 'valid_endptr' got status valid.
@@ -128,15 +128,15 @@
   function wcstoumax: precondition 'separation' got status valid.
 [eva] inttypes_h2.c:41: 
   function wcstoumax: precondition 'base_range' got status valid.
-[eva] FRAMAC_SHARE/libc/inttypes.h:483: 
+[eva] FRAMAC_SHARE/libc/inttypes.h:469: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function wcs_to_integer
-[eva] FRAMAC_SHARE/libc/inttypes.h:491: 
+[eva] FRAMAC_SHARE/libc/inttypes.h:477: 
+  cannot evaluate ACSL term, unsupported ACSL construct: logic function wcs_to_integer
+[eva] FRAMAC_SHARE/libc/inttypes.h:488: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function wcs_to_integer
 [eva] FRAMAC_SHARE/libc/inttypes.h:502: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function wcs_to_integer
-[eva] FRAMAC_SHARE/libc/inttypes.h:516: 
-  cannot evaluate ACSL term, unsupported ACSL construct: logic function wcs_to_integer
-[eva] FRAMAC_SHARE/libc/inttypes.h:521: 
+[eva] FRAMAC_SHARE/libc/inttypes.h:507: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function wcs_to_integer
 [eva] inttypes_h2.c:41: 
   function wcstoumax, behavior in_range_nonnull_endptr: precondition 'valid_endptr' got status valid.

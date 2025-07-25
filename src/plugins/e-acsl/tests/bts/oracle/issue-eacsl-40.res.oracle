@@ -1,33 +1,33 @@
 [e-acsl] beginning translation.
-[e-acsl] FRAMAC_SHARE/libc/stdio.h:392: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdio.h:378: Warning: 
   E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdio.h:190: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdio.h:176: Warning: 
   no assigns clause generated for function valid_read_string because pointers as arguments is not yet supported
-[e-acsl] FRAMAC_SHARE/libc/__fc_string_axiomatic.h:277: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/__fc_string_axiomatic.h:263: Warning: 
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdio.h:189: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdio.h:175: Warning: 
   E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdio.h:195: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdio.h:181: Warning: 
   E-ACSL construct
   `logic functions or predicates with no definition nor reads clause'
   is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdio.h:158: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdio.h:144: Warning: 
   E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
-[eva:alarm] FRAMAC_SHARE/libc/stdio.h:393: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/stdio.h:379: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/stdio.h:394: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/stdio.h:380: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/stdio.h:392: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/stdio.h:378: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/stdio.h:399: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/stdio.h:385: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/stdio.h:399: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/stdio.h:385: Warning: 
   function __gen_e_acsl_fread: postcondition 'initialization' got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/stdio.h:160: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/stdio.h:146: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] issue-eacsl-40.c:31: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.

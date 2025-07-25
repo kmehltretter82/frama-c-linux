@@ -1,8 +1,8 @@
 [kernel] Parsing strings_h.c (with preprocessing)
 [kernel] strings_h.c:29: User Error: 
-  Inconsistent storage specification for index. Previous declaration: FRAMAC_SHARE/libc/strings.h:61
+  Inconsistent storage specification for index. Previous declaration: FRAMAC_SHARE/libc/strings.h:47
 [kernel] strings_h.c:29: User Error: 
-  Declaration of index does not match previous declaration from FRAMAC_SHARE/libc/strings.h:61 (different type constructors:
+  Declaration of index does not match previous declaration from FRAMAC_SHARE/libc/strings.h:47 (different type constructors:
   char *(char const *s, int c) and int).
   27    
   28    // Check that 'index' is not defined when _POSIX_C_SOURCE >= 200809L

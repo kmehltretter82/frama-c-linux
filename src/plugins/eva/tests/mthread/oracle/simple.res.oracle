@@ -25,15 +25,15 @@
   c: read by <main> at simple.c:50 <- main
   v: read by <main> at simple.c:50 <- main
   job1:
-    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:15 <-
       pthread_create :: simple.c:46 <- main
   job2:
-    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:15 <-
       pthread_create :: simple.c:47 <- main
   lock:
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: simple.c:49 <- main
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: simple.c:51 <- main
 [mt] * shared variables computed
 [eva:interferences] 
@@ -65,9 +65,9 @@
   e: write by job1 at simple.c:28 <- f1
   v: write by job1 at simple.c:26 <- f1
   lock:
-    read by job1 at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by job1 at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: simple.c:22 <- f1
-    read by job1 at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by job1 at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: simple.c:27 <- f1
 [mt] * shared variables computed
 [eva:interferences] 
@@ -98,9 +98,9 @@
   d: write by job2 at simple.c:39 <- f2
   v: write by job2 at simple.c:37 <- f2
   lock:
-    read by job2 at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by job2 at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: simple.c:33 <- f2
-    read by job2 at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by job2 at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: simple.c:38 <- f2
 [mt] * shared variables computed
 [eva:interferences] 
@@ -149,15 +149,15 @@
   c: read by <main> at simple.c:50 <- main
   v: read by <main> at simple.c:50 <- main
   job1:
-    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:15 <-
       pthread_create :: simple.c:46 <- main
   job2:
-    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:15 <-
       pthread_create :: simple.c:47 <- main
   lock:
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: simple.c:49 <- main
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: simple.c:51 <- main
 [mt] * shared variables computed
 [eva:interferences] 
@@ -193,9 +193,9 @@
   e: write by job1 at simple.c:28 <- f1
   v: write by job1 at simple.c:26 <- f1
   lock:
-    read by job1 at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by job1 at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: simple.c:22 <- f1
-    read by job1 at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by job1 at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: simple.c:27 <- f1
 [mt] * shared variables computed
 [eva:interferences] 
@@ -260,9 +260,9 @@
   d: write by job2 at simple.c:39 <- f2
   v: write by job2 at simple.c:37 <- f2
   lock:
-    read by job2 at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by job2 at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: simple.c:33 <- f2
-    read by job2 at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by job2 at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: simple.c:38 <- f2
 [mt] * shared variables computed
 [eva:interferences] 
@@ -394,15 +394,15 @@
   c: read by <main> at simple.c:50 <- main
   v: read by <main> at simple.c:50 <- main
   job1:
-    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:15 <-
       pthread_create :: simple.c:46 <- main
   job2:
-    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:15 <-
       pthread_create :: simple.c:47 <- main
   lock:
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: simple.c:49 <- main
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: simple.c:51 <- main
 [mt] * shared variables computed
 [eva:interferences] 
@@ -437,9 +437,9 @@
   e: write by job1 at simple.c:28 <- f1
   v: write by job1 at simple.c:26 <- f1
   lock:
-    read by job1 at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by job1 at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: simple.c:22 <- f1
-    read by job1 at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by job1 at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: simple.c:27 <- f1
 [mt] * shared variables computed
 [eva:interferences] 
@@ -504,9 +504,9 @@
   d: write by job2 at simple.c:39 <- f2
   v: write by job2 at simple.c:37 <- f2
   lock:
-    read by job2 at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by job2 at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: simple.c:33 <- f2
-    read by job2 at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by job2 at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: simple.c:38 <- f2
 [mt] * shared variables computed
 [eva:interferences] 
@@ -632,15 +632,15 @@
   c: read by <main> at simple.c:50 <- main
   v: read by <main> at simple.c:50 <- main
   job1:
-    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:15 <-
       pthread_create :: simple.c:46 <- main
   job2:
-    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:15 <-
       pthread_create :: simple.c:47 <- main
   lock:
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: simple.c:49 <- main
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: simple.c:51 <- main
 [mt] * shared variables computed
 [eva:interferences] 

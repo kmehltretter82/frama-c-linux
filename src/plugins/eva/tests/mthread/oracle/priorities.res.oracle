@@ -31,26 +31,26 @@
   s1: write by <main> at priorities.c:63 <- main
   s2: read by <main> at priorities.c:64 <- main
   jobs1:
-    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:15 <-
       pthread_create :: priorities.c:54 <- main
   jobs2:
-    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:15 <-
       pthread_create :: priorities.c:55 <- main
   jobs3:
-    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:15 <-
       pthread_create :: priorities.c:56 <- main
   jobs4:
-    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:15 <-
       pthread_create :: priorities.c:57 <- main
   m1:
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: priorities.c:61 <- main
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: priorities.c:65 <- main
   m2:
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: priorities.c:62 <- main
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: priorities.c:66 <- main
 [mt] * shared variables computed
 [eva:interferences] 
@@ -78,9 +78,9 @@
 [mt] Globals accessed by thread:
   s1: read by jobs1 at priorities.c:22 <- f1
   m1:
-    read by jobs1 at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by jobs1 at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: priorities.c:21 <- f1
-    read by jobs1 at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by jobs1 at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: priorities.c:23 <- f1
 [mt] * shared variables computed
 [eva:interferences] 
@@ -106,9 +106,9 @@
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   m2:
-    read by jobs2 at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by jobs2 at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: priorities.c:29 <- f2
-    read by jobs2 at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by jobs2 at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: priorities.c:30 <- f2
 [mt] * shared variables computed
 [eva:interferences] 
@@ -157,9 +157,9 @@
 [mt] Globals accessed by thread:
   s2: write by jobs4 at priorities.c:44 <- f4
   m2:
-    read by jobs4 at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by jobs4 at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: priorities.c:43 <- f4
-    read by jobs4 at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by jobs4 at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: priorities.c:45 <- f4
 [mt] * shared variables computed
 [eva:interferences] 
@@ -213,26 +213,26 @@
   s1: write by <main> at priorities.c:63 <- main
   s2: read by <main> at priorities.c:64 <- main
   jobs1:
-    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:15 <-
       pthread_create :: priorities.c:54 <- main
   jobs2:
-    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:15 <-
       pthread_create :: priorities.c:55 <- main
   jobs3:
-    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:15 <-
       pthread_create :: priorities.c:56 <- main
   jobs4:
-    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:15 <-
       pthread_create :: priorities.c:57 <- main
   m1:
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: priorities.c:61 <- main
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: priorities.c:65 <- main
   m2:
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: priorities.c:62 <- main
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: priorities.c:66 <- main
 [mt] * shared variables computed
 [eva:interferences] 
@@ -269,9 +269,9 @@
 [mt] Globals accessed by thread:
   s1: read by jobs1 at priorities.c:22 <- f1
   m1:
-    read by jobs1 at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by jobs1 at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: priorities.c:21 <- f1
-    read by jobs1 at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by jobs1 at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: priorities.c:23 <- f1
 [mt] * shared variables computed
 [eva:interferences] 
@@ -299,9 +299,9 @@
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   m2:
-    read by jobs2 at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by jobs2 at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: priorities.c:29 <- f2
-    read by jobs2 at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by jobs2 at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: priorities.c:30 <- f2
 [mt] * shared variables computed
 [eva:interferences] 
@@ -363,9 +363,9 @@
 [mt] Globals accessed by thread:
   s2: write by jobs4 at priorities.c:44 <- f4
   m2:
-    read by jobs4 at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by jobs4 at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: priorities.c:43 <- f4
-    read by jobs4 at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by jobs4 at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: priorities.c:45 <- f4
 [mt] * shared variables computed
 [eva:interferences] 
@@ -454,26 +454,26 @@
   s1: write by <main> at priorities.c:63 <- main
   s2: read by <main> at priorities.c:64 <- main
   jobs1:
-    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:15 <-
       pthread_create :: priorities.c:54 <- main
   jobs2:
-    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:15 <-
       pthread_create :: priorities.c:55 <- main
   jobs3:
-    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:15 <-
       pthread_create :: priorities.c:56 <- main
   jobs4:
-    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:15 <-
       pthread_create :: priorities.c:57 <- main
   m1:
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: priorities.c:61 <- main
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: priorities.c:65 <- main
   m2:
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: priorities.c:62 <- main
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: priorities.c:66 <- main
 [mt] * shared variables computed
 [eva:interferences] 
@@ -510,9 +510,9 @@
 [mt] Globals accessed by thread:
   s1: read by jobs1 at priorities.c:22 <- f1
   m1:
-    read by jobs1 at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by jobs1 at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: priorities.c:21 <- f1
-    read by jobs1 at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by jobs1 at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: priorities.c:23 <- f1
 [mt] * shared variables computed
 [eva:interferences] 
@@ -540,9 +540,9 @@
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   m2:
-    read by jobs2 at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by jobs2 at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: priorities.c:29 <- f2
-    read by jobs2 at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by jobs2 at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: priorities.c:30 <- f2
 [mt] * shared variables computed
 [eva:interferences] 
@@ -604,9 +604,9 @@
 [mt] Globals accessed by thread:
   s2: write by jobs4 at priorities.c:44 <- f4
   m2:
-    read by jobs4 at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by jobs4 at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: priorities.c:43 <- f4
-    read by jobs4 at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by jobs4 at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: priorities.c:45 <- f4
 [mt] * shared variables computed
 [eva:interferences] 
@@ -688,26 +688,26 @@
   s1: write by <main> at priorities.c:63 <- main
   s2: read by <main> at priorities.c:64 <- main
   jobs1:
-    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:15 <-
       pthread_create :: priorities.c:54 <- main
   jobs2:
-    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:15 <-
       pthread_create :: priorities.c:55 <- main
   jobs3:
-    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:15 <-
       pthread_create :: priorities.c:56 <- main
   jobs4:
-    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:15 <-
       pthread_create :: priorities.c:57 <- main
   m1:
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: priorities.c:61 <- main
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: priorities.c:65 <- main
   m2:
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: priorities.c:62 <- main
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: priorities.c:66 <- main
 [mt] * shared variables computed
 [eva:interferences] 
@@ -743,9 +743,9 @@
 [mt] Globals accessed by thread:
   s1: read by jobs1 at priorities.c:22 <- f1
   m1:
-    read by jobs1 at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by jobs1 at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: priorities.c:21 <- f1
-    read by jobs1 at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by jobs1 at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: priorities.c:23 <- f1
 [mt] * shared variables computed
 [eva:interferences] 
@@ -772,9 +772,9 @@
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   m2:
-    read by jobs2 at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by jobs2 at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: priorities.c:29 <- f2
-    read by jobs2 at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by jobs2 at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: priorities.c:30 <- f2
 [mt] * shared variables computed
 [eva:interferences] 

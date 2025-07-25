@@ -33,10 +33,10 @@
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   jobs[0]:
-    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:15 <-
       pthread_create :: ccfg.c:24 <- g1 :: ccfg.c:75 <- main
   jobs[1..3]:
-    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:15 <-
       pthread_create :: ccfg.c:24 <- g1 :: ccfg.c:79 <- main
   x: read by <main> at ccfg.c:78 <- main
   global1: write by <main> at ccfg.c:26 <- g1 :: ccfg.c:79 <- main
@@ -49,9 +49,9 @@
   e: read by <main> at ccfg.c:95 <- main
   f: read by <main> at ccfg.c:96 <- main
   lock:
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: ccfg.c:89 <- main
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: ccfg.c:92 <- main
 [mt] * shared variables computed
 [eva:interferences] 
@@ -173,9 +173,9 @@
   e: write by job_f1 at ccfg.c:57 <- f1
   f: read by job_f1 at ccfg.c:49 <- g6 :: ccfg.c:57 <- f1
   lock:
-    read by job_f1 at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by job_f1 at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: ccfg.c:53 <- f1
-    read by job_f1 at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by job_f1 at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: ccfg.c:55 <- f1
 [mt] * shared variables computed
 [eva:interferences] 
@@ -208,9 +208,9 @@
   e: read by job_f2 at ccfg.c:49 <- g6 :: ccfg.c:66 <- f2
   f: write by job_f2 at ccfg.c:66 <- f2
   lock:
-    read by job_f2 at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by job_f2 at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: ccfg.c:62 <- f2
-    read by job_f2 at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by job_f2 at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: ccfg.c:64 <- f2
 [mt] * shared variables computed
 [eva:interferences] 
@@ -264,10 +264,10 @@
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   jobs[0]:
-    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:15 <-
       pthread_create :: ccfg.c:24 <- g1 :: ccfg.c:75 <- main
   jobs[1..3]:
-    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:15 <-
       pthread_create :: ccfg.c:24 <- g1 :: ccfg.c:79 <- main
   x: read by <main> at ccfg.c:78 <- main
   global1: write by <main> at ccfg.c:26 <- g1 :: ccfg.c:79 <- main
@@ -280,9 +280,9 @@
   e: read by <main> at ccfg.c:95 <- main
   f: read by <main> at ccfg.c:96 <- main
   lock:
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: ccfg.c:89 <- main
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: ccfg.c:92 <- main
 [mt] * shared variables computed
 [eva:interferences] 
@@ -529,9 +529,9 @@
   e: write by job_f1 at ccfg.c:57 <- f1
   f: read by job_f1 at ccfg.c:49 <- g6 :: ccfg.c:57 <- f1
   lock:
-    read by job_f1 at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by job_f1 at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: ccfg.c:53 <- f1
-    read by job_f1 at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by job_f1 at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: ccfg.c:55 <- f1
 [mt] * shared variables computed
 [eva:interferences] 
@@ -627,9 +627,9 @@
   e: read by job_f2 at ccfg.c:49 <- g6 :: ccfg.c:66 <- f2
   f: write by job_f2 at ccfg.c:66 <- f2
   lock:
-    read by job_f2 at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by job_f2 at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: ccfg.c:62 <- f2
-    read by job_f2 at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by job_f2 at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: ccfg.c:64 <- f2
 [mt] * shared variables computed
 [eva:interferences] 
@@ -903,10 +903,10 @@
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   jobs[0]:
-    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:15 <-
       pthread_create :: ccfg.c:24 <- g1 :: ccfg.c:75 <- main
   jobs[1..3]:
-    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:15 <-
       pthread_create :: ccfg.c:24 <- g1 :: ccfg.c:79 <- main
   x: read by <main> at ccfg.c:78 <- main
   global1: write by <main> at ccfg.c:26 <- g1 :: ccfg.c:79 <- main
@@ -919,9 +919,9 @@
   e: read by <main> at ccfg.c:95 <- main
   f: read by <main> at ccfg.c:96 <- main
   lock:
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: ccfg.c:89 <- main
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: ccfg.c:92 <- main
 [mt] * shared variables computed
 [eva:interferences] 
@@ -1172,9 +1172,9 @@
   e: write by job_f1 at ccfg.c:57 <- f1
   f: read by job_f1 at ccfg.c:49 <- g6 :: ccfg.c:57 <- f1
   lock:
-    read by job_f1 at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by job_f1 at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: ccfg.c:53 <- f1
-    read by job_f1 at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by job_f1 at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: ccfg.c:55 <- f1
 [mt] * shared variables computed
 [eva:interferences] 
@@ -1271,9 +1271,9 @@
   e: read by job_f2 at ccfg.c:49 <- g6 :: ccfg.c:66 <- f2
   f: write by job_f2 at ccfg.c:66 <- f2
   lock:
-    read by job_f2 at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by job_f2 at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: ccfg.c:62 <- f2
-    read by job_f2 at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by job_f2 at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: ccfg.c:64 <- f2
 [mt] * shared variables computed
 [eva:interferences] 
@@ -1537,10 +1537,10 @@
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   jobs[0]:
-    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:15 <-
       pthread_create :: ccfg.c:24 <- g1 :: ccfg.c:75 <- main
   jobs[1..3]:
-    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:15 <-
       pthread_create :: ccfg.c:24 <- g1 :: ccfg.c:79 <- main
   x: read by <main> at ccfg.c:78 <- main
   global1: write by <main> at ccfg.c:26 <- g1 :: ccfg.c:79 <- main
@@ -1553,9 +1553,9 @@
   e: read by <main> at ccfg.c:95 <- main
   f: read by <main> at ccfg.c:96 <- main
   lock:
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: ccfg.c:89 <- main
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: ccfg.c:92 <- main
 [mt] * shared variables computed
 [eva:interferences] 
@@ -1797,9 +1797,9 @@
   e: write by job_f1 at ccfg.c:57 <- f1
   f: read by job_f1 at ccfg.c:49 <- g6 :: ccfg.c:57 <- f1
   lock:
-    read by job_f1 at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by job_f1 at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: ccfg.c:53 <- f1
-    read by job_f1 at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by job_f1 at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: ccfg.c:55 <- f1
 [mt] * shared variables computed
 [eva:interferences] 
