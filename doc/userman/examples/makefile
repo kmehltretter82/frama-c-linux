@@ -7,6 +7,7 @@ all: generated/variadic.c
 clean:
 	$(RM) *.log generated/*.c
 
-generated/variadic.c: FCFLAGS += -no-autoload-plugins
-generated/variadic.c: variadic.c $(FRAMAC) $(MAKEFILE_LIST)
+FCFLAGS += -no-autoload-plugins
+
+generated/%.c: %.c $(FRAMAC) $(MAKEFILE_LIST)
 	$(FRAMAC) $(FCFLAGS) $< -print -ocode $@
