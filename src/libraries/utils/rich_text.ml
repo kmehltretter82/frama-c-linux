@@ -257,8 +257,9 @@ let bprintf buffer format =
   Format.fprintf buffer.formatter format
 let kbprintf kjob buffer format =
   Format.kfprintf kjob buffer.formatter format
-let sprintf ?prefix ?suffix ?indent ?margin ?trim ?truncate ?ellipsis format =
-  let buffer = create ?indent ?margin () in
+let sprintf ?prefix ?suffix ?(indent=20) ?(margin=40) ?trim
+    ?truncate ?ellipsis format =
+  let buffer = create ~indent ~margin () in
   let to_string _fmt =
     let message = message ?trim buffer in
     let length = Option.value ~default:(size message) truncate in
@@ -272,8 +273,6 @@ let sprintf ?prefix ?suffix ?indent ?margin ?trim ?truncate ?ellipsis format =
   in
   kbprintf to_string buffer format
 
-let to_string ?(indent=20) ?(margin=40) ?(trim=true) pp data =
-  sprintf ~indent ~margin ~trim "%a" pp data
 
 (* -------------------------------------------------------------------------- *)
 (* --- Tests                                                              --- *)

@@ -77,6 +77,22 @@ val bprintf : buffer -> ('a,Format.formatter,unit) format -> 'a
 val kbprintf :
   (Format.formatter -> 'a) ->
   buffer -> ('b,Format.formatter,unit,'a) format4 -> 'b
+
+(** Pretty prints to a string using a [Rich_text.buffer]. [prefix] can be used
+    to setup semantic tag functions.
+    @param prefix a pretty printing function called at the begining of the print
+    @param suffix a pretty printing function called at the end of the print
+    @param indent defines the maximum indentiation as in {!create}, defaults to
+    20
+    @param margin defines the right-margin as in {!create}, defaults to 40
+    @param truncate do not print more than [truncate] characters; if the
+    (trimed) buffer size is bigger than this number, than the middle part of the
+    buffer is replaced by [ellipsis]
+    @param ellipsis when [truncate] is given and the (trimed) buffer size is
+    bigger than [truncate], then [ellipsis] is printed instead of the truncated
+    middle part
+    @param trim if sets to true, remove leading and trailing whitespas
+    (including tabulations, line feed and carriage returns) *)
 val sprintf  :
   ?prefix:(Format.formatter -> unit) -> ?suffix:(Format.formatter -> unit) ->
   ?indent:int -> ?margin:int ->
@@ -105,16 +121,5 @@ val reset : buffer -> unit
 (** [truncate buffer size] truncates the content of [buffer] if longer than
     [size] characters. Returns true if the buffer has been truncated. *)
 val truncate : buffer -> int -> bool
-
-(* -------------------------------------------------------------------------- *)
-(** Printer *)
-(* -------------------------------------------------------------------------- *)
-
-(**
-   Dump the formatter into a string.
-   Defaults are [~indent:20], [~margin:40] and [~trim:true].
-*)
-val to_string : ?indent:int -> ?margin:int -> ?trim:bool ->
-  (Format.formatter -> 'a -> unit) -> 'a -> string
 
 (* -------------------------------------------------------------------------- *)
