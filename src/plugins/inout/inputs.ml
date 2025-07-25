@@ -55,6 +55,30 @@ class virtual do_it_ = object(self)
     in
     List.iter (fun e -> ignore (visitFramacExpr (self:>frama_c_visitor) e)) args;
 
+  method private treat_array_copy lv vi =
+    let lv_src = Var vi, NoOffset in
+    let t1 = Cil.typeOfLval lv in
+    if Ast_types.is_array t1 && Ast_types.is_array vi.vtype then begin
+      (* By construction, both arrays have a constant length, since we're
+         dealing with a literal string. However, the length might be
+         different, e.g. with char short_array[3] = "foo"; and
+         conversely char long_array[5] = "bar";. Hence, we take the
+         smaller value.
+      *)
+      let sz1 = Cil.bitsSizeOf t1 in
+      let sz2 = Cil.bitsSizeOf vi.vtype in
+      let sz = min sz1 sz2 in
+      let request = Eva.Results.before_kinstr self#current_kinstr in
+      let zone = Eva.Results.lval_deps lv_src request in
+      let bases = Locations.Zone.get_bases zone in
+      let itv = Int_Intervals.inject_bounds Z.zero (Z.(pred (of_int sz))) in
+      let add_one base =
+        let read = Locations.Zone.inject base itv in
+        self#join read
+      in
+      Base.SetLattice.iter add_one bases
+    end else ignore (self#vlval lv_src)
+
   method! vinst i =
     let stmt = Option.get self#current_stmt in
     if Eva.Results.is_reachable stmt then begin
@@ -66,6 +90,10 @@ class virtual do_it_ = object(self)
 
       | Local_init(v, AssignInit i,_) ->
         let rec aux lv = function
+          | SingleInit { enode = Lval (Var vi, NoOffset) }
+            when Ast_info.is_string_literal vi ->
+            self#read_address lv;
+            self#treat_array_copy lv vi
           | SingleInit e ->
             self#read_address lv;
             ignore (visitFramacExpr (self:>frama_c_visitor) e)
