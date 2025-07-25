@@ -60,7 +60,7 @@ let make ~packing ~callback =
       (fun (_,{evt_plugin=m}) -> [`TEXT m])
   in
   let _ = w#add_column_text ~title:"Message" [`YALIGN 0.0 ; `EDITABLE true]
-      (fun (_,{evt_message=m}) -> [`TEXT m])
+      (fun (_,e) -> [`TEXT (Log.Event.message e)])
   in
   w#on_click (fun (_,w) c -> callback w c);
   {append=append;clear=clear}

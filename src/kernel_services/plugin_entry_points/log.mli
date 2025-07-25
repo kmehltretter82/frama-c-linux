@@ -19,14 +19,22 @@ type event = {
   evt_plugin : string ;
   evt_category : string option ; (** message or warning category *)
   evt_source : Filepath.position option ;
-  evt_message : string ;
+  evt_message : Rich_text.message ;
 }
 (** @since Beryllium-20090601-beta1 *)
 
 module Event :
 sig
   type t = event
-  val pretty : Format.formatter -> t -> unit
+  (** Pretty prints the event header and message. This function outputs the
+      semantic tags if any in the event message.
+      @param truncate if set, the output will be truncated if the message size
+      is bigger than the given integer.  *)
+  val pretty : ?truncate:int -> Format.formatter -> t -> unit
+
+  (** Extract the message as a string. The output will be truncated
+      if the message is too long. *)
+  val message : t -> string
 end
 
 type 'a pretty_printer =

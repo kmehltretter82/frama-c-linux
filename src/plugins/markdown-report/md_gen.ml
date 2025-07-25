@@ -312,7 +312,8 @@ let make_events_table print_kind caption events =
     | Error -> "User error"
     | Failure -> "Internal error"
   in
-  let treat_event { evt_kind; evt_plugin; evt_source; evt_message } =
+  let treat_event ({ evt_kind; evt_plugin; evt_source } as evt) =
+    let evt_message = Log.Event.message evt in
     let evt_message =
       Str.global_replace (Str.regexp_string "\n") " " evt_message
     in
@@ -352,7 +353,7 @@ let section_event is_err env nb event =
   H2 (plain title, Some lab)
   :: Block (
     (text @@ plain "Message:") @
-    codeblock "[%s] %s" event.evt_plugin event.evt_message
+    codeblock "[%s] %s" event.evt_plugin (Log.Event.message event)
   )
   :: content
 

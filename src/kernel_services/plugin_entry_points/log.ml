@@ -28,7 +28,7 @@ type event = {
   evt_plugin : string ;
   evt_category : string option;
   evt_source : Filepath.position option ;
-  evt_message : string ;
+  evt_message : Rich_text.message ;
 }
 
 let kernel_channel_name = "kernel"
@@ -246,7 +246,10 @@ struct
     | Warning -> Format.pp_print_string fmt "Warning: "
     | Failure -> Format.pp_print_string fmt "Failure: "
 
-  let pretty fmt evt =
+  let pp_message ?truncate fmt buffer =
+    Rich_text.pretty ?truncate fmt buffer
+
+  let pretty ?truncate fmt evt =
     let header = Format.asprintf "[%s%a] %a%a"
         evt.evt_plugin
         pp_category evt.evt_category
@@ -260,19 +263,23 @@ struct
     (* whenever the first line of the event shall be printed along the header *)
     let lonely_header =
       long_header &&
-      (String.length header + String.length evt.evt_message > 80 ||
-       String.contains evt.evt_message '\n')
+      (String.length header + Rich_text.size evt.evt_message > 80 ||
+       Rich_text.contains evt.evt_message '\n')
     in
     let fmt = formatter_with_indentation fmt 2 in
-    Format.fprintf fmt "%s%t%s@."
+    Format.fprintf fmt "%s%t%a@."
       header
       (fun fmt -> if lonely_header then Format.pp_force_newline fmt ())
-      evt.evt_message
+      (pp_message ?truncate) evt.evt_message
+
+  let message event =
+    Rich_text.to_string event.evt_message
 end
 
 let echo_event evt terminal =
   term_clean terminal ;
-  Event.pretty terminal.formatter evt
+  let truncate = if terminal.isatty then Some max_message_length else None in
+  Event.pretty ?truncate terminal.formatter evt
 
 let do_echo terminal evt =
   if delayed_echo terminal then
@@ -280,15 +287,16 @@ let do_echo terminal evt =
   else
     echo_event evt terminal
 
-let do_transient terminal text p q =
-  if p <= q && not (delayed_echo terminal) then
+let do_transient terminal message =
+  if not (Rich_text.is_empty message) && not (delayed_echo terminal) then
     begin
       term_clean terminal ;
+      let text = Rich_text.to_string ~truncate:max_message_length message in
       let fmt = terminal.formatter in
-      echo_firstline fmt text p q 80 ;
+      echo_firstline fmt text 0 (String.length text) 80 ;
       if terminal.isatty
       then terminal.clean <- false
-      else Format.fprintf fmt "\n" ;
+      else Format.pp_print_newline fmt () ;
       Format.pp_print_flush fmt () ;
     end
 
@@ -451,21 +459,18 @@ let close_buffer c =
   else
     Rich_text.reset c.locked_buffer
 
-let logtransient channel text =
+let logtransient channel format =
   let buffer = open_buffer channel in
   Rich_text.kbprintf
-    (fun fmt ->
+    (fun _fmt ->
        try
-         Format.pp_print_newline fmt () ;
-         Format.pp_print_flush fmt () ;
-         ignore (Rich_text.truncate buffer max_message_length) ;
-         let p,q = Rich_text.trim buffer in
-         do_transient channel.terminal (Rich_text.contents buffer) p q ;
+         let message = Rich_text.message buffer in
+         do_transient channel.terminal message ;
          close_buffer channel
        with e ->
          close_buffer channel ;
          raise e
-    ) buffer text
+    ) buffer format
 
 let locked_listeners = ref false
 
@@ -478,30 +483,21 @@ let logwithfinal finally channel
     ?emitwith        (* additional emitter *)
     ?(echo=true)     (* echo on terminal *)
     ?(once=false)    (* log and emit only once *)
-    ?append          (* additional text *)
+    ?(append=ignore) (* additional text *)
     text =
+  let source = get_source current source in
   let buffer = open_buffer channel in
   Format.pp_open_vbox (Rich_text.formatter buffer) 0 ;
   Rich_text.kbprintf
     (fun fmt ->
        try
-         (match append with None -> () | Some k -> k fmt) ;
+         append fmt;
          Format.pp_close_box fmt () ;
          Format.pp_print_newline fmt () ;
          Format.pp_print_flush fmt () ;
-         let truncated =
-           if channel.terminal.isatty
-           then Rich_text.truncate buffer max_message_length
-           else false
-         in
-         let p,q = Rich_text.trim buffer in
+         let message = Rich_text.message buffer in
          let output =
-           if p <= q then
-             let source = get_source current source in
-             let message = Rich_text.range buffer p q in
-             let message =
-               if truncated then "(truncated message) " ^ message else message
-             in
+           if not (Rich_text.is_empty message) then
              let event = {
                evt_kind = kind ;
                evt_plugin = channel.plugin ;
@@ -579,7 +575,9 @@ let deferred_raise ~fatal event msg =
   let pp_pos fmt pos = Format.fprintf fmt "%a: " Filepath.pp_pos pos in
   let pp_pos_opt = Pretty_utils.pp_opt pp_pos in
   let print_event fmt =
-    Format.fprintf fmt "@\n%a%s" pp_pos_opt event.evt_source event.evt_message
+    Format.fprintf fmt "@\n%a%a"
+      pp_pos_opt event.evt_source
+      (Event.pp_message ?truncate:None) event.evt_message
   in
   let append = Some print_event in
   let exn =
@@ -636,8 +634,9 @@ let echo e =
     | Created c -> do_echo c.terminal e
   with Not_found ->
     let msg =
-      Format.sprintf "[unknown channel %s]:%s"
-        e.evt_plugin e.evt_message
+      Format.asprintf "[unknown channel %s]:%a"
+        e.evt_plugin
+        (Event.pp_message ?truncate:None) e.evt_message
     in failwith msg
 
 (* ------------------------------------------------------------------------- *)
@@ -1081,7 +1080,7 @@ struct
       { evt_kind = Failure;
         evt_plugin = channel.plugin;
         evt_category = Some unreported_error;
-        evt_message = "Silent error";
+        evt_message = Rich_text.of_string "Silent error";
         evt_source = None
       }
     | Some evt -> evt
