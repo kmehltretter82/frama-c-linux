@@ -34,6 +34,7 @@ export interface MultiSelection {
   label: string;
   title?: string;
   markers: Ast.marker[];
+  scopes?: Ast.decl[];
   index?: number;
 }
 
@@ -44,7 +45,21 @@ const MultiSelection = new GlobalState<MultiSelection>(emptySelection);
 
 export function useSelection(): MultiSelection {
   const [s] = useGlobalState(MultiSelection);
-  return s;
+  const [scopes, setScopes] = React.useState(s.scopes);
+  const getAttr = States.useSyncArrayGetter(Ast.markerAttributes);
+
+  React.useEffect(() => {
+    if(!s.scopes) {
+      const newScopes = new Set<Ast.decl>();
+      s.markers.forEach(marker => {
+        const scope = getAttr(marker)?.scope;
+        if(scope) newScopes.add(scope);
+      });
+      setScopes([...newScopes]);
+    }
+  }, [s, setScopes, getAttr])
+
+  return { ...s, scopes };
 }
 
 function updateSelection(s: MultiSelection): void {
