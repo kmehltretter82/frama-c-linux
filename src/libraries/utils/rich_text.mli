@@ -12,6 +12,13 @@
 
 type message (** Message with tags *)
 
+(** [empty] is the empty message, containing neither plain text nor tags. *)
+val empty : message
+
+(** [is_empty message] Returns true if [message] is empty. A buffer containing
+    only semantic tags is not considered empty. *)
+val is_empty : message -> bool
+
 val size : message -> int
 val char_at : message -> int -> char
 val substring : message -> int -> int -> string

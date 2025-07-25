@@ -22,6 +22,8 @@ type message = {
   tags : tag list;
 }
 
+let empty = { plain = "" ; tags = [] }
+let is_empty message = message.plain = "" && message.tags = []
 let size message = String.length message.plain
 let char_at message k = String.get message.plain k
 let substring message k n = String.sub message.plain k n
