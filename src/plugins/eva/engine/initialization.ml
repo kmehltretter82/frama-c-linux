@@ -224,27 +224,20 @@ module Make
   (* Applies an initializer. If [top_volatile] is true, sets volatile locations
      to top without applying the initializer. Otherwise, lets the standard
      transfer function on assignments handle volatile locations. *)
-  let apply_eva_initializer ~pos ~top_volatile lval init state =
+  let rec apply_eva_initializer ~pos ~top_volatile lval init state =
     if top_volatile && Ast_types.has_qualifier "volatile" lval.typ
     then initialize_top_volatile lval state
-    else begin
-      let rec aux lval init state =
-        match init with
-        | SingleInit (exp, loc) ->
-          let source = fst loc in
-          apply_eva_single_initializer ~pos ~source state lval exp
-        | CompoundInit (_typ, l) ->
-          let doinit state (off, init) =
-            let lval = Eva_ast.add_offset lval off in
-            aux lval init state
-          in
-          List.fold_left doinit state l
-      in
+    else
       match init with
-      | CInit init -> aux lval init state
-      | StrInit (Lit_str s) -> init_char_array ~pos lval s state
-      | StrInit (Lit_wstr a) -> init_wchar_array ~pos lval a state
-    end
+      | SingleInit (exp, loc) ->
+        let source = fst loc in
+        apply_eva_single_initializer ~pos ~source state lval exp
+      | CompoundInit (_typ, l) ->
+        let doinit state (off, init) =
+          let lval = Eva_ast.add_offset lval off in
+          apply_eva_initializer ~pos ~top_volatile lval init state
+        in
+        List.fold_left doinit state l
 
   (* Field by field initialization of a variable to zero, or top if volatile.
      Very inefficient. *)
@@ -252,7 +245,7 @@ module Make
     let loc = Position.loc pos in
     let init = Eva_ast.translate_init (Cil.makeZeroInit ~loc vi.vtype) in
     let lval = Eva_ast.Build.var vi in
-    apply_eva_initializer ~pos ~top_volatile:true lval (CInit init) state
+    apply_eva_initializer ~pos ~top_volatile:true lval init state
 
   (* ----------------------- Non Lib-entry mode ----------------------------- *)
 
@@ -281,7 +274,9 @@ module Make
     (* Applies the real initializer on top. *)
     match init with
     | None -> state
-    | Some init ->
+    | Some (StrInit (Lit_str s)) -> init_char_array ~pos lval s state
+    | Some (StrInit (Lit_wstr a)) -> init_wchar_array ~pos lval a state
+    | Some (CInit init) ->
       apply_eva_initializer ~pos ~top_volatile:false lval init state
 
 
