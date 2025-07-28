@@ -23,16 +23,20 @@ module Domain : sig
         processed first. The domains currently provided by Eva have priority
         ranging between 1 and 19, so a priority of 0 (respectively 20) ensures
         that a new domain is processed after (respectively before) the classic
-        Eva domains. The default priority is 0. *)
+        Eva domains. The default priority is 0.
+      - [auto_enable] is called during domain configuration; if it returns true,
+        the domain is automatically enabled. Always [false] by default. *)
   val register :
-    name:string -> descr:string -> ?experimental:bool -> ?priority:int ->
+    name:string -> descr:string ->
+    ?experimental:bool -> ?priority:int -> ?auto_enable:(unit -> bool) ->
     (module Abstract_domain.Leaf) -> registered
 
   (** Registers a dynamic domain, which is built at the start of an analysis
       analysis using the function given as last argument.
       See function {!register} for more details. *)
   val dynamic_register :
-    name:string -> descr:string -> ?experimental:bool -> ?priority:int ->
+    name:string -> descr:string ->
+    ?experimental:bool -> ?priority:int -> ?auto_enable:(unit -> bool) ->
     (unit -> (module Abstract_domain.Leaf)) -> unit
 
   module type Context = Abstract.Context.External
@@ -54,7 +58,8 @@ module Domain : sig
 
   (** Registers a functor domain. See function {!register} for more details. *)
   val register_functor:
-    name:string -> descr:string -> ?experimental:bool -> ?priority:int ->
+    name:string -> descr:string ->
+    ?experimental:bool -> ?priority:int -> ?auto_enable:(unit -> bool) ->
     (module Functor) -> registered
 
 end
