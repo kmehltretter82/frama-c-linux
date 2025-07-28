@@ -1,8 +1,6 @@
 [kernel] Parsing obfuscate.c (with preprocessing)
 [obfuscator] Warning: unobfuscated attribute name `fc_stdlib'
 [obfuscator] Warning: unobfuscated attribute parameter name `stdint.h'
-[obfuscator] Warning: unobfuscated attribute name `const'
-[obfuscator] Warning: unobfuscated attribute name `fc_literal'
 [obfuscator] Warning: unobfuscated attribute name `missingproto'
 /* *********************************** */
 /* start of dictionary for obfuscation */
@@ -26,9 +24,7 @@
 #define F7 my_f
 // global variables
 #define G1 my_var
-#define G2 __fc_lit_string1
-#define G3 __fc_lit_string2
-#define G4 example_struct
+#define G2 example_struct
 // labels
 #define L1 end
 #define L2 end
@@ -83,8 +79,8 @@
 /* *********************************************************** */
 /* start of dictionary required to compile the obfuscated code */
 /* *********************************************************** */
-// literal strings
-#define LS1 "ti\rti"
+#define __fc_lit_string1 "ti\rti"
+#define __fc_lit_string2 "ti\rti"
 /* ********************************************************* */
 /* end of dictionary required to compile the obfuscated code */
 /* ********************************************************* */
@@ -144,7 +140,7 @@ int F3(int f2)
 int main(int *f3)
 {
   int V4;
-  if (LS1 == LS1) F2(f3);
+  if (__fc_lit_string1 == __fc_lit_string2) F2(f3);
   V4 = 0;
   return V4;
 }
