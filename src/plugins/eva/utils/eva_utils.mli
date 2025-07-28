@@ -22,42 +22,6 @@
 
 open Cil_types
 
-(** {2 Callstacks related types and functions} *)
-
-(** Functions dealing with call stacks. *)
-
-(** Reset the current callstack: future accesses to the current callstack
-    will fail. *)
-val reset_call_stack : unit -> unit
-
-(** Same as {!reset_call_stack}, but records and keep perfs (see
-    {!Eva_perf}). *)
-val clear_call_stack : unit -> unit
-
-(** Initializes the current callstack with the main entry point. *)
-val init_call_stack : kernel_function -> Callstack.t
-
-(** Push a new call to the current callstack. *)
-val push_call_stack : kernel_function -> stmt -> unit
-
-(** Removes the topmost call from the current callstack. *)
-val pop_call_stack : unit -> unit
-
-(** Returns the current function, at the top of the current callstack.
-    Fails if no callstack has been initialized. This should only be called
-    during the analysis of a function. *)
-val current_kf : unit -> kernel_function
-
-(** Returns the current callstack; fails if it has not been initialized.
-    This should only be called during the analysis of a function. *)
-val current_call_stack : unit -> Callstack.t
-
-(** Returns the current callstack, or [None] if it has not been initialized. *)
-val current_call_stack_opt : unit -> Callstack.t option
-
-(** Prints the current callstack. *)
-val pp_callstack : Format.formatter -> unit
-
 (** {2 Others} *)
 
 (* TODO: Document the rest of this file. *)
@@ -66,11 +30,6 @@ val get_slevel : Kernel_function.t -> Parameters.SlevelFunction.value
 val get_subdivision: stmt -> int
 val pretty_actuals :
   Format.formatter -> (Eva_ast.exp * Cvalue.V.t) list -> unit
-val pretty_current_cfunction_name : Format.formatter -> unit
-
-(** Emit an alarm, either as warning or as a result, according to
-    status associated to {!Self.wkey_alarm} *)
-val alarm_report: 'a Log.pretty_printer
 
 (** [protect f ~cleanup] runs [f]. On a user interruption or a Frama-C error,
     if option -save is set, applies [cleanup]. This is used to clean up and

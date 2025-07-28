@@ -231,20 +231,20 @@ module Domain = struct
     | `Value loc -> loc.Eval.loc
     | `Top -> Precise_locs.loc_top (* should not occur *)
 
-  let assign _ki lv e _v valuation state =
+  let assign ~pos:_ lv e _v valuation state =
     let to_z = to_z valuation in
     let effects = Transfer.effects_assign to_z lv e in
     `Value (Transfer.catenate state effects)
 
-  let assume _stmt e _pos valuation state =
+  let assume ~pos:_ e _pos valuation state =
     let to_z = to_z valuation in
     let effects = Transfer.effects_assume to_z e in
     `Value (Transfer.catenate state effects)
 
-  let start_call _stmt _call _recursion _valuation _state =
+  let start_call ~pos:_ _call _recursion _valuation _state =
     `Value LatticeInout.empty
 
-  let finalize_call _stmt _call _recursion ~pre ~post =
+  let finalize_call ~pos:_ _call _recursion ~pre ~post =
     `Value (Transfer.catenate pre post)
 
   let update _valuation state = `Value state

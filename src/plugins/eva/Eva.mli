@@ -133,8 +133,7 @@ module Callstack: sig
   (** Prints a callstack without displaying call sites. *)
   val pretty_short : Format.formatter -> t -> unit
 
-  (** Prints a hash of the callstack when '-kernel-msg-key callstack'
-      is enabled (prints nothing otherwise). *)
+  (** Prints a hash of the callstack. *)
   val pretty_hash : Format.formatter -> t -> unit
 
   (** [compare_lex] compares callstack lexicographically, slightly slower
@@ -149,7 +148,7 @@ module Callstack: sig
   (*** {2 Stack manipulation} *)
 
   (*** Constructor *)
-  val init : ?thread:int -> Cil_types.kernel_function -> t
+  val init : thread:int -> entry_point:Cil_types.kernel_function -> t
 
   (** Adds a new call to the top of the callstack. *)
   val push : Cil_types.kernel_function -> Cil_types.stmt -> t -> t
@@ -158,15 +157,16 @@ module Callstack: sig
   val pop : t -> t option
 
   (** Removes the topmost call from the callstack and returns it. *)
-  val pop_call : t -> (Cil_types.kernel_function * Cil_types.kinstr) * t option
+  val pop_call : t -> Cil_types.kernel_function * (Cil_types.stmt * t) option
 
   val top : t -> (Cil_types.kernel_function * Cil_types.stmt) option
   val top_kf : t -> Cil_types.kernel_function
   val top_callsite : t -> Cil_types.kinstr
   val top_call : t -> Cil_types.kernel_function * Cil_types.kinstr
 
-  (** Returns the function that called the topmost function of the callstack. *)
-  val top_caller : t -> Cil_types.kernel_function option
+  (** Returns the function that called the topmost function of the callstack and
+      the top callsite. *)
+  val top_caller : t -> (Cil_types.stmt * Cil_types.kernel_function) option
 
   (** {2 Conversion} *)
 

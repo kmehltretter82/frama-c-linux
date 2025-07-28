@@ -22,58 +22,6 @@
 
 open Cil_types
 
-(* Callstacks related functions *)
-
-let current_callstack : Callstack.t option ref = ref None
-
-let reset_call_stack () =
-  current_callstack := None;
-  Eva_perf.reset ()
-
-let clear_call_stack () =
-  match !current_callstack with
-  | None -> ()
-  | Some cs ->
-    Callstack.iter Eva_perf.stop cs; (* Stop the whole remaining stack *)
-    current_callstack := None
-
-let init_call_stack kf =
-  assert (!current_callstack = None);
-  let cs = Callstack.init kf in
-  current_callstack := Some cs;
-  Eva_perf.start cs;
-  cs
-
-let current_call_stack_opt () = !current_callstack
-
-let current_call_stack () =
-  match !current_callstack with
-  | None -> Self.fatal "Callstack not initialized"
-  | Some cs -> cs
-
-let current_kf () =
-  let cs = current_call_stack () in
-  Callstack.top_kf cs
-
-let push_call_stack kf stmt =
-  let cs = current_call_stack () in
-  let new_cs = Callstack.push kf stmt cs in
-  current_callstack := Some new_cs;
-  Eva_perf.start new_cs
-
-let pop_call_stack () =
-  let cs = current_call_stack () in
-  Eva_perf.stop cs;
-  current_callstack := Callstack.pop cs
-
-let pp_callstack fmt =
-  if Parameters.PrintCallstacks.get () then
-    match !current_callstack with
-    | None -> () (* Stack not initialized; happens when handling global initializations *)
-    | Some cs ->
-      Format.fprintf fmt "@ stack: %a" Callstack.pretty cs
-
-
 (* Assertions emitted during the analysis *)
 
 let emitter =
@@ -106,14 +54,6 @@ let get_subdivision stmt =
 let pretty_actuals fmt actuals =
   let pp fmt (e,x) = Cvalue.V.pretty_typ (Some (e.Eva_ast.typ)) fmt x in
   Pretty_utils.pp_flowlist pp fmt actuals
-
-let pretty_current_cfunction_name fmt =
-  Kernel_function.pretty fmt (current_kf())
-
-(* Emit alarms in "non-warning" mode *)
-let alarm_report ?current ?source ?emitwith ?echo ?once ?append =
-  Self.warning ~wkey:Self.wkey_alarm
-    ?current ?source ?emitwith ?echo ?once ?append
 
 module DegenerationPoints =
   Cil_state_builder.Stmt_hashtbl

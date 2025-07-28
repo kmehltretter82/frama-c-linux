@@ -140,8 +140,8 @@ module State = struct
   let update valuation (s, clob) =
     Cvalue_transfer.update valuation s >>-: fun s -> s, clob
 
-  let assign stmt lv expr assigned valuation (s, clob) =
-    Cvalue_transfer.assign stmt lv expr assigned valuation s >>-: fun s ->
+  let assign ~pos lv expr assigned valuation (s, clob) =
+    Cvalue_transfer.assign ~pos lv expr assigned valuation s >>-: fun s ->
     (* TODO: use the value in assignment *)
     let _ =
       Eval.value_assigned assigned >>-: fun value ->
@@ -150,38 +150,38 @@ module State = struct
     in
     s, clob
 
-  let assume stmt expr positive valuation (s, clob) =
-    Cvalue_transfer.assume stmt expr positive valuation s >>-: fun s ->
+  let assume ~pos expr positive valuation (s, clob) =
+    Cvalue_transfer.assume ~pos expr positive valuation s >>-: fun s ->
     s, clob
 
-  let is_direct_recursion stmt call =
+  let is_direct_recursion ~pos call =
     try
-      let kf = Kernel_function.find_englobing_kf stmt in
+      let kf = Position.Local.kf pos in
       Kernel_function.equal kf call.kf
     with Not_found -> false (* Should not happen *)
 
-  let start_recursive_call stmt call recursion (state, clob) =
-    let direct = is_direct_recursion stmt call in
+  let start_recursive_call ~pos call recursion (state, clob) =
+    let direct = is_direct_recursion ~pos call in
     let state = Cvalue.Model.remove_variables recursion.withdrawal state in
     let substitution = recursion.base_substitution in
     let clob = if direct then clob else Locals_scoping.top () in
     let state = Locals_scoping.substitute substitution clob state in
     Cvalue.Model.replace_base substitution state
 
-  let start_call stmt call recursion valuation (state, clob) =
+  let start_call ~pos call recursion valuation (state, clob) =
     (* Uses the [valuation] to update the [state] before the substitution
        for recursive calls. *)
     Cvalue_transfer.update valuation state >>- fun state ->
     let state =
       match recursion with
       | None -> state
-      | Some recursion -> start_recursive_call stmt call recursion (state, clob)
+      | Some recursion -> start_recursive_call ~pos call recursion (state, clob)
     in
-    Cvalue_transfer.start_call stmt call recursion valuation state
+    Cvalue_transfer.start_call ~pos call recursion valuation state
     >>-: fun state -> state, Locals_scoping.bottom ()
 
-  let finalize_recursive_call stmt call ~pre recursion state =
-    let direct = is_direct_recursion stmt call in
+  let finalize_recursive_call ~pos call ~pre recursion state =
+    let direct = is_direct_recursion ~pos call in
     let pre, clob = pre in
     let substitution = recursion.base_substitution in
     let state = Cvalue.Model.replace_base substitution state in
@@ -190,24 +190,22 @@ module State = struct
     let inter = Cvalue.Model.filter_by_shape recursion.base_withdrawal pre in
     Cvalue.Model.merge ~into:state inter
 
-  let finalize_call stmt call recursion ~pre ~post =
+  let finalize_call ~pos call recursion ~pre ~post =
     let (pre, clob) = pre in
     let (post, post_clob) = post in
     Locals_scoping.(remember_bases_with_locals clob post_clob.clob);
     let finalize a =
-      finalize_recursive_call stmt call ~pre:(pre, clob) a post
+      finalize_recursive_call ~pos call ~pre:(pre, clob) a post
     in
     let post = Option.fold ~some:finalize ~none:post recursion in
     (* Deallocate memory allocated via alloca().
        To minimize computations, only do it for function definitions. *)
     let post =
       if Kernel_function.is_definition call.kf then
-        let callstack = Eva_utils.current_call_stack () in
-        let callstack = Callstack.push call.kf stmt callstack in
-        Builtins_malloc.free_automatic_bases callstack post
+        Builtins_malloc.free_automatic_bases call.callstack post
       else post
     in
-    Cvalue_transfer.finalize_call stmt call recursion ~pre ~post
+    Cvalue_transfer.finalize_call ~pos call recursion ~pre ~post
     >>-: fun state ->
     state, clob
 

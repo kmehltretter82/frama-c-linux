@@ -62,9 +62,8 @@ let returned_value kf =
   | TFloat FDouble
   | TFloat FLongDouble -> Cvalue.V.top_float
   | TBuiltin_va_list ->
-    Self.error ~current:true ~once:true
-      "functions returning variadic arguments must be stubbed%t"
-      Eva_utils.pp_callstack;
+    Self.error ~current:true ~once:true ~stacktrace:true
+      "functions returning variadic arguments must be stubbed";
     Cvalue.V.top_int
   | TVoid -> Cvalue.V.top (* this value will never be used *)
   | TFun _ | TNamed _ | TArray _ -> assert false

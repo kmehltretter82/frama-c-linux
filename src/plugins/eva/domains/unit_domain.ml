@@ -59,10 +59,10 @@ module Make
   let extract_lval ~oracle:_ _ _ _ _ = eval_top
 
   let update _ _ = `Value ()
-  let assign _ _ _ _ _ _ = `Value ()
-  let assume _ _ _ _ _ = `Value ()
-  let start_call _ _ _ _ _ = `Value ()
-  let finalize_call _ _ _ ~pre:_ ~post:_ = `Value ()
+  let assign ~pos:_ _ _ _ _ _ = `Value ()
+  let assume ~pos:_ _ _ _ _ = `Value ()
+  let start_call ~pos:_ _ _ _ _ = `Value ()
+  let finalize_call ~pos:_ _ _ ~pre:_ ~post:_ = `Value ()
   let show_expr _ _ _ _ = ()
 
   let logic_assign _ _ _ = ()

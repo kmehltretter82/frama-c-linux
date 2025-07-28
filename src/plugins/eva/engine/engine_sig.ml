@@ -64,7 +64,7 @@ sig
       statement [stmt] in the input abstract state [state].
       If [recursion] is not [None], the call is a recursive call. *)
   val compute_call:
-    stmt -> (loc, value) call -> recursion option -> state -> state call_result
+    (loc, value) call -> recursion option -> state -> state call_result
 end
 
 module type Interferences =
@@ -82,14 +82,14 @@ sig
   (** Add the last Eva analysis results to the given interferences abstract
       representation. *)
   val add_last_analysis :
-    Thread.t -> Analysis_location.Local.Set.t -> Base.Hptset.t -> add_result
+    Thread.t -> Position.Local.Set.t -> Base.Hptset.t -> add_result
 
   (** Inject current interferences to an abstract state. If activated,
       the Mthread domain helps filtering applicable interferences. This function
       is the identity if the Mthread domain can infer that no shared memory has
       been read or written during the last transfer function. *)
   val inject :
-    Cil_types.kernel_function -> Eva_automata.vertex -> Eva_automata.vertex ->
+    pos:Position.t -> Eva_automata.vertex -> Eva_automata.vertex ->
     state -> state
 
   (** Are there any interferences to inject after the given transition? *)
@@ -167,11 +167,11 @@ module type Results = sig
   val eval_function:
     state -> ?args:exp list -> lhost -> kernel_function list evaluated
 
-  (** [assume_cond stmt state expr b] reduces the given abstract state
+  (** [assume_cond ~pos state expr b] reduces the given abstract state
       by assuming [exp] evaluates to:
       - a non-zero value if [b] is true;
       - zero if [b] is false. *)
-  val assume_cond : stmt -> state -> exp -> bool -> state or_bottom
+  val assume_cond : pos:Position.t -> state -> exp -> bool -> state or_bottom
 end
 
 module type S_with_results = sig

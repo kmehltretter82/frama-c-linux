@@ -1176,11 +1176,11 @@ module D : Abstract_domain.Leaf
     let assume_one = assume_exp_bot valuation in
     valuation.Abstract_domain.fold assume_one (`Value state)
 
-  let assume _ _ _ = update
+  let assume ~pos:_ _ _ = update
 
   exception Unassignable
 
-  let assign _kinstr lv e _assignment valuation (state:state) =
+  let assign ~pos:_ lv e _assignment valuation (state:state) =
     update valuation state >>- fun state ->
     let to_loc lv =
       match valuation.Abstract_domain.find_loc lv with
@@ -1198,7 +1198,7 @@ module D : Abstract_domain.Leaf
     try `Value (G.assign to_loc to_val lv.lval e state)
     with Unassignable -> `Value (kill lv.lloc state)
 
-  let finalize_call _stmt _call _recursion ~pre ~post =
+  let finalize_call ~pos:_ _call _recursion ~pre ~post =
     let state =
       match function_calls_handling with
       | FullInterprocedural -> post
@@ -1211,7 +1211,7 @@ module D : Abstract_domain.Leaf
     let vars = List.map fst recursion.substitution @ recursion.withdrawal in
     remove_variables vars state
 
-  let start_call _stmt call recursion valuation state =
+  let start_call ~pos:_ call recursion valuation state =
     let state =
       match function_calls_handling with
       | FullInterprocedural ->

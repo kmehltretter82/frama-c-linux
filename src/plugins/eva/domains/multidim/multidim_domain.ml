@@ -746,7 +746,7 @@ struct
         | `Value src ->
           DomainLattice.overwrite ~oracle state dst src
 
-  let assign _kinstr { lval=dst } src assigned_value valuation state =
+  let assign ~pos:_ { lval=dst } src assigned_value valuation state =
     if Int_Base.is_zero (Bit_utils.sizeof dst.typ)
     then `Value state
     else
@@ -754,10 +754,10 @@ struct
       let oracle = valuation_to_oracle state valuation in
       assign' ~oracle ~value:assigned_value dst (Some src) state
 
-  let assume _stmt _expr _pos valuation state =
+  let assume ~pos:_ _expr _pos valuation state =
     assume_valuation valuation state
 
-  let start_call _stmt call recursion valuation state =
+  let start_call ~pos:_ call recursion valuation state =
     if recursion <> None
     then
       Self.abort ~current:true
@@ -769,7 +769,7 @@ struct
     in
     List.fold_left bind (`Value state) call.arguments
 
-  let finalize_call _stmt call _recursion ~pre:_ ~post =
+  let finalize_call ~pos:_ call _recursion ~pre:_ ~post =
     match find_builtin call.kf, call.return with
     | None, _ | _, None   -> `Value post
     | Some f, Some return ->

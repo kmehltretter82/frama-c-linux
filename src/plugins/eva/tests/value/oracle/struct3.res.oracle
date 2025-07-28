@@ -17,7 +17,7 @@
   v ∈ [--..--]
 [eva:alarm] struct3.i:42: Warning: 
   accessing out of bounds index. assert 10 < 10;
-[kernel] struct3.i:42: Warning: 
+[eva] struct3.i:42: Warning: 
   all target addresses were invalid. This path is assumed to be dead.
 [eva:alarm] struct3.i:46: Warning: 
   pointer downcast. assert (unsigned int)s2.c ≤ 2147483647;

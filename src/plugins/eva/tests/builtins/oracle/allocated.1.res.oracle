@@ -29,7 +29,7 @@
 [eva:alarm] allocated.c:44: Warning: 
   accessing left-value that contains escaping addresses.
   assert ¬\dangling(&p);
-[kernel] allocated.c:44: Warning: 
+[eva] allocated.c:44: Warning: 
   all target addresses were invalid. This path is assumed to be dead.
 [eva] allocated.c:45: Call to builtin free
 [eva] allocated.c:45: function free: precondition 'freeable' got status valid.
@@ -37,7 +37,7 @@
 [eva:alarm] allocated.c:46: Warning: 
   accessing left-value that contains escaping addresses.
   assert ¬\dangling(&p);
-[kernel] allocated.c:46: Warning: 
+[eva] allocated.c:46: Warning: 
   all target addresses were invalid. This path is assumed to be dead.
 [eva] allocated.c:50: Call to builtin malloc
 [eva:malloc:new] allocated.c:50: allocating variable __malloc_main_l50
@@ -45,7 +45,7 @@
 [eva:malloc:new] allocated.c:50: allocating variable __malloc_main_l50_0
 [eva] allocated.c:50: assertion got status valid.
 [eva:alarm] allocated.c:53: Warning: out of bounds write. assert \valid(p + 2);
-[kernel] allocated.c:53: Warning: 
+[eva] allocated.c:53: Warning: 
   all target addresses were invalid. This path is assumed to be dead.
 [eva] allocated.c:54: Frama_C_show_each_p: {{ &__malloc_main_l50 }}
 [eva] allocated.c:55: Frama_C_show_each_p0: {13}

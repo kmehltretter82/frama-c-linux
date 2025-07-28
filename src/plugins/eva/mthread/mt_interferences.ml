@@ -22,21 +22,20 @@
 
 let concurrent_writes shared_bases =
   let module Analyzer = (val Analysis.current_analyzer ()) in
-  let module ALoc = Analysis_location in
   match Analyzer.Dom.get Mt_domain.Domain.key with
   (* Domain disabled, no information about writes *)
-  | None -> ALoc.Local.Set.empty
+  | None -> Position.Local.Set.empty
   (* Domain enabled *)
   | Some _extract ->
-    let add_aloc stmt cs _state acc =
-      let aloc = ALoc.Local (stmt, cs) in
+    let add_pos stmt cs _state acc =
+      let pos = Position.local stmt cs in
       (* TODO: Maybe take the memory read/written for all callstacks of the
          given statement? (can be done directly by Inout_access). *)
       let filter = Inout_access.keep_globals_only in
-      let accesses = Inout_access.at ~filter aloc in
+      let accesses = Inout_access.at ~filter pos in
       let written_bases = Locations.Zone.get_bases accesses.write in
       if Base.SetLattice.(intersects (inject shared_bases) written_bases)
-      then ALoc.Local.Set.add (stmt, cs) acc
+      then Position.Local.Set.add (stmt, cs) acc
       else acc
     in
     let add_stmt acc stmt =
@@ -48,7 +47,7 @@ let concurrent_writes shared_bases =
       then match Analyzer.get_stmt_state_by_callstack ~after:true stmt with
         | `Top | `Bottom -> acc (* TODO: handle Tops *)
         | `Value table ->
-          Callstack.Hashtbl.fold (add_aloc stmt) table acc
+          Callstack.Hashtbl.fold (add_pos stmt) table acc
       else acc
     in
     let add_kf kf acc =
@@ -57,7 +56,7 @@ let concurrent_writes shared_bases =
       | Definition (fundec,_) ->
         List.fold_left add_stmt acc fundec.Cil_types.sallstmts
     in
-    Globals.Functions.fold add_kf ALoc.Local.Set.empty
+    Globals.Functions.fold add_kf Position.Local.Set.empty
 
 let shared_bases analysis_state =
   let shared_zones = analysis_state.Mt_thread.concurrent_accesses in

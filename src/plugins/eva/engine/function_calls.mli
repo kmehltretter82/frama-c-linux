@@ -42,7 +42,7 @@ type analysis_target =
 (** Define the analysis target of a function according to Eva parameters.
     Also registers the call in tables for the functions below. *)
 val define_analysis_target:
-  ?recursion_depth:int -> kinstr -> kernel_function -> analysis_target
+  ?recursion_depth:int -> ('l, 'v) Eval.call -> analysis_target
 
 (** Returns true if the Eva analysis use the specification of the given
     function instead of its body to interpret its calls. *)

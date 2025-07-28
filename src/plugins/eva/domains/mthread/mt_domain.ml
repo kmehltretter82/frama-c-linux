@@ -231,7 +231,7 @@ module Transfer = struct
 
   module Builtins = Datatype.String.Hashtbl
   type builtin =
-    t -> Cil_types.stmt -> (Value.t * exp) list -> (t * Value.t) Result.t
+    pos:Position.local -> t -> (Value.t * exp) list -> (t * Value.t) Result.t
   let builtins : builtin Builtins.t = Builtins.create 17
   let find_builtin name = Builtins.find_opt builtins name
   let add_builtin name f = Builtins.add builtins name f
@@ -246,24 +246,24 @@ module Transfer = struct
       Bottom.(map f result |> value ~bottom)
     else return
 
-  let assign kinstr { lval } _exp assigned _valuation state =
-    match kinstr with
-    | Cil_types.Kglobal -> `Value state
-    | Kstmt _stmt ->
+  let assign ~pos { lval } _exp assigned _valuation state =
+    match Position.is_local pos with
+    | false -> `Value state
+    | true ->
       let { return } = reset state in
       let return = assign_return lval (Eval.value_assigned assigned) return in
       `Value { state with return }
 
-  let assume _ _ _ _ state = `Value state
+  let assume ~pos:_ _ _ _ state = `Value state
 
-  let start_call _ _ _ _ state = `Value state
+  let start_call  ~pos:_ _ _ _ state = `Value state
 
   let map_non_bottom f xs =
     let module E = struct exception Bottom end in
     let f v = match f v with `Value v -> v | `Bottom -> raise E.Bottom in
     try `Value (List.map f xs) with E.Bottom -> `Bottom
 
-  let finalize_call stmt call _ ~pre:_ ~post =
+  let finalize_call ~pos call _ ~pre:_ ~post =
     let name = Kernel_function.get_name call.kf in
     match find_builtin name with
     | None -> `Value post
@@ -274,7 +274,7 @@ module Transfer = struct
       let extract (exp, v) = Eval.value_assigned v >>-: fun v -> v, exp in
       let* params = map_non_bottom extract arguments in
       let error = (post, Value.top) in
-      let (state, ret) = f post stmt params |> Result.log ~error in
+      let (state, ret) = f ~pos post params |> Result.log ~error in
       let results = BuiltinsResults.write call.return ret state.results in
       `Value { state with results }
 
@@ -342,20 +342,19 @@ module Domain = struct
     let results = BuiltinsResults.leave_scope kf vars state.results in
     { state with results }
 
-  let thread_create state stmt = function
+  let thread_create ~pos state = function
     | (name, _) :: (func, _) :: args ->
       let open Result.Operators in
       let name = Name.of_cvalue name in
       let* func = Value.extract_fun func in
       let args = List.map fst args in
-      let aloc = (stmt, Eva_utils.current_call_stack ()) in
-      let spawn f = Thread.spawn aloc name f args in
+      let spawn f = Thread.spawn pos name f args in
       let th_list = List.map spawn func in
       let+ threads, return = Mt_thread.Register.register th_list state.threads in
       { state with threads }, return
     | _ -> Result.error "Invalid parameters@."
 
-  let thread_update f state _ = function
+  let thread_update ~pos:_ f state = function
     | (id, _) :: [] ->
       let open Result.Operators in
       let+ (threads, return) = f id state.threads in
@@ -366,28 +365,27 @@ module Domain = struct
   let thread_suspend = thread_update Mt_thread.Register.suspend
   let thread_cancel  = thread_update Mt_thread.Register.cancel
 
-  let thread_id state _ = function
+  let thread_id ~pos:_ state = function
     | [] -> Result.ok (state, Thread.current () |> Thread.id |> Value.of_int)
     | _ -> Result.error "Invalid parameters@."
 
-  let mutex_init state stmt = function
+  let mutex_init ~pos state = function
     | (name, _) :: [] ->
       let open Result.Operators in
       let name = Name.of_cvalue name in
-      let aloc = (stmt, Eva_utils.current_call_stack ()) in
-      let mutex = Mutex.create aloc name in
+      let mutex = Mutex.create pos name in
       let+ (mutexes, return) = Mt_mutex.Register.register [mutex] state.mutexes in
       { state with mutexes }, return
     | _ -> Result.error "Invalid parameters@."
 
-  let mutex_lock state _ = function
+  let mutex_lock ~pos:_ state = function
     | (id, _) :: [] ->
       let open Result.Operators in
       let+ (mutexes, return) = Mt_mutex.Register.lock id state.mutexes in
       { state with mutexes }, return
     | _ -> Result.error "Invalid parameters@."
 
-  let mutex_unlock state _ = function
+  let mutex_unlock ~pos:_ state = function
     | (id, _) :: [] ->
       let open Result.Operators in
       let+ (mutexes, return) = Mt_mutex.Register.unlock id state.mutexes in

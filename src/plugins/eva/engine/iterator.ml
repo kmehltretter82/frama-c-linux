@@ -79,11 +79,11 @@ module Make_Dataflow
     (Logic : Transfer_logic.S with type state = Engine.Dom.t)
     (Spec: sig
        val treat_statement_assigns:
-         stmt -> assigns -> Engine.Dom.t -> Engine.Dom.t
+         pos:Position.t -> assigns -> Engine.Dom.t -> Engine.Dom.t
      end)
     (AnalysisParam : sig
-       val kf: kernel_function
-       val call_kinstr: kinstr
+       val kf: Cil_types.kernel_function
+       val callstack: Callstack.t
        val initial_state : Engine.Dom.t
      end)
     ()
@@ -95,6 +95,7 @@ module Make_Dataflow
   (* --- Analysis parameters --- *)
 
   let kf = AnalysisParam.kf
+  let callstack = AnalysisParam.callstack
   let fundec = Kernel_function.get_definition kf
   let cacheable = ref Eval.Cacheable
 
@@ -131,7 +132,7 @@ module Make_Dataflow
 
   let initial_states =
     let state = AnalysisParam.initial_state
-    and call_kinstr = AnalysisParam.call_kinstr
+    and call_kinstr = Callstack.top_callsite callstack
     and ab = active_behaviors in
     if Eva_utils.skip_specifications kf
     then [state]
@@ -256,27 +257,28 @@ module Make_Dataflow
 
 
   (* Tries to evaluate \assigns … \from … clauses for assembly code. *)
-  let transfer_asm (stmt : stmt) : transfer_function =
-    let asm_contracts = Annotations.code_annot stmt in
+  let transfer_asm ~pos : transfer_function =
+    let asm_contracts = Annotations.code_annot (fst pos) in
+    let pos = Position.of_local pos in
     match Logic_utils.extract_contract asm_contracts with
     | [] ->
-      Self.warning ~current:true ~once:true
-        "assuming assembly code has no effects in function %t"
-        Eva_utils.pretty_current_cfunction_name;
+      Self.warning ~pos ~once:true
+        "assuming assembly code has no effects in function %a"
+        Kernel_function.pretty kf;
       id
     (* There should be only one statement contract, if any. *)
     | (_, spec) :: _ ->
       let assigns = Ast_info.merge_assigns_from_spec ~warn:false spec in
-      lift (Spec.treat_statement_assigns stmt assigns)
+      lift (Spec.treat_statement_assigns ~pos assigns)
 
-  let transfer_assume (stmt : stmt) (exp : exp) (kind : guard_kind)
+  let transfer_assume ~pos (exp : exp) (kind : guard_kind)
     : transfer_function =
     let positive = (kind = Then) in
-    lift' (fun s -> Transfer.assume s stmt exp positive)
+    lift' (fun s -> Transfer.assume ~pos s exp positive)
 
-  let transfer_assign (stmt : stmt) (dest : lval) (exp : exp)
+  let transfer_assign ~pos (dest : lval) (exp : exp)
     : transfer_function =
-    lift' (fun s -> Transfer.assign s (Kstmt stmt) dest exp)
+    lift' (fun s -> Transfer.assign ~pos s dest exp)
 
   (* All variables local to a block are introduced in domain states when
      entering the block. Variables explicitly initialized at declaration time
@@ -285,24 +287,24 @@ module Make_Dataflow
      However, goto statements can skip their declaration/initialization, so it
      is safer to always introduce all local variables (without initialize them)
      when entering a block. *)
-  let transfer_enter (block : block) : transfer_function =
+  let transfer_enter ~pos (block : block) : transfer_function =
     let vars = block.blocals in
-    if vars = [] then id else lift (Transfer.enter_scope kf vars)
+    if vars = [] then id else lift (Transfer.enter_scope ~pos vars)
 
-  let transfer_leave (block : block) : transfer_function =
+  let transfer_leave ~pos:_ (block : block) : transfer_function =
     let vars = block.blocals in
     if vars = [] then id else lift (Domain.leave_scope kf vars)
 
-  let transfer_call (stmt : stmt) (dest : lval option) (callee : lhost)
+  let transfer_call ~pos (dest : lval option) (callee : lhost)
       (args : exp list) (key, state : key * state) : (key * state) list =
-    let result = Transfer.call stmt dest callee args state in
+    let result = Transfer.call ~pos dest callee args state in
     if result.cacheable = Eval.NoCacheCallers then
       (* Propagate info that the current call cannot be cached either *)
       cacheable := Eval.NoCacheCallers;
     (* Recombine callee partitioning keys with caller key *)
     Partitioning.call_return ~caller:key result.kind result.states
 
-  let transfer_return (stmt : stmt) (return_exp : exp option)
+  let transfer_return ~pos (return_exp : exp option)
     : transfer_function =
     (* Deconstruct return statement *)
     let return_var = match return_exp with
@@ -326,36 +328,42 @@ module Make_Dataflow
       | Some return_exp ->
         let vi_ret = Option.get (Library_functions.get_retres_vi kf) in
         let return_lval = Eva_ast.Build.var vi_ret in
-        let kstmt = Kstmt stmt in
         fun state ->
           let kind = Abstract_domain.Result kf in
           let state = Domain.enter_scope kind [vi_ret] state in
-          let state' = Transfer.assign state kstmt return_lval return_exp in
+          let state' = Transfer.assign ~pos state return_lval return_exp in
           Bottom.to_list state'
     in
     sequence (lift'' check_postconditions) (lift'' assign_retval)
 
-  let transfer_transition (t : transition) : transfer_function =
+  let transfer_transition ~pos (t : transition) : transfer_function =
     match t with
-    | Skip ->                     id
-    | Return (return_exp,stmt) -> transfer_return stmt return_exp
-    | Guard (exp,kind,stmt) ->    transfer_assume stmt exp kind
-    | Init (vi, exp, stmt) ->
+    | Skip ->
+      id
+    | Return (return_exp,_stmt) ->
+      transfer_return ~pos return_exp
+    | Guard (exp,kind,_stmt) ->
+      transfer_assume ~pos exp kind
+    | Init (vi, exp, _stmt) ->
       let transfer state =
-        Init.initialize_local_variable stmt vi exp state
+        Init.initialize_local_variable ~pos vi exp state
       in
       lift' transfer
-    | Assign (dest, exp, stmt) ->
-      transfer_assign stmt dest exp
+    | Assign (dest, exp, _stmt) ->
+      transfer_assign ~pos dest exp
     | Call (dest, callee, args, stmt) ->
-      transfer_call stmt dest callee args
+      let pos = (stmt, callstack) in
+      transfer_call ~pos dest callee args
     | Asm (_,_,_,stmt) ->
-      transfer_asm stmt
-    | Enter (block) ->            transfer_enter block
+      let pos = (stmt, callstack) in
+      transfer_asm ~pos
+    | Enter (block) ->
+      transfer_enter ~pos block
     | Leave (block) when blocks_share_locals fundec.sbody block ->
       (* The variables from the toplevel block will be removed by the caller *)
       id
-    | Leave (block) ->            transfer_leave block
+    | Leave (block) ->
+      transfer_leave ~pos block
 
   let transfer_annotations (stmt : stmt) ~(record : bool)
     : state -> state list =
@@ -388,7 +396,8 @@ module Make_Dataflow
         in
         let seq = List.map translate_elt seq in
         let check s =
-          Transfer.check_unspecified_sequence stmt s seq = `Value ()
+          let pos = Position.local stmt callstack in
+          Transfer.check_unspecified_sequence ~pos s seq = `Value ()
         in
         List.filter check states
       | _ -> states
@@ -438,12 +447,15 @@ module Make_Dataflow
     current_ki := kinstr;
     let open Current_loc.Operators in
     let<> UpdatedCurrentLoc = e.edge_loc in
-    let flow = Partitioning.transfer (transfer_transition transition) flow in
+    let pos = Position.of_kinstr e.edge_kinstr callstack in
+    let flow =
+      Partitioning.transfer (transfer_transition ~pos transition) flow
+    in
     let flow =
       if Engine.Interferences.is_empty transition
       then flow
       else
-        let inject_interferences = Engine.Interferences.inject kf v1 v2 in
+        let inject_interferences = Engine.Interferences.inject ~pos v1 v2 in
         Partitioning.transfer (lift inject_interferences) flow
     in
     let flow = process_partitioning_transitions v1 v2 transition flow in
@@ -459,7 +471,6 @@ module Make_Dataflow
     (* TODO: apply on all domains. *)
     let states = Partitioning.contents f in
     let cvalue_states = gather_cvalues states in
-    let callstack = Eva_utils.current_call_stack () in
     Cvalue_callbacks.apply_statement_hooks callstack stmt cvalue_states
 
   let update_vertex ?(widening : bool = false) (v : vertex)
@@ -676,7 +687,6 @@ module Make_Dataflow
     in
     let merged_pre_cvalues = lazy (lift_to_cvalues merged_pre_states)
     and merged_post_cvalues = lazy (lift_to_cvalues merged_post_states) in
-    let callstack = Eva_utils.current_call_stack () in
     if save_results then begin
       let register_pre = Domain.Store.register_state_before_stmt callstack
       and register_post = Domain.Store.register_state_after_stmt callstack in
@@ -701,17 +711,18 @@ module Computer
     (Logic : Transfer_logic.S with type state = Engine.Dom.t)
     (Spec: sig
        val treat_statement_assigns:
-         stmt -> assigns -> Engine.Dom.t -> Engine.Dom.t
+         pos:Position.t -> assigns -> Engine.Dom.t -> Engine.Dom.t
      end)
 = struct
 
-  let compute ~save_results kf call_kinstr state =
+  let compute ~save_results callstack state =
+    let kf = Callstack.top_kf callstack in
     let module Dataflow =
       Make_Dataflow
         (Engine) (Transfer) (Init) (Logic) (Spec)
         (struct
           let kf = kf
-          let call_kinstr = call_kinstr
+          let callstack = callstack
           let initial_state = state
         end)
         ()

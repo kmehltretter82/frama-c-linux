@@ -27,9 +27,14 @@
 *)
 
 module OCamlGraph = Graph
-module Frama_c_File = File
+module Typ = Cil_datatype.Typ
+module Lval = Cil_datatype.Lval
+module ExpStructEq = Cil_datatype.ExpStructEq
+module Varinfo = Cil_datatype.Varinfo
+module Stmt = Cil_datatype.Stmt
+module Location = Cil_datatype.Location
+
 open Cil_types
-open Cil_datatype
 open Lattice_bounds
 
 module Node : sig
@@ -1028,7 +1033,7 @@ let project_of_cfg vreturn s =
     visitor
   in
 
-  let _project = Frama_c_File.create_project_from_visitor "Eva.Traces_domain" visit in
+  let _project = File.create_project_from_visitor "Eva.Traces_domain" visit in
   ()
 (* let selection = *)
 (*   State_selection.diff *)
@@ -1102,18 +1107,18 @@ module D = struct
 
   include Domain_builder.Complete (Traces)
 
-  let assign ki lv e _v _valuation state =
+  let assign ~pos lv e _v _valuation state =
     let cil_lval = Eva_ast.to_cil_lval lv.Eval.lval in
     let cil_exp = Eva_ast.to_cil_exp e in
-    let trans = Assign (ki, cil_lval, lv.lval.typ, cil_exp) in
+    let trans = Assign (Position.kinstr pos, cil_lval, lv.lval.typ, cil_exp) in
     `Value (Traces.add_trans state trans)
 
-  let assume stmt e pos _valuation state =
+  let assume ~pos e positive _valuation state =
     let cil_exp = Eva_ast.to_cil_exp e in
-    let trans = Assume (stmt, cil_exp, pos) in
+    let trans = Assume (Position.stmt pos |> Option.get, cil_exp, positive) in
     `Value (Traces.add_trans state trans)
 
-  let start_call stmt call _recursion _valuation state =
+  let start_call ~pos call _recursion _valuation state =
     let kf = call.Eval.kf in
     if Kernel_function.is_definition kf then
       let msg = Format.asprintf "start_call: %s (%b)" (Kernel_function.get_name call.Eval.kf)
@@ -1123,7 +1128,7 @@ module D = struct
       let state = Traces.add_trans state (EnterScope (kf, formals)) in
       let state = List.fold_left (fun state arg ->
           Traces.add_trans state
-            (Assign (Kstmt stmt, Cil.var arg.Eval.formal,
+            (Assign (Position.Local.kinstr pos, Cil.var arg.Eval.formal,
                      arg.Eval.formal.Cil_types.vtype,
                      Eva_ast.to_cil_exp arg.Eval.concrete)))
           state call.Eval.arguments in
@@ -1143,7 +1148,7 @@ module D = struct
           (CallDeclared (call.Eval.kf, exps, Option.map Cil.var var))
       in `Value {state with call_declared_function = true}
 
-  let finalize_call _stmt call _recursion ~pre:_ ~post =
+  let finalize_call ~pos:_ call _recursion ~pre:_ ~post =
     if post.call_declared_function
     then `Value {post with call_declared_function = false}
     else

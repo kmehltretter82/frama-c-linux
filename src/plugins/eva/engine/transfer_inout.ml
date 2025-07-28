@@ -29,21 +29,21 @@ module type S = sig
   type value
   type valuation
   val add_logic_assign :
-    Analysis_location.t -> location Eval.logic_assign -> location -> unit
+    Position.t -> location Eval.logic_assign -> location -> unit
   val add_assign_lval :
-    Analysis_location.t -> valuation ->
+    Position.t -> valuation ->
     Eva_ast.lval -> Eva_ast.exp ->
     unit
   val add_assign_var :
-    Analysis_location.t -> valuation ->
+    Position.t -> valuation ->
     Eva_ast.varinfo -> Eva_ast.exp ->
     unit
   val add_read_exp :
-    Analysis_location.t -> valuation ->
+    Position.t -> valuation ->
     Eva_ast.exp ->
     unit
   val add_call_args :
-    Analysis_location.t -> valuation ->
+    Position.t -> valuation ->
     (location, value) Eval.call ->
     unit
 end
@@ -67,9 +67,9 @@ module Make (Engine : Engine_sig.S) = struct
       let lv_indirect_zone = EvaAstDeps.indirect_zone_of_lval to_loc lval in
       lv_zone, lv_indirect_zone
 
-  let add_logic_assign aloc clause location =
+  let add_logic_assign pos clause location =
     let written = Location.enumerate_valid_bits Write location in
-    Inout_access.register_write aloc written;
+    Inout_access.register_write pos written;
     let read =
       match clause with
       | Assigns (_, from_deps) ->
@@ -85,36 +85,36 @@ module Make (Engine : Engine_sig.S) = struct
           from_deps
       | _ -> Locations.Zone.bottom
     in
-    Inout_access.register_read aloc read
+    Inout_access.register_read pos read
 
   let find_loc valuation = Eval.Valuation.find_loc_def valuation
 
-  let add_assign_lval aloc valuation lval exp =
+  let add_assign_lval pos valuation lval exp =
     let to_loc = find_loc valuation in
     let written_zone, lv_indirect_zone = compute_zones to_loc lval in
-    Inout_access.register_write aloc written_zone;
+    Inout_access.register_write pos written_zone;
     let exp_zone = EvaAstDeps.zone_of_exp to_loc exp in
     let read_zone = Locations.Zone.join lv_indirect_zone exp_zone in
-    Inout_access.register_read aloc read_zone
+    Inout_access.register_read pos read_zone
 
-  let add_assign_var aloc valuation vi exp =
+  let add_assign_var pos valuation vi exp =
     let lval = Eva_ast.Build.var vi in
-    add_assign_lval aloc valuation lval exp
+    add_assign_lval pos valuation lval exp
 
-  let add_read_exp aloc valuation exp =
+  let add_read_exp pos valuation exp =
     let to_loc = find_loc valuation in
     let read_zone = EvaAstDeps.zone_of_exp to_loc exp in
-    Inout_access.register_read aloc read_zone
+    Inout_access.register_read pos read_zone
 
-  let add_call_args aloc valuation call =
+  let add_call_args pos valuation call =
     (* Register read and written zone for named arguments. *)
     let f { formal; concrete } =
-      add_assign_var aloc valuation formal concrete
+      add_assign_var pos valuation formal concrete
     in
     List.iter f call.arguments;
     (* Register read zones for the rest of the arguments. *)
     let f (concrete, _) =
-      add_read_exp aloc valuation concrete
+      add_read_exp pos valuation concrete
     in
     List.iter f call.rest
 

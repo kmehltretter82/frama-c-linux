@@ -150,18 +150,18 @@ module D : Abstract_domain.Leaf
     in
     store loc state v
 
-  let assign _kinstr lv _e assignment _valuation state =
+  let assign ~pos:_ lv _e assignment _valuation state =
     generic_assign lv assignment state
 
-  let assume _ _ _ _ state = `Value state
+  let assume ~pos:_ _ _ _ state = `Value state
 
-  let finalize_call _stmt _call _recursion ~pre:_ ~post = `Value post
+  let finalize_call ~pos:_ _call _recursion ~pre:_ ~post = `Value post
 
   let start_recursive_call recursion state =
     let vars = List.map fst recursion.substitution @ recursion.withdrawal in
     Memory.remove_variables vars state
 
-  let start_call _stmt _call recursion valuation state =
+  let start_call ~pos:_ _call recursion valuation state =
     update valuation state >>-: fun state ->
     let start_recursive_call r = start_recursive_call r state in
     Option.fold ~some:start_recursive_call ~none:state recursion

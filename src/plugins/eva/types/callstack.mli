@@ -42,8 +42,7 @@ include Datatype.S_with_collections with type t = callstack
 (** Prints a callstack without displaying call sites. *)
 val pretty_short : Format.formatter -> t -> unit
 
-(** Prints a hash of the callstack when '-kernel-msg-key callstack'
-    is enabled (prints nothing otherwise). *)
+(** Prints a hash of the callstack. *)
 val pretty_hash : Format.formatter -> t -> unit
 
 (** [compare_lex] compares callstack lexicographically, slightly slower
@@ -58,7 +57,7 @@ val is_empty : t -> bool
 (*** {2 Stack manipulation} *)
 
 (*** Constructor *)
-val init : ?thread:int -> Cil_types.kernel_function -> t
+val init : thread:int -> entry_point:Cil_types.kernel_function -> t
 
 (** Adds a new call to the top of the callstack. *)
 val push : Cil_types.kernel_function -> Cil_types.stmt -> t -> t
@@ -67,15 +66,16 @@ val push : Cil_types.kernel_function -> Cil_types.stmt -> t -> t
 val pop : t -> t option
 
 (** Removes the topmost call from the callstack and returns it. *)
-val pop_call : t -> (Cil_types.kernel_function * Cil_types.kinstr) * t option
+val pop_call : t -> Cil_types.kernel_function * (Cil_types.stmt * t) option
 
 val top : t -> (Cil_types.kernel_function * Cil_types.stmt) option
 val top_kf : t -> Cil_types.kernel_function
 val top_callsite : t -> Cil_types.kinstr
 val top_call : t -> Cil_types.kernel_function * Cil_types.kinstr
 
-(** Returns the function that called the topmost function of the callstack. *)
-val top_caller : t -> Cil_types.kernel_function option
+(** Returns the function that called the topmost function of the callstack and
+    the top callsite. *)
+val top_caller : t -> (Cil_types.stmt * Cil_types.kernel_function) option
 
 (** {2 Conversion} *)
 
@@ -97,3 +97,19 @@ val to_call_list : t -> (Cil_types.kernel_function * Cil_types.kinstr) list
 (** [iter f cs] calls [f] on [cs] and all the callstacks obtained by successful
     calls to {!pop} until the result of the call is [None]. *)
 val iter : (t -> unit) -> t -> unit
+
+(** {2 Callstack tracking} *)
+
+(** Returns the current callstack or None if it has not been initialized. *)
+val get_current : unit -> t option
+
+(** Returns the current callstack; fails if it has not been initialized.
+    This should only be called during the analysis of a function. *)
+val get_current_exn : unit -> t
+
+(** [with_callstack ~finally cs job] creates a wrapper arround [job] such that
+    the wrapped executions happen in environnement where the current callstack
+    returned by {!get_current} is set to [cs]. When [job] returns or raises an
+    exception, [finally] is called and then the current callstack is restored to
+    its previous value. *)
+val with_callstack : ?finally:(unit -> unit) -> t -> ('a -> 'b) -> 'a -> 'b

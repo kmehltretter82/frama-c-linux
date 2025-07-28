@@ -48,18 +48,14 @@ let check_spec kinstr kf =
   let funspec = Annotations.funspec kf in
   if List.for_all (fun b -> b.b_assigns = WritesAny) funspec.spec_behavior
   then
-    Self.warning ~current:true ~wkey:Self.wkey_missing_assigns
+    Self.warning ~current:true ~wkey:Self.wkey_missing_assigns ~stacktrace:true
       "@[Recursive call to %a without assigns clause.@ \
        Generating probably incomplete assigns to interpret the call.@ \
        Try to increase the %s parameter \
-       or write a correct specification for function %a.@\n%t@]"
-      (* note: the "\n" before the pretty print of the stack is required by:
-         FRAMAC_LIB/analysis-scripts/make_wrapper.py
-      *)
+       or write a correct specification for function %a.@]"
       Kernel_function.pretty kf
       Parameters.RecursiveUnroll.name
       Kernel_function.pretty kf
-      Eva_utils.pp_callstack
   else
     let depth = Parameters.RecursiveUnroll.get () in
     Self.warning ~once:true ~current:true

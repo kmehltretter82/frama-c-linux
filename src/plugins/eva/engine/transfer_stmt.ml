@@ -21,23 +21,22 @@
 (**************************************************************************)
 
 open Cil_types
-open Cil_datatype
 open Eval
 
 module type S = sig
   type state
   type value
   type loc
-  val assign: state -> kinstr -> lval -> exp -> state or_bottom
-  val assume: state -> stmt -> exp -> bool -> state or_bottom
+  val assign: pos:Position.t -> state -> lval -> exp -> state or_bottom
+  val assume: pos:Position.t -> state -> exp -> bool -> state or_bottom
   val call:
-    stmt -> lval option -> lhost -> exp list -> state ->
+    pos:Position.local -> lval option -> lhost -> exp list -> state ->
     state Engine_sig.call_result
   val check_unspecified_sequence:
-    stmt ->
+    pos:Position.t ->
     state -> (stmt * lval list * lval list * lval list * stmt ref list) list ->
     unit or_bottom
-  val enter_scope: kernel_function -> varinfo list -> state -> state
+  val enter_scope: pos:Position.t -> varinfo list -> state -> state
 end
 
 (* Reference filled in by the callwise-inout callback *)
@@ -64,13 +63,10 @@ let warn_indeterminate kf =
    indeterminate copies are allowed. Otherwise, such assignments are interpreted
    through the evaluation of the right lvalue, possibly leading to alarms about
    non initialization and dangling pointers. *)
-let do_copy_at = function
-  | Kglobal -> false
-  | Kstmt stmt ->
-    try
-      let kf = Kernel_function.find_englobing_kf stmt in
-      not (warn_indeterminate kf)
-    with Not_found -> assert false
+let do_copy_at ~pos =
+  match Position.kf pos with
+  | None -> false
+  | Some kf -> not (warn_indeterminate kf)
 
 (* Warn for call arguments that contain uninitialized/escaping except on
    [Frama_C_show_each] directives or if the user disables these alarms
@@ -82,9 +78,9 @@ let is_determinate kf =
 
 let subdivide_stmt = Eva_utils.get_subdivision
 
-let subdivide_kinstr = function
-  | Kglobal -> Parameters.LinearLevel.get ()
-  | Kstmt stmt -> subdivide_stmt stmt
+let subdivide_pos ~pos = match Position.stmt pos with
+  | None -> Parameters.LinearLevel.get ()
+  | Some stmt -> subdivide_stmt stmt
 
 (* Used to disambiguate files for Frama_C_dump_each_file directives. *)
 module DumpFileCounters =
@@ -185,9 +181,9 @@ module Make (Engine: Engine_sig.S) = struct
      the left location, as the written variable could be const.  This is only
      useful for local initializations through function calls, as other
      initializations are handled by initialization.ml. *)
-  let for_writing kinstr = match kinstr with
-    | Kglobal -> false
-    | Kstmt stmt -> match stmt.skind with
+  let for_writing ~pos = match Position.stmt pos with
+    | None -> false
+    | Some stmt -> match stmt.skind with
       | Instr (Local_init _) -> false
       | _ -> true
 
@@ -221,23 +217,23 @@ module Make (Engine: Engine_sig.S) = struct
     Int_Base.equal size1 size2 && not (Int_Base.is_top size1)
 
   (* Assignment. *)
-  let assign_lv_or_ret ~is_ret state kinstr lval expr =
-    let for_writing = for_writing kinstr in
-    let subdivnb = subdivide_kinstr kinstr in
+  let assign_lv_or_ret ~pos ~is_ret state lval expr =
+    let for_writing = for_writing ~pos in
+    let subdivnb = subdivide_pos ~pos in
     let eval, alarms = lvaluate_and_check ~for_writing ~subdivnb state lval in
-    Alarmset.emit kinstr alarms;
+    Alarmset.emit ~pos alarms;
     match eval with
     | `Bottom ->
-      Kernel.warning ~current:true ~once:true
-        "@[<v>@[all target addresses were invalid. This path is \
-         assumed to be dead.@]%t@]" Eva_utils.pp_callstack;
+      Self.warning ~pos ~stacktrace:true ~once:true
+        "@[all target addresses were invalid. This path is \
+         assumed to be dead.@]";
       `Bottom
     | `Value (valuation, lloc) ->
       (* Tries to interpret the assignment as a copy for the returned value
          of a function call, on struct and union types, and when
          -eva-warn-copy-indeterminate is disabled. *)
       let lval_copy =
-        if is_ret || Ast_types.is_struct_or_union lval.typ || do_copy_at kinstr
+        if is_ret || Ast_types.is_struct_or_union lval.typ || do_copy_at ~pos
         then find_lval expr
         else None
       in
@@ -258,13 +254,12 @@ module Make (Engine: Engine_sig.S) = struct
           else assign_by_eval ~subdivnb state valuation expr
       in
       if is_ret then assert (Alarmset.is_empty alarms);
-      Alarmset.emit kinstr alarms;
+      Alarmset.emit ~pos alarms;
       let* assigned, valuation = eval in
-      let aloc = Analysis_location.of_kinstr_lval kinstr lval in
-      Transfer_inout.add_assign_lval aloc valuation lval expr;
+      Transfer_inout.add_assign_lval pos valuation lval expr;
       let domain_valuation = Eval.to_domain_valuation valuation in
       let lvalue = { lval; lloc } in
-      Domain.assign kinstr lvalue expr assigned domain_valuation state
+      Domain.assign ~pos lvalue expr assigned domain_valuation state
 
   let assign = assign_lv_or_ret ~is_ret:false
   let assign_ret = assign_lv_or_ret ~is_ret:true
@@ -274,14 +269,13 @@ module Make (Engine: Engine_sig.S) = struct
   (* ------------------------------------------------------------------------ *)
 
   (* Assumption. *)
-  let assume state stmt expr positive =
+  let assume ~pos state expr positive =
     let eval, alarms = Eval.reduce state expr positive in
     (* TODO: check not comparable. *)
-    Alarmset.emit (Kstmt stmt) alarms;
+    Alarmset.emit ~pos alarms;
     let* valuation = eval in
-    let aloc = Analysis_location.of_stmt stmt in
-    Transfer_inout.add_read_exp aloc valuation expr;
-    Domain.assume stmt expr positive (Eval.to_domain_valuation valuation) state
+    Transfer_inout.add_read_exp pos valuation expr;
+    Domain.assume ~pos expr positive (Eval.to_domain_valuation valuation) state
 
 
   (* ------------------------------------------------------------------------ *)
@@ -289,25 +283,19 @@ module Make (Engine: Engine_sig.S) = struct
   (* ------------------------------------------------------------------------ *)
 
   (* Returns the result of a call. *)
-  let process_call stmt call recursion valuation state =
-    Eva_utils.push_call_stack call.kf stmt;
+  let process_call ~pos call recursion valuation state =
     let process () =
       let domain_valuation = Eval.to_domain_valuation valuation in
-      let res =
-        (* Process the call according to the domain decision. *)
-        match Domain.start_call stmt call recursion domain_valuation state with
-        | `Value state ->
-          let callstack = Eva_utils.current_call_stack () in
-          Domain.Store.register_initial_state callstack call.kf state;
-          Engine.Compute.compute_call stmt call recursion state
-        | `Bottom ->
-          { states = []; cacheable = Cacheable; kind = `Bottom }
-      in
-      Eva_utils.pop_call_stack ();
-      res
+      (* Process the call according to the domain decision. *)
+      match Domain.start_call ~pos call recursion domain_valuation state with
+      | `Value state ->
+        Domain.Store.register_initial_state call.callstack call.kf state;
+        Engine.Compute.compute_call call recursion state
+      | `Bottom ->
+        { states = []; cacheable = Cacheable; kind = `Bottom }
     in
     Eva_utils.protect process
-      ~cleanup:(fun () -> InOutCallback.clear (); Eva_utils.pop_call_stack ())
+      ~cleanup:(fun () -> InOutCallback.clear ())
 
   (* ------------------- Retro propagation on formals ----------------------- *)
 
@@ -335,7 +323,7 @@ module Make (Engine: Engine_sig.S) = struct
   let filter_safe_arguments valuation call =
     let written_formals = Backward_formals.written_formals call.kf in
     let is_safe argument =
-      not (Varinfo.Set.mem argument.formal written_formals)
+      not (Cil_datatype.Varinfo.Set.mem argument.formal written_formals)
       && Ast_types.is_scalar argument.formal.vtype
       && is_safe_argument valuation argument.concrete
     in
@@ -396,14 +384,14 @@ module Make (Engine: Engine_sig.S) = struct
   (* Treat the assignment of the return value in the caller: if the function
      has a non-void type, perform the assignment if there is a lvalue at
      the callsite, and in all cases, remove the pseudo-variable from scope. *)
-  let treat_return ~kf_callee lv return stmt state =
+  let treat_return ~pos ~kf_callee lv return state =
     match lv, return with
     | None, None -> `Value state
     | None, Some vi_ret -> `Value (Domain.leave_scope kf_callee [vi_ret] state)
     | Some _, None -> assert false
     | Some lval, Some vi_ret ->
       let exp_ret_caller = Eva_ast.Build.var_exp vi_ret in
-      let+ state = assign_ret state (Kstmt stmt) lval exp_ret_caller in
+      let+ state = assign_ret ~pos state lval exp_ret_caller in
       Domain.leave_scope kf_callee [vi_ret] state
 
   (* ---------------------- Make a one function call ------------------------ *)
@@ -420,11 +408,11 @@ module Make (Engine: Engine_sig.S) = struct
     Kernel_function.get_formals kf @ locals
 
   (* Do the call to one function. *)
-  let do_one_call valuation stmt lv call recursion state =
+  let do_one_call ~pos valuation lv call recursion state =
     let kf_callee = call.kf in
     let pre = state in
     (* Process the call according to the domain decision. *)
-    let call_result = process_call stmt call recursion valuation state in
+    let call_result = process_call ~pos call recursion valuation state in
     let leaving_vars = leaving_vars kf_callee in
     (* Treat each resulting state one by one. *)
     let process_resulting_state state =
@@ -437,10 +425,10 @@ module Make (Engine: Engine_sig.S) = struct
       let recursion = Option.map Recursion.revert recursion in
       (* Computes the state after the call, from the post state at the end of
          the called function, and the pre state at the call site. *)
-      let* state = Domain.finalize_call stmt call recursion ~pre ~post in
+      let* state = Domain.finalize_call ~pos call recursion ~pre ~post in
       (* Backward propagates the [reductions] on the concrete arguments. *)
       let* state = reduce_arguments reductions state in
-      treat_return ~kf_callee lv call.return stmt state
+      treat_return ~pos:(Position.of_local pos) ~kf_callee lv call.return state
     in
     (* Partitioning key remains unchanged. *)
     let process (key, state) =
@@ -488,9 +476,9 @@ module Make (Engine: Engine_sig.S) = struct
   (* ------------------------- Make an Eval.call ---------------------------- *)
 
   (* Create an Eval.call *)
-  let create_call stmt kf args =
+  let create_call ~pos kf args =
     let return = Library_functions.get_retres_vi kf in
-    let callstack = Callstack.push kf stmt (Eva_utils.current_call_stack ()) in
+    let callstack = Callstack.push kf (fst pos) (snd pos) in
     let arguments, rest =
       let formals = Kernel_function.get_formals kf in
       let rec format_arguments acc args formals = match args, formals with
@@ -529,12 +517,12 @@ module Make (Engine: Engine_sig.S) = struct
     let arguments = List.map replace_arg call.arguments in
     { call with arguments; }
 
-  let make_call ~subdivnb stmt kf arguments valuation state =
+  let make_call ~pos ~subdivnb kf arguments valuation state =
     (* Evaluate the arguments of the call. *)
     let determinate = is_determinate kf in
     compute_actuals ~subdivnb ~determinate valuation state arguments
     >>=: fun (args, valuation) ->
-    let call = create_call stmt kf args in
+    let call = create_call ~pos kf args in
     let recursion = Recursion.make call in
     let replace a = replace_recursive_call a call in
     let call = Option.fold ~some:replace ~none:call recursion in
@@ -555,10 +543,10 @@ module Make (Engine: Engine_sig.S) = struct
     else fun _ _ -> ()
 
   (* Frama_C_dump_each functions. *)
-  let dump_state name state =
-    Self.result ~current:true
-      "%s:@\n@[<v>%a@]==END OF DUMP==%t"
-      name print_state state Eva_utils.pp_callstack
+  let dump_state ~pos name state =
+    Self.result ~pos ~stacktrace:true
+      "%s:@\n@[<v>%a@]==END OF DUMP=="
+      name print_state state
 
   (* Idem as for [print_state]. *)
   let show_expr =
@@ -572,7 +560,7 @@ module Make (Engine: Engine_sig.S) = struct
     else fun _ _ _ _ -> ()
 
   (* Frama_C_domain_show_each functions. *)
-  let domain_show_each ~subdivnb name arguments state =
+  let domain_show_each ~pos ~subdivnb name arguments state =
     let pretty fmt expr =
       let pp fmt  =
         match fst (Eval.evaluate ~subdivnb state expr) with
@@ -584,9 +572,9 @@ module Make (Engine: Engine_sig.S) = struct
       Format.fprintf fmt "%a : @[<h>%t@]" Eva_ast.pp_exp expr pp
     in
     let pp = Pretty_utils.pp_list ~pre:"@[<v>" ~sep:"@ " ~suf:"@]" pretty in
-    Self.result ~current:true
-      "@[<v>%s:@ %a@]%t"
-      name pp arguments Eva_utils.pp_callstack
+    Self.result ~pos ~stacktrace:true
+      "@[<v>%s:@ %a@]"
+      name pp arguments
 
   (* For non scalar expressions, prints the offsetmap of the cvalue domain. *)
   let show_offsm =
@@ -627,13 +615,13 @@ module Make (Engine: Engine_sig.S) = struct
     Pretty_utils.pp_list ~pre:"@[<hv>" ~sep:",@ " ~suf:"@]" pretty arguments
 
   (* Frama_C_show_each functions. *)
-  let show_each ~subdivnb name arguments state =
-    Self.result ~current:true
-      "@[<hv>%s:@ %a@]%t"
-      name (pretty_arguments ~subdivnb state) arguments Eva_utils.pp_callstack
+  let show_each ~pos ~subdivnb name arguments state =
+    Self.result ~pos ~stacktrace:true
+      "@[<hv>%s:@ %a@]"
+      name (pretty_arguments ~subdivnb state) arguments
 
   (* Frama_C_dump_each_file functions. *)
-  let dump_state_file_exc ~subdivnb name arguments state =
+  let dump_state_file_exc ~pos ~subdivnb name arguments state =
     let size = String.length name in
     let name =
       if size > 23
@@ -647,8 +635,8 @@ module Make (Engine: Engine_sig.S) = struct
     let open Filesystem.Operators in
     let$ fmt = Filesystem.with_formatter_exn file in
     let l = fst (Current_loc.get ()) in
-    Self.feedback ~current:true "Dumping state in file '%a'%t"
-      Filepath.pretty file Eva_utils.pp_callstack;
+    Self.feedback ~pos ~stacktrace:true "Dumping state in file '%a'"
+      Filepath.pretty file;
     Format.fprintf fmt "DUMPING STATE at file %a line %d@."
       Filepath.pretty l.Filepath.pos_path
       l.Filepath.pos_lnum;
@@ -657,37 +645,38 @@ module Make (Engine: Engine_sig.S) = struct
     then Format.fprintf fmt "Args: %a@." pretty_args arguments;
     Format.fprintf fmt "@[<v>%a@]@?" print_state state
 
-  let dump_state_file ~subdivnb name arguments state =
-    try dump_state_file_exc ~subdivnb name arguments state
+  let dump_state_file ~pos ~subdivnb name arguments state =
+    try dump_state_file_exc ~pos ~subdivnb name arguments state
     with e ->
-      Self.warning ~current:true ~once:true
+      Self.warning ~pos ~once:true
         "Error during, or invalid call to Frama_C_dump_each_file (%s). Ignoring"
         (Printexc.to_string e)
 
   (** Applies the show_each or dump_each directives. *)
-  let apply_special_directives ~subdivnb kf arguments state =
+  let apply_special_directives ~pos ~subdivnb kf arguments state =
+    let pos = Position.of_local pos in
     let name = Kernel_function.get_name kf in
     if Ast_info.start_with_frama_c name
     then
       if Ast_info.is_show_each_builtin name
-      then (show_each ~subdivnb name arguments state; true)
+      then (show_each ~pos ~subdivnb name arguments state; true)
       else if Ast_info.is_domain_show_each_builtin name
-      then (domain_show_each ~subdivnb name arguments state; true)
+      then (domain_show_each ~pos ~subdivnb name arguments state; true)
       else if Ast_info.is_dump_file_builtin name
-      then (dump_state_file ~subdivnb name arguments state; true)
+      then (dump_state_file ~pos ~subdivnb name arguments state; true)
       else if Ast_info.is_dump_each_builtin name
-      then (dump_state name state; true)
+      then (dump_state ~pos name state; true)
       else false
     else false
 
   (* Legacy callbacks for the cvalue domain, usually called by
      {Cvalue_transfer.start_call}. *)
-  let apply_cvalue_callback kf stmt state =
+  let apply_cvalue_callback ~pos kf state =
     (* Generates assigns clauses for other plugins, as they may use
        the directive specification. *)
     Populate_spec.populate_funspec kf [`Assigns];
-    let call_stack = Eva_utils.current_call_stack () in
-    let stack_with_call = Callstack.push kf stmt call_stack in
+    let stmt, callstack = pos in
+    let stack_with_call = Callstack.push kf stmt callstack in
     let cvalue_state = get_cvalue_or_top state in
     Cvalue_callbacks.apply_call_hooks stack_with_call kf cvalue_state `Builtin;
     Cvalue_callbacks.apply_call_results_hooks stack_with_call kf cvalue_state
@@ -710,39 +699,38 @@ module Make (Engine: Engine_sig.S) = struct
     in
     Engine_sig.{ states; cacheable; kind }
 
-  let call stmt lval_option funclv args state =
-    let ki_call = Kstmt stmt in
+  let call ~pos lval_option funclv args state =
+    let stmt = fst pos in
     let subdivnb = subdivide_stmt stmt in
     (* Resolve [funclv] into the called kernel functions. *)
     let functions, alarms =
       Eval.eval_function ~subdivnb funclv ~args state
     in
-    Alarmset.emit ki_call alarms;
+    Alarmset.emit ~pos:(Position.of_local pos) alarms;
     let bottom =
       Engine_sig.{ states = []; cacheable = Cacheable; kind = `Bottom }
     in
     let process_one_function kf valuation =
       (* Create the call. *)
-      let eval, alarms = make_call ~subdivnb stmt kf args valuation state in
+      let eval, alarms = make_call ~pos ~subdivnb kf args valuation state in
       let _ =
         (* Register call arguments to Inout_access *)
-        let aloc = Analysis_location.of_stmt stmt in
         let+ call, _, valuation = eval in
-        Transfer_inout.add_call_args aloc valuation call
+        Transfer_inout.add_call_args (Position.of_local pos) valuation call
       in
       (* The special Frama_C_ functions to print states are handled here. *)
-      if apply_special_directives ~subdivnb kf args state
+      if apply_special_directives ~pos ~subdivnb kf args state
       then
-        let () = apply_cvalue_callback kf stmt state in
+        let () = apply_cvalue_callback ~pos kf state in
         let states = [(Partition.Key.empty, state)] in
         Engine_sig.{ states; cacheable = Cacheable; kind = `Internal }
       else begin
-        Alarmset.emit ki_call alarms;
+        Alarmset.emit ~pos:(Position.of_local pos) alarms;
         match eval with
         | `Bottom -> bottom
         | `Value (call, recursion, valuation) ->
           let call_result =
-            do_one_call valuation stmt lval_option call recursion state
+            do_one_call ~pos valuation lval_option call recursion state
           in
           let cacheable =
             if call_result.cacheable = NoCacheCallers then NoCacheCallers
@@ -805,7 +793,7 @@ module Make (Engine: Engine_sig.S) = struct
 
   (* Not currently taking advantage of calls information. But see
      plugin Undefined Order by VP. *)
-  let check_unspecified_sequence stmt state seq =
+  let check_unspecified_sequence ~pos state seq =
     let check_stmt_pair acc statement1 statement2 =
       let stmt1, _, writes1, _, _ = statement1 in
       let stmt2, modified2, writes2, reads2, _ = statement2 in
@@ -828,9 +816,9 @@ module Make (Engine: Engine_sig.S) = struct
     in
     try
       let alarms = Extlib.product_fold check_stmt_pair Alarmset.none seq seq in
-      Alarmset.emit (Kstmt stmt) alarms;
+      Alarmset.emit ~pos alarms;
       `Value ()
-    with EBottom alarms -> Alarmset.emit (Kstmt stmt) alarms; `Bottom
+    with EBottom alarms -> Alarmset.emit ~pos alarms; `Bottom
 
   (* ------------------------------------------------------------------------ *)
   (*                               Enter Scope                                *)
@@ -838,7 +826,8 @@ module Make (Engine: Engine_sig.S) = struct
 
   (* Makes the local variables [variables] enter the scope in [state].
      Also initializes volatile variable to top. *)
-  let enter_scope kf variables state =
+  let enter_scope ~pos variables state =
+    let kf = Position.kf pos |> Option.get in
     let kind = Abstract_domain.Local kf in
     let state = Domain.enter_scope kind variables state in
     let is_volatile varinfo =

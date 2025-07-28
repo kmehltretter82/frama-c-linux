@@ -35,7 +35,7 @@
 [eva:alarm] allocated.c:46: Warning: 
   accessing left-value that contains escaping addresses.
   assert ¬\dangling(&p);
-[kernel] allocated.c:46: Warning: 
+[eva] allocated.c:46: Warning: 
   all target addresses were invalid. This path is assumed to be dead.
 [eva] allocated.c:50: Call to builtin malloc
 [eva:malloc:new] allocated.c:50: allocating variable __malloc_main_l50

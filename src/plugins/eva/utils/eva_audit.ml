@@ -72,7 +72,15 @@ let check_correctness_parameters json =
           "expected correctness parameter %s, but not found" exp_p
     ) expected_parameters
 
-let compute_warning_status (module Plugin: Log.Messages) =
+module type PluginWarnings =
+sig
+  type warn_category
+  val wkey_name: warn_category -> string
+  val get_all_warn_categories_status:
+    unit -> (warn_category * Log.warn_status) list
+end
+
+let compute_warning_status (module Plugin: PluginWarnings) =
   let warning_categories = Plugin.get_all_warn_categories_status () in
   let is_active = function
     | Log.Winactive | Wfeedback_once | Wfeedback -> false
@@ -99,7 +107,7 @@ let enabled_warning_of_json name json =
     Kernel.abort "error reading JSON file: %s - %s" msg
       (Yojson.Basic.pretty_to_string v)
 
-let print_warning_status path name (module Plugin: Log.Messages) =
+let print_warning_status path name (module Plugin: PluginWarnings) =
   let enabled, disabled = compute_warning_status (module Plugin) in
   if Filepath.is_special_stdout path then
     begin
@@ -121,7 +129,7 @@ let print_warning_status path name (module Plugin: Log.Messages) =
     Json.merge_object path json
   end
 
-let check_warning_status json name (module Plugin: Log.Messages) =
+let check_warning_status json name (module Plugin: PluginWarnings) =
   let name = Stdlib.String.lowercase_ascii name in
   let enabled, _disabled = compute_warning_status (module Plugin) in
   let enabled = List.map fst enabled in

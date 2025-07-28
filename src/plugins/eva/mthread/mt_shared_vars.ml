@@ -116,18 +116,16 @@ let read_written_by_thread ?(watch_only=Locations.Zone.top) sm th =
 
   Inout_access.fold
     ~filter:filter_inout_access
-    (fun aloc memory acc ->
-       match aloc with
-       | Global _ ->
-         (* A Global analysis location represents the initialization state and
-            is never multithreaded. *)
-         acc
+    (fun pos memory acc ->
+       match pos with
+       | RootCall _ -> acc
+       | GlobalInit _ -> acc (* never multithreaded. *)
        | Local (stmt, _) ->
          let<> UpdatedCurrentLoc = Stmt.loc stmt in
          if sm stmt then
            acc
-           |> add stmt (ReadAloc aloc) memory.read
-           |> add stmt (WriteAloc aloc) memory.write
+           |> add stmt (ReadPos pos) memory.read
+           |> add stmt (WritePos pos) memory.write
          else
            acc)
     AccessesByZone.empty_map
@@ -601,8 +599,8 @@ struct
                 match op with
                 | Read -> (true, write)
                 | Write _ -> (read, true)
-                | ReadAloc _ -> (true, write)
-                | WriteAloc _ -> (read, true)
+                | ReadPos _ -> (true, write)
+                | WritePos _ -> (read, true)
              ) s (false, false)
          in match read_access, write_access with
          | false, false -> acc (* no access at all, [s] is empty *)
@@ -724,7 +722,7 @@ module Precise = struct
          SetNodeIdAccess.fold
            (fun (op, node, _thid as access) () ->
               match op with
-              | ReadAloc _ | WriteAloc _ ->
+              | ReadPos _ | WritePos _ ->
                 Mt_self.not_yet_implemented ~current:true ~once:true
                   "MtSharedVars.Precise.display_shared_vars_value for ALoc"
               | Write _ -> ()
@@ -744,7 +742,7 @@ module Precise = struct
     let aux _b _itvs s acc =
       let aux_nodes (op, node, th as access) (seen, _wr as acc) =
         match op with
-        | ReadAloc _ | WriteAloc _ ->
+        | ReadPos _ | WritePos _ ->
           Mt_self.not_yet_implemented ~current:true ~once:true
             "MtSharedVars.Precise.enumerate_written_vars_value for ALoc"
         | Read -> acc

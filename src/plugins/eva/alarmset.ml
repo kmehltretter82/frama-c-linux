@@ -247,9 +247,10 @@ let loc = function
     Current_loc.get ()
   | Cil_types.Kstmt s -> Cil_datatype.Stmt.loc s
 
-let report_alarm ki annot msg =
-  Eva_utils.alarm_report ~source:(fst (loc ki)) "@[%s.@ @[<hov 2>%a@]@]%t"
-    msg pr_annot annot Eva_utils.pp_callstack
+let report_alarm ~pos annot msg =
+  Self.warning ~wkey:Self.wkey_alarm ~pos ~stacktrace:true
+    "@[%s.@ @[<hov 2>%a@]@]"
+    msg pr_annot annot
 
 let string_fkind = function
   | Cil_types.FFloat -> "float"
@@ -258,7 +259,8 @@ let string_fkind = function
 
 (** Emitting alarms *)
 
-let register_alarm ki alarm status str =
+let register_alarm ~pos alarm status str =
+  let ki = Position.kinstr pos in
   let status = match status with
     | True -> Property_status.True
     | False ->
@@ -275,10 +277,10 @@ let register_alarm ki alarm status str =
   (* Report each alarm only once per analysis. The boolean [is_new] returned
      by {{Alarms.register}} is inadequate, as an alarm emitted by another
      plugin or by a previous run of Eva would be considered as not new. *)
-  Alarm_cache.memo (fun (_ki,_alarm) -> report_alarm ki annot str) (ki, alarm)
+  Alarm_cache.memo (fun (_ki,_alarm) -> report_alarm ~pos annot str) (ki, alarm)
 
-let emit_alarm kinstr alarm (status:status) =
-  let register_alarm = register_alarm kinstr alarm status in
+let emit_alarm ~pos alarm (status:status) =
+  let register_alarm = register_alarm ~pos alarm status in
   match alarm with
   | Alarms.Pointer_comparison (_, _) -> register_alarm "pointer comparison"
 
@@ -392,16 +394,16 @@ let remove_redundant_alarms map =
   in
   M.filter filter map
 
-let emit_alarms kinstr map =
+let emit_alarms ~pos map =
   let map = remove_redundant_alarms map in
   let list = M.bindings map in
   let sorted_list = List.sort cmp list in
-  List.iter (fun (alarm, status) -> emit_alarm kinstr alarm status) sorted_list;
+  List.iter (fun (alarm, status) -> emit_alarm ~pos alarm status) sorted_list;
   if Alarm_cache.length () >= Parameters.StopAtNthAlarm.get ()
   then Self.abort "Stopping at nth alarm"
 
-let emit kinstr = function
-  | Just map -> if not (M.is_empty map) then emit_alarms kinstr map
+let emit ~pos = function
+  | Just map -> if not (M.is_empty map) then emit_alarms ~pos map
   (* TODO: use GADT to avoid this assert false ? *)
   | AllBut  _ ->
     Self.abort ~current:true ~once:true

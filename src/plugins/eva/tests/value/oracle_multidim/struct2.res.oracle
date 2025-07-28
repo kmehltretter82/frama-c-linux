@@ -1,5 +1,5 @@
 53a54,55
-> [kernel] struct2.i:78: Warning: 
+> [eva] struct2.i:78: Warning: 
 >   all target addresses were invalid. This path is assumed to be dead.
 137,138d138
 <   tab4[0] ∈ {0; 2}

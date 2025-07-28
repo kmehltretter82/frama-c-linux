@@ -212,14 +212,14 @@ let check_from pre_state asgn assigns_zone from found_assigns =
 
 
 (* Display the message as result/warning depending on [status] *)
-let msg_status status ?current ?once ?source fmt =
+let msg_status status ?current ?once ?source ?stacktrace fmt =
   if status = Alarmset.True then
     if Parameters.ValShowProgress.get ()
     then Self.result ?current ?once ?source fmt
     else Self.result ?current ?once ?source ~level:2 fmt
   else
     Self.warning
-      ~wkey:Self.wkey_alarm ?current ?once ?source fmt
+      ~wkey:Self.wkey_alarm ?current ?once ?source ?stacktrace fmt
 
 let pp_bhv fmt b =
   if not (Cil.is_default_behavior b)
@@ -276,12 +276,11 @@ let check_fct_assigns kf ab ~pre_state found_froms =
              "unknown", Unknown, Property_status.Dont_know)
            else "valid", True, Property_status.True
          in
-         msg_status vstatus ~once:true ~source
-           "%a: assigns got status %s.%a%t"
+         msg_status vstatus ~once:true ~source ~stacktrace:true
+           "%a: assigns got status %s.%a"
            (pp_header kf) b
            status_txt
-           pp_activity activity
-           Eva_utils.pp_callstack;
+           pp_activity activity;
          let emit_status ppt status =
            Property_status.emit
              ~distinct:true Eva_utils.emitter ~hyps:[] ppt status
@@ -297,12 +296,11 @@ let check_fct_assigns kf ab ~pre_state found_froms =
              in
              let ip = Option.get (Property.ip_of_from kf Kglobal bol from) in
              let source = fst (asgn.it_content.term_loc) in
-             msg_status status ~once:true ~source
-               "%a: \\from ... part in assign clause got status %s.%a%t"
+             msg_status status ~once:true ~source ~stacktrace:true
+               "%a: \\from ... part in assign clause got status %s.%a"
                (pp_header kf) b
                status_txt
-               pp_activity activity
-               Eva_utils.pp_callstack;
+               pp_activity activity;
              emit_status ip (conv_status status)
          in
          List.iter2 check_from assigns_deps assigns_zones)

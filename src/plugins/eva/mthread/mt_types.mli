@@ -21,7 +21,6 @@
 (**************************************************************************)
 
 open Cil_types
-open Cil_datatype
 open Mt_cil
 open Mt_memory.Types
 
@@ -29,7 +28,7 @@ open Mt_memory.Types
 (** Kind of access to zones *)
 
 type rw = Read | Write of Locations.location
-        | ReadAloc of Analysis_location.t | WriteAloc of Analysis_location.t
+        | ReadPos of Position.t | WritePos of Position.t
 module RW: sig
   include Datatype.S with type t = rw
 
@@ -103,8 +102,8 @@ module Trace : sig
 
   type data = private {
     trace_events: events_set;
-    trace_states: state Stmt.Map.t; (* ??? *)
-    trace_states_after: state Stmt.Map.t;
+    trace_states: state Cil_datatype.Stmt.Map.t; (* ??? *)
+    trace_states_after: state Cil_datatype.Stmt.Map.t;
   }
 
   val empty : t

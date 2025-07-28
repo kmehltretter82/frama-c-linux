@@ -67,7 +67,7 @@ let () = Ast.add_monotonic_state Dynamic_Alloc_Bases.self
 (* -------------------------- Auxiliary functions  -------------------------- *)
 
 let current_call_site () =
-  match Callstack.top_callsite (Eva_utils.current_call_stack ()) with
+  match Callstack.top_callsite (Callstack.get_current_exn ()) with
   | Kglobal -> Cil_datatype.Stmt.dummy
   | Kstmt stmt -> stmt
 
@@ -77,7 +77,7 @@ let current_call_site () =
      these call site correspond to a different use of a malloc function,
      so it is interesting to keep their bases separated. *)
 let call_stack_no_wrappers () =
-  let cs = Eva_utils.current_call_stack () in
+  let cs = Callstack.get_current_exn () in
   let wrappers = Parameters.AllocFunctions.get () in
   let rec bottom_filter = function
     | [] | [_] as stack -> stack
@@ -170,9 +170,8 @@ let create_new_var stack prefix type_base weak =
    created by one of the functions of this module. Mutating variables name
    is not a good idea in general, but we take the risk here. *)
 let mutate_name_to_weak vi =
-  Self.warning ~wkey:wkey_weak_alloc ~current:true ~once:false
-    "@[marking variable `%s' as weak@]%t" vi.vname
-    Eva_utils.pp_callstack;
+  Self.warning ~wkey:wkey_weak_alloc ~current:true ~once:false ~stacktrace:true
+    "@[marking variable `%s' as weak@]" vi.vname;
   try
     let prefix, remainder =
       Scanf.sscanf vi.vname "__%s@_%s" (fun s1 s2 -> (s1, s2))
@@ -331,10 +330,9 @@ let alloc_fresh weak deallocation prefix sizev _state =
   let tsize = guess_intended_malloc_type stack sizev (weak = Strong) in
   let type_base = type_from_nb_elems tsize in
   let var = create_new_var stack prefix type_base weak in
-  Self.result ~dkey:dkey_new ~current:true ~once:true
-    "@[allocating %svariable %a@]%t"
-    (if weak = Weak then "weak " else "") Printer.pp_varinfo var
-    Eva_utils.pp_callstack;
+  Self.result ~dkey:dkey_new ~current:true ~once:true ~stacktrace:true
+    "@[allocating %svariable %a@]"
+    (if weak = Weak then "weak " else "") Printer.pp_varinfo var;
   let size_char = Bit_utils.sizeofchar () in
   (* Sizes are in bits *)
   let min_alloc = Int.(pred (mul size_char tsize.min_bytes)) in
@@ -385,7 +383,7 @@ let string_of_region = function
 
 (* Only called when the 'weakest base' needs to be allocated. *)
 let create_weakest_base region =
-  let stack = { (Eva_utils.current_call_stack ()) with stack = [] } in
+  let stack = { (Callstack.get_current_exn ()) with stack = [] } in
   let type_base = Cil_const.(mk_tarray charType None) in
   let var = create_new_var stack "alloc" type_base Weak in
   Self.warning ~wkey:wkey_imprecise_alloc ~current:true ~once:true

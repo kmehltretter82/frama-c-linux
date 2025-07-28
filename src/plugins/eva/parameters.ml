@@ -1072,6 +1072,15 @@ module PrintCallstacks =
       let option_name = "-eva-print-callstacks"
       let help = "When printing a message, also show the current call stack"
     end)
+let () =
+  let set_hook _old_enabled enabled =
+    warning "Option -eva-print-callstacks is now deprecated.@ \
+             Use -eva-msg-key callstacks instead.";
+    if enabled
+    then Self.(add_debug_keys dkey_callstacks)
+    else Self.(del_debug_keys dkey_callstacks)
+  in
+  PrintCallstacks.add_set_hook set_hook
 
 let () = Parameter_customize.set_group messages
 module ReportRedStatuses =

@@ -254,6 +254,12 @@ type ('loc, 'value) call = {
                                                   call to a given function. *)
 }
 
+(** [position_of_call call] creates the global or local position from the
+    call information [call]. If this is the entry point of the analysis (i.e.
+    the callsite is [Kglobal]) then the position will be a root call. If there
+    is a statement callsite then the position will be local. *)
+val position_of_call  : ('a, 'b) call -> Position.t
+
 (** Information needed to interpret a recursive call.
     The local variables and formal parameters of different recursive calls
     should not be mixed up. Those of the current call must be temporary withdraw

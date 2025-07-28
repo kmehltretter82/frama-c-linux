@@ -54,6 +54,8 @@ val dkey_widening : category
 val dkey_partition : category
 val dkey_split_return : category
 val dkey_precision_settings : category
+val dkey_callstacks : category
+val dkey_callstack_hash : category
 
 (** {2 Warning categories.} *)
 
@@ -78,3 +80,54 @@ val wkey_unknown_size : warn_category
 val wkey_ensures_false : warn_category
 val wkey_watchpoint : warn_category
 val wkey_recursion : warn_category
+
+(** {2 Logging.} *)
+
+(** This modules adapt the interface of {!Log.Messages} to be usable with
+    {!Position.t}.
+
+    If [position] is given, then message will be located at this position.
+    Otherwise if [current] or [source] are given, then the current position
+    tracked by the kernel or the given location will respectively be used.
+    [stacktrace] optional parameter controls wheter the call stack must
+    be printed at the end of the message and always default to false.
+
+    See {!Log.Messages} for documentation *)
+
+type 'a pretty_printer =
+  ?emitwith:(Log.event -> unit) -> ?once:bool ->
+  ?pos:Position.t -> ?current:bool -> ?source:Fc_Filepath.position ->
+  ?stacktrace:bool ->  ?append:(Format.formatter -> unit) -> ?echo:bool ->
+  ('a,Format.formatter,unit) format -> 'a
+
+type ('a,'b) pretty_aborter =
+  ?pos:Position.t -> ?current:bool -> ?source:Fc_Filepath.position ->
+  ?stacktrace:bool ->  ?append:(Format.formatter -> unit) -> ?echo:bool ->
+  ('a,Format.formatter,unit,'b) format4 -> 'a
+
+(** Results of analysis. *)
+val result : ?level:int -> ?dkey:category -> 'a pretty_printer
+
+(** Progress and feedback. *)
+val feedback : ?ontty:Log.ontty -> ?level:int -> ?dkey:category -> 'a pretty_printer
+
+(** Debugging information. *)
+val debug : ?level:int -> ?dkey:category -> 'a pretty_printer
+
+(** Warnings. *)
+val warning : ?wkey:warn_category -> 'a pretty_printer
+
+(** Alarm emitted by the analysis. *)
+val alarm : 'a pretty_printer
+
+(** User error. *)
+val error : 'a pretty_printer
+
+(** User error stopping the plugin. *)
+val abort : ('a,'b) pretty_aborter
+
+(** Internal error of the plug-in. *)
+val failure : 'a pretty_printer
+
+(** Internal error stopping the plug-in. *)
+val fatal   : ('a,'b) pretty_aborter

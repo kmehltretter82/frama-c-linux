@@ -26,6 +26,7 @@ module type S = sig
   include Datatype.S_with_collections
   val loc : t -> Cil_types.location
   val pos : t -> Filepath.position
+  val kinstr : t -> Cil_types.kinstr
   val pretty_loc : Format.formatter -> t -> unit
 end
 
@@ -37,7 +38,7 @@ struct
 
     type t = Stmt.t * Callstack.t [@@deriving eq, ord]
 
-    let name = "Analysis_location.Local"
+    let name = "Position.Local"
     let reprs =
       List.concat_map
         (fun stmt -> List.map (fun cs -> (stmt,cs)) Callstack.reprs)
@@ -55,91 +56,117 @@ struct
   let loc (stmt, _cs) =
     Cil_datatype.Stmt.loc stmt
 
-  let pos aloc =
-    fst (loc aloc)
+  let pos lpos =
+    fst (loc lpos)
 
-  let pretty_loc fmt (stmt, cs) =
-    let stmt_loc = Stmt.loc stmt in
-    Format.fprintf fmt "%a <-@ %a"
-      Printer.pp_location stmt_loc
-      Callstack.pretty cs
+  let kinstr lpos =
+    Cil_types.Kstmt (fst lpos)
+
+  let pretty_loc fmt lpos =
+    Printer.pp_location fmt (loc lpos)
+
+  let kf (_stmt, cs) =
+    Callstack.top_kf cs
+
+  let stmt (stmt, _cs) =
+    stmt
+
+  let callstack (_stmt, cs) =
+    cs
 end
 
-module Global = struct
-  include Cil_datatype.Global
-  let name = "Analysis_location.Global"
+type local = Local.t
 
-  let pos gloc =
-    fst (loc gloc)
-
-  let pretty_loc fmt gloc =
-    let global_loc = Global.loc gloc in
-    Printer.pp_location fmt global_loc
-end
-
-(* Datatype for Analysis_location *)
+(* Datatype for Position.t *)
 module Prototype = struct
   include Datatype.Serializable_undefined
 
   type t =
-    | Global of Global.t
+    | RootCall of { thread: int; entry_point: Kernel_function.t }
+    | GlobalInit of Varinfo.t
     | Local of Local.t
   [@@deriving eq, ord]
 
-  let name = "Analysis_location"
+  let name = "Position"
   let reprs =
-    List.map (fun global -> Global global) Global.reprs @
+    List.map
+      (fun kf -> RootCall { thread=0; entry_point=kf; })
+      Kernel_function.reprs @
+    List.map (fun vi -> GlobalInit vi) Varinfo.reprs @
     List.map (fun local -> Local local) Local.reprs
   let hash = function
-    | Local l -> Hashtbl.hash (1, Local.hash l)
-    | Global g -> Hashtbl.hash (2, Global.hash g)
+    | RootCall { thread; entry_point } ->
+      Hashtbl.hash (1, thread, Kernel_function.hash entry_point)
+    | GlobalInit vi -> Hashtbl.hash (2, Varinfo.hash vi)
+    | Local l -> Hashtbl.hash (3, Local.hash l)
   let pretty fmt = function
+    | RootCall { entry_point; _ } ->
+      Format.pp_print_string fmt (Kernel_function.get_name entry_point)
+    | GlobalInit vi -> Format.pp_print_string fmt vi.vname
     | Local l -> Local.pretty fmt l
-    | Global g -> Global.pretty fmt g
 end
 include Datatype.Make_with_collections (Prototype)
 include Prototype
 
-let loc aloc =
-  match aloc with
+let local stmt callstack =
+  Local (stmt, callstack)
+
+let root_call ~thread ~entry_point =
+  RootCall { thread; entry_point }
+
+let global_init vi =
+  GlobalInit vi
+
+let is_local = function
+  | RootCall _ | GlobalInit _ -> false
+  | Local _ -> true
+
+let loc pos =
+  match pos with
+  | RootCall { entry_point: Kernel_function.t; _ } ->
+    Kernel_function.get_location entry_point
+  | GlobalInit vi -> vi.vdecl
   | Local l -> Local.loc l
-  | Global g -> Global.loc g
 
-let pos aloc =
-  match aloc with
-  | Local l -> Local.pos l
-  | Global g -> Global.pos g
+let pos pos =
+  loc pos |> fst
 
-let pretty_loc fmt aloc =
-  match aloc with
-  | Local l -> Local.pretty_loc fmt l
-  | Global g -> Global.pretty_loc fmt g
+let kinstr pos =
+  match pos with
+  | RootCall _ | GlobalInit _ -> Cil_types.Kglobal
+  | Local l -> Local.kinstr l
 
-type global = Global.t
-type local = Local.t
+let stmt pos =
+  match pos with
+  | RootCall _ | GlobalInit _ -> None
+  | Local (stmt,_cs) -> Some stmt
 
-let of_stmt stmt : t = Local (stmt, Eva_utils.current_call_stack ())
+let kf pos =
+  match pos with
+  | RootCall { entry_point } -> Some entry_point
+  | GlobalInit _ -> None
+  | Local lpos -> Some (Local.kf lpos)
 
-let of_varinfo vi : t =
-  let initinfo = Globals.Vars.find vi in
-  Global (GVar (vi, initinfo, vi.vdecl))
-let of_kf kf : t = Global (Kernel_function.get_global kf)
+let callstack pos =
+  match pos with
+  | RootCall { thread; entry_point } ->
+    Some (Callstack.init ~thread ~entry_point)
+  | GlobalInit _vi -> None
+  | Local lpos -> Some (Local.callstack lpos)
 
-let of_call (call : ('a, 'b) Eval.call) =
-  let (kf, callsite), caller_stack = Callstack.pop_call call.callstack in
-  assert (Kernel_function.equal kf call.kf);
-  match callsite, call.return with
-  | Kglobal, Some vi -> of_varinfo vi
-  | Kglobal, None -> of_kf call.kf
-  | Kstmt stmt, _ -> Local (stmt, Option.get caller_stack)
+let pretty_loc fmt pos =
+  Printer.pp_location fmt (loc pos)
 
-let of_kinstr_lval (kinstr : Cil_types.kinstr) (lval : Eva_ast.lval) =
-  match kinstr, lval with
-  | Kglobal, { node = (Var vi, _) } -> of_varinfo vi
-  | Kstmt stmt, _ -> of_stmt stmt
-  | _ ->
-    Self.fatal ~current:true
-      "Incompatible combination. The only possible `kinstr/lval' couples are \
-       `Kglobal/Var' or `Kstmt/_'@;kinstr: %a@ lval: %a"
-      Kinstr.pretty kinstr
-      Eva_ast.Lval.pretty lval
+let of_kinstr kinstr callstack =
+  match kinstr with
+  | Cil_types.Kstmt stmt ->
+    Local (stmt, callstack)
+  | Kglobal ->
+    match Callstack.pop_call callstack with
+    | entry_point, None ->
+      RootCall { thread=callstack.thread; entry_point }
+    | _kf, Some (stmt, callstack) ->
+      Local (stmt, callstack)
+
+let of_local lpos =
+  Local lpos

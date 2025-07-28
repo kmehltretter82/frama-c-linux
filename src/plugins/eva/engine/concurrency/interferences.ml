@@ -22,8 +22,8 @@
 
 open Lattice_bounds
 
-module ALoc = Analysis_location.Local
-module AlocMap = ALoc.Map
+module Pos = Position.Local
+module PosMap = Pos.Map
 module MutexesMap = Map.Make (Mutex.Set)
 
 type thread_id = int
@@ -53,10 +53,10 @@ struct
 end
 
 
-(* Set of interferences stored as a map from analysis location to the
+(* Set of interferences stored as a map from position to the
    interference generated at this control state. *)
 
-module ByAnalysisLocation (Dom : Abstract.Domain.External) =
+module ByPosition (Dom : Abstract.Domain.External) =
 struct
   type elt =
     {
@@ -64,14 +64,14 @@ struct
       widening_counter : int;
     }
 
-  type t = elt AlocMap.t
+  type t = elt PosMap.t
 
   let pretty : Format.formatter -> t -> unit =
     let pp_val fmt { state; _ } = Top.pretty Dom.pretty fmt state
-    and pp_key fmt aloc = Cil_datatype.Location.pretty fmt (ALoc.loc aloc) in
-    pp_map AlocMap.iter pp_key pp_val
+    and pp_key = Pos.pretty_loc in
+    pp_map PosMap.iter pp_key pp_val
 
-  let empty : t = AlocMap.empty
+  let empty : t = PosMap.empty
 
   module DomOrTop =
   struct
@@ -80,7 +80,7 @@ struct
     let widen kf stmt = top_join (Dom.widen kf stmt)
   end
 
-  let add_and_widen (aloc : ALoc.t) (state : Dom.t or_top) : t -> t =
+  let add_and_widen (pos : Pos.t) (state : Dom.t or_top) : t -> t =
     let update = function
       | None -> (* No previous entry *)
         let widening_delay = Parameters.WideningDelay.get () in
@@ -96,17 +96,17 @@ struct
             (* Widen the interferences between the previous and current
                state. *)
             let widening_period = Parameters.WideningPeriod.get () in
-            let stmt, cs = aloc in
+            let stmt, cs = pos in
             let kf = Callstack.top_kf cs in
             DomOrTop.widen kf stmt previous.state state, widening_period
           end
         in
         Some { state ; widening_counter = widening_counter - 1 }
     in
-    AlocMap.update aloc update
+    PosMap.update pos update
 
   let group_by_mutexes (map : t) : (Dom.t or_top) MutexesMap.t =
-    let add _aloc { state ; _ } acc_map =
+    let add _pos { state ; _ } acc_map =
       let locked_mutexes =
         match state with
         | `Top -> Mutex.Set.empty
@@ -123,7 +123,7 @@ struct
       in
       MutexesMap.update locked_mutexes update acc_map
     in
-    AlocMap.fold add map MutexesMap.empty
+    PosMap.fold add map MutexesMap.empty
 end
 
 
@@ -133,30 +133,30 @@ module Make (Engine : Engine_sig.S_with_results) =
 struct
   module Dom = Engine.Dom
   module ThreadTable = Thread.Hashtbl
-  module ByAnalysisLocation = ByAnalysisLocation (Dom)
+  module ByPosition = ByPosition (Dom)
   module ByMutexes = ByMutexes (Dom)
 
   type state = Dom.t
 
   type t = {
-    states_by_aloc : ByAnalysisLocation.t ThreadTable.t;
+    states_by_pos : ByPosition.t ThreadTable.t;
     states_by_mutexes :  ByMutexes.t ThreadTable.t;
     mutable shared_bases : Base.Hptset.t;
   }
 
   let current = {
-    states_by_aloc = ThreadTable.create 13;
+    states_by_pos = ThreadTable.create 13;
     states_by_mutexes = ThreadTable.create 13;
     shared_bases = Base.Hptset.empty;
   }
 
   let reset () =
-    ThreadTable.reset current.states_by_aloc;
+    ThreadTable.reset current.states_by_pos;
     ThreadTable.reset current.states_by_mutexes;
     current.shared_bases <- Base.Hptset.empty
 
   let is_empty () =
-    ThreadTable.length current.states_by_aloc = 0
+    ThreadTable.length current.states_by_pos = 0
 
   (* Interference registration *)
 
@@ -166,13 +166,13 @@ struct
 
   let add_last_analysis thread concurrent_writes shared_bases =
     (* Retrieve the interferences  *)
-    let old_states_by_aloc =
-      ThreadTable.find_def current.states_by_aloc thread
-        ByAnalysisLocation.empty
+    let old_states_by_pos =
+      ThreadTable.find_def current.states_by_pos thread
+        ByPosition.empty
     in
-    let new_states_by_aloc =
-      let add (stmt, cs as aloc) acc_map =
-        let source = ALoc.pos aloc in
+    let new_states_by_pos =
+      let add (stmt, cs as pos) acc_map =
+        let source = Pos.pos pos in
         let open TopBottom.Operators in
         let state =
           let* state_table =
@@ -196,13 +196,13 @@ struct
           if Top.is_top state then
             Self.warning ~once:false ~source
               "Imprecise interference computed";
-          ByAnalysisLocation.add_and_widen aloc state acc_map
+          ByPosition.add_and_widen pos state acc_map
       in
-      ALoc.Set.fold add concurrent_writes old_states_by_aloc
+      Pos.Set.fold add concurrent_writes old_states_by_pos
     in
     (* Check for changes *)
     let new_states_by_mutexes =
-      ByAnalysisLocation.group_by_mutexes new_states_by_aloc
+      ByPosition.group_by_mutexes new_states_by_pos
     and old_states_by_mutexes =
       ThreadTable.find_opt current.states_by_mutexes thread
     in
@@ -214,16 +214,16 @@ struct
       Base.Hptset.equal current.shared_bases shared_bases
     in
     (* Update the record *)
-    ThreadTable.replace current.states_by_aloc thread new_states_by_aloc;
+    ThreadTable.replace current.states_by_pos thread new_states_by_pos;
     ThreadTable.replace current.states_by_mutexes thread new_states_by_mutexes;
     current.shared_bases <- shared_bases;
     (* Debug printing *)
-    let pp_write fmt (stmt, _cs as aloc)  =
-      Format.fprintf fmt "%a@ %a" Cil_datatype.Stmt.pretty stmt ALoc.pretty aloc
+    let pp_write fmt (stmt, _cs as pos)  =
+      Format.fprintf fmt "%a@ %a" Cil_datatype.Stmt.pretty stmt Pos.pretty pos
     in
     let pp_write_set fmt set =
-      let pp fmt aloc = Format.fprintf fmt "@,@[<hov 2>%a@]" pp_write aloc in
-      ALoc.Set.iter (pp fmt) set
+      let pp fmt pos = Format.fprintf fmt "@,@[<hov 2>%a@]" pp_write pos in
+      Pos.Set.iter (pp fmt) set
     in
     Self.debug ~dkey
       "@[<v 2>Interferences from thread %a@ \
@@ -234,7 +234,7 @@ struct
       Thread.pretty thread
       pp_write_set concurrent_writes
       Base.Hptset.pretty shared_bases
-      ByAnalysisLocation.pretty new_states_by_aloc
+      ByPosition.pretty new_states_by_pos
       ByMutexes.pretty new_states_by_mutexes;
     if not (same_interferences && same_shared_bases)
     then Updated
@@ -276,7 +276,8 @@ struct
     in
     ThreadTable.fold add_thread current.states_by_mutexes `Bottom
 
-  let inject kf (v1 : Eva_automata.vertex) _v2 (state : state) : state =
+  let inject ~pos (v1 : Eva_automata.vertex) _v2 (state : state) : state =
+    let kf = Position.kf pos |> Option.get in
     let need_injection =
       let automaton = Eva_automata.get_automaton kf in
       if not (Thread.is_main (Thread.current ())) &&
@@ -290,10 +291,9 @@ struct
            intersects with shared variables. *)
         match v1.vertex_start_of with
         | None -> false
-        | Some stmt -> begin
-            let aloc = Analysis_location.of_stmt stmt in
+        | Some _stmt -> begin
             let filter = Inout_access.keep_globals_only in
-            let accesses = Inout_access.at ~filter aloc in
+            let accesses = Inout_access.at ~filter pos in
             let zone = Locations.Zone.join accesses.read accesses.write in
             match Locations.Zone.get_bases zone with
             | Top ->

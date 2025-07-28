@@ -270,3 +270,16 @@ type recursion = {
 }
 
 type cacheable = Cacheable | NoCache | NoCacheCallers
+
+(** This function cannot be in {!Position} as it would create a dependency cycle
+    [Position] -> [Eval] -> [Alarmset] -> [Position] *)
+let position_of_call call =
+  let kf, lloc = Callstack.pop_call call.callstack in
+  assert (Kernel_function.equal kf call.kf);
+  match lloc, call.return with
+  | None, Some vi ->
+    Position.global_init vi
+  | None, None ->
+    Position.root_call ~thread:call.callstack.thread ~entry_point:call.kf
+  | Some (stmt, caller_stack), _ ->
+    Position.local stmt caller_stack

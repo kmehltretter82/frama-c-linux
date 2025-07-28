@@ -38,7 +38,7 @@ val find : int -> t option
     @param kf the entry point for the new thread
     @param args the list of arguments used for the thread invocation *)
 val spawn :
-  Analysis_location.local ->
+  Position.local ->
   Concurrency.Name.t option ->
   Cil_types.kernel_function ->
   Cvalue.V.t list ->

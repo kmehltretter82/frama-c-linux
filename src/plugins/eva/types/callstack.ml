@@ -22,9 +22,6 @@
 
 let stable_hash x = Hashtbl.seeded_hash 0 x
 
-let dkey_callstack = Self.register_category "callstack"
-    ~help:"additionally print the current callstack in some messages"
-
 module Thread = Int (* Threads are identified by integers *)
 module Kf = Kernel_function
 module Stmt = Cil_datatype.Stmt
@@ -93,7 +90,7 @@ let is_empty cs =
 
 (* Stack manipulation *)
 
-let init ?(thread=0) kf = { thread; entry_point=kf; stack = [] }
+let init ~thread ~entry_point = { thread; entry_point; stack = [] }
 
 let push kf stmt cs =
   { cs with stack = (kf, stmt) :: cs.stack }
@@ -104,10 +101,9 @@ let pop cs =
   | _ :: tail -> Some { cs with stack = tail }
 
 let pop_call cs =
-  let open Cil_types in
   match cs.stack with
-  | [] -> (cs.entry_point, Kglobal), None
-  | (kf, stmt) :: tail -> (kf, Kstmt stmt), Some { cs with stack = tail }
+  | [] -> cs.entry_point, None
+  | (kf, stmt) :: tail -> kf, Some (stmt, { cs with stack = tail })
 
 let top cs =
   match cs.stack with
@@ -131,8 +127,8 @@ let top_call cs =
 
 let top_caller cs =
   match cs.stack with
-  | _ :: (kf, _) :: _ -> Some kf
-  | [_] -> Some cs.entry_point
+  | (_,stmt) :: (kf, _) :: _ -> Some (stmt, kf)
+  | [(_,stmt)] -> Some (stmt, cs.entry_point)
   | [] -> None
 
 (* Conversion *)
@@ -183,18 +179,30 @@ let base58_of_int n =
   Bytes.to_string buf
 
 let pretty_hash fmt callstack =
-  if Self.is_debug_key_enabled dkey_callstack then
-    Format.fprintf fmt "<%s> " (base58_of_int (stable_hash callstack))
-  else Format.ifprintf fmt ""
+  Format.fprintf fmt "%s" (base58_of_int (stable_hash callstack))
 
 let pretty_short fmt callstack =
-  Format.fprintf fmt "%a" pretty_hash callstack;
   let list = List.rev (to_kf_list callstack) in
   Pretty_utils.pp_flowlist ~left:"" ~sep:" <- " ~right:""
     (fun fmt kf -> Kernel_function.pretty fmt kf)
     fmt list
 
-let pretty fmt callstack =
-  Format.fprintf fmt "@[<hv>%a" pretty_hash callstack;
-  pretty fmt callstack;
-  Format.fprintf fmt "@]"
+(* Callstack tracking *)
+
+let current : t option ref = ref None
+
+let get_current () = !current
+
+let get_current_exn () =
+  match !current with
+  | None -> invalid_arg "callstack not initialized"
+  | Some cs -> cs
+
+let with_callstack ?finally callstack job x =
+  let previous = !current in
+  current := Some callstack;
+  let finally () =
+    Option.iter (fun f -> f ()) finally;
+    current := previous
+  in
+  Fun.protect ~finally (fun () -> job x)

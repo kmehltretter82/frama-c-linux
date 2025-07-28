@@ -172,7 +172,7 @@
 [eva:alarm] invalid_pointer.c:190: Warning: 
   invalid pointer creation.
   assert \null ≡ p_0 + 1 ∨ \object_pointer(p_0 + 1);
-[kernel] invalid_pointer.c:190: Warning: 
+[eva] invalid_pointer.c:190: Warning: 
   all target addresses were invalid. This path is assumed to be dead.
 [eva] Recording results for flexible_array_member
 [eva] Done for function flexible_array_member

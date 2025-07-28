@@ -88,20 +88,20 @@ struct
 
     type t =
       | ByName of Concurrency.Name.t
-      | ByCreationPoint of Analysis_location.Local.t
+      | ByCreationPoint of Position.Local.t
     [@@deriving eq, ord]
 
     let name = "Eva.Queue.Identity"
 
     let reprs =
       List.map (fun n -> ByName n) Concurrency.Name.reprs @
-      List.map (fun al -> ByCreationPoint al) Analysis_location.Local.reprs
+      List.map (fun al -> ByCreationPoint al) Position.Local.reprs
 
     let hash = function
       | ByName name ->
         Stdlib.Hashtbl.hash(1, Concurrency.Name.hash name)
       | ByCreationPoint al ->
-        Stdlib.Hashtbl.hash(2, Analysis_location.Local.hash al)
+        Stdlib.Hashtbl.hash(2, Position.Local.hash al)
   end
 
   include Prototype

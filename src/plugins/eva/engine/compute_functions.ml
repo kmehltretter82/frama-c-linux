@@ -102,12 +102,10 @@ let pre_analysis () =
   (* We may be resuming Value from a previously crashed analysis. Clear
      degeneration states *)
   Eva_utils.DegenerationPoints.clear ();
-  Origin.clear ();
-  Eva_utils.reset_call_stack ();
-  Cvalue_callbacks.apply_at_start_hooks ()
+  Cvalue_callbacks.apply_at_start_hooks ();
+  Origin.clear ()
 
 let post_analysis_cleanup ~aborted =
-  Eva_utils.clear_call_stack ();
   if not aborted then
     (* Keep memexec results for users that want to resume the analysis *)
     Mem_exec.cleanup_results ()
@@ -191,13 +189,13 @@ module Make (Engine: Engine_sig.S) = struct
 
   module MemExec = Mem_exec.Make (Engine.Val) (Engine.Dom)
 
-  let compute_and_cache_call compute kinstr call init_state =
+  let compute_and_cache_call compute call init_state =
     let args =
       List.map (fun {avalue} -> Eval.value_assigned avalue) call.arguments
     in
     match MemExec.reuse_previous_call call.kf init_state args with
     | None ->
-      let call_result = compute kinstr call init_state in
+      let call_result = compute call init_state in
       let () =
         if call_result.Engine_sig.cacheable = Eval.Cacheable
         then
@@ -215,6 +213,7 @@ module Make (Engine: Engine_sig.S) = struct
          Eval_annots.has_requires spec
       then begin
         let ab = Logic.create init_state call.kf in
+        let kinstr = Callstack.top_callsite call.callstack in
         ignore (Logic.check_fct_preconditions kinstr call.kf ab init_state);
       end;
       if Parameters.ValShowProgress.get () then
@@ -226,16 +225,16 @@ module Make (Engine: Engine_sig.S) = struct
 
   (* ----- Body or specification analysis ----------------------------------- *)
 
-  (* Interprets a [call] at callsite [kinstr] in the state [state] by analyzing
+  (* Interprets a [call] in the state [state] by analyzing
      the body of the called function. *)
-  let compute_using_body fundec ~save_results kinstr call state =
-    let result = Computer.compute ~save_results call.kf kinstr state in
+  let compute_using_body fundec ~save_results call state =
+    let result = Computer.compute ~save_results call.callstack state in
     Summary.FunctionStats.recompute @@ Globals.Functions.get fundec.svar ;
     result
 
   (* Interprets a [call] at callsite [kinstr] in the state [state] by using the
      specification of the called function. *)
-  let compute_using_spec spec kinstr call state =
+  let compute_using_spec spec call state =
     if Parameters.InterpreterMode.get ()
     then Self.abort "Library function call. Stopping.";
     let vi = Kernel_function.get_vi call.kf in
@@ -246,25 +245,22 @@ module Make (Engine: Engine_sig.S) = struct
     if Cil.is_in_libc vi.vattr then
       Library_functions.warn_unsupported_spec vi.vorig_name;
     let states =
-      Spec.compute_using_specification ~warn:true kinstr call spec state
+      Spec.compute_using_specification ~warn:true call spec state
     in
     let cvalue_states = List.map (fun (_, s) -> get_cvalue_or_top s) states in
     apply_call_results_hooks call state (`Spec cvalue_states);
     states, Eval.Cacheable
 
-  (* Interprets a [call] at callsite [kinstr] in state [state], using its
+  (* Interprets a [call] in state [state], using its
      specification or body according to [target]. If [-eva-show-progress] is
      true, the callstack and additional information are printed. *)
-  let compute_using_spec_or_body target kinstr call state =
-    begin
-      match kinstr with
-      | Kstmt stmt when Parameters.ValShowProgress.get () ->
-        Self.feedback
-          "@[computing for function %a.@\nCalled from %a.@]"
-          Callstack.pretty_short call.callstack
-          Cil_datatype.Location.pretty (Cil_datatype.Stmt.loc stmt)
-      | _ -> ()
-    end;
+  let compute_using_spec_or_body target call state =
+    let pos = Eval.position_of_call call in
+    if Position.is_local pos && Parameters.ValShowProgress.get () then
+      Self.feedback
+        "@[computing for function %a.@\nCalled from %a.@]"
+        Callstack.pretty_short call.callstack
+        Position.pretty_loc pos;
     let compute, kind =
       match target with
       | `Body (fundec, save_results) ->
@@ -273,7 +269,7 @@ module Make (Engine: Engine_sig.S) = struct
         compute_using_spec funspec, `Spec
     in
     apply_call_hooks call state kind;
-    let resulting_states, cacheable = compute kinstr call state in
+    let resulting_states, cacheable = compute call state in
     if Parameters.ValShowProgress.get () then
       Self.feedback
         "Done for function %a" Kernel_function.pretty call.kf;
@@ -295,7 +291,7 @@ module Make (Engine: Engine_sig.S) = struct
 
   (* Interprets a call to [kf] at callsite [kinstr] in the state [state]
      by using a cvalue builtin. *)
-  let compute_builtin (name, builtin, cacheable, spec) kinstr call state =
+  let compute_builtin (name, builtin, cacheable, spec) call state =
     let kf_name = Kernel_function.get_name call.kf in
     if Parameters.ValShowProgress.get ()
     then
@@ -303,7 +299,7 @@ module Make (Engine: Engine_sig.S) = struct
         name (if kf_name = name then "" else " for function " ^ kf_name);
     apply_call_hooks call state `Builtin;
     let states =
-      Spec.compute_using_specification ~warn:false kinstr call spec state
+      Spec.compute_using_specification ~warn:false call spec state
     in
     let join = Engine.Dom.join in
     let final_state = Bottom.of_list ~join (List.map snd states) in
@@ -319,6 +315,7 @@ module Make (Engine: Engine_sig.S) = struct
         Builtins.apply_builtin builtin cvalue_call ~pre ~post
       in
       let insert result_id cvalue_state =
+        let kinstr = Callstack.top_callsite call.callstack in
         let branch = Partition.Builtin_result (call.kf, kinstr, result_id) in
         Partition.Key.(add_branch branch empty),
         Engine.Dom.set Cvalue_domain.State.key cvalue_state final_state
@@ -337,39 +334,44 @@ module Make (Engine: Engine_sig.S) = struct
 
   (* ----- Call computation ------------------------------------------------- *)
 
-  (* Interprets a [call] at callsite [kinstr] in the state [state],
+  (* Execute the function [job] with the current callstack set to [callstack],
+     and update [Eva_perf] accordingly *)
+  let with_callstack callstack job x =
+    Eva_perf.start callstack;
+    let finally () = Eva_perf.stop callstack in
+    Callstack.with_callstack ~finally callstack job x
+
+  (* Interprets a [call] in the state [state],
      using a builtin, the specification or the body of the called function,
-     according to [Function_calls.register]. *)
-  let compute_call' kinstr call recursion state =
+     according to [Function_calls.register].
+     Exported in [Engine_sig.Compute] and used by [Transfer_stmt] when
+     interpreting a call statement. *)
+  let compute_call call recursion =
+    with_callstack call.callstack @@ fun state ->
     let recursion_depth = Option.map (fun r -> r.depth) recursion in
-    let target =
-      Function_calls.define_analysis_target ?recursion_depth kinstr call.kf
-    in
+    let target = Function_calls.define_analysis_target ?recursion_depth call in
     match target with
-    | `Builtin builtin_info -> compute_builtin builtin_info kinstr call state
-    | `Spec _ as spec -> compute_using_spec_or_body spec kinstr call state
+    | `Builtin builtin_info -> compute_builtin builtin_info call state
+    | `Spec _ as spec -> compute_using_spec_or_body spec call state
     | `Body _ as def ->
       let compute = compute_using_spec_or_body def in
       if Parameters.MemExecAll.get ()
-      then compute_and_cache_call compute kinstr call state
-      else compute kinstr call state
-
-  (* Exported in [Engine_sig.Compute] and used by [Transfer_stmt] when
-     interpreting a call statement. *)
-  let compute_call stmt = compute_call' (Kstmt stmt)
+      then compute_and_cache_call compute call state
+      else compute call state
 
   (* ----- Main call -------------------------------------------------------- *)
 
   let compute_main_call kf init_state =
 
-    let compute_call_and_join init_state =
-      let callstack = Eva_utils.init_call_stack kf in
+    let compute_call_and_join =
+      let thread = Thread.(id (current ())) in
+      let callstack = Callstack.init ~thread ~entry_point:kf in
+      Callstack.with_callstack callstack @@ fun init_state ->
       Engine.Dom.Store.register_initial_state callstack kf init_state;
       let call = { kf; callstack; arguments = []; rest = []; return = None; } in
-      let final_result = compute_call' Kglobal call None init_state in
+      let final_result = compute_call call None init_state in
       let final_states = List.map snd (final_result.states) in
       let final_state = Bottom.of_list ~join:Engine.Dom.join final_states in
-      Eva_utils.clear_call_stack ();
       final_state
     in
 

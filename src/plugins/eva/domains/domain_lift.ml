@@ -113,19 +113,19 @@ module Make
 
   let update valuation = Domain.update (lift_valuation valuation)
 
-  let assign stmt lv expr value valuation state =
-    Domain.assign stmt
+  let assign ~pos lv expr value valuation state =
+    Domain.assign ~pos
       (lift_left lv) expr (lift_assigned value) (lift_valuation valuation) state
 
-  let assume stmt expr positive valuation state =
-    Domain.assume stmt expr positive (lift_valuation valuation) state
+  let assume ~pos expr positive valuation state =
+    Domain.assume ~pos expr positive (lift_valuation valuation) state
 
-  let start_call stmt call recursion valuation state =
+  let start_call ~pos call recursion valuation state =
     Domain.start_call
-      stmt (lift_call call) recursion (lift_valuation valuation) state
+      ~pos (lift_call call) recursion (lift_valuation valuation) state
 
-  let finalize_call stmt call recursion ~pre ~post =
-    Domain.finalize_call stmt (lift_call call) recursion ~pre ~post
+  let finalize_call ~pos call recursion ~pre ~post =
+    Domain.finalize_call ~pos (lift_call call) recursion ~pre ~post
 
   let show_expr valuation = Domain.show_expr (lift_valuation valuation)
 

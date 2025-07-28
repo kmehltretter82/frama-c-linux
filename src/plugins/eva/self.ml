@@ -120,6 +120,14 @@ let dkey_precision_settings =
     ~help:"messages about the automatic configuration of the analysis by \
            option -eva-precision"
 
+let dkey_callstacks =
+  register_category "callstacks"
+    ~help:"print the current callstack alongside some messages"
+
+let dkey_callstack_hash =
+  register_category "callstack-hash"
+    ~help:"additionally print the current callstack hash in some messages"
+
 let () =
   let activate dkey = add_debug_keys dkey in
   List.iter activate
@@ -159,3 +167,79 @@ let wkey_watchpoint = register_warn_category "watchpoint"
 let () = set_warn_status wkey_watchpoint Log.Wfeedback
 let wkey_recursion = register_warn_category "recursion"
 let () = set_warn_status wkey_recursion Log.Wfeedback
+
+(* Log with positions *)
+
+type 'a pretty_printer =
+  ?emitwith:(Log.event -> unit) -> ?once:bool ->
+  ?pos:Position.t -> ?current:bool -> ?source:Fc_Filepath.position ->
+  ?stacktrace:bool ->  ?append:(Format.formatter -> unit) -> ?echo:bool ->
+  ('a,Format.formatter,unit) format -> 'a
+
+type ('a,'b) pretty_aborter =
+  ?pos:Position.t -> ?current:bool -> ?source:Fc_Filepath.position ->
+  ?stacktrace:bool -> ?append:(Format.formatter -> unit) -> ?echo:bool ->
+  ('a,Format.formatter,unit,'b) format4 -> 'a
+
+let append_callstack ?(stacktrace=false) ?append ~callstack fmt =
+  let pretty_hash fmt cs =
+    if is_debug_key_enabled dkey_callstack_hash then
+      Format.fprintf fmt "<%a> " Callstack.pretty_hash cs
+  in
+  Option.iter (fun append -> append fmt) append;
+  if stacktrace && is_debug_key_enabled dkey_callstacks then
+    match callstack with
+    | None -> ()
+    | Some cs ->
+      (* note: the "\n" before the pretty print of the stack is required by:
+         FRAMAC_LIB/analysis-scripts/make_wrapper.py *)
+      Format.fprintf fmt "@\nstack: @[<hv>%a%a@]"
+        pretty_hash cs
+        Callstack.pretty cs
+
+let lift_aborter (aborter : ('a,'b) Log.pretty_aborter)
+  : ('a,'b) pretty_aborter =
+  fun ?pos ?current ?source ?stacktrace ?append ->
+  (* Extract source location *)
+  match pos with
+  | Some pos ->
+    let callstack = Position.callstack pos in
+    let source = Option.value ~default:(Position.pos pos) source
+    (* Append callstack if requested *)
+    and append = append_callstack ?stacktrace ?append ~callstack in
+    aborter ?current:None ~source ~append
+  | None ->
+    let callstack = Callstack.get_current () in
+    let append = append_callstack ?stacktrace ?append ~callstack in
+    aborter ?current ?source ~append
+
+
+let lift_printer (printer : 'a Log.pretty_printer) : 'a pretty_printer =
+  fun ?emitwith ?once -> lift_aborter (printer ?emitwith ?once)
+
+let result ?level ?dkey =
+  lift_printer (result ?level ?dkey)
+
+let feedback ?ontty ?level ?dkey  =
+  lift_printer (feedback ?ontty ?level ?dkey )
+
+let debug ?level ?dkey =
+  lift_printer (debug ?level ?dkey)
+
+let warning ?wkey : 'a pretty_printer =
+  lift_printer (warning ?wkey)
+
+let alarm ?emitwith =
+  warning ~wkey:wkey_alarm ?emitwith
+
+let error ?emitwith =
+  lift_printer error ?emitwith
+
+let abort ?pos =
+  lift_aborter abort ?pos
+
+let failure ?emitwith =
+  lift_printer failure ?emitwith
+
+let fatal ?pos =
+  lift_aborter fatal ?pos

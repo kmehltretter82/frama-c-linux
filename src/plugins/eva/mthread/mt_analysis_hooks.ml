@@ -32,7 +32,7 @@ let no_res = (None : value option)
 
 type hook_sig = (exp * value) list ->  state * value option
 
-let current_loc analysis =
+let current_position analysis =
   match Callstack.top_callsite analysis.curr_stack with
   | Kglobal -> assert false (* The current stack must contain the call to the builting creating the thread *)
   | Kstmt stmt ->
@@ -375,7 +375,7 @@ let standalone_thread th kf initial_state =
       Results.(in_cvalue_state initial_state |> eval_var vi |> as_cvalue)
     in
     let args = List.map eval_arg formals in
-    let stack = Callstack.init kf in
+    let stack = Callstack.init ~thread:(Thread.id th) ~entry_point:kf in
     basic_thread th stack kf initial_state args None
 
 let main_thread k_main initial_state =
@@ -421,8 +421,8 @@ let hook_thread_creation analysis state : hook_sig = function
     let params = List.map snd (trunc_params (formals, params)) in
     let eva_thread =
       let name = Concurrency.Name.of_cvalue name in
-      let aloc = current_loc analysis in
-      Thread.spawn aloc name kf params
+      let pos = current_position analysis in
+      Thread.spawn pos name kf params
     in
     ignore (spawn_thread analysis eva_thread analysis.curr_stack kf
               Cvalue.Model.bottom params (Some analysis.curr_thread));
@@ -559,10 +559,10 @@ let hook_queue_init analysis state : hook_sig = function
   | [_, name; _, size] ->
     let prefix = "During queue initialization" in
     let conv v = catch_conversion analysis ~prefix v in
-    let aloc = current_loc analysis
+    let pos = current_position analysis
     and name = Concurrency.Name.of_cvalue name
     and size = conv (Mt_memory.extract_int size) "invalid size" in
-    let q = Mqueue.create aloc name in
+    let q = Mqueue.create pos name in
     analysis.all_queues <- Mqueue.Set.add q analysis.all_queues;
     let state = QueueOp.check_and_write analysis state q QueueOp.initialize in
     let size = if size < 0 then None else Some size in
@@ -711,9 +711,9 @@ let aux_mutex ~operation:op ~event analysis state : hook_sig = function
 
 let hook_init_mutex analysis state : hook_sig = function
   | [_, name] ->
-    let aloc = current_loc analysis
+    let pos = current_position analysis
     and name = Concurrency.Name.of_cvalue name in
-    let mutex = Mutex.create aloc name in
+    let mutex = Mutex.create pos name in
     analysis.all_mutexes <- Mutex.Set.add mutex analysis.all_mutexes;
     let state = MutexOp.check_and_write analysis state mutex MutexOp.initialize in
     result analysis "Initializing mutex %a" Mutex.pretty mutex;

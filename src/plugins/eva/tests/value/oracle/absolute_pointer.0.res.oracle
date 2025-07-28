@@ -15,7 +15,7 @@
 [eva:alarm] absolute_pointer.c:14: Warning: 
   out of bounds write. assert \valid(tmp);
                        (tmp from f())
-[kernel] absolute_pointer.c:14: Warning: 
+[eva] absolute_pointer.c:14: Warning: 
   all target addresses were invalid. This path is assumed to be dead.
 [eva] Recording results for crash
 [eva] Done for function crash

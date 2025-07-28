@@ -61,10 +61,10 @@ module type Minimal = sig
 
   (** Transfer functions. *)
 
-  val assign: kinstr -> lval -> exp -> t -> t or_bottom
-  val assume: stmt -> exp -> bool -> t -> t or_bottom
-  val start_call: stmt -> simple_call -> t -> t
-  val finalize_call: stmt -> simple_call -> pre:t -> post:t -> t or_bottom
+  val assign: pos:Position.t -> lval -> exp -> t -> t or_bottom
+  val assume: pos:Position.t -> exp -> bool -> t -> t or_bottom
+  val start_call: pos:Position.local -> simple_call -> t -> t
+  val finalize_call: pos:Position.local -> simple_call -> pre:t -> post:t -> t or_bottom
 
   (** Initialization of variables. *)
 
@@ -121,16 +121,18 @@ module type Simple_Cvalue = sig
   (** Transfer functions. *)
 
   val assign:
-    kinstr -> Precise_locs.precise_location left_value -> exp ->
+    pos:Position.t -> Precise_locs.precise_location left_value -> exp ->
     (precise_loc, cvalue) assigned -> cvalue_valuation -> t -> t or_bottom
 
-  val assume: stmt -> exp -> bool -> cvalue_valuation -> t -> t or_bottom
+  val assume: pos:Position.t -> exp -> bool -> cvalue_valuation -> t -> t or_bottom
 
   val start_call:
-    stmt -> (precise_loc, cvalue) call -> cvalue_valuation -> t -> t
+    pos:Position.local -> (precise_loc, cvalue) call -> cvalue_valuation ->
+    t -> t
 
   val finalize_call:
-    stmt -> (precise_loc, cvalue) call ->  pre:t -> post:t -> t or_bottom
+    pos:Position.local -> (precise_loc, cvalue) call ->  pre:t -> post:t ->
+    t or_bottom
 
   (** Initialization of variables. *)
 

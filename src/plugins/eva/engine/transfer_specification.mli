@@ -29,11 +29,11 @@ module Make
   : sig
 
     val treat_statement_assigns:
-      stmt -> assigns -> Engine.Dom.t -> Engine.Dom.t
+      pos:Position.t -> assigns -> Engine.Dom.t -> Engine.Dom.t
 
     val compute_using_specification:
       warn:bool ->
-      kinstr -> (Engine.Loc.location, Engine.Val.t) call -> spec ->
+      (Engine.Loc.location, Engine.Val.t) call -> spec ->
       Engine.Dom.t -> (Partition.key*Engine.Dom.t) list
 
   end

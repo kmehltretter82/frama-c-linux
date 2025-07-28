@@ -107,20 +107,20 @@ struct
   struct
     type t =
       | ByName of Concurrency.Name.t
-      | BySpawnPoint of Analysis_location.Local.t
+      | BySpawnPoint of Position.Local.t
       | ByInterruptHandler of Kernel_function.t
     [@@deriving eq, ord]
 
     let reprs =
       List.map (fun n -> ByName n) Concurrency.Name.reprs @
-      List.map (fun al -> BySpawnPoint al) Analysis_location.Local.reprs @
+      List.map (fun al -> BySpawnPoint al) Position.Local.reprs @
       List.map (fun kf -> ByInterruptHandler kf) Kernel_function.reprs
 
     let hash = function
       | ByName name ->
         Stdlib.Hashtbl.hash(1, Concurrency.Name.hash name)
       | BySpawnPoint al ->
-        Stdlib.Hashtbl.hash(2, Analysis_location.Local.hash al)
+        Stdlib.Hashtbl.hash(2, Position.Local.hash al)
       | ByInterruptHandler kf ->
         Stdlib.Hashtbl.hash(3, Kernel_function.hash kf)
   end
@@ -164,34 +164,34 @@ module Identities = State_builder.Hashtbl (Identity.Hashtbl) (Thread)
 (* The thread state is all the information learned about the threads during
    the analysis *)
 
-module ALSet = Analysis_location.Local.Set
+module PosSet = Position.Local.Set
 
 module Properties =
 struct
   module Prototype =
   struct
-    open Cil_datatype
+    module Varinfo = Cil_datatype.Varinfo
 
     include Datatype.Serializable_undefined
 
     type t = {
       entry_point : Kernel_function.t;
-      spawn_points : ALSet.t;
+      spawn_points : PosSet.t;
       arguments : (Varinfo.t * Cvalue.V.t) list;
     }
 
     let name = "Eva.Thread.Properties"
     let reprs = [{
         entry_point = List.hd Kernel_function.reprs;
-        spawn_points = List.hd ALSet.reprs;
+        spawn_points = List.hd PosSet.reprs;
         arguments = [List.hd Varinfo.reprs, List.hd Cvalue.V.reprs];
       }]
     let pretty fmt properties =
-      let spawn_points = ALSet.elements properties.spawn_points in
+      let spawn_points = PosSet.elements properties.spawn_points in
       let pp_sep fmt () = Format.fprintf fmt ";@ " in
       let pp_var = Varinfo.pretty in
       let pp_val = Cvalue.V.pretty in
-      let pp_al = Analysis_location.Local.pretty in
+      let pp_al = Position.Local.pretty in
       let pp_arg fmt (vi, v) = Format.fprintf fmt "%a: %a" pp_var vi pp_val v in
       Format.fprintf fmt
         "@[<v 2>Entry point  :@ @[<hov>%a@]@]@\n\
@@ -220,21 +220,21 @@ struct
   let create spawn_point entry_point arguments =
     {
       entry_point;
-      spawn_points = ALSet.singleton spawn_point;
+      spawn_points = PosSet.singleton spawn_point;
       arguments = map_arguments entry_point arguments
     }
 
   let main_properties () =
     {
       entry_point = Globals.entry_point () |> fst;
-      spawn_points = ALSet.empty;
+      spawn_points = PosSet.empty;
       arguments = [];
     }
 
   let interrupt_properties kf =
     {
       entry_point = kf;
-      spawn_points = ALSet.empty;
+      spawn_points = PosSet.empty;
       arguments = [];
     }
 
@@ -242,7 +242,7 @@ struct
     assert (Kernel_function.equal entry_point properties.entry_point);
     {
       entry_point;
-      spawn_points = ALSet.add spawn_point properties.spawn_points;
+      spawn_points = PosSet.add spawn_point properties.spawn_points;
       arguments =
         (* Join a thread argument as varinfo * cvalue with a new cvalue *)
         let join_argument (vi, v1) v2 = (vi, Cvalue.V.join v1 v2) in
