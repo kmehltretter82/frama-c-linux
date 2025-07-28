@@ -175,6 +175,9 @@ README* header_spec=.ignore
 
 *.odoc header_spec=.ignore
 
+test_config header_spec=.ignore
+ptests_config header_spec=.ignore
+
 /.gitlab-ci.yml header_spec=.ignore
 /.mailmap header_spec=.ignore
 /.ocp-indent header_spec=.ignore
@@ -190,8 +193,12 @@ README* header_spec=.ignore
 /doc/LICENSE header_spec=.ignore
 /doc/MakeLaTeXModern header_spec=.ignore
 /doc/developer/dune-workspace.bench header_spec=.ignore
-/doc/developer/examples/**/* header_spec=.ignore
-/doc/developer/tutorial/**/* header_spec=.ignore
+/doc/developer/examples/**/Makefile* header_spec=.ignore
+/doc/developer/examples/**/dune header_spec=.ignore
+/doc/developer/examples/**/dune-project header_spec=.ignore
+/doc/developer/tutorial/**/Makefile* header_spec=.ignore
+/doc/developer/tutorial/**/dune header_spec=.ignore
+/doc/developer/tutorial/**/dune-project header_spec=.ignore
 /doc/qualification/testing header_spec=.ignore
 /doc/periodic-elements.txt header_spec=.ignore
 /doc/eva/watchpoints header_spec=.ignore
