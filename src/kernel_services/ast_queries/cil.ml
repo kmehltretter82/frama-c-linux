@@ -3108,11 +3108,9 @@ let unsignedVersionOf (ik:ikind): ikind =
   | _ -> ik
 
 let frank = function
-  | FFloat -> 1
-  | FDouble -> 2
+  | FFloat  | FFloat32 -> 1
+  | FDouble | FFloat64 -> 2
   | FLongDouble -> 3
-  | FFloat32 -> 4
-  | FFloat64 -> 5
 
 
 (* Convert 2 integer constants to integers with the same type, in preparation
