@@ -236,11 +236,6 @@ a negative value, and choose the smallest rank possible starting from
   is inlined (e.g., the function will contain an inlined version of itself with
   a recursive call inside it). Calls via function pointers are ignored.
 
-\item \texttt{\optiondef{-}{remove-inlined} <f1,...,fn>} removes from the AST
-  functions \texttt{f1,...,fn}, which must have been given to
-  \optionuse{-}{inline-calls}. Note: this option does not check if the given
-  functions were fully inlined.
-
 \item \optiondef{-}{keep-switch} preserves \texttt{switch} statements in the
   source code. Without this option, they are transformed into \texttt{if}
   statements. An experimental plug-in may require this option to be unset
@@ -291,6 +286,11 @@ or a compilation database as in Sect.~\ref{sec:using-json-comp}). In addition,
 since compilers tend to define builtin macros with a varying number of
 underscores as prefix and suffix, \texttt{-UMACRO} will also undefine
 \texttt{\_MACRO}, \texttt{\_\_MACRO}, \texttt{\_\_MACRO\_\_}, etc.
+
+\item \texttt{\optiondef{-}{remove-inlined} <f1,...,fn>} removes from the AST
+  functions \texttt{f1,...,fn}, which must have been given to
+  \optionuse{-}{inline-calls}. Note: this option does not check if the given
+  functions were fully inlined.
 
 \item \optiondef{-}{simplify-cfg} allows \FramaC to remove break, continue and
   switch statements. This option is automatically set by some plug-ins that

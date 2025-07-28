@@ -289,9 +289,9 @@ let translate_variadics (file : file) =
           when Classify.is_variadic_function vi && is_framac_builtin vi ->
           Kernel.not_yet_implemented
             ~source:(fst exp.eloc)
-            "The variadic plugin doesn't handle calls to a pointer to the \
+            "Option %s doesn't handle calls to a pointer to the \
              variadic builtin %s."
-            vi.vname
+            Kernel.VariadicTranslation.name vi.vname
         | _ -> Cil.DoChildren
       end
   end

@@ -403,8 +403,8 @@ handling of the CWE by \FramaC, as one of the following:
   \CWE{676}: Use of Potentially Dangerous Function & Annotations & Requires annotating which functions are ``potentially dangerous''\\
   \CWE{680}: Integer Overflow to Buffer Overflow & Handled & -\\
   \CWE{681}: Incorrect Conversion Between Numeric Types & Partially Handled & See note about {\em Numerical Conversions}\\
-  \CWE{685}: Function Call With Incorrect Number of Arguments & Partially Handled & The Variadic plugin handles most cases related to variadic function calls\\
-  \CWE{688}: Function Call With Incorrect Variable or Reference as Argument & Partially Handled & Some cases are related to variadic functions (e.g. \texttt{printf}) and detected by the Variadic plugin\\
+  \CWE{685}: Function Call With Incorrect Number of Arguments & Partially Handled & \texttt{-variadic-translation} handles most cases related to variadic function calls\\
+  \CWE{688}: Function Call With Incorrect Variable or Reference as Argument & Partially Handled & Some cases are related to variadic functions (e.g. \texttt{printf}) and detected by \texttt{-variadic-translation}\\
   \CWE{690}: Unchecked Return Value to NULL Pointer Dereference & Handled & For functions related to dynamically allocated memory, toggled via option \texttt{-eva-alloc-returns-null}\\
   \CWE{758}: Undefined Behavior & Partially Handled & The C language has too many undefined behaviors, but Frama-C does handle several of them\\
   \CWE{761}: Free Pointer Not at Start of Buffer & Handled & -\\
