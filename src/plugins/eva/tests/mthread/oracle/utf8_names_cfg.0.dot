@@ -60,7 +60,7 @@ digraph G {
        color="#AAAAAAFF", label="Call a = g(& b);\nwrites a", style="filled", ];
   v102 [URL="code.html#sid492", fillcolor="#CCCCFFFF", shape=box,
         color="#000000FF",
-        label="/*@ assert\n      Eva: pointer_downcast:\n        (unsigned long)(\"\\\"\\360\\220\\215\\205\\\" /0\" + *from) <= 2147483647;\n*/\n__retres = (int)(\"\\\"\\360\\220\\215\\205\\\" /0\" + *from);\nreads b",
+        label="/*@ assert\n      Eva: pointer_downcast:\n        (unsigned long)(&\"\\\"\\360\\220\\215\\205\\\" /0\"[*from]) <= 2147483647;\n*/\n__retres = (int)(& \"\\\"\\360\\220\\215\\205\\\" /0\"[*from]);\nreads b",
         style="filled", ];
   v103 [URL="code.html#sid646", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="return", style="filled", ];
@@ -103,7 +103,7 @@ digraph G {
        color="#AAAAAAFF", label="Call b = g(& a);\nwrites b", style="filled", ];
   v81 [URL="code.html#sid492", fillcolor="#CCCCFFFF", shape=box,
        color="#000000FF",
-       label="/*@ assert\n      Eva: pointer_downcast:\n        (unsigned long)(\"\\\"\\360\\220\\215\\205\\\" /0\" + *from) <= 2147483647;\n*/\n__retres = (int)(\"\\\"\\360\\220\\215\\205\\\" /0\" + *from);\nreads a",
+       label="/*@ assert\n      Eva: pointer_downcast:\n        (unsigned long)(&\"\\\"\\360\\220\\215\\205\\\" /0\"[*from]) <= 2147483647;\n*/\n__retres = (int)(& \"\\\"\\360\\220\\215\\205\\\" /0\"[*from]);\nreads a",
        style="filled", ];
   v82 [URL="code.html#sid646", fillcolor="#FFFFFFFF", shape=box,
        color="#AAAAAAFF", label="return", style="filled", ];
