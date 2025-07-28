@@ -2,8 +2,9 @@
 # HEADER_SPEC: CEA_LGPL #
 #########################
 
-/man/e-acsl-gcc.sh.1 header_spec=CEA_LGPL
-/scripts/e-acsl-gcc.sh.comp header_spec=CEA_LGPL
+/man/e-acsl-gcc.1 header_spec=CEA_LGPL
+/scripts/e-acsl-gcc header_spec=CEA_LGPL
+/scripts/e-acsl-gcc.comp header_spec=CEA_LGPL
 
 ###########################################
 # CHECK-INDENT                            #

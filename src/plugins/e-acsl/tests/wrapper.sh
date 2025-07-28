@@ -5,7 +5,7 @@
 BASEDIR="$(realpath `dirname $0`)"
 
 help() {
-  printf "wrapper.sh - run e-acsl-gcc.sh and the resulting binary to test E-ACSL
+  printf "wrapper.sh - run e-acsl-gcc and the resulting binary to test E-ACSL
 Usage: $0 framac_exe result_dir test_name test_file output_name opts fc_opts filter_cmd
 Args:
   framac_exe    @frama-c-exe@ in test_config
@@ -13,7 +13,7 @@ Args:
   test_name     @PTEST_NAME@ in test_config
   test_file     @PTEST_FILE@ in test_config
   output_name   Output file given to LOG in test_config
-  opts          Options for e-acsl-gcc.sh
+  opts          Options for e-acsl-gcc
   fc_opts       Options for Frama-C
   filter_cmd    Command to filter the output of the resulting binary
 " >&2
@@ -43,7 +43,7 @@ exec_err_log=$result_dir/$test_name.exec_err.log
 output_log=$result_dir/$output_name
 
 # Compile the test file
-e-acsl-gcc.sh -I $framac_exe \
+e-acsl-gcc -I $framac_exe \
   -c $opts \
   --frama-c-extra="$fc_opts" \
   -o $result_dir/$test_name.gcc.c \
@@ -55,7 +55,7 @@ e-acsl-gcc.sh -I $framac_exe \
 # Check compilation return code and exit script in case of error
 if [[ $? -ne 0 ]]; then
   error_code=$?
-  printf "Error while executing e-acsl-gcc.sh\n" > $output_log
+  printf "Error while executing e-acsl-gcc\n" > $output_log
   printf "\nSTDOUT:\n" >> $output_log
   cat $out_log >> $output_log
   printf "\nSTDERR:\n" >> $output_log

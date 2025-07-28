@@ -396,15 +396,15 @@ MIN_TLS=1 # Minimal size of a tracked program TLS
 MIN_THREAD_STACK=4 # Minimal size of a tracked program thread stack
 
 manpage() {
-  printf "e-acsl-gcc.sh - instrument and compile C files with E-ACSL
-Usage: e-acsl-gcc.sh [options] files
+  printf "e-acsl-gcc - instrument and compile C files with E-ACSL
+Usage: e-acsl-gcc [options] files
 Options:
   -h         show this help page
   -c         compile instrumented code
   -C         assume that the input files have already been instrumented
   -l         pass additional options to the linker
              (e.g. -l -lm)
-  -e         pass additional options to the prepreprocessor
+  -e         pass additional options to the prepreprocessor (requires -c)
              (e.g. -e \"-DPI=3.14 -DE_ACSL_DEBUG_ASSERT\")
   -E         pass additional arguments to the Frama-C preprocessor
              (e.g. -E \"-Iinclude -DMACRO=1\")
@@ -421,7 +421,7 @@ Options:
 
 Notes:
   This help page shows only basic options.
-  See man (1) e-acsl-gcc.sh for full up-to-date documentation.\n"
+  See man (1) e-acsl-gcc for full up-to-date documentation.\n"
   exit 1
 }
 
@@ -744,7 +744,7 @@ $zone_help_msg"
             ;;
           esac
         elif [ "${#size_arr[@]}" -eq "1" ] && [ "${size_arr[0]}" == "help" ]; then
-          printf "e-acsl-gcc.sh - $zone_help_msg"
+          printf "e-acsl-gcc - $zone_help_msg"
           exit 1
         else
           error "invalid zone size format: '$size' (expected 'name:number')"

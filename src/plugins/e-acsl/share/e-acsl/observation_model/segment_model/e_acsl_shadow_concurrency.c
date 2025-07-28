@@ -364,9 +364,9 @@ int eacsl_pthread_create(pthread_t *restrict thread,
 #  include "../../internals/e_acsl_private_assert.h"
 
 #  define CONCURRENCY_ABORT_MESSAGE                                            \
-    "Compile with option '--concurrency' of e-acsl-gcc.sh to support "         \
+    "Compile with option '--concurrency' of e-acsl-gcc to support "            \
     "concurrency.\n"                                                           \
-    "When compiling without e-acsl-gcc.sh, E_ACSL_CONCURRENCY_PTHREAD must\n " \
+    "When compiling without e-acsl-gcc, E_ACSL_CONCURRENCY_PTHREAD must\n "    \
     "be defined and the pthread library linked.\n"
 
 void init_thread_shadow_layout(size_t stack_size) {

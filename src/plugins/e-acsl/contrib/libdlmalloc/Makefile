@@ -9,7 +9,7 @@
 EACSL_DLMALLOC_LIB = libeacsl-dlmalloc.a
 EACSL_DLMALLOC_SRC = dlmalloc.c
 EACSL_DLMALLOC_OBJ  = dlmalloc.o
-# Don't forget to update "e-acsl-gcc.sh" if the flags are updated
+# Don't forget to update "e-acsl-gcc" if the flags are updated
 EACSL_DLMALLOC_FLAGS = \
   -DHAVE_MORECORE=0 \
   -DHAVE_MMAP=1  \

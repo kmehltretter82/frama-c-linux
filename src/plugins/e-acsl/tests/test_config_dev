@@ -1,7 +1,7 @@
 NOFRAMAC: only the EXEC command below is useful in this config
 MACRO: EACSL_ERR @PTEST_NAME@.e-acsl.err.log
 
-COMMENT: Default options for `e-acsl-gcc.sh`
+COMMENT: Default options for `e-acsl-gcc`
 MACRO: ROOT_EACSL_GCC_MISC_OPTS -X
 
 COMMENT: Default options for the frama-c invocation
@@ -10,7 +10,7 @@ MACRO: ROOT_EACSL_GCC_FC_EXTRA -verbose 1 -e-acsl-interlang
 COMMENT: Currently compilation assumes an x86_64 architecture
 ENABLED_IF: (= %{architecture} amd64)
 
-COMMENT: e-acsl-gcc.sh is not currently compatible with macos' getopt
+COMMENT: e-acsl-gcc is not currently compatible with macos' getopt
 ENABLED_IF: (<> %{system} macosx)
 
 PLUGIN: e-acsl eva,scope rtegen
@@ -25,7 +25,7 @@ COMMENT: These next macros can be redefined in a test file
 COMMENT: Define the following macro in a test to pass extra options to the frama-c invocation
 MACRO: ROOT_EACSL_GCC_FC_EXTRA_EXT
 
-COMMENT: Define the following macro in a test to pass extra options to `e-acsl-gcc.sh`
+COMMENT: Define the following macro in a test to pass extra options to `e-acsl-gcc`
 MACRO: ROOT_EACSL_GCC_OPTS_EXT
 
 COMMENT: Define the following macro in a test to filter the output of the test execution

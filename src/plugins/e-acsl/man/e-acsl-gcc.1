@@ -9,16 +9,16 @@
 .TH E-ACSL-GCC.SH 1 2016-02-02
 
 .SH NAME
-.B e-acsl-gcc.sh
+.B e-acsl-gcc
 \- instrument and compile C files with E-ACSL
 .SH SYNOPSIS
-.B e-acsl-gcc.sh
+.B e-acsl-gcc
 [
 .I options
 ]
 .I files
 .SH DESCRIPTION
-.B e-acsl-gcc.sh
+.B e-acsl-gcc
 is a convenience wrapper for instrumentation of C programs using the
 \fBE-ACSL\fP \fBFrama-C\fP plugin and their subsequent compilation using
 the GNU compiler collection (\fBGCC\fP).
@@ -272,16 +272,16 @@ instrumentation- or compile-time error
 
 .SH EXAMPLES
 
-.B e-acsl-gcc.sh foo.c
+.B e-acsl-gcc foo.c
 
 instrument foo.c and output the instrumented code to \fIa.out.frama.c\fP.
 
-.B e-acsl-gcc.sh -c -ogen_foo.c -Ofoo foo.c
+.B e-acsl-gcc -c -ogen_foo.c -Ofoo foo.c
 
 instrument \fIfoo.c\fP, output the instrumented code to \fIgen_foo.c\fP and
 compile \fIfoo.c\fP into \fIfoo\fP and \fIgen_foo.c\fP into \fIfoo.e-acsl\fP.
 
-.B e-acsl-gcc.sh --memory-model=bittree -C gen_foo.c
+.B e-acsl-gcc --memory-model=bittree -C gen_foo.c
 
 assume \fIgen_foo.c\fP has been instrumented by \fBE-ACSL\fP and compile it into
 \fIa.out.e-acsl\fP using \fBbittree\fP memory model.

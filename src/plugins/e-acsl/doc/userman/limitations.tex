@@ -56,7 +56,7 @@ actually undefined because the assertion reads the uninitialized variable
 the case yet.
 
 \begin{logs}
-\$ e-acsl-gcc.sh uninitialized.i -c -Omonitored_uninitialized
+\$ e-acsl-gcc uninitialized.i -c -Omonitored_uninitialized
 monitored_uninitialized.i: In function 'main':
 monitored_uninitialized.i:44:16: warning: 'x' is used uninitialized in this function
 [-Wuninitialized]
@@ -99,7 +99,7 @@ Consider the following example.
 
 You can generate the instrumented program as follows.
 \begin{logs}
-\$ e-acsl-gcc.sh -M -omonitored_valid_no_main.i valid_no_main.c
+\$ e-acsl-gcc -M -omonitored_valid_no_main.i valid_no_main.c
 [kernel] Parsing valid_no_main.c (with preprocessing)
 [e-acsl] beginning translation.
 [kernel] Parsing FRAMAC_SHARE/e-acsl/e_acsl.h (with preprocessing)
@@ -130,8 +130,8 @@ While it is possible to add such intrumentation manually we recommend using
 Then just compile and run it as explained in Section~\ref{sec:memory}.
 
 \begin{logs}
-\$ e-acsl-gcc.sh -M -omonitored_modified_main.i modified_main.c
-\$ e-acsl-gcc.sh -C -Ovalid_no_main monitored_modified_main.i monitored_valid_no_main.i
+\$ e-acsl-gcc -M -omonitored_modified_main.i modified_main.c
+\$ e-acsl-gcc -C -Ovalid_no_main monitored_modified_main.i monitored_valid_no_main.i
 \$ ./valid_no_main.e-acsl
 Assertion failed at line 11 in function f.
 The failing predicate is:

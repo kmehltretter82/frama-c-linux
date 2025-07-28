@@ -6,7 +6,7 @@
 #                                                                        #
 ##########################################################################
 
-# Bash completion for e-acsl-gcc.sh
+# Bash completion for e-acsl-gcc
 
 _eacsl_gcc() {
   local cur prev words cwords opts
@@ -46,4 +46,4 @@ _eacsl_gcc() {
     [[ $COMPREPLY == *= ]] && compopt -o nospace
   fi
 } &&
-  complete -F _eacsl_gcc e-acsl-gcc.sh
+  complete -F _eacsl_gcc e-acsl-gcc

@@ -9,5 +9,5 @@
 (install
  (package frama-c-e-acsl)
  (section man)
- (files e-acsl-gcc.sh.1)
+ (files e-acsl-gcc.1)
 )

@@ -40,7 +40,7 @@
  (package frama-c-e-acsl)
  (section bin)
  (files
-  (scripts/e-acsl-gcc.sh as e-acsl-gcc.sh)))
+  (scripts/e-acsl-gcc as e-acsl-gcc)))
 
 (install
  (package frama-c-e-acsl)

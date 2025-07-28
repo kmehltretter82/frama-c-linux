@@ -81,6 +81,10 @@
 | ".*frama-c.top" -> skip match:"#!.*"
 | "frama-c.debug" -> frame open:"#"  line:"#" close:"#"
 | ".*frama-c.debug" -> skip match:"#!.*"
+| "e-acsl-gcc" -> frame open:"#"  line:"#" close:"#"
+| ".*e-acsl-gcc" -> skip match:"#!.*"
+| "e-acsl-gcc.comp" -> frame open:"#"  line:"#" close:"#"
+| ".*e-acsl-gcc.comp" -> skip match:"#!.*"
 
 #############
 # Git hooks #

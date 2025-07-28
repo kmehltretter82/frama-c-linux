@@ -572,7 +572,7 @@
   keywordstyle=\color{frama-c-green}\bfseries,%
   keywordstyle=[2]\color{frama-c-dark-red}\bfseries,%
   classoffset=0,%
-  keywords={e-acsl-gcc.sh,frama-c,frama-c-gui,frama-c-script},%
+  keywords={e-acsl-gcc,frama-c,frama-c-gui,frama-c-script},%
   classoffset=1,%
   morekeywords={-load,-then,-then-last,-then-on,-then-replace,-save},%
   classoffset=0,%
