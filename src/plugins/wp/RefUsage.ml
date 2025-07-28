@@ -573,7 +573,7 @@ let cinit vi init =
   in
   match init with
   | CInit init -> aux (cval vi) E.bot init
-  | StrInit _s -> Wp_parameters.not_yet_implemented "StrInit"
+  | StrInit _s -> e_value (shift (cval vi) E.bot)
 
 let cfun_code env kf = (* Visits term/pred of code annotations and C exp *)
   let update_code_env v = env.global.code <- E.cup env.global.code v in
