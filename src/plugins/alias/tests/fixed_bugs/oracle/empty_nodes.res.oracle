@@ -12,12 +12,10 @@
 [alias] analysing instruction: *x = t;
 [alias] May-aliases after instruction  *x = t;  are  { x; y; z }  { *x; *y; *z; t }
 [alias] May-alias graph after instruction  *x = t;  is
-  0:{ y } → 9:{ t }   5:{ z } → 9:{ t }   8:{ x } → 9:{ t }
-  9:{ t } → 10:{  }
+  0:{ y } → 9:{ t }   5:{ z } → 9:{ t }   8:{ x } → 9:{ t }   9:{ t } → 10:{  }
 [alias] May-aliases at the end of function f: { x; y; z }  { *x; *y; *z; t }
 [alias] May-alias graph at the end of function f:
-  0:{ y } → 9:{ t }   5:{ z } → 9:{ t }   8:{ x } → 9:{ t }
-  9:{ t } → 10:{  }
+  0:{ y } → 9:{ t }   5:{ z } → 9:{ t }   8:{ x } → 9:{ t }   9:{ t } → 10:{  }
 [alias] Summary of function f:
   formals: x→{ t }  y→{ t }  z→{ t }    returns: <none>
   state: { x; y; z }  { *x; *y; *z; t }

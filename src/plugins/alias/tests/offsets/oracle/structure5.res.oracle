@@ -31,18 +31,15 @@
 [alias] analysing instruction: int *a = malloc(sizeof(int));
 [alias] May-aliases after instruction  int *a = malloc(sizeof(int));  are  <none>
 [alias] May-alias graph after instruction  int *a = malloc(sizeof(int));  is
-  0:{ y1 } → 1:{  }   2:{ z } → 3:{  }   4:{ t } → 5:{  }
-  6:{ a } → 7:{  }
+  0:{ y1 } → 1:{  }   2:{ z } → 3:{  }   4:{ t } → 5:{  }   6:{ a } → 7:{  }
 [alias] analysing instruction: *a = 0;
 [alias] May-aliases after instruction  *a = 0;  are  <none>
 [alias] May-alias graph after instruction  *a = 0;  is
-  0:{ y1 } → 1:{  }   2:{ z } → 3:{  }   4:{ t } → 5:{  }
-  6:{ a } → 7:{  }
+  0:{ y1 } → 1:{  }   2:{ z } → 3:{  }   4:{ t } → 5:{  }   6:{ a } → 7:{  }
 [alias] analysing instruction: y1 = & x1;
 [alias] May-aliases after instruction  y1 = & x1;  are  <none>
 [alias] May-alias graph after instruction  y1 = & x1;  is
-  0:{ y1 } → 1:{ x1 }   2:{ z } → 3:{  }   4:{ t } → 5:{  }
-  6:{ a } → 7:{  }
+  0:{ y1 } → 1:{ x1 }   2:{ z } → 3:{  }   4:{ t } → 5:{  }   6:{ a } → 7:{  }
 [alias] analysing instruction: z->s = (struct struct_1_t *)y1;
 [alias] May-aliases after instruction  z->s = (struct struct_1_t *)y1;  are
   { z->s; y1 }

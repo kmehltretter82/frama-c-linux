@@ -59,6 +59,8 @@ val pp_boolean : printer
 val pp_integer : printer
 val pp_real : printer
 
-(* Constants. *)
+(* Others *)
 
 val pp_pi : printer
+
+val pp_right_arrow : printer

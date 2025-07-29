@@ -261,8 +261,8 @@ module Pretty = struct
     Format.fprintf fmt "@[Edges:";
     G.iter_edges_e
       (fun e ->
-         Format.fprintf fmt "@;<3 2>@[%d@ @[%a→@]@ %d@]"
-           (E.src e) E.pretty (E.label e) (E.dst e))
+         Format.fprintf fmt "@;<3 2>@[%d@ @[%a%t@]@ %d@]"
+           (E.src e) E.pretty (E.label e) Unicode.pp_right_arrow (E.dst e))
       s.graph;
     Format.fprintf fmt "@]@;<6>";
     Format.fprintf fmt "@[VarMap:@;<3 2>";
@@ -301,9 +301,10 @@ module Pretty = struct
     let pp_edge e =
       let v1 = E.src e and v2 = E.dst e in
       if !is_first then is_first := false else Format.fprintf fmt "@;<3>";
-      Format.fprintf fmt "@[%a@] %a→ @[%a@]"
+      Format.fprintf fmt "@[%a@] %a%t @[%a@]"
         (pp_node v1) (VMap.find v1 s.vmap)
         E.pretty (E.label e)
+        Unicode.pp_right_arrow
         (pp_node v2) (VMap.find v2 s.vmap)
     in
     let pp_unconnected_vertex v =
@@ -348,7 +349,8 @@ let assert_invariants s : unit =
   in
   G.iter_vertex assert_vertex s.graph;
   let assert_edge v1 v2 =
-    Options.debug ~level:11 "checking coherence of edge %d → %d" v1 v2;
+    Options.debug ~level:11
+      "checking coherence of edge %d %t %d" v1 Unicode.pp_right_arrow v2;
     if v1 = v2 then
       Options.warning ~once:true ~wkey:Options.Warn.incoherent
         "loop on vertex %d (following unsafe cast?); analysis may be unsound" v1;
@@ -636,7 +638,7 @@ let is_included s s' =
   (* tests if s is included in s', at least as the nodes with lval *)
   assert_invariants s;
   assert_invariants s';
-  Options.debug ~level:8 "testing equal %a AND à.%a"
+  Options.debug ~level:8 "testing equal %a AND @.%a"
     Pretty.pp_graph s (pretty ~debug:true) s';
   let exception Not_included in
   try
@@ -802,7 +804,7 @@ module Summary = struct
         Format.fprintf fmt "@[%a" Cil_datatype.Lval.pretty lv;
         let pointees = Readout.points_to_vars lv s in
         if not @@ VarSet.is_empty pointees then
-          Format.fprintf fmt "→%a" VarSet.pretty pointees;
+          Format.fprintf fmt "%t%a" Unicode.pp_right_arrow VarSet.pretty pointees;
         Format.fprintf fmt "@]";
       in
       List.iter pp_elem l

@@ -8,8 +8,8 @@
 [alias] May-aliases after instruction  b = & y;  are
   { *a; x }  { *b; y }  { *(*b); *y }
 [alias] May-alias graph after instruction  b = & y;  is
-  0:{ a } → 1:{ x }   1:{ x } → 2:{  }   6:{ b } → 7:{ y }
-  7:{ y } → 8:{  }   8:{  } → 9:{  }
+  0:{ a } → 1:{ x }   1:{ x } → 2:{  }   6:{ b } → 7:{ y }   7:{ y } → 
+  8:{  }   8:{  } → 9:{  }
 [alias] analysing instruction: y = & z;
 [alias] May-aliases after instruction  y = & z;  are
   { *a; x }  { *b; y }  { *(*b); *y; z }
@@ -20,8 +20,7 @@
 [alias] May-aliases after instruction  *y = x;  are
   { *b; a; y }  { *(*b); *a; *y; x }
 [alias] May-alias graph after instruction  *y = x;  is
-  0:{ a } → 8:{ x }   6:{ b } → 7:{ y }   7:{ y } → 8:{ x }
-  8:{ x } → 9:{  }
+  0:{ a } → 8:{ x }   6:{ b } → 7:{ y }   7:{ y } → 8:{ x }   8:{ x } → 9:{  }
 [alias] analysing instruction: __retres = 0;
 [alias] May-aliases after instruction  __retres = 0;  are
   { *b; a; y }  { *(*b); *a; *y; x; z }

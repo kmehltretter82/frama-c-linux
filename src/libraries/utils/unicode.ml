@@ -62,6 +62,8 @@ let pp_boolean = pretty Utf8_logic.boolean "boolean"
 let pp_integer = pretty Utf8_logic.integer "integer"
 let pp_real =    pretty Utf8_logic.real "real"
 
-(* Constants. *)
+(* Others. *)
 
 let pp_pi = pretty Utf8_logic.pi "\\pi"
+
+let pp_right_arrow = pretty "→" "->"
