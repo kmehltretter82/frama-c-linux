@@ -22,6 +22,10 @@
 
 type printer = Format.formatter -> unit
 
+(* Before OCaml 5.4, an UTF-8 character is seen as several characters, leading
+   pretty-printers to split lines that do not overflow the right margin.
+   To avoid this issue (which caused test oracle changes with OCaml 5.4),
+   we print such characters as if they were of length 1 — which they are. *)
 let pretty utf8 ascii = fun fmt ->
   if Kernel.Unicode.get ()
   then Format.pp_print_as fmt 1 utf8
