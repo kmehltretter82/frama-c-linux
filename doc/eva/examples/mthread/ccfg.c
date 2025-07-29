@@ -1,5 +1,5 @@
-#include "mthread_pthread.h"
-#define NULL ((void*)0)
+#include <pthread.h>
+#include <stddef.h>
 
 pthread_t  jobs[4];
 int x, global1, global2[2];

@@ -1,7 +1,7 @@
 /* This example tests the various way a structure can be named:
    with a pointer, with a string, without any indication */
-#include "mthread_pthread.h"
-#define NULL ((void*)0)
+#include <stddef.h>
+#include <mthread.h>
 #define N 3
 
 int  locks[N];

@@ -1,5 +1,6 @@
-[kernel] Parsing FRAMAC_SHARE/mt/mthread.h (with preprocessing)
-[kernel] Parsing MTSHARE/mthread_pthread.c (with preprocessing)
+[mt] Preparing sources for Mthread with lib pthreads
+[kernel] Parsing FRAMAC_SHARE/mt/mthread.c (with preprocessing)
+[kernel] Parsing FRAMAC_SHARE/mt/mthread_pthread.c (with preprocessing)
 [kernel] Parsing init.c (with preprocessing)
 [mt] Warning: Mthread is an experimental plugin and is still in development.
 [mt] ******* Starting mthread

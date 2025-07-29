@@ -1,5 +1,6 @@
-[kernel] Parsing FRAMAC_SHARE/mt/mthread.h (with preprocessing)
-[kernel] Parsing MTSHARE/mthread_pthread.c (with preprocessing)
+[mt] Preparing sources for Mthread with lib pthreads
+[kernel] Parsing FRAMAC_SHARE/mt/mthread.c (with preprocessing)
+[kernel] Parsing FRAMAC_SHARE/mt/mthread_pthread.c (with preprocessing)
 [kernel] Parsing MTSHARE/mthread_queue.c (with preprocessing)
 [kernel] Parsing philo.c (with preprocessing)
 [mt] Warning: Mthread is an experimental plugin and is still in development.
@@ -30,7 +31,7 @@
 [mt] philo.c:19: Warning: 
   Trying to lock mutex #2, but unable to check its precise status (internal value {0; 1} should be 1).
 [mt] philo.c:19: Lock #2
-[eva] MTSHARE/mthread_pthread.c:42: Warning: Not a valid mutex id '0'.
+[eva] FRAMAC_SHARE/mt/mthread_pthread.c:46: Warning: Not a valid mutex id '0'.
 [mt] philo.c:20: Warning: Trying to lock a possibly uninitialized mutex.
 [mt] philo.c:20: Warning: 
   Trying to lock mutex #2, but it might already be locked (and initialized).
@@ -43,7 +44,7 @@
                                     [1] ∈ UNINITIALIZED
 [mt] philo.c:27: Warning: Trying to unlock a possibly uninitialized mutex.
 [mt] philo.c:27: Release #2
-[eva] MTSHARE/mthread_pthread.c:52: Warning: Not a valid mutex id '0'.
+[eva] FRAMAC_SHARE/mt/mthread_pthread.c:56: Warning: Not a valid mutex id '0'.
 [mt] philo.c:28: Warning: Trying to unlock a possibly uninitialized mutex.
 [mt] philo.c:28: Warning: 
   Trying to unlock mutex #2, but it might already be unlocked (and initialized).
@@ -51,18 +52,18 @@
 [mt] *** Thread jobs[0] computed
 [mt] *** Computing thread #3, iteration 1 (first iteration)
 [mt] philo.c:19: Warning: 
-  During mutex lock: invalid mutex id.Non-integer value: {0; 1; 2} Ignoring.
-[eva] MTSHARE/mthread_pthread.c:42: Warning: Not a valid mutex id '0'.
+  During mutex lock: invalid mutex id. Non-integer value: {0; 1; 2} Ignoring.
+[eva] FRAMAC_SHARE/mt/mthread_pthread.c:46: Warning: Not a valid mutex id '0'.
 [mt] philo.c:20: Warning: 
-  During mutex lock: invalid mutex id.Non-integer value: {0; 1; 2} Ignoring.
+  During mutex lock: invalid mutex id. Non-integer value: {0; 1; 2} Ignoring.
 [mt] philo.c:25: 
   Sending message on queue, content [0] ∈ {1; 3; 4; 5}
                                     [1] ∈ UNINITIALIZED
 [mt] philo.c:27: Warning: 
-  During mutex unlock: invalid mutex id.Non-integer value: {0; 1; 2} Ignoring.
-[eva] MTSHARE/mthread_pthread.c:52: Warning: Not a valid mutex id '0'.
+  During mutex unlock: invalid mutex id. Non-integer value: {0; 1; 2} Ignoring.
+[eva] FRAMAC_SHARE/mt/mthread_pthread.c:56: Warning: Not a valid mutex id '0'.
 [mt] philo.c:28: Warning: 
-  During mutex unlock: invalid mutex id.Non-integer value: {0; 1; 2} Ignoring.
+  During mutex unlock: invalid mutex id. Non-integer value: {0; 1; 2} Ignoring.
 [mt] *** Thread #3 computed
 [mt] ***** Threads computed for iteration 1.
 [mt] ***** Computing shared variables
@@ -118,7 +119,7 @@
 [mt] philo.c:19: Warning: 
   Trying to lock mutex #2, but unable to check its precise status (internal value {0; 1} should be 1).
 [mt] philo.c:19: Lock #2
-[eva] MTSHARE/mthread_pthread.c:42: Warning: Not a valid mutex id '0'.
+[eva] FRAMAC_SHARE/mt/mthread_pthread.c:46: Warning: Not a valid mutex id '0'.
 [mt] philo.c:20: Warning: Trying to lock a possibly uninitialized mutex.
 [mt] philo.c:20: Warning: 
   Trying to lock mutex #2, but it might already be locked (and initialized).
@@ -128,7 +129,7 @@
                                     [1] ∈ UNINITIALIZED
 [mt] philo.c:27: Warning: Trying to unlock a possibly uninitialized mutex.
 [mt] philo.c:27: Release #2
-[eva] MTSHARE/mthread_pthread.c:52: Warning: Not a valid mutex id '0'.
+[eva] FRAMAC_SHARE/mt/mthread_pthread.c:56: Warning: Not a valid mutex id '0'.
 [mt] philo.c:28: Warning: Trying to unlock a possibly uninitialized mutex.
 [mt] philo.c:28: Warning: 
   Trying to unlock mutex #2, but it might already be unlocked (and initialized).
@@ -137,18 +138,18 @@
 [mt] *** Computing thread #3, iteration 3
     (potential shared vars changed, interferences changed)
 [mt] philo.c:19: Warning: 
-  During mutex lock: invalid mutex id.Non-integer value: {0; 1; 2} Ignoring.
-[eva] MTSHARE/mthread_pthread.c:42: Warning: Not a valid mutex id '0'.
+  During mutex lock: invalid mutex id. Non-integer value: {0; 1; 2} Ignoring.
+[eva] FRAMAC_SHARE/mt/mthread_pthread.c:46: Warning: Not a valid mutex id '0'.
 [mt] philo.c:20: Warning: 
-  During mutex lock: invalid mutex id.Non-integer value: {0; 1; 2} Ignoring.
+  During mutex lock: invalid mutex id. Non-integer value: {0; 1; 2} Ignoring.
 [mt] philo.c:25: 
   Sending message on queue, content [0] ∈ {1; 3; 4; 5}
                                     [1] ∈ UNINITIALIZED
 [mt] philo.c:27: Warning: 
-  During mutex unlock: invalid mutex id.Non-integer value: {0; 1; 2} Ignoring.
-[eva] MTSHARE/mthread_pthread.c:52: Warning: Not a valid mutex id '0'.
+  During mutex unlock: invalid mutex id. Non-integer value: {0; 1; 2} Ignoring.
+[eva] FRAMAC_SHARE/mt/mthread_pthread.c:56: Warning: Not a valid mutex id '0'.
 [mt] philo.c:28: Warning: 
-  During mutex unlock: invalid mutex id.Non-integer value: {0; 1; 2} Ignoring.
+  During mutex unlock: invalid mutex id. Non-integer value: {0; 1; 2} Ignoring.
 [mt] *** Thread #3 computed
 [mt] ***** Threads computed for iteration 3.
 [mt] ***** Computing shared variables
@@ -186,7 +187,7 @@
 [mt] philo.c:19: Warning: 
   Trying to lock mutex #2, but unable to check its precise status (internal value {0; 1} should be 1).
 [mt] philo.c:19: Lock #2
-[eva] MTSHARE/mthread_pthread.c:42: Warning: Not a valid mutex id '0'.
+[eva] FRAMAC_SHARE/mt/mthread_pthread.c:46: Warning: Not a valid mutex id '0'.
 [mt] philo.c:20: Warning: Trying to lock a possibly uninitialized mutex.
 [mt] philo.c:20: Warning: 
   Trying to lock mutex #2, but it might already be locked (and initialized).
@@ -196,7 +197,7 @@
                                     [1] ∈ UNINITIALIZED
 [mt] philo.c:27: Warning: Trying to unlock a possibly uninitialized mutex.
 [mt] philo.c:27: Release #2
-[eva] MTSHARE/mthread_pthread.c:52: Warning: Not a valid mutex id '0'.
+[eva] FRAMAC_SHARE/mt/mthread_pthread.c:56: Warning: Not a valid mutex id '0'.
 [mt] philo.c:28: Warning: Trying to unlock a possibly uninitialized mutex.
 [mt] philo.c:28: Warning: 
   Trying to unlock mutex #2, but it might already be unlocked (and initialized).
@@ -204,18 +205,18 @@
 [mt] *** Thread jobs[0] computed
 [mt] *** Computing thread #3, iteration 4 (thread initial memory state changed)
 [mt] philo.c:19: Warning: 
-  During mutex lock: invalid mutex id.Non-integer value: {0; 1; 2} Ignoring.
-[eva] MTSHARE/mthread_pthread.c:42: Warning: Not a valid mutex id '0'.
+  During mutex lock: invalid mutex id. Non-integer value: {0; 1; 2} Ignoring.
+[eva] FRAMAC_SHARE/mt/mthread_pthread.c:46: Warning: Not a valid mutex id '0'.
 [mt] philo.c:20: Warning: 
-  During mutex lock: invalid mutex id.Non-integer value: {0; 1; 2} Ignoring.
+  During mutex lock: invalid mutex id. Non-integer value: {0; 1; 2} Ignoring.
 [mt] philo.c:25: 
   Sending message on queue, content [0] ∈ {1; 3; 4; 5}
                                     [1] ∈ UNINITIALIZED
 [mt] philo.c:27: Warning: 
-  During mutex unlock: invalid mutex id.Non-integer value: {0; 1; 2} Ignoring.
-[eva] MTSHARE/mthread_pthread.c:52: Warning: Not a valid mutex id '0'.
+  During mutex unlock: invalid mutex id. Non-integer value: {0; 1; 2} Ignoring.
+[eva] FRAMAC_SHARE/mt/mthread_pthread.c:56: Warning: Not a valid mutex id '0'.
 [mt] philo.c:28: Warning: 
-  During mutex unlock: invalid mutex id.Non-integer value: {0; 1; 2} Ignoring.
+  During mutex unlock: invalid mutex id. Non-integer value: {0; 1; 2} Ignoring.
 [mt] *** Thread #3 computed
 [mt] ***** Threads computed for iteration 4.
 [mt] ***** Computing shared variables

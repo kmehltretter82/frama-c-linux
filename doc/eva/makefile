@@ -27,6 +27,8 @@ mthread.pdf: ../../VERSION ../../VERSION_CODENAME examples/mthread/**.c
 clean:
 	latexmk -C -bibtex
 	latexmk -C -bibtex mthread/mthread.tex
+	$(MAKE) -C examples/parametrizing clean
+	$(MAKE) -C examples/mthread clean
 
 install:
 	rm -f ../manuals/eva-manual.pdf

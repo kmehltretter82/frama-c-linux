@@ -1,9 +1,9 @@
 /* All-purpose example, implementing a slightly complexified version of the
    dining philosphers problems */
 
-#include "mthread_pthread.h"
+#include <pthread.h>
+#include <stddef.h>
 #include "mthread_queue.h"
-#define NULL ((void*)0)
 #define N 5
 
 
