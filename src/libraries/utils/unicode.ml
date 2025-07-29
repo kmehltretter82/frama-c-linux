@@ -20,17 +20,15 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let inset_string () =
-  if Kernel.Unicode.get () then Utf8_logic.inset else "IN"
+type printer = Format.formatter -> unit
 
-let emptyset_string () =
-  if Kernel.Unicode.get () then Utf8_logic.emptyset else "EMPTY_SET"
+let pretty utf8 ascii = fun fmt ->
+  if Kernel.Unicode.get ()
+  then Format.pp_print_string fmt utf8
+  else Format.pp_print_string fmt ascii
 
-let union_string () =
-  if Kernel.Unicode.get () then Utf8_logic.union else "U"
-
-let top_string () =
-  if Kernel.Unicode.get () then Utf8_logic.top else "TOP"
-
-let bottom_string () =
-  if Kernel.Unicode.get () then Utf8_logic.bottom else "BOTTOM"
+let pp_in_set =    pretty Utf8_logic.inset "IN"
+let pp_empty_set = pretty Utf8_logic.emptyset "EMPTY_SET"
+let pp_union =     pretty Utf8_logic.union "U"
+let pp_top =       pretty Utf8_logic.top "TOP"
+let pp_bottom =    pretty Utf8_logic.bottom "BOTTOM"

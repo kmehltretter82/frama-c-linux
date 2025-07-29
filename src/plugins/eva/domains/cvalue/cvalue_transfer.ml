@@ -238,7 +238,7 @@ let show_expr valuation state fmt expr =
     in
     let offsm = Eval_op.offsetmap_of_loc loc state in
     Bottom.pretty (Eval_op.pretty_offsetmap lval.typ) fmt offsm
-  | _ -> Format.fprintf fmt "%s" (Unicode.top_string ())
+  | _ -> Unicode.pp_top fmt
 
 
 (* ----------------- Export assumption functions -------------------------- *)

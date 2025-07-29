@@ -33,7 +33,7 @@ let pretty_bounds invariant fmt i =
   Format.fprintf fmt "@[<h>[%a .. %a]@]" Rational.pretty l Rational.pretty u
 
 let pretty_invariant order fmt = function
-  | None -> Format.fprintf fmt "%s" (Unicode.top_string ())
+  | None -> Unicode.pp_top fmt
   | Some invariant ->
     let pp f i = pretty_bounds invariant f i in
     let pp f i = Format.fprintf f "@[<h>* %d : %a@]@," (Finite.to_int i) pp i in

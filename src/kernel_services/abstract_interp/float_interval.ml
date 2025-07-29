@@ -198,7 +198,7 @@ module Make (F: Float_sig.S) = struct
           (fun fmt -> if nan then Format.pp_print_string fmt ";NaN")
       else
         let print_nan fmt nan =
-          if nan then Format.fprintf fmt " %s {NaN}" (Unicode.union_string ())
+          if nan then Format.fprintf fmt " %t {NaN}" Unicode.pp_union
         in
         Format.fprintf fmt "[%a .. %a]%a" F.pretty b F.pretty e print_nan nan
     | FRange.NaN -> Format.fprintf fmt "NaN"

@@ -150,8 +150,9 @@ let pretty fmt s =
   if Array.length s < 10
   then pretty_array fmt s
   else
-    let union = Unicode.union_string () in
-    let sep = Scanf.format_from_string ("@ " ^ union ^ " ") "" in
+    let sep =
+      format_of_string (if Kernel.Unicode.get () then "@ ∪ " else "@ U ")
+    in
     Pretty_utils.pp_iter ~pre:"@[<hov 1>" ~suf:"@]" ~sep
       List.iter pretty_set_or_itv fmt (fuse_intervals s)
 

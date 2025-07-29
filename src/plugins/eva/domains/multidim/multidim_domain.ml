@@ -784,7 +784,7 @@ struct
     | Lval lval | StartOf lval ->
       let oracle = valuation_to_oracle state valuation in
       begin match Location.of_lval oracle lval with
-        | `Top -> Format.fprintf fmt "%s" (Unicode.top_string ())
+        | `Top -> Unicode.pp_top fmt
         | `Value loc ->
           let m = extract ~oracle state loc in
           Bottom.pretty Memory.pretty fmt m

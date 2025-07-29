@@ -22,10 +22,10 @@
 
 (** Handling unicode string. *)
 
-val inset_string : unit -> string
+type printer = Format.formatter -> unit
 
-val emptyset_string : unit -> string
-
-val top_string: unit -> string
-val bottom_string: unit -> string
-val union_string: unit -> string
+val pp_in_set : printer
+val pp_empty_set : printer
+val pp_top : printer
+val pp_bottom : printer
+val pp_union : printer

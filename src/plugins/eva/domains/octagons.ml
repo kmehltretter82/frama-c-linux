@@ -261,9 +261,9 @@ type octagon =
 let _pretty_octagon fmt octagon =
   let x, y = Pair.get octagon.variables in
   let op = match octagon.operation with Add -> "+" | Sub -> "-" in
-  Format.fprintf fmt "%a %s %a %s %a"
+  Format.fprintf fmt "%a %s %a %t %a"
     Variable.pretty x op Variable.pretty y
-    (Unicode.inset_string ()) Ival.pretty octagon.value
+    Unicode.pp_in_set Ival.pretty octagon.value
 
 (* An environment associates a term v ± c, where v is a variable and
    c an integer limited to an interval, to some well chosen expressions. A
@@ -628,9 +628,9 @@ module Octagons = struct
       let pretty_one op ival =
         if not Ival.(equal top ival)
         then
-          Format.fprintf fmt "@[@[%a %s %a@] %s @[%a@]@]@,"
+          Format.fprintf fmt "@[@[%a %s %a@] %t @[%a@]@]@,"
             Variable.pretty x op Variable.pretty y
-            (Unicode.inset_string ()) Ival.pretty ival
+            Unicode.pp_in_set Ival.pretty ival
       in
       pretty_one "+" diamond.add;
       pretty_one "-" diamond.sub

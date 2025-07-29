@@ -36,11 +36,8 @@ module Common = struct
 
   (* Pretty-printing *)
 
-  let pretty_top fmt =
-    Format.pp_print_string fmt (Unicode.top_string ())
-
-  let pretty_bottom fmt =
-    Format.pp_print_string fmt (Unicode.bottom_string ())
+  let pretty_top = Unicode.pp_top
+  let pretty_bottom = Unicode.pp_bottom
 
   let pretty pretty_value fmt = function
     | `Bottom -> pretty_bottom fmt

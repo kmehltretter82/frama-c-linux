@@ -207,7 +207,7 @@ let pretty_offsetmap typ fmt offsm =
   (* YYY: catch pointers to arrays, and print the contents of the array *)
   Format.fprintf fmt "@[";
   if Cvalue.V_Offsetmap.(equal empty offsm)
-  then Format.fprintf fmt "%s" (Unicode.emptyset_string ())
+  then Unicode.pp_empty_set fmt
   else begin
     match Cvalue.V_Offsetmap.single_interval_value offsm with
     | Some value -> Cvalue.V_Or_Uninitialized.pretty_typ (Some typ) fmt value;

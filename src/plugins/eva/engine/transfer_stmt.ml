@@ -565,7 +565,7 @@ module Make (Engine: Engine_sig.S) = struct
       let pp fmt  =
         match fst (Eval.evaluate ~subdivnb state expr) with
         | `Bottom ->
-          Format.fprintf fmt "%s" (Unicode.bottom_string ())
+          Unicode.pp_bottom fmt
         | `Value (valuation, _v) ->
           show_expr (Eval.to_domain_valuation valuation) state fmt expr
       in
@@ -580,7 +580,7 @@ module Make (Engine: Engine_sig.S) = struct
   let show_offsm =
     match get_cvalue, Location.get Main_locations.PLoc.key with
     | None, _ | _, None ->
-      fun fmt _ _ _ -> Format.fprintf fmt "%s" (Unicode.top_string ())
+      fun fmt _ _ _ -> Unicode.pp_top fmt
     | Some get_cvalue, Some get_ploc ->
       fun fmt subdivnb lval state ->
         try
@@ -591,12 +591,12 @@ module Make (Engine: Engine_sig.S) = struct
           in
           (Bottom.pretty (Eval_op.pretty_offsetmap lval.typ)) fmt offsm
         with Abstract_interp.Error_Top ->
-          Format.fprintf fmt "%s" (Unicode.top_string ())
+          Unicode.pp_top fmt
 
   (* For scalar expressions, prints the cvalue component of their values. *)
   let show_value =
     match Value.get Main_values.CVal.key with
-    | None -> fun fmt _ _ _ -> Format.fprintf fmt "%s" (Unicode.top_string ())
+    | None -> fun fmt _ _ _ -> Unicode.pp_top fmt
     | Some get_cval ->
       fun fmt subdivnb expr state ->
         let value =

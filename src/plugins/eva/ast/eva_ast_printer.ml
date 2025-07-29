@@ -139,7 +139,7 @@ and pp_binop fmt b =
 
 and pp_constant fmt = function
   | CTopInt _ ->
-    Format.fprintf fmt "%s" (Unicode.top_string ())
+    Unicode.pp_top fmt
   | CInt64 (_, _, Some s) ->
     Format.fprintf fmt "%s" s
   | CInt64 (i, _, None) ->
