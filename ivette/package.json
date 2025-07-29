@@ -104,7 +104,7 @@
   "build": {
     "appId": "com.framac.ivette",
     "compression": "store",
-    "copyright": "Copyright © 2007-2025 Frama-C. All Rights Reserved.",
+    "copyright": "Copyright © CEA (Commissariat à l'énergie atomique et aux énergies alternatives)",
     "artifactName": "${productName}-${arch}.${ext}",
     "win": {
       "target": [
