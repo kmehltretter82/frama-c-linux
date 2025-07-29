@@ -9,12 +9,10 @@
 [eva:alarm] dangling.i:15: Warning: assertion got status unknown.
 [eva] dangling.i:16: assertion got status valid.
 [eva:alarm] dangling.i:19: Warning: 
-  accessing left-value that contains escaping addresses.
-  assert ¬\dangling(&x);
+  accessing left-value that contains escaping addresses. assert ¬\dangling(&x);
 [eva:alarm] dangling.i:23: Warning: assertion got status unknown.
 [eva:alarm] dangling.i:24: Warning: 
-  accessing left-value that contains escaping addresses.
-  assert ¬\dangling(&x);
+  accessing left-value that contains escaping addresses. assert ¬\dangling(&x);
 [eva:locals-escaping] dangling.i:31: Warning: 
   locals {z} escaping the scope of a block of main through p
 [eva] dangling.i:33: assertion got status valid.

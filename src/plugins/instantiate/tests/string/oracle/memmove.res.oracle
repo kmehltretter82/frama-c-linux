@@ -134,8 +134,7 @@ void pointers(int *src[10], int *dest[10])
         \let __fc_len = len / 40;
         ∀ ℤ j0;
           0 ≤ j0 < __fc_len ⇒
-          (∀ ℤ j1;
-             0 ≤ j1 < 10 ⇒ (*(dest + j0))[j1] ≡ (*(src + j0))[j1]);
+          (∀ ℤ j1; 0 ≤ j1 < 10 ⇒ (*(dest + j0))[j1] ≡ (*(src + j0))[j1]);
     ensures result: \result ≡ dest;
     assigns (*(dest + (0 .. len / 40 - 1)))[0 .. 10 - 1], \result;
     assigns (*(dest + (0 .. len / 40 - 1)))[0 .. 10 - 1]
@@ -205,8 +204,7 @@ struct incomplete;
     ensures
       moved:
         \let __fc_len = \old(len) / 4;
-        ∀ ℤ j0;
-          0 ≤ j0 < __fc_len ⇒ *(\old(dest) + j0) ≡ *(\old(src) + j0);
+        ∀ ℤ j0; 0 ≤ j0 < __fc_len ⇒ *(\old(dest) + j0) ≡ *(\old(src) + j0);
     ensures result: \result ≡ \old(dest);
     assigns *(dest + (0 .. len / 4 - 1)), \result;
     assigns *(dest + (0 .. len / 4 - 1)) \from *(src + (0 .. len / 4 - 1));
@@ -247,8 +245,7 @@ void with_named(named src[10], named dest[10])
     ensures
       moved:
         \let __fc_len = \old(len) / 8;
-        ∀ ℤ j0;
-          0 ≤ j0 < __fc_len ⇒ *(\old(dest) + j0) ≡ *(\old(src) + j0);
+        ∀ ℤ j0; 0 ≤ j0 < __fc_len ⇒ *(\old(dest) + j0) ≡ *(\old(src) + j0);
     ensures result: \result ≡ \old(dest);
     assigns *(dest + (0 .. len / 8 - 1)), \result;
     assigns *(dest + (0 .. len / 8 - 1)) \from *(src + (0 .. len / 8 - 1));
@@ -283,8 +280,7 @@ void structure(struct X src[10], struct X dest[10])
     ensures
       moved:
         \let __fc_len = \old(len) / 8;
-        ∀ ℤ j0;
-          0 ≤ j0 < __fc_len ⇒ *(\old(dest) + j0) ≡ *(\old(src) + j0);
+        ∀ ℤ j0; 0 ≤ j0 < __fc_len ⇒ *(\old(dest) + j0) ≡ *(\old(src) + j0);
     ensures result: \result ≡ \old(dest);
     assigns *(dest + (0 .. len / 8 - 1)), \result;
     assigns *(dest + (0 .. len / 8 - 1)) \from *(src + (0 .. len / 8 - 1));
@@ -321,8 +317,7 @@ void pointers(int *src[10], int *dest[10])
         ∀ ℤ j0;
           0 ≤ j0 < __fc_len ⇒
           (∀ ℤ j1;
-             0 ≤ j1 < 10 ⇒
-             (*(\old(dest) + j0))[j1] ≡ (*(\old(src) + j0))[j1]);
+             0 ≤ j1 < 10 ⇒ (*(\old(dest) + j0))[j1] ≡ (*(\old(src) + j0))[j1]);
     ensures result: \result ≡ \old(dest);
     assigns (*(dest + (0 .. len / 40 - 1)))[0 .. 10 - 1], \result;
     assigns (*(dest + (0 .. len / 40 - 1)))[0 .. 10 - 1]

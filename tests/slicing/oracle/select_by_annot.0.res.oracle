@@ -432,14 +432,13 @@ main_slice_1:
   /* <[--d], [---]> */
   if (d > 0) {
     /*@ assert b ≡ 0; */ /* <[---], [---]> */
-                           ;
+                         ;
     /* <[--d], [---]> */
     a = 1;
   }
   /*@ \slicing::slice_preserve_expr a + b; */ /* <[ S ], [---]> */
                                               ;
-  /*@ assert
-      Eva: signed_overflow: (int)((int)(a + b) + c) + d ≤ 2147483647;
+  /*@ assert Eva: signed_overflow: (int)((int)(a + b) + c) + d ≤ 2147483647;
   */
   /* <[---], [---]> */
   /* <[---], [---]> */ int x = ((a + b) + c) + d;
@@ -564,14 +563,13 @@ main_slice_1:
   /* <[--d], [---]> */
   if (d > 0) {
     /*@ assert b ≡ 0; */ /* <[---], [---]> */
-                           ;
+                         ;
     /* <[--d], [---]> */
     a = 1;
   }
   /*@ \slicing::slice_preserve_expr a + b; */ /* <[ S ], [---]> */
                                               ;
-  /*@ assert
-      Eva: signed_overflow: (int)((int)(a + b) + c) + d ≤ 2147483647;
+  /*@ assert Eva: signed_overflow: (int)((int)(a + b) + c) + d ≤ 2147483647;
   */
   /* <[---], [---]> */
   /* <[---], [---]> */ int x = ((a + b) + c) + d;

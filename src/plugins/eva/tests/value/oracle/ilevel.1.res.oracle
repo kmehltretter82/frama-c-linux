@@ -41,9 +41,8 @@
   s2 ∈ {40; 41; 42} or UNINITIALIZED
   s1 ∈ {-101; 12; 17; 25; 53; 64; 72; 81; 99; 303; 404} or UNINITIALIZED
   x ∈
-   {-101} ∪ [-25..-15] ∪ [0..10]
-    ∪ {12; 17; 25; 40; 41; 42; 53; 64; 72; 81} ∪ [99..127] ∪ [129..200]
-    ∪ {303; 404} or UNINITIALIZED
+   {-101} ∪ [-25..-15] ∪ [0..10] ∪ {12; 17; 25; 40; 41; 42; 53; 64; 72; 81}
+    ∪ [99..127] ∪ [129..200] ∪ {303; 404} or UNINITIALIZED
 [from] Computing for function large_ilevel
 [from] Computing for function Frama_C_interval <-large_ilevel
 [from] Done for function Frama_C_interval

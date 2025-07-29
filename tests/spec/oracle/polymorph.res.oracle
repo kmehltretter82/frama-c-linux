@@ -34,9 +34,7 @@
  */
 /*@ predicate bli(foo<ℝ>  x) = g(x, x) ≡ 42;
  */
-/*@
-predicate blu2<a, b>(foo<a>  x, foo<b>  y) =
-  g(x, x) ≡ 36 ∧ g(y, y) ≡ 72;
+/*@ predicate blu2<a, b>(foo<a>  x, foo<b>  y) = g(x, x) ≡ 36 ∧ g(y, y) ≡ 72;
  */
 /*@ predicate bar(foo<ℝ>  x) = bli(x) ∧ blu2(x, x);
  */

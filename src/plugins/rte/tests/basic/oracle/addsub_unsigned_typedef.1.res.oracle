@@ -14,8 +14,7 @@ int main(void)
   uint uy;
   uint uz;
   ux = 0x7FFFFFFFU * (unsigned int)2;
-  /*@ assert
-      rte: unsigned_overflow: 0x80000000U + 0x80000000U ≤ 4294967295;
+  /*@ assert rte: unsigned_overflow: 0x80000000U + 0x80000000U ≤ 4294967295;
   */
   uy = 0x80000000U + 0x80000000U;
   /*@ assert rte: unsigned_overflow: 2U * 0x80000000U ≤ 4294967295; */

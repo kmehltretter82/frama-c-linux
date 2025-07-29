@@ -26,8 +26,7 @@
 [eva:alarm] decl_dpds.c:25: Warning: 
   signed overflow. assert (int)(argc0 + argc1) + G ≤ 2147483647;
 [eva:alarm] decl_dpds.c:25: Warning: 
-  signed overflow.
-  assert -2147483648 ≤ (int)((int)(argc0 + argc1) + G) + S.a;
+  signed overflow. assert -2147483648 ≤ (int)((int)(argc0 + argc1) + G) + S.a;
 [eva:alarm] decl_dpds.c:25: Warning: 
   signed overflow. assert (int)((int)(argc0 + argc1) + G) + S.a ≤ 2147483647;
 [eva] Recording results for main

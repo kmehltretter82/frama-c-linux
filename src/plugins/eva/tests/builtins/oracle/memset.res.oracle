@@ -150,10 +150,8 @@
   q ∈ {{ NULL ; &x }}
   __malloc_w_memset_weak_base_l101[0].i ∈ {0; 421} or UNINITIALIZED
                                   [0].c ∈ {0; 1} or UNINITIALIZED
-                                  [0].[bits 40 to 63] ∈
-                                  {0} or UNINITIALIZED
-                                  [0].ptr ∈
-                                  {{ NULL ; &x }} or UNINITIALIZED
+                                  [0].[bits 40 to 63] ∈ {0} or UNINITIALIZED
+                                  [0].ptr ∈ {{ NULL ; &x }} or UNINITIALIZED
 [eva:final-states] Values at end of function test:
   NULL[rbits 128 to 143] ∈ {66} repeated %8 
       [rbits 144 to 1927] ∈ [--..--]
@@ -319,8 +317,7 @@
                    [bits 8 to ..] ∈ [--..--] or UNINITIALIZED
   __malloc_w_memset_weak_base_l101[0].i ∈ {0; 421} or UNINITIALIZED
                                   [0].c ∈ {0; 1} or UNINITIALIZED
-                                  [0].[bits 40 to 63] ∈
-                                  {0} or UNINITIALIZED
+                                  [0].[bits 40 to 63] ∈ {0} or UNINITIALIZED
                                   [0].ptr ∈
                                   {0} or UNINITIALIZED or ESCAPINGADDR
 [from] ====== DISPLAYING CALLWISE DEPENDENCIES ======

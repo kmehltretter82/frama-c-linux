@@ -768,26 +768,16 @@
                                                 [7] ∈ {7} or UNINITIALIZED
                                                 [8] ∈ {8} or UNINITIALIZED
                                                 [9] ∈ {9} or UNINITIALIZED
-  __realloc_w_test_realloc_multiple_bases_loop_l187[0] ∈
-                                                   {0} or UNINITIALIZED
-                                                   [1] ∈
-                                                   {1} or UNINITIALIZED
-                                                   [2] ∈
-                                                   {2} or UNINITIALIZED
-                                                   [3] ∈
-                                                   {3} or UNINITIALIZED
-                                                   [4] ∈
-                                                   {4} or UNINITIALIZED
-                                                   [5] ∈
-                                                   {5} or UNINITIALIZED
-                                                   [6] ∈
-                                                   {6} or UNINITIALIZED
-                                                   [7] ∈
-                                                   {7} or UNINITIALIZED
-                                                   [8] ∈
-                                                   {8} or UNINITIALIZED
-                                                   [9] ∈
-                                                   {9} or UNINITIALIZED
+  __realloc_w_test_realloc_multiple_bases_loop_l187[0] ∈ {0} or UNINITIALIZED
+                                                   [1] ∈ {1} or UNINITIALIZED
+                                                   [2] ∈ {2} or UNINITIALIZED
+                                                   [3] ∈ {3} or UNINITIALIZED
+                                                   [4] ∈ {4} or UNINITIALIZED
+                                                   [5] ∈ {5} or UNINITIALIZED
+                                                   [6] ∈ {6} or UNINITIALIZED
+                                                   [7] ∈ {7} or UNINITIALIZED
+                                                   [8] ∈ {8} or UNINITIALIZED
+                                                   [9] ∈ {9} or UNINITIALIZED
                                                    [10] ∈
                                                    {10} or UNINITIALIZED
                                                    [11] ∈
@@ -880,8 +870,7 @@
 [eva:final-states] Values at end of function test_imprecise_both:
   __fc_heap_status ∈ [--..--]
   __fc_errno ∈ [--..--]
-  p1 ∈
-    {{ NULL ; (void *)&__malloc_test_imprecise_both_l89 }} or ESCAPINGADDR
+  p1 ∈ {{ NULL ; (void *)&__malloc_test_imprecise_both_l89 }} or ESCAPINGADDR
   s ∈ {0; 2}
   p2 ∈ {{ &__realloc_test_imprecise_both_l91[0] }}
   __realloc_test_imprecise_both_l91[0] ∈ {0} or UNINITIALIZED
@@ -914,8 +903,7 @@
 [eva:final-states] Values at end of function test_maybe_nonnull:
   __fc_heap_status ∈ [--..--]
   __fc_errno ∈ [--..--]
-  p1 ∈
-    {{ NULL ; (void *)&__malloc_test_maybe_nonnull_l57 }} or ESCAPINGADDR
+  p1 ∈ {{ NULL ; (void *)&__malloc_test_maybe_nonnull_l57 }} or ESCAPINGADDR
   p2 ∈ {{ &__realloc_test_maybe_nonnull_l58[0] }}
   __realloc_test_maybe_nonnull_l58[0] ∈ {0}
                                   [1] ∈ {1}
@@ -985,8 +973,7 @@
     {{ &__realloc_test_realloc_multiple_bases2_l166[0] ;
        &__malloc_test_realloc_multiple_bases2_l166[0] }} or ESCAPINGADDR
   p3 ∈ ESCAPINGADDR
-  p4 ∈
-    {{ &__realloc_test_realloc_multiple_bases2_l171[0] }} or ESCAPINGADDR
+  p4 ∈ {{ &__realloc_test_realloc_multiple_bases2_l171[0] }} or ESCAPINGADDR
   p5 ∈ {{ &__malloc_test_realloc_multiple_bases2_l174[0] }} or ESCAPINGADDR
   p6 ∈ {{ &__realloc_test_realloc_multiple_bases2_l177[0] }}
   __malloc_test_realloc_multiple_bases2_l163[0] ∈ {0}
@@ -1030,26 +1017,16 @@
                                                 [7] ∈ {7} or UNINITIALIZED
                                                 [8] ∈ {8} or UNINITIALIZED
                                                 [9] ∈ {9} or UNINITIALIZED
-  __realloc_w_test_realloc_multiple_bases_loop_l187[0] ∈
-                                                   {0} or UNINITIALIZED
-                                                   [1] ∈
-                                                   {1} or UNINITIALIZED
-                                                   [2] ∈
-                                                   {2} or UNINITIALIZED
-                                                   [3] ∈
-                                                   {3} or UNINITIALIZED
-                                                   [4] ∈
-                                                   {4} or UNINITIALIZED
-                                                   [5] ∈
-                                                   {5} or UNINITIALIZED
-                                                   [6] ∈
-                                                   {6} or UNINITIALIZED
-                                                   [7] ∈
-                                                   {7} or UNINITIALIZED
-                                                   [8] ∈
-                                                   {8} or UNINITIALIZED
-                                                   [9] ∈
-                                                   {9} or UNINITIALIZED
+  __realloc_w_test_realloc_multiple_bases_loop_l187[0] ∈ {0} or UNINITIALIZED
+                                                   [1] ∈ {1} or UNINITIALIZED
+                                                   [2] ∈ {2} or UNINITIALIZED
+                                                   [3] ∈ {3} or UNINITIALIZED
+                                                   [4] ∈ {4} or UNINITIALIZED
+                                                   [5] ∈ {5} or UNINITIALIZED
+                                                   [6] ∈ {6} or UNINITIALIZED
+                                                   [7] ∈ {7} or UNINITIALIZED
+                                                   [8] ∈ {8} or UNINITIALIZED
+                                                   [9] ∈ {9} or UNINITIALIZED
                                                    [10] ∈
                                                    {10} or UNINITIALIZED
                                                    [11] ∈
@@ -1235,26 +1212,16 @@
                                                 [7] ∈ {7} or UNINITIALIZED
                                                 [8] ∈ {8} or UNINITIALIZED
                                                 [9] ∈ {9} or UNINITIALIZED
-  __realloc_w_test_realloc_multiple_bases_loop_l187[0] ∈
-                                                   {0} or UNINITIALIZED
-                                                   [1] ∈
-                                                   {1} or UNINITIALIZED
-                                                   [2] ∈
-                                                   {2} or UNINITIALIZED
-                                                   [3] ∈
-                                                   {3} or UNINITIALIZED
-                                                   [4] ∈
-                                                   {4} or UNINITIALIZED
-                                                   [5] ∈
-                                                   {5} or UNINITIALIZED
-                                                   [6] ∈
-                                                   {6} or UNINITIALIZED
-                                                   [7] ∈
-                                                   {7} or UNINITIALIZED
-                                                   [8] ∈
-                                                   {8} or UNINITIALIZED
-                                                   [9] ∈
-                                                   {9} or UNINITIALIZED
+  __realloc_w_test_realloc_multiple_bases_loop_l187[0] ∈ {0} or UNINITIALIZED
+                                                   [1] ∈ {1} or UNINITIALIZED
+                                                   [2] ∈ {2} or UNINITIALIZED
+                                                   [3] ∈ {3} or UNINITIALIZED
+                                                   [4] ∈ {4} or UNINITIALIZED
+                                                   [5] ∈ {5} or UNINITIALIZED
+                                                   [6] ∈ {6} or UNINITIALIZED
+                                                   [7] ∈ {7} or UNINITIALIZED
+                                                   [8] ∈ {8} or UNINITIALIZED
+                                                   [9] ∈ {9} or UNINITIALIZED
                                                    [10] ∈
                                                    {10} or UNINITIALIZED
                                                    [11] ∈

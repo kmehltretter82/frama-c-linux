@@ -271,8 +271,7 @@
   q[bits 0 to 7] ∈ {{ garbled mix of &{a} (origin: Merge {origin.i:106}) }}
    [bits 8 to 15] ∈
    {{ garbled mix of &{a; b} (origin: Merge {origin.i:106}) }}
-   [bits 16 to 31] ∈
-   {{ garbled mix of &{b} (origin: Merge {origin.i:106}) }}
+   [bits 16 to 31] ∈ {{ garbled mix of &{b} (origin: Merge {origin.i:106}) }}
   ta1[0..9] ∈ {0}
   ta2[0..9] ∈
      {{ garbled mix of &{aa2} (origin: Misaligned write {origin.i:21}) }}

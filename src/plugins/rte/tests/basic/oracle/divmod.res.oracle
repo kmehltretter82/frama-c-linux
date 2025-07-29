@@ -10,11 +10,9 @@
   signed_overflow: (int)((int)(-2147483647) - 1) / (int)(-1) ≤ 2147483647;
 [rte] divmod.c:16: Warning: guaranteed RTE: assert division_by_zero: 0 ≢ 0;
 [rte] divmod.c:17: Warning: 
-  guaranteed RTE:
-  assert division_by_zero: (unsigned int)(0xffffffff + 1) ≢ 0;
+  guaranteed RTE: assert division_by_zero: (unsigned int)(0xffffffff + 1) ≢ 0;
 [rte] divmod.c:24: Warning: 
-  guaranteed RTE:
-  assert division_by_zero: (unsigned int)(0xffffffff + 1) ≢ 0;
+  guaranteed RTE: assert division_by_zero: (unsigned int)(0xffffffff + 1) ≢ 0;
 [rte] divmod.c:25: Warning: 
   guaranteed RTE:
   assert

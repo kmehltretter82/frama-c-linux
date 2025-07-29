@@ -151,7 +151,7 @@ let pretty fmt s =
   then pretty_array fmt s
   else
     let sep =
-      format_of_string (if Kernel.Unicode.get () then "@ ∪ " else "@ U ")
+      format_of_string (if Kernel.Unicode.get () then "@ @<1>∪ " else "@ U ")
     in
     Pretty_utils.pp_iter ~pre:"@[<hov 1>" ~suf:"@]" ~sep
       List.iter pretty_set_or_itv fmt (fuse_intervals s)

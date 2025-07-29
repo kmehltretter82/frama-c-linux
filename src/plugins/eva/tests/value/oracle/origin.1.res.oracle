@@ -92,8 +92,7 @@
    .t[1] ∈ {{ garbled mix of &{x} (origin: Arithmetic {origin.i:130}) }}
   q1[bits 0 to 15]# ∈ {{ (? *)&y }}%32, bits 16 to 31 
     [bits 16 to 31] ∈ {0}
-  q2[bits 0 to 7] ∈
-    {{ garbled mix of &{y} (origin: Merge {origin.i:129}) }}
+  q2[bits 0 to 7] ∈ {{ garbled mix of &{y} (origin: Merge {origin.i:129}) }}
     [bits 8 to 15]# ∈ {{ NULL ; (? *)&y }}%32, bits 24 to 31 
     [bits 16 to 31] ∈ {0}
 [from] Computing for function origin

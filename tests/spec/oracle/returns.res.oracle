@@ -30,8 +30,7 @@ int g(int *a)
   if (*a < 0) {
     *a = - *a;
     __retres = -1;
-    /*@ assert \at(*a < 0,__sid_13_label) ⇒ \at(*a,__sid_13_label) ≡ -*a;
-     */
+    /*@ assert \at(*a < 0,__sid_13_label) ⇒ \at(*a,__sid_13_label) ≡ -*a; */
     ;
     goto return_label;
   }

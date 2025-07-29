@@ -101,8 +101,7 @@ int G1 = 0;
 */
 /*@ requires G1 > 0;
     ensures G1 > \old(G1);
-    ensures ∀ ℤ LV2; LV2 ≡ LV2;
- */
+    ensures ∀ ℤ LV2; LV2 ≡ LV2; */
 int F1(void)
 {
   int V2;

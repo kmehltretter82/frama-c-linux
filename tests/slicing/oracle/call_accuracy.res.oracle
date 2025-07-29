@@ -140,11 +140,9 @@
 [eva:alarm] call_accuracy.i:49: Warning: 
   signed overflow. assert (int)(b + s1.b) + s3.b ≤ 2147483647;
 [eva:alarm] call_accuracy.i:49: Warning: 
-  signed overflow.
-  assert -2147483648 ≤ (int)((int)(b + s1.b) + s3.b) + tab[1];
+  signed overflow. assert -2147483648 ≤ (int)((int)(b + s1.b) + s3.b) + tab[1];
 [eva:alarm] call_accuracy.i:49: Warning: 
-  signed overflow.
-  assert (int)((int)(b + s1.b) + s3.b) + tab[1] ≤ 2147483647;
+  signed overflow. assert (int)((int)(b + s1.b) + s3.b) + tab[1] ≤ 2147483647;
 [eva:alarm] call_accuracy.i:49: Warning: 
   signed overflow.
   assert -2147483648 ≤ (int)((int)((int)(b + s1.b) + s3.b) + tab[1]) + S1.b;

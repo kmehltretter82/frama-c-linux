@@ -100,9 +100,8 @@ enum aorai_OpStatusList {
 
 /*@ ghost
   /@ requires
-       1 ≡ aorai_intermediate_state ∧
-       0 ≡ aorai_intermediate_state_0 ∧ 0 ≡ final ∧
-       0 ≡ first_step ∧ 0 ≡ init;
+       1 ≡ aorai_intermediate_state ∧ 0 ≡ aorai_intermediate_state_0 ∧
+       0 ≡ final ∧ 0 ≡ first_step ∧ 0 ≡ init;
      ensures aorai_CurOpStatus ≡ aorai_Terminated;
      ensures aorai_CurOperation ≡ op_f;
      assigns aorai_CurOpStatus, aorai_CurOperation, aorai_intermediate_state,
@@ -187,8 +186,8 @@ enum aorai_OpStatusList {
     
     behavior Buchi_property_behavior:
       ensures
-        0 ≡ aorai_intermediate_state ∧
-        0 ≡ aorai_intermediate_state_0 ∧ 0 ≡ final ∧ 0 ≡ init;
+        0 ≡ aorai_intermediate_state ∧ 0 ≡ aorai_intermediate_state_0 ∧
+        0 ≡ final ∧ 0 ≡ init;
       ensures 1 ≡ first_step;
  */
 void f(void)
@@ -199,8 +198,7 @@ void f(void)
 }
 
 /*@ requires 1 ≡ first_step ∨ 0 ≡ first_step;
-    requires
-      1 ≡ aorai_intermediate_state_0 ∨ 0 ≡ aorai_intermediate_state_0;
+    requires 1 ≡ aorai_intermediate_state_0 ∨ 0 ≡ aorai_intermediate_state_0;
     
     behavior Buchi_behavior_in_0:
       assumes 1 ≡ aorai_intermediate_state_0;
@@ -236,17 +234,14 @@ void g(void)
   /*@ loop invariant Aorai: 0 ≡ aorai_intermediate_state;
       loop invariant
         Aorai:
-          1 ≡ aorai_intermediate_state_0 ∨
-          0 ≡ aorai_intermediate_state_0;
+          1 ≡ aorai_intermediate_state_0 ∨ 0 ≡ aorai_intermediate_state_0;
       loop invariant Aorai: 0 ≡ final;
       loop invariant Aorai: 1 ≡ first_step ∨ 0 ≡ first_step;
       loop invariant Aorai: 0 ≡ init;
-      loop invariant
-        Aorai: 1 ≡ aorai_intermediate_state_0 ∨ 1 ≡ first_step;
+      loop invariant Aorai: 1 ≡ aorai_intermediate_state_0 ∨ 1 ≡ first_step;
       loop invariant
         Aorai:
-          aorai_Loop_Init_4 ≢ 0 ⇒
-          \at(0 ≡ first_step,Pre) ⇒ 0 ≡ first_step;
+          aorai_Loop_Init_4 ≢ 0 ⇒ \at(0 ≡ first_step,Pre) ⇒ 0 ≡ first_step;
       loop invariant
         Aorai:
           aorai_Loop_Init_4 ≢ 0 ⇒
@@ -353,9 +348,8 @@ void g(void)
 
 /*@ ghost
   /@ requires
-       1 ≡ aorai_intermediate_state_0 ∧
-       0 ≡ aorai_intermediate_state ∧ 0 ≡ final ∧
-       0 ≡ first_step ∧ 0 ≡ init;
+       1 ≡ aorai_intermediate_state_0 ∧ 0 ≡ aorai_intermediate_state ∧
+       0 ≡ final ∧ 0 ≡ first_step ∧ 0 ≡ init;
      ensures aorai_CurOpStatus ≡ aorai_Terminated;
      ensures aorai_CurOperation ≡ op_h;
      assigns aorai_CurOpStatus, aorai_CurOperation, aorai_intermediate_state,
@@ -439,8 +433,8 @@ void g(void)
     
     behavior Buchi_property_behavior:
       ensures
-        0 ≡ aorai_intermediate_state ∧
-        0 ≡ aorai_intermediate_state_0 ∧ 0 ≡ first_step ∧ 0 ≡ init;
+        0 ≡ aorai_intermediate_state ∧ 0 ≡ aorai_intermediate_state_0 ∧
+        0 ≡ first_step ∧ 0 ≡ init;
       ensures 1 ≡ final;
  */
 void h(void)
@@ -454,8 +448,8 @@ void h(void)
 
 /*@ behavior Buchi_property_behavior:
       ensures
-        0 ≡ aorai_intermediate_state ∧
-        0 ≡ aorai_intermediate_state_0 ∧ 0 ≡ first_step ∧ 0 ≡ init;
+        0 ≡ aorai_intermediate_state ∧ 0 ≡ aorai_intermediate_state_0 ∧
+        0 ≡ first_step ∧ 0 ≡ init;
       ensures 1 ≡ final;
  */
 int main(void)

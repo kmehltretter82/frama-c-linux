@@ -1,14 +1,12 @@
 [kernel] Parsing addsub.c (with preprocessing)
 [rte:annot] annotating function main
 [rte] addsub.c:9: Warning: 
-  guaranteed RTE:
-  assert signed_overflow: 0x7fffffff + 0x7fffffff ≤ 2147483647;
+  guaranteed RTE: assert signed_overflow: 0x7fffffff + 0x7fffffff ≤ 2147483647;
 [rte] addsub.c:10: Warning: 
   guaranteed RTE:
   assert signed_overflow: -2147483648 ≤ (int)(-0x7fffffff) - 0x7fffffff;
 [rte] addsub.c:11: Warning: 
-  guaranteed RTE:
-  assert signed_overflow: -2147483647 ≤ (int)(-0x7fffffff) - 1;
+  guaranteed RTE: assert signed_overflow: -2147483647 ≤ (int)(-0x7fffffff) - 1;
 [rte] addsub.c:11: Warning: 
   guaranteed RTE:
   assert

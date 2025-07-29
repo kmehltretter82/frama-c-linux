@@ -33,29 +33,28 @@ int g = 0;
 /*@
 check lemma empty_stack_deterministic_trans{L}:
   ¬(\at(aorai_CurOperation,L) ≡ op_push ∧
-     \at(aorai_CurOpStatus,L) ≡ aorai_Called ∧
-     \at(aorai_CurOperation,L) ≡ op_main ∧
-     \at(aorai_CurOpStatus,L) ≡ aorai_Terminated);
+    \at(aorai_CurOpStatus,L) ≡ aorai_Called ∧
+    \at(aorai_CurOperation,L) ≡ op_main ∧
+    \at(aorai_CurOpStatus,L) ≡ aorai_Terminated);
  */
 /*@ ghost enum aorai_States aorai_CurStates = init; */
 /*@ ghost int aorai_n = 0; */
 /*@
 check lemma filled_stack_deterministic_trans{L}:
   ¬(\at(aorai_CurOperation,L) ≡ op_pop ∧
-     \at(aorai_CurOpStatus,L) ≡ aorai_Called ∧ \at(aorai_n,L) > 0 ∧
-     \at(aorai_CurOperation,L) ≡ op_push ∧
-     \at(aorai_CurOpStatus,L) ≡ aorai_Called);
+    \at(aorai_CurOpStatus,L) ≡ aorai_Called ∧ \at(aorai_n,L) > 0 ∧
+    \at(aorai_CurOperation,L) ≡ op_push ∧
+    \at(aorai_CurOpStatus,L) ≡ aorai_Called);
  */
 /*@
 check lemma emptying_stack_deterministic_trans{L}:
   ¬(\at(aorai_CurOperation,L) ≡ op_pop ∧
-     \at(aorai_CurOpStatus,L) ≡ aorai_Terminated ∧
-     \at(aorai_n,L) ≡ 1 ∧ \at(aorai_CurOperation,L) ≡ op_pop ∧
-     \at(aorai_CurOpStatus,L) ≡ aorai_Terminated ∧ \at(aorai_n,L) > 1);
+    \at(aorai_CurOpStatus,L) ≡ aorai_Terminated ∧ \at(aorai_n,L) ≡ 1 ∧
+    \at(aorai_CurOperation,L) ≡ op_pop ∧
+    \at(aorai_CurOpStatus,L) ≡ aorai_Terminated ∧ \at(aorai_n,L) > 1);
  */
 /*@ ghost
-  /@ requires
-       aorai_CurStates ≡ empty_stack ∨ aorai_CurStates ≡ filled_stack;
+  /@ requires aorai_CurStates ≡ empty_stack ∨ aorai_CurStates ≡ filled_stack;
      ensures aorai_CurOpStatus ≡ aorai_Called;
      ensures aorai_CurOperation ≡ op_push;
      assigns aorai_CurOpStatus, aorai_CurOperation, aorai_CurStates;
@@ -169,23 +168,18 @@ check lemma emptying_stack_deterministic_trans{L}:
 
 */
 
-/*@ requires
-      aorai_CurStates ≡ empty_stack ∨ aorai_CurStates ≡ filled_stack;
-    requires
-      aorai_CurStates ≡ filled_stack ∨ aorai_CurStates ≢ filled_stack;
-    requires
-      aorai_CurStates ≡ empty_stack ∨ aorai_CurStates ≢ empty_stack;
+/*@ requires aorai_CurStates ≡ empty_stack ∨ aorai_CurStates ≡ filled_stack;
+    requires aorai_CurStates ≡ filled_stack ∨ aorai_CurStates ≢ filled_stack;
+    requires aorai_CurStates ≡ empty_stack ∨ aorai_CurStates ≢ empty_stack;
     
     behavior Buchi_property_behavior:
       ensures aorai_CurStates ≡ filled_stack;
       ensures
         \at(aorai_CurStates ≡ filled_stack,Pre) ∧
-        aorai_CurStates ≡ filled_stack ⇒
-        aorai_n ≡ \at(aorai_n + 1,Pre) + 0;
+        aorai_CurStates ≡ filled_stack ⇒ aorai_n ≡ \at(aorai_n + 1,Pre) + 0;
       ensures
         \at(aorai_CurStates ≡ empty_stack,Pre) ∧
-        aorai_CurStates ≡ filled_stack ⇒
-        aorai_n ≡ \at(aorai_n + 1,Pre) + 0;
+        aorai_CurStates ≡ filled_stack ⇒ aorai_n ≡ \at(aorai_n + 1,Pre) + 0;
  */
 void push(void)
 {
@@ -251,8 +245,7 @@ void push(void)
 
 /*@ ghost
   /@ requires aorai_CurStates ≡ emptying_stack;
-     requires
-       aorai_CurStates ≡ emptying_stack ⇒ aorai_n > 1 ∨ aorai_n ≡ 1;
+     requires aorai_CurStates ≡ emptying_stack ⇒ aorai_n > 1 ∨ aorai_n ≡ 1;
      ensures aorai_CurOpStatus ≡ aorai_Terminated;
      ensures aorai_CurOperation ≡ op_pop;
      assigns aorai_n, aorai_CurOpStatus, aorai_CurOperation, aorai_CurStates;
@@ -336,16 +329,13 @@ void push(void)
       ensures
         (aorai_CurStates ≡ empty_stack ⇒ aorai_n ≡ 1) ∧
         (aorai_CurStates ≡ filled_stack ⇒ aorai_n > 1);
-      ensures
-        aorai_CurStates ≡ empty_stack ∨ aorai_CurStates ≡ filled_stack;
-      ensures
-        \at(aorai_CurStates ≡ filled_stack,Pre) ∧
-        aorai_CurStates ≡ filled_stack ⇒
-        aorai_n ≡ \at(aorai_n - 1,Pre) + 0;
+      ensures aorai_CurStates ≡ empty_stack ∨ aorai_CurStates ≡ filled_stack;
       ensures
         \at(aorai_CurStates ≡ filled_stack,Pre) ∧
-        aorai_CurStates ≡ empty_stack ⇒
-        aorai_n ≡ \at(aorai_n - 1,Pre) + 0;
+        aorai_CurStates ≡ filled_stack ⇒ aorai_n ≡ \at(aorai_n - 1,Pre) + 0;
+      ensures
+        \at(aorai_CurStates ≡ filled_stack,Pre) ∧
+        aorai_CurStates ≡ empty_stack ⇒ aorai_n ≡ \at(aorai_n - 1,Pre) + 0;
  */
 void pop(void)
 {

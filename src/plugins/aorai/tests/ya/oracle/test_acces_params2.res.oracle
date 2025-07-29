@@ -24,9 +24,7 @@ int rr = 1;
 /*@ ghost int S6 = 0; */
 /*@ ghost int S7 = 0; */
 /*@ ghost
-  /@ requires
-       1 ≡ S2 ∧ 0 ≡ S1 ∧ 0 ≡ S3 ∧ 0 ≡ S4 ∧ 0 ≡ S5 ∧
-       0 ≡ S6 ∧ 0 ≡ S7;
+  /@ requires 1 ≡ S2 ∧ 0 ≡ S1 ∧ 0 ≡ S3 ∧ 0 ≡ S4 ∧ 0 ≡ S5 ∧ 0 ≡ S6 ∧ 0 ≡ S7;
      requires 1 ≡ S2 ⇒ r ≥ 0;
      ensures aorai_CurOpStatus ≡ aorai_Called;
      ensures aorai_CurOperation ≡ op_opa;
@@ -128,9 +126,7 @@ int rr = 1;
 */
 
 /*@ ghost
-  /@ requires
-       1 ≡ S3 ∧ 0 ≡ S1 ∧ 0 ≡ S2 ∧ 0 ≡ S4 ∧ 0 ≡ S5 ∧
-       0 ≡ S6 ∧ 0 ≡ S7;
+  /@ requires 1 ≡ S3 ∧ 0 ≡ S1 ∧ 0 ≡ S2 ∧ 0 ≡ S4 ∧ 0 ≡ S5 ∧ 0 ≡ S6 ∧ 0 ≡ S7;
      requires 1 ≡ S3 ⇒ res ≤ 5000;
      ensures aorai_CurOpStatus ≡ aorai_Terminated;
      ensures aorai_CurOperation ≡ op_opa;
@@ -231,9 +227,7 @@ int rr = 1;
 
 */
 
-/*@ requires
-      1 ≡ S2 ∧ 0 ≡ S1 ∧ 0 ≡ S3 ∧ 0 ≡ S4 ∧ 0 ≡ S5 ∧
-      0 ≡ S6 ∧ 0 ≡ S7;
+/*@ requires 1 ≡ S2 ∧ 0 ≡ S1 ∧ 0 ≡ S3 ∧ 0 ≡ S4 ∧ 0 ≡ S5 ∧ 0 ≡ S6 ∧ 0 ≡ S7;
     requires 1 ≡ S2 ⇒ r ≥ 0;
     requires r < 5000;
     
@@ -242,9 +236,7 @@ int rr = 1;
     
     behavior Buchi_property_behavior:
       ensures 1 ≡ S4 ⇒ \result ≤ 5000;
-      ensures
-        0 ≡ S1 ∧ 0 ≡ S2 ∧ 0 ≡ S3 ∧ 0 ≡ S5 ∧ 0 ≡ S6 ∧
-        0 ≡ S7;
+      ensures 0 ≡ S1 ∧ 0 ≡ S2 ∧ 0 ≡ S3 ∧ 0 ≡ S5 ∧ 0 ≡ S6 ∧ 0 ≡ S7;
       ensures 1 ≡ S4;
  */
 int opa(int r)
@@ -257,9 +249,7 @@ int opa(int r)
 }
 
 /*@ ghost
-  /@ requires
-       1 ≡ S4 ∧ 0 ≡ S1 ∧ 0 ≡ S2 ∧ 0 ≡ S3 ∧ 0 ≡ S5 ∧
-       0 ≡ S6 ∧ 0 ≡ S7;
+  /@ requires 1 ≡ S4 ∧ 0 ≡ S1 ∧ 0 ≡ S2 ∧ 0 ≡ S3 ∧ 0 ≡ S5 ∧ 0 ≡ S6 ∧ 0 ≡ S7;
      ensures aorai_CurOpStatus ≡ aorai_Called;
      ensures aorai_CurOperation ≡ op_opb;
      assigns aorai_CurOpStatus, aorai_CurOperation, S1, S2, S3, S4, S5, S6,
@@ -358,9 +348,7 @@ int opa(int r)
 */
 
 /*@ ghost
-  /@ requires
-       1 ≡ S5 ∧ 0 ≡ S1 ∧ 0 ≡ S2 ∧ 0 ≡ S3 ∧ 0 ≡ S4 ∧
-       0 ≡ S6 ∧ 0 ≡ S7;
+  /@ requires 1 ≡ S5 ∧ 0 ≡ S1 ∧ 0 ≡ S2 ∧ 0 ≡ S3 ∧ 0 ≡ S4 ∧ 0 ≡ S6 ∧ 0 ≡ S7;
      ensures aorai_CurOpStatus ≡ aorai_Terminated;
      ensures aorai_CurOperation ≡ op_opb;
      assigns aorai_CurOpStatus, aorai_CurOperation, S1, S2, S3, S4, S5, S6,
@@ -458,18 +446,14 @@ int opa(int r)
 
 */
 
-/*@ requires
-      1 ≡ S4 ∧ 0 ≡ S1 ∧ 0 ≡ S2 ∧ 0 ≡ S3 ∧ 0 ≡ S5 ∧
-      0 ≡ S6 ∧ 0 ≡ S7;
+/*@ requires 1 ≡ S4 ∧ 0 ≡ S1 ∧ 0 ≡ S2 ∧ 0 ≡ S3 ∧ 0 ≡ S5 ∧ 0 ≡ S6 ∧ 0 ≡ S7;
     requires rr ≥ 1 ∧ rr ≤ 5000;
     
     behavior f:
       ensures rr ≥ 3 ∧ rr ≤ 5000;
     
     behavior Buchi_property_behavior:
-      ensures
-        0 ≡ S1 ∧ 0 ≡ S2 ∧ 0 ≡ S3 ∧ 0 ≡ S4 ∧ 0 ≡ S5 ∧
-        0 ≡ S7;
+      ensures 0 ≡ S1 ∧ 0 ≡ S2 ∧ 0 ≡ S3 ∧ 0 ≡ S4 ∧ 0 ≡ S5 ∧ 0 ≡ S7;
       ensures 1 ≡ S6;
  */
 void opb(void)
@@ -703,9 +687,7 @@ void opc(void)
 }
 
 /*@ ghost
-  /@ requires
-       1 ≡ S1 ∧ 0 ≡ S2 ∧ 0 ≡ S3 ∧ 0 ≡ S4 ∧ 0 ≡ S5 ∧
-       0 ≡ S6 ∧ 0 ≡ S7;
+  /@ requires 1 ≡ S1 ∧ 0 ≡ S2 ∧ 0 ≡ S3 ∧ 0 ≡ S4 ∧ 0 ≡ S5 ∧ 0 ≡ S6 ∧ 0 ≡ S7;
      ensures aorai_CurOpStatus ≡ aorai_Called;
      ensures aorai_CurOperation ≡ op_main;
      assigns aorai_CurOpStatus, aorai_CurOperation, S1, S2, S3, S4, S5, S6,
@@ -804,9 +786,7 @@ void opc(void)
 */
 
 /*@ ghost
-  /@ requires
-       1 ≡ S6 ∧ 0 ≡ S1 ∧ 0 ≡ S2 ∧ 0 ≡ S3 ∧ 0 ≡ S4 ∧
-       0 ≡ S5 ∧ 0 ≡ S7;
+  /@ requires 1 ≡ S6 ∧ 0 ≡ S1 ∧ 0 ≡ S2 ∧ 0 ≡ S3 ∧ 0 ≡ S4 ∧ 0 ≡ S5 ∧ 0 ≡ S7;
      ensures aorai_CurOpStatus ≡ aorai_Terminated;
      ensures aorai_CurOperation ≡ op_main;
      assigns aorai_CurOpStatus, aorai_CurOperation, S1, S2, S3, S4, S5, S6,
@@ -904,15 +884,11 @@ void opc(void)
 
 */
 
-/*@ requires
-      1 ≡ S1 ∧ 0 ≡ S2 ∧ 0 ≡ S3 ∧ 0 ≡ S4 ∧ 0 ≡ S5 ∧
-      0 ≡ S6 ∧ 0 ≡ S7;
+/*@ requires 1 ≡ S1 ∧ 0 ≡ S2 ∧ 0 ≡ S3 ∧ 0 ≡ S4 ∧ 0 ≡ S5 ∧ 0 ≡ S6 ∧ 0 ≡ S7;
     requires rr ≡ 1;
     
     behavior Buchi_property_behavior:
-      ensures
-        0 ≡ S1 ∧ 0 ≡ S2 ∧ 0 ≡ S3 ∧ 0 ≡ S4 ∧ 0 ≡ S5 ∧
-        0 ≡ S6;
+      ensures 0 ≡ S1 ∧ 0 ≡ S2 ∧ 0 ≡ S3 ∧ 0 ≡ S4 ∧ 0 ≡ S5 ∧ 0 ≡ S6;
       ensures 1 ≡ S7;
  */
 int main(void)

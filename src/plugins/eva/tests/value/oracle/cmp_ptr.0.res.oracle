@@ -56,9 +56,8 @@
   assert (unsigned int)tmp_0 ≤ 2147483647;
   (tmp_0 from u?& f:& g)
 [eva:alarm] cmp_ptr.i:28: Warning: 
-  signed overflow.
-  assert -2147483648 ≤ 1 + (int)tmp_0;
-  (tmp_0 from u?& f:& g)
+  signed overflow. assert -2147483648 ≤ 1 + (int)tmp_0;
+                   (tmp_0 from u?& f:& g)
 [eva:alarm] cmp_ptr.i:28: Warning: 
   signed overflow. assert 1 + (int)tmp_0 ≤ 2147483647;
                    (tmp_0 from u?& f:& g)

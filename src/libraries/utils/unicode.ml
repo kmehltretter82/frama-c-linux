@@ -24,7 +24,7 @@ type printer = Format.formatter -> unit
 
 let pretty utf8 ascii = fun fmt ->
   if Kernel.Unicode.get ()
-  then Format.pp_print_string fmt utf8
+  then Format.pp_print_as fmt 1 utf8
   else Format.pp_print_string fmt ascii
 
 (* Set operations. *)

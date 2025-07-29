@@ -15,8 +15,7 @@
 [eva] alloc-vla.c:6: Call to builtin __fc_vla_free
 [eva:malloc] alloc-vla.c:6: strong free on bases: {__malloc_f_l6}
 [eva:alarm] alloc-vla.c:8: Warning: 
-  accessing left-value that contains escaping addresses.
-  assert ¬\dangling(&a);
+  accessing left-value that contains escaping addresses. assert ¬\dangling(&a);
 [eva] Recording results for f
 [eva] Done for function f
 [eva] Recording results for main

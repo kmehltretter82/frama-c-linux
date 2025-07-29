@@ -82,8 +82,7 @@ double main1(void)
         */
         a[i] = v;
         /*@ assert
-            Eva_export:
-              0.0000000000000000e+00d ≤ s ≤ 1.9000000000000000e+03d;
+            Eva_export: 0.0000000000000000e+00d ≤ s ≤ 1.9000000000000000e+03d;
         */
         /*@ assert
             Eva_export:
@@ -101,9 +100,7 @@ double main1(void)
   return s;
 }
 
-/*@ ensures
-      (\is_finite(\result) ∧ 0.0 ≤ \result ≤ 100.0) ∨
-      \is_NaN(\result);
+/*@ ensures (\is_finite(\result) ∧ 0.0 ≤ \result ≤ 100.0) ∨ \is_NaN(\result);
     assigns \result, world;
     assigns \result \from world;
     assigns world \from world;

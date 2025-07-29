@@ -18,9 +18,7 @@ axiomatic Permut {
   axiom permut_exchange{L1, L2}:
     ∀ double t1[], double t2[], ℤ i, ℤ j, ℤ n;
       \at(t1[i],L1) ≡ \at(t2[j],L2) ∧ \at(t1[j],L1) ≡ \at(t2[i],L2) ∧
-      (∀ ℤ k;
-         0 ≤ k < n ∧ k ≢ i ∧ k ≢ j ⇒
-         \at(t1[k],L1) ≡ \at(t2[k],L2)) ⇒
+      (∀ ℤ k; 0 ≤ k < n ∧ k ≢ i ∧ k ≢ j ⇒ \at(t1[k],L1) ≡ \at(t2[k],L2)) ⇒
       permut{L1, L2}(t1, t2, n);
   
 }

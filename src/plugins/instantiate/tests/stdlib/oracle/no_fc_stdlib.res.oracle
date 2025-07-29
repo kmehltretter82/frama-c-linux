@@ -56,11 +56,9 @@ void free_int(int *ptr)
       assumes allocable: is_allocable(num * size);
       ensures fresh_result: \fresh{Old, Here}(\result,num * size);
       ensures
-        zero_initialization:
-          ∀ ℤ j0; 0 ≤ j0 < num ⇒ *(\result + j0) ≡ 0;
+        zero_initialization: ∀ ℤ j0; 0 ≤ j0 < num ⇒ *(\result + j0) ≡ 0;
       ensures
-        initialization:
-          ∀ ℤ j0; 0 ≤ j0 < num ⇒ \initialized(\result + j0);
+        initialization: ∀ ℤ j0; 0 ≤ j0 < num ⇒ \initialized(\result + j0);
       assigns \result, __fc_heap_status;
       assigns \result \from __fc_heap_status, num, size;
       assigns __fc_heap_status \from __fc_heap_status, num, size;
@@ -183,8 +181,7 @@ void free_int(int *ptr)
       ensures
         fresh_result: \fresh{Old, Here}(\result,\old(num) * \old(size));
       ensures
-        zero_initialization:
-          ∀ ℤ j0; 0 ≤ j0 < \old(num) ⇒ *(\result + j0) ≡ 0;
+        zero_initialization: ∀ ℤ j0; 0 ≤ j0 < \old(num) ⇒ *(\result + j0) ≡ 0;
       ensures
         initialization:
           ∀ ℤ j0; 0 ≤ j0 < \old(num) ⇒ \initialized(\result + j0);

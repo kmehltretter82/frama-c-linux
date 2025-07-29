@@ -42,20 +42,15 @@ int x = 0;
        ensures 0 ≡ init;
      
      behavior buch_state_last_in:
-       assumes
-         (1 ≡ step1 ∧ x ≡ 4) ∨ (1 ≡ last ∧ x ≢ 4 ∧ x ≢ 3);
+       assumes (1 ≡ step1 ∧ x ≡ 4) ∨ (1 ≡ last ∧ x ≢ 4 ∧ x ≢ 3);
        ensures 1 ≡ last;
      
      behavior buch_state_last_out:
-       assumes
-         (0 ≡ step1 ∨ ¬(x ≡ 4)) ∧
-         (0 ≡ last ∨ ¬(x ≢ 4 ∧ x ≢ 3));
+       assumes (0 ≡ step1 ∨ ¬(x ≡ 4)) ∧ (0 ≡ last ∨ ¬(x ≢ 4 ∧ x ≢ 3));
        ensures 0 ≡ last;
      
      behavior buch_state_step1_in:
-       assumes
-         (1 ≡ step1 ∧ x ≢ 4) ∨ (1 ≡ last ∧ x ≡ 3) ∨
-         (1 ≡ init ∧ x ≡ 3);
+       assumes (1 ≡ step1 ∧ x ≢ 4) ∨ (1 ≡ last ∧ x ≡ 3) ∨ (1 ≡ init ∧ x ≡ 3);
        ensures 1 ≡ step1;
      
      behavior buch_state_step1_out:
@@ -146,20 +141,15 @@ int x = 0;
        ensures 0 ≡ init;
      
      behavior buch_state_last_in:
-       assumes
-         (1 ≡ step1 ∧ x ≡ 4) ∨ (1 ≡ last ∧ x ≢ 4 ∧ x ≢ 3);
+       assumes (1 ≡ step1 ∧ x ≡ 4) ∨ (1 ≡ last ∧ x ≢ 4 ∧ x ≢ 3);
        ensures 1 ≡ last;
      
      behavior buch_state_last_out:
-       assumes
-         (0 ≡ step1 ∨ ¬(x ≡ 4)) ∧
-         (0 ≡ last ∨ ¬(x ≢ 4 ∧ x ≢ 3));
+       assumes (0 ≡ step1 ∨ ¬(x ≡ 4)) ∧ (0 ≡ last ∨ ¬(x ≢ 4 ∧ x ≢ 3));
        ensures 0 ≡ last;
      
      behavior buch_state_step1_in:
-       assumes
-         (1 ≡ step1 ∧ x ≢ 4) ∨ (1 ≡ last ∧ x ≡ 3) ∨
-         (1 ≡ init ∧ x ≡ 3);
+       assumes (1 ≡ step1 ∧ x ≢ 4) ∨ (1 ≡ last ∧ x ≡ 3) ∨ (1 ≡ init ∧ x ≡ 3);
        ensures 1 ≡ step1;
      
      behavior buch_state_step1_out:
@@ -233,19 +223,16 @@ int x = 0;
     behavior Buchi_behavior_in_0:
       assumes (1 ≡ last ∧ x ≡ 4) ∨ (1 ≡ init ∧ x ≢ 3);
       ensures
-        (1 ≡ init ⇒ x ≡ 4 ∨ x ≢ 3) ∧
-        (1 ≡ last ⇒ x ≡ 4 ∨ (x ≢ 4 ∧ x ≢ 3)) ∧
+        (1 ≡ init ⇒ x ≡ 4 ∨ x ≢ 3) ∧ (1 ≡ last ⇒ x ≡ 4 ∨ (x ≢ 4 ∧ x ≢ 3)) ∧
         (1 ≡ step1 ⇒ x ≢ 4 ∨ x ≡ 3);
       ensures 1 ≡ init ∨ 0 ≡ init;
       ensures 1 ≡ step1 ∨ 0 ≡ step1;
       ensures 1 ≡ init ∨ 1 ≡ step1;
     
     behavior Buchi_behavior_in_1:
-      assumes
-        (1 ≡ step1 ∧ x ≡ 4) ∨ (1 ≡ last ∧ x ≢ 4 ∧ x ≢ 3);
+      assumes (1 ≡ step1 ∧ x ≡ 4) ∨ (1 ≡ last ∧ x ≢ 4 ∧ x ≢ 3);
       ensures
-        (1 ≡ init ⇒ x ≡ 4 ∨ x ≢ 3) ∧
-        (1 ≡ last ⇒ x ≡ 4 ∨ (x ≢ 4 ∧ x ≢ 3)) ∧
+        (1 ≡ init ⇒ x ≡ 4 ∨ x ≢ 3) ∧ (1 ≡ last ⇒ x ≡ 4 ∨ (x ≢ 4 ∧ x ≢ 3)) ∧
         (1 ≡ step1 ⇒ x ≢ 4 ∨ x ≡ 3);
       ensures 1 ≡ init ∨ 0 ≡ init;
       ensures 1 ≡ last ∨ 0 ≡ last;
@@ -253,12 +240,9 @@ int x = 0;
       ensures 1 ≡ init ∨ 1 ≡ last ∨ 1 ≡ step1;
     
     behavior Buchi_behavior_in_2:
-      assumes
-        (1 ≡ step1 ∧ x ≢ 4) ∨ (1 ≡ last ∧ x ≡ 3) ∨
-        (1 ≡ init ∧ x ≡ 3);
+      assumes (1 ≡ step1 ∧ x ≢ 4) ∨ (1 ≡ last ∧ x ≡ 3) ∨ (1 ≡ init ∧ x ≡ 3);
       ensures
-        (1 ≡ init ⇒ x ≡ 4 ∨ x ≢ 3) ∧
-        (1 ≡ last ⇒ x ≡ 4 ∨ (x ≢ 4 ∧ x ≢ 3)) ∧
+        (1 ≡ init ⇒ x ≡ 4 ∨ x ≢ 3) ∧ (1 ≡ last ⇒ x ≡ 4 ∨ (x ≢ 4 ∧ x ≢ 3)) ∧
         (1 ≡ step1 ⇒ x ≢ 4 ∨ x ≡ 3);
       ensures 1 ≡ last ∨ 0 ≡ last;
       ensures 1 ≡ step1 ∨ 0 ≡ step1;
@@ -266,14 +250,12 @@ int x = 0;
     
     behavior Buchi_behavior_out_0:
       assumes
-        (0 ≡ last ∨ (x ≡ 3 ∧ x ≢ 4)) ∧
-        (0 ≡ step1 ∨ x ≢ 4) ∧ (0 ≡ init ∨ x ≡ 3);
+        (0 ≡ last ∨ (x ≡ 3 ∧ x ≢ 4)) ∧ (0 ≡ step1 ∨ x ≢ 4) ∧
+        (0 ≡ init ∨ x ≡ 3);
       ensures 0 ≡ init;
     
     behavior Buchi_behavior_out_1:
-      assumes
-        0 ≡ step1 ∧ (0 ≡ init ∨ x ≢ 3) ∧
-        (0 ≡ last ∨ (x ≢ 3 ∧ x ≡ 4));
+      assumes 0 ≡ step1 ∧ (0 ≡ init ∨ x ≢ 3) ∧ (0 ≡ last ∨ (x ≢ 3 ∧ x ≡ 4));
       ensures 0 ≡ last;
     
     behavior Buchi_behavior_out_2:
@@ -314,20 +296,15 @@ void f(void)
        ensures 0 ≡ init;
      
      behavior buch_state_last_in:
-       assumes
-         (1 ≡ step1 ∧ x ≡ 4) ∨ (1 ≡ last ∧ x ≢ 4 ∧ x ≢ 3);
+       assumes (1 ≡ step1 ∧ x ≡ 4) ∨ (1 ≡ last ∧ x ≢ 4 ∧ x ≢ 3);
        ensures 1 ≡ last;
      
      behavior buch_state_last_out:
-       assumes
-         (0 ≡ step1 ∨ ¬(x ≡ 4)) ∧
-         (0 ≡ last ∨ ¬(x ≢ 4 ∧ x ≢ 3));
+       assumes (0 ≡ step1 ∨ ¬(x ≡ 4)) ∧ (0 ≡ last ∨ ¬(x ≢ 4 ∧ x ≢ 3));
        ensures 0 ≡ last;
      
      behavior buch_state_step1_in:
-       assumes
-         (1 ≡ step1 ∧ x ≢ 4) ∨ (1 ≡ last ∧ x ≡ 3) ∨
-         (1 ≡ init ∧ x ≡ 3);
+       assumes (1 ≡ step1 ∧ x ≢ 4) ∨ (1 ≡ last ∧ x ≡ 3) ∨ (1 ≡ init ∧ x ≡ 3);
        ensures 1 ≡ step1;
      
      behavior buch_state_step1_out:
@@ -418,20 +395,15 @@ void f(void)
        ensures 0 ≡ init;
      
      behavior buch_state_last_in:
-       assumes
-         (1 ≡ step1 ∧ x ≡ 4) ∨ (1 ≡ last ∧ x ≢ 4 ∧ x ≢ 3);
+       assumes (1 ≡ step1 ∧ x ≡ 4) ∨ (1 ≡ last ∧ x ≢ 4 ∧ x ≢ 3);
        ensures 1 ≡ last;
      
      behavior buch_state_last_out:
-       assumes
-         (0 ≡ step1 ∨ ¬(x ≡ 4)) ∧
-         (0 ≡ last ∨ ¬(x ≢ 4 ∧ x ≢ 3));
+       assumes (0 ≡ step1 ∨ ¬(x ≡ 4)) ∧ (0 ≡ last ∨ ¬(x ≢ 4 ∧ x ≢ 3));
        ensures 0 ≡ last;
      
      behavior buch_state_step1_in:
-       assumes
-         (1 ≡ step1 ∧ x ≢ 4) ∨ (1 ≡ last ∧ x ≡ 3) ∨
-         (1 ≡ init ∧ x ≡ 3);
+       assumes (1 ≡ step1 ∧ x ≢ 4) ∨ (1 ≡ last ∧ x ≡ 3) ∨ (1 ≡ init ∧ x ≡ 3);
        ensures 1 ≡ step1;
      
      behavior buch_state_step1_out:
@@ -505,19 +477,16 @@ void f(void)
     behavior Buchi_behavior_in_0:
       assumes (1 ≡ last ∧ x ≡ 4) ∨ (1 ≡ init ∧ x ≢ 3);
       ensures
-        (1 ≡ init ⇒ x ≡ 4 ∨ x ≢ 3) ∧
-        (1 ≡ last ⇒ x ≡ 4 ∨ (x ≢ 4 ∧ x ≢ 3)) ∧
+        (1 ≡ init ⇒ x ≡ 4 ∨ x ≢ 3) ∧ (1 ≡ last ⇒ x ≡ 4 ∨ (x ≢ 4 ∧ x ≢ 3)) ∧
         (1 ≡ step1 ⇒ x ≢ 4 ∨ x ≡ 3);
       ensures 1 ≡ init ∨ 0 ≡ init;
       ensures 1 ≡ step1 ∨ 0 ≡ step1;
       ensures 1 ≡ init ∨ 1 ≡ step1;
     
     behavior Buchi_behavior_in_1:
-      assumes
-        (1 ≡ step1 ∧ x ≡ 4) ∨ (1 ≡ last ∧ x ≢ 4 ∧ x ≢ 3);
+      assumes (1 ≡ step1 ∧ x ≡ 4) ∨ (1 ≡ last ∧ x ≢ 4 ∧ x ≢ 3);
       ensures
-        (1 ≡ init ⇒ x ≡ 4 ∨ x ≢ 3) ∧
-        (1 ≡ last ⇒ x ≡ 4 ∨ (x ≢ 4 ∧ x ≢ 3)) ∧
+        (1 ≡ init ⇒ x ≡ 4 ∨ x ≢ 3) ∧ (1 ≡ last ⇒ x ≡ 4 ∨ (x ≢ 4 ∧ x ≢ 3)) ∧
         (1 ≡ step1 ⇒ x ≢ 4 ∨ x ≡ 3);
       ensures 1 ≡ init ∨ 0 ≡ init;
       ensures 1 ≡ last ∨ 0 ≡ last;
@@ -525,12 +494,9 @@ void f(void)
       ensures 1 ≡ init ∨ 1 ≡ last ∨ 1 ≡ step1;
     
     behavior Buchi_behavior_in_2:
-      assumes
-        (1 ≡ step1 ∧ x ≢ 4) ∨ (1 ≡ last ∧ x ≡ 3) ∨
-        (1 ≡ init ∧ x ≡ 3);
+      assumes (1 ≡ step1 ∧ x ≢ 4) ∨ (1 ≡ last ∧ x ≡ 3) ∨ (1 ≡ init ∧ x ≡ 3);
       ensures
-        (1 ≡ init ⇒ x ≡ 4 ∨ x ≢ 3) ∧
-        (1 ≡ last ⇒ x ≡ 4 ∨ (x ≢ 4 ∧ x ≢ 3)) ∧
+        (1 ≡ init ⇒ x ≡ 4 ∨ x ≢ 3) ∧ (1 ≡ last ⇒ x ≡ 4 ∨ (x ≢ 4 ∧ x ≢ 3)) ∧
         (1 ≡ step1 ⇒ x ≢ 4 ∨ x ≡ 3);
       ensures 1 ≡ last ∨ 0 ≡ last;
       ensures 1 ≡ step1 ∨ 0 ≡ step1;
@@ -538,14 +504,12 @@ void f(void)
     
     behavior Buchi_behavior_out_0:
       assumes
-        (0 ≡ last ∨ (x ≡ 3 ∧ x ≢ 4)) ∧
-        (0 ≡ step1 ∨ x ≢ 4) ∧ (0 ≡ init ∨ x ≡ 3);
+        (0 ≡ last ∨ (x ≡ 3 ∧ x ≢ 4)) ∧ (0 ≡ step1 ∨ x ≢ 4) ∧
+        (0 ≡ init ∨ x ≡ 3);
       ensures 0 ≡ init;
     
     behavior Buchi_behavior_out_1:
-      assumes
-        0 ≡ step1 ∧ (0 ≡ init ∨ x ≢ 3) ∧
-        (0 ≡ last ∨ (x ≢ 3 ∧ x ≡ 4));
+      assumes 0 ≡ step1 ∧ (0 ≡ init ∨ x ≢ 3) ∧ (0 ≡ last ∨ (x ≢ 3 ∧ x ≡ 4));
       ensures 0 ≡ last;
     
     behavior Buchi_behavior_out_2:
@@ -648,20 +612,15 @@ void g(void)
        ensures 0 ≡ init;
      
      behavior buch_state_last_in:
-       assumes
-         (1 ≡ step1 ∧ x ≡ 4) ∨ (1 ≡ last ∧ x ≢ 4 ∧ x ≢ 3);
+       assumes (1 ≡ step1 ∧ x ≡ 4) ∨ (1 ≡ last ∧ x ≢ 4 ∧ x ≢ 3);
        ensures 1 ≡ last;
      
      behavior buch_state_last_out:
-       assumes
-         (0 ≡ step1 ∨ ¬(x ≡ 4)) ∧
-         (0 ≡ last ∨ ¬(x ≢ 4 ∧ x ≢ 3));
+       assumes (0 ≡ step1 ∨ ¬(x ≡ 4)) ∧ (0 ≡ last ∨ ¬(x ≢ 4 ∧ x ≢ 3));
        ensures 0 ≡ last;
      
      behavior buch_state_step1_in:
-       assumes
-         (1 ≡ step1 ∧ x ≢ 4) ∨ (1 ≡ last ∧ x ≡ 3) ∨
-         (1 ≡ init ∧ x ≡ 3);
+       assumes (1 ≡ step1 ∧ x ≢ 4) ∨ (1 ≡ last ∧ x ≡ 3) ∨ (1 ≡ init ∧ x ≡ 3);
        ensures 1 ≡ step1;
      
      behavior buch_state_step1_out:
@@ -733,8 +692,7 @@ void g(void)
     
     behavior Buchi_property_behavior:
       ensures
-        (1 ≡ init ⇒ x ≡ 4 ∨ x ≢ 3) ∧
-        (1 ≡ last ⇒ x ≡ 4 ∨ (x ≢ 4 ∧ x ≢ 3)) ∧
+        (1 ≡ init ⇒ x ≡ 4 ∨ x ≢ 3) ∧ (1 ≡ last ⇒ x ≡ 4 ∨ (x ≢ 4 ∧ x ≢ 3)) ∧
         (1 ≡ step1 ⇒ x ≢ 4 ∨ x ≡ 3);
       ensures 1 ≡ init ∨ 0 ≡ init;
       ensures 1 ≡ last ∨ 0 ≡ last;

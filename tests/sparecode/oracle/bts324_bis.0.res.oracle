@@ -45,12 +45,10 @@
   signed overflow. assert vi - f_si[i] ≤ 2147483647;
 [eva:alarm] bts324_bis.i:10: Warning: 
   signed overflow.
-  assert
-  -2147483648 ≤ (int)(f_so[i] / k) + (int)(ki[i] * (int)(vi - f_si[i]));
+  assert -2147483648 ≤ (int)(f_so[i] / k) + (int)(ki[i] * (int)(vi - f_si[i]));
 [eva:alarm] bts324_bis.i:10: Warning: 
   signed overflow.
-  assert
-  (int)(f_so[i] / k) + (int)(ki[i] * (int)(vi - f_si[i])) ≤ 2147483647;
+  assert (int)(f_so[i] / k) + (int)(ki[i] * (int)(vi - f_si[i])) ≤ 2147483647;
 [eva] Recording results for f
 [eva] Done for function f
 [eva] computing for function f <- loop_body <- main.

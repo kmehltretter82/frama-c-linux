@@ -116,20 +116,18 @@ enum aorai_OpStatusList {
 check lemma B_deterministic_trans{L}:
   (∀ float n, float x;
      ¬(\at(aorai_CurOperation,L) ≡ op_square_root_aux ∧
-        \at(aorai_CurOpStatus,L) ≡ aorai_Terminated ∧
-        \at(aorai_CurOperation,L) ≡ op_square_root_aux ∧
-        \at(aorai_CurOpStatus,L) ≡ aorai_Called ∧ x ≥ 1.0f ∧ 
-        x ≤ n)) ∧
+       \at(aorai_CurOpStatus,L) ≡ aorai_Terminated ∧
+       \at(aorai_CurOperation,L) ≡ op_square_root_aux ∧
+       \at(aorai_CurOpStatus,L) ≡ aorai_Called ∧ x ≥ 1.0f ∧ x ≤ n)) ∧
   (∀ float n, float x;
      ¬(\at(aorai_CurOperation,L) ≡ op_square_root ∧
-        \at(aorai_CurOpStatus,L) ≡ aorai_Terminated ∧
-        \at(aorai_CurOperation,L) ≡ op_square_root_aux ∧
-        \at(aorai_CurOpStatus,L) ≡ aorai_Called ∧ x ≥ 1.0f ∧ 
-        x ≤ n)) ∧
+       \at(aorai_CurOpStatus,L) ≡ aorai_Terminated ∧
+       \at(aorai_CurOperation,L) ≡ op_square_root_aux ∧
+       \at(aorai_CurOpStatus,L) ≡ aorai_Called ∧ x ≥ 1.0f ∧ x ≤ n)) ∧
   ¬(\at(aorai_CurOperation,L) ≡ op_square_root ∧
-     \at(aorai_CurOpStatus,L) ≡ aorai_Terminated ∧
-     \at(aorai_CurOperation,L) ≡ op_square_root_aux ∧
-     \at(aorai_CurOpStatus,L) ≡ aorai_Terminated);
+    \at(aorai_CurOpStatus,L) ≡ aorai_Terminated ∧
+    \at(aorai_CurOperation,L) ≡ op_square_root_aux ∧
+    \at(aorai_CurOpStatus,L) ≡ aorai_Terminated);
  */
 /*@ ghost enum aorai_States aorai_CurStates = I; */
 /*@ ghost

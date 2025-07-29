@@ -11,8 +11,7 @@
 [eva:locals-escaping] log_twice.i:12: Warning: 
   locals {x} escaping the scope of f through \result<f>
 [eva:alarm] log_twice.i:13: Warning: 
-  accessing left-value that contains escaping addresses.
-  assert ¬\dangling(&p);
+  accessing left-value that contains escaping addresses. assert ¬\dangling(&p);
 [eva] log_twice.i:13: Warning: 
   all target addresses were invalid. This path is assumed to be dead.
 [eva] Recording results for main
@@ -30,8 +29,7 @@
 [eva:locals-escaping] log_twice.i:12: Warning: 
   locals {x} escaping the scope of f through \result<f>
 [eva:alarm] log_twice.i:13: Warning: 
-  accessing left-value that contains escaping addresses.
-  assert ¬\dangling(&p);
+  accessing left-value that contains escaping addresses. assert ¬\dangling(&p);
 [eva] log_twice.i:13: Warning: 
   all target addresses were invalid. This path is assumed to be dead.
 [eva] Recording results for main

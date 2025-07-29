@@ -40,8 +40,7 @@
 [eva:locals-escaping] summary.i:43: Warning: 
   locals {z} escaping the scope of a block of alarms through p
 [eva:alarm] summary.i:45: Warning: 
-  accessing left-value that contains escaping addresses.
-  assert ¬\dangling(&p);
+  accessing left-value that contains escaping addresses. assert ¬\dangling(&p);
 [eva] Recording results for alarms
 [eva] Done for function alarms
 [eva] computing for function logic <- main.

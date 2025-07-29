@@ -249,8 +249,7 @@
   __retres ∈ [-11..0]
   __malloc_getaddrinfo_l58.ai_flags ∈ {0} or UNINITIALIZED
                           .ai_family ∈ [0..43] or UNINITIALIZED
-                          .ai_socktype ∈
-                          {0; 1; 2; 3; 4; 5} or UNINITIALIZED
+                          .ai_socktype ∈ {0; 1; 2; 3; 4; 5} or UNINITIALIZED
                           .ai_protocol ∈ [0..256] or UNINITIALIZED
                           .ai_addrlen ∈ {16} or UNINITIALIZED
                           .ai_addr ∈
@@ -313,8 +312,7 @@
                           .ai_protocol ∈ [0..256]
                           .ai_addrlen ∈ {16}
                           .ai_addr ∈ {{ &__malloc_getaddrinfo_l60 }}
-                          .ai_canonname ∈
-                          {{ &__malloc_getaddrinfo_l74[0] }}
+                          .ai_canonname ∈ {{ &__malloc_getaddrinfo_l74[0] }}
                           .ai_next ∈ {0}
   __malloc_getaddrinfo_l60.sa_family ∈ [0..43]
                           .sa_data[0..13] ∈ [--..--]

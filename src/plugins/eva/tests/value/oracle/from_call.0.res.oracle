@@ -226,10 +226,8 @@
   T1 ∈ {0}
   T2 ∈ {0}
   tab[0..4] ∈ {0}
-  AR ∈
-    {{ garbled mix of &{AA} (origin: Library function {from_call.i:96}) }}
-  AS ∈
-    {{ garbled mix of &{AA} (origin: Library function {from_call.i:96}) }}
+  AR ∈ {{ garbled mix of &{AA} (origin: Library function {from_call.i:96}) }}
+  AS ∈ {{ garbled mix of &{AA} (origin: Library function {from_call.i:96}) }}
   f_previous ∈ {{ &d }}
 [from] ====== DISPLAYING CALLWISE DEPENDENCIES ======
 [from] call to g at from_call.i:20 (by f):

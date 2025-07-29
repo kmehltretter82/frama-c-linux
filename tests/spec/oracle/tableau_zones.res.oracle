@@ -18,16 +18,13 @@ int main(void)
   int __retres;
   int i;
   i = 0;
-  /*@ loop invariant
-        0 ≤ i ≤ 5 ∧ (∀ int j; 0 ≤ j < i ⇒ t[j] ≡ 0);
-  */
+  /*@ loop invariant 0 ≤ i ≤ 5 ∧ (∀ int j; 0 ≤ j < i ⇒ t[j] ≡ 0); */
   while (i < 5) {
     f(& t[i],0);
     i ++;
   }
   i = 5;
-  /*@ loop invariant
-        5 ≤ i ≤ 10 ∧ (∀ int j; 5 ≤ j < i ⇒ t[j] ≡ 1);
+  /*@ loop invariant 5 ≤ i ≤ 10 ∧ (∀ int j; 5 ≤ j < i ⇒ t[j] ≡ 1);
       loop assigns t[5 .. 9];
   */
   while (i < 10) {

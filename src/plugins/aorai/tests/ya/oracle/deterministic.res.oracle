@@ -42,25 +42,25 @@ int Y;
 check lemma S3_deterministic_trans{L}:
   ∀ int x;
     ¬(\at(aorai_CurOperation,L) ≡ op_g ∧
-       \at(aorai_CurOpStatus,L) ≡ aorai_Called ∧ x ≡ 5 ∧
-       \at(aorai_CurOperation,L) ≡ op_g ∧
-       \at(aorai_CurOpStatus,L) ≡ aorai_Called ∧ x ≡ 4);
+      \at(aorai_CurOpStatus,L) ≡ aorai_Called ∧ x ≡ 5 ∧
+      \at(aorai_CurOperation,L) ≡ op_g ∧
+      \at(aorai_CurOpStatus,L) ≡ aorai_Called ∧ x ≡ 4);
  */
 /*@
 check lemma S1_deterministic_trans{L}:
   ∀ int __retres_f, int x;
     ¬(\at(aorai_CurOperation,L) ≡ op_f ∧
-       \at(aorai_CurOpStatus,L) ≡ aorai_Terminated ∧ __retres_f ≡ 0 ∧
-       \at(X,L) ≡ 5 ∧ \at(aorai_CurOperation,L) ≡ op_f ∧
-       \at(aorai_CurOpStatus,L) ≡ aorai_Called ∧ x ≡ 4);
+      \at(aorai_CurOpStatus,L) ≡ aorai_Terminated ∧ __retres_f ≡ 0 ∧
+      \at(X,L) ≡ 5 ∧ \at(aorai_CurOperation,L) ≡ op_f ∧
+      \at(aorai_CurOpStatus,L) ≡ aorai_Called ∧ x ≡ 4);
  */
 /*@
 check lemma S0_deterministic_trans{L}:
   ∀ int c;
     ¬(\at(aorai_CurOperation,L) ≡ op_real_main ∧
-       \at(aorai_CurOpStatus,L) ≡ aorai_Called ∧ c ≢ 0 ∧
-       \at(aorai_CurOperation,L) ≡ op_real_main ∧
-       \at(aorai_CurOpStatus,L) ≡ aorai_Called ∧ c ≡ 0);
+      \at(aorai_CurOpStatus,L) ≡ aorai_Called ∧ c ≢ 0 ∧
+      \at(aorai_CurOperation,L) ≡ op_real_main ∧
+      \at(aorai_CurOpStatus,L) ≡ aorai_Called ∧ c ≡ 0);
  */
 /*@ ghost enum aorai_States aorai_CurStates = Si; */
 /*@ ghost

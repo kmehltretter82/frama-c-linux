@@ -91,8 +91,7 @@ predicate test_singleton_1{L}(int *a, int x) = \at(x ≡ *(a + (0 .. 1)),L);
  */
 /*@ predicate test_singleton_3{L}(int *a) = \at(*(a + (0 .. 1)) ≡ {1},L);
  */
-/*@
-predicate test_set_of_elem{L}(int *a) = \at(*(a + (0 .. 1)) ≡ {1, 2},L);
+/*@ predicate test_set_of_elem{L}(int *a) = \at(*(a + (0 .. 1)) ≡ {1, 2},L);
 
 */
 int A[100];

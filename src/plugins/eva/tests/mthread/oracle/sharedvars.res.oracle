@@ -682,18 +682,16 @@
     shared bases: {u3, s4, s5, s6}
     interferences by location:
       sharedvars.c:46:
-        # cvalue:
-        u3 ∈ {1; 3}
-        s4 ∈ {-1; 0; 1; 4}
-        s5 ∈ {0}
-        s6 ∈ {0; 4; 6} 
+        # cvalue: u3 ∈ {1; 3}
+                  s4 ∈ {-1; 0; 1; 4}
+                  s5 ∈ {0}
+                  s6 ∈ {0; 4; 6} 
     interferences by mutexes:
       {  }:
-        # cvalue:
-        u3 ∈ {1; 3}
-        s4 ∈ {-1; 0; 1; 4}
-        s5 ∈ {0}
-        s6 ∈ {0; 4; 6}
+        # cvalue: u3 ∈ {1; 3}
+                  s4 ∈ {-1; 0; 1; 4}
+                  s5 ∈ {0}
+                  s6 ∈ {0; 4; 6}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs3 computed
@@ -726,24 +724,21 @@
     shared bases: {u3, s4, s5, s6}
     interferences by location:
       sharedvars.c:54:
-        # cvalue:
-        u3 ∈ {1; 3}
-        s4 ∈ {-1; 0; 1; 4}
-        s5 ∈ {0}
-        s6 ∈ {0; 4; 6} 
+        # cvalue: u3 ∈ {1; 3}
+                  s4 ∈ {-1; 0; 1; 4}
+                  s5 ∈ {0}
+                  s6 ∈ {0; 4; 6} 
       sharedvars.c:57:
-        # cvalue:
-        u3 ∈ {1; 3}
-        s4 ∈ {-1; 0; 1; 4}
-        s5 ∈ {0}
-        s6 ∈ {0; 4; 6} 
+        # cvalue: u3 ∈ {1; 3}
+                  s4 ∈ {-1; 0; 1; 4}
+                  s5 ∈ {0}
+                  s6 ∈ {0; 4; 6} 
     interferences by mutexes:
       {  }:
-        # cvalue:
-        u3 ∈ {1; 3}
-        s4 ∈ {-1; 0; 1; 4}
-        s5 ∈ {0}
-        s6 ∈ {0; 4; 6}
+        # cvalue: u3 ∈ {1; 3}
+                  s4 ∈ {-1; 0; 1; 4}
+                  s5 ∈ {0}
+                  s6 ∈ {0; 4; 6}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs4 computed
@@ -773,18 +768,16 @@
     shared bases: {u3, s4, s5, s6}
     interferences by location:
       sharedvars.c:69:
-        # cvalue:
-        u3 ∈ {1; 3}
-        s4 ∈ {-1; 0; 1; 4}
-        s5 ∈ {0; 5}
-        s6 ∈ {0; 4; 6} 
+        # cvalue: u3 ∈ {1; 3}
+                  s4 ∈ {-1; 0; 1; 4}
+                  s5 ∈ {0; 5}
+                  s6 ∈ {0; 4; 6} 
     interferences by mutexes:
       {  }:
-        # cvalue:
-        u3 ∈ {1; 3}
-        s4 ∈ {-1; 0; 1; 4}
-        s5 ∈ {0; 5}
-        s6 ∈ {0; 4; 6}
+        # cvalue: u3 ∈ {1; 3}
+                  s4 ∈ {-1; 0; 1; 4}
+                  s5 ∈ {0; 5}
+                  s6 ∈ {0; 4; 6}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs5 computed
@@ -811,18 +804,16 @@
     shared bases: {u3, s4, s5, s6}
     interferences by location:
       sharedvars.c:76:
-        # cvalue:
-        u3 ∈ {1; 3}
-        s4 ∈ {-1; 0; 1; 4}
-        s5 ∈ {0; 5}
-        s6 ∈ {0; 4; 6} 
+        # cvalue: u3 ∈ {1; 3}
+                  s4 ∈ {-1; 0; 1; 4}
+                  s5 ∈ {0; 5}
+                  s6 ∈ {0; 4; 6} 
     interferences by mutexes:
       {  }:
-        # cvalue:
-        u3 ∈ {1; 3}
-        s4 ∈ {-1; 0; 1; 4}
-        s5 ∈ {0; 5}
-        s6 ∈ {0; 4; 6}
+        # cvalue: u3 ∈ {1; 3}
+                  s4 ∈ {-1; 0; 1; 4}
+                  s5 ∈ {0; 5}
+                  s6 ∈ {0; 4; 6}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs6 computed
@@ -849,18 +840,16 @@
     shared bases: {u3, s4, s5, s6}
     interferences by location:
       sharedvars.c:41:
-        # cvalue:
-        u3 ∈ {1; 3; 31}
-        s4 ∈ {-1; 0; 1; 4}
-        s5 ∈ {0; 5}
-        s6 ∈ {0; 4; 6} 
+        # cvalue: u3 ∈ {1; 3; 31}
+                  s4 ∈ {-1; 0; 1; 4}
+                  s5 ∈ {0; 5}
+                  s6 ∈ {0; 4; 6} 
     interferences by mutexes:
       {  }:
-        # cvalue:
-        u3 ∈ {1; 3; 31}
-        s4 ∈ {-1; 0; 1; 4}
-        s5 ∈ {0; 5}
-        s6 ∈ {0; 4; 6}
+        # cvalue: u3 ∈ {1; 3; 31}
+                  s4 ∈ {-1; 0; 1; 4}
+                  s5 ∈ {0; 5}
+                  s6 ∈ {0; 4; 6}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs31 computed
@@ -1367,9 +1356,8 @@
     write by jobs4 at sharedvars.c:54, unprotected
 [mt] Shared memory: s4; s5; s6
 [mt] Write summary for <main> (updated): s4 ∈ {-1; 0; 1; 2; 3; 4}
-[mt] Write summary for jobs4:
-  s4 ∈ {-1; 0; 1; 2; 3; 4}
-  s6 ∈ [0..2147483646],0%2
+[mt] Write summary for jobs4: s4 ∈ {-1; 0; 1; 2; 3; 4}
+                           s6 ∈ [0..2147483646],0%2
 [mt] Write summary for jobs5 (updated): s5 ∈ [0..2147483647]
 [mt] Write summary for jobs6 (updated): s6 ∈ [0..2147483646],0%2
 [mt] Write summary for jobs51: s5 ∈ {0; 5; 51}
@@ -1796,9 +1784,8 @@
     write by jobs4 at sharedvars.c:54, unprotected
 [mt] Shared memory: s4; s5; s6
 [mt] Write summary for <main>: s4 ∈ {-1; 0; 1; 2; 3; 4}
-[mt] Write summary for jobs4:
-  s4 ∈ {-1; 0; 1; 2; 3; 4}
-  s6 ∈ [0..2147483646],0%2
+[mt] Write summary for jobs4: s4 ∈ {-1; 0; 1; 2; 3; 4}
+                           s6 ∈ [0..2147483646],0%2
 [mt] Write summary for jobs5: s5 ∈ [0..2147483647]
 [mt] Write summary for jobs6: s6 ∈ [0..2147483646],0%2
 [mt] Write summary for jobs51 (updated): s5 ∈ [0..2147483647]
@@ -2173,9 +2160,8 @@
     write by jobs4 at sharedvars.c:54, unprotected
 [mt] Shared memory: s4; s5; s6
 [mt] Write summary for <main>: s4 ∈ {-1; 0; 1; 2; 3; 4}
-[mt] Write summary for jobs4:
-  s4 ∈ {-1; 0; 1; 2; 3; 4}
-  s6 ∈ [0..2147483646],0%2
+[mt] Write summary for jobs4: s4 ∈ {-1; 0; 1; 2; 3; 4}
+                           s6 ∈ [0..2147483646],0%2
 [mt] Write summary for jobs5: s5 ∈ [0..2147483647]
 [mt] Write summary for jobs6: s6 ∈ [0..2147483646],0%2
 [mt] Write summary for jobs51: s5 ∈ [0..2147483647]

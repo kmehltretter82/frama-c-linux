@@ -92,22 +92,18 @@ enum aorai_OpStatusList {
        ensures 1 ≡ End;
      
      behavior buch_state_End_out:
-       assumes
-         (0 ≡ Idle ∨ ¬(res ≢ -1)) ∧ (0 ≡ End ∨ ¬(res ≢ -1));
+       assumes (0 ≡ Idle ∨ ¬(res ≢ -1)) ∧ (0 ≡ End ∨ ¬(res ≢ -1));
        ensures 0 ≡ End;
      
      behavior buch_state_Idle_out:
        ensures 0 ≡ Idle;
      
      behavior buch_state_WillDoFoo_in:
-       assumes
-         (1 ≡ WillDoFoo ∧ res ≡ -1) ∨ (1 ≡ Idle ∧ res ≡ -1);
+       assumes (1 ≡ WillDoFoo ∧ res ≡ -1) ∨ (1 ≡ Idle ∧ res ≡ -1);
        ensures 1 ≡ WillDoFoo;
      
      behavior buch_state_WillDoFoo_out:
-       assumes
-         (0 ≡ WillDoFoo ∨ ¬(res ≡ -1)) ∧
-         (0 ≡ Idle ∨ ¬(res ≡ -1));
+       assumes (0 ≡ WillDoFoo ∨ ¬(res ≡ -1)) ∧ (0 ≡ Idle ∨ ¬(res ≡ -1));
        ensures 0 ≡ WillDoFoo;
    @/
   void isPresent_post_func(int res)
@@ -164,9 +160,7 @@ enum aorai_OpStatusList {
         (∀ ℤ i; 0 ≤ i < \old(size) ⇒ *(\old(t) + i) ≢ \old(val));
     
     behavior Buchi_property_behavior:
-      ensures
-        (1 ≡ End ⇒ \result ≢ -1) ∧
-        (1 ≡ WillDoFoo ⇒ \result ≡ -1);
+      ensures (1 ≡ End ⇒ \result ≢ -1) ∧ (1 ≡ WillDoFoo ⇒ \result ≡ -1);
       ensures 1 ≡ End ∨ 0 ≡ End;
       ensures 1 ≡ WillDoFoo ∨ 0 ≡ WillDoFoo;
       ensures 0 ≡ Idle;

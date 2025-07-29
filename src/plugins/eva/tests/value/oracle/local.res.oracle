@@ -25,8 +25,7 @@
 [eva:locals-escaping] local.i:13: Warning: 
   locals {b} escaping the scope of f through \result<f>
 [eva:alarm] local.i:14: Warning: 
-  accessing left-value that contains escaping addresses.
-  assert ¬\dangling(&T);
+  accessing left-value that contains escaping addresses. assert ¬\dangling(&T);
 [eva] Recording results for g
 [eva] Done for function g
 [eva:locals-escaping] local.i:34: Warning: 

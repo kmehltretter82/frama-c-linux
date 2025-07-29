@@ -6,8 +6,7 @@ int main(void)
   /*@ ghost int x = 10; */
   /*@ ghost /@ loop invariant x ≥ 0;
                loop variant x; @/
-            while (x > 0) x --;
-  */
+            while (x > 0) x --; */
   __retres = 0;
   return __retres;
 }

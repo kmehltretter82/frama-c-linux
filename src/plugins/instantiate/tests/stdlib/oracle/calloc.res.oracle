@@ -40,8 +40,7 @@ struct incomplete;
           \let __fc_flexlen = (size - 8) / 4;
             \initialized(&\result->x) ∧
             \initialized(&\result->c) ∧
-            (∀ ℤ j1;
-               0 ≤ j1 < __fc_flexlen ⇒ \initialized(&\result->f[j1]));
+            (∀ ℤ j1; 0 ≤ j1 < __fc_flexlen ⇒ \initialized(&\result->f[j1]));
       assigns \result, __fc_heap_status;
       assigns \result \from __fc_heap_status, num, size;
       assigns __fc_heap_status \from __fc_heap_status, num, size;
@@ -76,14 +75,12 @@ struct Flex *calloc_st_Flex(size_t num, size_t size)
       ensures
         zero_initialization:
           ∀ ℤ j0;
-            0 ≤ j0 < num ⇒
-            (∀ ℤ j1; 0 ≤ j1 < 10 ⇒ (*(\result + j0))[j1] ≡ 0);
+            0 ≤ j0 < num ⇒ (∀ ℤ j1; 0 ≤ j1 < 10 ⇒ (*(\result + j0))[j1] ≡ 0);
       ensures
         initialization:
           ∀ ℤ j0;
             0 ≤ j0 < num ⇒
-            (∀ ℤ j1;
-               0 ≤ j1 < 10 ⇒ \initialized(&(*(\result + j0))[j1]));
+            (∀ ℤ j1; 0 ≤ j1 < 10 ⇒ \initialized(&(*(\result + j0))[j1]));
       assigns \result, __fc_heap_status;
       assigns \result \from __fc_heap_status, num, size;
       assigns __fc_heap_status \from __fc_heap_status, num, size;
@@ -116,11 +113,9 @@ int (*calloc_arr10_int(size_t num, size_t size))[10]
       assumes allocable: is_allocable(num * size);
       ensures fresh_result: \fresh{Old, Here}(\result,num * size);
       ensures
-        zero_initialization:
-          ∀ ℤ j0; 0 ≤ j0 < num ⇒ *(\result + j0) ≡ 0;
+        zero_initialization: ∀ ℤ j0; 0 ≤ j0 < num ⇒ *(\result + j0) ≡ 0;
       ensures
-        initialization:
-          ∀ ℤ j0; 0 ≤ j0 < num ⇒ \initialized(\result + j0);
+        initialization: ∀ ℤ j0; 0 ≤ j0 < num ⇒ \initialized(\result + j0);
       assigns \result, __fc_heap_status;
       assigns \result \from __fc_heap_status, num, size;
       assigns __fc_heap_status \from __fc_heap_status, num, size;
@@ -155,8 +150,7 @@ char *calloc_char(size_t num, size_t size)
       ensures
         zero_initialization:
           ∀ ℤ j0;
-            0 ≤ j0 < num ⇒
-            (\result + j0)->x ≡ 0 ∧ (\result + j0)->y ≡ 0;
+            0 ≤ j0 < num ⇒ (\result + j0)->x ≡ 0 ∧ (\result + j0)->y ≡ 0;
       ensures
         initialization:
           ∀ ℤ j0;
@@ -195,11 +189,9 @@ struct X *calloc_st_X(size_t num, size_t size)
       assumes allocable: is_allocable(num * size);
       ensures fresh_result: \fresh{Old, Here}(\result,num * size);
       ensures
-        zero_initialization:
-          ∀ ℤ j0; 0 ≤ j0 < num ⇒ *(\result + j0) ≡ 0.;
+        zero_initialization: ∀ ℤ j0; 0 ≤ j0 < num ⇒ *(\result + j0) ≡ 0.;
       ensures
-        initialization:
-          ∀ ℤ j0; 0 ≤ j0 < num ⇒ \initialized(\result + j0);
+        initialization: ∀ ℤ j0; 0 ≤ j0 < num ⇒ \initialized(\result + j0);
       assigns \result, __fc_heap_status;
       assigns \result \from __fc_heap_status, num, size;
       assigns __fc_heap_status \from __fc_heap_status, num, size;
@@ -232,11 +224,9 @@ float *calloc_float(size_t num, size_t size)
       assumes allocable: is_allocable(num * size);
       ensures fresh_result: \fresh{Old, Here}(\result,num * size);
       ensures
-        zero_initialization:
-          ∀ ℤ j0; 0 ≤ j0 < num ⇒ *(\result + j0) ≡ 0;
+        zero_initialization: ∀ ℤ j0; 0 ≤ j0 < num ⇒ *(\result + j0) ≡ 0;
       ensures
-        initialization:
-          ∀ ℤ j0; 0 ≤ j0 < num ⇒ \initialized(\result + j0);
+        initialization: ∀ ℤ j0; 0 ≤ j0 < num ⇒ \initialized(\result + j0);
       assigns \result, __fc_heap_status;
       assigns \result \from __fc_heap_status, num, size;
       assigns __fc_heap_status \from __fc_heap_status, num, size;
@@ -269,11 +259,9 @@ enum E *calloc_e_E(size_t num, size_t size)
       assumes allocable: is_allocable(num * size);
       ensures fresh_result: \fresh{Old, Here}(\result,num * size);
       ensures
-        zero_initialization:
-          ∀ ℤ j0; 0 ≤ j0 < num ⇒ *(\result + j0) ≡ 0;
+        zero_initialization: ∀ ℤ j0; 0 ≤ j0 < num ⇒ *(\result + j0) ≡ 0;
       ensures
-        initialization:
-          ∀ ℤ j0; 0 ≤ j0 < num ⇒ \initialized(\result + j0);
+        initialization: ∀ ℤ j0; 0 ≤ j0 < num ⇒ \initialized(\result + j0);
       assigns \result, __fc_heap_status;
       assigns \result \from __fc_heap_status, num, size;
       assigns __fc_heap_status \from __fc_heap_status, num, size;
@@ -354,8 +342,7 @@ struct incomplete;
         initialization:
           \let __fc_flexlen = (\old(size) - 8) / 4;
             \initialized(&\result->x) ∧ \initialized(&\result->c) ∧
-            (∀ ℤ j1;
-               0 ≤ j1 < __fc_flexlen ⇒ \initialized(&\result->f[j1]));
+            (∀ ℤ j1; 0 ≤ j1 < __fc_flexlen ⇒ \initialized(&\result->f[j1]));
       assigns \result, __fc_heap_status;
       assigns \result \from __fc_heap_status, num, size;
       assigns __fc_heap_status \from __fc_heap_status, num, size;
@@ -397,8 +384,7 @@ struct Flex *calloc_st_Flex(size_t num, size_t size)
         initialization:
           ∀ ℤ j0;
             0 ≤ j0 < \old(num) ⇒
-            (∀ ℤ j1;
-               0 ≤ j1 < 10 ⇒ \initialized(&(*(\result + j0))[j1]));
+            (∀ ℤ j1; 0 ≤ j1 < 10 ⇒ \initialized(&(*(\result + j0))[j1]));
       assigns \result, __fc_heap_status;
       assigns \result \from __fc_heap_status, num, size;
       assigns __fc_heap_status \from __fc_heap_status, num, size;
@@ -432,8 +418,7 @@ int (*calloc_arr10_int(size_t num, size_t size))[10]
       ensures
         fresh_result: \fresh{Old, Here}(\result,\old(num) * \old(size));
       ensures
-        zero_initialization:
-          ∀ ℤ j0; 0 ≤ j0 < \old(num) ⇒ *(\result + j0) ≡ 0;
+        zero_initialization: ∀ ℤ j0; 0 ≤ j0 < \old(num) ⇒ *(\result + j0) ≡ 0;
       ensures
         initialization:
           ∀ ℤ j0; 0 ≤ j0 < \old(num) ⇒ \initialized(\result + j0);
@@ -551,8 +536,7 @@ float *calloc_float(size_t num, size_t size)
       ensures
         fresh_result: \fresh{Old, Here}(\result,\old(num) * \old(size));
       ensures
-        zero_initialization:
-          ∀ ℤ j0; 0 ≤ j0 < \old(num) ⇒ *(\result + j0) ≡ 0;
+        zero_initialization: ∀ ℤ j0; 0 ≤ j0 < \old(num) ⇒ *(\result + j0) ≡ 0;
       ensures
         initialization:
           ∀ ℤ j0; 0 ≤ j0 < \old(num) ⇒ \initialized(\result + j0);
@@ -589,8 +573,7 @@ enum E *calloc_e_E(size_t num, size_t size)
       ensures
         fresh_result: \fresh{Old, Here}(\result,\old(num) * \old(size));
       ensures
-        zero_initialization:
-          ∀ ℤ j0; 0 ≤ j0 < \old(num) ⇒ *(\result + j0) ≡ 0;
+        zero_initialization: ∀ ℤ j0; 0 ≤ j0 < \old(num) ⇒ *(\result + j0) ≡ 0;
       ensures
         initialization:
           ∀ ℤ j0; 0 ≤ j0 < \old(num) ⇒ \initialized(\result + j0);

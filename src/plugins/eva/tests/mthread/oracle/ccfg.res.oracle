@@ -761,18 +761,15 @@
     \nothing
   vs.
     global1; global2[0..1]; a; b; c; d; e; f
-[mt] Write summary for <main> (updated):
-  global1 ∈ {1}
-  global2[0] ∈ {1}
-         [1] ∈ {2}
-[mt] Write summary for job_f1 (updated):
-  a ∈ [--..--]
-  c ∈ [--..--]
-  e ∈ {0; 1}
-[mt] Write summary for job_f2 (updated):
-  b ∈ [--..--]
-  d ∈ [--..--]
-  f ∈ {0; 1}
+[mt] Write summary for <main> (updated): global1 ∈ {1}
+                                      global2[0] ∈ {1}
+                                             [1] ∈ {2}
+[mt] Write summary for job_f1 (updated): a ∈ [--..--]
+                                      c ∈ [--..--]
+                                      e ∈ {0; 1}
+[mt] Write summary for job_f2 (updated): b ∈ [--..--]
+                                      d ∈ [--..--]
+                                      f ∈ {0; 1}
 [mt] Mutexes for concurrent accesses:
   global1  unprotected
   global2[0..1]  unprotected
@@ -1925,10 +1922,9 @@
     read by jobs[3] at ccfg.c:18, unprotected
     write by <main> at ccfg.c:26, unprotected
 [mt] Shared memory: global1; global2[0..1]; a; b; c; d; e; f
-[mt] Write summary for <main>:
-  global1 ∈ {0; 1}
-  global2[0] ∈ {0; 1}
-         [1] ∈ {0; 2}
+[mt] Write summary for <main>: global1 ∈ {0; 1}
+                            global2[0] ∈ {0; 1}
+                                   [1] ∈ {0; 2}
 [mt] Write summary for job_f1: a ∈ [--..--]
                             c ∈ [--..--]
                             e ∈ {0; 1}

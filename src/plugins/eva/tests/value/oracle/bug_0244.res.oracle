@@ -9,8 +9,7 @@
   locals {u} escaping the scope of a block of main through p
 [eva:partition] bug_0244.i:7: starting to merge loop iterations
 [eva:alarm] bug_0244.i:12: Warning: 
-  accessing left-value that contains escaping addresses.
-  assert ¬\dangling(&p);
+  accessing left-value that contains escaping addresses. assert ¬\dangling(&p);
 [eva:alarm] bug_0244.i:12: Warning: out of bounds read. assert \valid_read(p);
 [eva] Recording results for main
 [eva] Done for function main
