@@ -24,8 +24,41 @@
 
 type printer = Format.formatter -> unit
 
+(** Set operations. *)
+
 val pp_in_set : printer
 val pp_empty_set : printer
 val pp_top : printer
 val pp_bottom : printer
 val pp_union : printer
+
+(* Relations. *)
+
+val pp_le : printer
+val pp_ge : printer
+val pp_eq : printer
+val pp_neq : printer
+
+(* Logic operators. *)
+
+val pp_not : printer
+val pp_and : printer
+val pp_or : printer
+val pp_xor : printer
+
+val pp_implies : printer
+val pp_iff : printer
+
+val pp_in_acsl : printer
+val pp_forall : printer
+val pp_exists : printer
+
+(* Logic types. *)
+
+val pp_boolean : printer
+val pp_integer : printer
+val pp_real : printer
+
+(* Constants. *)
+
+val pp_pi : printer

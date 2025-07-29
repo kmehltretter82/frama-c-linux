@@ -27,8 +27,41 @@ let pretty utf8 ascii = fun fmt ->
   then Format.pp_print_string fmt utf8
   else Format.pp_print_string fmt ascii
 
+(* Set operations. *)
+
 let pp_in_set =    pretty Utf8_logic.inset "IN"
 let pp_empty_set = pretty Utf8_logic.emptyset "EMPTY_SET"
 let pp_union =     pretty Utf8_logic.union "U"
 let pp_top =       pretty Utf8_logic.top "TOP"
 let pp_bottom =    pretty Utf8_logic.bottom "BOTTOM"
+
+(* Relations. *)
+
+let pp_le =  pretty Utf8_logic.le "<="
+let pp_ge =  pretty Utf8_logic.ge ">="
+let pp_eq =  pretty Utf8_logic.eq "=="
+let pp_neq = pretty Utf8_logic.neq "!="
+
+(* Logic operators. *)
+
+let pp_not = pretty Utf8_logic.neg "!"
+let pp_and = pretty Utf8_logic.conj "&&"
+let pp_or =  pretty Utf8_logic.disj "||"
+let pp_xor = pretty Utf8_logic.x_or "^^"
+
+let pp_implies = pretty Utf8_logic.implies "==>"
+let pp_iff =     pretty Utf8_logic.iff "<==>"
+
+let pp_in_acsl = pretty Utf8_logic.inset "\\in"
+let pp_forall = pretty Utf8_logic.forall "\\forall"
+let pp_exists = pretty Utf8_logic.exists "\\exists"
+
+(* Logic types. *)
+
+let pp_boolean = pretty Utf8_logic.boolean "boolean"
+let pp_integer = pretty Utf8_logic.integer "integer"
+let pp_real =    pretty Utf8_logic.real "real"
+
+(* Constants. *)
+
+let pp_pi = pretty Utf8_logic.pi "\\pi"
