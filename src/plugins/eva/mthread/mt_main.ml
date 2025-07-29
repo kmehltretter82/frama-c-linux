@@ -201,16 +201,27 @@ let compute_mthread_once, _self =
     [ Ast.self (*; Kernel.MainFunction.self *) ]
     (fun () -> mthread_run (Project.current ()))
 
-
-(* We do a best effort to add [mthread.h] to the list of our files.
-   This should work even if a plugin requests the computation of
-   the AST before we have started running *)
-let () = Cmdline.run_after_setting_files
+let () =
+  (* Automatically add Mthread shared directory to the include path and add the
+     threads lib to the parsed sources if either -mt-threads-lib or -mthread
+     is used.
+     We do a best effort to add the stubbed files to the list of our files.
+     This should work even if a plugin requests the computation of
+     the AST before we have started running *)
+  Cmdline.run_after_setting_files
     (fun _l ->
-       if Mt_options.Enabled.get () then
-         let f = File.from_filename (Mt_lib.mthread_h ()) in
-         File.pre_register f;
-    )
+       if Mt_options.ThreadsLib.is_set () || Mt_options.Enabled.get () then
+         Mt_lib.load_threads_library (Mt_options.ThreadsLib.get ()))
+
+let () =
+  (* Check that the threads lib stays consistent if the AST has already been
+     computed with a specific variant. *)
+  Mt_options.ThreadsLib.add_set_hook
+    (fun old_value new_value ->
+       if old_value <> new_value && Ast.is_computed () then
+         Mt_self.warning
+           "ignoring option %s specified after parsing"
+           Mt_options.ThreadsLib.option_name)
 
 let main () =
   if Mt_options.Enabled.get () then (
