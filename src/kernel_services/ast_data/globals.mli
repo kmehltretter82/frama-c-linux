@@ -21,7 +21,19 @@ module Vars: sig
 
   val find: varinfo -> initinfo
 
+  (** Retrieve the (wide)string literal associated to a given varinfo.
+      Fatal error is the variable does not have the corresponding attribute
+      (see {!Ast_info.is_string_literal})
+      @since Frama-C+dev
+  *)
   val get_literal_string: varinfo -> str_literal
+
+  (** Creates a new global holding a (wide)string literal and insert it
+      into the Ast, marking it as grown.
+      @return the newly created varinfo
+      @since Frama-C+dev
+  *)
+  val add_literal_string: loc:location -> str_literal -> varinfo
 
   val find_from_astinfo: string -> syntactic_scope -> varinfo
   (** Finds a variable from its [vname] according to its localisation (which

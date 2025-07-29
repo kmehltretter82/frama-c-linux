@@ -71,6 +71,26 @@ module Vars = struct
 
   let add_decl vi = add vi { init = None }
 
+  let add_literal_string ~loc s =
+    let var =
+      match s with
+      | Lit_str s -> Cil.create_string_literal ~loc s
+      | Lit_wstr s -> Cil.create_wstring_literal ~loc s
+    in
+    let init = { init = Some (StrInit s) } in
+    add var init;
+    let glob = GVar(var,init,loc) in
+    let ast = Ast.get () in
+    let rec insert acc = function
+      | [] -> List.rev_append acc [glob]
+      | ((GVar _ | GVarDecl _ | GFun _ | GFunDecl _) :: _) as tl ->
+        List.rev_append acc  (glob :: tl)
+      | hd :: tl -> insert (hd::acc) tl
+    in
+    ast.globals <- insert [] ast.globals;
+    Ast.mark_as_grown ();
+    var
+
   let get_astinfo_ref : (Cil_types.varinfo -> string * syntactic_scope) ref =
     Extlib.mk_fun "get_astinfo_ref"
 

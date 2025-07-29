@@ -1911,17 +1911,21 @@ val fieldBitsOffset: fieldinfo -> int * int
 val create_string_literal: ?loc:Cil_types.location -> string -> varinfo
 (** creates a new varinfo for holding a string literal
 
-    @since Frama-C+dev
+    **NB** this function only creates the variable, but does not insert its
+    definition in an AST. Use {!Globals.Vars.add_string_literal} to properly
+    create a new global.
 
-    TODO: properly introduce it in the AST with appropriate initializer.
+    @since Frama-C+dev
 *)
 
 val create_wstring_literal: ?loc:Cil_types.location -> int64 list -> varinfo
 (** creates a new varinfo for holding a string literal
 
-    @since Frama-C+dev
+    **NB** this function only creates the variable, but does not insert its
+    definition in an AST. Use {!Globals.Vars.add_string_literal} to properly
+    create a new global.
 
-    TODO: properly introduce it in the AST with appropriate initializer.
+    @since Frama-C+dev
 *)
 
 
