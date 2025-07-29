@@ -25,9 +25,6 @@
 (** UTF-8 string for logic symbols.
     Use the {!Unicode} module to print these symbols. *)
 
-(** given an unicode code point, returns the corresponding utf-8 encoding. *)
-val from_unichar: int -> string
-
 val forall : string
 val exists : string
 val eq : string

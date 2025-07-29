@@ -22,61 +22,30 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let from_unichar n =
-  let rec log64 n =
-    if n = 0 then 0 else
-      1 + log64 (n lsr 5)
-  in
-  let utf8_storage_len n =
-    if n < 0x80 then 1 else
-      log64 (n lsr 1)
-  in
-  (* this function is not exported, so it's OK to do a few 'unsafe' things *)
-  let write_unichar s ~pos c =
-    let len = utf8_storage_len c in
-    if len = 1 then
-      Bytes.unsafe_set s pos (Char.unsafe_chr c)
-    else begin
-      Bytes.unsafe_set
-        s pos
-        (Char.unsafe_chr
-           (((1 lsl len - 1) lsl (8-len)) lor (c lsr ((len-1)*6))));
-      for i = 1 to len-1 do
-        Bytes.unsafe_set s (pos+i)
-          (Char.unsafe_chr (((c lsr ((len-1-i)*6)) land 0x3f) lor 0x80))
-      done ;
-    end ;
-    len
-  in
-  let s = Bytes.create 6 in
-  let len = write_unichar s ~pos:0 n in
-  Bytes.sub s 0 len |> Bytes.to_string
+let forall =  "\u{2200}"
+let exists =  "\u{2203}"
+let eq = "\u{2261}" (* \u{2263} *) (* \u{2250} *)
+let neq =  "\u{2262}"
+let le =  "\u{2264}"
+let ge =  "\u{2265}"
+let minus = "\u{2212}"
 
+let implies = "\u{21D2}"
+let iff = "\u{21D4}"
+let conj = "\u{2227}"
+let disj = "\u{2228}"
+let neg = "\u{00AC}"
+let x_or =  "\u{22BB}"
+let inset = "\u{2208}"
+let emptyset = "\u{2205}"
+let top = "\u{22A4}"
+let bottom = "\u{22A5}"
+let union = "\u{222A}"
 
-let forall =  from_unichar 0x2200
-let exists =  from_unichar 0x2203
-let eq =  from_unichar (*0x2263*) (*0x2250*) 0x2261
-let neq =  from_unichar 0x2262
-let le =  from_unichar 0x2264
-let ge =  from_unichar 0x2265
-let minus = from_unichar 0x2212
+let boolean = "\u{1D539}"
+let integer = "\u{2124}"
+let real = "\u{211D}"
 
-let implies = from_unichar 0x21D2
-let iff = from_unichar 0x21D4
-let conj = from_unichar 0x2227
-let disj = from_unichar 0x2228
-let neg = from_unichar 0x00AC
-let x_or =  from_unichar 0x22BB
-let inset = from_unichar 0x2208
-let emptyset = from_unichar 0x2205
-let top = from_unichar 0x22A4
-let bottom = from_unichar 0x22A5
-let union = from_unichar 0x222A
+let pi = "\u{3C0}"
 
-let boolean = from_unichar 0x1D539
-let integer = from_unichar 0x2124
-let real = from_unichar 0x211D
-
-let pi = from_unichar 0x3C0
-
-let infinity = from_unichar 0x221E
+let infinity = "\u{221E}"
