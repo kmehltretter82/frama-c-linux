@@ -7,6 +7,10 @@
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/stdlib.h:702: Warning: 
   E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/__fc_string_axiomatic.h:277: Warning: 
+  E-ACSL construct `logic functions or predicates performing read accesses'
+  is not yet supported.
+  Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
 [eva:alarm] FRAMAC_SHARE/libc/stdlib.h:707: Warning: 
   function __gen_e_acsl_getenv: postcondition 'null_or_valid_result' got status unknown.

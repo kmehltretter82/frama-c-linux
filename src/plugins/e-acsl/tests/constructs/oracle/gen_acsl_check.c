@@ -5,7 +5,6 @@
 #include "stdint.h"
 #include "stdio.h"
 #include "time.h"
-char *__gen_e_acsl_literal_string;
 extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 
 /*@ check requires a != 0;
@@ -70,6 +69,36 @@ void g(int a, int *b)
   return;
 }
 
+int main(void)
+{
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
+  int a = 0;
+  int b[3] = {1, 2, 3};
+  __e_acsl_store_block((void *)(b),12UL);
+  __e_acsl_full_init((void *)(& b));
+  {
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"a",0,a);
+    __gen_e_acsl_assert_data.blocking = 0;
+    __gen_e_acsl_assert_data.kind = "Assertion";
+    __gen_e_acsl_assert_data.pred_txt = "a == 1";
+    __gen_e_acsl_assert_data.file = "acsl_check.c";
+    __gen_e_acsl_assert_data.fct = "main";
+    __gen_e_acsl_assert_data.line = 21;
+    __e_acsl_assert(a == 1,& __gen_e_acsl_assert_data);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
+  }
+  /*@ check a == 1; */ ;
+  a = __gen_e_acsl_f(a);
+  fprintf(stderr,"SHOULD BE PRINTED IN EXECUTION LOG\n"); /* fprintf_va_1 */
+  g(a,b);
+  /*@ admit a == 1; */ ;
+  /*@ admit a == 2; */ ;
+  __e_acsl_delete_block((void *)(b));
+  __e_acsl_memory_clean();
+  return a;
+}
+
 /*@ check requires a != 0;
     check ensures \result != 0; */
 int __gen_e_acsl_f(int a)
@@ -103,51 +132,6 @@ int __gen_e_acsl_f(int a)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
     return __retres;
   }
-}
-
-void __e_acsl_globals_init(void)
-{
-  static char __e_acsl_already_run = 0;
-  if (! __e_acsl_already_run) {
-    __e_acsl_already_run = 1;
-    __gen_e_acsl_literal_string = "SHOULD BE PRINTED IN EXECUTION LOG\n";
-    __e_acsl_store_block((void *)__gen_e_acsl_literal_string,
-                         sizeof("SHOULD BE PRINTED IN EXECUTION LOG\n"));
-    __e_acsl_full_init((void *)__gen_e_acsl_literal_string);
-    __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string);
-  }
-  return;
-}
-
-int main(void)
-{
-  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
-  __e_acsl_globals_init();
-  int a = 0;
-  int b[3] = {1, 2, 3};
-  __e_acsl_store_block((void *)(b),12UL);
-  __e_acsl_full_init((void *)(& b));
-  {
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"a",0,a);
-    __gen_e_acsl_assert_data.blocking = 0;
-    __gen_e_acsl_assert_data.kind = "Assertion";
-    __gen_e_acsl_assert_data.pred_txt = "a == 1";
-    __gen_e_acsl_assert_data.file = "acsl_check.c";
-    __gen_e_acsl_assert_data.fct = "main";
-    __gen_e_acsl_assert_data.line = 21;
-    __e_acsl_assert(a == 1,& __gen_e_acsl_assert_data);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
-  }
-  /*@ check a == 1; */ ;
-  a = __gen_e_acsl_f(a);
-  fprintf(stderr,__gen_e_acsl_literal_string); /* fprintf_va_1 */
-  g(a,b);
-  /*@ admit a == 1; */ ;
-  /*@ admit a == 2; */ ;
-  __e_acsl_delete_block((void *)(b));
-  __e_acsl_memory_clean();
-  return a;
 }
 
 

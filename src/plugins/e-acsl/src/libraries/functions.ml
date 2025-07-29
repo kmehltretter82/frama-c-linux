@@ -171,7 +171,8 @@ module Libc = struct
         exps
         ""
     in
-    Cil.evar ~loc (Cil.create_string_literal ~loc param_str)
+    Cil.mkAddrOrStartOf ~loc
+      (Cil.var (Globals.Vars.add_literal_string ~loc (Lit_str param_str)))
 
 end
 

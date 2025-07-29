@@ -5,49 +5,16 @@
 #include "stdint.h"
 #include "stdio.h"
 #include "time.h"
-char *__gen_e_acsl_literal_string_2;
-char *__gen_e_acsl_literal_string_3;
-char *__gen_e_acsl_literal_string;
-char *__gen_e_acsl_literal_string_4;
 extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
-
-void __e_acsl_globals_init(void)
-{
-  static char __e_acsl_already_run = 0;
-  if (! __e_acsl_already_run) {
-    __e_acsl_already_run = 1;
-    __gen_e_acsl_literal_string_2 = "t is %d, going to %s\n";
-    __e_acsl_store_block((void *)__gen_e_acsl_literal_string_2,
-                         sizeof("t is %d, going to %s\n"));
-    __e_acsl_full_init((void *)__gen_e_acsl_literal_string_2);
-    __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_2);
-    __gen_e_acsl_literal_string_3 = "UP";
-    __e_acsl_store_block((void *)__gen_e_acsl_literal_string_3,sizeof("UP"));
-    __e_acsl_full_init((void *)__gen_e_acsl_literal_string_3);
-    __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_3);
-    __gen_e_acsl_literal_string = "RET";
-    __e_acsl_store_block((void *)__gen_e_acsl_literal_string,sizeof("RET"));
-    __e_acsl_full_init((void *)__gen_e_acsl_literal_string);
-    __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string);
-    __gen_e_acsl_literal_string_4 = "AGAIN";
-    __e_acsl_store_block((void *)__gen_e_acsl_literal_string_4,
-                         sizeof("AGAIN"));
-    __e_acsl_full_init((void *)__gen_e_acsl_literal_string_4);
-    __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_4);
-  }
-  return;
-}
 
 int main(int argc, char const **argv)
 {
   int __retres;
   __e_acsl_memory_init(& argc,(char ***)(& argv),8UL);
-  __e_acsl_globals_init();
   int t = 0;
   UP: ;
   if (t == 2) {
-    printf(__gen_e_acsl_literal_string_2,t,
-           (char *)__gen_e_acsl_literal_string); /* printf_va_1 */
+    printf("t is %d, going to %s\n",t,(char *)"RET"); /* printf_va_1 */
     goto RET;
   }
   AGAIN:
@@ -79,8 +46,7 @@ int main(int argc, char const **argv)
     }
     /*@ assert \valid(&a); */ ;
     if (t == 2) {
-      printf(__gen_e_acsl_literal_string_2,t,
-             (char *)__gen_e_acsl_literal_string_3); /* printf_va_2 */
+      printf("t is %d, going to %s\n",t,(char *)"UP"); /* printf_va_2 */
       __e_acsl_delete_block((void *)(& a));
       goto UP;
     }
@@ -110,8 +76,7 @@ int main(int argc, char const **argv)
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
     }
     /*@ assert \valid(&b); */ ;
-    printf(__gen_e_acsl_literal_string_2,t,
-           (char *)__gen_e_acsl_literal_string_4); /* printf_va_3 */
+    printf("t is %d, going to %s\n",t,(char *)"AGAIN"); /* printf_va_3 */
     __e_acsl_delete_block((void *)(& a));
     __e_acsl_delete_block((void *)(& b));
     goto AGAIN;

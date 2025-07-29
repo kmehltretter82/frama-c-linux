@@ -8,20 +8,6 @@
 #include "stdlib.h"
 #include "time.h"
 #include "unistd.h"
-char *__gen_e_acsl_literal_string_2;
-char *__gen_e_acsl_literal_string_5;
-char *__gen_e_acsl_literal_string_3;
-char *__gen_e_acsl_literal_string_6;
-char *__gen_e_acsl_literal_string_11;
-char *__gen_e_acsl_literal_string_12;
-char *__gen_e_acsl_literal_string;
-char *__gen_e_acsl_literal_string_4;
-char *__gen_e_acsl_literal_string_7;
-char *__gen_e_acsl_literal_string_8;
-char *__gen_e_acsl_literal_string_9;
-char *__gen_e_acsl_literal_string_10;
-char *__gen_e_acsl_literal_string_13;
-char *__gen_e_acsl_literal_string_14;
 extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 
 /*@ requires valid_cond: \valid(cond);
@@ -175,20 +161,20 @@ void *write_value(void *arg)
   __e_acsl_full_init((void *)(& tmp));
   tmp = __gen_e_acsl_pthread_mutex_lock(& write_mutex);
   if (tmp != 0) {
-    __gen_e_acsl_perror(__gen_e_acsl_literal_string);
+    __gen_e_acsl_perror("Unable to lock mutex in write_value()");
     __gen_e_acsl_exit(1);
   }
   write_count ++;
   __e_acsl_full_init((void *)(& tmp_0));
   tmp_0 = __gen_e_acsl_pthread_cond_wait(& write_cond,& write_mutex);
   if (tmp_0 != 0) {
-    __gen_e_acsl_perror(__gen_e_acsl_literal_string_2);
+    __gen_e_acsl_perror("Unable to wait on condvar in write_value()");
     __gen_e_acsl_exit(1);
   }
   __e_acsl_full_init((void *)(& tmp_1));
   tmp_1 = __gen_e_acsl_pthread_mutex_unlock(& write_mutex);
   if (tmp_1 != 0) {
-    __gen_e_acsl_perror(__gen_e_acsl_literal_string_3);
+    __gen_e_acsl_perror("Unable to unlock mutex in write_value()");
     __gen_e_acsl_exit(1);
   }
   __gen_e_acsl_usleep((useconds_t)100);
@@ -230,20 +216,20 @@ void *read_value(void *arg)
   __e_acsl_full_init((void *)(& tmp));
   tmp = __gen_e_acsl_pthread_mutex_lock(& read_mutex);
   if (tmp != 0) {
-    __gen_e_acsl_perror(__gen_e_acsl_literal_string_4);
+    __gen_e_acsl_perror("Unable to lock mutex in read_value()");
     __gen_e_acsl_exit(1);
   }
   read_count ++;
   __e_acsl_full_init((void *)(& tmp_0));
   tmp_0 = __gen_e_acsl_pthread_cond_wait(& read_cond,& read_mutex);
   if (tmp_0 != 0) {
-    __gen_e_acsl_perror(__gen_e_acsl_literal_string_5);
+    __gen_e_acsl_perror("Unable to wait on condvar in read_value()");
     __gen_e_acsl_exit(1);
   }
   __e_acsl_full_init((void *)(& tmp_1));
   tmp_1 = __gen_e_acsl_pthread_mutex_unlock(& read_mutex);
   if (tmp_1 != 0) {
-    __gen_e_acsl_perror(__gen_e_acsl_literal_string_6);
+    __gen_e_acsl_perror("Unable to unlock mutex in read_value()");
     __gen_e_acsl_exit(1);
   }
   __gen_e_acsl_usleep((useconds_t)100);
@@ -1618,76 +1604,40 @@ void __e_acsl_globals_init(void)
   static char __e_acsl_already_run = 0;
   if (! __e_acsl_already_run) {
     __e_acsl_already_run = 1;
-    __gen_e_acsl_literal_string_2 = "Unable to wait on condvar in write_value()";
-    __e_acsl_store_block((void *)__gen_e_acsl_literal_string_2,
-                         sizeof("Unable to wait on condvar in write_value()"));
-    __e_acsl_full_init((void *)__gen_e_acsl_literal_string_2);
-    __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_2);
-    __gen_e_acsl_literal_string_5 = "Unable to wait on condvar in read_value()";
-    __e_acsl_store_block((void *)__gen_e_acsl_literal_string_5,
-                         sizeof("Unable to wait on condvar in read_value()"));
-    __e_acsl_full_init((void *)__gen_e_acsl_literal_string_5);
-    __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_5);
-    __gen_e_acsl_literal_string_3 = "Unable to unlock mutex in write_value()";
-    __e_acsl_store_block((void *)__gen_e_acsl_literal_string_3,
-                         sizeof("Unable to unlock mutex in write_value()"));
-    __e_acsl_full_init((void *)__gen_e_acsl_literal_string_3);
-    __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_3);
-    __gen_e_acsl_literal_string_6 = "Unable to unlock mutex in read_value()";
-    __e_acsl_store_block((void *)__gen_e_acsl_literal_string_6,
-                         sizeof("Unable to unlock mutex in read_value()"));
-    __e_acsl_full_init((void *)__gen_e_acsl_literal_string_6);
-    __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_6);
-    __gen_e_acsl_literal_string_11 = "Unable to lock write_mutex";
-    __e_acsl_store_block((void *)__gen_e_acsl_literal_string_11,
-                         sizeof("Unable to lock write_mutex"));
-    __e_acsl_full_init((void *)__gen_e_acsl_literal_string_11);
-    __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_11);
-    __gen_e_acsl_literal_string_12 = "Unable to lock read_mutex";
-    __e_acsl_store_block((void *)__gen_e_acsl_literal_string_12,
-                         sizeof("Unable to lock read_mutex"));
-    __e_acsl_full_init((void *)__gen_e_acsl_literal_string_12);
-    __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_12);
-    __gen_e_acsl_literal_string = "Unable to lock mutex in write_value()";
-    __e_acsl_store_block((void *)__gen_e_acsl_literal_string,
-                         sizeof("Unable to lock mutex in write_value()"));
-    __e_acsl_full_init((void *)__gen_e_acsl_literal_string);
-    __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string);
-    __gen_e_acsl_literal_string_4 = "Unable to lock mutex in read_value()";
-    __e_acsl_store_block((void *)__gen_e_acsl_literal_string_4,
-                         sizeof("Unable to lock mutex in read_value()"));
-    __e_acsl_full_init((void *)__gen_e_acsl_literal_string_4);
-    __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_4);
-    __gen_e_acsl_literal_string_7 = "Unable to initialize write mutex";
-    __e_acsl_store_block((void *)__gen_e_acsl_literal_string_7,
-                         sizeof("Unable to initialize write mutex"));
-    __e_acsl_full_init((void *)__gen_e_acsl_literal_string_7);
-    __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_7);
-    __gen_e_acsl_literal_string_8 = "Unable to initialize write cond var";
-    __e_acsl_store_block((void *)__gen_e_acsl_literal_string_8,
-                         sizeof("Unable to initialize write cond var"));
-    __e_acsl_full_init((void *)__gen_e_acsl_literal_string_8);
-    __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_8);
-    __gen_e_acsl_literal_string_9 = "Unable to initialize read mutex";
-    __e_acsl_store_block((void *)__gen_e_acsl_literal_string_9,
-                         sizeof("Unable to initialize read mutex"));
-    __e_acsl_full_init((void *)__gen_e_acsl_literal_string_9);
-    __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_9);
-    __gen_e_acsl_literal_string_10 = "Unable to initialize read cond var";
-    __e_acsl_store_block((void *)__gen_e_acsl_literal_string_10,
-                         sizeof("Unable to initialize read cond var"));
-    __e_acsl_full_init((void *)__gen_e_acsl_literal_string_10);
-    __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_10);
-    __gen_e_acsl_literal_string_13 = "Unable to broadcast to write cond var";
-    __e_acsl_store_block((void *)__gen_e_acsl_literal_string_13,
-                         sizeof("Unable to broadcast to write cond var"));
-    __e_acsl_full_init((void *)__gen_e_acsl_literal_string_13);
-    __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_13);
-    __gen_e_acsl_literal_string_14 = "Unable to broadcast to read cond var";
-    __e_acsl_store_block((void *)__gen_e_acsl_literal_string_14,
-                         sizeof("Unable to broadcast to read cond var"));
-    __e_acsl_full_init((void *)__gen_e_acsl_literal_string_14);
-    __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_14);
+    __e_acsl_store_block((void *)"Unable to broadcast to read cond var",37UL);
+    __e_acsl_full_init((void *)(& "Unable to broadcast to read cond var"));
+    __e_acsl_store_block((void *)"Unable to broadcast to write cond var",
+                         38UL);
+    __e_acsl_full_init((void *)(& "Unable to broadcast to write cond var"));
+    __e_acsl_store_block((void *)"Unable to lock read_mutex",26UL);
+    __e_acsl_full_init((void *)(& "Unable to lock read_mutex"));
+    __e_acsl_store_block((void *)"Unable to lock write_mutex",27UL);
+    __e_acsl_full_init((void *)(& "Unable to lock write_mutex"));
+    __e_acsl_store_block((void *)"Unable to initialize read cond var",35UL);
+    __e_acsl_full_init((void *)(& "Unable to initialize read cond var"));
+    __e_acsl_store_block((void *)"Unable to initialize read mutex",32UL);
+    __e_acsl_full_init((void *)(& "Unable to initialize read mutex"));
+    __e_acsl_store_block((void *)"Unable to initialize write cond var",36UL);
+    __e_acsl_full_init((void *)(& "Unable to initialize write cond var"));
+    __e_acsl_store_block((void *)"Unable to initialize write mutex",33UL);
+    __e_acsl_full_init((void *)(& "Unable to initialize write mutex"));
+    __e_acsl_store_block((void *)"Unable to unlock mutex in read_value()",
+                         39UL);
+    __e_acsl_full_init((void *)(& "Unable to unlock mutex in read_value()"));
+    __e_acsl_store_block((void *)"Unable to wait on condvar in read_value()",
+                         42UL);
+    __e_acsl_full_init((void *)(& "Unable to wait on condvar in read_value()"));
+    __e_acsl_store_block((void *)"Unable to lock mutex in read_value()",37UL);
+    __e_acsl_full_init((void *)(& "Unable to lock mutex in read_value()"));
+    __e_acsl_store_block((void *)"Unable to unlock mutex in write_value()",
+                         40UL);
+    __e_acsl_full_init((void *)(& "Unable to unlock mutex in write_value()"));
+    __e_acsl_store_block((void *)"Unable to wait on condvar in write_value()",
+                         43UL);
+    __e_acsl_full_init((void *)(& "Unable to wait on condvar in write_value()"));
+    __e_acsl_store_block((void *)"Unable to lock mutex in write_value()",
+                         38UL);
+    __e_acsl_full_init((void *)(& "Unable to lock mutex in write_value()"));
     __e_acsl_store_block((void *)(& read_mutex),4UL);
     __e_acsl_full_init((void *)(& read_mutex));
     __e_acsl_store_block((void *)(& write_mutex),4UL);
@@ -1710,6 +1660,20 @@ void __e_acsl_globals_init(void)
 
 void __e_acsl_globals_clean(void)
 {
+  __e_acsl_delete_block((void *)"Unable to broadcast to read cond var");
+  __e_acsl_delete_block((void *)"Unable to broadcast to write cond var");
+  __e_acsl_delete_block((void *)"Unable to lock read_mutex");
+  __e_acsl_delete_block((void *)"Unable to lock write_mutex");
+  __e_acsl_delete_block((void *)"Unable to initialize read cond var");
+  __e_acsl_delete_block((void *)"Unable to initialize read mutex");
+  __e_acsl_delete_block((void *)"Unable to initialize write cond var");
+  __e_acsl_delete_block((void *)"Unable to initialize write mutex");
+  __e_acsl_delete_block((void *)"Unable to unlock mutex in read_value()");
+  __e_acsl_delete_block((void *)"Unable to wait on condvar in read_value()");
+  __e_acsl_delete_block((void *)"Unable to lock mutex in read_value()");
+  __e_acsl_delete_block((void *)"Unable to unlock mutex in write_value()");
+  __e_acsl_delete_block((void *)"Unable to wait on condvar in write_value()");
+  __e_acsl_delete_block((void *)"Unable to lock mutex in write_value()");
   __e_acsl_delete_block((void *)(& read_mutex));
   __e_acsl_delete_block((void *)(& write_mutex));
   __e_acsl_delete_block((void *)(& read_cond));
@@ -1749,28 +1713,28 @@ int main(void)
   tmp = __gen_e_acsl_pthread_mutex_init(& write_mutex,
                                         (pthread_mutexattr_t const *)0);
   if (tmp != 0) {
-    __gen_e_acsl_perror(__gen_e_acsl_literal_string_7);
+    __gen_e_acsl_perror("Unable to initialize write mutex");
     __gen_e_acsl_exit(1);
   }
   __e_acsl_full_init((void *)(& tmp_0));
   tmp_0 = __gen_e_acsl_pthread_cond_init(& write_cond,
                                          (pthread_condattr_t const *)0);
   if (tmp_0 != 0) {
-    __gen_e_acsl_perror(__gen_e_acsl_literal_string_8);
+    __gen_e_acsl_perror("Unable to initialize write cond var");
     __gen_e_acsl_exit(1);
   }
   __e_acsl_full_init((void *)(& tmp_1));
   tmp_1 = __gen_e_acsl_pthread_mutex_init(& read_mutex,
                                           (pthread_mutexattr_t const *)0);
   if (tmp_1 != 0) {
-    __gen_e_acsl_perror(__gen_e_acsl_literal_string_9);
+    __gen_e_acsl_perror("Unable to initialize read mutex");
     __gen_e_acsl_exit(1);
   }
   __e_acsl_full_init((void *)(& tmp_2));
   tmp_2 = __gen_e_acsl_pthread_cond_init(& read_cond,
                                          (pthread_condattr_t const *)0);
   if (tmp_2 != 0) {
-    __gen_e_acsl_perror(__gen_e_acsl_literal_string_10);
+    __gen_e_acsl_perror("Unable to initialize read cond var");
     __gen_e_acsl_exit(1);
   }
   {
@@ -1808,7 +1772,7 @@ int main(void)
       __e_acsl_delete_block((void *)(& done));
     }
     else 
-      if (res != 16) __gen_e_acsl_perror(__gen_e_acsl_literal_string_11);
+      if (res != 16) __gen_e_acsl_perror("Unable to lock write_mutex");
     __gen_e_acsl_usleep((useconds_t)100);
     __e_acsl_delete_block((void *)(& res));
   }
@@ -1829,14 +1793,14 @@ int main(void)
       __e_acsl_delete_block((void *)(& done_0));
     }
     else 
-      if (res_0 != 16) __gen_e_acsl_perror(__gen_e_acsl_literal_string_12);
+      if (res_0 != 16) __gen_e_acsl_perror("Unable to lock read_mutex");
     __gen_e_acsl_usleep((useconds_t)100);
     __e_acsl_delete_block((void *)(& res_0));
   }
   __e_acsl_full_init((void *)(& tmp_5));
   tmp_5 = __gen_e_acsl_pthread_cond_broadcast(& write_cond);
   if (tmp_5 != 0) {
-    __gen_e_acsl_perror(__gen_e_acsl_literal_string_13);
+    __gen_e_acsl_perror("Unable to broadcast to write cond var");
     __gen_e_acsl_exit(11);
   }
   {
@@ -1853,7 +1817,7 @@ int main(void)
   __e_acsl_full_init((void *)(& tmp_6));
   tmp_6 = __gen_e_acsl_pthread_cond_broadcast(& read_cond);
   if (tmp_6 != 0) {
-    __gen_e_acsl_perror(__gen_e_acsl_literal_string_14);
+    __gen_e_acsl_perror("Unable to broadcast to read cond var");
     __gen_e_acsl_exit(12);
   }
   {

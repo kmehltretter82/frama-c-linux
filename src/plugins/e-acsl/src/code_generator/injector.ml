@@ -60,6 +60,50 @@ let rename_caller ~loc caller args =
   else
     caller, args
 
+let init_one_char vi idx chr =
+  let loc = vi.vdecl in
+  let off =
+    Index (Cil.kinteger ~loc (Machine.sizeof_kind()) idx,NoOffset)
+  in
+  let i = SingleInit (Cil.new_exp ~loc (Const (CChr chr))) in
+  Global_observer.add_initializer vi off i
+
+let init_one_wchar vi idx chr =
+  let loc = vi.vdecl in
+  let off =
+    Index (Cil.kinteger ~loc (Machine.sizeof_kind()) idx,NoOffset)
+  in
+  let kind = Machine.wchar_kind() in
+  let i = SingleInit (Cil.kinteger64 ~loc ~kind (Z.of_int64 chr)) in
+  Global_observer.add_initializer vi off i
+
+let init_lit_str vi s =
+  if not (Ast_types.is_any_char_array vi.vtype) then
+    Options.fatal "Literal string can only be used to initialize char arrays";
+  let slen = String.length s in
+  let _, alen = Ast_types.array_elem_type_and_size vi.vtype in
+  let alen = Option.bind (Cil.constFoldToInt ~machdep:true) alen in
+  let alen = Option.map Z.to_int alen in
+  let alen = Option.value ~default:(slen + 1) alen in
+  String.iteri (init_one_char vi) s;
+  for i = slen to alen - 1 do
+    init_one_char vi i (Char.chr 0)
+  done
+
+let init_lit_wstr vi s =
+  if not (Ast_types.is_wchar_array vi.vtype) then
+    Options.fatal
+      "Wide Literal string can only be used to initialize wide char arrays";
+  let slen = List.length s in
+  let _, alen = Ast_types.array_elem_type_and_size vi.vtype in
+  let alen = Option.bind (Cil.constFoldToInt ~machdep:true) alen in
+  let alen = Option.map Z.to_int alen in
+  let alen = Option.value ~default:(slen + 1) alen in
+  List.iteri (init_one_wchar vi) s;
+  for i = slen to alen - 1 do
+    init_one_wchar vi i Int64.zero
+  done
+
 let inject_in_init env vi off i =
   let rec aux env off = function
     | SingleInit e as init ->
@@ -80,8 +124,9 @@ let inject_in_init env vi off i =
       CompoundInit(typ, List.rev l), env
   in
   match i with
-  | CInit i -> aux env off i
-  | StrInit _ -> Options.not_yet_implemented "StrInit"
+  | CInit i -> let i, env = aux env off i in CInit i, env
+  | StrInit (Lit_str s) -> init_lit_str vi s; i, env
+  | StrInit (Lit_wstr l) -> init_lit_wstr vi l; i, env
 
 let inject_in_local_init ~loc env kf vi = function
   | ConsInit (fvi, sz :: _, _) as init
@@ -104,7 +149,9 @@ let inject_in_local_init ~loc env kf vi = function
 
   | AssignInit init ->
     let init, env = inject_in_init env vi NoOffset (CInit init) in
-    AssignInit init, env
+    match init with
+    | CInit init -> AssignInit init, env
+    | _ -> assert false
 
 (* ************************************************************************** *)
 (* Instructions and statements *)

@@ -290,6 +290,9 @@ module rec Transfer
               "monitoring %a from %a."
               Printer.pp_varinfo vi_e
               Printer.pp_lval (lhost, NoOffset);
+            (* String literals can't be monitored. In case we have one,
+               drop the attribute. *)
+            Demote_string_literal.demote vi_e;
             Varinfo.Hptset.add vi_e state
           end
       end else
@@ -332,6 +335,7 @@ module rec Transfer
       Options.feedback ~level:4 ~dkey "monitoring %a from annotation of %a."
         Printer.pp_varinfo vi
         Kernel_function.pretty kf;
+      Demote_string_literal.demote vi;
       Varinfo.Hptset.add vi varinfos
     in
     match thost with
@@ -478,7 +482,7 @@ module rec Transfer
     in
     match init with
     | CInit i -> aux i state
-    | StrInit _ -> Options.not_yet_implemented "StrInit"
+    | StrInit _ -> state (* string literal, we do not need to monitor anything per se. *)
 
   let register_initializers state =
     let do_one vi init state = match init.init with

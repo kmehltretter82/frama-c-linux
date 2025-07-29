@@ -5,32 +5,26 @@
 #include "stdint.h"
 #include "stdio.h"
 #include "time.h"
-char *__gen_e_acsl_literal_string;
-char *__gen_e_acsl_literal_string_2;
 extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 
 struct ST {
    char *str ;
    int num ;
 };
+char const __fc_lit_string1[12UL] = "Struct_G[0]";
+char const __fc_lit_string2[12UL] = "Struct_G[1]";
 struct ST _G[2] =
-  {{.str = (char *)"Struct_G[0]", .num = 99},
-   {.str = (char *)"Struct_G[1]", .num = 147}};
+  {{.str = (char *)(__fc_lit_string1), .num = 99},
+   {.str = (char *)(__fc_lit_string2), .num = 147}};
 void __e_acsl_globals_init(void)
 {
   static char __e_acsl_already_run = 0;
   if (! __e_acsl_already_run) {
     __e_acsl_already_run = 1;
-    __gen_e_acsl_literal_string = "Struct_G[1]";
-    __e_acsl_store_block((void *)__gen_e_acsl_literal_string,
-                         sizeof("Struct_G[1]"));
-    __e_acsl_full_init((void *)__gen_e_acsl_literal_string);
-    __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string);
-    __gen_e_acsl_literal_string_2 = "Struct_G[0]";
-    __e_acsl_store_block((void *)__gen_e_acsl_literal_string_2,
-                         sizeof("Struct_G[0]"));
-    __e_acsl_full_init((void *)__gen_e_acsl_literal_string_2);
-    __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_2);
+    __e_acsl_store_block((void *)(__fc_lit_string2),12UL);
+    __e_acsl_full_init((void *)(& __fc_lit_string2));
+    __e_acsl_store_block((void *)(__fc_lit_string1),12UL);
+    __e_acsl_full_init((void *)(& __fc_lit_string1));
     __e_acsl_store_block((void *)(_G),32UL);
     __e_acsl_full_init((void *)(& _G));
   }
@@ -39,6 +33,8 @@ void __e_acsl_globals_init(void)
 
 void __e_acsl_globals_clean(void)
 {
+  __e_acsl_delete_block((void *)(__fc_lit_string2));
+  __e_acsl_delete_block((void *)(__fc_lit_string1));
   __e_acsl_delete_block((void *)(_G));
   return;
 }

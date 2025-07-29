@@ -150,7 +150,10 @@ let add_pending_register_data ~loc { data_ptr } name e =
           Printer.pp_typ ty
   in
   let fct = "assert_register_" ^ fct in
-  let name = Cil.evar ~loc (Cil.create_string_literal ~loc name) in
+  let name =
+    Cil.mkAddrOrStartOf ~loc
+      (Cil.var (Globals.Vars.add_literal_string ~loc (Lit_str name)))
+  in
   let args = data_ptr :: name :: args in
   let stmt = Smart_stmt.rtl_call ~loc fct args in
   match Stack.top_opt pending_register_data with
@@ -212,10 +215,11 @@ let register_pred_or_term ~loc env ?force pot e adata =
   | PoT_pred p -> register_pred ~loc env ?force p e adata
 
 let kind_to_string loc k =
-  Cil.evar ~loc
-    (Cil.create_string_literal
-       ~loc
-       (Format.asprintf "%a" Annotation_kind.pretty k))
+  Cil.mkAddrOrStartOf ~loc
+    (Cil.var
+       (Globals.Vars.add_literal_string
+          ~loc
+          (Lit_str (Format.asprintf "%a" Annotation_kind.pretty k))))
 
 let runtime_check_with_msg ~adata ~loc ?(name="") msg ~pred_kind kind kf env predicate_e =
   let env = Env.push env in
@@ -236,17 +240,22 @@ let runtime_check_with_msg ~adata ~loc ?(name="") msg ~pred_kind kind kf env pre
       Options.fatal "No runtime check should be generated for 'admit' clauses"
   in
   let kind = kind_to_string loc kind in
-  let pred_txt = Cil.evar ~loc (Cil.create_string_literal ~loc msg) in
+  let pred_txt =
+    Cil.mkAddrOrStartOf ~loc
+      (Cil.var (Globals.Vars.add_literal_string ~loc (Lit_str msg)))
+  in
   let start_pos = fst loc in
   let file =
-    Cil.evar ~loc
-      (Cil.create_string_literal
-         ~loc
-         (Filepath.to_string start_pos.Filepath.pos_path))
+    Cil.mkAddrOrStartOf ~loc
+      (Cil.var
+         (Globals.Vars.add_literal_string ~loc
+            (Lit_str (Filepath.to_string start_pos.Filepath.pos_path))))
   in
   let fct =
-    Cil.evar ~loc
-      (Cil.create_string_literal ~loc (Functions.RTL.get_original_name kf))
+    Cil.mkAddrOrStartOf ~loc
+      (Cil.var
+         (Globals.Vars.add_literal_string ~loc
+            (Lit_str (Functions.RTL.get_original_name kf))))
   in
   let line = Cil.integer ~loc start_pos.Filepath.pos_lnum in
   let stmts =
@@ -265,7 +274,9 @@ let runtime_check_with_msg ~adata ~loc ?(name="") msg ~pred_kind kind kf env pre
         ~loc
         data_vi
         "name"
-        (Cil.evar ~loc (Cil.create_string_literal ~loc name))
+        (Cil.mkAddrOrStartOf ~loc
+           (Cil.var
+              (Globals.Vars.add_literal_string ~loc (Lit_str name))))
       :: stmts
   in
   let stmts =

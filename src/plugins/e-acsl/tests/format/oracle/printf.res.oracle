@@ -20,9 +20,17 @@
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
   Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:431: Warning: 
+  E-ACSL construct `logic functions or predicates performing read accesses'
+  is not yet supported.
+  Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:414: Warning: 
   E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:420: Warning: 
+  E-ACSL construct `logic functions or predicates performing read accesses'
+  is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/__fc_string_axiomatic.h:277: Warning: 
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
   Ignoring annotation.
@@ -39,6 +47,10 @@
   Ignoring complete and disjoint behaviors annotations.
 [e-acsl] FRAMAC_SHARE/libc/string.h:188: Warning: 
   E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/__fc_string_axiomatic.h:277: Warning: 
+  E-ACSL construct `logic functions or predicates performing read accesses'
+  is not yet supported.
+  Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:196: Warning: 
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
@@ -50,6 +62,10 @@
     \forall char *p; \old(s) <= p < \result ==> *p != (char)\old(c)'
   is not yet supported.
   Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/__fc_string_axiomatic.h:277: Warning: 
+  E-ACSL construct `logic functions or predicates performing read accesses'
+  is not yet supported.
+  Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:154: Warning: 
   E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:156: Warning: 
@@ -57,6 +73,8 @@
   is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/unistd.h:899: Warning: 
+  E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/sys/wait.h:85: Warning: 
   E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/sys/wait.h:71: Warning: 
   E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.

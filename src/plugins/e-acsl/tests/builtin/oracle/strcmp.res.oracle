@@ -5,6 +5,8 @@
   E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/sys/wait.h:71: Warning: 
   E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/sys/wait.h:85: Warning: 
+  E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/stdlib.h:685: Warning: 
   E-ACSL construct `terminates clause' is not yet supported.
   Ignoring annotation.

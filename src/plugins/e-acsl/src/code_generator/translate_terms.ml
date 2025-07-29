@@ -47,7 +47,9 @@ let constant_to_exp_il t c =
 let constant_to_exp ~loc env t c =
   let mk_real s =
     let s = Gmp.Q.normalize_str s in
-    Cil.evar ~loc (Cil.create_string_literal ~loc s), Analyses_types.Str_R
+    Cil.mkAddrOrStartOf ~loc
+      (Cil.var (Globals.Vars.add_literal_string ~loc (Lit_str s))),
+    Analyses_types.Str_R
   in
   match c with
   | Boolean b ->
@@ -60,7 +62,10 @@ let constant_to_exp ~loc env t c =
      | Real -> Error.not_yet "real number constant"
      | Rational -> mk_real (Integer.to_string n)
      | Gmpz ->
-       Cil.evar ~loc (Cil.create_string_literal ~loc (Integer.to_string n)),
+       Cil.mkAddrOrStartOf ~loc
+         (Cil.var
+            (Globals.Vars.add_literal_string ~loc
+               (Lit_str (Integer.to_string n)))),
        Analyses_types.Str_Z
      (* too large integer *)
      | C_float fkind ->
@@ -70,7 +75,10 @@ let constant_to_exp ~loc env t c =
        match cast, kind with
        | Some ty, (ILongLong | IULongLong) when Gmp_types.Z.is_t ty ->
          (* too large integer *)
-         Cil.evar ~loc (Cil.create_string_literal ~loc (Integer.to_string n)),
+         Cil.mkAddrOrStartOf ~loc
+           (Cil.var
+              (Globals.Vars.add_literal_string ~loc
+                 (Lit_str (Integer.to_string n)))),
          Analyses_types.Str_Z
        | Some ty, _ when Gmp_types.Q.is_t ty ->
          mk_real (Integer.to_string n)

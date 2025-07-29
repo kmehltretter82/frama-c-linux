@@ -6,7 +6,6 @@
 #include "stdio.h"
 #include "string.h"
 #include "time.h"
-char *__gen_e_acsl_literal_string;
 extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 
 /*@ requires valid_string_src: valid_read_string(src);
@@ -118,6 +117,12 @@ char *__gen_e_acsl_strcat(char * restrict dest, char const * restrict src);
 char *__gen_e_acsl_strncat(char * restrict dest, char const * restrict src,
                            size_t n);
 
+char const __fc_lit_string1[2UL] = "b";
+char const __fc_lit_string2[3UL] = "ab";
+char const __fc_lit_string3[2UL] = "b";
+char const __fc_lit_string5[2UL] = "b";
+char const __fc_lit_string7[3UL] = "bc";
+char const __fc_lit_string9[2UL] = "b";
 /*@ requires valid_nstring_src: valid_read_nstring(src, n);
     requires valid_string_dest: valid_string(dest);
     requires
@@ -778,11 +783,39 @@ void __e_acsl_globals_init(void)
   static char __e_acsl_already_run = 0;
   if (! __e_acsl_already_run) {
     __e_acsl_already_run = 1;
-    __gen_e_acsl_literal_string = "a";
-    __e_acsl_store_block((void *)__gen_e_acsl_literal_string,sizeof("a"));
-    __e_acsl_full_init((void *)__gen_e_acsl_literal_string);
-    __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string);
+    __e_acsl_store_block((void *)(__fc_lit_string9),2UL);
+    __e_acsl_full_init((void *)(& __fc_lit_string9));
+    __e_acsl_store_block((void *)"a",2UL);
+    __e_acsl_full_init((void *)(& "a"));
+    __e_acsl_store_block((void *)(__fc_lit_string7),3UL);
+    __e_acsl_full_init((void *)(& __fc_lit_string7));
+    __e_acsl_store_block((void *)"a",2UL);
+    __e_acsl_full_init((void *)(& "a"));
+    __e_acsl_store_block((void *)(__fc_lit_string5),2UL);
+    __e_acsl_full_init((void *)(& __fc_lit_string5));
+    __e_acsl_store_block((void *)"a",2UL);
+    __e_acsl_full_init((void *)(& "a"));
+    __e_acsl_store_block((void *)(__fc_lit_string3),2UL);
+    __e_acsl_full_init((void *)(& __fc_lit_string3));
+    __e_acsl_store_block((void *)(__fc_lit_string2),3UL);
+    __e_acsl_full_init((void *)(& __fc_lit_string2));
+    __e_acsl_store_block((void *)(__fc_lit_string1),2UL);
+    __e_acsl_full_init((void *)(& __fc_lit_string1));
   }
+  return;
+}
+
+void __e_acsl_globals_clean(void)
+{
+  __e_acsl_delete_block((void *)(__fc_lit_string9));
+  __e_acsl_delete_block((void *)"a");
+  __e_acsl_delete_block((void *)(__fc_lit_string7));
+  __e_acsl_delete_block((void *)"a");
+  __e_acsl_delete_block((void *)(__fc_lit_string5));
+  __e_acsl_delete_block((void *)"a");
+  __e_acsl_delete_block((void *)(__fc_lit_string3));
+  __e_acsl_delete_block((void *)(__fc_lit_string2));
+  __e_acsl_delete_block((void *)(__fc_lit_string1));
   return;
 }
 
@@ -794,7 +827,7 @@ int main(void)
   {
     char dest[4];
     __e_acsl_store_block((void *)(dest),4UL);
-    char src[2] = {(char)'b', (char)'\000'};
+    char src[2UL] = {'b', '\000'};
     __e_acsl_store_block((void *)(src),2UL);
     __e_acsl_full_init((void *)(& src));
     {
@@ -943,7 +976,7 @@ int main(void)
   {
     char dest_0[4];
     __e_acsl_store_block((void *)(dest_0),4UL);
-    char src_0[4] = {(char)'a', (char)'b', (char)'\000'};
+    char src_0[4] = {'a', 'b', '\000', '\000'};
     __e_acsl_store_block((void *)(src_0),4UL);
     __e_acsl_full_init((void *)(& src_0));
     {
@@ -1085,7 +1118,7 @@ int main(void)
   {
     char dest_1[4];
     __e_acsl_store_block((void *)(dest_1),4UL);
-    char src_1[4] = {(char)'b', (char)'\000'};
+    char src_1[4] = {'b', '\000', '\000', '\000'};
     __e_acsl_store_block((void *)(src_1),4UL);
     __e_acsl_full_init((void *)(& src_1));
     {
@@ -1227,8 +1260,8 @@ int main(void)
   {
     char dest_2[4];
     __e_acsl_store_block((void *)(dest_2),4UL);
-    __gen_e_acsl_strcpy(dest_2,__gen_e_acsl_literal_string);
-    char src_2[2] = {(char)'b', (char)'\000'};
+    __gen_e_acsl_strcpy(dest_2,"a");
+    char src_2[2UL] = {'b', '\000'};
     __e_acsl_store_block((void *)(src_2),2UL);
     __e_acsl_full_init((void *)(& src_2));
     {
@@ -1406,8 +1439,8 @@ int main(void)
   {
     char dest_3[4];
     __e_acsl_store_block((void *)(dest_3),4UL);
-    __gen_e_acsl_strcpy(dest_3,__gen_e_acsl_literal_string);
-    char src_3[3] = {(char)'b', (char)'c', (char)'\000'};
+    __gen_e_acsl_strcpy(dest_3,"a");
+    char src_3[3UL] = {'b', 'c', '\000'};
     __e_acsl_store_block((void *)(src_3),3UL);
     __e_acsl_full_init((void *)(& src_3));
     {
@@ -1585,8 +1618,8 @@ int main(void)
   {
     char dest_4[4];
     __e_acsl_store_block((void *)(dest_4),4UL);
-    __gen_e_acsl_strcpy(dest_4,__gen_e_acsl_literal_string);
-    char src_4[2] = {(char)'b', (char)'\000'};
+    __gen_e_acsl_strcpy(dest_4,"a");
+    char src_4[2UL] = {'b', '\000'};
     __e_acsl_store_block((void *)(src_4),2UL);
     __e_acsl_full_init((void *)(& src_4));
     {
@@ -1762,6 +1795,7 @@ int main(void)
     __e_acsl_delete_block((void *)(dest_4));
   }
   __retres = 0;
+  __e_acsl_globals_clean();
   __e_acsl_memory_clean();
   return __retres;
 }
