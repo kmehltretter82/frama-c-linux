@@ -49,7 +49,7 @@ let node_of_instr = function
   | Call _ -> "call"
   | Local_init _ -> "local_init"
   | Asm _ -> "asm"
-  | Skip _ -> "nop"
+  | Skip _ -> "skip"
   | Code_annot _ ->
     (* should be done by the annotations visitor *)
     assert false
