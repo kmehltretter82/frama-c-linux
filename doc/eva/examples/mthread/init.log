@@ -18,10 +18,10 @@
 [mt] init.c:32: Initializing mutex mu7
 [mt] init.c:32: Initializing mutex #11
 [mt] init.c:32: Warning: 
-  Unable to check that mutex #11 has not been already initialized;
-  {0; 1} should be 0
+  Trying to initialize mutex #11, but unable to check its precise status (internal value {0; 1} should be 0).
 [mt] init.c:36: Initializing mutex 0
-[mt] init.c:36: Warning: Mutex 0 might be already initialized
+[mt] init.c:36: Warning: 
+  Trying to initialize mutex 0, but it might already be unlocked (and initialized).
 [eva] init.c:13: Warning: The mutex 0 is already registered.
 [mt] *** First value analysis for main thread done.
 [mt] ******* Starting to iterate
