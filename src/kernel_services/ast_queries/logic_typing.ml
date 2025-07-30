@@ -20,6 +20,8 @@ let ($) = Fun.compose
 let loc_join (b,_) (_,e) = (b,e)
 let unescape s = Logic_lexer.chr (Lexing.from_string s)
 
+let fkind_to_string fk = Format.asprintf "%a" Cil_printer.pp_fkind fk
+
 let wcharlist_of_string s =
   let res = ref [] in
   let i = ref 0 in
@@ -1965,11 +1967,7 @@ struct
                 | Some rel ->
                   let kind =
                     match Ast_types.unroll_node ty1 with
-                    | TFloat FFloat -> "float"
-                    | TFloat FFloat32 -> "_Float32"
-                    | TFloat FFloat64 -> "_Float64"
-                    | TFloat FDouble -> "double"
-                    | TFloat FLongDouble -> "long double"
+                    | TFloat fk -> fkind_to_string fk
                     | _ -> Kernel.fatal "floating point type expected"
                   in
                   let source = fst loc in

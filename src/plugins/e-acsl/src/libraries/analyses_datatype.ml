@@ -257,11 +257,7 @@ struct
         let pretty fmt = function
           | Ival i -> Ival.pretty fmt i
           | Float(_, Some f) -> Format.pp_print_float fmt f
-          | Float(FFloat, None) -> Format.pp_print_string fmt "float"
-          | Float(FFloat32, None) -> Format.pp_print_string fmt "_Float32"
-          | Float(FFloat64, None) -> Format.pp_print_string fmt "_Float64"
-          | Float(FDouble, None) -> Format.pp_print_string fmt "double"
-          | Float(FLongDouble, None) -> Format.pp_print_string fmt "long double"
+          | Float(fk, None) -> Printer.pp_fkind fmt fk
           | Rational -> Format.pp_print_string fmt "Rational"
           | Real -> Format.pp_print_string fmt "Real"
           | Nan -> Format.pp_print_string fmt "NaN"
