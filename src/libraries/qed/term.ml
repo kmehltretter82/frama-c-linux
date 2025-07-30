@@ -1060,7 +1060,7 @@ struct
       begin
         if not force && FIELD.mem fd fmap then
           let msg = Printf.sprintf
-              "Builtin already registered for '(%s …).%s'"
+              "Builtin already registered for '(%s ...).%s'"
               (Fun.debug f) (Field.debug fd) in
           raise (Failure msg)
       end ;
