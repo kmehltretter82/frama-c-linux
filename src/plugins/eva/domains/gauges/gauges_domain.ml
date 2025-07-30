@@ -540,10 +540,10 @@ module G = struct
     MV.empty, List.map (fun (s, ii) -> (s, top_iteration_info ii)) (snd state)
 
   let pretty_iteration_info fmt = function
-    | PreciseIteration i -> Format.fprintf fmt "%s(%d)" "λ" i
+    | PreciseIteration i -> Format.fprintf fmt "%t(%d)" Unicode.pp_lambda i
     | MultipleIterations i ->
-      Format.fprintf fmt "@[<v>@<1>%s(%a)@ @[%a@]@]"
-        "λ" Bounds.pretty i.nb MC.pretty i.coeffs
+      Format.fprintf fmt "@[<v>@<1>%t(%a)@ @[%a@]@]"
+        Unicode.pp_lambda Bounds.pretty i.nb MC.pretty i.coeffs
 
   let pretty_loop_step fmt (stmt, ii) =
     Format.fprintf fmt "s%d: %a" stmt.Cil_types.sid pretty_iteration_info ii

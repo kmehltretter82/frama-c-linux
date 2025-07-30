@@ -708,7 +708,7 @@ type region = {
 
 let pp_cells fmt = function
   | 1 -> ()
-  | 0 -> Format.fprintf fmt "[…]"
+  | 0 -> Format.fprintf fmt "[%t]" Unicode.pp_ellipsis
   | n -> Format.fprintf fmt "[%d]" n
 
 type slice =

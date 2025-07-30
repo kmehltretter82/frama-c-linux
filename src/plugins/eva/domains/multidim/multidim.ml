@@ -27,7 +27,8 @@ struct
   type t = Integer.t * Integer.t
 
   let pretty fmt (d,b : t) =
-    Format.fprintf fmt "%a×[..%a]" Integer.pretty d Integer.pretty b
+    Format.fprintf fmt "%a%t[..%a]"
+      Integer.pretty d Unicode.pp_times Integer.pretty b
 
   let order (d1,_b1 : t) (d2,_b2 : t) = (* descending order *)
     Integer.compare d2 d1

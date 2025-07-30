@@ -251,7 +251,8 @@ class virtual engine =
     method pp_label fmt lbl =
       Format.pp_print_string fmt lbl.name
 
-    method pp_chunk fmt mu = Format.fprintf fmt "µ:%a" Sigma.Chunk.pretty mu
+    method pp_chunk fmt mu =
+      Format.fprintf fmt "%t:%a" Unicode.pp_mu Sigma.Chunk.pretty mu
 
   end
 

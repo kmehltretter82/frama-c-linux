@@ -97,10 +97,10 @@ struct
     type t = { data : data ; region : R.region }
 
     let pp_data fmt = function
-      | Value p -> Format.fprintf fmt "µ%a" pp_prim p
-      | Array p -> Format.fprintf fmt "µ%a[]" pp_prim p
-      | ValInit -> Format.pp_print_string fmt "µinit"
-      | ArrInit -> Format.pp_print_string fmt "µinit[]"
+      | Value p -> Format.fprintf fmt "%t%a" Unicode.pp_mu pp_prim p
+      | Array p -> Format.fprintf fmt "%t%a[]" Unicode.pp_mu pp_prim p
+      | ValInit -> Format.fprintf fmt "%tinit" Unicode.pp_mu
+      | ArrInit -> Format.fprintf fmt "%tinit[]" Unicode.pp_mu
 
     let hash { data ; region } = Hashtbl.hash (data, R.id region)
     let equal a b = Stdlib.(=) a.data b.data && R.id a.region = R.id b.region

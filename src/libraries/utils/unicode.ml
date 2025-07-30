@@ -62,8 +62,23 @@ let pp_boolean = pretty Utf8_logic.boolean "boolean"
 let pp_integer = pretty Utf8_logic.integer "integer"
 let pp_real =    pretty Utf8_logic.real "real"
 
-(* Others. *)
+(* Greek letters. *)
 
 let pp_pi = pretty Utf8_logic.pi "\\pi"
+let pp_lambda = pretty "λ" "\\lambda"
+let pp_mu = pretty "µ" "\\mu"
+
+(* Other symbols. *)
 
 let pp_right_arrow = pretty "→" "->"
+let pp_plus_minus = pretty "±" "+/-"
+let pp_times = pretty "×" "x"
+let pp_ellipsis = pretty "…" "..."
+
+let pp_lceil = pretty "⌈" "ceil("
+let pp_rceil = pretty "⌉" ")"
+let pp_lfloor = pretty "⌊" "floor("
+let pp_rfloor = pretty "⌋" ")"
+
+let pp_ceil pp fmt elt = Format.fprintf fmt "%t%a%t" pp_lceil pp elt pp_rceil
+let pp_floor pp fmt elt = Format.fprintf fmt "%t%a%t" pp_lfloor pp elt pp_rfloor

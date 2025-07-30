@@ -53,7 +53,8 @@ let find = STATE.find
 
 let get kf =
   try STATE.find kf with Not_found ->
-    Options.feedback ~ontty:`Transient "Function %a…" Kernel_function.pretty kf ;
+    Options.feedback ~ontty:`Transient
+      "Function %a%t" Kernel_function.pretty kf Unicode.pp_ellipsis ;
     let domain = Code.domain kf in
     STATE.add kf domain ;
     domain

@@ -59,8 +59,20 @@ val pp_boolean : printer
 val pp_integer : printer
 val pp_real : printer
 
-(* Others *)
+(* Greek letters. *)
 
 val pp_pi : printer
+val pp_lambda : printer
+val pp_mu : printer
+
+(* Other symbols. *)
 
 val pp_right_arrow : printer
+
+val pp_plus_minus : printer
+val pp_times : printer
+
+val pp_ellipsis : printer
+
+val pp_floor : 'a Pretty_utils.formatter -> 'a Pretty_utils.formatter
+val pp_ceil : 'a Pretty_utils.formatter -> 'a Pretty_utils.formatter
