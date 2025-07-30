@@ -370,7 +370,7 @@ let check_package pkg =
 let check_name name =
   if not (Str.string_match name_re name 0) then
     Senv.fatal
-      "Invalid identifier %S (use « camlCased » names)" name
+      "Invalid identifier %S (use camlCased names)" name
 
 let register_ident id =
   if IdSet.mem id !registry then
