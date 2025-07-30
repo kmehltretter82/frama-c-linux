@@ -292,7 +292,7 @@ let show_perf current_time fmt =
     "@,Execution time per callstack:\
      @,================================================================@,";
   print_tree ~total_duration ~current_time fmt;
-  Format.fprintf fmt " @,@]"
+  Format.fprintf fmt "@,@]"
 
 (* -------------------------------------------------------------------------- *)
 (*                            Exported functions                              *)
