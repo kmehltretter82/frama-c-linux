@@ -1,0 +1,83 @@
+digraph G {
+  fontsize=9;
+  center=1;
+  v61 [URL="#", fillcolor="#00000000", shape=box, color="#00000055",
+       label="Start: main", style="filled", ];
+  v37 [URL="code.html#sid75", fillcolor="#FFFFFFFF", shape=box,
+       color="#AAAAAAFF", label="Call g1((int *)0,0);", style="filled", ];
+  v55 [URL="code.html#sid70", fillcolor="#FFFFFFFF", shape=box,
+       color="#AAAAAAFF",
+       label="Call pthread_create(& jobs[i],(pthread_attr_t const *)0,& fjob,(void *)0);",
+       style="filled", ];
+  v57 [URL="code.html#sid1", fillcolor="#FFFFFFFF", shape=box,
+       color="#FF0000FF", label="Create thread jobs[0]", style="filled", ];
+  v59 [URL="code.html#sid5", fillcolor="#FFFFFFFF", shape=box,
+       color="#FF0000FF", label="Start thread jobs[0]", style="filled", ];
+  v60 [URL="code.html#sid93", fillcolor="#FFFFFFFF", shape=box,
+       color="#AAAAAAFF", label="return", style="filled", ];
+  v56 [URL="code.html#sid117", fillcolor="#FFFFFFFF", shape=box,
+       color="#AAAAAAFF", label="return", style="filled", ];
+  v38 [URL="code.html#sid78", fillcolor="#FFFFFFFF", shape=box,
+       color="#000000FF", label="while(1)", style="filled", ];
+  v39 [URL="code.html#sid80", fillcolor="#FFFFFFFF", shape=box,
+       color="#000000FF", label="if (i < 5)", style="filled", ];
+  v42 [URL="code.html#sid83", fillcolor="#FFFFFFFF", shape=box,
+       color="#AAAAAAFF", label="Call (*pf)(& global1,i);", style="filled", ];
+  v46 [URL="code.html#sid69", fillcolor="#FFFFFFFF", shape=box,
+       color="#000000FF", label="if (i < 4)", style="filled", ];
+  v49 [URL="code.html#sid70", fillcolor="#FFFFFFFF", shape=box,
+       color="#AAAAAAFF",
+       label="Call pthread_create(& jobs[i],(pthread_attr_t const *)0,& fjob,(void *)0);",
+       style="filled", ];
+  v50 [URL="code.html#sid1", fillcolor="#FFFFFFFF", shape=box,
+       color="#FF0000FF",
+       label="Create thread jobs[1]\nCreate thread jobs[2]\nCreate thread jobs[3]",
+       style="filled", ];
+  v52 [URL="code.html#sid5", fillcolor="#FFFFFFFF", shape=box,
+       color="#FF0000FF",
+       label="Start thread jobs[1]\nStart thread jobs[2]\nStart thread jobs[3]",
+       style="filled", ];
+  v53 [URL="code.html#sid93", fillcolor="#FFFFFFFF", shape=box,
+       color="#AAAAAAFF", label="return", style="filled", ];
+  v48 [URL="code.html#sid117", fillcolor="#FFFFFFFF", shape=box,
+       color="#AAAAAAFF", label="return", style="filled", ];
+  v43 [URL="code.html#sid84", fillcolor="#FFFFFFFF", shape=box,
+       color="#AAAAAAFF", label="Call g2(global2);", style="filled", ];
+  v45 [URL="code.html#sid84", fillcolor="#CCCCFFFF", shape=diamond,
+       color="#000000FF", label="writes global2[0..1]", style="filled", ];
+  v47 [URL="code.html#sid71", fillcolor="#CCCCFFFF", shape=box,
+       color="#000000FF", label="*v = 1;\nwrites global1", style="filled", ];
+  v40 [URL="code.html#sid119", fillcolor="#FFFFFFFF", shape=box,
+       color="#000000FF", label="exit", style="filled", ];
+  v36 [URL="#", fillcolor="#FFFFFFFF", shape=plaintext, color="#000000FF",
+       label="", style="invis", ];
+  
+  
+  v61 -> v37 [dir=forward, ];
+  v37 -> v55 [weight=200, dir=forward, ];
+  v55 -> v57 [weight=200, dir=forward, ];
+  v57 -> v59 [dir=forward, ];
+  v59 -> v60 [dir=forward, ];
+  v60 -> v56 [dir=forward, ];
+  v55 -> v60 [weight=1, dir=none, style="dotted", ];
+  v56 -> v38 [dir=forward, ];
+  v37 -> v56 [weight=1, dir=none, style="dotted", ];
+  v38 -> v39 [dir=forward, ];
+  v39 -> v42 [label="then", dir=forward, ];
+  v39 -> v40 [label="else", dir=forward, ];
+  v42 -> v46 [weight=200, label="g1", dir=forward, ];
+  v46 -> v49 [label="then", dir=forward, ];
+  v46 -> v47 [label="else", dir=forward, ];
+  v49 -> v50 [weight=200, dir=forward, ];
+  v50 -> v52 [dir=forward, ];
+  v52 -> v53 [dir=forward, ];
+  v53 -> v48 [dir=forward, ];
+  v49 -> v53 [weight=1, dir=none, style="dotted", ];
+  v48 -> v43 [dir=forward, ];
+  v42 -> v48 [weight=1, dir=none, style="dotted", ];
+  v43 -> v45 [weight=200, dir=none, ];
+  v38 -> v45 [dir=back, ];
+  v47 -> v48 [dir=forward, ];
+  v40 -> v36 [dir=forward, ];
+  
+  }
