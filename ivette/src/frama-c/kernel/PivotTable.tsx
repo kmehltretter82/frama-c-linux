@@ -127,7 +127,7 @@ function PivotTableBuild(
   );
 }
 
-function onPreSetMenu(set: (a: Preset) => void): void {
+function onPresetMenu(set: (a: Preset) => void): void {
   const items: Dome.PopupMenuItem[] = Object.entries(presetList)
     .map(([name, preset]) => {
       return { label: name, onClick: () => set(preset) };
@@ -219,7 +219,7 @@ export default function PivotTableComponent(): JSX.Element {
   const [state, setState] = useGlobalState(PivotGlobalState);
   const [showDatas, flipShowDatas] =
     Dome.useFlipSettings('ivette.pivottable.showdatas', true);
-  const [currentPreSet, setCurrentPreSet] = React.useState<Preset>();
+  const [currentPreset, setCurrentPreset] = React.useState<Preset>();
   const filterTableState = React.useState<{[key: string]: string}>({});
   const [ filterTable, ] = filterTableState;
   // Pas de sens cette clé voir si on peut mettre un marker de l'AST
@@ -227,12 +227,12 @@ export default function PivotTableComponent(): JSX.Element {
     (v: string[]) => v[0]);
 
   React.useEffect(() => {
-    if (currentPreSet) {
+    if (currentPreset) {
       const v = PivotGlobalState.getValue();
-      setState({ ...v, ...currentPreSet });
-      setCurrentPreSet(undefined);
+      setState({ ...v, ...currentPreset });
+      setCurrentPreset(undefined);
     }
-  }, [setState, currentPreSet]);
+  }, [setState, currentPreset]);
 
   React.useEffect(() => {
     if (rawData && rawData.length > 0) {
@@ -248,8 +248,8 @@ export default function PivotTableComponent(): JSX.Element {
         { Object.entries(state).length > 0 &&
           <IconButton
             icon='TUNINGS'
-            title="Select PreSet"
-            onClick={() => onPreSetMenu(setCurrentPreSet)}
+            title="Select Preset"
+            onClick={() => onPresetMenu(setCurrentPreset)}
           />
         }
         <IconButton
@@ -288,38 +288,72 @@ interface Preset {
 }
 
 const presetList: {[name: string]: Preset} = {
-    functions: {
-      rows: ['Filename', 'Function'],
-      cols: ['Node'],
-      valueFilter: {
-        Domain: { message: true, property: true },
-        Kind: {
-         annot: true,
-         debug: true,
-         decl: true,
-         feedback: true,
-         result: true,
-         warning: true,
-         '': true
-        }
-      }
-    },
-    Filename: {
-      rows: ['Filename'],
-      cols: ['Node'],
-      valueFilter: {
-        Domain: { message: true, property: true },
-        Kind: {
-         annot: true,
-         debug: true,
-         decl: true,
-         feedback: true,
-         result: true,
-         warning: true,
-         '': true
-        }
+  "Syntax - Code - Statements per function": {
+    rows: ['Filename', 'Function'],
+    cols: ['Node'],
+    valueFilter: {
+      Filename: { "<unknown location>": true },
+      Domain: { message: true, property: true },
+      Kind: {
+        annot: true,
+        debug: true,
+        decl: true,
+        feedback: true,
+        result: true,
+        warning: true,
+        '': true
       }
     }
-  };
+  },
+  "Syntax - Code - Annotations per function": {
+    rows: ['Filename', 'Function'],
+    cols: ['Node'],
+    valueFilter: {
+      Filename: { "<unknown location>": true },
+      Domain: { message: true, property: true },
+      Kind: {
+        code: true,
+        debug: true,
+        decl: true,
+        feedback: true,
+        result: true,
+        warning: true,
+        '': true
+      }
+    }
+  },
+  "Messages - Warnings/Errors per function": {
+    rows: ['Filename', 'Function'],
+    cols: ['Node', 'Kind'],
+    valueFilter: {
+      Filename: { "<unknown location>": true },
+      Domain: { syntax: true, property: true },
+      Kind: {
+        annot: true,
+        code: true,
+        debug: true,
+        decl: true,
+        feedback: true,
+        result: true,
+        '': true
+      }
+    }
+  },
+  "Properties - Unknown/Invalid Statuses per function": {
+    rows: ['Filename', 'Function'],
+    cols: ['Node', 'Status'],
+    valueFilter: {
+      Filename: { "<unknown location>": true },
+      Domain: { syntax: true, message: true },
+      Status: {
+        "Never_tried": true,
+        "Considered_valid": true,
+        "Valid": true,
+        "Valid_under_hyp": true,
+        "Valid_but_dead": true,
+      }
+    }
+  }
+};
 
 // --------------------------------------------------------------------------
