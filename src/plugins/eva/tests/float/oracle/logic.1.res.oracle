@@ -296,8 +296,7 @@
   Frama_C_show_each_lt_double: {inf}, [-inf .. 0x1.fffffffffffffp1023]
 [eva] logic.i:104: Frama_C_show_each_le_double: {inf}, [-inf .. inf]
 [eva] logic.i:108: 
-  Frama_C_show_each_ne_double:
-  {inf}, [-inf .. 0x1.fffffffffffffp1023] ∪ {NaN}
+  Frama_C_show_each_ne_double: {inf}, [-inf .. 0x1.fffffffffffffp1023] ∪ {NaN}
 [eva] Recording results for test_comparison_reduction
 [eva] Done for function test_comparison_reduction
 [eva] computing for function test_comparison_reduction <- 

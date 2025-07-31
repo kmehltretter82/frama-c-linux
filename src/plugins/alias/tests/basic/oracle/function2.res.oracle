@@ -27,8 +27,7 @@
 [alias] Summary of function my_malloc:
   formals: size    returns: res    state: <none>
 [alias] May-aliases after instruction  a = my_malloc(2);  are  <none>
-[alias] May-alias graph after instruction  a = my_malloc(2);  is
-  4:{ a } → 3:{  }
+[alias] May-alias graph after instruction  a = my_malloc(2);  is    4:{ a } → 3:{  }
 [alias] analysing instruction: b = my_malloc(3);
 [alias] May-aliases after instruction  b = my_malloc(3);  are  <none>
 [alias] May-alias graph after instruction  b = my_malloc(3);  is

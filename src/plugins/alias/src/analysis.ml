@@ -94,7 +94,7 @@ let rec do_init (lv:lval) (init:init) state =
 
 let pp_abstract_state_opt ?(debug=false) fmt v =
   match v with
-  | None -> Format.fprintf fmt "⊥"
+  | None -> Unicode.pp_bottom fmt
   | Some a -> Abstract_state.pretty ~debug fmt a
 
 let analyse_global_var v initinfo st =

@@ -377,9 +377,8 @@
     read by tjob1 at memcpy.c:26, unprotected
     write by <main> at memcpy.c:48, unprotected
 [mt] Shared memory: a; b
-[mt] Write summary for <main>:
-  a# ∈ {0; 3} repeated %8 
-  b# ∈ {0; 3} repeated %8
+[mt] Write summary for <main>: a# ∈ {0; 3} repeated %8 
+                            b# ∈ {0; 3} repeated %8
 [mt] Mutexes for concurrent accesses:
   a  unprotected
   b  unprotected

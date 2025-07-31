@@ -87,13 +87,12 @@ axiomatic aorai_Trans_Stop {
 /*@
 predicate aorai_Trans_Cond_param{L}
   (ℤ _aorai_numTrans, ℤ _aorai_op, ℤ _aorai_status) =
-  (_aorai_numTrans ≡ 0 ⇒
-   _aorai_op ≡ op_f ∧ _aorai_status ≡ aorai_Called) ∧
+  (_aorai_numTrans ≡ 0 ⇒ _aorai_op ≡ op_f ∧ _aorai_status ≡ aorai_Called) ∧
   (_aorai_numTrans ≡ 1 ⇒
    _aorai_op ≡ op_f ∧ _aorai_status ≡ aorai_Terminated ∧ NB ≤ 0) ∧
   (_aorai_numTrans ≡ 2 ⇒
-   _aorai_op ≡ op_g ∧ _aorai_status ≡ aorai_Called ∧ NB > 0 ∧
-   g_calls < NB ∧ 0 ≤ g_calls) ∧
+   _aorai_op ≡ op_g ∧ _aorai_status ≡ aorai_Called ∧ NB > 0 ∧ g_calls < NB ∧
+   0 ≤ g_calls) ∧
   (_aorai_numTrans ≡ 3 ⇒
    G_i ≡ 0 ∧ g_calls < NB ∧ _aorai_op ≡ op_g ∧
    _aorai_status ≡ aorai_Terminated) ∧
@@ -102,12 +101,9 @@ predicate aorai_Trans_Cond_param{L}
    _aorai_status ≡ aorai_Terminated) ∧
   (_aorai_numTrans ≡ 5 ⇒
    G_i ≢ 0 ∧ _aorai_op ≡ op_g ∧ _aorai_status ≡ aorai_Terminated) ∧
-  (_aorai_numTrans ≡ 6 ⇒
-   _aorai_op ≡ op_h ∧ _aorai_status ≡ aorai_Called) ∧
-  (_aorai_numTrans ≡ 7 ⇒
-   _aorai_op ≡ op_h ∧ _aorai_status ≡ aorai_Terminated) ∧
-  (_aorai_numTrans ≡ 8 ⇒
-   _aorai_op ≡ op_f ∧ _aorai_status ≡ aorai_Terminated);
+  (_aorai_numTrans ≡ 6 ⇒ _aorai_op ≡ op_h ∧ _aorai_status ≡ aorai_Called) ∧
+  (_aorai_numTrans ≡ 7 ⇒ _aorai_op ≡ op_h ∧ _aorai_status ≡ aorai_Terminated) ∧
+  (_aorai_numTrans ≡ 8 ⇒ _aorai_op ≡ op_f ∧ _aorai_status ≡ aorai_Terminated);
  */
 /*@
 predicate aorai_Trans_Cond{L}(ℤ _aorai_numTrans) =
@@ -123,8 +119,7 @@ global invariant _Buch_not_crossable_cond:
 /*@
 global invariant _Buch_not_crossable_start:
   ∀ ℤ _buch_tr;
-    0 ≤ _buch_tr < 9 ∧
-    aorai_CurStates_old[aorai_Trans_Start(_buch_tr)] ≡ 0 ⇒
+    0 ≤ _buch_tr < 9 ∧ aorai_CurStates_old[aorai_Trans_Start(_buch_tr)] ≡ 0 ⇒
     aorai_CurTrans[_buch_tr] ≡ 0;
  */
 /*@
@@ -133,14 +128,12 @@ global invariant _Buch_not_reachable:
     0 ≤ _buch_st < 7 ∧
     (∀ ℤ _buch_tr;
        0 ≤ _buch_tr < 9 ⇒
-       aorai_CurTrans[_buch_tr] ≡ 0 ∨
-       aorai_Trans_Stop(_buch_tr) ≢ _buch_st) ⇒
+       aorai_CurTrans[_buch_tr] ≡ 0 ∨ aorai_Trans_Stop(_buch_tr) ≢ _buch_st) ⇒
     aorai_CurStates[_buch_st] ≡ 0;
  */
 /*@ requires
-      0 ≡ aorai_CurTrans[0] ∧ 0 ≡ aorai_CurTrans[1] ∧
-      0 ≡ aorai_CurTrans[3] ∧ 0 ≡ aorai_CurTrans[4] ∧
-      0 ≡ aorai_CurTrans[5] ∧ 0 ≡ aorai_CurTrans[6] ∧
+      0 ≡ aorai_CurTrans[0] ∧ 0 ≡ aorai_CurTrans[1] ∧ 0 ≡ aorai_CurTrans[3] ∧
+      0 ≡ aorai_CurTrans[4] ∧ 0 ≡ aorai_CurTrans[5] ∧ 0 ≡ aorai_CurTrans[6] ∧
       0 ≡ aorai_CurTrans[7] ∧ 0 ≡ aorai_CurTrans[8];
     requires 0 ≢ aorai_CurTrans[2];
     requires
@@ -148,8 +141,7 @@ global invariant _Buch_not_reachable:
       0 ≡ aorai_CurStates[OK] ∧ 0 ≡ aorai_CurStates[S5] ∧
       0 ≡ aorai_CurStates[S3] ∧ 0 ≡ aorai_CurStates[S4];
     requires 0 ≢ aorai_CurStates[S2];
-    requires
-      aorai_CurTrans[2] ≢ 0 ⇒ NB > 0 ∧ g_calls < NB ∧ 0 ≤ g_calls;
+    requires aorai_CurTrans[2] ≢ 0 ⇒ NB > 0 ∧ g_calls < NB ∧ 0 ≤ g_calls;
     
     behavior Buchi_property_behavior_3:
       ensures
@@ -161,8 +153,7 @@ global invariant _Buch_not_reachable:
         0 ≡ aorai_CurTrans[2] ∧ 0 ≡ aorai_CurTrans[6] ∧
         0 ≡ aorai_CurTrans[7] ∧ 0 ≡ aorai_CurTrans[8];
       ensures
-        0 ≢ aorai_CurTrans[3] ∨ 0 ≢ aorai_CurTrans[4] ∨
-        0 ≢ aorai_CurTrans[5];
+        0 ≢ aorai_CurTrans[3] ∨ 0 ≢ aorai_CurTrans[4] ∨ 0 ≢ aorai_CurTrans[5];
       ensures
         0 ≡ aorai_CurStates[S0] ∧ 0 ≡ aorai_CurStates[OK] ∧
         0 ≡ aorai_CurStates[S2] ∧ 0 ≡ aorai_CurStates[S4];
@@ -224,9 +215,8 @@ int g(int x)
 }
 
 /*@ requires
-      0 ≡ aorai_CurTrans[0] ∧ 0 ≡ aorai_CurTrans[1] ∧
-      0 ≡ aorai_CurTrans[2] ∧ 0 ≡ aorai_CurTrans[3] ∧
-      0 ≡ aorai_CurTrans[4] ∧ 0 ≡ aorai_CurTrans[5] ∧
+      0 ≡ aorai_CurTrans[0] ∧ 0 ≡ aorai_CurTrans[1] ∧ 0 ≡ aorai_CurTrans[2] ∧
+      0 ≡ aorai_CurTrans[3] ∧ 0 ≡ aorai_CurTrans[4] ∧ 0 ≡ aorai_CurTrans[5] ∧
       0 ≡ aorai_CurTrans[7] ∧ 0 ≡ aorai_CurTrans[8];
     requires 0 ≢ aorai_CurTrans[6];
     requires
@@ -282,9 +272,8 @@ void h(void)
 }
 
 /*@ requires
-      0 ≡ aorai_CurTrans[1] ∧ 0 ≡ aorai_CurTrans[2] ∧
-      0 ≡ aorai_CurTrans[3] ∧ 0 ≡ aorai_CurTrans[4] ∧
-      0 ≡ aorai_CurTrans[5] ∧ 0 ≡ aorai_CurTrans[6] ∧
+      0 ≡ aorai_CurTrans[1] ∧ 0 ≡ aorai_CurTrans[2] ∧ 0 ≡ aorai_CurTrans[3] ∧
+      0 ≡ aorai_CurTrans[4] ∧ 0 ≡ aorai_CurTrans[5] ∧ 0 ≡ aorai_CurTrans[6] ∧
       0 ≡ aorai_CurTrans[7] ∧ 0 ≡ aorai_CurTrans[8];
     requires 0 ≢ aorai_CurTrans[0];
     requires
@@ -298,8 +287,7 @@ void h(void)
       ensures
         0 ≡ aorai_CurTrans[0] ∧ 0 ≡ aorai_CurTrans[2] ∧
         0 ≡ aorai_CurTrans[3] ∧ 0 ≡ aorai_CurTrans[4] ∧
-        0 ≡ aorai_CurTrans[5] ∧ 0 ≡ aorai_CurTrans[6] ∧
-        0 ≡ aorai_CurTrans[7];
+        0 ≡ aorai_CurTrans[5] ∧ 0 ≡ aorai_CurTrans[6] ∧ 0 ≡ aorai_CurTrans[7];
       ensures 0 ≢ aorai_CurTrans[1] ∨ 0 ≢ aorai_CurTrans[8];
       ensures
         0 ≡ aorai_CurStates[S1] ∧ 0 ≡ aorai_CurStates[S0] ∧
@@ -327,13 +315,11 @@ void f(int N)
         (0 ≢ aorai_CurTrans[0] ∨ 0 ≢ aorai_CurTrans[3] ∨
          0 ≢ aorai_CurTrans[4] ∨ 0 ≢ aorai_CurTrans[5]) ∧
         0 ≡ aorai_CurTrans[1] ∧ 0 ≡ aorai_CurTrans[2] ∧
-        0 ≡ aorai_CurTrans[6] ∧ 0 ≡ aorai_CurTrans[7] ∧
-        0 ≡ aorai_CurTrans[8];
+        0 ≡ aorai_CurTrans[6] ∧ 0 ≡ aorai_CurTrans[7] ∧ 0 ≡ aorai_CurTrans[8];
       loop invariant
         aorai_Loop_Init_38 ≢ 0 ⇒
         aorai_CurStates[4] ≡ 0 ∧ aorai_CurStates[5] ≡ 0 ∧
-        aorai_CurTrans[3] ≡ 0 ∧ aorai_CurTrans[4] ≡ 0 ∧
-        aorai_CurTrans[5] ≡ 0;
+        aorai_CurTrans[3] ≡ 0 ∧ aorai_CurTrans[4] ≡ 0 ∧ aorai_CurTrans[5] ≡ 0;
       loop invariant aorai_Loop_Init_38 ≡ 0 ⇒ aorai_CurTrans[0] ≡ 0;
   */
   while (1) {

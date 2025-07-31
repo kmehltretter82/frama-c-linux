@@ -260,13 +260,15 @@ end = struct
     let empty = {substitutions = Logic_var.Map.empty; equations = []}
 
     let pp_substitution fmt (v, t) =
-      Format.fprintf fmt "@[@[%a@] → @[%a@]@]"
+      Format.fprintf fmt "@[@[%a@] %t @[%a@]@]"
         Printer.pp_logic_var v
+        Unicode.pp_right_arrow
         Printer.pp_logic_var t
 
     let pp_equation fmt (t1, t2) =
-      Format.fprintf fmt "@[@[%a@] ≡ @[%a@]@]"
+      Format.fprintf fmt "@[@[%a@] %t @[%a@]@]"
         Printer.pp_term t1
+        Unicode.pp_eq
         Printer.pp_term t2
 
     let pretty fmt {substitutions = subs; equations} =

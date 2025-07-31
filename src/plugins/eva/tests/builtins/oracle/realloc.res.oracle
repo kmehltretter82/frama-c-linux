@@ -139,14 +139,12 @@
                      [6] ∈ UNINITIALIZED
   ==END OF DUMP==
 [eva:alarm] realloc.c:49: Warning: 
-  accessing left-value that contains escaping addresses.
-  assert ¬\dangling(&q);
+  accessing left-value that contains escaping addresses. assert ¬\dangling(&q);
 [eva] realloc.c:49: Call to builtin free
 [eva] realloc.c:49: function free: precondition 'freeable' got status valid.
 [eva:malloc] realloc.c:49: strong free on bases: {__malloc_main3_l32}
 [eva:alarm] realloc.c:49: Warning: 
-  accessing left-value that contains escaping addresses.
-  assert ¬\dangling(&r);
+  accessing left-value that contains escaping addresses. assert ¬\dangling(&r);
 [eva] realloc.c:49: Call to builtin free
 [eva] realloc.c:49: function free: precondition 'freeable' got status valid.
 [eva:malloc] realloc.c:49: strong free on bases: {__malloc_main3_l35}
@@ -309,8 +307,7 @@
                      [1] ∈ UNINITIALIZED
   ==END OF DUMP==
 [eva:alarm] realloc.c:88: Warning: 
-  accessing left-value that contains escaping addresses.
-  assert ¬\dangling(&p);
+  accessing left-value that contains escaping addresses. assert ¬\dangling(&p);
 [eva] realloc.c:88: Call to builtin free
 [eva] realloc.c:88: function free: precondition 'freeable' got status valid.
 [eva:malloc] realloc.c:88: strong free on bases: {__malloc_main5_l76}

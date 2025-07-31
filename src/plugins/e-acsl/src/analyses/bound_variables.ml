@@ -576,10 +576,9 @@ let rec visit_quantif_relations ~is_forall ctxt p =
     end else
       let msg =
         Format.asprintf
-          "@[invalid quantification guard, expecting '%s' to continue@ \
-           bounding variables,@ found '%s'@]"
-          (if Kernel.Unicode.get () then Utf8_logic.conj else "&&")
-          (if Kernel.Unicode.get () then Utf8_logic.implies else "==>")
+          "@[invalid quantification guard, expecting '%t' to continue@ \
+           bounding variables,@ found '%t'@]"
+          Unicode.pp_and Unicode.pp_implies
       in
       Constraints.raise_error msg ctxt
   | Pand(lhs, rhs) ->
@@ -591,10 +590,9 @@ let rec visit_quantif_relations ~is_forall ctxt p =
     else
       let msg =
         Format.asprintf
-          "@[invalid quantification predicate, expecting '%s' to@ \
-           separate the hypotheses from the goal, found '%s'@]"
-          (if Kernel.Unicode.get () then Utf8_logic.implies else "==>")
-          (if Kernel.Unicode.get () then Utf8_logic.conj else "&&")
+          "@[invalid quantification predicate, expecting '%t' to@ \
+           separate the hypotheses from the goal, found '%t'@]"
+          Unicode.pp_implies Unicode.pp_and
       in
       Constraints.raise_error msg ctxt
   | Prel((Rlt | Rle) as r, t1, t2) ->

@@ -92,18 +92,9 @@ and print_logic_type name fmt typ =
     in
     print_logic_type (Some pname) fmt t
   | LTvoid -> fprintf fmt "void%t" pname
-  | LTboolean ->
-    fprintf fmt "%s%t"
-      (if Kernel.Unicode.get () then Utf8_logic.boolean else "boolean")
-      pname
-  | LTinteger ->
-    fprintf fmt "%s%t"
-      (if Kernel.Unicode.get () then Utf8_logic.integer else "integer")
-      pname
-  | LTreal ->
-    fprintf fmt "%s%t"
-      (if Kernel.Unicode.get () then Utf8_logic.real else "real")
-      pname
+  | LTboolean -> fprintf fmt "%t%t" Unicode.pp_boolean pname
+  | LTinteger -> fprintf fmt "%t%t" Unicode.pp_integer pname
+  | LTreal -> fprintf fmt "%t%t" Unicode.pp_real pname
   | LTint i -> fprintf fmt "%a%t" Cil_printer.pp_ikind i pname
   | LTfloat f -> fprintf fmt "%a%t" Cil_printer.pp_fkind f pname
   | LTarray (t,c) ->

@@ -198,16 +198,14 @@
         # cvalue: Frama_C_entropy_source ∈ [--..--]
                   vars[0..1] ∈ {0} 
       thread_arg.c:26:
-        # cvalue:
-        Frama_C_entropy_source ∈ [--..--]
-        vars[0] ∈ [0..10]
-            [1] ∈ {0} 
+        # cvalue: Frama_C_entropy_source ∈ [--..--]
+                  vars[0] ∈ [0..10]
+                      [1] ∈ {0} 
     interferences by mutexes:
       { locks[0] }:
-        # cvalue:
-        Frama_C_entropy_source ∈ [--..--]
-        vars[0] ∈ [0..10]
-            [1] ∈ {0}
+        # cvalue: Frama_C_entropy_source ∈ [--..--]
+                  vars[0] ∈ [0..10]
+                      [1] ∈ {0}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[0] computed
@@ -245,10 +243,9 @@
     shared bases: {Frama_C_entropy_source, vars}
     interferences by location:
       thread_arg.c:26:
-        # cvalue:
-        Frama_C_entropy_source ∈ [--..--]
-        vars[0] ∈ [0..10]
-            [1] ∈ {0} 
+        # cvalue: Frama_C_entropy_source ∈ [--..--]
+                  vars[0] ∈ [0..10]
+                      [1] ∈ {0} 
       thread_arg.c:26:
         # cvalue: Frama_C_entropy_source ∈ [--..--]
                   vars[0..1] ∈ [0..10] 

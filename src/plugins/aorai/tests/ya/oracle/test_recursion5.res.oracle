@@ -22,8 +22,7 @@ enum aorai_OpStatusList {
 /*@ ghost int IgnoreFoo = 0; */
 /*@ ghost int WillDoFoo = 0; */
 /*@ ghost
-  /@ requires
-       1 ≡ Idle ∧ 0 ≡ End ∧ 0 ≡ IgnoreFoo ∧ 0 ≡ WillDoFoo;
+  /@ requires 1 ≡ Idle ∧ 0 ≡ End ∧ 0 ≡ IgnoreFoo ∧ 0 ≡ WillDoFoo;
      ensures aorai_CurOpStatus ≡ aorai_Called;
      ensures aorai_CurOperation ≡ op_isPresentRec;
      assigns aorai_CurOpStatus, aorai_CurOperation, End, Idle, IgnoreFoo,
@@ -92,8 +91,7 @@ enum aorai_OpStatusList {
 */
 
 /*@ ghost
-  /@ requires
-       (1 ≡ Idle ∨ 1 ≡ IgnoreFoo ∨ 1 ≡ WillDoFoo) ∧ 0 ≡ End;
+  /@ requires (1 ≡ Idle ∨ 1 ≡ IgnoreFoo ∨ 1 ≡ WillDoFoo) ∧ 0 ≡ End;
      requires 1 ≡ Idle ⇒ res ≡ -1 ∨ res ≢ -1;
      requires 1 ≡ IgnoreFoo ⇒ res ≢ -1;
      requires 1 ≡ WillDoFoo ⇒ res ≡ -1;
@@ -127,25 +125,19 @@ enum aorai_OpStatusList {
        ensures 0 ≡ Idle;
      
      behavior buch_state_IgnoreFoo_in:
-       assumes
-         (1 ≡ IgnoreFoo ∧ res ≢ -1) ∨ (1 ≡ Idle ∧ res ≢ -1);
+       assumes (1 ≡ IgnoreFoo ∧ res ≢ -1) ∨ (1 ≡ Idle ∧ res ≢ -1);
        ensures 1 ≡ IgnoreFoo;
      
      behavior buch_state_IgnoreFoo_out:
-       assumes
-         (0 ≡ IgnoreFoo ∨ ¬(res ≢ -1)) ∧
-         (0 ≡ Idle ∨ ¬(res ≢ -1));
+       assumes (0 ≡ IgnoreFoo ∨ ¬(res ≢ -1)) ∧ (0 ≡ Idle ∨ ¬(res ≢ -1));
        ensures 0 ≡ IgnoreFoo;
      
      behavior buch_state_WillDoFoo_in:
-       assumes
-         (1 ≡ WillDoFoo ∧ res ≡ -1) ∨ (1 ≡ Idle ∧ res ≡ -1);
+       assumes (1 ≡ WillDoFoo ∧ res ≡ -1) ∨ (1 ≡ Idle ∧ res ≡ -1);
        ensures 1 ≡ WillDoFoo;
      
      behavior buch_state_WillDoFoo_out:
-       assumes
-         (0 ≡ WillDoFoo ∨ ¬(res ≡ -1)) ∧
-         (0 ≡ Idle ∨ ¬(res ≡ -1));
+       assumes (0 ≡ WillDoFoo ∨ ¬(res ≡ -1)) ∧ (0 ≡ Idle ∨ ¬(res ≡ -1));
        ensures 0 ≡ WillDoFoo;
    @/
   void isPresentRec_post_func(int res)
@@ -191,25 +183,20 @@ enum aorai_OpStatusList {
 
 */
 
-/*@ requires
-      1 ≡ Idle ∧ 0 ≡ End ∧ 0 ≡ IgnoreFoo ∧ 0 ≡ WillDoFoo;
+/*@ requires 1 ≡ Idle ∧ 0 ≡ End ∧ 0 ≡ IgnoreFoo ∧ 0 ≡ WillDoFoo;
     requires \valid(t + (0 .. max));
     requires max ≥ 0;
     requires 0 ≤ i ≤ max;
     decreases max - i;
     ensures (\old(i) ≤ \result ≤ \old(max)) ∨ \result ≡ -1;
-    ensures
-      \old(i) ≤ \result ≤ \old(max) ⇒
-      *(\old(t) + \result) ≡ \old(val);
+    ensures \old(i) ≤ \result ≤ \old(max) ⇒ *(\old(t) + \result) ≡ \old(val);
     ensures
       \result ≡ -1 ⇒
-      (∀ ℤ j;
-         \old(i) ≤ j ≤ \old(max) ⇒ *(\old(t) + j) ≢ \old(val));
+      (∀ ℤ j; \old(i) ≤ j ≤ \old(max) ⇒ *(\old(t) + j) ≢ \old(val));
     
     behavior Buchi_property_behavior:
       ensures
-        (1 ≡ IgnoreFoo ⇒ \result ≢ -1) ∧
-        (1 ≡ WillDoFoo ⇒ \result ≡ -1);
+        (1 ≡ IgnoreFoo ⇒ \result ≢ -1) ∧ (1 ≡ WillDoFoo ⇒ \result ≡ -1);
       ensures 1 ≡ IgnoreFoo ∨ 0 ≡ IgnoreFoo;
       ensures 1 ≡ WillDoFoo ∨ 0 ≡ WillDoFoo;
       ensures 0 ≡ End ∧ 0 ≡ Idle;
@@ -238,8 +225,7 @@ int isPresentRec(int *t, int i, int max, int val)
 }
 
 /*@ ghost
-  /@ requires
-       1 ≡ Idle ∧ 0 ≡ End ∧ 0 ≡ IgnoreFoo ∧ 0 ≡ WillDoFoo;
+  /@ requires 1 ≡ Idle ∧ 0 ≡ End ∧ 0 ≡ IgnoreFoo ∧ 0 ≡ WillDoFoo;
      ensures aorai_CurOpStatus ≡ aorai_Called;
      ensures aorai_CurOperation ≡ op_isPresent;
      assigns aorai_CurOpStatus, aorai_CurOperation, End, Idle, IgnoreFoo,
@@ -308,8 +294,7 @@ int isPresentRec(int *t, int i, int max, int val)
 */
 
 /*@ ghost
-  /@ requires
-       (1 ≡ IgnoreFoo ∨ 1 ≡ WillDoFoo) ∧ 0 ≡ End ∧ 0 ≡ Idle;
+  /@ requires (1 ≡ IgnoreFoo ∨ 1 ≡ WillDoFoo) ∧ 0 ≡ End ∧ 0 ≡ Idle;
      requires 1 ≡ IgnoreFoo ⇒ res ≢ -1;
      requires 1 ≡ WillDoFoo ⇒ res ≡ -1;
      ensures aorai_CurOpStatus ≡ aorai_Terminated;
@@ -388,21 +373,16 @@ int isPresentRec(int *t, int i, int max, int val)
 
 */
 
-/*@ requires
-      1 ≡ Idle ∧ 0 ≡ End ∧ 0 ≡ IgnoreFoo ∧ 0 ≡ WillDoFoo;
+/*@ requires 1 ≡ Idle ∧ 0 ≡ End ∧ 0 ≡ IgnoreFoo ∧ 0 ≡ WillDoFoo;
     requires \valid(t + (0 .. max));
     requires max ≥ 0;
     ensures (0 ≤ \result ≤ \old(max)) ∨ \result ≡ -1;
+    ensures 0 ≤ \result ≤ \old(max) ⇒ *(\old(t) + \result) ≡ \old(val);
     ensures
-      0 ≤ \result ≤ \old(max) ⇒ *(\old(t) + \result) ≡ \old(val);
-    ensures
-      \result ≡ -1 ⇒
-      (∀ ℤ i; 0 ≤ i ≤ \old(max) ⇒ *(\old(t) + i) ≢ \old(val));
+      \result ≡ -1 ⇒ (∀ ℤ i; 0 ≤ i ≤ \old(max) ⇒ *(\old(t) + i) ≢ \old(val));
     
     behavior Buchi_property_behavior:
-      ensures
-        (1 ≡ End ⇒ \result ≢ -1) ∧
-        (1 ≡ WillDoFoo ⇒ \result ≡ -1);
+      ensures (1 ≡ End ⇒ \result ≢ -1) ∧ (1 ≡ WillDoFoo ⇒ \result ≡ -1);
       ensures 1 ≡ End ∨ 0 ≡ End;
       ensures 1 ≡ WillDoFoo ∨ 0 ≡ WillDoFoo;
       ensures 0 ≡ Idle ∧ 0 ≡ IgnoreFoo;
@@ -418,8 +398,7 @@ int isPresent(int *t, int max, int val)
 }
 
 /*@ ghost
-  /@ requires
-       1 ≡ WillDoFoo ∧ 0 ≡ End ∧ 0 ≡ Idle ∧ 0 ≡ IgnoreFoo;
+  /@ requires 1 ≡ WillDoFoo ∧ 0 ≡ End ∧ 0 ≡ Idle ∧ 0 ≡ IgnoreFoo;
      ensures aorai_CurOpStatus ≡ aorai_Called;
      ensures aorai_CurOperation ≡ op_foo;
      assigns aorai_CurOpStatus, aorai_CurOperation, End, Idle, IgnoreFoo,
@@ -488,8 +467,7 @@ int isPresent(int *t, int max, int val)
 */
 
 /*@ ghost
-  /@ requires
-       1 ≡ End ∧ 0 ≡ Idle ∧ 0 ≡ IgnoreFoo ∧ 0 ≡ WillDoFoo;
+  /@ requires 1 ≡ End ∧ 0 ≡ Idle ∧ 0 ≡ IgnoreFoo ∧ 0 ≡ WillDoFoo;
      ensures aorai_CurOpStatus ≡ aorai_Terminated;
      ensures aorai_CurOperation ≡ op_foo;
      assigns aorai_CurOpStatus, aorai_CurOperation, End, Idle, IgnoreFoo,
@@ -557,8 +535,7 @@ int isPresent(int *t, int max, int val)
 
 */
 
-/*@ requires
-      1 ≡ WillDoFoo ∧ 0 ≡ End ∧ 0 ≡ Idle ∧ 0 ≡ IgnoreFoo;
+/*@ requires 1 ≡ WillDoFoo ∧ 0 ≡ End ∧ 0 ≡ Idle ∧ 0 ≡ IgnoreFoo;
     
     behavior Buchi_property_behavior:
       ensures 0 ≡ Idle ∧ 0 ≡ IgnoreFoo ∧ 0 ≡ WillDoFoo;
@@ -572,8 +549,7 @@ void foo(void)
 }
 
 /*@ ghost
-  /@ requires
-       1 ≡ Idle ∧ 0 ≡ End ∧ 0 ≡ IgnoreFoo ∧ 0 ≡ WillDoFoo;
+  /@ requires 1 ≡ Idle ∧ 0 ≡ End ∧ 0 ≡ IgnoreFoo ∧ 0 ≡ WillDoFoo;
      ensures aorai_CurOpStatus ≡ aorai_Called;
      ensures aorai_CurOperation ≡ op_main;
      assigns aorai_CurOpStatus, aorai_CurOperation, End, Idle, IgnoreFoo,
@@ -642,8 +618,7 @@ void foo(void)
 */
 
 /*@ ghost
-  /@ requires
-       1 ≡ End ∧ 0 ≡ Idle ∧ 0 ≡ IgnoreFoo ∧ 0 ≡ WillDoFoo;
+  /@ requires 1 ≡ End ∧ 0 ≡ Idle ∧ 0 ≡ IgnoreFoo ∧ 0 ≡ WillDoFoo;
      ensures aorai_CurOpStatus ≡ aorai_Terminated;
      ensures aorai_CurOperation ≡ op_main;
      assigns aorai_CurOpStatus, aorai_CurOperation, End, Idle, IgnoreFoo,
@@ -711,8 +686,7 @@ void foo(void)
 
 */
 
-/*@ requires
-      1 ≡ Idle ∧ 0 ≡ End ∧ 0 ≡ IgnoreFoo ∧ 0 ≡ WillDoFoo;
+/*@ requires 1 ≡ Idle ∧ 0 ≡ End ∧ 0 ≡ IgnoreFoo ∧ 0 ≡ WillDoFoo;
     
     behavior aorai_acceptance:
       ensures 1 ≡ End;

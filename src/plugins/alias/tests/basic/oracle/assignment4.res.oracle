@@ -19,8 +19,7 @@
 [alias] analysing instruction: *c = d;
 [alias] May-aliases after instruction  *c = d;  are  { *a; b }  { *c; d }
 [alias] May-alias graph after instruction  *c = d;  is
-  0:{ a } → 1:{ b }   1:{ b } → 2:{  }   5:{ c } → 6:{ d }
-  6:{ d } → 7:{  }
+  0:{ a } → 1:{ b }   1:{ b } → 2:{  }   5:{ c } → 6:{ d }   6:{ d } → 7:{  }
 [alias] analysing instruction: b = d;
 [alias] May-aliases after instruction  b = d;  are  { a; c }  { *a; *c; b; d }
 [alias] May-alias graph after instruction  b = d;  is

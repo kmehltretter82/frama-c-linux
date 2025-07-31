@@ -70,8 +70,7 @@
   S_sp_0_ts[0..1] ∈ [--..--]
   S_sp_1_ts[0..1] ∈ [--..--]
   WELL_uu[bits 0 to ..] ∈ {{ garbled mix of &{WELL_uu} (origin: Well) }}
-  S_p_svoid[bits 0 to ..] ∈
-           {{ garbled mix of &{S_p_svoid} (origin: Well) }}
+  S_p_svoid[bits 0 to ..] ∈ {{ garbled mix of &{S_p_svoid} (origin: Well) }}
   S_qvoid[bits 0 to ..] ∈ {{ garbled mix of &{S_qvoid} (origin: Well) }}
 [eva:initial-state] creating variable S_0_S_vvv with imprecise size (type void)
 [eva:initial-state] creating variable S_1_S_vvv with imprecise size (type void)
@@ -155,8 +154,7 @@
   vv ∈ {{ garbled mix of &{S_vv} (origin: Well) }}
   ta ∈ {{ &S_ta[0] }}
   pvoid ∈ {{ &S_qvoid + [0..4294967295] }}
-  S_p_svoid[bits 0 to ..] ∈
-           {{ garbled mix of &{S_p_svoid} (origin: Well) }}
+  S_p_svoid[bits 0 to ..] ∈ {{ garbled mix of &{S_p_svoid} (origin: Well) }}
   S_qvoid[bits 0 to ..] ∈
          {{ garbled mix of &{pvoid; S_qvoid} (origin: Well) }}
   S_ta[0] ∈ [--..--]

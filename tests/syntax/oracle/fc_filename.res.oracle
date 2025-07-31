@@ -8,8 +8,7 @@ int f(void)
   return __retres;
 }
 
-/*@
-lemma test{L}: *("string cst in ACSL: fc_filename.c.end test" + 3) ≡ 'i';
+/*@ lemma test{L}: *("string cst in ACSL: fc_filename.c.end test" + 3) ≡ 'i';
 
 */
 

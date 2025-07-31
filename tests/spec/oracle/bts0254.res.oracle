@@ -5,8 +5,7 @@
       assumes \false;
       requires \true;
       ensures
-        \old(x) ≢ 0 ∧ \old(x) ≢ 0 ∧ \old(x) ≢ 0 ∧
-        \old(x) ≢ 0 ∧ \old(x) ≢ 0;
+        \old(x) ≢ 0 ∧ \old(x) ≢ 0 ∧ \old(x) ≢ 0 ∧ \old(x) ≢ 0 ∧ \old(x) ≢ 0;
  */
 int f(int x)
 {

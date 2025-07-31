@@ -268,8 +268,7 @@
   Frama_C_entropy_source ∈ [--..--]
   p ∈ {{ &__malloc_main3_l52 }} or ESCAPINGADDR
   q ∈ {{ &__malloc_main3_l53_0 }} or ESCAPINGADDR
-  r ∈
-   {{ NULL ; &__malloc_main3_l52 ; &__malloc_main3_l53_0 }} or ESCAPINGADDR
+  r ∈ {{ NULL ; &__malloc_main3_l52 ; &__malloc_main3_l53_0 }} or ESCAPINGADDR
   s ∈ {{ &__realloc_main3_l65[0] ; &__realloc_main3_l65_0[0] }}
   x ∈ {17} or UNINITIALIZED
   y ∈ {17} or UNINITIALIZED
@@ -301,8 +300,7 @@
   Frama_C_entropy_source ∈ [--..--]
   p ∈ {{ &__malloc_main3_l52 }} or ESCAPINGADDR
   q ∈ {{ &__malloc_main3_l53_0 }} or ESCAPINGADDR
-  r ∈
-   {{ NULL ; &__malloc_main3_l52 ; &__malloc_main3_l53_0 }} or ESCAPINGADDR
+  r ∈ {{ NULL ; &__malloc_main3_l52 ; &__malloc_main3_l53_0 }} or ESCAPINGADDR
   s ∈ {{ &__realloc_main3_l65[0] ; &__realloc_main3_l65_0[0] }}
   v ∈ {3}
   __malloc_main3_l52 ∈ ESCAPINGADDR
@@ -314,8 +312,7 @@
   __realloc_main3_l65_1[0..1] ∈ UNINITIALIZED
   ==END OF DUMP==
 [eva:alarm] realloc_multiple.c:70: Warning: 
-  accessing left-value that contains escaping addresses.
-  assert ¬\dangling(&q);
+  accessing left-value that contains escaping addresses. assert ¬\dangling(&q);
 [eva] realloc_multiple.c:70: Call to builtin free
 [eva] realloc_multiple.c:70: 
   function free: precondition 'freeable' got status valid.

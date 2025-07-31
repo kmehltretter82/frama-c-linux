@@ -1348,7 +1348,7 @@ struct
     let to_dot_output pp_value (automaton,wto,states) out =
       let pp_vertex fmt v =
         match States.find_opt states v with
-        | None -> Format.fprintf fmt "⊥"
+        | None -> Unicode.pp_bottom fmt
         | Some v -> pp_value fmt v
       in
       output_to_dot ~pp_vertex ~wto out automaton

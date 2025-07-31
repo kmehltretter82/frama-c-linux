@@ -233,10 +233,10 @@
   interrupt_received_a ∈ {0; 1}  // interrupt.c:45 interrupt_cross_incr2
 [mt] <main> reads  interrupt_received_b ∈ {0}  // interrupt.c:50
   main_interrupt_cross_incr
-[mt] <interrupt_handler interrupt_cross_incr1> reads  interrupt_received_b ∈ {0}
-   // interrupt.c:41 interrupt_cross_incr1
-[mt] <interrupt_handler interrupt_cross_incr1> writes 
-  interrupt_received_a ∈ {1}  // interrupt.c:41 interrupt_cross_incr1
+[mt] <interrupt_handler interrupt_cross_incr1> reads  interrupt_received_b ∈ {0} 
+  // interrupt.c:41 interrupt_cross_incr1
+[mt] <interrupt_handler interrupt_cross_incr1> writes  interrupt_received_a ∈ {1} 
+  // interrupt.c:41 interrupt_cross_incr1
 [mt] <interrupt_handler interrupt_cross_incr2> writes 
   interrupt_received_b ∈ {0; 1; 2}  // interrupt.c:45 interrupt_cross_incr2
 [mt] Possible read/write data races:
@@ -390,15 +390,13 @@
 [mt] <main> reads  interrupt_received_a ∈ {0}  // interrupt.c:49
   main_interrupt_cross_incr
 [mt] <interrupt_handler interrupt_cross_incr2> reads 
-  interrupt_received_a ∈ {0; 1; 2; 3}  // interrupt.c:45
-  interrupt_cross_incr2
+  interrupt_received_a ∈ {0; 1; 2; 3}  // interrupt.c:45 interrupt_cross_incr2
 [mt] <main> reads  interrupt_received_b ∈ {0; 1; 2}  // interrupt.c:50
   main_interrupt_cross_incr
 [mt] <interrupt_handler interrupt_cross_incr1> reads 
   interrupt_received_b ∈ {0; 1; 2}  // interrupt.c:41 interrupt_cross_incr1
 [mt] <interrupt_handler interrupt_cross_incr1> writes 
-  interrupt_received_a ∈ {0; 1; 2; 3}  // interrupt.c:41
-  interrupt_cross_incr1
+  interrupt_received_a ∈ {0; 1; 2; 3}  // interrupt.c:41 interrupt_cross_incr1
 [mt] <interrupt_handler interrupt_cross_incr2> writes 
   interrupt_received_b ∈ {0; 1; 2; 3; 4}  // interrupt.c:45
   interrupt_cross_incr2
@@ -715,8 +713,8 @@
 [mt] <interrupt_handler interrupt_cross_incr2> reads 
   interrupt_received_a ∈ [0..2147483647]  // interrupt.c:45
   interrupt_cross_incr2
-[mt] <main> reads  interrupt_received_b ∈ {0; 1; 2; 3; 4; 5; 6} 
-  // interrupt.c:50 main_interrupt_cross_incr
+[mt] <main> reads  interrupt_received_b ∈ {0; 1; 2; 3; 4; 5; 6}  // interrupt.c:50
+  main_interrupt_cross_incr
 [mt] <interrupt_handler interrupt_cross_incr1> reads 
   interrupt_received_b ∈ {0; 1; 2; 3; 4; 5; 6}  // interrupt.c:41
   interrupt_cross_incr1

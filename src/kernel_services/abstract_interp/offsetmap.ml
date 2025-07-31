@@ -2053,8 +2053,13 @@ module Make
 
   let default_skip _v = false
 
-  let pretty_generic ?typ ?(pretty_v=V.pretty_typ) ?(skip_v=default_skip) ?(sep=Unicode.inset_string ()) () fmt m =
+  let pretty_generic ?typ ?(pretty_v=V.pretty_typ) ?(skip_v=default_skip) ?sep () fmt m =
     let is_first = ref true in
+    let pp_sep fmt =
+      match sep with
+      | None -> Unicode.pp_in_set fmt
+      | Some str -> Format.pp_print_string fmt str
+    in
     let pretty_binding fmt (bk, ek) (v, modu, rel_offs) =
       if not (skip_v v) then begin
         if !is_first then is_first:=false
@@ -2077,7 +2082,7 @@ module Make
               ~use_align:(not (V.is_isotropic v))
               ~align:rel_offs ~rh_size:modu ~start:bk ~stop:ek fmt
         in
-        Format.fprintf fmt " %s@ @[<hv 1>%a@]" sep (pretty_v printed_type) v ;
+        Format.fprintf fmt " %t@ @[<hv 1>%a@]" pp_sep (pretty_v printed_type) v ;
         if force_misalign
         then
           if Rel.is_zero rel_offs && (Int.length bk ek) %~ modu =~ Integer.zero
@@ -2095,12 +2100,12 @@ module Make
       end
     in
     if is_empty m then
-      Format.fprintf fmt "@[[?] %s EMPTY@]" sep
+      Format.fprintf fmt "@[[?] %t EMPTY@]" pp_sep
     else begin
       Format.fprintf fmt "@[";
       iter (pretty_binding fmt) m;
       if !is_first then
-        Format.fprintf fmt "%s@ %s" sep (Unicode.emptyset_string ());
+        Format.fprintf fmt "%t@ %t" pp_sep Unicode.pp_empty_set;
       Format.fprintf fmt "@]";
     end
 
@@ -2680,7 +2685,7 @@ module Int_Intervals = struct
     in
     match i with
     | Top -> Format.pp_print_string fmt "[..]"
-    | Bottom -> Format.fprintf fmt "[%s]" (Unicode.emptyset_string ())
+    | Bottom -> Format.fprintf fmt "[%t]" Unicode.pp_empty_set
     | Intervals _ ->
       let pp_one fmt (b,e)=
         assert (Int.le b e) ;
@@ -2919,7 +2924,7 @@ module Make_bitwise(V: sig
     in
     Format.fprintf fmt "@[<v>";
     fold_fuse_same (pretty_binding fmt) m ();
-    if !first then Format.fprintf fmt "%s@ %s" sep (Unicode.emptyset_string ());
+    if !first then Format.fprintf fmt "%s@ %t" sep Unicode.pp_empty_set;
     Format.fprintf fmt "@]"
 
   let map = map_on_values

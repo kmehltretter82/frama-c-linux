@@ -23,8 +23,7 @@ enum aorai_OpStatusList {
 /*@ ghost
   /@ requires
        1 ≡ aorai_intermediate_state ∧ 0 ≡ S0 ∧ 0 ≡ Sf ∧
-       0 ≡ aorai_intermediate_state_0 ∧
-       0 ≡ aorai_intermediate_state_1 ∧
+       0 ≡ aorai_intermediate_state_0 ∧ 0 ≡ aorai_intermediate_state_1 ∧
        0 ≡ aorai_intermediate_state_2 ∧ 0 ≡ aorai_intermediate_state_3;
      ensures aorai_CurOpStatus ≡ aorai_Called;
      ensures aorai_CurOperation ≡ op_f;
@@ -147,8 +146,7 @@ enum aorai_OpStatusList {
 /*@ ghost
   /@ requires
        1 ≡ aorai_intermediate_state_1 ∧ 0 ≡ S0 ∧ 0 ≡ Sf ∧
-       0 ≡ aorai_intermediate_state ∧
-       0 ≡ aorai_intermediate_state_0 ∧
+       0 ≡ aorai_intermediate_state ∧ 0 ≡ aorai_intermediate_state_0 ∧
        0 ≡ aorai_intermediate_state_2 ∧ 0 ≡ aorai_intermediate_state_3;
      ensures aorai_CurOpStatus ≡ aorai_Terminated;
      ensures aorai_CurOperation ≡ op_f;
@@ -270,15 +268,14 @@ enum aorai_OpStatusList {
 
 /*@ requires
       1 ≡ aorai_intermediate_state ∧ 0 ≡ S0 ∧ 0 ≡ Sf ∧
-      0 ≡ aorai_intermediate_state_0 ∧
-      0 ≡ aorai_intermediate_state_1 ∧
+      0 ≡ aorai_intermediate_state_0 ∧ 0 ≡ aorai_intermediate_state_1 ∧
       0 ≡ aorai_intermediate_state_2 ∧ 0 ≡ aorai_intermediate_state_3;
     
     behavior Buchi_property_behavior:
       ensures
         0 ≡ S0 ∧ 0 ≡ Sf ∧ 0 ≡ aorai_intermediate_state ∧
-        0 ≡ aorai_intermediate_state_1 ∧
-        0 ≡ aorai_intermediate_state_2 ∧ 0 ≡ aorai_intermediate_state_3;
+        0 ≡ aorai_intermediate_state_1 ∧ 0 ≡ aorai_intermediate_state_2 ∧
+        0 ≡ aorai_intermediate_state_3;
       ensures 1 ≡ aorai_intermediate_state_0;
  */
 void f(void)
@@ -295,10 +292,8 @@ void f(void)
        0 ≡ S0 ∧ 0 ≡ Sf ∧ 0 ≡ aorai_intermediate_state_1 ∧
        0 ≡ aorai_intermediate_state_3;
      requires 1 ≡ aorai_intermediate_state_2 ⇒ aorai_counter < 2;
-     requires
-       0 ≡ aorai_intermediate_state ∨ 0 ≡ aorai_intermediate_state_2;
-     requires
-       0 ≡ aorai_intermediate_state ∨ 0 ≡ aorai_intermediate_state_0;
+     requires 0 ≡ aorai_intermediate_state ∨ 0 ≡ aorai_intermediate_state_2;
+     requires 0 ≡ aorai_intermediate_state ∨ 0 ≡ aorai_intermediate_state_0;
      requires
        0 ≡ aorai_intermediate_state_0 ∨ 0 ≡ aorai_intermediate_state_2;
      ensures aorai_CurOpStatus ≡ aorai_Called;
@@ -451,8 +446,7 @@ void f(void)
 /*@ ghost
   /@ requires
        1 ≡ aorai_intermediate_state_3 ∧ 0 ≡ S0 ∧ 0 ≡ Sf ∧
-       0 ≡ aorai_intermediate_state ∧
-       0 ≡ aorai_intermediate_state_0 ∧
+       0 ≡ aorai_intermediate_state ∧ 0 ≡ aorai_intermediate_state_0 ∧
        0 ≡ aorai_intermediate_state_1 ∧ 0 ≡ aorai_intermediate_state_2;
      ensures aorai_CurOpStatus ≡ aorai_Terminated;
      ensures aorai_CurOperation ≡ op_g;
@@ -578,24 +572,18 @@ void f(void)
       0 ≡ S0 ∧ 0 ≡ Sf ∧ 0 ≡ aorai_intermediate_state_1 ∧
       0 ≡ aorai_intermediate_state_3;
     requires 1 ≡ aorai_intermediate_state_2 ⇒ aorai_counter < 2;
-    requires
-      0 ≡ aorai_intermediate_state ∨ 0 ≡ aorai_intermediate_state_2;
-    requires
-      0 ≡ aorai_intermediate_state ∨ 0 ≡ aorai_intermediate_state_0;
-    requires
-      0 ≡ aorai_intermediate_state_0 ∨ 0 ≡ aorai_intermediate_state_2;
-    requires
-      1 ≡ aorai_intermediate_state_2 ∨ 0 ≡ aorai_intermediate_state_2;
-    requires
-      1 ≡ aorai_intermediate_state_0 ∨ 0 ≡ aorai_intermediate_state_0;
-    requires
-      1 ≡ aorai_intermediate_state ∨ 0 ≡ aorai_intermediate_state;
+    requires 0 ≡ aorai_intermediate_state ∨ 0 ≡ aorai_intermediate_state_2;
+    requires 0 ≡ aorai_intermediate_state ∨ 0 ≡ aorai_intermediate_state_0;
+    requires 0 ≡ aorai_intermediate_state_0 ∨ 0 ≡ aorai_intermediate_state_2;
+    requires 1 ≡ aorai_intermediate_state_2 ∨ 0 ≡ aorai_intermediate_state_2;
+    requires 1 ≡ aorai_intermediate_state_0 ∨ 0 ≡ aorai_intermediate_state_0;
+    requires 1 ≡ aorai_intermediate_state ∨ 0 ≡ aorai_intermediate_state;
     
     behavior Buchi_property_behavior:
       ensures
         0 ≡ S0 ∧ 0 ≡ Sf ∧ 0 ≡ aorai_intermediate_state ∧
-        0 ≡ aorai_intermediate_state_0 ∧
-        0 ≡ aorai_intermediate_state_1 ∧ 0 ≡ aorai_intermediate_state_3;
+        0 ≡ aorai_intermediate_state_0 ∧ 0 ≡ aorai_intermediate_state_1 ∧
+        0 ≡ aorai_intermediate_state_3;
       ensures 1 ≡ aorai_intermediate_state_2;
       ensures
         \at(1 ≡ aorai_intermediate_state_2,Pre) ∧
@@ -618,8 +606,7 @@ void g(void)
 /*@ ghost
   /@ requires
        1 ≡ S0 ∧ 0 ≡ Sf ∧ 0 ≡ aorai_intermediate_state ∧
-       0 ≡ aorai_intermediate_state_0 ∧
-       0 ≡ aorai_intermediate_state_1 ∧
+       0 ≡ aorai_intermediate_state_0 ∧ 0 ≡ aorai_intermediate_state_1 ∧
        0 ≡ aorai_intermediate_state_2 ∧ 0 ≡ aorai_intermediate_state_3;
      ensures aorai_CurOpStatus ≡ aorai_Called;
      ensures aorai_CurOperation ≡ op_main;
@@ -742,8 +729,7 @@ void g(void)
 /*@ ghost
   /@ requires
        1 ≡ aorai_intermediate_state_2 ∧ 0 ≡ S0 ∧ 0 ≡ Sf ∧
-       0 ≡ aorai_intermediate_state ∧
-       0 ≡ aorai_intermediate_state_0 ∧
+       0 ≡ aorai_intermediate_state ∧ 0 ≡ aorai_intermediate_state_0 ∧
        0 ≡ aorai_intermediate_state_1 ∧ 0 ≡ aorai_intermediate_state_3;
      requires 1 ≡ aorai_intermediate_state_2 ⇒ 1 ≤ aorai_counter;
      ensures aorai_CurOpStatus ≡ aorai_Terminated;
@@ -867,8 +853,7 @@ void g(void)
 
 /*@ requires
       1 ≡ S0 ∧ 0 ≡ Sf ∧ 0 ≡ aorai_intermediate_state ∧
-      0 ≡ aorai_intermediate_state_0 ∧
-      0 ≡ aorai_intermediate_state_1 ∧
+      0 ≡ aorai_intermediate_state_0 ∧ 0 ≡ aorai_intermediate_state_1 ∧
       0 ≡ aorai_intermediate_state_2 ∧ 0 ≡ aorai_intermediate_state_3;
     
     behavior aorai_acceptance:
@@ -878,8 +863,7 @@ void g(void)
       ensures 1 ≡ Sf ⇒ 1 ≤ aorai_counter;
       ensures
         0 ≡ S0 ∧ 0 ≡ aorai_intermediate_state ∧
-        0 ≡ aorai_intermediate_state_0 ∧
-        0 ≡ aorai_intermediate_state_1 ∧
+        0 ≡ aorai_intermediate_state_0 ∧ 0 ≡ aorai_intermediate_state_1 ∧
         0 ≡ aorai_intermediate_state_2 ∧ 0 ≡ aorai_intermediate_state_3;
       ensures 1 ≡ Sf;
       ensures \at(1 ≡ S0,Pre) ∧ 1 ≡ Sf ⇒ 1 ≤ aorai_counter ≤ 2;

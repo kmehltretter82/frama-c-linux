@@ -37,16 +37,16 @@ enum aorai_OpStatusList {
 /*@
 check lemma aorai_intermediate_state_1_deterministic_trans{L}:
   ¬(\at(aorai_CurOperation,L) ≡ op_find ∧
-     \at(aorai_CurOpStatus,L) ≡ aorai_Terminated ∧
-     ¬(\at(aorai_CurOperation,L) ≡ op_find ∧
-        \at(aorai_CurOpStatus,L) ≡ aorai_Terminated));
+    \at(aorai_CurOpStatus,L) ≡ aorai_Terminated ∧
+    ¬(\at(aorai_CurOperation,L) ≡ op_find ∧
+      \at(aorai_CurOpStatus,L) ≡ aorai_Terminated));
  */
 /*@
 check lemma aorai_intermediate_state_0_deterministic_trans{L}:
   ¬(\at(aorai_CurOperation,L) ≡ op_find ∧
-     \at(aorai_CurOpStatus,L) ≡ aorai_Called ∧
-     \at(aorai_CurOperation,L) ≡ op_main ∧
-     \at(aorai_CurOpStatus,L) ≡ aorai_Terminated);
+    \at(aorai_CurOpStatus,L) ≡ aorai_Called ∧
+    \at(aorai_CurOperation,L) ≡ op_main ∧
+    \at(aorai_CurOpStatus,L) ≡ aorai_Terminated);
  */
 /*@ ghost enum aorai_States aorai_CurStates = fst; */
 /*@ ghost
@@ -189,8 +189,7 @@ void init(int *a, int n)
 
 /*@ ghost
   /@ requires
-       aorai_CurStates ≡ aorai_intermediate_state_0 ∨
-       aorai_CurStates ≡ c;
+       aorai_CurStates ≡ aorai_intermediate_state_0 ∨ aorai_CurStates ≡ c;
      ensures aorai_CurOpStatus ≡ aorai_Called;
      ensures aorai_CurOperation ≡ op_find;
      assigns aorai_CurOpStatus, aorai_CurOperation, aorai_CurStates;
@@ -209,14 +208,12 @@ void init(int *a, int n)
      
      behavior buch_state_aorai_intermediate_state_1_in:
        assumes
-         aorai_CurStates ≡ c ∨
-         aorai_CurStates ≡ aorai_intermediate_state_0;
+         aorai_CurStates ≡ c ∨ aorai_CurStates ≡ aorai_intermediate_state_0;
        ensures aorai_CurStates ≡ aorai_intermediate_state_1;
      
      behavior buch_state_aorai_intermediate_state_1_out:
        assumes
-         aorai_CurStates ≢ c ∧
-         aorai_CurStates ≢ aorai_intermediate_state_0;
+         aorai_CurStates ≢ c ∧ aorai_CurStates ≢ aorai_intermediate_state_0;
        ensures aorai_CurStates ≢ aorai_intermediate_state_1;
      
      behavior buch_state_aorai_reject_out:
@@ -304,8 +301,7 @@ void init(int *a, int n)
 */
 
 /*@ requires
-      aorai_CurStates ≡ aorai_intermediate_state_0 ∨
-      aorai_CurStates ≡ c;
+      aorai_CurStates ≡ aorai_intermediate_state_0 ∨ aorai_CurStates ≡ c;
     requires aorai_CurStates ≡ c ∨ aorai_CurStates ≢ c;
     requires
       aorai_CurStates ≡ aorai_intermediate_state_0 ∨

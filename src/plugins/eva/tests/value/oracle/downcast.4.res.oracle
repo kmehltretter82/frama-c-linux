@@ -114,8 +114,7 @@
   si ∈ {{ NULL + [0..36],0%4 ; &x_0 + [0..36],0%4 ; &a + [0..72],0%4 }}
   us ∈ {{ garbled mix of &{x_0; a} (origin: Arithmetic {downcast.c:70}) }}
   c ∈ {{ garbled mix of &{x_0; a} (origin: Arithmetic {downcast.c:72}) }}
-  uintptr ∈
-         {{ NULL + [0..36],0%4 ; &x_0 + [0..36],0%4 ; &a + [0..72],0%4 }}
+  uintptr ∈ {{ NULL + [0..36],0%4 ; &x_0 + [0..36],0%4 ; &a + [0..72],0%4 }}
   intptr ∈ {{ NULL + [0..36],0%4 ; &x_0 + [0..36],0%4 ; &a + [0..72],0%4 }}
 [eva:final-states] Values at end of function main5_wrap_signed:
   x_0 ∈ [100000..2147483647]

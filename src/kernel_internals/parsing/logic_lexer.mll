@@ -100,8 +100,10 @@
     let code = ref 0 in
     let add_digit c = code := 16 * !code + int_of_digit c in
     String.iter add_digit (String.sub s 2 (String.length s - 2));
-    let c = Utf8_logic.from_unichar !code in
-    find_utf8 c
+    let uchar = Uchar.of_int !code in
+    let buffer = Buffer.create (Uchar.utf_8_byte_length uchar) in
+    Buffer.add_utf_8_uchar buffer uchar;
+    find_utf8 (Buffer.contents buffer)
 
   let extension ~plugin name =
     try

@@ -20,8 +20,7 @@
 [eva:alarm] alloca_h.c:9: Warning: 
   function free: precondition 'freeable' got status unknown.
 [eva:alarm] alloca_h.c:10: Warning: 
-  accessing left-value that contains escaping addresses.
-  assert ¬\dangling(&p);
+  accessing left-value that contains escaping addresses. assert ¬\dangling(&p);
 [eva] Recording results for f
 [eva] Done for function f
 [eva:malloc:automatic-free] alloca_h.c:41: 

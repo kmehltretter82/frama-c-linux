@@ -95,8 +95,7 @@
     (origin: Arithmetic {initialized.c:50}) }} or UNINITIALIZED
    [8..9] ∈ {1; 2} or UNINITIALIZED
    [10][bits 0 to 23] ∈ {0} or UNINITIALIZED
-   {[10][bits 24 to 31]#; [11][bits 0 to 23]#} ∈
-   {0x11111111} or UNINITIALIZED
+   {[10][bits 24 to 31]#; [11][bits 0 to 23]#} ∈ {0x11111111} or UNINITIALIZED
    {[11][bits 24 to 31]; [12][bits 0 to 23]} ∈ {0} or UNINITIALIZED
    {[12][bits 24 to 31]#; [13][bits 0 to 23]#} ∈
    {0x11111111; 0x22222222} or UNINITIALIZED
@@ -131,8 +130,7 @@
     (origin: Arithmetic {initialized.c:50}) }} or UNINITIALIZED
    [8..9] ∈ {1; 2} or UNINITIALIZED
    [10][bits 0 to 23] ∈ {0} or UNINITIALIZED
-   {[10][bits 24 to 31]#; [11][bits 0 to 23]#} ∈
-   {0x11111111} or UNINITIALIZED
+   {[10][bits 24 to 31]#; [11][bits 0 to 23]#} ∈ {0x11111111} or UNINITIALIZED
    {[11][bits 24 to 31]; [12][bits 0 to 23]} ∈ {0} or UNINITIALIZED
    {[12][bits 24 to 31]#; [13][bits 0 to 23]#} ∈
    {0x11111111; 0x22222222} or UNINITIALIZED

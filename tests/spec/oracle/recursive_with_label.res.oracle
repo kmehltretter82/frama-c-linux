@@ -17,15 +17,13 @@ int size(int *busybits)
 
 /*@ logic ℤ f{L}(int *p, ℤ l) = \at(l > 0 ? 1 + f(p + 1, l - 1) : *p,L);
  */
-/*@
-predicate p{L}(int *p, ℤ l) = \at(l > 0 ? p(p + 1, l - 1) : \valid(p),L);
+/*@ predicate p{L}(int *p, ℤ l) = \at(l > 0 ? p(p + 1, l - 1) : \valid(p),L);
  */
 /*@
 inductive foo{L}(int *p, ℤ l) {
   case nil{L}: \at(∀ int *p; foo(p, 0),L);
   case other{L}: \at(∀ int *p, ℤ l;
-                       l > 0 ⇒
-                       \valid(p + l) ⇒ foo(p, l - 1) ⇒ foo(p, l),
+                       l > 0 ⇒ \valid(p + l) ⇒ foo(p, l - 1) ⇒ foo(p, l),
                      L);
   }
 

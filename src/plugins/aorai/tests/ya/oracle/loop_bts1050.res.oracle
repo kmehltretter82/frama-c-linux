@@ -26,8 +26,7 @@ enum aorai_OpStatusList {
        0 ≡ S0 ∧ 0 ≡ Sf ∧ 0 ≡ aorai_intermediate_state_1 ∧
        0 ≡ aorai_intermediate_state_2 ∧ 0 ≡ aorai_intermediate_state_3;
      requires 1 ≡ aorai_intermediate_state_0 ⇒ aorai_counter < 5;
-     requires
-       0 ≡ aorai_intermediate_state ∨ 0 ≡ aorai_intermediate_state_0;
+     requires 0 ≡ aorai_intermediate_state ∨ 0 ≡ aorai_intermediate_state_0;
      ensures aorai_CurOpStatus ≡ aorai_Called;
      ensures aorai_CurOperation ≡ op_f;
      assigns aorai_counter, aorai_CurOpStatus, aorai_CurOperation, S0, Sf,
@@ -169,8 +168,7 @@ enum aorai_OpStatusList {
 /*@ ghost
   /@ requires
        1 ≡ aorai_intermediate_state_1 ∧ 0 ≡ S0 ∧ 0 ≡ Sf ∧
-       0 ≡ aorai_intermediate_state ∧
-       0 ≡ aorai_intermediate_state_0 ∧
+       0 ≡ aorai_intermediate_state ∧ 0 ≡ aorai_intermediate_state_0 ∧
        0 ≡ aorai_intermediate_state_2 ∧ 0 ≡ aorai_intermediate_state_3;
      ensures aorai_CurOpStatus ≡ aorai_Terminated;
      ensures aorai_CurOperation ≡ op_f;
@@ -295,18 +293,15 @@ enum aorai_OpStatusList {
       0 ≡ S0 ∧ 0 ≡ Sf ∧ 0 ≡ aorai_intermediate_state_1 ∧
       0 ≡ aorai_intermediate_state_2 ∧ 0 ≡ aorai_intermediate_state_3;
     requires 1 ≡ aorai_intermediate_state_0 ⇒ aorai_counter < 5;
-    requires
-      0 ≡ aorai_intermediate_state ∨ 0 ≡ aorai_intermediate_state_0;
-    requires
-      1 ≡ aorai_intermediate_state_0 ∨ 0 ≡ aorai_intermediate_state_0;
-    requires
-      1 ≡ aorai_intermediate_state ∨ 0 ≡ aorai_intermediate_state;
+    requires 0 ≡ aorai_intermediate_state ∨ 0 ≡ aorai_intermediate_state_0;
+    requires 1 ≡ aorai_intermediate_state_0 ∨ 0 ≡ aorai_intermediate_state_0;
+    requires 1 ≡ aorai_intermediate_state ∨ 0 ≡ aorai_intermediate_state;
     
     behavior Buchi_property_behavior:
       ensures
         0 ≡ S0 ∧ 0 ≡ Sf ∧ 0 ≡ aorai_intermediate_state ∧
-        0 ≡ aorai_intermediate_state_0 ∧
-        0 ≡ aorai_intermediate_state_1 ∧ 0 ≡ aorai_intermediate_state_3;
+        0 ≡ aorai_intermediate_state_0 ∧ 0 ≡ aorai_intermediate_state_1 ∧
+        0 ≡ aorai_intermediate_state_3;
       ensures 1 ≡ aorai_intermediate_state_2;
       ensures
         \at(1 ≡ aorai_intermediate_state_0,Pre) ∧
@@ -326,8 +321,7 @@ void f(void)
 /*@ ghost
   /@ requires
        1 ≡ aorai_intermediate_state_2 ∧ 0 ≡ S0 ∧ 0 ≡ Sf ∧
-       0 ≡ aorai_intermediate_state ∧
-       0 ≡ aorai_intermediate_state_0 ∧
+       0 ≡ aorai_intermediate_state ∧ 0 ≡ aorai_intermediate_state_0 ∧
        0 ≡ aorai_intermediate_state_1 ∧ 0 ≡ aorai_intermediate_state_3;
      ensures aorai_CurOpStatus ≡ aorai_Called;
      ensures aorai_CurOperation ≡ op_g;
@@ -450,8 +444,7 @@ void f(void)
 /*@ ghost
   /@ requires
        1 ≡ aorai_intermediate_state_3 ∧ 0 ≡ S0 ∧ 0 ≡ Sf ∧
-       0 ≡ aorai_intermediate_state ∧
-       0 ≡ aorai_intermediate_state_0 ∧
+       0 ≡ aorai_intermediate_state ∧ 0 ≡ aorai_intermediate_state_0 ∧
        0 ≡ aorai_intermediate_state_1 ∧ 0 ≡ aorai_intermediate_state_2;
      ensures aorai_CurOpStatus ≡ aorai_Terminated;
      ensures aorai_CurOperation ≡ op_g;
@@ -579,8 +572,8 @@ void f(void)
     behavior Buchi_property_behavior:
       ensures
         0 ≡ S0 ∧ 0 ≡ Sf ∧ 0 ≡ aorai_intermediate_state ∧
-        0 ≡ aorai_intermediate_state_1 ∧
-        0 ≡ aorai_intermediate_state_2 ∧ 0 ≡ aorai_intermediate_state_3;
+        0 ≡ aorai_intermediate_state_1 ∧ 0 ≡ aorai_intermediate_state_2 ∧
+        0 ≡ aorai_intermediate_state_3;
       ensures 1 ≡ aorai_intermediate_state_0;
  */
 void g(void)
@@ -593,8 +586,7 @@ void g(void)
 /*@ ghost
   /@ requires
        1 ≡ S0 ∧ 0 ≡ Sf ∧ 0 ≡ aorai_intermediate_state ∧
-       0 ≡ aorai_intermediate_state_0 ∧
-       0 ≡ aorai_intermediate_state_1 ∧
+       0 ≡ aorai_intermediate_state_0 ∧ 0 ≡ aorai_intermediate_state_1 ∧
        0 ≡ aorai_intermediate_state_2 ∧ 0 ≡ aorai_intermediate_state_3;
      ensures aorai_CurOpStatus ≡ aorai_Called;
      ensures aorai_CurOperation ≡ op_main;
@@ -775,13 +767,11 @@ void g(void)
        ensures 0 ≡ S0;
      
      behavior buch_state_Sf_in:
-       assumes
-         1 ≡ aorai_intermediate_state_0 ∨ 1 ≡ aorai_intermediate_state;
+       assumes 1 ≡ aorai_intermediate_state_0 ∨ 1 ≡ aorai_intermediate_state;
        ensures 1 ≡ Sf;
      
      behavior buch_state_Sf_out:
-       assumes
-         0 ≡ aorai_intermediate_state_0 ∧ 0 ≡ aorai_intermediate_state;
+       assumes 0 ≡ aorai_intermediate_state_0 ∧ 0 ≡ aorai_intermediate_state;
        ensures 0 ≡ Sf;
      
      behavior buch_state_aorai_intermediate_state_out:
@@ -842,8 +832,7 @@ void g(void)
 
 /*@ requires
       1 ≡ S0 ∧ 0 ≡ Sf ∧ 0 ≡ aorai_intermediate_state ∧
-      0 ≡ aorai_intermediate_state_0 ∧
-      0 ≡ aorai_intermediate_state_1 ∧
+      0 ≡ aorai_intermediate_state_0 ∧ 0 ≡ aorai_intermediate_state_1 ∧
       0 ≡ aorai_intermediate_state_2 ∧ 0 ≡ aorai_intermediate_state_3;
     
     behavior aorai_acceptance:
@@ -852,14 +841,12 @@ void g(void)
     behavior Buchi_property_behavior:
       ensures
         0 ≡ S0 ∧ 0 ≡ aorai_intermediate_state ∧
-        0 ≡ aorai_intermediate_state_0 ∧
-        0 ≡ aorai_intermediate_state_1 ∧
+        0 ≡ aorai_intermediate_state_0 ∧ 0 ≡ aorai_intermediate_state_1 ∧
         0 ≡ aorai_intermediate_state_2 ∧ 0 ≡ aorai_intermediate_state_3;
       ensures 1 ≡ Sf;
       ensures
         \at(1 ≡ S0,Pre) ∧ 1 ≡ Sf ⇒
-        (1 ≤ aorai_counter ≤ 5) ∨
-        aorai_counter ≡ \at(aorai_counter,Pre) + 0;
+        (1 ≤ aorai_counter ≤ 5) ∨ aorai_counter ≡ \at(aorai_counter,Pre) + 0;
  */
 int main(int c)
 {
@@ -873,18 +860,15 @@ int main(int c)
   /*@ loop invariant Aorai: 0 ≡ S0;
       loop invariant Aorai: 0 ≡ Sf;
       loop invariant
-        Aorai:
-          1 ≡ aorai_intermediate_state ∨ 0 ≡ aorai_intermediate_state;
+        Aorai: 1 ≡ aorai_intermediate_state ∨ 0 ≡ aorai_intermediate_state;
       loop invariant
         Aorai:
-          1 ≡ aorai_intermediate_state_0 ∨
-          0 ≡ aorai_intermediate_state_0;
+          1 ≡ aorai_intermediate_state_0 ∨ 0 ≡ aorai_intermediate_state_0;
       loop invariant Aorai: 0 ≡ aorai_intermediate_state_1;
       loop invariant Aorai: 0 ≡ aorai_intermediate_state_2;
       loop invariant Aorai: 0 ≡ aorai_intermediate_state_3;
       loop invariant
-        Aorai:
-          1 ≡ aorai_intermediate_state ∨ 1 ≡ aorai_intermediate_state_0;
+        Aorai: 1 ≡ aorai_intermediate_state ∨ 1 ≡ aorai_intermediate_state_0;
       loop invariant
         Aorai: aorai_Loop_Init_13 ≢ 0 ⇒ 0 ≡ aorai_intermediate_state_0;
       loop invariant

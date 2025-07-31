@@ -1,30 +1,30 @@
-125,130d124
+123,128d122
 < [eva:alarm] addition.i:61: Warning: 
 <   signed overflow. assert -2147483648 ≤ (int)*((char *)(&q1)) + 2;
 < [eva:alarm] addition.i:61: Warning: 
 <   signed overflow. assert (int)*((char *)(&q1)) + 2 ≤ 2147483647;
 < [eva:garbled-mix:write] addition.i:61: Warning: 
 <   Assigning imprecise value to p14 because of misaligned read of addresses.
-138a133,137
+136a131,135
 > [eva:garbled-mix:summary] Warning: 
 >   Origins of garbled mix generated during analysis:
 >     addition.i:59: misaligned read of addresses
 >       (read in 1 statement, propagated through 2 statements)
 >       garbled mix of &{p1}
-140c139
+138c137
 < [scope:rm_asserts] removing 9 assertion(s)
 ---
 > [scope:rm_asserts] removing 7 assertion(s)
-164c163
-<      {{ garbled mix of &{p1} (origin: Misaligned read {addition.i:61}) }}
+160c159
+<   p14 ∈ {{ garbled mix of &{p1} (origin: Misaligned read {addition.i:61}) }}
 ---
->      {{ garbled mix of &{p1} (origin: Misaligned read {addition.i:59}) }}
-354,357d352
+>   p14 ∈ {{ garbled mix of &{p1} (origin: Misaligned read {addition.i:59}) }}
+348,351d346
 < [eva:alarm] addition.i:61: Warning: 
 <   signed overflow. assert -2147483648 ≤ (int)*((char *)(&q1)) + 2;
 < [eva:alarm] addition.i:61: Warning: 
 <   signed overflow. assert (int)*((char *)(&q1)) + 2 ≤ 2147483647;
-365c360,365
+359c354,359
 < [scope:rm_asserts] removing 9 assertion(s)
 ---
 > [eva:garbled-mix:summary] Warning: 
@@ -33,7 +33,7 @@
 >       (read in 1 statement, propagated through 2 statements)
 >       garbled mix of &{p1}
 > [scope:rm_asserts] removing 7 assertion(s)
-390c390
-<      {{ garbled mix of &{p1} (origin: Misaligned read {addition.i:61}) }}
+382c382
+<   p14 ∈ {{ garbled mix of &{p1} (origin: Misaligned read {addition.i:61}) }}
 ---
->      {{ garbled mix of &{p1} (origin: Misaligned read {addition.i:59}) }}
+>   p14 ∈ {{ garbled mix of &{p1} (origin: Misaligned read {addition.i:59}) }}

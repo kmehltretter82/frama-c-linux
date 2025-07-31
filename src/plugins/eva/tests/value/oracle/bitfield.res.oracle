@@ -230,8 +230,7 @@
   r ∈ {1}
 [eva:final-states] Values at end of function imprecise_bts_1671:
   b ∈ {0}
-  c ∈
-   {{ garbled mix of &{b; ee} (origin: Misaligned read {bitfield.i:70}) }}
+  c ∈ {{ garbled mix of &{b; ee} (origin: Misaligned read {bitfield.i:70}) }}
   ee ∈ {{ garbled mix of &{b} (origin: Misaligned read {bitfield.i:70}) }}
 [eva:final-states] Values at end of function logic:
   y.v0_3 ∈ [--..--]
@@ -282,8 +281,7 @@
   G ∈ {1}
   H ∈ {0}
   b ∈ {0}
-  c ∈
-   {{ garbled mix of &{b; ee} (origin: Misaligned read {bitfield.i:70}) }}
+  c ∈ {{ garbled mix of &{b; ee} (origin: Misaligned read {bitfield.i:70}) }}
   ee ∈ {{ garbled mix of &{b} (origin: Misaligned read {bitfield.i:70}) }}
   y.v0_3 ∈ [--..--]
    .v4 ∈ {0}

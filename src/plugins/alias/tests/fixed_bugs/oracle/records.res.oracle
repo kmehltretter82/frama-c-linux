@@ -20,8 +20,7 @@
 [alias] May-aliases after instruction  b = z->field;  are
   { z; q }  { z->field; q->field; a; b; t.field }
 [alias] May-alias graph after instruction  b = z->field;  is
-  9:{ z; q } → 10:{ t }   10:{ t } -field→ 11:{ a; b }
-  11:{ a; b } → 12:{ x }
+  9:{ z; q } → 10:{ t }   10:{ t } -field→ 11:{ a; b }   11:{ a; b } → 12:{ x }
 [alias] analysing instruction: n = q->field;
 [alias] May-aliases after instruction  n = q->field;  are
   { z; q }  { z->field; q->field; a; b; n; t.field }

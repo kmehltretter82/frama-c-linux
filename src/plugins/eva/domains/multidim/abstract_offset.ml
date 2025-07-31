@@ -36,8 +36,9 @@ let rec pretty fmt = function
       Int_val.pretty i
       pretty s
   | Index (Some e, i, _t, s) ->
-    Format.fprintf fmt "[%a∈%a]%a"
+    Format.fprintf fmt "[%a%t%a]%a"
       Eva_ast.pp_exp e
+      Unicode.pp_in_set
       Int_val.pretty i
       pretty s
 

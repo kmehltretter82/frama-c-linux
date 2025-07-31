@@ -1,22 +1,22 @@
-135a136,137
+133a134,135
 > [eva] allocated.c:82: Call to builtin malloc
 > [eva:malloc:new] allocated.c:82: allocating variable __malloc_main_l82_7
-146a149,150
+144a147,148
 > [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_7}
 > [eva] allocated.c:87: Call to builtin free
-156a161,162
+154a159,160
 > [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_7}
 > [eva] allocated.c:87: Call to builtin free
-166a173,174
+164a171,172
 > [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_7}
 > [eva] allocated.c:87: Call to builtin free
-176,177c184,185
+174,175c182,183
 < [eva] allocated.c:82: Call to builtin malloc
 < [eva:malloc:new] allocated.c:82: allocating variable __malloc_main_l82_7
 ---
 > [eva] allocated.c:87: Call to builtin free
 > [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_7}
-225a234,245
+223a232,243
 > [eva] allocated.c:82: Call to builtin malloc
 > [eva:malloc:new] allocated.c:82: allocating variable __malloc_main_l82_32
 > [eva] allocated.c:82: Call to builtin malloc
@@ -29,12 +29,12 @@
 > [eva:malloc:new] allocated.c:82: allocating variable __malloc_main_l82_36
 > [eva] allocated.c:82: Call to builtin malloc
 > [eva:malloc:new] allocated.c:82: allocating variable __malloc_main_l82_37
-228d247
+226d245
 < [eva:partition] allocated.c:84: Trace partitioning superposing up to 300 states
-231,232d249
+229,230d247
 < [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_7}
 < [eva] allocated.c:87: Call to builtin free
-281c298,308
+279c296,306
 < [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_7}
 ---
 > [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_32}
@@ -48,7 +48,7 @@
 > [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_36}
 > [eva] allocated.c:87: Call to builtin free
 > [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_37}
-331c358,368
+329c356,366
 < [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_7}
 ---
 > [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_32}
@@ -62,7 +62,7 @@
 > [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_36}
 > [eva] allocated.c:87: Call to builtin free
 > [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_37}
-381c418,428
+379c416,426
 < [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_7}
 ---
 > [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_32}
@@ -76,7 +76,7 @@
 > [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_36}
 > [eva] allocated.c:87: Call to builtin free
 > [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_37}
-431c478,488
+429c476,486
 < [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_7}
 ---
 > [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_32}
@@ -90,7 +90,7 @@
 > [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_36}
 > [eva] allocated.c:87: Call to builtin free
 > [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_37}
-481c538,548
+479c536,546
 < [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_7}
 ---
 > [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_32}
@@ -104,7 +104,7 @@
 > [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_36}
 > [eva] allocated.c:87: Call to builtin free
 > [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_37}
-531c598,608
+529c596,606
 < [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_7}
 ---
 > [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_32}
@@ -118,7 +118,7 @@
 > [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_36}
 > [eva] allocated.c:87: Call to builtin free
 > [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_37}
-581c658,668
+579c656,666
 < [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_7}
 ---
 > [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_32}
@@ -132,7 +132,7 @@
 > [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_36}
 > [eva] allocated.c:87: Call to builtin free
 > [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_37}
-629a717,729
+627a715,727
 > [eva] allocated.c:87: Call to builtin free
 > [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_32}
 > [eva] allocated.c:87: Call to builtin free
@@ -146,14 +146,14 @@
 > [eva] allocated.c:87: Call to builtin free
 > [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_37}
 > [eva:partition] allocated.c:81: Trace partitioning superposing up to 500 states
-740,742c840,841
+738,740c838,839
 <   __malloc_main_l82_7[0] ∈ {21} or UNINITIALIZED
 <                      [1] ∈ {24} or UNINITIALIZED
 <                      [2] ∈ {27} or UNINITIALIZED
 ---
 >   __malloc_main_l82_7[0] ∈ {14} or UNINITIALIZED
 >                      [1] ∈ {17} or UNINITIALIZED
-814a914,931
+812a912,929
 >   __malloc_main_l82_32[0] ∈ {21} or UNINITIALIZED
 >                       [1] ∈ {24} or UNINITIALIZED
 >                       [2] ∈ {27} or UNINITIALIZED
@@ -172,22 +172,22 @@
 >   __malloc_main_l82_37[0] ∈ {21} or UNINITIALIZED
 >                       [1] ∈ {24} or UNINITIALIZED
 >                       [2] ∈ {27} or UNINITIALIZED
-860c977
+858c975
 <   __malloc_main_l82_7[0..2] FROM __fc_heap_status; nondet (and SELF)
 ---
 >   __malloc_main_l82_7[0..1] FROM __fc_heap_status; nondet (and SELF)
-884a1002,1007
+882a1000,1005
 >   __malloc_main_l82_32[0..2] FROM __fc_heap_status; nondet (and SELF)
 >   __malloc_main_l82_33[0..2] FROM __fc_heap_status; nondet (and SELF)
 >   __malloc_main_l82_34[0..2] FROM __fc_heap_status; nondet (and SELF)
 >   __malloc_main_l82_35[0..2] FROM __fc_heap_status; nondet (and SELF)
 >   __malloc_main_l82_36[0..2] FROM __fc_heap_status; nondet (and SELF)
 >   __malloc_main_l82_37[0..2] FROM __fc_heap_status; nondet (and SELF)
-908c1031
+906c1029
 <     __malloc_main_l82_6[0..1]; __malloc_main_l82_7[0..2];
 ---
 >     __malloc_main_l82_6[0..1]; __malloc_main_l82_7[0..1];
-920a1044,1046
+918a1042,1044
 >     __malloc_main_l82_32[0..2]; __malloc_main_l82_33[0..2];
 >     __malloc_main_l82_34[0..2]; __malloc_main_l82_35[0..2];
 >     __malloc_main_l82_36[0..2]; __malloc_main_l82_37[0..2];

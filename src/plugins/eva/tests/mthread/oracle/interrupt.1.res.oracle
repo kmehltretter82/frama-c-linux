@@ -134,8 +134,7 @@
 [eva:interferences] 
   Interferences from thread <interrupt_handler interrupt_incr>
     concurrent writes:
-      /*@ assert Eva: signed_overflow: interrupt_received + 1 ≤ 2147483647;
-      */
+      /*@ assert Eva: signed_overflow: interrupt_received + 1 ≤ 2147483647; */
       interrupt_received ++; interrupt.c:29 <- interrupt_incr
     shared bases: {interrupt_received}
     interferences by location:
@@ -152,8 +151,7 @@
 [mt] * threads and mutexes computed
 [mt] ***** Computing shared variables
 [mt] Imprecise locations to watch: interrupt_received
-[mt] <main> reads  interrupt_received ∈ {0}  // interrupt.c:33
-  main_interrupt_incr
+[mt] <main> reads  interrupt_received ∈ {0}  // interrupt.c:33 main_interrupt_incr
 [mt] <interrupt_handler interrupt_incr> reads 
   interrupt_received ∈ [0..2147483647]  // interrupt.c:29 interrupt_incr
 [mt] <interrupt_handler interrupt_incr> writes 
@@ -210,8 +208,7 @@
 [mt] Imprecise locations to watch: interrupt_received
 [mt] <interrupt_handler interrupt_incr> reads 
   interrupt_received ∈ [0..2147483647]  // interrupt.c:29 interrupt_incr
-[mt] <main> reads  interrupt_received ∈ {0}  // interrupt.c:33
-  main_interrupt_incr
+[mt] <main> reads  interrupt_received ∈ {0}  // interrupt.c:33 main_interrupt_incr
 [mt] <interrupt_handler interrupt_incr> writes 
   interrupt_received ∈ [1..2147483647]  // interrupt.c:29 interrupt_incr
 [mt] Possible read/write data races:

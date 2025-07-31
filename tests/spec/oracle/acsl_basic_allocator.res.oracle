@@ -21,8 +21,7 @@ typedef struct _memory_block_list memory_block_list;
 typedef memory_block_list *memory_pool;
 /*@
 type invariant inv_memory_block(memory_block mb) =
-  0 < mb.size ∧ \offset(mb.data) ≡ 0 ∧
-  \block_length(mb.data) ≡ mb.size;
+  0 < mb.size ∧ \offset(mb.data) ≡ 0 ∧ \block_length(mb.data) ≡ mb.size;
  */
 /*@
 predicate used_memory_block{L}(memory_block mb) =

@@ -38,9 +38,13 @@ module Space (Field : Field.S) = struct
   type 'n row = Format.formatter -> 'n finite -> unit
   let pretty (type n m) (row : n row) fmt (M m : (n, m) matrix) =
     let cut () = Format.pp_print_cut fmt () in
-    let first () = Format.fprintf fmt "@[<h>⌈%a⌉@]" row Finite.first in
+    let first () =
+      Format.fprintf fmt "@[<h>%a@]" (Unicode.pp_ceil row) Finite.first
+    in
     let mid i = Format.fprintf fmt "@[<h>|%a|@]" row i in
-    let last () = Format.fprintf fmt "@[<h>⌋%a⌊@]" row Finite.(last m.rows) in
+    let last () =
+      Format.fprintf fmt "@[<h>%a@]" (Unicode.pp_floor row) Finite.(last m.rows)
+    in
     let row i () =
       if Finite.(i = first) then first ()
       else if Finite.(i = last m.rows) then (cut () ; last ())

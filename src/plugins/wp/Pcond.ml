@@ -93,11 +93,11 @@ class state =
         match context , lbl with
         | NoWhere , None ->
           context <- InAddr ;
-          Format.fprintf fmt "« %a »" pp w ;
+          Format.fprintf fmt "\" %a \"" pp w ;
           context <- NoWhere ;
         | NoWhere , Some l ->
           context <- AtLabel l ;
-          Format.fprintf fmt "« %a »%a" pp w self#pp_at l ;
+          Format.fprintf fmt "\" %a \"%a" pp w self#pp_at l ;
           context <- NoWhere ;
         | InAddr , None -> pp fmt w
         | AtLabel _ , None -> pp fmt w

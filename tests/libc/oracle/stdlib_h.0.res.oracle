@@ -492,8 +492,7 @@
   sl ∈ {{ "12 34 -56" }}
   s ∈ {{ "12 34 -56" ; " 3.14 0x1.2p2" }}
   pl ∈ {{ "12 34 -56" + [0..9] }} or UNINITIALIZED
-  q ∈
-   {{ "12 34 -56" + [0..9] ; " 3.14 0x1.2p2" + [0..13] }} or UNINITIALIZED
+  q ∈ {{ "12 34 -56" + [0..9] ; " 3.14 0x1.2p2" + [0..13] }} or UNINITIALIZED
   l ∈ [--..--]
   pll ∈ {{ "12 34 -56" + [0..9] }} or UNINITIALIZED
   ll ∈ [--..--] or UNINITIALIZED

@@ -21,8 +21,8 @@ enum aorai_OpStatusList {
 /*@ ghost
   /@ requires
        1 ≡ aorai_intermediate_state_0 ∧ 0 ≡ S0 ∧ 0 ≡ Sf ∧
-       0 ≡ aorai_intermediate_state_1 ∧
-       0 ≡ aorai_intermediate_state_2 ∧ 0 ≡ aorai_reject;
+       0 ≡ aorai_intermediate_state_1 ∧ 0 ≡ aorai_intermediate_state_2 ∧
+       0 ≡ aorai_reject;
      ensures aorai_CurOpStatus ≡ aorai_Called;
      ensures aorai_CurOperation ≡ op_f;
      assigns aorai_CurOpStatus, aorai_CurOperation, S0, Sf,
@@ -150,8 +150,8 @@ enum aorai_OpStatusList {
 /*@ ghost
   /@ requires
        1 ≡ aorai_intermediate_state_1 ∧ 0 ≡ S0 ∧ 0 ≡ Sf ∧
-       0 ≡ aorai_intermediate_state ∧
-       0 ≡ aorai_intermediate_state_0 ∧ 0 ≡ aorai_intermediate_state_2;
+       0 ≡ aorai_intermediate_state ∧ 0 ≡ aorai_intermediate_state_0 ∧
+       0 ≡ aorai_intermediate_state_2;
      ensures aorai_CurOpStatus ≡ aorai_Terminated;
      ensures aorai_CurOperation ≡ op_f;
      assigns aorai_CurOpStatus, aorai_CurOperation, S0, Sf,
@@ -277,12 +277,10 @@ enum aorai_OpStatusList {
 
 /*@ requires
       1 ≡ aorai_intermediate_state_0 ∧ 0 ≡ S0 ∧ 0 ≡ Sf ∧
-      0 ≡ aorai_intermediate_state_1 ∧
-      0 ≡ aorai_intermediate_state_2 ∧ 0 ≡ aorai_reject;
-    requires
-      1 ≡ aorai_intermediate_state_0 ∨ 0 ≡ aorai_intermediate_state_0;
-    requires
-      1 ≡ aorai_intermediate_state ∨ 0 ≡ aorai_intermediate_state;
+      0 ≡ aorai_intermediate_state_1 ∧ 0 ≡ aorai_intermediate_state_2 ∧
+      0 ≡ aorai_reject;
+    requires 1 ≡ aorai_intermediate_state_0 ∨ 0 ≡ aorai_intermediate_state_0;
+    requires 1 ≡ aorai_intermediate_state ∨ 0 ≡ aorai_intermediate_state;
     ensures 1 ≡ aorai_intermediate_state_2;
     
     behavior Buchi_behavior_in_0:
@@ -344,8 +342,7 @@ int main_bhv_bhv(int c); */
 /*@ ghost
   /@ requires
        1 ≡ S0 ∧ 0 ≡ Sf ∧ 0 ≡ aorai_intermediate_state ∧
-       0 ≡ aorai_intermediate_state_0 ∧
-       0 ≡ aorai_intermediate_state_1 ∧
+       0 ≡ aorai_intermediate_state_0 ∧ 0 ≡ aorai_intermediate_state_1 ∧
        0 ≡ aorai_intermediate_state_2 ∧ 0 ≡ aorai_reject;
      requires 1 ≡ S0 ⇒ c ≤ 0 ∨ c > 0;
      ensures aorai_CurOpStatus ≡ aorai_Called;
@@ -565,15 +562,13 @@ int main_bhv_bhv(int c); */
      
      behavior buch_state_aorai_reject_in:
        assumes
-         1 ≡ aorai_reject ∨
-         (1 ≡ aorai_intermediate_state_2 ∧ res ≢ 0) ∨
+         1 ≡ aorai_reject ∨ (1 ≡ aorai_intermediate_state_2 ∧ res ≢ 0) ∨
          1 ≡ aorai_intermediate_state_0;
        ensures 1 ≡ aorai_reject;
      
      behavior buch_state_aorai_reject_out:
        assumes
-         0 ≡ aorai_reject ∧
-         (0 ≡ aorai_intermediate_state_2 ∨ res ≡ 0) ∧
+         0 ≡ aorai_reject ∧ (0 ≡ aorai_intermediate_state_2 ∨ res ≡ 0) ∧
          0 ≡ aorai_intermediate_state_0;
        ensures 0 ≡ aorai_reject;
    @/
@@ -631,8 +626,7 @@ int main_bhv_bhv(int c); */
 
 /*@ requires
       1 ≡ S0 ∧ 0 ≡ Sf ∧ 0 ≡ aorai_intermediate_state ∧
-      0 ≡ aorai_intermediate_state_0 ∧
-      0 ≡ aorai_intermediate_state_1 ∧
+      0 ≡ aorai_intermediate_state_0 ∧ 0 ≡ aorai_intermediate_state_1 ∧
       0 ≡ aorai_intermediate_state_2 ∧ 0 ≡ aorai_reject;
     requires 1 ≡ S0 ⇒ c ≤ 0 ∨ c > 0;
     ensures 1 ≡ Sf;
@@ -649,8 +643,8 @@ int main_bhv_bhv(int c); */
       ensures 1 ≡ aorai_reject ∨ 0 ≡ aorai_reject;
       ensures
         0 ≡ S0 ∧ 0 ≡ aorai_intermediate_state ∧
-        0 ≡ aorai_intermediate_state_0 ∧
-        0 ≡ aorai_intermediate_state_1 ∧ 0 ≡ aorai_intermediate_state_2;
+        0 ≡ aorai_intermediate_state_0 ∧ 0 ≡ aorai_intermediate_state_1 ∧
+        0 ≡ aorai_intermediate_state_2;
       ensures 1 ≡ Sf ∨ 1 ≡ aorai_reject;
  */
 int main(int c)

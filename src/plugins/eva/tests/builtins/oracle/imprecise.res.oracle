@@ -145,8 +145,7 @@
     .[bits 64 to ..] ∈ {0} or UNINITIALIZED
   v3.[bits 0 to ..]# ∈ {0; 251} or UNINITIALIZED repeated %8 
   v5.[bits 0 to 262143]# ∈ {0; 18; 19; 20} or UNINITIALIZED repeated %8 
-    .[bits 262144 to 17179869183]# ∈
-    {0; 19; 20} or UNINITIALIZED repeated %8 
+    .[bits 262144 to 17179869183]# ∈ {0; 19; 20} or UNINITIALIZED repeated %8 
     .[bits 17179869184 to ..]# ∈ {0; 20} or UNINITIALIZED repeated %8 
   t[0..9] ∈ {0}
   p_gm_null ∈ [--..--]
@@ -180,8 +179,7 @@
     .[bits 64 to ..] ∈ {0} or UNINITIALIZED
   v3.[bits 0 to ..]# ∈ {0; 251} or UNINITIALIZED repeated %8 
   v5.[bits 0 to 262143]# ∈ {0; 18; 19; 20} or UNINITIALIZED repeated %8 
-    .[bits 262144 to 17179869183]# ∈
-    {0; 19; 20} or UNINITIALIZED repeated %8 
+    .[bits 262144 to 17179869183]# ∈ {0; 19; 20} or UNINITIALIZED repeated %8 
     .[bits 17179869184 to ..]# ∈ {0; 20} or UNINITIALIZED repeated %8 
   t[0..9] ∈ {0}
   p_gm_null ∈ [100..197]

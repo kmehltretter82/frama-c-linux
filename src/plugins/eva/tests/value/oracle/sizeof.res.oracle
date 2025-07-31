@@ -233,8 +233,7 @@ unsigned int fsize3(int n)
 {
   unsigned int __retres;
   unsigned int __lengthof_b;
-  /*@ assert alloca_bounds: 0 < sizeof(char) * (int)(n + 3) ≤ 4294967295;
-   */
+  /*@ assert alloca_bounds: 0 < sizeof(char) * (int)(n + 3) ≤ 4294967295; */
   ;
   __lengthof_b = (unsigned int)(n + 3);
   char *b = __fc_vla_alloc(sizeof(char) * __lengthof_b);

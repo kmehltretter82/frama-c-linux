@@ -230,8 +230,8 @@ void a(void)
 
 /*@ ghost
   /@ requires
-       1 ≡ init ∧ 0 ≡ S ∧ 0 ≡ T ∧
-       0 ≡ aorai_intermediate_state ∧ 0 ≡ aorai_intermediate_state_0;
+       1 ≡ init ∧ 0 ≡ S ∧ 0 ≡ T ∧ 0 ≡ aorai_intermediate_state ∧
+       0 ≡ aorai_intermediate_state_0;
      ensures aorai_CurOpStatus ≡ aorai_Called;
      ensures aorai_CurOperation ≡ op_main;
      assigns aorai_CurOpStatus, aorai_CurOperation, S, T,
@@ -391,8 +391,8 @@ void a(void)
 */
 
 /*@ requires
-      1 ≡ init ∧ 0 ≡ S ∧ 0 ≡ T ∧
-      0 ≡ aorai_intermediate_state ∧ 0 ≡ aorai_intermediate_state_0;
+      1 ≡ init ∧ 0 ≡ S ∧ 0 ≡ T ∧ 0 ≡ aorai_intermediate_state ∧
+      0 ≡ aorai_intermediate_state_0;
     
     behavior Buchi_property_behavior:
       ensures

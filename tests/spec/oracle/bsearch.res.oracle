@@ -5,8 +5,7 @@
 /*@ lemma mean_1: ∀ ℤ x, ℤ y; x ≤ y ⇒ x ≤ (x + y) / 2 ≤ y;
  */
 /*@
-predicate sorted{L}(int t[], ℤ n) =
-  ∀ ℤ i, ℤ j; 0 ≤ i ≤ j ≤ n ⇒ t[i] ≤ t[j];
+predicate sorted{L}(int t[], ℤ n) = ∀ ℤ i, ℤ j; 0 ≤ i ≤ j ≤ n ⇒ t[i] ≤ t[j];
  */
 /*@ requires
       n ≥ 0 ∧ \valid(t + (0 .. n - 1)) ∧ sorted(*((int (*)[])t), n - 1);
@@ -16,8 +15,7 @@ predicate sorted{L}(int t[], ℤ n) =
     
     behavior search_failure:
       ensures
-        \result < 0 ⇒
-        (∀ ℤ k; 0 ≤ k < \old(n) ⇒ *(\old(t) + k) ≢ \old(v));
+        \result < 0 ⇒ (∀ ℤ k; 0 ≤ k < \old(n) ⇒ *(\old(t) + k) ≢ \old(v));
  */
 int bsearch(int *t, int n, int v)
 {
@@ -25,8 +23,7 @@ int bsearch(int *t, int n, int v)
   int l = 0;
   int u = n - 1;
   /*@ loop invariant
-        0 ≤ l ∧ u ≤ n - 1 ∧
-        (∀ int k; 0 ≤ k < n ⇒ *(t + k) ≡ v ⇒ l ≤ k ≤ u);
+        0 ≤ l ∧ u ≤ n - 1 ∧ (∀ int k; 0 ≤ k < n ⇒ *(t + k) ≡ v ⇒ l ≤ k ≤ u);
       loop variant u - l;
   */
   while (l <= u) {

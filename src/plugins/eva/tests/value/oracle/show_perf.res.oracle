@@ -112,7 +112,6 @@
   | * print_collatz: executed: 1x total: ?s
   | | * collatz: executed: 2x total: ?s
   | | | * compute_next: executed: 16x total: ?s
-   
 [from] Computing for function compute_next
 [from] Done for function compute_next
 [from] Computing for function collatz

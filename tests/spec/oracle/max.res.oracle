@@ -13,8 +13,7 @@ axiomatic IsMax {
       is_max(max, t, length) ⇒ 0 ≤ i < length ⇒ t[i] ≤ max;
   
   axiom max_eq{L}:
-    ∀ int t[], ℤ max, ℤ length;
-      is_max(max, t, length) ⇒ (∃ ℤ i; t[i] ≡ max);
+    ∀ int t[], ℤ max, ℤ length; is_max(max, t, length) ⇒ (∃ ℤ i; t[i] ≡ max);
   
 }
  */
@@ -24,8 +23,7 @@ axiomatic IsMax {
       assumes n > 0;
       ensures
         0 ≤ \result < \old(n) ∧
-        (∀ int i;
-           0 ≤ i < \old(n) ⇒ *(\old(t) + \result) ≥ *(\old(t) + i)) ∧
+        (∀ int i; 0 ≤ i < \old(n) ⇒ *(\old(t) + \result) ≥ *(\old(t) + i)) ∧
         is_max(*(\old(t) + \result), *((int (*)[])\old(t)), \old(n));
     
     behavior empty:

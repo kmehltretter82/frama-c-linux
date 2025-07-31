@@ -244,8 +244,7 @@
   __realloc_main3_l65_1[0..1] ∈ UNINITIALIZED
   ==END OF DUMP==
 [eva:alarm] realloc_multiple.c:70: Warning: 
-  accessing left-value that contains escaping addresses.
-  assert ¬\dangling(&q);
+  accessing left-value that contains escaping addresses. assert ¬\dangling(&q);
 [eva] realloc_multiple.c:70: Call to builtin free
 [eva] realloc_multiple.c:70: 
   function free: precondition 'freeable' got status valid.

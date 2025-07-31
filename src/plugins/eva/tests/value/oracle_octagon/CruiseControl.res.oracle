@@ -1,8 +1,8 @@
-979c979
+972c972
 <        [0]._C4_ThrottleCmd._I0_Regul_ON ∈ {0; 1}
 ---
 >        [0]._C4_ThrottleCmd._I0_Regul_ON ∈ {1}
-1217c1217
+1208c1208
 <        [0]._C4_ThrottleCmd._I0_Regul_ON ∈ {0; 1}
 ---
 >        [0]._C4_ThrottleCmd._I0_Regul_ON ∈ {1}

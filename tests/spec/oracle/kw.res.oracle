@@ -47,8 +47,7 @@ int main(void)
   ;
   /*@
   assert
-  loop:
-    assert.ensures + assert.ensures ≤ (\let reads = assert.checks; reads);
+  loop: assert.ensures + assert.ensures ≤ (\let reads = assert.checks; reads);
    */
   ;
   __retres = 0;

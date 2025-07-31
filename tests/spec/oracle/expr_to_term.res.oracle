@@ -4,8 +4,7 @@ struct S {
    int y ;
    int z ;
 };
-/*@
-predicate int_eq(int logical, int from_stmt_id) = logical ≡ from_stmt_id;
+/*@ predicate int_eq(int logical, int from_stmt_id) = logical ≡ from_stmt_id;
  */
 int x[10];
 struct S s;

@@ -1,8 +1,8 @@
-200a201,203
+198a199,201
 > [eva] allocated.c:127: Call to builtin __fc_vla_alloc
 > [eva:malloc] allocated.c:127: 
 >   resizing variable `__malloc_main_l127' (0..31/319) to fit 0..63/319
-211c214
+209c212
 <   j ∈ [1..2147483647]
 ---
 >   j ∈ [1..10]

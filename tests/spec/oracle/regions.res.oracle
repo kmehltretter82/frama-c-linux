@@ -13,8 +13,7 @@ void g(int *p, int n)
 }
 
 /*@ requires \valid(x) ∧ \valid(y);
-    ensures *\old(x) ≡ 1 ∧ *\old(y) ≡ 2;
- */
+    ensures *\old(x) ≡ 1 ∧ *\old(y) ≡ 2; */
 void f(int *x, int *y)
 {
   g(x,1);

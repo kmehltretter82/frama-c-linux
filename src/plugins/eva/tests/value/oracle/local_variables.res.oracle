@@ -39,8 +39,7 @@
   locals {x} escaping the scope of a block of main through p
 [eva:partition] local_variables.i:43: starting to merge loop iterations
 [eva:alarm] local_variables.i:47: Warning: 
-  accessing left-value that contains escaping addresses.
-  assert ¬\dangling(&p);
+  accessing left-value that contains escaping addresses. assert ¬\dangling(&p);
 [eva:alarm] local_variables.i:47: Warning: 
   out of bounds read. assert \valid_read(p);
 [eva] Recording results for main

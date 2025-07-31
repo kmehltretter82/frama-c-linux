@@ -63,7 +63,8 @@ module Make (Field : Field.S) = struct
     let { matrix = m ; measure_center = c ; measure_deviation = dev } = s in
     Format.fprintf fmt "@[<v>" ;
     Format.fprintf fmt "Source:@ " ;
-    Format.fprintf fmt "- Measure : %a ± %a@ " Field.pretty c Field.pretty dev ;
+    Format.fprintf fmt "- Measure : %a %t %a@ "
+      Field.pretty c Unicode.pp_plus_minus Field.pretty dev ;
     Format.fprintf fmt "- Contributions :@   @[<v>%a@]@ @ " Matrix.pretty m ;
     Format.fprintf fmt "@]"
 

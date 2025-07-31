@@ -36,15 +36,15 @@
   <none>
 [alias] May-alias graph after instruction  z1->s[0] = (struct struct_1_t *)(& x1);
   is
-  0:{ z1 } → 1:{  }   1:{  } -s→ 6:{  }   2:{ t } → 3:{  }
-  4:{ a } → 5:{  }   6:{  } → 7:{  }   7:{  } → 8:{ x1 }
+  0:{ z1 } → 1:{  }   1:{  } -s→ 6:{  }   2:{ t } → 3:{  }   4:{ a } → 
+  5:{  }   6:{  } → 7:{  }   7:{  } → 8:{ x1 }
 [alias] analysing instruction: z1->s[1] = (struct struct_1_t *)(& x2);
 [alias] May-aliases after instruction  z1->s[1] = (struct struct_1_t *)(& x2);  are
   <none>
 [alias] May-alias graph after instruction  z1->s[1] = (struct struct_1_t *)(& x2);
   is
-  0:{ z1 } → 1:{  }   1:{  } -s→ 6:{  }   2:{ t } → 3:{  }
-  4:{ a } → 5:{  }   6:{  } → 7:{  }   7:{  } → 8:{ x1; x2 }
+  0:{ z1 } → 1:{  }   1:{  } -s→ 6:{  }   2:{ t } → 3:{  }   4:{ a } → 
+  5:{  }   6:{  } → 7:{  }   7:{  } → 8:{ x1; x2 }
 [alias] analysing instruction: z1->c = a;
 [alias] May-aliases after instruction  z1->c = a;  are  { z1->c; a }
 [alias] May-alias graph after instruction  z1->c = a;  is

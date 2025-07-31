@@ -2379,20 +2379,11 @@ class cil_printer () = object (self)
     function
     | Ctype typ -> self#typ name fmt typ
     | Lboolean ->
-      let res =
-        if Kernel.Unicode.get () then Utf8_logic.boolean else "boolean"
-      in
-      Format.fprintf fmt "%s%t" res pname
+      Format.fprintf fmt "%t%t" Unicode.pp_boolean pname
     | Linteger ->
-      let res =
-        if Kernel.Unicode.get () then Utf8_logic.integer else "integer"
-      in
-      Format.fprintf fmt "%s%t" res pname
+      Format.fprintf fmt "%t%t" Unicode.pp_integer pname
     | Lreal ->
-      let res =
-        if Kernel.Unicode.get () then Utf8_logic.real else "real"
-      in
-      Format.fprintf fmt "%s%t" res pname
+      Format.fprintf fmt "%t%t" Unicode.pp_real pname
     | Ltype (s,l) ->
       fprintf fmt "%a%a%t" self#logic_type_info s
         ((* the space avoids the issue of list<list<int>> where the double >
@@ -2437,37 +2428,33 @@ class cil_printer () = object (self)
      needed. *)
   val mutable current_label = Logic_const.here_label
 
-  method term_binop fmt b =
-    fprintf fmt "%s"
-      (match b with
-       | PlusA | PlusPI -> "+"
-       | MinusA | MinusPP | MinusPI -> "-"
-       | Mult -> "*"
-       | Div -> "/"
-       | Mod -> "%"
-       | Shiftlt -> "<<"
-       | Shiftrt -> ">>"
-       | Lt -> "<"
-       | Gt -> ">"
-       | Le ->  if Kernel.Unicode.get () then Utf8_logic.le else "<="
-       | Ge -> if Kernel.Unicode.get () then Utf8_logic.ge else ">="
-       | Eq -> if Kernel.Unicode.get () then Utf8_logic.eq else "=="
-       | Ne -> if Kernel.Unicode.get () then Utf8_logic.neq else "!="
-       | BAnd -> "&"
-       | BXor -> "^"
-       | BOr -> "|"
-       | LAnd -> if Kernel.Unicode.get () then Utf8_logic.conj else "&&"
-       | LOr -> if Kernel.Unicode.get () then Utf8_logic.disj else "||")
+  method term_binop fmt = function
+    | PlusA | PlusPI -> Format.pp_print_string fmt "+"
+    | MinusA | MinusPP | MinusPI -> Format.pp_print_string fmt "-"
+    | Mult -> Format.pp_print_string fmt "*"
+    | Div -> Format.pp_print_string fmt "/"
+    | Mod -> Format.pp_print_string fmt "%"
+    | Shiftlt -> Format.pp_print_string fmt "<<"
+    | Shiftrt -> Format.pp_print_string fmt ">>"
+    | Lt -> Format.pp_print_string fmt "<"
+    | Gt -> Format.pp_print_string fmt ">"
+    | Le -> Unicode.pp_le fmt
+    | Ge -> Unicode.pp_ge fmt
+    | Eq -> Unicode.pp_eq fmt
+    | Ne -> Unicode.pp_neq fmt
+    | BAnd -> Format.pp_print_string fmt "&"
+    | BXor -> Format.pp_print_string fmt "^"
+    | BOr -> Format.pp_print_string fmt "|"
+    | LAnd -> Unicode.pp_and fmt
+    | LOr -> Unicode.pp_or fmt
 
-  method relation fmt b =
-    fprintf fmt "%s"
-      (match b with
-       | Rlt -> "<"
-       | Rgt -> ">"
-       | Rle -> if Kernel.Unicode.get () then Utf8_logic.le else "<="
-       | Rge -> if Kernel.Unicode.get () then Utf8_logic.ge else ">="
-       | Req -> if Kernel.Unicode.get () then Utf8_logic.eq else "=="
-       | Rneq -> if Kernel.Unicode.get () then Utf8_logic.neq else "!=")
+  method relation fmt = function
+    | Rlt -> Format.pp_print_string fmt "<"
+    | Rgt -> Format.pp_print_string fmt ">"
+    | Rle -> Unicode.pp_le fmt
+    | Rge -> Unicode.pp_ge fmt
+    | Req -> Unicode.pp_eq fmt
+    | Rneq -> Unicode.pp_neq fmt
 
   method private tand_list fmt l =
     match l with
@@ -2668,10 +2655,7 @@ class cil_printer () = object (self)
       fprintf fmt "%a" self#term_lval lv
 
   method term_lval fmt lv = match lv with
-    | TVar vi ,TNoOffset
-      when vi.lv_name = "\\pi" ->
-      fprintf fmt "%s"
-        (if Kernel.Unicode.get () then Utf8_logic.pi else "\\pi")
+    | TVar vi ,TNoOffset when vi.lv_name = "\\pi" -> Unicode.pp_pi fmt
     | TVar vi, o -> fprintf fmt "%a%a" self#logic_var vi self#term_offset o
     | TResult _, o ->
       fprintf fmt "%a%a" self#pp_acsl_keyword "\\result" self#term_offset o
@@ -2807,9 +2791,9 @@ class cil_printer () = object (self)
     | Papp (pi,labels,l) -> begin
         match Precedence.subset_is_backslash_in p with
         | Some (tl, tr) ->
-          fprintf fmt "@[%a %s@ %a@]"
+          fprintf fmt "@[%a %t@ %a@]"
             term tl
-            (if Kernel.Unicode.get () then Utf8_logic.inset else "\\in")
+            Unicode.pp_in_acsl
             term tr
         | None ->
           fprintf fmt "@[%a%a%a@]"
@@ -2832,22 +2816,22 @@ class cil_printer () = object (self)
         self#term_binop LOr
         self#pred_prec_named (current_level,p2)
     | Pxor (p1, p2) ->
-      fprintf fmt "@[%a %s@ %a@]"
+      fprintf fmt "@[%a %t@ %a@]"
         self#pred_prec_named (current_level,p1)
-        (if Kernel.Unicode.get () then Utf8_logic.x_or else "^^")
+        Unicode.pp_xor
         self#pred_prec_named (current_level,p2)
     | Pimplies (p1,p2) ->
-      fprintf fmt "@[%a %s@ %a@]"
+      fprintf fmt "@[%a %t@ %a@]"
         self#pred_prec_named (current_level,p1)
-        (if Kernel.Unicode.get () then Utf8_logic.implies else "==>")
+        Unicode.pp_implies
         self#pred_prec_named (current_level+1,p2)
     | Piff (p1,p2) ->
-      fprintf fmt "@[%a %s@ %a@]"
+      fprintf fmt "@[%a %t@ %a@]"
         self#pred_prec_named (current_level,p1)
-        (if Kernel.Unicode.get () then Utf8_logic.iff else "<==>")
+        Unicode.pp_iff
         self#pred_prec_named (current_level,p2)
-    | Pnot a -> fprintf fmt "@[%s%a@]"
-                  (if Kernel.Unicode.get () then Utf8_logic.neg else "!")
+    | Pnot a -> fprintf fmt "@[%t%a@]"
+                  Unicode.pp_not
                   self#pred_prec_named (current_level,a)
     | Pif (e, p1, p2) ->
       fprintf fmt "@[<hv 2>@[%a@]@ ?@ @[%a@]@ :@ @[%a@]@]"
@@ -2884,16 +2868,12 @@ class cil_printer () = object (self)
     | Pforall (quant,pred) ->
       Precedence.needIndent current_level pred fmt
         "@[%t %a;@]@ %a"
-        (fun fmt ->
-           if Kernel.Unicode.get () then pp_print_string fmt Utf8_logic.forall
-           else self#pp_acsl_keyword fmt "\\forall")
+        Unicode.pp_forall
         self#quantifiers quant self#pred_prec_named (current_level,pred)
     | Pexists (quant,pred) ->
       Precedence.needIndent current_level pred fmt
         "@[%t %a;@]@ %a"
-        (fun fmt ->
-           if Kernel.Unicode.get () then pp_print_string fmt Utf8_logic.exists
-           else self#pp_acsl_keyword fmt "\\exists")
+        Unicode.pp_exists
         self#quantifiers quant self#pred_prec_named (current_level,pred)
     | Pfreeable (l,p) ->
       fprintf fmt "@[%a%a(@[%a@])@]"

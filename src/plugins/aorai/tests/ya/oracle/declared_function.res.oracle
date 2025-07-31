@@ -23,27 +23,25 @@ int f(void);
 check lemma I_deterministic_trans{L}:
   (∀ int __retres_f;
      ¬(\at(aorai_CurOperation,L) ≡ op_f ∧
-        \at(aorai_CurOpStatus,L) ≡ aorai_Terminated ∧
-        __retres_f ≡ 0 ∧
-        (¬(\at(aorai_CurOperation,L) ≡ op_f ∧
-            \at(aorai_CurOpStatus,L) ≡ aorai_Terminated) ∨
-         (\at(aorai_CurOperation,L) ≡ op_f ∧
-          \at(aorai_CurOpStatus,L) ≡ aorai_Terminated ∧
-          __retres_f ≢ 1 + 2 ∧ __retres_f ≢ 0)))) ∧
+       \at(aorai_CurOpStatus,L) ≡ aorai_Terminated ∧ __retres_f ≡ 0 ∧
+       (¬(\at(aorai_CurOperation,L) ≡ op_f ∧
+          \at(aorai_CurOpStatus,L) ≡ aorai_Terminated) ∨
+        (\at(aorai_CurOperation,L) ≡ op_f ∧
+         \at(aorai_CurOpStatus,L) ≡ aorai_Terminated ∧ __retres_f ≢ 1 + 2 ∧
+         __retres_f ≢ 0)))) ∧
   (∀ int __retres_f;
      ¬(\at(aorai_CurOperation,L) ≡ op_f ∧
-        \at(aorai_CurOpStatus,L) ≡ aorai_Terminated ∧
-        __retres_f ≡ 1 + 2 ∧
-        (¬(\at(aorai_CurOperation,L) ≡ op_f ∧
-            \at(aorai_CurOpStatus,L) ≡ aorai_Terminated) ∨
-         (\at(aorai_CurOperation,L) ≡ op_f ∧
-          \at(aorai_CurOpStatus,L) ≡ aorai_Terminated ∧
-          __retres_f ≢ 1 + 2 ∧ __retres_f ≢ 0)))) ∧
+       \at(aorai_CurOpStatus,L) ≡ aorai_Terminated ∧ __retres_f ≡ 1 + 2 ∧
+       (¬(\at(aorai_CurOperation,L) ≡ op_f ∧
+          \at(aorai_CurOpStatus,L) ≡ aorai_Terminated) ∨
+        (\at(aorai_CurOperation,L) ≡ op_f ∧
+         \at(aorai_CurOpStatus,L) ≡ aorai_Terminated ∧ __retres_f ≢ 1 + 2 ∧
+         __retres_f ≢ 0)))) ∧
   (∀ int __retres_f;
      ¬(\at(aorai_CurOperation,L) ≡ op_f ∧
-        \at(aorai_CurOpStatus,L) ≡ aorai_Terminated ∧
-        __retres_f ≡ 1 + 2 ∧ \at(aorai_CurOperation,L) ≡ op_f ∧
-        \at(aorai_CurOpStatus,L) ≡ aorai_Terminated ∧ __retres_f ≡ 0));
+       \at(aorai_CurOpStatus,L) ≡ aorai_Terminated ∧ __retres_f ≡ 1 + 2 ∧
+       \at(aorai_CurOperation,L) ≡ op_f ∧
+       \at(aorai_CurOpStatus,L) ≡ aorai_Terminated ∧ __retres_f ≡ 0));
  */
 /*@ ghost enum aorai_States aorai_CurStates = I; */
 /*@ ghost

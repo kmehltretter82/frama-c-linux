@@ -45,18 +45,18 @@ enum aorai_OpStatusList {
 /*@
 check lemma b_deterministic_trans{L}:
   ¬(\at(aorai_CurOperation,L) ≡ op_g ∧
-     \at(aorai_CurOpStatus,L) ≡ aorai_Called ∧
-     \at(aorai_CurOperation,L) ≡ op_f ∧
-     \at(aorai_CurOpStatus,L) ≡ aorai_Called);
+    \at(aorai_CurOpStatus,L) ≡ aorai_Called ∧
+    \at(aorai_CurOperation,L) ≡ op_f ∧
+    \at(aorai_CurOpStatus,L) ≡ aorai_Called);
  */
 /*@ ghost enum aorai_States aorai_CurStates = a; */
 /*@ ghost int aorai_x = 0; */
 /*@
 check lemma e_deterministic_trans{L}:
   ¬(\at(aorai_CurOperation,L) ≡ op_main ∧
-     \at(aorai_CurOpStatus,L) ≡ aorai_Terminated ∧
-     \at(aorai_CurOperation,L) ≡ op_h ∧
-     \at(aorai_CurOpStatus,L) ≡ aorai_Called ∧ \at(aorai_x,L) > 0);
+    \at(aorai_CurOpStatus,L) ≡ aorai_Terminated ∧
+    \at(aorai_CurOperation,L) ≡ op_h ∧
+    \at(aorai_CurOpStatus,L) ≡ aorai_Called ∧ \at(aorai_x,L) > 0);
  */
 /*@ ghost int aorai_y = 0; */
 /*@ ghost
@@ -620,8 +620,7 @@ void h(int x)
     behavior Buchi_property_behavior:
       ensures aorai_CurStates ≡ e;
       ensures
-        \at(aorai_CurStates ≡ g_0,Pre) ∧ aorai_CurStates ≡ e ⇒
-        aorai_y ≡ 0;
+        \at(aorai_CurStates ≡ g_0,Pre) ∧ aorai_CurStates ≡ e ⇒ aorai_y ≡ 0;
       ensures
         \at(aorai_CurStates ≡ g_0,Pre) ∧ aorai_CurStates ≡ e ⇒
         aorai_x ≡ \at(1,Pre) + 0;

@@ -26,10 +26,7 @@ enum e_h1 {
     H1 = 0xFFFFFFFFFFFFFFFFULL
 };
 enum e X;
-/*@ ensures
-      P:
-        X ≡ E0 ∧ \old(x) ≡ E1 ∧ X < \old(x) ∧ E0 ≤ E1 ⇒
-        \result ≡ E0;
+/*@ ensures P: X ≡ E0 ∧ \old(x) ≡ E1 ∧ X < \old(x) ∧ E0 ≤ E1 ⇒ \result ≡ E0;
  */
 enum e f(enum e x)
 {

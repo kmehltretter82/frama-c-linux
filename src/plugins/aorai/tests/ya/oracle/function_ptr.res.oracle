@@ -47,23 +47,23 @@ void g(void);
 /*@
 check lemma s1_deterministic_trans{L}:
   ¬(\at(aorai_CurOperation,L) ≡ op_g ∧
-     \at(aorai_CurOpStatus,L) ≡ aorai_Called ∧
-     \at(aorai_CurOperation,L) ≡ op_f ∧
-     \at(aorai_CurOpStatus,L) ≡ aorai_Called);
+    \at(aorai_CurOpStatus,L) ≡ aorai_Called ∧
+    \at(aorai_CurOperation,L) ≡ op_f ∧
+    \at(aorai_CurOpStatus,L) ≡ aorai_Called);
  */
 /*@
 check lemma aorai_intermediate_state_0_deterministic_trans{L}:
   ¬(\at(aorai_CurOperation,L) ≡ op_g ∧
-     \at(aorai_CurOpStatus,L) ≡ aorai_Terminated ∧
-     ¬(\at(aorai_CurOperation,L) ≡ op_g ∧
-        \at(aorai_CurOpStatus,L) ≡ aorai_Terminated));
+    \at(aorai_CurOpStatus,L) ≡ aorai_Terminated ∧
+    ¬(\at(aorai_CurOperation,L) ≡ op_g ∧
+      \at(aorai_CurOpStatus,L) ≡ aorai_Terminated));
  */
 /*@
 check lemma aorai_intermediate_state_deterministic_trans{L}:
   ¬(\at(aorai_CurOperation,L) ≡ op_f ∧
-     \at(aorai_CurOpStatus,L) ≡ aorai_Terminated ∧
-     ¬(\at(aorai_CurOperation,L) ≡ op_f ∧
-        \at(aorai_CurOpStatus,L) ≡ aorai_Terminated));
+    \at(aorai_CurOpStatus,L) ≡ aorai_Terminated ∧
+    ¬(\at(aorai_CurOperation,L) ≡ op_f ∧
+      \at(aorai_CurOpStatus,L) ≡ aorai_Terminated));
  */
 /*@ ghost enum aorai_States aorai_CurStates = i; */
 /*@ ghost
