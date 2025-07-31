@@ -634,6 +634,16 @@ let known_logic_funs = [
   "\\sub_float",ACSL;
   "\\mul_float",ACSL;
   "\\div_float",ACSL;
+  "\\neg_float32",ACSL;
+  "\\add_float32",ACSL;
+  "\\sub_float32",ACSL;
+  "\\mul_float32",ACSL;
+  "\\div_float32",ACSL;
+  "\\neg_float64",ACSL;
+  "\\add_float64",ACSL;
+  "\\sub_float64",ACSL;
+  "\\mul_float64",ACSL;
+  "\\div_float64",ACSL;
   "\\neg_double",ACSL;
   "\\add_double",ACSL;
   "\\sub_double",ACSL;
@@ -654,6 +664,18 @@ let known_predicates = [
   "\\le_float", ACSL;
   "\\gt_float", ACSL;
   "\\ge_float", ACSL;
+  "\\eq_float32", ACSL;
+  "\\ne_float32", ACSL;
+  "\\lt_float32", ACSL;
+  "\\le_float32", ACSL;
+  "\\gt_float32", ACSL;
+  "\\ge_float32", ACSL;
+  "\\eq_float64", ACSL;
+  "\\ne_float64", ACSL;
+  "\\lt_float64", ACSL;
+  "\\le_float64", ACSL;
+  "\\gt_float64", ACSL;
+  "\\ge_float64", ACSL;
   "\\eq_double", ACSL;
   "\\ne_double", ACSL;
   "\\lt_double", ACSL;
@@ -1445,6 +1467,8 @@ and eval_known_logic_function ~alarm_mode env li labels args =
 
   | ( "atan2" | "atan2f" | "fmod" | "fmodf" | "pow" | "powf"
     | "\\add_float" | "\\sub_float" | "\\mul_float" | "\\div_float"
+    | "\\add_float32" | "\\sub_float32" | "\\mul_float32" | "\\div_float32"
+    | "\\add_float64" | "\\sub_float64" | "\\mul_float64" | "\\div_float64"
     | "\\add_double" | "\\sub_double" | "\\mul_double" | "\\div_double" ),
     _, _, [arg1; arg2] ->
     eval_float_builtin_arity2 ~alarm_mode env lvi.lv_name arg1 arg2
@@ -1520,14 +1544,14 @@ and eval_float_builtin_arity2  ~alarm_mode env name arg1 arg2 =
     | "fmodf" ->  Fval.fmod  Fval.Single
     | "pow" ->    Fval.pow   Fval.Double
     | "powf" ->   Fval.pow   Fval.Single
-    | "\\add_float" -> Fval.add Fval.Single
-    | "\\sub_float" -> Fval.sub Fval.Single
-    | "\\mul_float" -> Fval.mul Fval.Single
-    | "\\div_float" -> Fval.div Fval.Single
-    | "\\add_double" -> Fval.add Fval.Double
-    | "\\sub_double" -> Fval.sub Fval.Double
-    | "\\mul_double" -> Fval.mul Fval.Double
-    | "\\div_double" -> Fval.div Fval.Double
+    | "\\add_float"   | "\\add_float32" -> Fval.add Fval.Single
+    | "\\sub_float"   | "\\sub_float32" -> Fval.sub Fval.Single
+    | "\\mul_float"   | "\\mul_float32" -> Fval.mul Fval.Single
+    | "\\div_float"   | "\\div_float32" -> Fval.div Fval.Single
+    | "\\add_float64" | "\\add_double"  -> Fval.add Fval.Double
+    | "\\sub_float64" | "\\sub_double"  -> Fval.sub Fval.Double
+    | "\\mul_float64" | "\\mul_double"  -> Fval.mul Fval.Double
+    | "\\div_float64" | "\\div_double"  -> Fval.div Fval.Double
     | _ -> assert false
   in
   let r1 = eval_term ~alarm_mode env arg1 in
@@ -1550,7 +1574,8 @@ and eval_float_builtin_arity1  ~alarm_mode env name arg =
   let fcaml = match name with
     | "sqrt" ->   Fval.sqrt  Fval.Double
     | "sqrtf" ->  Fval.sqrt  Fval.Single
-    | "\\neg_float" | "\\neg_double" ->  Fval.neg
+    | "\\neg_float" | "\\neg_float32" | "\\neg_float64" | "\\neg_double" ->
+      Fval.neg
     | _ -> assert false
   in
   let r = eval_term ~alarm_mode env arg in
@@ -2153,17 +2178,17 @@ and reduce_by_known_papp ~alarm_mode env positive li _labels args =
     reduce_float (reduce_by_infinity ~pos:false) arg
   | "\\is_NaN", [arg] ->
     reduce_float (fun _fkind -> Fval.backward_is_nan ~positive) arg
-  | ("\\eq_float" | "\\eq_double"), [t1;t2] ->
+  | ("\\eq_float" | "\\eq_float32" | "\\eq_float64" | "\\eq_double"), [t1;t2] ->
     reduce_by_relation ~alarm_mode env positive t1 Req t2
-  | ("\\ne_float" | "\\ne_double"), [t1;t2] ->
+  | ("\\ne_float" | "\\ne_float32" | "\\ne_float64" | "\\ne_double"), [t1;t2] ->
     reduce_by_relation ~alarm_mode env positive t1 Rneq t2
-  | ("\\lt_float" | "\\lt_double"), [t1;t2] ->
+  | ("\\lt_float" | "\\lt_float32" | "\\lt_float64" | "\\lt_double"), [t1;t2] ->
     reduce_by_relation ~alarm_mode env positive t1 Rlt t2
-  | ("\\le_float" | "\\le_double"), [t1;t2] ->
+  | ("\\le_float" | "\\le_float32" | "\\le_float64" | "\\le_double"), [t1;t2] ->
     reduce_by_relation ~alarm_mode env positive t1 Rle t2
-  | ("\\gt_float" | "\\gt_double"), [t1;t2] ->
+  | ("\\gt_float" | "\\gt_float32" | "\\gt_float64" | "\\gt_double"), [t1;t2] ->
     reduce_by_relation ~alarm_mode env positive t1 Rgt t2
-  | ("\\ge_float" | "\\ge_double"), [t1;t2] ->
+  | ("\\ge_float" | "\\ge_float32" | "\\ge_float64" | "\\ge_double"), [t1;t2] ->
     reduce_by_relation ~alarm_mode env positive t1 Rge t2
   | "\\subset", [argl;argr] when positive ->
     let vr = (eval_term ~alarm_mode env argr).eover in
@@ -2711,12 +2736,18 @@ and eval_predicate env pred =
       let neg_inf = Fval.neg_infinity Float_sig.Single in
       unary_float (fun f -> Fval.forward_comp Comp.Eq f neg_inf) arg
     | "\\is_NaN", [arg] -> inv_truth (unary_float Fval.is_not_nan arg)
-    | ("\\eq_float" | "\\eq_double"), [arg1;arg2] -> fval_cmp Comp.Eq arg1 arg2
-    | ("\\ne_float" | "\\ne_double"), [arg1;arg2] -> fval_cmp Comp.Ne arg1 arg2
-    | ("\\lt_float" | "\\lt_double"), [arg1;arg2] -> fval_cmp Comp.Lt arg1 arg2
-    | ("\\le_float" | "\\le_double"), [arg1;arg2] -> fval_cmp Comp.Le arg1 arg2
-    | ("\\gt_float" | "\\gt_double"), [arg1;arg2] -> fval_cmp Comp.Gt arg1 arg2
-    | ("\\ge_float" | "\\ge_double"), [arg1;arg2] -> fval_cmp Comp.Ge arg1 arg2
+    | ("\\eq_float" | "\\eq_float32" | "\\eq_float64" | "\\eq_double"),
+      [arg1;arg2] -> fval_cmp Comp.Eq arg1 arg2
+    | ("\\ne_float" | "\\ne_float32" | "\\ne_float64" | "\\ne_double"),
+      [arg1;arg2] -> fval_cmp Comp.Ne arg1 arg2
+    | ("\\lt_float" | "\\lt_float32" | "\\lt_float64" | "\\lt_double"),
+      [arg1;arg2] -> fval_cmp Comp.Lt arg1 arg2
+    | ("\\le_float" | "\\le_float32" | "\\le_float64" | "\\le_double"),
+      [arg1;arg2] -> fval_cmp Comp.Le arg1 arg2
+    | ("\\gt_float" | "\\gt_float32" | "\\gt_float64" | "\\gt_double"),
+      [arg1;arg2] -> fval_cmp Comp.Gt arg1 arg2
+    | ("\\ge_float" | "\\ge_float32" | "\\ge_float64" | "\\ge_double"),
+      [arg1;arg2] -> fval_cmp Comp.Ge arg1 arg2
     | "\\warning", _ -> begin
         match args with
         | [{ term_node = TConst(LStr(str))}] ->

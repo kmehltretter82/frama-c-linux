@@ -28,11 +28,15 @@
     enforce a strict manipulation of floating point numbers. *)
 
 type single = Format_Single
+type float32 = Format_Float32
+type float64 = Format_Float64
 type double = Format_Double
 type long   = Format_Long
 
 type 'f format =
   | Single : single format (** 32-bits single precision IEEE-754 format. *)
+  | Float32 : float32 format (** C23's _Float32 (identical to single) *)
+  | Float64 : float64 format (** C23's _Float64 (identical to double) *)
   | Double : double format (** 64-bits double precision IEEE-754 format. *)
 
 (** Returns the [fkind] corresponding to the given format. *)
@@ -49,8 +53,8 @@ type ('l, 'r) same_format =
 (** Check if two formats are in fact the same. *)
 val same_format : 'l format -> 'r format -> ('l, 'r) same_format
 
-(** Total order on formats. *)
-val format_order : 'l format -> 'r format -> int
+(** Compare formats. *)
+val compare : 'l format -> 'r format -> int
 
 
 
@@ -123,9 +127,11 @@ type 'f parsed_float =
     and the format actually used to parse it. For now, Long format is not
     supported by this module, and is thus approximated using double precision. *)
 type ('format, 'encoded_as) parsed_format =
-  | Single_supported : (single, single) parsed_format
-  | Double_supported : (double, double) parsed_format
-  | Long_unsupported : (long  , double) parsed_format
+  | Single_supported  : (single,   single) parsed_format
+  | Float32_supported : (float32, float32) parsed_format
+  | Float64_supported : (float64, float64) parsed_format
+  | Double_supported  : (double,   double) parsed_format
+  | Long_unsupported  : (long  ,   double) parsed_format
 
 type parsed_result =
   | Parsed : ('f, 'k) parsed_format * 'k parsed_float -> parsed_result

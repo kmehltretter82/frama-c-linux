@@ -16,6 +16,8 @@ let register builtin =
   Logic_env.Builtins.extend (fun () -> add builtin)
 
 let float_type = Ctype Cil_const.floatType
+let float32_type = Ctype Cil_const.float32Type
+let float64_type = Ctype Cil_const.float64Type
 let double_type = Ctype Cil_const.doubleType
 let long_double_type = Ctype Cil_const.longDoubleType
 let object_ptr = Ctype Cil_const.voidPtrType
@@ -110,18 +112,28 @@ let init =
              add { bl_name = f; bl_params = tparams; bl_profile = params;
                    bl_type = None; bl_labels = labels})
           [ "\\is_finite", [], [], ["x", float_type] ;
+            "\\is_finite", [], [], ["x", float32_type] ;
+            "\\is_finite", [], [], ["x", float64_type] ;
             "\\is_finite", [], [], ["x", double_type] ;
             "\\is_finite", [], [], ["x", long_double_type] ;
             "\\is_infinite", [], [], ["x", float_type] ;
+            "\\is_infinite", [], [], ["x", float32_type] ;
+            "\\is_infinite", [], [], ["x", float64_type] ;
             "\\is_infinite", [], [], ["x", double_type] ;
             "\\is_infinite", [], [], ["x", long_double_type] ;
             "\\is_NaN", [], [], ["x", float_type] ;
+            "\\is_NaN", [], [], ["x", float32_type] ;
+            "\\is_NaN", [], [], ["x", float64_type] ;
             "\\is_NaN", [], [], ["x", double_type] ;
             "\\is_NaN", [], [], ["x", long_double_type] ;
             "\\is_minus_infinity", [], [], ["x", float_type] ;
+            "\\is_minus_infinity", [], [], ["x", float32_type] ;
+            "\\is_minus_infinity", [], [], ["x", float64_type] ;
             "\\is_minus_infinity", [], [], ["x", double_type] ;
             "\\is_minus_infinity", [], [], ["x", long_double_type] ;
             "\\is_plus_infinity", [], [], ["x", float_type] ;
+            "\\is_plus_infinity", [], [], ["x", float32_type] ;
+            "\\is_plus_infinity", [], [], ["x", float64_type] ;
             "\\is_plus_infinity", [], [], ["x", double_type] ;
             "\\is_plus_infinity", [], [], ["x", long_double_type] ;
             "\\le_float", [], [], ["x", float_type; "y", float_type];
@@ -130,6 +142,18 @@ let init =
             "\\gt_float", [], [], ["x", float_type; "y", float_type];
             "\\eq_float", [], [], ["x", float_type; "y", float_type];
             "\\ne_float", [], [], ["x", float_type; "y", float_type];
+            "\\le_float32", [], [], ["x", float32_type; "y", float32_type];
+            "\\lt_float32", [], [], ["x", float32_type; "y", float32_type];
+            "\\ge_float32", [], [], ["x", float32_type; "y", float32_type];
+            "\\gt_float32", [], [], ["x", float32_type; "y", float32_type];
+            "\\eq_float32", [], [], ["x", float32_type; "y", float32_type];
+            "\\ne_float32", [], [], ["x", float32_type; "y", float32_type];
+            "\\le_float64", [], [], ["x", float64_type; "y", float64_type];
+            "\\lt_float64", [], [], ["x", float64_type; "y", float64_type];
+            "\\ge_float64", [], [], ["x", float64_type; "y", float64_type];
+            "\\gt_float64", [], [], ["x", float64_type; "y", float64_type];
+            "\\eq_float64", [], [], ["x", float64_type; "y", float64_type];
+            "\\ne_float64", [], [], ["x", float64_type; "y", float64_type];
             "\\le_double", [], [], ["x", double_type; "y", double_type];
             "\\lt_double", [], [], ["x", double_type; "y", double_type];
             "\\ge_double", [], [], ["x", double_type; "y", double_type];
@@ -246,26 +270,38 @@ let init =
             ["f", float_format; "m", rounding_mode; "x", Lreal], Lreal ;
 
             "\\sign", [], ["x",float_type], sign ;
+            "\\sign", [], ["x",float32_type], sign ;
+            "\\sign", [], ["x",float64_type], sign ;
             "\\sign", [], ["x",double_type], sign ;
             "\\sign", [], ["x",long_double_type], sign ;
 
             "\\model", [], ["x",float_type], Lreal;
+            "\\model", [], ["x",float32_type], Lreal;
+            "\\model", [], ["x",float64_type], Lreal;
             "\\model", [], ["x",double_type], Lreal;
             (*"\\model", [], ["x",long_double_type], Lreal;*)
 
             "\\exact", [], ["x",float_type], Lreal;
+            "\\exact", [], ["x",float32_type], Lreal;
+            "\\exact", [], ["x",float64_type], Lreal;
             "\\exact", [], ["x",double_type], Lreal;
             (*"\\exact", [], ["x",long_double_type], Lreal;*)
 
             "\\total_error", [], ["x",float_type], Lreal;
+            "\\total_error", [], ["x",float32_type], Lreal;
+            "\\total_error", [], ["x",float64_type], Lreal;
             "\\total_error", [], ["x",double_type], Lreal;
             (*"\\total_error", [], ["x",long_double_type], Lreal;*)
 
             "\\round_error", [], ["x",float_type], Lreal;
+            "\\round_error", [], ["x",float32_type], Lreal;
+            "\\round_error", [], ["x",float64_type], Lreal;
             "\\round_error", [], ["x",double_type], Lreal;
             (*"\\round_error", [], ["x",long_double_type], Lreal;*)
 
             "\\relative_error", [], ["x",float_type], Lreal;
+            "\\relative_error", [], ["x",float32_type], Lreal;
+            "\\relative_error", [], ["x",float64_type], Lreal;
             "\\relative_error", [], ["x",double_type], Lreal;
             (*"\\relative_error", [], ["x",long_double_type], Lreal;*)
 
@@ -284,6 +320,18 @@ let init =
             "\\sub_float",[],["x",float_type;"y",float_type], float_type;
             "\\mul_float",[],["x",float_type;"y",float_type], float_type;
             "\\div_float",[],["x",float_type;"y",float_type], float_type;
+
+            "\\neg_float32",[],["x",float32_type], float32_type;
+            "\\add_float32",[],["x",float32_type;"y",float32_type], float32_type;
+            "\\sub_float32",[],["x",float32_type;"y",float32_type], float32_type;
+            "\\mul_float32",[],["x",float32_type;"y",float32_type], float32_type;
+            "\\div_float32",[],["x",float32_type;"y",float32_type], float32_type;
+
+            "\\neg_float64",[],["x",float64_type], float64_type;
+            "\\add_float64",[],["x",float64_type;"y",float64_type], float64_type;
+            "\\sub_float64",[],["x",float64_type;"y",float64_type], float64_type;
+            "\\mul_float64",[],["x",float64_type;"y",float64_type], float64_type;
+            "\\div_float64",[],["x",float64_type;"y",float64_type], float64_type;
 
             "\\neg_double",[],["x",double_type], double_type;
             "\\add_double",[],["x",double_type;"y",double_type], double_type;
