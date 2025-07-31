@@ -11,6 +11,7 @@ THIS_SCRIPT="$0"
 CONFIG="<default>"
 VERBOSE=
 FORCE=
+BENCH=
 PREPARE=
 USEWPCACHE=
 UPDATE=
@@ -72,6 +73,8 @@ function Usage
     echo "  -g|--generate       Generate new oracles and update oracles"
     echo "  -s|--save           save dune logs into $DUNE_LOG"
     echo "  -v|--verbose        print executed commands"
+    echo "  -b|--benchmark      run hyperfine to measure time of the given tests"
+    echo "                      Uses --force, will perform 5 warmup runs"
     echo "  --coverage          compute test coverage in html format"
     echo "  --coverage-xml      compute test coverage in Cobertura XML format"
     echo "  --coverage-json     compute test coverage in Coveralls JSON format"
@@ -137,6 +140,16 @@ function RunDevNull
     "$@" >/dev/null 2>&1
 }
 
+function RunBench
+{
+    if [ "$BENCH" = "yes" ]; then
+        echo "Running hyperfine benchmarks"
+        Run hyperfine -w 5 "$*"
+    else
+        Run "$@"
+    fi
+}
+
 function Cmd
 {
     Run "$@" || Error "(command exits $?): $*"
@@ -199,6 +212,11 @@ do
             ;;
         "-v"|"--verbose")
             VERBOSE=yes
+            ;;
+        "-b"|"--benchmark")
+            RequiredTools hyperfine
+            FORCE=yes
+            BENCH=yes
             ;;
         "-l"|"--logs")
             LOGS=yes
@@ -439,8 +457,9 @@ function RunAlias
     # shellcheck disable=SC2206
     local commands=(${DUNE_OPT[@]} $@ ${DUNE_OPT_POST[@]})
 
+    # For practical reasons, benchmarks can only be launched without save option
     if [ "$DUNE_LOG" = "" ] || [ "$SAVE" != "yes" ]; then
-        Run dune build "${commands[@]}"
+        RunBench dune build "${commands[@]}"
     else
         # note: the Run function cannot performs redirection
         echo "> dune build ${commands[*]} 2> >(tee -a $DUNE_LOG >&2)"
