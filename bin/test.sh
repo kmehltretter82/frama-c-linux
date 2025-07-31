@@ -131,16 +131,27 @@ function Run
     "$@"
 }
 
+function RunDevNull
+{
+    Echo "> $* >/dev/null 2>&1"
+    "$@" >/dev/null 2>&1
+}
+
 function Cmd
 {
     Run "$@" || Error "(command exits $?): $*"
+}
+
+function CmdDevNull
+{
+    RunDevNull "$@" || Error "(command exits $?): $*"
 }
 
 function RequiredTools
 {
     local tool
     for tool in "$@" ; do
-        which "$tool" >/dev/null 2>&1 || Error "Executable not found: $tool"
+        RunDevNull which "$tool" || Error "Executable not found: $tool"
     done
 }
 
@@ -589,10 +600,10 @@ function Register
 
 function MissingOracles
 {
-    if Run which frama-c-ptests >/dev/null 2>&1 ; then
-        Cmd frama-c-ptests "$1" "${PTESTS_DIR[@]}" >/dev/null 2>&1
+    if RunDevNull which frama-c-ptests ; then
+        CmdDevNull frama-c-ptests "$1" "${PTESTS_DIR[@]}"
     else
-        Cmd dune exec -- frama-c-ptests "$1" "${PTESTS_DIR[@]}" >/dev/null 2>&1
+        CmdDevNull dune exec -- frama-c-ptests "$1" "${PTESTS_DIR[@]}"
     fi
 }
 
