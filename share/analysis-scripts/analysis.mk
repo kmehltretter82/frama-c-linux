@@ -233,6 +233,7 @@ endef
 	      -inout-log w:$@/warnings.log \
 	      -scope-log w:$@/warnings.log \
 	      -eva-log w:$@/warnings.log \
+	      -eva-statistics-file $@/eva-stats.csv \
 	      -then \
 	      -remove-projects @all_but_current -save $@/framac.sav \
 	      -then \
