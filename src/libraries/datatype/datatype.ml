@@ -247,14 +247,6 @@ module type Map = sig
   include Map.S
   module Key: S with type t = key
   module Make(Data: S) : S with type t = Data.t t
-  val pretty :
-    ?pre:Pretty_utils.sformat ->
-    ?sep:Pretty_utils.sformat ->
-    ?arrow:Pretty_utils.sformat ->
-    ?suf:Pretty_utils.sformat ->
-    ?empty:Pretty_utils.sformat ->
-    'a Pretty_utils.formatter ->
-    'a t Pretty_utils.formatter
 end
 
 module type Hashtbl_with_descr = sig
@@ -1221,20 +1213,6 @@ struct
   include M
   module Key = Key
   module Make = P.Make
-
-  let pretty
-      ?(pre=format_of_string "@[{")
-      ?(sep=format_of_string ";@ ")
-      ?(arrow=format_of_string " ↦ ")
-      ?(suf=format_of_string "}@]")
-      ?(empty=format_of_string "{}")
-      format_elem fmt m =
-    if is_empty m
-    then Format.fprintf fmt "%(%)" empty
-    else
-      Pretty_utils.pp_iter2
-        ~pre ~sep ~between:arrow ~suf
-        iter Key.pretty format_elem fmt m
 end
 
 (* ****************************************************************************)
