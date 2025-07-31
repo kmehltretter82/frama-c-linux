@@ -311,7 +311,7 @@ function GetCache
     else
         Head "Pull WP cache (to $FRAMAC_WP_CACHEDIR)..."
         RequiredTools git
-        Run git -C "$FRAMAC_WP_CACHEDIR" pull --rebase
+        Cmd git -C "$FRAMAC_WP_CACHEDIR" pull --rebase
     fi
 }
 
@@ -645,8 +645,8 @@ function Status
     if [ "$USEWPCACHE" = "yes" ] && [ "$UPDATE" = "yes" ]; then
         Head "Update $FRAMAC_WP_CACHEDIR and check status"
         RequiredTools git
-        Run git -C "$FRAMAC_WP_CACHEDIR" add -A
-        Run git -C "$FRAMAC_WP_CACHEDIR" status -s
+        Cmd git -C "$FRAMAC_WP_CACHEDIR" add -A
+        Cmd git -C "$FRAMAC_WP_CACHEDIR" status -s
     fi
 }
 
