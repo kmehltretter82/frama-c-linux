@@ -439,9 +439,7 @@ function RunAlias
     # shellcheck disable=SC2206
     local commands=(${DUNE_OPT[@]} $@ ${DUNE_OPT_POST[@]})
 
-    if [ "$DUNE_LOG" = "" ]; then
-        Run dune build "${commands[@]}"
-    elif [ "$SAVE" != "yes" ] && [ "$VERBOSE" != "yes" ]; then
+    if [ "$DUNE_LOG" = "" ] || [ "$SAVE" != "yes" ]; then
         Run dune build "${commands[@]}"
     else
         # note: the Run function cannot performs redirection
