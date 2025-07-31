@@ -348,13 +348,16 @@ let lconstant_to_constant c = match c with
   | LReal r -> CReal (r.r_nearest,FDouble,Some r.r_literal)
   | LEnum e -> CEnum e
 
+let float_exact_suffixes = ["F"; "D"; "F32"; "F64"]
+let string_has_suffix suffixes s =
+  let supper = String.uppercase_ascii s in
+  List.exists (fun suffix -> String.ends_with ~suffix supper) suffixes
+
 let parse_float ?loc literal =
-  (* If the string has suffix 'F' or 'D', then it represents a single or double
-     constant and the nearest parsed float is exact. Otherwise, use the upper
-     and lower float computed by [parse]. *)
-  let len = String.length literal in
-  let last = Char.uppercase_ascii literal.[len-1] in
-  let is_nearest_exact = last = 'F' || last = 'D' in
+  (* If the string has suffix 'F', 'D', 'F32' or 'F64', then it represents a
+     single or double constant and the nearest parsed float is exact.
+     Otherwise, use the upper and lower float computed by [parse]. *)
+  let is_nearest_exact = string_has_suffix float_exact_suffixes literal in
   let Parsed (format, p) = Typed_float.parse_exn literal in
   let nearest = Typed_float.(to_float p.nearest) in
   let fkind = Typed_float.parsed_fkind format in
