@@ -118,7 +118,7 @@ struct
            Format.fprintf fmt "@[%a@[%a@]@]" Base.pretty base
              (Offsetmap.pretty_generic ?typ ()) offs)
         fmt
-        (filter (fun x -> not (Base.is_string_literal x)) m)
+        m
 
     (* TODO: can be improved in quite a few ways. *)
     let filter_base f m =

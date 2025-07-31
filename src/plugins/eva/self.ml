@@ -123,6 +123,10 @@ let dkey_callstack_hash =
   register_category "callstack-hash"
     ~help:"additionally print the current callstack hash in some messages"
 
+let dkey_include_literal_string =
+  register_category "include-literal-strings"
+    ~help:"when printing a state, \
+           also include globals representing literal strings"
 
 (* ----- Warning categories ------------------------------------------------- *)
 

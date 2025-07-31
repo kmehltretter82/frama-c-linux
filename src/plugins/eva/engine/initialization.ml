@@ -474,7 +474,9 @@ module Make
     let print_base base =
       try
         let varinfo = Base.to_varinfo base in
-        not (Cil.is_in_libc varinfo.vattr)
+        not (Cil.is_in_libc varinfo.vattr) &&
+        (not (Ast_info.is_string_literal varinfo) ||
+         (Self.is_debug_key_enabled Self.dkey_include_literal_string))
       with Base.Not_a_C_variable -> true
     in
     let cvalue_state =
