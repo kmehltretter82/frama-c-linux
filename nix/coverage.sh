@@ -30,7 +30,7 @@ for i in _bisect/*.tar.xz ; do
   tar xfJ "$i" ;
 done
 
-combinetura ./*.xml -o report.xml
+combinetura ./*.xml -o report.xml --summary coverage-summary.txt
 
 LINE=$(sed -n '2p' report.xml)
 RATE=$(echo "$LINE" | sed -e 's/.*line-rate=\"\(.*\)\".*/\1/')
