@@ -173,7 +173,7 @@ let test (allowZeroSizeArrays, typ, types, kind) =
     true
 
 let f () =
-  Crowbar.add_test ~name:"mutable typeOffset"
+  Crowbar.add_test ~name:"complete type"
     [ gen_type ] @@ (fun x -> Crowbar.check (test x))
 
 let () = Crowbar_utils.run "complete_type" f

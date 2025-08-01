@@ -55,5 +55,8 @@ let zarith =
         [ map [int64] Z.of_int64;
           map [zarith; int64] (fun z i -> Z.((z lsl 64) + of_int64 i)) ])
 
-let () = Crowbar.add_test ~name:"pp_bin_hex"
+let f () =
+  Crowbar.add_test ~name:"pp_bin_hex"
     [ zarith; Crowbar.bool; Crowbar.int; Crowbar.bool ] test
+
+let () = Crowbar_utils.run "integer_bb_pretty" f

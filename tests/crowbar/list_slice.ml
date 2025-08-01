@@ -68,6 +68,9 @@ let mk_arg =
 
 let gen_list = Crowbar.list (Crowbar.range 10000)
 
-let () = Crowbar.add_test ~name:"List.slice"
+let f () =
+  Crowbar.add_test ~name:"List.slice"
     [ gen_list; mk_arg; mk_arg ] @@
   (fun l first last -> Crowbar.check (test l first last))
+
+let () = Crowbar_utils.run "list_slice" f

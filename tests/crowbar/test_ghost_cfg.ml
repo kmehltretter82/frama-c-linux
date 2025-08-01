@@ -545,6 +545,8 @@ let check_file (env, file) =
   end
   else true
 
-let () =
+let f () =
   add_test ~name:"ghost cfg" [gen_file]
     (fun res -> Crowbar.check (check_file res))
+
+let () = Crowbar_utils.run "test_ghost_cfg" f

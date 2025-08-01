@@ -1,6 +1,7 @@
 open Cil_types
 
 let main () =
+  Format.printf "Running test mutable_const_fail";
   Ast.compute ();
   let def =
     Kernel_function.get_definition

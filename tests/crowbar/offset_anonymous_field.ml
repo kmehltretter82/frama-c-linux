@@ -204,6 +204,8 @@ let test { designator; offsets; structs } =
          Crowbar.fail
            ("fieldsToInit failed on the test given in file " ^ filename ^
             ", for field " ^ field))
-let () =
+let f () =
   Crowbar.add_test ~name:"designator and anonymous fields"
     [ gen_type 20 ] @@ test
+
+let () = Crowbar_utils.run "offset_anonymous_field" f

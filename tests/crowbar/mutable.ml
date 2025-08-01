@@ -148,5 +148,8 @@ let test (types, kind) =
     end;
     true
 
-let () = Crowbar.add_test ~name:"mutable typeOffset" [ gen_type ] @@
+let f () =
+  Crowbar.add_test ~name:"mutable typeOffset" [ gen_type ] @@
   (fun x -> Crowbar.check (test x))
+
+let () = Crowbar_utils.run "mutable" f

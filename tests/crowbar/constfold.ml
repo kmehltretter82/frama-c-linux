@@ -216,4 +216,6 @@ let run typ expr =
       (fun fmt -> File.pretty_ast ~fmt ())
   end
 
-let () = add_test ~name:"constfold" [gen_type; gen_expr] run
+let f () = add_test ~name:"constfold" [gen_type; gen_expr] run
+
+let () = Crowbar_utils.run "constfold" f
