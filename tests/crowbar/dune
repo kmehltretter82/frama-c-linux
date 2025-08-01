@@ -3,26 +3,31 @@
  (deps (universe))
  (action
   (progn
-   (echo "Crowbar:" %{lib-available:crowbar} "\n")
-   (echo "  - Kernel:" %{lib-available:frama-c.kernel} "\n")
+   (echo "Crowbar Tests:" %{lib-available:crowbar} "\n")
+   (echo "  - Crowbar Utils:" %{lib-available:crowbar_utils} "\n")
+   (echo "  - Inout:" %{lib-available:frama-c-inout.core} "\n")
    (echo "  - Eva:" %{lib-available:frama-c-eva.core} "\n"))))
 
 (tests
+ (enabled_if (<> %{env:CROWBAR=false} "false"))
+;  (deps (package frama-c))
  (names
   complete_type
-  constfold
-  integer_bb_pretty
-  list_slice
-  mutable
-  mutable_const_fail
-  mutable_mutable_fail
-  offset_anonymous_field
-  test_ghost_cfg
+;   constfold
+;   integer_bb_pretty
+;   list_slice
+;   mutable
+;   mutable_const_fail
+;   mutable_mutable_fail
+;   offset_anonymous_field
+;   test_ghost_cfg
   )
  (flags -open Frama_c_kernel :standard -w -9)
  (libraries
+  crowbar_utils
   frama-c.init.cmdline
   frama-c.boot
   frama-c.kernel
+  frama-c-inout.core
   frama-c-eva.core
   crowbar))

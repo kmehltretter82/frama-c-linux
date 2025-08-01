@@ -163,13 +163,7 @@ let gen_cabs typ expr =
        },
        loc,loc)])
 
-let () = Kernel.AutoLoadPlugins.off()
-
 let () = Project.set_current (Project.create "my_project")
-
-(* let () = Dynamic.set_module_load_path [ "lib/plugins" ] *)
-
-let () = Dynamic.load_module "frama-c-eva"
 
 let () =
   Cmdline.(
