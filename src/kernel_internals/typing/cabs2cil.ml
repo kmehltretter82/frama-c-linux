@@ -62,20 +62,20 @@ let func_locs () = FuncLocs.get ()
 let unsupported_attributes = ["vector_size"]
 
 let check_attribute_name s =
-    let res = Extlib.strip_underscore s in
-    if res = "" then
+  let res = Extlib.strip_underscore s in
+  if res = "" then
     Kernel.error ~once:true ~current:true "Invalid attribute name %s" s
   else begin
     if List.mem res unsupported_attributes then
       Kernel.error ~current:true "Unsupported attribute: %s" s
     else if not (Ast_attributes.is_known res) then begin
       Ast_attributes.register AttrUnknown res;
-          Kernel.warning
-            ~once:true ~current:true ~wkey:Kernel.wkey_unknown_attribute
+      Kernel.warning
+        ~once:true ~current:true ~wkey:Kernel.wkey_unknown_attribute
         "Ignoring unknown attribute: %s" s;
     end
-    end;
-    res
+  end;
+  res
 
 (** A hook into the code that creates temporary local vars.  By default this
     is the identity function, but you can overwrite it if you need to change the
@@ -214,15 +214,15 @@ end
 
 let check_no_locals_in_initializer i =
   let rec aux i =
-  match i with
-  | SingleInit e ->
-    ignore (visitCilExpr (new check_no_locals) e)
-  | CompoundInit (ct, initl) ->
-    foldLeftCompound ~implicit:false
+    match i with
+    | SingleInit e ->
+      ignore (visitCilExpr (new check_no_locals) e)
+    | CompoundInit (ct, initl) ->
+      foldLeftCompound ~implicit:false
         ~doinit:(fun _off' i' _ () -> aux i')
-      ~ct:ct
-      ~initl:initl
-      ~acc:()
+        ~ct:ct
+        ~initl:initl
+        ~acc:()
   in
   match i with
   | CInit i -> aux i
@@ -1295,7 +1295,7 @@ let findCompType ghost kind name tattr =
             Kernel.error ~once:true
               ~source:(fst @@ Current_loc.get ())
               "forward declaration of enum %s" (Machdep.allowed_machdep "GCC");
-        cabsPushGlobal (GEnumTagDecl (enum, Current_loc.get ()));
+          cabsPushGlobal (GEnumTagDecl (enum, Current_loc.get ()));
         end;
       mk_tenum ~tattr enum
     else
@@ -1606,23 +1606,23 @@ struct
       b.bscoping <- b.bscoping || declares_var || not force_non_scoping;
       b
     | stmts ->
-    if c.unspecified_order then begin
+      if c.unspecified_order then begin
         if List.length stmts >= 2 then begin
-        let first_stmt =
+          let first_stmt =
             (fun (s,_,_,_,_) -> s) (Extlib.last stmts) in
-        Kernel.warning ~wkey:Kernel.wkey_cert_exp_10
-          ~source:(fst (Stmt.loc first_stmt))
-          "Potential unsequenced side-effects"
-      end;
-      let b =
-        Cil.mkBlock
+          Kernel.warning ~wkey:Kernel.wkey_cert_exp_10
+            ~source:(fst (Stmt.loc first_stmt))
+            "Potential unsequenced side-effects"
+        end;
+        let b =
+          Cil.mkBlock
             [mkStmt ~ghost ~valid_sid (UnspecifiedSequence (List.rev stmts))]
-      in
-      b.blocals <- vars;
-      b.bstatics <- c.statics;
-      b.bscoping <- declares_var || not force_non_scoping;
-      b
-    end else
+        in
+        b.blocals <- vars;
+        b.bstatics <- c.statics;
+        b.bscoping <- declares_var || not force_non_scoping;
+        b
+      end else
         let stmts = List.rev_map (fun (s,_,_,_,_) -> s) stmts in
         let b = Cil.mkBlock stmts in
         b.blocals <- vars;
@@ -2482,7 +2482,7 @@ let makeGlobalVarinfo (isadef: bool) (vi: varinfo) : varinfo * bool =
       let oldvi, oldloc = lookupGlobalVar true vi.vname in
       if oldvi.vghost <> vi.vghost then
         Errorloc.abort_context "Inconsistent ghost specification for %s.@ \
-                       Previous declaration was at: %a"
+                                Previous declaration was at: %a"
           vi.vname Cil_datatype.Location.pretty oldloc ;
 
       Kernel.debug ~dkey:Kernel.dkey_typing_global
@@ -3739,7 +3739,7 @@ let append_chunk_to_annot ~ghost annot_chunk current_chunk =
       let res =
         match current_chunk.stmts with
         | [(s1, m1, w1, r1, c1); (s2, m2, w2, r2, c2)] ->
-            Option.bind
+          Option.bind
             (function
               | [ s1' ] -> Some (s1', m1 @ m2, w1 @ w2, r1 @ r2, c1 @ c2)
               | _ -> None (* should not happen. *))
@@ -4537,9 +4537,9 @@ and cabsPartitionAttributes
 
 and doType (ghost:bool) (context: type_context)
     (nameortype: Ast_attributes.attribute_class) (* This is AttrName if we are doing
-                                  * the type for a name, or AttrType
-                                  * if we are doing this type in a
-                                  * typedef *)
+                                                  * the type for a name, or AttrType
+                                                  * if we are doing this type in a
+                                                  * typedef *)
     ?(allowZeroSizeArrays=false)
     ?(allowVarSizeArrays=false)
     (bt: typ)                    (* The base type *)
@@ -5569,7 +5569,7 @@ and doExp local_env
           let vi = Cil.create_wstring_literal ~loc ws in
           cabsPushGlobal
             (GVar (vi, { init = Some (StrInit (Lit_wstr ws)) },loc));
-          finishExp [] (unspecified_chunk empty) (Cil.evar vi)
+          finishExp [] (unspecified_chunk empty) (Cil.evar ~loc vi)
             (Cil.typeOf_wstring_literal ~loc ws)
 
         | Cabs.CONST_STRING s ->
@@ -5591,7 +5591,7 @@ and doExp local_env
           in
           let vi = Cil.create_string_literal ~loc s' in
           cabsPushGlobal (GVar (vi, { init = Some (StrInit (Lit_str s'))},loc));
-          finishExp [] (unspecified_chunk empty) (Cil.evar vi)
+          finishExp [] (unspecified_chunk empty) (Cil.evar ~loc vi)
             (Cil.typeOf_string_literal ~loc s')
 
         | Cabs.CONST_CHAR char_list ->
@@ -6359,7 +6359,7 @@ and doExp local_env
         | { tnode = TPtr t } -> begin
             match Ast_types.unroll t with
             | { tnode = TFun (rt, at, isvar) } -> (* Make the function pointer
-                                      * explicit  *)
+                                                   * explicit  *)
               let f'' =
                 match f'.enode with
                 | AddrOf (f,NoOffset) -> f
@@ -7826,28 +7826,28 @@ and doInitializer loc local_env (vi: varinfo) (inite: Cabs.init_expression)
   : chunk * init_or_str * typ * Cil_datatype.Lval.Set.t =
   let open Current_loc.Operators in
   let normal_init vi inite =
-  let acc, preinit, restl =
-    let so = makeSubobj vi vi.vtype NoOffset in
-    let asconst = if vi.vglob then CConst else CNoConst in
-    let<> UpdatedCurrentLoc = loc in
-    doInit local_env asconst NoInitPre so
-      (unspecified_chunk empty) [ (Cabs.NEXT_INIT, inite) ]
-  in
-  if restl <> [] then
-    Kernel.warning ~current:true "Ignoring some initializers";
-  (* sm: we used to do array-size fixups here, but they only worked
-   * for toplevel array types; now, collectInitializer does the job,
-   * including for nested array types *)
-  let typ' = vi.vtype in
-  Kernel.debug ~dkey:Kernel.dkey_typing_init
-    "Collecting the initializer for %s@\n" vi.vname;
-  let (init, typ'', reads) =
-    collectInitializer Cil_datatype.Lval.Set.empty preinit typ'
-      ~parenttype:typ'
-  in
-  Kernel.debug ~dkey:Kernel.dkey_typing_init
-    "Finished the initializer for %s@\n  init=%a@\n  typ=%a@\n  acc=%a@\n"
-    vi.vname Cil_printer.pp_init init Cil_datatype.Typ.pretty typ' d_chunk acc;
+    let acc, preinit, restl =
+      let so = makeSubobj vi vi.vtype NoOffset in
+      let asconst = if vi.vglob then CConst else CNoConst in
+      let<> UpdatedCurrentLoc = loc in
+      doInit local_env asconst NoInitPre so
+        (unspecified_chunk empty) [ (Cabs.NEXT_INIT, inite) ]
+    in
+    if restl <> [] then
+      Kernel.warning ~current:true "Ignoring some initializers";
+    (* sm: we used to do array-size fixups here, but they only worked
+     * for toplevel array types; now, collectInitializer does the job,
+     * including for nested array types *)
+    let typ' = vi.vtype in
+    Kernel.debug ~dkey:Kernel.dkey_typing_init
+      "Collecting the initializer for %s@\n" vi.vname;
+    let (init, typ'', reads) =
+      collectInitializer Cil_datatype.Lval.Set.empty preinit typ'
+        ~parenttype:typ'
+    in
+    Kernel.debug ~dkey:Kernel.dkey_typing_init
+      "Finished the initializer for %s@\n  init=%a@\n  typ=%a@\n  acc=%a@\n"
+      vi.vname Cil_printer.pp_init init Cil_datatype.Typ.pretty typ' d_chunk acc;
     empty @@@ (acc, local_env.is_ghost), CInit init, typ'', reads
   in
   let array_error () =
@@ -7882,7 +7882,7 @@ and doInitializer loc local_env (vi: varinfo) (inite: Cabs.init_expression)
            | Some _ -> vi.vtype
            | None ->
              let size = Cil.kinteger ~loc:e.expr_loc (Machine.sizeof_kind()) l
-         in
+             in
              { vi.vtype with tnode = TArray(telem,Some size) }
          in
          empty, StrInit (Lit_str s), typ, Lval.Set.empty
@@ -8608,7 +8608,7 @@ and createGlobal loc ghost logic_spec ((t,s,b,attr_list) : (typ * storage * bool
           );
           vi
         end
-      end
+    end
     (*
       ignore (E.log "Env after processing global %s is:@\n%t@\n"
       n docEnv);
@@ -8721,8 +8721,8 @@ and handle_autoreference vi chunk ie =
       let m' = transform_lvals ~update:true m in
       let w' = transform_lvals ~update:true w in
       let r' = transform_lvals ~update:false r in
-    let c' = extract_calls () in
-    (s', m', w', r', c')
+      let c' = extract_calls () in
+      (s', m', w', r', c')
     with Ignore -> stmt
   in
   let stmts = List.map treat_one chunk.stmts in
@@ -9039,7 +9039,7 @@ and doAliasFun ghost vtype (thisname:string) (othername:string)
   in
   let snode =
     if Ast_types.is_void rt then
-                  Cabs.COMPUTATION({expr_loc = loc; expr_node = call}, loc)
+      Cabs.COMPUTATION({expr_loc = loc; expr_node = call}, loc)
     else
       Cabs.RETURN ({expr_loc = loc; expr_node = call}, loc)
   in
@@ -9666,7 +9666,7 @@ and doTypedef ghost ((specs, nl): Cabs.name_group) =
             if declared_in_current_scope ~ghost n then
               begin
                 match newTyp'.tnode with (* do NOT unroll type here,
-                                      redefinitions of typedefs are ok *)
+                                            redefinitions of typedefs are ok *)
                 | TComp newci ->
                   (* Composite types with different tags may be compatible, but here
                      we use the tags to try and detect if the type is being redefined,
@@ -9689,7 +9689,7 @@ and doTypedef ghost ((specs, nl): Cabs.name_group) =
                   (match t.tnode with
                    | TEnum ei ->
                      if ei.ename <> newei.ename then
-                  error_conflicting_types ()
+                       error_conflicting_types ()
                      else
                        warn_c11_redefinition ()
                    | TInt _ -> error_conflicting_types ()

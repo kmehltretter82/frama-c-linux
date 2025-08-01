@@ -9,9 +9,10 @@ class vis =
     inherit Visitor.frama_c_inplace
     method! vexpr e =
       (match e.enode with
-       | Const (CStr _ | CWStr _ as c) ->
+       | Lval(Var vi, NoOffset as lv) | StartOf(Var vi, NoOffset as lv)
+         when Ast_info.is_string_literal vi ->
          Kernel.result "@[<hov 0>@[<h 0>Constant %a@]@ location: %a@]"
-           Printer.pp_constant c print_loc e.eloc
+           Printer.pp_lval lv print_loc e.eloc
        | _ -> ());
       Cil.DoChildren
   end

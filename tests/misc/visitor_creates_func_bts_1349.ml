@@ -32,8 +32,8 @@ class test prj = object(self)
         | None -> { init = None }
         | Some i ->
           { init =
-              Some (Visitor.visitFramacInit
-                      (self:>Visitor.frama_c_visitor) v' NoOffset i) }
+              Some (Visitor.visitFramacInit_or_str
+                      (self:>Visitor.frama_c_visitor) v' i) }
       in
       let g = GVar(v',i',loc) in
       Cil.ChangeToPost (g::self#create_f(),fun x -> x)
