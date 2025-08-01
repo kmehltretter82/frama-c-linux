@@ -1208,7 +1208,17 @@ struct
         (* transforms '(T[size])ptr' into an equivalent '*(T( * )[size])ptr'
            to get an explicit access to the memory *)
         mk_mem (c_mk_cast ~force e oldt (Cil_const.mk_tptr newt)) TNoOffset
-      else begin
+      else if Ast_types.(is_array oldt && is_array newt) then begin
+        let new_elt = Ast_types.element_type newt in
+        if Ast_types.is_void new_elt then begin
+          (* void array denotes a polymorphic array for now.
+              Make sure to change that when
+              we add a proper logic type for array
+          *)
+          if force then Logic_utils.mk_cast ~loc ~force newt e
+          else e
+        end else Logic_utils.mk_cast ~loc ~force newt e
+      end else begin
         match Ast_types.unroll_node newt, e.term_node with
         | TEnum ei, TConst (LEnum { eihost = ei'})
           when ei.ename = ei'.ename && not force -> e
@@ -1445,6 +1455,7 @@ struct
         match Ast_types.unroll_node ot, Ast_types.unroll_node nt with
         | TPtr _, TPtr _ when Ast_types.is_void_ptr nt ->
           nt, e
+        | TArray _, TArray(elt,_) when Ast_types.is_void elt -> ot, e
         | (TInt _ | TEnum _ | TPtr _ ), TVoid ->
           ot, e
         | TComp comp1, TComp comp2 when comp1.ckey = comp2.ckey ->
@@ -1489,6 +1500,13 @@ struct
                    | _ -> false)
       then begin
         let t,e = c_cast_to ty1 ty2 oterm in Ctype t, e
+      end else if Ast_types.is_array ty1 && Ast_types.is_array ty2 then begin
+        let elt2 = Ast_types.element_type ty2 in
+        if Ast_types.is_void elt2 then ot, oterm
+        else if overloaded then raise Not_applicable
+        else
+          C.error loc "invalid implicit conversion from '%a' to '%a'"
+            Cil_printer.pp_typ ty1 Cil_printer.pp_typ ty2
       end else if overloaded then raise Not_applicable
       else if (* not overloaded: raise an error. *)
         Ast_types.is_array ty1 &&

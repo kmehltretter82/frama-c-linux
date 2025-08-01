@@ -83,6 +83,7 @@ let init =
         let rounding_mode = Ltype(rounding_mode,[]) in
         let set_of_integer = Ltype (set, [Linteger]) in
         let set_of_a_type = Ltype (set, [a_type]) in
+        let void_array = Cil_builder.Type.(cil_logic_type (array void)) in
         (* "\list" logic type with its constructors *)
         let list =
           { lt_name="\\list"; lt_params=[a_name]; lt_def=None; lt_attr=[]}
@@ -297,6 +298,7 @@ let init =
             ["l", list_of_a_type; "n", Linteger], a_type;
             "\\length", [a_name],
             ["l", list_of_a_type], Linteger;
+            "\\length", [], ["a", void_array], Linteger;
             "\\concat", [a_name],
             ["l1", list_of_a_type; "l2", list_of_a_type], list_of_a_type;
             "\\repeat", [a_name],

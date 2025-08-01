@@ -14,29 +14,41 @@ open Cil_types
 exception Not_well_formed of Cil_types.location * string
 exception Unknown_ext
 
+let is_compatible_ltype t1 t2 =
+  Cil_datatype.Logic_type.equal t1 t2 ||
+  (match unroll_ltdef t1, unroll_ltdef t2 with
+   | Ctype t1, Ctype t2 ->
+     let open Ast_types in
+     if is_array t1 && is_array t2 then
+       is_void @@ element_type t2
+     else false
+   | _ -> false)
+
 let is_instance_of vars t1 t2 =
   let rec aux map t1 t2 =
-    match (Ast_types.unroll_logic t1, Ast_types.unroll_logic t2) with
-    | _, Lvar s when List.mem s vars ->
-      if Datatype.String.Map.mem s map then
-        Cil_datatype.Logic_type.equal t1 (Datatype.String.Map.find s map),
+    if is_compatible_ltype t1 t2 then true, map else begin
+      match (Ast_types.unroll_logic t1, Ast_types.unroll_logic t2) with
+      | _, Lvar s when List.mem s vars ->
+        if Datatype.String.Map.mem s map then
+          is_compatible_ltype t1 (Datatype.String.Map.find s map),
+          map
+        else
+          true, Datatype.String.Map.add s t1 map
+      | Ltype(ty1,prms1), Ltype(ty2,prms2) ->
+        if Cil_datatype.Logic_type_info.equal ty1 ty2 then
+          aux_list map prms1 prms2
+        else false, map
+      | Larrow(args1,rt1), Larrow(args2,rt2) ->
+        let flag,map as res = aux map rt1 rt2 in
+        if flag then aux_list map args1 args2 else res
+      | Ctype t1, Ctype t2 ->
+        Cil_datatype.Typ.equal
+          (Cil.typeDeepDropAllAttributes t1)
+          (Cil.typeDeepDropAllAttributes t2),
         map
-      else
-        true, Datatype.String.Map.add s t1 map
-    | Ltype(ty1,prms1), Ltype(ty2,prms2) ->
-      if Cil_datatype.Logic_type_info.equal ty1 ty2 then
-        aux_list map prms1 prms2
-      else false, map
-    | Larrow(args1,rt1), Larrow(args2,rt2) ->
-      let flag,map as res = aux map rt1 rt2 in
-      if flag then aux_list map args1 args2 else res
-    | Ctype t1, Ctype t2 ->
-      Cil_datatype.Typ.equal
-        (Cil.typeDeepDropAllAttributes t1)
-        (Cil.typeDeepDropAllAttributes t2),
-      map
-    | (Lvar _ | Ctype _ | Lboolean | Linteger | Lreal | Ltype _ | Larrow _), _ ->
-      Cil_datatype.Logic_type.equal t1 t2, map
+      | (Lvar _ | Ctype _ | Lboolean | Linteger | Lreal | Ltype _ | Larrow _), _ ->
+        Cil_datatype.Logic_type.equal t1 t2, map
+    end
   and aux_list map l1 l2 =
     match l1, l2 with
     | [], [] -> true, map
@@ -263,16 +275,15 @@ let mk_logic_pointer_or_StartOf t =
     Kernel.fatal ~source:(fst t.term_loc)
       "%a is neither a pointer nor a C array" !Cil.pp_term_ref t
 
-let equal_ltype = Cil_datatype.Logic_type.equal
-
 (* Does the same kind of optimization than [Cil.mkCastT] for [Ctype]. *)
 let mk_cast ?loc ?(force=false) newt t =
   let newt' = Ast_types.remove_attributes_for_logic_type newt in
-  if equal_ltype (Ctype newt') t.term_type then t else
+  if is_compatible_ltype t.term_type (Ctype newt') then t
+  else
     let rec unroll_cast e = match e.term_node with
       | TCast(false, Ctype oldt,e)
         when Ast_types.(is_ptr newt' && is_ptr oldt)
-          || equal_ltype
+          || is_compatible_ltype
                (Ctype (Ast_types.remove_attributes_for_logic_type oldt))
                (Ctype newt')
         -> unroll_cast e
