@@ -167,7 +167,7 @@ let () = Kernel.AutoLoadPlugins.off()
 
 let () = Project.set_current (Project.create "my_project")
 
-let () = Dynamic.set_module_load_path [ "lib/plugins" ]
+(* let () = Dynamic.set_module_load_path [ "lib/plugins" ] *)
 
 let () = Dynamic.load_module "frama-c-eva"
 
@@ -205,7 +205,7 @@ let run typ expr =
   Kernel.MainFunction.set "f";
   Eva.Analysis.compute ();
   let kf = Globals.Functions.find_by_name "f" in
-  let r = Globals.Vars.find_from_astinfo "result" Cil_types.VGlobal in
+  let r = Globals.Vars.find_from_astinfo "result" Cil_types.Global in
   let ret = Kernel_function.find_return kf in
   let expr = Cil.evar ~loc r in
   let v1 = Eva.Results.(before ret |> eval_exp expr |> as_cvalue) in

@@ -51,7 +51,7 @@ let x = Cil.makeGlobalVar "x" Cil_const.intType
 
 let y = Cil.makeGlobalVar ~ghost:true "y" Cil_const.intType
 
-let f = Cil.makeGlobalVar "f" (Cil_types.TFun (Cil_const.voidType,Some [],false,[]))
+let f = Cil.makeGlobalVar "f" Cil_const.(mk_tfun voidType (Some []) false)
 
 let return = Cil.mkStmt (Return (None, Loc.unknown))
 
@@ -76,8 +76,6 @@ let ghost_status env ghost =
   match env.stmt_pos with
   | Normal -> env.in_ghost || ghost
   | _ -> env.in_ghost
-
-let block env stmts = env, Cil.mkBlock stmts
 
 let gen_stmts gen_stmt =
   fix
@@ -175,7 +173,7 @@ let gen_goto ghost tgt env =
         env, stmt
       end
   in
-  let e = Cil.(new_exp ~loc (BinOp (Gt,evar ~loc x,integer ~loc 64,intType))) in
+  let e = Cil.(new_exp ~loc (BinOp (Gt,evar ~loc x,integer ~loc 64, Cil_const.intType))) in
   env, Cil.mkStmt ~ghost (If (e,Cil.mkBlock [stmt],Cil.mkBlock [],loc))
 
 let gen_break ghost env =
@@ -196,7 +194,7 @@ let gen_break ghost env =
   in
   let should_fail = env.should_fail || should_fail in
   let stmt = Cil.mkStmt ~ghost skind in
-  let e = Cil.(new_exp ~loc (BinOp (Gt,evar ~loc x,integer ~loc 75,intType))) in
+  let e = Cil.(new_exp ~loc (BinOp (Gt,evar ~loc x,integer ~loc 75,Cil_const.intType))) in
   let stmt = Cil.mkStmt ~ghost (If (e,Cil.mkBlock [stmt],Cil.mkBlock [],loc)) in
   let env = { env with should_fail } in
   let env = add_stack stmt env in
@@ -213,7 +211,7 @@ let gen_continue ghost env =
   in
   let should_fail = should_fail || env.should_fail in
   let stmt = Cil.mkStmt ~ghost skind in
-  let e = Cil.(new_exp ~loc (BinOp (Gt,evar ~loc x,integer ~loc 86,intType))) in
+  let e = Cil.(new_exp ~loc (BinOp (Gt,evar ~loc x,integer ~loc 86,Cil_const.intType))) in
   let stmt = Cil.mkStmt ~ghost (If (e,Cil.mkBlock [stmt],Cil.mkBlock [],loc)) in
   let env = { env with should_fail } in
   let env = add_stack stmt env in
@@ -236,8 +234,8 @@ let gen_if ghost ghost_else stmt_then stmt_else env =
   let env = merge env new_env in
   let else_b = Cil.mkBlock else_s in
   if (not ghost) && ghoste then begin
-    let attr = Attr (Cil.frama_c_ghost_else,[]) in
-    else_b.battrs <- Ast_attributes.add_attribute attr else_b.battrs;
+    let attr = (Ast_attributes.frama_c_ghost_else,[]) in
+    else_b.battrs <- Ast_attributes.add attr else_b.battrs;
   end;
   stmt.skind <- If(e,Cil.mkBlock then_s, Cil.mkBlock else_s,loc);
   env, stmt
@@ -391,7 +389,7 @@ let gen_switch ghost cases env =
   let mk_switch case (labels, stmts) =
     let h = List.hd case in
     h.labels <-
-      Cil_types.Case (Cil.integer Loc.unknown !count_case, Loc.unknown)
+      Cil_types.Case (Cil.integer ~loc:Loc.unknown !count_case, Loc.unknown)
       :: h.labels;
     incr count_case;
     (h::labels, case @ stmts)
@@ -481,7 +479,7 @@ let check_file (env, file) =
   in
   let () =
     if not (Sys.file_exists temp_dir) then
-      Extlib.mkdir ~parents:true temp_dir 0o755
+      Unix.mkdir temp_dir 0o755
   in
   let file_name = Filename.temp_file ~temp_dir "ghostified" ".c" in
   let out = open_out file_name in

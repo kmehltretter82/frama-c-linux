@@ -1,0 +1,28 @@
+(rule
+ (alias frama-c-configure)
+ (deps (universe))
+ (action
+  (progn
+   (echo "Crowbar:" %{lib-available:crowbar} "\n")
+   (echo "  - Kernel:" %{lib-available:frama-c.kernel} "\n")
+   (echo "  - Eva:" %{lib-available:frama-c-eva.core} "\n"))))
+
+(tests
+ (names
+  complete_type
+  constfold
+  integer_bb_pretty
+  list_slice
+  mutable
+  mutable_const_fail
+  mutable_mutable_fail
+  offset_anonymous_field
+  test_ghost_cfg
+  )
+ (flags -open Frama_c_kernel :standard -w -9)
+ (libraries
+  frama-c.init.cmdline
+  frama-c.boot
+  frama-c.kernel
+  frama-c-eva.core
+  crowbar))

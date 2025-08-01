@@ -25,7 +25,7 @@ let struct_name =
 let mk_compinfo cstruct field1 field2 field3 =
   let tname = struct_name () in
   let mk_type _ = Some [ field1; field2; field3 ] in
-  Cil.mkCompInfo cstruct tname ~norig:tname mk_type []
+  Cil_const.mkCompInfo cstruct tname ~norig:tname mk_type []
 
 type result =
   { designator: string option;
@@ -37,14 +37,14 @@ type result =
 let int_result =
   { designator = None;
     offsets = Datatype.String.Map.empty;
-    mytype = TInt (IInt,[]);
+    mytype = Cil_const.intType;
     structs = [] }
 
 let mk_field { mytype } anon =
   let name =
     if anon then begin
-      match mytype with
-      | TComp (_, _, _) -> anonFieldName ()
+      match mytype.tnode with
+      | TComp _ -> anonFieldName ()
       | _ -> Cil.missingFieldName
     end else field_name ()
   in
@@ -88,7 +88,7 @@ let mk_composite_type choice cstruct res1 anon1 res2 anon2 res3 anon3 =
   let info = mk_compinfo cstruct field1 field2 field3 in
   let field1, field2, field3 =
     match info.cfields with
-    | [ field1; field2; field3 ] -> field1, field2, field3
+    | Some [ field1; field2; field3 ] -> field1, field2, field3
     | _ -> bad_test()
   in
   let designator =
@@ -101,16 +101,9 @@ let mk_composite_type choice cstruct res1 anon1 res2 anon2 res3 anon3 =
   let offsets =
     lift_offset cstruct res1 anon1 field1 res2 anon2 field2 res3 anon3 field3
   in
-  let mytype = TComp (info, []) in
+  let mytype = Cil_const.mk_tcomp info in
   let structs = info :: res1.structs @ res2.structs @ res3.structs in
   { designator; mytype; structs; offsets }
-
-let rec mk_offset { cfields } =
-  let field = List.hd cfields in
-  let offset =
-    match field.ftype with TComp(comp,_) -> mk_offset comp | _ -> NoOffset
-  in
-  Field (field, offset)
 
 let rec gen_type_l n =
   if n <= 0 then lazy (const int_result)
@@ -139,12 +132,13 @@ let generate_failure_file =
     let fmt = Format.formatter_of_out_channel out in
     let typ = List.hd types in
     let x =
-      Cil.makeGlobalVar "x" (TComp (typ, []))
+      Cil.makeGlobalVar "x" (Cil_const.mk_tcomp typ)
     in
     let lvx = Var x, offset in
     let typ = Cil.typeOfLval lvx in
     let init = Cil.makeZeroInit ~loc typ in
-    let f = Cil.makeGlobalVar "f" (TFun (TVoid [], Some [], false, [])) in
+    let ft = Cil_const.(mk_tfun voidType (Some []) false) in
+    let f = Cil.makeGlobalVar "f" ft in
     let fdef =
       { svar = f;
         sformals = [];
@@ -175,7 +169,7 @@ let generate_failure_file =
     Kernel.add_debug_keys Kernel.dkey_print_attrs;
     Format.fprintf fmt "%a@." Cil_printer.pp_file file;
     close_out out;
-    Filepath.to_pretty_string name
+    Filepath.to_string_abs name
 
 let test { designator; offsets; structs } =
   match structs with
