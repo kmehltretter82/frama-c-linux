@@ -262,12 +262,7 @@ module LatticeMultiTaint = struct
 
   include TaintNamespace
   include Lattice_bounds.Top.Bound_Lattice (TaintNamespace)
-
-  include Datatype.Make_with_collections (struct
-      include Datatype.Serializable_undefined
-      include Lattice_bounds.Top.Make_Datatype (TaintNamespace)
-      let name = "taint"
-    end)
+  let name = "taint"
 
   let empty = `Value TaintNamespace.empty
 

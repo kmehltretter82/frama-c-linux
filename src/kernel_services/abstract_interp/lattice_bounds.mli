@@ -34,11 +34,13 @@ module Bottom : sig
 
   (** Datatype constructor *)
   module Make_Datatype (Domain: Datatype.S) :
-    Datatype.S with type t = Domain.t or_bottom
+    Datatype.S_with_collections with type t = Domain.t or_bottom
 
   (** Bounds a semi-lattice *)
-  module Bound_Lattice (Lattice: Lattice_type.Join_Semi_Lattice) :
-    Lattice_type.Bottom_Bounded_Join_Semi_Lattice with type t = Lattice.t or_bottom
+  module Bound_Lattice (Lattice: Lattice_type.Join_Semi_Lattice) : sig
+    include Datatype.S_with_collections with type t = Lattice.t or_bottom
+    include Lattice_type.Bottom_Bounded_Join_Semi_Lattice with type t := t
+  end
 
   (** Access *)
   val is_bottom : 'a t -> bool
@@ -95,11 +97,13 @@ module Top : sig
 
   (** Datatype constructor *)
   module Make_Datatype (Domain: Datatype.S) :
-    Datatype.S with type t = Domain.t or_top
+    Datatype.S_with_collections with type t = Domain.t or_top
 
   (** Bounds a semi-lattice *)
-  module Bound_Lattice (Lattice: Lattice_type.Join_Semi_Lattice) :
-    Lattice_type.Top_Bounded_Join_Semi_Lattice with type t = Lattice.t or_top
+  module Bound_Lattice (Lattice: Lattice_type.Join_Semi_Lattice) : sig
+    include Datatype.S_with_collections with type t = Lattice.t or_top
+    include Lattice_type.Top_Bounded_Join_Semi_Lattice with type t := t
+  end
 
   (** Access *)
   val is_top : 'a t -> bool
@@ -143,7 +147,7 @@ module TopBottom: sig
 
   (** Datatype constructor *)
   module Make_Datatype (Domain: Datatype.S) :
-    Datatype.S with type t = Domain.t or_top_bottom
+    Datatype.S_with_collections with type t = Domain.t or_top_bottom
 
   (** Operators. In presence of simultaneous `Bottom and `Top in and+ / and*,
       everything narrows down to `Bottom. Every operators is redefined to

@@ -179,21 +179,23 @@ module Bottom = struct
 
   let counter = ref 0
 
-  module Make_Datatype (Domain: Datatype.S) = Datatype.Make (struct
-      include Datatype.Serializable_undefined
-      type t = Domain.t or_bottom
-      let () = incr counter
-      let name = Domain.name ^ "+bottom(" ^ string_of_int !counter ^ ")"
-      let reprs = `Bottom :: Stdlib.List.map (fun v -> `Value v) Domain.reprs
-      let structural_descr = Structural_descr.t_unknown
-      let hash = Common.hash Domain.hash
-      let equal = (Common.equal Domain.equal :> t -> t -> bool)
-      let compare = Common.compare Domain.compare
-      let rehash = Datatype.identity
-      let copy = map Domain.copy
-      let pretty = Common.pretty Domain.pretty
-      let mem_project = Datatype.never_any_project
-    end)
+  module Make_Datatype (Domain: Datatype.S) =
+    Datatype.Make_with_collections
+      (struct
+        include Datatype.Serializable_undefined
+        type t = Domain.t or_bottom
+        let () = incr counter
+        let name = Domain.name ^ "+bottom(" ^ string_of_int !counter ^ ")"
+        let reprs = `Bottom :: Stdlib.List.map (fun v -> `Value v) Domain.reprs
+        let structural_descr = Structural_descr.t_unknown
+        let hash = Common.hash Domain.hash
+        let equal = (Common.equal Domain.equal :> t -> t -> bool)
+        let compare = Common.compare Domain.compare
+        let rehash = Datatype.identity
+        let copy = map Domain.copy
+        let pretty = Common.pretty Domain.pretty
+        let mem_project = Datatype.never_any_project
+      end)
 
   (* Bound lattice *)
 
@@ -260,21 +262,23 @@ module Top = struct
 
   let counter = ref 0
 
-  module Make_Datatype (Domain: Datatype.S) = Datatype.Make (struct
-      include Datatype.Serializable_undefined
-      type t = Domain.t or_top
-      let () = incr counter
-      let name = Domain.name ^ "+top(" ^ string_of_int !counter ^ ")"
-      let reprs = `Top :: Stdlib.List.map (fun v -> `Value v) Domain.reprs
-      let structural_descr = Structural_descr.t_unknown
-      let hash = Common.hash Domain.hash
-      let equal = (Common.equal Domain.equal :> t -> t -> bool)
-      let compare = Common.compare Domain.compare
-      let rehash = Datatype.identity
-      let copy = map Domain.copy
-      let pretty = Common.pretty Domain.pretty
-      let mem_project = Datatype.never_any_project
-    end)
+  module Make_Datatype (Domain: Datatype.S) =
+    Datatype.Make_with_collections
+      (struct
+        include Datatype.Serializable_undefined
+        type t = Domain.t or_top
+        let () = incr counter
+        let name = Domain.name ^ "+top(" ^ string_of_int !counter ^ ")"
+        let reprs = `Top :: Stdlib.List.map (fun v -> `Value v) Domain.reprs
+        let structural_descr = Structural_descr.t_unknown
+        let hash = Common.hash Domain.hash
+        let equal = (Common.equal Domain.equal :> t -> t -> bool)
+        let compare = Common.compare Domain.compare
+        let rehash = Datatype.identity
+        let copy = map Domain.copy
+        let pretty = Common.pretty Domain.pretty
+        let mem_project = Datatype.never_any_project
+      end)
 
   (* Bound lattice *)
 
@@ -347,20 +351,22 @@ module TopBottom = struct
 
   let counter = ref 0
 
-  module Make_Datatype (Domain: Datatype.S) = Datatype.Make (struct
-      include Datatype.Serializable_undefined
-      type t = Domain.t or_top_bottom
-      let () = incr counter
-      let name = Domain.name ^ "+top_bottom(" ^ string_of_int !counter ^ ")"
-      let reprs = `Bottom :: `Top :: (Stdlib.List.map (fun v -> `Value v) Domain.reprs)
-      let structural_descr = Structural_descr.t_unknown
-      let hash = Common.hash Domain.hash
-      let equal = (Common.equal Domain.equal :> t -> t -> bool)
-      let compare = Common.compare Domain.compare
-      let rehash = Datatype.identity
-      let copy = map Domain.copy
-      let pretty = Common.pretty Domain.pretty
-      let mem_project = Datatype.never_any_project
-    end)
+  module Make_Datatype (Domain: Datatype.S) =
+    Datatype.Make_with_collections
+      (struct
+        include Datatype.Serializable_undefined
+        type t = Domain.t or_top_bottom
+        let () = incr counter
+        let name = Domain.name ^ "+top_bottom(" ^ string_of_int !counter ^ ")"
+        let reprs = `Bottom :: `Top :: (Stdlib.List.map (fun v -> `Value v) Domain.reprs)
+        let structural_descr = Structural_descr.t_unknown
+        let hash = Common.hash Domain.hash
+        let equal = (Common.equal Domain.equal :> t -> t -> bool)
+        let compare = Common.compare Domain.compare
+        let rehash = Datatype.identity
+        let copy = map Domain.copy
+        let pretty = Common.pretty Domain.pretty
+        let mem_project = Datatype.never_any_project
+      end)
 
 end
