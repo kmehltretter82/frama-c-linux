@@ -234,3 +234,9 @@ val pretty_ast : ?prj:Project.t -> ?fmt:Format.formatter -> unit -> unit
     The default project is the current one.
     The default formatter is [Kernel.CodeOutput.get_fmt ()].
     @raise File_types.Bad_Initialization if the file is not initialized. *)
+
+(**/**)
+
+(* this function should only be used by unit tests that do not use the
+   normal Frama-C initialization process. *)
+val init_cil: unit->unit

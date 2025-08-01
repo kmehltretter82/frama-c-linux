@@ -195,6 +195,7 @@ let run typ expr =
     failf "Failed to typecheck cabs (had errors)@\n%a@."
       Cprint.printFile cabs
   end;
+  File.init_cil();
   File.prepare_cil_file cil;
   Kernel.MainFunction.set "f";
   Eva.Analysis.compute ();
