@@ -23,7 +23,7 @@ let get_name (an, _) =
    attribute for both the [x] attribute and the attributes of the list. For
    example, if have a call:
 
-   drop_attribute "__const" [ Attr("const", []) ; Attr("__const", []) ; Attr("__const__", []) ]
+   drop_attribute "__const" [ ("const", []) ; ("__const", []) ; ("__const__", []) ]
 
    The result is [].
 *)
