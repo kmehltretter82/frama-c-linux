@@ -501,7 +501,10 @@ module Html = struct
 
   let generate_dot ~generator filename =
     let tmp_file =
-      Temp_files.file ~keep:true ~prefix:(filename ^ "-") ~suffix:".dot" ()
+      if Mt_options.KeepDotFiles.get () then
+        Filepath.(default_dir / (filename ^ ".dot"))
+      else
+        Temp_files.file ~prefix:filename ~suffix:".dot" ()
     in
     try
       let open Filesystem.Operators in
@@ -540,9 +543,7 @@ module Html = struct
     in
     begin
       match Command.spawn ~timeout:60 "dot" args with
-      | Unix.WEXITED 0 ->
-        Mt_self.debug "remove %a\n" Filepath.pretty tmp_file;
-        Filesystem.remove_file tmp_file
+      | Unix.WEXITED 0 -> ()
       | Unix.WEXITED code ->
         fail (Printf.sprintf "Error (code %d)" code)
       | Unix.WSIGNALED id -> fail (Printf.sprintf "Signal %d" id)
@@ -595,8 +596,6 @@ module Html = struct
     let ret = Sys.command cmd in
     if ret <> 0 then
       Mt_self.error "Something bad happened when running %s" cmd;
-    Mt_self.debug "remove %a\n" Filepath.pretty_abs tmp_file;
-    Filesystem.remove_file tmp_file;
     Kernel.Unicode.set unicode;
     link_fname
   ;;
