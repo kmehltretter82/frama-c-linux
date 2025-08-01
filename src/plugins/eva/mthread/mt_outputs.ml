@@ -461,7 +461,7 @@ module Html = struct
 
   (* Some defaults *)
 
-  let default_dir = "html_summary";;
+  let default_dir = Filepath.of_string "html_summary";;
   let main_page_name = "index";;
   let footer_links = mk_div "Go to thread";;
   let stmt_link s = Printf.sprintf "sid%d" s.sid
@@ -474,7 +474,7 @@ module Html = struct
   ;;
 
   let append_file ~input ~output ~name =
-    let create = not (Sys.file_exists output) in
+    let create = not (Filesystem.exists output) in
     let print_header cout =
       Out_channel.output_string cout
         "// Concatenated dot files. \
@@ -487,33 +487,52 @@ module Html = struct
       In_channel.input_all cin |> Out_channel.output_string cout;
       Out_channel.output_string cout "\n\n"
     in
-    let with_open_in = In_channel.with_open_text input in
-    let flags = [ Open_creat; Open_text; Open_wronly; Open_append ] in
-    let with_open_out = Out_channel.with_open_gen flags 0o666 output in
-    try with_open_out (fun cout -> with_open_in (fun cin -> copy cin cout))
+    try
+      let open Filesystem.Operators in
+      let$ cout = Filesystem.with_open_out_exn ~if_exists:Append output in
+      let$ cin = Filesystem.with_open_in_exn input in
+      copy cin cout
     with e ->
       Mt_self.error
-        "Error while appending dot file %s to %s: %s"
-        input output (Printexc.to_string e)
+        "Error while appending dot file %a to %a: %s"
+        Filepath.pretty input
+        Filepath.pretty output
+        (Printexc.to_string e)
+
+  let generate_dot ~generator filename =
+    let tmp_file =
+      Temp_files.file ~keep:true ~prefix:(filename ^ "-") ~suffix:".dot" ()
+    in
+    try
+      let open Filesystem.Operators in
+      Mt_self.debug "Open %a for writing@." Filepath.pretty tmp_file;
+      let$ otmp = Filesystem.with_open_out_exn tmp_file in
+      let fmt = Format.formatter_of_out_channel otmp in
+      generator fmt;
+      tmp_file
+    with Sys_error s ->
+      Mt_self.abort
+        "Unable to open file %a to generate dot graph.@ %s"
+        Filepath.pretty tmp_file
+        s
 
   let mk_graph_img th =
     let unicode = suspend_unicode () in
     let f_stmt s = Format.sprintf "code.html#%s" (stmt_link s) in
     let thread_name = Thread.label th.th_eva_thread |> Mt_lib.sanitize_filename in
-    let tmp_file, otmp =  Filename.open_temp_file (thread_name ^ "-") ".dot" in
-    let fmt = Format.formatter_of_out_channel otmp in
-    Mt_cfg.dot_fprint_graph fmt th.th_cfg f_stmt;
-    close_out otmp;
+    let generator fmt = Mt_cfg.dot_fprint_graph fmt th.th_cfg f_stmt in
+    let tmp_file = generate_dot ~generator thread_name in
     if not (Mt_options.ConcatDotFilesTo.is_empty ()) then begin
       let name = Thread.label th.th_eva_thread in
-      let output = (Mt_options.ConcatDotFilesTo.get () :> string) in
+      let output = Mt_options.ConcatDotFilesTo.get () in
       append_file ~input:tmp_file ~output ~name
     end;
     let dot_output_format = "svg" in
     let link_fname =
       (Format.asprintf "%s.%s" thread_name dot_output_format) in
-    let output_file = Filename.concat default_dir link_fname in
-    let args = [ "-Tsvg"; tmp_file; "-o"; output_file ] in
+    let output_file = Filepath.(default_dir / link_fname) in
+    let args = [ "-Tsvg"; Filepath.to_string_abs tmp_file;
+                 "-o"; Filepath.to_string_abs output_file ] in
     let fail s =
       Mt_self.error "%s when generating graph for thread %a. \
                      Run 'dot %s' to restart generation"
@@ -524,8 +543,8 @@ module Html = struct
         let ret = Command.spawn ~timeout:60 "dot" args in
         match ret with
         | Unix.WEXITED 0 ->
-          Mt_self.debug "remove %s\n" tmp_file;
-          Sys.remove tmp_file
+          Mt_self.debug "remove %a\n" Filepath.pretty tmp_file;
+          Filesystem.remove_file tmp_file
         | Unix.WEXITED code ->
           fail (Printf.sprintf "Error (code %d)" code)
         | Unix.WSIGNALED id -> fail (Printf.sprintf "Signal %d" id)
@@ -565,21 +584,22 @@ module Html = struct
     let module TGDot = Graph.Graphviz.Dot(ThreadInheritanceGraph) in
     let unicode = suspend_unicode () in
     let name = "thread_inheritance_graph" in
-    let tmp_file, otmp = Filename.open_temp_file name ".dot" in
-    Mt_self.debug "Open %s for writing@." tmp_file;
-    let fmt = Format.formatter_of_out_channel otmp in
-    TGDot.fprint_graph fmt graph;
-    close_out otmp;
+    let generator fmt = TGDot.fprint_graph fmt graph in
+    let tmp_file = generate_dot ~generator name in
     let dot_output_format = "svg" in
     let link_fname = Format.sprintf "%s.%s" name dot_output_format in
-    let output_file = Filename.concat default_dir link_fname in
-    let cmd = Format.sprintf "dot -T%s '%s' -o '%s'"
-        dot_output_format tmp_file output_file in
+    let output_file = Filepath.(default_dir / link_fname) in
+    let cmd =
+      Format.sprintf "dot -T%s '%s' -o '%s'"
+        dot_output_format
+        (Filepath.to_string_abs ~quoted:true tmp_file)
+        (Filepath.to_string_abs ~quoted:true output_file)
+    in
     let ret = Sys.command cmd in
     if ret <> 0 then
       Mt_self.error "Something bad happened when running %s" cmd;
-    Mt_self.debug "remove %s\n" tmp_file;
-    Sys.remove tmp_file;
+    Mt_self.debug "remove %a\n" Filepath.pretty_abs tmp_file;
+    Filesystem.remove_file tmp_file;
     Kernel.Unicode.set unicode;
     link_fname
   ;;
@@ -634,27 +654,29 @@ module Html = struct
      not needed *)
   let css_content =
     lazy (
-      let css_file =
-        (Mt_self.Share.get_file "mthread.css" :> string)
-      in
+      let css_file = Mt_self.Share.get_file "mthread.css" in
       try
-        let ic = open_in css_file in
-        let ic_length = in_channel_length ic in
-        let b = Buffer.create ic_length in
-        Buffer.add_channel b ic ic_length;
-        close_in ic;
+        let open Filesystem.Operators in
+        let b =
+          let$ ic = Filesystem.with_open_in_exn css_file in
+          let ic_length = in_channel_length ic in
+          let b = Buffer.create ic_length in
+          Buffer.add_channel b ic ic_length;
+          b
+        in
         Buffer.contents b
       with Sys_error _ ->
-        Mt_self.warning "Cannot open mthread css '%s'" css_file;
+        Mt_self.warning "Cannot open mthread css '%a'" Filepath.pretty css_file;
         ""
     )
   ;;
 
 
   let pp_page page =
-    let file = Filename.concat default_dir page.page_name ^ ".html" in
-    Mt_self.debug "Open %s@." file;
-    let ofile = open_out file in
+    let open Filesystem.Operators in
+    let file = Filepath.(default_dir / (page.page_name ^ ".html")) in
+    Mt_self.debug "Open %a@." Filepath.pretty_abs file;
+    let$ ofile = Filesystem.with_open_out_exn file in
     let fmt = Format.formatter_of_out_channel ofile in
     Format.pp_set_formatter_stag_functions fmt html_stag_functions;
     Format.pp_set_tags fmt true;
@@ -672,8 +694,7 @@ module Html = struct
                         @}@}@}@]@?"
       page.page_title
       (Lazy.force css_content)
-      (Buffer.contents page.page_buffer);
-    close_out ofile;
+      (Buffer.contents page.page_buffer)
   ;;
 
   let mk_main_page page page_table th_list =
@@ -749,7 +770,7 @@ module Html = struct
       page_table, PageTable.add page_table, PageTable.find page_table
     in
 
-    (try Unix.mkdir default_dir 0o777; with _ -> ());
+    (try Filesystem.make_dir default_dir 0o777 |> ignore with _ -> ());
 
     let main_page = mk_html_page "Summary" main_page_name in
     (* Initialize one page with a buffer, a link name, a formatter
