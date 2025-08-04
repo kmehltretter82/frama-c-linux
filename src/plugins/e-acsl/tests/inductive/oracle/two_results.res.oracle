@@ -1,6 +1,8 @@
 [e-acsl] beginning translation.
 [e-acsl:analysis:inductive] function extraction with mode incomplete in 2
 [e-acsl] Warning: Translation of P might be unsound (if multiple cases apply to some given arguments simultaneously).
+[e-acsl] Warning: Translation of P might be unsound (if multiple cases apply to some given arguments simultaneously).
+[e-acsl] Warning: Translation of P might be unsound (if multiple cases apply to some given arguments simultaneously).
 [e-acsl] translation done in project "e-acsl".
 [eva:alarm] two_results.c:18: Warning: assertion got status unknown.
 [eva:alarm] two_results.c:19: Warning: assertion got status unknown.

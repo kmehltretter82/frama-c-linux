@@ -104,11 +104,13 @@ __BEGIN_DECLS
   @
   @ axiom memcmp_strlen_left{L}:
   @   \forall char *s1, *s2; \forall ℤ n;
-  @      memcmp{L,L}(s1,s2,n) == 0 && strlen(s1) < n ==> strlen(s1) == strlen(s2);
+  @      memcmp{L,L}(s1,s2,n) == 0 && strlen(s1) < n ==> strlen(s1) ==
+  strlen(s2);
   @
   @ axiom memcmp_strlen_right{L}:
   @   \forall char *s1, *s2; \forall ℤ n;
-  @      memcmp{L,L}(s1,s2,n) == 0 && strlen(s2) < n ==> strlen(s1) == strlen(s2);
+  @      memcmp{L,L}(s1,s2,n) == 0 && strlen(s2) < n ==> strlen(s1) ==
+  strlen(s2);
   @
   @ axiom memcmp_strlen_shift_left{L}:
   @   \forall char *s1, *s2; \forall ℤ k, n;
@@ -121,6 +123,15 @@ __BEGIN_DECLS
   @        0 <= strlen(s1) <= k + strlen(s2);
   @ }
   @*/
+
+/*@
+  logic integer strlen_aux(char a[], integer idx) =
+    idx>=\length(a)||idx<0?-1:a[idx]=='\000'?idx:strlen_aux(a,idx+1);
+*/
+
+/*@
+  logic integer strlen(char a[]) = strlen_aux(a,0);
+*/
 
 /*@ axiomatic StrCmp {
   @ logic ℤ strcmp{L}(char *s1, char *s2)
@@ -218,6 +229,14 @@ __BEGIN_DECLS
   @      0 <= k <= i && s[i] == L'\0' ==> 0 <= wcslen(s+k) <= i - k;
   @ }
   @*/
+
+/*@
+   logic integer wcslen_aux(wchar_t a[], integer idx) =
+     idx < 0 || idx >= \length(a) ? -1 :
+       a[idx] == 0 ? idx : wcslen_aux(a,idx+1);
+*/
+
+/*@ logic integer wcslen(wchar_t a[]) = wcslen_aux(a,0); */
 
 /*@ axiomatic WcsCmp {
   @ logic ℤ wcscmp{L}(wchar_t *s1, wchar_t *s2)

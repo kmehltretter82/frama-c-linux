@@ -1,6 +1,7 @@
 [e-acsl] beginning translation.
 [e-acsl:analysis:inductive] function extraction with mode incomplete in 3
 [e-acsl] Warning: Translation of power might be unsound (if multiple cases apply to some given arguments simultaneously).
+[e-acsl] Warning: Translation of power might be unsound (if multiple cases apply to some given arguments simultaneously).
 [e-acsl] translation done in project "e-acsl".
 [eva] power.c:9: Warning: 
   Using specification of function __gen_e_acsl_power_fun3

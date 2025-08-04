@@ -5,7 +5,7 @@
   when activating the concurrency support of E-ACSL.
 [e-acsl] FRAMAC_SHARE/libc/pthread.h:397: Warning: 
   E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/pthread.h:411: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/pthread.h:397: Warning: 
   E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/pthread.h:349: Warning: 
   E-ACSL construct `\valid_function' is not yet supported. Ignoring annotation.

@@ -1,15 +1,15 @@
 [e-acsl] beginning translation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:492: Warning: 
   no assigns clause generated for function valid_read_nstring because pointers as arguments is not yet supported
-[e-acsl] FRAMAC_SHARE/libc/__fc_string_axiomatic.h:267: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/__fc_string_axiomatic.h:286: Warning: 
   no assigns clause generated for function valid_read_string because pointers as arguments is not yet supported
-[e-acsl] FRAMAC_SHARE/libc/__fc_string_axiomatic.h:263: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/__fc_string_axiomatic.h:282: Warning: 
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:493: Warning: 
   no assigns clause generated for function valid_string because pointers as arguments is not yet supported
-[e-acsl] FRAMAC_SHARE/libc/__fc_string_axiomatic.h:260: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/__fc_string_axiomatic.h:279: Warning: 
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
   Ignoring annotation.
@@ -19,16 +19,16 @@
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:496: Warning: 
   no assigns clause generated for function strnlen because pointers as arguments is not yet supported
-[e-acsl] FRAMAC_SHARE/libc/__fc_string_axiomatic.h:286: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/__fc_string_axiomatic.h:305: Warning: 
   E-ACSL construct
   `logic functions or predicates with no definition nor reads clause'
   is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:509: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/string.h:495: Warning: 
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/__fc_string_axiomatic.h:300: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/__fc_string_axiomatic.h:305: Warning: 
   E-ACSL construct
   `logic functions or predicates with no definition nor reads clause'
   is not yet supported.
@@ -46,7 +46,7 @@
   Ignoring complete and disjoint behaviors annotations.
 [e-acsl] FRAMAC_SHARE/libc/string.h:491: Warning: 
   E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:505: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/string.h:491: Warning: 
   E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:506: Warning: 
   E-ACSL construct `logic functions or predicates performing read accesses'
@@ -56,11 +56,11 @@
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/__fc_string_axiomatic.h:277: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/__fc_string_axiomatic.h:282: Warning: 
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/__fc_string_axiomatic.h:274: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/__fc_string_axiomatic.h:279: Warning: 
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
   Ignoring annotation.
@@ -76,7 +76,7 @@
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:489: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/string.h:475: Warning: 
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
   Ignoring annotation.
@@ -94,7 +94,7 @@
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/__fc_string_axiomatic.h:277: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/__fc_string_axiomatic.h:282: Warning: 
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
   Ignoring annotation.
@@ -119,7 +119,7 @@
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/__fc_string_axiomatic.h:277: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/__fc_string_axiomatic.h:282: Warning: 
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
   Ignoring annotation.
@@ -127,7 +127,7 @@
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:431: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/string.h:417: Warning: 
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
   Ignoring annotation.

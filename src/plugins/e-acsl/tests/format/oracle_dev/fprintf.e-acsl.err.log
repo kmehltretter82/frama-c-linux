@@ -15,11 +15,9 @@ sprintf: output buffer is unallocated or has insufficient length to store 6 char
 TEST 10: OK: Expected signal at fprintf.c:43
 sprintf: output buffer is unallocated or has insufficient length to store 6 characters or not writeable
 TEST 11: OK: Expected signal at fprintf.c:44
-sprintf: output buffer is unallocated or has insufficient length to store 6 characters or not writeable
 TEST 12: OK: Expected signal at fprintf.c:45
 TEST 13: OK: Expected execution at fprintf.c:48
 TEST 14: OK: Expected execution at fprintf.c:49
-sprintf: output buffer is unallocated or has insufficient length to store 6 characters and \0 terminator or not writeable
 TEST 15: OK: Expected signal at fprintf.c:50
 sprintf: output buffer is unallocated or has insufficient length to store 6 characters and \0 terminator or not writeable
 TEST 16: OK: Expected signal at fprintf.c:51
