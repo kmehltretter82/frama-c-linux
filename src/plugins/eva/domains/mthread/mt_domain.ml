@@ -321,7 +321,6 @@ module Domain = struct
   let initialize_variable _ _ ~initialized:_ _ state = state
   let initialize_variable_using_type _ _ state  = state
   let relate _ _ = Base.SetLattice.empty
-  let log_category = Self.register_category "d-mthread"
 
   (* The interferences computation uses the properties inferred by the Mthread
      domain after projection of abstract states, so for now we need to keep
