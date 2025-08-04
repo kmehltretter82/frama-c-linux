@@ -42,7 +42,7 @@ Options taking a string as argument should preferably be written
 -test-warn-key <k1[=s1][,...,kn[=sn]]>  set warning status for category <k1>
                     to <s1>,...,<kn> to <sn>. Use -test-warn-key help to get
                     a list of available categories, and * to enable all
-                    categories. Possible statuses are inactive,
-                    feedback-once, once, active, error-once, error, and
-                    abort. Defaults to active (preferably use
+                    categories. Possible statuses are inactive, feedback,
+                    warning, error, abort, feedback-once, warning-once,
+                    error-once. Defaults to warning. (preferably use
                     -test-warn-key="k1[=s1][,...,kn[=sn]]")

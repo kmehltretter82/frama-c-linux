@@ -293,9 +293,9 @@ Can also be set on a per-plugin basis, with option -*\<plugin>*-**log**.
   Use **-kernel-warn-key help** to get a list of available warning categories
   and their currently associated actions.
   The following actions can be set per category:
-  **active** (warn), **feedback**, **error**, **abort**,
-  **once**, **feedback-once**, **err-once**.
-  Omitting the action is equivalent to setting it to **active**.
+  **inactive**, **feedback**, **warning**, **error**, **abort**,
+  **feedback-once**, **warning-once**, **error-once**.
+  Omitting the action is equivalent to setting it to **warning**.
   Warning categories can also be set on a per-plugin basis,
   with option -*\<plugin>***-warn-key**.
 

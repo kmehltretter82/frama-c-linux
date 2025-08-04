@@ -76,25 +76,24 @@ list of \texttt{key} of the form \texttt{<category>=<status>}, where category is
 category (possibly a sub-category as for messages categories above), and status is one of:
 \index{warning status}
 \begin{description}
-\item[inactive] no message is emitted for the category
-\item[feedback] a feedback message is emitted
-\item[active] a proper warning is emitted
-\item[once] a proper warning is emitted, and the status of the category is
-  reset to \texttt{inactive}, {\it i.e.}
-  at most one message for the category will be emitted.
-\item[error] a warning is emitted. \FramaC execution continues, but its
+\item[inactive] no message is emitted for the category.
+\item[feedback] a feedback message is emitted.
+\item[feedback-once] a feedback message is emitted only once;
+  the status of the category is then reset to \texttt{inactive}.
+\item[warning] a proper warning is emitted.
+\item[warning-once] a proper warning is emitted only once;
+  the status of the category is then reset to \texttt{inactive}.
+\item[error] an error is emitted. \FramaC execution continues, but its
   exit status will not be 0 at the end of the run.
-\item[abort] a warning is emitted and \FramaC will immediately abort
- its execution with an error.
-\item[feedback-once] a feedback message is emitted, and the status is reset to
-  \texttt{inactive}
-\item[err-once] combines the actions of \texttt{error} and \texttt{once}
-  statuses.
+\item[error-once] an error is emitted only once;
+  the status of the category is then reset to \texttt{inactive}.
+\item[abort] an error message is emitted and \FramaC will immediately abort
+ its execution.
 \end{description}
 
-The \texttt{=<status>} part might be omitted, which is equivalent to asking for \texttt{active} status.
+The \texttt{=<status>} part might be omitted, which is equivalent to asking for \texttt{warning} status.
 The new status will be propagated to subcategories, with one exception: statuses
-``abort'', ``error'' and ``err-once'' will only be propagated to subcategories
+``abort'', ``error'' and ``error-once'' will only be propagated to subcategories
 whose current status is not ``inactive''.
 
 Finally, as for debug categories, passing \texttt{help} (without status) in the list of
