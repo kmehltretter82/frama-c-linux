@@ -1434,7 +1434,8 @@ categories, and must be registered with the
 explained in the user manual~\cite{userman}, each category can be associated
 with a status that controls what will happen when a warning is triggered, from
 completely ignoring it to aborting execution. The default is to emit the
-warning, but this can be changed by using the
+warning, but this can be changed via the optional parameter \lstinline|default|
+of \lstinline|register_warn_category|, or by using the
 \sscodeidxdef{Log}{Messages}{set\_warn\_status}
 \lstinline|set_warn_status| function.
 
