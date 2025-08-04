@@ -134,12 +134,16 @@ void __e_acsl_globals_init(void)
     __e_acsl_already_run = 1;
     __e_acsl_store_block((void *)(__fc_lit_string4),5UL);
     __e_acsl_full_init((void *)(& __fc_lit_string4));
+    __e_acsl_mark_readonly((void *)(__fc_lit_string4));
     __e_acsl_store_block((void *)(__fc_lit_string3),4UL);
     __e_acsl_full_init((void *)(& __fc_lit_string3));
+    __e_acsl_mark_readonly((void *)(__fc_lit_string3));
     __e_acsl_store_block((void *)(__fc_lit_string2),4UL);
     __e_acsl_full_init((void *)(& __fc_lit_string2));
+    __e_acsl_mark_readonly((void *)(__fc_lit_string2));
     __e_acsl_store_block((void *)(__fc_lit_string1),4UL);
     __e_acsl_full_init((void *)(& __fc_lit_string1));
+    __e_acsl_mark_readonly((void *)(__fc_lit_string1));
     __e_acsl_store_block((void *)(& S),8UL);
     __e_acsl_full_init((void *)(& S));
   }

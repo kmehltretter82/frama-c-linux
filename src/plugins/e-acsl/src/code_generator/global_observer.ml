@@ -81,6 +81,23 @@ let mk_init_function () =
      depends on the local variable [already_run] whose generation required the
      existence of [fundec] *)
   let env = Env.push Env.empty in
+  (* 2-stage observation of initializers: temporal analysis must be performed
+     after generating observers of **all** globals *)
+  let stmts =
+    Varinfo.Hashtbl.fold_sorted
+      (fun vi l stmts ->
+         List.fold_left
+           (fun stmts (off,init) ->
+              match Temporal.generate_global_init vi off init with
+              | None -> stmts
+              | Some stmt -> stmt :: stmts
+           )
+           stmts
+           !l
+      )
+      tbl
+      []
+  in
   (* allocation and initialization of globals *)
   let stmts =
     Varinfo.Hashtbl.fold_sorted
@@ -99,7 +116,7 @@ let mk_init_function () =
            :: stmts
          end)
       tbl
-      []
+      stmts
   in
   (* create a new code block with generated statements *)
   let b, stmts = match stmts with

@@ -97,14 +97,38 @@ void __e_acsl_globals_init(void)
     __e_acsl_full_init((void *)(& extra_lbits));
     __e_acsl_store_block((void *)(__fc_lit_string4),4UL);
     __e_acsl_full_init((void *)(& __fc_lit_string4));
+    __e_acsl_mark_readonly((void *)(__fc_lit_string4));
     __e_acsl_store_block((void *)(__fc_lit_string3),4UL);
     __e_acsl_full_init((void *)(& __fc_lit_string3));
+    __e_acsl_mark_readonly((void *)(__fc_lit_string3));
     __e_acsl_store_block((void *)(__fc_lit_string2),4UL);
     __e_acsl_full_init((void *)(& __fc_lit_string2));
+    __e_acsl_mark_readonly((void *)(__fc_lit_string2));
     __e_acsl_store_block((void *)(__fc_lit_string1),4UL);
     __e_acsl_full_init((void *)(& __fc_lit_string1));
+    __e_acsl_mark_readonly((void *)(__fc_lit_string1));
     __e_acsl_store_block((void *)(strings),32UL);
     __e_acsl_full_init((void *)(& strings));
+    __e_acsl_temporal_store_nblock((void *)(& descs2[0].desc.extra_bits),
+                                   (void *)(extra_lbits));
+    __e_acsl_temporal_store_nblock((void *)(& descs2[1].desc.extra_bits),
+                                   (void *)(extra_lbits));
+    __e_acsl_temporal_store_nblock((void *)(& l_desc2.desc.extra_bits),
+                                   (void *)(extra_lbits));
+    __e_acsl_temporal_store_nblock((void *)(& descs[0].extra_bits),
+                                   (void *)(extra_lbits));
+    __e_acsl_temporal_store_nblock((void *)(& descs[1].extra_bits),
+                                   (void *)(extra_lbits));
+    __e_acsl_temporal_store_nblock((void *)(& l_desc.extra_bits),
+                                   (void *)(extra_lbits));
+    __e_acsl_temporal_store_nblock((void *)(& strings[0][0]),
+                                   (void *)(__fc_lit_string1));
+    __e_acsl_temporal_store_nblock((void *)(& strings[0][1]),
+                                   (void *)(__fc_lit_string2));
+    __e_acsl_temporal_store_nblock((void *)(& strings[1][0]),
+                                   (void *)(__fc_lit_string3));
+    __e_acsl_temporal_store_nblock((void *)(& strings[1][1]),
+                                   (void *)(__fc_lit_string4));
   }
   return;
 }

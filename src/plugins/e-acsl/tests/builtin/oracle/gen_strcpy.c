@@ -686,14 +686,19 @@ void __e_acsl_globals_init(void)
     __e_acsl_already_run = 1;
     __e_acsl_store_block((void *)(__fc_lit_string12),5UL);
     __e_acsl_full_init((void *)(& __fc_lit_string12));
+    __e_acsl_mark_readonly((void *)(__fc_lit_string12));
     __e_acsl_store_block((void *)(__fc_lit_string9),1UL);
     __e_acsl_full_init((void *)(& __fc_lit_string9));
+    __e_acsl_mark_readonly((void *)(__fc_lit_string9));
     __e_acsl_store_block((void *)(__fc_lit_string8),2UL);
     __e_acsl_full_init((void *)(& __fc_lit_string8));
+    __e_acsl_mark_readonly((void *)(__fc_lit_string8));
     __e_acsl_store_block((void *)(__fc_lit_string7),3UL);
     __e_acsl_full_init((void *)(& __fc_lit_string7));
+    __e_acsl_mark_readonly((void *)(__fc_lit_string7));
     __e_acsl_store_block((void *)(__fc_lit_string6),2UL);
     __e_acsl_full_init((void *)(& __fc_lit_string6));
+    __e_acsl_mark_readonly((void *)(__fc_lit_string6));
   }
   return;
 }

@@ -1606,38 +1606,52 @@ void __e_acsl_globals_init(void)
     __e_acsl_already_run = 1;
     __e_acsl_store_block((void *)"Unable to broadcast to read cond var",37UL);
     __e_acsl_full_init((void *)(& "Unable to broadcast to read cond var"));
+    __e_acsl_mark_readonly((void *)"Unable to broadcast to read cond var");
     __e_acsl_store_block((void *)"Unable to broadcast to write cond var",
                          38UL);
     __e_acsl_full_init((void *)(& "Unable to broadcast to write cond var"));
+    __e_acsl_mark_readonly((void *)"Unable to broadcast to write cond var");
     __e_acsl_store_block((void *)"Unable to lock read_mutex",26UL);
     __e_acsl_full_init((void *)(& "Unable to lock read_mutex"));
+    __e_acsl_mark_readonly((void *)"Unable to lock read_mutex");
     __e_acsl_store_block((void *)"Unable to lock write_mutex",27UL);
     __e_acsl_full_init((void *)(& "Unable to lock write_mutex"));
+    __e_acsl_mark_readonly((void *)"Unable to lock write_mutex");
     __e_acsl_store_block((void *)"Unable to initialize read cond var",35UL);
     __e_acsl_full_init((void *)(& "Unable to initialize read cond var"));
+    __e_acsl_mark_readonly((void *)"Unable to initialize read cond var");
     __e_acsl_store_block((void *)"Unable to initialize read mutex",32UL);
     __e_acsl_full_init((void *)(& "Unable to initialize read mutex"));
+    __e_acsl_mark_readonly((void *)"Unable to initialize read mutex");
     __e_acsl_store_block((void *)"Unable to initialize write cond var",36UL);
     __e_acsl_full_init((void *)(& "Unable to initialize write cond var"));
+    __e_acsl_mark_readonly((void *)"Unable to initialize write cond var");
     __e_acsl_store_block((void *)"Unable to initialize write mutex",33UL);
     __e_acsl_full_init((void *)(& "Unable to initialize write mutex"));
+    __e_acsl_mark_readonly((void *)"Unable to initialize write mutex");
     __e_acsl_store_block((void *)"Unable to unlock mutex in read_value()",
                          39UL);
     __e_acsl_full_init((void *)(& "Unable to unlock mutex in read_value()"));
+    __e_acsl_mark_readonly((void *)"Unable to unlock mutex in read_value()");
     __e_acsl_store_block((void *)"Unable to wait on condvar in read_value()",
                          42UL);
     __e_acsl_full_init((void *)(& "Unable to wait on condvar in read_value()"));
+    __e_acsl_mark_readonly((void *)"Unable to wait on condvar in read_value()");
     __e_acsl_store_block((void *)"Unable to lock mutex in read_value()",37UL);
     __e_acsl_full_init((void *)(& "Unable to lock mutex in read_value()"));
+    __e_acsl_mark_readonly((void *)"Unable to lock mutex in read_value()");
     __e_acsl_store_block((void *)"Unable to unlock mutex in write_value()",
                          40UL);
     __e_acsl_full_init((void *)(& "Unable to unlock mutex in write_value()"));
+    __e_acsl_mark_readonly((void *)"Unable to unlock mutex in write_value()");
     __e_acsl_store_block((void *)"Unable to wait on condvar in write_value()",
                          43UL);
     __e_acsl_full_init((void *)(& "Unable to wait on condvar in write_value()"));
+    __e_acsl_mark_readonly((void *)"Unable to wait on condvar in write_value()");
     __e_acsl_store_block((void *)"Unable to lock mutex in write_value()",
                          38UL);
     __e_acsl_full_init((void *)(& "Unable to lock mutex in write_value()"));
+    __e_acsl_mark_readonly((void *)"Unable to lock mutex in write_value()");
     __e_acsl_store_block((void *)(& read_mutex),4UL);
     __e_acsl_full_init((void *)(& read_mutex));
     __e_acsl_store_block((void *)(& write_mutex),4UL);

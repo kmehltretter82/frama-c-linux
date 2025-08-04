@@ -34,8 +34,10 @@ void __e_acsl_globals_init(void)
     __e_acsl_already_run = 1;
     __e_acsl_store_block((void *)(__fc_lit_string5),7UL);
     __e_acsl_full_init((void *)(& __fc_lit_string5));
+    __e_acsl_mark_readonly((void *)(__fc_lit_string5));
     __e_acsl_store_block((void *)(__fc_lit_string4),6UL);
     __e_acsl_full_init((void *)(& __fc_lit_string4));
+    __e_acsl_mark_readonly((void *)(__fc_lit_string4));
     __e_acsl_store_block((void *)(_G),32UL);
     __e_acsl_full_init((void *)(& _G));
     __e_acsl_store_block((void *)(& _E),4UL);
@@ -46,12 +48,15 @@ void __e_acsl_globals_init(void)
     __e_acsl_full_init((void *)(& _C));
     __e_acsl_store_block((void *)(__fc_lit_string3),3UL);
     __e_acsl_full_init((void *)(& __fc_lit_string3));
+    __e_acsl_mark_readonly((void *)(__fc_lit_string3));
     __e_acsl_store_block((void *)(& _B),8UL);
     __e_acsl_full_init((void *)(& _B));
     __e_acsl_store_block((void *)(__fc_lit_string2),3UL);
     __e_acsl_full_init((void *)(& __fc_lit_string2));
+    __e_acsl_mark_readonly((void *)(__fc_lit_string2));
     __e_acsl_store_block((void *)(__fc_lit_string1),3UL);
     __e_acsl_full_init((void *)(& __fc_lit_string1));
+    __e_acsl_mark_readonly((void *)(__fc_lit_string1));
     __e_acsl_store_block((void *)(_A),16UL);
     __e_acsl_full_init((void *)(& _A));
     __e_acsl_store_block((void *)(& _F),4UL);

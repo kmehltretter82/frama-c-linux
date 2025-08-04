@@ -259,8 +259,10 @@ void __e_acsl_globals_init(void)
     __e_acsl_already_run = 1;
     __e_acsl_store_block((void *)"tata",5UL);
     __e_acsl_full_init((void *)(& "tata"));
+    __e_acsl_mark_readonly((void *)"tata");
     __e_acsl_store_block((void *)"toto",5UL);
     __e_acsl_full_init((void *)(& "toto"));
+    __e_acsl_mark_readonly((void *)"toto");
   }
   return;
 }

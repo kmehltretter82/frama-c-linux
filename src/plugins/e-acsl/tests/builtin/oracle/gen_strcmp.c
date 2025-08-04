@@ -287,12 +287,16 @@ void __e_acsl_globals_init(void)
     __e_acsl_already_run = 1;
     __e_acsl_store_block((void *)(__fc_lit_string37),4UL);
     __e_acsl_full_init((void *)(& __fc_lit_string37));
+    __e_acsl_mark_readonly((void *)(__fc_lit_string37));
     __e_acsl_store_block((void *)(__fc_lit_string36),4UL);
     __e_acsl_full_init((void *)(& __fc_lit_string36));
+    __e_acsl_mark_readonly((void *)(__fc_lit_string36));
     __e_acsl_store_block((void *)(__fc_lit_string9),4UL);
     __e_acsl_full_init((void *)(& __fc_lit_string9));
+    __e_acsl_mark_readonly((void *)(__fc_lit_string9));
     __e_acsl_store_block((void *)(__fc_lit_string8),4UL);
     __e_acsl_full_init((void *)(& __fc_lit_string8));
+    __e_acsl_mark_readonly((void *)(__fc_lit_string8));
   }
   return;
 }

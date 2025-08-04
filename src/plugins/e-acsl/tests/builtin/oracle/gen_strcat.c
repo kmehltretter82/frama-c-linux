@@ -791,26 +791,37 @@ void __e_acsl_globals_init(void)
     __e_acsl_already_run = 1;
     __e_acsl_store_block((void *)(__fc_lit_string34),5UL);
     __e_acsl_full_init((void *)(& __fc_lit_string34));
+    __e_acsl_mark_readonly((void *)(__fc_lit_string34));
     __e_acsl_store_block((void *)(__fc_lit_string33),5UL);
     __e_acsl_full_init((void *)(& __fc_lit_string33));
+    __e_acsl_mark_readonly((void *)(__fc_lit_string33));
     __e_acsl_store_block((void *)(__fc_lit_string32),5UL);
     __e_acsl_full_init((void *)(& __fc_lit_string32));
+    __e_acsl_mark_readonly((void *)(__fc_lit_string32));
     __e_acsl_store_block((void *)(__fc_lit_string31),5UL);
     __e_acsl_full_init((void *)(& __fc_lit_string31));
+    __e_acsl_mark_readonly((void *)(__fc_lit_string31));
     __e_acsl_store_block((void *)(__fc_lit_string17),5UL);
     __e_acsl_full_init((void *)(& __fc_lit_string17));
+    __e_acsl_mark_readonly((void *)(__fc_lit_string17));
     __e_acsl_store_block((void *)(__fc_lit_string16),5UL);
     __e_acsl_full_init((void *)(& __fc_lit_string16));
+    __e_acsl_mark_readonly((void *)(__fc_lit_string16));
     __e_acsl_store_block((void *)(__fc_lit_string15),5UL);
     __e_acsl_full_init((void *)(& __fc_lit_string15));
+    __e_acsl_mark_readonly((void *)(__fc_lit_string15));
     __e_acsl_store_block((void *)(__fc_lit_string14),5UL);
     __e_acsl_full_init((void *)(& __fc_lit_string14));
+    __e_acsl_mark_readonly((void *)(__fc_lit_string14));
     __e_acsl_store_block((void *)(__fc_lit_string11),2UL);
     __e_acsl_full_init((void *)(& __fc_lit_string11));
+    __e_acsl_mark_readonly((void *)(__fc_lit_string11));
     __e_acsl_store_block((void *)(__fc_lit_string9),3UL);
     __e_acsl_full_init((void *)(& __fc_lit_string9));
+    __e_acsl_mark_readonly((void *)(__fc_lit_string9));
     __e_acsl_store_block((void *)(__fc_lit_string7),2UL);
     __e_acsl_full_init((void *)(& __fc_lit_string7));
+    __e_acsl_mark_readonly((void *)(__fc_lit_string7));
   }
   return;
 }
