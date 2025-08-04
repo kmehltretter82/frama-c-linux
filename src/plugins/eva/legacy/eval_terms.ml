@@ -1377,10 +1377,13 @@ and eval_tif : 'a. (alarm_mode:_ -> _ -> _ -> 'a eval_result) -> ('a -> 'a -> 'a
 and eval_known_logic_function ~alarm_mode env li labels args =
   let lvi = li.l_var_info in
   match lvi.lv_name, li.l_type, labels, args with
-  | ("strlen" | "wcslen") as b,  _, [lbl], [arg] ->
+  (* strlen comes in two flavors: one that takes an array. hence no labels,
+     and one that takes a char pointer and a label. Only the first one
+     can be fed with logic string literals as arguments. *)
+  | ("strlen" | "wcslen") as b,  _, [], [arg] ->
     begin
       match arg.term_node with
-      | TConst (LStr str) ->
+      | TConst (LStr str) | TCast(_,_,{term_node = TConst(LStr str)})->
         (* Look for the first occurrence of the '\0' character, otherwise
            return the string length. *)
         let length =
@@ -1394,8 +1397,15 @@ and eval_known_logic_function ~alarm_mode env li labels args =
           if b = "strlen" then Builtins_string.frama_c_strlen_wrapper
           else Builtins_string.frama_c_wcslen_wrapper
         in
-        eval_logic_charlen builtin { env with e_cur = lbl } r.eover r.ldeps
+        eval_logic_charlen builtin env r.eover r.ldeps
     end
+  | ("strlen" | "wcslen") as b,  _, [lbl], [arg] ->
+    let r = eval_term ~alarm_mode env arg in
+    let builtin =
+      if b = "strlen" then Builtins_string.frama_c_strlen_wrapper
+      else Builtins_string.frama_c_wcslen_wrapper
+    in
+    eval_logic_charlen builtin { env with e_cur = lbl } r.eover r.ldeps
   | ("memchr_off" | "wmemchr_off") as b,  _, [lbl], [arg_s; arg_c; arg_n] ->
     let s = eval_term ~alarm_mode env arg_s in
     let c = eval_term ~alarm_mode env arg_c in
