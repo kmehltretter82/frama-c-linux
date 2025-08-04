@@ -74,7 +74,9 @@ let is_computed () =
   | Computed | Aborted -> true
   | NotComputed | Computing -> false
 
-(* Debug categories. *)
+
+(* ----- Debug categories --------------------------------------------------- *)
+
 let dkey_initial_state =
   register_category "initial-state"
     ~help:"at the start of the analysis, \
@@ -134,41 +136,138 @@ let () =
     [dkey_initial_state; dkey_final_states; dkey_summary; dkey_cvalue_domain;
      dkey_partition; dkey_split_return; dkey_precision_settings]
 
-(* Warning categories. *)
-let wkey_alarm = register_warn_category "alarm"
-let wkey_locals_escaping = register_warn_category "locals-escaping"
-let wkey_garbled_mix_write = register_warn_category "garbled-mix:write"
-let () = set_warn_status wkey_garbled_mix_write Log.Wfeedback
-let wkey_garbled_mix_assigns = register_warn_category "garbled-mix:assigns"
-let () = set_warn_status wkey_garbled_mix_assigns Log.Wfeedback
-let wkey_garbled_mix_summary = register_warn_category "garbled-mix:summary"
-let () = set_warn_status wkey_garbled_mix_summary Log.Wfeedback
-let wkey_builtins_missing_spec = register_warn_category "builtins:missing-spec"
-let wkey_builtins_override = register_warn_category "builtins:override"
-let wkey_libc_unsupported_spec = register_warn_category "libc:unsupported-spec"
-let wkey_loop_unroll_auto = register_warn_category "loop-unroll:auto"
-let () = set_warn_status wkey_loop_unroll_auto Log.Wfeedback
-let wkey_loop_unroll_partial = register_warn_category "loop-unroll:partial"
-let () = set_warn_status wkey_loop_unroll_partial Log.Wfeedback
-let wkey_missing_loop_unroll = register_warn_category "loop-unroll:missing"
-let () = set_warn_status wkey_missing_loop_unroll Log.Winactive
-let wkey_missing_loop_unroll_for = register_warn_category "loop-unroll:missing:for"
-let () = set_warn_status wkey_missing_loop_unroll_for Log.Winactive
-let wkey_signed_overflow = register_warn_category "signed-overflow"
-let wkey_invalid_assigns = register_warn_category "assigns:invalid-location"
-let () = set_warn_status wkey_invalid_assigns Log.Wfeedback
-let wkey_missing_assigns = register_warn_category "assigns:missing"
-let () = set_warn_status wkey_missing_assigns Log.Werror
-let wkey_missing_assigns_result = register_warn_category "assigns:missing-result"
-let wkey_experimental = register_warn_category "experimental"
-let wkey_unknown_size = register_warn_category "unknown-size"
-let wkey_ensures_false = register_warn_category "ensures-false"
-let wkey_watchpoint = register_warn_category "watchpoint"
-let () = set_warn_status wkey_watchpoint Log.Wfeedback
-let wkey_recursion = register_warn_category "recursion"
-let () = set_warn_status wkey_recursion Log.Wfeedback
 
-(* Log with positions *)
+(* ----- Warning categories ------------------------------------------------- *)
+
+let wkey_alarm =
+  register_warn_category "alarm"
+    ~help:"warnings for each possible undefined behavior detected \
+           by the analysis"
+
+let wkey_locals_escaping =
+  register_warn_category "locals-escaping"
+    ~help:"a pointer p points to an out of scope local variable \
+           (any use of p also generates an alarm)"
+
+let _wkey_garbled_mix =
+  register_warn_category "garbled-mix"
+    ~help:"warnings about very imprecise values inferred for pointers, \
+           named garbled mix"
+    ~default:Log.Wfeedback
+
+let wkey_garbled_mix_write =
+  register_warn_category "garbled-mix:write"
+    ~help:"the interpretation of an assignment creates a garbled mix"
+    ~default:Log.Wfeedback
+
+let wkey_garbled_mix_assigns =
+  register_warn_category "garbled-mix:assigns"
+    ~help:"the interpretation of a specification creates a garbled mix"
+    ~default:Log.Wfeedback
+
+let wkey_garbled_mix_summary =
+  register_warn_category "garbled-mix:summary"
+    ~help:"list the origins of garbled mix at the end of an analysis"
+    ~default:Log.Wfeedback
+
+let _wkey_builtins =
+  register_warn_category "builtins"
+    ~help:"warnings related to builtins used to interpret some libc functions"
+
+let wkey_builtins_missing_spec =
+  register_warn_category "builtins:missing-spec"
+    ~help:"the ACSL specification on which a builtin soundness relies is missing"
+
+let wkey_builtins_override =
+  register_warn_category "builtins:override"
+    ~help:"a builtin overrides a function definition, which is therefore \
+           not analyzed"
+
+let _wkey_libc =
+  register_warn_category "libc"
+    ~help:"warnings related to the interpretation of the standard C library"
+
+let wkey_libc_unsupported_spec =
+  register_warn_category "libc:unsupported-spec"
+    ~help:"the ACSL specification of a libc function is not supported by Eva"
+
+let _wkey_loop_unroll =
+  register_warn_category "loop-unroll"
+    ~help:"messages about automatic loop unrolling from option \
+           -eva-auto-loop-unroll"
+    ~default:Log.Wfeedback
+
+let wkey_loop_unroll_auto =
+  register_warn_category "loop-unroll:auto"
+    ~help:"a loop is automatically unrolled by the analysis"
+
+let wkey_loop_unroll_partial =
+  register_warn_category "loop-unroll:partial"
+    ~help:"a loop has been partially but not completely unrolled"
+
+let wkey_missing_loop_unroll =
+  register_warn_category "loop-unroll:missing"
+    ~help:"a loop has no unroll annotation"
+    ~default:Log.Winactive
+
+let wkey_missing_loop_unroll_for =
+  register_warn_category "loop-unroll:missing:for"
+    ~help:"a for loop has no unroll annotation"
+    ~default:Log.Winactive
+
+let wkey_signed_overflow =
+  register_warn_category "signed-overflow"
+    ~help:"two's complement is used to interpret a signed overflow \
+           (when signed overflow alarms are disabled)"
+
+let _wkey_assigns =
+  register_warn_category "assigns"
+    ~help:"warnings related to the interpretation of assigns clauses \
+           in ACSL specification"
+
+let wkey_invalid_assigns =
+  register_warn_category "assigns:invalid-location"
+    ~help:"the memory location targeted by an assigns clause is invalid \
+           in at least one analysis state"
+    ~default:Log.Wfeedback
+
+let wkey_missing_assigns =
+  register_warn_category "assigns:missing"
+    ~help:"assigns clauses are missing or incomplete from an ACSL \
+           specification on which the analysis soundness relies"
+    ~default:Log.Werror
+
+let wkey_missing_assigns_result =
+  register_warn_category "assigns:missing-result"
+    ~help:"an assigns \\result clause is missing from an ACSL specification \
+           on which the analysis soundness relies"
+
+let wkey_experimental =
+  register_warn_category "experimental"
+    ~help:"an experimental feature of Eva is enabled"
+
+let wkey_unknown_size =
+  register_warn_category "unknown-size"
+    ~help:"the analysis cannot compute the size of a variable, \
+           which will thus be very imprecise"
+
+let wkey_ensures_false =
+  register_warn_category "ensures-false"
+    ~help:"a post-condition evaluates to false; \
+           there might be an error in the specification"
+
+let wkey_watchpoint =
+  register_warn_category "watchpoint"
+    ~help:"undocumented"
+    ~default:Log.Wfeedback
+
+let wkey_recursion =
+  register_warn_category "recursion"
+    ~help:"a recursive call is analyzed"
+    ~default:Log.Wfeedback
+
+
+(* ----- Log with positions ------------------------------------------------- *)
 
 type 'a pretty_printer =
   ?emitwith:(Log.event -> unit) -> ?once:bool ->

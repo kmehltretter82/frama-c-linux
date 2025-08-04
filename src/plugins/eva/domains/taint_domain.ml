@@ -76,7 +76,9 @@ type taint_state = {
 let dkey_debug = Self.register_category "d-taint-debug"
     ~help:"debug print of the taint domain"
 
-let wkey = Self.register_warn_category "taint"
+let wkey =
+  Self.register_warn_category "taint"
+    ~help:"warnings related to the taint analysis from \"-eva-domain taint\""
 
 module LatticeSingleTaint = struct
 

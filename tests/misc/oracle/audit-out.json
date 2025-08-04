@@ -39,14 +39,14 @@
       "enabled": [
         "*", "alarm", "assigns", "assigns:missing", "assigns:missing-result",
         "builtins", "builtins:missing-spec", "builtins:override",
-        "ensures-false", "experimental", "garbled-mix", "libc",
-        "libc:unsupported-spec", "locals-escaping", "loop-unroll", "malloc",
-        "malloc:imprecise", "signed-overflow", "taint", "unknown-size"
+        "ensures-false", "experimental", "libc", "libc:unsupported-spec",
+        "locals-escaping", "malloc", "malloc:imprecise", "signed-overflow",
+        "taint", "unknown-size"
       ],
       "disabled": [
-        "assigns:invalid-location", "garbled-mix:assigns",
-        "garbled-mix:summary", "garbled-mix:write", "loop-unroll:auto",
-        "loop-unroll:missing", "loop-unroll:missing:for",
+        "assigns:invalid-location", "garbled-mix", "garbled-mix:assigns",
+        "garbled-mix:summary", "garbled-mix:write", "loop-unroll",
+        "loop-unroll:auto", "loop-unroll:missing", "loop-unroll:missing:for",
         "loop-unroll:partial", "malloc:weak", "recursion", "watchpoint"
       ]
     }

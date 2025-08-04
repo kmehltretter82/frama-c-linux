@@ -37,11 +37,20 @@ let dkey_auto_free = Self.register_category "malloc:automatic-free"
     ~help:"messages emitted when bases are automatically freed (alloca or VLA)"
 let () = Self.add_debug_keys dkey_auto_free
 
-let wkey_weak_alloc = Self.register_warn_category "malloc:weak"
-let () = Self.set_warn_status wkey_weak_alloc Log.Winactive
+let _wkey_malloc =
+  Self.register_warn_category "malloc"
+    ~help:"warnings related to builtins interpreting dynamic allocation"
 
-let wkey_imprecise_alloc = Self.register_warn_category
-    "malloc:imprecise"
+let wkey_weak_alloc =
+  Self.register_warn_category "malloc:weak"
+    ~help:"a same \"weak\" variable is used to represent multiple dynamic \
+           allocations, which is rather imprecise"
+    ~default:Log.Winactive
+
+let wkey_imprecise_alloc =
+  Self.register_warn_category "malloc:imprecise"
+    ~help:"a single \"weak\" variable is used to represent all dynamic \
+           allocations, which is very imprecise"
 
 (* ---------------------- Dynamically allocated bases ----------------------- *)
 
