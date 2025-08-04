@@ -28,7 +28,10 @@ module MutexesMap = Map.Make (Mutex.Set)
 
 type thread_id = int
 
-let dkey = Self.register_category "interferences"
+let dkey =
+  Self.register_category "interferences"
+    ~help:"debug messages about interferences from other threads \
+           injected in Eva analysis with Mthread"
 
 let pp_map iteri pp_key pp_val fmt map =
   let pp fmt k v =
