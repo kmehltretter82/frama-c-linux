@@ -1,5 +1,5 @@
 /* run.config
-   OPT:-wp-gen -wp-prover=why3 -wp-msg-key=print-generated -kernel-warn-key parser:decimal-float=active
+   OPT:-wp-gen -wp-prover=why3 -wp-msg-key=print-generated -kernel-warn-key parser:decimal-float=warning
 */
 /* run.config_qualif
    OPT:

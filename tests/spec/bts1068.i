@@ -1,8 +1,8 @@
 /* run.config
- OPT: -print -kernel-warn-key=annot-error=active
+ OPT: -print -kernel-warn-key=annot-error=warning
 */
 
-// test of label inference into 
+// test of label inference into
 typedef struct {
   int a;
   unsigned char *b;
@@ -47,7 +47,7 @@ int V, Tab[10] ;
     logic int fa2(int *q) = *q; // <- label to infer
     logic char *fa3(integer i) = i + (char *)&P;   // <- label to infer
     logic integer fa4(T *q) reads q->a ;           // <- label to infer
- 
+
     predicate Initialized(int *q) = \initialized(q);      // <- label to infer
     predicate Valid(int *q) = \valid(q);                  // <- label to infer
     predicate ValidIndex(int *q) = \valid_index(q,1);     // <- label to infer
@@ -57,7 +57,7 @@ int V, Tab[10] ;
     logic integer BlockLength(int *q) = \block_length(q); // <- label to infer
     logic char * Base_addr(int *q) = \base_addr(q);       // <- label to infer
 
-//    logic integer Offset(int *q) = \offset(q);          // <- BUG parsing 
+//    logic integer Offset(int *q) = \offset(q);          // <- BUG parsing
 
     logic integer fi(T* t) = t->a + (*t).a;
 
@@ -65,7 +65,7 @@ int V, Tab[10] ;
 */
 
 
-typedef struct _list { 
+typedef struct _list {
   int element;
   struct _list* next; } list;
 
@@ -73,8 +73,8 @@ typedef struct _list {
 
 /*@ inductive model_0{L1,L2}(list* root, List<int>logic_list) {
 case nil{L1,L2}: model_0{L1,L2}(\null,Nil);
-case cons{L1,L2}: \forall list* l1,List<int>ll1; 
-\at(\valid(l1),L1) ==> model_0{L1,L2}(\at(l1->next,L1),ll1) ==> 
+case cons{L1,L2}: \forall list* l1,List<int>ll1;
+\at(\valid(l1),L1) ==> model_0{L1,L2}(\at(l1->next,L1),ll1) ==>
 model_0{L1,L2}(l1,Cons(\at(l1->element,L1),ll1));
 } */
 

@@ -1,15 +1,15 @@
 /* run.config
-   OPT: -kernel-warn-key=annot-error=active -print
+   OPT: -kernel-warn-key=annot-error=warning -print
 */
 /* run.config_qualif
-   OPT: -kernel-warn-key=annot-error=active -wp -wp-model Typed -wp-par 1 -wp-prop="-ko"
-   OPT: -kernel-warn-key=annot-error=active -wp -wp-model Typed -wp-par 1 -wp-prop="ko" -wp-steps 50
+   OPT: -kernel-warn-key=annot-error=warning -wp -wp-model Typed -wp-par 1 -wp-prop="-ko"
+   OPT: -kernel-warn-key=annot-error=warning -wp -wp-model Typed -wp-par 1 -wp-prop="ko" -wp-steps 50
 */
 
 /* Test of operator precedence and associativity.
  * - The option -kernel-warn-key annot-error=inactive allow to skip contracts that contain a 'badly_formed' term.
  *   Since the whole contract is rejected in a such case, these contracts must content only one property.
- *   So, they are put inside a statement contract. 
+ *   So, they are put inside a statement contract.
  */
 
 //@ axiomatic Pred  { predicate P; predicate Q; predicate R; predicate S; predicate U;}
@@ -46,7 +46,7 @@
   @ ensures     l_precedence_equiv_ite: (P ? Q : R <==> S) <==> (P ? Q : (R <==> S));
   @ ensures ko: r_precedence_ite_equiv: (P <==> Q ? R : S) <==> (P <==> (Q ? R : S));
   @ ensures ko: l_precedence_ite_equiv: (P ? Q : R <==> S) <==> ((P ? Q : R) <==> S);
-  
+
   @ ensures     r_assoc_ite: (P ? Q : R ? S : U) <==> (P ? Q : (R ? S : U));
   @ ensures ko: l_assoc_ite: (P ? Q : R ? S : U) <==> ((P ? Q : R) ? S : U);
 
@@ -83,9 +83,9 @@
 
   @ ensures ko: l_assoc_naming:          (P ? Q : R : S) <==> (P ? (Q : R) : S);
   @ ensures     r_precedence_ite_naming: (P ? Q : R : S) <==> (P ?  Q : (R: S));
-  
+
 */
-void predicate(int x, int a, int b) { 
+void predicate(int x, int a, int b) {
   // Properties that have to be rejected at the parsing.
   //@ ensures badly_formed: ;
   ;
@@ -133,7 +133,7 @@ void comparison(int p, int q, int r) {
   //@ ensures badly_formed: unchainable_lt_ge: p <  q >= r;
   //@ ensures badly_formed: unchainable_le_gt: p <= q >  r;
   //@ ensures badly_formed: unchainable_le_ge: p <= q >= r;
- ; 
+ ;
 }
 
 /*@ // BITWISE OPERATORS ------------------------------------------------

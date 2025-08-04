@@ -1,9 +1,9 @@
 /* run.config*
  PLUGIN: @EVA_MAIN_PLUGINS@
-   OPT: -no-annot -eva @EVA_CONFIG@ -then -kernel-warn-key=annot-error=active -annot -eva
-   OPT: -kernel-warn-key=annot-error=active -eva @EVA_CONFIG@ -main main3
-   OPT: -kernel-warn-key=annot-error=active -eva @EVA_CONFIG@ -main main_err1
-   OPT: -kernel-warn-key=annot-error=active -eva @EVA_CONFIG@ -main main_err2
+   OPT: -no-annot -eva @EVA_CONFIG@ -then -kernel-warn-key=annot-error=warning -annot -eva
+   OPT: -kernel-warn-key=annot-error=warning -eva @EVA_CONFIG@ -main main3
+   OPT: -kernel-warn-key=annot-error=warning -eva @EVA_CONFIG@ -main main_err1
+   OPT: -kernel-warn-key=annot-error=warning -eva @EVA_CONFIG@ -main main_err2
 */
 
 void main(void)

@@ -17,10 +17,10 @@ EXIT: 0
 EXIT: 1
   OPT: -test-warn-key="*=abort"
 EXIT: 0
-  OPT: -test-warn-key=a=once
+  OPT: -test-warn-key=a=warning-once
   OPT: -test-warn-key a=feedback-once
 EXIT: 1
-  OPT: -test-warn-key a=err-once
+  OPT: -test-warn-key a=error-once
   OPT: -test-warn-key test-vis-err
   OPT: -test-warn-key test-inv-err
 EXIT: 4
