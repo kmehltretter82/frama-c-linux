@@ -86,11 +86,18 @@ let mk_init_function () =
     Varinfo.Hashtbl.fold_sorted
       (fun vi _ stmts ->
          if Misc.is_fc_or_compiler_builtin vi then stmts
-         else
+         else begin
+           let stmts =
+             if Ast_types.is_const vi.vtype then
+               (* a const global can't be modified after initialization. *)
+               Smart_stmt.mark_readonly vi :: stmts
+             else stmts
+           in
            (* a global is both allocated and initialized *)
            Smart_stmt.store_stmt vi
            :: Smart_stmt.initialize ~loc:Location.unknown (Cil.var vi)
-           :: stmts)
+           :: stmts
+         end)
       tbl
       []
   in
