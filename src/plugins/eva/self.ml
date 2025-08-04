@@ -28,6 +28,10 @@ include Plugin.Register
         "automatically computes variation domains for the variables of the program"
     end)
 
+(* Makes the help message of various categories mandatory. *)
+let register_category ~help = register_category ~help
+let register_warn_category ~help = register_warn_category ~help
+
 let () =
   add_plugin_output_aliases ~visible:false ~deprecated:true [ "value" ; "val" ]
 

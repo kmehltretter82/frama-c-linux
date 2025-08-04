@@ -47,6 +47,9 @@ val dkey_summary : category
 
 (** {2 Debug categories.} *)
 
+(** Same as Log's {!register_category}, but [help] is mandatory. *)
+val register_category: help:string -> string -> category
+
 val dkey_pointer_comparison: category
 val dkey_cvalue_domain: category
 val dkey_iterator : category
@@ -58,6 +61,10 @@ val dkey_callstacks : category
 val dkey_callstack_hash : category
 
 (** {2 Warning categories.} *)
+
+(** Same as Log's {!register_warn_category}, but [help] is mandatory. *)
+val register_warn_category:
+  help:string -> ?default:Log.warn_status -> string -> warn_category
 
 val wkey_alarm: warn_category
 val wkey_locals_escaping: warn_category
