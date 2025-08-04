@@ -1,5 +1,5 @@
 /* run.config*
-STDOPT: +"-kernel-warn-key annot-error:active"
+STDOPT: +"-kernel-warn-key annot-error=warning"
 */
 
 /*@ axiomatic A {
