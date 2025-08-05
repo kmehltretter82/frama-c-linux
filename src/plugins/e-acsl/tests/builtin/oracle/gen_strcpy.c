@@ -492,6 +492,7 @@ void test_memory_tracking(void)
 
 char const __fc_lit_string9[1UL] = "";
 char const __fc_lit_string12[5UL] = "abcd";
+char const __fc_lit_string14[1UL] = "";
 /*@ ensures
       result_ok_child_or_error: \result == 0 || \result > 0 || \result == -1;
     assigns \result;
@@ -684,6 +685,9 @@ void __e_acsl_globals_init(void)
   static char __e_acsl_already_run = 0;
   if (! __e_acsl_already_run) {
     __e_acsl_already_run = 1;
+    __e_acsl_store_block((void *)(__fc_lit_string14),1UL);
+    __e_acsl_full_init((void *)(& __fc_lit_string14));
+    __e_acsl_mark_readonly((void *)(__fc_lit_string14));
     __e_acsl_store_block((void *)(__fc_lit_string12),5UL);
     __e_acsl_full_init((void *)(& __fc_lit_string12));
     __e_acsl_mark_readonly((void *)(__fc_lit_string12));
@@ -705,6 +709,7 @@ void __e_acsl_globals_init(void)
 
 void __e_acsl_globals_clean(void)
 {
+  __e_acsl_delete_block((void *)(__fc_lit_string14));
   __e_acsl_delete_block((void *)(__fc_lit_string12));
   __e_acsl_delete_block((void *)(__fc_lit_string9));
   __e_acsl_delete_block((void *)(__fc_lit_string8));
@@ -1006,7 +1011,7 @@ int main(int argc, char const **argv)
   {
     pid_t pid_0 = __gen_e_acsl_fork();
     if (! pid_0) {
-      __e_acsl_builtin_strcpy(empty_str,"");
+      __e_acsl_builtin_strcpy(empty_str,__fc_lit_string14);
       __gen_e_acsl_exit(0);
     }
     else {

@@ -612,6 +612,21 @@ module rec Transfer
             Kernel_function.pretty
             kf;
           state
+      else if Functions.Libc.has_replacement (Kernel_function.get_name kf) then
+        (* these are functions that get their own built-in instrumentation.
+           To be on the safe side, if any of their arguments is a string
+           literal replacement, we force it to be seen as a normal, monitored
+           variable.
+        *)
+        List.fold_left
+          (fun state arg ->
+             match base_addr arg with
+             | Some vi when Ast_info.is_string_literal vi ->
+               Demote_string_literal.demote vi;
+               Varinfo.Hptset.add vi state
+             | _ -> state
+          )
+          state args
       else
         state
     in
