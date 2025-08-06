@@ -36,7 +36,7 @@ module type Location_map_bitwise = sig
   type lmap = Top | Map of map | Bottom
 
   include Datatype.S with type t = lmap
-  include Lattice_type.Bounded_Join_Semi_Lattice with type t := t
+  include Lattice_type.Bottom_Bounded_Join_Semi_Lattice with type t := t
   include Lattice_type.With_Top with type t := t
 
   module LOffset :

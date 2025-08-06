@@ -99,7 +99,7 @@ module LatticeSingleTaint = struct
       t.dependent_call
 
   (* Frama-C "datatype" for type [taint]. *)
-  include Datatype.Make_with_collections(struct
+  include Datatype.Make_with_collections (struct
       include Datatype.Serializable_undefined
 
       type t = taint_state
@@ -184,77 +184,61 @@ module LatticeSingleTaint = struct
 
 end
 
-(* Maps a taint namespace to corresponding taint state. *)
-module TaintNamespace = struct
-  include Datatype.String.Map
-  include Datatype.String.Map.Make(LatticeSingleTaint)
-
-  let find_or_empty key map =
-    try find key map
-    with Not_found -> LatticeSingleTaint.empty
-
-  let compare t1 t2 =
-    Datatype.String.Map.compare LatticeSingleTaint.compare t1 t2
-
-  let hash t =
-    fold (fun _ state acc ->
-        LatticeSingleTaint.hash state + acc)
-      t 0
-
-  let pp_locs_only fmt t =
-    Pretty_utils.pp_iter2 ~sep:"@ " ~between:": "
-      iter Format.pp_print_string LatticeSingleTaint.pp_locs_only fmt t
-
-  let pp_state fmt t =
-    let pp_per_taint namespace taint =
-      Format.pp_print_string fmt namespace;
-      Format.pp_print_newline fmt ();
-      LatticeSingleTaint.pp_state fmt taint
-    in
-    iter pp_per_taint t
-
-  let pretty fmt t =
-    if Self.is_debug_key_enabled dkey_debug
-    then pp_state fmt t
-    else pp_locs_only fmt t
-end
 
 module LatticeMultiTaint = struct
 
-  include Datatype.Make_with_collections(struct
-      include Datatype.Serializable_undefined
-      include Lattice_bounds.Top.Make_Datatype(TaintNamespace)
-      let name = "taint"
-    end)
+  (* Maps a taint name to its corresponding state. *)
+  module TaintNamespace = struct
+    include Datatype.String.Map
+    include Datatype.String.Map.Make (LatticeSingleTaint)
 
-  let empty = `Value TaintNamespace.empty
+    let find_or_empty key map =
+      try find key map
+      with Not_found -> LatticeSingleTaint.empty
 
-  let top = `Top
+    let compare t1 t2 =
+      Datatype.String.Map.compare LatticeSingleTaint.compare t1 t2
 
-  let join t1 t2 =
-    let join_taint t1 t2 =
+    let hash t =
+      fold (fun _ state acc -> LatticeSingleTaint.hash state + acc) t 0
+
+    let pp_locs_only fmt t =
+      Pretty_utils.pp_iter2 ~sep:"@ " ~between:": "
+        iter Format.pp_print_string LatticeSingleTaint.pp_locs_only fmt t
+
+    let pp_state fmt t =
+      let pp_per_taint namespace taint =
+        Format.pp_print_string fmt namespace;
+        Format.pp_print_newline fmt ();
+        LatticeSingleTaint.pp_state fmt taint
+      in
+      iter pp_per_taint t
+
+    let pretty fmt t =
+      if Self.is_debug_key_enabled dkey_debug
+      then pp_state fmt t
+      else pp_locs_only fmt t
+
+    let join t1 t2 =
       let merge_per_key _key maybe_state1 maybe_state2 =
         match maybe_state1, maybe_state2 with
-        | state, None | None, state -> state
-        | Some state1, Some state2 -> Some (LatticeSingleTaint.join state1 state2)
+        | state, None | None, state ->
+          state
+        | Some state1, Some state2 ->
+          Some (LatticeSingleTaint.join state1 state2)
       in
-      `Value (TaintNamespace.merge merge_per_key t1 t2)
-    in
-    Lattice_bounds.Top.join join_taint t1 t2
+      merge merge_per_key t1 t2
 
-  let widen kf stmt t1 t2 =
-    let open Lattice_bounds.Top.Operators in
-    let+ t1 and+ t2 in
-    let widen_per_key _key maybe_state1 maybe_state2 =
-      match maybe_state1, maybe_state2 with
-      | state, None | None, state -> state
-      | Some state1, Some state2 ->
-        Some (LatticeSingleTaint.widen kf stmt state1 state2)
-    in
-    TaintNamespace.merge widen_per_key t1 t2
+    let widen kf stmt t1 t2 =
+      let widen_per_key _key maybe_state1 maybe_state2 =
+        match maybe_state1, maybe_state2 with
+        | state, None | None, state -> state
+        | Some state1, Some state2 ->
+          Some (LatticeSingleTaint.widen kf stmt state1 state2)
+      in
+      merge widen_per_key t1 t2
 
-  let narrow t1 t2 =
-    let narrow_taint t1 t2 =
+    let narrow t1 t2 =
       let merge_per_key _key maybe_state1 maybe_state2 =
         match maybe_state1, maybe_state2 with
         | _, None | None, _ -> None
@@ -262,23 +246,34 @@ module LatticeMultiTaint = struct
           let `Value v = LatticeSingleTaint.narrow state1 state2 in
           Some v
       in
-      (TaintNamespace.merge merge_per_key t1 t2)
-    in
-    `Value (Lattice_bounds.Top.narrow narrow_taint t1 t2)
+      merge merge_per_key t1 t2
 
-  let is_included t1 t2 =
-    let is_included_taint t1 t2 =
+    let is_included t1 t2 =
       let fold2 f t1 t2 base =
         let f key state1 acc =
-          let state2 = TaintNamespace.find_or_empty key t2 in
+          let state2 = find_or_empty key t2 in
           f state1 state2 acc
         in
-        TaintNamespace.fold f t1 base
+        fold f t1 base
       in
       fold2 (fun state1 state2 acc ->
           LatticeSingleTaint.is_included state1 state2 && acc) t1 t2 true
-    in
-    Lattice_bounds.Top.is_included is_included_taint t1 t2
+  end
+
+  include TaintNamespace
+  include Lattice_bounds.Top.Bound_Lattice (TaintNamespace)
+  let name = "taint"
+
+  let empty = `Value TaintNamespace.empty
+
+  let widen kf stmt t1 t2 =
+    let open Lattice_bounds.Top.Operators in
+    let+ t1 and+ t2 in
+    TaintNamespace.widen kf stmt t1 t2
+
+  let narrow t1 t2 =
+    `Value (Lattice_bounds.Top.narrow TaintNamespace.narrow t1 t2)
+
 end
 
 module TransferSingleTaint = struct
@@ -533,7 +528,7 @@ module TransferMultiTaint = struct
       let assign_per_taint state =
         get_value @@ TransferSingleTaint.assign ~pos lv exp v valuation state
       in
-      TaintNamespace.map assign_per_taint state_map)
+      LatticeMultiTaint.map assign_per_taint state_map)
 
   let assume ~pos exp b valuation state =
     `Value (
@@ -542,7 +537,7 @@ module TransferMultiTaint = struct
       let assume_per_taint state =
         get_value @@ TransferSingleTaint.assume ~pos exp b valuation state
       in
-      TaintNamespace.map assume_per_taint state_map)
+      LatticeMultiTaint.map assume_per_taint state_map)
 
   let start_call ~pos call recursion valuation state =
     `Value (
@@ -552,7 +547,7 @@ module TransferMultiTaint = struct
         get_value @@ TransferSingleTaint.start_call ~pos call
           recursion valuation state
       in
-      TaintNamespace.map start_call_per_taint state_map)
+      LatticeMultiTaint.map start_call_per_taint state_map)
 
   let finalize_call ~pos call recursion ~pre ~post =
     `Value (
@@ -571,15 +566,15 @@ module TransferMultiTaint = struct
         in
         if LatticeSingleTaint.(equal empty state) then None else Some state
       in
-      let map_state = TaintNamespace.merge merge_per_key pre post in
+      let map_state = LatticeMultiTaint.merge merge_per_key pre post in
       (* Adds auto taints if -eva-auto-taint is set. *)
       let map_state =
         if auto_taint () then
-          let auto_state = TaintNamespace.find_or_empty "auto" map_state in
+          let auto_state = LatticeMultiTaint.find_or_empty "auto" map_state in
           let auto_state =
             TransferSingleTaint.add_call_auto_taint call auto_state
           in
-          TaintNamespace.add "auto" auto_state map_state
+          LatticeMultiTaint.add "auto" auto_state map_state
         else map_state
       in
       map_state)
@@ -589,7 +584,7 @@ module TransferMultiTaint = struct
       Format.fprintf fmt "%s@." namespace;
       TransferSingleTaint.show_expr valuation state fmt exp
     in
-    Lattice_bounds.Top.iter (TaintNamespace.iter show_expr_per_taint) state
+    Lattice_bounds.Top.iter (LatticeMultiTaint.iter show_expr_per_taint) state
 end
 
 
@@ -660,8 +655,8 @@ module Domain = struct
     | Some (loc_assign, taint) ->
       let open Lattice_bounds.Top.Operators in
       let+ state_map = state and+ taint_map = taint in
-      TaintNamespace.mapi (fun key state ->
-          let current_taint = TaintNamespace.find_or_empty key taint_map in
+      LatticeMultiTaint.mapi (fun key state ->
+          let current_taint = LatticeMultiTaint.find_or_empty key taint_map in
           logic_assign_per_taint (loc_assign, current_taint) location state)
         state_map
 
@@ -677,7 +672,7 @@ module Domain = struct
   let remove_bases bases state =
     let open Lattice_bounds.Top.Operators in
     let+ state_map = state in
-    TaintNamespace.map (remove_bases_per_taint bases) state_map
+    LatticeMultiTaint.map (remove_bases_per_taint bases) state_map
 
   let leave_scope _kf vars state =
     let bases = Base.Hptset.of_list (List.map Base.of_varinfo vars) in
@@ -702,7 +697,7 @@ module Domain = struct
                    locs_control = filter_base state.locs_control;
                    assume_stmts = Stmt.Set.empty; }
     in
-    TaintNamespace.map (filter_state bases) state_map
+    LatticeMultiTaint.map (filter_state bases) state_map
 
   let project = filter
 
@@ -837,7 +832,7 @@ module TaintLogic = struct
       let open Lattice_bounds.Top.Operators in
       let+ state_map = state in
       let taint_names = term_taint_namespaces arg in
-      TaintNamespace.mapi (fun key state ->
+      LatticeMultiTaint.mapi (fun key state ->
           if List.mem key taint_names then
             reduce_by_taint_predicate cvalue_env state arg positive
           else
@@ -863,7 +858,7 @@ module TaintLogic = struct
             let taint_names = term_taint_namespaces arg in
             let states_list =
               List.map
-                (fun key -> TaintNamespace.find_or_empty key state_map)
+                (fun key -> LatticeMultiTaint.find_or_empty key state_map)
                 taint_names
             in
             List.fold_left LatticeSingleTaint.join
@@ -914,9 +909,9 @@ module TaintLogic = struct
             Printer.pp_term term;
         let taint_names = term_taint_namespaces term in
         let add_taint state name =
-          let taint = TaintNamespace.find_or_empty name state in
+          let taint = LatticeMultiTaint.find_or_empty name state in
           let locs_data = Zone.join taint.locs_data over in
-          TaintNamespace.add name { taint with locs_data } state
+          LatticeMultiTaint.add name { taint with locs_data } state
         in
         List.fold_left add_taint state_map taint_names
     in
@@ -994,8 +989,8 @@ let is_tainted state ?indirect zone =
     match state with
     | `Top -> LatticeSingleTaint.top
     | `Value state_map ->
-      TaintNamespace.fold (fun _ state acc -> LatticeSingleTaint.join state acc)
-        state_map LatticeSingleTaint.empty
+      LatticeMultiTaint.fold (fun _ state acc ->
+          LatticeSingleTaint.join state acc) state_map LatticeSingleTaint.empty
   in
   let { locs_data; locs_control } = taint_state in
   let intersects_any z = Zone.(intersects (join locs_data locs_control) z) in

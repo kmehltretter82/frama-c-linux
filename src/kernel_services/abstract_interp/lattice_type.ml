@@ -30,12 +30,17 @@ module type Join_Semi_Lattice = sig
   (** over-approximation of union *)
 
   val is_included: t -> t -> bool
-  (**is first argument included in the second?*)
+  (** is first argument included in the second? *)
 end
 
-module type Bounded_Join_Semi_Lattice = sig
-  include Join_Semi_Lattice;;
+module type Bottom_Bounded_Join_Semi_Lattice = sig
+  include Join_Semi_Lattice
   val bottom: t (** smallest element *)
+end
+
+module type Top_Bounded_Join_Semi_Lattice = sig
+  include Join_Semi_Lattice
+  val top: t (** largest element *)
 end
 
 module type With_Top = sig
@@ -125,7 +130,7 @@ end
 
 (** Signature shared by some functors of module {!Abstract_interp}. *)
 module type AI_Lattice_with_cardinal_one = sig
-  include Bounded_Join_Semi_Lattice
+  include Bottom_Bounded_Join_Semi_Lattice
   include With_Top with type t:= t
   include With_Cardinal_One with type t := t
   include With_Narrow with type t := t
@@ -136,7 +141,7 @@ end
 (** Lattice with over- and under-approximation of join and meet, and
     intersection and difference. *)
 module type Full_Lattice = sig
-  include Bounded_Join_Semi_Lattice
+  include Bottom_Bounded_Join_Semi_Lattice
   include With_Top with type t := t
   include With_Narrow with type t := t
   include With_Under_Approximation with type t := t
