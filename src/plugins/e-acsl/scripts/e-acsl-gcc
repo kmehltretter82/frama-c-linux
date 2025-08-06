@@ -404,7 +404,7 @@ Options:
   -C         assume that the input files have already been instrumented
   -l         pass additional options to the linker
              (e.g. -l -lm)
-  -e         pass additional options to the prepreprocessor (requires -c)
+  -e         pass additional options to the compilation prepreprocessor
              (e.g. -e \"-DPI=3.14 -DE_ACSL_DEBUG_ASSERT\")
   -E         pass additional arguments to the Frama-C preprocessor
              (e.g. -E \"-Iinclude -DMACRO=1\")

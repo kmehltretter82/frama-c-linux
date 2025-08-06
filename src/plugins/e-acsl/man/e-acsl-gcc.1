@@ -29,7 +29,10 @@ show a help page.
 .TP
 .B -c, --compile
 compile the generated and the original (supplied) sources.
-By default no compilation is performed.
+Enabled by default; use -n or --no-compile to disable.
+.TP
+.B -n, --no-compile
+disable compilation of the generated and the original (supplied) sources.
 .TP
 .B -D, --rt-debug
 enable runtime debug features, i.e., compile unoptimized executable
@@ -125,6 +128,7 @@ pass the specified flags to the linker.
 .B -e, --cpp-flags=\fI<FLAGS>
 pass the specified flags to the preprocessor at compile-time.
 For instrumentation-time preprocessor flags see \fB--extra-cpp-args\fP option.
+Only takes effect in case compilation has not been disabled (\fB--no-compile\fP).
 .TP
 .B -q, --quiet
 suppress any output except for errors and warnings.

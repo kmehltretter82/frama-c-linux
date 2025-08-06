@@ -56,7 +56,7 @@ actually undefined because the assertion reads the uninitialized variable
 the case yet.
 
 \begin{logs}
-\$ e-acsl-gcc uninitialized.i -c -Omonitored_uninitialized
+\$ e-acsl-gcc uninitialized.i -Omonitored_uninitialized
 monitored_uninitialized.i: In function 'main':
 monitored_uninitialized.i:44:16: warning: 'x' is used uninitialized in this function
 [-Wuninitialized]

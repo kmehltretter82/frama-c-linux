@@ -163,7 +163,7 @@ Compilation and Linking of the original and the instrumented sources
 is enabled using the \shortopt{c} option.  For instance, command
 
 \begin{frama-c-commands}
-\$ e-acsl-gcc -c -omonitored_first.i first.i
+\$ e-acsl-gcc -omonitored_first.i first.i
 \end{frama-c-commands}
 
 instruments the code in \texttt{first.i}, outputs it to
@@ -198,7 +198,7 @@ generated from the original program and the executable generated from the
 
 For example, command
 \begin{frama-c-commands}
-\$ e-acsl-gcc -c -omonitored_first.i -Omonitored_first first.i
+\$ e-acsl-gcc -omonitored_first.i -Omonitored_first first.i
 \end{frama-c-commands}
 names the executables generated from \texttt{first.i} and
 \texttt{monitored\_first.i}: \texttt{monitored\_first} and
@@ -236,7 +236,7 @@ while \shortopt{e} and \shortopt{l} options allow for passing additional
 preprocessor and linker flags during \gcc invocations.  For example, command
 
 \begin{frama-c-commands}
-\$ e-acsl-gcc -c -F"-unicode" -e"-I/bar -I/baz" foo.c
+\$ e-acsl-gcc -F"-unicode" -e"-I/bar -I/baz" foo.c
 \end{frama-c-commands}
 
 yields an instrumented program \texttt{a.out.frama.c} where ACSL formulas
@@ -274,7 +274,7 @@ output during instrumentation and compilation of \texttt{foo.c} to the
 file named \texttt{/tmp/log}.
 
 \begin{frama-c-commands}
-\$ e-acsl-gcc -c -s/tmp/log foo.c
+\$ e-acsl-gcc -s/tmp/log foo.c
 \end{frama-c-commands}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -315,7 +315,7 @@ using the option \longopt{concurrency} of  \eacslgcc.
 
 Example of compilation with concurrency support using \eacslgcc:
 \begin{frama-c-commands}
-  \$ e-acsl-gcc -c foo.c --concurrency -o foo.frama.c -O foo
+  \$ e-acsl-gcc foo.c --concurrency -o foo.frama.c -O foo
 \end{frama-c-commands}
 
 The concurrency support is a two part activation: first the
@@ -458,7 +458,7 @@ argument is equal to 0.  However, we can generate an instrumented code and
 compile it using the following command:
 
 \begin{logs}
-\$ e-acsl-gcc -c -omonitored_rte.i -Orte rte.i
+\$ e-acsl-gcc -omonitored_rte.i -Orte rte.i
 \end{logs}
 
 Now, when \T{rte.e-acsl} is executed, you get the following output indicating
@@ -555,7 +555,7 @@ referencing unallocated memory.  The execution of the instrumented program thus
 reports the violation of the second annotation:
 
 \begin{logs}
-\$ e-acsl-gcc -c -Ovalid valid.c
+\$ e-acsl-gcc -Ovalid valid.c
 \$ ./valid.e-acsl
 valid.c: In function 'main'
 valid.c:11: Error: Assertion failed:
@@ -601,17 +601,17 @@ At the level of \eacslgcc you can choose between different memory models using
 the \shortopt{m} switch followed by the name of the memory model to link
 against.  For instance, command
 \begin{logs}
-\$ e-acsl-gcc -mbittree -c -Ovalid valid.c
+\$ e-acsl-gcc -mbittree -Ovalid valid.c
 \end{logs}
 links a program generated from \T{valid.c} against the library implementing the
 bittree-based memory model, whereas the following invocation uses shadow-based
 tracking:
 \begin{logs}
-\$ e-acsl-gcc -msegment -c -Ovalid valid.c
+\$ e-acsl-gcc -msegment -Ovalid valid.c
 \end{logs}
 It is also possible to generate executables using both models as follows:
 \begin{logs}
-\$ e-acsl-gcc -msegment,bittree -c -Ovalid valid.c
+\$ e-acsl-gcc -msegment,bittree -Ovalid valid.c
 \end{logs}
 In this case, \eacslgcc produces 3 executables: \T{valid},
 \T{valid.e-acsl-segment} and \T{valid.e-acsl-bittree} corresponding to an
@@ -676,7 +676,7 @@ feature can be enabled using the \shortopt{M} switch of \eacslgcc or
 %% \longopt{rt-debug} flag of \eacslgcc as follows:
 
 %% \begin{shell}
-%% \$ e-acsl-gcc --rt-debug -c -omonitored_rte_debug.c -Orte_debug rte_debug.i
+%% \$ e-acsl-gcc --rt-debug -omonitored_rte_debug.c -Orte_debug rte_debug.i
 %% \end{shell}
 
 %% A run of the monitored executable shows violation of the \eacsl annotation.
@@ -729,7 +729,7 @@ that uses \texttt{exit(CODE)} instead of \texttt{abort}.
 For instance, the program generated using the following command
 exits with code \texttt{5} on a predicate violation.
 \begin{logs}
-\$ e-acsl-gcc -c --fail-with-code=5 foo.c
+\$ e-acsl-gcc --fail-with-code=5 foo.c
 \end{logs}
 
 Forceful termination of a monitored program can be disabled using
@@ -780,7 +780,7 @@ default implementation of \texttt{\_\_e\_acsl\_assert}\codeidxdef{e\_acsl\_asser
 with the customized one specified in \texttt{my\_assert.c}.
 
 \begin{logs}
-\$ e-acsl-gcc -c -X first.i -Ofirst --external-assert=my_assert.c
+\$ e-acsl-gcc -X first.i -Ofirst --external-assert=my_assert.c
 \$ ./first.e-acsl
 Assertion in file first.i at line 3 in function main is valid (trustworthy).
 The verified predicate was: `x == 0'.
@@ -792,7 +792,7 @@ The default assertion function prints the values contributing to an assertion
 along with the error message.
 
 \begin{logs}
-\$ e-acsl-gcc -c -X first.i -Ofirst
+\$ e-acsl-gcc -X first.i -Ofirst
 \$ ./first.e-acsl
 first.i: In function 'main'
 first.i:4: Error: Assertion failed:
@@ -806,7 +806,7 @@ This behavior can be overriden by using the \longopt{no-assert-print-data}
 option of \eacslgcc.
 
 \begin{logs}
-  \$ e-acsl-gcc -c -X first.i -Ofirst --no-assert-print-data
+  \$ e-acsl-gcc -X first.i -Ofirst --no-assert-print-data
   \$ ./first.e-acsl
   first.i: In function 'main'
   first.i:4: Error: Assertion failed:
@@ -843,7 +843,7 @@ replace the default implementation of \texttt{\_\_e\_acsl\_print\_value}
 \texttt{my\_print\_value.c}.
 
 \begin{logs}
-\$ e-acsl-gcc -c -X first.i -Ofirst \
+\$ e-acsl-gcc -X first.i -Ofirst \
     --external-print-value=my_print_value.c
 \$ ./first.e-acsl
 first.i: In function 'main'
@@ -859,7 +859,7 @@ and \texttt{\_\_e\_acsl\_print\_value}\codeidxdef{e\_acsl\_print\_value} can be
 used at the same time.
 
 \begin{logs}
-\$ e-acsl-gcc -c -X first.i -Ofirst \
+\$ e-acsl-gcc -X first.i -Ofirst \
     --external-assert=my_assert.c \
     --external-print-value=my_print_value.c
 \$ ./first.e-acsl
@@ -1161,7 +1161,7 @@ are potential overflows in this case), just do:
 Automatic assertion generation can also be enabled via \eacslgcc directly via
 the following command:
 \begin{frama-c-commands}
-\$ e-acsl-gcc -c -Ocombine -omonitored_combine.i --rte=all combine.i
+\$ e-acsl-gcc -Ocombine -omonitored_combine.i --rte=all combine.i
 \end{frama-c-commands}
 
 Note the use of \eacslgcc \longopt{rte} option which asks \framac to combine
