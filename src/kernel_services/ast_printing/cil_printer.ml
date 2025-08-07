@@ -961,10 +961,14 @@ class cil_printer () = object (self)
           | TFun(rt, _, _) when (Cil.need_cast rt destt) ->
             fprintf fmt "(%a)" (self#typ None) destt
           | _ -> ()));
-      (* Now the function name *)
+      (* Now the function name. Build an lvalue and print it using self#lval.
+         This is necessary for Printer_tag to create a localizable (a marker
+         in the server) for the function called, allowing users to interact
+         with it in the GUI (there is no localizable/marker for lhost only). *)
+      let f_lval = f, NoOffset in
       (match f with
-       | Var _ -> self#lhost fmt f
-       | Mem _ -> fprintf fmt "(%a)"  self#lhost f);
+       | Var _ -> self#lval fmt f_lval
+       | Mem _ -> fprintf fmt "(%a)"  self#lval f_lval);
 
       let (_, param_ts, _, _) = Cil.splitFunctionType (Cil.typeOfLhost f) in
       let _, g_params_ts = Cil.argsToPairOfLists param_ts in
