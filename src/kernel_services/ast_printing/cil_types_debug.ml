@@ -29,6 +29,9 @@ let print_full_varinfo = false
 let print_full_fundec = false
 let print_full_spec = false
 
+(* logic types may be recursive resulting in infinity recursive calls. *)
+let print_full_logic_types = false
+
 let pp_list fmt = Pretty_utils.pp_list fmt ~sep:"; " ~pre:"[" ~suf:"]" ~empty:"[]"
 let pp_option fmt = Pretty_utils.pp_opt ~none:"None" ~pre:"Some(" ~suf:")" fmt
 let pp_ref pp fmt r = Format.fprintf fmt "Ref(%a)" pp !r
@@ -785,11 +788,14 @@ and pp_logic_var fmt logic_var =
   }*)
 
 and pp_logic_ctor_info fmt logic_ctor_info =
-  Format.fprintf fmt "{ctor_name=%a;ctor_type=<...>;ctor_params=%a}"
-    pp_string logic_ctor_info.ctor_name
-    (*note: printing ctor_type type may lead to infinite recursion*)
-    (*pp_logic_type_info logic_ctor_info.ctor_type*)
-    (pp_list pp_logic_type) logic_ctor_info.ctor_params
+  if print_full_logic_types then
+    Format.fprintf fmt "{ctor_name=%a;ctor_type=%a;ctor_params=%a}"
+      pp_string logic_ctor_info.ctor_name
+      pp_logic_type_info logic_ctor_info.ctor_type
+      (pp_list pp_logic_type) logic_ctor_info.ctor_params
+  else (* omit elements that may lead to infinite recursion *)
+    Format.fprintf fmt "{ctor_name=%a;ctor_type=<...>;ctor_params=<...>}"
+      pp_string logic_ctor_info.ctor_name
 
 and pp_quantifiers fmt = pp_list pp_logic_var fmt
 
