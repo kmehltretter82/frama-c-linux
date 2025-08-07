@@ -829,13 +829,7 @@ and infer_predicate ~logic_env p =
     infer_predicate ~logic_env p
   | Pforall _
   | Pexists _ ->
-    let guards, goal =
-      Error.retrieve_preprocessing
-        "quantified predicate"
-        Bound_variables.get_preprocessed_quantifier
-        p
-        Printer.pp_predicate
-    in
+    let guards, goal = Bound_variables.get_preprocessed_quantifier p in
     let loc = p.pred_loc in
     let rec do_analysis guards new_guards logic_env =
       match guards with

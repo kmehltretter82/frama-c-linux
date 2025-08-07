@@ -9,11 +9,13 @@
 open Cil_types
 
 val get_preprocessed_quantifier:
-  predicate -> ((term * logic_var * term) list * predicate) Error.result
+  predicate -> (term * logic_var * term) list * predicate
 (** @return the preprocessed of a quantified predicate the
     [(term * logic_var * term) list] is the list of all the quantified variables
     along with their syntactic guards, and the [predicate] is the goal: the
-    original predicate with all the quantifiers removed *)
+    original predicate with all the quantifiers removed.
+    @raises Typing_error if predicate cannot be typed.
+    @raises Abort.fatal if predicate has not been preprocessed. *)
 
 val add_guard_for_small_type : logic_var -> predicate -> unit
 (** Adds an optional additional guard condition that comes from the typing *)

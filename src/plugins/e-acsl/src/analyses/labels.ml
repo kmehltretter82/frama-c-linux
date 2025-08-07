@@ -81,15 +81,18 @@ let add_at_for_stmt data stmt =
        the same, keep the old data. *)
     ()
 
-(* see documentation in .mli *)
 let at_for_stmt stmt =
-  if !preprocess_done then
-    let ats_ref =
-      Stmt.Hashtbl.find_def at_data_for_stmts stmt (ref [])
-    in
-    Result.Ok !ats_ref
-  else
-    Error.not_memoized ()
+  let retrieve stmt =
+    if !preprocess_done then
+      let ats_ref = Stmt.Hashtbl.find_def at_data_for_stmts stmt (ref []) in
+      Result.Ok !ats_ref
+    else Error.not_memoized ()
+  in
+  Error.retrieve_preprocessing
+    "labels pre-analysis"
+    retrieve
+    stmt
+    Printer.pp_stmt
 
 (**************************************************************************)
 (************************** AST traversal *********************************)
@@ -408,16 +411,8 @@ end = struct
       let env = { env with lscope = Lscope.add lvs env.lscope } in
       do_predicate ?error env p
     | Pforall _ | Pexists _ -> begin
-        let preprocessed_quantifier_or_error =
-          try
-            Bound_variables.get_preprocessed_quantifier p
-          with Error.Not_memoized _ ->
-            Options.fatal
-              "preprocessing of quantifier '%a' has not been performed"
-              Printer.pp_predicate p
-        in
-        match preprocessed_quantifier_or_error with
-        | Result.Ok (bound_vars, goal) ->
+        try
+          let bound_vars, goal = Bound_variables.get_preprocessed_quantifier p in
           if !has_empty_quantif_ref bound_vars then
             error
           else begin
@@ -441,7 +436,7 @@ end = struct
             let error = do_list do_it ?error env bound_vars in
             do_predicate ?error env goal
           end
-        | Result.Error exn -> set_error ?error exn
+        with exn -> set_error ?error exn
       end
     | Pnot p ->
       do_predicate ?error env p

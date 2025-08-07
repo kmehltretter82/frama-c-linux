@@ -62,13 +62,7 @@ module Label_ids =
 
 let convert kf env loc ~is_forall quantif =
   (* guarded quantification over integers (or a subtype of integer) *)
-  let bound_vars, goal =
-    Error.retrieve_preprocessing
-      "preprocessing of quantified predicate"
-      Bound_variables.get_preprocessed_quantifier
-      quantif
-      Printer.pp_predicate
-  in
+  let bound_vars, goal = Bound_variables.get_preprocessed_quantifier quantif in
   let logic_env = Env.Logic_env.get env in
   let empty = has_empty_quantif_with_false_negative ~logic_env bound_vars in
   match empty, is_forall with
