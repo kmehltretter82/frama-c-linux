@@ -1,5 +1,6 @@
 [e-acsl] beginning translation.
 [e-acsl:analysis:inductive] function extraction with mode incomplete in 2
+[e-acsl] Warning: Translation of fibo might be unsound (if multiple cases apply to some given arguments simultaneously).
 [e-acsl] translation done in project "e-acsl".
 [eva:alarm] fibo.c:17: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.

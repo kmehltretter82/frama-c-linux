@@ -1,0 +1,12 @@
+two_results.c: In function 'main'
+two_results.c:18: Warning: no sound verdict for Assertion (guess: ok).
+	the considered predicate is:
+	P(0, 0)
+	With values at failure point:
+	- P(0, 0): 1
+two_results.c: In function 'main'
+two_results.c:19: Warning: no sound verdict for Assertion (guess: ok).
+	the considered predicate is:
+	P(1, 1)
+	With values at failure point:
+	- P(1, 1): 1

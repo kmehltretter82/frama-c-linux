@@ -770,6 +770,13 @@ This simple subset is extended in some important ways giving rise to the
     the complicated argument, needs to be bound first by a recursive
     occurrence of $P$ in a hypothesis.
 \end{itemize}
+
+\begin{important}
+  The translation of this extended subset is currently
+  unsound if the inductive predicate has multiple cases that simultaneously
+  match for the same given arguments. A corresponding warning is printed.
+\end{important}
+
 As these conditions (especially the boundness conditions) are too intricate to
 explain here, let's consider a few more examples in order to convey an
 intuition for which inductive definitions are supported and which are not.

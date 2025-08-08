@@ -580,10 +580,22 @@ end
 let is_fallthrough_term = Fallthrough_terms.mem
 
 module Derived_functions = struct
-  let tbl = Logic_info.Hashtbl.create 9
-  let add = Logic_info.Hashtbl.add tbl
-  let iter f = Logic_info.Hashtbl.iter f tbl
-  let clear () = Logic_info.Hashtbl.clear tbl
+  open Logic_info.Hashtbl
+  let tbl = create 9
+  let add = add tbl
+  let iter f = iter f tbl
+  let clear () = clear tbl
+end
+
+(* In this implementation the extraction of logic functions is unsound. If
+   multiple cases apply for some given arguments the verdict may be wrong.
+   So we record here predicates that depend on logic functions. *)
+module Unsound_predicates = struct
+  open Logic_info.Hashtbl
+  let tbl = create 9
+  let add li = add tbl li ()
+  let mem = mem tbl
+  let clear () = clear tbl
 end
 
 module Extractions = struct
@@ -604,6 +616,7 @@ module rec Make_extractor : functor (Out : Out_language) -> sig
 end = functor (Out : Out_language) -> struct
 
   let extract ?name ~mode li = Extractions.memo ~mode li @@ fun ~mode li ->
+    let li_rec = li in
     Options.debug ~dkey ~level:2
       "@[<2>extracting data from inductive using mode %a:@ @[%a@]@]"
       Mode.pretty mode pp_logic_info li;
@@ -661,7 +674,9 @@ end = functor (Out : Out_language) -> struct
               Mode.in_out_args ~mode:mode' args,
               match mode' with
               | Complete -> Extractions.get ~mode:Complete li
-              | _ -> FunctionExtractor.extract ~mode:mode' li
+              | _ ->
+                Unsound_predicates.add li_rec;
+                FunctionExtractor.extract ~mode:mode' li
           in
           begin match in_out_args with
             | _, None -> (* complete mode *)
@@ -771,6 +786,7 @@ end
         Printer.pp_logic_info li
         Printer.pp_logic_info f
         pp_logic_info wrapper;
+      Unsound_predicates.add wrapper;
       wrapper
 
   let extract li =
@@ -781,8 +797,18 @@ end
 
 let extract_predicate = PredicateExtractor.extract
 
+let is_unsound_predicate li =
+  let res = Unsound_predicates.mem li in
+  if res then
+    Options.warning ~once:true
+      "Translation of %a might be unsound (if multiple cases apply \
+       to some given arguments simultaneously)."
+      Printer.pp_logic_info li;
+  res
+
 let clear () =
   Fallthrough_terms.clear ();
   Extractions.clear ();
   Derived_functions.clear ();
-  InductiveDefinition.clear ()
+  InductiveDefinition.clear ();
+  Unsound_predicates.clear ()

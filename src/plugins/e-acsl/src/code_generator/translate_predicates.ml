@@ -114,6 +114,15 @@ let rec predicate_content_to_exp_old ?(inplace=false) ?name ~loc ~adata ~env ~kf
   | Ptrue -> Cil.one ~loc, adata, env
   | Papp (li, [], args)
   | Papp (li, [BuiltinLabel Here], args) ->
+    let env =
+      if Logic_normalizer.is_unsound_predicate li then
+        let sound_verdict_vi = Prepare_ast.sound_verdict () in
+        let stmt =
+          Smart_stmt.assigns ~loc ~result:(Cil.var sound_verdict_vi) (Cil.zero ~loc)
+        in
+        Env.add_stmt env stmt
+      else env
+    in
     let e, adata, env =
       Logic_functions.app_to_exp ~adata ~loc kf env li args in
     let adata = Assert.register_pred ~loc env p e adata in

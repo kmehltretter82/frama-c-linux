@@ -43,6 +43,8 @@ end
     predicate p (from which f has been derived) as a key and f as a value.
     There may be multiple logic functions associated with a predicate. *)
 
+val is_unsound_predicate : logic_info -> bool
+
 val extract_predicate : logic_info -> logic_info
 (** transform a [logic_info] containing an inductively defined predicate
     ([LBinductive]) into a "directly" defined predicated ([LBpred]).
