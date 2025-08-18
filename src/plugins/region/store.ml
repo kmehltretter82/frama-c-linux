@@ -18,7 +18,7 @@ type 'a store = {
   mutable map : 'a Imap.t ;
 }
 
-let new_store () = { rid = 0 ; map = Imap.empty }
+let new_store () = { rid = 0 ; map = Imap.empty  }
 let copy r = { rid = r.rid ; map = r.map }
 
 let make s v =
