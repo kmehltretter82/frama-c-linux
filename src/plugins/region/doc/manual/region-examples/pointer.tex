@@ -1,0 +1,20 @@
+\begin{multicols}{2}
+    \begin{lstlisting}
+void g(short x, int y) {
+    short *p = &x;
+    *p = 1;
+    p = (short *) &y;
+    p[0] = 0;
+    p[1] = 1;
+}
+\end{lstlisting}
+\columnbreak
+%    \begin{tikzpicture}
+%        \draw node[ellipse, fill=yellow, draw, scale=1.5] (pointer) at (0,0) {R$^*$} ;
+%        \draw node[ellipse, fill=green, draw, scale=1.5]  (value) at  (3,0)  {RW(i)} ;
+%        \draw[thick,-{Latex[length=3mm]}] (pointer) -- (value) ;
+%    \end{tikzpicture}
+\centering
+\includegraphics[height=1.5cm]{"images/pointer-1.jpg"}
+
+\end{multicols}
