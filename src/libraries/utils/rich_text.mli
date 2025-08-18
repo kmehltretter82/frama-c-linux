@@ -19,6 +19,7 @@ val empty : message
     only semantic tags is not considered empty. *)
 val is_empty : message -> bool
 
+val of_string : string -> message
 val size : message -> int
 val char_at : message -> int -> char
 val substring : message -> int -> int -> string
