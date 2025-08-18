@@ -248,12 +248,11 @@ export function Item(props: ItemProps): JSX.Element {
       ref={ref}
       className={className}
       style={props.style}
-      title={props.title}
       onClick={onClick}
       onDoubleClick={onDoubleClick}
       onContextMenu={onContextMenu}
     >
-      <Label icon={props.icon} label={props.label} />
+      <Label icon={props.icon} label={props.label} title={props.title} />
       {props.children}
       {makeBadge(props.badge)}
     </div>

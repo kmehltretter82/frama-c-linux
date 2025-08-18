@@ -191,7 +191,7 @@ function addHelpMenuItems(): void {
 
 async function duplicateCurrentProject(): Promise<void> {
   const current = await Server.send(Project.getCurrent, null);
-  Projects.duplicateProject(current, "Duplicate current project");
+  Projects.duplicateProject(current);
 }
 
 async function deleteCurrentProject(): Promise<void> {
@@ -201,7 +201,7 @@ async function deleteCurrentProject(): Promise<void> {
 
 async function renameCurrentProject(): Promise<void> {
   const current = await Server.send(Project.getCurrent, null);
-  Projects.renameProject(current, "Rename current project");
+  Projects.renameProject(current);
 }
 
 export function addProjectSubMenu(others?: Dome.MenuItemProps[]): void {

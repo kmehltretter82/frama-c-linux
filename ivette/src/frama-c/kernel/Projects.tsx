@@ -106,47 +106,60 @@ export function newProject(): void {
   showModalProject('Create project', onValidate);
 }
 
+function getProject(id?: number): Project.listData | undefined {
+  const projects = States.getSyncArrayData(Project.list);
+  return projects.find(e => e.id === id);
+}
+
 /** Rename a project */
-export function renameProject(
-  id: number, title: string, project?: string
-): void {
+export function renameProject(id: number, project?: string): void {
+  const name = project || getProject(id)?.name;
+  const title = `Rename project "${name}" (id:${id})`;
   const onValidate = (name: string): void => {
     Server.send(Project.rename, [id, name]).then((error) => {
       if(!error) Dialogs.closeModal();
       else showError('Error while renaming project', error);
     });
   };
-  showModalProject(title, onValidate, project);
+  showModalProject(title, onValidate, name);
 }
 
 /** Remove a project */
 export async function removeProject(id: number): Promise<void> {
+  function deletionError(content: string): void {
+    showError('Error while deleting project', content);
+  }
+
   const projects = States.getSyncArrayData(Project.list);
   if(projects.length === 1) {
-    showError('Error while deleting project',
-      'The last project cannot be removed');
-    return;
+    return deletionError('The last project cannot be removed');
+  }
+
+  const project = projects.find(e => e.id === id);
+  if(!project) {
+    return deletionError(`The project with id '${id}' doesn't exist`);
   }
 
   const confirm = await Dialogs.showMessageBox({
+    block: true,
     buttons: [
       { label: 'Cancel' },
       { label: 'Ok', value: true }
     ],
-    details: 'Confirm to delete the project.',
-    message: 'Delete project',
+    details: `Confirm to delete project "${project.name}" (id:${id}).`,
+    message: `Delete project "${project.name}"`,
   });
 
   if(confirm === true) {
     const error = await Server.send(Project.remove, id);
-    if(error) showError('Error while deleting project', error);
+    if(error) deletionError(error);
   }
 }
 
 /** Duplicate a project */
-export function duplicateProject(
-  id: number, title: string, project?: string
-): void {
+export function duplicateProject(id: number, project?: string): void {
+  const name = project || getProject(id)?.name;
+  const title = `Duplicate project "${name}" (id:${id})`;
   const onValidate = (name: string): void => {
     Server.send(Project.copy, [id, name]).then((error) => {
       if(!error) Dialogs.closeModal();
@@ -154,7 +167,7 @@ export function duplicateProject(
     });
     Dialogs.modalLoader.setValue(true);
   };
-  showModalProject(title, onValidate, project);
+  showModalProject(title, onValidate, name);
 }
 
 /** Save a project */
@@ -180,14 +193,14 @@ function getActions(id: number, name: string): React.JSX.Element {
         icon='EDIT'
         size={14}
         title='Rename'
-        onClick={() => renameProject(id, `Rename project: ${name}`, name)}
+        onClick={() => renameProject(id, name)}
       />
       <IconButton
         icon='DUPLICATE'
         size={14}
         title='Duplicate'
         onClick={() =>
-          duplicateProject(id, `Duplicate project: ${name}`, name)
+          duplicateProject(id, name)
         }
       />
       <IconButton
