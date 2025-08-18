@@ -216,17 +216,11 @@ module Regions = Data.Jlist(Region)
 (* --- Server API                                                         --- *)
 (* -------------------------------------------------------------------------- *)
 
-let map_of_localizable ?(atStmt=false) (loc : Printer_tag.localizable) =
+let map_of_localizable (loc : Printer_tag.localizable) =
   let open Printer_tag in
   match kf_of_localizable loc with
   | None -> raise Not_found
-  | Some kf ->
-    let domain = Analysis.find kf in
-    if atStmt then
-      match ki_of_localizable loc with
-      | Kglobal -> domain.map
-      | Kstmt s -> Stmt.Map.find s domain.body
-    else domain.map
+  | Some kf -> (Analysis.find kf).map
 
 let region_of_localizable (m: Memory.map) (loc: Printer_tag.localizable) =
   try
@@ -276,7 +270,7 @@ let () =
     ~output:(module Regions)
     ~signals:[signal]
     begin fun loc ->
-      try Memory.regions @@ map_of_localizable ~atStmt:true loc
+      try Memory.regions @@ map_of_localizable loc
       with Not_found -> []
     end
 

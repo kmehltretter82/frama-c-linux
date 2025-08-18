@@ -20,8 +20,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cil_datatype
-
 (* -------------------------------------------------------------------------- *)
 (* ---  Projectification                                                  --- *)
 (* -------------------------------------------------------------------------- *)
@@ -35,7 +33,7 @@ module DOMAIN : Datatype.S with type t = Code.domain =
       let mem_project = Datatype.never_any_project
       let reprs =
         let m = Memory.create () in
-        Code.[{ map = m; body = Stmt.Map.empty ; spec = Property.Map.empty }]
+        Code.[{ map = m; spec = Property.Map.empty }]
     end)
 
 module STATE = State_builder.Hashtbl(Kernel_function.Hashtbl)(DOMAIN)
