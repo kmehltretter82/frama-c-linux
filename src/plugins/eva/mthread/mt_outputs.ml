@@ -539,20 +539,17 @@ module Html = struct
         s ThreadState.pretty th (String.concat " " args)
     in
     begin
-      try
-        let ret = Command.spawn ~timeout:60 "dot" args in
-        match ret with
-        | Unix.WEXITED 0 ->
-          Mt_self.debug "remove %a\n" Filepath.pretty tmp_file;
-          Filesystem.remove_file tmp_file
-        | Unix.WEXITED code ->
-          fail (Printf.sprintf "Error (code %d)" code)
-        | Unix.WSIGNALED id -> fail (Printf.sprintf "Signal %d" id)
-        | Unix.WSTOPPED id ->
-          fail (Printf.sprintf "Process stopped (signal %d)" id)
-      with
-      | Sys_error s -> fail (Printf.sprintf "Error (%s)" s)
-      | Async.Cancel -> fail "Timeout or user interruption"
+      match Command.spawn ~timeout:60 "dot" args with
+      | Unix.WEXITED 0 ->
+        Mt_self.debug "remove %a\n" Filepath.pretty tmp_file;
+        Filesystem.remove_file tmp_file
+      | Unix.WEXITED code ->
+        fail (Printf.sprintf "Error (code %d)" code)
+      | Unix.WSIGNALED id -> fail (Printf.sprintf "Signal %d" id)
+      | Unix.WSTOPPED id ->
+        fail (Printf.sprintf "Process stopped (signal %d)" id)
+      | exception Sys_error s -> fail (Printf.sprintf "Error (%s)" s)
+      | exception Async.Cancel -> fail "Timeout or user interruption"
     end;
     Kernel.Unicode.set unicode;
     link_fname
