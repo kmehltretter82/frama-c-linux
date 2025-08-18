@@ -381,12 +381,18 @@ export function Functions(props: ScrollableParent): JSX.Element {
 // --- Global variables section
 // --------------------------------------------------------------------------
 
-function makeVarItem(
+interface VarItemProps {
+  variable: Ast.globalsData,
   scope: States.Scope,
-  props: Ast.globalsData,
   icon?: string
-): JSX.Element {
-  const { name, type, decl } = props;
+}
+
+function VarItem(props: VarItemProps): JSX.Element {
+  const { variable, scope, icon } = props;
+  const { name, type, decl } = variable;
+  const varMarker = React.useMemo(
+    () => States.getDeclaration(decl).self, [decl]);
+  const { markers } = Locations.useSelection();
   return (
     <Item
       key={decl}
@@ -395,7 +401,12 @@ function makeVarItem(
       title={type}
       selected={decl === scope}
       onSelection={() => States.setCurrentScope(decl)}
-    />
+    >
+      {markers && markers.includes(varMarker) &&
+         <Icon id='MULTICHECK' kind='selected'
+          title='In the scope of multi-selection'/>
+      }
+    </Item>
   );
 }
 
@@ -500,7 +511,7 @@ export function Variables(props: ScrollableParent): JSX.Element {
     variables
       .filter(showVariable)
       .sort((v1, v2) => alpha(v1.name, v2.name))
-      .map((v) => makeVarItem(scope, v));
+      .map((v) => <VarItem key={v.decl} scope={scope} variable={v}/>);
 
   return (
     <List
@@ -729,9 +740,8 @@ export function Files(props: FilesProps): JSX.Element {
       fcts.map(fct =>
         <FctItem key={fct.decl} fct={fct} scope={scope} icon='FUNCTION'/>)
       : [];
-    const varsComp: JSX.Element[] = showVars ?
-      vars.map((v) => makeVarItem(scope, v, 'VARIABLE'))
-      : [];
+    const varsComp: JSX.Element[] = showVars ? vars.map((v) =>
+      <VarItem key={v.decl} scope={scope} variable={v} icon='VARIABLE'/>) : [];
     const items = fctsComp.concat(varsComp);
     if(items.length === 0) return null;
 
