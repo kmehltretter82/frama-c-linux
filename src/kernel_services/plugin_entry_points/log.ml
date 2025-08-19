@@ -189,15 +189,6 @@ let print_delayed job =
 (* --- Echo Line(s)                                                       --- *)
 (* -------------------------------------------------------------------------- *)
 
-(* whenever the first line of the event shall be printed along the prefix *)
-let is_first_line_prefixed = function
-  | { evt_category = None ; evt_source = None } -> true
-  | _ -> false
-
-let is_single_line text =
-  try ignore (String.index_from text 0 '\n') ; false
-  with Not_found -> true
-
 let echo_substring fmt text pos len =
   (* Do replace by Format.pp_print_substring_as as soon as OCaml 5.1 is
      the minimal version supported by Frama-C *)
@@ -209,73 +200,79 @@ let echo_firstline fmt text p q width =
   let n = min width (t-p) in
   echo_substring fmt text p n
 
-let echo_newline fmt =
-  Format.fprintf fmt "\n"
-
-(* output indentation unless the first line is along the prefix. *)
-let echo_line fmt ~is_prefixed text k n =
-  if not is_prefixed then Format.fprintf fmt "  ";
-  echo_substring fmt text k n
-
-(* [is_prefixed] can only be true for the first line. *)
-let rec echo_lines ?(is_prefixed=false) fmt text p q =
-  if p <= q then
-    let t = try String.index_from text p '\n' with Not_found -> (-1) in
-    if t < 0 || t > q then begin
-      (* incomplete, last line *)
-      echo_line fmt ~is_prefixed text p (q+1-p) ;
-      echo_newline fmt ;
+let formatter_with_indentation fmt amount =
+  let blank = String.make amount ' ' in
+  let begining_of_line = ref false in
+  let rec output old_output text p n =
+    if n > 0 then begin
+      (* Output indentation on each begining of a line *)
+      if !begining_of_line then old_output blank 0 amount;
+      match String.index_from_opt text p '\n' with
+      | Some t when t >= 0 && t <= p + n ->
+        (* complete line *)
+        let len = t + 1 - p in
+        old_output text p len;
+        begining_of_line := true;
+        output old_output text (t + 1) (n - len)
+      | _ ->
+        (* incomplete or last line *)
+        old_output text p n;
+        begining_of_line := false;
     end
-    else begin
-      (* complete line *)
-      echo_line fmt ~is_prefixed text p (t+1-p) ;
-      echo_lines fmt text (t+1) q ;
-    end
+  in
+  formatter_with ~output fmt
 
 (* -------------------------------------------------------------------------- *)
-(* --- Echo Event                                                         --- *)
+(* --- Events                                                             --- *)
 (* -------------------------------------------------------------------------- *)
 
-let add_source buffer = function
-  | None -> ()
-  | Some src ->
-    let fmt = Format.formatter_of_buffer buffer in
-    Format.fprintf fmt "%a: @?" Filepath.pp_pos src
+module Event =
+struct
+  type t = event
 
-let add_category buffer = function
-  | None -> ()
-  | Some a -> Buffer.add_char buffer ':' ; Buffer.add_string buffer a
+  let pp_source fmt = function
+    | None -> ()
+    | Some pos ->
+      Format.fprintf fmt "%a: @?" Filepath.pp_pos pos
 
-let add_kind buffer = function
-  | Result | Feedback | Debug -> ()
-  | Error   -> Buffer.add_string buffer "User Error: "
-  | Warning -> Buffer.add_string buffer "Warning: "
-  | Failure -> Buffer.add_string buffer "Failure: "
+  let pp_category fmt = function
+    | None -> ()
+    | Some name ->
+      Format.fprintf fmt ":%s" name
+
+  let pp_kind fmt = function
+    | Result | Feedback | Debug -> ()
+    | Error   -> Format.pp_print_string fmt "User Error: "
+    | Warning -> Format.pp_print_string fmt "Warning: "
+    | Failure -> Format.pp_print_string fmt "Failure: "
+
+  let pretty fmt evt =
+    let header = Format.asprintf "[%s%a] %a%a"
+        evt.evt_plugin
+        pp_category evt.evt_category
+        pp_source evt.evt_source
+        pp_kind evt.evt_kind
+    in
+    let long_header = match evt with
+      | { evt_category = None ; evt_source = None } -> false
+      | _ -> true
+    in
+    (* whenever the first line of the event shall be printed along the header *)
+    let lonely_header =
+      long_header &&
+      (String.length header + String.length evt.evt_message > 80 ||
+       String.contains evt.evt_message '\n')
+    in
+    let fmt = formatter_with_indentation fmt 2 in
+    Format.fprintf fmt "%s%t%s@."
+      header
+      (fun fmt -> if lonely_header then Format.pp_force_newline fmt ())
+      evt.evt_message
+end
 
 let echo_event evt terminal =
   term_clean terminal ;
-  let buffer = Buffer.create 120 in
-  Buffer.add_char buffer '[' ;
-  Buffer.add_string buffer evt.evt_plugin ;
-  add_category buffer evt.evt_category ;
-  Buffer.add_string buffer "] " ;
-  add_source buffer evt.evt_source ;
-  add_kind buffer evt.evt_kind ;
-  let header = Buffer.contents buffer in
-  let header_length = String.length header in
-  let text = evt.evt_message in
-  let size = String.length text in
-  let fmt = terminal.formatter in
-  Format.pp_print_string fmt header ;
-  if header_length + size <= 80 && is_single_line text then begin
-    Format.pp_print_string fmt text;
-    Format.pp_print_newline fmt ();
-  end else begin
-    let is_prefixed = is_first_line_prefixed evt in
-    if not is_prefixed then Format.fprintf fmt "\n";
-    echo_lines fmt ~is_prefixed text 0 (String.length text - 1)
-  end;
-  Format.pp_print_flush fmt ()
+  Event.pretty terminal.formatter evt
 
 let do_echo terminal evt =
   if delayed_echo terminal then

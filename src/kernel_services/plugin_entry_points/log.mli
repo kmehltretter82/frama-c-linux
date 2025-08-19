@@ -23,6 +23,12 @@ type event = {
 }
 (** @since Beryllium-20090601-beta1 *)
 
+module Event :
+sig
+  type t = event
+  val pretty : Format.formatter -> t -> unit
+end
+
 type 'a pretty_printer =
   ?current:bool -> ?source:Filepath.position ->
   ?emitwith:(event -> unit) -> ?echo:bool -> ?once:bool ->
