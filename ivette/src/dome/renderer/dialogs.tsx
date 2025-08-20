@@ -13,11 +13,12 @@
  */
 
 import React from 'react';
+import ReactDOM from "react-dom";
 import * as filepath from 'path';
 import { ipcRenderer } from 'electron';
 import { modal } from 'dome';
 import * as System from 'dome/system';
-import { classes } from 'dome/misc/utils';
+import { classes, styles } from 'dome/misc/utils';
 import { Label } from './controls/labels';
 import { IconButton } from './controls/buttons';
 import { GlobalState, useGlobalState } from './data/states';
@@ -380,6 +381,238 @@ export function Modal(
       </div>
     </div>
   );
+}
+
+// --------------------------------------------------------------------------
+// --- Popup
+// --------------------------------------------------------------------------
+
+interface PopupProps {
+  position: { top: number, left:number } | null;
+  popupRef: React.RefObject<HTMLDivElement>;
+  style?: React.CSSProperties;
+  children?: React.ReactNode;
+}
+
+// The popup is rendered in the body via the createportal function.
+function Popup(props: PopupProps): JSX.Element | null {
+  const { position, popupRef, style, children } = props;
+
+  const stylePopup = styles(
+    { top: position?.top, left: position?.left },
+    style && { ...style }
+  );
+
+  if(children === undefined) return null;
+  return ReactDOM.createPortal(
+    <div
+      ref={popupRef}
+      className="dome-xPopup"
+      style={stylePopup}
+    >{children}</div>,
+    document.body
+  );
+}
+
+// --------------------------------------------------------------------------
+// --- Dropdown
+// --------------------------------------------------------------------------
+
+/**
+ *  Hook to track the position of the element targeted by targetRef
+ */
+function useElementRect(
+  targetRef: React.RefObject<HTMLElement>
+): DOMRect | undefined {
+  const [position, setPosition] = React.useState<DOMRect>();
+
+  React.useEffect(() => {
+    if (!targetRef.current) {
+      setPosition(undefined);
+      return;
+    }
+    const trigger = targetRef.current;
+
+    const update = (): void => {
+      const rect = trigger.getBoundingClientRect();
+      setPosition(rect);
+    };
+    update();
+
+    window.addEventListener("scroll", update, true);
+    window.addEventListener("resize", update);
+
+    const resizeObserver = new ResizeObserver(update);
+    resizeObserver.observe(trigger);
+
+    let node: HTMLElement | null = trigger.parentElement;
+    while (node) {
+      resizeObserver.observe(node);
+      node = node.parentElement;
+    }
+
+    return () => {
+      window.removeEventListener("scroll", update, true);
+      window.removeEventListener("resize", update);
+      resizeObserver.disconnect();
+    };
+  }, [targetRef]);
+
+  return position;
+}
+
+function useWindowSize(): {width: number, height: number} {
+  const [size, setSize] = React.useState({
+    width: window.innerWidth,
+    height: window.innerHeight
+  });
+
+  React.useEffect(() => {
+    const handleResize = (): void => {
+      setSize({
+        width: window.innerWidth,
+        height: window.innerHeight
+      });
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  return size;
+}
+
+type Position = { top: number; left: number };
+const defaultPos = { top: 0, left: 0 };
+/**
+ *  Hook to calc the position of the dropdown top-left corner
+ */
+function useDropdownPosition(
+  popupRef: React.RefObject<HTMLElement>,
+  controlRef: React.RefObject<HTMLElement>,
+  askToOpen: boolean
+): Position {
+  const controlRect = useElementRect(controlRef);
+  const windowSize = useWindowSize();
+  const [position, setPosition] = React.useState<Position>(defaultPos);
+
+  React.useEffect(() => {
+    const controlElt = controlRef.current;
+    const popupElt = popupRef.current;
+    const rect = controlElt?.getBoundingClientRect();
+
+    if(!askToOpen || !rect || !controlElt) setPosition(defaultPos);
+    else {
+      const topElement = document.elementFromPoint(
+        rect.left + rect.width / 2,
+        rect.top + rect.height / 2
+      );
+      const isCovered = Boolean(
+        controlElt && !controlElt.contains(topElement) &&
+        popupElt && !popupElt.contains(topElement)
+      );
+      const visible = !(
+        rect.bottom <= 0
+        || rect.top >= windowSize.height
+        || rect.right <= 0
+        || rect.left >= windowSize.width
+      );
+      if(!visible || isCovered) setPosition(defaultPos);
+      else {
+        /** The offset is used to prevent the dropdown from extending beyond
+          * the right edge of the screen. */
+        let offset = 0;
+        if(popupElt) {
+          const popupRect = popupElt.getBoundingClientRect();
+          if(rect.left + popupRect.width > windowSize.width) {
+            offset = rect.left + popupRect.width - windowSize.width;
+          }
+        }
+        setPosition({ top: rect.bottom, left: rect.left-offset });
+      }
+    }
+  }, [controlRect, controlRef, popupRef, windowSize, askToOpen]);
+
+  return position;
+}
+
+export function useClickOutsideDropdown(
+  refPopup: React.RefObject<HTMLElement>,
+  refControl: React.RefObject<HTMLElement>,
+  handler: (event: MouseEvent | TouchEvent) => void
+): void {
+  React.useEffect(() => {
+    function handleClickOutside(event: MouseEvent | TouchEvent): void {
+      if ( refPopup.current
+        && !refPopup.current.contains(event.target as Node)
+        && refControl.current
+        && !refControl.current.contains(event.target as Node)
+      ) handler(event);
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [refPopup, refControl, handler]);
+}
+
+interface DropdownProps {
+  /** Control button */
+  control: React.JSX.Element;
+  /** Dropdown content */
+  children: React.ReactNode;
+}
+
+/**
+ * After requesting to open the drop-down menu,
+ * it is opened in the background, the position is calculated,
+ * and then the drop-down menu is brought to the foreground.
+ */
+export function Dropdown(props: DropdownProps): React.ReactNode {
+  const { control, children } = props;
+  const controlRef = React.useRef<HTMLDivElement>(null);
+  const popupRef = React.useRef<HTMLDivElement>(null);
+
+  /** Request to open the dropdown menu */
+  const [ askToOpen, setAskToOpen] = React.useState(false);
+
+  /**
+   * Top-left corner position of the popup
+   * return {top: 0, left: 0} if the popup must be hidden
+   */
+  const position = useDropdownPosition(popupRef, controlRef, askToOpen);
+
+  const isDropdownOpen = React.useMemo(() => {
+    return askToOpen && (position.left !== 0 || position.top !== 0);
+  }, [askToOpen, position]);
+
+  /**
+   * The drop-down menu is hidden between the request and opening
+   * because we need to see its dimensions.
+   */
+  const styleDropdown = styles(
+    askToOpen && !isDropdownOpen && { zIndex: '-1' });
+
+  /** Update the opening request if the position = {top: 0, left: 0} */
+  React.useEffect(() => {
+    if(position.left === 0 && position.top === 0) setAskToOpen(false);
+  }, [position]);
+
+  /** Close when clicked outside the dropdown */
+  useClickOutsideDropdown(popupRef, controlRef, () => setAskToOpen(false));
+
+  if(!children) return null;
+  return <>
+    <div ref={controlRef} style={{ display: 'flex', alignItems: 'center' }}>
+      { React.cloneElement(control, {
+        onClick: () => setAskToOpen((v) => !v),
+        selected: askToOpen
+        }) }
+    </div>
+    { askToOpen &&
+      <Popup style={styleDropdown} popupRef={popupRef} position={position}
+      >{ children }</Popup> }
+  </>;
 }
 
 // --------------------------------------------------------------------------

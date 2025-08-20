@@ -22,6 +22,8 @@ import { Button } from 'dome/controls/buttons';
 import { Label } from 'dome/controls/labels';
 import * as Toolbar from 'dome/frame/toolbars';
 import { Hbox } from 'dome/layout/boxes';
+import { Dropdown } from 'dome/dialogs';
+import { Icon } from 'dome/controls/icons';
 
 import * as Ivette from 'ivette';
 import * as Server from 'frama-c/server';
@@ -72,14 +74,64 @@ function resetMode(enabled: boolean): void {
 // --------------------------------------------------------------------------
 
 export type setting = [boolean, () => void]
-export function menuItem(label: string, [b, flip]: setting, enabled?: boolean)
-  : Dome.PopupMenuItem {
+interface MenuItemProps {
+  label: string,
+  state: setting,
+  title?: string,
+  enabled?: boolean
+}
+
+interface FilterMenuItemProps {
+  /** Item label. */
+  label: string;
+  /** Optional menu identifier. */
+  id?: string;
+  /** tooltip */
+  title?: string
+  /** Displayed item, default is `true`. */
+  display?: boolean;
+  /** Enabled item, default is `true`. */
+  enabled?: boolean;
+  /** Checked item, default is `false`. */
+  checked?: boolean;
+  /** Item selection callback. */
+  onClick: (() => void);
+}
+export type FilterMenuItem = FilterMenuItemProps | 'separator';
+
+export function menuItem(props: MenuItemProps): FilterMenuItemProps {
+  const { label, state, title, enabled = true } = props;
+  const [b, flip] = state;
   return {
     label: label,
-    enabled: enabled !== undefined ? enabled : true,
+    enabled: enabled,
+    title: title || '',
     checked: b,
     onClick: flip,
   };
+}
+
+function MenuItem({ item }: {item: FilterMenuItem}): React.JSX.Element {
+  if(item === 'separator') return <div className='menu-filter-separator' />;
+
+  const className = classes('menu-filter-item',
+    !item.enabled && 'menu-filter-item-disabled'
+  );
+  return <div title={item.title} className={className}
+      onClick={() => item.enabled && item.onClick()}
+    >
+      <Icon id='CHECK' size={14} visible={item.checked}/>
+      <div>{item.label}</div>
+    </div>;
+}
+
+export function MenuFilter({ items }: {items: FilterMenuItem[]})
+: React.JSX.Element {
+  return (
+    <div className='menu-filter'>
+      { items.map((e, i) => <MenuItem key={i} item={e} />)}
+    </div>
+  );
 }
 
 // --------------------------------------------------------------------------
@@ -97,7 +149,8 @@ type InfiniteScrollListProps = {
 type ListProps = {
   name: string;
   total: number;
-  filteringMenuItems: Dome.PopupMenuItem[];
+  filteringMenuItems?: Dome.PopupMenuItem[];
+  filteringMenu?: React.JSX.Element;
   children: JSX.Element[];
 } & InfiniteScrollListProps
 
@@ -107,7 +160,6 @@ function InfiniteScrollList(props: InfiniteScrollListProps): JSX.Element {
   const { children, scrollableParent } = props;
   const count = children.length;
   return (
-    // @ts-expect-error (incompatibility due to @types/react versions)
     <InfiniteScroll
       pageStart={0}
       loadMore={() => setDisplayedCount(displayedCount + 100)}
@@ -123,25 +175,31 @@ function InfiniteScrollList(props: InfiniteScrollListProps): JSX.Element {
 }
 
 function List(props: ListProps): JSX.Element {
-  const { name, total, filteringMenuItems, children, scrollableParent } = props;
+  const { name, total, filteringMenuItems, filteringMenu,
+    children, scrollableParent } = props;
   const Name = name.charAt(0).toUpperCase() + name.slice(1);
   const count = children.length;
 
   const filterButtonProps = {
     icon: 'FILTER',
     title: `${Name}s filtering options (${count} / ${total})`,
-    onClick: () => Dome.popupMenu(filteringMenuItems),
+    onClick: () => filteringMenuItems && Dome.popupMenu(filteringMenuItems),
   };
 
   let contents;
 
   if (count <= 0 && total > 0) {
+    const button = <Button {...filterButtonProps}
+      label={`${Name}s filters`} />;
     contents =
       <div className='dome-xSideBarSection-content'>
         <label className='globals-info'>
           All {name}s are filtered. Try adjusting {name} filters.
         </label>
-        <Button {...filterButtonProps} label={`${Name}s filters`} />
+        { filteringMenu
+            ? <Dropdown control={button}>{filteringMenu}</Dropdown>
+            : button
+        }
       </div>;
   }
   else if (total <= 0) {
@@ -166,6 +224,7 @@ function List(props: ListProps): JSX.Element {
       defaultUnfold
       settings={`frama-c.sidebar.${name}s`}
       rightButtonProps={filterButtonProps}
+      filteringMenu={filteringMenu}
       summary={[count]}
       className='globals-section'
     >
@@ -230,7 +289,7 @@ export function computeFcts(
 }
 
 interface FunctionFilterRet {
-  contextFctMenuItems: Dome.PopupMenuItem[],
+  contextFctFilter: React.JSX.Element,
   multipleSelection: States.Scope[],
   showFunction: (fct: functionsData) => boolean,
   isSelected: (fct: functionsData) => boolean
@@ -298,28 +357,29 @@ export function useFunctionFilter(): FunctionFilterRet {
     evaComputed, isSelected, multipleSelectionActive
   ]);
 
-  const contextMenuItems: Dome.PopupMenuItem[] = [
-    menuItem('Show Frama-C builtins', builtinState),
-    menuItem('Show stdlib functions', stdlibState),
+  const contextFctMenuItems: FilterMenuItem[] = [
+    menuItem({ label: 'Show Frama-C builtins', state: builtinState }),
+    menuItem({ label: 'Show stdlib functions', state: stdlibState }),
     'separator',
-    menuItem('Show defined functions', defState),
-    menuItem('Show undefined functions', undefState),
+    menuItem({ label: 'Show defined functions', state: defState }),
+    menuItem({ label: 'Show undefined functions', state: undefState }),
     'separator',
-    menuItem('Show non-extern functions', internState),
-    menuItem('Show extern functions', externState),
+    menuItem({ label: 'Show non-extern functions', state: internState }),
+    menuItem({ label: 'Show extern functions', state: externState }),
     'separator',
-    menuItem('Show functions analyzed by Eva', evaAnalyzedState, evaComputed),
-    menuItem('Show functions unreached by Eva', evaUnreachedState, evaComputed),
+    menuItem({ label: 'Show functions analyzed by Eva',
+              state: evaAnalyzedState, enabled: evaComputed }),
+    menuItem({ label: 'Show functions unreached by Eva',
+              state: evaUnreachedState, enabled: evaComputed }),
     'separator',
-    menuItem('Selected only', selectedState, multipleSelectionActive),
+    menuItem({ label: 'Selected only', state: selectedState,
+              title: 'Show only the functions selected in the Locations panel',
+              enabled: multipleSelectionActive }),
   ];
 
-  return {
-    contextFctMenuItems: contextMenuItems,
-    multipleSelection: multipleSelection,
-    showFunction: showFunction,
-    isSelected: isSelected
-  };
+  const contextFctFilter = <MenuFilter items={contextFctMenuItems} />;
+
+  return { contextFctFilter, multipleSelection, showFunction, isSelected };
 }
 
 export function Functions(props: ScrollableParent): JSX.Element {
@@ -329,7 +389,7 @@ export function Functions(props: ScrollableParent): JSX.Element {
   const ker = States.useSyncArrayProxy(Ast.functions);
   const eva = States.useSyncArrayProxy(Eva.functions);
   const fcts = React.useMemo(() => computeFcts(ker, eva), [ker, eva]);
-  const { showFunction, contextFctMenuItems } = useFunctionFilter();
+  const { showFunction, contextFctFilter } = useFunctionFilter();
 
   // Filtered
   const items =
@@ -342,7 +402,7 @@ export function Functions(props: ScrollableParent): JSX.Element {
     <List
       name="function"
       total={fcts.length}
-      filteringMenuItems={contextFctMenuItems}
+      filteringMenu={contextFctFilter}
       scrollableParent={props.scrollableParent}
     >
       {items}
@@ -373,9 +433,10 @@ function makeVarItem(
 }
 
 interface VariablesFilterRet {
-  contextVarMenuItems: Dome.PopupMenuItem[],
+  contextVarFilter: React.JSX.Element,
   showVariable: (vi: Ast.globalsData) => boolean,
 }
+
 export function useVariableFilter(): VariablesFilterRet {
   // Filter settings
   function useFlipSettings(label: string, b: boolean): setting {
@@ -427,39 +488,40 @@ export function useVariableFilter(): VariablesFilterRet {
   ]);
 
   // Context menu to change filter settings
-  const contextVarMenuItems: Dome.PopupMenuItem[] = [
-    menuItem('Show stdlib variables', stdlibState),
+  /* eslint-disable max-len */
+  const contextVarMenuItems: FilterMenuItem[] = [
+    menuItem({ label: 'Show stdlib variables', state: stdlibState }),
     'separator',
-    menuItem('Show extern variables', externState),
-    menuItem('Show non-extern variables', nonExternState),
+    menuItem({ label: 'Show extern variables', state: externState }),
+    menuItem({ label: 'Show non-extern variables', state: nonExternState }),
     'separator',
-    menuItem('Show const variables', isConstState),
-    menuItem('Show non-const variables', nonConstState),
+    menuItem({ label: 'Show const variables', state: isConstState }),
+    menuItem({ label: 'Show non-const variables', state: nonConstState }),
     'separator',
-    menuItem('Show volatile variables', volatileState),
-    menuItem('Show non-volatile variables', nonVolatileState),
+    menuItem({ label: 'Show volatile variables', state: volatileState }),
+    menuItem({ label: 'Show non-volatile variables', state: nonVolatileState }),
     'separator',
-    menuItem('Show ghost variables', ghostState),
-    menuItem('Show non-ghost variables', nonGhostState),
+    menuItem({ label: 'Show ghost variables', state: ghostState }),
+    menuItem({ label: 'Show non-ghost variables', state: nonGhostState }),
     'separator',
-    menuItem('Show variables with explicit initializer', initState),
-    menuItem('Show variables without explicit initializer', nonInitState),
+    menuItem({ label: 'Show variables with explicit initializer', state: initState }),
+    menuItem({ label: 'Show variables without explicit initializer', state: nonInitState }),
     'separator',
-    menuItem('Show variables from the source code', sourceState),
-    menuItem('Show variables generated from analyses', nonSourceState),
+    menuItem({ label: 'Show variables from the source code', state: sourceState }),
+    menuItem({ label: 'Show variables generated from analyses', state: nonSourceState }),
   ];
+  /* eslint-enable max-len */
 
-  return {
-    contextVarMenuItems: contextVarMenuItems,
-    showVariable: showVariable
-  };
+  const contextVarFilter = <MenuFilter items={contextVarMenuItems} />;
+
+  return { contextVarFilter, showVariable };
 }
 
 export function Variables(props: ScrollableParent): JSX.Element {
   // Hooks
   const scope = States.useCurrentScope();
   const variables = States.useSyncArrayData(Ast.globals);
-  const { showVariable, contextVarMenuItems } = useVariableFilter();
+  const { showVariable, contextVarFilter } = useVariableFilter();
 
   // Filtered
   const items =
@@ -472,7 +534,7 @@ export function Variables(props: ScrollableParent): JSX.Element {
     <List
       name="variable"
       total={variables.length}
-      filteringMenuItems={contextVarMenuItems}
+      filteringMenu={contextVarFilter}
       scrollableParent={props.scrollableParent}
     >
       {items}
@@ -629,6 +691,7 @@ export function GlobalAnnots(): JSX.Element {
 // --------------------------------------------------------------------------
 // --- Files Section
 // --------------------------------------------------------------------------
+
 type FilesProps = {
   showFunction: (fct: functionsData) => boolean;
   showFctsState: [boolean, () => void];
@@ -725,14 +788,14 @@ export function Files(props: FilesProps): JSX.Element {
 
 interface SidebarFilesTitleProps {
   showFctsState: [boolean, () => void];
-  contextFctMenuItems: Dome.PopupMenuItem[];
+  contextFctFilter: React.JSX.Element;
   showVarsState: [boolean, () => void];
-  contextVarMenuItems: Dome.PopupMenuItem[];
+  contextVarFilter: React.JSX.Element;
 }
 
 function SidebarFilesTitle(props: SidebarFilesTitleProps): JSX.Element {
-  const { showFctsState, contextFctMenuItems,
-    showVarsState, contextVarMenuItems } = props;
+  const { showFctsState, contextFctFilter,
+          showVarsState, contextVarFilter } = props;
   const [showFcts, flipShowFcts] = showFctsState;
   const [showVars, flipShowVars] = showVarsState;
 
@@ -746,10 +809,8 @@ function SidebarFilesTitle(props: SidebarFilesTitleProps): JSX.Element {
             selected={showFcts}
             onClick={() => flipShowFcts()}
             />
-          <Toolbar.Button
-            icon='TUNINGS'
-            onClick={() => Dome.popupMenu(contextFctMenuItems)}
-            />
+          <Dropdown control={ <Toolbar.Button icon='FILTER' /> }
+          >{contextFctFilter}</Dropdown>
         </Toolbar.ButtonGroup>
         <Toolbar.ButtonGroup>
           <Toolbar.Button
@@ -758,10 +819,8 @@ function SidebarFilesTitle(props: SidebarFilesTitleProps): JSX.Element {
             selected={showVars}
             onClick={() => flipShowVars()}
             />
-          <Toolbar.Button
-            icon='TUNINGS'
-            onClick={() => Dome.popupMenu(contextVarMenuItems)}
-            />
+          <Dropdown control={ <Toolbar.Button icon='FILTER' /> }
+          >{contextVarFilter}</Dropdown>
         </Toolbar.ButtonGroup>
       </Hbox>
     </SidebarTitle>
@@ -776,21 +835,21 @@ export function GlobalByFiles(): JSX.Element {
   const scrollableArea = React.useRef<HTMLDivElement>(null);
 
   // functions
-  const { showFunction, contextFctMenuItems } = useFunctionFilter();
+  const { showFunction, contextFctFilter } = useFunctionFilter();
   const showFctsState =
     Dome.useFlipSettings('ivette.files.show.functions', true);
 
   // Variables
-  const { showVariable, contextVarMenuItems } = useVariableFilter();
+  const { showVariable, contextVarFilter } = useVariableFilter();
   const showVarsState =
     Dome.useFlipSettings('ivette.files.show.globals', true);
 
   return (<>
       <SidebarFilesTitle
         showFctsState={showFctsState}
-        contextFctMenuItems={contextFctMenuItems}
+        contextFctFilter={contextFctFilter}
         showVarsState={showVarsState}
-        contextVarMenuItems={contextVarMenuItems}
+        contextVarFilter={contextVarFilter}
       />
       <div ref={scrollableArea} className="globals-scrollable-area">
         <Files scrollableParent={scrollableArea}

@@ -363,3 +363,36 @@ label.locations {
 }
 
 /* -------------------------------------------------------------------------- */
+/* --- Filter                                                             --- */
+/* -------------------------------------------------------------------------- */
+
+.menu-filter {
+  font-size: 1.1em;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  gap: 2px;
+  margin: 5px;
+
+  .menu-filter-item {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 5px;
+
+    &:not(.menu-filter-item-disabled) {
+      cursor: pointer ;
+    }
+  }
+  .menu-filter-item-disabled {
+    color: var(--disabled-text);
+    svg { fill: var(--disabled-text); }
+  }
+
+  .menu-filter-separator {
+    border-bottom: solid 1px var(--disabled-text);
+  }
+}
+
+/* -------------------------------------------------------------------------- */

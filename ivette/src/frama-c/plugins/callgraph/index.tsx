@@ -164,11 +164,8 @@ function Callgraph(): JSX.Element {
   const functions = React.useMemo(() => computeFcts(ker, eva), [ker, eva]);
   const properties = States.useSyncArrayData(Properties.status);
   const evaps = States.useSyncArrayData(Eva.properties);
-  const functionFilter = useFunctionFilter();
-
   const {
-    contextFctMenuItems, multipleSelection, showFunction
-  } = functionFilter;
+    contextFctFilter, multipleSelection, showFunction } = useFunctionFilter();
 
   const filteredFunctions =  React.useMemo(() => {
     return functions.filter(showFunction);
@@ -328,7 +325,7 @@ function Callgraph(): JSX.Element {
   return (
     <>
       <CallgraphTitleBar
-        contextMenuItems={contextFctMenuItems}
+        contextFctFilter={contextFctFilter}
         autoCenterState={[ autoCenter, flipAutoCenter ]}
         autoSelectState={[ autoSelect, flipAutoSelect ]}
       />
