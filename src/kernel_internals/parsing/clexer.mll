@@ -144,9 +144,9 @@ let init_lexicon () =
   valid "for" (fun loc -> FOR loc) ;
   valid "if" (fun loc -> IF loc) ;
   valid "else" (fun _ -> ELSE) ;
-  valid "alignas" (fun loc -> ALIGNAS loc) ;
+  c23 "alignas" (fun loc -> ALIGNAS loc) ;
   valid "_Alignas" (fun loc -> ALIGNAS loc) ;
-  valid "alignof" (fun loc -> ALIGNOF loc) ;
+  c23 "alignof" (fun loc -> ALIGNOF loc) ;
   valid "_Alignof" (fun loc -> ALIGNOF loc) ;
   (*** Implementation specific keywords ***)
   valid "__signed__" (fun loc -> SIGNED loc) ;
