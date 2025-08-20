@@ -126,7 +126,7 @@ void c11_6_2_8_3(void)
   // on our architecture:
   _Static_assert(_Alignof(max_align_t) == 16);
 
-  char _Alignas(1 << 29) x;
+  char _Alignas(1 << 29) x; /* GCC limits to 1 << 28 */
 }
 #endif
 
