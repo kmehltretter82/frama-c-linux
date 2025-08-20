@@ -62,8 +62,9 @@ val lock : map -> unit
 val unlock : map -> unit
 
 val id : node -> int
-val uid : map -> node -> int
 val forge : int -> node
+val uid : map -> node -> int option
+val id_to_node : map -> int -> node
 val equal : map -> node -> node -> bool
 val node : map -> node -> node
 val nodes : map -> node list -> node list

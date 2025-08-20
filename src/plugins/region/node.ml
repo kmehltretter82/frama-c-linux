@@ -24,43 +24,47 @@ module Imap = Map.Make(Int)
 module Ufind = UnionFind.Make(Store)
 
 type 'a t = {
-  nnode : 'a Ufind.rref ;
+  nnode : ('a * int option) Ufind.rref ;
   nid : int option ;
 }
+
 type 'a store = {
-  values : 'a Ufind.store ;
-  stable_ids : int Ufind.store ;
+  values : ('a * int option) Ufind.store ;
+  mutable ids_to_rref : int Imap.t ;
 }
 
 let new_store () = {
   values = Ufind.new_store () ;
-  stable_ids = Ufind.new_store () ;
+  ids_to_rref = Imap.empty ;
 }
 
 let copy s = {
   values = Ufind.copy s.values ;
-  stable_ids = s.stable_ids ;
+  ids_to_rref = s.ids_to_rref ;
 }
+
+let key n = Store.id n.nnode
+
+let id n = n.nid
 
 let forge n = {
   nnode = Store.forge n ;
   nid = None
 }
 
-let get m n = Ufind.get m.values n.nnode
-let set m n ?id (v:'a) =
-  Ufind.set m.values n.nnode v ;
-  match id with
-  | None -> ()
-  | Some nid -> Ufind.set m.stable_ids (Store.forge @@ Store.id n.nnode) nid
+let get m n = fst @@ Ufind.get m.values n.nnode
+
+let set m n (v:'a) =
+  Ufind.set m.values n.nnode (v,None)
+
+let set_id m n nid =
+  Ufind.set m.values n.nnode (fst @@ Ufind.get m.values n.nnode, Some nid) ;
+  m.ids_to_rref <- Imap.add nid (key n) m.ids_to_rref
 
 let new_value m v = {
-  nnode = Ufind.make m.values v ;
+  nnode = Ufind.make m.values (v,None) ;
   nid = None ;
 }
-
-let key n = Store.id n.nnode
-let id n = Option.value ~default:(key n) n.nid
 
 let eq m n1 n2 = Store.eq m.values n1.nnode n2.nnode
 
@@ -68,17 +72,23 @@ let normalize m n =
   let nnode = Ufind.find m.values n.nnode in
   {
     nnode ;
-    nid =
-      try Some (Ufind.get m.stable_ids @@ Store.forge @@ Store.id nnode)
-      with Not_found -> None ;
+    nid = snd @@ Ufind.get m.values nnode ;
   }
 
-let compare n1 n2 = Int.compare (Store.id n1.nnode) (Store.id n2.nnode)
+let id_to_node m id =
+  normalize m {
+    nnode = Store.forge @@ Imap.find id m.ids_to_rref ;
+    nid = Some id ;
+  }
+
+let compare n1 n2 = Int.compare (key n1) (key n2)
 
 let list m ns = List.sort_uniq compare @@ List.map (normalize m) ns
 
 let union m n1 n2 =
   let nnode = Ufind.union m.values n1.nnode n2.nnode in
-  let _ = Ufind.union m.stable_ids (Store.forge @@ key n1) (Store.forge @@ key n2) in
-  let nid = Option.fold ~none:n2.nid ~some:(fun id -> Some id) n1.nid in
+  let nid = try snd @@ Ufind.get m.values nnode with Not_found -> None in
   { nnode ; nid }
+
+let pp_ids fmt m =
+  Imap.iter (fun i n -> Format.fprintf fmt "; %i=%i ;" i n) m.ids_to_rref

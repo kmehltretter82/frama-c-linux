@@ -39,7 +39,6 @@ and chunk = {
   cwrites: Access.Set.t ;
   cshifts: Access.Set.t ;
   clayout: layout ;
-  cid : int option ;
 }
 
 type rg = node Ranges.range
@@ -112,7 +111,6 @@ let empty = {
   cwrites = Access.Set.empty ;
   cshifts = Access.Set.empty ;
   clayout = Blob ;
-  cid = None ;
 }
 
 (* -------------------------------------------------------------------------- *)
@@ -120,6 +118,13 @@ let empty = {
 (* -------------------------------------------------------------------------- *)
 
 let forge = Node.forge
+
+let id_to_node m id =
+  try Node.id_to_node m.store id with
+  | Not_found ->
+    Format.eprintf "+++ ids_to_rref=@[%a@]@." Node.pp_ids m.store ;
+    Node.forge id
+
 let equal (m: map) = Node.eq m.store
 
 let node map node =
@@ -138,7 +143,8 @@ let get map node =
 
 let update (m: map) (n: node) (f: chunk -> chunk) =
   let r = get m n in
-  Node.set m.store n (f r)
+  let c = f r in
+  Node.set m.store n c
 
 let failwith_locked m fn =
   if m.locked then raise (Invalid_argument (fn ^ ": locked"))
@@ -147,18 +153,16 @@ let failwith_locked m fn =
 (* --- Printers                                                           --- *)
 (* -------------------------------------------------------------------------- *)
 
-let pp_node ?i fmt (n : node) =
-  Option.fold
-    ~none:(Format.fprintf fmt "r%04x" @@ id n)
-    ~some:(fun i -> Format.fprintf fmt "R%04x" i)
-    i
+let pp_node fmt (n : node) =
+  match Node.id n with
+  | Some id -> Format.fprintf fmt "R%04x" @@ id
+  | None -> Format.fprintf fmt "r%04x" @@ Node.key n
 
 let pp_field fields fmt fd =
   if Options.debug_atleast 1 then Ranges.pp_range fmt fd else
     Fields.pretty fields fmt fd
 
-let pp_layout ?id fmt =
-  let pp_node = pp_node ?i:id in
+let pp_layout fmt =
   function
   | Blob -> Format.pp_print_string fmt "<blob>"
   | Cell(s,None) -> Format.fprintf fmt "<%04d>" s
@@ -172,8 +176,6 @@ let pp_layout ?id fmt =
     Format.fprintf fmt "@ }@]"
 
 let pp_chunk name fmt (m: chunk) =
-  let pp_layout = pp_layout ?id:m.cid in
-  let pp_node = pp_node ?i:m.cid in
   begin
     let acs r s = if Access.Set.is_empty s then '-' else r in
     Format.fprintf fmt "@[<hov 2>%s: %c%c%c" name
@@ -192,7 +194,7 @@ let pp_chunk name fmt (m: chunk) =
   end
 
 let pp_region (m : map) fmt (r : node) =
-  let name = Pretty_utils.to_string (pp_node ~i:(uid m r)) r in
+  let name = Pretty_utils.to_string pp_node r in
   pp_chunk name fmt (get m r)
 [@@ warning "-32"]
 
@@ -390,7 +392,6 @@ let merge_chunk (m: map) (q:queue) (root:node)
     cwrites = Access.Set.union a.cwrites b.cwrites ;
     cshifts = Access.Set.union a.cshifts b.cshifts ;
     clayout = merge_layout m q root a.clayout b.clayout ;
-    cid = None ;
   }
 
 let do_merge (m: map) (q: queue) (a: node) (b: node): unit =
@@ -727,12 +728,12 @@ let pp_slice fields fmt = function
   | Slice (Range r) ->
     Format.fprintf fmt "@ %t: %a%a;"
       (Fields.pslice ~fields ~offset:r.offset ~length:r.length)
-      (pp_node ?i:None) r.data
+      pp_node r.data
       pp_cells r.cells
 
 let pp_range fmt (Range r) =
   Format.fprintf fmt "@ %d..%d: %a%a;"
-    r.offset (r.offset + r.length) (pp_node ?i:None) r.data pp_cells r.cells
+    r.offset (r.offset + r.length) pp_node r.data pp_cells r.cells
 
 let pp_root fmt (Root r) =
   Format.fprintf fmt "%a%a" Varinfo.pretty r.cvar pp_cells r.cells
@@ -741,13 +742,13 @@ let pp_region fmt (m: region) =
   begin
     let acs r s = if s = [] then '-' else r in
     Format.fprintf fmt "@[<hov 2>%a: %c%c%c"
-      (pp_node ?i:None) m.node
+      pp_node m.node
       (acs 'R' m.reads) (acs 'W' m.writes) (acs 'A' m.shifts) ;
     List.iter (Format.fprintf fmt "@ %s:") m.labels ;
     List.iter (Format.fprintf fmt "@ %a" pp_root) m.cvars ;
     List.iter (Format.fprintf fmt "@ (%a)" Typ.pretty) m.types ;
     Format.fprintf fmt "@ %db" m.sizeof ;
-    Option.iter (Format.fprintf fmt "@ (*%a)" (pp_node ?i:None)) m.pointed ;
+    Option.iter (Format.fprintf fmt "@ (*%a)" pp_node) m.pointed ;
     if m.ranges <> [] then
       begin
         Format.fprintf fmt "@ @[<hv 0>@[<hv 2>{" ;
@@ -820,10 +821,9 @@ let regions map =
 (* -------------------------------------------------------------------------- *)
 
 let lock m =
-  let id : int ref = ref 0 in
+  let id : int ref = ref 1 in
   let set_stable_id m n =
-    let c = get m n in
-    Node.set m.store n ~id:(!id) { c with cid = Some !id } ;
+    Node.set_id m.store n !id ;
     id := ! id + 1 ;
   in
   iter m (set_stable_id m) ;

@@ -39,7 +39,7 @@ val id : node -> int
 (** Unique id of normalized node.
     This can be considered the unique identifier of the region equivalence
     class. *)
-val uid : map -> node -> int
+val uid : map -> node -> int option
 
 (** Returns a normalized node.
     @raises Not_found if not a valid node identifier. *)

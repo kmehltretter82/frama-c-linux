@@ -27,12 +27,14 @@ val forge : int -> 'a t
 val key : 'a t -> int
 
 (** Normalized id (if normalization is complete)*)
-val id : 'a t -> int
+val id : 'a t -> int option
+val id_to_node : 'a store -> int -> 'a t
+val set_id : 'a store -> 'a t -> int -> unit
 
 val eq : 'a store -> 'a t -> 'a t -> bool
 
 val get : 'a store -> 'a t -> 'a
-val set : 'a store -> 'a t -> ?id:int -> 'a -> unit
+val set : 'a store -> 'a t -> 'a -> unit
 
 val new_value : 'a store -> 'a -> 'a t
 val normalize : 'a store -> 'a t -> 'a t
@@ -42,3 +44,5 @@ val list : 'a store -> 'a t list -> 'a t list
 
 val new_store : unit -> 'a store
 val copy : 'a store -> 'a store
+
+val pp_ids : Format.formatter -> 'a store -> unit
