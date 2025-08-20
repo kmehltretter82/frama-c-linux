@@ -434,7 +434,7 @@ let trivially_aligned (expr: Cil_types.exp) target =
     Yes
   else
     (* we can safely compute this now *)
-    let target_align = Cil.bytesAlignOf target in
+    let t_align = Cil.bytesAlignOf target in
     let expr = Cil.stripCasts expr in
     let orig_t = Cil.typeOf expr in
     if Ast_types.is_void_ptr orig_t || Ast_types.is_fun_ptr orig_t
@@ -443,20 +443,23 @@ let trivially_aligned (expr: Cil_types.exp) target =
     if Ast_types.is_integral orig_t
     then match Cil.constFoldToInt expr with
       | None -> Maybe
-      | Some value when Z.(zero = (value mod of_int target_align)) -> Yes
+      | Some value when Z.(zero = (value mod of_int t_align)) -> Yes
       | _ -> No
     else
-      let orig_align = Cil.bytesAlignOf @@ Ast_types.direct_pointed_type orig_t in
-      if target_align <= orig_align
-      then Yes
-      else
-        match expr.enode with
-        | AddrOf (Var vi, NoOffset) | StartOf (Var vi, NoOffset) ->
-          if 0 = Cil.bytesAlignOfVarinfo vi mod target_align
-          then Yes
-          else Maybe
-        | _ -> (* probably more cases to optimize here *)
-          Maybe
+      match expr.enode with
+      | Lval (Var vi, NoOffset) when not vi.vglob && not vi.vaddrof ->
+        (* This optimization can be generalized if we check strict aliasing *)
+        if t_align <= Cil.bytesAlignOf @@ Ast_types.direct_pointed_type orig_t
+        then Yes
+        else Maybe
+
+      | AddrOf (Var vi, NoOffset) | StartOf (Var vi, NoOffset) ->
+        if 0 = Cil.bytesAlignOfVarinfo vi mod t_align
+        then Yes
+        else Maybe
+
+      | _ -> (* probably more cases to optimize here *)
+        Maybe
 
 let pointer_alignment ~remove_trivial ~on_alarm (expr, t) =
   assert (Ast_types.is_ptr t) ;
@@ -474,6 +477,7 @@ let pointer_alignment ~remove_trivial ~on_alarm (expr, t) =
 let bool_value ~remove_trivial ~on_alarm lv =
   match remove_trivial, lv with
   | true, (Var vi, NoOffset)
+    (* This optimization can be generalized if we check strict aliasing *)
     when (* consider as trivial accesses to ...  *)
       (not vi.vglob) && (* local variable or formal parameter when ... *)
       (not vi.vaddrof)  (* their address is not taken *)

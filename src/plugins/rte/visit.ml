@@ -279,8 +279,12 @@ class annot_visitor kf flags on_alarm = object (self)
 
         | Lval lval ->
           (match Ast_types.unroll_node (Cil.typeOfLval lval) with
-           | TPtr _ when self#do_pointer_value () ->
-             self#generate_assertion Rte.pointer_value exp
+           | TPtr _ ->
+             if self#do_pointer_value ()
+             then self#generate_assertion Rte.pointer_value exp ;
+             (* This control can be removed if we check strict aliasing *)
+             if self#do_pointer_alignment ()
+             then self#generate_assertion Rte.pointer_alignment (exp, Cil.typeOf exp) ;
            | TInt IBool when self#do_bool_value () ->
              self#generate_assertion Rte.bool_value lval
            | _ -> ());

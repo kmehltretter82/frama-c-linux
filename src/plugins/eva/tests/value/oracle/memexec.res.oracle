@@ -45,6 +45,8 @@
 [eva] computing for function fbug <- bug <- main.
   Called from memexec.c:40.
 [eva:alarm] memexec.c:33: Warning: 
+  assertion 'rte,pointer_alignment' got status unknown.
+[eva:alarm] memexec.c:33: Warning: 
   assertion 'rte,mem_access' got status invalid (stopping propagation).
 [eva] Recording results for fbug
 [eva] Done for function fbug

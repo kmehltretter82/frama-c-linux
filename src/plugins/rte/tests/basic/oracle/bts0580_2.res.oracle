@@ -23,6 +23,10 @@ int main(int i)
   int *p;
   int (*f)(int );
   /*@ assert rte: mem_access: \valid_read(p); */
+  /*@ assert
+        rte: pointer_alignment:
+          \aligned(buff.data[i].cell[*p].next,alignof(struct S));
+  */
   /*@ assert rte: index_bound: 0 ≤ i; */
   /*@ assert rte: index_bound: i < 10; */
   /*@ assert rte: index_bound: 0 ≤ *p; */

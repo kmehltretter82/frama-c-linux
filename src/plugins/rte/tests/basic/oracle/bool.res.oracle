@@ -72,6 +72,7 @@ _Bool ko1(void)
   _Bool __retres;
   char *p = & sb.c;
   /*@ assert rte: mem_access: \valid(p + 1); */
+  /*@ assert rte: pointer_alignment: \aligned(p,alignof(char)); */
   *(p + 1) = (char)17;
   /*@ assert rte: bool_value: sb.b ≡ 0 ∨ sb.b ≡ 1; */
   __retres = sb.b;
@@ -85,6 +86,7 @@ _Bool ko2(void)
   /*@ assert rte: pointer_alignment: \aligned(&b,alignof(char)); */
   char *p = (char *)(& b);
   /*@ assert rte: mem_access: \valid(p); */
+  /*@ assert rte: pointer_alignment: \aligned(p,alignof(char)); */
   *p = (char)17;
   /*@ assert rte: bool_value: b ≡ 0 ∨ b ≡ 1; */
   return b;
