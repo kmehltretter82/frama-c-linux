@@ -175,6 +175,8 @@
 [mt] * Computing value analysis for thread jobs[0]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[0]
 [eva] matrix.c:22: Frama_C_show_each: {0}
 [mt] matrix.c:25: Lock locks[0]
 [kernel:annot:missing-spec] matrix.c:29: Warning: 
@@ -218,6 +220,8 @@
 [mt] * Computing value analysis for thread jobs[1]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[1]
 [eva] matrix.c:22: Frama_C_show_each: {1}
 [mt] matrix.c:25: Lock locks[1]
 [eva] using specification for function f
@@ -258,6 +262,8 @@
 [mt] * Computing value analysis for thread jobs[2]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[2]
 [eva] matrix.c:22: Frama_C_show_each: {2}
 [mt] matrix.c:25: Lock locks[2]
 [eva] using specification for function f
@@ -298,6 +304,8 @@
 [mt] * Computing value analysis for thread jobs[3]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[3]
 [eva] matrix.c:22: Frama_C_show_each: {3}
 [mt] matrix.c:25: Lock locks[3]
 [eva] using specification for function f
@@ -338,6 +346,8 @@
 [mt] * Computing value analysis for thread jobs[4]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[4]
 [eva] matrix.c:22: Frama_C_show_each: {4}
 [mt] matrix.c:25: Lock locks[4]
 [eva] using specification for function f
@@ -566,10 +576,12 @@
 [mt] * Computing value analysis for thread jobs[0]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[0]
 [eva] matrix.c:22: Frama_C_show_each: {0}
 [mt] matrix.c:25: Lock locks[0]
-[eva] using specification for function f
 [eva:interferences] matrix.c:29: inject threads interferences at this point
+[eva] using specification for function f
 [mt] matrix.c:30: Release locks[0]
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
@@ -712,10 +724,12 @@
 [mt] * Computing value analysis for thread jobs[1]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[1]
 [eva] matrix.c:22: Frama_C_show_each: {1}
 [mt] matrix.c:25: Lock locks[1]
-[eva] using specification for function f
 [eva:interferences] matrix.c:29: inject threads interferences at this point
+[eva] using specification for function f
 [mt] matrix.c:30: Release locks[1]
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
@@ -858,10 +872,12 @@
 [mt] * Computing value analysis for thread jobs[2]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[2]
 [eva] matrix.c:22: Frama_C_show_each: {2}
 [mt] matrix.c:25: Lock locks[2]
-[eva] using specification for function f
 [eva:interferences] matrix.c:29: inject threads interferences at this point
+[eva] using specification for function f
 [mt] matrix.c:30: Release locks[2]
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
@@ -1004,10 +1020,12 @@
 [mt] * Computing value analysis for thread jobs[3]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[3]
 [eva] matrix.c:22: Frama_C_show_each: {3}
 [mt] matrix.c:25: Lock locks[3]
-[eva] using specification for function f
 [eva:interferences] matrix.c:29: inject threads interferences at this point
+[eva] using specification for function f
 [mt] matrix.c:30: Release locks[3]
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
@@ -1150,10 +1168,12 @@
 [mt] * Computing value analysis for thread jobs[4]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[4]
 [eva] matrix.c:22: Frama_C_show_each: {4}
 [mt] matrix.c:25: Lock locks[4]
-[eva] using specification for function f
 [eva:interferences] matrix.c:29: inject threads interferences at this point
+[eva] using specification for function f
 [mt] matrix.c:30: Release locks[4]
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
@@ -1672,10 +1692,12 @@
 [mt] * Computing value analysis for thread jobs[0]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[0]
 [eva] matrix.c:22: Frama_C_show_each: {0}
 [mt] matrix.c:25: Lock locks[0]
-[eva] using specification for function f
 [eva:interferences] matrix.c:29: inject threads interferences at this point
+[eva] using specification for function f
 [mt] matrix.c:30: Release locks[0]
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
@@ -1735,10 +1757,12 @@
 [mt] * Computing value analysis for thread jobs[1]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[1]
 [eva] matrix.c:22: Frama_C_show_each: {1}
 [mt] matrix.c:25: Lock locks[1]
-[eva] using specification for function f
 [eva:interferences] matrix.c:29: inject threads interferences at this point
+[eva] using specification for function f
 [mt] matrix.c:30: Release locks[1]
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
@@ -1798,10 +1822,12 @@
 [mt] * Computing value analysis for thread jobs[2]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[2]
 [eva] matrix.c:22: Frama_C_show_each: {2}
 [mt] matrix.c:25: Lock locks[2]
-[eva] using specification for function f
 [eva:interferences] matrix.c:29: inject threads interferences at this point
+[eva] using specification for function f
 [mt] matrix.c:30: Release locks[2]
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
@@ -1861,10 +1887,12 @@
 [mt] * Computing value analysis for thread jobs[3]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[3]
 [eva] matrix.c:22: Frama_C_show_each: {3}
 [mt] matrix.c:25: Lock locks[3]
-[eva] using specification for function f
 [eva:interferences] matrix.c:29: inject threads interferences at this point
+[eva] using specification for function f
 [mt] matrix.c:30: Release locks[3]
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
@@ -1924,10 +1952,12 @@
 [mt] * Computing value analysis for thread jobs[4]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[4]
 [eva] matrix.c:22: Frama_C_show_each: {4}
 [mt] matrix.c:25: Lock locks[4]
-[eva] using specification for function f
 [eva:interferences] matrix.c:29: inject threads interferences at this point
+[eva] using specification for function f
 [mt] matrix.c:30: Release locks[4]
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
@@ -2434,10 +2464,12 @@
 [mt] * Computing value analysis for thread jobs[0]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[0]
 [eva] matrix.c:22: Frama_C_show_each: {0}
 [mt] matrix.c:25: Lock locks[0]
-[eva] using specification for function f
 [eva:interferences] matrix.c:29: inject threads interferences at this point
+[eva] using specification for function f
 [mt] matrix.c:30: Release locks[0]
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
@@ -2495,10 +2527,12 @@
 [mt] * Computing value analysis for thread jobs[1]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[1]
 [eva] matrix.c:22: Frama_C_show_each: {1}
 [mt] matrix.c:25: Lock locks[1]
-[eva] using specification for function f
 [eva:interferences] matrix.c:29: inject threads interferences at this point
+[eva] using specification for function f
 [mt] matrix.c:30: Release locks[1]
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
@@ -2556,10 +2590,12 @@
 [mt] * Computing value analysis for thread jobs[2]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[2]
 [eva] matrix.c:22: Frama_C_show_each: {2}
 [mt] matrix.c:25: Lock locks[2]
-[eva] using specification for function f
 [eva:interferences] matrix.c:29: inject threads interferences at this point
+[eva] using specification for function f
 [mt] matrix.c:30: Release locks[2]
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved

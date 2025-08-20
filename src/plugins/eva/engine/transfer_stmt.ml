@@ -109,6 +109,7 @@ module Make (Engine: Engine_sig.S) = struct
   module Eval = Engine.Eval
   module EvaAstDeps = Eva_ast.MakeDepsOf (Location)
   module Transfer_inout = Transfer_inout.Make (Engine)
+  module Interferences = Engine.Interferences
   include Cvalue_domain.Getters (Domain)
 
   type state = Domain.t
@@ -256,10 +257,15 @@ module Make (Engine: Engine_sig.S) = struct
       if is_ret then assert (Alarmset.is_empty alarms);
       Alarmset.emit ~pos alarms;
       let* assigned, valuation = eval in
-      Transfer_inout.add_assign_lval pos valuation lval expr;
+      let access =
+        Transfer_inout.register_assign_lval pos valuation lval expr
+      in
       let domain_valuation = Eval.to_domain_valuation valuation in
       let lvalue = { lval; lloc } in
-      Domain.assign ~pos lvalue expr assigned domain_valuation state
+      let+ state =
+        Domain.assign ~pos lvalue expr assigned domain_valuation state
+      in
+      Interferences.inject_after_change access state
 
   let assign = assign_lv_or_ret ~is_ret:false
   let assign_ret = assign_lv_or_ret ~is_ret:true
@@ -274,8 +280,11 @@ module Make (Engine: Engine_sig.S) = struct
     (* TODO: check not comparable. *)
     Alarmset.emit ~pos alarms;
     let* valuation = eval in
-    Transfer_inout.add_read_exp pos valuation expr;
-    Domain.assume ~pos expr positive (Eval.to_domain_valuation valuation) state
+    let access = Transfer_inout.register_read_exp pos valuation expr in
+    let+ state =
+      Domain.assume ~pos expr positive (Eval.to_domain_valuation valuation) state
+    in
+    Interferences.inject_after_change access state
 
 
   (* ------------------------------------------------------------------------ *)
@@ -283,12 +292,13 @@ module Make (Engine: Engine_sig.S) = struct
   (* ------------------------------------------------------------------------ *)
 
   (* Returns the result of a call. *)
-  let process_call ~pos call recursion valuation state =
+  let process_call ~pos call recursion valuation access state =
     let process () =
       let domain_valuation = Eval.to_domain_valuation valuation in
       (* Process the call according to the domain decision. *)
       match Domain.start_call ~pos call recursion domain_valuation state with
       | `Value state ->
+        let state = Interferences.inject_after_change access state in
         Domain.Store.register_initial_state call.callstack call.kf state;
         Engine.Compute.compute_call call recursion state
       | `Bottom ->
@@ -408,11 +418,11 @@ module Make (Engine: Engine_sig.S) = struct
     Kernel_function.get_formals kf @ locals
 
   (* Do the call to one function. *)
-  let do_one_call ~pos valuation lv call recursion state =
+  let do_one_call ~pos valuation lv call recursion access state =
     let kf_callee = call.kf in
     let pre = state in
     (* Process the call according to the domain decision. *)
-    let call_result = process_call ~pos call recursion valuation state in
+    let call_result = process_call ~pos call recursion valuation access state in
     let leaving_vars = leaving_vars kf_callee in
     (* Treat each resulting state one by one. *)
     let process_resulting_state state =
@@ -713,11 +723,12 @@ module Make (Engine: Engine_sig.S) = struct
     let process_one_function kf valuation =
       (* Create the call. *)
       let eval, alarms = make_call ~pos ~subdivnb kf args valuation state in
-      let _ =
+      let access =
         (* Register call arguments to Inout_access *)
         let+ call, _, valuation = eval in
-        Transfer_inout.add_call_args (Position.of_local pos) valuation call
+        Transfer_inout.register_call_args (Position.of_local pos) valuation call
       in
+      let access = Bottom.value ~bottom:Inout_access.Access.bottom access in
       (* The special Frama_C_ functions to print states are handled here. *)
       if apply_special_directives ~pos ~subdivnb kf args state
       then
@@ -730,7 +741,7 @@ module Make (Engine: Engine_sig.S) = struct
         | `Bottom -> bottom
         | `Value (call, recursion, valuation) ->
           let call_result =
-            do_one_call ~pos valuation lval_option call recursion state
+            do_one_call ~pos valuation lval_option call recursion access state
           in
           let cacheable =
             if call_result.cacheable = NoCacheCallers then NoCacheCallers

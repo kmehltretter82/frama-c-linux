@@ -17,7 +17,7 @@
 > [eva] interrupt.c:18: Frama_C_show_each_locked: {0}
 > [eva] interrupt.c:18: Frama_C_show_each_locked: {0}
 > [eva] interrupt.c:18: Frama_C_show_each_locked: {0}
-37a56,73
+39a58,75
 > [eva] interrupt.c:18: Frama_C_show_each_locked: {0}
 > [eva] interrupt.c:18: Frama_C_show_each_locked: {0}
 > [eva] interrupt.c:18: Frama_C_show_each_locked: {0}
@@ -36,7 +36,7 @@
 > [eva] interrupt.c:18: Frama_C_show_each_locked: {0}
 > [eva] interrupt.c:18: Frama_C_show_each_locked: {0}
 > [eva] interrupt.c:18: Frama_C_show_each_locked: {0}
-98a135,152
+104a141,158
 > [eva] interrupt.c:18: Frama_C_show_each_locked: {0}
 > [eva] interrupt.c:18: Frama_C_show_each_locked: {0}
 > [eva] interrupt.c:18: Frama_C_show_each_locked: {0}
@@ -55,9 +55,7 @@
 > [eva] interrupt.c:18: Frama_C_show_each_locked: {0}
 > [eva] interrupt.c:18: Frama_C_show_each_locked: {0}
 > [eva] interrupt.c:18: Frama_C_show_each_locked: {0}
-192a247,278
-> [eva] interrupt.c:20: Frama_C_show_each: {1}
-> [eva] interrupt.c:22: Frama_C_show_each: {0; 1}
+198a253,285
 > [eva] interrupt.c:18: Frama_C_show_each_locked: {0; 1}
 > [eva] interrupt.c:20: Frama_C_show_each: {1}
 > [eva] interrupt.c:22: Frama_C_show_each: {0; 1}
@@ -88,7 +86,12 @@
 > [eva] interrupt.c:18: Frama_C_show_each_locked: {0; 1}
 > [eva] interrupt.c:20: Frama_C_show_each: {1}
 > [eva] interrupt.c:22: Frama_C_show_each: {0; 1}
-302a389,420
+> [eva] interrupt.c:18: Frama_C_show_each_locked: {0; 1}
+> [eva] interrupt.c:20: Frama_C_show_each: {1}
+> [eva] interrupt.c:22: Frama_C_show_each: {0; 1}
+307a395,427
+> [eva] interrupt.c:22: Frama_C_show_each: {0; 1}
+> [eva] interrupt.c:18: Frama_C_show_each_locked: {0; 1}
 > [eva] interrupt.c:20: Frama_C_show_each: {0; 1}
 > [eva] interrupt.c:22: Frama_C_show_each: {0; 1}
 > [eva] interrupt.c:18: Frama_C_show_each_locked: {0; 1}
@@ -120,4 +123,3 @@
 > [eva] interrupt.c:22: Frama_C_show_each: {0; 1}
 > [eva] interrupt.c:18: Frama_C_show_each_locked: {0; 1}
 > [eva] interrupt.c:20: Frama_C_show_each: {0; 1}
-> [eva] interrupt.c:22: Frama_C_show_each: {0; 1}

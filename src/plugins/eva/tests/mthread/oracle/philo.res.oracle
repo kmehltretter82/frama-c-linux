@@ -50,6 +50,8 @@
 [mt] * Computing value analysis for thread jobs[0]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[0]
 [mt] philo.c:24: Lock locks[4]
 [mt] philo.c:25: Lock locks[1]
 [kernel:annot:missing-spec] philo.c:26: Warning: 
@@ -91,6 +93,8 @@
 [mt] * Computing value analysis for thread jobs[1]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[1]
 [mt] philo.c:24: Lock locks[0]
 [mt] philo.c:25: Lock locks[2]
 [eva] using specification for function random
@@ -124,6 +128,8 @@
 [mt] * Computing value analysis for thread jobs[2]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[2]
 [mt] philo.c:24: Lock locks[1]
 [mt] philo.c:25: Lock locks[3]
 [eva] using specification for function random
@@ -162,6 +168,8 @@
 [mt] * Computing value analysis for thread jobs[3]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[3]
 [mt] philo.c:24: Lock locks[2]
 [mt] philo.c:25: Lock locks[4]
 [eva] using specification for function random
@@ -200,6 +208,8 @@
 [mt] * Computing value analysis for thread jobs[4]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[4]
 [mt] philo.c:24: Lock locks[3]
 [mt] philo.c:25: Lock locks[0]
 [eva] using specification for function random
@@ -365,6 +375,9 @@
 [mt] * Computing value analysis for thread jobs[0]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] philo.c:15: inject threads interferences at this point
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[0]
 [mt] philo.c:24: Lock locks[4]
 [mt] philo.c:25: Lock locks[1]
 [eva] using specification for function random
@@ -410,6 +423,9 @@
 [mt] * Computing value analysis for thread jobs[1]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] philo.c:15: inject threads interferences at this point
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[1]
 [mt] philo.c:24: Lock locks[0]
 [mt] philo.c:25: Lock locks[2]
 [eva] using specification for function random
@@ -444,6 +460,9 @@
 [mt] * Computing value analysis for thread jobs[2]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] philo.c:15: inject threads interferences at this point
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[2]
 [mt] philo.c:24: Lock locks[1]
 [mt] philo.c:25: Lock locks[3]
 [eva] using specification for function random
@@ -489,6 +508,9 @@
 [mt] * Computing value analysis for thread jobs[3]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] philo.c:15: inject threads interferences at this point
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[3]
 [mt] philo.c:24: Lock locks[2]
 [mt] philo.c:25: Lock locks[4]
 [eva] using specification for function random
@@ -534,6 +556,9 @@
 [mt] * Computing value analysis for thread jobs[4]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] philo.c:15: inject threads interferences at this point
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[4]
 [mt] philo.c:24: Lock locks[3]
 [mt] philo.c:25: Lock locks[0]
 [eva] using specification for function random
@@ -616,6 +641,7 @@
 [mt] * Computing value analysis for thread <main>
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
+[eva:interferences] philo.c:15: inject threads interferences at this point
 [mt] Thread <main>, fun main
 [mt] philo.c:51: Initializing mutex locks[0]
 [mt] philo.c:51: Initializing mutex locks[1]
@@ -670,6 +696,9 @@
 [mt] * Computing value analysis for thread jobs[0]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] philo.c:15: inject threads interferences at this point
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[0]
 [mt] philo.c:24: Lock locks[4]
 [mt] philo.c:25: Lock locks[1]
 [eva] using specification for function random
@@ -715,6 +744,9 @@
 [mt] * Computing value analysis for thread jobs[1]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] philo.c:15: inject threads interferences at this point
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[1]
 [mt] philo.c:24: Lock locks[0]
 [mt] philo.c:25: Lock locks[2]
 [eva] using specification for function random
@@ -749,6 +781,9 @@
 [mt] * Computing value analysis for thread jobs[2]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] philo.c:15: inject threads interferences at this point
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[2]
 [mt] philo.c:24: Lock locks[1]
 [mt] philo.c:25: Lock locks[3]
 [eva] using specification for function random
@@ -794,6 +829,9 @@
 [mt] * Computing value analysis for thread jobs[3]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] philo.c:15: inject threads interferences at this point
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[3]
 [mt] philo.c:24: Lock locks[2]
 [mt] philo.c:25: Lock locks[4]
 [eva] using specification for function random
@@ -839,6 +877,9 @@
 [mt] * Computing value analysis for thread jobs[4]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] philo.c:15: inject threads interferences at this point
+[eva:interferences] 
+  inject threads interferences at the start of job for thread jobs[4]
 [mt] philo.c:24: Lock locks[3]
 [mt] philo.c:25: Lock locks[0]
 [eva] using specification for function random

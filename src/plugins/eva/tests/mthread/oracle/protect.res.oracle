@@ -48,6 +48,8 @@
 [mt] * Computing value analysis for thread tjob
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of job for thread tjob
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -145,6 +147,8 @@
 [mt] * Computing value analysis for thread tjob
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of job for thread tjob
 [eva:interferences] protect.c:12: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
@@ -198,6 +202,8 @@
 [mt] * Computing value analysis for thread tjob
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of job for thread tjob
 [eva:interferences] protect.c:12: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved

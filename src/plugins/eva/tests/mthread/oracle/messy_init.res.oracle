@@ -38,6 +38,8 @@
 [mt] * Computing value analysis for thread job
 [eva] Analyzing a complete application starting at fjob
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of fjob for thread job
 [mt] messy_init.c:10: Warning: Trying to lock a possibly uninitialized mutex.
 [mt] messy_init.c:10: Warning: 
   Trying to lock mutex lock, but unable to check its precise status (internal value {0; 1} should be 1).

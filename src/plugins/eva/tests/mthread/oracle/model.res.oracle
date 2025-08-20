@@ -31,6 +31,8 @@
 [mt] * Computing value analysis for thread job1
 [eva] Analyzing a complete application starting at f1
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of f1 for thread job1
 [eva] using specification for function rand
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved

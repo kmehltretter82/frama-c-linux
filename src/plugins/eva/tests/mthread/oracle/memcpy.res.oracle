@@ -58,6 +58,8 @@
 [mt] * Computing value analysis for thread tjob0
 [eva] Analyzing a complete application starting at job0
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of job0 for thread tjob0
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -76,6 +78,8 @@
 [mt] * Computing value analysis for thread tjob1
 [eva] Analyzing a complete application starting at job1
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of job1 for thread tjob1
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -96,6 +100,8 @@
 [mt] * Computing value analysis for thread tjob2
 [eva] Analyzing a complete application starting at job2
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of job2 for thread tjob2
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -222,6 +228,8 @@
 [mt] * Computing value analysis for thread tjob0
 [eva] Analyzing a complete application starting at job0
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of job0 for thread tjob0
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -241,6 +249,8 @@
 [mt] * Computing value analysis for thread tjob1
 [eva] Analyzing a complete application starting at job1
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of job1 for thread tjob1
 [eva:interferences] memcpy.c:26: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
@@ -263,6 +273,8 @@
 [mt] * Computing value analysis for thread tjob2
 [eva] Analyzing a complete application starting at job2
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of job2 for thread tjob2
 [eva:interferences] memcpy.c:31: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
@@ -286,7 +298,7 @@
 [mt] ***** Computing shared variables
 [mt] Imprecise locations to watch: a; b; c; d
 [mt] tjob1 reads  a ∈ {3}  // memcpy.c:26 job1
-[mt] tjob2 reads  b ∈ {3}  // memcpy.c:31 job2
+[mt] tjob2 reads  b ∈ {0; 3}  // memcpy.c:31 job2
 [mt] <main> writes  a# ∈ {0; 3} repeated %8   // memcpy.c:48
   memcpy :: memcpy.c:48 <- main
 [mt] <main> writes  b# ∈ {0; 3} repeated %8   // memcpy.c:49
@@ -320,6 +332,8 @@
 [mt] * Computing value analysis for thread tjob1
 [eva] Analyzing a complete application starting at job1
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of job1 for thread tjob1
 [eva:interferences] memcpy.c:26: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
@@ -341,6 +355,8 @@
 [mt] * Computing value analysis for thread tjob2
 [eva] Analyzing a complete application starting at job2
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of job2 for thread tjob2
 [eva:interferences] memcpy.c:31: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
@@ -364,7 +380,7 @@
 [mt] ***** Computing shared variables
 [mt] Imprecise locations to watch: a; b; c; d
 [mt] tjob1 reads  a ∈ [0..50529027],0%3  // memcpy.c:26 job1
-[mt] tjob2 reads  b ∈ {3}  // memcpy.c:31 job2
+[mt] tjob2 reads  b ∈ {0; 3}  // memcpy.c:31 job2
 [mt] <main> writes  a# ∈ {0; 3} repeated %8   // memcpy.c:48
   memcpy :: memcpy.c:48 <- main
 [mt] <main> writes  b# ∈ {0; 3} repeated %8   // memcpy.c:49

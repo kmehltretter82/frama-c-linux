@@ -47,6 +47,8 @@
 [mt] * Computing value analysis for thread jobs
 [eva] Analyzing a complete application starting at f
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of f for thread jobs
 [mt] read_all.c:19: User Error: 
   read of the whole memory. Ignoring to allow Mthread to continue, but the
   analysis will not be correct.
@@ -134,6 +136,8 @@
 [mt] * Computing value analysis for thread jobs
 [eva] Analyzing a complete application starting at f
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of f for thread jobs
 [mt] read_all.c:19: User Error: 
   read of the whole memory. Ignoring to allow Mthread to continue, but the
   analysis will not be correct.

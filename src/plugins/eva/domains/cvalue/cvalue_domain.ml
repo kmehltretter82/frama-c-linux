@@ -226,7 +226,8 @@ module State = struct
   let reuse _bases ~current_input:(state, _) ~previous_output:(output, clob) =
     Cvalue.Model.merge ~into:state output, clob
 
-  let overwrite _bases ~on:(state, clob) ~by:(output, _) =
+  let overwrite bases ~on:(state, clob) ~by =
+    let (output, _) = project bases by in
     Cvalue.Model.merge ~into:state output, clob
 
   (* ------------------------------------------------------------------------ *)

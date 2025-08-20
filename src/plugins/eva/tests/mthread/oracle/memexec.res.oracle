@@ -32,6 +32,8 @@
 [mt] * Computing value analysis for thread th1
 [eva] Analyzing a complete application starting at t1
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of t1 for thread th1
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -97,6 +99,8 @@
 [mt] * Computing value analysis for thread th1
 [eva] Analyzing a complete application starting at t1
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of t1 for thread th1
 [eva:interferences] memexec.c:14: inject threads interferences at this point
 [eva:interferences] memexec.c:10: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis

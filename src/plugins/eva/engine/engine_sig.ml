@@ -84,16 +84,20 @@ sig
   val add_last_analysis :
     Thread.t -> Position.Local.Set.t -> Base.Hptset.t -> add_result
 
-  (** Inject current interferences to an abstract state. If activated,
-      the Mthread domain helps filtering applicable interferences. This function
-      is the identity if the Mthread domain can infer that no shared memory has
-      been read or written during the last transfer function. *)
-  val inject :
-    pos:Position.t -> Eva_automata.vertex -> Eva_automata.vertex ->
-    state -> state
+  (** [inject_init_state th kf state] injects current interferences to the
+      initial state of the analysis for thread [th] starting at the entry point
+      [kf]. If enabled, the Mthread domain helps filtering applicable
+      interferences. This function is the identity if the Mthread domain can
+      infer that no other thread can interfere with the current thread. *)
+  val inject_init_state : Thread.t -> kernel_function -> state -> state
 
-  (** Are there any interferences to inject after the given transition? *)
-  val is_empty : Eva_automata.transition -> bool
+  (** [inject_after_change access state] injects current interferences to the
+      given [state] that has just been changed by a transfer function with the
+      given [access]es. If enabled, the Mthread domain helps filtering
+      applicable interferences. This function is the identity if the Mthread
+      domain can infer that no shared memory has been read or written during
+      the last transfer function. *)
+  val inject_after_change : Inout_access.t -> state -> state
 end
 
 

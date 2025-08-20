@@ -58,6 +58,8 @@
 [mt] * Computing value analysis for thread jobs1
 [eva] Analyzing a complete application starting at f1
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of f1 for thread jobs1
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -78,6 +80,8 @@
 [mt] * Computing value analysis for thread jobs2
 [eva] Analyzing a complete application starting at f2
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of f2 for thread jobs2
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -97,6 +101,8 @@
 [mt] * Computing value analysis for thread jobs3
 [eva] Analyzing a complete application starting at f3
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of f3 for thread jobs3
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -116,6 +122,8 @@
 [mt] * Computing value analysis for thread jobs4
 [eva] Analyzing a complete application starting at f4
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of f4 for thread jobs4
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -135,6 +143,8 @@
 [mt] * Computing value analysis for thread jobs5
 [eva] Analyzing a complete application starting at f5
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of f5 for thread jobs5
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -154,6 +164,8 @@
 [mt] * Computing value analysis for thread jobs6
 [eva] Analyzing a complete application starting at f6
 [eva] Initial state supplied by user
+[eva:interferences] 
+  inject threads interferences at the start of f6 for thread jobs6
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables

@@ -368,6 +368,13 @@ module Make (Engine: Engine_sig.S) = struct
       let callstack = Callstack.init ~thread ~entry_point:kf in
       Callstack.with_callstack callstack @@ fun init_state ->
       Engine.Dom.Store.register_initial_state callstack kf init_state;
+      let init_state =
+        (* Inject interferences in the initial state. The interferences are
+           injected after registering the initial state as this is part of the
+           analysis. *)
+        let th = Thread.current () in
+        Engine.Interferences.inject_init_state th kf init_state
+      in
       let call = { kf; callstack; arguments = []; rest = []; return = None; } in
       let final_result = compute_call call None init_state in
       let final_states = List.map snd (final_result.states) in
