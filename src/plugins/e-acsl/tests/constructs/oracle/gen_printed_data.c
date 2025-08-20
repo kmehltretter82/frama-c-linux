@@ -377,8 +377,8 @@ int main(void)
   }
   /*@
   assert
-  \let int_mpz = 18446744073709551615ULL + 1;
-    int_mpz != 18446744073709551615ULL;
+    \let int_mpz = 18446744073709551615ULL + 1;
+      int_mpz != 18446744073709551615ULL;
    */
   ;
   float real_float = (float)0x1.fffffep+127;
@@ -422,7 +422,7 @@ int main(void)
   }
   /*@ assert \let x = real_double; \true; */ ;
   /*@ assert
-      Eva: is_nan_or_infinite: \is_finite(0x1.fffffffffffffffep+16383L);
+        Eva: is_nan_or_infinite: \is_finite(0x1.fffffffffffffffep+16383L);
   */
   long double real_ldouble = 0x1.fffffffffffffffep+16383L;
   __e_acsl_store_block((void *)(& real_ldouble),16UL);

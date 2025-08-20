@@ -77,16 +77,17 @@ double main1(void)
         double v = value();
         /*@ assert Eva_export: 0 ≤ i ≤ 19; */
         /*@ assert
-            Eva_export:
-              -0.0000000000000000e+00d ≤ v ≤ 1.0000000000000000e+02d;
+              Eva_export:
+                -0.0000000000000000e+00d ≤ v ≤ 1.0000000000000000e+02d;
         */
         a[i] = v;
         /*@ assert
-            Eva_export: 0.0000000000000000e+00d ≤ s ≤ 1.9000000000000000e+03d;
+              Eva_export:
+                0.0000000000000000e+00d ≤ s ≤ 1.9000000000000000e+03d;
         */
         /*@ assert
-            Eva_export:
-              -0.0000000000000000e+00d ≤ v ≤ 1.0000000000000000e+02d;
+              Eva_export:
+                -0.0000000000000000e+00d ≤ v ≤ 1.0000000000000000e+02d;
         */
         s += v;
       }
@@ -95,7 +96,7 @@ double main1(void)
     }
   }
   /*@ assert
-      Eva_export: 0.0000000000000000e+00d ≤ s ≤ 2.0000000000000000e+03d;
+        Eva_export: 0.0000000000000000e+00d ≤ s ≤ 2.0000000000000000e+03d;
   */
   return s;
 }
@@ -117,9 +118,9 @@ void main2(void)
       double v = value_or_nan();
       /*@ assert Eva_export: 0 ≤ i ≤ 19; */
       /*@ assert
-          Eva_export:
-            \is_NaN(v) ∨
-            (-0.0000000000000000e+00d ≤ v ≤ 1.0000000000000000e+02d);
+            Eva_export:
+              \is_NaN(v) ∨
+              (-0.0000000000000000e+00d ≤ v ≤ 1.0000000000000000e+02d);
       */
       a[i] = v;
     }

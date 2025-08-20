@@ -402,9 +402,9 @@ int main(void)
   }
   /*@
   assert \let k = -7;
-  \exists integer u;
-    9 <= u < 21 &&
-    (\forall integer v; -5 < v <= 6 ==> \at((u > 0 ? n + k : u + v) > 0,K));
+    \exists integer u;
+      9 <= u < 21 &&
+      (\forall integer v; -5 < v <= 6 ==> \at((u > 0 ? n + k : u + v) > 0,K));
    */
   ;
   {
@@ -573,10 +573,10 @@ int main(void)
                             & __gen_e_acsl_assert_data_12);
             __e_acsl_assert_clean(& __gen_e_acsl_assert_data_12);
             /*@ assert
-                Eva: initialization:
-                  \initialized(__gen_e_acsl_at_6 +
-                               (int)((int)((int)(__gen_e_acsl_u_7 - 9) * 26)
-                                     + (int)(__gen_e_acsl_v_5 - -4)));
+                  Eva: initialization:
+                    \initialized(__gen_e_acsl_at_6 +
+                                 (int)((int)((int)(__gen_e_acsl_u_7 - 9) * 26)
+                                       + (int)(__gen_e_acsl_v_5 - -4)));
             */
             if (*(__gen_e_acsl_at_6 + ((__gen_e_acsl_u_7 - 9) * 26 + (
                                        __gen_e_acsl_v_5 - -4))) > 0L) 
@@ -612,10 +612,10 @@ int main(void)
   }
   /*@
   assert
-  \exists integer u;
-    9 <= u < 21 &&
-    (\forall integer v;
-       -5 < v <= (u < 15 ? u + 6 : 3) ==> \at((n + u) + v,K) > 0);
+    \exists integer u;
+      9 <= u < 21 &&
+      (\forall integer v;
+         -5 < v <= (u < 15 ? u + 6 : 3) ==> \at((n + u) + v,K) > 0);
    */
   ;
   int t[5] = {9, 12, 12, 12, -4};
@@ -734,12 +734,13 @@ int main(void)
   }
   /*@
   assert
-  \exists integer u;
-    10 <= u < 20 &&
-    (\exists integer v;
-       -10 < v <= -5 + (\let u = -2; u) &&
-       (\exists integer w;
-          100 < w <= 200 && \at((((n - u) + (\let u = 42; u)) + v) + w > 0,K)));
+    \exists integer u;
+      10 <= u < 20 &&
+      (\exists integer v;
+         -10 < v <= -5 + (\let u = -2; u) &&
+         (\exists integer w;
+            100 < w <= 200 &&
+            \at((((n - u) + (\let u = 42; u)) + v) + w > 0,K)));
    */
   ;
   /*@

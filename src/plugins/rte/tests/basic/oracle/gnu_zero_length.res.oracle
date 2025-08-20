@@ -29,7 +29,8 @@ int main(void)
     }
     /*@ assert rte: mem_access: \valid_read(&s->length); */
     /*@ assert
-        rte: mem_access: \valid_read(&s->fam[(unsigned int)(s->length - 1)]);
+          rte: mem_access:
+            \valid_read(&s->fam[(unsigned int)(s->length - 1)]);
     */
     __retres = s->fam[s->length - (unsigned int)1];
     goto return_label;

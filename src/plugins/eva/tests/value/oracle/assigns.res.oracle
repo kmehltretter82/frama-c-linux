@@ -987,7 +987,7 @@ int main2(void)
   int *p = ff2();
   int *q = ff2_bis();
   /*@ assert
-      Eva: ptr_comparison: \pointer_comparable((void *)p, (void *)(&x));
+        Eva: ptr_comparison: \pointer_comparable((void *)p, (void *)(&x));
   */
   if (p != & x) {
     __retres = 1;

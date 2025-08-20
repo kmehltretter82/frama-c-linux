@@ -232,8 +232,8 @@ void g_signed(int a, int b)
                                 & __gen_e_acsl_assert_data_3);
     __gen_e_acsl_b_shiftl_guard = __gmpz_fits_ulong_p((__e_acsl_mpz_struct const *)(__gen_e_acsl_b));
     /*@ assert
-        E_ACSL: shiftl_rhs_fits_in_mp_bitcnt_t:
-          0 <= b <= 18446744073709551615;
+          E_ACSL: shiftl_rhs_fits_in_mp_bitcnt_t:
+            0 <= b <= 18446744073709551615;
     */
     {
       __gen_e_acsl_assert_data_3.blocking = 1;
@@ -313,8 +313,8 @@ void g_signed(int a, int b)
                                 & __gen_e_acsl_assert_data_6);
     __gen_e_acsl_b_shiftr_guard = __gmpz_fits_ulong_p((__e_acsl_mpz_struct const *)(__gen_e_acsl_b_2));
     /*@ assert
-        E_ACSL: shiftr_rhs_fits_in_mp_bitcnt_t:
-          0 <= b <= 18446744073709551615;
+          E_ACSL: shiftr_rhs_fits_in_mp_bitcnt_t:
+            0 <= b <= 18446744073709551615;
     */
     {
       __gen_e_acsl_assert_data_6.blocking = 1;
@@ -392,8 +392,8 @@ void g_signed(int a, int b)
                (__e_acsl_mpz_struct const *)(__gen_e_acsl__4));
     __gen_e_acsl_cst_shiftl_guard = __gmpz_fits_ulong_p((__e_acsl_mpz_struct const *)(__gen_e_acsl__4));
     /*@ assert
-        E_ACSL: shiftl_rhs_fits_in_mp_bitcnt_t:
-          0 <= 1 <= 18446744073709551615;
+          E_ACSL: shiftl_rhs_fits_in_mp_bitcnt_t:
+            0 <= 1 <= 18446744073709551615;
     */
     {
       __gen_e_acsl_assert_data_9.blocking = 1;
@@ -465,8 +465,8 @@ void g_signed(int a, int b)
                (__e_acsl_mpz_struct const *)(__gen_e_acsl__7));
     __gen_e_acsl_cst_shiftr_guard = __gmpz_fits_ulong_p((__e_acsl_mpz_struct const *)(__gen_e_acsl__7));
     /*@ assert
-        E_ACSL: shiftr_rhs_fits_in_mp_bitcnt_t:
-          0 <= 1 <= 18446744073709551615;
+          E_ACSL: shiftr_rhs_fits_in_mp_bitcnt_t:
+            0 <= 1 <= 18446744073709551615;
     */
     {
       __gen_e_acsl_assert_data_12.blocking = 1;
@@ -532,8 +532,8 @@ void g_signed(int a, int b)
     __gmpz_init_set_si(__gen_e_acsl__11,65L);
     __gen_e_acsl_cst_shiftl_guard_2 = __gmpz_fits_ulong_p((__e_acsl_mpz_struct const *)(__gen_e_acsl__11));
     /*@ assert
-        E_ACSL: shiftl_rhs_fits_in_mp_bitcnt_t:
-          0 <= 65 <= 18446744073709551615;
+          E_ACSL: shiftl_rhs_fits_in_mp_bitcnt_t:
+            0 <= 65 <= 18446744073709551615;
     */
     {
       __gen_e_acsl_assert_data_15.blocking = 1;
@@ -626,7 +626,8 @@ void g_signed(int a, int b)
   }
   /*@
   assert
-  (18446744073709551615ULL + 1 | (-9223372036854775807LL - 1LL) - 1) != 0; */
+    (18446744073709551615ULL + 1 | (-9223372036854775807LL - 1LL) - 1) != 0;
+   */
   ;
   {
     __e_acsl_mpz_t __gen_e_acsl__17;
@@ -677,8 +678,9 @@ void g_signed(int a, int b)
   }
   /*@
   assert
-  (18446744073709551615ULL + 1 & (-9223372036854775807LL - 1LL) - 1) !=
-  (18446744073709551615ULL + 1 ^ (-9223372036854775807LL - 1LL) - 1); */
+    (18446744073709551615ULL + 1 & (-9223372036854775807LL - 1LL) - 1) !=
+    (18446744073709551615ULL + 1 ^ (-9223372036854775807LL - 1LL) - 1);
+   */
   ;
   return;
 }
@@ -710,8 +712,8 @@ void g_unsigned(unsigned int a, unsigned int b)
                                 & __gen_e_acsl_assert_data_3);
     __gen_e_acsl_b_shiftl_guard = __gmpz_fits_ulong_p((__e_acsl_mpz_struct const *)(__gen_e_acsl_b));
     /*@ assert
-        E_ACSL: shiftl_rhs_fits_in_mp_bitcnt_t:
-          0 <= b <= 18446744073709551615;
+          E_ACSL: shiftl_rhs_fits_in_mp_bitcnt_t:
+            0 <= b <= 18446744073709551615;
     */
     {
       __gen_e_acsl_assert_data_3.blocking = 1;
@@ -791,8 +793,8 @@ void g_unsigned(unsigned int a, unsigned int b)
                                 & __gen_e_acsl_assert_data_6);
     __gen_e_acsl_b_shiftr_guard = __gmpz_fits_ulong_p((__e_acsl_mpz_struct const *)(__gen_e_acsl_b_2));
     /*@ assert
-        E_ACSL: shiftr_rhs_fits_in_mp_bitcnt_t:
-          0 <= b <= 18446744073709551615;
+          E_ACSL: shiftr_rhs_fits_in_mp_bitcnt_t:
+            0 <= b <= 18446744073709551615;
     */
     {
       __gen_e_acsl_assert_data_6.blocking = 1;
@@ -870,8 +872,8 @@ void g_unsigned(unsigned int a, unsigned int b)
                (__e_acsl_mpz_struct const *)(__gen_e_acsl__4));
     __gen_e_acsl_cst_shiftl_guard = __gmpz_fits_ulong_p((__e_acsl_mpz_struct const *)(__gen_e_acsl__4));
     /*@ assert
-        E_ACSL: shiftl_rhs_fits_in_mp_bitcnt_t:
-          0 <= 1u <= 18446744073709551615;
+          E_ACSL: shiftl_rhs_fits_in_mp_bitcnt_t:
+            0 <= 1u <= 18446744073709551615;
     */
     {
       __gen_e_acsl_assert_data_9.blocking = 1;
@@ -943,8 +945,8 @@ void g_unsigned(unsigned int a, unsigned int b)
                (__e_acsl_mpz_struct const *)(__gen_e_acsl__7));
     __gen_e_acsl_cst_shiftr_guard = __gmpz_fits_ulong_p((__e_acsl_mpz_struct const *)(__gen_e_acsl__7));
     /*@ assert
-        E_ACSL: shiftr_rhs_fits_in_mp_bitcnt_t:
-          0 <= 1u <= 18446744073709551615;
+          E_ACSL: shiftr_rhs_fits_in_mp_bitcnt_t:
+            0 <= 1u <= 18446744073709551615;
     */
     {
       __gen_e_acsl_assert_data_12.blocking = 1;
@@ -1010,8 +1012,8 @@ void g_unsigned(unsigned int a, unsigned int b)
     __gmpz_init_set_si(__gen_e_acsl__11,65L);
     __gen_e_acsl_cst_shiftl_guard_2 = __gmpz_fits_ulong_p((__e_acsl_mpz_struct const *)(__gen_e_acsl__11));
     /*@ assert
-        E_ACSL: shiftl_rhs_fits_in_mp_bitcnt_t:
-          0 <= 65u <= 18446744073709551615;
+          E_ACSL: shiftl_rhs_fits_in_mp_bitcnt_t:
+            0 <= 65u <= 18446744073709551615;
     */
     {
       __gen_e_acsl_assert_data_15.blocking = 1;
@@ -1134,7 +1136,8 @@ void g_unsigned(unsigned int a, unsigned int b)
   }
   /*@
   assert
-  (18446744073709551615ULL + 1u & 1u) != (18446744073709551615ULL + 1u ^ 1u);
+    (18446744073709551615ULL + 1u & 1u) !=
+    (18446744073709551615ULL + 1u ^ 1u);
    */
   ;
   return;

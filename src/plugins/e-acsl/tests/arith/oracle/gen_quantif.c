@@ -176,8 +176,8 @@ int main(void)
   }
   /*@
   assert
-  \forall integer x, integer y, integer z;
-    0 <= x < 2 && 0 <= y < 5 && 0 <= z <= y ==> x + z <= y + 1;
+    \forall integer x, integer y, integer z;
+      0 <= x < 2 && 0 <= y < 5 && 0 <= z <= y ==> x + z <= y + 1;
    */
   ;
   {
@@ -262,9 +262,9 @@ int main(void)
   }
   /*@
   assert
-  \forall int x;
-    0 <= x < 10 ==>
-    x % 2 == 0 ==> (\exists integer y; 0 <= y <= x / 2 && x == 2 * y);
+    \forall int x;
+      0 <= x < 10 ==>
+      x % 2 == 0 ==> (\exists integer y; 0 <= y <= x / 2 && x == 2 * y);
    */
   ;
   {
@@ -333,10 +333,10 @@ int main(void)
   }
   /*@
   assert
-  \forall int x;
-    0 <= x < 10 ==>
-    (\forall int y; 10 <= y < 20 ==> x <= y) &&
-    (\forall int y; -10 <= y < 0 ==> y <= x);
+    \forall int x;
+      0 <= x < 10 ==>
+      (\forall int y; 10 <= y < 20 ==> x <= y) &&
+      (\forall int y; -10 <= y < 0 ==> y <= x);
    */
   ;
   {
@@ -558,7 +558,8 @@ int main(void)
   }
   /*@
   assert \let u = 5;
-  \forall integer x, integer y; 0 <= x < 2 && 4 < y < u ==> \false; */
+    \forall integer x, integer y; 0 <= x < 2 && 4 < y < u ==> \false;
+   */
   ;
   {
     int __gen_e_acsl_forall_13;
@@ -610,9 +611,9 @@ int main(void)
   }
   /*@
   assert
-  forall_multiple_binders_1:
-    \forall integer i, integer j, integer k;
-      0 <= i < 10 && 1 < j <= 11 && 2 <= k <= 12 ==> p1(i, j, k);
+    forall_multiple_binders_1:
+      \forall integer i, integer j, integer k;
+        0 <= i < 10 && 1 < j <= 11 && 2 <= k <= 12 ==> p1(i, j, k);
    */
   ;
   {
@@ -665,9 +666,9 @@ int main(void)
   }
   /*@
   assert
-  forall_multiple_binders_2:
-    \forall integer i, integer j, integer k;
-      0 <= i <= j < k <= 10 ==> p2(i, j, k);
+    forall_multiple_binders_2:
+      \forall integer i, integer j, integer k;
+        0 <= i <= j < k <= 10 ==> p2(i, j, k);
    */
   ;
   {
@@ -720,9 +721,9 @@ int main(void)
   }
   /*@
   assert
-  forall_multiple_binders_3:
-    \forall integer i, integer j, integer k;
-      0 <= i < j <= 10 && 1 < k < 11 ==> p3(i, j, k);
+    forall_multiple_binders_3:
+      \forall integer i, integer j, integer k;
+        0 <= i < j <= 10 && 1 < k < 11 ==> p3(i, j, k);
    */
   ;
   {
@@ -775,9 +776,9 @@ int main(void)
   }
   /*@
   assert
-  forall_multiple_binders_4:
-    \forall integer i, integer j, integer k;
-      0 <= i < 10 ==> 1 < j <= 11 ==> 2 <= k <= 12 ==> p1(i, j, k);
+    forall_multiple_binders_4:
+      \forall integer i, integer j, integer k;
+        0 <= i < 10 ==> 1 < j <= 11 ==> 2 <= k <= 12 ==> p1(i, j, k);
    */
   ;
   {
@@ -830,9 +831,9 @@ int main(void)
   }
   /*@
   assert
-  forall_unordered_binders:
-    \forall integer i, integer j, integer k;
-      0 <= i <= k <= 10 && 1 <= j < k ==> p4(i, j, k);
+    forall_unordered_binders:
+      \forall integer i, integer j, integer k;
+        0 <= i <= k <= 10 && 1 <= j < k ==> p4(i, j, k);
    */
   ;
   {
@@ -885,9 +886,9 @@ int main(void)
   }
   /*@
   assert
-  exists_multiple_binders_1:
-    \exists integer i, integer j, integer k;
-      0 <= i < 10 && 1 < j <= 11 && 2 <= k <= 12 && p1(i, j, k);
+    exists_multiple_binders_1:
+      \exists integer i, integer j, integer k;
+        0 <= i < 10 && 1 < j <= 11 && 2 <= k <= 12 && p1(i, j, k);
    */
   ;
   {
@@ -940,9 +941,9 @@ int main(void)
   }
   /*@
   assert
-  exists_multiple_binders_2:
-    \exists integer i, integer j, integer k;
-      0 <= i <= j < k <= 10 && p2(i, j, k);
+    exists_multiple_binders_2:
+      \exists integer i, integer j, integer k;
+        0 <= i <= j < k <= 10 && p2(i, j, k);
    */
   ;
   {
@@ -995,9 +996,9 @@ int main(void)
   }
   /*@
   assert
-  exists_multiple_binders_3:
-    \exists integer i, integer j, integer k;
-      0 <= i < j <= 10 && 1 < k < 11 && p3(i, j, k);
+    exists_multiple_binders_3:
+      \exists integer i, integer j, integer k;
+        0 <= i < j <= 10 && 1 < k < 11 && p3(i, j, k);
    */
   ;
   {
@@ -1050,72 +1051,76 @@ int main(void)
   }
   /*@
   assert
-  exists_unordered_binders:
-    \exists integer i, integer j, integer k;
-      0 <= i <= k <= 10 && 1 <= j < k && p4(i, j, k);
+    exists_unordered_binders:
+      \exists integer i, integer j, integer k;
+        0 <= i <= k <= 10 && 1 <= j < k && p4(i, j, k);
    */
   ;
   /*@
   assert
-  failed_invalid_guards: \forall integer i; 10 > i >= 0 ==> p1(i, 2, 2); */
-  ;
-  /*@
-  assert
-  failed_unguarded_k:
-    \forall integer i, integer j, integer k;
-      0 <= i < 10 && 1 < j <= 11 ==> p1(i, j, k);
+    failed_invalid_guards: \forall integer i; 10 > i >= 0 ==> p1(i, 2, 2);
    */
   ;
   /*@
   assert
-  failed_non_integer: \forall real i; 0 <= i < 10 ==> p1(\truncate(i), 2, 2);
+    failed_unguarded_k:
+      \forall integer i, integer j, integer k;
+        0 <= i < 10 && 1 < j <= 11 ==> p1(i, j, k);
    */
   ;
   /*@
   assert
-  failed_missing_lower_bound: \forall integer i; i < 10 ==> p1(i, 2, 2); */
-  ;
-  /*@
-  assert
-  failded_missing_upper_bound: \forall integer i; 0 <= i ==> p1(i, 2, 2); */
-  ;
-  /*@
-  assert
-  failed_invalid_upper_bound_1:
-    \forall integer i, integer j; 0 <= i < j ==> p1(i, j, 2);
+    failed_non_integer:
+      \forall real i; 0 <= i < 10 ==> p1(\truncate(i), 2, 2);
    */
   ;
   /*@
   assert
-  failed_invalid_upper_bound_2:
-    \forall integer i, integer j; i < j && 0 <= i ==> p1(i, 2, 2);
+    failed_missing_lower_bound: \forall integer i; i < 10 ==> p1(i, 2, 2);
    */
   ;
   /*@
   assert
-  failed_extra_constraint:
-    \forall integer i, integer j;
-      0 <= i < j && i < 10 && 3 <= j < 5 ==> p1(i, j, 2);
+    failded_missing_upper_bound: \forall integer i; 0 <= i ==> p1(i, 2, 2);
    */
   ;
   /*@
   assert
-  failed_multiple_upper_bounds:
-    \forall integer i, integer j; 0 <= i < j < i && j <= 10 ==> p1(i, j, 2);
+    failed_invalid_upper_bound_1:
+      \forall integer i, integer j; 0 <= i < j ==> p1(i, j, 2);
    */
   ;
   /*@
   assert
-  multiple_linked_upper:
-    \forall integer i, integer j, integer k;
-      0 <= i < k && 1 <= j < k && 2 <= k < 10 ==> p1(i, j, k);
+    failed_invalid_upper_bound_2:
+      \forall integer i, integer j; i < j && 0 <= i ==> p1(i, 2, 2);
    */
   ;
   /*@
   assert
-  multiple_guard:
-    \forall integer i, integer j;
-      0 <= i < 10 && 2 <= i < 8 && 4 <= j < 6 ==> p1(i, j, 2);
+    failed_extra_constraint:
+      \forall integer i, integer j;
+        0 <= i < j && i < 10 && 3 <= j < 5 ==> p1(i, j, 2);
+   */
+  ;
+  /*@
+  assert
+    failed_multiple_upper_bounds:
+      \forall integer i, integer j; 0 <= i < j < i && j <= 10 ==> p1(i, j, 2);
+   */
+  ;
+  /*@
+  assert
+    multiple_linked_upper:
+      \forall integer i, integer j, integer k;
+        0 <= i < k && 1 <= j < k && 2 <= k < 10 ==> p1(i, j, k);
+   */
+  ;
+  /*@
+  assert
+    multiple_guard:
+      \forall integer i, integer j;
+        0 <= i < 10 && 2 <= i < 8 && 4 <= j < 6 ==> p1(i, j, 2);
    */
   ;
   {

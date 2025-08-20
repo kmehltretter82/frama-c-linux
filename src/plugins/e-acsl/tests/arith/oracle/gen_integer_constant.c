@@ -69,7 +69,7 @@ int main(void)
   }
   /*@
   assert
-  0xffffffffffffffffffffffffffffffff == 0xffffffffffffffffffffffffffffffff;
+    0xffffffffffffffffffffffffffffffff == 0xffffffffffffffffffffffffffffffff;
    */
   ;
   __retres = 0;

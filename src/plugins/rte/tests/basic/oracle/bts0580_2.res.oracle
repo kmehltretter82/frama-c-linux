@@ -28,7 +28,7 @@ int main(int i)
   /*@ assert rte: index_bound: 0 ≤ *p; */
   /*@ assert rte: index_bound: *p < 5; */
   /*@ assert
-      rte: mem_access: \valid_read(&(buff.data[i].cell[*p].next)->val);
+        rte: mem_access: \valid_read(&(buff.data[i].cell[*p].next)->val);
   */
   a = (buff.data[i].cell[*p].next)->val;
   /*@ assert rte: index_bound: 0 ≤ c[2]; */

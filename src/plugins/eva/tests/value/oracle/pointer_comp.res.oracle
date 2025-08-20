@@ -87,48 +87,51 @@ void main(void)
   i = p == (void (*)(void))0;
   i = & s2[2] < & s2[4];
   /*@ assert
-      Eva: ptr_comparison: \pointer_comparable((void *)(&s2[9]), (void *)0);
+        Eva: ptr_comparison: \pointer_comparable((void *)(&s2[9]), (void *)0);
   */
   i = & s2[9] == (struct s *)0;
   /*@ assert
-      Eva: ptr_comparison:
-        \pointer_comparable((void *)(&s2[9]), (void *)(&s2[9]));
+        Eva: ptr_comparison:
+          \pointer_comparable((void *)(&s2[9]), (void *)(&s2[9]));
   */
   i = & s2[9] == & s2[9];
   /*@ assert
-      Eva: ptr_comparison:
-        \pointer_comparable((void *)(&str1), (void *)(&str2));
+        Eva: ptr_comparison:
+          \pointer_comparable((void *)(&str1), (void *)(&str2));
   */
   i = & str1 < & str2;
   /*@ assert
-      Eva: ptr_comparison: \pointer_comparable((void *)(&s1), (void *)(&s2));
+        Eva: ptr_comparison:
+          \pointer_comparable((void *)(&s1), (void *)(&s2));
   */
   i = (void *)(& s1) < (void *)(& s2);
   /*@ assert
-      Eva: ptr_comparison:
-        \pointer_comparable((void (*)())(&f), (void (*)())(&g));
+        Eva: ptr_comparison:
+          \pointer_comparable((void (*)())(&f), (void (*)())(&g));
   */
   i = & f < & g;
   /*@ assert
-      Eva: ptr_comparison: \pointer_comparable((void *)(&s1), (void *)0);
+        Eva: ptr_comparison: \pointer_comparable((void *)(&s1), (void *)0);
   */
   i = & s1 > (struct s *)0;
   /*@ assert
-      Eva: ptr_comparison: \pointer_comparable((void *)(&s1 + 1), (void *)0);
+        Eva: ptr_comparison:
+          \pointer_comparable((void *)(&s1 + 1), (void *)0);
   */
   i = & s1 + 1 > (struct s *)0;
   /*@ assert
-      Eva: ptr_comparison: \pointer_comparable((void *)(&s2[8]), (void *)0);
+        Eva: ptr_comparison: \pointer_comparable((void *)(&s2[8]), (void *)0);
   */
   i = & s2[8] > (struct s *)0;
   i = & f == (void (*)(void))0;
   /*@ assert
-      Eva: ptr_comparison:
-        \pointer_comparable((void (*)())(&f), (void (*)())0);
+        Eva: ptr_comparison:
+          \pointer_comparable((void (*)())(&f), (void (*)())0);
   */
   i = & f > (void (*)(void))0;
   /*@ assert
-      Eva: ptr_comparison: \pointer_comparable((void (*)())p, (void (*)())0);
+        Eva: ptr_comparison:
+          \pointer_comparable((void (*)())p, (void (*)())0);
   */
   i = p > (void (*)(void))0;
   return;
