@@ -1,9 +1,9 @@
 [kernel] Parsing garbled.i (no preprocessing)
 [region] Analyzing regions
 [region] Function job:
-  R0008: R-- p (int *) 64b (*R000a) ;
-  R000a: R-- (int) (float) 32b ;
-  R0003: R-- q (int *) 64b (*R0005) ;
-  R0005: R-- (int) 32b ;
-  R0001: RW- __retres (float) 32b ;
-  R000f: -W- (float) 32b ;
+  R0001: R-- p (int *) 64b (*R0002) ;
+  R0002: R-- (int) (float) 32b ;
+  R0003: R-- q (int *) 64b (*R0004) ;
+  R0004: R-- (int) 32b ;
+  R0005: RW- __retres (float) 32b ;
+  R0006: -W- (float) 32b ;

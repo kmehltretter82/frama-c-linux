@@ -69,10 +69,10 @@ let new_value m v = {
 let eq m n1 n2 = Store.eq m.values n1.nnode n2.nnode
 
 let normalize m n =
-  let nnode = Ufind.find m.values n.nnode in
+  let nnode = try Ufind.find m.values n.nnode with Not_found -> n.nnode in
   {
     nnode ;
-    nid = snd @@ Ufind.get m.values nnode ;
+    nid = try snd @@ Ufind.get m.values nnode with Not_found -> None ;
   }
 
 let id_to_node m id =

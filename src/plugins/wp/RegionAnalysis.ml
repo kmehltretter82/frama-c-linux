@@ -18,10 +18,7 @@ let get_map () =
   | Global -> Wp_parameters.not_yet_implemented "[region] logic context"
 
 let id region =
-  let default () =
-    Format.eprintf "-+- No id for region %i@." @@ Region.id region ; 0
-  in
-  Option.value ~default:(default()) @@ Region.uid (get_map ()) region
+  Option.value ~default:0 @@ Region.uid (get_map ()) region
 let pretty fmt r = Format.fprintf fmt "R%03d" @@ id r
 
 let of_id id =

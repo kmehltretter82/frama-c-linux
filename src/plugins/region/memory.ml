@@ -119,11 +119,7 @@ let empty = {
 
 let forge = Node.forge
 
-let id_to_node m id =
-  try Node.id_to_node m.store id with
-  | Not_found ->
-    Format.eprintf "+++ ids_to_rref=@[%a@]@." Node.pp_ids m.store ;
-    Node.forge id
+let id_to_node m id = Node.id_to_node m.store id
 
 let equal (m: map) = Node.eq m.store
 
