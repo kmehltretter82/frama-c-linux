@@ -108,7 +108,7 @@ let pretty ?truncate ?(ellipsis="[...]") fmt message =
 let min_buffer = 128    (* initial size of buffer *)
 
 type buffer = {
-  mutable formatter : Format.formatter ; (* formatter on self (recursive) *)
+  formatter : Format.formatter ; (* formatter on self (recursive) *)
   content : Buffer.t ;
   mutable revtags : tag list ; (* in reverse order *)
   mutable stack : (int * Format.stag * tag list) list ; (* opened tag positions *)
@@ -186,14 +186,9 @@ let rec pop_all buffer =
 (* -------------------------------------------------------------------------- *)
 
 let create ?indent ?margin () =
-  let buffer = {
-    formatter = Format.err_formatter ;
-    content = Buffer.create min_buffer ;
-    revtags = [] ;
-    stack = [] ;
-  } in
-  let fmt = Format.formatter_of_buffer buffer.content in
-  buffer.formatter <- fmt ;
+  let content = Buffer.create min_buffer in
+  let fmt = Format.formatter_of_buffer content in
+  let buffer = { formatter=fmt; content; revtags = [] ; stack = [] ; } in
   begin match indent , margin with
     | None , None -> ()
     | Some k , None ->
@@ -207,14 +202,13 @@ let create ?indent ?margin () =
       Format.pp_set_margin fmt (max 0 m) ;
       Format.pp_set_max_indent fmt (max 0 (min k (m-10)))
   end ;
-  let open Format in
-  Format.pp_set_formatter_stag_functions fmt {
-    Format.print_open_stag = ignore ;
-    print_close_stag = ignore ;
-    mark_open_stag = (fun stag -> push_tag buffer stag; "") ;
-    mark_close_stag = (fun stag -> pop_tag buffer stag; "") ;
-  } ;
-  pp_set_mark_tags fmt true ;
+  Format.pp_set_formatter_stag_functions fmt Format.{
+      print_open_stag = ignore ;
+      print_close_stag = ignore ;
+      mark_open_stag = (fun stag -> push_tag buffer stag; "") ;
+      mark_close_stag = (fun stag -> pop_tag buffer stag; "") ;
+    } ;
+  Format.pp_set_mark_tags fmt true ;
   buffer
 
 let trim buffer =
