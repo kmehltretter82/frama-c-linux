@@ -17,12 +17,15 @@ type tag = {
   children : tag list ;
 }
 
-type message = string * tag list
+type message = {
+  plain : string;
+  tags : tag list;
+}
 
-let size (text,_) = String.length text
-let char_at (text,_) k = String.get text k
-let string (text,_) = text
-let substring (text,_) k n = String.sub text k n
+let size message = String.length message.plain
+let char_at message k = String.get message.plain k
+let string message = message.plain
+let substring message k n = String.sub message.plain k n
 
 let rec lookup acc k = function
   | [] -> acc
@@ -31,10 +34,12 @@ let rec lookup acc k = function
     if q < k then acc else
       lookup ((tag,p,q+1-p)::acc) k children
 
-let tags_at (_,tags) k = lookup [] k tags
+let tags_at message k = lookup [] k message.tags
 
-let pretty fmt (text, tags) =
-  let output p q = Format.pp_print_string fmt (String.sub text p (q + 1 - p)) in
+let pretty fmt message =
+  let output p q =
+    Format.pp_print_string fmt (String.sub message.plain p (q + 1 - p))
+  in
   let rec aux fmt p q = function
     | [] -> output p q
     | { tag ; p=tp ; q=tq ; children } :: tags ->
@@ -48,7 +53,7 @@ let pretty fmt (text, tags) =
           aux fmt (succ tq) q tags ;
         end
   in
-  aux fmt 0 (String.length text) tags
+  aux fmt 0 (String.length message.plain) message.tags
 
 
 (* -------------------------------------------------------------------------- *)
@@ -167,7 +172,8 @@ let contents buffer =
   Buffer.contents buffer.content
 
 let message buffer =
-  ( Buffer.contents buffer.content , List.rev buffer.revtags )
+  { plain = Buffer.contents buffer.content ;
+    tags = List.rev buffer.revtags }
 
 let sub buffer p n = Buffer.sub buffer.content p n
 let range buffer p q = Buffer.sub buffer.content p (q+1-p)
