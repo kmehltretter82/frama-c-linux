@@ -24,10 +24,7 @@ open Cil_types
 open Memory
 
 (** All the provided maps are locked. *)
-type domain = {
-  map : map ;
-  spec : map Property.Map.t ;
-}
+type domain = map
 
 (** The global map, if provided, is used as an accumulator. *)
 val domain : ?global:map -> kernel_function -> domain

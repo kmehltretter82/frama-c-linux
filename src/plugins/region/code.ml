@@ -253,20 +253,13 @@ and add_block ~kf (m:map) (b:block) =
 (* --- Behavior                                                           --- *)
 (* -------------------------------------------------------------------------- *)
 
-type imap = Memory.map Property.Map.t ref
-
-let istore imap m ip =
-  imap := Property.Map.add ip (Memory.copy ~locked:true m) !imap
-
-let add_bhv ~kf ~result:_ (s:imap) (m:map) (bhv:behavior) =
+let add_bhv ~kf:_ ~result:_ (m:map) (bhv:behavior) =
   List.iter
     (fun e ->
        let rs = Spec.of_extension e in
        if rs <> [] then
          begin
            List.iter (Logic.add_region m) rs ;
-           let ip = Property.ip_of_extended (ELContract kf) e in
-           istore s m ip ;
          end
     ) bhv.b_extended
 
@@ -274,18 +267,14 @@ let add_bhv ~kf ~result:_ (s:imap) (m:map) (bhv:behavior) =
 (* --- Function                                                           --- *)
 (* -------------------------------------------------------------------------- *)
 
-type domain = {
-  map : map ;
-  spec : map Property.Map.t ;
-}
+type domain = map
 
 let domain ?global kf =
   let m = match global with Some g -> g | None -> Memory.create () in
-  let s = ref Property.Map.empty in
   begin
     try
       let funspec = Annotations.funspec kf in
-      List.iter (add_bhv ~kf ~result s m) funspec.spec_behavior ;
+      List.iter (add_bhv ~kf ~result m) funspec.spec_behavior ;
       let ki = Kinstr.kinstr_of_opt_stmt None in
       List.iter (Annot.add_behavior ~iscalled:false ~kf ~ki ~result:None m)
         funspec.spec_behavior ;
@@ -297,9 +286,6 @@ let domain ?global kf =
       add_block ~kf m fundec.sbody ;
     with Kernel_function.No_Definition -> ()
   end ;
-  {
-    map = Memory.copy ~locked:true m ;
-    spec = !s ;
-  }
+  Memory.copy ~locked:true m
 
 (* -------------------------------------------------------------------------- *)

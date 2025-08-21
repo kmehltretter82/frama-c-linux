@@ -220,7 +220,7 @@ let map_of_localizable (loc : Printer_tag.localizable) =
   let open Printer_tag in
   match kf_of_localizable loc with
   | None -> raise Not_found
-  | Some kf -> (Analysis.find kf).map
+  | Some kf -> Analysis.find kf
 
 let region_of_localizable (m: Memory.map) (loc: Printer_tag.localizable) =
   try
@@ -234,7 +234,7 @@ let region_of_localizable (m: Memory.map) (loc: Printer_tag.localizable) =
 
 let map_of_declaration (decl : Printer_tag.declaration) =
   match decl with
-  | SFunction kf -> (Analysis.find kf).map
+  | SFunction kf -> Analysis.find kf
   | _ -> raise Not_found
 
 let signal = Request.signal ~package ~name:"updated"

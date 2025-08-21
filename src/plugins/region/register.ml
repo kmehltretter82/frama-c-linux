@@ -42,7 +42,7 @@ let main () =
                   Format.pp_print_newline fmt () ;
                   Memory.pp_region fmt r ;
                 end @@
-              Memory.regions domain.map
+              Memory.regions domain
             end
         end
     end
