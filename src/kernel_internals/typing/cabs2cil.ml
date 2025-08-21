@@ -3997,13 +3997,13 @@ let solveAlignas ~original_type alignas_specifiers =
   let doAlignas alignas =
     begin match Option.map Z.to_int @@ constFoldToInt ~machdep:true alignas with
       | exception Z.Overflow ->
-        Kernel.abort
+        Kernel.abort ~current:true
           "Can't handle a value that big for _Alignas (%a)" Cil_printer.pp_exp alignas
       | None ->
-        Kernel.abort (* C11 6.7.5 § 3 *)
+        Kernel.abort ~current:true (* C11 6.7.5 § 3 *)
           "Invalid _Alignas(%a): shall evaluate to a constant" Cil_printer.pp_exp alignas ;
       | Some value when not @@ (value = 0 || is_power_of_two value) ->
-        Kernel.abort (* C11 6.2.8 § 4 *)
+        Kernel.abort  ~current:true (* C11 6.2.8 § 4 *)
           "Invalid _Alignas(%a): shall be 0 or a positive power of 2" Cil_printer.pp_exp alignas ;
       | Some value -> alignas, value
     end
@@ -4026,7 +4026,7 @@ let solveAlignas ~original_type alignas_specifiers =
 
     (* C11 6.7.5 § 1 *)
     if v < original_align then
-      Kernel.abort
+      Kernel.abort ~current:true
         "Invalid _Alignas(%a): shall not reduce original alignof(%a): %d"
         Cil_printer.pp_exp alignas
         Cil_printer.pp_typ original_type
@@ -4034,7 +4034,7 @@ let solveAlignas ~original_type alignas_specifiers =
 
     (* C11 6.7.5 § 1 *)
     if extended_align = 0 && v > max_align then
-      Kernel.abort
+      Kernel.abort ~current:true
         "Invalid _Alignas(%a): exceeds alignof(max_align_t): %d, \
          and machdep does not allow extended alignment"
         Cil_printer.pp_exp alignas
@@ -4042,7 +4042,7 @@ let solveAlignas ~original_type alignas_specifiers =
 
     (* C11 6.7.5 § 1 *)
     if v > extended_align && extended_align > 0 then
-      Kernel.abort
+      Kernel.abort ~current:true
         "Invalid _Alignas(%a): exceeds max extended alignment: %d"
         Cil_printer.pp_exp alignas
         extended_align ;

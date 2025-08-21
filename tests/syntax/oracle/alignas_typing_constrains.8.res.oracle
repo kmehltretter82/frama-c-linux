@@ -1,3 +1,4 @@
 [kernel] Parsing alignas_typing_constrains.c (with preprocessing)
-[kernel] User Error: Invalid _Alignas(-1): shall be 0 or a positive power of 2
+[kernel] alignas_typing_constrains.c:112: User Error: 
+  Invalid _Alignas(2): shall not reduce original alignof(struct Al4): 4
 [kernel] Frama-C aborted: invalid user input.
