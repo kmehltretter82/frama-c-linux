@@ -29,6 +29,9 @@ let size message = String.length message.plain
 let char_at message k = String.get message.plain k
 let substring message k n = String.sub message.plain k n
 
+let contains message c =
+  String.contains message.plain c
+
 let rec lookup acc k = function
   | [] -> acc
   | { p ; q ; tag ; children } :: tags ->

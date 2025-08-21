@@ -23,10 +23,12 @@ val of_string : string -> message
 val size : message -> int
 val char_at : message -> int -> char
 val substring : message -> int -> int -> string
+val contains : message -> char -> bool
 
 val tags_at : message -> int -> (Format.stag * int * int) list
 (** Returns the list of tags at the given position.
     Inner tags come first, outer tags last. *)
+
 
 (** [pretty fmt buffer] pretty-prints the message onto the given formatter
     [fmt], with the semantic tags.
