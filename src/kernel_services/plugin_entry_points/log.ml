@@ -246,9 +246,9 @@ struct
 
   let pp_kind fmt = function
     | Result | Feedback | Debug -> ()
-    | Error   -> Format.pp_print_string fmt "User Error: "
-    | Warning -> Format.pp_print_string fmt "Warning: "
-    | Failure -> Format.pp_print_string fmt "Failure: "
+    | Error   -> Format.fprintf fmt "@{<red>User Error:@} "
+    | Warning -> Format.fprintf fmt "@{<orange>Warning:@} "
+    | Failure -> Format.fprintf fmt "@{<red>Failure:@} "
 
   let pp_message ?truncate fmt buffer =
     if Rich_text.need_truncation ?truncate buffer then
@@ -256,12 +256,13 @@ struct
     Rich_text.pretty ?truncate fmt buffer
 
   let pretty ?truncate fmt evt =
-    let header = Format.asprintf "[%s%a] %a%a"
+    let header = Rich_text.mprintf ~trim:false "@{<bold>[%s%a] %a%a@}"
         evt.evt_plugin
         pp_category evt.evt_category
         pp_source evt.evt_source
         pp_kind evt.evt_kind
     in
+    let pp_header fmt header = Rich_text.pretty fmt header in
     let long_header = match evt with
       | { evt_category = None ; evt_source = None } -> false
       | _ -> true
@@ -269,12 +270,12 @@ struct
     (* whenever the first line of the event shall be printed along the header *)
     let lonely_header =
       long_header &&
-      (String.length header + Rich_text.size evt.evt_message > 80 ||
+      (Rich_text.size header + Rich_text.size evt.evt_message > 80 ||
        Rich_text.contains evt.evt_message '\n')
     in
     let fmt = formatter_with_indentation fmt 2 in
-    Format.fprintf fmt "%s%t%a@."
-      header
+    Format.fprintf fmt "%a%t%a@."
+      pp_header header
       (fun fmt -> if lonely_header then Format.pp_force_newline fmt ())
       (pp_message ?truncate) evt.evt_message
 
