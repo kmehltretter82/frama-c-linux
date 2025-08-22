@@ -686,7 +686,7 @@ let () = Unicode.add_update_hook (fun _ curr -> Fclib.Unicode.use_unicode curr)
 
 let () = Parameter_customize.set_group messages
 let () = Parameter_customize.do_not_projectify ()
-let () = Parameter_customize.set_cmdline_stage Cmdline.Extending
+let () = Parameter_customize.set_cmdline_stage Cmdline.Early
 module TTY =
   True
     (struct
@@ -694,6 +694,10 @@ module TTY =
       let module_name = "TTY"
       let help = "use terminal capabilities for feedback (when available)"
     end)
+let () =
+  Cmdline.run_after_early_stage (fun () ->
+      if TTY.get () && Ansi_escape.is_supported () then
+        let _reset = Ansi_escape.enable_on Format.std_formatter in ())
 let () = Log.tty := TTY.get
 
 let () = Parameter_customize.set_group messages
