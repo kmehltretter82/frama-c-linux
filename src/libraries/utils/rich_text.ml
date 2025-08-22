@@ -274,14 +274,22 @@ let bprintf buffer format =
 let kbprintf kjob buffer format =
   Format.kfprintf kjob buffer.formatter format
 
-let sprintf ?prefix ?suffix ?(indent=20) ?(margin=40)
-    ?trim ?truncate ?ellipsis format =
-  let buffer = create ~indent ~margin () in
-  let to_string _fmt =
-    let message = message ?trim buffer in
-    to_string ?prefix ?suffix ?truncate ?ellipsis message
+let kmprintf ?indent ?margin ?trim kjob format =
+  let buffer = create ?indent ?margin () in
+  let to_message _fmt =
+    kjob (message ?trim buffer)
   in
-  kbprintf to_string buffer format
+  kbprintf to_message buffer format
+
+let mprintf ?indent ?margin ?trim format =
+  kmprintf ?indent ?margin ?trim (Fun.id) format
+
+let sprintf ?(indent=20) ?(margin=40) ?trim ?truncate ?ellipsis format =
+  let to_string message =
+    to_string ?truncate ?ellipsis message
+  in
+  kmprintf ~indent ~margin ?trim to_string format
+
 
 (* -------------------------------------------------------------------------- *)
 (* --- Tests                                                              --- *)
@@ -289,7 +297,8 @@ let sprintf ?prefix ?suffix ?(indent=20) ?(margin=40)
 
 let test_pretty ?(truncate=12) format output =
   let prefix fmt = Format.pp_set_mark_tags fmt true in
-  let result = sprintf ~prefix ~truncate format in
+  let message = mprintf format in
+  let result = to_string ~prefix ~truncate message in
   let success = result = output in
   if not success then
     Format.eprintf "wrong output: '%s' given, '%s' expected@."
