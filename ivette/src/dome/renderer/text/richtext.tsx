@@ -12,6 +12,7 @@ import { classes } from 'dome/misc/utils';
 import * as CS from '@codemirror/state';
 import * as CM from '@codemirror/view';
 import { Change, diffLines } from 'diff';
+import { Button } from 'dome/controls/buttons';
 
 /* -------------------------------------------------------------------------- */
 /* --- Basic Definitions                                                  --- */
@@ -921,6 +922,7 @@ export interface TextViewProps {
   showCurrentLine?: boolean;
   display?: boolean;
   visible?: boolean;
+  scrollToBottom?: boolean;
   className?: string;
   style?: CSSProperties;
 }
@@ -986,6 +988,27 @@ export function TextView(props: TextViewProps) : JSX.Element {
     return () => { setView(null); view.destroy(); };
   }, [nodeRef]);
 
+  /**
+   * Check if editor is scroll to the bottom
+   * isBottom is true if the last line of the document is in memory.
+   * isBottom=true does not mean that the last line is visible.
+   */
+  const [isBottom, setIsBottom] = React.useState(false);
+  React.useEffect(() => {
+    if (!view || !props.scrollToBottom) return;
+    const setBottom = (view: View): void => {
+      if(view) {
+        const lineAt = (v: number): number => view.state.doc.lineAt(v).number;
+        setIsBottom(lineAt(view.state.doc.length) <= lineAt(view.viewport.to));
+      }
+    };
+
+    view.scrollDOM.addEventListener("scroll", () => setBottom(view));
+    return () => {
+      view.scrollDOM.removeEventListener("scroll", () => setBottom(view));
+    };
+  }, [view, props.scrollToBottom, setIsBottom]);
+
   // ---- Editor DIV
   const { visible=true, display=true } = props;
   const className = classes(
@@ -994,7 +1017,24 @@ export function TextView(props: TextViewProps) : JSX.Element {
     !visible && 'dome-hidden',
     props.className,
   );
-  return <div className={className} style={props.style} ref={setRef} />;
+  return <>
+    <div className={className} style={props.style} ref={setRef} />
+    { props.scrollToBottom &&
+        <Button
+          icon='ANGLE.DOWN'
+          title='Scroll to bottom'
+          display={!isBottom}
+          style={{ position: 'absolute', bottom: '40px', right: '20px' }}
+          onClick={() => {
+            if(view) view.dispatch({
+              effects: CM.EditorView.scrollIntoView(
+                view.state.doc.length, { y: "end" }
+              )
+            });
+          }}
+        />
+    }
+  </>;
 }
 
 /* -------------------------------------------------------------------------- */
