@@ -197,31 +197,38 @@ struct
     buffer.revtags <- [];
     buffer.stack <- []
 
-  let rec offset_tag n tag =
-    { p = tag.p - n;
-      q = tag.q - n;
+  let clamp l u x =
+    assert (l < u);
+    max l (min u x)
+
+  let rec offset_tag ~limit n tag =
+    { p = clamp 0 limit (tag.p - n);
+      q = clamp 0 limit (tag.q - n);
       tag = tag.tag;
-      children = offset_tags n tag.children
+      children = offset_tags ~limit n tag.children
     }
-  and offset_tags n tags =
-    List.map (offset_tag n) tags
+  and offset_tags ~limit n tags =
+    List.map (offset_tag ~limit n) tags
 
   let contents ?(trim=true) buffer =
     Format.pp_print_flush buffer.formatter ();
-    let plain =
-      if trim then
-        let p = trim_begin buffer in
-        let q = trim_end buffer in
-        if p <= q
-        then Buffer.sub buffer.content p (q+1-p)
-        else ""
-      else
-        Buffer.contents buffer.content
-    in
     (* The following lines requires that the formatter have been flushed *)
     pop_all buffer;
-    let tags = List.rev buffer.revtags |> offset_tags (trim_begin buffer) in
-    { plain ; tags }
+    if trim then
+      let p = trim_begin buffer in
+      let q = trim_end buffer in
+      let length = q+1-p in
+      let plain =
+        if p <= q
+        then Buffer.sub buffer.content p length
+        else ""
+      in
+      let tags = List.rev buffer.revtags |> offset_tags ~limit:length p in
+      { plain ; tags }
+    else
+      let plain = Buffer.contents buffer.content
+      and tags = List.rev buffer.revtags in
+      { plain ; tags }
 
   let add_char buffer c =
     Format.pp_print_char buffer.formatter c
