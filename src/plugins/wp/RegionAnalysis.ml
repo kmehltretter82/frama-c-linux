@@ -17,8 +17,7 @@ let get_map () =
   | Kf kf -> Region.map kf
   | Global -> Wp_parameters.not_yet_implemented "[region] logic context"
 
-let id region =
-  Option.value ~default:0 @@ Region.uid (get_map ()) region
+let id region = Region.uid region
 let pretty fmt r = Format.fprintf fmt "R%03d" @@ id r
 
 let of_id id =
@@ -40,16 +39,15 @@ module Kind = WpContext.Generator(R)
       let name = "Wp.RegionAnalysis.Kind"
       type key = region
       type data = kind
-      let kind map r p = if Region.singleton map r then Single p else Many p
+      let kind r p = if Region.singleton r then Single p else Many p
       let compile r =
-        let map = get_map () in
-        match Region.typed map r with
+        match Region.typed r with
         | Some ty ->
           begin
             match Ctypes.object_of ty with
-            | C_int i -> kind map r (Int i)
-            | C_float f -> kind map r (Float f)
-            | C_pointer _ -> kind map r Ptr
+            | C_int i -> kind r (Int i)
+            | C_float f -> kind r (Float f)
+            | C_pointer _ -> kind r Ptr
             | _ -> Garbled
           end
         | None -> Garbled
@@ -61,20 +59,19 @@ module Name = WpContext.Generator(R)
       type key = region
       type data = string option
       let compile r =
-        let map = get_map () in
-        match Region.labels map r with
+        match Region.labels r with
         | label::_ -> Some label
         | [] ->
-          match Region.cvars map r with
+          match Region.cvars r with
           | v::_ -> Some v.vorig_name
           | _ -> None
     end)
 
 let kind = Kind.get
 let name = Name.get
-let points_to region = Region.points_to (get_map ()) region
-let separated r1 r2 = Region.separated (get_map ()) r1 r2
-let included r1 r2 = Region.included (get_map ()) r1 r2
+let points_to region = Region.points_to region
+let separated r1 r2 = Region.separated r1 r2
+let included r1 r2 = Region.included r1 r2
 
 let cvar var =
   try Some (Region.cvar (get_map ()) var)
@@ -90,4 +87,4 @@ let shift r obj =
 
 let literal ~eid _ = ignore eid ; None
 
-let footprint r = Region.footprint (get_map ()) r
+let footprint r = Region.footprint r

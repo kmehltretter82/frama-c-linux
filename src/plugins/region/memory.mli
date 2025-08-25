@@ -62,18 +62,18 @@ val lock : map -> unit
 val unlock : map -> unit
 
 val id : node -> int
-val forge : int -> node
-val uid : map -> node -> int option
+val forge : map -> int -> node
+val uid : node -> int
 val id_to_node : map -> int -> node
-val equal : map -> node -> node -> bool
-val node : map -> node -> node
-val nodes : map -> node list -> node list
+val equal : node -> node -> bool
+val normalize : node -> node
+val nodes : node list -> node list
 
-val size : map -> node -> int
-val parents : map -> node -> node list
-val cvars : map -> node -> varinfo list
-val labels : map -> node -> string list
-val region : map -> node -> region
+val size : node -> int
+val parents : node -> node list
+val cvars : node -> varinfo list
+val labels : node -> string list
+val region : node -> region
 val regions : map -> region list
 val iter : map -> (node -> unit) -> unit
 
@@ -99,7 +99,7 @@ val domain_of_typ : map -> typ -> domain
 val domain_of_ltyp : map -> ?ctxt:context -> logic_type -> domain
 
 val merge : map -> node -> node -> unit
-val merge_all : map -> node list -> unit
+val merge_all : node list -> unit
 val merge_domain : map -> domain -> domain -> domain
 
 val cvar : map -> varinfo -> node
@@ -111,20 +111,20 @@ val lval : map -> lval -> node
 val exp : map -> exp -> node option
 val result : map -> node option
 
-val ranges : map -> node -> range list
-val points_to : map -> node -> node option
-val pointed_by : map -> node -> node list
+val ranges : node -> range list
+val points_to : node -> node option
+val pointed_by : node -> node list
 
-val footprint : map -> node -> node list
+val footprint : node -> node list
 
-val included : map -> node -> node -> bool
-val separated : map -> node -> node -> bool
-val singleton : map -> node -> bool
+val included : node -> node -> bool
+val separated : node -> node -> bool
+val singleton : node -> bool
 
-val reads : map -> node -> typ list
-val writes : map -> node -> typ list
-val shifts : map -> node -> typ list
-val types : map -> node -> typ list
-val typed : map -> node -> typ option
+val reads : node -> typ list
+val writes : node -> typ list
+val shifts : node -> typ list
+val types : node -> typ list
+val typed : node -> typ option
 
 val bitsSizeOf : typ -> int

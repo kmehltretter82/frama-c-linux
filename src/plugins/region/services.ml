@@ -21,7 +21,7 @@ struct
   type t = Memory.node
   let jtype = Data.declare ~package ~name:"node" (Jindex "node")
   let to_json n = Json.of_int @@ Memory.id n
-  let of_json js = Memory.forge @@ Json.int js
+  let of_json _js = failwith "The of_json function should never be called."
 end
 
 module NodeOpt = Data.Joption(Node)

@@ -42,7 +42,7 @@ and add_exp (m:map) (p:path): Memory.node option =
 
 let add_region (m: map) (r : Spec.region) =
   let rs = List.map (add_path m) r.rpath in
-  merge_all m @@
+  merge_all @@
   match r.rname with
   | None -> rs
   | Some a -> add_label m a :: rs
