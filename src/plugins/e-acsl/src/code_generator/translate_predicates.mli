@@ -35,7 +35,6 @@ val generalized_untyped_to_exp:
 (** Convert an untyped ACSL predicate into a corresponding C expression. *)
 
 val do_it:
-  ?pred_to_print:predicate ->
   kernel_function ->
   Env.t ->
   toplevel_predicate ->

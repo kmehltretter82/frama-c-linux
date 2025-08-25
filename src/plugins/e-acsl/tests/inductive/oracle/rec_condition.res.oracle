@@ -1,5 +1,6 @@
 [e-acsl] beginning translation.
 [e-acsl:analysis:inductive] function extraction with mode incomplete in 3
+[e-acsl] Warning: Translation of P might be unsound (if multiple cases apply to some given arguments simultaneously).
 [e-acsl] translation done in project "e-acsl".
 [eva] rec_condition.c:11: Warning: 
   Using specification of function __gen_e_acsl_P_fun3_2

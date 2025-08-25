@@ -36,6 +36,7 @@ int main(void)
   {
     int __gen_e_acsl_P_2;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __e_acsl_sound_verdict = 0;
     __gen_e_acsl_P_2 = __gen_e_acsl_P(0,2,1);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"P(0, 2, 1)",0,
                                  __gen_e_acsl_P_2);

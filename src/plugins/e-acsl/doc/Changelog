@@ -25,6 +25,11 @@
 Plugin E-ACSL <next-release>
 ###############################################################################
 
+- E-ACSL        [2025-08-08] Inductive extractions may be unsound if
+                             inductive predicate has multiple matching cases
+                             for some given arguments. Render this explicit.
+- E-ACSL        [2025-07-25] support nested inductive definitions
+
 ###############################################################################
 Plugin E-ACSL 31.0 (Gallium)
 ###############################################################################

@@ -35,7 +35,7 @@
   }
 @*/
 
-// c does not occur in the concusion (and is not bound by a recursive hypothesis)
+// c does not occur in the conclusion (and is not bound by a recursive hypothesis)
 /*@
     inductive eq(ℤ x, ℤ y) {
         case c: \forall ℤ a, b, c; a == c ==> b == c ==> eq(a, b);

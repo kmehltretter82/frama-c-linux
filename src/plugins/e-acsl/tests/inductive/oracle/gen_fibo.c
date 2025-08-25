@@ -41,6 +41,7 @@ int main(void)
   {
     int __gen_e_acsl_fibo_2;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __e_acsl_sound_verdict = 0;
     __gen_e_acsl_fibo_2 = __gen_e_acsl_fibo(7,13);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"fibo(7, 13)",0,
                                  __gen_e_acsl_fibo_2);
@@ -58,6 +59,7 @@ int main(void)
     int __gen_e_acsl_fibo_4;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
       {.values = (void *)0};
+    __e_acsl_sound_verdict = 0;
     __gen_e_acsl_fibo_4 = __gen_e_acsl_fibo_3(7,12);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,"fibo(7, 12)",
                                  0,__gen_e_acsl_fibo_4);

@@ -378,6 +378,8 @@ let get_orig_pred = Predicates.original
 let get_term = Terms.derived
 let get_orig_term = Terms.original
 
+let is_unsound_predicate = Inductive.is_unsound_predicate
+
 let clear () =
   Terms.clear ();
   Predicates.clear ();

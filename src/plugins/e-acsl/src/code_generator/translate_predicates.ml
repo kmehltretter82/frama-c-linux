@@ -114,6 +114,15 @@ let rec predicate_content_to_exp_old ?(inplace=false) ?name ~loc ~adata ~env ~kf
   | Ptrue -> Cil.one ~loc, adata, env
   | Papp (li, [], args)
   | Papp (li, [BuiltinLabel Here], args) ->
+    let env =
+      if Logic_normalizer.is_unsound_predicate li then
+        let sound_verdict_vi = Prepare_ast.sound_verdict () in
+        let stmt =
+          Smart_stmt.assigns ~loc ~result:(Cil.var sound_verdict_vi) (Cil.zero ~loc)
+        in
+        Env.add_stmt env stmt
+      else env
+    in
     let e, adata, env =
       Logic_functions.app_to_exp ~adata ~loc kf env li args in
     let adata = Assert.register_pred ~loc env p e adata in
@@ -422,19 +431,11 @@ let generalized_untyped_to_exp ~adata ?name kf ?rte env p =
   let env = Env.Logic_scope.reset env in
   e, adata, env
 
-let do_it ?pred_to_print kf env p =
+let do_it kf env p =
   match p.tp_kind with
   | Assert | Check ->
     Options.feedback ~dkey ~level:3 "translating predicate %a"
       Printer.pp_toplevel_predicate p;
-    let pred_to_print =
-      match pred_to_print with
-      | Some pred ->
-        Options.feedback ~dkey ~level:3 "(predicate to print %a)"
-          Printer.pp_predicate pred;
-        pred
-      | None -> p.tp_statement
-    in
     let adata, env = Assert.empty ~loc:p.tp_statement.pred_loc kf env in
     let e, adata, env =
       generalized_untyped_to_exp ~adata kf env p.tp_statement
@@ -447,7 +448,7 @@ let do_it ?pred_to_print kf env p =
         kf
         env
         e
-        pred_to_print
+        p.tp_statement
     in
     Env.add_stmt env stmt
   | Admit -> env
