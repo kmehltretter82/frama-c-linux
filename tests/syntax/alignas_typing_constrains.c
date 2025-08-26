@@ -52,8 +52,8 @@ struct Al4
 // int _Alignas(8) al_loc1 ;
 // _Alignas(8) int al_loc2 ;
 
-void c18_6_2_8_1(void) // _Alignas cannot specify a weaker alignment
-// + c18_6_2_8_2       // _Alignas(n) with n <= _Alignof(max_align_t) always allowed
+void c17_6_2_8_1(void) // _Alignas cannot specify a weaker alignment
+// + c17_6_2_8_2       // _Alignas(n) with n <= _Alignof(max_align_t) always allowed
 {
   // Note: on our test archictecture long int == long long int
   // Note: on our test archictecture alignof(double) == 4
@@ -114,7 +114,7 @@ void c18_6_2_8_1(void) // _Alignas cannot specify a weaker alignment
 }
 
 #ifdef ALIGNAS_EXTENDED
-void c18_6_2_8_3(void)
+void c17_6_2_8_3(void)
 // _Alignas(n) with n > _Alignof(max_align_t) might be allowed by the implementation
 {
   // on our architecture:
@@ -125,7 +125,7 @@ void c18_6_2_8_3(void)
 #endif
 
 #ifdef ALIGNAS_EXTENDED_TOO_BIG
-void c18_6_2_8_3(void)
+void c17_6_2_8_3(void)
 // _Alignas(n) with n > _Alignof(max_align_t) might be allowed by the implementation
 {
   // on our architecture:
@@ -136,14 +136,14 @@ void c18_6_2_8_3(void)
 #endif
 
 #ifdef ALIGNAS_OCAML_TOO_BIG
-void c18_6_2_8_3(void)
+void c17_6_2_8_3(void)
 // Frama-C cannot handle that (OCaml limitation)
 {
   char _Alignas(1ull << 63) x;
 }
 #endif
 
-void c18_6_2_8_4(void)
+void c17_6_2_8_4(void)
 // a valid alignment is 0 or a power of two
 {
   size_t no_cast = _Alignof(int);
@@ -163,15 +163,15 @@ void c18_6_2_8_4(void)
 #endif
 }
 
-// c18_6_2_8_5: an address that satisfies an alignment satisfies the weaker ones
+// c17_6_2_8_5: an address that satisfies an alignment satisfies the weaker ones
 // --> not a typing property
 
-// c18_6_2_8_6: see alignof_typing_constrains.c
+// c17_6_2_8_6: see alignof_typing_constrains.c
 
-// c18_6_2_8_7: comparing alignment is comparing their numeric values
+// c17_6_2_8_7: comparing alignment is comparing their numeric values
 // --> not a typing property
 
-void c18_6_7_5_1(void)
+void c17_6_7_5_1(void)
 // accepts types and constant expressions
 {
   char _Alignas(4) c0;
@@ -181,15 +181,15 @@ void c18_6_7_5_1(void)
 #endif
 }
 
-// c18 6.7.5.2
+// c17 6.7.5.2
 // No _Alignas for typedefs, bitfields, functions, parameters or register
 
 #ifdef ALIGNAS_TYPEDEF_1
-typedef int _Alignas(8) c18_6_7_5_2_a;
+typedef int _Alignas(8) c17_6_7_5_2_a;
 #endif
 
 #ifdef ALIGNAS_TYPEDEF_2
-struct c18_6_7_5_2_a _Alignas(8);
+struct c17_6_7_5_2_a _Alignas(8);
 #endif
 
 #ifdef ALIGNAS_TYPEONLY
@@ -197,7 +197,7 @@ int g = sizeof(struct only _Alignas(8));
 #endif
 
 #ifdef ALIGNAS_BITFIELD
-struct c18_6_7_5_2_b
+struct c17_6_7_5_2_b
 {
   unsigned _Alignas(8) b : 4;
 };
@@ -205,57 +205,57 @@ struct c18_6_7_5_2_b
 
 #ifdef ALIGNAS_FUNCTION_1
 // note: no smart message, we just check that it is not capture as an attribute
-void c18_6_7_5_2_c(int x) _Alignas(8)
+void c17_6_7_5_2_c(int x) _Alignas(8)
 {
 }
 #endif
 
 #ifdef ALIGNAS_FUNCTION_2
-_Alignas(8) void c18_6_7_5_2_c(int x)
+_Alignas(8) void c17_6_7_5_2_c(int x)
 {
 }
 #endif
 
 #ifdef ALIGNAS_FUNCTION_3
 // note: no smart message, we just check that it is not capture as an attribute
-void c18_6_7_5_2_c(int x) _Alignas(8) ;
+void c17_6_7_5_2_c(int x) _Alignas(8) ;
 #endif
 
 #ifdef ALIGNAS_FUNCTION_4
-_Alignas(8) void c18_6_7_5_2_c(int x) ;
+_Alignas(8) void c17_6_7_5_2_c(int x) ;
 #endif
 
 
 #ifdef ALIGNAS_FORMAL
-void c18_6_7_5_2_d(int _Alignas(8) formal)
+void c17_6_7_5_2_d(int _Alignas(8) formal)
 {
 }
 #endif
 
 #ifdef ALIGNAS_REGISTER
-void c18_6_7_5_2_e(void){
+void c17_6_7_5_2_e(void){
   register int _Alignas(8) v ;
 }
 #endif
 
-// c18_6_7_5_3: _Alignas accepts valid or extended alingment.
-// --> cf c18_6_2_8_3/4 above
+// c17_6_7_5_3: _Alignas accepts valid or extended alingment.
+// --> cf c17_6_2_8_3/4 above
 
-// c18_6_7_5_4: no implementation for testing that
+// c17_6_7_5_4: no implementation for testing that
 
-// c18_6_7_5_5:
+// c17_6_7_5_5:
 #ifdef ALIGNAS_COMBINE_REDUCE
 typedef struct A { _Alignas(8) char c; } A;
 typedef struct B { _Alignas(1) A a; } B;
 #endif
 
-// c18_6_7_5_6: _Alignas(typ) == _Alignas(_Alignof(typ))
+// c17_6_7_5_6: _Alignas(typ) == _Alignas(_Alignof(typ))
 // --> by definition during parsing, so that the following declaration should
 //     be compatible:
 int _Alignas(long) alignas_typ = 0 ;
 extern int _Alignas(_Alignof(long)) alignas_typ ;
 
-void c18_6_7_5_7(void)
+void c17_6_7_5_7(void)
 // when _Alignas(0) --> no effect
 // when multiple _Alignas the strictest wins
 {
@@ -267,7 +267,7 @@ void c18_6_7_5_7(void)
 int _Alignas(8) i = 0 ;
 int j = 0;
 
-void c18_6_7_5_8(void){
+void c17_6_7_5_8(void){
   extern int _Alignas(8) i;
   extern int i;
 
@@ -295,7 +295,7 @@ void c18_6_7_5_8(void){
 }
 
 // see alignas_typing_constrains_companion.c
-// c18_6_2_7_1
+// c17_6_2_7_1
 
 #ifdef ALIGNAS_IN_STRUCT_IN_OTHER_TU_COMPATIBLE
 struct SAlF {

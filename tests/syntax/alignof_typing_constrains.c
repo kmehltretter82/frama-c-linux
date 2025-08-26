@@ -32,7 +32,7 @@ union nested_u {
 
 enum E { A, B, C, D }; /* underlying type for default machdep: int */
 
-void c18_6_2_5_6(void) // _Alignof(t) == _Alignof(unsigned t)
+void c17_6_2_5_6(void) // _Alignof(t) == _Alignof(unsigned t)
 {
   _Static_assert(_Alignof(char) == _Alignof(signed char));
   _Static_assert(_Alignof(char) == _Alignof(unsigned char));
@@ -43,15 +43,15 @@ void c18_6_2_5_6(void) // _Alignof(t) == _Alignof(unsigned t)
 }
 
 #ifdef TEST_COMPLEX
-void c18_6_2_5_13(void)
+void c17_6_2_5_13(void)
 {
   _Static_assert(_Alignof(float) == _Alignof(float _Complex));
   _Static_assert(_Alignof(double) == _Alignof(double _Complex));
 }
 #endif
 
-void c18_6_2_5_26(void) // _Alignof(t) == _Alignof(qualifier t)
-// + c18_6_2_5_27       // not necessarily if qualifier is _Atomic
+void c17_6_2_5_26(void) // _Alignof(t) == _Alignof(qualifier t)
+// + c17_6_2_5_27       // not necessarily if qualifier is _Atomic
 {
   _Static_assert(_Alignof(char) == _Alignof(const char));
   _Static_assert(_Alignof(char) == _Alignof(volatile char));
@@ -73,7 +73,7 @@ void c18_6_2_5_26(void) // _Alignof(t) == _Alignof(qualifier t)
   // _Atomic does not have the same constraints.
 }
 
-void c18_6_2_5_28_1(void){
+void c17_6_2_5_28_1(void){
   _Static_assert(_Alignof(void*) == _Alignof(char*));
 }
 
@@ -82,7 +82,7 @@ typedef struct basic_s basic_t ;
 typedef union basic_u u_t ;
 typedef enum E e_t ;
 
-void c18_6_2_5_28_2(void)
+void c17_6_2_5_28_2(void)
 // pointers to (qualified or not) compatible types have the same alignment
 {
   _Static_assert(_Alignof(int*) == _Alignof(int_t*));
@@ -98,19 +98,19 @@ void c18_6_2_5_28_2(void)
   _Static_assert(_Alignof(enum E*) == _Alignof(const volatile int*));
 }
 
-void c18_6_2_5_28_3(void)
+void c17_6_2_5_28_3(void)
 // pointers to struct types have the same alignment
 {
   _Static_assert(_Alignof(struct basic_s*) == _Alignof(struct nested_s*));
 }
 
-void c18_6_2_5_28_4(void)
+void c17_6_2_5_28_4(void)
 // pointers to union types have the same alignment
 {
   _Static_assert(_Alignof(union basic_u*) == _Alignof(union nested_u*));
 }
 
-void c18_6_2_8_6(void)
+void c17_6_2_8_6(void)
 // _Alignof(s-u-char) is the weakest
 {
   // on our test architecture:
@@ -121,7 +121,7 @@ void c18_6_2_8_6(void)
 
 typedef int function_type(void);
 
-void c18_6_5_3_4_1(void){
+void c17_6_5_3_4_1(void){
 #ifdef FAIL_FUNCTION /* undefined behavior: _Alignof(function type) */
   int a = _Alignof(function_type);
 #endif
@@ -130,7 +130,7 @@ void c18_6_5_3_4_1(void){
 #endif
 }
 
-void c18_6_5_3_4_3(void)
+void c17_6_5_3_4_3(void)
 // _Alignof(T) == _Alignof(T[N])
 {
   _Static_assert(_Alignof(int) == _Alignof(int[10]));

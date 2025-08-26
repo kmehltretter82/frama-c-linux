@@ -10,7 +10,7 @@
   _Alignof(field) == 8
 [kernel] Compound: struct Al4
   _Alignof(c) == 4
-[kernel] Function: c18_6_2_8_1
+[kernel] Function: c17_6_2_8_1
   _Alignof(c1) == 1
   _Alignof(c2) == 2
   _Alignof(c3) == 4
@@ -39,7 +39,7 @@
   _Alignof(al4_2) == 4
   _Alignof(al4_3) == 8
   _Alignof(al4_4) == 16
-[kernel] Function: c18_6_2_8_4
+[kernel] Function: c17_6_2_8_4
   _Alignof(no_cast) == 4
   _Alignof(c0) == 1
   _Alignof(c1) == 1
@@ -47,14 +47,14 @@
   _Alignof(c3) == 4
   _Alignof(c4) == 8
   _Alignof(c5) == 16
-[kernel] Function: c18_6_7_5_1
+[kernel] Function: c17_6_7_5_1
   _Alignof(c0) == 4
   _Alignof(c1) == 4
-[kernel] Function: c18_6_7_5_7
+[kernel] Function: c17_6_7_5_7
   _Alignof(zero) == 4
   _Alignof(several_1) == 16
   _Alignof(several_2) == 16
-[kernel] Function: c18_6_7_5_8
+[kernel] Function: c17_6_7_5_8
 [kernel] Function: get_SAlF
   _Alignof(__constr_expr_0) == 8
 [kernel] Function: get_UAlF
@@ -76,7 +76,7 @@ union UAlF {
 struct SAlF {
    int field _Alignas(8) ;
 };
-void c18_6_2_8_1(void)
+void c17_6_2_8_1(void)
 {
   char _Alignas(1) c1;
   char _Alignas(2) c2;
@@ -109,7 +109,7 @@ void c18_6_2_8_1(void)
   return;
 }
 
-void c18_6_2_8_4(void)
+void c17_6_2_8_4(void)
 {
   char c0;
   char _Alignas(1) c1;
@@ -121,7 +121,7 @@ void c18_6_2_8_4(void)
   return;
 }
 
-void c18_6_7_5_1(void)
+void c17_6_7_5_1(void)
 {
   char _Alignas(4) c0;
   char _Alignas(_Alignof(int)) c1;
@@ -129,7 +129,7 @@ void c18_6_7_5_1(void)
 }
 
 int _Alignas(_Alignof(long)) alignas_typ = 0;
-void c18_6_7_5_7(void)
+void c17_6_7_5_7(void)
 {
   int zero;
   int _Alignas(16) several_1;
@@ -139,7 +139,7 @@ void c18_6_7_5_7(void)
 
 int _Alignas(8) i = 0;
 int j = 0;
-void c18_6_7_5_8(void)
+void c17_6_7_5_8(void)
 {
   return;
 }
