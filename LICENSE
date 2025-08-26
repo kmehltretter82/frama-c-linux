@@ -8,7 +8,7 @@ Some files are distributed with the following licenses:
 - GPL v2 with exception on linking, see:
     - licenses/OCAML_STDLIB
     - licenses/CAMOMILE
-- QPL: see licenses/QPL (+ included choice of law)
+- QPL: see licenses/QPL_MODIFIED_LICENSE (+ included choice of law)
 
 Each source file contains its own header, indicating used license.
 
