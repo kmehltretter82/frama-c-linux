@@ -215,7 +215,7 @@ let check_builtin kf (name, _, _) =
   if not (Kernel_function.is_in_libc kf || is_frama_c_builtin kf)
   then warn_user_specification ~source kf;
   let is_internal = Filepath.is_relative ~base:System_config.Share.libc in
-  if Kernel_function.is_definition kf && not (is_internal source.pos_path)
+  if Kernel_function.is_definition kf && not (is_internal (Filepos.path source))
   then warn_builtin_override ~source kf name
 
 let find_builtin_override kf =

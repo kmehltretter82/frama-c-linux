@@ -1819,7 +1819,7 @@ struct
       try
         let _ =
           implicit_conversion
-            ~overloaded:true Cil_datatype.Location.unknown t t1 t2
+            ~overloaded:true Fileloc.unknown t t1 t2
         in true
       with Not_applicable -> false
     in

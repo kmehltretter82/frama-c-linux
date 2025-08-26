@@ -1481,7 +1481,7 @@ The code samples below show how to use and set the current location.
   \begin{ocamlcode}
   (* [Current_loc.get()] returns the last location set in Current_loc *)
   let print_current_loc () =
-    Format.printf "%a@." Cil_datatype.Location.pretty (Current_loc.get ())
+    Format.printf "%a@." Fileloc.pretty (Current_loc.get ())
 
   (* [with_loc loc f x] set the current location to loc, executes [f x] and set
      the location to its old value before returning the result of [f x]. Raised

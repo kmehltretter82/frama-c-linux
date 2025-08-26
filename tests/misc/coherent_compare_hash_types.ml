@@ -130,7 +130,7 @@ let pairs_nodes_typ =
 
 (* Make sure we consider types and len correctly for arrays. *)
 let pairs_array_typ =
-  let loc = Cil_datatype.Location.unknown in
+  let loc = Fileloc.unknown in
   let len1 = Some (Cil.one ~loc) in
   let len2 = Some (Cil.integer ~loc 42) in
   mk_tarray intType None

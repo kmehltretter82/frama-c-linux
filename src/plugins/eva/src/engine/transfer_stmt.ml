@@ -624,11 +624,11 @@ module Make (Engine: Engine_Subset) = struct
     let file = Format.sprintf "%s_%d" name n |> Filepath.of_string in
     let open Filesystem.Operators in
     let$ fmt = Filesystem.with_formatter_exn file in
-    let l = fst (Current_loc.get ()) in
+    let loc = Current_loc.get () in
     Self.feedback ~dkey:Self.dkey_show ~pos ~stacktrace:true
       "Dumping state in file '%a'" Filepath.pretty file;
-    Format.fprintf fmt "DUMPING STATE at file %a line %d@."
-      Filepath.pretty l.pos_path l.pos_lnum;
+    Format.fprintf fmt "DUMPING STATE at %a@."
+      Fileloc.pretty_long loc;
     let pretty_args = pretty_arguments ~subdivnb state in
     if arguments <> []
     then Format.fprintf fmt "Args: %a@." pretty_args arguments;

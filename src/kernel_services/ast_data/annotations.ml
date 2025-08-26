@@ -510,7 +510,7 @@ let fold_code_annot f stmt acc =
 let iter_all_code_annot ?(sorted=true) f =
   let cmp s1 s2 =
     let res =
-      Cil_datatype.Location.compare
+      Fileloc.compare
         (Cil_datatype.Stmt.loc s1) (Cil_datatype.Stmt.loc s2)
     in
     if res <> 0 then res else Cil_datatype.Stmt.compare s1 s2
@@ -534,7 +534,7 @@ let iter_all_code_annot ?(sorted=true) f =
 let fold_all_code_annot ?(sorted=true) f =
   let cmp s1 s2 =
     let res =
-      Cil_datatype.Location.compare
+      Fileloc.compare
         (Cil_datatype.Stmt.loc s1) (Cil_datatype.Stmt.loc s2)
     in
     if res <> 0 then res else Cil_datatype.Stmt.compare s1 s2

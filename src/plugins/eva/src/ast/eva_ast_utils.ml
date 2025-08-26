@@ -40,7 +40,7 @@ and build_cil_exp exp =
     | AddrOf lv -> AddrOf (to_cil_lval lv)
     | StartOf lv -> StartOf (to_cil_lval lv)
   in
-  Cil.new_exp ~loc:Cil_datatype.Location.unknown exp_node
+  Cil.new_exp ~loc:Fileloc.unknown exp_node
 
 and to_cil_unop : Eva_ast_types.unop -> Cil_types.unop = function
   | Neg -> Neg

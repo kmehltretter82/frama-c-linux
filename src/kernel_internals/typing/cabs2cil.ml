@@ -228,8 +228,8 @@ let check_no_locals_in_initializer i =
 
 (* ---------- source error message handling ------------- *)
 let cabslu s =
-  {Filepos.unknown with pos_path = Filepath.of_string ("Cabs2cil_start" ^ s)},
-  {Filepos.unknown with pos_path = Filepath.of_string ("Cabs2cil_end" ^ s)}
+  Filepos.generated ("Cabs2cil_start" ^ s),
+  Filepos.generated ("Cabs2cil_end" ^ s)
 
 
 (** Keep a list of the variable ID for the variables that were created to
@@ -634,9 +634,7 @@ let transparentUnionArgs : (int * typ) list ref = ref []
 let debugLoc = false
 let convLoc (l : cabsloc) =
   if debugLoc then
-    Kernel.debug "convLoc at %a: line %d, byte %d\n"
-      Filepath.pretty (fst l).pos_path
-      (fst l).pos_lnum (fst l).pos_bol;
+    Kernel.debug "convLoc at %a\n" Fileloc.pretty l;
   l
 
 let isOldStyleVarArgName n =
@@ -5262,7 +5260,7 @@ and makeCompType loc ghost (isstruct: bool)
         "field %s occurs multiple times in aggregate %a. \
          Previous occurrence is at line %d."
         f.fname Cil_printer.pp_typ (mk_tcomp comp)
-        (fst oldf.floc).Filepos.pos_lnum
+        (Fileloc.line oldf.floc)
     with Not_found ->
       (* Do not add unnamed bitfields: they can share the empty name. *)
       if f.fname <> "" then Hashtbl.add fld_table f.fname f

@@ -127,7 +127,7 @@ let run () =
 
   let ordered_kf =
     List.sort (fun kf1 kf2 ->
-        Cil_datatype.Location.compare
+        Fileloc.compare
           (Kernel_function.get_location kf1)
           (Kernel_function.get_location kf2)
           (* String.compare *)

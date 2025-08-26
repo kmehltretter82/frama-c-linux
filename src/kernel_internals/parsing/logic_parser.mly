@@ -16,8 +16,7 @@
   open Logic_utils
 
   let loc (start_pos, end_pos) =
-    Cil_datatype.Location.of_lexing_loc
-      (start_pos, end_pos)
+    Fileloc.of_lexing_loc (start_pos, end_pos)
 
   let pos pos =
     Filepos.of_lexing_pos pos

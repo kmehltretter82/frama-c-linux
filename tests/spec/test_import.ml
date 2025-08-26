@@ -23,7 +23,7 @@ let () = Format.printf "[test-import] Linking.@."
 let loader (ctxt: module_builder) (loc: location) (m: string list) =
   begin
     Format.printf "[test-import:%d] Loading %s.@."
-      (fst loc).pos_lnum (String.concat "::" m) ;
+      (Fileloc.line loc) (String.concat "::" m) ;
     let t = Cil_const.make_logic_type "t" in
     let check = Cil_const.make_logic_info "check" in
     let x = Cil_const.make_logic_var_formal "x" (Ltype(t,[])) in

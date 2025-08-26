@@ -15,7 +15,7 @@
    corresponding to our needs.
 *)
 module SemanticLocs : sig
-  include Hashtbl.S with type key = Cil_datatype.Location.t
+  include Hashtbl.S with type key = Fileloc.t
   val is_empty: 'a t -> bool
   val keys: 'a t -> key list (* sorted w.r.t. cmp_start_semantic *)
   val elements: 'a t -> (key * 'a) list (* sorted w.r.t. cmp_start_semantic *)
@@ -23,18 +23,18 @@ end =
 struct
   include
     Hashtbl.Make(struct
-      type t = Cil_datatype.Location.t
-      let equal = Cil_datatype.Location.equal_start_semantic
-      let hash (b, _e) = Hashtbl.hash (b.Filepos.pos_path, b.Filepos.pos_lnum)
+      type t = Fileloc.t
+      let equal = Fileloc.equal_start_semantic
+      let hash (b, _e) = Hashtbl.hash (Filepos.path b, Filepos.line b)
     end)
   let is_empty tbl = length tbl = 0
   let keys tbl =
     let l = fold (fun loc _ acc -> loc :: acc) tbl [] in
-    List.sort Cil_datatype.Location.compare_start_semantic l
+    List.sort Fileloc.compare_start_semantic l
   let elements tbl =
     let l = fold (fun loc v acc -> (loc, v) :: acc) tbl [] in
     List.sort (fun (l1, _v1) (l2, _v2) ->
-        Cil_datatype.Location.compare_start_semantic l1 l2) l
+        Fileloc.compare_start_semantic l1 l2) l
 end
 
 module Self = Plugin.Register
@@ -100,8 +100,8 @@ class stmt_count_visitor =
 (* Due to the fact that the Cabs AST contains no fc_stdlib attributes, we use a
    location-based approach. *)
 let located_within_framac_libc loc =
-  let pos = fst loc in
-  Filepath.is_relative ~base:System_config.Share.libc pos.Filepos.pos_path
+  let path = Fileloc.path loc in
+  Filepath.is_relative ~base:System_config.Share.libc path
 
 class fun_cabs_visitor print_libc = object(self)
   inherit Cabsvisit.nopCabsVisitor
@@ -159,13 +159,13 @@ let print_json fp funinfos_json =
 
 let pp_semlocs fmt t =
   Format.fprintf fmt "%a"
-    (Pretty_utils.pp_list ~sep:", " Cil_datatype.Location.pretty)
+    (Pretty_utils.pp_list ~sep:", " Fileloc.pretty)
     (SemanticLocs.keys t)
 
 let pp_loc_size fmt loc_size =
   let (loc, size) = loc_size in
   Format.fprintf fmt "%a (%d statement%s)"
-    Cil_datatype.Location.pretty loc size (if size <> 1 then "s" else "")
+    Fileloc.pretty loc size (if size <> 1 then "s" else "")
 
 let pp_definitions fmt defs =
   Format.fprintf fmt "%a"
@@ -212,7 +212,7 @@ let definitions_with_size name =
   defs_with_size
 
 let json_string_of_loc loc =
-  `String (Format.asprintf "%a" Cil_datatype.Location.pretty loc)
+  `String (Format.asprintf "%a" Fileloc.pretty loc)
 
 let json_list_of_loc_tbl tbl =
   let keys = SemanticLocs.keys tbl in

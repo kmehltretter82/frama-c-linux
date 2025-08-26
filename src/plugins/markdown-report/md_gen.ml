@@ -128,7 +128,7 @@ let section_stubs env =
       else
         let intro = Markdown.text @@ Markdown.format
             "`%s` @[<h>is defined at %a@]"
-            name Cil_datatype.Location.pretty loc in
+            name Fileloc.pretty loc in
         let fundecl = Markdown.codeblock ~lang:"c" "%a"
             Printer.pp_global (GFun (Kernel_function.get_definition kf,loc)) in
         Block ( intro @ fundecl ) :: insert_remark env anchor

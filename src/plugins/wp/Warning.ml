@@ -23,12 +23,12 @@ struct
 
   let compare w1 w2 =
     if w1 == w2 then 0 else
-      let f1 = w1.loc.pos_path in
-      let f2 = w2.loc.pos_path in
+      let f1 = Filepos.path w1.loc in
+      let f2 = Filepos.path w2.loc in
       let fc = Filepath.compare f1 f2 in
       if fc <> 0 then fc else
-        let l1 = w1.loc.pos_lnum in
-        let l2 = w2.loc.pos_lnum in
+        let l1 = Filepos.line w1.loc in
+        let l2 = Filepos.line w2.loc in
         let lc = l1 - l2 in
         if lc <> 0 then lc else
           match w1.severe , w2.severe with

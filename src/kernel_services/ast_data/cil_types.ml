@@ -1366,7 +1366,7 @@ and extended_asm =
   }
 
 (** Describes a location in a source file *)
-and location = Filepos.t * Filepos.t
+and location = Fileloc.t
 
 (** {1 Abstract syntax trees for annotations} *)
 

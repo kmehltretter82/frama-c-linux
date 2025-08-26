@@ -75,8 +75,8 @@ let pp_label fmt (s : stmt) =
   match s.labels with
   | Label(l,_,_)::_ -> Format.pp_print_string fmt l
   | _ ->
-    let loc, _ = Stmt.loc s in
-    Format.fprintf fmt "L%d" loc.pos_lnum
+    let line = Stmt.loc s |> Fileloc.line in
+    Format.fprintf fmt "L%d" line
 
 let pp_clause fmt = function
   | Body l -> Format.pp_print_string fmt "logic:" ; Logic_info.pretty fmt l
@@ -111,9 +111,9 @@ let pp_access fmt = function
     Format.fprintf fmt "%a { %a }" Kernel_function.pretty kf Printer.pp_term_lval t
 
 let pp_line fmt stmt =
-  let loc = Stmt.loc stmt in
+  let line = Stmt.loc stmt |> Fileloc.line in
   List.iter (Format.fprintf fmt "%a " Printer.pp_label) stmt.labels ;
-  Format.fprintf fmt "s%d, line %d" stmt.sid (fst loc).pos_lnum
+  Format.fprintf fmt "s%d, line %d" stmt.sid line
 
 let pp_source fmt = function
   | Init(stmt,_,_) | Ret(stmt,_) | Exp(stmt,_) | Lval(stmt,_) ->
@@ -132,7 +132,7 @@ let ctype_of = function
   | _ -> Cil_const.voidType
 
 let location = function
-  | Body _ -> Location.dummy (* TODO *)
+  | Body _ -> Fileloc.unknown (* TODO *)
   | Prop ip | Call(_,_,ip) -> Property.location ip
 
 let typeof = function
@@ -149,7 +149,8 @@ let marker = function
   | Init (stmt,(Mem e,_),_) -> PExp(None,Kstmt stmt,e)
   | Lval(stmt,_) | Term (Call (stmt, _, _), _) ->
     PStmtStart(Kernel_function.find_englobing_kf stmt, stmt)
-  | Term (Body fn, _) -> PGlobal(GAnnot(Dfun_or_pred(fn,Location.dummy),Location.dummy))
+  | Term (Body fn, _) ->
+    PGlobal(GAnnot(Dfun_or_pred(fn,Fileloc.unknown),Fileloc.unknown))
   | Term (Prop ip, _) -> PIP ip
 
 let rank = function

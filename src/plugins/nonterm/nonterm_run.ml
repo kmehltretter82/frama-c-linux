@@ -57,7 +57,7 @@ let pretty_stmt_kind fmt stmt =
         let loop = Kernel_function.find_enclosing_loop kf stmt in
         (* heuristic: if both statements have the same location, then
            the break was implicitly generated *)
-        Location.equal (Stmt.loc stmt) (Stmt.loc loop)
+        Fileloc.equal (Stmt.loc stmt) (Stmt.loc loop)
       with Not_found -> false
     in
     Format.fprintf fmt "%sbreak" (if implicit then "implicit " else "")

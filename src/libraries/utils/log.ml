@@ -299,7 +299,7 @@ let do_transient terminal ~plugin message =
 (* -------------------------------------------------------------------------- *)
 
 let source ~file ~line =
-  Filepos.{ pos_path = file ; pos_lnum = line ; pos_bol = 0 ; pos_cnum = 0 }
+  Filepos.make ~path:file ~line ~column:0 ~offset:0 ()
 
 let current_loc = ref (fun () -> raise Not_found)
 

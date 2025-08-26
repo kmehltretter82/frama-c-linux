@@ -493,14 +493,14 @@ let offset_match_cell om size_elt =
   | MatchSize size -> Z.leq size size_elt
   | MatchType typ' -> Z.leq (Z.of_int (Cil.bitsSizeOf typ')) size_elt
 
-let minus_one_expr = Cil.mone ~loc:Cil_datatype.Location.unknown
+let minus_one_expr = Cil.mone ~loc:Fileloc.unknown
 
 let rec find_offset typ ~offset om =
   (* Format.printf "Searching offset %a in %a, size %a@."
      Z.pretty offset
      Printer.pp_typ typ
      Z.pretty size; *)
-  let loc = Cil_datatype.Location.unknown in
+  let loc = Fileloc.unknown in
   if Z.is_zero offset && offset_matches om typ then
     NoOffset, typ
   else

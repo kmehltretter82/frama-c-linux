@@ -895,7 +895,7 @@ let synchronize_source_annot has_new_stmt kf =
             block_with_user_annots := father;
             user_annots_for_next_stmt := [st, annot] ;
           end;
-          Cil.ChangeTo (Cil.mkStmtOneInstr (Skip Cil_datatype.Location.unknown))
+          Cil.ChangeTo (Cil.mkStmtOneInstr (Skip Fileloc.unknown))
         in
         assert (!block_with_user_annots = None
                 || !user_annots_for_next_stmt <> []);
@@ -1487,8 +1487,8 @@ class reorder_ast: Visitor.frama_c_visitor =
                   (Daxiomatic
                      (unique_name_recursive_axiomatic (),
                       entries, attr,
-                      Cil_datatype.Location.unknown),
-                   Cil_datatype.Location.unknown))::res)
+                      Fileloc.unknown),
+                   Fileloc.unknown))::res)
             entries []
         end else begin
           Global_annotation_graph.fold
@@ -1532,12 +1532,12 @@ class reorder_ast: Visitor.frama_c_visitor =
              typedefs
        | TComp ci ->
          if not (Cil_datatype.Compinfo.Set.mem ci known_compinfo) then begin
-           self#add_needed_decl(GCompTagDecl(ci,Cil_datatype.Location.unknown));
+           self#add_needed_decl(GCompTagDecl(ci,Fileloc.unknown));
            self#add_known_compinfo ci
          end
        | TEnum ei ->
          if not (Cil_datatype.Enuminfo.Set.mem ei known_enuminfo) then begin
-           self#add_needed_decl(GEnumTagDecl(ei,Cil_datatype.Location.unknown));
+           self#add_needed_decl(GEnumTagDecl(ei,Fileloc.unknown));
            self#add_known_enuminfo ei
          end);
       DoChildren

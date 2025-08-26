@@ -67,26 +67,37 @@ end
 module Location: sig
   include S_with_collections_pretty with type t = location
   val unknown: t
-  val is_unknown : t -> bool
+
+  (** [is_known loc] returns true if the location is neither unknown nor
+      generated.
+      @since Frama-C+dev *)
+  val is_known : t -> bool
+
+  (** Get the line of the location.
+      @since Frama-C+dev *)
+  val line : t -> int
+
+  (** Get the file path of the location.
+      @since Frama-C+dev *)
+  val path : t -> Filepath.t
+
   val pretty_long : t Pretty_utils.formatter
 
-  (** Pretty prints the location under the form [file <f>, line <l>], without
-      the full-path to the file. The default pretty-printer [pretty] echoes
-      [<dir/f>:<l>] *)
+  (** Pretty prints the location under the form [line <l>] or a description of
+      the source if it is not a file. *)
   val pretty_line: t Pretty_utils.formatter
 
   (** Pretty prints the location under the form  [line <l>, between columns <c1>
       and <c2>]. *)
   val pretty_line_range: t Pretty_utils.formatter
 
-  (** Pretty-print both location start and end, including file, line and
-      character offset.
+  (** Pretty-prints the ocaml internal representation of a location, for debug
+      purposes.
 
       @since 22.0-Titanium
   *)
   val pretty_debug: t Pretty_utils.formatter
 
-  (** Prints only the line of the location *)
   val of_lexing_loc : Lexing.position * Lexing.position -> t
   val to_lexing_loc : t -> Lexing.position * Lexing.position
 

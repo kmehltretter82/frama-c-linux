@@ -663,7 +663,7 @@ end = struct
            | None -> ()
            | Some (name,symb) ->
              let file = Filepath.to_string
-                 (fst (Cil_datatype.Global.loc glob)).pos_path
+                 Cil_datatype.(Global.loc glob |> Fileloc.path)
              in
              let index na sy =
                let code = Symbol.symbol_code sy in
@@ -782,7 +782,7 @@ end = struct
       (* [VP 2013-11-06] an enumerated constant has the corresponding
          integral type, not an enumerated type. *)
       let typ = Cil_const.mk_tint item.eihost.ekind in
-      let exp = Cil.new_exp ~loc:Cil_datatype.Location.unknown (Const (CEnum (item)))
+      let exp = Cil.new_exp ~loc:Fileloc.unknown (Const (CEnum (item)))
       in
       Options.debug ~level:2 ~dkey "Found enum item of name %s: symbol=%a type=%a@."
         name Printer.pp_exp exp Printer.pp_logic_type (Ctype typ);
@@ -900,19 +900,11 @@ let set_buff_loc line =
 (** Get location of the first character of
     the string to parse with acsl parser *)
 let get_buff_loc () =
-  Filepos.{
-    unknown with
-    pos_path= !prop_file;
-    pos_lnum = !buff_line
-  }
+  Filepos.make ~path:!prop_file ~line:!buff_line ~column:0 ~offset:0 ()
 
 (** Get location of the first property token *)
 let get_prop_loc () =
-  Filepos.{
-    unknown with
-    pos_path= !prop_file;
-    pos_lnum = !prop_line
-  }
+  Filepos.make ~path:!prop_file ~line:!prop_line ~column:0 ~offset:0 ()
 
 (*-----------------------------------------------------------------------*)
 let basename_chop_extension file =
@@ -1117,7 +1109,7 @@ let lt_error (source, _ ) fmt = Options.annot_warning ~raising:(fun () -> raise 
 
 let lt_on_error action finally arg =
   try action arg
-  with Exit -> finally (Cil_datatype.Location.unknown,"Error"); raise Exit
+  with Exit -> finally (Fileloc.unknown,"Error"); raise Exit
 
 (** Add global annotations. *)
 let dkey = Options.register_category "trace-pasting"

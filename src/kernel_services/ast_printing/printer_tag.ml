@@ -483,9 +483,9 @@ let loc_of_localizable = function
   | PGlobal g -> Global.loc g
   | (PLval _ | PTermLval _ | PExp _) as localize ->
     (match kf_of_localizable localize with
-     | None -> Location.unknown
+     | None -> Fileloc.unknown
      | Some kf -> Kernel_function.get_location kf)
-  | PType _ -> Location.unknown
+  | PType _ -> Fileloc.unknown
 
 (* -------------------------------------------------------------------------- *)
 (* --- Helper for Globals                                                 --- *)
@@ -525,7 +525,7 @@ module FileToLines =
 
 module MappingLineLocalizable = struct
   module LineToLocalizableAux =
-    LineToLocalizable.Make( Datatype.Pair(Location)(Localizable))
+    LineToLocalizable.Make( Datatype.Pair(Fileloc)(Localizable))
 
   include State_builder.Hashtbl(FileToLines)(LineToLocalizableAux)
       (struct
@@ -544,24 +544,24 @@ class pos_to_localizable =
     val mutable insideIf = None
 
     method add_range loc (localizable : localizable) =
-      if not (Location.equal loc Location.unknown) then (
+      if Fileloc.is_known loc then (
         let p1, p2 = loc in
-        if p1.pos_path <> p2.pos_path then
+        if not (Filepath.equal (Filepos.path p1) (Filepos.path p2)) then
           Kernel.debug ~once:true ~dkey
             "Localizable over two files: %a and %a; %a"
-            Filepath.pretty p1.pos_path
-            Filepath.pretty p2.pos_path
+            Filepath.pretty (Filepos.path p1)
+            Filepath.pretty (Filepos.path p2)
             Localizable.pretty localizable;
-        let file = p1.pos_path in
-        let hfile =
-          try MappingLineLocalizable.find file
+        let path = Filepos.path p1 in
+        let hpath =
+          try MappingLineLocalizable.find path
           with Not_found ->
             let h = LineToLocalizable.create 17 in
-            MappingLineLocalizable.add file h;
+            MappingLineLocalizable.add path h;
             h
         in
-        for i = p1.pos_lnum to p2.pos_lnum do
-          LineToLocalizable.add hfile i (loc, localizable);
+        for i = Filepos.line p1 to Filepos.line p2 do
+          LineToLocalizable.add hpath i (loc, localizable);
         done
       );
 
@@ -630,35 +630,30 @@ class pos_to_localizable =
   end
 
 (* Returns [true] if the column [col] is within location [loc]. *)
-let location_contains_col loc col =
-  let (pos_start, pos_end) = loc in
-  let (col_start, col_end) =
-    pos_start.Filepos.pos_cnum - pos_start.Filepos.pos_bol,
-    pos_end.Filepos.pos_cnum - pos_end.Filepos.pos_bol
-  in
-  col_start <= col && col <= col_end
+let location_contains_col (pos_start, pos_end : location) col =
+  Filepos.input_column pos_start <= col && col <= Filepos.input_column pos_end
 
 (* Applies several heuristics to try and match the best localizable to a
-   given location [loc]. The list [possible_locs] should contain all
+   given position [pos]. The list [possible_locs] should contain all
    localizables in a given line. If [possible_col] is [true], then we try
    to take column information into account.
    Some heuristics may return an empty list, in which case a fallback is
    later used to return a better choice. *)
-let apply_location_heuristics precise_col possible_locs loc =
-  let col = loc.Filepos.pos_cnum - loc.Filepos.pos_bol in
+let apply_location_heuristics precise_col possible_locs pos =
+  let col = Filepos.input_column pos in
   Kernel.debug ~dkey
-    "apply_location_heuristics (precise_col:%b): loc: %a, col: %d@\n\
+    "apply_location_heuristics (precise_col:%b): pos: %a, col: %d@\n\
      possible_locs:@ %a"
-    precise_col Location.pretty (loc, loc) col
+    precise_col Filepos.pretty pos col
     (Pretty_utils.pp_list ~sep:"@\n"
-       (Pretty_utils.pp_pair ~sep:" :: " Location.pretty Localizable.pretty)) possible_locs;
+       (Pretty_utils.pp_pair ~sep:" :: " Fileloc.pretty Localizable.pretty)) possible_locs;
   (* Heuristic 1: we try to obtain a subset of localizables related to a given
      position, or a given column if [precise_col] is true.
      May result in an empty list. *)
   let filter_locs l =
     List.filter (fun (((pos_start, _) as loc'), _) ->
         if precise_col then location_contains_col loc' col
-        else loc = pos_start
+        else pos = pos_start
       ) l
   in
   (* Heuristic 2: prioritize expressions if they are present.
@@ -674,7 +669,7 @@ let apply_location_heuristics precise_col possible_locs loc =
   (* Heuristic 4: when there are no exact locations, we will consider the
      innermost ones, that is, those at the top of the list. *)
   let innermost_in loc l =
-    List.filter (fun (loc', _) -> Location.equal loc loc') l
+    List.filter (fun (loc', _) -> Fileloc.equal loc loc') l
   in
   match possible_locs, filter_locs possible_locs with
   | [], _ -> (* no possible localizables *) None
@@ -691,7 +686,7 @@ let apply_location_heuristics precise_col possible_locs loc =
     let filtered = innermost_in loc' possible_locs in
     last filtered
 
-let loc_to_localizable ?(precise_col=false) loc =
+let pos_to_localizable ?(precise_col=false) pos =
   if not (MappingLineLocalizable.is_computed ()) then (
     let vis = new pos_to_localizable in
     Visitor.visitFramacFile (vis :> Visitor.frama_c_visitor) (Ast.get ());
@@ -699,20 +694,21 @@ let loc_to_localizable ?(precise_col=false) loc =
   );
   try
     (* Find the mapping from this file to locs-by-line *)
-    let hfile = MappingLineLocalizable.find loc.Filepos.pos_path in
+    let hpath = MappingLineLocalizable.find (Filepos.path pos) in
     (* Find the localizable for this line *)
-    let all = LineToLocalizable.find_all hfile loc.Filepos.pos_lnum in
-    match apply_location_heuristics precise_col all loc with
+    let all = LineToLocalizable.find_all hpath (Filepos.line pos) in
+    match apply_location_heuristics precise_col all pos with
     | Some locz ->
-      Kernel.feedback ~dkey "loc: %a -> locz: %a"
-        Location.pretty (loc,loc) Localizable.pretty locz;
+      Kernel.feedback ~dkey "pos: %a -> locz: %a"
+        Filepos.pretty pos Localizable.pretty locz;
       Some locz
     | None ->
-      Kernel.feedback ~dkey "loc: %a -> NO locz" Location.pretty (loc,loc);
+      Kernel.feedback ~dkey "pos: %a -> NO locz"
+        Filepos.pretty pos;
       None
   with
   | Not_found ->
-    Kernel.debug ~once:true ~source:loc "no matching localizable found";
+    Kernel.debug ~once:true ~source:pos "no matching localizable found";
     None
 
 (* -------------------------------------------------------------------------- *)

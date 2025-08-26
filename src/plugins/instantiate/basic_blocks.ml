@@ -23,7 +23,7 @@ let prepare_definition name fun_type =
   fd
 
 let call_function lval vi args =
-  let loc  = Cil_datatype.Location.unknown in
+  let loc  = Fileloc.unknown in
   let _, typs, _, _ = Cil.splitFunctionTypeVI vi in
   let typs = Cil.argsToList typs in
   let gen_arg exp (_, typ, _) =

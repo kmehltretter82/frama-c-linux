@@ -9,7 +9,7 @@
 open Property
 open Cil_types
 
-let pp_loc = Cil_datatype.Location.pretty_long
+let pp_loc = Fileloc.pretty_long
 
 let pp_kloc kloc fmt loc =
   if kloc then Format.fprintf fmt " (%a)" pp_loc loc else ()

@@ -42,7 +42,7 @@ let enter_ghost_code () = ghost_code := true
 let exit_ghost_code () = ghost_code := false
 
 let ghost_annot = ref false
-let ghost_annot_start = ref Cil_datatype.Location.unknown
+let ghost_annot_start = ref Fileloc.unknown
 let is_ghost_annot () = !ghost_annot
 let get_ghost_annot_start () = !ghost_annot_start
 let enter_ghost_annot () =
@@ -50,7 +50,7 @@ let enter_ghost_annot () =
   ghost_annot_start:= currentLoc()
 let exit_ghost_annot () =
   ghost_annot := false;
-  ghost_annot_start := Cil_datatype.Location.unknown
+  ghost_annot_start := Fileloc.unknown
 
 let add_comment c = Cabshelper.Comments.add (currentLoc()) c
 
@@ -98,7 +98,7 @@ let c23_or_later key builder =
 
 let filename_keyword () =
   let convert acc c = int64_of_char c :: acc in
-  let path (loc : Cil_types.location) = (fst loc).pos_path in
+  let path (loc : Cil_types.location) = Filepos.path (fst loc) in
   let filename loc = Filepath.to_string (path loc) in
   let ints loc = List.rev (String.fold_left convert [] (filename loc)) in
   add "__FC_FILENAME__" (fun loc -> CST_STRING (ints loc, loc))
@@ -541,7 +541,7 @@ rule initial = parse
     let start = Lexing.lexeme_start_p lexbuf in
     let content = chr lexbuf in
     let last = Lexing.lexeme_end_p lexbuf in
-    CST_CHAR (content, Cil_datatype.Location.of_lexing_loc (start,last))
+    CST_CHAR (content, Fileloc.of_lexing_loc (start,last))
     }
 
   | "L'"
@@ -549,7 +549,7 @@ rule initial = parse
     let start = Lexing.lexeme_start_p lexbuf in
     let content = chr lexbuf in
     let last = Lexing.lexeme_end_p lexbuf in
-    CST_WCHAR (content, Cil_datatype.Location.of_lexing_loc (start,last))
+    CST_WCHAR (content, Fileloc.of_lexing_loc (start,last))
     }
 
   | '"'
@@ -557,7 +557,7 @@ rule initial = parse
     let start = Lexing.lexeme_start_p lexbuf in
     let content = str lexbuf in
     let last = Lexing.lexeme_end_p lexbuf in
-    CST_STRING (content, Cil_datatype.Location.of_lexing_loc (start,last))
+    CST_STRING (content, Fileloc.of_lexing_loc (start,last))
     }
 
   | "L\""
@@ -565,7 +565,7 @@ rule initial = parse
     let start = Lexing.lexeme_start_p lexbuf in
     let content = str lexbuf in
     let last = Lexing.lexeme_end_p lexbuf in
-    CST_WSTRING(content, Cil_datatype.Location.of_lexing_loc (start,last))
+    CST_WSTRING(content, Fileloc.of_lexing_loc (start,last))
     }
 
   | floatnum

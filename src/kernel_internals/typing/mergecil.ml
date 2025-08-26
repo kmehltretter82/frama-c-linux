@@ -570,7 +570,7 @@ module EnumMerging =
               fst
                 (Alpha.newAlphaName
                    ~alphaTable:aeAlpha ~undolist:None ~lookupname:e2.ename
-                   ~data:Cil_datatype.Location.unknown);
+                   ~data:Fileloc.unknown);
             Kernel.debug ~dkey:Kernel.dkey_linker
               "new anonymous name %s" e2.ename;
             false))))
@@ -584,7 +584,7 @@ module EnumMerging =
         else String.compare e1.ename e2.ename
       let merge_synonym _ = true
       let output fmt e =
-        Cil_printer.pp_global fmt (GEnumTag (e, Cil_datatype.Location.unknown))
+        Cil_printer.pp_global fmt (GEnumTag (e, Fileloc.unknown))
     end)
 
 open PlainMerging
@@ -916,7 +916,7 @@ let intEnumInfo kind =
 let intEnumInfoNode kind =
   let ei = intEnumInfo kind in
   EnumMerging.getNode eEq eSyn 0 ei ei
-    (Some (Cil_datatype.Location.unknown, 0))
+    (Some (Fileloc.unknown, 0))
 
 
 (* When comparing composite types for equality, we tolerate
@@ -1140,12 +1140,12 @@ let matchCompInfoGen (combineF : Cil.combineFunction)
                let fields_old =
                  Format.asprintf "%a"
                    Cil_printer.pp_global
-                   (GCompTag(oldci, Cil_datatype.Location.unknown))
+                   (GCompTag(oldci, Fileloc.unknown))
                in
                let fields =
                  Format.asprintf "%a"
                    Cil_printer.pp_global
-                   (GCompTag(ci, Cil_datatype.Location.unknown))
+                   (GCompTag(ci, Fileloc.unknown))
                in
                let fullname_old = Cil.compFullName oldci in
                let fullname = Cil.compFullName ci in
@@ -1280,7 +1280,7 @@ let update_compinfo ci =
   let loc =
     match node.nloc with
     | Some (loc,_) -> loc
-    | None -> Cil_datatype.Location.unknown
+    | None -> Fileloc.unknown
   in
   Alpha.registerAlphaName ~alphaTable:sAlpha ~lookupname:ci.cname ~data:loc;
   let orig_name = if ci.corig_name = "" then ci.cname else ci.corig_name in
@@ -1321,7 +1321,7 @@ let rec update_type_repr t =
     let loc =
       match node.nloc with
       | Some (loc,_) -> loc
-      | None -> Cil_datatype.Location.unknown
+      | None -> Fileloc.unknown
     in
     Alpha.registerAlphaName ~alphaTable:vtAlpha ~lookupname:ti.tname ~data:loc;
     let n,_ =
@@ -1691,8 +1691,8 @@ let oneFilePass1 (f:file) : unit =
       if fromGFun && Ast_attributes.contains "weak" oldvi.vattr &&
          not (Ast_attributes.contains "weak" vi.vattr) then
         begin
-          let oldpath = (fst oldvi.vdecl).pos_path in
-          let newpath = (fst vi.vdecl).pos_path in
+          let oldpath = Fileloc.path oldvi.vdecl in
+          let newpath = Fileloc.path vi.vdecl in
           Kernel.abort ~current:true
             "weak definition at %a cannot be overridden with \
              this non-weak definition. @ \

@@ -115,22 +115,22 @@ let setCurrentFile n =
    plus up to [ctx] lines before and after (if they exist),
    similar to 'grep -C<ctx>'.
    Most exceptions are silently caught and printing is stopped if they occur. *)
-let pp_context_from_file ?(ctx=2) fmt ((start_pos, pos) as loc) =
+let pp_context_from_file ?(ctx=2) fmt (start_pos, pos) =
   let open Filesystem.Operators in
   (* We cannot give any context on unknown locations *)
-  if Cil_datatype.Location.is_unknown loc then ()
+  if not (Filepos.is_known start_pos) then ()
   else
     let start_pos =
-      if Filepath.equal start_pos.pos_path pos.pos_path
+      if Filepath.equal (Filepos.path start_pos) (Filepos.path pos)
       then start_pos
       else pos
     in
     try
-      let$ in_ch = Filesystem.with_open_in_exn pos.pos_path in
-      let first_error_line, start_char, last_error_line =
-        min start_pos.pos_lnum pos.pos_lnum,
-        (start_pos.pos_cnum - start_pos.pos_bol),
-        max start_pos.pos_lnum pos.pos_lnum
+      let$ in_ch = Filesystem.with_open_in_exn (Filepos.path pos) in
+      let first_error_line = min (Filepos.line start_pos) (Filepos.line pos)
+      and last_error_line = max (Filepos.line start_pos) (Filepos.line pos)
+      and start_char = Filepos.input_column start_pos
+      and end_char = Filepos.input_column pos
       in
 
       (** Add an offset to the starting position if we're not on the first column.
@@ -193,7 +193,7 @@ let pp_context_from_file ?(ctx=2) fmt ((start_pos, pos) as loc) =
         if last_error_line <> first_error_line then
           Format.fprintf fmt "\n"
         else begin
-          let len = pos.pos_cnum - pos.pos_bol - start_char + 1 in
+          let len = end_char - start_char + 1 in
           (* output at least one '^' *)
           let len = if len <= 0 then 1 else len in
           let cursor =
@@ -214,7 +214,7 @@ let pp_context_from_file ?(ctx=2) fmt ((start_pos, pos) as loc) =
         else (* context after line n, no warning *) ()
     with Sys_error _ -> ()
 
-let pp_location = Cil_datatype.Location.pretty_line_range
+let pp_location = Fileloc.pretty_line_range
 
 let parse_error ?loc msg =
   let current = Option.get !current in
@@ -236,7 +236,7 @@ let parse_error ?loc msg =
     | Some loc -> loc
     | None ->
       if Stack.is_empty all_pos then
-        Cil_datatype.Location.of_lexing_loc
+        Fileloc.of_lexing_loc
           (current.lexbuf.Lexing.lex_start_p, current.lexbuf.Lexing.lex_curr_p)
       else
         let _,start_pos = Stack.pop all_pos in
@@ -246,7 +246,7 @@ let parse_error ?loc msg =
           else
             fst (Stack.pop all_pos)
         in
-        Cil_datatype.Location.of_lexing_loc (start_pos, last_pos)
+        Fileloc.of_lexing_loc (start_pos, last_pos)
   in
   let pretty_token fmt token =
     (* prints more detailed information around the erroneous token;
@@ -261,7 +261,7 @@ let parse_error ?loc msg =
       Kernel.feedback ~source:(fst loc) "%s:@." str
         ~append:(fun fmt ->
             Format.fprintf fmt "Location: %a%a\n"
-              Cil_datatype.Location.pretty_line_range loc
+              Fileloc.pretty_line_range loc
               pretty_token (Lexing.lexeme current.lexbuf);
             Format.fprintf fmt "%a@."
               (pp_context_from_file ~ctx:2) loc);
@@ -272,7 +272,7 @@ let parse_error ?loc msg =
 (* More parsing support functions: line, file, char count *)
 let currentLoc () =
   let i = Option.get !current in
-  Cil_datatype.Location.of_lexing_loc
+  Fileloc.of_lexing_loc
     (Lexing.lexeme_start_p i.lexbuf, Lexing.lexeme_end_p i.lexbuf)
 
 

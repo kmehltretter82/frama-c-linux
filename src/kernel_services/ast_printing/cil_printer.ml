@@ -368,12 +368,12 @@ module Precedence = struct
     | AUnOp (uo, _) ->
       getParenthLevel
         (Cil.dummy_exp
-           (UnOp(uo, Cil.zero ~loc:Cil_datatype.Location.unknown, Cil_const.intType)))
+           (UnOp(uo, Cil.zero ~loc:Fileloc.unknown, Cil_const.intType)))
     | ABinOp (bo, _, _) ->
       getParenthLevel
         (Cil.dummy_exp(BinOp(bo,
-                             Cil.zero ~loc:Cil_datatype.Location.unknown,
-                             Cil.zero ~loc:Cil_datatype.Location.unknown,
+                             Cil.zero ~loc:Fileloc.unknown,
+                             Cil.zero ~loc:Fileloc.unknown,
                              Cil_const.intType)))
     | AAddrOf _ -> addrOfLevel
     | ADot _ | AIndex _ | AStar _ -> memOffset_level
@@ -1409,10 +1409,10 @@ class cil_printer () = object (self)
   method line_directive ?(forcefile=false) fmt l =
     match state.line_directive_style with
     | None -> ()
-    | Some _ when (fst l).pos_lnum <= 0 -> ()
+    | Some _ when Fileloc.line l <= 0 -> ()
 
     (* Do not print lineComment if the same line as above *)
-    | Some Line_comment_sparse when (fst l).pos_lnum = lastLineNumber ->
+    | Some Line_comment_sparse when Fileloc.line l = lastLineNumber ->
       ()
 
     | Some style  ->
@@ -1421,18 +1421,17 @@ class cil_printer () = object (self)
         | Line_preprocessor_output when not (Machine.msvcMode ()) -> "#"
         | Line_preprocessor_output | Line_preprocessor_input -> "#line"
       in
-      let pos = fst l in
-      lastLineNumber <- pos.pos_lnum;
+      let path = Fileloc.path l in
+      lastLineNumber <- Fileloc.line l;
       let filename =
-        if forcefile || pos.pos_path <> lastFileName then begin
-          lastFileName <- pos.pos_path;
-          Format.asprintf " \"%a\""
-            Filepath.pretty pos.pos_path
+        if forcefile || not (Filepath.equal path lastFileName) then begin
+          lastFileName <- path;
+          Format.asprintf " \"%a\"" Filepath.pretty path
         end else
           ""
       in
       fprintf fmt "@[@<0>\n@<0>%s@<0> @<0>%d@<0> @<0>%s@]@\n"
-        directive (fst l).Filepos.pos_lnum filename
+        directive (Fileloc.line l) filename
 
   (* Print a recovered while condition from Loop *)
   method pp_while_head fmt cond =

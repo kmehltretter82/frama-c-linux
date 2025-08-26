@@ -26,9 +26,9 @@ let add_model ty =
       mi_attr = [];
       mi_field_type = Linteger;
       mi_base_type = ty;
-      mi_decl = Cil_datatype.Location.unknown }
+      mi_decl = Fileloc.unknown }
   in
-  let annot = Dmodel_annot (m,Cil_datatype.Location.unknown) in
+  let annot = Dmodel_annot (m,Fileloc.unknown) in
   Annotations.add_global e annot;
   annot
 

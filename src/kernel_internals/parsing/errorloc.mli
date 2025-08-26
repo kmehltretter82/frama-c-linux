@@ -19,7 +19,7 @@
 
 val newline: unit -> unit  (** Call this function to announce a new line *)
 
-val currentLoc: unit -> Cil_datatype.Location.t
+val currentLoc: unit -> Fileloc.t
 
 (** This function is used especially when the preprocessor has
     generated linemarkers in the output that let us know the current
@@ -56,7 +56,7 @@ val pp_context_from_file:
 (** prints a readable description of a location
     @since 22.0-Titanium *)
 val pp_location: Format.formatter -> Cil_types.location -> unit
-[@@deprecated "Use Cil_datatype.Location.pretty_line_range instead"]
+[@@deprecated "Use Fileloc.pretty_line_range instead"]
 
 (** Emits the corresponding error message with some location information.
     If not given, [location] will be considered to be between the end of

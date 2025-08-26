@@ -45,7 +45,7 @@ module StackElt = struct
       (fun fmt -> match ki with
          | Kstmt stmt ->
            let loc = Cil_datatype.Stmt.loc stmt in
-           Format.fprintf fmt " :: %a" Cil_datatype.Location.pretty loc
+           Format.fprintf fmt " :: %a" Fileloc.pretty loc
          | Kglobal -> ()
       )
 

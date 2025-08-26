@@ -35,9 +35,9 @@ let string_of_string_list sep =
   Format.asprintf "%a"
     (Pretty_utils.pp_list ~pre:"" ~suf:"" ~sep Format.pp_print_string)
 
-let split_loc (loc : Cil_types.location) =
-  let fp = (fst loc).pos_path in
-  let line = string_of_int (fst loc).pos_lnum in
+let split_loc loc =
+  let fp = Fileloc.path loc in
+  let line = Fileloc.line loc |> string_of_int in
   let fp_pretty = Filepath.to_string fp in
   let dir = Filename.dirname fp_pretty in
   let name = Filename.basename fp_pretty in
@@ -232,7 +232,7 @@ module FunctionAtPos = struct
     let tmp = Hashtbl.create 16 in
     let files =
       List.fold_left (fun acc ((pos1, _, _) as triple) ->
-          let fp = pos1.Filepos.pos_path in
+          let fp = Filepos.path pos1 in
           Hashtbl.add tmp fp triple;
           Filepath.Set.add fp acc
         ) Filepath.Set.empty (Cabs2cil.func_locs ())
@@ -248,14 +248,14 @@ module FunctionAtPos = struct
       ) files
 
   let find pos =
-    let fp = pos.Filepos.pos_path in
+    let fp = Filepos.path pos in
     Option.bind (fun a -> binary_search a pos)
       (Hashtbl.find_opt tbl fp)
 
 end
 
 type entry = {
-  loc: Cil_datatype.Location.t;
+  loc: Fileloc.t;
   func: string option;
   domain: domain;
   plugin: string;
@@ -458,7 +458,7 @@ let visit_messages () =
       let loc_of_pos p = (p, p) in
       let loc, func =
         match ev.evt_source with
-        | None -> Cil_datatype.Location.unknown, "<global>"
+        | None -> Fileloc.unknown, "<global>"
         | Some pos ->
           let funcname =
             match FunctionAtPos.find pos with

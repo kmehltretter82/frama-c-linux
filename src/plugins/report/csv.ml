@@ -7,11 +7,11 @@
 (**************************************************************************)
 
 (* Split the location into 'dir,file,line number,char number' in this order *)
-let split_loc loc =
-  let file = loc.Filepos.pos_path in
+let split_pos pos =
+  let file = Filepos.path pos in
   let dir = Filepath.(dirname file |> to_string) in
   let file = Filepath.basename file in
-  dir, file, loc.pos_lnum, loc.pos_cnum
+  dir, file, Filepos.line pos, Filepos.input_column pos
 
 (* For properties that we want to skip *)
 exception Skip
@@ -29,11 +29,11 @@ let to_string ip =
   | Some (kind, txt) ->
     let kf = kf_of_property ip in
     let loc =
-      if Cil_datatype.Location.(equal loc unknown) then
+      if not (Fileloc.is_known loc) then
         Kernel_function.get_location kf
       else loc
     in
-    let loc = split_loc (fst loc) in
+    let loc = split_pos (fst loc) in
     (loc, Kernel_function.get_name kf, kind, status, txt)
 
 (* Compute the lines to export as a .csv, then sorts them *)

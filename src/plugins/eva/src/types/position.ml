@@ -33,7 +33,7 @@ struct
       Hashtbl.hash (Stmt.hash stmt, Callstack.hash cs)
     let pretty fmt (stmt,cs) =
       Format.fprintf fmt "%a <-@ %a"
-        Cil_datatype.Location.pretty (Stmt.loc stmt)
+        Fileloc.pretty (Stmt.loc stmt)
         Callstack.pretty cs
   end
 

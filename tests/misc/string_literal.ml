@@ -1,7 +1,7 @@
 open Cil_types
 open Fun.Operators
 
-let loc = Cil_datatype.Location.dummy
+let loc = Fileloc.unknown
 
 let main () =
   let prj = Project.create "empty" in

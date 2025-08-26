@@ -11,7 +11,6 @@
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 open Cil_types
-open Cil_datatype
 
 (* ************************************************************************** *)
 (** {2 Nodes with a unique ID} *)
@@ -312,57 +311,57 @@ val is_boolean_type: logic_type -> bool
 (* ************************************************************************** *)
 
 (** returns a anonymous term of the given type. *)
-val term : ?loc:Location.t -> term_node -> logic_type -> term
+val term : ?loc:Fileloc.t -> term_node -> logic_type -> term
 
 (** [..] of integers *)
-val trange: ?loc:Location.t -> term option * term option -> term
+val trange: ?loc:Fileloc.t -> term option * term option -> term
 
 (** boolean constant
     @since 30.0-Zinc
 *)
-val tboolean: ?loc:Location.t -> bool -> term
+val tboolean: ?loc:Fileloc.t -> bool -> term
 
 (** integer constant *)
-val tinteger: ?loc:Location.t -> int -> term
+val tinteger: ?loc:Fileloc.t -> int -> term
 
 (** integer constant *)
-val tinteger_s64: ?loc:Location.t -> int64 -> term
+val tinteger_s64: ?loc:Fileloc.t -> int64 -> term
 
 (** integer constant
     @since Oxygen-20120901 *)
-val tint: ?loc:Location.t -> Z.t -> term
+val tint: ?loc:Fileloc.t -> Z.t -> term
 
 (** real constant *)
-val treal: ?loc:Location.t -> float -> term
+val treal: ?loc:Fileloc.t -> float -> term
 
 (** real zero *)
-val treal_zero: ?loc:Location.t -> ?ltyp:logic_type -> unit -> term
+val treal_zero: ?loc:Fileloc.t -> ?ltyp:logic_type -> unit -> term
 
 (** string constant *)
-val tstring: ?loc:Location.t -> string -> term
+val tstring: ?loc:Fileloc.t -> string -> term
 
 (** \at *)
-val tat: ?loc:Location.t -> term * logic_label -> term
+val tat: ?loc:Fileloc.t -> term * logic_label -> term
 
 (** \old
     @since Nitrogen-20111001
 *)
-val told: ?loc:Location.t -> term -> term
+val told: ?loc:Fileloc.t -> term -> term
 
 (** variable *)
-val tvar: ?loc:Location.t -> logic_var -> term
+val tvar: ?loc:Fileloc.t -> logic_var -> term
 
 (** \result *)
-val tresult: ?loc:Location.t -> typ -> term
+val tresult: ?loc:Fileloc.t -> typ -> term
 
 (** cast to the given C type *)
-val tcast: ?loc:Location.t -> term -> typ -> term
+val tcast: ?loc:Fileloc.t -> term -> typ -> term
 
 (** coercion to the given logic type *)
-val tlogic_coerce: ?loc:Location.t -> term -> logic_type -> term
+val tlogic_coerce: ?loc:Fileloc.t -> term -> logic_type -> term
 
 (** [alignof(t)] *)
-val talignof: ?loc:Location.t -> typ -> term
+val talignof: ?loc:Fileloc.t -> typ -> term
 
 (** [true] if the term is \result (potentially enclosed in \at)*)
 val is_result: term -> bool

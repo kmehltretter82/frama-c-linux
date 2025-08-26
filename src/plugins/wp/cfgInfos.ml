@@ -522,7 +522,7 @@ let compile Key.{ kf ; smoking ; bhv ; prop } =
             "In '%a', no 'calls' specification for statement(s) on \
              line(s): %a, @\nAssuming that they can call '%a'"
             Kernel_function.pretty kf
-            (Pretty_utils.pp_list ~sep:", " Cil_datatype.Location.pretty_line)
+            (Pretty_utils.pp_list ~sep:", " Fileloc.pretty_line)
             warning_locs
             Kernel_function.pretty kf ;
         if is_recursive kf then
