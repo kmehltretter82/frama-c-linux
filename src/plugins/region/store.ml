@@ -39,8 +39,9 @@ module Ufind = UnionFind.Make(S)
 
 module type Element = sig
   type 'a t
+  val default_id : int
   val get_id : 'a t -> int
-  val set_id : 'a t -> int -> 'a t
+  val set_id : 'a t -> int -> unit
 end
 
 
@@ -52,7 +53,7 @@ module Make(E : Element) = struct
 
   type 'a t = {
     nnode : 'a E.t Ufind.rref ;
-    nmap : 'a store ref ;
+    mutable nmap : 'a store ref ;
   }
 
   let check_nmap2 m1 m2 =
@@ -70,40 +71,71 @@ module Make(E : Element) = struct
 
   let key n = S.id n.nnode
 
-  let get_store n = (!(n.nmap)).values
+  let normalize ?store n =
+    begin match store with
+      | Some s -> if !s != !(n.nmap) then failwith "Region maps are not equal."
+      | None -> ()
+    end; {
+      nnode = (try Ufind.find ((!(n.nmap)).values) n.nnode with Not_found -> n.nnode) ;
+      nmap = n.nmap ;
+    }
 
-  let id n = E.get_id @@ Ufind.get (get_store n) n.nnode
+  let id n =
+    let n = normalize n in
+    E.get_id @@ Ufind.get ((!(n.nmap)).values) n.nnode
 
-  let forge m id = {
-    nnode = S.forge (Imap.find id m.refs) ;
-    nmap = ref m ;
-  }
+  let forge_id m id = normalize {
+      nnode = S.forge (Imap.find id !m.refs) ;
+      nmap = m ;
+    }
 
-  let normalize n = {
-    nnode = (try Ufind.find (get_store n) n.nnode with Not_found -> n.nnode) ;
-    nmap = n.nmap ;
-  }
+  let forge_key m key = normalize {
+      nnode = S.forge key ;
+      nmap = m ;
+    }
 
-  let get n = Ufind.get (get_store n) n.nnode
+  let min n1 n2 =
+    check_nmap2 n1 n2 ;
+    forge_key n1.nmap @@ Int.min (key n1) (key n2)
 
-  let get_map n = !(n.nmap)
+  let pp_all fmt m =
+    let print_id fmt id r =
+      Format.fprintf fmt "; id=%x:key=%x ;" id r (*E.pp_elt @@ Ufind.get (!m.values) (S.forge r) *);
+    in
+    Format.fprintf fmt "(%i)=" @@ Imap.cardinal !m.refs ;
+    Imap.iter (print_id fmt) !m.refs
 
-  let set n v = Ufind.set (get_store n) n.nnode v
+  let get n =
+    let n = normalize n in
+    let value = Ufind.get ((!(n.nmap)).values) n.nnode in
+    let id = E.get_id value in
+    if not @@ Int.equal E.default_id id && not @@ Imap.mem id (!(n.nmap)).refs
+    then Format.eprintf "+_+_+ %a@." pp_all n.nmap ;
+    value
+
+  let get_map n = n.nmap
+
+  let set_map m n = n.nmap <- m
+
+  let set n v =
+    let n = normalize n in
+    Ufind.set ((!(n.nmap)).values) n.nnode v
 
   let set_id n nid =
+    let n = normalize n in
     let m = n.nmap in
-    let nval = Ufind.get (get_store n) n.nnode in
-    Ufind.set (get_store n) n.nnode (E.set_id nval nid) ;
+    let nval = Ufind.get ((!(n.nmap)).values) n.nnode in
+    E.set_id nval nid ;
     !m.refs <- Imap.add nid (key n) !m.refs
 
   let new_value m v = {
-    nnode = Ufind.make m.values v ;
-    nmap = ref m ;
+    nnode = Ufind.make !m.values v ;
+    nmap = m ;
   }
 
   let eq n1 n2 =
     check_nmap2 n1 n2 ;
-    S.eq (get_store n1) n1.nnode n2.nnode
+    S.eq ((!(n1.nmap)).values) n1.nnode n2.nnode
 
   let compare n1 n2 = check_nmap2 n1 n2 ; Int.compare (key n1) (key n2)
 
@@ -116,7 +148,7 @@ module Make(E : Element) = struct
   let union n1 n2 =
     check_nmap2 n1 n2 ;
     let nmap = n1.nmap in
-    let nnode = Ufind.union (get_store n1) n1.nnode n2.nnode in
+    let nnode = Ufind.union ((!(n1.nmap)).values) n1.nnode n2.nnode in
     { nnode ; nmap }
 
 end

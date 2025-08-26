@@ -120,11 +120,11 @@ val cvar : map -> varinfo -> node
 
 (** Unormalized.
     @raises Not_found *)
-val field : map -> node -> fieldinfo -> node
+val field : node -> fieldinfo -> node
 
 (** Unormalized.
     @raises Not_found *)
-val index : map -> node -> typ -> node
+val index : node -> typ -> node
 
 (** Normalized list of leaf nodes. *)
 val footprint : node -> node list

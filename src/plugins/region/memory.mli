@@ -105,8 +105,8 @@ val merge_domain : map -> domain -> domain -> domain
 val cvar : map -> varinfo -> node
 val lvar : map -> logic_var -> domain
 val logic_info : map -> logic_info -> domain
-val field : map -> node -> fieldinfo -> node
-val index : map -> node -> typ -> node
+val field : node -> fieldinfo -> node
+val index : node -> typ -> node
 val lval : map -> lval -> node
 val exp : map -> exp -> node option
 val result : map -> node option

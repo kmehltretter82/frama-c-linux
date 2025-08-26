@@ -78,11 +78,11 @@ let cvar var =
   with Not_found -> None
 
 let field r fd =
-  try Some (Region.field (get_map ()) r fd)
+  try Some (Region.field r fd)
   with Not_found -> None
 
 let shift r obj =
-  try Some (Region.index (get_map ()) r (Ctypes.object_to obj))
+  try Some (Region.index r (Ctypes.object_to obj))
   with Not_found -> None
 
 let literal ~eid _ = ignore eid ; None
