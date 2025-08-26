@@ -185,6 +185,19 @@ val copy_file : Filepath.t -> Filepath.t -> unit
     @before 31.0-Gallium this function was {!Command.read_lines} *)
 val iter_lines : Filepath.t -> (string -> unit) -> unit
 
+(** Iter over all text lines and line number in the file
+    @raise Sys_error if a system error occurred
+    @raise Invalid_argument if one of the paths is empty
+    @since Frama-C+dev *)
+val iteri_lines : Filepath.t -> (int -> string -> unit) -> unit
+
+(** [iter_line_range p i j job] iter over the lines [i] to [j] (included) from
+    file [p]. [job] is called for every matching line if it exists.
+    @raise Sys_error if a system error occurred
+    @raise Invalid_argument if one of the paths is empty
+    @since Frama-C+dev *)
+val iter_line_range :
+  Filepath.t -> int -> int -> (int -> string -> unit) -> unit
 
 (* ************************************************************************* *)
 (** {2 Low level file Input/Output} *)
