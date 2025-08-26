@@ -237,6 +237,7 @@ module InitCodec
 end
 
 module Offset
+  
   use int.Int
   type offset = int
 
@@ -250,6 +251,7 @@ module RWBytes
   use map.Map as M
   use frama_c_wp.sequence.Seq as S
   use Offset
+  
   
   type seq   'a = S.seq 'a
   type block 'a = M.map int 'a
@@ -267,24 +269,24 @@ module RWBytes
     (S.L.Cons M.(b[o  ]) S.L.Nil)
     
   function bread_16bits (b: block 'a) (o: int) : seq 'a =
-    (S.L.Cons M.(b[o  ])
-    (S.L.Cons M.(b[o+1]) S.L.Nil))
+    (S.L.Cons M.(b[o+1])
+    (S.L.Cons M.(b[o  ]) S.L.Nil))
     
   function bread_32bits (b: block 'a) (o: int) : seq 'a =
-    (S.L.Cons M.(b[o  ])
-    (S.L.Cons M.(b[o+1])
+    (S.L.Cons M.(b[o+3])
     (S.L.Cons M.(b[o+2])
-    (S.L.Cons M.(b[o+3]) S.L.Nil))))
+    (S.L.Cons M.(b[o+1])
+    (S.L.Cons M.(b[o  ]) S.L.Nil))))
     
   function bread_64bits (b: block 'a) (o: int) : seq 'a =
-    (S.L.Cons M.(b[o  ])
-    (S.L.Cons M.(b[o+1])
-    (S.L.Cons M.(b[o+2])
-    (S.L.Cons M.(b[o+3])
-    (S.L.Cons M.(b[o+4])
-    (S.L.Cons M.(b[o+5])
+    (S.L.Cons M.(b[o+7])
     (S.L.Cons M.(b[o+6])
-    (S.L.Cons M.(b[o+7]) S.L.Nil))))))))
+    (S.L.Cons M.(b[o+5])
+    (S.L.Cons M.(b[o+4])
+    (S.L.Cons M.(b[o+3])
+    (S.L.Cons M.(b[o+2])
+    (S.L.Cons M.(b[o+1])
+    (S.L.Cons M.(b[o  ]) S.L.Nil))))))))
     
   function bwrite_8bits (b: block 'a) (o: int) (s: seq 'a) : block 'a =
     match s with
@@ -296,21 +298,21 @@ module RWBytes
   function bwrite_16bits (b: block 'a) (o: int) (s: seq 'a) : block 'a =
     match s with
     | S.L.Cons b0 (S.L.Cons b1 (_)) ->
-      M.(set (set b (o+1) b1) o b0)
+      M.(set (set b o b1) (o+1) b0)
     | _ -> b
     end
     
   function bwrite_32bits (b: block 'a) (o: int) (s: seq 'a) : block 'a =
     match s with
     | S.L.Cons b0 (S.L.Cons b1 (S.L.Cons b2 (S.L.Cons b3 (_)))) ->
-      M.(set (set (set (set b (o+3) b3) (o+2) b2) (o+1) b1) o b0)
+      M.(set (set (set (set b o b3) (o+1) b2) (o+2) b1) (o+3) b0)
     | _ -> b
     end
     
   function bwrite_64bits (b: block 'a) (o: int) (s: seq 'a) : block 'a =
     match s with
     | S.L.Cons b0 (S.L.Cons b1 (S.L.Cons b2 (S.L.Cons b3 (S.L.Cons b4 (S.L.Cons b5 (S.L.Cons b6 (S.L.Cons b7 (_)))))))) ->
-      M.(set (set (set (set (set (set (set (set b (o+7) b7) (o+6) b6) (o+5) b5) (o+4) b4) (o+3) b3) (o+2) b2) (o+1) b1) o b0)
+      M.(set (set (set (set (set (set (set (set b o b7) (o+1) b6) (o+2) b5) (o+3) b4) (o+4) b3) (o+5) b2) (o+6) b1) (o+7) b0)
     | _ -> b
     end
     
@@ -1111,6 +1113,7 @@ module MemBytes
   use RWBytes
   use ValueBlockRW as VB
   use InitBlockRW as IB
+  
   
   type memory = map int (VB.vblock)
   type init   = map int (IB.iblock)

@@ -23,7 +23,7 @@
 (executable (name membytesgen))
 
 (rule
- (targets membytes.mlw)
+ (targets membytes_be.mlw membytes_le.mlw)
  (deps membytesgen.exe Wp.header)
  (mode (promote))
  (action (run ./membytesgen.exe)))
