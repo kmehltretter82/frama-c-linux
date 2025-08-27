@@ -272,7 +272,6 @@ let domain ?global kf =
       add_block ~kf m fundec.sbody ;
     with Kernel_function.No_Definition -> ()
   end ;
-  Memory.lock m ;
-  m
+  Memory.copy ~locked:true m
 
 (* -------------------------------------------------------------------------- *)

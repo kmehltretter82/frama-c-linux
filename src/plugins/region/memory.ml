@@ -47,7 +47,7 @@ module N = Store.Make(struct
     let set_id c cid = c.cid <- cid
   end)
 
-type node = Node of node N.t
+type node = { nval : node N.t }
 type chunk = node nchunk
 type layout = node nlayout
 type rg = node Ranges.range
@@ -117,8 +117,8 @@ let empty = {
 (* --- Map                                                                --- *)
 (* -------------------------------------------------------------------------- *)
 
-let make_node n = Node n
-let get_node = function Node n -> n
+let make_node n = { nval = n }
+let get_node { nval } = nval
 
 let forge_id m n = make_node @@ N.forge_id (ref m.store) n
 
@@ -270,24 +270,24 @@ let domain_of_ltyp (m:map) ?(ctxt) (lt:logic_type) =
 (* --- Iterator                                                           --- *)
 (* -------------------------------------------------------------------------- *)
 
-let rec walk h (f: node -> unit) n =
-  let n = N.normalize @@ get_node n in
-  let id = N.key n in
+let rec walk m h (f: node -> unit) n =
+  let n = normalize ~store:(ref m.store) n in
+  let id = N.key @@ get_node n in
   try Hashtbl.find h id with Not_found ->
     Hashtbl.add h id () ;
-    f @@ make_node n ;
-    let r = get @@ Node n in
+    f n ;
+    let r = get n in
     match r.clayout with
     | Blob -> ()
-    | Cell(_,p) -> Option.iter (walk h f) p
-    | Compound(_,_,rg) -> Ranges.iter (walk h f) rg
+    | Cell(_,p) -> Option.iter (walk m h f) p
+    | Compound(_,_,rg) -> Ranges.iter (walk m h f) rg
 
 let iter (m:map) (f: node -> unit) =
   let h = Hashtbl.create 0 in
-  Vmap.iter   (fun _x n ->           walk h f n) m.cvars ;
-  LVmap.iter  (fun _ -> Ldomain.iter (walk h f)) m.lvars ;
-  LVImap.iter (fun _ -> Ldomain.iter (walk h f)) m.logics ;
-  Option.iter (walk h f) m.result
+  Vmap.iter   (fun _x n ->           walk m h f n) m.cvars ;
+  LVmap.iter  (fun _ -> Ldomain.iter (walk m h f)) m.lvars ;
+  LVImap.iter (fun _ -> Ldomain.iter (walk m h f)) m.logics ;
+  Option.iter (walk m h f) m.result
 
 let size (r: node) =
   sizeof (get r).clayout
@@ -826,8 +826,8 @@ let normalize n = normalize n
 (* --- Lock the map & set stable ids                                      --- *)
 (* -------------------------------------------------------------------------- *)
 
-let set_stable_id id = function Node n ->
-  N.set_id n !id ;
+let set_stable_id id n =
+  N.set_id (get_node n) !id ;
   id := (!id) + 1
 
 let lock m =
@@ -847,13 +847,7 @@ let copy ?locked m =
     logics = m.logics ;
     result = m.result ;
   } in
-  let update_map_in_node ?id n =
-    match id with Some id -> set_stable_id id n | None -> ();
-      N.set_map (ref m.store) @@ get_node n ;
-  in if m.locked then
-    let id : int ref = ref 1 in
-    iter m (update_map_in_node ~id) ;
-    ; m
+  if m.locked then lock m ; m
 
 
 (* -------------------------------------------------------------------------- *)

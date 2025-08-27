@@ -56,24 +56,30 @@ module Make(E : Element) = struct
     mutable nmap : 'a store ref ;
   }
 
+  let pp_all fmt m =
+    let print_id fmt id r =
+      Format.fprintf fmt "; id=%x:key=%x ;" id r (*E.pp_elt @@ Ufind.get (!m.values) (S.forge r) *);
+    in
+    Format.fprintf fmt "(%i)=" @@ Imap.cardinal !m.refs ;
+    Imap.iter (print_id fmt) !m.refs
+
   let check_nmap2 m1 m2 =
-    if !(m1.nmap) != !(m2.nmap) then failwith "Region maps are not equal."
+    if !(m1.nmap) != !(m2.nmap) then begin
+      Format.eprintf "__+_1 refs=%a@." pp_all m1.nmap ;
+      Format.eprintf "__+_2 refs=%a@." pp_all m2.nmap ;
+      failwith "Region maps are not equal."
+    end
 
   let new_store () = {
     values = Ufind.new_store () ;
     refs = Imap.empty ;
   }
 
-  let copy s = {
-    values = Ufind.copy s.values ;
-    refs = s.refs ;
-  }
-
   let key n = S.id n.nnode
 
   let normalize ?store n =
     begin match store with
-      | Some s -> if !s != !(n.nmap) then failwith "Region maps are not equal."
+      | Some s -> if !s != !(n.nmap) then n.nmap <- s
       | None -> ()
     end; {
       nnode = (try Ufind.find ((!(n.nmap)).values) n.nnode with Not_found -> n.nnode) ;
@@ -98,20 +104,9 @@ module Make(E : Element) = struct
     check_nmap2 n1 n2 ;
     forge_key n1.nmap @@ Int.min (key n1) (key n2)
 
-  let pp_all fmt m =
-    let print_id fmt id r =
-      Format.fprintf fmt "; id=%x:key=%x ;" id r (*E.pp_elt @@ Ufind.get (!m.values) (S.forge r) *);
-    in
-    Format.fprintf fmt "(%i)=" @@ Imap.cardinal !m.refs ;
-    Imap.iter (print_id fmt) !m.refs
-
   let get n =
     let n = normalize n in
-    let value = Ufind.get ((!(n.nmap)).values) n.nnode in
-    let id = E.get_id value in
-    if not @@ Int.equal E.default_id id && not @@ Imap.mem id (!(n.nmap)).refs
-    then Format.eprintf "+_+_+ %a@." pp_all n.nmap ;
-    value
+    Ufind.get ((!(n.nmap)).values) n.nnode
 
   let get_map n = n.nmap
 
@@ -131,6 +126,11 @@ module Make(E : Element) = struct
   let new_value m v = {
     nnode = Ufind.make !m.values v ;
     nmap = m ;
+  }
+
+  let copy s = {
+    values = Ufind.copy s.values ;
+    refs = s.refs ;
   }
 
   let eq n1 n2 =
