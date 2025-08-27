@@ -34,6 +34,13 @@ module type S = sig
   val pos_inf : scalar
   val neg_inf : scalar
 
+  (** {2 Scalar validity.}
+
+      If the using type may produce invalid scalars, like NaNs for instance,
+      it might be required to check scalar's validity. *)
+
+  val is_valid : scalar -> bool
+
   (** {2 Constructors interacting with standard OCaml types.} *)
 
   val of_int    : int -> scalar

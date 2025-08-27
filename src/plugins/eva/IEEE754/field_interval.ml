@@ -34,12 +34,17 @@ module Make (K : Field.S) (Computation : IEEE754.Computation) (Name : Name) = st
 
   type subset = scalar bounds
 
-  let between l u = { lower = l ; upper = u }
   let singleton k = { lower = k ; upper = k }
   let zero = singleton K.zero
   let one  = singleton K.one
   let top  = { lower = K.neg_inf ; upper = K.pos_inf }
 
+  let between l u =
+    if Scalar.(is_valid l && is_valid u) then
+      if Scalar.(l <= u) then { lower = l ; upper = u }
+      else raise (Invalid_argument "Lower bound is greater than upper bound.")
+    else top
+  
   let pretty fmt { lower ; upper } =
     Format.fprintf fmt "@[[%a .. %a]@]" K.pretty lower K.pretty upper
 

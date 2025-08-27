@@ -19,6 +19,11 @@ let of_float = Q.of_float
 let to_float = Q.to_float
 let of_int = Q.of_int
 
+let is_valid q =
+  match Q.classify q with
+  | Q.UNDEF -> false
+  | _ -> true
+
 let pow10 e = Z.(pow ten e) |> Q.of_bigint
 
 let split_significant_exponent s =
