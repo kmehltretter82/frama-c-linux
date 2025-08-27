@@ -39,8 +39,8 @@
   R0019: --- 128b { .v: R001a; .s: R001b; #32b; } ;
   R001a: -W- (double) 64b ;
   R001b: -W- (int) 32b ;
-  R001c: RW- inp (SN *) 64b (*R0006) ;
-  R001d: RW- out (SN *) 64b (*R000a) ;
-  R001e: RW- idx (SL *) 64b (*R0014) ;
+  R001c: R-- inp (SN *) 64b (*R0006) ;
+  R001d: R-- out (SN *) 64b (*R000a) ;
+  R001e: R-- idx (SL *) 64b (*R0014) ;
   R001f: RW- i (int) 32b ;
   R0020: --- 0b ;

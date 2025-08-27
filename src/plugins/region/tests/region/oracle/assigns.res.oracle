@@ -9,7 +9,7 @@
 [region] Function caller_result:
   R0001: R-- B[64] (int) 32b ;
   R0002: R-- k (int) 32b ;
-  R0003: RW- a (int *) 64b (*R0001) ;
+  R0003: R-- a (int *) 64b (*R0001) ;
   R0004: RW- __retres (int) 32b ;
   R0005: -W- (int) 32b ;
 [region] Function modify_by_ref:
