@@ -45,8 +45,19 @@ type spec_format = Sep1Line1 (* <space>* FileName <space>* `:` <space>* HeaderId
      | headers/hdrck --stdin -z -header-dirs headers/open-source -header-dirs src/plugins/e-acsl/headers/open-source
 *)
 
-(* Parameters settable from command line *)
-let debug_flag = ref false
+(* Parameters settable from command line and/or environment variables *)
+let debug_level =
+  let envvar_level =
+    match Sys.getenv_opt "HDRCK_DEBUG" with
+    | None -> 0
+    | Some v ->
+      begin
+        match Stdlib.int_of_string_opt v with
+        | None -> 1
+        | Some i -> i
+      end
+  in
+  ref envvar_level
 and spec_files = ref []
 and from_stdin = ref false
 and zero_stdin = ref false
@@ -73,7 +84,7 @@ let mode = ref Check
 let tmp_dirname = ref None
 let remove_tmp_dirname () = match !tmp_dirname with
   | None -> ()
-  | Some dirname -> if not !debug_flag then Unix.rmdir dirname
+  | Some dirname -> if !debug_level <= 0 then Unix.rmdir dirname
 
 (** Utilities for message printing **)
 
@@ -94,8 +105,8 @@ let pp_job_first_line () =
       Format.printf "@."
     end
 
-let debug fmt =
-  if !debug_flag then begin
+let debug ?(level=1) fmt =
+  if !debug_level >= level then begin
     pp_job_first_line ();
     Format.printf "- [debug] ";
     Format.printf fmt
@@ -214,6 +225,7 @@ end
 *)
 let add_spec_entry (ignored_files: StringSet.t ref) (spec_tab: (string, string) Hashtbl.t)
     idx ~(file_name : string) ~(license_name: string) =
+  debug ~level:2 "add_spec_entry: file_name: %s, license_name: %s@." file_name license_name;
   match license_name with
   | ("set" | "unset" | "unspecified") ->
     warn (* error ~exit_value:9 *)
@@ -310,7 +322,7 @@ let read_specs spec_format (ignored_files: StringSet.t ref) (spec_tab: (string, 
 
 let coma_reg_exp = Str.regexp ","
 let set_cumulative ~(name:string) (value: string list ref) ~(set : string) =
-  debug "Register cumulative %s option: %s" name set;
+  debug "Register cumulative %s option: %s@." name set;
   value := List.fold_left
       (fun acc v -> let v = String.trim v in if v="" then acc else v::acc)
       !value (Str.split coma_reg_exp set);
@@ -425,12 +437,13 @@ let check_spec_discrepancies
     let cmd = Format.sprintf "headache -c %s -e %s | diff -b -B -q - %s > /dev/null"
         config_file_opts orig_file template_hdr
     in
+    debug ~level:2 "Running: %s@." cmd;
     let ret = Sys.command cmd in
     if ret = 255 then
       (* Ctrl+C pressed, abort execution *)
       exit 255
     else
-    if ret <> 0 && !debug_flag then extract_header orig_file template_hdr ;
+    if ret <> 0 && !debug_level >= 1 then extract_header orig_file template_hdr ;
     ret = 0
   in
   if not !quiet then
@@ -573,7 +586,7 @@ let update_headers ~config_file_opts header_specifications =
         (* Ctrl+C pressed; abort execution *)
         exit 255
       else
-        debug "%s : error updating header" filename
+        debug "%s : error updating header@." filename
   in
   if not !quiet then
     job_head "Updating header files ... @?";
@@ -629,8 +642,8 @@ let rec argspec = [
   " extract an header spec from the standard input in addition to the given header spec files";
   "-help", Arg.Unit print_usage ,
   " print this option list and exits";
-  "-debug", Arg.Set debug_flag,
-  " enable debug messages";
+  "-debug", Arg.Int (fun l -> debug_level := l),
+  " enable debug messages if set to >= 1. Can also be set via environment variable HDRCK_DEBUG";
   "-quiet", Arg.Set quiet,
   "disable most messages";
   "-verbose", Arg.Unit (fun () -> quiet := false),
