@@ -130,13 +130,20 @@ let rec eliminate_ranges_from_index_of_toffset ~loc toffset quantifiers =
 (*****************************************************************************)
 
 (* \base_addr, \block_length, \offset and \freeable *)
-let call ~adata ~loc kf name ctx env t =
+let call ~adata ~loc kf name ctx env terms =
   assert (name = "base_addr" || name = "block_length"
           || name = "offset" || name ="freeable");
-  let (e, adata), env =
+  let (es, adata), env =
     Env.with_params_and_result ~rte:true ~env (fun env ->
-        let e, adata, env = term_to_exp ~adata kf env t in
-        (e, adata), env)
+        let es, adata, env =
+          List.fold_left
+            (fun (acc, adata, env) t ->
+               let e, adata, env = term_to_exp ~adata kf env t in
+               e :: acc, adata, env)
+            ([], adata, env)
+            terms
+        in
+        (List.rev es, adata), env)
   in
   let e, env =
     Env.rtl_call_to_new_var
@@ -147,7 +154,7 @@ let call ~adata ~loc kf name ctx env t =
       None
       ctx
       name
-      [ e ]
+      es
   in
   e, adata, env
 

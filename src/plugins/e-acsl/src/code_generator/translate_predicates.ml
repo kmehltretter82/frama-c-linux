@@ -333,7 +333,7 @@ let rec predicate_content_to_exp_old ?(inplace=false) ?name ~loc ~adata ~env ~kf
       | Some spec -> of_bool spec.freeable, adata, env
       | None ->
         let e, adata, env =
-          Memory_translate.call ~adata ~loc kf "freeable" Cil_const.intType env t
+          Memory_translate.call ~adata ~loc kf "freeable" Cil_const.intType env [t]
         in
         let adata = Assert.register_pred ~loc env p e adata in
         e, adata, env

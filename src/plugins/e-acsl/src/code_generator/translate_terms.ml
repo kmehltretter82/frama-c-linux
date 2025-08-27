@@ -911,7 +911,7 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
         name
         Cil_const.voidPtrType
         env
-        t'
+        [t']
     in
     let adata = Assert.register_term ~loc t e adata in
     e, adata, env, Analyses_types.C_number, name
@@ -920,7 +920,7 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
     let size_t = Machine.sizeof_type () in
     let name = "offset" in
     let e, adata, env =
-      Memory_translate.call ~adata ~loc kf name size_t env t'
+      Memory_translate.call ~adata ~loc kf name size_t env [t']
     in
     let adata = Assert.register_term ~loc t e adata in
     e, adata, env, Analyses_types.C_number, name
@@ -929,7 +929,7 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
     let size_t = Machine.sizeof_type () in
     let name = "block_length" in
     let e, adata, env =
-      Memory_translate.call ~adata ~loc kf name size_t env t'
+      Memory_translate.call ~adata ~loc kf name size_t env [t']
     in
     let adata = Assert.register_term ~loc t e adata in
     e, adata, env, Analyses_types.C_number, name
