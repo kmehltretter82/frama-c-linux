@@ -28,18 +28,6 @@ open Field
 include IEEE754_sig
 type 'f format = 'f Typed_float.format
 
-let warning_on_long_double () =
-  Kernel.warning ~wkey:Kernel.wkey_long_double
-    "Abstract semantics for IEEE-754 do not support the long double format.\
-     It will instead uses the double format."
-
-let format_of_fkind = function
-  | Cil_types.FFloat      -> Format Single
-  | Cil_types.FDouble     -> Format Double
-  | Cil_types.FLongDouble -> warning_on_long_double () ; Format Double
-
-
-
 module Make (Model : Modeling) = struct
 
   include Model
@@ -151,6 +139,16 @@ module Make (Model : Modeling) = struct
   let relative repr = map (fun r -> r.relative) repr
   let format   repr = map (fun r -> r.format  ) repr
   let approx   repr = Exact.(exact repr + absolute repr)
+
+  let format_of_fkind = function
+    | Cil_types.FFloat      -> Format Single
+    | Cil_types.FDouble     -> Format Double
+    | Cil_types.FLongDouble ->
+      Kernel.warning ~wkey:Kernel.wkey_long_double
+        "%s does not support the long double format.\
+         It will instead uses the double format."
+        name ;
+      Format Double
 
 
 

@@ -30,7 +30,8 @@ module Make (Model : IEEE754.Modeling) = struct
   let track_variable vi =
     Ast_types.is_float Cil_types.(vi.vtype)
 
-  let of_scalars format l u =
+  let of_scalars fkind l u =
+    let Format format = format_of_fkind fkind in
     let lower = Exact.singleton l in
     let upper = Exact.singleton u in
     let exact = Exact.join lower upper in

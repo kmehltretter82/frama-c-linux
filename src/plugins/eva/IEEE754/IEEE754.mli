@@ -78,10 +78,6 @@ open Typed_float
     duplications, and included here to simplify their use. *)
 include module type of IEEE754_sig
 
-(** Convert a [fkind] value to a typed format. For the long double format, a
-    warning is emitted and the double format is instead used. *)
-val format_of_fkind : Cil_types.fkind -> resulting_format
-
 
 
 (** {2 Functor building the IEEE-754 abstract semantic.} *)
@@ -150,6 +146,10 @@ module Make (Model : Modeling) : sig
 
   (** Abstract value constructor. *)
   val make : exact -> absolute -> relative -> 'f format -> t
+
+  (** Convert a [fkind] value to a typed format. For the long double format, a
+      warning is emitted and the double format is instead used. *)
+  val format_of_fkind : Cil_types.fkind -> resulting_format
 
 
   (** {3 Effectful arithmetic operators.} *)

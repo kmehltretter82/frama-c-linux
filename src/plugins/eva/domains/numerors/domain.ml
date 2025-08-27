@@ -142,14 +142,13 @@ module Reduce_Cast (Abstract : Abstractions.S) : Abstractions.S = struct
     let+ result = Val.forward_cast context ~src_type ~dst_type value in
     match src_type, dst_type with
     | Eval_typ.(TSInt _, TSFloat fkind) ->
-      let Format format = IEEE754.format_of_fkind fkind in
       let ival = get_cvalue value |> project_ival in
       let lower, upper = Ival.min_and_max ival in
       let to_neg_inf v = Option.value v ~default:Rational.neg_inf in
       let to_pos_inf v = Option.value v ~default:Rational.pos_inf in
       let lower = Option.(map Q.of_bigint lower |> to_neg_inf) in
       let upper = Option.(map Q.of_bigint upper |> to_pos_inf) in
-      let numerors = Value.of_scalars format lower upper in
+      let numerors = Value.of_scalars fkind lower upper in
       set_numerors numerors result
     | _ -> result
 
