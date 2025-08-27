@@ -134,7 +134,7 @@ module Make (Model : Modeling) = struct
     let context = Abstract_value.(context.from_domains) in
     Computation.resolve context computation
 
-  let map f x = Computation.Operators.(let+ x in f x)
+  let map = Computation.map
   let lift = Computation.return
 
   let exact    repr = map (fun r -> r.exact   ) repr

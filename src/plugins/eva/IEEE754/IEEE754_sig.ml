@@ -122,14 +122,14 @@ module type Abstraction = sig
 
   (** {3 Backward reductions.} *)
 
-  (** The call [backward_lower ~left ~right] returns a reduced abstraction
+  (** The call [backward_left_lower ~left ~right] returns a reduced abstraction
       of [left] based on the assumption that [left <= right]. If the assumption
       is wrong because no concrete element of [left] can possibly be lower
       than or equal to any concrete element of [right], the function must
       return [`Bottom]. *)
   val backward_left_lower : left : t -> right : t -> t or_bottom
 
-  (** The call [backward_greater ~left ~right] returns a reduced abstraction
+  (** The call [backward_left_greater ~left ~right] returns a reduced abstraction
       of [left] based on the assumption that [left >= right]. If the assumption
       is wrong because no concrete element of [left] can possibly be greater
       than or equal to any concrete element of [right], the function must
@@ -208,7 +208,7 @@ module type Modeling = sig
       absolute error bounds. *)
   val do_reduce_relative_with_absolute : unit -> bool
 
-  (** The call [recompute_absolute exact relative] returns a computation of
+  (** The call [recompute_absolute ~exact ~relative] returns a computation of
       absolute error bounds as deduced from [exact] and [relative], respectively
       representing the exact semantics and the relative error semantics. It will
       be used if the reduced product is configured to reduce the absolute errors
@@ -218,7 +218,7 @@ module type Modeling = sig
     relative : relative ->
     absolute computation
 
-  (** The call [recompute_relative exact absolute] returns a computation of
+  (** The call [recompute_relative ~exact ~absolute] returns a computation of
       relative error bounds as deduced from [exact] and [absolute], respectively
       representing the exact semantics and the absolute error semantics. It will
       be used if the reduced product is configured to reduce the relative errors

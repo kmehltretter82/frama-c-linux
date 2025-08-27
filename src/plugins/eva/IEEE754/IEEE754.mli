@@ -46,7 +46,7 @@
     here}. Moreover, the relative error semantics for additions and substractions
     is defined based on an expression of the form {m (ax \pm by) / (x \pm y)}.
     This expression can be precisely computed even in intervals, as described
-    in {{:https://theses.hal.science/tel-01094485v1} here}, and is optimal if
+    {{:https://theses.hal.science/tel-01094485v1} here}, and is optimal if
     there is no relation between {m a}, {m b}, {m x} and {m y}. Thus, an
     implementation of this computation is also required.
 
@@ -75,7 +75,7 @@ open Lattice_bounds
 open Typed_float
 
 (** All necessary types and signatures are declared in a separated file to avoid
-    duplications, and included here to simplify there use. *)
+    duplications, and included here to simplify their use. *)
 include module type of IEEE754_sig
 
 (** Convert a [fkind] value to a typed format. For the long double format, a

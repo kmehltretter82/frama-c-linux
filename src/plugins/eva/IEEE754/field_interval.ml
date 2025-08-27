@@ -81,8 +81,7 @@ module Make (K : Field.S) (Computation : IEEE754.Computation) (Name : Name) = st
 
   let sqrt b =
     let open Computation.Operators in
-    let+ { lower ; upper } = b in
-    join (K.sqrt lower) (K.sqrt upper)
+    let+ b in join (K.sqrt b.lower) (K.sqrt b.upper)
 
   let ( + ) l r =
     let open Computation.Operators in

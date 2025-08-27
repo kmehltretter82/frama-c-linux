@@ -54,7 +54,7 @@ let pow2 e =
    mean that n ≤ log₂ a < n + 1 and m ≤ log₂ b < m + 1, and thus
    we obtain n - m - 1 < log₂ a - log₂ b < n - m + 1, which is equivalent
    to 2 ^ (n - m - 1) < a / b < 2 ^ (n - m + 1). However, those bounds are
-   not optimal. Indeed, we necessary have one of the following :
+   not optimal. Indeed, we necessarily have one of the following :
    - n - m - 1 < n - m ≤ log₂ a - log₂ b < n - m + 1
    - n - m - 1 < log₂ a - log₂ b ≤ n - m < n - m + 1
 
