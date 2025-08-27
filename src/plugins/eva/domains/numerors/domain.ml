@@ -26,7 +26,7 @@
 type interaction_modes =
   | Only_Reduce_Absolute_Using_Relative
   | Only_Reduce_Relative_Using_Absolute
-  | Complet_Reduced_Product
+  | Complete_Reduced_Product
   | No_Reduced_Product
 
 (* Retrieving the interaction mode from parameters. *)
@@ -34,7 +34,7 @@ let get_interaction_mode () =
   match Parameters.Numerors_Mode.get () with
   | "relative" -> Only_Reduce_Relative_Using_Absolute
   | "absolute" -> Only_Reduce_Absolute_Using_Relative
-  | "both" -> Complet_Reduced_Product
+  | "both" -> Complete_Reduced_Product
   | "none" -> No_Reduced_Product
   | _ -> assert false
 
@@ -91,12 +91,12 @@ module Model = struct
 
   let do_reduce_absolute_with_relative () =
     match get_interaction_mode () with
-    | Only_Reduce_Absolute_Using_Relative | Complet_Reduced_Product -> true
+    | Only_Reduce_Absolute_Using_Relative | Complete_Reduced_Product -> true
     | Only_Reduce_Relative_Using_Absolute | No_Reduced_Product -> false
 
   let do_reduce_relative_with_absolute () =
     match get_interaction_mode () with
-    | Only_Reduce_Relative_Using_Absolute | Complet_Reduced_Product -> true
+    | Only_Reduce_Relative_Using_Absolute | Complete_Reduced_Product -> true
     | Only_Reduce_Absolute_Using_Relative | No_Reduced_Product -> false
 
   let recompute_absolute ~(exact : exact) ~(relative : relative) =
