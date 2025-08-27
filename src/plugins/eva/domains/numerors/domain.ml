@@ -107,10 +107,11 @@ module Model = struct
 
   let a_x_plus_b_y_over_x_plus_y ~a ~x ~b ~y =
     let bounds s = let b = Abstraction.bounds s in [ b.lower ; b.upper ] in
-    let zip l r = List.(map (fun l -> map (fun r -> l, r) r) l |> flatten) in
-    let inputs = zip (zip (bounds a) (bounds x)) (zip (bounds b) (bounds y)) in
+    let permutations l r = List.(map (fun l -> map (fun r -> l, r) r) l |> flatten) in
     let compute ((a, x), (b, y)) = Scalar.((a * x + b * y) / (x + y)) in
-    let values = List.map compute inputs in
+    let ax_permutations = permutations (bounds a) (bounds x) in
+    let by_permutations = permutations (bounds b) (bounds y) in
+    let values = List.map compute (permutations ax_permutations by_permutations) in
     let lower = List.fold_left Scalar.min Scalar.pos_inf values in
     let upper = List.fold_left Scalar.max Scalar.neg_inf values in
     between lower upper
