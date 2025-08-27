@@ -109,22 +109,22 @@
   Frama_C_domain_show_each_ex15:
   res_13 : # cvalue: [-158.71914441 .. -0.0294424405923]
            # numerors: Real     : [-158.71914441 .. -0.0294424405923]
-                       Absolute : [-1.58621505333e-13 .. 1.13124952313e-13]
-                       Relative : [-7.98058195217e-16 .. 1.07091429725e-15]
+                       Absolute : [-1.61263884318e-13 .. 1.13124952313e-13]
+                       Relative : [-8.03726213211e-16 .. 1.08756244008e-15]
                        Format : Binary64
 [eva] numerors.c:295: 
   Frama_C_domain_show_each_ex16:
   res_14 : # cvalue: [-276.076533164 .. -0.0190177456065]
            # numerors: Real     : [-276.076533164 .. -0.0190177456065]
-                       Absolute : [-3.15551523254e-13 .. 2.18442093115e-13]
-                       Relative : [-8.28598769775e-16 .. 1.16559287774e-15]
+                       Absolute : [-3.25629217954e-13 .. 2.21130746831e-13]
+                       Relative : [-8.48450204766e-16 .. 1.20256799708e-15]
                        Format : Binary64
 [eva] numerors.c:303: 
   Frama_C_domain_show_each_ex17:
   res_15 : # cvalue: [-96.2940054272 .. -0.437730749478]
            # numerors: Real     : [-96.2940054272 .. -0.437730749478]
-                       Absolute : [-8.42646023163e-14 .. 6.51409668787e-14]
-                       Relative : [-7.81550286206e-16 .. 9.61586166729e-16]
+                       Absolute : [-8.46847755296e-14 .. 6.51409668787e-14]
+                       Relative : [-7.83514848072e-16 .. 9.6594960775e-16]
                        Format : Binary64
 [eva] numerors.c:311: 
   Frama_C_domain_show_each_ex18:

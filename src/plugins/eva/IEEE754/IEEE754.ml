@@ -208,11 +208,11 @@ module Make (Model : Modeling) = struct
 
   let abs_exact_bounds approx =
     let { lower ; upper } = Exact.bounds approx in
-    let lower = Scalar.abs lower in
-    let upper = Scalar.abs upper in
+    let lower' = Scalar.abs lower in
+    let upper' = Scalar.abs upper in
     if Scalar.(lower <= zero && zero <= upper)
-    then Scalar.{ lower = zero ; upper = max lower upper }
-    else Scalar.{ lower = min lower upper ; upper = max lower upper }
+    then Scalar.{ lower = zero ; upper = max lower' upper' }
+    else Scalar.{ lower = min lower' upper' ; upper = max lower' upper' }
 
   (* Returns upper bounds of the elementary rounding errors introduced by a
      correctly rounded expression in a given format based on its absolute
