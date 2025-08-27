@@ -326,54 +326,19 @@ module Make (Model : Modeling) = struct
 
 
 
-  type unary = | and binary = |
+  type unary = Unary : 'f representation computation -> unary
 
-  type ('a, 'kind) handler =
-    | Handler_Unary  : value * 'a         -> ('a, unary ) handler
-    | Handler_Binary : value * value * 'a -> ('a, binary) handler
-
-  type 'kind handle =
-    | Unary  : 'f handle_unary  -> unary handle
-    | Binary : 'f handle_binary -> binary handle
-
-  and 'f handle_unary =
-    'f representation computation
-
-  and 'f handle_binary =
-    'f format * 'f representation computation * 'f representation computation
-
-  let unary value =
+  let ( let@ ) computation step =
     let open Computation.Operators in
-    let+ value in Handler_Unary (value, Top)
-
-  let binary ~fallback left right =
-    let open Computation.Operators in
-    let+ left and+ right in Handler_Binary (left, right, fallback)
-
-  type ('a, 'k) handler_step =
-    ('a, 'k) handler computation -> ('k handle -> 'a computation) -> 'a computation
-
-  let ( let@ ) : type k. ('a, k) handler_step = fun handler step ->
-    let open Computation.Operators in
-    let* handler = handler in
-    match handler with
-    | Handler_Unary  (Top     , fallback) -> lift fallback
-    | Handler_Unary  (False   , fallback) -> lift fallback
-    | Handler_Binary (Top  , _, fallback) -> lift fallback
-    | Handler_Binary (False, _, fallback) -> lift fallback
-    | Handler_Binary (_, Top  , fallback) -> lift fallback
-    | Handler_Binary (_, False, fallback) -> lift fallback
-    | Handler_Unary  (Repr r, _) -> step (Unary (lift r))
-    | Handler_Binary (Repr left, Repr right, fallback) ->
-      match Typed_float.same_format left.format right.format with
-      | Yes format -> step (Binary (format, lift left, lift right))
-      | No -> lift fallback
-
-
+    let* value = computation in
+    match value with
+    | Top -> lift Top
+    | False -> lift Top
+    | Repr r -> step (Unary (lift r))
 
   let neg computation =
     let open Computation.Operators in
-    let@ Unary  x = unary computation in
+    let@ Unary  x = computation in
     let* exact    = Exact.neg    (exact    x) in
     let* absolute = Absolute.neg (absolute x) in
     let* relative = relative x and* format = format x in
@@ -381,7 +346,7 @@ module Make (Model : Modeling) = struct
 
   let sqrt computation =
     let open Computation.Operators in
-    let@ Unary x = unary computation in
+    let@ Unary x = computation in
     let* lower = Exact.(exact x |> map lower) in
     if Scalar.(lower >= zero) then
       let* format  = format x in
@@ -401,6 +366,23 @@ module Make (Model : Modeling) = struct
     else Computation.return Top
 
 
+
+  type binary =
+    Binary : 'f binary_elements -> binary
+
+  and 'f binary_elements =
+    'f format * 'f representation computation * 'f representation computation
+
+  let ( let@ ) (left, right) step =
+    let open Computation.Operators in
+    let* left and* right in
+    match left, right with
+    | Top, _ | _, Top -> lift Top
+    | False, _ | _, False -> lift Top
+    | Repr left, Repr right ->
+      match Typed_float.same_format left.format right.format with
+      | Yes format -> step (Binary (format, lift left, lift right))
+      | No -> lift Top
 
   let a_x_plus_b_y_over_x_plus_y ~a ~x ~b ~y result =
     if contains_zero result then Relative.(lift top)
@@ -423,7 +405,7 @@ module Make (Model : Modeling) = struct
 
   let ( + ) l r =
     let open Computation.Operators in
-    let@ Binary (format, l, r) = binary ~fallback:Top l r in
+    let@ Binary (format, l, r) = l, r in
     let* result_is_nan = NaN.(l + r) in
     if not result_is_nan then
       let* result = Exact.(exact l + exact r) in
@@ -441,7 +423,7 @@ module Make (Model : Modeling) = struct
 
   let ( - ) l r =
     let open Computation.Operators in
-    let@ Binary (format, l, r) = binary ~fallback:Top l r in
+    let@ Binary (format, l, r) = l, r in
     let* result_is_nan = NaN.(l - r) in
     if not result_is_nan then
       let* result = Exact.(exact l - exact r) in
@@ -460,7 +442,7 @@ module Make (Model : Modeling) = struct
 
   let ( * ) l r =
     let open Computation.Operators in
-    let@ Binary (format, l, r) = binary ~fallback:Top l r in
+    let@ Binary (format, l, r) = l, r in
     let* result_is_nan = NaN.(l * r) in
     if not result_is_nan then
       let* result = Exact.(exact l * exact r) in
@@ -480,7 +462,7 @@ module Make (Model : Modeling) = struct
 
   let ( / ) l r =
     let open Computation.Operators in
-    let@ Binary (format, l, r) = binary ~fallback:Top l r in
+    let@ Binary (format, l, r) = l, r in
     let* result_is_nan = NaN.(l / r) in
     if not result_is_nan then
       let* result = Exact.(exact l / exact r) in
