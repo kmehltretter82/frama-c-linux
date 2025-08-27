@@ -564,14 +564,14 @@ int __gen_e_acsl_posix_memalign(void **memptr, size_t alignment, size_t size)
 void *__gen_e_acsl_aligned_alloc(size_t alignment, size_t size)
 {
   __e_acsl_contract_t *__gen_e_acsl_contract;
-  int __gen_e_acsl_at_2;
+  size_t __gen_e_acsl_at_2;
   int __gen_e_acsl_at;
   void *__retres;
   __e_acsl_store_block((void *)(& __retres),8UL);
   {
     int __gen_e_acsl_is_implementation_alignment_2;
     __gen_e_acsl_at = errno;
-    __gen_e_acsl_at_2 = (int)alignment;
+    __gen_e_acsl_at_2 = alignment;
     __gen_e_acsl_contract = __e_acsl_contract_init(2UL);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __gen_e_acsl_is_implementation_alignment_2 = __gen_e_acsl_is_implementation_alignment
@@ -630,12 +630,11 @@ void *__gen_e_acsl_aligned_alloc(size_t alignment, size_t size)
       int __gen_e_acsl_aligned;
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
         {.values = (void *)0};
-      __gen_e_acsl_aligned = __e_acsl_aligned(__retres,
-                                              (size_t)__gen_e_acsl_at_2);
+      __gen_e_acsl_aligned = __e_acsl_aligned(__retres,__gen_e_acsl_at_2);
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_5,"\\result",
                                    __retres);
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,
-                                   "\\old(alignment)",0,__gen_e_acsl_at_2);
+      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_5,
+                                     "\\old(alignment)",0,__gen_e_acsl_at_2);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,
                                    "allocation: aligned: \\aligned(\\result,\\old(alignment))",
                                    0,__gen_e_acsl_aligned);
