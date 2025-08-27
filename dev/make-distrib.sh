@@ -121,8 +121,24 @@ fi
 ################################################################################
 # External Plugins
 
-PLUGINS=$(find src/plugins -mindepth 1 -maxdepth 1 -type d)
-EXTERNAL_PLUGINS=$(find src/plugins -type d -name ".git" | sed "s/\/.git//")
+# (using declare and a while read loop because MacOS is still on bash 3.2 by
+#  default and does not know readarray D:)
+
+declare -a FC_PLUGINS
+while IFS= read -r -d $'\0' p; do FC_PLUGINS+=("$p"); done < <(
+  find src/plugins -mindepth 1 -maxdepth 1 -type d -print0)
+declare -a IVETTE_PLUGINS
+while IFS= read -r -d $'\0' p; do IVETTE_PLUGINS+=("$p"); done < <(
+  find ivette/src/frama-c/plugins -mindepth 1 -maxdepth 1 -type d -print0)
+declare -a FC_EXTERNAL_PLUGINS
+while IFS= read -r -d $'\0' p; do FC_EXTERNAL_PLUGINS+=("$p"); done < <(
+  find src/plugins -type d -name ".git" -print0 | sed "s/\/.git//g")
+declare -a IVETTE_EXTERNAL_PLUGINS
+while IFS= read -r -d $'\0' p; do IVETTE_EXTERNAL_PLUGINS+=("$p"); done < <(
+  find ivette/src/frama-c/plugins -type d -name ".git" -print0 | sed "s/\/.git//g")
+
+PLUGINS=("${FC_PLUGINS[@]}" "${IVETTE_PLUGINS[@]}")
+EXTERNAL_PLUGINS=("${FC_EXTERNAL_PLUGINS[@]}" "${IVETTE_EXTERNAL_PLUGINS[@]}")
 
 ################################################################################
 # Summary
@@ -130,13 +146,20 @@ EXTERNAL_PLUGINS=$(find src/plugins -type d -name ".git" | sed "s/\/.git//")
 echo "----------------------------------------------------------------"
 echo "Make Distribution"
 echo "Version: $VERSION ($VERSION_CODENAME)"
-echo "Plugins: $EXTERNAL_PLUGINS"
+echo "Frama-C Plug-ins:"
+if [ "${#FC_EXTERNAL_PLUGINS[@]}" -gt 0 ]; then
+  printf " * %s\n" "${FC_EXTERNAL_PLUGINS[@]}"
+fi
+echo "Ivette Plug-ins:"
+if [ "${#IVETTE_EXTERNAL_PLUGINS[@]}" -gt 0 ]; then
+  printf " * %s\n" "${IVETTE_EXTERNAL_PLUGINS[@]}"
+fi
 echo "----------------------------------------------------------------"
 
 ################################################################################
 # Warn if there are uncommitted changes (will not be taken into account)
 
-GIT_STATUS="$(git status --porcelain -- $(sed 's/^./:!&/' <<< $EXTERNAL_PLUGINS))"
+GIT_STATUS="$(git status --porcelain -- $(printf ":!%s\n" "${EXTERNAL_PLUGINS[@]}"))"
 if [ "" != "$GIT_STATUS" -a "$USE_STASH" != "yes" ]; then
   echo "WARNING: uncommitted changes will be IGNORED when making archive:"
   echo "$GIT_STATUS" | sed 's/^/  /'
@@ -154,14 +177,14 @@ fi
 git archive ${ARCHIVE_COMMIT:-HEAD} -o $FRAMAC_TAR --prefix "$FRAMAC/"
 
 ################################################################################
-# Add external plugin to archive
+# Add external plugins to archive
 
-if [ "" != "$EXTERNAL_PLUGINS" ]
+if [ "${#EXTERNAL_PLUGINS[@]}" -gt 0 ]
 then
   echo "Including external plugins:"
 fi
 
-for plugin in $EXTERNAL_PLUGINS
+for plugin in "${EXTERNAL_PLUGINS[@]}"
 do
     echo "  $plugin"
     PLUGIN_TAR="$(basename $plugin).tar"
@@ -170,7 +193,7 @@ do
     rm -rf "$plugin/$PLUGIN_TAR"
 done
 
-if [ "" != "$EXTERNAL_PLUGINS" ]
+if [ "${#EXTERNAL_PLUGINS[@]}" -gt 0 ]
 then
   echo "----------------------------------------------------------------"
 fi
@@ -188,7 +211,7 @@ git check-attr --stdin export-ignore |\
 grep -v "export-ignore: set" | awk -F ': ' '{print $1}' |\
 git check-attr --stdin header_spec > $HEADER_SPEC
 
-for plugin in $EXTERNAL_PLUGINS ; do
+for plugin in "${EXTERNAL_PLUGINS[@]}" ; do
   git -C $plugin ls-files |\
   git -C $plugin check-attr --stdin export-ignore |\
   grep -v "export-ignore: set" | awk -F ': ' '{print $1}' |\
@@ -203,7 +226,7 @@ CHECK_HEADER_OPT="-header-dirs headers"
 
 # For plugins, either they can be open-source and we assume they have OS headers
 # or they are closed-source
-for plugin in $PLUGINS ; do
+for plugin in "${PLUGINS[@]}" ; do
   if [ -d "$plugin/headers" ] ; then
     CHECK_HEADER_OPT="$CHECK_HEADER_OPT -header-dirs $plugin/headers"
   fi
