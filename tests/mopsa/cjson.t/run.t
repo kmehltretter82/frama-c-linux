@@ -41,9 +41,6 @@ Test invalid command lines
   $ frama-c -mopsa-db mopsa-db.json -mopsa-target cJSON_test
   [kernel:mopsa-db] Warning: 
     library '$TESTCASE_ROOT/libm.a' not found in mopsa-db, ignoring
-  [kernel] Sources from mopsa-db:
-    cJSON.c
-    test.c
   [kernel] Parsing cJSON.c (with preprocessing)
   [kernel] Parsing test.c (with preprocessing)
   [kernel:parser:decimal-float] test.c:144: Warning: 

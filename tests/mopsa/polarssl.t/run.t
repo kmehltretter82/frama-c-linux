@@ -1,7 +1,15 @@
+This file has two different testing modes:
+- if mopsa-build and mopsa-db are available, it tests the production of
+ mopsa-db.json;
+- otherwise, it uses a prepared mopsa-db.json
 Building the project with make will produce lots of messages, both from Make
 itself, and from GCC (e.g. warnings about sptring)
-  $ mopsa-build make -j >make.out 2>make.err
-  $ mopsa-db -json > mopsa-db.json
+  $ if command -v mopsa-build 2>&1 >/dev/null; then
+  >   mopsa-build make -j >make.out 2>make.err &&
+  >   mopsa-db -json > mopsa-db.json
+  > else
+  >   cp precomputed-mopsa-db.json mopsa-db.json
+  > fi
   $ frama-c -mopsa-db mopsa-db.json
   [kernel] targets:
     [library   ] library/libpolarssl.a
@@ -38,86 +46,51 @@ itself, and from GCC (e.g. warnings about sptring)
     [executable] programs/test/ssl_test
     [executable] programs/x509/cert_app
     [executable] programs/x509/crl_app
-  $ frama-c -mopsa-db mopsa-db.json -mopsa-list-deps programs/ssl/ssl_client1
+
+The 'sed' below is necessary to ensure both the normalized and non-normalized
+mopsa-dbs output the same paths. Otherwise, the "-I 'include'" path would
+be "-I '$TESTCASE_ROOT/include'".
+  $ frama-c -mopsa-db mopsa-db.json -mopsa-list-deps programs/ssl/ssl_client1 | sed "s|$PWD/||g"
   [kernel] dependencies:
-    $TESTCASE_ROOT/library/aes.c:	 -I '$TESTCASE_ROOT/include' -D '_FILE_OFFSET_BITS=64'
-    $TESTCASE_ROOT/library/arc4.c:	 -I '$TESTCASE_ROOT/include' -D '_FILE_OFFSET_BITS=64'
-    $TESTCASE_ROOT/library/asn1parse.c:	 -I '$TESTCASE_ROOT/include' -D '_FILE_OFFSET_BITS=64'
-    $TESTCASE_ROOT/library/base64.c:	 -I '$TESTCASE_ROOT/include' -D '_FILE_OFFSET_BITS=64'
-    $TESTCASE_ROOT/library/bignum.c:	 -I '$TESTCASE_ROOT/include' -D '_FILE_OFFSET_BITS=64'
-    $TESTCASE_ROOT/library/camellia.c:	 -I '$TESTCASE_ROOT/include' -D '_FILE_OFFSET_BITS=64'
-    $TESTCASE_ROOT/library/certs.c:	 -I '$TESTCASE_ROOT/include' -D '_FILE_OFFSET_BITS=64'
-    $TESTCASE_ROOT/library/cipher.c:	 -I '$TESTCASE_ROOT/include' -D '_FILE_OFFSET_BITS=64'
-    $TESTCASE_ROOT/library/cipher_wrap.c:	 -I '$TESTCASE_ROOT/include' -D '_FILE_OFFSET_BITS=64'
-    $TESTCASE_ROOT/library/ctr_drbg.c:	 -I '$TESTCASE_ROOT/include' -D '_FILE_OFFSET_BITS=64'
-    $TESTCASE_ROOT/library/debug.c:	 -I '$TESTCASE_ROOT/include' -D '_FILE_OFFSET_BITS=64'
-    $TESTCASE_ROOT/library/des.c:	 -I '$TESTCASE_ROOT/include' -D '_FILE_OFFSET_BITS=64'
-    $TESTCASE_ROOT/library/dhm.c:	 -I '$TESTCASE_ROOT/include' -D '_FILE_OFFSET_BITS=64'
-    $TESTCASE_ROOT/library/entropy.c:	 -I '$TESTCASE_ROOT/include' -D '_FILE_OFFSET_BITS=64'
-    $TESTCASE_ROOT/library/entropy_poll.c:	 -I '$TESTCASE_ROOT/include' -D '_FILE_OFFSET_BITS=64'
-    $TESTCASE_ROOT/library/error.c:	 -I '$TESTCASE_ROOT/include' -D '_FILE_OFFSET_BITS=64'
-    $TESTCASE_ROOT/library/havege.c:	 -I '$TESTCASE_ROOT/include' -D '_FILE_OFFSET_BITS=64'
-    $TESTCASE_ROOT/library/md.c:	 -I '$TESTCASE_ROOT/include' -D '_FILE_OFFSET_BITS=64'
-    $TESTCASE_ROOT/library/md2.c:	 -I '$TESTCASE_ROOT/include' -D '_FILE_OFFSET_BITS=64'
-    $TESTCASE_ROOT/library/md4.c:	 -I '$TESTCASE_ROOT/include' -D '_FILE_OFFSET_BITS=64'
-    $TESTCASE_ROOT/library/md5.c:	 -I '$TESTCASE_ROOT/include' -D '_FILE_OFFSET_BITS=64'
-    $TESTCASE_ROOT/library/md_wrap.c:	 -I '$TESTCASE_ROOT/include' -D '_FILE_OFFSET_BITS=64'
-    $TESTCASE_ROOT/library/net.c:	 -I '$TESTCASE_ROOT/include' -D '_FILE_OFFSET_BITS=64'
-    $TESTCASE_ROOT/library/padlock.c:	 -I '$TESTCASE_ROOT/include' -D '_FILE_OFFSET_BITS=64'
-    $TESTCASE_ROOT/library/pem.c:	 -I '$TESTCASE_ROOT/include' -D '_FILE_OFFSET_BITS=64'
-    $TESTCASE_ROOT/library/pkcs11.c:	 -I '$TESTCASE_ROOT/include' -D '_FILE_OFFSET_BITS=64'
-    $TESTCASE_ROOT/library/rsa.c:	 -I '$TESTCASE_ROOT/include' -D '_FILE_OFFSET_BITS=64'
-    $TESTCASE_ROOT/library/sha1.c:	 -I '$TESTCASE_ROOT/include' -D '_FILE_OFFSET_BITS=64'
-    $TESTCASE_ROOT/library/sha2.c:	 -I '$TESTCASE_ROOT/include' -D '_FILE_OFFSET_BITS=64'
-    $TESTCASE_ROOT/library/sha4.c:	 -I '$TESTCASE_ROOT/include' -D '_FILE_OFFSET_BITS=64'
-    $TESTCASE_ROOT/library/ssl_cli.c:	 -I '$TESTCASE_ROOT/include' -D '_FILE_OFFSET_BITS=64'
-    $TESTCASE_ROOT/library/ssl_srv.c:	 -I '$TESTCASE_ROOT/include' -D '_FILE_OFFSET_BITS=64'
-    $TESTCASE_ROOT/library/ssl_tls.c:	 -I '$TESTCASE_ROOT/include' -D '_FILE_OFFSET_BITS=64'
-    $TESTCASE_ROOT/library/timing.c:	 -I '$TESTCASE_ROOT/include' -D '_FILE_OFFSET_BITS=64'
-    $TESTCASE_ROOT/library/version.c:	 -I '$TESTCASE_ROOT/include' -D '_FILE_OFFSET_BITS=64'
-    $TESTCASE_ROOT/library/x509parse.c:	 -I '$TESTCASE_ROOT/include' -D '_FILE_OFFSET_BITS=64'
-    $TESTCASE_ROOT/library/xtea.c:	 -I '$TESTCASE_ROOT/include' -D '_FILE_OFFSET_BITS=64'
-    $TESTCASE_ROOT/programs/ssl/ssl_client1.c:	 -I '$TESTCASE_ROOT/include' -D '_FILE_OFFSET_BITS=64'
+    library/aes.c:	 -I 'include' -D '_FILE_OFFSET_BITS=64'
+    library/arc4.c:	 -I 'include' -D '_FILE_OFFSET_BITS=64'
+    library/asn1parse.c:	 -I 'include' -D '_FILE_OFFSET_BITS=64'
+    library/base64.c:	 -I 'include' -D '_FILE_OFFSET_BITS=64'
+    library/bignum.c:	 -I 'include' -D '_FILE_OFFSET_BITS=64'
+    library/camellia.c:	 -I 'include' -D '_FILE_OFFSET_BITS=64'
+    library/certs.c:	 -I 'include' -D '_FILE_OFFSET_BITS=64'
+    library/cipher.c:	 -I 'include' -D '_FILE_OFFSET_BITS=64'
+    library/cipher_wrap.c:	 -I 'include' -D '_FILE_OFFSET_BITS=64'
+    library/ctr_drbg.c:	 -I 'include' -D '_FILE_OFFSET_BITS=64'
+    library/debug.c:	 -I 'include' -D '_FILE_OFFSET_BITS=64'
+    library/des.c:	 -I 'include' -D '_FILE_OFFSET_BITS=64'
+    library/dhm.c:	 -I 'include' -D '_FILE_OFFSET_BITS=64'
+    library/entropy.c:	 -I 'include' -D '_FILE_OFFSET_BITS=64'
+    library/entropy_poll.c:	 -I 'include' -D '_FILE_OFFSET_BITS=64'
+    library/error.c:	 -I 'include' -D '_FILE_OFFSET_BITS=64'
+    library/havege.c:	 -I 'include' -D '_FILE_OFFSET_BITS=64'
+    library/md.c:	 -I 'include' -D '_FILE_OFFSET_BITS=64'
+    library/md2.c:	 -I 'include' -D '_FILE_OFFSET_BITS=64'
+    library/md4.c:	 -I 'include' -D '_FILE_OFFSET_BITS=64'
+    library/md5.c:	 -I 'include' -D '_FILE_OFFSET_BITS=64'
+    library/md_wrap.c:	 -I 'include' -D '_FILE_OFFSET_BITS=64'
+    library/net.c:	 -I 'include' -D '_FILE_OFFSET_BITS=64'
+    library/padlock.c:	 -I 'include' -D '_FILE_OFFSET_BITS=64'
+    library/pem.c:	 -I 'include' -D '_FILE_OFFSET_BITS=64'
+    library/pkcs11.c:	 -I 'include' -D '_FILE_OFFSET_BITS=64'
+    library/rsa.c:	 -I 'include' -D '_FILE_OFFSET_BITS=64'
+    library/sha1.c:	 -I 'include' -D '_FILE_OFFSET_BITS=64'
+    library/sha2.c:	 -I 'include' -D '_FILE_OFFSET_BITS=64'
+    library/sha4.c:	 -I 'include' -D '_FILE_OFFSET_BITS=64'
+    library/ssl_cli.c:	 -I 'include' -D '_FILE_OFFSET_BITS=64'
+    library/ssl_srv.c:	 -I 'include' -D '_FILE_OFFSET_BITS=64'
+    library/ssl_tls.c:	 -I 'include' -D '_FILE_OFFSET_BITS=64'
+    library/timing.c:	 -I 'include' -D '_FILE_OFFSET_BITS=64'
+    library/version.c:	 -I 'include' -D '_FILE_OFFSET_BITS=64'
+    library/x509parse.c:	 -I 'include' -D '_FILE_OFFSET_BITS=64'
+    library/xtea.c:	 -I 'include' -D '_FILE_OFFSET_BITS=64'
+    programs/ssl/ssl_client1.c:	 -I 'include' -D '_FILE_OFFSET_BITS=64'
   $ frama-c -mopsa-db mopsa-db.json -mopsa-target programs/ssl/ssl_client1 dummy.c
-  [kernel] Sources from mopsa-db:
-    library/aes.c
-    library/arc4.c
-    library/asn1parse.c
-    library/base64.c
-    library/bignum.c
-    library/camellia.c
-    library/certs.c
-    library/cipher.c
-    library/cipher_wrap.c
-    library/ctr_drbg.c
-    library/debug.c
-    library/des.c
-    library/dhm.c
-    library/entropy.c
-    library/entropy_poll.c
-    library/error.c
-    library/havege.c
-    library/md.c
-    library/md2.c
-    library/md4.c
-    library/md5.c
-    library/md_wrap.c
-    library/net.c
-    library/padlock.c
-    library/pem.c
-    library/pkcs11.c
-    library/rsa.c
-    library/sha1.c
-    library/sha2.c
-    library/sha4.c
-    library/ssl_cli.c
-    library/ssl_srv.c
-    library/ssl_tls.c
-    library/timing.c
-    library/version.c
-    library/x509parse.c
-    library/xtea.c
-    programs/ssl/ssl_client1.c
   [kernel] Parsing library/aes.c (with preprocessing)
   [kernel] Parsing library/arc4.c (with preprocessing)
   [kernel] Parsing library/asn1parse.c (with preprocessing)

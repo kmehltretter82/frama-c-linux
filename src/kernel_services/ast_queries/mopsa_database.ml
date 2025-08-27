@@ -70,7 +70,6 @@ let acc_deps object_map target_map targets =
       if Filepath.Set.mem t acc_seen then
         aux acc r
       else begin
-        let acc_seen = Filepath.Set.add t acc_seen in
         match Hashtbl.find_opt target_map t with
         | None ->
           begin
@@ -84,22 +83,23 @@ let acc_deps object_map target_map targets =
             end else
               match Hashtbl.find_opt object_map t with
               | None ->
-                if Kernel.MopsaPermissive.get () then begin
-                  Kernel.feedback
-                    "entry '%a' not found in mopsa-db, ignoring [%s]"
-                    Filepath.pretty_abs t
-                    Kernel.MopsaPermissive.name;
-                  aux (acc_res, acc_seen) r
-                end else
-                  Kernel.abort "entry '%a' not found in mopsa-db%s"
-                    Filepath.pretty_abs t
-                    (if Kernel.debug_atleast 1 then
-                       Format.asprintf
-                         "@\nobjects:@\n@[%a@]@\ntargets:@\n@[%a@]"
-                         pp_tbl_paths object_map
-                         pp_tbl_paths target_map
-                     else
-                       "")
+                let msg =
+                  let wkey = Kernel.wkey_mopsa_db_missing_library in
+                  match Kernel.(get_warn_status wkey) with
+                  | Log.(Winactive | Wfeedback | Wfeedback_once) ->
+                    ", ignoring"
+                  | _ ->
+                    if Kernel.(is_debug_key_enabled dkey_mopsa_db_verbose) then
+                      Format.asprintf
+                        "@\nobjects:@\n@[%a@]@\ntargets:@\n@[%a@]"
+                        pp_tbl_paths object_map
+                        pp_tbl_paths target_map
+                    else ""
+                in
+                Kernel.warning ~wkey:Kernel.wkey_mopsa_db_missing_library
+                  "entry '%a' not found in mopsa-db%s"
+                  Filepath.pretty_abs t msg;
+                aux (acc_res, acc_seen) r
               | Some o ->
                 if o.lang <> "C" then begin
                   Kernel.warning ~wkey:Kernel.wkey_mopsa_db_non_c ~once:true
@@ -220,10 +220,9 @@ let run () =
         "No remaining sources in mopsa-db \
          (%d sources before filters)!" count_before_filter
     else
-      Kernel.feedback
+      Kernel.feedback ~dkey:Kernel.dkey_mopsa_db
         "Sources from mopsa-db:@\n%a"
         (Pretty_utils.pp_list ~sep:"@\n" Filepath.pretty) deps_files;
-    List.iter Kernel.Files.add deps_files;
     Kernel.Files.set deps_files;
     Kernel.Files.add_set_hook (fun _ _ ->
         (* The user specified one or more sources;

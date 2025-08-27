@@ -4,16 +4,15 @@
     %{bin-available:cmake}))
   (deps
     ../../src/init/boot/empty_file.exe
-    (package mopsa)
+    ;(package mopsa) ; cannot optionally depend on it, so omitted for now
   )
 )
 
 (cram
   (applies_to polarssl)
-  (enabled_if (and %{bin-available:mopsa-build} %{bin-available:mopsa-db}))
   (deps
     ../../src/init/boot/empty_file.exe
-    (package mopsa)
+    ;(package mopsa) ; cannot optionally depend on it, so omitted for now
   )
 )
 

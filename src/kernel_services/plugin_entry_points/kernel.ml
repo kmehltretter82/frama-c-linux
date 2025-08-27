@@ -98,6 +98,10 @@ let dkey_mopsa_db =
   register_category "mopsa-db"
     ~help:"messages related to -mopsa-db and related options"
 
+let dkey_mopsa_db_verbose =
+  register_category "mopsa-db:verbose"
+    ~help:"highly verbose messages related to mopsa-db options"
+
 let dkey_print_bitfields = register_category "printer:bitfields"
 
 let dkey_print_builtins = register_category "printer:builtins"
@@ -213,6 +217,11 @@ let () = set_warn_status wkey_jcdb Log.Wonce
 let wkey_mopsa_db =
   register_warn_category "mopsa-db"
     ~help:"warnings related to option -mopsa-db"
+
+let wkey_mopsa_db_missing_library =
+  register_warn_category "mopsa-db:missing-library"
+    ~default:Log.Wabort
+    ~help:"warnings related to missing libraries in mopsa-db files"
 
 let wkey_mopsa_db_non_c =
   register_warn_category "mopsa-db:non-c-source"
@@ -1285,8 +1294,8 @@ module MopsaDb =
       let help =
         "when set, the specified path (or <path>/mopsa-db.json, if <path> is \
          a directory) is loaded as a build database. \
-         If '-mopsa-db-target' is not set, prints the list of targets in the \
-         database and exits. Otherwise, '-mopsa-db-target' sets the files to \
+         If '-mopsa-target' is not set, prints the list of targets in the \
+         database and exits. Otherwise, '-mopsa-target' sets the files to \
          be parsed and preprocessing flags."
     end)
 
@@ -1325,17 +1334,6 @@ module MopsaExcludeSources =
       let help = "list of source files to be blacklisted from the set \
                   computed by -mopsa-target, so that Frama-C will not \
                   try to parse them."
-    end)
-
-let () = Parameter_customize.set_group parsing
-let () = Parameter_customize.do_not_reset_on_copy ()
-module MopsaPermissive =
-  P.False
-    (struct
-      let option_name = "-mopsa-permissive"
-      let help = "allows missing entries to be ignored with a message \
-                  instead of an error. Experimental; useful for databases \
-                  containing non-standard sources."
     end)
 
 
