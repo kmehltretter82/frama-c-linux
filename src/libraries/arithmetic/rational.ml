@@ -49,15 +49,16 @@ let pow2 e =
   let scaling = Q.(mul_2exp one (Stdlib.abs e)) in
   if e >= 0 then scaling else Q.inv scaling
 
-(* We cannot compute directly ⌊log₂ (a / b)⌋ and ⌈log₂ (a / b)⌉. However, we
-   can compute n = ⌊log₂ a⌋ and m = ⌊log₂ b⌋ using Zarith. Those equalities
+(* We want to compute ⌊log₂ q⌋ ≤ q ≤ ⌈log₂ q⌉, where q = a / b is a rational.
+   This operation is not provided by Zarith so we cannot compute directly
+   either ⌊log₂ (a / b)⌋ or ⌈log₂ (a / b)⌉. However, we can compute
+   n = ⌊log₂ a⌋ and m = ⌊log₂ b⌋ using Zarith. Those equalities
    mean that n ≤ log₂ a < n + 1 and m ≤ log₂ b < m + 1, and thus
    we obtain n - m - 1 < log₂ a - log₂ b < n - m + 1, which is equivalent
    to 2 ^ (n - m - 1) < a / b < 2 ^ (n - m + 1). However, those bounds are
    not optimal. Indeed, we necessarily have one of the following :
    - n - m - 1 < n - m ≤ log₂ a - log₂ b < n - m + 1
    - n - m - 1 < log₂ a - log₂ b ≤ n - m < n - m + 1
-
    Testing which one is true comes down to check if 2 ^ (n - m) ≤ (a / b). *)
 let log2 q =
   if Q.(q <= zero) then raise (Invalid_argument (Q.to_string q)) ;
