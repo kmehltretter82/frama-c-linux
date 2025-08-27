@@ -22,8 +22,4 @@ path=$1
 
 find $path/frama-c -path "*/api/*" -name "*.ts" -exec rm -f {} \;
 	../bin/frama-c -server-tsc -server-tsc-out $path
-find $path/frama-c -path "*/api/*" -name "*.ts" \
-	-exec headache \
-		-h ../headers/CEA_LGPL \
-		-c ../headers/headache_config.txt {} \;\
-	-exec chmod a-w {} \;
+find $path/frama-c -path "*/api/*" -name "*.ts" -exec chmod a-w {} \;
