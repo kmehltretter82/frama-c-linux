@@ -358,9 +358,26 @@ int __gen_e_acsl_pthread_create(pthread_t * restrict thread,
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,"arg",arg);
     if (arg == (void *)0) __gen_e_acsl_or_2 = 1;
     else {
+      int __gen_e_acsl_aligned;
       int __gen_e_acsl_valid_2;
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
+        {.values = (void *)0};
+      __gen_e_acsl_aligned = __e_acsl_aligned(arg,_Alignof(char));
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_5,"arg",arg);
+      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_5,
+                                     "alignof(char)",0,_Alignof(char));
+      __gen_e_acsl_assert_data_5.blocking = 1;
+      __gen_e_acsl_assert_data_5.kind = "RTE";
+      __gen_e_acsl_assert_data_5.pred_txt = "\\aligned(arg,alignof(char))";
+      __gen_e_acsl_assert_data_5.file = "FRAMAC_SHARE/libc/pthread.h";
+      __gen_e_acsl_assert_data_5.fct = "pthread_create";
+      __gen_e_acsl_assert_data_5.line = 350;
+      __gen_e_acsl_assert_data_5.name = "pointer_alignment";
+      __e_acsl_assert(__gen_e_acsl_aligned,& __gen_e_acsl_assert_data_5);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
       __gen_e_acsl_valid_2 = __e_acsl_valid(arg,sizeof(char),arg,
                                             (void *)(& arg));
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,"arg",arg);
       __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_4,
                                      "sizeof(char)",0,sizeof(char));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,
@@ -368,7 +385,6 @@ int __gen_e_acsl_pthread_create(pthread_t * restrict thread,
                                    __gen_e_acsl_valid_2);
       __gen_e_acsl_or_2 = __gen_e_acsl_valid_2;
     }
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,"arg",arg);
     __gen_e_acsl_assert_data_4.blocking = 1;
     __gen_e_acsl_assert_data_4.kind = "Precondition";
     __gen_e_acsl_assert_data_4.pred_txt = "arg == \\null || \\valid((char *)arg)";

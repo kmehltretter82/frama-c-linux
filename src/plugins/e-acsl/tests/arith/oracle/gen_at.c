@@ -229,6 +229,7 @@ void g(int *p, int *q)
   L2:
   {
     int __gen_e_acsl_valid_read_4;
+    int __gen_e_acsl_aligned;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
       {.values = (void *)0};
     __gen_e_acsl_valid_read_4 = __e_acsl_valid_read((void *)(p + __gen_e_acsl_at_3),
@@ -248,6 +249,24 @@ void g(int *p, int *q)
     __gen_e_acsl_assert_data_4.name = "mem_access";
     __e_acsl_assert(__gen_e_acsl_valid_read_4,& __gen_e_acsl_assert_data_4);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
+      {.values = (void *)0};
+    __gen_e_acsl_aligned = __e_acsl_aligned((void *)(p + __gen_e_acsl_at_3),
+                                            _Alignof(int));
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_5,"p",(void *)p);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,
+                                 "__gen_e_acsl_at_3",0,__gen_e_acsl_at_3);
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_5,
+                                   "alignof(int)",0,_Alignof(int));
+    __gen_e_acsl_assert_data_5.blocking = 1;
+    __gen_e_acsl_assert_data_5.kind = "RTE";
+    __gen_e_acsl_assert_data_5.pred_txt = "\\aligned(p + __gen_e_acsl_at_3,alignof(int))";
+    __gen_e_acsl_assert_data_5.file = "at.i";
+    __gen_e_acsl_assert_data_5.fct = "g";
+    __gen_e_acsl_assert_data_5.line = 39;
+    __gen_e_acsl_assert_data_5.name = "pointer_alignment";
+    __e_acsl_assert(__gen_e_acsl_aligned,& __gen_e_acsl_assert_data_5);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
     __gen_e_acsl_at_4 = *(p + __gen_e_acsl_at_3);
   }
   A = 4;
@@ -270,7 +289,9 @@ void g(int *p, int *q)
   L3:
   {
     int __gen_e_acsl_valid_read_5;
+    int __gen_e_acsl_aligned_2;
     int __gen_e_acsl_valid_read_6;
+    int __gen_e_acsl_aligned_3;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_7 =
       {.values = (void *)0};
     __gen_e_acsl_valid_read_5 = __e_acsl_valid_read((void *)(p + __gen_e_acsl_at),
@@ -290,6 +311,24 @@ void g(int *p, int *q)
     __gen_e_acsl_assert_data_7.name = "mem_access";
     __e_acsl_assert(__gen_e_acsl_valid_read_5,& __gen_e_acsl_assert_data_7);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_8 =
+      {.values = (void *)0};
+    __gen_e_acsl_aligned_2 = __e_acsl_aligned((void *)(p + __gen_e_acsl_at),
+                                              _Alignof(int));
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_8,"p",(void *)p);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_8,
+                                 "__gen_e_acsl_at",0,__gen_e_acsl_at);
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_8,
+                                   "alignof(int)",0,_Alignof(int));
+    __gen_e_acsl_assert_data_8.blocking = 1;
+    __gen_e_acsl_assert_data_8.kind = "RTE";
+    __gen_e_acsl_assert_data_8.pred_txt = "\\aligned(p + __gen_e_acsl_at,alignof(int))";
+    __gen_e_acsl_assert_data_8.file = "at.i";
+    __gen_e_acsl_assert_data_8.fct = "g";
+    __gen_e_acsl_assert_data_8.line = 43;
+    __gen_e_acsl_assert_data_8.name = "pointer_alignment";
+    __e_acsl_assert(__gen_e_acsl_aligned_2,& __gen_e_acsl_assert_data_8);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_8);
     __gen_e_acsl_at_5 = *(p + __gen_e_acsl_at);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_9 =
       {.values = (void *)0};
@@ -312,6 +351,27 @@ void g(int *p, int *q)
     __gen_e_acsl_assert_data_10.name = "mem_access";
     __e_acsl_assert(__gen_e_acsl_valid_read_6,& __gen_e_acsl_assert_data_10);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_10);
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_11 =
+      {.values = (void *)0};
+    __gen_e_acsl_aligned_3 = __e_acsl_aligned((void *)(p + __gen_e_acsl_at_2),
+                                              _Alignof(int));
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_11,"p",(void *)p);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_11,
+                                 "__gen_e_acsl_at_2",0,__gen_e_acsl_at_2);
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_11,
+                                   "alignof(int)",0,_Alignof(int));
+    __gen_e_acsl_assert_data_11.blocking = 1;
+    __gen_e_acsl_assert_data_11.kind = "RTE";
+    __gen_e_acsl_assert_data_11.pred_txt = "\\aligned(p + __gen_e_acsl_at_2,alignof(int))";
+    __gen_e_acsl_assert_data_11.file = "at.i";
+    __gen_e_acsl_assert_data_11.fct = "g";
+    __gen_e_acsl_assert_data_11.line = 41;
+    __gen_e_acsl_assert_data_11.name = "pointer_alignment";
+    __e_acsl_assert(__gen_e_acsl_aligned_3,& __gen_e_acsl_assert_data_11);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_11);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_9,
+                                 "*(p + \\at(*q,L1))",0,
+                                 *(p + __gen_e_acsl_at_2));
     __gen_e_acsl_assert_data_9.blocking = 1;
     __gen_e_acsl_assert_data_9.kind = "Assertion";
     __gen_e_acsl_assert_data_9.pred_txt = "\\at(*(p + \\at(*q,L1)),Here) == 2";

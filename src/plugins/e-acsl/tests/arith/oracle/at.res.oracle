@@ -1,16 +1,16 @@
 [e-acsl] beginning translation.
-[e-acsl] at.i:39: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
-[e-acsl] at.i:43: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
-[e-acsl] at.i:41: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
 [eva:alarm] at.i:17: Warning: assertion got status unknown.
 [eva:alarm] at.i:19: Warning: assertion got status unknown.
 [eva:alarm] at.i:77: Warning: assertion got status unknown.
 [eva:alarm] at.i:78: Warning: assertion got status unknown.
 [eva:alarm] at.i:79: Warning: assertion got status unknown.
+[eva:alarm] at.i:39: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] at.i:39: Warning: assertion got status unknown.
+[eva:alarm] at.i:43: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] at.i:41: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] at.i:41: Warning: assertion got status unknown.
 [eva:alarm] at.i:43: Warning: assertion got status unknown.

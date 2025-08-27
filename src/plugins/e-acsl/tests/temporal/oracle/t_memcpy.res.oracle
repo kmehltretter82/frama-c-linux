@@ -1,40 +1,6 @@
 [e-acsl] beginning translation.
-[e-acsl] t_memcpy.c:20: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
-[e-acsl] t_memcpy.c:21: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
-[e-acsl] t_memcpy.c:25: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
-[e-acsl] t_memcpy.c:26: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
-[e-acsl] t_memcpy.c:30: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
-[e-acsl] t_memcpy.c:31: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
-[e-acsl] t_memcpy.c:40: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
-[e-acsl] t_memcpy.c:41: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
-[e-acsl] t_memcpy.c:41: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
-[e-acsl] t_memcpy.c:42: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
-[e-acsl] t_memcpy.c:43: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
-[e-acsl] t_memcpy.c:43: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
-[e-acsl] t_memcpy.c:48: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
-[e-acsl] t_memcpy.c:49: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
-[e-acsl] t_memcpy.c:49: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:144: Warning: 
   no assigns clause generated for function valid_or_empty because pointers as arguments is not yet supported
-[e-acsl] FRAMAC_SHARE/libc/string.h:29: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:29: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:144: Warning: 
   E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:147: Warning: 
@@ -43,18 +9,6 @@
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:109: Warning: 
   no assigns clause generated for function valid_read_or_empty because pointers as arguments is not yet supported
-[e-acsl] FRAMAC_SHARE/libc/string.h:32: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:32: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:111: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:111: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:111: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:111: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:108: Warning: 
   E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:114: Warning: 
@@ -62,17 +16,47 @@
   is not yet supported.
   Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
+[eva:alarm] t_memcpy.c:20: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] t_memcpy.c:21: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] FRAMAC_SHARE/libc/string.h:29: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] FRAMAC_SHARE/libc/string.h:29: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] FRAMAC_SHARE/libc/string.h:108: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] FRAMAC_SHARE/libc/string.h:32: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] FRAMAC_SHARE/libc/string.h:32: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] FRAMAC_SHARE/libc/string.h:109: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] FRAMAC_SHARE/libc/string.h:111: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] FRAMAC_SHARE/libc/string.h:111: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] FRAMAC_SHARE/libc/string.h:111: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] FRAMAC_SHARE/libc/string.h:114: Warning: 
   function __gen_e_acsl_memcpy: postcondition 'copied_contents' got status unknown.
+[eva:alarm] t_memcpy.c:25: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] t_memcpy.c:26: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] FRAMAC_SHARE/libc/string.h:144: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] FRAMAC_SHARE/libc/string.h:147: Warning: 
   function __gen_e_acsl_memset: postcondition 'acsl_c_equiv' got status unknown.
-[eva:alarm] t_memcpy.c:42: Warning: 
-  accessing uninitialized left-value. assert \initialized(q);
+[eva:alarm] t_memcpy.c:40: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] t_memcpy.c:41: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] t_memcpy.c:41: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] t_memcpy.c:48: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] t_memcpy.c:49: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] t_memcpy.c:49: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.

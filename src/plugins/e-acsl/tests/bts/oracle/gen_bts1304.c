@@ -51,10 +51,31 @@ int main(void)
     i ++;
   }
   {
+    int __gen_e_acsl_aligned;
     int __gen_e_acsl_initialized;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+      {.values = (void *)0};
+    __gen_e_acsl_aligned = __e_acsl_aligned((void *)(buf),
+                                            _Alignof(union msg));
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,
+                                 "(unsigned char *)buf",(void *)(buf));
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
+                                   "alignof(union msg)",0,
+                                   _Alignof(union msg));
+    __gen_e_acsl_assert_data_2.blocking = 1;
+    __gen_e_acsl_assert_data_2.kind = "RTE";
+    __gen_e_acsl_assert_data_2.pred_txt = "\\aligned((unsigned char *)buf,alignof(union msg))";
+    __gen_e_acsl_assert_data_2.file = "bts1304.i";
+    __gen_e_acsl_assert_data_2.fct = "main";
+    __gen_e_acsl_assert_data_2.line = 32;
+    __gen_e_acsl_assert_data_2.name = "pointer_alignment";
+    __e_acsl_assert(__gen_e_acsl_aligned,& __gen_e_acsl_assert_data_2);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
     __gen_e_acsl_initialized = __e_acsl_initialized((void *)(buf),
                                                     sizeof(union msg));
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,
+                                 "(unsigned char *)buf",(void *)(buf));
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,
                                    "sizeof(union msg)",0,sizeof(union msg));
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,

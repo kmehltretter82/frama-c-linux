@@ -272,6 +272,8 @@ int __gen_e_acsl_linked_n_here(struct list *root, struct list **cArr,
     if (__gen_e_acsl_and_7) {
       long __gen_e_acsl_index;
       int __gen_e_acsl_valid_read;
+      int __gen_e_acsl_aligned;
+      int __gen_e_acsl_aligned_2;
       __gen_e_acsl_index = __gmpz_get_si((__e_acsl_mpz_struct const *)(index));
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
         {.values = (void *)0};
@@ -296,7 +298,47 @@ int __gen_e_acsl_linked_n_here(struct list *root, struct list **cArr,
       __gen_e_acsl_assert_data_2.name = "mem_access";
       __e_acsl_assert(__gen_e_acsl_valid_read,& __gen_e_acsl_assert_data_2);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
+        {.values = (void *)0};
+      __gen_e_acsl_aligned = __e_acsl_aligned((void *)(cArr + __gen_e_acsl_index),
+                                              _Alignof(struct list *));
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"cArr",
+                                   (void *)cArr);
+      __e_acsl_assert_register_long(& __gen_e_acsl_assert_data_3,
+                                    "__gen_e_acsl_index",0,
+                                    __gen_e_acsl_index);
+      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_3,
+                                     "alignof(struct list *)",0,
+                                     _Alignof(struct list *));
+      __gen_e_acsl_assert_data_3.blocking = 1;
+      __gen_e_acsl_assert_data_3.kind = "RTE";
+      __gen_e_acsl_assert_data_3.pred_txt = "\\aligned(cArr + __gen_e_acsl_index,alignof(struct list *))";
+      __gen_e_acsl_assert_data_3.file = "ghosts_for_lists.c";
+      __gen_e_acsl_assert_data_3.fct = "linked_n_here";
+      __gen_e_acsl_assert_data_3.line = 33;
+      __gen_e_acsl_assert_data_3.name = "pointer_alignment";
+      __e_acsl_assert(__gen_e_acsl_aligned,& __gen_e_acsl_assert_data_3);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
+        {.values = (void *)0};
       /*@ assert Eva: mem_access: \valid_read(cArr + __gen_e_acsl_index); */
+      __gen_e_acsl_aligned_2 = __e_acsl_aligned((void *)*(cArr + __gen_e_acsl_index),
+                                                _Alignof(struct list));
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,
+                                   "*(cArr + __gen_e_acsl_index)",
+                                   (void *)*(cArr + __gen_e_acsl_index));
+      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_4,
+                                     "alignof(struct list)",0,
+                                     _Alignof(struct list));
+      __gen_e_acsl_assert_data_4.blocking = 1;
+      __gen_e_acsl_assert_data_4.kind = "RTE";
+      __gen_e_acsl_assert_data_4.pred_txt = "\\aligned(*(cArr + __gen_e_acsl_index),alignof(struct list))";
+      __gen_e_acsl_assert_data_4.file = "ghosts_for_lists.c";
+      __gen_e_acsl_assert_data_4.fct = "linked_n_here";
+      __gen_e_acsl_assert_data_4.line = 33;
+      __gen_e_acsl_assert_data_4.name = "pointer_alignment";
+      __e_acsl_assert(__gen_e_acsl_aligned_2,& __gen_e_acsl_assert_data_4);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
       __gen_e_acsl_and_8 = root == *(cArr + __gen_e_acsl_index);
     }
     else __gen_e_acsl_and_8 = 0;

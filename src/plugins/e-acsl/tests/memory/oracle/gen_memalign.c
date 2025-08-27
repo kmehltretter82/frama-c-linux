@@ -564,14 +564,14 @@ int __gen_e_acsl_posix_memalign(void **memptr, size_t alignment, size_t size)
 void *__gen_e_acsl_aligned_alloc(size_t alignment, size_t size)
 {
   __e_acsl_contract_t *__gen_e_acsl_contract;
-  size_t __gen_e_acsl_at_2;
+  int __gen_e_acsl_at_2;
   int __gen_e_acsl_at;
   void *__retres;
   __e_acsl_store_block((void *)(& __retres),8UL);
   {
     int __gen_e_acsl_is_implementation_alignment_2;
     __gen_e_acsl_at = errno;
-    __gen_e_acsl_at_2 = alignment;
+    __gen_e_acsl_at_2 = (int)alignment;
     __gen_e_acsl_contract = __e_acsl_contract_init(2UL);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __gen_e_acsl_is_implementation_alignment_2 = __gen_e_acsl_is_implementation_alignment
@@ -627,6 +627,18 @@ void *__gen_e_acsl_aligned_alloc(size_t alignment, size_t size)
     __gen_e_acsl_assumes_value = __e_acsl_contract_get_behavior_assumes
     ((__e_acsl_contract_t const *)__gen_e_acsl_contract,0UL);
     if (__gen_e_acsl_assumes_value) {
+      int __gen_e_acsl_aligned;
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
+        {.values = (void *)0};
+      __gen_e_acsl_aligned = __e_acsl_aligned(__retres,
+                                              (size_t)__gen_e_acsl_at_2);
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_5,"\\result",
+                                   __retres);
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,
+                                   "\\old(alignment)",0,__gen_e_acsl_at_2);
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,
+                                   "allocation: aligned: \\aligned(\\result,\\old(alignment))",
+                                   0,__gen_e_acsl_aligned);
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
         {.values = (void *)0};
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_6,"__fc_errno",
@@ -642,6 +654,15 @@ void *__gen_e_acsl_aligned_alloc(size_t alignment, size_t size)
       __gen_e_acsl_assert_data_6.name = "allocation/errno_same";
       __e_acsl_assert(errno == __gen_e_acsl_at,& __gen_e_acsl_assert_data_6);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
+      __gen_e_acsl_assert_data_5.blocking = 1;
+      __gen_e_acsl_assert_data_5.kind = "Postcondition";
+      __gen_e_acsl_assert_data_5.pred_txt = "\\aligned(\\result,\\old(alignment))";
+      __gen_e_acsl_assert_data_5.file = "FRAMAC_SHARE/libc/stdlib.h";
+      __gen_e_acsl_assert_data_5.fct = "aligned_alloc";
+      __gen_e_acsl_assert_data_5.line = 549;
+      __gen_e_acsl_assert_data_5.name = "allocation/aligned";
+      __e_acsl_assert(__gen_e_acsl_aligned,& __gen_e_acsl_assert_data_5);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
     }
     __gen_e_acsl_assumes_value = __e_acsl_contract_get_behavior_assumes
     ((__e_acsl_contract_t const *)__gen_e_acsl_contract,1UL);

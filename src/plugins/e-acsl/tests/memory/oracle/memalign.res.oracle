@@ -43,8 +43,6 @@
   E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/stdlib.h:548: Warning: 
   E-ACSL construct `\fresh' is not yet supported. Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:549: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/stdlib.h:539: Warning: 
   E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".

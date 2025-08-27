@@ -6,24 +6,6 @@
 [e-acsl] Warning: annotating undefined function `pthread_cond_init':
   the generated program may miss memory instrumentation
   if there are memory-related annotations.
-[e-acsl] parallel_threads.c:82: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
-[e-acsl] parallel_threads.c:82: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
-[e-acsl] parallel_threads.c:85: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
-[e-acsl] parallel_threads.c:85: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
-[e-acsl] parallel_threads.c:85: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
-[e-acsl] parallel_threads.c:61: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
-[e-acsl] parallel_threads.c:61: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
-[e-acsl] parallel_threads.c:32: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
-[e-acsl] parallel_threads.c:32: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/unistd.h:1295: Warning: 
   E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/stdlib.h:749: Warning: 
@@ -57,8 +39,6 @@
   E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/pthread.h:349: Warning: 
   E-ACSL construct `\valid_function' is not yet supported. Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/pthread.h:350: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/pthread.h:347: Warning: 
   E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/pthread.h:309: Warning: 
@@ -69,6 +49,8 @@
   E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
 [eva:alarm] FRAMAC_SHARE/libc/pthread.h:449: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] FRAMAC_SHARE/libc/pthread.h:350: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] FRAMAC_SHARE/libc/pthread.h:354: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.

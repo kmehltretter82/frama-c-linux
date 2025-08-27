@@ -1,74 +1,16 @@
 [e-acsl] beginning translation.
-[e-acsl] initialized.c:19: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
-[e-acsl] initialized.c:33: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
-[e-acsl] initialized.c:39: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
-[e-acsl] initialized.c:69: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
-[e-acsl] initialized.c:74: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
-[e-acsl] initialized.c:76: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
-[e-acsl] initialized.c:85: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
-[e-acsl] initialized.c:90: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
-[e-acsl] initialized.c:92: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
-[e-acsl] initialized.c:93: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
-[e-acsl] initialized.c:94: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
-[e-acsl] initialized.c:95: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
-[e-acsl] initialized.c:98: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
-[e-acsl] initialized.c:100: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
-[e-acsl] initialized.c:101: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
-[e-acsl] initialized.c:103: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
-[e-acsl] initialized.c:104: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
-[e-acsl] initialized.c:105: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
-[e-acsl] initialized.c:106: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
-[e-acsl] initialized.c:109: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
-[e-acsl] initialized.c:111: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
-[e-acsl] initialized.c:112: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
-[e-acsl] initialized.c:113: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
-[e-acsl] initialized.c:116: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
-[e-acsl] initialized.c:118: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
-[e-acsl] initialized.c:121: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
-[e-acsl] initialized.c:122: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
-[e-acsl] initialized.c:123: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
-[e-acsl] initialized.c:124: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
-[e-acsl] initialized.c:125: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
-[e-acsl] initialized.c:126: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
-[e-acsl] initialized.c:128: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
-[e-acsl] initialized.c:129: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
-[e-acsl] initialized.c:130: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
-[e-acsl] initialized.c:139: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
+[eva:alarm] initialized.c:19: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] initialized.c:33: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] initialized.c:39: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] initialized.c:69: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] initialized.c:74: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] initialized.c:76: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] initialized.c:84: Warning: 
   accessing left-value that contains escaping addresses. assert !\dangling(&p);

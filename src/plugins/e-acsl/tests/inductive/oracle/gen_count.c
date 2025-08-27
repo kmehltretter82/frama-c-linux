@@ -68,6 +68,8 @@ int main(void)
     int __gen_e_acsl_CountInd_here_2;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __gen_e_acsl_CountInd_here_2 = __gen_e_acsl_CountInd_here(ptr,2,2,1);
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"ptr",
+                                 (void *)ptr);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
                                  "CountInd(ptr, 2, 2, 1)",0,
                                  __gen_e_acsl_CountInd_here_2);
@@ -162,6 +164,7 @@ void __gen_e_acsl_CountInd_fun4_here(__e_acsl_mpz_t *__retres_arg, int *arr,
     __e_acsl_mpz_t __gen_e_acsl_if_2;
     if (0 < len) {
       int __gen_e_acsl_valid_read;
+      int __gen_e_acsl_aligned;
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
         {.values = (void *)0};
       __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)(arr + (int)(
@@ -182,6 +185,24 @@ void __gen_e_acsl_CountInd_fun4_here(__e_acsl_mpz_t *__retres_arg, int *arr,
       __gen_e_acsl_assert_data_2.name = "mem_access";
       __e_acsl_assert(__gen_e_acsl_valid_read,& __gen_e_acsl_assert_data_2);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
+        {.values = (void *)0};
+      __gen_e_acsl_aligned = __e_acsl_aligned((void *)(arr + (int)(len - 1L)),
+                                              _Alignof(int));
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"arr",
+                                   (void *)arr);
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,"len",0,len);
+      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_3,
+                                     "alignof(int)",0,_Alignof(int));
+      __gen_e_acsl_assert_data_3.blocking = 1;
+      __gen_e_acsl_assert_data_3.kind = "RTE";
+      __gen_e_acsl_assert_data_3.pred_txt = "\\aligned(arr + (int)(len - 1),alignof(int))";
+      __gen_e_acsl_assert_data_3.file = "count.c";
+      __gen_e_acsl_assert_data_3.fct = "CountInd_fun4_here";
+      __gen_e_acsl_assert_data_3.line = 17;
+      __gen_e_acsl_assert_data_3.name = "pointer_alignment";
+      __e_acsl_assert(__gen_e_acsl_aligned,& __gen_e_acsl_assert_data_3);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
       __gen_e_acsl_and = *(arr + (len - 1)) == val;
     }
     else __gen_e_acsl_and = 0;
@@ -211,6 +232,7 @@ void __gen_e_acsl_CountInd_fun4_here(__e_acsl_mpz_t *__retres_arg, int *arr,
       __e_acsl_mpz_t __gen_e_acsl_if;
       if (0 < len) {
         int __gen_e_acsl_valid_read_2;
+        int __gen_e_acsl_aligned_2;
         __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
           {.values = (void *)0};
         __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)(arr + (int)(
@@ -234,6 +256,26 @@ void __gen_e_acsl_CountInd_fun4_here(__e_acsl_mpz_t *__retres_arg, int *arr,
         __e_acsl_assert(__gen_e_acsl_valid_read_2,
                         & __gen_e_acsl_assert_data_4);
         __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
+        __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
+          {.values = (void *)0};
+        __gen_e_acsl_aligned_2 = __e_acsl_aligned((void *)(arr + (int)(
+                                                           len - 1L)),
+                                                  _Alignof(int));
+        __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_5,"arr",
+                                     (void *)arr);
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,"len",0,
+                                     len);
+        __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_5,
+                                       "alignof(int)",0,_Alignof(int));
+        __gen_e_acsl_assert_data_5.blocking = 1;
+        __gen_e_acsl_assert_data_5.kind = "RTE";
+        __gen_e_acsl_assert_data_5.pred_txt = "\\aligned(arr + (int)(len - 1),alignof(int))";
+        __gen_e_acsl_assert_data_5.file = "count.c";
+        __gen_e_acsl_assert_data_5.fct = "CountInd_fun4_here";
+        __gen_e_acsl_assert_data_5.line = 22;
+        __gen_e_acsl_assert_data_5.name = "pointer_alignment";
+        __e_acsl_assert(__gen_e_acsl_aligned_2,& __gen_e_acsl_assert_data_5);
+        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
         __gen_e_acsl_and_2 = *(arr + (len - 1)) != val;
       }
       else __gen_e_acsl_and_2 = 0;

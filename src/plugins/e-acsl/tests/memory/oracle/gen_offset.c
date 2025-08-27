@@ -77,10 +77,29 @@ int main(void)
   }
   /*@ assert \offset(&A[3]) == 12; */ ;
   {
+    int __gen_e_acsl_aligned;
     unsigned long __gen_e_acsl_offset_3;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
       {.values = (void *)0};
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
+      {.values = (void *)0};
+    __gen_e_acsl_aligned = __e_acsl_aligned((void *)PA,_Alignof(int));
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,"PA",
+                                 (void *)PA);
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_4,
+                                   "alignof(int)",0,_Alignof(int));
+    __gen_e_acsl_assert_data_4.blocking = 1;
+    __gen_e_acsl_assert_data_4.kind = "RTE";
+    __gen_e_acsl_assert_data_4.pred_txt = "\\aligned(PA,alignof(int))";
+    __gen_e_acsl_assert_data_4.file = "offset.c";
+    __gen_e_acsl_assert_data_4.fct = "main";
+    __gen_e_acsl_assert_data_4.line = 15;
+    __gen_e_acsl_assert_data_4.name = "pointer_alignment";
+    __e_acsl_assert(__gen_e_acsl_aligned,& __gen_e_acsl_assert_data_4);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
     __gen_e_acsl_offset_3 = __e_acsl_offset((void *)PA);
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"PA",
+                                 (void *)PA);
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_3,
                                    "\\offset(PA)",0,__gen_e_acsl_offset_3);
     __gen_e_acsl_assert_data_3.blocking = 1;
@@ -96,10 +115,29 @@ int main(void)
   /*@ assert \offset(PA) == 0; */ ;
   PA ++;
   {
+    int __gen_e_acsl_aligned_2;
     unsigned long __gen_e_acsl_offset_4;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
       {.values = (void *)0};
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
+      {.values = (void *)0};
+    __gen_e_acsl_aligned_2 = __e_acsl_aligned((void *)PA,_Alignof(int));
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_6,"PA",
+                                 (void *)PA);
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_6,
+                                   "alignof(int)",0,_Alignof(int));
+    __gen_e_acsl_assert_data_6.blocking = 1;
+    __gen_e_acsl_assert_data_6.kind = "RTE";
+    __gen_e_acsl_assert_data_6.pred_txt = "\\aligned(PA,alignof(int))";
+    __gen_e_acsl_assert_data_6.file = "offset.c";
+    __gen_e_acsl_assert_data_6.fct = "main";
+    __gen_e_acsl_assert_data_6.line = 17;
+    __gen_e_acsl_assert_data_6.name = "pointer_alignment";
+    __e_acsl_assert(__gen_e_acsl_aligned_2,& __gen_e_acsl_assert_data_6);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
     __gen_e_acsl_offset_4 = __e_acsl_offset((void *)(PA + 1));
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_5,"PA",
+                                 (void *)PA);
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_5,
                                    "\\offset(PA + 1)",0,
                                    __gen_e_acsl_offset_4);

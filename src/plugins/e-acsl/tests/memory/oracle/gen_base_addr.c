@@ -63,11 +63,31 @@ int main(void)
   /*@ assert \base_addr((int *)A) == \base_addr(&A); */ ;
   {
     void *__gen_e_acsl_base_addr_3;
+    int __gen_e_acsl_aligned;
     void *__gen_e_acsl_base_addr_4;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
       {.values = (void *)0};
     __gen_e_acsl_base_addr_3 = __e_acsl_base_addr((void *)(A));
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
+      {.values = (void *)0};
+    __gen_e_acsl_aligned = __e_acsl_aligned((void *)PA,_Alignof(int));
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"PA",
+                                 (void *)PA);
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_3,
+                                   "alignof(int)",0,_Alignof(int));
+    __gen_e_acsl_assert_data_3.blocking = 1;
+    __gen_e_acsl_assert_data_3.kind = "RTE";
+    __gen_e_acsl_assert_data_3.pred_txt = "\\aligned(PA,alignof(int))";
+    __gen_e_acsl_assert_data_3.file = "base_addr.c";
+    __gen_e_acsl_assert_data_3.fct = "main";
+    __gen_e_acsl_assert_data_3.line = 14;
+    __gen_e_acsl_assert_data_3.name = "pointer_alignment";
+    __e_acsl_assert(__gen_e_acsl_aligned,& __gen_e_acsl_assert_data_3);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
     __gen_e_acsl_base_addr_4 = __e_acsl_base_addr((void *)PA);
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,
+                                 "\\base_addr((int *)A)",
+                                 __gen_e_acsl_base_addr_3);
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,
                                  "\\base_addr(PA)",__gen_e_acsl_base_addr_4);
     __gen_e_acsl_assert_data_2.blocking = 1;
@@ -83,11 +103,31 @@ int main(void)
   /*@ assert \base_addr((int *)A) == \base_addr(PA); */ ;
   {
     void *__gen_e_acsl_base_addr_5;
+    int __gen_e_acsl_aligned_2;
     void *__gen_e_acsl_base_addr_6;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
       {.values = (void *)0};
     __gen_e_acsl_base_addr_5 = __e_acsl_base_addr((void *)(& A[3]));
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
+      {.values = (void *)0};
+    __gen_e_acsl_aligned_2 = __e_acsl_aligned((void *)PA,_Alignof(int));
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_5,"PA",
+                                 (void *)PA);
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_5,
+                                   "alignof(int)",0,_Alignof(int));
+    __gen_e_acsl_assert_data_5.blocking = 1;
+    __gen_e_acsl_assert_data_5.kind = "RTE";
+    __gen_e_acsl_assert_data_5.pred_txt = "\\aligned(PA,alignof(int))";
+    __gen_e_acsl_assert_data_5.file = "base_addr.c";
+    __gen_e_acsl_assert_data_5.fct = "main";
+    __gen_e_acsl_assert_data_5.line = 15;
+    __gen_e_acsl_assert_data_5.name = "pointer_alignment";
+    __e_acsl_assert(__gen_e_acsl_aligned_2,& __gen_e_acsl_assert_data_5);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
     __gen_e_acsl_base_addr_6 = __e_acsl_base_addr((void *)PA);
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,
+                                 "\\base_addr(&A[3])",
+                                 __gen_e_acsl_base_addr_5);
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,
                                  "\\base_addr(PA)",__gen_e_acsl_base_addr_6);
     __gen_e_acsl_assert_data_4.blocking = 1;
@@ -103,10 +143,27 @@ int main(void)
   /*@ assert \base_addr(&A[3]) == \base_addr(PA); */ ;
   PA ++;
   {
+    int __gen_e_acsl_aligned_3;
     void *__gen_e_acsl_base_addr_7;
     void *__gen_e_acsl_base_addr_8;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
       {.values = (void *)0};
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_7 =
+      {.values = (void *)0};
+    __gen_e_acsl_aligned_3 = __e_acsl_aligned((void *)PA,_Alignof(int));
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_7,"PA",
+                                 (void *)PA);
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_7,
+                                   "alignof(int)",0,_Alignof(int));
+    __gen_e_acsl_assert_data_7.blocking = 1;
+    __gen_e_acsl_assert_data_7.kind = "RTE";
+    __gen_e_acsl_assert_data_7.pred_txt = "\\aligned(PA,alignof(int))";
+    __gen_e_acsl_assert_data_7.file = "base_addr.c";
+    __gen_e_acsl_assert_data_7.fct = "main";
+    __gen_e_acsl_assert_data_7.line = 17;
+    __gen_e_acsl_assert_data_7.name = "pointer_alignment";
+    __e_acsl_assert(__gen_e_acsl_aligned_3,& __gen_e_acsl_assert_data_7);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
     __gen_e_acsl_base_addr_7 = __e_acsl_base_addr((void *)PA);
     __gen_e_acsl_base_addr_8 = __e_acsl_base_addr((void *)(A));
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_6,
@@ -126,10 +183,27 @@ int main(void)
   }
   /*@ assert \base_addr(PA) == \base_addr((int *)A); */ ;
   {
+    int __gen_e_acsl_aligned_4;
     void *__gen_e_acsl_base_addr_9;
     void *__gen_e_acsl_base_addr_10;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_8 =
       {.values = (void *)0};
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_9 =
+      {.values = (void *)0};
+    __gen_e_acsl_aligned_4 = __e_acsl_aligned((void *)PA,_Alignof(int));
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_9,"PA",
+                                 (void *)PA);
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_9,
+                                   "alignof(int)",0,_Alignof(int));
+    __gen_e_acsl_assert_data_9.blocking = 1;
+    __gen_e_acsl_assert_data_9.kind = "RTE";
+    __gen_e_acsl_assert_data_9.pred_txt = "\\aligned(PA,alignof(int))";
+    __gen_e_acsl_assert_data_9.file = "base_addr.c";
+    __gen_e_acsl_assert_data_9.fct = "main";
+    __gen_e_acsl_assert_data_9.line = 18;
+    __gen_e_acsl_assert_data_9.name = "pointer_alignment";
+    __e_acsl_assert(__gen_e_acsl_aligned_4,& __gen_e_acsl_assert_data_9);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_9);
     __gen_e_acsl_base_addr_9 = __e_acsl_base_addr((void *)(PA + 2));
     __gen_e_acsl_base_addr_10 = __e_acsl_base_addr((void *)(& A[3]));
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_8,

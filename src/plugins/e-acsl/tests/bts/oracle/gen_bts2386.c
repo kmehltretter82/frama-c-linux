@@ -45,8 +45,28 @@ void f(void const *s, int c, unsigned long n)
   }
   /*@ assert p - (unsigned char const *)s == n - n; */ ;
   {
+    int __gen_e_acsl_aligned;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
       {.values = (void *)0};
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
+      {.values = (void *)0};
+    __gen_e_acsl_aligned = __e_acsl_aligned((void *)s,
+                                            _Alignof(unsigned char const));
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"s",(void *)s);
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_3,
+                                   "alignof(unsigned char const)",0,
+                                   _Alignof(unsigned char const));
+    __gen_e_acsl_assert_data_3.blocking = 1;
+    __gen_e_acsl_assert_data_3.kind = "RTE";
+    __gen_e_acsl_assert_data_3.pred_txt = "\\aligned(s,alignof(unsigned char const))";
+    __gen_e_acsl_assert_data_3.file = "bts2386.c";
+    __gen_e_acsl_assert_data_3.fct = "f";
+    __gen_e_acsl_assert_data_3.line = 8;
+    __gen_e_acsl_assert_data_3.name = "pointer_alignment";
+    __e_acsl_assert(__gen_e_acsl_aligned,& __gen_e_acsl_assert_data_3);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"p",(void *)p);
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"s",(void *)s);
     __gen_e_acsl_assert_data_2.blocking = 1;
     __gen_e_acsl_assert_data_2.kind = "Assertion";
     __gen_e_acsl_assert_data_2.pred_txt = "p - (unsigned char const *)s == 0";

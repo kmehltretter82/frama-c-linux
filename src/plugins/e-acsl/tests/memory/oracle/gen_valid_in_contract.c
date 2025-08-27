@@ -89,6 +89,7 @@ struct list *__gen_e_acsl_f(struct list *l)
                                                       sizeof(struct list *));
       if (__gen_e_acsl_initialized) {
         int __gen_e_acsl_valid_read;
+        int __gen_e_acsl_aligned;
         int __gen_e_acsl_valid_2;
         __e_acsl_assert_data_t __gen_e_acsl_assert_data =
           {.values = (void *)0};
@@ -110,6 +111,24 @@ struct list *__gen_e_acsl_f(struct list *l)
         __gen_e_acsl_assert_data.name = "mem_access";
         __e_acsl_assert(__gen_e_acsl_valid_read,& __gen_e_acsl_assert_data);
         __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
+        __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+          {.values = (void *)0};
+        __gen_e_acsl_aligned = __e_acsl_aligned((void *)l->next,
+                                                _Alignof(struct list));
+        __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"l->next",
+                                     (void *)l->next);
+        __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
+                                       "alignof(struct list)",0,
+                                       _Alignof(struct list));
+        __gen_e_acsl_assert_data_2.blocking = 1;
+        __gen_e_acsl_assert_data_2.kind = "RTE";
+        __gen_e_acsl_assert_data_2.pred_txt = "\\aligned(l->next,alignof(struct list))";
+        __gen_e_acsl_assert_data_2.file = "valid_in_contract.c";
+        __gen_e_acsl_assert_data_2.fct = "f";
+        __gen_e_acsl_assert_data_2.line = 17;
+        __gen_e_acsl_assert_data_2.name = "pointer_alignment";
+        __e_acsl_assert(__gen_e_acsl_aligned,& __gen_e_acsl_assert_data_2);
+        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
         __gen_e_acsl_valid_2 = __e_acsl_valid((void *)l->next,
                                               sizeof(struct list),
                                               (void *)l->next,

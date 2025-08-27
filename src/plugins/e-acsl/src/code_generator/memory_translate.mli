@@ -22,7 +22,7 @@ val call:
 (* [call ~loc kf name ctx env ts] creates a call to the E-ACSL memory built-in
    identified by [name] with the given arguments [ts].
    The supported built-ins are:
-   [base_addr], [block_length], [offset] and [freeable]. *)
+   [base_addr], [block_length], [offset], [freeable] and [aligned]. *)
 
 val call_with_size:
   adata:Assert.t ->

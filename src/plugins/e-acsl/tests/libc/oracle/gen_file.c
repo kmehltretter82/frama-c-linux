@@ -347,6 +347,7 @@ size_t __gen_e_acsl_fread(void * restrict ptr, size_t size, size_t nmemb,
   size_t __retres;
   {
     __e_acsl_mpz_t __gen_e_acsl_size;
+    int __gen_e_acsl_aligned;
     __e_acsl_mpz_t __gen_e_acsl_size_2;
     __e_acsl_mpz_t __gen_e_acsl_sizeof;
     __e_acsl_mpz_t __gen_e_acsl_nmemb;
@@ -371,6 +372,21 @@ size_t __gen_e_acsl_fread(void * restrict ptr, size_t size, size_t nmemb,
     __gen_e_acsl_at_2 = ptr;
     __gen_e_acsl_at_3 = nmemb;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+      {.values = (void *)0};
+    __gen_e_acsl_aligned = __e_acsl_aligned(ptr,_Alignof(char));
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"ptr",ptr);
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
+                                   "alignof(char)",0,_Alignof(char));
+    __gen_e_acsl_assert_data_2.blocking = 1;
+    __gen_e_acsl_assert_data_2.kind = "RTE";
+    __gen_e_acsl_assert_data_2.pred_txt = "\\aligned(ptr,alignof(char))";
+    __gen_e_acsl_assert_data_2.file = "FRAMAC_SHARE/libc/stdio.h";
+    __gen_e_acsl_assert_data_2.fct = "fread";
+    __gen_e_acsl_assert_data_2.line = 379;
+    __gen_e_acsl_assert_data_2.name = "pointer_alignment";
+    __e_acsl_assert(__gen_e_acsl_aligned,& __gen_e_acsl_assert_data_2);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
     __gmpz_init_set_si(__gen_e_acsl_sizeof,1L);
     __gmpz_init_set_ui(__gen_e_acsl_nmemb,nmemb);
     __gmpz_init(__gen_e_acsl_mul);
@@ -425,6 +441,7 @@ size_t __gen_e_acsl_fread(void * restrict ptr, size_t size, size_t nmemb,
     __gen_e_acsl_valid = __e_acsl_valid((void *)((char *)ptr + 0),
                                         __gen_e_acsl_size_3,ptr,
                                         (void *)(& ptr));
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"ptr",ptr);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"sizeof(char)",0,
                                  1);
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,"nmemb",0,
@@ -521,6 +538,7 @@ size_t __gen_e_acsl_fread(void * restrict ptr, size_t size, size_t nmemb,
     __gmpz_clear(__gen_e_acsl__5);
   }
   {
+    int __gen_e_acsl_aligned_2;
     __e_acsl_mpz_t __gen_e_acsl_size_6;
     __e_acsl_mpz_t __gen_e_acsl_sizeof_2;
     __e_acsl_mpz_t __gen_e_acsl_result;
@@ -555,6 +573,23 @@ size_t __gen_e_acsl_fread(void * restrict ptr, size_t size, size_t nmemb,
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_7 =
       {.values = (void *)0};
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_8 =
+      {.values = (void *)0};
+    __gen_e_acsl_aligned_2 = __e_acsl_aligned(__gen_e_acsl_at_2,
+                                              _Alignof(char));
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_8,
+                                 "__gen_e_acsl_at_2",__gen_e_acsl_at_2);
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_8,
+                                   "alignof(char)",0,_Alignof(char));
+    __gen_e_acsl_assert_data_8.blocking = 1;
+    __gen_e_acsl_assert_data_8.kind = "RTE";
+    __gen_e_acsl_assert_data_8.pred_txt = "\\aligned(__gen_e_acsl_at_2,alignof(char))";
+    __gen_e_acsl_assert_data_8.file = "FRAMAC_SHARE/libc/stdio.h";
+    __gen_e_acsl_assert_data_8.fct = "fread";
+    __gen_e_acsl_assert_data_8.line = 385;
+    __gen_e_acsl_assert_data_8.name = "pointer_alignment";
+    __e_acsl_assert(__gen_e_acsl_aligned_2,& __gen_e_acsl_assert_data_8);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_8);
     __gmpz_init_set_si(__gen_e_acsl_sizeof_2,1L);
     __gmpz_init_set_ui(__gen_e_acsl_result,__retres);
     __gmpz_init(__gen_e_acsl_mul_4);
@@ -612,6 +647,8 @@ size_t __gen_e_acsl_fread(void * restrict ptr, size_t size, size_t nmemb,
     __gen_e_acsl_size_7 = __gmpz_get_ui((__e_acsl_mpz_struct const *)(__gen_e_acsl_if_2));
     __gen_e_acsl_initialized = __e_acsl_initialized((void *)((char *)__gen_e_acsl_at_2 + 0),
                                                     __gen_e_acsl_size_7);
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_7,"\\old(ptr)",
+                                 __gen_e_acsl_at_2);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_7,"sizeof(char)",
                                  0,1);
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_7,"\\result",0,

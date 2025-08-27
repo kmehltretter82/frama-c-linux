@@ -4,11 +4,11 @@
   no assigns clause generated for function CountInd because pointers as arguments is not yet supported
 [e-acsl] <unknown location>: Warning: 
   no assigns clause generated for function CountInd because pointers as arguments is not yet supported
-[e-acsl] count.c:17: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
-[e-acsl] count.c:22: Warning: 
-  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
+[eva:alarm] count.c:17: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] count.c:22: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] count.c:31: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] count.c:31: Warning: assertion got status unknown.

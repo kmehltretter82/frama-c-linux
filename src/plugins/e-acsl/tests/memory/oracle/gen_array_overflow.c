@@ -115,13 +115,35 @@ int main(void)
   }
   /*@ assert !\valid(&d.arr[4]); */ ;
   {
+    int __gen_e_acsl_aligned;
     int __gen_e_acsl_valid_4;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
       {.values = (void *)0};
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
+      {.values = (void *)0};
+    __gen_e_acsl_aligned = __e_acsl_aligned((void *)d2.p[1],
+                                            _Alignof(struct dat));
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_5,"d2.p[1]",
+                                 (void *)d2.p[1]);
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_5,
+                                   "alignof(struct dat)",0,
+                                   _Alignof(struct dat));
+    __gen_e_acsl_assert_data_5.blocking = 1;
+    __gen_e_acsl_assert_data_5.kind = "RTE";
+    __gen_e_acsl_assert_data_5.pred_txt = "\\aligned(d2.p[1],alignof(struct dat))";
+    __gen_e_acsl_assert_data_5.file = "array_overflow.c";
+    __gen_e_acsl_assert_data_5.fct = "main";
+    __gen_e_acsl_assert_data_5.line = 43;
+    __gen_e_acsl_assert_data_5.name = "pointer_alignment";
+    __e_acsl_assert(__gen_e_acsl_aligned,& __gen_e_acsl_assert_data_5);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
     __gen_e_acsl_valid_4 = __e_acsl_valid((void *)(& (d2.p[1])->arr[2]),
                                           sizeof(int),
                                           (void *)(& (d2.p[1])->arr[0]),
                                           (void *)0);
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,
+                                 "&(d2.p[1])->arr[2]",
+                                 (void *)(& (d2.p[1])->arr[2]));
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_4,
                                    "sizeof(int)",0,sizeof(int));
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,

@@ -44,6 +44,7 @@ Plugin E-ACSL 32.0 (Germanium)
 Plugin E-ACSL 31.0 (Gallium)
 ###############################################################################
 
+- E-ACSL        [..........] support \aligned built-in predicate
 - E-ACSL        [2025-04-14] support certain forms of inductive definitions
 - E-ACSL        [2025-04-24] better sharing of generated functions
 -* E-ACSL       [2025-04-01] fix missing variables in failed assertion summaries

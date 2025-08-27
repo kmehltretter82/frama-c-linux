@@ -233,6 +233,7 @@ int main(int argc, char const **argv)
     if (__gen_e_acsl_initialized_2) {
       int __gen_e_acsl_initialized_3;
       int __gen_e_acsl_and_2;
+      int __gen_e_acsl_aligned;
       int __gen_e_acsl_valid_read_3;
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
         {.values = (void *)0};
@@ -264,9 +265,27 @@ int main(int argc, char const **argv)
       __gen_e_acsl_assert_data_3.name = "mem_access";
       __e_acsl_assert(__gen_e_acsl_and_2,& __gen_e_acsl_assert_data_3);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
+        {.values = (void *)0};
+      __gen_e_acsl_aligned = __e_acsl_aligned((void *)*p,_Alignof(char));
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,"*p",
+                                   (void *)*p);
+      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_4,
+                                     "alignof(char)",0,_Alignof(char));
+      __gen_e_acsl_assert_data_4.blocking = 1;
+      __gen_e_acsl_assert_data_4.kind = "RTE";
+      __gen_e_acsl_assert_data_4.pred_txt = "\\aligned(*p,alignof(char))";
+      __gen_e_acsl_assert_data_4.file = "t_global_init.c";
+      __gen_e_acsl_assert_data_4.fct = "main";
+      __gen_e_acsl_assert_data_4.line = 50;
+      __gen_e_acsl_assert_data_4.name = "pointer_alignment";
+      __e_acsl_assert(__gen_e_acsl_aligned,& __gen_e_acsl_assert_data_4);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
       __gen_e_acsl_valid_read_3 = __e_acsl_valid_read((void *)*p,
                                                       sizeof(char),
                                                       (void *)*p,(void *)p);
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"*p",
+                                   (void *)*p);
       __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
                                      "sizeof(char)",0,sizeof(char));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
@@ -275,8 +294,6 @@ int main(int argc, char const **argv)
       __gen_e_acsl_and_3 = __gen_e_acsl_valid_read_3;
     }
     else __gen_e_acsl_and_3 = 0;
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"*p",
-                                 (void *)*p);
     __gen_e_acsl_assert_data_2.blocking = 1;
     __gen_e_acsl_assert_data_2.kind = "Assertion";
     __gen_e_acsl_assert_data_2.pred_txt = "\\valid_read(*p)";
