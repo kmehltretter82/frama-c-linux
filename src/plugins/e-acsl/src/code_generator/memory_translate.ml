@@ -23,6 +23,8 @@ let predicate_to_exp_ref
   ref (fun ~adata:_ _kf _env _p ->
       Extlib.mk_labeled_fun "predicate_to_exp_ref")
 
+let predicate_to_exp ~adata = !predicate_to_exp_ref ~adata
+
 let term_to_exp_ref
   : (adata:Assert.t ->
      kernel_function ->
@@ -31,6 +33,8 @@ let term_to_exp_ref
      exp * Assert.t * Env.t) ref
   =
   ref (fun ~adata:_ _kf _env _t -> Extlib.mk_labeled_fun "term_to_exp_ref")
+
+let term_to_exp ~adata = !term_to_exp_ref ~adata
 
 let gmp_to_sizet_ref
   : (adata:Assert.t ->
@@ -133,7 +137,7 @@ let call ~adata ~loc kf name ctx env t =
     Env.with_params_and_result
       ~rte:true
       ~f:(fun env ->
-          let e, adata, env = !term_to_exp_ref ~adata kf env t in
+          let e, adata, env = term_to_exp ~adata kf env t in
           (e, adata), env)
       env
   in
@@ -207,7 +211,7 @@ let range_to_ptr_and_size ~adata ~loc kf env ptr r p =
     Env.with_params_and_result
       ~rte:true
       ~f:(fun env ->
-          let e, adata, env = !term_to_exp_ref ~adata kf env ptr in
+          let e, adata, env = term_to_exp ~adata kf env ptr in
           (e, adata), env)
       env
   in
@@ -258,7 +262,7 @@ let range_to_ptr_and_size ~adata ~loc kf env ptr r p =
     | Gmpz ->
       (* Start by translating [size_term] to an expression so that the full term
          with [\let] is not passed around. *)
-      let size_e, adata, env = !term_to_exp_ref ~adata kf env size_term in
+      let size_e, adata, env = term_to_exp ~adata kf env size_term in
       (* Since translating a GMP code should always produce a C variable, we
          can reuse it as a term for the function [gmp_to_sizet]. *)
       let cvar_term =
@@ -269,7 +273,7 @@ let range_to_ptr_and_size ~adata ~loc kf env ptr r p =
             "translation to GMP code should always return a C variable"
       in
       gmp_to_sizet ~adata ~loc ~pp:size_term kf env cvar_term p
-    | C_integer _ | C_float _ -> !term_to_exp_ref ~adata kf env size_term
+    | C_integer _ | C_float _ -> term_to_exp ~adata kf env size_term
     | Rational | Real | Nan -> assert false
   in
   ptr, size, adata, env
@@ -282,7 +286,7 @@ let term_to_ptr_and_size ~adata ~loc kf env t =
     Env.with_params_and_result
       ~rte:true
       ~f:(fun env ->
-          let e, adata, env = !term_to_exp_ref ~adata kf env t in
+          let e, adata, env = term_to_exp ~adata kf env t in
           (e, adata), env)
       env
   in
@@ -460,7 +464,7 @@ let call_with_tset
     (* There's no more quantifiers in the arguments now, we can call back
        [predicate_to_exp] to translate the predicate as usual *)
     Typing.preprocess_predicate ~logic_env:(Env.Logic_env.get env) p_quantified;
-    !predicate_to_exp_ref ~adata kf env p_quantified
+    predicate_to_exp ~adata kf env p_quantified
   | [] ->
     (* No arguments require quantifiers, so we can directly translate the
        predicate *)
