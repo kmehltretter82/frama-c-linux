@@ -53,6 +53,13 @@ module Make (Model : Modeling) = struct
     ; format   : 'f format
     }
 
+  (* When computing backward operations, the Eva engine provides an abstract
+     value representing the result of the operation. For logical expressions,
+     the only provided value is the integer 0, meaning in C that the
+     expression is false. However, the abstraction built here only handles
+     floating point. Thus, to be able to handle backward operations on
+     logical expressions, the constructor False is provided to represent
+     the integer 0 in case it encodes that a logical expression is false. *)
   type value =
     | Top   : value
     | False : value
@@ -127,14 +134,16 @@ module Make (Model : Modeling) = struct
   end
 
   include Datatype.Make (Type)
-  let key : t Abstract_value.key = Structure.Key_Value.create_key "Filter.Value"
   let context = Abstract_context.Leaf (module Context)
+  let key : t Abstract_value.key =
+    let key_name = Format.sprintf "IEEE754(%s)" name in
+    Structure.Key_Value.create_key key_name
 
   let resolve context computation =
     let context = Abstract_value.(context.from_domains) in
     Computation.resolve context computation
 
-  let map = Computation.map
+  let map  = Computation.map
   let lift = Computation.return
 
   let exact    repr = map (fun r -> r.exact   ) repr
@@ -175,13 +184,19 @@ module Make (Model : Modeling) = struct
 
 
 
+  (* Returns the unit in the last place of the given format if the input
+     interval [ lower ; upper ] contains normalized numbers.
+     Returns zero otherwise. *)
   let machine_epsilon format lower upper =
     let epsilon = Typed_float.unit_in_the_last_place_of ~format in
     let epsilon = Scalar.of_float (Typed_float.to_float epsilon) in
-    let in_pos_range = Scalar.(epsilon <= upper && upper <= pos_inf) in
-    let in_neg_range = Scalar.(neg_inf <= lower && lower <= neg epsilon) in
+    let in_pos_range = Scalar.(epsilon <= upper) in
+    let in_neg_range = Scalar.(lower <= neg epsilon) in
     if in_pos_range || in_neg_range then epsilon else Scalar.zero
 
+  (* Returns the smallest denormalized number in the given format if the input
+     interval [ lower ; upper ] contains denormalized numbers.
+     Returns zero otherwise. *)
   let machine_delta format lower upper =
     let epsilon = Typed_float.unit_in_the_last_place_of ~format in
     let epsilon = Scalar.of_float (Typed_float.to_float epsilon) in
@@ -199,6 +214,20 @@ module Make (Model : Modeling) = struct
     then Scalar.{ lower = zero ; upper = max lower upper }
     else Scalar.{ lower = min lower upper ; upper = max lower upper }
 
+  (* Returns upper bounds of the elementary rounding errors introduced by a
+     correctly rounded expression in a given format based on its absolute
+     floating point bounds.
+
+     Denote r = [l ; u] the lower (resp upper) bound of the absolute value
+     of the given floating point computation. Denote ε either the unit in the
+     last place if r contains normalized numbers or zero otherwise. Denote δ
+     either the smallest denormalized if r contains denormalized numbers or
+     zero otherwise.
+
+     The absolute elementary rounding error bound is max (2 ^ ⌊log₂ u⌋ × ε, δ)
+     The relative elementary rounding error bound is max (λ × ε, δ / l) where
+     λ is equal to (2 ^ ⌊log₂ l⌋) / l if l and u share the same exponent and
+     one otherwise. *)
   let elementary expr format approx =
     let open Computation.Operators in
     let max_float = Typed_float.largest_finite_float_of ~format in
