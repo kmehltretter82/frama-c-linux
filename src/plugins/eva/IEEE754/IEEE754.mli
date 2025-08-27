@@ -53,7 +53,7 @@
     Another key part of the precision of the built semantics is the relations
     between absolute and relative errors. Indeed, each one can be derived from
     the other as follows:
-    - {m \varepsilon_a^f(x) = \mathbb{R}(x)\left(1 + \varepsilon_r^f(x)\right)}
+    - {m \varepsilon_a^f(x) = \mathbb{R}(x) \varepsilon_r^f(x)}
     - {m \varepsilon_r^f(x) = \varepsilon_a^f(x) / \mathbb{R}(x)}
 
     Thus, a sound abstraction of those computations are required to define a
