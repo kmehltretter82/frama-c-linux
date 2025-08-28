@@ -449,6 +449,20 @@ let silence_cpp_machdep_warnings cmdl =
   else
     []
 
+let c_standard_option cmdl =
+  let exe = cpp_name cmdl in
+  if exe = "clang" || exe = "gcc"
+  then match Kernel.Std.get () with
+    | C11 -> [ "-std=c11" ]
+    | C17 -> [ "-std=c17" ]
+    | C23 -> [ "-std=c2x" ] (* still supported most of the time, unlike c23 *)
+  else if exe = "cl" (* MSVC *)
+  then match Kernel.Std.get () with
+    | C11 -> [ "/std:c11" ]
+    | C17 -> [ "/std:c17" ]
+    | C23 -> [ "/std:c23" ] (* not supported, we hope they will use this name *)
+  else []
+
 let censored_macros cpp_args =
   List.fold_left
     (fun acc arg ->
@@ -527,9 +541,10 @@ let build_cpp_cmd = function
         (concat_strs ~pre:" -D" ~sep:" -D" defines)
         (concat_strs ~pre:" " ~sep:" " extra)
     in
+    let standard = c_standard_option cmdl in
     let supp_args =
       string_of_supp_args
-        (gnu_implicit_args @ machdep_no_warn @ clang_no_warn @ extra_args)
+        (gnu_implicit_args @ standard @ machdep_no_warn @ clang_no_warn @ extra_args)
         fc_include_args
         unsupported_libc_macros
         fc_define_args

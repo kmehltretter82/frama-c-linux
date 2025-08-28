@@ -597,8 +597,12 @@ val normalization_parameters: unit -> Typed_parameter.t list
     changing one will reset the AST entirely.contents
 *)
 
-module C23: Parameter_sig.Bool
-(** Behavior of option "-c23" *)
+type iso_c = C11 | C17 | C23
+
+module Std: Parameter_sig.S with type t = iso_c
+(** ISO C version to consider.
+    @since Frama-C+dev
+*)
 
 module JsonCompilationDatabase: Parameter_sig.Filepath
 [@@ ocaml.deprecated "Use CompilationDb instead"]

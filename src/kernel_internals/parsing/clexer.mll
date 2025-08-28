@@ -93,7 +93,8 @@ let gcc key builder = compiler ("GCC", Machine.gccMode ()) key builder
 let msvc key builder = compiler ("MSVC", Machine.msvcMode ()) key builder
 
 let c23 key builder =
-  if Kernel.C23.get() then add key builder
+  if Kernel.Std.get() = Kernel.C23
+  then add key builder
 
 let filename_keyword () =
   let convert acc c = int64_of_char c :: acc in

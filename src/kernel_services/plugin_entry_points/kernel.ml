@@ -1300,13 +1300,20 @@ module Orig_name =
     let help = "prints a message each time a variable is renamed"
   end)
 
+type iso_c = C11 | C17 | C23
+
 let () = Parameter_customize.set_group parsing
 let () = Parameter_customize.do_not_reset_on_copy ()
-module C23 =
-  False(struct
-    let option_name = "-c23"
-    let help = "allow C13 constructs (experimental; partial support only)"
-    let module_name = "C23"
+module Std =
+  P.Enum
+  (struct
+    type t = iso_c
+    let default = C11
+    let option_name = "-std"
+    let help =
+      "Configures the ISO standard to use. Note that your preprocessor must \
+       support it, else it will lead to preprocessing failure."
+    let values = [ C11, "c11" ; C17, "c17" ; C23, "c23" ]
   end)
 
 let () = Parameter_customize.set_group parsing

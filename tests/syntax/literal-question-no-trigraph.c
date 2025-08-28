@@ -1,5 +1,5 @@
 /* run.config
-   STDOPT: #"-cpp-extra-args=-Wno-trigraphs"
+   STDOPT: #"-cpp-command='cc -C -E -Wno-trigraphs' -cpp-frama-c-compliant"
    STDOPT: #"-cpp-extra-args='-trigraphs -Wno-trigraphs'"
 */
 int main() {

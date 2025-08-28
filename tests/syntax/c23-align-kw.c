@@ -1,8 +1,8 @@
 /* run.config
    STDOPT: #"-cpp-extra-args=-DALIGNOF" #"-cpp-extra-args=-DALIGNAS"
    EXIT: 1
-   STDOPT: +"-c23" #"-cpp-extra-args=-DALIGNOF"
-   STDOPT: +"-c23" #"-cpp-extra-args=-DALIGNAS"
+   STDOPT: +"-std=c23" #"-cpp-extra-args=-DALIGNOF"
+   STDOPT: +"-std=c23" #"-cpp-extra-args=-DALIGNAS"
 */
 
 void f(void){

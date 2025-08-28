@@ -310,8 +310,6 @@ Options taking a string as argument should preferably be written
                     information as JSON to the specified file, or if the file
                     is '-', prints as text to the standard output. Requires
                     -cpp-frama-c-compliant.
--c23                allow C13 constructs (experimental; partial support only)
-                    (opposite option is -no-c23)
 -compilation-db <path>  when set, preprocessing of each file will include
                     corresponding flags (e.g. -I, -D) from the JSON
                     compilation database specified by <path>. If <path> is a
@@ -373,6 +371,9 @@ Options taking a string as argument should preferably be written
                     -cpp-frama-c-compliant) (opposite option is -no-pp-annot)
 -print-cpp-commands  prints the preprocessing command(s) used by Frama-C and
                     exits. (opposite option is -no-print-cpp-commands)
+-std <c11|c17|c23>  Configures the ISO standard to use. Note that your
+                    preprocessor must support it, else it will lead to
+                    preprocessing failure.
 
 *** PERFORMANCE
 
