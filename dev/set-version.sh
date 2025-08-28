@@ -63,6 +63,7 @@ if [[ $NEXT == "dev" ]]; then
 
   echo "$CURRENT_MAJOR.$CURRENT_MINOR+dev" >VERSION
   $SED -i "s/^version: .*/version: \"$CURRENT_MAJOR.$CURRENT_MINOR+dev\"/g" opam
+  $SED -i "s/^\(doc:.*$CURRENT_MAJOR.$CURRENT_MINOR\)$(tr '~' '-' <<< $CURRENT_SUFFIX)\(-$CURRENT_CODENAME.*\)\(.*\)/\1\2/" opam
   $SED -i "s/^version: .*/version: \"$CURRENT_MAJOR.$CURRENT_MINOR+dev\"/g" tools/lint/frama-c-lint.opam
   $SED -i "s/^version: .*/version: \"$CURRENT_MAJOR.$CURRENT_MINOR+dev\"/g" tools/hdrck/frama-c-hdrck.opam
 else
@@ -95,7 +96,7 @@ else
 
   # Opam files
   $SED -i "s/^version: .*/version: \"$NEXT\"/g" opam
-  CURRENT_OPAM_DOC=$CURRENT_MAJOR.$CURRENT_MINOR$(tr '~' '-' <<< $CURRENT_SUFFIX)
+  CURRENT_OPAM_DOC=$CURRENT_MAJOR.$CURRENT_MINOR$(echo $CURRENT_SUFFIX | tr '~' '-' | sed -e 's/+dev//')
   NEXT_OPAM_DOC=$NEXT_MAJOR.$NEXT_MINOR$(tr '~' '-' <<< $NEXT_SUFFIX)
   $SED -i "s/\(.*\)$CURRENT_OPAM_DOC-$CURRENT_CODENAME\(.*\)/\1$NEXT_OPAM_DOC-$NEXT_CODENAME\2/g" opam
 
