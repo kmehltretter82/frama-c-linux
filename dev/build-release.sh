@@ -185,6 +185,7 @@ MANUALS=(
   "e-acsl-implementation"
   "e-acsl-manual"
   "eva-manual"
+  "mthread-manual"
   "metrics-manual"
   "plugin-development-guide"
   "rte-manual"
