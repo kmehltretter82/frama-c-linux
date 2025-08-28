@@ -396,6 +396,9 @@ coverage:
     - ./nix/shell-checkers.sh "./nix/coverage.sh"
   coverage: '/Coverage: \d+\.\d+\%/'
   artifacts:
+    expose_as: 'Coverage summary'
+    paths:
+      - coverage-summary.txt
     reports:
       coverage_report:
         coverage_format: cobertura
