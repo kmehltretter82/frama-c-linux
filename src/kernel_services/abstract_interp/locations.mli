@@ -126,16 +126,16 @@ module Location_Bytes : sig
 
   val fold_bases : (Base.t -> 'a -> 'a) -> t -> 'a -> 'a
   (** Fold on all the bases of the location, including [Top bases].
-      @raise Error_Top in the case [Top Top]. *)
+      @raise Abstract_interp.Error_Top in the case [Top Top]. *)
 
   val fold_i : (Base.t -> Ival.t -> 'a -> 'a) -> t -> 'a -> 'a
   (** Fold with offsets.
-      @raise Error_Top in the cases [Top Top], [Top bases]. *)
+      @raise Abstract_interp.Error_Top in the cases [Top Top], [Top bases]. *)
 
   val fold_topset_ok: (Base.t -> Ival.t -> 'a -> 'a) -> t -> 'a -> 'a
   (** Fold with offsets, including in the case [Top bases]. In this case,
       [Ival.top] is supplied to the iterator.
-      @raise Error_Top in the case [Top Top]. *)
+      @raise Abstract_interp.Error_Top in the case [Top Top]. *)
 
   val fold_enum : (t -> 'a -> 'a) -> t -> 'a -> 'a
   (** [fold_enum f loc acc] enumerates the locations in [acc], and passes
@@ -146,7 +146,7 @@ module Location_Bytes : sig
 
   val to_seq_i : t -> (Base.t * Ival.t) Seq.t
   (** Builds a sequence of all bases (with their offsets) of the location.
-      @raise Error_Top in the cases [Top _]. *)
+      @raise Abstract_interp.Error_Top in the cases [Top _]. *)
 
   val cached_fold:
     cache:Hptmap_sig.cache_type ->
@@ -273,21 +273,21 @@ module Zone : sig
   (** {3 Folding} *)
 
   val filter_base : (Base.t -> bool) -> t -> t
-  (** [filter_base] can't raise Error_Top since it filters bases of [Top
-      bases]. Note: the filter may give an over-approximation (in the case
-      [Top Top]). *)
+  (** [filter_base] can't raise [Abstract_interp.Error_Top] since it
+      filtersbases of [Top bases]. Note: the filter may give an
+      over-approximation (in the case [Top Top]). *)
 
   val fold_bases : (Base.t -> 'a -> 'a) -> t -> 'a -> 'a
   (** [fold_bases] folds also bases of [Top bases].
-      @raise Error_Top in the case [Top Top]. *)
+      @raise Abstract_interp.Error_Top in the case [Top Top]. *)
 
   val fold_i : (Base.t -> Int_Intervals.t -> 'a -> 'a) -> t -> 'a -> 'a
   (** [fold_i f l acc] folds [l] by base.
-      @raise Error_Top in the cases [Top Top], [Top bases]. *)
+      @raise Abstract_interp.Error_Top in the cases [Top Top], [Top bases]. *)
 
   val fold_topset_ok : (Base.t -> Int_Intervals.t -> 'a -> 'a) -> t -> 'a -> 'a
   (** [fold_i f l acc] folds [l] by base.
-      @raise Error_Top in the case [Top Top]. *)
+      @raise Abstract_interp.Error_Top in the case [Top Top]. *)
 
   val cached_fold :
     cache:Hptmap_sig.cache_type ->

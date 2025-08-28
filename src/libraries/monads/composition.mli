@@ -89,6 +89,6 @@ module Make_with_product
     theory. Even if none of this formal knowledge is required to use this
     module, one can check the following references to satisfy their curiosity.
 
-    @see Jon Beck paper "Distributive laws" for more details on this topic.
-    @see Alexandre Goy thesis "On the compositionality of monads via weak
-    distributive laws" for details on how to relax some of those axioms. *)
+    @see "Distributive laws" by Jon Beck for more details on this topic.
+    @see "On the compositionality of monads via weak distributive laws" by
+    Alexandre Goy thesis  for details on how to relax some of those axioms. *)

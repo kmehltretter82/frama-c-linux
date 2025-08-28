@@ -194,18 +194,18 @@ val makeZeroInit: loc:location -> typ -> init
     [List.fold_left] except we also pass the type of the initializer.
 
     This is a good way to use it to scan even nested initializers :
-    {v
-  let rec myInit (lv: lval) (i: init) (acc: 'a) : 'a =
-    match i with
-      | SingleInit e -> (* ... do something with [lv] and [e] and [acc] ... *)
-      | CompoundInit (ct, initl) ->
-         foldLeftCompound ~implicit:false
-           ~doinit:(fun off' i' _typ acc' ->
-                      myInit (addOffsetLval off' lv) i' acc')
-           ~ct
-           ~initl
-           ~acc
-v}
+    {[
+      let rec myInit (lv: lval) (i: init) (acc: 'a) : 'a =
+        match i with
+        | SingleInit e -> (* ... do something with [lv] and [e] and [acc] ... *)
+        | CompoundInit (ct, initl) ->
+          foldLeftCompound ~implicit:false
+            ~doinit:(fun off' i' _typ acc' ->
+                myInit (addOffsetLval off' lv) i' acc')
+            ~ct
+            ~initl
+            ~acc
+    ]}
 *)
 val foldLeftCompound:
   implicit:bool ->

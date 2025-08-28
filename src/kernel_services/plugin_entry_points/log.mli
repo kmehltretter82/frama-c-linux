@@ -505,7 +505,8 @@ val set_current_source : (unit -> Filepath.position) -> unit
 
 val check_not_yet: (event -> bool) ref
 (** Checks whether a message been emitted already, in which case it is
-    not reprinted. Currently set in {Messages}. Not for the casual user.
+    not reprinted. Currently set in {!module-type:Messages}. Not for the casual
+    user.
 *)
 
 val tty : (unit -> bool) ref
