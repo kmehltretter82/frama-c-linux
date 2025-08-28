@@ -46,8 +46,7 @@ module Identity = struct
 end
 
 (* Interval abstraction over rationals. *)
-module Abstraction_Name = struct let name = "Numerors.Rational.Interval" end
-module Abstraction = Field_interval.Make (Rational) (Identity) (Abstraction_Name)
+module Abstraction = Field_interval.Make (Rational) (Identity)
 
 
 

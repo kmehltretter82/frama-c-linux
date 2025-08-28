@@ -22,7 +22,7 @@
 
 module type Name = sig val name : string end
 
-module Make (K : Field.S) (Computation : IEEE754.Computation) (_ : Name) :
+module Make (K : Field.S) (Computation : IEEE754.Computation) :
   IEEE754.Abstraction
   with module Scalar = K
    and module Computation = Computation

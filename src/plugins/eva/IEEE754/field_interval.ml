@@ -24,7 +24,7 @@ module type Name = sig val name : string end
 
 type 'k bounds = 'k Field.bounds = { lower : 'k ; upper : 'k }
 
-module Make (K : Field.S) (Computation : IEEE754.Computation) (Name : Name) = struct
+module Make (K : Field.S) (Computation : IEEE754.Computation) = struct
 
   module Scalar = K
   type scalar = K.t
@@ -58,7 +58,7 @@ module Make (K : Field.S) (Computation : IEEE754.Computation) (Name : Name) = st
 
   include Datatype.Make (struct
       type t = subset
-      let name = Name.name
+      let name = "Field.Interval(" ^ K.name ^ ")"
       let reprs = [ zero ; one ; top ]
       let structural_descr = structural_descr
       let mem_project = Datatype.never_any_project
