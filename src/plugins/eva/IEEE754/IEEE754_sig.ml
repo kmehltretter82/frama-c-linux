@@ -122,19 +122,19 @@ module type Abstraction = sig
 
   (** {3 Backward reductions.} *)
 
-  (** The call [backward_left_lower ~left ~right] returns a reduced abstraction
-      of [left] based on the assumption that [left <= right]. If the assumption
-      is wrong because no concrete element of [left] can possibly be lower
-      than or equal to any concrete element of [right], the function must
-      return [`Bottom]. *)
-  val backward_left_lower : left : t -> right : t -> t or_bottom
+  (** The call [backward_left_less_than ~left ~right] returns a reduced
+      abstraction of [left] based on the assumption that [left <= right].
+      If the assumption is wrong because no concrete element of [left] can
+      possibly be less than any concrete element of [right], the function
+      must return [`Bottom]. *)
+  val backward_left_less_than : left : t -> right : t -> t or_bottom
 
-  (** The call [backward_left_greater ~left ~right] returns a reduced abstraction
-      of [left] based on the assumption that [left >= right]. If the assumption
-      is wrong because no concrete element of [left] can possibly be greater
-      than or equal to any concrete element of [right], the function must
-      return [`Bottom]. *)
-  val backward_left_greater : left : t -> right : t -> t or_bottom
+  (** The call [backward_left_greater_than ~left ~right] returns a reduced
+      abstraction of [left] based on the assumption that [left >= right].
+      If the assumption is wrong because no concrete element of [left] can
+      possibly be greater than any concrete element of [right], the function
+      must return [`Bottom]. *)
+  val backward_left_greater_than : left : t -> right : t -> t or_bottom
 
 end
 
