@@ -78,7 +78,7 @@ let dkey_debug = Self.register_category "d-taint-debug"
 
 let wkey =
   Self.register_warn_category "taint"
-    ~help:"warnings related to the taint analysis from \"-eva-domain taint\""
+    ~help:"warnings related to the taint analysis from \"-eva-domains taint\""
 
 module LatticeSingleTaint = struct
 
