@@ -1,5 +1,5 @@
 /* run.config*
- EXIT: 4
+ EXIT: 1
    STDOPT:
 */
 

@@ -8099,11 +8099,10 @@ and doInit local_env asconst preinit so acc initl =
     normalSubobj so;
     (* Start over with the fields *)
     doInit local_env asconst preinit so acc allinitl
-  (* An incomplete structure with any initializer is an error. *)
-  | TComp comp, _ :: restil when comp.cfields = None ->
-    Kernel.error ~current:true ~once:true
-      "variable `%s' has initializer but incomplete type" so.host.vname;
-    doInit local_env asconst preinit so acc restil
+  (* An incomplete structure with any initializer is an error (this should not
+   * happen here because of mustIgnoreInit). *)
+  | TComp { cfields = None }, _ ->
+    Kernel.fatal ~current:true "Initialization of variable with incomplete type"
   (* If we are at a composite and we see a single initializer of the same
    * type as the composite then grab it all. If the type is not the same
    * then we must go on and try to initialize the fields *)
@@ -8377,6 +8376,16 @@ and doInit local_env asconst preinit so acc initl =
     Errorloc.abort_context "doInit: cases for t=%a"
       Cil_datatype.Typ.pretty soTyp'
 
+(* This function must only be used for variable (either global or local)
+   initialisation, not structure's field. *)
+and mustIgnoreInit vi init =
+  if init = Cabs.NO_INIT then true
+  else if not (Cil.isCompleteType ~last_field:true vi.vtype) then begin
+    Kernel.error ~current:true ~once:true
+      "variable `%s' has initializer but incomplete type" vi.vname;
+    true
+  end else false
+
 (* Create and add to the file (if not already added) a global. Return the
  * varinfo *)
 and createGlobal loc ghost logic_spec ((t,s,b,attr_list) : (typ * storage * bool * Cabs.attribute list))
@@ -8433,7 +8442,7 @@ and createGlobal loc ghost logic_spec ((t,s,b,attr_list) : (typ * storage * bool
   let vi, alreadyInEnv = makeGlobalVarinfo isadef vi in
   (* Do the initializer and complete the array type if necessary *)
   let init : init option =
-    if inite = Cabs.NO_INIT then
+    if mustIgnoreInit vi inite then
       None
     else
       let se, ie', et, _ =
@@ -8773,7 +8782,7 @@ and createLocal ghost ((_, sto, _, _) as specs)
     Cil.update_var_type vi (constFoldType vi.vtype);
 
     let init : init option =
-      if inite = Cabs.NO_INIT then
+      if mustIgnoreInit vi inite then
         None
       else begin
         let se, ie', et, _ =
@@ -8931,7 +8940,7 @@ and createLocal ghost ((_, sto, _, _) as specs)
       end else empty
     in
     let se1 = local_var_chunk se1 vi in
-    if inite = Cabs.NO_INIT then
+    if mustIgnoreInit vi inite then
       se1 (* skipChunk *)
     else begin
       (* TODO: if vi occurs in se4, this is not a real initialization. *)
