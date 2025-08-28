@@ -342,9 +342,11 @@ module type Messages = sig
       @since Fluorine-20130401
   *)
 
-  val register_warn_category: ?help:string -> string -> warn_category
+  val register_warn_category:
+    ?help:string -> ?default:warn_status -> string -> warn_category
   (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
       @before 30.0-Zinc [?help] parameter was not present
+      @before Frama-C+dev [?default] parameter was not present
   *)
 
   val is_warn_category: string -> bool

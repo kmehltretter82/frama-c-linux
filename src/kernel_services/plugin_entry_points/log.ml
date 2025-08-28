@@ -843,7 +843,8 @@ sig
 
   val is_debug_key_enabled: category -> bool
 
-  val register_warn_category: ?help:string -> string -> warn_category
+  val register_warn_category:
+    ?help:string -> ?default:warn_status -> string -> warn_category
 
   val is_warn_category: string -> bool
 
@@ -950,10 +951,21 @@ struct
 
   let () = Hashtbl.add warn_categories_help "*" "All warning categories"
 
-  let register_warn_category ?(help="No description provided") s =
+  let wnot_registered s =
+    failwith (s ^ " is not a registered warning category for " ^ label)
+
+  let set_warn_status s status =
+    try
+      warn_categories :=
+        Category_trie.add_info
+          (split_category s) ~merge:merge_status status !warn_categories
+    with Not_found -> wnot_registered s
+
+  let register_warn_category ?(help="No description provided") ?default s =
     let l = split_category s in
     warn_categories := Category_trie.add_structure l !warn_categories;
     Hashtbl.replace warn_categories_help s help;
+    Option.iter (set_warn_status s) default;
     s
 
   let get_warn_category_help (cat: category) =
@@ -977,16 +989,6 @@ struct
   let pp_warn_category fmt s = Format.pp_print_string fmt s
 
   let get_warn_category s = if is_warn_category s then Some s else None
-
-  let wnot_registered s =
-    failwith (s ^ " is not a registered warning category for " ^ label)
-
-  let set_warn_status s status =
-    try
-      warn_categories :=
-        Category_trie.add_info
-          (split_category s) ~merge:merge_status status !warn_categories
-    with Not_found -> wnot_registered s
 
   let get_warn_status s =
     match Category_trie.get (split_category s) !warn_categories with
