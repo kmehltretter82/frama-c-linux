@@ -47,7 +47,7 @@ val is_extension_block: plugin:string -> string -> bool
 val is_importer: plugin:string -> string -> bool
 
 (** Return the extension category.
-    @raise Not_Found if the extension is not registered
+    @raise Not_found if the extension is not registered
     @before Frama-C+def the function took one less argument, [plugin], which is
     now used to avoid ambiguity if plugins use the same name for an extension
 *)
@@ -71,7 +71,7 @@ val preprocess_extension_block:
 (** Return the plugin name of the ACSL extension. If [~plugin] is [None], we try
     to find an extension with this [name] in our tables (can crash in case of
     ambiguity), if it is [Some] we check that this extension exists.
-    @raise Not_Found If the extension does not exist
+    @raise Not_found If the extension does not exist
     @raise Log.AbortFatal If [~plugin] is [None] and two or more extensions have
     the same name
     @before 30.0-Zinc The [~plugin] parameter did not exist and the function
@@ -85,7 +85,7 @@ val extension_from : ?plugin:string -> string -> string
 (** Return the plugin name of the module importer extension. If [~plugin] is
     [None] we try to find an extension with this [name] in our tables, if it
     is [Some] we check that this extension exists.
-    @raise Not_Found If the importer does not exist
+    @raise Not_found If the importer does not exist
     @raise Log.AbortFatal If [~plugin] is [None] and two or more extensions have
     the same name
     @since 30.0-Zinc

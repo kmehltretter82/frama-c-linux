@@ -98,11 +98,11 @@ module type S = sig
 
   type map2_decide =
       ReturnLeft | ReturnRight | ReturnConstant of v | Recurse
-    (** See the documentation of type {!Offsetmap_sig.map2_decide} *)
+    (** See the documentation of type {!Offsetmap_sig.S.map2_decide} *)
 
   val map2:
     Hptmap_sig.cache_type -> (t -> t -> map2_decide) -> (v -> v -> v) -> t -> t -> t
-  (** See the documentation of function {!Offsetmap_sig.map2_on_values}. *)
+  (** See the documentation of function {!Offsetmap_sig.S.map2_on_values}. *)
 
 
   val fold :          (intervals -> v -> 'a -> 'a) -> t -> 'a -> 'a
@@ -118,7 +118,7 @@ module type S = sig
     (Int_Intervals_sig.itv -> v -> 'a -> 'a) ->
     Int_Intervals_sig.itv ->
     t -> 'a -> 'a
-  (** See documentation of {!Offsetmap_sig.fold_between}. *)
+  (** See documentation of {!Offsetmap_sig.S.fold_between}. *)
 
   (** [fold_join f join vempty itvs m] is an implementation of [fold] that
       restricts itself to the intervals in [itvs]. Unlike in [fold] (where the

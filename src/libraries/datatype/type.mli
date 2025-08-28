@@ -286,7 +286,7 @@ module type Heterogeneous_table = sig
   (** [add tbl s ty v] binds [s] to the value [v] in the table [tbl].
       If the returned value is a closure whose the type of one of its
       argument was dynamically registered, then it may raise
-      [Incompatible_Type].
+      [Incompatible_type].
       @raise AlreadyExists if [s] is already bound in [tbl].
   *)
 
@@ -296,7 +296,7 @@ module type Heterogeneous_table = sig
   val find: t -> key -> 'a ty -> 'a info
   (** [find tbl s ty] returns the binding of [s] in the table [tbl].
       @raise Unbound_value if [s] is not bound in [tbl].
-      @raise Incompatible_Type if [ty] was not the type value used to add
+      @raise Incompatible_type if [ty] was not the type value used to add
       the binding of [s] in [tbl]. *)
 
   val iter: (key -> 'a ty -> 'a info -> unit) -> t -> unit

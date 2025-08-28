@@ -28,7 +28,7 @@ val make_cfg: thread_state -> cfg
 
 (** Remove nodes without multi-thread contents in the automata given by
     the start node, and returns the new start node. Nodes that are concurrent
-    according to keep and {CfgNode.must_be_in_cfg}. *)
+    according to keep and {!Mt_cfg_types.CfgNode.must_be_in_cfg}. *)
 val remove_superfluous_nodes : keep:var_access_kind -> cfg -> cfg
 
 

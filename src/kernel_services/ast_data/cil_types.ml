@@ -1235,11 +1235,7 @@ and stmtkind =
   | TryExcept of block * (instr list * exp) * block * location
   (** On MSVC we support structured exception handling. The try/except
        statement is a bit tricky:
-      {v         __try \{ blk \}
-    __except (e) \{
-    handler
-    \}
-    v}
+      {@c[ __try { blk } __except (e) { handler } ]}
 
       The argument to __except  must be an expression. However, we keep a
       list of instructions AND an expression in case you need to make
