@@ -15,7 +15,7 @@
     -cpp-extra-args="-I$(frama-c-config -print-share-path)/mt" \
     $(frama-c-config -print-share-path)/mt/mthread_pthread.c \
     $(frama-c-config -print-share-path)/mt/mthread_queue.c \
-    -eva-verbose 0 -eva-msg-key="-summary" -mt-extract html \
+    -eva-verbose 0 -mt-extract html \
     -eva-slevel 15 philo.c > output.txt
 */
 /* -------------------------------------------------------------------------- */

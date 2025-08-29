@@ -9,7 +9,7 @@
     -mt-shared-accesses-synchronization \
     -cpp-extra-args="-I$(frama-c-config -print-share-path)/mt" \
     $(frama-c-config -print-share-path)/mt/mthread_pthread.c \
-    -eva-verbose 0 -eva-msg-key="-summary" -mt-extract html \
+    -eva-verbose 0 -mt-extract html \
     -eva-slevel 15 \
     -mt-non-concurrent-accesses -mt-non-shared-accesses \
     sharedvars.c > output.txt

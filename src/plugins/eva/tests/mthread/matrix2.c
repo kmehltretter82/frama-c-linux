@@ -9,8 +9,8 @@
     -mt-shared-accesses-synchronization \
     -cpp-extra-args="-I$(frama-c-config -print-share-path)/mt" \
     $(frama-c-config -print-share-path)/mt/mthread_pthread.c \
-    -eva-verbose 0 -eva-msg-key="-summary" -mt-extract html \
-    -eva-slevel 15 matrix2.c
+    -eva-verbose 0 -mt-extract html \
+    -eva-slevel 15 matrix2.c > output.txt
 */
 /* -------------------------------------------------------------------------- */
 #include "mthread_pthread.h"
@@ -62,4 +62,3 @@ int main() {
   }
   return 0;
 }
-
