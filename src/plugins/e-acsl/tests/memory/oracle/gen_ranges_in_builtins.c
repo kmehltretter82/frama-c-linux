@@ -626,6 +626,11 @@ int main(void)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_15);
   }
   /*@ assert \initialized(&s.a[0] + (1 .. 1)); */ ;
+  float sb = 0.5f;
+  __e_acsl_store_block((void *)(& sb),4UL);
+  __e_acsl_full_init((void *)(& sb));
+  __e_acsl_initialize((void *)(& s.b),sizeof(float *));
+  s.b = & sb;
   {
     int __gen_e_acsl_size_13;
     int __gen_e_acsl_if_13;
@@ -635,7 +640,6 @@ int main(void)
     __gen_e_acsl_size_13 = 4 * ((1 - 0) + 1);
     if (__gen_e_acsl_size_13 <= 0) __gen_e_acsl_if_13 = 0;
     else __gen_e_acsl_if_13 = __gen_e_acsl_size_13;
-    /*@ assert Eva: initialization: \initialized(&s.b); */
     __gen_e_acsl_initialized_6 = __e_acsl_initialized((void *)((char *)s.b + 
                                                                4 * 0),
                                                       (size_t)__gen_e_acsl_if_13);
@@ -657,7 +661,7 @@ int main(void)
     __gen_e_acsl_assert_data_16.pred_txt = "!\\initialized(s.b + (0 .. 1))";
     __gen_e_acsl_assert_data_16.file = "ranges_in_builtins.c";
     __gen_e_acsl_assert_data_16.fct = "main";
-    __gen_e_acsl_assert_data_16.line = 63;
+    __gen_e_acsl_assert_data_16.line = 65;
     __e_acsl_assert(! __gen_e_acsl_initialized_6,
                     & __gen_e_acsl_assert_data_16);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_16);
@@ -696,7 +700,7 @@ int main(void)
     __gen_e_acsl_assert_data_18.pred_txt = "\\valid_read(multi_dynamic + 4)";
     __gen_e_acsl_assert_data_18.file = "ranges_in_builtins.c";
     __gen_e_acsl_assert_data_18.fct = "main";
-    __gen_e_acsl_assert_data_18.line = 72;
+    __gen_e_acsl_assert_data_18.line = 74;
     __gen_e_acsl_assert_data_18.name = "mem_access";
     __e_acsl_assert(__gen_e_acsl_valid_read_3,& __gen_e_acsl_assert_data_18);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_18);
@@ -727,7 +731,7 @@ int main(void)
     __gen_e_acsl_assert_data_17.pred_txt = "\\valid(*(multi_dynamic + 4) + (1 .. 7))";
     __gen_e_acsl_assert_data_17.file = "ranges_in_builtins.c";
     __gen_e_acsl_assert_data_17.fct = "main";
-    __gen_e_acsl_assert_data_17.line = 72;
+    __gen_e_acsl_assert_data_17.line = 74;
     __e_acsl_assert(__gen_e_acsl_valid_9,& __gen_e_acsl_assert_data_17);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_17);
   }
@@ -735,6 +739,7 @@ int main(void)
   /*@ assert \valid(*(multi_dynamic + (2 .. 4)) + (1 .. 7)); */ ;
   i --;
   while (i >= 0) {
+    /*@ assert Eva: dangling_pointer: !\dangling(multi_dynamic + i); */
     free((void *)*(multi_dynamic + i));
     i --;
   }
@@ -776,7 +781,7 @@ int main(void)
     __gen_e_acsl_assert_data_20.pred_txt = "\\valid(&t5[2 .. 3])";
     __gen_e_acsl_assert_data_20.file = "ranges_in_builtins.c";
     __gen_e_acsl_assert_data_20.fct = "main";
-    __gen_e_acsl_assert_data_20.line = 84;
+    __gen_e_acsl_assert_data_20.line = 86;
     __e_acsl_assert(__gen_e_acsl_valid_10,& __gen_e_acsl_assert_data_20);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_20);
   }
@@ -785,6 +790,7 @@ int main(void)
   __e_acsl_delete_block((void *)(t5));
   __e_acsl_delete_block((void *)(& c));
   __e_acsl_delete_block((void *)(& multi_dynamic));
+  __e_acsl_delete_block((void *)(& sb));
   __e_acsl_delete_block((void *)(& s));
   __e_acsl_delete_block((void *)(t4));
   __e_acsl_delete_block((void *)(t3));
