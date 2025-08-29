@@ -641,6 +641,12 @@ let gen_all_defines fmt mach =
   gen_define_string fmt "__SSIZE_T" mach.ssize_t;
   if String.length mach.max_align_t > 0 then
     gen_define_string fmt "__MAX_ALIGN_T" mach.max_align_t;
+  let implem_max_align =
+    if mach.max_extended_alignment > 0
+    then mach.max_extended_alignment
+    else mach.alignof_max_align_t
+  in
+  gen_define_int fmt "__FC_IMPLEM_MAX_ALIGN" implem_max_align;
   gen_intlike_max fmt "__FC_SIZE" mach.size_t mach;
   gen_intlike_min fmt "__FC_INTPTR" mach.intptr_t mach;
   gen_intlike_max fmt "__FC_INTPTR" mach.intptr_t mach;
