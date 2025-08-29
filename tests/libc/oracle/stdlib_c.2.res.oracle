@@ -6,15 +6,15 @@
   
 [eva] computing for function calloc <- main.
   Called from stdlib_c.c:15.
-[eva] FRAMAC_SHARE/libc/stdlib.c:72: Call to builtin Frama_C_malloc
-[eva:malloc:new] FRAMAC_SHARE/libc/stdlib.c:72: 
-  allocating variable __malloc_calloc_l72
+[eva] FRAMAC_SHARE/libc/stdlib.c:58: Call to builtin Frama_C_malloc
+[eva:malloc:new] FRAMAC_SHARE/libc/stdlib.c:58: 
+  allocating variable __malloc_calloc_l58
 [eva] computing for function memset <- calloc <- main.
-  Called from FRAMAC_SHARE/libc/stdlib.c:73.
+  Called from FRAMAC_SHARE/libc/stdlib.c:59.
 [eva] using specification for function memset
-[eva] FRAMAC_SHARE/libc/stdlib.c:73: 
+[eva] FRAMAC_SHARE/libc/stdlib.c:59: 
   function memset: precondition 'valid_s' got status valid.
-[eva] FRAMAC_SHARE/libc/string.h:161: 
+[eva] FRAMAC_SHARE/libc/string.h:147: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memset
 [eva] Done for function memset
 [eva] Recording results for calloc
@@ -28,12 +28,12 @@
 [eva] Done for function Frama_C_size_t_interval
 [eva] computing for function calloc <- main.
   Called from stdlib_c.c:22.
-[eva] FRAMAC_SHARE/libc/stdlib.c:72: Call to builtin Frama_C_malloc
-[eva:malloc:new] FRAMAC_SHARE/libc/stdlib.c:72: 
-  allocating variable __malloc_calloc_l72_0
+[eva] FRAMAC_SHARE/libc/stdlib.c:58: Call to builtin Frama_C_malloc
+[eva:malloc:new] FRAMAC_SHARE/libc/stdlib.c:58: 
+  allocating variable __malloc_calloc_l58_0
 [eva] computing for function memset <- calloc <- main.
-  Called from FRAMAC_SHARE/libc/stdlib.c:73.
-[eva:alarm] FRAMAC_SHARE/libc/stdlib.c:73: Warning: 
+  Called from FRAMAC_SHARE/libc/stdlib.c:59.
+[eva:alarm] FRAMAC_SHARE/libc/stdlib.c:59: Warning: 
   function memset: precondition 'valid_s' got status unknown.
 [eva] Done for function memset
 [eva] Recording results for calloc
@@ -46,20 +46,20 @@
 [eva] stdlib_c.c:29: assertion got status valid.
 [eva] computing for function calloc <- main.
   Called from stdlib_c.c:33.
-[eva] FRAMAC_SHARE/libc/stdlib.c:72: Call to builtin Frama_C_malloc
-[eva:malloc:new] FRAMAC_SHARE/libc/stdlib.c:72: 
-  allocating variable __malloc_calloc_l72_1
+[eva] FRAMAC_SHARE/libc/stdlib.c:58: Call to builtin Frama_C_malloc
+[eva:malloc:new] FRAMAC_SHARE/libc/stdlib.c:58: 
+  allocating variable __malloc_calloc_l58_1
 [eva] computing for function memset <- calloc <- main.
-  Called from FRAMAC_SHARE/libc/stdlib.c:73.
+  Called from FRAMAC_SHARE/libc/stdlib.c:59.
 [eva] Done for function memset
 [eva] Recording results for calloc
 [eva] Done for function calloc
 [eva:partition] stdlib_c.c:32: starting to merge loop iterations
 [eva] computing for function calloc <- main.
   Called from stdlib_c.c:33.
-[eva] FRAMAC_SHARE/libc/stdlib.c:72: Call to builtin Frama_C_malloc
+[eva] FRAMAC_SHARE/libc/stdlib.c:58: Call to builtin Frama_C_malloc
 [eva] computing for function memset <- calloc <- main.
-  Called from FRAMAC_SHARE/libc/stdlib.c:73.
+  Called from FRAMAC_SHARE/libc/stdlib.c:59.
 [eva] Done for function memset
 [eva] Recording results for calloc
 [eva] Done for function calloc
@@ -67,41 +67,41 @@
   out of bounds write. assert \valid(s + (size_t)(i - 1));
 [eva] computing for function calloc <- main.
   Called from stdlib_c.c:33.
-[eva] FRAMAC_SHARE/libc/stdlib.c:72: Call to builtin Frama_C_malloc
+[eva] FRAMAC_SHARE/libc/stdlib.c:58: Call to builtin Frama_C_malloc
 [eva] computing for function memset <- calloc <- main.
-  Called from FRAMAC_SHARE/libc/stdlib.c:73.
+  Called from FRAMAC_SHARE/libc/stdlib.c:59.
 [eva] Done for function memset
 [eva] Recording results for calloc
 [eva] Done for function calloc
 [eva] computing for function calloc <- main.
   Called from stdlib_c.c:33.
-[eva] FRAMAC_SHARE/libc/stdlib.c:72: Call to builtin Frama_C_malloc
+[eva] FRAMAC_SHARE/libc/stdlib.c:58: Call to builtin Frama_C_malloc
 [eva] computing for function memset <- calloc <- main.
-  Called from FRAMAC_SHARE/libc/stdlib.c:73.
+  Called from FRAMAC_SHARE/libc/stdlib.c:59.
 [eva] Done for function memset
 [eva] Recording results for calloc
 [eva] Done for function calloc
 [eva] computing for function calloc <- main.
   Called from stdlib_c.c:33.
-[eva] FRAMAC_SHARE/libc/stdlib.c:72: Call to builtin Frama_C_malloc
+[eva] FRAMAC_SHARE/libc/stdlib.c:58: Call to builtin Frama_C_malloc
 [eva] computing for function memset <- calloc <- main.
-  Called from FRAMAC_SHARE/libc/stdlib.c:73.
+  Called from FRAMAC_SHARE/libc/stdlib.c:59.
 [eva] Done for function memset
 [eva] Recording results for calloc
 [eva] Done for function calloc
 [eva] computing for function calloc <- main.
   Called from stdlib_c.c:33.
-[eva] FRAMAC_SHARE/libc/stdlib.c:72: Call to builtin Frama_C_malloc
+[eva] FRAMAC_SHARE/libc/stdlib.c:58: Call to builtin Frama_C_malloc
 [eva] computing for function memset <- calloc <- main.
-  Called from FRAMAC_SHARE/libc/stdlib.c:73.
+  Called from FRAMAC_SHARE/libc/stdlib.c:59.
 [eva] Done for function memset
 [eva] Recording results for calloc
 [eva] Done for function calloc
 [eva] computing for function posix_memalign <- main.
   Called from stdlib_c.c:38.
-[eva] FRAMAC_SHARE/libc/stdlib.c:200: Call to builtin Frama_C_malloc
-[eva:malloc:new] FRAMAC_SHARE/libc/stdlib.c:200: 
-  allocating variable __malloc_posix_memalign_l200
+[eva] FRAMAC_SHARE/libc/stdlib.c:186: Call to builtin Frama_C_malloc
+[eva:malloc:new] FRAMAC_SHARE/libc/stdlib.c:186: 
+  allocating variable __malloc_posix_memalign_l186
 [eva] Recording results for posix_memalign
 [eva] Done for function posix_memalign
 [eva] computing for function free <- main.
@@ -112,9 +112,9 @@
 [eva] Done for function free
 [eva] computing for function posix_memalign <- main.
   Called from stdlib_c.c:40.
-[eva] FRAMAC_SHARE/libc/stdlib.c:200: Call to builtin Frama_C_malloc
-[eva:malloc:new] FRAMAC_SHARE/libc/stdlib.c:200: 
-  allocating variable __malloc_posix_memalign_l200_0
+[eva] FRAMAC_SHARE/libc/stdlib.c:186: Call to builtin Frama_C_malloc
+[eva:malloc:new] FRAMAC_SHARE/libc/stdlib.c:186: 
+  allocating variable __malloc_posix_memalign_l186_0
 [eva] Recording results for posix_memalign
 [eva] Done for function posix_memalign
 [eva] computing for function free <- main.
@@ -132,20 +132,20 @@
 [eva] computing for function realpath <- main.
   Called from stdlib_c.c:49.
 [eva] computing for function Frama_C_interval <- realpath <- main.
-  Called from FRAMAC_SHARE/libc/stdlib.c:214.
+  Called from FRAMAC_SHARE/libc/stdlib.c:200.
 [eva] using specification for function Frama_C_interval
-[eva] FRAMAC_SHARE/libc/stdlib.c:214: 
+[eva] FRAMAC_SHARE/libc/stdlib.c:200: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva] computing for function Frama_C_interval <- realpath <- main.
-  Called from FRAMAC_SHARE/libc/stdlib.c:223.
-[eva] FRAMAC_SHARE/libc/stdlib.c:223: 
+  Called from FRAMAC_SHARE/libc/stdlib.c:209.
+[eva] FRAMAC_SHARE/libc/stdlib.c:209: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva] computing for function Frama_C_make_unknown <- realpath <- main.
-  Called from FRAMAC_SHARE/libc/stdlib.c:231.
+  Called from FRAMAC_SHARE/libc/stdlib.c:217.
 [eva] using specification for function Frama_C_make_unknown
-[eva] FRAMAC_SHARE/libc/stdlib.c:231: 
+[eva] FRAMAC_SHARE/libc/stdlib.c:217: 
   function Frama_C_make_unknown: precondition 'valid_p' got status valid.
 [eva] Done for function Frama_C_make_unknown
 [eva] Recording results for realpath
@@ -166,37 +166,37 @@
 [eva] computing for function realpath <- main.
   Called from stdlib_c.c:57.
 [eva] computing for function Frama_C_interval <- realpath <- main.
-  Called from FRAMAC_SHARE/libc/stdlib.c:214.
+  Called from FRAMAC_SHARE/libc/stdlib.c:200.
 [eva] Done for function Frama_C_interval
 [eva] computing for function Frama_C_interval <- realpath <- main.
-  Called from FRAMAC_SHARE/libc/stdlib.c:223.
+  Called from FRAMAC_SHARE/libc/stdlib.c:209.
 [eva] Done for function Frama_C_interval
-[eva] FRAMAC_SHARE/libc/stdlib.c:225: Call to builtin Frama_C_malloc
-[eva:malloc:new] FRAMAC_SHARE/libc/stdlib.c:225: 
-  allocating variable __malloc_realpath_l225
+[eva] FRAMAC_SHARE/libc/stdlib.c:211: Call to builtin Frama_C_malloc
+[eva:malloc:new] FRAMAC_SHARE/libc/stdlib.c:211: 
+  allocating variable __malloc_realpath_l211
 [eva] computing for function Frama_C_make_unknown <- realpath <- main.
-  Called from FRAMAC_SHARE/libc/stdlib.c:231.
+  Called from FRAMAC_SHARE/libc/stdlib.c:217.
 [eva] Done for function Frama_C_make_unknown
 [eva] Recording results for realpath
 [eva] Done for function realpath
 [eva] computing for function canonicalize_file_name <- main.
   Called from stdlib_c.c:59.
 [eva] computing for function realpath <- canonicalize_file_name <- main.
-  Called from FRAMAC_SHARE/libc/stdlib.c:237.
-[eva] computing for function Frama_C_interval <- realpath <- 
-                          canonicalize_file_name <- main.
-  Called from FRAMAC_SHARE/libc/stdlib.c:214.
-[eva] Done for function Frama_C_interval
-[eva] computing for function Frama_C_interval <- realpath <- 
-                          canonicalize_file_name <- main.
   Called from FRAMAC_SHARE/libc/stdlib.c:223.
+[eva] computing for function Frama_C_interval <- realpath <- 
+                          canonicalize_file_name <- main.
+  Called from FRAMAC_SHARE/libc/stdlib.c:200.
 [eva] Done for function Frama_C_interval
-[eva] FRAMAC_SHARE/libc/stdlib.c:225: Call to builtin Frama_C_malloc
-[eva:malloc:new] FRAMAC_SHARE/libc/stdlib.c:225: 
-  allocating variable __malloc_realpath_l225_0
+[eva] computing for function Frama_C_interval <- realpath <- 
+                          canonicalize_file_name <- main.
+  Called from FRAMAC_SHARE/libc/stdlib.c:209.
+[eva] Done for function Frama_C_interval
+[eva] FRAMAC_SHARE/libc/stdlib.c:211: Call to builtin Frama_C_malloc
+[eva:malloc:new] FRAMAC_SHARE/libc/stdlib.c:211: 
+  allocating variable __malloc_realpath_l211_0
 [eva] computing for function Frama_C_make_unknown <- realpath <- 
                           canonicalize_file_name <- main.
-  Called from FRAMAC_SHARE/libc/stdlib.c:231.
+  Called from FRAMAC_SHARE/libc/stdlib.c:217.
 [eva] Done for function Frama_C_make_unknown
 [eva] Recording results for realpath
 [eva] Done for function realpath
@@ -215,61 +215,61 @@
   __fc_errno ∈ [--..--]
   l ∈ [0..4294967292],0%4
   p ∈
-   {{ NULL ; &__malloc_calloc_l72[0] ; &__malloc_calloc_l72_0[0] ;
-      &__malloc_w_calloc_l72_1[0] }} or UNINITIALIZED
+   {{ NULL ; &__malloc_calloc_l58[0] ; &__malloc_calloc_l58_0[0] ;
+      &__malloc_w_calloc_l58_1[0] }} or UNINITIALIZED
   __retres ∈
-          {{ NULL ; (void *)&__malloc_calloc_l72 ;
-             (void *)&__malloc_calloc_l72_0 ;
-             (void *)&__malloc_w_calloc_l72_1 }}
-  __malloc_calloc_l72[0..3] ∈ [--..--] or UNINITIALIZED
-  __malloc_calloc_l72_0[0..4294967291] ∈ [--..--] or UNINITIALIZED
-  __malloc_w_calloc_l72_1[0..4294967291] ∈ [--..--] or UNINITIALIZED
+          {{ NULL ; (void *)&__malloc_calloc_l58 ;
+             (void *)&__malloc_calloc_l58_0 ;
+             (void *)&__malloc_w_calloc_l58_1 }}
+  __malloc_calloc_l58[0..3] ∈ [--..--] or UNINITIALIZED
+  __malloc_calloc_l58_0[0..4294967291] ∈ [--..--] or UNINITIALIZED
+  __malloc_w_calloc_l58_1[0..4294967291] ∈ [--..--] or UNINITIALIZED
 [eva:final-states] Values at end of function posix_memalign:
   __fc_heap_status ∈ [--..--]
   __fc_errno ∈ [--..--]
-  p_al0 ∈ {{ NULL ; &__malloc_posix_memalign_l200[0] }}
-  p_al1 ∈ {{ NULL ; &__malloc_posix_memalign_l200_0[0] }} or UNINITIALIZED
+  p_al0 ∈ {{ NULL ; &__malloc_posix_memalign_l186[0] }}
+  p_al1 ∈ {{ NULL ; &__malloc_posix_memalign_l186_0[0] }} or UNINITIALIZED
   __retres ∈ {0; 12; 22}
 [eva:final-states] Values at end of function realpath:
   __fc_heap_status ∈ [--..--]
   __fc_errno ∈ [--..--]
   Frama_C_entropy_source ∈ [--..--]
   resolved_name ∈
-               {{ NULL ; &__malloc_main_l47[0] ; &__malloc_realpath_l225[0] ;
-                  &__malloc_realpath_l225_0[0] }}
+               {{ NULL ; &__malloc_main_l47[0] ; &__malloc_realpath_l211[0] ;
+                  &__malloc_realpath_l211_0[0] }}
   realpath_len ∈ [1..4096] or UNINITIALIZED
   __retres ∈
-          {{ NULL ; &__malloc_main_l47[0] ; &__malloc_realpath_l225[0] ;
-             &__malloc_realpath_l225_0[0] }}
+          {{ NULL ; &__malloc_main_l47[0] ; &__malloc_realpath_l211[0] ;
+             &__malloc_realpath_l211_0[0] }}
   __malloc_main_l47[0..4095] ∈ [--..--] or UNINITIALIZED
-  __malloc_realpath_l225[0..4095] ∈ [--..--] or UNINITIALIZED
-  __malloc_realpath_l225_0[0..4095] ∈ [--..--] or UNINITIALIZED
+  __malloc_realpath_l211[0..4095] ∈ [--..--] or UNINITIALIZED
+  __malloc_realpath_l211_0[0..4095] ∈ [--..--] or UNINITIALIZED
 [eva:final-states] Values at end of function canonicalize_file_name:
   __fc_heap_status ∈ [--..--]
   __fc_errno ∈ [--..--]
   Frama_C_entropy_source ∈ [--..--]
-  __malloc_realpath_l225_0[0..4095] ∈ [--..--] or UNINITIALIZED
+  __malloc_realpath_l211_0[0..4095] ∈ [--..--] or UNINITIALIZED
 [eva:final-states] Values at end of function main:
   __fc_heap_status ∈ [--..--]
   __fc_errno ∈ [--..--]
   Frama_C_entropy_source ∈ [--..--]
-  p ∈ {{ NULL ; (int *)&__malloc_calloc_l72 }}
+  p ∈ {{ NULL ; (int *)&__malloc_calloc_l58 }}
   nmemb ∈ [1..4294967295]
-  q ∈ {{ NULL ; (int *)&__malloc_calloc_l72_0 }}
+  q ∈ {{ NULL ; (int *)&__malloc_calloc_l58_0 }}
   r ∈ {0}
-  s ∈ {{ NULL ; (int *)&__malloc_w_calloc_l72_1 }} or UNINITIALIZED
-  p_al0 ∈ {{ NULL ; &__malloc_posix_memalign_l200[0] }}
-  p_al1 ∈ {{ NULL ; &__malloc_posix_memalign_l200_0[0] }}
+  s ∈ {{ NULL ; (int *)&__malloc_w_calloc_l58_1 }} or UNINITIALIZED
+  p_al0 ∈ {{ NULL ; &__malloc_posix_memalign_l186[0] }}
+  p_al1 ∈ {{ NULL ; &__malloc_posix_memalign_l186_0[0] }}
   p_memal_res ∈ {0; 12}
   p_memal_res2 ∈ {0; 12}
   p_memal_inv ∈ {22}
   resolved_name ∈ {{ NULL ; &__malloc_main_l47[0] }}
-  realpath_res ∈ {{ NULL ; &__malloc_realpath_l225[0] }} or UNINITIALIZED
-  canon ∈ {{ NULL ; &__malloc_realpath_l225_0[0] }} or UNINITIALIZED
+  realpath_res ∈ {{ NULL ; &__malloc_realpath_l211[0] }} or UNINITIALIZED
+  canon ∈ {{ NULL ; &__malloc_realpath_l211_0[0] }} or UNINITIALIZED
   __retres ∈ {0; 1}
-  __malloc_calloc_l72[0..3] ∈ [--..--] or UNINITIALIZED
-  __malloc_calloc_l72_0[0..4294967291] ∈ [--..--] or UNINITIALIZED
-  __malloc_w_calloc_l72_1[0..4294967291] ∈ [--..--] or UNINITIALIZED
+  __malloc_calloc_l58[0..3] ∈ [--..--] or UNINITIALIZED
+  __malloc_calloc_l58_0[0..4294967291] ∈ [--..--] or UNINITIALIZED
+  __malloc_w_calloc_l58_1[0..4294967291] ∈ [--..--] or UNINITIALIZED
   __malloc_main_l47[0..4095] ∈ [--..--] or UNINITIALIZED
-  __malloc_realpath_l225[0..4095] ∈ [--..--] or UNINITIALIZED
-  __malloc_realpath_l225_0[0..4095] ∈ [--..--] or UNINITIALIZED
+  __malloc_realpath_l211[0..4095] ∈ [--..--] or UNINITIALIZED
+  __malloc_realpath_l211_0[0..4095] ∈ [--..--] or UNINITIALIZED

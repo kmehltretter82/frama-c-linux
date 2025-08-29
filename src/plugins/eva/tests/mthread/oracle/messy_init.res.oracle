@@ -44,13 +44,13 @@
 [mt] messy_init.c:10: Warning: 
   Trying to lock mutex lock, but unable to check its precise status (internal value {0; 1} should be 1).
 [mt] messy_init.c:10: Lock lock
-[eva] FRAMAC_SHARE/mthread_pthread.c:56: Warning: Not a valid mutex id '0'.
+[eva] FRAMAC_SHARE/mthread_pthread.c:42: Warning: Not a valid mutex id '0'.
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   lock:
-    read by job at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by job at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: messy_init.c:10 <- fjob
 [mt] * shared variables computed
 [eva:interferences] 

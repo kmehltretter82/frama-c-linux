@@ -1,23 +1,9 @@
 #!/usr/bin/env bash
 ##########################################################################
 #                                                                        #
-#  This file is part of Frama-C.                                         #
-#                                                                        #
-#  Copyright (C) 2007-2025                                               #
-#    CEA (Commissariat à l'énergie atomique et aux énergies              #
-#         alternatives)                                                  #
-#                                                                        #
-#  you can redistribute it and/or modify it under the terms of the GNU   #
-#  Lesser General Public License as published by the Free Software       #
-#  Foundation, version 2.1.                                              #
-#                                                                        #
-#  It is distributed in the hope that it will be useful,                 #
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of        #
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         #
-#  GNU Lesser General Public License for more details.                   #
-#                                                                        #
-#  See the GNU Lesser General Public License version 2.1                 #
-#  for more details (enclosed in the file licenses/LGPLv2.1).            #
+#  SPDX-License-Identifier LGPL-2.1                                      #
+#  Copyright (C)                                                         #
+#  CEA (Commissariat à l'énergie atomique et aux énergies alternatives)  #
 #                                                                        #
 ##########################################################################
 
@@ -25,11 +11,6 @@ set -e
 
 ################################################################################
 # Configuration
-
-if [ -z ${OPEN_SOURCE+x} ]; then
-  echo "OPEN_SOURCE variable not set, defaults to 'no'"
-  OPEN_SOURCE="no"
-fi
 
 if [ -z ${HDRCK+x} ]; then
   HDRCK="dune exec -- frama-c-hdrck"
@@ -71,8 +52,6 @@ do
             echo "OPTIONS"
             echo ""
             echo "  --help            Print this help message"
-            echo "  --closed-source   Set closed source header mode (default)"
-            echo "  --open-source     Set open source header mode"
             echo "  --ci-link         Symlink to frama-c.tar.gz"
             echo "  --hdrck <cmd>     Check headers command"
             echo "  --codename <name> Set local VERSION_CODENAME"
@@ -82,7 +61,6 @@ do
             echo ""
             echo "  HDRCK=<cmd> (overriden set by --hdrck)"
             echo "  VERSION_CODENAME=<name> (overriden by --codename)"
-            echo "  OPEN_SOURCE=yes|no (overriden by --open-source and --closed-source)"
             echo "  CI_LINK=yes|no (also set by --ci-link)"
             echo "  USE_STASH=yes|no (default: no)"
             echo ""
@@ -95,12 +73,6 @@ do
         "--codename")
             shift
             VERSION_CODENAME=$1
-            ;;
-        "--open-source")
-            OPEN_SOURCE=yes
-            ;;
-        "--closed-source")
-            OPEN_SOURCE=no
             ;;
         "--ci-link")
             CI_LINK=yes
@@ -159,12 +131,6 @@ echo "----------------------------------------------------------------"
 echo "Make Distribution"
 echo "Version: $VERSION ($VERSION_CODENAME)"
 echo "Plugins: $EXTERNAL_PLUGINS"
-if [ "$OPEN_SOURCE" == "yes" ]
-then
-    echo "Headers: OPEN SOURCE"
-else
-    echo "Headers: CLOSED SOURCE"
-fi
 echo "----------------------------------------------------------------"
 
 ################################################################################
@@ -233,70 +199,26 @@ done
 ################################################################################
 # Build option for check
 
-# Frama-C is checked in open-source mode
-CHECK_HEADER_OPT="-header-dirs headers/open-source"
+CHECK_HEADER_OPT="-header-dirs headers"
 
 # For plugins, either they can be open-source and we assume they have OS headers
 # or they are closed-source
 for plugin in $PLUGINS ; do
-  if [ -d "$plugin/headers/open-source" ] ; then
-    CHECK_HEADER_OPT="$CHECK_HEADER_OPT -header-dirs $plugin/headers/open-source"
-  elif [ -d "$plugin/headers/closed-source" ] ; then
-    CHECK_HEADER_OPT="$CHECK_HEADER_OPT -header-dirs $plugin/headers/closed-source"
-  fi
-done
-
-################################################################################
-# Build option for update
-
-if [[ "$OPEN_SOURCE" == "yes" ]]; then
-  HEADER_KIND="open-source"
-else
-  HEADER_KIND="closed-source"
-fi
-
-MAKE_HEADER_OPT="-header-dirs headers/$HEADER_KIND"
-
-# Plugins can:
-# - have both open and closed -> just use header kind
-# - have only closed -> just use header kind, if it is open, build will fail
-# - have only open -> just use open
-for plugin in $PLUGINS ; do
   if [ -d "$plugin/headers" ] ; then
-    if [ "$OPEN_SOURCE" == "yes" ] ; then
-      MAKE_HEADER_OPT="$MAKE_HEADER_OPT -header-dirs $plugin/headers/open-source"
-    else
-      if [ ! -d "$plugin/headers/closed-source" ] ; then
-        MAKE_HEADER_OPT="$MAKE_HEADER_OPT -header-dirs $plugin/headers/open-source"
-      else
-        MAKE_HEADER_OPT="$MAKE_HEADER_OPT -header-dirs $plugin/headers/closed-source"
-      fi
-    fi
+    CHECK_HEADER_OPT="$CHECK_HEADER_OPT -header-dirs $plugin/headers"
   fi
 done
 
 ################################################################################
 # Headers
 
-echo "Make headers..."
+echo "Check headers..."
 
 TMP_DIR=$(mktemp -d)
 $TAR xf $FRAMAC_TAR -C $TMP_DIR
 
 # Check
 $HDRCK $CHECK_HEADER_OPT -spec-format="3-fields-by-line" -C "$TMP_DIR/$FRAMAC" $HEADER_SPEC
-# Update
-$HDRCK -update $MAKE_HEADER_OPT -spec-format="3-fields-by-line" -C "$TMP_DIR/$FRAMAC" $HEADER_SPEC
-
-################################################################################
-# Sanity check
-
-if [ "$OPEN_SOURCE" == "yes" ] ; then
-  if grep -Iir --exclude-dir="headers" --exclude="make-distrib.sh" "Contact CEA LIST for licensing." $TMP_DIR; then
-    echo "Looks like there are some files containing undetected closed source licences"
-    exit 1
-  fi
-fi
 
 ################################################################################
 # Finalize archive

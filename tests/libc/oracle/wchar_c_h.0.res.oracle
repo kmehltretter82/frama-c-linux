@@ -137,15 +137,15 @@
 [eva] Done for function wcsstr
 [eva] computing for function wcscat <- main.
   Called from wchar_c_h.c:52.
-[eva] FRAMAC_SHARE/libc/wchar.c:74: Call to builtin wcslen
-[eva] FRAMAC_SHARE/libc/wchar.c:74: 
+[eva] FRAMAC_SHARE/libc/wchar.c:60: Call to builtin wcslen
+[eva] FRAMAC_SHARE/libc/wchar.c:60: 
   function wcslen: precondition 'valid_string_s' got status valid.
 [eva] Recording results for wcscat
 [eva] Done for function wcscat
 [eva] computing for function wcsncat <- main.
   Called from wchar_c_h.c:54.
-[eva] FRAMAC_SHARE/libc/wchar.c:84: Call to builtin wcslen
-[eva] FRAMAC_SHARE/libc/wchar.c:84: 
+[eva] FRAMAC_SHARE/libc/wchar.c:70: Call to builtin wcslen
+[eva] FRAMAC_SHARE/libc/wchar.c:70: 
   function wcslen: precondition 'valid_string_s' got status valid.
 [eva] Recording results for wcsncat
 [eva] Done for function wcsncat
@@ -184,26 +184,26 @@
   function wmemchr: precondition 'danglingness' got status valid.
 [eva] computing for function wcsdup <- main.
   Called from wchar_c_h.c:73.
-[eva] FRAMAC_SHARE/libc/wchar.c:98: Call to builtin wcslen
-[eva] FRAMAC_SHARE/libc/wchar.c:98: 
+[eva] FRAMAC_SHARE/libc/wchar.c:84: Call to builtin wcslen
+[eva] FRAMAC_SHARE/libc/wchar.c:84: 
   function wcslen: precondition 'valid_string_s' got status valid.
-[eva] FRAMAC_SHARE/libc/wchar.c:99: Call to builtin malloc
-[eva:malloc:new] FRAMAC_SHARE/libc/wchar.c:99: 
-  allocating variable __malloc_wcsdup_l99
+[eva] FRAMAC_SHARE/libc/wchar.c:85: Call to builtin malloc
+[eva:malloc:new] FRAMAC_SHARE/libc/wchar.c:85: 
+  allocating variable __malloc_wcsdup_l85
 [eva] computing for function wmemcpy <- wcsdup <- main.
-  Called from FRAMAC_SHARE/libc/wchar.c:104.
+  Called from FRAMAC_SHARE/libc/wchar.c:90.
 [eva] Recording results for wmemcpy
 [eva] Done for function wmemcpy
 [eva] Recording results for wcsdup
 [eva] Done for function wcsdup
 [eva] computing for function wcsdup <- main.
   Called from wchar_c_h.c:75.
-[eva] FRAMAC_SHARE/libc/wchar.c:98: Call to builtin wcslen
-[eva] FRAMAC_SHARE/libc/wchar.c:99: Call to builtin malloc
-[eva:malloc:new] FRAMAC_SHARE/libc/wchar.c:99: 
-  allocating variable __malloc_wcsdup_l99_0
+[eva] FRAMAC_SHARE/libc/wchar.c:84: Call to builtin wcslen
+[eva] FRAMAC_SHARE/libc/wchar.c:85: Call to builtin malloc
+[eva:malloc:new] FRAMAC_SHARE/libc/wchar.c:85: 
+  allocating variable __malloc_wcsdup_l85_0
 [eva] computing for function wmemcpy <- wcsdup <- main.
-  Called from FRAMAC_SHARE/libc/wchar.c:104.
+  Called from FRAMAC_SHARE/libc/wchar.c:90.
 [eva] Recording results for wmemcpy
 [eva] Done for function wmemcpy
 [eva] Recording results for wcsdup
@@ -262,11 +262,11 @@
   buf[0..4] ∈ [--..--]
      [5] ∈ {0} or UNINITIALIZED
      [6..19] ∈ UNINITIALIZED
-  __malloc_wcsdup_l99[0] ∈ {65}
+  __malloc_wcsdup_l85[0] ∈ {65}
                      [1] ∈ {66}
                      [2] ∈ {67}
                      [3] ∈ {0}
-  __malloc_wcsdup_l99_0[0] ∈ {65}
+  __malloc_wcsdup_l85_0[0] ∈ {65}
                        [1] ∈ {66}
                        [2] ∈ {67}
                        [3] ∈ {0}
@@ -274,13 +274,13 @@
   __fc_errno ∈ [--..--]
   __fc_heap_status ∈ [--..--]
   l ∈ {4}
-  p ∈ {{ NULL ; &__malloc_wcsdup_l99[0] ; &__malloc_wcsdup_l99_0[0] }}
-  __retres ∈ {{ NULL ; &__malloc_wcsdup_l99[0] ; &__malloc_wcsdup_l99_0[0] }}
-  __malloc_wcsdup_l99[0] ∈ {65}
+  p ∈ {{ NULL ; &__malloc_wcsdup_l85[0] ; &__malloc_wcsdup_l85_0[0] }}
+  __retres ∈ {{ NULL ; &__malloc_wcsdup_l85[0] ; &__malloc_wcsdup_l85_0[0] }}
+  __malloc_wcsdup_l85[0] ∈ {65}
                      [1] ∈ {66}
                      [2] ∈ {67}
                      [3] ∈ {0}
-  __malloc_wcsdup_l99_0[0] ∈ {65}
+  __malloc_wcsdup_l85_0[0] ∈ {65}
                        [1] ∈ {66}
                        [2] ∈ {67}
                        [3] ∈ {0}
@@ -314,13 +314,13 @@
   wmr1 ∈ {0} or UNINITIALIZED
   wmr2 ∈ {{ L"ABC" + {8} }} or UNINITIALIZED
   dupbuf ∈
-        {{ NULL ; &__malloc_wcsdup_l99_0[0] }} or UNINITIALIZED or ESCAPINGADDR
+        {{ NULL ; &__malloc_wcsdup_l85_0[0] }} or UNINITIALIZED or ESCAPINGADDR
   __retres ∈ {0}
-  __malloc_wcsdup_l99[0] ∈ {65}
+  __malloc_wcsdup_l85[0] ∈ {65}
                      [1] ∈ {66}
                      [2] ∈ {67}
                      [3] ∈ {0}
-  __malloc_wcsdup_l99_0[0] ∈ {65}
+  __malloc_wcsdup_l85_0[0] ∈ {65}
                        [1] ∈ {66}
                        [2] ∈ {67}
                        [3] ∈ {0}

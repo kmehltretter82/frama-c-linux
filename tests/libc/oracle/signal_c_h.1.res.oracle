@@ -171,40 +171,40 @@
   Called from signal_c_h.c:89.
 [eva] computing for function get_signal_handler <- signal <- test_sighandler <- 
                           main.
-  Called from FRAMAC_SHARE/libc/signal.c:63.
+  Called from FRAMAC_SHARE/libc/signal.c:49.
 [eva] computing for function set_signal_handler <- get_signal_handler <- signal <- 
                           test_sighandler <- main.
-  Called from FRAMAC_SHARE/libc/signal.c:55.
+  Called from FRAMAC_SHARE/libc/signal.c:41.
 [eva] Recording results for set_signal_handler
 [eva] Done for function set_signal_handler
 [eva] computing for function set_signal_handler <- get_signal_handler <- signal <- 
                           test_sighandler <- main.
-  Called from FRAMAC_SHARE/libc/signal.c:55.
+  Called from FRAMAC_SHARE/libc/signal.c:41.
 [eva] Recording results for set_signal_handler
 [eva] Done for function set_signal_handler
 [eva] Recording results for get_signal_handler
 [eva] Done for function get_signal_handler
 [eva] computing for function set_signal_handler <- signal <- test_sighandler <- 
                           main.
-  Called from FRAMAC_SHARE/libc/signal.c:64.
+  Called from FRAMAC_SHARE/libc/signal.c:50.
 [eva] Recording results for set_signal_handler
 [eva] Done for function set_signal_handler
 [eva] Recording results for signal
 [eva] Done for function signal
 [eva] computing for function raise <- test_sighandler <- main.
   Called from signal_c_h.c:92.
-[eva] FRAMAC_SHARE/libc/signal.c:74: 
+[eva] FRAMAC_SHARE/libc/signal.c:60: 
   Reusing old results for call to get_signal_handler
 [eva] computing for function SIG_DFL <- raise <- test_sighandler <- main.
-  Called from FRAMAC_SHARE/libc/signal.c:75.
+  Called from FRAMAC_SHARE/libc/signal.c:61.
 [eva] computing for function exit <- SIG_DFL <- raise <- test_sighandler <- main.
-  Called from FRAMAC_SHARE/libc/signal.c:35.
+  Called from FRAMAC_SHARE/libc/signal.c:21.
 [eva] using specification for function exit
 [eva] Done for function exit
 [eva] Recording results for SIG_DFL
 [eva] Done for function SIG_DFL
 [eva] computing for function SIG_IGN <- raise <- test_sighandler <- main.
-  Called from FRAMAC_SHARE/libc/signal.c:75.
+  Called from FRAMAC_SHARE/libc/signal.c:61.
 [eva] Recording results for SIG_IGN
 [eva] Done for function SIG_IGN
 [eva] Recording results for raise
@@ -212,11 +212,11 @@
 [eva] computing for function raise <- test_sighandler <- main.
   Called from signal_c_h.c:92.
 [eva] computing for function get_signal_handler <- raise <- test_sighandler <- main.
-  Called from FRAMAC_SHARE/libc/signal.c:74.
+  Called from FRAMAC_SHARE/libc/signal.c:60.
 [eva] Recording results for get_signal_handler
 [eva] Done for function get_signal_handler
 [eva] computing for function signal_handler <- raise <- test_sighandler <- main.
-  Called from FRAMAC_SHARE/libc/signal.c:75.
+  Called from FRAMAC_SHARE/libc/signal.c:61.
 [eva] Recording results for signal_handler
 [eva] Done for function signal_handler
 [eva] Recording results for raise

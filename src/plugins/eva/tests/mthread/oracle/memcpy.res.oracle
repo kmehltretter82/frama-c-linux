@@ -20,13 +20,13 @@
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   tjob0:
-    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:15 <-
       pthread_create :: memcpy.c:38 <- main
   tjob1:
-    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:15 <-
       pthread_create :: memcpy.c:45 <- main
   tjob2:
-    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:15 <-
       pthread_create :: memcpy.c:46 <- main
   shared:
     write by <main> at memcpy.c:40 <- main
@@ -150,13 +150,13 @@
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   tjob0:
-    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:15 <-
       pthread_create :: memcpy.c:38 <- main
   tjob1:
-    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:15 <-
       pthread_create :: memcpy.c:45 <- main
   tjob2:
-    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:15 <-
       pthread_create :: memcpy.c:46 <- main
   shared:
     write by <main> at memcpy.c:40 <- main

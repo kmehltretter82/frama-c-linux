@@ -104,7 +104,7 @@ pid_t __gen_e_acsl_fork(void)
     __gen_e_acsl_assert_data.pred_txt = "\\result == 0 || \\result > 0 || \\result == -1";
     __gen_e_acsl_assert_data.file = "FRAMAC_SHARE/libc/unistd.h";
     __gen_e_acsl_assert_data.fct = "fork";
-    __gen_e_acsl_assert_data.line = 916;
+    __gen_e_acsl_assert_data.line = 902;
     __gen_e_acsl_assert_data.name = "result_ok_child_or_error";
     __e_acsl_assert(__gen_e_acsl_or_2,& __gen_e_acsl_assert_data);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
@@ -166,7 +166,7 @@ pid_t __gen_e_acsl_waitpid(pid_t pid, int *stat_loc, int options)
       __gen_e_acsl_assert_data.pred_txt = "\\valid(stat_loc)";
       __gen_e_acsl_assert_data.file = "FRAMAC_SHARE/libc/sys/wait.h";
       __gen_e_acsl_assert_data.fct = "waitpid";
-      __gen_e_acsl_assert_data.line = 98;
+      __gen_e_acsl_assert_data.line = 84;
       __gen_e_acsl_assert_data.name = "stat_loc_non_null/valid_stat_loc";
       __e_acsl_assert(__gen_e_acsl_valid,& __gen_e_acsl_assert_data);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
@@ -192,7 +192,7 @@ pid_t __gen_e_acsl_waitpid(pid_t pid, int *stat_loc, int options)
     __gen_e_acsl_assert_data_2.pred_txt = "\\result == -1 || \\result >= 0";
     __gen_e_acsl_assert_data_2.file = "FRAMAC_SHARE/libc/sys/wait.h";
     __gen_e_acsl_assert_data_2.fct = "waitpid";
-    __gen_e_acsl_assert_data_2.line = 90;
+    __gen_e_acsl_assert_data_2.line = 76;
     __gen_e_acsl_assert_data_2.name = "result_ok_or_error";
     __e_acsl_assert(__gen_e_acsl_or,& __gen_e_acsl_assert_data_2);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
@@ -226,7 +226,7 @@ pid_t __gen_e_acsl_waitpid(pid_t pid, int *stat_loc, int options)
     __gen_e_acsl_assert_data_3.pred_txt = "\\result >= 0 && \\old(stat_loc) != \\null ==> \\initialized(\\old(stat_loc))";
     __gen_e_acsl_assert_data_3.file = "FRAMAC_SHARE/libc/sys/wait.h";
     __gen_e_acsl_assert_data_3.fct = "waitpid";
-    __gen_e_acsl_assert_data_3.line = 92;
+    __gen_e_acsl_assert_data_3.line = 78;
     __gen_e_acsl_assert_data_3.name = "initialization/stat_loc_init_on_success";
     __e_acsl_assert(__gen_e_acsl_implies,& __gen_e_acsl_assert_data_3);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
@@ -252,7 +252,7 @@ pid_t __gen_e_acsl_waitpid(pid_t pid, int *stat_loc, int options)
     __gen_e_acsl_assert_data.pred_txt = "\\false";
     __gen_e_acsl_assert_data.file = "FRAMAC_SHARE/libc/stdlib.h";
     __gen_e_acsl_assert_data.fct = "exit";
-    __gen_e_acsl_assert_data.line = 703;
+    __gen_e_acsl_assert_data.line = 689;
     __gen_e_acsl_assert_data.name = "never_terminates";
     __e_acsl_assert(0,& __gen_e_acsl_assert_data);
     return;
@@ -275,7 +275,7 @@ pid_t __gen_e_acsl_waitpid(pid_t pid, int *stat_loc, int options)
     __gen_e_acsl_assert_data.pred_txt = "\\false";
     __gen_e_acsl_assert_data.file = "FRAMAC_SHARE/libc/stdlib.h";
     __gen_e_acsl_assert_data.fct = "abort";
-    __gen_e_acsl_assert_data.line = 689;
+    __gen_e_acsl_assert_data.line = 675;
     __gen_e_acsl_assert_data.name = "never_terminates";
     __e_acsl_assert(0,& __gen_e_acsl_assert_data);
     return;

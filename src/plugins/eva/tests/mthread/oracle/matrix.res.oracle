@@ -133,32 +133,32 @@
     write by <main> at matrix.c:59 <- main
   result: read by <main> at matrix.c:49 <- main
   locks[0]:
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: matrix.c:55 <- main
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: matrix.c:60 <- main
   locks[1]:
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: matrix.c:55 <- main
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: matrix.c:60 <- main
   locks[2]:
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: matrix.c:55 <- main
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: matrix.c:60 <- main
   locks[3]:
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: matrix.c:55 <- main
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: matrix.c:60 <- main
   locks[4]:
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: matrix.c:55 <- main
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: matrix.c:60 <- main
   jobs[0..4]:
-    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:15 <-
       pthread_create :: matrix.c:46 <- main
 [mt] * shared variables computed
 [eva:interferences] 
@@ -202,9 +202,9 @@
   matrix[20][0..99]: write by jobs[0] at matrix.c:29 <- job
   matrix[25][0..99]: write by jobs[0] at matrix.c:29 <- job
   locks[0]:
-    read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: matrix.c:25 <- job
-    read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: matrix.c:30 <- job
 [mt] * shared variables computed
 [eva:interferences] 
@@ -244,9 +244,9 @@
   matrix[21][0..99]: write by jobs[1] at matrix.c:29 <- job
   matrix[26][0..99]: write by jobs[1] at matrix.c:29 <- job
   locks[1]:
-    read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: matrix.c:25 <- job
-    read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: matrix.c:30 <- job
 [mt] * shared variables computed
 [eva:interferences] 
@@ -286,9 +286,9 @@
   matrix[22][0..99]: write by jobs[2] at matrix.c:29 <- job
   matrix[27][0..99]: write by jobs[2] at matrix.c:29 <- job
   locks[2]:
-    read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: matrix.c:25 <- job
-    read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: matrix.c:30 <- job
 [mt] * shared variables computed
 [eva:interferences] 
@@ -328,9 +328,9 @@
   matrix[23][0..99]: write by jobs[3] at matrix.c:29 <- job
   matrix[28][0..99]: write by jobs[3] at matrix.c:29 <- job
   locks[3]:
-    read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: matrix.c:25 <- job
-    read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: matrix.c:30 <- job
 [mt] * shared variables computed
 [eva:interferences] 
@@ -370,9 +370,9 @@
   matrix[24][0..99]: write by jobs[4] at matrix.c:29 <- job
   matrix[29][0..99]: write by jobs[4] at matrix.c:29 <- job
   locks[4]:
-    read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: matrix.c:25 <- job
-    read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: matrix.c:30 <- job
 [mt] * shared variables computed
 [eva:interferences] 
@@ -529,32 +529,32 @@
     write by <main> at matrix.c:59 <- main
   result: read by <main> at matrix.c:49 <- main
   locks[0]:
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: matrix.c:55 <- main
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: matrix.c:60 <- main
   locks[1]:
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: matrix.c:55 <- main
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: matrix.c:60 <- main
   locks[2]:
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: matrix.c:55 <- main
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: matrix.c:60 <- main
   locks[3]:
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: matrix.c:55 <- main
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: matrix.c:60 <- main
   locks[4]:
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: matrix.c:55 <- main
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: matrix.c:60 <- main
   jobs[0..4]:
-    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:15 <-
       pthread_create :: matrix.c:46 <- main
 [mt] * shared variables computed
 [eva:interferences] 
@@ -601,9 +601,9 @@
   matrix[20][0..99]: write by jobs[0] at matrix.c:29 <- job
   matrix[25][0..99]: write by jobs[0] at matrix.c:29 <- job
   locks[0]:
-    read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: matrix.c:25 <- job
-    read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: matrix.c:30 <- job
 [mt] * shared variables computed
 [eva:interferences] 
@@ -749,9 +749,9 @@
   matrix[21][0..99]: write by jobs[1] at matrix.c:29 <- job
   matrix[26][0..99]: write by jobs[1] at matrix.c:29 <- job
   locks[1]:
-    read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: matrix.c:25 <- job
-    read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: matrix.c:30 <- job
 [mt] * shared variables computed
 [eva:interferences] 
@@ -897,9 +897,9 @@
   matrix[22][0..99]: write by jobs[2] at matrix.c:29 <- job
   matrix[27][0..99]: write by jobs[2] at matrix.c:29 <- job
   locks[2]:
-    read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: matrix.c:25 <- job
-    read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: matrix.c:30 <- job
 [mt] * shared variables computed
 [eva:interferences] 
@@ -1045,9 +1045,9 @@
   matrix[23][0..99]: write by jobs[3] at matrix.c:29 <- job
   matrix[28][0..99]: write by jobs[3] at matrix.c:29 <- job
   locks[3]:
-    read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: matrix.c:25 <- job
-    read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: matrix.c:30 <- job
 [mt] * shared variables computed
 [eva:interferences] 
@@ -1193,9 +1193,9 @@
   matrix[24][0..99]: write by jobs[4] at matrix.c:29 <- job
   matrix[29][0..99]: write by jobs[4] at matrix.c:29 <- job
   locks[4]:
-    read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: matrix.c:25 <- job
-    read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: matrix.c:30 <- job
 [mt] * shared variables computed
 [eva:interferences] 
@@ -1644,32 +1644,32 @@
     write by <main> at matrix.c:59 <- main
   result: read by <main> at matrix.c:49 <- main
   locks[0]:
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: matrix.c:55 <- main
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: matrix.c:60 <- main
   locks[1]:
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: matrix.c:55 <- main
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: matrix.c:60 <- main
   locks[2]:
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: matrix.c:55 <- main
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: matrix.c:60 <- main
   locks[3]:
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: matrix.c:55 <- main
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: matrix.c:60 <- main
   locks[4]:
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: matrix.c:55 <- main
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: matrix.c:60 <- main
   jobs[0..4]:
-    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:15 <-
       pthread_create :: matrix.c:46 <- main
 [mt] * shared variables computed
 [eva:interferences] 
@@ -1717,9 +1717,9 @@
   matrix[20][0..99]: write by jobs[0] at matrix.c:29 <- job
   matrix[25][0..99]: write by jobs[0] at matrix.c:29 <- job
   locks[0]:
-    read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: matrix.c:25 <- job
-    read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: matrix.c:30 <- job
 [mt] * shared variables computed
 [eva:interferences] 
@@ -1782,9 +1782,9 @@
   matrix[21][0..99]: write by jobs[1] at matrix.c:29 <- job
   matrix[26][0..99]: write by jobs[1] at matrix.c:29 <- job
   locks[1]:
-    read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: matrix.c:25 <- job
-    read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: matrix.c:30 <- job
 [mt] * shared variables computed
 [eva:interferences] 
@@ -1847,9 +1847,9 @@
   matrix[22][0..99]: write by jobs[2] at matrix.c:29 <- job
   matrix[27][0..99]: write by jobs[2] at matrix.c:29 <- job
   locks[2]:
-    read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: matrix.c:25 <- job
-    read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: matrix.c:30 <- job
 [mt] * shared variables computed
 [eva:interferences] 
@@ -1912,9 +1912,9 @@
   matrix[23][0..99]: write by jobs[3] at matrix.c:29 <- job
   matrix[28][0..99]: write by jobs[3] at matrix.c:29 <- job
   locks[3]:
-    read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: matrix.c:25 <- job
-    read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: matrix.c:30 <- job
 [mt] * shared variables computed
 [eva:interferences] 
@@ -1977,9 +1977,9 @@
   matrix[24][0..99]: write by jobs[4] at matrix.c:29 <- job
   matrix[29][0..99]: write by jobs[4] at matrix.c:29 <- job
   locks[4]:
-    read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: matrix.c:25 <- job
-    read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: matrix.c:30 <- job
 [mt] * shared variables computed
 [eva:interferences] 
@@ -2418,32 +2418,32 @@
     write by <main> at matrix.c:59 <- main
   result: read by <main> at matrix.c:49 <- main
   locks[0]:
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: matrix.c:55 <- main
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: matrix.c:60 <- main
   locks[1]:
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: matrix.c:55 <- main
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: matrix.c:60 <- main
   locks[2]:
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: matrix.c:55 <- main
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: matrix.c:60 <- main
   locks[3]:
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: matrix.c:55 <- main
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: matrix.c:60 <- main
   locks[4]:
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: matrix.c:55 <- main
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: matrix.c:60 <- main
   jobs[0..4]:
-    write by <main> at FRAMAC_SHARE/mthread_pthread.c:29 <-
+    write by <main> at FRAMAC_SHARE/mthread_pthread.c:15 <-
       pthread_create :: matrix.c:46 <- main
 [mt] * shared variables computed
 [eva:interferences] 
@@ -2489,9 +2489,9 @@
   matrix[20][0..99]: write by jobs[0] at matrix.c:29 <- job
   matrix[25][0..99]: write by jobs[0] at matrix.c:29 <- job
   locks[0]:
-    read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: matrix.c:25 <- job
-    read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: matrix.c:30 <- job
 [mt] * shared variables computed
 [eva:interferences] 
@@ -2552,9 +2552,9 @@
   matrix[21][0..99]: write by jobs[1] at matrix.c:29 <- job
   matrix[26][0..99]: write by jobs[1] at matrix.c:29 <- job
   locks[1]:
-    read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: matrix.c:25 <- job
-    read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: matrix.c:30 <- job
 [mt] * shared variables computed
 [eva:interferences] 
@@ -2615,9 +2615,9 @@
   matrix[22][0..99]: write by jobs[2] at matrix.c:29 <- job
   matrix[27][0..99]: write by jobs[2] at matrix.c:29 <- job
   locks[2]:
-    read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: matrix.c:25 <- job
-    read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: matrix.c:30 <- job
 [mt] * shared variables computed
 [eva:interferences] 

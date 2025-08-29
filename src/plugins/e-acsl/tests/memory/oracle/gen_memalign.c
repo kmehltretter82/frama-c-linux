@@ -431,7 +431,7 @@ int __gen_e_acsl_posix_memalign(void **memptr, size_t alignment, size_t size)
     __gen_e_acsl_assert_data.pred_txt = "\\valid(memptr)";
     __gen_e_acsl_assert_data.file = "FRAMAC_SHARE/libc/stdlib.h";
     __gen_e_acsl_assert_data.fct = "posix_memalign";
-    __gen_e_acsl_assert_data.line = 966;
+    __gen_e_acsl_assert_data.line = 952;
     __gen_e_acsl_assert_data.name = "valid_memptr";
     __e_acsl_assert(__gen_e_acsl_valid,& __gen_e_acsl_assert_data);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
@@ -455,7 +455,7 @@ int __gen_e_acsl_posix_memalign(void **memptr, size_t alignment, size_t size)
       __gen_e_acsl_assert_data_2.pred_txt = "\\result == 22";
       __gen_e_acsl_assert_data_2.file = "FRAMAC_SHARE/libc/stdlib.h";
       __gen_e_acsl_assert_data_2.fct = "posix_memalign";
-      __gen_e_acsl_assert_data_2.line = 974;
+      __gen_e_acsl_assert_data_2.line = 960;
       __gen_e_acsl_assert_data_2.name = "invalid_alignment/result_einval";
       __e_acsl_assert(__retres == 22,& __gen_e_acsl_assert_data_2);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
@@ -472,7 +472,7 @@ int __gen_e_acsl_posix_memalign(void **memptr, size_t alignment, size_t size)
       __gen_e_acsl_assert_data_4.pred_txt = "\\result == 0";
       __gen_e_acsl_assert_data_4.file = "FRAMAC_SHARE/libc/stdlib.h";
       __gen_e_acsl_assert_data_4.fct = "posix_memalign";
-      __gen_e_acsl_assert_data_4.line = 982;
+      __gen_e_acsl_assert_data_4.line = 968;
       __gen_e_acsl_assert_data_4.name = "allocation/result_zero";
       __e_acsl_assert(__retres == 0,& __gen_e_acsl_assert_data_4);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
@@ -496,7 +496,7 @@ int __gen_e_acsl_posix_memalign(void **memptr, size_t alignment, size_t size)
       __gen_e_acsl_assert_data_5.pred_txt = "\\result < 0 || \\result > 0";
       __gen_e_acsl_assert_data_5.file = "FRAMAC_SHARE/libc/stdlib.h";
       __gen_e_acsl_assert_data_5.fct = "posix_memalign";
-      __gen_e_acsl_assert_data_5.line = 988;
+      __gen_e_acsl_assert_data_5.line = 974;
       __gen_e_acsl_assert_data_5.name = "no_allocation/result_non_zero";
       __e_acsl_assert(__gen_e_acsl_or,& __gen_e_acsl_assert_data_5);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);

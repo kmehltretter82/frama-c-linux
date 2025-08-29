@@ -22,14 +22,14 @@
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   lock1:
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: protect.c:24 <- main
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: protect.c:26 <- main
   lock2:
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: protect.c:28 <- main
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: protect.c:30 <- main
   t[1]: write by <main> at protect.c:25 <- main
   t[3]: write by <main> at protect.c:29 <- main
@@ -99,14 +99,14 @@
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   lock1:
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: protect.c:24 <- main
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: protect.c:26 <- main
   lock2:
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:42 <-
       pthread_mutex_lock :: protect.c:28 <- main
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66 <-
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:52 <-
       pthread_mutex_unlock :: protect.c:30 <- main
   t[1]: write by <main> at protect.c:25 <- main
   t[3]: write by <main> at protect.c:29 <- main
