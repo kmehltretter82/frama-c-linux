@@ -6,8 +6,11 @@
 /*                                                                        */
 /**************************************************************************/
 
+#if __STDC_VERSION__ < 202311L
+
 #ifndef __FC_STDALIGN_H
 #define __FC_STDALIGN_H
+
 #include "features.h"
 __PUSH_FC_STDLIB
 __BEGIN_DECLS
@@ -20,4 +23,6 @@ __BEGIN_DECLS
 
 __END_DECLS
 __POP_FC_STDLIB
+#endif
+
 #endif
