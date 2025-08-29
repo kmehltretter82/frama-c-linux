@@ -57,12 +57,30 @@
 [mt] *** Thread <main> computed
 [mt] *** Computing thread jobs[0], iteration 2
     (potential shared vars changed, interferences changed)
+[eva:alarm] ccfg.c:8: Warning: 
+  signed overflow. assert global1 + global2[0] ≤ 2147483647;
+[eva:alarm] ccfg.c:8: Warning: 
+  signed overflow.
+  assert -2147483648 ≤ (int)(global1 + global2[0]) + global2[1];
+[eva:alarm] ccfg.c:8: Warning: 
+  signed overflow.
+  assert (int)(global1 + global2[0]) + global2[1] ≤ 2147483647;
 [mt] *** Thread jobs[0] computed
 [mt] *** Computing thread jobs[1], iteration 2
     (potential shared vars changed, interferences changed)
+[eva:alarm] ccfg.c:8: Warning: 
+  signed overflow. assert global1 + global2[0] ≤ 2147483647;
+[eva:alarm] ccfg.c:8: Warning: 
+  signed overflow.
+  assert -2147483648 ≤ (int)(global1 + global2[0]) + global2[1];
+[eva:alarm] ccfg.c:8: Warning: 
+  signed overflow.
+  assert (int)(global1 + global2[0]) + global2[1] ≤ 2147483647;
 [mt] *** Thread jobs[1] computed
 [mt] *** Computing thread jobs[2], iteration 2
     (potential shared vars changed, interferences changed)
+[eva:alarm] ccfg.c:8: Warning: 
+  signed overflow. assert global1 + global2[0] ≤ 2147483647;
 [eva:alarm] ccfg.c:8: Warning: 
   signed overflow.
   assert -2147483648 ≤ (int)(global1 + global2[0]) + global2[1];
@@ -72,6 +90,8 @@
 [mt] *** Thread jobs[2] computed
 [mt] *** Computing thread jobs[3], iteration 2
     (potential shared vars changed, interferences changed)
+[eva:alarm] ccfg.c:8: Warning: 
+  signed overflow. assert global1 + global2[0] ≤ 2147483647;
 [eva:alarm] ccfg.c:8: Warning: 
   signed overflow.
   assert -2147483648 ≤ (int)(global1 + global2[0]) + global2[1];
@@ -106,10 +126,28 @@
 [mt] ***** Shared variables computed
 [mt] ***** Iteration 3
 [mt] *** Computing thread jobs[0], iteration 3 (shared vars values changed)
+[eva:alarm] ccfg.c:8: Warning: 
+  signed overflow. assert global1 + global2[0] ≤ 2147483647;
+[eva:alarm] ccfg.c:8: Warning: 
+  signed overflow.
+  assert -2147483648 ≤ (int)(global1 + global2[0]) + global2[1];
+[eva:alarm] ccfg.c:8: Warning: 
+  signed overflow.
+  assert (int)(global1 + global2[0]) + global2[1] ≤ 2147483647;
 [mt] *** Thread jobs[0] computed
 [mt] *** Computing thread jobs[1], iteration 3 (shared vars values changed)
+[eva:alarm] ccfg.c:8: Warning: 
+  signed overflow. assert global1 + global2[0] ≤ 2147483647;
+[eva:alarm] ccfg.c:8: Warning: 
+  signed overflow.
+  assert -2147483648 ≤ (int)(global1 + global2[0]) + global2[1];
+[eva:alarm] ccfg.c:8: Warning: 
+  signed overflow.
+  assert (int)(global1 + global2[0]) + global2[1] ≤ 2147483647;
 [mt] *** Thread jobs[1] computed
 [mt] *** Computing thread jobs[2], iteration 3 (shared vars values changed)
+[eva:alarm] ccfg.c:8: Warning: 
+  signed overflow. assert global1 + global2[0] ≤ 2147483647;
 [eva:alarm] ccfg.c:8: Warning: 
   signed overflow.
   assert -2147483648 ≤ (int)(global1 + global2[0]) + global2[1];
@@ -118,6 +156,8 @@
   assert (int)(global1 + global2[0]) + global2[1] ≤ 2147483647;
 [mt] *** Thread jobs[2] computed
 [mt] *** Computing thread jobs[3], iteration 3 (shared vars values changed)
+[eva:alarm] ccfg.c:8: Warning: 
+  signed overflow. assert global1 + global2[0] ≤ 2147483647;
 [eva:alarm] ccfg.c:8: Warning: 
   signed overflow.
   assert -2147483648 ≤ (int)(global1 + global2[0]) + global2[1];

@@ -166,6 +166,14 @@ module ConcatDotFilesTo =
                   single file."
     end)
 
+let () = Parameter_customize.set_group grp_debug
+module KeepDotFiles =
+  False
+    (struct
+      let option_name = "-mt-keep-dot-files"
+      let help = "Keep dot files used to generate SVG for the html output"
+    end)
+
 
 let () = Parameter_customize.set_group grp_models
 module ExtractModels =

@@ -9,15 +9,18 @@ TARGETS = \
 	init.log \
 
 CFG_TARGETS = \
-  ccfg.pdf \
+  ccfg.dot \
+
+PDF_CFG_TARGETS = $(CFG_TARGETS:.dot=.pdf)
 
 
 .SECONDEXPANSION:
 .PHONY: all clean
 
-all: $(TARGETS) $(CFG_TARGETS)
+all: $(TARGETS) $(CFG_TARGETS) $(PDF_CFG_TARGETS)
 clean:
 	$(RM) *.log
+	$(RM) *.dot
 	$(RM) *.pdf
 	$(RM) -r html_summary
 
@@ -40,11 +43,15 @@ $(TARGETS) : %.log: $$(SOURCE) $(FRAMAC) $(MAKEFILE_LIST)
 		$(FCFLAGS) \
 		$< > $*.log
 
-%.pdf: SOURCE = $(word 1,$(subst ., ,$*)).log
-$(CFG_TARGETS) : %.pdf: $$(SOURCE) $(MAKEFILE_LIST)
-	magick html_summary/'<main>.svg' $*.pdf
+%.dot: SOURCE = $(word 1,$(subst ., ,$*)).log
+$(CFG_TARGETS) : %.dot: $$(SOURCE) $(MAKEFILE_LIST)
+	cp html_summary/'<main>.dot' $*.dot
 
-ccfg.log: FCFLAGS += -eva-slevel 15 -mt-extract html
+%.pdf: SOURCE = $(word 1,$(subst ., ,$*)).dot
+$(PDF_CFG_TARGETS) : %.pdf: $$(SOURCE) $(MAKEFILE_LIST)
+	dot -Tpdf $< -o $@
+
+ccfg.log: FCFLAGS += -eva-slevel 15 -mt-extract html -mt-keep-dot-files
 philo.noslevel.log: FCFLAGS += ${MT_QUEUE}
 philo.slevel5.log: FCFLAGS += ${MT_QUEUE} -eva-slevel 5
 philo.mtverbose2.log: FCFLAGS += ${MT_QUEUE} -eva-slevel 5 -mt-verbose 2

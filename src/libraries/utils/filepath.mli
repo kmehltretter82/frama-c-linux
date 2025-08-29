@@ -161,8 +161,8 @@ val extend: ?existence:existence -> t -> string -> t
     @since 22.0-Titanium *)
 val concat: ?existence:existence -> t -> string -> t
 
-(** Operator version of {!Filepath.concat}. [Filepath.(file / ext)] is
-    equivalent to [Filepath.concat file ext]. *)
+(** Operator version of {!Filepath.concat}. [Filepath.(dir / file)] is
+    equivalent to [Filepath.concat dir file]. *)
 val (/): t -> string -> t
 
 (** [concats ~existence dir paths] concatenates a list of paths, as per
