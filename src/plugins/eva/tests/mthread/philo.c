@@ -3,6 +3,22 @@
    LOG: @LOG_MT_DOT_FILES_FILENAME@
    STDOPT: +"@LOG_MT_DOT_FILES_OPTS@"
 */
+/*
+  THIS FILE IS USED AS AN EXAMPLE FOR THE WEBSITE. DO NOT FORGET TO UPDATE THE
+  EXAMPLES ON THE WEBSITE IF IT IS EDITED.
+  When updating the examples, copy the file in a new folder, remove comments
+  until the ---- line and then run the following command to generate the log
+  file and the HTML summary:
+
+  frama-c -mthread -eva-domains mthread -mt-shared-values 2 \
+    -mt-shared-accesses-synchronization \
+    -cpp-extra-args="-I$(frama-c-config -print-share-path)/mt" \
+    $(frama-c-config -print-share-path)/mt/mthread_pthread.c \
+    $(frama-c-config -print-share-path)/mt/mthread_queue.c \
+    -eva-verbose 0 -mt-extract html \
+    -eva-slevel 15 philo.c > output.txt
+*/
+/* -------------------------------------------------------------------------- */
 /* All-purpose example, implementing a slightly complexified version of the
    dining philosphers problems */
 
