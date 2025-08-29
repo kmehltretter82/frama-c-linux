@@ -70,17 +70,17 @@ module LatticeSingleTaint = struct
 
   let pp_locs_only fmt t =
     Format.fprintf fmt
-      "@[<v 2>Locations (data):@ @[<hov>%a@]@]@\n\
-       @[<v 2>Locations (control):@ @[<hov>%a@]@]"
+      "@[<v>@[<hv 2>Locations (data):@ @[<hov>%a@]@]@,\
+       @[<hv 2>Locations (control):@ @[<hov>%a@]@]@]"
       Zone.pretty t.locs_data
       Zone.pretty t.locs_control
 
   let pp_state fmt t =
     Format.fprintf fmt
-      "@[<v 2>Locations (data):@ @[<hov>%a@]@]@\n\
-       @[<v 2>Locations (control):@ @[<hov>%a@]@]@\n\
-       @[<v 2>Assume statements:@ @[<hov>%a@]@\n\
-       @[<v 2>Dependent call:@ %b@]"
+      "@[<v>@[<hv 2>Locations (data):@ @[<hov>%a@]@]@,\
+       @[<hv 2>Locations (control):@ @[<hov>%a@]@]@,\
+       @[<hv 2>Assume statements:@ @[<hov>%a@]@]@,\
+       @[<hv 2>Dependent call:@ @[<hov>%b@]@]@]"
       Zone.pretty t.locs_data
       Zone.pretty t.locs_control
       Stmt.Set.pretty t.assume_stmts
@@ -190,22 +190,19 @@ module LatticeMultiTaint = struct
     let hash t =
       fold (fun _ state acc -> LatticeSingleTaint.hash state + acc) t 0
 
-    let pp_locs_only fmt t =
-      Pretty_utils.pp_iter2 ~sep:"@ " ~between:": "
-        iter Format.pp_print_string LatticeSingleTaint.pp_locs_only fmt t
-
-    let pp_state fmt t =
-      let pp_per_taint namespace taint =
-        Format.pp_print_string fmt namespace;
-        Format.pp_print_newline fmt ();
-        LatticeSingleTaint.pp_state fmt taint
-      in
-      iter pp_per_taint t
+    let pp_per_taint fmt ~pp taint =
+      Format.fprintf fmt "@[%a@]" pp taint
 
     let pretty fmt t =
-      if Self.is_debug_key_enabled dkey_debug
-      then pp_state fmt t
-      else pp_locs_only fmt t
+      let pp =
+        if Self.is_debug_key_enabled dkey_debug
+        then LatticeSingleTaint.pp_state
+        else LatticeSingleTaint.pp_locs_only
+      in
+      Pretty_utils.pp_iter2 ~pre:"@[<v>" ~sep:"@," ~between:":@;<1 2>" iter
+        Format.pp_print_string
+        (pp_per_taint ~pp)
+        fmt t
 
     let join t1 t2 =
       let merge_per_key _key maybe_state1 maybe_state2 =

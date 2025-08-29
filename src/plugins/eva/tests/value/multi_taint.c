@@ -1,6 +1,7 @@
 /* run.config*
-   STDOPT: +" -eva-domains taint -eva-auto-taint -eva-no-taint-singletons"
+   STDOPT: +" -eva-domains taint -eva-msg-key=d-taint -eva-auto-taint -eva-no-taint-singletons"
 */
+#include "__fc_builtin.h"
 #include <stdio.h>
 
 void taint_simplify_singletons(int taint_var) {
@@ -28,6 +29,8 @@ void multi_taint_test(int* taint_var) {
   y = 10;
   /*@ \eva::taint test:y; */
   /*@ check !\tainted(auto:y); */
+
+  Frama_C_dump_each();
 }
 
 int main(void) {

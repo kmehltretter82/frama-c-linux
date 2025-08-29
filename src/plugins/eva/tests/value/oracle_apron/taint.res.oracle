@@ -1,6 +1,6 @@
 2d1
 < [eva:experimental] Warning: The taint domain is experimental.
-117c116,122
+107c106,112
 < [eva] taint.c:202: Reusing old results for call to taints
 ---
 > [eva] computing for function taints <- main.
@@ -10,7 +10,7 @@
 > [eva] Done for function Frama_C_interval
 > [eva] Recording results for taints
 > [eva] Done for function taints
-150c155,161
+138c143,149
 < [eva] taint.c:211: Reusing old results for call to taints
 ---
 > [eva] computing for function taints <- main.
@@ -20,10 +20,10 @@
 > [eva] Done for function Frama_C_interval
 > [eva] Recording results for taints
 > [eva] Done for function taints
-180,181d190
+167,168d177
 < [eva:loop-unroll:auto] taint.c:157: Automatic loop unrolling.
 < [eva:loop-unroll:partial] taint.c:157: loop not completely unrolled
-194c203,209
+180c189,195
 < [eva] taint.c:217: Reusing old results for call to taints
 ---
 > [eva] computing for function taints <- main.
