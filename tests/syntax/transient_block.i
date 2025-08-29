@@ -1,6 +1,6 @@
 /* run.config
  MODULE: @PTEST_NAME@
-   OPT: -kernel-warn-key transient-block=active
+   OPT: -kernel-warn-key transient-block=warning
 */
 
 void f(void) { }

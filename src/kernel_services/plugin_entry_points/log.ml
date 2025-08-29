@@ -762,11 +762,11 @@ let pp_warn_status fmt s =
   let s =
     match s with
     | Winactive -> "inactive"
-    | Wfeedback_once -> "feedback,once"
+    | Wfeedback_once -> "feedback-once"
     | Wfeedback -> "feedback"
-    | Wonce -> "once"
-    | Wactive ->   "active"
-    | Werror_once -> "error,once"
+    | Wonce -> "warning-once"
+    | Wactive -> "warning"
+    | Werror_once -> "error-once"
     | Werror -> "error"
     | Wabort -> "abort"
   in

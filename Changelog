@@ -18,6 +18,9 @@
 Open Source Release <next-release>
 ###############################################################################
 
+-   Kernel    [2025-08-29] In options -*-warn-key, statuses 'active', 'once'
+              and 'err-once' have been renamed 'warning', 'warning-once'
+              and 'error-once' respectively.
 o!  Kernel    [2025-07-22] Cil_types.Call now takes a lhost instead of an
               expression as node for the function being called.
 o!  Kernel    [2025-07-22] Uniformization of dummies for Cil datatypes. All

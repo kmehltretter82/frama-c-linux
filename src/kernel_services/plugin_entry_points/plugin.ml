@@ -648,12 +648,12 @@ struct
 
   let warn_status_of_string = function
     | "inactive" | "ignore" -> Log.Winactive
-    | "feedback" -> Log.Wfeedback
     | "feedback-once" -> Log.Wfeedback_once
-    | "once" -> Log.Wonce
-    | "active" -> Log.Wactive
-    | "err-once" -> Log.Werror_once
-    | "error" -> Log.Werror
+    | "feedback" -> Log.Wfeedback
+    | "warning-once" | "warn-once" | "once" -> Log.Wonce
+    | "warning" | "warn" | "active" -> Log.Wactive
+    | "error-once" | "err-once" -> Log.Werror_once
+    | "error" | "err" -> Log.Werror
     | "abort" -> Log.Wabort
     | s -> L.abort "Unknown warning category status `%s'" s
 
@@ -744,8 +744,9 @@ struct
         "set warning status for category <k1> to <s1>,...,<kn> to <sn>. Use "
         ^ warn_category_optname
         ^ " help to get a list of available categories, and * to enable \
-           all categories. Possible statuses are inactive, feedback-once, \
-           once, active, error-once, error, and abort. Defaults to active"
+           all categories. Possible statuses are inactive, feedback, warning, \
+           error, abort, feedback-once, warning-once, error-once. \
+           Defaults to warning."
     end)
 
   let () =

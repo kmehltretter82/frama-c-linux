@@ -1,6 +1,6 @@
 /* run.config
   MODULE: @PTEST_NAME@
-  OPT: -kernel-warn-key=annot-error=active -print
+  OPT: -kernel-warn-key=annot-error=warning -print
 */
 
 /*@ \test::bhv_foo must_replace(x); */

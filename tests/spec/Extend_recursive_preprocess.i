@@ -1,6 +1,6 @@
 /* run.config
   MODULE: @PTEST_NAME@
-  OPT: -kernel-warn-key=annot-error=active -print
+  OPT: -kernel-warn-key=annot-error=warning -print
 */
 
 /*@ \test::gl_foo foo1 {
@@ -31,4 +31,4 @@
 
 }*/
 
-//frama-c -no-autoload-plugins -kernel-warn-key=annot-error=active -print -load-script Extend_recursive_preprocess.ml Extend_recursive_preprocess.i
+//frama-c -no-autoload-plugins -kernel-warn-key=annot-error=warning -print -load-script Extend_recursive_preprocess.ml Extend_recursive_preprocess.i

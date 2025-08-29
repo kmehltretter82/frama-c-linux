@@ -1,5 +1,5 @@
 /* run.config*
-   STDOPT: +"-print -inout -eva-warn-key assigns:missing=active"
+   STDOPT: +"-print -inout -eva-warn-key assigns:missing=warning"
 */
 volatile int v;
 int G;

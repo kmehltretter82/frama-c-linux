@@ -1,6 +1,6 @@
 /* run.config
   MODULE: @PTEST_NAME@
-  OPT: -copy -kernel-warn-key=annot-error=active
+  OPT: -copy -kernel-warn-key=annot-error=warning
 */
 
 /*@ \test::foo x == 0;

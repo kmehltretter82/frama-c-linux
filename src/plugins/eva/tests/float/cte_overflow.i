@@ -1,5 +1,5 @@
 /* run.config*
-   STDOPT: #"-kernel-warn-key parser:decimal-float=active"
+   STDOPT: #"-kernel-warn-key parser:decimal-float=warning"
 */
 
 int volatile v;

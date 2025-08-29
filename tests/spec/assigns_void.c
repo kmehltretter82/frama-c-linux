@@ -1,5 +1,5 @@
 /* run.config
- OPT: -print -kernel-warn-key=annot-error=active
+ OPT: -print -kernel-warn-key=annot-error=warning
 PLUGIN: eva,inout,scope
  OPT: -eva @EVA_CONFIG@ -main g -print -no-annot
  */

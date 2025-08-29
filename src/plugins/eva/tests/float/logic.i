@@ -1,6 +1,6 @@
 /* run.config*
-   STDOPT: #"-kernel-warn-key parser:decimal-float=active -float-hex"
-   STDOPT: #"-kernel-warn-key parser:decimal-float=active -float-hex -warn-special-float none"
+   STDOPT: #"-kernel-warn-key parser:decimal-float=warning -float-hex"
+   STDOPT: #"-kernel-warn-key parser:decimal-float=warning -float-hex -warn-special-float none"
 */
 
 volatile int v;
