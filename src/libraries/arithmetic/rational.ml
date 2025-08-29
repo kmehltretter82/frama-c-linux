@@ -19,6 +19,10 @@ let of_float = Q.of_float
 let to_float = Q.to_float
 let of_int = Q.of_int
 
+let represents ~scalar ~in_format =
+  let f = Typed_float.represents ~float:(to_float scalar) ~in_format in
+  Q.of_float (Typed_float.to_float f)
+
 let is_valid q =
   match Q.classify q with
   | Q.UNDEF -> false

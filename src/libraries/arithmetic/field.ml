@@ -48,6 +48,10 @@ module type S = sig
   val to_float  : scalar -> float
   val of_string : string -> scalar
 
+  (** {2 Round to a valid number in a given floating point format.} *)
+
+  val represents : scalar:scalar -> in_format:'f Typed_float.format -> scalar
+
   (** {2 Standard arithmetic unary operations.} *)
 
   val neg : scalar -> scalar

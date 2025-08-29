@@ -547,19 +547,32 @@ module Make (Model : Modeling) = struct
 
 
 
+  let represents ~exact ~in_format =
+    let approx = Scalar.represents ~scalar:exact ~in_format in
+    let absolute = Scalar.(approx - exact) in
+    let relative = Scalar.(if exact = zero then zero else absolute / exact) in
+    let exact = Exact.singleton exact in
+    let absolute = Absolute.singleton absolute in
+    let relative = Relative.singleton relative in
+    Repr { exact ; absolute ; relative ; format = in_format }
+
   let constant _ _ = function
     | CInt64 _ | CTopInt _ | CString _ | CChr _ | CEnum _ -> Top
-    | CReal (f, fkind, str) ->
-      let open Scalar in
-      let approx = of_float f in
+    | CReal (f, fkind, None) ->
       let Format format = format_of_fkind fkind in
-      let exact  = Option.(map of_string str |> value ~default:approx) in
-      let relative = if exact = zero then zero else approx / exact - one in
-      let absolute = approx - exact in
-      let exact    = Exact.singleton    exact    in
-      let absolute = Absolute.singleton absolute in
-      let relative = Relative.singleton relative in
+      let exact = Scalar.of_float f |> Exact.singleton in
+      let absolute = Absolute.zero in
+      let relative = Relative.zero in
+      Self.warning
+        "No exact representation for constant %f. \
+         Assuming its floating point representation \
+         is exact in format %a."
+         f Typed_float.pretty_format format ;
       Repr { exact ; absolute ; relative ; format }
+    | CReal (_, fkind, Some str) ->
+      let Format format = format_of_fkind fkind in
+      let exact = Scalar.of_string str in
+      represents ~exact ~in_format:format
 
   let forward_unop context _ unop value =
     match unop with
@@ -577,6 +590,26 @@ module Make (Model : Modeling) = struct
     | Lt | Gt | Le | Ge | Eq | Ne -> `Value top
     | BAnd | BXor | BOr | LAnd | LOr -> `Value top
 
+  let is_an_exact_constant_in_format ~format r =
+    let exact = Exact.bounds r.exact in
+    let abs = Absolute.bounds r.absolute in
+    let rel = Relative.bounds r.relative in
+    let limit = Typed_float.largest_finite_float_of ~format in
+    let limit = Typed_float.to_float limit |> Scalar.of_float in
+    let is_const b = Scalar.(b.lower = b.upper) in
+    let in_format b = Scalar.(neg limit <= b.lower && b.upper <= limit) in
+    if is_const exact && in_format exact && is_const abs && is_const rel
+    then Some (exact.lower)
+    else None
+
+  let perform_imprecise_cast ~dest r =
+    let open Computation.Operators in
+    let expr = Cast r.exact and r = lift r in
+    let* exact = exact r and* approx = approx r in
+    let relative = Relative.(relative r + lift one) in
+    let absolute = absolute r in
+    add_elementary expr exact approx absolute relative dest
+
   let forward_cast context ~src_type ~dst_type value =
     let open Eval_typ in
     match value, src_type, dst_type with
@@ -591,13 +624,9 @@ module Make (Model : Modeling) = struct
       | Single, (Single | Double) -> `Value default
       | Double, Double -> `Value default
       | Double, Single ->
-        let result =
-          let open Computation.Operators in
-          let expr = Cast r.exact and r = lift r in
-          let* exact = exact r and* approx = approx r in
-          let absolute = absolute r and relative = relative r in
-          add_elementary expr exact approx absolute relative dest
-        in `Value (resolve context result)
+        match is_an_exact_constant_in_format ~format:Single r with
+        | None -> `Value (perform_imprecise_cast ~dest r |> resolve context)
+        | Some r -> `Value (represents ~exact:r ~in_format:Single)
 
 
 
