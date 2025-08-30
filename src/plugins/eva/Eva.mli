@@ -971,6 +971,9 @@ module Statistics: sig
 
   (** {2 Registered statistics } *)
 
+  (** Max heap size in kilobytes until the statistics are exported. *)
+  val memory_usage : (unit, int) t
+
   (** Number of alarms emitted by the analysis. *)
   val alarm_count : (unit, int) t
 
@@ -1023,6 +1026,10 @@ module Statistics: sig
 
   (** Registers a statistic tied to statements. *)
   val register_statement_stat : string -> 'ty typ -> (Cil_types.stmt, 'ty) t
+
+  (** Add a hook function that will be called when the statistics are exported.
+      Is can be used to update the statistics before they are actually used. *)
+  val add_compute_hook : (unit -> unit) -> unit
 
 
   (** {2 Statistics retrieval } *)
