@@ -22,10 +22,9 @@
 [eva] taint.c:35: 
   Frama_C_dump_each:
   # taint:
-  default: Locations (data):
-             tainted; t; u; x
-  Locations (control):
-    w; buf[0..1]
+  default:
+    Locations (data): tainted; t; u; x
+    Locations (control): w; buf[0..1]
   ==END OF DUMP==
 [eva] Recording results for taint_basic
 [eva] Done for function taint_basic
@@ -35,58 +34,51 @@
 [eva] taint.c:50: 
   Frama_C_dump_each:
   # taint:
-  default: Locations (data):
-             \nothing
-  Locations (control):
-    \nothing
+  default:
+    Locations (data): \nothing
+    Locations (control): \nothing
   ==END OF DUMP==
 [eva] taint.c:53: 
   Frama_C_dump_each:
   # taint:
-  default: Locations (data):
-             \nothing
-  Locations (control):
-    \nothing
+  default:
+    Locations (data): \nothing
+    Locations (control): \nothing
   ==END OF DUMP==
 [eva] taint.c:50: 
   Frama_C_dump_each:
   # taint:
-  default: Locations (data):
-             x
-  Locations (control):
-    \nothing
+  default:
+    Locations (data): x
+    Locations (control): \nothing
   ==END OF DUMP==
 [eva] taint.c:53: 
   Frama_C_dump_each:
   # taint:
-  default: Locations (data):
-             x
-  Locations (control):
-    y
+  default:
+    Locations (data): x
+    Locations (control): y
   ==END OF DUMP==
 [eva] taint.c:50: 
   Frama_C_dump_each:
   # taint:
-  default: Locations (data):
-             x
-  Locations (control):
-    x; y
+  default:
+    Locations (data): x
+    Locations (control): x; y
   ==END OF DUMP==
 [eva] taint.c:53: 
   Frama_C_dump_each:
   # taint:
-  default: Locations (data):
-             x
-  Locations (control):
-    x; y
+  default:
+    Locations (data): x
+    Locations (control): x; y
   ==END OF DUMP==
 [eva] taint.c:63: 
   Frama_C_dump_each:
   # taint:
-  default: Locations (data):
-             x
-  Locations (control):
-    x; y
+  default:
+    Locations (data): x
+    Locations (control): x; y
   ==END OF DUMP==
 [eva] Recording results for taint_assume_1
 [eva] Done for function taint_assume_1
@@ -95,10 +87,9 @@
 [eva] taint.c:79: 
   Frama_C_dump_each:
   # taint:
-  default: Locations (data):
-             x
-  Locations (control):
-    x; y
+  default:
+    Locations (data): x
+    Locations (control): x; y
   ==END OF DUMP==
 [eva] Recording results for taint_assume_2
 [eva] Done for function taint_assume_2
@@ -107,10 +98,9 @@
 [eva] taint.c:91: 
   Frama_C_dump_each:
   # taint:
-  default: Locations (data):
-             x; y; t
-  Locations (control):
-    \nothing
+  default:
+    Locations (data): x; y; t
+    Locations (control): \nothing
   ==END OF DUMP==
 [eva] Recording results for taint_undet_locs
 [eva] Done for function taint_undet_locs
@@ -128,10 +118,9 @@
 [eva] taint.c:110: 
   Frama_C_dump_each:
   # taint:
-  default: Locations (data):
-             t
-  Locations (control):
-    x
+  default:
+    Locations (data): t
+    Locations (control): x
   ==END OF DUMP==
 [eva] Recording results for taint_goto_1
 [eva] Done for function taint_goto_1
@@ -140,10 +129,9 @@
 [eva] taint.c:130: 
   Frama_C_dump_each:
   # taint:
-  default: Locations (data):
-             t
-  Locations (control):
-    x; y
+  default:
+    Locations (data): t
+    Locations (control): x; y
   ==END OF DUMP==
 [eva] Recording results for taint_goto_2
 [eva] Done for function taint_goto_2
@@ -155,10 +143,9 @@
 [eva] taint.c:35: 
   Frama_C_dump_each:
   # taint:
-  default: Locations (data):
-             tainted; t; u; x; t
-  Locations (control):
-    t; u; w; x; y; buf[0..1]
+  default:
+    Locations (data): tainted; t; u; x; t
+    Locations (control): t; u; w; x; y; buf[0..1]
   ==END OF DUMP==
 [eva] Recording results for taint_basic
 [eva] Done for function taint_basic
@@ -184,10 +171,9 @@
 [eva] taint.c:165: 
   Frama_C_dump_each:
   # taint:
-  default: Locations (data):
-             tainted; t; y
-  Locations (control):
-    w
+  default:
+    Locations (data): tainted; t; y
+    Locations (control): w
   ==END OF DUMP==
 [eva] Recording results for taint_infinite_while
 [eva] Done for function taint_infinite_while
