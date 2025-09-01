@@ -906,13 +906,18 @@ let do_prover_detect () =
         let name = String.lowercase_ascii p.prover_name in
         match Why3Provers.lookup name with
         | Some p' when Prover.equal p p' -> Format.fprintf fmt " (%s)" name
-        | _ -> ()
-      in List.iter
+        | _ -> () in
+      let print_ce fmt p =
+        match Why3Provers.with_counter_examples p with
+        | Some _ -> Format.fprintf fmt " (counter-examples)"
+        | _ -> () in
+      List.iter
         (fun p ->
-           Wp_parameters.result "Prover %-10s %-6s [%s]%a"
+           Wp_parameters.result "Prover %-10s %-6s [%s]%a%a"
              p.prover_name p.prover_version
              (Why3Provers.ident_wp p)
              print_shortcut p
+             print_ce p
         ) provers
 
 (* ------------------------------------------------------------------------ *)
