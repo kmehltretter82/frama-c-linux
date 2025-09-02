@@ -164,7 +164,7 @@ README* header_spec=.ignore
 
 *.pdf header_spec=.ignore
 
-.tex header_spec=.ignore
+*.tex header_spec=.ignore
 *.sty header_spec=.ignore
 *.bib header_spec=.ignore
 
