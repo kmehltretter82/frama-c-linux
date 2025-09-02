@@ -115,6 +115,30 @@ int __fc_fpclassify(double x);
 
 
 /*@
+  assigns \result \from x;
+  ensures res_nonzero_if_negative: \sign(x) == \Negative <==> \result != 0;
+*/
+__FC_EXTERN_FOR_MACRO(signbit) int __fc_signbitf(float x);
+
+/*@
+  assigns \result \from x;
+  ensures res_nonzero_if_negative: \sign(x) == \Negative <==> \result != 0;
+*/
+__FC_EXTERN_FOR_MACRO(signbit) int __fc_signbit(double x);
+
+/*@
+  assigns \result \from x;
+  ensures res_nonzero_if_negative: \sign(x) == \Negative <==> \result != 0;
+*/
+__FC_EXTERN_FOR_MACRO(signbit) int __fc_signbitl(long double x);
+
+#define signbit(x) _Generic(x,                                  \
+                            float: __fc_signbitf(x),            \
+                            double: __fc_signbit(x),            \
+                            long double: __fc_signbitl(x))
+
+
+/*@
   assigns errno, \result \from x;
   behavior normal:
     assumes in_domain: \is_finite(x) && \abs(x) <= 1;

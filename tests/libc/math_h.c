@@ -103,8 +103,8 @@ int main() {
   TEST_FUN2_FST_CONSTS(float,ldexpf,f_,100000,_pos_inf);
   //TEST_FUN2_FST_CONSTS(long double,ldexpl,ld_,100000,_pos_inf);
 
-#ifdef NONFINITE
   int r;
+#ifdef NONFINITE
   r = isfinite(pi);
   //@ assert r;
   r = isfinite(large);
@@ -120,4 +120,23 @@ int main() {
 #endif
   //@ assert !r;
 #endif
+
+  r = signbit(0.0f);
+  //@ assert r == 0;
+  r = signbit(-0.0);
+  //@ assert r != 0;
+  r = signbit(1.0);
+  //@ assert r == 0;
+  r = signbit(-21389.75f);
+  //@ assert r != 0;
+#ifdef NONFINITE
+  r = signbit(INFINITY);
+  //@ assert r == 0;
+  r = signbit(-INFINITY);
+  //@ assert r != 0;
+#ifndef NONAN
+  r = signbit(NAN);
+#endif
+#endif
+
 }

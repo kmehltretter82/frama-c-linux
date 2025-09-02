@@ -1086,7 +1086,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/math.h, line 328)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/math.h, line 352)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -1118,7 +1118,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/math.h, line 1401)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/math.h, line 1425)
             assigns \result \from x;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
