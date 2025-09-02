@@ -226,6 +226,14 @@ module Alarm_cache =
       let size = 35
     end)
 
+(* Has the given alarm already been emitted by the current analysis?
+   For now, alarms emitted at Kglobal are bound to the first statement of the
+   main function by the kernel, so we also need to check this case. *)
+let already_emitted stmt alarm =
+  Alarm_cache.mem (Kstmt stmt, alarm)
+  || Kernel_function.is_first_stmt (fst (Globals.entry_point ())) stmt
+     && Alarm_cache.mem (Kglobal, alarm)
+
 let loc = function
   | Cil_types.Kglobal -> (* can occur in case of obscure bugs (already happened)
                             with wacky initializers. Module Initial_state of

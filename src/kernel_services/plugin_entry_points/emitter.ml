@@ -484,6 +484,16 @@ let get e =
 
 module ED = D (* for debugging *)
 
+(* Reference for functions removing bindings related to a given emitter
+   in all tables built by the [Make_table] functor below. *)
+let clear_emitter_ref = ref []
+
+let register_clear_emitter f =
+  clear_emitter_ref := f :: !clear_emitter_ref
+
+let clear emitter =
+  List.iter (fun f -> f emitter) !clear_emitter_ref
+
 module Make_table
     (H: Datatype.Hashtbl)
     (E: sig
@@ -635,7 +645,21 @@ struct
       with Not_found ->
         ()
     end;
-    H.remove !state key;
+    H.remove !state key
+
+  (* Removes all bindings related to the given emitter. *)
+  let clear_emitter emitter =
+    let is_emitter e = ED.equal emitter (E.get e) in
+    let clear key tbl =
+      let remove emitter elt =
+        E.Hashtbl.remove tbl emitter;
+        apply_hooks_on_remove emitter key elt
+      in
+      E.Hashtbl.iter (fun e elt -> if is_emitter e then remove e elt) tbl
+    in
+    iter clear
+
+  let () = register_clear_emitter clear_emitter
 
 end
 

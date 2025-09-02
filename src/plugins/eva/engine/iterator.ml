@@ -354,10 +354,19 @@ module Make_Dataflow
   let transfer_annotations (stmt : stmt) ~(record : bool)
     : state -> state list =
     let annots =
-      (* We do not interpret annotations that come from statement contracts
-         and everything previously emitted by Value (currently, alarms) *)
+      let already_emitted code_annotation =
+        (* For now, Eva only emits alarms with its default emitter. *)
+        match Alarms.find code_annotation with
+        | Some alarm -> Alarmset.already_emitted stmt alarm
+        | None -> false
+      in
+      (* We do not interpret annotations that come from statement contracts,
+         alarms previously emitted by the current Eva analysis, or annotations
+         emitted by Eva as export for other plug-ins. *)
       let filter e ca =
-        not (Logic_utils.is_contract ca || Emitter.equal e Eva_utils.emitter)
+        not (Logic_utils.is_contract ca
+             || Emitter.equal e Eva_utils.emitter && already_emitted ca
+             || Emitter.equal e Eva_utils.export_emitter)
       in
       List.map fst (Annotations.code_annot_emitter ~filter stmt)
     in

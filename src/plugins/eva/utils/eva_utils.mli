@@ -10,8 +10,15 @@ open Cil_types
 
 (** {2 Others} *)
 
-(* TODO: Document the rest of this file. *)
+(** Emitter of alarms and logical statuses evaluated by the analysis. *)
 val emitter : Emitter.t
+
+(** Emitter of code annotations stating the properties inferred by an analysis,
+    intended for other plug-ins. Used by the {!Export} module. *)
+val export_emitter : Emitter.t
+
+(* TODO: Document the rest of this file. *)
+
 val get_slevel : Kernel_function.t -> Parameters.SlevelFunction.value
 val get_subdivision: stmt -> int
 val pretty_actuals :

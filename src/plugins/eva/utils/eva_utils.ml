@@ -10,12 +10,14 @@ open Cil_types
 
 (* Assertions emitted during the analysis *)
 
-let emitter =
+let create_emitter =
   Emitter.create
-    "Eva"
-    [ Emitter.Property_status; Emitter.Alarm ]
     ~correctness:Parameters.parameters_correctness
     ~tuning:Parameters.parameters_tuning
+
+let emitter = create_emitter "Eva" [ Emitter.Property_status; Emitter.Alarm ]
+let export_emitter = create_emitter "Eva_export" [ Emitter.Code_annot ]
+
 
 let get_slevel kf =
   try Parameters.SlevelFunction.find kf

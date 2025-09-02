@@ -48,6 +48,9 @@
     [2][0..1] ∈ {2}
     [2][2..4] ∈ {0}
   G ∈ {99}
+[eva] inversion2.i:12: assertion 'Eva,division_by_zero' got status valid.
+[eva:alarm] inversion2.i:12: Warning: 
+  assertion 'Eva,division_by_zero' got status unknown.
 [eva:alarm] inversion2.i:12: Warning: division by zero. assert TT[i][j] ≢ 0;
 [eva] Recording results for main
 [eva] Done for function main

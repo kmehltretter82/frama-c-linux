@@ -96,9 +96,13 @@ int main(void)
 [eva] computing for function f <- main.
   Called from declaration.c:27.
 [eva:alarm] declaration.c:6: Warning: 
+  assertion 'Eva,signed_overflow' got status unknown.
+[eva:alarm] declaration.c:6: Warning: 
   signed overflow. assert X + 1 ≤ 2147483647;
 [eva] computing for function h <- f <- main.
   Called from declaration.c:8.
+[eva:alarm] declaration.c:22: Warning: 
+  assertion 'Eva,signed_overflow' got status unknown.
 [eva:alarm] declaration.c:22: Warning: 
   signed overflow. assert X + 2 ≤ 2147483647;
 [eva] Recording results for h
@@ -107,6 +111,8 @@ int main(void)
 [eva] Done for function f
 [eva] computing for function g <- main.
   Called from declaration.c:28.
+[eva:alarm] declaration.c:12: Warning: 
+  assertion 'Eva,signed_overflow' got status unknown.
 [eva:alarm] declaration.c:12: Warning: 
   signed overflow. assert X + 1 ≤ 2147483647;
 [eva] computing for function h <- g <- main.

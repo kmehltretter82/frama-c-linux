@@ -44,6 +44,7 @@ export default function EvaTools(
     startAnalysis();
   };
   const abort = (): void => { Server.send(Eva.abort, null); };
+  const clear = (): void => { Server.send(Eva.clear, null); };
   const syncFromFC = (): void => { remote.reset(); };
   const syncToFC = (): void => { remote.commit(); };
 
@@ -63,6 +64,13 @@ export default function EvaTools(
           size={iconSize}
           disabled={evaComputed !== "computing"}
           onClick={abort}
+        />
+        <IconButton
+          icon="CIRC.CLOSE"
+          title="Clear Eva results, including alarms and statuses"
+          size={iconSize}
+          enabled={evaComputed !== "computing"}
+          onClick={clear}
         />
         <IconButton
           icon="RELOAD"
