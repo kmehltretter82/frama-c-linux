@@ -6045,11 +6045,6 @@ and is_complete_agg_member ~allowZeroSizeArrays ?last_field t =
   isCompleteType ~allowZeroSizeArrays ?last_field t &&
   (allowZeroSizeArrays || not (has_flexible_array_member t))
 
-(* last_field optional argument can only be used internally. Do not allow
-   callers to mess with it. *)
-let isCompleteType ?allowZeroSizeArrays t =
-  isCompleteType ?allowZeroSizeArrays t
-
 let pointer_decay t =
   let t' = Ast_types.unroll t in
   match t'.tnode with
