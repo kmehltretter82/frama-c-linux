@@ -154,14 +154,7 @@ let register_plugin_parameters plugin =
   Hashtbl.iter register_group plugin.Plugin.p_parameters
 
 (* Automatically registers requests for all Frama-C parameters. *)
-let register_all () =
-  (* For now, only registers parameters from the kernel and some plugins. *)
-  let whitelist = [ "kernel"; "Eva"; "WP"; "rtegen" ] in
-  let register plugin =
-    if List.mem plugin.Plugin.p_name whitelist
-    then register_plugin_parameters plugin
-  in
-  Plugin.iter_on_plugins register
+let register_all () = Plugin.iter_on_plugins register_plugin_parameters
 
 let apply_once =
   let once = ref true in
