@@ -42,11 +42,11 @@
   ==END OF DUMP==
 [eva] computing for function malloc <- main.
   Called from linked_list.c:41.
-[eva:alarm] FRAMAC_SHARE/libc/stdlib.h:564: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/stdlib.h:624: Warning: 
   function malloc, behavior allocation: postcondition 'allocation' got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/stdlib.h:565: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/stdlib.h:625: Warning: 
   function malloc, behavior allocation: postcondition 'aligned' got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/stdlib.h:566: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/stdlib.h:626: Warning: 
   function malloc, behavior allocation: postcondition 'errno_same' got status unknown.
 [eva] Recording results for malloc
 [eva] Done for function malloc
