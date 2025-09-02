@@ -24,7 +24,8 @@ mk_tests {
       @src/plugins/report/tests/ptests \
       @src/plugins/region/tests/ptests \
       @src/plugins/rte/tests/ptests \
-      @src/plugins/server/tests/ptests
+      @src/plugins/server/tests/ptests \
+      @src/plugins/volatile/tests/ptests
     dune runtest -j1 \
       src/plugins/server
   '';

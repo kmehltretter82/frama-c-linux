@@ -271,8 +271,7 @@ external-plugins:
           "pathcrawler",
           "security",
           "synchrone",
-          "unitcheck",
-          "volatile"
+          "unitcheck"
         ]
 
 ivette-plugins:
