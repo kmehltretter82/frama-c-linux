@@ -896,23 +896,28 @@ let () = Cmdline.run_after_configuring_stage Why3Provers.configure
 
 let do_prover_detect () =
   if Wp_parameters.Detect.get () && not @@ Wp_parameters.is_interactive () then
-    let provers = Why3Provers.provers () in
+    let provers =
+      List.filter Why3Provers.is_mainstream @@ Why3Provers.provers () in
     if provers = [] then
       Wp_parameters.result "No Why3 provers detected."
     else
       let open Why3.Whyconf in
-      let shortcuts = get_prover_shortcuts (Why3Provers.config ()) in
-      let print_prover_shortcuts_for fmt p =
-        Why3.Wstdlib.Mstr.iter
-          (fun name p' -> if Prover.equal p p' then
-              Format.fprintf fmt "%s|" name)
-          shortcuts in
+      let print_shortcut fmt p =
+        let name = String.lowercase_ascii p.prover_name in
+        match Why3Provers.lookup name with
+        | Some p' when Prover.equal p p' -> Format.fprintf fmt " (%s)" name
+        | _ -> () in
+      let print_ce fmt p =
+        match Why3Provers.with_counter_examples p with
+        | Some _ -> Format.fprintf fmt " (counter-examples)"
+        | _ -> () in
       List.iter
         (fun p ->
-           Wp_parameters.result "Prover %10s %-6s [%a%s]"
+           Wp_parameters.result "Prover %-10s %-6s [%s]%a%a"
              p.prover_name p.prover_version
-             print_prover_shortcuts_for p
              (Why3Provers.ident_wp p)
+             print_shortcut p
+             print_ce p
         ) provers
 
 (* ------------------------------------------------------------------------ *)
