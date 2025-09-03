@@ -102,17 +102,26 @@ let acc_deps object_map target_map targets =
                 aux (acc_res, acc_seen) r
               | Some o ->
                 if o.lang <> "C" then begin
-                  Kernel.warning ~wkey:Kernel.wkey_mopsa_db_non_c ~once:true
-                    "ignoring non-C (%s) dependency: %a@\n(setting this \
-                     warning category to inactive or feedback will try to \
-                     parse it nevertheless)"
-                    o.lang Filepath.pretty t;
-                  let force =
-                    match Kernel.(get_warn_status wkey_mopsa_db_non_c) with
-                    | Log.(Wfeedback | Wfeedback_once | Winactive) -> true
-                    | _ -> false
+                  let suffixes = File.get_suffixes () in
+                  let suffix = Filename.extension (o.source :> string) in
+                  let try_parse =
+                    if List.mem suffix suffixes then true
+                    else begin
+                      Kernel.warning ~wkey:Kernel.wkey_mopsa_db_non_c ~once:true
+                        "ignoring non-C (%s) dependency: %a@\n(setting this \
+                         warning category to inactive or feedback will try to \
+                         parse it nevertheless)"
+                        o.lang Filepath.pretty t;
+                      let force =
+                        match Kernel.(get_warn_status wkey_mopsa_db_non_c) with
+                        | Log.(Wfeedback | Wfeedback_once | Winactive) -> true
+                        | _ -> false
+                      in
+                      force
+                    end
                   in
-                  if force then aux ((o.source, o.args) :: acc_res, acc_seen) r
+                  if try_parse then
+                    aux ((o.source, o.args) :: acc_res, acc_seen) r
                   else aux (acc_res, acc_seen) r
                 end else
                   aux ((o.source, o.args) :: acc_res, acc_seen) r

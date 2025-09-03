@@ -29,3 +29,10 @@
     ../../src/init/boot/empty_file.exe
   )
 )
+
+(cram
+  (applies_to langs)
+  (deps
+    ../../src/init/boot/empty_file.exe
+  )
+)
