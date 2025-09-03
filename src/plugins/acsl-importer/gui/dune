@@ -1,0 +1,18 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;                                                                        ;;
+;;  SPDX-License-Identifier LGPL-2.1                                      ;;
+;;  Copyright (C)                                                         ;;
+;;  CEA (Commissariat à l'énergie atomique et aux énergies alternatives)  ;;
+;;                                                                        ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(library
+ (optional)
+ (name register_gui)
+ (public_name frama-c-acsl-importer.gui)
+ (flags -open Frama_c_kernel -open Frama_c_gui -open Acsl_importer :standard -w -9)
+ (libraries frama-c-acsl-importer.core frama-c.kernel frama-c.gui))
+
+(plugin
+  (optional)
+  (name acsl-importer-gui) (libraries frama-c-acsl-importer.gui) (site (frama-c plugins_gui)))
