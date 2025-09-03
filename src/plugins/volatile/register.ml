@@ -15,6 +15,21 @@ module FILE = File
 open Cil_types
 open Cil_datatype
 
+let dkey_binding =
+  Options.register_category
+    ~help:"Prints debug messages related to volatile operations"
+    "binding"
+
+let dkey_binding_table =
+  Options.register_category
+    ~help:"Prints debug messages related to volatile operations on internal tables"
+    "binding-table"
+
+let dkey_volatile_table =
+  Options.register_category
+    ~help:"Prints Volatile internal tables"
+    "volatile-table"
+
 let typename (t:typ) =
   let typename = Pretty_utils.to_string Printer.pp_typ t in
   let blank = ref false
@@ -36,11 +51,6 @@ let typename (t:typ) =
   else
     typename
 
-module BindingKey=
-struct let dkey = Options.register_category "binding" end
-
-module BindingTableKey=
-struct let dkey = Options.register_category "binding-table" end
 
 (* -------------------------------------------------------------------------- *)
 (* --- Global Volatile Annotation tables                                  --- *)
@@ -170,7 +180,9 @@ module BA_TBL = struct
     let ret,args,is_varg_arg,_attrib = Cil.splitFunctionType ty in
     let ret_type = ret in
     let volatile_ret_type = Ast_types.add_attributes [("volatile",[])] ret in
-    BindingKey.(Options.debug ~level:2 ~dkey "Verifying prototype of function %s: %a@." fct.Cil_types.vorig_name Printer.pp_typ ty) ;
+    Options.debug ~level:2 ~dkey:dkey_binding
+      "Verifying prototype of function %s: %a@."
+      fct.Cil_types.vorig_name Printer.pp_typ ty;
     match is_wr_access, args with
     | false, Some [_,arg1,_] when
         (not (Ast_types.is_void ret || is_varg_arg))
@@ -196,7 +208,10 @@ module BA_TBL = struct
         && Typ.equal (Ast_types.direct_pointed_type arg1) ret_type
         && Ast_types.is_volatile ret
       -> true (* matching prototype: T fct (T *arg1, T arg2) when T has some volatile attr *)
-    | _, _ -> BindingKey.(Options.debug ~level:2 ~dkey "Invalid prototype of function %s@." fct.Cil_types.vorig_name) ;
+    | _, _ ->
+      Options.debug ~level:2 ~dkey:dkey_binding
+        "Invalid prototype of function %s@."
+        fct.Cil_types.vorig_name;
       false
 
   let build_kf_table kf_tbl =
@@ -213,7 +228,8 @@ module BA_TBL = struct
       let may_add_vi ~is_wr_access kf_tbl kf_name vi_kf =
         if filter_kf_prototype vi_kf ~is_wr_access then
           begin
-            BindingTableKey.(Options.debug ~level:2 ~dkey "Adding function into the default binding table: %s@." kf_name);
+            Options.debug ~level:2 ~dkey:dkey_binding_table
+              "Adding function into the default binding table: %s@." kf_name;
             Datatype.String.Hashtbl.add (get_tbl_access kf_tbl ~is_wr_access) kf_name vi_kf
           end;
       in
@@ -278,7 +294,9 @@ module B_MAP = struct
     let volatile_ret_type =
       Ast_types.add_attributes [("volatile",[])] ret_type
     in
-    BindingKey.(Options.debug ~level:2 ~dkey "Verifying prototype of function %s: %a@." fct.Cil_types.vorig_name Printer.pp_typ ty) ;
+    Options.debug ~level:2 ~dkey:dkey_binding
+      "Verifying prototype of function %s: %a@."
+      fct.Cil_types.vorig_name Printer.pp_typ ty;
     let result is_wr_access arg1 =
       Some (is_wr_access, (Ast_types.direct_pointed_type arg1))
     in match args with
@@ -532,31 +550,43 @@ let do_pointer_call ~index ~transform f es ~loc =
 (*-------------------------------------------------------------------------*)
 
 let typename_access (t:typ) ~is_wr_access =
-  let typename = typename t
-  in let r = (Options.BindingPrefix.get ()) ^ (if is_wr_access then "Wr_" else "Rd_") ^ typename
-  in BindingKey.(Options.debug ~dkey "Looking for function %s@." r) ; r
+  let typename = typename t in
+  let r =
+    (Options.BindingPrefix.get ())
+    ^ (if is_wr_access then "Wr_" else "Rd_")
+    ^ typename
+  in
+  Options.debug ~dkey:dkey_binding "Looking for function %s@." r;
+  r
 
 let find_typename kf_tbl typ ~is_wr_access =
-  let kf_tbl = match !kf_tbl with
+  let kf_tbl =
+    match !kf_tbl with
     | None -> BA_TBL.build_kf_table kf_tbl
     | Some (kf_tbl) -> kf_tbl
-  in let rec find_fct typ =
-       try
-         let typ = Ast_types.remove_attributes_for_c_cast typ in
-         Datatype.String.Hashtbl.find (BA_TBL.get_tbl_access ~is_wr_access kf_tbl) (typename_access typ ~is_wr_access)
-       with Not_found -> (* Unroll the typedef until finding one function into the kf table. *)
-       match typ.tnode with
-       | TNamed r -> find_fct ((*Cil.typeAddAttributes _a'*) r.ttype)
-       | _ -> raise Not_found
-  in let fct = (* Looking from the type name *)
-       BindingKey.(Options.debug ~level:2 ~dkey "Looking for a default binding from the type name: %a@." Printer.pp_typ typ);
-       find_fct typ
+  in
+  let rec find_fct typ =
+    try
+      let typ = Ast_types.remove_attributes_for_c_cast typ in
+      Datatype.String.Hashtbl.find (BA_TBL.get_tbl_access ~is_wr_access kf_tbl) (typename_access typ ~is_wr_access)
+    with Not_found -> (* Unroll the typedef until finding one function into the kf table. *)
+    match typ.tnode with
+    | TNamed r -> find_fct ((*Cil.typeAddAttributes _a'*) r.ttype)
+    | _ -> raise Not_found
+  in
+  let fct = (* Looking from the type name *)
+    Options.debug ~level:2 ~dkey:dkey_binding
+      "Looking for a default binding from the type name: %a@."
+      Printer.pp_typ typ;
+    find_fct typ
   in (* Verifying the protyping within the type of the volatile access. *)
   let ty = fct.Cil_types.vtype in
   assert (Ast_types.is_fun ty) ;
   let ret,_args,_is_varg_arg,_attrib = Cil.splitFunctionType ty in
   let volatile_ret_type = Ast_types.add_attributes [("volatile",[])] ret in
-  BindingKey.(Options.debug ~level:2 ~dkey "Verifying the type of the lvalue within the prototype of function %s: %a@." fct.Cil_types.vorig_name Printer.pp_typ ty) ;
+  Options.debug ~level:2 ~dkey:dkey_binding
+    "Verifying the type of the lvalue within the prototype of function %s: %a@."
+    fct.Cil_types.vorig_name Printer.pp_typ ty;
   if not (Typ.equal typ volatile_ret_type) then raise Not_found ;
   fct
 
@@ -565,9 +595,6 @@ let find_typename kf_tbl typ ~is_wr_access =
 let has_volatile_attr = Ast_attributes.contains "volatile"
 
 (*-------------------------------------------------------------------------*)
-
-module VolatileTableKey=
-struct let dkey = Options.register_category "volatile-table" end
 
 type vmap = {
   mutable rd : varinfo L_MAP.t ;
@@ -606,21 +633,19 @@ let build_volatile_table vmap =
         ) tset
     | _ -> ()
   in
-  Options.feedback ~level:2 "Building volatile table...@." ;
-  Annotations.iter_global add_clause ;
-  let dkey = VolatileTableKey.dkey in
-  if Options.is_debug_key_enabled dkey then
-    begin
-      let dump kind map fmt =
-        L_MAP.iter
-          (fun p f -> Format.fprintf fmt
-              "@\n@[<hov 2>volatile %a@ %s %a@]"
-              L_PATH.pretty p kind Varinfo.pretty f)
-          map in
-      Options.debug ~dkey "Volatile table:%t%t@."
-        (dump "reads" vmap.rd)
-        (dump "writes" vmap.wr)
-    end
+  Options.feedback ~level:2 "Building volatile table...@.";
+  Annotations.iter_global add_clause;
+  if Options.is_debug_key_enabled dkey_volatile_table then begin
+    let dump kind map fmt =
+      L_MAP.iter (fun p f ->
+          Format.fprintf fmt "@\n@[<hov 2>volatile %a@ %s %a@]"
+            L_PATH.pretty p kind Varinfo.pretty f
+        ) map
+    in
+    Options.debug ~dkey:dkey_volatile_table "Volatile table:%t%t@."
+      (dump "reads" vmap.rd)
+      (dump "writes" vmap.wr)
+  end
 
 (*-------------------------------------------------------------------------*)
 
@@ -637,7 +662,8 @@ let get_volatile_access ?loc fct_name binding_map kf_tbl vol_tbl lval ~is_wr_acc
           raise Not_found
       in
       let found fct =
-        BindingKey.(Options.debug ~level:2 ~dkey "Function found: %s@." fct.Cil_types.vname) ;
+        Options.debug ~level:2 ~dkey:dkey_binding
+          "Function found: %s@." fct.Cil_types.vname;
         (match loc with
          | None -> ()
          | Some loc ->
@@ -654,10 +680,10 @@ let get_volatile_access ?loc fct_name binding_map kf_tbl vol_tbl lval ~is_wr_acc
       in
       (* Looking for a volatile function relative to the [lval] access. *)
       try
-        BindingKey.(Options.debug ~level:2
-                      ~dkey "Looking for a function relative to %s access to volatile left-value: %a@."
-                      (if is_wr_access then "write" else "read")
-                      L_PATH.pretty path);
+        Options.debug ~level:2 ~dkey:dkey_binding
+          "Looking for a function relative to %s access to volatile left-value: %a@."
+          (if is_wr_access then "write" else "read")
+          L_PATH.pretty path;
         (* 1 - Looking into the volatile table [vol_tbl]. *)
         let vmap = if is_wr_access then vol_tbl.wr else vol_tbl.rd in
         found (L_MAP.find path vmap)
