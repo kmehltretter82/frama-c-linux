@@ -1,4 +1,3 @@
-acsl-importer git@git.frama-c.com:frama-c/acsl-importer.git
 caveat-importer git@git.frama-c.com:frama-c/caveat-importer.git
 context-from-precondition git@git.frama-c.com:frama-c/context-from-precondition.git
 frama-clang git@git.frama-c.com:frama-c/frama-clang.git
@@ -8,4 +7,3 @@ minimal git@git.frama-c.com:frama-c/minimal.git
 security git@git.frama-c.com:frama-c/security.git
 synchrone git@git.frama-c.com:frama-c/synchrone.git
 unitcheck git@git.frama-c.com:frama-c/UnitCheck.git
-volatile git@git.frama-c.com:frama-c/volatile.git
