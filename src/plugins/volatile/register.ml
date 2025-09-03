@@ -562,47 +562,7 @@ let find_typename kf_tbl typ ~is_wr_access =
 
 (*-------------------------------------------------------------------------*)
 
-module Mark = Typ.Set
-
-let visitAllTypeAttributes (f: attributes -> unit) (ty:typ): unit =
-  let marks = ref Mark.empty in
-  let rec visit (t0: typ) : unit =
-    if not (Mark.mem t0 !marks) then
-      begin
-        marks := Mark.add t0 !marks ;
-        f t0.tattr;
-        match t0.tnode with
-        | TNamed r -> visit r.ttype
-        | TPtr t
-        | TArray (t, _)
-        | TFun (t, None, _) -> visit t
-        | TFun (rt, Some (args), _) ->
-          visit rt ;
-          List.iter (fun (_, atype, _) -> visit atype) args
-        | TComp comp ->
-          List.iter
-            (fun fi -> f fi.fattr; visit fi.ftype)
-            (Option.value ~default:[] comp.cfields)
-        | TVoid | TInt _ | TFloat _ | TEnum _
-        | TBuiltin_va_list -> ()
-      end
-  in visit ty
-
 let has_volatile_attr = Ast_attributes.contains "volatile"
-
-exception VolatileFound
-
-(** looking for volatile attribute into the type definition
-      including following pointers *)
-let hasSomeWhereVolatileAttr (ty:typ) : bool =
-  try
-    let hasVolatileAttr attr =
-      if has_volatile_attr attr
-      then raise VolatileFound
-    in
-    visitAllTypeAttributes hasVolatileAttr ty ;
-    false
-  with VolatileFound -> true
 
 (*-------------------------------------------------------------------------*)
 
@@ -985,7 +945,7 @@ class process_volatile_access project binding_map kf_tbl vol_tbl index =
           (let typ_exp = Cil.typeOf exp in
            match Ast_types.unroll_node typ_exp
            with
-           | TPtr typ_pointed when hasSomeWhereVolatileAttr typ_pointed
+           | TPtr typ_pointed when Ast_types.has_attribute_memory_block "volatile" typ_pointed
              -> Options.warning ~source:(fst (Current_loc.get ()))
                   ~wkey:Options.wkey_volatile_cast
                   "Cast from type with volatile attribute (%a) to %a. Detection of volatile access may fail."
