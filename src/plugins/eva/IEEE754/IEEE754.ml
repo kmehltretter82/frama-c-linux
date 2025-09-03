@@ -563,7 +563,7 @@ module Make (Model : Modeling) = struct
       let exact = Scalar.of_float f |> Exact.singleton in
       let absolute = Absolute.zero in
       let relative = Relative.zero in
-      Self.warning
+      Self.debug ~level:2
         "No exact representation for constant %f. \
          Assuming its floating point representation \
          is exact in format %a."
