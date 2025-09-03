@@ -37,10 +37,10 @@ let typename (t:typ) =
     typename
 
 module BindingKey=
-struct let dkey = V2fcParameter.register_category "binding" end
+struct let dkey = Options.register_category "binding" end
 
 module BindingTableKey=
-struct let dkey = V2fcParameter.register_category "binding-table" end
+struct let dkey = Options.register_category "binding-table" end
 
 (* -------------------------------------------------------------------------- *)
 (* --- Global Volatile Annotation tables                                  --- *)
@@ -148,7 +148,7 @@ module BA_TBL = struct
     and pos = ref 0 in
     try
       let is_wr_access =
-        find_prefix (V2fcParameter.BindingPrefix.get ()) pos kf_name ;
+        find_prefix (Options.BindingPrefix.get ()) pos kf_name ;
         try
           let memo_pos = ref !pos in
           find_prefix "Rd_" memo_pos kf_name ;
@@ -170,7 +170,7 @@ module BA_TBL = struct
     let ret,args,is_varg_arg,_attrib = Cil.splitFunctionType ty in
     let ret_type = ret in
     let volatile_ret_type = Ast_types.add_attributes [("volatile",[])] ret in
-    BindingKey.(V2fcParameter.debug ~level:2 ~dkey "Verifying prototype of function %s: %a@." fct.Cil_types.vorig_name Printer.pp_typ ty) ;
+    BindingKey.(Options.debug ~level:2 ~dkey "Verifying prototype of function %s: %a@." fct.Cil_types.vorig_name Printer.pp_typ ty) ;
     match is_wr_access, args with
     | false, Some [_,arg1,_] when
         (not (Ast_types.is_void ret || is_varg_arg))
@@ -196,7 +196,7 @@ module BA_TBL = struct
         && Typ.equal (Ast_types.direct_pointed_type arg1) ret_type
         && Ast_types.is_volatile ret
       -> true (* matching prototype: T fct (T *arg1, T arg2) when T has some volatile attr *)
-    | _, _ -> BindingKey.(V2fcParameter.debug ~level:2 ~dkey "Invalid prototype of function %s@." fct.Cil_types.vorig_name) ;
+    | _, _ -> BindingKey.(Options.debug ~level:2 ~dkey "Invalid prototype of function %s@." fct.Cil_types.vorig_name) ;
       false
 
   let build_kf_table kf_tbl =
@@ -213,7 +213,7 @@ module BA_TBL = struct
       let may_add_vi ~is_wr_access kf_tbl kf_name vi_kf =
         if filter_kf_prototype vi_kf ~is_wr_access then
           begin
-            BindingTableKey.(V2fcParameter.debug ~level:2 ~dkey "Adding function into the default binding table: %s@." kf_name);
+            BindingTableKey.(Options.debug ~level:2 ~dkey "Adding function into the default binding table: %s@." kf_name);
             Datatype.String.Hashtbl.add (get_tbl_access kf_tbl ~is_wr_access) kf_name vi_kf
           end;
       in
@@ -224,8 +224,8 @@ module BA_TBL = struct
         | None -> ()
         | Some is_wr_access ->
           may_add_vi ~is_wr_access kf_tbl kf_name vi_kf;
-      in if V2fcParameter.BindingAuto.get() then
-        (V2fcParameter.feedback ~level:2 "Building default binding table...@." ;
+      in if Options.BindingAuto.get() then
+        (Options.feedback ~level:2 "Building default binding table...@." ;
          Globals.Functions.iter may_add_kf) ;
       kf_tbl
 
@@ -250,7 +250,7 @@ struct
 
   let basetype t =
     let t = Ast_types.unroll_deep t in
-    if V2fcParameter.Base.get () then
+    if Options.Base.get () then
       let rec base t' =
         match t'.tnode with
         | TInt _ | TFloat _ when t'.tattr = [] -> t'
@@ -278,7 +278,7 @@ module B_MAP = struct
     let volatile_ret_type =
       Ast_types.add_attributes [("volatile",[])] ret_type
     in
-    BindingKey.(V2fcParameter.debug ~level:2 ~dkey "Verifying prototype of function %s: %a@." fct.Cil_types.vorig_name Printer.pp_typ ty) ;
+    BindingKey.(Options.debug ~level:2 ~dkey "Verifying prototype of function %s: %a@." fct.Cil_types.vorig_name Printer.pp_typ ty) ;
     let result is_wr_access arg1 =
       Some (is_wr_access, (Ast_types.direct_pointed_type arg1))
     in match args with
@@ -306,7 +306,7 @@ module B_MAP = struct
         && Typ.equal (Ast_types.direct_pointed_type arg1) ret_type
         && Ast_types.is_volatile ret_type
       -> result true arg1 (* matching prototype: T fct (T *arg1, T arg2) when T has some volatile attr *)
-    | _ -> V2fcParameter.warning ~wkey:V2fcParameter.wkey_invalid_binding_function
+    | _ -> Options.warning ~wkey:Options.wkey_invalid_binding_function
              "Binding function '%s' has an invalid prototype"
              fct.Cil_types.vorig_name ;
       None
@@ -323,10 +323,10 @@ module B_MAP = struct
              let map = if is_wr_access then map_wr else map_rd in
              let map = try
                  let vf0 = T_MAP.find volatile_object map in
-                 V2fcParameter.warning ~wkey:V2fcParameter.wkey_invalid_binding_function
+                 Options.warning ~wkey:Options.wkey_invalid_binding_function
                    "Functions -volatile-binding '%s' and '%s' %s"
                    vf0.vorig_name vf.vorig_name
-                   (if V2fcParameter.Base.get ()
+                   (if Options.Base.get ()
                     then "apply to the same base type"
                     else "has same signature");
                  None
@@ -335,19 +335,19 @@ module B_MAP = struct
              in match map with
              | None -> maps
              | Some map ->
-               V2fcParameter.feedback
+               Options.feedback
                  "Register binding function '%s' for '%s' accesses to type '%a'"
                  vf.vorig_name
                  (if is_wr_access then "write" else "read")
                  Printer.pp_typ (T_MAP.basetype volatile_object);
                if is_wr_access then (map_rd,map) else (map,map_wr)
          with Not_found ->
-           V2fcParameter.warning ~wkey:V2fcParameter.wkey_invalid_binding_function
+           Options.warning ~wkey:Options.wkey_invalid_binding_function
              "Unknown function related to -volatile-binding '%s'" f;
            maps
       )
       (T_MAP.empty,T_MAP.empty)
-      (V2fcParameter.Binding.get ())
+      (Options.Binding.get ())
 
   let find_binding map typ ~is_wr_access =
     T_MAP.find typ (if is_wr_access then snd map else fst map)
@@ -422,21 +422,21 @@ let build_call_index () =
          let vf = Kernel_function.get_vi kf in
          match SIG.stub vf with
          | None ->
-           V2fcParameter.abort
+           Options.abort
              "Function '%s' can not be used as call-pointer stub" f
          | Some s ->
            try
              let vf0 = INDEX.find s idx in
-             V2fcParameter.abort
+             Options.abort
                "Functions -volatile-call-pointer '%s' and '%s' has same signature"
                vf0.vorig_name vf.vorig_name
            with Not_found ->
              INDEX.add s vf idx
        with Not_found ->
-         V2fcParameter.abort "Unknown function -volatile-call-pointer '%s'" f
+         Options.abort "Unknown function -volatile-call-pointer '%s'" f
     )
     INDEX.empty
-    (V2fcParameter.CallPtr.get ())
+    (Options.CallPtr.get ())
 
 (* -------------------------------------------------------------------------- *)
 (* --- Pointer Calls                                                      --- *)
@@ -452,7 +452,7 @@ let get_cannonical_call ~source f tf =
     | TNamed ti when Ast_types.is_fun tf -> ti.torig_name
     | TFun (r,args,va) ->
       let buffer = Buffer.create 80 in
-      Buffer.add_string buffer (V2fcParameter.BindingPrefix.get ()) ;
+      Buffer.add_string buffer (Options.BindingPrefix.get ()) ;
       Buffer.add_string buffer "Call_" ;
       Buffer.add_string buffer (typename r) ;
       List.iter
@@ -463,7 +463,7 @@ let get_cannonical_call ~source f tf =
       if va then Buffer.add_string buffer "_va" ;
       Buffer.contents buffer
     | _ ->
-      V2fcParameter.abort ~source
+      Options.abort ~source
         "@[<hov 0>Call to @[<hov 2>(%a)@]@ with non-function type @[<hov 2>(%a)@]@]"
         Exp.pretty f Typ.pretty tf
   in
@@ -471,7 +471,7 @@ let get_cannonical_call ~source f tf =
     let kf = Globals.Functions.find_by_name name in
     Kernel_function.get_vi kf
   with Not_found ->
-    V2fcParameter.warning ~source ~wkey:V2fcParameter.wkey_untransformed_call_function_not_found
+    Options.warning ~source ~wkey:Options.wkey_untransformed_call_function_not_found
       "@[<hov 0>Call to (%a) with type @[<hov 2>(%a):@]@ Function '%s' not found@]"
       Exp.pretty f Typ.pretty (Cil.typeOf f) name ;
     raise Not_found
@@ -480,7 +480,7 @@ let get_pointer_call ~index ~source f =
   let tf = Ast_types.direct_pointed_type (Cil.typeOf f) in
   try Some (INDEX.find (SIG.of_type tf) index)
   with | Not_found ->
-    if V2fcParameter.BindingCall.get () then
+    if Options.BindingCall.get () then
       (try Some (get_cannonical_call ~source f tf)
        with Not_found -> (* warning has been printed *) None)
     else None
@@ -491,7 +491,7 @@ let add_eventual_cast_to_expression lval_typ e =
   let e' = Cil.mkCast ~force:cast_mode ~newt e in
   if e' != e then
     begin
-      V2fcParameter.warning ~source:(fst e.eloc) ~wkey:V2fcParameter.wkey_cast_insertion
+      Options.warning ~source:(fst e.eloc) ~wkey:Options.wkey_cast_insertion
         "@[<hov 0>Cast to (%a) inserted@ for expression (%a)@ of type (%a)@]"
         Typ.pretty newt Exp.pretty e Typ.pretty (Cil.typeOf e) ;
     end;
@@ -502,7 +502,7 @@ let add_eventual_cast_to_param arg_typ param =
   let param' = Cil.mkCast ~force:cast_mode ~newt param in
   if param' != param then
     begin
-      V2fcParameter.warning ~source:(fst param.eloc) ~wkey:V2fcParameter.wkey_cast_insertion
+      Options.warning ~source:(fst param.eloc) ~wkey:Options.wkey_cast_insertion
         "@[<hov 0>Cast to (%a) inserted@ for parameter (%a)@ of type (%a)@]"
         Typ.pretty newt Exp.pretty param Typ.pretty (Cil.typeOf param) ;
     end;
@@ -519,10 +519,10 @@ let do_pointer_call ~index ~transform f es ~loc =
       | (_,t,_)::ts,e::es -> (add_eventual_cast_to_param t e) :: wrap ts va es
       | [],es when va -> es
       | [],es ->
-        V2fcParameter.warning ~source ~wkey:V2fcParameter.wkey_transformed_call_skipped_parameters
+        Options.warning ~source ~wkey:Options.wkey_transformed_call_skipped_parameters
           "Using '%s': %d last parameters skipped" fn (List.length es) ; []
       | ts,[] ->
-        V2fcParameter.warning ~source ~wkey:V2fcParameter.wkey_transformed_call_missing_parameters
+        Options.warning ~source ~wkey:Options.wkey_transformed_call_missing_parameters
           "Using '%s': missing %d parameters" fn (List.length ts) ; []
     in
     let vf = transform vf in
@@ -533,8 +533,8 @@ let do_pointer_call ~index ~transform f es ~loc =
 
 let typename_access (t:typ) ~is_wr_access =
   let typename = typename t
-  in let r = (V2fcParameter.BindingPrefix.get ()) ^ (if is_wr_access then "Wr_" else "Rd_") ^ typename
-  in BindingKey.(V2fcParameter.debug ~dkey "Looking for function %s@." r) ; r
+  in let r = (Options.BindingPrefix.get ()) ^ (if is_wr_access then "Wr_" else "Rd_") ^ typename
+  in BindingKey.(Options.debug ~dkey "Looking for function %s@." r) ; r
 
 let find_typename kf_tbl typ ~is_wr_access =
   let kf_tbl = match !kf_tbl with
@@ -549,14 +549,14 @@ let find_typename kf_tbl typ ~is_wr_access =
        | TNamed r -> find_fct ((*Cil.typeAddAttributes _a'*) r.ttype)
        | _ -> raise Not_found
   in let fct = (* Looking from the type name *)
-       BindingKey.(V2fcParameter.debug ~level:2 ~dkey "Looking for a default binding from the type name: %a@." Printer.pp_typ typ);
+       BindingKey.(Options.debug ~level:2 ~dkey "Looking for a default binding from the type name: %a@." Printer.pp_typ typ);
        find_fct typ
   in (* Verifying the protyping within the type of the volatile access. *)
   let ty = fct.Cil_types.vtype in
   assert (Ast_types.is_fun ty) ;
   let ret,_args,_is_varg_arg,_attrib = Cil.splitFunctionType ty in
   let volatile_ret_type = Ast_types.add_attributes [("volatile",[])] ret in
-  BindingKey.(V2fcParameter.debug ~level:2 ~dkey "Verifying the type of the lvalue within the prototype of function %s: %a@." fct.Cil_types.vorig_name Printer.pp_typ ty) ;
+  BindingKey.(Options.debug ~level:2 ~dkey "Verifying the type of the lvalue within the prototype of function %s: %a@." fct.Cil_types.vorig_name Printer.pp_typ ty) ;
   if not (Typ.equal typ volatile_ret_type) then raise Not_found ;
   fct
 
@@ -607,7 +607,7 @@ let hasSomeWhereVolatileAttr (ty:typ) : bool =
 (*-------------------------------------------------------------------------*)
 
 module VolatileTableKey=
-struct let dkey = V2fcParameter.register_category "volatile-table" end
+struct let dkey = Options.register_category "volatile-table" end
 
 type vmap = {
   mutable rd : varinfo L_MAP.t ;
@@ -624,7 +624,7 @@ let build_volatile_table vmap =
       try
         let old = L_MAP.find path map in
         if not (Varinfo.equal old fct) then
-          V2fcParameter.warning ~source:(fst loc) ~wkey:V2fcParameter.wkey_duplicated_access_function
+          Options.warning ~source:(fst loc) ~wkey:Options.wkey_duplicated_access_function
             "%s access function already defined for %a"
             kind L_PATH.pretty path ;
         map
@@ -640,16 +640,16 @@ let build_volatile_table vmap =
              vmap.rd <- add_fct "read" loc vmap.rd p fct_rd ;
              vmap.wr <- add_fct "write" loc vmap.wr p fct_wr ;
            with L_PATH.Unsupported ->
-             V2fcParameter.error ~source:(fst loc)
+             Options.error ~source:(fst loc)
                "Unsupported l-value in volatile clause: %a@."
                Printer.pp_identified_term l
         ) tset
     | _ -> ()
   in
-  V2fcParameter.feedback ~level:2 "Building volatile table...@." ;
+  Options.feedback ~level:2 "Building volatile table...@." ;
   Annotations.iter_global add_clause ;
   let dkey = VolatileTableKey.dkey in
-  if V2fcParameter.is_debug_key_enabled dkey then
+  if Options.is_debug_key_enabled dkey then
     begin
       let dump kind map fmt =
         L_MAP.iter
@@ -657,7 +657,7 @@ let build_volatile_table vmap =
               "@\n@[<hov 2>volatile %a@ %s %a@]"
               L_PATH.pretty p kind Varinfo.pretty f)
           map in
-      V2fcParameter.debug ~dkey "Volatile table:%t%t@."
+      Options.debug ~dkey "Volatile table:%t%t@."
         (dump "reads" vmap.rd)
         (dump "writes" vmap.wr)
     end
@@ -672,18 +672,18 @@ let get_volatile_access ?loc fct_name binding_map kf_tbl vol_tbl lval ~is_wr_acc
         try L_PATH.of_lval lval
         with L_PATH.Unsupported ->
           let source = match loc with None -> None | Some l -> Some (fst l) in
-          V2fcParameter.warning ?source "Unsupported volatile l-value: %a"
+          Options.warning ?source "Unsupported volatile l-value: %a"
             Printer.pp_lval lval ;
           raise Not_found
       in
       let found fct =
-        BindingKey.(V2fcParameter.debug ~level:2 ~dkey "Function found: %s@." fct.Cil_types.vname) ;
+        BindingKey.(Options.debug ~level:2 ~dkey "Function found: %s@." fct.Cil_types.vname) ;
         (match loc with
          | None -> ()
          | Some loc ->
-           V2fcParameter.warning ~source:(fst loc)
-             ~wkey:V2fcParameter.(if is_complete then wkey_transformed_access_lvalue_volatile
-                                  else wkey_transformed_access_lvalue_partially_volatile)
+           Options.warning ~source:(fst loc)
+             ~wkey:Options.(if is_complete then wkey_transformed_access_lvalue_volatile
+                            else wkey_transformed_access_lvalue_partially_volatile)
              "%s function: Introducing a call to '%s' for %s access to %svolatile left-value: %a"
              fct_name
              fct.Cil_types.vorig_name
@@ -694,7 +694,7 @@ let get_volatile_access ?loc fct_name binding_map kf_tbl vol_tbl lval ~is_wr_acc
       in
       (* Looking for a volatile function relative to the [lval] access. *)
       try
-        BindingKey.(V2fcParameter.debug ~level:2
+        BindingKey.(Options.debug ~level:2
                       ~dkey "Looking for a function relative to %s access to volatile left-value: %a@."
                       (if is_wr_access then "write" else "read")
                       L_PATH.pretty path);
@@ -712,15 +712,15 @@ let get_volatile_access ?loc fct_name binding_map kf_tbl vol_tbl lval ~is_wr_acc
       (match loc with
        | None -> ()
        | Some loc ->
-         V2fcParameter.warning ~source:(fst loc)
-           ~wkey:V2fcParameter.(if is_complete
-                                then wkey_untransformed_access_lvalue_volatile
-                                else wkey_untransformed_access_lvalue_partially_volatile)
+         Options.warning ~source:(fst loc)
+           ~wkey:Options.(if is_complete
+                          then wkey_untransformed_access_lvalue_volatile
+                          else wkey_untransformed_access_lvalue_partially_volatile)
            "Undefined %s access function for %svolatile left-value: (volatile %a) %a"
            (if is_wr_access then "write" else "read")
            (if is_complete then "" else "partially ")
            Printer.pp_typ (Ast_types.remove_attributes_for_c_cast
-                             (if V2fcParameter.Base.get () then T_MAP.basetype typ else typ))
+                             (if Options.Base.get () then T_MAP.basetype typ else typ))
            Printer.pp_lval lval) ;
       None
   in if has_volatile_attr (Ast_types.get_attributes typ) then
@@ -736,7 +736,7 @@ let get_rd_types fct =
   let ret,args,_is_varg_arg,_attrib = Cil.splitFunctionType ty in
   match args with
   | Some [_,arg1,_] -> ret, arg1
-  | _ -> V2fcParameter.abort "Invalid prototype of function %s@." fct.Cil_types.vorig_name
+  | _ -> Options.abort "Invalid prototype of function %s@." fct.Cil_types.vorig_name
 
 let get_wr_types fct =
   let ty = fct.Cil_types.vtype in
@@ -744,7 +744,7 @@ let get_wr_types fct =
   let ret,args,_is_varg_arg,_attrib = Cil.splitFunctionType ty in
   match args with
   | Some ((_,arg1,_)::[_,arg2,_]) -> ret, arg1, arg2
-  | _ -> V2fcParameter.abort "Invalid prototype of function %s@." fct.Cil_types.vorig_name
+  | _ -> Options.abort "Invalid prototype of function %s@." fct.Cil_types.vorig_name
 
 let get_cast_type_needed_for_assignation ~ret_typ ~lv =
   let tlv = Cil.typeOfLval lv in
@@ -754,10 +754,10 @@ let get_cast_type_needed_for_assignation ~ret_typ ~lv =
   else Some tlv
 
 module ActionKey=
-struct let dkey = V2fcParameter.register_category "transformation-action" end
+struct let dkey = Options.register_category "transformation-action" end
 
 module VisitKey =
-struct let dkey = V2fcParameter.register_category "transformation-visit" end
+struct let dkey = Options.register_category "transformation-visit" end
 
 module ScopingBlock = struct
   let stack = ref []
@@ -775,7 +775,7 @@ end
 let new_blk () = Cil.mkBlockNonScoping []
 
 class process_volatile_access project binding_map kf_tbl vol_tbl index =
-  let callptr = not (INDEX.is_empty index) || V2fcParameter.BindingCall.get () in
+  let callptr = not (INDEX.is_empty index) || Options.BindingCall.get () in
   object(self)
     inherit Visitor.frama_c_copy project
 
@@ -800,11 +800,11 @@ class process_volatile_access project binding_map kf_tbl vol_tbl index =
       | Some kf -> Kernel_function.get_name kf
 
     method private add_instr i =
-      ActionKey.(V2fcParameter.debug ~level:2 ~dkey "Add new stmt to block");
+      ActionKey.(Options.debug ~level:2 ~dkey "Add new stmt to block");
       blk <- {blk with bstmts = (Cil.mkStmt (Instr i)):: blk.bstmts}
 
     method private makeTempLval typ =
-      ActionKey.(V2fcParameter.debug ~level:2 ~dkey "Add tmp variable to block");
+      ActionKey.(Options.debug ~level:2 ~dkey "Add tmp variable to block");
       let definition =
         Visitor_behavior.Get.fundec self#behavior (Option.get self#current_func)
       in
@@ -812,17 +812,17 @@ class process_volatile_access project binding_map kf_tbl vol_tbl index =
 
     method! vblock b =
       VisitKey.(
-        V2fcParameter.debug ~level:2 ~dkey "Visit DO blk@.");
+        Options.debug ~level:2 ~dkey "Visit DO blk@.");
       if b.bscoping then ScopingBlock.push b ;
       let pop b = if b.bscoping then ScopingBlock.pop () ; b in
       let r = Cil.ChangeDoChildrenPost (b,pop) in
       VisitKey.(
-        V2fcParameter.debug ~level:2 ~dkey "Visit DONE blk@.");
+        Options.debug ~level:2 ~dkey "Visit DONE blk@.");
       r
 
     method! vstmt_aux s =
       VisitKey.(
-        V2fcParameter.debug ~level:2 ~dkey
+        Options.debug ~level:2 ~dkey
           "Visit DO stmt: sid=%d, volatile block:@.%a@." s.sid Printer.pp_block blk);
       let previous_blk =
         if blk.bstmts = [] then
@@ -840,14 +840,14 @@ class process_volatile_access project binding_map kf_tbl vol_tbl index =
         if current_blk.bstmts = [] then
           begin
             VisitKey.(
-              V2fcParameter.debug ~level:3 ~dkey
+              Options.debug ~level:3 ~dkey
                 "Do not Transform stmt:@.sid=%d %a@." s.sid Printer.pp_stmt st);
             st
           end
         else
           begin
             VisitKey.(
-              V2fcParameter.debug ~level:2 ~dkey
+              Options.debug ~level:2 ~dkey
                 "Transform DO stmt: sid=%d, volatile block:@.%a@."
                 s.sid Printer.pp_block current_blk);
             let stmt = Cil.mkStmt st.skind in
@@ -856,7 +856,7 @@ class process_volatile_access project binding_map kf_tbl vol_tbl index =
             in
             st.skind <- Block stmts ;
             VisitKey.(
-              V2fcParameter.debug ~level:2 ~dkey
+              Options.debug ~level:2 ~dkey
                 "Transform Done stmt: sid=%d, new block:@.%a@."
                 st.sid Printer.pp_stmt st);
             st
@@ -864,7 +864,7 @@ class process_volatile_access project binding_map kf_tbl vol_tbl index =
       in
       let r = Cil.ChangeDoChildrenPost (s,do_vstmt) in
       VisitKey.(
-        V2fcParameter.debug ~level:2 ~dkey "Visit Done stmt: sid=%d@." s.sid);
+        Options.debug ~level:2 ~dkey "Visit Done stmt: sid=%d@." s.sid);
       r
 
     method! vinst instr =
@@ -891,7 +891,7 @@ class process_volatile_access project binding_map kf_tbl vol_tbl index =
                         | Some newt -> (* In fact a cast has to be added
                                           lv=lv2; -> vtmp=rd_fct(&lv2); lv=(newt) vtmp *)
                           VisitKey.(
-                            V2fcParameter.debug ~level:2 ~dkey
+                            Options.debug ~level:2 ~dkey
                               "@[<hov 0> Cast Needed: Lval-type(%a) Return-type (%a)@]"
                               Typ.pretty (Cil.typeOfLval lv) Typ.pretty ret_typ) ;
                           let lvtmp = self#makeTempLval ret_typ in
@@ -939,12 +939,12 @@ class process_volatile_access project binding_map kf_tbl vol_tbl index =
               let transform = Visitor_behavior.Memo.varinfo self#behavior in
               match do_pointer_call ~index ~transform f xs ~loc with
               | Some(fn,g,ys) ->
-                V2fcParameter.warning ~source:(fst loc) ~wkey:V2fcParameter.wkey_transformed_call
+                Options.warning ~source:(fst loc) ~wkey:Options.wkey_transformed_call
                   "%a: use pointer function '%s'"
                   Printer.pp_location loc fn ;
                 Call(result,g,ys,loc)
               | None ->
-                V2fcParameter.warning ~source:(fst loc) ~wkey:V2fcParameter.wkey_untransformed_call
+                Options.warning ~source:(fst loc) ~wkey:Options.wkey_untransformed_call
                   "Original pointer function kept" ; i
           end
         | i -> i in
@@ -976,7 +976,7 @@ class process_volatile_access project binding_map kf_tbl vol_tbl index =
               add_eventual_cast_to_expression (Cil.typeOf e) (Cil.new_exp ~loc (Lval lvtmp))
           end
         | {enode=CastE(typ,exp)} as e
-          when (* V2fcParameter.Cast.get () && *)
+          when (* Options.Cast.get () && *)
             (match Ast_types.unroll_node typ
              with
              | TPtr typ_pointed ->
@@ -986,8 +986,8 @@ class process_volatile_access project binding_map kf_tbl vol_tbl index =
            match Ast_types.unroll_node typ_exp
            with
            | TPtr typ_pointed when hasSomeWhereVolatileAttr typ_pointed
-             -> V2fcParameter.warning ~source:(fst (Current_loc.get ()))
-                  ~wkey:V2fcParameter.wkey_volatile_cast
+             -> Options.warning ~source:(fst (Current_loc.get ()))
+                  ~wkey:Options.wkey_volatile_cast
                   "Cast from type with volatile attribute (%a) to %a. Detection of volatile access may fail."
                   Printer.pp_typ typ_exp
                   Printer.pp_typ typ
@@ -1001,53 +1001,53 @@ class process_volatile_access project binding_map kf_tbl vol_tbl index =
     method! vglob_aux = function
       | GFun(decl,_) ->
         let f = decl.svar.vname in
-        let fs = V2fcParameter.Process.get() in
+        let fs = Options.Process.get() in
         if Datatype.String.Set.is_empty fs || Datatype.String.Set.mem f fs
         then begin
           VisitKey.(
-            V2fcParameter.debug ~level:2 ~dkey "Visit DO fun %s@." f);
+            Options.debug ~level:2 ~dkey "Visit DO fun %s@." f);
           ScopingBlock.reset () ;
           Cil.DoChildren
         end
         else begin
           VisitKey.(
-            V2fcParameter.debug ~level:2 ~dkey "Visit COPY fun %s@." f);
+            Options.debug ~level:2 ~dkey "Visit COPY fun %s@." f);
           Cil.JustCopy
         end
       | _ ->
         VisitKey.(
-          V2fcParameter.debug ~level:3 ~dkey "Visit COPY glob@.");
+          Options.debug ~level:3 ~dkey "Visit COPY glob@.");
         Cil.JustCopy
 
   end
 
 let find_volatile_access vol_tbl =
-  V2fcParameter.feedback ~level:2 "Building new project with volatile access transformed...@." ;
+  Options.feedback ~level:2 "Building new project with volatile access transformed...@." ;
   let kf_tbl = ref None in
   let index = build_call_index () in
   let binding_map = B_MAP.build_binding_map () in
   let _fresh_project =
     FILE.create_project_from_visitor
       ~reorder:true
-      V2fcParameter.plugin_name
+      Options.plugin_name
       (fun prj -> new process_volatile_access prj binding_map kf_tbl vol_tbl index)
   in BA_TBL.clear_kf_table kf_tbl
 
 let process_volatile () =
-  V2fcParameter.feedback ~level:1 "Running volatile plugin...@." ;
+  Options.feedback ~level:1 "Running volatile plugin...@." ;
   let _ast = Ast.get () in
   let vol_tbl = { rd = L_MAP.empty ; wr = L_MAP.empty } in
-  V2fcParameter.feedback ~level:1 "Processing volatile clauses...@." ;
+  Options.feedback ~level:1 "Processing volatile clauses...@." ;
   begin
     build_volatile_table vol_tbl ;
     find_volatile_access vol_tbl ;
   end
 
 let main () =
-  if V2fcParameter.is_volatile_on ()
+  if Options.is_volatile_on ()
   then begin
     process_volatile () ;
-    V2fcParameter.set_volatile_off ()
+    Options.set_volatile_off ()
   end
 
 let () =
