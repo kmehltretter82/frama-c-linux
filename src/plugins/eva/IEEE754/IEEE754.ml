@@ -146,7 +146,7 @@ module Make (Model : Modeling) = struct
     | Cil_types.FLongDouble ->
       Kernel.warning ~wkey:Kernel.wkey_long_double
         "%s does not support the long double format.\
-         It will instead uses the double format."
+         It will instead use the double format."
         name ;
       Format Double
 

@@ -69,7 +69,11 @@
     and tracked if needed abstraction based on a given positive bound.
 
     All the required components form together an abstract {b Model}, as described
-    by the [Modeling] signature described in {!IEEE754_sig}. *)
+    by the [Modeling] signature described in {!IEEE754_sig}. Note that both in
+    this file and in {!IEEE754_sig}, the types use to represent the exact and
+    the absolute errors semantics are required to be the same. It is, in theory,
+    not mandatory. However, in practice it complexifies quite a lot both the
+    signatures and the implementation without providing much use. *)
 
 open Lattice_bounds
 open Typed_float
