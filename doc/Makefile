@@ -78,6 +78,7 @@ clean::
 	$(MAKE) -C aorai clean
 	$(MAKE) -C eva clean
 	$(MAKE) -C metrics clean
+	$(MAKE) -C ../src/plugins/volatile/doc/manual clean
 	$(MAKE) -C ../src/plugins/wp/doc/manual clean
 
 all: \
@@ -89,6 +90,7 @@ all: \
 	manuals/hello$(FC_SUFFIX).tar.gz \
 	manuals/eva-manual$(FC_SUFFIX).pdf \
 	manuals/metrics-manual$(FC_SUFFIX).pdf \
+	manuals/volatile-manual$(FC_SUFFIX).pdf \
 	manuals/wp-manual$(FC_SUFFIX).pdf \
 
 manuals/%:
@@ -111,6 +113,7 @@ manuals/aorai-example$(FC_SUFFIX).tar.gz: aorai/aorai-example.tar.gz
 manuals/hello$(FC_SUFFIX).tar.gz: developer/hello.tar.gz
 manuals/eva-manual$(FC_SUFFIX).pdf: eva/main.pdf
 manuals/metrics-manual$(FC_SUFFIX).pdf: metrics/metrics.pdf
+manuals/volatile-manual$(FC_SUFFIX).pdf: ../src/plugins/volatile/doc/manual/volatile.pdf
 manuals/wp-manual$(FC_SUFFIX).pdf: ../src/plugins/wp/doc/manual/wp.pdf
 
 
