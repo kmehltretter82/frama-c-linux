@@ -1043,40 +1043,12 @@ let process_volatile () =
     find_volatile_access vol_tbl ;
   end
 
-(** {1 API [Volatile].} *)
-
-(** Volatile support from the cmdline process. *)
-let volatile_from_cmdline () =
-  process_volatile () ;
-  V2fcParameter.set_volatile_off ()
-
-(** API [Volatile.volatile__from_cmdline]. *)
-let volatile_from_cmdline =
-  Dynamic.register
-    ~plugin:V2fcParameter.plugin_name
-    "volatile_from_cmdline"
-    (Datatype.func Datatype.unit Datatype.unit)
-    volatile_from_cmdline
-
-(** {1 The main entry point.} *)
-
-module TraceJobKey=
-struct let dkey = V2fcParameter.register_category "trace-job" end
-
-(** API [ACSL_importer.main]. *)
 let main () =
-  TraceJobKey.(V2fcParameter.debug ~level:2 ~dkey "Start volatile plugin...@.") ;
-  if V2fcParameter.is_volatile_on () then volatile_from_cmdline () ;
-  TraceJobKey.(V2fcParameter.debug ~level:2 ~dkey "Stop volatile plugin...@.")
+  if V2fcParameter.is_volatile_on ()
+  then begin
+    process_volatile () ;
+    V2fcParameter.set_volatile_off ()
+  end
 
-
-(** Register the function [main] as a main entry point. *)
 let () =
-  let main =
-    Dynamic.register
-      ~plugin:V2fcParameter.plugin_name
-      "main"
-      (Datatype.func Datatype.unit Datatype.unit)
-      main
-  in
   Boot.Main.extend main
