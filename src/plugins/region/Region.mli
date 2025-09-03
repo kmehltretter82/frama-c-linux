@@ -32,26 +32,13 @@ type map
 type node
 val map : kernel_function -> map
 
-(** Not normalized.
-    Two nodes in the same equivalence class may have different identifiers. *)
-val id : node -> int
-
 (** Unique id of normalized node.
     This can be considered the unique identifier of the region equivalence
     class. *)
-val uid : node -> int
+val id : node -> int
+val of_id : map -> int -> node
 
-(** Returns a normalized node.
-    @raises Not_found if not a valid node identifier. *)
-val find : map -> int -> node
-
-(** Normalized node.
-    The returned node is the representative of the region equivalence class.
-    There is one unique representative per equivalence class. *)
-val normalize : node -> node
-
-(** Normalized list of nodes (normalized, uniques, sorted by id) *)
-val nodes : node list -> node list
+val pretty : Format.formatter -> node -> unit
 
 (** {2 Region Properties}
 
@@ -76,13 +63,16 @@ val iter : map -> (node -> unit) -> unit
 
 (** {2 Alias Analysis} *)
 
-(** [equal m a b] checks if nodes [a] and [b] are in the same region. *)
+(** [equal a b] checks if nodes [a] and [b] are in the same region. *)
 val equal : node -> node -> bool
 
-(** [include m a b] checks if region [a] is a sub-region of [b] in map [m]. *)
+(** [compare a b] compares regions [a] and [b] by their unique id. *)
+val compare : node -> node -> int
+
+(** [include a b] checks if region [a] is a sub-region of [b] in map [m]. *)
 val included : node -> node -> bool
 
-(** [separated m a b] checks if region [a] and region [b] are disjoint.
+(** [separated a b] checks if region [a] and region [b] are disjoint.
     Disjoints regions [a] and [b] have the following properties:
     - [a] is {i not} a sub-region of [b];
     - [b] is {i not} a sub-region of [a];
@@ -92,7 +82,7 @@ val included : node -> node -> bool
 val separated : node -> node -> bool
 
 
-(** [singleton m a] returns [true] when node [a] is guaranteed to have only
+(** [singleton a] returns [true] when node [a] is guaranteed to have only
     one single address in its equivalence class. *)
 val singleton : node -> bool
 

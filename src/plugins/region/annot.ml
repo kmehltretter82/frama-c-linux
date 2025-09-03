@@ -33,7 +33,7 @@ let iadd_from ~iscalled env (tgt,from) =
   | From srcs ->
     if iscalled then
       let merge_from env a it =
-        merge_domain env.map a @@ add_iterm env it
+        merge_domain a @@ add_iterm env it
       in ignore @@ List.fold_left (merge_from env) d srcs
     else
       List.iter (fun it -> ignore @@ add_iterm env it) srcs
@@ -65,7 +65,7 @@ let add_allocation ~map ~kf ~ki ~bhv ~formal ~result alloc =
     let add_alloc env it1 it2 =
       let d1 = add_iterm env it1 in
       let d2 = add_iterm env it2 in
-      ignore @@ merge_domain env.map d1 d2
+      ignore @@ merge_domain d1 d2
     in
     List.iter2 (add_alloc env) its1 its2
 
@@ -159,7 +159,7 @@ let add_code_annot ~kf ~stmt ?(formal=Vmap.empty) ~result ~iscalled map c =
     let add_alloc env it1 it2 =
       let d1 = add_iterm env it1 in
       let d2 = add_iterm env it2 in
-      ignore @@ merge_domain env.map d1 d2
+      ignore @@ merge_domain d1 d2
     in
     List.iter2 (add_alloc { map ; property ; formal ; result }) its1 its2
   | AExtended (_,_, acsl) ->

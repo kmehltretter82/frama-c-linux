@@ -52,22 +52,18 @@ val pp_region : Format.formatter -> region -> unit
 (** Initially unlocked. *)
 val create : unit -> map
 
-(** Default locked status is inherited from the copied map. *)
-val copy : ?locked:bool -> map -> map
-
 (** Lock the map. No more access nor merge can be added into the map. *)
 val lock : map -> unit
 
-(** Unlock the map. *)
-val unlock : map -> unit
-
+(** The underlying map must have been lock to get unique identifiers. *)
 val id : node -> int
-val forge : map -> int -> node
-val uid : node -> int
-val id_to_node : map -> int -> node
+
+(** Provided the map is locked and the id exists. *)
+val of_id : map -> int -> node
+
 val equal : node -> node -> bool
-val normalize : node -> node
-val nodes : node list -> node list
+val find : node -> node
+val find_all : node list -> node list
 
 val size : node -> int
 val parents : node -> node list
@@ -77,30 +73,27 @@ val region : node -> region
 val regions : map -> region list
 val iter : map -> (node -> unit) -> unit
 
-val new_chunk : map ->
-  ?parent:node -> ?size:int -> ?ptr:node -> ?pointed:node ->
-  unit -> node
-
+val fresh : map -> node
 val add_cvar : map -> Cil_types.varinfo -> node
 val add_logic_var : map -> Cil_types.logic_var -> domain
 val add_logic_info : map -> Cil_types.logic_info -> domain
 val add_result : map -> node
 val add_label : map -> string -> node
-val add_field : map -> node -> fieldinfo -> node
-val add_index : map -> node -> typ -> node
-val add_points_to : map -> node -> node -> unit
-val add_value : map -> node -> typ -> node option
+val add_field : node -> fieldinfo -> node
+val add_index : node -> typ -> node
+val add_points_to : node -> node -> unit
+val add_value : node -> typ -> node option
 
-val add_read : map -> node -> Access.acs -> unit
-val add_write : map -> node -> Access.acs -> unit
-val add_shift : map -> node -> Access.acs -> unit
+val add_read : node -> Access.acs -> unit
+val add_write : node -> Access.acs -> unit
+val add_shift : node -> Access.acs -> unit
 
 val domain_of_typ : map -> typ -> domain
 val domain_of_ltyp : map -> ?ctxt:context -> logic_type -> domain
 
-val merge : map -> node -> node -> unit
+val merge : node -> node -> unit
 val merge_all : node list -> unit
-val merge_domain : map -> domain -> domain -> domain
+val merge_domain : domain -> domain -> domain
 
 val cvar : map -> varinfo -> node
 val lvar : map -> logic_var -> domain

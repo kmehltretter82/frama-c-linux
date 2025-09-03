@@ -12,7 +12,8 @@
 
 module Imap = Map.Make(Int)
 
-module S = struct
+module S =
+struct
   type 'a rref = int
   type 'a store = {
     mutable rid : int ;
@@ -31,124 +32,111 @@ module S = struct
 
   let eq _s i j = (i == j)
 
-  let id x = x
-  let forge (x : 'a rref) : int = x
 end
 
-module Ufind = UnionFind.Make(S)
+module Ufind :
+sig
+  type 'a rref
+  type 'a store
+  val id : 'a rref -> int
+  val new_store : unit -> 'a store
+  val get : 'a store -> 'a rref -> 'a
+  val set : 'a store -> 'a rref -> 'a -> unit
+  val make : 'a store -> 'a -> 'a rref
+  val find : 'a store -> 'a rref -> 'a rref
+  val merge : 'a store -> ('a -> 'a -> 'a) -> 'a rref -> 'a rref -> 'a rref
+end =
+struct
+  include UnionFind.Make(S)
+  let id = Fun.id
+end
 
-module type Element = sig
+module type NodeData =
+sig
   type 'a t
-  val default_id : int
   val get_id : 'a t -> int
   val set_id : 'a t -> int -> unit
 end
 
 
-module Make(E : Element) = struct
-  type 'a store = {
-    values : 'a E.t Ufind.store ;
-    mutable refs : int Imap.t ;
+module Make(D : NodeData) =
+struct
+
+  type store = {
+    values : data Ufind.store ;
+    keymap : (int,node) Hashtbl.t ;
   }
+  and data = node D.t
+  and node = { rref : data Ufind.rref ; store : store }
 
-  type 'a t = {
-    nnode : 'a E.t Ufind.rref ;
-    mutable nmap : 'a store ref ;
-  }
+  let check ~fn (m : store) (m' : store) =
+    if m == m' then m else
+      let msg = Printf.sprintf "Region.Store.%s (inconsistent maps)" fn in
+      raise (Invalid_argument msg)
 
-  let pp_all fmt m =
-    let print_id fmt id r =
-      Format.fprintf fmt "; id=%x:key=%x ;" id r (*E.pp_elt @@ Ufind.get (!m.values) (S.forge r) *);
-    in
-    Format.fprintf fmt "(%i)=" @@ Imap.cardinal !m.refs ;
-    Imap.iter (print_id fmt) !m.refs
+  let checklock ~fn store =
+    if Hashtbl.length store.keymap > 0 then
+      let msg = Printf.sprintf "Region.Store.%s (locked map)" fn in
+      raise (Invalid_argument msg)
 
-  let check_nmap2 m1 m2 =
-    if !(m1.nmap) != !(m2.nmap) then begin
-      Format.eprintf "__+_1 refs=%a@." pp_all m1.nmap ;
-      Format.eprintf "__+_2 refs=%a@." pp_all m2.nmap ;
-      failwith "Region maps are not equal."
+  let create () = { values = Ufind.new_store () ; keymap = Hashtbl.create 0 }
+
+  let ufind n = Ufind.find n.store.values n.rref
+  let find n = { n with rref = ufind n }
+
+  let by_rank a b = Int.compare (Ufind.id a.rref) (Ufind.id b.rref)
+  let find_all ns = List.sort_uniq by_rank @@ List.map find ns
+
+  let find_all2 xs ys =
+    let rec bag xs ys =
+      match xs , ys with
+      | [] , w | w , [] -> List.map find w
+      | x::xs , y::ys ->
+        if x.rref == y.rref then
+          find x :: bag xs ys
+        else
+          find x :: find y :: bag xs ys
+    in List.sort_uniq by_rank (bag xs ys)
+
+  let store a = a.store
+  let get a = Ufind.get a.store.values a.rref
+  let set a v = Ufind.set a.store.values a.rref v
+  let any a b = if Ufind.id a.rref <= Ufind.id b.rref then a else b
+
+  let fresh store v =
+    checklock ~fn:"fresh" store ;
+    { rref = Ufind.make store.values v ; store }
+
+  let eq a b =
+    let store = check ~fn:"eq" a.store b.store in
+    S.eq store a.rref b.rref
+
+  let merge f a b =
+    let store = check ~fn:"merge" a.store b.store in
+    checklock ~fn:"merge" store ;
+    { rref = Ufind.merge store.values f a.rref b.rref ; store }
+
+  let noid = (-1)
+  let is_locked store = Hashtbl.length store.keymap > 0
+
+  let lock a : bool =
+    let d = get a in
+    0 < D.get_id d ||
+    begin
+      let uid = succ @@ Hashtbl.length a.store.keymap in
+      Hashtbl.add a.store.keymap uid a ;
+      D.set_id d uid ; false
     end
 
-  let new_store () = {
-    values = Ufind.new_store () ;
-    refs = Imap.empty ;
-  }
+  let id a = checklock ~fn:"id" a.store ; D.get_id @@ get a
+  let of_id store k =
+    try Hashtbl.find store.keymap k
+    with Not_found -> raise (Invalid_argument "Region.Store.of_id")
 
-  let key n = S.id n.nnode
-
-  let normalize ?store n =
-    begin match store with
-      | Some s -> if !s != !(n.nmap) then n.nmap <- s
-      | None -> ()
-    end; {
-      nnode = (try Ufind.find ((!(n.nmap)).values) n.nnode with Not_found -> n.nnode) ;
-      nmap = n.nmap ;
-    }
-
-  let id n =
-    let n = normalize n in
-    E.get_id @@ Ufind.get ((!(n.nmap)).values) n.nnode
-
-  let forge_id m id = normalize {
-      nnode = S.forge (Imap.find id !m.refs) ;
-      nmap = m ;
-    }
-
-  let forge_key m key = normalize {
-      nnode = S.forge key ;
-      nmap = m ;
-    }
-
-  let min n1 n2 =
-    check_nmap2 n1 n2 ;
-    forge_key n1.nmap @@ Int.min (key n1) (key n2)
-
-  let get n =
-    let n = normalize n in
-    Ufind.get ((!(n.nmap)).values) n.nnode
-
-  let get_map n = n.nmap
-
-  let set_map m n = n.nmap <- m
-
-  let set n v =
-    let n = normalize n in
-    Ufind.set ((!(n.nmap)).values) n.nnode v
-
-  let set_id n nid =
-    let n = normalize n in
-    let m = n.nmap in
-    let nval = Ufind.get ((!(n.nmap)).values) n.nnode in
-    E.set_id nval nid ;
-    !m.refs <- Imap.add nid (key n) !m.refs
-
-  let new_value m v = {
-    nnode = Ufind.make !m.values v ;
-    nmap = m ;
-  }
-
-  let copy s = {
-    values = Ufind.copy s.values ;
-    refs = s.refs ;
-  }
-
-  let eq n1 n2 =
-    check_nmap2 n1 n2 ;
-    S.eq ((!(n1.nmap)).values) n1.nnode n2.nnode
-
-  let compare n1 n2 = check_nmap2 n1 n2 ; Int.compare (key n1) (key n2)
-
-  let list l = List.sort_uniq compare l
-
-  let rec bag l1 l2 = match l1, l2 with
-    | [], c | c, [] -> c
-    | a :: l1, b :: l2 -> a :: b :: bag l1 l2
-
-  let union n1 n2 =
-    check_nmap2 n1 n2 ;
-    let nmap = n1.nmap in
-    let nnode = Ufind.union ((!(n1.nmap)).values) n1.nnode n2.nnode in
-    { nnode ; nmap }
+  let pretty fmt a =
+    if is_locked a.store then
+      Format.fprintf fmt "R%04x" (D.get_id @@ get a)
+    else
+      Format.fprintf fmt "#%04X" (Ufind.id a.rref)
 
 end

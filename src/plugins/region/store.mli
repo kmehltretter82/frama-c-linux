@@ -6,38 +6,62 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module type Element = sig
+module type NodeData =
+sig
   type 'a t
-  val default_id : int
   val get_id : 'a t -> int
   val set_id : 'a t -> int -> unit
 end
 
-module Make (E:Element) : sig
-  type 'a t
+module Make (D : NodeData) :
+sig
+  type node
+  type store
 
-  type 'a store
-  val new_store : unit -> 'a store
-  val copy : 'a store -> 'a store
+  type data = node D.t
+  val create : unit -> store
 
-  val key : 'a t -> int
-  val id : 'a t -> int
-  val forge_id : 'a store ref -> int -> 'a t
-  val forge_key : 'a store ref -> int -> 'a t
-  val get_map : 'a t -> 'a store ref
-  val set_map : 'a store ref -> 'a t -> unit
+  val store : node -> store
+  val fresh : store -> data -> node
+  (** Returns a fresh node with the associated data. *)
 
-  val new_value : 'a store ref -> 'a E.t -> 'a t
-  val get : 'a t -> 'a E.t
-  val set : 'a t -> 'a E.t -> unit
-  val set_id : 'a t -> int -> unit
-  val normalize : ?store:'a store ref -> 'a t -> 'a t
+  val get : node -> data
+  val set : node -> data -> unit
+  val any : node -> node -> node
+  val merge : (data -> data -> data) -> node -> node -> node
+  (** Merge the two nodes in the same equivalence class. *)
 
-  val eq : 'a t -> 'a t -> bool
-  val min : 'a t -> 'a t -> 'a t
-  val list : 'a t list -> 'a t list
-  val bag : 'a list -> 'a list -> 'a list
-  val union : 'a t -> 'a t -> 'a t
+  val find : node -> node
+  (** Returns an equivalent, normalized node *)
 
-  val pp_all : Format.formatter -> 'a store ref -> unit
+  val find_all : node list -> node list
+  (** Returns a set of (unique, normalized) nodes *)
+
+  val find_all2 : node list -> node list -> node list
+  (** Returns the set of (unique, normalized) nodes from the two lists. *)
+
+  val eq : node -> node -> bool
+
+  val noid : int
+  (** Default identifier for [D.t] *)
+
+  val lock : node -> bool
+  (** Assigns a unique identifier to the node by [D.set_id].
+      Returns [true] if the node has been already locked.
+      The underlying store is now locked and no fresh nodes can be created
+      nor nodes can not more be merged. *)
+
+  val is_locked : store -> bool
+
+  val id : node -> int
+  (** Get the unique identifier of the (locked) node. *)
+
+  val of_id : store -> int -> node
+  (** Retrieves the (locked) node associated with the given id. *)
+
+  val pretty : Format.formatter -> node -> unit
+  (** Prints '#HHHH' for non-locked nodes or 'Rhhhh' for locked nodes.
+      For non-locked nodes, 'HHHH' is the raw rref of the node, for
+      locked nodes, 'hhhh' is the unique identifier of the node. *)
+
 end

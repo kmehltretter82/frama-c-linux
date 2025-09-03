@@ -17,13 +17,11 @@ let get_map () =
   | Kf kf -> Region.map kf
   | Global -> Wp_parameters.not_yet_implemented "[region] logic context"
 
-let id region = Region.uid region
-let pretty fmt r = Format.fprintf fmt "R%03d" @@ id r
-
-let of_id id =
-  try Some (Region.find (get_map ()) id)
-  with Not_found -> None
-let compare r1 r2 = Int.compare (Region.id r1) (Region.id r2)
+let id = Region.id
+let of_id k =
+  try Some (Region.of_id (get_map ()) k) with Invalid_argument _ -> None
+let pretty = Region.pretty
+let compare = Region.compare
 
 module R =
 struct
