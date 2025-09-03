@@ -115,9 +115,21 @@ int main() {
   //@ assert !r;
   r = isfinite(-INFINITY);
   //@ assert !r;
+  r = isfinite(1e-400L);
+  //@ assert r;
 #ifndef NONAN
   r = isfinite(NAN);
+  //@ assert !r;
+  if (isnan(NAN)) {
+    r = isnormal(NAN);
+    //@ assert !r;
+  }
 #endif
+  r = isnormal(0.0);
+  //@ assert !r;
+  r = isnormal(1e-300);
+  //@ assert r;
+  r = isnormal(INFINITY);
   //@ assert !r;
 #endif
 
