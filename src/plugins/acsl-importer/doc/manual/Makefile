@@ -15,9 +15,9 @@ all: doc
 include ../MakeDoc
 
 .PHONY: doc
-doc: $(PLUGIN)-manual.pdf
+doc: $(PLUGIN).pdf
 
-$(PLUGIN)-manual.pdf: $(DOCUMENT).pdf
+$(PLUGIN).pdf: $(DOCUMENT).pdf
 	@echo "Final copy: $@"
 	cp $< $@
 

@@ -14,6 +14,7 @@ mk_tests {
       @tests/slicing/ptests \
       @tests/scope/ptests \
       @tests/sparecode/ptests \
+      @src/plugins/acsl-importer/tests/ptests \
       @src/plugins/aorai/tests/ptests \
       @src/plugins/alias/tests/ptests \
       @src/plugins/dive/tests/ptests \
