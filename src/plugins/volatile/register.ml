@@ -175,14 +175,14 @@ module BA_TBL = struct
 
   let filter_kf_prototype fct ~is_wr_access =
     (* Verifying the prototype within the kind of access. *)
-    let ty = fct.Cil_types.vtype in
+    let ty = fct.vtype in
     assert (Ast_types.is_fun ty) ;
     let ret,args,is_varg_arg,_attrib = Cil.splitFunctionType ty in
     let ret_type = ret in
     let volatile_ret_type = Ast_types.add_attributes [("volatile",[])] ret in
     Options.debug ~level:2 ~dkey:dkey_binding
       "Verifying prototype of function %s: %a@."
-      fct.Cil_types.vorig_name Printer.pp_typ ty;
+      fct.vorig_name Printer.pp_typ ty;
     match is_wr_access, args with
     | false, Some [_,arg1,_] when
         (not (Ast_types.is_void ret || is_varg_arg))
@@ -211,7 +211,7 @@ module BA_TBL = struct
     | _, _ ->
       Options.debug ~level:2 ~dkey:dkey_binding
         "Invalid prototype of function %s@."
-        fct.Cil_types.vorig_name;
+        fct.vorig_name;
       false
 
   let build_kf_table kf_tbl =
@@ -235,7 +235,7 @@ module BA_TBL = struct
       in
       let may_add_kf kf =
         let vi_kf = Kernel_function.get_vi kf in
-        let kf_name = vi_kf.Cil_types.vorig_name in
+        let kf_name = vi_kf.vorig_name in
         match filter_kf_name kf_name with
         | None -> ()
         | Some is_wr_access ->
@@ -288,7 +288,7 @@ module B_MAP = struct
 
   let checks_prototype_kind fct =
     (* Verifying the prototype within the kind of access. *)
-    let ty = fct.Cil_types.vtype in
+    let ty = fct.vtype in
     assert (Ast_types.is_fun ty) ;
     let ret_type,args,is_varg_arg,_attrib = Cil.splitFunctionType ty in
     let volatile_ret_type =
@@ -296,7 +296,7 @@ module B_MAP = struct
     in
     Options.debug ~level:2 ~dkey:dkey_binding
       "Verifying prototype of function %s: %a@."
-      fct.Cil_types.vorig_name Printer.pp_typ ty;
+      fct.vorig_name Printer.pp_typ ty;
     let result is_wr_access arg1 =
       Some (is_wr_access, (Ast_types.direct_pointed_type arg1))
     in match args with
@@ -326,7 +326,7 @@ module B_MAP = struct
       -> result true arg1 (* matching prototype: T fct (T *arg1, T arg2) when T has some volatile attr *)
     | _ -> Options.warning ~wkey:Options.wkey_invalid_binding_function
              "Binding function '%s' has an invalid prototype"
-             fct.Cil_types.vorig_name ;
+             fct.vorig_name ;
       None
 
   let build_binding_map () =
@@ -580,13 +580,13 @@ let find_typename kf_tbl typ ~is_wr_access =
       Printer.pp_typ typ;
     find_fct typ
   in (* Verifying the protyping within the type of the volatile access. *)
-  let ty = fct.Cil_types.vtype in
+  let ty = fct.vtype in
   assert (Ast_types.is_fun ty) ;
   let ret,_args,_is_varg_arg,_attrib = Cil.splitFunctionType ty in
   let volatile_ret_type = Ast_types.add_attributes [("volatile",[])] ret in
   Options.debug ~level:2 ~dkey:dkey_binding
     "Verifying the type of the lvalue within the prototype of function %s: %a@."
-    fct.Cil_types.vorig_name Printer.pp_typ ty;
+    fct.vorig_name Printer.pp_typ ty;
   if not (Typ.equal typ volatile_ret_type) then raise Not_found ;
   fct
 
@@ -663,7 +663,7 @@ let get_volatile_access ?loc fct_name binding_map kf_tbl vol_tbl lval ~is_wr_acc
       in
       let found fct =
         Options.debug ~level:2 ~dkey:dkey_binding
-          "Function found: %s@." fct.Cil_types.vname;
+          "Function found: %s@." fct.vname;
         (match loc with
          | None -> ()
          | Some loc ->
@@ -672,7 +672,7 @@ let get_volatile_access ?loc fct_name binding_map kf_tbl vol_tbl lval ~is_wr_acc
                             else wkey_transformed_access_lvalue_partially_volatile)
              "%s function: Introducing a call to '%s' for %s access to %svolatile left-value: %a"
              fct_name
-             fct.Cil_types.vorig_name
+             fct.vorig_name
              (if is_wr_access then "write" else "read")
              (if is_complete then "" else "partially ")
              Printer.pp_lval lval);
@@ -717,20 +717,20 @@ let get_volatile_access ?loc fct_name binding_map kf_tbl vol_tbl lval ~is_wr_acc
     None
 
 let get_rd_types fct =
-  let ty = fct.Cil_types.vtype in
+  let ty = fct.vtype in
   assert (Ast_types.is_fun ty) ;
   let ret,args,_is_varg_arg,_attrib = Cil.splitFunctionType ty in
   match args with
   | Some [_,arg1,_] -> ret, arg1
-  | _ -> Options.abort "Invalid prototype of function %s@." fct.Cil_types.vorig_name
+  | _ -> Options.abort "Invalid prototype of function %s@." fct.vorig_name
 
 let get_wr_types fct =
-  let ty = fct.Cil_types.vtype in
+  let ty = fct.vtype in
   assert (Ast_types.is_fun ty) ;
   let ret,args,_is_varg_arg,_attrib = Cil.splitFunctionType ty in
   match args with
   | Some ((_,arg1,_)::[_,arg2,_]) -> ret, arg1, arg2
-  | _ -> Options.abort "Invalid prototype of function %s@." fct.Cil_types.vorig_name
+  | _ -> Options.abort "Invalid prototype of function %s@." fct.vorig_name
 
 let get_cast_type_needed_for_assignation ~ret_typ ~lv =
   let tlv = Cil.typeOfLval lv in
