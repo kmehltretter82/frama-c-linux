@@ -579,7 +579,7 @@ ocaml-versions-nightly:
 
 .build_template: &opam_pin_template
   stage: compatibility
-  image: 'ocaml/opam:ubuntu-20.04-ocaml-$OCAML'
+  image: 'ocaml/opam:ubuntu-lts-ocaml-$OCAML'
   script:
     - sudo ln -f /usr/bin/opam-2.1 /usr/bin/opam
     - opam init --reinit -ni
@@ -608,7 +608,7 @@ opam-pin-release:
 
 .build_template: &opam_pin_minimal_template
   stage: compatibility
-  image: 'ocaml/opam:ubuntu-20.04-ocaml-$OCAML'
+  image: 'ocaml/opam:ubuntu-lts-ocaml-$OCAML'
   variables:
     OPAMDOWNLOADJOBS: "1"
     OPAMERRLOGLEN: "0"
