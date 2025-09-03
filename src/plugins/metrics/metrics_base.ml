@@ -215,19 +215,6 @@ end (* End of BasicMetrics *)
 
 (** {3 Filename utilities} *)
 
-exception No_suffix;;
-let get_suffix filename =
-  try
-    let slen = String.length filename in
-    let last_idx = pred slen in
-    let last_dot_idx = String.rindex_from filename last_idx '.' in
-    if last_dot_idx < last_idx then
-      String.sub filename (succ last_dot_idx) (slen - last_dot_idx - 1)
-    else ""
-  with
-  | Not_found -> raise No_suffix
-;;
-
 type output_type =
   | Html
   | Text
@@ -235,19 +222,13 @@ type output_type =
 ;;
 
 let get_file_type (filename : Filepath.t) =
-  try
-    match get_suffix (filename:>string) with
-    | "html" | "htm" -> Html
-    | "txt" | "text" -> Text
-    | "json" -> Json
-    | s ->
-      Metrics_parameters.abort
-        "Unknown file extension %s. Cannot produce output.@." s
-  with
-  | No_suffix ->
+  match Filename.extension (filename:>string) with
+  | ".html" | ".htm" -> Html
+  | ".txt" | ".text" -> Text
+  | ".json" -> Json
+  | s ->
     Metrics_parameters.abort
-      "File %a has no suffix. Cannot produce output.@."
-      Filepath.pretty filename
+      "Unknown file extension %s. Cannot produce output.@." s
 
 module VarinfoByName = struct
   type t = Cil_types.varinfo
