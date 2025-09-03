@@ -13,7 +13,7 @@ open Cil_types
 
 (*-----------------------------------------------------------------------*)
 
-let dkey = A2fcParameter.register_category "trace-table"
+let dkey = Options.register_category "trace-table"
 
 let hidden_attr = "hidden"
 let () = Ast_attributes.register AttrUnknown hidden_attr
@@ -126,7 +126,7 @@ struct
   let find_loop_stmt_set n kf =
     memoized_find H_Int.find H_Int.create Sloop.find Sloop.replace kf n
       (fun tbl ->
-         A2fcParameter.debug ~level:2 ~dkey "Computing loop index table for function \"%a\""
+         Options.debug ~level:2 ~dkey "Computing loop index table for function \"%a\""
            Kernel_function.pretty kf;
          let attr_regexp = Str.regexp_string loop_number_attr in
          let on_loop stmt = match stmt.skind with
@@ -150,7 +150,7 @@ struct
   let find_body_stmt_set n kf =
     memoized_find H_Int.find H_Int.create Sbody.find Sbody.replace kf n
       (fun tbl ->
-         A2fcParameter.debug ~level:2 ~dkey "Computing loop body table for function \"%a\""
+         Options.debug ~level:2 ~dkey "Computing loop body table for function \"%a\""
            Kernel_function.pretty kf;
          let attr_regexp = Str.regexp_string loop_body_attr in
          let on_body stmt = match stmt.skind with
@@ -174,7 +174,7 @@ struct
   let find_asm_stmt_set n kf =
     memoized_find H_Int.find H_Int.create Sasm.find Sasm.replace kf n
       (fun tbl ->
-         A2fcParameter.debug ~level:2 ~dkey "Computing asm call table for function \"%a\""
+         Options.debug ~level:2 ~dkey "Computing asm call table for function \"%a\""
            Kernel_function.pretty kf;
          let cpt = ref 0 in
          let on_asm stmt = match stmt.skind with
@@ -201,7 +201,7 @@ struct
   let find_call_stmt n kf =
     memoized_find H_Int.find H_Int.create Scall.find Scall.replace kf n
       (fun tbl ->
-         A2fcParameter.debug ~level:2 ~dkey "Computing call table1 for function \"%a\""
+         Options.debug ~level:2 ~dkey "Computing call table1 for function \"%a\""
            Kernel_function.pretty kf;
          let cpt = ref 0 in
          let cpt_indirect = ref 0 in
@@ -243,7 +243,7 @@ struct
   let find_call2_stmt called_kf kf =
     memoized_find H_Kf.find H_Kf.create Scall2.find Scall2.replace kf called_kf
       (fun tbl ->
-         A2fcParameter.debug ~level:2 ~dkey "Computing call table2 for function \"%a\""
+         Options.debug ~level:2 ~dkey "Computing call table2 for function \"%a\""
            Kernel_function.pretty kf;
          let tbl_cpt = H_Kf.create 3 in
          let on_call stmt = match stmt.skind with
@@ -282,13 +282,13 @@ struct
 
   (** Clear the memoized tables. *)
   let clear_temporary_table () =
-    A2fcParameter.debug ~level:2 ~dkey "Clear loop index table";
+    Options.debug ~level:2 ~dkey "Clear loop index table";
     Sloop.clear ();
-    A2fcParameter.debug ~level:2 ~dkey "Clear loop body table";
+    Options.debug ~level:2 ~dkey "Clear loop body table";
     Sbody.clear ();
-    A2fcParameter.debug ~level:2 ~dkey "Clear asm call table";
+    Options.debug ~level:2 ~dkey "Clear asm call table";
     Sasm.clear ();
-    A2fcParameter.debug ~level:2 ~dkey "Clear function call tables";
+    Options.debug ~level:2 ~dkey "Clear function call tables";
     Scall.clear ();
     Scall2.clear ()
 
@@ -302,7 +302,7 @@ module MacroIndex: sig
   type scope_t = Sfile | Smodule | Sfunction
   val pp_scope:  Format.formatter -> scope_t -> unit
 
-  val dkey: A2fcParameter.category
+  val dkey: Options.category
 
   (* val self : State.t
      (** Dependencies of the result of find_xxx functions. *)
@@ -367,10 +367,10 @@ end = struct
     with Not_found ->
       Sfile.find m
 
-  let dkey = A2fcParameter.register_category "trace-tables"
+  let dkey = Options.register_category "trace-tables"
 
   let add_macro scope m def =
-    A2fcParameter.debug ~level:2 ~dkey "Add macro %S at %a scope"
+    Options.debug ~level:2 ~dkey "Add macro %S at %a scope"
       m  pp_scope scope;
     let replace = match scope with
       | Sfile     -> Sfile.replace
@@ -383,7 +383,7 @@ end = struct
   (** Clear the memoized "MacroIndex" table in order to free memory,
       without clearing the result dependencies. *)
   let clear_macro_table scope =
-    A2fcParameter.debug ~level:2 ~dkey "Clear macro table from %a scope"
+    Options.debug ~level:2 ~dkey "Clear macro table from %a scope"
       pp_scope scope;
     if scope = Sfile then Sfile.clear () ;
     if scope <> Sfunction then Smodule.clear () ;
@@ -470,7 +470,7 @@ end = struct
   (** To encapsulate all global C symbols *)
   module Symbol = struct
 
-    let dkey = A2fcParameter.register_category "trace-symbols"
+    let dkey = Options.register_category "trace-symbols"
 
     type symbol =
       | Gdef of varinfo | Gdec of varinfo
@@ -492,51 +492,51 @@ end = struct
 
     let encode = function
       | GType (t,_) ->
-        A2fcParameter.debug ~level:2 ~dkey
+        Options.debug ~level:2 ~dkey
           "Type: %S@." t.torig_name;
         Some (t.torig_name,
               Tdef (t))
       | GCompTag (c,_) ->
-        A2fcParameter.debug ~level:2 ~dkey
+        Options.debug ~level:2 ~dkey
           "CompTag: %S@." c.corig_name;
         Some (c.corig_name,
               if c.cstruct then Sdef (c) else Udef (c))
       | GCompTagDecl (c,_)  ->
-        A2fcParameter.debug ~level:2 ~dkey
+        Options.debug ~level:2 ~dkey
           "CompTagDecl: %S@." c.cname;
         Some (c.cname,
               if c.cstruct then Sdec (c)else Udec (c))
       | GEnumTag (e,_) ->
-        A2fcParameter.debug ~level:2 ~dkey
+        Options.debug ~level:2 ~dkey
           "EnumTag: %S@." e.eorig_name;
         Some (e.eorig_name,
               Edef (e))
       | GEnumTagDecl (e,_) ->
-        A2fcParameter.debug ~level:2 ~dkey
+        Options.debug ~level:2 ~dkey
           "EnumTagDecl: %S@." e.eorig_name;
         Some (e.eorig_name,
               Edec (e))
       | GVarDecl (vi,_) ->
         if vi.vglob then
-          (A2fcParameter.debug ~level:2 ~dkey
+          (Options.debug ~level:2 ~dkey
              "VarDecl: %S@." vi.vorig_name;
            Some (vi.vorig_name, Gdec (vi)))
         else None
       | GFunDecl (_,vi,_) ->
         if vi.vglob then
-          (A2fcParameter.debug ~level:2 ~dkey
+          (Options.debug ~level:2 ~dkey
              "FunDecl: %S@." vi.vorig_name;
            Some (vi.vorig_name,Fdec (vi)))
         else None
       | GVar (vi,_,_) ->
         if vi.vglob then
-          (A2fcParameter.debug ~level:2 ~dkey
+          (Options.debug ~level:2 ~dkey
              "Var: %S@." vi.vorig_name;
            Some (vi.vorig_name, Gdef (vi)))
         else None
       | GFun (f,_) ->
         if f.svar.vglob then
-          (A2fcParameter.debug ~level:2 ~dkey
+          (Options.debug ~level:2 ~dkey
              "Fun: %S@." f.svar.vorig_name;
            Some (f.svar.vorig_name, Fdef (f.svar)))
         else None
@@ -650,12 +650,12 @@ end = struct
   (** Compute once the index symbol table. *)
   let compute, self =
     let compute () =
-      A2fcParameter.debug
+      Options.debug
         ~level:2 ~dkey:MacroIndex.dkey "Indexing the C symbol table...";
       let ast =
         try A2fc_inner_ast.get ()
         with Not_found ->
-          A2fcParameter.fatal "No AST registered in ACSL importer plug-in"
+          Options.fatal "No AST registered in ACSL importer plug-in"
       in
       iterGlobals
         ast
@@ -704,7 +704,7 @@ end = struct
   (** Clear the memoized [SymbolIndex] table and the fact it hash been computed
       in order to free memory. *)
   let clear_temporary_table () =
-    A2fcParameter.debug ~level:2 ~dkey "Clear symbol table";
+    Options.debug ~level:2 ~dkey "Clear symbol table";
     First.set true ;
     S.clear () ;
     Statement.clear_temporary_table ()
@@ -785,7 +785,7 @@ end = struct
       let typ = Cil_const.mk_tint item.eihost.ekind in
       let exp = Cil.new_exp ~loc:Cil_datatype.Location.unknown (Const (CEnum (item)))
       in
-      A2fcParameter.debug ~level:2 ~dkey "Found enum item of name %s: symbol=%a type=%a@."
+      Options.debug ~level:2 ~dkey "Found enum item of name %s: symbol=%a type=%a@."
         name Printer.pp_exp exp Printer.pp_logic_type (Ctype typ);
       exp, typ
 
@@ -923,16 +923,16 @@ let current_scope = ref MacroIndex.Sfile
 let current_module = ref None
 let current_function = ref None
 
-let dkey = A2fcParameter.register_category "trace-actions"
+let dkey = Options.register_category "trace-actions"
 
 let set_current_scope scope =
-  A2fcParameter.debug ~level:2 ~dkey "Set current scope to %a@."
+  Options.debug ~level:2 ~dkey "Set current scope to %a@."
     MacroIndex.pp_scope scope ;
   MacroIndex.clear_macro_table scope ;
   current_scope := scope
 
 let set_current_module ~is_from_file_name m =
-  A2fcParameter.debug ~level:2 ~dkey "Set current module to %S@." m ;
+  Options.debug ~level:2 ~dkey "Set current module to %S@." m ;
   set_current_scope (if is_from_file_name
                      then MacroIndex.Sfile
                      else MacroIndex.Smodule) ;
@@ -946,7 +946,7 @@ let set_current_module ~is_from_file_name m =
                   (fun file -> m = basename_chop_extension (File.get_name file))
                   (File.get_all ()))
         in
-        A2fcParameter.debug ~level:2 ~dkey "MODULE %s@." m ;
+        Options.debug ~level:2 ~dkey "MODULE %s@." m ;
         file
       with Not_found -> None
 
@@ -954,26 +954,26 @@ let find_kf fct = SymbolIndex.find_kf ~file:!current_module fct
 
 let set_current_function (fct,(source,_loc2)) =
   set_current_scope MacroIndex.Sfunction ;
-  A2fcParameter.debug ~level:2 ~dkey
+  Options.debug ~level:2 ~dkey
     "Set current function to %S@." fct ;
   try
     current_function :=  Some (find_kf fct) ;
-    A2fcParameter.debug ~level:2 ~dkey "FUNCTION %s@." fct
+    Options.debug ~level:2 ~dkey "FUNCTION %s@." fct
   with
     Not_found ->
-    A2fcParameter.annot_error ~source "could not find function %s for ACSL importer." fct;
+    Options.annot_error ~source "could not find function %s for ACSL importer." fct;
     current_function := None
 
 exception Kf_not_found
 let with_current_function ?source () =
   match !current_function with
-  | None -> A2fcParameter.annot_warning ~raising:(fun () -> raise Kf_not_found)
+  | None -> Options.annot_warning ~raising:(fun () -> raise Kf_not_found)
               ?source "no proper function found for ACSL importer."
   | Some kf -> kf
 
 let get_current_function ?source () =
   match !current_function with
-  | None -> A2fcParameter.abort ?source "no proper function found for ACSL importer."
+  | None -> Options.abort ?source "no proper function found for ACSL importer."
   | Some kf -> kf
 
 (*--------*)
@@ -1006,14 +1006,14 @@ let parse_global s =
                                = (get_prop_loc (),
                                   snd d.Logic_ptree.decl_loc)})
       decls
-  | _ -> A2fcParameter.abort "[Syntax error] Unallowed global annotation."
+  | _ -> Options.abort "[Syntax error] Unallowed global annotation."
 
 (** Parse a function contract. *)
 let parse_spec s =
   match Logic_lexer.spec (get_buff_loc (), s) with
   | Some (loc2, a) -> (* update starting annotation location *)
     a, (get_prop_loc (), loc2)
-  | None -> A2fcParameter.abort "[Syntax error] Invalid function contract"
+  | None -> Options.abort "[Syntax error] Invalid function contract"
 
 (** Parse a code annotation. *)
 let parse_annots s =
@@ -1025,13 +1025,13 @@ let parse_annots s =
     (* update starting annotation location *)
     (get_prop_loc (), loc2), a
   | _ ->
-    A2fcParameter.abort "[Syntax error] Unallowed annotation."
+    Options.abort "[Syntax error] Unallowed annotation."
 
 (** Parse a term/pred. *)
 let parse_lexpr s =
   match Logic_lexer.lexpr (get_buff_loc (), s) with
   | Some (_, t) -> t, get_prop_loc ()
-  | None -> A2fcParameter.abort "[Syntax error] Invalid logic term"
+  | None -> Options.abort "[Syntax error] Invalid logic term"
 
 (*-----------------------------------------------------------------------*)
 exception Stmt_not_found of Kernel_function.t
@@ -1071,7 +1071,7 @@ let find_stmt_set_from_misc ?source label =
     try
       let local_sid = int_of_string label in
       (fun () -> Statement.find_stmt local_sid kf),
-      (fun () -> A2fcParameter.abort ?source "statement ID %s not found into %a function for ACSL import."
+      (fun () -> Options.abort ?source "statement ID %s not found into %a function for ACSL import."
           label Kernel_function.pretty kf)
     with
     | Failure _ -> (* label is not a statement number *)
@@ -1082,7 +1082,7 @@ let find_stmt_set_from_misc ?source label =
           (fun () -> !(Kernel_function.find_label kf label))
       in
       find_stmt,
-      (fun () -> A2fcParameter.abort ?source "statement label %S not found into %a function for ACSL import."
+      (fun () -> Options.abort ?source "statement label %S not found into %a function for ACSL import."
           label Kernel_function.pretty kf)
   in
   let stmt =
@@ -1096,12 +1096,12 @@ let add_macro ~is_global_scope m =
   MacroIndex.add_macro (if is_global_scope then MacroIndex.Sfile else !current_scope) m
 
 let integral_cast ty t =
-  if A2fcParameter.ACSLAddonIntegerCast.get () then
+  if Options.ACSLAddonIntegerCast.get () then
     begin
       let loc = t.term_loc in
       let source = fst loc in
       let ty = Ast_types.remove_attributes_for_logic_type ty in
-      A2fcParameter.warning ~wkey:A2fcParameter.wkey_integer_cast ~source "Casting term %a of type %a into type %a."
+      Options.warning ~wkey:Options.wkey_integer_cast ~source "Casting term %a of type %a into type %a."
         Printer.pp_term t Printer.pp_logic_type Linteger Printer.pp_typ ty;
       Logic_const.tcast ~loc t ty
     end
@@ -1110,14 +1110,14 @@ let integral_cast ty t =
 
 
 (* messages that leads also to an annor_error in raising Exit*)
-let lt_error (source, _ ) fmt = A2fcParameter.annot_warning ~raising:(fun () -> raise Exit) ~source fmt
+let lt_error (source, _ ) fmt = Options.annot_warning ~raising:(fun () -> raise Exit) ~source fmt
 
 let lt_on_error action finally arg =
   try action arg
   with Exit -> finally (Cil_datatype.Location.unknown,"Error"); raise Exit
 
 (** Add global annotations. *)
-let dkey = A2fcParameter.register_category "trace-pasting"
+let dkey = Options.register_category "trace-pasting"
 
 let add_global_annot g_annots =
   let file = !current_module in
@@ -1145,16 +1145,16 @@ let add_global_annot g_annots =
   in
   let add_global parsed_g_annot =
     LT.annot parsed_g_annot |> function None -> () | Some g_annot ->
-      if A2fcParameter.continue_after_typing () then begin
-        A2fcParameter.debug ~level:2 ~dkey
+      if Options.continue_after_typing () then begin
+        Options.debug ~level:2 ~dkey
           "Adding global annotation:@.%a" Printer.pp_global_annotation g_annot;
-        Annotations.add_global A2fcParameter.emitter g_annot
+        Annotations.add_global Options.emitter g_annot
       end
   in
   let add_global parsed_g_annot=
     try add_global parsed_g_annot
     with | Exit ->
-      A2fcParameter.annot_error "global annotation ignored by ACSL import."
+      Options.annot_error "global annotation ignored by ACSL import."
   in
   List.iter add_global g_annots
 
@@ -1198,26 +1198,26 @@ let add_funspec spec loc =
            spec_disjoint_behaviors } as spec) =  (* typed function contract *)
       LT.funspec behaviors vi formals typ spec
     in
-    if A2fcParameter.continue_after_typing () then begin
-      A2fcParameter.debug ~level:2 ~dkey
+    if Options.continue_after_typing () then begin
+      Options.debug ~level:2 ~dkey
         "Adding function specification:@.%a" Printer.pp_funspec spec;
-      Annotations.add_behaviors A2fcParameter.emitter kf spec_behavior;
+      Annotations.add_behaviors Options.emitter kf spec_behavior;
       Option.iter
-        (Annotations.add_terminates A2fcParameter.emitter kf)
+        (Annotations.add_terminates Options.emitter kf)
         spec_terminates;
       Option.iter
-        (Annotations.add_decreases A2fcParameter.emitter kf)
+        (Annotations.add_decreases Options.emitter kf)
         spec_variant;
       List.iter
-        (Annotations.add_complete A2fcParameter.emitter kf)
+        (Annotations.add_complete Options.emitter kf)
         spec_complete_behaviors;
       List.iter
-        (Annotations.add_disjoint A2fcParameter.emitter kf)
+        (Annotations.add_disjoint Options.emitter kf)
         spec_disjoint_behaviors
     end
   with | Kf_not_found
        | Exit ->
-    A2fcParameter.annot_error "function contract ignored by ACSL import."
+    Options.annot_error "function contract ignored by ACSL import."
 
 (** Add code annotations. *)
 let add_annots_aux kf file ?loop_number loc annots stmt =
@@ -1258,26 +1258,26 @@ let add_annots_aux kf file ?loop_number loc annots stmt =
       (* we are supposed to fill empty specs. Do not refrain from replacing
          WritesAny and FreeAllocAny with actual annotations. *)
       let keep_empty = false in
-      if A2fcParameter.continue_after_typing () then begin
+      if Options.continue_after_typing () then begin
         match annot.annot_content with
         | AStmtSpec (_bhv,_spec) -> (* Merging statement contract *)
-          A2fcParameter.debug ~level:2 ~dkey
+          Options.debug ~level:2 ~dkey
             "Adding statement contract:@.%a" Printer.pp_code_annotation annot;
           Annotations.add_code_annot
-            ~keep_empty A2fcParameter.emitter ~kf stmt annot
+            ~keep_empty Options.emitter ~kf stmt annot
         | AAllocation (_bhv,_fa) -> (* Merging loop allocation clause *)
-          A2fcParameter.debug ~level:2 ~dkey
+          Options.debug ~level:2 ~dkey
             "Adding loop allocation clause:@.%a" Printer.pp_code_annotation annot;
           Annotations.add_code_annot
-            ~keep_empty A2fcParameter.emitter ~kf stmt annot
+            ~keep_empty Options.emitter ~kf stmt annot
         | AAssigns (_bhv,_a) ->  (* Merging loop assigns clause *)
-          A2fcParameter.debug ~level:2 ~dkey
+          Options.debug ~level:2 ~dkey
             "Adding loop assigns clause:@.%a" Printer.pp_code_annotation annot;
           Annotations.add_code_annot
-            ~keep_empty A2fcParameter.emitter ~kf stmt annot
+            ~keep_empty Options.emitter ~kf stmt annot
         | AInvariant (bhv,false,pred) when loop_number <> None ->
           (* Converting invariant into loop invariant when possible *)
-          A2fcParameter.debug ~level:2 ~dkey
+          Options.debug ~level:2 ~dkey
             "Adding invariant annotation:@.%a" Printer.pp_code_annotation annot;
           let loop_number =
             match loop_number with
@@ -1293,13 +1293,13 @@ let add_annots_aux kf file ?loop_number loc annots stmt =
                  | _ -> assert false
                in let stmt,annot =
                     if is_convertible then
-                      (A2fcParameter.debug ~level:2 ~dkey
+                      (Options.debug ~level:2 ~dkey
                          "Converting invariant into loop invariant for loop #%d" loop_number;
                        loop_stmt, {annot with annot_content=AInvariant (bhv,true,pred)})
                     else stmt,annot
                in
                Annotations.add_code_annot
-                 ~keep_empty A2fcParameter.emitter ~kf stmt annot
+                 ~keep_empty Options.emitter ~kf stmt annot
           in
           S_Stmt.iter add_invariant
             (try find_loop_stmt_set_from_loop_number loop_number
@@ -1307,11 +1307,11 @@ let add_annots_aux kf file ?loop_number loc annots stmt =
                lt_error loc "loop %d not found into %a function for ACSL import"
                  loop_number Kernel_function.pretty kf)
         | _ ->
-          A2fcParameter.debug ~level:2 ~dkey
+          Options.debug ~level:2 ~dkey
             "Adding statement annotation:@.%a"
             Printer.pp_code_annotation annot;
           Annotations.add_code_annot
-            ~keep_empty A2fcParameter.emitter ~kf stmt annot
+            ~keep_empty Options.emitter ~kf stmt annot
       end
     in
     let loop_stmt =
@@ -1330,7 +1330,7 @@ let add_annots_aux kf file ?loop_number loc annots stmt =
   let add_annot parsed_annot =
     try add_annot parsed_annot
     with | Exit ->
-      A2fcParameter.annot_error "code annotation ignored by ACSL import."
+      Options.annot_error "code annotation ignored by ACSL import."
   in
   List.iter add_annot annots
 
@@ -1340,7 +1340,7 @@ let add_annots ?loop_number stmts loc annots =
     let file = !current_module in
     S_Stmt.iter (add_annots_aux kf file ?loop_number loc annots) stmts
   with | Kf_not_found ->
-    A2fcParameter.annot_error "code annotation ignored by ACSL import."
+    Options.annot_error "code annotation ignored by ACSL import."
 
 (** Add Caveat Post clauses as an ensures and an exits clause. *)
 let add_post kf id _loc post =
@@ -1457,14 +1457,14 @@ let add_post kf id _loc post =
   let env = List.fold_left add_formal env (Kernel_function.get_formals kf) in
   try
     let pred = LT.predicate env post in
-    if A2fcParameter.continue_after_typing () then begin
+    if Options.continue_after_typing () then begin
       let behavior =
         Cil.mk_behavior ~name:id ~post_cond:(visitor#make_post_cond pred) ()
       in
-      Annotations.add_behaviors A2fcParameter.emitter kf [ behavior ]
+      Annotations.add_behaviors Options.emitter kf [ behavior ]
     end
   with | Exit ->
-    A2fcParameter.annot_error "extended annotation ignored by ACSL import."
+    Options.annot_error "extended annotation ignored by ACSL import."
 
 (*-----------------------------------------------------------------------*)
 
@@ -1568,7 +1568,7 @@ let clause_extension = "ensures_and_exits"
 (* Register the grammar extension for "ensures_and_exits" clauses. *)
 let () =
   let clause_typer typing_context loc ps =
-    if A2fcParameter.ACSLAddonEnsuresAndExits.get () then
+    if Options.ACSLAddonEnsuresAndExits.get () then
       ensures_and_exits_typer ~typing_context ~loc ps
     else typing_context.Logic_typing.error loc
         "[Setting error] Rejected clause extension: %s." clause_extension
@@ -1577,7 +1577,7 @@ let () =
     clause_extension clause_typer false
 
 let () =
-  let dkey = A2fcParameter.register_category "trace-ensures-and-exits" in
+  let dkey = Options.register_category "trace-ensures-and-exits" in
   let code_transformation =
     File.register_code_transformation_category clause_extension
   in
@@ -1587,7 +1587,7 @@ let () =
       | "at_exit" :: _ -> Exits
       | "at_return" :: _ -> Normal
       | _ ->
-        A2fcParameter.fatal
+        Options.fatal
           "Unrecognized predicate in %s extension %a"
           clause_extension Printer.pp_predicate p
     in
@@ -1596,7 +1596,7 @@ let () =
       | _ -> p.pred_name
     in
     let pred = Logic_const.new_predicate { p with pred_name } in
-    A2fcParameter.debug ~level:2 ~dkey
+    Options.debug ~level:2 ~dkey
       "Adding clause: %s %a@." (Cil_printer.get_termination_kind_name kind)
       Cil_printer.pp_identified_predicate pred;
     kind, pred
@@ -1624,7 +1624,7 @@ let () =
           | _ ->
             List.iter
               (fun clause_extension ->
-                 A2fcParameter.debug ~level:2 ~dkey
+                 Options.debug ~level:2 ~dkey
                    "Removing clause: %a@."
                    Cil_printer.pp_extended clause_extension;
                  (* note: the remove_extended never fails even if the clause
@@ -1632,7 +1632,7 @@ let () =
                  Annotations.remove_extended Emitter.end_user (*from C file*)
                    (Option.get self#current_kf)
                    clause_extension;
-                 Annotations.remove_extended A2fcParameter.emitter (*imported*)
+                 Annotations.remove_extended Options.emitter (*imported*)
                    (Option.get self#current_kf)
                    clause_extension
               )
@@ -1643,7 +1643,7 @@ let () =
                    (function
                      | {ext_kind = Ext_preds l} -> List.map mk_clause l
                      | _ ->
-                       A2fcParameter.fatal
+                       Options.fatal
                          "Unrecognized content of extension %s"
                          clause_extension)
                    my_ext)
@@ -1654,16 +1654,16 @@ let () =
               if Cil.is_default_behavior bhv then None else Some bhv.b_name
             in
             Annotations.add_ensures
-              A2fcParameter.emitter kf ?stmt ?active ?behavior clauses;
+              Options.emitter kf ?stmt ?active ?behavior clauses;
             SkipChildren
       end
     in
     Visitor.visitFramacFileSameGlobals vis ast
   in
   let deps = (* extension only active when this option is given. *)
-    [(module A2fcParameter.ACSLAddonEnsuresAndExits: Parameter_sig.S)]
+    [(module Options.ACSLAddonEnsuresAndExits: Parameter_sig.S)]
   in
-  let after = [A2fcParameter.main_import] in
+  let after = [Options.main_import] in
   File.add_code_transformation_after_cleanup
     ~deps ~after code_transformation transform
 
@@ -1699,10 +1699,10 @@ let paste_code_annot ?loop_number stmts s =
 
 (*-- Pasting global annotations from buffer --*)
 
-let dkey = A2fcParameter.register_category "trace-importations"
+let dkey = Options.register_category "trace-importations"
 let paste_at_global ~clause =
   let prop = Buffer.contents buffer in
-  A2fcParameter.debug ~level:2 ~dkey
+  Options.debug ~level:2 ~dkey
     "Importing %s %s;@." clause prop ;
   paste_global_annot (clause ^ " " ^ prop ^ ";")
 
@@ -1710,7 +1710,7 @@ let paste_at_global ~clause =
 
 let paste_at_func ~clause =
   let prop = Buffer.contents buffer in
-  A2fcParameter.debug ~level:2 ~dkey
+  Options.debug ~level:2 ~dkey
     "Importing %s %s;@." clause prop ;
   paste_fun_spec (clause ^ " " ^ prop ^ ";")
 
@@ -1718,13 +1718,13 @@ let paste_at_func_behavior ~clause ~behav =
   let prop = Buffer.contents buffer in
   let prop = clause ^ " " ^ prop ^ ";" in
   let prop = if behav = "" then prop else ("behavior " ^ behav ^ ": " ^ prop) in
-  A2fcParameter.debug ~level:2 ~dkey
+  Options.debug ~level:2 ~dkey
     "Importing %s@." prop ;
   paste_fun_spec prop
 
 let paste_post ~behav =
   let prop = Buffer.contents buffer in
-  A2fcParameter.debug ~level:2 ~dkey
+  Options.debug ~level:2 ~dkey
     "Importing ensures_and_exits %s: %s;@." behav prop ;
   let kf = get_current_function () in
   paste_postcond kf behav prop
@@ -1733,18 +1733,18 @@ let paste_post ~behav =
 
 let paste_loop_body ~clause ~loop =
   let prop = Buffer.contents buffer in
-  A2fcParameter.debug ~level:2 ~dkey
+  Options.debug ~level:2 ~dkey
     "Importing AT loop %s: %s %s;@." loop clause prop ;
   let loop_number = int_of_string loop in
   let stmts = try find_loop_body_set_from_loop_number loop_number
     with Stmt_not_found kf ->
-      A2fcParameter.abort "loop body %d not found into %a function for ACSL import."
+      Options.abort "loop body %d not found into %a function for ACSL import."
         loop_number Kernel_function.pretty kf
   in paste_code_annot ~loop_number stmts (clause ^ " " ^ prop ^ ";")
 
 let paste_code ~clause ~label =
   let prop = Buffer.contents buffer in
-  A2fcParameter.debug ~level:2 ~dkey
+  Options.debug ~level:2 ~dkey
     "Importing AT %s: %s %s;@." label clause prop ;
   let stmts = find_stmt_set_from_misc label
   in paste_code_annot stmts (clause ^ " " ^ prop ^ ";")
@@ -1755,12 +1755,12 @@ let paste_at_stmt ~clause ~loop ~label =
 
 let paste_at_loop ~clause ~loop =
   let prop = Buffer.contents buffer in
-  A2fcParameter.debug ~level:2 ~dkey
+  Options.debug ~level:2 ~dkey
     "Importing AT loop %s: loop %s %s;@." loop clause prop ;
   let loop_number = int_of_string loop in
   let stmts = try find_loop_stmt_set_from_loop_number loop_number
     with  Stmt_not_found kf ->
-      A2fcParameter.abort "loop %d not found into %a function for ACSL import."
+      Options.abort "loop %d not found into %a function for ACSL import."
         loop_number Kernel_function.pretty kf
   in paste_code_annot stmts ("loop " ^ clause ^ " " ^ prop ^ ";")
 
@@ -1776,12 +1776,12 @@ let paste_global_annot ~pfile ~pline ~cfile s ast =
   init_pasting ~pfile ~pline ~cfile ast ;
   paste_global_annot s
 
-let dkey = A2fcParameter.register_category "trace-actions"
+let dkey = Options.register_category "trace-actions"
 
 (** For external plug-in API: *)
 let paste_fun_spec kf ~pfile ~pline ~cfile s ast =
   init_pasting ~pfile  ~pline ~cfile ast ;
-  A2fcParameter.debug ~level:2 ~dkey
+  Options.debug ~level:2 ~dkey
     "Set current fonction to %a@." Kernel_function.pretty kf ;
   current_function := Some kf ;
   paste_fun_spec s
@@ -1789,7 +1789,7 @@ let paste_fun_spec kf ~pfile ~pline ~cfile s ast =
 (** For external plug-in API: *)
 let paste_code_annot kf stmt ~pfile ~pline ~cfile s ast=
   init_pasting ~pfile ~pline ~cfile ast;
-  A2fcParameter.debug ~level:2 ~dkey
+  Options.debug ~level:2 ~dkey
     "Set current fonction to %a@." Kernel_function.pretty kf ;
   current_function := Some kf ;
   paste_code_annot (S_Stmt.singleton stmt) s

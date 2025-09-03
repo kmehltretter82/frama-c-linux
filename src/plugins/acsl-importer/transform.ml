@@ -36,13 +36,13 @@ end = struct
       let loop_attr_cabs = if is_unrollable
         then loop_condition_attr_cabs else loop_processed_attr_cabs
       in
-      let loop_attr_cabs = (attr_cabs (A2fcPaste.loop_body_attr_name n)) ::
+      let loop_attr_cabs = (attr_cabs (Paste.loop_body_attr_name n)) ::
                            loop_attr_cabs
-      in [ A2fcPaste.hidden_attr, loop_attr_cabs ], is_unrollable
+      in [ Paste.hidden_attr, loop_attr_cabs ], is_unrollable
 
   let is_block_markup processed_attr block =
     not (List.exists (fun (attr,args) ->
-        ((attr = A2fcPaste.hidden_attr) &&
+        ((attr = Paste.hidden_attr) &&
          List.exists (function
              | { expr_node = CONSTANT (CONST_STRING attr) } ->
                processed_attr = attr
@@ -125,15 +125,15 @@ module S = struct
 end
 
 (** May add an UNROLL_LOOP pragma from -acsl-ulevel option *)
-let dkey = A2fcParameter.register_category "trace-transformations"
+let dkey = Options.register_category "trace-transformations"
 let transform_cabs cabs =
   (* Syntactic transformation of the source code transforming loop body:
      - add a new attribute to blocks of each loop body,
      - unrool loop conditions when -acsl-unroll-loop-conditions is set,
      - insert unroll pragmas as specified by -acsl-ulevel option.
   *)
-  let unroll_loop_cond = A2fcParameter.is_unroll_loop_condition_on ()
-  and unroll_loop_pragma = not (A2fcParameter.is_unroll_loop_pragma_on ())
+  let unroll_loop_cond = Options.is_unroll_loop_condition_on ()
+  and unroll_loop_pragma = not (Options.is_unroll_loop_pragma_on ())
   in
   let visitor = object (self)
     inherit Cabsvisit.nopCabsVisitor
@@ -148,7 +148,7 @@ let transform_cabs cabs =
       if not unroll_loop_pragma then s
       else try begin
         let unroll_pragma_insertion_process loop_category li =
-          A2fcParameter.debug ~level:3 ~dkey
+          Options.debug ~level:3 ~dkey
             "Look at %S loop #%d of function %S for insertion of UNROLL pragma@."
             loop_category loop_cpt fct_name;
           let (is_total_unrolling,nb_unrolling) =
@@ -158,7 +158,7 @@ let transform_cabs cabs =
               raise Not_found ;
             (* 2 - Check if there is unrolling level specified option for that
                    loop *)
-            A2fcParameter.find_ulevel_spec loop_category loop_cpt fct_name
+            Options.find_ulevel_spec loop_category loop_cpt fct_name
             (* May raise [Not_found] *)
           in
           let unroll_specs =
@@ -193,7 +193,7 @@ let transform_cabs cabs =
     method fresh_loop_body_attr li =
       let is_unrollable = unroll_loop_cond &&
                           ((has_only_unroll_loop li) ||
-                           (A2fcParameter.result
+                           (Options.result
                               "Loop condition of loop #%d of function %S was not unrolled since there is a loop annotation."
                               loop_cpt fct_name;
                             false))
@@ -212,7 +212,7 @@ let transform_cabs cabs =
              "if (c) do {/* body attribs */ Sb; } while (c);" *)
           let dowhile = S.stmt (DOWHILE(li,cond,body,loc)) ~sref
           and nop = S.nop ~loc ~sref
-          in A2fcParameter.debug ~level:2 ~dkey
+          in Options.debug ~level:2 ~dkey
             "Unrolling loop condition of loop #%d of function %S."
             loop_cpt fct_name;
           IF(cond,dowhile,nop,loc)
@@ -241,7 +241,7 @@ let transform_cabs cabs =
               DOWHILE(li,cond,body,loc)
             | _ -> let nop = S.nop ~loc ~sref in
               IF(cond,(S.stmt dowhile_node ~sref),nop,loc)
-          in A2fcParameter.debug ~level:2 ~dkey
+          in Options.debug ~level:2 ~dkey
             "Unrolling loop condition of loop #%d of function %S."
             loop_cpt fct_name;
           let init = match init with
@@ -300,7 +300,7 @@ let transform_cabs cabs =
        with Invalid_argument _ -> name
      in let cabsfile = Filepath.to_string (fst cabs)
      in let get_basename () = get_basename (Filename.basename cabsfile)
-     in A2fcParameter.debug ~dkey
+     in Options.debug ~dkey
        "Unrolling loop conditions in file: %s ..." (get_basename ()) ) ;
   if unroll_loop_pragma then begin
     let rec get_basename name =
@@ -309,7 +309,7 @@ let transform_cabs cabs =
       with Invalid_argument _ -> name
     in let cabsfile = Filepath.to_string (fst cabs)
     in let get_basename () = get_basename (Filename.basename cabsfile)
-    in A2fcParameter.debug ~dkey
+    in Options.debug ~dkey
       "Inserting unrolling loop pragmas in file: %s ..." (get_basename ())
   end ;
   Cabsvisit.visitCabsFile (visitor:>Cabsvisit.cabsVisitor) cabs
@@ -319,9 +319,9 @@ let transform_cabs cabs =
 let () =
   Frontc.add_syntactic_transformation
     (fun cabs ->
-       if A2fcParameter.is_importation_on() ||
-          (A2fcParameter.is_unroll_loop_condition_on ()) ||
-          not (A2fcParameter.is_unroll_loop_pragma_on ())
+       if Options.is_importation_on() ||
+          (Options.is_unroll_loop_condition_on ()) ||
+          not (Options.is_unroll_loop_pragma_on ())
        then
          transform_cabs cabs
        else cabs)
@@ -331,9 +331,9 @@ let () =
    unrolling loops *)
 
 let ident_attr_cil f_attr_name n =
-  (A2fcPaste.hidden_attr, [ AStr (f_attr_name n) ])
+  (Paste.hidden_attr, [ AStr (f_attr_name n) ])
 
-let loop_ident_attr_cil = ident_attr_cil A2fcPaste.loop_number_attr_name
+let loop_ident_attr_cil = ident_attr_cil Paste.loop_number_attr_name
 
 let ast_has_changed = ref false
 
@@ -369,16 +369,16 @@ class do_it = object(_self)
 end
 
 let transform_cil file =
-  if A2fcParameter.is_importation_on () then
+  if Options.is_importation_on () then
     let visitor = new do_it in
     Visitor.visitFramacFileSameGlobals (visitor:>Visitor.frama_c_visitor) file;
     if !ast_has_changed then Ast.mark_as_changed ()
 
 let () =
   File.add_code_transformation_after_cleanup
-    ~deps:[(module A2fcParameter.ACSLImport:Parameter_sig.S);
-           (module A2fcParameter.ACSLRun: Parameter_sig.S)]
-    ~before:[Unfold_loops.transform; A2fcParameter.main_import]
-    A2fcParameter.aux_import transform_cil
+    ~deps:[(module Options.ACSLImport:Parameter_sig.S);
+           (module Options.ACSLRun: Parameter_sig.S)]
+    ~before:[Unfold_loops.transform; Options.main_import]
+    Options.aux_import transform_cil
 
 (*-----------------------------------------------------------------------*)
