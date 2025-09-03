@@ -14,4 +14,4 @@ directory	file	line	function	property kind	status	property
 .	csv.c	37	__FC_assert	precondition	Invalid or unreachable	\false
 .	csv.c	50	main4	is_nan_or_infinite	Unknown	\is_finite(d)
 .	csv.c	50	main4	precondition of __FC_assert	Invalid or unreachable	\false
-FRAMAC_SHARE/libc	math.h	1364	pow	precondition	Unknown	finite_logic_res: \is_finite(pow(x, y))
+FRAMAC_SHARE/libc	math.h	1388	pow	precondition	Unknown	finite_logic_res: \is_finite(pow(x, y))

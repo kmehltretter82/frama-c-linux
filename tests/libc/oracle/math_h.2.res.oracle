@@ -989,10 +989,29 @@
 [eva:alarm] math_h.c:103: Warning: 
   function ldexpf: precondition 'finite_logic_res' got status unknown.
 [eva] Done for function ldexpf
+[eva] computing for function __fc_signbitf <- main.
+  Called from math_h.c:124.
+[eva] using specification for function __fc_signbitf
+[eva] Done for function __fc_signbitf
+[eva] math_h.c:125: assertion got status valid.
+[eva] computing for function __fc_signbit <- main.
+  Called from math_h.c:126.
+[eva] using specification for function __fc_signbit
+[eva] Done for function __fc_signbit
+[eva:alarm] math_h.c:127: Warning: assertion got status unknown.
+[eva] computing for function __fc_signbit <- main.
+  Called from math_h.c:128.
+[eva] Done for function __fc_signbit
+[eva] math_h.c:129: assertion got status valid.
+[eva] computing for function __fc_signbitf <- main.
+  Called from math_h.c:130.
+[eva] Done for function __fc_signbitf
+[eva:alarm] math_h.c:131: Warning: assertion got status unknown.
 [eva] Recording results for main
 [eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   __fc_errno ∈ [--..--]
   exponent ∈ [--..--] or UNINITIALIZED
+  r ∈ [--..--]
   __retres ∈ {0}
