@@ -492,6 +492,12 @@ module Make (Model : Modeling) = struct
   let top_int = top
   let inject_int _ _ = top
 
+  let zero_float format =
+    let exact    = Exact.zero    in
+    let absolute = Absolute.zero in
+    let relative = Relative.zero in
+    Repr { exact ; absolute ; relative ; format }
+
   let assume_non_zero v = `Unknown v
   let assume_bounded _ _ v = `Unknown v
   let assume_not_nan ~assume_finite:_ _ v = `Unknown v
@@ -535,7 +541,17 @@ module Make (Model : Modeling) = struct
     match l, r with
     | Top, result | result, Top -> `Value result
     | False, False -> `Value False
-    | False, Repr _ | Repr _, False -> `Bottom
+    | False, Repr _ | Repr _, False ->
+      (* Trying to compute the narrow between False and a valid representation.
+         In the abstraction lattice view, it should be Bottom, as False is a
+         boolean, not a floating point number. But in C, both the boolean
+         false and the floating point number 0.0 share the same exact bitfield
+         representation and are thus strictly equal. The abstraction would be
+         technically incorrect with respect to the C semantic, even if it
+         would make no sens on the abstraction side. Good luck with that. *)
+      Self.fatal
+        "Trying to compute the narrow between False and a valid \
+         floating-point representation, which are not compatible."
     | Repr l, Repr r ->
       match Typed_float.same_format l.format r.format with
       | No -> `Bottom
@@ -613,8 +629,10 @@ module Make (Model : Modeling) = struct
   let forward_cast context ~src_type ~dst_type value =
     let open Eval_typ in
     match value, src_type, dst_type with
-    | False, TSFloat _, TSFloat _ -> `Value False
     | Top, TSFloat _, TSFloat _ -> `Value Top
+    | False, _, TSFloat destination ->
+      let Format format = format_of_fkind destination in
+      `Value (zero_float format)
     | _, (TSInt _ | TSPtr _), (TSInt _ | TSFloat _ | TSPtr _) -> `Value Top
     | _, TSFloat _, (TSInt _ | TSPtr _) -> `Value Top
     | Repr r, TSFloat _, TSFloat destination ->
