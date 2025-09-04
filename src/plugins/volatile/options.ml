@@ -70,48 +70,6 @@ module Process =
     let help = "Only process the given function(s)"
   end)
 
-module Cast =
-  True(struct
-    let option_name = "-volatile-warning-on-volatile-casts"
-    let help = "[DEPRECATED: Use -volatile-warn-key cast:volatile \
-                (or similar options) instead] \
-                warns on casts which may loose volatile qualifier"
-  end)
-let () = Cast.add_set_hook
-    (fun o s ->
-       if (o <> s) then
-         set_warn_status wkey_volatile_cast
-           (if s then Log.Wactive else Log.Winactive);
-    )
-
-module Complete =
-  True(struct
-    let option_name = "-volatile-warning-on-volatile-lvalues"
-    let help = "[DEPRECATED: Use -volatile-warn-key transformed-access:lvalue-volatile \
-                (or similar options) instead] \
-                warns on accesses to lvalues completely volatile"
-  end)
-let () = Cast.add_set_hook
-    (fun o s ->
-       if (o <> s) then
-         set_warn_status wkey_transformed_access_lvalue_volatile
-           (if s then Log.Wactive else Log.Winactive);
-    )
-
-module Partial =
-  True(struct
-    let option_name = "-volatile-warning-on-lvalues-partially-volatile"
-    let help = "[DEPRECATED: Use -volatile-warn-key transformed-access:lvalue-partially-volatile \
-                (or similar options) instead] \
-                warns on accesses to lvalues partially volatile"
-  end)
-let () = Cast.add_set_hook
-    (fun o s ->
-       if (o <> s) then
-         set_warn_status wkey_transformed_access_lvalue_partially_volatile
-           (if s then Log.Wactive else Log.Winactive);
-    )
-
 module CallPtr =
   String_list
     (struct

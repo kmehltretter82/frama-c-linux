@@ -37,12 +37,3 @@ module BindingAuto : Parameter_sig.Bool
 module BindingCall : Parameter_sig.Bool
 module Base : Parameter_sig.Bool
 module BindingPrefix : Parameter_sig.String
-
-module Cast : Parameter_sig.Bool
-[@@ deprecated "Uses C2fcParameter.wkey_volatile_cast instead."]
-
-module Partial : Parameter_sig.Bool
-[@@ deprecated "Uses C2fcParameter.wkey_transformed_access_lvalue_partially_volatile instead."]
-
-module Complete : Parameter_sig.Bool
-[@@ deprecated "Uses C2fcParameter.wkey_transformed_access_lvalue_volatile instead."]
