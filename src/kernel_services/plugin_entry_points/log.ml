@@ -810,7 +810,7 @@ sig
 
   val register_tag_handlers : (string -> string) * (string -> string) -> unit
 
-  val register_category: ?help:string -> string -> category
+  val register_category: ?help:string -> ?default:bool -> string -> category
 
   val pp_category: Format.formatter -> category -> unit
 
@@ -873,10 +873,25 @@ struct
 
   let () = Hashtbl.add categories_help "*" "All categories"
 
-  let register_category ?(help="No description provided") (s:string) =
+  let not_registered s =
+    failwith (s ^ " is not a registered category for " ^ label)
+
+  let add_debug_keys s =
+    try
+      categories := Category_trie.add_info (split_category s) true !categories
+    with Not_found -> not_registered s
+
+  let del_debug_keys s =
+    try
+      categories := Category_trie.add_info (split_category s) false !categories
+    with Not_found -> not_registered s
+
+  let register_category ?(help="No description provided") ?(default=false)
+      (s:string) =
     let l = split_category s in
     categories := Category_trie.add_structure l !categories;
     Hashtbl.replace categories_help s help;
+    if default then add_debug_keys s;
     s
 
   let pp_category fmt (cat: category) = Format.pp_print_string fmt cat
@@ -895,22 +910,9 @@ struct
   let get_category s =
     if is_registered_category s then Some s else None
 
-  let not_registered s =
-    failwith (s ^ " is not a registered category for " ^ label)
-
   let dkey_name s = s
 
   let wkey_name s = s
-
-  let add_debug_keys s =
-    try
-      categories := Category_trie.add_info (split_category s) true !categories
-    with Not_found -> not_registered s
-
-  let del_debug_keys s =
-    try
-      categories := Category_trie.add_info (split_category s) false !categories
-    with Not_found -> not_registered s
 
   let get_debug_keys () =
     let f cat info acc =

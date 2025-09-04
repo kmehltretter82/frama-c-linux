@@ -34,7 +34,7 @@ val dkey_summary : category
 (** {2 Debug categories.} *)
 
 (** Same as Log's {!register_category}, but [help] is mandatory. *)
-val register_category: help:string -> string -> category
+val register_category: help:string -> ?default:bool -> string -> category
 
 val dkey_pointer_comparison: category
 val dkey_cvalue_domain: category
