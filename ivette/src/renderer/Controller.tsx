@@ -384,6 +384,7 @@ export function RenderConsole(): JSX.Element {
         onViewport={onVisible}
         onSelection={onVisible}
         showCurrentLine={!scrolling}
+        scrollToBottom={true}
       />
     </>
   );
