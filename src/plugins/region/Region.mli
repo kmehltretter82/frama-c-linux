@@ -32,69 +32,59 @@ type map
 type node
 val map : kernel_function -> map
 
-(** Not normalized.
-    Two nodes in the same equivalence class may have different identifiers. *)
-val id : node -> int
-
 (** Unique id of normalized node.
     This can be considered the unique identifier of the region equivalence
     class. *)
-val uid : map -> node -> int
+val id : node -> int
+val of_id : map -> int -> node
 
-(** Returns a normalized node.
-    @raises Not_found if not a valid node identifier. *)
-val find : map -> int -> node
-
-(** Normalized node.
-    The returned node is the representative of the region equivalence class.
-    There is one unique representative per equivalence class. *)
-val node : map -> node -> node
-
-(** Normalized list of nodes (normalized, uniques, sorted by id) *)
-val nodes : map -> node list -> node list
+val pretty : Format.formatter -> node -> unit
 
 (** {2 Region Properties}
 
     All functions in this section provide normalized nodes
     and shall never raise exception. *)
 
-val points_to : map -> node -> node option
-val pointed_by : map -> node -> node list
+val points_to : node -> node option
+val pointed_by : node -> node list
 
-val size : map -> node -> int
-val parents : map -> node -> node list
-val cvars : map -> node -> varinfo list
-val labels: map -> node -> string list
-val reads : map -> node -> typ list
-val writes : map -> node -> typ list
-val shifts : map -> node -> typ list
+val size : node -> int
+val parents : node -> node list
+val cvars : node -> varinfo list
+val labels: node -> string list
+val reads : node -> typ list
+val writes : node -> typ list
+val shifts : node -> typ list
 
-val typed : map -> node -> typ option
+val typed : node -> typ option
 (** Full-sized cells with unique type access *)
 
 val iter : map -> (node -> unit) -> unit
 
 (** {2 Alias Analysis} *)
 
-(** [equal m a b] checks if nodes [a] and [b] are in the same region. *)
-val equal : map -> node -> node -> bool
+(** [equal a b] checks if nodes [a] and [b] are in the same region. *)
+val equal : node -> node -> bool
 
-(** [include m a b] checks if region [a] is a sub-region of [b] in map [m]. *)
-val included : map -> node -> node -> bool
+(** [compare a b] compares regions [a] and [b] by their unique id. *)
+val compare : node -> node -> int
 
-(** [separated m a b] checks if region [a] and region [b] are disjoint.
+(** [include a b] checks if region [a] is a sub-region of [b] in map [m]. *)
+val included : node -> node -> bool
+
+(** [separated a b] checks if region [a] and region [b] are disjoint.
     Disjoints regions [a] and [b] have the following properties:
     - [a] is {i not} a sub-region of [b];
     - [b] is {i not} a sub-region of [a];
     - two l-values respectively localized in [a] and [b]
       can {i never} be aliased.
 *)
-val separated : map -> node -> node -> bool
+val separated : node -> node -> bool
 
 
-(** [singleton m a] returns [true] when node [a] is guaranteed to have only
+(** [singleton a] returns [true] when node [a] is guaranteed to have only
     one single address in its equivalence class. *)
-val singleton : map -> node -> bool
+val singleton : node -> bool
 
 (** [lval m lv] is region where the address of [l] lives in.
     The returned region is normalized.
@@ -120,11 +110,11 @@ val cvar : map -> varinfo -> node
 
 (** Unormalized.
     @raises Not_found *)
-val field : map -> node -> fieldinfo -> node
+val field : node -> fieldinfo -> node
 
 (** Unormalized.
     @raises Not_found *)
-val index : map -> node -> typ -> node
+val index : node -> typ -> node
 
 (** Normalized list of leaf nodes. *)
-val footprint : map -> node -> node list
+val footprint : node -> node list

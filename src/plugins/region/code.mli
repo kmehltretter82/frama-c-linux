@@ -12,5 +12,5 @@ open Memory
 (** All the provided maps are locked. *)
 type domain = map
 
-(** The global map, if provided, is used as an accumulator. *)
-val domain : ?global:map -> kernel_function -> domain
+(** Domain for a function (not memoized). *)
+val domain : kernel_function -> domain

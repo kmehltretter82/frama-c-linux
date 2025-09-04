@@ -89,6 +89,7 @@ struct
       | ArrInit -> Format.fprintf fmt "%tinit[]" Unicode.pp_mu
 
     let hash { data ; region } = Hashtbl.hash (data, R.id region)
+
     let equal a b = Stdlib.(=) a.data b.data && R.id a.region = R.id b.region
     let compare a b =
       let cmp = Stdlib.compare a.data b.data in

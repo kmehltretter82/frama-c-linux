@@ -20,29 +20,29 @@ open Ldomain
 let rec add_path (m:map) (p:path): node =
   match p.step with
   | Var x -> add_cvar m x
-  | Field(lv,fd) -> Memory.add_field m (add_path m lv) fd
-  | Index(lv,_) -> Memory.add_index m (add_path m lv) lv.typ
+  | Field(lv,fd) -> Memory.add_field (add_path m lv) fd
+  | Index(lv,_) -> Memory.add_index (add_path m lv) lv.typ
   | Star e | Cast(_,e) -> add_pointer m e
   | Shift _ | AddrOf _ ->
     Options.error ~source:(fst p.loc)
       "Unexpected expression (l-value expected)" ;
-    Memory.new_chunk m ()
-and add_pointer  (m:map) (p:path): Memory.node =
+    Memory.fresh m
+and add_pointer (m:map) (p:path): Memory.node =
   match add_exp m p with
-  | None -> Memory.new_chunk m ()
+  | None -> Memory.fresh m
   | Some r -> r
 
 and add_exp (m:map) (p:path): Memory.node option =
   match p.step with
   | (Var _ | Field _ | Index _ | Star _ | Cast _) ->
     let r = add_path m p in
-    add_value m r p.typ
+    add_value r p.typ
   | AddrOf p -> Some (add_path m p)
   | Shift p -> add_exp m p
 
 let add_region (m: map) (r : Spec.region) =
   let rs = List.map (add_path m) r.rpath in
-  merge_all m @@
+  merge_all @@
   match r.rname with
   | None -> rs
   | Some a -> add_label m a :: rs
@@ -60,10 +60,12 @@ type env = {
   property : Property.t ;
 }
 
-let merge env a b = Memory.merge env.map a b ; min a b
+let fresh env () = Memory.fresh env.map
 
-let pointer (env:env) (d:domain) : node =
-  match Ldomain.pointed (merge env) d with
+let merge a b = Memory.merge a b ; min a b
+
+let pointer (d:domain) : node =
+  match Ldomain.pointed merge d with
   | Some p -> p
   | None -> Options.abort "Not a pointer value"
 
@@ -82,7 +84,7 @@ let logic_var env lv =
 let rec load env lv (ty:typ) r : domain =
   match Ast_types.unroll_node ty with
   | TArray(te,_) ->
-    let r' = Memory.add_index env.map r ty in
+    let r' = Memory.add_index r ty in
     let ofs = TIndex (Logic_const.trange (None,None), TNoOffset) in
     let lv = Logic_const.addTermOffsetLval ofs lv in
     array (load env lv te r')
@@ -90,15 +92,15 @@ let rec load env lv (ty:typ) r : domain =
     let add_field d fd =
       let ofs = TField (fd,TNoOffset) in
       let lv = Logic_const.addTermOffsetLval ofs lv in
-      merge_domain env.map d
+      merge_domain d
       @@ Ldomain.field fd
       @@ load env lv fd.ftype
-      @@ Memory.add_field env.map r fd
+      @@ Memory.add_field r fd
     in List.fold_left add_field pure @@ Option.value ~default:[] cfields
   | _ ->
     let acs = Access.Term (env.property, lv) in
-    Memory.add_read env.map r acs ;
-    Ldomain.scalar @@ Memory.add_value env.map r ty
+    Memory.add_read r acs ;
+    Ldomain.scalar @@ Memory.add_value r ty
 
 let rterm = ref (fun _ _ -> assert false)
 
@@ -106,20 +108,20 @@ let rec addr_offset (env:env) (ty:typ) (r:node) = function
   | TNoOffset -> r
   | TModel _ -> Options.not_yet_implemented "Model field"
   | TField (f,offset) ->
-    addr_offset env f.ftype (Memory.add_field env.map r f) offset
+    addr_offset env f.ftype (Memory.add_field r f) offset
   | TIndex(k,offset) ->
     ignore @@ !rterm env k ;
     let te = Ast_types.direct_element_type ty in
-    addr_offset env te (Memory.add_index env.map r ty) offset
+    addr_offset env te (Memory.add_index r ty) offset
 
 let rec term_offset (env:env) (d:domain) = function
   | TNoOffset -> d
   | TModel _ -> Options.not_yet_implemented "Model field"
   | TField (f,offset) ->
-    term_offset env (Ldomain.get_field (merge env) d f) offset
+    term_offset env (Ldomain.get_field merge d f) offset
   | TIndex(k,offset) ->
     ignore @@ !rterm env k ;
-    term_offset env (Ldomain.get_index (merge env) d) offset
+    term_offset env (Ldomain.get_index merge d) offset
 
 let get_result env = match env.result with
   | None -> Memory.add_result env.map
@@ -132,7 +134,7 @@ let add_term_lval (env:env) lv =
   | TResult ty ->
     load env lvh ty @@ addr_offset env ty (get_result env) loffset
   | TMem e ->
-    let rh = pointer env (!rterm env e) in
+    let rh = pointer (!rterm env e) in
     let te = Logic_typing.ctype_of_pointed e.term_type in
     load env lvh te @@ addr_offset env te rh loffset
   | TVar v ->
@@ -147,14 +149,14 @@ let add_addr_lval (env:env) (lhost,loffset) : node =
   match lhost with
   | TResult ty -> addr_offset env ty (get_result env) loffset
   | TMem e ->
-    let rh = pointer env (!rterm env e) in
+    let rh = pointer (!rterm env e) in
     let te = Logic_typing.ctype_of_pointed e.term_type in
     addr_offset env te rh loffset
   | TVar lv ->
     begin match logic_var env lv with
       | VAL d ->
         let te = Logic_utils.logicCType lv.lv_type in
-        addr_offset env te (pointer env d) loffset
+        addr_offset env te (pointer d) loffset
       | VAR x ->
         addr_offset env x.vtype (Memory.add_cvar env.map x) loffset
     end
@@ -167,7 +169,7 @@ let rec add_loffset (env:env) loffest d = match loffest with
 
 let call (env:env) (l:logic_info) (ds:domain list) : domain =
   let sigma = ref Ldomain.empty in
-  let unify = Ldomain.unify (merge env) sigma in
+  let unify = Ldomain.unify merge sigma in
   List.iter2 (fun x -> unify (Memory.add_logic_var env.map x)) l.l_profile ds ;
   Ldomain.subst !sigma @@ Memory.add_logic_info env.map l
 
@@ -182,19 +184,19 @@ let rec add_term (env:env) (t:term) : domain = match t.term_node with
     iadd_term env b ;
     let dt = add_term env ct in
     let df = add_term env cf in
-    merge_domain env.map dt df
+    merge_domain dt df
   | TUnOp(_,t) | TCast(_,_,t) | Tat(t,_) -> add_term env t
   | TBinOp ((PlusPI|MinusPI),t1,t2) ->
     let d1 = add_term env t1 in
     let d2 = add_term env t2 in
-    merge_domain env.map d1 d2
+    merge_domain d1 d2
   | TBinOp(_,t1,t2) -> iadd_term env t1 ; iadd_term env t2 ; pure
   | Tbase_addr(_,t) | Toffset (_,t) | Tblock_length(_,t) ->
     iadd_term env t ; pure
   | TUpdate(lv,o,v) ->
-    merge_domain env.map (add_term env lv) @@ add_loffset env o @@ add_term env v
+    merge_domain (add_term env lv) @@ add_loffset env o @@ add_term env v
   | Tunion ts | Tinter ts ->
-    List.fold_left (fun d t -> merge_domain env.map d @@ add_term env t) pure ts
+    List.fold_left (fun d t -> merge_domain d @@ add_term env t) pure ts
   | Tcomprehension(t,q,p) ->
     Option.iter (add_predicate env) p ;
     List.iter (iadd_logic_var env.map) q ;
@@ -208,7 +210,7 @@ let rec add_term (env:env) (t:term) : domain = match t.term_node with
         let dv = add_logic_var env.map v in
         let da = add_term env a in
         let sigma = ref Ldomain.empty in
-        Ldomain.unify (merge env) sigma da dv ;
+        Ldomain.unify merge sigma da dv ;
         Ldomain.subst !sigma @@ add_term env b
       | LBpred p ->
         iadd_logic_var env.map v ;
@@ -218,11 +220,11 @@ let rec add_term (env:env) (t:term) : domain = match t.term_node with
     end
   | TDataCons(c,ts) ->
     let ds = List.map (add_term env) ts in
-    let args = List.map (of_ltype (new_chunk env.map)) c.ctor_params in
+    let args = List.map (of_ltype (fresh env)) c.ctor_params in
     let sigma = ref Ldomain.empty in
-    List.iter2 (unify (merge env) sigma) ds args ;
+    List.iter2 (unify merge sigma) ds args ;
     match c.ctor_type.lt_def with
-    | Some (LTsyn lt) -> of_ltype (new_chunk env.map) lt
+    | Some (LTsyn lt) -> of_ltype (fresh env) lt
     | None | Some (LTsum _) -> pure
 
 and iadd_term env t = ignore @@ add_term env t
@@ -248,7 +250,7 @@ and add_predicate (env:env) (p:predicate) = match p.pred_content with
     let dv = add_logic_var env.map v in
     let dt = add_term env t in
     let sigma = ref empty in
-    Ldomain.unify (merge env) sigma dt dv ;
+    Ldomain.unify merge sigma dt dv ;
     add_predicate env p2
   | Plet({ l_var_info = v ; l_body = LBpred p1 ; },p2) ->
     iadd_logic_var env.map v ;

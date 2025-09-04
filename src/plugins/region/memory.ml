@@ -8,48 +8,54 @@
 
 open Cil_types
 open Cil_datatype
-module Ufind = UnionFind.Make(Store)
 module Vmap = Varinfo.Map
 module Vset = Varinfo.Set
 module Lmap = Map.Make(String)
 module Lset = Set.Make(String)
 module LVmap = Logic_var.Map
 module LVImap = Logic_info.Map
-
 (* -------------------------------------------------------------------------- *)
 (* --- Region Maps                                                        --- *)
 (* -------------------------------------------------------------------------- *)
 
-(* All offsets in bits *)
-
-type node = chunk Ufind.rref
-
-and layout =
+type 'a nlayout =
   | Blob
-  | Cell of int * node option
-  | Compound of int * Fields.domain * node Ranges.t
+  | Cell of int * 'a option
+  | Compound of int * Fields.domain * 'a Ranges.t
   (* must only contain strict sub-ranges *)
 
-and chunk = {
-  cparents: node list ;
-  cpointed: node list ;
+and 'a nchunk = {
+  cparents: 'a list ;
+  cpointed: 'a list ;
   ccvars: Vset.t ;
   clabels: Lset.t ;
   creads: Access.Set.t ;
   cwrites: Access.Set.t ;
   cshifts: Access.Set.t ;
-  clayout: layout ;
+  clayout: 'a nlayout ;
+  mutable cid : int ;
 }
 
+(* All offsets in bits *)
+
+module UF = Store.Make
+    (struct
+      type 'a t = 'a nchunk
+      let get_id c = c.cid
+      let set_id c cid = c.cid <- cid
+    end)
+
+type node = UF.node
+type chunk = node nchunk
+type layout = node nlayout
 type rg = node Ranges.range
 
 type domain = node Ldomain.t
 type context = node Ldomain.context
 
 type map = {
-  store: chunk Ufind.store ;
+  store: UF.store ;
   mutable labels: node Lmap.t ;
-  mutable locked: bool ;
   mutable cvars: node Vmap.t ;
   mutable lvars: domain LVmap.t ;
   mutable logics: domain LVImap.t ;
@@ -78,19 +84,12 @@ let ctypes (m : chunk) : typ list =
   Access.Set.iter add m.cwrites ;
   Typ.Set.elements !pool
 
-let failwith_locked m fn =
-  if m.locked then raise (Invalid_argument (fn ^ ": locked"))
-
-let lock m = m.locked <- true
-let unlock m = m.locked <- false
-
 (* -------------------------------------------------------------------------- *)
 (* --- Map Constructors                                                   --- *)
 (* -------------------------------------------------------------------------- *)
 
 let create () = {
-  locked = false ;
-  store = Ufind.new_store () ;
+  store = UF.create () ;
   cvars = Vmap.empty ;
   labels = Lmap.empty ;
   lvars = LVmap.empty ;
@@ -98,17 +97,8 @@ let create () = {
   result = None;
 }
 
-let copy ?locked m = {
-  locked = (match locked with None -> m.locked | Some l -> l) ;
-  store = Ufind.copy m.store ;
-  cvars = m.cvars ;
-  labels = m.labels ;
-  lvars = m.lvars ;
-  logics = m.logics ;
-  result = m.result ;
-}
-
 let empty = {
+  cid = UF.noid ;
   cparents = [] ;
   cpointed = [] ;
   ccvars = Vset.empty ;
@@ -123,35 +113,25 @@ let empty = {
 (* --- Map                                                                --- *)
 (* -------------------------------------------------------------------------- *)
 
-let id = Store.id
-let forge = Store.forge
-let equal (m: map) = Ufind.eq m.store
+let equal = UF.eq
 
-let node map node =
-  try Ufind.find map.store node
-  with Not_found -> node
+let find = UF.find
+let find_all = UF.find_all
 
-let nodes map ns = Store.list @@ List.map (node map) ns
-
-let get map node =
-  try Ufind.get map.store node
-  with Not_found -> empty
-
-let update (m: map) (n: node) (f: chunk -> chunk) =
-  let r = get m n in
-  Ufind.set m.store n (f r)
+let update (n: node) (f: chunk -> chunk) =
+  UF.set n (f @@ UF.get n)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Printers                                                           --- *)
 (* -------------------------------------------------------------------------- *)
 
-let pp_node fmt (n : node) = Format.fprintf fmt "R%04x" @@ Store.id n
-
+let pp_node = UF.pretty
 let pp_field fields fmt fd =
   if Options.debug_atleast 1 then Ranges.pp_range fmt fd else
     Fields.pretty fields fmt fd
 
-let pp_layout fmt = function
+let pp_layout fmt =
+  function
   | Blob -> Format.pp_print_string fmt "<blob>"
   | Cell(s,None) -> Format.fprintf fmt "<%04d>" s
   | Cell(s,Some n) -> Format.fprintf fmt "<%04d>(*%a)" s pp_node n
@@ -181,14 +161,17 @@ let pp_chunk name fmt (m: chunk) =
     Format.fprintf fmt "@ %a ;@]" pp_layout m.clayout ;
   end
 
-let pp_region (m : map) fmt (r : node) =
+let pp_region fmt (r : node) =
   let name = Pretty_utils.to_string pp_node r in
-  pp_chunk name fmt (get m r)
+  pp_chunk name fmt (UF.get r)
 [@@ warning "-32"]
 
 (* -------------------------------------------------------------------------- *)
 (* --- Nodes Set                                                          --- *)
 (* -------------------------------------------------------------------------- *)
+
+let id n = (UF.get n).cid
+let of_id m = UF.of_id m.store
 
 module SNode = Set.Make(struct
     type t = node
@@ -199,8 +182,7 @@ module SNode = Set.Make(struct
 (* --- Chunk Constructors                                                 --- *)
 (* -------------------------------------------------------------------------- *)
 
-let new_chunk (m: map) ?parent ?(size=0) ?ptr ?pointed () =
-  failwith_locked m "Region.Memory.new_chunk" ;
+let new_chunk (store : UF.store) ?parent ?(size=0) ?ptr ?pointed () =
   let clayout =
     match ptr with
     | None -> if size = 0 then Blob else Cell(size,None)
@@ -209,82 +191,79 @@ let new_chunk (m: map) ?parent ?(size=0) ?ptr ?pointed () =
   in
   let cparents = match parent with None -> [] | Some root -> [root] in
   let cpointed = match pointed with None -> [] | Some ptr -> [ptr] in
-  Ufind.make m.store  { empty with clayout ; cpointed ; cparents }
+  UF.fresh store { empty with clayout ; cpointed ; cparents }
+
+let fresh (m: map) = new_chunk m.store ()
 
 let add_label (m: map) a =
   try Lmap.find a m.labels with Not_found ->
-    failwith_locked m "Region.Memory.add_label" ;
-    let n = new_chunk m () in
-    update m n (fun d -> { d with clabels = Lset.singleton a }) ;
+    let n = new_chunk m.store () in
+    update n (fun d -> { d with clabels = Lset.singleton a }) ;
     m.labels <- Lmap.add a n m.labels ; n
 
 let add_cvar (m: map) v =
   try Vmap.find v m.cvars with Not_found ->
-    failwith_locked m "Region.Memory.add_varinfo" ;
-    let n = new_chunk m () in
-    update m n (fun d -> { d with ccvars = Vset.singleton v }) ;
+    let n = new_chunk m.store () in
+    update n (fun d -> { d with ccvars = Vset.singleton v }) ;
     m.cvars <- Vmap.add v n m.cvars ; n
 
 let add_logic_info (m: map) f =
   try LVImap.find f m.logics with Not_found ->
-    failwith_locked m "Region.Memory.add_logic_info" ;
-    let get_type t = Ldomain.of_ltype (new_chunk m) t in
+    let get_type t = Ldomain.of_ltype (new_chunk m.store) t in
     let d = Option.fold ~none:Ldomain.pure ~some:get_type f.l_type in
     m.logics <- LVImap.add f d m.logics ; d
 
 let add_logic_var (m: map) lv =
   try LVmap.find lv m.lvars with Not_found ->
-    failwith_locked m "Region.Memory.add_logic_var" ;
     assert (lv.lv_origin = None);
-    let d = Ldomain.of_ltype (new_chunk m) lv.lv_type in
+    let d = Ldomain.of_ltype (new_chunk m.store) lv.lv_type in
     m.lvars <- LVmap.add lv d m.lvars ; d
 
 let add_result (m: map) =
   let result = match m.result with
-    | None -> new_chunk m ()
+    | None -> new_chunk m.store ()
     | Some r -> r
   in m.result <- Some result ; result
 
-let domain_of_typ (m:map) (typ:typ) = Ldomain.of_typ (new_chunk m) typ
+let domain_of_typ (m:map) (typ:typ) =
+  Ldomain.of_typ (new_chunk m.store) typ
 
 let domain_of_ltyp (m:map) ?(ctxt) (lt:logic_type) =
-  let d : domain = Ldomain.of_ltype (new_chunk m) lt in
+  let d : domain = Ldomain.of_ltype (new_chunk m.store) lt in
   Option.fold ~none:d ~some:(fun (c:context) -> Ldomain.subst c d) ctxt
 
 (* -------------------------------------------------------------------------- *)
 (* --- Iterator                                                           --- *)
 (* -------------------------------------------------------------------------- *)
 
-let rec walk h m (f: node -> unit) n =
-  let n = Ufind.find m.store n in
-  let id = Store.id n in
-  try Hashtbl.find h id with Not_found ->
-    Hashtbl.add h id () ;
-    f n ;
-    let r = Ufind.get m.store n in
-    match r.clayout with
+let rec walk (f: node -> bool) n =
+  if not (f n) then
+    match (UF.get n).clayout with
     | Blob -> ()
-    | Cell(_,p) -> Option.iter (walk h m f) p
-    | Compound(_,_,rg) -> Ranges.iter (walk h m f) rg
+    | Cell(_,p) -> Option.iter (walk f) p
+    | Compound(_,_,rg) -> Ranges.iter (walk f) rg
 
-let iter (m:map) (f: node -> unit) =
-  let h = Hashtbl.create 0 in
-  Vmap.iter   (fun _x n ->           walk h m f n) m.cvars ;
-  LVmap.iter  (fun _ -> Ldomain.iter (walk h m f)) m.lvars ;
-  LVImap.iter (fun _ -> Ldomain.iter (walk h m f)) m.logics ;
-  Option.iter (walk h m f) m.result
+let witer (m:map) (f: node -> bool) =
+  Vmap.iter   (fun _x n -> walk f n) m.cvars ;
+  LVmap.iter  (fun _ -> Ldomain.iter (walk f)) m.lvars ;
+  LVImap.iter (fun _ -> Ldomain.iter (walk f)) m.logics ;
+  Option.iter (walk f) m.result
 
-let size (m: map) (r: node) =
-  sizeof (Ufind.get m.store r).clayout
+let once (f : node -> unit) : node -> bool =
+  let h = ref Z.zero in
+  fun n ->
+    let uid = (UF.get n).cid in
+    Z.testbit !h uid ||
+    begin
+      h := Z.( !h lor (one lsl uid) ) ;
+      f n ; false
+    end
 
-let parents (m: map) (r: node) =
-  nodes m (Ufind.get m.store r).cparents
-
-let cvars (m: map) (r: node) =
-  Vset.elements (Ufind.get m.store r).ccvars
-
-let labels (m: map) (r: node) =
-  Lset.elements (Ufind.get m.store r).clabels
+let iter m f = witer m (once f)
+let size (r: node) = sizeof (UF.get r).clayout
+let parents (r: node) = UF.find_all (UF.get r).cparents
+let cvars (r: node) = Vset.elements (UF.get r).ccvars
+let labels (r: node) = Lset.elements (UF.get r).clabels
 
 (* -------------------------------------------------------------------------- *)
 (* --- Merge                                                              --- *)
@@ -296,154 +275,152 @@ let new_cell ?(size=0) ?ptr () = { size ; ptr }
 let cell_layout { size ; ptr } =
   if size = 0 && ptr = None then Blob else Cell(size,ptr)
 
-let merge_push (m: map) (q: queue) (a: node) (b: node) : unit =
-  if not @@ Ufind.eq m.store a b then Queue.push (a,b) q
+let merge_push (q: queue) (a: node) (b: node) : unit =
+  if not @@ equal a b then Queue.push (a,b) q
 
-let merge_node (m: map) (q: queue) (a: node) (b: node) : node =
-  merge_push m q a b ;
-  Ufind.find m.store (min a b)
+let merge_node (q: queue) (a: node) (b: node) : node =
+  merge_push q a b ; UF.any a b
 
-let merge_opt (m: map) (q: queue)
-    (pa : node option) (pb : node option) : node option =
+let merge_opt (q: queue) (pa : node option) (pb : node option) : node option =
   match pa, pb with
   | None, p | p, None -> p
-  | Some pa, Some pb -> Some (merge_node m q pa pb)
+  | Some pa, Some pb -> Some (merge_node q pa pb)
 
-let merge_cell (m:map) (q:queue) cell root r =
-  let node = Ufind.get m.store r in
+let merge_cell (q:queue) cell root r =
+  let node = UF.get r in
   let s = sizeof node.clayout in
   let p = cpointed node.clayout in
   begin
-    merge_push m q root r ;
+    merge_push q root r ;
     cell.size <- Ranges.gcd cell.size s ;
-    cell.ptr <- merge_opt m q cell.ptr p ;
+    cell.ptr <- merge_opt q cell.ptr p ;
   end
 
-let merge_range (m: map) (q: queue) (ra : rg) (rb : rg) : node =
+let merge_range s (q: queue) (ra : rg) (rb : rg) : node =
   let na = ra.data in
   let nb = rb.data in
-  let r = merge_node m q na nb in
+  let r = merge_node q na nb in
   let ma = ra.offset + ra.length in
   let mb = rb.offset + rb.length in
   let dp = ra.offset - rb.offset in
   let dq = ma - mb in
   if dp = 0 && dq = 0 then r else
-    let sa = sizeof (get m na).clayout in
-    let sb = sizeof (get m nb).clayout in
+    let sa = sizeof (UF.get na).clayout in
+    let sb = sizeof (UF.get nb).clayout in
     let size = Ranges.(sa %. sb %. dp %. dq) in
     if (sa = 0 || sa = size) && (sb = 0 || sb = size)
     then r (* merged size is compatible with dp and dq *)
-    else merge_node m q r (new_chunk m ~size ())
+    else merge_node q r (new_chunk s ~size ())
 
-let merge_ranges (m: map) (q: queue) (root: node)
+let merge_ranges s (q: queue) (root: node)
     (sa : int) (fa : Fields.domain) (wa : node Ranges.t)
     (sb : int) (fb : Fields.domain) (wb : node Ranges.t)
   : layout =
   if sa = sb then
-    match Ranges.merge (merge_range m q) wa wb with
+    match Ranges.merge (merge_range s q) wa wb with
     | R [{ offset = 0 ; length ; data }] when length = sa ->
-      merge_push m q root data ; (get m data).clayout
+      merge_push q root data ; (UF.get data).clayout
     | ranges ->
       let fields = Fields.union fa fb in
       Compound(sa, fields, ranges)
   else
     let size = Ranges.gcd sa sb in
     let cell = new_cell ~size () in
-    Ranges.iter (merge_cell m q cell root) wa ;
-    Ranges.iter (merge_cell m q cell root) wb ;
+    Ranges.iter (merge_cell q cell root) wa ;
+    Ranges.iter (merge_cell q cell root) wb ;
     cell_layout cell
 
-let merge_layout (m:map) (q:queue) (root:node) (a:layout) (b:layout) : layout =
+let merge_layout s (q:queue) (root:node) (a:layout) (b:layout) : layout =
   match a, b with
   | Blob, c | c, Blob -> c
 
-  | Cell(sa,pa) , Cell(sb,pb) -> Cell(Ranges.gcd sa sb, merge_opt m q pa pb)
+  | Cell(sa,pa) , Cell(sb,pb) -> Cell(Ranges.gcd sa sb, merge_opt q pa pb)
 
   | Compound(sa,fa,wa), Compound(sb,fb,wb) ->
-    merge_ranges m q root sa fa wa sb fb wb
+    merge_ranges s q root sa fa wa sb fb wb
 
   | Compound(sr,_,wr), Cell(sx,ptr)
   | Cell(sx,ptr), Compound(sr,_,wr) ->
     let size = Ranges.gcd sx sr in
     let cell = new_cell ~size ?ptr () in
-    Ranges.iter (merge_cell m q cell root) wr ;
+    Ranges.iter (merge_cell q cell root) wr ;
     cell_layout cell
 
-let merge_chunk (m: map) (q:queue) (root:node)
+let merge_chunk s (q:queue) (root:node)
     (a : chunk) (b : chunk) : chunk =
   {
-    cparents = nodes m @@ Store.bag a.cparents b.cparents ;
-    cpointed = nodes m @@ Store.bag a.cpointed b.cpointed ;
+    cparents = UF.find_all2 a.cparents b.cparents ;
+    cpointed = UF.find_all2 a.cpointed b.cpointed ;
     clabels = Lset.union a.clabels b.clabels ;
     ccvars = Vset.union a.ccvars b.ccvars ;
     creads = Access.Set.union a.creads b.creads ;
     cwrites = Access.Set.union a.cwrites b.cwrites ;
     cshifts = Access.Set.union a.cshifts b.cshifts ;
-    clayout = merge_layout m q root a.clayout b.clayout ;
+    clayout = merge_layout s q root a.clayout b.clayout ;
+    cid = UF.noid ;
   }
 
-let do_merge (m: map) (q: queue) (a: node) (b: node): unit =
+let do_merge (q: queue) (a: node) (b: node): unit =
   begin
-    let ca = Ufind.get m.store a in
-    let cb = Ufind.get m.store b in
-    let rt = Ufind.union m.store a b in
-    let ck = merge_chunk m q rt ca cb in
-    let cparents = List.filter (fun r -> not @@ equal m r rt) ck.cparents in
-    let ck = { ck with cparents } in
-    Ufind.set m.store rt ck ;
+    let store = UF.store a in
+    let ca = UF.get a in
+    let cb = UF.get b in
+    let rt = UF.merge (fun w _ -> w) a b in
+    let ck = merge_chunk store q rt ca cb in
+    let cparents = List.filter (fun r -> not @@ equal r rt) ck.cparents in
+    let ck = { ck with cparents } in UF.set rt ck ;
   end
 
-let merge_all (m:map) = function
+let merge_all = function
   | [] -> ()
   | r::rs ->
     let q = Queue.create () in
-    List.iter (fun r' -> ignore @@ merge_node m q r r') rs ;
+    List.iter (fun r' -> ignore @@ merge_node q r r') rs ;
     while not @@ Queue.is_empty q do
       let a,b = Queue.pop q in
-      do_merge m q a b ;
+      do_merge q a b ;
     done
 
-let merge (m: map) (a: node) (b: node) : unit =
-  failwith_locked m "Region.Memory.merge" ;
-  merge_all m [a;b]
+let merge (a: node) (b: node) : unit = merge_all [a;b]
 
-let merge_domain (m:map) = Ldomain.merge (fun a b -> merge m a b ; min a b)
+let merge_domain = Ldomain.merge (fun a b -> merge a b ; min a b)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Offset                                                             --- *)
 (* -------------------------------------------------------------------------- *)
 
-let add_field (m:map) (r:node) (fd:fieldinfo) : node =
+let add_field (r:node) (fd:fieldinfo) : node =
   let ci = fd.fcomp in
   if not ci.cstruct then r else
+    let store = UF.store r in
     let size = bitsSizeOf (Cil_const.mk_tcomp ci) in
     let offset, length = Cil.fieldBitsOffset fd in
     if offset = 0 && size = length then r else
-      let data = new_chunk m ~parent:r () in
+      let data = new_chunk store ~parent:r () in
       let ranges = Ranges.singleton { offset ; length ; data } in
       let fields = Fields.singleton fd in
       let clayout = Compound(size,fields,ranges) in
-      let nc = Ufind.make m.store { empty with clayout } in
-      merge m r nc ; data
+      let nc = UF.fresh store { empty with clayout } in
+      merge r nc ; data
 
-let add_index (m:map) (r:node) (ty:typ) : node =
+let add_index (r:node) (ty:typ) : node =
   let size = bitsSizeOf ty in
-  let re = new_chunk m ~size () in
-  merge m r re ; re
+  let re = new_chunk (UF.store r) ~size () in
+  merge r re ; re
 
-let add_points_to (m: map) (a: node) (b : node) =
+let add_points_to (a: node) (b : node) =
   begin
-    failwith_locked m "Region.Memory.points_to" ;
-    merge m a @@ new_chunk m ~ptr:b () ;
-    merge m b @@ new_chunk m ~pointed:a () ;
+    let store = UF.store a in
+    merge a @@ new_chunk store ~ptr:b () ;
+    merge b @@ new_chunk store ~pointed:a () ;
   end
 
-let add_value (m:map) (rv:node) (ty:typ) : node option =
+let add_value (rv:node) (ty:typ) : node option =
   if Ast_types.is_ptr ty then
     begin
-      failwith_locked m "Region.Memory.add_value" ;
+      let m = UF.store rv in
       let rp = new_chunk m ~pointed:rv () in
-      merge m rv @@ new_chunk m ~ptr:rp () ;
+      merge rv @@ new_chunk m ~ptr:rp () ;
       Some rp
     end
   else
@@ -453,88 +430,72 @@ let add_value (m:map) (rv:node) (ty:typ) : node option =
 (* --- Access                                                             --- *)
 (* -------------------------------------------------------------------------- *)
 
-let sized (m:map) (a:node) (ty: typ) =
+let sized (a:node) (ty: typ) =
   if Ast_types.is_scalar ty then
-    let sr = sizeof (get m a).clayout in
+    let sr = sizeof (UF.get a).clayout in
     let size = Ranges.gcd sr (bitsSizeOf ty) in
-    if sr <> size then ignore (merge m a (new_chunk m ~size ()))
+    if sr <> size then ignore (merge a (new_chunk (UF.store a) ~size ()))
 
-let add_read (m: map) (a: node) acs =
-  failwith_locked m "Region.Memory.read" ;
-  let r = get m a in
-  Ufind.set m.store a { r with creads = Access.Set.add acs r.creads } ;
-  sized m a @@ Access.typeof acs
+let add_read (a: node) acs =
+  let r = UF.get a in
+  UF.set a { r with creads = Access.Set.add acs r.creads } ;
+  sized a @@ Access.typeof acs
 
-let add_write (m: map) (a: node) acs =
-  failwith_locked m "Region.Memory.write" ;
-  let r = get m a in
-  Ufind.set m.store a { r with cwrites = Access.Set.add acs r.cwrites } ;
-  sized m a @@ Access.typeof acs
+let add_write (a: node) acs =
+  update a (fun r -> { r with cwrites = Access.Set.add acs r.cwrites }) ;
+  sized a @@ Access.typeof acs
 
-let add_shift (m: map) (a: node) acs =
-  failwith_locked m "Region.Memory.shift" ;
-  let r = get m a in
-  Ufind.set m.store a { r with cshifts = Access.Set.add acs r.cshifts } ;
-  sized m a @@ Access.typeof acs
+let add_shift (a: node) acs =
+  update a (fun r -> { r with cshifts = Access.Set.add acs r.cshifts }) ;
+  sized a @@ Access.typeof acs
 
 (* -------------------------------------------------------------------------- *)
 (* --- Lookup                                                            ---- *)
 (* -------------------------------------------------------------------------- *)
 
-let points_to m (r : node) : node option =
-  let rg = Ufind.get m.store r in
-  match rg.clayout with
+let points_to (r : node) : node option =
+  match (UF.get r).clayout with
   | Blob | Compound _ | Cell(_,None) -> None
-  | Cell(_,Some r) -> Some (Ufind.find m.store r)
+  | Cell(_,Some r) -> Some (UF.find r)
 
-let pointed_by m (r : node) =
-  let rg = Ufind.get m.store r in rg.cpointed
+let pointed_by (r : node) = UF.find_all (UF.get r).cpointed
+let cvar (m: map) (v: varinfo) : node = UF.find @@ Vmap.find v m.cvars
+let lvar (m: map) (v: logic_var) = LVmap.find v m.lvars
+let logic_info (m: map) (l: logic_info) = LVImap.find l m.logics
 
-let cvar (m: map) (v: varinfo) : node =
-  Ufind.find m.store @@ Vmap.find v m.cvars
-
-let logic_info (m: map) (l: logic_info) =
-  LVImap.find l m.logics
-
-let lvar (m: map) (v: logic_var) =
-  LVmap.find v m.lvars
-
-let rec move (m: map) (r: node) (p: int) (s: int) =
-  let c = Ufind.get m.store r in
-  match c.clayout with
+let rec move (r: node) (p: int) (s: int) =
+  match (UF.get r).clayout with
   | Blob | Cell _ -> r
   | Compound(s0,_,rgs) ->
     if s0 <= s then r else
       let rg = Ranges.find p rgs in
-      move m rg.data (p - rg.offset) s
+      move rg.data (p - rg.offset) s
 
-let field (m: map) (r: node) (fd: fieldinfo) : node =
+let field (r: node) (fd: fieldinfo) : node =
   if fd.fcomp.cstruct then
     let s = bitsSizeOf fd.ftype in
     let (p,_) = Cil.fieldBitsOffset fd in
-    move m r p s
+    move r p s
   else r
 
-let footprint (m: map) (r: node) : node list =
+let footprint (r: node) : node list =
   try
     let visited = ref SNode.empty (* set of visited & normalized nodes *) in
     let leaves = ref [] (* returned leaves *) in
     let rec visit (r: node) : unit =
-      let n = node m r in (* normalized node *)
+      let n = find r in (* normalized node *)
       if SNode.mem n !visited then () else
-        let () = visited := SNode.add n !visited in
-        let rg = (* raises Not_found *) Ufind.get m.store n in
-        match rg.clayout with
-        | Compound (_, _, range) -> Ranges.iter visit range
-        | Blob | Cell (_,_) -> leaves := n :: !leaves
+        visited := SNode.add n !visited ;
+      match (UF.get n).clayout with
+      | Compound (_, _, range) -> Ranges.iter visit range
+      | Blob | Cell (_,_) -> leaves := n :: !leaves
     in visit r ; !leaves
   with Not_found -> []
 
-let index (m : map) (r: node) (ty:typ) : node =
-  move m r 0 (bitsSizeOf ty)
+let index (r: node) (ty:typ) : node = move r 0 (bitsSizeOf ty)
 
 let rec lval (m: map) (h,ofs) : node =
-  offset m (lhost m h) (Cil.typeOfLhost h) ofs
+  offset (lhost m h) (Cil.typeOfLhost h) ofs
 
 and lhost (m: map) (h: lhost) : node =
   match h with
@@ -544,20 +505,20 @@ and lhost (m: map) (h: lhost) : node =
     | Some r -> r
     | None -> raise Not_found
 
-and offset (m: map) (r: node) (ty: typ) (ofs: offset) : node =
+and offset (r: node) (ty: typ) (ofs: offset) : node =
   match ofs with
-  | NoOffset -> Ufind.find m.store r
+  | NoOffset -> UF.find r
   | Field (fd, ofs) ->
-    offset m (field m r fd) fd.ftype ofs
+    offset (field r fd) fd.ftype ofs
   | Index (_, ofs) ->
     let te = Ast_types.direct_element_type ty in
-    offset m (index m r te) te ofs
+    offset (index r te) te ofs
 
 and exp (m: map) (e: exp) : node option =
   match e.enode with
   | Const _
   | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _ | AlignOfE _ -> None
-  | Lval lv -> points_to m @@ lval m lv
+  | Lval lv -> points_to @@ lval m lv
   | AddrOf lv | StartOf lv -> Some (lval m lv)
   | CastE(_, e) -> exp m e
   | BinOp((PlusPI|MinusPI),p,_,_) -> exp m p
@@ -567,24 +528,24 @@ let result (m: map) = m.result
 
 (* -------------------------------------------------------------------------- *)
 
-let included map source target : bool =
+let included source target : bool =
   let exception Reached in
   try
     let q = Queue.create () in (* only marked nodes *)
     let push r =
-      let r = node map r in
-      if equal map target r then raise Reached else Queue.push r q
+      let r = UF.find r in
+      if equal target r then raise Reached else Queue.push r q
     in
     push source ;
     let visited = Hashtbl.create 0 in
     while true do
       let node = Queue.pop q in
-      if equal map target node then raise Exit else
+      if equal target node then raise Exit else
         let id = id node in
         if not @@ Hashtbl.mem visited id then
           begin
             Hashtbl.add visited id () ;
-            List.iter push (parents map node) ;
+            List.iter push (parents node) ;
           end
     done ;
     assert false
@@ -592,50 +553,50 @@ let included map source target : bool =
   | Queue.Empty -> false
   | Reached -> true
 
-let separated map r1 r2 =
-  not (included map r1 r2) && not (included map r2 r1)
+let separated r1 r2 =
+  not (included r1 r2) && not (included r2 r1)
 
-let single_path m r0 r s =
-  match (Ufind.get m.store r0).clayout with
+let single_path r0 r s =
+  match (UF.get r0).clayout with
   | Blob -> true
   | Cell(s0,_) -> s = s0
   | Compound(_,_,R rgs) ->
     List.for_all
       (fun (rg : node Ranges.range) ->
-         not (Ufind.eq m.store r rg.data) || rg.length = s
+         not (equal r rg.data) || rg.length = s
       ) rgs
 
-let rec singleton m r =
-  let node = Ufind.get m.store r in
+let rec singleton r =
+  let node = UF.get r in
   (* normalized parents *)
-  match nodes m node.cparents with
+  match UF.find_all node.cparents with
   | [] -> Vset.cardinal node.ccvars = 1
   | [r0] ->
     Vset.is_empty node.ccvars &&
-    single_path m r0 r (sizeof node.clayout) &&
+    single_path r0 r (sizeof node.clayout) &&
     (* r != r0 && (* This test may be useful to prevent infinity loops. *) *)
-    singleton m r0
+    singleton r0
   | _ -> false
 
 (* -------------------------------------------------------------------------- *)
 
-let reads (m:map) (r:node) =
-  let node = Ufind.get m.store r in
+let reads (r:node) =
+  let node = UF.get r in
   List.map Access.typeof @@ Access.Set.elements node.creads
 
-let writes (m:map) (r:node) =
-  let node = Ufind.get m.store r in
+let writes (r:node) =
+  let node = UF.get r in
   List.map Access.typeof @@ Access.Set.elements node.cwrites
 
-let shifts (m:map) (r:node) =
-  let node = Ufind.get m.store r in
+let shifts (r:node) =
+  let node = UF.get r in
   List.map Access.typeof @@ Access.Set.elements node.cshifts
 
-let types (m:map) (r:node) = ctypes @@ Ufind.get m.store r
+let types (r:node) = ctypes @@ UF.get r
 
-let typed (m:map) (r:node) =
+let typed (r:node) =
   let types = ref None in
-  let node = Ufind.get m.store r in
+  let node = UF.get r in
   let size = sizeof node.clayout in
   try
     let check acs =
@@ -755,6 +716,8 @@ let pp_region fmt (m: region) =
     Format.fprintf fmt " ;@]" ;
   end
 
+let pp_node fmt n = pp_node fmt n
+
 (* -------------------------------------------------------------------------- *)
 (* --- Consolidated Accessors                                             --- *)
 (* -------------------------------------------------------------------------- *)
@@ -764,42 +727,44 @@ let make_root s (v : Cil_types.varinfo) : root =
   let label = Format.asprintf "%a%a" Varinfo.pretty v pp_cells cells in
   Root { cvar = v ; cells ; label }
 
-let make_range (m: map) fields Ranges.{ length ; offset ; data } : range =
-  let s = sizeof (get m data).clayout in
+let make_range fields Ranges.{ length ; offset ; data } : range =
+  let s = sizeof (UF.get data).clayout in
   let cells = if s = 0 then 0 else length / s in
   let label = Format.asprintf "%t%a"
       (Fields.pslice ~fields ~offset ~length) pp_cells cells
-  in Range { offset ; length ; cells ; label ; data = node m data }
+  in Range { offset ; length ; cells ; label ; data = UF.find data }
 
-let ranges (m:map) (r:node) =
-  let node = Ufind.get m.store r in
+let ranges (r:node) =
+  let node = UF.get r in
   let fields = cfields node.clayout in
-  List.map (make_range m fields) (cranges node.clayout)
+  List.map (make_range fields) (cranges node.clayout)
 
-let make_region (m: map) (n: node) (r: chunk) : region =
+let make_region (n: node) (r: chunk) : region =
   let types = ctypes r in
-  let typed = typed m n in
+  let typed = typed n in
   let sizeof = sizeof r.clayout in
   let fields = cfields r.clayout in
-  let singleton = singleton m n in
+  let singleton = singleton n in
   {
     node = n ;
-    parents = nodes m r.cparents ;
+    parents = UF.find_all r.cparents ;
     cvars = List.map (make_root sizeof) @@ Vset.elements r.ccvars ;
     labels = Lset.elements r.clabels ;
     reads = Access.Set.elements r.creads ;
     writes = Access.Set.elements r.cwrites ;
     shifts = Access.Set.elements r.cshifts ;
-    ranges = List.map (make_range m fields) (cranges r.clayout) ;
-    pointed = Option.map (node m) (cpointed r.clayout) ;
+    ranges = List.map (make_range fields) (cranges r.clayout) ;
+    pointed = Option.map UF.find (cpointed r.clayout) ;
     types ; typed ; singleton ; sizeof ; fields ;
   }
 
-let region map n = make_region map n (get map n)
+let region n = make_region n (UF.get n)
 
 let regions map =
   let pool = ref [] in
-  iter map (fun r -> pool := region map r :: !pool) ;
+  iter map (fun r -> pool := region r :: !pool) ;
   List.rev !pool
+
+let lock m = witer m UF.lock
 
 (* -------------------------------------------------------------------------- *)

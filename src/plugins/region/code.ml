@@ -32,11 +32,11 @@ and add_lhost (m:map) (s:stmt) = function
 and add_loffset (m:map) (s:stmt) (r:node) (ty:typ)= function
   | NoOffset -> r
   | Field(fd,ofs) ->
-    add_loffset m s (add_field m r fd) fd.ftype ofs
+    add_loffset m s (add_field r fd) fd.ftype ofs
   | Index(e,ofs) ->
     let elt = Ast_types.direct_element_type ty in
     ignore @@ add_exp m s e ;
-    add_loffset m s (add_index m r elt) elt ofs
+    add_loffset m s (add_index r elt) elt ofs
 
 and add_value m s e = ignore (add_exp m s e)
 
@@ -47,13 +47,13 @@ and add_exp (m: map) (s:stmt) (e:exp) : value =
 
   | Lval lv ->
     let rv = add_lval m s lv in
-    Memory.add_read m rv (Lval(s,lv)) ;
-    Memory.add_value m rv @@ Cil.typeOfLval lv
+    Memory.add_read rv (Lval(s,lv)) ;
+    Memory.add_value rv @@ Cil.typeOfLval lv
 
   | BinOp((PlusPI|MinusPI),p,k,_) ->
     add_value m s k ;
     let vp = add_exp m s p in
-    Memory.add_shift m (pointer vp) (Exp(s,e)) ; vp
+    Memory.add_shift (pointer vp) (Exp(s,e)) ; vp
 
   | UnOp(_,e,_) ->
     add_value m s e ; None
@@ -86,12 +86,12 @@ let rec add_init (m:map) (s:stmt) (acs:Access.acs) (lv:lval) (iv:init) =
   | SingleInit { enode = Lval le } when is_comp le ->
     let r = add_lval m s lv in
     let v = add_lval m s le in
-    Memory.merge m r v
+    Memory.merge r v
 
   | SingleInit e ->
     let r = add_lval m s lv in
-    Memory.add_write m r acs ;
-    Option.iter (Memory.add_points_to m r) (add_exp m s e)
+    Memory.add_write r acs ;
+    Option.iter (Memory.add_points_to r) (add_exp m s e)
 
   | CompoundInit(_,fvs) ->
     List.iter
@@ -106,14 +106,14 @@ let rec add_init (m:map) (s:stmt) (acs:Access.acs) (lv:lval) (iv:init) =
 (* -------------------------------------------------------------------------- *)
 
 let add_write ~map ~stmt ~acs (r:node) (e:exp) =
-  Memory.add_write map r acs ;
+  Memory.add_write r acs ;
   match e.enode with
   | Lval le when is_comp le ->
     let v = add_lval map stmt le in
-    Memory.merge map r v
+    Memory.merge r v
   | _ ->
     let v = add_exp map stmt e in
-    Option.iter (Memory.add_points_to map r) v
+    Option.iter (Memory.add_points_to r) v
 
 let add_kf_call ~kf ~stmt map ?property ~result args kfct =
   let module Vmap = Cil_datatype.Varinfo.Map in
@@ -166,7 +166,7 @@ let add_instr ~kf (m:map) (s:stmt) (instr:instr) =
 
   | Local_init(x,ConsInit (vf,args,kind), loc) ->
     let r = add_cvar m x in
-    Memory.add_write m r (Lval (s,Cil.var x)) ;
+    Memory.add_write r (Lval (s,Cil.var x)) ;
     Cil.treat_constructor_as_func
       begin fun _res fct args _loc ->
         add_function m s fct;
@@ -180,7 +180,7 @@ let add_instr ~kf (m:map) (s:stmt) (instr:instr) =
     let result = Option.map
         (fun lv ->
            let r = add_lval m s lv in
-           Memory.add_write m r (Lval(s,lv)) ; r
+           Memory.add_write r (Lval(s,lv)) ; r
         ) lr
     in add_call ~kf ~stmt:s m ~result f es
 
@@ -255,8 +255,8 @@ let add_bhv ~kf:_ ~result:_ (m:map) (bhv:behavior) =
 
 type domain = map
 
-let domain ?global kf =
-  let m = match global with Some g -> g | None -> Memory.create () in
+let domain kf =
+  let m = Memory.create () in
   begin
     try
       let funspec = Annotations.funspec kf in
@@ -272,6 +272,6 @@ let domain ?global kf =
       add_block ~kf m fundec.sbody ;
     with Kernel_function.No_Definition -> ()
   end ;
-  Memory.copy ~locked:true m
+  Memory.lock m ; m
 
 (* -------------------------------------------------------------------------- *)

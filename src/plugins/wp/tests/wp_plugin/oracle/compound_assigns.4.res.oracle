@@ -14,86 +14,86 @@
 
 Cluster Compound {
   
-  Function Load_R000b_Init_S1_A (p_1 : addr) (Minit_6 : bool[addr])
+  Function Load_R0003_Init_S1_A (p_1 : addr) (Minit_6 : bool[addr])
     (Minit_7 : bool[addr]) : Init_S1_A
     = {
          Init_F1_A_f =
-           (Array_R0021_sint32_init (shiftfield_F1_A_f p_1) 4 Minit_7) ;
-         Init_F1_A_g = Minit_6[(shiftfield_F1_A_g p_1)]
+           (Array_R0004_sint32_init (shiftfield_F1_A_f p_1) 4 Minit_6) ;
+         Init_F1_A_g = Minit_7[(shiftfield_F1_A_g p_1)]
       }
   
-  Function Array_R0021_sint32_init (p_1 : addr) (n_1 : int)
+  Function Array_R0004_sint32_init (p_1 : addr) (n_1 : int)
     (Minit_3 : bool[addr]) : bool[]
   
-  Function Load_R000b_S1_A (p_1 : addr) (M0025_float64_0 : f64[addr])
-    (M0021_sint32_0 : int[addr]) : S1_A
+  Function Load_R0003_S1_A (p_1 : addr) (M0004_sint32_0 : int[addr])
+    (M0005_float64_0 : f64[addr]) : S1_A
     = {
          F1_A_f =
-           (Array_R0021_sint32 (shiftfield_F1_A_f p_1) 4 M0021_sint32_0) ;
-         F1_A_g = M0025_float64_0[(shiftfield_F1_A_g p_1)]
+           (Array_R0004_sint32 (shiftfield_F1_A_f p_1) 4 M0004_sint32_0) ;
+         F1_A_g = M0005_float64_0[(shiftfield_F1_A_g p_1)]
       }
   
-  Function Array_R0021_sint32 (p_1 : addr) (n_1 : int)
-    (M0021_sint32_0 : int[addr]) : int[]
+  Function Array_R0004_sint32 (p_1 : addr) (n_1 : int)
+    (M0004_sint32_0 : int[addr]) : int[]
   
-  Axiom Load_R000b_Init_S1_A_framed:
+  Axiom Load_R0003_Init_S1_A_framed:
     forall Minit_8: bool[addr].
     forall Minit_9: bool[addr].
     forall Minit_10: bool[addr].
     forall Minit_11: bool[addr].
     forall p_1: addr.
     (eqmem Minit_8 Minit_10 p_1 24) -> (eqmem Minit_9 Minit_11 p_1 24)
-    -> ((Load_R000b_Init_S1_A p_1 Minit_10 Minit_11)=
-        (Load_R000b_Init_S1_A p_1 Minit_8 Minit_9))
+    -> ((Load_R0003_Init_S1_A p_1 Minit_10 Minit_11)=
+        (Load_R0003_Init_S1_A p_1 Minit_8 Minit_9))
   
-  Axiom Array_R0021_sint32_init_framed:
+  Axiom Array_R0004_sint32_init_framed:
     forall Minit_4: bool[addr].
     forall Minit_5: bool[addr].
     forall n_1: int.
     forall p_1: addr.
     (eqmem Minit_4 Minit_5 p_1 (4*n_1))
-    -> ((Array_R0021_sint32_init p_1 n_1 Minit_5)=
-        (Array_R0021_sint32_init p_1 n_1 Minit_4))
+    -> ((Array_R0004_sint32_init p_1 n_1 Minit_5)=
+        (Array_R0004_sint32_init p_1 n_1 Minit_4))
   
-  Axiom Array_R0021_sint32_init_access:
+  Axiom Array_R0004_sint32_init_access:
     forall Minit_3: bool[addr].
     forall i_1: int.
     forall n_1: int.
     forall p_1: addr.
-    [ (Array_R0021_sint32_init p_1 n_1 Minit_3)[i_1] ]
+    [ (Array_R0004_sint32_init p_1 n_1 Minit_3)[i_1] ]
     (0<=i_1) -> (i_1<n_1)
-    -> ((Array_R0021_sint32_init p_1 n_1 Minit_3)[i_1]=
+    -> ((Array_R0004_sint32_init p_1 n_1 Minit_3)[i_1]=
         Minit_3[(shift_sint32 p_1 i_1)])
   
-  Axiom Load_R000b_S1_A_framed:
-    forall M0021_sint32_1: int[addr].
-    forall M0021_sint32_2: int[addr].
-    forall M0025_float64_1: f64[addr].
-    forall M0025_float64_2: f64[addr].
+  Axiom Load_R0003_S1_A_framed:
+    forall M0004_sint32_1: int[addr].
+    forall M0004_sint32_2: int[addr].
+    forall M0005_float64_1: f64[addr].
+    forall M0005_float64_2: f64[addr].
     forall p_1: addr.
-    (eqmem M0021_sint32_1 M0021_sint32_2 p_1 24)
-    -> (eqmem M0025_float64_1 M0025_float64_2 p_1 24)
-    -> ((Load_R000b_S1_A p_1 M0025_float64_2 M0021_sint32_2)=
-        (Load_R000b_S1_A p_1 M0025_float64_1 M0021_sint32_1))
+    (eqmem M0004_sint32_1 M0004_sint32_2 p_1 24)
+    -> (eqmem M0005_float64_1 M0005_float64_2 p_1 24)
+    -> ((Load_R0003_S1_A p_1 M0004_sint32_2 M0005_float64_2)=
+        (Load_R0003_S1_A p_1 M0004_sint32_1 M0005_float64_1))
   
-  Axiom Array_R0021_sint32_framed:
-    forall M0021_sint32_1: int[addr].
-    forall M0021_sint32_2: int[addr].
+  Axiom Array_R0004_sint32_framed:
+    forall M0004_sint32_1: int[addr].
+    forall M0004_sint32_2: int[addr].
     forall n_1: int.
     forall p_1: addr.
-    (eqmem M0021_sint32_1 M0021_sint32_2 p_1 (4*n_1))
-    -> ((Array_R0021_sint32 p_1 n_1 M0021_sint32_2)=
-        (Array_R0021_sint32 p_1 n_1 M0021_sint32_1))
+    (eqmem M0004_sint32_1 M0004_sint32_2 p_1 (4*n_1))
+    -> ((Array_R0004_sint32 p_1 n_1 M0004_sint32_2)=
+        (Array_R0004_sint32 p_1 n_1 M0004_sint32_1))
   
-  Axiom Array_R0021_sint32_access:
-    forall M0021_sint32_0: int[addr].
+  Axiom Array_R0004_sint32_access:
+    forall M0004_sint32_0: int[addr].
     forall i_1: int.
     forall n_1: int.
     forall p_1: addr.
-    [ (Array_R0021_sint32 p_1 n_1 M0021_sint32_0)[i_1] ]
+    [ (Array_R0004_sint32 p_1 n_1 M0004_sint32_0)[i_1] ]
     (0<=i_1) -> (i_1<n_1)
-    -> ((Array_R0021_sint32 p_1 n_1 M0021_sint32_0)[i_1]=
-        M0021_sint32_0[(shift_sint32 p_1 i_1)])
+    -> ((Array_R0004_sint32 p_1 n_1 M0004_sint32_0)[i_1]=
+        M0004_sint32_0[(shift_sint32 p_1 i_1)])
   
 }
 
@@ -237,10 +237,10 @@ Cluster Shifts {
 }
 
 Goal Assertion 'Kept' (file compound_assigns.i, line 70):
-Let a = memcpy(M0025_float64_0, tmp_0, M0025_float64_0, p, 24).
-Let a_1 = memcpy(M0021_sint32_0, tmp_0, M0021_sint32_0, p, 24).
-Let a_2 = Load_R000b_S1_A(s, M0025_float64_0, M0021_sint32_0).
-Let a_3 = Load_R000b_S1_A(s, a, a_1).
+Let a = memcpy(M0004_sint32_0, tmp_0, M0004_sint32_0, p, 24).
+Let a_1 = memcpy(M0005_float64_0, tmp_0, M0005_float64_0, p, 24).
+Let a_2 = Load_R0003_S1_A(s, M0004_sint32_0, M0005_float64_0).
+Let a_3 = Load_R0003_S1_A(s, a, a_1).
 Assume {
   Type: is_sint32(side_0) /\ IsS1_A(a_2) /\ IsS1_A(a_3).
   (* Heap *)
@@ -256,21 +256,21 @@ Assume {
   If side_0 != 0
   Then { Have: s = q. }
   Else { Have: s = r. }
-  Have: Load_R000b_S1_A(tmp_0, a, a_1) =
-      Load_R000b_S1_A(p, M0025_float64_0, M0021_sint32_0).
+  Have: Load_R0003_S1_A(tmp_0, a, a_1) =
+      Load_R0003_S1_A(p, M0004_sint32_0, M0005_float64_0).
 }
 Prove: EqS1_A(a_3, a_2).
 
 ------------------------------------------------------------
 
 Goal Assertion 'Kept' (file compound_assigns.i, line 72):
-Let a = memcpy(M0025_float64_0, tmp_0, M0025_float64_0, p, 24).
+Let a = memcpy(M0004_sint32_0, tmp_0, M0004_sint32_0, p, 24).
 Let a_1 = memcpy(a, p, a, s, 24).
-Let a_2 = memcpy(M0021_sint32_0, tmp_0, M0021_sint32_0, p, 24).
+Let a_2 = memcpy(M0005_float64_0, tmp_0, M0005_float64_0, p, 24).
 Let a_3 = memcpy(a_2, p, a_2, s, 24).
-Let a_4 = Load_R000b_S1_A(s, a, a_2).
-Let a_5 = Load_R000b_S1_A(s, M0025_float64_0, M0021_sint32_0).
-Let a_6 = Load_R000b_S1_A(s, a_1, a_3).
+Let a_4 = Load_R0003_S1_A(s, a, a_2).
+Let a_5 = Load_R0003_S1_A(s, M0004_sint32_0, M0005_float64_0).
+Let a_6 = Load_R0003_S1_A(s, a_1, a_3).
 Assume {
   Type: is_sint32(side_0) /\ IsS1_A(a_5) /\ IsS1_A(a_4) /\ IsS1_A(a_6).
   (* Heap *)
@@ -286,11 +286,11 @@ Assume {
   If side_0 != 0
   Then { Have: s = q. }
   Else { Have: s = r. }
-  Have: Load_R000b_S1_A(tmp_0, a, a_2) =
-      Load_R000b_S1_A(p, M0025_float64_0, M0021_sint32_0).
+  Have: Load_R0003_S1_A(tmp_0, a, a_2) =
+      Load_R0003_S1_A(p, M0004_sint32_0, M0005_float64_0).
   (* Assertion 'Kept' *)
   Have: a_4 = a_5.
-  Have: Load_R000b_S1_A(p, a_1, a_3) = a_4.
+  Have: Load_R0003_S1_A(p, a_1, a_3) = a_4.
 }
 Prove: EqS1_A(a_6, a_5).
 
@@ -336,18 +336,18 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Post-condition for 'Left' 'CopyQ' in 'copy':
-Let a = memcpy(M0025_float64_0, r, M0025_float64_0, p, 24).
+Let a = memcpy(M0004_sint32_0, r, M0004_sint32_0, p, 24).
 Let a_1 = memcpy(a, p, a, q, 24).
-Let a_2 = memcpy(M0021_sint32_0, r, M0021_sint32_0, p, 24).
+Let a_2 = memcpy(M0005_float64_0, r, M0005_float64_0, p, 24).
 Let a_3 = memcpy(a_2, p, a_2, q, 24).
-Let a_4 = Load_R000b_S1_A(q, a_1, a_3).
-Let a_5 = Load_R000b_S1_A(q, M0025_float64_0, M0021_sint32_0).
-Let a_6 = Load_R000b_S1_A(p, a_1, a_3).
-Let a_7 = Load_R000b_S1_A(q, a, a_2).
-Let a_8 = Load_R000b_S1_A(p, M0025_float64_0, M0021_sint32_0).
+Let a_4 = Load_R0003_S1_A(q, a_1, a_3).
+Let a_5 = Load_R0003_S1_A(q, M0004_sint32_0, M0005_float64_0).
+Let a_6 = Load_R0003_S1_A(p, a_1, a_3).
+Let a_7 = Load_R0003_S1_A(q, a, a_2).
+Let a_8 = Load_R0003_S1_A(p, M0004_sint32_0, M0005_float64_0).
 Assume {
   Type: is_sint32(side_0) /\ IsS1_A(a_8) /\ IsS1_A(a_5) /\ IsS1_A(a_7) /\
-      IsS1_A(a_6) /\ IsS1_A(a_4) /\ IsS1_A(Load_R000b_S1_A(r, a_1, a_3)).
+      IsS1_A(a_6) /\ IsS1_A(a_4) /\ IsS1_A(Load_R0003_S1_A(r, a_1, a_3)).
   (* Heap *)
   Type: (region(p.base) <= 0) /\ (region(q.base) <= 0) /\
       (region(r.base) <= 0).
@@ -356,7 +356,7 @@ Assume {
       separated(q, 24, r, 24).
   (* Pre-condition for 'Left' *)
   Have: side_0 != 0.
-  Have: Load_R000b_S1_A(r, a, a_2) = a_8.
+  Have: Load_R0003_S1_A(r, a, a_2) = a_8.
   (* Assertion 'Kept' *)
   Have: a_7 = a_5.
   Have: a_6 = a_7.
@@ -368,18 +368,18 @@ Prove: EqS1_A(a_6, a_5).
 ------------------------------------------------------------
 
 Goal Post-condition for 'Left' 'KeepQ' in 'copy':
-Let a = memcpy(M0025_float64_0, r, M0025_float64_0, p, 24).
+Let a = memcpy(M0004_sint32_0, r, M0004_sint32_0, p, 24).
 Let a_1 = memcpy(a, p, a, q, 24).
-Let a_2 = memcpy(M0021_sint32_0, r, M0021_sint32_0, p, 24).
+Let a_2 = memcpy(M0005_float64_0, r, M0005_float64_0, p, 24).
 Let a_3 = memcpy(a_2, p, a_2, q, 24).
-Let a_4 = Load_R000b_S1_A(q, a_1, a_3).
-Let a_5 = Load_R000b_S1_A(q, M0025_float64_0, M0021_sint32_0).
-Let a_6 = Load_R000b_S1_A(p, a_1, a_3).
-Let a_7 = Load_R000b_S1_A(q, a, a_2).
-Let a_8 = Load_R000b_S1_A(p, M0025_float64_0, M0021_sint32_0).
+Let a_4 = Load_R0003_S1_A(q, a_1, a_3).
+Let a_5 = Load_R0003_S1_A(q, M0004_sint32_0, M0005_float64_0).
+Let a_6 = Load_R0003_S1_A(p, a_1, a_3).
+Let a_7 = Load_R0003_S1_A(q, a, a_2).
+Let a_8 = Load_R0003_S1_A(p, M0004_sint32_0, M0005_float64_0).
 Assume {
   Type: is_sint32(side_0) /\ IsS1_A(a_8) /\ IsS1_A(a_5) /\ IsS1_A(a_7) /\
-      IsS1_A(a_6) /\ IsS1_A(a_4) /\ IsS1_A(Load_R000b_S1_A(r, a_1, a_3)).
+      IsS1_A(a_6) /\ IsS1_A(a_4) /\ IsS1_A(Load_R0003_S1_A(r, a_1, a_3)).
   (* Heap *)
   Type: (region(p.base) <= 0) /\ (region(q.base) <= 0) /\
       (region(r.base) <= 0).
@@ -388,7 +388,7 @@ Assume {
       separated(q, 24, r, 24).
   (* Pre-condition for 'Left' *)
   Have: side_0 != 0.
-  Have: Load_R000b_S1_A(r, a, a_2) = a_8.
+  Have: Load_R0003_S1_A(r, a, a_2) = a_8.
   (* Assertion 'Kept' *)
   Have: a_7 = a_5.
   Have: a_6 = a_7.
@@ -400,16 +400,16 @@ Prove: EqS1_A(a_4, a_5).
 ------------------------------------------------------------
 
 Goal Post-condition for 'Left' 'SaveR' in 'copy':
-Let a = memcpy(M0025_float64_0, r, M0025_float64_0, p, 24).
+Let a = memcpy(M0004_sint32_0, r, M0004_sint32_0, p, 24).
 Let a_1 = memcpy(a, p, a, q, 24).
-Let a_2 = memcpy(M0021_sint32_0, r, M0021_sint32_0, p, 24).
+Let a_2 = memcpy(M0005_float64_0, r, M0005_float64_0, p, 24).
 Let a_3 = memcpy(a_2, p, a_2, q, 24).
-Let a_4 = Load_R000b_S1_A(q, a_1, a_3).
-Let a_5 = Load_R000b_S1_A(q, M0025_float64_0, M0021_sint32_0).
-Let a_6 = Load_R000b_S1_A(p, a_1, a_3).
-Let a_7 = Load_R000b_S1_A(q, a, a_2).
-Let a_8 = Load_R000b_S1_A(p, M0025_float64_0, M0021_sint32_0).
-Let a_9 = Load_R000b_S1_A(r, a_1, a_3).
+Let a_4 = Load_R0003_S1_A(q, a_1, a_3).
+Let a_5 = Load_R0003_S1_A(q, M0004_sint32_0, M0005_float64_0).
+Let a_6 = Load_R0003_S1_A(p, a_1, a_3).
+Let a_7 = Load_R0003_S1_A(q, a, a_2).
+Let a_8 = Load_R0003_S1_A(p, M0004_sint32_0, M0005_float64_0).
+Let a_9 = Load_R0003_S1_A(r, a_1, a_3).
 Assume {
   Type: is_sint32(side_0) /\ IsS1_A(a_8) /\ IsS1_A(a_5) /\ IsS1_A(a_7) /\
       IsS1_A(a_6) /\ IsS1_A(a_4) /\ IsS1_A(a_9).
@@ -421,7 +421,7 @@ Assume {
       separated(q, 24, r, 24).
   (* Pre-condition for 'Left' *)
   Have: side_0 != 0.
-  Have: Load_R000b_S1_A(r, a, a_2) = a_8.
+  Have: Load_R0003_S1_A(r, a, a_2) = a_8.
   (* Assertion 'Kept' *)
   Have: a_7 = a_5.
   Have: a_6 = a_7.
@@ -436,25 +436,25 @@ Prove: EqS1_A(a_9, a_8).
 ------------------------------------------------------------
 
 Goal Post-condition for 'Right' 'CopyR' in 'copy':
-Let a = memcpy(M0025_float64_0, q, M0025_float64_0, p, 24).
+Let a = memcpy(M0004_sint32_0, q, M0004_sint32_0, p, 24).
 Let a_1 = memcpy(a, p, a, r, 24).
-Let a_2 = memcpy(M0021_sint32_0, q, M0021_sint32_0, p, 24).
+Let a_2 = memcpy(M0005_float64_0, q, M0005_float64_0, p, 24).
 Let a_3 = memcpy(a_2, p, a_2, r, 24).
-Let a_4 = Load_R000b_S1_A(r, a_1, a_3).
-Let a_5 = Load_R000b_S1_A(r, M0025_float64_0, M0021_sint32_0).
-Let a_6 = Load_R000b_S1_A(p, a_1, a_3).
-Let a_7 = Load_R000b_S1_A(r, a, a_2).
-Let a_8 = Load_R000b_S1_A(p, M0025_float64_0, M0021_sint32_0).
+Let a_4 = Load_R0003_S1_A(r, a_1, a_3).
+Let a_5 = Load_R0003_S1_A(r, M0004_sint32_0, M0005_float64_0).
+Let a_6 = Load_R0003_S1_A(p, a_1, a_3).
+Let a_7 = Load_R0003_S1_A(r, a, a_2).
+Let a_8 = Load_R0003_S1_A(p, M0004_sint32_0, M0005_float64_0).
 Assume {
   Type: IsS1_A(a_8) /\ IsS1_A(a_5) /\ IsS1_A(a_7) /\ IsS1_A(a_6) /\
-      IsS1_A(Load_R000b_S1_A(q, a_1, a_3)) /\ IsS1_A(a_4).
+      IsS1_A(Load_R0003_S1_A(q, a_1, a_3)) /\ IsS1_A(a_4).
   (* Heap *)
   Type: (region(p.base) <= 0) /\ (region(q.base) <= 0) /\
       (region(r.base) <= 0).
   (* Pre-condition *)
   Have: separated(p, 24, q, 24) /\ separated(p, 24, r, 24) /\
       separated(q, 24, r, 24).
-  Have: Load_R000b_S1_A(q, a, a_2) = a_8.
+  Have: Load_R0003_S1_A(q, a, a_2) = a_8.
   (* Assertion 'Kept' *)
   Have: a_7 = a_5.
   Have: a_6 = a_7.
@@ -466,16 +466,16 @@ Prove: EqS1_A(a_6, a_5).
 ------------------------------------------------------------
 
 Goal Post-condition for 'Right' 'SaveQ' in 'copy':
-Let a = memcpy(M0025_float64_0, q, M0025_float64_0, p, 24).
+Let a = memcpy(M0004_sint32_0, q, M0004_sint32_0, p, 24).
 Let a_1 = memcpy(a, p, a, r, 24).
-Let a_2 = memcpy(M0021_sint32_0, q, M0021_sint32_0, p, 24).
+Let a_2 = memcpy(M0005_float64_0, q, M0005_float64_0, p, 24).
 Let a_3 = memcpy(a_2, p, a_2, r, 24).
-Let a_4 = Load_R000b_S1_A(r, a_1, a_3).
-Let a_5 = Load_R000b_S1_A(r, M0025_float64_0, M0021_sint32_0).
-Let a_6 = Load_R000b_S1_A(p, a_1, a_3).
-Let a_7 = Load_R000b_S1_A(r, a, a_2).
-Let a_8 = Load_R000b_S1_A(p, M0025_float64_0, M0021_sint32_0).
-Let a_9 = Load_R000b_S1_A(q, a_1, a_3).
+Let a_4 = Load_R0003_S1_A(r, a_1, a_3).
+Let a_5 = Load_R0003_S1_A(r, M0004_sint32_0, M0005_float64_0).
+Let a_6 = Load_R0003_S1_A(p, a_1, a_3).
+Let a_7 = Load_R0003_S1_A(r, a, a_2).
+Let a_8 = Load_R0003_S1_A(p, M0004_sint32_0, M0005_float64_0).
+Let a_9 = Load_R0003_S1_A(q, a_1, a_3).
 Assume {
   Type: IsS1_A(a_8) /\ IsS1_A(a_5) /\ IsS1_A(a_7) /\ IsS1_A(a_6) /\
       IsS1_A(a_9) /\ IsS1_A(a_4).
@@ -485,7 +485,7 @@ Assume {
   (* Pre-condition *)
   Have: separated(p, 24, q, 24) /\ separated(p, 24, r, 24) /\
       separated(q, 24, r, 24).
-  Have: Load_R000b_S1_A(q, a, a_2) = a_8.
+  Have: Load_R0003_S1_A(q, a, a_2) = a_8.
   (* Assertion 'Kept' *)
   Have: a_7 = a_5.
   Have: a_6 = a_7.
@@ -497,25 +497,25 @@ Prove: EqS1_A(a_9, a_8).
 ------------------------------------------------------------
 
 Goal Post-condition for 'Right' 'KeepR' in 'copy':
-Let a = memcpy(M0025_float64_0, q, M0025_float64_0, p, 24).
+Let a = memcpy(M0004_sint32_0, q, M0004_sint32_0, p, 24).
 Let a_1 = memcpy(a, p, a, r, 24).
-Let a_2 = memcpy(M0021_sint32_0, q, M0021_sint32_0, p, 24).
+Let a_2 = memcpy(M0005_float64_0, q, M0005_float64_0, p, 24).
 Let a_3 = memcpy(a_2, p, a_2, r, 24).
-Let a_4 = Load_R000b_S1_A(r, a_1, a_3).
-Let a_5 = Load_R000b_S1_A(r, M0025_float64_0, M0021_sint32_0).
-Let a_6 = Load_R000b_S1_A(p, a_1, a_3).
-Let a_7 = Load_R000b_S1_A(r, a, a_2).
-Let a_8 = Load_R000b_S1_A(p, M0025_float64_0, M0021_sint32_0).
+Let a_4 = Load_R0003_S1_A(r, a_1, a_3).
+Let a_5 = Load_R0003_S1_A(r, M0004_sint32_0, M0005_float64_0).
+Let a_6 = Load_R0003_S1_A(p, a_1, a_3).
+Let a_7 = Load_R0003_S1_A(r, a, a_2).
+Let a_8 = Load_R0003_S1_A(p, M0004_sint32_0, M0005_float64_0).
 Assume {
   Type: IsS1_A(a_8) /\ IsS1_A(a_5) /\ IsS1_A(a_7) /\ IsS1_A(a_6) /\
-      IsS1_A(Load_R000b_S1_A(q, a_1, a_3)) /\ IsS1_A(a_4).
+      IsS1_A(Load_R0003_S1_A(q, a_1, a_3)) /\ IsS1_A(a_4).
   (* Heap *)
   Type: (region(p.base) <= 0) /\ (region(q.base) <= 0) /\
       (region(r.base) <= 0).
   (* Pre-condition *)
   Have: separated(p, 24, q, 24) /\ separated(p, 24, r, 24) /\
       separated(q, 24, r, 24).
-  Have: Load_R000b_S1_A(q, a, a_2) = a_8.
+  Have: Load_R0003_S1_A(q, a, a_2) = a_8.
   (* Assertion 'Kept' *)
   Have: a_7 = a_5.
   Have: a_6 = a_7.
@@ -531,115 +531,115 @@ Prove: EqS1_A(a_4, a_5).
 
 Cluster Compound {
   
-  Function Load_R0007_Init_S1_A (p_2 : addr) (Minit_12 : bool[addr])
+  Function Load_R0002_Init_S1_A (p_2 : addr) (Minit_12 : bool[addr])
     (Minit_13 : bool[addr]) : Init_S1_A
     = {
          Init_F1_A_f =
-           (Array_R000d_sint32_init (shiftfield_F1_A_f p_2) 4 Minit_13) ;
-         Init_F1_A_g = Minit_12[(shiftfield_F1_A_g p_2)]
+           (Array_R0003_sint32_init (shiftfield_F1_A_f p_2) 4 Minit_12) ;
+         Init_F1_A_g = Minit_13[(shiftfield_F1_A_g p_2)]
       }
   
-  Function Array_R000d_sint32_init (p_2 : addr) (n_2 : int)
+  Function Array_R0003_sint32_init (p_2 : addr) (n_2 : int)
     (Minit_6 : bool[addr]) : bool[]
   
-  Function Load_R0007_S1_A (p_2 : addr) (M000d_sint32_0 : int[addr])
-    (M0011_float64_0 : f64[addr]) : S1_A
+  Function Load_R0002_S1_A (p_2 : addr) (M0004_float64_0 : f64[addr])
+    (M0003_sint32_0 : int[addr]) : S1_A
     = {
          F1_A_f =
-           (Array_R000d_sint32 (shiftfield_F1_A_f p_2) 4 M000d_sint32_0) ;
-         F1_A_g = M0011_float64_0[(shiftfield_F1_A_g p_2)]
+           (Array_R0003_sint32 (shiftfield_F1_A_f p_2) 4 M0003_sint32_0) ;
+         F1_A_g = M0004_float64_0[(shiftfield_F1_A_g p_2)]
       }
   
-  Function Array_R000d_sint32 (p_2 : addr) (n_2 : int)
-    (M000d_sint32_0 : int[addr]) : int[]
+  Function Array_R0003_sint32 (p_2 : addr) (n_2 : int)
+    (M0003_sint32_0 : int[addr]) : int[]
   
-  Predicate IsInit_S1_A_R0007 (p_0 : addr) (Minit_0 : bool[addr])
+  Predicate IsInit_S1_A_R0002 (p_0 : addr) (Minit_0 : bool[addr])
     (Minit_1 : bool[addr])
-    = (IsInitArray_R000d_sint32 (shiftfield_F1_A_f p_0) 4 Minit_1)
-      /\ Minit_0[(shiftfield_F1_A_g p_0)]
+    = (IsInitArray_R0003_sint32 (shiftfield_F1_A_f p_0) 4 Minit_0)
+      /\ Minit_1[(shiftfield_F1_A_g p_0)]
   
-  Predicate IsInitArray_R000d_sint32 (p_0 : addr) (n_0 : int)
+  Predicate IsInitArray_R0003_sint32 (p_0 : addr) (n_0 : int)
     (Minit_0 : bool[addr])
     = forall i_0:int.
       (0<=i_0) -> (i_0<n_0) -> Minit_0[(shift_sint32 p_0 i_0)]
   
-  Axiom Load_R0007_Init_S1_A_framed:
+  Axiom Load_R0002_Init_S1_A_framed:
     forall Minit_14: bool[addr].
     forall Minit_15: bool[addr].
     forall Minit_16: bool[addr].
     forall Minit_17: bool[addr].
     forall p_2: addr.
     (eqmem Minit_14 Minit_16 p_2 24) -> (eqmem Minit_15 Minit_17 p_2 24)
-    -> ((Load_R0007_Init_S1_A p_2 Minit_16 Minit_17)=
-        (Load_R0007_Init_S1_A p_2 Minit_14 Minit_15))
+    -> ((Load_R0002_Init_S1_A p_2 Minit_16 Minit_17)=
+        (Load_R0002_Init_S1_A p_2 Minit_14 Minit_15))
   
-  Axiom Array_R000d_sint32_init_framed:
+  Axiom Array_R0003_sint32_init_framed:
     forall Minit_7: bool[addr].
     forall Minit_8: bool[addr].
     forall n_2: int.
     forall p_2: addr.
     (eqmem Minit_7 Minit_8 p_2 (4*n_2))
-    -> ((Array_R000d_sint32_init p_2 n_2 Minit_8)=
-        (Array_R000d_sint32_init p_2 n_2 Minit_7))
+    -> ((Array_R0003_sint32_init p_2 n_2 Minit_8)=
+        (Array_R0003_sint32_init p_2 n_2 Minit_7))
   
-  Axiom Array_R000d_sint32_init_access:
+  Axiom Array_R0003_sint32_init_access:
     forall Minit_6: bool[addr].
     forall i_2: int.
     forall n_2: int.
     forall p_2: addr.
-    [ (Array_R000d_sint32_init p_2 n_2 Minit_6)[i_2] ]
+    [ (Array_R0003_sint32_init p_2 n_2 Minit_6)[i_2] ]
     (0<=i_2) -> (i_2<n_2)
-    -> ((Array_R000d_sint32_init p_2 n_2 Minit_6)[i_2]=
+    -> ((Array_R0003_sint32_init p_2 n_2 Minit_6)[i_2]=
         Minit_6[(shift_sint32 p_2 i_2)])
   
-  Axiom Load_R0007_S1_A_framed:
-    forall M000d_sint32_1: int[addr].
-    forall M000d_sint32_2: int[addr].
-    forall M0011_float64_1: f64[addr].
-    forall M0011_float64_2: f64[addr].
+  Axiom Load_R0002_S1_A_framed:
+    forall M0003_sint32_1: int[addr].
+    forall M0003_sint32_2: int[addr].
+    forall M0004_float64_1: f64[addr].
+    forall M0004_float64_2: f64[addr].
     forall p_2: addr.
-    (eqmem M000d_sint32_1 M000d_sint32_2 p_2 24)
-    -> (eqmem M0011_float64_1 M0011_float64_2 p_2 24)
-    -> ((Load_R0007_S1_A p_2 M000d_sint32_2 M0011_float64_2)=
-        (Load_R0007_S1_A p_2 M000d_sint32_1 M0011_float64_1))
+    (eqmem M0003_sint32_1 M0003_sint32_2 p_2 24)
+    -> (eqmem M0004_float64_1 M0004_float64_2 p_2 24)
+    -> ((Load_R0002_S1_A p_2 M0004_float64_2 M0003_sint32_2)=
+        (Load_R0002_S1_A p_2 M0004_float64_1 M0003_sint32_1))
   
-  Axiom Array_R000d_sint32_framed:
-    forall M000d_sint32_1: int[addr].
-    forall M000d_sint32_2: int[addr].
+  Axiom Array_R0003_sint32_framed:
+    forall M0003_sint32_1: int[addr].
+    forall M0003_sint32_2: int[addr].
     forall n_2: int.
     forall p_2: addr.
-    (eqmem M000d_sint32_1 M000d_sint32_2 p_2 (4*n_2))
-    -> ((Array_R000d_sint32 p_2 n_2 M000d_sint32_2)=
-        (Array_R000d_sint32 p_2 n_2 M000d_sint32_1))
+    (eqmem M0003_sint32_1 M0003_sint32_2 p_2 (4*n_2))
+    -> ((Array_R0003_sint32 p_2 n_2 M0003_sint32_2)=
+        (Array_R0003_sint32 p_2 n_2 M0003_sint32_1))
   
-  Axiom Array_R000d_sint32_access:
-    forall M000d_sint32_0: int[addr].
+  Axiom Array_R0003_sint32_access:
+    forall M0003_sint32_0: int[addr].
     forall i_2: int.
     forall n_2: int.
     forall p_2: addr.
-    [ (Array_R000d_sint32 p_2 n_2 M000d_sint32_0)[i_2] ]
+    [ (Array_R0003_sint32 p_2 n_2 M0003_sint32_0)[i_2] ]
     (0<=i_2) -> (i_2<n_2)
-    -> ((Array_R000d_sint32 p_2 n_2 M000d_sint32_0)[i_2]=
-        M000d_sint32_0[(shift_sint32 p_2 i_2)])
+    -> ((Array_R0003_sint32 p_2 n_2 M0003_sint32_0)[i_2]=
+        M0003_sint32_0[(shift_sint32 p_2 i_2)])
   
-  Axiom IsInit_S1_A_R0007_framed:
+  Axiom IsInit_S1_A_R0002_framed:
     forall Minit_2: bool[addr].
     forall Minit_3: bool[addr].
     forall Minit_4: bool[addr].
     forall Minit_5: bool[addr].
     forall p_0: addr.
     (eqmem Minit_2 Minit_4 p_0 24) -> (eqmem Minit_3 Minit_5 p_0 24)
-    -> ((IsInit_S1_A_R0007 p_0 Minit_4 Minit_5)
-        <-> (IsInit_S1_A_R0007 p_0 Minit_2 Minit_3))
+    -> ((IsInit_S1_A_R0002 p_0 Minit_4 Minit_5)
+        <-> (IsInit_S1_A_R0002 p_0 Minit_2 Minit_3))
   
-  Axiom IsInitArray_R000d_sint32_framed:
+  Axiom IsInitArray_R0003_sint32_framed:
     forall Minit_1: bool[addr].
     forall Minit_2: bool[addr].
     forall n_0: int.
     forall p_0: addr.
     (eqmem Minit_1 Minit_2 p_0 (4*n_0))
-    -> ((IsInitArray_R000d_sint32 p_0 n_0 Minit_2)
-        <-> (IsInitArray_R000d_sint32 p_0 n_0 Minit_1))
+    -> ((IsInitArray_R0003_sint32 p_0 n_0 Minit_2)
+        <-> (IsInitArray_R0003_sint32 p_0 n_0 Minit_1))
   
 }
 
@@ -720,9 +720,10 @@ Cluster Shifts {
 }
 
 Goal Post-condition (file compound_assigns.i, line 79) in 'init':
-Let a = Load_R0007_S1_A(p, memcpy(M000d_sint32_0, p, M000d_sint32_0, q, 24),
-          memcpy(M0011_float64_0, p, M0011_float64_0, q, 24)).
-Let a_1 = Load_R0007_S1_A(q, M000d_sint32_0, M0011_float64_0).
+Let a = Load_R0002_S1_A(p,
+          memcpy(M0004_float64_0, p, M0004_float64_0, q, 24),
+          memcpy(M0003_sint32_0, p, M0003_sint32_0, q, 24)).
+Let a_1 = Load_R0002_S1_A(q, M0004_float64_0, M0003_sint32_0).
 Assume {
   Type: IsS1_A(a_1) /\ IsS1_A(a).
   (* Heap *)
@@ -736,36 +737,36 @@ Prove: EqS1_A(a, a_1).
 ------------------------------------------------------------
 
 Goal Post-condition (file compound_assigns.i, line 80) in 'init':
-Let a = memcpy(Minit_1, p, Minit_1, q, 24).
-Let a_1 = memcpy(Minit_0, p, Minit_0, q, 24).
-Let a_2 = Load_R0007_S1_A(p,
-            memcpy(M000d_sint32_0, p, M000d_sint32_0, q, 24),
-            memcpy(M0011_float64_0, p, M0011_float64_0, q, 24)).
-Let a_3 = Load_R0007_S1_A(q, M000d_sint32_0, M0011_float64_0).
+Let a = memcpy(Minit_0, p, Minit_0, q, 24).
+Let a_1 = memcpy(Minit_1, p, Minit_1, q, 24).
+Let a_2 = Load_R0002_S1_A(p,
+            memcpy(M0004_float64_0, p, M0004_float64_0, q, 24),
+            memcpy(M0003_sint32_0, p, M0003_sint32_0, q, 24)).
+Let a_3 = Load_R0002_S1_A(q, M0004_float64_0, M0003_sint32_0).
 Assume {
   Type: IsS1_A(a_3) /\ IsS1_A(a_2).
   (* Heap *)
   Type: (region(p.base) <= 0) /\ (region(q.base) <= 0).
   (* Pre-condition *)
-  Have: IsInit_S1_A_R0007(q, Minit_0, Minit_1).
+  Have: IsInit_S1_A_R0002(q, Minit_0, Minit_1).
   (* Pre-condition *)
   Have: separated(p, 24, q, 24).
-  Have: (Load_R0007_Init_S1_A(p, a_1, a) =
-         Load_R0007_Init_S1_A(q, Minit_0, Minit_1)) /\ (a_2 = a_3).
+  Have: (Load_R0002_Init_S1_A(p, a, a_1) =
+         Load_R0002_Init_S1_A(q, Minit_0, Minit_1)) /\ (a_2 = a_3).
   (* Assertion 'PF,Z3_only' *)
   Have: forall i : Z. ((0 <= i) -> ((i <= 3) ->
       (a[shift_sint32(shiftfield_F1_A_f(p), i)]=true))).
 }
-Prove: IsInit_S1_A_R0007(p, a_1, a).
+Prove: IsInit_S1_A_R0002(p, a, a_1).
 
 ------------------------------------------------------------
 
 Goal Assertion 'PF,Z3_only' (file compound_assigns.i, line 87):
 Let a = memcpy(Minit_0, p, Minit_0, q, 24).
-Let a_1 = Load_R0007_S1_A(p,
-            memcpy(M000d_sint32_0, p, M000d_sint32_0, q, 24),
-            memcpy(M0011_float64_0, p, M0011_float64_0, q, 24)).
-Let a_2 = Load_R0007_S1_A(q, M000d_sint32_0, M0011_float64_0).
+Let a_1 = Load_R0002_S1_A(p,
+            memcpy(M0004_float64_0, p, M0004_float64_0, q, 24),
+            memcpy(M0003_sint32_0, p, M0003_sint32_0, q, 24)).
+Let a_2 = Load_R0002_S1_A(q, M0004_float64_0, M0003_sint32_0).
 Assume {
   Type: IsS1_A(a_2) /\ IsS1_A(a_1).
   (* Heap *)
@@ -773,11 +774,11 @@ Assume {
   (* Goal *)
   When: (0 <= i) /\ (i <= 3).
   (* Pre-condition *)
-  Have: IsInit_S1_A_R0007(q, Minit_1, Minit_0).
+  Have: IsInit_S1_A_R0002(q, Minit_0, Minit_1).
   (* Pre-condition *)
   Have: separated(p, 24, q, 24).
-  Have: (Load_R0007_Init_S1_A(p, memcpy(Minit_1, p, Minit_1, q, 24), a) =
-         Load_R0007_Init_S1_A(q, Minit_1, Minit_0)) /\ (a_1 = a_2).
+  Have: (Load_R0002_Init_S1_A(p, a, memcpy(Minit_1, p, Minit_1, q, 24)) =
+         Load_R0002_Init_S1_A(q, Minit_0, Minit_1)) /\ (a_1 = a_2).
 }
 Prove: (a[shift_sint32(shiftfield_F1_A_f(p), i)]=true).
 
@@ -794,86 +795,86 @@ Prove: true.
 
 Cluster Compound {
   
-  Function Load_R0002_Init_S1_A (p_0 : addr) (Minit_0 : bool[addr])
+  Function Load_R0001_Init_S1_A (p_0 : addr) (Minit_0 : bool[addr])
     (Minit_1 : bool[addr]) : Init_S1_A
     = {
          Init_F1_A_f =
-           (Array_R0012_sint32_init (shiftfield_F1_A_f p_0) 4 Minit_0) ;
-         Init_F1_A_g = Minit_1[(shiftfield_F1_A_g p_0)]
+           (Array_R0002_sint32_init (shiftfield_F1_A_f p_0) 4 Minit_1) ;
+         Init_F1_A_g = Minit_0[(shiftfield_F1_A_g p_0)]
       }
   
-  Function Array_R0012_sint32_init (p_0 : addr) (n_0 : int)
+  Function Array_R0002_sint32_init (p_0 : addr) (n_0 : int)
     (Minit_0 : bool[addr]) : bool[]
   
-  Function Load_R0002_S1_A (p_0 : addr) (M0012_sint32_0 : int[addr])
-    (M0016_float64_0 : f64[addr]) : S1_A
+  Function Load_R0001_S1_A (p_0 : addr) (M0003_float64_0 : f64[addr])
+    (M0002_sint32_0 : int[addr]) : S1_A
     = {
          F1_A_f =
-           (Array_R0012_sint32 (shiftfield_F1_A_f p_0) 4 M0012_sint32_0) ;
-         F1_A_g = M0016_float64_0[(shiftfield_F1_A_g p_0)]
+           (Array_R0002_sint32 (shiftfield_F1_A_f p_0) 4 M0002_sint32_0) ;
+         F1_A_g = M0003_float64_0[(shiftfield_F1_A_g p_0)]
       }
   
-  Function Array_R0012_sint32 (p_0 : addr) (n_0 : int)
-    (M0012_sint32_0 : int[addr]) : int[]
+  Function Array_R0002_sint32 (p_0 : addr) (n_0 : int)
+    (M0002_sint32_0 : int[addr]) : int[]
   
-  Axiom Load_R0002_Init_S1_A_framed:
+  Axiom Load_R0001_Init_S1_A_framed:
     forall Minit_2: bool[addr].
     forall Minit_3: bool[addr].
     forall Minit_4: bool[addr].
     forall Minit_5: bool[addr].
     forall p_0: addr.
     (eqmem Minit_2 Minit_4 p_0 24) -> (eqmem Minit_3 Minit_5 p_0 24)
-    -> ((Load_R0002_Init_S1_A p_0 Minit_4 Minit_5)=
-        (Load_R0002_Init_S1_A p_0 Minit_2 Minit_3))
+    -> ((Load_R0001_Init_S1_A p_0 Minit_4 Minit_5)=
+        (Load_R0001_Init_S1_A p_0 Minit_2 Minit_3))
   
-  Axiom Array_R0012_sint32_init_framed:
+  Axiom Array_R0002_sint32_init_framed:
     forall Minit_1: bool[addr].
     forall Minit_2: bool[addr].
     forall n_0: int.
     forall p_0: addr.
     (eqmem Minit_1 Minit_2 p_0 (4*n_0))
-    -> ((Array_R0012_sint32_init p_0 n_0 Minit_2)=
-        (Array_R0012_sint32_init p_0 n_0 Minit_1))
+    -> ((Array_R0002_sint32_init p_0 n_0 Minit_2)=
+        (Array_R0002_sint32_init p_0 n_0 Minit_1))
   
-  Axiom Array_R0012_sint32_init_access:
+  Axiom Array_R0002_sint32_init_access:
     forall Minit_0: bool[addr].
     forall i_0: int.
     forall n_0: int.
     forall p_0: addr.
-    [ (Array_R0012_sint32_init p_0 n_0 Minit_0)[i_0] ]
+    [ (Array_R0002_sint32_init p_0 n_0 Minit_0)[i_0] ]
     (0<=i_0) -> (i_0<n_0)
-    -> ((Array_R0012_sint32_init p_0 n_0 Minit_0)[i_0]=
+    -> ((Array_R0002_sint32_init p_0 n_0 Minit_0)[i_0]=
         Minit_0[(shift_sint32 p_0 i_0)])
   
-  Axiom Load_R0002_S1_A_framed:
-    forall M0012_sint32_1: int[addr].
-    forall M0012_sint32_2: int[addr].
-    forall M0016_float64_1: f64[addr].
-    forall M0016_float64_2: f64[addr].
+  Axiom Load_R0001_S1_A_framed:
+    forall M0002_sint32_1: int[addr].
+    forall M0002_sint32_2: int[addr].
+    forall M0003_float64_1: f64[addr].
+    forall M0003_float64_2: f64[addr].
     forall p_0: addr.
-    (eqmem M0012_sint32_1 M0012_sint32_2 p_0 24)
-    -> (eqmem M0016_float64_1 M0016_float64_2 p_0 24)
-    -> ((Load_R0002_S1_A p_0 M0012_sint32_2 M0016_float64_2)=
-        (Load_R0002_S1_A p_0 M0012_sint32_1 M0016_float64_1))
+    (eqmem M0002_sint32_1 M0002_sint32_2 p_0 24)
+    -> (eqmem M0003_float64_1 M0003_float64_2 p_0 24)
+    -> ((Load_R0001_S1_A p_0 M0003_float64_2 M0002_sint32_2)=
+        (Load_R0001_S1_A p_0 M0003_float64_1 M0002_sint32_1))
   
-  Axiom Array_R0012_sint32_framed:
-    forall M0012_sint32_1: int[addr].
-    forall M0012_sint32_2: int[addr].
+  Axiom Array_R0002_sint32_framed:
+    forall M0002_sint32_1: int[addr].
+    forall M0002_sint32_2: int[addr].
     forall n_0: int.
     forall p_0: addr.
-    (eqmem M0012_sint32_1 M0012_sint32_2 p_0 (4*n_0))
-    -> ((Array_R0012_sint32 p_0 n_0 M0012_sint32_2)=
-        (Array_R0012_sint32 p_0 n_0 M0012_sint32_1))
+    (eqmem M0002_sint32_1 M0002_sint32_2 p_0 (4*n_0))
+    -> ((Array_R0002_sint32 p_0 n_0 M0002_sint32_2)=
+        (Array_R0002_sint32 p_0 n_0 M0002_sint32_1))
   
-  Axiom Array_R0012_sint32_access:
-    forall M0012_sint32_0: int[addr].
+  Axiom Array_R0002_sint32_access:
+    forall M0002_sint32_0: int[addr].
     forall i_0: int.
     forall n_0: int.
     forall p_0: addr.
-    [ (Array_R0012_sint32 p_0 n_0 M0012_sint32_0)[i_0] ]
+    [ (Array_R0002_sint32 p_0 n_0 M0002_sint32_0)[i_0] ]
     (0<=i_0) -> (i_0<n_0)
-    -> ((Array_R0012_sint32 p_0 n_0 M0012_sint32_0)[i_0]=
-        M0012_sint32_0[(shift_sint32 p_0 i_0)])
+    -> ((Array_R0002_sint32 p_0 n_0 M0002_sint32_0)[i_0]=
+        M0002_sint32_0[(shift_sint32 p_0 i_0)])
   
 }
 
@@ -954,14 +955,14 @@ Cluster Shifts {
 }
 
 Goal Post-condition 'P' in 'swap':
-Let a = memcpy(M0012_sint32_0, p, M0012_sint32_0, q, 24).
-Let a_1 = memcpy(M0016_float64_0, p, M0016_float64_0, q, 24).
-Let a_2 = Load_R0002_S1_A(q, M0012_sint32_0, M0016_float64_0).
-Let a_3 = memcpy(a, q, M0012_sint32_undef_0, q, 24).
-Let a_4 = memcpy(a_1, q, M0016_float64_undef_0, q, 24).
-Let a_5 = Load_R0002_S1_A(q, a_3, a_4).
-Let a_6 = Load_R0002_S1_A(p, M0012_sint32_0, M0016_float64_0).
-Let a_7 = Load_R0002_S1_A(p, a_3, a_4).
+Let a = memcpy(M0003_float64_0, p, M0003_float64_0, q, 24).
+Let a_1 = memcpy(M0002_sint32_0, p, M0002_sint32_0, q, 24).
+Let a_2 = Load_R0001_S1_A(q, M0003_float64_0, M0002_sint32_0).
+Let a_3 = memcpy(a, q, M0003_float64_undef_0, q, 24).
+Let a_4 = memcpy(a_1, q, M0002_sint32_undef_0, q, 24).
+Let a_5 = Load_R0001_S1_A(q, a_3, a_4).
+Let a_6 = Load_R0001_S1_A(p, M0003_float64_0, M0002_sint32_0).
+Let a_7 = Load_R0001_S1_A(p, a_3, a_4).
 Assume {
   Type: IsS1_A(a_6) /\ IsS1_A(a_2) /\ IsS1_A(a_7) /\ IsS1_A(a_5).
   (* Heap *)
@@ -970,22 +971,22 @@ Assume {
   Have: (q = p) \/ separated(p, 24, q, 24).
   (* Initializer *)
   Init: a_5 = a_6.
-  Have: Load_R0002_S1_A(p, a, a_1) = a_2.
+  Have: Load_R0001_S1_A(p, a, a_1) = a_2.
 }
 Prove: EqS1_A(a_7, a_2).
 
 ------------------------------------------------------------
 
 Goal Post-condition 'Q' in 'swap':
-Let a = memcpy(M0012_sint32_0, p, M0012_sint32_0, q, 24).
-Let a_1 = memcpy(M0016_float64_0, p, M0016_float64_0, q, 24).
-Let a_2 = Load_R0002_S1_A(q, M0012_sint32_0, M0016_float64_0).
-Let a_3 = memcpy(a, q, M0012_sint32_undef_0, q, 24).
-Let a_4 = memcpy(a_1, q, M0016_float64_undef_0, q, 24).
-Let a_5 = Load_R0002_S1_A(q, a_3, a_4).
-Let a_6 = Load_R0002_S1_A(p, M0012_sint32_0, M0016_float64_0).
+Let a = memcpy(M0003_float64_0, p, M0003_float64_0, q, 24).
+Let a_1 = memcpy(M0002_sint32_0, p, M0002_sint32_0, q, 24).
+Let a_2 = Load_R0001_S1_A(q, M0003_float64_0, M0002_sint32_0).
+Let a_3 = memcpy(a, q, M0003_float64_undef_0, q, 24).
+Let a_4 = memcpy(a_1, q, M0002_sint32_undef_0, q, 24).
+Let a_5 = Load_R0001_S1_A(q, a_3, a_4).
+Let a_6 = Load_R0001_S1_A(p, M0003_float64_0, M0002_sint32_0).
 Assume {
-  Type: IsS1_A(a_6) /\ IsS1_A(a_2) /\ IsS1_A(Load_R0002_S1_A(p, a_3, a_4)) /\
+  Type: IsS1_A(a_6) /\ IsS1_A(a_2) /\ IsS1_A(Load_R0001_S1_A(p, a_3, a_4)) /\
       IsS1_A(a_5).
   (* Heap *)
   Type: (region(p.base) <= 0) /\ (region(q.base) <= 0).
@@ -993,7 +994,7 @@ Assume {
   Have: (q = p) \/ separated(p, 24, q, 24).
   (* Initializer *)
   Init: a_5 = a_6.
-  Have: Load_R0002_S1_A(p, a, a_1) = a_2.
+  Have: Load_R0001_S1_A(p, a, a_1) = a_2.
 }
 Prove: EqS1_A(a_5, a_6).
 

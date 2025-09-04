@@ -52,77 +52,72 @@ val pp_region : Format.formatter -> region -> unit
 (** Initially unlocked. *)
 val create : unit -> map
 
-(** Default locked status is inherited from the copied map. *)
-val copy : ?locked:bool -> map -> map
-
 (** Lock the map. No more access nor merge can be added into the map. *)
 val lock : map -> unit
 
-(** Unlock the map. *)
-val unlock : map -> unit
-
+(** The underlying map must have been lock to get unique identifiers. *)
 val id : node -> int
-val forge : int -> node
-val equal : map -> node -> node -> bool
-val node : map -> node -> node
-val nodes : map -> node list -> node list
 
-val size : map -> node -> int
-val parents : map -> node -> node list
-val cvars : map -> node -> varinfo list
-val labels : map -> node -> string list
-val region : map -> node -> region
+(** Provided the map is locked and the id exists. *)
+val of_id : map -> int -> node
+
+val equal : node -> node -> bool
+val find : node -> node
+val find_all : node list -> node list
+
+val size : node -> int
+val parents : node -> node list
+val cvars : node -> varinfo list
+val labels : node -> string list
+val region : node -> region
 val regions : map -> region list
 val iter : map -> (node -> unit) -> unit
 
-val new_chunk : map ->
-  ?parent:node -> ?size:int -> ?ptr:node -> ?pointed:node ->
-  unit -> node
-
+val fresh : map -> node
 val add_cvar : map -> Cil_types.varinfo -> node
 val add_logic_var : map -> Cil_types.logic_var -> domain
 val add_logic_info : map -> Cil_types.logic_info -> domain
 val add_result : map -> node
 val add_label : map -> string -> node
-val add_field : map -> node -> fieldinfo -> node
-val add_index : map -> node -> typ -> node
-val add_points_to : map -> node -> node -> unit
-val add_value : map -> node -> typ -> node option
+val add_field : node -> fieldinfo -> node
+val add_index : node -> typ -> node
+val add_points_to : node -> node -> unit
+val add_value : node -> typ -> node option
 
-val add_read : map -> node -> Access.acs -> unit
-val add_write : map -> node -> Access.acs -> unit
-val add_shift : map -> node -> Access.acs -> unit
+val add_read : node -> Access.acs -> unit
+val add_write : node -> Access.acs -> unit
+val add_shift : node -> Access.acs -> unit
 
 val domain_of_typ : map -> typ -> domain
 val domain_of_ltyp : map -> ?ctxt:context -> logic_type -> domain
 
-val merge : map -> node -> node -> unit
-val merge_all : map -> node list -> unit
-val merge_domain : map -> domain -> domain -> domain
+val merge : node -> node -> unit
+val merge_all : node list -> unit
+val merge_domain : domain -> domain -> domain
 
 val cvar : map -> varinfo -> node
 val lvar : map -> logic_var -> domain
 val logic_info : map -> logic_info -> domain
-val field : map -> node -> fieldinfo -> node
-val index : map -> node -> typ -> node
+val field : node -> fieldinfo -> node
+val index : node -> typ -> node
 val lval : map -> lval -> node
 val exp : map -> exp -> node option
 val result : map -> node option
 
-val ranges : map -> node -> range list
-val points_to : map -> node -> node option
-val pointed_by : map -> node -> node list
+val ranges : node -> range list
+val points_to : node -> node option
+val pointed_by : node -> node list
 
-val footprint : map -> node -> node list
+val footprint : node -> node list
 
-val included : map -> node -> node -> bool
-val separated : map -> node -> node -> bool
-val singleton : map -> node -> bool
+val included : node -> node -> bool
+val separated : node -> node -> bool
+val singleton : node -> bool
 
-val reads : map -> node -> typ list
-val writes : map -> node -> typ list
-val shifts : map -> node -> typ list
-val types : map -> node -> typ list
-val typed : map -> node -> typ option
+val reads : node -> typ list
+val writes : node -> typ list
+val shifts : node -> typ list
+val types : node -> typ list
+val typed : node -> typ option
 
 val bitsSizeOf : typ -> int
