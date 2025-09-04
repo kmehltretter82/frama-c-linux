@@ -752,8 +752,13 @@ class process_volatile_access project binding_map kf_tbl vol_tbl index =
   object(self)
     inherit Visitor.frama_c_copy project
 
-    method private get_volatile_access lv =
-      get_volatile_access (self#get_kf_name ()) binding_map kf_tbl vol_tbl lv
+    method private get_volatile_access ~is_wr_access lv =
+      let kf_name =
+        match self#current_kf with
+        | None -> assert false (* cannot happen *)
+        | Some kf -> Kernel_function.get_name kf
+      in
+      get_volatile_access ~is_wr_access kf_name binding_map kf_tbl vol_tbl lv
 
     val mutable top_eid = -1
     method private set_top_eid = function
@@ -768,11 +773,6 @@ class process_volatile_access project binding_map kf_tbl vol_tbl index =
       top_eid <- -1
 
     val mutable blk = new_blk ()
-
-    method private get_kf_name () =
-      match self#current_kf with
-      | None -> assert false
-      | Some kf -> Kernel_function.get_name kf
 
     method private add_instr i =
       Options.debug ~level:2 ~dkey:dkey_transformation_action "Add new stmt to block";
