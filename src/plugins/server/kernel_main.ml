@@ -18,6 +18,10 @@ module Senv = Server_parameters
 let package =
   Package.package ~name:"parameters" ~title:"All Frama-C parameters" ()
 
+(* Should a parameter be exported? *)
+let is_exported_parameter (p : Typed_parameter.parameter) =
+  p.visible && p.reconfigurable
+
 (* Translates a parameter name into a valid camlCase request. *)
 let camlCaseParameterName name =
   match String.split_on_char '-' name with
@@ -123,7 +127,10 @@ let () = Request.register
     begin fun name ->
       try
         let plugin = Plugin.get_from_name name in
-        Hashtbl.to_seq plugin.p_parameters |> List.of_seq
+        let add group params acc =
+          (group, List.filter is_exported_parameter params) :: acc
+        in
+        Hashtbl.fold add plugin.p_parameters []
       with Not_found -> Data.failure "No plug-in of name %S" name
     end
 
@@ -148,8 +155,7 @@ let register_parameter parameter =
 (* Registers requests for all parameters of the given plugin. *)
 let register_plugin_parameters plugin =
   let register_group _group list =
-    let is_visible p = p.Typed_parameter.visible && p.reconfigurable in
-    List.iter register_parameter (List.filter is_visible list)
+    List.iter register_parameter (List.filter is_exported_parameter list)
   in
   Hashtbl.iter register_group plugin.Plugin.p_parameters
 
