@@ -275,7 +275,6 @@ module B_MAP = struct
   let checks_prototype_kind fct =
     (* Verifying the prototype within the kind of access. *)
     let ty = fct.vtype in
-    assert (Ast_types.is_fun ty) ;
     let ret_type, args, is_varg_arg, _attrib = Cil.splitFunctionType ty in
     let volatile_ret_type = add_volatile_attr ret_type in
     Options.debug ~level:2 ~dkey:dkey_binding
@@ -575,7 +574,6 @@ let find_typename ~is_wr_access kf_tbl typ =
   | Some fct ->
     (* Verifying the protyping within the type of the volatile access. *)
     let ty = fct.vtype in
-    assert (Ast_types.is_fun ty);
     let ret, _args, _is_varg_arg, _attrib = Cil.splitFunctionType ty in
     let volatile_ret_type = add_volatile_attr ret in
     Options.debug ~level:2 ~dkey:dkey_binding
@@ -705,7 +703,6 @@ let get_volatile_access ~is_wr_access fct_name binding_map kf_tbl vol_tbl lval =
 
 let get_rd_types fct =
   let ty = fct.vtype in
-  assert (Ast_types.is_fun ty) ;
   let ret, args, _is_varg_arg, _attrib = Cil.splitFunctionType ty in
   match args with
   | Some [_, arg1, _] -> ret, arg1
@@ -713,7 +710,6 @@ let get_rd_types fct =
 
 let get_wr_types fct =
   let ty = fct.vtype in
-  assert (Ast_types.is_fun ty) ;
   let ret, args, _is_varg_arg, _attrib = Cil.splitFunctionType ty in
   match args with
   | Some ((_, arg1, _) :: [_, arg2, _]) -> ret, arg1, arg2
