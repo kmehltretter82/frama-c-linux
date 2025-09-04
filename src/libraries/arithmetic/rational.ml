@@ -68,6 +68,7 @@ let pow2 e =
    not optimal. Indeed, we necessarily have one of the following :
    - n - m - 1 < n - m ≤ log₂ a - log₂ b < n - m + 1
    - n - m - 1 < log₂ a - log₂ b ≤ n - m < n - m + 1
+
    Testing which one is true comes down to check if 2 ^ (n - m) ≤ (a / b). *)
 let log2 q =
   if Q.(q <= zero) then raise (Invalid_argument (Q.to_string q)) ;

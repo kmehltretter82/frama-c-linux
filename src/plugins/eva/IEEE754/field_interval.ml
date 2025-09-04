@@ -30,7 +30,7 @@ module Make (K : Field.S) (Computation : IEEE754.Computation) = struct
       if Scalar.(l <= u) then { lower = l ; upper = u }
       else Self.fatal "Lower bound is greater than upper bound."
     else top
-  
+
   let pretty fmt { lower ; upper } =
     Format.fprintf fmt "@[[%a .. %a]@]" K.pretty lower K.pretty upper
 

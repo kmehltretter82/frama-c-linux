@@ -310,7 +310,8 @@ module Make (Model : Modeling) = struct
 
 
 
-  type unary = Unary : 'f representation computation -> unary
+  type 'f element = 'f representation computation
+  type unary = Unary : 'f element -> unary
 
   let ( let@ ) computation step =
     let open Computation.Operators in
@@ -351,11 +352,8 @@ module Make (Model : Modeling) = struct
 
 
 
-  type binary =
-    Binary : 'f binary_elements -> binary
-
-  and 'f binary_elements =
-    'f format * 'f representation computation * 'f representation computation
+  type binary = Binary : 'f binary_elements -> binary
+  and 'f binary_elements = 'f format * 'f element * 'f element
 
   let ( let@ ) (left, right) step =
     let open Computation.Operators in
@@ -575,7 +573,7 @@ module Make (Model : Modeling) = struct
         "No exact representation for constant %f. \
          Assuming its floating point representation \
          is exact in format %a."
-         f Typed_float.pretty_format format ;
+        f Typed_float.pretty_format format ;
       Repr { exact ; absolute ; relative ; format }
     | CReal (_, fkind, Some str) ->
       let Format format = format_of_fkind fkind in
