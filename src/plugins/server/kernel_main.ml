@@ -61,6 +61,10 @@ module ParameterData = struct
     let descr = Md.plain "Parameter type : bool, int, float or string" in
     Record.field jparameter ~name:"type" ~descr (module ParameterType)
 
+  let is_set =
+    let descr = Md.plain "Has the parameter been set by the user?" in
+    Record.field jparameter ~name:"isSet" ~descr (module Jbool)
+
   let data = Record.publish ~package ~name:"parameter"
       ~descr:(Md.plain "Information about a Frama-C parameter") jparameter
 
@@ -76,6 +80,7 @@ module ParameterData = struct
     R.set help parameter.help |>
     R.set typ parameter |>
     R.set state (camlCaseParameterName parameter.name) |>
+    R.set is_set (parameter.is_set ()) |>
     R.to_json
 
   let of_json _ = Data.failure "Parameter.of_json not implemented"
