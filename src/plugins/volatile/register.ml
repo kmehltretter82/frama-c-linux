@@ -629,33 +629,30 @@ let build_volatile_table vmap =
 
 (*-------------------------------------------------------------------------*)
 
-let get_volatile_access ?loc ~is_wr_access fct_name binding_map kf_tbl vol_tbl lval =
+let get_volatile_access ~is_wr_access fct_name binding_map kf_tbl vol_tbl lval =
   let typ = Cil.typeOfLval lval in
+  let source = fst (Current_loc.get ()) in
   let get_volatile_access ~is_complete =
     try
       let path =
         try L_PATH.of_lval lval
         with L_PATH.Unsupported ->
-          let source = match loc with None -> None | Some l -> Some (fst l) in
-          Options.warning ?source "Unsupported volatile l-value: %a"
+          Options.warning ~source "Unsupported volatile l-value: %a"
             Lval.pretty lval ;
           raise Not_found
       in
       let found fct =
         Options.debug ~level:2 ~dkey:dkey_binding
           "Function found: %s@." fct.vname;
-        (match loc with
-         | None -> ()
-         | Some loc ->
-           Options.warning ~source:(fst loc)
-             ~wkey:Options.(if is_complete then wkey_transformed_access_lvalue_volatile
-                            else wkey_transformed_access_lvalue_partially_volatile)
-             "%s function: Introducing a call to '%s' for %s access to %svolatile left-value: %a"
-             fct_name
-             fct.vorig_name
-             (if is_wr_access then "write" else "read")
-             (if is_complete then "" else "partially ")
-             Lval.pretty lval);
+        Options.warning ~source
+          ~wkey:Options.(if is_complete then wkey_transformed_access_lvalue_volatile
+                         else wkey_transformed_access_lvalue_partially_volatile)
+          "%s function: Introducing a call to '%s' for %s access to %svolatile left-value: %a"
+          fct_name
+          fct.vorig_name
+          (if is_wr_access then "write" else "read")
+          (if is_complete then "" else "partially ")
+          Lval.pretty lval;
         Some (fct, (Ast_types.remove_attributes_for_c_cast typ))
       in
       (* Looking for a volatile function relative to the [lval] access. *)
@@ -675,19 +672,16 @@ let get_volatile_access ?loc ~is_wr_access fct_name binding_map kf_tbl vol_tbl l
         (* 3 - Looking into kernel functions for a name infered from the type value. *)
         found (find_typename ~is_wr_access kf_tbl typ)
     with Not_found ->
-      (match loc with
-       | None -> ()
-       | Some loc ->
-         Options.warning ~source:(fst loc)
-           ~wkey:Options.(if is_complete
-                          then wkey_untransformed_access_lvalue_volatile
-                          else wkey_untransformed_access_lvalue_partially_volatile)
-           "Undefined %s access function for %svolatile left-value: (volatile %a) %a"
-           (if is_wr_access then "write" else "read")
-           (if is_complete then "" else "partially ")
-           Typ.pretty (Ast_types.remove_attributes_for_c_cast
-                         (if Options.Base.get () then T_MAP.basetype typ else typ))
-           Lval.pretty lval) ;
+      Options.warning ~source
+        ~wkey:Options.(if is_complete
+                       then wkey_untransformed_access_lvalue_volatile
+                       else wkey_untransformed_access_lvalue_partially_volatile)
+        "Undefined %s access function for %svolatile left-value: (volatile %a) %a"
+        (if is_wr_access then "write" else "read")
+        (if is_complete then "" else "partially ")
+        Typ.pretty (Ast_types.remove_attributes_for_c_cast
+                      (if Options.Base.get () then T_MAP.basetype typ else typ))
+        Lval.pretty lval;
       None
   in if has_volatile_attr (Ast_types.get_attributes typ) then
     get_volatile_access ~is_complete:true
@@ -745,9 +739,8 @@ class process_volatile_access project binding_map kf_tbl vol_tbl index =
   object(self)
     inherit Visitor.frama_c_copy project
 
-
-    method private get_volatile_access ?loc lv =
-      get_volatile_access ?loc (self#get_kf_name ()) binding_map kf_tbl vol_tbl lv
+    method private get_volatile_access lv =
+      get_volatile_access (self#get_kf_name ()) binding_map kf_tbl vol_tbl lv
 
     val mutable top_eid = -1
     method private set_top_eid = function
@@ -840,12 +833,12 @@ class process_volatile_access project binding_map kf_tbl vol_tbl index =
       let do_volatile = function
         | Set (lv, e, loc) as i ->
           begin
-            match self#get_volatile_access ~loc ~is_wr_access:true lv  with
+            match self#get_volatile_access ~is_wr_access:true lv  with
             | None ->
               let i = match e with
                 | {enode=Lval (lv2);eid} when eid = top_eid ->
                   begin
-                    match self#get_volatile_access ~loc ~is_wr_access:false lv2 with
+                    match self#get_volatile_access ~is_wr_access:false lv2 with
                     | None -> i
                     | Some (rd_fct, _typ) -> begin (* lv=lv2; -> lv=rd_fct(&lv2); *)
                         (* To get the varinfo of the new project *)
@@ -881,7 +874,7 @@ class process_volatile_access project binding_map kf_tbl vol_tbl index =
           end
         | Call (Some lv, f, a, loc) as i ->
           begin
-            match self#get_volatile_access ~loc ~is_wr_access:true lv with
+            match self#get_volatile_access ~is_wr_access:true lv with
             | None -> i
             | Some (wr_fct, typ) ->
               (* lv=f(a); -> vtmp = f(a); wr_fct(&lv, vtmp); *)
@@ -903,7 +896,7 @@ class process_volatile_access project binding_map kf_tbl vol_tbl index =
             | None -> i
             | Some f ->
               let transform = Visitor_behavior.Memo.varinfo self#behavior in
-              match do_pointer_call ~index ~transform f xs ~loc with
+              match do_pointer_call ~loc ~index ~transform f xs with
               | Some (fn, g, ys) ->
                 Options.warning ~source:(fst loc) ~wkey:Options.wkey_transformed_call
                   "%a: use pointer function '%s'"
@@ -922,7 +915,7 @@ class process_volatile_access project binding_map kf_tbl vol_tbl index =
       let do_vexpr = function
         | {enode=Lval (lv);eid} as e when eid <> top_eid ->
           begin (* ...lv..;. -> vtmp=rd_fct(&lv); ...vtmp...; *)
-            match self#get_volatile_access ~loc:e.eloc ~is_wr_access:false lv with
+            match self#get_volatile_access ~is_wr_access:false lv with
             | None -> e
             | Some (rd_fct, _typ) ->
               (* To get the varinfo of the new project *)

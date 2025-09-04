@@ -3,9 +3,13 @@
 [volatile] Processing volatile clauses...
 [volatile] Register binding function 'c2fc2_Rd_INT' for 'read' accesses to type 'int'
 [volatile:transformed-access:lvalue-volatile] binding_auto.i:17: 
+  f function: Introducing a call to 'c2fc2_Wr_int' for write access to volatile left-value: x
+[volatile:transformed-access:lvalue-volatile] binding_auto.i:17: 
   f function: Introducing a call to 'c2fc2_Rd_INT' for read access to volatile left-value: y
 [volatile:transformed-access:lvalue-volatile] binding_auto.i:17: 
   f function: Introducing a call to 'c2fc2_Wr_int' for write access to volatile left-value: x
+[volatile:transformed-access:lvalue-volatile] binding_auto.i:20: 
+  f function: Introducing a call to 'c2fc2_Wr_int' for write access to volatile left-value: y
 [volatile:transformed-access:lvalue-volatile] binding_auto.i:20: 
   f function: Introducing a call to 'c2fc2_Rd_INT' for read access to volatile left-value: x
 [volatile:transformed-access:lvalue-volatile] binding_auto.i:20: 

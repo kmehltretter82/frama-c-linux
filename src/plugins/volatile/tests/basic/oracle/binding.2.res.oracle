@@ -32,6 +32,8 @@
 [volatile:cast:insertion] binding.i:26: 
   Cast to (int *) inserted for expression (__volatile_tmp_10) of type (T1)
 [volatile:transformed-access:lvalue-partially-volatile] binding.i:45: 
+  partial_access function: Introducing a call to 'WrT3_bis' for write access to partially volatile left-value: sx
+[volatile:transformed-access:lvalue-partially-volatile] binding.i:45: 
   partial_access function: Introducing a call to 'RdT3_bis' for read access to partially volatile left-value: sy
 [volatile:transformed-access:lvalue-partially-volatile] binding.i:45: 
   partial_access function: Introducing a call to 'WrT3_bis' for write access to partially volatile left-value: sx

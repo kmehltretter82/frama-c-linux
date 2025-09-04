@@ -2,6 +2,8 @@
 [volatile] Running volatile plugin...
 [volatile] Processing volatile clauses...
 [volatile:binding] Looking for function c2fc2_Wr_int
+[volatile:transformed-access:lvalue-volatile] binding_auto.i:17: 
+  f function: Introducing a call to 'c2fc2_Wr_int' for write access to volatile left-value: x
 [volatile:binding] Looking for function c2fc2_Rd_INT
 [volatile:transformed-access:lvalue-volatile] binding_auto.i:17: 
   f function: Introducing a call to 'c2fc2_Rd_INT' for read access to volatile left-value: y
@@ -10,6 +12,8 @@
   f function: Introducing a call to 'c2fc2_Wr_int' for write access to volatile left-value: x
 [volatile:binding] Looking for function c2fc2_Wr_INT
 [volatile:binding] Looking for function c2fc2_Wr_int
+[volatile:transformed-access:lvalue-volatile] binding_auto.i:20: 
+  f function: Introducing a call to 'c2fc2_Wr_int' for write access to volatile left-value: y
 [volatile:binding] Looking for function c2fc2_Rd_int
 [volatile:transformed-access:lvalue-volatile] binding_auto.i:20: 
   f function: Introducing a call to 'c2fc2_Rd_int' for read access to volatile left-value: x
