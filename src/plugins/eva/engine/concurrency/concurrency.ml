@@ -28,6 +28,20 @@ module Name = struct
       | String s -> Format.pp_print_string fmt s
       | Integer i -> Integer.pretty fmt i
       | Pointer (v, o) ->
+        let last_offset = Cil.lastOffset o in
+        let o =
+          match last_offset with
+          | Field ({ forig_name ; fattr; _ }, NoOffset)
+            when forig_name = "_fc"
+              && Ast_attributes.(contains fc_stdlib_internal fattr) ->
+            (* The pthreads library in Frama-C's stdlib models pthreads types
+               with a struct with a single field `_fc`. Mthread uses that field
+               to identify threads and mutexes so it ends up here as concurrency
+               name. We can omit that field when printing the name. *)
+            fst (Cil.removeOffset o)
+          | _ ->
+            o
+        in
         Format.fprintf fmt "%a%a" Varinfo.pretty v OffsetStructEq.pretty o
       | RawPointer (v, o) ->
         Format.fprintf fmt "&%a + %a" Varinfo.pretty v Integer.pretty o
