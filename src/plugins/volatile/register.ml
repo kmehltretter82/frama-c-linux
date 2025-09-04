@@ -30,27 +30,14 @@ let dkey_volatile_table =
     ~help:"Prints Volatile internal tables"
     "volatile-table"
 
-let typename (t:typ) =
-  let typename = Pretty_utils.to_string Printer.pp_typ t in
-  let blank = ref false
-  in String.iter (function
-      | ' ' -> blank := true
-      | c -> let v = Char.code c in
-        if not (((Char.code 'a') <= v && v <= (Char.code 'z'))
-                || ((Char.code 'A') <= v && v <= (Char.code 'Z'))
-                || ((Char.code '0') <= v && v <= (Char.code '9'))) then
-          raise Not_found) typename ;
-  if !blank then
-    begin
-      let buffer = Buffer.create 40  in
-      String.iter (function
-          | ' ' -> Buffer.add_char buffer '_'
-          | c -> Buffer.add_char buffer c) typename ;
-      Buffer.contents buffer
-    end
-  else
-    typename
-
+(* This function replaces spaces in type names.
+   Note: A previous version also made sure all caracters were either a-z, A-Z or
+   0-9 (or raised Not_found), it does not seem to be necessary so it was removed
+   to simplify the code, but maybe it'll break something (?).
+*)
+let typename (t: typ) =
+  let typename = Pretty_utils.to_string Typ.pretty t in
+  String.map (function ' ' -> '_' | c -> c) typename
 
 (* -------------------------------------------------------------------------- *)
 (* --- Global Volatile Annotation tables                                  --- *)
