@@ -66,4 +66,15 @@ void main() {
   classf = fpclassify(f);
   //@ assert classf == FP_NORMAL || classf == FP_INFINITE;
 
+  // test macro inside 'if'
+  if (FP_NORMAL == fpclassify(f));
+
+  long double ld = 42.0L;
+  int classld;
+  classld = fpclassify(ld);
+  //@ assert classld == FP_NORMAL;
+  classld = fpclassify(1e40000L); // imprecise; parsed as [LDBL_MAX .. inf]
+  //@ assert unknown: classld == FP_INFINITE;
+  classld = fpclassify(0.0L/-0.0L);
+  //@ assert classld == FP_NAN;
 }

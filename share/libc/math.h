@@ -74,7 +74,7 @@ typedef double double_t;
   complete behaviors;
   disjoint behaviors;
  */
-int __fc_fpclassifyf(float x);
+__FC_EXTERN_FOR_MACRO(fpclassify) int __fc_fpclassifyf(float x);
 
 /*@
   assigns \result \from x;
@@ -98,21 +98,101 @@ int __fc_fpclassifyf(float x);
   complete behaviors;
   disjoint behaviors;
  */
-int __fc_fpclassify(double x);
+__FC_EXTERN_FOR_MACRO(fpclassify) int __fc_fpclassify(double x);
 
-// Incorrect in presence of long double with >64 bits
-#define fpclassify(x) \
-  (sizeof(x) == sizeof(float) ? __fc_fpclassifyf(x) : __fc_fpclassify(x))
+/*@
+  assigns \result \from x;
+  behavior nan:
+    assumes is_nan: \is_NaN(x);
+    ensures fp_nan: \result == FP_NAN;
+  behavior inf:
+    assumes is_infinite: !\is_NaN(x) && !\is_finite(x);
+    ensures fp_infinite: \result == FP_INFINITE;
+  behavior zero:
+    assumes is_a_zero: x == 0.0; // also includes -0.0
+    ensures fp_zero: \result == FP_ZERO;
+  behavior subnormal:
+    assumes is_finite: \is_finite(x);
+    assumes is_subnormal: (x > 0.0 && x < LDBL_MIN) || (x < 0.0 && x > -LDBL_MIN);
+    ensures fp_subnormal: \result == FP_SUBNORMAL;
+  behavior normal:
+    assumes is_finite: \is_finite(x);
+    assumes not_subnormal: (x <= -LDBL_MIN || x >= LDBL_MIN);
+    ensures fp_normal: \result == FP_NORMAL;
+  complete behaviors;
+  disjoint behaviors;
+*/
+__FC_EXTERN_FOR_MACRO(fpclassify) int __fc_fpclassifyl(long double x);
 
-#define isinf(x) \
-  (sizeof(x) == sizeof(float) ? __fc_fpclassifyf(x) == FP_INFINITE : __fc_fpclassify(x) == FP_INFINITE)
+#define fpclassify(x) _Generic(x,                                       \
+                               float: __fc_fpclassifyf(x),              \
+                               double: __fc_fpclassify(x),              \
+                               long double: __fc_fpclassifyl(x))
 
-#define isnan(x) \
-  (sizeof(x) == sizeof(float) ? __fc_fpclassifyf(x) == FP_NAN : __fc_fpclassify(x) == FP_NAN)
+#define isnan(x) (fpclassify(x) == FP_NAN)
 
-#define isnormal(x) \
-  (sizeof(x) == sizeof(float) ? __fc_fpclassifyf(x) == FP_NORMAL : __fc_fpclassify(x) == FP_NORMAL)
+#define isnormal(x) _Generic(x,                                         \
+                             float: __fc_fpclassifyf(x) == FP_NORMAL, \
+                             double: __fc_fpclassify(x) == FP_NORMAL, \
+                             long double: __fc_fpclassifyl(x) == FP_NORMAL)
 
+
+/* Note: for the isinf builtin, GCC returns 1 for +inf and -1 for -inf, so we
+   cannot simply apply fpclassify(x) == FP_INFINITE.
+*/
+
+/*@
+  assigns \result \from x;
+  behavior plus_inf:
+    assumes is_plus_infinity: \is_plus_infinity(x);
+    ensures res_one: \result == 1;
+  behavior neg_inf:
+    assumes is_minus_infinity: \is_minus_infinity(x);
+    ensures res_minus_one: \result == -1;
+  behavior rest:
+    assumes not_infinity: !\is_infinite (x);
+    ensures res_zero: \result == 0;
+  complete behaviors;
+  disjoint behaviors;
+ */
+__FC_EXTERN_FOR_MACRO(isinf) int __fc_isinff(float x);
+
+/*@
+  assigns \result \from x;
+  behavior plus_inf:
+    assumes is_plus_infinity: \is_plus_infinity(x);
+    ensures res_one: \result == 1;
+  behavior neg_inf:
+    assumes is_minus_infinity: \is_minus_infinity(x);
+    ensures res_minus_one: \result == -1;
+  behavior rest:
+    assumes not_infinity: !\is_infinite (x);
+    ensures res_zero: \result == 0;
+  complete behaviors;
+  disjoint behaviors;
+ */
+__FC_EXTERN_FOR_MACRO(isinf) int __fc_isinf(double x);
+
+/*@
+  assigns \result \from x;
+  behavior plus_inf:
+    assumes is_plus_infinity: \is_plus_infinity(x);
+    ensures res_one: \result == 1;
+  behavior neg_inf:
+    assumes is_minus_infinity: \is_minus_infinity(x);
+    ensures res_minus_one: \result == -1;
+  behavior rest:
+    assumes not_infinity: !\is_infinite (x);
+    ensures res_zero: \result == 0;
+  complete behaviors;
+  disjoint behaviors;
+ */
+__FC_EXTERN_FOR_MACRO(isinf) int __fc_isinfl(long double x);
+
+#define isinf(x) _Generic(x,                           \
+                           float: __fc_isinff(x),       \
+                           double: __fc_isinf(x),       \
+                           long double: __fc_isinfl(x))
 
 /*@
   assigns \result \from x;
@@ -2061,6 +2141,14 @@ extern float fmaf(float x, float y, float z);
 */
 extern long double fmal(long double x, long double y, long double z);
 
+/*
+  Note: __finite, __finitef, __finitel are present in the LSB, e.g.:
+  https://refspecs.linuxbase.org/LSB_5.0.0/LSB-Core-generic/LSB-Core-generic/baselib---finitef.html
+
+  Therefore, we keep these names for the functions that are used by the
+  isfinite() macro.
+*/
+
 /*@
   assigns \result \from f;
   behavior finite:
@@ -2087,8 +2175,23 @@ extern int __finitef(float f);
 */
 extern int __finite(double d);
 
-#  define isfinite(x) \
-     (sizeof (x) == sizeof (float) ? __finitef (x) : __finite (x))
+/*@
+  assigns \result \from x;
+  behavior finite:
+    assumes isfinite: \is_finite(x);
+    ensures nonzero_result: \result > 0 || \result < 0;
+  behavior nonfinite:
+    assumes nonfinite: !\is_finite(x);
+    ensures zero_result: \result == 0;
+  complete behaviors;
+  disjoint behaviors;
+*/
+extern int __finitel(long double x);
+
+#define isfinite(x) _Generic(x,                         \
+                             float: __finitef(x),       \
+                             double: __finite(x),       \
+                             long double: __finitel(x))
 
 //The (integer x) argument is just here because a function without argument is
 //applied differently in ACSL and C
@@ -2098,19 +2201,19 @@ extern int __finite(double d);
   logic float __fc_infinity(integer x) = \plus_infinity;
   logic float __fc_nan(integer x) = \NaN;
 
-  @*/
+*/
 
 /*@
   ensures result_is_infinity: \is_plus_infinity(\result);
   assigns \result \from \nothing;
-  @*/
-__FC_EXTERN float __fc_infinity(int x);
+*/
+__FC_EXTERN_FOR_MACRO(INFINITY) float __fc_infinity(int x);
 
 /*@
   ensures result_is_nan: \is_NaN(\result);
   assigns \result \from \nothing;
-  @*/
-__FC_EXTERN float __fc_nan(int x);
+*/
+__FC_EXTERN_FOR_MACRO(NAN) float __fc_nan(int x);
 
 
 #define INFINITY __fc_infinity(0)

@@ -738,38 +738,67 @@
   Called from math_h.c:116.
 [eva] Done for function __finitef
 [eva] math_h.c:117: assertion got status valid.
+[eva] computing for function __finitel <- main.
+  Called from math_h.c:118.
+[eva] using specification for function __finitel
+[eva] Done for function __finitel
+[eva] math_h.c:119: assertion got status valid.
 [eva] computing for function __finitef <- main.
-  Called from math_h.c:119.
+  Called from math_h.c:121.
 [eva] Done for function __finitef
-[eva] math_h.c:121: assertion got status valid.
-[eva] computing for function __fc_signbitf <- main.
+[eva] computing for function __finitef <- main.
+  Called from math_h.c:121.
+[eva] Done for function __finitef
+[eva] math_h.c:122: assertion got status valid.
+[eva] computing for function __fc_fpclassifyf <- main.
+  Called from math_h.c:123.
+[eva] using specification for function __fc_fpclassifyf
+[eva] Done for function __fc_fpclassifyf
+[eva] computing for function __fc_fpclassifyf <- main.
   Called from math_h.c:124.
+[eva] Done for function __fc_fpclassifyf
+[eva] math_h.c:125: assertion got status valid.
+[eva] computing for function __fc_fpclassify <- main.
+  Called from math_h.c:128.
+[eva] using specification for function __fc_fpclassify
+[eva] Done for function __fc_fpclassify
+[eva] math_h.c:129: assertion got status valid.
+[eva] computing for function __fc_fpclassify <- main.
+  Called from math_h.c:130.
+[eva] Done for function __fc_fpclassify
+[eva] math_h.c:131: assertion got status valid.
+[eva] computing for function __fc_fpclassifyf <- main.
+  Called from math_h.c:132.
+[eva] Done for function __fc_fpclassifyf
+[eva] math_h.c:133: assertion got status valid.
+[eva] computing for function __fc_signbitf <- main.
+  Called from math_h.c:136.
 [eva] using specification for function __fc_signbitf
 [eva] Done for function __fc_signbitf
-[eva] math_h.c:125: assertion got status valid.
+[eva] math_h.c:137: assertion got status valid.
 [eva] computing for function __fc_signbit <- main.
-  Called from math_h.c:126.
+  Called from math_h.c:138.
 [eva] using specification for function __fc_signbit
 [eva] Done for function __fc_signbit
-[eva:alarm] math_h.c:127: Warning: assertion got status unknown.
+[eva:alarm] math_h.c:139: Warning: assertion got status unknown.
 [eva] computing for function __fc_signbit <- main.
-  Called from math_h.c:128.
+  Called from math_h.c:140.
 [eva] Done for function __fc_signbit
-[eva] math_h.c:129: assertion got status valid.
+[eva] math_h.c:141: assertion got status valid.
 [eva] computing for function __fc_signbitf <- main.
-  Called from math_h.c:130.
+  Called from math_h.c:142.
 [eva] Done for function __fc_signbitf
-[eva:alarm] math_h.c:131: Warning: assertion got status unknown.
+[eva:alarm] math_h.c:143: Warning: assertion got status unknown.
 [eva] computing for function __fc_signbitf <- main.
-  Called from math_h.c:133.
+  Called from math_h.c:145.
 [eva] Done for function __fc_signbitf
-[eva] math_h.c:134: assertion got status valid.
+[eva] math_h.c:146: assertion got status valid.
 [eva] computing for function __fc_signbitf <- main.
-  Called from math_h.c:135.
+  Called from math_h.c:147.
 [eva] Done for function __fc_signbitf
-[eva:alarm] math_h.c:136: Warning: assertion got status unknown.
+[eva:alarm] math_h.c:148: Warning: assertion got status unknown.
 [eva] computing for function __fc_signbitf <- main.
-  Called from math_h.c:138.
+  Called from math_h.c:150.
 [eva] Done for function __fc_signbitf
 [eva] Recording results for main
 [eva] Done for function main
