@@ -29,9 +29,7 @@ val wkey_transformed_call_missing_parameters: warn_category
 
 (** {1 Options} *)
 
-val is_volatile_on: unit -> bool
-val set_volatile_off: unit -> unit
-
+module Enabled : Parameter_sig.Bool
 module Process : Parameter_sig.String_set
 module CallPtr : Parameter_sig.String_list
 module Binding : Parameter_sig.String_list

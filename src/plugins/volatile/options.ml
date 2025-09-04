@@ -57,13 +57,11 @@ let wkey_transformed_call_missing_parameters =
 
 (** {1 Plug-in options.} *)
 
-module Volatile =
+module Enabled =
   False(struct
     let option_name = "-volatile"
     let help = "builds a new projet (named \""^ plugin_name ^"\") where volatile accesses are simulated by function calls"
   end)
-let is_volatile_on () = Volatile.get ()
-let set_volatile_off () = Volatile.set false
 
 module Process =
   String_set(struct

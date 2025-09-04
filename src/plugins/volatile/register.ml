@@ -1006,11 +1006,10 @@ let process_volatile () =
   build_volatile_table vol_tbl;
   find_volatile_access vol_tbl
 
-let main () =
-  if Options.is_volatile_on ()
-  then begin
-    process_volatile ();
-    Options.set_volatile_off ()
-  end
+let process_volatile_once, _ =
+  State_builder.apply_once "Volatile.process_volatile" [] process_volatile
 
-let () = Boot.Main.extend main
+let run () =
+  if Options.Enabled.get () then process_volatile_once ()
+
+let () = Boot.Main.extend run
