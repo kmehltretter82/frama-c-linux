@@ -60,7 +60,8 @@
   ----------------------------------------------------------------------------
   No logical properties have been reached by the analysis.
   ----------------------------------------------------------------------------
-[metrics] Eva coverage statistics
+[metrics:eva:coverage] 
+  Eva coverage statistics
   =======================
   Syntactically reachable functions = 3 (out of 5)
   Semantically reached functions = 1
@@ -68,11 +69,13 @@
   
   Unreached functions (2) =
     <func_ptr.c>: exit; foo;
-[metrics] References to non-analyzed functions
+[metrics:eva:unreached] 
+  References to non-analyzed functions
   ------------------------------------
   Function main calls exit (at func_ptr.c:29)
   Function main references foo (at func_ptr.c:30)
-[metrics] Statements analyzed by Eva
+[metrics:eva:reached-stmts] 
+  Statements analyzed by Eva
   --------------------------
   13 stmts in analyzed functions, 6 stmts analyzed (46.2%)
   main: 6 stmts out of 13 (46.2%)

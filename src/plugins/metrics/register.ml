@@ -32,14 +32,29 @@ let syntactic ?(libc=Metrics_parameters.Libc.get ()) () =
 
 let () = ValueCoverage.set_output_dependencies [Eva.Analysis.self; Libc.self]
 
+let dkey_eva_coverage =
+  Metrics_parameters.register_category "eva:coverage" ~default:true
+    ~help:"print messages about Eva coverage"
+
+let dkey_eva_unreached =
+  Metrics_parameters.register_category "eva:unreached" ~default:true
+    ~help:"print messages about function calls not reached by Eva"
+
+let dkey_eva_reached_stmts =
+  Metrics_parameters.register_category "eva:reached-stmts" ~default:true
+    ~help:"print messages about statements reached by Eva"
+
 let value ~libc () =
   Eva.Analysis.compute ();
   if Eva.Analysis.is_computed () then begin
     let cov_metrics = Metrics_coverage.compute ~libc in
     let cov_printer = new Metrics_coverage.semantic_printer ~libc cov_metrics in
-    Metrics_parameters.result "%t" cov_printer#pp_value_coverage;
-    Metrics_parameters.result "%t" cov_printer#pp_unreached_calls;
-    Metrics_parameters.result "%t" cov_printer#pp_stmts_reached_by_function;
+    Metrics_parameters.result ~dkey:dkey_eva_coverage
+      "%t" cov_printer#pp_value_coverage;
+    Metrics_parameters.result ~dkey:dkey_eva_unreached
+      "%t" cov_printer#pp_unreached_calls;
+    Metrics_parameters.result ~dkey:dkey_eva_reached_stmts
+      "%t" cov_printer#pp_stmts_reached_by_function;
   end
 ;;
 
