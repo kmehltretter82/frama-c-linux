@@ -45,6 +45,31 @@ module ParameterType = struct
   let of_json _ = Data.failure "ParameterType.of_json not implemented"
 end
 
+
+module ParameterRange = struct
+  type t = Typed_parameter.parameter
+
+  let jtype =
+    let descr = Md.plain "Range of values for an integer or float parameter, \
+                          or list of possible values of a string parameter" in
+    Data.declare ~package ~name:"parameterRange" ~descr
+      (Junion [ Jnull ; Jtuple [Jnumber; Jnumber] ; Jarray Jstring ])
+
+  let to_json (parameter : t) =
+    match parameter.accessor with
+    | Bool _ -> `Null
+    | Int (_accessor, range) ->
+      let min, max = range () in `List [`Int min ; `Int max]
+    | Float (_accessor, range) ->
+      let min, max = range () in `List [`Float min ; `Float max]
+    | String (_accessor, values) ->
+      match values () with
+      | [] -> `Null
+      | list -> `List (List.map (fun s -> `String s) list)
+
+  let of_json _ = Data.failure "ParameterRange.of_json not implemented"
+end
+
 module ParameterData = struct
 
   type parameter
@@ -60,6 +85,11 @@ module ParameterData = struct
   let typ =
     let descr = Md.plain "Parameter type : bool, int, float or string" in
     Record.field jparameter ~name:"type" ~descr (module ParameterType)
+
+  let range =
+    let descr = Md.plain "Range of values for an integer or float parameter, \
+                          or list of possible values for a string parameter" in
+    Record.field jparameter ~name:"range" ~descr (module ParameterRange)
 
   let is_set =
     let descr = Md.plain "Has the parameter been set by the user?" in
@@ -80,6 +110,7 @@ module ParameterData = struct
     R.set help parameter.help |>
     R.set typ parameter |>
     R.set state (camlCaseParameterName parameter.name) |>
+    R.set range parameter |>
     R.set is_set (parameter.is_set ()) |>
     R.to_json
 
