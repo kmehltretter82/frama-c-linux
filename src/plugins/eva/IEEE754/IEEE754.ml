@@ -242,7 +242,7 @@ module Make (Model : Modeling) = struct
         let significant n = Scalar.(pow2 (log2 n).lower / n) in
         let ufp = if same_exponent then significant lower else Scalar.one in
         let epsilon = Scalar.(ufp * machine_epsilon) in
-        let delta = Scalar.(machine_delta / lower) in
+        let delta = Scalar.(if machine_delta = zero then zero else one) in
         let relative = Scalar.max epsilon delta in
         let+ relative = new_relative_elementary_error expr relative in
         absolute, relative
@@ -386,6 +386,12 @@ module Make (Model : Modeling) = struct
     if contains_zero result then Relative.(lift top)
     else a_x_plus_b_y_over_x_plus_y ~a ~x ~b ~y
 
+  (* Check if the computation [l - r] is exactly computed. It relies on the
+     Sterbenz lemma, stating that if [r / 2 ≤ l ≤ 2r] then the computation
+     is exact. Moreover, this condition is equivalent to [l / 2 ≤ r ≤ 2l] in
+     the concrete. Just to be sure, we check both conditions in the abstract.
+     Note that the computation is also exact if either l or r are equal to
+     zero, which is also checked. *)
   let is_linear_exact l r =
     let open Computation.Operators in
     let* l = Exact.(map bounds l) in
