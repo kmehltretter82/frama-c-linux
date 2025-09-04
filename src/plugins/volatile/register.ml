@@ -146,25 +146,12 @@ module BA_TBL = struct
 
   (** Looking for a kernel function name maching prefix^("Wr_"|"Rd_").* regexp. *)
   let filter_kf_name kf_name =
-    let find_prefix prefix i s =
-      String.iter (fun c -> if not (c = (String.get s !i)) then raise Not_found ; incr i) prefix
-    and pos = ref 0 in
-    try
-      let is_wr_access =
-        find_prefix (Options.BindingPrefix.get ()) pos kf_name ;
-        try
-          let memo_pos = ref !pos in
-          find_prefix "Rd_" memo_pos kf_name ;
-          ignore (String.get kf_name !memo_pos) ;
-          (* good prefix for a read function *)
-          false
-        with Not_found -> (* kf_name may have enought characters *)
-          find_prefix "Wr_" pos kf_name ;
-          ignore (String.get kf_name !pos) ;
-          (* good prefix for a write function *)
-          true
-      in Some is_wr_access
-    with (Not_found | Invalid_argument _) -> None
+    let prefix = Options.BindingPrefix.get () in
+    let rd_prefix = prefix ^ "Rd_" in
+    let wr_prefix = prefix ^ "Wr_" in
+    if String.starts_with ~prefix:rd_prefix kf_name then Some false
+    else if String.starts_with ~prefix:wr_prefix kf_name then Some true
+    else None
 
   let filter_kf_prototype ~is_wr_access fct =
     (* Verifying the prototype within the kind of access. *)
