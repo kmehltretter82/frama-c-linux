@@ -1,27 +1,27 @@
 [kernel] Parsing assigns.i (no preprocessing)
 [region] Analyzing regions
 [region] Function caller_by_ref:
-  R0001: R-- B[64] (int) 32b ;
-  R0002: R-- k (int) 32b ;
-  R0003: R-- a (int *) 64b (*R0001) ;
-  R0004: RW- __retres (int) 32b ;
-  R0005: -W- (int) 32b ;
+  R0001: -R-- B[64] (int) 32b ;
+  R0002: -R-- k (int) 32b ;
+  R0003: -R-- a (int *) 64b (*R0001) ;
+  R0004: -RW- __retres (int) 32b ;
+  R0005: --W- (int) 32b ;
 [region] Function caller_result:
-  R0001: R-- B[64] (int) 32b ;
-  R0002: R-- k (int) 32b ;
-  R0003: R-- a (int *) 64b (*R0001) ;
-  R0004: RW- __retres (int) 32b ;
-  R0005: -W- (int) 32b ;
+  R0001: -R-- B[64] (int) 32b ;
+  R0002: -R-- k (int) 32b ;
+  R0003: IR-- a (int *) 64b (*R0001) ;
+  R0004: -RW- __retres (int) 32b ;
+  R0005: --W- (int) 32b ;
 [region] Function modify_by_ref:
-  R0001: R-- p (int **) 64b (*R0002) ;
-  R0002: RW- (int *) 64b (*R0003) ;
-  R0003: --A 64b ;
-  R0004: R-- q (int *) 64b (*R0003) ;
-  R0005: R-- k (int) 32b ;
-  R0006: --- 0b ;
+  R0001: -R-- p (int **) 64b (*R0002) ;
+  R0002: -RW- (int *) 64b (*R0003) ;
+  R0003: ---A 64b ;
+  R0004: -R-- q (int *) 64b (*R0003) ;
+  R0005: -R-- k (int) 32b ;
+  R0006: ---- 0b ;
 [region] Function modify_result:
-  R0001: R-- q (int *) 64b (*R0002) ;
-  R0002: --A 64b ;
-  R0003: R-- k (int) 32b ;
-  R0004: RW- __retres (int *) 64b (*R0002) ;
-  R0005: RW- (int *) 64b (*R0002) ;
+  R0001: -R-- q (int *) 64b (*R0002) ;
+  R0002: ---A 64b ;
+  R0003: -R-- k (int) 32b ;
+  R0004: -RW- __retres (int *) 64b (*R0002) ;
+  R0005: -RW- (int *) 64b (*R0002) ;
