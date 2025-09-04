@@ -15,6 +15,8 @@ module FILE = File
 open Cil_types
 open Cil_datatype
 
+module StringTbl = Datatype.String.Hashtbl
+
 let dkey_binding =
   Options.register_category
     ~help:"Prints debug messages related to volatile operations"
@@ -202,8 +204,8 @@ module BA_TBL = struct
     | Some kf_tbl -> kf_tbl
     | None ->
       let kf_tbl =
-        let tbl_rd = Datatype.String.Hashtbl.create 40 in
-        let tbl_wr = Datatype.String.Hashtbl.create 40 in
+        let tbl_rd = StringTbl.create 40 in
+        let tbl_wr = StringTbl.create 40 in
         let tbl_rd_wr = tbl_rd, tbl_wr in
         kf_tbl := Some tbl_rd_wr ;
         tbl_rd_wr
@@ -212,7 +214,7 @@ module BA_TBL = struct
         if filter_kf_prototype ~is_wr_access vi_kf then begin
           Options.debug ~level:2 ~dkey:dkey_binding_table
             "Adding function into the default binding table: %s@." kf_name;
-          Datatype.String.Hashtbl.add (get_tbl_access ~is_wr_access kf_tbl) kf_name vi_kf
+          StringTbl.add (get_tbl_access ~is_wr_access kf_tbl) kf_name vi_kf
         end
       in
       let may_add_kf kf =
@@ -232,8 +234,8 @@ module BA_TBL = struct
     match !kf_tbl with
     | None -> ()
     | Some (rd_tbl, wr_tbl) ->
-      Datatype.String.Hashtbl.clear rd_tbl;
-      Datatype.String.Hashtbl.clear wr_tbl
+      StringTbl.clear rd_tbl;
+      StringTbl.clear wr_tbl
 
 end
 
@@ -557,7 +559,7 @@ let find_typename ~is_wr_access kf_tbl typ =
     let typ = Ast_types.remove_attributes_for_c_cast typ in
     let tbl = BA_TBL.get_tbl_access ~is_wr_access kf_tbl in
     let typ_name = typename_access ~is_wr_access typ in
-    match Datatype.String.Hashtbl.find_opt tbl typ_name with
+    match StringTbl.find_opt tbl typ_name with
     | Some vi -> Some vi
     | None ->
       (* Unroll the typedef until finding one function into the kf table. *)
