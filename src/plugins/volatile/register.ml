@@ -636,31 +636,37 @@ let build_volatile_table vmap =
 
 (*-------------------------------------------------------------------------*)
 
+(* Returne a tuple 'transformed_key, untransformed_key) *)
+let get_wkeys ~is_complete =
+  let open Options in
+  if is_complete then
+    wkey_transformed_access_lvalue_volatile,
+    wkey_untransformed_access_lvalue_volatile
+  else
+    wkey_transformed_access_lvalue_partially_volatile,
+    wkey_untransformed_access_lvalue_partially_volatile
+
 let get_volatile_access ~is_wr_access fct_name binding_map kf_tbl vol_tbl lval =
   let typ = Cil.typeOfLval lval in
   let source = fst (Current_loc.get ()) in
+  let warn_access = if is_wr_access then "write" else "read" in
   (* Can raise L_PATH.Unsupported via L_PATH.of_lval *)
   let get_volatile_access ~is_complete =
+    let transformed_key, untransformed_key = get_wkeys ~is_complete in
+    let warn_complete = if is_complete then "" else "partially " in
     let path = L_PATH.of_lval lval in
     let found fct =
       Options.debug ~level:2 ~dkey:dkey_binding
         "Function found: %s@." fct.vname;
-      Options.warning ~source
-        ~wkey:Options.(if is_complete then wkey_transformed_access_lvalue_volatile
-                       else wkey_transformed_access_lvalue_partially_volatile)
+      Options.warning ~source ~wkey:transformed_key
         "%s function: Introducing a call to '%s' for %s access to %svolatile left-value: %a"
-        fct_name
-        fct.vorig_name
-        (if is_wr_access then "write" else "read")
-        (if is_complete then "" else "partially ")
-        Lval.pretty lval;
+        fct_name fct.vorig_name warn_access warn_complete Lval.pretty lval;
       Some (fct, (Ast_types.remove_attributes_for_c_cast typ))
     in
     (* Looking for a volatile function relative to the [lval] access. *)
     Options.debug ~level:2 ~dkey:dkey_binding
       "Looking for a function relative to %s access to volatile left-value: %a@."
-      (if is_wr_access then "write" else "read")
-      L_PATH.pretty path;
+      warn_access L_PATH.pretty path;
     (* 1 - Looking into the volatile table [vol_tbl]. *)
     let vmap = if is_wr_access then vol_tbl.wr else vol_tbl.rd in
     match L_MAP.find_opt path vmap with
@@ -678,15 +684,9 @@ let get_volatile_access ~is_wr_access fct_name binding_map kf_tbl vol_tbl lval =
             Ast_types.remove_attributes_for_c_cast
               (if Options.Base.get () then T_MAP.basetype typ else typ)
           in
-          Options.warning ~source
-            ~wkey:Options.(if is_complete
-                           then wkey_untransformed_access_lvalue_volatile
-                           else wkey_untransformed_access_lvalue_partially_volatile)
+          Options.warning ~source ~wkey:untransformed_key
             "Undefined %s access function for %svolatile left-value: (volatile %a) %a"
-            (if is_wr_access then "write" else "read")
-            (if is_complete then "" else "partially ")
-            Typ.pretty t
-            Lval.pretty lval;
+            warn_access warn_complete Typ.pretty t Lval.pretty lval;
           None
   in
   try
