@@ -144,7 +144,7 @@ module BA_TBL = struct
   let get_tbl_access ~is_wr_access kf_tbl =
     if is_wr_access then snd kf_tbl else fst kf_tbl
 
-  (** Looking for a kernel function name maching prefix^("Wr_"|"Rd_").* regexp. *)
+  (** Looking for a kernel function name starting with prefix^("Wr_"|"Rd_") *)
   let filter_kf_name kf_name =
     let prefix = Options.BindingPrefix.get () in
     let rd_prefix = prefix ^ "Rd_" in
@@ -156,38 +156,37 @@ module BA_TBL = struct
   let filter_kf_prototype ~is_wr_access fct =
     (* Verifying the prototype within the kind of access. *)
     let ty = fct.vtype in
-    assert (Ast_types.is_fun ty) ;
-    let ret, args, is_varg_arg, _attrib = Cil.splitFunctionType ty in
-    let ret_type = ret in
-    let volatile_ret_type = Ast_types.add_attributes [("volatile", [])] ret in
+    let ret_type, args, is_varg_arg, _attrib = Cil.splitFunctionType ty in
+    let volatile_ret_type = Ast_types.add_attributes [("volatile", [])] ret_type in
     Options.debug ~level:2 ~dkey:dkey_binding
       "Verifying prototype of function %s: %a@."
       fct.vorig_name Typ.pretty ty;
+    let not_void_or_varg = not (Ast_types.is_void ret_type || is_varg_arg) in
     match is_wr_access, args with
     | false, Some [_, arg1, _] when
-        (not (Ast_types.is_void ret || is_varg_arg))
+        not_void_or_varg
         && Ast_types.is_ptr arg1
         && Typ.equal (Ast_types.direct_pointed_type arg1) volatile_ret_type
       -> true (* matching prototype: T fct (volatile T *arg1) *)
     | false, Some [_, arg1, _] when
-        (not (Ast_types.is_void ret || is_varg_arg))
+        not_void_or_varg
         && Ast_types.is_ptr arg1
         && Typ.equal (Ast_types.direct_pointed_type arg1) ret_type
-        && Ast_types.is_volatile ret
-      -> true (* matching prototype: T fct (T *arg1) when T has some volatile attr*)
+        && Ast_types.is_volatile ret_type
+      -> true (* matching prototype: T fct (T *arg1) when T has some volatile attr. *)
     | true, Some ((_, arg1, _) :: [_, arg2, _]) when
-        (not (Ast_types.is_void ret || is_varg_arg))
+        not_void_or_varg
         && Ast_types.is_ptr arg1
         && Typ.equal arg2 ret_type
         && Typ.equal (Ast_types.direct_pointed_type arg1) volatile_ret_type
       -> true (* matching prototype: T fct (volatile T *arg1, T arg2) *)
     | true, Some ((_, arg1, _) :: [_, arg2, _]) when
-        (not (Ast_types.is_void ret || is_varg_arg))
+        not_void_or_varg
         && Ast_types.is_ptr arg1
         && Typ.equal arg2 ret_type
         && Typ.equal (Ast_types.direct_pointed_type arg1) ret_type
-        && Ast_types.is_volatile ret
-      -> true (* matching prototype: T fct (T *arg1, T arg2) when T has some volatile attr *)
+        && Ast_types.is_volatile ret_type
+      -> true (* matching prototype: T fct (T *arg1, T arg2) when T has some volatile attr.  *)
     | _, _ ->
       Options.debug ~level:2 ~dkey:dkey_binding
         "Invalid prototype of function %s@."
@@ -206,12 +205,11 @@ module BA_TBL = struct
         tbl_rd_wr
       in
       let may_add_vi ~is_wr_access kf_tbl kf_name vi_kf =
-        if filter_kf_prototype ~is_wr_access vi_kf then
-          begin
-            Options.debug ~level:2 ~dkey:dkey_binding_table
-              "Adding function into the default binding table: %s@." kf_name;
-            Datatype.String.Hashtbl.add (get_tbl_access ~is_wr_access kf_tbl) kf_name vi_kf
-          end;
+        if filter_kf_prototype ~is_wr_access vi_kf then begin
+          Options.debug ~level:2 ~dkey:dkey_binding_table
+            "Adding function into the default binding table: %s@." kf_name;
+          Datatype.String.Hashtbl.add (get_tbl_access ~is_wr_access kf_tbl) kf_name vi_kf
+        end
       in
       let may_add_kf kf =
         let vi_kf = Kernel_function.get_vi kf in
@@ -220,7 +218,8 @@ module BA_TBL = struct
         | None -> ()
         | Some is_wr_access ->
           may_add_vi ~is_wr_access kf_tbl kf_name vi_kf;
-      in if Options.BindingAuto.get () then
+      in
+      if Options.BindingAuto.get () then
         (Options.feedback ~level:2 "Building default binding table...@." ;
          Globals.Functions.iter may_add_kf) ;
       kf_tbl
@@ -228,8 +227,9 @@ module BA_TBL = struct
   let clear_kf_table kf_tbl =
     match !kf_tbl with
     | None -> ()
-    | Some kf_tbl -> Datatype.String.Hashtbl.clear (fst kf_tbl);
-      Datatype.String.Hashtbl.clear (snd kf_tbl)
+    | Some (rd_tbl, wr_tbl) ->
+      Datatype.String.Hashtbl.clear rd_tbl;
+      Datatype.String.Hashtbl.clear wr_tbl
 
 end
 
@@ -259,7 +259,7 @@ struct
     else t
 
   let add t d m = M.add (basetype t) d m
-  let find t m = M.find (basetype t) m
+  let find_opt t m = M.find_opt (basetype t) m
 
 end
 
@@ -271,9 +271,7 @@ module B_MAP = struct
     let ty = fct.vtype in
     assert (Ast_types.is_fun ty) ;
     let ret_type, args, is_varg_arg, _attrib = Cil.splitFunctionType ty in
-    let volatile_ret_type =
-      Ast_types.add_attributes [("volatile", [])] ret_type
-    in
+    let volatile_ret_type = Ast_types.add_attributes [("volatile", [])] ret_type in
     Options.debug ~level:2 ~dkey:dkey_binding
       "Verifying prototype of function %s: %a@."
       fct.vorig_name Typ.pretty ty;
@@ -310,45 +308,45 @@ module B_MAP = struct
       None
 
   let build_binding_map () =
-    List.fold_left
-      (fun ((map_rd, map_wr) as maps) f ->
-         try
-           let kf = Globals.Functions.find_by_name f in
-           let vf = Kernel_function.get_vi kf in
-           match checks_prototype_kind vf with
-           | None -> maps
-           | Some (is_wr_access, volatile_object) ->
-             let map = if is_wr_access then map_wr else map_rd in
-             let map = try
-                 let vf0 = T_MAP.find volatile_object map in
-                 Options.warning ~wkey:Options.wkey_invalid_binding_function
-                   "Functions -volatile-binding '%s' and '%s' %s"
-                   vf0.vorig_name vf.vorig_name
-                   (if Options.Base.get ()
-                    then "apply to the same base type"
-                    else "has same signature");
-                 None
-               with Not_found ->
-                 Some (T_MAP.add volatile_object vf map)
-             in match map with
-             | None -> maps
-             | Some map ->
-               Options.feedback
-                 "Register binding function '%s' for '%s' accesses to type '%a'"
-                 vf.vorig_name
-                 (if is_wr_access then "write" else "read")
-                 Typ.pretty (T_MAP.basetype volatile_object);
-               if is_wr_access then (map_rd, map) else (map, map_wr)
-         with Not_found ->
-           Options.warning ~wkey:Options.wkey_invalid_binding_function
-             "Unknown function related to -volatile-binding '%s'" f;
-           maps
+    List.fold_left (fun ((map_rd, map_wr) as maps) f ->
+        try
+          let kf = Globals.Functions.find_by_name f in
+          let vf = Kernel_function.get_vi kf in
+          match checks_prototype_kind vf with
+          | None -> maps
+          | Some (is_wr_access, volatile_object) ->
+            let map = if is_wr_access then map_wr else map_rd in
+            let map =
+              match T_MAP.find_opt volatile_object map with
+              | None -> Some (T_MAP.add volatile_object vf map)
+              | Some vf0 ->
+                Options.warning ~wkey:Options.wkey_invalid_binding_function
+                  "Functions -volatile-binding '%s' and '%s' %s"
+                  vf0.vorig_name vf.vorig_name
+                  (if Options.Base.get ()
+                   then "apply to the same base type"
+                   else "has same signature");
+                None
+            in
+            match map with
+            | None -> maps
+            | Some map ->
+              Options.feedback
+                "Register binding function '%s' for '%s' accesses to type '%a'"
+                vf.vorig_name
+                (if is_wr_access then "write" else "read")
+                Typ.pretty (T_MAP.basetype volatile_object);
+              if is_wr_access then (map_rd, map) else (map, map_wr)
+        with Not_found ->
+          Options.warning ~wkey:Options.wkey_invalid_binding_function
+            "Unknown function related to -volatile-binding '%s'" f;
+          maps
       )
       (T_MAP.empty, T_MAP.empty)
       (Options.Binding.get ())
 
   let find_binding ~is_wr_access map typ =
-    T_MAP.find typ (if is_wr_access then snd map else fst map)
+    T_MAP.find_opt typ (if is_wr_access then snd map else fst map)
 
 end
 
@@ -361,20 +359,27 @@ struct
   module CT = Wp.Ctypes
 
   type t = CT.c_object option * CT.c_object list * bool
-  let _unused_pretty fmt (r, ts, va) =
-    begin
-      Format.fprintf fmt "@[<hov 2>%a(" CT.pretty r ;
-      Pretty_utils.pp_list ~sep:",@ " CT.pretty fmt ts ;
-      if va then Format.fprintf fmt ",@,..." ;
-      Format.fprintf fmt ")@]"
-    end
-  let of_return r = if Ast_types.is_void r then None else Some (CT.object_of r)
+
+  let pretty fmt (r, ts, va) =
+    Format.fprintf fmt "@[<hov 2>%a(" CT.pretty r;
+    Pretty_utils.pp_list ~sep:",@ " CT.pretty fmt ts;
+    if va then Format.fprintf fmt ",@,...";
+    Format.fprintf fmt ")@]"
+  [@@warning "-32"]
+
+  let of_return r =
+    if Ast_types.is_void r then None else Some (CT.object_of r)
+
   let of_type t : t =
     let r, args, va, _ = Cil.splitFunctionType t in
-    of_return r ,
-    List.map (fun (_, ty, _) -> CT.object_of ty) (Cil.argsToList args) , va
+    of_return r,
+    List.map (fun (_, ty, _) -> CT.object_of ty) (Cil.argsToList args), va
+
   let of_vi vi = of_type vi.vtype
-  let _unused_of_kf kf = of_vi (Kernel_function.get_vi kf)
+
+  let of_kf kf = of_vi (Kernel_function.get_vi kf)
+  [@@warning "-32"]
+
   let rec compare_list xs ys =
     match xs, ys with
     | [], [] -> 0
@@ -383,12 +388,14 @@ struct
     | p :: ps, q :: qs ->
       let cmp = CT.compare p q in
       if cmp <> 0 then cmp else compare_list ps qs
+
   let compare_option x y =
     match x, y with
     | None, None -> 0
     | None, Some _ -> (-1)
     | Some _, None -> 1
     | Some p , Some q -> CT.compare p q
+
   let compare (r1, p1, v1) (r2, p2, v2) =
     match v1, v2 with
     | true , false -> (-1)
@@ -396,6 +403,7 @@ struct
     | true , true | false, false ->
       let cmp = compare_option r1 r2 in
       if cmp<>0 then cmp else compare_list p1 p2
+
   let stub vf =
     if Ast_types.is_fun vf.vtype then
       let r, args, va, _ = Cil.splitFunctionTypeVI vf in
@@ -413,25 +421,23 @@ end
 module INDEX = Map.Make (SIG)
 
 let build_call_index () =
-  List.fold_left
-    (fun idx f ->
-       try
-         let kf = Globals.Functions.find_by_name f in
-         let vf = Kernel_function.get_vi kf in
-         match SIG.stub vf with
-         | None ->
-           Options.abort
-             "Function '%s' can not be used as call-pointer stub" f
-         | Some s ->
-           try
-             let vf0 = INDEX.find s idx in
-             Options.abort
-               "Functions -volatile-call-pointer '%s' and '%s' has same signature"
-               vf0.vorig_name vf.vorig_name
-           with Not_found ->
-             INDEX.add s vf idx
-       with Not_found ->
-         Options.abort "Unknown function -volatile-call-pointer '%s'" f
+  List.fold_left (fun idx f ->
+      let kf =
+        try Globals.Functions.find_by_name f
+        with Not_found ->
+          Options.abort "Unknown function -volatile-call-pointer '%s'" f
+      in
+      let vf = Kernel_function.get_vi kf in
+      match SIG.stub vf with
+      | None ->
+        Options.abort "Function '%s' can not be used as call-pointer stub" f
+      | Some s ->
+        match INDEX.find_opt s idx with
+        | Some vf0 ->
+          Options.abort
+            "Functions -volatile-call-pointer '%s' and '%s' has same signature"
+            vf0.vorig_name vf.vorig_name
+        | None -> INDEX.add s vf idx
     )
     INDEX.empty
     (Options.CallPtr.get ())
@@ -450,15 +456,14 @@ let get_cannonical_call ~source f tf =
     | TNamed ti when Ast_types.is_fun tf -> ti.torig_name
     | TFun (r, args, va) ->
       let buffer = Buffer.create 80 in
-      Buffer.add_string buffer (Options.BindingPrefix.get ()) ;
-      Buffer.add_string buffer "Call_" ;
-      Buffer.add_string buffer (typename r) ;
-      List.iter
-        (fun (_, ty, _) ->
-           Buffer.add_char buffer '_' ;
-           Buffer.add_string buffer (typename ty) ;
-        ) (Cil.argsToList args) ;
-      if va then Buffer.add_string buffer "_va" ;
+      Buffer.add_string buffer (Options.BindingPrefix.get ());
+      Buffer.add_string buffer "Call_";
+      Buffer.add_string buffer (typename r);
+      List.iter (fun (_, ty, _) ->
+          Buffer.add_char buffer '_';
+          Buffer.add_string buffer (typename ty);
+        ) (Cil.argsToList args);
+      if va then Buffer.add_string buffer "_va";
       Buffer.contents buffer
     | _ ->
       Options.abort ~source
@@ -467,46 +472,42 @@ let get_cannonical_call ~source f tf =
   in
   try
     let kf = Globals.Functions.find_by_name name in
-    Kernel_function.get_vi kf
+    Some (Kernel_function.get_vi kf)
   with Not_found ->
     Options.warning ~source ~wkey:Options.wkey_untransformed_call_function_not_found
       "@[<hov 0>Call to (%a) with type @[<hov 2>(%a):@]@ Function '%s' not found@]"
       Exp.pretty f Typ.pretty (Cil.typeOf f) name ;
-    raise Not_found
+    None
 
 let get_pointer_call ~index ~source f =
   let tf = Ast_types.direct_pointed_type (Cil.typeOf f) in
-  try Some (INDEX.find (SIG.of_type tf) index)
-  with | Not_found ->
+  let res = INDEX.find_opt (SIG.of_type tf) index in
+  match res with
+  | Some _ -> res
+  | None ->
     if Options.BindingCall.get () then
-      (try Some (get_cannonical_call ~source f tf)
-       with Not_found -> (* warning has been printed *) None)
+      get_cannonical_call ~source f tf
     else None
 
-let cast_mode = false
 let add_eventual_cast_to_expression lval_typ e =
   let newt = Ast_types.remove_attributes_for_c_cast lval_typ in
-  let e' = Cil.mkCast ~force:cast_mode ~newt e in
+  let e' = Cil.mkCast ~force:false ~newt e in
   if e' != e then
-    begin
-      Options.warning ~source:(fst e.eloc) ~wkey:Options.wkey_cast_insertion
-        "@[<hov 0>Cast to (%a) inserted@ for expression (%a)@ of type (%a)@]"
-        Typ.pretty newt Exp.pretty e Typ.pretty (Cil.typeOf e) ;
-    end;
+    Options.warning ~source:(fst e.eloc) ~wkey:Options.wkey_cast_insertion
+      "@[<hov 0>Cast to (%a) inserted@ for expression (%a)@ of type (%a)@]"
+      Typ.pretty newt Exp.pretty e Typ.pretty (Cil.typeOf e);
   e'
 
 let add_eventual_cast_to_param arg_typ param =
   let newt = Ast_types.remove_attributes_for_c_cast arg_typ in
-  let param' = Cil.mkCast ~force:cast_mode ~newt param in
+  let param' = Cil.mkCast ~force:false ~newt param in
   if param' != param then
-    begin
-      Options.warning ~source:(fst param.eloc) ~wkey:Options.wkey_cast_insertion
-        "@[<hov 0>Cast to (%a) inserted@ for parameter (%a)@ of type (%a)@]"
-        Typ.pretty newt Exp.pretty param Typ.pretty (Cil.typeOf param) ;
-    end;
+    Options.warning ~source:(fst param.eloc) ~wkey:Options.wkey_cast_insertion
+      "@[<hov 0>Cast to (%a) inserted@ for parameter (%a)@ of type (%a)@]"
+      Typ.pretty newt Exp.pretty param Typ.pretty (Cil.typeOf param);
   param'
 
-let do_pointer_call ~index ~transform f es ~loc =
+let do_pointer_call ~loc ~index ~transform f es =
   let source = fst loc in
   match get_pointer_call ~index ~source f with
   | None -> None
@@ -514,14 +515,17 @@ let do_pointer_call ~index ~transform f es ~loc =
     let fn = vf.vorig_name in
     let rec wrap ts va es : exp list = match ts, es with
       | [], [] -> []
-      | (_, t, _) :: ts, e :: es -> (add_eventual_cast_to_param t e) :: wrap ts va es
+      | (_, t, _) :: ts, e :: es ->
+        (add_eventual_cast_to_param t e) :: wrap ts va es
       | [], es when va -> es
       | [], es ->
         Options.warning ~source ~wkey:Options.wkey_transformed_call_skipped_parameters
-          "Using '%s': %d last parameters skipped" fn (List.length es) ; []
+          "Using '%s': %d last parameters skipped" fn (List.length es);
+        []
       | ts, [] ->
         Options.warning ~source ~wkey:Options.wkey_transformed_call_missing_parameters
-          "Using '%s': missing %d parameters" fn (List.length ts) ; []
+          "Using '%s': missing %d parameters" fn (List.length ts);
+        []
     in
     let vf = transform vf in
     let (_, args, va, _) = Cil.splitFunctionTypeVI vf in
@@ -546,29 +550,34 @@ let find_typename ~is_wr_access kf_tbl typ =
     | Some (kf_tbl) -> kf_tbl
   in
   let rec find_fct typ =
-    try
-      let typ = Ast_types.remove_attributes_for_c_cast typ in
-      Datatype.String.Hashtbl.find (BA_TBL.get_tbl_access ~is_wr_access kf_tbl) (typename_access ~is_wr_access typ)
-    with Not_found -> (* Unroll the typedef until finding one function into the kf table. *)
-    match typ.tnode with
-    | TNamed r -> find_fct ((*Cil.typeAddAttributes _a'*) r.ttype)
-    | _ -> raise Not_found
+    let typ = Ast_types.remove_attributes_for_c_cast typ in
+    let tbl = BA_TBL.get_tbl_access ~is_wr_access kf_tbl in
+    let typ_name = typename_access ~is_wr_access typ in
+    match Datatype.String.Hashtbl.find_opt tbl typ_name with
+    | Some vi -> Some vi
+    | None ->
+      (* Unroll the typedef until finding one function into the kf table. *)
+      match typ.tnode with
+      | TNamed r -> find_fct r.ttype
+      | _ -> None
   in
-  let fct = (* Looking from the type name *)
-    Options.debug ~level:2 ~dkey:dkey_binding
-      "Looking for a default binding from the type name: %a@."
-      Typ.pretty typ;
-    find_fct typ
-  in (* Verifying the protyping within the type of the volatile access. *)
-  let ty = fct.vtype in
-  assert (Ast_types.is_fun ty) ;
-  let ret, _args, _is_varg_arg, _attrib = Cil.splitFunctionType ty in
-  let volatile_ret_type = Ast_types.add_attributes [("volatile", [])] ret in
   Options.debug ~level:2 ~dkey:dkey_binding
-    "Verifying the type of the lvalue within the prototype of function %s: %a@."
-    fct.vorig_name Typ.pretty ty;
-  if not (Typ.equal typ volatile_ret_type) then raise Not_found ;
-  fct
+    "Looking for a default binding from the type name: %a@."
+    Typ.pretty typ;
+  match find_fct typ with
+  | None -> None
+  | Some fct ->
+    (* Verifying the protyping within the type of the volatile access. *)
+    let ty = fct.vtype in
+    assert (Ast_types.is_fun ty);
+    let ret, _args, _is_varg_arg, _attrib = Cil.splitFunctionType ty in
+    let volatile_ret_type = Ast_types.add_attributes [("volatile", [])] ret in
+    Options.debug ~level:2 ~dkey:dkey_binding
+      "Verifying the type of the lvalue within the prototype of function %s: %a@."
+      fct.vorig_name Typ.pretty ty;
+    if not (Typ.equal typ volatile_ret_type) then
+      None
+    else Some fct
 
 (*-------------------------------------------------------------------------*)
 
@@ -588,28 +597,26 @@ let build_volatile_table vmap =
   let add_fct kind loc map path = function
     | None -> map
     | Some fct ->
-      try
-        let old = L_MAP.find path map in
+      match L_MAP.find_opt path map with
+      | Some old ->
         if not (Varinfo.equal old fct) then
           Options.warning ~source:(fst loc) ~wkey:Options.wkey_duplicated_access_function
             "%s access function already defined for %a"
             kind L_PATH.pretty path ;
         map
-      with Not_found ->
-        L_MAP.add path fct map
+      | None -> L_MAP.add path fct map
   in
   let add_clause _emitter = function
     | Dvolatile (tset, fct_rd, fct_wr, _attr, loc) ->
-      List.iter
-        (fun l ->
-           try
-             let p = L_PATH.of_term l.it_content in
-             vmap.rd <- add_fct "read" loc vmap.rd p fct_rd ;
-             vmap.wr <- add_fct "write" loc vmap.wr p fct_wr ;
-           with L_PATH.Unsupported ->
-             Options.error ~source:(fst loc)
-               "Unsupported l-value in volatile clause: %a@."
-               Identified_term.pretty l
+      List.iter (fun l ->
+          try
+            let p = L_PATH.of_term l.it_content in
+            vmap.rd <- add_fct "read" loc vmap.rd p fct_rd ;
+            vmap.wr <- add_fct "write" loc vmap.wr p fct_wr ;
+          with L_PATH.Unsupported ->
+            Options.error ~source:(fst loc)
+              "Unsupported l-value in volatile clause: %a@."
+              Identified_term.pretty l
         ) tset
     | _ -> ()
   in
@@ -632,62 +639,66 @@ let build_volatile_table vmap =
 let get_volatile_access ~is_wr_access fct_name binding_map kf_tbl vol_tbl lval =
   let typ = Cil.typeOfLval lval in
   let source = fst (Current_loc.get ()) in
+  (* Can raise L_PATH.Unsupported via L_PATH.of_lval *)
   let get_volatile_access ~is_complete =
-    try
-      let path =
-        try L_PATH.of_lval lval
-        with L_PATH.Unsupported ->
-          Options.warning ~source "Unsupported volatile l-value: %a"
-            Lval.pretty lval ;
-          raise Not_found
-      in
-      let found fct =
-        Options.debug ~level:2 ~dkey:dkey_binding
-          "Function found: %s@." fct.vname;
-        Options.warning ~source
-          ~wkey:Options.(if is_complete then wkey_transformed_access_lvalue_volatile
-                         else wkey_transformed_access_lvalue_partially_volatile)
-          "%s function: Introducing a call to '%s' for %s access to %svolatile left-value: %a"
-          fct_name
-          fct.vorig_name
-          (if is_wr_access then "write" else "read")
-          (if is_complete then "" else "partially ")
-          Lval.pretty lval;
-        Some (fct, (Ast_types.remove_attributes_for_c_cast typ))
-      in
-      (* Looking for a volatile function relative to the [lval] access. *)
-      try
-        Options.debug ~level:2 ~dkey:dkey_binding
-          "Looking for a function relative to %s access to volatile left-value: %a@."
-          (if is_wr_access then "write" else "read")
-          L_PATH.pretty path;
-        (* 1 - Looking into the volatile table [vol_tbl]. *)
-        let vmap = if is_wr_access then vol_tbl.wr else vol_tbl.rd in
-        found (L_MAP.find path vmap)
-      with Not_found ->
-      try
-        (* 2 - Looking into binding functions from the type value. *)
-        found (B_MAP.find_binding ~is_wr_access binding_map typ)
-      with Not_found ->
-        (* 3 - Looking into kernel functions for a name infered from the type value. *)
-        found (find_typename ~is_wr_access kf_tbl typ)
-    with Not_found ->
+    let path = L_PATH.of_lval lval in
+    let found fct =
+      Options.debug ~level:2 ~dkey:dkey_binding
+        "Function found: %s@." fct.vname;
       Options.warning ~source
-        ~wkey:Options.(if is_complete
-                       then wkey_untransformed_access_lvalue_volatile
-                       else wkey_untransformed_access_lvalue_partially_volatile)
-        "Undefined %s access function for %svolatile left-value: (volatile %a) %a"
+        ~wkey:Options.(if is_complete then wkey_transformed_access_lvalue_volatile
+                       else wkey_transformed_access_lvalue_partially_volatile)
+        "%s function: Introducing a call to '%s' for %s access to %svolatile left-value: %a"
+        fct_name
+        fct.vorig_name
         (if is_wr_access then "write" else "read")
         (if is_complete then "" else "partially ")
-        Typ.pretty (Ast_types.remove_attributes_for_c_cast
-                      (if Options.Base.get () then T_MAP.basetype typ else typ))
         Lval.pretty lval;
+      Some (fct, (Ast_types.remove_attributes_for_c_cast typ))
+    in
+    (* Looking for a volatile function relative to the [lval] access. *)
+    Options.debug ~level:2 ~dkey:dkey_binding
+      "Looking for a function relative to %s access to volatile left-value: %a@."
+      (if is_wr_access then "write" else "read")
+      L_PATH.pretty path;
+    (* 1 - Looking into the volatile table [vol_tbl]. *)
+    let vmap = if is_wr_access then vol_tbl.wr else vol_tbl.rd in
+    match L_MAP.find_opt path vmap with
+    | Some fct -> found fct
+    | None ->
+      (* 2 - Looking into binding functions from the type value. *)
+      match B_MAP.find_binding ~is_wr_access binding_map typ with
+      | Some f -> found f
+      | None ->
+        (* 3 - Looking into kernel functions for a name infered from the type value. *)
+        match find_typename ~is_wr_access kf_tbl typ with
+        | Some fct -> found fct
+        | None ->
+          let t =
+            Ast_types.remove_attributes_for_c_cast
+              (if Options.Base.get () then T_MAP.basetype typ else typ)
+          in
+          Options.warning ~source
+            ~wkey:Options.(if is_complete
+                           then wkey_untransformed_access_lvalue_volatile
+                           else wkey_untransformed_access_lvalue_partially_volatile)
+            "Undefined %s access function for %svolatile left-value: (volatile %a) %a"
+            (if is_wr_access then "write" else "read")
+            (if is_complete then "" else "partially ")
+            Typ.pretty t
+            Lval.pretty lval;
+          None
+  in
+  try
+    if has_volatile_attr (Ast_types.get_attributes typ) then
+      get_volatile_access ~is_complete:true
+    else if Ast_types.is_volatile typ then
+      get_volatile_access ~is_complete:false
+    else
       None
-  in if has_volatile_attr (Ast_types.get_attributes typ) then
-    get_volatile_access ~is_complete:true
-  else if Ast_types.is_volatile (Cil.typeOfLval lval) then
-    get_volatile_access ~is_complete:false
-  else
+  with L_PATH.Unsupported ->
+    Options.warning ~source "Unsupported volatile l-value: %a"
+      Lval.pretty lval ;
     None
 
 let get_rd_types fct =
