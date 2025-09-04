@@ -30,6 +30,10 @@ let dkey_volatile_table =
     ~help:"Prints Volatile internal tables"
     "volatile-table"
 
+let has_volatile_attr t =
+  Ast_types.get_attributes t |> Ast_attributes.contains "volatile"
+let add_volatile_attr = Ast_types.add_attributes [ ("volatile", []) ]
+
 (* This function replaces spaces in type names.
    Note: A previous version also made sure all caracters were either a-z, A-Z or
    0-9 (or raised Not_found), it does not seem to be necessary so it was removed
@@ -157,7 +161,7 @@ module BA_TBL = struct
     (* Verifying the prototype within the kind of access. *)
     let ty = fct.vtype in
     let ret_type, args, is_varg_arg, _attrib = Cil.splitFunctionType ty in
-    let volatile_ret_type = Ast_types.add_attributes [("volatile", [])] ret_type in
+    let volatile_ret_type = add_volatile_attr ret_type in
     Options.debug ~level:2 ~dkey:dkey_binding
       "Verifying prototype of function %s: %a@."
       fct.vorig_name Typ.pretty ty;
@@ -271,7 +275,7 @@ module B_MAP = struct
     let ty = fct.vtype in
     assert (Ast_types.is_fun ty) ;
     let ret_type, args, is_varg_arg, _attrib = Cil.splitFunctionType ty in
-    let volatile_ret_type = Ast_types.add_attributes [("volatile", [])] ret_type in
+    let volatile_ret_type = add_volatile_attr ret_type in
     Options.debug ~level:2 ~dkey:dkey_binding
       "Verifying prototype of function %s: %a@."
       fct.vorig_name Typ.pretty ty;
@@ -571,17 +575,13 @@ let find_typename ~is_wr_access kf_tbl typ =
     let ty = fct.vtype in
     assert (Ast_types.is_fun ty);
     let ret, _args, _is_varg_arg, _attrib = Cil.splitFunctionType ty in
-    let volatile_ret_type = Ast_types.add_attributes [("volatile", [])] ret in
+    let volatile_ret_type = add_volatile_attr ret in
     Options.debug ~level:2 ~dkey:dkey_binding
       "Verifying the type of the lvalue within the prototype of function %s: %a@."
       fct.vorig_name Typ.pretty ty;
     if not (Typ.equal typ volatile_ret_type) then
       None
     else Some fct
-
-(*-------------------------------------------------------------------------*)
-
-let has_volatile_attr = Ast_attributes.contains "volatile"
 
 (*-------------------------------------------------------------------------*)
 
@@ -690,7 +690,7 @@ let get_volatile_access ~is_wr_access fct_name binding_map kf_tbl vol_tbl lval =
           None
   in
   try
-    if has_volatile_attr (Ast_types.get_attributes typ) then
+    if has_volatile_attr typ then
       get_volatile_access ~is_complete:true
     else if Ast_types.is_volatile typ then
       get_volatile_access ~is_complete:false
@@ -949,7 +949,7 @@ class process_volatile_access project binding_map kf_tbl vol_tbl index =
             (match Ast_types.unroll_node typ
              with
              | TPtr typ_pointed ->
-               not (has_volatile_attr (Ast_types.get_attributes typ_pointed))
+               not (has_volatile_attr typ_pointed)
              | _ -> false) ->
           (let typ_exp = Cil.typeOf exp in
            match Ast_types.unroll_node typ_exp
