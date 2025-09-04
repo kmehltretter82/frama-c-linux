@@ -141,7 +141,7 @@ module L_MAP = Map.Make (L_PATH)
 (* Table management for [-volatile-binding-auto] option *)
 module BA_TBL = struct
 
-  let get_tbl_access kf_tbl ~is_wr_access =
+  let get_tbl_access ~is_wr_access kf_tbl =
     if is_wr_access then snd kf_tbl else fst kf_tbl
 
   (** Looking for a kernel function name maching prefix^("Wr_"|"Rd_").* regexp. *)
@@ -166,7 +166,7 @@ module BA_TBL = struct
       in Some is_wr_access
     with (Not_found | Invalid_argument _) -> None
 
-  let filter_kf_prototype fct ~is_wr_access =
+  let filter_kf_prototype ~is_wr_access fct =
     (* Verifying the prototype within the kind of access. *)
     let ty = fct.vtype in
     assert (Ast_types.is_fun ty) ;
@@ -219,11 +219,11 @@ module BA_TBL = struct
         tbl_rd_wr
       in
       let may_add_vi ~is_wr_access kf_tbl kf_name vi_kf =
-        if filter_kf_prototype vi_kf ~is_wr_access then
+        if filter_kf_prototype ~is_wr_access vi_kf then
           begin
             Options.debug ~level:2 ~dkey:dkey_binding_table
               "Adding function into the default binding table: %s@." kf_name;
-            Datatype.String.Hashtbl.add (get_tbl_access kf_tbl ~is_wr_access) kf_name vi_kf
+            Datatype.String.Hashtbl.add (get_tbl_access ~is_wr_access kf_tbl) kf_name vi_kf
           end;
       in
       let may_add_kf kf =
@@ -360,7 +360,7 @@ module B_MAP = struct
       (T_MAP.empty, T_MAP.empty)
       (Options.Binding.get ())
 
-  let find_binding map typ ~is_wr_access =
+  let find_binding ~is_wr_access map typ =
     T_MAP.find typ (if is_wr_access then snd map else fst map)
 
 end
@@ -542,7 +542,7 @@ let do_pointer_call ~index ~transform f es ~loc =
 
 (*-------------------------------------------------------------------------*)
 
-let typename_access (t:typ) ~is_wr_access =
+let typename_access ~is_wr_access (t:typ) =
   let typename = typename t in
   let r =
     (Options.BindingPrefix.get ())
@@ -552,7 +552,7 @@ let typename_access (t:typ) ~is_wr_access =
   Options.debug ~dkey:dkey_binding "Looking for function %s@." r;
   r
 
-let find_typename kf_tbl typ ~is_wr_access =
+let find_typename ~is_wr_access kf_tbl typ =
   let kf_tbl =
     match !kf_tbl with
     | None -> BA_TBL.build_kf_table kf_tbl
@@ -561,7 +561,7 @@ let find_typename kf_tbl typ ~is_wr_access =
   let rec find_fct typ =
     try
       let typ = Ast_types.remove_attributes_for_c_cast typ in
-      Datatype.String.Hashtbl.find (BA_TBL.get_tbl_access ~is_wr_access kf_tbl) (typename_access typ ~is_wr_access)
+      Datatype.String.Hashtbl.find (BA_TBL.get_tbl_access ~is_wr_access kf_tbl) (typename_access ~is_wr_access typ)
     with Not_found -> (* Unroll the typedef until finding one function into the kf table. *)
     match typ.tnode with
     | TNamed r -> find_fct ((*Cil.typeAddAttributes _a'*) r.ttype)
@@ -642,7 +642,7 @@ let build_volatile_table vmap =
 
 (*-------------------------------------------------------------------------*)
 
-let get_volatile_access ?loc fct_name binding_map kf_tbl vol_tbl lval ~is_wr_access =
+let get_volatile_access ?loc ~is_wr_access fct_name binding_map kf_tbl vol_tbl lval =
   let typ = Cil.typeOfLval lval in
   let get_volatile_access ~is_complete =
     try
@@ -683,10 +683,10 @@ let get_volatile_access ?loc fct_name binding_map kf_tbl vol_tbl lval ~is_wr_acc
       with Not_found ->
       try
         (* 2 - Looking into binding functions from the type value. *)
-        found (B_MAP.find_binding binding_map typ ~is_wr_access)
+        found (B_MAP.find_binding ~is_wr_access binding_map typ)
       with Not_found ->
         (* 3 - Looking into kernel functions for a name infered from the type value. *)
-        found (find_typename kf_tbl typ ~is_wr_access)
+        found (find_typename ~is_wr_access kf_tbl typ)
     with Not_found ->
       (match loc with
        | None -> ()
@@ -705,7 +705,7 @@ let get_volatile_access ?loc fct_name binding_map kf_tbl vol_tbl lval ~is_wr_acc
   in if has_volatile_attr (Ast_types.get_attributes typ) then
     get_volatile_access ~is_complete:true
   else if Ast_types.is_volatile (Cil.typeOfLval lval) then
-    get_volatile_access  ~is_complete:false
+    get_volatile_access ~is_complete:false
   else
     None
 
@@ -758,12 +758,15 @@ class process_volatile_access project binding_map kf_tbl vol_tbl index =
   object(self)
     inherit Visitor.frama_c_copy project
 
+
+    method private get_volatile_access ?loc lv =
+      get_volatile_access ?loc (self#get_kf_name ()) binding_map kf_tbl vol_tbl lv
+
     val mutable top_eid = -1
     method private set_top_eid = function
       | Set (lv, {enode=Lval _; eid}, _loc) ->
         begin
-          match get_volatile_access "" binding_map kf_tbl vol_tbl lv
-                  ~is_wr_access:true with
+          match self#get_volatile_access ~is_wr_access:true lv with
           | None -> top_eid <- eid
           | Some _ -> ()
         end
@@ -850,14 +853,12 @@ class process_volatile_access project binding_map kf_tbl vol_tbl index =
       let do_volatile = function
         | Set (lv, e, loc) as i ->
           begin
-            match get_volatile_access (self#get_kf_name ()) binding_map kf_tbl vol_tbl lv
-                    ~is_wr_access:true ~loc with
+            match self#get_volatile_access ~loc ~is_wr_access:true lv  with
             | None ->
               let i = match e with
                 | {enode=Lval (lv2);eid} when eid = top_eid ->
                   begin
-                    match get_volatile_access (self#get_kf_name ()) binding_map kf_tbl vol_tbl lv2
-                            ~is_wr_access:false ~loc with
+                    match self#get_volatile_access ~loc ~is_wr_access:false lv2 with
                     | None -> i
                     | Some (rd_fct, _typ) -> begin (* lv=lv2; -> lv=rd_fct(&lv2); *)
                         (* To get the varinfo of the new project *)
@@ -893,8 +894,7 @@ class process_volatile_access project binding_map kf_tbl vol_tbl index =
           end
         | Call (Some lv, f, a, loc) as i ->
           begin
-            match get_volatile_access (self#get_kf_name ()) binding_map kf_tbl vol_tbl lv
-                    ~is_wr_access:true ~loc with
+            match self#get_volatile_access ~loc ~is_wr_access:true lv with
             | None -> i
             | Some (wr_fct, typ) ->
               (* lv=f(a); -> vtmp = f(a); wr_fct(&lv, vtmp); *)
@@ -935,8 +935,7 @@ class process_volatile_access project binding_map kf_tbl vol_tbl index =
       let do_vexpr = function
         | {enode=Lval (lv);eid} as e when eid <> top_eid ->
           begin (* ...lv..;. -> vtmp=rd_fct(&lv); ...vtmp...; *)
-            match get_volatile_access (self#get_kf_name ()) binding_map kf_tbl vol_tbl lv ~loc:(Current_loc.get ())
-                    ~is_wr_access:false with
+            match self#get_volatile_access ~loc:e.eloc ~is_wr_access:false lv with
             | None -> e
             | Some (rd_fct, _typ) ->
               (* To get the varinfo of the new project *)
