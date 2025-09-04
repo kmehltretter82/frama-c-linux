@@ -58,25 +58,25 @@ struct
 
   exception Unsupported
   type t =
-    | Lram of Integer.t (* absolute addr *)
-    | Lvar of varinfo (* [x] *)
+    | Lram   of Integer.t     (* absolute addr *)
+    | Lvar   of varinfo       (* [x] *)
     | Lfield of t * fieldinfo (* [e.f] *)
 
   let rec pretty fmt = function
     | Lvar x -> Varinfo.pretty fmt x
     | Lram p -> Format.fprintf fmt "&%s" (Integer.to_string p)
-    | Lfield(e,fd) ->
+    | Lfield (e, fd) ->
       Format.fprintf fmt "%a:%a" pretty e Fieldinfo.pretty fd
 
   let rec compare a b =
-    match a,b with
+    match a, b with
     | Lram p , Lram q -> Integer.compare p q
-    | Lram _ , _ -> (-1)
+    | Lram _ , _ -> -1
     | _ , Lram _ -> 1
     | Lvar x , Lvar y -> Varinfo.compare x y
-    | Lvar _ , _ -> (-1)
+    | Lvar _ , _ -> -1
     | _ , Lvar _ -> 1
-    | Lfield(x,f) , Lfield(y,g) ->
+    | Lfield (x, f) , Lfield (y, g) ->
       let cmp = Fieldinfo.compare f g in
       if cmp <> 0 then cmp else compare x y
 
@@ -84,49 +84,55 @@ struct
     match e.enode with
     | Lval lv -> of_lval lv
     | AddrOf lv | StartOf lv -> of_lval lv
-    | BinOp((PlusPI|MinusPI),e,_,_)
-    | CastE(_,e) -> of_expr e
+    | BinOp ((PlusPI | MinusPI), e, _, _)
+    | CastE (_, e) -> of_expr e
     | _ ->
       match Cil.constFoldToInt e with
       | Some p -> Lram p
       | None -> raise Unsupported
-  and of_lval (host,offset) = of_offset (of_host host) offset
+
+  and of_lval (host, offset) = of_offset (of_host host) offset
+
   and of_host = function
     | Var x -> Lvar x
     | Mem e -> of_expr e
+
   and of_offset p = function
     | NoOffset -> p
-    | Index(_,ofs) -> of_offset p ofs
-    | Field(fd,ofs) -> of_offset (Lfield(p,fd)) ofs
+    | Index (_, ofs) -> of_offset p ofs
+    | Field (fd, ofs) -> of_offset (Lfield (p, fd)) ofs
 
   let rec to_const t =
     match t.term_node with
-    | TCast(false, _,e) -> to_const e
+    | TCast (false, _, e) -> to_const e
     | Tnull -> Integer.zero
-    | TConst(Integer(i,_)) -> i
-    | TBinOp(PlusA,a,b) -> Integer.add (to_const a) (to_const b)
+    | TConst (Integer (i, _)) -> i
+    | TBinOp (PlusA, a, b) -> Integer.add (to_const a) (to_const b)
     | _ -> raise Unsupported
 
   let rec of_term t =
     match t.term_node with
     | TLval lv -> of_tlval lv
-    | TBinOp((PlusPI|MinusPI),e,_)
-    | TCast(_, _, e) | Tat(e,_) -> of_term e
+    | TBinOp ((PlusPI | MinusPI), e, _)
+    | TCast (_, _, e) | Tat (e, _) -> of_term e
     | _ -> Lram (to_const t)
-  and of_tlval (host,offset) = of_toffset (of_thost host) offset
+
+  and of_tlval (host, offset) = of_toffset (of_thost host) offset
+
   and of_thost = function
     | TVar { lv_origin = Some x } -> Lvar x
     | TMem e -> of_term e
     | _ -> raise Unsupported
+
   and of_toffset p = function
     | TNoOffset -> p
-    | TIndex(_,ofs) -> of_toffset p ofs
-    | TField(fd,ofs) -> of_toffset (Lfield(p,fd)) ofs
+    | TIndex (_, ofs) -> of_toffset p ofs
+    | TField (fd, ofs) -> of_toffset (Lfield (p, fd)) ofs
     | TModel _ -> raise Unsupported
 
 end
 
-module L_MAP = Map.Make(L_PATH)
+module L_MAP = Map.Make (L_PATH)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Automatic binding of volatile accesses                             --- *)
@@ -164,31 +170,31 @@ module BA_TBL = struct
     (* Verifying the prototype within the kind of access. *)
     let ty = fct.vtype in
     assert (Ast_types.is_fun ty) ;
-    let ret,args,is_varg_arg,_attrib = Cil.splitFunctionType ty in
+    let ret, args, is_varg_arg, _attrib = Cil.splitFunctionType ty in
     let ret_type = ret in
-    let volatile_ret_type = Ast_types.add_attributes [("volatile",[])] ret in
+    let volatile_ret_type = Ast_types.add_attributes [("volatile", [])] ret in
     Options.debug ~level:2 ~dkey:dkey_binding
       "Verifying prototype of function %s: %a@."
       fct.vorig_name Printer.pp_typ ty;
     match is_wr_access, args with
-    | false, Some [_,arg1,_] when
+    | false, Some [_, arg1, _] when
         (not (Ast_types.is_void ret || is_varg_arg))
         && Ast_types.is_ptr arg1
         && Typ.equal (Ast_types.direct_pointed_type arg1) volatile_ret_type
       -> true (* matching prototype: T fct (volatile T *arg1) *)
-    | false, Some [_,arg1,_] when
+    | false, Some [_, arg1, _] when
         (not (Ast_types.is_void ret || is_varg_arg))
         && Ast_types.is_ptr arg1
         && Typ.equal (Ast_types.direct_pointed_type arg1) ret_type
         && Ast_types.is_volatile ret
       -> true (* matching prototype: T fct (T *arg1) when T has some volatile attr*)
-    | true, Some ((_,arg1,_)::[_,arg2,_]) when
+    | true, Some ((_, arg1, _) :: [_, arg2, _]) when
         (not (Ast_types.is_void ret || is_varg_arg))
         && Ast_types.is_ptr arg1
         && Typ.equal arg2 ret_type
         && Typ.equal (Ast_types.direct_pointed_type arg1) volatile_ret_type
       -> true (* matching prototype: T fct (volatile T *arg1, T arg2) *)
-    | true, Some ((_,arg1,_)::[_,arg2,_]) when
+    | true, Some ((_, arg1, _) :: [_, arg2, _]) when
         (not (Ast_types.is_void ret || is_varg_arg))
         && Ast_types.is_ptr arg1
         && Typ.equal arg2 ret_type
@@ -208,7 +214,7 @@ module BA_TBL = struct
       let kf_tbl =
         let tbl_rd = Datatype.String.Hashtbl.create 40 in
         let tbl_wr = Datatype.String.Hashtbl.create 40 in
-        let tbl_rd_wr = tbl_rd,tbl_wr in
+        let tbl_rd_wr = tbl_rd, tbl_wr in
         kf_tbl := Some tbl_rd_wr ;
         tbl_rd_wr
       in
@@ -227,7 +233,7 @@ module BA_TBL = struct
         | None -> ()
         | Some is_wr_access ->
           may_add_vi ~is_wr_access kf_tbl kf_name vi_kf;
-      in if Options.BindingAuto.get() then
+      in if Options.BindingAuto.get () then
         (Options.feedback ~level:2 "Building default binding table...@." ;
          Globals.Functions.iter may_add_kf) ;
       kf_tbl
@@ -277,9 +283,9 @@ module B_MAP = struct
     (* Verifying the prototype within the kind of access. *)
     let ty = fct.vtype in
     assert (Ast_types.is_fun ty) ;
-    let ret_type,args,is_varg_arg,_attrib = Cil.splitFunctionType ty in
+    let ret_type, args, is_varg_arg, _attrib = Cil.splitFunctionType ty in
     let volatile_ret_type =
-      Ast_types.add_attributes [("volatile",[])] ret_type
+      Ast_types.add_attributes [("volatile", [])] ret_type
     in
     Options.debug ~level:2 ~dkey:dkey_binding
       "Verifying prototype of function %s: %a@."
@@ -287,24 +293,24 @@ module B_MAP = struct
     let result is_wr_access arg1 =
       Some (is_wr_access, (Ast_types.direct_pointed_type arg1))
     in match args with
-    | Some [_,arg1,_] when
+    | Some [_, arg1, _] when
         (not (Ast_types.is_void ret_type || is_varg_arg))
         && Ast_types.is_ptr arg1
         && Typ.equal (Ast_types.direct_pointed_type arg1) volatile_ret_type
       -> result false arg1 (* matching prototype: T fct (volatile T *arg1) *)
-    | Some [_,arg1,_] when
+    | Some [_, arg1, _] when
         (not (Ast_types.is_void ret_type || is_varg_arg))
         && Ast_types.is_ptr arg1
         && Typ.equal (Ast_types.direct_pointed_type arg1) ret_type
         && Ast_types.is_volatile ret_type
       -> result false arg1 (* matching prototype: T fct (T *arg1) when T has some volatile attr*)
-    | Some ((_,arg1,_)::[_,arg2,_]) when
+    | Some ((_, arg1, _) :: [_, arg2, _]) when
         (not (Ast_types.is_void ret_type || is_varg_arg))
         && Ast_types.is_ptr arg1
         && Typ.equal arg2 ret_type
         && Typ.equal (Ast_types.direct_pointed_type arg1) volatile_ret_type
       -> result true arg1 (* matching prototype: T fct (volatile T *arg1, T arg2) *)
-    | Some ((_,arg1,_)::[_,arg2,_]) when
+    | Some ((_, arg1, _) :: [_, arg2, _]) when
         (not (Ast_types.is_void ret_type || is_varg_arg))
         && Ast_types.is_ptr arg1
         && Typ.equal arg2 ret_type
@@ -318,7 +324,7 @@ module B_MAP = struct
 
   let build_binding_map () =
     List.fold_left
-      (fun ((map_rd,map_wr) as maps) f ->
+      (fun ((map_rd, map_wr) as maps) f ->
          try
            let kf = Globals.Functions.find_by_name f in
            let vf = Kernel_function.get_vi kf in
@@ -345,13 +351,13 @@ module B_MAP = struct
                  vf.vorig_name
                  (if is_wr_access then "write" else "read")
                  Printer.pp_typ (T_MAP.basetype volatile_object);
-               if is_wr_access then (map_rd,map) else (map,map_wr)
+               if is_wr_access then (map_rd, map) else (map, map_wr)
          with Not_found ->
            Options.warning ~wkey:Options.wkey_invalid_binding_function
              "Unknown function related to -volatile-binding '%s'" f;
            maps
       )
-      (T_MAP.empty,T_MAP.empty)
+      (T_MAP.empty, T_MAP.empty)
       (Options.Binding.get ())
 
   let find_binding map typ ~is_wr_access =
@@ -368,7 +374,7 @@ struct
   module CT = Wp.Ctypes
 
   type t = CT.c_object option * CT.c_object list * bool
-  let _unused_pretty fmt (r,ts,va) =
+  let _unused_pretty fmt (r, ts, va) =
     begin
       Format.fprintf fmt "@[<hov 2>%a(" CT.pretty r ;
       Pretty_utils.pp_list ~sep:",@ " CT.pretty fmt ts ;
@@ -377,47 +383,47 @@ struct
     end
   let of_return r = if Ast_types.is_void r then None else Some (CT.object_of r)
   let of_type t : t =
-    let r,args,va,_ = Cil.splitFunctionType t in
+    let r, args, va, _ = Cil.splitFunctionType t in
     of_return r ,
-    List.map (fun (_,ty,_) -> CT.object_of ty) (Cil.argsToList args) , va
+    List.map (fun (_, ty, _) -> CT.object_of ty) (Cil.argsToList args) , va
   let of_vi vi = of_type vi.vtype
   let _unused_of_kf kf = of_vi (Kernel_function.get_vi kf)
   let rec compare_list xs ys =
-    match xs,ys with
-    | [],[] -> 0
-    | [],_ -> (-1)
-    | _,[] -> 1
-    | p::ps,q::qs ->
+    match xs, ys with
+    | [], [] -> 0
+    | [], _ -> (-1)
+    | _, [] -> 1
+    | p :: ps, q :: qs ->
       let cmp = CT.compare p q in
       if cmp <> 0 then cmp else compare_list ps qs
   let compare_option x y =
-    match x,y with
-    | None,None -> 0
-    | None,Some _ -> (-1)
-    | Some _,None -> 1
+    match x, y with
+    | None, None -> 0
+    | None, Some _ -> (-1)
+    | Some _, None -> 1
     | Some p , Some q -> CT.compare p q
-  let compare (r1,p1,v1) (r2,p2,v2) =
-    match v1,v2 with
+  let compare (r1, p1, v1) (r2, p2, v2) =
+    match v1, v2 with
     | true , false -> (-1)
     | false , true -> 1
-    | true , true | false,false ->
+    | true , true | false, false ->
       let cmp = compare_option r1 r2 in
       if cmp<>0 then cmp else compare_list p1 p2
   let stub vf =
     if Ast_types.is_fun vf.vtype then
-      let r,args,va,_ = Cil.splitFunctionTypeVI vf in
+      let r, args, va, _ = Cil.splitFunctionTypeVI vf in
       match Cil.argsToList args with
-      | (_,tf,_)::ps ->
+      | (_, tf, _) :: ps ->
         let r = of_return r in
-        let ts = List.map (fun (_,ty,_) -> CT.object_of ty) ps in
+        let ts = List.map (fun (_, ty, _) -> CT.object_of ty) ps in
         let sp = of_type (Ast_types.direct_pointed_type tf) in
-        let sf = (r,ts,va) in
+        let sf = (r, ts, va) in
         if compare sp sf <> 0 then None else Some sf
       | _ -> None
     else None
 end
 
-module INDEX = Map.Make(SIG)
+module INDEX = Map.Make (SIG)
 
 let build_call_index () =
   List.fold_left
@@ -455,13 +461,13 @@ let get_cannonical_call ~source f tf =
   let name =
     match tf.tnode with
     | TNamed ti when Ast_types.is_fun tf -> ti.torig_name
-    | TFun (r,args,va) ->
+    | TFun (r, args, va) ->
       let buffer = Buffer.create 80 in
       Buffer.add_string buffer (Options.BindingPrefix.get ()) ;
       Buffer.add_string buffer "Call_" ;
       Buffer.add_string buffer (typename r) ;
       List.iter
-        (fun (_,ty,_) ->
+        (fun (_, ty, _) ->
            Buffer.add_char buffer '_' ;
            Buffer.add_string buffer (typename ty) ;
         ) (Cil.argsToList args) ;
@@ -519,20 +525,20 @@ let do_pointer_call ~index ~transform f es ~loc =
   | None -> None
   | Some vf ->
     let fn = vf.vorig_name in
-    let rec wrap ts va es : exp list = match ts,es with
-      | [],[] -> []
-      | (_,t,_)::ts,e::es -> (add_eventual_cast_to_param t e) :: wrap ts va es
-      | [],es when va -> es
-      | [],es ->
+    let rec wrap ts va es : exp list = match ts, es with
+      | [], [] -> []
+      | (_, t, _) :: ts, e :: es -> (add_eventual_cast_to_param t e) :: wrap ts va es
+      | [], es when va -> es
+      | [], es ->
         Options.warning ~source ~wkey:Options.wkey_transformed_call_skipped_parameters
           "Using '%s': %d last parameters skipped" fn (List.length es) ; []
-      | ts,[] ->
+      | ts, [] ->
         Options.warning ~source ~wkey:Options.wkey_transformed_call_missing_parameters
           "Using '%s': missing %d parameters" fn (List.length ts) ; []
     in
     let vf = transform vf in
-    let (_,args,va,_) = Cil.splitFunctionTypeVI vf in
-    Some (fn, Var vf, wrap (Cil.argsToList args) va (f::es))
+    let (_, args, va, _) = Cil.splitFunctionTypeVI vf in
+    Some (fn, Var vf, wrap (Cil.argsToList args) va (f :: es))
 
 (*-------------------------------------------------------------------------*)
 
@@ -569,8 +575,8 @@ let find_typename kf_tbl typ ~is_wr_access =
   in (* Verifying the protyping within the type of the volatile access. *)
   let ty = fct.vtype in
   assert (Ast_types.is_fun ty) ;
-  let ret,_args,_is_varg_arg,_attrib = Cil.splitFunctionType ty in
-  let volatile_ret_type = Ast_types.add_attributes [("volatile",[])] ret in
+  let ret, _args, _is_varg_arg, _attrib = Cil.splitFunctionType ty in
+  let volatile_ret_type = Ast_types.add_attributes [("volatile", [])] ret in
   Options.debug ~level:2 ~dkey:dkey_binding
     "Verifying the type of the lvalue within the prototype of function %s: %a@."
     fct.vorig_name Printer.pp_typ ty;
@@ -590,7 +596,7 @@ type vmap = {
 
 (** Builds a table of volatile clauses.
     This table can be viewed as a map from term_lhost to a map from term_lval
-    to (reads,writes) fonctions. *)
+    to (reads, writes) fonctions. *)
 let build_volatile_table vmap =
   let add_fct kind loc map path = function
     | None -> map
@@ -606,7 +612,7 @@ let build_volatile_table vmap =
         L_MAP.add path fct map
   in
   let add_clause _emitter = function
-    | Dvolatile(tset,fct_rd,fct_wr,_attr,loc) ->
+    | Dvolatile (tset, fct_rd, fct_wr, _attr, loc) ->
       List.iter
         (fun l ->
            try
@@ -706,17 +712,17 @@ let get_volatile_access ?loc fct_name binding_map kf_tbl vol_tbl lval ~is_wr_acc
 let get_rd_types fct =
   let ty = fct.vtype in
   assert (Ast_types.is_fun ty) ;
-  let ret,args,_is_varg_arg,_attrib = Cil.splitFunctionType ty in
+  let ret, args, _is_varg_arg, _attrib = Cil.splitFunctionType ty in
   match args with
-  | Some [_,arg1,_] -> ret, arg1
+  | Some [_, arg1, _] -> ret, arg1
   | _ -> Options.abort "Invalid prototype of function %s@." fct.vorig_name
 
 let get_wr_types fct =
   let ty = fct.vtype in
   assert (Ast_types.is_fun ty) ;
-  let ret,args,_is_varg_arg,_attrib = Cil.splitFunctionType ty in
+  let ret, args, _is_varg_arg, _attrib = Cil.splitFunctionType ty in
   match args with
-  | Some ((_,arg1,_)::[_,arg2,_]) -> ret, arg1, arg2
+  | Some ((_, arg1, _) :: [_, arg2, _]) -> ret, arg1, arg2
   | _ -> Options.abort "Invalid prototype of function %s@." fct.vorig_name
 
 let get_cast_type_needed_for_assignation ~ret_typ ~lv =
@@ -736,13 +742,13 @@ module ScopingBlock = struct
   let stack = ref []
   let reset () =
     stack := []
-  let push b = stack := b::!stack
+  let push b = stack := b :: !stack
   let pop () = match !stack with
     | [] -> assert false
-    | _::tail -> stack := tail
+    | _ :: tail -> stack := tail
   let top () = match !stack with
     | [] -> assert false
-    | top::_ -> top
+    | top :: _ -> top
 end
 
 let new_blk () = Cil.mkBlockNonScoping []
@@ -754,7 +760,7 @@ class process_volatile_access project binding_map kf_tbl vol_tbl index =
 
     val mutable top_eid = -1
     method private set_top_eid = function
-      | Set (lv,{enode=Lval _; eid},_loc) ->
+      | Set (lv, {enode=Lval _; eid}, _loc) ->
         begin
           match get_volatile_access "" binding_map kf_tbl vol_tbl lv
                   ~is_wr_access:true with
@@ -774,7 +780,7 @@ class process_volatile_access project binding_map kf_tbl vol_tbl index =
 
     method private add_instr i =
       ActionKey.(Options.debug ~level:2 ~dkey "Add new stmt to block");
-      blk <- {blk with bstmts = (Cil.mkStmt (Instr i)):: blk.bstmts}
+      blk <- {blk with bstmts = (Cil.mkStmt (Instr i)) :: blk.bstmts}
 
     method private makeTempLval typ =
       ActionKey.(Options.debug ~level:2 ~dkey "Add tmp variable to block");
@@ -788,7 +794,7 @@ class process_volatile_access project binding_map kf_tbl vol_tbl index =
         Options.debug ~level:2 ~dkey "Visit DO blk@.");
       if b.bscoping then ScopingBlock.push b ;
       let pop b = if b.bscoping then ScopingBlock.pop () ; b in
-      let r = Cil.ChangeDoChildrenPost (b,pop) in
+      let r = Cil.ChangeDoChildrenPost (b, pop) in
       VisitKey.(
         Options.debug ~level:2 ~dkey "Visit DONE blk@.");
       r
@@ -825,7 +831,7 @@ class process_volatile_access project binding_map kf_tbl vol_tbl index =
                 s.sid Printer.pp_block current_blk);
             let stmt = Cil.mkStmt st.skind in
             let stmts =
-              { current_blk with bstmts = List.rev (stmt::current_blk.bstmts)}
+              { current_blk with bstmts = List.rev (stmt :: current_blk.bstmts)}
             in
             st.skind <- Block stmts ;
             VisitKey.(
@@ -835,14 +841,14 @@ class process_volatile_access project binding_map kf_tbl vol_tbl index =
             st
           end
       in
-      let r = Cil.ChangeDoChildrenPost (s,do_vstmt) in
+      let r = Cil.ChangeDoChildrenPost (s, do_vstmt) in
       VisitKey.(
         Options.debug ~level:2 ~dkey "Visit Done stmt: sid=%d@." s.sid);
       r
 
     method! vinst instr =
       let do_volatile = function
-        | Set (lv,e,loc) as i ->
+        | Set (lv, e, loc) as i ->
           begin
             match get_volatile_access (self#get_kf_name ()) binding_map kf_tbl vol_tbl lv
                     ~is_wr_access:true ~loc with
@@ -853,14 +859,14 @@ class process_volatile_access project binding_map kf_tbl vol_tbl index =
                     match get_volatile_access (self#get_kf_name ()) binding_map kf_tbl vol_tbl lv2
                             ~is_wr_access:false ~loc with
                     | None -> i
-                    | Some (rd_fct,_typ) -> begin (* lv=lv2; -> lv=rd_fct(&lv2); *)
+                    | Some (rd_fct, _typ) -> begin (* lv=lv2; -> lv=rd_fct(&lv2); *)
                         (* To get the varinfo of the new project *)
                         let rd_fct = Visitor_behavior.Memo.varinfo self#behavior rd_fct in
-                        let ret_typ,arg1_typ = get_rd_types rd_fct in
+                        let ret_typ, arg1_typ = get_rd_types rd_fct in
                         let rd_fct = Var rd_fct in
                         let addr = add_eventual_cast_to_param arg1_typ (Cil.mkAddrOf ~loc lv2) in
                         match get_cast_type_needed_for_assignation ~ret_typ ~lv with
-                        | None -> Call (Some lv,rd_fct,[addr],loc)
+                        | None -> Call (Some lv, rd_fct, [addr], loc)
                         | Some newt -> (* In fact a cast has to be added
                                           lv=lv2; -> vtmp=rd_fct(&lv2); lv=(newt) vtmp *)
                           VisitKey.(
@@ -868,54 +874,54 @@ class process_volatile_access project binding_map kf_tbl vol_tbl index =
                               "@[<hov 0> Cast Needed: Lval-type(%a) Return-type (%a)@]"
                               Typ.pretty (Cil.typeOfLval lv) Typ.pretty ret_typ) ;
                           let lvtmp = self#makeTempLval ret_typ in
-                          let instr = Call (Some lvtmp,rd_fct,[addr],loc) in
+                          let instr = Call (Some lvtmp, rd_fct, [addr], loc) in
                           self#add_instr instr ;
                           let etmp = Cil.new_exp ~loc (Lval lvtmp) in
-                          Set (lv,(add_eventual_cast_to_expression newt etmp),loc)
+                          Set (lv, (add_eventual_cast_to_expression newt etmp), loc)
                       end
                   end
                 | _ -> i
               in self#reset_top_eid () ; i
-            | Some (wr_fct,_typ) -> (* lv=e; -> wr_fct(&lv,e); *)
+            | Some (wr_fct, _typ) -> (* lv=e; -> wr_fct(&lv, e); *)
               (* To get the varinfo of the new project *)
               let wr_fct = Visitor_behavior.Memo.varinfo self#behavior wr_fct in
-              let _,arg1_typ,arg2_typ = get_wr_types wr_fct in
+              let _, arg1_typ, arg2_typ = get_wr_types wr_fct in
               let wr_fct = Var wr_fct in
               let addr = add_eventual_cast_to_param arg1_typ (Cil.mkAddrOf ~loc lv) in
               let e = add_eventual_cast_to_param arg2_typ e in
-              Call (None,wr_fct,[addr;e],loc)
+              Call (None, wr_fct, [addr;e], loc)
           end
-        | Call (Some lv,f,a,loc) as i ->
+        | Call (Some lv, f, a, loc) as i ->
           begin
             match get_volatile_access (self#get_kf_name ()) binding_map kf_tbl vol_tbl lv
                     ~is_wr_access:true ~loc with
             | None -> i
-            | Some (wr_fct,typ) ->
-              (* lv=f(a); -> vtmp = f(a); wr_fct(&lv,vtmp); *)
+            | Some (wr_fct, typ) ->
+              (* lv=f(a); -> vtmp = f(a); wr_fct(&lv, vtmp); *)
               (* To get the varinfo of the new project *)
               let wr_fct = Visitor_behavior.Memo.varinfo self#behavior wr_fct in
-              let _,arg1_typ,arg2_typ = get_wr_types wr_fct in
+              let _, arg1_typ, arg2_typ = get_wr_types wr_fct in
               let wr_fct = Var wr_fct in
               let addr = add_eventual_cast_to_param arg1_typ (Cil.mkAddrOf ~loc lv) in
               let lvtmp = self#makeTempLval (Ast_types.remove_attributes_for_c_cast typ) in
-              let instr = Call (Some lvtmp,f,a,loc) in
+              let instr = Call (Some lvtmp, f, a, loc) in
               let etmp = add_eventual_cast_to_param arg2_typ (Cil.new_exp ~loc (Lval lvtmp)) in
               self#add_instr instr ;
-              Call (None,wr_fct,[addr;etmp],loc)
+              Call (None, wr_fct, [addr;etmp], loc)
           end
         | i -> i in
       let do_call = function
-        | Call (result,ef,xs,loc) as i ->
+        | Call (result, ef, xs, loc) as i ->
           begin match get_called_ptr ef with
             | None -> i
             | Some f ->
               let transform = Visitor_behavior.Memo.varinfo self#behavior in
               match do_pointer_call ~index ~transform f xs ~loc with
-              | Some(fn,g,ys) ->
+              | Some (fn, g, ys) ->
                 Options.warning ~source:(fst loc) ~wkey:Options.wkey_transformed_call
                   "%a: use pointer function '%s'"
                   Printer.pp_location loc fn ;
-                Call(result,g,ys,loc)
+                Call (result, g, ys, loc)
               | None ->
                 Options.warning ~source:(fst loc) ~wkey:Options.wkey_untransformed_call
                   "Original pointer function kept" ; i
@@ -923,7 +929,7 @@ class process_volatile_access project binding_map kf_tbl vol_tbl index =
         | i -> i in
       let do_vinst i = do_volatile (if callptr then do_call i else i)
       in self#set_top_eid instr ;
-      Cil.ChangeDoChildrenPost ([instr],tailrec_list_map do_vinst)
+      Cil.ChangeDoChildrenPost ([instr], tailrec_list_map do_vinst)
 
     method! vexpr e =
       let do_vexpr = function
@@ -932,10 +938,10 @@ class process_volatile_access project binding_map kf_tbl vol_tbl index =
             match get_volatile_access (self#get_kf_name ()) binding_map kf_tbl vol_tbl lv ~loc:(Current_loc.get ())
                     ~is_wr_access:false with
             | None -> e
-            | Some (rd_fct,_typ) ->
+            | Some (rd_fct, _typ) ->
               (* To get the varinfo of the new project *)
               let rd_fct = Visitor_behavior.Memo.varinfo self#behavior rd_fct in
-              let ret_typ,arg1_typ = get_rd_types rd_fct in
+              let ret_typ, arg1_typ = get_rd_types rd_fct in
               let loc =  match self#current_kinstr with
                 | Kstmt stmt -> Stmt.loc stmt
                 | _ -> assert false (* impossible *)
@@ -944,11 +950,11 @@ class process_volatile_access project binding_map kf_tbl vol_tbl index =
               let addr = add_eventual_cast_to_param arg1_typ (Cil.mkAddrOf ~loc lv) in
               let ret_typ = Ast_types.remove_attributes_for_c_cast ret_typ in
               let lvtmp = self#makeTempLval ret_typ in
-              let instr = Call (Some lvtmp,rd_fct,[addr],loc) in
+              let instr = Call (Some lvtmp, rd_fct, [addr], loc) in
               self#add_instr instr ;
               add_eventual_cast_to_expression (Cil.typeOf e) (Cil.new_exp ~loc (Lval lvtmp))
           end
-        | {enode=CastE(typ,exp)} as e
+        | {enode=CastE (typ, exp)} as e
           when (* Options.Cast.get () && *)
             (match Ast_types.unroll_node typ
              with
@@ -969,12 +975,12 @@ class process_volatile_access project binding_map kf_tbl vol_tbl index =
         | _ as e -> e
       in match e with
       | ({enode=SizeOfE _} | {enode=AlignOfE _}) -> Cil.JustCopy
-      | _ -> Cil.ChangeDoChildrenPost (e,do_vexpr)
+      | _ -> Cil.ChangeDoChildrenPost (e, do_vexpr)
 
     method! vglob_aux = function
-      | GFun(decl,_) ->
+      | GFun (decl, _) ->
         let f = decl.svar.vname in
-        let fs = Options.Process.get() in
+        let fs = Options.Process.get () in
         if Datatype.String.Set.is_empty fs || Datatype.String.Set.mem f fs
         then begin
           VisitKey.(
