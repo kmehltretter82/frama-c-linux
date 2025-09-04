@@ -32,6 +32,16 @@ let dkey_volatile_table =
     ~help:"Prints Volatile internal tables"
     "volatile-table"
 
+let dkey_transformation_action =
+  Options.register_category
+    ~help:"Prints information on generated code"
+    "transformation-action"
+
+let dkey_transformation_visit =
+  Options.register_category
+    ~help:"Prints visitor informations during the transformation"
+    "transformation-visit"
+
 let has_volatile_attr t =
   Ast_types.get_attributes t |> Ast_attributes.contains "volatile"
 let add_volatile_attr = Ast_types.add_attributes [ ("volatile", []) ]
@@ -722,12 +732,6 @@ let get_cast_type_needed_for_assignation ~ret_typ ~lv =
   then None
   else Some tlv
 
-module ActionKey=
-struct let dkey = Options.register_category "transformation-action" end
-
-module VisitKey =
-struct let dkey = Options.register_category "transformation-visit" end
-
 module ScopingBlock = struct
   let stack = ref []
   let reset () =
@@ -771,30 +775,27 @@ class process_volatile_access project binding_map kf_tbl vol_tbl index =
       | Some kf -> Kernel_function.get_name kf
 
     method private add_instr i =
-      ActionKey.(Options.debug ~level:2 ~dkey "Add new stmt to block");
+      Options.debug ~level:2 ~dkey:dkey_transformation_action "Add new stmt to block";
       blk <- {blk with bstmts = (Cil.mkStmt (Instr i)) :: blk.bstmts}
 
     method private makeTempLval typ =
-      ActionKey.(Options.debug ~level:2 ~dkey "Add tmp variable to block");
+      Options.debug ~level:2 ~dkey:dkey_transformation_action "Add tmp variable to block";
       let definition =
         Visitor_behavior.Get.fundec self#behavior (Option.get self#current_func)
       in
       Var (Cil.makeLocalVar definition ~scope:(ScopingBlock.top ()) "__volatile_tmp" typ), NoOffset
 
     method! vblock b =
-      VisitKey.(
-        Options.debug ~level:2 ~dkey "Visit DO blk@.");
+      Options.debug ~level:2 ~dkey:dkey_transformation_visit "Visit DO blk@.";
       if b.bscoping then ScopingBlock.push b ;
       let pop b = if b.bscoping then ScopingBlock.pop () ; b in
       let r = Cil.ChangeDoChildrenPost (b, pop) in
-      VisitKey.(
-        Options.debug ~level:2 ~dkey "Visit DONE blk@.");
+      Options.debug ~level:2 ~dkey:dkey_transformation_visit "Visit DONE blk@.";
       r
 
     method! vstmt_aux s =
-      VisitKey.(
-        Options.debug ~level:2 ~dkey
-          "Visit DO stmt: sid=%d, volatile block:@.%a@." s.sid Block.pretty blk);
+      Options.debug ~level:2 ~dkey:dkey_transformation_visit
+        "Visit DO stmt: sid=%d, volatile block:@.%a@." s.sid Block.pretty blk;
       let previous_blk =
         if blk.bstmts = [] then
           None
@@ -810,32 +811,29 @@ class process_volatile_access project binding_map kf_tbl vol_tbl index =
             | Some previous_blk -> previous_blk) ;
         if current_blk.bstmts = [] then
           begin
-            VisitKey.(
-              Options.debug ~level:3 ~dkey
-                "Do not Transform stmt:@.sid=%d %a@." s.sid Stmt.pretty st);
+            Options.debug ~level:3 ~dkey:dkey_transformation_visit
+              "Do not Transform stmt:@.sid=%d %a@." s.sid Stmt.pretty st;
             st
           end
         else
           begin
-            VisitKey.(
-              Options.debug ~level:2 ~dkey
-                "Transform DO stmt: sid=%d, volatile block:@.%a@."
-                s.sid Block.pretty current_blk);
+            Options.debug ~level:2 ~dkey:dkey_transformation_visit
+              "Transform DO stmt: sid=%d, volatile block:@.%a@."
+              s.sid Block.pretty current_blk;
             let stmt = Cil.mkStmt st.skind in
             let stmts =
               { current_blk with bstmts = List.rev (stmt :: current_blk.bstmts)}
             in
             st.skind <- Block stmts ;
-            VisitKey.(
-              Options.debug ~level:2 ~dkey
-                "Transform Done stmt: sid=%d, new block:@.%a@."
-                st.sid Stmt.pretty st);
+            Options.debug ~level:2 ~dkey:dkey_transformation_visit
+              "Transform Done stmt: sid=%d, new block:@.%a@."
+              st.sid Stmt.pretty st;
             st
           end
       in
       let r = Cil.ChangeDoChildrenPost (s, do_vstmt) in
-      VisitKey.(
-        Options.debug ~level:2 ~dkey "Visit Done stmt: sid=%d@." s.sid);
+      Options.debug ~level:2 ~dkey:dkey_transformation_visit
+        "Visit Done stmt: sid=%d@." s.sid;
       r
 
     method! vinst instr =
@@ -859,10 +857,9 @@ class process_volatile_access project binding_map kf_tbl vol_tbl index =
                         | None -> Call (Some lv, rd_fct, [addr], loc)
                         | Some newt -> (* In fact a cast has to be added
                                           lv=lv2; -> vtmp=rd_fct(&lv2); lv=(newt) vtmp *)
-                          VisitKey.(
-                            Options.debug ~level:2 ~dkey
-                              "@[<hov 0> Cast Needed: Lval-type(%a) Return-type (%a)@]"
-                              Typ.pretty (Cil.typeOfLval lv) Typ.pretty ret_typ) ;
+                          Options.debug ~level:2 ~dkey:dkey_transformation_visit
+                            "@[<hov 0> Cast Needed: Lval-type(%a) Return-type (%a)@]"
+                            Typ.pretty (Cil.typeOfLval lv) Typ.pretty ret_typ;
                           let lvtmp = self#makeTempLval ret_typ in
                           let instr = Call (Some lvtmp, rd_fct, [addr], loc) in
                           self#add_instr instr ;
@@ -971,19 +968,16 @@ class process_volatile_access project binding_map kf_tbl vol_tbl index =
         let fs = Options.Process.get () in
         if Datatype.String.Set.is_empty fs || Datatype.String.Set.mem f fs
         then begin
-          VisitKey.(
-            Options.debug ~level:2 ~dkey "Visit DO fun %s@." f);
+          Options.debug ~level:2 ~dkey:dkey_transformation_visit "Visit DO fun %s@." f;
           ScopingBlock.reset () ;
           Cil.DoChildren
         end
         else begin
-          VisitKey.(
-            Options.debug ~level:2 ~dkey "Visit COPY fun %s@." f);
+          Options.debug ~level:2 ~dkey:dkey_transformation_visit "Visit COPY fun %s@." f;
           Cil.JustCopy
         end
       | _ ->
-        VisitKey.(
-          Options.debug ~level:3 ~dkey "Visit COPY glob@.");
+        Options.debug ~level:3 ~dkey:dkey_transformation_visit "Visit COPY glob@.";
         Cil.JustCopy
 
   end
