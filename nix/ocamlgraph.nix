@@ -23,7 +23,7 @@ buildDunePackage rec {
   meta = with lib; {
     homepage = "https://github.com/backtracking/ocamlgraph";
     description = "Graph library for OCaml";
-    license = licenses.gpl2Oss;
+    license = licenses.gpl2Only;
     maintainers = [ ];
   };
 }
