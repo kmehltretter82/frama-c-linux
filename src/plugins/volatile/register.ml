@@ -14,6 +14,7 @@ let tailrec_list_map f l = List.rev (List.rev_map f l)
 module FILE = File
 open Cil_types
 open Cil_datatype
+open Options.Keys
 
 module StringTbl = Datatype.String.Hashtbl
 
@@ -318,7 +319,7 @@ module B_MAP = struct
         && Typ.equal (Ast_types.direct_pointed_type arg1) ret_type
         && Ast_types.is_volatile ret_type
       -> result true arg1 (* matching prototype: T fct (T *arg1, T arg2) when T has some volatile attr *)
-    | _ -> Options.warning ~wkey:Options.wkey_invalid_binding_function
+    | _ -> Options.warning ~wkey:wkey_invalid_binding_function
              "Binding function '%s' has an invalid prototype"
              fct.vorig_name;
       None
@@ -336,7 +337,7 @@ module B_MAP = struct
               match T_MAP.find_opt volatile_object map with
               | None -> Some (T_MAP.add volatile_object vf map)
               | Some vf0 ->
-                Options.warning ~wkey:Options.wkey_invalid_binding_function
+                Options.warning ~wkey:wkey_invalid_binding_function
                   "Functions -volatile-binding '%s' and '%s' %s"
                   vf0.vorig_name vf.vorig_name
                   (if Options.Base.get ()
@@ -354,7 +355,7 @@ module B_MAP = struct
                 Typ.pretty (T_MAP.basetype volatile_object);
               if is_wr_access then (map_rd, map) else (map, map_wr)
         with Not_found ->
-          Options.warning ~wkey:Options.wkey_invalid_binding_function
+          Options.warning ~wkey:wkey_invalid_binding_function
             "Unknown function related to -volatile-binding '%s'" f;
           maps
       )
@@ -490,7 +491,7 @@ let get_cannonical_call ~source f tf =
     let kf = Globals.Functions.find_by_name name in
     Some (Kernel_function.get_vi kf)
   with Not_found ->
-    Options.warning ~source ~wkey:Options.wkey_untransformed_call_function_not_found
+    Options.warning ~source ~wkey:wkey_untransformed_call_function_not_found
       "@[<hov 0>Call to (%a) with type @[<hov 2>(%a):@]@ Function '%s' not found@]"
       Exp.pretty f Typ.pretty (Cil.typeOf f) name;
     None
@@ -509,7 +510,7 @@ let add_eventual_cast_to_expression lval_typ e =
   let newt = Ast_types.remove_attributes_for_c_cast lval_typ in
   let e' = Cil.mkCast ~force:false ~newt e in
   if e' != e then
-    Options.warning ~source:(fst e.eloc) ~wkey:Options.wkey_cast_insertion
+    Options.warning ~source:(fst e.eloc) ~wkey:wkey_cast_insertion
       "@[<hov 0>Cast to (%a) inserted@ for expression (%a)@ of type (%a)@]"
       Typ.pretty newt Exp.pretty e Typ.pretty (Cil.typeOf e);
   e'
@@ -518,7 +519,7 @@ let add_eventual_cast_to_param arg_typ param =
   let newt = Ast_types.remove_attributes_for_c_cast arg_typ in
   let param' = Cil.mkCast ~force:false ~newt param in
   if param' != param then
-    Options.warning ~source:(fst param.eloc) ~wkey:Options.wkey_cast_insertion
+    Options.warning ~source:(fst param.eloc) ~wkey:wkey_cast_insertion
       "@[<hov 0>Cast to (%a) inserted@ for parameter (%a)@ of type (%a)@]"
       Typ.pretty newt Exp.pretty param Typ.pretty (Cil.typeOf param);
   param'
@@ -536,11 +537,11 @@ let do_pointer_call ~loc ~index ~transform f es =
         (add_eventual_cast_to_param t e) :: wrap ts va es
       | [], es when va -> es
       | [], es ->
-        Options.warning ~source ~wkey:Options.wkey_transformed_call_skipped_parameters
+        Options.warning ~source ~wkey:wkey_transformed_call_skipped_parameters
           "Using '%s': %d last parameters skipped" fn (List.length es);
         []
       | ts, [] ->
-        Options.warning ~source ~wkey:Options.wkey_transformed_call_missing_parameters
+        Options.warning ~source ~wkey:wkey_transformed_call_missing_parameters
           "Using '%s': missing %d parameters" fn (List.length ts);
         []
     in
@@ -612,7 +613,7 @@ let build_volatile_table vmap =
       match L_MAP.find_opt path map with
       | Some old ->
         if not (Varinfo.equal old fct) then
-          Options.warning ~source:(fst loc) ~wkey:Options.wkey_duplicated_access_function
+          Options.warning ~source:(fst loc) ~wkey:wkey_duplicated_access_function
             "%s access function already defined for %a"
             kind L_PATH.pretty path;
         map
@@ -650,7 +651,6 @@ let build_volatile_table vmap =
 
 (* Returne a tuple 'transformed_key, untransformed_key) *)
 let get_wkeys ~is_complete =
-  let open Options in
   if is_complete then
     wkey_transformed_access_lvalue_volatile,
     wkey_untransformed_access_lvalue_volatile
@@ -907,12 +907,12 @@ class process_volatile_access project binding_map kf_tbl vol_tbl index =
               let transform = Visitor_behavior.Memo.varinfo self#behavior in
               match do_pointer_call ~loc ~index ~transform f xs with
               | Some (fn, g, ys) ->
-                Options.warning ~source:(fst loc) ~wkey:Options.wkey_transformed_call
+                Options.warning ~source:(fst loc) ~wkey:wkey_transformed_call
                   "%a: use pointer function '%s'"
                   Location.pretty loc fn;
                 Call (result, g, ys, loc)
               | None ->
-                Options.warning ~source:(fst loc) ~wkey:Options.wkey_untransformed_call
+                Options.warning ~source:(fst loc) ~wkey:wkey_untransformed_call
                   "Original pointer function kept"; i
           end
         | i -> i in
@@ -952,7 +952,7 @@ class process_volatile_access project binding_map kf_tbl vol_tbl index =
             match Ast_types.unroll_node typ_exp with
             | TPtr typ_pointed when Ast_types.is_volatile typ_pointed ->
               Options.warning ~source:(fst (Current_loc.get ()))
-                ~wkey:Options.wkey_volatile_cast
+                ~wkey:wkey_volatile_cast
                 "Cast from type with volatile attribute (%a) to %a. Detection of \
                  volatile access may fail."
                 Typ.pretty typ_exp Typ.pretty typ

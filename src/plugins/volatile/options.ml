@@ -19,94 +19,126 @@ include Plugin.Register
 
 (** {1 Messages and warning categories} *)
 
-let wkey name status =
-  let wkey = register_warn_category name in
-  set_warn_status wkey status ;
-  wkey
+module Keys = struct
 
-let wkey_invalid_binding_function =
-  wkey "invalid-binding-function" Log.Werror
-let wkey_unsupported_volatile_clause =
-  wkey "unsupported:volatile-clause" Log.Werror
-let wkey_duplicated_access_function =
-  wkey "duplicated-access-function" Log.Werror
+  let dkey_binding =
+    register_category
+      ~help:"Prints debug messages related to volatile operations"
+      "binding"
 
-let wkey_volatile_cast = wkey "cast:volatile" Log.Wfeedback
-let wkey_cast_insertion =
-  wkey "cast:insertion" Log.Wfeedback
+  let dkey_binding_table =
+    register_category
+      ~help:"Prints debug messages related to volatile operations on internal tables"
+      "binding-table"
 
-let wkey_transformed_access_lvalue_volatile =
-  wkey "transformed-access:lvalue-volatile" Log.Wfeedback
-let wkey_transformed_access_lvalue_partially_volatile =
-  wkey "transformed-access:lvalue-partially-volatile" Log.Wfeedback
+  let dkey_volatile_table =
+    register_category
+      ~help:"Prints Volatile internal tables"
+      "volatile-table"
 
-let wkey_untransformed_access_lvalue_volatile =
-  wkey "untransformed-access:lvalue-volatile" Log.Wactive
-let wkey_untransformed_access_lvalue_partially_volatile =
-  wkey "untransformed-access:lvalue-partially-volatile" Log.Wactive
+  let dkey_transformation_action =
+    register_category
+      ~help:"Prints information on generated code"
+      "transformation-action"
 
-let wkey_untransformed_call = wkey "untransformed-call" Log.Wactive
-let wkey_untransformed_call_function_not_found =
-  wkey "untransformed-call:function_not_found" Log.Wactive
+  let dkey_transformation_visit =
+    register_category
+      ~help:"Prints visitor informations during the transformation"
+      "transformation-visit"
 
-let wkey_transformed_call = wkey "transformed-call" Log.Wfeedback
-let wkey_transformed_call_skipped_parameters =
-  wkey "transformed-call:skipped-parameters" Log.Wactive
-let wkey_transformed_call_missing_parameters =
-  wkey "transformed-call:missing-parameters" Log.Wactive
+  let wkey name status =
+    let wkey = register_warn_category name in
+    set_warn_status wkey status;
+    wkey
+
+  let wkey_invalid_binding_function =
+    wkey "invalid-binding-function" Log.Werror
+  let wkey_unsupported_volatile_clause =
+    wkey "unsupported:volatile-clause" Log.Werror
+  let wkey_duplicated_access_function =
+    wkey "duplicated-access-function" Log.Werror
+
+  let wkey_volatile_cast = wkey "cast:volatile" Log.Wfeedback
+  let wkey_cast_insertion =
+    wkey "cast:insertion" Log.Wfeedback
+
+  let wkey_transformed_access_lvalue_volatile =
+    wkey "transformed-access:lvalue-volatile" Log.Wfeedback
+  let wkey_transformed_access_lvalue_partially_volatile =
+    wkey "transformed-access:lvalue-partially-volatile" Log.Wfeedback
+
+  let wkey_untransformed_access_lvalue_volatile =
+    wkey "untransformed-access:lvalue-volatile" Log.Wactive
+  let wkey_untransformed_access_lvalue_partially_volatile =
+    wkey "untransformed-access:lvalue-partially-volatile" Log.Wactive
+
+  let wkey_untransformed_call = wkey "untransformed-call" Log.Wactive
+  let wkey_untransformed_call_function_not_found =
+    wkey "untransformed-call:function_not_found" Log.Wactive
+
+  let wkey_transformed_call = wkey "transformed-call" Log.Wfeedback
+  let wkey_transformed_call_skipped_parameters =
+    wkey "transformed-call:skipped-parameters" Log.Wactive
+  let wkey_transformed_call_missing_parameters =
+    wkey "transformed-call:missing-parameters" Log.Wactive
+
+end
 
 (** {1 Plug-in options.} *)
 
 module Enabled =
-  False(struct
+  False (struct
     let option_name = "-volatile"
-    let help = "builds a new projet (named \""^ plugin_name ^"\") where volatile accesses are simulated by function calls"
+    let help =
+      "builds a new projet (named \"" ^ plugin_name
+      ^"\") where volatile accesses are simulated by function calls"
   end)
 
 module Process =
-  String_set(struct
+  String_set (struct
     let option_name = "-volatile-fct"
     let arg_name = "f,..."
     let help = "Only process the given function(s)"
   end)
 
 module CallPtr =
-  String_list
-    (struct
-      let option_name = "-volatile-call-pointer"
-      let arg_name = "f,..."
-      let help = "stub call to pointer functions to the provided functions (indexed by type)"
-    end)
+  String_list (struct
+    let option_name = "-volatile-call-pointer"
+    let arg_name = "f,..."
+    let help = "stub call to pointer functions to the provided functions \
+                (indexed by type)"
+  end)
 
 module Base =
-  False
-    (struct
-      let option_name = "-volatile-basetype"
-      let help = "use base-type for int, float and enums for the instrumentation related to -volatile-binding option"
-    end)
+  False (struct
+    let option_name = "-volatile-basetype"
+    let help = "use base-type for int, float and enums for the instrumentation \
+                related to -volatile-binding option"
+  end)
 
 module Binding =
-  String_list(struct
+  String_list (struct
     let option_name = "-volatile-binding"
     let arg_name = "f,..."
     let help = "allows binding of volatile accesses to functions <f,...>"
   end)
 
 module BindingAuto =
-  False(struct
+  False (struct
     let option_name = "-volatile-binding-auto"
-    let help = "allows automatic binding of volatiles accesses to functions: <prefix>Rd_<typename> and <prefix>Wr_<typename>"
+    let help = "allows automatic binding of volatiles accesses to functions: \
+                <prefix>Rd_<typename> and <prefix>Wr_<typename>"
   end)
 
 module BindingCall =
-  False
-    (struct
-      let option_name = "-volatile-binding-call-pointer"
-      let help = "replaces calls through function pointers by direct calls to functions: <prefix>Call_<result-type>_<param-types>"
-    end)
+  False (struct
+    let option_name = "-volatile-binding-call-pointer"
+    let help = "replaces calls through function pointers by direct calls to \
+                functions: <prefix>Call_<result-type>_<param-types>"
+  end)
 
-module BindingPrefix=
-  String(struct
+module BindingPrefix =
+  String (struct
     let option_name = "-volatile-binding-prefix"
     let arg_name = "str"
     let default = "c2fc2_"
