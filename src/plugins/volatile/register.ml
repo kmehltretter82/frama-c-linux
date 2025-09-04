@@ -162,7 +162,7 @@ module BA_TBL = struct
     let volatile_ret_type = Ast_types.add_attributes [("volatile", [])] ret in
     Options.debug ~level:2 ~dkey:dkey_binding
       "Verifying prototype of function %s: %a@."
-      fct.vorig_name Printer.pp_typ ty;
+      fct.vorig_name Typ.pretty ty;
     match is_wr_access, args with
     | false, Some [_, arg1, _] when
         (not (Ast_types.is_void ret || is_varg_arg))
@@ -276,7 +276,7 @@ module B_MAP = struct
     in
     Options.debug ~level:2 ~dkey:dkey_binding
       "Verifying prototype of function %s: %a@."
-      fct.vorig_name Printer.pp_typ ty;
+      fct.vorig_name Typ.pretty ty;
     let result is_wr_access arg1 =
       Some (is_wr_access, (Ast_types.direct_pointed_type arg1))
     in match args with
@@ -337,7 +337,7 @@ module B_MAP = struct
                  "Register binding function '%s' for '%s' accesses to type '%a'"
                  vf.vorig_name
                  (if is_wr_access then "write" else "read")
-                 Printer.pp_typ (T_MAP.basetype volatile_object);
+                 Typ.pretty (T_MAP.basetype volatile_object);
                if is_wr_access then (map_rd, map) else (map, map_wr)
          with Not_found ->
            Options.warning ~wkey:Options.wkey_invalid_binding_function
@@ -557,7 +557,7 @@ let find_typename ~is_wr_access kf_tbl typ =
   let fct = (* Looking from the type name *)
     Options.debug ~level:2 ~dkey:dkey_binding
       "Looking for a default binding from the type name: %a@."
-      Printer.pp_typ typ;
+      Typ.pretty typ;
     find_fct typ
   in (* Verifying the protyping within the type of the volatile access. *)
   let ty = fct.vtype in
@@ -566,7 +566,7 @@ let find_typename ~is_wr_access kf_tbl typ =
   let volatile_ret_type = Ast_types.add_attributes [("volatile", [])] ret in
   Options.debug ~level:2 ~dkey:dkey_binding
     "Verifying the type of the lvalue within the prototype of function %s: %a@."
-    fct.vorig_name Printer.pp_typ ty;
+    fct.vorig_name Typ.pretty ty;
   if not (Typ.equal typ volatile_ret_type) then raise Not_found ;
   fct
 
@@ -609,7 +609,7 @@ let build_volatile_table vmap =
            with L_PATH.Unsupported ->
              Options.error ~source:(fst loc)
                "Unsupported l-value in volatile clause: %a@."
-               Printer.pp_identified_term l
+               Identified_term.pretty l
         ) tset
     | _ -> ()
   in
@@ -638,7 +638,7 @@ let get_volatile_access ?loc ~is_wr_access fct_name binding_map kf_tbl vol_tbl l
         with L_PATH.Unsupported ->
           let source = match loc with None -> None | Some l -> Some (fst l) in
           Options.warning ?source "Unsupported volatile l-value: %a"
-            Printer.pp_lval lval ;
+            Lval.pretty lval ;
           raise Not_found
       in
       let found fct =
@@ -655,7 +655,7 @@ let get_volatile_access ?loc ~is_wr_access fct_name binding_map kf_tbl vol_tbl l
              fct.vorig_name
              (if is_wr_access then "write" else "read")
              (if is_complete then "" else "partially ")
-             Printer.pp_lval lval);
+             Lval.pretty lval);
         Some (fct, (Ast_types.remove_attributes_for_c_cast typ))
       in
       (* Looking for a volatile function relative to the [lval] access. *)
@@ -685,9 +685,9 @@ let get_volatile_access ?loc ~is_wr_access fct_name binding_map kf_tbl vol_tbl l
            "Undefined %s access function for %svolatile left-value: (volatile %a) %a"
            (if is_wr_access then "write" else "read")
            (if is_complete then "" else "partially ")
-           Printer.pp_typ (Ast_types.remove_attributes_for_c_cast
-                             (if Options.Base.get () then T_MAP.basetype typ else typ))
-           Printer.pp_lval lval) ;
+           Typ.pretty (Ast_types.remove_attributes_for_c_cast
+                         (if Options.Base.get () then T_MAP.basetype typ else typ))
+           Lval.pretty lval) ;
       None
   in if has_volatile_attr (Ast_types.get_attributes typ) then
     get_volatile_access ~is_complete:true
@@ -792,7 +792,7 @@ class process_volatile_access project binding_map kf_tbl vol_tbl index =
     method! vstmt_aux s =
       VisitKey.(
         Options.debug ~level:2 ~dkey
-          "Visit DO stmt: sid=%d, volatile block:@.%a@." s.sid Printer.pp_block blk);
+          "Visit DO stmt: sid=%d, volatile block:@.%a@." s.sid Block.pretty blk);
       let previous_blk =
         if blk.bstmts = [] then
           None
@@ -810,7 +810,7 @@ class process_volatile_access project binding_map kf_tbl vol_tbl index =
           begin
             VisitKey.(
               Options.debug ~level:3 ~dkey
-                "Do not Transform stmt:@.sid=%d %a@." s.sid Printer.pp_stmt st);
+                "Do not Transform stmt:@.sid=%d %a@." s.sid Stmt.pretty st);
             st
           end
         else
@@ -818,7 +818,7 @@ class process_volatile_access project binding_map kf_tbl vol_tbl index =
             VisitKey.(
               Options.debug ~level:2 ~dkey
                 "Transform DO stmt: sid=%d, volatile block:@.%a@."
-                s.sid Printer.pp_block current_blk);
+                s.sid Block.pretty current_blk);
             let stmt = Cil.mkStmt st.skind in
             let stmts =
               { current_blk with bstmts = List.rev (stmt :: current_blk.bstmts)}
@@ -827,7 +827,7 @@ class process_volatile_access project binding_map kf_tbl vol_tbl index =
             VisitKey.(
               Options.debug ~level:2 ~dkey
                 "Transform Done stmt: sid=%d, new block:@.%a@."
-                st.sid Printer.pp_stmt st);
+                st.sid Stmt.pretty st);
             st
           end
       in
@@ -907,7 +907,7 @@ class process_volatile_access project binding_map kf_tbl vol_tbl index =
               | Some (fn, g, ys) ->
                 Options.warning ~source:(fst loc) ~wkey:Options.wkey_transformed_call
                   "%a: use pointer function '%s'"
-                  Printer.pp_location loc fn ;
+                  Location.pretty loc fn ;
                 Call (result, g, ys, loc)
               | None ->
                 Options.warning ~source:(fst loc) ~wkey:Options.wkey_untransformed_call
@@ -954,8 +954,8 @@ class process_volatile_access project binding_map kf_tbl vol_tbl index =
              -> Options.warning ~source:(fst (Current_loc.get ()))
                   ~wkey:Options.wkey_volatile_cast
                   "Cast from type with volatile attribute (%a) to %a. Detection of volatile access may fail."
-                  Printer.pp_typ typ_exp
-                  Printer.pp_typ typ
+                  Typ.pretty typ_exp
+                  Typ.pretty typ
            | _ -> ());
           e
         | _ as e -> e
