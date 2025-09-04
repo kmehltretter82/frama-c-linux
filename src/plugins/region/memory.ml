@@ -150,7 +150,7 @@ let pp_chunk name fmt (m: chunk) =
   begin
     let acs r s = if Access.Set.is_empty s then '-' else r in
     Format.fprintf fmt "@[<hov 2>%s: %c%c%c%c" name
-    (acs 'I' m.cinits) (acs 'R' m.creads) (acs 'W' m.cwrites) (acs 'A' m.cshifts) ;
+      (acs 'I' m.cinits) (acs 'R' m.creads) (acs 'W' m.cwrites) (acs 'A' m.cshifts) ;
     List.iter (Format.fprintf fmt "@ (%a)" Typ.pretty) (ctypes m) ;
     Lset.iter (Format.fprintf fmt "@ %s:") m.clabels ;
     Vset.iter (Format.fprintf fmt "@ %a" Varinfo.pretty) m.ccvars ;
@@ -655,6 +655,7 @@ type region = {
   fields: Fields.domain ;
   reads: Access.acs list ;
   writes: Access.acs list ;
+  inits: Access.acs list ;
   shifts: Access.acs list ;
   sizeof: int ;
   singleton : bool ;
@@ -703,8 +704,8 @@ let pp_root fmt (Root r) =
 let pp_region fmt (m: region) =
   begin
     let acs r s = if s = [] then '-' else r in
-    Format.fprintf fmt "@[<hov 2>%a: %c%c%c"
-      pp_node m.node
+    Format.fprintf fmt "@[<hov 2>%a: %c%c%c%c"
+      pp_node m.node (acs 'I' m.inits)
       (acs 'R' m.reads) (acs 'W' m.writes) (acs 'A' m.shifts) ;
     List.iter (Format.fprintf fmt "@ %s:") m.labels ;
     List.iter (Format.fprintf fmt "@ %a" pp_root) m.cvars ;
@@ -766,6 +767,7 @@ let make_region (n: node) (r: chunk) : region =
     reads = Access.Set.elements r.creads ;
     writes = Access.Set.elements r.cwrites ;
     shifts = Access.Set.elements r.cshifts ;
+    inits = Access.Set.elements r.cinits ;
     ranges = List.map (make_range fields) (cranges r.clayout) ;
     pointed = Option.map UF.find (cpointed r.clayout) ;
     types ; typed ; singleton ; sizeof ; fields ;

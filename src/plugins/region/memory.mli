@@ -34,6 +34,7 @@ type region = {
   fields: Fields.domain ;
   reads: Access.acs list ;
   writes: Access.acs list ;
+  inits: Access.acs list ;
   shifts: Access.acs list ;
   sizeof: int ;
   singleton : bool ;
