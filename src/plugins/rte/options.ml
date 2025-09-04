@@ -111,5 +111,6 @@ module FunctionSelection =
       let help = "select <fun> for analysis (default all functions)"
     end)
 
-let dkey_annot = register_category "annot"
-let () = add_debug_keys dkey_annot
+let dkey_annot =
+  register_category "annot" ~default:true
+    ~help:"message about function annotations"

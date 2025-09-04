@@ -21,8 +21,9 @@ module R =
       let help = "data dependencies higher level functions"
     end)
 
-let cat_rm_asserts = R.register_category "rm_asserts"
-let () = R.add_debug_keys cat_rm_asserts
+let cat_rm_asserts =
+  R.register_category "rm_asserts" ~default:true
+    ~help:"messages about removing redundant assertions"
 
 (** {2 Computing a mapping between zones and modifying statements}
     We first go through all the function statements in other to build

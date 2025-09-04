@@ -68,17 +68,17 @@ let is_computed () =
 (* ----- Debug categories --------------------------------------------------- *)
 
 let dkey_initial_state =
-  register_category "initial-state"
+  register_category "initial-state" ~default:true
     ~help:"at the start of the analysis, \
            print the initial value of global variables"
 
 let dkey_final_states =
-  register_category "final-states"
+  register_category "final-states" ~default:true
     ~help:"at the end of the analysis, print final values inferred \
            at the return point of each analyzed function "
 
 let dkey_summary =
-  register_category "summary"
+  register_category "summary" ~default:true
     ~help:"print a summary of the analysis at the end, including coverage \
            and alarm numbers"
 
@@ -87,7 +87,7 @@ let dkey_pointer_comparison =
     ~help:"messages about the evaluation of pointer comparisons"
 
 let dkey_cvalue_domain =
-  register_category "d-cvalue"
+  register_category "d-cvalue" ~default:true
     ~help:"print states of the cvalue domain on some user directives"
 
 let dkey_iterator =
@@ -100,15 +100,15 @@ let dkey_widening =
     ~help:"print a message at each point where the analysis applies a widening"
 
 let dkey_partition =
-  register_category "partition"
+  register_category "partition" ~default:true
     ~help:"messages about states partitioning"
 
 let dkey_split_return =
-  register_category "split-return"
+  register_category "split-return" ~default:true
     ~help:"messages related to option -eva-split-return"
 
 let dkey_precision_settings =
-  register_category "precision-settings"
+  register_category "precision-settings" ~default:true
     ~help:"messages about the automatic configuration of the analysis by \
            option -eva-precision"
 
@@ -119,12 +119,6 @@ let dkey_callstacks =
 let dkey_callstack_hash =
   register_category "callstack-hash"
     ~help:"additionally print the current callstack hash in some messages"
-
-let () =
-  let activate dkey = add_debug_keys dkey in
-  List.iter activate
-    [dkey_initial_state; dkey_final_states; dkey_summary; dkey_cvalue_domain;
-     dkey_partition; dkey_split_return; dkey_precision_settings]
 
 
 (* ----- Warning categories ------------------------------------------------- *)
