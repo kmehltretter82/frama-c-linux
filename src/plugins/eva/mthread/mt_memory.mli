@@ -54,8 +54,6 @@ val join_value : value -> value -> value * bool
 
 val join_params : value list -> value list -> value list * bool
 
-val join_zone : zone -> zone -> zone * bool
-
 (** Remove all the values that are not global variables from the state *)
 val clear_non_globals : state -> state
 
@@ -83,9 +81,6 @@ val replace_value_at_int_pointer:
     writing at the [sbytes] bytes starting at [p] the slice [v]. *)
 val write_slice:
   p:pointer -> sbytes:int -> slice:slice -> exact:bool -> state -> state
-
-
-val lval_from_pointer: pointer -> lval
 
 
 (** {1 Conversion to and from Mthread world to the value analysis} *)

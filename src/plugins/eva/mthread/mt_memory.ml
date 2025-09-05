@@ -7,7 +7,6 @@
 (**************************************************************************)
 
 open Cil_types
-open Cil
 open Locations
 
 (* Must be used inlined, as Machine.theMachine is mutable
@@ -102,16 +101,6 @@ let location_with_size p sbytes =
 let location_of_pointer (p : Types.pointer) =
   Location_Bytes.inject
     (Base.of_varinfo (fst p) ) (Ival.of_int (snd p))
-
-
-let lval_from_pointer (v, offs) : lval =
-  let loc = v.vdecl in
-  let exp_var = mkAddrOrStartOf ~loc (var v) in
-  let exp_offs = Cil.new_exp ~loc
-      (Const (CInt64 (Integer.of_int offs, IInt, None))) in
-  let exp' = new_exp ~loc (BinOp (PlusPI, exp_var, exp_offs, Cil_const.intPtrType)) in
-  let lval = mkMem ~addr:exp' ~off:NoOffset in
-  lval
 
 
 let read_int_pointer p state =
@@ -268,9 +257,5 @@ let rec join_params l1 l2 = match l1, l2 with
   | x::xs , y::ys ->
     let v, recv = join_value x y and lv, recl = join_params xs ys in
     v :: lv, recv || recl
-
-let join_zone z1 z2 =
-  let r = Zone.join z1 z2 in
-  r, Zone.equal r z1 = false
 
 let int_to_value i = Cvalue.V.inject_ival (Ival.of_int i)
