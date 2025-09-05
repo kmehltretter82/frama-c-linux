@@ -1,5 +1,5 @@
 /* run.config
-   PLUGIN: @PTEST_PLUGIN@ eva.numerors
+   PLUGIN: @PTEST_PLUGIN@
    OPT: -eva -eva-domains numerors -eva-msg-key=d-numerors
 */
 /* Tests for the numerors domain, that computes absolute and relative errors
@@ -243,7 +243,7 @@ int main() {
     double x6 = Frama_C_double_interval(1.0, 2.0) ;
     double x7 = Frama_C_double_interval(1.0, 2.0) ;
     double res = ex10(x3, x4, x0, x5, x2, x7, x6, x1) ;
-    DPRINTFrama_C_domain_show_each_ex10(res) ;
+    Frama_C_domain_show_each_ex10(res) ;
   }
   //test03_nonlin2
   {

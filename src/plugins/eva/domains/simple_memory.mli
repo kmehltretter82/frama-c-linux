@@ -14,12 +14,15 @@
     bottom). *)
 type 'value builtin = 'value list -> 'value Eval.or_bottom
 
+(** Set of relevant thresholds for the widening. *)
+type widen_hint = Datatype.Integer.Set.t * Datatype.Float.Set.t
+
 (** Abstraction of the values variables are mapped to. *)
 module type Value = sig
   include Abstract_value.Leaf
 
   (** Widening operation to ensure convergence. *)
-  val widen : t -> t -> t
+  val widen : widen_hint -> t -> t -> t
 
   (** This function must return [true] if the given variable should be
       tracked by the domain. All untracked variables are implicitely
@@ -73,7 +76,7 @@ module Make_Memory (_: sig val name: string end) (Value: Value) : sig
   (** The top abstraction, which maps all variables to {!V.top}. *)
 
   val join: t -> t -> t
-  val widen: t -> t -> t
+  val widen: Cil_types.kernel_function -> Cil_types.stmt -> t -> t -> t
   val is_included: t -> t -> bool
 end
 

@@ -248,6 +248,9 @@ let wkey_line_directive = register_warn_category "pp:line-directive"
 
 let wkey_unknown_attribute = register_warn_category "unknown-attribute"
 
+let wkey_long_double = register_warn_category "typing:long-double-unsupported"
+let () = set_warn_status wkey_long_double Log.Wonce
+
 let wkey_libc = register_warn_category "libc"
 let wkey_format = register_warn_category "libc:format"
 let wkey_libc_framac = register_warn_category "libc:frama-c"

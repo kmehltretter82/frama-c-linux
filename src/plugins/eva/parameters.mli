@@ -84,7 +84,6 @@ module AllocatedContextValid: Parameter_sig.Bool
 module InitializationPaddingGlobals: Parameter_sig.S
   with type t = [ `Initialized | `Uninitialized | `MaybeInitialized ]
 
-module Numerors_Real_Size : Parameter_sig.Int
 module Numerors_Mode : Parameter_sig.String
 
 module UndefinedPointerComparisonPropagateAll: Parameter_sig.Bool
@@ -122,7 +121,6 @@ module ValPerfFlamegraphs: Parameter_sig.Filepath
 module ShowSlevel: Parameter_sig.Int
 module PrintCallstacks: Parameter_sig.Bool
 module ReportRedStatuses: Parameter_sig.Filepath
-module NumerorsLogFile: Parameter_sig.Filepath
 module StatisticsFile: Parameter_sig.Filepath
 module ForcePrintSummary: Parameter_sig.Bool
 

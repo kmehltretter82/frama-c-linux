@@ -70,9 +70,9 @@
         "typing:incompatible-pointer-types",
         "typing:incompatible-types-call", "typing:inconsistent-specifier",
         "typing:initializer-overrides", "typing:int-conversion",
-        "typing:merge-conversion", "typing:no-proto", "typing:variadic",
-        "typing:variadic:format", "typing:variadic:format:nonliteral",
-        "unknown-attribute"
+        "typing:long-double-unsupported", "typing:merge-conversion",
+        "typing:no-proto", "typing:variadic", "typing:variadic:format",
+        "typing:variadic:format:nonliteral", "unknown-attribute"
       ],
       "disabled": [
         "CERT:EXP:10", "acsl-float-compare", "c11", "file:not-found",

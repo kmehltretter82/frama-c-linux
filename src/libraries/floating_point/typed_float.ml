@@ -54,6 +54,11 @@ let fkind_of_format : type f. f format -> Cil_types.fkind = function
   | Single -> Cil_types.FFloat
   | Double -> Cil_types.FDouble
 
+let pretty_format : type f. f format Pretty_utils.formatter = fun fmt format ->
+  match format with
+  | Single -> Format.fprintf fmt "Binary32"
+  | Double -> Format.fprintf fmt "Binary64"
+
 let parsed_fkind : type k f. (k, f) parsed_format -> Cil_types.fkind = function
   | Single_supported -> Cil_types.FFloat
   | Double_supported -> Cil_types.FDouble
@@ -382,7 +387,7 @@ let parse_hexadecimal (type f) ~(format : f format) s =
 
 
 
-let pretty_format fmt (Format (supported, format)) =
+let pretty_resulting_format fmt (Format (supported, format)) =
   match supported, format with
   | Single_supported, Single -> Format.fprintf fmt "single precision"
   | Double_supported, Double -> Format.fprintf fmt "double precision"
@@ -392,7 +397,7 @@ let cannot_be_parsed string format =
   let msg =
     Format.asprintf
       "The string %s cannot be parsed as a %a floating-point constant"
-      string pretty_format format
+      string pretty_resulting_format format
   in
   Error msg
 

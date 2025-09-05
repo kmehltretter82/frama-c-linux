@@ -19,6 +19,15 @@ let of_float = Q.of_float
 let to_float = Q.to_float
 let of_int = Q.of_int
 
+let represents ~scalar ~in_format =
+  let f = Typed_float.represents ~float:(to_float scalar) ~in_format in
+  Q.of_float (Typed_float.to_float f)
+
+let is_valid q =
+  match Q.classify q with
+  | Q.UNDEF -> false
+  | _ -> true
+
 let pow10 e = Z.(pow ten e) |> Q.of_bigint
 
 let split_significant_exponent s =
@@ -46,18 +55,27 @@ let of_string str =
   Q.(significant * shift)
 
 let pow2 e =
-  Q.(mul_2exp one e)
+  let scaling = Q.(mul_2exp one (Stdlib.abs e)) in
+  if e >= 0 then scaling else Q.inv scaling
 
-(* r = ⌊log₂ (n / d)⌋ = ⌊log₂ n - log₂ d⌋ which cannot be calculated directly.
-   However, we have the three following properties:
-   - ⌊x⌋ + ⌊y⌋ ≤ ⌊x + y⌋ ≤ ⌊x⌋ + ⌊y⌋ + 1 ;
-   - ⌊-x⌋ = -⌈x⌉ ;
-   - ⌈x⌉ = ⌊x⌋ + 1 ;
-     Thus, we deduce that ⌊log₂ n⌋ - ⌊log₂ d⌋ - 1 ≤ r ≤ ⌊log₂ n⌋ - ⌊log₂ d⌋. *)
+(* We want to compute ⌊log₂ q⌋ ≤ q ≤ ⌈log₂ q⌉, where q = a / b is a rational.
+   This operation is not provided by Zarith so we cannot compute directly
+   either ⌊log₂ (a / b)⌋ or ⌈log₂ (a / b)⌉. However, we can compute
+   n = ⌊log₂ a⌋ and m = ⌊log₂ b⌋ using Zarith. Those equalities
+   mean that n ≤ log₂ a < n + 1 and m ≤ log₂ b < m + 1, and thus
+   we obtain n - m - 1 < log₂ a - log₂ b < n - m + 1, which is equivalent
+   to 2 ^ (n - m - 1) < a / b < 2 ^ (n - m + 1). However, those bounds are
+   not optimal. Indeed, we necessarily have one of the following :
+   - n - m - 1 < n - m ≤ log₂ a - log₂ b < n - m + 1
+   - n - m - 1 < log₂ a - log₂ b ≤ n - m < n - m + 1
+
+   Testing which one is true comes down to check if 2 ^ (n - m) ≤ (a / b). *)
 let log2 q =
   if Q.(q <= zero) then raise (Invalid_argument (Q.to_string q)) ;
-  let num = Q.num q |> Z.log2 and den = Q.den q |> Z.log2 in
-  Field.{ lower = num - den - 1 ; upper = num - den }
+  let middle = (Q.num q |> Z.log2) - (Q.den q |> Z.log2) in
+  if Q.(pow2 middle <= q)
+  then Field.{ lower = middle ; upper = middle + 1 }
+  else Field.{ lower = middle - 1 ; upper = middle }
 
 let neg = Q.neg
 let abs = Q.abs

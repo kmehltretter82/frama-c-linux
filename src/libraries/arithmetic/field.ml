@@ -34,12 +34,23 @@ module type S = sig
   val pos_inf : scalar
   val neg_inf : scalar
 
+  (** {2 Scalar validity.}
+
+      If the using type may produce invalid scalars, like NaNs for instance,
+      it might be required to check scalar's validity. *)
+
+  val is_valid : scalar -> bool
+
   (** {2 Constructors interacting with standard OCaml types.} *)
 
   val of_int    : int -> scalar
   val of_float  : float -> scalar
   val to_float  : scalar -> float
   val of_string : string -> scalar
+
+  (** {2 Round to a valid number in a given floating point format.} *)
+
+  val represents : scalar:scalar -> in_format:'f Typed_float.format -> scalar
 
   (** {2 Standard arithmetic unary operations.} *)
 

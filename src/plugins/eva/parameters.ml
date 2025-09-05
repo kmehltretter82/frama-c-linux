@@ -274,20 +274,6 @@ module TaintSingletons =
 let () = add_precision_dep TaintSingletons.parameter
 
 let () = Parameter_customize.set_group domains
-module Numerors_Real_Size =
-  Int
-    (struct
-      let default = 128
-      let option_name = "-eva-numerors-real-size"
-      let arg_name = "n"
-      let help =
-        "Set <n> as the significand size of the MPFR representation \
-         of reals used by the numerors domain (defaults to 128)"
-    end)
-let () = Numerors_Real_Size.set_range ~min:1 ~max:max_int
-let () = add_precision_dep Numerors_Real_Size.parameter
-
-let () = Parameter_customize.set_group domains
 module Numerors_Mode =
   String
     (struct
@@ -1080,18 +1066,6 @@ module ReportRedStatuses =
                   given name. These are the properties which were invalid for \
                   some states. Their consolidated status may not be invalid, \
                   but they should often be investigated first."
-    end)
-
-let () = Parameter_customize.set_group messages
-module NumerorsLogFile =
-  Filepath
-    (struct
-      let option_name = "-eva-numerors-log-file"
-      let arg_name = "file"
-      let file_kind = "Text"
-      let existence = Fc_Filepath.Indifferent
-      let help = "The Numerors domain will save each call to the DPRINT \
-                  function in the given file"
     end)
 
 let () = Parameter_customize.set_group messages
