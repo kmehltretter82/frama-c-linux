@@ -25,6 +25,7 @@ import { LSplit } from './layout/splitters';
 import { Icon } from './controls/icons';
 import { LED } from './controls/displays';
 import { Button, ButtonGroup } from './frame/toolbars';
+import { useStyle } from './themes';
 
 /* --------------------------------------------------------------------------*/
 /* --- Help                                                                  */
@@ -315,6 +316,17 @@ function GeneralDocModal(): JSX.Element {
     return getErrors(chapters, news);
   }, [chapters]);
 
+  const style = useStyle();
+  const [ fontSize, setFontSize ] = React.useState(
+    parseInt(style.getPropertyValue('--help-modal-fontsize'))
+  );
+
+  const setSizes = React.useCallback((size: number) => {
+    document.documentElement.style.setProperty(
+      "--help-modal-fontsize", size.toString()+"px");
+    setFontSize(size);
+  }, [setFontSize]);
+
   const tableOfContent = React.useMemo(() => {
     return getTableOfContents(indexes);
   }, [indexes]);
@@ -336,20 +348,34 @@ function GeneralDocModal(): JSX.Element {
     return Boolean(indexes.find(elt => elt[1].find(title => title.id === id)));
   }
 
-  const actionsHeader = <ButtonGroup>
-    <Button icon='ANGLE.LEFT'
-      disabled={history.isFirstpos()}
-      onClick={ history.previous } />
-    <Button icon='ANGLE.RIGHT'
-      disabled={history.isLastpos()}
-      onClick={ history.next } />
-  </ButtonGroup>;
+  const actionsHeader = <>
+    <ButtonGroup>
+      <Button icon='ANGLE.LEFT'
+        disabled={history.isFirstpos()}
+        onClick={ history.previous } />
+      <Button icon='ANGLE.RIGHT'
+        disabled={history.isLastpos()}
+        onClick={ history.next } />
+    </ButtonGroup>
+    <ButtonGroup>
+      <Button
+        icon='ZOOM.OUT'
+        disabled={fontSize < 10}
+        onClick={() => setSizes(fontSize-2)} />
+      <Button
+        icon='ZOOM.IN'
+        disabled={fontSize > 25}
+        onClick={() => setSizes(fontSize+2)} />
+    </ButtonGroup>
+  </>;
 
   return (
-    <Modal className='modal-framac-doc' label={title} actions={actionsHeader}>
-      <LSplit settings="frama-c.modal-doc.split"
-        defaultPosition={250}
-      >
+    <Modal label={title}
+      className='modal-framac-doc'
+      actions={actionsHeader}
+      style={{ fontSize: fontSize+'px' }}
+    >
+      <LSplit settings="frama-c.modal-doc.split">
         <SideBar>
           <SidebarTitle label='Table of contents' >
             <div className='dome-xTree-actions'>
@@ -357,14 +383,12 @@ function GeneralDocModal(): JSX.Element {
                 icon={ "CHEVRON.CONTRACT" }
                 title="Fold all"
                 disabled={unfoldAll === false}
-                size={14}
                 onClick={() => setUnfoldAll(false)}
               />
               <IconButton
                 icon={ "CHEVRON.EXPAND" }
                 title="Unfold all"
                 disabled={unfoldAll}
-                size={14}
                 onClick={() => setUnfoldAll(true)}
               />
             </div>

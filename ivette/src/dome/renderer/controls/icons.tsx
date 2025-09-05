@@ -66,8 +66,7 @@ export function SVG(props: SVGprops): null | JSX.Element {
   const { path, viewBox = '0 0 24 24' } = icon;
   return (
     <svg
-      height={size}
-      style={{ bottom: offset }}
+      style={{ bottom: offset, height: size }}
       viewBox={viewBox}
       className={className}
     >

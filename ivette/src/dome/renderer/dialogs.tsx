@@ -329,6 +329,8 @@ export interface ModalProps {
   actions?: React.JSX.Element;
   /** Function onClose */
   onClose?: () => void
+  /** More style */
+  style?: React.CSSProperties;
   /** Modal content */
   children: JSX.Element;
 }
@@ -336,7 +338,8 @@ export interface ModalProps {
 export function Modal(
   props: ModalProps
 ): JSX.Element {
-  const { label, title, icon, className, actions, onClose, children } = props;
+  const { label, title, icon, className,
+    onClose, style, actions, children } = props;
   const [ isLoader, ] = useGlobalState(modalLoader);
 
   const contentClasses = classes('dome-xModal-content', className);
@@ -357,12 +360,12 @@ export function Modal(
   }, [onCloseModal]);
 
   return (
-    <div className={contentClasses}>
+    <div className={contentClasses} style={style}>
       <div className='dome-xModal-header'>
         <Label className='dome-xModal-title'
           label={label} icon={icon} title={title}
         />
-        <div className='dome-xModal-acions'>
+        <div className='dome-xModal-actions'>
           { actions }
           <IconButton icon='CROSS' size={18} onClick={onCloseModal} />
         </div>

@@ -12,6 +12,13 @@
 
   .dome-xTree { margin-top: 10px; }
   .dome-xTree-nodes { margin-right: 10px; }
+  .dome-xModal-body {
+    svg { height: var(--help-modal-fontsize) !important; }
+    .dome-xButton-led  {
+      height: var(--help-modal-fontsize);
+      width: var(--help-modal-fontsize);
+    }
+  }
 }
 
 .modal-framac-infos {
