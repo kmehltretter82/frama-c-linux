@@ -12,13 +12,6 @@ open Mt_thread
 
 module Utilities = struct
 
-  let mk_translation_tbl l =
-    List.fold_left
-      (fun smap (s1,s2) ->
-         Datatype.String.Map.add s1 s2 smap)
-      Datatype.String.Map.empty l
-  ;;
-
   (* Outputs are done in separate buffers then assembled together.
      The following allows to maintain some kind of consistency
      in buffer creations.
@@ -32,23 +25,6 @@ module Utilities = struct
     b, Format.formatter_of_buffer b
   ;;
 
-  let _escape_string special_chars =
-    Str.global_replace special_chars "\\\\\\\\0"
-  ;;
-
-  let replace_chars ttable s =
-    let buf = Buffer.create ((String.length s) * 2 ) in
-    String.iter
-      (fun c ->
-         let s = Format.sprintf "%c" c in
-         let ts =
-           try
-             Datatype.String.Map.find s ttable
-           with Not_found -> s
-         in Buffer.add_string buf ts
-      ) s;
-    buf
-  ;;
 end
 
 
@@ -61,16 +37,6 @@ module Html = struct
     let s = Format.asprintf "%a" pp v in
     let s = escape s in
     Format.pp_print_string fmt s
-
-  let dot_escape s =
-    let translation_table =
-      Utilities.mk_translation_tbl
-        (List.map (fun s -> (s,"_"))
-           ["&"; "+"; "["; "]"; "."]
-        )
-    in
-    Utilities.replace_chars translation_table s
-  ;;
 
 
   (* Formatting html with Format.formatters *)
@@ -566,7 +532,10 @@ module Html = struct
       let default_vertex_attributes _ = []
       let vertex_name v =
         let s = Format.asprintf "%a" Thread.pretty v in
-        Buffer.contents (dot_escape s)
+        (* Surround name with double-quotes so that we can use UTF-8 and other
+           special characters apart from double quotes. [escape_non_utf8] is
+           used so that double quote are escaped. *)
+        Format.asprintf "\"%s\"" (Eva_utils.escape_non_utf8 s)
       let vertex_attributes v =
         let s = Format.asprintf "%a" Thread.pretty v in
         [ `Label (Eva_utils.escape_non_utf8 s)]
