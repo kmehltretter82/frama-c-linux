@@ -310,6 +310,20 @@ let html_escape s =
     ) s ;
   Buffer.contents buf
 
+let percent_encode s =
+  let buf = Buffer.create (String.length s) in
+  String.iter
+    (function
+      | 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9'
+      | '-' | '.' | '_' | '~' as c ->
+        Buffer.add_char buf c
+      | c ->
+        let code = Char.code c in
+        let percent_code = Format.asprintf "%%%2X" code in
+        Buffer.add_string buf percent_code)
+    s;
+  Buffer.contents buf
+
 let format_string_of_stag = function
   | Format.String_tag tag -> tag
   | _ -> raise (Invalid_argument "unsupported tag extension")

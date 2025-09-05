@@ -212,6 +212,17 @@ val strip_underscore: string -> string
 
 val html_escape: string -> string
 
+(** [percent_encode s] returns the string [s] encoded so that it can be used
+    as a path component in a HTML URL. All characters not on the list of
+    unreserved characters in RFC3986 are percent-encoded. For instance the space
+    character is converted to [%20].
+
+    Cf. {{:https://datatracker.ietf.org/doc/html/rfc3986#section-2.3}} for the
+    list of unreserved characters.
+
+    @since Frama-C+dev *)
+val percent_encode: string -> string
+
 (** [format_string_of_stag stag] returns the string corresponding to [stag],
     or raises an exception if the tag extension is unsupported.
 
