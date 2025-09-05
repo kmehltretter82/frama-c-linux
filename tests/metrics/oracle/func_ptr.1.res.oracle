@@ -60,12 +60,14 @@
   ----------------------------------------------------------------------------
   No logical properties have been reached by the analysis.
   ----------------------------------------------------------------------------
-[metrics] Eva coverage statistics
+[metrics:eva:coverage] 
+  Eva coverage statistics
   =======================
   Syntactically reachable functions = 2 (out of 5)
   Semantically reached functions = 2
   Coverage estimation = 100.0%
-[metrics] Statements analyzed by Eva
+[metrics:eva:reached-stmts] 
+  Statements analyzed by Eva
   --------------------------
   5 stmts in analyzed functions, 5 stmts analyzed (100.0%)
   baz: 1 stmts out of 1 (100.0%)
