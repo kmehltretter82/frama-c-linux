@@ -27,7 +27,8 @@ module UnaccessedOrProtection = struct
   let compare v1 v2 = match v1, v2 with
     | Unaccessed, Unaccessed -> 0
     | Mutexes p1, Mutexes p2 -> MutexPresence.compare p1 p2
-    | (Unaccessed | Mutexes _), _ -> Mt_lib.compare_tag v1 v2
+    | Unaccessed, Mutexes _ -> -1
+    | Mutexes _, Unaccessed -> 1
 
 
   let hash = function
@@ -72,9 +73,9 @@ module MutexesByAccess = struct
     UnaccessedOrProtection.equal v1.mutexes_for_write v2.mutexes_for_write
 
   let compare v1 v2 =
-    Mt_lib.comp
-      UnaccessedOrProtection.compare v1.mutexes_for_read v2.mutexes_for_read
-      UnaccessedOrProtection.compare v1.mutexes_for_write v2.mutexes_for_write
+    let (<?>) c lcmp = if c <> 0 then c else Lazy.force lcmp in
+    UnaccessedOrProtection.compare v1.mutexes_for_read v2.mutexes_for_read <?>
+    lazy (UnaccessedOrProtection.compare v1.mutexes_for_write v2.mutexes_for_write)
 
   let join v1 v2 = {
     mutexes_for_read = UnaccessedOrProtection.join

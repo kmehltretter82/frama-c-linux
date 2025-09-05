@@ -31,20 +31,17 @@ module RecomputeReason = struct
 
   type t = recompute_reason
 
-  let compare r1 r2 = match r1, r2 with
-    | FirstIteration, FirstIteration
-    | NewMsgReceived, NewMsgReceived
-    | SharedVarsValuesChanged, SharedVarsValuesChanged
-    | PotentialSharedVarsChanged, PotentialSharedVarsChanged
-    | InitialArgsChanged, InitialArgsChanged
-    | InitialEnvChanged, InitialEnvChanged
-    | InterferencesChanged, InterferencesChanged
-      -> 0
-    | (FirstIteration | NewMsgReceived | SharedVarsValuesChanged
-      | PotentialSharedVarsChanged | InitialArgsChanged | InitialEnvChanged
-      | InterferencesChanged),
-      _ ->
-      Mt_lib.compare_tag r1 r2
+  (* Used for comparison. *)
+  let rank = function
+    | FirstIteration -> 0
+    | NewMsgReceived -> 1
+    | PotentialSharedVarsChanged -> 2
+    | SharedVarsValuesChanged -> 3
+    | InitialArgsChanged -> 4
+    | InitialEnvChanged -> 5
+    | InterferencesChanged -> 6
+
+  let compare r1 r2 = rank r1 - rank r2
 
   let pretty fmt = function
     | FirstIteration -> Format.fprintf fmt "first@ iteration"

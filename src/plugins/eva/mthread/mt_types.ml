@@ -9,7 +9,6 @@
 open Cil_types
 open Mt_cil
 open Mt_memory.Types
-open Mt_lib
 
 
 (* -------------------------------------------------------------------------- *)
@@ -103,6 +102,21 @@ type event =
 module Event = struct
   type t = event
 
+  (* Used for comparison. *)
+  let rank = function
+    | CreateThread _ -> 0
+    | StartThread _ -> 1
+    | SuspendThread _ -> 2
+    | CancelThread _ -> 3
+    | ThreadExit _ -> 4
+    | MutexLock _ -> 5
+    | MutexRelease _ -> 6
+    | CreateQueue _ -> 7
+    | SendMsg _ -> 8
+    | ReceiveMsg _ -> 9
+    | VarAccess _ -> 10
+    | Dummy _ -> 11
+
   let pretty fmt = function
     | CreateThread th -> Format.fprintf fmt "Create thread %a" Thread.pretty th
     | StartThread th -> Format.fprintf fmt "Start thread %a" Thread.pretty th
@@ -151,6 +165,8 @@ module Event = struct
       false
 
 
+  let (<?>) c lcmp = if c <> 0 then c else Lazy.force lcmp
+
   let compare a1 a2 = match a1, a2 with
     | CreateThread th1, CreateThread th2
     | StartThread th1, StartThread th2
@@ -160,25 +176,26 @@ module Event = struct
     | MutexRelease m1, MutexRelease m2 -> Mutex.compare m1 m2
     | ThreadExit v1, ThreadExit v2 -> Cvalue.V.compare v1 v2
     | CreateQueue (q1, s1), CreateQueue (q2, s2) ->
-      comp compare s1 s2 Mqueue.compare q1 q2
+      compare s1 s2 <?> lazy (Mqueue.compare q1 q2)
     | SendMsg (q1, (v1, s1)), SendMsg (q2, (v2, s2)) ->
-      comp Stdlib.compare s1 s2
-        (comp Cvalue.V_Offsetmap.compare v1 v2 Mqueue.compare)
-        q1 q2
+      Stdlib.compare s1 s2 <?>
+      lazy (Cvalue.V_Offsetmap.compare v1 v2) <?>
+      lazy (Mqueue.compare q1 q2)
     | ReceiveMsg (q1, l1, s1), ReceiveMsg (q2, l2, s2) ->
-      comp Stdlib.compare s1 s2
-        (comp Pointer.compare l1 l2 Mqueue.compare)
-        q1 q2
+      Stdlib.compare s1 s2 <?>
+      lazy (Pointer.compare l1 l2) <?>
+      lazy (Mqueue.compare q1 q2)
     | VarAccess (rw1, z1), VarAccess (rw2, z2) ->
-      comp RW.compare rw1 rw2 Locations.Zone.compare z1 z2
+      RW.compare rw1 rw2 <?>
+      lazy (Locations.Zone.compare z1 z2)
     | Dummy (s1, l1), Dummy (s2, l2) ->
-      comp String.compare s1 s2
-        (Extlib.list_compare Cvalue.V.compare) l1 l2
+      String.compare s1 s2 <?>
+      lazy ((Extlib.list_compare Cvalue.V.compare) l1 l2)
     | (CreateThread _ | StartThread _ | SuspendThread _ | CancelThread _
       | ThreadExit _
       | MutexLock _ | MutexRelease _ | CreateQueue _
       | SendMsg _ | ReceiveMsg _ | VarAccess _ | Dummy _), _ ->
-      Mt_lib.compare_tag a1 a2
+      rank a1 - rank a2
 
   let hash = function
     | CreateThread th -> Hashtbl.hash (Thread.hash th, 0)

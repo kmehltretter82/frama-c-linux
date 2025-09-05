@@ -6,20 +6,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-
-let compare_tag (v1 : 'a) (v2 : 'a) =
-  let o1 = Obj.repr v1 and o2 = Obj.repr v2 in
-  match Obj.is_int o1, Obj.is_int o2 with
-  | true, true -> Stdlib.compare o1 o2
-  | false, false -> Stdlib.compare (Obj.tag o1) (Obj.tag o2)
-  | true, false -> 1
-  | false, true -> -1
-
-let comp f1 v11 v12 f2 v21 v22 =
-  let r = f1 v11 v12 in
-  if r = 0 then f2 v21 v22 else r
-
-
 (* -------------------------------------------------------------------------- *)
 (* --- Misc                                                               --- *)
 (* -------------------------------------------------------------------------- *)

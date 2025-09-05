@@ -7,16 +7,6 @@
 (**************************************************************************)
 
 
-(** Compare the tags of two OCaml values (or their values if they are
-    integers). Can be used to implement the generic cases of compare functions
-    on inductive types. Not for the casual user. *)
-val compare_tag: 'a -> 'a -> int
-
-
-val comp: ('a -> 'b -> int) -> 'a -> 'b -> ('c -> 'd -> int) -> 'c -> 'd -> int
-
-
-
 (** Conversion from something into something else. Returns a formatter that
     prints the error in case of failure *)
 type 'a conversion_with_warning = [
