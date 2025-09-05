@@ -12,7 +12,7 @@ exception Not_less_than
 exception Can_not_subdiv
 
 let dkey = Kernel.register_category "approximation" ~default:true
-    ~help:"messages emitted when approximations are performed"
+    ~help:"messages emitted when imprecise approximations are performed"
 
 let feedback_approximation format =
   Kernel.feedback ~dkey ~current:true ~once:true format

@@ -876,15 +876,12 @@ struct
   let not_registered s =
     failwith (s ^ " is not a registered category for " ^ label)
 
-  let add_debug_keys s =
-    try
-      categories := Category_trie.add_info (split_category s) true !categories
+  let change_debug_key_status s b =
+    try categories := Category_trie.add_info (split_category s) b !categories
     with Not_found -> not_registered s
 
-  let del_debug_keys s =
-    try
-      categories := Category_trie.add_info (split_category s) false !categories
-    with Not_found -> not_registered s
+  let add_debug_keys s = change_debug_key_status s true
+  let del_debug_keys s = change_debug_key_status s false
 
   let register_category ?(help="No description provided") ?(default=false)
       (s:string) =
