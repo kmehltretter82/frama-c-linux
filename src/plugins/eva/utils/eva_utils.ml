@@ -186,8 +186,17 @@ let escape_non_utf8 s =
   Buffer.contents buffer
 
 let sanitize_filename s =
+  (* Invalid characters for different OSes taken from
+     <https://stackoverflow.com/a/31976060> *)
   let is_invalid = function
-    | '&' | '+' | '[' | ']' | '.' -> true
+    (* Unix limitations *)
+    | '/' -> true
+    | c when Char.code c = 0 -> true
+    (* Additional MacOS limitations *)
+    | ':' -> true
+    (* Additional Windows limitations *)
+    | '<' | '>' | '"' | '\\' | '|' | '?' | '*' -> true
+    | c when Char.code c > 0 && Char.code c <= 31 -> true
     | _ -> false
   in
   String.map (fun c -> if is_invalid c then '_' else c) s
