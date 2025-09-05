@@ -370,7 +370,7 @@ let stmt_is_multithreaded analysis sa =
          iter_requests stmt (fun request ->
              let value = Results.(eval_var v request |> as_cvalue) in
              match Mt_memory.extract_int value with
-             | `Success 0 -> ()
+             | Ok 0 -> ()
              | _ -> raise Stmt_is_multithreaded
            );
          false

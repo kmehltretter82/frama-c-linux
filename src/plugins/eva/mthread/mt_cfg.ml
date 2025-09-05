@@ -804,15 +804,17 @@ let cfg_accesses th node =
 
 
 let compute_node_context th mutexes iter state node =
-  let extract v = match v with
-    | `Success v -> v
-    | `WithWarning (mess, v) ->
-      Mt_self.warning "%a: %t" CfgNode.pretty_with_stmts node mess; v
+  let extract ~default v = match v with
+    | Ok v -> v
+    | Error error ->
+      Mt_self.warning "%a: %s" CfgNode.pretty_with_stmts node error;
+      default
   in
   let mutexes =
     Mutex.Set.fold
       (fun m acc ->
-         let p = extract (NodeValueState.mutex_presence m state) in
+         let mutex_presence = NodeValueState.mutex_presence m state in
+         let p = extract ~default:NotPresent mutex_presence in
          MutexPresence.add m p acc
       ) mutexes MutexPresence.empty
   and threads =
@@ -822,7 +824,8 @@ let compute_node_context th mutexes iter state node =
       (fun th' started ->
          if Thread.equal th th' then `NotStarted
          else
-           let r = extract (NodeValueState.threads_presence started th' state) in
+           let presence = NodeValueState.threads_presence started th' state in
+           let r = extract ~default:MaybePresent presence in
            save th' r;
            match started, r with
            | `Prior, _ -> `Prior

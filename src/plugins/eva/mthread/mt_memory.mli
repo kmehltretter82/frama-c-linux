@@ -90,10 +90,8 @@ val lval_from_pointer: pointer -> lval
 
 (** {1 Conversion to and from Mthread world to the value analysis} *)
 
-type 'a conversion = [
-  | `Success of 'a
-  | `Failure of (Format.formatter -> unit)
-]
+(*** All conversion functions below return an error message in case of failure. *)
+type 'a conversion = ('a, string) Result.t
 
 val extract_fun : value -> kernel_function conversion
 val extract_pointer : value -> pointer conversion
@@ -101,6 +99,9 @@ val extract_int : value -> int conversion
 val extract_int_possibly_zero : value -> (int * [`Exact | `WithZero]) conversion
 val extract_constant_string : value -> string conversion
 val extract_non_wide_string : Base.cstring -> string conversion
+
+(** Fails if [value] represents more than [cardinal] integers. *)
+val extract_int_list : cardinal:int -> value -> int list conversion
 
 
 val int_to_value: int -> value

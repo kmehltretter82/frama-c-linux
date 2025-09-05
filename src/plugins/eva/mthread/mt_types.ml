@@ -10,11 +10,6 @@ open Cil_types
 open Mt_cil
 open Mt_memory.Types
 
-type 'a conversion_with_warning = [
-  | `Success of 'a
-  | `WithWarning of (Format.formatter -> unit) * 'a
-]
-
 (* -------------------------------------------------------------------------- *)
 (* --- Variable access kind                                               --- *)
 (* -------------------------------------------------------------------------- *)

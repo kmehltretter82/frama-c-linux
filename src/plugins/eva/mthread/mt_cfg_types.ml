@@ -109,42 +109,35 @@ module NodeValueState = struct
     state_after  = Cvalue.Model.bottom;
   }
 
-  let aux_presence default raw_id f state : _ conversion_with_warning =
-    match Mt_ids.read_id_state_enumerate 4 state raw_id with
-    | `Failure mess ->
-      `WithWarning(mess, default)
-    | `Success l ->
-      match f (List.sort compare l) with
-      | `Warn ->
-        `WithWarning (
-          (fun fmt -> Format.fprintf fmt
-              "@[Id %a@ contains@ strange@ state@ {%a}@]"
-              Mt_ids.pretty_raw_id raw_id
-              (Pretty_utils.pp_list ~sep:"@ " ~pre:"" ~suf:""
-                 Format.pp_print_int) l;
-          ),
-          default)
-      | `Ok v -> `Success v
+  let aux_presence raw_id f state =
+    let open Result.Operators in
+    let* l = Mt_ids.read_id_state_enumerate 4 state raw_id in
+    let error () =
+      Format.asprintf "Id %a contains strange state {%a}"
+        Mt_ids.pretty_raw_id raw_id
+        (Pretty_utils.pp_list ~sep:" " Format.pp_print_int) l;
+    in
+    f (List.sort compare l) |> Result.map_error error
 
   let mutex_presence m =
-    aux_presence NotPresent (Mt_ids.of_mutex m)
+    aux_presence (Mt_ids.of_mutex m)
       (function
-        | [0] |[1] | [0;1] -> `Ok NotPresent
-        | [2] -> `Ok Present
-        | [0;2] | [1;2] | [0;1;2] -> `Ok MaybePresent
-        | _ -> `Warn)
+        | [0] |[1] | [0;1] -> Ok NotPresent
+        | [2] -> Ok Present
+        | [0;2] | [1;2] | [0;1;2] -> Ok MaybePresent
+        | _ -> Error ())
 
   let threads_presence started th =
-    aux_presence MaybePresent (Mt_ids.of_thread th)
+    aux_presence (Mt_ids.of_thread th)
       (fun l -> match l, started with
-         | [0], (`Prior | `Started) -> `Ok Present
-         | [0], `MaybeStarted -> `Ok MaybePresent
-         | [0], `NotStarted -> `Ok NotPresent
-         | [1], _ -> `Ok Present
-         | [2], _ -> `Ok NotPresent
-         | [0;2], `NotStarted -> `Ok NotPresent
-         | ([0;1] | [0;2] | [1;2] | [0;1;2]), _ -> `Ok MaybePresent
-         | _ -> `Warn)
+         | [0], (`Prior | `Started) -> Ok Present
+         | [0], `MaybeStarted -> Ok MaybePresent
+         | [0], `NotStarted -> Ok NotPresent
+         | [1], _ -> Ok Present
+         | [2], _ -> Ok NotPresent
+         | [0;2], `NotStarted -> Ok NotPresent
+         | ([0;1] | [0;2] | [1;2] | [0;1;2]), _ -> Ok MaybePresent
+         | _ -> Error ())
 
 end
 

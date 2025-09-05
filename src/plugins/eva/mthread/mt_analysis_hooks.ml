@@ -62,9 +62,9 @@ let hook_fail ?(code=default_err_code) () =
    into a proper value fails *)
 let catch_conversion analysis ~prefix v msg =
   match v with
-  | `Success v -> v
-  | `Failure w ->
-    warning analysis "@[%s: %s. %t Ignoring.@]" prefix msg w;
+  | Ok v -> v
+  | Error error ->
+    warning analysis "@[%s: %s. %s. Ignoring.@]" prefix msg error;
     hook_fail ()
 
 (* -------------------------------------------------------------------------- *)
@@ -72,26 +72,26 @@ let catch_conversion analysis ~prefix v msg =
 (* -------------------------------------------------------------------------- *)
 
 let find_failure kind id =
-  let pp fmt =
-    Format.fprintf fmt
+  let error =
+    Format.sprintf
       "Id %d for %s does not exists (incrementation inside program?)."
       id kind
   in
-  `Failure pp
+  Error error
 
 let find_thread id =
   match Thread.find id with
-  | Some th -> `Success th
+  | Some th -> Ok th
   | None -> find_failure "thread" id
 
 let find_mutex id =
   match Mutex.find id with
-  | Some m -> `Success m
+  | Some m -> Ok m
   | None -> find_failure "mutex" id
 
 let find_queue id =
   match Mqueue.find id with
-  | Some q -> `Success q
+  | Some q -> Ok q
   | None -> find_failure "queue" id
 
 
@@ -253,7 +253,7 @@ let sync_values analysis state =
   let v = Mt_lib.var_thread_created () in
   let value = Results.(in_cvalue_state state |> eval_var v |> as_cvalue) in
   match Mt_memory.extract_int value with
-  | `Success 0 ->
+  | Ok 0 ->
     (* As no thread is running, just skip the synchronization. *)
     state
   | _ ->
@@ -564,10 +564,7 @@ let hook_send_msg analysis state : hook_sig = function
     if offset <> 0 then
       let sbytes = conv (Mt_memory.extract_int size) "invalid message size" in
       if sbytes <= 0 then
-        begin
-          let failure = `Failure (fun fmt -> Format.fprintf fmt "%d." sbytes) in
-          conv failure "invalid message length";
-        end;
+        conv (Error (string_of_int sbytes)) "invalid message length";
       let q = conv (find_queue offset) "unkwown queue" in
       let content = Mt_memory.read_slice ~p:content ~sbytes state in
       let state = QueueOp.check_and_write analysis state q QueueOp.send in
