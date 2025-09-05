@@ -62,5 +62,3 @@ val register_concurrent_var_accesses :
 val stmt_is_multithreaded :
   Mt_thread.analysis_state ->
   Mt_memory.Types.state_accesser -> Cil_types.stmt -> bool
-
-val var_thread_created : unit -> Cil_types.varinfo

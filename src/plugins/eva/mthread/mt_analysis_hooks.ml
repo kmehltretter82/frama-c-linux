@@ -250,7 +250,7 @@ let sync_values analysis state =
            Cvalue.Model.add_base b offsm'' state)
       written state
   in
-  let v = Mt_shared_vars.var_thread_created () in
+  let v = Mt_lib.var_thread_created () in
   let value = Results.(in_cvalue_state state |> eval_var v |> as_cvalue) in
   match Mt_memory.extract_int value with
   | `Success 0 ->
@@ -374,7 +374,7 @@ let interrupt_thread kf initial_state =
 (** Set the global variable that indicates that at least one thread is running
     to one *)
 let thread_is_running state =
-  let p_thread_running = Mt_shared_vars.var_thread_created (), 0 in
+  let p_thread_running = Mt_lib.var_thread_created (), 0 in
   Mt_memory.write_int_pointer p_thread_running 1 state
 
 
