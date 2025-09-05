@@ -67,3 +67,10 @@ val height_lval: lval -> int
 val skip_specifications: kernel_function -> bool
 (** Should we skip the specifications of this function, according to
     [-eva-skip-stdlib-specs] *)
+
+
+(** Escape non-utf8 characters. *)
+val escape_non_utf8: string -> string
+
+(** Remove specialchars forbidden in file names *)
+val sanitize_filename: string -> string

@@ -666,7 +666,7 @@ let dot_fprint_graph fmt start_tg link_stmt =
         | NEOP -> `Invis
         | _ -> `Filled
       in [
-        `Label (Mt_lib.escape_non_utf8 label);
+        `Label (Eva_utils.escape_non_utf8 label);
         `ColorWithTransparency color;
         `Shape shape;
         `Style style;

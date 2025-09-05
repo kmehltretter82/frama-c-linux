@@ -7,19 +7,6 @@
 (**************************************************************************)
 
 
-val escape_non_utf8: string -> string
-
-
-(** Clear the results of the value analysis *)
-val clear_value_results: unit -> unit
-
-
-(** Location of the header file "mthread.h" *)
-val mthread_h: unit -> Filepath.t
-
-(** Remove specialchars forbidden in file names *)
-val sanitize_filename: ?char:char -> string -> string
-
 (** Threading library stubbed by Mthread. *)
 type threads_lib =
   | BuiltinsOnly (** Only Mthread built-ins are available. *)

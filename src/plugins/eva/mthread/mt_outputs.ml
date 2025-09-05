@@ -522,9 +522,10 @@ module Html = struct
   let mk_graph_img th =
     let unicode = suspend_unicode () in
     let f_stmt s = Format.sprintf "code.html#%s" (stmt_link s) in
-    let thread_name = Thread.label th.th_eva_thread |> Mt_lib.sanitize_filename in
+    let thread_name = Thread.label th.th_eva_thread in
+    let filename = Eva_utils.sanitize_filename thread_name in
     let generator fmt = Mt_cfg.dot_fprint_graph fmt th.th_cfg f_stmt in
-    let tmp_file = generate_dot ~generator thread_name in
+    let tmp_file = generate_dot ~generator filename in
     if not (Mt_options.ConcatDotFilesTo.is_empty ()) then begin
       let name = Thread.label th.th_eva_thread in
       let output = Mt_options.ConcatDotFilesTo.get () in
@@ -532,7 +533,7 @@ module Html = struct
     end;
     let dot_output_format = "svg" in
     let link_fname =
-      (Format.asprintf "%s.%s" thread_name dot_output_format) in
+      (Format.asprintf "%s.%s" filename dot_output_format) in
     let output_file = Filepath.(default_dir / link_fname) in
     let args = [ "-Tsvg"; Filepath.to_string_abs tmp_file;
                  "-o"; Filepath.to_string_abs output_file ] in
@@ -566,7 +567,7 @@ module Html = struct
         Buffer.contents (dot_escape s)
       let vertex_attributes v =
         let s = Format.asprintf "%a" Thread.pretty v in
-        [ `Label (Mt_lib.escape_non_utf8 s)]
+        [ `Label (Eva_utils.escape_non_utf8 s)]
       let get_subgraph _ = None
       let default_edge_attributes _ = [`Style(`Solid);]
       let edge_attributes _ = []
