@@ -585,6 +585,10 @@ module Html = struct
     let name = "thread_inheritance_graph" in
     let generator fmt = TGDot.fprint_graph fmt graph in
     let tmp_file = generate_dot ~generator name in
+    if not (Mt_options.ConcatDotFilesTo.is_empty ()) then begin
+      let output = Mt_options.ConcatDotFilesTo.get () in
+      append_file ~input:tmp_file ~output ~name
+    end;
     let dot_output_format = "svg" in
     let link_fname = Format.sprintf "%s.%s" name dot_output_format in
     let output_file = Filepath.(default_dir / link_fname) in
