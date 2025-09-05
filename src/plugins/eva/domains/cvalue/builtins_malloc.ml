@@ -15,13 +15,12 @@ open Lattice_bounds
 let dkey = Self.register_category "malloc"
     ~help:"messages from the builtins interpreting dynamic allocations"
 
-let dkey_new = Self.register_category "malloc:new"
+let dkey_new = Self.register_category "malloc:new" ~default:true
     ~help:"messages emitted at the creation of new bases"
-let () = Self.add_debug_keys dkey_new
 
 let dkey_auto_free = Self.register_category "malloc:automatic-free"
+    ~default:true
     ~help:"messages emitted when bases are automatically freed (alloca or VLA)"
-let () = Self.add_debug_keys dkey_auto_free
 
 let _wkey_malloc =
   Self.register_warn_category "malloc"

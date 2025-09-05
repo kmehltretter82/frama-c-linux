@@ -265,12 +265,13 @@ module type Messages = sig
 
   (** {3 Category management} *)
 
-  val register_category: ?help:string -> string -> category
+  val register_category: ?help:string -> ?default:bool -> string -> category
   (** register a new debugging/verbose category.
-      Note: to enable a category's messages by default, add it
-      (e.g. via [add_debug_keys]) after registration.
+      Note: to enable a category's messages by default, pass [~default:true]
+      or add it (e.g. via [add_debug_keys]) after registration.
       @since Fluorine-20130401
       @before 30.0-Zinc [?help] parameter was not present
+      @before Frama-C+dev [?default] parameter was not present
   *)
 
   val pp_category: Format.formatter -> category -> unit
