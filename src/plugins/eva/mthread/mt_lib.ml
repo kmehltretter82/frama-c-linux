@@ -35,54 +35,22 @@ type 'a conversion = [
 ]
 
 
-exception Found of int
-
-let utf8_char_length c =
-  if c < 0x80 then 1
-  else
-    try
-      let mask = ref 0b10000000 in
-      for i = 1 to 8 do
-        mask := !mask lor (1 lsl (8-i));
-        if (c land !mask) = !mask then
-          raise (Found (i+1))
-      done;
-      failwith (Format.sprintf "incorrect utf-8 start %d" c)
-    with Found i -> i
-
-(*if c < 0b11100000 then 2
-  else if c < 0b11110000 then 3
-  else if c < 0b11111000 then 4
-  else if c < 0b11111100 then 5
-  else 6
-*)
-
-exception Escape_non_utf8 of string * int * int
-
 let escape_char c =
-  if c = '"' then "\\\""
-  else Char.escaped c
+  if c = '"' then "\\\"" else Char.escaped c
 
 let escape_non_utf8 s =
-  let s' = Buffer.create (String.length s) in
+  let buffer = Buffer.create (String.length s) in
   let rec aux i =
     if i < String.length s then
-      let c = s.[i] in
-      let utf8 = utf8_char_length (Char.code c) in
-      if utf8 <> 1 then
-        try
-          let sub = String.sub s i utf8 in
-          Buffer.add_string s' sub;
-          aux (i+utf8)
-        with _ -> raise (Escape_non_utf8 (s, i, utf8))
-      else (
-        Buffer.add_string s' (escape_char c);
-        aux (i+1)
-      )
+      let uchar = String.get_utf_8_uchar s i in
+      let len = Uchar.utf_decode_length uchar in
+      if len = 1
+      then escape_char s.[i] |> Buffer.add_string buffer
+      else Uchar.utf_decode_uchar uchar |> Buffer.add_utf_8_uchar buffer;
+      aux (i + len)
   in
   aux 0;
-  Buffer.contents s'
-
+  Buffer.contents buffer
 
 let clear_value_results () =
   Project.clear ~selection:(State_selection.with_dependencies
