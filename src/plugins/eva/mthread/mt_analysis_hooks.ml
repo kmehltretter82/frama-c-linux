@@ -252,11 +252,9 @@ let sync_values analysis state =
   in
   let v = Mt_lib.var_thread_created () in
   let value = Results.(in_cvalue_state state |> eval_var v |> as_cvalue) in
-  match Mt_memory.extract_int value with
-  | Ok 0 ->
-    (* As no thread is running, just skip the synchronization. *)
-    state
-  | _ ->
+  if Cvalue.V.is_zero value then
+    state (* As no thread is running, just skip the synchronization. *)
+  else
     fold_threads analysis state
       (fun th state ->
          match th.th_values_written with

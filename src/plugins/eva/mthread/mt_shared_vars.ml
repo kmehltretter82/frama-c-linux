@@ -353,30 +353,24 @@ let read_written_by_function sm th sa ?(watch_only=Locations.Zone.top) kf ki =
    | Kstmt s -> comp#push_stmt s
   );
   comp#rw_fun kf;
-  comp#accesses;
-;;
+  comp#accesses
+
+let is_multithreaded state_accessor stmt =
+  let exception Stmt_is_multithreaded in
+  let v = Mt_lib.var_thread_created () in
+  let raise_if_non_zero request =
+    let value = Results.(eval_var v request |> as_cvalue) in
+    if Cvalue.V.contains_non_zero value then raise Stmt_is_multithreaded
+  in
+  try iter_requests state_accessor stmt raise_if_non_zero; false
+  with Stmt_is_multithreaded -> true
 
 (* Ad-hoc function that disregards accesses to variables that
    occurs before any thread is created. This simplifies the cfg of threads,
    and increases convergence speed *)
-exception Stmt_is_multithreaded
-let stmt_is_multithreaded analysis sa =
-  let iter_requests = iter_requests sa in
-  let th = analysis.curr_thread in
-  if Thread.is_main th.th_eva_thread then
-    let v = Mt_lib.var_thread_created () in
-    (fun stmt ->
-       try
-         iter_requests stmt (fun request ->
-             let value = Results.(eval_var v request |> as_cvalue) in
-             match Mt_memory.extract_int value with
-             | Ok 0 -> ()
-             | _ -> raise Stmt_is_multithreaded
-           );
-         false
-       with Stmt_is_multithreaded -> true
-    )
-  else (fun _ -> true)
+let stmt_is_multithreaded analysis state_accessor stmt =
+  not (Thread.is_main analysis.curr_thread.th_eva_thread)
+  || is_multithreaded state_accessor stmt
 
 
 (* -------------------------------------------------------------------------- *)
