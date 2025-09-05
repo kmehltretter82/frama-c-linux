@@ -2,8 +2,9 @@
    STDOPT: +" -absolute-valid-range 100-200"
 */
 
-#include "mthread_pthread.h"
-#define NULL ((void*)0)
+#include <stddef.h>
+#include <pthread.h>
+#include <mthread.h>
 
 pthread_t        tjob0, tjob1, tjob2;
 

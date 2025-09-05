@@ -64,7 +64,7 @@ let catch_conversion analysis ~prefix v msg =
   match v with
   | `Success v -> v
   | `Failure w ->
-    warning analysis "@[%s: %s.%t Ignoring.@]" prefix msg w;
+    warning analysis "@[%s: %s. %t Ignoring.@]" prefix msg w;
     hook_fail ()
 
 (* -------------------------------------------------------------------------- *)

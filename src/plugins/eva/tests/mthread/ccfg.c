@@ -5,8 +5,8 @@
 */
 /* This file is used to give an example of a cfg with many features */
 
-#include "mthread_pthread.h"
-#define NULL ((void*)0)
+#include <stddef.h>
+#include <pthread.h>
 
 volatile int nondet;
 int random(void);

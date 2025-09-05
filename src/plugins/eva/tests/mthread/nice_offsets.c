@@ -1,17 +1,16 @@
-#include "mthread_pthread.h"
-#include "mthread_queue.h"
-#define NULL ((void*)0)
+#include <stddef.h>
+#include <pthread.h>
 
 struct s0 {
-  int a0;
-  int b0;
-  int c0;
+  pthread_mutex_t a0;
+  pthread_mutex_t b0;
+  pthread_mutex_t c0;
 };
 
 typedef struct {
-  int a1;
+  pthread_mutex_t a1;
   struct s0 b1[5];
-  int c1;
+  pthread_mutex_t c1;
 } s1;
 
 s1 t[3];

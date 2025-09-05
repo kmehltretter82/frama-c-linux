@@ -1,11 +1,12 @@
 [kernel] Expanding arguments from mthread_test_options.txt
-[kernel] Parsing FRAMAC_SHARE/mt/mthread.h (with preprocessing)
+[mt] Preparing sources for Mthread with lib pthreads
+[kernel] Parsing FRAMAC_SHARE/mt/mthread.c (with preprocessing)
+[kernel] Parsing FRAMAC_SHARE/mt/mthread_pthread.c (with preprocessing)
 [kernel] Parsing messy_init.c (with preprocessing)
-[kernel] Parsing FRAMAC_SHARE/mthread_pthread.c (with preprocessing)
-[kernel] Parsing FRAMAC_SHARE/mthread_queue.c (with preprocessing)
 [mt] Warning: Mthread is an experimental plugin and is still in development.
 [mt] ******* Starting mthread
 [mt] *** Computing value analysis for main thread
+[eva] Found concurrency builtins: enabling mthread domain
 [eva] Analyzing a complete application starting at main
 [mt] New thread: <main>, fun main
 [kernel:annot:missing-spec] messy_init.c:15: Warning: 
@@ -44,13 +45,13 @@
 [mt] messy_init.c:10: Warning: 
   Trying to lock mutex lock, but unable to check its precise status (internal value {0; 1} should be 1).
 [mt] messy_init.c:10: Lock lock
-[eva] FRAMAC_SHARE/mthread_pthread.c:42: Warning: Not a valid mutex id '0'.
+[eva] FRAMAC_SHARE/mt/mthread_pthread.c:46: Warning: Not a valid mutex id '0'.
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   lock:
-    read by job at FRAMAC_SHARE/mthread_pthread.c:42 <-
+    read by job at FRAMAC_SHARE/mt/mthread_pthread.c:46 <-
       pthread_mutex_lock :: messy_init.c:10 <- fjob
 [mt] * shared variables computed
 [eva:interferences] 

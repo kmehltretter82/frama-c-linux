@@ -4,8 +4,8 @@
 */
 /* This file tests a major degeneration during the value analysis, where
    the whole memory is accessed. */
-#include "mthread_pthread.h"
-#define NULL ((void*)0)
+#include <stddef.h>
+#include <pthread.h>
 
 pthread_t        jobs;
 int random(void);

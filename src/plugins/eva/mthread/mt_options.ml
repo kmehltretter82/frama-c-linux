@@ -64,6 +64,23 @@ module ToDiskPrefix =
 
 
 let () = Parameter_customize.set_group grp_analysis
+module ThreadsLib =
+  Enum
+    (struct
+      type t = Mt_lib.threads_lib
+      let option_name = "-mt-threads-lib"
+      let help = "Select which threading library is stubbed by MThread. \
+                  Defaults to \"builtins-only\"."
+      let default = Mt_lib.BuiltinsOnly
+      let values = [
+        (Mt_lib.BuiltinsOnly, "builtins-only");
+        (Mt_lib.Pthreads, "pthreads");
+      ]
+    end)
+
+
+
+let () = Parameter_customize.set_group grp_analysis
 module WriteWriteRaces =
   False (struct
     let option_name = "-mt-write-races"
@@ -93,7 +110,7 @@ module CheckProtections =
 let () = Parameter_customize.set_group grp_analysis
 module InterruptHandlers =
   Kernel_function_set (struct
-    let option_name = "-mt-interrupt-handlers"
+    let option_name = "-mt-interrupt-handlers" (* if modified, update name in mt_domain.ml *)
     let arg_name = "functions"
     let help = "Specify functions that will be treated as handlers for \
                 interrupts."

@@ -1,5 +1,5 @@
-#include "mthread_pthread.h"
-#define NULL ((void*)0)
+#include <stddef.h>
+#include <pthread.h>
 
 volatile int v;
 int a, c;

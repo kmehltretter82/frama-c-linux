@@ -4,8 +4,8 @@
    STDOPT: +"-main main_thread_loop"
 */
 
-#include "mthread_pthread.h"
-#define NULL ((void*)0)
+#include <stddef.h>
+#include <pthread.h>
 
 volatile int nondet;
 int shared_a, shared_b, shared_c;

@@ -1,7 +1,7 @@
 /* This example tests concurrent accesses to different array cells */
 
-#include "mthread_pthread.h"
-#define NULL ((void*)0)
+#include <stddef.h>
+#include <pthread.h>
 #define N 5
 
 char t[5];

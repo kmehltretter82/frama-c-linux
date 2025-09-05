@@ -24,16 +24,13 @@ clean:
 	$(RM) *.pdf
 	$(RM) -r html_summary
 
-MT_PTHREAD = ${MTSHARE}/mthread_pthread.c
 MT_QUEUE = ${MTSHARE}/mthread_queue.c
 
 MT_COMMON_FLAGS = \
   -mthread \
-	-eva-domains mthread \
-  -cpp-extra-args="-I${MTSHARE}" \
+	-mt-threads-lib pthreads \
 	-eva-verbose 0 \
 	-add-symbolic-path=${MTSHARE}:MTSHARE \
-	${MT_PTHREAD} \
 
 
 %.log: SOURCE = $(word 1,$(subst ., ,$*)).c

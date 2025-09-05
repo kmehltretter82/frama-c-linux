@@ -6,15 +6,14 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef _FRAMAC_QUEUE_H_
-#define _FRAMAC_QUEUE_H_
+#include <features.h>
 
-#include <mthread.h>
-
-typedef __fc_mthread_id msgqueue_t;
-
-int queuecreate(msgqueue_t *q, int size);
-int msgsnd(msgqueue_t msgqid, const char *mess, int size);
-int msgrcv(msgqueue_t msgqid, int size, char *mess);
-
+#ifndef MTHREAD_NUMBER_IDS
+#define MTHREAD_NUMBER_IDS 32
 #endif
+
+__FC_INTERN int __fc_mthread_threads_running = 0;
+
+__FC_INTERN int __fc_mthread_threads[MTHREAD_NUMBER_IDS];
+__FC_INTERN int __fc_mthread_mutexes[MTHREAD_NUMBER_IDS];
+__FC_INTERN int __fc_mthread_queues[MTHREAD_NUMBER_IDS];

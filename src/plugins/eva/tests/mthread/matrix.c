@@ -1,6 +1,5 @@
-#include "mthread_pthread.h"
-#include "mthread_queue.h"
-#define NULL ((void*)0)
+#include <stddef.h>
+#include <pthread.h>
 #define N 5
 #define M 6
 #define K 100

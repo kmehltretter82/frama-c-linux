@@ -503,26 +503,31 @@ module Domain = struct
 
   (* Registration of a leaf or functor domain. *)
   let register_domain
-      ~name ~descr ?(experimental=false) ?(priority=0) abstraction =
+      ~name ~descr ?(experimental=false) ?(priority=0)
+      ?(auto_enable=fun () -> false)
+      abstraction =
     register_domain_option ~name ~descr ~experimental ;
     let registered = { name ; experimental ; priority ; abstraction } in
-    static_domains := registered :: !static_domains ;
+    static_domains := (registered, auto_enable) :: !static_domains ;
     registered
 
   (* Registration of a leaf domain. *)
-  let register ~name ~descr ?experimental ?priority domain =
-    register_domain ~name ~descr ?experimental ?priority (Domain domain)
+  let register ~name ~descr ?experimental ?priority ?auto_enable domain =
+    register_domain ~name ~descr ?experimental ?priority ?auto_enable
+      (Domain domain)
 
   (* Registration of a functor domain. *)
-  let register_functor ~name ~descr ?experimental ?priority domain =
-    register_domain ~name ~descr ?experimental ?priority (Functor domain)
+  let register_functor ~name ~descr ?experimental ?priority ?auto_enable domain =
+    register_domain ~name ~descr ?experimental ?priority ?auto_enable
+      (Functor domain)
 
   (* Registration of a dynamic domain. *)
-  let dynamic_register ~name ~descr ?(experimental=false) ?(priority=0) make =
+  let dynamic_register ~name ~descr ?(experimental=false) ?(priority=0)
+      ?(auto_enable=fun () -> false) make =
     register_domain_option ~name ~descr ~experimental ;
     let make () = Domain (make ()) in
     let make () = { name ; experimental ; priority ; abstraction = make () } in
-    dynamic_domains := (name, make) :: !dynamic_domains
+    dynamic_domains := (name, auto_enable, make) :: !dynamic_domains
 
 
   (* Building the domain abstraction consists of structuring the requested
@@ -794,14 +799,20 @@ module Config = struct
     let find name = try Some (find name) with Not_found -> None in
     let main () = Globals.entry_point () |> fst in
     let add_main_mode modes = (main (), Domain_mode.Mode.all) :: modes in
-    let dynamic (name, make) config =
+    let dynamic (name, auto_enable, make) config =
+      if not (Parameters.Domains.mem name) && auto_enable () then
+        (* Add the auto-enabled domain to the options so that it appears
+           enabled in the GUI. *)
+        Parameters.Domains.add name;
       let enabled = Parameters.Domains.mem name in
       let enable modes = if enabled then add_main_mode modes else modes in
       match find name with
       | None -> if enabled then add (make (), None) config else config
       | Some modes -> add (make (), Some (enable modes)) config
     in
-    let static d = dynamic (d.Domain.name, fun () -> d) in
+    let static (d, auto_enable) =
+      dynamic (d.Domain.name, auto_enable, fun () -> d)
+    in
     let fold f xs acc = List.fold_left (fun acc x -> f x acc) acc xs in
     fold static !Domain.static_domains empty |>
     fold dynamic !Domain.dynamic_domains

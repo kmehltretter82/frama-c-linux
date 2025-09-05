@@ -219,6 +219,7 @@ module Transfer = struct
   type builtin =
     pos:Position.local -> t -> (Value.t * exp) list -> (t * Value.t) Result.t
   let builtins : builtin Builtins.t = Builtins.create 17
+  let mem_builtin name = Builtins.mem builtins name
   let find_builtin name = Builtins.find_opt builtins name
   let add_builtin name f = Builtins.add builtins name f
 
@@ -387,8 +388,34 @@ module Domain = struct
   let () = add_builtin "Frama_C_mutex_unlock" mutex_unlock
 end
 
+let have_builtins_in_globals () =
+  let is_builtin kf = Domain.mem_builtin (Kernel_function.get_name kf) in
+  Globals.Functions.fold (fun kf acc -> acc || is_builtin kf) false
+
+let have_interrupt_handlers () =
+  if Plugin.is_present "mt" then
+    (* TODO: when -mt-interrupt-handlers becomes an Eva option, use it directly
+       instead of using Dynamic.*)
+    let opt_name = "-mt-interrupt-handlers" in
+    let p =  Dynamic.Parameter.get_parameter opt_name in
+    p.is_set ()
+  else
+    false
+
 let domain =
   let name = "mthread" in
   let descr = "Mthread domain" in
   let experimental = true in
-  Abstractions.Domain.register ~name ~descr ~experimental (module Domain)
+  let auto_enable () =
+    (* TODO: When the options of Mthread are merged with Eva options, reassess
+       how the domain should be enabled (only automatic detection, only specific
+       option, mix of automatic and option with auto,true,false for instance).
+       In any case it should be possible to explicitely deactivate the domain.*)
+    let enable = have_builtins_in_globals () || have_interrupt_handlers () in
+    if enable then
+      Self.feedback ~once:true
+        "Found concurrency builtins: enabling mthread domain";
+    enable
+  in
+  Abstractions.Domain.register ~name ~descr ~experimental ~auto_enable
+    (module Domain)

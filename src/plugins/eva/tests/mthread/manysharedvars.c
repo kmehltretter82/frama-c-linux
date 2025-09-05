@@ -6,8 +6,8 @@
 /* This example tests the behavior of Mthread with many shared vars,
    here an array with a medium number of cells. */
 
-#include "mthread_pthread.h"
-#define NULL ((void*)0)
+#include <stddef.h>
+#include <pthread.h>
 #define N 128
 
 struct pair {

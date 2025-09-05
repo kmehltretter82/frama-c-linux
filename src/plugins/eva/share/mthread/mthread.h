@@ -13,17 +13,7 @@ __PUSH_FC_STDLIB
 
 __BEGIN_DECLS
 
-#ifndef MTHREAD_NUMBER_IDS
-#define MTHREAD_NUMBER_IDS 32
-#endif
-
 __FC_EXTERN int __fc_mthread_shared;
-
-__FC_INTERN int __fc_mthread_threads_running = 0;
-
-__FC_INTERN int __fc_mthread_threads[MTHREAD_NUMBER_IDS];
-__FC_INTERN int __fc_mthread_mutexes[MTHREAD_NUMBER_IDS];
-__FC_INTERN int __fc_mthread_queues[MTHREAD_NUMBER_IDS];
 
 typedef void *__fc_mthread_name;
 
