@@ -688,7 +688,7 @@ module Html = struct
                         @{<html>@ \
                         @{<head>@ \
                         @{<title>%s@}@ \
-                        <meta content=\"text/html; charset=iso-8859-1\" \
+                        <meta content=\"text/html; charset=utf-8\" \
                         http-equiv=\"Content-Type\">@ \
                         @{<style type=\"text/css\">%s@}@}@ \
                         @{<body>@ %s@ \
