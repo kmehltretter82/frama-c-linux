@@ -90,13 +90,17 @@ val lval_from_pointer: pointer -> lval
 
 (** {1 Conversion to and from Mthread world to the value analysis} *)
 
-val extract_fun : value -> kernel_function Mt_lib.conversion
-val extract_pointer : value -> pointer Mt_lib.conversion
-val extract_int : value -> int Mt_lib.conversion
-val extract_int_possibly_zero :
-  value -> (int * [`Exact | `WithZero]) Mt_lib.conversion
-val extract_constant_string : value -> string Mt_lib.conversion
-val extract_non_wide_string : Base.cstring -> string Mt_lib.conversion
+type 'a conversion = [
+  | `Success of 'a
+  | `Failure of (Format.formatter -> unit)
+]
+
+val extract_fun : value -> kernel_function conversion
+val extract_pointer : value -> pointer conversion
+val extract_int : value -> int conversion
+val extract_int_possibly_zero : value -> (int * [`Exact | `WithZero]) conversion
+val extract_constant_string : value -> string conversion
+val extract_non_wide_string : Base.cstring -> string conversion
 
 
 val int_to_value: int -> value

@@ -44,7 +44,7 @@ let read_id_state state raw_id =
   let p = pointer_of_id raw_id in
   Mt_memory.read_int_pointer p state
 
-let read_id_state_enumerate card state raw_id : _ Mt_lib.conversion =
+let read_id_state_enumerate card state raw_id : _ Mt_memory.conversion =
   let value = read_id_state state raw_id in
   let failure fmt = Format.fprintf fmt "Id %a contains garbled state %a"
       pretty_raw_id raw_id Cvalue.V.pretty value

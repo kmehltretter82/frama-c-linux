@@ -7,18 +7,6 @@
 (**************************************************************************)
 
 
-(** Conversion from something into something else. Returns a formatter that
-    prints the error in case of failure *)
-type 'a conversion_with_warning = [
-  | `Success of 'a
-  | `WithWarning of (Format.formatter -> unit) * 'a
-]
-
-type 'a conversion = [
-  | `Success of 'a
-  | `Failure of (Format.formatter -> unit)
-]
-
 val escape_non_utf8: string -> string
 
 

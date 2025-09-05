@@ -10,6 +10,12 @@ open Cil_types
 open Mt_cil
 open Mt_memory.Types
 
+(** Conversion from something into something else. Returns a formatter that
+    prints the error in case of failure *)
+type 'a conversion_with_warning = [
+  | `Success of 'a
+  | `WithWarning of (Format.formatter -> unit) * 'a
+]
 
 (** Kind of access to zones *)
 

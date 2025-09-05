@@ -10,16 +10,6 @@
 (* --- Misc                                                               --- *)
 (* -------------------------------------------------------------------------- *)
 
-type 'a conversion_with_warning = [
-  | `Success of 'a
-  | `WithWarning of (Format.formatter -> unit) * 'a
-]
-
-type 'a conversion = [
-  | `Success of 'a
-  | `Failure of (Format.formatter -> unit)
-]
-
 
 let escape_char c =
   if c = '"' then "\\\"" else Char.escaped c

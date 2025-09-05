@@ -73,6 +73,8 @@ type node_value_state = {
   state_after: state;
 }
 
+
+
 module NodeValueState: sig
   type t = node_value_state
 
@@ -80,9 +82,9 @@ module NodeValueState: sig
 
   val threads_presence:
     [> `NotStarted | `Prior | `Started | `MaybeStarted]
-    -> Thread.t -> state -> presence_flag Mt_lib.conversion_with_warning
+    -> Thread.t -> state -> presence_flag conversion_with_warning
 
-  val mutex_presence: Mutex.t -> state -> presence_flag Mt_lib.conversion_with_warning
+  val mutex_presence: Mutex.t -> state -> presence_flag conversion_with_warning
 
 end
 

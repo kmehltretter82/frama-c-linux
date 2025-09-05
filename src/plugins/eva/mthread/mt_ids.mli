@@ -13,7 +13,7 @@ val pretty_raw_id : Format.formatter -> raw_id -> unit
 
 val read_id_state : Mt_memory.Types.state -> raw_id -> Mt_memory.Types.value
 val read_id_state_enumerate :
-  int -> Mt_memory.Types.state -> raw_id -> int list Mt_lib.conversion
+  int -> Mt_memory.Types.state -> raw_id -> int list Mt_memory.conversion
 val write_id_state :
   Mt_memory.Types.state -> raw_id -> int -> Mt_memory.Types.state
 val replace_id_value :
