@@ -106,13 +106,15 @@ module Html = struct
   let mk_html_page title name =
     let b, fmt = Utilities.mk_buffer_formatter () in
     { page_title = title;
-      page_name = name;
+      page_name = Eva_utils.sanitize_filename name;
       page_buffer = b;
       page_fmt = fmt;
     }
   ;;
 
-  let html_fname html_page = escape html_page.page_name ^ ".html";;
+  (** [html_fname page_name] returns the page [page_name.html] encoded to be
+      used in an HTML URL. *)
+  let html_fname html_page = Extlib.percent_encode html_page.page_name ^ ".html"
 
 
   type html_div = {
@@ -783,7 +785,7 @@ module Html = struct
            Format.asprintf "%a" ThreadState.pretty th in
          let html_page = mk_html_page
              (Format.asprintf "Summary for thread %s" thread_name)
-             (Format.asprintf "%a" ThreadState.pretty th) in
+             thread_name in
          add_page th.th_eva_thread html_page;
          Format.pp_set_formatter_stag_functions
            html_page.page_fmt html_stag_functions;
