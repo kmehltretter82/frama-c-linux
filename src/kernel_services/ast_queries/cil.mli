@@ -251,15 +251,19 @@ val missingFieldName: string
 (** Get the full name of a comp, including the 'struct' or 'union' prefix *)
 val compFullName: compinfo -> string
 
-(** Returns true if this is a complete type.
-    This means that sizeof(t) makes sense.
-    Incomplete types are not yet defined
-    structures and empty arrays.
+(** Returns true if this is a complete type. This means that sizeof(t) makes
+    sense. Incomplete types are not yet defined structures and empty arrays.
     @param allowZeroSizeArrays indicates whether arrays of
     size 0 (a gcc extension) are considered as complete. Default value
     depends on the current machdep.
+    @param last_field indicates if it is the last element of a struct
+    or not part of an aggregate. Useful for arrays without size in
+    the square brackets. Unless you know what you are doing, this parameter
+    should always left untouched. Default value: [false].
+    @before Frama-C+dev [last_field] was not exposed and always [false] when
+    using this function
 *)
-val isCompleteType: ?allowZeroSizeArrays:bool -> typ -> bool
+val isCompleteType: ?allowZeroSizeArrays:bool -> ?last_field:bool -> typ -> bool
 
 (** Performs lvalue-conversion on the type and returns the converted type,
     or Error if the type is incomplete and not an array type.
