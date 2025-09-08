@@ -215,6 +215,7 @@ val strip_underscore: string -> string
     @since Frama-C+dev *)
 val escape_non_utf8: string -> string
 
+(** Escape string for use in HTML tag. *)
 val html_escape: string -> string
 
 (** [percent_encode s] returns the string [s] encoded so that it can be used
