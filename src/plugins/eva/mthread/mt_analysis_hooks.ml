@@ -71,29 +71,20 @@ let catch_conversion analysis ~prefix v msg =
 (* --- Specialization of id function                                          *)
 (* -------------------------------------------------------------------------- *)
 
-let find_failure kind id =
-  let error =
-    Format.sprintf
-      "Id %d for %s does not exists (incrementation inside program?)."
-      id kind
-  in
-  Error error
+let find_id kind find id =
+  match find id with
+  | Some elt -> Ok elt
+  | None ->
+    let error =
+      Format.sprintf
+        "Id %d for %s does not exists (incrementation inside program?)."
+        id kind
+    in
+    Error error
 
-let find_thread id =
-  match Thread.find id with
-  | Some th -> Ok th
-  | None -> find_failure "thread" id
-
-let find_mutex id =
-  match Mutex.find id with
-  | Some m -> Ok m
-  | None -> find_failure "mutex" id
-
-let find_queue id =
-  match Mqueue.find id with
-  | Some q -> Ok q
-  | None -> find_failure "queue" id
-
+let find_thread = find_id "thread" Thread.find
+let find_mutex = find_id "mutex" Mutex.find
+let find_queue = find_id "queue" Mqueue.find
 
 (* -------------------------------------------------------------------------- *)
 (* --- Constants written in memory to store states                        --- *)
