@@ -72,7 +72,7 @@ module Html = struct
   let mk_html_page title name =
     let b, fmt = Utilities.mk_buffer_formatter () in
     { page_title = title;
-      page_name = Eva_utils.sanitize_filename name;
+      page_name = Filepath.sanitize_filename name;
       page_buffer = b;
       page_fmt = fmt;
     }
@@ -491,7 +491,7 @@ module Html = struct
     let unicode = suspend_unicode () in
     let f_stmt s = Format.sprintf "code.html#%s" (stmt_link s) in
     let thread_name = Thread.label th.th_eva_thread in
-    let filename = Eva_utils.sanitize_filename thread_name in
+    let filename = Filepath.sanitize_filename thread_name in
     let generator fmt = Mt_cfg.dot_fprint_graph fmt th.th_cfg f_stmt in
     let tmp_file = generate_dot ~generator filename in
     if not (Mt_options.ConcatDotFilesTo.is_empty ()) then begin
@@ -535,10 +535,10 @@ module Html = struct
         (* Surround name with double-quotes so that we can use UTF-8 and other
            special characters apart from double quotes. [escape_non_utf8] is
            used so that double quote are escaped. *)
-        Format.asprintf "\"%s\"" (Eva_utils.escape_non_utf8 s)
+        Format.asprintf "\"%s\"" (Extlib.escape_non_utf8 s)
       let vertex_attributes v =
         let s = Format.asprintf "%a" Thread.pretty v in
-        [ `Label (Eva_utils.escape_non_utf8 s)]
+        [ `Label (Extlib.escape_non_utf8 s)]
       let get_subgraph _ = None
       let default_edge_attributes _ = [`Style(`Solid);]
       let edge_attributes _ = []

@@ -164,39 +164,3 @@ let skip_specifications kf =
   Parameters.SkipLibcSpecs.get () &&
   Kernel_function.is_definition kf &&
   Cil.is_in_libc (Kernel_function.get_vi kf).vattr
-
-
-(* ----- String and filename ------------------------------------------------ *)
-
-let escape_char c =
-  if c = '"' then "\\\"" else Char.escaped c
-
-let escape_non_utf8 s =
-  let buffer = Buffer.create (String.length s) in
-  let rec aux i =
-    if i < String.length s then
-      let uchar = String.get_utf_8_uchar s i in
-      let len = Uchar.utf_decode_length uchar in
-      if len = 1
-      then escape_char s.[i] |> Buffer.add_string buffer
-      else Uchar.utf_decode_uchar uchar |> Buffer.add_utf_8_uchar buffer;
-      aux (i + len)
-  in
-  aux 0;
-  Buffer.contents buffer
-
-let sanitize_filename s =
-  (* Invalid characters for different OSes taken from
-     <https://stackoverflow.com/a/31976060> *)
-  let is_invalid = function
-    (* Unix limitations *)
-    | '/' -> true
-    | c when Char.code c = 0 -> true
-    (* Additional MacOS limitations *)
-    | ':' -> true
-    (* Additional Windows limitations *)
-    | '<' | '>' | '"' | '\\' | '|' | '?' | '*' -> true
-    | c when Char.code c > 0 && Char.code c <= 31 -> true
-    | _ -> false
-  in
-  String.map (fun c -> if is_invalid c then '_' else c) s

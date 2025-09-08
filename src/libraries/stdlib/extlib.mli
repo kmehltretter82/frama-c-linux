@@ -210,6 +210,11 @@ val strip_underscore: string -> string
     @since 18.0-Argon
 *)
 
+(** Same as [String.escaped], but avoid escaping UTF8 characters encoded on
+    several chars.
+    @since Frama-C+dev *)
+val escape_non_utf8: string -> string
+
 val html_escape: string -> string
 
 (** [percent_encode s] returns the string [s] encoded so that it can be used

@@ -53,7 +53,7 @@ let record_end_of_thread_analysis analysis =
   th.th_value_results <- Some results;
 
   if Mt_options.ToDisk.get () then
-    let th = ThreadState.label th |> Eva_utils.sanitize_filename in
+    let th = ThreadState.label th |> Filepath.sanitize_filename in
     let name = Format.sprintf "%s%s_iteration_%d.sav"
         (Mt_options.ToDiskPrefix.get ())
         th analysis.iteration in

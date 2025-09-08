@@ -188,6 +188,13 @@ val chop_suffix: t -> string -> t
     @before 31.0-Gallium named argument was [base_name] *)
 val is_relative: ?base:t -> t -> bool
 
+(** [sanitize_filename name] returns the given filename with every
+    character not allowed as filename replaced with _. Note that this
+    function takes a file {i name} so path separators like / and \ are
+    replaced.
+
+    @since Frama-C+dev *)
+val sanitize_filename: string -> string
 
 (* ************************************************************************* *)
 (** {2 Current working directory} *)
