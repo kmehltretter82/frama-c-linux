@@ -7,7 +7,7 @@
 (**************************************************************************)
 
 (** Checks if the given name is the name of a Frama-C builtin *)
-val is_frama_c_builtin : string -> bool
+val is_frama_c_builtin : Cil_types.varinfo -> bool
 
 (** Checks if the given name is the name of one of the variadic va_* builtins *)
 val is_va_builtin : string -> bool

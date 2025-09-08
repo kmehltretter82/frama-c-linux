@@ -28,7 +28,7 @@
 [mt] ccfg.c:90: Start thread job_f2
 [mt] ccfg.c:92: Lock lock
 [mt] ccfg.c:95: Release lock
-[mt] Monitored event: main event without argument {{ &__va_args }}
+[mt] Monitored event: main event without argument
 [mt] Warning: During unknown event: invalid event name. When decoding string, incorrect value '{{ &event }}'. Ignoring.
 [mt] *** First value analysis for main thread done.
 [mt] * Starting to save the state of the value analysis
@@ -163,7 +163,7 @@
   inject threads interferences at the start of f1 for thread job_f1
 [mt] ccfg.c:54: Lock lock
 [eva] using specification for function g3
-[mt] Monitored event: custom event {{ &__va_args }}
+[mt] Monitored event: custom event {0} [-2147483648..2147483647] {1}
 [mt] ccfg.c:57: Release lock
 [eva] using specification for function g5
 [mt] * Starting to save the state of the value analysis
@@ -202,7 +202,7 @@
   inject threads interferences at the start of f2 for thread job_f2
 [mt] ccfg.c:64: Lock lock
 [eva] using specification for function g4
-[mt] Monitored event: other custom event {{ &__va_args }}
+[mt] Monitored event: other custom event {0} {1} [-2147483648..2147483647]
 [mt] ccfg.c:67: Release lock
 [eva] using specification for function g5
 [mt] * Starting to save the state of the value analysis
@@ -270,7 +270,7 @@
 [mt] ccfg.c:90: Start thread job_f2
 [mt] ccfg.c:92: Lock lock
 [mt] ccfg.c:95: Release lock
-[mt] Monitored event: main event without argument {{ &__va_args }}
+[mt] Monitored event: main event without argument
 [mt] Warning: During unknown event: invalid event name. When decoding string, incorrect value '{{ &event }}'. Ignoring.
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
@@ -527,7 +527,7 @@
 [eva] using specification for function g3
 [eva:interferences] ccfg.c:55: inject threads interferences at this point
 [eva:interferences] ccfg.c:56: inject threads interferences at this point
-[mt] Monitored event: custom event {{ &__va_args }}
+[mt] Monitored event: custom event {0} [-2147483648..2147483647] {0; 1}
 [mt] ccfg.c:57: Release lock
 [eva] using specification for function g5
 [eva:interferences] ccfg.c:58: inject threads interferences at this point
@@ -630,7 +630,8 @@
 [eva] using specification for function g4
 [eva:interferences] ccfg.c:65: inject threads interferences at this point
 [eva:interferences] ccfg.c:66: inject threads interferences at this point
-[mt] Monitored event: other custom event {{ &__va_args }}
+[mt] Monitored event: other custom event {0} [-2147483648..2147483647]
+                                      [-2147483648..2147483647]
 [mt] ccfg.c:67: Release lock
 [eva] using specification for function g5
 [eva:interferences] ccfg.c:68: inject threads interferences at this point
@@ -929,7 +930,7 @@
 [eva:interferences] ccfg.c:98: inject threads interferences at this point
 [eva:alarm] ccfg.c:99: Warning: signed overflow. assert sum + f ≤ 2147483647;
 [eva:interferences] ccfg.c:99: inject threads interferences at this point
-[mt] Monitored event: main event without argument {{ &__va_args }}
+[mt] Monitored event: main event without argument
 [mt] Warning: During unknown event: invalid event name. When decoding string, incorrect value '{{ &event }}'. Ignoring.
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
@@ -1190,7 +1191,8 @@
 [eva] using specification for function g3
 [eva:interferences] ccfg.c:55: inject threads interferences at this point
 [eva:interferences] ccfg.c:56: inject threads interferences at this point
-[mt] Monitored event: custom event {{ &__va_args }}
+[mt] Monitored event: custom event {0} [-2147483648..2147483647]
+                                [-2147483648..2147483647]
 [mt] ccfg.c:57: Release lock
 [eva] using specification for function g5
 [eva:interferences] ccfg.c:58: inject threads interferences at this point
@@ -1294,7 +1296,8 @@
 [eva] using specification for function g4
 [eva:interferences] ccfg.c:65: inject threads interferences at this point
 [eva:interferences] ccfg.c:66: inject threads interferences at this point
-[mt] Monitored event: other custom event {{ &__va_args }}
+[mt] Monitored event: other custom event {0} [-2147483648..2147483647]
+                                      [-2147483648..2147483647]
 [mt] ccfg.c:67: Release lock
 [eva] using specification for function g5
 [eva:interferences] ccfg.c:68: inject threads interferences at this point
@@ -1583,7 +1586,7 @@
 [eva:interferences] ccfg.c:98: inject threads interferences at this point
 [eva:alarm] ccfg.c:99: Warning: signed overflow. assert sum + f ≤ 2147483647;
 [eva:interferences] ccfg.c:99: inject threads interferences at this point
-[mt] Monitored event: main event without argument {{ &__va_args }}
+[mt] Monitored event: main event without argument
 [mt] Warning: During unknown event: invalid event name. When decoding string, incorrect value '{{ &event }}'. Ignoring.
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
@@ -1835,7 +1838,8 @@
 [eva] using specification for function g3
 [eva:interferences] ccfg.c:55: inject threads interferences at this point
 [eva:interferences] ccfg.c:56: inject threads interferences at this point
-[mt] Monitored event: custom event {{ &__va_args }}
+[mt] Monitored event: custom event {0} [-2147483648..2147483647]
+                                [-2147483648..2147483647]
 [mt] ccfg.c:57: Release lock
 [eva] using specification for function g5
 [eva:interferences] ccfg.c:58: inject threads interferences at this point
