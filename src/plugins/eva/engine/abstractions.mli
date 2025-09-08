@@ -37,7 +37,7 @@ module Domain : sig
   val dynamic_register :
     name:string -> descr:string ->
     ?experimental:bool -> ?priority:int -> ?auto_enable:(unit -> bool) ->
-    (unit -> (module Abstract_domain.Leaf)) -> unit
+    (unit -> (module Abstract_domain.Leaf)) -> registered
 
   module type Context = Abstract.Context.External
   module type Value = Abstract.Value.External

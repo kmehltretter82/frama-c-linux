@@ -479,55 +479,52 @@ module Domain = struct
     | Domain : (module Abstract_domain.Leaf) -> domain
     | Functor : (module Functor) -> domain
 
-  (* Registered domain are saved in mutable lists along with their information:
-     name, experimental status and priority. *)
-  type registered =
+  (* Information about a domain: name, experimental status and priority rank. *)
+  type domain_info =
     { name : string
     ; experimental : bool
     ; priority : int
-    ; abstraction : domain
+    }
+
+  (* A registered domain: the domain information, a function that builds
+     the domain, and a condition which automatically enables the domain. *)
+  type registered =
+    { info : domain_info
+    ; domain : unit -> domain
+    ; auto_enable : unit -> bool
     }
 
   (* The configuration of an analysis contains a set of registered domains
      along with their analysis mode. *)
   type registered_with_mode = registered * Domain_mode.t option
 
-  (* Mutable lists containing statically and dynamically registered domains. *)
-  let static_domains = ref []
-  let dynamic_domains = ref []
+  (* Mutable list containing statically and dynamically registered domains. *)
+  let domains_list = ref []
 
-  (* Helper function used to register the parameters of a domain. *)
-  let register_domain_option ~name ~experimental ~descr =
-    let descr = if experimental then "Experimental. " ^ descr else descr in
-    Parameters.register_domain ~name ~descr
-
-  (* Registration of a leaf or functor domain. *)
   let register_domain
-      ~name ~descr ?(experimental=false) ?(priority=0)
-      ?(auto_enable=fun () -> false)
-      abstraction =
-    register_domain_option ~name ~descr ~experimental ;
-    let registered = { name ; experimental ; priority ; abstraction } in
-    static_domains := (registered, auto_enable) :: !static_domains ;
+      ?(experimental=false) ?(priority=0) ?(auto_enable=fun () -> false)
+      ~name ~descr domain =
+    let descr = if experimental then "Experimental. " ^ descr else descr in
+    Parameters.register_domain ~name ~descr;
+    let info = { name ; experimental ; priority } in
+    let registered = { info ; domain ; auto_enable } in
+    domains_list := registered :: !domains_list;
     registered
 
   (* Registration of a leaf domain. *)
   let register ~name ~descr ?experimental ?priority ?auto_enable domain =
     register_domain ~name ~descr ?experimental ?priority ?auto_enable
-      (Domain domain)
+      (fun () -> Domain domain)
 
   (* Registration of a functor domain. *)
   let register_functor ~name ~descr ?experimental ?priority ?auto_enable domain =
     register_domain ~name ~descr ?experimental ?priority ?auto_enable
-      (Functor domain)
+      (fun () -> Functor domain)
 
   (* Registration of a dynamic domain. *)
-  let dynamic_register ~name ~descr ?(experimental=false) ?(priority=0)
-      ?(auto_enable=fun () -> false) make =
-    register_domain_option ~name ~descr ~experimental ;
-    let make () = Domain (make ()) in
-    let make () = { name ; experimental ; priority ; abstraction = make () } in
-    dynamic_domains := (name, auto_enable, make) :: !dynamic_domains
+  let dynamic_register ~name ~descr ?experimental ?priority ?auto_enable make =
+    register_domain ~name ~descr ?experimental ?priority ?auto_enable
+      (fun () -> Domain (make ()))
 
 
   (* Building the domain abstraction consists of structuring the requested
@@ -635,17 +632,17 @@ module Domain = struct
   (* Adding a registered domain into a structured one consists of performing a
      lifting of the registered one if needed before performing the product,
      configuring the name and restricting the domain depending of the mode. *)
-  type input = registered_with_mode
-  type ('c, 'v, 'l) add = input -> ('c, 'v, 'l) structured identity
-  let add : type c v l. (c, v, l) add = fun (registered, mode) structured ->
+  type input = domain_info * domain * Domain_mode.t option
+  let add : type c v l. input -> (c, v, l) structured identity =
+    fun (info, domain, mode) structured ->
     let wkey = Self.wkey_experimental in
-    let { experimental = exp ; name } = registered in
-    if exp then Self.warning ~wkey "The %s domain is experimental." name ;
+    if info.experimental
+    then Self.warning ~wkey "The %s domain is experimental." info.name;
     let module Ctx = (val context structured) in
     let module Val = (val value structured) in
     let module Loc = (val location structured) in
     let lifted : (c, v, l) structured_domain =
-      match registered.abstraction with
+      match domain with
       | Functor (module Functor) ->
         let locs = Location.outline Functor.location_dependencies in
         let eq_loc = Location.dec_eq locs Loc.structure in
@@ -698,7 +695,7 @@ module Domain = struct
                (val ctx_converter) (val val_converter) (val loc_converter))
     in
     (* Take -eva-no-results-domain into account for this domain. *)
-    let lifted = use_no_results registered.name lifted in
+    let lifted = use_no_results info.name lifted in
     (* Restricts the domain according to [mode]. *)
     let restricted : (c, v, l) structured_domain =
       match mode with
@@ -729,9 +726,9 @@ module Domain = struct
 
 
 
-  let add_contexts contexts (registered, _mode) =
+  let add_contexts contexts (_info, domain, _mode) =
     let add_context = Context.{ folder = add } in
-    match registered.abstraction with
+    match domain with
     | Domain (module Domain) ->
       Context.fold add_context Domain.context_dependencies contexts |>
       Value.fold_contexts add_context Domain.value_dependencies |>
@@ -739,22 +736,24 @@ module Domain = struct
     | Functor (module F) ->
       Location.fold_contexts add_context F.location_dependencies contexts
 
-  let add_values values (registered, _) =
+  let add_values values (_info, domain, _mode) =
     let add_value = Value.{ folder = add } in
-    match registered.abstraction with
+    match domain with
     | Domain (module Domain) ->
       Value.fold add_value Domain.value_dependencies values |>
       Location.fold_values add_value Domain.location_dependencies
     | Functor (module F) ->
       Location.fold_values add_value F.location_dependencies values
 
-  let add_locations locs (registered, _) =
+  let add_locations locs (_info, domain, _mode) =
     let add = Location.{ folder = add } in
-    match registered.abstraction with
+    match domain with
     | Domain  (module D) -> Location.fold add D.location_dependencies locs
     | Functor (module D) -> Location.fold add D.location_dependencies locs
 
   let build domains =
+    let make (registered, mode) = registered.info, registered.domain (), mode in
+    let domains = List.map make domains in
     (* Build the contexts *)
     let contexts = List.fold_left add_contexts Context.init domains in
     let interactive_ctx c = Context.(make_interactive c |> assert_not_unit) in
@@ -787,9 +786,9 @@ module Config = struct
       open Domain
       type t = registered_with_mode
       let compare (d1, m1) (d2, m2) =
-        let c = Datatype.Int.compare d1.priority d2.priority in
+        let c = Datatype.Int.compare d1.info.priority d2.info.priority in
         if c = 0 then
-          let c = Datatype.String.compare d1.name d2.name in
+          let c = Datatype.String.compare d1.info.name d2.info.name in
           if c = 0 then Mode.compare m1 m2 else c
         else c
     end)
@@ -799,23 +798,19 @@ module Config = struct
     let find name = try Some (find name) with Not_found -> None in
     let main () = Globals.entry_point () |> fst in
     let add_main_mode modes = (main (), Domain_mode.Mode.all) :: modes in
-    let dynamic (name, auto_enable, make) config =
-      if not (Parameters.Domains.mem name) && auto_enable () then
+    let add config (registered : Domain.registered) =
+      let name = registered.info.name in
+      if not (Parameters.Domains.mem name) && registered.auto_enable () then
         (* Add the auto-enabled domain to the options so that it appears
            enabled in the GUI. *)
         Parameters.Domains.add name;
       let enabled = Parameters.Domains.mem name in
       let enable modes = if enabled then add_main_mode modes else modes in
       match find name with
-      | None -> if enabled then add (make (), None) config else config
-      | Some modes -> add (make (), Some (enable modes)) config
+      | None -> if enabled then add (registered, None) config else config
+      | Some modes -> add (registered, Some (enable modes)) config
     in
-    let static (d, auto_enable) =
-      dynamic (d.Domain.name, auto_enable, fun () -> d)
-    in
-    let fold f xs acc = List.fold_left (fun acc x -> f x acc) acc xs in
-    fold static !Domain.static_domains empty |>
-    fold dynamic !Domain.dynamic_domains
+    List.fold_left add empty !Domain.domains_list
 end
 
 
