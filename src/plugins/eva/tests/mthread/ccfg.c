@@ -7,7 +7,7 @@
 
 #include <stddef.h>
 #include <pthread.h>
-
+#include <mthread.h>
 
 volatile int nondet;
 int random(void);
@@ -53,7 +53,7 @@ int g6(int * from) {
 void *f1(void * _) {
   pthread_mutex_lock(&lock);
   g3();
-
+  Frama_C_mthread_show("custom event", x, a, b);
   pthread_mutex_unlock(&lock);
   g5(&c, &d);
   e = g6(&f);
@@ -63,7 +63,7 @@ void *f1(void * _) {
 void *f2(void * _) {
   pthread_mutex_lock(&lock);
   g4();
-
+  Frama_C_mthread_show("other custom event", x, a, b);
   pthread_mutex_unlock(&lock);
   g5(&d, &c);
   f = g6(&e);
@@ -97,5 +97,9 @@ void main() {
     sum += d;
     sum += e;
     sum += f;
+    Frama_C_mthread_show("main event without argument");
+    // Incorrect use of builtin Frama_C_mthread_show.
+    char event[4] = {0};
+    Frama_C_mthread_show(event);
   }
 }
