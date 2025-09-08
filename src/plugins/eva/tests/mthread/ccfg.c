@@ -8,6 +8,7 @@
 #include <stddef.h>
 #include <pthread.h>
 
+
 volatile int nondet;
 int random(void);
 
@@ -52,6 +53,7 @@ int g6(int * from) {
 void *f1(void * _) {
   pthread_mutex_lock(&lock);
   g3();
+
   pthread_mutex_unlock(&lock);
   g5(&c, &d);
   e = g6(&f);
@@ -61,6 +63,7 @@ void *f1(void * _) {
 void *f2(void * _) {
   pthread_mutex_lock(&lock);
   g4();
+
   pthread_mutex_unlock(&lock);
   g5(&d, &c);
   f = g6(&e);
