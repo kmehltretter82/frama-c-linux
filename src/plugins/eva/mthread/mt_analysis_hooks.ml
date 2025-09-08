@@ -766,6 +766,9 @@ let catch_functions_calls analysis (stack : Callstack.callstack) kf state kind =
      message arrives too late, and is not really readable *)
   if is_mthread_builtin f && Option.is_none (Callstack.pop stack) then
     Mt_self.abort "Thread function %s called as starting thread function" f;
+  (* Warn on concurrency library functions without stubs. *)
+  if kind = `Spec then
+    Mt_lib.warn_on_unsupported_library_function kf;
   analysis.curr_stack <- stack;
   if Callstack.is_empty stack then
     (* This is the entry point of the analysis, the events stack needs to be
