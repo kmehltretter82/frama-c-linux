@@ -21,15 +21,10 @@ let pretty_raw_id fmt (idt, offset) =
   Format.fprintf fmt "%s_%d" (to_string idt) offset
 
 
-(* YYY cache this per project *)
-let array_threads = Mt_cil.mthread_global_var "__fc_mthread_threads"
-let array_mutexes = Mt_cil.mthread_global_var "__fc_mthread_mutexes"
-let array_queues = Mt_cil.mthread_global_var "__fc_mthread_queues"
-
 let array_of_idt = function
-  | IdThread -> array_threads ()
-  | IdMutex -> array_mutexes ()
-  | IdQueue -> array_queues ()
+  | IdThread -> Mt_lib.array_threads ()
+  | IdMutex -> Mt_lib.array_mutexes ()
+  | IdQueue -> Mt_lib.array_queues ()
 
 let pointer_of_id ((idt, offset): raw_id) : pointer =
   assert (offset > 0);
@@ -44,7 +39,7 @@ let read_id_state state raw_id =
   let p = pointer_of_id raw_id in
   Mt_memory.read_int_pointer p state
 
-let read_id_state_enumerate card state raw_id : _ Mt_lib.conversion =
+let read_id_state_enumerate card state raw_id : _ Mt_memory.conversion =
   let value = read_id_state state raw_id in
   let failure fmt = Format.fprintf fmt "Id %a contains garbled state %a"
       pretty_raw_id raw_id Cvalue.V.pretty value

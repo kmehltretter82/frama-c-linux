@@ -6,41 +6,20 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(** Variable __fc_mthread_threads in mthread.c *)
+val array_threads : unit -> Cil_types.varinfo
 
-(** Compare the tags of two OCaml values (or their values if they are
-    integers). Can be used to implement the generic cases of compare functions
-    on inductive types. Not for the casual user. *)
-val compare_tag: 'a -> 'a -> int
+(** Variable __fc_mthread_mutexes in mthread.c *)
+val array_mutexes : unit -> Cil_types.varinfo
 
+(** Variable __fc_mthread_queues in mthread.c *)
+val array_queues : unit -> Cil_types.varinfo
 
-val comp: ('a -> 'b -> int) -> 'a -> 'b -> ('c -> 'd -> int) -> 'c -> 'd -> int
+(** Variable __fc_mthread_threads_running in mthread.c *)
+val var_thread_created : unit -> Cil_types.varinfo
 
-
-
-(** Conversion from something into something else. Returns a formatter that
-    prints the error in case of failure *)
-type 'a conversion_with_warning = [
-  | `Success of 'a
-  | `WithWarning of (Format.formatter -> unit) * 'a
-]
-
-type 'a conversion = [
-  | `Success of 'a
-  | `Failure of (Format.formatter -> unit)
-]
-
-val escape_non_utf8: string -> string
-
-
-(** Clear the results of the value analysis *)
-val clear_value_results: unit -> unit
-
-
-(** Location of the header file "mthread.h" *)
-val mthread_h: unit -> Filepath.t
-
-(** Remove specialchars forbidden in file names *)
-val sanitize_filename: ?char:char -> string -> string
+(** Checks that all variables above are in the source files. *)
+val check_mthread_library : unit -> unit
 
 (** Threading library stubbed by Mthread. *)
 type threads_lib =

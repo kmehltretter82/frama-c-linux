@@ -85,6 +85,8 @@ let mthread_run project =
   Mt_self.warning
     "Mthread is an experimental plugin and is still in development.";
 
+  Mt_lib.check_mthread_library ();
+
   if not (Mt_options.ConcatDotFilesTo.is_empty ()) &&
      not (Mt_options.ExtractModels.mem "html") then
     Mt_self.error "Option %S needs option \"%s html\" to work."
@@ -150,7 +152,7 @@ let mthread_run project =
     (* We analyse the main thread *)
     let module Analyzer = (val Analysis.current_analyzer ()) in
     Analyzer.Interferences.reset ();
-    Mt_lib.clear_value_results ();
+    Self.clear_results ();
     Thread.reset_state ();
     Mutex.reset_state ();
     Mqueue.reset_state ();

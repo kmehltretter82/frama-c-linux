@@ -16,6 +16,11 @@ open Locations
 *)
 let size_char_in_bits = 8
 
+type 'a conversion = [
+  | `Success of 'a
+  | `Failure of (Format.formatter -> unit)
+]
+
 module Types = struct
 
   type state = Cvalue.Model.t

@@ -356,9 +356,6 @@ let read_written_by_function sm th sa ?(watch_only=Locations.Zone.top) kf ki =
   comp#accesses;
 ;;
 
-let var_thread_created =
-  Mt_cil.mthread_global_var "__fc_mthread_threads_running"
-
 (* Ad-hoc function that disregards accesses to variables that
    occurs before any thread is created. This simplifies the cfg of threads,
    and increases convergence speed *)
@@ -367,7 +364,7 @@ let stmt_is_multithreaded analysis sa =
   let iter_requests = iter_requests sa in
   let th = analysis.curr_thread in
   if Thread.is_main th.th_eva_thread then
-    let v = var_thread_created () in
+    let v = Mt_lib.var_thread_created () in
     (fun stmt ->
        try
          iter_requests stmt (fun request ->

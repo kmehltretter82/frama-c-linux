@@ -109,7 +109,7 @@ module NodeValueState = struct
     state_after  = Cvalue.Model.bottom;
   }
 
-  let aux_presence default raw_id f state : _ Mt_lib.conversion_with_warning =
+  let aux_presence default raw_id f state : _ conversion_with_warning =
     match Mt_ids.read_id_state_enumerate 4 state raw_id with
     | `Failure mess ->
       `WithWarning(mess, default)

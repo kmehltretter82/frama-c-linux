@@ -14,6 +14,9 @@ val state: State.t
 (** Return [true] iff the value analysis has been done. *)
 val is_computed: unit -> bool
 
+(** Clears the results of the Eva analysis. *)
+val clear_results: unit -> unit
+
 (** Computation state of the analysis. *)
 type computation_state = NotComputed | Computing | Computed | Aborted
 

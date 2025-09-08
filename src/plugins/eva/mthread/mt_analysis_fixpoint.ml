@@ -53,7 +53,7 @@ let record_end_of_thread_analysis analysis =
   th.th_value_results <- Some results;
 
   if Mt_options.ToDisk.get () then
-    let th = ThreadState.label th |> Mt_lib.sanitize_filename in
+    let th = ThreadState.label th |> Eva_utils.sanitize_filename in
     let name = Format.sprintf "%s%s_iteration_%d.sav"
         (Mt_options.ToDiskPrefix.get ())
         th analysis.iteration in
@@ -124,10 +124,10 @@ let compute_thread analysis th =
   analysis.curr_events_stack <- [];
   Datatype.Int.Hashtbl.clear analysis.memexec_cache;
 
-  (* We reset the concurrent value analysis (necessary because sometimes,
+  (* We reset the concurrent Eva analysis (necessary because sometimes,
      only the hooks have changed, and this is not captured by the project
      infrastructure) *)
-  Mt_lib.clear_value_results ();
+  Self.clear_results ();
 
   (* We set the parameters for the value analysis *)
   Globals.set_entry_point (Kernel_function.get_name th.th_fun) false;
