@@ -8,7 +8,7 @@
 
 open Cil_types
 
-let dkey = Self.register_category "widen-hints"
+let dkey = Self.register_category "widen-hints" ~level:7
     ~help:"debug messages when failing to use widen_hints annotations"
 
 let error ?msg loc typing_context =

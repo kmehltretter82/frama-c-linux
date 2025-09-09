@@ -1,6 +1,6 @@
 /* run.config
-   STDOPT: +"-eva-verbose 2 -eva-no-builtins-auto"
-   STDOPT: +"-eva-verbose 2 -machdep x86_64 -eva-no-builtins-auto"
+   STDOPT: +"-eva-verbose 6 -eva-no-builtins-auto"
+   STDOPT: +"-eva-verbose 6 -machdep x86_64 -eva-no-builtins-auto"
 */
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -70,7 +70,7 @@ void test_readv(void)
 
 
   rcv_buffer_scattered1[0] == 0; /* Reduce to bottom if rcv_buffer_scattered1 is not initialized.  */
-  /* @assert \true; */ 
+  /* @assert \true; */
 
   printf( "Hello %.2s%.3s\n", rcv_buffer_scattered1, rcv_buffer_scattered2);
 }

@@ -202,7 +202,7 @@ let msg_status status ?current ?once ?source ?stacktrace fmt =
   if status = Alarmset.True then
     if Parameters.ValShowProgress.get ()
     then Self.result ?current ?once ?source fmt
-    else Self.result ?current ?once ?source ~level:2 fmt
+    else Self.result ?current ?once ?source ~level:6 fmt
   else
     Self.warning
       ~wkey:Self.wkey_alarm ?current ?once ?source ?stacktrace fmt

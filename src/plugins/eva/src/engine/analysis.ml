@@ -64,6 +64,7 @@ let generate_specs () =
   Parameters.UsePrototype.iter aux
 
 let pre_analysis () =
+  Self.configure_verbosity ();
   Parameters.configure_precision ();
   Iterator.signal_reset ();
   floats_ok ();

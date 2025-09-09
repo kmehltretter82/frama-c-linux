@@ -1,5 +1,5 @@
 /* run.config*
-   STDOPT: +"-eva-verbose 2"
+   STDOPT: +"-eva-verbose 6"
 */
 
 #include <stdlib.h>

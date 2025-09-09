@@ -6,6 +6,30 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(* Parses a string given to -eva-msg-key or -eva-warn-key into a list of
+   message or warning category names. *)
+let parse_categories s =
+  let categories = String.split_on_char ',' s in
+  let parse_name s =
+    match String.split_on_char '=' s with
+    | [] -> assert false (* split_on_char never returns an empty list *)
+    | name :: _ ->
+      match String.get name 0 with
+      | '-' | '+' -> String.sub name 1 (String.length name - 1)
+      | _ -> name
+  in
+  List.map parse_name categories
+
+(* Split a category "x:y:z" into a list of subcategories "x", "x:y", "x:y:z". *)
+let split_category name =
+  let list = String.split_on_char ':' name in
+  let concat acc elt = let acc = acc ^ elt in acc ^ ":", acc in
+  snd (List.fold_left_map concat "" list)
+
+
+let default_verbosity = 5
+let () = Plugin.set_default_verbose_level default_verbosity
+
 include Plugin.Register
     (struct
       let name = "Eva"
@@ -14,12 +38,11 @@ include Plugin.Register
         "automatically computes variation domains for the variables of the program"
     end)
 
-(* Makes the help message of various categories mandatory. *)
-let register_category ~help = register_category ~help
-let register_warn_category ~help = register_warn_category ~help
-
 let () =
   add_plugin_output_aliases ~visible:false ~deprecated:true [ "value" ; "val" ]
+
+
+(* ----- Analysis state ----------------------------------------------------- *)
 
 (* Do not add dependencies to Kernel parameters here, but at the top of
    Parameters. *)
@@ -69,59 +92,122 @@ let clear_results () =
   (* Explicit clear to apply hooks on changes. *)
   ComputationState.clear ()
 
-(* ----- Debug categories --------------------------------------------------- *)
+
+(* ----- Verbosity configuration -------------------------------------------- *)
+
+(* List of message categories manually set by the user via -eva-msg-key.
+   In Log, message categories are not projectified nor saved on disk, so we
+   simply use a reference. *)
+let user_categories : string list ref = ref []
+let add_user_category s = user_categories := s :: !user_categories
+
+(* Avoid enabling/disabling categories set by the user. *)
+let is_used_category c =
+  dkey_name c |> split_category |>
+  List.exists (fun name -> List.mem name !user_categories)
+
+(* Hook to register categories set by the user. *)
+let () =
+  Message_category.add_set_hook
+    (fun _ s -> parse_categories s |> List.iter add_user_category)
+
+(* Each Eva message category is bound to a verbosity level, at which the
+   key is automatically enabled. *)
+let dkey_verbosity : (int, category list) Hashtbl.t = Hashtbl.create 11
+
+let add_dkey_verbosity level category =
+  let list = try Hashtbl.find dkey_verbosity level with Not_found -> [] in
+  Hashtbl.replace dkey_verbosity level (category :: list)
+
+(* Enable/disable all message categories according to -eva-verbose,
+   except for categories manually set by the user via -eva-msg-key. *)
+let configure_verbosity () =
+  let level = Verbose.get () in
+  let change positive category =
+    if not (is_used_category category) then
+      (if positive then add_debug_keys else del_debug_keys) category
+  in
+  let enable i list = List.iter (change (i <= level)) list in
+  Hashtbl.iter enable dkey_verbosity
+
+(* Makes the help message of various categories mandatory.
+   Also associates each category to a verbosity level. *)
+let register_category ?(level=11) ~help name =
+  assert (level >= 0 && level <= 11);
+  let default = level <= default_verbosity in
+  let category = register_category ~help ~default name in
+  add_dkey_verbosity level category;
+  category
+
+(* Makes the help message of various categories mandatory. *)
+let register_warn_category ~help = register_warn_category ~help
+
+
+(* ----- Message categories ------------------------------------------------- *)
+
+(* Each message category is automatically enabled at a given level of verbosity:
+   0: No messages.
+   1: Minimal general info (starting analysis, etc) and summary.
+   2: Directives given by user: Frama_C_show_each, split, etc.
+   3-4: Important information about the analysis: partitioning, imprecisions…
+   5: Initial and final states.
+   6-8: Advanced information about automatic behaviors.
+   9: Progress of the analysis (equivalent to -eva-show-progress).
+   10: Additional information such as callstacks in messages.
+   11: All messages.
+*)
 
 let dkey_initial_state =
-  register_category "initial-state" ~default:true
+  register_category "initial-state" ~level:5
     ~help:"at the start of the analysis, \
            print the initial value of global variables"
 
 let dkey_final_states =
-  register_category "final-states" ~default:true
+  register_category "final-states" ~level:5
     ~help:"at the end of the analysis, print final values inferred \
            at the return point of each analyzed function "
 
 let dkey_summary =
-  register_category "summary" ~default:true
+  register_category "summary" ~level:1
     ~help:"print a summary of the analysis at the end, including coverage \
            and alarm numbers"
 
 let dkey_pointer_comparison =
-  register_category "pointer-comparison"
+  register_category "pointer-comparison" ~level:7
     ~help:"messages about the evaluation of pointer comparisons"
 
 let dkey_cvalue_domain =
-  register_category "d-cvalue" ~default:true
+  register_category "d-cvalue" ~level:0
     ~help:"print states of the cvalue domain on some user directives"
 
 let dkey_iterator =
-  register_category "iterator"
+  register_category "iterator" ~level:11
     ~help:"debug messages about the fixpoint engine on the control-flow graph \
            of functions"
 
 let dkey_widening =
-  register_category "widening"
+  register_category "widening" ~level:6
     ~help:"print a message at each point where the analysis applies a widening"
 
 let dkey_partition =
-  register_category "partition" ~default:true
+  register_category "partition" ~level:4
     ~help:"messages about states partitioning"
 
 let dkey_split_return =
-  register_category "split-return" ~default:true
+  register_category "split-return" ~level:4
     ~help:"messages related to option -eva-split-return"
 
 let dkey_precision_settings =
-  register_category "precision-settings" ~default:true
+  register_category "precision-settings" ~level:3
     ~help:"messages about the automatic configuration of the analysis by \
            option -eva-precision"
 
 let dkey_callstacks =
-  register_category "callstacks"
+  register_category "callstacks" ~level:9
     ~help:"print the current callstack alongside some messages"
 
 let dkey_callstack_hash =
-  register_category "callstack-hash"
+  register_category "callstack-hash" ~level:9
     ~help:"additionally print the current callstack hash in some messages"
 
 let dkey_include_string_literal =

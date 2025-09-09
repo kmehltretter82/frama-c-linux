@@ -36,8 +36,9 @@ val dkey_summary : category
 
 (** {2 Debug categories.} *)
 
-(** Same as Log's {!register_category}, but [help] is mandatory. *)
-val register_category: help:string -> ?default:bool -> string -> category
+(** Same as Log's {!register_category}, but [help] is mandatory, and a verbosity
+    level is associated to the category. *)
+val register_category: ?level:int -> help:string -> string -> category
 
 val dkey_pointer_comparison: category
 val dkey_cvalue_domain: category
@@ -129,3 +130,8 @@ val failure : 'a pretty_printer
 
 (** Internal error stopping the plug-in. *)
 val fatal   : ('a,'b) pretty_aborter
+
+
+(** Called at the beginning of the analysis to configure Eva verbosity,
+    by automatically enabling/disabling message keys. *)
+val configure_verbosity : unit -> unit
