@@ -94,22 +94,6 @@ module  ACSLAddonIntegerCast =
         "allows and explicits casts from integer to C integral types"
     end)
 
-module ACSLWarnIntegerCast =
-  True
-    (struct
-      let option_name = "-acsl-warn-integer-cast"
-      let help =
-        "[DEPRECATED: Use -acsl-importer-warn-key annot:integer-cast \
-         (or similar options) instead] \
-         emits a warning when casting an integer into a C integral type"
-    end)
-let () = ACSLWarnIntegerCast.add_set_hook
-    (fun o s ->
-       if (o <> s) then
-         set_warn_status wkey_integer_cast
-           (if s then Log.Wactive else Log.Winactive);
-    )
-
 module ACSLRun =
   True
     (struct

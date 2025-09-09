@@ -48,5 +48,4 @@ module ACSLIdir : Parameter_sig.String_list
 module ACSLAddonIntegerCast: Parameter_sig.Bool
 module ACSLRun : Parameter_sig.Bool
 module ACSLImport : Parameter_sig.String_list
-module ACSLWarnIntegerCast : Parameter_sig.Bool
-[@@ deprecated "Uses A2fcParameter.wkey_integer_cast instead."]
+
