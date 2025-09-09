@@ -17,7 +17,7 @@
   Called from loopfun.i:16.
 [eva] Recording results for test
 [eva] Done for function test
-[eva] loopfun.i:16: Frama_C_show_each_t: {5}
+[eva:show] loopfun.i:16: Frama_C_show_each_t: {5}
 [eva] computing for function test <- main.
   Called from loopfun.i:14.
 [eva] Recording results for test
@@ -30,7 +30,7 @@
   Called from loopfun.i:16.
 [eva] Recording results for test
 [eva] Done for function test
-[eva] loopfun.i:16: Frama_C_show_each_t: {2}
+[eva:show] loopfun.i:16: Frama_C_show_each_t: {2}
 [eva] computing for function test <- main.
   Called from loopfun.i:14.
 [eva] Recording results for test

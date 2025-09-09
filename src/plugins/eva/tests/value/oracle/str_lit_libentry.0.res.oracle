@@ -39,7 +39,7 @@
 [eva] Recording results for f
 [eva] Done for function f
 [eva] str_lit_libentry.i:14: Reusing old results for call to f
-[eva] str_lit_libentry.i:16: 
+[eva:show] str_lit_libentry.i:16: 
   Frama_C_show_each: {99}, [-128..127], {99}, {0; 97; 99; 108; 111}
 [eva] Recording results for main
 [eva] Done for function main

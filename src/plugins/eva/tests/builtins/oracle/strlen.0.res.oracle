@@ -292,7 +292,7 @@
 [eva] strlen.c:299: Call to builtin strlen
 [eva:alarm] strlen.c:299: Warning: 
   function strlen: precondition 'valid_string_s' got status unknown.
-[eva] strlen.c:300: Frama_C_show_each: {1}, {1}, {1}
+[eva:show] strlen.c:300: Frama_C_show_each: {1}, {1}, {1}
 [eva] strlen.c:302: Call to builtin strlen
 [eva:alarm] strlen.c:302: Warning: 
   function strlen: precondition 'valid_string_s' got status unknown.
@@ -302,7 +302,7 @@
 [eva] strlen.c:304: Call to builtin strlen
 [eva:alarm] strlen.c:304: Warning: 
   function strlen: precondition 'valid_string_s' got status unknown.
-[eva] strlen.c:305: Frama_C_show_each: {1}, {1}, {1}
+[eva:show] strlen.c:305: Frama_C_show_each: {1}, {1}, {1}
 [eva] Recording results for big_array
 [eva] Done for function big_array
 [eva] computing for function negative_offsets <- main.

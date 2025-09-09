@@ -10,7 +10,7 @@
 [eva:malloc:new] free.c:8: allocating variable __malloc_main1_l8
 [eva] free.c:10: Call to builtin malloc
 [eva:malloc:new] free.c:10: allocating variable __malloc_main1_l10
-[eva] free.c:13: 
+[eva:show] free.c:13: 
   Frama_C_dump_each:
   # cvalue:
   __fc_heap_status ∈ [--..--]

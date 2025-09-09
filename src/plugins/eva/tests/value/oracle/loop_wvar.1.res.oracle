@@ -13,15 +13,15 @@
 [eva] Done for function main_unhelpful
 [eva] computing for function main_multiple_hints <- main3.
   Called from loop_wvar.i:81.
-[eva] loop_wvar.i:67: Frama_C_show_each: {0}, {0}, {0}
+[eva:show] loop_wvar.i:67: Frama_C_show_each: {0}, {0}, {0}
 [eva:partition] loop_wvar.i:65: starting to merge loop iterations
-[eva] loop_wvar.i:67: Frama_C_show_each: {0; 1}, {0; 1}, {0; 1}
-[eva] loop_wvar.i:67: Frama_C_show_each: {0; 1; 2}, {0; 1; 2}, {0; 1; 2}
-[eva] loop_wvar.i:67: Frama_C_show_each: [0..9], {0; 1; 2; 3}, {0; 1; 2; 3}
-[eva] loop_wvar.i:67: 
+[eva:show] loop_wvar.i:67: Frama_C_show_each: {0; 1}, {0; 1}, {0; 1}
+[eva:show] loop_wvar.i:67: Frama_C_show_each: {0; 1; 2}, {0; 1; 2}, {0; 1; 2}
+[eva:show] loop_wvar.i:67: Frama_C_show_each: [0..9], {0; 1; 2; 3}, {0; 1; 2; 3}
+[eva:show] loop_wvar.i:67: 
   Frama_C_show_each: [0..9], {0; 1; 2; 3; 4}, {0; 1; 2; 3; 4}
-[eva] loop_wvar.i:67: Frama_C_show_each: [0..9], [0..17], [0..11]
-[eva] loop_wvar.i:67: Frama_C_show_each: [0..9], [0..18], [0..12]
+[eva:show] loop_wvar.i:67: Frama_C_show_each: [0..9], [0..17], [0..11]
+[eva:show] loop_wvar.i:67: Frama_C_show_each: [0..9], [0..18], [0..12]
 [eva] Recording results for main_multiple_hints
 [eva] Done for function main_multiple_hints
 [eva] Recording results for main3

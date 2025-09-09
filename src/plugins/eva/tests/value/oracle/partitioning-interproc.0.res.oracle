@@ -12,7 +12,7 @@
 [eva] Done for function Frama_C_nondet
 [eva] Recording results for cassign
 [eva] Done for function cassign
-[eva] partitioning-interproc.c:26: Frama_C_show_each: {1}
+[eva:show] partitioning-interproc.c:26: Frama_C_show_each: {1}
 [eva] computing for function cassign <- cassign_test.
   Called from partitioning-interproc.c:30.
 [eva] computing for function Frama_C_nondet <- cassign <- cassign_test.
@@ -21,7 +21,7 @@
 [eva] Recording results for cassign
 [eva] Done for function cassign
 [eva] partitioning-interproc.c:30: Reusing old results for call to cassign
-[eva] partitioning-interproc.c:32: Frama_C_show_each: {1}
+[eva:show] partitioning-interproc.c:32: Frama_C_show_each: {1}
 [eva] Recording results for cassign_test
 [eva] Done for function cassign_test
 [eva] ====== VALUES COMPUTED ======

@@ -16,7 +16,7 @@
   non-finite float value. assert \is_finite(u1.f);
 [eva:alarm] alarms.i:18: Warning: 
   non-finite double value. assert \is_finite(u2.d);
-[eva] alarms.i:19: 
+[eva:show] alarms.i:19: 
   Frama_C_dump_each:
   # cvalue:
   u1{.l[bits 0 to 31]; .f; .d[bits 0 to 31]} ∈

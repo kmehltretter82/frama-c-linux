@@ -33,7 +33,7 @@
 [eva] strnlen.c:15: Call to builtin strnlen
 [eva] strnlen.c:15: 
   function strnlen: precondition 'valid_string_s' got status valid.
-[eva] strnlen.c:17: 
+[eva:show] strnlen.c:17: 
   Frama_C_dump_each:
   # cvalue:
   __fc_heap_status ∈ [--..--]

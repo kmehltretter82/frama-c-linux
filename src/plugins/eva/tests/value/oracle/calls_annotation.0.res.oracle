@@ -48,7 +48,7 @@
   Called from calls_annotation.i:59.
 [eva] Recording results for decr
 [eva] Done for function decr
-[eva] calls_annotation.i:60: Frama_C_show_each_0_1: {0; 1}
+[eva:show] calls_annotation.i:60: Frama_C_show_each_0_1: {0; 1}
 [eva:alarm] calls_annotation.i:65: Warning: 
   calls annotation got status invalid (stopping propagation).
 [eva:alarm] calls_annotation.i:71: Warning: 

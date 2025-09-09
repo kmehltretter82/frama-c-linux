@@ -43,11 +43,11 @@
   The specification of function f_int_star_int
   has generated a garbled mix of addresses for assigns clause \result.
 [eva] Done for function f_int_star_int
-[eva] leaf.i:51: Frama_C_show_each_F: [-2147483648..2147483647]
+[eva:show] leaf.i:51: Frama_C_show_each_F: [-2147483648..2147483647]
 [eva:alarm] leaf.i:52: Warning: 
   unaligned pointer creation. assert \aligned(p,alignof(int));
 [eva:alarm] leaf.i:52: Warning: out of bounds write. assert \valid(p);
-[eva] leaf.i:53: Frama_C_show_each_F: {5}
+[eva:show] leaf.i:53: Frama_C_show_each_F: {5}
 [eva] computing for function f_int_star_int_star_int <- main.
   Called from leaf.i:55.
 [eva] using specification for function f_int_star_int_star_int
@@ -55,10 +55,10 @@
   The specification of function f_int_star_int_star_int
   has generated a garbled mix of addresses for assigns clause \result.
 [eva] Done for function f_int_star_int_star_int
-[eva] leaf.i:56: Frama_C_show_each_G: {{ &g }}
-[eva] leaf.i:57: Frama_C_show_each_F: {5}
-[eva] leaf.i:59: Frama_C_show_each_G: {{ &g }}
-[eva] leaf.i:60: Frama_C_show_each_F: {5}
+[eva:show] leaf.i:56: Frama_C_show_each_G: {{ &g }}
+[eva:show] leaf.i:57: Frama_C_show_each_F: {5}
+[eva:show] leaf.i:59: Frama_C_show_each_G: {{ &g }}
+[eva:show] leaf.i:60: Frama_C_show_each_F: {5}
 [kernel:annot:missing-spec] leaf.i:62: Warning: 
   Neither code nor specification for function f_star_int_cint, generating
   default assigns. See -generated-spec-* options for more info.

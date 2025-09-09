@@ -12,7 +12,7 @@
 [eva] Done for function main1
 [eva] computing for function main2 <- main.
   Called from slevel_return.i:45.
-[eva] slevel_return.i:38: 
+[eva:show] slevel_return.i:38: 
   Frama_C_dump_each:
   # cvalue:
   x ∈ {-3}

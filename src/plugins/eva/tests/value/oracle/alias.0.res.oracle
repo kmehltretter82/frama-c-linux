@@ -68,8 +68,8 @@
   Called from alias.i:47.
 [eva] Recording results for f
 [eva] Done for function f
-[eva] alias.i:82: Frama_C_show_each_d0: [-2147483648..2147483647]
-[eva] alias.i:84: Frama_C_show_each_d2: [-2147483648..2147483647]
+[eva:show] alias.i:82: Frama_C_show_each_d0: [-2147483648..2147483647]
+[eva:show] alias.i:84: Frama_C_show_each_d2: [-2147483648..2147483647]
 [eva] Recording results for main
 [eva] Done for function main
 [eva] ====== VALUES COMPUTED ======

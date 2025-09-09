@@ -9,8 +9,8 @@
 [eva] partitioning-cases.c:12: Call to builtin malloc
 [eva:malloc:new] partitioning-cases.c:12: 
   allocating variable __malloc_test_builtin_l12
-[eva] partitioning-cases.c:13: Frama_C_show_each: {0}
-[eva] partitioning-cases.c:13: 
+[eva:show] partitioning-cases.c:13: Frama_C_show_each: {0}
+[eva:show] partitioning-cases.c:13: 
   Frama_C_show_each: {{ &__malloc_test_builtin_l12 }}
 [eva] Recording results for test_builtin
 [eva] Done for function test_builtin
@@ -26,9 +26,9 @@
   Called from partitioning-cases.c:38.
 [eva] using specification for function sgn_spec
 [eva] Done for function sgn_spec
-[eva] partitioning-cases.c:39: Frama_C_show_each: {0}
-[eva] partitioning-cases.c:39: Frama_C_show_each: {1}
-[eva] partitioning-cases.c:39: Frama_C_show_each: {-1}
+[eva:show] partitioning-cases.c:39: Frama_C_show_each: {0}
+[eva:show] partitioning-cases.c:39: Frama_C_show_each: {1}
+[eva:show] partitioning-cases.c:39: Frama_C_show_each: {-1}
 [eva] computing for function Frama_C_interval <- test_spec <- main.
   Called from partitioning-cases.c:40.
 [eva] partitioning-cases.c:40: 
@@ -44,8 +44,8 @@
   Called from partitioning-cases.c:40.
 [eva] using specification for function f_spec
 [eva] Done for function f_spec
-[eva] partitioning-cases.c:41: Frama_C_show_each: [-2147483648..-1]
-[eva] partitioning-cases.c:41: Frama_C_show_each: [1..2147483647]
+[eva:show] partitioning-cases.c:41: Frama_C_show_each: [-2147483648..-1]
+[eva:show] partitioning-cases.c:41: Frama_C_show_each: [1..2147483647]
 [eva] Recording results for test_spec
 [eva] Done for function test_spec
 [eva] computing for function test_assert <- main.
@@ -56,8 +56,8 @@
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva] partitioning-cases.c:47: assertion got status valid.
-[eva] partitioning-cases.c:48: Frama_C_show_each: [0..49]
-[eva] partitioning-cases.c:48: Frama_C_show_each: [50..100]
+[eva:show] partitioning-cases.c:48: Frama_C_show_each: [0..49]
+[eva:show] partitioning-cases.c:48: Frama_C_show_each: [50..100]
 [eva] Recording results for test_assert
 [eva] Done for function test_assert
 [eva] Recording results for main

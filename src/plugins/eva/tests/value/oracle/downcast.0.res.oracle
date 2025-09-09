@@ -51,12 +51,12 @@
   Called from downcast.c:182.
 [eva:alarm] downcast.c:84: Warning: assertion 'ASSUME' got status unknown.
 [eva] downcast.c:85: assertion got status valid.
-[eva] downcast.c:89: 
+[eva:show] downcast.c:89: 
   Frama_C_show_each:
   [2147483503..2147483647],
   [2147483648..2147483792],
   [-2147483648..-2147483504]
-[eva] downcast.c:89: 
+[eva:show] downcast.c:89: 
   Frama_C_show_each:
   [100000..2147483502], [100145..2147483647], [100145..2147483647]
 [eva] downcast.c:90: assertion got status valid.

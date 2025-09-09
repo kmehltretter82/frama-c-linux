@@ -235,7 +235,7 @@
 [eva] string_h.c:103: 
   function strtok_r, behavior resume_str: precondition 'initialization,saveptr' got status valid.
 [eva] Done for function strtok_r
-[eva] string_h.c:104: Frama_C_show_each_saveptr: {{ &buf + {0; 1} }}
+[eva:show] string_h.c:104: Frama_C_show_each_saveptr: {{ &buf + {0; 1} }}
 [eva] string_h.c:105: check got status valid.
 [eva] computing for function strtok_r <- test_strtok_r <- main.
   Called from string_h.c:107.

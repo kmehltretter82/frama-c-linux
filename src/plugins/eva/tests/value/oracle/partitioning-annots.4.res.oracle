@@ -11,8 +11,8 @@
 [eva] partitioning-annots.c:246: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] partitioning-annots.c:252: Frama_C_show_each: {1}, {1}
-[eva] partitioning-annots.c:252: Frama_C_show_each: {0}, {0}
+[eva:show] partitioning-annots.c:252: Frama_C_show_each: {1}, {1}
+[eva:show] partitioning-annots.c:252: Frama_C_show_each: {0}, {0}
 [eva] Recording results for test_history
 [eva] Done for function test_history
 [eva] ====== VALUES COMPUTED ======

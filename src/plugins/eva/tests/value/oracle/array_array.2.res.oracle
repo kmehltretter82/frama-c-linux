@@ -8,7 +8,8 @@
   LIB_MEM_StaticAlloc_next_free ∈ {0}
 [eva] computing for function LIB_MEM_StaticAlloc <- main3.
   Called from array_array.c:66.
-[eva] array_array.c:13: Frama_C_show_each_ALLOCATION_WITH_STATIC_ALLOC: {24}
+[eva:show] array_array.c:13: 
+  Frama_C_show_each_ALLOCATION_WITH_STATIC_ALLOC: {24}
 [eva] Recording results for LIB_MEM_StaticAlloc
 [eva] Done for function LIB_MEM_StaticAlloc
 [eva:alarm] array_array.c:69: Warning: 

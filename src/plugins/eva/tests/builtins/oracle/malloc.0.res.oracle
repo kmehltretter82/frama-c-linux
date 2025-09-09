@@ -21,8 +21,8 @@
 [eva:alarm] malloc.c:21: Warning: out of bounds write. assert \valid(p);
 [eva:alarm] malloc.c:22: Warning: out of bounds write. assert \valid(p + 2);
 [eva:alarm] malloc.c:23: Warning: out of bounds write. assert \valid(p + 24999);
-[eva] malloc.c:26: Frama_C_show_each: {{ &__malloc_main_l18 + {8} }}
-[eva] malloc.c:26: Frama_C_show_each: {{ &__malloc_main_l18 + {8} }}
+[eva:show] malloc.c:26: Frama_C_show_each: {{ &__malloc_main_l18 + {8} }}
+[eva:show] malloc.c:26: Frama_C_show_each: {{ &__malloc_main_l18 + {8} }}
 [eva] malloc.c:33: Call to builtin malloc
 [eva:malloc:imprecise] malloc.c:33: Warning: 
   allocating a single weak variable for ALL dynamic allocations via malloc/calloc/realloc: __alloc_w_main

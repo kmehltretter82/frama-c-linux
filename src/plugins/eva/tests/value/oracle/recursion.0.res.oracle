@@ -11,7 +11,7 @@
 [eva] using specification for function five
 [eva:alarm] recursion.c:18: Warning: 
   function five: postcondition got status unknown.
-[eva] recursion.c:346: Frama_C_show_each_5: {5}
+[eva:show] recursion.c:346: Frama_C_show_each_5: {5}
 [eva:recursion] recursion.c:31: detected recursive call of function sum.
 [eva] recursion.c:31: Warning: 
   Using specification of function sum for recursive calls.
@@ -20,21 +20,21 @@
 [eva] using specification for function sum
 [eva:alarm] recursion.c:27: Warning: 
   function sum: postcondition got status unknown.
-[eva] recursion.c:348: Frama_C_show_each_91: {91}
+[eva:show] recursion.c:348: Frama_C_show_each_91: {91}
 [eva:recursion] recursion.c:40: detected recursive call of function factorial.
 [eva] recursion.c:40: Warning: 
   Using specification of function factorial for recursive calls.
   Analysis of function factorial is thus incomplete and its soundness
   relies on the written specification.
 [eva] using specification for function factorial
-[eva] recursion.c:350: Frama_C_show_each_120: [0..4294967295]
+[eva:show] recursion.c:350: Frama_C_show_each_120: [0..4294967295]
 [eva:recursion] recursion.c:49: detected recursive call of function syracuse.
 [eva] recursion.c:49: Warning: 
   Using specification of function syracuse for recursive calls.
   Analysis of function syracuse is thus incomplete and its soundness
   relies on the written specification.
 [eva] using specification for function syracuse
-[eva] recursion.c:352: Frama_C_show_each_1: [0..4294967294]
+[eva:show] recursion.c:352: Frama_C_show_each_1: [0..4294967294]
 [eva:recursion] recursion.c:62: detected recursive call of function fibonacci.
 [eva] recursion.c:62: Warning: 
   Using specification of function fibonacci for recursive calls.
@@ -46,7 +46,7 @@
   Using specification of function fibonacci for recursive calls.
   Analysis of function fibonacci is thus incomplete and its soundness
   relies on the written specification.
-[eva] recursion.c:354: Frama_C_show_each_89: [0..4294967295]
+[eva:show] recursion.c:354: Frama_C_show_each_89: [0..4294967295]
 [eva:recursion] recursion.c:79: detected recursive call of function sum_ptr.
 [eva] recursion.c:79: Warning: 
   Using specification of function sum_ptr for recursive calls.
@@ -57,7 +57,7 @@
   function sum_ptr: postcondition got status unknown.
 [eva:alarm] recursion.c:72: Warning: 
   function sum_ptr: postcondition got status unknown.
-[eva] recursion.c:359: Frama_C_show_each_91: {91}
+[eva:show] recursion.c:359: Frama_C_show_each_91: {91}
 [eva:recursion] recursion.c:92: 
   detected recursive call of function factorial_ptr.
 [eva] recursion.c:92: Warning: 
@@ -67,7 +67,7 @@
 [eva] using specification for function factorial_ptr
 [eva:alarm] recursion.c:93: Warning: 
   accessing uninitialized left-value. assert \initialized(&res);
-[eva] recursion.c:362: Frama_C_show_each_120: [0..4294967295]
+[eva:show] recursion.c:362: Frama_C_show_each_120: [0..4294967295]
 [eva:recursion] recursion.c:104: 
   detected recursive call of function syracuse_ptr.
 [eva] recursion.c:104: Warning: 
@@ -77,7 +77,7 @@
 [eva] using specification for function syracuse_ptr
 [eva:alarm] recursion.c:105: Warning: 
   accessing uninitialized left-value. assert \initialized(&prev_res);
-[eva] recursion.c:365: Frama_C_show_each_1: [0..4294967294]
+[eva:show] recursion.c:365: Frama_C_show_each_1: [0..4294967294]
 [eva:recursion] recursion.c:120: 
   detected recursive call of function fibonacci_ptr.
 [eva] recursion.c:120: Warning: 
@@ -95,7 +95,7 @@
   accessing uninitialized left-value. assert \initialized(&x);
 [eva:alarm] recursion.c:123: Warning: 
   accessing uninitialized left-value. assert \initialized(&y);
-[eva] recursion.c:368: Frama_C_show_each_89: [0..4294967295]
+[eva:show] recursion.c:368: Frama_C_show_each_89: [0..4294967295]
 [eva:recursion] recursion.c:140: 
   detected recursive call of function sum_and_fact.
 [eva] recursion.c:140: Warning: 
@@ -107,7 +107,8 @@
   function sum_and_fact: postcondition got status unknown.
 [eva:alarm] recursion.c:132: Warning: 
   function sum_and_fact: postcondition got status unknown.
-[eva] recursion.c:372: Frama_C_show_each_36_40320: {36}, [0..4294967288],0%8
+[eva:show] recursion.c:372: 
+  Frama_C_show_each_36_40320: {36}, [0..4294967288],0%8
 [eva:recursion] recursion.c:164: detected recursive call of function odd.
 [eva] recursion.c:164: Warning: 
   Using specification of function odd for recursive calls.
@@ -116,8 +117,8 @@
 [eva] using specification for function odd
 [eva:alarm] recursion.c:152: Warning: 
   function odd: postcondition got status unknown.
-[eva] recursion.c:377: Frama_C_show_each_1: {1}, {1}
-[eva] recursion.c:380: Frama_C_show_each_0: {0}, {0}
+[eva:show] recursion.c:377: Frama_C_show_each_1: {1}, {1}
+[eva:show] recursion.c:380: Frama_C_show_each_0: {0}, {0}
 [eva:recursion] recursion.c:186: detected recursive call of function odd_ptr.
 [eva] recursion.c:186: Warning: 
   Using specification of function odd_ptr for recursive calls.
@@ -138,13 +139,13 @@
 [eva] using specification for function even_ptr
 [eva:alarm] recursion.c:175: Warning: 
   accessing uninitialized left-value. assert \initialized(&x);
-[eva] recursion.c:383: Frama_C_show_each_1: {1}, {1}
-[eva] recursion.c:386: Frama_C_show_each_0: {0}, {0}
+[eva:show] recursion.c:383: Frama_C_show_each_1: {1}, {1}
+[eva:show] recursion.c:386: Frama_C_show_each_0: {0}, {0}
 [eva] using specification for function Frama_C_interval
-[eva] recursion.c:392: Frama_C_show_each_6_66: [6..66]
-[eva] recursion.c:395: Frama_C_show_each_6_66: [6..66]
-[eva] recursion.c:398: Frama_C_show_each_2_89: [0..4294967295]
-[eva] recursion.c:401: Frama_C_show_each_2_89: [0..4294967295]
+[eva:show] recursion.c:392: Frama_C_show_each_6_66: [6..66]
+[eva:show] recursion.c:395: Frama_C_show_each_6_66: [6..66]
+[eva:show] recursion.c:398: Frama_C_show_each_2_89: [0..4294967295]
+[eva:show] recursion.c:401: Frama_C_show_each_2_89: [0..4294967295]
 [eva:alarm] recursion.c:225: Warning: 
   function fill_array: precondition got status invalid.
 [eva:alarm] recursion.c:229: Warning: 
@@ -174,11 +175,12 @@
   Using specification of function binary_search for recursive calls.
   Analysis of function binary_search is thus incomplete and its soundness
   relies on the written specification.
-[eva] recursion.c:232: Frama_C_show_each_3: [-2147483648..2147483647]
-[eva] recursion.c:234: Frama_C_show_each_12: [-2147483648..2147483647]
-[eva] recursion.c:236: Frama_C_show_each_minus1: [-2147483648..2147483647]
-[eva] recursion.c:241: Frama_C_show_each_7_11: [-2147483648..2147483647]
-[eva] recursion.c:244: Frama_C_show_each_minus_1_15: [-2147483648..2147483647]
+[eva:show] recursion.c:232: Frama_C_show_each_3: [-2147483648..2147483647]
+[eva:show] recursion.c:234: Frama_C_show_each_12: [-2147483648..2147483647]
+[eva:show] recursion.c:236: Frama_C_show_each_minus1: [-2147483648..2147483647]
+[eva:show] recursion.c:241: Frama_C_show_each_7_11: [-2147483648..2147483647]
+[eva:show] recursion.c:244: 
+  Frama_C_show_each_minus_1_15: [-2147483648..2147483647]
 [eva:recursion] recursion.c:255: detected recursive call of function alarm.
 [eva] recursion.c:255: Warning: 
   Using specification of function alarm for recursive calls.
@@ -190,7 +192,7 @@
 [eva:alarm] recursion.c:255: Warning: 
   signed overflow. assert i * tmp ≤ 2147483647;
                    (tmp from alarm(i - 1))
-[eva] recursion.c:410: Frama_C_show_each_unreachable: [20..2147483640],0%20
+[eva:show] recursion.c:410: Frama_C_show_each_unreachable: [20..2147483640],0%20
 [eva:recursion] recursion.c:265: detected recursive call of function precond.
 [eva] recursion.c:265: Warning: 
   Using specification of function precond for recursive calls.
@@ -207,7 +209,7 @@
 [eva:alarm] recursion.c:282: Warning: 
   unaligned pointer creation. assert \aligned(p,alignof(int));
 [eva:alarm] recursion.c:282: Warning: out of bounds write. assert \valid(p);
-[eva] recursion.c:283: Frama_C_show_each_1: {5}
+[eva:show] recursion.c:283: Frama_C_show_each_1: {5}
 [eva:locals-escaping] recursion.c:281: Warning: 
   locals {x} escaping the scope of a block of escaping_local through p
 [eva:recursion] recursion.c:295: 
@@ -220,7 +222,7 @@
 [eva:alarm] recursion.c:297: Warning: 
   unaligned pointer creation. assert \aligned(p,alignof(int));
 [eva:alarm] recursion.c:297: Warning: out of bounds write. assert \valid(p);
-[eva] recursion.c:298: Frama_C_show_each_1: {5}
+[eva:show] recursion.c:298: Frama_C_show_each_1: {5}
 [eva:locals-escaping] recursion.c:415: Warning: 
   locals {x} escaping the scope of escaping_formal through p
 [eva:recursion] recursion.c:311: 
@@ -236,7 +238,7 @@
 [eva:alarm] recursion.c:313: Warning: 
   unaligned pointer creation. assert \aligned(p,alignof(int));
 [eva:alarm] recursion.c:313: Warning: out of bounds write. assert \valid(p);
-[eva] recursion.c:314: Frama_C_show_each_1_2: {5}
+[eva:show] recursion.c:314: Frama_C_show_each_1_2: {5}
 [eva:locals-escaping] recursion.c:312: Warning: 
   locals {x} escaping the scope of a block of escaping_stack through p
 [eva:recursion] recursion.c:327: detected recursive call of function decr.

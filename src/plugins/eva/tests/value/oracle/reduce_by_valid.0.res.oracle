@@ -96,47 +96,52 @@
   Called from reduce_by_valid.i:310.
 [eva:alarm] reduce_by_valid.i:180: Warning: 
   out of bounds write. assert \valid((int *)p);
-[eva] reduce_by_valid.i:181: Frama_C_show_each_main10_1: {{ &t_0 + [0..36] }}
+[eva:show] reduce_by_valid.i:181: 
+  Frama_C_show_each_main10_1: {{ &t_0 + [0..36] }}
 [eva] reduce_by_valid.i:182: assertion got status valid.
 [eva:alarm] reduce_by_valid.i:185: Warning: 
   out of bounds write. assert \valid((int *)p + 2);
-[eva] reduce_by_valid.i:186: Frama_C_show_each_main10_2: {{ &t_0 + [-8..28] }}
+[eva:show] reduce_by_valid.i:186: 
+  Frama_C_show_each_main10_2: {{ &t_0 + [-8..28] }}
 [eva] reduce_by_valid.i:187: assertion got status valid.
 [eva:alarm] reduce_by_valid.i:190: Warning: 
   out of bounds write. assert \valid((int *)(p + 2));
-[eva] reduce_by_valid.i:191: Frama_C_show_each_main10_3: {{ &t_0 + [-2..34] }}
+[eva:show] reduce_by_valid.i:191: 
+  Frama_C_show_each_main10_3: {{ &t_0 + [-2..34] }}
 [eva] reduce_by_valid.i:192: assertion got status valid.
 [eva:alarm] reduce_by_valid.i:201: Warning: 
   out of bounds write. assert \valid(&((struct s_1 *)p)->b);
-[eva] reduce_by_valid.i:202: Frama_C_show_each_main10_4: {{ &t_0 + [-4..32] }}
+[eva:show] reduce_by_valid.i:202: 
+  Frama_C_show_each_main10_4: {{ &t_0 + [-4..32] }}
 [eva] reduce_by_valid.i:204: assertion got status valid.
 [eva:alarm] reduce_by_valid.i:207: Warning: 
   out of bounds write. assert \valid(&((struct s_1 *)p + 2)->b);
-[eva] reduce_by_valid.i:208: Frama_C_show_each_main10_4: {{ &t_0 + [-20..16] }}
+[eva:show] reduce_by_valid.i:208: 
+  Frama_C_show_each_main10_4: {{ &t_0 + [-20..16] }}
 [eva] reduce_by_valid.i:210: assertion got status valid.
 [eva:alarm] reduce_by_valid.i:214: Warning: 
   out of bounds write. assert \valid((char *)q);
-[eva] reduce_by_valid.i:215: Frama_C_show_each: {{ &u_0 + [0..79] }}
+[eva:show] reduce_by_valid.i:215: Frama_C_show_each: {{ &u_0 + [0..79] }}
 [eva] reduce_by_valid.i:217: assertion got status valid.
 [eva:alarm] reduce_by_valid.i:220: Warning: 
   out of bounds write. assert \valid((char *)q + 2);
-[eva] reduce_by_valid.i:221: Frama_C_show_each: {{ &u_0 + [-2..77] }}
+[eva:show] reduce_by_valid.i:221: Frama_C_show_each: {{ &u_0 + [-2..77] }}
 [eva] reduce_by_valid.i:223: assertion got status valid.
 [eva] Recording results for main10
 [eva] Done for function main10
 [eva] computing for function main11 <- main.
   Called from reduce_by_valid.i:311.
 [eva:alarm] reduce_by_valid.i:232: Warning: assertion got status unknown.
-[eva] reduce_by_valid.i:234: Frama_C_show_each: {{ &TC + [10..410] }}
+[eva:show] reduce_by_valid.i:234: Frama_C_show_each: {{ &TC + [10..410] }}
 [eva:alarm] reduce_by_valid.i:235: Warning: assertion got status unknown.
 [eva:alarm] reduce_by_valid.i:241: Warning: assertion got status unknown.
-[eva] reduce_by_valid.i:243: Frama_C_show_each: {{ &TU + [40..1640],0%4 }}
+[eva:show] reduce_by_valid.i:243: Frama_C_show_each: {{ &TU + [40..1640],0%4 }}
 [eva:alarm] reduce_by_valid.i:244: Warning: assertion got status unknown.
 [eva:alarm] reduce_by_valid.i:249: Warning: assertion got status unknown.
-[eva] reduce_by_valid.i:251: Frama_C_show_each: {{ &TU + [40..840] }}
+[eva:show] reduce_by_valid.i:251: Frama_C_show_each: {{ &TU + [40..840] }}
 [eva:alarm] reduce_by_valid.i:252: Warning: assertion got status unknown.
 [eva:alarm] reduce_by_valid.i:257: Warning: assertion got status unknown.
-[eva] reduce_by_valid.i:259: Frama_C_show_each: {{ &TC + [10..410],2%4 }}
+[eva:show] reduce_by_valid.i:259: Frama_C_show_each: {{ &TC + [10..410],2%4 }}
 [eva:alarm] reduce_by_valid.i:260: Warning: assertion got status unknown.
 [eva] Recording results for main11
 [eva] Done for function main11
@@ -149,14 +154,14 @@
   The specification of function garbled_mix
   has generated a garbled mix of addresses for assigns clause \result.
 [eva] Done for function garbled_mix
-[eva] reduce_by_valid.i:277: 
+[eva:show] reduce_by_valid.i:277: 
   Frama_C_show_each_gm:
   {{ garbled mix of &{x; a}
   (origin: Library function {reduce_by_valid.i:276}) }}
 [eva:alarm] reduce_by_valid.i:279: Warning: 
   out of bounds write. assert \valid(p);
 [eva:alarm] reduce_by_valid.i:281: Warning: assertion got status unknown.
-[eva] reduce_by_valid.i:282: 
+[eva:show] reduce_by_valid.i:282: 
   Frama_C_show_each_reduced_gm: {{ &x ; &a + [0..16] }}
 [eva] computing for function reduced_garbled_mix <- main12 <- main.
   Called from reduce_by_valid.i:286.

@@ -48,9 +48,10 @@
 [eva] Done for function typedef_with_aligned
 [eva] computing for function struct_aligned <- main.
   Called from attribute-aligned.c:186.
-[eva] attribute-aligned.c:142: Frama_C_show_each_4: {4}, {4}, {4}
-[eva] attribute-aligned.c:146: Frama_C_show_each_1: {1}, {1}, {1}
-[eva] attribute-aligned.c:150: Frama_C_show_each_4: {4}, {4}, {4}, {4}, {4}, {4}
+[eva:show] attribute-aligned.c:142: Frama_C_show_each_4: {4}, {4}, {4}
+[eva:show] attribute-aligned.c:146: Frama_C_show_each_1: {1}, {1}, {1}
+[eva:show] attribute-aligned.c:150: 
+  Frama_C_show_each_4: {4}, {4}, {4}, {4}, {4}, {4}
 [eva:alarm] attribute-aligned.c:165: Warning: 
   unaligned pointer creation.
   assert

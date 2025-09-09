@@ -12,20 +12,21 @@
   accessing out of bounds index. assert 0 ≤ i;
 [eva:alarm] bitwise_reduction.i:15: Warning: 
   accessing out of bounds index. assert i < 2;
-[eva] bitwise_reduction.i:16: Frama_C_show_each_then1: {1}, {0; 1}
-[eva] bitwise_reduction.i:18: 
+[eva:show] bitwise_reduction.i:16: Frama_C_show_each_then1: {1}, {0; 1}
+[eva:show] bitwise_reduction.i:18: 
   Frama_C_show_each_else1:
   {0; 1}, {0; 1; 0x3000; 0x3001; 0x3200; 0x3201; 0xF000; 0xFF00}
-[eva] bitwise_reduction.i:20: 
+[eva:show] bitwise_reduction.i:20: 
   Frama_C_show_each_else_then1:
   {0; 1}, {0; 1; 0x3000; 0x3001; 0x3200; 0x3201; 0xF000; 0xFF00}
 [eva:alarm] bitwise_reduction.i:24: Warning: 
   out of bounds read. assert \valid_read(p);
-[eva] bitwise_reduction.i:25: Frama_C_show_each_then2: {{ &t + {4} }}, {0; 1}
-[eva] bitwise_reduction.i:27: 
+[eva:show] bitwise_reduction.i:25: 
+  Frama_C_show_each_then2: {{ &t + {4} }}, {0; 1}
+[eva:show] bitwise_reduction.i:27: 
   Frama_C_show_each_else2:
   {{ &t + {0; 4} }}, {0; 1; 0x3000; 0x3001; 0x3200; 0x3201; 0xF000; 0xFF00}
-[eva] bitwise_reduction.i:29: 
+[eva:show] bitwise_reduction.i:29: 
   Frama_C_show_each_else_then2:
   {0; 1}, {0; 1; 0x3000; 0x3001; 0x3200; 0x3201; 0xF000; 0xFF00}
 [eva] Recording results for main1

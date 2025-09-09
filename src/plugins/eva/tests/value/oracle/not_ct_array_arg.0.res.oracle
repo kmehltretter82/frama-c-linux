@@ -11,7 +11,7 @@
   computed (Array with non-constant length.)
 [eva:alarm] not_ct_array_arg.i:10: Warning: 
   out of bounds write. assert \valid((int *)tb);
-[eva] not_ct_array_arg.i:11: 
+[eva:show] not_ct_array_arg.i:11: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -26,7 +26,7 @@
   out of bounds write. assert \valid(&(*(tb + 9))[100]);
 [eva:alarm] not_ct_array_arg.i:12: Warning: 
   pointer downcast. assert (unsigned int)(&tb) ≤ 2147483647;
-[eva] not_ct_array_arg.i:13: 
+[eva:show] not_ct_array_arg.i:13: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]

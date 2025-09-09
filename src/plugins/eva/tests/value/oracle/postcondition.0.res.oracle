@@ -16,7 +16,7 @@
 [eva] computing for function get_index <- main.
   Called from postcondition.i:84.
 [eva] postcondition.i:84: function get_index: precondition got status valid.
-[eva] postcondition.i:17: Frama_C_show_each_cmd: {1}
+[eva:show] postcondition.i:17: Frama_C_show_each_cmd: {1}
 [kernel:annot:missing-spec] postcondition.i:20: Warning: 
   Neither code nor explicit assigns for function u, generating default clauses.
   See -generated-spec-* options for more info.
@@ -55,7 +55,7 @@
   Called from postcondition.i:87.
 [eva:alarm] postcondition.i:87: Warning: 
   function get_index: precondition got status unknown.
-[eva] postcondition.i:17: Frama_C_show_each_cmd: {4}
+[eva:show] postcondition.i:17: Frama_C_show_each_cmd: {4}
 [eva] computing for function u <- get_index <- main.
   Called from postcondition.i:20.
 [eva] Done for function u

@@ -56,7 +56,7 @@
 [eva:alarm] volatile2.i:78: Warning: signed overflow. assert j + 1 ≤ 32767;
 [eva:alarm] volatile2.i:78: Warning: signed overflow. assert -32768 ≤ i + j;
 [eva:alarm] volatile2.i:78: Warning: signed overflow. assert i + j ≤ 32767;
-[eva] volatile2.i:80: 
+[eva:show] volatile2.i:80: 
   Frama_C_dump_each:
   # cvalue:
   t[0..9] ∈ [--..--]
@@ -87,7 +87,7 @@
 [eva] Done for function main7
 [eva] computing for function main8 <- main.
   Called from volatile2.i:143.
-[eva] volatile2.i:119: 
+[eva:show] volatile2.i:119: 
   Frama_C_show_each: [--..--], [--..--], [--..--], [--..--], [--..--]
 [eva] Recording results for main8
 [eva] Done for function main8

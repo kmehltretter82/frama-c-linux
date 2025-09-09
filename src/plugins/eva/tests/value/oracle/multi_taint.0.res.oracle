@@ -50,7 +50,7 @@
 [eva] Done for function Frama_C_interval
 [eva] multi_taint.c:63: check 'true' got status valid.
 [eva] multi_taint.c:64: check 'true' got status valid.
-[eva] multi_taint.c:66: 
+[eva:show] multi_taint.c:66: 
   Frama_C_dump_each:
   # cvalue:
   __fc_heap_status ∈ [--..--]

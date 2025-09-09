@@ -1,32 +1,36 @@
-19c19
-< [eva] domains_function.c:93: Frama_C_show_each_top: [-2147483648..2147483647]
+19,20c19
+< [eva:show] domains_function.c:93: 
+<   Frama_C_show_each_top: [-2147483648..2147483647]
 ---
-> [eva] domains_function.c:93: Frama_C_show_each_top: {3}
-27c27
-< [eva] domains_function.c:78: Frama_C_show_each_top: [-2147483648..2147483647]
+> [eva:show] domains_function.c:93: Frama_C_show_each_top: {3}
+28,29c27
+< [eva:show] domains_function.c:78: 
+<   Frama_C_show_each_top: [-2147483648..2147483647]
 ---
-> [eva] domains_function.c:78: Frama_C_show_each_top: {1}
-30c30
-< [eva] domains_function.c:97: Frama_C_show_each_top: [-2147483648..2147483647]
+> [eva:show] domains_function.c:78: Frama_C_show_each_top: {1}
+32,33c30
+< [eva:show] domains_function.c:97: 
+<   Frama_C_show_each_top: [-2147483648..2147483647]
 ---
-> [eva] domains_function.c:97: Frama_C_show_each_top: {1}
-47,51c47
+> [eva:show] domains_function.c:97: Frama_C_show_each_top: {1}
+52,56c49
 < [eva] computing for function not_enabled <- recursively_enabled <- main.
 <   Called from domains_function.c:111.
-< [eva] domains_function.c:78: Frama_C_show_each_top: {1}
+< [eva:show] domains_function.c:78: Frama_C_show_each_top: {1}
 < [eva] Recording results for not_enabled
 < [eva] Done for function not_enabled
 ---
 > [eva] domains_function.c:111: Reusing old results for call to not_enabled
-53,57c49
+58,63c51
 < [eva] computing for function disabled <- recursively_enabled <- main.
 <   Called from domains_function.c:113.
-< [eva] domains_function.c:85: Frama_C_show_each_top: [-2147483648..2147483647]
+< [eva:show] domains_function.c:85: 
+<   Frama_C_show_each_top: [-2147483648..2147483647]
 < [eva] Recording results for disabled
 < [eva] Done for function disabled
 ---
 > [eva] domains_function.c:113: Reusing old results for call to disabled
-120c112
+130c118
 <   result ∈ [--..--]
 ---
 >   result ∈ {1}

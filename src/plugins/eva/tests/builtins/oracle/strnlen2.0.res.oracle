@@ -295,7 +295,7 @@
 [eva] strnlen2.c:275: assertion got status valid.
 [eva] strnlen2.c:276: assertion got status valid.
 [eva] strnlen2.c:277: assertion got status valid.
-[eva] strnlen2.c:278: Frama_C_show_each: {1}, {1}, {1}
+[eva:show] strnlen2.c:278: Frama_C_show_each: {1}, {1}, {1}
 [eva] strnlen2.c:282: Call to builtin strnlen
 [eva:alarm] strnlen2.c:282: Warning: 
   function strnlen: precondition 'valid_string_s' got status unknown.
@@ -308,7 +308,7 @@
 [eva] strnlen2.c:285: assertion got status valid.
 [eva] strnlen2.c:286: assertion got status valid.
 [eva] strnlen2.c:287: assertion got status valid.
-[eva] strnlen2.c:288: Frama_C_show_each: {1}, {1}, {1}
+[eva:show] strnlen2.c:288: Frama_C_show_each: {1}, {1}, {1}
 [eva] computing for function init_array_nondet <- big_array <- main.
   Called from strnlen2.c:291.
 [eva] strnlen2.c:138: Call to builtin memset
@@ -339,7 +339,7 @@
 [eva] strnlen2.c:303: assertion got status valid.
 [eva] strnlen2.c:304: assertion got status valid.
 [eva] strnlen2.c:305: assertion got status valid.
-[eva] strnlen2.c:306: Frama_C_show_each: [0..800], [0..804], [0..4000000]
+[eva:show] strnlen2.c:306: Frama_C_show_each: [0..800], [0..804], [0..4000000]
 [eva] strnlen2.c:308: Call to builtin strnlen
 [eva:alarm] strnlen2.c:308: Warning: 
   function strnlen: precondition 'valid_string_s' got status unknown.
@@ -352,7 +352,7 @@
 [eva] strnlen2.c:311: assertion got status valid.
 [eva] strnlen2.c:312: assertion got status valid.
 [eva] strnlen2.c:313: assertion got status valid.
-[eva] strnlen2.c:314: Frama_C_show_each: [0..799], [0..803], [0..3999999]
+[eva:show] strnlen2.c:314: Frama_C_show_each: [0..799], [0..803], [0..3999999]
 [eva] Recording results for big_array
 [eva] Done for function big_array
 [eva] computing for function no_zero_but_ok <- main.

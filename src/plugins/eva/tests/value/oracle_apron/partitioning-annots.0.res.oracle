@@ -1,4 +1,4 @@
-116,117c116,123
+123,124c123,130
 < [eva] partitioning-annots.c:236: Reusing old results for call to body
 < [eva] partitioning-annots.c:236: Reusing old results for call to body
 ---
@@ -10,7 +10,7 @@
 >   Called from partitioning-annots.c:236.
 > [eva] Recording results for body
 > [eva] Done for function body
-212,213c218,219
+222,223c228,229
 <   x ∈ [0..44]
 <   y ∈ [0..44]
 ---

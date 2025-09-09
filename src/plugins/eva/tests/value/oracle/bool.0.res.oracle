@@ -6,35 +6,35 @@
   rand ∈ [--..--]
 [eva] computing for function valid_bool <- main.
   Called from bool.i:71.
-[eva] bool.i:12: Frama_C_show_each: {0}
-[eva] bool.i:14: Frama_C_show_each: {1}
-[eva] bool.i:16: Frama_C_show_each: {1}, {2}
-[eva] bool.i:18: Frama_C_show_each: {1}
-[eva] bool.i:20: Frama_C_show_each: {1}
-[eva] bool.i:22: Frama_C_show_each: {1}
-[eva] bool.i:24: Frama_C_show_each: {0}
-[eva] bool.i:26: Frama_C_show_each: {1}
-[eva] bool.i:28: Frama_C_show_each: {0}
-[eva] bool.i:30: Frama_C_show_each: {1}
+[eva:show] bool.i:12: Frama_C_show_each: {0}
+[eva:show] bool.i:14: Frama_C_show_each: {1}
+[eva:show] bool.i:16: Frama_C_show_each: {1}, {2}
+[eva:show] bool.i:18: Frama_C_show_each: {1}
+[eva:show] bool.i:20: Frama_C_show_each: {1}
+[eva:show] bool.i:22: Frama_C_show_each: {1}
+[eva:show] bool.i:24: Frama_C_show_each: {0}
+[eva:show] bool.i:26: Frama_C_show_each: {1}
+[eva:show] bool.i:28: Frama_C_show_each: {0}
+[eva:show] bool.i:30: Frama_C_show_each: {1}
 [eva] Recording results for valid_bool
 [eva] Done for function valid_bool
 [eva] computing for function invalid_bool <- main.
   Called from bool.i:72.
 [eva:alarm] bool.i:43: Warning: 
   trap representation of a _Bool lvalue. assert ub.b ≡ 0 ∨ ub.b ≡ 1;
-[eva] bool.i:46: Frama_C_show_each_zero: {0}
-[eva] bool.i:49: Frama_C_show_each_one: {1}
+[eva:show] bool.i:46: Frama_C_show_each_zero: {0}
+[eva:show] bool.i:49: Frama_C_show_each_one: {1}
 [eva:alarm] bool.i:52: Warning: 
   trap representation of a _Bool lvalue. assert ub.b ≡ 0 ∨ ub.b ≡ 1;
 [eva:alarm] bool.i:55: Warning: 
   trap representation of a _Bool lvalue. assert ub.b ≡ 0 ∨ ub.b ≡ 1;
-[eva] bool.i:56: Frama_C_show_each_zero_or_one: {0; 1}
-[eva] bool.i:59: Frama_C_show_each_one: {1}
+[eva:show] bool.i:56: Frama_C_show_each_zero_or_one: {0; 1}
+[eva:show] bool.i:59: Frama_C_show_each_one: {1}
 [eva:alarm] bool.i:62: Warning: 
   trap representation of a _Bool lvalue. assert b ≡ 0 ∨ b ≡ 1;
 [eva:alarm] bool.i:66: Warning: 
   trap representation of a _Bool lvalue. assert *p ≡ 0 ∨ *p ≡ 1;
-[eva] bool.i:67: Frama_C_show_each_zero_or_one: {0; 1}
+[eva:show] bool.i:67: Frama_C_show_each_zero_or_one: {0; 1}
 [eva] Recording results for invalid_bool
 [eva] Done for function invalid_bool
 [eva] Recording results for main

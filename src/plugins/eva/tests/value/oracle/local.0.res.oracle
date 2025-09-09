@@ -32,7 +32,7 @@
   locals {d} escaping the scope of g through U
 [eva:locals-escaping] local.i:34: Warning: 
   locals {d} escaping the scope of g through \result<g>
-[eva] local.i:35: 
+[eva:show] local.i:35: 
   Frama_C_dump_each:
   # cvalue:
   X ∈ ESCAPINGADDR

@@ -157,6 +157,11 @@ let register_warn_category ~help = register_warn_category ~help
    11: All messages.
 *)
 
+let dkey_show =
+  register_category "show" ~level:2
+    ~help:"show values/states inferred by the analysis on directives
+           such as Frama_C_show_each and Frama_C_dump_each"
+
 let dkey_initial_state =
   register_category "initial-state" ~level:5
     ~help:"at the start of the analysis, \

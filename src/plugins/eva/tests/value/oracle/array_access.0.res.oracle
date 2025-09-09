@@ -134,7 +134,7 @@
 [eva] computing for function any_int <- main.
   Called from array_access.c:16.
 [eva] Done for function any_int
-[eva] array_access.c:18: Frama_C_show_each_I: [0..8]
+[eva:show] array_access.c:18: Frama_C_show_each_I: [0..8]
 [eva:alarm] array_access.c:19: Warning: 
   accessing out of bounds index. assert 0 ≤ (int)((int)(-i) - 1);
 [eva] computing for function any_int <- main.

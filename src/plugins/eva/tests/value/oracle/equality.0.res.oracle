@@ -46,20 +46,20 @@
 [eva] equality.c:64: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] equality.c:79: Frama_C_show_each_precise_0_9: [0..9]
+[eva:show] equality.c:79: Frama_C_show_each_precise_0_9: [0..9]
 [eva:alarm] equality.c:84: Warning: 
   accessing uninitialized left-value. assert \initialized(p);
-[eva] equality.c:85: Frama_C_show_each_imprecise_0_17: [0..32]
+[eva:show] equality.c:85: Frama_C_show_each_imprecise_0_17: [0..32]
 [eva:alarm] equality.c:92: Warning: 
   accessing uninitialized left-value. assert \initialized(p);
-[eva] equality.c:93: Frama_C_show_each_imprecise_0_21: [0..32]
-[eva] equality.c:99: Frama_C_show_each_10_19: [10..42]
+[eva:show] equality.c:93: Frama_C_show_each_imprecise_0_21: [0..32]
+[eva:show] equality.c:99: Frama_C_show_each_10_19: [10..42]
 [eva:alarm] equality.c:103: Warning: 
   accessing uninitialized left-value. assert \initialized(p);
-[eva] equality.c:105: Frama_C_show_each_10_42: [10..42]
+[eva:show] equality.c:105: Frama_C_show_each_10_42: [10..42]
 [eva:alarm] equality.c:111: Warning: 
   accessing uninitialized left-value. assert \initialized(p);
-[eva] equality.c:113: Frama_C_show_each_10_42: [10..42]
+[eva:show] equality.c:113: Frama_C_show_each_10_42: [10..42]
 [eva] Recording results for test_join
 [eva] Done for function test_join
 [eva] Recording results for main

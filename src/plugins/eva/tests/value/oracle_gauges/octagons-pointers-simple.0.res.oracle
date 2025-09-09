@@ -1,6 +1,6 @@
 39a40,70
 > [eva:partition] octagons-pointers-simple.c:43: starting to merge loop iterations
-> [eva] octagons-pointers-simple.c:46: 
+> [eva:show] octagons-pointers-simple.c:46: 
 >   Frama_C_dump_each:
 >   # octagon:
 >   {[ buffer - cmd ∈ [-436..-6]
@@ -10,7 +10,7 @@
 >       ]}
 >   ==END OF DUMP==
 > [eva] octagons-pointers-simple.c:47: Reusing old results for call to cmdRead
-> [eva] octagons-pointers-simple.c:46: 
+> [eva:show] octagons-pointers-simple.c:46: 
 >   Frama_C_dump_each:
 >   # octagon:
 >   {[ buffer - cmd ∈ [-436..-6]
@@ -20,7 +20,7 @@
 >       ]}
 >   ==END OF DUMP==
 > [eva] octagons-pointers-simple.c:47: Reusing old results for call to cmdRead
-> [eva] octagons-pointers-simple.c:46: 
+> [eva:show] octagons-pointers-simple.c:46: 
 >   Frama_C_dump_each:
 >   # octagon:
 >   {[ buffer - cmd ∈ [-436..-6]

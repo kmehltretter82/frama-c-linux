@@ -1,22 +1,23 @@
-11c11
-< [eva] backward_add_ptr.c:26: Frama_C_show_each_only_a: {0; 1}, {{ &a }}, {0}
+11,12c11
+< [eva:show] backward_add_ptr.c:26: 
+<   Frama_C_show_each_only_a: {0; 1}, {{ &a }}, {0}
 ---
-> [eva] backward_add_ptr.c:26: Frama_C_show_each_only_a: {0}, {{ &a }}, {0}
-72c72,75
+> [eva:show] backward_add_ptr.c:26: Frama_C_show_each_only_a: {0}, {{ &a }}, {0}
+73c72,75
 < [eva] backward_add_ptr.c:110: Reusing old results for call to gm
 ---
 > [eva] computing for function gm <- main3 <- main.
 >   Called from backward_add_ptr.c:110.
 > [eva] Recording results for gm
 > [eva] Done for function gm
-81c84,87
+82c84,87
 < [eva] backward_add_ptr.c:125: Reusing old results for call to gm
 ---
 > [eva] computing for function gm <- main3 <- main.
 >   Called from backward_add_ptr.c:125.
 > [eva] Recording results for gm
 > [eva] Done for function gm
-118c124,127
+119c124,127
 < [eva] backward_add_ptr.c:160: Reusing old results for call to gm
 ---
 > [eva] computing for function gm <- main4 <- main.

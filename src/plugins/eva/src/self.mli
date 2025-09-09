@@ -40,6 +40,7 @@ val dkey_summary : category
     level is associated to the category. *)
 val register_category: ?level:int -> help:string -> string -> category
 
+val dkey_show: category
 val dkey_pointer_comparison: category
 val dkey_cvalue_domain: category
 val dkey_iterator : category

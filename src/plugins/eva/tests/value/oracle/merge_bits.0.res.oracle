@@ -19,11 +19,11 @@
 [eva] Done for function join_offsetmap
 [eva] computing for function merge_bits <- main.
   Called from merge_bits.i:40.
-[eva] merge_bits.i:28: Frama_C_show_each_F: {1}
-[eva] merge_bits.i:29: Frama_C_show_each_F: {16777216}
-[eva] merge_bits.i:30: Frama_C_show_each_F: {67305985}
-[eva] merge_bits.i:31: Frama_C_show_each_F: {16843008}
-[eva] merge_bits.i:33: Frama_C_show_each_F: {1048577}
+[eva:show] merge_bits.i:28: Frama_C_show_each_F: {1}
+[eva:show] merge_bits.i:29: Frama_C_show_each_F: {16777216}
+[eva:show] merge_bits.i:30: Frama_C_show_each_F: {67305985}
+[eva:show] merge_bits.i:31: Frama_C_show_each_F: {16843008}
+[eva:show] merge_bits.i:33: Frama_C_show_each_F: {1048577}
 [eva] Recording results for merge_bits
 [eva] Done for function merge_bits
 [eva] Recording results for main

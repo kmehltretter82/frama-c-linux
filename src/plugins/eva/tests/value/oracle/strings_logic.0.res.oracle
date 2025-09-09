@@ -14,34 +14,34 @@
 [eva:loop-unroll:auto] strings_logic.c:48: Automatic loop unrolling.
 [eva:loop-unroll:auto] strings_logic.c:53: Automatic loop unrolling.
 [eva:alarm] strings_logic.c:84: Warning: assertion got status unknown.
-[eva] strings_logic.c:85: 
+[eva:show] strings_logic.c:85: 
   Frama_C_show_each_valid_string_zero_offset:
   {{ &s1 ; &s2 ; &s_zero ; &s_partially_valid ; &s_imprecise ; &s_unknown ;
      &anything }}
 [eva:alarm] strings_logic.c:89: Warning: assertion got status unknown.
-[eva] strings_logic.c:90: 
+[eva:show] strings_logic.c:90: 
   Frama_C_show_each_valid_read_string_zero_offset:
   {{ &s1 ; &s2 ; &s_const ; &s_zero ; &s_partially_valid ; &s_imprecise ;
      &s_unknown ; &anything ; "hello\000 world" ; "hello world" }}
 [eva:alarm] strings_logic.c:94: Warning: assertion got status unknown.
-[eva] strings_logic.c:95: 
+[eva:show] strings_logic.c:95: 
   Frama_C_show_each_invalid_string_zero_offset:
   {{ NULL ; &s_const ; &s_uninit ; &s_partially_initialized ; &s_imprecise ;
      &s_unknown ; &anything ; "hello\000 world" ; "hello world" }}
 [eva:alarm] strings_logic.c:99: Warning: assertion got status unknown.
-[eva] strings_logic.c:100: 
+[eva:show] strings_logic.c:100: 
   Frama_C_show_each_invalid_read_string_zero_offset:
   {{ NULL ; &s_uninit ; &s_partially_initialized ; &s_imprecise ; &s_unknown ;
      &anything }}
 [eva:alarm] strings_logic.c:108: Warning: assertion got status unknown.
-[eva] strings_logic.c:109: 
+[eva:show] strings_logic.c:109: 
   Frama_C_show_each_valid_string_precise_offset:
   {{ &s1 + {5; 10} ; &s2 + {5; 10} ; &s_zero + {5; 10; 20} ;
      &s_partially_initialized + {5; 10; 20} ;
      &s_partially_valid + {5; 10; 20} ; &s_imprecise + {5; 10; 20} ;
      &s_unknown + {5; 10; 20} ; &anything + {5; 10} }}
 [eva:alarm] strings_logic.c:113: Warning: assertion got status unknown.
-[eva] strings_logic.c:114: 
+[eva:show] strings_logic.c:114: 
   Frama_C_show_each_valid_read_string_precise_offset:
   {{ &s1 + {5; 10} ; &s2 + {5; 10} ; &s_const + {5; 10} ;
      &s_zero + {5; 10; 20} ; &s_partially_initialized + {5; 10; 20} ;
@@ -49,7 +49,7 @@
      &s_unknown + {5; 10; 20} ; &anything + {5; 10} ;
      "hello\000 world" + {5; 10} ; "hello world" + {5; 10} }}
 [eva:alarm] strings_logic.c:118: Warning: assertion got status unknown.
-[eva] strings_logic.c:119: 
+[eva:show] strings_logic.c:119: 
   Frama_C_show_each_invalid_string_precise_offset:
   {{ NULL + {5; 10; 20} ; &s1 + {5; 10; 20} ; &s2 + {5; 10; 20} ;
      &s_const + {5; 10; 20} ; &s_uninit + {5; 10; 20} ;
@@ -58,7 +58,7 @@
      &s_unknown + {5; 10; 20} ; &anything + {5; 10; 20} ;
      "hello\000 world" + {5; 10; 20} ; "hello world" + {5; 10; 20} }}
 [eva:alarm] strings_logic.c:123: Warning: assertion got status unknown.
-[eva] strings_logic.c:124: 
+[eva:show] strings_logic.c:124: 
   Frama_C_show_each_invalid_read_string_precise_offset:
   {{ NULL + {5; 10; 20} ; &s1 + {5; 10; 20} ; &s2 + {5; 10; 20} ;
      &s_const + {5; 10; 20} ; &s_uninit + {5; 10; 20} ;
@@ -67,20 +67,20 @@
      &s_unknown + {5; 10; 20} ; &anything + {5; 10; 20} ;
      "hello\000 world" + {5; 10; 20} ; "hello world" + {5; 10; 20} }}
 [eva:alarm] strings_logic.c:131: Warning: assertion got status unknown.
-[eva] strings_logic.c:132: 
+[eva:show] strings_logic.c:132: 
   Frama_C_show_each_valid_string_imprecise_offset:
   {{ &s1 + [0..13] ; &s2 + [0..12] ; &s_zero + [0..31] ;
      &s_partially_initialized + [0..31] ; &s_partially_valid + [0..31] ;
      &s_imprecise + [0..31] ; &s_unknown + [0..31] ; &anything + [0..15] }}
 [eva:alarm] strings_logic.c:136: Warning: assertion got status unknown.
-[eva] strings_logic.c:137: 
+[eva:show] strings_logic.c:137: 
   Frama_C_show_each_valid_read_string_imprecise_offset:
   {{ &s1 + [0..13] ; &s2 + [0..12] ; &s_const + [0..16] ; &s_zero + [0..31] ;
      &s_partially_initialized + [0..31] ; &s_partially_valid + [0..31] ;
      &s_imprecise + [0..31] ; &s_unknown + [0..31] ; &anything + [0..15] ;
      "hello\000 world" + [0..12] ; "hello world" + [0..11] }}
 [eva:alarm] strings_logic.c:141: Warning: assertion got status unknown.
-[eva] strings_logic.c:142: 
+[eva:show] strings_logic.c:142: 
   Frama_C_show_each_invalid_string_imprecise_offset:
   {{ NULL + [0..4294967295] ; &s1 + [-123..147] ; &s2 + [-123..147] ;
      &s_const + [-123..147] ; &s_zero + [-123..147] ; &s_uninit + [-123..147] ;
@@ -89,7 +89,7 @@
      &s_unknown + [-123..147] ; &anything + [-123..147] ;
      "hello\000 world" + [-123..147] ; "hello world" + [-123..147] }}
 [eva:alarm] strings_logic.c:146: Warning: assertion got status unknown.
-[eva] strings_logic.c:147: 
+[eva:show] strings_logic.c:147: 
   Frama_C_show_each_invalid_read_string_imprecise_offset:
   {{ NULL + [0..4294967295] ; &s1 + [-123..147] ; &s2 + [-123..147] ;
      &s_const + [-123..147] ; &s_zero + [-123..147] ; &s_uninit + [-123..147] ;
@@ -105,27 +105,27 @@
   has generated a garbled mix of addresses for assigns clause \result.
 [eva] Done for function garbled_mix
 [eva:alarm] strings_logic.c:154: Warning: assertion got status unknown.
-[eva] strings_logic.c:155: 
+[eva:show] strings_logic.c:155: 
   Frama_C_show_each_valid_string_garbled_mix:
   {{ &s1 + [0..13] ; &s2 + [0..12] ; &s_zero + [0..31] ;
      &s_partially_initialized + [0..31] ; &s_partially_valid + [0..31] ;
      &s_imprecise + [0..31] ; &s_unknown + [0..31] ; &anything + [0..15] }}
 [eva:alarm] strings_logic.c:159: Warning: assertion got status unknown.
-[eva] strings_logic.c:160: 
+[eva:show] strings_logic.c:160: 
   Frama_C_show_each_valid_read_string_garbled_mix:
   {{ &s1 + [0..13] ; &s2 + [0..12] ; &s_const + [0..16] ; &s_zero + [0..31] ;
      &s_partially_initialized + [0..31] ; &s_partially_valid + [0..31] ;
      &s_imprecise + [0..31] ; &s_unknown + [0..31] ; &anything + [0..15] ;
      "hello\000 world" + [0..12] ; "hello world" + [0..11] }}
 [eva:alarm] strings_logic.c:164: Warning: assertion got status unknown.
-[eva] strings_logic.c:165: 
+[eva:show] strings_logic.c:165: 
   Frama_C_show_each_invalid_string_garbled_mix:
   {{ garbled mix of &{s1; s2; s_const; s_zero; s_uninit;
                       s_partially_initialized; s_partially_valid; s_imprecise;
                       s_unknown; anything; "hello\000 world"; "hello world"}
   (origin: Library function {strings_logic.c:151}) }}
 [eva:alarm] strings_logic.c:169: Warning: assertion got status unknown.
-[eva] strings_logic.c:170: 
+[eva:show] strings_logic.c:170: 
   Frama_C_show_each_invalid_read_string_garbled_mix:
   {{ garbled mix of &{s1; s2; s_const; s_zero; s_uninit;
                       s_partially_initialized; s_partially_valid; s_imprecise;
@@ -136,14 +136,14 @@
 [eva] computing for function reduce_by_valid_wstring <- main.
   Called from strings_logic.c:210.
 [eva:alarm] strings_logic.c:193: Warning: assertion got status unknown.
-[eva] strings_logic.c:194: 
+[eva:show] strings_logic.c:194: 
   Frama_C_show_each_wide_string_valid_wstring: {{ &ws1 ; &ws_zero }}
 [eva:alarm] strings_logic.c:198: Warning: assertion got status unknown.
-[eva] strings_logic.c:199: 
+[eva:show] strings_logic.c:199: 
   Frama_C_show_each_wide_string_valid_read_wstring:
   {{ &ws1 ; &ws_zero ; L"Wide literal" }}
 [eva:alarm] strings_logic.c:203: Warning: assertion got status unknown.
-[eva] strings_logic.c:204: 
+[eva:show] strings_logic.c:204: 
   Frama_C_show_each_wide_string_invalid_read_wstring:
   {{ &ws1 ; &ws_zero ; &wchar ; &ws_with_hole ; L"Wide literal" }}
 [eva] Recording results for reduce_by_valid_wstring

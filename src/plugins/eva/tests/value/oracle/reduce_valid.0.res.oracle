@@ -11,13 +11,13 @@
   A ∈ {0}
   offs ∈ {0}
 [eva:alarm] reduce_valid.i:9: Warning: out of bounds write. assert \valid(p);
-[eva] reduce_valid.i:16: Frama_C_show_each_ici: {0}
+[eva:show] reduce_valid.i:16: Frama_C_show_each_ici: {0}
 [eva:alarm] reduce_valid.i:17: Warning: out of bounds write. assert \valid(q);
 [eva] reduce_valid.i:17: Warning: 
   all target addresses were invalid. This path is assumed to be dead.
 [eva:alarm] reduce_valid.i:24: Warning: 
   out of bounds read. assert \valid_read(r + offs);
-[eva] reduce_valid.i:25: Frama_C_show_each_r: {{ &t }}
+[eva:show] reduce_valid.i:25: Frama_C_show_each_r: {{ &t }}
 [eva:alarm] reduce_valid.i:26: Warning: 
   accessing out of bounds index. assert (int)((int)h + 1) < 2;
 [eva] Recording results for main

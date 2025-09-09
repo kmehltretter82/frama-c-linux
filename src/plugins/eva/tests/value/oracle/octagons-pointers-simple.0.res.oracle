@@ -11,7 +11,7 @@
 [eva:partition] octagons-pointers-simple.c:18: starting to merge loop iterations
 [eva] Recording results for init
 [eva] Done for function init
-[eva] octagons-pointers-simple.c:46: 
+[eva:show] octagons-pointers-simple.c:46: 
   Frama_C_dump_each:
   # octagon:
   {[ buffer - cmd ∈ {-3}
@@ -22,7 +22,7 @@
   Called from octagons-pointers-simple.c:47.
 [eva] Recording results for cmdRead
 [eva] Done for function cmdRead
-[eva] octagons-pointers-simple.c:46: 
+[eva:show] octagons-pointers-simple.c:46: 
   Frama_C_dump_each:
   # octagon:
   {[ buffer - cmd ∈ [-436..-6]

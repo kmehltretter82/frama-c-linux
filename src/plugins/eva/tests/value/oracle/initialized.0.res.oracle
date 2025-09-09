@@ -75,7 +75,7 @@
 [eva:garbled-mix:write] initialized.c:50: 
   Assigning imprecise value to t[6]
   because of arithmetic operation on addresses.
-[eva] initialized.c:63: 
+[eva:show] initialized.c:63: 
   Frama_C_dump_each:
   # cvalue:
   __fc_heap_status ∈ [--..--]
@@ -106,7 +106,7 @@
   __retres ∈ UNINITIALIZED
   ==END OF DUMP==
 [eva:alarm] initialized.c:66: Warning: assertion got status unknown.
-[eva] initialized.c:68: 
+[eva:show] initialized.c:68: 
   Frama_C_dump_each:
   # cvalue:
   __fc_heap_status ∈ [--..--]
@@ -140,7 +140,7 @@
   i6 ∈ [--..--]
   __retres ∈ UNINITIALIZED
   ==END OF DUMP==
-[eva] initialized.c:70: Frama_C_show_each: {0x66778811}
+[eva:show] initialized.c:70: Frama_C_show_each: {0x66778811}
 [eva:alarm] initialized.c:72: Warning: assertion got status unknown.
 [eva:alarm] initialized.c:74: Warning: assertion got status unknown.
 [eva:alarm] initialized.c:76: Warning: assertion got status unknown.

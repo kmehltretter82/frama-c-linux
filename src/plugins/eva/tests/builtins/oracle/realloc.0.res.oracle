@@ -8,7 +8,7 @@
   Called from realloc.c:177.
 [eva] realloc.c:12: Call to builtin malloc
 [eva:malloc:new] realloc.c:12: allocating variable __malloc_main1_l12
-[eva] realloc.c:15: 
+[eva:show] realloc.c:15: 
   Frama_C_dump_each:
   # cvalue:
   __fc_heap_status ∈ [--..--]
@@ -27,7 +27,7 @@
 [eva:malloc] bases_to_realloc: {__malloc_main1_l12}
 [eva:malloc:new] realloc.c:16: allocating variable __realloc_main1_l16
 [eva:malloc] realloc.c:16: strong free on bases: {__malloc_main1_l12}
-[eva] realloc.c:17: 
+[eva:show] realloc.c:17: 
   Frama_C_dump_each:
   # cvalue:
   __fc_heap_status ∈ [--..--]
@@ -63,7 +63,7 @@
 [eva:malloc] bases_to_realloc: {__malloc_main2_l23}
 [eva:malloc:new] realloc.c:26: allocating variable __realloc_main2_l26
 [eva:malloc] realloc.c:26: strong free on bases: {__malloc_main2_l23}
-[eva] realloc.c:27: 
+[eva:show] realloc.c:27: 
   Frama_C_dump_each:
   # cvalue:
   __fc_heap_status ∈ [--..--]
@@ -95,7 +95,7 @@
 [eva] realloc.c:39: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] realloc.c:44: 
+[eva:show] realloc.c:44: 
   Frama_C_dump_each:
   # cvalue:
   __fc_heap_status ∈ [--..--]
@@ -118,7 +118,7 @@
 [eva:malloc:new] realloc.c:46: allocating variable __realloc_main3_l46
 [eva:malloc] realloc.c:46: 
   weak free on bases: {__malloc_main3_l32, __malloc_main3_l35}
-[eva] realloc.c:48: 
+[eva:show] realloc.c:48: 
   Frama_C_dump_each:
   # cvalue:
   __fc_heap_status ∈ [--..--]
@@ -171,7 +171,7 @@
 [eva:malloc:new] realloc.c:56: allocating variable __malloc_main4_l56
 [eva:alarm] realloc.c:59: Warning: out of bounds write. assert \valid(q + i);
 [eva:alarm] realloc.c:58: Warning: out of bounds write. assert \valid(p + i);
-[eva] realloc.c:61: 
+[eva:show] realloc.c:61: 
   Frama_C_dump_each:
   # cvalue:
   __fc_heap_status ∈ [--..--]
@@ -217,7 +217,7 @@
 [eva:malloc] bases_to_realloc: {__malloc_main4_l56}
 [eva:malloc:new] realloc.c:68: allocating variable __realloc_main4_l68
 [eva:malloc] realloc.c:68: strong free on bases: {__malloc_main4_l56}
-[eva] realloc.c:69: 
+[eva:show] realloc.c:69: 
   Frama_C_dump_each:
   # cvalue:
   __fc_heap_status ∈ [--..--]
@@ -269,7 +269,7 @@
 [eva] realloc.c:78: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] realloc.c:83: 
+[eva:show] realloc.c:83: 
   Frama_C_dump_each:
   # cvalue:
   __fc_heap_status ∈ [--..--]
@@ -289,7 +289,7 @@
 [eva:malloc] bases_to_realloc: {__malloc_main5_l76}
 [eva:malloc:new] realloc.c:85: allocating variable __realloc_main5_l85
 [eva:malloc] realloc.c:85: weak free on bases: {__malloc_main5_l76}
-[eva] realloc.c:86: 
+[eva:show] realloc.c:86: 
   Frama_C_dump_each:
   # cvalue:
   __fc_heap_status ∈ [--..--]
@@ -325,7 +325,8 @@
 [eva] Done for function Frama_C_interval
 [eva] realloc.c:93: Call to builtin malloc
 [eva:malloc:new] realloc.c:93: allocating variable __malloc_main6_l93
-[eva] realloc.c:102: Frama_C_show_each: {{ &x ; &__malloc_main6_l93 + {4} }}
+[eva:show] realloc.c:102: 
+  Frama_C_show_each: {{ &x ; &__malloc_main6_l93 + {4} }}
 [eva] realloc.c:103: Call to builtin realloc
 [eva:alarm] realloc.c:103: Warning: 
   function realloc: precondition 'freeable' got status invalid.
@@ -343,7 +344,7 @@
 [eva:malloc] bases_to_realloc: {__malloc_main7_l110}
 [eva:malloc:new] realloc.c:115: allocating variable __realloc_main7_l115
 [eva:malloc] realloc.c:115: strong free on bases: {__malloc_main7_l110}
-[eva] realloc.c:116: 
+[eva:show] realloc.c:116: 
   Frama_C_dump_each:
   # cvalue:
   __fc_heap_status ∈ [--..--]
@@ -360,7 +361,7 @@
   ==END OF DUMP==
 [eva:locals-escaping] realloc.c:116: Warning: 
   locals {x} escaping the scope of a block of main7 through __realloc_main7_l115
-[eva] realloc.c:118: 
+[eva:show] realloc.c:118: 
   Frama_C_dump_each:
   # cvalue:
   __fc_heap_status ∈ [--..--]
@@ -388,7 +389,7 @@
 [eva:malloc] bases_to_realloc: {__malloc_main8_l123}
 [eva:malloc:new] realloc.c:126: allocating variable __realloc_main8_l126
 [eva:malloc] realloc.c:126: strong free on bases: {__malloc_main8_l123}
-[eva] realloc.c:127: 
+[eva:show] realloc.c:127: 
   Frama_C_dump_each:
   # cvalue:
   __fc_heap_status ∈ [--..--]
@@ -415,7 +416,7 @@
 [eva:malloc] bases_to_realloc: {__malloc_main9_l132}
 [eva:malloc:new] realloc.c:135: allocating variable __realloc_main9_l135
 [eva:malloc] realloc.c:135: strong free on bases: {__malloc_main9_l132}
-[eva] realloc.c:136: 
+[eva:show] realloc.c:136: 
   Frama_C_dump_each:
   # cvalue:
   __fc_heap_status ∈ [--..--]
@@ -442,8 +443,8 @@
 [eva:malloc] bases_to_realloc: {__malloc_main10_l147}
 [eva:malloc:new] realloc.c:152: allocating variable __realloc_main10_l152
 [eva:malloc] realloc.c:152: strong free on bases: {__malloc_main10_l147}
-[eva] realloc.c:154: Frama_C_show_each_main10: {4}
-[eva] realloc.c:155: 
+[eva:show] realloc.c:154: Frama_C_show_each_main10: {4}
+[eva:show] realloc.c:155: 
   Frama_C_dump_each:
   # cvalue:
   __fc_heap_status ∈ [--..--]
@@ -462,8 +463,8 @@
 [eva:malloc:weak] realloc.c:152: 
   marking variable `__realloc_main10_l152' as weak
 [eva:malloc] realloc.c:152: weak free on bases: {__realloc_w_main10_l152}
-[eva] realloc.c:154: Frama_C_show_each_main10: {4}
-[eva] realloc.c:155: 
+[eva:show] realloc.c:154: Frama_C_show_each_main10: {4}
+[eva:show] realloc.c:155: 
   Frama_C_dump_each:
   # cvalue:
   __fc_heap_status ∈ [--..--]
@@ -508,8 +509,8 @@
 [eva:malloc] bases_to_realloc: {}
 [eva:malloc:new] realloc.c:171: allocating variable __realloc_main11_l171
 [eva:malloc] realloc.c:171: strong free on bases: {}
-[eva] realloc.c:172: Frama_C_show_each_p: {{ &__realloc_main11_l171 }}
-[eva] realloc.c:172: Frama_C_show_each_p: {0}
+[eva:show] realloc.c:172: Frama_C_show_each_p: {{ &__realloc_main11_l171 }}
+[eva:show] realloc.c:172: Frama_C_show_each_p: {0}
 [eva] realloc.c:165: Call to builtin reallocarray
 [eva:malloc] bases_to_realloc: {__realloc_main11_l171}
 [eva:malloc:weak] realloc.c:165: 
@@ -534,10 +535,10 @@
 [eva] realloc.c:171: Call to builtin reallocarray
 [eva:malloc] bases_to_realloc: {}
 [eva:malloc] realloc.c:171: strong free on bases: {}
-[eva] realloc.c:172: Frama_C_show_each_p: {{ &__realloc_main11_l171 }}
-[eva] realloc.c:172: Frama_C_show_each_p: {0}
-[eva] realloc.c:172: Frama_C_show_each_p: {{ &__realloc_main11_l171 }}
-[eva] realloc.c:172: Frama_C_show_each_p: {0}
+[eva:show] realloc.c:172: Frama_C_show_each_p: {{ &__realloc_main11_l171 }}
+[eva:show] realloc.c:172: Frama_C_show_each_p: {0}
+[eva:show] realloc.c:172: Frama_C_show_each_p: {{ &__realloc_main11_l171 }}
+[eva:show] realloc.c:172: Frama_C_show_each_p: {0}
 [eva] realloc.c:165: Call to builtin reallocarray
 [eva:malloc] bases_to_realloc: {__realloc_main11_l171}
 [eva:malloc] realloc.c:165: strong free on bases: {__realloc_main11_l171}

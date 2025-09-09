@@ -5,7 +5,7 @@
 >   Called from fptr.i:9.
 > [eva] Recording results for h
 > [eva] Done for function h
-50,51c53,60
+51,52c54,61
 < [eva] fptr.i:9: Reusing old results for call to h
 < [eva] fptr.i:9: Reusing old results for call to hh
 ---
@@ -17,7 +17,7 @@
 >   Called from fptr.i:9.
 > [eva] Recording results for hh
 > [eva] Done for function hh
-55c64,75
+57c66,77
 < [eva] fptr.i:68: Reusing old results for call to f
 ---
 > [eva] computing for function f <- main_uninit.

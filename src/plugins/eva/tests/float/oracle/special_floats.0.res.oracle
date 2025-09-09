@@ -34,37 +34,37 @@
 [eva:alarm] special_floats.c:52: Warning: check 'false' got status invalid.
 [eva:alarm] special_floats.c:53: Warning: check 'unknown' got status unknown.
 [eva:alarm] special_floats.c:57: Warning: assertion got status unknown.
-[eva] special_floats.c:58: Frama_C_show_each_pos_infinity: {inf}
+[eva:show] special_floats.c:58: Frama_C_show_each_pos_infinity: {inf}
 [eva:alarm] special_floats.c:61: Warning: assertion got status unknown.
-[eva] special_floats.c:62: Frama_C_show_each_neg_infinity: {-inf}
+[eva:show] special_floats.c:62: Frama_C_show_each_neg_infinity: {-inf}
 [eva:alarm] special_floats.c:65: Warning: assertion got status unknown.
-[eva] special_floats.c:66: Frama_C_show_each_infinities: [-inf .. inf]
+[eva:show] special_floats.c:66: Frama_C_show_each_infinities: [-inf .. inf]
 [eva:alarm] special_floats.c:69: Warning: assertion got status unknown.
 [eva:alarm] special_floats.c:70: Warning: assertion got status unknown.
-[eva] special_floats.c:71: 
+[eva:show] special_floats.c:71: 
   Frama_C_show_each_finite_nan:
   [-1.79769313486e+308 .. 1.79769313486e+308] ∪ {NaN}
 [eva:alarm] special_floats.c:74: Warning: assertion got status unknown.
-[eva] special_floats.c:75: 
+[eva:show] special_floats.c:75: 
   Frama_C_show_each_finite_nan:
   [-1.79769313486e+308 .. 1.79769313486e+308] ∪ {NaN}
 [eva:alarm] special_floats.c:78: Warning: assertion got status unknown.
-[eva] special_floats.c:79: Frama_C_show_each_top: [-inf .. inf] ∪ {NaN}
+[eva:show] special_floats.c:79: Frama_C_show_each_top: [-inf .. inf] ∪ {NaN}
 [eva:alarm] special_floats.c:82: Warning: assertion got status unknown.
-[eva] special_floats.c:83: Frama_C_show_each_pos_infinity: {inf;NaN}
+[eva:show] special_floats.c:83: Frama_C_show_each_pos_infinity: {inf;NaN}
 [eva:alarm] special_floats.c:86: Warning: assertion got status unknown.
-[eva] special_floats.c:87: Frama_C_show_each_neg_infinity: {-inf}
+[eva:show] special_floats.c:87: Frama_C_show_each_neg_infinity: {-inf}
 [eva] Recording results for is_infinite
 [eva] Done for function is_infinite
 [eva] computing for function macro_infinity <- main.
   Called from special_floats.c:119.
-[eva] special_floats.c:97: Frama_C_show_each_infinity: {inf}
+[eva:show] special_floats.c:97: Frama_C_show_each_infinity: {inf}
 [eva] special_floats.c:98: assertion got status valid.
 [eva] Recording results for macro_infinity
 [eva] Done for function macro_infinity
 [eva] computing for function macro_nan <- main.
   Called from special_floats.c:120.
-[eva] special_floats.c:107: Frama_C_show_each_nan: NaN
+[eva:show] special_floats.c:107: Frama_C_show_each_nan: NaN
 [eva] special_floats.c:108: assertion got status valid.
 [eva] special_floats.c:109: assertion got status valid.
 [eva] special_floats.c:110: assertion got status valid.

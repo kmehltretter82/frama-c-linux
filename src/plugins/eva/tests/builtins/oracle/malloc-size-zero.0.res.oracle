@@ -11,7 +11,7 @@
   allocating variable __malloc_my_calloc_l10
 [eva] Recording results for my_calloc
 [eva] Done for function my_calloc
-[eva] malloc-size-zero.c:20: Frama_C_show_each_not_NULL_p1:
+[eva:show] malloc-size-zero.c:20: Frama_C_show_each_not_NULL_p1:
 [eva:alarm] malloc-size-zero.c:24: Warning: 
   pointer comparison. assert \pointer_comparable((void *)(p1 + 1), (void *)0);
 [eva] computing for function my_calloc <- main.
@@ -50,7 +50,7 @@
   marking variable `__malloc_my_calloc_l10_3' as weak
 [eva] Recording results for my_calloc
 [eva] Done for function my_calloc
-[eva] malloc-size-zero.c:33: 
+[eva:show] malloc-size-zero.c:33: 
   Frama_C_dump_each:
   # cvalue:
   __fc_heap_status ∈ [--..--]
@@ -77,7 +77,7 @@
   function free: precondition 'freeable' got status valid.
 [eva:malloc] malloc-size-zero.c:37: 
   strong free on bases: {__malloc_my_calloc_l10}
-[eva] malloc-size-zero.c:39: 
+[eva:show] malloc-size-zero.c:39: 
   Frama_C_show_each:
   {{ &__malloc_my_calloc_l10_0 ; &__malloc_my_calloc_l10_1 ;
      &__malloc_my_calloc_l10_2 ; &__malloc_w_my_calloc_l10_3 }}

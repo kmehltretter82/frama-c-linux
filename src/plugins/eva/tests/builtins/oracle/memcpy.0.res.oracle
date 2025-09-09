@@ -354,7 +354,7 @@
 [eva] memcpy.c:213: function memcpy: precondition 'separation' got status valid.
 [eva:locals-escaping] memcpy.c:214: Warning: 
   locals {y} escaping the scope of a block of test_local through p
-[eva] memcpy.c:216: 
+[eva:show] memcpy.c:216: 
   Frama_C_dump_each:
   # cvalue:
   __fc_heap_status ∈ [--..--]

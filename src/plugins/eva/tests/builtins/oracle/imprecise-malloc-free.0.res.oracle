@@ -29,10 +29,10 @@
 [eva] imprecise-malloc-free.c:16: Call to builtin malloc
 [eva:malloc:new] imprecise-malloc-free.c:16: 
   allocating variable __malloc_main_l16
-[eva] imprecise-malloc-free.c:18: 
+[eva:show] imprecise-malloc-free.c:18: 
   Frama_C_show_each:
   {{ &__malloc_main_l14 }}, {{ &__malloc_main_l15 }}, {{ &__malloc_main_l16 }}
-[eva] imprecise-malloc-free.c:19: 
+[eva:show] imprecise-malloc-free.c:19: 
   Frama_C_show_each:
   {{ garbled mix of &{__malloc_main_l14}
   (origin: Arithmetic {imprecise-malloc-free.c:19}) }}

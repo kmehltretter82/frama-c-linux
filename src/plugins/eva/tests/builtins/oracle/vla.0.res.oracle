@@ -9,7 +9,7 @@
 [eva] vla.c:6: assertion 'alloca_bounds' got status valid.
 [eva] vla.c:6: Call to builtin __fc_vla_alloc
 [eva:malloc:new] vla.c:6: allocating variable __malloc_f_l6
-[eva] vla.c:7: Frama_C_show_each: {{ &__malloc_f_l6 }}
+[eva:show] vla.c:7: Frama_C_show_each: {{ &__malloc_f_l6 }}
 [eva] vla.c:6: Call to builtin __fc_vla_free
 [eva:malloc] vla.c:6: strong free on bases: {__malloc_f_l6}
 [eva] Recording results for f
@@ -20,7 +20,7 @@
   Called from vla.c:20.
 [eva] vla.c:6: Call to builtin __fc_vla_alloc
 [eva:malloc] vla.c:6: resizing variable `__malloc_f_l6' (0..63) to fit 0..95
-[eva] vla.c:7: Frama_C_show_each: {{ &__malloc_f_l6 }}
+[eva:show] vla.c:7: Frama_C_show_each: {{ &__malloc_f_l6 }}
 [eva:alarm] vla.c:8: Warning: out of bounds write. assert \valid(t + i);
 [eva:alarm] vla.c:9: Warning: out of bounds read. assert \valid_read(t + i);
 [eva] vla.c:6: Call to builtin __fc_vla_free
@@ -32,7 +32,7 @@
   Called from vla.c:20.
 [eva] vla.c:6: Call to builtin __fc_vla_alloc
 [eva:malloc] vla.c:6: resizing variable `__malloc_f_l6' (0..63/95) to fit 0..127
-[eva] vla.c:7: Frama_C_show_each: {{ &__malloc_f_l6 }}
+[eva:show] vla.c:7: Frama_C_show_each: {{ &__malloc_f_l6 }}
 [eva] vla.c:6: Call to builtin __fc_vla_free
 [eva:malloc] vla.c:6: strong free on bases: {__malloc_f_l6}
 [eva] Recording results for f
@@ -43,7 +43,7 @@
 [eva] vla.c:6: Call to builtin __fc_vla_alloc
 [eva:malloc] vla.c:6: 
   resizing variable `__malloc_f_l6' (0..63/127) to fit 0..159
-[eva] vla.c:7: Frama_C_show_each: {{ &__malloc_f_l6 }}
+[eva:show] vla.c:7: Frama_C_show_each: {{ &__malloc_f_l6 }}
 [eva] vla.c:6: Call to builtin __fc_vla_free
 [eva:malloc] vla.c:6: strong free on bases: {__malloc_f_l6}
 [eva] Recording results for f
@@ -54,7 +54,7 @@
 [eva] vla.c:6: Call to builtin __fc_vla_alloc
 [eva:malloc] vla.c:6: 
   resizing variable `__malloc_f_l6' (0..63/159) to fit 0..191
-[eva] vla.c:7: Frama_C_show_each: {{ &__malloc_f_l6 }}
+[eva:show] vla.c:7: Frama_C_show_each: {{ &__malloc_f_l6 }}
 [eva] vla.c:6: Call to builtin __fc_vla_free
 [eva:malloc] vla.c:6: strong free on bases: {__malloc_f_l6}
 [eva] Recording results for f
@@ -65,7 +65,7 @@
 [eva] vla.c:6: Call to builtin __fc_vla_alloc
 [eva:malloc] vla.c:6: 
   resizing variable `__malloc_f_l6' (0..63/191) to fit 0..223
-[eva] vla.c:7: Frama_C_show_each: {{ &__malloc_f_l6 }}
+[eva:show] vla.c:7: Frama_C_show_each: {{ &__malloc_f_l6 }}
 [eva] vla.c:6: Call to builtin __fc_vla_free
 [eva:malloc] vla.c:6: strong free on bases: {__malloc_f_l6}
 [eva] Recording results for f
@@ -76,7 +76,7 @@
 [eva] vla.c:6: Call to builtin __fc_vla_alloc
 [eva:malloc] vla.c:6: 
   resizing variable `__malloc_f_l6' (0..63/223) to fit 0..255
-[eva] vla.c:7: Frama_C_show_each: {{ &__malloc_f_l6 }}
+[eva:show] vla.c:7: Frama_C_show_each: {{ &__malloc_f_l6 }}
 [eva] vla.c:6: Call to builtin __fc_vla_free
 [eva:malloc] vla.c:6: strong free on bases: {__malloc_f_l6}
 [eva] Recording results for f
@@ -87,7 +87,7 @@
 [eva] vla.c:6: Call to builtin __fc_vla_alloc
 [eva:malloc] vla.c:6: 
   resizing variable `__malloc_f_l6' (0..63/255) to fit 0..287
-[eva] vla.c:7: Frama_C_show_each: {{ &__malloc_f_l6 }}
+[eva:show] vla.c:7: Frama_C_show_each: {{ &__malloc_f_l6 }}
 [eva] vla.c:6: Call to builtin __fc_vla_free
 [eva:malloc] vla.c:6: strong free on bases: {__malloc_f_l6}
 [eva] Recording results for f
@@ -98,7 +98,7 @@
 [eva] vla.c:6: Call to builtin __fc_vla_alloc
 [eva:malloc] vla.c:6: 
   resizing variable `__malloc_f_l6' (0..63/287) to fit 0..319
-[eva] vla.c:7: Frama_C_show_each: {{ &__malloc_f_l6 }}
+[eva:show] vla.c:7: Frama_C_show_each: {{ &__malloc_f_l6 }}
 [eva] vla.c:6: Call to builtin __fc_vla_free
 [eva:malloc] vla.c:6: strong free on bases: {__malloc_f_l6}
 [eva] Recording results for f

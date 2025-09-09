@@ -7,7 +7,7 @@
   y ∈ {0}
 [eva] computing for function g <- main.
   Called from char_ampamp.c:17.
-[eva] char_ampamp.c:11: Frama_C_show_each_x: {1}
+[eva:show] char_ampamp.c:11: Frama_C_show_each_x: {1}
 [eva] Recording results for g
 [eva] Done for function g
 [eva] Recording results for main

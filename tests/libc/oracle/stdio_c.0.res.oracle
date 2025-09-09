@@ -303,9 +303,9 @@
 [eva] Done for function fgetc
 [eva] Recording results for getchar
 [eva] Done for function getchar
-[eva] stdio_c.c:50: Frama_C_show_each_getchar: [-1..255]
+[eva:show] stdio_c.c:50: Frama_C_show_each_getchar: [-1..255]
 [eva] stdio_c.c:51: Reusing old results for call to fgetc
-[eva] stdio_c.c:52: Frama_C_show_each_fgetc: [-1..255]
+[eva:show] stdio_c.c:52: Frama_C_show_each_fgetc: [-1..255]
 [eva] computing for function fgets <- main.
   Called from stdio_c.c:54.
 [eva] computing for function Frama_C_interval <- fgets <- main.

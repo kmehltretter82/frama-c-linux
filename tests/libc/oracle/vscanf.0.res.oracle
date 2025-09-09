@@ -888,7 +888,7 @@
 [eva] Done for function caller_stub_for_vscanf
 [eva:alarm] vscanf.c:23: Warning: check got status unknown.
 [eva:alarm] vscanf.c:24: Warning: check got status unknown.
-[eva] vscanf.c:25: 
+[eva:show] vscanf.c:25: 
   Frama_C_show_each_must_be_reachable:
   [-2147483648..2147483647],
   {{ &c }},

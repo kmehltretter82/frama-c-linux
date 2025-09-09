@@ -35,7 +35,7 @@
   invalid RHS operand for shift. assert 0 ≤ 5555 < 32;
 [eva:alarm] shift.i:40: Warning: 
   invalid RHS operand for shift. assert 0 ≤ b < 32;
-[eva] shift.i:48: 
+[eva:show] shift.i:48: 
   Frama_C_show_each: {{ "ua:%u\nub:%u\n" }}, {1401}, {1073741074}
 [eva:alarm] shift.i:52: Warning: 
   unsigned overflow. assert 0 ≤ (unsigned long)((char *)t) << 8;

@@ -296,7 +296,7 @@
 [eva] wcslen.c:307: Call to builtin wcslen
 [eva:alarm] wcslen.c:307: Warning: 
   function wcslen: precondition 'valid_string_s' got status unknown.
-[eva] wcslen.c:308: Frama_C_show_each: {0}, {0}, {0}
+[eva:show] wcslen.c:308: Frama_C_show_each: {0}, {0}, {0}
 [eva] wcslen.c:310: Call to builtin wcslen
 [eva:alarm] wcslen.c:310: Warning: 
   function wcslen: precondition 'valid_string_s' got status unknown.
@@ -306,7 +306,7 @@
 [eva] wcslen.c:312: Call to builtin wcslen
 [eva:alarm] wcslen.c:312: Warning: 
   function wcslen: precondition 'valid_string_s' got status unknown.
-[eva] wcslen.c:313: Frama_C_show_each: {0}, {0}, {0}
+[eva:show] wcslen.c:313: Frama_C_show_each: {0}, {0}, {0}
 [eva] Recording results for big_array
 [eva] Done for function big_array
 [eva] computing for function negative_offsets <- main.

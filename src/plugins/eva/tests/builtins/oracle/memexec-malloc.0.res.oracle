@@ -14,9 +14,9 @@
 [eva] Recording results for f
 [eva] Done for function f
 [eva] memexec-malloc.c:25: Reusing old results for call to f
-[eva] memexec-malloc.c:26: Frama_C_show_each: [0..1999]
-[eva] memexec-malloc.c:27: Frama_C_show_each: [0..1999]
-[eva] memexec-malloc.c:28: Frama_C_show_each: [0..1999]
+[eva:show] memexec-malloc.c:26: Frama_C_show_each: [0..1999]
+[eva:show] memexec-malloc.c:27: Frama_C_show_each: [0..1999]
+[eva:show] memexec-malloc.c:28: Frama_C_show_each: [0..1999]
 [eva] memexec-malloc.c:29: Reusing old results for call to f
 [eva] computing for function alloc <- main.
   Called from memexec-malloc.c:31.

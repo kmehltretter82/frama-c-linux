@@ -70,46 +70,46 @@
 [eva] malloc_multiple.c:29: Call to builtin malloc
 [eva:malloc:new] malloc_multiple.c:29: 
   allocating variable __malloc_allocate_and_free_last_l29
-[eva] malloc_multiple.c:31: 
+[eva:show] malloc_multiple.c:31: 
   Frama_C_show_each_F: {{ &__malloc_allocate_and_free_last_l29 }}
 [eva] malloc_multiple.c:29: Call to builtin malloc
 [eva:malloc:new] malloc_multiple.c:29: 
   allocating variable __malloc_allocate_and_free_last_l29_0
-[eva] malloc_multiple.c:31: 
+[eva:show] malloc_multiple.c:31: 
   Frama_C_show_each_F: {{ &__malloc_allocate_and_free_last_l29_0 }}
 [eva] malloc_multiple.c:29: Call to builtin malloc
 [eva:malloc:new] malloc_multiple.c:29: 
   allocating variable __malloc_allocate_and_free_last_l29_1
-[eva] malloc_multiple.c:31: 
+[eva:show] malloc_multiple.c:31: 
   Frama_C_show_each_F: {{ &__malloc_allocate_and_free_last_l29_1 }}
 [eva] malloc_multiple.c:29: Call to builtin malloc
 [eva:malloc:new] malloc_multiple.c:29: 
   allocating variable __malloc_allocate_and_free_last_l29_2
-[eva] malloc_multiple.c:31: 
+[eva:show] malloc_multiple.c:31: 
   Frama_C_show_each_F: {{ &__malloc_allocate_and_free_last_l29_2 }}
 [eva] malloc_multiple.c:29: Call to builtin malloc
 [eva:malloc:new] malloc_multiple.c:29: 
   allocating variable __malloc_allocate_and_free_last_l29_3
-[eva] malloc_multiple.c:31: 
+[eva:show] malloc_multiple.c:31: 
   Frama_C_show_each_F: {{ &__malloc_allocate_and_free_last_l29_3 }}
 [eva] malloc_multiple.c:29: Call to builtin malloc
 [eva:malloc:new] malloc_multiple.c:29: 
   allocating variable __malloc_allocate_and_free_last_l29_4
-[eva] malloc_multiple.c:31: 
+[eva:show] malloc_multiple.c:31: 
   Frama_C_show_each_F: {{ &__malloc_allocate_and_free_last_l29_4 }}
 [eva] malloc_multiple.c:29: Call to builtin malloc
 [eva:malloc:weak] malloc_multiple.c:29: 
   marking variable `__malloc_allocate_and_free_last_l29_4' as weak
-[eva] malloc_multiple.c:31: 
+[eva:show] malloc_multiple.c:31: 
   Frama_C_show_each_F: {{ &__malloc_w_allocate_and_free_last_l29_4 }}
 [eva] malloc_multiple.c:29: Call to builtin malloc
-[eva] malloc_multiple.c:31: 
+[eva:show] malloc_multiple.c:31: 
   Frama_C_show_each_F: {{ &__malloc_w_allocate_and_free_last_l29_4 }}
 [eva] malloc_multiple.c:29: Call to builtin malloc
-[eva] malloc_multiple.c:31: 
+[eva:show] malloc_multiple.c:31: 
   Frama_C_show_each_F: {{ &__malloc_w_allocate_and_free_last_l29_4 }}
 [eva] malloc_multiple.c:29: Call to builtin malloc
-[eva] malloc_multiple.c:31: 
+[eva:show] malloc_multiple.c:31: 
   Frama_C_show_each_F: {{ &__malloc_w_allocate_and_free_last_l29_4 }}
 [eva] malloc_multiple.c:34: Call to builtin free
 [eva] malloc_multiple.c:34: 

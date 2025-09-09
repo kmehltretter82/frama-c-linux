@@ -45,14 +45,15 @@
   Called from offsetmap.i:87.
 [eva] using specification for function Frama_C_interval
 [eva] Done for function Frama_C_interval
-[eva] offsetmap.i:90: Frama_C_show_each_1_256_257: [-2147483648..2147483647]
+[eva:show] offsetmap.i:90: 
+  Frama_C_show_each_1_256_257: [-2147483648..2147483647]
 [eva:alarm] offsetmap.i:95: Warning: 
   pointer comparison. assert \pointer_comparable((void *)q, (void *)0);
 [eva:alarm] offsetmap.i:95: Warning: out of bounds write. assert \valid(q);
 [eva] computing for function Frama_C_interval <- h <- main.
   Called from offsetmap.i:101.
 [eva] Done for function Frama_C_interval
-[eva] offsetmap.i:104: Frama_C_show_each_1_256_257: [-32768..32767]
+[eva:show] offsetmap.i:104: Frama_C_show_each_1_256_257: [-32768..32767]
 [eva] Recording results for h
 [eva] Done for function h
 [eva] Recording results for main

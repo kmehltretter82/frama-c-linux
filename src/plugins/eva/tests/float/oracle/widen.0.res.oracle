@@ -10,17 +10,17 @@
 [eva:alarm] widen.c:14: Warning: 
   non-finite double value. assert \is_finite(\mul_double(max, (double)2.));
 [eva:partition] widen.c:16: starting to merge loop iterations
-[eva] widen.c:24: Frama_C_show_each_double_inf: [1. .. 1.79769313486e+308]
+[eva:show] widen.c:24: Frama_C_show_each_double_inf: [1. .. 1.79769313486e+308]
 [eva:partition] widen.c:25: starting to merge loop iterations
 [eva:alarm] widen.c:27: Warning: 
   non-finite float value. assert \is_finite((float)max);
-[eva] widen.c:34: Frama_C_show_each_float_inf: [1. .. 3.40282346639e+38]
+[eva:show] widen.c:34: Frama_C_show_each_float_inf: [1. .. 3.40282346639e+38]
 [eva] Recording results for main1
 [eva] Done for function main1
 [eva] computing for function main2 <- main.
   Called from widen.c:51.
 [eva:partition] widen.c:40: starting to merge loop iterations
-[eva] widen.c:45: Frama_C_show_each: [-0. .. 0.]
+[eva:show] widen.c:45: Frama_C_show_each: [-0. .. 0.]
 [eva] Recording results for main2
 [eva] Done for function main2
 [eva] Recording results for main

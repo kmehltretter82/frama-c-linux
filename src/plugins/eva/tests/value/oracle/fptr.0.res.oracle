@@ -36,7 +36,7 @@
 [eva:alarm] fptr.i:45: Warning: 
   pointer to function with incompatible type.
   assert \valid_function((short (*)(void))(&retint));
-[eva] fptr.i:51: Frama_C_show_each_F: {{ &h }}
+[eva:show] fptr.i:51: Frama_C_show_each_F: {{ &h }}
 [eva] computing for function f <- main.
   Called from fptr.i:52.
 [eva] computing for function h <- f <- main.
@@ -45,9 +45,9 @@
 [eva] Done for function h
 [eva] Recording results for f
 [eva] Done for function f
-[eva] fptr.i:52: Frama_C_show_each: {0}
+[eva:show] fptr.i:52: Frama_C_show_each: {0}
 [eva:partition] fptr.i:50: starting to merge loop iterations
-[eva] fptr.i:51: Frama_C_show_each_F: {{ &h ; &hh }}
+[eva:show] fptr.i:51: Frama_C_show_each_F: {{ &h ; &hh }}
 [eva] computing for function f <- main.
   Called from fptr.i:52.
 [eva] fptr.i:9: Reusing old results for call to h
@@ -57,8 +57,8 @@
 [eva] Done for function hh
 [eva] Recording results for f
 [eva] Done for function f
-[eva] fptr.i:52: Frama_C_show_each: {0; 1}
-[eva] fptr.i:51: Frama_C_show_each_F: {{ NULL ; &h ; &hh }}
+[eva:show] fptr.i:52: Frama_C_show_each: {0; 1}
+[eva:show] fptr.i:51: Frama_C_show_each_F: {{ NULL ; &h ; &hh }}
 [eva] computing for function f <- main.
   Called from fptr.i:52.
 [eva:alarm] fptr.i:9: Warning: 
@@ -67,8 +67,8 @@
 [eva] fptr.i:9: Reusing old results for call to hh
 [eva] Recording results for f
 [eva] Done for function f
-[eva] fptr.i:52: Frama_C_show_each: {0; 1}
-[eva] fptr.i:51: Frama_C_show_each_F: {{ NULL ; &h ; &hh }}
+[eva:show] fptr.i:52: Frama_C_show_each: {0; 1}
+[eva:show] fptr.i:51: Frama_C_show_each_F: {{ NULL ; &h ; &hh }}
 [eva] fptr.i:52: Reusing old results for call to f
 [eva:alarm] fptr.i:56: Warning: division by zero. assert (int)(c & 64) ≢ 0;
 [eva] computing for function h <- main.

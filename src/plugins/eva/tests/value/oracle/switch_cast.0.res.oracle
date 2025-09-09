@@ -6,7 +6,7 @@
   x ∈ [--..--]
 [eva] computing for function g <- main.
   Called from switch_cast.i:71.
-[eva] switch_cast.i:67: Frama_C_show_each: [1..241],1%2
+[eva:show] switch_cast.i:67: Frama_C_show_each: [1..241],1%2
 [eva] Recording results for g
 [eva] Done for function g
 [eva] Recording results for main

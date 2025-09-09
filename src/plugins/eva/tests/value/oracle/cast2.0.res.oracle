@@ -22,7 +22,7 @@
 [eva] computing for function any_int <- passcast <- main.
   Called from cast2.i:20.
 [eva] Done for function any_int
-[eva] cast2.i:23: Frama_C_show_each: [-128..100]
+[eva:show] cast2.i:23: Frama_C_show_each: [-128..100]
 [eva] Recording results for passcast
 [eva] Done for function passcast
 [eva] Recording results for main

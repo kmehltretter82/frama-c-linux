@@ -10,12 +10,12 @@
 [eva] for_loops.c:24: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] for_loops.c:30: Frama_C_show_each_F: {0}
+[eva:show] for_loops.c:30: Frama_C_show_each_F: {0}
 [eva:partition] for_loops.c:27: starting to merge loop iterations
 [eva:partition] for_loops.c:29: starting to merge loop iterations
-[eva] for_loops.c:30: Frama_C_show_each_F: {0; 1}
-[eva] for_loops.c:30: Frama_C_show_each_F: {0; 1; 2}
-[eva] for_loops.c:30: Frama_C_show_each_F: [0..2147483647]
+[eva:show] for_loops.c:30: Frama_C_show_each_F: {0; 1}
+[eva:show] for_loops.c:30: Frama_C_show_each_F: {0; 1; 2}
+[eva:show] for_loops.c:30: Frama_C_show_each_F: [0..2147483647]
 [eva:alarm] for_loops.c:27: Warning: 
   signed overflow. assert j + 1 ≤ 2147483647;
 [eva] Recording results for main

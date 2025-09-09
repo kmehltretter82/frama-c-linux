@@ -58,7 +58,7 @@
 [eva] Done for function eq_tsets
 [eva] computing for function eq_char <- main.
   Called from logic.c:598.
-[eva] logic.c:149: Frama_C_show_each: {-126}
+[eva:show] logic.c:149: Frama_C_show_each: {-126}
 [eva] logic.c:150: assertion got status valid.
 [eva] logic.c:151: assertion got status valid.
 [eva] Recording results for eq_char
@@ -92,24 +92,24 @@
   Called from logic.c:602.
 [eva:alarm] logic.c:182: Warning: assertion 'ASSUME' got status unknown.
 [eva:alarm] logic.c:184: Warning: assertion 'UNK' got status unknown.
-[eva] logic.c:185: Frama_C_show_each: {-1; 1}
+[eva:show] logic.c:185: Frama_C_show_each: {-1; 1}
 [eva:alarm] logic.c:186: Warning: assertion 'UNK' got status unknown.
-[eva] logic.c:187: Frama_C_show_each: {-1; 1}
+[eva:show] logic.c:187: Frama_C_show_each: {-1; 1}
 [eva:alarm] logic.c:189: Warning: assertion 'ASSUME' got status unknown.
 [eva] logic.c:190: assertion 'OK' got status valid.
-[eva] logic.c:191: Frama_C_show_each: {1}
+[eva:show] logic.c:191: Frama_C_show_each: {1}
 [eva] logic.c:192: assertion 'OK' got status valid.
-[eva] logic.c:193: Frama_C_show_each: {1}
+[eva:show] logic.c:193: Frama_C_show_each: {1}
 [eva:alarm] logic.c:197: Warning: assertion 'ASSUME' got status unknown.
 [eva:alarm] logic.c:198: Warning: assertion 'UNK' got status unknown.
-[eva] logic.c:199: Frama_C_show_each: {0; 1}
+[eva:show] logic.c:199: Frama_C_show_each: {0; 1}
 [eva:alarm] logic.c:200: Warning: assertion 'UNK' got status unknown.
-[eva] logic.c:201: Frama_C_show_each: {0; 1}
+[eva:show] logic.c:201: Frama_C_show_each: {0; 1}
 [eva:alarm] logic.c:203: Warning: assertion 'ASSUME' got status unknown.
 [eva] logic.c:204: assertion 'OK' got status valid.
-[eva] logic.c:205: Frama_C_show_each: {1}
+[eva:show] logic.c:205: Frama_C_show_each: {1}
 [eva] logic.c:206: assertion 'OK' got status valid.
-[eva] logic.c:207: Frama_C_show_each: {1}
+[eva:show] logic.c:207: Frama_C_show_each: {1}
 [eva] Recording results for alarms
 [eva] Done for function alarms
 [eva] computing for function cond_in_lval <- main.
@@ -234,15 +234,15 @@
 [eva] computing for function check_and_assert <- main.
   Called from logic.c:608.
 [eva:alarm] logic.c:295: Warning: assertion got status unknown.
-[eva] logic.c:296: Frama_C_show_each_42: {42}
+[eva:show] logic.c:296: Frama_C_show_each_42: {42}
 [eva] logic.c:297: check got status valid.
 [eva:alarm] logic.c:299: Warning: check got status unknown.
-[eva] logic.c:300: Frama_C_show_each_imprecise: [-2147483648..2147483647]
+[eva:show] logic.c:300: Frama_C_show_each_imprecise: [-2147483648..2147483647]
 [eva:alarm] logic.c:301: Warning: assertion got status unknown.
 [eva:alarm] logic.c:303: Warning: 
   assertion got status invalid (stopping propagation).
 [eva:alarm] logic.c:306: Warning: check got status invalid.
-[eva] logic.c:307: Frama_C_show_each_reachable: {42}
+[eva:show] logic.c:307: Frama_C_show_each_reachable: {42}
 [eva] Recording results for check_and_assert
 [eva] Done for function check_and_assert
 [eva] computing for function min_max_quantifier <- main.
@@ -327,7 +327,7 @@
 [eva] computing for function abs <- int_abs <- main.
   Called from logic.c:371.
 [eva] Done for function abs
-[eva] logic.c:372: Frama_C_show_each_5_10: {5; 6; 7; 8; 9; 10}
+[eva:show] logic.c:372: Frama_C_show_each_5_10: {5; 6; 7; 8; 9; 10}
 [eva] computing for function Frama_C_interval <- int_abs <- main.
   Called from logic.c:373.
 [eva] logic.c:373: 
@@ -336,7 +336,7 @@
 [eva] computing for function abs <- int_abs <- main.
   Called from logic.c:374.
 [eva] Done for function abs
-[eva] logic.c:375: Frama_C_show_each_0_4: {0; 1; 2; 3; 4}
+[eva:show] logic.c:375: Frama_C_show_each_0_4: {0; 1; 2; 3; 4}
 [eva] computing for function Frama_C_interval <- int_abs <- main.
   Called from logic.c:377.
 [eva] logic.c:377: 
@@ -345,7 +345,7 @@
 [eva] computing for function abs <- int_abs <- main.
   Called from logic.c:378.
 [eva] Done for function abs
-[eva] logic.c:379: Frama_C_show_each_10_100: [10..100]
+[eva:show] logic.c:379: Frama_C_show_each_10_100: [10..100]
 [eva] computing for function Frama_C_interval <- int_abs <- main.
   Called from logic.c:380.
 [eva] logic.c:380: 
@@ -354,7 +354,7 @@
 [eva] computing for function abs <- int_abs <- main.
   Called from logic.c:381.
 [eva] Done for function abs
-[eva] logic.c:382: Frama_C_show_each_0_100: [0..100]
+[eva:show] logic.c:382: Frama_C_show_each_0_100: [0..100]
 [eva] computing for function Frama_C_interval <- int_abs <- main.
   Called from logic.c:383.
 [eva] logic.c:383: 
@@ -363,7 +363,7 @@
 [eva] computing for function abs <- int_abs <- main.
   Called from logic.c:384.
 [eva] Done for function abs
-[eva] logic.c:385: Frama_C_show_each_10_20: [10..20]
+[eva:show] logic.c:385: Frama_C_show_each_10_20: [10..20]
 [eva] computing for function Frama_C_interval <- int_abs <- main.
   Called from logic.c:386.
 [eva] logic.c:386: 
@@ -372,7 +372,7 @@
 [eva] computing for function abs <- int_abs <- main.
   Called from logic.c:387.
 [eva] Done for function abs
-[eva] logic.c:388: Frama_C_show_each_0_12: [0..12]
+[eva:show] logic.c:388: Frama_C_show_each_0_12: [0..12]
 [eva] computing for function Frama_C_interval <- int_abs <- main.
   Called from logic.c:389.
 [eva] logic.c:389: 
@@ -381,7 +381,7 @@
 [eva] computing for function abs <- int_abs <- main.
   Called from logic.c:390.
 [eva] Done for function abs
-[eva] logic.c:391: Frama_C_show_each_0_16: [0..16]
+[eva:show] logic.c:391: Frama_C_show_each_0_16: [0..16]
 [eva] computing for function Frama_C_interval <- int_abs <- main.
   Called from logic.c:393.
 [eva] logic.c:393: 
@@ -390,7 +390,7 @@
 [eva] computing for function abs <- int_abs <- main.
   Called from logic.c:395.
 [eva] Done for function abs
-[eva] logic.c:396: Frama_C_show_each_2_mod_4: [2..82],2%4
+[eva:show] logic.c:396: Frama_C_show_each_2_mod_4: [2..82],2%4
 [eva] computing for function Frama_C_interval <- int_abs <- main.
   Called from logic.c:397.
 [eva] logic.c:397: 
@@ -399,7 +399,7 @@
 [eva] computing for function abs <- int_abs <- main.
   Called from logic.c:399.
 [eva] Done for function abs
-[eva] logic.c:400: Frama_C_show_each_1_mod_2: [1..83],1%2
+[eva:show] logic.c:400: Frama_C_show_each_1_mod_2: [1..83],1%2
 [eva] computing for function Frama_C_interval <- int_abs <- main.
   Called from logic.c:401.
 [eva] logic.c:401: 
@@ -408,7 +408,7 @@
 [eva] computing for function abs <- int_abs <- main.
   Called from logic.c:403.
 [eva] Done for function abs
-[eva] logic.c:404: Frama_C_show_each_no_mod: [0..35]
+[eva:show] logic.c:404: Frama_C_show_each_no_mod: [0..35]
 [eva] computing for function Frama_C_interval <- int_abs <- main.
   Called from logic.c:406.
 [eva] logic.c:406: 
@@ -417,14 +417,14 @@
 [eva] computing for function abs <- int_abs <- main.
   Called from logic.c:407.
 [eva] Done for function abs
-[eva] logic.c:408: Frama_C_show_each_set: {0; 1; 2; 3; 4; 5}
+[eva:show] logic.c:408: Frama_C_show_each_set: {0; 1; 2; 3; 4; 5}
 [eva] computing for function abs <- int_abs <- main.
   Called from logic.c:411.
 [eva:garbled-mix:assigns] logic.c:411: 
   The specification of function abs has generated a garbled mix of addresses
   for assigns clause \result.
 [eva] Done for function abs
-[eva] logic.c:412: 
+[eva:show] logic.c:412: 
   Frama_C_show_each_gm:
   {{ garbled mix of &{x_0} (origin: Library function {logic.c:411}) }}
 [eva] Recording results for int_abs
@@ -450,7 +450,7 @@
 [eva] computing for function fabs <- float_abs <- main.
   Called from logic.c:427.
 [eva] Done for function fabs
-[eva] logic.c:428: Frama_C_show_each_zero: [-0. .. 0.]
+[eva:show] logic.c:428: Frama_C_show_each_zero: [-0. .. 0.]
 [eva] computing for function Frama_C_double_interval <- float_abs <- main.
   Called from logic.c:429.
 [eva] logic.c:429: 
@@ -459,7 +459,7 @@
 [eva] computing for function fabs <- float_abs <- main.
   Called from logic.c:430.
 [eva] Done for function fabs
-[eva] logic.c:431: Frama_C_show_each_half_two: [0.5 .. 2.]
+[eva:show] logic.c:431: Frama_C_show_each_half_two: [0.5 .. 2.]
 [eva] computing for function Frama_C_double_interval <- float_abs <- main.
   Called from logic.c:432.
 [eva] logic.c:432: 
@@ -468,7 +468,7 @@
 [eva] computing for function fabs <- float_abs <- main.
   Called from logic.c:433.
 [eva] Done for function fabs
-[eva] logic.c:434: Frama_C_show_each_0_10: [-0. .. 10.]
+[eva:show] logic.c:434: Frama_C_show_each_0_10: [-0. .. 10.]
 [eva] computing for function Frama_C_double_interval <- float_abs <- main.
   Called from logic.c:435.
 [eva] logic.c:435: 
@@ -477,23 +477,23 @@
 [eva] computing for function fabs <- float_abs <- main.
   Called from logic.c:436.
 [eva] Done for function fabs
-[eva] logic.c:437: Frama_C_show_each_0_3: [-0. .. 3.]
+[eva:show] logic.c:437: Frama_C_show_each_0_3: [-0. .. 3.]
 [eva] Recording results for float_abs
 [eva] Done for function float_abs
 [eva] computing for function set_comprehension <- main.
   Called from logic.c:612.
 [eva:alarm] logic.c:444: Warning: assertion got status unknown.
-[eva] logic.c:445: Frama_C_show_each_10_100: [10..100]
+[eva:show] logic.c:445: Frama_C_show_each_10_100: [10..100]
 [eva:alarm] logic.c:448: Warning: assertion got status unknown.
-[eva] logic.c:449: Frama_C_show_each_10_100: [10..100]
+[eva:show] logic.c:449: Frama_C_show_each_10_100: [10..100]
 [eva:alarm] logic.c:452: Warning: assertion got status unknown.
-[eva] logic.c:453: Frama_C_show_each_31_301: [31..301],1%3
+[eva:show] logic.c:453: Frama_C_show_each_31_301: [31..301],1%3
 [eva:alarm] logic.c:456: Warning: assertion got status unknown.
-[eva] logic.c:457: Frama_C_show_each_5_50: [-2147483648..2147483647]
+[eva:show] logic.c:457: Frama_C_show_each_5_50: [-2147483648..2147483647]
 [eva:alarm] logic.c:460: Warning: assertion got status unknown.
-[eva] logic.c:461: Frama_C_show_each_0: [-90..90]
+[eva:show] logic.c:461: Frama_C_show_each_0: [-90..90]
 [eva:alarm] logic.c:464: Warning: assertion got status unknown.
-[eva] logic.c:465: Frama_C_show_each_bottom: [-2147483648..2147483647]
+[eva:show] logic.c:465: Frama_C_show_each_bottom: [-2147483648..2147483647]
 [eva] computing for function Frama_C_interval <- set_comprehension <- main.
   Called from logic.c:467.
 [eva] logic.c:467: 
@@ -505,15 +505,15 @@
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva:alarm] logic.c:470: Warning: assertion got status unknown.
-[eva] logic.c:471: Frama_C_show_each_12_32: [12..32]
+[eva:show] logic.c:471: Frama_C_show_each_12_32: [12..32]
 [eva:alarm] logic.c:474: Warning: assertion got status unknown.
-[eva] logic.c:475: Frama_C_show_each_16_24: [16..24]
+[eva:show] logic.c:475: Frama_C_show_each_16_24: [16..24]
 [eva:alarm] logic.c:478: Warning: assertion got status unknown.
-[eva] logic.c:479: Frama_C_show_each_24_68: [24..68]
+[eva:show] logic.c:479: Frama_C_show_each_24_68: [24..68]
 [eva:alarm] logic.c:483: Warning: assertion got status unknown.
-[eva] logic.c:484: Frama_C_show_each_5_41: [5..41],1%2
+[eva:show] logic.c:484: Frama_C_show_each_5_41: [5..41],1%2
 [eva:alarm] logic.c:487: Warning: assertion got status unknown.
-[eva] logic.c:488: Frama_C_show_each: [-2147483648..2147483647]
+[eva:show] logic.c:488: Frama_C_show_each: [-2147483648..2147483647]
 [eva] Recording results for set_comprehension
 [eva] Done for function set_comprehension
 [eva] computing for function set_comprehension_assigns <- main.
@@ -542,9 +542,9 @@
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva:alarm] logic.c:512: Warning: assertion 'unknown' got status unknown.
-[eva] logic.c:513: Frama_C_show_each_0_24: [0..24]
+[eva:show] logic.c:513: Frama_C_show_each_0_24: [0..24]
 [eva] logic.c:516: assertion 'true' got status valid.
-[eva] logic.c:517: Frama_C_show_each_0_120: [0..120]
+[eva:show] logic.c:517: Frama_C_show_each_0_120: [0..120]
 [eva:alarm] logic.c:520: Warning: 
   assertion 'false' got status invalid (stopping propagation).
 [eva] logic.c:525: assertion 'true' got status valid.
@@ -573,11 +573,11 @@
 [eva:alarm] logic.c:560: Warning: check 'unknown' got status unknown.
 [eva:alarm] logic.c:561: Warning: check 'unknown' got status unknown.
 [eva:alarm] logic.c:565: Warning: assertion got status unknown.
-[eva] logic.c:566: 
+[eva:show] logic.c:566: 
   Frama_C_show_each:
   {{ NULL ; &c ; &t_0 + [0..196],0%4 }}, {{ &c ; &t_0 + [0..196],0%4 }}
 [eva:alarm] logic.c:571: Warning: assertion got status unknown.
-[eva] logic.c:572: 
+[eva:show] logic.c:572: 
   Frama_C_domain_show_each:
   p : # cvalue: {{ NULL ; &a ; &c ; &t_0 + [0..196],0%4 ;
                    &u_0 + [0..196],0%4 }}
@@ -590,7 +590,7 @@
   has generated a garbled mix of addresses for assigns clause \result.
 [eva] Done for function garbled_mix
 [eva:alarm] logic.c:576: Warning: assertion got status unknown.
-[eva] logic.c:577: 
+[eva:show] logic.c:577: 
   Frama_C_show_each:
   {{ NULL ; &c ; &t_0 + [0..196],0%4 }},
   {{ garbled mix of &{c; t_0}

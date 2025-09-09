@@ -15,7 +15,7 @@
 [eva:alarm] reduce_formals.i:70: Warning: 
   function main2: precondition got status unknown.
 [eva] Done for function main2
-[eva] reduce_formals.i:72: 
+[eva:show] reduce_formals.i:72: 
   Frama_C_dump_each:
   # cvalue:
   g ∈ [--..--]
@@ -32,7 +32,7 @@
   Called from reduce_formals.i:19.
 [eva] Recording results for f_main3
 [eva] Done for function f_main3
-[eva] reduce_formals.i:20: Frama_C_show_each: {6}
+[eva:show] reduce_formals.i:20: Frama_C_show_each: {6}
 [eva] Recording results for main3
 [eva] Done for function main3
 [eva] computing for function main4 <- main.
@@ -42,13 +42,13 @@
 [eva:alarm] reduce_formals.i:24: Warning: assertion got status unknown.
 [eva] Recording results for f_main4_1
 [eva] Done for function f_main4_1
-[eva] reduce_formals.i:34: Frama_C_show_each_v: {10; 11; 12; 13; 14; 15}
+[eva:show] reduce_formals.i:34: Frama_C_show_each_v: {10; 11; 12; 13; 14; 15}
 [eva] computing for function f_main4_2 <- main4 <- main.
   Called from reduce_formals.i:36.
 [eva:alarm] reduce_formals.i:28: Warning: assertion got status unknown.
 [eva] Recording results for f_main4_2
 [eva] Done for function f_main4_2
-[eva] reduce_formals.i:37: Frama_C_show_each_v: {16; 17; 18; 19; 20}
+[eva:show] reduce_formals.i:37: Frama_C_show_each_v: {16; 17; 18; 19; 20}
 [eva] Recording results for main4
 [eva] Done for function main4
 [eva] computing for function main5 <- main.
@@ -71,7 +71,7 @@
 [eva:alarm] reduce_formals.i:58: Warning: assertion got status unknown.
 [eva] Recording results for f_main6
 [eva] Done for function f_main6
-[eva] reduce_formals.i:65: Frama_C_show_each_6: {3}
+[eva:show] reduce_formals.i:65: Frama_C_show_each_6: {3}
 [eva] Recording results for main6
 [eva] Done for function main6
 [eva] Recording results for main

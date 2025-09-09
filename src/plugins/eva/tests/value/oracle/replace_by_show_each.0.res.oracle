@@ -4,8 +4,8 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   x ∈ {0}
-[eva] replace_by_show_each.c:23: Frama_C_show_each_2:
-[eva] replace_by_show_each.c:25: Frama_C_show_each_1:
+[eva:show] replace_by_show_each.c:23: Frama_C_show_each_2:
+[eva:show] replace_by_show_each.c:25: Frama_C_show_each_1:
 [from] Warning: no assigns clauses for function Frama_C_show_each_1.
   Results will be imprecise.
 [inout] Warning: no assigns clauses for function Frama_C_show_each_1.

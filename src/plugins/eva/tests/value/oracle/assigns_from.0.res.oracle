@@ -318,24 +318,25 @@
   The specification of function get_imprecise_pointer
   has generated a garbled mix of addresses for assigns clause \result.
 [eva] Done for function get_imprecise_pointer
-[eva] assigns_from.i:256: 
+[eva:show] assigns_from.i:256: 
   Frama_C_show_each_gm:
   {{ garbled mix of &{g; h} (origin: Library function {assigns_from.i:255}) }}
 [eva] computing for function get_exact_pointer <- main19 <- main.
   Called from assigns_from.i:257.
 [eva] using specification for function get_exact_pointer
 [eva] Done for function get_exact_pointer
-[eva] assigns_from.i:258: Frama_C_show_each_exact: {{ &g ; &h }}
+[eva:show] assigns_from.i:258: Frama_C_show_each_exact: {{ &g ; &h }}
 [eva] computing for function get_valid_pointer <- main19 <- main.
   Called from assigns_from.i:259.
 [eva] using specification for function get_valid_pointer
 [eva] Done for function get_valid_pointer
-[eva] assigns_from.i:260: Frama_C_show_each_valid: {{ &g ; &h + [0..396],0%4 }}
+[eva:show] assigns_from.i:260: 
+  Frama_C_show_each_valid: {{ &g ; &h + [0..396],0%4 }}
 [eva] computing for function get_function_pointer <- main19 <- main.
   Called from assigns_from.i:262.
 [eva] using specification for function get_function_pointer
 [eva] Done for function get_function_pointer
-[eva] assigns_from.i:263: Frama_C_show_each_fct: {{ &fun ; &fun2 }}
+[eva:show] assigns_from.i:263: Frama_C_show_each_fct: {{ &fun ; &fun2 }}
 [eva] Recording results for main19
 [from] Computing for function main19
 [from] Done for function main19

@@ -4,7 +4,7 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva] fam.c:15: Frama_C_show_each: {{ &buf + {11} }}
+[eva:show] fam.c:15: Frama_C_show_each: {{ &buf + {11} }}
 [eva] fam.c:16: Call to builtin memcpy
 [eva] fam.c:16: function memcpy: precondition 'valid_dest' got status valid.
 [eva] fam.c:16: function memcpy: precondition 'valid_src' got status valid.

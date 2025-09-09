@@ -4,7 +4,8 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva] long_const.i:35: Frama_C_show_each_f: {4}, {18446603611099103232}, {0}
+[eva:show] long_const.i:35: 
+  Frama_C_show_each_f: {4}, {18446603611099103232}, {0}
 [eva] computing for function div64 <- main.
   Called from long_const.i:37.
 [eva:alarm] long_const.i:37: Warning: 
@@ -16,7 +17,7 @@
 [eva] Recording results for LL_ABS
 [eva] Done for function LL_ABS
 [eva] long_const.i:25: Reusing old results for call to LL_ABS
-[eva] long_const.i:26: 
+[eva:show] long_const.i:26: 
   Frama_C_show_each:
   [-9223372036854775807..9223372036854775807],
   [0..9223372036854775807],

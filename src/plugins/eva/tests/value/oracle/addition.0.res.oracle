@@ -128,7 +128,7 @@
   Assigning imprecise value to p14 because of misaligned read of addresses.
 [eva:alarm] addition.i:66: Warning: 
   out of bounds read. assert \valid_read(*((int **)45));
-[eva] addition.i:87: Frama_C_show_each_1: [-10..15]
+[eva:show] addition.i:87: Frama_C_show_each_1: [-10..15]
 [eva] addition.i:88: assertion got status valid.
 [eva:alarm] addition.i:98: Warning: 
   signed overflow. assert p17 / (int)(-1) ≤ 2147483647;
@@ -351,7 +351,7 @@
   signed overflow. assert (int)*((char *)(&q1)) + 2 ≤ 2147483647;
 [eva:alarm] addition.i:66: Warning: 
   out of bounds read. assert \valid_read(*((int **)45));
-[eva] addition.i:87: Frama_C_show_each_1: [-10..15]
+[eva:show] addition.i:87: Frama_C_show_each_1: [-10..15]
 [eva:alarm] addition.i:98: Warning: 
   signed overflow. assert p17 / (int)(-1) ≤ 2147483647;
 [eva] Recording results for main

@@ -20,7 +20,7 @@
   Called from local_cleanup.c:22.
 [eva] Recording results for h
 [eva] Done for function h
-[eva] local_cleanup.c:23: 
+[eva:show] local_cleanup.c:23: 
   Frama_C_dump_each:
   # cvalue:
   lmain[0] ∈ UNINITIALIZED

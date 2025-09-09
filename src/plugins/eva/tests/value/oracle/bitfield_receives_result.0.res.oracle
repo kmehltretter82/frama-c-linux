@@ -8,7 +8,7 @@
   Called from bitfield_receives_result.i:9.
 [eva] Recording results for f
 [eva] Done for function f
-[eva] bitfield_receives_result.i:10: 
+[eva:show] bitfield_receives_result.i:10: 
   Frama_C_dump_each:
   # cvalue:
   s.b ∈ {-1}

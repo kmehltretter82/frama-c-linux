@@ -10,7 +10,7 @@
   result4 ∈ {0}
   result2 ∈ {7}
   d2 ∈ {0}
-[eva] switch.i:29: Frama_C_show_each_F: {0}
+[eva:show] switch.i:29: Frama_C_show_each_F: {0}
 [eva:alarm] switch.i:63: Warning: check 'unknown' got status unknown.
 [eva:alarm] switch.i:64: Warning: 
   accessing uninitialized left-value. assert \initialized(&i);

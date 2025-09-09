@@ -4,7 +4,7 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva] fc_builtins_in_ghost.c:5: Frama_C_show_each: ⊥
+[eva:show] fc_builtins_in_ghost.c:5: Frama_C_show_each: ⊥
 [eva] computing for function Frama_C_int_interval <- main.
   Called from fc_builtins_in_ghost.c:6.
 [eva] using specification for function Frama_C_int_interval

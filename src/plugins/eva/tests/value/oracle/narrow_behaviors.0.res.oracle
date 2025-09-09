@@ -8,7 +8,7 @@
   Called from narrow_behaviors.i:56.
 [eva] using specification for function f1
 [eva] Done for function f1
-[eva] narrow_behaviors.i:56: 
+[eva:show] narrow_behaviors.i:56: 
   Frama_C_dump_each:
   # cvalue:
   nondet ∈ {0}
@@ -16,7 +16,7 @@
   q ∈ UNINITIALIZED
   __retres ∈ UNINITIALIZED
   ==END OF DUMP==
-[eva] narrow_behaviors.i:56: 
+[eva:show] narrow_behaviors.i:56: 
   Frama_C_dump_each:
   # cvalue:
   nondet ∈ [--..--]
@@ -36,7 +36,7 @@
 [eva] computing for function f2 <- main.
   Called from narrow_behaviors.i:57.
 [eva] Done for function f2
-[eva] narrow_behaviors.i:57: 
+[eva:show] narrow_behaviors.i:57: 
   Frama_C_dump_each:
   # cvalue:
   nondet ∈ {0}
@@ -45,7 +45,7 @@
    .y ∈ {1}
   __retres ∈ UNINITIALIZED
   ==END OF DUMP==
-[eva] narrow_behaviors.i:57: 
+[eva:show] narrow_behaviors.i:57: 
   Frama_C_dump_each:
   # cvalue:
   nondet ∈ {0}
@@ -55,7 +55,7 @@
    .y ∈ {1}
   __retres ∈ UNINITIALIZED
   ==END OF DUMP==
-[eva] narrow_behaviors.i:57: 
+[eva:show] narrow_behaviors.i:57: 
   Frama_C_dump_each:
   # cvalue:
   nondet ∈ [--..--]
@@ -81,7 +81,7 @@
 [eva] narrow_behaviors.i:62: 
   function f1, behavior d: assumes got status invalid; behavior not evaluated.
 [eva] Done for function f1
-[eva] narrow_behaviors.i:62: 
+[eva:show] narrow_behaviors.i:62: 
   Frama_C_dump_each:
   # cvalue:
   nondet ∈ {0}
@@ -89,7 +89,7 @@
   s ∈ UNINITIALIZED
   __retres ∈ UNINITIALIZED
   ==END OF DUMP==
-[eva] narrow_behaviors.i:62: 
+[eva:show] narrow_behaviors.i:62: 
   Frama_C_dump_each:
   # cvalue:
   nondet ∈ {1}
@@ -115,7 +115,7 @@
   context. If it is valid, either a precondition was not verified for this
   call, or some assigns/from clauses are incomplete (or incorrect).
 [eva] Done for function f2
-[eva] narrow_behaviors.i:63: 
+[eva:show] narrow_behaviors.i:63: 
   Frama_C_dump_each:
   # cvalue:
   nondet ∈ {0}

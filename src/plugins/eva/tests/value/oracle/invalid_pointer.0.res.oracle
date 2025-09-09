@@ -130,7 +130,8 @@
   assert \null ≡ p + undet ∨ \object_pointer(p + undet);
 [eva] invalid_pointer.c:139: assertion got status valid.
 [eva] invalid_pointer.c:140: assertion got status valid.
-[eva] invalid_pointer.c:141: Frama_C_show_each_object_pointer: {{ &x + {0; 4} }}
+[eva:show] invalid_pointer.c:141: 
+  Frama_C_show_each_object_pointer: {{ &x + {0; 4} }}
 [eva:alarm] invalid_pointer.c:142: Warning: 
   unaligned pointer creation.
   assert
@@ -142,7 +143,7 @@
   \object_pointer((int *)((uintptr_t)((uintptr_t)(&x) + (uintptr_t)undet)));
 [eva] invalid_pointer.c:143: assertion got status valid.
 [eva] invalid_pointer.c:144: assertion got status valid.
-[eva] invalid_pointer.c:145: 
+[eva:show] invalid_pointer.c:145: 
   Frama_C_show_each_object_pointer_char: {{ &x + {0; 4} }}
 [eva] computing for function Frama_C_interval <- object_pointer_predicate <- main.
   Called from invalid_pointer.c:146.
@@ -157,7 +158,7 @@
   invalid pointer creation.
   assert \null ≡ p + undet ∨ \object_pointer(p + undet);
 [eva] invalid_pointer.c:152: assertion got status valid.
-[eva] invalid_pointer.c:153: 
+[eva:show] invalid_pointer.c:153: 
   Frama_C_show_each_object_pointer_array:
   {{ &x + {0; 4} ; &array + [0..256],0%4 }}
 [eva:alarm] invalid_pointer.c:156: Warning: 
@@ -167,7 +168,7 @@
   invalid pointer creation.
   assert \null ≡ (int *)50 ∨ \object_pointer((int *)50);
 [eva:alarm] invalid_pointer.c:165: Warning: assertion got status unknown.
-[eva] invalid_pointer.c:166: Frama_C_show_each_absolute_20: {20}
+[eva:show] invalid_pointer.c:166: Frama_C_show_each_absolute_20: {20}
 [eva:alarm] invalid_pointer.c:167: Warning: 
   unaligned pointer creation. assert \aligned((void *)undet,alignof(int));
 [eva:alarm] invalid_pointer.c:167: Warning: 

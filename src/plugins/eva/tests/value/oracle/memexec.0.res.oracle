@@ -101,10 +101,10 @@
 [eva:alarm] memexec.c:96: Warning: assertion got status unknown.
 [eva] Recording results for f5_aux
 [eva] Done for function f5_aux
-[eva] memexec.c:108: 
+[eva:show] memexec.c:108: 
   Frama_C_show_each_f5: [9..2147483647], [-2147483648..6], [-2147483648..7]
 [eva] memexec.c:113: Reusing old results for call to f5_aux
-[eva] memexec.c:114: 
+[eva:show] memexec.c:114: 
   Frama_C_show_each_f5: [9..2147483647], [-2147483648..6], [-2147483648..7]
 [eva] Recording results for f5
 [eva] Done for function f5

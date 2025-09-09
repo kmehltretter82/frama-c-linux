@@ -20,7 +20,7 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   v ∈ [--..--]
-[eva] dr_infinity.i:9: Frama_C_show_each: {0x1.fffffe0000000p127}
+[eva:show] dr_infinity.i:9: Frama_C_show_each: {0x1.fffffe0000000p127}
 [eva:alarm] dr_infinity.i:11: Warning: 
   non-finite float value.
   assert \is_finite((float)((double)3.402823567797366e+38));

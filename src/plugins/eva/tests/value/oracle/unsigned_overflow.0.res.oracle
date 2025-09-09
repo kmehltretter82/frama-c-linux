@@ -7,7 +7,7 @@
   i2 ∈ [--..--]
 [eva:alarm] unsigned_overflow.c:4: Warning: assertion got status unknown.
 [eva:alarm] unsigned_overflow.c:5: Warning: assertion got status unknown.
-[eva] unsigned_overflow.c:10: Frama_C_show_each_dead:
+[eva:show] unsigned_overflow.c:10: Frama_C_show_each_dead:
 [eva] Recording results for main
 [eva] Done for function main
 [eva] ====== VALUES COMPUTED ======

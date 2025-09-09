@@ -75,7 +75,7 @@
 [eva] Recording results for collatz
 [eva] Done for function collatz
 [eva] show_perf.i:39: Reusing old results for call to collatz
-[eva] show_perf.i:40: Frama_C_show_each: {7}, {16}, {52}
+[eva:show] show_perf.i:40: Frama_C_show_each: {7}, {16}, {52}
 [eva] Recording results for print_collatz
 [eva] Done for function print_collatz
 [eva] Recording results for main

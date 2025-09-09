@@ -888,7 +888,7 @@
 [eva] Done for function caller_stub_for_vwscanf
 [eva:alarm] vwscanf.c:19: Warning: check got status unknown.
 [eva:alarm] vwscanf.c:20: Warning: check got status unknown.
-[eva] vwscanf.c:21: 
+[eva:show] vwscanf.c:21: 
   Frama_C_show_each_must_be_reachable:
   [-2147483648..2147483647],
   {{ &c }},

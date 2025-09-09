@@ -1,4 +1,4 @@
-105c105,108
+106c106,109
 < [eva] bitwise.i:173: Reusing old results for call to set_zero
 ---
 > [eva] computing for function set_zero <- bug6 <- main.
