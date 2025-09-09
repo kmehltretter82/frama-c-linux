@@ -1,4 +1,5 @@
 [e-acsl] beginning translation.
+[e-acsl:analysis:inductive] predicate extraction in complete mode
 [e-acsl] ghosts_for_lists.c:40: Warning: 
   no assigns clause generated for function linked_n because pointers as arguments is not yet supported
 [e-acsl] translation done in project "e-acsl".

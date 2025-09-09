@@ -758,6 +758,7 @@ end
   let extract_with_mode ~mode li =
     match mode.Modus.mode with
     | Complete ->
+      Options.debug ~dkey "predicate extraction in complete mode";
       Extractor.extract ~mode:mode.Modus.mode li
     | Incomplete i ->
       let f = FunctionExtractor.extract ~mode:mode.mode li in
