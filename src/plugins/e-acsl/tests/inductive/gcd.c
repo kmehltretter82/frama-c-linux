@@ -4,13 +4,10 @@
 
 /*@
 
-    inductive gcd(ℤ n, ℤ m, ℤ r) {
-      case gcd_zero:
-        \forall ℤ x;
-          gcd(x, 0, x);
-
-      case gcd_S:
-        \forall ℤ x, y, z;
+    inductive gcd(ℤ a, ℤ b, ℤ r) {
+      case zero: ∀ ℤ x; gcd(x, 0, x);
+      case succ:
+        ∀ ℤ x, y, z;
           y != 0 ==> gcd(y, x % y, z) ==> gcd(x, y, z);
     }
 

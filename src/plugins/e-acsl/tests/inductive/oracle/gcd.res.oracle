@@ -1,5 +1,5 @@
 [e-acsl] beginning translation.
 [e-acsl:analysis:inductive] predicate extraction in complete mode
 [e-acsl] translation done in project "e-acsl".
-[eva:alarm] gcd.c:20: Warning: assertion got status unknown.
-[eva:alarm] gcd.c:21: Warning: assertion got status unknown.
+[eva:alarm] gcd.c:17: Warning: assertion got status unknown.
+[eva:alarm] gcd.c:18: Warning: assertion got status unknown.

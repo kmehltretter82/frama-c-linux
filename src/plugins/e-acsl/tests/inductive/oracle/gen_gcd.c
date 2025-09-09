@@ -8,18 +8,18 @@
 extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 
 /*@
-inductive gcd(integer n, integer m, integer r) {
-  case gcd_zero: \forall integer x; gcd(x, 0, x);
-  case gcd_S: \forall integer x, integer y, integer z;
-                y != 0 ==> gcd(y, x % y, z) ==> gcd(x, y, z);
+inductive gcd(integer a, integer b, integer r) {
+  case zero: \forall integer x; gcd(x, 0, x);
+  case succ: \forall integer x, integer y, integer z;
+               y != 0 ==> gcd(y, x % y, z) ==> gcd(x, y, z);
   }
  */
 /*@
-predicate gcd(integer n, integer m, integer r) =
-  (m == 0 && r == n) || (m != 0 && gcd(m, n % m, r));
+predicate gcd(integer a, integer b, integer r) =
+  (b == 0 && r == a) || (b != 0 && gcd(b, a % b, r));
 
 */
-int __gen_e_acsl_gcd(int n, int m, int r);
+int __gen_e_acsl_gcd(int a, int b, int r);
 
 int main(void)
 {
@@ -36,7 +36,7 @@ int main(void)
     __gen_e_acsl_assert_data.pred_txt = "gcd(42, 24, 6)";
     __gen_e_acsl_assert_data.file = "gcd.c";
     __gen_e_acsl_assert_data.fct = "main";
-    __gen_e_acsl_assert_data.line = 20;
+    __gen_e_acsl_assert_data.line = 17;
     __e_acsl_assert(__gen_e_acsl_gcd_4,& __gen_e_acsl_assert_data);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
   }
@@ -53,7 +53,7 @@ int main(void)
     __gen_e_acsl_assert_data_2.pred_txt = "!gcd(42, 24, 7)";
     __gen_e_acsl_assert_data_2.file = "gcd.c";
     __gen_e_acsl_assert_data_2.fct = "main";
-    __gen_e_acsl_assert_data_2.line = 21;
+    __gen_e_acsl_assert_data_2.line = 18;
     __e_acsl_assert(! __gen_e_acsl_gcd_6,& __gen_e_acsl_assert_data_2);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
   }
@@ -64,18 +64,18 @@ int main(void)
 }
 
 /*@ assigns \result;
-    assigns \result \from n, m, r; */
-int __gen_e_acsl_gcd(int n, int m, int r)
+    assigns \result \from a, b, r; */
+int __gen_e_acsl_gcd(int a, int b, int r)
 {
   int __gen_e_acsl_and;
   int __gen_e_acsl_or;
-  if (m == 0) __gen_e_acsl_and = r == n; else __gen_e_acsl_and = 0;
+  if (b == 0) __gen_e_acsl_and = r == a; else __gen_e_acsl_and = 0;
   if (__gen_e_acsl_and) __gen_e_acsl_or = 1;
   else {
     int __gen_e_acsl_and_2;
-    if (m != 0) {
+    if (b != 0) {
       int __gen_e_acsl_gcd_3;
-      __gen_e_acsl_gcd_3 = __gen_e_acsl_gcd(m,n % m,r);
+      __gen_e_acsl_gcd_3 = __gen_e_acsl_gcd(b,a % b,r);
       __gen_e_acsl_and_2 = __gen_e_acsl_gcd_3;
     }
     else __gen_e_acsl_and_2 = 0;
