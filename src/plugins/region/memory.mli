@@ -34,6 +34,7 @@ type region = {
   fields: Fields.domain ;
   reads: Access.acs list ;
   writes: Access.acs list ;
+  inits: Access.acs list ;
   shifts: Access.acs list ;
   sizeof: int ;
   singleton : bool ;
@@ -87,6 +88,7 @@ val add_value : node -> typ -> node option
 val add_read : node -> Access.acs -> unit
 val add_write : node -> Access.acs -> unit
 val add_shift : node -> Access.acs -> unit
+val add_init : node -> Access.acs -> unit
 
 val domain_of_typ : map -> typ -> domain
 val domain_of_ltyp : map -> ?ctxt:context -> logic_type -> domain
@@ -117,6 +119,7 @@ val singleton : node -> bool
 val reads : node -> typ list
 val writes : node -> typ list
 val shifts : node -> typ list
+val inits : node -> typ list
 val types : node -> typ list
 val typed : node -> typ option
 

@@ -32,6 +32,7 @@ and 'a nchunk = {
   creads: Access.Set.t ;
   cwrites: Access.Set.t ;
   cshifts: Access.Set.t ;
+  cinits: Access.Set.t ;
   clayout: 'a nlayout ;
   mutable cid : int ;
 }
@@ -82,6 +83,7 @@ let ctypes (m : chunk) : typ list =
     pool := Typ.Set.add (Ast_types.unroll @@ Access.typeof acs) !pool in
   Access.Set.iter add m.creads ;
   Access.Set.iter add m.cwrites ;
+  Access.Set.iter add m.cinits ;
   Typ.Set.elements !pool
 
 (* -------------------------------------------------------------------------- *)
@@ -106,6 +108,7 @@ let empty = {
   creads = Access.Set.empty ;
   cwrites = Access.Set.empty ;
   cshifts = Access.Set.empty ;
+  cinits = Access.Set.empty ;
   clayout = Blob ;
 }
 
@@ -146,13 +149,14 @@ let pp_layout fmt =
 let pp_chunk name fmt (m: chunk) =
   begin
     let acs r s = if Access.Set.is_empty s then '-' else r in
-    Format.fprintf fmt "@[<hov 2>%s: %c%c%c" name
-      (acs 'R' m.creads) (acs 'W' m.cwrites) (acs 'A' m.cshifts) ;
+    Format.fprintf fmt "@[<hov 2>%s: %c%c%c%c" name
+      (acs 'I' m.cinits) (acs 'R' m.creads) (acs 'W' m.cwrites) (acs 'A' m.cshifts) ;
     List.iter (Format.fprintf fmt "@ (%a)" Typ.pretty) (ctypes m) ;
     Lset.iter (Format.fprintf fmt "@ %s:") m.clabels ;
     Vset.iter (Format.fprintf fmt "@ %a" Varinfo.pretty) m.ccvars ;
     if Options.debug_atleast 1 then
       begin
+        Access.Set.iter (Format.fprintf fmt "@ I:%a" Access.pretty) m.cinits ;
         Access.Set.iter (Format.fprintf fmt "@ R:%a" Access.pretty) m.creads ;
         Access.Set.iter (Format.fprintf fmt "@ W:%a" Access.pretty) m.cwrites ;
         Access.Set.iter (Format.fprintf fmt "@ A:%a" Access.pretty) m.cshifts ;
@@ -356,6 +360,7 @@ let merge_chunk s (q:queue) (root:node)
     creads = Access.Set.union a.creads b.creads ;
     cwrites = Access.Set.union a.cwrites b.cwrites ;
     cshifts = Access.Set.union a.cshifts b.cshifts ;
+    cinits = Access.Set.union a.cinits b.cinits ;
     clayout = merge_layout s q root a.clayout b.clayout ;
     cid = UF.noid ;
   }
@@ -447,6 +452,10 @@ let add_write (a: node) acs =
 
 let add_shift (a: node) acs =
   update a (fun r -> { r with cshifts = Access.Set.add acs r.cshifts }) ;
+  sized a @@ Access.typeof acs
+
+let add_init (a: node) acs =
+  update a (fun r -> { r with cinits = Access.Set.add acs r.cinits });
   sized a @@ Access.typeof acs
 
 (* -------------------------------------------------------------------------- *)
@@ -592,6 +601,10 @@ let shifts (r:node) =
   let node = UF.get r in
   List.map Access.typeof @@ Access.Set.elements node.cshifts
 
+let inits (r:node) =
+  let node = UF.get r in
+  List.map Access.typeof @@ Access.Set.elements node.cinits
+
 let types (r:node) = ctypes @@ UF.get r
 
 let typed (r:node) =
@@ -642,6 +655,7 @@ type region = {
   fields: Fields.domain ;
   reads: Access.acs list ;
   writes: Access.acs list ;
+  inits: Access.acs list ;
   shifts: Access.acs list ;
   sizeof: int ;
   singleton : bool ;
@@ -690,8 +704,8 @@ let pp_root fmt (Root r) =
 let pp_region fmt (m: region) =
   begin
     let acs r s = if s = [] then '-' else r in
-    Format.fprintf fmt "@[<hov 2>%a: %c%c%c"
-      pp_node m.node
+    Format.fprintf fmt "@[<hov 2>%a: %c%c%c%c"
+      pp_node m.node (acs 'I' m.inits)
       (acs 'R' m.reads) (acs 'W' m.writes) (acs 'A' m.shifts) ;
     List.iter (Format.fprintf fmt "@ %s:") m.labels ;
     List.iter (Format.fprintf fmt "@ %a" pp_root) m.cvars ;
@@ -753,6 +767,7 @@ let make_region (n: node) (r: chunk) : region =
     reads = Access.Set.elements r.creads ;
     writes = Access.Set.elements r.cwrites ;
     shifts = Access.Set.elements r.cshifts ;
+    inits = Access.Set.elements r.cinits ;
     ranges = List.map (make_range fields) (cranges r.clayout) ;
     pointed = Option.map UF.find (cpointed r.clayout) ;
     types ; typed ; singleton ; sizeof ; fields ;

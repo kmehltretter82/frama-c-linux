@@ -90,7 +90,7 @@ let rec add_init (m:map) (s:stmt) (acs:Access.acs) (lv:lval) (iv:init) =
 
   | SingleInit e ->
     let r = add_lval m s lv in
-    Memory.add_write r acs ;
+    Memory.add_init r acs ;
     Option.iter (Memory.add_points_to r) (add_exp m s e)
 
   | CompoundInit(_,fvs) ->
@@ -166,7 +166,7 @@ let add_instr ~kf (m:map) (s:stmt) (instr:instr) =
 
   | Local_init(x,ConsInit (vf,args,kind), loc) ->
     let r = add_cvar m x in
-    Memory.add_write r (Lval (s,Cil.var x)) ;
+    Memory.add_init r (Lval (s,Cil.var x)) ;
     Cil.treat_constructor_as_func
       begin fun _res fct args _loc ->
         add_function m s fct;
