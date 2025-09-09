@@ -28,6 +28,8 @@ module type S_no_log = sig
   val add_group: ?memo:bool -> string -> Cmdline.Group.t
   module Verbose: Parameter_sig.Int
   module Debug: Parameter_sig.Int
+  module Message_category: Parameter_sig.String
+  module Warn_category: Parameter_sig.String
   module Lib: Parameter_sig.Site_root
   module Share: Parameter_sig.Site_root
   module Session: Parameter_sig.User_dir_opt
@@ -729,7 +731,7 @@ struct
     end
 
   let debug_category_optname = output_mode "Msg_key" "msg-key"
-  module Debug_category =
+  module Message_category =
     Empty_string(struct
       let option_name = debug_category_optname
       let arg_name="k1[,...,kn]"
@@ -742,7 +744,7 @@ struct
 
   let () =
     let is_kernel = is_kernel () in
-    Debug_category.add_set_hook
+    Message_category.add_set_hook
       (fun _ s ->
          match parse_category s with
          | Print_help ->
@@ -787,7 +789,7 @@ struct
     let optname suffix = List.map (fun alias -> "-" ^ alias ^ suffix) aliases in
     Help.add_aliases ?visible ?deprecated (optname "-help");
     Verbose.add_aliases ?visible ?deprecated (optname "-verbose");
-    Debug_category.add_aliases ?visible ?deprecated (optname "-msg-key");
+    Message_category.add_aliases ?visible ?deprecated (optname "-msg-key");
     Warn_category.add_aliases ?visible ?deprecated (optname "-warn-key");
     LogToFile.add_aliases ?visible ?deprecated (optname "-log")
 

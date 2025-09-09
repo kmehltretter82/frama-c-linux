@@ -29,6 +29,9 @@ module type S_no_log = sig
   module Verbose: Parameter_sig.Int
   module Debug: Parameter_sig.Int
 
+  module Message_category: Parameter_sig.String
+  module Warn_category: Parameter_sig.String
+
   (** Handle the specific `lib' directory of the plug-in.
       @since Frama-C+dev
   *)
