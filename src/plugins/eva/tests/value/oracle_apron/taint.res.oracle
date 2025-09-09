@@ -1,22 +1,22 @@
 2d1
 < [eva:experimental] Warning: The taint domain is experimental.
 107c106,112
-< [eva] taint.c:202: Reusing old results for call to taints
+< [eva] taint.c:215: Reusing old results for call to taints
 ---
 > [eva] computing for function taints <- main.
->   Called from taint.c:202.
+>   Called from taint.c:215.
 > [eva] computing for function Frama_C_interval <- taints <- main.
->   Called from taint.c:187.
+>   Called from taint.c:200.
 > [eva] Done for function Frama_C_interval
 > [eva] Recording results for taints
 > [eva] Done for function taints
 138c143,149
-< [eva] taint.c:211: Reusing old results for call to taints
+< [eva] taint.c:224: Reusing old results for call to taints
 ---
 > [eva] computing for function taints <- main.
->   Called from taint.c:211.
+>   Called from taint.c:224.
 > [eva] computing for function Frama_C_interval <- taints <- main.
->   Called from taint.c:187.
+>   Called from taint.c:200.
 > [eva] Done for function Frama_C_interval
 > [eva] Recording results for taints
 > [eva] Done for function taints
@@ -24,12 +24,12 @@
 < [eva:loop-unroll:auto] taint.c:157: Automatic loop unrolling.
 < [eva:loop-unroll:partial] taint.c:157: loop not completely unrolled
 180c189,195
-< [eva] taint.c:217: Reusing old results for call to taints
+< [eva] taint.c:230: Reusing old results for call to taints
 ---
 > [eva] computing for function taints <- main.
->   Called from taint.c:217.
+>   Called from taint.c:230.
 > [eva] computing for function Frama_C_interval <- taints <- main.
->   Called from taint.c:187.
+>   Called from taint.c:200.
 > [eva] Done for function Frama_C_interval
 > [eva] Recording results for taints
 > [eva] Done for function taints

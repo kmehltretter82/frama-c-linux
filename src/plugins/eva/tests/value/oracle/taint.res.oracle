@@ -7,17 +7,17 @@
   undet ∈ [--..--]
   tainted ∈ {0}
 [eva] computing for function taints <- main.
-  Called from taint.c:192.
+  Called from taint.c:205.
 [eva] computing for function Frama_C_interval <- taints <- main.
-  Called from taint.c:187.
+  Called from taint.c:200.
 [eva] using specification for function Frama_C_interval
-[eva] taint.c:187: 
+[eva] taint.c:200: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva] Recording results for taints
 [eva] Done for function taints
 [eva] computing for function taint_basic <- main.
-  Called from taint.c:193.
+  Called from taint.c:206.
 [eva:alarm] taint.c:33: Warning: accessing out of bounds index. assert t < 2;
 [eva] taint.c:35: 
   Frama_C_dump_each:
@@ -29,7 +29,7 @@
 [eva] Recording results for taint_basic
 [eva] Done for function taint_basic
 [eva] computing for function taint_assume_1 <- main.
-  Called from taint.c:196.
+  Called from taint.c:209.
 [eva:loop-unroll:auto] taint.c:49: Automatic loop unrolling.
 [eva] taint.c:50: 
   Frama_C_dump_each:
@@ -83,7 +83,7 @@
 [eva] Recording results for taint_assume_1
 [eva] Done for function taint_assume_1
 [eva] computing for function taint_assume_2 <- main.
-  Called from taint.c:197.
+  Called from taint.c:210.
 [eva] taint.c:79: 
   Frama_C_dump_each:
   # taint:
@@ -94,7 +94,7 @@
 [eva] Recording results for taint_assume_2
 [eva] Done for function taint_assume_2
 [eva] computing for function taint_undet_locs <- main.
-  Called from taint.c:199.
+  Called from taint.c:212.
 [eva] taint.c:91: 
   Frama_C_dump_each:
   # taint:
@@ -104,17 +104,17 @@
   ==END OF DUMP==
 [eva] Recording results for taint_undet_locs
 [eva] Done for function taint_undet_locs
-[eva] taint.c:202: Reusing old results for call to taints
+[eva] taint.c:215: Reusing old results for call to taints
 [eva] computing for function taint_spec_assigns <- main.
-  Called from taint.c:203.
+  Called from taint.c:216.
 [eva] using specification for function taint_spec_assigns
 [eva] Done for function taint_spec_assigns
-[eva] taint.c:205: 
+[eva] taint.c:218: 
   Frama_C_domain_show_each:
   l : # taint: default
   true
 [eva] computing for function taint_goto_1 <- main.
-  Called from taint.c:208.
+  Called from taint.c:221.
 [eva] taint.c:110: 
   Frama_C_dump_each:
   # taint:
@@ -125,7 +125,7 @@
 [eva] Recording results for taint_goto_1
 [eva] Done for function taint_goto_1
 [eva] computing for function taint_goto_2 <- main.
-  Called from taint.c:209.
+  Called from taint.c:222.
 [eva] taint.c:130: 
   Frama_C_dump_each:
   # taint:
@@ -135,9 +135,9 @@
   ==END OF DUMP==
 [eva] Recording results for taint_goto_2
 [eva] Done for function taint_goto_2
-[eva] taint.c:211: Reusing old results for call to taints
+[eva] taint.c:224: Reusing old results for call to taints
 [eva] computing for function taint_call <- main.
-  Called from taint.c:212.
+  Called from taint.c:225.
 [eva] computing for function taint_basic <- taint_call <- main.
   Called from taint.c:138.
 [eva] taint.c:35: 
@@ -156,14 +156,14 @@
 [eva] Recording results for taint_call
 [eva] Done for function taint_call
 [eva] computing for function taints <- main.
-  Called from taint.c:214.
+  Called from taint.c:227.
 [eva] computing for function Frama_C_interval <- taints <- main.
-  Called from taint.c:187.
+  Called from taint.c:200.
 [eva] Done for function Frama_C_interval
 [eva] Recording results for taints
 [eva] Done for function taints
 [eva] computing for function taint_infinite_while <- main.
-  Called from taint.c:215.
+  Called from taint.c:228.
 [eva:loop-unroll:auto] taint.c:157: Automatic loop unrolling.
 [eva:loop-unroll:partial] taint.c:157: loop not completely unrolled
 [eva:partition] taint.c:157: starting to merge loop iterations
@@ -177,9 +177,9 @@
   ==END OF DUMP==
 [eva] Recording results for taint_infinite_while
 [eva] Done for function taint_infinite_while
-[eva] taint.c:217: Reusing old results for call to taints
+[eva] taint.c:230: Reusing old results for call to taints
 [eva] computing for function tainted_predicate <- main.
-  Called from taint.c:218.
+  Called from taint.c:231.
 [eva] computing for function Frama_C_interval <- tainted_predicate <- main.
   Called from taint.c:170.
 [eva] taint.c:170: 
@@ -192,6 +192,10 @@
 [eva:alarm] taint.c:180: Warning: assertion 'unknown' got status unknown.
 [eva] taint.c:181: check 'true' got status valid.
 [eva:alarm] taint.c:182: Warning: check got status invalid.
+[eva] taint.c:190: assertion 'true' got status valid.
+[eva] taint.c:191: assertion 'true' got status valid.
+[eva] taint.c:194: check got status valid.
+[eva] taint.c:195: check got status valid.
 [eva] Recording results for tainted_predicate
 [eva] Done for function tainted_predicate
 [eva] Recording results for main
@@ -239,6 +243,9 @@
   not_tainted ∈ [0..20]
   x ∈ [0..20]
   indirect ∈ {0; 1}
+  y ∈ {1} or UNINITIALIZED
+  z ∈ {1} or UNINITIALIZED
+  p ∈ {{ &y ; &z }}
 [eva:final-states] Values at end of function taints:
   Frama_C_entropy_source ∈ [--..--]
   tainted ∈ [0..10]
@@ -339,7 +346,7 @@
 [inout] Inputs for function taint_undet_locs:
     undet
 [inout] Out (internal) for function tainted_predicate:
-    Frama_C_entropy_source; not_tainted; x; tmp_0; indirect
+    Frama_C_entropy_source; not_tainted; x; tmp_0; indirect; y; z; p
 [inout] Inputs for function tainted_predicate:
     Frama_C_entropy_source; undet; tainted
 [inout] Out (internal) for function taints:
