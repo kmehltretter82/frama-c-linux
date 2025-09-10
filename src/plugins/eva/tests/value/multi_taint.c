@@ -36,7 +36,7 @@ void multi_taint_test(int* taint_var) {
   
   if (t)
     y = 2;
-  /*@ check !\tainted(auto:y); */ // true: for now, \tainted only considers direct taint
+  /*@ check !\tainted(auto:y); */
 
   Frama_C_dump_each();
 }

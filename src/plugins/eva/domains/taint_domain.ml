@@ -798,8 +798,10 @@ module TaintLogic = struct
     | None -> state
     | Some (under, _over) ->
       if positive
-      then { state with locs_data = Zone.join state.locs_data under }
-      else { state with locs_data = Zone.diff state.locs_data under }
+      then { state with locs_data = Zone.join state.locs_data under;
+                        locs_control = Zone.join state.locs_control under; }
+      else { state with locs_data = Zone.diff state.locs_data under;
+                        locs_control = Zone.diff state.locs_control under }
 
   let rec reduce_by_predicate cvalue_env state predicate positive =
     match positive, predicate.pred_content with
@@ -829,6 +831,7 @@ module TaintLogic = struct
     | None -> Alarmset.Unknown
     | Some (_under, over) ->
       if Zone.intersects over state.locs_data
+         || Zone.intersects over state.locs_control
       then Alarmset.Unknown
       else Alarmset.False
 

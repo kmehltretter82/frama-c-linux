@@ -28,7 +28,7 @@
 [eva:alarm] multi_taint.c:27: Warning: check got status unknown.
 [eva] multi_taint.c:31: check got status valid.
 [eva] multi_taint.c:35: check got status valid.
-[eva] multi_taint.c:39: check got status valid.
+[eva:alarm] multi_taint.c:39: Warning: check got status unknown.
 [eva] multi_taint.c:41: 
   Frama_C_dump_each:
   # cvalue:

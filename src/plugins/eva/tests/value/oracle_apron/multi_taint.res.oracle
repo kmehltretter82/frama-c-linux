@@ -6,6 +6,10 @@
 ---
 > [eva:alarm] multi_taint.c:26: Warning: check got status invalid.
 > [eva:alarm] multi_taint.c:27: Warning: check got status invalid.
+31c30
+< [eva:alarm] multi_taint.c:39: Warning: check got status unknown.
+---
+> [eva] multi_taint.c:39: check got status valid.
 39,41c38,40
 <   t ∈ [--..--]
 <   y ∈ {2; 3}

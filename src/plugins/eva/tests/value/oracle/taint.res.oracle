@@ -191,11 +191,11 @@
 [eva] taint.c:179: check 'true' got status valid.
 [eva:alarm] taint.c:180: Warning: assertion 'unknown' got status unknown.
 [eva] taint.c:181: check 'true' got status valid.
-[eva:alarm] taint.c:182: Warning: check got status invalid.
+[eva:alarm] taint.c:182: Warning: check got status unknown.
 [eva] taint.c:190: assertion 'true' got status valid.
 [eva] taint.c:191: assertion 'true' got status valid.
-[eva] taint.c:194: check got status valid.
-[eva] taint.c:195: check got status valid.
+[eva:alarm] taint.c:194: Warning: check got status unknown.
+[eva:alarm] taint.c:195: Warning: check got status unknown.
 [eva] Recording results for tainted_predicate
 [eva] Done for function tainted_predicate
 [eva] Recording results for main
