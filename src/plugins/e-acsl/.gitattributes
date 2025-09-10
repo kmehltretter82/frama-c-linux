@@ -10,8 +10,13 @@
 # CHECK-INDENT                            #
 ###########################################
 
+/doc/**/*.[ch] -check-indent
+/examples/**/*.[ch] -check-indent
 /tests/*/*.c check-syntax check-indent
 /share/**/*.c check-syntax check-indent
+
+# Don't check it because it takes too much time
+/contrib/libdlmalloc/dlmalloc.[ch] -check-indent
 
 ########################
 # HEADER_SPEC: .ignore #
