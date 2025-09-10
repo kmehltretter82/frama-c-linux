@@ -4,6 +4,8 @@
 #include "__fc_builtin.h"
 #include <stdio.h>
 
+extern int undet;
+
 void taint_simplify_singletons(int taint_var) {
   int x;
   //@ \eva::taint test:taint_var;
@@ -33,10 +35,33 @@ void multi_taint_test(int* taint_var) {
   if (y)
     y = 3;
   /*@ check !\tainted(auto:y); */
-  
-  if (t)
+  /*@ check !\tainted_directly(auto:y); */ // !tainted ==> !tainted_directly
+  /*@ check !\tainted_indirectly(auto:y); */ // !tainted ==> !tainted_indirectly
+  /*@ check !\tainted_directly(test:y); */
+  /*@ check \tainted_indirectly(test:y); */
+
+  //@ taint auto:undet;
+  if (undet)
     y = 2;
-  /*@ check !\tainted(auto:y); */
+  /*@ check !\tainted_directly(auto:y); */
+  /*@ check !\tainted_directly(test:y); */
+
+  /*@ check false: !\tainted_indirectly(auto:y); */
+  /*@ assert !\tainted_indirectly(auto:y); */
+  /*@ check true: !\tainted_indirectly(auto:y); */
+
+  int i = Frama_C_interval(0, 2);
+  int j = Frama_C_interval(5, 7);
+  int buf[10] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+  //@ taint buf:buf[9];
+
+  //@ taint buf:undet;
+  if (undet)
+    buf[i] = i + 1;
+  else
+    buf[j] = j + 1;
+  /*@ check true: !\tainted(buf:buf[4]); */
+  /*@ check true: !\tainted_directly(buf:buf[6]); */
 
   Frama_C_dump_each();
 }

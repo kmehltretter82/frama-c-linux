@@ -1,40 +1,30 @@
 27,28c27,28
-< [eva:alarm] multi_taint.c:26: Warning: check got status unknown.
-< [eva:alarm] multi_taint.c:27: Warning: check got status unknown.
+< [eva:alarm] multi_taint.c:28: Warning: check got status unknown.
+< [eva:alarm] multi_taint.c:29: Warning: check got status unknown.
 ---
-> [eva:alarm] multi_taint.c:26: Warning: check got status invalid.
-> [eva:alarm] multi_taint.c:27: Warning: check got status invalid.
-31c31
-< [eva:alarm] multi_taint.c:39: Warning: check got status unknown.
----
-> [eva] multi_taint.c:39: check got status valid.
-39,41c39,41
+> [eva:alarm] multi_taint.c:28: Warning: check got status invalid.
+> [eva:alarm] multi_taint.c:29: Warning: check got status invalid.
+61c61
 <   t ∈ [--..--]
-<   y ∈ {2; 3}
+---
+>   t ∈ {4}
+73c73
 <   taint_var ∈ [--..--]
 ---
->   t ∈ {4}
->   y ∈ {2}
 >   taint_var ∈ {4}
-46,47c46,47
+78c78
+<     Locations (data): undet; t; taint_var
+---
+>     Locations (data): undet; taint_var
+84c84
 <     Locations (data): t; taint_var
-<     Locations (control): y
 ---
 >     Locations (data): taint_var
->     Locations (control): \nothing
-49,50c49,50
-<     Locations (data): t; taint_var
-<     Locations (control): y
----
->     Locations (data): taint_var
->     Locations (control): \nothing
-59,60c59,60
+96c96
 <   t ∈ [--..--]
-<   y ∈ {2; 3}
 ---
 >   t ∈ {4}
->   y ∈ {2}
-65c65
+113c113
 <   taint_var ∈ [--..--]
 ---
 >   taint_var ∈ {4}

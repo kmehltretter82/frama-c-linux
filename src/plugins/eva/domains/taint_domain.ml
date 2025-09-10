@@ -712,19 +712,25 @@ let error ?msg loc typing_context =
 
 let _parse_error ?msg () = raise (Parse_error msg)
 
-(* Registers ACSL builtin predicate \tainted. *)
+(* Registers ACSL builtin predicates. *)
 let () =
-  let a_name = "tainted" in
-  let a_type = Lvar a_name in
-  let builtin_logic_info =
-    { bl_name = "\\tainted";
+  let a_names = [
+    "tainted"; (* Both direct (data) and indirect (control) taints. *)
+    "tainted_directly"; (* Only direct (data) taints. *)
+    "tainted_indirectly" (* Only indirect (control) taints. *)
+  ]
+  in
+  let mk_builtin_logic_info a_name =
+    { bl_name = "\\" ^ a_name;
       bl_labels = [];
       bl_params = [ a_name ];
       bl_type = None;
-      bl_profile = ["p", a_type];
+      bl_profile = ["p", Lvar a_name];
     }
   in
-  Logic_builtin.register builtin_logic_info
+  List.iter
+    (fun a_name -> Logic_builtin.register (mk_builtin_logic_info a_name))
+    a_names
 
 let rec parse_lval names kind typing_context loc arg =
   match arg.Logic_ptree.lexpr_node with
@@ -793,15 +799,20 @@ module TaintLogic = struct
     | Some _ as x -> x
     | None -> eval_term_deps cvalue_env term
 
-  let reduce_by_taint_predicate cvalue_env state term positive =
+  let reduce_by_taint_predicate predicate_name cvalue_env state term positive =
     match eval_term_zone cvalue_env term with
     | None -> state
     | Some (under, _over) ->
-      if positive
-      then { state with locs_data = Zone.join state.locs_data under;
-                        locs_control = Zone.join state.locs_control under; }
-      else { state with locs_data = Zone.diff state.locs_data under;
-                        locs_control = Zone.diff state.locs_control under }
+      let zone_op = if positive then Zone.join else Zone.diff in
+      match predicate_name with
+      | "\\tainted" ->
+        { state with locs_data = zone_op state.locs_data under;
+                     locs_control = zone_op state.locs_control under; }
+      | "\\tainted_directly" ->
+        { state with locs_data = zone_op state.locs_data under }
+      | "\\tainted_indirectly" ->
+        { state with locs_control = zone_op state.locs_control under }
+      | _ -> state
 
   let rec reduce_by_predicate cvalue_env state predicate positive =
     match positive, predicate.pred_content with
@@ -815,44 +826,60 @@ module TaintLogic = struct
       let state2 = reduce_by_predicate cvalue_env state p2 positive in
       join state1 state2
     | _, Pnot p -> reduce_by_predicate cvalue_env state p (not positive)
-    | _, Papp ({l_var_info = {lv_name = "\\tainted"}}, _labels, [arg]) ->
-      let open Lattice_bounds.Top.Operators in
-      let+ state_map = state in
-      let taint_names = term_taint_namespaces arg in
-      LatticeMultiTaint.mapi (fun key state ->
-          if List.mem key taint_names then
-            reduce_by_taint_predicate cvalue_env state arg positive
-          else
-            state) state_map
+    | _, Papp ({l_var_info = {lv_name}}, _labels, [arg]) ->
+      begin
+        match lv_name with
+        | "\\tainted" | "\\tainted_directly" | "\\tainted_indirectly" ->
+          let open Lattice_bounds.Top.Operators in
+          let+ state_map = state in
+          let taint_names = term_taint_namespaces arg in
+          LatticeMultiTaint.mapi (fun key state ->
+              if List.mem key taint_names then
+                reduce_by_taint_predicate lv_name cvalue_env state arg positive
+              else
+                state) state_map
+        | _ -> state
+      end
     | _ -> state
 
-  let evaluate_taint_predicate cvalue_env state term =
+  let evaluate_taint_predicate cvalue_env zone term =
     match eval_term_zone cvalue_env term with
     | None -> Alarmset.Unknown
     | Some (_under, over) ->
-      if Zone.intersects over state.locs_data
-         || Zone.intersects over state.locs_control
+      if Zone.intersects over zone
       then Alarmset.Unknown
       else Alarmset.False
 
   let evaluate_predicate cvalue_env state predicate =
     let rec evaluate predicate =
       match predicate.pred_content with
-      | Papp ({l_var_info = {lv_name = "\\tainted"}}, _labels, [arg]) ->
-        let states =
-          match state with
-          | `Top -> LatticeSingleTaint.top
-          | `Value state_map ->
-            let taint_names = term_taint_namespaces arg in
-            let states_list =
-              List.map
-                (fun key -> LatticeMultiTaint.find_or_empty key state_map)
-                taint_names
+      | Papp ({l_var_info = {lv_name}}, _labels, [arg]) ->
+        begin
+          match lv_name with
+          | "\\tainted" | "\\tainted_directly" | "\\tainted_indirectly" ->
+            let state =
+              match state with
+              | `Top -> LatticeSingleTaint.top
+              | `Value state_map ->
+                let taint_names = term_taint_namespaces arg in
+                let states_list =
+                  List.map
+                    (fun key -> LatticeMultiTaint.find_or_empty key state_map)
+                    taint_names
+                in
+                List.fold_left LatticeSingleTaint.join
+                  LatticeSingleTaint.empty states_list
             in
-            List.fold_left LatticeSingleTaint.join
-              LatticeSingleTaint.empty states_list
-        in
-        evaluate_taint_predicate cvalue_env states arg
+            let zone =
+              match lv_name with
+              | "\\tainted" -> Zone.join state.locs_data state.locs_control
+              | "\\tainted_directly" -> state.locs_data
+              | "\\tainted_indirectly" -> state.locs_control
+              | _ -> assert false
+            in
+            evaluate_taint_predicate cvalue_env zone arg
+          | _ -> Unknown
+        end
       | Ptrue -> True
       | Pfalse -> False
       | Pand (p1, p2) ->
