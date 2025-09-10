@@ -6,28 +6,30 @@
 [eva:initial-state] Values of globals at initialization
   
 [eva] computing for function scanf_va_1 <- main.
-  Called from multi_taint.c:38.
+  Called from multi_taint.c:46.
 [eva] using specification for function scanf
-[eva] multi_taint.c:38: 
+[eva] multi_taint.c:46: 
   function scanf_va_1: precondition \valid(param0) got status valid.
-[eva] multi_taint.c:38: 
+[eva] multi_taint.c:46: 
   function scanf_va_1: precondition valid_read_string(format) got status valid.
 [eva] Done for function scanf_va_1
-[eva:alarm] multi_taint.c:39: Warning: check got status unknown.
+[eva:alarm] multi_taint.c:47: Warning: check got status unknown.
 [eva] computing for function taint_simplify_singletons <- main.
-  Called from multi_taint.c:41.
+  Called from multi_taint.c:49.
 [eva:alarm] multi_taint.c:13: Warning: assertion got status unknown.
 [eva] multi_taint.c:17: check got status valid.
 [eva] multi_taint.c:18: check got status valid.
 [eva] Recording results for taint_simplify_singletons
 [eva] Done for function taint_simplify_singletons
-[eva] multi_taint.c:42: check got status valid.
+[eva] multi_taint.c:50: check got status valid.
 [eva] computing for function multi_taint_test <- main.
-  Called from multi_taint.c:44.
+  Called from multi_taint.c:52.
 [eva:alarm] multi_taint.c:26: Warning: check got status unknown.
 [eva:alarm] multi_taint.c:27: Warning: check got status unknown.
 [eva] multi_taint.c:31: check got status valid.
-[eva] multi_taint.c:33: 
+[eva] multi_taint.c:35: check got status valid.
+[eva] multi_taint.c:39: check got status valid.
+[eva] multi_taint.c:41: 
   Frama_C_dump_each:
   # cvalue:
   __fc_heap_status ∈ [--..--]
@@ -35,27 +37,27 @@
   __fc_stdin ∈ {{ NULL ; &S___fc_stdin[0] }}
   taint_var ∈ {{ &taint_var }}
   t ∈ [--..--]
-  y ∈ {10}
+  y ∈ {2; 3}
   taint_var ∈ [--..--]
   __retres ∈ UNINITIALIZED
   S___fc_stdin[0..1] ∈ [--..--]
   # taint:
   auto:
     Locations (data): t; taint_var
-    Locations (control): \nothing
+    Locations (control): y
   test:
-    Locations (data): t; y; taint_var
-    Locations (control): \nothing
+    Locations (data): t; taint_var
+    Locations (control): y
   ==END OF DUMP==
 [eva] Recording results for multi_taint_test
 [eva] Done for function multi_taint_test
-[eva:alarm] multi_taint.c:45: Warning: check got status unknown.
+[eva:alarm] multi_taint.c:53: Warning: check got status unknown.
 [eva] Recording results for main
 [eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function multi_taint_test:
   t ∈ [--..--]
-  y ∈ {10}
+  y ∈ {2; 3}
 [eva:final-states] Values at end of function taint_simplify_singletons:
   x ∈ {0}
   y ∈ {4}

@@ -30,6 +30,14 @@ void multi_taint_test(int* taint_var) {
   /*@ \eva::taint test:y; */
   /*@ check !\tainted(auto:y); */
 
+  if (y)
+    y = 3;
+  /*@ check !\tainted(auto:y); */
+  
+  if (t)
+    y = 2;
+  /*@ check !\tainted(auto:y); */ // true: for now, \tainted only considers direct taint
+
   Frama_C_dump_each();
 }
 

@@ -4,27 +4,33 @@
 ---
 > [eva:alarm] multi_taint.c:26: Warning: check got status invalid.
 > [eva:alarm] multi_taint.c:27: Warning: check got status invalid.
-37c37
+39,41c39,41
 <   t ∈ [--..--]
----
->   t ∈ {4}
-39c39
+<   y ∈ {2; 3}
 <   taint_var ∈ [--..--]
 ---
+>   t ∈ {4}
+>   y ∈ {2}
 >   taint_var ∈ {4}
-44c44
+46,47c46,47
 <     Locations (data): t; taint_var
+<     Locations (control): y
 ---
 >     Locations (data): taint_var
-47c47
-<     Locations (data): t; y; taint_var
+>     Locations (control): \nothing
+49,50c49,50
+<     Locations (data): t; taint_var
+<     Locations (control): y
 ---
->     Locations (data): y; taint_var
-57c57
+>     Locations (data): taint_var
+>     Locations (control): \nothing
+59,60c59,60
 <   t ∈ [--..--]
+<   y ∈ {2; 3}
 ---
 >   t ∈ {4}
-63c63
+>   y ∈ {2}
+65c65
 <   taint_var ∈ [--..--]
 ---
 >   taint_var ∈ {4}
