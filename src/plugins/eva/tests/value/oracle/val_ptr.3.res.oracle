@@ -1,7 +1,7 @@
 [kernel] Parsing val_ptr.i (no preprocessing)
 [eva] Analyzing a complete application starting at f2
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   i ∈ {0}
   j ∈ {0}
@@ -16,8 +16,8 @@
   c ∈ {0}
   p ∈ {0}
   T[0..7] ∈ {0}
-[eva] Recording results for f2
-[eva] Done for function f2
+[eva:progress] Recording results for f2
+[eva:progress] Done for function f2
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function f2:
   j ∈ {3}

@@ -6,8 +6,8 @@
 [kernel:parser:decimal-float] extract_bits.i:9: Warning: 
   Floating-point constant 1.8254370818746402660437411213933955878019332885742187 is not represented exactly. Will use 0x1.d34fd8378ea83p0.
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   f ∈ {3.1400001049041748}
   d ∈ {2.7099999999999999}
@@ -15,8 +15,8 @@
   fr[0..0x3] ∈ {0}
   dr[0..0x7] ∈ {0}
 [eva:show] extract_bits.i:25: Frama_C_show_each: [0..0xFF]
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   fr[0] ∈ {0x40}

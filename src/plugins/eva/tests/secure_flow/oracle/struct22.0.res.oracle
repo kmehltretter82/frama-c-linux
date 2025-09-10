@@ -1,24 +1,26 @@
 [kernel] Expanding arguments from test_options.txt
 [kernel] Parsing struct22.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   foo ∈ {0}
   bar ∈ {0}
   baz ∈ {0}
-[eva] computing for function assign_struct <- main.
+[eva:progress] 
+  computing for function assign_struct <- main.
   Called from struct22.c:31.
 [eva] using specification for function assign_struct
-[eva] Done for function assign_struct
-[eva] computing for function assign_union <- main.
+[eva:progress] Done for function assign_struct
+[eva:progress] 
+  computing for function assign_union <- main.
   Called from struct22.c:32.
 [eva] using specification for function assign_union
-[eva] Done for function assign_union
+[eva:progress] Done for function assign_union
 [eva:alarm] struct22.c:34: Warning: assertion got status unknown.
 [eva:alarm] struct22.c:35: Warning: assertion got status unknown.
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   foo ∈ [--..--]

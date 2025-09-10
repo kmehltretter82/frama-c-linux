@@ -1,12 +1,14 @@
-22,23c22,29
-< [eva] funcall6.c:37: Reusing old results for call to write_x
-< [eva] funcall6.c:38: Reusing old results for call to write_y
+24,25c24,33
+< [eva:progress] funcall6.c:37: Reusing old results for call to write_x
+< [eva:progress] funcall6.c:38: Reusing old results for call to write_y
 ---
-> [eva] computing for function write_x <- main.
+> [eva:progress] 
+>   computing for function write_x <- main.
 >   Called from funcall6.c:37.
-> [eva] Recording results for write_x
-> [eva] Done for function write_x
-> [eva] computing for function write_y <- main.
+> [eva:progress] Recording results for write_x
+> [eva:progress] Done for function write_x
+> [eva:progress] 
+>   computing for function write_y <- main.
 >   Called from funcall6.c:38.
-> [eva] Recording results for write_y
-> [eva] Done for function write_y
+> [eva:progress] Recording results for write_y
+> [eva:progress] Done for function write_y

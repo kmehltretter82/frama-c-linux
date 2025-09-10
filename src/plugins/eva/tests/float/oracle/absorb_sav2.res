@@ -1,6 +1,6 @@
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   x ∈ {0x1.0000000000000p0}
   y ∈ {0}
@@ -9,15 +9,16 @@
   min_f ∈ {0}
   min_fl ∈ {0}
   den ∈ {0}
-[eva] computing for function Frama_C_interval <- main.
+[eva:progress] 
+  computing for function Frama_C_interval <- main.
   Called from absorb.c:19.
 [eva] using specification for function Frama_C_interval
-[eva] absorb.c:19: 
+[eva:progress] absorb.c:19: 
   function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
+[eva:progress] Done for function Frama_C_interval
 [eva:partition] absorb.c:22: starting to merge loop iterations
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   Frama_C_entropy_source ∈ [--..--]

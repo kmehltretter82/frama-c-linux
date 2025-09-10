@@ -1,7 +1,7 @@
 [kernel] Parsing conversion.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   v ∈ [--..--]
 [eva:show] conversion.i:16: 
@@ -86,8 +86,8 @@
   f ∈ [7.00649232162e-45 .. 2.10194769649e-44] or UNINITIALIZED
   l ∈ [5..15] or UNINITIALIZED
   ==END OF DUMP==
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   x[bits 0 to 15] ∈ {1}
@@ -107,8 +107,8 @@
 [inout] Inputs for function main:
     v
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   v ∈ [--..--]
 [eva:show] conversion.i:16: 
@@ -195,8 +195,8 @@
   f ∈ [7.00649232162e-45 .. 2.10194769649e-44]
   l ∈ [5..15]
   ==END OF DUMP==
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   x[bits 0 to 15] ∈ {1}

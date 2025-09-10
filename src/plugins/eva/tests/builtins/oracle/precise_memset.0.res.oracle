@@ -1,7 +1,7 @@
 [kernel] Parsing precise_memset.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   v ∈ [--..--]
   x ∈ {0}
@@ -19,64 +19,64 @@
   vv ∈ {0}
   t_b[0..1023] ∈ {0}
   t_s[0..1023] ∈ {0}
-[eva] precise_memset.c:72: Call to builtin memset
-[eva] precise_memset.c:72: 
+[eva:progress] precise_memset.c:72: Call to builtin memset
+[eva:progress] precise_memset.c:72: 
   function memset: precondition 'valid_s' got status valid.
 [eva:acsl:unsupported] FRAMAC_SHARE/libc/string.h:147: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memset
-[eva] precise_memset.c:73: Call to builtin memset
-[eva] precise_memset.c:73: 
+[eva:progress] precise_memset.c:73: Call to builtin memset
+[eva:progress] precise_memset.c:73: 
   function memset: precondition 'valid_s' got status valid.
-[eva] precise_memset.c:74: Call to builtin memset
-[eva] precise_memset.c:74: 
+[eva:progress] precise_memset.c:74: Call to builtin memset
+[eva:progress] precise_memset.c:74: 
   function memset: precondition 'valid_s' got status valid.
-[eva] precise_memset.c:75: Call to builtin memset
-[eva] precise_memset.c:75: 
+[eva:progress] precise_memset.c:75: Call to builtin memset
+[eva:progress] precise_memset.c:75: 
   function memset: precondition 'valid_s' got status valid.
-[eva] precise_memset.c:76: Call to builtin memset
-[eva] precise_memset.c:76: 
+[eva:progress] precise_memset.c:76: Call to builtin memset
+[eva:progress] precise_memset.c:76: 
   function memset: precondition 'valid_s' got status valid.
-[eva] precise_memset.c:77: Call to builtin memset
-[eva] precise_memset.c:77: 
+[eva:progress] precise_memset.c:77: Call to builtin memset
+[eva:progress] precise_memset.c:77: 
   function memset: precondition 'valid_s' got status valid.
-[eva] precise_memset.c:78: Call to builtin memset
-[eva] precise_memset.c:78: 
+[eva:progress] precise_memset.c:78: Call to builtin memset
+[eva:progress] precise_memset.c:78: 
   function memset: precondition 'valid_s' got status valid.
-[eva] precise_memset.c:79: Call to builtin memset
-[eva] precise_memset.c:79: 
+[eva:progress] precise_memset.c:79: Call to builtin memset
+[eva:progress] precise_memset.c:79: 
   function memset: precondition 'valid_s' got status valid.
-[eva] precise_memset.c:80: Call to builtin memset
-[eva] precise_memset.c:80: 
+[eva:progress] precise_memset.c:80: Call to builtin memset
+[eva:progress] precise_memset.c:80: 
   function memset: precondition 'valid_s' got status valid.
-[eva] precise_memset.c:81: Call to builtin memset
-[eva] precise_memset.c:81: 
+[eva:progress] precise_memset.c:81: Call to builtin memset
+[eva:progress] precise_memset.c:81: 
   function memset: precondition 'valid_s' got status valid.
 [eva:alarm] precise_memset.c:84: Warning: assertion got status unknown.
-[eva] precise_memset.c:85: Call to builtin memset
-[eva] precise_memset.c:85: 
+[eva:progress] precise_memset.c:85: Call to builtin memset
+[eva:progress] precise_memset.c:85: 
   function memset: precondition 'valid_s' got status valid.
-[eva] precise_memset.c:87: Call to builtin memset
-[eva] precise_memset.c:87: 
+[eva:progress] precise_memset.c:87: Call to builtin memset
+[eva:progress] precise_memset.c:87: 
   function memset: precondition 'valid_s' got status valid.
-[eva] precise_memset.c:88: Call to builtin memset
-[eva] precise_memset.c:88: 
+[eva:progress] precise_memset.c:88: Call to builtin memset
+[eva:progress] precise_memset.c:88: 
   function memset: precondition 'valid_s' got status valid.
-[eva] precise_memset.c:89: Call to builtin memset
-[eva] precise_memset.c:89: 
+[eva:progress] precise_memset.c:89: Call to builtin memset
+[eva:progress] precise_memset.c:89: 
   function memset: precondition 'valid_s' got status valid.
-[eva] precise_memset.c:90: Call to builtin memset
-[eva] precise_memset.c:90: 
+[eva:progress] precise_memset.c:90: Call to builtin memset
+[eva:progress] precise_memset.c:90: 
   function memset: precondition 'valid_s' got status valid.
-[eva] precise_memset.c:91: Call to builtin memset
-[eva] precise_memset.c:91: 
+[eva:progress] precise_memset.c:91: Call to builtin memset
+[eva:progress] precise_memset.c:91: 
   function memset: precondition 'valid_s' got status valid.
-[eva] precise_memset.c:92: Call to builtin memset
-[eva] precise_memset.c:92: 
+[eva:progress] precise_memset.c:92: Call to builtin memset
+[eva:progress] precise_memset.c:92: 
   function memset: precondition 'valid_s' got status valid.
-[eva] Recording results for main
+[eva:progress] Recording results for main
 [from] Computing for function main
 [from] Done for function main
-[eva] Done for function main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   x ∈ {33686018}

@@ -1,16 +1,17 @@
 [kernel] Parsing topbot.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva] computing for function f <- main.
+[eva:progress] 
+  computing for function f <- main.
   Called from topbot.c:15.
 [eva:alarm] topbot.c:15: Warning: function f: precondition got status invalid.
-[eva] Recording results for f
-[eva] Done for function f
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for f
+[eva:progress] Done for function f
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [pdg] computing for function f
 [pdg] Warning: unreachable entry point (sid:14, function f)
 [pdg] Bottom for function f

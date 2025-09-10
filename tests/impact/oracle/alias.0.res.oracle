@@ -1,8 +1,8 @@
 [kernel] Parsing alias.i (no preprocessing)
 [impact] beginning analysis
 [eva] Analyzing an incomplete application starting at f
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   P ∈ [--..--]
   c ∈ [--..--]
@@ -14,8 +14,8 @@
 [eva:alarm] alias.i:17: Warning: 
   unaligned pointer creation. assert \aligned((void *)P,alignof(int));
 [eva:alarm] alias.i:18: Warning: out of bounds read. assert \valid_read(y);
-[eva] Recording results for f
-[eva] Done for function f
+[eva:progress] Recording results for f
+[eva:progress] Done for function f
 [eva] alias.i:18: assertion 'Eva,mem_access' got final status invalid.
 [scope:rm_asserts] removing 2 assertion(s)
 [pdg] computing for function f

@@ -1,12 +1,12 @@
 [kernel] Warning: ignoring source files specified on the command line while loading a global initial context.
 [kernel] Parsing fc_libc.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   
@@ -134,18 +134,18 @@ void main(void)
 
 
 [eva] Analyzing an incomplete application starting at main
-[eva] Computing initial state
+[eva:progress] Computing initial state
 [eva:initial-state] 
   creating variable S_data_0_S___fc_search_tbl with imprecise size (type void)
 [eva:initial-state] 
   creating variable S_data_1_S___fc_search_tbl with imprecise size (type void)
 [eva:initial-state] 
   creating variable S_data___fc_search_entry with imprecise size (type void)
-[eva] Initial state computed
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   

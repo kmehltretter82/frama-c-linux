@@ -1,7 +1,7 @@
 [kernel] Parsing interpreter-mode-syracuse.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
 [eva:show] interpreter-mode-syracuse.i:10: Frama_C_show_each: {1}, {127}
@@ -51,8 +51,8 @@
 [eva:show] interpreter-mode-syracuse.i:18: Frama_C_show_each: {45}, {4}
 [eva:show] interpreter-mode-syracuse.i:18: Frama_C_show_each: {46}, {2}
 [eva:show] interpreter-mode-syracuse.i:18: Frama_C_show_each: {47}, {1}
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   x ∈ {1}

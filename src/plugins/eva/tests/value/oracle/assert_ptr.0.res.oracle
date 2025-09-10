@@ -1,19 +1,19 @@
 [kernel] Parsing assert_ptr.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   ptr ∈ {0}
   q ∈ {0}
   s_q ∈ {0}
   a ∈ {0}
   r ∈ {0}
-[eva] assert_ptr.i:8: assertion got status valid.
+[eva:progress] assert_ptr.i:8: assertion got status valid.
 [eva:show] assert_ptr.i:9: Frama_C_show_each_ptr: {{ NULL ; &a }}
 [eva:alarm] assert_ptr.i:12: Warning: assertion got status unknown.
 [eva:show] assert_ptr.i:13: Frama_C_show_each_q: {{ &a }}
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   ptr ∈ {{ NULL ; &a }}

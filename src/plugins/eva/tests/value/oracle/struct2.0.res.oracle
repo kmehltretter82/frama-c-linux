@@ -1,7 +1,7 @@
 [kernel] Parsing struct2.i (no preprocessing)
 [eva] Analyzing a complete application starting at f_precis
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   NULL[rbits 32768 to 65543] ∈ [--..--]
   tabst[0..9] ∈ {0}
@@ -93,8 +93,8 @@
   signed overflow. assert -2147483648 ≤ tab3[l] + m;
 [eva:alarm] struct2.i:185: Warning: 
   signed overflow. assert tab3[l] + m ≤ 2147483647;
-[eva] Recording results for f_precis
-[eva] Done for function f_precis
+[eva:progress] Recording results for f_precis
+[eva:progress] Done for function f_precis
 [eva] struct2.i:124: assertion 'Eva,mem_access' got final status invalid.
 [eva] struct2.i:130: assertion 'Eva,mem_access' got final status invalid.
 [scope:rm_asserts] removing 2 assertion(s)

@@ -1,28 +1,32 @@
 [kernel] Parsing n8.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   nondet ∈ [--..--]
-[eva] computing for function main2 <- main.
+[eva:progress] 
+  computing for function main2 <- main.
   Called from n8.i:42.
-[eva] computing for function loop <- main2 <- main.
+[eva:progress] 
+  computing for function loop <- main2 <- main.
   Called from n8.i:35.
 [eva:alarm] n8.i:15: Warning: signed overflow. assert i + 1 ≤ 2147483647;
-[eva] Recording results for loop
-[eva] Done for function loop
-[eva] computing for function loop2 <- main2 <- main.
+[eva:progress] Recording results for loop
+[eva:progress] Done for function loop
+[eva:progress] 
+  computing for function loop2 <- main2 <- main.
   Called from n8.i:36.
-[eva] Recording results for loop2
-[eva] Done for function loop2
-[eva] computing for function loop3 <- main2 <- main.
+[eva:progress] Recording results for loop2
+[eva:progress] Done for function loop2
+[eva:progress] 
+  computing for function loop3 <- main2 <- main.
   Called from n8.i:36.
-[eva] Recording results for loop3
-[eva] Done for function loop3
-[eva] Recording results for main2
-[eva] Done for function main2
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for loop3
+[eva:progress] Done for function loop3
+[eva:progress] Recording results for main2
+[eva:progress] Done for function main2
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function loop:
   NON TERMINATING FUNCTION

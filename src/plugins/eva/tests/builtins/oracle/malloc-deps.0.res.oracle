@@ -1,111 +1,121 @@
 [kernel] Parsing malloc-deps.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   v ∈ [--..--]
-[eva] malloc-deps.c:12: Call to builtin malloc
+[eva:progress] malloc-deps.c:12: Call to builtin malloc
 [eva:malloc:new] malloc-deps.c:12: allocating weak variable __malloc_w_main_l12
-[eva] malloc-deps.c:17: Call to builtin malloc
+[eva:progress] malloc-deps.c:17: Call to builtin malloc
 [eva:malloc:new] malloc-deps.c:17: allocating variable __malloc_main_l17
-[eva] malloc-deps.c:25: Call to builtin malloc
+[eva:progress] malloc-deps.c:25: Call to builtin malloc
 [eva:malloc:new] malloc-deps.c:25: allocating variable __malloc_main_l25
-[eva] computing for function g <- main.
+[eva:progress] 
+  computing for function g <- main.
   Called from malloc-deps.c:26.
 [eva:alarm] malloc-deps.c:7: Warning: out of bounds write. assert \valid(p + k);
-[eva] Recording results for g
+[eva:progress] Recording results for g
 [from] Computing for function g
 [from] Done for function g
-[eva] Done for function g
-[eva] malloc-deps.c:25: Call to builtin malloc
+[eva:progress] Done for function g
+[eva:progress] malloc-deps.c:25: Call to builtin malloc
 [eva:malloc:weak] malloc-deps.c:25: marking variable `__malloc_main_l25' as weak
 [eva:malloc] malloc-deps.c:25: 
   resizing variable `__malloc_w_main_l25' (0..31) to fit 0..63
 [eva:alarm] malloc-deps.c:26: Warning: 
   signed overflow. assert l + v ≤ 2147483647;
-[eva] computing for function g <- main.
+[eva:progress] 
+  computing for function g <- main.
   Called from malloc-deps.c:26.
-[eva] Recording results for g
+[eva:progress] Recording results for g
 [from] Computing for function g
 [from] Done for function g
-[eva] Done for function g
-[eva] malloc-deps.c:25: Call to builtin malloc
+[eva:progress] Done for function g
+[eva:progress] malloc-deps.c:25: Call to builtin malloc
 [eva:malloc] malloc-deps.c:25: 
   resizing variable `__malloc_w_main_l25' (0..31/63) to fit 0..95
-[eva] computing for function g <- main.
+[eva:progress] 
+  computing for function g <- main.
   Called from malloc-deps.c:26.
-[eva] Recording results for g
+[eva:progress] Recording results for g
 [from] Computing for function g
 [from] Done for function g
-[eva] Done for function g
-[eva] malloc-deps.c:25: Call to builtin malloc
+[eva:progress] Done for function g
+[eva:progress] malloc-deps.c:25: Call to builtin malloc
 [eva:malloc] malloc-deps.c:25: 
   resizing variable `__malloc_w_main_l25' (0..31/95) to fit 0..127
-[eva] computing for function g <- main.
+[eva:progress] 
+  computing for function g <- main.
   Called from malloc-deps.c:26.
-[eva] Recording results for g
+[eva:progress] Recording results for g
 [from] Computing for function g
 [from] Done for function g
-[eva] Done for function g
-[eva] malloc-deps.c:25: Call to builtin malloc
+[eva:progress] Done for function g
+[eva:progress] malloc-deps.c:25: Call to builtin malloc
 [eva:malloc] malloc-deps.c:25: 
   resizing variable `__malloc_w_main_l25' (0..31/127) to fit 0..159
-[eva] computing for function g <- main.
+[eva:progress] 
+  computing for function g <- main.
   Called from malloc-deps.c:26.
-[eva] Recording results for g
+[eva:progress] Recording results for g
 [from] Computing for function g
 [from] Done for function g
-[eva] Done for function g
-[eva] malloc-deps.c:25: Call to builtin malloc
+[eva:progress] Done for function g
+[eva:progress] malloc-deps.c:25: Call to builtin malloc
 [eva:malloc] malloc-deps.c:25: 
   resizing variable `__malloc_w_main_l25' (0..31/159) to fit 0..191
-[eva] computing for function g <- main.
+[eva:progress] 
+  computing for function g <- main.
   Called from malloc-deps.c:26.
-[eva] Recording results for g
+[eva:progress] Recording results for g
 [from] Computing for function g
 [from] Done for function g
-[eva] Done for function g
+[eva:progress] Done for function g
 [eva:partition] malloc-deps.c:23: starting to merge loop iterations
-[eva] malloc-deps.c:25: Call to builtin malloc
+[eva:progress] malloc-deps.c:25: Call to builtin malloc
 [eva:malloc] malloc-deps.c:25: 
   resizing variable `__malloc_w_main_l25' (0..31/191) to fit 0..191/223
-[eva] computing for function g <- main.
+[eva:progress] 
+  computing for function g <- main.
   Called from malloc-deps.c:26.
-[eva] Recording results for g
+[eva:progress] Recording results for g
 [from] Computing for function g
 [from] Done for function g
-[eva] Done for function g
-[eva] malloc-deps.c:25: Call to builtin malloc
+[eva:progress] Done for function g
+[eva:progress] malloc-deps.c:25: Call to builtin malloc
 [eva:malloc] malloc-deps.c:25: 
   resizing variable `__malloc_w_main_l25' (0..31/223) to fit 0..191/255
-[eva] computing for function g <- main.
+[eva:progress] 
+  computing for function g <- main.
   Called from malloc-deps.c:26.
-[eva] Recording results for g
+[eva:progress] Recording results for g
 [from] Computing for function g
 [from] Done for function g
-[eva] Done for function g
-[eva] malloc-deps.c:25: Call to builtin malloc
+[eva:progress] Done for function g
+[eva:progress] malloc-deps.c:25: Call to builtin malloc
 [eva:malloc] malloc-deps.c:25: 
   resizing variable `__malloc_w_main_l25' (0..31/255) to fit 0..191/319
-[eva] computing for function g <- main.
+[eva:progress] 
+  computing for function g <- main.
   Called from malloc-deps.c:26.
-[eva] Recording results for g
+[eva:progress] Recording results for g
 [from] Computing for function g
 [from] Done for function g
-[eva] Done for function g
-[eva] malloc-deps.c:25: Call to builtin malloc
+[eva:progress] Done for function g
+[eva:progress] malloc-deps.c:25: Call to builtin malloc
 [eva:malloc] malloc-deps.c:25: 
   resizing variable `__malloc_w_main_l25' (0..31/319) to fit 0..191/319
-[eva] computing for function g <- main.
+[eva:progress] 
+  computing for function g <- main.
   Called from malloc-deps.c:26.
-[eva] Recording results for g
+[eva:progress] Recording results for g
 [from] Computing for function g
 [from] Done for function g
-[eva] Done for function g
-[eva] Recording results for main
+[eva:progress] Done for function g
+[eva:progress] Recording results for main
 [from] Computing for function main
 [from] Done for function main
-[eva] Done for function main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function g:
   __malloc_w_main_l25[0..9] ∈ [0..9] or UNINITIALIZED

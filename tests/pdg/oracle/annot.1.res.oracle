@@ -1,15 +1,15 @@
 [kernel] Parsing annot.c (with preprocessing)
 [eva] Analyzing a complete application starting at loop
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   G ∈ {0}
 [eva:alarm] annot.c:22: Warning: loop invariant got status unknown.
-[eva] annot.c:22: loop invariant got status valid.
+[eva:progress] annot.c:22: loop invariant got status valid.
 [eva:partition] annot.c:25: starting to merge loop iterations
 [eva:alarm] annot.c:26: Warning: signed overflow. assert s + 2 ≤ 2147483647;
-[eva] Recording results for loop
-[eva] Done for function loop
+[eva:progress] Recording results for loop
+[eva:progress] Done for function loop
 [pdg] computing for function loop
 [pdg] done for function loop
 [pdg] PDG for loop

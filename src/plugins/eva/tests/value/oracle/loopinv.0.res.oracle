@@ -1,39 +1,46 @@
 [kernel] Parsing loopinv.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   n ∈ [--..--]
-[eva] computing for function main1 <- main.
+[eva:progress] 
+  computing for function main1 <- main.
   Called from loopinv.c:80.
-[eva] computing for function init <- main1 <- main.
+[eva:progress] 
+  computing for function init <- main1 <- main.
   Called from loopinv.c:22.
-[eva] loopinv.c:22: function init: precondition 'valid' got status valid.
-[eva] loopinv.c:22: function init: precondition 'c' got status valid.
-[eva] loopinv.c:9: loop invariant got status valid.
+[eva:progress] loopinv.c:22: 
+  function init: precondition 'valid' got status valid.
+[eva:progress] loopinv.c:22: function init: precondition 'c' got status valid.
+[eva:progress] loopinv.c:9: loop invariant got status valid.
 [eva:partition] loopinv.c:10: starting to merge loop iterations
-[eva] Recording results for init
-[eva] Done for function init
-[eva] computing for function init <- main1 <- main.
+[eva:progress] Recording results for init
+[eva:progress] Done for function init
+[eva:progress] 
+  computing for function init <- main1 <- main.
   Called from loopinv.c:25.
-[eva] loopinv.c:25: function init: precondition 'valid' got status valid.
-[eva] loopinv.c:25: function init: precondition 'c' got status valid.
-[eva] Recording results for init
-[eva] Done for function init
-[eva] Recording results for main1
-[eva] Done for function main1
-[eva] computing for function main2 <- main.
+[eva:progress] loopinv.c:25: 
+  function init: precondition 'valid' got status valid.
+[eva:progress] loopinv.c:25: function init: precondition 'c' got status valid.
+[eva:progress] Recording results for init
+[eva:progress] Done for function init
+[eva:progress] Recording results for main1
+[eva:progress] Done for function main1
+[eva:progress] 
+  computing for function main2 <- main.
   Called from loopinv.c:81.
-[eva] loopinv.c:32: loop invariant got status valid.
-[eva] loopinv.c:33: loop invariant got status valid.
+[eva:progress] loopinv.c:32: loop invariant got status valid.
+[eva:progress] loopinv.c:33: loop invariant got status valid.
 [eva:alarm] loopinv.c:32: Warning: 
   loop invariant got status invalid (stopping propagation).
-[eva] loopinv.c:33: no state left, loop invariant got status valid.
-[eva] Recording results for main2
-[eva] Done for function main2
-[eva] computing for function main3 <- main.
+[eva:progress] loopinv.c:33: no state left, loop invariant got status valid.
+[eva:progress] Recording results for main2
+[eva:progress] Done for function main2
+[eva:progress] 
+  computing for function main3 <- main.
   Called from loopinv.c:82.
-[eva] loopinv.c:42: loop invariant got status valid.
+[eva:progress] loopinv.c:42: loop invariant got status valid.
 [eva:show] loopinv.c:46: Frama_C_show_each: {0}, {0}
 [eva:partition] loopinv.c:43: starting to merge loop iterations
 [eva:show] loopinv.c:46: Frama_C_show_each: {0; 1}, {0; 1}
@@ -44,18 +51,20 @@
   Frama_C_show_each: {0; 1; 2; 3; 4; 5; 6}, {0; 1; 2; 3; 4}
 [eva:alarm] loopinv.c:45: Warning: signed overflow. assert j + 1 ≤ 2147483647;
 [eva:show] loopinv.c:46: Frama_C_show_each: [0..99], [0..2147483647]
-[eva] Recording results for main3
-[eva] Done for function main3
-[eva] computing for function main4 <- main.
+[eva:progress] Recording results for main3
+[eva:progress] Done for function main3
+[eva:progress] 
+  computing for function main4 <- main.
   Called from loopinv.c:83.
-[eva] loopinv.c:58: loop invariant got status valid.
+[eva:progress] loopinv.c:58: loop invariant got status valid.
 [eva:partition] loopinv.c:59: starting to merge loop iterations
 [eva:alarm] loopinv.c:58: Warning: loop invariant got status unknown.
-[eva] Recording results for main4
-[eva] Done for function main4
-[eva] computing for function main5 <- main.
+[eva:progress] Recording results for main4
+[eva:progress] Done for function main4
+[eva:progress] 
+  computing for function main5 <- main.
   Called from loopinv.c:84.
-[eva] loopinv.c:69: loop invariant got status valid.
+[eva:progress] loopinv.c:69: loop invariant got status valid.
 [eva:show] loopinv.c:71: Frama_C_show_each: {0}, {1}
 [eva:partition] loopinv.c:70: starting to merge loop iterations
 [eva:show] loopinv.c:71: Frama_C_show_each: {0; 2}, {1; 2}
@@ -67,10 +76,10 @@
 [eva:alarm] loopinv.c:72: Warning: 
   signed overflow. assert sn + 2 ≤ 2147483647;
 [eva:alarm] loopinv.c:73: Warning: signed overflow. assert i + 1 ≤ 2147483647;
-[eva] Recording results for main5
-[eva] Done for function main5
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for main5
+[eva:progress] Done for function main5
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function init:
   p ∈ {{ &t1 + [4..284],0%4 ; &t2 + [4..40],0%4 }}

@@ -1,8 +1,8 @@
 [kernel] Parsing loop.i (no preprocessing)
 [impact] beginning analysis
 [eva] Analyzing an incomplete application starting at loop
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   c ∈ [--..--]
   x ∈ [--..--]
@@ -13,8 +13,8 @@
 [eva:alarm] loop.i:11: Warning: signed overflow. assert y + 1 ≤ 2147483647;
 [eva:alarm] loop.i:13: Warning: signed overflow. assert x + 1 ≤ 2147483647;
 [eva:alarm] loop.i:14: Warning: signed overflow. assert x + 1 ≤ 2147483647;
-[eva] Recording results for loop
-[eva] Done for function loop
+[eva:progress] Recording results for loop
+[eva:progress] Done for function loop
 [pdg] computing for function loop
 [pdg] done for function loop
 [impact] impacted statements of stmt(s) 9 are:

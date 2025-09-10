@@ -1,7 +1,7 @@
 [kernel] Parsing struct_call.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   G ∈ {77}
   GG ∈ {0}
@@ -10,37 +10,42 @@
   C{.c1; .[bits 16 to 31]} ∈ [--..--]
    .c2 ∈ {{ NULL ; &S_c2_C[0] }}
   S_c2_C[0..1] ∈ [--..--]
-[eva] computing for function main1 <- main.
+[eva:progress] 
+  computing for function main1 <- main.
   Called from struct_call.i:46.
-[eva] computing for function g <- main1 <- main.
+[eva:progress] 
+  computing for function g <- main1 <- main.
   Called from struct_call.i:33.
 [eva:show] struct_call.i:16: Frama_C_show_each_G: {0}
-[eva] Recording results for g
-[eva] Done for function g
-[eva] computing for function create_A <- main1 <- main.
+[eva:progress] Recording results for g
+[eva:progress] Done for function g
+[eva:progress] 
+  computing for function create_A <- main1 <- main.
   Called from struct_call.i:34.
 [eva:show] struct_call.i:25: 
   Frama_C_show_each_GG: .x ∈ {1}
                         .y ∈ {0}
-[eva] Recording results for create_A
-[eva] Done for function create_A
-[eva] computing for function g <- main1 <- main.
+[eva:progress] Recording results for create_A
+[eva:progress] Done for function create_A
+[eva:progress] 
+  computing for function g <- main1 <- main.
   Called from struct_call.i:35.
 [eva:show] struct_call.i:16: 
   Frama_C_show_each_G: .x ∈ {0}
                        .y ∈ {77}
-[eva] Recording results for g
-[eva] Done for function g
-[eva] Recording results for main1
-[eva] Done for function main1
-[eva] computing for function h <- main.
+[eva:progress] Recording results for g
+[eva:progress] Done for function g
+[eva:progress] Recording results for main1
+[eva:progress] Done for function main1
+[eva:progress] 
+  computing for function h <- main.
   Called from struct_call.i:47.
 [eva:show] struct_call.i:42: 
   Frama_C_show_each: [-32768..32767], {{ NULL ; &S_c2_C }}
-[eva] Recording results for h
-[eva] Done for function h
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for h
+[eva:progress] Done for function h
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function create_A:
   r.x ∈ {1}

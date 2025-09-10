@@ -159,7 +159,7 @@ let register_warn_category ~help = register_warn_category ~help
 
 let dkey_show =
   register_category "show" ~level:2
-    ~help:"show values/states inferred by the analysis on directives
+    ~help:"show values/states inferred by the analysis on directives \
            such as Frama_C_show_each and Frama_C_dump_each"
 
 let dkey_initial_state =
@@ -206,6 +206,10 @@ let dkey_precision_settings =
   register_category "precision-settings" ~level:3
     ~help:"messages about the automatic configuration of the analysis by \
            option -eva-precision"
+
+let dkey_progress =
+  register_category "progress" ~level:10
+    ~help:"messages about the analysis progress in the C code"
 
 let dkey_callstacks =
   register_category "callstacks" ~level:9

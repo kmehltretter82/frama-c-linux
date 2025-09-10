@@ -1,7 +1,7 @@
 [kernel] Parsing bitfield_assign.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   g_18 ∈ {0}
   g_5 ∈ {0}
@@ -10,8 +10,8 @@
      [0]{.f0[bits 7 to 159]; .f1[bits 7 to 159]; .f2[bits 7 to 159]; .f3{.f0[bits 7 to 31]; .f1; .f2; .f3; .[bits 48 to 63]; .[bits 90 to 95]}} ∈
      {0}
 [eva:show] bitfield_assign.i:34: Frama_C_show_each: {21668890}
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   g_2 ∈ {21668890}

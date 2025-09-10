@@ -1,20 +1,21 @@
 [kernel] Parsing cmp.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
 [eva:alarm] cmp.i:10: Warning: accessing out of bounds index. assert 0 ≤ d;
 [eva:alarm] cmp.i:10: Warning: accessing out of bounds index. assert d < 10;
-[eva] computing for function cmp <- main.
+[eva:progress] 
+  computing for function cmp <- main.
   Called from cmp.i:11.
 [eva:alarm] cmp.i:4: Warning: 
   accessing uninitialized left-value. assert \initialized(s1);
 [eva:alarm] cmp.i:4: Warning: out of bounds read. assert \valid_read(s1);
-[eva] Recording results for cmp
-[eva] Done for function cmp
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for cmp
+[eva:progress] Done for function cmp
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function cmp:
   __retres ∈ {1}

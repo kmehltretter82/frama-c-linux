@@ -1,101 +1,135 @@
-296a297,298
+365a366,367
 > [eva:signed-overflow] ieee_1180_1990.c:219: Warning: 
 >   2's complement assumed for overflow
-300a303,304
+369a372,373
 > [eva:signed-overflow] ieee_1180_1990.c:220: Warning: 
 >   2's complement assumed for overflow
-306,307d309
+375,376d378
 < [eva:signed-overflow] ieee_1180_1990.c:219: Warning: 
 <   2's complement assumed for overflow
-332a335,336
+404a407,408
 > [eva:signed-overflow] ieee_1180_1990.c:243: Warning: 
 >   2's complement assumed for overflow
-336a341,342
+408a413,414
 > [eva:signed-overflow] ieee_1180_1990.c:244: Warning: 
 >   2's complement assumed for overflow
-342,343d347
+414,415d419
 < [eva:signed-overflow] ieee_1180_1990.c:243: Warning: 
 <   2's complement assumed for overflow
-358a363,366
-> [eva] ieee_1180_1990.c:85: Reusing old results for call to IEEE_1180_1990_rand
-> [eva] ieee_1180_1990.c:85: Reusing old results for call to IEEE_1180_1990_rand
-> [eva] ieee_1180_1990.c:85: Reusing old results for call to IEEE_1180_1990_rand
-> [eva] ieee_1180_1990.c:85: Reusing old results for call to IEEE_1180_1990_rand
-369a378,379
+438a443,450
+> [eva:progress] ieee_1180_1990.c:85: 
+>   Reusing old results for call to IEEE_1180_1990_rand
+> [eva:progress] ieee_1180_1990.c:85: 
+>   Reusing old results for call to IEEE_1180_1990_rand
+> [eva:progress] ieee_1180_1990.c:85: 
+>   Reusing old results for call to IEEE_1180_1990_rand
+> [eva:progress] ieee_1180_1990.c:85: 
+>   Reusing old results for call to IEEE_1180_1990_rand
+451a464,465
 > [eva:signed-overflow] ieee_1180_1990.c:265: Warning: 
 >   2's complement assumed for overflow
-373a384,385
+455a470,471
 > [eva:signed-overflow] ieee_1180_1990.c:266: Warning: 
 >   2's complement assumed for overflow
-379,380d390
+461,462d476
 < [eva:signed-overflow] ieee_1180_1990.c:265: Warning: 
 <   2's complement assumed for overflow
-396a407,408
+480a495,496
 > [eva:signed-overflow] ieee_1180_1990.c:289: Warning: 
 >   2's complement assumed for overflow
-400a413,414
+484a501,502
 > [eva:signed-overflow] ieee_1180_1990.c:290: Warning: 
 >   2's complement assumed for overflow
-406,407d419
+490,491d507
 < [eva:signed-overflow] ieee_1180_1990.c:289: Warning: 
 <   2's complement assumed for overflow
-422a435,438
-> [eva] ieee_1180_1990.c:85: Reusing old results for call to IEEE_1180_1990_rand
-> [eva] ieee_1180_1990.c:85: Reusing old results for call to IEEE_1180_1990_rand
-> [eva] ieee_1180_1990.c:85: Reusing old results for call to IEEE_1180_1990_rand
-> [eva] ieee_1180_1990.c:85: Reusing old results for call to IEEE_1180_1990_rand
-433a450,451
+514a531,538
+> [eva:progress] ieee_1180_1990.c:85: 
+>   Reusing old results for call to IEEE_1180_1990_rand
+> [eva:progress] ieee_1180_1990.c:85: 
+>   Reusing old results for call to IEEE_1180_1990_rand
+> [eva:progress] ieee_1180_1990.c:85: 
+>   Reusing old results for call to IEEE_1180_1990_rand
+> [eva:progress] ieee_1180_1990.c:85: 
+>   Reusing old results for call to IEEE_1180_1990_rand
+527a552,553
 > [eva:signed-overflow] ieee_1180_1990.c:311: Warning: 
 >   2's complement assumed for overflow
-437a456,457
+531a558,559
 > [eva:signed-overflow] ieee_1180_1990.c:312: Warning: 
 >   2's complement assumed for overflow
-443,444d462
+537,538d564
 < [eva:signed-overflow] ieee_1180_1990.c:311: Warning: 
 <   2's complement assumed for overflow
-460a479,480
+556a583,584
 > [eva:signed-overflow] ieee_1180_1990.c:335: Warning: 
 >   2's complement assumed for overflow
-464a485,486
+560a589,590
 > [eva:signed-overflow] ieee_1180_1990.c:336: Warning: 
 >   2's complement assumed for overflow
-470,471d491
+566,567d595
 < [eva:signed-overflow] ieee_1180_1990.c:335: Warning: 
 <   2's complement assumed for overflow
-484a505,508
-> [eva] ieee_1180_1990.c:85: Reusing old results for call to IEEE_1180_1990_rand
-> [eva] ieee_1180_1990.c:85: Reusing old results for call to IEEE_1180_1990_rand
-> [eva] ieee_1180_1990.c:85: Reusing old results for call to IEEE_1180_1990_rand
-> [eva] ieee_1180_1990.c:85: Reusing old results for call to IEEE_1180_1990_rand
-490a515
-> [eva] ieee_1180_1990.c:100: Call to builtin Frama_C_sqrt for function sqrt
-491a517,519
-> [eva] ieee_1180_1990.c:100: Call to builtin Frama_C_sqrt for function sqrt
-> [eva] ieee_1180_1990.c:101: Call to builtin Frama_C_cos for function cos
-> [eva] ieee_1180_1990.c:100: Call to builtin Frama_C_sqrt for function sqrt
-492a521,527
-> [eva] ieee_1180_1990.c:100: Call to builtin Frama_C_sqrt for function sqrt
-> [eva] ieee_1180_1990.c:101: Call to builtin Frama_C_cos for function cos
-> [eva] ieee_1180_1990.c:100: Call to builtin Frama_C_sqrt for function sqrt
-> [eva] ieee_1180_1990.c:101: Call to builtin Frama_C_cos for function cos
-> [eva] ieee_1180_1990.c:100: Call to builtin Frama_C_sqrt for function sqrt
-> [eva] ieee_1180_1990.c:101: Call to builtin Frama_C_cos for function cos
-> [eva] ieee_1180_1990.c:100: Call to builtin Frama_C_sqrt for function sqrt
-505a541
-> [eva] ieee_1180_1990.c:140: Call to builtin Frama_C_sqrt for function sqrt
-506a543
-> [eva] ieee_1180_1990.c:140: Call to builtin Frama_C_sqrt for function sqrt
-507a545,553
-> [eva] ieee_1180_1990.c:140: Call to builtin Frama_C_sqrt for function sqrt
-> [eva] ieee_1180_1990.c:141: Call to builtin Frama_C_cos for function cos
-> [eva] ieee_1180_1990.c:140: Call to builtin Frama_C_sqrt for function sqrt
-> [eva] ieee_1180_1990.c:141: Call to builtin Frama_C_cos for function cos
-> [eva] ieee_1180_1990.c:140: Call to builtin Frama_C_sqrt for function sqrt
-> [eva] ieee_1180_1990.c:141: Call to builtin Frama_C_cos for function cos
-> [eva] ieee_1180_1990.c:140: Call to builtin Frama_C_sqrt for function sqrt
-> [eva] ieee_1180_1990.c:141: Call to builtin Frama_C_cos for function cos
-> [eva] ieee_1180_1990.c:140: Call to builtin Frama_C_sqrt for function sqrt
-769c815
+588a617,624
+> [eva:progress] ieee_1180_1990.c:85: 
+>   Reusing old results for call to IEEE_1180_1990_rand
+> [eva:progress] ieee_1180_1990.c:85: 
+>   Reusing old results for call to IEEE_1180_1990_rand
+> [eva:progress] ieee_1180_1990.c:85: 
+>   Reusing old results for call to IEEE_1180_1990_rand
+> [eva:progress] ieee_1180_1990.c:85: 
+>   Reusing old results for call to IEEE_1180_1990_rand
+597a634,651
+> [eva:progress] ieee_1180_1990.c:100: 
+>   Call to builtin Frama_C_sqrt for function sqrt
+> [eva:progress] ieee_1180_1990.c:101: 
+>   Call to builtin Frama_C_cos for function cos
+> [eva:progress] ieee_1180_1990.c:100: 
+>   Call to builtin Frama_C_sqrt for function sqrt
+> [eva:progress] ieee_1180_1990.c:101: 
+>   Call to builtin Frama_C_cos for function cos
+> [eva:progress] ieee_1180_1990.c:100: 
+>   Call to builtin Frama_C_sqrt for function sqrt
+> [eva:progress] ieee_1180_1990.c:101: 
+>   Call to builtin Frama_C_cos for function cos
+> [eva:progress] ieee_1180_1990.c:100: 
+>   Call to builtin Frama_C_sqrt for function sqrt
+> [eva:progress] ieee_1180_1990.c:101: 
+>   Call to builtin Frama_C_cos for function cos
+> [eva:progress] ieee_1180_1990.c:100: 
+>   Call to builtin Frama_C_sqrt for function sqrt
+599a654,655
+> [eva:progress] ieee_1180_1990.c:100: 
+>   Call to builtin Frama_C_sqrt for function sqrt
+601a658,659
+> [eva:progress] ieee_1180_1990.c:100: 
+>   Call to builtin Frama_C_sqrt for function sqrt
+624a683,696
+> [eva:progress] ieee_1180_1990.c:140: 
+>   Call to builtin Frama_C_sqrt for function sqrt
+> [eva:progress] ieee_1180_1990.c:141: 
+>   Call to builtin Frama_C_cos for function cos
+> [eva:progress] ieee_1180_1990.c:140: 
+>   Call to builtin Frama_C_sqrt for function sqrt
+> [eva:progress] ieee_1180_1990.c:141: 
+>   Call to builtin Frama_C_cos for function cos
+> [eva:progress] ieee_1180_1990.c:140: 
+>   Call to builtin Frama_C_sqrt for function sqrt
+> [eva:progress] ieee_1180_1990.c:141: 
+>   Call to builtin Frama_C_cos for function cos
+> [eva:progress] ieee_1180_1990.c:140: 
+>   Call to builtin Frama_C_sqrt for function sqrt
+626a699,700
+> [eva:progress] ieee_1180_1990.c:140: 
+>   Call to builtin Frama_C_sqrt for function sqrt
+628a703,708
+> [eva:progress] ieee_1180_1990.c:140: 
+>   Call to builtin Frama_C_sqrt for function sqrt
+> [eva:progress] ieee_1180_1990.c:141: 
+>   Call to builtin Frama_C_cos for function cos
+> [eva:progress] ieee_1180_1990.c:140: 
+>   Call to builtin Frama_C_sqrt for function sqrt
+999c1079
 <     by the Eva analyzer:      0 errors   42 warnings
 ---
 >     by the Eva analyzer:      0 errors   48 warnings

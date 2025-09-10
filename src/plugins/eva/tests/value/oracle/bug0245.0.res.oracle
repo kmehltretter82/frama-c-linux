@@ -1,7 +1,7 @@
 [kernel] Parsing bug0245.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   R ∈ {0}
   p ∈ {0}
@@ -15,8 +15,8 @@
   accessing left-value that contains escaping addresses. assert ¬\dangling(&p);
 [eva:alarm] bug0245.i:24: Warning: 
   accessing left-value that contains escaping addresses. assert ¬\dangling(&q);
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] bug0245.i:23: assertion 'Eva,dangling_pointer' got final status invalid.
 [eva] bug0245.i:24: assertion 'Eva,dangling_pointer' got final status invalid.
 [eva] ====== VALUES COMPUTED ======

@@ -1,30 +1,32 @@
 [kernel] Expanding arguments from test_options.txt
 [kernel] Parsing funcall6.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   secret ∈ [--..--]
   x ∈ {0}
   y ∈ {0}
   funcs[0].f ∈ {{ &write_x }}
        [1].f ∈ {{ &write_y }}
-[eva] computing for function write_x <- main.
+[eva:progress] 
+  computing for function write_x <- main.
   Called from funcall6.c:26.
-[eva] Recording results for write_x
-[eva] Done for function write_x
-[eva] computing for function write_y <- main.
+[eva:progress] Recording results for write_x
+[eva:progress] Done for function write_x
+[eva:progress] 
+  computing for function write_y <- main.
   Called from funcall6.c:27.
-[eva] Recording results for write_y
-[eva] Done for function write_y
+[eva:progress] Recording results for write_y
+[eva:progress] Done for function write_y
 [eva:alarm] funcall6.c:29: Warning: assertion got status unknown.
-[eva] funcall6.c:30: assertion got status valid.
-[eva] funcall6.c:37: Reusing old results for call to write_x
-[eva] funcall6.c:38: Reusing old results for call to write_y
+[eva:progress] funcall6.c:30: assertion got status valid.
+[eva:progress] funcall6.c:37: Reusing old results for call to write_x
+[eva:progress] funcall6.c:38: Reusing old results for call to write_y
 [eva:alarm] funcall6.c:40: Warning: assertion got status unknown.
-[eva] funcall6.c:41: assertion got status valid.
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] funcall6.c:41: assertion got status valid.
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function write_x:
   x ∈ [--..--]

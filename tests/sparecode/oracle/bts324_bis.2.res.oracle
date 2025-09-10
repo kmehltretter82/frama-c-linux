@@ -2,8 +2,8 @@
 [sparecode] remove unused code...
 [sparecode] selecting function main outputs and entry point
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   ki[0..1] ∈ {0}
   k ∈ {0}
@@ -14,30 +14,36 @@
   is_ok ∈ {0}
   f_si[0..1] ∈ {0}
   f_so[0..1] ∈ {0}
-[eva] computing for function init <- main.
+[eva:progress] 
+  computing for function init <- main.
   Called from bts324_bis.i:37.
-[eva] Recording results for init
-[eva] Done for function init
-[eva] computing for function loop_body <- main.
+[eva:progress] Recording results for init
+[eva:progress] Done for function init
+[eva:progress] 
+  computing for function loop_body <- main.
   Called from bts324_bis.i:40.
-[eva] computing for function f <- loop_body <- main.
+[eva:progress] 
+  computing for function f <- loop_body <- main.
   Called from bts324_bis.i:22.
 [eva:alarm] bts324_bis.i:10: Warning: 
   signed overflow. assert -2147483648 ≤ ki[i] * (int)(vi - f_si[i]);
 [eva:alarm] bts324_bis.i:10: Warning: 
   signed overflow. assert ki[i] * (int)(vi - f_si[i]) ≤ 2147483647;
-[eva] Recording results for f
-[eva] Done for function f
-[eva] computing for function f <- loop_body <- main.
+[eva:progress] Recording results for f
+[eva:progress] Done for function f
+[eva:progress] 
+  computing for function f <- loop_body <- main.
   Called from bts324_bis.i:23.
-[eva] Recording results for f
-[eva] Done for function f
-[eva] Recording results for loop_body
-[eva] Done for function loop_body
+[eva:progress] Recording results for f
+[eva:progress] Done for function f
+[eva:progress] Recording results for loop_body
+[eva:progress] Done for function loop_body
 [eva:partition] bts324_bis.i:39: starting to merge loop iterations
-[eva] computing for function loop_body <- main.
+[eva:progress] 
+  computing for function loop_body <- main.
   Called from bts324_bis.i:40.
-[eva] computing for function f <- loop_body <- main.
+[eva:progress] 
+  computing for function f <- loop_body <- main.
   Called from bts324_bis.i:22.
 [eva:alarm] bts324_bis.i:10: Warning: 
   signed overflow. assert -2147483648 ≤ vi - f_si[i];
@@ -49,28 +55,32 @@
 [eva:alarm] bts324_bis.i:10: Warning: 
   signed overflow.
   assert (int)(f_so[i] / k) + (int)(ki[i] * (int)(vi - f_si[i])) ≤ 2147483647;
-[eva] Recording results for f
-[eva] Done for function f
-[eva] computing for function f <- loop_body <- main.
+[eva:progress] Recording results for f
+[eva:progress] Done for function f
+[eva:progress] 
+  computing for function f <- loop_body <- main.
   Called from bts324_bis.i:23.
-[eva] Recording results for f
-[eva] Done for function f
-[eva] Recording results for loop_body
-[eva] Done for function loop_body
-[eva] computing for function loop_body <- main.
+[eva:progress] Recording results for f
+[eva:progress] Done for function f
+[eva:progress] Recording results for loop_body
+[eva:progress] Done for function loop_body
+[eva:progress] 
+  computing for function loop_body <- main.
   Called from bts324_bis.i:40.
-[eva] computing for function f <- loop_body <- main.
+[eva:progress] 
+  computing for function f <- loop_body <- main.
   Called from bts324_bis.i:22.
-[eva] Recording results for f
-[eva] Done for function f
-[eva] computing for function f <- loop_body <- main.
+[eva:progress] Recording results for f
+[eva:progress] Done for function f
+[eva:progress] 
+  computing for function f <- loop_body <- main.
   Called from bts324_bis.i:23.
-[eva] Recording results for f
-[eva] Done for function f
-[eva] Recording results for loop_body
-[eva] Done for function loop_body
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for f
+[eva:progress] Done for function f
+[eva:progress] Recording results for loop_body
+[eva:progress] Done for function loop_body
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [pdg] computing for function main
 [from] Computing for function init
 [from] Done for function init

@@ -1,12 +1,12 @@
 [kernel] Parsing loops.c (with preprocessing)
 [eva] Analyzing an incomplete application starting at loop_with_goto
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   after ∈ [--..--]
 [eva:alarm] loops.c:120: Warning: signed overflow. assert -2147483648 ≤ n - 1;
-[eva] Recording results for loop_with_goto
-[eva] Done for function loop_with_goto
+[eva:progress] Recording results for loop_with_goto
+[eva:progress] Done for function loop_with_goto
 [pdg] computing for function loop_with_goto
 [pdg] done for function loop_with_goto
 [pdg] PDG for loop_with_goto

@@ -1,55 +1,60 @@
 [kernel] Parsing multi_taint.c (with preprocessing)
 [eva:experimental] Warning: The taint domain is experimental.
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   undet ∈ [--..--]
-[eva] computing for function scanf_va_1 <- main.
+[eva:progress] 
+  computing for function scanf_va_1 <- main.
   Called from multi_taint.c:71.
 [eva] using specification for function scanf
-[eva] multi_taint.c:71: 
+[eva:progress] multi_taint.c:71: 
   function scanf_va_1: precondition \valid(param0) got status valid.
-[eva] multi_taint.c:71: 
+[eva:progress] multi_taint.c:71: 
   function scanf_va_1: precondition valid_read_string(format) got status valid.
-[eva] Done for function scanf_va_1
+[eva:progress] Done for function scanf_va_1
 [eva:alarm] multi_taint.c:72: Warning: check got status unknown.
-[eva] computing for function taint_simplify_singletons <- main.
+[eva:progress] 
+  computing for function taint_simplify_singletons <- main.
   Called from multi_taint.c:74.
 [eva:alarm] multi_taint.c:15: Warning: assertion got status unknown.
-[eva] multi_taint.c:19: check got status valid.
-[eva] multi_taint.c:20: check got status valid.
-[eva] Recording results for taint_simplify_singletons
-[eva] Done for function taint_simplify_singletons
-[eva] multi_taint.c:75: check got status valid.
-[eva] computing for function multi_taint_test <- main.
+[eva:progress] multi_taint.c:19: check got status valid.
+[eva:progress] multi_taint.c:20: check got status valid.
+[eva:progress] Recording results for taint_simplify_singletons
+[eva:progress] Done for function taint_simplify_singletons
+[eva:progress] multi_taint.c:75: check got status valid.
+[eva:progress] 
+  computing for function multi_taint_test <- main.
   Called from multi_taint.c:77.
 [eva:alarm] multi_taint.c:28: Warning: check got status unknown.
 [eva:alarm] multi_taint.c:29: Warning: check got status unknown.
-[eva] multi_taint.c:33: check got status valid.
-[eva] multi_taint.c:37: check got status valid.
-[eva] multi_taint.c:38: check got status valid.
-[eva] multi_taint.c:39: check got status valid.
-[eva] multi_taint.c:40: check got status valid.
+[eva:progress] multi_taint.c:33: check got status valid.
+[eva:progress] multi_taint.c:37: check got status valid.
+[eva:progress] multi_taint.c:38: check got status valid.
+[eva:progress] multi_taint.c:39: check got status valid.
+[eva:progress] multi_taint.c:40: check got status valid.
 [eva:alarm] multi_taint.c:41: Warning: check got status unknown.
-[eva] multi_taint.c:46: check got status valid.
-[eva] multi_taint.c:47: check got status valid.
+[eva:progress] multi_taint.c:46: check got status valid.
+[eva:progress] multi_taint.c:47: check got status valid.
 [eva:alarm] multi_taint.c:49: Warning: check 'false' got status unknown.
 [eva:alarm] multi_taint.c:50: Warning: assertion got status unknown.
-[eva] multi_taint.c:51: check 'true' got status valid.
-[eva] computing for function Frama_C_interval <- multi_taint_test <- main.
+[eva:progress] multi_taint.c:51: check 'true' got status valid.
+[eva:progress] 
+  computing for function Frama_C_interval <- multi_taint_test <- main.
   Called from multi_taint.c:53.
 [eva] using specification for function Frama_C_interval
-[eva] multi_taint.c:53: 
+[eva:progress] multi_taint.c:53: 
   function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
-[eva] computing for function Frama_C_interval <- multi_taint_test <- main.
+[eva:progress] Done for function Frama_C_interval
+[eva:progress] 
+  computing for function Frama_C_interval <- multi_taint_test <- main.
   Called from multi_taint.c:54.
-[eva] multi_taint.c:54: 
+[eva:progress] multi_taint.c:54: 
   function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
-[eva] multi_taint.c:63: check 'true' got status valid.
-[eva] multi_taint.c:64: check 'true' got status valid.
+[eva:progress] Done for function Frama_C_interval
+[eva:progress] multi_taint.c:63: check 'true' got status valid.
+[eva:progress] multi_taint.c:64: check 'true' got status valid.
 [eva:show] multi_taint.c:66: 
   Frama_C_dump_each:
   # cvalue:
@@ -84,11 +89,11 @@
     Locations (data): t; taint_var
     Locations (control): y
   ==END OF DUMP==
-[eva] Recording results for multi_taint_test
-[eva] Done for function multi_taint_test
+[eva:progress] Recording results for multi_taint_test
+[eva:progress] Done for function multi_taint_test
 [eva:alarm] multi_taint.c:78: Warning: check got status unknown.
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [scope:rm_asserts] removing 1 assertion(s)
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function multi_taint_test:

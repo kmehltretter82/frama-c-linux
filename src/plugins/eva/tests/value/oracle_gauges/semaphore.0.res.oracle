@@ -1,10 +1,13 @@
-25a26,34
-> [eva] computing for function V <- g.
+29a30,41
+> [eva:progress] 
+>   computing for function V <- g.
 >   Called from semaphore.i:31.
-> [eva] Done for function V
-> [eva] computing for function V <- g.
+> [eva:progress] Done for function V
+> [eva:progress] 
+>   computing for function V <- g.
 >   Called from semaphore.i:31.
-> [eva] Done for function V
-> [eva] computing for function V <- g.
+> [eva:progress] Done for function V
+> [eva:progress] 
+>   computing for function V <- g.
 >   Called from semaphore.i:31.
-> [eva] Done for function V
+> [eva:progress] Done for function V

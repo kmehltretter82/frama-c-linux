@@ -1,7 +1,7 @@
 [kernel] Parsing annot.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   A ∈ {0}
   B ∈ {0}
@@ -10,9 +10,9 @@
   v ∈ {0}
   w ∈ {0}
 [eva:alarm] annot.i:5: Warning: function main: precondition got status unknown.
-[eva] annot.i:15: assertion got status valid.
+[eva:progress] annot.i:15: assertion got status valid.
 [eva:show] annot.i:16: Frama_C_show_each_diff: {1}
-[eva] annot.i:21: assertion got status valid.
+[eva:progress] annot.i:21: assertion got status valid.
 [eva:alarm] annot.i:28: Warning: assertion got status unknown.
 [eva:alarm] annot.i:33: Warning: assertion got status unknown.
 [eva:show] annot.i:34: Frama_C_show_each_elseif_A_B: {0}, {2}
@@ -20,14 +20,15 @@
 [eva:show] annot.i:39: Frama_C_show_each_else_A_B: {0; 1}, {0; 2}
 [eva:alarm] annot.i:42: Warning: assertion got status unknown.
 [eva:show] annot.i:43: Frama_C_show_each_mn: [0..9], [0..9]
-[eva] annot.i:46: assertion got status valid.
-[eva] annot.i:47: assertion got status valid.
+[eva:progress] annot.i:46: assertion got status valid.
+[eva:progress] annot.i:47: assertion got status valid.
 [eva:alarm] annot.i:51: Warning: assertion got status unknown.
 [eva:alarm] annot.i:53: Warning: 
   assertion got status invalid (stopping propagation).
-[eva] annot.i:7: function main: no state left, postcondition got status valid.
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] annot.i:7: 
+  function main: no state left, postcondition got status valid.
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   NON TERMINATING FUNCTION

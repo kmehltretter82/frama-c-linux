@@ -1,4 +1,4 @@
-52,66d51
+56,70d55
 < [eva:alarm] idct.c:129: Warning: 
 <   accessing uninitialized left-value. assert \initialized(&tmp1[i][j]);
 < [eva:alarm] idct.c:131: Warning: 
@@ -14,9 +14,9 @@
 < [eva:alarm] idct.c:150: Warning: 
 <   accessing uninitialized left-value. assert \initialized(&tmp1[i][j]);
 < [eva:signed-overflow] idct.c:141: Warning: 2's complement assumed for overflow
-68d52
+72d56
 < [eva:signed-overflow] idct.c:163: Warning: 2's complement assumed for overflow
-73,87d56
+77,91d60
 < [eva:alarm] idct.c:163: Warning: 
 <   accessing uninitialized left-value. assert \initialized(&tmp1[i][j]);
 < [eva:alarm] idct.c:166: Warning: 
@@ -32,20 +32,24 @@
 <   accessing uninitialized left-value. assert \initialized(&tmp1[i][j]);
 < [eva:alarm] idct.c:185: Warning: 
 <   accessing uninitialized left-value. assert \initialized(&tmp1[i][j]);
-95,103d63
-< [eva] computing for function printf_va_1 <- main.
+100,112d68
+<   computing for function printf_va_1 <- main.
 <   Called from ieee_1180_1990.c:195.
 < [eva] using specification for function printf
-< [eva] ieee_1180_1990.c:195: function printf_va_1: precondition got status valid.
-< [eva] Done for function printf_va_1
-< [eva] computing for function printf_va_2 <- main.
+< [eva:progress] ieee_1180_1990.c:195: 
+<   function printf_va_1: precondition got status valid.
+< [eva:progress] Done for function printf_va_1
+< [eva:progress] 
+<   computing for function printf_va_2 <- main.
 <   Called from ieee_1180_1990.c:196.
-< [eva] ieee_1180_1990.c:196: function printf_va_2: precondition got status valid.
-< [eva] Done for function printf_va_2
-180,181d139
+< [eva:progress] ieee_1180_1990.c:196: 
+<   function printf_va_2: precondition got status valid.
+< [eva:progress] Done for function printf_va_2
+< [eva:progress] 
+225,226d180
 < [eva:alarm] ieee_1180_1990.c:109: Warning: 
 <   accessing uninitialized left-value. assert \initialized(&tmp1[i][j]);
-187,210d144
+232,255d185
 < [eva:alarm] ieee_1180_1990.c:116: Warning: 
 <   accessing uninitialized left-value. assert \initialized(&tmp2[i][j]);
 < [eva:alarm] ieee_1180_1990.c:117: Warning: 
@@ -70,10 +74,10 @@
 < [eva:alarm] ieee_1180_1990.c:124: Warning: 
 <   overflow in conversion from floating-point to integer.
 <   assert tmp2[i][j] - 0.5 < 2147483648;
-250,251d183
+318,319d247
 < [eva:alarm] ieee_1180_1990.c:150: Warning: 
 <   accessing uninitialized left-value. assert \initialized(&tmp1[i][j]);
-257,280d188
+325,348d252
 < [eva:alarm] ieee_1180_1990.c:157: Warning: 
 <   accessing uninitialized left-value. assert \initialized(&tmp2[i][j]);
 < [eva:alarm] ieee_1180_1990.c:158: Warning: 
@@ -98,104 +102,104 @@
 < [eva:alarm] ieee_1180_1990.c:165: Warning: 
 <   overflow in conversion from floating-point to integer.
 <   assert tmp2[i][j] - 0.5 < 2147483648;
-286d193
+355d258
 < [eva:signed-overflow] idct.c:129: Warning: 2's complement assumed for overflow
-288a196,197
+357a261,262
 > [eva:signed-overflow] idct.c:129: Warning: 2's complement assumed for overflow
 > [eva:signed-overflow] idct.c:163: Warning: 2's complement assumed for overflow
-291,292d199
+360,361d264
 < [eva:signed-overflow] ieee_1180_1990.c:218: Warning: 
 <   2's complement assumed for overflow
-299,302d205
+368,371d270
 < [eva:signed-overflow] ieee_1180_1990.c:220: Warning: 
 <   2's complement assumed for overflow
 < [eva:signed-overflow] ieee_1180_1990.c:230: Warning: 
 <   2's complement assumed for overflow
-313,314d215
+382,383d280
 < [eva:signed-overflow] ieee_1180_1990.c:235: Warning: 
 <   2's complement assumed for overflow
-327,328d227
+399,400d295
 < [eva:signed-overflow] ieee_1180_1990.c:242: Warning: 
 <   2's complement assumed for overflow
-335,338d233
+407,410d301
 < [eva:signed-overflow] ieee_1180_1990.c:244: Warning: 
 <   2's complement assumed for overflow
 < [eva:signed-overflow] ieee_1180_1990.c:254: Warning: 
 <   2's complement assumed for overflow
-364,365d258
+446,447d336
 < [eva:signed-overflow] ieee_1180_1990.c:264: Warning: 
 <   2's complement assumed for overflow
-372,375d264
+454,457d342
 < [eva:signed-overflow] ieee_1180_1990.c:266: Warning: 
 <   2's complement assumed for overflow
 < [eva:signed-overflow] ieee_1180_1990.c:276: Warning: 
 <   2's complement assumed for overflow
-384,385d272
+466,467d350
 < [eva:signed-overflow] ieee_1180_1990.c:281: Warning: 
 <   2's complement assumed for overflow
-391,392d277
+475,476d357
 < [eva:signed-overflow] ieee_1180_1990.c:288: Warning: 
 <   2's complement assumed for overflow
-399,402d283
+483,486d363
 < [eva:signed-overflow] ieee_1180_1990.c:290: Warning: 
 <   2's complement assumed for overflow
 < [eva:signed-overflow] ieee_1180_1990.c:300: Warning: 
 <   2's complement assumed for overflow
-428,429d308
+522,523d398
 < [eva:signed-overflow] ieee_1180_1990.c:310: Warning: 
 <   2's complement assumed for overflow
-436,439d314
+530,533d404
 < [eva:signed-overflow] ieee_1180_1990.c:312: Warning: 
 <   2's complement assumed for overflow
 < [eva:signed-overflow] ieee_1180_1990.c:322: Warning: 
 <   2's complement assumed for overflow
-448,449d322
+542,543d412
 < [eva:signed-overflow] ieee_1180_1990.c:327: Warning: 
 <   2's complement assumed for overflow
-455,456d327
+551,552d419
 < [eva:signed-overflow] ieee_1180_1990.c:334: Warning: 
 <   2's complement assumed for overflow
-463,466d333
+559,562d425
 < [eva:signed-overflow] ieee_1180_1990.c:336: Warning: 
 <   2's complement assumed for overflow
 < [eva:signed-overflow] ieee_1180_1990.c:346: Warning: 
 <   2's complement assumed for overflow
-670,671d536
+900,901d762
 < [eva:alarm] ieee_1180_1990.c:358: Warning: 
 <   accessing uninitialized left-value. assert \initialized(&res[i].pmse[j][k]);
-674,679d538
+904,909d764
 < [eva:alarm] ieee_1180_1990.c:369: Warning: 
 <   accessing uninitialized left-value. assert \initialized(&res[i].pme[j][k]);
 < [eva:alarm] ieee_1180_1990.c:369: Warning: 
 <   accessing uninitialized left-value. assert \initialized(&res[i].pme[j][k]);
 < [eva:alarm] ieee_1180_1990.c:369: Warning: 
 <   accessing uninitialized left-value. assert \initialized(&res[i].pme[j][k]);
-686d544
+916d770
 < [scope:rm_asserts] removing 16 assertion(s)
-697c555,556
+927c781,782
 <   M1[0..7][0..7] ∈ [--..--]
 ---
 >   M1[0][0..7] ∈ [-2147483647..2147483647]
 >     [1..7][0..7] ∈ [--..--]
-707c566
+937c792
 <   m2[0..7][0..7] ∈ [--..--] or UNINITIALIZED
 ---
 >   m2[0..7][0..7] ∈ [-2048..2047] or UNINITIALIZED
-719c578
+949c804
 <   m3[0..7][0..7] ∈ [--..--] or UNINITIALIZED
 ---
 >   m3[0..7][0..7] ∈ [-256..255] or UNINITIALIZED
-724,725c583,584
+954,955c809,810
 <   m2[0..7][0..7] ∈ [--..--] or UNINITIALIZED
 <   m4[0..7][0..7] ∈ [--..--] or UNINITIALIZED
 ---
 >   m2[0..7][0..7] ∈ [-2048..2047] or UNINITIALIZED
 >   m4[0..7][0..7] ∈ [-256..255] or UNINITIALIZED
-730c589
+960c815
 <   tmp2[0..7][0..7] ∈ [--..--] or UNINITIALIZED
 ---
 >   tmp2[0..7][0..7] ∈ [-8192..8191] or UNINITIALIZED
-743,745c602,604
+973,975c828,830
 <   m2[0..7][0..7] ∈ [--..--] or UNINITIALIZED
 <   m3[0..7][0..7] ∈ [--..--] or UNINITIALIZED
 <   m4[0..7][0..7] ∈ [--..--] or UNINITIALIZED
@@ -203,60 +207,60 @@
 >   m2[0..7][0..7] ∈ [-2048..2047] or UNINITIALIZED
 >   m3[0..7][0..7] ∈ [-256..255] or UNINITIALIZED
 >   m4[0..7][0..7] ∈ [-256..255] or UNINITIALIZED
-749,750c608,610
+979,980c834,836
 <   err ∈ [--..--] or UNINITIALIZED
 <   M1[0..7][0..7] ∈ [--..--]
 ---
 >   err ∈ [-261121..261121] or UNINITIALIZED
 >   M1[0][0..7] ∈ [-2147483647..2147483647]
 >     [1..7][0..7] ∈ [--..--]
-762d621
+992d847
 <   S___fc_stdout[0..1] ∈ [--..--]
-766c625
+996c851
 <   In these functions, 588 statements reached (out of 626): 94% coverage.
 ---
 >   In these functions, 585 statements reached (out of 626): 93% coverage.
-769c628
+999c854
 <     by the Eva analyzer:      0 errors   42 warnings
 ---
 >     by the Eva analyzer:      0 errors   19 warnings
-772,774c631,632
+1002,1004c857,858
 <   72 alarms generated by the analysis:
 <       64 accesses to uninitialized left-values
 <        8 illegal conversions from floating-point to integer
 ---
 >   32 alarms generated by the analysis:
 >       32 accesses to uninitialized left-values
-778c636
+1008c862
 <     Preconditions    11 valid     0 unknown     0 invalid     11 total
 ---
 >     Preconditions     9 valid     0 unknown     0 invalid      9 total
-796,799d653
+1026,1029d879
 < [from] Computing for function printf_va_1 <-main
 < [from] Done for function printf_va_1
 < [from] Computing for function printf_va_2 <-main
 < [from] Done for function printf_va_2
-812,817d665
+1042,1047d891
 < [from] Function printf_va_1:
 <   S___fc_stdout[0].__fc_FILE_data FROM S___fc_stdout[0] (and SELF)
 <   \result FROM S___fc_stdout[0]
 < [from] Function printf_va_2:
 <   S___fc_stdout[0].__fc_FILE_data FROM S___fc_stdout[0] (and SELF)
 <   \result FROM S___fc_stdout[0]
-851,853d698
+1081,1083d924
 <   S___fc_stdout[0].__fc_FILE_data
 <                FROM M1[0..7][0..7]; idct_init; idct_mc1[0..7][0..7];
 <                     idct_mc2[0..7][0..7]; S___fc_stdout[0] (and SELF)
-896,897c741
+1126,1127c967
 <     idct_init; idct_mc1[0..7][0..7]; idct_mc2[0..7][0..7]; __retres;
 <     S___fc_stdout[0].__fc_FILE_data
 ---
 >     idct_init; idct_mc1[0..7][0..7]; idct_mc2[0..7][0..7]; __retres
-902c746
+1132c972
 <     idct_init; idct_mc1[0..7][0..7]; idct_mc2[0..7][0..7]; S___fc_stdout[0]
 ---
 >     idct_init; idct_mc1[0..7][0..7]; idct_mc2[0..7][0..7]
-1124,1146d967
+1354,1376d1193
 < [    -    ] Assertion 'Eva,initialization' (file idct.c, line 129)
 <             assert Eva: initialization: \initialized(&tmp1[i][j]);
 <             tried with Eva.
@@ -280,7 +284,7 @@
 <             assert Eva: initialization: \initialized(&tmp1[i][j]);
 <             By RedundantAlarms, with pending:
 <              - Assertion 'Eva,initialization' (file idct.c, line 145)
-1150,1172d970
+1380,1402d1196
 < [    -    ] Assertion 'Eva,initialization' (file idct.c, line 163)
 <             assert Eva: initialization: \initialized(&tmp1[i][j]);
 <             tried with Eva.
@@ -304,11 +308,11 @@
 <             assert Eva: initialization: \initialized(&tmp1[i][j]);
 <             By RedundantAlarms, with pending:
 <              - Assertion 'Eva,initialization' (file idct.c, line 180)
-1194,1196d991
+1424,1426d1217
 < [    -    ] Assertion 'Eva,initialization' (file ieee_1180_1990.c, line 109)
 <             assert Eva: initialization: \initialized(&tmp1[i][j]);
 <             tried with Eva.
-1200,1233d994
+1430,1463d1220
 < [    -    ] Assertion 'Eva,initialization' (file ieee_1180_1990.c, line 116)
 <             assert Eva: initialization: \initialized(&tmp2[i][j]);
 <             tried with Eva.
@@ -343,11 +347,11 @@
 < [    -    ] Assertion 'Eva,float_to_int' (file ieee_1180_1990.c, line 124)
 <             assert Eva: float_to_int: tmp2[i][j] - 0.5 < 2147483648;
 <             tried with Eva.
-1254,1256d1014
+1484,1486d1240
 < [    -    ] Assertion 'Eva,initialization' (file ieee_1180_1990.c, line 150)
 <             assert Eva: initialization: \initialized(&tmp1[i][j]);
 <             tried with Eva.
-1260,1293d1017
+1490,1523d1243
 < [    -    ] Assertion 'Eva,initialization' (file ieee_1180_1990.c, line 157)
 <             assert Eva: initialization: \initialized(&tmp2[i][j]);
 <             tried with Eva.
@@ -382,7 +386,7 @@
 < [    -    ] Assertion 'Eva,float_to_int' (file ieee_1180_1990.c, line 165)
 <             assert Eva: float_to_int: tmp2[i][j] - 0.5 < 2147483648;
 <             tried with Eva.
-1393,1409c1117,1123
+1623,1639c1343,1349
 < [ Partial ] Assertion 'Eva,initialization' (file ieee_1180_1990.c, line 358)
 <             assert Eva: initialization: \initialized(&res[i].pmse[j][k]);
 <             By RedundantAlarms, with pending:
@@ -408,7 +412,7 @@
 >             reachability of stmt line 196 in main
 >             by Eva.
 > [  Dead   ] Instance of 'Pre-condition (file FRAMAC_SHARE/libc/stdio.h, line 239)' at call 'printf_va_1' (file ieee_1180_1990.c, line 195)
-1413,1414c1127,1130
+1643,1644c1353,1356
 <             by Eva.
 < [  Valid  ] Instance of 'Pre-condition (file FRAMAC_SHARE/libc/stdio.h, line 239)' at call 'printf_va_2' (file ieee_1180_1990.c, line 196)
 ---
@@ -416,18 +420,18 @@
 >             By Eva because:
 >              - Unreachable call 'printf_va_1' (file ieee_1180_1990.c, line 195)
 > [  Dead   ] Instance of 'Pre-condition (file FRAMAC_SHARE/libc/stdio.h, line 239)' at call 'printf_va_2' (file ieee_1180_1990.c, line 196)
-1418c1134,1136
+1648c1360,1362
 <             by Eva.
 ---
 >             Locally valid, but unreachable.
 >             By Eva because:
 >              - Unreachable call 'printf_va_2' (file ieee_1180_1990.c, line 196)
-1475,1476c1193
+1705,1706c1419
 <     36 Completely validated
 <     16 Locally validated
 ---
 >     34 Completely validated
-1478,1479c1195,1198
+1708,1709c1421,1424
 <     56 To be validated
 <    160 Total
 ---

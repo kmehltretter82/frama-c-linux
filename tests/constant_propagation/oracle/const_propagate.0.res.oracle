@@ -1,7 +1,7 @@
 [kernel] Parsing const_propagate.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   x ∈ {0}
   y ∈ {0}
@@ -18,47 +18,56 @@
   d1 ∈ {0}
   d2 ∈ {0}
   d3 ∈ {0}
-[eva] computing for function test_ull <- main.
+[eva:progress] 
+  computing for function test_ull <- main.
   Called from const_propagate.c:78.
-[eva] Recording results for test_ull
-[eva] Done for function test_ull
-[eva] computing for function test_struct <- main.
+[eva:progress] Recording results for test_ull
+[eva:progress] Done for function test_ull
+[eva:progress] 
+  computing for function test_struct <- main.
   Called from const_propagate.c:79.
-[eva] Recording results for test_struct
-[eva] Done for function test_struct
-[eva] computing for function test_struct_ptr <- main.
+[eva:progress] Recording results for test_struct
+[eva:progress] Done for function test_struct
+[eva:progress] 
+  computing for function test_struct_ptr <- main.
   Called from const_propagate.c:80.
-[eva] Recording results for test_struct_ptr
-[eva] Done for function test_struct_ptr
-[eva] computing for function test_tab <- main.
+[eva:progress] Recording results for test_struct_ptr
+[eva:progress] Done for function test_struct_ptr
+[eva:progress] 
+  computing for function test_tab <- main.
   Called from const_propagate.c:81.
-[eva] Recording results for test_tab
-[eva] Done for function test_tab
-[eva] computing for function test_float_double <- main.
+[eva:progress] Recording results for test_tab
+[eva:progress] Done for function test_tab
+[eva:progress] 
+  computing for function test_float_double <- main.
   Called from const_propagate.c:82.
-[eva] Recording results for test_float_double
-[eva] Done for function test_float_double
-[eva] computing for function init <- main.
+[eva:progress] Recording results for test_float_double
+[eva:progress] Done for function test_float_double
+[eva:progress] 
+  computing for function init <- main.
   Called from const_propagate.c:84.
-[eva] computing for function add3 <- init <- main.
+[eva:progress] 
+  computing for function add3 <- init <- main.
   Called from const_propagate.c:56.
-[eva] Recording results for add3
-[eva] Done for function add3
-[eva] Recording results for init
-[eva] Done for function init
-[eva] computing for function add3 <- main.
+[eva:progress] Recording results for add3
+[eva:progress] Done for function add3
+[eva:progress] Recording results for init
+[eva:progress] Done for function init
+[eva:progress] 
+  computing for function add3 <- main.
   Called from const_propagate.c:85.
-[eva] Recording results for add3
-[eva] Done for function add3
-[eva] computing for function test_ptr <- main.
+[eva:progress] Recording results for add3
+[eva:progress] Done for function add3
+[eva:progress] 
+  computing for function test_ptr <- main.
   Called from const_propagate.c:87.
-[eva] Recording results for test_ptr
-[eva] Done for function test_ptr
-[eva] const_propagate.c:88: assertion got status valid.
+[eva:progress] Recording results for test_ptr
+[eva:progress] Done for function test_ptr
+[eva:progress] const_propagate.c:88: assertion got status valid.
 [eva:alarm] const_propagate.c:91: Warning: assertion got status unknown.
-[eva] const_propagate.c:92: assertion got status valid.
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] const_propagate.c:92: assertion got status valid.
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function add3:
   __retres ∈ [--..--]

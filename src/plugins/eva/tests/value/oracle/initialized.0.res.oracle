@@ -1,7 +1,7 @@
 [kernel] Parsing initialized.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   b1 ∈ [--..--]
   b2 ∈ [--..--]
@@ -12,59 +12,69 @@
   rand ∈ [--..--]
   v1 ∈ {0}
   i6 ∈ [--..--]
-[eva] computing for function g1 <- main.
+[eva:progress] 
+  computing for function g1 <- main.
   Called from initialized.c:193.
 [eva:partition] initialized.c:19: starting to merge loop iterations
 [eva:alarm] initialized.c:21: Warning: assertion got status unknown.
 [eva:alarm] initialized.c:22: Warning: assertion got status unknown.
-[eva] computing for function Frama_C_interval <- g1 <- main.
+[eva:progress] 
+  computing for function Frama_C_interval <- g1 <- main.
   Called from initialized.c:24.
 [eva] using specification for function Frama_C_interval
-[eva] initialized.c:24: 
+[eva:progress] initialized.c:24: 
   function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
-[eva] computing for function Frama_C_interval <- g1 <- main.
+[eva:progress] Done for function Frama_C_interval
+[eva:progress] 
+  computing for function Frama_C_interval <- g1 <- main.
   Called from initialized.c:25.
-[eva] initialized.c:25: 
+[eva:progress] initialized.c:25: 
   function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
+[eva:progress] Done for function Frama_C_interval
 [eva:alarm] initialized.c:26: Warning: assertion got status unknown.
-[eva] computing for function Frama_C_interval <- g1 <- main.
+[eva:progress] 
+  computing for function Frama_C_interval <- g1 <- main.
   Called from initialized.c:28.
-[eva] initialized.c:28: 
+[eva:progress] initialized.c:28: 
   function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
-[eva] computing for function Frama_C_interval <- g1 <- main.
+[eva:progress] Done for function Frama_C_interval
+[eva:progress] 
+  computing for function Frama_C_interval <- g1 <- main.
   Called from initialized.c:29.
-[eva] initialized.c:29: 
+[eva:progress] initialized.c:29: 
   function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
+[eva:progress] Done for function Frama_C_interval
 [eva:alarm] initialized.c:30: Warning: assertion got status unknown.
-[eva] computing for function Frama_C_interval <- g1 <- main.
+[eva:progress] 
+  computing for function Frama_C_interval <- g1 <- main.
   Called from initialized.c:32.
-[eva] initialized.c:32: 
+[eva:progress] initialized.c:32: 
   function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
-[eva] computing for function Frama_C_interval <- g1 <- main.
+[eva:progress] Done for function Frama_C_interval
+[eva:progress] 
+  computing for function Frama_C_interval <- g1 <- main.
   Called from initialized.c:33.
-[eva] initialized.c:33: 
+[eva:progress] initialized.c:33: 
   function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
-[eva] initialized.c:34: assertion got status valid.
-[eva] computing for function Frama_C_interval <- g1 <- main.
+[eva:progress] Done for function Frama_C_interval
+[eva:progress] initialized.c:34: assertion got status valid.
+[eva:progress] 
+  computing for function Frama_C_interval <- g1 <- main.
   Called from initialized.c:36.
-[eva] initialized.c:36: 
+[eva:progress] initialized.c:36: 
   function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
-[eva] computing for function Frama_C_interval <- g1 <- main.
+[eva:progress] Done for function Frama_C_interval
+[eva:progress] 
+  computing for function Frama_C_interval <- g1 <- main.
   Called from initialized.c:37.
-[eva] initialized.c:37: 
+[eva:progress] initialized.c:37: 
   function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
+[eva:progress] Done for function Frama_C_interval
 [eva:alarm] initialized.c:38: Warning: assertion got status unknown.
-[eva] Recording results for g1
-[eva] Done for function g1
-[eva] computing for function g2 <- main.
+[eva:progress] Recording results for g1
+[eva:progress] Done for function g1
+[eva:progress] 
+  computing for function g2 <- main.
   Called from initialized.c:194.
 [eva:alarm] initialized.c:50: Warning: 
   pointer downcast. assert (unsigned int)(&b4) ≤ 0x7FFFFFFF;
@@ -146,71 +156,81 @@
 [eva:alarm] initialized.c:76: Warning: assertion got status unknown.
 [eva:alarm] initialized.c:78: Warning: assertion got status unknown.
 [eva:alarm] initialized.c:80: Warning: assertion got status unknown.
-[eva] Recording results for g2
-[eva] Done for function g2
-[eva] computing for function g3 <- main.
+[eva:progress] Recording results for g2
+[eva:progress] Done for function g2
+[eva:progress] 
+  computing for function g3 <- main.
   Called from initialized.c:195.
 [eva:alarm] initialized.c:89: Warning: assertion got status unknown.
 [eva:alarm] initialized.c:93: Warning: 
   accessing uninitialized left-value. assert \initialized(&r2);
 [eva:alarm] initialized.c:96: Warning: 
   accessing uninitialized left-value. assert \initialized(&x3);
-[eva] computing for function f <- g3 <- main.
+[eva:progress] 
+  computing for function f <- g3 <- main.
   Called from initialized.c:98.
 [eva:partition] initialized.c:11: starting to merge loop iterations
 [eva:alarm] initialized.c:8: Warning: 
   function f: postcondition got status unknown.
-[eva] Recording results for f
-[eva] Done for function f
-[eva] computing for function f <- g3 <- main.
+[eva:progress] Recording results for f
+[eva:progress] Done for function f
+[eva:progress] 
+  computing for function f <- g3 <- main.
   Called from initialized.c:99.
-[eva] Recording results for f
-[eva] Done for function f
-[eva] Recording results for g3
-[eva] Done for function g3
-[eva] computing for function g4 <- main.
+[eva:progress] Recording results for f
+[eva:progress] Done for function f
+[eva:progress] Recording results for g3
+[eva:progress] Done for function g3
+[eva:progress] 
+  computing for function g4 <- main.
   Called from initialized.c:196.
 [eva:alarm] initialized.c:104: Warning: 
   accessing uninitialized left-value. assert \initialized(&y);
-[eva] Recording results for g4
-[eva] Done for function g4
-[eva] computing for function g5 <- main.
+[eva:progress] Recording results for g4
+[eva:progress] Done for function g4
+[eva:progress] 
+  computing for function g5 <- main.
   Called from initialized.c:197.
-[eva] computing for function wrong_assigns <- g5 <- main.
+[eva:progress] 
+  computing for function wrong_assigns <- g5 <- main.
   Called from initialized.c:127.
 [eva] using specification for function wrong_assigns
 [eva:ensures-false] initialized.c:114: Warning: 
   function wrong_assigns: this postcondition evaluates to false in this
   context. If it is valid, either a precondition was not verified for this
   call, or some assigns/from clauses are incomplete (or incorrect).
-[eva] Done for function wrong_assigns
-[eva] initialized.c:130: assertion got status valid.
-[eva] initialized.c:131: assertion got status valid.
+[eva:progress] Done for function wrong_assigns
+[eva:progress] initialized.c:130: assertion got status valid.
+[eva:progress] initialized.c:131: assertion got status valid.
 [eva:alarm] initialized.c:133: Warning: assertion got status unknown.
-[eva] Recording results for g5
-[eva] Done for function g5
-[eva] computing for function g6 <- main.
+[eva:progress] Recording results for g5
+[eva:progress] Done for function g5
+[eva:progress] 
+  computing for function g6 <- main.
   Called from initialized.c:198.
 [eva:alarm] initialized.c:143: Warning: assertion got status unknown.
 [eva:alarm] initialized.c:144: Warning: assertion got status unknown.
 [eva:alarm] initialized.c:145: Warning: assertion got status unknown.
-[eva] initialized.c:146: assertion got status valid.
+[eva:progress] initialized.c:146: assertion got status valid.
 [eva:alarm] initialized.c:147: Warning: assertion got status unknown.
-[eva] initialized.c:148: assertion got status valid.
-[eva] Recording results for g6
-[eva] Done for function g6
-[eva] computing for function g7 <- main.
+[eva:progress] initialized.c:148: assertion got status valid.
+[eva:progress] Recording results for g6
+[eva:progress] Done for function g6
+[eva:progress] 
+  computing for function g7 <- main.
   Called from initialized.c:199.
-[eva] computing for function Frama_C_make_unknown <- g7 <- main.
+[eva:progress] 
+  computing for function Frama_C_make_unknown <- g7 <- main.
   Called from initialized.c:153.
 [eva] using specification for function Frama_C_make_unknown
-[eva] initialized.c:153: 
+[eva:progress] initialized.c:153: 
   function Frama_C_make_unknown: precondition 'valid_p' got status valid.
-[eva] Done for function Frama_C_make_unknown
-[eva] initialized.c:154: assertion got status valid.
-[eva] Recording results for g7
-[eva] Done for function g7
-[eva] computing for function reduce_by_negation <- main.
+[eva:progress] Done for function Frama_C_make_unknown
+[eva:progress] initialized.c:154: assertion got status valid.
+[eva:progress] Recording results for g7
+[eva:progress] Done for function g7
+[eva:progress] 
+  computing for function reduce_by_negation <- main.
   Called from initialized.c:200.
 [eva:alarm] initialized.c:164: Warning: assertion got status unknown.
 [eva:alarm] initialized.c:165: Warning: check 'invalid' got status invalid.
@@ -225,10 +245,10 @@
 [eva:partition] initialized.c:186: starting to merge loop iterations
 [eva:alarm] initialized.c:188: Warning: assertion got status unknown.
 [eva:alarm] initialized.c:189: Warning: check 'unknown' got status unknown.
-[eva] Recording results for reduce_by_negation
-[eva] Done for function reduce_by_negation
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for reduce_by_negation
+[eva:progress] Done for function reduce_by_negation
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva:garbled-mix:summary] 
   Origins of garbled mix generated during analysis:
     initialized.c:50: arithmetic operation on addresses

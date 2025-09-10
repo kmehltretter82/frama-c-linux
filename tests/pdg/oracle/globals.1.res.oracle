@@ -1,15 +1,15 @@
 [kernel] Parsing globals.c (with preprocessing)
 [eva] Analyzing a complete application starting at h
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   X ∈ {3}
   S ∈ [--..--]
   P ∈ {{ &X }}
 [eva:alarm] globals.c:28: Warning: 
   signed overflow. assert s2.a2 + s2.b2 ≤ 2147483647;
-[eva] Recording results for h
-[eva] Done for function h
+[eva:progress] Recording results for h
+[eva:progress] Done for function h
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function h:
   s2.a2 ∈ [-2147483648..2147483644]

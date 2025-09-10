@@ -1,19 +1,21 @@
 [kernel] Parsing slevelex.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   c ∈ [--..--]
 [eva:alarm] slevelex.i:80: Warning: assertion got status unknown.
 [eva:show] slevelex.i:82: Frama_C_show_each_xy: {1; 2}, {1; 2}
-[eva] computing for function f <- main.
+[eva:progress] 
+  computing for function f <- main.
   Called from slevelex.i:83.
-[eva] Recording results for f
-[eva] Done for function f
-[eva] slevelex.i:84: assertion got status valid.
-[eva] computing for function gu <- main.
+[eva:progress] Recording results for f
+[eva:progress] Done for function f
+[eva:progress] slevelex.i:84: assertion got status valid.
+[eva:progress] 
+  computing for function gu <- main.
   Called from slevelex.i:88.
-[eva] slevelex.i:26: assertion got status valid.
+[eva:progress] slevelex.i:26: assertion got status valid.
 [eva:show] slevelex.i:40: Frama_C_show_each_u: {1}
 [eva:show] slevelex.i:40: Frama_C_show_each_u: {2}
 [eva:show] slevelex.i:40: Frama_C_show_each_u: {3}
@@ -34,11 +36,12 @@
 [eva:show] slevelex.i:40: Frama_C_show_each_u: {18}
 [eva:show] slevelex.i:40: Frama_C_show_each_u: {19}
 [eva:show] slevelex.i:40: Frama_C_show_each_u: {20}
-[eva] Recording results for gu
-[eva] Done for function gu
-[eva] computing for function ginc <- main.
+[eva:progress] Recording results for gu
+[eva:progress] Done for function gu
+[eva:progress] 
+  computing for function ginc <- main.
   Called from slevelex.i:89.
-[eva] slevelex.i:49: assertion got status valid.
+[eva:progress] slevelex.i:49: assertion got status valid.
 [eva:show] slevelex.i:63: Frama_C_show_each_inc: {4}
 [eva:show] slevelex.i:63: Frama_C_show_each_inc: {8}
 [eva:show] slevelex.i:63: Frama_C_show_each_inc: {12}
@@ -59,10 +62,10 @@
 [eva:show] slevelex.i:63: Frama_C_show_each_inc: {72}
 [eva:show] slevelex.i:63: Frama_C_show_each_inc: {76}
 [eva:show] slevelex.i:63: Frama_C_show_each_inc: {80}
-[eva] Recording results for ginc
-[eva] Done for function ginc
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for ginc
+[eva:progress] Done for function ginc
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function f:
   x ∈ {1; 2}
@@ -115,27 +118,30 @@
 [eva] Warning: option -eva-slevel-function: 'ginc' previously bound to '21';
   now bound to '0'.
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   c ∈ [--..--]
 [eva:show] slevelex.i:82: Frama_C_show_each_xy: {1; 2}, {1; 2}
-[eva] computing for function f <- main.
+[eva:progress] 
+  computing for function f <- main.
   Called from slevelex.i:83.
-[eva] Recording results for f
-[eva] Done for function f
-[eva] computing for function gu <- main.
+[eva:progress] Recording results for f
+[eva:progress] Done for function f
+[eva:progress] 
+  computing for function gu <- main.
   Called from slevelex.i:88.
 [eva:show] slevelex.i:40: Frama_C_show_each_u: [1..20]
-[eva] Recording results for gu
-[eva] Done for function gu
-[eva] computing for function ginc <- main.
+[eva:progress] Recording results for gu
+[eva:progress] Done for function gu
+[eva:progress] 
+  computing for function ginc <- main.
   Called from slevelex.i:89.
 [eva:show] slevelex.i:63: Frama_C_show_each_inc: [4..80],0%4
-[eva] Recording results for ginc
-[eva] Done for function ginc
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for ginc
+[eva:progress] Done for function ginc
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function f:
   x ∈ {1; 2}

@@ -1,46 +1,53 @@
 [kernel] Parsing for_loops.c (with preprocessing)
 [eva] Analyzing a complete application starting at main_2
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   x ∈ {0}
-[eva] computing for function Frama_C_interval <- main_2.
+[eva:progress] 
+  computing for function Frama_C_interval <- main_2.
   Called from for_loops.c:13.
 [eva] using specification for function Frama_C_interval
-[eva] for_loops.c:13: 
+[eva:progress] for_loops.c:13: 
   function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
-[eva] computing for function Frama_C_interval <- main_2.
+[eva:progress] Done for function Frama_C_interval
+[eva:progress] 
+  computing for function Frama_C_interval <- main_2.
   Called from for_loops.c:16.
-[eva] for_loops.c:16: 
+[eva:progress] for_loops.c:16: 
   function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
+[eva:progress] Done for function Frama_C_interval
 [eva:show] for_loops.c:17: Frama_C_show_each_F: {0; 1}
 [eva:partition] for_loops.c:16: starting to merge loop iterations
-[eva] computing for function Frama_C_interval <- main_2.
+[eva:progress] 
+  computing for function Frama_C_interval <- main_2.
   Called from for_loops.c:16.
-[eva] Done for function Frama_C_interval
+[eva:progress] Done for function Frama_C_interval
 [eva:show] for_loops.c:17: Frama_C_show_each_F: {0; 1; 2}
-[eva] computing for function Frama_C_interval <- main_2.
+[eva:progress] 
+  computing for function Frama_C_interval <- main_2.
   Called from for_loops.c:16.
-[eva] Done for function Frama_C_interval
+[eva:progress] Done for function Frama_C_interval
 [eva:show] for_loops.c:17: Frama_C_show_each_F: {0; 1; 2; 3}
-[eva] computing for function Frama_C_interval <- main_2.
+[eva:progress] 
+  computing for function Frama_C_interval <- main_2.
   Called from for_loops.c:16.
-[eva] Done for function Frama_C_interval
+[eva:progress] Done for function Frama_C_interval
 [eva:show] for_loops.c:17: Frama_C_show_each_F: {0; 1; 2; 3; 4}
-[eva] computing for function Frama_C_interval <- main_2.
+[eva:progress] 
+  computing for function Frama_C_interval <- main_2.
   Called from for_loops.c:16.
-[eva] Done for function Frama_C_interval
+[eva:progress] Done for function Frama_C_interval
 [eva:show] for_loops.c:17: Frama_C_show_each_F: {0; 1; 2; 3; 4; 5}
-[eva] computing for function Frama_C_interval <- main_2.
+[eva:progress] 
+  computing for function Frama_C_interval <- main_2.
   Called from for_loops.c:16.
-[eva] Done for function Frama_C_interval
+[eva:progress] Done for function Frama_C_interval
 [eva:alarm] for_loops.c:16: Warning: 
   signed overflow. assert w + 1 ≤ 2147483647;
 [eva:show] for_loops.c:17: Frama_C_show_each_F: [0..2147483647]
-[eva] Recording results for main_2
-[eva] Done for function main_2
+[eva:progress] Recording results for main_2
+[eva:progress] Done for function main_2
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main_2:
   Frama_C_entropy_source ∈ [--..--]

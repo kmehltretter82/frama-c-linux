@@ -1,128 +1,149 @@
 [kernel] Parsing octagons.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   undet ∈ [--..--]
-[eva] computing for function demo <- main.
+[eva:progress] 
+  computing for function demo <- main.
   Called from octagons.c:275.
-[eva] computing for function Frama_C_interval <- demo <- main.
+[eva:progress] 
+  computing for function Frama_C_interval <- demo <- main.
   Called from octagons.c:12.
 [eva] using specification for function Frama_C_interval
-[eva] octagons.c:12: 
+[eva:progress] octagons.c:12: 
   function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
+[eva:progress] Done for function Frama_C_interval
 [eva:alarm] octagons.c:13: Warning: 
   signed overflow. assert -2147483648 ≤ y - k;
 [eva:alarm] octagons.c:14: Warning: 
   signed overflow. assert x + 3 ≤ 2147483647;
-[eva] Recording results for demo
-[eva] Done for function demo
-[eva] computing for function integer_types <- main.
+[eva:progress] Recording results for demo
+[eva:progress] Done for function demo
+[eva:progress] 
+  computing for function integer_types <- main.
   Called from octagons.c:276.
-[eva] computing for function Frama_C_interval <- integer_types <- main.
+[eva:progress] 
+  computing for function Frama_C_interval <- integer_types <- main.
   Called from octagons.c:23.
-[eva] octagons.c:23: 
+[eva:progress] octagons.c:23: 
   function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
-[eva] computing for function Frama_C_interval <- integer_types <- main.
+[eva:progress] Done for function Frama_C_interval
+[eva:progress] 
+  computing for function Frama_C_interval <- integer_types <- main.
   Called from octagons.c:24.
-[eva] octagons.c:24: 
+[eva:progress] octagons.c:24: 
   function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
+[eva:progress] Done for function Frama_C_interval
 [eva:show] octagons.c:29: Frama_C_show_each_reduced_unsigned: [3..13], [0..309]
-[eva] computing for function Frama_C_interval <- integer_types <- main.
+[eva:progress] 
+  computing for function Frama_C_interval <- integer_types <- main.
   Called from octagons.c:31.
-[eva] octagons.c:31: 
+[eva:progress] octagons.c:31: 
   function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
-[eva] computing for function Frama_C_interval <- integer_types <- main.
+[eva:progress] Done for function Frama_C_interval
+[eva:progress] 
+  computing for function Frama_C_interval <- integer_types <- main.
   Called from octagons.c:32.
-[eva] octagons.c:32: 
+[eva:progress] octagons.c:32: 
   function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
+[eva:progress] Done for function Frama_C_interval
 [eva:show] octagons.c:37: 
   Frama_C_show_each_unreduced_unsigned: [0..4294967295], [0..4294967295]
-[eva] computing for function Frama_C_interval <- integer_types <- main.
+[eva:progress] 
+  computing for function Frama_C_interval <- integer_types <- main.
   Called from octagons.c:40.
-[eva] octagons.c:40: 
+[eva:progress] octagons.c:40: 
   function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
-[eva] computing for function Frama_C_interval <- integer_types <- main.
+[eva:progress] Done for function Frama_C_interval
+[eva:progress] 
+  computing for function Frama_C_interval <- integer_types <- main.
   Called from octagons.c:41.
-[eva] octagons.c:41: 
+[eva:progress] octagons.c:41: 
   function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
+[eva:progress] Done for function Frama_C_interval
 [eva:show] octagons.c:46: Frama_C_show_each_reduced_char: [-7..3], [6..100]
-[eva] computing for function Frama_C_interval <- integer_types <- main.
+[eva:progress] 
+  computing for function Frama_C_interval <- integer_types <- main.
   Called from octagons.c:49.
-[eva] octagons.c:49: 
+[eva:progress] octagons.c:49: 
   function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
+[eva:progress] Done for function Frama_C_interval
 [eva:show] octagons.c:54: 
   Frama_C_show_each_unreduced_char: [-128..127], [-128..127]
-[eva] computing for function Frama_C_interval <- integer_types <- main.
+[eva:progress] 
+  computing for function Frama_C_interval <- integer_types <- main.
   Called from octagons.c:58.
-[eva] octagons.c:58: 
+[eva:progress] octagons.c:58: 
   function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
+[eva:progress] Done for function Frama_C_interval
 [eva:show] octagons.c:63: Frama_C_show_each_reduced_int: [-7..3], [6..127]
-[eva] Recording results for integer_types
-[eva] Done for function integer_types
-[eva] computing for function arith <- main.
+[eva:progress] Recording results for integer_types
+[eva:progress] Done for function integer_types
+[eva:progress] 
+  computing for function arith <- main.
   Called from octagons.c:277.
-[eva] computing for function Frama_C_interval <- arith <- main.
+[eva:progress] 
+  computing for function Frama_C_interval <- arith <- main.
   Called from octagons.c:70.
-[eva] octagons.c:70: 
+[eva:progress] octagons.c:70: 
   function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
-[eva] computing for function Frama_C_interval <- arith <- main.
+[eva:progress] Done for function Frama_C_interval
+[eva:progress] 
+  computing for function Frama_C_interval <- arith <- main.
   Called from octagons.c:73.
-[eva] octagons.c:73: 
+[eva:progress] octagons.c:73: 
   function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
-[eva] computing for function Frama_C_interval <- arith <- main.
+[eva:progress] Done for function Frama_C_interval
+[eva:progress] 
+  computing for function Frama_C_interval <- arith <- main.
   Called from octagons.c:74.
-[eva] octagons.c:74: 
+[eva:progress] octagons.c:74: 
   function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
+[eva:progress] Done for function Frama_C_interval
 [eva:show] octagons.c:79: Frama_C_show_each_precise: [42..66],0%2
 [eva:show] octagons.c:81: Frama_C_show_each_imprecise: [2..106],0%2
-[eva] computing for function Frama_C_interval <- arith <- main.
+[eva:progress] 
+  computing for function Frama_C_interval <- arith <- main.
   Called from octagons.c:82.
-[eva] octagons.c:82: 
+[eva:progress] octagons.c:82: 
   function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
+[eva:progress] Done for function Frama_C_interval
 [eva:show] octagons.c:86: Frama_C_show_each: {50; 60; 70}
-[eva] computing for function Frama_C_interval <- arith <- main.
+[eva:progress] 
+  computing for function Frama_C_interval <- arith <- main.
   Called from octagons.c:89.
-[eva] octagons.c:89: 
+[eva:progress] octagons.c:89: 
   function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
-[eva] computing for function Frama_C_interval <- arith <- main.
+[eva:progress] Done for function Frama_C_interval
+[eva:progress] 
+  computing for function Frama_C_interval <- arith <- main.
   Called from octagons.c:90.
-[eva] octagons.c:90: 
+[eva:progress] octagons.c:90: 
   function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
+[eva:progress] Done for function Frama_C_interval
 [eva:show] octagons.c:94: Frama_C_show_each: [-29..29]
-[eva] Recording results for arith
-[eva] Done for function arith
-[eva] computing for function join <- main.
+[eva:progress] Recording results for arith
+[eva:progress] Done for function arith
+[eva:progress] 
+  computing for function join <- main.
   Called from octagons.c:278.
-[eva] computing for function Frama_C_interval <- join <- main.
+[eva:progress] 
+  computing for function Frama_C_interval <- join <- main.
   Called from octagons.c:103.
-[eva] octagons.c:103: 
+[eva:progress] octagons.c:103: 
   function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
+[eva:progress] Done for function Frama_C_interval
 [eva:alarm] octagons.c:106: Warning: 
   signed overflow. assert -2147483648 ≤ a + k;
 [eva:alarm] octagons.c:106: Warning: 
   signed overflow. assert a + k ≤ 2147483647;
-[eva] computing for function Frama_C_interval <- join <- main.
+[eva:progress] 
+  computing for function Frama_C_interval <- join <- main.
   Called from octagons.c:108.
-[eva] octagons.c:108: 
+[eva:progress] octagons.c:108: 
   function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
+[eva:progress] Done for function Frama_C_interval
 [eva:show] octagons.c:113: Frama_C_show_each_join_positive: [0..53]
 [eva:alarm] octagons.c:116: Warning: 
   signed overflow. assert -2147483648 ≤ a + k;
@@ -130,26 +151,30 @@
   signed overflow. assert a + k ≤ 2147483647;
 [eva:alarm] octagons.c:116: Warning: 
   signed overflow. assert -((int)(a + k)) ≤ 2147483647;
-[eva] computing for function Frama_C_interval <- join <- main.
+[eva:progress] 
+  computing for function Frama_C_interval <- join <- main.
   Called from octagons.c:118.
-[eva] octagons.c:118: 
+[eva:progress] octagons.c:118: 
   function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
+[eva:progress] Done for function Frama_C_interval
 [eva:show] octagons.c:123: Frama_C_show_each_join_negative: [-47..0]
-[eva] Recording results for join
-[eva] Done for function join
-[eva] computing for function loop <- main.
+[eva:progress] Recording results for join
+[eva:progress] Done for function join
+[eva:progress] 
+  computing for function loop <- main.
   Called from octagons.c:279.
-[eva] computing for function Frama_C_interval <- loop <- main.
+[eva:progress] 
+  computing for function Frama_C_interval <- loop <- main.
   Called from octagons.c:128.
-[eva] octagons.c:128: 
+[eva:progress] octagons.c:128: 
   function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
-[eva] computing for function Frama_C_interval <- loop <- main.
+[eva:progress] Done for function Frama_C_interval
+[eva:progress] 
+  computing for function Frama_C_interval <- loop <- main.
   Called from octagons.c:129.
-[eva] octagons.c:129: 
+[eva:progress] octagons.c:129: 
   function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
+[eva:progress] Done for function Frama_C_interval
 [eva:partition] octagons.c:133: starting to merge loop iterations
 [eva:alarm] octagons.c:134: Warning: 
   signed overflow. assert a + 2 ≤ 2147483647;
@@ -162,77 +187,92 @@
 [eva:show] octagons.c:142: Frama_C_show_each_singleton_1: {1}
 [eva:show] octagons.c:143: Frama_C_show_each_imprecise: [-2147483648..1]
 [eva:show] octagons.c:144: Frama_C_show_each_precise: [-8..8]
-[eva] Recording results for loop
-[eva] Done for function loop
-[eva] computing for function pointers <- main.
+[eva:progress] Recording results for loop
+[eva:progress] Done for function loop
+[eva:progress] 
+  computing for function pointers <- main.
   Called from octagons.c:280.
-[eva] computing for function Frama_C_interval <- pointers <- main.
+[eva:progress] 
+  computing for function Frama_C_interval <- pointers <- main.
   Called from octagons.c:151.
-[eva] octagons.c:151: 
+[eva:progress] octagons.c:151: 
   function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
+[eva:progress] Done for function Frama_C_interval
 [eva:show] octagons.c:154: Frama_C_show_each_singleton_1: {1}
-[eva] computing for function Frama_C_interval <- pointers <- main.
+[eva:progress] 
+  computing for function Frama_C_interval <- pointers <- main.
   Called from octagons.c:155.
-[eva] octagons.c:155: 
+[eva:progress] octagons.c:155: 
   function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
+[eva:progress] Done for function Frama_C_interval
 [eva:show] octagons.c:156: Frama_C_show_each_singleton_1: {1}
-[eva] computing for function Frama_C_interval <- pointers <- main.
+[eva:progress] 
+  computing for function Frama_C_interval <- pointers <- main.
   Called from octagons.c:157.
-[eva] octagons.c:157: 
+[eva:progress] octagons.c:157: 
   function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
+[eva:progress] Done for function Frama_C_interval
 [eva:show] octagons.c:158: Frama_C_show_each_unknown: [-1024..1024]
 [eva:show] octagons.c:160: Frama_C_show_each_unknown: [-2047..2049]
 [eva:show] octagons.c:163: Frama_C_show_each_singleton_2: {2}
-[eva] Recording results for pointers
-[eva] Done for function pointers
-[eva] computing for function saturate <- main.
+[eva:progress] Recording results for pointers
+[eva:progress] Done for function pointers
+[eva:progress] 
+  computing for function saturate <- main.
   Called from octagons.c:281.
-[eva] computing for function Frama_C_interval <- saturate <- main.
+[eva:progress] 
+  computing for function Frama_C_interval <- saturate <- main.
   Called from octagons.c:169.
-[eva] octagons.c:169: 
+[eva:progress] octagons.c:169: 
   function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
-[eva] computing for function Frama_C_interval <- saturate <- main.
+[eva:progress] Done for function Frama_C_interval
+[eva:progress] 
+  computing for function Frama_C_interval <- saturate <- main.
   Called from octagons.c:170.
-[eva] octagons.c:170: 
+[eva:progress] octagons.c:170: 
   function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
+[eva:progress] Done for function Frama_C_interval
 [eva:show] octagons.c:174: Frama_C_show_each_saturate: [-5..5]
-[eva] Recording results for saturate
-[eva] Done for function saturate
-[eva] computing for function interprocedural <- main.
+[eva:progress] Recording results for saturate
+[eva:progress] Done for function saturate
+[eva:progress] 
+  computing for function interprocedural <- main.
   Called from octagons.c:282.
-[eva] computing for function Frama_C_interval <- interprocedural <- main.
+[eva:progress] 
+  computing for function Frama_C_interval <- interprocedural <- main.
   Called from octagons.c:194.
-[eva] octagons.c:194: 
+[eva:progress] octagons.c:194: 
   function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
-[eva] computing for function Frama_C_interval <- interprocedural <- main.
+[eva:progress] Done for function Frama_C_interval
+[eva:progress] 
+  computing for function Frama_C_interval <- interprocedural <- main.
   Called from octagons.c:195.
-[eva] octagons.c:195: 
+[eva:progress] octagons.c:195: 
   function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
-[eva] computing for function neg <- interprocedural <- main.
+[eva:progress] Done for function Frama_C_interval
+[eva:progress] 
+  computing for function neg <- interprocedural <- main.
   Called from octagons.c:196.
-[eva] Recording results for neg
-[eva] Done for function neg
-[eva] computing for function neg <- interprocedural <- main.
+[eva:progress] Recording results for neg
+[eva:progress] Done for function neg
+[eva:progress] 
+  computing for function neg <- interprocedural <- main.
   Called from octagons.c:197.
-[eva] Recording results for neg
-[eva] Done for function neg
-[eva] computing for function diff <- interprocedural <- main.
+[eva:progress] Recording results for neg
+[eva:progress] Done for function neg
+[eva:progress] 
+  computing for function diff <- interprocedural <- main.
   Called from octagons.c:206.
-[eva] Recording results for diff
-[eva] Done for function diff
-[eva] computing for function diff <- interprocedural <- main.
+[eva:progress] Recording results for diff
+[eva:progress] Done for function diff
+[eva:progress] 
+  computing for function diff <- interprocedural <- main.
   Called from octagons.c:210.
-[eva] Recording results for diff
-[eva] Done for function diff
+[eva:progress] Recording results for diff
+[eva:progress] Done for function diff
 [eva:show] octagons.c:213: Frama_C_show_each_equal: [0..16], [0..16], [0..16]
-[eva] computing for function test_non_integer_args <- interprocedural <- main.
+[eva:progress] 
+  computing for function test_non_integer_args <- interprocedural <- main.
   Called from octagons.c:216.
 [eva:show] octagons.c:189: 
   Frama_C_dump_each:
@@ -243,22 +283,25 @@
      *p - a1 ∈ {0}
       ]}
   ==END OF DUMP==
-[eva] Recording results for test_non_integer_args
-[eva] Done for function test_non_integer_args
-[eva] Recording results for interprocedural
-[eva] Done for function interprocedural
-[eva] computing for function dump <- main.
+[eva:progress] Recording results for test_non_integer_args
+[eva:progress] Done for function test_non_integer_args
+[eva:progress] Recording results for interprocedural
+[eva:progress] Done for function interprocedural
+[eva:progress] 
+  computing for function dump <- main.
   Called from octagons.c:283.
-[eva] computing for function Frama_C_interval <- dump <- main.
+[eva:progress] 
+  computing for function Frama_C_interval <- dump <- main.
   Called from octagons.c:221.
-[eva] octagons.c:221: 
+[eva:progress] octagons.c:221: 
   function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
-[eva] computing for function Frama_C_interval <- dump <- main.
+[eva:progress] Done for function Frama_C_interval
+[eva:progress] 
+  computing for function Frama_C_interval <- dump <- main.
   Called from octagons.c:222.
-[eva] octagons.c:222: 
+[eva:progress] octagons.c:222: 
   function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
+[eva:progress] Done for function Frama_C_interval
 [eva:show] octagons.c:225: 
   Frama_C_dump_each:
   # octagon:
@@ -270,47 +313,54 @@
      a - c ∈ [-8..8]
       ]}
   ==END OF DUMP==
-[eva] Recording results for dump
-[eva] Done for function dump
-[eva] computing for function pub301 <- main.
+[eva:progress] Recording results for dump
+[eva:progress] Done for function dump
+[eva:progress] 
+  computing for function pub301 <- main.
   Called from octagons.c:284.
-[eva] computing for function Frama_C_interval <- pub301 <- main.
+[eva:progress] 
+  computing for function Frama_C_interval <- pub301 <- main.
   Called from octagons.c:231.
-[eva] octagons.c:231: 
+[eva:progress] octagons.c:231: 
   function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
-[eva] computing for function Frama_C_interval <- pub301 <- main.
+[eva:progress] Done for function Frama_C_interval
+[eva:progress] 
+  computing for function Frama_C_interval <- pub301 <- main.
   Called from octagons.c:232.
-[eva] octagons.c:232: 
+[eva:progress] octagons.c:232: 
   function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
-[eva] Recording results for pub301
-[eva] Done for function pub301
-[eva] computing for function arrays <- main.
+[eva:progress] Done for function Frama_C_interval
+[eva:progress] Recording results for pub301
+[eva:progress] Done for function pub301
+[eva:progress] 
+  computing for function arrays <- main.
   Called from octagons.c:285.
-[eva] computing for function Frama_C_interval <- arrays <- main.
+[eva:progress] 
+  computing for function Frama_C_interval <- arrays <- main.
   Called from octagons.c:250.
-[eva] octagons.c:250: 
+[eva:progress] octagons.c:250: 
   function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
+[eva:progress] Done for function Frama_C_interval
 [eva:partition] octagons.c:251: starting to merge loop iterations
-[eva] computing for function Frama_C_interval <- arrays <- main.
+[eva:progress] 
+  computing for function Frama_C_interval <- arrays <- main.
   Called from octagons.c:256.
-[eva] octagons.c:256: 
+[eva:progress] octagons.c:256: 
   function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
+[eva:progress] Done for function Frama_C_interval
 [eva:partition] octagons.c:258: starting to merge loop iterations
-[eva] computing for function Frama_C_float_interval <- arrays <- main.
+[eva:progress] 
+  computing for function Frama_C_float_interval <- arrays <- main.
   Called from octagons.c:265.
 [eva] using specification for function Frama_C_float_interval
-[eva] octagons.c:265: 
+[eva:progress] octagons.c:265: 
   function Frama_C_float_interval, behavior finite: precondition 'order' got status valid.
-[eva] Done for function Frama_C_float_interval
+[eva:progress] Done for function Frama_C_float_interval
 [eva:partition] octagons.c:267: starting to merge loop iterations
-[eva] Recording results for arrays
-[eva] Done for function arrays
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for arrays
+[eva:progress] Done for function arrays
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function arith:
   Frama_C_entropy_source ∈ [--..--]

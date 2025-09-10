@@ -1,7 +1,7 @@
 [kernel] Parsing call_alias.i (no preprocessing)
 [eva] Analyzing a complete application starting at main2
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   X ∈ {0}
   c ∈ {0}
@@ -11,12 +11,13 @@
   G ∈ {0}
   H ∈ {0}
   I ∈ {0}
-[eva] computing for function sum <- main2.
+[eva:progress] 
+  computing for function sum <- main2.
   Called from call_alias.i:33.
-[eva] Recording results for sum
-[eva] Done for function sum
-[eva] Recording results for main2
-[eva] Done for function main2
+[eva:progress] Recording results for sum
+[eva:progress] Done for function sum
+[eva:progress] Recording results for main2
+[eva:progress] Done for function main2
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function sum:
   __retres ∈ {0}

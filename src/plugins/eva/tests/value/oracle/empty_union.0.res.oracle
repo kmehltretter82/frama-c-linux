@@ -1,51 +1,53 @@
 [kernel] Parsing empty_union.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
+[eva:progress] Computing initial state
 [eva:unknown-size] empty_union.c:59: Warning: 
   during initialization of variable 'f1', size of type 'int []' cannot be
   computed (Size of array without number of elements.)
-[eva] Initial state computed
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   nondet ∈ [--..--]
   array_of_comp[0]{.a; .e{}; .b} ∈ {17}
   f1[bits 0 to ..] ∈ {0} or UNINITIALIZED
   f2.data[0] ∈ {1}
     .data[1..2] ∈ {0}
-[eva] empty_union.c:67: assertion got status valid.
-[eva] empty_union.c:68: assertion got status valid.
+[eva:progress] empty_union.c:67: assertion got status valid.
+[eva:progress] empty_union.c:68: assertion got status valid.
 [eva:show] empty_union.c:70: Frama_C_show_each_global_empty: ∅
 [eva:show] empty_union.c:71: Frama_C_show_each_e1: ∅
-[eva] empty_union.c:72: Call to builtin memcpy
-[eva] empty_union.c:72: 
+[eva:progress] empty_union.c:72: Call to builtin memcpy
+[eva:progress] empty_union.c:72: 
   function memcpy: precondition 'valid_dest' got status valid.
-[eva] empty_union.c:72: 
+[eva:progress] empty_union.c:72: 
   function memcpy: precondition 'valid_src' got status valid.
-[eva] empty_union.c:72: 
+[eva:progress] empty_union.c:72: 
   function memcpy: precondition 'separation' got status valid.
 [eva:acsl:unsupported] FRAMAC_SHARE/libc/string.h:114: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memcmp
-[eva] empty_union.c:77: Call to builtin memcpy
-[eva] empty_union.c:77: 
+[eva:progress] empty_union.c:77: Call to builtin memcpy
+[eva:progress] empty_union.c:77: 
   function memcpy: precondition 'valid_dest' got status valid.
-[eva] empty_union.c:77: 
+[eva:progress] empty_union.c:77: 
   function memcpy: precondition 'valid_src' got status valid.
-[eva] empty_union.c:77: 
+[eva:progress] empty_union.c:77: 
   function memcpy: precondition 'separation' got status valid.
 [eva:show] empty_union.c:78: Frama_C_show_each_c2: {77}
 [eva:show] empty_union.c:79: Frama_C_show_each_c2_e: ∅
-[eva] computing for function f <- main.
+[eva:progress] 
+  computing for function f <- main.
   Called from empty_union.c:80.
-[eva] Recording results for f
-[eva] Done for function f
-[eva] computing for function copy_empty <- main.
+[eva:progress] Recording results for f
+[eva:progress] Done for function f
+[eva:progress] 
+  computing for function copy_empty <- main.
   Called from empty_union.c:81.
 [eva:alarm] empty_union.c:37: Warning: 
   function copy_empty: postcondition got status unknown.
-[eva] Recording results for copy_empty
-[eva] Done for function copy_empty
+[eva:progress] Recording results for copy_empty
+[eva:progress] Done for function copy_empty
 [eva:show] empty_union.c:83: Frama_C_show_each_res: {74}
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function copy_empty:
   

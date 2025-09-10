@@ -1,7 +1,7 @@
 [kernel] Parsing precise_locations.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   t[0..49] ∈ {0}
   i ∈ {0}
@@ -24,22 +24,23 @@
   __retres ∈ UNINITIALIZED
   ==END OF DUMP==
 [eva:partition] precise_locations.i:34: starting to merge loop iterations
-[eva] computing for function ct <- main.
+[eva:progress] 
+  computing for function ct <- main.
   Called from precise_locations.i:39.
-[eva] Recording results for ct
-[eva] Done for function ct
+[eva:progress] Recording results for ct
+[eva:progress] Done for function ct
 [eva:partition] precise_locations.i:38: starting to merge loop iterations
-[eva] precise_locations.i:39: Reusing old results for call to ct
-[eva] precise_locations.i:39: Reusing old results for call to ct
-[eva] precise_locations.i:39: Reusing old results for call to ct
-[eva] precise_locations.i:39: Reusing old results for call to ct
+[eva:progress] precise_locations.i:39: Reusing old results for call to ct
+[eva:progress] precise_locations.i:39: Reusing old results for call to ct
+[eva:progress] precise_locations.i:39: Reusing old results for call to ct
+[eva:progress] precise_locations.i:39: Reusing old results for call to ct
 [eva:partition] precise_locations.i:37: starting to merge loop iterations
-[eva] precise_locations.i:39: Reusing old results for call to ct
-[eva] precise_locations.i:39: Reusing old results for call to ct
-[eva] precise_locations.i:39: Reusing old results for call to ct
-[eva] precise_locations.i:39: Reusing old results for call to ct
-[eva] precise_locations.i:39: Reusing old results for call to ct
-[eva] precise_locations.i:39: Reusing old results for call to ct
+[eva:progress] precise_locations.i:39: Reusing old results for call to ct
+[eva:progress] precise_locations.i:39: Reusing old results for call to ct
+[eva:progress] precise_locations.i:39: Reusing old results for call to ct
+[eva:progress] precise_locations.i:39: Reusing old results for call to ct
+[eva:progress] precise_locations.i:39: Reusing old results for call to ct
+[eva:progress] precise_locations.i:39: Reusing old results for call to ct
 [eva:show] precise_locations.i:42: 
   Frama_C_dump_each:
   # cvalue:
@@ -152,60 +153,76 @@
   v ∈ [--..--]
   __retres ∈ UNINITIALIZED
   ==END OF DUMP==
-[eva] computing for function f <- main.
+[eva:progress] 
+  computing for function f <- main.
   Called from precise_locations.i:48.
 [eva] using specification for function f
-[eva] precise_locations.i:48: function f: precondition got status valid.
-[eva] Done for function f
-[eva] computing for function g <- main.
+[eva:progress] precise_locations.i:48: 
+  function f: precondition got status valid.
+[eva:progress] Done for function f
+[eva:progress] 
+  computing for function g <- main.
   Called from precise_locations.i:49.
 [eva] using specification for function g
-[eva] precise_locations.i:49: function g: precondition got status valid.
-[eva] Done for function g
+[eva:progress] precise_locations.i:49: 
+  function g: precondition got status valid.
+[eva:progress] Done for function g
 [eva:partition] precise_locations.i:45: starting to merge loop iterations
-[eva] computing for function f <- main.
+[eva:progress] 
+  computing for function f <- main.
   Called from precise_locations.i:48.
-[eva] Done for function f
-[eva] computing for function g <- main.
+[eva:progress] Done for function f
+[eva:progress] 
+  computing for function g <- main.
   Called from precise_locations.i:49.
-[eva] Done for function g
-[eva] computing for function f <- main.
+[eva:progress] Done for function g
+[eva:progress] 
+  computing for function f <- main.
   Called from precise_locations.i:48.
-[eva] Done for function f
-[eva] computing for function g <- main.
+[eva:progress] Done for function f
+[eva:progress] 
+  computing for function g <- main.
   Called from precise_locations.i:49.
-[eva] Done for function g
-[eva] computing for function f <- main.
+[eva:progress] Done for function g
+[eva:progress] 
+  computing for function f <- main.
   Called from precise_locations.i:48.
-[eva] Done for function f
-[eva] computing for function g <- main.
+[eva:progress] Done for function f
+[eva:progress] 
+  computing for function g <- main.
   Called from precise_locations.i:49.
-[eva] Done for function g
+[eva:progress] Done for function g
 [eva:partition] precise_locations.i:44: starting to merge loop iterations
-[eva] computing for function f <- main.
+[eva:progress] 
+  computing for function f <- main.
   Called from precise_locations.i:48.
-[eva] Done for function f
-[eva] computing for function g <- main.
+[eva:progress] Done for function f
+[eva:progress] 
+  computing for function g <- main.
   Called from precise_locations.i:49.
-[eva] Done for function g
-[eva] computing for function f <- main.
+[eva:progress] Done for function g
+[eva:progress] 
+  computing for function f <- main.
   Called from precise_locations.i:48.
-[eva] Done for function f
-[eva] computing for function g <- main.
+[eva:progress] Done for function f
+[eva:progress] 
+  computing for function g <- main.
   Called from precise_locations.i:49.
-[eva] Done for function g
-[eva] computing for function f <- main.
+[eva:progress] Done for function g
+[eva:progress] 
+  computing for function f <- main.
   Called from precise_locations.i:48.
 [eva:alarm] precise_locations.i:48: Warning: 
   function f: precondition got status unknown.
-[eva] Done for function f
-[eva] computing for function g <- main.
+[eva:progress] Done for function f
+[eva:progress] 
+  computing for function g <- main.
   Called from precise_locations.i:49.
 [eva:alarm] precise_locations.i:49: Warning: 
   function g: precondition got status unknown.
-[eva] Done for function g
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Done for function g
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function ct:
   __retres ∈ {20}
@@ -393,8 +410,8 @@
      8 Total
 --------------------------------------------------------------------------------
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   t[0..49] ∈ {0}
   i ∈ {0}
@@ -511,20 +528,21 @@
   v ∈ [--..--]
   __retres ∈ UNINITIALIZED
   ==END OF DUMP==
-[eva] computing for function ct <- main.
+[eva:progress] 
+  computing for function ct <- main.
   Called from precise_locations.i:39.
-[eva] Recording results for ct
-[eva] Done for function ct
-[eva] precise_locations.i:39: Reusing old results for call to ct
-[eva] precise_locations.i:39: Reusing old results for call to ct
-[eva] precise_locations.i:39: Reusing old results for call to ct
-[eva] precise_locations.i:39: Reusing old results for call to ct
-[eva] precise_locations.i:39: Reusing old results for call to ct
-[eva] precise_locations.i:39: Reusing old results for call to ct
-[eva] precise_locations.i:39: Reusing old results for call to ct
-[eva] precise_locations.i:39: Reusing old results for call to ct
-[eva] precise_locations.i:39: Reusing old results for call to ct
-[eva] precise_locations.i:39: Reusing old results for call to ct
+[eva:progress] Recording results for ct
+[eva:progress] Done for function ct
+[eva:progress] precise_locations.i:39: Reusing old results for call to ct
+[eva:progress] precise_locations.i:39: Reusing old results for call to ct
+[eva:progress] precise_locations.i:39: Reusing old results for call to ct
+[eva:progress] precise_locations.i:39: Reusing old results for call to ct
+[eva:progress] precise_locations.i:39: Reusing old results for call to ct
+[eva:progress] precise_locations.i:39: Reusing old results for call to ct
+[eva:progress] precise_locations.i:39: Reusing old results for call to ct
+[eva:progress] precise_locations.i:39: Reusing old results for call to ct
+[eva:progress] precise_locations.i:39: Reusing old results for call to ct
+[eva:progress] precise_locations.i:39: Reusing old results for call to ct
 [eva:show] precise_locations.i:42: 
   Frama_C_dump_each:
   # cvalue:
@@ -735,50 +753,64 @@
   v ∈ [--..--]
   __retres ∈ UNINITIALIZED
   ==END OF DUMP==
-[eva] computing for function f <- main.
+[eva:progress] 
+  computing for function f <- main.
   Called from precise_locations.i:48.
-[eva] Done for function f
-[eva] computing for function g <- main.
+[eva:progress] Done for function f
+[eva:progress] 
+  computing for function g <- main.
   Called from precise_locations.i:49.
-[eva] Done for function g
-[eva] computing for function f <- main.
+[eva:progress] Done for function g
+[eva:progress] 
+  computing for function f <- main.
   Called from precise_locations.i:48.
-[eva] Done for function f
-[eva] computing for function g <- main.
+[eva:progress] Done for function f
+[eva:progress] 
+  computing for function g <- main.
   Called from precise_locations.i:49.
-[eva] Done for function g
-[eva] computing for function f <- main.
+[eva:progress] Done for function g
+[eva:progress] 
+  computing for function f <- main.
   Called from precise_locations.i:48.
-[eva] Done for function f
-[eva] computing for function g <- main.
+[eva:progress] Done for function f
+[eva:progress] 
+  computing for function g <- main.
   Called from precise_locations.i:49.
-[eva] Done for function g
-[eva] computing for function f <- main.
+[eva:progress] Done for function g
+[eva:progress] 
+  computing for function f <- main.
   Called from precise_locations.i:48.
-[eva] Done for function f
-[eva] computing for function g <- main.
+[eva:progress] Done for function f
+[eva:progress] 
+  computing for function g <- main.
   Called from precise_locations.i:49.
-[eva] Done for function g
-[eva] computing for function f <- main.
+[eva:progress] Done for function g
+[eva:progress] 
+  computing for function f <- main.
   Called from precise_locations.i:48.
-[eva] Done for function f
-[eva] computing for function g <- main.
+[eva:progress] Done for function f
+[eva:progress] 
+  computing for function g <- main.
   Called from precise_locations.i:49.
-[eva] Done for function g
-[eva] computing for function f <- main.
+[eva:progress] Done for function g
+[eva:progress] 
+  computing for function f <- main.
   Called from precise_locations.i:48.
-[eva] Done for function f
-[eva] computing for function g <- main.
+[eva:progress] Done for function f
+[eva:progress] 
+  computing for function g <- main.
   Called from precise_locations.i:49.
-[eva] Done for function g
-[eva] computing for function f <- main.
+[eva:progress] Done for function g
+[eva:progress] 
+  computing for function f <- main.
   Called from precise_locations.i:48.
-[eva] Done for function f
-[eva] computing for function g <- main.
+[eva:progress] Done for function f
+[eva:progress] 
+  computing for function g <- main.
   Called from precise_locations.i:49.
-[eva] Done for function g
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Done for function g
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function ct:
   __retres ∈ {20}

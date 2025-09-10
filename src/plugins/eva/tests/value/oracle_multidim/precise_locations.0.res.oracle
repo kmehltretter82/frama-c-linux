@@ -1,23 +1,27 @@
-199,200d198
+215,216d214
 < [eva:alarm] precise_locations.i:48: Warning: 
 <   function f: precondition got status unknown.
-204,205c202,213
+221,222c219,234
 < [eva:alarm] precise_locations.i:49: Warning: 
 <   function g: precondition got status unknown.
 ---
-> [eva] Done for function g
-> [eva] computing for function f <- main.
+> [eva:progress] Done for function g
+> [eva:progress] 
+>   computing for function f <- main.
 >   Called from precise_locations.i:48.
-> [eva] Done for function f
-> [eva] computing for function g <- main.
+> [eva:progress] Done for function f
+> [eva:progress] 
+>   computing for function g <- main.
 >   Called from precise_locations.i:49.
-> [eva] Done for function g
-> [eva] computing for function f <- main.
+> [eva:progress] Done for function g
+> [eva:progress] 
+>   computing for function f <- main.
 >   Called from precise_locations.i:48.
-> [eva] Done for function f
-> [eva] computing for function g <- main.
+> [eva:progress] Done for function f
+> [eva:progress] 
+>   computing for function g <- main.
 >   Called from precise_locations.i:49.
-317,319c325,327
+334,336c346,348
 <   q ∈ [0..255]
 <   r ∈ [0..256]
 <   __retres ∈ [0..511]
@@ -25,52 +29,56 @@
 >   q ∈ {0; 10; 20}
 >   r ∈ {0; 1; 11; 21}
 >   __retres ∈ {0; 1; 10; 11; 20; 21; 31; 41}
-358,359c366,367
+375,376c387,388
 < [    -    ] Pre-condition (file precise_locations.i, line 18)
 <             tried with Call Preconditions.
 ---
 > [  Valid  ] Pre-condition (file precise_locations.i, line 18)
 >             by Call Preconditions.
-369,370c377,378
+386,387c398,399
 < [    -    ] Pre-condition (file precise_locations.i, line 21)
 <             tried with Call Preconditions.
 ---
 > [  Valid  ] Pre-condition (file precise_locations.i, line 21)
 >             by Call Preconditions.
-380c388
+397c409
 < [    -    ] Instance of 'Pre-condition (file precise_locations.i, line 18)' at call 'f' (file precise_locations.i, line 48)
 ---
 > [  Valid  ] Instance of 'Pre-condition (file precise_locations.i, line 18)' at call 'f' (file precise_locations.i, line 48)
-382,383c390,391
+399,400c411,412
 <             tried with Eva.
 < [    -    ] Instance of 'Pre-condition (file precise_locations.i, line 21)' at call 'g' (file precise_locations.i, line 49)
 ---
 >             by Eva.
 > [  Valid  ] Instance of 'Pre-condition (file precise_locations.i, line 21)' at call 'g' (file precise_locations.i, line 49)
-385c393
+402c414
 <             tried with Eva.
 ---
 >             by Eva.
-390c398
+407c419
 <      2 Completely validated
 ---
 >      6 Completely validated
-392d399
+409d420
 <      4 To be validated
-779a787,798
-> [eva] computing for function f <- main.
+811a823,838
+> [eva:progress] 
+>   computing for function f <- main.
 >   Called from precise_locations.i:48.
-> [eva] Done for function f
-> [eva] computing for function g <- main.
+> [eva:progress] Done for function f
+> [eva:progress] 
+>   computing for function g <- main.
 >   Called from precise_locations.i:49.
-> [eva] Done for function g
-> [eva] computing for function f <- main.
+> [eva:progress] Done for function g
+> [eva:progress] 
+>   computing for function f <- main.
 >   Called from precise_locations.i:48.
-> [eva] Done for function f
-> [eva] computing for function g <- main.
+> [eva:progress] Done for function f
+> [eva:progress] 
+>   computing for function g <- main.
 >   Called from precise_locations.i:49.
-> [eva] Done for function g
-1170a1190
+> [eva:progress] Done for function g
+1202a1230
 >             by Eva (v1).
-1173a1194
+1205a1234
 >             by Eva (v1).

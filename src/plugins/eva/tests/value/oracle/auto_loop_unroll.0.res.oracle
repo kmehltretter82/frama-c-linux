@@ -1,11 +1,12 @@
 [kernel] Parsing auto_loop_unroll.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   undet ∈ [--..--]
   g ∈ {0}
-[eva] computing for function simple_loops <- main.
+[eva:progress] 
+  computing for function simple_loops <- main.
   Called from auto_loop_unroll.c:428.
 [eva:partition] auto_loop_unroll.c:24: starting to merge loop iterations
 [eva:alarm] auto_loop_unroll.c:25: Warning: 
@@ -22,9 +23,10 @@
 [eva:partition] auto_loop_unroll.c:46: 
   Trace partitioning superposing up to 100 states
 [eva:show] auto_loop_unroll.c:49: Frama_C_show_each_singleton: {100}
-[eva] Recording results for simple_loops
-[eva] Done for function simple_loops
-[eva] computing for function various_loops <- main.
+[eva:progress] Recording results for simple_loops
+[eva:progress] Done for function simple_loops
+[eva:progress] 
+  computing for function various_loops <- main.
   Called from auto_loop_unroll.c:429.
 [eva:partition] auto_loop_unroll.c:57: starting to merge loop iterations
 [eva:alarm] auto_loop_unroll.c:58: Warning: 
@@ -42,12 +44,13 @@
 [eva:alarm] auto_loop_unroll.c:76: Warning: 
   signed overflow. assert res + 1 ≤ 2147483647;
 [eva:show] auto_loop_unroll.c:82: Frama_C_show_each_32_80: [0..2147483647]
-[eva] computing for function Frama_C_interval <- various_loops <- main.
+[eva:progress] 
+  computing for function Frama_C_interval <- various_loops <- main.
   Called from auto_loop_unroll.c:86.
 [eva] using specification for function Frama_C_interval
-[eva] auto_loop_unroll.c:86: 
+[eva:progress] auto_loop_unroll.c:86: 
   function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
+[eva:progress] Done for function Frama_C_interval
 [eva:partition] auto_loop_unroll.c:87: starting to merge loop iterations
 [eva:alarm] auto_loop_unroll.c:88: Warning: 
   signed overflow. assert res + 1 ≤ 2147483647;
@@ -56,68 +59,81 @@
 [eva:alarm] auto_loop_unroll.c:93: Warning: 
   signed overflow. assert res + 1 ≤ 2147483647;
 [eva:show] auto_loop_unroll.c:95: Frama_C_show_each_101: [0..2147483647]
-[eva] computing for function incr_g <- various_loops <- main.
+[eva:progress] 
+  computing for function incr_g <- various_loops <- main.
   Called from auto_loop_unroll.c:99.
-[eva] Recording results for incr_g
-[eva] Done for function incr_g
-[eva] computing for function incr <- various_loops <- main.
+[eva:progress] Recording results for incr_g
+[eva:progress] Done for function incr_g
+[eva:progress] 
+  computing for function incr <- various_loops <- main.
   Called from auto_loop_unroll.c:100.
-[eva] Recording results for incr
-[eva] Done for function incr
-[eva] auto_loop_unroll.c:101: Reusing old results for call to incr
+[eva:progress] Recording results for incr
+[eva:progress] Done for function incr
+[eva:progress] auto_loop_unroll.c:101: Reusing old results for call to incr
 [eva:partition] auto_loop_unroll.c:98: starting to merge loop iterations
-[eva] computing for function incr_g <- various_loops <- main.
+[eva:progress] 
+  computing for function incr_g <- various_loops <- main.
   Called from auto_loop_unroll.c:99.
-[eva] Recording results for incr_g
-[eva] Done for function incr_g
-[eva] computing for function incr <- various_loops <- main.
+[eva:progress] Recording results for incr_g
+[eva:progress] Done for function incr_g
+[eva:progress] 
+  computing for function incr <- various_loops <- main.
   Called from auto_loop_unroll.c:100.
-[eva] Recording results for incr
-[eva] Done for function incr
-[eva] auto_loop_unroll.c:101: Reusing old results for call to incr
-[eva] computing for function incr_g <- various_loops <- main.
+[eva:progress] Recording results for incr
+[eva:progress] Done for function incr
+[eva:progress] auto_loop_unroll.c:101: Reusing old results for call to incr
+[eva:progress] 
+  computing for function incr_g <- various_loops <- main.
   Called from auto_loop_unroll.c:99.
-[eva] Recording results for incr_g
-[eva] Done for function incr_g
-[eva] computing for function incr <- various_loops <- main.
+[eva:progress] Recording results for incr_g
+[eva:progress] Done for function incr_g
+[eva:progress] 
+  computing for function incr <- various_loops <- main.
   Called from auto_loop_unroll.c:100.
-[eva] Recording results for incr
-[eva] Done for function incr
-[eva] auto_loop_unroll.c:101: Reusing old results for call to incr
-[eva] computing for function incr_g <- various_loops <- main.
+[eva:progress] Recording results for incr
+[eva:progress] Done for function incr
+[eva:progress] auto_loop_unroll.c:101: Reusing old results for call to incr
+[eva:progress] 
+  computing for function incr_g <- various_loops <- main.
   Called from auto_loop_unroll.c:99.
-[eva] Recording results for incr_g
-[eva] Done for function incr_g
-[eva] computing for function incr <- various_loops <- main.
+[eva:progress] Recording results for incr_g
+[eva:progress] Done for function incr_g
+[eva:progress] 
+  computing for function incr <- various_loops <- main.
   Called from auto_loop_unroll.c:100.
-[eva] Recording results for incr
-[eva] Done for function incr
-[eva] computing for function incr <- various_loops <- main.
+[eva:progress] Recording results for incr
+[eva:progress] Done for function incr
+[eva:progress] 
+  computing for function incr <- various_loops <- main.
   Called from auto_loop_unroll.c:101.
-[eva] Recording results for incr
-[eva] Done for function incr
-[eva] computing for function incr_g <- various_loops <- main.
+[eva:progress] Recording results for incr
+[eva:progress] Done for function incr
+[eva:progress] 
+  computing for function incr_g <- various_loops <- main.
   Called from auto_loop_unroll.c:99.
-[eva] Recording results for incr_g
-[eva] Done for function incr_g
-[eva] auto_loop_unroll.c:100: Reusing old results for call to incr
-[eva] computing for function incr <- various_loops <- main.
+[eva:progress] Recording results for incr_g
+[eva:progress] Done for function incr_g
+[eva:progress] auto_loop_unroll.c:100: Reusing old results for call to incr
+[eva:progress] 
+  computing for function incr <- various_loops <- main.
   Called from auto_loop_unroll.c:101.
-[eva] Recording results for incr
-[eva] Done for function incr
-[eva] computing for function incr_g <- various_loops <- main.
+[eva:progress] Recording results for incr
+[eva:progress] Done for function incr
+[eva:progress] 
+  computing for function incr_g <- various_loops <- main.
   Called from auto_loop_unroll.c:99.
 [eva:alarm] auto_loop_unroll.c:14: Warning: 
   signed overflow. assert g + 1 ≤ 2147483647;
-[eva] Recording results for incr_g
-[eva] Done for function incr_g
-[eva] auto_loop_unroll.c:100: Reusing old results for call to incr
-[eva] computing for function incr <- various_loops <- main.
+[eva:progress] Recording results for incr_g
+[eva:progress] Done for function incr_g
+[eva:progress] auto_loop_unroll.c:100: Reusing old results for call to incr
+[eva:progress] 
+  computing for function incr <- various_loops <- main.
   Called from auto_loop_unroll.c:101.
 [eva:alarm] auto_loop_unroll.c:18: Warning: 
   signed overflow. assert i + 1 ≤ 2147483647;
-[eva] Recording results for incr
-[eva] Done for function incr
+[eva:progress] Recording results for incr
+[eva:progress] Done for function incr
 [eva:show] auto_loop_unroll.c:103: Frama_C_show_each_25: [0..2147483647]
 [eva:loop-unroll:auto] auto_loop_unroll.c:108: Automatic loop unrolling.
 [eva:partition] auto_loop_unroll.c:107: starting to merge loop iterations
@@ -137,9 +153,10 @@
 [eva:alarm] auto_loop_unroll.c:139: Warning: 
   signed overflow. assert res + 1 ≤ 2147483647;
 [eva:show] auto_loop_unroll.c:141: Frama_C_show_each_top: [0..2147483647]
-[eva] Recording results for various_loops
-[eva] Done for function various_loops
-[eva] computing for function complex_loops <- main.
+[eva:progress] Recording results for various_loops
+[eva:progress] Done for function various_loops
+[eva:progress] 
+  computing for function complex_loops <- main.
   Called from auto_loop_unroll.c:430.
 [eva:partition] auto_loop_unroll.c:152: starting to merge loop iterations
 [eva:alarm] auto_loop_unroll.c:154: Warning: 
@@ -159,25 +176,29 @@
 [eva:alarm] auto_loop_unroll.c:186: Warning: 
   signed overflow. assert res + 1 ≤ 2147483647;
 [eva:show] auto_loop_unroll.c:188: Frama_C_show_each_imprecise: [0..2147483647]
-[eva] computing for function incr_g <- complex_loops <- main.
+[eva:progress] 
+  computing for function incr_g <- complex_loops <- main.
   Called from auto_loop_unroll.c:193.
-[eva] Recording results for incr_g
-[eva] Done for function incr_g
+[eva:progress] Recording results for incr_g
+[eva:progress] Done for function incr_g
 [eva:partition] auto_loop_unroll.c:192: starting to merge loop iterations
-[eva] computing for function incr_g <- complex_loops <- main.
+[eva:progress] 
+  computing for function incr_g <- complex_loops <- main.
   Called from auto_loop_unroll.c:193.
-[eva] Recording results for incr_g
-[eva] Done for function incr_g
-[eva] computing for function incr_g <- complex_loops <- main.
+[eva:progress] Recording results for incr_g
+[eva:progress] Done for function incr_g
+[eva:progress] 
+  computing for function incr_g <- complex_loops <- main.
   Called from auto_loop_unroll.c:193.
-[eva] Recording results for incr_g
-[eva] Done for function incr_g
-[eva] computing for function incr_g <- complex_loops <- main.
+[eva:progress] Recording results for incr_g
+[eva:progress] Done for function incr_g
+[eva:progress] 
+  computing for function incr_g <- complex_loops <- main.
   Called from auto_loop_unroll.c:193.
-[eva] Recording results for incr_g
-[eva] Done for function incr_g
-[eva] auto_loop_unroll.c:193: Reusing old results for call to incr_g
-[eva] auto_loop_unroll.c:193: Reusing old results for call to incr_g
+[eva:progress] Recording results for incr_g
+[eva:progress] Done for function incr_g
+[eva:progress] auto_loop_unroll.c:193: Reusing old results for call to incr_g
+[eva:progress] auto_loop_unroll.c:193: Reusing old results for call to incr_g
 [eva:alarm] auto_loop_unroll.c:195: Warning: 
   signed overflow. assert res + 1 ≤ 2147483647;
 [eva:show] auto_loop_unroll.c:197: Frama_C_show_each_imprecise: [0..2147483647]
@@ -191,9 +212,10 @@
 [eva:alarm] auto_loop_unroll.c:211: Warning: 
   signed overflow. assert i + 1 ≤ 2147483647;
 [eva:show] auto_loop_unroll.c:214: Frama_C_show_each_imprecise: [0..2147483647]
-[eva] Recording results for complex_loops
-[eva] Done for function complex_loops
-[eva] computing for function various_conditions <- main.
+[eva:progress] Recording results for complex_loops
+[eva:progress] Done for function complex_loops
+[eva:progress] 
+  computing for function various_conditions <- main.
   Called from auto_loop_unroll.c:431.
 [eva:partition] auto_loop_unroll.c:223: starting to merge loop iterations
 [eva:alarm] auto_loop_unroll.c:224: Warning: 
@@ -227,9 +249,10 @@
 [eva:alarm] auto_loop_unroll.c:263: Warning: 
   signed overflow. assert res + 1 ≤ 2147483647;
 [eva:show] auto_loop_unroll.c:265: Frama_C_show_each_16: [0..2147483647]
-[eva] Recording results for various_conditions
-[eva] Done for function various_conditions
-[eva] computing for function temporary_variables <- main.
+[eva:progress] Recording results for various_conditions
+[eva:progress] Done for function various_conditions
+[eva:progress] 
+  computing for function temporary_variables <- main.
   Called from auto_loop_unroll.c:432.
 [eva:partition] auto_loop_unroll.c:274: starting to merge loop iterations
 [eva:alarm] auto_loop_unroll.c:274: Warning: 
@@ -261,9 +284,10 @@
 [eva:alarm] auto_loop_unroll.c:299: Warning: 
   signed overflow. assert i + 1 ≤ 2147483647;
 [eva:show] auto_loop_unroll.c:304: Frama_C_show_each_top: [0..2147483647]
-[eva] Recording results for temporary_variables
-[eva] Done for function temporary_variables
-[eva] computing for function loops_with_goto <- main.
+[eva:progress] Recording results for temporary_variables
+[eva:progress] Done for function temporary_variables
+[eva:progress] 
+  computing for function loops_with_goto <- main.
   Called from auto_loop_unroll.c:433.
 [eva:partition] auto_loop_unroll.c:310: starting to merge loop iterations
 [eva:alarm] auto_loop_unroll.c:311: Warning: 
@@ -301,9 +325,10 @@
 [eva:alarm] auto_loop_unroll.c:370: Warning: 
   signed overflow. assert res + 1 ≤ 2147483647;
 [eva:show] auto_loop_unroll.c:372: Frama_C_show_each_27: [0..2147483647]
-[eva] Recording results for loops_with_goto
-[eva] Done for function loops_with_goto
-[eva] computing for function non_natural_loops <- main.
+[eva:progress] Recording results for loops_with_goto
+[eva:progress] Done for function loops_with_goto
+[eva:progress] 
+  computing for function non_natural_loops <- main.
   Called from auto_loop_unroll.c:434.
 [eva:alarm] auto_loop_unroll.c:383: Warning: 
   signed overflow. assert res + 1 ≤ 2147483647;
@@ -313,9 +338,10 @@
 [eva:alarm] auto_loop_unroll.c:392: Warning: 
   signed overflow. assert -2147483648 ≤ i - 1;
 [eva:show] auto_loop_unroll.c:395: Frama_C_show_each_1_51: [1..2147483647]
-[eva] Recording results for non_natural_loops
-[eva] Done for function non_natural_loops
-[eva] computing for function following_loops <- main.
+[eva:progress] Recording results for non_natural_loops
+[eva:progress] Done for function non_natural_loops
+[eva:progress] 
+  computing for function following_loops <- main.
   Called from auto_loop_unroll.c:435.
 [eva:partition] auto_loop_unroll.c:402: starting to merge loop iterations
 [eva:alarm] auto_loop_unroll.c:404: Warning: 
@@ -331,10 +357,10 @@
   signed overflow. assert j + 1 ≤ 2147483647;
 [eva:partition] auto_loop_unroll.c:417: starting to merge loop iterations
 [eva:show] auto_loop_unroll.c:424: Frama_C_show_each_30: [0..2147483647]
-[eva] Recording results for following_loops
-[eva] Done for function following_loops
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for following_loops
+[eva:progress] Done for function following_loops
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function following_loops:
   i ∈ {30}

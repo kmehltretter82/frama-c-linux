@@ -1,7 +1,7 @@
 [kernel] Parsing reading_null.i (no preprocessing)
 [eva] Analyzing an incomplete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   AutoTest[0..999] ∈ [--..--]
   X ∈ [--..--]
@@ -27,8 +27,8 @@
   Frama_C_show_each_F: [-2147483648..2147483647], {0; 1; 2}
 [eva:show] reading_null.i:25: 
   Frama_C_show_each_F: [-2147483648..2147483647], [0..9]
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   X ∈ [--..--]

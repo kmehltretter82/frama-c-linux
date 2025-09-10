@@ -1,31 +1,34 @@
 [kernel] Parsing descending.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva] computing for function test1 <- main.
+[eva:progress] 
+  computing for function test1 <- main.
   Called from descending.i:33.
-[eva] computing for function f <- test1 <- main.
+[eva:progress] 
+  computing for function f <- test1 <- main.
   Called from descending.i:12.
 [eva:partition] descending.i:4: starting to merge loop iterations
-[eva] Recording results for f
-[eva] Done for function f
+[eva:progress] Recording results for f
+[eva:progress] Done for function f
 [eva:alarm] descending.i:13: Warning: 
   accessing out of bounds index. assert (int)(i - 1) < 10;
 [eva:alarm] descending.i:13: Warning: 
   accessing uninitialized left-value. assert \initialized(&A[(int)(i - 1)]);
-[eva] Recording results for test1
-[eva] Done for function test1
-[eva] computing for function test2 <- main.
+[eva:progress] Recording results for test1
+[eva:progress] Done for function test1
+[eva:progress] 
+  computing for function test2 <- main.
   Called from descending.i:34.
 [eva:partition] descending.i:22: starting to merge loop iterations
 [eva:alarm] descending.i:28: Warning: 
   accessing out of bounds index. assert j < 33;
-[eva] Recording results for test2
-[eva] Done for function test2
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for test2
+[eva:progress] Done for function test2
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function f:
   i ∈ [10..2147483647]

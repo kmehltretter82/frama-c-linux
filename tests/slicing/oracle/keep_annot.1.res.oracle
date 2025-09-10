@@ -1,21 +1,22 @@
 [kernel] Parsing keep_annot.i (no preprocessing)
 [slicing] slicing requests in progress...
 [eva] Analyzing an incomplete application starting at f
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva] computing for function g <- f.
+[eva:progress] 
+  computing for function g <- f.
   Called from keep_annot.i:26.
 [eva:partition] keep_annot.i:15: starting to merge loop iterations
 [eva:alarm] keep_annot.i:20: Warning: assertion got status unknown.
 [eva:alarm] keep_annot.i:21: Warning: assertion got status unknown.
-[eva] Recording results for g
-[eva] Done for function g
-[eva] keep_annot.i:27: assertion got status valid.
+[eva:progress] Recording results for g
+[eva:progress] Done for function g
+[eva:progress] keep_annot.i:27: assertion got status valid.
 [eva:alarm] keep_annot.i:28: Warning: assertion got status unknown.
-[eva] Recording results for f
-[eva] Done for function f
+[eva:progress] Recording results for f
+[eva:progress] Done for function f
 [slicing] initializing slicing ...
 [slicing] interpreting slicing requests from the command line...
 [pdg] computing for function f

@@ -1,12 +1,13 @@
 [kernel] Parsing symbolic_locs.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   v ∈ [--..--]
   t[0..9] ∈ {0}
   u[0..9] ∈ [--..--]
-[eva] computing for function main2_kill_direct <- main.
+[eva:progress] 
+  computing for function main2_kill_direct <- main.
   Called from symbolic_locs.i:119.
 [eva:alarm] symbolic_locs.i:29: Warning: assertion got status unknown.
 [eva:show] symbolic_locs.i:32: 
@@ -40,9 +41,10 @@
   I: {[  ]}
   S: {[  ]}
   ==END OF DUMP==
-[eva] Recording results for main2_kill_direct
-[eva] Done for function main2_kill_direct
-[eva] computing for function main3_kill_indirect <- main.
+[eva:progress] Recording results for main2_kill_direct
+[eva:progress] Done for function main2_kill_direct
+[eva:progress] 
+  computing for function main3_kill_indirect <- main.
   Called from symbolic_locs.i:120.
 [eva:alarm] symbolic_locs.i:41: Warning: assertion got status unknown.
 [eva:show] symbolic_locs.i:44: 
@@ -78,9 +80,10 @@
   I: {[  ]}
   S: {[  ]}
   ==END OF DUMP==
-[eva] Recording results for main3_kill_indirect
-[eva] Done for function main3_kill_indirect
-[eva] computing for function main4_scope_right <- main.
+[eva:progress] Recording results for main3_kill_indirect
+[eva:progress] Done for function main3_kill_indirect
+[eva:progress] 
+  computing for function main4_scope_right <- main.
   Called from symbolic_locs.i:121.
 [eva:alarm] symbolic_locs.i:51: Warning: assertion got status unknown.
 [eva:alarm] symbolic_locs.i:54: Warning: 
@@ -122,9 +125,10 @@
   I: {[  ]}
   S: {[  ]}
   ==END OF DUMP==
-[eva] Recording results for main4_scope_right
-[eva] Done for function main4_scope_right
-[eva] computing for function main5_scope_lv <- main.
+[eva:progress] Recording results for main4_scope_right
+[eva:progress] Done for function main4_scope_right
+[eva:progress] 
+  computing for function main5_scope_lv <- main.
   Called from symbolic_locs.i:122.
 [eva:alarm] symbolic_locs.i:63: Warning: assertion got status unknown.
 [eva:show] symbolic_locs.i:65: 
@@ -157,9 +161,10 @@
   I: {[  ]}
   S: {[  ]}
   ==END OF DUMP==
-[eva] Recording results for main5_scope_lv
-[eva] Done for function main5_scope_lv
-[eva] computing for function main6_ghost_dep <- main.
+[eva:progress] Recording results for main5_scope_lv
+[eva:progress] Done for function main5_scope_lv
+[eva:progress] 
+  computing for function main6_ghost_dep <- main.
   Called from symbolic_locs.i:123.
 [eva:alarm] symbolic_locs.i:83: Warning: assertion got status unknown.
 [eva:alarm] symbolic_locs.i:86: Warning: assertion got status unknown.
@@ -177,14 +182,15 @@
   I: {[  ]}
   S: {[  ]}
   ==END OF DUMP==
-[eva] Recording results for main6_ghost_dep
-[eva] Done for function main6_ghost_dep
-[eva] computing for function main7_widening <- main.
+[eva:progress] Recording results for main6_ghost_dep
+[eva:progress] Done for function main6_ghost_dep
+[eva:progress] 
+  computing for function main7_widening <- main.
   Called from symbolic_locs.i:124.
 [eva:partition] symbolic_locs.i:110: starting to merge loop iterations
 [eva:show] symbolic_locs.i:113: Frama_C_show_each: [10001..2147483647]
-[eva] Recording results for main7_widening
-[eva] Done for function main7_widening
+[eva:progress] Recording results for main7_widening
+[eva:progress] Done for function main7_widening
 [eva:show] symbolic_locs.i:125: 
   Frama_C_dump_each:
   # cvalue:
@@ -198,8 +204,8 @@
   I: {[  ]}
   S: {[  ]}
   ==END OF DUMP==
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main2_kill_direct:
   t[0..1] ∈ {0; 4}

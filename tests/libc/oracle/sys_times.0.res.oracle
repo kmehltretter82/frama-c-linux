@@ -1,17 +1,18 @@
 [kernel] Parsing sys_times.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva] computing for function times <- main.
+[eva:progress] 
+  computing for function times <- main.
   Called from sys_times.c:6.
 [eva] using specification for function times
-[eva] sys_times.c:6: 
+[eva:progress] sys_times.c:6: 
   function times: precondition 'valid_buffer' got status valid.
-[eva] Done for function times
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Done for function times
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   t ∈ [--..--] or UNINITIALIZED

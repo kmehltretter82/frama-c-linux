@@ -1,27 +1,30 @@
 [kernel] Parsing uninitialized.c (with preprocessing)
 [slicing] slicing requests in progress...
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   X1 ∈ {0}
   X2 ∈ {0}
-[eva] computing for function f1 <- main.
+[eva:progress] 
+  computing for function f1 <- main.
   Called from uninitialized.c:38.
-[eva] Recording results for f1
-[eva] Done for function f1
-[eva] computing for function f2 <- main.
+[eva:progress] Recording results for f1
+[eva:progress] Done for function f1
+[eva:progress] 
+  computing for function f2 <- main.
   Called from uninitialized.c:39.
-[eva] Recording results for f2
-[eva] Done for function f2
-[eva] computing for function g <- main.
+[eva:progress] Recording results for f2
+[eva:progress] Done for function f2
+[eva:progress] 
+  computing for function g <- main.
   Called from uninitialized.c:40.
 [eva:alarm] uninitialized.c:30: Warning: 
   accessing uninitialized left-value. assert \initialized(&y);
-[eva] Recording results for g
-[eva] Done for function g
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for g
+[eva:progress] Done for function g
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] uninitialized.c:30: 
   assertion 'Eva,initialization' got final status invalid.
 [slicing] initializing slicing ...

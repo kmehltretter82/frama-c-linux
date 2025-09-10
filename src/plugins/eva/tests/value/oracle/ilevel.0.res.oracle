@@ -1,7 +1,7 @@
 [kernel] Parsing ilevel.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   nondet ∈ [--..--]
   i ∈ {0}
@@ -13,8 +13,8 @@
 [eva:alarm] ilevel.c:26: Warning: assertion got status unknown.
 [eva:alarm] ilevel.c:28: Warning: assertion got status unknown.
 [eva:show] ilevel.c:30: Frama_C_show_each: [0..9]
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   i ∈ {0; 1; 2; 3; 4; 5; 6; 7}
@@ -40,8 +40,8 @@
 [sparecode] remove unused global declarations from project 'Slicing export tmp'
 [sparecode] removed unused global declarations in new project 'Slicing export'
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   nondet ∈ [--..--]
   i ∈ {0}
@@ -52,8 +52,8 @@
 [eva:partition] ilevel.c:18: starting to merge loop iterations
 [eva:alarm] ilevel.c:32: Warning: 
   signed overflow. assert (int)((int)(i + j) + k) + l ≤ 2147483647;
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   i ∈ {0; 1; 2; 3; 4; 5; 6; 7}
@@ -62,8 +62,8 @@
   l ∈ [--..--]
   __retres ∈ [--..--]
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   nondet ∈ [--..--]
   i ∈ {0}
@@ -71,8 +71,8 @@
   k ∈ {0}
   l ∈ {0}
 [eva:show] ilevel.c:30: Frama_C_show_each: {0; 1; 2; 3; 4; 6; 7; 8; 9}
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   i ∈ {0; 1; 2; 3; 4; 5; 6; 7}
@@ -81,8 +81,8 @@
   l ∈ {0; 1; 2; 3; 4; 6; 7; 8; 9}
   __retres ∈ [0..47]
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   nondet ∈ [--..--]
   i ∈ {0}
@@ -90,8 +90,8 @@
   k ∈ {0}
   l ∈ {0}
 [eva:show] ilevel.c:30: Frama_C_show_each: {0; 1; 2; 3; 4; 6; 7; 8; 9}
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   i ∈ {0; 1; 2; 3; 4; 5; 6; 7}

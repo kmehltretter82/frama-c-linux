@@ -1,31 +1,35 @@
 [kernel] Parsing contract_special_float.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   v ∈ [--..--]
-[eva] computing for function fun <- main.
+[eva:progress] 
+  computing for function fun <- main.
   Called from contract_special_float.c:92.
 [eva] using specification for function fun
-[eva] Done for function fun
+[eva:progress] Done for function fun
 [kernel:annot:missing-spec] contract_special_float.c:94: Warning: 
   Neither code nor explicit assigns for function fun_no_default, generating
   default clauses from the specification.
   See -generated-spec-* options for more info.
-[eva] computing for function fun_no_default <- main.
+[eva:progress] 
+  computing for function fun_no_default <- main.
   Called from contract_special_float.c:94.
 [eva] using specification for function fun_no_default
-[eva] Done for function fun_no_default
-[eva] computing for function fun_no_disjoint <- main.
+[eva:progress] Done for function fun_no_default
+[eva:progress] 
+  computing for function fun_no_disjoint <- main.
   Called from contract_special_float.c:96.
 [eva] using specification for function fun_no_disjoint
-[eva] Done for function fun_no_disjoint
-[eva] computing for function fun_no_complete <- main.
+[eva:progress] Done for function fun_no_disjoint
+[eva:progress] 
+  computing for function fun_no_complete <- main.
   Called from contract_special_float.c:98.
 [eva] using specification for function fun_no_complete
-[eva] Done for function fun_no_complete
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Done for function fun_no_complete
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   a ∈ [-inf .. inf] ∪ {NaN}

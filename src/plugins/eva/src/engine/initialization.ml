@@ -453,10 +453,9 @@ module Make (Engine: Engine_Subset) = struct
         let* state = global_state ~lib_entry in
         supplied_state state cvalue_state
       | None ->
-        let pp = Parameters.ValShowProgress.get () in
-        if pp then Self.feedback "Computing initial state";
+        Self.feedback ~dkey:Self.dkey_progress "Computing initial state";
         let state = global_state ~lib_entry in
-        if pp then Self.feedback "Initial state computed";
+        Self.feedback ~dkey:Self.dkey_progress "Initial state computed";
         state
     in
     let b = Parameters.ResultsAll.get () in

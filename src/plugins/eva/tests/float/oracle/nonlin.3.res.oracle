@@ -3,8 +3,8 @@
   Floating-point constant 0.000000001 is not represented exactly. Will use 0x1.12e0be826d695p-30.
   (warn-once: no further messages from category 'parser:decimal-float' will be emitted)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   a ∈ {0}
   b ∈ {0}
@@ -36,21 +36,24 @@
   rbits2 ∈ {0}
   v ∈ [--..--]
   nondet ∈ [--..--]
-[eva] computing for function nonlin_f <- main.
+[eva:progress] 
+  computing for function nonlin_f <- main.
   Called from nonlin.c:144.
-[eva] computing for function Frama_C_float_interval <- nonlin_f <- main.
+[eva:progress] 
+  computing for function Frama_C_float_interval <- nonlin_f <- main.
   Called from nonlin.c:18.
 [eva] using specification for function Frama_C_float_interval
-[eva] nonlin.c:18: 
+[eva:progress] nonlin.c:18: 
   function Frama_C_float_interval, behavior finite: precondition 'order' got status valid.
-[eva] Done for function Frama_C_float_interval
-[eva] computing for function Frama_C_float_interval <- nonlin_f <- main.
+[eva:progress] Done for function Frama_C_float_interval
+[eva:progress] 
+  computing for function Frama_C_float_interval <- nonlin_f <- main.
   Called from nonlin.c:19.
-[eva] nonlin.c:19: 
+[eva:progress] nonlin.c:19: 
   function Frama_C_float_interval, behavior finite: precondition 'order' got status valid.
-[eva] Done for function Frama_C_float_interval
-[eva] nonlin.c:22: assertion got status valid.
-[eva] nonlin.c:26: assertion got status valid.
+[eva:progress] Done for function Frama_C_float_interval
+[eva:progress] nonlin.c:22: assertion got status valid.
+[eva:progress] nonlin.c:26: assertion got status valid.
 [eva:show] nonlin.c:44: 
   Frama_C_show_each_a_r2:
   {{ "a" }},
@@ -147,40 +150,46 @@
   [0x1.b800000000000p2 .. 0x1.c000000000000p2],
   {{ "r2" }},
   [0x1.b800000000000p2 .. 0x1.c800000000000p2]
-[eva] Recording results for nonlin_f
-[eva] Done for function nonlin_f
-[eva] computing for function other <- main.
+[eva:progress] Recording results for nonlin_f
+[eva:progress] Done for function nonlin_f
+[eva:progress] 
+  computing for function other <- main.
   Called from nonlin.c:145.
-[eva] computing for function Frama_C_float_interval <- other <- main.
+[eva:progress] 
+  computing for function Frama_C_float_interval <- other <- main.
   Called from nonlin.c:61.
-[eva] nonlin.c:61: 
+[eva:progress] nonlin.c:61: 
   function Frama_C_float_interval, behavior finite: precondition 'order' got status valid.
-[eva] Done for function Frama_C_float_interval
-[eva] computing for function Frama_C_float_interval <- other <- main.
+[eva:progress] Done for function Frama_C_float_interval
+[eva:progress] 
+  computing for function Frama_C_float_interval <- other <- main.
   Called from nonlin.c:62.
-[eva] nonlin.c:62: 
+[eva:progress] nonlin.c:62: 
   function Frama_C_float_interval, behavior finite: precondition 'order' got status valid.
-[eva] Done for function Frama_C_float_interval
+[eva:progress] Done for function Frama_C_float_interval
 [eva:alarm] nonlin.c:63: Warning: 
   accessing out of bounds index.
   assert 0 ≤ (int)\add_double((double)\mul_float(i, i), (double)2.0);
 [eva:alarm] nonlin.c:63: Warning: 
   accessing out of bounds index.
   assert (int)\add_double((double)\mul_float(i, i), (double)2.0) < 10;
-[eva] computing for function access_bits <- other <- main.
+[eva:progress] 
+  computing for function access_bits <- other <- main.
   Called from nonlin.c:69.
-[eva] Recording results for access_bits
-[eva] Done for function access_bits
-[eva] computing for function Frama_C_interval <- other <- main.
+[eva:progress] Recording results for access_bits
+[eva:progress] Done for function access_bits
+[eva:progress] 
+  computing for function Frama_C_interval <- other <- main.
   Called from nonlin.c:71.
 [eva] using specification for function Frama_C_interval
-[eva] nonlin.c:71: 
+[eva:progress] nonlin.c:71: 
   function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
+[eva:progress] Done for function Frama_C_interval
 [eva:alarm] nonlin.c:72: Warning: division by zero. assert x ≢ 0;
-[eva] Recording results for other
-[eva] Done for function other
-[eva] computing for function split_alarm <- main.
+[eva:progress] Recording results for other
+[eva:progress] Done for function other
+[eva:progress] 
+  computing for function split_alarm <- main.
   Called from nonlin.c:146.
 [eva:alarm] nonlin.c:76: Warning: non-finite float value. assert \is_finite(v);
 [eva:alarm] nonlin.c:77: Warning: 
@@ -189,22 +198,25 @@
   \is_finite(\div_double((double)1,
                         \add_double(\mul_double((double)ff, (double)ff),
                                    (double)0.000000001)));
-[eva] Recording results for split_alarm
-[eva] Done for function split_alarm
-[eva] computing for function norm <- main.
+[eva:progress] Recording results for split_alarm
+[eva:progress] Done for function split_alarm
+[eva:progress] 
+  computing for function norm <- main.
   Called from nonlin.c:147.
 [eva:alarm] nonlin.c:81: Warning: non-finite float value. assert \is_finite(v);
 [eva:alarm] nonlin.c:82: Warning: non-finite float value. assert \is_finite(v);
-[eva] computing for function Frama_C_float_interval <- norm <- main.
+[eva:progress] 
+  computing for function Frama_C_float_interval <- norm <- main.
   Called from nonlin.c:84.
-[eva] nonlin.c:84: 
+[eva:progress] nonlin.c:84: 
   function Frama_C_float_interval, behavior finite: precondition 'order' got status valid.
-[eva] Done for function Frama_C_float_interval
-[eva] computing for function Frama_C_float_interval <- norm <- main.
+[eva:progress] Done for function Frama_C_float_interval
+[eva:progress] 
+  computing for function Frama_C_float_interval <- norm <- main.
   Called from nonlin.c:85.
-[eva] nonlin.c:85: 
+[eva:progress] nonlin.c:85: 
   function Frama_C_float_interval, behavior finite: precondition 'order' got status valid.
-[eva] Done for function Frama_C_float_interval
+[eva:progress] Done for function Frama_C_float_interval
 [eva:alarm] nonlin.c:92: Warning: 
   non-finite float value. assert \is_finite(\mul_float(v1, v1));
 [eva:alarm] nonlin.c:92: Warning: 
@@ -212,9 +224,10 @@
 [eva:alarm] nonlin.c:92: Warning: 
   non-finite float value.
   assert \is_finite(\add_float(\mul_float(v1, v1), \mul_float(v2, v2)));
-[eva] Recording results for norm
-[eva] Done for function norm
-[eva] computing for function garbled <- main.
+[eva:progress] Recording results for norm
+[eva:progress] Done for function norm
+[eva:progress] 
+  computing for function garbled <- main.
   Called from nonlin.c:148.
 [eva:alarm] nonlin.c:98: Warning: 
   pointer downcast. assert (unsigned int)(&x_0) ≤ 2147483647;
@@ -230,42 +243,47 @@
   non-finite float value. assert \is_finite(a_0);
 [eva:alarm] nonlin.c:99: Warning: 
   non-finite float value. assert \is_finite(\add_float(a_0, a_0));
-[eva] Recording results for garbled
-[eva] Done for function garbled
-[eva] computing for function around_zeros <- main.
+[eva:progress] Recording results for garbled
+[eva:progress] Done for function garbled
+[eva:progress] 
+  computing for function around_zeros <- main.
   Called from nonlin.c:149.
-[eva] computing for function Frama_C_float_interval <- around_zeros <- main.
+[eva:progress] 
+  computing for function Frama_C_float_interval <- around_zeros <- main.
   Called from nonlin.c:108.
-[eva] nonlin.c:108: 
+[eva:progress] nonlin.c:108: 
   function Frama_C_float_interval, behavior finite: precondition 'order' got status valid.
-[eva] Done for function Frama_C_float_interval
+[eva:progress] Done for function Frama_C_float_interval
 [eva:alarm] nonlin.c:113: Warning: 
   non-finite float value.
   assert
   \is_finite(\div_float(f1, \sub_float(\sub_float(\add_float(f, f), f), f1)));
-[eva] Recording results for around_zeros
-[eva] Done for function around_zeros
-[eva] computing for function subdivide_strategy <- main.
+[eva:progress] Recording results for around_zeros
+[eva:progress] Done for function around_zeros
+[eva:progress] 
+  computing for function subdivide_strategy <- main.
   Called from nonlin.c:150.
-[eva] computing for function Frama_C_float_interval <- subdivide_strategy <- main.
+[eva:progress] 
+  computing for function Frama_C_float_interval <- subdivide_strategy <- main.
   Called from nonlin.c:126.
-[eva] nonlin.c:126: 
+[eva:progress] nonlin.c:126: 
   function Frama_C_float_interval, behavior finite: precondition 'order' got status valid.
-[eva] Done for function Frama_C_float_interval
+[eva:progress] Done for function Frama_C_float_interval
 [eva:alarm] nonlin.c:131: Warning: 
   non-finite float value. assert \is_finite(nondet);
 [eva:alarm] nonlin.c:135: Warning: 
   non-finite float value.
   assert \is_finite(\mul_float(\sub_float(x_0, d_0), \sub_float(x_0, d_0)));
-[eva] computing for function Frama_C_float_interval <- subdivide_strategy <- main.
+[eva:progress] 
+  computing for function Frama_C_float_interval <- subdivide_strategy <- main.
   Called from nonlin.c:136.
-[eva] nonlin.c:136: 
+[eva:progress] nonlin.c:136: 
   function Frama_C_float_interval, behavior finite: precondition 'order' got status valid.
-[eva] Done for function Frama_C_float_interval
-[eva] Recording results for subdivide_strategy
-[eva] Done for function subdivide_strategy
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Done for function Frama_C_float_interval
+[eva:progress] Recording results for subdivide_strategy
+[eva:progress] Done for function subdivide_strategy
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva:garbled-mix:summary] 
   Origins of garbled mix generated during analysis:
     nonlin.c:98: arithmetic operation on addresses

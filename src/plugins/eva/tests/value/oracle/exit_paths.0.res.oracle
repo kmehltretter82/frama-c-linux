@@ -1,10 +1,11 @@
 [kernel] Parsing exit_paths.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva] computing for function test1 <- main.
+[eva:progress] 
+  computing for function test1 <- main.
   Called from exit_paths.i:71.
 [eva:show] exit_paths.i:11: Frama_C_show_each_1: {{ "On exit path" }}, {0}
 [eva:show] exit_paths.i:16: Frama_C_show_each_3: {{ "Not on exit path" }}, {0}
@@ -21,9 +22,10 @@
   Frama_C_show_each_3: {{ "Not on exit path" }}, [0..9]
 [eva:show] exit_paths.i:13: 
   Frama_C_show_each_2: {{ "On exit path" }}, [10..2147483647]
-[eva] Recording results for test1
-[eva] Done for function test1
-[eva] computing for function test2 <- main.
+[eva:progress] Recording results for test1
+[eva:progress] Done for function test1
+[eva:progress] 
+  computing for function test2 <- main.
   Called from exit_paths.i:72.
 [eva:show] exit_paths.i:25: Frama_C_show_each_4: {{ "On exit path" }}, {0}
 [eva:show] exit_paths.i:28: Frama_C_show_each_5: {{ "On exit path" }}, {0}, {0}
@@ -81,9 +83,10 @@
   signed overflow. assert i + 1 ≤ 2147483647;
 [eva:show] exit_paths.i:34: 
   Frama_C_show_each_7: {{ "On exit path" }}, [11..2147483647], [0..9]
-[eva] Recording results for test2
-[eva] Done for function test2
-[eva] computing for function test3 <- main.
+[eva:progress] Recording results for test2
+[eva:progress] Done for function test2
+[eva:progress] 
+  computing for function test3 <- main.
   Called from exit_paths.i:73.
 [eva:show] exit_paths.i:49: Frama_C_show_each_10: {{ "On exit path" }}, {0}
 [eva:show] exit_paths.i:52: Frama_C_show_each_11: {{ "On exit path" }}, {0}, {0}
@@ -136,10 +139,10 @@
   Frama_C_show_each_15: {{ "Not on exit path" }}, [0..9]
 [eva:show] exit_paths.i:61: 
   Frama_C_show_each_14: {{ "On exit path" }}, [10..2147483647]
-[eva] Recording results for test3
-[eva] Done for function test3
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for test3
+[eva:progress] Done for function test3
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function test1:
   i ∈ [10..2147483647]

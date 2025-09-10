@@ -1,7 +1,7 @@
 [kernel] Parsing initialized_copy.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   w[0..9] ∈ {0}
   v ∈ [--..--]
@@ -82,10 +82,11 @@
   accessing uninitialized left-value. assert \initialized(&a_6);
 [eva:alarm] initialized_copy.i:143: Warning: 
   accessing uninitialized left-value. assert \initialized(&a_7);
-[eva] computing for function f <- main.
+[eva:progress] 
+  computing for function f <- main.
   Called from initialized_copy.i:143.
-[eva] Recording results for f
-[eva] Done for function f
+[eva:progress] Recording results for f
+[eva:progress] Done for function f
 [eva:show] initialized_copy.i:144: 
   Frama_C_dump_each:
   # cvalue:
@@ -99,10 +100,11 @@
 [kernel:annot:missing-spec] initialized_copy.i:151: Warning: 
   Neither code nor specification for function g, generating default assigns.
   See -generated-spec-* options for more info.
-[eva] computing for function g <- main.
+[eva:progress] 
+  computing for function g <- main.
   Called from initialized_copy.i:151.
 [eva] using specification for function g
-[eva] Done for function g
+[eva:progress] Done for function g
 [eva:show] initialized_copy.i:152: 
   Frama_C_dump_each:
   # cvalue:
@@ -111,8 +113,8 @@
   a_8 ∈ {1}
   __retres ∈ UNINITIALIZED
   ==END OF DUMP==
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] initialized_copy.i:29: 
   assertion 'Eva,initialization' got final status invalid.
 [eva] initialized_copy.i:47: 
@@ -158,15 +160,15 @@
 [inout] Inputs for function main:
     v
 [eva] Analyzing a complete application starting at main2
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   w[0..9] ∈ {0}
   v ∈ [--..--]
 [eva:alarm] initialized_copy.i:160: Warning: 
   accessing uninitialized left-value. assert \initialized(&x);
-[eva] Recording results for main2
-[eva] Done for function main2
+[eva:progress] Recording results for main2
+[eva:progress] Done for function main2
 [eva] initialized_copy.i:160: 
   assertion 'Eva,initialization' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
@@ -184,13 +186,13 @@
 [inout] Inputs for function main2:
     \nothing
 [eva] Analyzing a complete application starting at main2
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   w[0..9] ∈ {0}
   v ∈ [--..--]
-[eva] Recording results for main2
-[eva] Done for function main2
+[eva:progress] Recording results for main2
+[eva:progress] Done for function main2
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main2:
   

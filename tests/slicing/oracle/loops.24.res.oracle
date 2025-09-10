@@ -1,7 +1,7 @@
 [kernel] Parsing loops.i (no preprocessing)
 [eva] Analyzing an incomplete application starting at alarm
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   G ∈ [--..--]
   C1 ∈ [--..--]
@@ -9,10 +9,10 @@
   X ∈ [--..--]
   Y ∈ [--..--]
   Z ∈ [--..--]
-[eva] loops.i:210: assertion got status valid.
+[eva:progress] loops.i:210: assertion got status valid.
 [eva:alarm] loops.i:211: Warning: signed overflow. assert j + 1 ≤ 2147483647;
-[eva] Recording results for alarm
-[eva] Done for function alarm
+[eva:progress] Recording results for alarm
+[eva:progress] Done for function alarm
 [from] Computing for function alarm
 [from] Done for function alarm
 [from] ====== DEPENDENCIES COMPUTED ======

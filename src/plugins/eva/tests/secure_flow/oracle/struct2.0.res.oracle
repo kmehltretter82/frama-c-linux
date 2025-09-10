@@ -1,16 +1,16 @@
 [kernel] Expanding arguments from test_options.txt
 [kernel] Parsing struct2.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   secret ∈ [--..--]
-[eva] struct2.c:33: assertion got status valid.
-[eva] struct2.c:34: assertion got status valid.
-[eva] struct2.c:36: assertion got status valid.
-[eva] struct2.c:37: assertion got status valid.
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] struct2.c:33: assertion got status valid.
+[eva:progress] struct2.c:34: assertion got status valid.
+[eva:progress] struct2.c:36: assertion got status valid.
+[eva:progress] struct2.c:37: assertion got status valid.
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [scope:rm_asserts] removing 2 assertion(s)
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:

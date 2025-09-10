@@ -2,62 +2,72 @@
 [sparecode] remove unused code...
 [sparecode] selecting function main outputs and entry point
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   G ∈ {0}
   X10 ∈ {0}
   Y10 ∈ {0}
-[eva] computing for function param <- main.
+[eva:progress] 
+  computing for function param <- main.
   Called from intra.i:82.
-[eva] Recording results for param
-[eva] Done for function param
-[eva] computing for function tmp <- main.
+[eva:progress] Recording results for param
+[eva:progress] Done for function param
+[eva:progress] 
+  computing for function tmp <- main.
   Called from intra.i:83.
-[eva] intra.i:21: assertion got status valid.
-[eva] intra.i:23: assertion got status valid.
-[eva] Recording results for tmp
-[eva] Done for function tmp
-[eva] computing for function spare_called_fct <- main.
+[eva:progress] intra.i:21: assertion got status valid.
+[eva:progress] intra.i:23: assertion got status valid.
+[eva:progress] Recording results for tmp
+[eva:progress] Done for function tmp
+[eva:progress] 
+  computing for function spare_called_fct <- main.
   Called from intra.i:84.
-[eva] Recording results for spare_called_fct
-[eva] Done for function spare_called_fct
-[eva] computing for function call_two_outputs <- main.
+[eva:progress] Recording results for spare_called_fct
+[eva:progress] Done for function spare_called_fct
+[eva:progress] 
+  computing for function call_two_outputs <- main.
   Called from intra.i:85.
-[eva] computing for function two_outputs <- call_two_outputs <- main.
+[eva:progress] 
+  computing for function two_outputs <- call_two_outputs <- main.
   Called from intra.i:49.
-[eva] Recording results for two_outputs
-[eva] Done for function two_outputs
-[eva] computing for function two_outputs <- call_two_outputs <- main.
+[eva:progress] Recording results for two_outputs
+[eva:progress] Done for function two_outputs
+[eva:progress] 
+  computing for function two_outputs <- call_two_outputs <- main.
   Called from intra.i:53.
-[eva] Recording results for two_outputs
-[eva] Done for function two_outputs
-[eva] Recording results for call_two_outputs
-[eva] Done for function call_two_outputs
-[eva] computing for function loop <- main.
+[eva:progress] Recording results for two_outputs
+[eva:progress] Done for function two_outputs
+[eva:progress] Recording results for call_two_outputs
+[eva:progress] Done for function call_two_outputs
+[eva:progress] 
+  computing for function loop <- main.
   Called from intra.i:86.
-[eva] intra.i:64: assertion got status valid.
-[eva] intra.i:65: loop invariant got status valid.
+[eva:progress] intra.i:64: assertion got status valid.
+[eva:progress] intra.i:65: loop invariant got status valid.
 [eva:partition] intra.i:67: starting to merge loop iterations
-[eva] Recording results for loop
-[eva] Done for function loop
-[eva] computing for function assign <- main.
+[eva:progress] Recording results for loop
+[eva:progress] Done for function loop
+[eva:progress] 
+  computing for function assign <- main.
   Called from intra.i:87.
-[eva] Recording results for assign
-[eva] Done for function assign
-[eva] computing for function assign <- main.
+[eva:progress] Recording results for assign
+[eva:progress] Done for function assign
+[eva:progress] 
+  computing for function assign <- main.
   Called from intra.i:88.
-[eva] Recording results for assign
-[eva] Done for function assign
+[eva:progress] Recording results for assign
+[eva:progress] Done for function assign
 [kernel:annot:missing-spec] intra.i:91: Warning: 
   Neither code nor specification for function stop, generating default assigns.
   See -generated-spec-* options for more info.
-[eva] computing for function stop <- main.
+[eva:progress] 
+  computing for function stop <- main.
   Called from intra.i:91.
 [eva] using specification for function stop
-[eva] Done for function stop
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Done for function stop
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [pdg] computing for function main
 [from] Computing for function param
 [from] Done for function param

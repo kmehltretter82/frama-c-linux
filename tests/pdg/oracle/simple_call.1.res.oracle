@@ -1,37 +1,41 @@
 [kernel] Parsing simple_call.c (with preprocessing)
 [eva] Analyzing a complete application starting at call_in_loop
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   G ∈ [--..--]
   G1 ∈ [--..--]
   G2 ∈ [--..--]
   S ∈ [--..--]
-[eva] computing for function call <- call_in_loop.
+[eva:progress] 
+  computing for function call <- call_in_loop.
   Called from simple_call.c:52.
 [eva:alarm] simple_call.c:45: Warning: 
   signed overflow. assert G + y ≤ 2147483647;
-[eva] Recording results for call
-[eva] Done for function call
+[eva:progress] Recording results for call
+[eva:progress] Done for function call
 [eva:partition] simple_call.c:51: starting to merge loop iterations
-[eva] computing for function call <- call_in_loop.
+[eva:progress] 
+  computing for function call <- call_in_loop.
   Called from simple_call.c:52.
-[eva] Recording results for call
-[eva] Done for function call
-[eva] computing for function call <- call_in_loop.
+[eva:progress] Recording results for call
+[eva:progress] Done for function call
+[eva:progress] 
+  computing for function call <- call_in_loop.
   Called from simple_call.c:52.
-[eva] Recording results for call
-[eva] Done for function call
-[eva] computing for function call <- call_in_loop.
+[eva:progress] Recording results for call
+[eva:progress] Done for function call
+[eva:progress] 
+  computing for function call <- call_in_loop.
   Called from simple_call.c:52.
-[eva] Recording results for call
-[eva] Done for function call
+[eva:progress] Recording results for call
+[eva:progress] Done for function call
 [eva:alarm] simple_call.c:52: Warning: 
   signed overflow. assert a + tmp ≤ 2147483647;
                    (tmp from call(i, c))
-[eva] simple_call.c:52: Reusing old results for call to call
-[eva] Recording results for call_in_loop
-[eva] Done for function call_in_loop
+[eva:progress] simple_call.c:52: Reusing old results for call to call
+[eva:progress] Recording results for call_in_loop
+[eva:progress] Done for function call_in_loop
 [pdg] computing for function call_in_loop
 [from] Computing for function call
 [from] Done for function call

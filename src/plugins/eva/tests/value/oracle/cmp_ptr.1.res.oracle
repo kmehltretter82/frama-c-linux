@@ -1,7 +1,7 @@
 [kernel] Parsing cmp_ptr.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   p ∈ {0}
   T[0] ∈ {0}
@@ -91,8 +91,8 @@
   assert \pointer_comparable((void (*)())0, (void (*)())(&f + 3));
 [eva:pointer-comparison] cmp_ptr.i:32: 
   evaluating condition to {0; 1} instead of {1} because of -eva-undefined-pointer-comparison-propagate-all
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   p ∈ {{ &T + [-8589934588..8589934592],0%4 }}

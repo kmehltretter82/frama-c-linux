@@ -1,56 +1,64 @@
 [kernel] Parsing partitioning-cases.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva] computing for function test_builtin <- main.
+[eva:progress] 
+  computing for function test_builtin <- main.
   Called from partitioning-cases.c:53.
-[eva] partitioning-cases.c:12: Call to builtin malloc
+[eva:progress] partitioning-cases.c:12: Call to builtin malloc
 [eva:malloc:new] partitioning-cases.c:12: 
   allocating variable __malloc_test_builtin_l12
 [eva:show] partitioning-cases.c:13: 
   Frama_C_show_each: {{ NULL ; &__malloc_test_builtin_l12 }}
-[eva] Recording results for test_builtin
-[eva] Done for function test_builtin
-[eva] computing for function test_spec <- main.
+[eva:progress] Recording results for test_builtin
+[eva:progress] Done for function test_builtin
+[eva:progress] 
+  computing for function test_spec <- main.
   Called from partitioning-cases.c:54.
-[eva] computing for function Frama_C_interval <- test_spec <- main.
+[eva:progress] 
+  computing for function Frama_C_interval <- test_spec <- main.
   Called from partitioning-cases.c:38.
 [eva] using specification for function Frama_C_interval
-[eva] partitioning-cases.c:38: 
+[eva:progress] partitioning-cases.c:38: 
   function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
-[eva] computing for function sgn_spec <- test_spec <- main.
+[eva:progress] Done for function Frama_C_interval
+[eva:progress] 
+  computing for function sgn_spec <- test_spec <- main.
   Called from partitioning-cases.c:38.
 [eva] using specification for function sgn_spec
-[eva] Done for function sgn_spec
+[eva:progress] Done for function sgn_spec
 [eva:show] partitioning-cases.c:39: Frama_C_show_each: {-1; 0; 1}
-[eva] computing for function Frama_C_interval <- test_spec <- main.
+[eva:progress] 
+  computing for function Frama_C_interval <- test_spec <- main.
   Called from partitioning-cases.c:40.
-[eva] partitioning-cases.c:40: 
+[eva:progress] partitioning-cases.c:40: 
   function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
-[eva] computing for function f_spec <- test_spec <- main.
+[eva:progress] Done for function Frama_C_interval
+[eva:progress] 
+  computing for function f_spec <- test_spec <- main.
   Called from partitioning-cases.c:40.
 [eva] using specification for function f_spec
-[eva] Done for function f_spec
+[eva:progress] Done for function f_spec
 [eva:show] partitioning-cases.c:41: Frama_C_show_each: [-2147483648..2147483647]
-[eva] Recording results for test_spec
-[eva] Done for function test_spec
-[eva] computing for function test_assert <- main.
+[eva:progress] Recording results for test_spec
+[eva:progress] Done for function test_spec
+[eva:progress] 
+  computing for function test_assert <- main.
   Called from partitioning-cases.c:55.
-[eva] computing for function Frama_C_interval <- test_assert <- main.
+[eva:progress] 
+  computing for function Frama_C_interval <- test_assert <- main.
   Called from partitioning-cases.c:46.
-[eva] partitioning-cases.c:46: 
+[eva:progress] partitioning-cases.c:46: 
   function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
-[eva] partitioning-cases.c:47: assertion got status valid.
+[eva:progress] Done for function Frama_C_interval
+[eva:progress] partitioning-cases.c:47: assertion got status valid.
 [eva:show] partitioning-cases.c:48: Frama_C_show_each: [0..100]
-[eva] Recording results for test_assert
-[eva] Done for function test_assert
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for test_assert
+[eva:progress] Done for function test_assert
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function test_assert:
   Frama_C_entropy_source ∈ [--..--]

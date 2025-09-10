@@ -1,36 +1,41 @@
 [kernel] Parsing subset.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   t[0..9] ∈ {0}
   __fc_fopen[0..511] ∈ {0}
   _p__fc_fopen ∈ {{ &__fc_fopen[0] }}
   v ∈ [--..--]
-[eva] computing for function main1 <- main.
+[eva:progress] 
+  computing for function main1 <- main.
   Called from subset.c:80.
 [eva:alarm] subset.c:23: Warning: assertion got status unknown.
-[eva] subset.c:24: assertion got status valid.
-[eva] subset.c:25: assertion got status valid.
+[eva:progress] subset.c:24: assertion got status valid.
+[eva:progress] subset.c:25: assertion got status valid.
 [eva:alarm] subset.c:29: Warning: assertion got status unknown.
-[eva] computing for function fopen <- main1 <- main.
+[eva:progress] 
+  computing for function fopen <- main1 <- main.
   Called from subset.c:32.
 [eva] using specification for function fopen
-[eva] Done for function fopen
-[eva] subset.c:33: assertion got status valid.
-[eva] computing for function fopen2 <- main1 <- main.
+[eva:progress] Done for function fopen
+[eva:progress] subset.c:33: assertion got status valid.
+[eva:progress] 
+  computing for function fopen2 <- main1 <- main.
   Called from subset.c:34.
 [eva] using specification for function fopen2
-[eva] Done for function fopen2
-[eva] subset.c:35: assertion got status valid.
-[eva] Recording results for main1
-[eva] Done for function main1
-[eva] computing for function main2 <- main.
+[eva:progress] Done for function fopen2
+[eva:progress] subset.c:35: assertion got status valid.
+[eva:progress] Recording results for main1
+[eva:progress] Done for function main1
+[eva:progress] 
+  computing for function main2 <- main.
   Called from subset.c:81.
-[eva] subset.c:44: assertion got status valid.
-[eva] Recording results for main2
-[eva] Done for function main2
-[eva] computing for function main3 <- main.
+[eva:progress] subset.c:44: assertion got status valid.
+[eva:progress] Recording results for main2
+[eva:progress] Done for function main2
+[eva:progress] 
+  computing for function main3 <- main.
   Called from subset.c:82.
 [eva:alarm] subset.c:49: Warning: accessing out of bounds index. assert 0 ≤ v;
 [eva:alarm] subset.c:49: Warning: accessing out of bounds index. assert v < 10;
@@ -42,9 +47,10 @@
 [eva:alarm] subset.c:57: Warning: assertion got status unknown.
 [eva:alarm] subset.c:58: Warning: assertion got status unknown.
 [eva:alarm] subset.c:59: Warning: assertion got status unknown.
-[eva] Recording results for main3
-[eva] Done for function main3
-[eva] computing for function main4 <- main.
+[eva:progress] Recording results for main3
+[eva:progress] Done for function main3
+[eva:progress] 
+  computing for function main4 <- main.
   Called from subset.c:83.
 [eva:alarm] subset.c:64: Warning: accessing out of bounds index. assert 0 ≤ v;
 [eva:alarm] subset.c:64: Warning: accessing out of bounds index. assert v < 10;
@@ -55,13 +61,13 @@
 [eva:alarm] subset.c:70: Warning: assertion got status unknown.
 [eva:alarm] subset.c:72: Warning: assertion got status unknown.
 [eva:alarm] subset.c:73: Warning: assertion got status unknown.
-[eva] subset.c:74: assertion 'OK' got status valid.
+[eva:progress] subset.c:74: assertion 'OK' got status valid.
 [eva:alarm] subset.c:75: Warning: 
   assertion 'KO' got status invalid (stopping propagation).
-[eva] Recording results for main4
-[eva] Done for function main4
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for main4
+[eva:progress] Done for function main4
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [scope:rm_asserts] removing 3 assertion(s)
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main1:

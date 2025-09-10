@@ -1,20 +1,21 @@
 [kernel] Expanding arguments from test_options.txt
 [kernel] Parsing funcall9.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   d ∈ [--..--]
   e ∈ {{ NULL ; &S_e[0] }}
   L ∈ {5}
   S_e[0..1] ∈ [--..--]
-[eva] funcall9.c:27: assertion got status valid.
-[eva] computing for function fn1 <- main.
+[eva:progress] funcall9.c:27: assertion got status valid.
+[eva:progress] 
+  computing for function fn1 <- main.
   Called from funcall9.c:28.
-[eva] Recording results for fn1
-[eva] Done for function fn1
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for fn1
+[eva:progress] Done for function fn1
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function fn1:
   d ∈ {5}

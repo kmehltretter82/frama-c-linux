@@ -1025,6 +1025,12 @@ module ValShowProgress =
       let option_name = "-eva-show-progress"
       let help = "Show progression messages during analysis"
     end)
+let () =
+  let hook _previous enabled =
+    let prefix = if enabled then "+" else "-" in
+    Self.Message_category.set (prefix ^ "progress");
+  in
+  ValShowProgress.add_set_hook hook
 
 let () = Parameter_customize.set_group messages
 module ValShowPerf =

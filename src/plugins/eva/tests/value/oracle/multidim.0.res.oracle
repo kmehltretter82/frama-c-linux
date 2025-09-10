@@ -1,12 +1,13 @@
 [kernel] Parsing multidim.c (with preprocessing)
 [eva:experimental] Warning: The multidim domain is experimental.
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   z[0..3] ∈ {0}
   nondet ∈ [--..--]
-[eva] computing for function main1 <- main.
+[eva:progress] 
+  computing for function main1 <- main.
   Called from multidim.c:187.
 [eva:show] multidim.c:39: 
   Frama_C_domain_show_each:
@@ -65,10 +66,11 @@
                     .t1[0 .. 3] = { .f = {{ ANYTHING }} or UNINITIALIZED },
                     .t2[0 .. 3] = { .f = {{ ANYTHING }} or UNINITIALIZED }
                   }
-[eva] computing for function f <- main1 <- main.
+[eva:progress] 
+  computing for function f <- main1 <- main.
   Called from multidim.c:47.
 [eva] using specification for function f
-[eva] Done for function f
+[eva:progress] Done for function f
 [eva:show] multidim.c:48: 
   Frama_C_domain_show_each:
   z : # cvalue: [--..--]
@@ -81,9 +83,10 @@
                     }
                   }
 [eva:alarm] multidim.c:50: Warning: check got status unknown.
-[eva] Recording results for main1
-[eva] Done for function main1
-[eva] computing for function main2 <- main.
+[eva:progress] Recording results for main1
+[eva:progress] Done for function main1
+[eva:progress] 
+  computing for function main2 <- main.
   Called from multidim.c:188.
 [eva:partition] multidim.c:55: starting to merge loop iterations
 [eva:alarm] multidim.c:58: Warning: check got status unknown.
@@ -91,9 +94,10 @@
   Frama_C_domain_show_each:
   t : # cvalue: {0; 1}
       # multidim: [0 .. 9] = {1}
-[eva] Recording results for main2
-[eva] Done for function main2
-[eva] computing for function main3 <- main.
+[eva:progress] Recording results for main2
+[eva:progress] Done for function main2
+[eva:progress] 
+  computing for function main3 <- main.
   Called from multidim.c:189.
 [eva:partition] multidim.c:65: starting to merge loop iterations
 [eva:partition] multidim.c:64: starting to merge loop iterations
@@ -105,17 +109,19 @@
   more than 1(28) locations to update in array. Approximating.
 [kernel:approximation] multidim.c:67: 
   more than 1(28) locations to update in array. Approximating.
-[eva] computing for function Frama_C_interval <- main3 <- main.
+[eva:progress] 
+  computing for function Frama_C_interval <- main3 <- main.
   Called from multidim.c:70.
 [eva] using specification for function Frama_C_interval
-[eva] multidim.c:70: 
+[eva:progress] multidim.c:70: 
   function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
-[eva] computing for function Frama_C_interval <- main3 <- main.
+[eva:progress] Done for function Frama_C_interval
+[eva:progress] 
+  computing for function Frama_C_interval <- main3 <- main.
   Called from multidim.c:71.
-[eva] multidim.c:71: 
+[eva:progress] multidim.c:71: 
   function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
+[eva:progress] Done for function Frama_C_interval
 [eva:show] multidim.c:73: 
   Frama_C_domain_show_each:
   z : # cvalue: [--..--]
@@ -130,9 +136,10 @@
                   }
   r : # cvalue: [--..--]
       # multidim: { .f = [-3.40282346639e+38 .. 3.40282346639e+38], .i = T }
-[eva] Recording results for main3
-[eva] Done for function main3
-[eva] computing for function main4 <- main.
+[eva:progress] Recording results for main3
+[eva:progress] Done for function main3
+[eva:progress] 
+  computing for function main4 <- main.
   Called from multidim.c:190.
 [eva:loop-unroll:partial] multidim.c:81: loop not completely unrolled
 [eva:partition] multidim.c:81: starting to merge loop iterations
@@ -141,9 +148,10 @@
   Frama_C_domain_show_each:
   t : # cvalue: {42}
       # multidim: { [0] = {42}, [1] = {42}, [2] = {42}, [3] = {42} }
-[eva] Recording results for main4
-[eva] Done for function main4
-[eva] computing for function main5 <- main.
+[eva:progress] Recording results for main4
+[eva:progress] Done for function main4
+[eva:progress] 
+  computing for function main5 <- main.
   Called from multidim.c:191.
 [eva:partition] multidim.c:96: starting to merge loop iterations
 [eva:show] multidim.c:104: 
@@ -151,9 +159,10 @@
   t : # cvalue: [0..9] ∈ {0; 1}
                 [10..19] ∈ {0; 2}
       # multidim: { [0 .. 9] = {1}, [10 .. 18] = {2}, [19] = {2} }
-[eva] Recording results for main5
-[eva] Done for function main5
-[eva] computing for function main6 <- main.
+[eva:progress] Recording results for main5
+[eva:progress] Done for function main5
+[eva:progress] 
+  computing for function main6 <- main.
   Called from multidim.c:192.
 [eva:partition] multidim.c:114: Trace partitioning superposing up to 100 states
 [eva:show] multidim.c:118: 
@@ -169,9 +178,10 @@
                     [98] = {0},
                     [99] = {0}
                   }
-[eva] Recording results for main6
-[eva] Done for function main6
-[eva] computing for function main7 <- main.
+[eva:progress] Recording results for main6
+[eva:progress] Done for function main6
+[eva:progress] 
+  computing for function main7 <- main.
   Called from multidim.c:193.
 [eva:partition] multidim.c:134: starting to merge loop iterations
 [kernel:approximation] multidim.c:136: 
@@ -190,25 +200,28 @@
                     { .typ = {1}, .val.i = {42} } or 
                     { .typ = {2}, .val.f = {42.} }
                   }
-[eva] computing for function Frama_C_interval <- main7 <- main.
+[eva:progress] 
+  computing for function Frama_C_interval <- main7 <- main.
   Called from multidim.c:147.
-[eva] multidim.c:147: 
+[eva:progress] multidim.c:147: 
   function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
+[eva:progress] Done for function Frama_C_interval
 [eva:show] multidim.c:150: Frama_C_show_each_INT: {42}
 [eva:show] multidim.c:153: Frama_C_show_each_FLOAT: {42.}
-[eva] Recording results for main7
-[eva] Done for function main7
-[eva] computing for function main8 <- main.
+[eva:progress] Recording results for main7
+[eva:progress] Done for function main7
+[eva:progress] 
+  computing for function main8 <- main.
   Called from multidim.c:194.
 [eva:partition] multidim.c:165: starting to merge loop iterations
 [eva:show] multidim.c:169: 
   Frama_C_domain_show_each:
   t : # cvalue: {0; 1}
       # multidim: [0 .. 9] = {1}
-[eva] Recording results for main8
-[eva] Done for function main8
-[eva] computing for function main9 <- main.
+[eva:progress] Recording results for main8
+[eva:progress] Done for function main8
+[eva:progress] 
+  computing for function main9 <- main.
   Called from multidim.c:195.
 [eva:partition] multidim.c:176: starting to merge loop iterations
 [eva:show] multidim.c:182: 
@@ -217,10 +230,10 @@
        # multidim: [0 .. 9] = {0}
   t2 : # cvalue: {0} or UNINITIALIZED
        # multidim: T
-[eva] Recording results for main9
-[eva] Done for function main9
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for main9
+[eva:progress] Done for function main9
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main1:
   z[0..3] ∈ [--..--]

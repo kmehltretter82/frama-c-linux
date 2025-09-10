@@ -1,7 +1,7 @@
 [kernel] Parsing origin.i (no preprocessing)
 [eva] Analyzing a complete application starting at origin
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   a ∈ {0}
   b ∈ {0}
@@ -55,10 +55,11 @@
 [kernel:annot:missing-spec] origin.i:124: Warning: 
   Neither code nor specification for function f, generating default assigns.
   See -generated-spec-* options for more info.
-[eva] computing for function f <- origin.
+[eva:progress] 
+  computing for function f <- origin.
   Called from origin.i:124.
 [eva] using specification for function f
-[eva] Done for function f
+[eva:progress] Done for function f
 [eva:garbled-mix:write] origin.i:126: 
   Assigning imprecise value to r.p because of misaligned read of addresses.
 [eva:garbled-mix:write] origin.i:129: 
@@ -72,8 +73,8 @@
 [eva:garbled-mix:write] origin.i:130: 
   Assigning imprecise value to r.t[1]
   because of arithmetic operation on addresses.
-[eva] Recording results for origin
-[eva] Done for function origin
+[eva:progress] Recording results for origin
+[eva:progress] Done for function origin
 [eva:garbled-mix:summary] 
   Origins of garbled mix generated during analysis:
     origin.i:126: misaligned read of addresses

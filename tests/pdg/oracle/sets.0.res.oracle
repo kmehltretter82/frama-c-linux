@@ -1,7 +1,7 @@
 [kernel] Parsing sets.c (with preprocessing)
 [eva] Analyzing an incomplete application starting at f
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   b ∈ [--..--]
   c ∈ [--..--]
@@ -10,8 +10,8 @@
   z ∈ [--..--]
   t ∈ [--..--]
 [eva:alarm] sets.c:15: Warning: signed overflow. assert b + y ≤ 2147483647;
-[eva] Recording results for f
-[eva] Done for function f
+[eva:progress] Recording results for f
+[eva:progress] Done for function f
 [inout] InOut (internal) for function f:
   Operational inputs:
     a

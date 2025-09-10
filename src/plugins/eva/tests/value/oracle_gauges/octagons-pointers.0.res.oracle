@@ -1,4 +1,4 @@
-83a84,108
+86a87,111
 > [eva:partition] octagons-pointers.c:43: starting to merge loop iterations
 > [eva:show] octagons-pointers.c:46: 
 >   Frama_C_dump_each:
@@ -7,7 +7,7 @@
 >      cmd->cmdLen + index ∈ [--..434]
 >       ]}
 >   ==END OF DUMP==
-> [eva] octagons-pointers.c:47: Reusing old results for call to cmdRead
+> [eva:progress] octagons-pointers.c:47: Reusing old results for call to cmdRead
 > [eva:show] octagons-pointers.c:46: 
 >   Frama_C_dump_each:
 >   # octagon:
@@ -15,7 +15,7 @@
 >      cmd->cmdLen + index ∈ [--..434]
 >       ]}
 >   ==END OF DUMP==
-> [eva] octagons-pointers.c:47: Reusing old results for call to cmdRead
+> [eva:progress] octagons-pointers.c:47: Reusing old results for call to cmdRead
 > [eva:show] octagons-pointers.c:46: 
 >   Frama_C_dump_each:
 >   # octagon:
@@ -23,4 +23,4 @@
 >      cmd->cmdLen + index ∈ [--..434]
 >       ]}
 >   ==END OF DUMP==
-> [eva] octagons-pointers.c:47: Reusing old results for call to cmdRead
+> [eva:progress] octagons-pointers.c:47: Reusing old results for call to cmdRead

@@ -1,4 +1,4 @@
-27,29c27,30
+31,33c31,34
 < [eva:alarm] incompatible_states.c:41: Warning: 
 <   accessing uninitialized left-value.
 <   assert \initialized(&t[(int)((int)(2 * i) / 2)]);
@@ -7,10 +7,10 @@
 >   The evaluation of the expression t[(2 * i) / 2]
 >   led to bottom without alarms:
 >   at this point the product of states has no possible concretization.
-41,42d41
+47,48d47
 < [eva:alarm] incompatible_states.c:53: Warning: 
 <   division by zero. assert t[i] ≢ 0;
-47,49d45
+53,55d51
 < [eva] incompatible_states.c:41: 
 <   assertion 'Eva,initialization' got final status invalid.
 < [scope:rm_asserts] removing 2 assertion(s)

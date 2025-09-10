@@ -1,18 +1,18 @@
 [kernel] Parsing memset_malloc_0.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   p ∈ {0}
-[eva] memset_malloc_0.c:17: Call to builtin malloc
+[eva:progress] memset_malloc_0.c:17: Call to builtin malloc
 [eva:malloc:new] memset_malloc_0.c:17: allocating variable __malloc_main_l17
-[eva] memset_malloc_0.c:18: Call to builtin memset
-[eva] memset_malloc_0.c:18: 
+[eva:progress] memset_malloc_0.c:18: Call to builtin memset
+[eva:progress] memset_malloc_0.c:18: 
   function memset: precondition 'valid_s' got status valid.
 [eva:acsl:unsupported] FRAMAC_SHARE/libc/string.h:147: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memset
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   __fc_heap_status ∈ [--..--]

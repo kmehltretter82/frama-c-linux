@@ -1,29 +1,34 @@
 [kernel] Parsing partitioning-interproc.c (with preprocessing)
 [eva] Analyzing a complete application starting at cassign_test
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva] computing for function cassign <- cassign_test.
+[eva:progress] 
+  computing for function cassign <- cassign_test.
   Called from partitioning-interproc.c:24.
-[eva] computing for function Frama_C_nondet <- cassign <- cassign_test.
+[eva:progress] 
+  computing for function Frama_C_nondet <- cassign <- cassign_test.
   Called from partitioning-interproc.c:11.
 [eva] using specification for function Frama_C_nondet
-[eva] Done for function Frama_C_nondet
-[eva] Recording results for cassign
-[eva] Done for function cassign
+[eva:progress] Done for function Frama_C_nondet
+[eva:progress] Recording results for cassign
+[eva:progress] Done for function cassign
 [eva:show] partitioning-interproc.c:26: Frama_C_show_each: {1}
-[eva] computing for function cassign <- cassign_test.
+[eva:progress] 
+  computing for function cassign <- cassign_test.
   Called from partitioning-interproc.c:30.
-[eva] computing for function Frama_C_nondet <- cassign <- cassign_test.
+[eva:progress] 
+  computing for function Frama_C_nondet <- cassign <- cassign_test.
   Called from partitioning-interproc.c:11.
-[eva] Done for function Frama_C_nondet
-[eva] Recording results for cassign
-[eva] Done for function cassign
-[eva] partitioning-interproc.c:30: Reusing old results for call to cassign
+[eva:progress] Done for function Frama_C_nondet
+[eva:progress] Recording results for cassign
+[eva:progress] Done for function cassign
+[eva:progress] partitioning-interproc.c:30: 
+  Reusing old results for call to cassign
 [eva:show] partitioning-interproc.c:32: Frama_C_show_each: {1}
-[eva] Recording results for cassign_test
-[eva] Done for function cassign_test
+[eva:progress] Recording results for cassign_test
+[eva:progress] Done for function cassign_test
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function cassign:
   Frama_C_entropy_source ∈ [--..--]

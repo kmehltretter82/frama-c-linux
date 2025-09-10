@@ -1,19 +1,21 @@
 [kernel] Parsing callstack.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva] computing for function g <- main.
+[eva:progress] 
+  computing for function g <- main.
   Called from callstack.i:12.
-[eva] computing for function f <- g <- main.
+[eva:progress] 
+  computing for function f <- g <- main.
   Called from callstack.i:7.
-[eva] Recording results for f
-[eva] Done for function f
-[eva] Recording results for g
-[eva] Done for function g
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for f
+[eva:progress] Done for function f
+[eva:progress] Recording results for g
+[eva:progress] Done for function g
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function f:
   NON TERMINATING FUNCTION

@@ -1,7 +1,7 @@
 [kernel] Parsing initialized_copy.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   w[0..9] ∈ {0}
   v ∈ [--..--]
@@ -67,17 +67,19 @@
      [2..9] ∈ UNINITIALIZED
   __retres ∈ UNINITIALIZED
   ==END OF DUMP==
-[eva] computing for function f <- main.
+[eva:progress] 
+  computing for function f <- main.
   Called from initialized_copy.i:129.
-[eva] Recording results for f
-[eva] Done for function f
+[eva:progress] Recording results for f
+[eva:progress] Done for function f
 [eva:show] initialized_copy.i:130: Frama_C_show_each_unreached:
 [eva:alarm] initialized_copy.i:135: Warning: 
   accessing uninitialized left-value. assert \initialized(&a_6);
-[eva] computing for function f <- main.
+[eva:progress] 
+  computing for function f <- main.
   Called from initialized_copy.i:143.
-[eva] Recording results for f
-[eva] Done for function f
+[eva:progress] Recording results for f
+[eva:progress] Done for function f
 [eva:show] initialized_copy.i:144: 
   Frama_C_dump_each:
   # cvalue:
@@ -91,10 +93,11 @@
 [kernel:annot:missing-spec] initialized_copy.i:151: Warning: 
   Neither code nor specification for function g, generating default assigns.
   See -generated-spec-* options for more info.
-[eva] computing for function g <- main.
+[eva:progress] 
+  computing for function g <- main.
   Called from initialized_copy.i:151.
 [eva] using specification for function g
-[eva] Done for function g
+[eva:progress] Done for function g
 [eva:show] initialized_copy.i:152: 
   Frama_C_dump_each:
   # cvalue:
@@ -103,8 +106,8 @@
   a_8 ∈ {1}
   __retres ∈ UNINITIALIZED
   ==END OF DUMP==
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] initialized_copy.i:135: 
   assertion 'Eva,initialization' got final status invalid.
 [eva] ====== VALUES COMPUTED ======

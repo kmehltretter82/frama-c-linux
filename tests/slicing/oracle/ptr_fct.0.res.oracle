@@ -1,28 +1,31 @@
 [kernel] Parsing ptr_fct.i (no preprocessing)
 [slicing] slicing requests in progress...
 [eva] Analyzing a complete application starting at h
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   X ∈ {0}
   ptf ∈ {0}
-[eva] computing for function g <- h.
+[eva:progress] 
+  computing for function g <- h.
   Called from ptr_fct.i:23.
-[eva] computing for function f1 <- g <- h.
+[eva:progress] 
+  computing for function f1 <- g <- h.
   Called from ptr_fct.i:17.
-[eva] Recording results for f1
-[eva] Done for function f1
+[eva:progress] Recording results for f1
+[eva:progress] Done for function f1
 [kernel:annot:missing-spec] ptr_fct.i:17: Warning: 
   Neither code nor specification for function f2, generating default assigns.
   See -generated-spec-* options for more info.
-[eva] computing for function f2 <- g <- h.
+[eva:progress] 
+  computing for function f2 <- g <- h.
   Called from ptr_fct.i:17.
 [eva] using specification for function f2
-[eva] Done for function f2
-[eva] Recording results for g
-[eva] Done for function g
-[eva] Recording results for h
-[eva] Done for function h
+[eva:progress] Done for function f2
+[eva:progress] Recording results for g
+[eva:progress] Done for function g
+[eva:progress] Recording results for h
+[eva:progress] Done for function h
 [slicing] initializing slicing ...
 [slicing] interpreting slicing requests from the command line...
 [pdg] computing for function h

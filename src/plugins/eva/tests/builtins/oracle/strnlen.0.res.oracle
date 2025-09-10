@@ -1,8 +1,8 @@
 [kernel] Parsing strnlen.c (with preprocessing)
 [kernel] strnlen.c:4: Warning: Too many initializers for character array t1
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   t1[0] ∈ {97}
     [1] ∈ {98}
@@ -15,23 +15,23 @@
     [3] ∈ {100}
     [4] ∈ {101}
     [5] ∈ {0}
-[eva] strnlen.c:9: Call to builtin strnlen
-[eva] strnlen.c:9: 
+[eva:progress] strnlen.c:9: Call to builtin strnlen
+[eva:progress] strnlen.c:9: 
   function strnlen: precondition 'valid_string_s' got status valid.
-[eva] strnlen.c:10: Call to builtin strnlen
-[eva] strnlen.c:10: 
+[eva:progress] strnlen.c:10: Call to builtin strnlen
+[eva:progress] strnlen.c:10: 
   function strnlen: precondition 'valid_string_s' got status valid.
-[eva] strnlen.c:11: Call to builtin strnlen
+[eva:progress] strnlen.c:11: Call to builtin strnlen
 [eva:alarm] strnlen.c:11: Warning: 
   function strnlen: precondition 'valid_string_s' got status invalid.
-[eva] strnlen.c:13: Call to builtin strnlen
-[eva] strnlen.c:13: 
+[eva:progress] strnlen.c:13: Call to builtin strnlen
+[eva:progress] strnlen.c:13: 
   function strnlen: precondition 'valid_string_s' got status valid.
-[eva] strnlen.c:14: Call to builtin strnlen
-[eva] strnlen.c:14: 
+[eva:progress] strnlen.c:14: Call to builtin strnlen
+[eva:progress] strnlen.c:14: 
   function strnlen: precondition 'valid_string_s' got status valid.
-[eva] strnlen.c:15: Call to builtin strnlen
-[eva] strnlen.c:15: 
+[eva:progress] strnlen.c:15: Call to builtin strnlen
+[eva:progress] strnlen.c:15: 
   function strnlen: precondition 'valid_string_s' got status valid.
 [eva:show] strnlen.c:17: 
   Frama_C_dump_each:
@@ -65,8 +65,8 @@
   tmp_4 ∈ {5}
   __retres ∈ UNINITIALIZED
   ==END OF DUMP==
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   r1a ∈ {3}

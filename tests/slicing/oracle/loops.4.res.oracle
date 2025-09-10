@@ -1,7 +1,7 @@
 [kernel] Parsing loops.i (no preprocessing)
 [eva] Analyzing a complete application starting at test_infinite_loop_3
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   G ∈ {0}
   C1 ∈ {1}
@@ -9,8 +9,8 @@
   X ∈ {0}
   Y ∈ {0}
   Z ∈ {0}
-[eva] Recording results for test_infinite_loop_3
-[eva] Done for function test_infinite_loop_3
+[eva:progress] Recording results for test_infinite_loop_3
+[eva:progress] Done for function test_infinite_loop_3
 [from] Computing for function test_infinite_loop_3
 [from] Done for function test_infinite_loop_3
 [from] ====== DEPENDENCIES COMPUTED ======

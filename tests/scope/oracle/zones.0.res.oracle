@@ -1,7 +1,7 @@
 [kernel] Parsing zones.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   T[0..9] ∈ {0}
   S ∈ {0}
@@ -12,52 +12,61 @@
   Xg ∈ {0}
   Yf ∈ {0}
   Yg ∈ {0}
-[eva] computing for function simple <- main.
+[eva:progress] 
+  computing for function simple <- main.
   Called from zones.c:73.
 [eva:alarm] zones.c:15: Warning: signed overflow. assert x + 1 ≤ 2147483647;
 [eva:alarm] zones.c:16: Warning: signed overflow. assert y + z ≤ 2147483647;
-[eva] Recording results for simple
-[eva] Done for function simple
-[eva] computing for function array1 <- main.
+[eva:progress] Recording results for simple
+[eva:progress] Done for function simple
+[eva:progress] 
+  computing for function array1 <- main.
   Called from zones.c:74.
 [eva:alarm] zones.c:21: Warning: accessing out of bounds index. assert 0 ≤ x;
 [eva:alarm] zones.c:21: Warning: accessing out of bounds index. assert x < 10;
 [eva:alarm] zones.c:22: Warning: 
   signed overflow. assert T[0] + y ≤ 2147483647;
-[eva] Recording results for array1
-[eva] Done for function array1
-[eva] computing for function struct1 <- main.
+[eva:progress] Recording results for array1
+[eva:progress] Done for function array1
+[eva:progress] 
+  computing for function struct1 <- main.
   Called from zones.c:75.
-[eva] Recording results for struct1
-[eva] Done for function struct1
-[eva] computing for function ctrl1 <- main.
+[eva:progress] Recording results for struct1
+[eva:progress] Done for function struct1
+[eva:progress] 
+  computing for function ctrl1 <- main.
   Called from zones.c:76.
-[eva] Recording results for ctrl1
-[eva] Done for function ctrl1
-[eva] computing for function caller <- main.
+[eva:progress] Recording results for ctrl1
+[eva:progress] Done for function ctrl1
+[eva:progress] 
+  computing for function caller <- main.
   Called from zones.c:78.
-[eva] computing for function f <- caller <- main.
+[eva:progress] 
+  computing for function f <- caller <- main.
   Called from zones.c:66.
-[eva] Recording results for f
-[eva] Done for function f
-[eva] computing for function g <- caller <- main.
+[eva:progress] Recording results for f
+[eva:progress] Done for function f
+[eva:progress] 
+  computing for function g <- caller <- main.
   Called from zones.c:67.
-[eva] Recording results for g
-[eva] Done for function g
-[eva] computing for function f <- caller <- main.
+[eva:progress] Recording results for g
+[eva:progress] Done for function g
+[eva:progress] 
+  computing for function f <- caller <- main.
   Called from zones.c:68.
 [eva:alarm] zones.c:54: Warning: signed overflow. assert x + y ≤ 2147483647;
-[eva] Recording results for f
-[eva] Done for function f
-[eva] computing for function g <- caller <- main.
+[eva:progress] Recording results for f
+[eva:progress] Done for function f
+[eva:progress] 
+  computing for function g <- caller <- main.
   Called from zones.c:68.
 [eva:alarm] zones.c:60: Warning: signed overflow. assert a + b ≤ 2147483647;
-[eva] Recording results for g
-[eva] Done for function g
-[eva] Recording results for caller
-[eva] Done for function caller
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for g
+[eva:progress] Done for function g
+[eva:progress] Recording results for caller
+[eva:progress] Done for function caller
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function array1:
   T[0] ∈ [--..--]

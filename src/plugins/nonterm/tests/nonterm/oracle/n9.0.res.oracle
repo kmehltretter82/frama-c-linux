@@ -1,23 +1,26 @@
 [kernel] Parsing n9.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   nondet ∈ [--..--]
-[eva] computing for function f <- main.
+[eva:progress] 
+  computing for function f <- main.
   Called from n9.i:41.
-[eva] Recording results for f
-[eva] Done for function f
-[eva] computing for function g <- main.
+[eva:progress] Recording results for f
+[eva:progress] Done for function f
+[eva:progress] 
+  computing for function g <- main.
   Called from n9.i:42.
-[eva] Recording results for g
-[eva] Done for function g
-[eva] computing for function f_explicit_break <- main.
+[eva:progress] Recording results for g
+[eva:progress] Done for function g
+[eva:progress] 
+  computing for function f_explicit_break <- main.
   Called from n9.i:43.
-[eva] Recording results for f_explicit_break
-[eva] Done for function f_explicit_break
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for f_explicit_break
+[eva:progress] Done for function f_explicit_break
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function f:
   NON TERMINATING FUNCTION

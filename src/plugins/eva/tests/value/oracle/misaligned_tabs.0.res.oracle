@@ -1,7 +1,7 @@
 [kernel] Parsing misaligned_tabs.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   T[0..299] ∈ {0}
   S1{.i1; .i2} ∈ {4369}
@@ -16,7 +16,8 @@
   S4{.i1; .i2} ∈ {4369}
     {.c1; .c2} ∈ {17}
     {.i3; .i4} ∈ {4369}
-[eva] computing for function misaligned_struct <- main.
+[eva:progress] 
+  computing for function misaligned_struct <- main.
   Called from misaligned_tabs.i:62.
 [eva:show] misaligned_tabs.i:14: Frama_C_show_each_1: {1}
 [eva:show] misaligned_tabs.i:17: Frama_C_show_each_2: {1}
@@ -33,11 +34,11 @@
 [eva:show] misaligned_tabs.i:49: Frama_C_show_each_d: {1}
 [eva:show] misaligned_tabs.i:50: Frama_C_show_each_e: {1}
 [eva:show] misaligned_tabs.i:51: Frama_C_show_each_f: {1}
-[eva] Recording results for misaligned_struct
-[eva] Done for function misaligned_struct
+[eva:progress] Recording results for misaligned_struct
+[eva:progress] Done for function misaligned_struct
 [eva:show] misaligned_tabs.i:68: Frama_C_show_each_g: {1}
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function misaligned_struct:
   S1.i1[bits 0 to 7] ∈ {17}

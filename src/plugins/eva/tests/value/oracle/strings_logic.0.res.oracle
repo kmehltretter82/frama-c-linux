@@ -2,11 +2,12 @@
 [kernel] strings_logic.c:180: Warning: 
   Too many initializers for character array ws_with_hole
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   nondet ∈ [--..--]
-[eva] computing for function reduce_by_valid_string <- main.
+[eva:progress] 
+  computing for function reduce_by_valid_string <- main.
   Called from strings_logic.c:209.
 [eva:loop-unroll:auto] strings_logic.c:30: Automatic loop unrolling.
 [eva:loop-unroll:auto] strings_logic.c:36: Automatic loop unrolling.
@@ -97,13 +98,14 @@
      &s_partially_valid + [-123..147] ; &s_imprecise + [-123..147] ;
      &s_unknown + [-123..147] ; &anything + [-123..147] ;
      "hello\000 world" + [-123..147] ; "hello world" + [-123..147] }}
-[eva] computing for function garbled_mix <- reduce_by_valid_string <- main.
+[eva:progress] 
+  computing for function garbled_mix <- reduce_by_valid_string <- main.
   Called from strings_logic.c:151.
 [eva] using specification for function garbled_mix
 [eva:garbled-mix:assigns] strings_logic.c:151: 
   The specification of function garbled_mix
   has generated a garbled mix of addresses for assigns clause \result.
-[eva] Done for function garbled_mix
+[eva:progress] Done for function garbled_mix
 [eva:alarm] strings_logic.c:154: Warning: assertion got status unknown.
 [eva:show] strings_logic.c:155: 
   Frama_C_show_each_valid_string_garbled_mix:
@@ -131,9 +133,10 @@
                       s_partially_initialized; s_partially_valid; s_imprecise;
                       s_unknown; anything; "hello\000 world"; "hello world"}
   (origin: Library function {strings_logic.c:151}) }}
-[eva] Recording results for reduce_by_valid_string
-[eva] Done for function reduce_by_valid_string
-[eva] computing for function reduce_by_valid_wstring <- main.
+[eva:progress] Recording results for reduce_by_valid_string
+[eva:progress] Done for function reduce_by_valid_string
+[eva:progress] 
+  computing for function reduce_by_valid_wstring <- main.
   Called from strings_logic.c:210.
 [eva:alarm] strings_logic.c:193: Warning: assertion got status unknown.
 [eva:show] strings_logic.c:194: 
@@ -146,10 +149,10 @@
 [eva:show] strings_logic.c:204: 
   Frama_C_show_each_wide_string_invalid_read_wstring:
   {{ &ws1 ; &ws_zero ; &wchar ; &ws_with_hole ; L"Wide literal" }}
-[eva] Recording results for reduce_by_valid_wstring
-[eva] Done for function reduce_by_valid_wstring
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for reduce_by_valid_wstring
+[eva:progress] Done for function reduce_by_valid_wstring
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva:garbled-mix:summary] 
   Origins of garbled mix generated during analysis:
     strings_logic.c:151: assigns clause on addresses

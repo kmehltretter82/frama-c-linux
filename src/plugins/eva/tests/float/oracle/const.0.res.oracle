@@ -24,8 +24,8 @@
 [kernel:parser:decimal-float] const.i:37: Warning: 
   Floating-point constant 0.00000000000000000000000000000000000000000000070064923216240853546186479164495806564013097093825788587853414194489554134293030074331909418106079101562501f is not represented exactly. Will use 0x1.0000000000000p-149.
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   f0 ∈ {0}
   f_ ∈ {0}
@@ -132,9 +132,9 @@
   half_smallest_pos3 ∈ {0}
   half_smallest_pos4 ∈ {0}
   half_smallest_pos5 ∈ {0x1.0000000000000p-149}
-[eva] const.i:48: assertion got status valid.
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] const.i:48: assertion got status valid.
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   f_ ∈ {-0x0.0000000000000p0}

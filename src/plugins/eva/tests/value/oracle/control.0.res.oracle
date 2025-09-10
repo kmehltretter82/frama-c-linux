@@ -1,7 +1,7 @@
 [kernel] Parsing control.i (no preprocessing)
 [eva] Analyzing a complete application starting at f
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   x ∈ {0}
   y ∈ {0}
@@ -9,8 +9,8 @@
   d ∈ {0}
 [eva:partition] control.i:11: starting to merge loop iterations
 [eva:alarm] control.i:14: Warning: signed overflow. assert x + 1 ≤ 2147483647;
-[eva] Recording results for f
-[eva] Done for function f
+[eva:progress] Recording results for f
+[eva:progress] Done for function f
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function f:
   x ∈ [0..2147483647]

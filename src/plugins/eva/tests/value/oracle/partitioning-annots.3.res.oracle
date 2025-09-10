@@ -1,21 +1,22 @@
 [kernel] Parsing partitioning-annots.c (with preprocessing)
 [eva] Analyzing a complete application starting at test_history
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   nondet ∈ [--..--]
   k ∈ {0}
-[eva] computing for function Frama_C_interval <- test_history.
+[eva:progress] 
+  computing for function Frama_C_interval <- test_history.
   Called from partitioning-annots.c:246.
 [eva] using specification for function Frama_C_interval
-[eva] partitioning-annots.c:246: 
+[eva:progress] partitioning-annots.c:246: 
   function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
+[eva:progress] Done for function Frama_C_interval
 [eva:show] partitioning-annots.c:252: Frama_C_show_each: {0; 1}, {0; 1}
 [eva:alarm] partitioning-annots.c:255: Warning: 
   division by zero. assert j ≢ 0;
-[eva] Recording results for test_history
-[eva] Done for function test_history
+[eva:progress] Recording results for test_history
+[eva:progress] Done for function test_history
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function test_history:
   Frama_C_entropy_source ∈ [--..--]

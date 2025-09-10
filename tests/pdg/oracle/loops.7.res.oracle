@@ -1,12 +1,12 @@
 [kernel] Parsing loops.c (with preprocessing)
 [eva] Analyzing an incomplete application starting at non_natural_loop
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   after ∈ [--..--]
 [eva:alarm] loops.c:137: Warning: signed overflow. assert x + 2 ≤ 2147483647;
-[eva] Recording results for non_natural_loop
-[eva] Done for function non_natural_loop
+[eva:progress] Recording results for non_natural_loop
+[eva:progress] Done for function non_natural_loop
 [eva] loops.c:137: assertion 'Eva,signed_overflow' got final status valid.
 [pdg] computing for function non_natural_loop
 [pdg] done for function non_natural_loop

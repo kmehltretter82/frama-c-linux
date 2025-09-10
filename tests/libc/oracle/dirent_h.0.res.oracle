@@ -1,18 +1,20 @@
 [kernel] Parsing dirent_h.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva] computing for function __va_open_void <- main.
+[eva:progress] 
+  computing for function __va_open_void <- main.
   Called from dirent_h.c:19.
 [eva] using specification for function __va_open_void
-[eva] dirent_h.c:19: 
+[eva:progress] dirent_h.c:19: 
   function __va_open_void: precondition 'valid_filename' got status valid.
-[eva] dirent_h.c:19: 
+[eva:progress] dirent_h.c:19: 
   function __va_open_void: precondition 'flag_not_CREAT' got status valid.
-[eva] Done for function __va_open_void
-[eva] computing for function fdopendir <- main.
+[eva:progress] Done for function __va_open_void
+[eva:progress] 
+  computing for function fdopendir <- main.
   Called from dirent_h.c:19.
 [eva] using specification for function fdopendir
 [eva:garbled-mix:assigns] dirent_h.c:19: 
@@ -22,36 +24,41 @@
   The specification of function fdopendir
   has generated a garbled mix of addresses
   for assigns clause __fc_opendir[0 .. 16 - 1].
-[eva] Done for function fdopendir
+[eva:progress] Done for function fdopendir
 [eva:alarm] dirent_h.c:19: Warning: 
   unaligned pointer creation. assert \aligned(d,alignof(DIR));
 [eva:alarm] dirent_h.c:19: Warning: 
   pointer comparison. assert \pointer_comparable((void *)d, (void *)0);
-[eva] computing for function fprintf_va_1 <- main.
+[eva:progress] 
+  computing for function fprintf_va_1 <- main.
   Called from dirent_h.c:20.
 [eva] using specification for function fprintf
-[eva] dirent_h.c:20: function fprintf_va_1: precondition got status valid.
-[eva] Done for function fprintf_va_1
-[eva] computing for function exit <- main.
+[eva:progress] dirent_h.c:20: 
+  function fprintf_va_1: precondition got status valid.
+[eva:progress] Done for function fprintf_va_1
+[eva:progress] 
+  computing for function exit <- main.
   Called from dirent_h.c:21.
 [eva] using specification for function exit
-[eva] Done for function exit
+[eva:progress] Done for function exit
 [eva:alarm] dirent_h.c:23: Warning: 
   unaligned pointer creation. assert \aligned(d,alignof(DIR));
-[eva] computing for function readdir <- main.
+[eva:progress] 
+  computing for function readdir <- main.
   Called from dirent_h.c:23.
 [eva] using specification for function readdir
 [eva:alarm] dirent_h.c:23: Warning: 
   function readdir: precondition 'dirp_valid_dir_stream' got status unknown.
-[eva] Done for function readdir
-[eva] computing for function closedir <- main.
+[eva:progress] Done for function readdir
+[eva:progress] 
+  computing for function closedir <- main.
   Called from dirent_h.c:39.
 [eva] using specification for function closedir
-[eva] dirent_h.c:39: 
+[eva:progress] dirent_h.c:39: 
   function closedir: precondition 'dirp_valid_dir_stream' got status valid.
-[eva] Done for function closedir
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Done for function closedir
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva:garbled-mix:summary] 
   Origins of garbled mix generated during analysis:
     dirent_h.c:19: assigns clause on addresses

@@ -1,15 +1,15 @@
 [kernel] Parsing same_sliced_name_bts1422.i (no preprocessing)
 [slicing] slicing requests in progress...
 [eva] Analyzing a complete application starting at foo
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   y ∈ {0}
   ptr ∈ {{ &foo }}
 [eva:alarm] same_sliced_name_bts1422.i:9: Warning: 
   signed overflow. assert x + 1 ≤ 2147483647;
-[eva] Recording results for foo
-[eva] Done for function foo
+[eva:progress] Recording results for foo
+[eva:progress] Done for function foo
 [slicing] initializing slicing ...
 [slicing] interpreting slicing requests from the command line...
 [pdg] computing for function foo

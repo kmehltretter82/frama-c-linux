@@ -1,7 +1,7 @@
 [kernel] Parsing attribute-aligned.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   S ∈ {0}
   A ∈ {0}
@@ -12,41 +12,50 @@
   var_aligned1 ∈ {0}
   var_aligned2 ∈ {0}
   var_aligned3 ∈ {0}
-[eva] computing for function ct <- main.
+[eva:progress] 
+  computing for function ct <- main.
   Called from attribute-aligned.c:178.
-[eva] Recording results for ct
-[eva] Done for function ct
-[eva] computing for function dt <- main.
+[eva:progress] Recording results for ct
+[eva:progress] Done for function ct
+[eva:progress] 
+  computing for function dt <- main.
   Called from attribute-aligned.c:179.
-[eva] Recording results for dt
-[eva] Done for function dt
-[eva] computing for function pt <- main.
+[eva:progress] Recording results for dt
+[eva:progress] Done for function dt
+[eva:progress] 
+  computing for function pt <- main.
   Called from attribute-aligned.c:180.
-[eva] Recording results for pt
-[eva] Done for function pt
-[eva] computing for function qt <- main.
+[eva:progress] Recording results for pt
+[eva:progress] Done for function pt
+[eva:progress] 
+  computing for function qt <- main.
   Called from attribute-aligned.c:181.
-[eva] Recording results for qt
-[eva] Done for function qt
-[eva] computing for function rt <- main.
+[eva:progress] Recording results for qt
+[eva:progress] Done for function qt
+[eva:progress] 
+  computing for function rt <- main.
   Called from attribute-aligned.c:182.
-[eva] Recording results for rt
-[eva] Done for function rt
-[eva] computing for function st <- main.
+[eva:progress] Recording results for rt
+[eva:progress] Done for function rt
+[eva:progress] 
+  computing for function st <- main.
   Called from attribute-aligned.c:183.
-[eva] Recording results for st
-[eva] Done for function st
-[eva] computing for function tt <- main.
+[eva:progress] Recording results for st
+[eva:progress] Done for function st
+[eva:progress] 
+  computing for function tt <- main.
   Called from attribute-aligned.c:184.
-[eva] Recording results for tt
-[eva] Done for function tt
-[eva] computing for function typedef_with_aligned <- main.
+[eva:progress] Recording results for tt
+[eva:progress] Done for function tt
+[eva:progress] 
+  computing for function typedef_with_aligned <- main.
   Called from attribute-aligned.c:185.
-[eva] attribute-aligned.c:100: check got status valid.
-[eva] attribute-aligned.c:102: check got status valid.
-[eva] Recording results for typedef_with_aligned
-[eva] Done for function typedef_with_aligned
-[eva] computing for function struct_aligned <- main.
+[eva:progress] attribute-aligned.c:100: check got status valid.
+[eva:progress] attribute-aligned.c:102: check got status valid.
+[eva:progress] Recording results for typedef_with_aligned
+[eva:progress] Done for function typedef_with_aligned
+[eva:progress] 
+  computing for function struct_aligned <- main.
   Called from attribute-aligned.c:186.
 [eva:show] attribute-aligned.c:142: Frama_C_show_each_4: {4}, {4}, {4}
 [eva:show] attribute-aligned.c:146: Frama_C_show_each_1: {1}, {1}, {1}
@@ -76,10 +85,10 @@
   unaligned pointer creation.
   assert
   \aligned(&var_aligned1.c,alignof(int __attribute__((__aligned__(8)))));
-[eva] Recording results for struct_aligned
-[eva] Done for function struct_aligned
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for struct_aligned
+[eva:progress] Done for function struct_aligned
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [scope:rm_asserts] removing 2 assertion(s)
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function ct:

@@ -1,21 +1,22 @@
 [kernel] Parsing top.i (no preprocessing)
 [slicing] slicing requests in progress...
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
 [eva:alarm] top.i:27: Warning: 
   out of bounds read. assert \valid_read(p_str + i);
-[eva] computing for function strlen <- main.
+[eva:progress] 
+  computing for function strlen <- main.
   Called from top.i:27.
 [eva:alarm] top.i:21: Warning: out of bounds read. assert \valid_read(q);
 [eva:partition] top.i:21: starting to merge loop iterations
 [eva:alarm] top.i:21: Warning: signed overflow. assert k + 1 ≤ 2147483647;
-[eva] Recording results for strlen
-[eva] Done for function strlen
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for strlen
+[eva:progress] Done for function strlen
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [slicing] initializing slicing ...
 [slicing] interpreting slicing requests from the command line...
 [pdg] computing for function main

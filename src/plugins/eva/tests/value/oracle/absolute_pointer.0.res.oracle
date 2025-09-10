@@ -1,26 +1,28 @@
 [kernel] Parsing absolute_pointer.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   NULL[rbits 0 to 31] ∈ [--..--]
   R ∈ {0}
   nondet ∈ [--..--]
-[eva] computing for function crash <- main.
+[eva:progress] 
+  computing for function crash <- main.
   Called from absolute_pointer.c:20.
-[eva] computing for function f <- crash <- main.
+[eva:progress] 
+  computing for function f <- crash <- main.
   Called from absolute_pointer.c:14.
-[eva] Recording results for f
-[eva] Done for function f
+[eva:progress] Recording results for f
+[eva:progress] Done for function f
 [eva:alarm] absolute_pointer.c:14: Warning: 
   out of bounds write. assert \valid(tmp);
                        (tmp from f())
 [eva] absolute_pointer.c:14: Warning: 
   all target addresses were invalid. This path is assumed to be dead.
-[eva] Recording results for crash
-[eva] Done for function crash
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for crash
+[eva:progress] Done for function crash
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] absolute_pointer.c:14: 
   assertion 'Eva,mem_access' got final status invalid.
 [eva] ====== VALUES COMPUTED ======

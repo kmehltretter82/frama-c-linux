@@ -75,8 +75,8 @@
   /*  <-  */
   tmp_18 = tmp_16 + tmp_17;
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   G[0..9] ∈ {0}
   c ∈ [--..--]
@@ -101,38 +101,44 @@
   undefined multiple accesses in expression. assert \separated(&i, &i);
 [eva:alarm] undefined_sequence.i:53: Warning: 
   undefined multiple accesses in expression. assert \separated(&x, &x);
-[eva] computing for function g <- main.
+[eva:progress] 
+  computing for function g <- main.
   Called from undefined_sequence.i:54.
-[eva] Recording results for g
-[eva] Done for function g
-[eva] computing for function f <- main.
+[eva:progress] Recording results for g
+[eva:progress] Done for function g
+[eva:progress] 
+  computing for function f <- main.
   Called from undefined_sequence.i:54.
-[eva] Recording results for f
-[eva] Done for function f
-[eva] computing for function h <- main.
+[eva:progress] Recording results for f
+[eva:progress] Done for function f
+[eva:progress] 
+  computing for function h <- main.
   Called from undefined_sequence.i:56.
 [eva:alarm] undefined_sequence.i:16: Warning: 
   undefined multiple accesses in expression. assert \separated(&r, &r);
-[eva] Recording results for h
-[eva] Done for function h
-[eva] computing for function h <- main.
+[eva:progress] Recording results for h
+[eva:progress] Done for function h
+[eva:progress] 
+  computing for function h <- main.
   Called from undefined_sequence.i:56.
-[eva] Recording results for h
-[eva] Done for function h
-[eva] computing for function func <- main.
+[eva:progress] Recording results for h
+[eva:progress] Done for function h
+[eva:progress] 
+  computing for function func <- main.
   Called from undefined_sequence.i:60.
-[eva] Recording results for func
-[eva] Done for function func
-[eva] computing for function ub_ret <- main.
+[eva:progress] Recording results for func
+[eva:progress] Done for function func
+[eva:progress] 
+  computing for function ub_ret <- main.
   Called from undefined_sequence.i:65.
 [eva:alarm] undefined_sequence.i:28: Warning: 
   undefined multiple accesses in expression. assert \separated(&d, &d);
-[eva] Recording results for ub_ret
-[eva] Done for function ub_ret
+[eva:progress] Recording results for ub_ret
+[eva:progress] Done for function ub_ret
 [eva:alarm] undefined_sequence.i:67: Warning: 
   undefined multiple accesses in expression. assert \separated(&my_f, &my_f);
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] undefined_sequence.i:16: 
   assertion 'Eva,separation' got final status invalid.
 [eva] undefined_sequence.i:28: 

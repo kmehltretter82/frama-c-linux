@@ -1,7 +1,7 @@
 [kernel] Parsing loops.i (no preprocessing)
 [eva] Analyzing an incomplete application starting at f1
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   G ∈ [--..--]
   C1 ∈ [--..--]
@@ -9,11 +9,11 @@
   X ∈ [--..--]
   Y ∈ [--..--]
   Z ∈ [--..--]
-[eva] loops.i:36: assertion got status valid.
+[eva:progress] loops.i:36: assertion got status valid.
 [eva:partition] loops.i:34: starting to merge loop iterations
 [eva:alarm] loops.i:35: Warning: signed overflow. assert s + 1 ≤ 2147483647;
-[eva] Recording results for f1
-[eva] Done for function f1
+[eva:progress] Recording results for f1
+[eva:progress] Done for function f1
 [from] Computing for function f1
 [from] Done for function f1
 [from] ====== DEPENDENCIES COMPUTED ======

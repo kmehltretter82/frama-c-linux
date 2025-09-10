@@ -15,8 +15,8 @@
     option -eva-equality-through-calls set to 'none'.
     option -eva-octagon-through-calls set to false (default value).
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   nondet ∈ [--..--]
 [eva:partition] eva_precision.i:23: starting to merge loop iterations
@@ -25,8 +25,8 @@
 [eva:alarm] eva_precision.i:32: Warning: 
   accessing uninitialized left-value. assert \initialized(&t[index]);
 [eva:show] eva_precision.i:33: Frama_C_show_each_42: [0..99]
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   t[0..63] ∈ [0..99] or UNINITIALIZED

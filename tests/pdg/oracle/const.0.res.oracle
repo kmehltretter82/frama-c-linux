@@ -1,7 +1,7 @@
 [kernel] Parsing const.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   G1 ∈ {0}
   G2 ∈ {0}
@@ -9,22 +9,24 @@
   G4.M5 ∈ {{ &G1 }}
   G5.M3 ∈ {{ &G2 }}
     .M4 ∈ {{ &G3 }}
-[eva] computing for function F2 <- main.
+[eva:progress] 
+  computing for function F2 <- main.
   Called from const.i:39.
-[eva] Recording results for F2
+[eva:progress] Recording results for F2
 [from] Computing for function F2
 [from] Done for function F2
-[eva] Done for function F2
-[eva] computing for function F1 <- main.
+[eva:progress] Done for function F2
+[eva:progress] 
+  computing for function F1 <- main.
   Called from const.i:41.
-[eva] Recording results for F1
+[eva:progress] Recording results for F1
 [from] Computing for function F1
 [from] Done for function F1
-[eva] Done for function F1
-[eva] Recording results for main
+[eva:progress] Done for function F1
+[eva:progress] Recording results for main
 [from] Computing for function main
 [from] Done for function main
-[eva] Done for function main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function F1:
   G3 ∈ {0}

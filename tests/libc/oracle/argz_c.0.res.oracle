@@ -47,586 +47,678 @@
     \return(Frama_C_malloc_fresh) == 0 (auto)
     \return(char_equal_ignore_case) == 0 (auto)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva] computing for function argz_create <- main.
+[eva:progress] 
+  computing for function argz_create <- main.
   Called from argz_c.c:20.
-[eva] FRAMAC_SHARE/libc/argz.c:227: Call to builtin strlen
-[eva] FRAMAC_SHARE/libc/argz.c:227: 
+[eva:progress] FRAMAC_SHARE/libc/argz.c:227: Call to builtin strlen
+[eva:progress] FRAMAC_SHARE/libc/argz.c:227: 
   function strlen: precondition 'valid_string_s' got status valid.
-[eva] FRAMAC_SHARE/libc/argz.c:227: Call to builtin strlen
-[eva] FRAMAC_SHARE/libc/argz.c:227: Call to builtin strlen
-[eva] FRAMAC_SHARE/libc/argz.c:232: Call to builtin malloc
+[eva:progress] FRAMAC_SHARE/libc/argz.c:227: Call to builtin strlen
+[eva:progress] FRAMAC_SHARE/libc/argz.c:227: Call to builtin strlen
+[eva:progress] FRAMAC_SHARE/libc/argz.c:232: Call to builtin malloc
 [eva:malloc:new] FRAMAC_SHARE/libc/argz.c:232: 
   allocating variable __malloc_argz_create_l232
-[eva] computing for function stpcpy <- argz_create <- main.
+[eva:progress] 
+  computing for function stpcpy <- argz_create <- main.
   Called from FRAMAC_SHARE/libc/argz.c:237.
-[eva] Recording results for stpcpy
-[eva] Done for function stpcpy
-[eva] computing for function stpcpy <- argz_create <- main.
+[eva:progress] Recording results for stpcpy
+[eva:progress] Done for function stpcpy
+[eva:progress] 
+  computing for function stpcpy <- argz_create <- main.
   Called from FRAMAC_SHARE/libc/argz.c:237.
-[eva] Recording results for stpcpy
-[eva] Done for function stpcpy
-[eva] computing for function stpcpy <- argz_create <- main.
+[eva:progress] Recording results for stpcpy
+[eva:progress] Done for function stpcpy
+[eva:progress] 
+  computing for function stpcpy <- argz_create <- main.
   Called from FRAMAC_SHARE/libc/argz.c:237.
-[eva] Recording results for stpcpy
-[eva] Done for function stpcpy
-[eva] Recording results for argz_create
-[eva] Done for function argz_create
-[eva] computing for function exit <- main.
+[eva:progress] Recording results for stpcpy
+[eva:progress] Done for function stpcpy
+[eva:progress] Recording results for argz_create
+[eva:progress] Done for function argz_create
+[eva:progress] 
+  computing for function exit <- main.
   Called from argz_c.c:21.
 [eva] using specification for function exit
-[eva] Done for function exit
-[eva] argz_c.c:22: assertion got status valid.
-[eva] argz_c.c:23: Call to builtin free
-[eva] argz_c.c:23: function free: precondition 'freeable' got status valid.
-[eva] computing for function argz_create_sep <- main.
+[eva:progress] Done for function exit
+[eva:progress] argz_c.c:22: assertion got status valid.
+[eva:progress] argz_c.c:23: Call to builtin free
+[eva:progress] argz_c.c:23: 
+  function free: precondition 'freeable' got status valid.
+[eva:progress] 
+  computing for function argz_create_sep <- main.
   Called from argz_c.c:25.
-[eva] FRAMAC_SHARE/libc/argz.c:183: Call to builtin strlen
-[eva] FRAMAC_SHARE/libc/argz.c:183: 
+[eva:progress] FRAMAC_SHARE/libc/argz.c:183: Call to builtin strlen
+[eva:progress] FRAMAC_SHARE/libc/argz.c:183: 
   function strlen: precondition 'valid_string_s' got status valid.
-[eva] FRAMAC_SHARE/libc/argz.c:189: Call to builtin malloc
+[eva:progress] FRAMAC_SHARE/libc/argz.c:189: Call to builtin malloc
 [eva:malloc:new] FRAMAC_SHARE/libc/argz.c:189: 
   allocating variable __malloc_argz_create_sep_l189
-[eva] Recording results for argz_create_sep
-[eva] Done for function argz_create_sep
-[eva] computing for function exit <- main.
+[eva:progress] Recording results for argz_create_sep
+[eva:progress] Done for function argz_create_sep
+[eva:progress] 
+  computing for function exit <- main.
   Called from argz_c.c:26.
-[eva] Done for function exit
-[eva] computing for function __FC_assert <- main.
+[eva:progress] Done for function exit
+[eva:progress] 
+  computing for function __FC_assert <- main.
   Called from argz_c.c:27.
 [eva] using specification for function __FC_assert
-[eva] argz_c.c:27: 
+[eva:progress] argz_c.c:27: 
   function __FC_assert: precondition 'nonnull_c' got status valid.
-[eva] Done for function __FC_assert
-[eva] computing for function argz_count <- main.
+[eva:progress] Done for function __FC_assert
+[eva:progress] 
+  computing for function argz_count <- main.
   Called from argz_c.c:28.
-[eva] FRAMAC_SHARE/libc/argz.c:247: Call to builtin strlen
-[eva] FRAMAC_SHARE/libc/argz.c:247: 
+[eva:progress] FRAMAC_SHARE/libc/argz.c:247: Call to builtin strlen
+[eva:progress] FRAMAC_SHARE/libc/argz.c:247: 
   function strlen: precondition 'valid_string_s' got status valid.
-[eva] FRAMAC_SHARE/libc/argz.c:247: Call to builtin strlen
-[eva] FRAMAC_SHARE/libc/argz.c:247: Call to builtin strlen
-[eva] Recording results for argz_count
-[eva] Done for function argz_count
-[eva] computing for function __FC_assert <- main.
+[eva:progress] FRAMAC_SHARE/libc/argz.c:247: Call to builtin strlen
+[eva:progress] FRAMAC_SHARE/libc/argz.c:247: Call to builtin strlen
+[eva:progress] Recording results for argz_count
+[eva:progress] Done for function argz_count
+[eva:progress] 
+  computing for function __FC_assert <- main.
   Called from argz_c.c:29.
-[eva] argz_c.c:29: 
+[eva:progress] argz_c.c:29: 
   function __FC_assert: precondition 'nonnull_c' got status valid.
-[eva] Done for function __FC_assert
-[eva] computing for function argz_add <- main.
+[eva:progress] Done for function __FC_assert
+[eva:progress] 
+  computing for function argz_add <- main.
   Called from argz_c.c:30.
-[eva] FRAMAC_SHARE/libc/argz.c:269: Call to builtin strlen
-[eva] FRAMAC_SHARE/libc/argz.c:269: 
+[eva:progress] FRAMAC_SHARE/libc/argz.c:269: Call to builtin strlen
+[eva:progress] FRAMAC_SHARE/libc/argz.c:269: 
   function strlen: precondition 'valid_string_s' got status valid.
-[eva] computing for function argz_append <- argz_add <- main.
+[eva:progress] 
+  computing for function argz_append <- argz_add <- main.
   Called from FRAMAC_SHARE/libc/argz.c:269.
-[eva] FRAMAC_SHARE/libc/argz.c:258: Call to builtin realloc
-[eva] FRAMAC_SHARE/libc/argz.c:258: 
+[eva:progress] FRAMAC_SHARE/libc/argz.c:258: Call to builtin realloc
+[eva:progress] FRAMAC_SHARE/libc/argz.c:258: 
   function realloc: precondition 'freeable' got status valid.
 [eva:malloc:new] FRAMAC_SHARE/libc/argz.c:258: 
   allocating variable __realloc_argz_append_l258
-[eva] FRAMAC_SHARE/libc/argz.c:260: Call to builtin memcpy
-[eva] FRAMAC_SHARE/libc/argz.c:260: 
+[eva:progress] FRAMAC_SHARE/libc/argz.c:260: Call to builtin memcpy
+[eva:progress] FRAMAC_SHARE/libc/argz.c:260: 
   function memcpy: precondition 'valid_dest' got status valid.
-[eva] FRAMAC_SHARE/libc/argz.c:260: 
+[eva:progress] FRAMAC_SHARE/libc/argz.c:260: 
   function memcpy: precondition 'valid_src' got status valid.
-[eva] FRAMAC_SHARE/libc/argz.c:260: 
+[eva:progress] FRAMAC_SHARE/libc/argz.c:260: 
   function memcpy: precondition 'separation' got status valid.
 [eva:acsl:unsupported] FRAMAC_SHARE/libc/string.h:114: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memcmp
-[eva] Recording results for argz_append
-[eva] Done for function argz_append
-[eva] Recording results for argz_add
-[eva] Done for function argz_add
-[eva] computing for function exit <- main.
+[eva:progress] Recording results for argz_append
+[eva:progress] Done for function argz_append
+[eva:progress] Recording results for argz_add
+[eva:progress] Done for function argz_add
+[eva:progress] 
+  computing for function exit <- main.
   Called from argz_c.c:31.
-[eva] Done for function exit
-[eva] computing for function __FC_assert <- main.
+[eva:progress] Done for function exit
+[eva:progress] 
+  computing for function __FC_assert <- main.
   Called from argz_c.c:32.
-[eva] argz_c.c:32: 
+[eva:progress] argz_c.c:32: 
   function __FC_assert: precondition 'nonnull_c' got status valid.
-[eva] Done for function __FC_assert
-[eva] computing for function argz_add_sep <- main.
+[eva:progress] Done for function __FC_assert
+[eva:progress] 
+  computing for function argz_add_sep <- main.
   Called from argz_c.c:33.
-[eva] FRAMAC_SHARE/libc/argz.c:274: Call to builtin strlen
-[eva] FRAMAC_SHARE/libc/argz.c:274: 
+[eva:progress] FRAMAC_SHARE/libc/argz.c:274: Call to builtin strlen
+[eva:progress] FRAMAC_SHARE/libc/argz.c:274: 
   function strlen: precondition 'valid_string_s' got status valid.
-[eva] FRAMAC_SHARE/libc/argz.c:280: Call to builtin realloc
-[eva] FRAMAC_SHARE/libc/argz.c:280: 
+[eva:progress] FRAMAC_SHARE/libc/argz.c:280: Call to builtin realloc
+[eva:progress] FRAMAC_SHARE/libc/argz.c:280: 
   function realloc: precondition 'freeable' got status valid.
 [eva:malloc:new] FRAMAC_SHARE/libc/argz.c:280: 
   allocating variable __realloc_argz_add_sep_l280
-[eva] Recording results for argz_add_sep
-[eva] Done for function argz_add_sep
-[eva] computing for function exit <- main.
+[eva:progress] Recording results for argz_add_sep
+[eva:progress] Done for function argz_add_sep
+[eva:progress] 
+  computing for function exit <- main.
   Called from argz_c.c:34.
-[eva] Done for function exit
-[eva] computing for function __FC_assert <- main.
+[eva:progress] Done for function exit
+[eva:progress] 
+  computing for function __FC_assert <- main.
   Called from argz_c.c:35.
-[eva] argz_c.c:35: 
+[eva:progress] argz_c.c:35: 
   function __FC_assert: precondition 'nonnull_c' got status valid.
-[eva] Done for function __FC_assert
-[eva] computing for function argz_count <- main.
+[eva:progress] Done for function __FC_assert
+[eva:progress] 
+  computing for function argz_count <- main.
   Called from argz_c.c:36.
-[eva] FRAMAC_SHARE/libc/argz.c:247: Call to builtin strlen
-[eva] FRAMAC_SHARE/libc/argz.c:247: Call to builtin strlen
-[eva] FRAMAC_SHARE/libc/argz.c:247: Call to builtin strlen
-[eva] FRAMAC_SHARE/libc/argz.c:247: Call to builtin strlen
-[eva] FRAMAC_SHARE/libc/argz.c:247: Call to builtin strlen
-[eva] FRAMAC_SHARE/libc/argz.c:247: Call to builtin strlen
-[eva] Recording results for argz_count
-[eva] Done for function argz_count
-[eva] computing for function __FC_assert <- main.
+[eva:progress] FRAMAC_SHARE/libc/argz.c:247: Call to builtin strlen
+[eva:progress] FRAMAC_SHARE/libc/argz.c:247: Call to builtin strlen
+[eva:progress] FRAMAC_SHARE/libc/argz.c:247: Call to builtin strlen
+[eva:progress] FRAMAC_SHARE/libc/argz.c:247: Call to builtin strlen
+[eva:progress] FRAMAC_SHARE/libc/argz.c:247: Call to builtin strlen
+[eva:progress] FRAMAC_SHARE/libc/argz.c:247: Call to builtin strlen
+[eva:progress] Recording results for argz_count
+[eva:progress] Done for function argz_count
+[eva:progress] 
+  computing for function __FC_assert <- main.
   Called from argz_c.c:37.
-[eva] argz_c.c:37: 
+[eva:progress] argz_c.c:37: 
   function __FC_assert: precondition 'nonnull_c' got status valid.
-[eva] Done for function __FC_assert
-[eva] computing for function argz_append <- main.
+[eva:progress] Done for function __FC_assert
+[eva:progress] 
+  computing for function argz_append <- main.
   Called from argz_c.c:38.
-[eva] FRAMAC_SHARE/libc/argz.c:258: Call to builtin realloc
+[eva:progress] FRAMAC_SHARE/libc/argz.c:258: Call to builtin realloc
 [eva:malloc:new] FRAMAC_SHARE/libc/argz.c:258: 
   allocating variable __realloc_argz_append_l258_0
-[eva] FRAMAC_SHARE/libc/argz.c:260: Call to builtin memcpy
-[eva] Recording results for argz_append
-[eva] Done for function argz_append
-[eva] computing for function exit <- main.
+[eva:progress] FRAMAC_SHARE/libc/argz.c:260: Call to builtin memcpy
+[eva:progress] Recording results for argz_append
+[eva:progress] Done for function argz_append
+[eva:progress] 
+  computing for function exit <- main.
   Called from argz_c.c:39.
-[eva] Done for function exit
-[eva] computing for function __FC_assert <- main.
+[eva:progress] Done for function exit
+[eva:progress] 
+  computing for function __FC_assert <- main.
   Called from argz_c.c:40.
-[eva] argz_c.c:40: 
+[eva:progress] argz_c.c:40: 
   function __FC_assert: precondition 'nonnull_c' got status valid.
-[eva] Done for function __FC_assert
-[eva] computing for function argz_add <- main.
+[eva:progress] Done for function __FC_assert
+[eva:progress] 
+  computing for function argz_add <- main.
   Called from argz_c.c:41.
-[eva] FRAMAC_SHARE/libc/argz.c:269: Call to builtin strlen
-[eva] computing for function argz_append <- argz_add <- main.
+[eva:progress] FRAMAC_SHARE/libc/argz.c:269: Call to builtin strlen
+[eva:progress] 
+  computing for function argz_append <- argz_add <- main.
   Called from FRAMAC_SHARE/libc/argz.c:269.
-[eva] FRAMAC_SHARE/libc/argz.c:258: Call to builtin realloc
+[eva:progress] FRAMAC_SHARE/libc/argz.c:258: Call to builtin realloc
 [eva:malloc:new] FRAMAC_SHARE/libc/argz.c:258: 
   allocating variable __realloc_argz_append_l258_1
-[eva] FRAMAC_SHARE/libc/argz.c:260: Call to builtin memcpy
-[eva] Recording results for argz_append
-[eva] Done for function argz_append
-[eva] Recording results for argz_add
-[eva] Done for function argz_add
-[eva] computing for function exit <- main.
+[eva:progress] FRAMAC_SHARE/libc/argz.c:260: Call to builtin memcpy
+[eva:progress] Recording results for argz_append
+[eva:progress] Done for function argz_append
+[eva:progress] Recording results for argz_add
+[eva:progress] Done for function argz_add
+[eva:progress] 
+  computing for function exit <- main.
   Called from argz_c.c:42.
-[eva] Done for function exit
-[eva] computing for function __FC_assert <- main.
+[eva:progress] Done for function exit
+[eva:progress] 
+  computing for function __FC_assert <- main.
   Called from argz_c.c:43.
-[eva] argz_c.c:43: 
+[eva:progress] argz_c.c:43: 
   function __FC_assert: precondition 'nonnull_c' got status valid.
-[eva] Done for function __FC_assert
-[eva] computing for function argz_replace <- main.
+[eva:progress] Done for function __FC_assert
+[eva:progress] 
+  computing for function argz_replace <- main.
   Called from argz_c.c:45.
-[eva] FRAMAC_SHARE/libc/argz.c:59: Call to builtin strlen
-[eva] FRAMAC_SHARE/libc/argz.c:59: 
+[eva:progress] FRAMAC_SHARE/libc/argz.c:59: Call to builtin strlen
+[eva:progress] FRAMAC_SHARE/libc/argz.c:59: 
   function strlen: precondition 'valid_string_s' got status valid.
-[eva] FRAMAC_SHARE/libc/argz.c:59: Call to builtin strlen
-[eva] FRAMAC_SHARE/libc/argz.c:59: 
+[eva:progress] FRAMAC_SHARE/libc/argz.c:59: Call to builtin strlen
+[eva:progress] FRAMAC_SHARE/libc/argz.c:59: 
   function strlen: precondition 'valid_string_s' got status valid.
-[eva] computing for function argz_next <- argz_replace <- main.
+[eva:progress] 
+  computing for function argz_next <- argz_replace <- main.
   Called from FRAMAC_SHARE/libc/argz.c:61.
-[eva] Recording results for argz_next
-[eva] Done for function argz_next
-[eva] computing for function strstr <- argz_replace <- main.
+[eva:progress] Recording results for argz_next
+[eva:progress] Done for function argz_next
+[eva:progress] 
+  computing for function strstr <- argz_replace <- main.
   Called from FRAMAC_SHARE/libc/argz.c:62.
-[eva] Recording results for strstr
-[eva] Done for function strstr
-[eva] computing for function argz_next <- argz_replace <- main.
+[eva:progress] Recording results for strstr
+[eva:progress] Done for function strstr
+[eva:progress] 
+  computing for function argz_next <- argz_replace <- main.
   Called from FRAMAC_SHARE/libc/argz.c:61.
-[eva] FRAMAC_SHARE/libc/argz.c:116: Call to builtin strchr
-[eva] FRAMAC_SHARE/libc/argz.c:116: 
+[eva:progress] FRAMAC_SHARE/libc/argz.c:116: Call to builtin strchr
+[eva:progress] FRAMAC_SHARE/libc/argz.c:116: 
   function strchr: precondition 'valid_string_s' got status valid.
 [eva:acsl:unsupported] FRAMAC_SHARE/libc/string.h:198: 
   cannot evaluate ACSL term, unsupported logic var p
-[eva] Recording results for argz_next
-[eva] Done for function argz_next
-[eva] computing for function strstr <- argz_replace <- main.
+[eva:progress] Recording results for argz_next
+[eva:progress] Done for function argz_next
+[eva:progress] 
+  computing for function strstr <- argz_replace <- main.
   Called from FRAMAC_SHARE/libc/argz.c:62.
-[eva] Recording results for strstr
-[eva] Done for function strstr
-[eva] computing for function argz_next <- argz_replace <- main.
+[eva:progress] Recording results for strstr
+[eva:progress] Done for function strstr
+[eva:progress] 
+  computing for function argz_next <- argz_replace <- main.
   Called from FRAMAC_SHARE/libc/argz.c:61.
-[eva] FRAMAC_SHARE/libc/argz.c:116: Call to builtin strchr
-[eva] Recording results for argz_next
-[eva] Done for function argz_next
-[eva] computing for function strstr <- argz_replace <- main.
+[eva:progress] FRAMAC_SHARE/libc/argz.c:116: Call to builtin strchr
+[eva:progress] Recording results for argz_next
+[eva:progress] Done for function argz_next
+[eva:progress] 
+  computing for function strstr <- argz_replace <- main.
   Called from FRAMAC_SHARE/libc/argz.c:62.
-[eva] Recording results for strstr
-[eva] Done for function strstr
-[eva] computing for function argz_next <- argz_replace <- main.
+[eva:progress] Recording results for strstr
+[eva:progress] Done for function strstr
+[eva:progress] 
+  computing for function argz_next <- argz_replace <- main.
   Called from FRAMAC_SHARE/libc/argz.c:61.
-[eva] FRAMAC_SHARE/libc/argz.c:116: Call to builtin strchr
-[eva] Recording results for argz_next
-[eva] Done for function argz_next
-[eva] computing for function strstr <- argz_replace <- main.
+[eva:progress] FRAMAC_SHARE/libc/argz.c:116: Call to builtin strchr
+[eva:progress] Recording results for argz_next
+[eva:progress] Done for function argz_next
+[eva:progress] 
+  computing for function strstr <- argz_replace <- main.
   Called from FRAMAC_SHARE/libc/argz.c:62.
-[eva] Recording results for strstr
-[eva] Done for function strstr
-[eva] computing for function strndup <- argz_replace <- main.
+[eva:progress] Recording results for strstr
+[eva:progress] Done for function strstr
+[eva:progress] 
+  computing for function strndup <- argz_replace <- main.
   Called from FRAMAC_SHARE/libc/argz.c:66.
 [eva:loop-unroll:auto] FRAMAC_SHARE/libc/string.c:333: Automatic loop unrolling.
-[eva] FRAMAC_SHARE/libc/string.c:336: Call to builtin malloc
+[eva:progress] FRAMAC_SHARE/libc/string.c:336: Call to builtin malloc
 [eva:malloc:new] FRAMAC_SHARE/libc/string.c:336: 
   allocating variable __malloc_strndup_l336
-[eva] FRAMAC_SHARE/libc/string.c:341: Call to builtin memcpy
-[eva] FRAMAC_SHARE/libc/string.c:341: 
+[eva:progress] FRAMAC_SHARE/libc/string.c:341: Call to builtin memcpy
+[eva:progress] FRAMAC_SHARE/libc/string.c:341: 
   function memcpy: precondition 'valid_dest' got status valid.
-[eva] FRAMAC_SHARE/libc/string.c:341: 
+[eva:progress] FRAMAC_SHARE/libc/string.c:341: 
   function memcpy: precondition 'valid_src' got status valid.
-[eva] FRAMAC_SHARE/libc/string.c:341: 
+[eva:progress] FRAMAC_SHARE/libc/string.c:341: 
   function memcpy: precondition 'separation' got status valid.
-[eva] Recording results for strndup
-[eva] Done for function strndup
-[eva] computing for function str_append <- argz_replace <- main.
+[eva:progress] Recording results for strndup
+[eva:progress] Done for function strndup
+[eva:progress] 
+  computing for function str_append <- argz_replace <- main.
   Called from FRAMAC_SHARE/libc/argz.c:69.
-[eva] FRAMAC_SHARE/libc/argz.c:36: Call to builtin realloc
-[eva] FRAMAC_SHARE/libc/argz.c:36: 
+[eva:progress] FRAMAC_SHARE/libc/argz.c:36: Call to builtin realloc
+[eva:progress] FRAMAC_SHARE/libc/argz.c:36: 
   function realloc: precondition 'freeable' got status valid.
 [eva:malloc:new] FRAMAC_SHARE/libc/argz.c:36: 
   allocating variable __realloc_str_append_l36
-[eva] computing for function mempcpy <- str_append <- argz_replace <- main.
+[eva:progress] 
+  computing for function mempcpy <- str_append <- argz_replace <- main.
   Called from FRAMAC_SHARE/libc/argz.c:39.
 [eva:loop-unroll:auto] FRAMAC_SHARE/libc/string.c:40: Automatic loop unrolling.
-[eva] Recording results for mempcpy
-[eva] Done for function mempcpy
-[eva] FRAMAC_SHARE/libc/argz.c:43: Call to builtin free
-[eva] FRAMAC_SHARE/libc/argz.c:43: 
+[eva:progress] Recording results for mempcpy
+[eva:progress] Done for function mempcpy
+[eva:progress] FRAMAC_SHARE/libc/argz.c:43: Call to builtin free
+[eva:progress] FRAMAC_SHARE/libc/argz.c:43: 
   function free: precondition 'freeable' got status valid.
-[eva] Recording results for str_append
-[eva] Done for function str_append
-[eva] computing for function strstr <- argz_replace <- main.
+[eva:progress] Recording results for str_append
+[eva:progress] Done for function str_append
+[eva:progress] 
+  computing for function strstr <- argz_replace <- main.
   Called from FRAMAC_SHARE/libc/argz.c:71.
-[eva] Recording results for strstr
-[eva] Done for function strstr
-[eva] FRAMAC_SHARE/libc/argz.c:76: Call to builtin strlen
-[eva] FRAMAC_SHARE/libc/argz.c:76: 
+[eva:progress] Recording results for strstr
+[eva:progress] Done for function strstr
+[eva:progress] FRAMAC_SHARE/libc/argz.c:76: Call to builtin strlen
+[eva:progress] FRAMAC_SHARE/libc/argz.c:76: 
   function strlen: precondition 'valid_string_s' got status valid.
-[eva] computing for function str_append <- argz_replace <- main.
+[eva:progress] 
+  computing for function str_append <- argz_replace <- main.
   Called from FRAMAC_SHARE/libc/argz.c:76.
-[eva] FRAMAC_SHARE/libc/argz.c:36: Call to builtin realloc
+[eva:progress] FRAMAC_SHARE/libc/argz.c:36: Call to builtin realloc
 [eva:malloc:new] FRAMAC_SHARE/libc/argz.c:36: 
   allocating variable __realloc_str_append_l36_0
-[eva] computing for function mempcpy <- str_append <- argz_replace <- main.
+[eva:progress] 
+  computing for function mempcpy <- str_append <- argz_replace <- main.
   Called from FRAMAC_SHARE/libc/argz.c:39.
-[eva] Recording results for mempcpy
-[eva] Done for function mempcpy
-[eva] FRAMAC_SHARE/libc/argz.c:43: Call to builtin free
-[eva] Recording results for str_append
-[eva] Done for function str_append
-[eva] computing for function argz_append <- argz_replace <- main.
+[eva:progress] Recording results for mempcpy
+[eva:progress] Done for function mempcpy
+[eva:progress] FRAMAC_SHARE/libc/argz.c:43: Call to builtin free
+[eva:progress] Recording results for str_append
+[eva:progress] Done for function str_append
+[eva:progress] 
+  computing for function argz_append <- argz_replace <- main.
   Called from FRAMAC_SHARE/libc/argz.c:85.
-[eva] FRAMAC_SHARE/libc/argz.c:258: Call to builtin realloc
+[eva:progress] FRAMAC_SHARE/libc/argz.c:258: Call to builtin realloc
 [eva:malloc:new] FRAMAC_SHARE/libc/argz.c:258: 
   allocating variable __realloc_argz_append_l258_2
-[eva] FRAMAC_SHARE/libc/argz.c:260: Call to builtin memcpy
-[eva] Recording results for argz_append
-[eva] Done for function argz_append
-[eva] computing for function argz_add <- argz_replace <- main.
+[eva:progress] FRAMAC_SHARE/libc/argz.c:260: Call to builtin memcpy
+[eva:progress] Recording results for argz_append
+[eva:progress] Done for function argz_append
+[eva:progress] 
+  computing for function argz_add <- argz_replace <- main.
   Called from FRAMAC_SHARE/libc/argz.c:89.
-[eva] FRAMAC_SHARE/libc/argz.c:269: Call to builtin strlen
-[eva] computing for function argz_append <- argz_add <- argz_replace <- main.
+[eva:progress] FRAMAC_SHARE/libc/argz.c:269: Call to builtin strlen
+[eva:progress] 
+  computing for function argz_append <- argz_add <- argz_replace <- main.
   Called from FRAMAC_SHARE/libc/argz.c:269.
-[eva] FRAMAC_SHARE/libc/argz.c:258: Call to builtin realloc
+[eva:progress] FRAMAC_SHARE/libc/argz.c:258: Call to builtin realloc
 [eva:malloc:new] FRAMAC_SHARE/libc/argz.c:258: 
   allocating variable __realloc_argz_append_l258_3
-[eva] FRAMAC_SHARE/libc/argz.c:260: Call to builtin memcpy
-[eva] Recording results for argz_append
-[eva] Done for function argz_append
-[eva] Recording results for argz_add
-[eva] Done for function argz_add
-[eva] FRAMAC_SHARE/libc/argz.c:90: Call to builtin free
-[eva] FRAMAC_SHARE/libc/argz.c:90: 
+[eva:progress] FRAMAC_SHARE/libc/argz.c:260: Call to builtin memcpy
+[eva:progress] Recording results for argz_append
+[eva:progress] Done for function argz_append
+[eva:progress] Recording results for argz_add
+[eva:progress] Done for function argz_add
+[eva:progress] FRAMAC_SHARE/libc/argz.c:90: Call to builtin free
+[eva:progress] FRAMAC_SHARE/libc/argz.c:90: 
   function free: precondition 'freeable' got status valid.
-[eva] FRAMAC_SHARE/libc/argz.c:90: Call to builtin free
-[eva] FRAMAC_SHARE/libc/argz.c:90: Call to builtin free
-[eva] computing for function argz_next <- argz_replace <- main.
+[eva:progress] FRAMAC_SHARE/libc/argz.c:90: Call to builtin free
+[eva:progress] FRAMAC_SHARE/libc/argz.c:90: Call to builtin free
+[eva:progress] 
+  computing for function argz_next <- argz_replace <- main.
   Called from FRAMAC_SHARE/libc/argz.c:61.
-[eva] FRAMAC_SHARE/libc/argz.c:116: Call to builtin strchr
-[eva] Recording results for argz_next
-[eva] Done for function argz_next
-[eva] computing for function strstr <- argz_replace <- main.
+[eva:progress] FRAMAC_SHARE/libc/argz.c:116: Call to builtin strchr
+[eva:progress] Recording results for argz_next
+[eva:progress] Done for function argz_next
+[eva:progress] 
+  computing for function strstr <- argz_replace <- main.
   Called from FRAMAC_SHARE/libc/argz.c:62.
-[eva] Recording results for strstr
-[eva] Done for function strstr
-[eva] computing for function argz_add <- argz_replace <- main.
+[eva:progress] Recording results for strstr
+[eva:progress] Done for function strstr
+[eva:progress] 
+  computing for function argz_add <- argz_replace <- main.
   Called from FRAMAC_SHARE/libc/argz.c:97.
-[eva] FRAMAC_SHARE/libc/argz.c:269: Call to builtin strlen
-[eva] computing for function argz_append <- argz_add <- argz_replace <- main.
+[eva:progress] FRAMAC_SHARE/libc/argz.c:269: Call to builtin strlen
+[eva:progress] 
+  computing for function argz_append <- argz_add <- argz_replace <- main.
   Called from FRAMAC_SHARE/libc/argz.c:269.
-[eva] FRAMAC_SHARE/libc/argz.c:258: Call to builtin realloc
+[eva:progress] FRAMAC_SHARE/libc/argz.c:258: Call to builtin realloc
 [eva:malloc:new] FRAMAC_SHARE/libc/argz.c:258: 
   allocating variable __realloc_argz_append_l258_4
-[eva] FRAMAC_SHARE/libc/argz.c:260: Call to builtin memcpy
-[eva] Recording results for argz_append
-[eva] Done for function argz_append
-[eva] Recording results for argz_add
-[eva] Done for function argz_add
-[eva] computing for function argz_next <- argz_replace <- main.
+[eva:progress] FRAMAC_SHARE/libc/argz.c:260: Call to builtin memcpy
+[eva:progress] Recording results for argz_append
+[eva:progress] Done for function argz_append
+[eva:progress] Recording results for argz_add
+[eva:progress] Done for function argz_add
+[eva:progress] 
+  computing for function argz_next <- argz_replace <- main.
   Called from FRAMAC_SHARE/libc/argz.c:61.
-[eva] FRAMAC_SHARE/libc/argz.c:116: Call to builtin strchr
-[eva] Recording results for argz_next
-[eva] Done for function argz_next
-[eva] computing for function strstr <- argz_replace <- main.
+[eva:progress] FRAMAC_SHARE/libc/argz.c:116: Call to builtin strchr
+[eva:progress] Recording results for argz_next
+[eva:progress] Done for function argz_next
+[eva:progress] 
+  computing for function strstr <- argz_replace <- main.
   Called from FRAMAC_SHARE/libc/argz.c:62.
-[eva] Recording results for strstr
-[eva] Done for function strstr
-[eva] computing for function argz_add <- argz_replace <- main.
+[eva:progress] Recording results for strstr
+[eva:progress] Done for function strstr
+[eva:progress] 
+  computing for function argz_add <- argz_replace <- main.
   Called from FRAMAC_SHARE/libc/argz.c:97.
-[eva] FRAMAC_SHARE/libc/argz.c:269: Call to builtin strlen
-[eva] computing for function argz_append <- argz_add <- argz_replace <- main.
+[eva:progress] FRAMAC_SHARE/libc/argz.c:269: Call to builtin strlen
+[eva:progress] 
+  computing for function argz_append <- argz_add <- argz_replace <- main.
   Called from FRAMAC_SHARE/libc/argz.c:269.
-[eva] FRAMAC_SHARE/libc/argz.c:258: Call to builtin realloc
+[eva:progress] FRAMAC_SHARE/libc/argz.c:258: Call to builtin realloc
 [eva:malloc:new] FRAMAC_SHARE/libc/argz.c:258: 
   allocating variable __realloc_argz_append_l258_5
-[eva] FRAMAC_SHARE/libc/argz.c:260: Call to builtin memcpy
-[eva] Recording results for argz_append
-[eva] Done for function argz_append
-[eva] Recording results for argz_add
-[eva] Done for function argz_add
-[eva] computing for function argz_next <- argz_replace <- main.
+[eva:progress] FRAMAC_SHARE/libc/argz.c:260: Call to builtin memcpy
+[eva:progress] Recording results for argz_append
+[eva:progress] Done for function argz_append
+[eva:progress] Recording results for argz_add
+[eva:progress] Done for function argz_add
+[eva:progress] 
+  computing for function argz_next <- argz_replace <- main.
   Called from FRAMAC_SHARE/libc/argz.c:61.
-[eva] FRAMAC_SHARE/libc/argz.c:116: Call to builtin strchr
-[eva] Recording results for argz_next
-[eva] Done for function argz_next
-[eva] computing for function strstr <- argz_replace <- main.
+[eva:progress] FRAMAC_SHARE/libc/argz.c:116: Call to builtin strchr
+[eva:progress] Recording results for argz_next
+[eva:progress] Done for function argz_next
+[eva:progress] 
+  computing for function strstr <- argz_replace <- main.
   Called from FRAMAC_SHARE/libc/argz.c:62.
-[eva] Recording results for strstr
-[eva] Done for function strstr
-[eva] computing for function argz_add <- argz_replace <- main.
+[eva:progress] Recording results for strstr
+[eva:progress] Done for function strstr
+[eva:progress] 
+  computing for function argz_add <- argz_replace <- main.
   Called from FRAMAC_SHARE/libc/argz.c:97.
-[eva] FRAMAC_SHARE/libc/argz.c:269: Call to builtin strlen
-[eva] computing for function argz_append <- argz_add <- argz_replace <- main.
+[eva:progress] FRAMAC_SHARE/libc/argz.c:269: Call to builtin strlen
+[eva:progress] 
+  computing for function argz_append <- argz_add <- argz_replace <- main.
   Called from FRAMAC_SHARE/libc/argz.c:269.
-[eva] FRAMAC_SHARE/libc/argz.c:258: Call to builtin realloc
+[eva:progress] FRAMAC_SHARE/libc/argz.c:258: Call to builtin realloc
 [eva:malloc:new] FRAMAC_SHARE/libc/argz.c:258: 
   allocating variable __realloc_argz_append_l258_6
-[eva] FRAMAC_SHARE/libc/argz.c:260: Call to builtin memcpy
-[eva] Recording results for argz_append
-[eva] Done for function argz_append
-[eva] Recording results for argz_add
-[eva] Done for function argz_add
-[eva] computing for function argz_next <- argz_replace <- main.
+[eva:progress] FRAMAC_SHARE/libc/argz.c:260: Call to builtin memcpy
+[eva:progress] Recording results for argz_append
+[eva:progress] Done for function argz_append
+[eva:progress] Recording results for argz_add
+[eva:progress] Done for function argz_add
+[eva:progress] 
+  computing for function argz_next <- argz_replace <- main.
   Called from FRAMAC_SHARE/libc/argz.c:61.
-[eva] FRAMAC_SHARE/libc/argz.c:116: Call to builtin strchr
-[eva] Recording results for argz_next
-[eva] Done for function argz_next
-[eva] computing for function strstr <- argz_replace <- main.
+[eva:progress] FRAMAC_SHARE/libc/argz.c:116: Call to builtin strchr
+[eva:progress] Recording results for argz_next
+[eva:progress] Done for function argz_next
+[eva:progress] 
+  computing for function strstr <- argz_replace <- main.
   Called from FRAMAC_SHARE/libc/argz.c:62.
-[eva] Recording results for strstr
-[eva] Done for function strstr
-[eva] computing for function strndup <- argz_replace <- main.
+[eva:progress] Recording results for strstr
+[eva:progress] Done for function strstr
+[eva:progress] 
+  computing for function strndup <- argz_replace <- main.
   Called from FRAMAC_SHARE/libc/argz.c:66.
-[eva] FRAMAC_SHARE/libc/string.c:336: Call to builtin malloc
+[eva:progress] FRAMAC_SHARE/libc/string.c:336: Call to builtin malloc
 [eva:malloc:new] FRAMAC_SHARE/libc/string.c:336: 
   allocating variable __malloc_strndup_l336_0
-[eva] FRAMAC_SHARE/libc/string.c:341: Call to builtin memcpy
-[eva] Recording results for strndup
-[eva] Done for function strndup
-[eva] computing for function str_append <- argz_replace <- main.
+[eva:progress] FRAMAC_SHARE/libc/string.c:341: Call to builtin memcpy
+[eva:progress] Recording results for strndup
+[eva:progress] Done for function strndup
+[eva:progress] 
+  computing for function str_append <- argz_replace <- main.
   Called from FRAMAC_SHARE/libc/argz.c:69.
-[eva] FRAMAC_SHARE/libc/argz.c:36: Call to builtin realloc
+[eva:progress] FRAMAC_SHARE/libc/argz.c:36: Call to builtin realloc
 [eva:malloc:new] FRAMAC_SHARE/libc/argz.c:36: 
   allocating variable __realloc_str_append_l36_1
-[eva] computing for function mempcpy <- str_append <- argz_replace <- main.
+[eva:progress] 
+  computing for function mempcpy <- str_append <- argz_replace <- main.
   Called from FRAMAC_SHARE/libc/argz.c:39.
-[eva] Recording results for mempcpy
-[eva] Done for function mempcpy
-[eva] FRAMAC_SHARE/libc/argz.c:43: Call to builtin free
-[eva] Recording results for str_append
-[eva] Done for function str_append
-[eva] computing for function strstr <- argz_replace <- main.
+[eva:progress] Recording results for mempcpy
+[eva:progress] Done for function mempcpy
+[eva:progress] FRAMAC_SHARE/libc/argz.c:43: Call to builtin free
+[eva:progress] Recording results for str_append
+[eva:progress] Done for function str_append
+[eva:progress] 
+  computing for function strstr <- argz_replace <- main.
   Called from FRAMAC_SHARE/libc/argz.c:71.
-[eva] Recording results for strstr
-[eva] Done for function strstr
-[eva] FRAMAC_SHARE/libc/argz.c:76: Call to builtin strlen
-[eva] computing for function str_append <- argz_replace <- main.
+[eva:progress] Recording results for strstr
+[eva:progress] Done for function strstr
+[eva:progress] FRAMAC_SHARE/libc/argz.c:76: Call to builtin strlen
+[eva:progress] 
+  computing for function str_append <- argz_replace <- main.
   Called from FRAMAC_SHARE/libc/argz.c:76.
-[eva] FRAMAC_SHARE/libc/argz.c:36: Call to builtin realloc
+[eva:progress] FRAMAC_SHARE/libc/argz.c:36: Call to builtin realloc
 [eva:malloc:new] FRAMAC_SHARE/libc/argz.c:36: 
   allocating variable __realloc_str_append_l36_2
-[eva] computing for function mempcpy <- str_append <- argz_replace <- main.
+[eva:progress] 
+  computing for function mempcpy <- str_append <- argz_replace <- main.
   Called from FRAMAC_SHARE/libc/argz.c:39.
-[eva] Recording results for mempcpy
-[eva] Done for function mempcpy
-[eva] FRAMAC_SHARE/libc/argz.c:43: Call to builtin free
-[eva] Recording results for str_append
-[eva] Done for function str_append
-[eva] computing for function argz_add <- argz_replace <- main.
+[eva:progress] Recording results for mempcpy
+[eva:progress] Done for function mempcpy
+[eva:progress] FRAMAC_SHARE/libc/argz.c:43: Call to builtin free
+[eva:progress] Recording results for str_append
+[eva:progress] Done for function str_append
+[eva:progress] 
+  computing for function argz_add <- argz_replace <- main.
   Called from FRAMAC_SHARE/libc/argz.c:89.
-[eva] FRAMAC_SHARE/libc/argz.c:269: Call to builtin strlen
-[eva] computing for function argz_append <- argz_add <- argz_replace <- main.
+[eva:progress] FRAMAC_SHARE/libc/argz.c:269: Call to builtin strlen
+[eva:progress] 
+  computing for function argz_append <- argz_add <- argz_replace <- main.
   Called from FRAMAC_SHARE/libc/argz.c:269.
-[eva] FRAMAC_SHARE/libc/argz.c:258: Call to builtin realloc
+[eva:progress] FRAMAC_SHARE/libc/argz.c:258: Call to builtin realloc
 [eva:malloc:new] FRAMAC_SHARE/libc/argz.c:258: 
   allocating variable __realloc_argz_append_l258_7
-[eva] FRAMAC_SHARE/libc/argz.c:260: Call to builtin memcpy
-[eva] Recording results for argz_append
-[eva] Done for function argz_append
-[eva] Recording results for argz_add
-[eva] Done for function argz_add
-[eva] FRAMAC_SHARE/libc/argz.c:90: Call to builtin free
-[eva] FRAMAC_SHARE/libc/argz.c:90: Call to builtin free
-[eva] computing for function argz_next <- argz_replace <- main.
+[eva:progress] FRAMAC_SHARE/libc/argz.c:260: Call to builtin memcpy
+[eva:progress] Recording results for argz_append
+[eva:progress] Done for function argz_append
+[eva:progress] Recording results for argz_add
+[eva:progress] Done for function argz_add
+[eva:progress] FRAMAC_SHARE/libc/argz.c:90: Call to builtin free
+[eva:progress] FRAMAC_SHARE/libc/argz.c:90: Call to builtin free
+[eva:progress] 
+  computing for function argz_next <- argz_replace <- main.
   Called from FRAMAC_SHARE/libc/argz.c:61.
-[eva] FRAMAC_SHARE/libc/argz.c:116: Call to builtin strchr
-[eva] Recording results for argz_next
-[eva] Done for function argz_next
-[eva] FRAMAC_SHARE/libc/argz.c:102: Call to builtin free
-[eva] FRAMAC_SHARE/libc/argz.c:102: 
+[eva:progress] FRAMAC_SHARE/libc/argz.c:116: Call to builtin strchr
+[eva:progress] Recording results for argz_next
+[eva:progress] Done for function argz_next
+[eva:progress] FRAMAC_SHARE/libc/argz.c:102: Call to builtin free
+[eva:progress] FRAMAC_SHARE/libc/argz.c:102: 
   function free: precondition 'freeable' got status valid.
-[eva] FRAMAC_SHARE/libc/argz.c:107: Call to builtin free
-[eva] FRAMAC_SHARE/libc/argz.c:107: 
+[eva:progress] FRAMAC_SHARE/libc/argz.c:107: Call to builtin free
+[eva:progress] FRAMAC_SHARE/libc/argz.c:107: 
   function free: precondition 'freeable' got status valid.
-[eva] FRAMAC_SHARE/libc/argz.c:107: Call to builtin free
-[eva] FRAMAC_SHARE/libc/argz.c:107: Call to builtin free
-[eva] FRAMAC_SHARE/libc/argz.c:107: Call to builtin free
-[eva] FRAMAC_SHARE/libc/argz.c:107: Call to builtin free
-[eva] Recording results for argz_replace
-[eva] Done for function argz_replace
-[eva] computing for function exit <- main.
+[eva:progress] FRAMAC_SHARE/libc/argz.c:107: Call to builtin free
+[eva:progress] FRAMAC_SHARE/libc/argz.c:107: Call to builtin free
+[eva:progress] FRAMAC_SHARE/libc/argz.c:107: Call to builtin free
+[eva:progress] FRAMAC_SHARE/libc/argz.c:107: Call to builtin free
+[eva:progress] Recording results for argz_replace
+[eva:progress] Done for function argz_replace
+[eva:progress] 
+  computing for function exit <- main.
   Called from argz_c.c:46.
-[eva] Done for function exit
-[eva] computing for function __FC_assert <- main.
+[eva:progress] Done for function exit
+[eva:progress] 
+  computing for function __FC_assert <- main.
   Called from argz_c.c:47.
-[eva] argz_c.c:47: 
+[eva:progress] argz_c.c:47: 
   function __FC_assert: precondition 'nonnull_c' got status valid.
-[eva] Done for function __FC_assert
-[eva] computing for function __FC_assert <- main.
+[eva:progress] Done for function __FC_assert
+[eva:progress] 
+  computing for function __FC_assert <- main.
   Called from argz_c.c:48.
-[eva] argz_c.c:48: 
+[eva:progress] argz_c.c:48: 
   function __FC_assert: precondition 'nonnull_c' got status valid.
-[eva] Done for function __FC_assert
-[eva] computing for function argz_next <- main.
+[eva:progress] Done for function __FC_assert
+[eva:progress] 
+  computing for function argz_next <- main.
   Called from argz_c.c:49.
-[eva] Recording results for argz_next
-[eva] Done for function argz_next
-[eva] computing for function __FC_assert <- main.
+[eva:progress] Recording results for argz_next
+[eva:progress] Done for function argz_next
+[eva:progress] 
+  computing for function __FC_assert <- main.
   Called from argz_c.c:50.
-[eva] argz_c.c:50: 
+[eva:progress] argz_c.c:50: 
   function __FC_assert: precondition 'nonnull_c' got status valid.
-[eva] Done for function __FC_assert
-[eva] computing for function argz_next <- main.
+[eva:progress] Done for function __FC_assert
+[eva:progress] 
+  computing for function argz_next <- main.
   Called from argz_c.c:52.
-[eva] FRAMAC_SHARE/libc/argz.c:116: Call to builtin strchr
-[eva] Recording results for argz_next
-[eva] Done for function argz_next
-[eva] computing for function argz_delete <- main.
+[eva:progress] FRAMAC_SHARE/libc/argz.c:116: Call to builtin strchr
+[eva:progress] Recording results for argz_next
+[eva:progress] Done for function argz_next
+[eva:progress] 
+  computing for function argz_delete <- main.
   Called from argz_c.c:54.
-[eva] FRAMAC_SHARE/libc/argz.c:171: Call to builtin strlen
-[eva] FRAMAC_SHARE/libc/argz.c:171: 
+[eva:progress] FRAMAC_SHARE/libc/argz.c:171: Call to builtin strlen
+[eva:progress] FRAMAC_SHARE/libc/argz.c:171: 
   function strlen: precondition 'valid_string_s' got status valid.
-[eva] FRAMAC_SHARE/libc/argz.c:173: Call to builtin memmove
-[eva] FRAMAC_SHARE/libc/argz.c:173: 
+[eva:progress] FRAMAC_SHARE/libc/argz.c:173: Call to builtin memmove
+[eva:progress] FRAMAC_SHARE/libc/argz.c:173: 
   function memmove: precondition 'valid_dest' got status valid.
-[eva] FRAMAC_SHARE/libc/argz.c:173: 
+[eva:progress] FRAMAC_SHARE/libc/argz.c:173: 
   function memmove: precondition 'valid_src' got status valid.
 [eva:acsl:unsupported] FRAMAC_SHARE/libc/string.h:137: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memcmp
-[eva] Recording results for argz_delete
-[eva] Done for function argz_delete
-[eva] computing for function __FC_assert <- main.
+[eva:progress] Recording results for argz_delete
+[eva:progress] Done for function argz_delete
+[eva:progress] 
+  computing for function __FC_assert <- main.
   Called from argz_c.c:55.
-[eva] argz_c.c:55: 
+[eva:progress] argz_c.c:55: 
   function __FC_assert: precondition 'nonnull_c' got status valid.
-[eva] Done for function __FC_assert
-[eva] computing for function argz_next <- main.
+[eva:progress] Done for function __FC_assert
+[eva:progress] 
+  computing for function argz_next <- main.
   Called from argz_c.c:56.
-[eva] Recording results for argz_next
-[eva] Done for function argz_next
-[eva] computing for function argz_next <- main.
+[eva:progress] Recording results for argz_next
+[eva:progress] Done for function argz_next
+[eva:progress] 
+  computing for function argz_next <- main.
   Called from argz_c.c:58.
-[eva] FRAMAC_SHARE/libc/argz.c:116: Call to builtin strchr
-[eva] Recording results for argz_next
-[eva] Done for function argz_next
-[eva] computing for function argz_next <- main.
+[eva:progress] FRAMAC_SHARE/libc/argz.c:116: Call to builtin strchr
+[eva:progress] Recording results for argz_next
+[eva:progress] Done for function argz_next
+[eva:progress] 
+  computing for function argz_next <- main.
   Called from argz_c.c:58.
-[eva] FRAMAC_SHARE/libc/argz.c:116: Call to builtin strchr
-[eva] Recording results for argz_next
-[eva] Done for function argz_next
-[eva] computing for function __FC_assert <- main.
+[eva:progress] FRAMAC_SHARE/libc/argz.c:116: Call to builtin strchr
+[eva:progress] Recording results for argz_next
+[eva:progress] Done for function argz_next
+[eva:progress] 
+  computing for function __FC_assert <- main.
   Called from argz_c.c:60.
-[eva] argz_c.c:60: 
+[eva:progress] argz_c.c:60: 
   function __FC_assert: precondition 'nonnull_c' got status valid.
-[eva] Done for function __FC_assert
-[eva] computing for function argz_delete <- main.
+[eva:progress] Done for function __FC_assert
+[eva:progress] 
+  computing for function argz_delete <- main.
   Called from argz_c.c:61.
-[eva] FRAMAC_SHARE/libc/argz.c:171: Call to builtin strlen
-[eva] FRAMAC_SHARE/libc/argz.c:173: Call to builtin memmove
-[eva] Recording results for argz_delete
-[eva] Done for function argz_delete
-[eva] computing for function __FC_assert <- main.
+[eva:progress] FRAMAC_SHARE/libc/argz.c:171: Call to builtin strlen
+[eva:progress] FRAMAC_SHARE/libc/argz.c:173: Call to builtin memmove
+[eva:progress] Recording results for argz_delete
+[eva:progress] Done for function argz_delete
+[eva:progress] 
+  computing for function __FC_assert <- main.
   Called from argz_c.c:62.
-[eva] argz_c.c:62: 
+[eva:progress] argz_c.c:62: 
   function __FC_assert: precondition 'nonnull_c' got status valid.
-[eva] Done for function __FC_assert
-[eva] computing for function argz_next <- main.
+[eva:progress] Done for function __FC_assert
+[eva:progress] 
+  computing for function argz_next <- main.
   Called from argz_c.c:63.
-[eva] Recording results for argz_next
-[eva] Done for function argz_next
-[eva] computing for function argz_insert <- main.
+[eva:progress] Recording results for argz_next
+[eva:progress] Done for function argz_next
+[eva:progress] 
+  computing for function argz_insert <- main.
   Called from argz_c.c:64.
-[eva] FRAMAC_SHARE/libc/argz.c:140: Call to builtin strlen
-[eva] FRAMAC_SHARE/libc/argz.c:140: 
+[eva:progress] FRAMAC_SHARE/libc/argz.c:140: Call to builtin strlen
+[eva:progress] FRAMAC_SHARE/libc/argz.c:140: 
   function strlen: precondition 'valid_string_s' got status valid.
-[eva] FRAMAC_SHARE/libc/argz.c:144: Call to builtin realloc
-[eva] FRAMAC_SHARE/libc/argz.c:144: 
+[eva:progress] FRAMAC_SHARE/libc/argz.c:144: Call to builtin realloc
+[eva:progress] FRAMAC_SHARE/libc/argz.c:144: 
   function realloc: precondition 'freeable' got status valid.
 [eva:malloc:new] FRAMAC_SHARE/libc/argz.c:144: 
   allocating variable __realloc_argz_insert_l144
-[eva] FRAMAC_SHARE/libc/argz.c:148: Call to builtin memmove
-[eva] FRAMAC_SHARE/libc/argz.c:148: 
+[eva:progress] FRAMAC_SHARE/libc/argz.c:148: Call to builtin memmove
+[eva:progress] FRAMAC_SHARE/libc/argz.c:148: 
   function memmove: precondition 'valid_dest' got status valid.
-[eva] FRAMAC_SHARE/libc/argz.c:148: 
+[eva:progress] FRAMAC_SHARE/libc/argz.c:148: 
   function memmove: precondition 'valid_src' got status valid.
-[eva] FRAMAC_SHARE/libc/argz.c:149: Call to builtin memmove
-[eva] FRAMAC_SHARE/libc/argz.c:149: 
+[eva:progress] FRAMAC_SHARE/libc/argz.c:149: Call to builtin memmove
+[eva:progress] FRAMAC_SHARE/libc/argz.c:149: 
   function memmove: precondition 'valid_dest' got status valid.
-[eva] FRAMAC_SHARE/libc/argz.c:149: 
+[eva:progress] FRAMAC_SHARE/libc/argz.c:149: 
   function memmove: precondition 'valid_src' got status valid.
-[eva] Recording results for argz_insert
-[eva] Done for function argz_insert
-[eva] computing for function exit <- main.
+[eva:progress] Recording results for argz_insert
+[eva:progress] Done for function argz_insert
+[eva:progress] 
+  computing for function exit <- main.
   Called from argz_c.c:65.
-[eva] Done for function exit
-[eva] computing for function __FC_assert <- main.
+[eva:progress] Done for function exit
+[eva:progress] 
+  computing for function __FC_assert <- main.
   Called from argz_c.c:66.
-[eva] argz_c.c:66: 
+[eva:progress] argz_c.c:66: 
   function __FC_assert: precondition 'nonnull_c' got status valid.
-[eva] Done for function __FC_assert
-[eva] computing for function argz_insert <- main.
+[eva:progress] Done for function __FC_assert
+[eva:progress] 
+  computing for function argz_insert <- main.
   Called from argz_c.c:67.
-[eva] computing for function argz_add <- argz_insert <- main.
+[eva:progress] 
+  computing for function argz_add <- argz_insert <- main.
   Called from FRAMAC_SHARE/libc/argz.c:129.
-[eva] FRAMAC_SHARE/libc/argz.c:269: Call to builtin strlen
-[eva] computing for function argz_append <- argz_add <- argz_insert <- main.
+[eva:progress] FRAMAC_SHARE/libc/argz.c:269: Call to builtin strlen
+[eva:progress] 
+  computing for function argz_append <- argz_add <- argz_insert <- main.
   Called from FRAMAC_SHARE/libc/argz.c:269.
-[eva] FRAMAC_SHARE/libc/argz.c:258: Call to builtin realloc
+[eva:progress] FRAMAC_SHARE/libc/argz.c:258: Call to builtin realloc
 [eva:malloc:new] FRAMAC_SHARE/libc/argz.c:258: 
   allocating variable __realloc_argz_append_l258_8
-[eva] FRAMAC_SHARE/libc/argz.c:260: Call to builtin memcpy
-[eva] Recording results for argz_append
-[eva] Done for function argz_append
-[eva] Recording results for argz_add
-[eva] Done for function argz_add
-[eva] Recording results for argz_insert
-[eva] Done for function argz_insert
-[eva] computing for function exit <- main.
+[eva:progress] FRAMAC_SHARE/libc/argz.c:260: Call to builtin memcpy
+[eva:progress] Recording results for argz_append
+[eva:progress] Done for function argz_append
+[eva:progress] Recording results for argz_add
+[eva:progress] Done for function argz_add
+[eva:progress] Recording results for argz_insert
+[eva:progress] Done for function argz_insert
+[eva:progress] 
+  computing for function exit <- main.
   Called from argz_c.c:68.
-[eva] Done for function exit
-[eva] computing for function __FC_assert <- main.
+[eva:progress] Done for function exit
+[eva:progress] 
+  computing for function __FC_assert <- main.
   Called from argz_c.c:69.
-[eva] argz_c.c:69: 
+[eva:progress] argz_c.c:69: 
   function __FC_assert: precondition 'nonnull_c' got status valid.
-[eva] Done for function __FC_assert
-[eva] argz_c.c:71: Call to builtin free
-[eva] argz_c.c:71: function free: precondition 'freeable' got status valid.
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Done for function __FC_assert
+[eva:progress] argz_c.c:71: Call to builtin free
+[eva:progress] argz_c.c:71: 
+  function free: precondition 'freeable' got status valid.
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function mempcpy:
   i ∈ {0; 3}

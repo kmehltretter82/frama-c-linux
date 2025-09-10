@@ -1,7 +1,7 @@
 [kernel] Parsing volatile.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   G ∈ [--..--]
   F ∈ [--..--]
@@ -43,9 +43,11 @@
         .[bits 240 to 255] ∈ {0} or UNINITIALIZED
   R1 ∈ {0}
   R2 ∈ {0}
-[eva] computing for function main1 <- main.
+[eva:progress] 
+  computing for function main1 <- main.
   Called from volatile.c:176.
-[eva] computing for function fn1 <- main1 <- main.
+[eva:progress] 
+  computing for function fn1 <- main1 <- main.
   Called from volatile.c:39.
 [eva:show] volatile.c:24: Frama_C_show_each_1: [-2147483648..2147483647]
 [eva:show] volatile.c:25: Frama_C_show_each_2: [-2147483648..2147483647]
@@ -53,15 +55,16 @@
   signed overflow. assert -2147483648 ≤ x_0 + y_0;
 [eva:alarm] volatile.c:26: Warning: 
   signed overflow. assert x_0 + y_0 ≤ 2147483647;
-[eva] Recording results for fn1
-[eva] Done for function fn1
+[eva:progress] Recording results for fn1
+[eva:progress] Done for function fn1
 [kernel:annot:missing-spec] volatile.c:40: Warning: 
   Neither code nor specification for function fn2, generating default assigns.
   See -generated-spec-* options for more info.
-[eva] computing for function fn2 <- main1 <- main.
+[eva:progress] 
+  computing for function fn2 <- main1 <- main.
   Called from volatile.c:40.
 [eva] using specification for function fn2
-[eva] Done for function fn2
+[eva:progress] Done for function fn2
 [eva:show] volatile.c:41: Frama_C_show_each_d: [-2147483648..2147483647]
 [eva:alarm] volatile.c:52: Warning: 
   signed overflow. assert -2147483648 ≤ b - c;
@@ -87,15 +90,17 @@
   signed overflow. assert -2147483648 ≤ m - l;
 [eva:alarm] volatile.c:59: Warning: 
   signed overflow. assert m - l ≤ 2147483647;
-[eva] Recording results for main1
-[eva] Done for function main1
-[eva] computing for function main2 <- main.
+[eva:progress] Recording results for main1
+[eva:progress] Done for function main1
+[eva:progress] 
+  computing for function main2 <- main.
   Called from volatile.c:177.
 [eva:alarm] volatile.c:83: Warning: 
   pointer downcast. assert (unsigned int)(&X) ≤ 2147483647;
-[eva] Recording results for main2
-[eva] Done for function main2
-[eva] computing for function main3 <- main.
+[eva:progress] Recording results for main2
+[eva:progress] Done for function main2
+[eva:progress] 
+  computing for function main3 <- main.
   Called from volatile.c:178.
 [eva:alarm] volatile.c:118: Warning: 
   accessing out of bounds index. assert 0 ≤ v;
@@ -335,9 +340,10 @@
   accessing out of bounds index. assert a_0[deepvolt[0].g[0]] < 1;
 [eva:show] volatile.c:154: Frama_C_show_each_av: [-2147483648..2147483647]
 [eva:alarm] volatile.c:155: Warning: assertion 'NORED' got status unknown.
-[eva] Recording results for main3
-[eva] Done for function main3
-[eva] computing for function main4 <- main.
+[eva:progress] Recording results for main3
+[eva:progress] Done for function main3
+[eva:progress] 
+  computing for function main4 <- main.
   Called from volatile.c:179.
 [eva:alarm] volatile.c:162: Warning: 
   accessing uninitialized left-value. assert \initialized(&v1);
@@ -352,10 +358,10 @@
 [eva:show] volatile.c:172: 
   Frama_C_show_each_ptr_volatile:
   {{ &x_0 + [--..--],0%4 }}, {{ &x_0 + [--..--],0%4 }}
-[eva] Recording results for main4
-[eva] Done for function main4
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for main4
+[eva:progress] Done for function main4
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function fn1:
   __retres ∈ [--..--]

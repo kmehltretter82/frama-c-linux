@@ -1,7 +1,8 @@
-35c35,38
-< [eva] fun_ptr.i:33: Reusing old results for call to f
+38c38,42
+< [eva:progress] fun_ptr.i:33: Reusing old results for call to f
 ---
-> [eva] computing for function f <- test2 <- main.
+> [eva:progress] 
+>   computing for function f <- test2 <- main.
 >   Called from fun_ptr.i:33.
-> [eva] Recording results for f
-> [eva] Done for function f
+> [eva:progress] Recording results for f
+> [eva:progress] Done for function f

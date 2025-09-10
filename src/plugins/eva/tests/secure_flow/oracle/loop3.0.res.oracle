@@ -1,22 +1,22 @@
 [kernel] Expanding arguments from test_options.txt
 [kernel] Parsing loop3.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   user_input ∈ [--..--]
   secret ∈ [--..--]
-[eva] loop3.c:13: assertion got status valid.
+[eva:progress] loop3.c:13: assertion got status valid.
 [eva:secure-flow:condition] loop3.c:18: Warning: 
   non-interference violation on condition involving {secret; x}
 [eva:secure-flow:condition] loop3.c:15: Warning: 
   non-interference violation on condition involving {x}
 [eva:alarm] loop3.c:20: Warning: assertion got status unknown.
-[eva] loop3.c:20: assertion got status valid.
-[eva] loop3.c:21: assertion got status valid.
+[eva:progress] loop3.c:20: assertion got status valid.
+[eva:progress] loop3.c:21: assertion got status valid.
 [eva:alarm] loop3.c:21: Warning: assertion got status unknown.
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   x ∈ [-2147483647..2147483647]

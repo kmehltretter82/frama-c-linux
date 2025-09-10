@@ -1,146 +1,163 @@
 [kernel] Parsing secureflow.c (with preprocessing)
 [eva:experimental] Warning: The taint domain is experimental.
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   secret ∈ [--..--]
-[eva] computing for function annot <- main.
+[eva:progress] 
+  computing for function annot <- main.
   Called from secureflow.c:244.
 [eva:alarm] secureflow.c:15: Warning: check got status unknown.
-[eva] secureflow.c:16: check got status valid.
-[eva] secureflow.c:17: check got status valid.
-[eva] Recording results for annot
-[eva] Done for function annot
-[eva] computing for function direct_interference <- main.
+[eva:progress] secureflow.c:16: check got status valid.
+[eva:progress] secureflow.c:17: check got status valid.
+[eva:progress] Recording results for annot
+[eva:progress] Done for function annot
+[eva:progress] 
+  computing for function direct_interference <- main.
   Called from secureflow.c:245.
 [eva:secure-flow:direct] secureflow.c:26: Warning: 
   direct non-interference violation on {non_secret}
-[eva] Recording results for direct_interference
-[eva] Done for function direct_interference
-[eva] computing for function indirect_interference <- main.
+[eva:progress] Recording results for direct_interference
+[eva:progress] Done for function direct_interference
+[eva:progress] 
+  computing for function indirect_interference <- main.
   Called from secureflow.c:246.
 [eva:secure-flow:condition] secureflow.c:38: Warning: 
   non-interference violation on condition involving {secret}
 [eva:secure-flow:indirect] secureflow.c:39: Warning: 
   indirect non-interference violation on {non_secret}
-[eva] Recording results for indirect_interference
-[eva] Done for function indirect_interference
-[eva] computing for function public_after_sanitize <- main.
+[eva:progress] Recording results for indirect_interference
+[eva:progress] Done for function indirect_interference
+[eva:progress] 
+  computing for function public_after_sanitize <- main.
   Called from secureflow.c:247.
 [eva:alarm] secureflow.c:51: Warning: check got status unknown.
-[eva] computing for function sanitize <- public_after_sanitize <- main.
+[eva:progress] 
+  computing for function sanitize <- public_after_sanitize <- main.
   Called from secureflow.c:52.
 [eva] using specification for function sanitize
-[eva] Done for function sanitize
-[eva] secureflow.c:53: check got status valid.
-[eva] Recording results for public_after_sanitize
-[eva] Done for function public_after_sanitize
-[eva] computing for function annot_contract <- main.
+[eva:progress] Done for function sanitize
+[eva:progress] secureflow.c:53: check got status valid.
+[eva:progress] Recording results for public_after_sanitize
+[eva:progress] Done for function public_after_sanitize
+[eva:progress] 
+  computing for function annot_contract <- main.
   Called from secureflow.c:248.
-[eva] computing for function add <- annot_contract <- main.
+[eva:progress] 
+  computing for function add <- annot_contract <- main.
   Called from secureflow.c:70.
 [eva:alarm] secureflow.c:70: Warning: 
   function add: precondition got status unknown.
 [eva:alarm] secureflow.c:61: Warning: check got status unknown.
-[eva] secureflow.c:62: check got status valid.
+[eva:progress] secureflow.c:62: check got status valid.
 [eva:alarm] secureflow.c:64: Warning: check got status unknown.
-[eva] Recording results for add
-[eva] Done for function add
+[eva:progress] Recording results for add
+[eva:progress] Done for function add
 [eva:alarm] secureflow.c:71: Warning: check got status unknown.
-[eva] Recording results for annot_contract
-[eva] Done for function annot_contract
-[eva] computing for function direct_interference_from_assigns <- main.
+[eva:progress] Recording results for annot_contract
+[eva:progress] Done for function annot_contract
+[eva:progress] 
+  computing for function direct_interference_from_assigns <- main.
   Called from secureflow.c:249.
 [eva:secure-flow:condition] secureflow.c:81: Warning: 
   non-interference violation on condition involving {secret}
-[eva] secureflow.c:82: check got status valid.
-[eva] secureflow.c:83: check got status valid.
+[eva:progress] secureflow.c:82: check got status valid.
+[eva:progress] secureflow.c:83: check got status valid.
 [eva:alarm] secureflow.c:84: Warning: check got status unknown.
-[eva] computing for function assigns_from <- direct_interference_from_assigns <- 
+[eva:progress] 
+  computing for function assigns_from <- direct_interference_from_assigns <- 
                           main.
   Called from secureflow.c:86.
 [eva] using specification for function assigns_from
 [eva:garbled-mix:assigns] secureflow.c:86: 
   The specification of function assigns_from
   has generated a garbled mix of addresses for assigns clause \result.
-[eva] Done for function assigns_from
+[eva:progress] Done for function assigns_from
 [eva:secure-flow:direct] secureflow.c:86: Warning: 
   direct non-interference violation on {v}
 [eva:alarm] secureflow.c:87: Warning: check got status unknown.
-[eva] Recording results for direct_interference_from_assigns
-[eva] Done for function direct_interference_from_assigns
-[eva] computing for function indirect_interference_goto <- main.
+[eva:progress] Recording results for direct_interference_from_assigns
+[eva:progress] Done for function direct_interference_from_assigns
+[eva:progress] 
+  computing for function indirect_interference_goto <- main.
   Called from secureflow.c:250.
 [eva:secure-flow:condition] secureflow.c:94: Warning: 
   non-interference violation on condition involving {secret}
 [eva:secure-flow:indirect] secureflow.c:95: Warning: 
   indirect non-interference violation on {x}
-[eva] secureflow.c:103: check got status valid.
-[eva] secureflow.c:104: check got status valid.
+[eva:progress] secureflow.c:103: check got status valid.
+[eva:progress] secureflow.c:104: check got status valid.
 [eva:alarm] secureflow.c:105: Warning: check got status unknown.
-[eva] Recording results for indirect_interference_goto
-[eva] Done for function indirect_interference_goto
-[eva] computing for function indirect_interference_ptr_array <- main.
+[eva:progress] Recording results for indirect_interference_goto
+[eva:progress] Done for function indirect_interference_goto
+[eva:progress] 
+  computing for function indirect_interference_ptr_array <- main.
   Called from secureflow.c:251.
-[eva] secureflow.c:113: check got status valid.
-[eva] secureflow.c:114: check got status valid.
-[eva] secureflow.c:115: check got status valid.
+[eva:progress] secureflow.c:113: check got status valid.
+[eva:progress] secureflow.c:114: check got status valid.
+[eva:progress] secureflow.c:115: check got status valid.
 [eva:alarm] secureflow.c:118: Warning: check got status unknown.
 [eva:secure-flow:indirect] secureflow.c:119: Warning: 
   indirect non-interference violation on {x; y}
 [eva:alarm] secureflow.c:120: Warning: check got status unknown.
 [eva:alarm] secureflow.c:121: Warning: check got status unknown.
 [eva:alarm] secureflow.c:122: Warning: check got status unknown.
-[eva] secureflow.c:127: check got status valid.
-[eva] secureflow.c:128: check got status valid.
-[eva] secureflow.c:129: check got status valid.
+[eva:progress] secureflow.c:127: check got status valid.
+[eva:progress] secureflow.c:128: check got status valid.
+[eva:progress] secureflow.c:129: check got status valid.
 [eva:secure-flow:direct] secureflow.c:130: Warning: 
   direct non-interference violation on {z}
 [eva:alarm] secureflow.c:131: Warning: check got status unknown.
-[eva] secureflow.c:132: check got status valid.
-[eva] secureflow.c:133: check got status valid.
-[eva] Recording results for indirect_interference_ptr_array
-[eva] Done for function indirect_interference_ptr_array
-[eva] computing for function indirect_interference_fun_call <- main.
+[eva:progress] secureflow.c:132: check got status valid.
+[eva:progress] secureflow.c:133: check got status valid.
+[eva:progress] Recording results for indirect_interference_ptr_array
+[eva:progress] Done for function indirect_interference_ptr_array
+[eva:progress] 
+  computing for function indirect_interference_fun_call <- main.
   Called from secureflow.c:252.
-[eva] secureflow.c:149: check got status valid.
-[eva] secureflow.c:150: check got status valid.
-[eva] computing for function set_xy <- indirect_interference_fun_call <- main.
+[eva:progress] secureflow.c:149: check got status valid.
+[eva:progress] secureflow.c:150: check got status valid.
+[eva:progress] 
+  computing for function set_xy <- indirect_interference_fun_call <- main.
   Called from secureflow.c:151.
 [eva:secure-flow:condition] secureflow.c:140: Warning: 
   non-interference violation on condition involving {secret}
-[eva] computing for function set_y <- set_xy <- indirect_interference_fun_call <- 
+[eva:progress] 
+  computing for function set_y <- set_xy <- indirect_interference_fun_call <- 
                           main.
   Called from secureflow.c:141.
-[eva] Recording results for set_y
-[eva] Done for function set_y
-[eva] Recording results for set_xy
-[eva] Done for function set_xy
-[eva] secureflow.c:152: check got status valid.
+[eva:progress] Recording results for set_y
+[eva:progress] Done for function set_y
+[eva:progress] Recording results for set_xy
+[eva:progress] Done for function set_xy
+[eva:progress] secureflow.c:152: check got status valid.
 [eva:alarm] secureflow.c:153: Warning: check got status unknown.
-[eva] secureflow.c:156: check got status valid.
+[eva:progress] secureflow.c:156: check got status valid.
 [eva:secure-flow:condition] secureflow.c:157: Warning: 
   non-interference violation on condition involving {secret}
-[eva] computing for function set_xy <- indirect_interference_fun_call <- main.
+[eva:progress] 
+  computing for function set_xy <- indirect_interference_fun_call <- main.
   Called from secureflow.c:158.
 [eva:secure-flow:indirect] secureflow.c:139: Warning: 
   indirect non-interference violation on {x}
-[eva] secureflow.c:141: Reusing old results for call to set_y
-[eva] Recording results for set_xy
-[eva] Done for function set_xy
+[eva:progress] secureflow.c:141: Reusing old results for call to set_y
+[eva:progress] Recording results for set_xy
+[eva:progress] Done for function set_xy
 [eva:alarm] secureflow.c:159: Warning: check got status unknown.
 [eva:alarm] secureflow.c:161: Warning: check got status unknown.
 [eva:alarm] secureflow.c:162: Warning: check got status unknown.
-[eva] computing for function set_xy <- indirect_interference_fun_call <- main.
+[eva:progress] 
+  computing for function set_xy <- indirect_interference_fun_call <- main.
   Called from secureflow.c:164.
-[eva] secureflow.c:141: Reusing old results for call to set_y
-[eva] Recording results for set_xy
-[eva] Done for function set_xy
-[eva] secureflow.c:165: check got status valid.
-[eva] Recording results for indirect_interference_fun_call
-[eva] Done for function indirect_interference_fun_call
-[eva] computing for function direct_interference_array <- main.
+[eva:progress] secureflow.c:141: Reusing old results for call to set_y
+[eva:progress] Recording results for set_xy
+[eva:progress] Done for function set_xy
+[eva:progress] secureflow.c:165: check got status valid.
+[eva:progress] Recording results for indirect_interference_fun_call
+[eva:progress] Done for function indirect_interference_fun_call
+[eva:progress] 
+  computing for function direct_interference_array <- main.
   Called from secureflow.c:253.
 [eva:secure-flow:direct] secureflow.c:174: Warning: 
   direct non-interference violation on {array[0]}
@@ -150,20 +167,21 @@
   direct non-interference violation on {array[4]}
 [eva:alarm] secureflow.c:177: Warning: check got status unknown.
 [eva:alarm] secureflow.c:178: Warning: check got status unknown.
-[eva] secureflow.c:179: check got status valid.
+[eva:progress] secureflow.c:179: check got status valid.
 [eva:alarm] secureflow.c:180: Warning: check got status unknown.
-[eva] secureflow.c:181: check got status valid.
+[eva:progress] secureflow.c:181: check got status valid.
 [eva:alarm] secureflow.c:182: Warning: check got status unknown.
-[eva] Recording results for direct_interference_array
-[eva] Done for function direct_interference_array
-[eva] computing for function indirect_interference_struct <- main.
+[eva:progress] Recording results for direct_interference_array
+[eva:progress] Done for function direct_interference_array
+[eva:progress] 
+  computing for function indirect_interference_struct <- main.
   Called from secureflow.c:254.
-[eva] secureflow.c:201: check got status valid.
-[eva] secureflow.c:202: check got status valid.
-[eva] secureflow.c:203: check got status valid.
-[eva] secureflow.c:204: check got status valid.
-[eva] secureflow.c:205: check got status valid.
-[eva] secureflow.c:206: check got status valid.
+[eva:progress] secureflow.c:201: check got status valid.
+[eva:progress] secureflow.c:202: check got status valid.
+[eva:progress] secureflow.c:203: check got status valid.
+[eva:progress] secureflow.c:204: check got status valid.
+[eva:progress] secureflow.c:205: check got status valid.
+[eva:progress] secureflow.c:206: check got status valid.
 [eva:secure-flow:condition] secureflow.c:207: Warning: 
   non-interference violation on condition involving {secret}
 [eva:alarm] secureflow.c:212: Warning: check got status unknown.
@@ -172,22 +190,23 @@
 [eva:secure-flow:indirect] secureflow.c:216: Warning: 
   indirect non-interference violation on {v}
 [eva:alarm] secureflow.c:217: Warning: check got status unknown.
-[eva] secureflow.c:220: check got status valid.
+[eva:progress] secureflow.c:220: check got status valid.
 [eva:alarm] secureflow.c:221: Warning: check got status unknown.
-[eva] secureflow.c:222: check got status valid.
-[eva] secureflow.c:223: check got status valid.
-[eva] Recording results for indirect_interference_struct
-[eva] Done for function indirect_interference_struct
-[eva] computing for function interference_on_private_only <- main.
+[eva:progress] secureflow.c:222: check got status valid.
+[eva:progress] secureflow.c:223: check got status valid.
+[eva:progress] Recording results for indirect_interference_struct
+[eva:progress] Done for function indirect_interference_struct
+[eva:progress] 
+  computing for function interference_on_private_only <- main.
   Called from secureflow.c:255.
-[eva] secureflow.c:232: check got status valid.
-[eva] secureflow.c:233: assertion got status valid.
-[eva] secureflow.c:239: check got status valid.
-[eva] secureflow.c:240: assertion got status valid.
-[eva] Recording results for interference_on_private_only
-[eva] Done for function interference_on_private_only
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] secureflow.c:232: check got status valid.
+[eva:progress] secureflow.c:233: assertion got status valid.
+[eva:progress] secureflow.c:239: check got status valid.
+[eva:progress] secureflow.c:240: assertion got status valid.
+[eva:progress] Recording results for interference_on_private_only
+[eva:progress] Done for function interference_on_private_only
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function add:
   result ∈ [--..--]

@@ -1,62 +1,74 @@
 [kernel] Parsing precond.c (with preprocessing)
 [eva] Analyzing an incomplete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   x ∈ [--..--]
   pf2 ∈ {{ &f2 }}
-[eva] computing for function f <- main.
+[eva:progress] 
+  computing for function f <- main.
   Called from precond.c:31.
-[eva] precond.c:31: function f: precondition 'i_plus_one' got status valid.
-[eva] precond.c:31: function f: precondition 'i' got status valid.
-[eva] Recording results for f
-[eva] Done for function f
-[eva] computing for function f <- main.
+[eva:progress] precond.c:31: 
+  function f: precondition 'i_plus_one' got status valid.
+[eva:progress] precond.c:31: function f: precondition 'i' got status valid.
+[eva:progress] Recording results for f
+[eva:progress] Done for function f
+[eva:progress] 
+  computing for function f <- main.
   Called from precond.c:32.
-[eva] precond.c:32: function f: precondition 'i_plus_one' got status valid.
-[eva] precond.c:32: function f: precondition 'i' got status valid.
-[eva] Recording results for f
-[eva] Done for function f
+[eva:progress] precond.c:32: 
+  function f: precondition 'i_plus_one' got status valid.
+[eva:progress] precond.c:32: function f: precondition 'i' got status valid.
+[eva:progress] Recording results for f
+[eva:progress] Done for function f
 [kernel:annot:missing-spec] precond.c:34: Warning: 
   Neither code nor explicit assigns for function g, generating default clauses.
   See -generated-spec-* options for more info.
-[eva] computing for function g <- main.
+[eva:progress] 
+  computing for function g <- main.
   Called from precond.c:34.
 [eva] using specification for function g
 [eva:alarm] precond.c:34: Warning: function g: precondition got status unknown.
-[eva] Done for function g
-[eva] computing for function aux <- main.
+[eva:progress] Done for function g
+[eva:progress] 
+  computing for function aux <- main.
   Called from precond.c:36.
 [kernel:annot:missing-spec] precond.c:21: Warning: 
   Neither code nor explicit assigns for function f2, generating default
   clauses. See -generated-spec-* options for more info.
-[eva] computing for function f2 <- aux <- main.
+[eva:progress] 
+  computing for function f2 <- aux <- main.
   Called from precond.c:21.
 [eva] using specification for function f2
-[eva] precond.c:21: function f2: precondition got status valid.
-[eva] Done for function f2
-[eva] Recording results for aux
-[eva] Done for function aux
-[eva] computing for function aux <- main.
+[eva:progress] precond.c:21: function f2: precondition got status valid.
+[eva:progress] Done for function f2
+[eva:progress] Recording results for aux
+[eva:progress] Done for function aux
+[eva:progress] 
+  computing for function aux <- main.
   Called from precond.c:37.
-[eva] computing for function f2 <- aux <- main.
+[eva:progress] 
+  computing for function f2 <- aux <- main.
   Called from precond.c:21.
 [eva:alarm] precond.c:21: Warning: function f2: precondition got status unknown.
-[eva] Done for function f2
-[eva] Recording results for aux
-[eva] Done for function aux
-[eva] precond.c:39: function f: precondition 'i_plus_one' got status valid.
-[eva] precond.c:39: function f: precondition 'i' got status valid.
-[eva] precond.c:39: Reusing old results for call to f
-[eva] computing for function f <- main.
+[eva:progress] Done for function f2
+[eva:progress] Recording results for aux
+[eva:progress] Done for function aux
+[eva:progress] precond.c:39: 
+  function f: precondition 'i_plus_one' got status valid.
+[eva:progress] precond.c:39: function f: precondition 'i' got status valid.
+[eva:progress] precond.c:39: Reusing old results for call to f
+[eva:progress] 
+  computing for function f <- main.
   Called from precond.c:40.
-[eva] precond.c:40: function f: precondition 'i_plus_one' got status valid.
+[eva:progress] precond.c:40: 
+  function f: precondition 'i_plus_one' got status valid.
 [eva:alarm] precond.c:40: Warning: 
   function f: precondition 'i' got status invalid.
-[eva] Recording results for f
-[eva] Done for function f
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for f
+[eva:progress] Done for function f
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function f:
   x ∈ {0; 1}

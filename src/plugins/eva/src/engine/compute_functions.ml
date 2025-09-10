@@ -67,9 +67,8 @@ module Make (Engine: Engine_sig.S) = struct
         let kinstr = Callstack.top_callsite call.callstack in
         ignore (Logic.check_fct_preconditions kinstr call.kf ab init_state);
       end;
-      if Parameters.ValShowProgress.get () then
-        Self.feedback ~current:true
-          "Reusing old results for call to %a" Kernel_function.pretty call.kf;
+      Self.feedback ~current:true ~dkey:Self.dkey_progress
+        "Reusing old results for call to %a" Kernel_function.pretty call.kf;
       apply_call_results_hooks call init_state (`Reuse i);
       (* call can be cached since it was cached once *)
       Engine_sig.{ states; cacheable = Cacheable; kind = `Body }
@@ -106,8 +105,8 @@ module Make (Engine: Engine_sig.S) = struct
      true, the callstack and additional information are printed. *)
   let compute_using_spec_or_body target call state =
     let pos = Eval.position_of_call call in
-    if Position.is_local pos && Parameters.ValShowProgress.get () then
-      Self.feedback
+    if Position.is_local pos then
+      Self.feedback ~dkey:Self.dkey_progress
         "@[computing for function %a.@\nCalled from %a.@]"
         Callstack.pretty_short call.callstack
         Position.pretty_loc pos;
@@ -118,9 +117,8 @@ module Make (Engine: Engine_sig.S) = struct
     in
     apply_call_hooks call state kind;
     let resulting_states, cacheable = compute call state in
-    if Parameters.ValShowProgress.get () then
-      Self.feedback
-        "Done for function %a" Kernel_function.pretty call.kf;
+    Self.feedback ~dkey:Self.dkey_progress
+      "Done for function %a" Kernel_function.pretty call.kf;
     Engine_sig.{ states = resulting_states; cacheable; kind }
 
   (* ----- Use of cvalue builtins ------------------------------------------- *)
@@ -141,10 +139,9 @@ module Make (Engine: Engine_sig.S) = struct
      by using a cvalue builtin. *)
   let compute_builtin (name, builtin, cacheable, spec) call state =
     let kf_name = Kernel_function.get_name call.kf in
-    if Parameters.ValShowProgress.get ()
-    then
-      Self.feedback ~current:true "Call to builtin %s%s"
-        name (if kf_name = name then "" else " for function " ^ kf_name);
+    Self.feedback ~current:true ~dkey:Self.dkey_progress
+      "Call to builtin %s%s"
+      name (if kf_name = name then "" else " for function " ^ kf_name);
     apply_call_hooks call state `Builtin;
     let states =
       Spec.compute_using_specification ~warn:false call spec state

@@ -1,7 +1,7 @@
 [kernel] Parsing plevel.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   t[0..0xFFFE] ∈ {0}
   i ∈ [--..--]
@@ -9,8 +9,8 @@
 [eva:alarm] plevel.i:13: Warning: assertion got status unknown.
 [kernel:approximation] plevel.i:21: 
   more than 40(65) locations to update in array. Approximating.
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   t[0..0xFF] ∈ {0}

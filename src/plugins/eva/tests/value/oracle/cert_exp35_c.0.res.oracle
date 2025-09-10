@@ -1,24 +1,26 @@
 [kernel] Parsing cert_exp35_c.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   __fc_stdout ∈ {{ NULL ; &S___fc_stdout[0] }}
   S___fc_stdout[0..1] ∈ [--..--]
-[eva] computing for function addressee <- main.
+[eva:progress] 
+  computing for function addressee <- main.
   Called from cert_exp35_c.i:24.
-[eva] Recording results for addressee
-[eva] Done for function addressee
-[eva] computing for function printf_va_1 <- main.
+[eva:progress] Recording results for addressee
+[eva:progress] Done for function addressee
+[eva:progress] 
+  computing for function printf_va_1 <- main.
   Called from cert_exp35_c.i:24.
 [eva] using specification for function printf
 [eva:alarm] cert_exp35_c.i:24: Warning: 
   function printf_va_1: precondition valid_read_string(param0) got status unknown.
 [eva:alarm] cert_exp35_c.i:24: Warning: 
   function printf_va_1: precondition valid_read_string(format) got status unknown.
-[eva] Done for function printf_va_1
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Done for function printf_va_1
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function addressee:
   result.a[0] ∈ {119}

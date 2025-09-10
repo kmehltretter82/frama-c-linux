@@ -1,7 +1,7 @@
 [kernel] Parsing pointer_comparison.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   x ∈ {0}
   y ∈ {0}
@@ -50,8 +50,8 @@
 [eva:show] pointer_comparison.c:23: Frama_C_show_each_6: {{ &x + [20..--],0%4 }}
 [eva:pointer-comparison] pointer_comparison.c:23: 
   evaluating condition to {0; 1} instead of {1} because of -eva-undefined-pointer-comparison-propagate-all
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   p ∈ {{ &x + [20..--],0%4 }}
@@ -88,8 +88,8 @@
      2 Total
 --------------------------------------------------------------------------------
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   x ∈ {0}
   y ∈ {0}
@@ -127,8 +127,8 @@
 [eva:show] pointer_comparison.c:23: Frama_C_show_each_6: {{ &x + {20; 24} }}
 [eva:show] pointer_comparison.c:23: Frama_C_show_each_6: {{ &x + {20; 24; 28} }}
 [eva:show] pointer_comparison.c:23: Frama_C_show_each_6: {{ &x + [20..--],0%4 }}
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   p ∈ {{ &x + [20..--],0%4 }}
@@ -185,8 +185,8 @@
      6 Total
 --------------------------------------------------------------------------------
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   x ∈ {0}
   y ∈ {0}
@@ -227,8 +227,8 @@
 [eva:show] pointer_comparison.c:23: Frama_C_show_each_6: {{ &x + {20; 24} }}
 [eva:show] pointer_comparison.c:23: Frama_C_show_each_6: {{ &x + {20; 24; 28} }}
 [eva:show] pointer_comparison.c:23: Frama_C_show_each_6: {{ &x + [20..--],0%4 }}
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   p ∈ {{ &x + [20..--],0%4 }}

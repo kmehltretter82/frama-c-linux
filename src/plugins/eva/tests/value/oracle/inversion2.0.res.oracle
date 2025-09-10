@@ -1,7 +1,7 @@
 [kernel] Parsing inversion2.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   T[0] ∈ {3}
    [1] ∈ {1}
@@ -16,8 +16,8 @@
 [eva:partition] inversion2.i:11: starting to merge loop iterations
 [eva:partition] inversion2.i:10: starting to merge loop iterations
 [eva:alarm] inversion2.i:12: Warning: division by zero. assert TT[i][j] ≢ 0;
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   G ∈ [5..99],1%2
@@ -35,8 +35,8 @@
 [inout] Inputs for function main:
     T[0..2]; TT{[0][0..2]; [1][0..2]; [2][0..2]}
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   T[0] ∈ {3}
    [1] ∈ {1}
@@ -48,12 +48,13 @@
     [2][0..1] ∈ {2}
     [2][2..4] ∈ {0}
   G ∈ {99}
-[eva] inversion2.i:12: assertion 'Eva,division_by_zero' got status valid.
+[eva:progress] inversion2.i:12: 
+  assertion 'Eva,division_by_zero' got status valid.
 [eva:alarm] inversion2.i:12: Warning: 
   assertion 'Eva,division_by_zero' got status unknown.
 [eva:alarm] inversion2.i:12: Warning: division by zero. assert TT[i][j] ≢ 0;
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   G ∈ {5; 7; 15; 99}

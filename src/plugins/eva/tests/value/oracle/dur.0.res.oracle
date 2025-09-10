@@ -1,7 +1,7 @@
 [kernel] Parsing dur.i (no preprocessing)
 [eva] Analyzing a complete application starting at F2
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   G1 ∈ {0}
   G2 ∈ {0}
@@ -156,8 +156,8 @@
   G6 ∈ [--..--]
   G7[0..160] ∈ [--..--]
 [eva:partition] dur.i:167: starting to merge loop iterations
-[eva] Recording results for F2
-[eva] Done for function F2
+[eva:progress] Recording results for F2
+[eva:progress] Done for function F2
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function F2:
   G5.M75 ∈ [0..255]

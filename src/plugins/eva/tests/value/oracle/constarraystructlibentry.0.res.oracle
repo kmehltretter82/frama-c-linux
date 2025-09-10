@@ -1,7 +1,7 @@
 [kernel] Parsing constarraystructlibentry.i (no preprocessing)
 [eva] Analyzing an incomplete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   t[0] ∈ {1}
    [1] ∈ {2}
@@ -72,14 +72,14 @@
   s2 ∈ {0}
   s3.a{.b; .c} ∈ {0}
     {.a.[bits 40 to 63]; .c; .[bits 72 to 95]} ∈ [--..--]
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   x ∈ {{ &t7[0] }}
 [eva] Analyzing an incomplete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   t[0] ∈ {1}
    [1] ∈ {2}
@@ -161,8 +161,8 @@
     .a.[bits 40 to 63] ∈ UNINITIALIZED
     .c ∈ [--..--]
     .[bits 72 to 95] ∈ UNINITIALIZED
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   x ∈ {{ &t7[0] }}

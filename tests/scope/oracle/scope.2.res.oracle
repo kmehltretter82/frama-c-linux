@@ -1,7 +1,7 @@
 [kernel] Parsing scope.c (with preprocessing)
 [eva] Analyzing a complete application starting at loop
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   S1 ∈ {0}
   S2 ∈ {0}
@@ -13,8 +13,8 @@
 [eva:alarm] scope.c:75: Warning: signed overflow. assert a + 1 ≤ 2147483647;
 [eva:alarm] scope.c:76: Warning: signed overflow. assert b + 1 ≤ 2147483647;
 [eva:alarm] scope.c:77: Warning: signed overflow. assert i + 1 ≤ 2147483647;
-[eva] Recording results for loop
-[eva] Done for function loop
+[eva:progress] Recording results for loop
+[eva:progress] Done for function loop
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function loop:
   a ∈ [1..2147483647]

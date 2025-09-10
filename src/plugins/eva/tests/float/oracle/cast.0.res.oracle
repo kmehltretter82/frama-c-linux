@@ -1,22 +1,23 @@
 [kernel] Parsing cast.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   v ∈ [--..--]
 [eva:alarm] cast.i:11: Warning: non-finite double value. assert \is_finite(v);
 [eva:alarm] cast.i:11: Warning: 
   non-finite float value. assert \is_finite((float)v);
-[eva] computing for function assert_subnormal <- main.
+[eva:progress] 
+  computing for function assert_subnormal <- main.
   Called from cast.i:15.
 [eva] using specification for function assert_subnormal
-[eva] cast.i:15: 
+[eva:progress] cast.i:15: 
   function assert_subnormal: precondition \is_finite(d) got status valid.
 [eva:alarm] cast.i:15: Warning: 
   function assert_subnormal: precondition 0.0 < d < 0x1p-1022 got status unknown.
-[eva] Done for function assert_subnormal
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Done for function assert_subnormal
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   NON TERMINATING FUNCTION

@@ -1,46 +1,54 @@
 [kernel] Parsing loopfun.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   v ∈ [--..--]
   a ∈ {7}
-[eva] computing for function test <- main.
+[eva:progress] 
+  computing for function test <- main.
   Called from loopfun.i:14.
-[eva] Recording results for test
-[eva] Done for function test
-[eva] computing for function test <- main.
+[eva:progress] Recording results for test
+[eva:progress] Done for function test
+[eva:progress] 
+  computing for function test <- main.
   Called from loopfun.i:14.
-[eva] Recording results for test
-[eva] Done for function test
-[eva] computing for function test <- main.
+[eva:progress] Recording results for test
+[eva:progress] Done for function test
+[eva:progress] 
+  computing for function test <- main.
   Called from loopfun.i:16.
-[eva] Recording results for test
-[eva] Done for function test
+[eva:progress] Recording results for test
+[eva:progress] Done for function test
 [eva:show] loopfun.i:16: Frama_C_show_each_t: {5}
-[eva] computing for function test <- main.
+[eva:progress] 
+  computing for function test <- main.
   Called from loopfun.i:14.
-[eva] Recording results for test
-[eva] Done for function test
-[eva] computing for function test <- main.
+[eva:progress] Recording results for test
+[eva:progress] Done for function test
+[eva:progress] 
+  computing for function test <- main.
   Called from loopfun.i:14.
-[eva] Recording results for test
-[eva] Done for function test
-[eva] computing for function test <- main.
+[eva:progress] Recording results for test
+[eva:progress] Done for function test
+[eva:progress] 
+  computing for function test <- main.
   Called from loopfun.i:16.
-[eva] Recording results for test
-[eva] Done for function test
+[eva:progress] Recording results for test
+[eva:progress] Done for function test
 [eva:show] loopfun.i:16: Frama_C_show_each_t: {2}
-[eva] computing for function test <- main.
+[eva:progress] 
+  computing for function test <- main.
   Called from loopfun.i:14.
-[eva] Recording results for test
-[eva] Done for function test
-[eva] computing for function test <- main.
+[eva:progress] Recording results for test
+[eva:progress] Done for function test
+[eva:progress] 
+  computing for function test <- main.
   Called from loopfun.i:14.
-[eva] Recording results for test
-[eva] Done for function test
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for test
+[eva:progress] Done for function test
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [from] Computing for function test
 [from] Done for function test

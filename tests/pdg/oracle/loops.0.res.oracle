@@ -1,13 +1,13 @@
 [kernel] Parsing loops.c (with preprocessing)
 [eva] Analyzing an incomplete application starting at simple
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   after ∈ [--..--]
 [eva:partition] loops.c:41: starting to merge loop iterations
 [eva:alarm] loops.c:42: Warning: signed overflow. assert s + 2 ≤ 2147483647;
-[eva] Recording results for simple
-[eva] Done for function simple
+[eva:progress] Recording results for simple
+[eva:progress] Done for function simple
 [pdg] computing for function simple
 [pdg] done for function simple
 [pdg] PDG for simple

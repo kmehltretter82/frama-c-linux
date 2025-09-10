@@ -1,7 +1,8 @@
-106c106,109
-< [eva] bitwise.i:173: Reusing old results for call to set_zero
+126c126,130
+< [eva:progress] bitwise.i:173: Reusing old results for call to set_zero
 ---
-> [eva] computing for function set_zero <- bug6 <- main.
+> [eva:progress] 
+>   computing for function set_zero <- bug6 <- main.
 >   Called from bitwise.i:173.
-> [eva] Recording results for set_zero
-> [eva] Done for function set_zero
+> [eva:progress] Recording results for set_zero
+> [eva:progress] Done for function set_zero

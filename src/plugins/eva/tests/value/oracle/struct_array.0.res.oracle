@@ -1,13 +1,13 @@
 [kernel] Parsing struct_array.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
+[eva:progress] Computing initial state
 [eva:alarm] struct_array.i:15: Warning: 
   pointer downcast. assert (unsigned int)(&z1) ≤ 2147483647;
 [eva:alarm] struct_array.i:15: Warning: 
   pointer downcast. assert (unsigned int)(&z2) ≤ 2147483647;
 [eva:alarm] struct_array.i:15: Warning: 
   pointer downcast. assert (unsigned int)(&z4) ≤ 2147483647;
-[eva] Initial state computed
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   v ∈ [--..--]
   outp ∈ {0}
@@ -46,7 +46,8 @@
   s1 ∈ {0}
   s2 ∈ {0}
   s3 ∈ {0}
-[eva] computing for function main1 <- main.
+[eva:progress] 
+  computing for function main1 <- main.
   Called from struct_array.i:56.
 [eva:alarm] struct_array.i:35: Warning: 
   accessing out of bounds index. assert 0 ≤ v;
@@ -54,9 +55,10 @@
   accessing out of bounds index. assert v < 22;
 [eva:alarm] struct_array.i:36: Warning: 
   out of bounds write. assert \valid(outp);
-[eva] Recording results for main1
-[eva] Done for function main1
-[eva] computing for function main2 <- main.
+[eva:progress] Recording results for main1
+[eva:progress] Done for function main1
+[eva:progress] 
+  computing for function main2 <- main.
   Called from struct_array.i:57.
 [eva:show] struct_array.i:41: 
   Frama_C_show_each:
@@ -69,10 +71,11 @@
   .t[5] ∈ {7}
   .t[6] ∈ {8}
   .b ∈ {9}
-[eva] computing for function f1 <- main2 <- main.
+[eva:progress] 
+  computing for function f1 <- main2 <- main.
   Called from struct_array.i:42.
 [eva] using specification for function f1
-[eva] Done for function f1
+[eva:progress] Done for function f1
 [eva:show] struct_array.i:43: 
   Frama_C_show_each:
   .a ∈ {1}
@@ -83,10 +86,11 @@
   .t[4] ∈ {6}
   .t[5..6] ∈ [--..--]
   .b ∈ {9}
-[eva] computing for function f2 <- main2 <- main.
+[eva:progress] 
+  computing for function f2 <- main2 <- main.
   Called from struct_array.i:44.
 [eva] using specification for function f2
-[eva] Done for function f2
+[eva:progress] Done for function f2
 [eva:show] struct_array.i:45: 
   Frama_C_show_each:
   .a ∈ {1}
@@ -96,20 +100,21 @@
   .t[5] ∈ {7}
   .t[6] ∈ {8}
   .b ∈ {9}
-[eva] computing for function f3 <- main2 <- main.
+[eva:progress] 
+  computing for function f3 <- main2 <- main.
   Called from struct_array.i:46.
 [eva] using specification for function f3
-[eva] Done for function f3
+[eva:progress] Done for function f3
 [eva:show] struct_array.i:47: 
   Frama_C_show_each: .a ∈ {1}
                      .t[0..6] ∈ [--..--]
                      .b ∈ {9}
-[eva] struct_array.i:50: assertion got status valid.
+[eva:progress] struct_array.i:50: assertion got status valid.
 [eva:show] struct_array.i:51: Frama_C_show_each_reach:
-[eva] Recording results for main2
-[eva] Done for function main2
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for main2
+[eva:progress] Done for function main2
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main1:
   outp ∈ {{ &x ; &y }}
@@ -239,14 +244,14 @@
       [10].p; [11].p; [12].p; [13].p; [14].p; [15].p; [16].p; [17].p; [18].p;
       [19].p; [20].p; [21].p}; s; s1; s2; s3
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
+[eva:progress] Computing initial state
 [eva:alarm] struct_array.i:15: Warning: 
   pointer downcast. assert (unsigned int)(&z1) ≤ 2147483647;
 [eva:alarm] struct_array.i:15: Warning: 
   pointer downcast. assert (unsigned int)(&z2) ≤ 2147483647;
 [eva:alarm] struct_array.i:15: Warning: 
   pointer downcast. assert (unsigned int)(&z4) ≤ 2147483647;
-[eva] Initial state computed
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   v ∈ [--..--]
   outp ∈ {0}
@@ -285,15 +290,17 @@
   s1 ∈ {0}
   s2 ∈ {0}
   s3 ∈ {0}
-[eva] computing for function main1 <- main.
+[eva:progress] 
+  computing for function main1 <- main.
   Called from struct_array.i:56.
 [eva:alarm] struct_array.i:35: Warning: 
   out of bounds read. assert \valid_read(&T[v].p);
 [eva:alarm] struct_array.i:36: Warning: 
   out of bounds write. assert \valid(outp);
-[eva] Recording results for main1
-[eva] Done for function main1
-[eva] computing for function main2 <- main.
+[eva:progress] Recording results for main1
+[eva:progress] Done for function main1
+[eva:progress] 
+  computing for function main2 <- main.
   Called from struct_array.i:57.
 [eva:show] struct_array.i:41: 
   Frama_C_show_each:
@@ -306,9 +313,10 @@
   .t[5] ∈ {7}
   .t[6] ∈ {8}
   .b ∈ {9}
-[eva] computing for function f1 <- main2 <- main.
+[eva:progress] 
+  computing for function f1 <- main2 <- main.
   Called from struct_array.i:42.
-[eva] Done for function f1
+[eva:progress] Done for function f1
 [eva:show] struct_array.i:43: 
   Frama_C_show_each:
   .a ∈ {1}
@@ -318,9 +326,10 @@
   .t[3] ∈ {5}
   .t[4] ∈ {6}
   {.t[5..6]; .b} ∈ [--..--]
-[eva] computing for function f2 <- main2 <- main.
+[eva:progress] 
+  computing for function f2 <- main2 <- main.
   Called from struct_array.i:44.
-[eva] Done for function f2
+[eva:progress] Done for function f2
 [eva:show] struct_array.i:45: 
   Frama_C_show_each:
   {.a; .t[0..2]} ∈ [--..--]
@@ -329,16 +338,17 @@
   .t[5] ∈ {7}
   .t[6] ∈ {8}
   .b ∈ {9}
-[eva] computing for function f3 <- main2 <- main.
+[eva:progress] 
+  computing for function f3 <- main2 <- main.
   Called from struct_array.i:46.
-[eva] Done for function f3
+[eva:progress] Done for function f3
 [eva:show] struct_array.i:47: Frama_C_show_each: [--..--]
 [eva:alarm] struct_array.i:50: Warning: 
   assertion got status invalid (stopping propagation).
-[eva] Recording results for main2
-[eva] Done for function main2
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for main2
+[eva:progress] Done for function main2
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main1:
   outp ∈ {{ &x ; &y }}

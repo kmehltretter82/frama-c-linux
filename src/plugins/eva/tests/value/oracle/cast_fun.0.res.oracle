@@ -42,73 +42,83 @@
 [kernel:typing:incompatible-pointer-types] cast_fun.i:141: Warning: 
   casting function from int *
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva] computing for function f1 <- main.
+[eva:progress] 
+  computing for function f1 <- main.
   Called from cast_fun.i:60.
 [eva] using specification for function f1
 [eva:assigns:missing-result] cast_fun.i:6: Warning: 
   no 'assigns \result \from ...' clause specified for function f1
-[eva] Done for function f1
+[eva:progress] Done for function f1
 [eva:alarm] cast_fun.i:65: Warning: 
   pointer to function with incompatible type. assert \valid_function(p1);
-[eva] computing for function f2 <- main.
+[eva:progress] 
+  computing for function f2 <- main.
   Called from cast_fun.i:65.
 [eva] using specification for function f2
 [eva:assigns:missing-result] cast_fun.i:8: Warning: 
   no 'assigns \result \from ...' clause specified for function f2
-[eva] Done for function f2
-[eva] computing for function f3 <- main.
+[eva:progress] Done for function f2
+[eva:progress] 
+  computing for function f3 <- main.
   Called from cast_fun.i:70.
 [eva] using specification for function f3
 [eva:assigns:missing-result] cast_fun.i:10: Warning: 
   no 'assigns \result \from ...' clause specified for function f3
-[eva] Done for function f3
-[eva] computing for function f3 <- main.
+[eva:progress] Done for function f3
+[eva:progress] 
+  computing for function f3 <- main.
   Called from cast_fun.i:75.
-[eva] Done for function f3
+[eva:progress] Done for function f3
 [eva:alarm] cast_fun.i:80: Warning: 
   pointer to function with incompatible type. assert \valid_function(p1);
 [eva:alarm] cast_fun.i:85: Warning: 
   pointer to function with incompatible type.
   assert \valid_function((void (*)(int ))p4);
-[eva] computing for function f6 <- main.
+[eva:progress] 
+  computing for function f6 <- main.
   Called from cast_fun.i:90.
 [eva] using specification for function f6
-[eva] Done for function f6
+[eva:progress] Done for function f6
 [eva:alarm] cast_fun.i:95: Warning: 
   pointer to function with incompatible type. assert \valid_function(p2);
 [eva:alarm] cast_fun.i:100: Warning: 
   pointer to function with incompatible type. assert \valid_function(p2);
-[eva] computing for function f9 <- main.
+[eva:progress] 
+  computing for function f9 <- main.
   Called from cast_fun.i:105.
 [eva] using specification for function f9
-[eva] Done for function f9
-[eva] computing for function f10 <- main.
+[eva:progress] Done for function f9
+[eva:progress] 
+  computing for function f10 <- main.
   Called from cast_fun.i:110.
 [eva] using specification for function f10
-[eva] Done for function f10
-[eva] computing for function f10 <- main.
+[eva:progress] Done for function f10
+[eva:progress] 
+  computing for function f10 <- main.
   Called from cast_fun.i:121.
-[eva] Done for function f10
+[eva:progress] Done for function f10
 [eva:alarm] cast_fun.i:126: Warning: 
   pointer to function with incompatible type. assert \valid_function(p1);
 [eva:alarm] cast_fun.i:131: Warning: 
   pointer to function with incompatible type. assert \valid_function(p1);
-[eva] computing for function f1 <- main.
+[eva:progress] 
+  computing for function f1 <- main.
   Called from cast_fun.i:136.
-[eva] Done for function f1
+[eva:progress] Done for function f1
 [kernel] Warning: Unknown alignment of base f1: Undefined alignof on a function.
 [eva:alarm] cast_fun.i:140: Warning: 
   unaligned pointer creation. assert \aligned(&f1,alignof(int));
 [eva:alarm] cast_fun.i:141: Warning: 
   unaligned pointer creation. assert \aligned(y,alignof(int));
-[eva] computing for function f1 <- main.
+[eva:progress] 
+  computing for function f1 <- main.
   Called from cast_fun.i:142.
-[eva] Done for function f1
-[eva] Recording results for main
+[eva:progress] Done for function f1
+[eva:progress] Recording results for main
 [from] Computing for function main
 [from] cast_fun.i:60: Warning: variadic call detected. Using only 0 argument(s).
 [from] cast_fun.i:65: Warning: variadic call detected. Using only 0 argument(s).
@@ -121,7 +131,7 @@
 [from] cast_fun.i:142: Warning: 
   variadic call detected. Using only 0 argument(s).
 [from] Done for function main
-[eva] Done for function main
+[eva:progress] Done for function main
 [eva] cast_fun.i:80: assertion 'Eva,function_pointer' got final status invalid.
 [eva] cast_fun.i:85: assertion 'Eva,function_pointer' got final status invalid.
 [eva] cast_fun.i:95: assertion 'Eva,function_pointer' got final status invalid.

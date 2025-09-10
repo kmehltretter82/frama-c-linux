@@ -1,14 +1,14 @@
 [kernel] Parsing loops.c (with preprocessing)
 [eva] Analyzing an incomplete application starting at infinite
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   after ∈ [--..--]
 [eva:partition] loops.c:65: starting to merge loop iterations
 [eva:alarm] loops.c:66: Warning: signed overflow. assert s + 2 ≤ 2147483647;
 [eva:alarm] loops.c:67: Warning: signed overflow. assert i + 1 ≤ 2147483647;
-[eva] Recording results for infinite
-[eva] Done for function infinite
+[eva:progress] Recording results for infinite
+[eva:progress] Done for function infinite
 [pdg] computing for function infinite
 [pdg] loops.c:70: Warning: no final state. Probably unreachable...
 [pdg] done for function infinite

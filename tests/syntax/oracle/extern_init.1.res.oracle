@@ -2,24 +2,26 @@
 [kernel] Parsing extern_init_2.i (no preprocessing)
 [kernel] Parsing extern_init_1.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   a[0] ∈ {1}
    [1] ∈ {2}
    [2] ∈ {3}
    [3] ∈ {4}
    [4] ∈ {5}
-[eva] computing for function f <- main.
+[eva:progress] 
+  computing for function f <- main.
   Called from extern_init_2.i:10.
-[eva] Recording results for f
-[eva] Done for function f
-[eva] computing for function g <- main.
+[eva:progress] Recording results for f
+[eva:progress] Done for function f
+[eva:progress] 
+  computing for function g <- main.
   Called from extern_init_2.i:11.
 [eva] using specification for function g
-[eva] Done for function g
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Done for function g
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function f:
   a[0] ∈ {1}

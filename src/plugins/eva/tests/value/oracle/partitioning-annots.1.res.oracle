@@ -1,21 +1,23 @@
 [kernel] Parsing partitioning-annots.c (with preprocessing)
 [eva] Analyzing a complete application starting at test_split
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   nondet ∈ [--..--]
   k ∈ {0}
-[eva] computing for function Frama_C_interval <- test_split.
+[eva:progress] 
+  computing for function Frama_C_interval <- test_split.
   Called from partitioning-annots.c:97.
 [eva] using specification for function Frama_C_interval
-[eva] partitioning-annots.c:97: 
+[eva:progress] partitioning-annots.c:97: 
   function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
-[eva] computing for function Frama_C_interval <- test_split.
+[eva:progress] Done for function Frama_C_interval
+[eva:progress] 
+  computing for function Frama_C_interval <- test_split.
   Called from partitioning-annots.c:98.
-[eva] partitioning-annots.c:98: 
+[eva:progress] partitioning-annots.c:98: 
   function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
+[eva:progress] Done for function Frama_C_interval
 [eva:show] partitioning-annots.c:104: 
   Frama_C_show_each_before_first_split: {0; 1}, {0; 1; 2}, {0}
 [eva:show] partitioning-annots.c:107: 
@@ -48,8 +50,8 @@
   Frama_C_show_each_before_second_merge: {1}, {2}, {1}
 [eva:show] partitioning-annots.c:113: Frama_C_show_each_end: {0}, {0; 1; 2}, {0}
 [eva:show] partitioning-annots.c:113: Frama_C_show_each_end: {1}, {0; 1; 2}, {1}
-[eva] Recording results for test_split
-[eva] Done for function test_split
+[eva:progress] Recording results for test_split
+[eva:progress] Done for function test_split
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function test_split:
   Frama_C_entropy_source ∈ [--..--]

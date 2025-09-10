@@ -1,39 +1,44 @@
 [kernel] Parsing bts1194.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   Y ∈ {0}
   X ∈ {0}
   v ∈ [--..--]
-[eva] computing for function f <- main.
+[eva:progress] 
+  computing for function f <- main.
   Called from bts1194.c:32.
-[eva] computing for function input <- f <- main.
+[eva:progress] 
+  computing for function input <- f <- main.
   Called from bts1194.c:13.
 [eva] using specification for function input
-[eva] Done for function input
+[eva:progress] Done for function input
 [eva:alarm] bts1194.c:17: Warning: assertion got status unknown.
-[eva] Recording results for f
+[eva:progress] Recording results for f
 [from] Computing for function f
 [from] Done for function f
-[eva] Done for function f
-[eva] computing for function h <- main.
+[eva:progress] Done for function f
+[eva:progress] 
+  computing for function h <- main.
   Called from bts1194.c:33.
-[eva] computing for function g <- h <- main.
+[eva:progress] 
+  computing for function g <- h <- main.
   Called from bts1194.c:26.
-[eva] bts1194.c:20: function g: no state left, postcondition got status valid.
-[eva] Recording results for g
+[eva:progress] bts1194.c:20: 
+  function g: no state left, postcondition got status valid.
+[eva:progress] Recording results for g
 [from] Computing for function g
 [from] Done for function g
-[eva] Done for function g
-[eva] Recording results for h
+[eva:progress] Done for function g
+[eva:progress] Recording results for h
 [from] Computing for function h
 [from] Done for function h
-[eva] Done for function h
-[eva] Recording results for main
+[eva:progress] Done for function h
+[eva:progress] Recording results for main
 [from] Computing for function main
 [from] Done for function main
-[eva] Done for function main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function g:
   NON TERMINATING FUNCTION
@@ -207,24 +212,26 @@
 [sparecode] remove unused global declarations from project 'Slicing export tmp'
 [sparecode] removed unused global declarations in new project 'Slicing export'
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   Y ∈ {0}
-[eva] computing for function f_slice_1 <- main.
+[eva:progress] 
+  computing for function f_slice_1 <- main.
   Called from bts1194.c:32.
 [kernel:annot:missing-spec] bts1194.c:13: Warning: 
   Neither code nor specification for function input, generating default
   assigns. See -generated-spec-* options for more info.
-[eva] computing for function input <- f_slice_1 <- main.
+[eva:progress] 
+  computing for function input <- f_slice_1 <- main.
   Called from bts1194.c:13.
 [eva] using specification for function input
-[eva] Done for function input
+[eva:progress] Done for function input
 [eva:alarm] bts1194.c:17: Warning: assertion got status unknown.
-[eva] Recording results for f_slice_1
-[eva] Done for function f_slice_1
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for f_slice_1
+[eva:progress] Done for function f_slice_1
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [pdg] computing for function input
 [from] Computing for function input
 [from] Done for function input

@@ -1,30 +1,34 @@
 [kernel] Parsing bts344.i (no preprocessing)
 [slicing] slicing requests in progress...
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   X ∈ {0}
   Y ∈ {0}
-[eva] computing for function f <- main.
+[eva:progress] 
+  computing for function f <- main.
   Called from bts344.i:24.
-[eva] computing for function h <- f <- main.
+[eva:progress] 
+  computing for function h <- f <- main.
   Called from bts344.i:21.
-[eva] Recording results for h
-[eva] Done for function h
-[eva] Recording results for f
-[eva] Done for function f
-[eva] computing for function h <- main.
+[eva:progress] Recording results for h
+[eva:progress] Done for function h
+[eva:progress] Recording results for f
+[eva:progress] Done for function f
+[eva:progress] 
+  computing for function h <- main.
   Called from bts344.i:25.
-[eva] Recording results for h
-[eva] Done for function h
-[eva] computing for function k <- main.
+[eva:progress] Recording results for h
+[eva:progress] Done for function h
+[eva:progress] 
+  computing for function k <- main.
   Called from bts344.i:26.
-[eva] bts344.i:9: function k: postcondition got status valid.
-[eva] Recording results for k
-[eva] Done for function k
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] bts344.i:9: function k: postcondition got status valid.
+[eva:progress] Recording results for k
+[eva:progress] Done for function k
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [slicing] initializing slicing ...
 [slicing] interpreting slicing requests from the command line...
 [pdg] computing for function main

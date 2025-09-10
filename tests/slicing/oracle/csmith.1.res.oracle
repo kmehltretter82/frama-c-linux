@@ -1,15 +1,15 @@
 [kernel] Parsing csmith.i (no preprocessing)
 [eva] Analyzing a complete application starting at bts906b
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   G1 ∈ {0}
   G1b ∈ {0}
   G2 ∈ {0}
 [eva:partition] csmith.i:168: starting to merge loop iterations
 [eva:partition] csmith.i:169: starting to merge loop iterations
-[eva] Recording results for bts906b
-[eva] Done for function bts906b
+[eva:progress] Recording results for bts906b
+[eva:progress] Done for function bts906b
 [pdg] computing for function bts906b
 [pdg] done for function bts906b
 [pdg] PDG for bts906b

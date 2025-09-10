@@ -1,27 +1,30 @@
 [kernel] Parsing enum2.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   must_be_one ∈ {0}
   must_be_zero ∈ {0}
-[eva] computing for function enum1_sgn1_inf_sgn0 <- main.
+[eva:progress] 
+  computing for function enum1_sgn1_inf_sgn0 <- main.
   Called from enum2.c:33.
 [eva:show] enum2.c:27: Frama_C_show_each_enum1_sgn1_inf_sgn0: {0}
-[eva] Recording results for enum1_sgn1_inf_sgn0
-[eva] Done for function enum1_sgn1_inf_sgn0
-[eva] computing for function enum1_sgn1_positif <- main.
+[eva:progress] Recording results for enum1_sgn1_inf_sgn0
+[eva:progress] Done for function enum1_sgn1_inf_sgn0
+[eva:progress] 
+  computing for function enum1_sgn1_positif <- main.
   Called from enum2.c:34.
-[eva] computing for function f <- enum1_sgn1_positif <- main.
+[eva:progress] 
+  computing for function f <- enum1_sgn1_positif <- main.
   Called from enum2.c:21.
-[eva] Recording results for f
-[eva] Done for function f
+[eva:progress] Recording results for f
+[eva:progress] Done for function f
 [eva:show] enum2.c:22: Frama_C_show_each_enum1_sgn1_positif: {1}
-[eva] Recording results for enum1_sgn1_positif
-[eva] Done for function enum1_sgn1_positif
+[eva:progress] Recording results for enum1_sgn1_positif
+[eva:progress] Done for function enum1_sgn1_positif
 [eva:show] enum2.c:35: Frama_C_show_each_sizeof_enum1: {8}
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function enum1_sgn1_inf_sgn0:
   res ∈ {0}

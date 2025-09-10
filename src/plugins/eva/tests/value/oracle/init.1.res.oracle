@@ -1,8 +1,8 @@
 [kernel] Parsing init.i (no preprocessing)
 [kernel] init.i:6: Warning: Too many initializers for character array S
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   S[0] ∈ {49}
    [1] ∈ {50}
@@ -134,8 +134,8 @@
    [1] ∈ {4}
   x ∈ {8}
   y ∈ {40}
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   __retres ∈ {8}

@@ -1,19 +1,20 @@
 [kernel] Parsing simple_call.c (with preprocessing)
 [eva] Analyzing a complete application starting at call_multiple_global_outputs
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   G ∈ [--..--]
   G1 ∈ [--..--]
   G2 ∈ [--..--]
   S ∈ [--..--]
-[eva] computing for function multiple_global_outputs <- 
+[eva:progress] 
+  computing for function multiple_global_outputs <- 
                           call_multiple_global_outputs.
   Called from simple_call.c:39.
-[eva] Recording results for multiple_global_outputs
-[eva] Done for function multiple_global_outputs
-[eva] Recording results for call_multiple_global_outputs
-[eva] Done for function call_multiple_global_outputs
+[eva:progress] Recording results for multiple_global_outputs
+[eva:progress] Done for function multiple_global_outputs
+[eva:progress] Recording results for call_multiple_global_outputs
+[eva:progress] Done for function call_multiple_global_outputs
 [pdg] computing for function call_multiple_global_outputs
 [from] Computing for function multiple_global_outputs
 [from] Done for function multiple_global_outputs
