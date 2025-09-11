@@ -39,23 +39,11 @@ let read_id_state state raw_id =
   let p = pointer_of_id raw_id in
   Mt_memory.read_int_pointer p state
 
-let read_id_state_enumerate card state raw_id : _ Mt_memory.conversion =
-  let value = read_id_state state raw_id in
-  let failure fmt = Format.fprintf fmt "Id %a contains garbled state %a"
-      pretty_raw_id raw_id Cvalue.V.pretty value
-  in
-  try
-    match Locations.Location_Bytes.fold_i (fun b i l -> (b,i) :: l) value []
-    with
-    | [Base.Null,i]  -> begin
-        try
-          ignore (Ival.cardinal_less_than i card);
-          `Success (Ival.fold_int (fun i l -> Abstract_interp.Int.to_int_exn i :: l) i [])
-        with Abstract_interp.Not_less_than -> `Failure failure
-      end
-
-    | _ -> `Failure failure
-  with Not_found -> `Failure failure
+let read_id_state_enumerate cardinal state raw_id =
+  read_id_state state raw_id |>
+  Mt_memory.extract_int_list ~cardinal |>
+  Result.map_error
+    (fun s -> Format.asprintf "Id %a contains %s" pretty_raw_id raw_id s)
 
 
 let write_id_state state raw_id v =

@@ -54,8 +54,6 @@ val join_value : value -> value -> value * bool
 
 val join_params : value list -> value list -> value list * bool
 
-val join_zone : zone -> zone -> zone * bool
-
 (** Remove all the values that are not global variables from the state *)
 val clear_non_globals : state -> state
 
@@ -85,15 +83,10 @@ val write_slice:
   p:pointer -> sbytes:int -> slice:slice -> exact:bool -> state -> state
 
 
-val lval_from_pointer: pointer -> lval
-
-
 (** {1 Conversion to and from Mthread world to the value analysis} *)
 
-type 'a conversion = [
-  | `Success of 'a
-  | `Failure of (Format.formatter -> unit)
-]
+(*** All conversion functions below return an error message in case of failure. *)
+type 'a conversion = ('a, string) Result.t
 
 val extract_fun : value -> kernel_function conversion
 val extract_pointer : value -> pointer conversion
@@ -101,6 +94,9 @@ val extract_int : value -> int conversion
 val extract_int_possibly_zero : value -> (int * [`Exact | `WithZero]) conversion
 val extract_constant_string : value -> string conversion
 val extract_non_wide_string : Base.cstring -> string conversion
+
+(** Fails if [value] represents more than [cardinal] integers. *)
+val extract_int_list : cardinal:int -> value -> int list conversion
 
 
 val int_to_value: int -> value

@@ -62,38 +62,29 @@ let hook_fail ?(code=default_err_code) () =
    into a proper value fails *)
 let catch_conversion analysis ~prefix v msg =
   match v with
-  | `Success v -> v
-  | `Failure w ->
-    warning analysis "@[%s: %s. %t Ignoring.@]" prefix msg w;
+  | Ok v -> v
+  | Error error ->
+    warning analysis "@[%s: %s. %s. Ignoring.@]" prefix msg error;
     hook_fail ()
 
 (* -------------------------------------------------------------------------- *)
 (* --- Specialization of id function                                          *)
 (* -------------------------------------------------------------------------- *)
 
-let find_failure kind id =
-  let pp fmt =
-    Format.fprintf fmt
-      "Id %d for %s does not exists (incrementation inside program?)."
-      id kind
-  in
-  `Failure pp
+let find_id kind find id =
+  match find id with
+  | Some elt -> Ok elt
+  | None ->
+    let error =
+      Format.sprintf
+        "Id %d for %s does not exists (incrementation inside program?)."
+        id kind
+    in
+    Error error
 
-let find_thread id =
-  match Thread.find id with
-  | Some th -> `Success th
-  | None -> find_failure "thread" id
-
-let find_mutex id =
-  match Mutex.find id with
-  | Some m -> `Success m
-  | None -> find_failure "mutex" id
-
-let find_queue id =
-  match Mqueue.find id with
-  | Some q -> `Success q
-  | None -> find_failure "queue" id
-
+let find_thread = find_id "thread" Thread.find
+let find_mutex = find_id "mutex" Mutex.find
+let find_queue = find_id "queue" Mqueue.find
 
 (* -------------------------------------------------------------------------- *)
 (* --- Constants written in memory to store states                        --- *)
@@ -252,11 +243,9 @@ let sync_values analysis state =
   in
   let v = Mt_lib.var_thread_created () in
   let value = Results.(in_cvalue_state state |> eval_var v |> as_cvalue) in
-  match Mt_memory.extract_int value with
-  | `Success 0 ->
-    (* As no thread is running, just skip the synchronization. *)
-    state
-  | _ ->
+  if Cvalue.V.is_zero value then
+    state (* As no thread is running, just skip the synchronization. *)
+  else
     fold_threads analysis state
       (fun th state ->
          match th.th_values_written with
@@ -564,10 +553,7 @@ let hook_send_msg analysis state : hook_sig = function
     if offset <> 0 then
       let sbytes = conv (Mt_memory.extract_int size) "invalid message size" in
       if sbytes <= 0 then
-        begin
-          let failure = `Failure (fun fmt -> Format.fprintf fmt "%d." sbytes) in
-          conv failure "invalid message length";
-        end;
+        conv (Error (string_of_int sbytes)) "invalid message length";
       let q = conv (find_queue offset) "unkwown queue" in
       let content = Mt_memory.read_slice ~p:content ~sbytes state in
       let state = QueueOp.check_and_write analysis state q QueueOp.send in

@@ -7,7 +7,6 @@
 (**************************************************************************)
 
 open Cil_types
-open Cil
 open Locations
 
 (* Must be used inlined, as Machine.theMachine is mutable
@@ -15,11 +14,6 @@ open Locations
    let int_size_bytes = Machine.sizeof_int ()
 *)
 let size_char_in_bits = 8
-
-type 'a conversion = [
-  | `Success of 'a
-  | `Failure of (Format.formatter -> unit)
-]
 
 module Types = struct
 
@@ -109,16 +103,6 @@ let location_of_pointer (p : Types.pointer) =
     (Base.of_varinfo (fst p) ) (Ival.of_int (snd p))
 
 
-let lval_from_pointer (v, offs) : lval =
-  let loc = v.vdecl in
-  let exp_var = mkAddrOrStartOf ~loc (var v) in
-  let exp_offs = Cil.new_exp ~loc
-      (Const (CInt64 (Integer.of_int offs, IInt, None))) in
-  let exp' = new_exp ~loc (BinOp (PlusPI, exp_var, exp_offs, Cil_const.intPtrType)) in
-  let lval = mkMem ~addr:exp' ~off:NoOffset in
-  lval
-
-
 let read_int_pointer p state =
   let p = location_of_pointer p in
   let p = location_with_size p (Machine.sizeof_int ()) in
@@ -166,113 +150,86 @@ let write_slice ~p ~sbytes ~slice ~exact state =
     ~exact
     state
 
+
+(* ----- Conversion from cvalue --------------------------------------------- *)
+
+(* All conversion functions below return an error message in case of failure. *)
+type 'a conversion = ('a, string) Result.t
+
+let error format = Format.kasprintf Result.error format
+
+let extract_definition name kf =
+  if Kernel_function.has_definition kf
+  then Result.Ok kf
+  else error "Missing definition for function %s" name
+
 let extract_fun value =
-  try
-    let b, _ = Location_Bytes.find_lonely_key value in
-    (match b with
-     | Base.Var (v, _)  ->
-       (try
-          let f = Globals.Functions.get v in
-          (match f.fundec with
-           | Definition (_, _) -> `Success f
-           | Declaration (_, f, _, _) ->
-             `Failure (fun fmt -> Format.fprintf fmt
-                          "Missing@ definition@ for function@ '%s'." f.vname))
-        with Not_found ->
-          `Failure (fun fmt -> Format.fprintf fmt
-                       "Expected@ pointer to@ function,@ received@ \
-                        non-function@ value %a." Base.pretty b))
-     | _ -> raise Not_found)
-  with Not_found -> (* find_loneley_key + above *)
-    `Failure (fun fmt -> Format.fprintf fmt
-                 "Expected@ pointer@ to function,@ received %a."
-                 Cvalue.V.pretty value)
+  match fst (Location_Bytes.find_lonely_key value) with
+  | Base.Var (vi, _) when Globals.Functions.mem vi ->
+    extract_definition vi.vname (Globals.Functions.get vi)
+  | _ | exception Not_found ->
+    error "Expected pointer to function, received %a" Cvalue.V.pretty value
 
 let extract_pointer value =
-  try
-    let b, i = Location_Bytes.find_lonely_key value in
-    (match b with
-     | Base.Var (v, _) | Base.Allocated (v, _, _) ->
-       (try
-          `Success (v, Abstract_interp.Int.to_int_exn (Ival.project_int i))
-        with Ival.Not_Singleton_Int ->
-          `Failure (fun fmt -> Format.fprintf fmt "Not@ a@ correct@ \
-                                                   pointer@, incorrect@ offset: %a" Ival.pretty i)
-       )
+  match Location_Bytes.find_lonely_key value with
+  | Base.Var (v, _), i
+  | Base.Allocated (v, _, _), i ->
+    begin
+      try Result.Ok (v, Integer.to_int_exn (Ival.project_int i))
+      with Ival.Not_Singleton_Int | Z.Overflow ->
+        error "Not a correct pointer, incorrect offset: %a" Ival.pretty i
+    end
+  | _ | exception Not_found ->
+    error "Not a correct pointer '%a' (should be variable+offset)"
+      Cvalue.V.pretty value
 
-     | _ -> raise Not_found)
-  with Not_found -> (* find_loneley_key + above *)
-    `Failure (fun fmt -> Format.fprintf fmt "Not@ a@ correct@ \
-                                             pointer '%a'@ (should be@ variable+offset)"
-                 Cvalue.V.pretty value)
+let to_int i =
+  try Result.Ok (Integer.to_int_exn i)
+  with Z.Overflow -> error "Overflow on integer %a" Integer.pretty i
 
 let extract_int value =
-  try
-    let b, i = Location_Bytes.find_lonely_key value in
-    (match b with
-     | Base.Null ->
-       (try
-          `Success (Abstract_interp.Int.to_int_exn (Ival.project_int i))
-        with Ival.Not_Singleton_Int ->
-          `Failure (fun fmt -> Format.fprintf fmt "Non-integer value: %a"
-                       Ival.pretty i)
-       )
-
-     | _ -> raise Not_found)
-  with Not_found -> (* find_loneley_key + above *)
-    `Failure (fun fmt -> Format.fprintf fmt "Non-integer value: %a"
-                 Cvalue.V.pretty value)
+  try Cvalue.V.project_ival value |> Ival.project_int |> to_int
+  with Cvalue.V.Not_based_on_null | Ival.Not_Singleton_Int ->
+    error "Non-singleton integer value: %a" Cvalue.V.pretty value
 
 let extract_int_possibly_zero value =
+  match Cvalue.V.project_ival value |> Ival.project_small_set with
+  | Some [v] ->
+    to_int v |> Result.map (fun v -> v, `Exact)
+  | Some [v1; v2] when Integer.is_zero v1 ->
+    to_int v2 |> Result.map (fun v -> v, `WithZero)
+  | Some [v1; v2] when Integer.is_zero v2 ->
+    to_int v1 |> Result.map (fun v -> v, `WithZero)
+  | Some _ | None | exception Cvalue.V.Not_based_on_null ->
+    error "Non-integer or imprecise value: %a" Cvalue.V.pretty value
+
+let extract_int_list ~cardinal value =
   try
-    let b, i = Location_Bytes.find_lonely_key value in
-    (match b with
-     | Base.Null ->
-       let fail =
-         `Failure (fun fmt -> Format.fprintf fmt "Non-integer value: %a"
-                      Ival.pretty i)
-       in
-       (try
-          ignore (Ival.cardinal_less_than i 3);
-          (match Ival.fold_int (fun i l -> i :: l) i [] with
-           | [v] -> `Success (Abstract_interp.Int.to_int_exn v, `Exact)
-           | [v1; v2] -> (* Sorted in reverse direction *)
-             let v1 = Abstract_interp.Int.to_int_exn v1 in
-             let v2 = Abstract_interp.Int.to_int_exn v2 in
-             if v2 = 0 then `Success (v1, `WithZero)
-             else fail
-           | [] | _ :: _ :: _ :: _ -> fail
-          )
-        with Abstract_interp.Error_Top | Abstract_interp.Not_less_than -> fail)
-     | _ -> raise Not_found)
-  with Not_found -> (* find_loneley_key + above *)
-    `Failure (fun fmt -> Format.fprintf fmt "Non-integer value: %a"
-                 Cvalue.V.pretty value)
+    let ival = Cvalue.V.project_ival value in
+    if Ival.is_int ival && Ival.cardinal_is_less_than ival cardinal
+    then
+      Ival.to_int_seq ival |>
+      List.of_seq |>
+      List.map Integer.to_int_exn |>
+      Result.ok
+    else error "Imprecise value: %a" Ival.pretty ival
+  with
+  | Cvalue.V.Not_based_on_null ->
+    error "Non-integer value: %a" Cvalue.V.pretty value
+  | Z.Overflow ->
+    error "Overflow integer value: %a" Cvalue.V.pretty value
 
-
-let extract_non_wide_string cstr =
-  match cstr with
-  | Base.CSString s -> `Success s
+let extract_non_wide_string = function
+  | Base.CSString s -> Result.Ok s
   | Base.CSWstring s ->
-    `Failure (fun fmt -> Format.fprintf fmt
-                 "Wide string not supported (string@ '%s')"
-                 (Escape.escape_wstring s))
-
+    error "Wide string not supported (string %S)" (Escape.escape_wstring s)
 
 let extract_constant_string value =
-  try
-    match Location_Bytes.fold_i (fun b i l -> (b,i) :: l) value [] with
-    | [Base.String (_, e), i] when Ival.is_zero i ->
-      extract_non_wide_string e
-
-    | _ ->
-      `Failure (fun fmt -> Format.fprintf fmt
-                   "When decoding string, incorrect value@ '%a'"
-                   Cvalue.V.pretty value)
-  with e ->
-    `Failure (fun fmt -> Format.fprintf fmt "Not a correct string '%a'@. \
-                                             Conversion raised %s"
-                 Cvalue.V.pretty value (Printexc.to_string e))
+  match Location_Bytes.fold_i (fun b i l -> (b,i) :: l) value [] with
+  | [Base.String (_, e), i] when Ival.is_zero i ->
+    extract_non_wide_string e
+  | _ | exception Abstract_interp.Error_Top ->
+    error "When decoding string, incorrect value '%a'" Cvalue.V.pretty value
 
 
 
@@ -300,9 +257,5 @@ let rec join_params l1 l2 = match l1, l2 with
   | x::xs , y::ys ->
     let v, recv = join_value x y and lv, recl = join_params xs ys in
     v :: lv, recv || recl
-
-let join_zone z1 z2 =
-  let r = Zone.join z1 z2 in
-  r, Zone.equal r z1 = false
 
 let int_to_value i = Cvalue.V.inject_ival (Ival.of_int i)
