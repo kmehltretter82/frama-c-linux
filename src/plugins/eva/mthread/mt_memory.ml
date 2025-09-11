@@ -222,7 +222,10 @@ let extract_int_list ~cardinal value =
 let extract_constant_string value =
   match Location_Bytes.fold_i (fun b i l -> (b,i) :: l) value [] with
   | [Base.Var (vi, _), i] when Ival.is_zero i && Ast_attributes.contains "__str_lit" vi.vattr ->
-    Result.ok "TODO: Retrieve String Literal"
+    let l = Globals.Vars.get_literal_string vi in
+    (match l with
+     | Lit_str s -> Result.ok s
+     | Lit_wstr _ -> error "Expected a string, not a wide string")
   | _ | exception Abstract_interp.Error_Top ->
     error "When decoding string, incorrect value '%a'" Cvalue.V.pretty value
 
