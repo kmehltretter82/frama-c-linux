@@ -3,13 +3,8 @@ This file has two different testing modes:
  mopsa-db.json;
 - otherwise, it uses a prepared mopsa-db.json
 Building the project with make will produce lots of messages, both from Make
-itself, and from GCC (e.g. warnings about sptring)
-  $ if command -v mopsa-build 2>&1 >/dev/null; then
-  >   mopsa-build make -j >make.out 2>make.err &&
-  >   mopsa-db -json > mopsa-db.json
-  > else
-  >   cp precomputed-mopsa-db.json mopsa-db.json
-  > fi
+itself, and from GCC (e.g. warnings about sprintf)
+  $ ./run-mopsa-build-if-available.sh
   $ frama-c -mopsa-db mopsa-db.json
   [kernel] targets:
     [library   ] library/libpolarssl.a

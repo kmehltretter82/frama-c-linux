@@ -1,3 +1,4 @@
+.SUFFIXES:
 DESTDIR=/usr/local
 PREFIX=polarssl_
 
@@ -10,10 +11,8 @@ all:
 install:
 	mkdir -p $(DESTDIR)/include/polarssl
 	cp -r include/polarssl $(DESTDIR)/include
-	
 	mkdir -p $(DESTDIR)/lib
 	cp library/libpolarssl.* $(DESTDIR)/lib
-	
 	mkdir -p $(DESTDIR)/bin
 	for p in programs/*/* ; do              \
 	    if [ -x $$p ] && [ ! -d $$p ] ;     \
