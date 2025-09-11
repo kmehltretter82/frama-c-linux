@@ -28,9 +28,11 @@ let current_position analysis =
 (* --- Specialized logging functions                                      --- *)
 (* -------------------------------------------------------------------------- *)
 
-(* Returns [source] and [append] arguments for log functions, according to the
-   current stack. To be used only inside hooks, as it makes pretty bold
-   assumptions on the shape of the stack *)
+
+(* Returns [source] and [append] arguments for log functions used in hooks,
+   according to the the current stack. As builtins are called inside stubbed
+   function for pthreads library, we use the position of the penultimate call
+   site, which should correspond to the call to the pthreads function. *)
 let log_arg analysis =
   let stack = analysis.curr_stack in
   let stack = Option.value (Callstack.pop stack) ~default:stack in
