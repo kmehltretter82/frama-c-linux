@@ -94,6 +94,14 @@ let dkey_pp = register_category "pp"
 let dkey_pp_logic = register_category "pp:logic"
 let dkey_compilation_db = register_category "pp:compilation-db"
 
+let dkey_mopsa_db =
+  register_category "mopsa-db"
+    ~help:"messages related to -mopsa-db and related options"
+
+let dkey_mopsa_db_verbose =
+  register_category "mopsa-db:verbose"
+    ~help:"highly verbose messages related to mopsa-db options"
+
 let dkey_print_bitfields = register_category "printer:bitfields"
 
 let dkey_print_builtins = register_category "printer:builtins"
@@ -205,6 +213,19 @@ let wkey_check_volatile = register_warn_category "check:volatile"
 
 let wkey_jcdb = register_warn_category "pp:compilation-db"
 let () = set_warn_status wkey_jcdb Log.Wonce
+
+let wkey_mopsa_db =
+  register_warn_category "mopsa-db"
+    ~help:"warnings related to option -mopsa-db"
+
+let wkey_mopsa_db_missing_library =
+  register_warn_category "mopsa-db:missing-library"
+    ~default:Log.Wabort
+    ~help:"warnings related to missing libraries in mopsa-db files"
+
+let wkey_mopsa_db_non_c =
+  register_warn_category "mopsa-db:non-c-source"
+    ~help:"warnings related non-C sources present in a mopsa-db file"
 
 let wkey_implicit_function_declaration = register_warn_category
     "typing:implicit-function-declaration"
@@ -1234,6 +1255,87 @@ module JsonCompilationDatabase =
          specified by <path>. If <path> is a directory, use \
          '<path>/compile_commands.json'. Disabled by default."
     end)
+
+let () = Parameter_customize.set_group parsing
+let () = Parameter_customize.do_not_reset_on_copy ()
+module CompilationDb =
+  P.Filepath
+    (struct
+      let option_name = "-compilation-db"
+      let arg_name = "path"
+      let file_kind = "directory or json"
+      let existence = Filepath.Must_exist
+      let help =
+        "when set, preprocessing of each file will include corresponding \
+         flags (e.g. -I, -D) from the JSON compilation database \
+         specified by <path>. If <path> is a directory, use \
+         '<path>/compile_commands.json'. Disabled by default."
+    end)
+
+let () =
+  JsonCompilationDatabase.add_set_hook (fun _old new_ ->
+      warning "Option -json-compilation-database is deprecated. \
+               Use -compilation-db instead.";
+      CompilationDb.set new_
+    )
+
+
+let mopsa = add_group "Mopsa"
+
+let () = Parameter_customize.set_group mopsa
+let () = Parameter_customize.do_not_reset_on_copy ()
+module MopsaDb =
+  P.Filepath
+    (struct
+      let option_name = "-mopsa-db"
+      let arg_name = "path"
+      let file_kind = "directory or json"
+      let existence = Filepath.Must_exist
+      let help =
+        "when set, the specified path (or <path>/mopsa-db.json, if <path> is \
+         a directory) is loaded as a build database. \
+         If '-mopsa-target' is not set, prints the list of targets in the \
+         database and exits. Otherwise, '-mopsa-target' sets the files to \
+         be parsed and preprocessing flags."
+    end)
+
+let () = Parameter_customize.set_group parsing
+let () = Parameter_customize.do_not_reset_on_copy ()
+module MopsaListDeps =
+  P.String_list
+    (struct
+      let option_name = "-mopsa-list-deps"
+      let arg_name = "target1,target2,..."
+      let help = "prints the sources (and relevant preprocessing flags) \
+                  used by target1,target2,..., then exits."
+    end)
+
+let () = Parameter_customize.set_group parsing
+let () = Parameter_customize.do_not_reset_on_copy ()
+module MopsaTarget =
+  P.String_list
+    (struct
+      let option_name = "-mopsa-target"
+      let arg_name = "target1,target2,..."
+      let help = "name of the target(s) present in the mopsa-db for \
+                  which the list of sources should be parsed; replaces \
+                  any existing files in the command-line."
+    end)
+
+let () = Parameter_customize.set_group parsing
+let () = Parameter_customize.do_not_reset_on_copy ()
+module MopsaExcludeSources =
+  P.Filepath_list
+    (struct
+      let option_name = "-mopsa-exclude-sources"
+      let arg_name = "file1,file2,..."
+      let existence = Filepath.Indifferent
+      let file_kind = "source"
+      let help = "list of source files to be blacklisted from the set \
+                  computed by -mopsa-target, so that Frama-C will not \
+                  try to parse them."
+    end)
+
 
 (* ************************************************************************* *)
 (** {2 Customizing Normalization} *)

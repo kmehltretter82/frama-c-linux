@@ -39,6 +39,10 @@ val dkey_comments: category
 
 val dkey_compilation_db: category
 
+val dkey_mopsa_db: category
+
+val dkey_mopsa_db_verbose: category
+
 val dkey_dataflow: category
 
 val dkey_dataflow_scc: category
@@ -191,6 +195,12 @@ val wkey_cert_exp_10: warn_category
 val wkey_check_volatile: warn_category
 
 val wkey_jcdb: warn_category
+
+val wkey_mopsa_db: warn_category
+
+val wkey_mopsa_db_missing_library: warn_category
+
+val wkey_mopsa_db_non_c: warn_category
 
 val wkey_implicit_function_declaration: warn_category
 
@@ -585,7 +595,23 @@ val normalization_parameters: unit -> Typed_parameter.t list
 *)
 
 module JsonCompilationDatabase: Parameter_sig.Filepath
-(** Behavior of option "-json-compilation-database" *)
+[@@ ocaml.deprecated "Use CompilationDb instead"]
+(** Deprecated; use "-compilation-db" instead *)
+
+module CompilationDb: Parameter_sig.Filepath
+(** Behavior of option "-compilation-db" *)
+
+module MopsaDb: Parameter_sig.Filepath
+(** Behavior of option "-mopsa-db" *)
+
+module MopsaListDeps: Parameter_sig.String_list
+(** Behavior of option "-mopsa-list-deps" *)
+
+module MopsaTarget: Parameter_sig.String_list
+(** Behavior of option "-mopsa-target" *)
+
+module MopsaExcludeSources: Parameter_sig.Filepath_list
+(** Behavior of option "-mopsa-exclude-sources" *)
 
 module GeneratedSpecMode: Parameter_sig.String
 (** Behavior of option "-generated-spec-mode". *)

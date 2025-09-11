@@ -1,11 +1,11 @@
 /* run.config
  DEPS: compile_commands.json
  COMMENT: parsing option are defined in the default json file "compile_commands.json"
-   OPT: -json-compilation-database ./ -print
+   OPT: -compilation-db ./ -print
  DEPS:
-   OPT: %{dep:./jcdb2.c} -json-compilation-database %{dep:./with_arguments.json} -print
+   OPT: %{dep:./jcdb2.c} -compilation-db %{dep:./with_arguments.json} -print
  MODULE: @PTEST_NAME@
-   OPT: -json-compilation-database %{dep:./with_arguments.json}
+   OPT: -compilation-db %{dep:./with_arguments.json}
  MODULE:
  DEPS: file_without_main.c
    EXECNOW: LOG list_files.res LOG list_files.err %{bin:frama-c-script} list-files %{dep:./compile_commands_working.json} > ./list_files.res 2> ./list_files.err

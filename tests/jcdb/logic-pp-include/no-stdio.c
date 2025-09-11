@@ -1,5 +1,5 @@
 /* run.config
-   OPT: -json-compilation-database %{dep:./no-stdio.json} -print
+   OPT: -compilation-db %{dep:./no-stdio.json} -print
 */
 
 // no-stdio.json must have "-includestdio.h" and define ZERO

@@ -4,32 +4,79 @@
 This chapter explains how to specify the source files that form the
 basis of an analysis project, and describes options that influence parsing.
 
-\section{Overview of source processing in \FramaC}\label{sec:overview}
+\section{Overview of Source Processing in \FramaC}\label{sec:overview}
 
 For small projects and tests, processing the sources in \FramaC is as simple
-as running \texttt{frama-c *.c}. For more complex projects, however,
-some problems may arise when using this command, and the user must be aware
-of the several steps involved in \FramaC source processing to fix them.
+as running \texttt{frama-c *.c}. For more complex projects, there are a few
+possibilities:
 
-The diagram in Figure~\ref{fig:source-preparation} presents an overview
-of the steps described in this chapter. For comparison purposes, we add
-the equivalent process performed by a compiler such as GCC.
+\begin{itemize}
+\item If the project is built using \texttt{cc}/\texttt{gcc} (with a Makefile,
+  for instance), you can use Mopsa-build\footnote{\textsf{Mopsa} is an
+  open-source static analyzer, available at
+  \url{https://gitlab.com/mopsa/mopsa-analyzer}. \texttt{mopsa-build} is a tool
+  shipped with Mopsa which wraps compiler calls and produces a build
+  database that \FramaC can use.} and \texttt{-mopsa-db}
+  (detailed in Section~\ref{sec:mopsa}) to automate the parsing process;
+\item If you have the list of sources and preprocessing flags
+  (included directories and macros, i.e. \texttt{-I}/\texttt{-D} for
+  GCC/Clang), you can use option \verb|-cpp-extra-args="-I... -D..."|
+  (detailed in Section~\ref{sec:preprocessing-gcc});
+\item For more complex cases or if you do not know the above
+  commands/options, Section~\ref{sec:preprocessing-full} details the
+  entire preprocessing and parsing steps performed by \FramaC.
+\end{itemize}
 
-\begin{figure}[htbp]
-  \begin{center}
-    \includegraphics[width=\textwidth]{source-preparation.pdf}
-    \caption{Overview of source preparation steps: as performed by GCC
-      (top) and as performed by \FramaC (bottom).}
-    \label{fig:source-preparation}
-  \end{center}
-\end{figure}
+\section{Parsing Using a Mopsa-DB File}\label{sec:mopsa}
 
-The following sections describe various options related to the steps shown
-in the figure. Note that some plug-ins, such as \textsf{Variadic}
-(described in chapter~\ref{user-variadic}), perform further AST
-transformations before most analyses are run.
+The \textsf{Mopsa} analyzer includes the \texttt{mopsa-build} tool, a build
+wrapper that produces a build database, similar to tools such as \texttt{bear}
+(Build EAR, mentioned in Section~\ref{sec:compilation-db}).
 
-\section{Preprocessing the Source Files}\label{sec:preprocessing}
+By running \verb|mopsa-build <build commands>|, it produces a
+\verb|mopsa.db| file. This binary database can be converted to JSON using
+\verb|mopsa-db -json > mopsa-db.json|. This file can then be passed on to
+\FramaC using option \optiondef{-}{mopsa-db}. By default, this option
+will print the list of {\em targets} identified during the build.
+A target is either a library or an executable, that you might want to
+analyze with \FramaC.
+
+Adding option \optiondef{-}{mopsa-target} will instruct \FramaC to parse
+the source files used to build the given target. For instance, if a
+target \texttt{app} has been built using \texttt{main.o} and \texttt{util.o},
+which were in turn built using \texttt{main.c} and \texttt{util.c}, running:
+
+\begin{frama-c-commands}
+$ frama-c -mopsa-db mopsa-db.json -mopsa-target app
+\end{frama-c-commands}
+
+Is equivalent to running \verb|frama-c main.c util.c|, plus the appropriate
+preprocessing flags (if any).
+
+Other Mopsa-DB-related options are available, but they are only occasionally
+useful:
+
+\begin{description}
+\item \texttt{\optiondef{-}{mopsa-exclude-sources} <sources...>} tells \FramaC
+  not to parse such sources, even if they are present in the Mopsa-DB file as
+  dependencies of a selected target.
+\item \texttt{\optiondef{-}{list-deps} <targets>} prints the list of sources
+  that were used to produce the given targets, along with their preprocessing
+  flags, then exits.
+\item \optiondef{-}{permissive} allows \FramaC to proceed parsing even when
+  there are missing sources, instead of aborting. Used when the Mopsa-DB
+  contains spurious entries.
+\end{description}
+
+Note that, even when using a Mopsa-DB, you can add other source files (e.g.
+additional stubs) to the command line, to be parsed along with those from
+the Mopsa-DB.
+
+\section{Preprocessing Sources in a GCC-Compatible Environment}
+\label{sec:preprocessing-gcc}
+
+This section assumes you cannot or do not want to use \texttt{-mopsa-db}
+directly.
 
 The list of files to analyze must be provided on the command line, or
 chosen interactively in the GUI. Files with the suffix
@@ -49,7 +96,58 @@ default preprocessing command, typically via the inclusion of defines
 You can also add arguments on a per-file basis, using option
 \optiondef{-}{cpp-extra-args-per-file}.
 
-If you need to, you can also {\em replace} the preprocessing command
+\subsection{Preprocessing Using a Compilation Database}\label{sec:compilation-db}
+
+If you have a JSON compilation database file\footnote{%
+  \url{http://clang.llvm.org/docs/JSONCompilationDatabase.html}}, you can use
+it to retrieve the above preprocessing flags for each file in the database,
+via option \optiondef{-}{compilation-db} \texttt{<path>},
+where \texttt{<path>} is the path to the JSON file or to a directory containing
+a file named \texttt{compile\_commands.json}.
+
+JSON compilation databases can be produced by \textsf{CMake} (with option
+\verb|-DCMAKE_EXPORT_COMPILE_COMMANDS=1|) or build wrappers such as
+Build~EAR\footnote{\url{https://github.com/rizsotto/Bear}}.
+
+Note that, unlike a Mopsa-DB, a \verb|compile_commands.json| file does not
+include linking information and cannot track dependencies from binaries to
+sources. This means you need to provide the list of source files to be parsed.
+
+With \verb|compilation-db| set, \FramaC will parse
+the compilation database and include associated preprocessing flags,
+as if they had been manually added via \texttt{-cpp-extra-args-per-file}.
+
+Note: if both \texttt{-cpp-extra-args-per-file} and the JSON compilation
+database specify options for a given file, the former are used and the latter
+are ignored.
+
+\section{Preprocessing Sources, Full Details}\label{sec:preprocessing-full}
+
+This section contains details about how preprocessing and parsing are done
+in \FramaC, which should help deal with non-standard usage scenarios.
+
+The diagram in Figure~\ref{fig:source-preparation} presents an overview
+of the steps described in this chapter. For comparison purposes, we add
+the equivalent process performed by a compiler such as GCC.
+
+\begin{figure}[htbp]
+  \begin{center}
+    \includegraphics[width=\textwidth]{source-preparation.pdf}
+    \caption{Overview of source preparation steps: as performed by GCC
+      (top) and as performed by \FramaC (bottom).}
+    \label{fig:source-preparation}
+  \end{center}
+\end{figure}
+
+Note that some plug-ins and kernel modules, such as \textsf{Variadic}
+(described in chapter~\ref{user-variadic}), perform further AST
+transformations before most analyses are run.
+
+By default, \FramaC considers that \gcc is installed and uses it as
+preprocessor.
+If option \texttt{-cpp-extra-args} mentioned in the previous section is not
+enough for your needs (e.g. you use a non-GCC-compatible compiler), you can
+replace the preprocessing command
 entirely with option \optiondef{-}{cpp-command}. Placeholders (see below)
 can be used for advanced commands.
 If no placeholders are used, the preprocessor is invoked in the
@@ -75,7 +173,7 @@ the following placeholders:
 \hline
 \end{tabular}
 
-Here are some examples for using this option.
+Here are some examples using this option.
 \begin{frama-c-commands}
 \$ frama-c -cpp-command 'gcc -C -E -I. -x c' file1.src file2.i
 \$ frama-c -cpp-command 'gcc -C -E -I. %args -o %o %i' file1.c file2.i
@@ -90,27 +188,10 @@ to indicate that the custom preprocessor accepts the same set of options as GNU
 \optionuse{-}{cpp-frama-c-compliant} also implies some extra
 constraints, such as accepting architecture-specific flags, e.g. \texttt{-m32}.
 
-If you have a JSON compilation database file\footnote{%
-  \url{http://clang.llvm.org/docs/JSONCompilationDatabase.html}}, you can use
-it to retrieve preprocessing macros such as \texttt{-D} and \texttt{-I}
-for each file in the database, via option
-\optiondef{-}{json-compilation-database} \texttt{<path>}, where \texttt{<path>}
-is the path to the JSON file or to a directory containing a
-file named \texttt{compile\_commands.json}. With this option set,
-\FramaC will parse
-the compilation database and include associated preprocessing flags,
-as if they had been manually added via \texttt{-cpp-extra-args-per-file}.
-Note: if both \texttt{-cpp-extra-args-per-file} and the JSON compilation
-database specify options for a given file, the former are used and the latter
-are ignored. Also note that the use of the database simply adds flags
-{\em for the files specified on the command-line}, but these files must still
-be specified by the user.
+\subsection*{Preprocessing ACSL Annotations}
 
-In all of the above cases,
-\acsl annotations are preprocessed by default (option \optiondef{-}{pp-annot}
-is set by default). Unless a custom preprocessor is specified
-(via \optionuse{-}{cpp-frama-c-compliant}), \FramaC considers that \gcc is
-installed and uses it as preprocessor.
+By default, \acsl annotations are preprocessed (option \optiondef{-}{pp-annot}
+is set by default).
 If you do \emph{not} want annotations to be preprocessed, you need to pass
 option \texttt{-no-pp-annot} to \FramaC. Note that some headers in the
 standard C library provided with \FramaC (described in Section~\ref{sec:libc})
@@ -128,7 +209,7 @@ depending on the number of times they are included.
 
 In addition, files having the suffix \texttt{.ci} will be considered as needing
 preprocessing for ACSL annotations only. Those files may contain
-\texttt{\#define} directives and annotations are preprocessed as explained in
+\texttt{\#define} directives, and annotations are preprocessed as explained in
 the previous paragraph. This allows to have macros in ACSL annotations while
 using a non-GNU-like preprocessor.
 
@@ -140,11 +221,10 @@ optionally present in the program. Together, these steps form the
 \emph{merging} phase of the creation of an analysis project.
 
 \FramaC aborts whenever any error occurs during one of these steps. However
-users can use the option
+users can apply option
 \texttt{-kernel-warn-key annot-error=warning}\footnote{%
 See section~\ref{sec:feedback-options} for more information on warning statuses.}
-in order to
-continue after emitting a warning when an \acsl annotation fails to type-check.
+to continue parsing after emitting a warning when an \acsl annotation fails to type-check.
 
 \section{Normalizing the Source Code}\label{sec:normalize}
 
@@ -281,8 +361,9 @@ this format in more detail, as well as the use of \texttt{frama-c-script make-ma
 to automatically generate it. The YAML schema contains a list of builtin
 macros with their values. However, any such \texttt{MACRO} can be undefined by passing
 \texttt{-UMACRO} in the preprocessor arguments
-(using \texttt{-cpp-extra-args} or its per-file counterpart as in Sect.~\ref{sec:preprocessing},
-or a compilation database as in Sect.~\ref{sec:using-json-comp}). In addition,
+(using \texttt{-cpp-extra-args} or its per-file counterpart as in
+Sect.~\ref{sec:preprocessing-gcc},
+or a compilation database as in Sect.~\ref{sec:compilation-db}). In addition,
 since compilers tend to define builtin macros with a varying number of
 underscores as prefix and suffix, \texttt{-UMACRO} will also undefine
 \texttt{\_MACRO}, \texttt{\_\_MACRO}, \texttt{\_\_MACRO\_\_}, etc.
@@ -597,7 +678,7 @@ command, as well as some GCC-specific options, including (but not limited to)
 \texttt{-dD}, \texttt{-nostdinc}, \texttt{-undef}, and some \texttt{-Wno-*}
 options. If any of these if not accepted by your preprocessor,
 \optionuse{-}{no-cpp-frama-c-compliant} can be given to \FramaC
-(see section~\ref{sec:preprocessing}).
+(see section~\ref{sec:preprocessing-full}).
 
 The use of \FramaC's standard library contains a few caveats:
 \begin{itemize}

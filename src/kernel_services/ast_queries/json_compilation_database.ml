@@ -13,8 +13,8 @@ module Flags =
     (Filepath.Hashtbl)
     (Datatype.Pair(Filepath)(StringList))
     (struct
-      let name ="JsonCompilationDatabase.Flags"
-      let dependencies = [Kernel.JsonCompilationDatabase.self]
+      let name ="CompilationDb.Flags"
+      let dependencies = [Kernel.CompilationDb.self]
       let size = 32
     end)
 
@@ -281,7 +281,7 @@ let parse_compilation_entry jcdb_dir r =
   update_flags_verbosely path (dirname, flags)
 
 let compute_flags_from_file () =
-  let database = Kernel.JsonCompilationDatabase.get () in
+  let database = Kernel.CompilationDb.get () in
   let jcdb_dir, jcdb_path =
     if Filesystem.is_dir database then
       database, Filepath.(database / "compile_commands.json")
@@ -313,7 +313,7 @@ let compute_flags_from_file () =
   Flags.mark_as_computed ()
 
 let get_flags f =
-  if not (Kernel.JsonCompilationDatabase.is_empty ()) then begin
+  if not (Kernel.CompilationDb.is_empty ()) then begin
     if not (Flags.is_computed ()) then compute_flags_from_file ();
     try
       let (_, flags) = Flags.find f in
@@ -328,7 +328,7 @@ let get_flags f =
   else []
 
 let get_dir f =
-  if not (Kernel.JsonCompilationDatabase.is_empty ()) then begin
+  if not (Kernel.CompilationDb.is_empty ()) then begin
     if not (Flags.is_computed ()) then compute_flags_from_file ();
     try
       let (dir, _) = Flags.find f in

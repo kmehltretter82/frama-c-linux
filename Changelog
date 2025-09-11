@@ -18,6 +18,12 @@
 Open Source Release <next-release>
 ###############################################################################
 
+-   Kernel    [2025-09-11] Added options related to Mopsa-build databases,
+              which are similar to JSON compilation databases, but also track
+              dependencies from binaries to source files. The main options are
+              -mopsa-db and -mopsa-target.
+-!  Kernel    [2025-09-11] Renamed option -json-compilation-database to
+              -compilation-db.
 -   Kernel    [2025-08-29] In options -*-warn-key, statuses 'active', 'once'
               and 'err-once' have been renamed 'warning', 'warning-once'
               and 'error-once' respectively.

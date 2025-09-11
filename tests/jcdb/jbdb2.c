@@ -1,5 +1,5 @@
 /* run.config
-OPT: -json-compilation-database %{dep:./build_commands.json} -print
+OPT: -compilation-db %{dep:./build_commands.json} -print
 */
 
 int f1 () {

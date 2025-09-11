@@ -1,8 +1,8 @@
 let print_json () =
   Kernel.feedback
-    "Value of -json-compilation-database in %s is %a"
+    "Value of -compilation-db in %s is %a"
     (Project.get_name (Project.current()))
-    Filepath.pretty (Kernel.JsonCompilationDatabase.get())
+    Filepath.pretty (Kernel.CompilationDb.get())
 
 let run () =
   print_json ();
