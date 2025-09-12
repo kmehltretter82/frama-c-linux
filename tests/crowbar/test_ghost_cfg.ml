@@ -10,7 +10,7 @@ let report file_name s =
   let summary =
     Printf.sprintf
       "%s. Saving ghostified file in %s"
-      s file_name
+      s (Filepath.to_string_abs file_name)
   in
   fail summary
 
@@ -451,6 +451,16 @@ let gen_body =
        let stmts = stmts @ end_of_body in
        env, Cil.mkBlock stmts)
 
+let create_file () =
+  let temp_dir =
+    Crowbar_utils.dirname
+    ^ "/output-"
+    ^ (Filename.basename Sys.executable_name)
+  in
+  ignore(Filesystem.make_dir ~parents:true (Filepath.of_string temp_dir) 0o755);
+  let name = Filename.temp_file ~temp_dir "ghostified" ".c" in
+  Filepath.of_string name
+
 let gen_file =
   map [gen_body]
     (fun (env, body) ->
@@ -458,7 +468,7 @@ let gen_file =
        f.svar.vdefined <- true;
        f.sbody <- body;
        (env,
-        { fileName = Filepath.empty;
+        { fileName = create_file ();
           globals = [
             GVarDecl (x,Cil_datatype.Location.unknown);
             GVarDecl (y,Cil_datatype.Location.unknown);
@@ -471,22 +481,14 @@ let gen_file =
 let ignore_deferred_errors () =
   try Log.treat_deferred_error () with Log.AbortError _ -> ()
 
+let success_remove file =
+  Filesystem.remove_file file.fileName;
+  true
+
 let check_file (env, file) =
   prepare();
-  let temp_dir = Filename.dirname Sys.executable_name in
-  let temp_dir =
-    temp_dir ^ "/output-" ^ (Filename.basename Sys.executable_name) ^ "/files"
-  in
-  let () =
-    if not (Sys.file_exists temp_dir) then
-      Unix.mkdir temp_dir 0o755
-  in
-  let file_name = Filename.temp_file ~temp_dir "ghostified" ".c" in
-  let out = open_out file_name in
-  let fmt = Format.formatter_of_out_channel out in
-  Printer.pp_file fmt file;
-  Format.pp_print_flush fmt ();
-  close_out out;
+  let file_name = file.fileName in
+  Crowbar_utils.generate_file file;
   let success =
     try
       File.prepare_cil_file file;
@@ -499,7 +501,9 @@ let check_file (env, file) =
     | exn ->
       Printf.printf
         "Uncaught exception: %s\n%t\nFile saved in %s\n%!"
-        (Printexc.to_string exn) Printexc.print_backtrace file_name;
+        (Printexc.to_string exn)
+        Printexc.print_backtrace
+        (Filepath.to_string_abs file_name);
       ignore_deferred_errors ();
       report file_name "Found code leading to an unknown exception"
   in
@@ -513,7 +517,7 @@ let check_file (env, file) =
       Kernel_function.pretty fmt f;
       let prj2 = Project.create "copy" in
       Project.set_current prj2;
-      Kernel.Files.set [ Filepath.of_string file_name ];
+      Kernel.Files.set [ file_name ];
       let parse_success =
         try
           File.init_from_cmdline (); true
@@ -526,16 +530,16 @@ let check_file (env, file) =
         let f = Globals.Functions.find_by_name "f" in
         Kernel_function.pretty fmt f;
         if Buffer.contents norm_buf <> Buffer.contents copy_buf then begin
-          let norm = open_out (file_name ^ ".norm.c") in
+          let norm = open_out (Filepath.to_string_abs file_name ^ ".norm.c") in
           Buffer.output_buffer norm norm_buf;
           flush norm;
           close_out norm;
-          let copy = open_out (file_name ^ ".copy.c") in
+          let copy = open_out (Filepath.to_string_abs file_name ^ ".copy.c") in
           Buffer.output_buffer copy copy_buf;
           flush copy;
           close_out copy;
           report file_name "Found ghost code not well pretty-printed"
-        end else true
+        end else success_remove file
       end else begin
         report file_name "Error during re-parsing of pretty-printed code"
       end
@@ -543,7 +547,7 @@ let check_file (env, file) =
     else
       report file_name "Found ghost code that should have been accepted"
   end
-  else true
+  else success_remove file
 
 let f () =
   add_test ~name:"ghost cfg" [gen_file]

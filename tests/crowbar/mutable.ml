@@ -81,10 +81,7 @@ let generate_failure_file is_const =
   fun types ->
     incr count;
     let name = "test_case_" ^ kind ^ "_" ^ string_of_int !count ^ ".i" in
-    let dirname = Filename.dirname Sys.executable_name in
-    let name = Filepath.of_string (dirname ^ "/" ^ name) in
-    let out = open_out (Filepath.to_string_abs name) in
-    let fmt = Format.formatter_of_out_channel out in
+    let path = Crowbar_utils.filepath name in
     let typ = List.hd types in
     let x =
       Cil.makeGlobalVar "x" (Cil_const.mk_tcomp typ)
@@ -111,7 +108,7 @@ let generate_failure_file is_const =
         sspec = Cil.empty_funspec () }
     in
     let file =
-      { fileName = name;
+      { fileName = path;
         globals =
           List.rev_map (fun typ -> GCompTag (typ,loc)) types @
           [ GVarDecl (x,loc); GVarDecl(y,loc); GFun (fdef, loc) ];
@@ -119,10 +116,8 @@ let generate_failure_file is_const =
         globinitcalled = true
       }
     in
-    Kernel.add_debug_keys Kernel.dkey_print_attrs;
-    Format.fprintf fmt "%a@." Cil_printer.pp_file file;
-    close_out out;
-    Filepath.to_string_abs name
+    Crowbar_utils.generate_file file;
+    Filepath.to_string_abs path
 
 let test (types, kind) =
   let out_type = List.hd types in

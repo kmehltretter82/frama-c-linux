@@ -129,10 +129,7 @@ let generate_failure_file is_complete =
   fun (typ, types) ->
     incr count;
     let name = "test_case_" ^ kind ^ "_" ^ string_of_int !count ^ ".i" in
-    let dirname = Filename.dirname Sys.executable_name in
-    let name = Filepath.of_string (dirname ^ "/" ^ name) in
-    let out = open_out (Filepath.to_string_abs name) in
-    let fmt = Format.formatter_of_out_channel out in
+    let path = Crowbar_utils.filepath name in
     let fundec = Cil.emptyFunction "f" in
     let s =
       Cil.mkPureExpr ~valid_sid:true ~fundec (Cil.new_exp ~loc (SizeOf typ))
@@ -140,17 +137,15 @@ let generate_failure_file is_complete =
     let b = Cil.mkBlock [ s ] in
     fundec.sbody <- b;
     let file =
-      { fileName = name;
+      { fileName = path;
         globals =
           List.rev types @ [ GFun (fundec, loc) ];
         globinit = None;
         globinitcalled = true
       }
     in
-    Kernel.add_debug_keys Kernel.dkey_print_attrs;
-    Format.fprintf fmt "%a@." Cil_printer.pp_file file;
-    close_out out;
-    Filepath.to_string_abs name
+    Crowbar_utils.generate_file file;
+    Filepath.to_string_abs path
 
 let test (allowZeroSizeArrays, typ, types, kind) =
   match kind with
@@ -174,6 +169,6 @@ let test (allowZeroSizeArrays, typ, types, kind) =
 
 let f () =
   Crowbar.add_test ~name:"complete type"
-    [ gen_type ] @@ (fun x -> Crowbar.check (test x))
+    [ gen_type ] (fun x -> Crowbar.check (test x))
 
 let () = Crowbar_utils.run "complete_type" f
