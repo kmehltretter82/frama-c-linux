@@ -83,10 +83,6 @@ let dkey_linker_find = register_category "linker:find"
 
 let dkey_loops = register_category "natural-loops"
 
-let dkey_pp_keep_temp_files =
-  register_category
-    ~help:"keep temporary preprocessor intermediate output files"
-    "pp:keep-temp-files"
 let dkey_rmtmps = register_category "parser:rmtmps"
 let dkey_referenced = register_category "parser:referenced"
 
@@ -2105,4 +2101,19 @@ module Permissive =
       let option_name = "-permissive"
       let help =
         "perform less verifications on validity of command-line options"
+    end)
+
+(* ************************************************************************* *)
+(** {2 Debug options} *)
+(* ************************************************************************* *)
+
+let () = Parameter_customize.set_group grp_debug
+let () = Parameter_customize.do_not_projectify ()
+let () = Parameter_customize.set_cmdline_stage Cmdline.Early
+module KeepTempFiles =
+  False
+    (struct
+      let module_name = "KeepTempFiles"
+      let option_name = "-keep-temp-files"
+      let help = "Keep temporary intermediate files"
     end)

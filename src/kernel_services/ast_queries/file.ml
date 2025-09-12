@@ -385,7 +385,7 @@ let pretty_machdep ?fmt ?machdep () =
 (* ************************************************************************* *)
 
 let safe_remove_file (f : Filepath.t) =
-  if not (Kernel.is_debug_key_enabled Kernel.dkey_pp_keep_temp_files) then
+  if not (Kernel.KeepTempFiles.get ()) then
     Filesystem.remove_file f
 
 let cpp_name cmd =

@@ -78,8 +78,6 @@ val dkey_linker_find: category
 
 val dkey_loops: category
 
-val dkey_pp_keep_temp_files: category
-
 val dkey_pp: category
 
 val dkey_pp_logic: category
@@ -737,3 +735,10 @@ module Copy: Parameter_sig.Bool
 
 module TypeCheck: Parameter_sig.Bool
 (** Behavior of option "-typecheck" *)
+
+(* ************************************************************************* *)
+(** {2 Debug options} *)
+(* ************************************************************************* *)
+
+module KeepTempFiles: Parameter_sig.Bool
+(** Behavior of option "-keep-temp-files" *)
