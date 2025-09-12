@@ -23,7 +23,7 @@ let needs_int_unary = function
   | NOT | BNOT -> true
   | _ -> false
 
-let gen_unary =
+let gen_unary_op =
   choose [
     const NOT;
     const BNOT;
@@ -38,7 +38,7 @@ let needs_int_binary = function
   | AND | OR | BAND | BOR | XOR -> true
   | _ -> false
 
-let gen_binary =
+let gen_binary_op =
   choose [
     const AND;
     const OR;
@@ -55,6 +55,8 @@ let gen_binary =
     const LE;
     const GE;
   ]
+
+
 
 (* int32 generator as the default machdep is 32 bit.
    Moreover, we only generate positive integers here, as negative ones are
@@ -89,33 +91,34 @@ let protected_cast t e =
       mk_exp(QUESTION(mk_exp(BINARY(LE,e,max)),e,maxr)),
       minr))
 
-let force_int typ e =
-  let e = protected_cast typ e in
-  mk_exp (CAST (([SpecType typ],JUSTBASE), SINGLE_INIT e))
+let gen_cast t e =
+  let e = protected_cast t e in
+  mk_exp (CAST (([SpecType t],JUSTBASE), SINGLE_INIT e))
+
+let gen_unary t op e =
+  let e = if needs_int_unary op then gen_cast t e else e in
+  mk_exp (UNARY (op,e))
+
+let gen_binary t op e1 e2 =
+  let e1,e2 =
+    if needs_int_binary op then
+      gen_cast t e1, gen_cast t e2
+    else e1,e2
+  in
+  mk_exp (BINARY (op,e1,e2))
+
+let gen_question c et ef =
+  mk_exp (QUESTION (c,et,ef))
 
 let gen_expr =
   fix
     (fun gen_expr ->
        choose [
          gen_constant;
-         map [ gen_int_type; gen_unary; gen_expr]
-           (fun t u e ->
-              let e = if needs_int_unary u then force_int t e else e in
-              mk_exp (UNARY(u,e)));
-         map [ gen_int_type; gen_binary; gen_expr; gen_expr ]
-           (fun t b e1 e2 ->
-              let e1,e2 =
-                if needs_int_binary b then
-                  force_int t e1, force_int t e2
-                else e1,e2
-              in
-              mk_exp (BINARY (b,e1,e2)));
-         map [ gen_expr; gen_expr; gen_expr ]
-           (fun c et ef -> mk_exp (QUESTION (c,et,ef)));
-         map [ gen_type; gen_expr ]
-           (fun t e ->
-              let e = protected_cast t e in
-              mk_exp (CAST (([SpecType t],JUSTBASE), SINGLE_INIT e)));
+         map [ gen_int_type; gen_unary_op; gen_expr] gen_unary;
+         map [ gen_int_type; gen_binary_op; gen_expr; gen_expr ] gen_binary;
+         map [ gen_expr; gen_expr; gen_expr ] gen_question;
+         map [ gen_type; gen_expr ] gen_cast;
        ])
 
 let gen_cabs typ expr =
