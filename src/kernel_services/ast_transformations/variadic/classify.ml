@@ -95,10 +95,9 @@ let mk_format_fun vi f_kind f_buffer ~format_pos =
 (* Classification                                                           *)
 (* ************************************************************************ *)
 
-let is_frama_c_builtin name =
-  Ast_info.start_with_frama_c_builtin name ||
-  Cil_builtins.Builtin_functions.mem name ||
-  String.starts_with ~prefix:"__FRAMAC_" name (* Mthread prefixes *)
+let is_frama_c_builtin vi =
+  Ast_info.is_frama_c_builtin vi ||
+  Cil_builtins.Builtin_functions.mem vi.vname
 
 let va_builtins = [
   "__builtin_c23_va_start";
@@ -153,9 +152,8 @@ let classify_std env vi = match vi.vname with
   | "ioctl"   -> mk_overload env ["__va_ioctl_void" ; "__va_ioctl_int" ; "__va_ioctl_ptr"]
   | n when String.starts_with ~prefix:"__sync_" n -> Misc
   | n when is_va_builtin n -> Misc
-  | n when is_frama_c_builtin n -> Builtin
   (* Anything else *)
-  | _ -> Unknown
+  | _ -> if is_frama_c_builtin vi then Builtin else Unknown
 
 let is_variadic_function vi =
   match Ast_types.unroll_node vi.vtype with

@@ -10,10 +10,6 @@ open Cil_types
 open Va_types
 module Typ = Extends.Typ
 
-(* List of builtin function names to translate *)
-
-let is_framac_builtin vi = Classify.is_frama_c_builtin vi.vname
-
 (* In place visitor for translation *)
 
 let translate_variadics (file : file) =
@@ -272,7 +268,7 @@ let translate_variadics (file : file) =
     method! vexpr exp =
       begin match exp.enode with
         | AddrOf (Var vi, NoOffset)
-          when Classify.is_variadic_function vi && is_framac_builtin vi ->
+          when Classify.(is_variadic_function vi && is_frama_c_builtin vi) ->
           Kernel.not_yet_implemented
             ~source:(fst exp.eloc)
             "Option %s doesn't handle calls to a pointer to the \

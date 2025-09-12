@@ -61,17 +61,41 @@ let threads_lib_files lib =
 
 let load_threads_library lib =
   Mt_self.feedback "Preparing sources for Mthread with %a" pp_threads_lib lib;
-
   (* Add MThread folder to the include path. *)
   let mt_include_dir =
     Format.asprintf "-I%a"
       Filepath.pretty_abs (Mt_self.Share.get_dir ".")
   in
   Kernel.CppExtraArgs.add mt_include_dir;
-
   (* Add the stubbed library files to the list of files to parse. *)
   threads_lib_files lib
   |> Filepath.Set.iter
     (fun f ->
        let f = File.from_filename f in
        File.pre_register f)
+
+
+let is_pthread_function kf =
+  let loc = Kernel_function.get_location kf in
+  let path = (fst loc).pos_path in
+  Filepath.basename path = "pthread.h"
+
+let has_been_parsed lib =
+  let lib_files = threads_lib_files lib in
+  let cabs_files = Ast.UntypedFiles.get () in
+  let parsed_files = List.map fst cabs_files |> Filepath.Set.of_list in
+  Filepath.Set.subset lib_files parsed_files
+
+let warn_on_unsupported_library_function kf =
+  if is_pthread_function kf then
+    if has_been_parsed Pthreads then
+      Mt_self.error ~current:true ~once:true
+        "Unsupported function %a from the pthreads library: \
+         its analysis is probably unsound."
+        Kernel_function.pretty kf
+    else
+      Mt_self.abort ~current:true
+        "Call to %a from the pthreads library, whose Mthread files are missing. \
+         Use '-mt-threads-lib pthreads' to enable the support of pthreads, \
+         or write a C stub for this function using Mthread primitives."
+        Kernel_function.pretty kf

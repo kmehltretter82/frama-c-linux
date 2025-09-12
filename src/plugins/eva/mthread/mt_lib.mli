@@ -28,3 +28,7 @@ type threads_lib =
 
 (** Load the given threads library into Frama-C. *)
 val load_threads_library : threads_lib -> unit
+
+(** Aborts if [kf] is from a library whose stubs have not been loaded;
+    warn if [kf] is an unsupported function from a loaded library. *)
+val warn_on_unsupported_library_function : Cil_types.kernel_function -> unit

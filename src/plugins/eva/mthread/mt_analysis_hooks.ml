@@ -28,9 +28,11 @@ let current_position analysis =
 (* --- Specialized logging functions                                      --- *)
 (* -------------------------------------------------------------------------- *)
 
-(* Returns [source] and [append] arguments for log functions, according to the
-   current stack. To be used only inside hooks, as it makes pretty bold
-   assumptions on the shape of the stack *)
+
+(* Returns [source] and [append] arguments for log functions used in hooks,
+   according to the the current stack. As builtins are called inside stubbed
+   function for pthreads library, we use the position of the penultimate call
+   site, which should correspond to the call to the pthreads function. *)
 let log_arg analysis =
   let stack = analysis.curr_stack in
   let stack = Option.value (Callstack.pop stack) ~default:stack in
@@ -766,6 +768,9 @@ let catch_functions_calls analysis (stack : Callstack.callstack) kf state kind =
      message arrives too late, and is not really readable *)
   if is_mthread_builtin f && Option.is_none (Callstack.pop stack) then
     Mt_self.abort "Thread function %s called as starting thread function" f;
+  (* Warn on concurrency library functions without stubs. *)
+  if kind = `Spec then
+    Mt_lib.warn_on_unsupported_library_function kf;
   analysis.curr_stack <- stack;
   if Callstack.is_empty stack then
     (* This is the entry point of the analysis, the events stack needs to be
