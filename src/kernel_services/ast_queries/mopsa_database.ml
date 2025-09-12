@@ -179,7 +179,7 @@ let run () =
     try
       from_file (db_path :> string)
     with
-    | Yojson__.Common.Json_error s ->
+    | Yojson.Json_error s ->
       Kernel.abort "mopsa-db: invalid JSON file '%a': %s"
         Filepath.pretty db_path s
   in
