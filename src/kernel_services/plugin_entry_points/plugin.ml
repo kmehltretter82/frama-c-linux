@@ -457,8 +457,8 @@ struct
          if Help.get () then Cmdline.plugin_help P.shortname else Cmdline.nop);
     Help.add_aliases [ prefix ^ "h" ]
 
-  let output_mode modname optname =
-    Parameter_customize.set_group messages;
+  let output_mode ?(group=messages) modname optname =
+    Parameter_customize.set_group group;
     Parameter_customize.do_not_projectify ();
     Parameter_customize.is_reconfigurable ();
     if is_kernel () then begin
@@ -601,7 +601,7 @@ struct
       end
   end
 
-  let debug_optname = output_mode "Debug" "debug"
+  let debug_optname = output_mode ~group:grp_debug "Debug" "debug"
   module Debug = struct
     include
       Int(struct

@@ -8,6 +8,8 @@ Options taking a string as argument should preferably be written
 
 ***** LIST OF AVAILABLE OPTIONS:
 
+-permissive         perform less verifications on validity of command-line
+                    options
 -session <dir>      set the Frama-C session directory to <dir>
 
 *** ANALYSIS OPTIONS
@@ -65,16 +67,6 @@ Options taking a string as argument should preferably be written
                     -no-warn-unsigned-downcast)
 -warn-unsigned-overflow  generate alarms for unsigned operations that
                     overflow (opposite option is -no-warn-unsigned-overflow)
-
-*** CHECKS
-
--check              performs consistency checks over the Abstract Syntax Tree
-                    (opposite option is -no-check)
--copy               always perform a copy of the original AST before analysis
-                    begin (opposite option is -no-copy)
--permissive         perform less verifications on validity of command-line
-                    options
--typecheck          forces typechecking of the source files (set by default)
 
 *** CUSTOMIZING NORMALIZATION
 
@@ -166,6 +158,24 @@ Options taking a string as argument should preferably be written
                     (set by default, opposite option is
                     -no-variadic-translation)
 
+*** DEBUG
+
+-check              performs consistency checks over the Abstract Syntax Tree
+                    (opposite option is -no-check)
+-copy               always perform a copy of the original AST before analysis
+                    begin (opposite option is -no-copy)
+-debug <n>          general level of debug
+-deterministic      undocumented
+-dump-dependencies <s>  undocumented
+-keep-temp-files    Keep temporary intermediate files (opposite option is
+                    -no-keep-temp-files)
+-kernel-debug <n>   level of debug for the Frama-C kernel (default to 0)
+-orig-name          prints a message each time a variable is renamed
+                    (opposite option is -no-orig-name)
+-print-as-is        when pretty-printing C code, try to print it as close as
+                    possible to the internal (Cil) representation (opposite
+                    option is -no-print-as-is)
+
 *** GETTING INFORMATION
 
 --help              display a general help
@@ -179,7 +189,6 @@ Options taking a string as argument should preferably be written
                     names (or '@all' for all plugins). Note: for the kernel,
                     use an empty string. (preferably use
                     -autocomplete="p1,p2,...")
--dump-dependencies <s>  undocumented
 -explain            prints the help message for each option given in the
                     command line
 -kernel-help        help of the Frama-C kernel
@@ -225,14 +234,12 @@ Options taking a string as argument should preferably be written
                     <filename>
 -print              pretty print original code with its comments (opposite
                     option is -no-print)
--print-as-is        when pretty-printing C code, try to print it as close as
-                    possible to the internal (Cil) representation (opposite
-                    option is -no-print-as-is)
 -print-libc         when pretty-printing C code, keep prototypes coming from
                     Frama-C standard library (opposite option is
                     -no-print-libc)
 -print-return       inline gotos to return statement (opposite option is
                     -no-print-return)
+-typecheck          forces typechecking of the source files (set by default)
 
 *** MOPSA
 
@@ -248,8 +255,6 @@ Options taking a string as argument should preferably be written
                     locations, replace (absolute) path with the corresponding
                     symbolic name (preferably use
                     -add-symbolic-path="path_1:name_1,...,path_n:name_n")
--debug <n>          general level of debug
--kernel-debug <n>   level of debug for the Frama-C kernel (default to 0)
 -kernel-log <K_1:file_1,...>  copy log messages from the Frama-C kernel to a
                     file. <K> is a combination of these characters:
                     a: ALL messages (equivalent to 'dfiruw')
@@ -352,8 +357,6 @@ Options taking a string as argument should preferably be written
                     mopsa-db for which the list of sources should be parsed;
                     replaces any existing files in the command-line.
                     (preferably use -mopsa-target="target1,target2,...")
--orig-name          prints a message each time a variable is renamed
-                    (opposite option is -no-orig-name)
 -pp-annot           preprocess annotations (if they are read). Set by default
                     if the preprocessor is GNU-like (see option
                     -cpp-frama-c-compliant) (opposite option is -no-pp-annot)
@@ -368,7 +371,6 @@ Options taking a string as argument should preferably be written
                     Small values are most suitable for the analysis of small
                     programs (less than 1000 lines). Higher values (around
                     7-8) can speed up the analysis of large code bases.
--deterministic      undocumented
 -memory-footprint <n>  Control the memory usage of Frama-C. With smaller
                     values, analyses consume much less memory but are also
                     slightly slower. Must be between 1 and 10; default is 6.

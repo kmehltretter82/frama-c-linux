@@ -14,6 +14,10 @@ Options taking a string as argument should preferably be written
 ***** LIST OF AVAILABLE OPTIONS:
 
 
+*** DEBUG
+
+-studia-debug <n>   level of debug for plug-in Studia (default to 0)
+
 *** GETTING INFORMATION
 
 -studia-help        help of plug-in Studia
@@ -21,7 +25,6 @@ Options taking a string as argument should preferably be written
 
 *** OUTPUT MESSAGES
 
--studia-debug <n>   level of debug for plug-in Studia (default to 0)
 -studia-log <K_1:file_1,...>  copy log messages from Studia to a file. <K> is
                     a combination of these characters:
                     a: ALL messages (equivalent to 'dfiruw')

@@ -54,6 +54,11 @@ Options taking a string as argument should preferably be written
                     conditions (opposite option is
                     -acsl-import-no-unroll-loop-conditions)
 
+*** DEBUG
+
+-acsl-import-debug <n>  level of debug for plug-in ACSL importer (default to
+                    0)
+
 *** GETTING INFORMATION
 
 -acsl-import-help   help of plug-in ACSL importer
@@ -61,8 +66,6 @@ Options taking a string as argument should preferably be written
 
 *** OUTPUT MESSAGES
 
--acsl-import-debug <n>  level of debug for plug-in ACSL importer (default to
-                    0)
 -acsl-import-log <K_1:file_1,...>  copy log messages from ACSL importer to a
                     file. <K> is a combination of these characters:
                     a: ALL messages (equivalent to 'dfiruw')

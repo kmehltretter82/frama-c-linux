@@ -36,6 +36,10 @@ Options taking a string as argument should preferably be written
                     the set of written locations, excluding locals (opposite
                     option is -no-out-external)
 
+*** DEBUG
+
+-inout-debug <n>    level of debug for plug-in inout (default to 0)
+
 *** GETTING INFORMATION
 
 -inout-help         help of plug-in inout
@@ -43,7 +47,6 @@ Options taking a string as argument should preferably be written
 
 *** OUTPUT MESSAGES
 
--inout-debug <n>    level of debug for plug-in inout (default to 0)
 -inout-log <K_1:file_1,...>  copy log messages from inout to a file. <K> is a
                     combination of these characters:
                     a: ALL messages (equivalent to 'dfiruw')

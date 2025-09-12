@@ -15,6 +15,10 @@ Options taking a string as argument should preferably be written
 
 -users              compute function callees (opposite option is -no-users)
 
+*** DEBUG
+
+-users-debug <n>    level of debug for plug-in users (default to 0)
+
 *** GETTING INFORMATION
 
 -users-help         help of plug-in users
@@ -22,7 +26,6 @@ Options taking a string as argument should preferably be written
 
 *** OUTPUT MESSAGES
 
--users-debug <n>    level of debug for plug-in users (default to 0)
 -users-log <K_1:file_1,...>  copy log messages from users to a file. <K> is a
                     combination of these characters:
                     a: ALL messages (equivalent to 'dfiruw')

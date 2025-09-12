@@ -15,6 +15,10 @@ Options taking a string as argument should preferably be written
 
 -loop               Launch loop analysis (opposite option is -no-loop)
 
+*** DEBUG
+
+-loop-debug <n>     level of debug for plug-in loop (default to 0)
+
 *** GETTING INFORMATION
 
 -loop-help          help of plug-in loop
@@ -22,7 +26,6 @@ Options taking a string as argument should preferably be written
 
 *** OUTPUT MESSAGES
 
--loop-debug <n>     level of debug for plug-in loop (default to 0)
 -loop-log <K_1:file_1,...>  copy log messages from loop to a file. <K> is a
                     combination of these characters:
                     a: ALL messages (equivalent to 'dfiruw')

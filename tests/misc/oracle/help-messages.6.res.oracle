@@ -30,6 +30,10 @@ Options taking a string as argument should preferably be written
                     unfolded into individual cells. (preferably use
                     -dive-unfold="f::v,...")
 
+*** DEBUG
+
+-dive-debug <n>     level of debug for plug-in dive (default to 0)
+
 *** GETTING INFORMATION
 
 -dive-help          help of plug-in dive
@@ -37,7 +41,6 @@ Options taking a string as argument should preferably be written
 
 *** OUTPUT MESSAGES
 
--dive-debug <n>     level of debug for plug-in dive (default to 0)
 -dive-log <K_1:file_1,...>  copy log messages from dive to a file. <K> is a
                     combination of these characters:
                     a: ALL messages (equivalent to 'dfiruw')

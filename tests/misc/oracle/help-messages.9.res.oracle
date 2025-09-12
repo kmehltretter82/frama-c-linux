@@ -21,6 +21,10 @@ Options taking a string as argument should preferably be written
                     -from-no-verify-assigns)
 -show-indirect-deps  experimental (opposite option is -no-show-indirect-deps)
 
+*** DEBUG
+
+-from-debug <n>     level of debug for plug-in from analysis (default to 0)
+
 *** GETTING INFORMATION
 
 -from-help          help of plug-in from analysis
@@ -32,7 +36,6 @@ Options taking a string as argument should preferably be written
                     opposite option is -no-calldeps-print)
 -deps-print         print results for option -deps (set by default, opposite
                     option is -no-deps-print)
--from-debug <n>     level of debug for plug-in from analysis (default to 0)
 -from-log <K_1:file_1,...>  copy log messages from from analysis to a file.
                     <K> is a combination of these characters:
                     a: ALL messages (equivalent to 'dfiruw')

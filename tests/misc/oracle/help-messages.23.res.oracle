@@ -16,6 +16,10 @@ Options taking a string as argument should preferably be written
 -report             display a summary of properties status (opposite option
                     is -no-report)
 
+*** DEBUG
+
+-report-debug <n>   level of debug for plug-in report (default to 0)
+
 *** GETTING INFORMATION
 
 -report-help        help of plug-in report
@@ -60,7 +64,6 @@ Options taking a string as argument should preferably be written
 
 *** OUTPUT MESSAGES
 
--report-debug <n>   level of debug for plug-in report (default to 0)
 -report-log <K_1:file_1,...>  copy log messages from report to a file. <K> is
                     a combination of these characters:
                     a: ALL messages (equivalent to 'dfiruw')

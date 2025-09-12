@@ -32,6 +32,10 @@ Options taking a string as argument should preferably be written
 -instantiate-memset  Activate replacement for function 'memset' (set by
                     default, opposite option is -instantiate-no-memset)
 
+*** DEBUG
+
+-instantiate-debug <n>  level of debug for plug-in Instantiate (default to 0)
+
 *** GETTING INFORMATION
 
 -instantiate-help   help of plug-in Instantiate
@@ -39,7 +43,6 @@ Options taking a string as argument should preferably be written
 
 *** OUTPUT MESSAGES
 
--instantiate-debug <n>  level of debug for plug-in Instantiate (default to 0)
 -instantiate-log <K_1:file_1,...>  copy log messages from Instantiate to a
                     file. <K> is a combination of these characters:
                     a: ALL messages (equivalent to 'dfiruw')

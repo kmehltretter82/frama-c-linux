@@ -31,6 +31,10 @@ Options taking a string as argument should preferably be written
 -impact-slicing     slice from the impacted stmt (opposite option is
                     -impact-no-slicing)
 
+*** DEBUG
+
+-impact-debug <n>   level of debug for plug-in impact (default to 0)
+
 *** GETTING INFORMATION
 
 -impact-help        help of plug-in impact
@@ -38,7 +42,6 @@ Options taking a string as argument should preferably be written
 
 *** OUTPUT MESSAGES
 
--impact-debug <n>   level of debug for plug-in impact (default to 0)
 -impact-log <K_1:file_1,...>  copy log messages from impact to a file. <K> is
                     a combination of these characters:
                     a: ALL messages (equivalent to 'dfiruw')

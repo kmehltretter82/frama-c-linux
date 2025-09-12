@@ -18,6 +18,10 @@ Options taking a string as argument should preferably be written
 -pdg                build the dependence graph of each function (opposite
                     option is -no-pdg)
 
+*** DEBUG
+
+-pdg-debug <n>      level of debug for plug-in pdg (default to 0)
+
 *** GETTING INFORMATION
 
 -pdg-help           help of plug-in pdg
@@ -33,7 +37,6 @@ Options taking a string as argument should preferably be written
 
 *** OUTPUT MESSAGES
 
--pdg-debug <n>      level of debug for plug-in pdg (default to 0)
 -pdg-log <K_1:file_1,...>  copy log messages from pdg to a file. <K> is a
                     combination of these characters:
                     a: ALL messages (equivalent to 'dfiruw')

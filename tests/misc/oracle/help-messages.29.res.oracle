@@ -79,6 +79,10 @@ Options taking a string as argument should preferably be written
                     -slicing-exported-project-postfix option) (preferably use
                     -slicing-project-name="ident")
 
+*** DEBUG
+
+-slicing-debug <n>  level of debug for plug-in slicing (default to 0)
+
 *** GETTING INFORMATION
 
 -slicing-help       help of plug-in slicing
@@ -86,7 +90,6 @@ Options taking a string as argument should preferably be written
 
 *** OUTPUT MESSAGES
 
--slicing-debug <n>  level of debug for plug-in slicing (default to 0)
 -slicing-log <K_1:file_1,...>  copy log messages from slicing to a file. <K>
                     is a combination of these characters:
                     a: ALL messages (equivalent to 'dfiruw')

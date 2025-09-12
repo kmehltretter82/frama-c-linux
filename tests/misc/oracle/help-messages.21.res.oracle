@@ -18,6 +18,10 @@ Options taking a string as argument should preferably be written
                     from Eva (preferably use
                     -reduc-gen-annot="gen-annot-heuristic")
 
+*** DEBUG
+
+-reduc-debug <n>    level of debug for plug-in Reduction (default to 0)
+
 *** GETTING INFORMATION
 
 -reduc-help         help of plug-in Reduction
@@ -25,7 +29,6 @@ Options taking a string as argument should preferably be written
 
 *** OUTPUT MESSAGES
 
--reduc-debug <n>    level of debug for plug-in Reduction (default to 0)
 -reduc-log <K_1:file_1,...>  copy log messages from Reduction to a file. <K>
                     is a combination of these characters:
                     a: ALL messages (equivalent to 'dfiruw')

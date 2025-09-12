@@ -26,6 +26,10 @@ Options taking a string as argument should preferably be written
 -alias-show-stmt-table  display abstract state for each statement after the
                     analysis (opposite option is -alias-no-show-stmt-table)
 
+*** DEBUG
+
+-alias-debug <n>    level of debug for plug-in Alias Analysis (default to 0)
+
 *** GETTING INFORMATION
 
 -alias-help         help of plug-in Alias Analysis
@@ -33,7 +37,6 @@ Options taking a string as argument should preferably be written
 
 *** OUTPUT MESSAGES
 
--alias-debug <n>    level of debug for plug-in Alias Analysis (default to 0)
 -alias-log <K_1:file_1,...>  copy log messages from Alias Analysis to a file.
                     <K> is a combination of these characters:
                     a: ALL messages (equivalent to 'dfiruw')

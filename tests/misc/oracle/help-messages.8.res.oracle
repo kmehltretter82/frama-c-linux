@@ -77,6 +77,10 @@ Options taking a string as argument should preferably be written
                     loops. (set by default, opposite option is
                     -eva-no-traces-unroll-loop)
 
+*** DEBUG
+
+-eva-debug <n>      level of debug for plug-in Eva (default to 0)
+
 *** DETERMINISTIC PROGRAMS
 
 -eva-interpreter-mode  Stop at first call to a library function, if main()
@@ -136,7 +140,6 @@ Options taking a string as argument should preferably be written
                     representing the range of values computed by Eva on
                     l-values read by the code, when available. (preferably
                     use -eva-annot="f")
--eva-debug <n>      level of debug for plug-in Eva (default to 0)
 -eva-flamegraph <file>  Dump a summary of the time spent analyzing function
                     calls in a format suitable for the Flamegraph tool
                     (http://www.brendangregg.com/flamegraphs.html)

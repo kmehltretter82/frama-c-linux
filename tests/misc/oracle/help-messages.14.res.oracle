@@ -43,6 +43,10 @@ Options taking a string as argument should preferably be written
 -mdr-title <t>      title of the generated document (preferably use
                     -mdr-title="t")
 
+*** DEBUG
+
+-mdr-debug <n>      level of debug for plug-in Markdown report (default to 0)
+
 *** GETTING INFORMATION
 
 -mdr-help           help of plug-in Markdown report
@@ -50,7 +54,6 @@ Options taking a string as argument should preferably be written
 
 *** OUTPUT MESSAGES
 
--mdr-debug <n>      level of debug for plug-in Markdown report (default to 0)
 -mdr-log <K_1:file_1,...>  copy log messages from Markdown report to a file.
                     <K> is a combination of these characters:
                     a: ALL messages (equivalent to 'dfiruw')

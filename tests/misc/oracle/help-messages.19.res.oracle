@@ -16,6 +16,10 @@ Options taking a string as argument should preferably be written
 -occurrence         print results of occurrence analysis (opposite option is
                     -no-occurrence)
 
+*** DEBUG
+
+-occurrence-debug <n>  level of debug for plug-in occurrence (default to 0)
+
 *** GETTING INFORMATION
 
 -occurrence-help    help of plug-in occurrence
@@ -23,7 +27,6 @@ Options taking a string as argument should preferably be written
 
 *** OUTPUT MESSAGES
 
--occurrence-debug <n>  level of debug for plug-in occurrence (default to 0)
 -occurrence-log <K_1:file_1,...>  copy log messages from occurrence to a
                     file. <K> is a combination of these characters:
                     a: ALL messages (equivalent to 'dfiruw')

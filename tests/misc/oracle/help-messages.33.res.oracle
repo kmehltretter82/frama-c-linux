@@ -39,6 +39,10 @@ Options taking a string as argument should preferably be written
 -volatile-fct <f,...>  Only process the given function(s) (preferably use
                     -volatile-fct="f,...")
 
+*** DEBUG
+
+-volatile-debug <n>  level of debug for plug-in Volatile (default to 0)
+
 *** GETTING INFORMATION
 
 -volatile-help      help of plug-in Volatile
@@ -46,7 +50,6 @@ Options taking a string as argument should preferably be written
 
 *** OUTPUT MESSAGES
 
--volatile-debug <n>  level of debug for plug-in Volatile (default to 0)
 -volatile-log <K_1:file_1,...>  copy log messages from Volatile to a file.
                     <K> is a combination of these characters:
                     a: ALL messages (equivalent to 'dfiruw')

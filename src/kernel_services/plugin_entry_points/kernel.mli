@@ -288,8 +288,6 @@ val seq: Cmdline.Group.t
 
 val project: Cmdline.Group.t
 
-val checks: Cmdline.Group.t
-
 (* ************************************************************************* *)
 (** {2 Installation Information} *)
 (* ************************************************************************* *)

@@ -67,6 +67,10 @@ Options taking a string as argument should preferably be written
 -e-acsl-widening-output-base <n>  wideining strategy for output of recursive
                     functions.
 
+*** DEBUG
+
+-e-acsl-debug <n>   level of debug for plug-in E-ACSL (default to 0)
+
 *** GETTING INFORMATION
 
 -e-acsl-help        help of plug-in E-ACSL
@@ -74,7 +78,6 @@ Options taking a string as argument should preferably be written
 
 *** OUTPUT MESSAGES
 
--e-acsl-debug <n>   level of debug for plug-in E-ACSL (default to 0)
 -e-acsl-log <K_1:file_1,...>  copy log messages from E-ACSL to a file. <K> is
                     a combination of these characters:
                     a: ALL messages (equivalent to 'dfiruw')

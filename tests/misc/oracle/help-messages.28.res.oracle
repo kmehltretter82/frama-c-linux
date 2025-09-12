@@ -17,6 +17,11 @@ Options taking a string as argument should preferably be written
                     -no-server-tsc)
 -server-tsc-out <path>  Output directory (default is 'src')
 
+*** DEBUG
+
+-server-tsc-debug <n>  level of debug for plug-in Server TypeScript API
+                    (default to 0)
+
 *** GETTING INFORMATION
 
 -server-tsc-help    help of plug-in Server TypeScript API
@@ -24,8 +29,6 @@ Options taking a string as argument should preferably be written
 
 *** OUTPUT MESSAGES
 
--server-tsc-debug <n>  level of debug for plug-in Server TypeScript API
-                    (default to 0)
 -server-tsc-log <K_1:file_1,...>  copy log messages from Server TypeScript
                     API to a file. <K> is a combination of these
                     characters:

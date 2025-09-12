@@ -16,6 +16,10 @@ Options taking a string as argument should preferably be written
 -scope-defs-interproc  interprocedural defs computation (set by default,
                     opposite option is -scope-no-defs-interproc)
 
+*** DEBUG
+
+-scope-debug <n>    level of debug for plug-in scope (default to 0)
+
 *** GETTING INFORMATION
 
 -scope-help         help of plug-in scope
@@ -23,7 +27,6 @@ Options taking a string as argument should preferably be written
 
 *** OUTPUT MESSAGES
 
--scope-debug <n>    level of debug for plug-in scope (default to 0)
 -scope-log <K_1:file_1,...>  copy log messages from scope to a file. <K> is a
                     combination of these characters:
                     a: ALL messages (equivalent to 'dfiruw')

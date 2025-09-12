@@ -17,6 +17,10 @@ Options taking a string as argument should preferably be written
 -test-deprecated-option <x>  alias for option -test-decimal-option
 -test-default-range <x>  test option
 
+*** DEBUG
+
+-test-debug <n>     level of debug for plug-in test (default to 0)
+
 *** GETTING INFORMATION
 
 -test-help          help of plug-in test
@@ -24,7 +28,6 @@ Options taking a string as argument should preferably be written
 
 *** OUTPUT MESSAGES
 
--test-debug <n>     level of debug for plug-in test (default to 0)
 -test-log <K_1:file_1,...>  copy log messages from test to a file. <K> is a
                     combination of these characters:
                     a: ALL messages (equivalent to 'dfiruw')

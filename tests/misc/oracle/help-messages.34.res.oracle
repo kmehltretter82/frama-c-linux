@@ -74,6 +74,10 @@ Options taking a string as argument should preferably be written
                     hypothesis. (opposite option is
                     -wp-no-variant-with-terminates)
 
+*** DEBUG
+
+-wp-debug <n>       level of debug for plug-in WP (default to 0)
+
 *** GETTING INFORMATION
 
 -wp-help            help of plug-in WP
@@ -150,7 +154,6 @@ Options taking a string as argument should preferably be written
 
 *** OUTPUT MESSAGES
 
--wp-debug <n>       level of debug for plug-in WP (default to 0)
 -wp-log <K_1:file_1,...>  copy log messages from WP to a file. <K> is a
                     combination of these characters:
                     a: ALL messages (equivalent to 'dfiruw')

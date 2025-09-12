@@ -67,7 +67,7 @@ module type S_no_log = sig
       @since Boron-20100401 *)
 
   val grp_debug: Cmdline.Group.t
-  (** Group containing debut options.
+  (** Group containing debug options.
       @since Frama-C+dev *)
 
   val add_plugin_output_aliases:

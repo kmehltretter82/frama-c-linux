@@ -25,6 +25,10 @@ Options taking a string as argument should preferably be written
                     ignored. By default, the following functions are ignored:
                     abort, exit (preferably use -nonterm-ignore="f1,..,fn")
 
+*** DEBUG
+
+-nonterm-debug <n>  level of debug for plug-in nonterm (default to 0)
+
 *** GETTING INFORMATION
 
 -nonterm-help       help of plug-in nonterm
@@ -32,7 +36,6 @@ Options taking a string as argument should preferably be written
 
 *** OUTPUT MESSAGES
 
--nonterm-debug <n>  level of debug for plug-in nonterm (default to 0)
 -nonterm-log <K_1:file_1,...>  copy log messages from nonterm to a file. <K>
                     is a combination of these characters:
                     a: ALL messages (equivalent to 'dfiruw')

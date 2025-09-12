@@ -45,6 +45,7 @@ Options taking a string as argument should preferably be written
 -mt-consider-null   (set by default) opposite of option -mt-ignore-null,
                     whose help message is:
                     Ignore shared accesses to numeric memory (NULL base)
+-mt-debug <n>       level of debug for plug-in mthread (default to 0)
 -mt-ignore-null     Ignore shared accesses to numeric memory (NULL base)
                     (opposite option is -mt-consider-null)
 -mt-keep-analyses <all|last|none>  keep a copy of the analyses done for each
@@ -94,7 +95,6 @@ Options taking a string as argument should preferably be written
 
 *** OUTPUT MESSAGES
 
--mt-debug <n>       level of debug for plug-in mthread (default to 0)
 -mt-log <K_1:file_1,...>  copy log messages from mthread to a file. <K> is a
                     combination of these characters:
                     a: ALL messages (equivalent to 'dfiruw')

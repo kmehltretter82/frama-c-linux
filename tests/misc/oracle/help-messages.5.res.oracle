@@ -39,6 +39,10 @@ Options taking a string as argument should preferably be written
                     themselves, do not call any function (opposite option is
                     -cg-no-uncalled-leaf)
 
+*** DEBUG
+
+-cg-debug <n>       level of debug for plug-in callgraph (default to 0)
+
 *** GETTING INFORMATION
 
 -cg-help            help of plug-in callgraph
@@ -46,7 +50,6 @@ Options taking a string as argument should preferably be written
 
 *** OUTPUT MESSAGES
 
--cg-debug <n>       level of debug for plug-in callgraph (default to 0)
 -cg-log <K_1:file_1,...>  copy log messages from callgraph to a file. <K> is
                     a combination of these characters:
                     a: ALL messages (equivalent to 'dfiruw')

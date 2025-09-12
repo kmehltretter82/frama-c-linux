@@ -17,6 +17,11 @@ Options taking a string as argument should preferably be written
 -security-slicing   perform the security slicing analysis (opposite option is
                     -no-security-slicing)
 
+*** DEBUG
+
+-security-slicing-debug <n>  level of debug for plug-in security-slicing
+                    (default to 0)
+
 *** GETTING INFORMATION
 
 -security-slicing-help  help of plug-in security-slicing
@@ -24,8 +29,6 @@ Options taking a string as argument should preferably be written
 
 *** OUTPUT MESSAGES
 
--security-slicing-debug <n>  level of debug for plug-in security-slicing
-                    (default to 0)
 -security-slicing-log <K_1:file_1,...>  copy log messages from
                     security-slicing to a file. <K> is a combination of these
                     characters:

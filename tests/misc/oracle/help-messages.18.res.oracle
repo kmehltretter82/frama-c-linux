@@ -24,6 +24,10 @@ Options taking a string as argument should preferably be written
                     default) (preferably use
                     -obfuscator-string-dictionary="f")
 
+*** DEBUG
+
+-obfuscator-debug <n>  level of debug for plug-in obfuscator (default to 0)
+
 *** GETTING INFORMATION
 
 -obfuscator-help    help of plug-in obfuscator
@@ -31,7 +35,6 @@ Options taking a string as argument should preferably be written
 
 *** OUTPUT MESSAGES
 
--obfuscator-debug <n>  level of debug for plug-in obfuscator (default to 0)
 -obfuscator-log <K_1:file_1,...>  copy log messages from obfuscator to a
                     file. <K> is a combination of these characters:
                     a: ALL messages (equivalent to 'dfiruw')

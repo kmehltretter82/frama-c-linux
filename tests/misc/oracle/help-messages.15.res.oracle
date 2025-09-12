@@ -40,6 +40,10 @@ Options taking a string as argument should preferably be written
 -metrics-used-files  list files containing global definitions reachable by
                     main (opposite option is -metrics-no-used-files)
 
+*** DEBUG
+
+-metrics-debug <n>  level of debug for plug-in metrics (default to 0)
+
 *** GETTING INFORMATION
 
 -metrics-help       help of plug-in metrics
@@ -50,7 +54,6 @@ Options taking a string as argument should preferably be written
 -metrics-by-function-print  print results for option -metrics-by-function
                     (set by default, opposite option is
                     -metrics-no-by-function-print)
--metrics-debug <n>  level of debug for plug-in metrics (default to 0)
 -metrics-eva-cover-print  print results for option -metrics-eva-cover (set by
                     default, opposite option is -metrics-no-eva-cover-print)
 -metrics-value-cover-print  alias for option -metrics-eva-cover-print

@@ -31,6 +31,11 @@ Options taking a string as argument should preferably be written
 -scf-project-name <s>  name of the generated project (default is
                     `propagated`) (preferably use -scf-project-name="")
 
+*** DEBUG
+
+-scf-debug <n>      level of debug for plug-in semantic constant folding
+                    (default to 0)
+
 *** GETTING INFORMATION
 
 -scf-help           help of plug-in semantic constant folding
@@ -38,8 +43,6 @@ Options taking a string as argument should preferably be written
 
 *** OUTPUT MESSAGES
 
--scf-debug <n>      level of debug for plug-in semantic constant folding
-                    (default to 0)
 -scf-log <K_1:file_1,...>  copy log messages from semantic constant folding
                     to a file. <K> is a combination of these characters:
                     a: ALL messages (equivalent to 'dfiruw')

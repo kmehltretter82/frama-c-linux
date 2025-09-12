@@ -22,6 +22,10 @@ Options taking a string as argument should preferably be written
                     (automatically done by -sparecode-analysis) (opposite
                     option is -sparecode-no-rm-unused-globals)
 
+*** DEBUG
+
+-sparecode-debug <n>  level of debug for plug-in sparecode (default to 0)
+
 *** GETTING INFORMATION
 
 -sparecode-help     help of plug-in sparecode
@@ -29,7 +33,6 @@ Options taking a string as argument should preferably be written
 
 *** OUTPUT MESSAGES
 
--sparecode-debug <n>  level of debug for plug-in sparecode (default to 0)
 -sparecode-log <K_1:file_1,...>  copy log messages from sparecode to a file.
                     <K> is a combination of these characters:
                     a: ALL messages (equivalent to 'dfiruw')

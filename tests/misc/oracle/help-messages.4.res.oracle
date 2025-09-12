@@ -50,6 +50,10 @@ Options taking a string as argument should preferably be written
 -aorai-spec-on      if set, does not axiomatize automata (set by default,
                     opposite option is -aorai-spec-off)
 
+*** DEBUG
+
+-aorai-debug <n>    level of debug for plug-in aorai (default to 0)
+
 *** GETTING INFORMATION
 
 -aorai-help         help of plug-in aorai
@@ -57,7 +61,6 @@ Options taking a string as argument should preferably be written
 
 *** OUTPUT MESSAGES
 
--aorai-debug <n>    level of debug for plug-in aorai (default to 0)
 -aorai-log <K_1:file_1,...>  copy log messages from aorai to a file. <K> is a
                     combination of these characters:
                     a: ALL messages (equivalent to 'dfiruw')
