@@ -12,7 +12,8 @@ void main(void)
   d = 0.;
   /*@ assert rte: is_nan_or_infinite: \is_finite(\div_double(d, d)); */
   /*@ assert
-      rte: is_nan_or_infinite: \is_finite(\add_double(\div_double(d, d), d));
+        rte: is_nan_or_infinite:
+          \is_finite(\add_double(\div_double(d, d), d));
   */
   double e = d / d + d;
   return;

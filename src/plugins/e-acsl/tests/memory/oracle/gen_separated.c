@@ -2314,9 +2314,10 @@ int main(void)
     }
     /*@
     assert
-    \separated(
-      &array_1[0][0 .. 2][0], &array_1[0][3 .. 5][0], &array_1[0][6 .. 9][0]
-      );
+      \separated(
+        &array_1[0][0 .. 2][0], &array_1[0][3 .. 5][0],
+        &array_1[0][6 .. 9][0]
+        );
      */
     ;
     {
@@ -2557,9 +2558,10 @@ int main(void)
     }
     /*@
     assert
-    \separated(
-      &array_1[0][0 .. 2][0], &array_1[1][0 .. 2][0], &array_1[2][0 .. 2][0]
-      );
+      \separated(
+        &array_1[0][0 .. 2][0], &array_1[1][0 .. 2][0],
+        &array_1[2][0 .. 2][0]
+        );
      */
     ;
     {
@@ -2790,7 +2792,8 @@ int main(void)
     }
     /*@
     assert
-    \separated(&array_1[0 .. 2][0 .. 2][0], &array_1[0 .. 2][3 .. 5][0]); */
+      \separated(&array_1[0 .. 2][0 .. 2][0], &array_1[0 .. 2][3 .. 5][0]);
+     */
     ;
     {
       int __gen_e_acsl_forall_21;
@@ -3020,7 +3023,8 @@ int main(void)
     }
     /*@
     assert
-    !\separated(&array_1[0 .. 3][0 .. 2][0], &array_1[3 .. 5][0 .. 2][0]); */
+      !\separated(&array_1[0 .. 3][0 .. 2][0], &array_1[3 .. 5][0 .. 2][0]);
+     */
     ;
     {
       int __gen_e_acsl_forall_29;
@@ -3129,7 +3133,8 @@ int main(void)
     }
     /*@
     assert
-    \separated(&array_1[0 .. 3][2 .. 0][0], &array_1[3 .. 5][0 .. 2][0]); */
+      \separated(&array_1[0 .. 3][2 .. 0][0], &array_1[3 .. 5][0 .. 2][0]);
+     */
     ;
     __e_acsl_delete_block((void *)(array_1));
   }

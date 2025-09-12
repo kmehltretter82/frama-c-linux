@@ -11,9 +11,10 @@ int f(int x)
 }
 
 /*@ requires (int)((x + y) + 1) ≡ (x + y) + 1;
-    ensures \let f = \lambda ℤ x, ℤ y; \let x1 = x + 1; x1 + y;
+    ensures
+      \let f = \lambda ℤ x, ℤ y; \let x1 = x + 1; x1 + y;
       \let P = \lambda ℤ x, ℤ y; x ≡ y;
-        P(f(\old(x), \old(y)), \result) ≡ \true;
+      P(f(\old(x), \old(y)), \result) ≡ \true;
  */
 int g(int x, int y)
 {

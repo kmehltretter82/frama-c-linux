@@ -23,8 +23,8 @@ void funk(int rounds)
   int *k = __fc_vla_alloc(sizeof(int) * __lengthof_k);
   /*@
   assert
-  alloca_bounds:
-    0 < sizeof(int) * (unsigned int)((int)(2 * rounds)) ≤ 4294967295;
+    alloca_bounds:
+      0 < sizeof(int) * (unsigned int)((int)(2 * rounds)) ≤ 4294967295;
    */
   ;
   __lengthof_kk = (unsigned int)(2 * rounds);

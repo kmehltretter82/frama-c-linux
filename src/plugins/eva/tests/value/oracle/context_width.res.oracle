@@ -40,13 +40,13 @@ void main(int *p)
   if (! (p == (int *)0)) {
     if (! (p + 1 == (int *)0)) 
       /*@ assert
-          Eva: ptr_comparison:
-            \pointer_comparable((void *)(p + 2), (void *)0);
+            Eva: ptr_comparison:
+              \pointer_comparable((void *)(p + 2), (void *)0);
       */
       if (! (p + 2 == (int *)0)) ;
     /*@ assert
-        Eva: ptr_comparison:
-          \pointer_comparable((void *)(p + 1), (void *)(&a));
+          Eva: ptr_comparison:
+            \pointer_comparable((void *)(p + 1), (void *)(&a));
     */
     if (p + 1 == & a) ;
     *p = 1;
@@ -100,13 +100,13 @@ void main(int *p)
   if (! (p == (int *)0)) {
     if (! (p + 1 == (int *)0)) 
       /*@ assert
-          Eva: ptr_comparison:
-            \pointer_comparable((void *)(p + 2), (void *)0);
+            Eva: ptr_comparison:
+              \pointer_comparable((void *)(p + 2), (void *)0);
       */
       if (! (p + 2 == (int *)0)) ;
     /*@ assert
-        Eva: ptr_comparison:
-          \pointer_comparable((void *)(p + 1), (void *)(&a));
+          Eva: ptr_comparison:
+            \pointer_comparable((void *)(p + 1), (void *)(&a));
     */
     if (p + 1 == & a) ;
     *p = 1;

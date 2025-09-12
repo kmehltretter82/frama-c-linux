@@ -364,7 +364,7 @@ int main(void)
                                  (__e_acsl_mpz_struct const *)(__gen_e_acsl_int_mpz));
     __gen_e_acsl_assert_data_13.blocking = 1;
     __gen_e_acsl_assert_data_13.kind = "Assertion";
-    __gen_e_acsl_assert_data_13.pred_txt = "\\let int_mpz = 18446744073709551615ULL + 1;\n  int_mpz != 18446744073709551615ULL";
+    __gen_e_acsl_assert_data_13.pred_txt = "\\let int_mpz = 18446744073709551615ULL + 1;\nint_mpz != 18446744073709551615ULL";
     __gen_e_acsl_assert_data_13.file = "printed_data.c";
     __gen_e_acsl_assert_data_13.fct = "main";
     __gen_e_acsl_assert_data_13.line = 93;
@@ -377,7 +377,7 @@ int main(void)
   }
   /*@
   assert
-  \let int_mpz = 18446744073709551615ULL + 1;
+    \let int_mpz = 18446744073709551615ULL + 1;
     int_mpz != 18446744073709551615ULL;
    */
   ;
@@ -422,7 +422,7 @@ int main(void)
   }
   /*@ assert \let x = real_double; \true; */ ;
   /*@ assert
-      Eva: is_nan_or_infinite: \is_finite(0x1.fffffffffffffffep+16383L);
+        Eva: is_nan_or_infinite: \is_finite(0x1.fffffffffffffffep+16383L);
   */
   long double real_ldouble = 0x1.fffffffffffffffep+16383L;
   __e_acsl_store_block((void *)(& real_ldouble),16UL);

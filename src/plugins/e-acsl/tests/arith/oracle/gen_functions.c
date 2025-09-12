@@ -286,8 +286,9 @@ int main(void)
   }
   /*@
   assert
-  f1(99999999999999999999999999999, 99999999999999999999999999999) ==
-  199999999999999999999999999998; */
+    f1(99999999999999999999999999999, 99999999999999999999999999999) ==
+    199999999999999999999999999998;
+   */
   ;
   {
     int __gen_e_acsl_g_2;
@@ -1075,8 +1076,8 @@ int __gen_e_acsl_f4(__e_acsl_mpz_struct * x)
     __gmpz_init_set_si(__gen_e_acsl__8,99L);
     __gen_e_acsl_cst_shiftl_guard_3 = __gmpz_fits_ulong_p((__e_acsl_mpz_struct const *)(__gen_e_acsl__8));
     /*@ assert
-        E_ACSL: shiftl_rhs_fits_in_mp_bitcnt_t:
-          0 <= 99 <= 18446744073709551615;
+          E_ACSL: shiftl_rhs_fits_in_mp_bitcnt_t:
+            0 <= 99 <= 18446744073709551615;
     */
     {
       __gen_e_acsl_assert_data_5.blocking = 1;
@@ -1161,8 +1162,8 @@ void __gen_e_acsl_f4_2(__e_acsl_mpz_t *__retres_arg, __e_acsl_mpz_struct * x)
     __gmpz_init_set_si(__gen_e_acsl__6,99L);
     __gen_e_acsl_cst_shiftl_guard = __gmpz_fits_ulong_p((__e_acsl_mpz_struct const *)(__gen_e_acsl__6));
     /*@ assert
-        E_ACSL: shiftl_rhs_fits_in_mp_bitcnt_t:
-          0 <= 99 <= 18446744073709551615;
+          E_ACSL: shiftl_rhs_fits_in_mp_bitcnt_t:
+            0 <= 99 <= 18446744073709551615;
     */
     {
       __gen_e_acsl_assert_data_3.blocking = 1;

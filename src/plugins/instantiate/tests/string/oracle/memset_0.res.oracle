@@ -98,8 +98,7 @@ void nested_chars(char dest[10][10])
         (\let __fc_len = len / 4; \valid(ptr + (0 .. __fc_len - 1)));
     ensures
       set_content:
-        \let __fc_len = len / 4;
-        ∀ ℤ j0; 0 ≤ j0 < __fc_len ⇒ *(ptr + j0) ≡ 0;
+        \let __fc_len = len / 4; ∀ ℤ j0; 0 ≤ j0 < __fc_len ⇒ *(ptr + j0) ≡ 0;
     ensures result: \result ≡ ptr;
     assigns *(ptr + (0 .. len / 4 - 1)), \result;
     assigns *(ptr + (0 .. len / 4 - 1)) \from \nothing;
@@ -126,8 +125,7 @@ void integer(int dest[10])
         (\let __fc_len = len / 4; \valid(ptr + (0 .. __fc_len - 1)));
     ensures
       set_content:
-        \let __fc_len = len / 4;
-        ∀ ℤ j0; 0 ≤ j0 < __fc_len ⇒ *(ptr + j0) ≡ 0;
+        \let __fc_len = len / 4; ∀ ℤ j0; 0 ≤ j0 < __fc_len ⇒ *(ptr + j0) ≡ 0;
     ensures result: \result ≡ ptr;
     assigns *(ptr + (0 .. len / 4 - 1)), \result;
     assigns *(ptr + (0 .. len / 4 - 1)) \from \nothing;
@@ -154,8 +152,7 @@ void with_enum(enum E dest[10])
         (\let __fc_len = len / 4; \valid(ptr + (0 .. __fc_len - 1)));
     ensures
       set_content:
-        \let __fc_len = len / 4;
-        ∀ ℤ j0; 0 ≤ j0 < __fc_len ⇒ *(ptr + j0) ≡ 0.;
+        \let __fc_len = len / 4; ∀ ℤ j0; 0 ≤ j0 < __fc_len ⇒ *(ptr + j0) ≡ 0.;
     ensures result: \result ≡ ptr;
     assigns *(ptr + (0 .. len / 4 - 1)), \result;
     assigns *(ptr + (0 .. len / 4 - 1)) \from \nothing;

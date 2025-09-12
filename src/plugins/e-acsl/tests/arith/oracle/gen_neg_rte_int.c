@@ -66,8 +66,8 @@ void main(void)
     __gmpq_clear(__gen_e_acsl__4);
   }
   /*@ assert
-      rte: is_nan_or_infinite:
-        \is_finite(\add_double((double)f, (double)0.5));
+        rte: is_nan_or_infinite:
+          \is_finite(\add_double((double)f, (double)0.5));
   */
   /*@ assert rte: float_to_int: (double)f + 0.5 < 128; */
   /*@ assert rte: float_to_int: -129 < (double)f + 0.5; */

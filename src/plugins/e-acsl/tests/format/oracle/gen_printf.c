@@ -649,7 +649,7 @@ void test_specifier_application(char const *allowed, char const *fmt,
   }
   /*@
   assert
-  alloca_bounds: 0 < sizeof(char) * (int)(len + 1) <= 18446744073709551615;
+    alloca_bounds: 0 < sizeof(char) * (int)(len + 1) <= 18446744073709551615;
    */
   ;
   __lengthof_format = (unsigned long)(len + 1);

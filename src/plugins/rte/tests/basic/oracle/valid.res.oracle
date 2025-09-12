@@ -138,8 +138,8 @@ int main(void)
   /*@ assert rte: index_bound: 0 ≤ i4; */
   /*@ assert rte: index_bound: i4 < 5; */
   /*@ assert
-      rte: mem_access:
-        \valid_read(&((p.nexts[i1][i2])->nexts[i3][*i])->id[i4]);
+        rte: mem_access:
+          \valid_read(&((p.nexts[i1][i2])->nexts[i3][*i])->id[i4]);
   */
   v = ((p.nexts[i1][i2])->nexts[i3][*i])->id[i4];
   v = p.q.v;
@@ -160,7 +160,7 @@ int main(void)
   /*@ assert rte: index_bound: 0 ≤ i4; */
   /*@ assert rte: index_bound: i4 < 11; */
   /*@ assert
-      rte: mem_access: \valid_read(&(p.tq[i1][i2].next)->tq[i3][i4].v);
+        rte: mem_access: \valid_read(&(p.tq[i1][i2].next)->tq[i3][i4].v);
   */
   v = (p.tq[i1][i2].next)->tq[i3][i4].v;
   /*@ assert rte: index_bound: 0 ≤ i3; */
@@ -172,7 +172,7 @@ int main(void)
   /*@ assert rte: mem_access: \valid_read(p.znexts + i0); */
   /*@ assert rte: mem_access: \valid_read(*(p.znexts + i0) + i1); */
   /*@ assert
-      rte: mem_access: \valid_read(&(*(*(p.znexts + i0) + i1) + i2)->val);
+        rte: mem_access: \valid_read(&(*(*(p.znexts + i0) + i1) + i2)->val);
   */
   v = (*(*(p.znexts + i0) + i1) + i2)->val;
   /*@ assert rte: index_bound: 0 ≤ i0; */
@@ -299,8 +299,8 @@ int main(void)
   /*@ assert rte: mem_access: \valid_read(&(p.nexts[i1][i2])->nexts[i3][*i]);
   */
   /*@ assert
-      rte: mem_access:
-        \valid_read(&((p.nexts[i1][i2])->nexts[i3][*i])->id[i4]);
+        rte: mem_access:
+          \valid_read(&((p.nexts[i1][i2])->nexts[i3][*i])->id[i4]);
   */
   v = ((p.nexts[i1][i2])->nexts[i3][*i])->id[i4];
   v = p.q.v;
@@ -310,7 +310,7 @@ int main(void)
   v = p.tq[i3][i1].v;
   /*@ assert rte: mem_access: \valid_read(&p.tq[i1][i2].next); */
   /*@ assert
-      rte: mem_access: \valid_read(&(p.tq[i1][i2].next)->tq[i3][i4].v);
+        rte: mem_access: \valid_read(&(p.tq[i1][i2].next)->tq[i3][i4].v);
   */
   v = (p.tq[i1][i2].next)->tq[i3][i4].v;
   /*@ assert rte: mem_access: \valid_read(&pp->tq[i3][i1].v); */
@@ -318,7 +318,7 @@ int main(void)
   /*@ assert rte: mem_access: \valid_read(p.znexts + i0); */
   /*@ assert rte: mem_access: \valid_read(*(p.znexts + i0) + i1); */
   /*@ assert
-      rte: mem_access: \valid_read(&(*(*(p.znexts + i0) + i1) + i2)->val);
+        rte: mem_access: \valid_read(&(*(*(p.znexts + i0) + i1) + i2)->val);
   */
   v = (*(*(p.znexts + i0) + i1) + i2)->val;
   /*@ assert rte: mem_access: \valid_read(&p.tq[i0][i1]); */

@@ -34,20 +34,21 @@ int main(void)
   behavior ++;
   /*@
   assert
-  custom:
-    writes.reads + writes.behaviors ≤ (\let global = writes.label; global);
+    custom:
+      writes.reads + writes.behaviors ≤ (\let global = writes.label; global);
    */
   ;
   /*@
   assert
-  at:
-    include.function + include.module ≤
-    (\let behaviors = include.global; behaviors);
+    at:
+      include.function + include.module ≤
+      (\let behaviors = include.global; behaviors);
    */
   ;
   /*@
   assert
-  loop: assert.ensures + assert.ensures ≤ (\let reads = assert.checks; reads);
+    loop:
+      assert.ensures + assert.ensures ≤ (\let reads = assert.checks; reads);
    */
   ;
   __retres = 0;
