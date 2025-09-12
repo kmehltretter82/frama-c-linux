@@ -170,6 +170,17 @@ let () = Request.register
       with Not_found -> Data.failure "No plug-in of name %S" name
     end
 
+let () = Request.register
+    ~package ~kind:`GET ~name:"isSetParameter"
+    ~descr:(Md.plain "Has the given parameter been set?")
+    ~input:(module Jstring)
+    ~output:(module Jbool)
+    begin fun name ->
+      try (Typed_parameter.get name).is_set ()
+      with Not_found -> Data.failure "No parameter of name %S" name
+    end
+
+
 (* Registers a synchronized state for the given parameter. *)
 let register_parameter parameter =
   let open Typed_parameter in
