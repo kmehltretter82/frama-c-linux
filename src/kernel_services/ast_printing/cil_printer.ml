@@ -907,8 +907,8 @@ class cil_printer () = object (self)
       end
 
   method str_literal fmt = function
-    | Lit_str s -> Format.fprintf fmt "\"%s\"" (Escape.escape_string s)
-    | Lit_wstr l -> pp_wstring fmt l
+    | Str s -> Format.fprintf fmt "\"%s\"" (Escape.escape_string s)
+    | Wstr l -> pp_wstring fmt l
 
   method init_or_str fmt i =
     match i with

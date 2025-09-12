@@ -15,7 +15,7 @@ type k =
   | Function
   | Global_var
   | Label
-  | Literal_string
+  | String_literal
   | Local_var
   | Logic_var
   | Predicate
@@ -34,7 +34,7 @@ let name_of_kind = function
   | Function -> "function"
   | Global_var -> "global variable"
   | Label -> "label"
-  | Literal_string -> "literal string"
+  | String_literal -> "literal string"
   | Local_var -> "local variable"
   | Logic_var -> "logic variable"
   | Predicate -> "predicate"
@@ -53,7 +53,7 @@ let prefix = function
   | Function -> "F"
   | Global_var -> "G"
   | Label -> "L"
-  | Literal_string -> "LS"
+  | String_literal -> "LS"
   | Local_var -> "V"
   | Logic_var -> "LV"
   | Predicate -> "P"

@@ -246,7 +246,7 @@ class printer_with_annot () = object (self)
       end
 
   method private var_as_str_literal fmt v =
-    let s = Globals.Vars.get_literal_string v in
+    let s = Globals.Vars.get_string_literal v in
     self#str_literal fmt s
 
   method! lval fmt lv =

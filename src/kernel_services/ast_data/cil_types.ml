@@ -906,12 +906,12 @@ and init =
 
 (** since @Frama-C+dev *)
 and str_literal =
-  | Lit_str of string
+  | Str of string
   (** a const char array representing a string literal.
       The escape characters inside the string have been already
       interpreted.
   *)
-  | Lit_wstr of int64 list
+  | Wstr of int64 list
   (** Initialization of a const wide character string literal.
       Note that the local interpretation of such
       a literal depends on {!Machine.wchar_type} and

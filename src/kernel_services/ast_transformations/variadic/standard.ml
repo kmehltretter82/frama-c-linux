@@ -386,8 +386,8 @@ let rec static_string env a = match a.enode with
   | StartOf(Var s, NoOffset) ->
     (match Environment.find_global_init env s.vname with
      | None -> None
-     | Some (StrInit (Lit_str s)) -> Some (Format_string.String s)
-     | Some (StrInit (Lit_wstr s)) -> Some (Format_string.WString s)
+     | Some (StrInit (Str s)) -> Some (Format_string.String s)
+     | Some (StrInit (Wstr s)) -> Some (Format_string.WString s)
      | Some (CInit _) | exception Not_found -> None)
   | CastE (_, e) -> static_string env e
   | _ ->

@@ -111,7 +111,7 @@ module Make
   let get_string_literal e =
     match e.node with
     | Lval { node = Var v, NoOffset } ->
-      Some (Globals.Vars.get_literal_string v)
+      Some (Globals.Vars.get_string_literal v)
     | _ -> None
 
   let rec init_char_array ~pos lval s state =
@@ -203,13 +203,13 @@ module Make
   and apply_eva_single_initializer ~source ~pos state lval expr =
     if Ast_types.is_any_char_array lval.typ then begin
       match get_string_literal expr with
-      | Some (Lit_str s) -> init_char_array ~pos lval s state
-      | None | Some (Lit_wstr _) ->
+      | Some (Str s) -> init_char_array ~pos lval s state
+      | None | Some (Wstr _) ->
         Self.fatal "Single init of a char array can only be a string literal"
     end else if Ast_types.is_wchar_array lval.typ then begin
       match get_string_literal expr with
-      | Some (Lit_wstr ws) -> init_wchar_array ~pos lval ws state
-      | None | Some (Lit_str _) ->
+      | Some (Wstr ws) -> init_wchar_array ~pos lval ws state
+      | None | Some (Str _) ->
         Self.fatal "Single init of a wchar array can only be a wide string literal"
     end else begin
       match Transfer.assign state ~pos lval expr with
@@ -274,8 +274,8 @@ module Make
     (* Applies the real initializer on top. *)
     match init with
     | None -> state
-    | Some (StrInit (Lit_str s)) -> init_char_array ~pos lval s state
-    | Some (StrInit (Lit_wstr a)) -> init_wchar_array ~pos lval a state
+    | Some (StrInit (Str s)) -> init_char_array ~pos lval s state
+    | Some (StrInit (Wstr a)) -> init_wchar_array ~pos lval a state
     | Some (CInit init) ->
       apply_eva_initializer ~pos ~top_volatile:false lval init state
 
@@ -476,7 +476,7 @@ module Make
         let varinfo = Base.to_varinfo base in
         not (Cil.is_in_libc varinfo.vattr) &&
         (not (Ast_info.is_string_literal varinfo) ||
-         (Self.is_debug_key_enabled Self.dkey_include_literal_string))
+         (Self.is_debug_key_enabled Self.dkey_include_string_literal))
       with Base.Not_a_C_variable -> true
     in
     let cvalue_state =

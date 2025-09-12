@@ -52,7 +52,7 @@ module Vars = struct
 
   exception AlreadyExists of varinfo * initinfo
 
-  let get_literal_string vi =
+  let get_string_literal vi =
     match find vi with
     | { init = Some (StrInit lit) } -> lit
     | _ ->
@@ -71,11 +71,11 @@ module Vars = struct
 
   let add_decl vi = add vi { init = None }
 
-  let add_literal_string ~loc s =
+  let add_string_literal ~loc s =
     let var =
       match s with
-      | Lit_str s -> Cil.create_string_literal ~loc s
-      | Lit_wstr s -> Cil.create_wstring_literal ~loc s
+      | Str s -> Cil.create_string_literal ~loc s
+      | Wstr s -> Cil.create_wstring_literal ~loc s
     in
     let init = { init = Some (StrInit s) } in
     add var init;

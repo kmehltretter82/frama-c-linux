@@ -450,8 +450,8 @@ and pp_init fmt = function
       (pp_list (pp_pair pp_offset pp_init)) offset_init_pair_list
 
 and pp_str_literal fmt = function
-  | Lit_str s -> Format.fprintf fmt "Lit_str(%S)" s
-  | Lit_wstr l -> Format.fprintf fmt "Lit_wstr(%a)" (pp_list pp_int64) l
+  | Str s -> Format.fprintf fmt "Str(%S)" s
+  | Wstr l -> Format.fprintf fmt "Wstr(%a)" (pp_list pp_int64) l
 
 and pp_init_or_str fmt = function
   | CInit init -> Format.fprintf fmt "Init(%a)" pp_init init

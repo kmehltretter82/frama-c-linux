@@ -43,11 +43,11 @@ let init_idx loc idx elt =
   Index (Cil.kinteger64 ~loc ~kind idx, NoOffset), SingleInit elt
 
 let mk_array_init loc dest src =
-  let s = Globals.Vars.get_literal_string src in
+  let s = Globals.Vars.get_string_literal src in
   let len, elts =
     match s with
-    | Lit_str s -> String.length s, to_seq_string loc s
-    | Lit_wstr s -> List.length s, to_seq_wstring loc s
+    | Str s -> String.length s, to_seq_string loc s
+    | Wstr s -> List.length s, to_seq_wstring loc s
   in
   let _,alen = Ast_types.array_elem_type_and_size dest.vtype in
   let alen = Option.bind Cil.constFoldToInt alen in

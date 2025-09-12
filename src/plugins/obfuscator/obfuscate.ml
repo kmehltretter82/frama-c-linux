@@ -215,7 +215,7 @@ let obfuscate_behaviors () =
 
 let define_string_lit fmt v =
   Format.fprintf fmt "#define %s %a@\n"
-    v.vname Cil_printer.pp_str_literal (Globals.Vars.get_literal_string v)
+    v.vname Cil_printer.pp_str_literal (Globals.Vars.get_string_literal v)
 
 module UpdatePrinter (X: Printer.PrinterClass) = struct
   (* obfuscated printer *)
@@ -233,9 +233,9 @@ module UpdatePrinter (X: Printer.PrinterClass) = struct
       in
       if not (Cil_datatype.Varinfo.Set.is_empty literal_strings) then begin
         let string_fmt =
-          if Options.Literal_string.is_default () then fmt
+          if Options.String_literal.is_default () then fmt
           else begin
-            let file = Options.Literal_string.get () in
+            let file = Options.String_literal.get () in
             try
               let cout = open_out file in
               Format.formatter_of_out_channel cout
@@ -262,7 +262,7 @@ module UpdatePrinter (X: Printer.PrinterClass) = struct
           Format.fprintf fmt "\
 /* include the dictionary of literal strings */@\n\
 @[#include \"%s\"@]@\n@\n"
-            (Options.Literal_string.get ())
+            (Options.String_literal.get ())
         end
       end;
       super#file fmt ast

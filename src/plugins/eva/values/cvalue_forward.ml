@@ -52,9 +52,9 @@ let for_all_string v f =
   Locations.Location_Bytes.for_all
     (fun base off -> match base with
        | Base.Var (vi, _) when Ast_info.is_string_literal vi ->
-         (match Globals.Vars.get_literal_string vi with
-          | Lit_str str -> f base str off
-          | Lit_wstr _ -> false (* Not implemented yet *)
+         (match Globals.Vars.get_string_literal vi with
+          | Str str -> f base str off
+          | Wstr _ -> false (* Not implemented yet *)
          )
        | _ -> true)
     v

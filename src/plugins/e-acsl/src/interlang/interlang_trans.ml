@@ -114,7 +114,7 @@ and compile_context_insensitive {Interlang.enode; origin} =
     let mk_real s =
       let s = Gmp.Q.normalize_str s in
       Cil.mkAddrOrStartOf ~loc
-        (Cil.var (Globals.Vars.add_literal_string ~loc (Lit_str s)))
+        (Cil.var (Globals.Vars.add_string_literal ~loc (Str s)))
     in
     let e, strnum =
       let open Analyses_types in
@@ -125,8 +125,8 @@ and compile_context_insensitive {Interlang.enode; origin} =
       | Gmpz ->
         Cil.mkAddrOrStartOf ~loc
           (Cil.var
-             (Globals.Vars.add_literal_string ~loc
-                (Lit_str (Integer.to_string n)))),
+             (Globals.Vars.add_string_literal ~loc
+                (Str (Integer.to_string n)))),
         Str_Z
       | C_float fkind ->
         Cil.kfloat ~loc fkind (Int64.to_float (Integer.to_int64_exn n)), C_number
@@ -136,8 +136,8 @@ and compile_context_insensitive {Interlang.enode; origin} =
           (* too large integer *)
           Cil.mkAddrOrStartOf ~loc
             (Cil.var
-               (Globals.Vars.add_literal_string ~loc
-                  (Lit_str (Integer.to_string n)))),
+               (Globals.Vars.add_string_literal ~loc
+                  (Str (Integer.to_string n)))),
           Str_Z
         | Some ty, _ when Gmp_types.Q.is_t ty ->
           mk_real (Integer.to_string n),  Str_R

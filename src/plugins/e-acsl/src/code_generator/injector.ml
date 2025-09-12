@@ -125,8 +125,8 @@ let inject_in_init env vi off i =
   in
   match i with
   | CInit i -> let i, env = aux env off i in CInit i, env
-  | StrInit (Lit_str s) -> init_lit_str vi s; i, env
-  | StrInit (Lit_wstr l) -> init_lit_wstr vi l; i, env
+  | StrInit (Str s) -> init_lit_str vi s; i, env
+  | StrInit (Wstr l) -> init_lit_wstr vi l; i, env
 
 let inject_in_local_init ~loc env kf vi = function
   | ConsInit (fvi, sz :: _, _) as init

@@ -2503,10 +2503,10 @@ and equalLvals (x: lval) (y: lval) : bool =
 
 let equal_str_literal lit1 lit2 =
   match lit1, lit2 with
-  | Lit_str s1, Lit_str s2 -> String.equal s1 s2
-  | Lit_wstr l1, Lit_wstr l2 ->
+  | Str s1, Str s2 -> String.equal s1 s2
+  | Wstr l1, Wstr l2 ->
     list_compare Int64.compare l1 l2 = 0
-  | (Lit_str _ | Lit_wstr _), _ -> false
+  | (Str _ | Wstr _), _ -> false
 
 let equal_init_or_str i1 i2 =
   match i1, i2 with

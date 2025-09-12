@@ -88,7 +88,7 @@ class constGlobSubstVisitorClass : cilVisitor = object
            | CInit i,_ ->
              let newexp = find_replace NoOffset i zero_exp in
              ChangeTo newexp
-           | StrInit (Lit_str s), Index (i,NoOffset) ->
+           | StrInit (Str s), Index (i,NoOffset) ->
              let l = Z.of_int (String.length s) in
              (match Cil.constFoldToInt i with
               | Some z when Z.geq Z.zero z && Z.lt z l ->
@@ -98,7 +98,7 @@ class constGlobSubstVisitorClass : cilVisitor = object
                 ChangeTo (Cil.new_exp ~loc (Const (CChr '\000')))
               | Some _ | None -> DoChildren
              )
-           | StrInit (Lit_wstr l), Index(i,NoOffset) ->
+           | StrInit (Wstr l), Index(i,NoOffset) ->
              let len = Z.of_int (List.length l) in
              (match Cil.constFoldToInt i with
               | Some z when Z.geq Z.zero z && Z.lt z len ->

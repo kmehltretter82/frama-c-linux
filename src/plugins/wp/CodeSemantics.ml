@@ -604,11 +604,11 @@ struct
     let telt, len = Ast_types.array_elem_type_and_size v.vtype in
     let len = Option.bind (Cil.constFoldToInt ~machdep:true) len in
     match s with
-    | Lit_str s ->
+    | Str s ->
       let lit_len = Z.of_int (String.length s) in
       let rest = init_end_array ~sigma v telt lit_len len in
       Seq.fold_lefti (init_one_char ~sigma v telt) rest (String.to_seq s)
-    | Lit_wstr l ->
+    | Wstr l ->
       let lit_len = Z.of_int (List.length l) in
       let rest = init_end_array ~sigma v telt lit_len len in
       Seq.fold_lefti (init_one_wchar ~sigma v telt) rest (List.to_seq l)

@@ -16,7 +16,7 @@ module Dictionary =
       let dependencies = [ Ast.self ]
     end)
 
-module Literal_strings =
+module String_literals =
   State_builder.Hashtbl
     (Datatype.String.Hashtbl)
     (Datatype.String)
@@ -31,11 +31,11 @@ let fresh kind name =
   let idx = Datatype.String.Hashtbl.length h + 1 in
   let fresh = Obfuscator_kind.prefix kind ^ string_of_int idx in
   Datatype.String.Hashtbl.add h fresh name;
-  if kind = Obfuscator_kind.Literal_string && not (Literal_strings.mem name)
-  then Literal_strings.add name fresh;
+  if kind = Obfuscator_kind.String_literal && not (String_literals.mem name)
+  then String_literals.add name fresh;
   fresh
 
-let id_of_literal_string = Literal_strings.find
+let id_of_string_literal = String_literals.find
 
 let iter_sorted_kind f k h =
   if Datatype.String.Hashtbl.length h > 0 then
@@ -52,7 +52,7 @@ let iter_sorted f =
 
 let pretty_entry fmt k =
   Format.fprintf fmt "// %as@\n" Obfuscator_kind.pretty k;
-  let quote = k = Obfuscator_kind.Literal_string in
+  let quote = k = Obfuscator_kind.String_literal in
   fun new_ old ->
     if quote then Format.fprintf fmt "#define %s %S@\n" new_ old
     else Format.fprintf fmt "#define %s %s@\n" new_ old
@@ -71,7 +71,7 @@ let pretty fmt =
 /* *********************************** */@\n";
   iter_sorted
     (fun k ->
-       if k = Obfuscator_kind.Literal_string then fun _ _ -> ()
+       if k = Obfuscator_kind.String_literal then fun _ _ -> ()
        else pretty_entry fmt k);
   Format.fprintf fmt "\
 /*********************************** */@\n\

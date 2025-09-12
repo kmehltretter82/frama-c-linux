@@ -48,7 +48,7 @@ let constant_to_exp ~loc env t c =
   let mk_real s =
     let s = Gmp.Q.normalize_str s in
     Cil.mkAddrOrStartOf ~loc
-      (Cil.var (Globals.Vars.add_literal_string ~loc (Lit_str s))),
+      (Cil.var (Globals.Vars.add_string_literal ~loc (Str s))),
     Analyses_types.Str_R
   in
   match c with
@@ -64,8 +64,8 @@ let constant_to_exp ~loc env t c =
      | Gmpz ->
        Cil.mkAddrOrStartOf ~loc
          (Cil.var
-            (Globals.Vars.add_literal_string ~loc
-               (Lit_str (Integer.to_string n)))),
+            (Globals.Vars.add_string_literal ~loc
+               (Str (Integer.to_string n)))),
        Analyses_types.Str_Z
      (* too large integer *)
      | C_float fkind ->
@@ -77,8 +77,8 @@ let constant_to_exp ~loc env t c =
          (* too large integer *)
          Cil.mkAddrOrStartOf ~loc
            (Cil.var
-              (Globals.Vars.add_literal_string ~loc
-                 (Lit_str (Integer.to_string n)))),
+              (Globals.Vars.add_string_literal ~loc
+                 (Str (Integer.to_string n)))),
          Analyses_types.Str_Z
        | Some ty, _ when Gmp_types.Q.is_t ty ->
          mk_real (Integer.to_string n)

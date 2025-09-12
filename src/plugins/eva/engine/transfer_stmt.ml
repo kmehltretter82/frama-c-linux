@@ -605,7 +605,7 @@ module Make (Engine: Engine_sig.S) = struct
     let pretty fmt (expr : Eva_ast.exp) =
       match expr.node with
       | StartOf { node = Var v, NoOffset } when Ast_info.is_string_literal v ->
-        let s = Globals.Vars.get_literal_string v in
+        let s = Globals.Vars.get_string_literal v in
         Format.fprintf fmt "{{ %a }}" Printer.pp_str_literal s
       | Lval lval | StartOf lval when not (is_scalar lval) ->
         show_offsm fmt subdivnb lval state

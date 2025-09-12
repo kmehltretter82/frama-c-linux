@@ -114,7 +114,7 @@ let is_string_literal = function
 let pretty fmt t =
   match t with
   | Var(v,_) when Ast_info.is_string_literal v ->
-    Printer.pp_str_literal fmt (Globals.Vars.get_literal_string v)
+    Printer.pp_str_literal fmt (Globals.Vars.get_string_literal v)
   | Var (t,_) | Allocated (t,_,_) -> Printer.pp_varinfo fmt t
   | CLogic_Var (lvi, _, _) -> Printer.pp_logic_var fmt lvi
   | Null -> Format.pp_print_string fmt "NULL"

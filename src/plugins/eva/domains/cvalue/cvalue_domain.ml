@@ -59,7 +59,7 @@ let print_final_state kf values =
 
 let pretty_wo_string_literal fmt s =
   let filtered =
-    if Self.(is_debug_key_enabled dkey_include_literal_string) then
+    if Self.(is_debug_key_enabled dkey_include_string_literal) then
       s
     else
       Cvalue.Model.filter_base

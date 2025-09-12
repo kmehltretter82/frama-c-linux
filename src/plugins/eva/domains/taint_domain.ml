@@ -462,8 +462,8 @@ module TransferSingleTaint = struct
         | { concrete = { node = StartOf { node = (Var vi,NoOffset)} } } :: rest
           when Ast_info.is_string_literal vi ->
           begin
-            match Globals.Vars.get_literal_string vi with
-            | Lit_str s ->
+            match Globals.Vars.get_string_literal vi with
+            | Str s ->
               let zones = List.map arg_to_zone rest in
               let n = get_formats_number s in
               let vars_to_taint = get_n_first zones n in
@@ -471,7 +471,7 @@ module TransferSingleTaint = struct
                 List.fold_left Zone.join state.locs_data vars_to_taint
               in
               { state with locs_data }
-            | Lit_wstr _ -> state
+            | Wstr _ -> state
           end
         | _ -> state
       end

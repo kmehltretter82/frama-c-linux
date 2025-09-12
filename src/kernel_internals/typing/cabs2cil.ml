@@ -5568,7 +5568,7 @@ and doExp local_env
         | Cabs.CONST_WSTRING (ws: int64 list) ->
           let vi = Cil.create_wstring_literal ~loc ws in
           cabsPushGlobal
-            (GVar (vi, { init = Some (StrInit (Lit_wstr ws)) },loc));
+            (GVar (vi, { init = Some (StrInit (Wstr ws)) },loc));
           finishExp [] (unspecified_chunk empty) (Cil.evar ~loc vi)
             (Cil.typeOf_wstring_literal ~loc ws)
 
@@ -5590,7 +5590,7 @@ and doExp local_env
             with Not_found -> s
           in
           let vi = Cil.create_string_literal ~loc s' in
-          cabsPushGlobal (GVar (vi, { init = Some (StrInit (Lit_str s'))},loc));
+          cabsPushGlobal (GVar (vi, { init = Some (StrInit (Str s'))},loc));
           finishExp [] (unspecified_chunk empty) (Cil.evar ~loc vi)
             (Cil.typeOf_string_literal ~loc s')
 
@@ -7885,7 +7885,7 @@ and doInitializer loc local_env (vi: varinfo) (inite: Cabs.init_expression)
              in
              { vi.vtype with tnode = TArray(telem,Some size) }
          in
-         empty, StrInit (Lit_str s), typ, Lval.Set.empty
+         empty, StrInit (Str s), typ, Lval.Set.empty
        | CONSTANT (CONST_WSTRING l) ->
          let sz = List.length l + 1 in
          warn_if_bigger sz;
@@ -7897,7 +7897,7 @@ and doInitializer loc local_env (vi: varinfo) (inite: Cabs.init_expression)
              in
              { vi.vtype with tnode = TArray(telem,Some size) }
          in
-         empty, StrInit (Lit_wstr l), typ, Lval.Set.empty
+         empty, StrInit (Wstr l), typ, Lval.Set.empty
        | _ ->
          array_error ();
          empty, (CInit (CompoundInit(vi.vtype,[]))), vi.vtype,Lval.Set.empty)
@@ -8970,11 +8970,11 @@ and createLocal ghost ((_, sto, _, _) as specs)
       let ie' =
         match ie' with
         | CInit i -> i
-        | StrInit (Lit_str s) ->
+        | StrInit (Str s) ->
           let vi = Cil.create_string_literal ~loc s in
           cabsPushGlobal (GVar (vi, { init = Some ie' }, loc));
           SingleInit (Cil.evar vi)
-        | StrInit (Lit_wstr l) ->
+        | StrInit (Wstr l) ->
           let vi = Cil.create_wstring_literal ~loc l in
           cabsPushGlobal (GVar (vi, { init = Some ie' }, loc));
           SingleInit (Cil.evar vi)

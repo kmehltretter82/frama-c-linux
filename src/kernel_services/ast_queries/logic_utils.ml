@@ -2660,7 +2660,7 @@ let find_initial_value init loff =
     match init with
     | None -> Some (S.singleton Integer.zero)
     | Some (CInit init) -> Some (aux loff init)
-    | Some (StrInit (Lit_str s)) ->
+    | Some (StrInit (Str s)) ->
       (match loff with
        | TIndex(t,TNoOffset) ->
          let len = Z.of_int @@ String.length s in
@@ -2673,7 +2673,7 @@ let find_initial_value init loff =
          let typ = Cil.typeOf_string_literal s in
          Some (lift_set_index single_index t typ)
        | _ -> None)
-    | Some (StrInit (Lit_wstr l)) ->
+    | Some (StrInit (Wstr l)) ->
       (match loff with
        | TIndex(t,TNoOffset) ->
          let len = Z.of_int @@ List.length l in

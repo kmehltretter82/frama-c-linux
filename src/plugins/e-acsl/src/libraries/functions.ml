@@ -172,7 +172,7 @@ module Libc = struct
         ""
     in
     Cil.mkAddrOrStartOf ~loc
-      (Cil.var (Globals.Vars.add_literal_string ~loc (Lit_str param_str)))
+      (Cil.var (Globals.Vars.add_string_literal ~loc (Str param_str)))
 
 end
 
