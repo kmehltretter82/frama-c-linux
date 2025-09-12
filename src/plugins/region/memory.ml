@@ -496,8 +496,8 @@ let footprint (r: node) : node list =
       if SNode.mem n !visited then () else
         visited := SNode.add n !visited ;
       match (UF.get n).clayout with
-        | Compound (_, _, range) -> Ranges.iter visit range
-        | Blob | Cell (_,_) -> leaves := n :: !leaves
+      | Compound (_, _, range) -> Ranges.iter visit range
+      | Blob | Cell (_,_) -> leaves := n :: !leaves
     in visit r ; !leaves
   with Not_found -> []
 
