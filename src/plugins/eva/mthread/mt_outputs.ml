@@ -12,13 +12,6 @@ open Mt_thread
 
 module Utilities = struct
 
-  let mk_translation_tbl l =
-    List.fold_left
-      (fun smap (s1,s2) ->
-         Datatype.String.Map.add s1 s2 smap)
-      Datatype.String.Map.empty l
-  ;;
-
   (* Outputs are done in separate buffers then assembled together.
      The following allows to maintain some kind of consistency
      in buffer creations.
@@ -32,23 +25,6 @@ module Utilities = struct
     b, Format.formatter_of_buffer b
   ;;
 
-  let _escape_string special_chars =
-    Str.global_replace special_chars "\\\\\\\\0"
-  ;;
-
-  let replace_chars ttable s =
-    let buf = Buffer.create ((String.length s) * 2 ) in
-    String.iter
-      (fun c ->
-         let s = Format.sprintf "%c" c in
-         let ts =
-           try
-             Datatype.String.Map.find s ttable
-           with Not_found -> s
-         in Buffer.add_string buf ts
-      ) s;
-    buf
-  ;;
 end
 
 
@@ -61,16 +37,6 @@ module Html = struct
     let s = Format.asprintf "%a" pp v in
     let s = escape s in
     Format.pp_print_string fmt s
-
-  let dot_escape s =
-    let translation_table =
-      Utilities.mk_translation_tbl
-        (List.map (fun s -> (s,"_"))
-           ["&"; "+"; "["; "]"; "."]
-        )
-    in
-    Utilities.replace_chars translation_table s
-  ;;
 
 
   (* Formatting html with Format.formatters *)
@@ -106,13 +72,15 @@ module Html = struct
   let mk_html_page title name =
     let b, fmt = Utilities.mk_buffer_formatter () in
     { page_title = title;
-      page_name = name;
+      page_name = Filepath.sanitize_filename name;
       page_buffer = b;
       page_fmt = fmt;
     }
   ;;
 
-  let html_fname html_page = escape html_page.page_name ^ ".html";;
+  (** [html_fname page_name] returns the page [page_name.html] encoded to be
+      used in an HTML URL. *)
+  let html_fname html_page = Extlib.percent_encode html_page.page_name ^ ".html"
 
 
   type html_div = {
@@ -523,7 +491,7 @@ module Html = struct
     let unicode = suspend_unicode () in
     let f_stmt s = Format.sprintf "code.html#%s" (stmt_link s) in
     let thread_name = Thread.label th.th_eva_thread in
-    let filename = Eva_utils.sanitize_filename thread_name in
+    let filename = Filepath.sanitize_filename thread_name in
     let generator fmt = Mt_cfg.dot_fprint_graph fmt th.th_cfg f_stmt in
     let tmp_file = generate_dot ~generator filename in
     if not (Mt_options.ConcatDotFilesTo.is_empty ()) then begin
@@ -564,10 +532,13 @@ module Html = struct
       let default_vertex_attributes _ = []
       let vertex_name v =
         let s = Format.asprintf "%a" Thread.pretty v in
-        Buffer.contents (dot_escape s)
+        (* Surround name with double-quotes so that we can use UTF-8 and other
+           special characters apart from double quotes. [escape_non_utf8] is
+           used so that double quote are escaped. *)
+        Format.asprintf "\"%s\"" (Extlib.escape_non_utf8 s)
       let vertex_attributes v =
         let s = Format.asprintf "%a" Thread.pretty v in
-        [ `Label (Eva_utils.escape_non_utf8 s)]
+        [ `Label (Extlib.escape_non_utf8 s)]
       let get_subgraph _ = None
       let default_edge_attributes _ = [`Style(`Solid);]
       let edge_attributes _ = []
@@ -585,6 +556,10 @@ module Html = struct
     let name = "thread_inheritance_graph" in
     let generator fmt = TGDot.fprint_graph fmt graph in
     let tmp_file = generate_dot ~generator name in
+    if not (Mt_options.ConcatDotFilesTo.is_empty ()) then begin
+      let output = Mt_options.ConcatDotFilesTo.get () in
+      append_file ~input:tmp_file ~output ~name
+    end;
     let dot_output_format = "svg" in
     let link_fname = Format.sprintf "%s.%s" name dot_output_format in
     let output_file = Filepath.(default_dir / link_fname) in
@@ -684,7 +659,7 @@ module Html = struct
                         @{<html>@ \
                         @{<head>@ \
                         @{<title>%s@}@ \
-                        <meta content=\"text/html; charset=iso-8859-1\" \
+                        <meta content=\"text/html; charset=utf-8\" \
                         http-equiv=\"Content-Type\">@ \
                         @{<style type=\"text/css\">%s@}@}@ \
                         @{<body>@ %s@ \
@@ -779,7 +754,7 @@ module Html = struct
            Format.asprintf "%a" ThreadState.pretty th in
          let html_page = mk_html_page
              (Format.asprintf "Summary for thread %s" thread_name)
-             (Format.asprintf "%a" ThreadState.pretty th) in
+             thread_name in
          add_page th.th_eva_thread html_page;
          Format.pp_set_formatter_stag_functions
            html_page.page_fmt html_stag_functions;

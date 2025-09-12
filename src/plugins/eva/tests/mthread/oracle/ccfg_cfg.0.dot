@@ -415,3 +415,24 @@ digraph G {
   
   }
 
+// Graph for thread_inheritance_graph
+digraph G {
+  "<main>" [label="<main>", ];
+  "jobs[0]" [label="jobs[0]", ];
+  "jobs[1]" [label="jobs[1]", ];
+  "jobs[2]" [label="jobs[2]", ];
+  "jobs[3]" [label="jobs[3]", ];
+  "job_f1" [label="job_f1", ];
+  "job_f2" [label="job_f2", ];
+  
+  
+  edge [style="solid", ];
+  "<main>" -> "jobs[0]";
+  "<main>" -> "jobs[1]";
+  "<main>" -> "jobs[2]";
+  "<main>" -> "jobs[3]";
+  "<main>" -> "job_f1";
+  "<main>" -> "job_f2";
+  
+  }
+

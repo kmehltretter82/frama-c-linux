@@ -285,3 +285,16 @@ digraph G {
   
   }
 
+// Graph for thread_inheritance_graph
+digraph G {
+  "<main>" [label="<main>", ];
+  "job1" [label="job1", ];
+  "job2" [label="job2", ];
+  
+  
+  edge [style="solid", ];
+  "<main>" -> "job1";
+  "<main>" -> "job2";
+  
+  }
+
