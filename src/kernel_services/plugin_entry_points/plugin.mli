@@ -66,6 +66,10 @@ module type S_no_log = sig
   (** The group containing options -*-debug and -*-verbose.
       @since Boron-20100401 *)
 
+  val grp_debug: Cmdline.Group.t
+  (** Group containing debut options.
+      @since Frama-C+dev *)
+
   val add_plugin_output_aliases:
     ?visible:bool -> ?deprecated:bool -> string list -> unit
     (** Adds aliases to the options -plugin-help, -plugin-verbose, -plugin-log,

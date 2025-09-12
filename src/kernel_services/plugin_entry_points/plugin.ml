@@ -35,6 +35,7 @@ module type S_no_log = sig
   module State_dir () : Parameter_sig.User_dir_opt
   val help: Cmdline.Group.t
   val messages: Cmdline.Group.t
+  val grp_debug: Cmdline.Group.t
   val add_plugin_output_aliases:
     ?visible:bool -> ?deprecated:bool -> string list -> unit
 end
@@ -249,6 +250,7 @@ struct
   (* ************************************************************************ *)
 
   let messages = add_group "Output Messages"
+  let grp_debug = add_group "Debug"
 
   include Parameter_builder.Make
       (struct
