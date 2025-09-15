@@ -1,6 +1,8 @@
 open Cil_types
 open Crowbar
 
+let loc = Cil_datatype.Location.unknown
+
 let field_name =
   let count = ref 0 in
   fun () ->
@@ -24,7 +26,11 @@ let attr_of_kind =
   function NoAttr | Const -> [] | Mutable -> [ (Ast_attributes.frama_c_mutable, []) ]
 
 let tattr_of_kind =
-  function NoAttr | Mutable -> [] | Const -> [ ("const",[]) ]
+  function NoAttr | Mutable -> [] | Const -> [ ("const", []) ]
+
+let is_const = function
+  | NoAttr | Mutable -> false
+  | Const -> true
 
 let merge_kind field_kind subobj_kind =
   match field_kind, subobj_kind with
@@ -39,7 +45,7 @@ let mk_type ftype attr =
   let tname = struct_name () in
   let fname = field_name () in
   let mk_type _ =
-    Some [ fname, ftype, None, attr, Cil_datatype.Location.unknown ]
+    Some [ fname, ftype, None, attr, loc ]
   in
   Cil_const.mkCompInfo true tname ~norig:tname mk_type []
 
@@ -74,50 +80,63 @@ let gen_type =
          [ map [ gen_attr ] mk_int_type;
            map [ gen_attr; gen_type ] mk_composite_type ])
 
-let generate_failure_file is_const =
+let generate_empty_file =
   let count = ref 0 in
-  let kind = if is_const then "const" else "mutable" in
-  let loc = Cil_datatype.Location.unknown in
-  fun types ->
+  fun name ->
     incr count;
-    let name = "test_case_" ^ kind ^ "_" ^ string_of_int !count ^ ".i" in
+    let name = "failed_test_cases/" ^ name ^ "_failed.i" in
     let path = Crowbar_utils.filepath name in
-    let typ = List.hd types in
-    let x =
-      Cil.makeGlobalVar "x" (Cil_const.mk_tcomp typ)
-    in
-    let y =
-      Cil.makeGlobalVar "y" (Cil_const.intType)
-    in
-    let lvx = Var x, mk_offset typ in
-    let lvy = Var y, NoOffset in
-    let lv, rv = if is_const then lvy, lvx else lvx, lvy in
-    let instr = Set (lv, Cil.new_exp ~loc (Lval rv),loc) in
-    let s = Cil.mkStmtOneInstr instr in
-    let b = Cil.mkBlock [ s ] in
-    let ft = Cil_const.(mk_tfun voidType (Some []) false) in
-    let f = Cil.makeGlobalVar "f" ft in
-    let fdef =
-      { svar = f;
-        sformals = [];
-        slocals = [];
-        smaxid = 0;
-        sbody = b;
-        smaxstmtid = None;
-        sallstmts = [ s ];
-        sspec = Cil.empty_funspec () }
-    in
-    let file =
-      { fileName = path;
-        globals =
-          List.rev_map (fun typ -> GCompTag (typ,loc)) types @
-          [ GVarDecl (x,loc); GVarDecl(y,loc); GFun (fdef, loc) ];
-        globinit = None;
-        globinitcalled = true
-      }
-    in
-    Crowbar_utils.generate_file file;
-    Filepath.to_string_abs path
+    {
+      fileName = path;
+      globals = [GText ("// This file will be filled if the test fails.")];
+      globinit = None;
+      globinitcalled = true
+    }
+
+let generate_success_file name =
+  let file = generate_empty_file name in
+  if not (Filesystem.exists file.fileName) then
+    Crowbar_utils.generate_file file
+
+let generate_success_files () =
+  generate_success_file "const";
+  generate_success_file "mutable"
+
+let generate_failure_file =
+  fun file is_const types ->
+  let typ = List.hd types in
+  let x =
+    Cil.makeGlobalVar "x" (Cil_const.mk_tcomp typ)
+  in
+  let y =
+    Cil.makeGlobalVar "y" (Cil_const.intType)
+  in
+  let lvx = Var x, mk_offset typ in
+  let lvy = Var y, NoOffset in
+  let lv, rv = if is_const then lvy, lvx else lvx, lvy in
+  let instr = Set (lv, Cil.new_exp ~loc (Lval rv),loc) in
+  let s = Cil.mkStmtOneInstr instr in
+  let b = Cil.mkBlock [ s ] in
+  let ft = Cil_const.(mk_tfun voidType (Some []) false) in
+  let f = Cil.makeGlobalVar "f" ft in
+  let fdef =
+    { svar = f;
+      sformals = [];
+      slocals = [];
+      smaxid = 0;
+      sbody = b;
+      smaxstmtid = None;
+      sallstmts = [ s ];
+      sspec = Cil.empty_funspec () }
+  in
+  let file =
+    { file with
+      globals =
+        List.rev_map (fun typ -> GCompTag (typ,loc)) types @
+        [ GVarDecl (x,loc); GVarDecl(y,loc); GFun (fdef, loc) ]
+    }
+  in
+  Crowbar_utils.generate_file file
 
 let test (types, kind) =
   let out_type = List.hd types in
@@ -125,26 +144,29 @@ let test (types, kind) =
   let inner_type =
     Cil.typeOffset (Cil_const.mk_tcomp out_type) offset
   in
-  match kind with
-  | NoAttr | Mutable ->
-    if Ast_types.has_attribute "const" inner_type then begin
-      let filename = generate_failure_file false types in
-      Crowbar.fail
-        ("typeOffset declared const a field that should have been mutable. \
-          See example in file '" ^ filename ^ "'.")
-    end;
-    true
-  | Const ->
-    if not (Ast_types.has_attribute "const" inner_type) then begin
-      let filename = generate_failure_file true types in
-      Crowbar.fail
-        ("typeOffset should have marked a field as const. \
-          See example in file '" ^ filename ^ "'.")
-    end;
-    true
+  let is_const = is_const kind in
+  let kind = if is_const then "const" else "mutable" in
+  let has_const = Ast_types.has_attribute "const" inner_type in
+  let file = generate_empty_file kind in
+  if is_const && not has_const then begin
+    generate_failure_file file is_const types;
+    Crowbar.fail
+      ("typeOffset should have marked a field as const. \
+        See example in file '" ^ (file.fileName:>string) ^ "'.")
+  end
+  else if not is_const && has_const then begin
+    generate_failure_file file is_const types;
+    Crowbar.fail
+      ("typeOffset declared const a field that should have been mutable. \
+        See example in file '" ^ (file.fileName:>string) ^ "'.")
+  end
+  else true
 
 let f () =
+  ignore(Filesystem.make_dir (Filepath.of_string "failed_test_cases") 0o755);
   Crowbar.add_test ~name:"mutable typeOffset" [ gen_type ] @@
   (fun x -> Crowbar.check (test x))
 
-let () = Crowbar_utils.run "mutable" f
+let () =
+  Crowbar_utils.run "mutable" f;
+  generate_success_files ()
