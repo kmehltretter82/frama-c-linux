@@ -44,7 +44,7 @@ output_log=$result_dir/$output_name
 
 # Compile the test file
 e-acsl-gcc -I $framac_exe \
-  -c $opts \
+  $opts \
   --frama-c-extra="$fc_opts" \
   -o $result_dir/$test_name.gcc.c \
   -O $result_dir/$test_name \
