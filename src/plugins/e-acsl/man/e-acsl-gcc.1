@@ -9,16 +9,16 @@
 .TH E-ACSL-GCC.SH 1 2016-02-02
 
 .SH NAME
-.B e-acsl-gcc.sh
+.B e-acsl-gcc
 \- instrument and compile C files with E-ACSL
 .SH SYNOPSIS
-.B e-acsl-gcc.sh
+.B e-acsl-gcc
 [
 .I options
 ]
 .I files
 .SH DESCRIPTION
-.B e-acsl-gcc.sh
+.B e-acsl-gcc
 is a convenience wrapper for instrumentation of C programs using the
 \fBE-ACSL\fP \fBFrama-C\fP plugin and their subsequent compilation using
 the GNU compiler collection (\fBGCC\fP).
@@ -29,7 +29,10 @@ show a help page.
 .TP
 .B -c, --compile
 compile the generated and the original (supplied) sources.
-By default no compilation is performed.
+Enabled by default; use -n or --no-compile to disable.
+.TP
+.B -n, --no-compile
+disable compilation of the generated and the original (supplied) sources.
 .TP
 .B -D, --rt-debug
 enable runtime debug features, i.e., compile unoptimized executable
@@ -125,6 +128,7 @@ pass the specified flags to the linker.
 .B -e, --cpp-flags=\fI<FLAGS>
 pass the specified flags to the preprocessor at compile-time.
 For instrumentation-time preprocessor flags see \fB--extra-cpp-args\fP option.
+Only takes effect in case compilation has not been disabled (\fB--no-compile\fP).
 .TP
 .B -q, --quiet
 suppress any output except for errors and warnings.
@@ -272,16 +276,16 @@ instrumentation- or compile-time error
 
 .SH EXAMPLES
 
-.B e-acsl-gcc.sh foo.c
+.B e-acsl-gcc foo.c
 
 instrument foo.c and output the instrumented code to \fIa.out.frama.c\fP.
 
-.B e-acsl-gcc.sh -c -ogen_foo.c -Ofoo foo.c
+.B e-acsl-gcc -c -ogen_foo.c -Ofoo foo.c
 
 instrument \fIfoo.c\fP, output the instrumented code to \fIgen_foo.c\fP and
 compile \fIfoo.c\fP into \fIfoo\fP and \fIgen_foo.c\fP into \fIfoo.e-acsl\fP.
 
-.B e-acsl-gcc.sh --memory-model=bittree -C gen_foo.c
+.B e-acsl-gcc --memory-model=bittree -C gen_foo.c
 
 assume \fIgen_foo.c\fP has been instrumented by \fBE-ACSL\fP and compile it into
 \fIa.out.e-acsl\fP using \fBbittree\fP memory model.

@@ -16,7 +16,7 @@
 # Categories:
 #   E-ACSL      monitor generation
 #   runtime     C runtime library (and memory model)
-#   e-acsl-gcc  launcher e-acsl-gcc.sh
+#   e-acsl-gcc  launcher e-acsl-gcc
 #   Makefile    Makefile
 #   configure   configure
 ###############################################################################

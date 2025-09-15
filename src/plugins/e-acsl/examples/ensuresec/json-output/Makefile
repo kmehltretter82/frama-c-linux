@@ -1,6 +1,6 @@
 OUT:=$(dir $(abspath $(lastword $(MAKEFILE_LIST))))build
 DEPS:=Makefile ensuresec_ee.c json_assert.c
-EACSL_CC:=e-acsl-gcc.sh -c --concurrency --external-assert json_assert.c ensuresec_ee.c
+EACSL_CC:=e-acsl-gcc --concurrency --external-assert json_assert.c ensuresec_ee.c
 MKDIR:=mkdir -p
 
 EE_ID:=EnsuresecEE
