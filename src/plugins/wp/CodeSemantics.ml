@@ -616,6 +616,10 @@ struct
   let init ~sigma v = function
     | None -> [init_value ~sigma (Cil.var v) v.vtype None]
     | Some (CInit init) -> List.rev (init_variable ~sigma (Cil.var v) init [])
-    | Some (StrInit s) -> init_string_literal ~sigma v s
+    | Some (StrInit s) ->
+      if Wp_parameters.Literals.get () then
+        init_string_literal ~sigma v s
+      else
+        [init_value ~sigma (Cil.var v) v.vtype None]
 
 end
