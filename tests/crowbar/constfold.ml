@@ -1,21 +1,20 @@
 open Cabs
-open Crowbar
 
 let loc = Cabshelper.cabslu
 
 let gen_int_type =
-  choose [
-    const Tint;
-    const Tlong;
-    const Tunsigned;
-  ]
+  Crowbar.(choose [
+      const Tint;
+      const Tlong;
+      const Tunsigned;
+    ])
 
 let gen_type =
-  choose [
-    gen_int_type;
-    const Tfloat;
-    const Tdouble;
-  ]
+  Crowbar.(choose [
+      gen_int_type;
+      const Tfloat;
+      const Tdouble;
+    ])
 
 let mk_exp expr_node = { expr_loc = loc; expr_node }
 
@@ -24,12 +23,12 @@ let needs_int_unary = function
   | _ -> false
 
 let gen_unary_op =
-  choose [
-    const NOT;
-    const BNOT;
-    const MINUS;
-    const PLUS;
-  ]
+  Crowbar.(choose [
+      const NOT;
+      const BNOT;
+      const MINUS;
+      const PLUS;
+    ])
 
 (* NB: we don't generate shifts and division/modulo operands to avoid
    undefined operations. Overflows alarms are deactivated as well. *)
@@ -39,6 +38,7 @@ let needs_int_binary = function
   | _ -> false
 
 let gen_binary_op =
+  let open Crowbar in
   choose [
     const AND;
     const OR;
@@ -63,6 +63,7 @@ let gen_binary_op =
    supposed to be given by unary -
 *)
 let gen_constant =
+  let open Crowbar in
   choose [
     map [ range 4 ]
       (fun i -> mk_exp (CONSTANT (CONST_INT (string_of_int i))));
@@ -111,6 +112,7 @@ let gen_question c et ef =
   mk_exp (QUESTION (c,et,ef))
 
 let gen_expr =
+  let open Crowbar in
   fix
     (fun gen_expr ->
        choose [
@@ -190,12 +192,12 @@ let run typ expr =
   let cil =
     try Cabs2cil.convFile cabs
     with exn ->
-      failf "Failed to typecheck cabs: %s@\n%a@."
+      Crowbar.failf "Failed to typecheck cabs: %s@\n%a@."
         (Printexc.to_string exn)
         Cprint.printFile cabs
   in
   if Errorloc.had_errors () then begin
-    failf "Failed to typecheck cabs (had errors)@\n%a@."
+    Crowbar.failf "Failed to typecheck cabs (had errors)@\n%a@."
       Cprint.printFile cabs
   end;
   File.init_cil();
@@ -210,15 +212,15 @@ let run typ expr =
   let itv =
     try Cvalue.V.project_ival v1
     with exn ->
-      failf "Eva analysis did not reduce to a constant: %s@\n%t@."
+      Crowbar.failf "Eva analysis did not reduce to a constant: %s@\n%t@."
         (Printexc.to_string exn)
         (fun fmt -> File.pretty_ast ~fmt ())
   in
   if not (Ival.is_one itv) then begin
-    failf "const fold did not reduce to identical value:@\n%t@."
+    Crowbar.failf "const fold did not reduce to identical value:@\n%t@."
       (fun fmt -> File.pretty_ast ~fmt ())
   end
 
-let f () = add_test ~name:"constfold" [gen_type; gen_expr] run
+let f () = Crowbar.add_test ~name:"constfold" [gen_type; gen_expr] run
 
 let () = Crowbar_utils.run "constfold" f

@@ -1,5 +1,4 @@
 open Cil_types
-open Crowbar
 
 let loc = Cil_datatype.Location.unknown
 
@@ -27,8 +26,7 @@ let mk_ptr_type (is_gcc, typ, types, _) =
   (is_gcc, Cil_const.mk_tptr typ, types, Complete)
 
 let gen_length =
-  choose
-    [ const None; const (Some 0); const (Some 1); ]
+  Crowbar.(choose [ const None; const (Some 0); const (Some 1); ])
 
 let mk_array_type (is_gcc, typ, types, kind) length =
   let kind =

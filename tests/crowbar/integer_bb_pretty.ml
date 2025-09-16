@@ -1,5 +1,3 @@
-open Crowbar
-
 exception Found of int
 
 let reparse v s =
@@ -7,7 +5,7 @@ let reparse v s =
     Crowbar.fail
       ("Pretty-printing '" ^ (Z.to_string v) ^ "' returns '" ^ s ^ "'" ^ info)
   in
-  guard (String.length s > 2);
+  Crowbar.guard (String.length s > 2);
   let is_neg = s.[0] = '1' in
   let is_hex = s.[1] = 'x' in
   let s = String.(concat "" (split_on_char '_' s)) in

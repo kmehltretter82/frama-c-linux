@@ -1,5 +1,4 @@
 open Cil_types
-open Crowbar
 
 let loc = Cil_datatype.Location.unknown
 
@@ -39,7 +38,7 @@ let merge_kind field_kind subobj_kind =
   | _, Const -> Const
 
 let gen_attr =
-  choose [ const NoAttr; const Const; const Mutable ]
+  Crowbar.(choose [ const NoAttr; const Const; const Mutable ])
 
 let mk_type ftype attr =
   let tname = struct_name () in

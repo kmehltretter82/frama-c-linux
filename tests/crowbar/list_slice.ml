@@ -1,5 +1,3 @@
-open Crowbar
-
 let process_output_to_list2 = fun command ->
   let chan = Unix.open_process_in command in
   let res = ref ([] : string list) in
@@ -45,20 +43,18 @@ let python_slice list first last =
   parse_python_list (List.hd res)
 
 let test l first last =
-  begin
-    match python_slice l first last with
-    | None ->
-      Crowbar.fail ("could not parse python list slice")
-    | Some oracle ->
-      let result = List.slice ?first ?last l in
-      if oracle <> result then
-        Crowbar.fail
-          (Format.asprintf "oracle: [%a], result: [%a]"
-             (Pretty_utils.pp_list ~sep:"; " Format.pp_print_int) oracle
-             (Pretty_utils.pp_list ~sep:"; " Format.pp_print_int) result
-          )
-  end;
-  true
+  match python_slice l first last with
+  | None ->
+    Crowbar.fail ("could not parse python list slice")
+  | Some oracle ->
+    let result = List.slice ?first ?last l in
+    if oracle <> result then
+      Crowbar.fail
+        (Format.asprintf "oracle: [%a], result: [%a]"
+           (Pretty_utils.pp_list ~sep:"; " Format.pp_print_int) oracle
+           (Pretty_utils.pp_list ~sep:"; " Format.pp_print_int) result
+        );
+    true
 
 let mk_arg =
   Crowbar.map [ Crowbar.option (Crowbar.range 20) ]

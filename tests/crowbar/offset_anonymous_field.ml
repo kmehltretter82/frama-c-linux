@@ -1,5 +1,4 @@
 open Cil_types
-open Crowbar
 
 let field_name =
   let count = ref 0 in
@@ -77,7 +76,7 @@ let lift_offset cstruct res1 anon1 field1 res2 anon2 field2 res3 anon3 field3 =
 let lift_designator anon designator field =
   if anon then begin
     match designator with
-    | None -> bad_test ()
+    | None -> Crowbar.bad_test ()
     | Some _ -> designator
   end else Some field.fname
 
@@ -89,14 +88,14 @@ let mk_composite_type choice cstruct res1 anon1 res2 anon2 res3 anon3 =
   let field1, field2, field3 =
     match info.cfields with
     | Some [ field1; field2; field3 ] -> field1, field2, field3
-    | _ -> bad_test()
+    | _ -> Crowbar.bad_test ()
   in
   let designator =
     match choice with
     | 0 -> lift_designator anon1 res1.designator field1
     | 1 -> lift_designator anon2 res2.designator field2
     | 2 -> lift_designator anon3 res3.designator field3
-    | _ -> bad_test()
+    | _ -> Crowbar.bad_test ()
   in
   let offsets =
     lift_offset cstruct res1 anon1 field1 res2 anon2 field2 res3 anon3 field3
@@ -106,7 +105,7 @@ let mk_composite_type choice cstruct res1 anon1 res2 anon2 res3 anon3 =
   { designator; mytype; structs; offsets }
 
 let rec gen_type_l n =
-  if n <= 0 then lazy (const int_result)
+  if n <= 0 then lazy (Crowbar.const int_result)
   else
     lazy
       (let open Crowbar in
@@ -118,7 +117,7 @@ let rec gen_type_l n =
                gen_type (n-1); bool;
                gen_type (n-1); bool]
              mk_composite_type ])
-and gen_type n = unlazy (gen_type_l n)
+and gen_type n = Crowbar.unlazy (gen_type_l n)
 
 let generate_failure_file =
   let count = ref 0 in
@@ -168,14 +167,14 @@ let generate_failure_file =
 
 let test { designator; offsets; structs } =
   match structs with
-  | [] -> bad_test ()
+  | [] -> Crowbar.bad_test ()
   | comp :: _ ->
     (match designator with
-     | None -> bad_test ()
+     | None -> Crowbar.bad_test ()
      | Some field ->
        let offset, expected =
          match Datatype.String.Map.find_opt field offsets with
-         | None | Some [] -> bad_test ()
+         | None | Some [] -> Crowbar.bad_test ()
          | Some (hd :: _ as l) -> hd, l
        in
        try

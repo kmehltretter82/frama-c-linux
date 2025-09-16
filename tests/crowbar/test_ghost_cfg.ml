@@ -1,4 +1,3 @@
-open Crowbar
 open Cil_types
 
 (* just here to ensure we load the corresponding transformation. *)
@@ -12,7 +11,7 @@ let report file_name s =
       "%s. Saving ghostified file in %s"
       s (Filepath.to_string_abs file_name)
   in
-  fail summary
+  Crowbar.fail summary
 
 type stmt_pos =
   | Normal
@@ -78,6 +77,7 @@ let ghost_status env ghost =
   | _ -> env.in_ghost
 
 let gen_stmts gen_stmt =
+  let open Crowbar in
   fix
     (fun gen_stmts ->
        choose [
@@ -360,6 +360,7 @@ let gen_case ghost should_break my_case cases env =
   env, default, stmts :: others
 
 let gen_cases gen_stmt =
+  let open Crowbar in
   fix
     (fun gen_cases ->
        choose [
@@ -431,6 +432,7 @@ let gen_loop ghost stmts env =
   env, stmt
 
 let gen_stmt =
+  let open Crowbar in
   fix (fun gen_stmt ->
       choose [
         map [bool] gen_inst;
@@ -445,7 +447,7 @@ let gen_stmt =
       ])
 
 let gen_body =
-  map [gen_stmts gen_stmt]
+  Crowbar.map [gen_stmts gen_stmt]
     (fun f ->
        let (env, stmts) = f empty_env in
        let stmts = stmts @ end_of_body in
@@ -462,7 +464,7 @@ let create_file () =
   Filepath.of_string name
 
 let gen_file =
-  map [gen_body]
+  Crowbar.map [gen_body]
     (fun (env, body) ->
        let f = Cil.emptyFunctionFromVI f in
        f.svar.vdefined <- true;
@@ -550,7 +552,7 @@ let check_file (env, file) =
   else success_remove file
 
 let f () =
-  add_test ~name:"ghost cfg" [gen_file]
+  Crowbar.add_test ~name:"ghost cfg" [gen_file]
     (fun res -> Crowbar.check (check_file res))
 
 let () = Crowbar_utils.run "test_ghost_cfg" f
