@@ -3,7 +3,7 @@ open Cil_types
 (* just here to ensure we load the corresponding transformation. *)
 let _ = Ghost_cfg.transform_category
 
-module Loc = Cil_datatype.Location
+let loc = Cil_datatype.Location.unknown
 
 let report file_name s =
   let summary =
@@ -52,19 +52,18 @@ let y = Cil.makeGlobalVar ~ghost:true "y" Cil_const.intType
 
 let f = Cil.makeGlobalVar "f" Cil_const.(mk_tfun voidType (Some []) false)
 
-let return = Cil.mkStmt (Return (None, Loc.unknown))
+let return = Cil.mkStmt (Return (None, loc))
 
-let forward_goto_target = Cil.mkStmtOneInstr (Skip Loc.unknown)
+let forward_goto_target = Cil.mkStmtOneInstr (Skip loc)
 
 let incr_stmt =
-  let loc = Loc.unknown in
   Cil.mkStmtOneInstr (Set (Cil.var x, Cil.increm (Cil.evar ~loc x) 1,loc))
 
 let prepare () =
   Kernel.set_warn_status Kernel.wkey_ghost_bad_use Log.Wabort;
   Messages.reset_once_flag ();
-  return.skind <- Return (None, Loc.unknown);
-  forward_goto_target.labels <- [Label("Unreach", Loc.unknown, true)];
+  return.skind <- Return (None, loc);
+  forward_goto_target.labels <- [Label("Unreach", loc, true)];
   let old = Project.current () in
   Project.set_current (Project.create "simple project");
   Project.remove ~project:old ()
@@ -91,7 +90,6 @@ let gen_stmts gen_stmt =
               env, stmt :: stmts)])
 
 let gen_inst ghost env =
-  let loc = Loc.unknown in
   let ghost = ghost_status env ghost in
   let v = if ghost then y else x in
   let stmt =
@@ -113,9 +111,8 @@ let gen_block ghost f env =
   env, Cil.mkStmt ~ghost (Block (Cil.mkBlock stmts))
 
 let gen_return ghost env =
-  let loc = Loc.unknown in
   let ghost = ghost_status env ghost in
-  let stmt = Cil.mkStmt ~ghost (Return (None, Loc.unknown)) in
+  let stmt = Cil.mkStmt ~ghost (Return (None, loc)) in
   let e =
     Cil.new_exp ~loc (BinOp(Lt,Cil.evar x,Cil.integer ~loc 53,Cil_const.intType))
   in
@@ -131,7 +128,7 @@ let mk_label =
     | [] ->
       incr nb;
       let name = "L" ^ (string_of_int !nb) in
-      stmt.labels <- [ Label (name, Loc.unknown, true) ]
+      stmt.labels <- [ Label (name, loc, true) ]
     | _ -> ()
 
 (* approximation for gotos: if all the statements we jump over are ghost, we
@@ -144,7 +141,6 @@ let rec all_ghosts n l =
   | s :: tl -> s.ghost && all_ghosts (n-1) tl
 
 let gen_goto ghost tgt env =
-  let loc = Loc.unknown in
   let ghost = ghost_status env ghost in
   let len = List.length env.stmt_stack in
   let tgt = tgt mod (len + 1) in
@@ -153,7 +149,7 @@ let gen_goto ghost tgt env =
       begin
         let env = { env with should_fail = env.should_fail || ghost } in
         let stmt =
-          Cil.mkStmt ~ghost (Goto (ref forward_goto_target, Loc.unknown))
+          Cil.mkStmt ~ghost (Goto (ref forward_goto_target, loc))
         in
         let env = add_stack stmt env in
         env, stmt
@@ -168,7 +164,7 @@ let gen_goto ghost tgt env =
         in
         let should_fail = env.should_fail || should_fail in
         let env = { env with should_fail } in
-        let stmt = Cil.mkStmt ~ghost (Goto (ref stmt, Loc.unknown)) in
+        let stmt = Cil.mkStmt ~ghost (Goto (ref stmt, loc)) in
         let env = add_stack stmt env in
         env, stmt
       end
@@ -177,20 +173,19 @@ let gen_goto ghost tgt env =
   env, Cil.mkStmt ~ghost (If (e,Cil.mkBlock [stmt],Cil.mkBlock [],loc))
 
 let gen_break ghost env =
-  let loc = Loc.unknown in
   let ghost = ghost_status env ghost in
   let skind, should_fail =
     match env.switch_or_loop with
-    | [] -> Instr (Skip Loc.unknown), false
-    | (Is_loop,g) :: _ -> Break Loc.unknown, not g && ghost
+    | [] -> Instr (Skip loc), false
+    | (Is_loop,g) :: _ -> Break loc, not g && ghost
     | (Is_switch,g)::_ ->
       (match env.stmt_pos with
-       | Normal -> Break Loc.unknown, not g && ghost
-       | Case g1 -> Break Loc.unknown, not g && (g1 || ghost)
-       | Case_no_default _ -> Break Loc.unknown, false
-       | Last_case g1 -> Break Loc.unknown, not g && (g1 || ghost)
-       | Last_case_no_default _ -> Break Loc.unknown, false
-       | Default g1 -> Break Loc.unknown, not g && not g1 && ghost)
+       | Normal -> Break loc, not g && ghost
+       | Case g1 -> Break loc, not g && (g1 || ghost)
+       | Case_no_default _ -> Break loc, false
+       | Last_case g1 -> Break loc, not g && (g1 || ghost)
+       | Last_case_no_default _ -> Break loc, false
+       | Default g1 -> Break loc, not g && not g1 && ghost)
   in
   let should_fail = env.should_fail || should_fail in
   let stmt = Cil.mkStmt ~ghost skind in
@@ -201,13 +196,12 @@ let gen_break ghost env =
   env, stmt
 
 let gen_continue ghost env =
-  let loc = Loc.unknown in
   let ghost = ghost_status env ghost in
   let is_loop = function (Is_loop,_) -> true | (Is_switch,_) -> false in
   let skind, should_fail =
     match List.find_opt is_loop env.switch_or_loop with
-    | None -> Instr (Skip Loc.unknown), false
-    | Some (_,g) -> Continue Loc.unknown, not g && ghost
+    | None -> Instr (Skip loc), false
+    | Some (_,g) -> Continue loc, not g && ghost
   in
   let should_fail = should_fail || env.should_fail in
   let stmt = Cil.mkStmt ~ghost skind in
@@ -219,7 +213,6 @@ let gen_continue ghost env =
 
 let gen_if ghost ghost_else stmt_then stmt_else env =
   let ghost = ghost_status env ghost in
-  let loc = Loc.unknown in
   let stmt = Cil.mkEmptyStmt ~ghost ~loc () in
   let e =
     Cil.new_exp ~loc (BinOp (Ne,Cil.evar ~loc x,Cil.zero ~loc,Cil_const.intType))
@@ -255,13 +248,13 @@ let gen_default should_break stmts env =
   let _,s1 = gen_inst ghost env in
   let epilogue =
     if should_break then
-      [s1; Cil.mkStmt ~ghost (Break Loc.unknown)]
+      [s1; Cil.mkStmt ~ghost (Break loc)]
     else
       [s1]
   in
   let stmts = stmts @ epilogue in
-  let h = Cil.mkEmptyStmt ~ghost ~loc:Loc.unknown () in
-  h.labels <- Default Loc.unknown :: h.labels;
+  let h = Cil.mkEmptyStmt ~ghost ~loc () in
+  h.labels <- Default loc :: h.labels;
   let stmts = h :: stmts in
   let env = merge env new_env in
   env, Some stmts, []
@@ -350,11 +343,11 @@ let gen_case ghost should_break my_case cases env =
   let _, s1 = gen_inst ghost env in
   let epilogue =
     if should_break then
-      [ s1; Cil.mkStmt ~ghost (Break Loc.unknown)]
+      [ s1; Cil.mkStmt ~ghost (Break loc)]
     else [s1]
   in
   let stmts = stmts @ epilogue in
-  let lab_stmt = Cil.mkEmptyStmt ~ghost ~loc:Loc.unknown () in
+  let lab_stmt = Cil.mkEmptyStmt ~ghost ~loc () in
   let stmts = lab_stmt :: stmts in
   let env = merge env new_env in
   env, default, stmts :: others
@@ -370,7 +363,6 @@ let gen_cases gen_stmt =
        ])
 
 let gen_switch ghost cases env =
-  let loc = Loc.unknown in
   let ghost = ghost_status env ghost in
   let stmt = Cil.mkEmptyStmt ~ghost ~loc () in
   let new_env =
@@ -390,7 +382,7 @@ let gen_switch ghost cases env =
   let mk_switch case (labels, stmts) =
     let h = List.hd case in
     h.labels <-
-      Cil_types.Case (Cil.integer ~loc:Loc.unknown !count_case, Loc.unknown)
+      Cil_types.Case (Cil.integer ~loc !count_case, loc)
       :: h.labels;
     incr count_case;
     (h::labels, case @ stmts)
@@ -406,7 +398,6 @@ let gen_switch ghost cases env =
   env, stmt
 
 let gen_loop ghost stmts env =
-  let loc = Loc.unknown in
   let ghost = ghost_status env ghost in
   let stmt = Cil.mkEmptyStmt ~ghost ~loc () in
   let new_env =
@@ -428,7 +419,7 @@ let gen_loop ghost stmts env =
   let new_env = add_stack inc_stmt new_env in
   let stmts = cond_stmt :: stmts @ [inc_stmt] in
   let env = merge env new_env in
-  stmt.skind <- Loop([],Cil.mkBlock stmts,Loc.unknown,None,None);
+  stmt.skind <- Loop([],Cil.mkBlock stmts,loc,None,None);
   env, stmt
 
 let gen_stmt =

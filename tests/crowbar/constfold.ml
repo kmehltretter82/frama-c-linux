@@ -1,6 +1,6 @@
 open Cabs
 
-let loc = Cabshelper.cabslu
+let loc = Cil_datatype.Location.unknown
 
 let gen_int_type =
   Crowbar.(choose [
@@ -178,7 +178,6 @@ let () =
 
 let run typ expr =
   Project.clear ();
-  let loc = Cil_datatype.Location.unknown in
   let cabs = gen_cabs typ expr in
   Kernel.SignedOverflow.off ();
   Kernel.SignedDowncast.off ();

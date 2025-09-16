@@ -1,5 +1,7 @@
 open Cil_types
 
+let loc = Cil_datatype.Location.unknown
+
 let field_name =
   let count = ref 0 in
   fun () ->
@@ -121,7 +123,6 @@ and gen_type n = Crowbar.unlazy (gen_type_l n)
 
 let generate_failure_file =
   let count = ref 0 in
-  let loc = Cil_datatype.Location.unknown in
   fun offset types ->
     incr count;
     let name = "test_case_" ^ string_of_int !count ^ ".i" in
