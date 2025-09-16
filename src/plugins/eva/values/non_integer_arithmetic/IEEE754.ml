@@ -478,7 +478,6 @@ module Make (Model : Modeling) = struct
 
   let top  = Top
   let zero = False
-  let one  = top
   let top_int = top
   let inject_int _ _ = top
 

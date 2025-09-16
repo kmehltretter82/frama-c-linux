@@ -13,7 +13,6 @@ module CVal = struct
   let context = Abstract_context.Leaf (module Unit_context)
 
   let zero = Cvalue.V.singleton_zero
-  let one = Cvalue.V.singleton_one
 
   let top = Cvalue.V.top
   let top_int = Cvalue.V.top_int
@@ -152,7 +151,6 @@ module Interval = struct
       if Ival.is_bottom res then `Bottom else `Value (Some res)
 
   let zero = None
-  let one = None
   let top_int = None
   let inject_int _typ i = Some (Ival.inject_singleton i)
 

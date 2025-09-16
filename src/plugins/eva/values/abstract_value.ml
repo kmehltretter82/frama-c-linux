@@ -62,7 +62,6 @@ module type S = sig
   (** {3 Constructors } *)
 
   val zero: t
-  val one: t
   val top_int : t
   val inject_int : typ -> Integer.t -> t
   (** Abstract address for the given varinfo. (With type "pointer to the type
