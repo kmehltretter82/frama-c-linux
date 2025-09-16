@@ -221,7 +221,7 @@ let extract_int_list ~cardinal value =
 
 let extract_constant_string value =
   match Location_Bytes.fold_i (fun b i l -> (b,i) :: l) value [] with
-  | [Base.Var (vi, _), i] when Ival.is_zero i && Ast_attributes.contains "__str_lit" vi.vattr ->
+  | [Base.Var (vi, _), i] when Ival.is_zero i && Ast_info.is_string_literal vi ->
     let l = Globals.Vars.get_string_literal vi in
     (match l with
      | Str s -> Result.ok s
