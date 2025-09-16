@@ -6,7 +6,7 @@ The mopsa-db.json file generated from building the test has been relativized.
 Since we don't have any non-C++ parsable sources anyway, we don't even add them
 to the test directory.
 
-  $ frama-c -mopsa-db build/mopsa-db.json -mopsa-target Tests/UnitTests/UnitTests
+  $ frama-c -no-autoload-plugins -mopsa-db build/mopsa-db.json -mopsa-target Tests/UnitTests/UnitTests
   [kernel:mopsa-db:non-c-source] Warning: 
     ignoring non-C (C++) dependency: Tests/UnitTests/CMakeFiles/UnitTests.dir/UnitTest.cpp.o
     (setting this warning category to inactive or feedback will try to parse it nevertheless)
