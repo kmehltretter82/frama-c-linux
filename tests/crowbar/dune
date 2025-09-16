@@ -11,6 +11,7 @@
 (tests
  (names
   complete_type
+  test_hptmap
   constfold
   integer_bb_pretty
   list_slice
