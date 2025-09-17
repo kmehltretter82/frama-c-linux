@@ -45,7 +45,7 @@ int logic(int f1)
 }
 
 int main(int* p) { 
-  if ("ti\rti" == "ti\rti") f(p); 
+  if ("ti\rti" == "ti\rti" || "to\rto"+1 == "to\rto"+1) f(p); 
 }
 
 /* Obfuscate logic types and logic constructors. */
@@ -78,3 +78,6 @@ void test_func(struct S* s) { s->my_func(3,4); example_struct.my_func(5,6); }
 /*@ axiomatic A1 { predicate P1(void (*galois_fp_old)()); } */
 void my_f() {}
 /*@ lemma OK: P(my_f) && P1(my_f); */
+
+/*@ lemma string_literal: "foobar"[3] != "raw"[0]; */
+char sl[] = "global str";
