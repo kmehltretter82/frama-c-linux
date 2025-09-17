@@ -10,6 +10,7 @@ import React from 'react';
 import ReactMarkdown, { Options } from 'react-markdown';
 import remarkCustomHeaderId from 'remark-custom-header-id';
 
+import { getResourcePath } from 'dome';
 import * as Themes from 'dome/themes';
 import { classes } from 'dome/misc/utils';
 import { Icon, jIconKind, IconKind as _IconKind  } from 'dome/controls/icons';
@@ -205,6 +206,10 @@ export function Markdown(
       }
       return <a href={href}>{children}</a>;
     },
+    img: ({ src, alt }) => {
+      const newSrc = src ? getResourcePath(src) : undefined;
+      return <img src={newSrc} alt={alt} style={{ maxWidth: '100%' }} />;
+    }
   };
 
   return <ReactMarkdown {...options}>{ children }</ReactMarkdown>;
