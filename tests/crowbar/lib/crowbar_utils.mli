@@ -1,6 +1,4 @@
-val dirname : string
-
-val filepath : string -> Filepath.t
+val generate_cil_file : string -> Cil_types.file
 
 val generate_file : Cil_types.file -> unit
 

@@ -444,31 +444,21 @@ let gen_body =
        let stmts = stmts @ end_of_body in
        env, Cil.mkBlock stmts)
 
-let create_file () =
-  let temp_dir =
-    Crowbar_utils.dirname
-    ^ "/output-"
-    ^ (Filename.basename Sys.executable_name)
-  in
-  ignore(Filesystem.make_dir ~parents:true (Filepath.of_string temp_dir) 0o755);
-  let name = Filename.temp_file ~temp_dir "ghostified" ".c" in
-  Filepath.of_string name
 
 let gen_file =
   Crowbar.map [gen_body]
     (fun (env, body) ->
+       let file = Crowbar_utils.generate_cil_file "ghostified" in
        let f = Cil.emptyFunctionFromVI f in
        f.svar.vdefined <- true;
        f.sbody <- body;
        (env,
-        { fileName = create_file ();
+        { file with
           globals = [
             GVarDecl (x,Cil_datatype.Location.unknown);
             GVarDecl (y,Cil_datatype.Location.unknown);
             GFun (f, Cil_datatype.Location.unknown)
-          ];
-          globinit = None;
-          globinitcalled = false
+          ]
         }))
 
 let ignore_deferred_errors () =

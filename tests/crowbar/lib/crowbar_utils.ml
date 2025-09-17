@@ -2,9 +2,31 @@ let () = Kernel.AutoLoadPlugins.off ()
 let () = Dynamic.load_module "frama-c-eva"
 
 let dirname = Filename.dirname Sys.executable_name
+let cases_dir = "failed_cases"
 
-let filepath name =
-  Filepath.of_string (dirname ^ "/" ^ name)
+let () =
+  Filesystem.make_dir ~perm:0o755 (Filepath.of_string cases_dir)
+
+let filepath =
+  let count = ref 0 in
+  fun name ->
+    incr count;
+    let id = string_of_int !count in
+    let name =
+      dirname ^ "/"
+      ^ cases_dir ^ "/"
+      ^ name ^ id ^ ".i"
+    in
+    Filepath.of_string name
+
+let generate_cil_file name =
+  let path = filepath name in
+  Cil_types.{
+    fileName = path;
+    globals = [];
+    globinit = None;
+    globinitcalled = false
+  }
 
 let generate_file file =
   let open Filesystem.Operators in
@@ -12,8 +34,11 @@ let generate_file file =
   Kernel.add_debug_keys Kernel.dkey_print_attrs;
   let result =
     let+ channel = Filesystem.with_open_out filepath in
-    let fmt = Format.formatter_of_out_channel channel in
-    Format.fprintf fmt "%a@." Printer.pp_file file
+    match file.globals with
+    | [] -> ()
+    | _ ->
+      let fmt = Format.formatter_of_out_channel channel in
+      Format.fprintf fmt "%a@." Printer.pp_file file
   in
   match result with
   | Ok () -> ()

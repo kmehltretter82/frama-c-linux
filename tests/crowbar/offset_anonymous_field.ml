@@ -121,50 +121,44 @@ let rec gen_type_l n =
              mk_composite_type ])
 and gen_type n = Crowbar.unlazy (gen_type_l n)
 
-let generate_failure_file =
-  let count = ref 0 in
-  fun offset types ->
-    incr count;
-    let name = "test_case_" ^ string_of_int !count ^ ".i" in
-    let path = Crowbar_utils.filepath name in
-    let typ = List.hd types in
-    let x =
-      Cil.makeGlobalVar "x" (Cil_const.mk_tcomp typ)
-    in
-    let lvx = Var x, offset in
-    let typ = Cil.typeOfLval lvx in
-    let init = Cil.makeZeroInit ~loc typ in
-    let ft = Cil_const.(mk_tfun voidType (Some []) false) in
-    let f = Cil.makeGlobalVar "f" ft in
-    let fdef =
-      { svar = f;
-        sformals = [];
-        slocals = [];
-        smaxid = 0;
-        sbody = Cil.mkBlock [];
-        smaxstmtid = None;
-        sallstmts = [ ];
-        sspec = Cil.empty_funspec () }
-    in
-    let y = Cil.makeLocalVar fdef "y" typ in
-    let init_instr = Local_init (y, AssignInit init, loc) in
-    let instr = Set (lvx, Cil.evar ~loc y,loc) in
-    let s1 = Cil.mkStmtOneInstr init_instr in
-    let s2 = Cil.mkStmtOneInstr instr in
-    let b = Cil.mkBlock [ s1; s2 ] in
-    fdef.sallstmts <- [ s1; s2 ];
-    fdef.sbody <- b;
-    let file =
-      { fileName = path;
-        globals =
-          List.rev_map (fun typ -> GCompTag (typ,loc)) types @
-          [ GVarDecl (x,loc); GFun (fdef, loc) ];
-        globinit = None;
-        globinitcalled = true
-      }
-    in
-    Crowbar_utils.generate_file file;
-    Filepath.to_string_abs path
+let generate_failure_file name offset types  =
+  let file = Crowbar_utils.generate_cil_file name in
+  let typ = List.hd types in
+  let x =
+    Cil.makeGlobalVar "x" (Cil_const.mk_tcomp typ)
+  in
+  let lvx = Var x, offset in
+  let typ = Cil.typeOfLval lvx in
+  let init = Cil.makeZeroInit ~loc typ in
+  let ft = Cil_const.(mk_tfun voidType (Some []) false) in
+  let f = Cil.makeGlobalVar "f" ft in
+  let fdef =
+    { svar = f;
+      sformals = [];
+      slocals = [];
+      smaxid = 0;
+      sbody = Cil.mkBlock [];
+      smaxstmtid = None;
+      sallstmts = [ ];
+      sspec = Cil.empty_funspec () }
+  in
+  let y = Cil.makeLocalVar fdef "y" typ in
+  let init_instr = Local_init (y, AssignInit init, loc) in
+  let instr = Set (lvx, Cil.evar ~loc y,loc) in
+  let s1 = Cil.mkStmtOneInstr init_instr in
+  let s2 = Cil.mkStmtOneInstr instr in
+  let b = Cil.mkBlock [ s1; s2 ] in
+  fdef.sallstmts <- [ s1; s2 ];
+  fdef.sbody <- b;
+  let file =
+    { file with
+      globals =
+        List.rev_map (fun typ -> GCompTag (typ,loc)) types @
+        [ GVarDecl (x,loc); GFun (fdef, loc) ];
+    }
+  in
+  Crowbar_utils.generate_file file;
+  Filepath.to_string_abs file.fileName
 
 let test { designator; offsets; structs } =
   match structs with
@@ -183,7 +177,7 @@ let test { designator; offsets; structs } =
          if List.length result <> List.length expected ||
             not (List.for_all2 Cil_datatype.Offset.equal result expected)
          then begin
-           let filename = generate_failure_file offset structs in
+           let filename = generate_failure_file "anonymous" offset structs in
            let pp_sep fmt () = Format.pp_print_string fmt " " in
            Crowbar.fail
              (Format.asprintf
@@ -201,6 +195,6 @@ let test { designator; offsets; structs } =
             ", for field " ^ field))
 let f () =
   Crowbar.add_test ~name:"designator and anonymous fields"
-    [ gen_type 20 ] @@ test
+    [ gen_type 20 ] test
 
 let () = Crowbar_utils.run "offset_anonymous_field" f

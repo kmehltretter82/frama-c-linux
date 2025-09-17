@@ -79,30 +79,8 @@ let gen_type =
          [ map [ gen_attr ] mk_int_type;
            map [ gen_attr; gen_type ] mk_composite_type ])
 
-let generate_empty_file =
-  let count = ref 0 in
-  fun name ->
-    incr count;
-    let name = "failed_test_cases/" ^ name ^ "_failed.i" in
-    let path = Crowbar_utils.filepath name in
-    {
-      fileName = path;
-      globals = [GText ("// This file will be filled if the test fails.")];
-      globinit = None;
-      globinitcalled = true
-    }
-
-let generate_success_file name =
-  let file = generate_empty_file name in
-  if not (Filesystem.exists file.fileName) then
-    Crowbar_utils.generate_file file
-
-let generate_success_files () =
-  generate_success_file "const";
-  generate_success_file "mutable"
-
-let generate_failure_file =
-  fun file is_const types ->
+let generate_failure_file name is_const types =
+  let file = Crowbar_utils.generate_cil_file name in
   let typ = List.hd types in
   let x =
     Cil.makeGlobalVar "x" (Cil_const.mk_tcomp typ)
@@ -135,7 +113,8 @@ let generate_failure_file =
         [ GVarDecl (x,loc); GVarDecl(y,loc); GFun (fdef, loc) ]
     }
   in
-  Crowbar_utils.generate_file file
+  Crowbar_utils.generate_file file;
+  Filepath.to_string_abs file.fileName
 
 let test (types, kind) =
   let out_type = List.hd types in
@@ -146,26 +125,23 @@ let test (types, kind) =
   let is_const = is_const kind in
   let kind = if is_const then "const" else "mutable" in
   let has_const = Ast_types.has_attribute "const" inner_type in
-  let file = generate_empty_file kind in
   if is_const && not has_const then begin
-    generate_failure_file file is_const types;
+    let filename = generate_failure_file kind is_const types in
     Crowbar.fail
       ("typeOffset should have marked a field as const. \
-        See example in file '" ^ (file.fileName:>string) ^ "'.")
+        See example in file '" ^ filename ^ "'.")
   end
   else if not is_const && has_const then begin
-    generate_failure_file file is_const types;
+    let filename = generate_failure_file kind is_const types in
     Crowbar.fail
       ("typeOffset declared const a field that should have been mutable. \
-        See example in file '" ^ (file.fileName:>string) ^ "'.")
+        See example in file '" ^ filename ^ "'.")
   end
   else true
 
 let f () =
-  ignore(Filesystem.make_dir (Filepath.of_string "failed_test_cases") 0o755);
   Crowbar.add_test ~name:"mutable typeOffset" [ gen_type ] @@
   (fun x -> Crowbar.check (test x))
 
 let () =
-  Crowbar_utils.run "mutable" f;
-  generate_success_files ()
+  Crowbar_utils.run "mutable" f

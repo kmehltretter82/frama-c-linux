@@ -123,27 +123,19 @@ let gen_type =
 
 let generate_failure_file is_complete =
   let count = ref 0 in
-  let kind = if is_complete then "complete" else "incomplete" in
+  let name = if is_complete then "complete" else "incomplete" in
   fun (typ, types) ->
     incr count;
-    let name = "test_case_" ^ kind ^ "_" ^ string_of_int !count ^ ".i" in
-    let path = Crowbar_utils.filepath name in
+    let file = Crowbar_utils.generate_cil_file name in
     let fundec = Cil.emptyFunction "f" in
     let s =
       Cil.mkPureExpr ~valid_sid:true ~fundec (Cil.new_exp ~loc (SizeOf typ))
     in
     let b = Cil.mkBlock [ s ] in
     fundec.sbody <- b;
-    let file =
-      { fileName = path;
-        globals =
-          List.rev types @ [ GFun (fundec, loc) ];
-        globinit = None;
-        globinitcalled = true
-      }
-    in
+    let file = { file with globals = List.rev types @ [ GFun (fundec, loc) ] } in
     Crowbar_utils.generate_file file;
-    Filepath.to_string_abs path
+    Filepath.to_string_abs file.fileName
 
 let test (allowZeroSizeArrays, typ, types, kind) =
   match kind with
