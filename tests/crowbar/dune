@@ -8,57 +8,9 @@
    (echo "  - Inout:" %{lib-available:frama-c-inout.core} "\n")
    (echo "  - Eva:" %{lib-available:frama-c-eva.core} "\n"))))
 
-(tests
- (names
-  complete_type
-  test_hptmap
-  constfold
-  integer_bb_pretty
-  list_slice
-  offset_anonymous_field
-  test_ghost_cfg
-  )
- (flags -open Frama_c_kernel :standard -w -9)
- (libraries
-  frama-c.init.cmdline
-  frama-c.kernel
-  frama-c-inout.core
-  frama-c-eva.core
-  crowbar
-  crowbar_utils))
-
-(executable
- (name mutable)
- (libraries
-  frama-c.init.cmdline
-  frama-c.kernel
-  crowbar
-  crowbar_utils)
- (flags :standard -w -9 -open Frama_c_kernel))
-
-(executables
- (names mutable_const_fail mutable_mutable_fail)
- (modes plugin)
- (libraries
-  frama-c.init.cmdline
-  frama-c.boot
-  frama-c.kernel)
- (flags :standard -w -9 -open Frama_c_kernel)
+(cram
+  (enabled_if (<> %{env:CROWBAR=false} "false"))
+  (deps ../../src/init/boot/empty_file.exe (package frama-c) (package crowbar_utils))
 )
 
-(rule
-  (targets (dir failed_test_cases))
-  (action (with-accepted-exit-codes (or 0 1) (run ./mutable.exe)))
-)
-
-(rule
- (alias runtest)
- (deps  mutable_const_fail.cmxs failed_test_cases (package frama-c))
- (action (run frama-c -load-module=mutable_const_fail.cmxs failed_test_cases/const_failed.i))
-)
-
-(rule
- (alias runtest)
- (deps mutable_mutable_fail.cmxs failed_test_cases (package frama-c))
- (action (run frama-c -load-module=mutable_mutable_fail.cmxs failed_test_cases/mutable_failed.i))
 )

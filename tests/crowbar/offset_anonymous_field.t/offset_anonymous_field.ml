@@ -189,7 +189,7 @@ let test { designator; offsets; structs } =
                 (Format.pp_print_list ~pp_sep Cil_printer.pp_offset) result)
          end
        with Log.AbortFatal _ ->
-         let filename = generate_failure_file offset structs in
+         let filename = generate_failure_file "anonymous" offset structs in
          Crowbar.fail
            ("fieldsToInit failed on the test given in file " ^ filename ^
             ", for field " ^ field))

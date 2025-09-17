@@ -1,0 +1,10 @@
+(test
+ (name constfold)
+ (libraries
+  frama-c.init.cmdline
+  frama-c.kernel
+  frama-c-inout.core
+  frama-c-eva.core
+  crowbar
+  crowbar_utils)
+ (flags -open Frama_c_kernel :standard -w -9))

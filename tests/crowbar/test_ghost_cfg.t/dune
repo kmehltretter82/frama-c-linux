@@ -1,0 +1,9 @@
+(executable
+ (name test_ghost_cfg)
+ (libraries frama-c.init.cmdline frama-c.kernel crowbar crowbar_utils)
+ (flags -open Frama_c_kernel :standard -w -9))
+
+(rule
+ (alias runtest)
+ (target (dir failed_cases))
+ (action (run ./test_ghost_cfg.exe)))
