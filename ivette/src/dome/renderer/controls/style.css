@@ -457,4 +457,31 @@ meter::-webkit-meter-even-less-good-value  {
   }
 }
 
+
+/* -------------------------------------------------------------------------- */
+/* --- Multiselect                                                        --- */
+/* -------------------------------------------------------------------------- */
+
+.dome-xMenu-Item {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  align-content: center;
+  gap: 5px;
+
+  &:not(.dome-xMenu-Item-disabled) {
+    cursor: pointer ;
+  }
+}
+
+.dome-xMenu-Item-disabled {
+  color: var(--disabled-text);
+  svg { fill: var(--disabled-text); }
+}
+
+.dome-xMenu-Item-separator {
+  border-bottom: solid 1px var(--disabled-text);
+}
+/* } */
 /* -------------------------------------------------------------------------- */

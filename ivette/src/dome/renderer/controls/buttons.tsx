@@ -17,6 +17,7 @@
 
 import React from 'react';
 import { classes } from 'dome/misc/utils';
+import { Vbox } from 'dome/layout/boxes';
 import { Icon } from './icons';
 import './style.css';
 
@@ -511,6 +512,48 @@ export function SelectMenu(props: SelectProps): JSX.Element {
     </select >
   );
 }
+
+// --------------------------------------------------------------------------
+// --- Multiselect
+// --------------------------------------------------------------------------
+
+export interface ItemProps {
+  /** Item label. */
+  label: string;
+  /** Optional menu identifier. */
+  id?: string;
+  /** tooltip */
+  title?: string
+  /** Displayed item, default is `true`. */
+  display?: boolean;
+  /** Enabled item, default is `true`. */
+  enabled?: boolean;
+  /** Checked item, default is `false`. */
+  checked?: boolean;
+  /** Item selection callback. */
+  onClick: (() => void);
+}
+export type MultiselectItemProps = ItemProps | 'separator'
+
+export function MultiselectItem({ item }: {item: MultiselectItemProps})
+: React.JSX.Element {
+  if(item === 'separator')
+    return <div className='dome-xMenu-Item-separator' />;
+
+  const className = classes(
+    'dome-xMenu-Item',
+    !item.enabled && 'dome-xMenu-Item-disabled'
+  );
+  return <div title={item.title} className={className}
+      onClick={() => item.enabled && item.onClick()}
+    >
+      <Icon id='CHECK' size={14} visible={item.checked}/>
+      <div>{item.label}</div>
+    </div>;
+}
+
+export function Multiselect({ children }: {children: React.ReactNode[]})
+: React.JSX.Element { return <Vbox>{ children }</Vbox>; }
 
 // --------------------------------------------------------------------------
 // --- Spinner

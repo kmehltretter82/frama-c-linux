@@ -18,12 +18,13 @@ import * as Json from 'dome/data/json';
 import { classes } from 'dome/misc/utils';
 import { alpha } from 'dome/data/compare';
 import { Section, Item, SidebarTitle } from 'dome/frame/sidebars';
-import { Button } from 'dome/controls/buttons';
+import {
+  Button, ItemProps, Multiselect, MultiselectItem, MultiselectItemProps
+} from 'dome/controls/buttons';
 import { Label } from 'dome/controls/labels';
 import * as Toolbar from 'dome/frame/toolbars';
 import { Hbox } from 'dome/layout/boxes';
 import { Dropdown } from 'dome/dialogs';
-import { Icon } from 'dome/controls/icons';
 
 import * as Ivette from 'ivette';
 import * as Server from 'frama-c/server';
@@ -81,25 +82,7 @@ interface MenuItemProps {
   enabled?: boolean
 }
 
-interface FilterMenuItemProps {
-  /** Item label. */
-  label: string;
-  /** Optional menu identifier. */
-  id?: string;
-  /** tooltip */
-  title?: string
-  /** Displayed item, default is `true`. */
-  display?: boolean;
-  /** Enabled item, default is `true`. */
-  enabled?: boolean;
-  /** Checked item, default is `false`. */
-  checked?: boolean;
-  /** Item selection callback. */
-  onClick: (() => void);
-}
-export type FilterMenuItem = FilterMenuItemProps | 'separator';
-
-export function menuItem(props: MenuItemProps): FilterMenuItemProps {
+export function menuItem(props: MenuItemProps): ItemProps {
   const { label, state, title, enabled = true } = props;
   const [b, flip] = state;
   return {
@@ -109,29 +92,6 @@ export function menuItem(props: MenuItemProps): FilterMenuItemProps {
     checked: b,
     onClick: flip,
   };
-}
-
-function MenuItem({ item }: {item: FilterMenuItem}): React.JSX.Element {
-  if(item === 'separator') return <div className='menu-filter-separator' />;
-
-  const className = classes('menu-filter-item',
-    !item.enabled && 'menu-filter-item-disabled'
-  );
-  return <div title={item.title} className={className}
-      onClick={() => item.enabled && item.onClick()}
-    >
-      <Icon id='CHECK' size={14} visible={item.checked}/>
-      <div>{item.label}</div>
-    </div>;
-}
-
-export function MenuFilter({ items }: {items: FilterMenuItem[]})
-: React.JSX.Element {
-  return (
-    <div className='menu-filter'>
-      { items.map((e, i) => <MenuItem key={i} item={e} />)}
-    </div>
-  );
 }
 
 // --------------------------------------------------------------------------
@@ -357,7 +317,7 @@ export function useFunctionFilter(): FunctionFilterRet {
     evaComputed, isSelected, multipleSelectionActive
   ]);
 
-  const contextFctMenuItems: FilterMenuItem[] = [
+  const contextFctMenuItems: MultiselectItemProps[] = [
     menuItem({ label: 'Show Frama-C builtins', state: builtinState }),
     menuItem({ label: 'Show stdlib functions', state: stdlibState }),
     'separator',
@@ -377,7 +337,9 @@ export function useFunctionFilter(): FunctionFilterRet {
               enabled: multipleSelectionActive }),
   ];
 
-  const contextFctFilter = <MenuFilter items={contextFctMenuItems} />;
+  const itemsComp = contextFctMenuItems.map(
+    (e, i) => <MultiselectItem key={i} item={e} />);
+  const contextFctFilter = <Multiselect>{ itemsComp }</Multiselect>;
 
   return { contextFctFilter, multipleSelection, showFunction, isSelected };
 }
@@ -489,7 +451,7 @@ export function useVariableFilter(): VariablesFilterRet {
 
   // Context menu to change filter settings
   /* eslint-disable max-len */
-  const contextVarMenuItems: FilterMenuItem[] = [
+  const contextVarMenuItems: MultiselectItemProps[] = [
     menuItem({ label: 'Show stdlib variables', state: stdlibState }),
     'separator',
     menuItem({ label: 'Show extern variables', state: externState }),
@@ -512,7 +474,9 @@ export function useVariableFilter(): VariablesFilterRet {
   ];
   /* eslint-enable max-len */
 
-  const contextVarFilter = <MenuFilter items={contextVarMenuItems} />;
+  const itemsComp = contextVarMenuItems.map(
+    (e, i) => <MultiselectItem key={i} item={e} />);
+  const contextVarFilter =  <Multiselect>{ itemsComp }</Multiselect>;
 
   return { contextVarFilter, showVariable };
 }
