@@ -1,0 +1,65 @@
+/* -------------------------------------------------------------------------- */
+/* --- About Frama-c - Options                                            --- */
+/* -------------------------------------------------------------------------- */
+
+.modal-framac-options {
+  height: 85vh;
+  min-width: 85vw;
+}
+
+.framac-options {
+  width: 100%;
+  height: 100%;
+
+  .dome-xSideBar {
+    .dome-xSideBarItem {
+      &.options-left-form {
+        background-color: var(--selected-button-tabs-left);
+      }
+      &.options-right-form {
+        background-color: var(--selected-button-tabs-right);
+      }
+    }
+  }
+
+  .framac-options-forms {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+
+    .ka-wrapper,
+    .ka-content,
+    .dome-xBoxes-vbox { height: 100%;}
+
+
+    .dome-xSideBarTitle {
+      padding: 2px 12px;
+      border-bottom: solid 2px var(--border-discrete);
+      display: flex;
+      justify-content: space-between;
+    }
+    .dome-xForm-sidebar {
+      padding-top: 5px;
+
+      .dome-xSideBarSection {
+
+        &:has(> .dome-xSideBarSection-content .options-field-modified) {
+          .dome-xSideBarSection-title label {
+            color: var(--warning)
+          }
+        }
+
+        .dome-xSideBarSection-content {
+          padding-left: 5px;
+        }
+      }
+
+      .dome-xForm-field-block:has(> .dome-xForm-field .options-field-modified) {
+        box-shadow: -4px 0px 4px var(--warning);
+      }
+
+    }
+  }
+
+  label.field-is-set { color: var(--primary-button-active) }
+}

@@ -21,6 +21,7 @@ import * as Ast from 'frama-c/kernel/api/ast';
 import * as States from 'frama-c/states';
 import * as Projects from 'frama-c/kernel/Projects';
 import { showAboutModal, showCreditsModal } from './help';
+import { showOptionsModal } from './options';
 
 const cFilter = {
   name: 'C source files',
@@ -172,6 +173,14 @@ function addHelpMenuItems(): void {
     id: 'help_credits',
     onClick: showCreditsModal,
     kind: 'normal',
+  });
+  Dome.addMenuItem({
+    menu: 'Edit',
+    label: 'Option',
+    id: 'frama_c_options',
+    onClick: showOptionsModal,
+    kind: 'normal',
+    key: 'Cmd+Shift+o'
   });
 }
 

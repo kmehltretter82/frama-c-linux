@@ -925,6 +925,8 @@ export function Actions(props?: Children): JSX.Element | null {
 export interface GenericFieldProps extends FilterProps, Children {
   /** Field label. */
   label: string;
+  /** ClassName. */
+  className?: string;
   /** Field tooltip text. */
   title?: string;
   /** Field offset. */
@@ -960,6 +962,7 @@ export function Field(props: GenericFieldProps): JSX.Element | null {
   const cssLabel = Utils.classes(
     'dome-xForm-label dome-text-label',
     disabled && 'dome-disabled',
+    props.className
   );
 
   const cssField = Utils.classes(
