@@ -1,12 +1,12 @@
 # Default tests
 
-DEFAULT_SUITES= builtins float idct numerors traces value mthread
+DEFAULT_SUITES= builtins float idct numerors traces value mthread taint
 
 ## Diff/default domain tests
-apron_SUITES = builtins float idct value
-bitwise_SUITES = value builtins float idct mthread
-equality_SUITES = value builtins float idct mthread
-gauges_SUITES = value builtins float idct mthread
-multidim_SUITES = value builtins float idct
-octagon_SUITES = value builtins float idct mthread
-symblocs_SUITES = value builtins float idct mthread
+apron_SUITES = builtins float idct value taint
+bitwise_SUITES = value builtins float idct mthread taint
+equality_SUITES = value builtins float idct mthread taint
+gauges_SUITES = value builtins float idct mthread taint
+multidim_SUITES = value builtins float idct taint
+octagon_SUITES = value builtins float idct mthread taint
+symblocs_SUITES = value builtins float idct mthread taint
