@@ -22,6 +22,7 @@ import { Label, Title } from 'dome/controls/labels';
 import { classes } from 'dome/misc/utils';
 import { Hbox } from 'dome/layout/boxes';
 import { IconButton, IconButtonProps } from 'dome/controls/buttons';
+import { Dropdown } from 'dome/dialogs';
 
 import './style.css';
 
@@ -104,6 +105,8 @@ export interface SectionProps {
   children?: React.ReactNode;
   /** Additionnal CSS class. */
   className?: string;
+  /** Filering menu */
+  filteringMenu?: React.JSX.Element;
 }
 
 /**
@@ -117,7 +120,7 @@ export interface SectionProps {
    Sections with no items are not displayed.
 */
 export function Section(props: SectionProps): JSX.Element | null {
-  const { settings, defaultUnfold, infos, unfold } = props;
+  const { settings, defaultUnfold, filteringMenu, infos, unfold } = props;
   const [state, flipState] = useFlipSettings(settings, defaultUnfold);
   const icon = state ? 'TRIANGLE.DOWN' : 'TRIANGLE.RIGHT';
 
@@ -129,7 +132,14 @@ export function Section(props: SectionProps): JSX.Element | null {
   const { rightButtonProps: iconProps } = props;
   const className = `dome-xSideBarSection-filterButton ${iconProps?.className}`;
   const rightButton =
-    iconProps ? <IconButton {...iconProps} className={className}/> : undefined;
+    iconProps ?
+      filteringMenu ?
+        <Dropdown
+          control={ <IconButton {...iconProps} className={className}/> }
+        >{filteringMenu}</Dropdown>
+        :
+         <IconButton {...iconProps} className={className}/>
+    : undefined;
 
   return (
     <div className={`dome-xSideBarSection ${props.className}`}>

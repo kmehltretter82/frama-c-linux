@@ -843,9 +843,7 @@ function makeColumn<Key, Row>(
     props.disableSort || !sorting || !sorting.canSortBy(dataKey);
   const getter = state.computeGetter(id, dataKey, props);
   const render = state.computeRender(id, dataKey, props);
-  // Type incompatibility between react-virtualized & react
   return (
-    // @ts-expect-error (TODO Fix this type error, VColumn is not a ReactNode)
     <VColumn
       key={id}
       width={width}
@@ -1079,10 +1077,8 @@ function makeTable<Key, Row>(
     setImmediate(state.forceUpdate);
   }
 
-  // Type incompatibility between react-virtualized & react
   return (
     <div onKeyDown={state.onKeyDown}>
-      {/* @ts-expect-error (TODO Fix this type error) */}
       <VTable
         ref={state.tableRef}
         key="table"

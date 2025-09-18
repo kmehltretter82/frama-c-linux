@@ -101,6 +101,11 @@
     "vite": "^5.0.12",
     "vite-plugin-commonjs-externals": "^0.1.4"
   },
+  "resolutions": {
+    "react": "^18",
+    "react-dom": "^18",
+    "@types/react": "^18"
+  },
   "build": {
     "appId": "com.framac.ivette",
     "compression": "store",

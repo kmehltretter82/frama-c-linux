@@ -7,14 +7,14 @@
 /* ************************************************************************ */
 
 import React from 'react';
-
 import * as Ivette from 'ivette';
-import * as Dome from 'dome';
 
 import { IconButton } from 'dome/controls/buttons';
 import { Button, ButtonGroup, Inset } from 'dome/frame/toolbars';
 import * as Themes from 'dome/themes';
 import { Pattern } from 'dome/text/markdown';
+import { Dropdown } from 'dome/dialogs';
+
 import doc from '../callgraph.md?raw';
 import { ModeDisplay } from '../definitions';
 import { IThreeStateButton, ThreeStateButton, TThreesButtonState
@@ -25,8 +25,8 @@ import { IThreeStateButton, ThreeStateButton, TThreesButtonState
 /* -------------------------------------------------------------------------- */
 
 interface CallgraphTitleBarProps {
-  /** Context menu to filtering nodes */
-  contextMenuItems: Dome.PopupMenuItem[],
+  /** filtering menu to filtering nodes */
+  contextFctFilter: React.JSX.Element,
   /** automatic graph centering */
   autoCenterState: [boolean, () => void],
   /** automatic selection */
@@ -34,17 +34,17 @@ interface CallgraphTitleBarProps {
 }
 
 export function CallgraphTitleBar(props: CallgraphTitleBarProps): JSX.Element {
-  const { autoCenterState, autoSelectState, contextMenuItems } = props;
+  const { autoCenterState, autoSelectState, contextFctFilter } = props;
   const [ autoCenter, flipAutoCenter ] = autoCenterState;
   const [ autoSelect, flipAutoSelect] = autoSelectState;
 
   return (
     <Ivette.TitleBar help="callgraph">
-      <IconButton
-        icon={'TUNINGS'}
-        title={`Filter functions appearing in the graph`}
-        onClick={() => Dome.popupMenu(contextMenuItems)}
-      />
+      <Dropdown
+        control={<IconButton icon='FILTER'
+            title={`Filter functions appearing in the graph`}
+          />}
+      >{contextFctFilter}</Dropdown>
       <Inset />
       <IconButton
         icon={"TARGET"}

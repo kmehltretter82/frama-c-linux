@@ -318,7 +318,10 @@ function getContextMenu(
   const typeStr = type+".";
   return Object.entries(DEFAULTS)
     .filter(([k, ]) => k.startsWith(typeStr))
-    .map(([k, elt]) => menuItem(elt.label, filters[k.replace(typeStr, "")]));
+    .map(([k, elt]) => menuItem({
+      label: elt.label,
+      state: filters[k.replace(typeStr, "")]
+    }));
 }
 
 export function useStatusFilter(): IFilterState {

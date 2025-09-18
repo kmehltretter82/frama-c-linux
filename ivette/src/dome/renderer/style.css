@@ -304,3 +304,17 @@ input[type="checkbox"]:checked {
 }
 
 /* -------------------------------------------------------------------------- */
+/* --- Popup                                                              --- */
+/* -------------------------------------------------------------------------- */
+
+.dome-xPopup {
+  position: absolute;
+  background-color: var(--background-popup);
+  white-space: nowrap;
+  width: max-content;
+  max-width: none;
+  overflow: visible;
+  z-index: 1000;
+}
+
+/* -------------------------------------------------------------------------- */
