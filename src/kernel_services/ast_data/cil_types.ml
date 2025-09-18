@@ -882,14 +882,13 @@ and offset =
 (** {2 Initializers} *)
 (* ************************************************************************* *)
 
-(** A special kind of expressions are those that can appear as initializers for
-    global variables (initialization of local variables is turned into
-    assignments). The initializers are represented as type
+(** A special kind of expressions are those that can appear as initializers.
+    The initializers are represented as type
     {!type:Cil_types.init}. You can create initializers with {!Cil.makeZeroInit}
     and you can conveniently scan compound initializers them with
     {!Cil.foldLeftCompound}. *)
 
-(** Initializers for global variables. *)
+(** Initializers *)
 and init =
   | SingleInit   of exp   (** A single initializer *)
   | CompoundInit   of typ * (offset * init) list
@@ -904,7 +903,13 @@ and init =
       GCC since MSVC does not understand this. You can scan an initializer list
       with {!Cil.foldLeftCompound}. *)
 
-(** since @Frama-C+dev *)
+(** This special case of global initializer is used for string literals,
+    which are represented in the AST as global const [char] (or [wchar_t])
+    arrays. See {!Ast_info.is_string_literal} and
+    {!Globals.Vars.get_string_literal} to respectively check whether a
+    varinfo corresponds to a string literal and retrieve its value.
+    @since @Frama-C+dev
+*)
 and str_literal =
   | Str of string
   (** a const char array representing a string literal.
@@ -922,10 +927,11 @@ and str_literal =
       two elements: 65 and 43981. That "interpretation" depends on the
       underlying wide character type. *)
 
-(** since @Frama-C+dev *)
+(** Initializers of global variables.
+    @since @Frama-C+dev *)
 and init_or_str =
   | CInit of init (** standard initialisation. *)
-  | StrInit of str_literal
+  | StrInit of str_literal (** string literal. *)
 
 (** We want to be able to update an initializer in a global variable, so we
     define it as a mutable field *)
