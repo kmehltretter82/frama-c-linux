@@ -226,12 +226,13 @@ module type Transfer = sig
       and the locations of lvalues available in the [valuation] record. *)
   val update : (value, location, origin) valuation -> state -> state or_bottom
 
-  (** [assign kinstr lv expr v valuation state] is the transfer function for the
+  (** [assign ~pos lv expr v valuation state] is the transfer function for the
       assignment [lv = expr] for [state]. It must return the state where the
       assignment has been performed.
-      - [kinstr] is the statement of the assignment, or Kglobal for the
-        initialization of a global variable.
-      - when the kinstr is a function call, [expr] is the special variable in
+      - [pos] is the position of the assignment, designating either a global
+        initialization or a function assignment statement with the current
+        callstack.
+      - when the position is a function call, [expr] is the special variable in
         [!Eval.call.return].
       - [v] carries the value being assigned to [lv], i.e. the value of the
         expression [expr]. [v] also denotes the kind of assignment: Assign for
@@ -246,9 +247,9 @@ module type Transfer = sig
     state -> state or_bottom
 
   (** Transfer function for an assumption.
-      [assume stmt expr bool valuation state] returns a state in which the
+      [assume ~pos expr bool valuation state] returns a state in which the
       boolean expression [expr] evaluates to [bool].
-      - [stmt] is the statement of the assumption.
+      - [pos] is the analysis position of the assumption.
       - [valuation] is a cache of all sub-expressions and locations computed
         for the evaluation and the reduction of [expr]; it can also be used
         to reduce the state. *)
@@ -256,10 +257,10 @@ module type Transfer = sig
     pos:Position.t -> exp -> bool ->
     (value, location, origin) valuation -> state -> state or_bottom
 
-  (** [start_call stmt call recursion valuation state] returns an initial state
+  (** [start_call ~pos call recursion valuation state] returns an initial state
       for the analysis of a called function. In particular, this function
       should introduce the formal parameters in the state, if necessary.
-      - [stmt] is the statement of the call site;
+      - [pos] is the analysis position of the call site;
       - [call] represents the call: the called function and the arguments;
       - [recursion] is the information needed to interpret a recursive call.
         It is None if the call is not recursive.
@@ -279,10 +280,10 @@ module type Transfer = sig
     pos:Position.local -> (location, value) call -> recursion option ->
     (value, location, origin) valuation -> state -> state or_bottom
 
-  (** [finalize_call stmt call ~pre ~post] computes the state after a function
-      call, given the state [pre] before the call, and the state [post] at the
-      end of the called function.
-      - [stmt] is the statement of the call site;
+  (** [finalize_call ~pos call recursion ~pre ~post] computes the state after a
+      function call, given the state [pre] before the call, and the state [post]
+      at the end of the called function.
+      - [pos] is the analysis position of the call site;
       - [call] represents the function call and its arguments.
       - [recursion] is the information needed to interpret a recursive call.
         It is None if the call is not recursive.
