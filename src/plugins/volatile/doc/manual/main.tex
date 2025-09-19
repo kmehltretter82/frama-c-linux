@@ -33,7 +33,7 @@ The content of this document corresponds to the version \FCVERSION, released on 
 
 This plug-in adds to \FramaC support for \C qualifier {\tt volatile}.
 It builds a new project where volatile accesses (loads from and stores to volatile data) are simulated by function calls, according to the \acsl\cite{acsl-implem} clauses {\tt volatile}.
-Therefore it is useful to perform analyses on this new project without taking care of the {\tt volatile} qualifiers since the introduced function calls model the effects of these volatile accesses.
+Therefore, it is useful to perform analyses on this new project without taking care of the {\tt volatile} qualifiers since the introduced function calls model the effects of these volatile accesses.
 
 The detection of volatile accesses is purely syntactic.
 The plug-in looks at the l-values of the source code.
@@ -46,10 +46,10 @@ An instrumentation of calls through function pointers is also available.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter{Volatiles}
+\chapter{Volatile}
 
-You may refer to the user manual of \FramaC \cite{userman} for non
-specific options of \FramaC .
+You may refer to the user manual of \FramaC \cite{userman} for non-specific
+options of \FramaC.
 
 After its installation, the plug-in is listed by \verb|frama-c -plugins|
 as \verb|Volatile|.
@@ -58,13 +58,13 @@ The plug-in options are:
 \begin{itemize}{}
 \item \verb|-volatile-help| lists all options specific to the plug-in.
 \item \verb|-volatile| invokes the plug-in.
-\item \verb|-volatile-fct| {\sl\/<f,..>} specifies the list of functions to process (defaults to all functions).
-\item \verb|-volatile-binding| {\sl\/<f,..>} allows binding of the volatile accesses to the specified functions.
-\item \verb|-volatile-binding-auto| allows automatic binding to functions from the type name of the volatile accesses: fonctions \verb|Rd_|{\sl\/<type-name>} and \verb|Wr_|{\sl\/<type-name>} for read and write accesses (the use of the option \verb|-volatile-msg-key="binding"| could help to guess the necessary {\sl <type-name>}).
+\item \verb|-volatile-fct| {\sl\/<f, ...>} specifies the list of functions to process (defaults to all functions).
+\item \verb|-volatile-binding| {\sl\/<f, ...>} allows binding of the volatile accesses to the specified functions.
+\item \verb|-volatile-binding-auto| allows automatic binding to functions from the type name of the volatile accesses: functions \verb|Rd_|{\sl\/<type-name>} and \verb|Wr_|{\sl\/<type-name>} for read and write accesses (the use of the option \verb|-volatile-msg-key="binding"| could help to guess the necessary {\sl <type-name>}).
 \item \verb|-volatile-binding-prefix| {\sl <str>}: adds {\sl <str>} as prefix to function name for automatic binding (defaults to \verb|c2fc2_|).
 \item \verb|-volatile-binding-call-pointer| replaces calls through function pointers by direct calls to functions:
   \\ {\sl <prefix>\verb|Call_|<result-type-name>\verb|_|<param-type-names>}
-\item \verb|-volatile-call-pointer| {\sl <f,...>}:  stub call to pointer functions to the provided functions (indexed by type).
+\item \verb|-volatile-call-pointer| {\sl <f, ...>}:  stub call to pointer functions to the provided functions (indexed by type).
 \end{itemize}
 
 The use of the plug-in could be the following:
@@ -107,12 +107,12 @@ frama-c <importing options> <C files> \
 
 The volatile accesses can be bound to functions from (sorted by decreasing priority order):
 \begin{enumerate}
-\item global \verb|volatile| clauses written into {\sl ACSL} (as into the previous exemple)
+\item global \verb|volatile| clauses written into {\sl ACSL} (as into the previous example)
 \item the option \verb|-volatile-binding|
 \item the option \verb|-volatile-binding-auto|
 \end{enumerate}
 When no binding is found for an lvalue, a dedicated warning message is emitted.
-However, theses warnings can be silent using \verb|-volatile-no-warning-on-volatile-lvalues|.
+However, these warnings can be silent using \verb|-volatile-no-warning-on-volatile-lvalues|.
 
 The prototype of the functions bound using the options must be compatible to the ones specified into global \verb|volatile| clauses of {\sl ACSL}:
 \begin{itemize}
@@ -120,20 +120,23 @@ The prototype of the functions bound using the options must be compatible to the
 \item  {\sl <T> <function-name>\verb|(volatile| <T> \verb|*, <T>)|} for write accesses to lvalues of type {\sl <T>}
 \end{itemize}
 
-For the binding feature related to the option \verb|-volatile-binding|, the option \verb|-volatile-basetype| breaks that rule since it enables a search among the functions specified by \verb|-volatile-binding| from the base type of the volatile access to instrument, and not the real C type.
+For the binding feature related to the \verb|-volatile-binding|, using the
+\verb|-volatile-basetype| breaks that rule since it enables a search among the
+functions specified by \verb|-volatile-binding| from the base type of the volatile
+access to instrument, and not the real C type.
 Mainly, the type attributes and qualifiers are not considered during the search.
 Of course, casts are introduced when necessary into the code instrumentation to get a compilable C code.
 
-When using automatic binding, the option \verb|-volatile-msg-key="binding"| could help to guess the necessary {\sl <function-name>} in giving the infered {\sl <type-name>}.
+When using automatic binding, the option \verb|-volatile-msg-key="binding"| could help to guess the necessary {\sl <function-name>} in giving the inferred {\sl <type-name>}.
 
 \chapter{Function Pointers}
 
-The Volatile plug-in is also capable of instrumentating calls through function pointers.
+The Volatile plug-in is also capable of instrumenting calls through function pointers.
 For instance, the following statement:
 \begin{verbatim}
    r = (*p)(a,b,c);
 \end{verbatim}
-can be instrumented by a static call to some well choosen function \verb+F+:
+can be instrumented by a static call to some well-chosen function \verb+F+:
 \begin{verbatim}
    r = F(p,a,b,c);
 \end{verbatim}
