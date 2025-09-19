@@ -30,13 +30,6 @@ let wkey_integer_cast = register_warn_category "annot:integer-cast"
 
 (** {1 Plug-in options.} *)
 
-let () = Parameter_customize.set_cmdline_stage Cmdline.Extended
-module Version =
-  False(struct
-    let option_name = "-acsl-version"
-    let help = "prints plugin version"
-  end)
-
 module ACSLTypingOnly =
   False(struct
     let option_name = "-acsl-typing-only"
@@ -195,8 +188,6 @@ let find_ulevel_spec loop_category loop_num fct_name =
 let is_importation_on () = (not (ACSLImport.is_empty ()) && ACSLRun.get () )
 
 let set_importation_off () =  ACSLImport.set []
-
-let is_version_on () = Version.get ()
 
 let emitter =
   Emitter.create

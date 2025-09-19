@@ -30,8 +30,6 @@ val wkey_integer_cast: warn_category
 
 (** {1 Options} *)
 
-val is_version_on: unit -> bool
-
 val find_ulevel_spec: string -> int -> string -> bool * int
 val is_importation_on: unit -> bool
 val set_importation_off: unit -> unit
@@ -48,4 +46,3 @@ module ACSLIdir : Parameter_sig.String_list
 module ACSLAddonIntegerCast: Parameter_sig.Bool
 module ACSLRun : Parameter_sig.Bool
 module ACSLImport : Parameter_sig.String_list
-
