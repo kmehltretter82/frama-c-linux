@@ -145,11 +145,11 @@ There are two mechanisms for choosing the appropriate function \verb+F+ associat
 \item Or the option \verb+-volatile-binding-call-pointer+ is set and \verb+F+ has a canonical name, like for volatile read/write functions.
 \end{itemize}
 
-The canonical name is \verb+<prefix>Call_<result-type-name>_<param-type-name>_..._<param-type-name>+, where:
+The canonical name is \verb+<prefix>Call_<result-type>_<param-type>_..._<param-type>+, where:
 \begin{itemize}
 \item \verb+<prefix>+ is set by option \verb+-volatile-binding-prefix <prefix>+
-\item \verb+<result-type-name>+ is the result type name of the call through function pointer
-\item \verb+<param-type-name>+ is the type name of the parameter of the call (using the same order from the left to right)
+\item \verb+<result-type>+ is the result type name of the call through function pointer
+\item \verb+<param-type>+ is the type name of the parameter of the call (using the same order from the left to right)
 \end{itemize}
 
 \appendix
