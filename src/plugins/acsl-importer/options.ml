@@ -30,50 +30,50 @@ let wkey_integer_cast = register_warn_category "annot:integer-cast"
 
 (** {1 Plug-in options.} *)
 
-module ACSLTypingOnly =
+module TypeOnly =
   False(struct
-    let option_name = "-acsl-typing-only"
+    let option_name = "-acsl-type-only"
     let help = "parses and types the ACSL files without imports"
   end)
 
-let continue_after_typing () = not (ACSLTypingOnly.get ())
+let continue_after_typing () = not (TypeOnly.get ())
 
-module ACSLParseOnly =
+module ParseOnly =
   False(struct
     let option_name = "-acsl-parse-only"
     let help = "parses the ACSL files without typing nor imports"
   end)
 
-let continue_after_parsing () = not (ACSLParseOnly.get ())
+let continue_after_parsing () = not (ParseOnly.get ())
 
-module ACSLImport =
+module Import =
   String_list(struct
     let option_name = "-acsl-import"
     let arg_name = "f1,...,fn"
     let help = "ACSL files to import"
   end)
 
-module ACSLKeepUnusedSymbols =
+module KeepUnusedSymbols =
   False(struct
     let option_name = "-acsl-keep-unused-symbols"
     let help = "keeps unused C symbols"
   end)
-let () = ACSLKeepUnusedSymbols.add_update_hook (fun _ v -> Rmtmps.keepUnused := v)
+let () = KeepUnusedSymbols.add_update_hook (fun _ v -> Rmtmps.keepUnused := v)
 
-module ACSLAddonEnsuresAndExits =
+module AddonEnsuresAndExits =
   False(struct
     let option_name = "-acsl-addon-ensures-and-exits"
     let help = "adds ensures_and_exits extension clause"
   end)
 
-module ACSLIdir =
+module Idir =
   String_list(struct
     let option_name = "-acsl-Idir"
     let arg_name = "d1,...,dn"
     let help = "directory for searching ACSL files to include"
   end)
 
-module  ACSLAddonIntegerCast =
+module AddonIntegerCast =
   False
     (struct
       let option_name = "-acsl-addon-integer-cast"
@@ -81,7 +81,7 @@ module  ACSLAddonIntegerCast =
         "allows and explicits casts from integer to C integral types"
     end)
 
-module ACSLRun = (* ? *)
+module Run =
   True
     (struct
       let option_name = "-acsl-run"
@@ -89,14 +89,14 @@ module ACSLRun = (* ? *)
         "runs the plugin otherwise, just configure the parameters"
     end)
 
-module ACSLUnroolLoopCondition =
+module UnroolLoopCondition =
   False
     (struct
       let option_name = "-acsl-unroll-loop-conditions"
       let help =
         "unrolls statements related to loop conditions"
     end)
-let is_unroll_loop_condition_on = ACSLUnroolLoopCondition.get
+let is_unroll_loop_condition_on = UnroolLoopCondition.get
 
 let split_value s =
   let completely = "completely" in
@@ -112,7 +112,7 @@ let split_value s =
   | _ -> failwith "too much directive separator '@'"
   in b, if s = "" then -1 else (try int_of_string s with _ -> failwith ("invalid unrolling number:" ^ s))
 
-module ACSLUnroolLoopFunctionLevel =
+module UnroolLoopFunctionLevel =
   String_map
     (struct
       include Datatype.Pair(Datatype.Bool)(Datatype.Int)
@@ -142,7 +142,7 @@ module ACSLUnroolLoopFunctionLevel =
       let default = Datatype.String.Map.empty
     end)
 
-let is_unroll_loop_pragma_on = ACSLUnroolLoopFunctionLevel.is_empty
+let is_unroll_loop_pragma_on = UnroolLoopFunctionLevel.is_empty
 
 let find_ulevel_spec loop_category loop_num fct_name =
   debug ~level:2 ~dkey "Find -acsl-ulevel-spec for %S loop #%d of function %S." loop_category loop_num fct_name;
@@ -155,7 +155,7 @@ let find_ulevel_spec loop_category loop_num fct_name =
                  let b, n =
                    let key = f () in
                    debug ~level:2 ~dkey  "-> keys=%S." key;
-                   ACSLUnroolLoopFunctionLevel.find key
+                   UnroolLoopFunctionLevel.find key
                  in debug ~level:2 ~dkey  "-> found %b, %d." b n;
                  if b then total := true;
                  if !times < 0 then times := n;
@@ -172,9 +172,9 @@ let find_ulevel_spec loop_category loop_num fct_name =
   in if times < 0 then raise Not_found ;
   spec
 
-let is_importation_on () = (not (ACSLImport.is_empty ()) && ACSLRun.get () )
+let is_importation_on () = (not (Import.is_empty ()) && Run.get () )
 
-let set_importation_off () =  ACSLImport.set []
+let set_importation_off () = Import.set []
 
 let emitter =
   Emitter.create

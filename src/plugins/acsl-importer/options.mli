@@ -40,8 +40,8 @@ val continue_after_typing: unit -> bool
 val is_unroll_loop_pragma_on: unit -> bool
 val is_unroll_loop_condition_on: unit -> bool
 
-module ACSLAddonEnsuresAndExits : Parameter_sig.Bool
-module ACSLIdir : Parameter_sig.String_list
-module ACSLAddonIntegerCast: Parameter_sig.Bool
-module ACSLRun : Parameter_sig.Bool
-module ACSLImport : Parameter_sig.String_list
+module AddonEnsuresAndExits : Parameter_sig.Bool
+module Idir : Parameter_sig.String_list
+module AddonIntegerCast: Parameter_sig.Bool
+module Run : Parameter_sig.Bool
+module Import : Parameter_sig.String_list

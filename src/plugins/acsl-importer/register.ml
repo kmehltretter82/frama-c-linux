@@ -128,8 +128,8 @@ let import iDir files ast =
 
 let import files1 files2 ast =
   import
-    (Options.ACSLIdir.get ())
-    (files1 @ (Options.ACSLImport.get ()) @ files2)
+    (Options.Idir.get ())
+    (files1 @ (Options.Import.get ()) @ files2)
     ast;
   Options.set_importation_off ()
 
@@ -177,6 +177,6 @@ let () =
       main
   in
   File.add_code_transformation_after_cleanup
-    ~deps:[(module Options.ACSLImport:Parameter_sig.S);
-           (module Options.ACSLRun:Parameter_sig.S)]
+    ~deps:[(module Options.Import:Parameter_sig.S);
+           (module Options.Run:Parameter_sig.S)]
     ~before:[Unfold_loops.transform] Options.main_import main

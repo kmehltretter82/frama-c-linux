@@ -376,8 +376,8 @@ let transform_cil file =
 
 let () =
   File.add_code_transformation_after_cleanup
-    ~deps:[(module Options.ACSLImport:Parameter_sig.S);
-           (module Options.ACSLRun: Parameter_sig.S)]
+    ~deps:[(module Options.Import:Parameter_sig.S);
+           (module Options.Run: Parameter_sig.S)]
     ~before:[Unfold_loops.transform; Options.main_import]
     Options.aux_import transform_cil
 

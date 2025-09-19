@@ -1096,7 +1096,7 @@ let add_macro ~is_global_scope m =
   MacroIndex.add_macro (if is_global_scope then MacroIndex.Sfile else !current_scope) m
 
 let integral_cast ty t =
-  if Options.ACSLAddonIntegerCast.get () then
+  if Options.AddonIntegerCast.get () then
     begin
       let loc = t.term_loc in
       let source = fst loc in
@@ -1568,7 +1568,7 @@ let clause_extension = "ensures_and_exits"
 (* Register the grammar extension for "ensures_and_exits" clauses. *)
 let () =
   let clause_typer typing_context loc ps =
-    if Options.ACSLAddonEnsuresAndExits.get () then
+    if Options.AddonEnsuresAndExits.get () then
       ensures_and_exits_typer ~typing_context ~loc ps
     else typing_context.Logic_typing.error loc
         "[Setting error] Rejected clause extension: %s." clause_extension
@@ -1661,7 +1661,7 @@ let () =
     Visitor.visitFramacFileSameGlobals vis ast
   in
   let deps = (* extension only active when this option is given. *)
-    [(module Options.ACSLAddonEnsuresAndExits: Parameter_sig.S)]
+    [(module Options.AddonEnsuresAndExits: Parameter_sig.S)]
   in
   let after = [Options.main_import] in
   File.add_code_transformation_after_cleanup
