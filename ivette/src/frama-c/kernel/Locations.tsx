@@ -1,8 +1,22 @@
 /* ************************************************************************ */
 /*                                                                          */
-/*   SPDX-License-Identifier LGPL-2.1                                       */
-/*   Copyright (C)                                                          */
-/*   CEA (Commissariat à l'énergie atomique et aux énergies alternatives)   */
+/*   This file is part of Frama-C.                                          */
+/*                                                                          */
+/*   Copyright (C) 2007-2025                                                */
+/*     CEA (Commissariat à l'énergie atomique et aux énergies               */
+/*          alternatives)                                                   */
+/*                                                                          */
+/*   you can redistribute it and/or modify it under the terms of the GNU    */
+/*   Lesser General Public License as published by the Free Software        */
+/*   Foundation, version 2.1.                                               */
+/*                                                                          */
+/*   It is distributed in the hope that it will be useful,                  */
+/*   but WITHOUT ANY WARRANTY; without even the implied warranty of         */
+/*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the          */
+/*   GNU Lesser General Public License for more details.                    */
+/*                                                                          */
+/*   See the GNU Lesser General Public License version 2.1                  */
+/*   for more details (enclosed in the file licenses/LGPLv2.1).             */
 /*                                                                          */
 /* ************************************************************************ */
 
@@ -17,8 +31,11 @@ import * as States from 'frama-c/states';
 import { CompactModel } from 'dome/table/arrays';
 import { Table, Column, Renderer } from 'dome/table/views';
 import { Label, Cell } from 'dome/controls/labels';
-import { IconButton } from 'dome/controls/buttons';
-import { Space } from 'dome/frame/toolbars';
+import {
+  IconButton, Multiselect, MultiselectItem
+} from 'dome/controls/buttons';
+import { Button, Space } from 'dome/frame/toolbars';
+import { Dropdown } from 'dome/dialogs';
 import { TitleBar } from 'ivette';
 import * as Display from 'ivette/display';
 import * as Ast from 'frama-c/kernel/api/ast';
@@ -45,21 +62,16 @@ const MultiSelection = new GlobalState<MultiSelection>(emptySelection);
 
 export function useSelection(): MultiSelection {
   const [s] = useGlobalState(MultiSelection);
-  const [scopes, setScopes] = React.useState(s.scopes);
-  const getAttr = States.useSyncArrayGetter(Ast.markerAttributes);
+  return s;
+}
 
-  React.useEffect(() => {
-    if(!s.scopes) {
-      const newScopes = new Set<Ast.decl>();
-      s.markers.forEach(marker => {
-        const scope = getAttr(marker)?.scope;
-        if(scope) newScopes.add(scope);
-      });
-      setScopes([...newScopes]);
-    }
-  }, [s, setScopes, getAttr]);
-
-  return { ...s, scopes };
+function getScopesFromMarkers(markers: Ast.marker[]): Ast.decl[] {
+  const newScopes = new Set<Ast.decl>();
+  markers.forEach(marker => {
+    const scope = States.getSyncArrayElt(Ast.markerAttributes, marker)?.scope;
+    if(scope) newScopes.add(scope);
+  });
+  return [...newScopes];
 }
 
 function updateSelection(s: MultiSelection): void {
@@ -69,6 +81,7 @@ function updateSelection(s: MultiSelection): void {
 }
 
 export function setSelection(s: MultiSelection): void {
+  if(!s.scopes) s.scopes = getScopesFromMarkers(s.markers);
   updateSelection(s);
   if (s.plugin && s.markers.length > 0) {
     const label = `${s.plugin}: ${s.markers.length} locations selected`;
@@ -190,7 +203,8 @@ export default function LocationsTable(): JSX.Element {
   const model = React.useMemo(() => new Model(), []);
   const getDecl = States.useSyncArrayGetter(Ast.declAttributes);
   const getAttr = States.useSyncArrayGetter(Ast.markerAttributes);
-  const { label, title, markers, index } = useSelection();
+  const { label, title, markers, index, scopes } = useSelection();
+  const prevscopesRef = React.useRef< Ast.decl[] | undefined>(undefined);
   React.useEffect(() => {
     model.replaceAllDataWith(
       markers.map((marker, index): Data => {
@@ -206,12 +220,41 @@ export default function LocationsTable(): JSX.Element {
   const indexLabel = index === undefined ? '…' : index + 1;
   const positionLabel = `${indexLabel} / ${size}`;
 
-  // Filter on the scope of the selected element in the Locations table
-  const [targetedScope, setTargetedScope] = React.useState<Ast.decl>();
+  /** filter */
+  const [visibleScopes, setVisibleScopes] = React.useState<Set<string>>(
+    new Set(scopes));
+
   React.useEffect(() => {
-    if(!targetedScope) model.setFilter(undefined);
-    else model.setFilter(({ decl }, ) => decl.decl === targetedScope);
-  }, [model, targetedScope]);
+    const isScopesChanged = !prevscopesRef?.current
+      || prevscopesRef.current.length !== scopes?.length
+      || !prevscopesRef.current?.every(e => scopes && scopes.includes(e));
+    if(isScopesChanged) {
+      setVisibleScopes(new Set(scopes));
+      prevscopesRef.current = scopes;
+    }
+  }, [scopes]);
+
+  const setVisible = React.useCallback((a: string) => {
+    if(visibleScopes.has(a)) visibleScopes.delete(a);
+    else visibleScopes.add(a);
+    setVisibleScopes(new Set(visibleScopes));
+  }, [visibleScopes, setVisibleScopes]);
+
+  React.useEffect(() => {
+    model.setFilter(({ decl }, ) => visibleScopes.has(decl.decl));
+  }, [model, visibleScopes]);
+
+  const itemsComp = scopes && scopes.map((e, i) =>
+    <MultiselectItem key={i} item={{
+       label: getDecl(e)?.name || e,
+       id: e,
+       enabled: true,
+       checked: visibleScopes.has(e),
+       onClick: () => setVisible(e)
+      }}
+    />
+  );
+  const filter = <Multiselect>{ itemsComp && itemsComp }</Multiselect>;
 
   // Component
   return (
@@ -236,14 +279,9 @@ export default function LocationsTable(): JSX.Element {
           label={positionLabel}
           title='Current location index / Number of locations' />
         <Space />
-        <IconButton
-          icon='FILTER'
-          selected={targetedScope !== undefined}
-          title='Filtered on the scope of the
-            selected element in the Locations table'
-          onClick={() =>
-            setTargetedScope(v => v ? undefined : getAttr(selected)?.scope)}
-        />
+        { scopes && scopes.length > 1 &&
+          <Dropdown control={ <Button icon='FILTER' /> }>{filter}</Dropdown>
+        }
         <IconButton
           icon='TRASH'
           title='Cancel selected locations'
