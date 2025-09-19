@@ -60,12 +60,6 @@ module ACSLKeepUnusedSymbols =
   end)
 let () = ACSLKeepUnusedSymbols.add_update_hook (fun _ v -> Rmtmps.keepUnused := v)
 
-module ACSLAddonCalls =
-  False(struct
-    let option_name = "-acsl-addon-calls"
-    let help = "adds calls extension clause"
-  end)
-
 module ACSLAddonEnsuresAndExits =
   False(struct
     let option_name = "-acsl-addon-ensures-and-exits"
@@ -87,7 +81,7 @@ module  ACSLAddonIntegerCast =
         "allows and explicits casts from integer to C integral types"
     end)
 
-module ACSLRun =
+module ACSLRun = (* ? *)
   True
     (struct
       let option_name = "-acsl-run"
@@ -145,13 +139,6 @@ module ACSLUnroolLoopFunctionLevel =
                   The priority ordering used for choosing the (\"tag\", unrolling value <n>) pair is: m@f:tag@n > c@f:tag@n > f:tag@n > c:tag@n > :tag@n.\n \
                   The default value for optional tags is the empty string which leads to add a loop pragmas without tags.\n \
                   Nothing is done for loops having already a clause 'loop unfold ...'."
-(*
-      let redefine_binding _k ~old:(b1,n1) (b, n) =
-        if (b1 && b) || (n1 >= 0 && n >= 0) then
-          warning "already defined" ;
-        (b1 || b), (if n1 < n then n else n1)
-      let no_binding _ = raise Not_found
-*)
       let default = Datatype.String.Map.empty
     end)
 
