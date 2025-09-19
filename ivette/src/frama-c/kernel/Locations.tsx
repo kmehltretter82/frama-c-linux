@@ -1,22 +1,8 @@
 /* ************************************************************************ */
 /*                                                                          */
-/*   This file is part of Frama-C.                                          */
-/*                                                                          */
-/*   Copyright (C) 2007-2025                                                */
-/*     CEA (Commissariat à l'énergie atomique et aux énergies               */
-/*          alternatives)                                                   */
-/*                                                                          */
-/*   you can redistribute it and/or modify it under the terms of the GNU    */
-/*   Lesser General Public License as published by the Free Software        */
-/*   Foundation, version 2.1.                                               */
-/*                                                                          */
-/*   It is distributed in the hope that it will be useful,                  */
-/*   but WITHOUT ANY WARRANTY; without even the implied warranty of         */
-/*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the          */
-/*   GNU Lesser General Public License for more details.                    */
-/*                                                                          */
-/*   See the GNU Lesser General Public License version 2.1                  */
-/*   for more details (enclosed in the file licenses/LGPLv2.1).             */
+/*   SPDX-License-Identifier LGPL-2.1                                       */
+/*   Copyright (C)                                                          */
+/*   CEA (Commissariat à l'énergie atomique et aux énergies alternatives)   */
 /*                                                                          */
 /* ************************************************************************ */
 
@@ -34,7 +20,7 @@ import { Label, Cell } from 'dome/controls/labels';
 import {
   IconButton, Multiselect, MultiselectItem
 } from 'dome/controls/buttons';
-import { Button, Space } from 'dome/frame/toolbars';
+import { Space } from 'dome/frame/toolbars';
 import { Dropdown } from 'dome/dialogs';
 import { TitleBar } from 'ivette';
 import * as Display from 'ivette/display';
@@ -62,16 +48,19 @@ const MultiSelection = new GlobalState<MultiSelection>(emptySelection);
 
 export function useSelection(): MultiSelection {
   const [s] = useGlobalState(MultiSelection);
-  return s;
-}
+  const [scopes, setScopes] = React.useState<Ast.decl[]>([]);
+  const getAttr = States.useSyncArrayGetter(Ast.markerAttributes);
 
-function getScopesFromMarkers(markers: Ast.marker[]): Ast.decl[] {
-  const newScopes = new Set<Ast.decl>();
-  markers.forEach(marker => {
-    const scope = States.getSyncArrayElt(Ast.markerAttributes, marker)?.scope;
-    if(scope) newScopes.add(scope);
-  });
-  return [...newScopes];
+  React.useEffect(() => {
+    const newScopes = new Set<Ast.decl>();
+    s.markers.forEach(marker => {
+      const scope = getAttr(marker)?.scope;
+      if(scope) newScopes.add(scope);
+    });
+    setScopes([...newScopes]);
+  }, [s, setScopes, getAttr]);
+
+  return { ...s, scopes };
 }
 
 function updateSelection(s: MultiSelection): void {
@@ -81,7 +70,6 @@ function updateSelection(s: MultiSelection): void {
 }
 
 export function setSelection(s: MultiSelection): void {
-  if(!s.scopes) s.scopes = getScopesFromMarkers(s.markers);
   updateSelection(s);
   if (s.plugin && s.markers.length > 0) {
     const label = `${s.plugin}: ${s.markers.length} locations selected`;
@@ -254,7 +242,25 @@ export default function LocationsTable(): JSX.Element {
       }}
     />
   );
-  const filter = <Multiselect>{ itemsComp && itemsComp }</Multiselect>;
+
+  const filter = <Multiselect>
+    <MultiselectItem key={'all'} item={{
+       label: visibleScopes.size === scopes?.length ?
+         'Uncheck all' : 'Check all',
+       enabled: true,
+       checked: visibleScopes.size === scopes?.length,
+       onClick: () => {
+          if(visibleScopes.size !== scopes?.length)
+            setVisibleScopes(new Set(scopes));
+          else setVisibleScopes(new Set([]));
+        }
+      }}
+    />
+    <MultiselectItem key={'separator'} item='separator' />
+    { itemsComp && itemsComp }
+    </Multiselect>;
+  const filterKind = visibleScopes.size === scopes?.length ? 'positive' :
+    visibleScopes.size === 0 ? 'negative' : 'warning';
 
   // Component
   return (
@@ -280,7 +286,8 @@ export default function LocationsTable(): JSX.Element {
           title='Current location index / Number of locations' />
         <Space />
         { scopes && scopes.length > 1 &&
-          <Dropdown control={ <Button icon='FILTER' /> }>{filter}</Dropdown>
+          <Dropdown control={ <IconButton icon='FILTER' kind={filterKind} /> }
+          >{filter}</Dropdown>
         }
         <IconButton
           icon='TRASH'
