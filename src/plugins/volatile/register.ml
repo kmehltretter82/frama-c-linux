@@ -566,11 +566,8 @@ let typename_access ~is_wr_access (t:typ) =
   r
 
 let find_typename ~is_wr_access kf_tbl typ =
-  let kf_tbl =
-    match !kf_tbl with
-    | None -> BA_TBL.build_kf_table kf_tbl
-    | Some (kf_tbl) -> kf_tbl
-  in
+  let open Option.Operators in
+  let kf_tbl = Option.value ~default:(BA_TBL.build_kf_table kf_tbl) !kf_tbl in
   let rec find_fct typ =
     let typ = Ast_types.remove_attributes_for_c_cast typ in
     let tbl = BA_TBL.get_tbl_access ~is_wr_access kf_tbl in
@@ -586,19 +583,17 @@ let find_typename ~is_wr_access kf_tbl typ =
   Options.debug ~level:2 ~dkey:dkey_binding
     "Looking for a default binding from the type name: %a@."
     Typ.pretty typ;
-  match find_fct typ with
-  | None -> None
-  | Some fct ->
-    (* Verifying the protyping within the type of the volatile access. *)
-    let ty = fct.vtype in
-    let ret, _args, _is_varg_arg, _attrib = Cil.splitFunctionType ty in
-    let volatile_ret_type = add_volatile_attr ret in
-    Options.debug ~level:2 ~dkey:dkey_binding
-      "Verifying the type of the lvalue within the prototype of function %s: %a@."
-      fct.vorig_name Typ.pretty ty;
-    if not (Typ.equal typ volatile_ret_type) then
-      None
-    else Some fct
+  (* Verifying the protyping within the type of the volatile access. *)
+  let* fct = find_fct typ in
+  let ty = fct.vtype in
+  let ret, _args, _is_varg_arg, _attrib = Cil.splitFunctionType ty in
+  let volatile_ret_type = add_volatile_attr ret in
+  Options.debug ~level:2 ~dkey:dkey_binding
+    "Verifying the type of the lvalue within the prototype of function %s: %a@."
+    fct.vorig_name Typ.pretty ty;
+  if not (Typ.equal typ volatile_ret_type) then
+    None
+  else Some fct
 
 (*-------------------------------------------------------------------------*)
 
