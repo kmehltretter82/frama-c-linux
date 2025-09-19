@@ -62,6 +62,12 @@ val to_string :
   ?truncate:int -> ?ellipsis:string ->
   message -> string
 
+(** [need_truncation ?truncate text] returns whether
+    [to_string ?truncate text] or [pretty ?truncate fmt text] will truncate
+    the text. *)
+val need_truncation : ?truncate:int -> message -> bool
+
+
 (* -------------------------------------------------------------------------- *)
 (** Message Buffer  *)
 (* -------------------------------------------------------------------------- *)

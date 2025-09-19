@@ -247,6 +247,8 @@ struct
     | Failure -> Format.pp_print_string fmt "Failure: "
 
   let pp_message ?truncate fmt buffer =
+    if Rich_text.need_truncation ?truncate buffer then
+      Format.pp_print_string fmt "(truncated message) ";
     Rich_text.pretty ?truncate fmt buffer
 
   let pretty ?truncate fmt evt =

@@ -41,6 +41,12 @@ let rec lookup acc k = function
 
 let tags_at message k = lookup [] k message.tags
 
+let need_truncation ?truncate text =
+  let length = String.length text.plain in
+  match truncate with
+  | None -> false
+  | Some size -> size < length
+
 let pretty ?truncate ?(ellipsis="[...]") fmt message =
   (* Compute buffer length *)
   let length = String.length message.plain in
