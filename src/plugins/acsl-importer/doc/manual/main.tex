@@ -63,24 +63,24 @@ specific options of \FramaC.
 After its installation, the plug-in is listed by \verb|frama-c -plugins|
 as \verb|ACSL importer|.
 
-All options of the plug-in are prefixed by \verb|-acsl-|.
+All options of the plug-in are prefixed by \verb|-acsl-import|.
 
 The main options are:
 \begin{itemize}{}
-\item \verb|-acsl-importer-help| lists all options specific to the plug-in
+\item \verb|-acsl-import-help| lists all options specific to the plug-in
 \item \verb|-acsl-import <filename list>| analyzes the content of
   files listed in its arguments and inserts the correctly typed
   specifications in the abstract syntax tree of \FramaC for further processing.
   The file name list is a comma separated list of file names.
   It can be repeated many times and its effect is cumulative.
-\item \verb|-acsl-Idir <dirname list>| specifies the list of directories
+\item \verb|-acsl-import-Idir <dirname list>| specifies the list of directories
   where the relative file names mentioned in \verb|include| directives are
   searched.
-\item \verb|-acsl-keep-unsed-symbols| configures \FramaC kernel such that
+\item \verb|-acsl-import-keep-unsed-symbols| configures \FramaC kernel such that
   unused C symbols aren't removed before the import.
-\item \verb|-acsl-no-run| doesn't run the plug-in, just configure its parameters.
-\item \verb|-acsl-parse-only| parses the ACSL files without typing nor imports.
-\item \verb|-acsl-typing-only| parses and types the ACSL files without imports.
+\item \verb|-acsl-import-no-run| doesn't run the plug-in, just configure its parameters.
+\item \verb|-acsl-import-parse-only| parses the ACSL files without typing nor imports.
+\item \verb|-acsl-import-typing-only| parses and types the ACSL files without imports.
 \end{itemize}
 
 For example if you want to check your specification written in the file
@@ -161,7 +161,7 @@ The importation semantics is given by the following rules:
     If \verb|f.acsl| is a relative filename the plug-in will look for
     first inside the directory containing file containing the
     \verb|include| directive and then in first directory of the list
-    of directories given to the option \verb|-acsl-I| that contains
+    of directories given to the option \verb|-acsl-import-Idir| that contains
     \verb|f.acsl|.
   \item \verb|let m = <T>;| defines a macro named \verb|m|. All
     occurrences of the macro \verb|m| in current scope
@@ -347,9 +347,9 @@ Selection of such a menu opens a popup window allowing to type directly the corr
 \section*{Addons for \acsl}
 \markright{}
 \addcontentsline{toc}{section}{Addons for \acsl}
-The option \verb|-acsl-addon-ensures-and-exits| adds a new clause \verb|ensures_and_exits| to \acsl grammar. This keyword is syntactic sugar for writing two clauses (one \verb|ensures| and one \verb|exits|) in one.
+The option \verb|-acsl-import-addon-ensures-and-exits| adds a new clause \verb|ensures_and_exits| to \acsl grammar. This keyword is syntactic sugar for writing two clauses (one \verb|ensures| and one \verb|exits|) in one.
 
-The option \verb|-acsl-addon-integer-cast| allows the introduction of casts from integer to C integral types. Warnings of the category \verb|annot:integer-cast| are emitted when introducing such casts.
+The option \verb|-acsl-import-addon-integer-cast| allows the introduction of casts from integer to C integral types. Warnings of the category \verb|annot:integer-cast| are emitted when introducing such casts.
 
 
 \section*{Addons for code transformations}
@@ -365,7 +365,7 @@ The import of ACSL specification files can be viewed as a second class transform
 But, some imports need a code transformation of the first class for beeing performed (i.e. for identifying the statement body of the i$^{th}$ loop).
 All syntaxic code transformations of \FramaC kernel (including the deletion of unused C symbols) are processed before the import of ACSL specification files.
 
-The option \verb|-acsl-unroll-loop-conditions| transforms \verb|while| loops and and \verb|for| loops into \verb|do-while| loops when the initial loops have no loop annotation.
+The option \verb|-acsl-import-unroll-loop-conditions| transforms \verb|while| loops and and \verb|for| loops into \verb|do-while| loops when the initial loops have no loop annotation.
 
 The \verb|while| loop
 \begin{shell}
@@ -401,13 +401,13 @@ For \verb|do-while| loops, \verb|invariant| clauses set on their loop body are e
 So, the importer is able to transform \verb|invariant| clauses set on every body of loops of every kind into \verb|loop invariant| clauses of \verb|do-while| loops.
 
 This transformation is a first class transformation processed before the loop unrolling related to the option \verb|-kernel-ulevel| \verb|<n>|.
-Since the code transformation processed by the option \verb|-kernel-ulevel| \verb|<n>| is also a first class transformation, the use of the options \verb|-kernel-ulevel| \verb|-1| {\tt <acsl-import-options>} \verb|-then| \verb|-acsl-run| \verb|-acsl-ulevel <n>| is required to perform loop unrolling after the import of ACSL specification files.
+Since the code transformation processed by the option \verb|-kernel-ulevel| \verb|<n>| is also a first class transformation, the use of the options \verb|-kernel-ulevel| \verb|-1| {\tt <acsl-import-options>} \verb|-then| \verb|-acsl-import-run| \verb|-acsl-ulevel <n>| is required to perform loop unrolling after the import of ACSL specification files.
 
-The option \verb|-acsl-ulevel <n>| unrolls loops as \verb|-kernel-ulevel <n>| does at the parsing stage, except that is now a second class transformation.
-This means that a code annotation imported to a statement of the body of an unrolled loops can be duplicated using option \verb|-acsl-ulevel <n>| as if it was inside the C file and using the option \verb|-kernel-ulevel <n>| instead.
-These \verb|UNROLL| loop pragmas could be in the source code, imported from ACSL specification files or generated by the {\tt\/-acsl-ulevel-spec} option.
+The option \verb|-acsl-import-ulevel <n>| unrolls loops as \verb|-kernel-ulevel <n>| does at the parsing stage, except that is now a second class transformation.
+This means that a code annotation imported to a statement of the body of an unrolled loops can be duplicated using option \verb|-acsl-import-ulevel <n>| as if it was inside the C file and using the option \verb|-kernel-ulevel <n>| instead.
+These \verb|UNROLL| loop pragmas could be in the source code, imported from ACSL specification files or generated by the {\tt\/-acsl-import-ulevel-spec} option.
 
-The option {\tt\/-acsl-ulevel-spec <spec$_{1}$,...,spec$_{s}$>} adds \verb|UNROLL| loop pragmas that can be used by both  \verb|-acsl-ulevel| and \verb|-kernel-ulevel| transformations.
+The option {\tt\/-acsl-import-ulevel-spec <spec$_{1}$,...,spec$_{s}$>} adds \verb|UNROLL| loop pragmas that can be used by both  \verb|-acsl-import-ulevel| and \verb|-kernel-ulevel| transformations.
 An unrolling specification \verb|<m@f:tag@n>| adds an annotation '{\tt\/loop unfold "tag", <n>;}' to the {\tt m$_{th}$} loop of the function \verb|<f>|.
 An unrolling specification \verb|<c@f:tag@n>| adds an annotation '{\tt\/loop unfold "tag", <n>;}' to all loops of category \verb|<c>| of the function \verb|<f>|, where allowed loop categories are: \verb|while|, \verb|for| and \verb|do-while|.\\
 A specification is considered as a set of elementary specifications: {\tt\/spec$_{1}$}, ..., {\tt\/spec$_{s}$}.\\
@@ -419,7 +419,7 @@ Nothing is done for loops having already a clause '{\tt\/loop unfold} ...'.\\
 
 The command line
 \begin{shell}
-# frama-c -acsl-unroll-loop-conditions -ulevel-spec "fct:completely@2" file.c
+# frama-c -acsl-import-unroll-loop-conditions -ulevel-spec "fct:completely@2" file.c
 \end{shell}
  will transforms the function
 \begin{shell}
