@@ -504,7 +504,10 @@ async function _launch(): Promise<void> {
       }
     }
   }
-  params = client.commandLine(sockdomain, sockaddr, params);
+
+  const prelude = window.electron.process.env.FRAMAC_SERVER_PRELUDE ?
+    window.electron.process.env.FRAMAC_SERVER_PRELUDE.split(" ") : [];
+  params = client.commandLine(sockdomain, sockaddr, params, prelude);
 
   buffer.clear();
   buffer.append('$', command);

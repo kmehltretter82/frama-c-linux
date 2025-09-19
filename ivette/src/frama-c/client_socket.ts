@@ -36,8 +36,10 @@ class SocketClient extends Client {
   buffer: Buffer = Buffer.from('');
 
   /** Server CLI */
-  commandLine(domain: SocketDomain, sockaddr: string, params: string[]):
+  commandLine(domain: SocketDomain, sockaddr: string, params: string[],
+              prelude: string[]):
   string[] {
+    let args;
     switch (domain) {
       case 'internet': {
         let addr, port;
@@ -47,13 +49,20 @@ class SocketClient extends Client {
           addr = sockaddr;
           port = defaultInetPort.toString();
         }
-        const args = ['-server-socket-domain', domain,
-                      '-server-socket', addr, '-server-socket-port', port];
-        return args.concat(params);
+        args = ['-server-socket-domain', domain,
+                '-server-socket', addr, '-server-socket-port', port];
       }
+        break;
       case 'unix':
-        return ['-server-socket', sockaddr].concat(params);
+        args = ['-server-socket', sockaddr];
+        break;
+      default:
+        throw new Error("expected 'unix' or 'internet', got: " + domain);
     }
+    args.push(...prelude);
+    args = (params?.length) ?
+      args.concat("-then", params) : args.concat(params);
+    return args;
   }
 
   createSocketConnection(sockaddr: string | [string, number],

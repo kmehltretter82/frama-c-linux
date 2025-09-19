@@ -16,7 +16,8 @@ import { json } from 'dome/data/json';
 export abstract class Client {
 
   /** Server CLI */
-  abstract commandLine(domain: string, sockaddr: string, params: string[]):
+  abstract commandLine(domain: string, sockaddr: string, params: string[],
+                       prelude: string[]):
   string[];
 
   /** Connection */
