@@ -1,6 +1,6 @@
 [kernel] Parsing demo.c (with preprocessing)
-[acsl-importer] Success for demo-error.acsl
-[acsl-importer] Done: 1 file.
+[acsl-import] Success for demo-error.acsl
+[acsl-import] Done: 1 file.
 [eva] Analyzing a complete application starting at main
 [eva:initial-state] Values of globals at initialization
   T[0..99] ∈ {0}

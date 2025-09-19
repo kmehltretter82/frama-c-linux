@@ -1,6 +1,6 @@
 /* run.config
 MODULE: @PTEST_NAME@
-STDOPT: -acsl-import %{dep:./@PTEST_NAME@.acsl} -copy -kernel-warn-key annot-error=active -then -print -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then -no-acsl-run -no-print ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i
+STDOPT: -acsl-import %{dep:./@PTEST_NAME@.acsl} -copy -kernel-warn-key annot-error=active -then -print -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then -acsl-import-no-run -no-print ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i
 */
 
 /*@ \test::foo x == 0;

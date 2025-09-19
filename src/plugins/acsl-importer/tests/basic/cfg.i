@@ -1,5 +1,5 @@
 /* run.config
-STDOPT: -acsl-import %{dep:./cfg.acsl} -print -acsl-importer-debug 2 -acsl-importer-msg-key "*"
+STDOPT: -acsl-import %{dep:./cfg.acsl} -print -acsl-import-debug 2 -acsl-import-msg-key "*"
  */
 void case_label (unsigned i) {
   i++;
@@ -35,4 +35,3 @@ void label_start_end (unsigned i) {
      //@ ensures i == \old(i) - 1 ;
  L3: i--;
 }
-

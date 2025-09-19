@@ -1,5 +1,5 @@
 /* run.config
-STDOPT: -no-unicode  -acsl-addon-integer-cast -acsl-import %{dep:./@PTEST_NAME@.acsl} -print -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then -no-print ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i
+STDOPT: -no-unicode  -acsl-import-addon-integer-cast -acsl-import %{dep:./@PTEST_NAME@.acsl} -print -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then -no-print ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i
  */
 
 typedef struct S {

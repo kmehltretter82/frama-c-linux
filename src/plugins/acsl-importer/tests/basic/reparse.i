@@ -1,5 +1,5 @@
 /* run.config
-STDOPT: -acsl-addon-ensures-and-exits -then -print -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then -no-print ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i
+STDOPT: -acsl-import-addon-ensures-and-exits -then -print -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then -no-print ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i
  */
 
 

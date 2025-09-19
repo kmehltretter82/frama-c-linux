@@ -11,11 +11,9 @@
 include Plugin.Register
     (struct
       let name = "ACSL importer"
-      let shortname = "acsl-importer"
+      let shortname = "acsl-import"
       let help = "external ASCL files importer"
     end)
-
-
 let dkey = register_category "trace-options"
 
 (** {1 Messages and warning categories} *)
@@ -32,7 +30,7 @@ let wkey_integer_cast = register_warn_category "annot:integer-cast"
 
 module TypeOnly =
   False(struct
-    let option_name = "-acsl-type-only"
+    let option_name = "-acsl-import-type-only"
     let help = "parses and types the ACSL files without imports"
   end)
 
@@ -40,7 +38,7 @@ let continue_after_typing () = not (TypeOnly.get ())
 
 module ParseOnly =
   False(struct
-    let option_name = "-acsl-parse-only"
+    let option_name = "-acsl-import-parse-only"
     let help = "parses the ACSL files without typing nor imports"
   end)
 
@@ -55,20 +53,20 @@ module Import =
 
 module KeepUnusedSymbols =
   False(struct
-    let option_name = "-acsl-keep-unused-symbols"
+    let option_name = "-acsl-import-keep-unused-symbols"
     let help = "keeps unused C symbols"
   end)
 let () = KeepUnusedSymbols.add_update_hook (fun _ v -> Rmtmps.keepUnused := v)
 
 module AddonEnsuresAndExits =
   False(struct
-    let option_name = "-acsl-addon-ensures-and-exits"
+    let option_name = "-acsl-import-addon-ensures-and-exits"
     let help = "adds ensures_and_exits extension clause"
   end)
 
 module Idir =
   String_list(struct
-    let option_name = "-acsl-Idir"
+    let option_name = "-acsl-import-Idir"
     let arg_name = "d1,...,dn"
     let help = "directory for searching ACSL files to include"
   end)
@@ -76,7 +74,7 @@ module Idir =
 module AddonIntegerCast =
   False
     (struct
-      let option_name = "-acsl-addon-integer-cast"
+      let option_name = "-acsl-import-addon-integer-cast"
       let help =
         "allows and explicits casts from integer to C integral types"
     end)
@@ -84,7 +82,7 @@ module AddonIntegerCast =
 module Run =
   True
     (struct
-      let option_name = "-acsl-run"
+      let option_name = "-acsl-import-run"
       let help =
         "runs the plugin otherwise, just configure the parameters"
     end)
@@ -92,7 +90,7 @@ module Run =
 module UnroolLoopCondition =
   False
     (struct
-      let option_name = "-acsl-unroll-loop-conditions"
+      let option_name = "-acsl-import-unroll-loop-conditions"
       let help =
         "unrolls statements related to loop conditions"
     end)
@@ -118,7 +116,7 @@ module UnroolLoopFunctionLevel =
       include Datatype.Pair(Datatype.Bool)(Datatype.Int)
       let of_string s =
         try
-          debug ~level:2 ~dkey "Parsing value for \"-acsl-ulevel-spec=%s\"" s;
+          debug ~level:2 ~dkey "Parsing value for \"-acsl-import-ulevel-spec=%s\"" s;
           let (b, n) as v  = split_value s
           in debug ~level:2 ~dkey  "-> unencoded value: %b, %d." b n;
           v
@@ -130,7 +128,7 @@ module UnroolLoopFunctionLevel =
     end
     )
     (struct
-      let option_name = "-acsl-ulevel-spec"
+      let option_name = "-acsl-import-ulevel-spec"
       let arg_name = "spec1,...,specs"
       let help = "an unrolling specification <m@f:tag@n> adds a 'loop unfold \"tag\", <n>;' to the loop of the function <f> of occurence <m>.\n \
                   An unrolling specification <c@f:tag@n> adds a 'loop unfold \"tag\", <n>;' to all loops of category <c> of the function <f> where allowed loop categories are: 'while', 'for' and 'do-while'.\n \
@@ -145,7 +143,7 @@ module UnroolLoopFunctionLevel =
 let is_unroll_loop_pragma_on = UnroolLoopFunctionLevel.is_empty
 
 let find_ulevel_spec loop_category loop_num fct_name =
-  debug ~level:2 ~dkey "Find -acsl-ulevel-spec for %S loop #%d of function %S." loop_category loop_num fct_name;
+  debug ~level:2 ~dkey "Find -acsl-import-ulevel-spec for %S loop #%d of function %S." loop_category loop_num fct_name;
   let (_, times) as spec =
     let total = ref false
     and times = ref (-1)

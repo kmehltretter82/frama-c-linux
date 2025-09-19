@@ -1,6 +1,6 @@
 [kernel] Parsing static.i (no preprocessing)
-[acsl-importer] Success for static.acsl
-[acsl-importer] Done: 1 file.
+[acsl-import] Success for static.acsl
+[acsl-import] Done: 1 file.
 [eva] Analyzing a complete application starting at main
 [eva:initial-state] Values of globals at initialization
   counter ∈ {0}

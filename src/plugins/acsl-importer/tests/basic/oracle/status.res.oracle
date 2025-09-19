@@ -1,6 +1,6 @@
 [kernel] Parsing status.i (no preprocessing)
-[acsl-importer] Success for status.acsl
-[acsl-importer] Done: 1 file.
+[acsl-import] Success for status.acsl
+[acsl-import] Done: 1 file.
 [eva] Analyzing a complete application starting at main
 [eva:initial-state] Values of globals at initialization
   status[0] ∈ {STATUS_KO}

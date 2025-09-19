@@ -1,5 +1,5 @@
 /* run.config
-STDOPT: -acsl-unroll-loop-conditions -acsl-import %{dep:./loop.acsl} -print -acsl-importer-debug 2 -acsl-importer-msg-key "*"
+STDOPT: -acsl-import-unroll-loop-conditions -acsl-import %{dep:./loop.acsl} -print -acsl-import-debug 2 -acsl-import-msg-key "*"
  */
 extern int f_extern(int i) ;
 
@@ -39,11 +39,11 @@ void job(int n) {
   L0:
     //@ assigns i;
   L1:
-  L2: while (i < n) 
+  L2: while (i < n)
       i++;
   }
- 
-  { //@ loop assigns \nothing ; 
+
+  { //@ loop assigns \nothing ;
     for (;;) break ; }
   { for (;;) break ; }
   { for (;;i++) break ; }
@@ -58,4 +58,3 @@ void job(int n) {
   { for (int i=30;i < n;) break ; }
   { for (int i=40;i < n;i++) break ; }
 }
-

@@ -2,19 +2,19 @@
    STDOPT: -acsl-import %{dep:./unroll_loops.acsl} -ulevel -1 -then -print
    STDOPT: -acsl-import %{dep:./unroll_loops.acsl} -then -print
    STDOPT: -ulevel 2 -typecheck -then -print
-   STDOPT: -acsl-import %{dep:./unroll_loops.acsl} -acsl-importer-debug 3 -acsl-importer-msg-key trace-transformations -ulevel -1 -acsl-ulevel-spec for_loops_only:2 -then -print
-   STDOPT: -acsl-import %{dep:./unroll_loops.acsl} -ulevel -1 -acsl-ulevel-spec for:2 -then -print
-   STDOPT: -acsl-import %{dep:./unroll_loops.acsl} -ulevel -1 -acsl-ulevel-spec for_loops_only:1,for:2,do-while@main:1,1@while_loops_only:3 -then -print
-   STDOPT: -acsl-import %{dep:./unroll_loops.acsl} -ulevel  0 -acsl-ulevel-spec for_loops_only:2 -then -print
-   STDOPT: -acsl-import %{dep:./unroll_loops.acsl} -ulevel  0 -acsl-ulevel-spec for:2 -then -print
-   STDOPT: -acsl-import %{dep:./unroll_loops.acsl} -ulevel  0 -acsl-ulevel-spec for_loops_only:1,for:2 -then -print
-   STDOPT: -acsl-import %{dep:./unroll_loops.acsl} -ulevel -1 -acsl-ulevel-spec for_loops_only:1,for:2 -ulevel 0 -then -print
-   STDOPT: -acsl-import %{dep:./unroll_loops.acsl} -ulevel -1 -acsl-ulevel-spec for_loops_only:1,for:2 -then -ulevel 0 -then -print
-   STDOPT: -acsl-import %{dep:./unroll_loops.acsl} -acsl-unroll-loop-conditions -then -print
-   STDOPT: -acsl-import %{dep:./unroll_loops.acsl} -acsl-unroll-loop-conditions -acsl-ulevel-spec F_BoucleDepliee_1:1 -then -print
-   STDOPT: -acsl-unroll-loop-conditions -acsl-ulevel-spec F_BoucleDepliee_1:completely@1 -then -print
-   STDOPT: -acsl-ulevel-spec ":2" -typecheck -then -print
-   STDOPT: -acsl-ulevel-spec ":2" -typecheck -then -acsl-import %{dep:./unroll_loops.acsl} -then -print
+   STDOPT: -acsl-import %{dep:./unroll_loops.acsl} -acsl-import-debug 3 -acsl-import-msg-key trace-transformations -ulevel -1 -acsl-import-ulevel-spec for_loops_only:2 -then -print
+   STDOPT: -acsl-import %{dep:./unroll_loops.acsl} -ulevel -1 -acsl-import-ulevel-spec for:2 -then -print
+   STDOPT: -acsl-import %{dep:./unroll_loops.acsl} -ulevel -1 -acsl-import-ulevel-spec for_loops_only:1,for:2,do-while@main:1,1@while_loops_only:3 -then -print
+   STDOPT: -acsl-import %{dep:./unroll_loops.acsl} -ulevel  0 -acsl-import-ulevel-spec for_loops_only:2 -then -print
+   STDOPT: -acsl-import %{dep:./unroll_loops.acsl} -ulevel  0 -acsl-import-ulevel-spec for:2 -then -print
+   STDOPT: -acsl-import %{dep:./unroll_loops.acsl} -ulevel  0 -acsl-import-ulevel-spec for_loops_only:1,for:2 -then -print
+   STDOPT: -acsl-import %{dep:./unroll_loops.acsl} -ulevel -1 -acsl-import-ulevel-spec for_loops_only:1,for:2 -ulevel 0 -then -print
+   STDOPT: -acsl-import %{dep:./unroll_loops.acsl} -ulevel -1 -acsl-import-ulevel-spec for_loops_only:1,for:2 -then -ulevel 0 -then -print
+   STDOPT: -acsl-import %{dep:./unroll_loops.acsl} -acsl-import-unroll-loop-conditions -then -print
+   STDOPT: -acsl-import %{dep:./unroll_loops.acsl} -acsl-import-unroll-loop-conditions -acsl-import-ulevel-spec F_BoucleDepliee_1:1 -then -print
+   STDOPT: -acsl-import-unroll-loop-conditions -acsl-import-ulevel-spec F_BoucleDepliee_1:completely@1 -then -print
+   STDOPT: -acsl-import-ulevel-spec ":2" -typecheck -then -print
+   STDOPT: -acsl-import-ulevel-spec ":2" -typecheck -then -acsl-import %{dep:./unroll_loops.acsl} -then -print
  */
 
 
@@ -31,23 +31,23 @@
  */
 
 /* Note:
- * -acsl-ulevel-spec <unrolling-specification> : adds LOOP_UNROLL pragma.
+ * -acsl-import-ulevel-spec <unrolling-specification> : adds LOOP_UNROLL pragma.
  *    that option is processed before -ulevel option.
- *    Unrolling loops is left to -ulevel and -acsl-ulevel option.
+ *    Unrolling loops is left to -ulevel and -acsl-import-ulevel option.
  * .3.res -> insert LOOP_UNROLL pragma for the loops of function 'for_loops_only'.
  * .4.res -> insert LOOP_UNROLL pragma for all loops 'for'.
  * .5.res -> insert LOOP_UNROLL pragma ...
  */
 
 /* Note:
- *   about combination of -acsl-ulevel-spec and -ulevel  0 .
+ *   about combination of -acsl-import-ulevel-spec and -ulevel  0 .
  *   So, the unrolling is performed before importing  ACSL specification files.
  * .6.res -> performs unrolling of result.3.res .
  * .7.res -> performs unrolling of result.4.res .
  * .8.res -> performs unrolling of result.5.res
  */
 
-/* Note: -acsl-ulevel <n> : performs also loop unrolling when <n> is not negative.
+/* Note: -acsl-import-ulevel <n> : performs also loop unrolling when <n> is not negative.
  *    that option is processed after importing ACSL specification files.
  * .9.res -> idem result.8.res except assertion of the loop body is also unrolled.
  * .10.res -> idem result.9.res, but the test show that the unrolling process can be postponed

@@ -1,8 +1,8 @@
 [kernel] Parsing ensures-and-exits.i (no preprocessing)
-[acsl-importer] Importing...
-[acsl-importer] Success for ensures-and-exits.acsl
-[acsl-importer] Done: 1 file.
-[acsl-importer:trace-ensures-and-exits] 
+[acsl-import] Importing...
+[acsl-import] Success for ensures-and-exits.acsl
+[acsl-import] Done: 1 file.
+[acsl-import:trace-ensures-and-exits] 
   Removing clause: \acsl_importer::ensures_and_exits at_return: p:
                                                        ∀ ℤ exit_status;
                                                          \old(c) ≡ 0
@@ -17,15 +17,15 @@
                                                            \exit_status ≡ 1
                                                            :
                                                            result ≡ 1;
-[acsl-importer:trace-ensures-and-exits] 
+[acsl-import:trace-ensures-and-exits] 
   Adding clause: ensures at_return_p:
                            ∀ ℤ exit_status;
                              \old(c) ≡ 0 ? exit_status ≡ 1 : \result ≡ 1
-[acsl-importer:trace-ensures-and-exits] 
+[acsl-import:trace-ensures-and-exits] 
   Adding clause: exits at_exit_p:
                          ∀ int result;
                            \old(c) ≡ 0 ? \exit_status ≡ 1 : result ≡ 1
-[acsl-importer:trace-ensures-and-exits] 
+[acsl-import:trace-ensures-and-exits] 
   Removing clause: \acsl_importer::ensures_and_exits at_return: q:
                                                        ∀ ℤ exit_status;
                                                          \old(c) ≡ 0
@@ -40,11 +40,11 @@
                                                            \exit_status ≡ 1
                                                            :
                                                            result ≡ 1;
-[acsl-importer:trace-ensures-and-exits] 
+[acsl-import:trace-ensures-and-exits] 
   Adding clause: ensures at_return_q:
                            ∀ ℤ exit_status;
                              \old(c) ≡ 0 ? exit_status ≡ 1 : \result ≡ 1
-[acsl-importer:trace-ensures-and-exits] 
+[acsl-import:trace-ensures-and-exits] 
   Adding clause: exits at_exit_q:
                          ∀ int result;
                            \old(c) ≡ 0 ? \exit_status ≡ 1 : result ≡ 1
