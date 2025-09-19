@@ -583,7 +583,7 @@ module Make
     | _ -> return (v1, v2)
 
   let assume_valid_binop context typ (e1, v1 as arg1) op (e2, v2 as arg2) =
-    if Ast_types.is_integral typ then
+    if Ast_types.is_integral typ || Ast_types.is_ptr typ then
       match op with
       | Div | Mod ->
         (* The behavior of a%b is undefined if the behavior of a/b is undefined,
@@ -646,7 +646,7 @@ module Make
     in
     value, alarms
 
-  let forward_binop context typ (e1, v1 as arg1) op arg2 =
+  let forward_binop context ~typ_res (e1, v1 as arg1) op arg2 =
     let open Evaluated.Operators in
     let typ_arg = Ast_types.unroll e1.typ in
     match comparison_kind op with
@@ -654,17 +654,17 @@ module Make
       let compute v1 v2 = Value.forward_binop context typ_arg op v1 v2 in
       (* Detect zero expressions created by the evaluator *)
       let e1 = if Eva_ast.is_zero_ptr e1 then None else Some e1 in
-      forward_comparison ~compute ~typ_res:typ ~typ_arg kind (e1, v1) arg2
+      forward_comparison ~compute ~typ_res ~typ_arg kind (e1, v1) arg2
     | None ->
-      let& v1, v2 = assume_valid_binop context typ arg1 op arg2 in
+      let& v1, v2 = assume_valid_binop context typ_arg arg1 op arg2 in
       Value.forward_binop context typ_arg op v1 v2
 
-  let forward_unop context typ unop (e, v as arg) =
+  let forward_unop context ~typ_res unop (e, v as arg) =
     let typ_arg = Ast_types.unroll e.typ in
     if unop = LNot then
       let kind = Abstract_value.Equality in
       let compute _ v = Value.forward_unop context typ_arg unop v in
-      forward_comparison ~compute ~typ_res:typ ~typ_arg kind (None, Value.zero) arg
+      forward_comparison ~compute ~typ_res ~typ_arg kind (None, Value.zero) arg
     else Value.forward_unop context typ_arg unop v, Alarmset.none
 
   (* ------------------------------------------------------------------------
@@ -935,19 +935,19 @@ module Make
       let v = assume_pointer env.context expr value in
       compute_reduction v false
 
-    | UnOp (op, e, typ) ->
+    | UnOp (op, e, typ_res) ->
       let* v, volatile = root_forward_eval env e in
-      let* v = forward_unop env.context typ op (e, v) in
+      let* v = forward_unop env.context ~typ_res op (e, v) in
       let may_overflow = op = Neg in
-      let v = handle_overflow ~may_overflow env.context expr typ v in
+      let v = handle_overflow ~may_overflow env.context expr typ_res v in
       compute_reduction v volatile
 
-    | BinOp (op, e1, e2, typ) ->
+    | BinOp (op, e1, e2, typ_res) ->
       let* v1, volatile1 = root_forward_eval env e1 in
       let* v2, volatile2 = root_forward_eval env e2 in
-      let* v = forward_binop env.context typ (e1, v1) op (e2, v2) in
+      let* v = forward_binop env.context ~typ_res (e1, v1) op (e2, v2) in
       let may_overflow = may_overflow op in
-      let v = handle_overflow ~may_overflow env.context expr typ v in
+      let v = handle_overflow ~may_overflow env.context expr typ_res v in
       compute_reduction v (volatile1 || volatile2)
 
     | CastE (dst_typ, e) ->
