@@ -6,14 +6,10 @@
   f function: Introducing a call to 'c2fc2_Wr_int' for write access to volatile left-value: x
 [volatile:transformed-access:lvalue-volatile] binding_auto.i:17: 
   f function: Introducing a call to 'c2fc2_Rd_INT' for read access to volatile left-value: y
-[volatile:transformed-access:lvalue-volatile] binding_auto.i:17: 
-  f function: Introducing a call to 'c2fc2_Wr_int' for write access to volatile left-value: x
 [volatile:transformed-access:lvalue-volatile] binding_auto.i:20: 
   f function: Introducing a call to 'c2fc2_Wr_int' for write access to volatile left-value: y
 [volatile:transformed-access:lvalue-volatile] binding_auto.i:20: 
   f function: Introducing a call to 'c2fc2_Rd_INT' for read access to volatile left-value: x
-[volatile:transformed-access:lvalue-volatile] binding_auto.i:20: 
-  f function: Introducing a call to 'c2fc2_Wr_int' for write access to volatile left-value: y
 [volatile:transformed-access:lvalue-volatile] binding_auto.i:43: 
   enum_volatile function: Introducing a call to 'c2fc2_Rd_enum_E1' for read access to volatile left-value: x1
 [volatile:transformed-access:lvalue-volatile] binding_auto.i:43: 

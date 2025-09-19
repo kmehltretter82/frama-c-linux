@@ -30,8 +30,6 @@
   partial_access function: Introducing a call to 'WrT3_bis' for write access to partially volatile left-value: sx
 [volatile:transformed-access:lvalue-partially-volatile] binding.i:45: 
   partial_access function: Introducing a call to 'RdT3_bis' for read access to partially volatile left-value: sy
-[volatile:transformed-access:lvalue-partially-volatile] binding.i:45: 
-  partial_access function: Introducing a call to 'WrT3_bis' for write access to partially volatile left-value: sx
 [volatile:transformed-access:lvalue-volatile] binding.i:69: 
   enum_volatile function: Introducing a call to 'RdE1' for read access to volatile left-value: x1
 [volatile:transformed-access:lvalue-volatile] binding.i:69: 

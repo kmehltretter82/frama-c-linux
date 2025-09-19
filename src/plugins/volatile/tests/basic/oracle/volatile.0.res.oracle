@@ -5,12 +5,8 @@
   Cast from type with volatile attribute (ST volatile *) to ST *. Detection of volatile access may fail.
 [volatile:untransformed-access:lvalue-volatile] volatile.i:36: Warning: 
   Undefined write access function for volatile left-value: (volatile int) x
-[volatile:untransformed-access:lvalue-volatile] volatile.i:36: Warning: 
-  Undefined write access function for volatile left-value: (volatile int) x
 [volatile:transformed-access:lvalue-volatile] volatile.i:36: 
   main function: Introducing a call to 'f' for read access to volatile left-value: s.a
-[volatile:untransformed-access:lvalue-volatile] volatile.i:37: Warning: 
-  Undefined write access function for volatile left-value: (volatile int) sv.a
 [volatile:untransformed-access:lvalue-volatile] volatile.i:37: Warning: 
   Undefined write access function for volatile left-value: (volatile int) sv.a
 [volatile:transformed-access:lvalue-volatile] volatile.i:37: 
@@ -19,14 +15,10 @@
   main function: Introducing a call to 'gs' for write access to partially volatile left-value: s
 [volatile:untransformed-access:lvalue-partially-volatile] volatile.i:38: Warning: 
   Undefined read access function for partially volatile left-value: (volatile struct st3) s
-[volatile:transformed-access:lvalue-partially-volatile] volatile.i:38: 
-  main function: Introducing a call to 'gs' for write access to partially volatile left-value: s
 [volatile:transformed-access:lvalue-volatile] volatile.i:39: 
   main function: Introducing a call to 'gsv' for write access to volatile left-value: sv
 [volatile:transformed-access:lvalue-volatile] volatile.i:39: 
   main function: Introducing a call to 'c2fc2_Rd_struct_st2' for read access to volatile left-value: sv
-[volatile:transformed-access:lvalue-volatile] volatile.i:39: 
-  main function: Introducing a call to 'gsv' for write access to volatile left-value: sv
 [volatile:transformed-access:lvalue-volatile] volatile.i:40: 
   main function: Introducing a call to 'g' for write access to volatile left-value: *(*q)
 [volatile:transformed-access:lvalue-volatile] volatile.i:41: 
@@ -39,18 +31,10 @@
   Undefined write access function for volatile left-value: (volatile int) t[y]
 [volatile:untransformed-access:lvalue-volatile] volatile.i:44: Warning: 
   Undefined write access function for volatile left-value: (volatile int) t[1]
-[volatile:untransformed-access:lvalue-volatile] volatile.i:44: Warning: 
-  Undefined write access function for volatile left-value: (volatile int) t[1]
-[volatile:transformed-access:lvalue-volatile] volatile.i:45: 
-  main function: Introducing a call to 'g' for write access to volatile left-value: t10[1]
 [volatile:transformed-access:lvalue-volatile] volatile.i:45: 
   main function: Introducing a call to 'g' for write access to volatile left-value: t10[1]
 [volatile:transformed-access:lvalue-volatile] volatile.i:46: 
   main function: Introducing a call to 'g' for write access to volatile left-value: t10_2[1][2]
-[volatile:transformed-access:lvalue-volatile] volatile.i:46: 
-  main function: Introducing a call to 'g' for write access to volatile left-value: t10_2[1][2]
-[volatile:transformed-access:lvalue-volatile] volatile.i:47: 
-  main function: Introducing a call to 'g' for write access to volatile left-value: tt[2][3]
 [volatile:transformed-access:lvalue-volatile] volatile.i:47: 
   main function: Introducing a call to 'g' for write access to volatile left-value: tt[2][3]
 [volatile:untransformed-access:lvalue-volatile] volatile.i:48: Warning: 
@@ -61,8 +45,6 @@
   main function: Introducing a call to 'f' for read access to volatile left-value: x
 [volatile:untransformed-access:lvalue-volatile] volatile.i:56: Warning: 
   Undefined write access function for volatile left-value: (volatile int) s.a
-[volatile:untransformed-access:lvalue-volatile] volatile.i:56: Warning: 
-  Undefined write access function for volatile left-value: (volatile int) s.a
 [volatile:transformed-access:lvalue-volatile] volatile.i:56: 
   wr function: Introducing a call to 'f' for read access to volatile left-value: x
 [volatile:transformed-access:lvalue-volatile] volatile.i:57: 
@@ -71,8 +53,6 @@
   wr function: Introducing a call to 'g' for write access to volatile left-value: *p
 [volatile:transformed-access:lvalue-volatile] volatile.i:58: 
   wr function: Introducing a call to 'f' for read access to volatile left-value: x
-[volatile:transformed-access:lvalue-volatile] volatile.i:58: 
-  wr function: Introducing a call to 'g' for write access to volatile left-value: *p
 [volatile:transformed-access:lvalue-volatile] volatile.i:59: 
   wr function: Introducing a call to 'f' for read access to volatile left-value: x
 [volatile:transformed-access:lvalue-volatile] volatile.i:59: 
