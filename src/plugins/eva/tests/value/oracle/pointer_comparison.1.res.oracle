@@ -10,26 +10,26 @@
 [eva:pointer-comparison] pointer_comparison.c:15: 
   invalid pointer comparison: invalid pointer(s)
 [eva:pointer-comparison] pointer_comparison.c:15: 
-  evaluating condition to {0; 1} instead of {0} because of UPCPA
+  evaluating condition to {0; 1} instead of {0} because of -eva-undefined-pointer-comparison-propagate-all
 [eva] pointer_comparison.c:15: Frama_C_show_each_2: {{ &x + {8} }}
 [eva:pointer-comparison] pointer_comparison.c:15: 
-  evaluating condition to {0; 1} instead of {1} because of UPCPA
+  evaluating condition to {0; 1} instead of {1} because of -eva-undefined-pointer-comparison-propagate-all
 [eva] pointer_comparison.c:16: Frama_C_show_each_2e: {{ &x + {8} }}
 [eva:pointer-comparison] pointer_comparison.c:17: 
   invalid pointer comparison: invalid pointer(s)
 [eva:pointer-comparison] pointer_comparison.c:17: 
-  evaluating condition to {0; 1} instead of {0} because of UPCPA
+  evaluating condition to {0; 1} instead of {0} because of -eva-undefined-pointer-comparison-propagate-all
 [eva] pointer_comparison.c:17: Frama_C_show_each_3: {{ &x + {12} }}
 [eva:pointer-comparison] pointer_comparison.c:17: 
-  evaluating condition to {0; 1} instead of {1} because of UPCPA
+  evaluating condition to {0; 1} instead of {1} because of -eva-undefined-pointer-comparison-propagate-all
 [eva] pointer_comparison.c:18: Frama_C_show_each_3e: {{ &x + {12} }}
 [eva:pointer-comparison] pointer_comparison.c:19: 
   invalid pointer comparison: invalid pointer(s)
 [eva:pointer-comparison] pointer_comparison.c:19: 
-  evaluating condition to {0; 1} instead of {0} because of UPCPA
+  evaluating condition to {0; 1} instead of {0} because of -eva-undefined-pointer-comparison-propagate-all
 [eva] pointer_comparison.c:19: Frama_C_show_each_4: {{ &x + {16} }}
 [eva:pointer-comparison] pointer_comparison.c:19: 
-  evaluating condition to {0; 1} instead of {1} because of UPCPA
+  evaluating condition to {0; 1} instead of {1} because of -eva-undefined-pointer-comparison-propagate-all
 [eva] pointer_comparison.c:20: Frama_C_show_each_4e: {{ &x + {16} }}
 [eva:pointer-comparison] pointer_comparison.c:21: 
   invalid pointer comparison: invalid pointer(s)
@@ -42,14 +42,14 @@
 [eva:pointer-comparison] pointer_comparison.c:23: 
   invalid pointer comparison: invalid pointer(s)
 [eva:pointer-comparison] pointer_comparison.c:23: 
-  evaluating condition to {0; 1} instead of {0} because of UPCPA
+  evaluating condition to {0; 1} instead of {0} because of -eva-undefined-pointer-comparison-propagate-all
 [eva] pointer_comparison.c:23: Frama_C_show_each_6: {{ &x + {20} }}
 [eva:partition] pointer_comparison.c:23: starting to merge loop iterations
 [eva] pointer_comparison.c:23: Frama_C_show_each_6: {{ &x + {20; 24} }}
 [eva] pointer_comparison.c:23: Frama_C_show_each_6: {{ &x + {20; 24; 28} }}
 [eva] pointer_comparison.c:23: Frama_C_show_each_6: {{ &x + [20..--],0%4 }}
 [eva:pointer-comparison] pointer_comparison.c:23: 
-  evaluating condition to {0; 1} instead of {1} because of UPCPA
+  evaluating condition to {0; 1} instead of {1} because of -eva-undefined-pointer-comparison-propagate-all
 [eva] Recording results for main
 [eva] Done for function main
 [eva] ====== VALUES COMPUTED ======

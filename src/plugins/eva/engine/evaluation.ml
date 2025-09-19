@@ -639,8 +639,9 @@ module Make
           Self.result
             ~current:true ~once:true
             ~dkey:Self.dkey_pointer_comparison
-            "evaluating condition to {0; 1} instead of %a because of UPCPA"
-            (Bottom.pretty pretty_cvalue) result;
+            "evaluating condition to {0; 1} instead of %a because of %s"
+            (Bottom.pretty pretty_cvalue) result
+            Parameters.UndefinedPointerComparisonPropagateAll.name;
         `Value zero_or_one
     in
     value, alarms
