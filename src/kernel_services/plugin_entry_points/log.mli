@@ -481,6 +481,10 @@ val set_formatter : ?isatty:bool -> Format.formatter -> unit
     arguments
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
+val reset_stdout : isatty:bool -> unit -> unit
+(** Reset the log formatter to [Format.std_formatter].
+    @since Frama-C+dev *)
+
 val print_on_output : (Format.formatter -> unit) -> unit
 (** Direct printing on output.
     Message echo is delayed until the output is finished.
@@ -513,9 +517,6 @@ val check_not_yet: (event -> bool) ref
     not reprinted. Currently set in {!module-type:Messages}. Not for the casual
     user.
 *)
-
-val tty : (unit -> bool) ref
-(** Callback for command-line option '-(no)-tty' *)
 
 val cmdline_error_occurred: (exn -> unit) ref
 

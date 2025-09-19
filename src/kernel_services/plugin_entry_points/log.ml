@@ -113,6 +113,10 @@ let clean () = term_clean stdout
 let set_formatter ?(isatty=false) formatter =
   set_terminal stdout isatty formatter
 
+let reset_stdout ~isatty () =
+  set_terminal stdout isatty Format.std_formatter
+
+
 (* -------------------------------------------------------------------------- *)
 (* --- Locked Formatter                                                   --- *)
 (* -------------------------------------------------------------------------- *)
@@ -334,8 +338,6 @@ type ontty = [
   | `Transient (* Temporary visible, only on console *)
   | `Silent    (* Not visible on console *)
 ]
-
-let tty = ref (fun () -> false)
 
 type channel = {
   locked_buffer : Rich_text.buffer ; (* already allocated top-level buffer *)
@@ -1041,7 +1043,7 @@ struct
         ?source ?emitwith ?echo ?once ?append text
     else Pretty_utils.nullprintf text
 
-  let transient channel = channel.terminal.isatty && !tty ()
+  let transient channel = channel.terminal.isatty
 
   let has_tty () = transient channel
 

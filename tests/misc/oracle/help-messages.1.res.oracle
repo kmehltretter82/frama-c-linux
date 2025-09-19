@@ -284,8 +284,9 @@ Options taking a string as argument should preferably be written
 -quiet              sets -verbose and -debug to 0
 -time <filename>    append process time and timestamp to <filename> at exit
                     (preferably use -time="filename")
--tty                use terminal capabilities for feedback (when available)
-                    (set by default, opposite option is -no-tty)
+-tty                force the use of terminal capabilities for feedback; use
+                    the opposite option for completely disabling the use of
+                    terminal capabilities (opposite option is -no-tty)
 -unicode            use utf8 in messages (set by default, opposite option is
                     -no-unicode)
 -verbose <n>        general level of verbosity

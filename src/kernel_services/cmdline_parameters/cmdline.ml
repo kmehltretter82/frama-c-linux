@@ -58,8 +58,13 @@ let dkey = Kernel_log.register_category "cmdline"
 
 let quiet_ref = ref false
 let deterministic = ref false
+let tty = ref Unix.(isatty stdout)
 let permissive = ref false
 let compress_saved_session = ref true
+
+let set_tty isatty =
+  tty := isatty;
+  Log.reset_stdout ~isatty  ()
 
 let last_project_created_by_copy = ref (fun () -> assert false)
 
@@ -223,7 +228,7 @@ let catch_toplevel_run ~f ~at_normal_exit ~on_error =
   try
     f ();
     (* write again on stdout *)
-    Log.set_formatter ~isatty:(Unix.isatty Unix.stdout) Format.std_formatter;
+    Log.reset_stdout ~isatty:!tty ();
     cleanup ();
   with
   | Exit ->
@@ -490,6 +495,8 @@ let () =
         "-kernel-verbose", Int (fun n -> Kernel_verbose_level.set n);
         "-kernel-debug", Int (fun n -> Kernel_debug_level.set n);
         "-deterministic", Unit (fun () -> deterministic := true);
+        "-tty", Unit (fun () -> set_tty true);
+        "-no-tty", Unit (fun () -> set_tty false);
         "-permissive", Unit (fun () -> permissive := true);
         "-memory-footprint", Int configure_ocaml_gc;
         "-compress-saved-session", Unit (fun () ->
@@ -512,6 +519,7 @@ let () =
 
 let quiet = !quiet_ref
 let deterministic = !deterministic
+let tty = !tty
 let permissive = !permissive
 let compress_saved_session = !compress_saved_session
 
