@@ -134,12 +134,9 @@ let call ~adata ~loc kf name ctx env t =
   assert (name = "base_addr" || name = "block_length"
           || name = "offset" || name ="freeable");
   let (e, adata), env =
-    Env.with_params_and_result
-      ~rte:true
-      ~f:(fun env ->
-          let e, adata, env = term_to_exp ~adata kf env t in
-          (e, adata), env)
-      env
+    Env.with_params_and_result ~rte:true ~env (fun env ->
+        let e, adata, env = term_to_exp ~adata kf env t in
+        (e, adata), env)
   in
   let e, env =
     Env.rtl_call_to_new_var
@@ -208,12 +205,9 @@ let range_to_ptr_and_size ~adata ~loc kf env ptr r p =
   let logic_env = Env.Logic_env.get env in
   Typing.preprocess_term ~use_gmp_opt:false ~ctx:Typing.nan ~logic_env ptr;
   let (ptr, adata), env =
-    Env.with_params_and_result
-      ~rte:true
-      ~f:(fun env ->
-          let e, adata, env = term_to_exp ~adata kf env ptr in
-          (e, adata), env)
-      env
+    Env.with_params_and_result ~rte:true ~env (fun env ->
+        let e, adata, env = term_to_exp ~adata kf env ptr in
+        (e, adata), env)
   in
   (* size *)
   let size_term =
@@ -283,12 +277,9 @@ let range_to_ptr_and_size ~adata ~loc kf env ptr r p =
    expression in bytes. [adata] and [env] as usual. *)
 let term_to_ptr_and_size ~adata ~loc kf env t =
   let (e, adata), env =
-    Env.with_params_and_result
-      ~rte:true
-      ~f:(fun env ->
-          let e, adata, env = term_to_exp ~adata kf env t in
-          (e, adata), env)
-      env
+    Env.with_params_and_result ~rte:true ~env (fun env ->
+        let e, adata, env = term_to_exp ~adata kf env t in
+        (e, adata), env)
   in
   let ty = Ast_types.remove_attributes_deep ["ghost"] @@ Misc.cty t.term_type in
   let sizeof = Smart_exp.ptr_sizeof ~loc ty in

@@ -719,43 +719,35 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
   | TBinOp(LOr, t1, t2) ->
     (* t1 || t2 <==> if t1 then true else t2 *)
     let e, adata, env =
-      Extlib.flatten
-        (Env.with_params_and_result
-           ~rte:true
-           ~f:(fun env ->
-               let e1, adata, env1 = to_exp ~adata kf env t1 in
-               let env' = Env.push env1 in
-               let e2, adata, env2 =
-                 to_exp ~adata kf (Env.push env') t2
-               in
-               let res2 = e2, env2 in
-               Extlib.nest
-                 adata
-                 (Translate_utils.conditional_to_exp
-                    ~name:"or" ~loc kf (Some t) e1 (Cil.one ~loc, env') res2)
-             )
-           env)
+      Extlib.flatten @@ Env.with_params_and_result ~rte:true ~env (fun env ->
+          let e1, adata, env1 = to_exp ~adata kf env t1 in
+          let env' = Env.push env1 in
+          let e2, adata, env2 =
+            to_exp ~adata kf (Env.push env') t2
+          in
+          let res2 = e2, env2 in
+          Extlib.nest
+            adata
+            (Translate_utils.conditional_to_exp
+               ~name:"or" ~loc kf (Some t) e1 (Cil.one ~loc, env') res2)
+        )
     in
     e, adata, env, Analyses_types.C_number, ""
   | TBinOp(LAnd, t1, t2) ->
     (* t1 && t2 <==> if t1 then t2 else false *)
     let e, adata, env =
-      Extlib.flatten
-        (Env.with_params_and_result
-           ~rte:true
-           ~f:(fun env ->
-               let e1, adata, env1 = to_exp ~adata kf env t1 in
-               let e2, adata, env2 =
-                 to_exp ~adata kf (Env.push env1) t2
-               in
-               let res2 = e2, env2 in
-               let env3 = Env.push env2 in
-               Extlib.nest
-                 adata
-                 (Translate_utils.conditional_to_exp
-                    ~name:"and" ~loc kf (Some t) e1 res2 (Cil.zero ~loc, env3))
-             )
-           env)
+      Extlib.flatten @@ Env.with_params_and_result ~rte:true ~env (fun env ->
+          let e1, adata, env1 = to_exp ~adata kf env t1 in
+          let e2, adata, env2 =
+            to_exp ~adata kf (Env.push env1) t2
+          in
+          let res2 = e2, env2 in
+          let env3 = Env.push env2 in
+          Extlib.nest
+            adata
+            (Translate_utils.conditional_to_exp
+               ~name:"and" ~loc kf (Some t) e1 res2 (Cil.zero ~loc, env3))
+        )
     in
     e, adata, env, Analyses_types.C_number, ""
   | TBinOp((BOr | BXor | BAnd) as bop, t1, t2) ->
@@ -879,30 +871,26 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
     let t2 = Logic_normalizer.get_term t2 in
     let t3 = Logic_normalizer.get_term t3 in
     let e, adata, env =
-      Extlib.flatten
-        (Env.with_params_and_result
-           ~rte:true
-           ~f:(fun env ->
-               let e1, adata, env1 = to_exp ~adata kf env t1 in
-               let e2, adata, env2 =
-                 to_exp ~adata kf (Env.push env1) t2
-               in
-               let res2 = e2, env2 in
-               let e3, adata, env3 =
-                 to_exp ~adata kf (Env.push env2) t3
-               in
-               let res3 = e3, env3 in
-               Extlib.nest
-                 adata
-                 (Translate_utils.conditional_to_exp
-                    ~loc
-                    kf
-                    (Some t)
-                    e1
-                    res2
-                    res3)
-             )
-           env)
+      Extlib.flatten @@ Env.with_params_and_result ~rte:true ~env (fun env ->
+          let e1, adata, env1 = to_exp ~adata kf env t1 in
+          let e2, adata, env2 =
+            to_exp ~adata kf (Env.push env1) t2
+          in
+          let res2 = e2, env2 in
+          let e3, adata, env3 =
+            to_exp ~adata kf (Env.push env2) t3
+          in
+          let res3 = e3, env3 in
+          Extlib.nest
+            adata
+            (Translate_utils.conditional_to_exp
+               ~loc
+               kf
+               (Some t)
+               e1
+               res2
+               res3)
+        )
     in
     e, adata, env, Analyses_types.C_number, ""
   | Tat(t', label) ->
@@ -994,36 +982,33 @@ and to_exp_old ?inplace ~loc:_ ~adata ~env ~kf t =
     (Env.Logic_env.get_profile env);
   let logic_env = Env.Logic_env.get env in
   let t = Logic_normalizer.get_term t in
-  let ((rexp, _), _) as result =
-    Env.with_params_and_result
-      ~rte:false
-      ~f:(fun env ->
-          let e, adata, env, sty, name =
-            context_insensitive_term_to_exp_old ?inplace ~adata kf env t
-          in
-          let env =
-            if generate_rte then !translate_rte_exp_ref kf env e else env
-          in
-          let cast = Typing.get_cast ~logic_env t in
-          let name = if name = "" then None else Some name in
-          Extlib.nest
-            adata
-            (Typed_number.add_cast
-               ~loc:t.term_loc
-               ?name
-               env
-               kf
-               cast
-               sty
-               (Some t)
-               e)
-        )
-      env
+  let (rexp, _, _) as result =
+    Extlib.flatten @@ Env.with_params_and_result ~rte:false ~env (fun env ->
+        let e, adata, env, sty, name =
+          context_insensitive_term_to_exp_old ?inplace ~adata kf env t
+        in
+        let env =
+          if generate_rte then !translate_rte_exp_ref kf env e else env
+        in
+        let cast = Typing.get_cast ~logic_env t in
+        let name = if name = "" then None else Some name in
+        Extlib.nest
+          adata
+          (Typed_number.add_cast
+             ~loc:t.term_loc
+             ?name
+             env
+             kf
+             cast
+             sty
+             (Some t)
+             e)
+      )
   in
   Options.debug ~dkey ~level:4 "to_exp_old %a {%a} %a = %a"
     Kernel_function.pretty kf Profile.pretty (Env.Logic_env.get_profile env)
     Printer.pp_term t Printer.pp_exp rexp;
-  Extlib.flatten result
+  result
 
 and to_exp ~adata ?inplace kf env t =
   let loc = t.term_loc in
