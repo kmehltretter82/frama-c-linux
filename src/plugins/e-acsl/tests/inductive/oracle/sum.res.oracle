@@ -4,8 +4,6 @@
   no assigns clause generated for function sum because pointers as arguments is not yet supported
 [e-acsl] <unknown location>: Warning: 
   no assigns clause generated for function sum because pointers as arguments is not yet supported
-[e-acsl] sum.c:27: Warning: 
-  no assigns clause generated for function sum because pointers as arguments is not yet supported
 [e-acsl] translation done in project "e-acsl".
 [eva:alarm] sum.c:26: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.

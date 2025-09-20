@@ -19,8 +19,6 @@ int __gen_e_acsl_p1(int x, int y);
 /*@ predicate p2(integer x, integer y) = x + y > 0;
 
 */
-int __gen_e_acsl_p2_5(int x, int y);
-
 int __gen_e_acsl_p2_3(int x, __e_acsl_mpz_struct * y);
 
 int __gen_e_acsl_p2(int x, int y);
@@ -28,13 +26,13 @@ int __gen_e_acsl_p2(int x, int y);
 /*@ logic integer f1(integer x, integer y) = x + y;
 
 */
-long __gen_e_acsl_f1(int x, int y);
-
 void __gen_e_acsl_f1_7(__e_acsl_mpz_t *__retres_arg, __e_acsl_mpz_struct * x,
                        __e_acsl_mpz_struct * y);
 
 void __gen_e_acsl_f1_5(__e_acsl_mpz_t *__retres_arg, int x,
                        __e_acsl_mpz_struct * y);
+
+long __gen_e_acsl_f1(int x, int y);
 
 int __gen_e_acsl_f1_3(int x, int y);
 
@@ -109,8 +107,6 @@ void __gen_e_acsl_over(__e_acsl_mpq_t *__retres_arg, double a, double b);
 int __gen_e_acsl_signum_3(__e_acsl_mpq_t x);
 
 int __gen_e_acsl_signum(double x);
-
-int __gen_e_acsl_signum_5(double x);
 
 int z = 8;
 /*@ logic integer f3{L}(integer y) = \at(z + y,L);
@@ -209,7 +205,7 @@ int main(void)
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
       {.values = (void *)0};
     __gen_e_acsl_f1_4 = __gen_e_acsl_f1_3(3,4);
-    __gen_e_acsl_p2_6 = __gen_e_acsl_p2_5(x,__gen_e_acsl_f1_4);
+    __gen_e_acsl_p2_6 = __gen_e_acsl_p2(x,__gen_e_acsl_f1_4);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,"f1(3, 4)",0,
                                  __gen_e_acsl_f1_4);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,"x",0,x);
@@ -564,7 +560,7 @@ int main(void)
     int __gen_e_acsl_signum_6;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_21 =
       {.values = (void *)0};
-    __gen_e_acsl_signum_6 = __gen_e_acsl_signum_5(0.);
+    __gen_e_acsl_signum_6 = __gen_e_acsl_signum(0.);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_21,"signum(0.0)",
                                  0,__gen_e_acsl_signum_6);
     __gen_e_acsl_assert_data_21.blocking = 1;
@@ -798,17 +794,17 @@ int __gen_e_acsl_p2_3(int x, __e_acsl_mpz_struct * y)
 
 /*@ assigns \result;
     assigns \result \from x, y; */
-int __gen_e_acsl_p2_5(int x, int y)
+int __gen_e_acsl_f1_3(int x, int y)
 {
-  int __retres = x + (long)y > 0L;
+  int __retres = x + y;
   return __retres;
 }
 
 /*@ assigns \result;
     assigns \result \from x, y; */
-int __gen_e_acsl_f1_3(int x, int y)
+long __gen_e_acsl_f1(int x, int y)
 {
-  int __retres = x + y;
+  long __retres = x + (long)y;
   return __retres;
 }
 
@@ -847,14 +843,6 @@ void __gen_e_acsl_f1_7(__e_acsl_mpz_t *__retres_arg, __e_acsl_mpz_struct * x,
                   (__e_acsl_mpz_struct const *)(__gen_e_acsl_add_3));
   __gmpz_clear(__gen_e_acsl_add_3);
   return;
-}
-
-/*@ assigns \result;
-    assigns \result \from x, y; */
-long __gen_e_acsl_f1(int x, int y)
-{
-  long __retres = x + (long)y;
-  return __retres;
 }
 
 /*@ assigns \result;
@@ -981,20 +969,6 @@ void __gen_e_acsl_over(__e_acsl_mpq_t *__retres_arg, double a, double b)
   __gmpq_clear(__gen_e_acsl_b);
   __gmpq_clear(__gen_e_acsl_div_2);
   return;
-}
-
-/*@ assigns \result;
-    assigns \result \from x; */
-int __gen_e_acsl_signum_5(double x)
-{
-  int __gen_e_acsl_if_6;
-  if (x > 0.) __gen_e_acsl_if_6 = 1;
-  else {
-    int __gen_e_acsl_if_5;
-    if (x < 0.) __gen_e_acsl_if_5 = -1; else __gen_e_acsl_if_5 = 0;
-    __gen_e_acsl_if_6 = __gen_e_acsl_if_5;
-  }
-  return __gen_e_acsl_if_6;
 }
 
 /*@ assigns \result;

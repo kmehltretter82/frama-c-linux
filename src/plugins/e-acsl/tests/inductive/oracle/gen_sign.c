@@ -28,8 +28,6 @@ int __gen_e_acsl_signum_5(__e_acsl_mpq_t x, int r);
 
 int __gen_e_acsl_signum(double x, int r);
 
-int __gen_e_acsl_signum_3(double x, int r);
-
 int main(void)
 {
   int __retres;
@@ -54,7 +52,7 @@ int main(void)
     int __gen_e_acsl_signum_4;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
       {.values = (void *)0};
-    __gen_e_acsl_signum_4 = __gen_e_acsl_signum_3(0.,ZERO);
+    __gen_e_acsl_signum_4 = __gen_e_acsl_signum(0.,ZERO);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
                                  "signum(0., ZERO)",0,__gen_e_acsl_signum_4);
     __gen_e_acsl_assert_data_2.blocking = 1;
@@ -105,32 +103,6 @@ int main(void)
 
 /*@ assigns \result;
     assigns \result \from x, r; */
-int __gen_e_acsl_signum_3(double x, int r)
-{
-  int __gen_e_acsl_and_4;
-  int __gen_e_acsl_or_4;
-  if (x == 0.) __gen_e_acsl_and_4 = (unsigned int)r == 1U;
-  else __gen_e_acsl_and_4 = 0;
-  if (__gen_e_acsl_and_4) __gen_e_acsl_or_4 = 1;
-  else {
-    int __gen_e_acsl_and_5;
-    int __gen_e_acsl_or_3;
-    if (x > 0.) __gen_e_acsl_and_5 = (unsigned int)r == 0U;
-    else __gen_e_acsl_and_5 = 0;
-    if (__gen_e_acsl_and_5) __gen_e_acsl_or_3 = 1;
-    else {
-      int __gen_e_acsl_and_6;
-      if (x < 0.) __gen_e_acsl_and_6 = (unsigned int)r == 2U;
-      else __gen_e_acsl_and_6 = 0;
-      __gen_e_acsl_or_3 = __gen_e_acsl_and_6;
-    }
-    __gen_e_acsl_or_4 = __gen_e_acsl_or_3;
-  }
-  return __gen_e_acsl_or_4;
-}
-
-/*@ assigns \result;
-    assigns \result \from x, r; */
 int __gen_e_acsl_signum(double x, int r)
 {
   int __gen_e_acsl_and;
@@ -161,45 +133,45 @@ int __gen_e_acsl_signum_5(__e_acsl_mpq_t x, int r)
 {
   __e_acsl_mpq_t __gen_e_acsl__3;
   int __gen_e_acsl_eq;
-  int __gen_e_acsl_and_7;
-  int __gen_e_acsl_or_6;
+  int __gen_e_acsl_and_4;
+  int __gen_e_acsl_or_4;
   __gmpq_init(__gen_e_acsl__3);
   __gmpq_set_d(__gen_e_acsl__3,0.);
   __gen_e_acsl_eq = __gmpq_cmp((__e_acsl_mpq_struct const *)(x),
                                (__e_acsl_mpq_struct const *)(__gen_e_acsl__3));
-  if (__gen_e_acsl_eq == 0) __gen_e_acsl_and_7 = (unsigned int)r == 1U;
-  else __gen_e_acsl_and_7 = 0;
-  if (__gen_e_acsl_and_7) __gen_e_acsl_or_6 = 1;
+  if (__gen_e_acsl_eq == 0) __gen_e_acsl_and_4 = (unsigned int)r == 1U;
+  else __gen_e_acsl_and_4 = 0;
+  if (__gen_e_acsl_and_4) __gen_e_acsl_or_4 = 1;
   else {
     __e_acsl_mpq_t __gen_e_acsl__4;
     int __gen_e_acsl_gt;
-    int __gen_e_acsl_and_8;
-    int __gen_e_acsl_or_5;
+    int __gen_e_acsl_and_5;
+    int __gen_e_acsl_or_3;
     __gmpq_init(__gen_e_acsl__4);
     __gmpq_set_d(__gen_e_acsl__4,0.);
     __gen_e_acsl_gt = __gmpq_cmp((__e_acsl_mpq_struct const *)(x),
                                  (__e_acsl_mpq_struct const *)(__gen_e_acsl__4));
-    if (__gen_e_acsl_gt > 0) __gen_e_acsl_and_8 = (unsigned int)r == 0U;
-    else __gen_e_acsl_and_8 = 0;
-    if (__gen_e_acsl_and_8) __gen_e_acsl_or_5 = 1;
+    if (__gen_e_acsl_gt > 0) __gen_e_acsl_and_5 = (unsigned int)r == 0U;
+    else __gen_e_acsl_and_5 = 0;
+    if (__gen_e_acsl_and_5) __gen_e_acsl_or_3 = 1;
     else {
       __e_acsl_mpq_t __gen_e_acsl__5;
       int __gen_e_acsl_lt;
-      int __gen_e_acsl_and_9;
+      int __gen_e_acsl_and_6;
       __gmpq_init(__gen_e_acsl__5);
       __gmpq_set_d(__gen_e_acsl__5,0.);
       __gen_e_acsl_lt = __gmpq_cmp((__e_acsl_mpq_struct const *)(x),
                                    (__e_acsl_mpq_struct const *)(__gen_e_acsl__5));
-      if (__gen_e_acsl_lt < 0) __gen_e_acsl_and_9 = (unsigned int)r == 2U;
-      else __gen_e_acsl_and_9 = 0;
-      __gen_e_acsl_or_5 = __gen_e_acsl_and_9;
+      if (__gen_e_acsl_lt < 0) __gen_e_acsl_and_6 = (unsigned int)r == 2U;
+      else __gen_e_acsl_and_6 = 0;
+      __gen_e_acsl_or_3 = __gen_e_acsl_and_6;
       __gmpq_clear(__gen_e_acsl__5);
     }
-    __gen_e_acsl_or_6 = __gen_e_acsl_or_5;
+    __gen_e_acsl_or_4 = __gen_e_acsl_or_3;
     __gmpq_clear(__gen_e_acsl__4);
   }
   __gmpq_clear(__gen_e_acsl__3);
-  return __gen_e_acsl_or_6;
+  return __gen_e_acsl_or_4;
 }
 
 

@@ -13,10 +13,7 @@ inductive Q(integer x, integer y, integer z) {
   }
  */
 /*@ predicate Q(integer x, integer y, integer z) = y == 0 && z == 0;
-
-*/
-int __gen_e_acsl_Q_3(int x, int y, int z);
-
+ */
 int __gen_e_acsl_Q(int x, int y, int z);
 
 /*@
@@ -27,8 +24,6 @@ inductive P(integer x, integer y) {
 /*@ predicate P(integer x, integer y) = Q(0, 0, y);
 
 */
-int __gen_e_acsl_P_3(int x, int y);
-
 int __gen_e_acsl_P(int x, int y);
 
 int main(void)
@@ -55,7 +50,7 @@ int main(void)
     int __gen_e_acsl_P_4;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
       {.values = (void *)0};
-    __gen_e_acsl_P_4 = __gen_e_acsl_P_3(1,2);
+    __gen_e_acsl_P_4 = __gen_e_acsl_P(1,2);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,"P(1, 2)",0,
                                  __gen_e_acsl_P_4);
     __gen_e_acsl_assert_data_2.blocking = 1;
@@ -83,30 +78,12 @@ int __gen_e_acsl_Q(int x, int y, int z)
 }
 
 /*@ assigns \result;
-    assigns \result \from x, y, z; */
-int __gen_e_acsl_Q_3(int x, int y, int z)
-{
-  int __gen_e_acsl_and_2;
-  if (y == 0) __gen_e_acsl_and_2 = z == 0; else __gen_e_acsl_and_2 = 0;
-  return __gen_e_acsl_and_2;
-}
-
-/*@ assigns \result;
     assigns \result \from x, y; */
 int __gen_e_acsl_P(int x, int y)
 {
   int __gen_e_acsl_Q_2;
   __gen_e_acsl_Q_2 = __gen_e_acsl_Q(0,0,y);
   return __gen_e_acsl_Q_2;
-}
-
-/*@ assigns \result;
-    assigns \result \from x, y; */
-int __gen_e_acsl_P_3(int x, int y)
-{
-  int __gen_e_acsl_Q_4;
-  __gen_e_acsl_Q_4 = __gen_e_acsl_Q_3(0,0,y);
-  return __gen_e_acsl_Q_4;
 }
 
 

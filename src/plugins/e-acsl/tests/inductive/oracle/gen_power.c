@@ -15,11 +15,8 @@ inductive power(integer x, integer y, integer p) {
   }
  */
 /*@ predicate power(integer x, integer y, integer p) = power_fun3(x, y) == p;
-
-*/
+ */
 int __gen_e_acsl_power(int x, int y, int p);
-
-int __gen_e_acsl_power_3(int x, int y, int p);
 
 /*@
 logic integer power_fun3(integer x, integer y) =
@@ -55,7 +52,7 @@ int main(void)
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
       {.values = (void *)0};
     __e_acsl_sound_verdict = 0;
-    __gen_e_acsl_power_4 = __gen_e_acsl_power_3(2,3,7);
+    __gen_e_acsl_power_4 = __gen_e_acsl_power(2,3,7);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
                                  "power(2, 3, 7)",0,__gen_e_acsl_power_4);
     __gen_e_acsl_assert_data_2.blocking = 1;
@@ -126,27 +123,6 @@ void __gen_e_acsl_power_fun3(__e_acsl_mpz_t *__retres_arg, int x,
   __gmpz_clear(__gen_e_acsl_);
   __gmpz_clear(__gen_e_acsl_if);
   return;
-}
-
-/*@ assigns \result;
-    assigns \result \from x, y, p; */
-int __gen_e_acsl_power_3(int x, int y, int p)
-{
-  __e_acsl_mpz_t __gen_e_acsl_y_2;
-  __e_acsl_mpz_t __gen_e_acsl_power_fun3_6;
-  __e_acsl_mpz_t __gen_e_acsl_p_2;
-  int __gen_e_acsl_eq_3;
-  __gmpz_init_set_si(__gen_e_acsl_y_2,(long)y);
-  __gen_e_acsl_power_fun3(& __gen_e_acsl_power_fun3_6,x,
-                          (__e_acsl_mpz_struct *)__gen_e_acsl_y_2);
-  __gmpz_init_set_si(__gen_e_acsl_p_2,(long)p);
-  __gen_e_acsl_eq_3 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_power_fun3_6),
-                                 (__e_acsl_mpz_struct const *)(__gen_e_acsl_p_2));
-  int __retres = __gen_e_acsl_eq_3 == 0;
-  __gmpz_clear(__gen_e_acsl_y_2);
-  __gmpz_clear(__gen_e_acsl_power_fun3_6);
-  __gmpz_clear(__gen_e_acsl_p_2);
-  return __retres;
 }
 
 /*@ assigns \result;

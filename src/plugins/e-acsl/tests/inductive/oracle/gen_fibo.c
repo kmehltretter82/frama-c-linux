@@ -17,11 +17,8 @@ inductive fibo(integer i, integer x) {
   }
  */
 /*@ predicate fibo(integer i, integer x) = fibo_fun2(i) == x;
-
-*/
+ */
 int __gen_e_acsl_fibo(int i, int x);
-
-int __gen_e_acsl_fibo_3(int i, int x);
 
 /*@
 logic integer fibo_fun2(integer i) =
@@ -60,7 +57,7 @@ int main(void)
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
       {.values = (void *)0};
     __e_acsl_sound_verdict = 0;
-    __gen_e_acsl_fibo_4 = __gen_e_acsl_fibo_3(7,12);
+    __gen_e_acsl_fibo_4 = __gen_e_acsl_fibo(7,12);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,"fibo(7, 12)",
                                  0,__gen_e_acsl_fibo_4);
     __gen_e_acsl_assert_data_3.blocking = 1;
@@ -155,23 +152,6 @@ void __gen_e_acsl_fibo_fun2(__e_acsl_mpz_t *__retres_arg, int i)
                   (__e_acsl_mpz_struct const *)(__gen_e_acsl_if_3));
   __gmpz_clear(__gen_e_acsl_if_3);
   return;
-}
-
-/*@ assigns \result;
-    assigns \result \from i, x; */
-int __gen_e_acsl_fibo_3(int i, int x)
-{
-  __e_acsl_mpz_t __gen_e_acsl_fibo_fun2_8;
-  __e_acsl_mpz_t __gen_e_acsl_x_2;
-  int __gen_e_acsl_eq_2;
-  __gen_e_acsl_fibo_fun2(& __gen_e_acsl_fibo_fun2_8,i);
-  __gmpz_init_set_si(__gen_e_acsl_x_2,(long)x);
-  __gen_e_acsl_eq_2 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_fibo_fun2_8),
-                                 (__e_acsl_mpz_struct const *)(__gen_e_acsl_x_2));
-  int __retres = __gen_e_acsl_eq_2 == 0;
-  __gmpz_clear(__gen_e_acsl_fibo_fun2_8);
-  __gmpz_clear(__gen_e_acsl_x_2);
-  return __retres;
 }
 
 /*@ assigns \result;

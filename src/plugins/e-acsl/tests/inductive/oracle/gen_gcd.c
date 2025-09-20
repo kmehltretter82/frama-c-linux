@@ -19,8 +19,6 @@ predicate gcd(integer n, integer m, integer r) =
   (m == 0 && r == n) || (m != 0 && gcd(m, n % m, r));
 
 */
-int __gen_e_acsl_gcd_5(int n, int m, int r);
-
 int __gen_e_acsl_gcd(int n, int m, int r);
 
 int main(void)
@@ -44,19 +42,19 @@ int main(void)
   }
   /*@ assert gcd(42, 24, 6); */ ;
   {
-    int __gen_e_acsl_gcd_8;
+    int __gen_e_acsl_gcd_6;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
       {.values = (void *)0};
-    __gen_e_acsl_gcd_8 = __gen_e_acsl_gcd_5(42,24,7);
+    __gen_e_acsl_gcd_6 = __gen_e_acsl_gcd(42,24,7);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
-                                 "gcd(42, 24, 7)",0,__gen_e_acsl_gcd_8);
+                                 "gcd(42, 24, 7)",0,__gen_e_acsl_gcd_6);
     __gen_e_acsl_assert_data_2.blocking = 1;
     __gen_e_acsl_assert_data_2.kind = "Assertion";
     __gen_e_acsl_assert_data_2.pred_txt = "!gcd(42, 24, 7)";
     __gen_e_acsl_assert_data_2.file = "gcd.c";
     __gen_e_acsl_assert_data_2.fct = "main";
     __gen_e_acsl_assert_data_2.line = 21;
-    __e_acsl_assert(! __gen_e_acsl_gcd_8,& __gen_e_acsl_assert_data_2);
+    __e_acsl_assert(! __gen_e_acsl_gcd_6,& __gen_e_acsl_assert_data_2);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
   }
   /*@ assert !gcd(42, 24, 7); */ ;
@@ -84,27 +82,6 @@ int __gen_e_acsl_gcd(int n, int m, int r)
     __gen_e_acsl_or = __gen_e_acsl_and_2;
   }
   return __gen_e_acsl_or;
-}
-
-/*@ assigns \result;
-    assigns \result \from n, m, r; */
-int __gen_e_acsl_gcd_5(int n, int m, int r)
-{
-  int __gen_e_acsl_and_3;
-  int __gen_e_acsl_or_2;
-  if (m == 0) __gen_e_acsl_and_3 = r == n; else __gen_e_acsl_and_3 = 0;
-  if (__gen_e_acsl_and_3) __gen_e_acsl_or_2 = 1;
-  else {
-    int __gen_e_acsl_and_4;
-    if (m != 0) {
-      int __gen_e_acsl_gcd_7;
-      __gen_e_acsl_gcd_7 = __gen_e_acsl_gcd_5(m,n % m,r);
-      __gen_e_acsl_and_4 = __gen_e_acsl_gcd_7;
-    }
-    else __gen_e_acsl_and_4 = 0;
-    __gen_e_acsl_or_2 = __gen_e_acsl_and_4;
-  }
-  return __gen_e_acsl_or_2;
 }
 
 
