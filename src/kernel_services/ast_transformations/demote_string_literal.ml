@@ -8,28 +8,27 @@
 
 open Cil_types
 
+(* infinite sequence whose first elements are the characters of the string
+   and the rest are [0]. We'll use it later to initialize an array of
+   arbitrary length, padding with [0]'s as appropriate (or truncating if
+   the declared length is smaller than the length of the string literal)
+*)
 let to_seq_string loc s =
-  let len = String.length s in
-  let gen i =
-    if i >= len then
-      Some (Cil.new_exp ~loc (Const (CChr '\000')),i)
-    else
-      Some (Cil.new_exp ~loc (Const (CChr s.[i])),i+1)
-  in
-  Seq.unfold gen 0
+  let mk_char_exp c = Cil.new_exp ~loc (Const (CChr c)) in
+  let es = Seq.map mk_char_exp (String.to_seq s) in
+  Seq.append es (Seq.repeat (mk_char_exp '\000'))
 
+(* same as to_seq_string above, but for wide strings *)
 let to_seq_wstring loc s =
   let kind = Machine.wchar_kind () in
-  let gen = function
-    | [] -> Some (Cil.kinteger ~loc kind 0, [])
-    | wchar :: tl ->
-      let transf =
-        if Machine.char_is_unsigned() then Z.of_int64_unsigned else Z.of_int64
-      in
-      Some (Cil.kinteger64 ~loc ~kind (transf wchar),tl)
+  let z_of_wchar =
+    if Machine.char_is_unsigned() then Z.of_int64_unsigned else Z.of_int64
   in
-  Seq.unfold gen s
+  let mk_wchar_exp w = Cil.kinteger64 ~loc ~kind (z_of_wchar w) in
+  let es = Seq.map mk_wchar_exp (List.to_seq s) in
+  Seq.append es (Seq.repeat (Cil.kinteger ~loc kind 0))
 
+(* finite sequence of indices of elements to initialize. *)
 let to_seq_idx up =
   let gen i =
     if Z.lt i up then
