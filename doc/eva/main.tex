@@ -4664,9 +4664,10 @@ in very long analyses and/or massive memory usage.
 
 \emph{This domain is experimental.}
 
-Option \texttt{-eva-domains taint} performs a taint analysis, which is a
-data-dependency analysis tracking the impact an external user may have on
-the program execution when supplying some data.
+Option \texttt{-eva-domains taint} performs a taint analysis, a form of
+information-flow analysis, that tracks how data originating from untrusted or
+sensitive sources---such as external inputs or secrets---propagate through the
+program and potentially influence its execution.
 
 The initial taint must be specified by the user with ACSL annotations
 \lstinline|//@ taint <lvalues>;| on a statement, or a clause
@@ -4717,6 +4718,37 @@ not tainted anymore.
   void sanitize(int *p);
 \end{listing-nonumber}
 
+Taint analysis accounts for both data and control dependencies: a value may
+become tainted either directly, through assignments and computations that use
+tainted data, or indirectly, through control flow that depends on tainted
+values. To reflect this distinction, the predicates
+\lstinline|\tainted_directly| and \lstinline|\tainted_indirectly| refine the
+general \lstinline|\tainted| predicate. In the same spirit as
+\lstinline|\tainted|, \lstinline|\tainted_directly| can be used to verify that a
+value is \emph{not} directly tainted, while \lstinline|\tainted_indirectly| to
+verify that a value is \emph{not} indirectly tainted.
+
+\begin{listing-nonumber}
+  void fun(int a, int b, int t) {
+    //@ taint t;
+    int x = a + t;
+    //@ check !\tainted_indirectly(x);  // TRUE
+    //@ check \tainted_directly(x);     // UNKNOWN
+    //@ check \tainted(x);              // UNKNOWN
+
+    int y = 0;
+    if (t)
+      y = a - b;
+    //@ check !\tainted_directly(y);    // TRUE
+    //@ check \tainted_indirectly(y);   // UNKNOWN
+    //@ check \tainted(y);              // UNKNOWN
+  }
+\end{listing-nonumber}
+
+As with \lstinline|\tainted|, the predicates \lstinline|\tainted_directly| and
+\lstinline|\tainted_indirectly| can be used in ACSL assertions to refine the
+over-approximation of tainted locations, with respect to direct and indirect
+taints respectively.
 
 \subsection{Numerors}
 \label{sec:numerors}

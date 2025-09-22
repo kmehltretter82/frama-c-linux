@@ -179,7 +179,27 @@ void tainted_predicate (void) {
   //@ check true: !\tainted(not_tainted);
   //@ assert unknown: !\tainted(x);
   //@ check true: !\tainted(x);
-  //@ check \tainted(indirect); // for now, \tainted only considers direct taint.
+  //@ check \tainted(indirect); // unknown as over-approximation of taint
+  //@ check false: \tainted_directly(indirect);
+
+  int y, z, *p;
+  if (tainted) {
+    p = &y;
+  } else {
+    p = &z;
+  }
+  //@ assert true: !\tainted(y);
+  //@ assert true: !\tainted(z);
+
+  *p = 1;
+  //@ check !\tainted(y); // unknown as over-approximation of taint
+  //@ check !\tainted(z); // unknown as over-approximation of taint
+  //@ check true: !\tainted_directly(y);
+  //@ check true: !\tainted_directly(z);
+
+  //@ check false: !\tainted_indirectly(z); // unknown as over-approximation of taint
+  //@ assert unknown: !\tainted_indirectly(z);
+  //@ check true: !\tainted_indirectly(z);
 }
 
 // Taints global variable 'tainted'.
