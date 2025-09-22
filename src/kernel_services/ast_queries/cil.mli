@@ -1348,6 +1348,11 @@ class type cilVisitor = object
   method vinit: varinfo -> offset -> init -> init visitAction
   (** Initializers. Pass the global where this occurs, and the offset *)
 
+  method vstr_literal: varinfo -> str_literal -> str_literal visitAction
+  (** (Wide-)string literal
+      @since Frama-C+dev
+  *)
+
   method vinit_or_str: varinfo -> init_or_str -> init_or_str visitAction
   (** Global Initializers (either normal one or (wide) string)
       @since Frama-C+dev
@@ -1646,6 +1651,15 @@ val visitCilVarDecl: cilVisitor -> varinfo -> varinfo
     offset. *)
 val visitCilInit: cilVisitor -> varinfo -> offset -> init -> init
 
+(** Visit a (wide-)string literal. The [varinfo] is its representative
+    (see {!Globals.Vars.get_string_literal} for more information)
+    @since Frama-C+dev
+*)
+val visitCilStr_literal: cilVisitor -> varinfo -> str_literal -> str_literal
+
+(** Visit a normal initializer or a string literal.
+    @since Frama-C+dev
+*)
 val visitCilInit_or_str: cilVisitor -> varinfo -> init_or_str -> init_or_str
 
 (** Visit a list of attributes *)

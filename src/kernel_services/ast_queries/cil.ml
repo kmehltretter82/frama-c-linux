@@ -386,6 +386,8 @@ class type cilVisitor = object
   (** Initializers for globals, pass the global where this occurs, and the
       offset *)
 
+  method vstr_literal: varinfo -> str_literal -> str_literal visitAction
+
   method vinit_or_str: varinfo -> init_or_str -> init_or_str visitAction
 
   method vlocal_init: varinfo -> local_init -> local_init visitAction
@@ -546,6 +548,7 @@ class internal_genericCilVisitor current_func behavior queue: cilVisitor =
     method vfunc (_f:fundec) = DoChildren
     method vglob (_g:global) = DoChildren
     method vinit (_forg: varinfo) (_off: offset) (_i:init) = DoChildren
+    method vstr_literal _ _ = DoChildren
     method vinit_or_str _ _ = DoChildren
     method vlocal_init _ _ = DoChildren
     method vtype (_t:typ) = DoChildren
@@ -833,6 +836,11 @@ let copy_logic_label is_copy l =
     (* we don't copy the associated statement. It will be recomputed
        if needed. *)
   end else l
+
+let nopChildren _vis elt = elt
+
+let visitCilStr_literal vis vi lit =
+  doVisitCil vis id (vis#vstr_literal vi) nopChildren lit
 
 let rec visitCilTerm vis t =
   Current_loc.with_loc t.term_loc
@@ -1659,7 +1667,9 @@ and visitCilInit_or_str vis vi i =
     | CInit init ->
       let init' = visitCilInit vis vi NoOffset init in
       if init != init' then CInit init' else i
-    | StrInit _ -> i
+    | StrInit lit ->
+      let lit' = visitCilStr_literal vis vi lit in
+      if lit' != lit then StrInit lit' else i
   in
   doVisitCil vis id (vis#vinit_or_str vi) childrenInit_or_str i
 
