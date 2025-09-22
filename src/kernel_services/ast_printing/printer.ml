@@ -150,11 +150,10 @@ class printer_with_annot () = object (self)
        variable declaration of the first function definition. *)
     match glob with
     | GFunDecl _ | GFun _ ->
-      print_spec <- Ast.is_def_or_last_decl glob; super#global fmt glob
+      print_spec <- Ast.is_def_or_last_decl glob;
+      super#global fmt glob
     | GVar (v,_,_) | GVarDecl(v,_)
-      when
-        Ast_attributes.(contains fc_literal v.vattr)
-        && not (Kernel.PrintAsIs.get()) ->
+      when Ast_info.is_string_literal v && not (Kernel.PrintAsIs.get()) ->
       ()
     | _ -> super#global fmt glob
 

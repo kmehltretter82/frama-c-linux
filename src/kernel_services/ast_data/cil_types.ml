@@ -908,11 +908,11 @@ and init =
     arrays. See {!Ast_info.is_string_literal} and
     {!Globals.Vars.get_string_literal} to respectively check whether a
     varinfo corresponds to a string literal and retrieve its value.
-    @since @Frama-C+dev
+    @since Frama-C+dev
 *)
 and str_literal =
   | Str of string
-  (** a const char array representing a string literal.
+  (** A const char array representing a string literal.
       The escape characters inside the string have been already
       interpreted.
   *)
@@ -928,7 +928,7 @@ and str_literal =
       underlying wide character type. *)
 
 (** Initializers of global variables.
-    @since @Frama-C+dev *)
+    @since Frama-C+dev *)
 and init_or_str =
   | CInit of init (** standard initialisation. *)
   | StrInit of str_literal (** string literal. *)

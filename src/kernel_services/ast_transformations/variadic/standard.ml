@@ -390,8 +390,7 @@ let rec static_string env a = match a.enode with
      | Some (StrInit (Wstr s)) -> Some (Format_string.WString s)
      | Some (CInit _) | exception Not_found -> None)
   | CastE (_, e) -> static_string env e
-  | _ ->
-    None
+  | _ -> None
 
 let find_global env name =
   try

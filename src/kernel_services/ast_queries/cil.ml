@@ -2815,13 +2815,11 @@ let no_op_coerce typ t =
 
 let typeOf_string_literal ?(loc=Cil_datatype.Location.unknown) s =
   let len = kinteger ~loc (Machine.sizeof_kind()) (String.length s + 1) in
-  let t = Ast_types.add_attributes ["const",[]] Cil_const.charType in
-  { tnode = TArray(t,Some len); tattr = [] }
+  Cil_const.(mk_tarray ~tattr:[("const",[])] charType (Some len))
 
 let typeOf_wstring_literal ?(loc=Cil_datatype.Location.unknown) l =
   let len = kinteger ~loc (Machine.sizeof_kind()) (List.length l + 1) in
-  let t = Ast_types.add_attributes ["const",[]] (Machine.wchar_type()) in
-  { tnode = TArray(t,Some len); tattr = [] }
+  Cil_const.mk_tarray ~tattr:[("const",[])] (Machine.wchar_type()) (Some len)
 
 (**** Compute the type of an expression ****)
 let rec typeOf (e: exp) : typ =

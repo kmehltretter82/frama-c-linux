@@ -104,7 +104,7 @@ class constGlobSubstVisitorClass : cilVisitor = object
               | Some z when Z.geq Z.zero z && Z.lt z len ->
                 let c = List.nth l (Z.to_int z) in
                 ChangeTo
-                  (Cil.kinteger64 ~loc ~kind:(Machine.wchar_kind())(Z.of_int64 c))
+                  (Cil.kinteger64 ~loc ~kind:(Machine.wchar_kind()) (Z.of_int64 c))
               | Some z when Z.equal z len ->
                 ChangeTo (Cil.kinteger64 ~loc ~kind:(Machine.wchar_kind()) Z.zero)
               | Some _ | None -> DoChildren)

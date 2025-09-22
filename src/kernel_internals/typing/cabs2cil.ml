@@ -7860,15 +7860,13 @@ and doInitializer loc local_env (vi: varinfo) (inite: Cabs.init_expression)
   if Ast_types.is_array vi.vtype then begin
     let telem, size = Ast_types.array_elem_type_and_size vi.vtype in
     let warn_if_bigger l =
-      Option.value
-        (let open Option.Operators in
-         let* size in
-         let* sz = Cil.constFoldToInt ~machdep:true size in
-         Option.return
-           (if Z.(gt (of_int l) sz) then
-              Kernel.warning ~current:true
-                "Too many initializers for character array %s" vi.vname))
-        ~default:()
+      let open Option.Operators in
+      ignore @@
+      let* size in
+      let+ sz = Cil.constFoldToInt ~machdep:true size in
+      if Z.(gt (of_int l) sz) then
+        Kernel.warning ~current:true
+          "Too many initializers for character array %s" vi.vname
     in
     match inite with
     | NO_INIT | COMPOUND_INIT _ -> normal_init vi inite
