@@ -50,9 +50,9 @@ void main() {
   mutex = Frama_C_mutex_init("mutex / \"𐍅\"");
   queue = Frama_C_queue_init("queue / \"𐍅\"", 2);
 
-  job1 = Frama_C_thread_create("job / \"𐍅\" 1", &f1, NULL);
+  job1 = Frama_C_thread_create("job / \"𐍅\" f1", &f1, NULL);
   Frama_C_thread_start(job1);
-  job2 = Frama_C_thread_create("job / \"𐍅\" 2", &f2, NULL);
+  job2 = Frama_C_thread_create("job / \"𐍅\" f2", &f2, NULL);
   Frama_C_thread_start(job2);
 
   char buf[BUF_SIZE] = { 0 };

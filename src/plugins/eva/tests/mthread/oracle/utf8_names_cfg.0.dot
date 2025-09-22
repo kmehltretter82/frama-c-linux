@@ -11,16 +11,16 @@ digraph G {
        color="#FF0000FF", label="Creating queue queue / \"𐍅\" (size 2)",
        style="filled", ];
   v86 [URL="code.html#sid514", fillcolor="#FFFFFFFF", shape=box,
-       color="#FF0000FF", label="Create thread job / \"𐍅\" 1",
+       color="#FF0000FF", label="Create thread job / \"𐍅\" f1",
        style="filled", ];
   v87 [URL="code.html#sid515", fillcolor="#FFFFFFFF", shape=box,
-       color="#FF0000FF", label="Start thread job / \"𐍅\" 1",
+       color="#FF0000FF", label="Start thread job / \"𐍅\" f1",
        style="filled", ];
   v88 [URL="code.html#sid516", fillcolor="#FFFFFFFF", shape=box,
-       color="#FF0000FF", label="Create thread job / \"𐍅\" 2",
+       color="#FF0000FF", label="Create thread job / \"𐍅\" f2",
        style="filled", ];
   v89 [URL="code.html#sid517", fillcolor="#FFFFFFFF", shape=box,
-       color="#FF0000FF", label="Start thread job / \"𐍅\" 2",
+       color="#FF0000FF", label="Start thread job / \"𐍅\" f2",
        style="filled", ];
   v90 [URL="code.html#sid519", fillcolor="#FFFFFFFF", shape=box,
        color="#000000FF", label="while(1)", style="filled", ];
@@ -50,7 +50,7 @@ digraph G {
   
   }
 
-// Graph for job / "𐍅" 1
+// Graph for job / "𐍅" f1
 digraph G {
   fontsize=9;
   center=1;
@@ -93,7 +93,7 @@ digraph G {
   
   }
 
-// Graph for job / "𐍅" 2
+// Graph for job / "𐍅" f2
 digraph G {
   fontsize=9;
   center=1;
@@ -139,13 +139,13 @@ digraph G {
 // Graph for thread_inheritance_graph
 digraph G {
   "<main>" [label="<main>", ];
-  "job / \"𐍅\" 1" [label="job / \"𐍅\" 1", ];
-  "job / \"𐍅\" 2" [label="job / \"𐍅\" 2", ];
+  "job / \"𐍅\" f1" [label="job / \"𐍅\" f1", ];
+  "job / \"𐍅\" f2" [label="job / \"𐍅\" f2", ];
   
   
   edge [style="solid", ];
-  "<main>" -> "job / \"𐍅\" 1";
-  "<main>" -> "job / \"𐍅\" 2";
+  "<main>" -> "job / \"𐍅\" f1";
+  "<main>" -> "job / \"𐍅\" f2";
   
   }
 
