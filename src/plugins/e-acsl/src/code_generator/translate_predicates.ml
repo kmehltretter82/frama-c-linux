@@ -332,8 +332,14 @@ let rec predicate_content_to_exp_old ?(inplace=false) ?name ~loc ~adata ~env ~kf
       (* static resolutions: \freeable(stdout) ≡ 0; etc. *)
       | Some spec -> of_bool spec.freeable, adata, env
       | None ->
-        let e, adata, env =
-          Memory_translate.call ~adata ~loc kf "freeable" Cil_const.intType env [t]
+        let (t_exp, adata), env =
+          Env.with_params_and_result ~rte:true ~env (fun env ->
+              let t_exp, adata, env = Translate_terms.to_exp ~adata kf env t in
+              (t_exp, adata), env
+            )
+        in
+        let e, env =
+          Memory_translate.call ~loc kf "freeable" Cil_const.intType env [t_exp]
         in
         let adata = Assert.register_pred ~loc env p e adata in
         e, adata, env

@@ -102,6 +102,13 @@ let create_and_init_var ~loc kf ty name exp_init env =
     (fun v_as_varinfo v_as_exp ->
        [ Gmp.init_set ~loc (Cil.var v_as_varinfo) v_as_exp  exp_init ])
 
+let with_env ?rte ?kinstr ~env f =
+  let (e', adata), env =
+    Env.with_params_and_result ?rte ?kinstr ~env
+      (fun env -> let e', adata, env = f env in (e', adata), env)
+  in
+  e', adata, env
+
 (* Create a statement that assigns [exp1 binop exp2] to [var]. [exp_type] allows
    to decide if the binary operation is carried out using a function of gmp or
    not.*)
@@ -718,8 +725,8 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
     end
   | TBinOp(LOr, t1, t2) ->
     (* t1 || t2 <==> if t1 then true else t2 *)
-    let e, adata, env =
-      Extlib.flatten @@ Env.with_params_and_result ~rte:true ~env (fun env ->
+    let (e, adata), env =
+      Env.with_params_and_result ~rte:true ~env (fun env ->
           let e1, adata, env1 = to_exp ~adata kf env t1 in
           let env' = Env.push env1 in
           let e2, adata, env2 =
@@ -735,8 +742,8 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
     e, adata, env, Analyses_types.C_number, ""
   | TBinOp(LAnd, t1, t2) ->
     (* t1 && t2 <==> if t1 then t2 else false *)
-    let e, adata, env =
-      Extlib.flatten @@ Env.with_params_and_result ~rte:true ~env (fun env ->
+    let (e, adata), env =
+      Env.with_params_and_result ~rte:true ~env (fun env ->
           let e1, adata, env1 = to_exp ~adata kf env t1 in
           let e2, adata, env2 =
             to_exp ~adata kf (Env.push env1) t2
@@ -870,8 +877,8 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
     let t1 = Logic_normalizer.get_term t1 in
     let t2 = Logic_normalizer.get_term t2 in
     let t3 = Logic_normalizer.get_term t3 in
-    let e, adata, env =
-      Extlib.flatten @@ Env.with_params_and_result ~rte:true ~env (fun env ->
+    let (e, adata), env =
+      Env.with_params_and_result ~rte:true ~env (fun env ->
           let e1, adata, env1 = to_exp ~adata kf env t1 in
           let e2, adata, env2 =
             to_exp ~adata kf (Env.push env1) t2
@@ -903,15 +910,17 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
     e, adata, env, Analyses_types.C_number, ""
   | Tbase_addr(BuiltinLabel Here, t') ->
     let name = "base_addr" in
-    let e, _, env =
+    let e', _, env =
+      with_env ~rte:true ~env (fun env -> to_exp ~adata:Assert.no_data kf env t')
+    in
+    let e, env =
       Memory_translate.call
-        ~adata:Assert.no_data
         ~loc
         kf
         name
         Cil_const.voidPtrType
         env
-        [t']
+        [e']
     in
     let adata = Assert.register_term ~loc t e adata in
     e, adata, env, Analyses_types.C_number, name
@@ -919,8 +928,11 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
   | Toffset(BuiltinLabel Here, t') ->
     let size_t = Machine.sizeof_type () in
     let name = "offset" in
-    let e, adata, env =
-      Memory_translate.call ~adata ~loc kf name size_t env [t']
+    let e', adata, env =
+      with_env ~rte:true ~env (fun env -> to_exp ~adata kf env t')
+    in
+    let e, env =
+      Memory_translate.call ~loc kf name size_t env [e']
     in
     let adata = Assert.register_term ~loc t e adata in
     e, adata, env, Analyses_types.C_number, name
@@ -928,8 +940,11 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
   | Tblock_length(BuiltinLabel Here, t') ->
     let size_t = Machine.sizeof_type () in
     let name = "block_length" in
-    let e, adata, env =
-      Memory_translate.call ~adata ~loc kf name size_t env [t']
+    let e', adata, env =
+      with_env ~rte:true ~env (fun env -> to_exp ~adata kf env t')
+    in
+    let e, env =
+      Memory_translate.call ~loc kf name size_t env [e']
     in
     let adata = Assert.register_term ~loc t e adata in
     e, adata, env, Analyses_types.C_number, name
@@ -982,7 +997,7 @@ and to_exp_old ?inplace ~loc:_ ~adata ~env ~kf t =
     (Env.Logic_env.get_profile env);
   let logic_env = Env.Logic_env.get env in
   let t = Logic_normalizer.get_term t in
-  let (rexp, _, _) as result =
+  let rexp, _, _ as result =
     Extlib.flatten @@ Env.with_params_and_result ~rte:false ~env (fun env ->
         let e, adata, env, sty, name =
           context_insensitive_term_to_exp_old ?inplace ~adata kf env t

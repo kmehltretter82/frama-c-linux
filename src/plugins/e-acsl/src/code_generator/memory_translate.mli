@@ -12,14 +12,13 @@ open Cil_types
    Partial support for ranges is provided. *)
 
 val call:
-  adata:Assert.t ->
   loc:location ->
   kernel_function ->
   string ->
   typ ->
   Env.t ->
-  term list ->
-  exp * Assert.t * Env.t
+  exp list ->
+  exp * Env.t
 (* [call ~loc kf name ctx env ts] creates a call to the E-ACSL memory built-in
    identified by [name] with the given arguments [ts].
    The supported built-ins are:
