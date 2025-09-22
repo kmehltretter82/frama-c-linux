@@ -91,7 +91,7 @@ class constGlobSubstVisitorClass : cilVisitor = object
            | StrInit (Str s), Index (i,NoOffset) ->
              let l = Z.of_int (String.length s) in
              (match Cil.constFoldToInt i with
-              | Some z when Z.geq Z.zero z && Z.lt z l ->
+              | Some z when Z.leq Z.zero z && Z.lt z l ->
                 let c = s.[Z.to_int z] in
                 ChangeTo (Cil.new_exp ~loc (Const (CChr c)))
               | Some z when Z.equal z l ->
@@ -101,7 +101,7 @@ class constGlobSubstVisitorClass : cilVisitor = object
            | StrInit (Wstr l), Index(i,NoOffset) ->
              let len = Z.of_int (List.length l) in
              (match Cil.constFoldToInt i with
-              | Some z when Z.geq Z.zero z && Z.lt z len ->
+              | Some z when Z.leq Z.zero z && Z.lt z len ->
                 let c = List.nth l (Z.to_int z) in
                 ChangeTo
                   (Cil.kinteger64 ~loc ~kind:(Machine.wchar_kind()) (Z.of_int64 c))
