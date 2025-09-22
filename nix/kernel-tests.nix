@@ -16,8 +16,8 @@ mk_tests {
       @tests/variadic/ptests \
       @src/kernel_internals/parsing/tests/ptests
     dune runtest -j1 \
-      tests \
-      src
+      tests
+    dune build @runtest-frama_c_kernel
     make -C share/machdeps check-schema
   '';
 }
