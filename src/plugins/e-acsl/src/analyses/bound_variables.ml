@@ -111,7 +111,14 @@ end = struct
 end
 
 (** Getters and setters *)
-let get_preprocessed_quantifier = Quantifier.get
+
+let get_preprocessed_quantifier p =
+  Error.retrieve_preprocessing
+    "bound variables analysis"
+    Quantifier.get
+    p
+    Printer.pp_predicate
+
 let get_guard_for_small_type = Quantifier.get_guard_for_small_type
 let add_guard_for_small_type = Quantifier.add_guard_for_small_type
 let replace = Quantifier.replace

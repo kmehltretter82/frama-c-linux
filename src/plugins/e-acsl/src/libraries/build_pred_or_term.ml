@@ -36,7 +36,7 @@ let rec term_of_pred p =
   | Papp (({ l_body = LBpred _; _ } as li), labels, args) ->
     mk_bool_term ~loc (Tapp (li, labels, args))
   | _ ->
-    Options.fatal "Cannot convert predicate '%a' to term" Printer.pp_predicate p
+    Options.fatal ~source:(fst loc) "Cannot convert predicate '%a' to term" Printer.pp_predicate p
 
 module type S = sig
   type t

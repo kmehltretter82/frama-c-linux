@@ -825,13 +825,7 @@ and type_predicate ~profile p =
     type_predicate ~profile p
   | Pforall _
   | Pexists _ ->
-    let guards, goal =
-      Error.retrieve_preprocessing
-        "preprocessing of quantified predicate"
-        Bound_variables.get_preprocessed_quantifier
-        p
-        Printer.pp_predicate
-    in
+    let guards, goal = Bound_variables.get_preprocessed_quantifier p in
     List.iter
       (fun (t1, x, t2) -> type_bound_variables ~profile (t1, x, t2))
       guards;

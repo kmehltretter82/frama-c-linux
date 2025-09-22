@@ -1,4 +1,5 @@
 [e-acsl] beginning translation.
+[e-acsl:analysis:inductive] predicate extraction in complete mode
 [e-acsl] translation done in project "e-acsl".
 [eva:alarm] complex_complete.c:16: Warning: assertion got status unknown.
 [eva:alarm] complex_complete.c:17: Warning: assertion got status unknown.

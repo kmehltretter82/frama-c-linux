@@ -459,15 +459,6 @@ let for_stmt env kf stmt =
       clabels_ref := Logic_label.Set.add (StmtLabel (ref stmt)) !clabels_ref
   end;
 
-  (* Retrieve the set of [\at()] to translate for the given statement. *)
-  let at_for_stmt =
-    Error.retrieve_preprocessing
-      "labels pre-analysis"
-      Labels.at_for_stmt
-      stmt
-      Printer.pp_stmt
-  in
-
   (* Translate the [\at()]. *)
   let stmt_translations = Pred_or_term.Hashtbl.create 7 in
   List.fold_left
@@ -506,7 +497,7 @@ let for_stmt env kf stmt =
        At_data.Hashtbl.replace translations at_data vi_or_err;
        env)
     env
-    at_for_stmt
+    (Labels.at_for_stmt stmt)
 
 let to_exp ~loc ~adata kf env pot label =
   let kinstr = Env.get_kinstr env in
