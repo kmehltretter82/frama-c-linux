@@ -593,7 +593,7 @@ let pop_and_get_contract env =
 (** {2 Utilities} *)
 (* ************************************************************************** *)
 
-let with_params_and_result ?rte ?kinstr ~f env =
+let with_params_and_result ?rte ?kinstr ~env f =
   let old_rte, env =
     match rte with
     | Some rte ->
@@ -619,9 +619,9 @@ let with_params_and_result ?rte ?kinstr ~f env =
   in
   other, env
 
-let with_params ?rte ?kinstr ~f env =
+let with_params ?rte ?kinstr ~env f =
   let (), env =
-    with_params_and_result ?rte ?kinstr ~f:(fun env -> (), f env) env
+    with_params_and_result ?rte ?kinstr ~env (fun env -> (), f env)
   in
   env
 

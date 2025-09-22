@@ -1,5 +1,5 @@
 [e-acsl] beginning translation.
-[e-acsl] ranges_in_builtins.c:73: Warning: 
+[e-acsl] ranges_in_builtins.c:75: Warning: 
   E-ACSL construct `arithmetic over set of pointers or arrays'
   is not yet supported.
   Ignoring annotation.
@@ -10,5 +10,15 @@
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] ranges_in_builtins.c:9: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] ranges_in_builtins.c:63: Warning: 
-  accessing uninitialized left-value. assert \initialized(&s.b);
+[eva:alarm] ranges_in_builtins.c:65: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] ranges_in_builtins.c:65: Warning: assertion got status unknown.
+[eva:alarm] ranges_in_builtins.c:74: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] ranges_in_builtins.c:78: Warning: 
+  accessing left-value that contains escaping addresses.
+  assert !\dangling(multi_dynamic + i);
+[eva:alarm] ranges_in_builtins.c:6: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] ranges_in_builtins.c:6: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.

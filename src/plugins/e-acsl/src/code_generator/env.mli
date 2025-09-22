@@ -214,7 +214,7 @@ val pop_and_get_contract: t -> contract * t
 (** {2 Utilities} *)
 (* ************************************************************************** *)
 
-val with_params: ?rte:bool -> ?kinstr:kinstr -> f:(t -> t) -> t -> t
+val with_params: ?rte:bool -> ?kinstr:kinstr -> env:t -> (t -> t) -> t
 (** [with_params ~rte ~kinstr ~f env] executes the given closure with the given
     environment after having set RTE generation to [rte] and current kinstr to
     [kinstr].
@@ -224,7 +224,7 @@ val with_params: ?rte:bool -> ?kinstr:kinstr -> f:(t -> t) -> t -> t
     then is returned. *)
 
 val with_params_and_result:
-  ?rte:bool -> ?kinstr:kinstr -> f:(t -> 'a * t) -> t -> 'a * t
+  ?rte:bool -> ?kinstr:kinstr -> env:t -> (t -> 'a * t) -> 'a * t
 (** [with_params_and_result ~rte ~kinstr ~f env] executes the given closure with
     the given environment after having set RTE generation to [rte] and current
     kinstr to [kinstr].

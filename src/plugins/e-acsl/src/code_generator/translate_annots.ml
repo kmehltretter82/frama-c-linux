@@ -36,18 +36,12 @@ let pre_funspec kf env funspec =
   let loc = Kernel_function.get_location kf in
   let env = convert_unsupported_clauses env in
   let contract = Contract.create ~loc funspec in
-  Env.with_params
-    ~rte:true
-    ~kinstr
-    ~f:(fun env -> Contract.translate_preconditions kf env contract)
-    env
+  Env.with_params ~rte:true ~kinstr ~env
+    (fun env -> Contract.translate_preconditions kf env contract)
 
 let post_funspec kf env =
-  Env.with_params
-    ~rte:true
-    ~kinstr:Kglobal
-    ~f:(fun env -> Contract.translate_postconditions kf env)
-    env
+  Env.with_params ~rte:true ~kinstr:Kglobal ~env
+    (fun env -> Contract.translate_postconditions kf env)
 
 let pre_code_annotation kf stmt env annot =
   let kinstr = Kstmt stmt in
@@ -58,11 +52,8 @@ let pre_code_annotation kf stmt env annot =
         let env = Env.set_annotation_kind env Assertion in
         if l <> [] then
           Env.not_yet env "@[assertion applied only on some behaviors@]";
-        Env.with_params
-          ~rte:true
-          ~kinstr
-          ~f:(fun env -> Translate_predicates.do_it kf env p)
-          env
+        Env.with_params ~rte:true ~kinstr ~env
+          (fun env -> Translate_predicates.do_it kf env p)
       else
         env
     | AStmtSpec(l, spec) ->
@@ -70,11 +61,8 @@ let pre_code_annotation kf stmt env annot =
         Env.not_yet env "@[statement contract applied only on some behaviors@]";
       let loc = Stmt.loc stmt in
       let contract = Contract.create ~loc spec in
-      Env.with_params
-        ~rte:true
-        ~kinstr
-        ~f:(fun env -> Contract.translate_preconditions kf env contract)
-        env
+      Env.with_params ~rte:true ~kinstr ~env
+        (fun env -> Contract.translate_preconditions kf env contract)
     | AInvariant(l, loop_invariant, p) ->
       let open Current_loc.Operators in
       let<> UpdatedCurrentLoc = p.tp_statement.pred_loc in
@@ -84,11 +72,8 @@ let pre_code_annotation kf stmt env annot =
         if l <> [] then
           Env.not_yet env "@[invariant applied only on some behaviors@]";
         let env =
-          Env.with_params
-            ~rte:true
-            ~kinstr
-            ~f:(fun env -> Translate_predicates.do_it kf env p)
-            env
+          Env.with_params ~rte:true ~kinstr ~env
+            (fun env -> Translate_predicates.do_it kf env p)
         in
         if loop_invariant then
           Env.add_loop_invariant env p
@@ -128,11 +113,8 @@ let post_code_annotation kf stmt env annot =
   let kinstr = Kstmt stmt in
   let convert env = match annot.annot_content with
     | AStmtSpec(_, _) ->
-      Env.with_params
-        ~rte:true
-        ~kinstr
-        ~f:(fun env -> Contract.translate_postconditions kf env)
-        env
+      Env.with_params ~rte:true ~kinstr ~env
+        (fun env -> Contract.translate_postconditions kf env)
     | AAssert _
     | AInvariant _
     | AVariant _

@@ -139,53 +139,45 @@ let rec predicate_content_to_exp_old ?(inplace=false) ?name ~loc ~adata ~env ~kf
     e, adata, env
   | Pand(p1, p2) ->
     (* p1 && p2 <==> if p1 then p2 else false *)
-    Extlib.flatten
-      (Env.with_params_and_result
-         ~rte:true
-         ~f:(fun env ->
-             let e1, adata, env1 = to_exp ~adata kf env p1 in
-             let e2, adata, env2 =
-               to_exp ~adata kf (Env.push env1) p2 in
-             let res2 = e2, env2 in
-             let env3 = Env.push env2 in
-             let name = match name with None -> "and" | Some n -> n in
-             Extlib.nest
-               adata
-               (Translate_utils.conditional_to_exp
-                  ~name
-                  ~loc
-                  kf
-                  None
-                  e1
-                  res2
-                  (Cil.zero ~loc, env3))
-           )
-         env)
+    Extlib.flatten @@ Env.with_params_and_result ~rte:true ~env (fun env ->
+        let e1, adata, env1 = to_exp ~adata kf env p1 in
+        let e2, adata, env2 =
+          to_exp ~adata kf (Env.push env1) p2 in
+        let res2 = e2, env2 in
+        let env3 = Env.push env2 in
+        let name = match name with None -> "and" | Some n -> n in
+        Extlib.nest
+          adata
+          (Translate_utils.conditional_to_exp
+             ~name
+             ~loc
+             kf
+             None
+             e1
+             res2
+             (Cil.zero ~loc, env3))
+      )
   | Por(p1, p2) ->
     (* p1 || p2 <==> if p1 then true else p2 *)
-    Extlib.flatten
-      (Env.with_params_and_result
-         ~rte:true
-         ~f:(fun env ->
-             let e1, adata, env1 = to_exp ~adata kf env p1 in
-             let env' = Env.push env1 in
-             let e2, adata, env2 =
-               to_exp ~adata kf (Env.push env') p2
-             in
-             let res2 = e2, env2 in
-             let name = match name with None -> "or" | Some n -> n in
-             Extlib.nest
-               adata
-               (Translate_utils.conditional_to_exp
-                  ~name
-                  ~loc
-                  kf
-                  None
-                  e1
-                  (Cil.one ~loc, env')
-                  res2)
-           )
-         env)
+    Extlib.flatten @@ Env.with_params_and_result ~rte:true ~env (fun env ->
+        let e1, adata, env1 = to_exp ~adata kf env p1 in
+        let env' = Env.push env1 in
+        let e2, adata, env2 =
+          to_exp ~adata kf (Env.push env') p2
+        in
+        let res2 = e2, env2 in
+        let name = match name with None -> "or" | Some n -> n in
+        Extlib.nest
+          adata
+          (Translate_utils.conditional_to_exp
+             ~name
+             ~loc
+             kf
+             None
+             e1
+             (Cil.one ~loc, env')
+             res2)
+      )
   | Pxor _ -> Env.not_yet env "xor"
   | Pimplies(p1, p2) ->
     (* (p1 ==> p2) <==> !p1 || p2 *)
@@ -209,23 +201,19 @@ let rec predicate_content_to_exp_old ?(inplace=false) ?name ~loc ~adata ~env ~kf
     let e, adata, env = to_exp ~adata kf env p in
     Smart_exp.lnot ~loc e, adata, env
   | Pif(t, p2, p3) ->
-    Extlib.flatten
-      (Env.with_params_and_result
-         ~rte:true
-         ~f:(fun env ->
-             let e1, adata, env1 = Translate_terms.to_exp ~adata kf env t in
-             let e2, adata, env2 =
-               to_exp ~adata kf (Env.push env1) p2 in
-             let res2 = e2, env2 in
-             let e3, adata, env3 =
-               to_exp ~adata kf (Env.push env2) p3
-             in
-             let res3 = e3, env3 in
-             Extlib.nest
-               adata
-               (Translate_utils.conditional_to_exp ~loc kf None e1 res2 res3)
-           )
-         env)
+    Extlib.flatten @@ Env.with_params_and_result ~rte:true ~env (fun env ->
+        let e1, adata, env1 = Translate_terms.to_exp ~adata kf env t in
+        let e2, adata, env2 =
+          to_exp ~adata kf (Env.push env1) p2 in
+        let res2 = e2, env2 in
+        let e3, adata, env3 =
+          to_exp ~adata kf (Env.push env2) p3
+        in
+        let res3 = e3, env3 in
+        Extlib.nest
+          adata
+          (Translate_utils.conditional_to_exp ~loc kf None e1 res2 res3)
+      )
   | Plet(li, p) ->
     (* Translate the term registered to the \let logic variable *)
     let adata, env = Translate_utils.env_of_li ~adata ~loc kf env li in
@@ -344,8 +332,14 @@ let rec predicate_content_to_exp_old ?(inplace=false) ?name ~loc ~adata ~env ~kf
       (* static resolutions: \freeable(stdout) ≡ 0; etc. *)
       | Some spec -> of_bool spec.freeable, adata, env
       | None ->
-        let e, adata, env =
-          Memory_translate.call ~adata ~loc kf "freeable" Cil_const.intType env t
+        let (t_exp, adata), env =
+          Env.with_params_and_result ~rte:true ~env (fun env ->
+              let t_exp, adata, env = Translate_terms.to_exp ~adata kf env t in
+              (t_exp, adata), env
+            )
+        in
+        let e, env =
+          Memory_translate.call ~loc kf "freeable" Cil_const.intType env [t_exp]
         in
         let adata = Assert.register_pred ~loc env p e adata in
         e, adata, env
@@ -361,16 +355,12 @@ and predicate_content_to_exp ~adata ?inplace ?name kf env p =
     p
 
 and to_exp_old ~rte ~loc:_ ?inplace ?name ~adata ~env ~kf p =
-  Extlib.flatten @@
-  Env.with_params_and_result
-    ~rte:false
-    ~f:(fun env ->
-        let e, adata, env =
-          predicate_content_to_exp ?inplace ~adata ?name kf env p
-        in
-        let env = if rte then !translate_rte_exp_ref kf env e else env in
-        (e, adata), env)
-    env
+  Extlib.flatten @@ Env.with_params_and_result ~rte:false ~env (fun env ->
+      let e, adata, env =
+        predicate_content_to_exp ?inplace ~adata ?name kf env p
+      in
+      let env = if rte then !translate_rte_exp_ref kf env e else env in
+      (e, adata), env)
 
 and to_exp_il ~rte p =
   if rte

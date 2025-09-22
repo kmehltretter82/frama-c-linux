@@ -60,6 +60,8 @@ int main(void) {
   s.a[0] = 7;
   s.a[1] = 8;
   /*@ assert \initialized(&s.a[0] + (1..1)); */;
+  float sb = 0.5f;
+  s.b = &sb;
   /*@ assert !\initialized(s.b + (0..1)); */;
 
   int **multi_dynamic;
