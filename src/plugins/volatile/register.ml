@@ -758,7 +758,10 @@ class process_volatile_access project binding_map kf_tbl vol_tbl index =
     method private get_volatile_access ~is_wr_access lv =
       let kf_name =
         match self#current_kf with
-        | None -> assert false (* cannot happen *)
+        | None ->
+          Options.fatal "get_volatile_access: this method should always be \
+                         called inside a function (i.e. at a point where \
+                         current_kf is set)."
         | Some kf -> Kernel_function.get_name kf
       in
       get_volatile_access ~is_wr_access kf_name binding_map kf_tbl vol_tbl lv
