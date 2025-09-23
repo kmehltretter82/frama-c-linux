@@ -128,7 +128,7 @@ let import iDir files ast =
 
 let import files1 files2 ast =
   import
-    (Options.Idir.get ())
+    (Options.Idirs.get ())
     (files1 @ (Options.Import.get ()) @ files2)
     ast;
   Options.set_importation_off ()

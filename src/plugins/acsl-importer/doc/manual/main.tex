@@ -73,9 +73,9 @@ The main options are:
   specifications in the abstract syntax tree of \FramaC for further processing.
   The file name list is a comma separated list of file names.
   It can be repeated many times and its effect is cumulative.
-\item \verb|-acsl-import-Idir <dirname list>| specifies the list of directories
-  where the relative file names mentioned in \verb|include| directives are
-  searched.
+\item \verb|-acsl-import-include-dirs <dirname list>| specifies the list of
+  directories where the relative file names mentioned in \verb|include|
+  directives are searched.
 \item \verb|-acsl-import-keep-unsed-symbols| configures \FramaC kernel such that
   unused C symbols aren't removed before the import.
 \item \verb|-acsl-import-no-run| doesn't run the plug-in, just configure its parameters.
@@ -161,8 +161,8 @@ The importation semantics is given by the following rules:
     If \verb|f.acsl| is a relative filename the plug-in will look for
     first inside the directory containing file containing the
     \verb|include| directive and then in first directory of the list
-    of directories given to the option \verb|-acsl-import-Idir| that contains
-    \verb|f.acsl|.
+    of directories given to the option \verb|-acsl-import-include-dirs| that
+    contains \verb|f.acsl|.
   \item \verb|let m = <T>;| defines a macro named \verb|m|. All
     occurrences of the macro \verb|m| in current scope
     will be expanded verbatim by the \acsl term \verb|T|. The

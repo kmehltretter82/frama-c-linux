@@ -41,7 +41,7 @@ val is_unroll_loop_pragma_on: unit -> bool
 val is_unroll_loop_condition_on: unit -> bool
 
 module AddonEnsuresAndExits : Parameter_sig.Bool
-module Idir : Parameter_sig.String_list
+module Idirs : Parameter_sig.String_list
 module AddonIntegerCast: Parameter_sig.Bool
 module Run : Parameter_sig.Bool
 module Import : Parameter_sig.String_list

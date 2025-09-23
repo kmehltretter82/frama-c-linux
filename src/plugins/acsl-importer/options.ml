@@ -64,11 +64,11 @@ module AddonEnsuresAndExits =
     let help = "adds ensures_and_exits extension clause"
   end)
 
-module Idir =
+module Idirs =
   String_list(struct
-    let option_name = "-acsl-import-Idir"
+    let option_name = "-acsl-import-include-dirs"
     let arg_name = "d1,...,dn"
-    let help = "directory for searching ACSL files to include"
+    let help = "directories for searching ACSL files to include"
   end)
 
 module AddonIntegerCast =
