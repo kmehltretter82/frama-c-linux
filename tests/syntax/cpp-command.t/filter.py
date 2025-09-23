@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-""" Filter for the cpp-command test. Expects $FRAMAC_SHARE as its first argument. """
+"""Filter for the cpp-command test. Expects $FRAMAC_SHARE as its first argument."""
 
 import re
 import sys

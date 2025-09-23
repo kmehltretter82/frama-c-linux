@@ -8,7 +8,7 @@
 ##########################################################################
 
 """Contains functions to perform logging-related configuration common to
-   several scripts."""
+several scripts."""
 
 import logging
 import sys
