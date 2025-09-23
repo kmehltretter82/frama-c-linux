@@ -169,14 +169,10 @@ let mark_close_stag state default stag =
   with
     Not_found -> default stag
 
-let is_supported out_channel =
-  let isatty = Unix.(isatty (descr_of_out_channel out_channel)) in
-  let ansi_terminal =
-    match Sys.getenv "TERM" with
-    | exception Not_found | "dumb" | "" -> false
-    | _  -> true
-  in
-  isatty && ansi_terminal
+let is_supported () =
+  match Sys.getenv "TERM" with
+  | exception Not_found | "dumb" | "" -> false
+  | _  -> true
 
 let enable_on formatter =
   let state = State.init () in
@@ -191,11 +187,6 @@ let enable_on formatter =
       mark_open_stag = mark_open_stag state old.mark_open_stag;
       mark_close_stag = mark_close_stag state old.mark_close_stag; };
   reset
-
-let enable () =
-  if is_supported stdout then
-    enable_on Format.std_formatter
-  else ignore
 
 
 (* Tests *)

@@ -18,7 +18,12 @@
     The name [s] of the string tags inside ["@{<s>}"] should match the
     corresponding style or color constructor. The comparison is
     case-insensitive. For colors, the color name may be prefixed by an optional
-    "fg" for foreground color and by "bg" for background colors.
+    "fg" for foreground color and by "bg" for background colors. Multiple tags
+    can be given at once by separating them with a comma.
+
+    {[
+      Format.printf "@{<red,bold>Red & Bold Text}"
+    ]}
 
     Alternatively, style tags may be output using the new [Style_tag] :
 
@@ -31,20 +36,15 @@
 
     See {!Format.stag} for details about semantic tags. *)
 
-(** [is_supported out] returns whether the out channel [out] supports ansi
-    escape sequence, i.e. if it is a tty and exports a [TERM] environnement
+(** [is_supported ()] returns whether the current terminal supports ansi
+    escape sequence, i.e. if it exports a [TERM] environnement
     variable that is not assigned "DUMB" *)
-val is_supported : out_channel -> bool
+val is_supported : unit -> bool
 
 (** Enable the style output on the given formatter. No support test is
     performed.
     @return a reset function that can be called to reset styles. *)
 val enable_on : Format.formatter -> (unit -> unit)
-
-(** Enable the style output on the standard formatter, but only if [stdout]
-    supports it.
-    @return a reset function that can be called to reset styles. *)
-val enable : unit -> (unit -> unit)
 
 (** Output colors *)
 type color =
