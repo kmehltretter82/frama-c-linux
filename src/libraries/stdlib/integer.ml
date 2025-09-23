@@ -152,7 +152,7 @@ type digits = {
   bsize : int ; (* bits in each bloc *)
   bmask : Z.t ; (* block mask, must be (1 << bsize) - 1 *)
   sep : string ;
-  pp : Format.formatter -> int -> unit ; (* print one block *)
+  pp : int formatter ; (* print one block *)
 }
 
 let rec pp_digits d fmt n v =
