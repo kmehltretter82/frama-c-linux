@@ -18,16 +18,17 @@ module Error = Translation_error
 (********************** Forward references ********************************)
 (**************************************************************************)
 
-let term_to_exp_ref
-  : (adata:Assert.t ->
-     ?inplace:bool ->
-     kernel_function ->
-     Env.t ->
-     term ->
-     exp * Assert.t * Env.t) ref
-  =
-  ref (fun ~adata:_ ?inplace:_ _kf _env _t ->
-      Extlib.mk_labeled_fun "term_to_exp_ref")
+module Translate_terms = struct
+  let to_exp_ref
+    : (adata:Assert.t ->
+       ?inplace:bool ->
+       kernel_function ->
+       Env.t ->
+       term ->
+       exp * Assert.t * Env.t) ref
+    = ref @@ fun ~adata:_ ?inplace:_ _kf _env _t -> Extlib.mk_labeled_fun "Translate_ats.Translate_terms.to_exp_ref"
+  let to_exp ~adata ?inplace kf env t = !to_exp_ref ~adata ?inplace kf env t
+end
 
 let predicate_to_exp_ref
   : (adata:Assert.t ->
@@ -170,7 +171,7 @@ let size_from_sizes_and_shifts ~loc = function
 let lval_at_index ~loc kf env (e_at, t_index) =
   let logic_env = Env.Logic_env.get env in
   Typing.preprocess_term ~use_gmp_opt:false ~ctx:Typing.c_int ~logic_env t_index;
-  let term_to_exp = !term_to_exp_ref in
+  let term_to_exp = Translate_terms.to_exp in
   let e_index, _, env = term_to_exp ~adata:Assert.no_data kf env t_index in
   let e_index = Cil.constFold false e_index in
   let e_addr =
@@ -250,7 +251,7 @@ let pretranslate_to_exp ~loc kf env pot =
     let adata = Assert.no_data in
     match pot with
     | PoT_term t ->
-      let e, _, env = !term_to_exp_ref ~adata ~inplace:true kf env t in
+      let e, _, env = Translate_terms.to_exp ~adata ~inplace:true kf env t in
       e, env, Some t
     | PoT_pred p ->
       let e, _, env = !predicate_to_exp_ref ~adata ~inplace:true kf env p in
@@ -284,7 +285,7 @@ let pretranslate_to_exp_with_lscope ~loc ~lscope kf env pot =
     Profile.pretty
     (Env.Logic_env.get_profile env)
     Lscope.D.pretty lscope;
-  let term_to_exp = !term_to_exp_ref in
+  let term_to_exp = Translate_terms.to_exp in
   let lscope_vars = Lscope.get_all lscope in
   let lscope_vars = List.rev lscope_vars in
   let rec add_lscope_to_logic_env env = function
@@ -368,7 +369,7 @@ let pretranslate_to_exp_with_lscope ~loc ~lscope kf env pot =
   let t_index = index_from_sizes_and_shifts ~loc sizes_and_shifts in
   (* Innermost block *)
   let mk_innermost_block env =
-    let term_to_exp = !term_to_exp_ref ~adata:Assert.no_data ~inplace:true in
+    let term_to_exp = Translate_terms.to_exp ~adata:Assert.no_data ~inplace:true in
     let predicate_to_exp =
       !predicate_to_exp_ref ~adata:Assert.no_data ~inplace:true
     in
@@ -523,7 +524,7 @@ let to_exp ~loc ~adata kf env pot label =
         raise exn
     with Not_found -> begin
         match pot with
-        | PoT_term t -> !term_to_exp_ref ~adata ~inplace:true kf env t
+        | PoT_term t -> Translate_terms.to_exp ~adata ~inplace:true kf env t
         | PoT_pred p -> !predicate_to_exp_ref ~adata ~inplace:true kf env p
       end
   else

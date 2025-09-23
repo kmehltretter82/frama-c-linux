@@ -16,16 +16,17 @@ module Error = Translation_error
 (********************** Forward references ********************************)
 (**************************************************************************)
 
-let term_to_exp_ref
-  : (adata:Assert.t ->
-     kernel_function ->
-     Env.t ->
-     term ->
-     exp * Assert.t * Env.t) ref
-  =
-  ref (fun ~adata:_ _kf _env _t -> Extlib.mk_labeled_fun "term_to_exp_ref")
-
-let term_to_exp ~adata kf env t = !term_to_exp_ref ~adata kf env t
+module Translate_terms = struct
+  let to_exp_ref
+    : (adata:Assert.t ->
+       ?inplace:bool ->
+       kernel_function ->
+       Env.t ->
+       term ->
+       exp * Assert.t * Env.t) ref
+    = ref @@ fun ~adata:_ ?inplace:_ _kf _env _t -> Extlib.mk_labeled_fun "Translate_utils.Translate_terms.to_exp_ref"
+  let to_exp ~adata ?inplace kf env t = !to_exp_ref ~adata ?inplace kf env t
+end
 
 let predicate_to_exp_ref
   : (adata:Assert.t ->
@@ -132,7 +133,7 @@ let gmp_to_sizet ~adata ~loc ~name ?(check_lower_bound=true) ?pp kf env t =
   in
   let stmts = assertion :: stmts in
   (* Translate term [t] into an exp of type [size_t] *)
-  let gmp_e, adata, env = term_to_exp ~adata kf env t in
+  let gmp_e, adata, env = Translate_terms.to_exp ~adata kf env t in
   let  _, e, env = Env.new_var
       ~loc
       ~name:"size"
@@ -236,7 +237,7 @@ let env_of_li ~adata ~loc kf env li =
     let logic_env = Env.Logic_env.get env in
     let ty = Typing.get_typ ~logic_env t in
     let vi, vi_e, env = Env.Logic_binding.add ~ty env kf li.l_var_info in
-    let e, adata, env = term_to_exp ~adata kf env t in
+    let e, adata, env = Translate_terms.to_exp ~adata kf env t in
     let stmt = match Typing.get_number_ty ~logic_env t with
       | C_integer _ | C_float _ | Nan ->
         Smart_stmt.assigns ~loc ~result:(Cil.var vi) e

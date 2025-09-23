@@ -26,14 +26,17 @@ let predicate_to_exp_ref
   ref (fun ~adata:_ _kf _env _p ->
       Extlib.mk_labeled_fun "predicate_to_exp_ref")
 
-let term_to_exp_ref
-  : (adata:Assert.t ->
-     kernel_function ->
-     Env.t ->
-     term ->
-     exp * Assert.t * Env.t) ref
-  =
-  ref (fun ~adata:_ _kf _env _t -> Extlib.mk_labeled_fun "term_to_exp_ref")
+module Translate_terms = struct
+  let to_exp_ref
+    : (adata:Assert.t ->
+       ?inplace:bool ->
+       kernel_function ->
+       Env.t ->
+       term ->
+       exp * Assert.t * Env.t) ref
+    = ref @@ fun ~adata:_ ?inplace:_ _kf _env _t -> Extlib.mk_labeled_fun "Logic_functions.Translate_terms.to_exp_ref"
+  let to_exp ~adata ?inplace kf env t = !to_exp_ref ~adata ?inplace kf env t
+end
 
 (*****************************************************************************)
 (************************** Auxiliary  functions* ****************************)
@@ -92,7 +95,7 @@ let pred_to_block ~loc kf env ret_vi p =
 
 (* Generate the function's body for terms. *)
 let term_to_block ~loc kf env ret_ty ret_vi t =
-  let e, _, env = !term_to_exp_ref ~adata:Assert.no_data kf env t in
+  let e, _, env = Translate_terms.to_exp ~adata:Assert.no_data kf env t in
   if Ast_types.is_void ret_ty then
     (* if the function's result is a GMP, it is the first parameter of the
        function (by reference). *)
@@ -474,7 +477,7 @@ let app_to_exp ~adata ~loc ?tapp kf env ?eargs li targs =
       | None ->
         List.fold_right
           (fun targ (l, adata, env) ->
-             let e, adata, env = !term_to_exp_ref ~adata kf env targ in
+             let e, adata, env = Translate_terms.to_exp ~adata kf env targ in
              e :: l, adata, env)
           targs
           ([], adata, env)
@@ -510,7 +513,7 @@ let app_to_exp ~adata ~loc ?tapp kf env ?eargs li targs =
         | None ->
           List.fold_right
             (fun targ (eargs, adata, env) ->
-               let e, adata, env = !term_to_exp_ref ~adata kf env targ in
+               let e, adata, env = Translate_terms.to_exp ~adata kf env targ in
                e :: eargs, adata, env)
             targs
             ([], adata, env)

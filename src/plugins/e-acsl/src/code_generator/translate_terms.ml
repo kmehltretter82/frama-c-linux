@@ -1032,14 +1032,12 @@ and to_exp ~adata ?inplace kf env t =
     (to_exp_old ?inplace)
     t
 
-let term_to_exp_without_inplace ~adata kf env t = to_exp ~adata kf env t
-
 let () =
-  Translate_utils.term_to_exp_ref := term_to_exp_without_inplace;
-  Translate_ats.term_to_exp_ref := to_exp;
-  Loops.term_to_exp_ref := term_to_exp_without_inplace;
-  Memory_translate.term_to_exp_ref := term_to_exp_without_inplace;
-  Logic_functions.term_to_exp_ref := term_to_exp_without_inplace
+  Translate_utils.Translate_terms.to_exp_ref := to_exp;
+  Translate_ats.Translate_terms.to_exp_ref := to_exp;
+  Loops.Translate_terms.to_exp_ref := to_exp;
+  Memory_translate.Translate_terms.to_exp_ref := to_exp;
+  Logic_functions.Translate_terms.to_exp_ref := to_exp
 
 exception No_simple_translation of term
 

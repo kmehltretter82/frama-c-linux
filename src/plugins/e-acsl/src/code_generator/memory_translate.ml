@@ -25,16 +25,17 @@ let predicate_to_exp_ref
 
 let predicate_to_exp ~adata = !predicate_to_exp_ref ~adata
 
-let term_to_exp_ref
-  : (adata:Assert.t ->
-     kernel_function ->
-     Env.t ->
-     term ->
-     exp * Assert.t * Env.t) ref
-  =
-  ref (fun ~adata:_ _kf _env _t -> Extlib.mk_labeled_fun "term_to_exp_ref")
-
-let term_to_exp ~adata = !term_to_exp_ref ~adata
+module Translate_terms = struct
+  let to_exp_ref
+    : (adata:Assert.t ->
+       ?inplace:bool ->
+       kernel_function ->
+       Env.t ->
+       term ->
+       exp * Assert.t * Env.t) ref
+    = ref @@ fun ~adata:_ ?inplace:_ _kf _env _t -> Extlib.mk_labeled_fun "Memory_translate.Translate_terms.to_exp_ref"
+  let to_exp ~adata ?inplace kf env t = !to_exp_ref ~adata ?inplace kf env t
+end
 
 let gmp_to_sizet_ref
   : (adata:Assert.t ->
@@ -200,7 +201,7 @@ let range_to_ptr_and_size ~adata ~loc kf env ptr r p =
   Typing.preprocess_term ~use_gmp_opt:false ~ctx:Typing.nan ~logic_env ptr;
   let (ptr, adata), env =
     Env.with_params_and_result ~rte:true ~env (fun env ->
-        let e, adata, env = term_to_exp ~adata kf env ptr in
+        let e, adata, env = Translate_terms.to_exp ~adata kf env ptr in
         (e, adata), env)
   in
   (* size *)
@@ -250,7 +251,7 @@ let range_to_ptr_and_size ~adata ~loc kf env ptr r p =
     | Gmpz ->
       (* Start by translating [size_term] to an expression so that the full term
          with [\let] is not passed around. *)
-      let size_e, adata, env = term_to_exp ~adata kf env size_term in
+      let size_e, adata, env = Translate_terms.to_exp ~adata kf env size_term in
       (* Since translating a GMP code should always produce a C variable, we
          can reuse it as a term for the function [gmp_to_sizet]. *)
       let cvar_term =
@@ -261,7 +262,7 @@ let range_to_ptr_and_size ~adata ~loc kf env ptr r p =
             "translation to GMP code should always return a C variable"
       in
       gmp_to_sizet ~adata ~loc ~pp:size_term kf env cvar_term p
-    | C_integer _ | C_float _ -> term_to_exp ~adata kf env size_term
+    | C_integer _ | C_float _ -> Translate_terms.to_exp ~adata kf env size_term
     | Rational | Real | Nan -> assert false
   in
   ptr, size, adata, env
@@ -272,7 +273,7 @@ let range_to_ptr_and_size ~adata ~loc kf env ptr r p =
 let term_to_ptr_and_size ~adata ~loc kf env t =
   let (e, adata), env =
     Env.with_params_and_result ~rte:true ~env (fun env ->
-        let e, adata, env = term_to_exp ~adata kf env t in
+        let e, adata, env = Translate_terms.to_exp ~adata kf env t in
         (e, adata), env)
   in
   let ty = Ast_types.remove_attributes_deep ["ghost"] @@ Misc.cty t.term_type in
