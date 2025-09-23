@@ -92,7 +92,7 @@ module L = Datatype.Make
       let name = "Property_status.t"
       let reprs =
         let l = Emitter_with_properties.reprs in
-        [ Never_tried; Best(True, []); Inconsistent { valid = l; invalid = l } ]
+        [ Never_tried; Best(True, l); Inconsistent { valid = l; invalid = l } ]
       let mem_project = Datatype.never_any_project
       let pretty fmt s =
         let pp_emitters fmt l =

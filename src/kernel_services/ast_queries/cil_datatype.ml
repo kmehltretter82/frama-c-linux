@@ -154,8 +154,14 @@ module Cabs_file = struct
       (struct
         type t = Cabs.file
         let name = "Cabs_file"
-        let reprs = List.concat_map
-            (fun p -> [ p, []; p, [ true, Cabs.GLOBANNOT [] ] ])
+        let reprs =
+          let loc = Filepath.(empty_pos, empty_pos) in
+          let dummy_def =
+            Cabs.DECDEF (None, ([SpecType Tint], [("dummy", JUSTBASE, [], loc),
+                                                  NO_INIT]), loc)
+          in
+          List.concat_map
+            (fun p -> [(p, []); (p, [true, dummy_def])])
             Filepath.reprs
         let pretty fmt cabs = !pretty_ref fmt cabs
       end)
@@ -866,7 +872,6 @@ module Fieldinfo = struct
 end
 
 module Enuminfo = struct
-  let pretty_ref = ref (fun _ _ -> assert false)
   let dummy = {
     eorig_name  = "@dummy_enuminfo@";
     ename       = "@dummy_enuminfo@";
@@ -885,12 +890,11 @@ module Enuminfo = struct
         let compare v1 v2 = String.compare v1.ename v2.ename
         let hash v = Hashtbl.hash v.ename
         let equal v1 v2 = v1.ename = v2.ename
-        let pretty fmt v = !pretty_ref fmt v
+        let pretty = Datatype.undefined
       end)
 end
 
 module Enumitem = struct
-  let pretty_ref = ref (fun _ _ -> assert false)
   let dummy = {
     eiorig_name = "@dummy_enumitem@";
     einame      = "@dummy_enumitem@";
@@ -916,7 +920,7 @@ module Enumitem = struct
         let compare v1 v2 = String.compare v1.einame v2.einame
         let hash v = Hashtbl.hash v.einame
         let equal v1 v2 = v1.einame = v2.einame
-        let pretty fmt v = !pretty_ref fmt v
+        let pretty = Datatype.undefined
       end)
 end
 
@@ -2322,7 +2326,6 @@ module Logic_label = struct
 end
 
 module Logic_real = struct
-  let pretty_ref = ref (fun _ _ -> assert false)
   let dummy = {
     r_literal = "@dummy_logic_real@";
     r_nearest = 0.0;
@@ -2342,7 +2345,7 @@ module Logic_real = struct
           11 * Datatype.String.hash r.r_literal
         let equal r1 r2 = compare r1 r2 = 0
         let copy = Datatype.undefined
-        let pretty fmt t = !pretty_ref fmt t
+        let pretty = Datatype.undefined
       end)
 end
 
@@ -2622,7 +2625,6 @@ module Identified_predicate = struct
 end
 
 module PredicateStructEq = struct
-  let pretty_ref = ref (fun _ _ -> assert false)
   let dummy = Predicate.dummy
 
   include Make_with_collections
@@ -2634,7 +2636,7 @@ module PredicateStructEq = struct
         let equal = Datatype.from_compare
         let copy = Datatype.undefined
         let hash = hash_fct hash_predicate
-        let pretty fmt x = !pretty_ref fmt x
+        let pretty = Datatype.undefined
       end)
 end
 

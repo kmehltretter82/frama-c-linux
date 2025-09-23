@@ -26,6 +26,7 @@
           (echo "  - ppx_deriving.eq:" %{lib-available:ppx_deriving.eq} "\n")
           (echo "  - ppx_deriving.ord:" %{lib-available:ppx_deriving.ord} "\n")
           (echo "  - ppx_deriving_yaml:" %{lib-available:ppx_deriving_yaml} "\n")
+          (echo "  - ppx_inline_test:" %{lib-available:ppx_inline_test} "\n")
           (echo "  - camlzip:" %{lib-available:zip} "\n")
   )
   )
@@ -39,7 +40,8 @@
   (libraries frama-c.init fpath str unix zarith ocamlgraph dynlink bytes yaml.unix yojson menhirLib dune-site dune-site.plugins zip)
   (instrumentation (backend landmarks))
   (instrumentation (backend bisect_ppx))
-  (preprocess (pps ppx_deriving.eq ppx_deriving.ord ppx_deriving_yaml))
+  (inline_tests (libraries frama-c.init.cmdline))
+  (preprocess (pps ppx_deriving.eq ppx_deriving.ord ppx_deriving_yaml ppx_inline_test))
 )
 
 (generate_sites_module (module config_data) (sites frama-c) (plugins (frama-c plugins) (frama-c plugins_gui)))

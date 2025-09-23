@@ -236,3 +236,24 @@ let pp_pos fmt pos =
     Format.fprintf fmt "%a:%d" pretty path pos.pos_lnum
 
 let is_empty_pos pos = pos == empty_pos
+
+
+(* -------------------------------------------------------------------------- *)
+(* --- Tests                                                              --- *)
+(* -------------------------------------------------------------------------- *)
+
+let%test _ = of_string "/" = "/"
+let%test _ = of_string "/.." = "/"
+let%test _ = of_string "/../../." = "/"
+let%test _ = of_string "///" = "//"
+let%test _ = of_string "//tmp//" = "//tmp/"
+let%test _ = of_string "/../tmp/../.." = "/"
+let%test _ = of_string "/tmp/inexistent_directory/.." = "/tmp"
+let%test _ = of_string "" = ""
+let%test _ = to_string_rel (of_string ".") = "."
+let%test _ = to_string_rel (of_string "./tests/..") = "."
+let%test _ =
+  to_string_rel ~base:(of_string "/a/b/") (of_string "/a/bc/d") = "/a/bc/d"
+let%test _ =
+  add_symbolic_dir "SYMB" (of_string "/tmp/symb/");
+  to_string (of_string "/tmp/symb/file.c") = "SYMB/file.c"
