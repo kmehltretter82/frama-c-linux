@@ -54,12 +54,22 @@ let neg = Z.neg
 
 let mul = Z.mul
 
+let ediv = Z.ediv
 let e_div = Z.ediv
+
+let erem = Z.erem
 let e_rem = Z.erem
+
+let ediv_rem = Z.ediv_rem
 let e_div_rem = Z.ediv_rem
 
+let div = Z.div
 let c_div = Z.div
+
+let rem = Z.rem
 let c_rem = Z.rem
+
+let div_rem = Z.div_rem
 let c_div_rem = Z.div_rem
 
 let abs = Z.abs

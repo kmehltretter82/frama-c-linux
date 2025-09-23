@@ -329,9 +329,9 @@ let is_aligned_by b alignment =
     try
       match b with
       | Var (v,_) | Allocated(v,_,_) ->
-        Int.is_zero (Int.e_rem (Int.of_int (Cil.bytesAlignOf v.vtype)) alignment)
+        Int.is_zero (Int.erem (Int.of_int (Cil.bytesAlignOf v.vtype)) alignment)
       | CLogic_Var (_, ty, _) ->
-        Int.is_zero (Int.e_rem (Int.of_int (Cil.bytesAlignOf ty)) alignment)
+        Int.is_zero (Int.erem (Int.of_int (Cil.bytesAlignOf ty)) alignment)
       | Null -> true
     with Cil.SizeOfError _ -> false
 

@@ -660,8 +660,8 @@ let scale_div ~pos f s =
   assert (not (Int.is_zero f));
   let div_f =
     if pos
-    then fun a -> Int.e_div a f
-    else fun a -> Int.c_div a f
+    then fun a -> Int.ediv a f
+    else fun a -> Int.div a f
   in
   if Int.lt f Int.zero
   then map_set_decr div_f s
@@ -670,10 +670,10 @@ let scale_div ~pos f s =
 let scale_rem ~pos f s =
   assert (not (Int.is_zero f));
   let f = if Int.lt f Int.zero then Int.neg f else f in
-  let rem_f a = if pos then Int.e_rem a f else Int.c_rem a f in
+  let rem_f a = if pos then Int.erem a f else Int.rem a f in
   map rem_f s
 
-let c_rem s1 s2 = apply2_notzero Int.c_rem s1 s2
+let c_rem s1 s2 = apply2_notzero Int.rem s1 s2
 
 let bitwise_signed_not = map_set_strict_decr Int.lognot
 

@@ -96,7 +96,7 @@ let is_safe_modulo r modu =
 
 let is_safe_bound bound r modu = match bound with
   | None -> true
-  | Some m -> Int.equal (Int.e_rem m modu) r
+  | Some m -> Int.equal (Int.erem m modu) r
 
 (* Sanity check. *)
 let check ~min ~max ~rem ~modu =
@@ -119,7 +119,7 @@ let build_interval ~min ~max ~rem:r ~modu =
   assert (is_safe_modulo r modu);
   let fix_bound fix bound = match bound with
     | None -> None
-    | Some b -> Some (if Int.equal b (Int.e_rem r modu) then b else fix b)
+    | Some b -> Some (if Int.equal b (Int.erem r modu) then b else fix b)
   in
   let min = fix_bound (fun min -> Int.round_up_to_r ~min ~r ~modu) min
   and max = fix_bound (fun max -> Int.round_down_to_r ~max ~r ~modu) max in
@@ -157,13 +157,13 @@ let min_and_max t = t.min, t.max
 let min_max_rem_modu t = t.min, t.max, t.rem, t.modu
 
 let mem i t =
-  Int.equal (Int.e_rem i t.modu) t.rem
+  Int.equal (Int.erem i t.modu) t.rem
   && min_le_elt t.min i && max_ge_elt t.max i
 
 let cardinal t =
   match t.min, t.max with
   | None, _ | _, None -> None
-  | Some mn, Some mx -> Some Int.(succ ((e_div (sub mx mn) t.modu)))
+  | Some mn, Some mx -> Some Int.(succ ((ediv (sub mx mn) t.modu)))
 
 (* --------------------------------- Lattice -------------------------------- *)
 
@@ -182,7 +182,7 @@ let max_is_greater max1 max2 =
   | Some m1, Some m2 -> Int.ge m1 m2
 
 let rem_is_included r1 m1 r2 m2 =
-  (Int.is_zero (Int.e_rem m1 m2)) && (Int.equal (Int.e_rem r1 m2) r2)
+  (Int.is_zero (Int.erem m1 m2)) && (Int.equal (Int.erem r1 m2) r2)
 
 let is_included t1 t2 =
   (min_is_lower t2.min t1.min) &&
@@ -201,7 +201,7 @@ let max_max x y =
 
 let join t1 t2 =
   let modu = Int.(pgcd (pgcd t1.modu t2.modu) (abs (sub t1.rem t2.rem))) in
-  let rem = Int.e_rem t1.rem modu in
+  let rem = Int.erem t1.rem modu in
   let min = min_min t1.min t2.min in
   let max = max_max t1.max t2.max in
   make ~min ~max ~rem ~modu
@@ -227,7 +227,7 @@ let extended_euclidian_algorithm a b =
   let x = ref Int.zero and lastx = ref Int.one in
   let y = ref Int.one and lasty = ref Int.zero in
   while not (Int.is_zero !b) do
-    let (q,r) = Int.e_div_rem !a !b in
+    let (q,r) = Int.ediv_rem !a !b in
     a := !b;
     b := r;
     let tmpx = !x in
@@ -256,7 +256,7 @@ let compute_r_common r1 m1 r2 m2 =
      [Error_Bottom]. *)
   let (x1,_,pgcd) = extended_euclidian_algorithm m1 m2 in
   let r = Int.sub r2 r1 in
-  let (r_div, r_rem) = Int.e_div_rem r pgcd in
+  let (r_div, r_rem) = Int.ediv_rem r pgcd in
   if not (Int.equal r_rem Int.zero)
   then raise Error_Bottom
   (* The extended euclidian algorithm has provided solutions x1,x2 to
@@ -277,7 +277,7 @@ let compute_r_common r1 m1 r2 m2 =
        of ppcm(m1,m2). Thus x = y mod ppcm(m1,m2). *)
     let ppcm = Integer.ppcm m1 m2 in
     (* x may be bigger than the ppcm, we normalize it. *)
-    (Int.e_rem x ppcm, ppcm)
+    (Int.erem x ppcm, ppcm)
 
 let compute_first_common mn1 mn2 r modu =
   if mn1 = None && mn2 = None
@@ -337,7 +337,7 @@ let widen ?(size=Integer.zero) ?(hint = Datatype.Integer.Set.empty) t1 t2 =
         Datatype.Integer.Set.(union hint (of_list limits))
     in
     let modu = Int.(pgcd (pgcd t1.modu t2.modu) (abs (sub t1.rem t2.rem))) in
-    let rem = Int.e_rem t1.rem modu in
+    let rem = Int.erem t1.rem modu in
     let min =
       if bound_compare t1.min t2.min = 0 then t2.min else
         match t2.min with
@@ -366,7 +366,7 @@ let intersects v1 v2 =
 let cardinal_less_than t n =
   let c = match t.min, t.max with
     | None, _ | _, None -> raise Not_less_than
-    | Some min, Some max -> Int.succ ((Int.e_div (Int.sub max min) t.modu))
+    | Some min, Some max -> Int.succ ((Int.ediv (Int.sub max min) t.modu))
   in
   if Int.le c (Int.of_int n)
   then Int.to_int_exn c (* This is smaller than the original [n] *)
@@ -436,12 +436,12 @@ let add_singleton_int i t =
   let incr = Int.add i in
   let min = Option.map incr t.min in
   let max = Option.map incr t.max in
-  let rem = Int.e_rem (incr t.rem) t.modu in
+  let rem = Int.erem (incr t.rem) t.modu in
   make ~min ~max ~rem ~modu:t.modu
 
 let add t1 t2 =
   let modu = Int.pgcd t1.modu t2.modu in
-  let rem = Int.e_rem (Int.add t1.rem t2.rem) modu in
+  let rem = Int.erem (Int.add t1.rem t2.rem) modu in
   let min =
     opt_map2
       (fun min1 min2 -> Int.round_up_to_r ~min:(Int.add min1 min2) ~r:rem ~modu)
@@ -459,7 +459,7 @@ let add_under t1 t2 =
   then
     (* Note: min1+min2 % modu = max1 + max2 % modu = r1 + r2 % modu;
        no need to trim the bounds here.  *)
-    let rem = Int.e_rem (Int.add t1.rem t2.rem) t1.modu in
+    let rem = Int.erem (Int.add t1.rem t2.rem) t1.modu in
     let min = opt_map2 Int.add t1.min t2.min
     and max = opt_map2 Int.add t1.max t2.max in
     `Value (make ~min ~max ~rem ~modu:t1.modu)
@@ -475,7 +475,7 @@ let neg t =
   make
     ~min:(Option.map Int.neg t.max)
     ~max:(Option.map Int.neg t.min)
-    ~rem:(Int.e_rem (Int.neg t.rem) t.modu)
+    ~rem:(Int.erem (Int.neg t.rem) t.modu)
     ~modu:t.modu
 
 let abs t =
@@ -489,7 +489,7 @@ let abs t =
       | _, _ -> None
     in
     let modu = Int.(pgcd t.modu (add t.rem t.rem)) in
-    let rem = Int.e_rem t.rem modu in
+    let rem = Int.erem t.rem modu in
     build_interval ~min:(Some Int.zero) ~max ~rem ~modu
 
 type ext_value = Ninf | Pinf | Val of Int.t
@@ -527,31 +527,31 @@ let scale f t =
     let modu = incr t.modu in
     make
       ~min:(Option.map incr t.min) ~max:(Option.map incr t.max)
-      ~rem:(Int.e_rem (incr t.rem) modu) ~modu
+      ~rem:(Int.erem (incr t.rem) modu) ~modu
   else
     let modu = Int.neg (incr t.modu) in
     make
       ~min:(Option.map incr t.max) ~max:(Option.map incr t.min)
-      ~rem:(Int.e_rem (incr t.rem) modu) ~modu
+      ~rem:(Int.erem (incr t.rem) modu) ~modu
 
 let scale_div_common ~pos f t degenerate =
   assert (not (Int.is_zero f));
   let div_f =
     if pos
-    then fun a -> Int.e_div a f
-    else fun a -> Int.c_div a f
+    then fun a -> Int.ediv a f
+    else fun a -> Int.div a f
   in
   let rem, modu =
     let negative = max_is_greater (Some Int.zero) t.max in
     if (negative                                (* all negative *)
         || pos                                  (* good div *)
         || (min_is_lower (Some Int.zero) t.min) (* all positive *)
-        ||    (Int.is_zero (Int.e_rem t.rem f)))  (* exact *)
-    && (Int.is_zero (Int.e_rem t.modu f))
+        ||    (Int.is_zero (Int.erem t.rem f)))  (* exact *)
+    && (Int.is_zero (Int.erem t.modu f))
     then
       let modu = Int.abs (div_f t.modu) in
       let r = if negative then Int.sub t.rem t.modu else t.rem in
-      (Int.e_rem (div_f r) modu), modu
+      (Int.erem (div_f r) modu), modu
     else (* degeneration*)
       degenerate t.rem t.modu
   in
@@ -578,9 +578,9 @@ let scale_div_under ~pos f v =
 let scale_rem ~pos f t =
   assert (not (Int.is_zero f));
   let f = if Int.lt f Int.zero then Int.neg f else f in
-  let rem_f a = if pos then Int.e_rem a f else Int.c_rem a f in
+  let rem_f a = if pos then Int.erem a f else Int.rem a f in
   let modu = Int.pgcd f t.modu in
-  let rr = Int.e_rem t.rem modu in
+  let rr = Int.erem t.rem modu in
   let binf, bsup =
     if pos
     then Int.round_up_to_r ~min:Int.zero ~r:rr ~modu,
@@ -594,7 +594,7 @@ let scale_rem ~pos f t =
   let mn_rem, mx_rem =
     match t.min, t.max with
     | Some mn, Some mx ->
-      let div_f a = if pos then Int.e_div a f else Int.c_div a f in
+      let div_f a = if pos then Int.ediv a f else Int.div a f in
       (* See if [mn..mx] is included in [k*f..(k+1)*f] for some [k]. In
          this case, [%] is monotonic and [mn%f .. mx%f] is a more precise
          result. *)
@@ -651,17 +651,17 @@ let mul t1 t2 =
            (pgcd (mul t1.modu t2.modu) (mul t1.rem t2.modu))
            (mul t2.rem t1.modu))
   in
-  let rem = Int.e_rem (Int.mul t1.rem t2.rem) modu in
+  let rem = Int.erem (Int.mul t1.rem t2.rem) modu in
   make ~min:(ext_proj min) ~max:(ext_proj max) ~rem ~modu
 
 (* ymin and ymax must be the same sign *)
 let div_range x ymn ymx =
   match min_and_max x with
   | Some xmn, Some xmx ->
-    let c1 = Int.c_div xmn ymn in
-    let c2 = Int.c_div xmx ymn in
-    let c3 = Int.c_div xmn ymx in
-    let c4 = Int.c_div xmx ymx in
+    let c1 = Int.div xmn ymn in
+    let c2 = Int.div xmx ymn in
+    let c3 = Int.div xmn ymx in
+    let c4 = Int.div xmx ymx in
     let min = Int.min (Int.min c1 c2) (Int.min c3 c4) in
     let max = Int.max (Int.max c1 c2) (Int.max c3 c4) in
     inject_range (Some min) (Some max)
@@ -703,7 +703,7 @@ let cast ~size ~signed t =
   and mask = Int.two_power (Int.pred size) in
   let best_effort () =
     let modu = Int.pgcd factor t.modu in
-    let rem = Int.e_rem t.rem modu in
+    let rem = Int.erem t.rem modu in
     let min =
       if signed
       then Int.round_up_to_r ~min:(Int.neg mask) ~r:rem ~modu
@@ -733,7 +733,7 @@ let cast ~size ~signed t =
       else
         let rem_f value = Int.cast ~size ~signed ~value in
         let min, max = rem_f min, rem_f max in
-        let rem = Int.e_rem min t.modu in
+        let rem = Int.erem min t.modu in
         make ~min:(Some min) ~max:(Some max) ~rem ~modu:t.modu
     else best_effort ()
   | _, _ -> best_effort ()
@@ -741,7 +741,7 @@ let cast ~size ~signed t =
 let subdivide t =
   match t.min, t.max with
   | Some min, Some max ->
-    let mean = Int.e_div (Int.add min max) Int.two in
+    let mean = Int.ediv (Int.add min max) Int.two in
     let succmean = Int.succ mean in
     build_interval ~min:(Some min) ~max:(Some mean) ~rem:t.rem ~modu:t.modu,
     build_interval ~min:(Some succmean) ~max:(Some max) ~rem:t.rem ~modu:t.modu

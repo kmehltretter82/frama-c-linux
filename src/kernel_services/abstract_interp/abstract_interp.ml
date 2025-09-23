@@ -249,6 +249,8 @@ module Int = struct
   include (Integer: module type of Integer with type t = Integer.t)
   include (Datatype.Integer: Datatype.S_with_collections with type t:=Integer.t)
 
+  let e_rem = erem
+
   let pretty fmt v =
     if not (Kernel.BigIntsHex.is_default ()) then
       let max = of_int (Kernel.BigIntsHex.get ()) in
@@ -261,7 +263,7 @@ module Int = struct
   let fold f ~inf ~sup ~step acc =
     (*    Format.printf "Int.fold: inf:%a sup:%a step:%a@\n"
            pretty inf pretty sup pretty step; *)
-    let nb_loop = e_div (sub sup inf) step in
+    let nb_loop = ediv (sub sup inf) step in
     let rec fold_incr ~counter ~inf acc =
       if equal counter onethousand then
         feedback_approximation "enumerating %a integers" pretty nb_loop;

@@ -2428,7 +2428,7 @@ let truncateInteger64 (k: ikind) i =
     let i' =
       let nrBits = Integer.of_int (8 * (bytesSizeOfInt k)) in
       let max_strict_bound = Integer.shift_left Integer.one nrBits in
-      let modulo = Integer.e_rem i max_strict_bound in
+      let modulo = Integer.erem i max_strict_bound in
       let signed = isSigned k in
       if signed then
         let max_signed_strict_bound =
@@ -3843,19 +3843,19 @@ and constFoldBinOp ~loc (machdep: bool) bop e1 e2 tres =
         when Integer.equal one Integer.one -> e1''
       | Div, Const(CInt64(i1,ik1,_)),Const(CInt64(i2,ik2,_)) when ik1 = ik2 ->
         begin
-          try kinteger64 ~loc ~kind:tk (Integer.c_div i1 i2)
+          try kinteger64 ~loc ~kind:tk (Integer.div i1 i2)
           with Division_by_zero -> new_exp ~loc (BinOp(bop, e1', e2', tres))
         end
       | Div, Const(CInt64(i1,ik1,_)),Const(CInt64(i2,ik2,_))
         when bytesSizeOfInt ik1 = bytesSizeOfInt ik2 -> begin
-          try kinteger64 ~loc ~kind:tk (Integer.c_div i1 i2)
+          try kinteger64 ~loc ~kind:tk (Integer.div i1 i2)
           with Division_by_zero -> new_exp ~loc (BinOp(bop, e1', e2', tres))
         end
       | Div, _, Const(CInt64(one,_,_))
         when Integer.equal one Integer.one -> e1''
       | Mod, Const(CInt64(i1,ik1,_)),Const(CInt64(i2,ik2,_)) when ik1 = ik2 ->
         begin
-          try kinteger64 ~loc ~kind:tk (Integer.c_rem i1 i2)
+          try kinteger64 ~loc ~kind:tk (Integer.rem i1 i2)
           with Division_by_zero -> new_exp ~loc (BinOp(bop, e1', e2', tres))
         end
       | BAnd, Const(CInt64(i1,ik1,_)),Const(CInt64(i2,ik2,_)) when ik1 = ik2 ->

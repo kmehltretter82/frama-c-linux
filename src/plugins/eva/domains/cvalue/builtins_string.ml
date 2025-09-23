@@ -140,12 +140,12 @@ let search_offsetmap_range kind offsetmap validity ~min ~max ~v_size acc =
   let size = kind.size in
   (* Reads will repeat themselves every [modu] bits. *)
   let modu = Integer.ppcm v_size size in
-  let max_reads = Integer.(to_int_exn (e_div modu size)) in
+  let max_reads = Integer.(to_int_exn (ediv modu size)) in
   (* Performs [max_reads] consecutive reads from offsets {[min] + k[modu]},
      bound by [max]. *)
   let search_until ~max acc =
     let rec read_index count ~min res =
-      let rem = Integer.e_rem min modu in
+      let rem = Integer.erem min modu in
       let offsets = make_interval ~min ~max ~rem ~modu in
       let cvalue = Cvalue.V_Offsetmap.find ~validity ~offsets ~size offsetmap in
       let cvalue = Cvalue.V_Or_Uninitialized.inject_or_bottom cvalue in
@@ -193,7 +193,7 @@ let fold_offsm kind ~validity ~start ~max ~rem offsetmap acc =
              overlaps between two ranges of the offsetmap.
            - and either the value is isotropic, or the repeated value has the
              same size than the reads. *)
-        if Integer.equal rem (Integer.e_rem (Integer.succ max) modu) &&
+        if Integer.equal rem (Integer.erem (Integer.succ max) modu) &&
            (Cvalue.V_Or_Uninitialized.is_isotropic v ||
             Integer.equal min v_start && Integer.equal v_size kind.size)
         then

@@ -190,12 +190,12 @@ module G = struct
 
     let div_towards_minus_infty x y =
       if Integer.gt y Integer.zero
-      then Integer.e_div x y
-      else Integer.(e_div (neg x) (neg y))
+      then Integer.ediv x y
+      else Integer.(ediv (neg x) (neg y))
     let div_towards_plus_infty x y =
       if Integer.lt y Integer.zero
-      then Integer.e_div x y
-      else Integer.(e_div (neg x) (neg y))
+      then Integer.ediv x y
+      else Integer.(ediv (neg x) (neg y))
 
     (* Computes the possible [n] such that [(add b)^n = r], when [f^n]
        is [f] consecutive applications of [f]. *)

@@ -333,7 +333,7 @@ let rec pmatch env (p : pattern) e =
   | Binop(p,`Lsl,q) , Fun(lf,[a;b]) when lf == Cint.f_lsl -> pbinop env p q a b
   | Binop(p,`Lsr,q) , Fun(lf,[a;b]) when lf == Cint.f_lsr -> pbinop env p q a b
   | Times(b,p) , Times(a,e) ->
-    let q,r = Integer.c_div_rem a b in
+    let q,r = Integer.div_rem a b in
     if Integer.is_zero r then pmatch env p (Lang.F.e_times q e)
     else raise Not_found
   | Get(pa,pk) , Aget(a,k) ->

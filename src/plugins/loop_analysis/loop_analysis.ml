@@ -403,7 +403,7 @@ module Store(* (B:sig *)
               may be missed;
            2. in '<=' and '>=' loops, to adjust for the last iteration *)
         let divident = Integer.sub bound offset in
-        let remainder = Integer.e_rem divident increment in
+        let remainder = Integer.erem divident increment in
         (* check if induction variable may miss termination condition *)
         if binop = Cil_types.Ne && not Integer.(equal remainder zero) then
           Options.warning ~current:true
@@ -414,7 +414,7 @@ module Store(* (B:sig *)
             Printer.pp_varinfo vi pretty_increment increment
         else
           try
-            let value = (Integer.to_int_exn (Integer.c_div bound_offset increment)) in
+            let value = (Integer.to_int_exn (Integer.div bound_offset increment)) in
             let adjusted_value =
               if (binop = Cil_types.Le && Integer.(equal remainder zero))
               || (not Integer.(equal remainder zero))

@@ -165,7 +165,7 @@ class propagate project fnames ~cast_intro = object(self)
                   in
                   array, Int_Base.project size
                 in
-                let div,rem = Integer.e_div_rem offset sizeof_pointed in
+                let div,rem = Integer.ediv_rem offset sizeof_pointed in
                 array,div,rem
               in
               let expr' =

@@ -78,7 +78,7 @@ let make ~min ~max ~rem ~modu =
     if Int.equal mx mn
     then inject_singleton mn
     else
-      let l = Int.succ (Int.e_div (Int.sub mx mn) modu) in
+      let l = Int.succ (Int.ediv (Int.sub mx mn) modu) in
       if Int.le l (small_cardinal_Int ())
       then Set (Int_set.inject_periodic ~from:mn ~period:modu ~number:l)
       else Itv (Int_interval.make ~min ~max ~rem ~modu)
@@ -92,7 +92,7 @@ let inject_interval ~min ~max ~rem:r ~modu =
   assert ((Int.ge r Int.zero ) && (Int.ge modu Int.one) && (Int.lt r modu));
   let fix_bound fix bound = match bound with
     | None -> None
-    | Some b -> Some (if Int.equal b (Int.e_rem r modu) then b else fix b)
+    | Some b -> Some (if Int.equal b (Int.erem r modu) then b else fix b)
   in
   let min = fix_bound (fun min -> Int.round_up_to_r ~min ~r ~modu) min
   and max = fix_bound (fun max -> Int.round_down_to_r ~max ~r ~modu) max in
@@ -127,7 +127,7 @@ let inject_set s = Set s
    these results as proper integer abstractions of type t.*)
 
 let inject_pre_itv ~min ~max ~modu =
-  let rem = Int.e_rem min modu in
+  let rem = Int.erem min modu in
   Itv (Int_interval.make ~min:(Some min) ~max:(Some max) ~rem ~modu)
 
 let inject_set_or_top = function
@@ -149,7 +149,7 @@ let make_top_from_set s =
       let modu =
         Int_set.fold (fun x acc -> Int.pgcd (Int.sub x min) acc) s Int.zero
       in
-      Int.e_rem min modu, modu
+      Int.erem min modu, modu
   in
   let max = Some (Int_set.max s) in
   let min = Some min in
@@ -313,7 +313,7 @@ let is_included t1 t2 =
     (* Inclusion of bounds is needed for the entire inclusion *)
     min_le_elt min (Int_set.min s) && max_ge_elt max (Int_set.max s)
     && (Int.equal Int.one modu (* Top side contains all integers, we're done *)
-        || Int_set.for_all (fun x -> Int.equal (Int.e_rem x modu) rem) s)
+        || Int_set.for_all (fun x -> Int.equal (Int.erem x modu) rem) s)
 
 let join v1 v2 =
   match v1, v2 with
@@ -324,7 +324,7 @@ let join v1 v2 =
     let min, max, r, modu = Int_interval.min_max_rem_modu i in
     let f elt modu = Int.pgcd modu (Int.abs (Int.sub r elt)) in
     let modu = Int_set.fold f s modu in
-    let rem = Int.e_rem r modu in
+    let rem = Int.erem r modu in
     let min = match min with
         None -> None
       | Some m -> Some (Int.min m (Int_set.min s))

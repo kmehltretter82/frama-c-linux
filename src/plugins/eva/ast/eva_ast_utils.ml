@@ -217,8 +217,8 @@ let apply_binop_to_integers binop i1 i2 ikind =
     | PlusA -> Integer.add
     | MinusA -> Integer.sub
     | Mult -> Integer.mul
-    | Div -> Integer.c_div
-    | Mod -> Integer.c_rem
+    | Div -> Integer.div
+    | Mod -> Integer.rem
     | BAnd -> Integer.logand
     | BOr -> Integer.logor
     | BXor -> Integer.logxor

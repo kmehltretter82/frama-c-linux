@@ -593,7 +593,7 @@ module Infty = struct
     | None -> None
     | Some a -> match b with
       | None -> Some Int.zero
-      | Some b -> Some (Int.e_div a b)
+      | Some b -> Some (Int.ediv a b)
 
   let neg = function
     | Some a -> Some (Int.neg a)

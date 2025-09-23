@@ -244,7 +244,7 @@ let nearly_valid_bits = function
 
 let nearly_valid_offset base =
   let min, max = nearly_valid_bits base in
-  let to_byte bound = Some (Integer.e_div bound (Bit_utils.sizeofchar ())) in
+  let to_byte bound = Some (Integer.ediv bound (Bit_utils.sizeofchar ())) in
   Ival.inject_range (to_byte min) (to_byte max)
 
 let assume_pointer loc =

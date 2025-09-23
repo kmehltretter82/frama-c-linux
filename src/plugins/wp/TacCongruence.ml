@@ -49,7 +49,7 @@ let to_term = function
   | QDIV(a,b) -> F.e_div a b
   | Ival(e,_) | Rval e -> e
 
-let pdiv a b = let k = Integer.c_div a b in Ival(F.e_zint k,Some k)
+let pdiv a b = let k = Integer.div a b in Ival(F.e_zint k,Some k)
 
 let nzero x = F.p_neq F.e_zero x
 let positive x = F.p_lt F.e_zero x
@@ -119,8 +119,8 @@ let rec compare cmp a b =
       not Integer.(equal p zero) &&
       not Integer.(equal q zero) ->
     let g = Integer.pgcd (Integer.abs p) (Integer.abs q) in
-    let ka = Integer.e_div p g in
-    let kb = Integer.e_div q g in
+    let ka = Integer.ediv p g in
+    let kb = Integer.ediv q g in
     compare_div cmp (F.e_times ka a) (F.e_times kb b) (F.e_zint g)
 
   | QDIV(a,u) , QDIV(b,v) -> compare_ratio cmp a u b v
@@ -136,22 +136,22 @@ let rec equal eq a b =
   match a , b with
   | IMUL_K( k,a ) , Ival(_,Some n)
   | Ival(_,Some n) , IMUL_K( k,a ) ->
-    let r = Integer.c_rem k n in
+    let r = Integer.rem k n in
     if Integer.equal r Integer.zero then
       equal eq (pattern a) (pdiv n k)
     else
       eq F.e_one F.e_zero
   | IMUL_K( k,a ) , IMUL_K( k',b ) ->
     let r = Integer.pgcd k k' in
-    eq (F.e_times (Integer.c_div k r) a)
-      (F.e_times (Integer.c_div k' r) b)
+    eq (F.e_times (Integer.div k r) a)
+      (F.e_times (Integer.div k' r) b)
 
   | IDIV_K( a,p ) , IDIV_K( b,q ) when
       not Integer.(equal p zero) &&
       not Integer.(equal q zero) ->
     let g = Integer.pgcd (Integer.abs p) (Integer.abs q) in
-    let ka = Integer.e_div p g in
-    let kb = Integer.e_div q g in
+    let ka = Integer.ediv p g in
+    let kb = Integer.ediv q g in
     compare_div EQ (F.e_times ka a) (F.e_times kb b) (F.e_zint g)
 
   | QDIV(a,u) , QDIV(b,v) -> eq_ratio eq a u b v

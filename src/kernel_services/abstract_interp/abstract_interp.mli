@@ -75,7 +75,11 @@ module Rel : sig
   val add_abs : Int.t -> t -> Int.t
   val add : t -> t -> t
   val sub_abs : Int.t -> Int.t -> t
+  val erem: t -> Int.t -> t
+
   val e_rem: t -> Int.t -> t
+  [@@deprecated "Use erem instead."]
+  [@@migrate { repl = Rel.erem } ]
 
   val check: rem:t -> modu:Int.t -> bool
 end

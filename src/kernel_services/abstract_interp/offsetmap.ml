@@ -20,8 +20,8 @@ let ( >=~ ) = Integer.ge
 let ( +~ ) = Integer.add
 let ( -~ ) = Integer.sub
 (* let ( *~ ) = Integer.mul *)
-let ( /~ ) = Integer.e_div
-let ( %~ ) = Integer.e_rem
+let ( /~ ) = Integer.ediv
+let ( %~ ) = Integer.erem
 let succ = Integer.succ
 let pred = Integer.pred
 
@@ -78,7 +78,7 @@ type 'a offsetmap =
    alignment must be recomputed wrt the offset of the new interval. The new
    alignment should be consistent with the size of the value. *)
 let realign ~offset ~new_offset rem modu =
-  Rel.e_rem (Rel.add (Rel.sub_abs offset new_offset) rem) modu
+  Rel.erem (Rel.add (Rel.sub_abs offset new_offset) rem) modu
 
 (** plevel-related operation: value + hooks to call when the value is modified*)
 let plevel = ref 200
@@ -996,7 +996,7 @@ module Make
         else
           begin (* abs_max1 >~ abs_max2 *)
             let min = succ abs_max2 in
-            let rem1 = Rel.e_rem (Rel.add (Rel.sub_abs o1 min) rem1) modu1 in
+            let rem1 = Rel.erem (Rel.add (Rel.sub_abs o1 min) rem1) modu1 in
             let new_offr1, new_subr1 =
               add_node ~min ~max:abs_max1 rem1 modu1 v1 abs_offr1 subr1
             in
@@ -1931,7 +1931,7 @@ module Make
             let lmin = Integer.max imin curr_off in
             let lmax = Integer.min imax abs_max in
             let lrem =
-              Rel.e_rem (Rel.sub rem (Rel.sub_abs lmin curr_off)) modu
+              Rel.erem (Rel.sub rem (Rel.sub_abs lmin curr_off)) modu
             in
             f (lmin, lmax) (v, modu, lrem) acc
         in
@@ -2077,7 +2077,7 @@ module Make
             (if Int.length bk ek >~ modu then
                Format.fprintf fmt " repeated %%%a " pretty_int modu)
           else (
-            let b_bits = Rel.e_rem (Rel.sub Rel.zero rel_offs) modu  in
+            let b_bits = Rel.erem (Rel.sub Rel.zero rel_offs) modu  in
             let e_bits = Rel.add_abs (ek -~ bk) b_bits in
             Format.fprintf fmt "%s%%%a, bits %a to %a "
               (if e_bits >~ modu then " repeated " else "")

@@ -168,12 +168,12 @@ let isCrossableAtInit tr func =
            | Div, TConst(Integer(i1,_)), TConst(Integer(i2,_)) ->
              (try
                 { t with term_node =
-                           TConst(Integer(Integer.c_div i1 i2,None)) }
+                           TConst(Integer(Integer.div i1 i2,None)) }
               with Division_by_zero -> t)
            | Mod, TConst(Integer(i1,_)), TConst(Integer(i2,_)) ->
              (try
                 { t with term_node =
-                           TConst(Integer(Integer.c_rem i1 i2,None)) }
+                           TConst(Integer(Integer.rem i1 i2,None)) }
               with Division_by_zero -> t)
            | Shiftlt, TConst(Integer(i1,_)), TConst(Integer(i2,_)) ->
              { t with term_node =

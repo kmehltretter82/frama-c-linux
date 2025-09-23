@@ -24,7 +24,7 @@ struct
      produce two terms instead of one *)
   let coarsen (d,b : t) (d' : Integer.t) =
     (* d×[0,b] -> (d'q + r)×[0,b] -> d'×[0,qb] + r×[0,b] *)
-    let q,r = Integer.e_div_rem d d' in
+    let q,r = Integer.ediv_rem d d' in
     if Integer.is_zero r
     then [ (d', Integer.mul q b) ]
     else [ (d', Integer.mul q b) ; (r,b) ]
@@ -101,7 +101,7 @@ let of_ival ival =
   match Ival.min_max_r_mod ival with (* Raises Abstract_interp.Error_Bottom *)
   | None,_,_,_ | _,None,_,_ -> raise Abstract_interp.Error_Top
   | Some l, Some u, _r, m ->
-    let u' = Integer.(c_div (sub u l) m) in
+    let u' = Integer.(div (sub u l) m) in
     (l,[m,u'])
 
 (* Properties *)
@@ -124,7 +124,7 @@ let first_dimension (o,sum) =
   | [] -> None
   | (d,_b) :: tail ->
     (* If normalized, no need to look in tail *)
-    Some (d, (Integer.e_rem o d,tail))
+    Some (d, (Integer.erem o d,tail))
 
 (* Arithmetic *)
 
@@ -160,9 +160,9 @@ let mul_int x i =
 
 let mod_integer (o,sum) i =
   (* mod everything *)
-  let o = Integer.e_rem o i in
+  let o = Integer.erem o i in
   let non_zero_rem (d, b) =
-    let rem = Integer.e_rem d i in
+    let rem = Integer.erem d i in
     if Integer.is_zero rem then None else Some (rem, b)
   in
   let sum = List.filter_map non_zero_rem sum in
@@ -179,8 +179,8 @@ let mod_integer (o,sum) i =
     then (o,sum) (* hull is ok, this is our result *)
     else
       let d' = Integer.pgcd d i in
-      let b' = Integer.(pred (e_div i d')) in
-      let o' = Integer.e_rem o d' in
+      let b' = Integer.(pred (ediv i d')) in
+      let o' = Integer.erem o d' in
       o', Terms.(normalize (merge [(d',b')] tail))
 
 let mod_int x i =

@@ -196,7 +196,7 @@ let guess_intended_malloc_type stack sizev constant_size =
   let nb_elems elem_size =
     if constant_size && Int.equal size_min size_max
     then Some (if Int.(equal elem_size zero) then Int.zero
-               else Int.e_div size_min elem_size)
+               else Int.ediv size_min elem_size)
     else None
   in
   let mk_typed_size t =
@@ -204,8 +204,8 @@ let guess_intended_malloc_type stack sizev constant_size =
     | TPtr t when not (Ast_types.is_void t) ->
       let s = Int.of_int (Cil.bytesSizeOf t) in
       if Int.(equal s zero) ||
-         (Int.equal (Int.e_rem size_min s) Int.zero &&
-          Int.equal (Int.e_rem size_max s) Int.zero)
+         (Int.equal (Int.erem size_min s) Int.zero &&
+          Int.equal (Int.erem size_max s) Int.zero)
       then
         { min_bytes = size_min; max_bytes = size_max;
           elem_typ = t; nb_elems = nb_elems s }

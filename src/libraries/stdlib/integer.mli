@@ -42,7 +42,7 @@ val lognot : t -> t
 val min : t -> t -> t
 val max : t -> t -> t
 
-val e_div : t -> t -> t
+val ediv : t -> t -> t
 (** Euclidean division (that returns a positive rem).
     Implemented by [Z.ediv]
 
@@ -52,24 +52,24 @@ val e_div : t -> t -> t
     Note: it is possible that e_div (-a) b <> e_div a (-b).
 *)
 
-val e_rem : t -> t -> t
+val erem : t -> t -> t
 (** Remainder of the Euclidean division (always positive).
     Implemented by [Z.erem] *)
 
-val e_div_rem: t -> t -> (t * t)
-(** [e_div_rem a b] returns [(e_div a b, e_rem a b)].
+val ediv_rem: t -> t -> (t * t)
+(** [ediv_rem a b] returns [(ediv a b, erem a b)].
     Implemented by [Z.ediv_rem] *)
 
-val c_div : t -> t -> t
+val div : t -> t -> t
 (** Truncated division towards 0 (like in C99).
     Implemented by [Z.div] *)
 
-val c_rem : t -> t -> t
+val rem : t -> t -> t
 (** Remainder of the truncated division towards 0 (like in C99).
     Implemented by [Z.rem] *)
 
-val c_div_rem : t -> t -> t * t
-(** [c_div_rem a b] returns [(c_div a b, c_rem a b)].
+val div_rem : t -> t -> t * t
+(** [div_rem a b] returns [(div a b, rem a b)].
     Implemented by [Z.div_rem] *)
 
 val pgcd : t -> t -> t
@@ -205,3 +205,48 @@ val pp_hex : ?nbits:int -> ?sep:string -> t formatter
 
     Positive values are prefixed with ["0x"] and negative values
     are printed as their 2-complement ([lnot]) with prefix ["1x"]. *)
+
+
+(** Deprecated definitions *)
+
+val e_div : t -> t -> t
+(** Euclidean division (that returns a positive rem).
+    Implemented by [Z.ediv]
+
+    Equivalent to C division if both operands are positive.
+    Equivalent to a floored division if b > 0 (rounds downwards),
+    otherwise rounds upwards.
+    Note: it is possible that e_div (-a) b <> e_div a (-b).
+*)
+[@@deprecated "Use ediv instead."]
+[@@migrate { repl = Rel.ediv } ]
+
+val e_rem : t -> t -> t
+(** Remainder of the Euclidean division (always positive).
+    Implemented by [Z.erem] *)
+[@@deprecated "Use erem instead."]
+[@@migrate { repl = Rel.erem } ]
+
+val e_div_rem: t -> t -> (t * t)
+(** [e_div_rem a b] returns [(e_div a b, e_rem a b)].
+    Implemented by [Z.ediv_rem] *)
+[@@deprecated "Use ediv_rem instead."]
+[@@migrate { repl = Rel.ediv_rem } ]
+
+val c_div : t -> t -> t
+(** Truncated division towards 0 (like in C99).
+    Implemented by [Z.div] *)
+[@@deprecated "Use div instead."]
+[@@migrate { repl = Rel.div } ]
+
+val c_rem : t -> t -> t
+(** Remainder of the truncated division towards 0 (like in C99).
+    Implemented by [Z.rem] *)
+[@@deprecated "Use rem instead."]
+[@@migrate { repl = Rel.rem } ]
+
+val c_div_rem : t -> t -> t * t
+(** [c_div_rem a b] returns [(c_div a b, c_rem a b)].
+    Implemented by [Z.div_rem] *)
+[@@deprecated "Use div_rem instead."]
+[@@migrate { repl = Rel.div_rem } ]
