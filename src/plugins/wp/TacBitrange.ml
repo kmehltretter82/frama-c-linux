@@ -43,7 +43,7 @@ and log2d i j n =
 *)
 
 let land_leq ~positive es n = (* land(e_1,...,e_n) <= n *)
-  if Integer.(le zero n) then
+  if Integer.(leq zero n) then
     (* From theorem LAND-1 when 0<=n:
        (exist i, 0 <= e_i <= n) |- 0 <= land(e_1,...,e_n) <= n *)
     let a = F.e_zint n in
@@ -65,7 +65,7 @@ let land_leq ~positive es n = (* land(e_1,...,e_n) <= n *)
       F.p_or case1 case2
 
 let leq_land ~positive n es = (* n <= land(e_1,...,e_n) *)
-  if Integer.(le n zero) then
+  if Integer.(leq n zero) then
     (* From theorem LAND-1 when n<=0:
        (exist i, n <= 0 <= e_i) |- n <= 0 <= land(e_1,...,e_n) *)
     F.p_any is_positive es
@@ -90,7 +90,7 @@ let leq_land ~positive n es = (* n <= land(e_1,...,e_n) *)
 *)
 
 let lor_leq ~positive es n = (* lor(e_1,...,e_n) <= n *)
-  if Integer.(le zero n) then
+  if Integer.(leq zero n) then
     let p = log2m 0 1 (Integer.succ n) in
     (* Have 0 <= 2^p <= n+1, hence 0 <= 2^p-1 <= n.
        From theorem LOR-1 when 0 <= 2^p-1 <= n
@@ -106,7 +106,7 @@ let lor_leq ~positive es n = (* lor(e_1,...,e_n) <= n *)
     raise Not_found
 
 let leq_lor ~positive n es = (* n <= lor(e_1,...,e_n) *)
-  if Integer.(le zero n) then
+  if Integer.(leq zero n) then
     (* From theorem LOR-1 when 0<=n:
        (forall i, 0 <= n <= e_i) |- 0 <= n <= lor(e_1,...,e_n) *)
     let a = F.e_zint n in

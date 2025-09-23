@@ -2919,7 +2919,7 @@ let rec collectInitializer
         match leno with
         | Some len -> begin
             match constFoldToInt len with
-            | Some ni when Integer.ge ni Integer.zero -> to_integer ni, false
+            | Some ni when Integer.geq ni Integer.zero -> to_integer ni, false
             | _ -> (* VLA cannot have initializers, and this should have
                       been captured beforehand. *)
               Kernel.fatal "Trying to initialize a variable-length array"
@@ -4263,7 +4263,7 @@ let rec doSpecList loc ghost (suggestedAnonName: string)
       enum.eitems <- List.map (fun (_, x) -> x) fields;
       (* Pick the enum's kind - see discussion above *)
       begin
-        let unsigned = Integer.ge !smallest Integer.zero in
+        let unsigned = Integer.geq !smallest Integer.zero in
         let smallKind = intKindForValue !smallest unsigned in
         let largeKind = intKindForValue !largest unsigned in
         let real_kind =

@@ -258,7 +258,7 @@ let ikind_of_ival iv =
     | Some l, Some u ->
       begin
         try
-          let is_pos = Integer.ge l Integer.zero in
+          let is_pos = Integer.geq l Integer.zero in
           let lkind = Cil.intKindForValue l is_pos in
           let ukind = Cil.intKindForValue u is_pos in
           (* kind corresponding to the interval *)

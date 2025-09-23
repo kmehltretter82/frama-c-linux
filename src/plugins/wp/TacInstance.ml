@@ -53,7 +53,7 @@ let rec complexity = function
 
 let cardinal limit bindings =
   let n = complexity bindings in
-  if Integer.le n (Integer.of_int limit)
+  if Integer.leq n (Integer.of_int limit)
   then Some (Integer.to_int_exn n) else None
 
 let rec bind_exists bindings property =

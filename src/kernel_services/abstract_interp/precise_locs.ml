@@ -55,11 +55,11 @@ let is_bottom_offset off = off = POBottom
 
 let cardinal_zero_or_one_offset = function
   | POBottom | POZero | POSingleton _ -> true
-  | POPrecise (_, c) | POShift (_, _, c) -> Int.le c Int.one
+  | POPrecise (_, c) | POShift (_, _, c) -> Int.leq c Int.one
   | POImprecise _ -> false
 
 
-let small_cardinal c = Int.le c (Int.of_int (Offsetmap.get_plevel ()))
+let small_cardinal c = Int.leq c (Int.of_int (Offsetmap.get_plevel ()))
 
 let _cardinal_offset = function
   | POBottom -> Some Int.zero

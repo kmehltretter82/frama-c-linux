@@ -161,7 +161,7 @@ type arraypart =
   (* start index, stop index, typ of element , align , start, stop *)
 
 let rec pretty_bits_internal env bfinfo typ ~align ~start ~stop =
-  assert ( Integer.le Integer.zero align
+  assert ( Integer.leq Integer.zero align
            && Integer.lt align env.rh_size);
   assert (if (Integer.lt start Integer.zero
               || Integer.lt stop Integer.minus_one) then
@@ -255,7 +255,7 @@ let rec pretty_bits_internal env bfinfo typ ~align ~start ~stop =
                      (Integer.pred width_o)
                  else stop
                in
-               if Integer.le new_start new_stop then
+               if Integer.leq new_start new_stop then
                  let new_bfinfo = match field.fbitfield with
                    | None -> Other
                    | Some i -> Bitfield (Int64.of_int i)
@@ -284,7 +284,7 @@ let rec pretty_bits_internal env bfinfo typ ~align ~start ~stop =
                  in
                  let succ_stop_o = Integer.add start_o width_o in
                  if Integer.gt start_o stop then acc
-                 else if Integer.le succ_stop_o start then acc
+                 else if Integer.leq succ_stop_o start then acc
                  else if Integer.gt start_o last_field_offset then
                    (* found a hole *)
                    (RawField('c', last_field_offset,Integer.pred start_o)::s,
@@ -297,7 +297,7 @@ let rec pretty_bits_internal env bfinfo typ ~align ~start ~stop =
           else full_fields_to_print, Integer.zero
         in
         let overflowing =
-          if compinfo.cstruct && Integer.le succ_last stop
+          if compinfo.cstruct && Integer.leq succ_last stop
           then RawField('o',Integer.max start succ_last,stop)::non_covered
           else non_covered
         in
@@ -416,7 +416,7 @@ let pretty_bits typ ~use_align ~align ~rh_size ~start ~stop fmt =
   let align =
     Integer.erem (Abstract_interp.Rel.add_abs start align) rh_size
   in
-  assert (Integer.le Integer.zero align
+  assert (Integer.leq Integer.zero align
           && Integer.lt align rh_size);
   if Integer.lt start Integer.zero then
     (Format.fprintf fmt "[%sbits %a to %a]#(negative offsets)"
@@ -494,8 +494,8 @@ let offset_matches om typ =
 let offset_match_cell om size_elt =
   match om with
   | MatchFirst | MatchLast -> true
-  | MatchSize size -> Integer.le size size_elt
-  | MatchType typ' -> Integer.le (Integer.of_int (Cil.bitsSizeOf typ')) size_elt
+  | MatchSize size -> Integer.leq size size_elt
+  | MatchType typ' -> Integer.leq (Integer.of_int (Cil.bitsSizeOf typ')) size_elt
 
 let minus_one_expr = Cil.mone ~loc:Cil_datatype.Location.unknown
 
@@ -557,7 +557,7 @@ let rec find_offset typ ~offset om =
           try
             let off_fi, len_fi = Cil.bitsOffset typ (Field (fi, NoOffset)) in
             let off_fi, len_fi = Integer.of_int off_fi, Integer.of_int len_fi in
-            if Integer.(ge offset (add off_fi len_fi)) then
+            if Integer.(geq offset (add off_fi len_fi)) then
               (* [offset] is not in the interval occupied by [fi]. Try the next
                  one (including for union: maybe the next fields are larger). *)
               find_field q

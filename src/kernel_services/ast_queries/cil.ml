@@ -2412,7 +2412,7 @@ let fitsInInt k i =
   let min_bound = if signed then Integer.neg max_strict_bound
     else Integer.zero
   in
-  let fits = Integer.le min_bound i && Integer.lt i max_strict_bound in
+  let fits = Integer.leq min_bound i && Integer.lt i max_strict_bound in
   if debugTruncation then
     Kernel.debug "Fits in %a %a : %b@."
       !pp_ikind_ref k Datatype.Integer.pretty i fits;
@@ -2434,7 +2434,7 @@ let truncateInteger64 (k: ikind) i =
         let max_signed_strict_bound =
           Integer.shift_right max_strict_bound Integer.one
         in
-        if Integer.ge modulo max_signed_strict_bound then
+        if Integer.geq modulo max_signed_strict_bound then
           Integer.sub modulo max_strict_bound
         else if Integer.lt modulo (Integer.neg max_signed_strict_bound)
         then Integer.add modulo max_strict_bound
@@ -2596,7 +2596,7 @@ let parseIntAux (str:string) =
    * positive integers since the lexer takes care of the sign *)
   let rec toInt base (acc: Integer.t) (idx: int) =
     let doAcc what =
-      if Integer.ge what base
+      if Integer.geq what base
       then
         Error (Format.asprintf
                  "Invalid digit %a in integer literal '%s' in base %a."
@@ -3809,7 +3809,7 @@ and constFoldBinOp ~loc (machdep: bool) bop e1 e2 tres =
            compiler sort it out. *)
         if machdep then
           try
-            (Integer.ge i2 Integer.zero)
+            (Integer.geq i2 Integer.zero)
             && Integer.lt i2 (Integer.of_int (bitsSizeOf (typeOf e1')))
           with SizeOfError _ -> false
         else false
@@ -3896,10 +3896,10 @@ and constFoldBinOp ~loc (machdep: bool) bop e1 e2 tres =
         if Integer.equal i1' i2' then zero ~loc else one ~loc
       | Le, Const(CInt64(i1,ik1,_)),Const(CInt64(i2,ik2,_)) ->
         let i1', i2', _ = convertInts i1 ik1 i2 ik2 in
-        if Integer.le i1' i2' then one ~loc else zero ~loc
+        if Integer.leq i1' i2' then one ~loc else zero ~loc
       | Ge, Const(CInt64(i1,ik1,_)),Const(CInt64(i2,ik2,_)) ->
         let i1', i2', _ = convertInts i1 ik1 i2 ik2 in
-        if Integer.ge i1' i2' then one ~loc else zero ~loc
+        if Integer.geq i1' i2' then one ~loc else zero ~loc
       | Lt, Const(CInt64(i1,ik1,_)),Const(CInt64(i2,ik2,_)) ->
         let i1', i2', _ = convertInts i1 ik1 i2 ik2 in
         if Integer.lt i1' i2' then one ~loc else zero ~loc
@@ -4434,8 +4434,8 @@ let rec constFoldTermNodeAtTop = function
         let bool_op = match op with
           | Lt -> Integer.lt
           | Gt -> Integer.gt
-          | Le -> Integer.le
-          | Ge -> Integer.ge
+          | Le -> Integer.leq
+          | Ge -> Integer.geq
           | Eq -> Integer.equal
           | Ne -> (fun i1 i2 -> not (Integer.equal i1 i2))
           | LAnd ->
@@ -5881,7 +5881,7 @@ let lenOfArray64 eo =
     None -> raise (LenOfArray Not_constant)
   | Some e -> begin
       match (constFold true e).enode with
-      | Const(CInt64(ni, _, _)) when Integer.ge ni Integer.zero ->
+      | Const(CInt64(ni, _, _)) when Integer.geq ni Integer.zero ->
         ni
       | Const(CInt64 _) -> raise (LenOfArray Negative)
       | Const _ -> raise (LenOfArray Not_integer)

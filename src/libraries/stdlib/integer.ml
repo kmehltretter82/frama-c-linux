@@ -88,10 +88,14 @@ let lognot = Z.lognot
 let logor = Z.logor
 let logxor = Z.logxor
 
-let le a b = Z.compare a b <= 0
-let ge a b = Z.compare a b >= 0
-let lt a b = Z.compare a b < 0
-let gt a b = Z.compare a b > 0
+let leq = Z.leq
+let le = Z.leq
+
+let geq = Z.geq
+let ge = Z.geq
+
+let lt = Z.lt
+let gt = Z.gt
 
 let of_int = Z.of_int
 let of_int64 = Z.of_int64

@@ -143,7 +143,7 @@ struct
               let orig = Origin.current Origin.Misalign_write in
               Offsetmap.update_imprecise_everywhere ~validity orig v offm
             | Int_Base.Value size ->
-              assert (Int.ge size Int.zero);
+              assert (Int.geq size Int.zero);
               Offsetmap.update ?origin ~validity ~exact ~offsets ~size v offm
           in
           match offm' with
@@ -449,7 +449,7 @@ struct
 
     let paste_offsetmap ~from ~dst_loc ~size ~exact m =
       let loc_dst = make_loc dst_loc (Int_Base.inject size) in
-      assert (Int.le Int.zero size);
+      assert (Int.leq Int.zero size);
       let exact = exact && cardinal_zero_or_one loc_dst in
       (* TODO: do we want to alter exact here? *)
       let had_non_bottom = ref false in

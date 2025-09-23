@@ -206,7 +206,7 @@ and get_nth_repeat k x n f =
   let en = Integer.of_int n in
   let em = Integer.of_int m in
   let ek = Integer.of_int k in
-  if Integer.(ge ek (mul en em)) then f (k -(n*m))
+  if Integer.(geq ek (mul en em)) then f (k -(n*m))
   else get_nth (k mod m) x
 
 let rewrite_nth s k =

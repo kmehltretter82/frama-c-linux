@@ -15,8 +15,8 @@ let ( =~ ) = Integer.equal
 let ( <>~ ) x y = not (Integer.equal x y)
 let ( <~ ) = Integer.lt
 let ( >~ ) = Integer.gt
-let ( <=~ ) = Integer.le
-let ( >=~ ) = Integer.ge
+let ( <=~ ) = Integer.leq
+let ( >=~ ) = Integer.geq
 let ( +~ ) = Integer.add
 let ( -~ ) = Integer.sub
 (* let ( *~ ) = Integer.mul *)
@@ -291,7 +291,7 @@ module Make
           tag land min_int
 
       let nNode cur offl subl offr subr f g v =
-        if debug then assert (Integer.ge cur Integer.zero);
+        if debug then assert (Integer.geq cur Integer.zero);
         let current_counter = !counter in
         let tag =
           if V.cardinal_zero_or_one v
@@ -607,7 +607,7 @@ module Make
         | Empty -> assert false
       with Empty_tree -> max, offr, subr
     in
-    if debug then assert (Integer.ge max Integer.zero);
+    if debug then assert (Integer.geq max Integer.zero);
     let curr_off, max, rem, offl, subl, offr =
       try
         let offset, nl, zl =
@@ -2097,7 +2097,7 @@ module Make
     end
 
   let create_isotropic ~size v =
-    assert (Int.ge size Int.zero);
+    assert (Int.geq size Int.zero);
     if Int.(equal size zero) then Empty
     else begin
       assert (V.is_isotropic v);
@@ -2105,7 +2105,7 @@ module Make
     end
 
   let create ~size v ~size_v =
-    assert (Int.ge size Int.zero);
+    assert (Int.geq size Int.zero);
     if Int.(equal size zero) then Empty
     else snd (Int.zero, interval_aux (pred size) Rel.zero size_v v)
 
@@ -2675,7 +2675,7 @@ module Int_Intervals = struct
     | Bottom -> Format.fprintf fmt "[%t]" Unicode.pp_empty_set
     | Intervals _ ->
       let pp_one fmt (b,e)=
-        assert (Int.le b e) ;
+        assert (Int.leq b e) ;
         ignore (Bit_utils.pretty_bits typ
                   ~use_align:false
                   ~align:Rel.zero
@@ -2820,7 +2820,7 @@ module Make_bitwise(V: sig
       | Base.Valid_range None -> `Value m (* empty validity *)
       | Base.Valid_range (Some itv) ->
         let aux_itv itv m =
-          if Int.le (fst itv) (snd itv) then
+          if Int.leq (fst itv) (snd itv) then
             add ~exact itv (v_size_mod v) m
           else m
         in

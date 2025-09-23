@@ -38,7 +38,7 @@ let valid_index ~remove_trivial ~on_alarm e size =
     let v_e = get_expr_val e in
     let v_size = get_expr_val size in
     let neg_ok =
-      Option.fold ~none:false ~some:(Integer.le Integer.zero) v_e
+      Option.fold ~none:false ~some:(Integer.leq Integer.zero) v_e
       || Cil.isUnsignedInteger (Cil.typeOf e)
     in
     if not neg_ok then alarm Lower_bound;
@@ -265,7 +265,7 @@ let shift_assertion ~remove_trivial ~on_alarm (exp, upper_bound) =
         | None -> true
         | Some u -> Integer.lt c64 (Integer.of_int u)
       in
-      if not (Integer.ge c64 Integer.zero && upper_bound_ok) then
+      if not (Integer.geq c64 Integer.zero && upper_bound_ok) then
         alarm ~invalid:true ()
   end
   else alarm ()
@@ -309,7 +309,7 @@ let shift_overflow_assertion ~signed ~remove_trivial ~on_alarm (exp, op, lexp, r
       | Some lval64, Some rval64 ->
         (* both operands are constant: check result is representable in
            result type *)
-        if Integer.ge rval64 Integer.zero
+        if Integer.geq rval64 Integer.zero
         && Integer.gt (Integer.shift_left lval64 rval64) maxValResult
         then
           overflow_alarm ~invalid:true ()

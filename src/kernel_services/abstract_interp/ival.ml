@@ -49,14 +49,14 @@ module Type : Type = struct
   let top = Int Int_val.top
 
   let inject_singleton e =
-    if Int.le Int.zero e && Int.le e Int.thirtytwo
+    if Int.leq Int.zero e && Int.leq e Int.thirtytwo
     then small_nums.(Int.to_int_exn e)
     else Int (Int_val.inject_singleton e)
 
   let inject_int i =
     try
       let e = Int_val.project_int i in
-      if Int.le Int.zero e && Int.le e Int.thirtytwo
+      if Int.leq Int.zero e && Int.leq e Int.thirtytwo
       then small_nums.(Int.to_int_exn e)
       else Int i
     with Int_val.Not_Singleton ->
@@ -211,7 +211,7 @@ let cardinal_less_than v n =
 let cardinal_is_less_than v n =
   match cardinal v with
   | None -> false
-  | Some c -> Int.le c (Int.of_int n)
+  | Some c -> Int.leq c (Int.of_int n)
 
 let inject_top min max rem modu =
   match min, max with
@@ -827,7 +827,7 @@ let cast_float_to_int_inverse ~single_precision i =
   match min_and_max i with
   | Some min, Some max when Int.lt exact_min min && Int.lt max exact_max ->
     let minf =
-      if Int.le min Int.zero then
+      if Int.leq min Int.zero then
         (* min is negative. We want to return [(float)((real)(min-1)+epsilon)],
            as converting this number to int will truncate all the fractional
            part (C99 6.3.1.4). Given [exact_min] and [exact_max], 1ulp
@@ -843,7 +843,7 @@ let cast_float_to_int_inverse ~single_precision i =
     in
     (* All operations are dual w.r.t. the min bound. *)
     let maxf =
-      if Int.le Int.zero max
+      if Int.leq Int.zero max
       then
         (* This float is finite because max is big enough *)
         Fval.F.prev_float fkind (Int.to_float (Int.succ max))

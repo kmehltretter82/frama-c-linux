@@ -111,7 +111,7 @@ let extract_size sizev_bytes =
     let sizei_bytes = Cvalue.V.project_ival sizev_bytes in
     begin match Ival.min_and_max sizei_bytes with
       | Some smin, Some smax ->
-        assert (Integer.(ge smin zero));
+        assert (Integer.(geq smin zero));
         smin, Integer.min smax max
       | _ -> assert false (* Cil invariant: cast to size_t *)
     end
@@ -331,8 +331,8 @@ let alloc_fresh weak deallocation prefix sizev _state =
   let min_alloc = Int.(pred (mul size_char tsize.min_bytes)) in
   let max_alloc = Int.(pred (mul size_char tsize.max_bytes)) in
   (* NOTE: min_alloc/max_alloc may be -1 if the size is zero *)
-  assert Int.(ge min_alloc Int.minus_one);
-  assert Int.(ge max_alloc min_alloc);
+  assert Int.(geq min_alloc Int.minus_one);
+  assert Int.(geq max_alloc min_alloc);
   (* note that min_alloc may be negative (-1) if the allocated size is 0 *)
   let weak = match weak with Weak -> true | Strong -> false in
   let variable_v = Base.create_variable_validity ~weak ~min_alloc ~max_alloc in

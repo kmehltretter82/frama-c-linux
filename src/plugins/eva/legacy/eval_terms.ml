@@ -561,7 +561,7 @@ let pass_logic_cast exn typ trm =
     in
     let sityp = Bit_utils.is_signed_int_enum_pointer typ in
     let sisexpr = Bit_utils.is_signed_int_enum_pointer typeoftrm in
-    if (Integer.ge styp sexpr && sityp = sisexpr) (* larger, same signedness *)
+    if (Integer.geq styp sexpr && sityp = sisexpr) (* larger, same signedness *)
     || (Integer.gt styp sexpr && sityp) (* strictly larger and signed *)
     then ()
     else raise exn
@@ -1570,7 +1570,7 @@ and eval_quantifier_extremum backward_left ~min ~max eval_term =
   let project r = Cvalue.V.project_ival r.eover in
   match Ival.min_and_max (project min),
         Ival.min_and_max (project max) with
-  | (min, Some b), (Some e, max) when Integer.le b e ->
+  | (min, Some b), (Some e, max) when Integer.leq b e ->
     (* All integers between [b] and [e] are necessarily in the range to be
        considered. If [e-b] is small enough, evaluate [eval_term i] for each [i]
        between [b] and [e]. Otherwise, evaluate [eval_term] for the bound [b]
@@ -1581,7 +1581,7 @@ and eval_quantifier_extremum backward_left ~min ~max eval_term =
       then eval_term (Cvalue.V.inject_int b)
       else
         let fold =
-          if Integer.(le (sub e b) (of_int 10))
+          if Integer.(leq (sub e b) (of_int 10))
           then Ival.fold_enum
           else Ival.fold_int_bounds
         in

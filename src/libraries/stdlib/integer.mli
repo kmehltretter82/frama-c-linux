@@ -16,10 +16,10 @@ type t = Z.t
 val equal : t -> t -> bool
 val compare : t -> t -> int
 
-val le : t -> t -> bool
-val ge : t -> t -> bool
-val lt : t -> t -> bool
-val gt : t -> t -> bool
+val leq : t -> t -> bool
+val geq : t -> t -> bool
+val lt  : t -> t -> bool
+val gt  : t -> t -> bool
 
 val add : t -> t -> t
 val sub : t -> t -> t
@@ -208,6 +208,14 @@ val pp_hex : ?nbits:int -> ?sep:string -> t formatter
 
 
 (** Deprecated definitions *)
+
+val le : t -> t -> bool
+[@@deprecated "Use leq instead."]
+[@@migrate { repl = Rel.leq } ]
+
+val ge : t -> t -> bool
+[@@deprecated "Use geq instead."]
+[@@migrate { repl = Rel.geq } ]
 
 val e_div : t -> t -> t
 (** Euclidean division (that returns a positive rem).

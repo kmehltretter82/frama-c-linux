@@ -259,9 +259,9 @@ struct
         match Int_val.min_and_max r with
         | Some min, Some max when Integer.is_zero min && Integer.is_zero max ->
           Equal
-        | Some l, _ when Integer.(ge l zero) ->
+        | Some l, _ when Integer.(geq l zero) ->
           if Integer.(gt l zero) then Greater else GreaterOrEqual
-        | _, Some u when Integer.(le u zero) ->
+        | _, Some u when Integer.(leq u zero) ->
           if Integer.(lt u zero) then Lower else LowerOrEqual
         | _ -> Uncomparable
 

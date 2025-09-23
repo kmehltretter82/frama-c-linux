@@ -776,7 +776,7 @@ class cil_printer () = object (self)
     | UnOp(u,e1,_) ->
       (match u, e1 with
        | Neg, {enode = Const (CInt64 (v, _, _))}
-         when Integer.ge v Integer.zero ->
+         when Integer.geq v Integer.zero ->
          fprintf fmt "-%a" (self#exp_prec level) e1
        | _ ->
          fprintf fmt "%a %a" self#unop u (self#exp_prec level) e1)

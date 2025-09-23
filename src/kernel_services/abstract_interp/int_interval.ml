@@ -92,7 +92,7 @@ let fail min max r modu =
     bound min bound max Int.pretty r Int.pretty modu
 
 let is_safe_modulo r modu =
-  (Int.ge r Int.zero ) && (Int.ge modu Int.one) && (Int.lt r modu)
+  (Int.geq r Int.zero ) && (Int.geq modu Int.one) && (Int.lt r modu)
 
 let is_safe_bound bound r modu = match bound with
   | None -> true
@@ -135,22 +135,22 @@ let make_or_bottom ~min ~max ~rem ~modu =
 let min_le_elt min elt =
   match min with
   | None -> true
-  | Some m -> Int.le m elt
+  | Some m -> Int.leq m elt
 
 let max_ge_elt max elt =
   match max with
   | None -> true
-  | Some m -> Int.ge m elt
+  | Some m -> Int.geq m elt
 
 let all_positives t =
   match t.min with
   | None -> false
-  | Some m -> Int.ge m Int.zero
+  | Some m -> Int.geq m Int.zero
 
 let all_negatives t =
   match t.max with
   | None -> false
-  | Some m -> Int.le m Int.zero
+  | Some m -> Int.leq m Int.zero
 
 let min_and_max t = t.min, t.max
 
@@ -172,14 +172,14 @@ let min_is_lower min1 min2 =
   match min1, min2 with
   | None, _ -> true
   | _, None -> false
-  | Some m1, Some m2 -> Int.le m1 m2
+  | Some m1, Some m2 -> Int.leq m1 m2
 
 (** [max_is_greater mx1 mx2] is true iff mx1 is a greater max than mx2 *)
 let max_is_greater max1 max2 =
   match max1, max2 with
   | None, _ -> true
   | _, None -> false
-  | Some m1, Some m2 -> Int.ge m1 m2
+  | Some m1, Some m2 -> Int.geq m1 m2
 
 let rem_is_included r1 m1 r2 m2 =
   (Int.is_zero (Int.erem m1 m2)) && (Int.equal (Int.erem r1 m2) r2)
@@ -368,7 +368,7 @@ let cardinal_less_than t n =
     | None, _ | _, None -> raise Not_less_than
     | Some min, Some max -> Int.succ ((Int.ediv (Int.sub max min) t.modu))
   in
-  if Int.le c (Int.of_int n)
+  if Int.leq c (Int.of_int n)
   then Int.to_int_exn c (* This is smaller than the original [n] *)
   else raise Not_less_than
 
@@ -383,7 +383,7 @@ let diff_if_one v _ = `Value v
 
 let complement_under ~min ~max t =
   let inject_range min max =
-    if Int.le min max
+    if Int.leq min max
     then `Value (inject_range (Some min) (Some max))
     else `Bottom
   in
@@ -394,7 +394,7 @@ let complement_under ~min ~max t =
   | Some b, Some e ->
     let delta_min = Int.sub b min in
     let delta_max = Int.sub max e in
-    if Int.le delta_min delta_max
+    if Int.leq delta_min delta_max
     then inject_range (Int.succ e) max
     else inject_range min (Int.pred b)
 
@@ -411,7 +411,7 @@ let fold_enum f v acc =
 let to_seq ?(increasing=true) t =
   let start, is_before_last =
     match t.min, t.max with
-    | Some l, Some u -> if increasing then l, Integer.ge u else u, Integer.le l
+    | Some l, Some u -> if increasing then l, Integer.geq u else u, Integer.leq l
     | Some l, None when increasing -> l, fun _ -> true (* Infinite sequence *)
     | None, Some u when not increasing -> u, fun _ -> true (* Infinite sequence *)
     | _ -> raise Error_Top
@@ -480,8 +480,8 @@ let neg t =
 
 let abs t =
   match t.min, t.max with
-  | Some mn, _ when Int.(ge mn zero) -> t
-  | _, Some mx when Int.(le mx zero) -> neg t
+  | Some mn, _ when Int.(geq mn zero) -> t
+  | _, Some mx when Int.(leq mx zero) -> neg t
   | _, _ ->
     let max =
       match t.min, t.max with

@@ -520,7 +520,7 @@ struct
         let add_missing_indices acc i0 = function
           (* adds eventual default value for missing indices. *)
           | (i1, _) ->
-            if Integer.ge i0 i1 then (* no hole *) acc
+            if Integer.geq i0 i1 then (* no hole *) acc
             else (* defaults values
                     Added pred: \forall i \in [i0 .. i1[ ; t[i]==default *)
               init_range ~sigma lv ty i0 (Integer.pred i1) None :: acc

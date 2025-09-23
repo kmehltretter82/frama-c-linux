@@ -69,12 +69,12 @@ module G = struct
       (match bmin1, bmin2 with
        | _, None -> true
        | None, Some _ -> false
-       | Some b1, Some b2 -> Integer.le b2 b1)
+       | Some b1, Some b2 -> Integer.leq b2 b1)
       &&
       (match bmax1, bmax2 with
        | _, None -> true
        | None, Some _ -> false
-       | Some b1, Some b2 -> Integer.le b1 b2)
+       | Some b1, Some b2 -> Integer.leq b1 b2)
 
     (* This function computes how much the bounds of [i2] have increased from
        those of [i1], i.e. [diff [1 .. 4]  [-2 .. 8]] is [-3 .. 4]
@@ -114,7 +114,7 @@ module G = struct
 
     let mul_ct k (bmin, bmax: t) : t =
       let mul = Integer.mul k in
-      if Integer.le k Integer.zero then
+      if Integer.leq k Integer.zero then
         Option.map mul bmax, Option.map mul bmin
       else
         Option.map mul bmin, Option.map mul bmax
@@ -157,7 +157,7 @@ module G = struct
           | None, _ | _, None -> None
           | Some ib1, Some ib2 ->
             if Integer.equal ib1 ib2 then b1
-            else if Integer.le ib1 n && Integer.le ib2 n then Some n
+            else if Integer.leq ib1 n && Integer.leq ib2 n then Some n
             else None
       in
       (widen_unstable_min min1 min2, widen_unstable_max max1 max2)

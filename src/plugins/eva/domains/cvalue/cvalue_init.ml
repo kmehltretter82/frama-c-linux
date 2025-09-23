@@ -65,7 +65,7 @@ let create_hidden_base ~libc ~valid ~hidden_var_name ~name_desc pointed_typ =
       (match valid with
        | KnownThenUnknownValidity size -> (*except here, for size bits*)
          let size = Integer.pred size in
-         assert (Integer.le size b);
+         assert (Integer.leq size b);
          Base.Unknown (a, Some size, b)
        | UnknownValidity -> Base.Unknown (a, None, b)
       )

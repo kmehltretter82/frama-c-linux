@@ -611,8 +611,8 @@ let complement_under ~min ~max set =
   done;
   let b, e = Int.succ (get (!index-1)), Int.pred (get !index) in
   let card = Int.succ (Int.sub e b) in
-  if Int.(le card zero) then `Bottom
-  else if Int.le card (Int.of_int !small_cardinal)
+  if Int.(leq card zero) then `Bottom
+  else if Int.leq card (Int.of_int !small_cardinal)
   then `Set (Array.init (Int.to_int_exn card) (fun i -> Int.add b (Int.of_int i)))
   else `Top (b, e, Int.one)
 
@@ -640,14 +640,14 @@ let add_under s1 s2 =
 let neg s = map_set_strict_decr Int.neg s
 
 let abs s =
-  if Int.(ge s.(0) zero)
+  if Int.(geq s.(0) zero)
   then s
-  else if Int.(le s.(Array.length s - 1) zero)
+  else if Int.(leq s.(Array.length s - 1) zero)
   then neg s
   else map Int.abs s
 
 let scale f s =
-  if Int.ge f Int.zero
+  if Int.geq f Int.zero
   then apply_bin_1_strict_incr Int.mul f s
   else apply_bin_1_strict_decr Int.mul f s
 

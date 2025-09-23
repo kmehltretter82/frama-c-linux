@@ -267,7 +267,7 @@ module Int = struct
     let rec fold_incr ~counter ~inf acc =
       if equal counter onethousand then
         feedback_approximation "enumerating %a integers" pretty nb_loop;
-      if le inf sup then begin
+      if leq inf sup then begin
         (*          Format.printf "Int.fold: %a@\n" pretty inf; *)
         fold_incr ~counter:(succ counter) ~inf:(add step inf) (f inf acc)
       end else acc
@@ -275,12 +275,12 @@ module Int = struct
     let rec fold_decr ~counter ~sup acc =
       if equal counter onethousand then
         feedback_approximation "enumerating %a integers" pretty nb_loop;
-      if le inf sup then begin
+      if leq inf sup then begin
         (*          Format.printf "Int.fold: %a@\n" pretty inf; *)
         fold_decr ~counter:(succ counter) ~sup:(add step sup) (f sup acc)
       end else acc
     in
-    if le zero step
+    if leq zero step
     then fold_incr ~counter:zero ~inf acc
     else fold_decr ~counter:zero ~sup acc
 

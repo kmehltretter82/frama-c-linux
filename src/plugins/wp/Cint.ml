@@ -125,7 +125,7 @@ let match_mod t =
 (* integration with qed should be improved! *)
 let is_positive t =
   match F.repr t with
-  | Logic.Kint c -> Integer.le Integer.one c
+  | Logic.Kint c -> Integer.leq Integer.one c
   | _ -> false
 
 (* integration with qed should be improved! *)
@@ -213,7 +213,7 @@ let match_ufun uop t =
 
 let match_positive_or_null_integer t =
   match F.repr t with
-  | Logic.Kint c when Integer.le Integer.zero c -> c
+  | Logic.Kint c when Integer.leq Integer.zero c -> c
   | _ -> raise Not_found
 
 let match_binop_arg1 match_f = function (* for binop *)
@@ -740,10 +740,10 @@ let smp_eq_with_lsl_cst a0 b0 =
     let a1,e= match_integer_arg1 es in
     if is_negative e then raise Not_found ;
     (* [PB] can be generalized to any term for a1 *)
-    if Integer.le Integer.zero a1 && Integer.lt b1 a1 then
+    if Integer.leq Integer.zero a1 && Integer.lt b1 a1 then
       (* e>=0 && 0<=a1 && b1<a1 ==> ( (a1<<e)==b1 <==> false ) *)
       e_false
-    else if Integer.ge Integer.zero a1 && Integer.gt b1 a1 then
+    else if Integer.geq Integer.zero a1 && Integer.gt b1 a1 then
       (* e>=0 && 0>=a1 && b1>a1 ==> ( (a1<<e)==b1 <==> false ) *)
       e_false
     else raise Not_found
@@ -1323,7 +1323,7 @@ module Masks = struct
 
   [@@@ warning "-32"]
   let pretty_mask fmt m =
-    if Integer.le Integer.zero m then Integer.pretty_hex fmt m
+    if Integer.leq Integer.zero m then Integer.pretty_hex fmt m
     else Format.fprintf fmt "~%a" Integer.pretty_hex (Integer.lognot m)
 
   [@@@ warning "-32"]
@@ -1642,13 +1642,13 @@ module MasksDomain = struct
         else ctx
       | Fun(f,[x;k]) when f == f_bit_positive ->
         let k = match_positive_or_null_integer k in (* may raise Not_found *)
-        if Integer.le Integer.zero k then
+        if Integer.leq Integer.zero k then
           reduce ctx x { Masks.top with set = two_power_k k }
         else ctx
       | Not x -> begin match F.repr x with
           | Fun(f,[x;k]) when f == f_bit_positive ->
             let k = match_positive_or_null_integer k in
-            if Integer.le Integer.zero k then
+            if Integer.leq Integer.zero k then
               reduce ctx x { Masks.top with unset = two_power_k k }
             else ctx
           | _ -> ctx

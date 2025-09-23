@@ -184,7 +184,7 @@ let min_valid_absolute_address = MinValidAbsoluteAddress.get
 let max_valid_absolute_address = MaxValidAbsoluteAddress.get
 
 let validity_from_size size =
-  assert Int.(ge size zero);
+  assert Int.(geq size zero);
   if Int.(equal size zero) then Empty
   else Known (Int.zero, Int.pred size)
 
@@ -296,8 +296,8 @@ let offset_is_in_validity access base ival =
   let is_valid_for_bounds min_bound max_bound =
     match Ival.min_and_max ival with
     | Some min, Some max ->
-      Int.ge min min_bound &&
-      Int.le max (last_valid_offset base max_bound access)
+      Int.geq min min_bound &&
+      Int.leq max (last_valid_offset base max_bound access)
     | _, _ -> false
   in
   match validity base with

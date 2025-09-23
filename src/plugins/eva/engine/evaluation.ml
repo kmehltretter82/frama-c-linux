@@ -739,8 +739,8 @@ module Make
 
   let truncate_float_bound fkind bound bound_kind expr value =
     let next_int, prev_float, is_beyond = match bound_kind with
-      | Alarms.Upper_bound -> Integer.succ, Fval.F.prev_float, Integer.ge
-      | Alarms.Lower_bound -> Integer.pred, Fval.F.next_float, Integer.le
+      | Alarms.Upper_bound -> Integer.succ, Fval.F.prev_float, Integer.geq
+      | Alarms.Lower_bound -> Integer.pred, Fval.F.next_float, Integer.leq
     in
     let ibound = next_int bound in
     let fbound = Integer.to_float ibound in

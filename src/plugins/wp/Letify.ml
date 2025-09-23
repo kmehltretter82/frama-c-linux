@@ -347,8 +347,8 @@ struct
       let bound = Integer.of_int (Wp_parameters.BoundForallUnfolding.get ()) in
       begin match extract_forall_equality fb with
         | Some (csta,cstb) when
-            Integer.le csta cstb &&
-            Integer.le (Integer.sub cstb csta) bound ->
+            Integer.leq csta cstb &&
+            Integer.leq (Integer.sub cstb csta) bound ->
           let rec aux sigma i =
             if Integer.lt cstb i then sigma
             else begin

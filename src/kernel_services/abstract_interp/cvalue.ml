@@ -428,7 +428,7 @@ module V = struct
     let integer_part'= on_null ~size ~signed integer_part in
     (* no_garble indicates that we do _not_ create a (new) garbled mix *)
     let no_garble =
-      Int.ge size (Int.of_int (Bit_utils.sizeofpointer ())) ||
+      Int.geq size (Int.of_int (Bit_utils.sizeofpointer ())) ||
       is_bottom pointer_part || is_imprecise pointer_part
     in
     if no_garble && integer_part' == integer_part then

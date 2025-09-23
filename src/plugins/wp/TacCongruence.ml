@@ -58,7 +58,7 @@ let negative x = F.p_lt x F.e_zero
 type cmp = LEQ | LT | EQ
 
 let icmp cmp a b = match cmp with
-  | LEQ -> Integer.le a b
+  | LEQ -> Integer.leq a b
   | LT -> Integer.lt a b
   | EQ -> Integer.equal a b
 

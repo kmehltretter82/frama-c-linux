@@ -617,7 +617,7 @@ let frama_c_interval_split _state actuals =
         let lower = Ival.project_int (Cvalue.V.project_ival lower) in
         let i = ref lower in
         let r = ref [] in
-        while (Int.le !i upper) do
+        while (Int.leq !i upper) do
           r := Cvalue.V.inject_int !i :: !r;
           i := Int.succ !i;
         done;
