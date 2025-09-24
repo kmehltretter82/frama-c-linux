@@ -9,9 +9,75 @@
 (** Extension of [Big_int] compatible with [Zarith].
     @since Nitrogen-20111001 *)
 
+type t = Z.t
+
 type 'a formatter = Format.formatter -> 'a -> unit
 
-type t = Z.t
+(**************************************************************************)
+(** {3 Conversions} *)
+(**************************************************************************)
+
+val of_int : int -> t
+val of_int32 : Int32.t -> t
+val of_int64 : Int64.t -> t
+
+(**
+   @raise Z.Overflow if too big
+   @since 24.0-Chromium
+*)
+val to_int_exn : t -> int
+
+(**
+   @raise Z.Overflow if too big
+   @since 24.0-Chromium
+*)
+val to_int32_exn : t -> int32
+
+(**
+   @raise Z.Overflow if too big
+   @since 24.0-Chromium
+*)
+val to_int64_exn : t -> int64
+
+(**
+   Returns [Some i] if the number can be converted to an [int],
+   or [None] otherwise.
+   @since 24.0-Chromium
+*)
+val to_int_opt : t -> int option
+
+(**
+   Returns [Some i] if the number can be converted to an [int32],
+   or [None] otherwise.
+   @since 24.0-Chromium
+*)
+val to_int32_opt : t -> int32 option
+
+(**
+   Returns [Some i] if the number can be converted to an [int64],
+   or [None] otherwise.
+   @since 24.0-Chromium
+*)
+val to_int64_opt : t -> int64 option
+
+val to_float : t -> float
+val of_float : float -> t
+
+val to_string : t -> string
+val of_string : string -> t
+(** @raise Invalid_argument when the string cannot be parsed. *)
+
+(**************************************************************************)
+(** {3 Numbers} *)
+(**************************************************************************)
+
+val minus_one : t
+val zero : t
+val one : t
+
+(**************************************************************************)
+(** {3 Basic functions, most of them from Z} *)
+(**************************************************************************)
 
 val equal : t -> t -> bool
 val compare : t -> t -> int
@@ -24,6 +90,28 @@ val gt  : t -> t -> bool
 val add : t -> t -> t
 val sub : t -> t -> t
 val mul : t -> t -> t
+
+val abs : t -> t
+val neg : t -> t
+val succ : t -> t
+val pred : t -> t
+
+val is_zero : t -> bool
+val is_one : t -> bool
+
+val is_even : t -> bool
+
+val length : t -> t -> t (** b - a + 1 *)
+
+val two_power : t -> t
+(** Computes [2^n]
+    @raise Z.Overflow for exponents greater than 1024 *)
+
+val two_power_of_int : int -> t
+(** Computes [2^n] *)
+
+val power_int_positive_int_opt : int -> int -> t option
+(** Exponentiation *)
 
 val shift_left : t -> t -> t
 (** @raise Invalid_argument if second argument (count) is negative *)
@@ -78,69 +166,6 @@ val pgcd : t -> t -> t
 val ppcm : t -> t -> t
 (** [ppcm v 0 == ppcm 0 v == 0]. Result is always positive *)
 
-val cast: size:t -> signed:bool -> value:t -> t
-
-val abs : t -> t
-val neg : t -> t
-val succ : t -> t
-val pred : t -> t
-
-val is_zero : t -> bool
-val is_one : t -> bool
-val is_even : t -> bool
-
-val zero : t
-val one : t
-val minus_one : t
-val length : t -> t -> t (** b - a + 1 *)
-
-val of_int : int -> t
-val of_int64 : Int64.t -> t
-val of_int32 : Int32.t -> t
-
-(**
-   @raise Z.Overflow if too big
-   @since 24.0-Chromium
-*)
-val to_int_exn : t -> int
-
-(**
-   @raise Z.Overflow if too big
-   @since 24.0-Chromium
-*)
-val to_int64_exn : t -> int64
-
-(**
-   @raise Z.Overflow if too big
-   @since 24.0-Chromium
-*)
-val to_int32_exn : t -> int32
-
-(**
-   Returns [Some i] if the number can be converted to an [int],
-   or [None] otherwise.
-   @since 24.0-Chromium
-*)
-val to_int_opt : t -> int option
-
-(**
-   Returns [Some i] if the number can be converted to an [int64],
-   or [None] otherwise.
-   @since 24.0-Chromium
-*)
-val to_int64_opt : t -> int64 option
-
-(**
-   Returns [Some i] if the number can be converted to an [int32],
-   or [None] otherwise.
-   @since 24.0-Chromium
-*)
-val to_int32_opt : t -> int32 option
-
-
-val to_float : t -> float
-val of_float : float -> t
-
 val round_up_to_r : min:t -> r:t -> modu:t -> t
 (** [round_up_to_r m r modu] is the smallest number [n] such that
     [n]>=[m] and [n] = [r] modulo [modu] *)
@@ -149,23 +174,20 @@ val round_down_to_r : max:t -> r:t -> modu:t -> t
 (** [round_down_to_r m r modu] is the largest number [n] such that
     [n]<=[m] and [n] = [r] modulo [modu] *)
 
-val two_power : t -> t
-(** Computes [2^n]
-    @raise Z.Overflow for exponents greater than 1024 *)
-
-val two_power_of_int : int -> t
-(** Computes [2^n] *)
-
-val power_int_positive_int_opt : int -> int -> t option
-(** Exponentiation *)
-
-val extract_bits : start:t -> stop:t -> t -> t
 val popcount: t -> int
+
 val hash : t -> int
 
-val to_string : t -> string
-val of_string : string -> t
-(** @raise Invalid_argument when the string cannot be parsed. *)
+val extract_bits : start:t -> stop:t -> t -> t
+(** [extract_bits ~start ~stop v] is a shortcut for [Z.extract v pos length]
+    where [pos] and [length] are computed using [start] and [stop].
+*)
+
+val cast: size:t -> signed:bool -> value:t -> t
+
+(**************************************************************************)
+(** {3 Printers} *)
+(**************************************************************************)
 
 (** Prints the integer in decimal format. See also {!pretty_hex}.
 
@@ -194,8 +216,9 @@ val pp_hex : ?nbits:int -> ?sep:string -> t formatter
     Positive values are prefixed with ["0x"] and negative values
     are printed as their 2-complement ([lnot]) with prefix ["1x"]. *)
 
-
-(** Deprecated definitions *)
+(**************************************************************************)
+(** {3 Deprecated} *)
+(**************************************************************************)
 
 val two : t
 [@@deprecated "Use 'of_int 2' instead."]

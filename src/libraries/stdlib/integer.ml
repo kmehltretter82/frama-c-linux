@@ -15,6 +15,24 @@ let ( - ) = Stdlib.( - )
 
 type 'a formatter = Format.formatter -> 'a -> unit
 
+(* ----------- *)
+(* Conversions *)
+(* ----------- *)
+
+(* These functions can raise Z.Overflow, so we make it explicit. *)
+let to_int_exn = to_int
+let to_int64_exn = to_int64
+let to_int32_exn = to_int32
+
+let wrap to_int i = try Some (to_int i) with Z.Overflow -> None
+let to_int_opt = wrap to_int
+let to_int64_opt = wrap to_int64
+let to_int32_opt = wrap to_int32
+
+(* ------------------------- *)
+(* Basic functions and utils *)
+(* ------------------------- *)
+
 let two_power_of_int k =
   shift_left one k
 
@@ -29,9 +47,7 @@ let power_int_positive_int_opt n e =
   try Some (Big_int_Z.power_int_positive_int n e)
   with Invalid_argument _ -> None
 
-let is_zero v = equal v zero
-let is_one  v = equal one v
-
+(* We redefine shifts to operate on t instead of int. *)
 let shift_left x y = shift_left x (to_int y)
 let shift_right x y = shift_right x (to_int y)
 let shift_right_logical x y = (* no meaning for negative value of x *)
@@ -39,16 +55,35 @@ let shift_right_logical x y = (* no meaning for negative value of x *)
   then raise (Invalid_argument "Integer.shift_right_logical")
   else shift_right x y
 
-let to_int_exn = to_int
-let to_int64_exn = to_int64
-let to_int32_exn = to_int32
+let is_zero v = equal v zero
+let is_one  v = equal v one
 
-let wrap to_int i = try Some (to_int i) with Z.Overflow -> None
-let to_int_opt = wrap to_int
-let to_int64_opt = wrap to_int64
-let to_int32_opt = wrap to_int32
+let is_even v = is_zero (logand one v)
 
+let length u v = succ (sub v u)
 
+let pgcd u v =
+  if is_zero v then abs u (* Zarith raises an exception on zero arguments *)
+  else if is_zero u then abs v
+  else gcd u v
+
+let ppcm u v =
+  if u = zero || v = zero
+  then zero
+  else lcm u v
+
+let round_down_to_zero v modu =
+  mul (ediv v modu) modu
+
+let round_up_to_r ~min:m ~r ~modu =
+  add (add (round_down_to_zero (pred (sub m r)) modu) r) modu
+
+let round_down_to_r ~max:m ~r ~modu =
+  add (round_down_to_zero (sub m r) modu) r
+
+(* -------- *)
+(* Printers *)
+(* -------- *)
 
 let bdigits = [|
   "0000" ; (* 0 *)
@@ -136,19 +171,21 @@ let pretty_hex fmt v =
   else if gt v zero then (Format.pp_print_string fmt "0x"; aux v)
   else (Format.pp_print_string fmt "-0x"; aux (neg v))
 
+(* ------------- *)
+(* Miscellaneous *)
+(* ------------- *)
+
 let cast ~size ~signed ~value =
-  if (not signed)
-  then
-    let factor = two_power size in logand value (pred factor)
+  if (not signed) then
+    let factor = two_power size in
+    logand value (pred factor)
   else
     let mask = two_power (sub size one) in
     let p_mask = pred mask in
-    if equal (logand mask value) zero
-    then logand value p_mask
+    if equal (logand mask value) zero then
+      logand value p_mask
     else
       logor (lognot p_mask) value
-
-let length u v = succ (sub v u)
 
 let extract_bits ~start ~stop v =
   assert (geq start zero && geq stop start);
@@ -156,27 +193,6 @@ let extract_bits ~start ~stop v =
   let r = extract v (to_int_exn start) (to_int_exn (length start stop)) in
   (*Format.printf "%a[%a..%a]=%a@\n" pretty v pretty start pretty stop pretty r;*)
   r
-
-let is_even v = is_zero (logand one v)
-
-let pgcd u v =
-  if is_zero v then abs u (* Zarith raises an exception on zero arguments *)
-  else if is_zero u then abs v
-  else gcd u v
-
-let ppcm u v =
-  if u = zero || v = zero
-  then zero
-  else lcm u v
-
-let round_down_to_zero v modu =
-  mul (ediv v modu) modu
-
-let round_up_to_r ~min:m ~r ~modu =
-  add (add (round_down_to_zero (pred (sub m r)) modu) r) modu
-
-let round_down_to_r ~max:m ~r ~modu =
-  add (round_down_to_zero (sub m r) modu) r
 
 (* Deprecated *)
 
