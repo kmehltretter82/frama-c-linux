@@ -424,8 +424,8 @@ let update_variable_validity ?(make_weak=false) base sizev =
   | Base.Allocated (vi, _deallocation, (Base.Variable variable_v)) ->
     if make_weak && (variable_v.Base.weak = false) then
       mutate_name_to_weak vi;
-    let min_sure_bits = Int.(pred (mul eight size_min)) in
-    let max_valid_bits = Int.(pred (mul eight size_max)) in
+    let min_sure_bits = Int.(pred (mul (of_int 8) size_min)) in
+    let max_valid_bits = Int.(pred (mul (of_int 8) size_max)) in
     if not (Int.equal variable_v.Base.min_alloc min_sure_bits) ||
        not (Int.equal variable_v.Base.max_alloc max_valid_bits)
     then begin

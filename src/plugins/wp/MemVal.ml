@@ -157,7 +157,7 @@ struct
     | Unknown (_, _, m) -> Integer.succ m
     | Variable { max_allocable } -> Integer.succ max_allocable
 
-  let size_from_validity b = Integer.(ediv (bitsize_from_validity b) eight)
+  let size_from_validity b = Integer.(ediv (bitsize_from_validity b) (of_int 8))
 end
 
 
@@ -598,12 +598,12 @@ struct
     | Base.Known (min_valid, max_valid)
     | Base.Unknown (min_valid, Some max_valid, _) ->
       (* valid between min_valid .. max_valid inclusive *)
-      let mn = F.e_bigint Integer.(ediv min_valid eight) in
-      let mx = F.e_bigint Integer.(ediv max_valid eight) in
+      let mn = F.e_bigint Integer.(ediv min_valid (of_int 8)) in
+      let mx = F.e_bigint Integer.(ediv max_valid (of_int 8)) in
       Vset.range (Some mn) (Some mx)
     | Base.Variable { Base.min_alloc = min_valid } ->
       (* valid between 0 .. min_valid inclusive *)
-      let mn_valid = F.e_bigint Integer.(ediv min_valid eight) in
+      let mn_valid = F.e_bigint Integer.(ediv min_valid (of_int 8)) in
       Vset.range (Some F.e_zero) (Some mn_valid)
     | Base.Unknown (_, None, _) -> Vset.empty
 

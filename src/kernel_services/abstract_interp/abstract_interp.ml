@@ -264,6 +264,7 @@ module Int = struct
     (*    Format.printf "Int.fold: inf:%a sup:%a step:%a@\n"
            pretty inf pretty sup pretty step; *)
     let nb_loop = ediv (sub sup inf) step in
+    let onethousand = of_int 1000 in
     let rec fold_incr ~counter ~inf acc =
       if equal counter onethousand then
         feedback_approximation "enumerating %a integers" pretty nb_loop;

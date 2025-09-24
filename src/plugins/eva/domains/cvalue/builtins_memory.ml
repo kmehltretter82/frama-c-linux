@@ -265,7 +265,7 @@ let frama_c_memset_imprecise state dst_expr dst v size =
     if Int.gt size_min Int.zero then
       let size = size_min in
       let value = Cvalue.V_Or_Uninitialized.initialized v in
-      let from = Cvalue.V_Offsetmap.create ~size ~size_v:Integer.eight value in
+      let from = Cvalue.V_Offsetmap.create ~size ~size_v:(Integer.of_int 8) value in
       warn_imprecise_offsm_write ~name:"memset" dst_expr from;
       let state =
         Cvalue.Model.paste_offsetmap ~from ~size ~exact ~dst_loc:dst state

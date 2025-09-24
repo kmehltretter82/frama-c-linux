@@ -49,14 +49,14 @@ module Type : Type = struct
   let top = Int Int_val.top
 
   let inject_singleton e =
-    if Int.leq Int.zero e && Int.leq e Int.thirtytwo
+    if Int.leq Int.zero e && Int.leq e (Int.of_int 32)
     then small_nums.(Int.to_int_exn e)
     else Int (Int_val.inject_singleton e)
 
   let inject_int i =
     try
       let e = Int_val.project_int i in
-      if Int.leq Int.zero e && Int.leq e Int.thirtytwo
+      if Int.leq Int.zero e && Int.leq e (Int.of_int 32)
       then small_nums.(Int.to_int_exn e)
       else Int i
     with Int_val.Not_Singleton ->
@@ -504,7 +504,7 @@ let create_all_values ~signed ~size =
   inject_int (Int_val.create_all_values ~signed ~size)
 
 let big_int_64 = Int.of_int 64
-let big_int_32 = Int.thirtytwo
+let big_int_32 = Int.of_int 32
 
 let cast_int_to_int ~size ~signed = function
   | Bottom -> bottom

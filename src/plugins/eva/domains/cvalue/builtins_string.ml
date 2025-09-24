@@ -339,7 +339,7 @@ let reduce_by_validity ~size cvalue =
 type char = Char | Wide
 
 let bits_size = function
-  | Char -> Integer.eight
+  | Char -> Integer.of_int 8
   | Wide -> Integer.of_int (Cil.bitsSizeOf (Machine.wchar_type ()))
 
 let signed_char = function
@@ -349,7 +349,7 @@ let signed_char = function
 (* Converts the searched characters into char; needed for strchr and memchr. *)
 let searched_char ~size ~signed cvalue =
   let ival = Cvalue.V.project_ival cvalue in
-  if size = Integer.eight
+  if size = Integer.of_int 8
   then Ival.cast_int_to_int ~size ~signed ival
   else ival
 

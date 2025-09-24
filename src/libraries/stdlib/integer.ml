@@ -29,17 +29,6 @@ let power_int_positive_int_opt n e =
   try Some (Big_int_Z.power_int_positive_int n e)
   with Invalid_argument _ -> None
 
-let two = of_int 2
-let four = of_int 4
-let eight = of_int 8
-let sixteen = of_int 16
-let thirtytwo = of_int 32
-let onethousand = of_int 1000
-let billion_one = of_int 1_000_000_001
-let two_power_32 = two_power_of_int 32
-let two_power_60 = two_power_of_int 60
-let two_power_64 = two_power_of_int 64
-
 let is_zero v = equal v zero
 let is_one  v = equal one v
 
@@ -59,8 +48,6 @@ let to_int_opt = wrap to_int
 let to_int64_opt = wrap to_int64
 let to_int32_opt = wrap to_int32
 
-let max_int64 = of_int64 Int64.max_int
-let min_int64 = of_int64 Int64.min_int
 
 
 let bdigits = [|
@@ -136,6 +123,7 @@ let pretty fmt v =
   Format.pp_print_string fmt (to_string v)
 
 let pretty_hex fmt v =
+  let two_power_60 = two_power_of_int 60 in
   let rec aux v =
     if gt v two_power_60 then
       let quo, rem = ediv_rem v two_power_60 in
@@ -191,11 +179,26 @@ let round_down_to_r ~max:m ~r ~modu =
   add (round_down_to_zero (sub m r) modu) r
 
 (* Deprecated *)
+
+let two = of_int 2
+let four = of_int 4
+let eight = of_int 8
+let sixteen = of_int 16
+let thirtytwo = of_int 32
+let onethousand = of_int 1000
+let billion_one = of_int 1_000_000_001
+let two_power_32 = two_power_of_int 32
+let two_power_64 = two_power_of_int 64
+
+let max_int64 = of_int64 Int64.max_int
+let min_int64 = of_int64 Int64.min_int
+
+let le = leq
+let ge = geq
+
 let e_div = ediv
 let e_rem = erem
 let e_div_rem = ediv_rem
 let c_div = div
 let c_rem = rem
 let c_div_rem = div_rem
-let le = leq
-let ge = geq

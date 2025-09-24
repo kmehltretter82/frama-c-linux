@@ -91,19 +91,7 @@ val is_even : t -> bool
 
 val zero : t
 val one : t
-val two : t
-val four : t
-val eight : t
-val sixteen : t
-val thirtytwo : t
-val onethousand : t
-val billion_one : t
 val minus_one : t
-val max_int64 : t
-val min_int64 : t
-val two_power_32 : t
-val two_power_64 : t
-
 val length : t -> t -> t (** b - a + 1 *)
 
 val of_int : int -> t
@@ -209,6 +197,30 @@ val pp_hex : ?nbits:int -> ?sep:string -> t formatter
 
 (** Deprecated definitions *)
 
+val two : t
+[@@deprecated "Use 'of_int 2' instead."]
+[@@migrate { repl = Rel.of_int 2 } ]
+
+val four : t
+[@@deprecated "Use 'of_int 4' instead."]
+[@@migrate { repl = Rel.of_int 4 } ]
+
+val eight : t
+[@@deprecated "Use 'of_int 8' instead."]
+[@@migrate { repl = Rel.of_int 8 } ]
+
+val sixteen : t
+[@@deprecated "Use 'of_int 16' instead."]
+[@@migrate { repl = Rel.of_int 16 } ]
+
+val thirtytwo : t
+[@@deprecated "Use 'of_int 32' instead."]
+[@@migrate { repl = Rel.of_int 32 } ]
+
+val onethousand : t
+[@@deprecated "Use 'of_int 1000' instead."]
+[@@migrate { repl = Rel.of_int 1000 } ]
+
 val le : t -> t -> bool
 [@@deprecated "Use leq instead."]
 [@@migrate { repl = Rel.leq } ]
@@ -216,6 +228,26 @@ val le : t -> t -> bool
 val ge : t -> t -> bool
 [@@deprecated "Use geq instead."]
 [@@migrate { repl = Rel.geq } ]
+
+val billion_one : t
+[@@deprecated "Use 'of_int 1_000_000_001' instead."]
+[@@migrate { repl = Rel.of_int 1_000_000_001 } ]
+
+val two_power_32 : t
+[@@deprecated "Use 'two_power_of_int 32' instead."]
+[@@migrate { repl = Rel.two_power_of_int 32 } ]
+
+val two_power_64 : t
+[@@deprecated "Use 'two_power_of_int 64' instead."]
+[@@migrate { repl = Rel.two_power_of_int 64 } ]
+
+val max_int64 : t
+[@@deprecated "Use 'of_int64 Int64.max_int' instead."]
+[@@migrate { repl = Rel.of_int64 Int64.max_int } ]
+
+val min_int64 : t
+[@@deprecated "Use 'of_int64 Int64.min_int' instead."]
+[@@migrate { repl = Rel.of_int64 Int64.min_int } ]
 
 val e_div : t -> t -> t
 (** Euclidean division (that returns a positive rem).

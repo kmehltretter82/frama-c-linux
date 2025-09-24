@@ -741,7 +741,7 @@ let cast ~size ~signed t =
 let subdivide t =
   match t.min, t.max with
   | Some min, Some max ->
-    let mean = Int.ediv (Int.add min max) Int.two in
+    let mean = Int.ediv (Int.add min max) (Int.of_int 2) in
     let succmean = Int.succ mean in
     build_interval ~min:(Some min) ~max:(Some mean) ~rem:t.rem ~modu:t.modu,
     build_interval ~min:(Some succmean) ~max:(Some max) ~rem:t.rem ~modu:t.modu
