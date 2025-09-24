@@ -110,8 +110,8 @@ let pp_bin_neg fmt r = Format.pp_print_string fmt bdigits.(15-r)
 let pp_hex_pos fmt r = Format.fprintf fmt "%04X" r
 let pp_hex_neg fmt r = Format.fprintf fmt "%04X" (0xFFFF-r)
 
-let bmask_bin = of_int 0xF     (* 4 bits mask *)
-let bmask_hex = of_int 0xFFFF (* 64 bits mask *)
+let bmask_bin = 0xFz    (* 4 bits mask *)
+let bmask_hex = 0xFFFFz (* 64 bits mask *)
 
 type digits = {
   nbits : int ; (* max number of bits *)
@@ -196,13 +196,13 @@ let extract_bits ~start ~stop v =
 
 (* Deprecated *)
 
-let two = of_int 2
-let four = of_int 4
-let eight = of_int 8
-let sixteen = of_int 16
-let thirtytwo = of_int 32
-let onethousand = of_int 1000
-let billion_one = of_int 1_000_000_001
+let two = 2z
+let four = 4z
+let eight = 8z
+let sixteen = 16z
+let thirtytwo = 32z
+let onethousand = 1000z
+let billion_one = 1_000_000_001_z
 let two_power_32 = two_power_of_int 32
 let two_power_64 = two_power_of_int 64
 

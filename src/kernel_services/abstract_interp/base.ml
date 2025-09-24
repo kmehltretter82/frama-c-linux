@@ -170,7 +170,7 @@ let () =
              (fun min max ->
                 (* let mul_CHAR_BIT = Int64.mul (Int64.of_int (bitsSizeOf charType)) in *)
                 (* the above is what we would like to write but it is too early *)
-                let mul_CHAR_BIT = Int.mul (Int.of_int 8) in
+                let mul_CHAR_BIT = Int.mul 8z in
                 MinValidAbsoluteAddress.set
                   (mul_CHAR_BIT (Int.of_string min));
                 MaxValidAbsoluteAddress.set
@@ -274,11 +274,10 @@ let offset_for_validity ~bitfield access base =
     if bitfield
     then Ival.inject_range (Some min) (Some max)
     else
-      Ival.inject_interval ~min:(Some min) ~max:(Some max) ~rem:Int.zero
-        ~modu:(Int.of_int 8)
+      Ival.inject_interval ~min:(Some min) ~max:(Some max) ~rem:0z ~modu:8z
   | Variable variable_v ->
     let maxv = last_valid_offset base variable_v.max_alloc access in
-    Ival.inject_range (Some Int.zero) (Some maxv)
+    Ival.inject_range (Some 0z) (Some maxv)
 
 let valid_offset ?(bitfield=true) access base =
   if for_writing access && is_read_only base

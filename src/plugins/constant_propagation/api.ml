@@ -148,7 +148,7 @@ class propagate project fnames ~cast_intro = object(self)
               let typ_pointed = Ast_types.(unroll (direct_pointed_type typ_e)) in
               if Ast_types.is_void typ_pointed then
                 raise Bit_utils.NoMatchingOffset;
-              let offset = Integer.mul offset (Integer.of_int 8) in
+              let offset = Integer.mul offset 8z in
               let m = Bit_utils.MatchType typ_pointed in
               let off, _ = Bit_utils.(find_offset vi.vtype ~offset m) in
               Cil.mkAddrOrStartOf ~loc (Var vi, off)

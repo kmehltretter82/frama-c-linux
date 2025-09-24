@@ -195,10 +195,10 @@ let reinterpret fkind f =
   let i_f = Ival.inject_float f in
   let i_f_int, fkind = match fkind with
     | Single ->
-      Ival.reinterpret_as_int i_f ~signed ~size:(Integer.of_int 32),
+      Ival.reinterpret_as_int i_f ~signed ~size:(Z.of_int 32),
       Cil_types.FFloat
     | Double ->
-      Ival.reinterpret_as_int i_f ~signed ~size:(Integer.of_int 64),
+      Ival.reinterpret_as_int i_f ~signed ~size:(Z.of_int 64),
       Cil_types.FDouble
     | Real | Long_Double -> assert false
   in

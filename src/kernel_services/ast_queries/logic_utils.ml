@@ -2523,7 +2523,7 @@ and constFoldToffset t =
   | TStartOf (TVar v, offset) | TAddrOf (TVar v, offset) -> begin
       try
         let start, _width = bitsLogicOffset v.lv_type offset in
-        let size_char = Integer.of_int 8 in
+        let size_char = 8z in
         if Integer.(is_zero (erem start size_char)) then
           Some (Integer.ediv start size_char)
         else None (* bitfields *)

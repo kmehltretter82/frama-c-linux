@@ -324,7 +324,7 @@ let widen ?(size=Integer.zero) ?(hint = Datatype.Integer.Set.empty) t1 t2 =
          This can (rarely) happen on structures or arrays that have been
          reinterpreted as one value by the offsetmaps. In this case, do not
          use limits, and do not create arbitrarily large integers. *)
-      if Integer.gt size (Integer.of_int 128)
+      if Integer.gt size 128z
       then Datatype.Integer.Set.empty
       else if Integer.is_zero size
       then hint
@@ -741,7 +741,7 @@ let cast ~size ~signed t =
 let subdivide t =
   match t.min, t.max with
   | Some min, Some max ->
-    let mean = Int.ediv (Int.add min max) (Int.of_int 2) in
+    let mean = Int.ediv (Int.add min max) 2z in
     let succmean = Int.succ mean in
     build_interval ~min:(Some min) ~max:(Some mean) ~rem:t.rem ~modu:t.modu,
     build_interval ~min:(Some succmean) ~max:(Some max) ~rem:t.rem ~modu:t.modu

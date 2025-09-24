@@ -67,7 +67,7 @@ let evaluate cvalue typ =
       | exception Cvalue.V.Not_based_on_null -> Wide
       | exception Abstract_interp.Error_Bottom -> Empty
     end
-  | _, Some cardinal -> cardinal_range cardinal (Integer.of_int 100) (* arbitrary limit for pointers *)
+  | _, Some cardinal -> cardinal_range cardinal 100z (* arbitrary limit for pointers *)
   | _, None -> Wide
 
 let upper_bound r1 r2 =

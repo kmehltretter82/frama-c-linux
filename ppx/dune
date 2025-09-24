@@ -1,0 +1,7 @@
+(library
+ (name ppx_z_literals)
+ (public_name frama-c.ppx_z_literals)
+ (kind ppx_rewriter)
+ (libraries ppxlib)
+ (preprocess (pps ppxlib.metaquot)))
+

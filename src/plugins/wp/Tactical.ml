@@ -675,8 +675,7 @@ let () =
       method descr = ""
       method arity = 1
       method filter = List.for_all F.is_arith
-      method compute = function [e] -> F.e_times (Integer.of_int 10) e
-                              | _ -> F.e_int 0
+      method compute = function [e] -> F.e_times 10z e | _ -> F.e_int 0
     end)
 
 let () = add_composer

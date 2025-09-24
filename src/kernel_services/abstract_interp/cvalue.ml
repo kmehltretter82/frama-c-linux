@@ -912,7 +912,7 @@ module V_Or_Uninitialized = struct
     match v with
     | C_init_noesc(v) -> vcard v
     | C_uninit_noesc(v) | C_init_esc(v) -> Integer.add Integer.one (vcard v)
-    | C_uninit_esc(v) -> Integer.add (Integer.of_int 2) (vcard v)
+    | C_uninit_esc(v) -> Integer.add 2z (vcard v)
 
 end
 

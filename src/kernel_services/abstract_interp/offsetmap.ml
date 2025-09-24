@@ -1997,7 +1997,7 @@ module Make
       let* v =
         (* Under this size, this may be an integer. Try to be a bit precise
            when doing 'find' *)
-        if size <=~ Integer.of_int 128 then
+        if size <=~ 128z then
           let validity_src = Base.validity_from_size size in
           find ~validity:validity_src ~conflate_bottom:false
             ~offsets:Ival.zero ~size src

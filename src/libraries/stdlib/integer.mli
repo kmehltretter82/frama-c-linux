@@ -221,28 +221,32 @@ val pp_hex : ?nbits:int -> ?sep:string -> t formatter
 (**************************************************************************)
 
 val two : t
-[@@deprecated "Use 'of_int 2' instead."]
-[@@migrate { repl = Rel.of_int 2 } ]
+[@@deprecated "Use '2z' instead."]
+[@@migrate { repl = 2z } ]
 
 val four : t
-[@@deprecated "Use 'of_int 4' instead."]
-[@@migrate { repl = Rel.of_int 4 } ]
+[@@deprecated "Use '4z' instead."]
+[@@migrate { repl = 4z } ]
 
 val eight : t
-[@@deprecated "Use 'of_int 8' instead."]
-[@@migrate { repl = Rel.of_int 8 } ]
+[@@deprecated "Use '8z' instead."]
+[@@migrate { repl = 8z } ]
 
 val sixteen : t
-[@@deprecated "Use 'of_int 16' instead."]
-[@@migrate { repl = Rel.of_int 16 } ]
+[@@deprecated "Use '1z6' instead."]
+[@@migrate { repl = 16z } ]
 
 val thirtytwo : t
-[@@deprecated "Use 'of_int 32' instead."]
-[@@migrate { repl = Rel.of_int 32 } ]
+[@@deprecated "Use '32z' instead."]
+[@@migrate { repl = 32z } ]
 
 val onethousand : t
-[@@deprecated "Use 'of_int 1000' instead."]
-[@@migrate { repl = Rel.of_int 1000 } ]
+[@@deprecated "Use '1000z' instead."]
+[@@migrate { repl = 1000z } ]
+
+val billion_one : t
+[@@deprecated "Use '1_000_000_001_z' instead."]
+[@@migrate { repl = 1_000_000_001_z } ]
 
 val le : t -> t -> bool
 [@@deprecated "Use leq instead."]
@@ -252,9 +256,6 @@ val ge : t -> t -> bool
 [@@deprecated "Use geq instead."]
 [@@migrate { repl = Rel.geq } ]
 
-val billion_one : t
-[@@deprecated "Use 'of_int 1_000_000_001' instead."]
-[@@migrate { repl = Rel.of_int 1_000_000_001 } ]
 
 val two_power_32 : t
 [@@deprecated "Use 'two_power_of_int 32' instead."]

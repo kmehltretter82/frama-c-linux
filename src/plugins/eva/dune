@@ -14,6 +14,7 @@
    (echo "EVA:" %{lib-available:frama-c-eva.core} "\n")
    (echo " - ppx_deriving.eq:" %{lib-available:ppx_deriving.eq} "\n")
    (echo " - ppx_deriving.ord:" %{lib-available:ppx_deriving.ord} "\n")
+   (echo " - ppx_z_literals:" %{lib-available:frama-c.ppx_z_literals} "\n")
    (echo "Apron domains:" %{lib-available:frama-c-eva.apron.core} "\n")
    (echo " - apron.octMPQ:" %{lib-available:apron.octMPQ} "\n")
    (echo " - apron.boxMPQ:" %{lib-available:apron.boxMPQ} "\n")
@@ -37,7 +38,7 @@
  (libraries frama-c.kernel frama-c-server.core)
  (instrumentation (backend landmarks))
  (instrumentation (backend bisect_ppx))
- (preprocess (pps ppx_deriving.eq ppx_deriving.ord)))
+ (preprocess (pps ppx_deriving.eq ppx_deriving.ord frama-c.ppx_z_literals)))
 
 (plugin
  (name eva)

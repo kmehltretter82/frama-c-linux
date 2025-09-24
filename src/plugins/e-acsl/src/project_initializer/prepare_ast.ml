@@ -456,7 +456,7 @@ let prepare_fundec kf =
                      storage of 32-bit timestamps in a 1:1 shadow. *)
                   if require_alignment vi 4 then
                     vi.vattr <-
-                      ("aligned", [ AInt (Integer.of_int 4) ]) :: vi.vattr)
+                      ("aligned", [ AInt 4z ]) :: vi.vattr)
                blk.blocals;
              blk)
       else

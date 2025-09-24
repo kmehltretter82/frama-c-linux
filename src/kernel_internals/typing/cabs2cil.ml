@@ -384,8 +384,8 @@ let get_valid_pragma_pack_alignment n =
     true, None
   end
   else begin
-    let valid = Integer.(equal n one || equal n (of_int 2) || equal n (of_int 4) ||
-                         equal n (of_int 8) || equal n (of_int 16))
+    let valid = Integer.(equal n 1z || equal n 2z || equal n 4z ||
+                         equal n 8z || equal n 16z)
     in
     if not valid then
       Kernel.warning ~current:true "ignoring invalid packing alignment (%a)"
