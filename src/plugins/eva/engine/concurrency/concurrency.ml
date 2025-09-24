@@ -65,11 +65,12 @@ module Name = struct
     match base with
     | Base.Null ->
       Some (Integer i)
-    | Base.Var(vi,_) when Ast_info.is_string_literal vi ->
-      (match Globals.Vars.get_string_literal vi with
-       | Str s -> Some (String s)
-       | Wstr s -> Some (String (Escape.escape_wstring s))
-      )
+    | Base.Var (vi, _) when Ast_info.is_string_literal vi ->
+      begin
+        match Globals.Vars.get_string_literal vi with
+        | Str s -> Some (String s)
+        | Wstr s -> Some (String (Escape.escape_wstring s))
+      end
     | Base.Var (vi, _) | Base.Allocated (vi, _, _) ->
       begin try
           let offset, _typ =

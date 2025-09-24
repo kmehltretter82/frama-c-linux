@@ -1377,7 +1377,7 @@ and eval_tif : 'a. (alarm_mode:_ -> _ -> _ -> 'a eval_result) -> ('a -> 'a -> 'a
 and eval_known_logic_function ~alarm_mode env li labels args =
   let lvi = li.l_var_info in
   match lvi.lv_name, li.l_type, labels, args with
-  (* strlen comes in two flavors: one that takes an array. hence no labels,
+  (* strlen comes in two flavors: one that takes an array, hence no labels,
      and one that takes a char pointer and a label. Only the first one
      can be fed with logic string literals as arguments. *)
   | ("strlen" | "wcslen") as b,  _, [], [arg] ->

@@ -59,13 +59,9 @@ let print_final_state kf values =
 
 let pretty_wo_string_literal fmt s =
   let filtered =
-    if Self.(is_debug_key_enabled dkey_include_string_literal) then
-      s
-    else
-      Cvalue.Model.filter_base
-        (fun b ->
-           try not (Ast_info.is_string_literal (Base.to_varinfo b))
-           with Base.Not_a_C_variable -> true) s
+    if Self.(is_debug_key_enabled dkey_include_string_literal)
+    then s
+    else Cvalue.Model.filter_base (fun b -> not (Base.is_string_literal b)) s
   in
   Cvalue.Model.pretty fmt filtered
 
