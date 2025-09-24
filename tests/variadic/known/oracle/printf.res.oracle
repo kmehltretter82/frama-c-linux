@@ -1,16 +1,16 @@
 [kernel] Parsing printf.c (with preprocessing)
 [kernel] printf.c:73: Warning: Too many initializers for character array hashes
-[kernel:variadic] FRAMAC_SHARE/libc/wchar.h:555: 
+[kernel:variadic] FRAMAC_SHARE/libc/wchar.h:805: 
   Declaration of variadic function fwprintf.
-[kernel:variadic] FRAMAC_SHARE/libc/wchar.h:557: 
+[kernel:variadic] FRAMAC_SHARE/libc/wchar.h:807: 
   Declaration of variadic function swprintf.
-[kernel:variadic] FRAMAC_SHARE/libc/wchar.h:559: 
+[kernel:variadic] FRAMAC_SHARE/libc/wchar.h:809: 
   Declaration of variadic function wprintf.
-[kernel:variadic] FRAMAC_SHARE/libc/wchar.h:562: 
+[kernel:variadic] FRAMAC_SHARE/libc/wchar.h:812: 
   Declaration of variadic function wscanf.
-[kernel:variadic] FRAMAC_SHARE/libc/wchar.h:564: 
+[kernel:variadic] FRAMAC_SHARE/libc/wchar.h:814: 
   Declaration of variadic function fwscanf.
-[kernel:variadic] FRAMAC_SHARE/libc/wchar.h:566: 
+[kernel:variadic] FRAMAC_SHARE/libc/wchar.h:816: 
   Declaration of variadic function swscanf.
 [kernel:variadic] FRAMAC_SHARE/libc/stdio.h:233: 
   Declaration of variadic function fprintf.
