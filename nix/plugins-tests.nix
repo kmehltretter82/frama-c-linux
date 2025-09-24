@@ -14,6 +14,7 @@ mk_tests {
       @tests/slicing/ptests \
       @tests/scope/ptests \
       @tests/sparecode/ptests \
+      @src/plugins/acsl-importer/tests/ptests \
       @src/plugins/aorai/tests/ptests \
       @src/plugins/alias/tests/ptests \
       @src/plugins/dive/tests/ptests \
@@ -24,7 +25,8 @@ mk_tests {
       @src/plugins/report/tests/ptests \
       @src/plugins/region/tests/ptests \
       @src/plugins/rte/tests/ptests \
-      @src/plugins/server/tests/ptests
+      @src/plugins/server/tests/ptests \
+      @src/plugins/volatile/tests/ptests
     dune runtest -j1 \
       src/plugins/server
   '';

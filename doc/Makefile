@@ -75,20 +75,24 @@ clean::
 	$(MAKE) -C userman clean
 	$(MAKE) -C developer dist-clean
 	$(MAKE) -C rte clean
+	$(MAKE) -C ../src/plugins/acsl-importer/doc/manual clean
 	$(MAKE) -C aorai clean
 	$(MAKE) -C eva clean
 	$(MAKE) -C metrics clean
+	$(MAKE) -C ../src/plugins/volatile/doc/manual clean
 	$(MAKE) -C ../src/plugins/wp/doc/manual clean
 
 all: \
 	manuals/user-manual$(FC_SUFFIX).pdf \
 	manuals/plugin-development-guide$(FC_SUFFIX).pdf \
 	manuals/rte-manual$(FC_SUFFIX).pdf \
+	manuals/acsl-importer-manual$(FC_SUFFIX).pdf \
 	manuals/aorai-manual$(FC_SUFFIX).pdf \
 	manuals/aorai-example$(FC_SUFFIX).tar.gz \
 	manuals/hello$(FC_SUFFIX).tar.gz \
 	manuals/eva-manual$(FC_SUFFIX).pdf \
 	manuals/metrics-manual$(FC_SUFFIX).pdf \
+	manuals/volatile-manual$(FC_SUFFIX).pdf \
 	manuals/wp-manual$(FC_SUFFIX).pdf \
 
 manuals/%:
@@ -106,11 +110,13 @@ manuals/%:
 manuals/user-manual$(FC_SUFFIX).pdf: userman/userman.pdf
 manuals/plugin-development-guide$(FC_SUFFIX).pdf: developer/developer.pdf
 manuals/rte-manual$(FC_SUFFIX).pdf: rte/main.pdf
+manuals/acsl-importer-manual$(FC_SUFFIX).pdf: ../src/plugins/acsl-importer/doc/manual/acsl-importer.pdf
 manuals/aorai-manual$(FC_SUFFIX).pdf: aorai/main.pdf
 manuals/aorai-example$(FC_SUFFIX).tar.gz: aorai/aorai-example.tar.gz
 manuals/hello$(FC_SUFFIX).tar.gz: developer/hello.tar.gz
 manuals/eva-manual$(FC_SUFFIX).pdf: eva/main.pdf
 manuals/metrics-manual$(FC_SUFFIX).pdf: metrics/metrics.pdf
+manuals/volatile-manual$(FC_SUFFIX).pdf: ../src/plugins/volatile/doc/manual/volatile.pdf
 manuals/wp-manual$(FC_SUFFIX).pdf: ../src/plugins/wp/doc/manual/wp.pdf
 
 

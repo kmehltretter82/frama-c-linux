@@ -166,6 +166,7 @@ show_step "Searching for manuals"
 MANUALS=(
   "acsl"
   "acsl-implementation"
+  "acsl-importer-manual"
   "aorai-manual"
   "e-acsl"
   "e-acsl-implementation"
@@ -176,6 +177,7 @@ MANUALS=(
   "plugin-development-guide"
   "rte-manual"
   "user-manual"
+  "volatile-manual"
   "wp-manual"
 )
 

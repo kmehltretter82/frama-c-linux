@@ -126,10 +126,14 @@ else
     doc/developer/changes.tex
   $SED -i "s/\(^\\\\subsection{Frama-C+dev}\)/%\1\n\n\\\\subsection{Frama-C $NEXT_CODENAME}/g" \
     doc/aorai/main.tex
+  $SED -i "s/\(^\\\\section\*{Frama-C+dev}\)/%\1\n\n\\\\section\*{Frama-C $NEXT_MAJOR.$NEXT_MINOR ($NEXT_CODENAME)}/g" \
+    src/plugins/acsl-importer/doc/manual/user-changes.tex
   $SED -i "s/\(^\\\\section\*{E-ACSL \\\\eacslpluginversion \\\\eacslplugincodename}\)/%\1\n\n\\\\section\*{E-ACSL $NEXT_MAJOR.$NEXT_MINOR $NEXT_CODENAME}/g" \
     src/plugins/e-acsl/doc/userman/changes.tex
   $SED -i "s/\(^\\\\subsection\*{Version Frama-C+dev}\)/%\1\n\n\\\\subsection\*{Version $NEXT_CODENAME-$NEXT_MAJOR}/g" \
     src/plugins/e-acsl/doc/refman/changes_modern.tex
+  $SED -i "s/\(^\\\\section\*{Frama-C+dev}\)/%\1\n\n\\\\section\*{Frama-C $NEXT_MAJOR.$NEXT_MINOR ($NEXT_CODENAME)}/g" \
+    src/plugins/volatile/doc/manual/user-changes.tex
 
   # Reference configuration
   $SED -i "s/Frama-C [1-9][0-9]\.[0-9]/Frama-C $NEXT_MAJOR.$NEXT_MINOR/gI" \
