@@ -18,6 +18,10 @@
 Open Source Release <next-release>
 ###############################################################################
 
+-   ACSL-Importer [2025-09-24] Open-sourced plug-in ACSL Importer for
+              importation of annotations from external files
+-   Volatile  [2025-09-24] Open-sourced plug-in Volatile for specification
+              of volatile accesses
 -   Kernel    [2025-09-11] Added options related to Mopsa-build databases,
               which are similar to JSON compilation databases, but also track
               dependencies from binaries to source files. The main options are
