@@ -7,6 +7,7 @@
 /**************************************************************************/
 
 #include "__fc_builtin.c"
+#include "__fc_file.c"
 #include "argz.c"
 #include "assert.c"
 #include "ctype.c"

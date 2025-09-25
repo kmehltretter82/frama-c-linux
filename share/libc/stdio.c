@@ -14,18 +14,8 @@
 #include "stdlib.h"
 #include "stdint.h" // for SIZE_MAX
 #include "sys/types.h" // for ssize_t
+#include "__fc_file.c" // __fc_fopen initializers
 __PUSH_FC_STDLIB
-
-FILE __fc_initial_stdout = {.__fc_FILE_id=1};
-FILE * __fc_stdout = &__fc_initial_stdout;
-
-FILE __fc_initial_stderr = {.__fc_FILE_id=2};
-FILE * __fc_stderr = &__fc_initial_stderr;
-
-FILE __fc_initial_stdin = {.__fc_FILE_id=0};
-FILE * __fc_stdin = &__fc_initial_stdin;
-
-FILE __fc_fopen[__FC_FOPEN_MAX];
 
 // Returns 1 iff mode contains a valid mode string for fopen() and
 // related functions; that is, one of the following:
