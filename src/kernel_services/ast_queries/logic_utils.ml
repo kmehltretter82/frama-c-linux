@@ -136,12 +136,14 @@ let plain_array_to_ptr ty =
         let<> UpdatedCurrentLoc = e.eloc in
         try
           let len = Cil.bitsSizeOf tarr in
-          let len = try len / (Cil.bitsSizeOf ty)
-            with Cil.SizeOfError _ ->
-              Kernel.fatal
-                "Inconsistent information: I know the length of \
-                 array type %a, but not of its elements."
-                !Cil.pp_typ_ref tarr
+          let len =
+            if Cil.bitsSizeOf ty == 0 then 0
+            else try len / (Cil.bitsSizeOf ty)
+              with Cil.SizeOfError _ ->
+                Kernel.fatal
+                  "Inconsistent information: I know the length of \
+                   array type %a, but not of its elements."
+                  !Cil.pp_typ_ref tarr
           in
           (* Normally, overflow is checked in bitsSizeOf itself *)
           let la = AInt (Integer.of_int len) in
