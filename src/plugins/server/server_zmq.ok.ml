@@ -159,7 +159,7 @@ let launch_server url =
 
 let temp_url () =
   let socket = Temp_files.file ~prefix:"frama-c.socket" ~suffix:".io" () in
-  "ipc://" ^ (socket :> string)
+  "ipc://" ^ (Filepath.to_string_abs socket )
 
 let start_server () =
   match !server with

@@ -59,7 +59,7 @@ struct
     let file =
       if Server_parameters.has_relative_filepath ()
       then path
-      else (p.Filepath.pos_path :> string)
+      else (Filepath.to_string_abs p.Filepath.pos_path)
     in
     `Assoc [
       "dir"  , `String (Filename.dirname path) ;
@@ -1083,7 +1083,7 @@ let () =
 
 let get_files () =
   let files = Kernel.Files.get () in
-  List.map (fun f -> (f:Filepath.t:>string)) files
+  List.map (fun f -> (Filepath.to_string_abs f)) files
 
 let () =
   Request.register

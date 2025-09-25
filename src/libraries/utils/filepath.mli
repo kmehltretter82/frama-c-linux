@@ -12,7 +12,7 @@
 *)
 
 (** A normalized (absolute) path. *)
-type t = private string
+type t
 
 
 (* ************************************************************************* *)

@@ -85,7 +85,7 @@ let load_file w ?title ~(filename : Filepath.t) ?(line=(-1)) ~click_cb () =
         let page_num = w.notebook#page_num sw#coerce in
         let scan_references = Kernel.EagerLoadSources.get () in
         let s =
-          match Parse_env.open_source ~scan_references (filename :> string) with
+          match Parse_env.open_source ~scan_references (Filepath.to_string_abs filename) with
           | Error _msg ->
             let f = Filepath.to_string_rel filename in
             "Error: cannot open file '" ^ f ^ "'"

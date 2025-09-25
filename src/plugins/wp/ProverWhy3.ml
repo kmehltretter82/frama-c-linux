@@ -48,9 +48,9 @@ let get_why3_conf = Conf.memoize
     begin fun () ->
       let config = Why3Provers.config () in
       let main = Why3.Whyconf.get_main config in
-      let ctx = (WpContext.directory () :> string) in
-      let wp = ((Wp_parameters.Share.get_dir "why3") :> string) in
-      let user = (Wp_parameters.Library.get () :> string list) in
+      let ctx = Filepath.to_string_abs (WpContext.directory ()) in
+      let wp = Filepath.to_string_abs (Wp_parameters.Share.get_dir "why3") in
+      let user = Filepath.to_string_list (Wp_parameters.Library.get ()) in
       let why3 = Why3.Whyconf.loadpath main in
       let ld = ctx :: wp :: (user @ why3) in
       { env = Why3.Env.create_env ld ; config = main }
@@ -1331,7 +1331,7 @@ let output_task wpo drv ?(script : Filepath.t option) prover task =
       (fun fscript ->
          let hash = Filesystem.digest fscript in
          Format.fprintf fmt "(* WP Script %s *)@\n" hash ;
-         open_in (fscript :> string)
+         open_in (Filepath.to_string_abs fscript)
       ) script in
   let _ = Why3.Driver.print_task_prepared ?old drv fmt task in
   Option.iter close_in old
@@ -1376,7 +1376,8 @@ let run_batch pconf driver ~config
   Wp_parameters.debug ~dkey "Prover command %S" command ;
   let inplace = if script <> None then Some true else None in
   let call =
-    Why3.Driver.prove_task_prepared ?old:(script :> string option) ?inplace
+    Why3.Driver.prove_task_prepared
+      ?old:(Option.map Filepath.to_string_abs script) ?inplace
       ~command ~limits ~config driver task in
   call_prover_task ~config ~timeout ~steps ~probes prover call
 
@@ -1421,7 +1422,7 @@ let editor ~script ~merge ~config pconf driver task =
       Wp_parameters.debug ~dkey "Editor command %S" command ;
       let probes = Probe.Map.empty in
       call_prover_task ~config ~timeout:None ~steps:None ~probes pconf.prover @@
-      Why3.Call_provers.call_editor ~command ~config (script :> string)
+      Why3.Call_provers.call_editor ~command ~config (Filepath.to_string_abs script)
     end
 
 let compile ~script ~timeout ~memlimit ~config pconf driver prover task =
@@ -1457,7 +1458,7 @@ let interactive ~mode ~config wpo pconf driver prover task =
   | Some (script, merge) ->
     Wp_parameters.debug ~dkey "%s %a script %S@."
       (if merge then "Found" else "New")
-      Why3.Whyconf.print_prover prover (script :> string) ;
+      Why3.Whyconf.print_prover prover (Filepath.to_string_abs script) ;
     match mode with
     | VCS.Batch ->
       compile ~script ~timeout ~memlimit ~config pconf driver prover task
@@ -1515,7 +1516,7 @@ let print_debug_task wpo drv prover task =
     let goal = Wpo.get_gid wpo ^ "_" ^ prover in
     let filename = Why3.Driver.file_of_task drv "" goal task in
     let file = Filepath.(out_dir / filename) in
-    let out_channel = open_out (file :> string) in
+    let out_channel = open_out (Filepath.to_string_abs file) in
     let fmt = Format.formatter_of_out_channel out_channel in
     Format.fprintf fmt "%a" pp_task task ;
     close_out out_channel

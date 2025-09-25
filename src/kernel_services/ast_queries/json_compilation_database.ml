@@ -292,7 +292,7 @@ let compute_flags_from_file () =
   begin
     try
       let r_list =
-        Yojson.Basic.from_file (jcdb_path :> string) |> Yojson.Basic.Util.to_list
+        Yojson.Basic.from_file (Filepath.to_string_abs jcdb_path) |> Yojson.Basic.Util.to_list
       in
       let is_build_database =
         try
@@ -302,7 +302,7 @@ let compute_flags_from_file () =
       let parse_entry =
         if is_build_database then parse_build_entry else parse_compilation_entry
       in
-      List.iter (parse_entry (jcdb_dir :> string)) r_list;
+      List.iter (parse_entry (Filepath.to_string_abs jcdb_dir)) r_list;
     with
     | Sys_error msg
     | Yojson.Json_error msg

@@ -182,7 +182,7 @@ module Position =  struct
     pos_cnum = p.Lexing.pos_cnum;
   }
   let to_lexing_pos p = {
-    Lexing.pos_fname = (p.Filepath.pos_path :> string);
+    Lexing.pos_fname = Filepath.to_string_abs p.Filepath.pos_path;
     pos_lnum = p.Filepath.pos_lnum;
     pos_bol = p.Filepath.pos_bol;
     pos_cnum = p.Filepath.pos_cnum;

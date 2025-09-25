@@ -571,9 +571,11 @@ and pp_extended_asm fmt extended_asm =
     (pp_list (pp_ref pp_stmt)) extended_asm.asm_gotos
 
 and pp_filepath_position fmt filepath_position =
-  Format.fprintf fmt "{pos_path=%s;pos_lnum=%d;pos_bol=%d;pos_cnum=%d}"
-    (filepath_position.Filepath.pos_path :> string) filepath_position.Filepath.pos_lnum
-    filepath_position.Filepath.pos_bol filepath_position.Filepath.pos_cnum
+  Format.fprintf fmt "{pos_path=%a;pos_lnum=%d;pos_bol=%d;pos_cnum=%d}"
+    Filepath.pretty_abs filepath_position.Filepath.pos_path
+    filepath_position.Filepath.pos_lnum
+    filepath_position.Filepath.pos_bol
+    filepath_position.Filepath.pos_cnum
 
 and pp_lexing_position fmt lexing_position =
   Format.fprintf fmt "{pos_fname=%s;pos_lnum=%d;pos_bol=%d;pos_cnum=%d}"
@@ -1020,7 +1022,7 @@ let pp_syntactic_scope fmt = function
   | Global -> pp_string fmt "Global"
   | Program -> pp_string fmt "Program"
   | Translation_unit file ->
-    Format.fprintf fmt "Translation_unit %S" (file:>string)
+    Format.fprintf fmt "Translation_unit %a" Filepath.pretty_abs file
   | Formal kf -> Format.fprintf fmt "Formal %a" pp_kernel_function kf
   | Block_scope stmt -> Format.fprintf fmt "Local %a" pp_stmt stmt
   | Whole_function kf ->

@@ -15,7 +15,7 @@ let collect_headers () =
   let libc_dir = Kernel.Share.get_dir "libc" in
   let libc_dir_files = Filesystem.list_dir libc_dir in
   let contents =
-    List.map (Filename.concat (libc_dir :> string)) libc_dir_files
+    List.map (Filename.concat (Filepath.to_string_abs libc_dir)) libc_dir_files
   in
   let subdirs = List.filter Sys.is_directory contents in
   let base_headers = List.filter is_header contents in

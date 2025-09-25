@@ -1295,7 +1295,7 @@ class main_window () : main_window_extension_points =
         if not (Location.equal loc Location.unknown) then
           let args_for_emacs =
             Format.sprintf "emacsclient -n +%d %S"
-              (fst loc).Filepath.pos_lnum ((fst loc).Filepath.pos_path :> string)
+              (fst loc).Filepath.pos_lnum (Filepath.to_string_abs (fst loc).Filepath.pos_path)
               (*          Format.sprintf "mate -a -l %d %s" line file  *)
           in
           Gui_parameters.debug ~dkey "Running %s" args_for_emacs;
@@ -1835,8 +1835,8 @@ class main_window () : main_window_extension_points =
   end
 
 let make_splash () =
-  GMain.Rc.add_default_file ((System_config.Share.main:>string) ^"/frama-c.rc");
-  GMain.Rc.add_default_file ((System_config.Share.main:>string) ^"/frama-c-user.rc");
+  GMain.Rc.add_default_file ((Filepath.to_string_abs System_config.Share.main) ^"/frama-c.rc");
+  GMain.Rc.add_default_file ((Filepath.to_string_abs System_config.Share.main) ^"/frama-c-user.rc");
   (*print_endline ("BOOT: " ^ (Glib.Main.setlocale `ALL None));*)
   let (_:string) = GtkMain.Main.init ~setlocale:false () in
   (*print_endline ("START: " ^ (Glib.Main.setlocale `ALL None));*)

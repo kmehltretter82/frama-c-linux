@@ -146,7 +146,7 @@ struct
       Hashtbl.find file_formatters normalized_filename
     with
     | Not_found ->
-      let oc = open_out (normalized_filename :> string)in
+      let oc = open_out (Filepath.to_string_abs normalized_filename) in
       let fmt = Format.formatter_of_out_channel oc in
       Hashtbl.add file_formatters normalized_filename fmt;
       Extlib.safe_at_exit (fun () -> close_out oc);

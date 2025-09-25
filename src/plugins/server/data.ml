@@ -199,7 +199,7 @@ struct
   type t = Filepath.t
   let jtype = Jstring
   let of_json js = Ju.to_string js |> Filepath.of_string
-  let to_json (file:t) = `String (file :> string)
+  let to_json (file:t) = `String (Filepath.to_string_abs file)
 end
 
 (* -------------------------------------------------------------------------- *)

@@ -295,7 +295,7 @@ let dump () =
   if not (Metrics_parameters.OutputFile.is_empty ()) then begin
     let out = Metrics_parameters.OutputFile.get () in
     try
-      let chan = open_out (out:>string) in
+      let chan = open_out (Filepath.to_string_abs out) in
       let fmt = Format.formatter_of_out_channel chan in
       (match Metrics_base.get_file_type out with
        | Metrics_base.Html -> dump_acsl_stats_html fmt

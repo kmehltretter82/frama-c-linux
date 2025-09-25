@@ -61,7 +61,7 @@ struct
     let mid = Wp_parameters.get_output_dir (WpContext.MODEL.id model) in
     let buffer = Buffer.create 80 in
     let fmt = Format.formatter_of_buffer buffer in
-    Format.fprintf fmt "%s/%s" (mid :> string) id ;
+    Format.fprintf fmt "%s/%s" (Filepath.to_string_abs mid) id ;
     (match prover with None -> () | Some p ->
         Format.fprintf fmt "_%s" (filename_for_prover p)) ;
     (match suffix with None -> () | Some s ->

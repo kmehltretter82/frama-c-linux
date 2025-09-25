@@ -1453,7 +1453,7 @@ struct
     Make_list
       (struct
         include Fc_Filepath
-        let to_string s = (s : t :> string)
+        let to_string s = Fc_Filepath.to_string_abs s
 
         let of_string s =
           [ normalize_filepath ~existence:X.existence ~file_kind:X.file_kind s ]

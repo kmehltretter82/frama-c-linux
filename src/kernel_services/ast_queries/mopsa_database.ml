@@ -37,7 +37,7 @@ let tables_from_json json =
         let entry = { lang; source; args } in
         Kernel.debug
           ~dkey:Kernel.dkey_mopsa_db
-          "object_map: adding '%s'" (filename :> string);
+          "object_map: adding '%a'" Filepath.pretty_abs filename;
         Hashtbl.replace object_map filename entry;
       end else if typ = "executable" || typ = "library" then begin
         let contents =
@@ -47,7 +47,7 @@ let tables_from_json json =
         let entry = { contents } in
         Kernel.debug
           ~dkey:Kernel.dkey_mopsa_db
-          "target_map: adding '%s'" (filename :> string);
+          "target_map: adding '%a'" Filepath.pretty_abs filename;
         Hashtbl.replace target_map filename entry
       end else
         Kernel.abort "unknown 'type' in Mopsa DB: %s" typ
@@ -57,7 +57,7 @@ let tables_from_json json =
 let pp_tbl_paths fmt tbl =
   let paths =
     Hashtbl.fold (fun (k : Filepath.t) _v acc ->
-        let s = (k :> string) in s :: acc) tbl []
+        let s = Filepath.to_string_abs k in s :: acc) tbl []
   in
   let sorted = List.sort String.compare paths in
   List.iter (fun k -> Format.fprintf fmt "%s@\n" k) sorted
@@ -73,8 +73,8 @@ let acc_deps object_map target_map targets =
         match Hashtbl.find_opt target_map t with
         | None ->
           begin
-            if String.ends_with ~suffix:".a" (t :> string)
-            || String.ends_with ~suffix:".so" (t :> string)
+            if String.ends_with ~suffix:".a" (Filepath.to_string_abs t)
+            || String.ends_with ~suffix:".so" (Filepath.to_string_abs t)
             then begin
               Kernel.warning ~wkey:Kernel.wkey_mopsa_db
                 "library '%a' not found in mopsa-db, ignoring"
@@ -103,7 +103,7 @@ let acc_deps object_map target_map targets =
               | Some o ->
                 if o.lang <> "C" then begin
                   let suffixes = File.get_suffixes () in
-                  let suffix = Filename.extension (o.source :> string) in
+                  let suffix = Filename.extension (Filepath.to_string o.source) in
                   let try_parse =
                     if List.mem suffix suffixes then true
                     else begin
@@ -177,7 +177,7 @@ let run () =
   let db_path = Kernel.MopsaDb.get () in
   let json =
     try
-      from_file (db_path :> string)
+      from_file (Filepath.to_string_abs db_path)
     with
     | Yojson.Json_error s ->
       Kernel.abort "mopsa-db: invalid JSON file '%a': %s"

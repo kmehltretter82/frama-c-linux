@@ -498,7 +498,7 @@ let pretty_used_files used_files =
   let is_c_file s = String.ends_with ~suffix:".c" s && s <> ".c" in
   let used_included_c_files =
     Filepath.Set.filter
-      (fun f -> is_c_file (f : Filepath.t :> string))
+      (fun f -> is_c_file (Filepath.to_string_abs f))
       used_included_files
   in
   let used_implicitly_included_c_files =
@@ -719,7 +719,7 @@ let compute_on_cilast ~libc =
   if not (Metrics_parameters.OutputFile.is_empty ()) then begin
     let out_fname = Metrics_parameters.OutputFile.get () in
     try
-      let oc = open_out_bin (out_fname:>string) in
+      let oc = open_out_bin (Filepath.to_string_abs out_fname) in
       let fmt = Format.formatter_of_out_channel oc in
       (match Metrics_base.get_file_type out_fname with
        | Html -> dump_html fmt cil_visitor

@@ -294,7 +294,8 @@ let stats_to_json g (s : Stats.stats) : Json.t =
   let source = fst (Property.location target) in
   let script = match ProofSession.get g with
     | NoScript -> []
-    | Script file | Deprecated file -> [ "script", `String (file :> string) ]
+    | Script file | Deprecated file ->
+      [ "script", `String (Filepath.to_string_abs file) ]
   in
   let index =
     match g.po_idx with
@@ -313,7 +314,7 @@ let stats_to_json g (s : Stats.stats) : Json.t =
     ([
       "goal", `String g.po_gid ;
       "property", `String (Property.Names.get_prop_name_id target) ;
-      "file", `String (source.pos_path :> string) ;
+      "file", `String (Filepath.to_string_abs source.pos_path) ;
       "line", `Int source.pos_lnum ;
     ] @ index @ [
         "smoke", `Bool smoke ;

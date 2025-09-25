@@ -185,7 +185,7 @@ let mark goal =
   if Filesystem.exists marks && Filesystem.is_dir marks then
     let mark = Filepath.(marks / (goal.po_sid ^ ".json")) in
     if Filesystem.exists mark then ()
-    else close_out @@ open_out (mark :> string)
+    else close_out @@ open_out (Filepath.to_string_abs mark)
 
 module StringSet = Datatype.String.Set
 

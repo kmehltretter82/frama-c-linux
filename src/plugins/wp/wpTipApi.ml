@@ -658,7 +658,7 @@ let () =
         begin
           match ProofSession.get goal with
           | NoScript -> None | Script file | Deprecated file ->
-            Some (file :> string)
+            Some (Filepath.to_string_abs file)
         end ;
     end
 

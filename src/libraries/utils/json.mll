@@ -140,9 +140,9 @@ let load_channel ?file inc =
   load_lexbuf lexbuf
 
 let load_file (file : Filepath.t) =
-  let inc = open_in (file :> string) in
+  let inc = open_in (Filepath.to_string_abs file) in
   try
-    let content = load_channel ~file:(file :> string) inc in
+    let content = load_channel ~file:(Filepath.to_string_abs file) inc in
     close_in inc ; content
   with e ->
     close_in inc ; raise e
@@ -349,7 +349,7 @@ let merge_array path json_root_array =
 let flush_cache () =
   let written =
     Hashtbl.fold (fun (path : Filepath.t) json acc ->
-        let oc = open_out (path:>string) in
+        let oc = open_out (Filepath.to_string_abs path) in
         Yojson.Basic.pretty_to_channel oc json;
         output_char oc '\n'; (* ensure JSON file terminates with a newline *)
         path :: acc
@@ -364,7 +364,7 @@ let from_file (path : Filepath.t) =
   try
     Hashtbl.find json_cache path
   with Not_found ->
-    let json = Yojson.Basic.from_file (path:>string) in
+    let json = Yojson.Basic.from_file (Filepath.to_string_abs path) in
     Hashtbl.replace json_cache path json;
     json
 

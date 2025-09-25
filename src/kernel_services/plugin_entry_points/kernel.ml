@@ -824,7 +824,7 @@ module CodeOutput = struct
         let fmt =
           try fst (Hashtbl.find streams file)
           with Not_found ->
-            let out = open_out (file:>string) in
+            let out = open_out (Filepath.to_string_abs file) in
             let fmt = Format.formatter_of_out_channel out in
             Hashtbl.add streams file (fmt,out) ; fmt
         in
@@ -1086,7 +1086,7 @@ module Machdep = struct
     Filesystem.is_file (get_default_file machdep)
 
   let normalize name =
-    if is_default name then name else (Filepath.of_string name :> string)
+    if is_default name then name else Filepath.(of_string name |> to_string_abs)
 
   let () =
     let set_if_necessary old_name new_name =

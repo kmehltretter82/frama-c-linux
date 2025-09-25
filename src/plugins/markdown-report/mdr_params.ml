@@ -39,7 +39,7 @@ struct
     end)
   let get () =
     let s = get () in
-    if Pervasives_string.contains (Filename.basename (s:>string)) '.' then s
+    if Pervasives_string.contains (Fc_Filepath.basename s) '.' then s
     else
       let kind = Generate.get () in
       let ext = if kind = "sarif" then ".sarif" else ".md" in

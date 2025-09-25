@@ -1238,7 +1238,7 @@ module D = struct
   let overwrite _bases ~on: state ~by:_ = state
 
   let output_dot (filename : Filepath.t) state =
-    let out = open_out (filename :> string) in
+    let out = open_out (Filepath.to_string_abs filename) in
     Self.feedback ~dkey:log_category "@[Output dot produced to %a.@]"
       Filepath.pretty filename;
     GraphDot.output_graph out (complete_graph (snd (Traces.get_current state)));

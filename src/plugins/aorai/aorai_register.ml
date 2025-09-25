@@ -17,13 +17,14 @@ let dot_file = ref Filepath.empty
 let check_and_open_in (f : Filepath.t) errmsg =
   if not (Filesystem.is_file f) then
     Aorai_option.abort "%s: %a" errmsg Filepath.pretty f;
-  open_in (f :> string)
+  open_in (Filepath.to_string_abs f)
 
 let load_ya_file filename  =
   let channel = check_and_open_in filename "invalid Ya file" in
   let lexbuf = Lexing.from_channel channel in
-  Lexing.(lexbuf.lex_curr_p <-
-            { lexbuf.lex_curr_p with pos_fname = (filename :> string) });
+  Lexing.(lexbuf.lex_curr_p <- {
+      lexbuf.lex_curr_p with pos_fname = Filepath.to_string_abs filename
+    });
   try
     let automata = Yaparser.main Yalexer.token lexbuf in
     close_in channel;
@@ -44,7 +45,7 @@ let display_status () =
 
 let init_file_names () =
   let freshname ?opt_suf file suf =
-    let name = (file:Filepath.t:>string) in
+    let name = Filepath.to_string_abs file in
     let pre = Filename.remove_extension name in
     let pre = match opt_suf with None -> pre | Some s -> pre ^ s in
     let rec fn p s n =
@@ -72,7 +73,7 @@ let output () =
   if (Aorai_option.Dot.get()) then
     begin
       Pretty_automaton.Typed.output_dot_automata (Data_for_aorai.getAutomata ())
-        (!dot_file:>string);
+        (Filepath.to_string_abs !dot_file);
       printverb "Generating dot file    : done\n"
     end
 

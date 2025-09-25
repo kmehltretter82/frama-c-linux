@@ -9,7 +9,7 @@
 let add_files (host_window: Design.main_window_extension_points) =
   Gtk_helper.source_files_chooser
     (host_window :> Gtk_helper.source_files_chooser_host)
-    (Kernel.Files.get () :> string list)
+    (Filepath.to_string_list (Kernel.Files.get ()))
     (fun filenames ->
        Kernel.Files.set (List.map Filepath.of_string filenames);
        if Ast.is_computed () then

@@ -80,7 +80,7 @@ let extend () =
       let tmpfile =
         tmpdir ^ "/aorai_" ^
         Filename.(
-          chop_extension (basename (List.hd (Kernel.Files.get()):>string))) ^
+          chop_extension (basename (Filepath.to_string_abs (List.hd (Kernel.Files.get()))))) ^
         "_" ^ (TestID.get ()) ^ ".i"
       in
       let tmpfile = Filepath.of_string tmpfile in
