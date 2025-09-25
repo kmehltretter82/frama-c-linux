@@ -616,3 +616,19 @@ When exiting, \FramaC has one of the following status:
 \item[125] \FramaC exits abnormally on an unknown error. Please report a ``bug
   report'' on the Bug Tracking System (see Chapter~\ref{user-errors}).
 \end{description}
+
+\subsection{Sandbox mode}\label{sec:sandbox-mode}
+
+\FramaC can operate in \emph{sandbox mode} when required by a security policy.
+In this mode, any user-supplied custom commands are blocked from execution.
+Notably, modifying the preprocessor's command-line is not allowed.
+
+To activate sandbox mode, set the \texttt{FRAMAC\_SANDBOX} environment variable
+before running \FramaC. When enabled, \FramaC will verify that potentially
+unsafe parameters -- such as \texttt{\optiondef{-}{cpp-command}} or
+\texttt{\optiondef{-}{load-module}} -- are not used. These and
+other options considered unsafe in sandbox mode are marked as such in the
+\FramaC help output.
+
+This mode is experimental, and some commands may still bypass the current
+checks.
