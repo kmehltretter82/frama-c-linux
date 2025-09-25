@@ -1053,14 +1053,29 @@ let print_renaming: Cil.cilVisitor = object
     DoChildren
 end
 
+(* Build a hook module that treat deferred errors after each hook. *)
+module HookTreatingDeferredError (Param : sig
+    module Id : Hook.Comparable
+    type t
+  end) = struct
+  include Hook.Build_ordered (Param)
+
+  let extend id f =
+    extend id
+      (fun param ->
+         let result = f param in
+         Log.treat_deferred_error ();
+         result)
+end
+
 module Transform_before_cleanup =
-  Hook.Build_ordered
+  HookTreatingDeferredError
     (struct module Id = Datatype.String type t = Cil_types.file end)
 module Transform_after_cleanup =
-  Hook.Build_ordered
+  HookTreatingDeferredError
     (struct module Id = Datatype.String type t = Cil_types.file end)
 module Transform_after_parameter_change =
-  Hook.Build_ordered
+  HookTreatingDeferredError
     (struct module Id = Datatype.String type t = State.t end)
 let transform_parameters = ref State.Set.empty
 
