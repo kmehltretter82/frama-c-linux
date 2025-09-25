@@ -1,0 +1,13 @@
+[kernel] Parsing float_parser_ddos.c (with preprocessing)
+[kernel:parser:decimal-float] float_parser_ddos.c:5: Warning: 
+  Floating-point constant 1e308 is not represented exactly. Will use 0x1.1ccf385ebc8a0p1023.
+[kernel:parser:decimal-float] float_parser_ddos.c:6: Warning: 
+  Floating-point constant 1e309 is not represented exactly. Will use inf.
+[kernel:parser:decimal-float] float_parser_ddos.c:7: Warning: 
+  Floating-point constant 1e-308 is not represented exactly. Will use 0x0.730d67819e8d2p-1022.
+[kernel:parser:decimal-float] float_parser_ddos.c:8: Warning: 
+  Floating-point constant 5e-324 is not represented exactly. Will use 0x0.0000000000001p-1022.
+[kernel:parser:decimal-float] float_parser_ddos.c:9: Warning: 
+  Floating-point constant 1e-325 is not represented exactly. Will use 0x0.0000000000000p0.
+[kernel:parser:decimal-float] float_parser_ddos.c:10: Warning: 
+  Floating-point constant 1e-40000000 is not represented exactly. Will use 0x0.0000000000000p0.
