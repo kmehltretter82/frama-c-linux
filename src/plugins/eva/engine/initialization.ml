@@ -443,20 +443,14 @@ module Make
 
   let print_initial_cvalue_state state =
     let cvalue_state = get_cvalue_or_bottom state in
-    (* Do not show variables from the frama-c libc specifications. *)
+    (* Do not show string literal nor variables from libc specifications. *)
     let print_base base =
       try
-        let varinfo = Base.to_varinfo base in
-        not (Cil.is_in_libc varinfo.vattr) &&
-        (not (Ast_info.is_string_literal varinfo) ||
-         (Self.is_debug_key_enabled Self.dkey_include_string_literal))
+        let vi = Base.to_varinfo base in
+        not (Cil.is_in_libc vi.vattr || Ast_info.is_string_literal vi)
       with Base.Not_a_C_variable -> true
     in
-    let cvalue_state =
-      if Kernel.PrintLibc.get ()
-      then cvalue_state
-      else Cvalue.Model.filter_base print_base cvalue_state
-    in
+    let cvalue_state = Cvalue.Model.filter_base print_base cvalue_state in
     Self.printf ~dkey:Self.dkey_initial_state
       ~header:(fun fmt -> Format.pp_print_string fmt
                   "Values of globals at initialization")
