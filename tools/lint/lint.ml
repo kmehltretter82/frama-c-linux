@@ -23,7 +23,7 @@ type tool_cmds =
 (** Supported indent formatters *)
 let external_formatters = [
   { kind = "C";
-    extensions = [ ".c" ; ".h" ];
+    extensions = [ ".c" ; ".i"; ".h"; ".cpp"; ".hpp"; ".ii"; ".cc" ];
     name = "clang-format";
     available_cmd = "clang-format --version > /dev/null 2> /dev/null";
     check_cmd = "clang-format --dry-run -Werror" ;
