@@ -14,104 +14,104 @@
 [eva] computing for function getline <- main.
   Called from stdio_c.c:18.
 [eva] computing for function ferror <- getline <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:58.
+  Called from FRAMAC_SHARE/libc/stdio.c:48.
 [eva] using specification for function ferror
-[eva] FRAMAC_SHARE/libc/stdio.c:58: 
+[eva] FRAMAC_SHARE/libc/stdio.c:48: 
   function ferror: precondition 'valid_stream' got status valid.
 [eva] Done for function ferror
 [eva] computing for function feof <- getline <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:58.
+  Called from FRAMAC_SHARE/libc/stdio.c:48.
 [eva] using specification for function feof
-[eva] FRAMAC_SHARE/libc/stdio.c:58: 
+[eva] FRAMAC_SHARE/libc/stdio.c:48: 
   function feof: precondition 'valid_stream' got status valid.
 [eva] Done for function feof
-[eva] FRAMAC_SHARE/libc/stdio.c:63: Call to builtin malloc
-[eva:malloc:new] FRAMAC_SHARE/libc/stdio.c:63: 
-  allocating variable __malloc_getline_l63
+[eva] FRAMAC_SHARE/libc/stdio.c:53: Call to builtin malloc
+[eva:malloc:new] FRAMAC_SHARE/libc/stdio.c:53: 
+  allocating variable __malloc_getline_l53
 [eva] computing for function ferror <- getline <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:72.
-[eva] FRAMAC_SHARE/libc/stdio.c:72: 
+  Called from FRAMAC_SHARE/libc/stdio.c:62.
+[eva] FRAMAC_SHARE/libc/stdio.c:62: 
   function ferror: precondition 'valid_stream' got status valid.
 [eva] Done for function ferror
 [eva] computing for function feof <- getline <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:72.
-[eva] FRAMAC_SHARE/libc/stdio.c:72: 
+  Called from FRAMAC_SHARE/libc/stdio.c:62.
+[eva] FRAMAC_SHARE/libc/stdio.c:62: 
   function feof: precondition 'valid_stream' got status valid.
 [eva] Done for function feof
 [eva] computing for function fgetc <- getline <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:74.
+  Called from FRAMAC_SHARE/libc/stdio.c:64.
 [eva] computing for function Frama_C_interval <- fgetc <- getline <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:169.
+  Called from FRAMAC_SHARE/libc/stdio.c:159.
 [eva] using specification for function Frama_C_interval
-[eva] FRAMAC_SHARE/libc/stdio.c:169: 
+[eva] FRAMAC_SHARE/libc/stdio.c:159: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva] computing for function Frama_C_interval <- fgetc <- getline <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:180.
-[eva] FRAMAC_SHARE/libc/stdio.c:180: 
+  Called from FRAMAC_SHARE/libc/stdio.c:170.
+[eva] FRAMAC_SHARE/libc/stdio.c:170: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva] computing for function Frama_C_interval <- fgetc <- getline <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:185.
-[eva] FRAMAC_SHARE/libc/stdio.c:185: 
+  Called from FRAMAC_SHARE/libc/stdio.c:175.
+[eva] FRAMAC_SHARE/libc/stdio.c:175: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva] computing for function Frama_C_unsigned_char_interval <- fgetc <- getline <- 
                           main.
-  Called from FRAMAC_SHARE/libc/stdio.c:188.
+  Called from FRAMAC_SHARE/libc/stdio.c:178.
 [eva] using specification for function Frama_C_unsigned_char_interval
-[eva] FRAMAC_SHARE/libc/stdio.c:188: 
+[eva] FRAMAC_SHARE/libc/stdio.c:178: 
   function Frama_C_unsigned_char_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_unsigned_char_interval
 [eva] Recording results for fgetc
 [eva] Done for function fgetc
-[eva:partition] FRAMAC_SHARE/libc/stdio.c:73: starting to merge loop iterations
-[eva] FRAMAC_SHARE/libc/stdio.c:74: Reusing old results for call to fgetc
-[eva] FRAMAC_SHARE/libc/stdio.c:94: Call to builtin realloc
-[eva] FRAMAC_SHARE/libc/stdio.c:94: 
+[eva:partition] FRAMAC_SHARE/libc/stdio.c:63: starting to merge loop iterations
+[eva] FRAMAC_SHARE/libc/stdio.c:64: Reusing old results for call to fgetc
+[eva] FRAMAC_SHARE/libc/stdio.c:84: Call to builtin realloc
+[eva] FRAMAC_SHARE/libc/stdio.c:84: 
   function realloc: precondition 'freeable' got status valid.
-[eva:malloc:new] FRAMAC_SHARE/libc/stdio.c:94: 
-  allocating variable __realloc_getline_l94
-[eva:partition] FRAMAC_SHARE/libc/stdio.c:72: starting to merge loop iterations
+[eva:malloc:new] FRAMAC_SHARE/libc/stdio.c:84: 
+  allocating variable __realloc_getline_l84
+[eva:partition] FRAMAC_SHARE/libc/stdio.c:62: starting to merge loop iterations
 [eva] computing for function ferror <- getline <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:72.
+  Called from FRAMAC_SHARE/libc/stdio.c:62.
 [eva] Done for function ferror
 [eva] computing for function feof <- getline <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:72.
+  Called from FRAMAC_SHARE/libc/stdio.c:62.
 [eva] Done for function feof
-[eva] FRAMAC_SHARE/libc/stdio.c:74: Reusing old results for call to fgetc
-[eva] FRAMAC_SHARE/libc/stdio.c:74: Reusing old results for call to fgetc
-[eva] FRAMAC_SHARE/libc/stdio.c:94: Call to builtin realloc
+[eva] FRAMAC_SHARE/libc/stdio.c:64: Reusing old results for call to fgetc
+[eva] FRAMAC_SHARE/libc/stdio.c:64: Reusing old results for call to fgetc
+[eva] FRAMAC_SHARE/libc/stdio.c:84: Call to builtin realloc
 [eva] computing for function ferror <- getline <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:72.
+  Called from FRAMAC_SHARE/libc/stdio.c:62.
 [eva] Done for function ferror
 [eva] computing for function feof <- getline <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:72.
+  Called from FRAMAC_SHARE/libc/stdio.c:62.
 [eva] Done for function feof
-[eva] FRAMAC_SHARE/libc/stdio.c:74: Reusing old results for call to fgetc
-[eva:alarm] FRAMAC_SHARE/libc/stdio.c:80: Warning: 
+[eva] FRAMAC_SHARE/libc/stdio.c:64: Reusing old results for call to fgetc
+[eva:alarm] FRAMAC_SHARE/libc/stdio.c:70: Warning: 
   out of bounds write. assert \valid(*lineptr + tmp_2);
                        (tmp_2 from cur++)
-[eva] FRAMAC_SHARE/libc/stdio.c:74: Reusing old results for call to fgetc
-[eva] FRAMAC_SHARE/libc/stdio.c:94: Call to builtin realloc
+[eva] FRAMAC_SHARE/libc/stdio.c:64: Reusing old results for call to fgetc
+[eva] FRAMAC_SHARE/libc/stdio.c:84: Call to builtin realloc
 [eva] computing for function ferror <- getline <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:72.
+  Called from FRAMAC_SHARE/libc/stdio.c:62.
 [eva] Done for function ferror
 [eva] computing for function feof <- getline <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:72.
+  Called from FRAMAC_SHARE/libc/stdio.c:62.
 [eva] Done for function feof
-[eva] FRAMAC_SHARE/libc/stdio.c:74: Reusing old results for call to fgetc
-[eva] FRAMAC_SHARE/libc/stdio.c:74: Reusing old results for call to fgetc
-[eva] FRAMAC_SHARE/libc/stdio.c:94: Call to builtin realloc
+[eva] FRAMAC_SHARE/libc/stdio.c:64: Reusing old results for call to fgetc
+[eva] FRAMAC_SHARE/libc/stdio.c:64: Reusing old results for call to fgetc
+[eva] FRAMAC_SHARE/libc/stdio.c:84: Call to builtin realloc
 [eva] computing for function ferror <- getline <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:72.
+  Called from FRAMAC_SHARE/libc/stdio.c:62.
 [eva] Done for function ferror
 [eva] computing for function feof <- getline <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:72.
+  Called from FRAMAC_SHARE/libc/stdio.c:62.
 [eva] Done for function feof
-[eva] FRAMAC_SHARE/libc/stdio.c:74: Reusing old results for call to fgetc
-[eva] FRAMAC_SHARE/libc/stdio.c:94: Call to builtin realloc
-[eva:alarm] FRAMAC_SHARE/libc/stdio.c:83: Warning: 
+[eva] FRAMAC_SHARE/libc/stdio.c:64: Reusing old results for call to fgetc
+[eva] FRAMAC_SHARE/libc/stdio.c:84: Call to builtin realloc
+[eva:alarm] FRAMAC_SHARE/libc/stdio.c:73: Warning: 
   out of bounds write. assert \valid(*lineptr + cur);
 [eva] Recording results for getline
 [eva] Done for function getline
@@ -126,57 +126,28 @@
 [eva] computing for function getline <- main.
   Called from stdio_c.c:18.
 [eva] computing for function ferror <- getline <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:58.
+  Called from FRAMAC_SHARE/libc/stdio.c:48.
 [eva] Done for function ferror
 [eva] computing for function feof <- getline <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:58.
+  Called from FRAMAC_SHARE/libc/stdio.c:48.
 [eva] Done for function feof
-[eva] FRAMAC_SHARE/libc/stdio.c:63: Call to builtin malloc
+[eva] FRAMAC_SHARE/libc/stdio.c:53: Call to builtin malloc
 [eva] computing for function ferror <- getline <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:72.
+  Called from FRAMAC_SHARE/libc/stdio.c:62.
 [eva] Done for function ferror
 [eva] computing for function feof <- getline <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:72.
+  Called from FRAMAC_SHARE/libc/stdio.c:62.
 [eva] Done for function feof
-[eva] FRAMAC_SHARE/libc/stdio.c:74: Reusing old results for call to fgetc
-[eva] FRAMAC_SHARE/libc/stdio.c:74: Reusing old results for call to fgetc
-[eva] FRAMAC_SHARE/libc/stdio.c:74: Reusing old results for call to fgetc
-[eva] FRAMAC_SHARE/libc/stdio.c:74: Reusing old results for call to fgetc
-[eva] FRAMAC_SHARE/libc/stdio.c:94: Call to builtin realloc
+[eva] FRAMAC_SHARE/libc/stdio.c:64: Reusing old results for call to fgetc
+[eva] FRAMAC_SHARE/libc/stdio.c:64: Reusing old results for call to fgetc
+[eva] FRAMAC_SHARE/libc/stdio.c:64: Reusing old results for call to fgetc
+[eva] FRAMAC_SHARE/libc/stdio.c:64: Reusing old results for call to fgetc
+[eva] FRAMAC_SHARE/libc/stdio.c:84: Call to builtin realloc
 [eva] computing for function ferror <- getline <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:72.
+  Called from FRAMAC_SHARE/libc/stdio.c:62.
 [eva] Done for function ferror
 [eva] computing for function feof <- getline <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:72.
-[eva] Done for function feof
-[eva] Recording results for getline
-[eva] Done for function getline
-[eva] stdio_c.c:20: Call to builtin strlen
-[eva] computing for function getline <- main.
-  Called from stdio_c.c:18.
-[eva] computing for function ferror <- getline <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:58.
-[eva] Done for function ferror
-[eva] computing for function feof <- getline <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:58.
-[eva] Done for function feof
-[eva] FRAMAC_SHARE/libc/stdio.c:63: Call to builtin malloc
-[eva] computing for function ferror <- getline <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:72.
-[eva] Done for function ferror
-[eva] computing for function feof <- getline <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:72.
-[eva] Done for function feof
-[eva] FRAMAC_SHARE/libc/stdio.c:74: Reusing old results for call to fgetc
-[eva] FRAMAC_SHARE/libc/stdio.c:74: Reusing old results for call to fgetc
-[eva] FRAMAC_SHARE/libc/stdio.c:74: Reusing old results for call to fgetc
-[eva] FRAMAC_SHARE/libc/stdio.c:74: Reusing old results for call to fgetc
-[eva] FRAMAC_SHARE/libc/stdio.c:94: Call to builtin realloc
-[eva] computing for function ferror <- getline <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:72.
-[eva] Done for function ferror
-[eva] computing for function feof <- getline <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:72.
+  Called from FRAMAC_SHARE/libc/stdio.c:62.
 [eva] Done for function feof
 [eva] Recording results for getline
 [eva] Done for function getline
@@ -184,28 +155,57 @@
 [eva] computing for function getline <- main.
   Called from stdio_c.c:18.
 [eva] computing for function ferror <- getline <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:58.
+  Called from FRAMAC_SHARE/libc/stdio.c:48.
 [eva] Done for function ferror
 [eva] computing for function feof <- getline <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:58.
+  Called from FRAMAC_SHARE/libc/stdio.c:48.
 [eva] Done for function feof
-[eva] FRAMAC_SHARE/libc/stdio.c:63: Call to builtin malloc
+[eva] FRAMAC_SHARE/libc/stdio.c:53: Call to builtin malloc
 [eva] computing for function ferror <- getline <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:72.
+  Called from FRAMAC_SHARE/libc/stdio.c:62.
 [eva] Done for function ferror
 [eva] computing for function feof <- getline <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:72.
+  Called from FRAMAC_SHARE/libc/stdio.c:62.
 [eva] Done for function feof
-[eva] FRAMAC_SHARE/libc/stdio.c:74: Reusing old results for call to fgetc
-[eva] FRAMAC_SHARE/libc/stdio.c:74: Reusing old results for call to fgetc
-[eva] FRAMAC_SHARE/libc/stdio.c:74: Reusing old results for call to fgetc
-[eva] FRAMAC_SHARE/libc/stdio.c:74: Reusing old results for call to fgetc
-[eva] FRAMAC_SHARE/libc/stdio.c:94: Call to builtin realloc
+[eva] FRAMAC_SHARE/libc/stdio.c:64: Reusing old results for call to fgetc
+[eva] FRAMAC_SHARE/libc/stdio.c:64: Reusing old results for call to fgetc
+[eva] FRAMAC_SHARE/libc/stdio.c:64: Reusing old results for call to fgetc
+[eva] FRAMAC_SHARE/libc/stdio.c:64: Reusing old results for call to fgetc
+[eva] FRAMAC_SHARE/libc/stdio.c:84: Call to builtin realloc
 [eva] computing for function ferror <- getline <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:72.
+  Called from FRAMAC_SHARE/libc/stdio.c:62.
 [eva] Done for function ferror
 [eva] computing for function feof <- getline <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:72.
+  Called from FRAMAC_SHARE/libc/stdio.c:62.
+[eva] Done for function feof
+[eva] Recording results for getline
+[eva] Done for function getline
+[eva] stdio_c.c:20: Call to builtin strlen
+[eva] computing for function getline <- main.
+  Called from stdio_c.c:18.
+[eva] computing for function ferror <- getline <- main.
+  Called from FRAMAC_SHARE/libc/stdio.c:48.
+[eva] Done for function ferror
+[eva] computing for function feof <- getline <- main.
+  Called from FRAMAC_SHARE/libc/stdio.c:48.
+[eva] Done for function feof
+[eva] FRAMAC_SHARE/libc/stdio.c:53: Call to builtin malloc
+[eva] computing for function ferror <- getline <- main.
+  Called from FRAMAC_SHARE/libc/stdio.c:62.
+[eva] Done for function ferror
+[eva] computing for function feof <- getline <- main.
+  Called from FRAMAC_SHARE/libc/stdio.c:62.
+[eva] Done for function feof
+[eva] FRAMAC_SHARE/libc/stdio.c:64: Reusing old results for call to fgetc
+[eva] FRAMAC_SHARE/libc/stdio.c:64: Reusing old results for call to fgetc
+[eva] FRAMAC_SHARE/libc/stdio.c:64: Reusing old results for call to fgetc
+[eva] FRAMAC_SHARE/libc/stdio.c:64: Reusing old results for call to fgetc
+[eva] FRAMAC_SHARE/libc/stdio.c:84: Call to builtin realloc
+[eva] computing for function ferror <- getline <- main.
+  Called from FRAMAC_SHARE/libc/stdio.c:62.
+[eva] Done for function ferror
+[eva] computing for function feof <- getline <- main.
+  Called from FRAMAC_SHARE/libc/stdio.c:62.
 [eva] Done for function feof
 [eva] Recording results for getline
 [eva] Done for function getline
@@ -221,22 +221,22 @@
 [eva] computing for function asprintf <- main.
   Called from stdio_c.c:31.
 [eva] computing for function vasprintf <- asprintf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:125.
+  Called from FRAMAC_SHARE/libc/stdio.c:115.
 [eva] computing for function Frama_C_interval <- vasprintf <- asprintf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:111.
-[eva] FRAMAC_SHARE/libc/stdio.c:111: 
+  Called from FRAMAC_SHARE/libc/stdio.c:101.
+[eva] FRAMAC_SHARE/libc/stdio.c:101: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] FRAMAC_SHARE/libc/stdio.c:112: Call to builtin malloc
-[eva:malloc:new] FRAMAC_SHARE/libc/stdio.c:112: 
-  allocating variable __malloc_vasprintf_l112
+[eva] FRAMAC_SHARE/libc/stdio.c:102: Call to builtin malloc
+[eva:malloc:new] FRAMAC_SHARE/libc/stdio.c:102: 
+  allocating variable __malloc_vasprintf_l102
 [eva] computing for function Frama_C_make_unknown <- vasprintf <- asprintf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:117.
+  Called from FRAMAC_SHARE/libc/stdio.c:107.
 [eva] using specification for function Frama_C_make_unknown
-[eva:alarm] FRAMAC_SHARE/libc/stdio.c:117: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/stdio.c:107: Warning: 
   function Frama_C_make_unknown: precondition 'valid_p' got status unknown.
 [eva] Done for function Frama_C_make_unknown
-[eva:alarm] FRAMAC_SHARE/libc/stdio.c:118: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/stdio.c:108: Warning: 
   out of bounds write. assert \valid(*strp + (size_t)(len - 1U));
 [eva] Recording results for vasprintf
 [eva] Done for function vasprintf
@@ -255,20 +255,20 @@
 [eva] computing for function fmemopen <- main.
   Called from stdio_c.c:42.
 [eva] computing for function is_valid_mode <- fmemopen <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:201.
+  Called from FRAMAC_SHARE/libc/stdio.c:191.
 [eva] Recording results for is_valid_mode
 [eva] Done for function is_valid_mode
-[eva] FRAMAC_SHARE/libc/stdio.c:219: Call to builtin malloc
-[eva:malloc:new] FRAMAC_SHARE/libc/stdio.c:219: 
-  allocating variable __malloc_fmemopen_l219
+[eva] FRAMAC_SHARE/libc/stdio.c:209: Call to builtin malloc
+[eva:malloc:new] FRAMAC_SHARE/libc/stdio.c:209: 
+  allocating variable __malloc_fmemopen_l209
 [eva] computing for function Frama_C_interval <- fmemopen <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:227.
-[eva] FRAMAC_SHARE/libc/stdio.c:227: 
+  Called from FRAMAC_SHARE/libc/stdio.c:217.
+[eva] FRAMAC_SHARE/libc/stdio.c:217: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva] computing for function Frama_C_interval <- fmemopen <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:232.
-[eva] FRAMAC_SHARE/libc/stdio.c:232: 
+  Called from FRAMAC_SHARE/libc/stdio.c:222.
+[eva] FRAMAC_SHARE/libc/stdio.c:222: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva] Recording results for fmemopen
@@ -285,19 +285,19 @@
 [eva] computing for function getchar <- main.
   Called from stdio_c.c:49.
 [eva] computing for function fgetc <- getchar <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:193.
+  Called from FRAMAC_SHARE/libc/stdio.c:183.
 [eva] computing for function Frama_C_interval <- fgetc <- getchar <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:169.
+  Called from FRAMAC_SHARE/libc/stdio.c:159.
 [eva] Done for function Frama_C_interval
 [eva] computing for function Frama_C_interval <- fgetc <- getchar <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:180.
+  Called from FRAMAC_SHARE/libc/stdio.c:170.
 [eva] Done for function Frama_C_interval
 [eva] computing for function Frama_C_interval <- fgetc <- getchar <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:185.
+  Called from FRAMAC_SHARE/libc/stdio.c:175.
 [eva] Done for function Frama_C_interval
 [eva] computing for function Frama_C_unsigned_char_interval <- fgetc <- getchar <- 
                           main.
-  Called from FRAMAC_SHARE/libc/stdio.c:188.
+  Called from FRAMAC_SHARE/libc/stdio.c:178.
 [eva] Done for function Frama_C_unsigned_char_interval
 [eva] Recording results for fgetc
 [eva] Done for function fgetc
@@ -309,757 +309,56 @@
 [eva] computing for function fgets <- main.
   Called from stdio_c.c:54.
 [eva] computing for function Frama_C_interval <- fgets <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:131.
-[eva] FRAMAC_SHARE/libc/stdio.c:131: 
+  Called from FRAMAC_SHARE/libc/stdio.c:121.
+[eva] FRAMAC_SHARE/libc/stdio.c:121: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva] computing for function Frama_C_interval <- fgets <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:142.
-[eva] FRAMAC_SHARE/libc/stdio.c:142: 
+  Called from FRAMAC_SHARE/libc/stdio.c:132.
+[eva] FRAMAC_SHARE/libc/stdio.c:132: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva] computing for function Frama_C_interval <- fgets <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:149.
-[eva] FRAMAC_SHARE/libc/stdio.c:149: 
+  Called from FRAMAC_SHARE/libc/stdio.c:139.
+[eva] FRAMAC_SHARE/libc/stdio.c:139: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva] computing for function Frama_C_interval <- fgets <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:155.
-[eva] FRAMAC_SHARE/libc/stdio.c:155: 
+  Called from FRAMAC_SHARE/libc/stdio.c:145.
+[eva] FRAMAC_SHARE/libc/stdio.c:145: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva:partition] FRAMAC_SHARE/libc/stdio.c:146: starting to merge loop iterations
+[eva:partition] FRAMAC_SHARE/libc/stdio.c:136: starting to merge loop iterations
 [eva] computing for function Frama_C_interval <- fgets <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:149.
+  Called from FRAMAC_SHARE/libc/stdio.c:139.
 [eva] Done for function Frama_C_interval
 [eva] computing for function Frama_C_interval <- fgets <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:155.
+  Called from FRAMAC_SHARE/libc/stdio.c:145.
 [eva] Done for function Frama_C_interval
 [eva] computing for function Frama_C_interval <- fgets <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:149.
+  Called from FRAMAC_SHARE/libc/stdio.c:139.
 [eva] Done for function Frama_C_interval
 [eva] computing for function Frama_C_interval <- fgets <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:155.
+  Called from FRAMAC_SHARE/libc/stdio.c:145.
 [eva] Done for function Frama_C_interval
 [eva] computing for function Frama_C_interval <- fgets <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:149.
+  Called from FRAMAC_SHARE/libc/stdio.c:139.
 [eva] Done for function Frama_C_interval
 [eva] computing for function Frama_C_interval <- fgets <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:155.
+  Called from FRAMAC_SHARE/libc/stdio.c:145.
 [eva] Done for function Frama_C_interval
 [eva] computing for function Frama_C_interval <- fgets <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:149.
+  Called from FRAMAC_SHARE/libc/stdio.c:139.
 [eva] Done for function Frama_C_interval
 [eva] computing for function Frama_C_interval <- fgets <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:155.
+  Called from FRAMAC_SHARE/libc/stdio.c:145.
 [eva] Done for function Frama_C_interval
-[eva:alarm] FRAMAC_SHARE/libc/stdio.c:164: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/stdio.c:154: Warning: 
   out of bounds write. assert \valid(s + i);
 [eva] Recording results for fgets
 [eva] Done for function fgets
 [eva:alarm] stdio_c.c:56: Warning: 
   assertion 'at_least_one_char' got status unknown.
-[eva] computing for function caller_stub_for_vscanf <- main.
-  Called from stdio_c.c:66.
-[eva] computing for function vscanf <- caller_stub_for_vscanf <- main.
-  Called from stdio_c.c:79.
-[eva] computing for function vfscanf <- vscanf <- caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:501.
-[eva:partition] FRAMAC_SHARE/libc/stdio.c:253: starting to merge loop iterations
-[eva] computing for function Frama_C_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:338.
-[eva] FRAMAC_SHARE/libc/stdio.c:338: 
-  function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
-[eva:partition] FRAMAC_SHARE/libc/stdio.c:244: starting to merge loop iterations
-[eva:partition] FRAMAC_SHARE/libc/stdio.c:268: starting to merge loop iterations
-[eva:partition] FRAMAC_SHARE/libc/stdio.c:326: starting to merge loop iterations
-[eva] computing for function Frama_C_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:338.
-[eva] Done for function Frama_C_interval
-[eva:alarm] FRAMAC_SHARE/libc/stdio.c:338: Warning: 
-  out of bounds write. assert \valid(tmp_0);
-                       (tmp_0 from vararg)
-[eva:alarm] FRAMAC_SHARE/libc/stdio.c:328: Warning: 
-  out of bounds read. assert \valid_read(arg);
-[eva:alarm] FRAMAC_SHARE/libc/stdio.c:338: Warning: 
-  out of bounds read. assert \valid_read(arg);
-[eva] computing for function Frama_C_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:338.
-[eva] Done for function Frama_C_interval
-[eva:alarm] FRAMAC_SHARE/libc/stdio.c:341: Warning: 
-  out of bounds read. assert \valid_read(arg);
-[eva] computing for function Frama_C_char_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:341.
-[eva] using specification for function Frama_C_char_interval
-[eva] FRAMAC_SHARE/libc/stdio.c:341: 
-  function Frama_C_char_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_char_interval
-[eva:alarm] FRAMAC_SHARE/libc/stdio.c:344: Warning: 
-  out of bounds read. assert \valid_read(arg);
-[eva] computing for function Frama_C_short_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:344.
-[eva] using specification for function Frama_C_short_interval
-[eva] FRAMAC_SHARE/libc/stdio.c:344: 
-  function Frama_C_short_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_short_interval
-[eva:alarm] FRAMAC_SHARE/libc/stdio.c:344: Warning: 
-  out of bounds write. assert \valid(tmp_2_0);
-                       (tmp_2_0 from vararg)
-[eva:alarm] FRAMAC_SHARE/libc/stdio.c:347: Warning: 
-  out of bounds read. assert \valid_read(arg);
-[eva] computing for function Frama_C_long_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:347.
-[eva] using specification for function Frama_C_long_interval
-[eva] FRAMAC_SHARE/libc/stdio.c:347: 
-  function Frama_C_long_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_long_interval
-[eva:alarm] FRAMAC_SHARE/libc/stdio.c:347: Warning: 
-  out of bounds write. assert \valid(tmp_3);
-                       (tmp_3 from vararg)
-[eva:alarm] FRAMAC_SHARE/libc/stdio.c:351: Warning: 
-  out of bounds read. assert \valid_read(arg);
-[eva] computing for function Frama_C_long_long_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:352.
-[eva] using specification for function Frama_C_long_long_interval
-[eva] FRAMAC_SHARE/libc/stdio.c:352: 
-  function Frama_C_long_long_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_long_long_interval
-[eva:alarm] FRAMAC_SHARE/libc/stdio.c:352: Warning: 
-  out of bounds write. assert \valid(tmp_4);
-                       (tmp_4 from vararg)
-[eva:alarm] FRAMAC_SHARE/libc/stdio.c:355: Warning: 
-  out of bounds read. assert \valid_read(arg);
-[eva] computing for function Frama_C_intmax_t_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:356.
-[eva] using specification for function Frama_C_intmax_t_interval
-[eva] FRAMAC_SHARE/libc/stdio.c:356: 
-  function Frama_C_intmax_t_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_intmax_t_interval
-[eva:alarm] FRAMAC_SHARE/libc/stdio.c:356: Warning: 
-  out of bounds write. assert \valid(tmp_5);
-                       (tmp_5 from vararg)
-[eva:alarm] FRAMAC_SHARE/libc/stdio.c:359: Warning: 
-  out of bounds read. assert \valid_read(arg);
-[eva] computing for function Frama_C_size_t_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:359.
-[eva] using specification for function Frama_C_size_t_interval
-[eva] FRAMAC_SHARE/libc/stdio.c:359: 
-  function Frama_C_size_t_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_size_t_interval
-[eva:alarm] FRAMAC_SHARE/libc/stdio.c:359: Warning: 
-  out of bounds write. assert \valid(tmp_6);
-                       (tmp_6 from vararg)
-[eva:alarm] FRAMAC_SHARE/libc/stdio.c:362: Warning: 
-  out of bounds read. assert \valid_read(arg);
-[eva] computing for function Frama_C_ptrdiff_t_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:363.
-[eva] using specification for function Frama_C_ptrdiff_t_interval
-[eva] FRAMAC_SHARE/libc/stdio.c:363: 
-  function Frama_C_ptrdiff_t_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_ptrdiff_t_interval
-[eva:alarm] FRAMAC_SHARE/libc/stdio.c:363: Warning: 
-  out of bounds write. assert \valid(tmp_7);
-                       (tmp_7 from vararg)
-[eva:alarm] FRAMAC_SHARE/libc/stdio.c:373: Warning: 
-  out of bounds read. assert \valid_read(arg);
-[eva] computing for function Frama_C_unsigned_int_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:374.
-[eva] using specification for function Frama_C_unsigned_int_interval
-[eva] FRAMAC_SHARE/libc/stdio.c:374: 
-  function Frama_C_unsigned_int_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_unsigned_int_interval
-[eva:alarm] FRAMAC_SHARE/libc/stdio.c:374: Warning: 
-  out of bounds write. assert \valid(tmp_8);
-                       (tmp_8 from vararg)
-[eva:alarm] FRAMAC_SHARE/libc/stdio.c:377: Warning: 
-  out of bounds read. assert \valid_read(arg);
-[eva] computing for function Frama_C_unsigned_char_interval <- vfscanf <- 
-                          vscanf <- caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:378.
-[eva] FRAMAC_SHARE/libc/stdio.c:378: 
-  function Frama_C_unsigned_char_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_unsigned_char_interval
-[eva:alarm] FRAMAC_SHARE/libc/stdio.c:381: Warning: 
-  out of bounds read. assert \valid_read(arg);
-[eva] computing for function Frama_C_unsigned_short_interval <- vfscanf <- 
-                          vscanf <- caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:382.
-[eva] using specification for function Frama_C_unsigned_short_interval
-[eva] FRAMAC_SHARE/libc/stdio.c:382: 
-  function Frama_C_unsigned_short_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_unsigned_short_interval
-[eva:alarm] FRAMAC_SHARE/libc/stdio.c:382: Warning: 
-  out of bounds write. assert \valid(tmp_10);
-                       (tmp_10 from vararg)
-[eva:alarm] FRAMAC_SHARE/libc/stdio.c:385: Warning: 
-  out of bounds read. assert \valid_read(arg);
-[eva] computing for function Frama_C_unsigned_long_interval <- vfscanf <- 
-                          vscanf <- caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:386.
-[eva] using specification for function Frama_C_unsigned_long_interval
-[eva] FRAMAC_SHARE/libc/stdio.c:386: 
-  function Frama_C_unsigned_long_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_unsigned_long_interval
-[eva:alarm] FRAMAC_SHARE/libc/stdio.c:386: Warning: 
-  out of bounds write. assert \valid(tmp_11);
-                       (tmp_11 from vararg)
-[eva:alarm] FRAMAC_SHARE/libc/stdio.c:390: Warning: 
-  out of bounds read. assert \valid_read(arg);
-[eva] computing for function Frama_C_unsigned_long_long_interval <- vfscanf <- 
-                          vscanf <- caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:391.
-[eva] using specification for function Frama_C_unsigned_long_long_interval
-[eva] FRAMAC_SHARE/libc/stdio.c:391: 
-  function Frama_C_unsigned_long_long_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_unsigned_long_long_interval
-[eva:alarm] FRAMAC_SHARE/libc/stdio.c:391: Warning: 
-  out of bounds write. assert \valid(tmp_12);
-                       (tmp_12 from vararg)
-[eva:alarm] FRAMAC_SHARE/libc/stdio.c:394: Warning: 
-  out of bounds read. assert \valid_read(arg);
-[eva] computing for function Frama_C_uintmax_t_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:394.
-[eva] using specification for function Frama_C_uintmax_t_interval
-[eva] FRAMAC_SHARE/libc/stdio.c:394: 
-  function Frama_C_uintmax_t_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_uintmax_t_interval
-[eva:alarm] FRAMAC_SHARE/libc/stdio.c:394: Warning: 
-  out of bounds write. assert \valid(tmp_13);
-                       (tmp_13 from vararg)
-[eva:alarm] FRAMAC_SHARE/libc/stdio.c:397: Warning: 
-  out of bounds read. assert \valid_read(arg);
-[eva] computing for function Frama_C_size_t_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:397.
-[eva] FRAMAC_SHARE/libc/stdio.c:397: 
-  function Frama_C_size_t_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_size_t_interval
-[eva:alarm] FRAMAC_SHARE/libc/stdio.c:397: Warning: 
-  out of bounds write. assert \valid(tmp_14);
-                       (tmp_14 from vararg)
-[eva:alarm] FRAMAC_SHARE/libc/stdio.c:400: Warning: 
-  out of bounds read. assert \valid_read(arg);
-[eva] computing for function Frama_C_ptrdiff_t_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:401.
-[eva] FRAMAC_SHARE/libc/stdio.c:401: 
-  function Frama_C_ptrdiff_t_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_ptrdiff_t_interval
-[eva:alarm] FRAMAC_SHARE/libc/stdio.c:401: Warning: 
-  out of bounds write. assert \valid(tmp_15);
-                       (tmp_15 from vararg)
-[eva:alarm] FRAMAC_SHARE/libc/stdio.c:417: Warning: 
-  out of bounds read. assert \valid_read(arg);
-[eva] computing for function Frama_C_double_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:417.
-[eva] using specification for function Frama_C_double_interval
-[eva] FRAMAC_SHARE/libc/stdio.c:417: 
-  function Frama_C_double_interval, behavior finite: precondition 'order' got status valid.
-[eva] Done for function Frama_C_double_interval
-[eva:alarm] FRAMAC_SHARE/libc/stdio.c:417: Warning: 
-  out of bounds write. assert \valid(tmp_16);
-                       (tmp_16 from vararg)
-[eva:alarm] FRAMAC_SHARE/libc/stdio.c:423: Warning: 
-  out of bounds read. assert \valid_read(arg);
-[eva:alarm] FRAMAC_SHARE/libc/stdio.c:423: Warning: 
-  out of bounds write. assert \valid(tmp_17);
-                       (tmp_17 from vararg)
-[eva:alarm] FRAMAC_SHARE/libc/stdio.c:423: Warning: 
-  non-finite long double value. assert \is_finite(vld);
-[eva:alarm] FRAMAC_SHARE/libc/stdio.c:428: Warning: 
-  assertion 'invalid_scanf_specifier' got status invalid (stopping propagation).
-[eva:alarm] FRAMAC_SHARE/libc/stdio.c:435: Warning: 
-  out of bounds read. assert \valid_read(arg);
-[eva] computing for function Frama_C_char_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:435.
-[eva] FRAMAC_SHARE/libc/stdio.c:435: 
-  function Frama_C_char_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_char_interval
-[eva:alarm] FRAMAC_SHARE/libc/stdio.c:438: Warning: 
-  out of bounds read. assert \valid_read(arg);
-[eva] computing for function Frama_C_wint_t_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:438.
-[eva] using specification for function Frama_C_wint_t_interval
-[eva] FRAMAC_SHARE/libc/stdio.c:438: 
-  function Frama_C_wint_t_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_wint_t_interval
-[eva:alarm] FRAMAC_SHARE/libc/stdio.c:438: Warning: 
-  out of bounds write. assert \valid(tmp_19);
-                       (tmp_19 from vararg)
-[eva:alarm] FRAMAC_SHARE/libc/stdio.c:441: Warning: 
-  assertion 'invalid_scanf_specifier' got status invalid (stopping propagation).
-[eva] computing for function Frama_C_size_t_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:450.
-[eva] FRAMAC_SHARE/libc/stdio.c:450: 
-  function Frama_C_size_t_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_size_t_interval
-[eva:alarm] FRAMAC_SHARE/libc/stdio.c:449: Warning: 
-  out of bounds read. assert \valid_read(arg);
-[eva] computing for function Frama_C_make_unknown <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:449.
-[eva:alarm] FRAMAC_SHARE/libc/stdio.c:449: Warning: 
-  function Frama_C_make_unknown: precondition 'valid_p' got status unknown.
-[eva] Done for function Frama_C_make_unknown
-[eva] computing for function Frama_C_size_t_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:455.
-[eva] FRAMAC_SHARE/libc/stdio.c:455: 
-  function Frama_C_size_t_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_size_t_interval
-[eva:alarm] FRAMAC_SHARE/libc/stdio.c:454: Warning: 
-  out of bounds read. assert \valid_read(arg);
-[eva] computing for function Frama_C_make_unknown_wchar <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:454.
-[eva] using specification for function Frama_C_make_unknown_wchar
-[eva:alarm] FRAMAC_SHARE/libc/stdio.c:454: Warning: 
-  function Frama_C_make_unknown_wchar: precondition 'valid_p' got status unknown.
-[eva] Done for function Frama_C_make_unknown_wchar
-[eva:alarm] FRAMAC_SHARE/libc/stdio.c:458: Warning: 
-  assertion 'invalid_scanf_specifier' got status invalid (stopping propagation).
-[eva:alarm] FRAMAC_SHARE/libc/stdio.c:465: Warning: 
-  out of bounds read. assert \valid_read(arg);
-[eva:alarm] FRAMAC_SHARE/libc/stdio.c:465: Warning: 
-  out of bounds write. assert \valid(tmp_24);
-                       (tmp_24 from vararg)
-[eva:alarm] FRAMAC_SHARE/libc/stdio.c:468: Warning: 
-  out of bounds read. assert \valid_read(arg);
-[eva:alarm] FRAMAC_SHARE/libc/stdio.c:471: Warning: 
-  out of bounds read. assert \valid_read(arg);
-[eva:alarm] FRAMAC_SHARE/libc/stdio.c:471: Warning: 
-  out of bounds write. assert \valid(tmp_26);
-                       (tmp_26 from vararg)
-[eva:alarm] FRAMAC_SHARE/libc/stdio.c:474: Warning: 
-  out of bounds read. assert \valid_read(arg);
-[eva:alarm] FRAMAC_SHARE/libc/stdio.c:474: Warning: 
-  out of bounds write. assert \valid(tmp_27);
-                       (tmp_27 from vararg)
-[eva:alarm] FRAMAC_SHARE/libc/stdio.c:478: Warning: 
-  out of bounds read. assert \valid_read(arg);
-[eva:alarm] FRAMAC_SHARE/libc/stdio.c:478: Warning: 
-  out of bounds write. assert \valid(tmp_28);
-                       (tmp_28 from vararg)
-[eva:alarm] FRAMAC_SHARE/libc/stdio.c:481: Warning: 
-  out of bounds read. assert \valid_read(arg);
-[eva:alarm] FRAMAC_SHARE/libc/stdio.c:481: Warning: 
-  out of bounds write. assert \valid(tmp_29);
-                       (tmp_29 from vararg)
-[eva:alarm] FRAMAC_SHARE/libc/stdio.c:484: Warning: 
-  out of bounds read. assert \valid_read(arg);
-[eva:alarm] FRAMAC_SHARE/libc/stdio.c:484: Warning: 
-  out of bounds write. assert \valid(tmp_30);
-                       (tmp_30 from vararg)
-[eva:alarm] FRAMAC_SHARE/libc/stdio.c:487: Warning: 
-  out of bounds read. assert \valid_read(arg);
-[eva:alarm] FRAMAC_SHARE/libc/stdio.c:487: Warning: 
-  out of bounds write. assert \valid(tmp_31);
-                       (tmp_31 from vararg)
-[eva:alarm] FRAMAC_SHARE/libc/stdio.c:244: Warning: 
-  out of bounds read. assert \valid_read(p);
-[eva:partition] FRAMAC_SHARE/libc/stdio.c:279: starting to merge loop iterations
-[eva] computing for function Frama_C_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:338.
-[eva] Done for function Frama_C_interval
-[eva] computing for function Frama_C_char_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:341.
-[eva] Done for function Frama_C_char_interval
-[eva] computing for function Frama_C_short_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:344.
-[eva] Done for function Frama_C_short_interval
-[eva] computing for function Frama_C_long_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:347.
-[eva] Done for function Frama_C_long_interval
-[eva] computing for function Frama_C_long_long_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:352.
-[eva] Done for function Frama_C_long_long_interval
-[eva] computing for function Frama_C_intmax_t_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:356.
-[eva] Done for function Frama_C_intmax_t_interval
-[eva] computing for function Frama_C_size_t_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:359.
-[eva] Done for function Frama_C_size_t_interval
-[eva] computing for function Frama_C_ptrdiff_t_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:363.
-[eva] Done for function Frama_C_ptrdiff_t_interval
-[eva] computing for function Frama_C_unsigned_int_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:374.
-[eva] Done for function Frama_C_unsigned_int_interval
-[eva] computing for function Frama_C_unsigned_char_interval <- vfscanf <- 
-                          vscanf <- caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:378.
-[eva] Done for function Frama_C_unsigned_char_interval
-[eva] computing for function Frama_C_unsigned_short_interval <- vfscanf <- 
-                          vscanf <- caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:382.
-[eva] Done for function Frama_C_unsigned_short_interval
-[eva] computing for function Frama_C_unsigned_long_interval <- vfscanf <- 
-                          vscanf <- caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:386.
-[eva] Done for function Frama_C_unsigned_long_interval
-[eva] computing for function Frama_C_unsigned_long_long_interval <- vfscanf <- 
-                          vscanf <- caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:391.
-[eva] Done for function Frama_C_unsigned_long_long_interval
-[eva] computing for function Frama_C_uintmax_t_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:394.
-[eva] Done for function Frama_C_uintmax_t_interval
-[eva] computing for function Frama_C_size_t_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:397.
-[eva] Done for function Frama_C_size_t_interval
-[eva] computing for function Frama_C_ptrdiff_t_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:401.
-[eva] Done for function Frama_C_ptrdiff_t_interval
-[eva] computing for function Frama_C_double_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:417.
-[eva] Done for function Frama_C_double_interval
-[eva] computing for function Frama_C_char_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:435.
-[eva] Done for function Frama_C_char_interval
-[eva] computing for function Frama_C_wint_t_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:438.
-[eva] Done for function Frama_C_wint_t_interval
-[eva] computing for function Frama_C_size_t_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:450.
-[eva] Done for function Frama_C_size_t_interval
-[eva] computing for function Frama_C_make_unknown <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:449.
-[eva] Done for function Frama_C_make_unknown
-[eva] computing for function Frama_C_size_t_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:455.
-[eva] Done for function Frama_C_size_t_interval
-[eva] computing for function Frama_C_make_unknown_wchar <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:454.
-[eva] Done for function Frama_C_make_unknown_wchar
-[eva] computing for function Frama_C_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:338.
-[eva] Done for function Frama_C_interval
-[eva] computing for function Frama_C_char_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:341.
-[eva] Done for function Frama_C_char_interval
-[eva] computing for function Frama_C_short_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:344.
-[eva] Done for function Frama_C_short_interval
-[eva] computing for function Frama_C_long_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:347.
-[eva] Done for function Frama_C_long_interval
-[eva] computing for function Frama_C_long_long_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:352.
-[eva] Done for function Frama_C_long_long_interval
-[eva] computing for function Frama_C_intmax_t_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:356.
-[eva] Done for function Frama_C_intmax_t_interval
-[eva] computing for function Frama_C_size_t_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:359.
-[eva] Done for function Frama_C_size_t_interval
-[eva] computing for function Frama_C_ptrdiff_t_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:363.
-[eva] Done for function Frama_C_ptrdiff_t_interval
-[eva] computing for function Frama_C_unsigned_int_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:374.
-[eva] Done for function Frama_C_unsigned_int_interval
-[eva] computing for function Frama_C_unsigned_char_interval <- vfscanf <- 
-                          vscanf <- caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:378.
-[eva] Done for function Frama_C_unsigned_char_interval
-[eva] computing for function Frama_C_unsigned_short_interval <- vfscanf <- 
-                          vscanf <- caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:382.
-[eva] Done for function Frama_C_unsigned_short_interval
-[eva] computing for function Frama_C_unsigned_long_interval <- vfscanf <- 
-                          vscanf <- caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:386.
-[eva] Done for function Frama_C_unsigned_long_interval
-[eva] computing for function Frama_C_unsigned_long_long_interval <- vfscanf <- 
-                          vscanf <- caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:391.
-[eva] Done for function Frama_C_unsigned_long_long_interval
-[eva] computing for function Frama_C_uintmax_t_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:394.
-[eva] Done for function Frama_C_uintmax_t_interval
-[eva] computing for function Frama_C_size_t_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:397.
-[eva] Done for function Frama_C_size_t_interval
-[eva] computing for function Frama_C_ptrdiff_t_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:401.
-[eva] Done for function Frama_C_ptrdiff_t_interval
-[eva] computing for function Frama_C_double_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:417.
-[eva] Done for function Frama_C_double_interval
-[eva] computing for function Frama_C_char_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:435.
-[eva] Done for function Frama_C_char_interval
-[eva] computing for function Frama_C_wint_t_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:438.
-[eva] Done for function Frama_C_wint_t_interval
-[eva] computing for function Frama_C_size_t_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:450.
-[eva] Done for function Frama_C_size_t_interval
-[eva] computing for function Frama_C_make_unknown <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:449.
-[eva] Done for function Frama_C_make_unknown
-[eva] computing for function Frama_C_size_t_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:455.
-[eva] Done for function Frama_C_size_t_interval
-[eva] computing for function Frama_C_make_unknown_wchar <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:454.
-[eva] Done for function Frama_C_make_unknown_wchar
-[eva] computing for function Frama_C_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:338.
-[eva] Done for function Frama_C_interval
-[eva] computing for function Frama_C_char_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:341.
-[eva] Done for function Frama_C_char_interval
-[eva] computing for function Frama_C_short_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:344.
-[eva] Done for function Frama_C_short_interval
-[eva] computing for function Frama_C_long_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:347.
-[eva] Done for function Frama_C_long_interval
-[eva] computing for function Frama_C_long_long_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:352.
-[eva] Done for function Frama_C_long_long_interval
-[eva] computing for function Frama_C_intmax_t_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:356.
-[eva] Done for function Frama_C_intmax_t_interval
-[eva] computing for function Frama_C_size_t_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:359.
-[eva] Done for function Frama_C_size_t_interval
-[eva] computing for function Frama_C_ptrdiff_t_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:363.
-[eva] Done for function Frama_C_ptrdiff_t_interval
-[eva] computing for function Frama_C_unsigned_int_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:374.
-[eva] Done for function Frama_C_unsigned_int_interval
-[eva] computing for function Frama_C_unsigned_char_interval <- vfscanf <- 
-                          vscanf <- caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:378.
-[eva] Done for function Frama_C_unsigned_char_interval
-[eva] computing for function Frama_C_unsigned_short_interval <- vfscanf <- 
-                          vscanf <- caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:382.
-[eva] Done for function Frama_C_unsigned_short_interval
-[eva] computing for function Frama_C_unsigned_long_interval <- vfscanf <- 
-                          vscanf <- caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:386.
-[eva] Done for function Frama_C_unsigned_long_interval
-[eva] computing for function Frama_C_unsigned_long_long_interval <- vfscanf <- 
-                          vscanf <- caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:391.
-[eva] Done for function Frama_C_unsigned_long_long_interval
-[eva] computing for function Frama_C_uintmax_t_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:394.
-[eva] Done for function Frama_C_uintmax_t_interval
-[eva] computing for function Frama_C_size_t_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:397.
-[eva] Done for function Frama_C_size_t_interval
-[eva] computing for function Frama_C_ptrdiff_t_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:401.
-[eva] Done for function Frama_C_ptrdiff_t_interval
-[eva] computing for function Frama_C_double_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:417.
-[eva] Done for function Frama_C_double_interval
-[eva] computing for function Frama_C_char_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:435.
-[eva] Done for function Frama_C_char_interval
-[eva] computing for function Frama_C_wint_t_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:438.
-[eva] Done for function Frama_C_wint_t_interval
-[eva] computing for function Frama_C_size_t_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:450.
-[eva] Done for function Frama_C_size_t_interval
-[eva] computing for function Frama_C_make_unknown <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:449.
-[eva] Done for function Frama_C_make_unknown
-[eva] computing for function Frama_C_size_t_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:455.
-[eva] Done for function Frama_C_size_t_interval
-[eva] computing for function Frama_C_make_unknown_wchar <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:454.
-[eva] Done for function Frama_C_make_unknown_wchar
-[eva] computing for function Frama_C_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:338.
-[eva] Done for function Frama_C_interval
-[eva] computing for function Frama_C_char_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:341.
-[eva] Done for function Frama_C_char_interval
-[eva] computing for function Frama_C_short_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:344.
-[eva] Done for function Frama_C_short_interval
-[eva] computing for function Frama_C_long_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:347.
-[eva] Done for function Frama_C_long_interval
-[eva] computing for function Frama_C_long_long_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:352.
-[eva] Done for function Frama_C_long_long_interval
-[eva] computing for function Frama_C_intmax_t_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:356.
-[eva] Done for function Frama_C_intmax_t_interval
-[eva] computing for function Frama_C_size_t_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:359.
-[eva] Done for function Frama_C_size_t_interval
-[eva] computing for function Frama_C_ptrdiff_t_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:363.
-[eva] Done for function Frama_C_ptrdiff_t_interval
-[eva] computing for function Frama_C_unsigned_int_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:374.
-[eva] Done for function Frama_C_unsigned_int_interval
-[eva] computing for function Frama_C_unsigned_char_interval <- vfscanf <- 
-                          vscanf <- caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:378.
-[eva] Done for function Frama_C_unsigned_char_interval
-[eva] computing for function Frama_C_unsigned_short_interval <- vfscanf <- 
-                          vscanf <- caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:382.
-[eva] Done for function Frama_C_unsigned_short_interval
-[eva] computing for function Frama_C_unsigned_long_interval <- vfscanf <- 
-                          vscanf <- caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:386.
-[eva] Done for function Frama_C_unsigned_long_interval
-[eva] computing for function Frama_C_unsigned_long_long_interval <- vfscanf <- 
-                          vscanf <- caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:391.
-[eva] Done for function Frama_C_unsigned_long_long_interval
-[eva] computing for function Frama_C_uintmax_t_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:394.
-[eva] Done for function Frama_C_uintmax_t_interval
-[eva] computing for function Frama_C_size_t_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:397.
-[eva] Done for function Frama_C_size_t_interval
-[eva] computing for function Frama_C_ptrdiff_t_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:401.
-[eva] Done for function Frama_C_ptrdiff_t_interval
-[eva] computing for function Frama_C_double_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:417.
-[eva] Done for function Frama_C_double_interval
-[eva] computing for function Frama_C_char_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:435.
-[eva] Done for function Frama_C_char_interval
-[eva] computing for function Frama_C_wint_t_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:438.
-[eva] Done for function Frama_C_wint_t_interval
-[eva] computing for function Frama_C_size_t_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:450.
-[eva] Done for function Frama_C_size_t_interval
-[eva] computing for function Frama_C_make_unknown <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:449.
-[eva] Done for function Frama_C_make_unknown
-[eva] computing for function Frama_C_size_t_interval <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:455.
-[eva] Done for function Frama_C_size_t_interval
-[eva] computing for function Frama_C_make_unknown_wchar <- vfscanf <- vscanf <- 
-                          caller_stub_for_vscanf <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:454.
-[eva] Done for function Frama_C_make_unknown_wchar
-[eva] Recording results for vfscanf
-[eva] Done for function vfscanf
-[eva] Recording results for vscanf
-[eva] Done for function vscanf
-[eva] Recording results for caller_stub_for_vscanf
-[eva] Done for function caller_stub_for_vscanf
-[eva:alarm] stdio_c.c:68: Warning: check got status unknown.
-[eva:alarm] stdio_c.c:69: Warning: check got status unknown.
-[eva] stdio_c.c:70: 
-  Frama_C_show_each_must_be_reachable:
-  [-2147483648..2147483647],
-  {{ &vscanf_c }},
-  {{ &vscanf_Ld }},
-  [--..--] or UNINITIALIZED,
-  [-2147483648..2147483647],
-  [-9223372036854775808..9223372036854775807],
-  [0..4294967295]
 [eva] Recording results for main
 [eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
@@ -1083,7 +382,7 @@
   __fc_heap_status ∈ [--..--]
   __fc_errno ∈ [--..--]
   Frama_C_entropy_source ∈ [--..--]
-  buf ∈ {{ NULL ; (void *)&__malloc_fmemopen_l219 }}
+  buf ∈ {{ NULL ; (void *)&__malloc_fmemopen_l209 }}
   __retres ∈ {{ NULL ; &__fc_fopen + [0..120],0%8 }}
 [eva:final-states] Values at end of function getline:
   __fc_heap_status ∈ [--..--]
@@ -1091,20 +390,20 @@
   Frama_C_entropy_source ∈ [--..--]
   cur ∈ [0..2147483647] or UNINITIALIZED
   line ∈
-      {{ NULL ; &__malloc_w_getline_l63[0] ; &__realloc_w_getline_l94[0] }}
+      {{ NULL ; &__malloc_w_getline_l53[0] ; &__realloc_w_getline_l84[0] }}
   len ∈ [0..2147483647]
   __retres ∈ [-1..2147483646]
-  __malloc_w_getline_l63[0..1] ∈ [--..--] or UNINITIALIZED
-  __realloc_w_getline_l94[0..2147483645] ∈ [--..--] or UNINITIALIZED
+  __malloc_w_getline_l53[0..1] ∈ [--..--] or UNINITIALIZED
+  __realloc_w_getline_l84[0..2147483645] ∈ [--..--] or UNINITIALIZED
                          [2147483646] ∈ {0} or UNINITIALIZED
 [eva:final-states] Values at end of function vasprintf:
   __fc_heap_status ∈ [--..--]
   __fc_errno ∈ [--..--]
   Frama_C_entropy_source ∈ [--..--]
   len ∈ [1..256]
-  s ∈ {{ NULL ; &__malloc_vasprintf_l112[0] }}
+  s ∈ {{ NULL ; &__malloc_vasprintf_l102[0] }}
   __retres ∈ [-1..256]
-  __malloc_vasprintf_l112[0..254] ∈ [--..--] or UNINITIALIZED
+  __malloc_vasprintf_l102[0..254] ∈ [--..--] or UNINITIALIZED
                          [255] ∈ {0} or UNINITIALIZED
 [eva:final-states] Values at end of function asprintf:
   __fc_heap_status ∈ [--..--]
@@ -1112,42 +411,9 @@
   Frama_C_entropy_source ∈ [--..--]
   args ∈ {{ &__va_args[0] }}
   res ∈ [-1..256]
-  s ∈ {{ NULL ; &__malloc_vasprintf_l112[0] }}
-  __malloc_vasprintf_l112[0..254] ∈ [--..--] or UNINITIALIZED
+  s ∈ {{ NULL ; &__malloc_vasprintf_l102[0] }}
+  __malloc_vasprintf_l102[0..254] ∈ [--..--] or UNINITIALIZED
                          [255] ∈ {0} or UNINITIALIZED
-[eva:final-states] Values at end of function vfscanf:
-  Frama_C_entropy_source ∈ [--..--]
-  arg ∈ {{ &__va_args_39{[0], [1], [2], [3], [4], [5], [6], [7]} }}
-  p ∈ {{ "%+d %-2c % 41.999Lf %s %ti %jx %zu" + [2..34] }}
-  conversion_counter ∈ [--..--]
-  vscanf_d ∈ [--..--] or UNINITIALIZED
-  vscanf_c ∈ [--..--] or UNINITIALIZED
-  vscanf_Ld ∈ [--..--] or UNINITIALIZED
-  vscanf_s[0..29] ∈ [--..--] or UNINITIALIZED
-  vscanf_t ∈ [--..--] or UNINITIALIZED
-  vscanf_j ∈ [--..--] or UNINITIALIZED
-  vscanf_z ∈ [--..--] or UNINITIALIZED
-  __retres ∈ [-128..127]
-[eva:final-states] Values at end of function vscanf:
-  Frama_C_entropy_source ∈ [--..--]
-  vscanf_d ∈ [--..--] or UNINITIALIZED
-  vscanf_c ∈ [--..--] or UNINITIALIZED
-  vscanf_Ld ∈ [--..--] or UNINITIALIZED
-  vscanf_s[0..29] ∈ [--..--] or UNINITIALIZED
-  vscanf_t ∈ [--..--] or UNINITIALIZED
-  vscanf_j ∈ [--..--] or UNINITIALIZED
-  vscanf_z ∈ [--..--] or UNINITIALIZED
-[eva:final-states] Values at end of function caller_stub_for_vscanf:
-  Frama_C_entropy_source ∈ [--..--]
-  vscanf_d ∈ [--..--] or UNINITIALIZED
-  vscanf_c ∈ [--..--] or UNINITIALIZED
-  vscanf_Ld ∈ [--..--] or UNINITIALIZED
-  vscanf_s[0..29] ∈ [--..--] or UNINITIALIZED
-  vscanf_t ∈ [--..--] or UNINITIALIZED
-  vscanf_j ∈ [--..--] or UNINITIALIZED
-  vscanf_z ∈ [--..--] or UNINITIALIZED
-  args ∈ {{ &__va_args_39[0] }}
-  res ∈ [-128..127]
 [eva:final-states] Values at end of function main:
   __fc_heap_status ∈ [--..--]
   __fc_errno ∈ [--..--]
@@ -1157,7 +423,7 @@
                      .__fc_FILE_data ∈ [--..--]
   stream ∈ {{ NULL ; &__fc_fopen + [0..120],0%8 }}
   line ∈
-      {{ NULL ; &__malloc_w_getline_l63[0] ; &__realloc_w_getline_l94[0] }} or ESCAPINGADDR
+      {{ NULL ; &__malloc_w_getline_l53[0] ; &__realloc_w_getline_l84[0] }} or ESCAPINGADDR
   len ∈ [0..2147483647]
   total_len ∈ [--..--]
   read ∈ {-1} or UNINITIALIZED
@@ -1165,31 +431,9 @@
   buf[0..8] ∈ [--..--] or UNINITIALIZED
      [9] ∈ {0} or UNINITIALIZED
   r_1 ∈ {{ NULL ; &buf[0] }} or UNINITIALIZED
-  vscanf_d ∈ [--..--] or UNINITIALIZED
-  vscanf_c ∈ [--..--] or UNINITIALIZED
-  vscanf_Ld ∈ [--..--] or UNINITIALIZED
-  vscanf_s[0..29] ∈ [--..--] or UNINITIALIZED
-  vscanf_t ∈ [--..--] or UNINITIALIZED
-  vscanf_j ∈ [--..--] or UNINITIALIZED
-  vscanf_z ∈ [--..--] or UNINITIALIZED
-  vscanf_res ∈ [-128..127] or UNINITIALIZED
-  __va_arg0_31 ∈ {{ &vscanf_d }} or UNINITIALIZED
-  __va_arg1 ∈ {{ &vscanf_c }} or UNINITIALIZED
-  __va_arg2 ∈ {{ &vscanf_Ld }} or UNINITIALIZED
-  __va_arg3 ∈ {{ &vscanf_s[0] }} or UNINITIALIZED
-  __va_arg4 ∈ {{ &vscanf_t }} or UNINITIALIZED
-  __va_arg5 ∈ {{ &vscanf_j }} or UNINITIALIZED
-  __va_arg6 ∈ {{ &vscanf_z }} or UNINITIALIZED
-  __va_args_39[0] ∈ {{ (void *)&__va_arg0_31 }} or UNINITIALIZED
-              [1] ∈ {{ (void *)&__va_arg1 }} or UNINITIALIZED
-              [2] ∈ {{ (void *)&__va_arg2 }} or UNINITIALIZED
-              [3] ∈ {{ (void *)&__va_arg3 }} or UNINITIALIZED
-              [4] ∈ {{ (void *)&__va_arg4 }} or UNINITIALIZED
-              [5] ∈ {{ (void *)&__va_arg5 }} or UNINITIALIZED
-              [6] ∈ {{ (void *)&__va_arg6 }} or UNINITIALIZED
   __retres ∈ {0; 1}
-  __malloc_w_getline_l63[0..1] ∈ [--..--] or UNINITIALIZED
-  __realloc_w_getline_l94[0..2147483645] ∈ [--..--] or UNINITIALIZED
+  __malloc_w_getline_l53[0..1] ∈ [--..--] or UNINITIALIZED
+  __realloc_w_getline_l84[0..2147483645] ∈ [--..--] or UNINITIALIZED
                          [2147483646] ∈ {0} or UNINITIALIZED
-  __malloc_vasprintf_l112[0..254] ∈ [--..--] or UNINITIALIZED
+  __malloc_vasprintf_l102[0..254] ∈ [--..--] or UNINITIALIZED
                          [255] ∈ {0} or UNINITIALIZED

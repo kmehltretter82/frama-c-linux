@@ -77,7 +77,9 @@ let unsupported_specifications =
     "unsetenv", "stdlib.c";
     "vasprintf", "stdio.c";
     "vfscanf", "stdio.c";
+    "vfwscanf", "wchar.c";
     "vscanf", "stdio.c";
+    "vwscanf", "wchar.c";
     "wcsdup", "wchar.c";
     "raise", "signal.c";
     "rawmemchr", "string.c";

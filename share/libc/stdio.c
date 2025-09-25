@@ -223,12 +223,11 @@ FILE *fmemopen(void *restrict buf, size_t size,
 }
 
 #include "stdarg.h"
+#include "__fc_scanf_stub_helper.h"
 
-enum length_modifier {
-  NONE, HH, H, L, LL, J, Z, T, UPPER_L
-};
-
-int vfscanf(FILE * restrict stream, const char * restrict format, va_list arg) {
+// Internal function used by v*scanf; we never look at the actual "source"
+// (string, FILE* or stdin)
+int __fc_v_scanf(const char * restrict format, va_list arg) {
   const char *p = format;
   char conversion_counter = 0;
   while (*p) {
@@ -487,8 +486,43 @@ int vfscanf(FILE * restrict stream, const char * restrict format, va_list arg) {
   return conversion_counter;
 }
 
+int _scanf_possible_errors[] = {
+  EAGAIN,
+  EBADF,
+  EILSEQ,
+  EINTR,
+  EINVAL,
+  EIO,
+  ENOMEM,
+  ENXIO,
+  EOVERFLOW,
+};
+
+#define N_SCANF_ERRORS (sizeof(_scanf_possible_errors)/sizeof(int))
+
+int vfscanf(FILE * restrict stream, const char * restrict format, va_list arg) {
+  if (Frama_C_interval(0, 1)) { // simulate an error
+    errno = _scanf_possible_errors[Frama_C_interval(0, N_SCANF_ERRORS-1)];
+    return EOF;
+  }
+  return __fc_v_scanf(format, arg);
+}
+
 int vscanf(const char * restrict format, va_list arg) {
-  return vfscanf(__fc_stdin, format, arg);
+  if (Frama_C_interval(0, 1)) { // simulate an error
+    errno = _scanf_possible_errors[Frama_C_interval(0, N_SCANF_ERRORS-1)];
+    return EOF;
+  }
+  return __fc_v_scanf(format, arg);
+}
+
+int vsscanf(const char * restrict str, const char * restrict format, va_list arg) {
+  //@ check valid_read_string(str);
+  if (Frama_C_interval(0, 1)) { // simulate an error
+    errno = _scanf_possible_errors[Frama_C_interval(0, N_SCANF_ERRORS-1)];
+    return EOF;
+  }
+  return __fc_v_scanf(format, arg);
 }
 
 char __fc_tmpnam[L_tmpnam];

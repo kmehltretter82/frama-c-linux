@@ -15,6 +15,7 @@
 #include "__fc_define_fd_set_t.h"
 #include "__fc_define_fs_cnt.h"
 #include "__fc_define_timeval.h"
+#include "__fc_file.c"
 #include "__fc_gcc_builtins.h"
 #include "__fc_integer.h"
 #include "__fc_select.h"

@@ -26,6 +26,15 @@
   __fc_initial_stderr.__fc_FILE_id ∈ {2}
                      .__fc_FILE_data ∈ {0}
   __fc_initial_stdin ∈ {0}
+  _scanf_possible_errors[0] ∈ {11}
+                        [1] ∈ {9}
+                        [2] ∈ {84}
+                        [3] ∈ {4}
+                        [4] ∈ {22}
+                        [5] ∈ {5}
+                        [6] ∈ {12}
+                        [7] ∈ {6}
+                        [8] ∈ {75}
   curr ∈ UNINITIALIZED
   head ∈ {0}
   i ∈ {1}
@@ -60,6 +69,15 @@
   __fc_initial_stderr.__fc_FILE_id ∈ {2}
                      .__fc_FILE_data ∈ {0}
   __fc_initial_stdin ∈ {0}
+  _scanf_possible_errors[0] ∈ {11}
+                        [1] ∈ {9}
+                        [2] ∈ {84}
+                        [3] ∈ {4}
+                        [4] ∈ {22}
+                        [5] ∈ {5}
+                        [6] ∈ {12}
+                        [7] ∈ {6}
+                        [8] ∈ {75}
   curr ∈ {{ (item *)&MEMORY }}
   head ∈ {0}
   i ∈ {1}
@@ -88,6 +106,15 @@
   __fc_initial_stderr.__fc_FILE_id ∈ {2}
                      .__fc_FILE_data ∈ {0}
   __fc_initial_stdin ∈ {0}
+  _scanf_possible_errors[0] ∈ {11}
+                        [1] ∈ {9}
+                        [2] ∈ {84}
+                        [3] ∈ {4}
+                        [4] ∈ {22}
+                        [5] ∈ {5}
+                        [6] ∈ {12}
+                        [7] ∈ {6}
+                        [8] ∈ {75}
   curr ∈ {{ (item *)&MEMORY }} or UNINITIALIZED
   head ∈ {{ NULL ; (item *)&MEMORY }}
   i ∈ {1; 2}
@@ -119,6 +146,15 @@
   __fc_initial_stderr.__fc_FILE_id ∈ {2}
                      .__fc_FILE_data ∈ {0}
   __fc_initial_stdin ∈ {0}
+  _scanf_possible_errors[0] ∈ {11}
+                        [1] ∈ {9}
+                        [2] ∈ {84}
+                        [3] ∈ {4}
+                        [4] ∈ {22}
+                        [5] ∈ {5}
+                        [6] ∈ {12}
+                        [7] ∈ {6}
+                        [8] ∈ {75}
   curr ∈ {{ (item *)&MEMORY{[0], [8]} }}
   head ∈ {{ NULL ; (item *)&MEMORY }}
   i ∈ {1; 2}
@@ -149,6 +185,15 @@
   __fc_initial_stderr.__fc_FILE_id ∈ {2}
                      .__fc_FILE_data ∈ {0}
   __fc_initial_stdin ∈ {0}
+  _scanf_possible_errors[0] ∈ {11}
+                        [1] ∈ {9}
+                        [2] ∈ {84}
+                        [3] ∈ {4}
+                        [4] ∈ {22}
+                        [5] ∈ {5}
+                        [6] ∈ {12}
+                        [7] ∈ {6}
+                        [8] ∈ {75}
   curr ∈ {{ (item *)&MEMORY{[0], [8]} }} or UNINITIALIZED
   head ∈ {{ NULL ; (item *)&MEMORY{[0], [8]} }}
   i ∈ {1; 2; 3}
@@ -183,6 +228,15 @@
   __fc_initial_stderr.__fc_FILE_id ∈ {2}
                      .__fc_FILE_data ∈ {0}
   __fc_initial_stdin ∈ {0}
+  _scanf_possible_errors[0] ∈ {11}
+                        [1] ∈ {9}
+                        [2] ∈ {84}
+                        [3] ∈ {4}
+                        [4] ∈ {22}
+                        [5] ∈ {5}
+                        [6] ∈ {12}
+                        [7] ∈ {6}
+                        [8] ∈ {75}
   curr ∈ {{ (item *)&MEMORY{[0], [8], [16]} }}
   head ∈ {{ NULL ; (item *)&MEMORY{[0], [8]} }}
   i ∈ {1; 2; 3}
@@ -215,6 +269,15 @@
   __fc_initial_stderr.__fc_FILE_id ∈ {2}
                      .__fc_FILE_data ∈ {0}
   __fc_initial_stdin ∈ {0}
+  _scanf_possible_errors[0] ∈ {11}
+                        [1] ∈ {9}
+                        [2] ∈ {84}
+                        [3] ∈ {4}
+                        [4] ∈ {22}
+                        [5] ∈ {5}
+                        [6] ∈ {12}
+                        [7] ∈ {6}
+                        [8] ∈ {75}
   curr ∈ {{ (item *)&MEMORY{[0], [8], [16]} }} or UNINITIALIZED
   head ∈ {{ NULL ; (item *)&MEMORY{[0], [8], [16]} }}
   i ∈ [1..10]
@@ -251,6 +314,15 @@
   __fc_initial_stderr.__fc_FILE_id ∈ {2}
                      .__fc_FILE_data ∈ {0}
   __fc_initial_stdin ∈ {0}
+  _scanf_possible_errors[0] ∈ {11}
+                        [1] ∈ {9}
+                        [2] ∈ {84}
+                        [3] ∈ {4}
+                        [4] ∈ {22}
+                        [5] ∈ {5}
+                        [6] ∈ {12}
+                        [7] ∈ {6}
+                        [8] ∈ {75}
   curr ∈ {{ (item *)&MEMORY{[0], [8], [16], [24]} }}
   head ∈ {{ NULL ; (item *)&MEMORY{[0], [8], [16]} }}
   i ∈ [1..10]
@@ -285,6 +357,15 @@
   __fc_initial_stderr.__fc_FILE_id ∈ {2}
                      .__fc_FILE_data ∈ {0}
   __fc_initial_stdin ∈ {0}
+  _scanf_possible_errors[0] ∈ {11}
+                        [1] ∈ {9}
+                        [2] ∈ {84}
+                        [3] ∈ {4}
+                        [4] ∈ {22}
+                        [5] ∈ {5}
+                        [6] ∈ {12}
+                        [7] ∈ {6}
+                        [8] ∈ {75}
   curr ∈ {{ (item *)&MEMORY{[0], [8], [16], [24]} }} or UNINITIALIZED
   head ∈ {{ NULL ; (item *)&MEMORY{[0], [8], [16], [24]} }}
   i ∈ [1..10]
@@ -323,6 +404,15 @@
   __fc_initial_stderr.__fc_FILE_id ∈ {2}
                      .__fc_FILE_data ∈ {0}
   __fc_initial_stdin ∈ {0}
+  _scanf_possible_errors[0] ∈ {11}
+                        [1] ∈ {9}
+                        [2] ∈ {84}
+                        [3] ∈ {4}
+                        [4] ∈ {22}
+                        [5] ∈ {5}
+                        [6] ∈ {12}
+                        [7] ∈ {6}
+                        [8] ∈ {75}
   curr ∈ {{ (item *)&MEMORY{[0], [8], [16], [24], [32]} }}
   head ∈ {{ NULL ; (item *)&MEMORY{[0], [8], [16], [24]} }}
   i ∈ [1..10]
@@ -359,6 +449,15 @@
   __fc_initial_stderr.__fc_FILE_id ∈ {2}
                      .__fc_FILE_data ∈ {0}
   __fc_initial_stdin ∈ {0}
+  _scanf_possible_errors[0] ∈ {11}
+                        [1] ∈ {9}
+                        [2] ∈ {84}
+                        [3] ∈ {4}
+                        [4] ∈ {22}
+                        [5] ∈ {5}
+                        [6] ∈ {12}
+                        [7] ∈ {6}
+                        [8] ∈ {75}
   curr ∈ {{ &MEMORY + [0..1016],0%8 }} or UNINITIALIZED
   head ∈ {{ NULL ; &MEMORY + [0..1016],0%8 }}
   i ∈ [1..10]
@@ -399,6 +498,15 @@
   __fc_initial_stderr.__fc_FILE_id ∈ {2}
                      .__fc_FILE_data ∈ {0}
   __fc_initial_stdin ∈ {0}
+  _scanf_possible_errors[0] ∈ {11}
+                        [1] ∈ {9}
+                        [2] ∈ {84}
+                        [3] ∈ {4}
+                        [4] ∈ {22}
+                        [5] ∈ {5}
+                        [6] ∈ {12}
+                        [7] ∈ {6}
+                        [8] ∈ {75}
   curr ∈ {{ NULL ; &MEMORY + [0..1008],0%8 }}
   head ∈ {{ NULL ; &MEMORY + [0..1016],0%8 }}
   i ∈ [1..10]
@@ -681,6 +789,15 @@
   __fc_initial_stderr.__fc_FILE_id ∈ {2}
                      .__fc_FILE_data ∈ {0}
   __fc_initial_stdin ∈ {0}
+  _scanf_possible_errors[0] ∈ {11}
+                        [1] ∈ {9}
+                        [2] ∈ {84}
+                        [3] ∈ {4}
+                        [4] ∈ {22}
+                        [5] ∈ {5}
+                        [6] ∈ {12}
+                        [7] ∈ {6}
+                        [8] ∈ {75}
   curr ∈ {{ &MEMORY + [0..1016],0%8 }} or UNINITIALIZED
   head ∈ {{ NULL ; &MEMORY + [0..1016],0%8 }}
   i ∈ [1..10]
@@ -965,6 +1082,15 @@
   __fc_initial_stderr.__fc_FILE_id ∈ {2}
                      .__fc_FILE_data ∈ {0}
   __fc_initial_stdin ∈ {0}
+  _scanf_possible_errors[0] ∈ {11}
+                        [1] ∈ {9}
+                        [2] ∈ {84}
+                        [3] ∈ {4}
+                        [4] ∈ {22}
+                        [5] ∈ {5}
+                        [6] ∈ {12}
+                        [7] ∈ {6}
+                        [8] ∈ {75}
   curr ∈ {{ NULL ; &MEMORY + [0..1008],0%8 }}
   head ∈ {{ NULL ; &MEMORY + [0..1016],0%8 }}
   i ∈ [1..10]
@@ -1245,6 +1371,15 @@
   __fc_initial_stderr.__fc_FILE_id ∈ {2}
                      .__fc_FILE_data ∈ {0}
   __fc_initial_stdin ∈ {0}
+  _scanf_possible_errors[0] ∈ {11}
+                        [1] ∈ {9}
+                        [2] ∈ {84}
+                        [3] ∈ {4}
+                        [4] ∈ {22}
+                        [5] ∈ {5}
+                        [6] ∈ {12}
+                        [7] ∈ {6}
+                        [8] ∈ {75}
   curr ∈ {{ &MEMORY + [0..1016],0%8 }} or UNINITIALIZED
   head ∈ {{ NULL ; &MEMORY + [0..1016],0%8 }}
   i ∈ [1..10]
@@ -1529,6 +1664,15 @@
   __fc_initial_stderr.__fc_FILE_id ∈ {2}
                      .__fc_FILE_data ∈ {0}
   __fc_initial_stdin ∈ {0}
+  _scanf_possible_errors[0] ∈ {11}
+                        [1] ∈ {9}
+                        [2] ∈ {84}
+                        [3] ∈ {4}
+                        [4] ∈ {22}
+                        [5] ∈ {5}
+                        [6] ∈ {12}
+                        [7] ∈ {6}
+                        [8] ∈ {75}
   curr ∈ {{ NULL ; &MEMORY + [0..4294967288],0%8 }}
   head ∈ {{ NULL ; &MEMORY + [0..1016],0%8 }}
   i ∈ [1..10]
@@ -1810,6 +1954,15 @@
   __fc_initial_stderr.__fc_FILE_id ∈ {2}
                      .__fc_FILE_data ∈ {0}
   __fc_initial_stdin ∈ {0}
+  _scanf_possible_errors[0] ∈ {11}
+                        [1] ∈ {9}
+                        [2] ∈ {84}
+                        [3] ∈ {4}
+                        [4] ∈ {22}
+                        [5] ∈ {5}
+                        [6] ∈ {12}
+                        [7] ∈ {6}
+                        [8] ∈ {75}
   curr ∈ {{ &MEMORY + [0..1016],0%8 }} or UNINITIALIZED
   head ∈ {{ NULL ; &MEMORY + [0..1016],0%8 }}
   i ∈ [1..10]
@@ -2095,6 +2248,15 @@
   __fc_initial_stderr.__fc_FILE_id ∈ {2}
                      .__fc_FILE_data ∈ {0}
   __fc_initial_stdin ∈ {0}
+  _scanf_possible_errors[0] ∈ {11}
+                        [1] ∈ {9}
+                        [2] ∈ {84}
+                        [3] ∈ {4}
+                        [4] ∈ {22}
+                        [5] ∈ {5}
+                        [6] ∈ {12}
+                        [7] ∈ {6}
+                        [8] ∈ {75}
   curr ∈ {{ NULL ; &MEMORY + [0..4294967288],0%8 }}
   head ∈ {{ NULL ; &MEMORY + [0..1016],0%8 }}
   i ∈ [1..10]
