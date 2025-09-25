@@ -640,14 +640,14 @@ let add_under s1 s2 =
 let neg s = map_set_strict_decr Int.neg s
 
 let abs s =
-  if Int.(geq s.(0) zero)
+  if Int.(s.(0) >= zero)
   then s
-  else if Int.(leq s.(Array.length s - 1) zero)
+  else if Int.leq s.(Array.length s - 1) 0z
   then neg s
   else map Int.abs s
 
 let scale f s =
-  if Int.geq f Int.zero
+  if Int.(f >= 0z)
   then apply_bin_1_strict_incr Int.mul f s
   else apply_bin_1_strict_decr Int.mul f s
 
@@ -663,13 +663,13 @@ let scale_div ~pos f s =
     then fun a -> Int.ediv a f
     else fun a -> Int.div a f
   in
-  if Int.lt f Int.zero
+  if Int.(f < 0z)
   then map_set_decr div_f s
   else map_set_incr div_f s
 
 let scale_rem ~pos f s =
   assert (not (Int.is_zero f));
-  let f = if Int.lt f Int.zero then Int.neg f else f in
+  let f = if Int.(f < 0z) then Int.neg f else f in
   let rem_f a = if pos then Int.erem a f else Int.rem a f in
   map rem_f s
 

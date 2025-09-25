@@ -765,8 +765,8 @@ let reduce_sign t b =
 
 let reduce_bit i t b =
   let r, modu = t.rem, t.modu in
-  let power = Int.(two_power_of_int i) in (* 001000 *)
-  let mask = Int.(pred (two_power_of_int (i+1))) in (* 001111 *)
+  let power = Int.two_power_of_int i in (* 001000 *)
+  let mask = Int.pred (Int.two_power_of_int (i+1)) in (* 001111 *)
   (* Reduce bounds to the nearest satisfying bound *)
   let min = match t.min with
     | Some l when Z.testbit l i <> b ->

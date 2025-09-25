@@ -14,6 +14,63 @@ type t = Z.t
 type 'a formatter = Format.formatter -> 'a -> unit
 
 (**************************************************************************)
+(** {3 Operators} *)
+(**************************************************************************)
+
+(** This module contains all Z operators. [lsl] and [asr] are using our own
+    functions {!Integer.shift_left} and {!Integer.shift_right}.
+*)
+module Operators : sig
+  include module type of Z.Compare
+
+  val (~-): t -> t
+  (** Negation {!Z.neg}. *)
+
+  val (+): t -> t -> t
+  (** Addition {!Z.add}. *)
+
+  val (-): t -> t -> t
+  (** Subtraction {!Z.sub}. *)
+
+  val ( * ): t -> t -> t
+  (** Multiplication {!Z.mul}. *)
+
+  val (/): t -> t -> t
+  (** Truncated division {!Z.div}. *)
+
+  val (mod): t -> t -> t
+  (** Remainder {!Z.rem}. *)
+
+  val (land): t -> t -> t
+  (** Bit-wise logical and {!Z.logand}. *)
+
+  val (lor): t -> t -> t
+  (** Bit-wise logical inclusive or {!Z.logor}. *)
+
+  val (lxor): t -> t -> t
+  (** Bit-wise logical exclusive or {!Z.logxor}. *)
+
+  val (~!): t -> t
+  (** Bit-wise logical negation {!Z.lognot}. *)
+
+  val (lsl): t -> t -> t
+  (** Bit-wise shift to the left {!Integer.shift_left}. *)
+
+  val (asr): t -> t -> t
+  (** Bit-wise shift to the right {!Integer.shift_right}. *)
+
+  val ( ~$ ) : int -> t
+  (** Conversion from [int] using {!Z.of_int}. *)
+
+  val ( ** ) : t -> int -> t
+  (** Power {!Z.pow}. *)
+end
+
+(** {!Operators} module is included to have operators at top level, but still
+    allow to open only instead of {!Integer} when needed. *)
+include module type of Operators
+
+(**************************************************************************)
 (** {3 Conversions} *)
 (**************************************************************************)
 

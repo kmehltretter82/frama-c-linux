@@ -8,11 +8,6 @@
 
 include Z
 
-(* Z exports its operators at top level, we want to use the regular Stdlib ones
-   so we redefine them here. *)
-let ( + ) = Stdlib.( + )
-let ( - ) = Stdlib.( - )
-
 type 'a formatter = Format.formatter -> 'a -> unit
 
 (* ----------- *)
@@ -105,10 +100,10 @@ let bdigits = [|
 |]
 
 let pp_bin_pos fmt r = Format.pp_print_string fmt bdigits.(r)
-let pp_bin_neg fmt r = Format.pp_print_string fmt bdigits.(15-r)
+let pp_bin_neg fmt r = Format.pp_print_string fmt Stdlib.(bdigits.(15-r))
 
 let pp_hex_pos fmt r = Format.fprintf fmt "%04X" r
-let pp_hex_neg fmt r = Format.fprintf fmt "%04X" (0xFFFF-r)
+let pp_hex_neg fmt r = Format.fprintf fmt "%04X" Stdlib.(0xFFFF-r)
 
 let bmask_bin = 0xFz    (* 4 bits mask *)
 let bmask_hex = 0xFFFFz (* 64 bits mask *)
@@ -126,8 +121,8 @@ let rec pp_digits d fmt n v =
     begin
       let r = to_int_exn (logand v d.bmask) in
       let k = d.bsize in
-      pp_digits d fmt (n + k) (shift_right_trunc v k) ;
-      if gt v d.bmask || (n + k) < d.nbits
+      pp_digits d fmt Stdlib.(n + k) (shift_right_trunc v k) ;
+      if gt v d.bmask || Stdlib.(n + k) < d.nbits
       then Format.pp_print_string fmt d.sep ;
       d.pp fmt r ;
     end
@@ -193,6 +188,33 @@ let extract_bits ~start ~stop v =
   let r = extract v (to_int_exn start) (to_int_exn (length start stop)) in
   (*Format.printf "%a[%a..%a]=%a@\n" pretty v pretty start pretty stop pretty r;*)
   r
+
+(* --------- *)
+(* Operators *)
+(* --------- *)
+
+(* Operators are at toplevel but we want to be able to have them without
+   openning everything, so we create an additionnal module. *)
+module Operators = struct
+  include Compare
+  let ( ~- ) = ( ~- )
+  let ( + ) = ( + )
+  let ( - ) = ( - )
+  let ( * ) = ( * )
+  let ( / ) = ( / )
+  let ( mod )  = ( mod )
+  let ( land ) = ( land )
+  let ( lor )  = ( lor )
+  let ( lxor ) = ( lxor )
+  let ( ~! )  = ( ~! )
+  let ( lsl ) = shift_left
+  let ( asr ) = shift_right
+  let ( ~$ ) = ( ~$ )
+  let ( ** ) = ( ** )
+end
+
+(* We want our own shift operators and relationnal operators at top level. *)
+include Operators
 
 (* Deprecated *)
 

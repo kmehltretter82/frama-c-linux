@@ -384,9 +384,7 @@ let get_valid_pragma_pack_alignment n =
     true, None
   end
   else begin
-    let valid = Integer.(equal n 1z || equal n 2z || equal n 4z ||
-                         equal n 8z || equal n 16z)
-    in
+    let valid = Integer.( n = 1z || n = 2z || n = 4z || n = 8z || n = 16z ) in
     if not valid then
       Kernel.warning ~current:true "ignoring invalid packing alignment (%a)"
         Integer.pretty n;
@@ -1370,7 +1368,7 @@ let checkBool (ot : typ) (_ : exp) =
 let rec isConstTrueFalse c: [ `CTrue | `CFalse ] =
   match c with
   | CInt64 (n,_,_) ->
-    if Integer.equal n Integer.zero then `CFalse else `CTrue
+    if Integer.( n = 0z ) then `CFalse else `CTrue
   | CChr c ->
     if Char.code c = 0 then `CFalse else `CTrue
   | CReal(f, _, _) ->
