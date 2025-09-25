@@ -1,7 +1,7 @@
-{ mk_tests, frama-c-nocover } :
+{ mk_tests, frama-c-no-cover } :
 
 let mk_tests_distrib = mk_tests.override {
-  frama-c = frama-c-nocover ;
+  frama-c = frama-c-no-cover ;
 }; in
 mk_tests_distrib {
   cover = false ;

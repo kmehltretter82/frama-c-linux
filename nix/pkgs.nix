@@ -7,6 +7,7 @@ let
     combinetura = oself.callPackage ./combinetura.nix {};
     dolmen = oself.callPackage ./dolmen.nix {};
     mlmpfr = oself.callPackage ./mlmpfr.nix {};
+    ppxlib = oself.callPackage ./ppxlib.nix {};
     why3 = oself.callPackage ./why3.nix {
       coqPackages = pkgs.coqPackages_8_19 ;
     };
@@ -25,13 +26,12 @@ let
 
     # Builds
     frama-c = oself.callPackage ./frama-c.nix {};
-    frama-c-no-cover = oself.callPackage ./frama-c.nix { cover = false ; };
     frama-c-hdrck = oself.callPackage ./frama-c-hdrck.nix {};
     frama-c-lint = oself.callPackage ./frama-c-lint.nix {};
 
     # Tests
     default-config-tests = oself.callPackage ./default-config-tests.nix {
-      frama-c-nocover = oself.frama-c.override {
+      frama-c-no-cover = oself.frama-c.override {
         cover = false ;
       } ;
     };
