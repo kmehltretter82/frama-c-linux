@@ -21,72 +21,6 @@ module Space (Field : Field.S) = struct
 
 
 
-  type 'n row = Format.formatter -> 'n finite -> unit
-  let pretty (type n m) (row : n row) fmt (M m : (n, m) matrix) =
-    let cut () = Format.pp_print_cut fmt () in
-    let first () =
-      Format.fprintf fmt "@[<h>%a@]" (Unicode.pp_ceil row) Finite.first
-    in
-    let mid i = Format.fprintf fmt "@[<h>|%a|@]" row i in
-    let last () =
-      Format.fprintf fmt "@[<h>%a@]" (Unicode.pp_floor row) Finite.(last m.rows)
-    in
-    let row i () =
-      if Finite.(i = first) then first ()
-      else if Finite.(i = last m.rows) then (cut () ; last ())
-      else (cut () ; mid i)
-    in
-    Format.pp_open_vbox fmt 0 ;
-    Finite.for_each row m.rows () ;
-    Format.pp_close_box fmt ()
-
-
-
-  module Vector = struct
-
-    let pretty_row (type n) fmt (M { data ; _ } : n vector) =
-      Format.pp_open_hbox fmt () ;
-      Parray.pretty ~sep:"@ " Field.pretty fmt data ;
-      Format.pp_close_box fmt ()
-
-    let init size f =
-      let data = Parray.init (Nat.to_int size) (fun _ -> Field.zero) in
-      let set i data = Parray.set data (Finite.to_int i) (f i) in
-      let data = Finite.for_each set size data in
-      M { data ; rows = size ; cols = Nat.one }
-
-    let size (type n) (M vector : n vector) : n nat = vector.rows
-    let repeat n size = init size (fun _ -> n)
-    let zero size = repeat Field.zero size
-
-    let get (type n) (i : n finite) (M vec : n vector) : scalar =
-      Parray.get vec.data (Finite.to_int i)
-
-    let pretty (type n) fmt (vector : n vector) =
-      let get fmt (i : n finite) = Field.pretty fmt (get i vector) in
-      pretty get fmt vector
-
-    let set (type n) (i : n finite) scalar (M vec : n vector) : n vector =
-      M { vec with data = Parray.set vec.data (Finite.to_int i) scalar }
-
-    let norm (type n) (v : n vector) : scalar =
-      let max i r = Field.(max (abs (get i v)) r) in
-      Finite.for_each max (size v) Field.zero
-
-    let ( * ) (type n) (l : n vector) (r : n vector) =
-      let inner i acc = Field.(acc + get i l * get i r) in
-      Finite.for_each inner (size l) Field.zero
-
-    let max (type n) (M l : n vector) (M r : n vector) : n vector =
-      init l.rows @@ fun i -> Field.max (get i (M l)) (get i (M r))
-
-    let base (type n) (i : n succ finite) (dimension : n succ nat) =
-      zero dimension |> set i Field.one
-
-  end
-
-
-
   module Matrix = struct
 
     let index cols i j = i * Nat.to_int cols + j
@@ -100,15 +34,36 @@ module Space (Field : Field.S) = struct
       let data = Parray.set m.data (index m.cols i j) num in
       M { m with data }
 
-    let row row (M m) = Vector.init m.cols @@ fun i -> get row i (M m)
-    let col col (M m) = Vector.init m.rows @@ fun i -> get i col (M m)
+    let dimensions (type n m) (M m : (n, m) matrix) : n nat * m nat =
+      m.rows, m.cols
 
-    let dimensions : type n m. (n, m) matrix -> n nat * m nat =
-      fun (M m) -> m.rows, m.cols
 
-    let pretty (type n m) fmt (M m : (n, m) matrix) =
-      let row fmt i = Vector.pretty_row fmt (row i (M m)) in
-      pretty row fmt (M m)
+    type ('n, 'm) formatter = ('n, 'm) matrix Pretty_utils.formatter
+    type ('n, 'm) boxing = ('n, 'm) formatter -> ('n, 'm) formatter
+
+    let boxing : type n m. n finite -> n nat -> (n, m) boxing = fun i rows ->
+      let i = Finite.to_int i and rows = Nat.to_int rows in
+      let pp_vec pp fmt v = Format.fprintf fmt "[%a]" pp v in
+      if Stdlib.(i < 0 || rows < 1) then assert false
+      else if Stdlib.(i == 0 && rows == 1) then pp_vec
+      else if Stdlib.(i == 0) then Unicode.pp_ceil
+      else if Stdlib.(i == rows - 1) then Unicode.pp_floor
+      else (fun pp fmt v -> Format.fprintf fmt "|%a|" pp v)
+
+    let pp_row_unboxed : type n m. n finite -> (n, m) formatter = fun i fmt (M m) ->
+      let scalar fmt j = Field.pretty fmt (get i j (M m)) in
+      let spacer fmt j = if j != last m.cols then Format.fprintf fmt " ; " in
+      let pp_elt j () = Format.fprintf fmt "%a%a" scalar j spacer j in
+      Finite.for_each pp_elt m.cols ()
+
+    let pp_row : type n m. n finite -> (n, m) formatter = fun i fmt (M m) ->
+      boxing i m.rows (pp_row_unboxed i) fmt (M m)
+
+    let pretty : type n m. (n, m) formatter = fun fmt (M m) ->
+      let cut fmt i = if i != last m.rows then Format.pp_print_cut fmt () in
+      let row i () = Format.fprintf fmt "@[<h>%a@]%a" (pp_row i) (M m) cut i in
+      Finite.for_each row m.rows ()
+
 
     let init n m init =
       let rows = Nat.to_int n and cols = Nat.to_int m in
@@ -120,9 +75,6 @@ module Space (Field : Field.S) = struct
 
     let zero n m = init n m (fun _ _ -> Field.zero)
     let id n = Finite.for_each (fun i m -> set i i Field.one m) n (zero n n)
-
-    let shift n = init n n @@ fun row col ->
-      if Finite.(col = (prev row |> weaken)) then Field.one else Field.zero
 
     let transpose : type n m. (n, m) matrix -> (m, n) matrix =
       fun (M m) -> init m.cols m.rows (fun j i -> get i j (M m))
@@ -139,41 +91,34 @@ module Space (Field : Field.S) = struct
 
     type ('n, 'm, 'p) mul = ('n, 'm) matrix -> ('m, 'p) matrix -> ('n, 'p) matrix
     let ( * ) : type n m p. (n, m, p) mul = fun (M l) (M r) ->
-      let ( * ) i j = Vector.(row i (M l) * col j (M r)) in
-      init l.rows r.cols ( * )
+      let n = l.rows and m = l.cols and p = r.cols in
+      let folder i k j acc = Field.(get i j (M l) * get j k (M r) + acc) in
+      let elt i k = Finite.for_each (folder i k) m Field.zero in
+      init n p elt
 
-    let ( ** ) : type n m. scalar -> (n, m) matrix -> (n, m) matrix = fun l (M m) ->
-      M { m with data = Parray.map (fun c -> Field.(l * c)) m.data }
+    let ( ** ) : type n m. scalar -> (n, m) matrix -> (n, m) matrix =
+      fun l (M m) -> M { m with data = Parray.map (Field.( * ) l) m.data }
+
+    let abs : type n m. (n, m) matrix -> (n, m) matrix =
+      fun (M m) -> M { m with data = Parray.map Field.abs m.data }
+
+    let all_components_lower_than l r =
+      let rows, cols = dimensions l in
+      let lower i j acc = acc && Field.(get i j l < get i j r) in
+      let do_row i = Finite.for_each (lower i) cols in
+      Finite.for_each do_row rows true
 
     let norm_inf : type n m. (n, m) matrix -> scalar = fun (M m) ->
-      let add v j r = Field.(abs (Vector.get j v) + r) in
-      let sum v = Finite.for_each (add v) (Vector.size v) Field.zero in
-      let max i res = Field.max res (row i (M m) |> sum) in
-      Finite.for_each max m.rows Field.zero
-
-    let norm_one : type n m. (n, m) matrix -> scalar = fun (M m) ->
-      let add v j r = Field.(abs (Vector.get j v) + r) in
-      let sum v = Finite.for_each (add v) (Vector.size v) Field.zero in
-      let max i res = Field.max res (col i (M m) |> sum) in
+      let sum j i acc = Field.(abs (get i j (M m)) + acc) in
+      let col j = Finite.for_each (sum j) m.rows Field.zero in
+      let max j res = Field.max res (col j) in
       Finite.for_each max m.cols Field.zero
 
-    let power (type n) (M m : (n, n) matrix) : int -> (n, n) matrix =
-      let n = dimensions (M m) |> fst in
-      let cache = Datatype.Int.Hashtbl.create 17 in
-      let find i = Datatype.Int.Hashtbl.find_opt cache i in
-      let save i v = Datatype.Int.Hashtbl.add cache i v ; v in
-      let rec pow e =
-        if Stdlib.(e < 0) then raise (Invalid_argument "negative exponent") ;
-        match find e with
-        | Some r -> r
-        | None when Stdlib.(e = 0) -> id n
-        | None when Stdlib.(e = 1) -> M m
-        | None -> let h = pow (e / 2) in save e (pow (e mod 2) * h * h)
-      in pow
-
-    let abs (type n m) (M m : (n, m) matrix) : (n, m) matrix =
-      M { m with data = Parray.map Field.abs m.data }
-
+    let norm_one : type n m. (n, m) matrix -> scalar = fun (M m) ->
+      let sum i j acc = Field.(abs (get i j (M m)) + acc) in
+      let row i = Finite.for_each (sum i) m.cols Field.zero in
+      let max i res = Field.max res (row i) in
+      Finite.for_each max m.rows Field.zero
 
 
     let swap_rows (M m) r r' =
@@ -262,5 +207,42 @@ module Space (Field : Field.S) = struct
       back_propagation m inverse (Finite.last size)
 
   end
+
+
+
+  module Vector = struct
+
+    let init size f =
+      let data = Parray.init (Nat.to_int size) (fun _ -> Field.zero) in
+      let set i data = Parray.set data (Finite.to_int i) (f i) in
+      let data = Finite.for_each set size data in
+      M { data ; rows = size ; cols = Nat.one }
+
+    let size (type n) (M vector : n vector) : n nat = vector.rows
+    let repeat n size = init size (fun _ -> n)
+    let zero size = repeat Field.zero size
+
+    let get (type n) (i : n finite) (M vec : n vector) : scalar =
+      Parray.get vec.data (Finite.to_int i)
+
+    let pretty (type n) fmt (vector : n vector) =
+      Matrix.(pretty fmt (transpose vector))
+
+    let set (type n) (i : n finite) scalar (M vec : n vector) : n vector =
+      M { vec with data = Parray.set vec.data (Finite.to_int i) scalar }
+
+    let norm (type n) (v : n vector) : scalar =
+      let max i r = Field.(max (abs (get i v)) r) in
+      Finite.for_each max (size v) Field.zero
+
+    let max (type n) (M l : n vector) (M r : n vector) : n vector =
+      init l.rows @@ fun i -> Field.max (get i (M l)) (get i (M r))
+
+    let base (type n) (i : n succ finite) (dimension : n succ nat) =
+      zero dimension |> set i Field.one
+
+  end
+
+
 
 end

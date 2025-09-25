@@ -77,10 +77,6 @@ module Space (Field : Field.S) : sig
     (** The call [zero n m] returns the 0 matrix in 𝕂ⁿˣᵐ. *)
     val zero : 'n succ nat -> 'm succ nat -> ('n succ, 'm succ) matrix
 
-    (** The call [shift n] returns a square matrix in 𝕂ⁿˣⁿ such as the first row
-        and the last column is all zero, and the remaining is the identity. *)
-    val shift : 'n succ nat -> ('n succ, 'n succ) matrix
-
     (** The call [get i j m] returns the coefficient of the i-th row and
         the j-th column. *)
     val get : 'n finite -> 'm finite -> ('n, 'm) matrix -> scalar
@@ -119,18 +115,17 @@ module Space (Field : Field.S) : sig
     (** Scalar multiplication. *)
     val ( ** ) : scalar -> ('n, 'm) matrix  -> ('n, 'm) matrix
 
-    (** Matrix exponentiation. The call [power m] returns a memoized function.
-        When one needs to compute several exponentiations of the same matrix,
-        one should perform the call [power m] once and used the returned
-        function each times one needs it. *)
-    val power : ('n, 'n) matrix -> (int -> ('n, 'n) matrix)
-
     (** Matrix inverse. Returns None if the input matrix is singular. *)
     val inverse : ('n, 'n) matrix -> ('n, 'n) matrix option
 
     (** The call [abs m] returns a matrix for which each coordinate is the
         absolute value of the corresponding coordinate of [m]. *)
     val abs : ('n, 'm) matrix -> ('n, 'm) matrix
+
+    (** The call [all_components_lower_than l r] return true if and only if
+        each components of [l] are lower or equal to their counterpart in [r],
+        i.e for all i and j, [get i j l] is lower or equal to [get i j r]. *)
+    val all_components_lower_than : ('n, 'm) matrix -> ('n, 'm) matrix -> bool
 
   end
 

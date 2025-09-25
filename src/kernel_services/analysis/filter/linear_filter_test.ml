@@ -9,22 +9,29 @@
 module Filter = Linear_filter.Make (Rational)
 module Linear = Filter.Linear
 module Matrix = Linear.Matrix
+module Vector = Linear.Vector
 
-let max_exponent = 200
 let fin size n = Finite.of_int size n |> Option.get
 let set row col i j n = Linear.Matrix.set (fin row i) (fin col j) n
 
-let pretty_bounds invariant fmt i =
-  let l, u = Filter.bounds i invariant in
-  Format.fprintf fmt "@[<h>[%a .. %a]@]" Rational.pretty l Rational.pretty u
+let pretty_limit invariant fmt i =
+  let permanent = invariant.Filter.permanent in
+  let lower = Vector.get i permanent.Field.lower in
+  let upper = Vector.get i permanent.Field.upper in
+  Format.fprintf fmt "@[<h>[%a .. %a]@]"
+    Rational.pretty lower
+    Rational.pretty upper
 
 let pretty_invariant order fmt = function
   | None -> Unicode.pp_top fmt
   | Some invariant ->
-    let pp f i = pretty_bounds invariant f i in
+    let pp f i = pretty_limit invariant f i in
     let pp f i = Format.fprintf f "@[<h>* %d : %a@]@," (Finite.to_int i) pp i in
     let pretty fmt () = Finite.for_each (fun i () -> pp fmt i) order () in
-    Format.fprintf fmt "@[<v>%a@]" pretty ()
+    let transition = List.length invariant.transition in
+    Format.fprintf fmt "@[<v>" ;
+    Format.fprintf fmt "Transition duration : %d iterations@ " transition ;
+    Format.fprintf fmt "State space invariant :@ %a@]" pretty ()
 
 
 
@@ -35,31 +42,45 @@ let pretty_invariant order fmt = function
 module Circle = struct
 
   let order = Nat.(succ one)
-  let delay = Nat.one
+  let delay = Nat.(succ one)
 
-  let state =
+  let initial =
+    Vector.zero order
+    |> set order Nat.one 0 0 Rational.(of_int 1000)
+    |> set order Nat.one 1 0 Rational.(of_int  200)
+
+  let shift =
+    Vector.zero order
+
+  let measure_center =
+    Vector.zero delay
+
+  let measure_radius =
+    Vector.repeat Q.one delay
+
+  let measure_matrix =
+    Matrix.zero order delay
+    |> set order delay 0 0 Q.one
+    |> set order delay 1 1 Q.one
+
+  let state_matrix =
     Matrix.zero order order
     |> set order order 0 0 Rational.(of_float 0.68)
     |> set order order 0 1 Rational.(of_float ~-.0.68)
     |> set order order 1 0 Rational.(of_float 0.68)
     |> set order order 1 1 Rational.(of_float 0.68)
 
-  let source_1 =
-    let center = Rational.zero and deviation = Rational.one in
-    let matrix = Matrix.zero order delay |> set order delay 0 0 Rational.one in
-    Filter.source ~matrix ~center ~deviation
-
-  let source_2 =
-    let center = Rational.zero and deviation = Rational.one in
-    let matrix = Matrix.zero order delay |> set order delay 1 0 Rational.one in
-    Filter.source ~matrix ~center ~deviation
-
-  let sources = [ source_1 ; source_2 ]
-  let center = Linear.Vector.zero order
+  let filter =
+    Filter.create
+      ~initial
+      ~shift
+      ~measure_center
+      ~measure_radius
+      ~measure_matrix
+      ~state_matrix
 
   let compute () =
-    let filter = Filter.create ~state ~center ~sources in
-    let invariant = Filter.invariant filter max_exponent in
+    let invariant = Filter.behavior filter in
     Kernel.result "@[<v>Circle :@,%a@,@]" (pretty_invariant order) invariant
 
 end
@@ -75,27 +96,41 @@ module Simple = struct
   let order = Nat.(succ one)
   let delay = Nat.one
 
-  let state =
+  let initial =
+    Vector.zero order
+
+  let shift =
+    Vector.repeat Q.one order
+
+  let measure_center =
+    Vector.zero delay
+
+  let measure_radius =
+    Vector.repeat (Rational.of_float 0.1) delay
+
+  let measure_matrix =
+    Matrix.zero order delay
+    |> set order delay 0 0 Rational.one
+    |> set order delay 1 0 Rational.zero
+
+  let state_matrix =
     Matrix.zero order order
     |> set order order 0 0 Rational.(of_float 1.5)
     |> set order order 0 1 Rational.(of_float ~-.0.7)
     |> set order order 1 0 Rational.(of_float 1.)
     |> set order order 1 1 Rational.(of_float 0.)
 
-  let input =
-    Linear.Matrix.zero order delay
-    |> set order delay 0 0 Rational.one
-    |> set order delay 1 0 Rational.zero
-
-  let sources =
-    let center = Rational.zero and deviation = Rational.of_float 0.1 in
-    [ Filter.source ~matrix:input ~center ~deviation ]
-
-  let center = Linear.Vector.repeat Rational.one order
+  let filter =
+    Filter.create
+      ~initial
+      ~shift
+      ~measure_center
+      ~measure_radius
+      ~measure_matrix
+      ~state_matrix
 
   let compute () =
-    let filter = Filter.create ~state ~center ~sources in
-    let invariant = Filter.invariant filter max_exponent in
+    let invariant = Filter.behavior filter in
     Kernel.result "@[<v>Simple :@,%a@,@]" (pretty_invariant order) invariant
 
 end

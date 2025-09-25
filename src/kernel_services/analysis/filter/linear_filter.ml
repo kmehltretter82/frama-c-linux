@@ -6,262 +6,219 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* Important notations and conventions.
-
-   In all this file, the following notations are used :
+(* Notations and conventions :
    - I is the identity matrix ;
-   - S is the shift matrix, i.e an identity matrix augmented with a zero-row
-     on top and a zero column on the right ;
    - A is the filter's state matrix ;
-   - B is a source matrix. *)
+   - B is the filter's measure matrix ;
+   - S is the filter's shift ;
+   - ε is an infinite sequence of measures ;
+   - C is the center of the measures' box ;
+   - R is the radius of the measures' box ;
+   - Everytime a radius is mentionned, it is always supposed all positive ;
+   - |.| is the componentwise absolute value on matrices and vectors. *)
 
+module Make (K : Field.S) = struct
 
-
-module Make (Field : Field.S) = struct
-
-  module Linear = Linear.Space (Field)
-  open Pretty_utils
+  module Linear = Linear.Space (K)
   open Linear
-  open Nat
+
+  (* A 'n box is a 'n vector of intervals that, instead of being described as
+     'n intervals, is described as a 'n vector center and a 'n vector radius. *)
+  type 'n box = { center : 'n vector ; radius : 'n vector }
+
+  (* Utilitary functions on boxes. The radius is forced to be all positive by
+     the box constructor. Inclusion is componentwise. *)
+  module Box = struct
+    let ( < ) = Matrix.all_components_lower_than
+    let make center radius = { center ; radius = Matrix.abs radius }
+    let shift delta box = { box with center = Matrix.(box.center + delta) }
+    let lower { center ; radius } = Matrix.(center - radius)
+    let upper { center ; radius } = Matrix.(center + radius)
+    let is_included l r = lower r < lower l && upper l < upper r
+  end
 
 
 
-  (* A source describes a source of measures, for instance a specific sensor,
-     that is treated at each iteration by the filter. Measures can be centered
-     around any scalar, and are thus described by a center and a deviation. The
-     given source matrix describes how the current and past measures are taken
-     into account by the filter. *)
-  type 'n source =
-    | Source : ('n, 'm succ) source_data -> 'n source
+  (* A filter is composed of an initial state, a state related structure and
+     a measures related structure. *)
+  type ('n, 'm) filter =
+    { initial : 'n vector ; state : 'n state ; measure : ('n, 'm) measure }
 
-  and ('n, 'm) source_data =
-    { matrix : ('n, 'm) matrix
-    ; measure_center : scalar
-    ; measure_deviation : scalar
-    }
+  (* State related data are the filter's shift and its state matrix. *)
+  and 'n state =
+    { shift : 'n vector ; matrix : ('n, 'n) matrix }
 
-  (* Sources constructors. *)
-  let source (type n m) ~(matrix : (n succ, m succ) matrix) ~center ~deviation =
-    Source { matrix ; measure_center = center ; measure_deviation = deviation }
+  (* Measures related data are the measure space's box and the measure matrix. *)
+  and ('n, 'm) measure =
+    { space : 'm box ; matrix : ('n, 'm) matrix }
 
-  (* Sources pretty printer. *)
-  let pretty_source : type n. n source formatter = fun fmt (Source s) ->
-    let { matrix = m ; measure_center = c ; measure_deviation = dev } = s in
-    Format.fprintf fmt "@[<v>" ;
-    Format.fprintf fmt "Source:@ " ;
-    Format.fprintf fmt "- Measure : %a %t %a@ "
-      Field.pretty c Unicode.pp_plus_minus Field.pretty dev ;
-    Format.fprintf fmt "- Contributions :@   @[<v>%a@]@ @ " Matrix.pretty m ;
-    Format.fprintf fmt "@]"
+  (* Filter's constructor. *)
+  let create ~initial ~shift
+      ~measure_center ~measure_radius
+      ~measure_matrix ~state_matrix =
+    let state = { shift ; matrix = state_matrix } in
+    let space = Box.make measure_center measure_radius in
+    let measure = { space ; matrix = measure_matrix } in
+    { initial ; state ; measure }
 
 
 
-  (* A filter is composed of a center, a constant vector added to the state at
-     each iteration, a state matrix, describing how the current and past states
-     are taken into account, and a list of sources. *)
-  type 'n filter =
-    | Filter : 'n succ filter_data -> 'n succ filter
+  (* Let binding operator memoizing sequences' elements. *)
+  let ( let@ ) seq f = f (Seq.memoize seq)
 
-  and 'n filter_data =
-    { center  : 'n vector
-    ; state   : ('n, 'n) matrix
-    ; sources : 'n source list
-    }
+  (* Returns the first non none element of a sequence, if any. Do not terminate
+     on an infinite sequence of nones. *)
+  let first s = Option.map fst Seq.(filter_map Datatype.identity s |> uncons)
 
-  (* Filters constructor. *)
-  let create ~state ~center ~sources =
-    Filter { center ; state ; sources }
-
-  (* Filters pretty printers. *)
-  let pretty : type n. n filter formatter = fun fmt (Filter f) ->
-    let pp_sep = Format.pp_print_cut in
-    let pp_sources = Format.pp_print_list ~pp_sep pretty_source in
-    Format.fprintf fmt "@[<v>" ;
-    Format.fprintf fmt "Filter:@ @ " ;
-    Format.fprintf fmt "- Center  :@ @   @[<v>%a@]@ @ " Vector.pretty f.center ;
-    Format.fprintf fmt "- State   :@ @   @[<v>%a@]@ @ " Matrix.pretty f.state ;
-    Format.fprintf fmt "- Sources :@ @   @[<v>%a@]@ @ " pp_sources f.sources ;
-    Format.fprintf fmt "@]"
-
-
-
-  (* An extended source provides a way to compute the cumulated contribution of
-     a measure at a given iteration [t]. This contribution is computed as the
-     sum for i between 0 and [t] (both included) of A^(t-i) x B x S^i. *)
-  type 'n extended_source =
-    | Extended : ('n, 'm succ) extended_data -> 'n extended_source
-
-  and ('n, 'm) extended_data =
-    ('n, 'm) source_data * (int -> ('n, 'm) matrix)
-
-  (* The function computing the cumulated contributions is memoized. *)
-  let extend_source state (Source data) =
-    let order, delay = Matrix.dimensions data.matrix in
-    let shift = Matrix.power (Matrix.shift delay) in
-    let cache = Datatype.Int.Hashtbl.create 17 in
-    let find i = Datatype.Int.Hashtbl.find cache i in
-    let save i v = Datatype.Int.Hashtbl.add cache i v ; v in
-    let compute =
-      let rec compute t i =
-        if 0 <= i && i <= t then
-          let from_state = state (t - i) in
-          let from_shift = shift i in
-          let from_iter = Matrix.(from_state * data.matrix * from_shift) in
-          let from_previous = compute t (i + 1) in
-          Matrix.(from_iter + from_previous)
-        else Matrix.zero order delay
-      in fun t -> try find t with Not_found -> compute t 0 |> save t
-    in Extended (data, compute)
+  (* Returns the first window satisfying a given predicate until completed
+     if any. For instance, using the predicate [x < 3] and the completion
+     condition [start = length] on the sequence [5, 1, 4, 2, 3, 1, 4, ...],
+     the returned window will be { start = 3 ; length = 3 }. The function
+     stops the sequence evaluation as soon as a valid window is found.
+     Do not terminate on a infinite sequence with no valid window. *)
+  type window = { start : int ; length : int }
+  let find_window pred completed seq =
+    let exception Found of window in
+    let incr w = { w with length = w.length + 1 } in
+    let search window i data =
+      let () = Async.yield () in
+      match window with
+      | None -> if pred data then Some { start = i ; length = 1 } else None
+      | Some window when completed window -> raise (Found window)
+      | Some window -> if pred data then Some (incr window) else None
+    in
+    try Seq.fold_lefti search None seq |> ignore ; None
+    with Found window -> Some window
 
 
 
-  (* A filter's invariant is a pair of vector, the first one containing lower
-     bounds for each state variables, and the second one containing upper bounds
-     for those state variables. *)
-  type 'n invariant = 'n vector * 'n vector
-  type 'n finite = 'n Finite.finite
+  (* This function performs a dichotomy search in the interval [0 .. 1] for
+     as long as the given [duration], evaluating the given [compute] function
+     at each step and returning the last result found. The first computed
+     value is with the input one, then a half if the computation lead to
+     a result, and so on and so forth. The implementation relies on the
+     [Async] module and thus should be portable on Windows. *)
+  let rec timed_dichotomy compute duration =
+    let start = (Unix.times ()).tms_utime in
+    let elapsed_time () = (Unix.times ()).tms_utime -. start in
+    let cancel () = if elapsed_time () > duration then Async.cancel () in
+    let start () = try compute K.one with Async.Cancel -> None in
+    let job () = start () |> cancelable_dichotomy compute K.zero K.one in
+    Async.with_progress cancel job ()
 
-  (* Lower bound for a given dimension. *)
-  let lower : type n. n finite -> n invariant -> scalar = fun i (lower, _) ->
-    Linear.Matrix.get i Finite.first lower
+  (* Each dichotomy step is wrapped in a try-with that returns the last known
+     result if the exception [Async.Cancel] is catched. *)
+  and cancelable_dichotomy compute lower upper acc =
+    try dichotomy_step compute lower upper acc
+    with Async.Cancel -> acc
 
-  (* Upper bound for a given dimension. *)
-  let upper : type n. n finite -> n invariant -> scalar = fun i (_, upper) ->
-    Linear.Matrix.get i Finite.first upper
+  (* At each step, if the computation leads to a result for the half-point
+     candidate, the next step is perform on the lower half interval.
+     Conservely, if no result is obtained, the next step is perform on the
+     upper half interval. *)
+  and dichotomy_step compute lower upper acc =
+    let current = K.((upper + lower) / (of_int 2)) in
+    let () = Async.yield () in
+    match compute current with
+    | None -> cancelable_dichotomy compute current upper acc
+    | acc  -> cancelable_dichotomy compute lower current acc
 
-  (* Bounds for a given dimension. *)
-  let bounds i invariant = (lower i invariant, upper i invariant)
 
 
-
-  (* Invariant computation. The computation of the sum of all past
-     contributions, and in particuler the oldest ones, implies to check
-     if an infinite series converge and to compute its limit. This is done
-     by grouping iterations by pack of size [e] and factorizing the common
-     state matrix power. This leads to an infinite geometric series in the
-     matrix space. If the spectral radius of this matrix is strictly lower
-     than one, then the series converge and its limit at infinity can be
-     computed as (I - A^e)^(-1). *)
-  let invariant : type n. n filter -> int -> n invariant option = fun f e ->
+  (* Let n ∈ ℕ, [state_power] be A^n and [measure] be the cumulated
+     overapproximation of the n first measures represented as a box
+     of center γ and of radius σ.
+     The result of [limit state_power measure] is, assuming that the
+     norm one of A^n is strictly lower than one, an overapproximation
+     of the permanent behavior computed as the following box :
+     { center = (I - A^n)^{-1} γ ; radius = (I - |A^n|)^{-1} σ }. *)
+  let limit state_power measure =
     let open Option.Operators in
+    let norm = Matrix.norm_one state_power in
+    let n, _ = Matrix.dimensions state_power in
+    let* state_power = if K.(norm < one) then Some state_power else None in
+    let* center_shift = Matrix.(id n - state_power |> inverse) in
+    let+ radius_shift = Matrix.(id n - abs state_power |> inverse) in
+    let center = Matrix.(center_shift * measure.center) in
+    let radius = Matrix.(radius_shift * measure.radius) in
+    Box.make center radius
 
-    (* Computation of the spectral radius at the given exponent. As the power
-       computation is memoized, it will be cheap to retrieve the spectral
-       matrix later on. *)
-    let Filter f = f in
-    let state = Matrix.power f.state in
-    let* StrictlyPositive exponent = Nat.of_strictly_positive_int e in
-    let* spectral_norm =
-      let spectral_matrix = state (Nat.to_int exponent) in
-      let spectral_norm = Matrix.norm_inf spectral_matrix in
-      if Field.(spectral_norm < one) then Some spectral_norm else None
-    in
+  (* Search for the first valid unrolling stop point, returning it along
+     the permanent phase's overapproximation for which the unrolling stop
+     point is valid. *)
+  let stop_point state_powers measures abstractions max_unrolling threshold =
+    let open Option.Operators in
+    let below norm = K.(norm < threshold) in
+    (* Compute the sequence of ||A^q|| here instead of in the map_fold to
+       memoize the results. Not a huge optimization, but an easy one. *)
+    let@ norms = Seq.map Matrix.norm_one state_powers in
+    (* Simulate a map_fold using the three sequences and the iteration as
+       the propagated state. At each step, we thus check if the assumptions
+       on ||A^n|| is verified, compute the limit and check if we can find n
+       consecutive iterations that are included in the limit. We have to cut
+       the infinite sequence of abstractions here to ensure that we actually
+       try to unroll more. Indeed, there is examples where, for a given
+       iteration, there is no such window even if one can be found if we
+       unroll once more. *)
+    let folder (state_powers, measures, norms, spectral) =
+      let* state_power, state_powers = Seq.uncons state_powers in
+      let* measure, measures = Seq.uncons measures in
+      let* norm, norms = Seq.uncons norms in
+      let result =
+        if below norm && Seq.(take spectral norms |> for_all below) then
+          let* limit = limit state_power measure in
+          let completed window = spectral = window.length in
+          let is_included abstraction = Box.is_included abstraction limit in
+          let abstractions = Seq.take (spectral + max_unrolling) abstractions in
+          let+ window = find_window is_included completed abstractions in
+          window.start, limit
+        else None
+      in Some (result, (state_powers, measures, norms, spectral + 1))
+    in Seq.unfold folder (state_powers, measures, norms, 0) |> first
 
-    (* Source extended with a function computing the cumulated contributions of
-       a measure at a given iteration. Those computations are memoized to
-       improve performances. *)
-    let extended_sources = List.map (extend_source state) f.sources in
 
-    (* Recovering the maximal delay of all sources. *)
-    let* StrictlyPositive maximal_delay =
-      let delay m = Matrix.dimensions m |> snd |> Nat.to_int in
-      let max current (Source s) = Stdlib.(max current (delay s.matrix)) in
-      List.fold_left max 0 f.sources |> Nat.of_strictly_positive_int
-    in
 
-    (* To compute the invariant center, we need to invert I - Aⁿ with A the
-       state matrix and n the spectral exponent. *)
-    let order, _ = Matrix.dimensions f.state in
-    let+ invert = Matrix.(inverse (id order - state e)) in
-    let state t = state (Finite.to_int t) in
+  (* A filter behavior is described as a transition phase and a permanent
+     phase. The first one is a list of abstractions corresponding to the
+     unrolled iterations. The second is an overapproximation of the filter's
+     behavior up to infinity. *)
+  type 'n bounds = 'n vector Field.bounds
+  type 'n behavior = { transition : 'n bounds list ; permanent : 'n bounds }
 
-    (* Contribution from the filter's center. The infinite series is handled
-       as described previously. *)
-    let center_from_filter =
-      let zero = Matrix.zero order order in
-      let add_iteration_state t acc = Matrix.(acc + state t) in
-      let iterations = Finite.for_each add_iteration_state exponent zero in
-      Matrix.(invert * iterations * f.center)
-    in
-
-    (* Contribution from the sources centers. *)
-    let center_from_sources =
-      let zero = Vector.zero order in
-      let add_center_from_source acc (Extended (source, contributions)) =
-        let order, delay = Matrix.dimensions source.matrix in
-        let zero = Matrix.zero order delay in
-        let base = Vector.base Finite.first delay in
-        let measures_center = Matrix.(source.measure_center ** base) in
-        let limit = contributions (Nat.to_int maximal_delay) in
-        let contributions t = contributions (Finite.to_int t) in
-        (* Recent contributions are the M last iterations, with M the maximal
-           delay. The filter has not yet started to forget those measures. *)
-        let add_recent_contrib t acc = Matrix.(acc + contributions t) in
-        let recent = Finite.for_each add_recent_contrib maximal_delay zero in
-        (* Old contributions come from all the previous iterations, for which
-           the filter is forgetting more and more. This implies a limit
-           computation, as described previously. *)
-        let add_old_contrib t acc = Matrix.(acc + state t * limit) in
-        let old = Finite.for_each add_old_contrib exponent zero in
-        let old_at_infinity = Matrix.(invert * old) in
-        (* The measures center is factorized and taken into account. *)
-        Matrix.(acc + (recent + old_at_infinity) * measures_center)
-      in List.fold_left add_center_from_source zero extended_sources
-    in
-
-    (* Invariant's deviation. *)
-    let deviation =
-      let zero = Vector.zero order in
-      let add_dev_from_source acc (Extended (source, contributions)) =
-        let _, delay = Matrix.dimensions source.matrix in
-        let limit = contributions (Nat.to_int maximal_delay) in
-        let contributions t = contributions (Finite.to_int t) in
-        (* For recent and old contributions, we must look after the maximal
-           deviation from cumulated measures. This is what this function do,
-           based on a given function that returns how the measure at
-           iteration [t] contributes. *)
-        let base = Vector.base Finite.first delay in
-        let deviation = Field.abs source.measure_deviation in
-        let lower_measure = Matrix.(Field.neg deviation ** base) in
-        let upper_measure = Matrix.(deviation ** base) in
-        let add_contribution compute t acc =
-          let lower = Matrix.(compute t * lower_measure) in
-          let upper = Matrix.(compute t * upper_measure) in
-          Matrix.(acc + Vector.(max (abs lower) (abs upper)))
-        in
-        (* The contributions from the recent measures is simply computed by
-           accumulating each contribution multiplied by the measure producing
-           the maximal deviation. *)
-        let compute_recent_contrib = contributions in
-        let add_recent_contrib = add_contribution compute_recent_contrib in
-        let recent = Finite.for_each add_recent_contrib maximal_delay zero in
-        (* For the old contributions, we use the same factorization as described
-           previously. However, this time the common term is not independent
-           from the exponent (i.e the index of the infinite sum). However, for
-           each index [k], that common term actually behave the same, it is
-           just a matter of rewriting. Thus, by computing the maximal deviation
-           of this finite common up to rewriting term, we can actually consider
-           it as a constant and thus use the same technique as previously
-           described. *)
-        let compute_old_contrib t = Matrix.(state t * limit) in
-        let add_old_contrib = add_contribution compute_old_contrib in
-        let old = Finite.for_each add_old_contrib exponent zero in
-        (* The old contribution is raised to infinity by dividing it with the
-           scalar (1 - ||A^q||), which is the limit of the norm of the infinite
-           series. We do not use the same method as before because we observe
-           experimentaly that it produces an under approximation. Even if we do
-           not have a proof of why it is the case, our intuition is that by
-           grouping the infinite sum with our rewriting, we do introduce
-           correlations that lead to an underapproximation. Those correlations
-           are however ignored through a norm based approach and thus the
-           computation is correct. *)
-        let scale_to_infinity = Field.(one / (one - spectral_norm)) in
-        let old_at_infinity = Matrix.(scale_to_infinity ** old) in
-        Matrix.(acc + recent + old_at_infinity)
-      in List.fold_left add_dev_from_source zero extended_sources
-    in
-
-    let center = Matrix.(center_from_filter + center_from_sources) in
-    Matrix.(center - deviation, center + deviation)
+  (* Behavior computation. Comes down to build the needed sequences, then use
+     the timed dichotomic search to find the stop point and the limit. As the
+     infinite sequence of unrolled abstractions is needed to search for the
+     stop point, once it is found, we just have to gather the results. *)
+  let behavior ?(timeout = 1.0) ?(maximal_unrolling = 200) f =
+    let open Option.Operators in
+    let dim = Vector.size f.initial in
+    (* Sequence of all A^n. *)
+    let power = Matrix.( * ) f.state.matrix in
+    let@ state_powers = Seq.iterate power (Matrix.id dim) in
+    (* Sequence of all A^n × X0. *)
+    let reminder p = Matrix.(p * f.initial) in
+    let@ initial_state_reminder = Seq.map reminder state_powers in
+    (* Sequence of all ∑ A^t (B C + S) for t between 0 and n - 1. *)
+    let measure_center = Matrix.(f.measure.matrix * f.measure.space.center) in
+    let measure_center_shift = Matrix.(measure_center + f.state.shift) in
+    let next_center center p = Matrix.(center + p * measure_center_shift) in
+    let measures_center = Seq.scan next_center (Vector.zero dim) state_powers in
+    (* Sequence of all ∑ |A^t| |B| |R| for t between 0 and n - 1. *)
+    let delta = Matrix.(abs f.measure.matrix * abs f.measure.space.radius) in
+    let next_radius radius p = Matrix.(radius + abs p * delta) in
+    let measures_radius = Seq.scan next_radius (Vector.zero dim) state_powers in
+    (* Sequence of overapproximating boxes related to measures, i.e without
+       taking the initial state into account. *)
+    let@ measures = Seq.map2 Box.make measures_center measures_radius in
+    (* Sequence of complete overapproximations for each iterations, i.e
+       including the initial state contributions. *)
+    let@ abstractions = Seq.map2 Box.shift initial_state_reminder measures in
+    (* Dichotomic search of the stop point. *)
+    let search = stop_point state_powers measures abstractions in
+    let+ until, limit = timed_dichotomy (search maximal_unrolling) timeout in
+    (* Building the behavior data structure. *)
+    let bounds box = Field.{ lower = Box.lower box ; upper = Box.upper box } in
+    let transition = Seq.(take until abstractions |> map bounds) in
+    { transition = List.of_seq transition ; permanent = bounds limit }
 
 end

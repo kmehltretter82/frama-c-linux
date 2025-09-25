@@ -6,94 +6,95 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Compute filters invariants, i.e bounds for each of the filter's state
-    dimensions when the iterations goes to infinity.
+(** This module aims to provide overapproximations of the behaviors of
+    linear time-invariant (LTI) filters, for both the transition and
+    the permanent phases.
 
-    A filter corresponds to the following recursive equation :
-       {math X[t + 1] = AX[t] + ∑B(ω)ε(ω)[k + 1] + C }
+    A LTI filter corresponds to the following recursive equation :
+      {math X[t + 1] = AX[t] + Bε[t] + S}
     where :
-    - {m n} is the filter's order ;
-    - {m ω} is a measure's source (for instance, a specific sensor in a
-      cyberphysical system) ;
-    - {m m(ω)} is the delay for the source {m ω} ;
-    - {m X[t] ∈ 𝕂^n} is the filter's state at iteration [t] ;
-    - {m ε(ω)[t] ∈ 𝕂^{m(ω)}} is the measure at iteration [t] for the source {m ω} ;
-    - {m A ∈ 𝕂^{nxn}} is the filter's state matrix ;
-    - {m B(ω) ∈ 𝕂^{nxm(ω)}} is the source matrix for the source {m ω} ;
-    - {m C ∈ 𝕂^n} is the filter's center.
+    - {m 𝕂} is a field ;
+    - {m n} is the filter's state dimension, or order ;
+    - {m m} is the filter's measure space dimension ;
+    - {m X[t] ∈ 𝕂^n} is the filter's state vector at iteration {m t} ;
+    - {m ε[t] ∈ 𝕂^m} is a measure vector at iteration {m t} ;
+    - {m A ∈ 𝕂^{n × n}} is the state matrix ;
+    - {m B ∈ 𝕂^{n × m}} is the measure matrix ;
+    - {m S ∈ 𝕂^n} is the filter's shift.
 
-    To compute filter invariants, each measure of a given source is supposed
-    bounded by the same interval, represented as a center and a deviation. Each
-    source can thus be bounded by a different interval.
+    Several notes here :
+    - The only hypothesis on {m A} is that its eigenvalues are all lower
+      than one in absolute value. It is a sufficient condition for the
+      filter to converge. Conversely, there is no hypothesis on {m B}.
+      If the procedure cannot prove easily that this hypothesis is
+      satisfied, it will simply return [None].
+    - All measure vectors are supposed belonging to a box subset of {m 𝕂^m}
+      described by a center vector and a radius vector.
+    - In most presentations of LTI filters, the presented system is
+      described using two equations, a recursive one equivalent to the
+      one presented here and focused on the hidden state vector, and
+      an output non recursive equation focused on transforming the hidden
+      state vector into a usable output. However, as the two equations can
+      be easily combined into one, it is not considered in this module.
+    - Moreover, the filter's shift is usually not present, as it makes
+      the system kind of an affine time-invariant filter. However, the
+      theory underlying this module can easily take it into account, and
+      thus make it more general.
 
-    {!Linear_filter_test} is an example using this module. *)
+    A complete documentation on the underlying theory will be added in a
+    near future. For an example using this module, one can check
+    {!Linear_filter_test}. *)
 
-module Make (Field : Field.S) : sig
+module Make (K : Field.S) : sig
 
   (** The linear space in which the filters are defined. *)
-  module Linear : module type of Linear.Space (Field)
-  open Finite
+  module Linear : module type of Linear.Space (K)
+  open Linear
   open Nat
 
+  (** A value of type [(n, m) filter] describes a LTI filter with a state
+      space of dimension [n] and a measure space of dimension [m]. *)
+  type ('n, 'm) filter
 
-  (** A source describes a source of measures, for instance a specific sensor,
-      that is treated at each iteration by the filter. Measures can be centered
-      around any scalar, and are thus described by a center and a deviation. The
-      source's delay is hidden inside the type. *)
-  type 'n source
-
-  (** Sources constructor. The inputs are as following :
-      - [matrix] is the source matrix, describing how the current and past
-        measures are taken into account ;
-      - [center] is the measures center ;
-      - [deviation] is the measures deviation. *)
-  val source :
-    matrix    : ('n succ, 'm succ) Linear.matrix ->
-    center    : Field.scalar ->
-    deviation : Field.scalar ->
-    'n succ source
-
-  (** A value of type [n filter] describes a filter of order [n] (i.e with [n] state
-      variables). The sources delays are contained by each one of them. *)
-  type 'n filter
-
-  (** Filters constructors. The inputs are as following :
-      - [center] is the filter's center ;
-      - [state] is the filter's state matrix ;
-      - [sources] is the list of the filter's sources. *)
+  (** Filters constructor. The inputs are as following :
+      - [initial] is the filter's initial state, i.e {m X[0]} ;
+      - [shift] is the filter's shift, called {m S} above ;
+      - [measure_center] is the center of the box containing the measures ;
+      - [measure_radius] is the radius of the box containing the measures ;
+      - [measure_matrix] is the measure matrix, called {m B} above ;
+      - [state_matrix] is the state matrix, called {m A} above. *)
   val create :
-    state   : ('n succ, 'n succ) Linear.matrix ->
-    center  : 'n succ Linear.vector ->
-    sources : 'n succ source list ->
-    'n succ filter
+    initial        : 'n succ vector ->
+    shift          : 'n succ vector ->
+    measure_center : 'm succ vector ->
+    measure_radius : 'm succ vector ->
+    measure_matrix : ('n succ, 'm succ) matrix ->
+    state_matrix   : ('n succ, 'n succ) matrix ->
+    ('n succ, 'm succ) filter
 
-  (** Filters pretty printer. *)
-  val pretty : Format.formatter -> 'n filter -> unit
+  (** Representation of a LTI filter's behavior. The fields are as follows
+      - [transition] represents the transition phase as a list of bounds,
+        one for each iteration that cannot be proven contained in the
+        permanent phase. The length of the list, i.e the number of unrolled
+        iterations, depends on the filter's parameters and on the precision
+        of the permanent phase's abstraction.
+      - [permanent] represents the permanent phase a a unique bounds, which
+        is an invariant for the filter for all iterations after the one
+        unrolled through the transition phase. *)
+  type 'n behavior = { transition : 'n bounds list ; permanent : 'n bounds }
+  and  'n bounds = 'n vector Field.bounds
 
-
-  (** Representation of a filter's invariant. Bounds for each dimension can be
-      accessed using the corresponding functions. *)
-  type 'n invariant
-  val lower  : 'n finite -> 'n invariant -> Field.scalar
-  val upper  : 'n finite -> 'n invariant -> Field.scalar
-  val bounds : 'n finite -> 'n invariant -> Field.scalar * Field.scalar
-
-
-  (** Invariant computation. The computation of [invariant filter k] relies on
-      the search of an exponent such as the norm of the state matrix is strictly
-      lower than one. For the filter to converge, there must exist an α such as,
-      for every β greater than α, ||A^β|| < 1 with A the filter's state matrix.
-      As such, the search does not have to find α, but instead any exponent such
-      as the property is satisfied. As the computed invariant will be more
-      precise with a larger exponent, the computation always uses [k], the
-      largest authorized exponent, and thus only check that indeed ||A^k|| < 1.
-      If the property is not verified, the function returns None as it cannot
-      prove that the filter converges.
-
-      The only thing limiting the invariant optimality is [k]. However, for most
-      simple filters, k = 200 will gives exact bounds up to at least ten digits,
-      which is more than enough. Moreover, for those simple filters, the
-      computation is immediate, even when using rational numbers. *)
-  val invariant : 'n filter -> int -> 'n invariant option
+  (** Behavior computation. As stated above, a complete documentation of the
+      underlying theory will be provided. The optionnal parameters are as
+      follows :
+      - [timeout] specifies the maximum analysis duration. It is expressed
+        in seconds, and its default value is one second.
+      - [maximal_unrolling] specifies the maximum number of iterations that
+        are accepted for the transition phase. Its default value is 200. *)
+  val behavior :
+    ?timeout : float ->
+    ?maximal_unrolling : int ->
+    ('n succ, 'm succ) filter ->
+    'n succ behavior option
 
 end

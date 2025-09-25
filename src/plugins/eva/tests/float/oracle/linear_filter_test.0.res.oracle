@@ -1,7 +1,11 @@
 [kernel] Parsing linear_filter_test.i (no preprocessing)
 [kernel] Circle :
-  * 0 : [-31.3829787234 .. 31.3829787234]
-  * 1 : [-31.3829787234 .. 31.3829787234]
+  Transition duration : 191 iterations
+  State space invariant :
+  * 0 : [-31.9563596338 .. 31.9563596338]
+  * 1 : [-31.9563596338 .. 31.9563596338]
 [kernel] Simple :
-  * 0 : [0.572672526718 .. 2.42732747328]
-  * 1 : [1.57267252672 .. 3.42732747328]
+  Transition duration : 110 iterations
+  State space invariant :
+  * 0 : [0.572672523846 .. 2.42732747615]
+  * 1 : [1.57267252189 .. 3.42732747811]
