@@ -394,7 +394,7 @@ let is_any_char_array t = match unroll_skel t with
 
 let is_wchar_array t = match unroll_skel t with
   | TArray(tau, _) ->
-    Cil_datatype.Typ.equal tau (Machine.wchar_type())
+    Cil_datatype.TypNoAttrs.equal tau (Machine.wchar_type ())
   | _ -> false
 
 let is_fun t =
