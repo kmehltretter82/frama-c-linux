@@ -1085,13 +1085,16 @@ module Machdep = struct
   let is_default machdep =
     Filesystem.is_file (get_default_file machdep)
 
-  let normalize name =
-    if is_default name then name else Filepath.(of_string name |> to_string_abs)
+  let normalize machdep =
+    if is_default machdep then
+      machdep
+    else
+      Filepath.(of_string machdep |> to_string_abs)
 
   let () =
-    let set_if_necessary old_name new_name =
-      let new_name = normalize new_name in
-      if not (equal old_name new_name) then unsafe_set new_name
+    let set_if_necessary old_machdep new_machdep =
+      let new_machdep = normalize new_machdep in
+      if not (equal old_machdep new_machdep) then unsafe_set new_machdep
     in
     add_set_hook set_if_necessary
 end
