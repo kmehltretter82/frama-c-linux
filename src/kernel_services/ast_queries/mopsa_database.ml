@@ -103,7 +103,7 @@ let acc_deps object_map target_map targets =
               | Some o ->
                 if o.lang <> "C" then begin
                   let suffixes = File.get_suffixes () in
-                  let suffix = Filename.extension (Filepath.to_string o.source) in
+                  let suffix = Filepath.extension o.source in
                   let try_parse =
                     if List.mem suffix suffixes then true
                     else begin

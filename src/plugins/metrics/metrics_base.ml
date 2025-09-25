@@ -222,7 +222,7 @@ type output_type =
 ;;
 
 let get_file_type (filename : Filepath.t) =
-  match Filename.extension (Filepath.to_string_abs filename) with
+  match Filepath.extension filename with
   | ".html" | ".htm" -> Html
   | ".txt" | ".text" -> Text
   | ".json" -> Json
