@@ -161,3 +161,26 @@ let spawn ?(timeout=0) ?stdout ?stderr cmd args =
     match f () with
     | Result r -> r
     | Not_ready _ -> assert false
+
+module Dot =
+struct
+  type format = Jpeg | Pdf | Png | Svg
+
+  let format_to_string = function
+    | Jpeg -> "jpeg"
+    | Pdf -> "pdf"
+    | Png -> "png"
+    | Svg -> "svg"
+
+  let spawn ?timeout ?layout ~format ~output input =
+    let layout_args = match layout with
+      | Some s -> ["-K" ; s]
+      | None -> []
+    in
+    let args = layout_args @
+               [ "-T" ; format_to_string format ;
+                 "-o" ; Filepath.to_string_abs output ;
+                 Filepath.to_string_abs input ]
+    in
+    spawn ?timeout "dot" args
+end
