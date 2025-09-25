@@ -1,0 +1,46 @@
+Plug-in name: users
+Plug-in shortname: users
+Description: function callees
+
+Most options of the form '-users-option-name' and without any parameter
+have an opposite with the name '-users-no-option-name'.
+
+Most options of the form '-option-name' and without any parameter
+have an opposite with the name '-no-option-name'.
+
+Options taking a string as argument should preferably be written
+-option-name="argument".
+
+***** LIST OF AVAILABLE OPTIONS:
+
+-users              compute function callees (opposite option is -no-users)
+
+*** GETTING INFORMATION
+
+-users-help         help of plug-in users
+-users-h            alias for option -users-help
+
+*** OUTPUT MESSAGES
+
+-users-debug <n>    level of debug for plug-in users (default to 0)
+-users-log <K_1:file_1,...>  copy log messages from users to a file. <K> is a
+                    combination of these characters:
+                    a: ALL messages (equivalent to 'dfiruw')
+                    d: debug       e: user or internal error (same as 'iu')
+                    f: feedback    i: internal error
+                    r: result      u: user error    w: warning
+                    An empty <K> (e.g. ":file.txt") defaults to 'iruw'. One
+                    plug-in can output to several files and vice-versa.
+                    (preferably use -users-log="K_1:file_1,...")
+-users-msg-key <k1[,...,kn]>  enables message display for categories
+                    <k1>,...,<kn>. Use -users-msg-key help to get a list of
+                    available categories, and * to enable all categories
+                    (preferably use -users-msg-key="k1[,...,kn]")
+-users-verbose <n>  level of verbosity for plug-in users (default to 1)
+-users-warn-key <k1[=s1][,...,kn[=sn]]>  set warning status for category <k1>
+                    to <s1>,...,<kn> to <sn>. Use -users-warn-key help to get
+                    a list of available categories, and * to enable all
+                    categories. Possible statuses are inactive, feedback,
+                    warning, error, abort, feedback-once, warning-once,
+                    error-once. Defaults to warning. (preferably use
+                    -users-warn-key="k1[=s1][,...,kn[=sn]]")
