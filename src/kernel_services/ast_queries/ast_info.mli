@@ -35,7 +35,7 @@ val possible_value_of_integral_const: constant -> Integer.t option
 val possible_value_of_integral_expr: exp -> Integer.t option
 
 (** returns the value of the corresponding integer literal. It is
-    the responsability of the caller to ensure the constant is indeed
+    the responsibility of the caller to ensure the constant is indeed
     an integer constant. If unsure, use {!possible_value_of_integral_const}.
 *)
 val value_of_integral_const: constant -> Integer.t

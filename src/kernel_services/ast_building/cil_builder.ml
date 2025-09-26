@@ -71,7 +71,7 @@ struct
   let structure compinfo f =
     Record f, Ctype (mk_tcomp compinfo)
 
-  (* Attrbutes *)
+  (* Attributes *)
 
   let attribute (s, t) name params =
     match t with
@@ -731,7 +731,7 @@ struct
       Cil_types.Pfresh (l1, l2, t1', t2')
 
   and build_pred ~scope ~loc ~restyp t =
-    Logic_const.unamed ~loc (build_pred_node ~scope ~loc ~restyp t)
+    Logic_const.unnamed ~loc (build_pred_node ~scope ~loc ~restyp t)
 
   let rec build_init ~scope ~loc = function
     | CilInit init -> init
@@ -971,9 +971,9 @@ struct
     let add_one (acc,scope) stmt =
       match stmt with
       | CilStmt s -> s :: acc, scope
-      | Sequence s -> (* do not build a block if unecessary *)
+      | Sequence s -> (* do not build a block if unnecessary *)
         build_stmtlist_rev ~scope ~loc ~ghost ~block ~fundec acc s
-      | GhostSection stmt -> (* do not build a block if unecessary *)
+      | GhostSection stmt -> (* do not build a block if unnecessary *)
         build_stmtlist_rev ~scope ~loc ~ghost:true ~block ~fundec acc [stmt]
       | _ ->
         let stmtkind, scope =
@@ -1159,11 +1159,11 @@ struct
 
   let check_empty () =
     if !stack <> [] then
-      error "some contextes have not been closed: %t" pretty_stack !stack
+      error "some contexts have not been closed: %t" pretty_stack !stack
 
   let check_not_empty () =
     if !stack = [] then
-      error "only a finish_* function can close all contextes"
+      error "only a finish_* function can close all contexts"
 
   let top () =
     match !stack with
@@ -1191,7 +1191,7 @@ struct
     match !stack with
     | [] -> error "not in an opened context"
     | [b] -> stack := []; b
-    | _ :: _ :: _ -> error "all contextes have not been closed"
+    | _ :: _ :: _ -> error "all contexts have not been closed"
 
   let append_stmt b s =
     b.stmts <- s :: b.stmts

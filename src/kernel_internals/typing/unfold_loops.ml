@@ -234,7 +234,7 @@ let copy_annotations kf assoc labelled_stmt_tbl (break_continue_must_change, stm
       (fun emitter annot acc ->
          match filter_annotation annot with
          | None -> acc
-         | Some filtred_annot -> (emitter, fresh_annotation filtred_annot) :: acc)
+         | Some filtered_annot -> (emitter, fresh_annotation filtered_annot) :: acc)
       stmt_src
       []
   in

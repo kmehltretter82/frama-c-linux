@@ -373,7 +373,7 @@ let type_to_expr_for_builtin ~loc ~builtin specifier decl_type =
 %right  NAMED_TYPE /* We'll use this to handle redefinitions of NAMED_TYPE as variables */
 %left   IDENT
 
-/* Non-terminals informations */
+/* Non-terminals information */
 %start interpret file
 %type <(bool*Cabs.definition) list> file interpret globals
 
@@ -1161,7 +1161,7 @@ decl_spec_list:
     SpecType(fst $1) :: $3, snd $1
   }
 
-/* Here we can match any specifier, meaning we alreay saw at least one type or
+/* Here we can match any specifier, meaning we already saw at least one type or
    C standard specifier. */
 decl_spec_list_no_restriction:
 | decl_spec_wo_type_nor_attr decl_spec_list_opt { fst $1 :: $2, snd $1 }

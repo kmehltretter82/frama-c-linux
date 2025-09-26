@@ -103,7 +103,7 @@ class annotateFunFromDeclspec =
                let args = term_of_var v :: args in
                let app =
                  Logic_const.new_predicate
-                   (Logic_const.unamed (Papp(p,labels,args)))
+                   (Logic_const.unnamed (Papp(p,labels,args)))
                in
                app :: acc
              with Not_found -> acc
@@ -159,7 +159,7 @@ class annotateFunFromDeclspec =
                      let args = res :: args in
                      let app =
                        Logic_const.new_predicate
-                         (Logic_const.unamed (Papp(p,[],args)))
+                         (Logic_const.unnamed (Papp(p,[],args)))
                      in
                      (Normal,app) :: acc
                    with Not_found -> acc)

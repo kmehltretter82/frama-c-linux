@@ -1987,7 +1987,7 @@ struct
         when Ast_types.is_integral t -> Linteger
       | (Linteger, Ctype t | Ctype t, Linteger)
         when Ast_types.is_arithmetic t -> Lreal
-      (* In ACSL, you can convert implicitely from integral to boolean =>
+      (* In ACSL, you can convert implicitly from integral to boolean =>
          prefer boolean as common type when doing comparison. *)
       | Lboolean, t when is_integral_type t -> Lboolean
       | t, Lboolean when is_integral_type t -> Lboolean
@@ -2513,7 +2513,7 @@ struct
       | TAddrOf lv when is_fct_ptr lv -> m.accept_func_ptr
       | TAddrOf lv | TStartOf lv ->
         m.accept_addrs &&
-        (* note that we assume that 'lv' is adressable. *)
+        (* note that we assume that 'lv' is addressable. *)
         begin match lv with
           | TVar { lv_origin = Some _ }, _ | TMem _, _ -> true
           | TVar { lv_origin = None }, _ -> false
@@ -3508,8 +3508,8 @@ struct
       fpred ?loc (l,t)
     in
     match p0.lexpr_node with
-    | PLfalse -> unamed ~loc Pfalse
-    | PLtrue -> unamed ~loc Ptrue
+    | PLfalse -> unnamed ~loc Pfalse
+    | PLtrue -> unnamed ~loc Ptrue
     | PLrel (t1, (Eq | Neq | Lt | Le | Gt | Ge as op), t2) ->
       let f loc op t1 t2 = prel ~loc (type_rel op, t1, t2) in
       type_relation ctxt env f t1 op t2

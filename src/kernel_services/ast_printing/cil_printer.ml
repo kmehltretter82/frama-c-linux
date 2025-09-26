@@ -186,7 +186,7 @@ let state =
 *)
 module Precedence = struct
 
-  let upperLevel = 110          (* Occurence order in [logic_parser.mly]:
+  let upperLevel = 110          (* Occurrence order in [logic_parser.mly]:
                                    1 [%right prec_named]
                                    2 [%nonassoc TYPENAME] *)
 

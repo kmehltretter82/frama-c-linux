@@ -14,7 +14,7 @@ include State_builder.Ref with type data = Filepath.position * Filepath.position
 
 (** [with_loc loc f x] set the current location to [loc], which can be used
     with [Current_loc.get ()] or via the option [~current] in Log functions.
-    The old location is saved and set back after exectution of [f x]. If [f x]
+    The old location is saved and set back after execution of [f x]. If [f x]
     raises an exception, it is caught and re-raised after setting the location
     to its old value.
 *)

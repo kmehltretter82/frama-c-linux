@@ -244,7 +244,7 @@ val get_definition : t -> fundec
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
 val has_definition : t -> bool
-(** @return [true] iff the given kernel function has a defintion.
+(** @return [true] iff the given kernel function has a definition.
     @since 21.0-Scandium *)
 
 val is_ghost : t -> bool

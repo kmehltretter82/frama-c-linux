@@ -432,7 +432,7 @@ module type FORWARD_MONOTONE_PARAMETER_GENERIC_STORAGE = sig
 
      Note that it is allowed that not all succs are present in the
      list returned by [transfer_stmt], or that succs are present several
-     times (this is useful to handle switchs). *)
+     times (this is useful to handle switches). *)
   val transfer_stmt: stmt -> t -> (stmt * t) list
 
   (* These functions explain how we store the state associated to each
@@ -527,7 +527,7 @@ module type FORWARD_MONOTONE_PARAMETER = sig
 
      Note that it is allowed that not all succs are present in the
      list returned by [transfer_stmt], or that succs are present several
-     times (this is useful to handle switchs). *)
+     times (this is useful to handle switches). *)
   val transfer_stmt: stmt -> t -> (stmt * t) list
 
   (* The initial value for each statement. Statements in this list are

@@ -461,7 +461,7 @@ class logic_inliner env = object (self)
     let one t = Visitor.visitFramacTerm (self :> Visitor.frama_c_copy) t in
     List.map one args
 
-  (* Builds the environnement to enter into the body of [li] with actual
+  (* Builds the environment to enter into the body of [li] with actual
      labels and arguments [labels] and [args] respectively. Assumes that
      both have already been inlined. *)
   method private new_env li args labels =
@@ -532,7 +532,7 @@ class logic_inliner env = object (self)
             let x' = {t with term_node = TLval(h, offx')} in
             Cil.ChangeTo (self#add_at x' lbl)
           | _ -> (* we cannot handle casts on aggregates, functions
-                    returning aggregates, etc, because we cannot buid
+                    returning aggregates, etc, because we cannot build
                     the corresponding term without a TLet *)
             raise CannotInline
       end

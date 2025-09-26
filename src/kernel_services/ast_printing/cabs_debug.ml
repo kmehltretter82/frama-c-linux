@@ -211,7 +211,7 @@ and pp_raw_stmt fmt = function
   |     CONTINUE loc -> fprintf fmt "@[<hov 2>CONTINUE loc(%a)@]" pp_cabsloc loc
   |     RETURN (exp, loc) ->  fprintf fmt "@[<hov 2>RETURN exp(%a, loc(%a))@]" pp_exp exp pp_cabsloc loc
   |     SWITCH (exp, stmt, loc) ->
-    fprintf fmt "@[<hov 2>SWITH exp(%a), stmt(%a), loc(%a)@]" pp_exp exp pp_stmt stmt pp_cabsloc loc
+    fprintf fmt "@[<hov 2>SWITCH exp(%a), stmt(%a), loc(%a)@]" pp_exp exp pp_stmt stmt pp_cabsloc loc
   |     CASE (exp, stmt, loc) ->
     fprintf fmt "@[<hov 2>CASE exp(%a), stmt(%a), loc(%a)@]" pp_exp exp pp_stmt stmt pp_cabsloc loc
   |     CASERANGE (exp1, exp2, stmt, loc) ->

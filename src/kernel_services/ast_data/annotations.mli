@@ -345,7 +345,7 @@ type 'a behavior_component_addition =
 
 exception AlreadySpecified of string list
 (** raised when a specification can't be added since there is already one, the
-    list contains the clause kind that can't be addeed (e.g: "decreases"). *)
+    list contains the clause kind that can't be added (e.g: "decreases"). *)
 
 val add_spec:
   ?register_children:bool -> ?force:bool -> spec contract_component_addition

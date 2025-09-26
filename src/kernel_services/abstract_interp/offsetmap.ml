@@ -1463,7 +1463,7 @@ module Make
         | Some read_ahead ->
           (* [read_ahead] is the last offset of the node that has been read.
              The next reads within the node are unnecessary, so we could
-             theoretically start at [succ read_ahead] (after re-alignement on
+             theoretically start at [succ read_ahead] (after re-alignment on
              [period]). However, the last read that starts on this node
              may overlap with the next node, and must be performed. So
              we rewind by [pred size] bits, then round up to the next periodic
@@ -2340,7 +2340,7 @@ module Int_Intervals_Map = struct
 
   (* normalizes a non-empty offsetmap [m], by removing an eventual rightmost
      interval bound to false. Returns the new rightmost bit bound to [true].*)
-  let rec drop_righmost_false curr_off node =
+  let rec drop_rightmost_false curr_off node =
     match node with
     | Empty -> assert false
     | Node (max, _, _, _, Empty, _, _, true, _) ->
@@ -2352,7 +2352,7 @@ module Int_Intervals_Map = struct
     | Node (max, offl, subl, offr, (Node _ as subr), _, _, v, _) ->
       (* Normalize the right tree and rebuild. *)
       let new_rcurr_off, new_rtree, rbit =
-        drop_righmost_false (curr_off +~ offr) subr
+        drop_rightmost_false (curr_off +~ offr) subr
       in
       (* We cannot have [v = false] and [new_rtree = empty]: [subr] would need
          contain only [false], and it should have been merged with us. *)
@@ -2533,7 +2533,7 @@ module Int_Intervals = struct
     | Empty | Node (_, _, Empty, _, Empty, _ ,_, false, _) -> Bottom
     | Node _ ->
       let curr_off, m, right_bit =
-        Int_Intervals_Map.drop_righmost_false curr_off m
+        Int_Intervals_Map.drop_rightmost_false curr_off m
       in
       let curr_off, m, left_bit =
         Int_Intervals_Map.drop_leftmost_false curr_off m

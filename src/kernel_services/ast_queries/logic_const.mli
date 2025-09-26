@@ -98,7 +98,7 @@ val init_label: logic_label
 (* ************************************************************************** *)
 
 (** makes a predicate with no name. Default location is unknown.*)
-val unamed: ?loc:location -> predicate_node -> predicate
+val unnamed: ?loc:location -> predicate_node -> predicate
 
 (** \true *)
 val ptrue: predicate

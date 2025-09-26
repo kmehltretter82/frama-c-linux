@@ -80,8 +80,8 @@ module type S = sig
       This value must be neutral wrt. merging of values. *)
 
   val anisotropic_cast : size:Integer.t -> t -> t
-  (** Optionnally change the representation of the given value, under the
+  (** Optionally change the representation of the given value, under the
       assumption that it fits in [size] bits. Returning the value argument
-      is alwas correct. *)
+      is always correct. *)
 
 end

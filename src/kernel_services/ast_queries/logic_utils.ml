@@ -629,12 +629,12 @@ and expr_to_boolean e =
 
 and expr_to_predicate e =
   let open Cil_types in
-  let unamed = Logic_const.unamed ~loc:e.eloc in
-  let pnot p = unamed @@ Pnot p in
+  let unnamed = Logic_const.unnamed ~loc:e.eloc in
+  let pnot p = unnamed @@ Pnot p in
   let prel r a b =
     let va = expr_to_term ~coerce:true a in
     let vb = expr_to_term ~coerce:true b in
-    unamed @@ Prel(r,va,vb)
+    unnamed @@ Prel(r,va,vb)
   in match e.enode with
   | BinOp(Lt, a, b, _) -> prel Rlt a b
   | BinOp(Le, a, b, _) -> prel Rle a b
@@ -659,9 +659,9 @@ and expr_to_predicate e =
       | _ -> prel Rneq a b
     end
   | BinOp(LAnd, a, b, _) ->
-    unamed @@ Pand(expr_to_predicate a,expr_to_predicate b)
+    unnamed @@ Pand(expr_to_predicate a,expr_to_predicate b)
   | BinOp(LOr, a, b, _) ->
-    unamed @@ Por(expr_to_predicate a,expr_to_predicate b)
+    unnamed @@ Por(expr_to_predicate a,expr_to_predicate b)
   | UnOp(LNot, a, _) ->
     pnot @@ expr_to_predicate a
   | _ ->
@@ -2393,7 +2393,7 @@ let pointer_comparable ?loc ?(label=Logic_const.here_label) t1 t2 =
     with Not_found ->
       Kernel.fatal "built-in predicate \\pointer_comparable not found"
   in
-  Logic_const.unamed ?loc (Papp (pi, [label], [t1;t2]))
+  Logic_const.unnamed ?loc (Papp (pi, [label], [t1;t2]))
 
 let is_min_max_function name li =
   li.l_var_info.lv_name = name &&

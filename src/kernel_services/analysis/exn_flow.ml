@@ -419,7 +419,7 @@ class erase_exn =
 
     val mutable fct_can_throw = false
 
-    val mutable catched_var = None
+    val mutable caught_var = None
 
     val mutable label_counter = 0
 
@@ -582,7 +582,7 @@ class erase_exn =
       let add_unreachable_block b =
         Cil.mkStmt (If(Cil.zero ~loc, b, Cil.mkBlock [], loc))
       in
-      let assign_catched_obj v b =
+      let assign_caught_obj v b =
         let exn_obj = self#exn_obj_field in
         let kind_field = self#exn_obj_kind_field (purify v.vtype) in
         let lv = Cil.addOffsetLval (Field (kind_field,NoOffset)) exn_obj in
@@ -603,12 +603,12 @@ class erase_exn =
          | Catch_exn (v,[]) ->
            Cil.update_var_type v (purify v.vtype);
            update_locals v b;
-           assign_catched_obj v b; b
+           assign_caught_obj v b; b
          | Catch_exn(v,aux) ->
            let add_one_aux stmts (v,b) =
              Cil.update_var_type v (purify v.vtype);
              update_locals v b;
-             assign_catched_obj v b;
+             assign_caught_obj v b;
              add_unreachable_block b :: stmts
            in
            b.blocals <- List.filter (fun v' -> v!=v') b.blocals;

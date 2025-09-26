@@ -325,18 +325,18 @@ let rec is_exit_status t = match t.term_node with
 (** {2 Predicate constructors} *)
 (* empty line for ocamldoc *)
 
-let unamed ?(loc=Cil_datatype.Location.unknown) p =
+let unnamed ?(loc=Cil_datatype.Location.unknown) p =
   {pred_content = p ; pred_loc = loc; pred_name = [] }
 
-let ptrue = unamed Ptrue
-let pfalse = unamed Pfalse
+let ptrue = unnamed Ptrue
+let pfalse = unnamed Pfalse
 
 let pold ?(loc=Cil_datatype.Location.unknown) p = match p.pred_content with
   | Ptrue | Pfalse -> p
   | _ -> {p with pred_content = Pat(p, old_label); pred_loc = loc}
 
 let papp ?(loc=Cil_datatype.Location.unknown) (p,lab,a) =
-  unamed ~loc (Papp(p,lab,a))
+  unnamed ~loc (Papp(p,lab,a))
 
 let pand ?(loc=Cil_datatype.Location.unknown) (p1, p2) =
   match p1.pred_content, p2.pred_content with
@@ -344,7 +344,7 @@ let pand ?(loc=Cil_datatype.Location.unknown) (p1, p2) =
   | _, Ptrue -> p1
   | Pfalse, _ -> p1
   | _, Pfalse -> p2
-  | _, _ -> unamed ~loc (Pand (p1, p2))
+  | _, _ -> unnamed ~loc (Pand (p1, p2))
 
 let por ?(loc=Cil_datatype.Location.unknown) (p1, p2) =
   match p1.pred_content, p2.pred_content with
@@ -352,73 +352,73 @@ let por ?(loc=Cil_datatype.Location.unknown) (p1, p2) =
   | _, Ptrue -> p2
   | Pfalse, _ -> p2
   | _, Pfalse -> p1
-  | _, _ -> unamed ~loc (Por (p1, p2))
+  | _, _ -> unnamed ~loc (Por (p1, p2))
 
 let pxor ?(loc=Cil_datatype.Location.unknown) (p1, p2) =
   match p1.pred_content, p2.pred_content with
-  | Ptrue, Ptrue -> unamed ~loc Pfalse
+  | Ptrue, Ptrue -> unnamed ~loc Pfalse
   | Ptrue, _ -> p1
   | _, Ptrue -> p2
   | Pfalse, _ -> p2
   | _, Pfalse -> p1
-  | _,_ -> unamed ~loc (Pxor (p1,p2))
+  | _,_ -> unnamed ~loc (Pxor (p1,p2))
 
 let pnot ?(loc=Cil_datatype.Location.unknown) p2 = match p2.pred_content with
   | Ptrue -> {p2 with pred_content = Pfalse; pred_loc = loc }
   | Pfalse ->  {p2 with pred_content = Ptrue; pred_loc = loc }
   | Pnot p -> p
-  | _ -> unamed ~loc (Pnot p2)
+  | _ -> unnamed ~loc (Pnot p2)
 
 let pands l = List.fold_right (fun p1 p2 -> pand (p1, p2)) l ptrue
 let pors l = List.fold_right (fun p1 p2 -> por (p1, p2)) l pfalse
 
 let plet ?(loc=Cil_datatype.Location.unknown) v p = match p.pred_content with
   | Ptrue -> p
-  | _ -> unamed ~loc (Plet (v, p))
+  | _ -> unnamed ~loc (Plet (v, p))
 
 let pimplies ?(loc=Cil_datatype.Location.unknown) (p1,p2) =
   match p1.pred_content, p2.pred_content with
   | Ptrue, _ | _, Ptrue -> p2
   | Pfalse, _ -> { pred_name = p1.pred_name; pred_loc = loc; pred_content = Ptrue }
-  | _, _ -> unamed ~loc (Pimplies (p1, p2))
+  | _, _ -> unnamed ~loc (Pimplies (p1, p2))
 
 let pif ?(loc=Cil_datatype.Location.unknown) (t,p2,p3) =
   match (p2.pred_content, p3.pred_content) with
   | Ptrue, Ptrue  -> ptrue
   | Pfalse, Pfalse -> pfalse
-  | _,_ -> unamed ~loc (Pif (t,p2,p3))
+  | _,_ -> unnamed ~loc (Pif (t,p2,p3))
 
 let piff ?(loc=Cil_datatype.Location.unknown) (p2,p3) =
   match p2.pred_content, p3.pred_content with
   | Pfalse, Pfalse -> ptrue
   | Ptrue, _  -> p3
   | _, Ptrue -> p2
-  | _,_ -> unamed ~loc (Piff (p2,p3))
+  | _,_ -> unnamed ~loc (Piff (p2,p3))
 
 (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 let prel ?(loc=Cil_datatype.Location.unknown) (a,b,c) =
-  unamed ~loc (Prel(a,b,c))
+  unnamed ~loc (Prel(a,b,c))
 
 let pforall ?(loc=Cil_datatype.Location.unknown) (l,p) = match l with
   | [] -> p
   | _ :: _ ->
     match p.pred_content with
     | Ptrue -> p
-    | _ -> unamed ~loc (Pforall (l,p))
+    | _ -> unnamed ~loc (Pforall (l,p))
 
 let pexists ?(loc=Cil_datatype.Location.unknown) (l,p) = match l with
   | [] -> p
   | _ :: _ -> match p.pred_content with
     | Pfalse -> p
-    | _ -> unamed ~loc (Pexists (l,p))
+    | _ -> unnamed ~loc (Pexists (l,p))
 
-let pfresh ?(loc=Cil_datatype.Location.unknown) (l1,l2,p,n) = unamed ~loc (Pfresh (l1,l2,p,n))
-let pallocable ?(loc=Cil_datatype.Location.unknown) (l,p) = unamed ~loc (Pallocable (l,p))
-let pfreeable ?(loc=Cil_datatype.Location.unknown) (l,p) = unamed ~loc (Pfreeable (l,p))
-let pvalid ?(loc=Cil_datatype.Location.unknown) (l,p) = unamed ~loc (Pvalid (l,p))
-let pvalid_read ?(loc=Cil_datatype.Location.unknown) (l,p) = unamed ~loc (Pvalid_read (l,p))
-let pobject_pointer ?(loc=Cil_datatype.Location.unknown) (l,p) = unamed ~loc (Pobject_pointer (l,p))
-let pvalid_function ?(loc=Cil_datatype.Location.unknown) p = unamed ~loc (Pvalid_function p)
+let pfresh ?(loc=Cil_datatype.Location.unknown) (l1,l2,p,n) = unnamed ~loc (Pfresh (l1,l2,p,n))
+let pallocable ?(loc=Cil_datatype.Location.unknown) (l,p) = unnamed ~loc (Pallocable (l,p))
+let pfreeable ?(loc=Cil_datatype.Location.unknown) (l,p) = unnamed ~loc (Pfreeable (l,p))
+let pvalid ?(loc=Cil_datatype.Location.unknown) (l,p) = unnamed ~loc (Pvalid (l,p))
+let pvalid_read ?(loc=Cil_datatype.Location.unknown) (l,p) = unnamed ~loc (Pvalid_read (l,p))
+let pobject_pointer ?(loc=Cil_datatype.Location.unknown) (l,p) = unnamed ~loc (Pobject_pointer (l,p))
+let pvalid_function ?(loc=Cil_datatype.Location.unknown) p = unnamed ~loc (Pvalid_function p)
 
 (* the index should be an integer or a range of integers *)
 let pvalid_index ?(loc=Cil_datatype.Location.unknown) (l,t1,t2) =
@@ -435,11 +435,11 @@ let pvalid_index ?(loc=Cil_datatype.Location.unknown) (l,t1,t2) =
 let pvalid_range ?(loc=Cil_datatype.Location.unknown) (l,t1,b1,b2) =
   let t2 = trange ((Some b1), (Some b2)) in
   pvalid_index ~loc (l,t1,t2)
-let pat ?(loc=Cil_datatype.Location.unknown) (p,q) = unamed ~loc (Pat (p,q))
+let pat ?(loc=Cil_datatype.Location.unknown) (p,q) = unnamed ~loc (Pat (p,q))
 let pinitialized ?(loc=Cil_datatype.Location.unknown) (l,p) =
-  unamed ~loc (Pinitialized (l,p))
+  unnamed ~loc (Pinitialized (l,p))
 let pdangling ?(loc=Cil_datatype.Location.unknown) (l,p) =
-  unamed ~loc (Pdangling (l,p))
+  unnamed ~loc (Pdangling (l,p))
 
 let pseparated  ?(loc=Cil_datatype.Location.unknown) seps =
-  unamed ~loc (Pseparated seps)
+  unnamed ~loc (Pseparated seps)

@@ -182,7 +182,7 @@ let parse_int b =
   in
   if neg then -i else i
 
-let parse_assignement_suppression b =
+let parse_assignment_suppression b =
   match Buffer.peek b with
   | '*' -> Buffer.consume b; true
   | _ -> false
@@ -285,7 +285,7 @@ let parse_f_spec b =
   }
 
 let parse_s_spec b =
-  let s_assignment_suppression = parse_assignement_suppression b in
+  let s_assignment_suppression = parse_assignment_suppression b in
   let s_field_width = parse_s_fw b in
   let s_length_modifier = parse_lm b in
   let s_conversion_specifier = parse_s_cs b in

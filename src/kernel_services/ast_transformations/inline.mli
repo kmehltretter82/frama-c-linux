@@ -14,7 +14,7 @@ val inline_calls : file -> unit
     and logic functions for which [inline] is true. If provided, [current] is
     the current label of the term; it is [Here] by default. Returns [None]
     if the inlining of a predicate or a logic function fails, in particular
-    when they are recursive or have no direct definitiion. *)
+    when they are recursive or have no direct definition. *)
 val inline_term:
   inline:(logic_info -> bool) -> ?current:logic_label -> term -> term option
 

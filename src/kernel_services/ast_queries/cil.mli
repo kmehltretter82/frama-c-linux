@@ -403,7 +403,7 @@ val combineAttributes : combineWhat -> attribute list -> attributes -> attribute
 
 (** [combineFunction] contains information on how enum, struct/union and typedef
     are to be handled when combining with {!combineTypes} and
-    {!combineTypesGen}. In pratice, the first argument of each field is a
+    {!combineTypesGen}. In practice, the first argument of each field is a
     recursive definition.
 
     @since 28.0-Nickel
@@ -428,7 +428,7 @@ type combineFunction =
 
 (** [combineTypesGen ~strictInteger ~strictReturnTypes combF combW oldt newt]
     Combine [oldt] and [newt] accordingly to [combF], [combW] indicates what
-    we are combinining.
+    we are combining.
 
     Warning : this is not commutative. Indeed, excluding enum, struct/union and
     typedef which depend on [combF], the resulting type is as close as possible
@@ -752,7 +752,7 @@ val constFold: bool -> exp -> exp
 val constFoldToInt: ?machdep:bool -> exp -> Integer.t option
 
 (** Do constant folding on an term at toplevel only.
-    This uses compiler-dependent informations and will
+    This uses compiler-dependent information and will
     remove all sizeof and alignof. *)
 val constFoldTermNodeAtTop:  term_node -> term_node
 

@@ -923,7 +923,7 @@ module Enumitem = struct
       end)
 end
 
-(* If [strict] is true, the comparaison of integer and floating-point constants
+(* If [strict] is true, the comparison of integer and floating-point constants
    takes into account their textual representation (if any). Otherwise,
    constants with the same type and value are equal even if their textual
    representations differ. *)
@@ -999,7 +999,7 @@ end
 module StructEq =
 struct
 
-  (* Return true if the types have the same size, machine-indepently *)
+  (* Return true if the types have the same size, machine-independently *)
   let rec compare_structural_typ_size (t1 : typ) (t2 : typ) : int =
     match (!punrollType t1).tnode, (!punrollType t2).tnode with
     | TPtr t1, TPtr t2 when
@@ -1034,11 +1034,11 @@ struct
     | _ -> Typ.compare t1 t2
 
 
-  (* If [strict] is true, the comparaison of integer and floating-point constants
+  (* If [strict] is true, the comparison of integer and floating-point constants
      takes into account their textual representation (if any). Otherwise,
      constants with the same type and value are equal even if their textual
      representations differ.
-     If [structural] is true, the comparaison of type into sizeof takes only
+     If [structural] is true, the comparison of type into sizeof takes only
      the size into account. Otherwise, we use the usual type comparison.
   *)
   let rec compare_exp ~structural ~strict e1 e2 =

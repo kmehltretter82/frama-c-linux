@@ -246,7 +246,7 @@ module type Messages = sig
 
   val logwith : (event option -> 'b) -> ?wkey:warn_category ->
     ?emitwith:(event -> unit) -> ?once:bool -> ('a,'b) pretty_aborter
-  (** Recommanded generic log routine using [warn_category] instead of [kind].
+  (** Recommended generic log routine using [warn_category] instead of [kind].
       [logwith continuation ?wkey fmt] similar to [warning ?wkey fmt]
       and then calling the [continuation].
       The optional continuation argument refers to the corresponding event.
@@ -360,11 +360,11 @@ module type Messages = sig
 
 end
 
-(** Split an event category into its constituants.
+(** Split an event category into its constituents.
     @since 18.0-Argon *)
 val evt_category : event -> string list
 
-(** Split a category specification into its constituants.
+(** Split a category specification into its constituents.
     ["*"] is considered as empty, and [""] categories are skipped.
     @since 18.0-Argon *)
 val split_category : string -> string list

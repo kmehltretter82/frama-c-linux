@@ -685,7 +685,7 @@ module Make (F: Float_sig.S) = struct
      NaN can be created from \infty - \infty, 0 * \infty, 0/0 and \infty /
      \infty, in which case the result contains NaN, and new operations are
      performed to take into account the results of values near \infty and 0.
-     Beware that NaN and discontinuities occuring between the bounds of the
+     Beware that NaN and discontinuities occurring between the bounds of the
      arguments (i.e. on zeros, as an infinity is always a bound) should be
      checked and processed by the caller. *)
   let monotonic op prec x y =

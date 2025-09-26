@@ -647,7 +647,7 @@ let transparentUnionArgs : (int * typ) list ref = ref []
 let debugLoc = false
 let convLoc (l : cabsloc) =
   if debugLoc then
-    Kernel.debug "convLoc at %a: line %d, btye %d\n"
+    Kernel.debug "convLoc at %a: line %d, byte %d\n"
       Filepath.pretty (fst l).Filepath.pos_path
       (fst l).Filepath.pos_lnum (fst l).Filepath.pos_bol;
   l
@@ -2541,7 +2541,7 @@ let makeGlobalVarinfo (isadef: bool) (vi: varinfo) : varinfo * bool =
           if not (Cil_datatype.Typ.equal oldvi.vtype vi.vtype)
           then begin
             DifferentDeclHook.apply (oldvi,vi);
-            (* note: combineTypes is (purposedly) not very strict, so we
+            (* note: combineTypes is (purposely) not very strict, so we
                use compatibleTypes here to perform more strict checks and
                raise Cannot_combine if necessary. However, due to old-style
                prototypes in GCC machdeps, we must support eccentric cases,
@@ -2828,7 +2828,7 @@ let rec setOneInit this o preinit =
         end;
         pMaxIdx, pArray
       | SinglePre (e, lvset) ->
-        (* [SinglePre] can happen here when overridding initialization, in
+        (* [SinglePre] can happen here when overriding initialization, in
            particular with structs and unions :
 
              typedef struct { int a; int b} T;
@@ -2837,7 +2837,7 @@ let rec setOneInit this o preinit =
              S const s = {.t = x, .t.b = 3};
 
            Here we will first initialize [s.t] with [SinglePre (x, _)] and then
-           try to initialize the field [b] of [t], overridding the value [x.b].
+           try to initialize the field [b] of [t], overriding the value [x.b].
            What we do here is to transform the [SinglePre] into a [CompoundPre]
            so that we can proceed with [.t.b] initialization. The new
            [CompoundPre] will be of the form [{.a = x.a, .b = x.b}].
@@ -7821,7 +7821,7 @@ and doFullExp local_env const e what =
 and doInitializer loc local_env (vi: varinfo) (inite: Cabs.init_expression)
   (* Return the accumulated chunk, the initializer and the new type (might be
    * different for arrays), together with the lvals read during evaluation of
-   * the initializer (for local intialization)
+   * the initializer (for local initialization)
   *)
   : chunk * init_or_str * typ * Cil_datatype.Lval.Set.t =
   let open Current_loc.Operators in
@@ -9508,7 +9508,7 @@ and doDecl local_env (isglobal: bool) (def: Cabs.definition) : chunk =
         let protect_return,retval =
           (* Guard the [return] instructions we add with an
              [\assert \false]*)
-          let pfalse = Logic_const.unamed ~loc Pfalse in
+          let pfalse = Logic_const.unnamed ~loc Pfalse in
           let pfalse = { pfalse with pred_name = ["missing_return"] } in
           let pfalse = Logic_const.toplevel_predicate pfalse in
           let assert_false () =

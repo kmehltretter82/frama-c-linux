@@ -382,7 +382,7 @@ let annot_lex initial rule lexbuf =
 let make_annot ~one_line default lexbuf s =
   let start = snd !annot_start_pos in
   match Logic_lexer.annot (start, s) with
-  (* error occured and annotation is discarded. Find a normal token. *)
+  (* error occurred and annotation is discarded. Find a normal token. *)
   | None -> default lexbuf
   | Some (stop, token) ->
     lexbuf.Lexing.lex_curr_p <- Cil_datatype.Position.to_lexing_pos stop ;

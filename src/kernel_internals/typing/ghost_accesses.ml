@@ -86,9 +86,9 @@ class visitor = object(self)
     | _ ->
       false
 
-  val mutable prefered_loc = None
-  method private prefer_loc l = prefered_loc <- Some l
-  method private reset_loc () = prefered_loc <- None
+  val mutable preferred_loc = None
+  method private prefer_loc l = preferred_loc <- Some l
+  method private reset_loc () = preferred_loc <- None
 
   method private ghost_stmt () =
     match self#current_stmt with
@@ -100,7 +100,7 @@ class visitor = object(self)
     | None -> false
 
   method private bad_ghost_function kf =
-    let source = match prefered_loc with
+    let source = match preferred_loc with
       | None -> fst (Current_loc.get())
       | Some l -> l
     in
@@ -130,7 +130,7 @@ class visitor = object(self)
 
   method! vvdec v =
     let current, source =
-      match prefered_loc with
+      match preferred_loc with
       | Some l -> false, l
       | None -> true, (Log.get_current_source ())
     in

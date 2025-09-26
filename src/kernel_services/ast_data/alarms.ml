@@ -445,7 +445,7 @@ let create_special_float_predicate ~loc e fkind predicate =
       Kernel.fatal "Unexpected type %a for predicate %s"
         Printer.pp_logic_type t.term_type predicate
   in
-  Logic_const.unamed ~loc (Papp (pi, [], [ t ]))
+  Logic_const.unnamed ~loc (Papp (pi, [], [ t ]))
 
 let create_predicate ?(loc=Location.unknown) alarm =
   let aux = function
