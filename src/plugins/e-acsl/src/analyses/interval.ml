@@ -317,6 +317,9 @@ let infer_sum_product oper lambda min max = match lambda, min, max with
   | _ -> Error.not_yet "extended quantifiers with non-integer parameters"
 
 let rec infer ~force ~logic_env t =
+  let recurse ?(force = force) ?(logic_env = logic_env) t =
+    infer ~force ~logic_env t
+  in
   let get_cty t = match t.term_type with Ctype ty -> ty | _ -> assert false in
   let get_res = Error.map (fun x -> x) in
   let t = Logic_normalizer.get_term t in
@@ -350,54 +353,54 @@ let rec infer ~force ~logic_env t =
     | TLval lv -> infer_term_lval ~force ~logic_env lv
     | TSizeOf ty -> infer_sizeof ty
     | TSizeOfE t ->
-      ignore (infer ~force ~logic_env t);
+      ignore (recurse t);
       infer_sizeof (get_cty t)
     | TSizeOfStr str -> singleton_of_int (String.length str + 1 (* '\0' *))
     | TAlignOf ty -> infer_alignof ty
     | TAlignOfE t ->
-      ignore (infer ~force ~logic_env t);
+      ignore (recurse t);
       infer_alignof (get_cty t)
 
     | TUnOp (Neg, t) ->
-      let i = infer ~force ~logic_env t in
+      let i = recurse t in
       Error.map (lift_unop Ival.neg_int) i
     | TUnOp (BNot, t) ->
-      let i = infer ~force ~logic_env t in
+      let i = recurse t in
       Error.map (lift_unop Ival.bitwise_signed_not) i
     | TUnOp (LNot, t) ->
-      ignore (infer ~force ~logic_env t);
+      ignore (recurse t);
       Ival Ival.zero_or_one
 
     | TBinOp ((Lt | Gt | Le | Ge | Eq | Ne | LAnd | LOr), t1, t2) ->
-      ignore (infer ~force ~logic_env t1);
-      ignore (infer ~force ~logic_env t2);
+      ignore (recurse t1);
+      ignore (recurse t2);
       Ival Ival.zero_or_one
 
     | TBinOp ((PlusA | MinusA | Mult | Div | Mod | Shiftlt
               | Shiftrt | BAnd | BXor | BOr) as op , t1, t2) ->
-      let i1 = infer ~force ~logic_env t1 in
-      let i2 = infer ~force ~logic_env t2 in
+      let i1 = recurse t1 in
+      let i2 = recurse t2 in
       Error.map2 (lift_arith_binop (ival_arith_binop op)) i1 i2
 
     | TCast (false, Ctype ty, t) ->
-      let src = infer ~force ~logic_env t in
+      let src = recurse t in
       let dst = interv_of_typ ty in
       Error.map (fun src -> cast ~src ~dst) src
-    | TCast (true, _, t) -> get_res (infer ~force ~logic_env t)
+    | TCast (true, _, t) -> get_res (recurse t)
     | TCast (false, _,_) -> assert false
     | Tif (t1, t2, t3) ->
-      ignore (infer ~force ~logic_env t1);
+      ignore (recurse t1);
       let logic_env_tbranch, logic_env_fbranch =
         compute_logic_env_if_branches logic_env t1
       in
-      let i2 = infer ~force ~logic_env:logic_env_tbranch t2 in
-      let i3 = infer ~force ~logic_env:logic_env_fbranch t3 in
+      let i2 = recurse ~logic_env:logic_env_tbranch t2 in
+      let i3 = recurse ~logic_env:logic_env_fbranch t3 in
       Error.map2 join i2 i3
     | Tat (t, _) ->
-      get_res (infer ~force ~logic_env t)
+      get_res (recurse t)
     | TBinOp (MinusPP, t1, t2) ->
-      ignore (infer ~force ~logic_env t1);
-      ignore (infer ~force ~logic_env t2);
+      ignore (recurse t1);
+      ignore (recurse t2);
       (match Ast_types.unroll (get_cty t1) with
        | { tnode = TArray(_, _) } as ta ->
          begin
@@ -414,8 +417,8 @@ let rec infer ~force ~logic_env t =
        | { tnode = TPtr _ } -> Lazy.force interv_of_unknown_block
        | _ -> assert false)
     | Tblock_length (_, t)
-    | Toffset(_, t) ->
-      ignore (infer ~force ~logic_env t);
+    | Toffset (_, t) ->
+      ignore (recurse t);
       (match Ast_types.unroll (get_cty t) with
        | { tnode = TArray (_, _) } as ta ->
          begin
@@ -435,9 +438,7 @@ let rec infer ~force ~logic_env t =
          let call_profile =
            Profile.make
              li.l_profile
-             (List.map
-                (fun arg -> get_res (infer ~force ~logic_env arg))
-                args)
+             (List.map (fun arg -> get_res @@ recurse arg) args)
          in
          if LF_env.is_rec li then
            try
@@ -473,29 +474,27 @@ let rec infer ~force ~logic_env t =
                  ranges inside this C type *)
               (match li.l_type with
                | Some (Ctype typ) ->
-                 ignore ((infer ~force ~logic_env t'));
+                 ignore (recurse ~logic_env t');
                  interv_of_typ typ;
                | None | Some _ ->
-                 get_res (infer ~force ~logic_env t'))
+                 get_res (recurse ~logic_env t'))
             | _ -> assert false)
        | LBnone when li.l_var_info.lv_name = "\\sum" ||
                      li.l_var_info.lv_name = "\\product" ->
          (match args with
           | [ t1; t2; { term_node = Tlambda([ k ], _) } as lambda ] ->
-            let t1_iv = infer ~force ~logic_env t1 in
-            let t2_iv = infer ~force ~logic_env t2 in
+            let t1_iv = recurse t1 in
+            let t2_iv = recurse t2 in
             let k_iv = Error.map2 join t1_iv t2_iv in
             let logic_env_with_k =
               Logic_env.add logic_env k k_iv
             in
-            let lambda_iv = infer ~force ~logic_env:logic_env_with_k lambda in
+            let lambda_iv = recurse ~logic_env:logic_env_with_k lambda in
             Error.map3 (infer_sum_product li.l_var_info) lambda_iv t1_iv t2_iv
           | _ -> Error.not_yet "extended quantifiers without lambda term")
        | LBnone
        | LBreads _ ->
-         List.iter
-           (fun arg -> ignore (infer ~force ~logic_env arg))
-           args;
+         List.iter (fun arg -> ignore @@ recurse arg) args;
          (match li.l_type with
           | None -> assert false
           | Some ret_type -> interv_of_logic_typ ret_type)
@@ -505,9 +504,9 @@ let rec infer ~force ~logic_env t =
     | Tunion _ -> Error.not_yet "tset union"
     | Tinter _ -> Error.not_yet "tset intersection"
     | Tcomprehension (_,_,_) -> Error.not_yet "tset comprehension"
-    | Trange(Some n1, Some n2) ->
-      let i1 = infer ~force ~logic_env n1 in
-      let i2 = infer ~force ~logic_env n2 in
+    | Trange (Some n1, Some n2) ->
+      let i1 = recurse n1 in
+      let i2 = recurse n2 in
       Error.map2 join i1 i2
     | Trange(None, _) | Trange(_, None) ->
       Options.abort ~current:true "unbounded ranges are not part of E-ACSl"
@@ -515,16 +514,16 @@ let rec infer ~force ~logic_env t =
     | Tlet (li,t) ->
       let li_t = Misc.term_of_li li in
       let li_v = li.l_var_info in
-      let i1 = infer ~force ~logic_env li_t in
+      let i1 = recurse li_t in
       let logic_env =
         Error.map (Logic_env.add logic_env li_v) i1
       in
-      get_res (infer ~force ~logic_env t)
+      get_res (recurse ~logic_env t)
     | TConst (LReal lr) ->
       if lr.r_lower = lr.r_upper then Float(FDouble, Some lr.r_nearest)
       else Rational
     | Tlambda ([ _ ],lt) ->
-      get_res (infer ~force ~logic_env lt)
+      get_res (recurse lt)
 
     | TStartOf lv
     | TAddrOf lv ->
@@ -533,22 +532,22 @@ let rec infer ~force ~logic_env t =
 
     | TBinOp (PlusPI, t1 ,t2)
     | TBinOp (MinusPI, t1, t2) ->
-      ignore (infer ~force ~logic_env t1);
-      ignore (infer ~force ~logic_env t2);
+      ignore (recurse t1);
+      ignore (recurse t2);
       Nan
 
     | Tbase_addr (_,t)
     | Ttypeof t ->
-      ignore (infer ~force ~logic_env t);
+      ignore (recurse t);
       Nan
 
-    |TDataCons(_,l) ->
-      List.iter (fun t -> ignore (infer ~force ~logic_env t)) l;
+    | TDataCons (_,l) ->
+      List.iter (fun t -> ignore (recurse t)) l;
       Nan
 
-    | TUpdate(t1, toff, t2) ->
-      ignore (infer ~force ~logic_env t1);
-      ignore (infer ~force ~logic_env t2);
+    | TUpdate (t1, toff, t2) ->
+      ignore (recurse t1);
+      ignore (recurse t2);
       infer_term_offset ~force ~logic_env toff;
       Nan
 
