@@ -142,13 +142,13 @@ struct str_list {
 
 /*@
   assigns \result \from indirect:fildes, indirect:path[0..];
-    //missign: assigns 'filesystem' \from 'filesystem'
+    //missing: assigns 'filesystem' \from 'filesystem'
 */
 extern int fattach(int fildes, const char *path);
 
 /*@
   assigns \result \from indirect:path[0..];
-    //missign: assigns 'filesystem' \from 'filesystem'
+    //missing: assigns 'filesystem' \from 'filesystem'
 */
 extern int fdetach(const char *path);
 
