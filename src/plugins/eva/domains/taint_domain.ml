@@ -24,9 +24,10 @@ let auto_taint_arg_functions = (* auto taint the arguments *) [
   "read"
 ]
 
+(* Variadic function expecting a string literal argument as nth argument. *)
 let auto_taint_variadic_functions = [
-  "fscanf";
-  "scanf"
+  "fscanf", 1;
+  "scanf", 0;
 ]
 
 let auto_taint_res_functions = (* auto taint the result *) [
@@ -405,10 +406,13 @@ module TransferSingleTaint = struct
     let splitted = String.split_on_char '%' s in
     List.length splitted - 1
 
+  (* If [kf] is a known variadic function, returns the position of the
+     expected string literal argument; returns None otherwise. *)
   let is_auto_taint_variadic kf =
     let vi = Kernel_function.get_vi kf in
-    Ast_attributes.contains "fc_stdlib_generated" vi.vattr
-    && List.mem vi.vorig_name auto_taint_variadic_functions
+    if not (Ast_attributes.contains "fc_stdlib_generated" vi.vattr)
+    then None
+    else List.assoc_opt vi.vorig_name auto_taint_variadic_functions
 
   let is_auto_taint_arg kf =
     let vi = Kernel_function.get_vi kf in
@@ -427,6 +431,11 @@ module TransferSingleTaint = struct
     match l with
     | curr :: rest when n > 0 -> curr :: get_n_first rest (n - 1)
     | _ -> []
+
+  (* Can be replaced by List.drop with OCaml 5.3. *)
+  let rec drop n = function
+    | _elt :: l when n > 0 -> drop (n - 1) l
+    | l -> l
 
   let rec find_tainted_argument args =
     match args with
@@ -456,9 +465,10 @@ module TransferSingleTaint = struct
   (* Adds automatic taint from [call] to [state] for some libc functions.
      Should be called after [finalize_call] only if -eva-auto-taint is set. *)
   let add_call_auto_taint call state =
-    if is_auto_taint_variadic call.Eval.kf then
+    match is_auto_taint_variadic call.Eval.kf with
+    | Some str_literal_pos ->
       begin
-        match call.arguments with
+        match drop str_literal_pos call.arguments with
         | { concrete = { node = StartOf { node = (Var vi,NoOffset)} } } :: rest
           when Ast_info.is_string_literal vi ->
           begin
@@ -475,22 +485,23 @@ module TransferSingleTaint = struct
           end
         | _ -> state
       end
-    else if is_auto_taint_arg call.kf then
-      begin
-        try
-          let to_taint = find_tainted_argument call.arguments in
-          let zone = arg_to_zone to_taint in
+    | None ->
+      if is_auto_taint_arg call.kf then
+        begin
+          try
+            let to_taint = find_tainted_argument call.arguments in
+            let zone = arg_to_zone to_taint in
+            { state with locs_data = Zone.join state.locs_data zone }
+          with
+          | Not_found -> state
+        end
+      else if is_auto_taint_res call.kf then
+        begin
+          let zone = zone_of_return call.return in
           { state with locs_data = Zone.join state.locs_data zone }
-        with
-        | Not_found -> state
-      end
-    else if is_auto_taint_res call.kf then
-      begin
-        let zone = zone_of_return call.return in
-        { state with locs_data = Zone.join state.locs_data zone }
-      end
-    else
-      state
+        end
+      else
+        state
 
   let show_expr valuation state fmt exp =
     let to_loc = loc_of_lval valuation in
