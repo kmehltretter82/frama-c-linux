@@ -6,7 +6,7 @@
 #                                                                        #
 ##########################################################################
 
-# Default font for all widgets The first exisiting font is used.
+# Default font for all widgets The first existing font is used.
 style "general 1" 
 {
         font_name = "DejaVu Sans"
@@ -23,7 +23,7 @@ widget "*" style "general 3"
 widget "*" style "general 2"
 widget "*" style "general 1"
 
-# Style for widgets displaying source code. The first exisiting font is used.
+# Style for widgets displaying source code. The first existing font is used.
 style "monospace 1" 
 {
         font_name = "Menlo"

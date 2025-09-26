@@ -6,7 +6,7 @@
 ;;                                                                        ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-; automatic versionning from opam file
+; automatic versioning from opam file
 (rule
  (targets version.ml)
  (deps frama-c-lint.opam)

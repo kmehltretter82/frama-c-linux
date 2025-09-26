@@ -124,7 +124,7 @@ stdenv.mkDerivation {
     cp frama-c-$name.opam $out/lib/frama-c-$name/opam
   '' else "" ;
 
-  # Required so that tests of external plugins can be excuted
+  # Required so that tests of external plugins can be executed
   postFixup = ''
     cp -r $out/share/doc $out/doc
   '';

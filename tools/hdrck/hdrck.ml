@@ -617,7 +617,7 @@ let umsg =
      "The location directory of the license definitions can be specified using the -header-dirs option.\n" ^
      "When the name of a <header spec file> has the form 'path/./header-spec-file', "^
      "then the <source file> names that it contains " ^
-     "are considered beeing relative to given 'path'.\n" ^
+     "are considered relative to the given 'path'.\n" ^
      "That is done before processing the option '-C <dir>'.'\n" ^
      "List of the options:")
 
