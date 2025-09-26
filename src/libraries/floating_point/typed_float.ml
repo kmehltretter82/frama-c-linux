@@ -251,6 +251,11 @@ let pos_inf_shortcut ~format =
   let max = largest_finite_float_of ~format in
   Shortcut { lower = max ; nearest = inf ; upper = inf ; format }
 
+let zero_shortcut ~format =
+  let zero = represents ~float:0.0 ~in_format:format in
+  let smallest = smallest_denormal_float_of ~format in
+  Shortcut { lower = zero ; nearest = zero ; upper = smallest ; format }
+
 
 
 let normalize_exponent_of_string ~format e =
@@ -308,6 +313,7 @@ let normalize integral fractional exponent format =
      significant size, i.e it's the minimal exponent of the last bit of
      the significant. *)
   let sig_size = sig_size format in
+  let maximal_exponent = maximal_exponent_of ~format in
   let minimal_exponent = minimal_exponent_of ~format in
   let minimal_exponent = Stdlib.(minimal_exponent - sig_size + 1) in
   (* Morally, the next step would be to find δ ∈ ℤ such as we have :
@@ -325,11 +331,16 @@ let normalize integral fractional exponent format =
      number is larger than the largest exponent in the format, we can already
      take a shortcut, the result will be infinity. This fix an old issue where
      the parser were stuck for a long time on numbers like 1e99999. *)
-  let delta = Stdlib.(sig_size - Z.log2 !numerator + Z.log2 !denominator + 1) in
-  let max_exponent_in_format = maximal_exponent_of ~format in
-  let exponent_underapprox = Stdlib.(!exponent - delta) in
-  let is_infinity = Stdlib.(max_exponent_in_format < exponent_underapprox) in
+  let delta = Stdlib.(Z.log2 !denominator - Z.log2 !numerator) in
+  (* Fast check for maximal exponent. *)
+  let exponent_underapprox = Stdlib.(!exponent - sig_size - delta - 1) in
+  let is_infinity = Stdlib.(maximal_exponent < exponent_underapprox) in
   let* () = if is_infinity then pos_inf_shortcut ~format else Normalized () in
+  (* Fast check for minimal exponent. *)
+  let exponent_overapprox = Stdlib.(!exponent - delta + 1) in
+  let is_zero = Stdlib.(minimal_exponent > exponent_overapprox) in
+  let* () = if is_zero then zero_shortcut ~format else Normalized () in
+  (* Precise check. *)
   let shifted_denom () = Z.shift_left !denominator sig_size in
   let denom_can_grow () = Z.Compare.(!numerator >= shifted_denom ()) in
   let exponent_too_small () = Stdlib.(!exponent < minimal_exponent) in
