@@ -21,7 +21,7 @@ function InstallHelp()
     echo "Ivette Requirements:"
     echo "  - node v20 or v22"
     echo "  - yarn (any version)"
-    echo "Recommanded Installation:"
+    echo "Recommended Installation:"
     echo "  - install nvm (https://github.com/nvm-sh/nvm)"
     echo "  - run 'nvm use 22'"
     echo "  - run 'npm install --global yarn'"

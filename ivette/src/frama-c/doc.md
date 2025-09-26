@@ -31,7 +31,7 @@ However, Ctrl+click opens the file in an external editor at the selected
 location. The editor (emacs by default) can be configured in the Ivette
 preferences.
 
-Other useful shorcuts are:
+Other useful shortcuts are:
 - Alt+F to search for a given text or regexp.
 - Alt+G to go to a given line.
 

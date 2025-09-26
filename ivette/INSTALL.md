@@ -2,7 +2,7 @@
 
 Required package to be installed:
 - `node` version 20.x or 22.x;
-- `yarn` for node pakage management;
+- `yarn` for node package management;
 - `pandoc` for generating the documentation.
 
 ## Linux

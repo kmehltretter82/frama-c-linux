@@ -13,7 +13,7 @@ and shall register sandboxe(s) by using typically:
         id: 'sandbox.<ident>',
         label: 'My New Feature',
         title: 'Testing this new amazing feature',
-        chidren: <MyNewFeature />,
+        children: <MyNewFeature />,
     })
 
 Enjoy Sandboxing !
