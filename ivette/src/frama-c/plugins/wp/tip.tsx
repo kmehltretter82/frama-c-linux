@@ -438,7 +438,7 @@ export function TIPView(props: TIPProps): JSX.Element {
           icon='MEDIA.HALT'
           kind='negative'
           enabled={server.running}
-          title={`Interrrupt (${server.todo}/${server.todo + server.done})`}
+          title={`Interrupt (${server.todo}/${server.todo + server.done})`}
           onClick={cancelProofTasks}
         />
       </ToolBar>
@@ -448,7 +448,7 @@ export function TIPView(props: TIPProps): JSX.Element {
           parents={parents}
           subgoals={children}
         />
-        <Vfill className='dome-positionned'>
+        <Vfill className='dome-positioned'>
           <Overlay display className='wp-printer'>
             <Icon
               id='LOCK'

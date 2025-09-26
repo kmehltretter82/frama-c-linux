@@ -103,7 +103,7 @@ export interface SectionProps {
   rightButtonProps?: IconButtonProps;
   /** Section contents. */
   children?: React.ReactNode;
-  /** Additionnal CSS class. */
+  /** Additional CSS class. */
   className?: string;
   /** Filering menu */
   filteringMenu?: React.JSX.Element;
@@ -262,7 +262,7 @@ export function Item(props: ItemProps): JSX.Element {
 export interface SidebarTitleProps {
   /** Label. */
   label: string;
-  /** Additionnal CSS class. */
+  /** Additional CSS class. */
   className?: string;
   /** Other elements. */
   children?: React.ReactNode;

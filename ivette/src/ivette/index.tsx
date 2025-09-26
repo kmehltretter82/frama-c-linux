@@ -63,7 +63,7 @@ export const GROUP = new State.ElementRack<ItemProps>();
 /** Defines a group of components.
 
    The group with identifier `G` contains
-   implicitely all components identified by pattern `G.*`. For instance,
+   implicitly all components identified by pattern `G.*`. For instance,
    component `fc.kernel.ast` belongs to group `kernel`.
 
    Group `fc.kernel` is dedicated to components of the Kernel.

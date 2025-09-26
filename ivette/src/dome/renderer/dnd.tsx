@@ -292,7 +292,7 @@ function RenderOverlay(
 
 /** Can be used to dynamically render an element with respect to current
    dragging state. The parameter `d` is `undefined` when there is no current
-   dragging action. Otherwize, `d` contains the relevant dragging data.  */
+   dragging action. Otherwise, `d` contains the relevant dragging data.  */
 export type DraggingRenderer = (d: Dragging | undefined) => JSX.Element;
 
 export interface DragSourceProps extends DragHandler, DropHandler {

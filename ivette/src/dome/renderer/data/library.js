@@ -371,7 +371,7 @@ export const Node = ({ children, ...props }) => {
    @property {Library} [lib] - local library to use
    @property {Sortable} [order] - local order to use (default: inherited)
    @property {boolean} [enabled] - fragment shall be rendered (default: `true`)
-   @property {boolean} [disabled] - fragment shal not be rendered (default: `false`)
+   @property {boolean} [disabled] - fragment shall not be rendered (default: `false`)
    @property {React.Children} [children] - sub-data and rendering of the data collection
  */
 export const Fragment = ({ lib: localLib, order, enabled = true, disabled = false, children, ...localProps }) => {

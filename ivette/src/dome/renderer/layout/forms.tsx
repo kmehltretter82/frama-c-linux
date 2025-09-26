@@ -110,8 +110,8 @@ function isValidArray(err: FieldError[]): boolean {
  *
  * There are three cases of an unstable fieldState :
  * - Error : There is an error in the field.
- * - Resetable : The fieldState has a reset value.
- * - Commitable : The fieldState has a reset value and is valid (!Error).
+ * - Resettable : The fieldState has a reset value.
+ * - Committable : The fieldState has a reset value and is valid (!Error).
  */
 export function isError<A>( state: FieldState<A> ): boolean {
   return !isValid(state.error);
@@ -265,7 +265,7 @@ export function useBuffer<A>(
 ): FieldState<A> {
   const { value, error, reset, onChanged } = state;
   const [ modified, setModified ] = React.useState(false);
-  const [ commited, setCommited ] = React.useState(false);
+  const [ committed, setCommitted ] = React.useState(false);
   const [ buffer, setBuffer ] = React.useState<A>(value);
   const [ berror, setBerror ] = React.useState<FieldError>(error);
 
@@ -284,7 +284,7 @@ export function useBuffer<A>(
    * this old value before the new value is returned to the field.
    */
   React.useEffect(() => {
-    setCommited((val) => {
+    setCommitted((val) => {
       if(!val) setModified(false);
       return true;
     });
@@ -308,7 +308,7 @@ export function useBuffer<A>(
     if (modified) {
       const doCommit = (): void => {
         if (valid) {
-          setCommited(false);
+          setCommitted(false);
           onChanged(buffer, undefined, false);
         } else {
           setModified(false);
@@ -330,14 +330,14 @@ export function useBuffer<A>(
       if (compare(equal, rollback, newValue)) {
         setModified(false);
       } else if (isReset && !compare(equal, newValue, value)) {
-        setCommited(false);
+        setCommitted(false);
         onChanged(newValue, newError, isReset);
       }
     }, [equal, value, rollback, onChanged]);
 
   return {
-    value: modified || !commited ? buffer : value,
-    error: modified || !commited ? berror : error,
+    value: modified || !committed ? buffer : value,
+    error: modified || !committed ? berror : error,
     reset: reset ?? (modified ? value : undefined),
     onChanged: onLocalChange,
   };
@@ -1390,7 +1390,7 @@ export interface SliderFieldProps extends FieldProps<number> {
 
 const FORMAT_VALUE = (v: number): string => Number(v).toString();
 const FORMAT_RANGE = (v: number): string => (v > 0 ? `+${v}` : `-${-v}`);
-const FORMATING =
+const FORMATTING =
   (props: SliderFieldProps): (undefined | ((v: number) => string)) => {
     const { labelValue = true, min } = props;
     if (labelValue === false) return undefined;
@@ -1416,7 +1416,7 @@ export function SliderField(props: SliderFieldProps): JSX.Element {
   const delayed = useLatency(checked, latency);
   const [label, setLabel] = React.useState<string | undefined>(undefined);
   const { value, error, onChanged } = delayed;
-  const labeling = FORMATING(props);
+  const labeling = FORMATTING(props);
   const onChange = React.useMemo(
     () => {
       const fadeOut = debounce(() => setLabel(undefined), latency);

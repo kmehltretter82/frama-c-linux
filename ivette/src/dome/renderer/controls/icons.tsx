@@ -41,7 +41,7 @@ export interface SVGprops {
   /** Icon's dimension in pixels (default: `12`). */
   size?: number;
   /**
-     Vertical alignement offset, in pixels.
+     Vertical alignment offset, in pixels.
      Default is set to `-0.125` times the size).
    */
   offset?: number;

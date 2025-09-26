@@ -67,7 +67,7 @@ export const ledTag: Pattern = {
   }
 };
 
-const defautPatterns = [iconTag, ledTag];
+const defaultPatterns = [iconTag, ledTag];
 
 // --------------------------------------------------------------------------
 // --- Replacement function
@@ -149,7 +149,7 @@ export function Markdown(
 ): JSX.Element {
   const { className, scrollTo, checkLink, onLinkClick,
     patterns = [], children } = props;
-  const mdPatterns = patterns.concat(defautPatterns);
+  const mdPatterns = patterns.concat(defaultPatterns);
 
   const theme = Themes.useColorTheme()[0];
   const markdownClasses = classes(

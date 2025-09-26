@@ -87,7 +87,7 @@ export interface MessageProps<A> {
    - the default value if the enter key is pressed,
    - or the value of the clicked button otherwised.
 
-   The promise is asynchronously resolved by defaut.
+   The promise is asynchronously resolved by default.
    For synchronous resolution, you need to use the `block` option.
 
    The default buttons are `"Ok"` and `"Cancel"` associated to values `true` and

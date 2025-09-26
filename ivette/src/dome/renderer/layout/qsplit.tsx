@@ -47,7 +47,7 @@ export interface QSplitProps {
   setPosition?: (HTOP: number, HBOTTOM: number, V: number) => void;
   /** Q-Split contents. Shall be (possibly packed) Q-Panes.
      Other components would be layout as they are in the
-     positionned `<div/>` of the Q-Split. */
+     positioned `<div/>` of the Q-Split. */
   children?: React.ReactNode;
 }
 
@@ -498,7 +498,7 @@ function QSplitEngine(props: QSplitEngineProps): JSX.Element {
 /* --- Q-Split                                                            --- */
 /* -------------------------------------------------------------------------- */
 
-/** Q-Spliiter Container.
+/** Q-Splitter Container.
 
    The contained is divided into four quarters named `A`, `B`, `C` and `D`
    with the following layout:
@@ -519,9 +519,9 @@ function QSplitEngine(props: QSplitEngineProps): JSX.Element {
    collapse and the only component extends to the full container size.
 
    Other cases are a bit degenerated and lead to « incomplete » layout.
-   For instance, when a given component is positionned into two diagonal
+   For instance, when a given component is positioned into two diagonal
    corners but the adjacent quarters can not collapse,
-   it will be positionned into only one quarter.
+   it will be positioned into only one quarter.
  */
 export function QSplit(props: QSplitProps): JSX.Element {
   const CONTAINER = Utils.classes('dome-xSplitter-container', props.className);
@@ -541,7 +541,7 @@ export function QSplit(props: QSplitProps): JSX.Element {
 /* -------------------------------------------------------------------------- */
 
 export interface QPaneProps {
-  id: string; /** Q-Pane Identifer. */
+  id: string; /** Q-Pane Identifier. */
   className?: string; /** Additional class of the Q-Pane div. */
   style?: React.CSSProperties; /** Additional style of the Q-Pane div. */
   children?: React.ReactNode; /** Q-Pane contents. */
@@ -550,7 +550,7 @@ export interface QPaneProps {
 /**
    Q-Splitter Components.
 
-   Childrens are rendered in a positionned `<div/>` with absolute coordinates.
+   Childrens are rendered in a positioned `<div/>` with absolute coordinates.
  */
 export function QPane(props: QPaneProps): JSX.Element {
   const layout = React.useContext(QSplitContext);

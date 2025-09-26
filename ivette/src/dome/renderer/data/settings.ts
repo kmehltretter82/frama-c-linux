@@ -37,7 +37,7 @@ interface Settings<A> {
 
 /**
    Global settings.
-   This utility class allows you to share accross several
+   This utility class allows you to share across several
    components and windows the parameters associated to global settings.
 
    However, it is important to note that global settings are uniquely identified

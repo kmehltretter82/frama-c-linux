@@ -287,7 +287,7 @@ export function jEnum<A>(d: { [tag: string]: A }): Decoder<A> {
 /**
    One of the enumerated _constants_ or throws JsonError.
    The typechecker will prevent you from listing values that are not in
-   type `A`. However, it will not protected you from missings constants in `A`.
+   type `A`. However, it will not protect you from missing constants in `A`.
 */
 export function jTags<A extends string | number>(...values: A[]): Decoder<A> {
   const m = new Set<string | number>();

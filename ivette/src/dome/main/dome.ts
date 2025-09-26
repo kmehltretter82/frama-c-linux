@@ -130,7 +130,7 @@ function saveSettings(file: string, data: Store = {}): void {
 // --- Global Settings
 // --------------------------------------------------------------------------
 
-let GlobalSettings = {}; // Current Dictionnary
+let GlobalSettings = {}; // Current Dictionary
 
 const APP_DIR = app.getPath('userData');
 const PATH_WINDOW_SETTINGS = path.join(APP_DIR, 'WindowSettings.json');
@@ -165,7 +165,7 @@ interface Handle {
   primary: boolean; // Primary window
   window: BrowserWindow; // Also prevents Gc
   frame: Electron.Rectangle | undefined; // Window frame
-  devtools: boolean; // Developper tools visible
+  devtools: boolean; // Developer tools visible
   reloaded: boolean; // Reloaded window
   config: string; // Path to config file
   settings: Store; // Current settings

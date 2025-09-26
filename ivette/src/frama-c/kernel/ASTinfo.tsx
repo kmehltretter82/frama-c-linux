@@ -78,7 +78,7 @@ function FieldInfo(props: FieldInfoProps): JSX.Element {
 }
 
 // --------------------------------------------------------------------------
-// --- Mark Informations Buttons
+// --- Mark Information Buttons
 // --------------------------------------------------------------------------
 
 interface MarkButtonProps {
@@ -102,7 +102,7 @@ function MarkButton(props: MarkButtonProps): JSX.Element {
 }
 
 // --------------------------------------------------------------------------
-// --- Mark Informations Section
+// --- Mark Information Section
 // --------------------------------------------------------------------------
 
 interface InfoSectionProps {

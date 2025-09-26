@@ -19,7 +19,7 @@ import React from 'react' ;
 
 export function register(Component,NAME) {
   Component._DOME = NAME ;
-  Component.istanceOf = (elt) => (elt.type ? elt.type._DOME === NAME : false) ;
+  Component.instanceOf = (elt) => (elt.type ? elt.type._DOME === NAME : false) ;
 }
 
 // --------------------------------------------------------------------------

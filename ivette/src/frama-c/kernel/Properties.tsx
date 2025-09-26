@@ -582,7 +582,7 @@ function FilterSection(props: SectionProps): JSX.Element {
 interface CheckFieldProps {
   label: string;
   title?: string;
-  highligh?: boolean; // Highlights the label when the value is [highligh]
+  highlight?: boolean; // Highlights the label when the value is [highlight]
   path: string;
 }
 
@@ -593,7 +593,7 @@ function CheckField(props: CheckFieldProps): JSX.Element {
     <Checkbox
       style={{
         display: 'block',
-        color: (props.highligh === value) ? 'red' : '',
+        color: (props.highlight === value) ? 'red' : '',
       }}
       label={props.label}
       title={props.title}

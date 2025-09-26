@@ -164,7 +164,7 @@ function getOnEngineStop(
   };
 }
 
-/** Tranform JSX.Element to HtmlObject */
+/** Transform JSX.Element to HtmlObject */
 const jsxToHtmlObject = (jsxElement: JSX.Element): HTMLDivElement => {
   const container = document.createElement('div');
   createRoot(container).render(jsxElement);

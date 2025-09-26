@@ -108,7 +108,7 @@ export function EvaSideBar(): JSX.Element {
       state: AutoLoopUnroll
     },
     "-eva-min-loop-unroll": {
-      label: "Minimun loop unrolling",
+      label: "Minimum loop unrolling",
       step: 1, min: 0, max: 10,
       state: MinLoopUnroll
     },

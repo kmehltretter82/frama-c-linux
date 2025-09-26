@@ -75,7 +75,7 @@ export type Handlers<I> = { [e in keyof EventMap]?: Handler<I, EventMap[e]> };
 // hooks shenanigans. It also exposes a StateField, a CodeMirror data structure
 // representing the internal state's part responsible of the data. This
 // structure is exposed for two reasons. The first one is that it contains the
-// extension that must be added to the CodeMirror instanciation. The second one
+// extension that must be added to the CodeMirror instantiation. The second one
 // is that it is needed during the Aspects creation's process.
 export interface Field<A> extends Data<A, StateField<A>> { set: Set<A> }
 
@@ -123,13 +123,13 @@ function mapDeps<I extends Dict, A>(deps: Deps<I>, fn: Mapper<I, A>): A[] {
   return Object.keys(deps).map((k) => fn(deps[k], k));
 }
 
-// Helper function used to check if at least one depencency satisfied a
+// Helper function used to check if at least one dependency satisfied a
 // given predicate.
 function existsDeps<I extends Dict>(deps: Deps<I>, fn: Pred<I>): boolean {
   return Object.keys(deps).find((k) => fn(deps[k], k)) !== undefined;
 }
 
-// Helper function used to transfrom a Dependencies will keeping its structure.
+// Helper function used to transform a Dependencies will keeping its structure.
 function transformDeps<I extends Dict>(deps: Deps<I>, tr: Transform<I>): Dict {
   return Object.fromEntries(Object.keys(deps).map(k => [k, tr(deps[k], k)]));
 }
@@ -253,7 +253,7 @@ export function createTooltip<I extends Dict>(
   return [extension, show];
 }
 
-// An Event Handler is an extention responsible of performing a computation each
+// An Event Handler is an extension responsible of performing a computation each
 // time a DOM event (like <mouseup> or <contextmenu>) happens.
 export function createEventHandler<I extends Dict>(
   deps: Dependencies<I>,
@@ -270,7 +270,7 @@ export function createEventHandler<I extends Dict>(
 }
 
 // A View updater is an extension that allows to modify the view each time a
-// depencency is updated. For example, one could use this to change the cursor
+// dependency is updated. For example, one could use this to change the cursor
 // position when a Data is updated by the outside world.
 export function createViewUpdater<I extends Dict>(
   deps: Dependencies<I>,
@@ -446,7 +446,7 @@ function createHighlightActiveLine(): Extension {
   });
 }
 
-// An extension handling the folding of foldable nodes. For exemple, If used
+// An extension handling the folding of foldable nodes. For example, If used
 // with the language highlighter defined above, it will provides interactions
 // to fold comments only.
 export const FoldGutter = createFoldGutter();
