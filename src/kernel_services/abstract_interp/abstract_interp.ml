@@ -204,7 +204,7 @@ module Make_Generic_Lattice_Set
     (Datatype.Make
        (struct
          type t = set
-         let name = V.name ^ " lattice_set"
+         let name = V.datatype_name ^ " lattice_set"
          let structural_descr =
            Structural_descr.t_sum [| [| Set.packed_descr |] |]
          let reprs = Top :: List.map (fun o -> Set o) Set.reprs

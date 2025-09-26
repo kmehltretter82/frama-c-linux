@@ -147,7 +147,7 @@ include Datatype.Make_with_collections
       type t = set
       let name = "int_set"
       open Structural_descr
-      let structural_descr = t_array (Descr.str Int.descr)
+      let structural_descr = t_array (Descr.str Int.datatype_descr)
       let reprs = [ zero ]
       let equal = equal
       let compare = compare

@@ -66,7 +66,7 @@ include Datatype.Make_with_collections
       let name = "int_interval"
       open Structural_descr
       let structural_descr =
-        let s_int = Descr.str Int.descr in
+        let s_int = Descr.str Int.datatype_descr in
         t_record [| pack (t_option s_int);
                     pack (t_option s_int);
                     Int.packed_descr;

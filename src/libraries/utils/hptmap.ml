@@ -662,11 +662,12 @@ struct
     Datatype.Make_with_collections
       (struct
         type t = hptmap
-        let name = "(" ^ Key.name ^ ", " ^ V.name ^ ") ptmap"
+        let name = "(" ^ Key.datatype_name ^ ", " ^ V.datatype_name ^ ") ptmap"
         open Structural_descr
         let r = Recursive.create ()
         let structural_descr =
-          if Descr.is_unmarshable Key.descr || Descr.is_unmarshable V.descr
+          if Descr.is_unmarshable Key.datatype_descr ||
+             Descr.is_unmarshable V.datatype_descr
           then t_unknown
           else
             t_sum
@@ -682,7 +683,8 @@ struct
         let compare = compare
         let hash = hash_generic
         let rehash =
-          if Descr.is_unmarshable Key.descr || Descr.is_unmarshable V.descr
+          if Descr.is_unmarshable Key.datatype_descr ||
+             Descr.is_unmarshable V.datatype_descr
           then Datatype.undefined
           else fun x -> !rehash_ref x
 
@@ -803,7 +805,7 @@ struct
     | Empty -> Empty
     | Leaf (k, v, _) -> wrap_Leaf k v
     | Branch (p,m,l,r,_) ->
-      if Descr.is_abstract Key.descr then
+      if Descr.is_abstract Key.datatype_descr then
         (* The keys id have not been modified during de-marshalling.
            The shapes of [l] and [r] are compatible, just merge them. *)
         wrap_Branch p m l r

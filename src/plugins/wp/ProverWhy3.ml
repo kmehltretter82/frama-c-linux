@@ -42,6 +42,7 @@ module Conf = WpContext.Index(struct
     include Datatype.Unit
     type key = unit
     type data = why3_conf
+    let name = datatype_name
   end)
 
 let get_why3_conf = Conf.memoize

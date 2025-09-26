@@ -103,7 +103,8 @@ struct
     include State_builder.Register
         (struct
           include Datatype.Ref(X)
-          let descr = if must_save then descr else Descr.unmarshable
+          let datatype_descr =
+            if must_save then datatype_descr else Descr.unmarshable
         end)
         (struct
           type t = data ref

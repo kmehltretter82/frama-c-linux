@@ -58,7 +58,7 @@ struct
     | Constant v ->
       if not (V.is_isotropic v) then
         Kernel.fatal "[Lmap] invalid default contents for offsetmaps %a \
-                      (datatype: %s)" V.pretty v V.name
+                      (datatype: %s)" V.pretty v V.datatype_name
     | _ -> ()
 
   let vtop () =
@@ -70,7 +70,7 @@ struct
 
     module Offsetmap = struct
       include Offsetmap
-      let name = Offsetmap.name ^ " " ^ Default_offsetmap.name
+      let datatype_name = Offsetmap.datatype_name ^ " " ^ Default_offsetmap.name
     end
 
     module Comp = struct
@@ -365,7 +365,7 @@ struct
       else pretty_diff_aux fmt m1 m2
 
     let is_included =
-      let name = Format.asprintf "Lmap(%s).is_included" V.name in
+      let name = Format.asprintf "Lmap(%s).is_included" V.datatype_name in
       let decide_fst base v1 =
         Offsetmap.is_included v1 (default_bound_offsetmap base)
       in
@@ -572,7 +572,8 @@ struct
         let structural_descr =
           Structural_descr.t_sum [| [| M.packed_descr |] |]
         let name =
-          Printf.sprintf "(%s, %s) Lmap" Offsetmap.name Default_offsetmap.name
+          Printf.sprintf "(%s, %s) Lmap"
+            Offsetmap.datatype_name Default_offsetmap.name
         let reprs = Bottom :: Top :: List.map (fun b -> Map b) M.reprs
         let equal = equal
         let compare = compare

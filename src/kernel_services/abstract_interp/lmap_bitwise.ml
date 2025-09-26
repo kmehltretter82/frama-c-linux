@@ -189,7 +189,7 @@ struct
         let reprs = Top :: List.map (fun b -> Map b) LBase.reprs
         let structural_descr =
           Structural_descr.t_sum [| [| LBase.packed_descr |] |]
-        let name = LOffset.name ^ " lmap_bitwise"
+        let name = LOffset.datatype_name ^ " lmap_bitwise"
         let hash = hash
         let equal = equal
         let compare = compare
@@ -320,7 +320,7 @@ struct
     | Map m1, Map m2 -> Map (join_on_map m1 m2)
 
   let is_included_map =
-    let name = Format.asprintf "Lmap_bitwise(%s).is_included" V.name in
+    let name = Format.asprintf "Lmap_bitwise(%s).is_included" V.datatype_name in
     let decide_fst b offs1 = LOffset.is_included offs1 (LOffset.default b) in
     let decide_snd b offs2 = LOffset.is_included (LOffset.default b) offs2 in
     let decide_both _ offs1 offs2 = LOffset.is_included offs1 offs2 in
