@@ -70,6 +70,7 @@ module type S = sig
   (** [pp_result pp] where [pp] is a formatter for ['a] returns a formatter for
       ['a result]. *)
 
+  val iter : ('a -> unit) -> 'a result -> unit
   val map : ('a -> 'b) -> 'a result -> 'b
   val map2 : ('a -> 'b -> 'c) -> 'a result -> 'b result -> 'c
   val map3 : ('a -> 'b -> 'c -> 'd) -> 'a result -> 'b result -> 'c result -> 'd

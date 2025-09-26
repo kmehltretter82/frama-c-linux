@@ -317,6 +317,15 @@ let infer_sum_product oper lambda min max = match lambda, min, max with
   | _ -> Error.not_yet "extended quantifiers with non-integer parameters"
 
 let rec infer ~force ~logic_env t =
+  let debug_analysis_result ~level t ival =
+    Error.iter (fun ival ->
+        Options.debug ~dkey ~level "%a : %a"
+          Printer.pp_term t
+          Analyses_types.pp_ival ival
+      ) ival;
+    ival
+  in
+  debug_analysis_result ~level:4 t @@
   let recurse ?(force = force) ?(logic_env = logic_env) t =
     infer ~force ~logic_env t
   in
@@ -856,10 +865,6 @@ and infer_predicate ~logic_env p =
     ignore (infer ~force:false ~logic_env t);
   | Pat(p, _) -> infer_predicate ~logic_env p
   | Pfresh _ -> Error.not_yet "\\fresh"
-
-let infer t =
-  let i = infer t in
-  i
 
 include Ival_datatype
 

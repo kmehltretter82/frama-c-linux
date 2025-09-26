@@ -42,6 +42,7 @@ module type S = sig
     Format.formatter ->
     'a result ->
     unit
+  val iter : ('a -> unit) -> 'a result -> unit
   val map: ('a -> 'b) -> 'a result -> 'b
   val map2: ('a -> 'b -> 'c) -> 'a result -> 'b result -> 'c
   val map3 : ('a -> 'b -> 'c -> 'd) -> 'a result -> 'b result -> 'c result -> 'd
@@ -124,6 +125,10 @@ module Make_with_opt(P: sig val phase:Options.category option end): S = struct
     match res with
     | Result.Ok a -> Format.fprintf fmt "@[%a@]" pp a
     | Result.Error err -> Format.fprintf fmt "@[%s@]" (Printexc.to_string err)
+
+  let iter f = function
+    | Result.Ok a -> f a
+    | Result.Error _ -> ()
 
   let map f = function
     | Result.Ok a -> f a
