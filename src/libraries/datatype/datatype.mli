@@ -45,10 +45,10 @@ module type S_no_copy = sig
 
   include Ty
 
-  val name: string
+  val datatype_name: string
   (** Unique name of the datatype. *)
 
-  val descr: t Descr.t
+  val datatype_descr: t Descr.t
   (** Datatype descriptor. *)
 
   val packed_descr: Structural_descr.pack

@@ -27,8 +27,8 @@ end
 
 module type S_no_copy = sig
   include Ty
-  val name: string
-  val descr: t Descr.t
+  val datatype_name: string
+  val datatype_descr: t Descr.t
   val packed_descr: Structural_descr.pack
   val reprs: t list
   val equal: t -> t -> bool
@@ -138,8 +138,7 @@ module Build
      end) =
 struct
 
-  let name = Type.name T.ty
-  (*  let () = Format.printf "datatype %S@." name*)
+  let datatype_name = Type.name T.ty
 
   let equal =
     if T.equal == from_compare then (fun x y -> T.compare x y = 0)
@@ -167,7 +166,7 @@ struct
       if Descr.is_unmarshable d then Descr.unmarshable
       else
       if rehash == undefined then begin
-        check rehash "rehash" name;
+        check rehash "rehash" datatype_name;
         assert false
       end
       else
@@ -175,7 +174,7 @@ struct
       else
         begin
           if Descr.is_unmarshable d then begin
-            check undefined "structural_descr" name;
+            check undefined "structural_descr" datatype_name;
             assert false
           end;
           Descr.transform d rehash
@@ -183,7 +182,7 @@ struct
     in
     descr, Descr.pack descr
 
-  let descr, packed_descr = mk_full_descr (Descr.of_type T.ty)
+  let datatype_descr, packed_descr = mk_full_descr (Descr.of_type T.ty)
   let reprs = T.reprs (* [Type.reprs] is not usable in the "no-obj" mode *)
 
   let %test_unit _ =
@@ -219,8 +218,9 @@ module Make(X: Make_input) = struct
 
   module T = struct
     include X
-    let name = if is_module_name X.name then X.name ^ ".t" else X.name
-    let ty = Type.register ~name X.structural_descr X.reprs
+    let ty =
+      let name = if is_module_name X.name then X.name ^ ".t" else X.name in
+      Type.register ~name X.structural_descr X.reprs
   end
 
   include T
@@ -359,11 +359,12 @@ module Polymorphic2(P: Polymorphic2_input) = struct
             build mk T1.mem_project T2.mem_project
         end)
 
-    let descr, packed_descr =
+    let datatype_descr, packed_descr =
       mk_full_descr
         (Descr.of_structural
            ty
-           (P.structural_descr (Descr.str T1.descr) (Descr.str T2.descr)))
+           (P.structural_descr
+              (Descr.str T1.datatype_descr) (Descr.str T2.datatype_descr)))
 
   end
 
@@ -454,14 +455,14 @@ struct
             build mk T1.mem_project T2.mem_project T3.mem_project
         end)
 
-    let descr, packed_descr =
+    let datatype_descr, packed_descr =
       mk_full_descr
         (Descr.of_structural
            ty
            (P.structural_descr
-              (Descr.str T1.descr)
-              (Descr.str T2.descr)
-              (Descr.str T3.descr)))
+              (Descr.str T1.datatype_descr)
+              (Descr.str T2.datatype_descr)
+              (Descr.str T3.datatype_descr)))
 
   end
 
@@ -560,15 +561,15 @@ struct
             build mk T1.mem_project T2.mem_project T3.mem_project T4.mem_project
         end)
 
-    let descr, packed_descr =
+    let datatype_descr, packed_descr =
       mk_full_descr
         (Descr.of_structural
            ty
            (P.structural_descr
-              (Descr.str T1.descr)
-              (Descr.str T2.descr)
-              (Descr.str T3.descr)
-              (Descr.str T4.descr)))
+              (Descr.str T1.datatype_descr)
+              (Descr.str T2.datatype_descr)
+              (Descr.str T3.datatype_descr)
+              (Descr.str T4.datatype_descr)))
 
   end
 
@@ -629,9 +630,9 @@ let pair (type typ1) (type typ2) (ty1: typ1 Type.t) (ty2: typ2 Type.t) =
   let module Make(X: sig type t val ty: t Type.t end) = struct
     type t = X.t
     let ty = X.ty
-    let name = Type.name X.ty
-    let descr = Descr.of_type X.ty
-    let packed_descr = Descr.pack descr
+    let datatype_name = Type.name X.ty
+    let datatype_descr = Descr.of_type X.ty
+    let packed_descr = Descr.pack datatype_descr
     let reprs = Type.reprs X.ty
     let equal = equal X.ty
     let compare = compare X.ty
@@ -758,9 +759,10 @@ module Polymorphic_gen(P: Polymorphic_input) = struct
           let reprs = Type.reprs ty
         end)
 
-    let descr, packed_descr =
+    let datatype_descr, packed_descr =
       mk_full_descr
-        (Descr.of_structural ty (P.structural_descr (Descr.str X.descr)))
+        (Descr.of_structural ty
+           (P.structural_descr (Descr.str X.datatype_descr)))
 
   end
 
@@ -773,7 +775,7 @@ module Polymorphic(P: Polymorphic_input) = struct
       (X)
       (struct
         let rehash =
-          if Descr.is_unmarshable X.descr then undefined
+          if Descr.is_unmarshable X.datatype_descr then undefined
           else identity
       end)
 end
@@ -805,9 +807,9 @@ let t_ref (type typ) (ty: typ Type.t) =
     Ref(struct
       type t = typ
       let ty = ty
-      let name = Type.name ty
-      let descr = Descr.of_type ty
-      let packed_descr = Descr.pack descr
+      let datatype_name = Type.name ty
+      let datatype_descr = Descr.of_type ty
+      let packed_descr = Descr.pack datatype_descr
       let reprs = Type.reprs ty
       let equal = equal ty
       let compare = compare ty
@@ -858,9 +860,9 @@ let option (type typ) (ty: typ Type.t) =
     Option(struct
       type t = typ
       let ty = ty
-      let name = Type.name ty
-      let descr = Descr.of_type ty
-      let packed_descr = Descr.pack descr
+      let datatype_name = Type.name ty
+      let datatype_descr = Descr.of_type ty
+      let packed_descr = Descr.pack datatype_descr
       let reprs = Type.reprs ty
       let equal = equal ty
       let compare = compare ty
@@ -925,9 +927,9 @@ let list (type typ) (ty: typ Type.t) =
     List(struct
       type t = typ
       let ty = ty
-      let name = Type.name ty
-      let descr = Descr.of_type ty
-      let packed_descr = Descr.pack descr
+      let datatype_name = Type.name ty
+      let datatype_descr = Descr.of_type ty
+      let packed_descr = Descr.pack datatype_descr
       let reprs = Type.reprs ty
       let equal = equal ty
       let compare = compare ty
@@ -1011,9 +1013,9 @@ let array (type typ) (ty: typ Type.t) =
     Array(struct
       type t = typ
       let ty = ty
-      let name = Type.name ty
-      let descr = Descr.of_type ty
-      let packed_descr = Descr.pack descr
+      let datatype_name = Type.name ty
+      let datatype_descr = Descr.of_type ty
+      let packed_descr = Descr.pack datatype_descr
       let reprs = Type.reprs ty
       let equal = equal ty
       let compare = compare ty
@@ -1057,9 +1059,9 @@ let queue (type typ) (ty: typ Type.t) =
     Queue(struct
       type t = typ
       let ty = ty
-      let name = Type.name ty
-      let descr = Descr.of_type ty
-      let packed_descr = Descr.pack descr
+      let datatype_name = Type.name ty
+      let datatype_descr = Descr.of_type ty
+      let packed_descr = Descr.pack datatype_descr
       let reprs = Type.reprs ty
       let equal = equal ty
       let compare = compare ty
@@ -1079,15 +1081,15 @@ let queue (type typ) (ty: typ Type.t) =
 module Set(S: Set.S)(E: S with type t = S.elt) =
 struct
 
-  let () = check E.equal "equal" E.name
-  let () = check E.compare "compare" E.name
+  let () = check E.equal "equal" E.datatype_name
+  let () = check E.compare "compare" E.datatype_name
 
   module P = Make
       (struct
         type t = S.t
-        let name = "Set(" ^ E.name ^ ")"
+        let name = "Set(" ^ E.datatype_name ^ ")"
         let structural_descr =
-          Structural_descr.t_set_unchanged_compares (Descr.str E.descr)
+          Structural_descr.t_set_unchanged_compares (Descr.str E.datatype_descr)
         open S
         let reprs = empty :: Caml_list.map (fun r -> singleton r) E.reprs
         let compare = S.compare
@@ -1096,8 +1098,8 @@ struct
           if E.hash == undefined then undefined
           else (fun s -> S.fold (fun e h -> 67 * E.hash e + h) s 189)
         let rehash =
-          if Descr.is_unmarshable E.descr then undefined
-          else if Descr.is_abstract E.descr then identity
+          if Descr.is_unmarshable E.datatype_descr then undefined
+          else if Descr.is_abstract E.datatype_descr then identity
           else
             fun s -> (* The key changed, rebalance the tree *)
               S.fold S.add s S.empty
@@ -1128,8 +1130,8 @@ struct
   let nearest_elt_ge x = S.find_first (fun y -> y >= x)
 
   let ty = P.ty
-  let name = P.name
-  let descr = P.descr
+  let datatype_name = P.datatype_name
+  let datatype_descr = P.datatype_descr
   let packed_descr = P.packed_descr
   let reprs = P.reprs
   let equal = P.equal
@@ -1148,15 +1150,16 @@ end
 module Map(M: Map.S)(Key: S with type t = M.key) =
 struct
 
-  let () = check Key.equal "equal" Key.name
-  let () = check Key.compare "compare" Key.name
+  let () = check Key.equal "equal" Key.datatype_name
+  let () = check Key.compare "compare" Key.datatype_name
 
   module P_gen = Polymorphic_gen
       (struct
         type 'a t = 'a M.t
-        let name ty = "Map(" ^ Key.name ^ ", " ^ Type.name ty ^ ")"
+        let name ty = "Map(" ^ Key.datatype_name ^ ", " ^ Type.name ty ^ ")"
         let structural_descr d =
-          Structural_descr.t_map_unchanged_compares (Descr.str Key.descr) d
+          Structural_descr.t_map_unchanged_compares
+            (Descr.str Key.datatype_descr) d
         open M
         let reprs r =
           [ Caml_list.fold_left (fun m k -> add k r m) empty Key.reprs ]
@@ -1201,11 +1204,11 @@ struct
         (X)
         (struct
           let rehash =
-            if Descr.is_unmarshable Key.descr
-            || Descr.is_unmarshable X.descr
+            if Descr.is_unmarshable Key.datatype_descr
+            || Descr.is_unmarshable X.datatype_descr
             then undefined
             else
-            if Descr.is_abstract Key.descr then identity
+            if Descr.is_abstract Key.datatype_descr then identity
             else (* the key changed: rebuild the map *)
               fun m ->
                 M.fold M.add m M.empty;
@@ -1226,13 +1229,13 @@ end
 module Hashtbl(H: Hashtbl_with_descr)(Key: S with type t = H.key) =
 struct
 
-  let () = check Key.equal "equal" Key.name
-  let () = check Key.hash "hash" Key.name
+  let () = check Key.equal "equal" Key.datatype_name
+  let () = check Key.hash "hash" Key.datatype_name
 
   module P_gen = Polymorphic_gen
       (struct
         type 'a t = 'a H.t
-        let name ty = "Hashtbl(" ^ Key.name ^ ", " ^ Type.name ty ^ ")"
+        let name ty = "Hashtbl(" ^ Key.datatype_name ^ ", " ^ Type.name ty ^ ")"
         let structural_descr = H.structural_descr
         let reprs x =
           [ let h = H.create 7 in
@@ -1275,11 +1278,11 @@ struct
         (X)
         (struct
           let rehash =
-            if Descr.is_unmarshable Key.descr
-            || Descr.is_unmarshable X.descr
+            if Descr.is_unmarshable Key.datatype_descr
+            || Descr.is_unmarshable X.datatype_descr
             then undefined
             else
-            if Descr.is_abstract Key.descr then identity
+            if Descr.is_abstract Key.datatype_descr then identity
             else (* the key changed: rebuild the hashtbl *)
               fun h ->
                 let h' = H.create (H.length h) in
@@ -1297,9 +1300,9 @@ struct
         type t = typ
         include Undefined
         let ty = ty
-        let name = Type.name ty
-        let descr = Descr.of_type ty
-        let packed_descr = Descr.pack descr
+        let datatype_name = Type.name ty
+        let datatype_descr = Descr.of_type ty
+        let packed_descr = Descr.pack datatype_descr
         let reprs = Type.reprs ty
       end)
     in M.ty
@@ -1327,14 +1330,14 @@ module Weak(W: Sub_caml_weak_hashtbl)(D: S with type t = W.data) = struct
       (struct
         include Undefined
         type t = W.t
-        let name = "Weak(" ^ D.name ^ ")"
+        let name = "Weak(" ^ D.datatype_name ^ ")"
         let reprs = let w = W.create 0 in Caml_list.iter (W.add w) D.reprs; [ w ]
       end)
 end
 
 module Caml_weak_hashtbl(D: S) = struct
-  let () = check D.equal "equal" D.name
-  let () = check D.compare "hash" D.name
+  let () = check D.equal "equal" D.datatype_name
+  let () = check D.compare "hash" D.datatype_name
   module W = Initial_caml_weak.Make(D)
   include W
   module Datatype = Weak(W)(D)
@@ -1382,7 +1385,8 @@ module With_hashtbl(X: S) = struct
           | Some cmp -> fold_sorted ~cmp
 
         let structural_descr =
-          Structural_descr.t_hashtbl_unchanged_hashes (Descr.str D.descr)
+          Structural_descr.t_hashtbl_unchanged_hashes
+            (Descr.str D.datatype_descr)
       end)
       (D)
 
@@ -1666,9 +1670,9 @@ let triple
   let module Make(X: sig type t val ty: t Type.t end) = struct
     type t = X.t
     let ty = X.ty
-    let name = Type.name X.ty
-    let descr = Descr.of_type X.ty
-    let packed_descr = Descr.pack descr
+    let datatype_name = Type.name X.ty
+    let datatype_descr = Descr.of_type X.ty
+    let packed_descr = Descr.pack datatype_descr
     let reprs = Type.reprs X.ty
     let equal = equal X.ty
     let compare = compare X.ty
@@ -1761,9 +1765,9 @@ let quadruple
   let module Make(X: sig type t val ty: t Type.t end) = struct
     type t = X.t
     let ty = X.ty
-    let name = Type.name X.ty
-    let descr = Descr.of_type X.ty
-    let packed_descr = Descr.pack descr
+    let datatype_name = Type.name X.ty
+    let datatype_descr = Descr.of_type X.ty
+    let packed_descr = Descr.pack datatype_descr
     let reprs = Type.reprs X.ty
     let equal = equal X.ty
     let compare = compare X.ty
