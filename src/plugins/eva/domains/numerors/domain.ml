@@ -105,7 +105,7 @@ end
 
 
 
-(* Instanciate the value using the model. *)
+(* Instantiate the value using the model. *)
 module Value = struct
   include Value.Make (Model)
   let contextualize (name, builtin) = (name, builtin ())

@@ -34,7 +34,7 @@ module Stack : sig
       statement *)
   val access_to_var: stmt -> stack_elt
 
-  (** Doess the given stack element represent an access to a shared variable *)
+  (** Does the given stack element represent an access to a shared variable *)
   val is_access_to_var: stack_elt -> bool
 
 end

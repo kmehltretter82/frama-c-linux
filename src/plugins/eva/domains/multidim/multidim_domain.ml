@@ -409,7 +409,7 @@ struct
       | _ -> None
     in
     (* [oracle] must be the oracle before the (non-invertible)
-       assignement of the referee to allow removing of eventual empty slice
+       assignment of the referee to allow removing of eventual empty slice
        before the bound leaves the segmentation. *)
     let referers = snd (BaseMap.find_or_top base_map (Base.of_varinfo dst)) in
     let update_ref base base_map =

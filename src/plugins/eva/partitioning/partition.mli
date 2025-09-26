@@ -119,7 +119,7 @@ type action =
   | Enter_loop of unroll_limit * Eva_automata.loop
   (** Enters a loop in which the n first iterations will be kept separate:
       creates an iteration counter at 0 for each states in the flow; states at
-      different iterations will be kept separate, untill reaching the
+      different iterations will be kept separate, until reaching the
       [unroll_limit]. Counters are incremented by the [Incr_loop] action. *)
   | Leave_loop
   (** Leaves the current loop: removes its iteration counter. States that were

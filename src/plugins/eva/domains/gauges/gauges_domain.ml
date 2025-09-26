@@ -265,7 +265,7 @@ module G = struct
   (* A MV contains (usual) values for the different bases that are incremented
      in a loop.
      1. for missing bases, no information is stored (i.e. Top)
-     2. bases are mapped to an interger range, or to a pointer
+     2. bases are mapped to an integer range, or to a pointer
        2.1. bases can only be mapped to a pointer with a single base address
   *)
   module MV = struct

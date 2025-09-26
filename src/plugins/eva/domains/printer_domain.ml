@@ -9,7 +9,7 @@
 open Eval
 
 
-(** An abstract domain based on Simple_Cvalue that will litterally just print
+(** An abstract domain based on Simple_Cvalue that will literally just print
     what goes through it. *)
 module Simple : Simpler_domains.Simple_Cvalue = struct
 

@@ -187,7 +187,7 @@ struct
     (* TODO: verify type compatibility between e and base_offset *)
     match of_exp e with
     | Exp (e, c) -> Ptroffset (e, base_offset, c)
-    | Const _ -> assert false (* should not happen ? even with absolute adresses ? *)
+    | Const _ -> assert false (* should not happen ? even with absolute addresses ? *)
     | Ptroffset _ -> assert false (* Not produced by of_exp *)
 
   (* Convert bound to interval using oracle *)
@@ -625,7 +625,7 @@ struct
             | _, Equal ->
               (* u1 and u2 can be indeferently used right side
                  -> use u1 as next bound
-                 Note: Asymetric choice, u2 may also be a good choice *)
+                 Note: Asymmetric choice, u2 may also be a good choice *)
               aux u1 t1 t2 ((f v1 v2, u1) :: acc)
             | Equal, _ ->
               (* u1 and u2 can be indeferently used left side
@@ -741,7 +741,7 @@ struct
       else B.birth lindex, B.birth uindex in
     (* (start,head) : segmentation kept identical below the update indexes,
                       head is a list in reverse order
-       (l,v,u) : the segment (l,u) beeing overwriten with previous value v
+       (l,v,u) : the segment (l,u) being overwritten with previous value v
 
        head = (_,l) :: _
     *)

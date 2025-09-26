@@ -54,7 +54,7 @@ void print_b(int b) {
 
 int main_interrupt_cross_incr() {
   // Check that the interferences are correctly passed through function
-  // parameters, even when the main function does not explicitely start threads.
+  // parameters, even when the main function does not explicitly start threads.
   print_a(interrupt_received_a);
   print_b(interrupt_received_b);
   return 0;

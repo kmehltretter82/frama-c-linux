@@ -56,7 +56,7 @@ module MSet = Set
 
 
 (* A register of all the program's mutexes and their current status. A mutex is
-   registered as locked if and only if we are absolutly sure that it is locked.
+   registered as locked if and only if we are absolutely sure that it is locked.
    It is indeed necessary to ensure soundness, as it will trigger more
    interferences as necessary. *)
 module Register = struct

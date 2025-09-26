@@ -156,7 +156,7 @@ module Transfer = struct
       operational_inputs = inputs;
     }
 
-  (* Effects of an assigment [lv = e]. [to_z] converts the lvalues present
+  (* Effects of an assignment [lv = e]. [to_z] converts the lvalues present
      in [lv] and [e] into locations. *)
   let effects_assign to_z lv e =
     let inputs_e = Eva_ast.PreciseDepsOf.zone_of_exp to_z e in

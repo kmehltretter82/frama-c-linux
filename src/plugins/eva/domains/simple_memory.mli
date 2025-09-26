@@ -25,7 +25,7 @@ module type Value = sig
   val widen : widen_hint -> t -> t -> t
 
   (** This function must return [true] if the given variable should be
-      tracked by the domain. All untracked variables are implicitely
+      tracked by the domain. All untracked variables are implicitly
       mapped to [V.top]. *)
   val track_variable: Cil_types.varinfo -> bool
 

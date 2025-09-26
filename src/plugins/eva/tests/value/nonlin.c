@@ -38,7 +38,7 @@ void subdivide_integer () {
   int l = (z+17817) * (z+17817);
 
   int x = sizeof(y)+sizeof(y); // do not optimize y
-  int *p = &x + x; // do not optmize x;
+  int *p = &x + x; // do not optimize x;
 
   long long i1 = vs;
   long long i2 = vs;
@@ -51,7 +51,7 @@ void subdivide_integer () {
 }
 
 
-/* Exemples where a subdivision on several variables simultaneously is necessary
+/* Examples where a subdivision on several variables simultaneously is necessary
    to get more precision. */
 void subdivide_several_variables () {
   int w = Frama_C_interval(-10, 10);

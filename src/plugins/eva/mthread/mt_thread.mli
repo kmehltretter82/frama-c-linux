@@ -98,7 +98,7 @@ module ThreadState : sig
   (** Prints the name of the thread *)
   val pretty: t Pretty_utils.formatter
 
-  (** Prints the name of the thread with detailed informations *)
+  (** Prints the name of the thread with detailed information *)
   val pretty_detailed: t Pretty_utils.formatter
 
   (** Equality based on thread id *)

@@ -47,7 +47,7 @@ type red_alarm = {
   kind:string;
   acsl: string;
   ip: Property.t;
-  callstacks: int; (* Number of callstacks in which the red alarm occured. *)
+  callstacks: int; (* Number of callstacks in which the red alarm occurred. *)
 }
 
 let get_predicate ca =

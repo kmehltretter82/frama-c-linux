@@ -434,7 +434,7 @@ let () = add_correctness_dep WarnSignedConvertedDowncast.parameter
 
 
 let () = Parameter_customize.set_group alarms
-module WarnPointerSubstraction =
+module WarnPointerSubtraction =
   True
     (struct
       let option_name = "-eva-warn-pointer-subtraction"
@@ -443,7 +443,7 @@ module WarnPointerSubstraction =
          allocated block, and return the pointwise difference between the \
          offsets. When unset, do not warn but generate imprecise offsets."
     end)
-let () = add_correctness_dep WarnPointerSubstraction.parameter
+let () = add_correctness_dep WarnPointerSubtraction.parameter
 
 let () = Parameter_customize.set_group alarms
 let () = Parameter_customize.is_invisible ()
@@ -1284,7 +1284,7 @@ let deprecated_aliases : ((module Parameter_sig.S) * string) list =
   ; (module UndefinedPointerComparisonPropagateAll), "-undefined-pointer-comparison-propagate-all"
   ; (module WarnPointerComparison), "-val-warn-undefined-pointer-comparison"
   ; (module WarnSignedConvertedDowncast), "-val-warn-signed-converted-downcast"
-  ; (module WarnPointerSubstraction), "-val-warn-pointer-subtraction"
+  ; (module WarnPointerSubtraction), "-val-warn-pointer-subtraction"
   ; (module IgnoreRecursiveCalls), "-val-ignore-recursive-calls"
   ; (module WarnCopyIndeterminate), "-val-warn-copy-indeterminate"
   ; (module ReduceOnLogicAlarms), "-val-reduce-on-logic-alarms"

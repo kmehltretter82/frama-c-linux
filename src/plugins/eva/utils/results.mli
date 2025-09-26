@@ -152,7 +152,7 @@ val print_states : ?filter:Base.Hptset.t -> request -> (string * string) list
 (** Dependencies *)
 
 (** Computes (an overapproximation of) the memory zones that must be read to
-    evaluate the given expression, including all adresses computations. *)
+    evaluate the given expression, including all addresses computations. *)
 val expr_deps : Cil_types.exp -> request -> Locations.Zone.t
 
 (** Computes (an overapproximation of) the memory zones that must be read to

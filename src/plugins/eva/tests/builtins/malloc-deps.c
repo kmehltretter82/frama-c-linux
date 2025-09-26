@@ -11,7 +11,7 @@ void main(int i, int j) {
   /*@ eva_allocate fresh_weak; */
   p = malloc(100);
   *p = i;
-  *p = j; // Cannnot perform strong update for deps, variable is weak
+  *p = j; // Cannot perform strong update for deps, variable is weak
 
   /*@ eva_allocate fresh; */
   q = malloc(100);

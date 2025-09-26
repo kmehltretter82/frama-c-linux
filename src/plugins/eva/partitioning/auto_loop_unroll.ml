@@ -36,7 +36,7 @@
 
    When computing the increment [v_delta] of a lvalue [v] in the loop, the
    heuristic searches assignments "v = v ± i;". Otherwise, if [v] is only
-   modified within the loop through an assignement "v = v2", the heuristic
+   modified within the loop through an assignment "v = v2", the heuristic
    computes the initial value and delta increment of variable [v2] instead.
    This is required to deal with temporary variables introduced by the Frama-C
    normalization.
@@ -118,7 +118,7 @@ end
 (* Effects of a loop:
    - set of varinfos that are directly modified within the loop. Pointer
      accesses are ignored.
-   - does the loop contain a pointer write, a call or assemly code? *)
+   - does the loop contain a pointer write, a call or assembly code? *)
 type loop_effect =
   { written_vars: Cil_datatype.Varinfo.Set.t;
     pointer_writes: bool;
@@ -239,7 +239,7 @@ let find_lonely_candidate eval_ptr loop_effect expr =
   aux None lvalues
 
 (* Builds a transfer function suitable for [Graph.compute] that does nothing,
-   except on assignemnts of [lval]:
+   except on assignments of [lval]:
    - to the value of an expression [expr], it applies [f expr acc];
    - to a function call, or if [inner_loop] is true, it raises [exn]. *)
 let transfer_assign lval exn f ~inner_loop acc transition =
@@ -309,7 +309,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
       let add v = let* v in Val.forward_binop context typ binop v (inject i) in
       { value = add acc.value; delta = add acc.delta; }
 
-  (* Adds to [acc] the increment from the assignement of [lval] to the value
+  (* Adds to [acc] the increment from the assignment of [lval] to the value
      of [expr]. Raises NoIncrement if this is not an increment of [lval]. *)
   let rec delta_assign context lval expr acc =
     (* Is the expression [e] equal to the lvalue [lval] (modulo cast)? *)

@@ -143,7 +143,7 @@ let inter s1 s2 =
   with Inconsistent -> `Inconsistent
 
 let combine s1 s2 =
-  (* [intersect] is only applied if both maps explicitely contain the same
+  (* [intersect] is only applied if both maps explicitly contain the same
      alarm. As both maps have been produced in the same state, the statuses for
      this alarm should be consistent. *)
   try merge ~combine:true intersect s1 s2

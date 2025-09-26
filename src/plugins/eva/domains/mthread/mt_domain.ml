@@ -410,7 +410,7 @@ let domain =
     (* TODO: When the options of Mthread are merged with Eva options, reassess
        how the domain should be enabled (only automatic detection, only specific
        option, mix of automatic and option with auto,true,false for instance).
-       In any case it should be possible to explicitely deactivate the domain.*)
+       In any case it should be possible to explicitly deactivate the domain.*)
     let enable = have_builtins_in_globals () || have_interrupt_handlers () in
     if enable then
       Self.feedback ~once:true

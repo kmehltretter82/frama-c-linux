@@ -381,7 +381,7 @@ struct
      - the value has an aggregate type (as the current Eva values have no
        meaning for such type, the equality would be useless or misleading).
      - it is an assignment by copy, and the copied value is possibly
-       unitialized or escaping. In this case, when using the equality later,
+       uninitialized or escaping. In this case, when using the equality later,
        the reevaluation of [right_expr] would reduce it incorrectly, by
        removing indeterminate flags without emitting alarms. *)
   let assign_eq left_lval right_expr value valuation state =

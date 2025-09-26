@@ -511,7 +511,7 @@ let remove_node ~keep a =
             a
       end
 
-    | _ -> a (* Not simplication on this node *)
+    | _ -> a (* Not simplification on this node *)
   else
     a
 

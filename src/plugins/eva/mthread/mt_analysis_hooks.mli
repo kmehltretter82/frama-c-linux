@@ -14,7 +14,7 @@ val main_thread: Cil_types.kernel_function -> state -> thread_state
 
 
 (** Exception to be returned when a hook did not process fully correctly, to be
-    caught the level of hook registration. The [int] is the erro code *)
+    caught the level of hook registration. The [int] is the error code *)
 exception Hook_failure of int
 
 (** List of builtins that are to be registered by Mthread. We use

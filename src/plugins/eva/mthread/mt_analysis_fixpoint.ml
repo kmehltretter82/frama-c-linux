@@ -386,7 +386,7 @@ let one_iteration analysis =
 let mark_shared_nodes_kind analysis =
   let precise_accesses = analysis.concurrent_accesses_by_nodes in
   let shared_vars = Mt_shared_vars.Precise.all_zones_accessed precise_accesses in
-  (* Update the informations in the cfgs *)
+  (* Update the information in the cfgs *)
   iter_threads analysis
     (fun th -> Mt_shared_vars.Precise.remove_non_concur_zones_from_cfg
         shared_vars th.th_cfg

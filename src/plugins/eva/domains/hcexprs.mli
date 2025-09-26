@@ -84,7 +84,7 @@ module HCEToZone: sig
 end
 
 
-(** Maps froms {!Base.t} to set of {!HCE.t}. *)
+(** Maps from {!Base.t} to set of {!HCE.t}. *)
 module BaseToHCESet: sig
   include Hptmap_sig.S with type key = Base.t
                         and type v = HCESet.t

@@ -117,7 +117,7 @@ struct
         t
 
   (*s The iterators [map], [mapi], [iter] and [fold] are implemented in
-      a straigthforward way using the corresponding iterators [M.map],
+      a straightforward way using the corresponding iterators [M.map],
       [M.mapi], [M.iter] and [M.fold]. For the last three of them,
       we have to remember the path from the root, as an extra argument
       [revp]. Since elements are pushed in reverse order in [revp],

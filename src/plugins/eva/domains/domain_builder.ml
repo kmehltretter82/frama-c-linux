@@ -541,7 +541,7 @@ module Restrict
     | None -> ()
     | Some (state, _mode) -> Domain.show_expr valuation state fmt expr
 
-  (* ----- Logic evalutation ------------------------------------------------ *)
+  (* ----- Logic evaluation ------------------------------------------------ *)
 
   let logic_assign assign location = function
     | None -> None

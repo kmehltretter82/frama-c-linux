@@ -11,8 +11,8 @@ open Cil_types
 
 module Types : sig
 
-  (** Pointers are the adress of a variable, with a potential offset,
-      and are used to refer in a simple way to an adress in memory *)
+  (** Pointers are the address of a variable, with a potential offset,
+      and are used to refer in a simple way to an address in memory *)
   type pointer = Cil_types.varinfo * int
 
   module Pointer: Datatype.S_with_collections with type t = pointer

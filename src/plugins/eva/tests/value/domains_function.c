@@ -10,7 +10,7 @@
    of the location t[i] where [i] is imprecise, from an assignment of t[i]
    to a read of t[i].
    If the domain is not enabled, the value of t[i] remains imprecise because
-   [i] is imprecise. If the domain is enabled, the value of the first assignemnt
+   [i] is imprecise. If the domain is enabled, the value of the first assignment
    is stored until the read. If the assignment and the read are in different
    functions, the domain should also be enabled in all functions in between. */
 

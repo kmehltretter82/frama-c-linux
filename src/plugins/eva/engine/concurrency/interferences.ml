@@ -316,7 +316,7 @@ struct
       let is_current_thread = Thread.(equal thread (current ())) in
       let maybe_running =
         match Mt_thread.Register.find thread threads with
-        (* Thread status is uknown, consider that the thread might be running*)
+        (* Thread status is unknown, consider that the thread might be running*)
         | None -> true
         (* Thread status is known *)
         | Some status -> Mt_utils.Trilean.maybe_true status.running

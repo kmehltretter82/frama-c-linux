@@ -2,7 +2,7 @@
    EXIT: 1
    STDOPT: @PTEST_SHARE_DIR@/mthread/mthread_queue.c
  */
-/* This example tests a very specific error message withing message, a call
+/* This example tests a very specific error message within message, a call
    through a function pointer calls simultaneously a standard function
    and an mthread function. */
 

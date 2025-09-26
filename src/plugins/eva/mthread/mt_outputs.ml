@@ -304,7 +304,7 @@ module Html = struct
            global_queue_set
         ) Mqueue.Set.empty th_list
     in
-    (* Returns mothing when there is no queue in the program *)
+    (* Returns nothing when there is no queue in the program *)
     if Mqueue.Set.is_empty queue_set then None
     else begin
       let queue_olist =

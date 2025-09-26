@@ -201,7 +201,7 @@ module Make_Domain (Info: sig val name: string end) (Value: Value) = struct
 
   (* This function binds [loc] to [v], of type [typ], in [state].
      [v] can be [`Bottom], which means that its contents are guaranteed
-     to be indeterminate (e.g. unitialized data). *)
+     to be indeterminate (e.g. uninitialized data). *)
   let bind_loc loc typ v state =
     match v with
     (* We are adding a "good" value. Store it in the state. *)
