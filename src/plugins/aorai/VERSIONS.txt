@@ -11,8 +11,8 @@
 2010/04/14 - r8437 
  * Feature :
    # Improvement of the YA language : parameters of a function and its return value can now be accessed to describe the property. The syntax is :
-      + opName().result to acces the returned value of opName. It implies RETURN(opName).
-      + opName().a to acces the a parameter value of opName. It implies CALL(opName).
+      + opName().result to access the returned value of opName. It implies RETURN(opName).
+      + opName().a to access the a parameter value of opName. It implies CALL(opName).
   
 2010/??/?? - r? -
  * Features :

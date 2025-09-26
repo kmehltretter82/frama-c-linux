@@ -65,7 +65,7 @@ quantifications described in Fig.~\ref{fig:gram:guarded} is also recognized
 \emph{for (possibly infinite) enumerable types} (typically,
 \lstinline|integer|). In guarded quantifications, each bound variable must be
 guarded exactly once and, if its bounds depend on other bound variables, these
-variables must be guarded earlier or guarded by the same guard. Additionnally,
+variables must be guarded earlier or guarded by the same guard. Additionally,
 guards are limited to bound variables, meaning that the only allowed
 identifiers $id$ are variable identifiers enclosed in the binder list.
 
@@ -766,7 +766,7 @@ This simple subset is extended in some important ways giving rise to the
     does not need to be a constant or a quantified variable. The position of
     the complicated argument has to be identical for all the constructors.
   \item the quantified variables occurring in the formulas have to obey
-    certain boundness conditions, such as: a quantified variable occuring in
+    certain boundness conditions, such as: a quantified variable occurring in
     the complicated argument, needs to be bound first by a recursive
     occurrence of $P$ in a hypothesis.
 \end{itemize}
@@ -787,7 +787,7 @@ intuition for which inductive definitions are supported and which are not.
   is not simple. It does however belong to the extended subset as described
   above.
   \cinput{fibo.c}
-  The quantified variables \lstinline|f1| and \lstinline|f2| occuring in the
+  The quantified variables \lstinline|f1| and \lstinline|f2| occurring in the
   complicated argument are both bound by the two preceding hypotheses:
   \lstinline|fibo(n-1, f1)| binds \lstinline|f1| while
   \lstinline|fibo(nm2), f2)| binds \lstinline|f2|.
@@ -934,7 +934,7 @@ Figure~\ref{fig:gram:logicreads} introduces \lstinline|reads| clauses.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Pointers and physical adressing}
+\section{Pointers and physical addressing}
 \label{sec:pointers}
 
 \nodiff

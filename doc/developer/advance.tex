@@ -1112,7 +1112,7 @@ their code.
 
 At the moment, \texttt{Ocamlmig} uses \texttt{OCamlFormat} to print the code. If
 you do not use \texttt{OCamlFormat} in your plug-in, you can minimize the diff
-by setting an environnement variable \texttt{OCAMLMIG\_PRESERVE\_FORMAT} before
+by setting an environment variable \texttt{OCAMLMIG\_PRESERVE\_FORMAT} before
 running the migration command, either by exporting it via
 \lstinline{export OCAMLMIG_PRESERVE_FORMAT=1} or in front of the command
 \lstinline{OCAMLMIG_PRESERVE_FORMAT=1 ocamlmig migrate -w}. With this setting,
@@ -2517,7 +2517,7 @@ hold\index{Equality!Physical}\index{Equality!Structural}:\footnotemark
 \label{eq:copy}\\
 \forall \texttt{p1},\texttt{p2} \mbox{ of type } \texttt{t}
 \mbox{ such that } \texttt{p1 != p2},\, \texttt{(set p1; get ()) != p2}
-\label{eq:independance}
+\label{eq:independence}
 \end{gather}
 \end{important}
 \footnotetext{As usual in \caml, \texttt{=} stands for \emph{structural}
@@ -2529,7 +2529,7 @@ Invariant~\ref{eq:create} ensures that there is no sharing%
 got its own fresh state. Invariant~\ref{eq:clear} ensures that cleaning
 a state\index{State!Cleaning} resets it to its initial
 value. Invariant~\ref{eq:copy} ensures that there is no sharing with any
-copy. Invariant~\ref{eq:independance} is a local independence criterion which
+copy. Invariant~\ref{eq:independence} is a local independence criterion which
 ensures that modifying a local version does not affect any other version
 (different from the global current one) by side effects\index{Side-Effect}.
 \begin{example}
@@ -3260,7 +3260,7 @@ customizing this header (see next section for more information).
 
 \subsection{Machdep record fields}\label{sec:machdep-fields}
 
-Each field of the machdep is succintly described in the
+Each field of the machdep is succinctly described in the
 \verb+machdep-schema.yaml+ file.
 We present below a thorough description of each field.
 

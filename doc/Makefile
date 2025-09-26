@@ -28,7 +28,7 @@ VERSION_SAFE=$(subst ~,-,$(VERSION))
 
 ifeq ($(findstring +dev,$(VERSION)),+dev)
 
-# Developpement version, generate the manuals
+# Development version, generate the manuals
 default: all
 
 else
