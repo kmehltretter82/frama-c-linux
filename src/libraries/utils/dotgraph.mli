@@ -75,7 +75,7 @@ type attr = [
 
 val pp_attr : Format.formatter -> attr -> unit
 
-(** {1 Dot Ouput} *)
+(** {1 Dot Output} *)
 
 type dot
 (** Buffer to a [dot] file with a graph environment (nodes, edges, etc.) *)
@@ -210,12 +210,12 @@ sig
   (** Pushes the callback which will be executed {i once}
       for all created nodes.
       You must call [run dot] at some point to flush them.
-      Any previsously registred callback is replaced
+      Any previously registered callback is replaced
       by the new one. *)
   val define : dot -> (t -> node -> unit) -> unit
 
   (** Set node prefix.
-      Otherwize, some default one is created for each functor application. *)
+      Otherwise, some default one is created for each functor application. *)
   val prefix : string -> unit
 end
 

@@ -223,7 +223,7 @@ module Space (Field : Field.S) = struct
       if Field.(get i_max k m = zero) then
         (* No pivot here, goes to the next. Stop if we've done them all. *)
         let- `Callback = m, inverse in
-        let+ k = Finite.(next k |> strenghten size) in
+        let+ k = Finite.(next k |> strengthen size) in
         inverse_aux m inverse h k
       else
         let value = get i_max k m in
@@ -252,8 +252,8 @@ module Space (Field : Field.S) = struct
         in
         let m, inverse = Finite.for_each below_pivot size (m, inverse) in
         let- `Callback = m, inverse in
-        let* h = Finite.(next h |> strenghten size) in
-        let+ k = Finite.(next k |> strenghten size) in
+        let* h = Finite.(next h |> strengthen size) in
+        let+ k = Finite.(next k |> strengthen size) in
         inverse_aux m inverse h k
 
     let inverse : type n. (n, n) matrix -> (n, n) matrix option = fun (M m) ->

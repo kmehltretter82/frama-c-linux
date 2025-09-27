@@ -122,7 +122,7 @@ val t_sum: pack array array -> t
 
 val t_set_unchanged_compares: t -> t
 val t_map_unchanged_compares: t -> t -> t
-val t_hashtbl_unchanged_hashs: t -> t -> t
+val t_hashtbl_unchanged_hashes: t -> t -> t
 
 (** Packed versions of predefined descriptors. *)
 

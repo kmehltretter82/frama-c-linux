@@ -45,9 +45,9 @@ val weaken : 'n finite -> 'n succ finite
     also be an element of any finite subset of cardinal [n]. The call
     [strengten n f] allows to prove that fact to the type system. [None]
     is returned if and only if [f] is the last element of its subset. *)
-val strenghten : 'n nat -> 'n succ finite -> 'n finite option
+val strengthen : 'n nat -> 'n succ finite -> 'n finite option
 
-(** The call [of_int limit n] returns a finite value representing the n-nd
+(** The call [of_int limit n] returns a finite value representing the nth
     element of a finite set of cardinal limit. If n is not in the bounds, [None]
     is returned. This function complexity is O(1). *)
 val of_int : 'n succ nat -> int -> 'n succ finite option

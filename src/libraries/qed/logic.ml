@@ -24,7 +24,7 @@ type 'a operator = {
   commutative : bool ; (* x+y=y+x *)
   idempotent : bool ; (* x+x = x *)
   neutral : 'a element ;
-  absorbant : 'a element ;
+  absorbent : 'a element ;
 }
 
 (** Algebraic properties for functions. *)
@@ -539,7 +539,7 @@ sig
   (** atoms are lower than complex terms ; otherwise, sorted by id. *)
 
   val pretty : Format.formatter -> t -> unit
-  val weigth : t -> int
+  val weight : t -> int
   (** Informal size *)
 
   (** {3 Utilities} *)
@@ -557,7 +557,7 @@ sig
   (** Constants only *)
 
   val is_neutral : Fun.t -> t -> bool
-  val is_absorbant : Fun.t -> t -> bool
+  val is_absorbent : Fun.t -> t -> bool
 
   val size : t -> int
   val basename : t -> string

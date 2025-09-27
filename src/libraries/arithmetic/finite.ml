@@ -18,7 +18,7 @@ let to_int : type n. n finite -> int = fun n -> n
 
 let weaken : type n. n finite -> n succ finite = fun n -> n
 
-let strenghten : type n. n nat -> n succ finite -> n finite option =
+let strengthen : type n. n nat -> n succ finite -> n finite option =
   fun limit n -> if n < Nat.to_int limit then Some n else None
 
 let of_int : type n. n succ nat -> int -> n succ finite option =

@@ -15,7 +15,7 @@ type output =
   | CompressedOut of Compression.out_channel
 
 let is_compressed_chan chan =
-  (* Requires that chan is a channel opened at the begining of a file. *)
+  (* Requires that chan is a channel opened at the beginning of a file. *)
   let res =
     try
       let char1 = Stdlib.input_byte chan in

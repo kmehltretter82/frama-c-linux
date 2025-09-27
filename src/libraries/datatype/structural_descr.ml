@@ -164,7 +164,7 @@ let poly2 f a b = match a, b with
     with Cannot_pack -> Unknown
 
 let t_map_unchanged_compares = poly2 Unmarshal.t_map_unchangedcompares
-let t_hashtbl_unchanged_hashs = poly2 (Unmarshal.t_hashtbl_unchangedhashs)
+let t_hashtbl_unchanged_hashes = poly2 (Unmarshal.t_hashtbl_unchangedhashs)
 
 let t_sum a =
   if Array.exists is_unknown_array a then Unknown

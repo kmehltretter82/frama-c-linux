@@ -94,7 +94,7 @@ type coin =
   | Kill (** stop the computation *)
 
 val async : (coin -> 'a status async) -> 'a task
-(** low level command for managing ressource with active wait *)
+(** low level command for managing resource with active wait *)
 
 
 val (>>>) : 'a task -> ('a status -> 'b task) -> 'b task (** [bind] infix. *)

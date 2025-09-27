@@ -7,7 +7,7 @@
 (**************************************************************************)
 
 (** The State monad represents computations relying on a global mutable
-    state but implemented in a functionnal way.
+    state but implemented in a functional way.
     @since 31.0-Gallium *)
 
 module Make (Env : Datatype.S_with_collections) : sig
