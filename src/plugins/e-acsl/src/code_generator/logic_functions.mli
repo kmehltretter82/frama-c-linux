@@ -34,7 +34,7 @@ val app_to_exp:
   exp * Assert.t * Env.t
 (** Translate a Tapp term or a Papp predicate to an expression. If the optional
     argument [eargs] is provided, then these expressions are used as arguments
-    of the fonction. The optional argument [tapp] is the term corresponding to
+    of the function. The optional argument [tapp] is the term corresponding to
     the call, in case we are translating a term *)
 
 val add_generated_functions_to_file: file -> unit

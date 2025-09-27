@@ -1082,7 +1082,7 @@ int main(void)
   ;
   /*@
   assert
-    failded_missing_upper_bound: \forall integer i; 0 <= i ==> p1(i, 2, 2);
+    failed_missing_upper_bound: \forall integer i; 0 <= i ==> p1(i, 2, 2);
    */
   ;
   /*@

@@ -69,7 +69,7 @@
  *  setbits64(64, x)  //   => behaviour undefined */
 #define setbits64(_bits, _number) (_number |= ~(ONE << _bits))
 
-/** Set up to 64 bits from left to right to ones skiping `_skip` leftmost bits
+/** Set up to 64 bits from left to right to ones skipping `_skip` leftmost bits
  * Example:
  *  int x = 0;          // x => 00000000 00000000 ...
  *  setbits64(11, x, 2) //   => 00111111 11111000 ...

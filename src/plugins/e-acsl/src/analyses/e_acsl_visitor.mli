@@ -31,7 +31,7 @@ val case_globals :
     - [fc_stdlib_generated] is the case for frama-c or standard library
       generated functions
     - [var_fun_decl] is the case for variables or functions declarations
-    - [var_init] is the case for variable definition wihtout an initialization
+    - [var_init] is the case for variable definition without an initialization
       value
     - [var_def] is the case for variable definitions with an initialization
       value
@@ -60,7 +60,7 @@ val case_globals :
     visit the children of those nodes.
 
     To support these functionalities, the methods [vglob_aux] and [vstmt_aux]
-    have been heavily modified and should not be overriden further. *)
+    have been heavily modified and should not be overridden further. *)
 class visitor :
   Options.category ->
   object

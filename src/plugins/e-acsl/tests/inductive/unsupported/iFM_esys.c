@@ -1758,11 +1758,11 @@ predicate valid_hmac_start_in{L}(HMAC_Start_IN *hmac_start_in) =
  */
 /*@
 predicate valid_hierarchy_change_auth_in{L}
-  (HierarchyChangeAuth_IN *hierachy_change_auth_in) =
-  \at(\valid(hierachy_change_auth_in) ∧
-      valid_esys_tr(&hierachy_change_auth_in->authHandle) ∧
-      valid_tpm2b_digest(hierachy_change_auth_in->newAuth) ∧
-      valid_tpm2b_digest(&hierachy_change_auth_in->newAuthData),L);
+  (HierarchyChangeAuth_IN *hierarchy_change_auth_in) =
+  \at(\valid(hierarchy_change_auth_in) ∧
+      valid_esys_tr(&hierarchy_change_auth_in->authHandle) ∧
+      valid_tpm2b_digest(hierarchy_change_auth_in->newAuth) ∧
+      valid_tpm2b_digest(&hierarchy_change_auth_in->newAuthData),L);
  */
 /*@
 predicate valid_sequence_complete_in{L}

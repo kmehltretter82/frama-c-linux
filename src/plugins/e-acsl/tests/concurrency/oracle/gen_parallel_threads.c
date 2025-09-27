@@ -11,7 +11,7 @@
 extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 
 /*@ requires valid_cond: \valid(cond);
-    ensures sucess: \result == 0;
+    ensures success: \result == 0;
     assigns \result;
     assigns \result \from \nothing;
  */
@@ -1547,7 +1547,7 @@ int __gen_e_acsl_pthread_cond_init(pthread_cond_t * restrict cond,
 }
 
 /*@ requires valid_cond: \valid(cond);
-    ensures sucess: \result == 0;
+    ensures success: \result == 0;
     assigns \result;
     assigns \result \from \nothing;
  */
@@ -1590,7 +1590,7 @@ int __gen_e_acsl_pthread_cond_broadcast(pthread_cond_t *cond)
     __gen_e_acsl_assert_data_2.file = "FRAMAC_SHARE/libc/pthread.h";
     __gen_e_acsl_assert_data_2.fct = "pthread_cond_broadcast";
     __gen_e_acsl_assert_data_2.line = 274;
-    __gen_e_acsl_assert_data_2.name = "sucess";
+    __gen_e_acsl_assert_data_2.name = "success";
     __e_acsl_assert(__retres == 0,& __gen_e_acsl_assert_data_2);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
     __e_acsl_delete_block((void *)(& cond));

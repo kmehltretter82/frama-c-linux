@@ -599,7 +599,7 @@ void eacsl_memory_init(int *argc_ref, char ***argv_ref, size_t ptr_size) {
 
 #ifdef E_ACSL_DEBUG
 /* Debug version of store block with location tracking. This function is aimed
- * at manual debugging.  While there is no easy way of traking file/line numbers
+ * at manual debugging.  While there is no easy way of tracking file/line numbers
  * recorded memory blocks with the use of the following macros placed after the
  * declaration of __e_acsl_store_block:
  *

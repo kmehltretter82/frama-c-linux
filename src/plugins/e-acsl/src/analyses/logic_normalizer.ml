@@ -111,7 +111,7 @@ end = struct
     Auxiliary_functions.M.tails li
 end
 
-(** E-ACSL currently is not in general capable of translationg predicates and
+(** E-ACSL currently is not in general capable of translating predicates and
     logic functions with labels. However often such functions are used
     while supplying the Here label.
     In this case we can specialize the logic function, such that it has no

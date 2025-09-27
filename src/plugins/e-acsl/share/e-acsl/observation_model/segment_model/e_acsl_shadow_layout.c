@@ -150,11 +150,11 @@ static size_t get_global_size() {
  *
  * Start and end addresses of TLS are obtained with system call
  * arch_prctl(FS) return the max address of the TLS segment
- * depending on system alignement policy. Work only on 64 bits system
+ * depending on system alignment policy. Work only on 64 bits system
  *
- * __get_tls_addr return the start adress of the TLS segment
+ * __get_tls_addr return the start address of the TLS segment
  *
- * All __threads varaiables defined in dynamic libs will not be seen !
+ * All __threads variables defined in dynamic libs will not be seen !
  */
 
 /*! \brief Return byte-size of the TLS segment */
@@ -325,7 +325,7 @@ static void init_shadow_layout_stack(int *argc_ref, char ***argv_ref) {
 #  include <processthreadsapi.h>
 #  include <windows.h>
 
-/** Program segment informations {{{ */
+/** Program segment information {{{ */
 typedef struct mem_loc_info {
   uintptr_t start;
   size_t size;

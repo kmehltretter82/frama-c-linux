@@ -98,7 +98,7 @@ void ensuresec_clean_assert() {
   int result = fflush(ensuresec_output_file);
   ENSURESEC_ASSERT(result == 0, "Unable to flush ENSURESEC_OUTPUT_FILE\n");
 
-  // Purposefully do not close the json ouptut file: on normal termination, this
+  // Purposefully do not close the json output file: on normal termination, this
   // function will be called after the return in `main()` and the shadow
   // memories of E-ACSL will already be destroyed, resulting in a segmentation
   // fault.

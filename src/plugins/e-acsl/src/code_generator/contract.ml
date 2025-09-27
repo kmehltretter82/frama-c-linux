@@ -145,7 +145,7 @@ let assumes_predicate env assumes =
          let loc = pred.pred_loc in
          Logic_const.pand ~loc
            (acc,
-            Logic_const.unamed ~loc pred.pred_content))
+            Logic_const.unnamed ~loc pred.pred_content))
       Logic_const.ptrue
       assumes
   in
@@ -540,7 +540,7 @@ let check_active_behaviors ~ppt_to_translate ~get_or_create_var kf env contract 
   fold_left_handle_error do_clause env clauses
 
 (** Insert complete and disjoint behaviors check for the given contract in the
-    environement *)
+    environment *)
 let check_complete_and_disjoint kf env contract =
   (* Only translate the complete and disjoint clauses if all the assumes clauses
      could be translated *)
@@ -606,7 +606,7 @@ let check_complete_and_disjoint kf env contract =
     env
   end
 
-(** Insert ensures check for the given contract in the environement *)
+(** Insert ensures check for the given contract in the environment *)
 let check_post_conds kf env contract =
   let<> UpdatedCurrentLoc = contract.location in
   let get_or_create_assumes_var =

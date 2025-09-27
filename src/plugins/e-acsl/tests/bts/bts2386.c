@@ -1,5 +1,5 @@
 /* run.config
-   COMMENT: pointer substraction
+   COMMENT: pointer subtraction
 */
 
 void f(const void *s, int c, unsigned long n) {

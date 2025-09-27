@@ -204,7 +204,7 @@ end = struct
           Options.fatal "%s" (msg "invalid label")
         (* - Invalid use of assertion in function contract *)
         | Kglobal, Assertion, _ ->
-          Options.fatal "invalid use of assertion in fonction contract"
+          Options.fatal "invalid use of assertion in function contract"
 
         (* Function contracts *)
         (* - Preconditions *)
@@ -261,7 +261,7 @@ end = struct
         (* -- Old correspond to the current statement *)
         | Kstmt stmt, Postcondition, BuiltinLabel Old ->
           error, Some stmt
-        (* -- In-place tranlsation for Here and Post *)
+        (* -- In-place translation for Here and Post *)
         | Kstmt _, Postcondition, BuiltinLabel (Here | Post) ->
           error, None
         (* -- Not yet supported labels *)

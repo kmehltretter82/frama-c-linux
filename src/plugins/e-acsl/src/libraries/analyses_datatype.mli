@@ -95,10 +95,10 @@ end
 
 
 (** Imperative environment to perform fixpoint algorithm for recursive
-    functions. This environnement store four pieces of information associated
+    functions. This environment store four pieces of information associated
     to every logic_info:
-    - the current profile in which the interval for the logic_info is infered.
-    - the current interval that it is infered to.
+    - the current profile in which the interval for the logic_info is inferred.
+    - the current interval that it is inferred to.
     - a map associating to each parameter all the arguments in their profiles
       that this parameter has been called with up until now.
     - the depth of calls to the fixpoint algorithm associated to the logic_info.
@@ -113,7 +113,7 @@ end
 module LF_env : sig
 
   (** find the current profile in which a recursive function or predicate is
-      being infered *)
+      being inferred *)
   val find_profile : logic_info -> Profile.t
 
   (** find the currently inferred interval for a call to a logic function *)

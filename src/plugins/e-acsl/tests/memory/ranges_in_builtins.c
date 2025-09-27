@@ -8,7 +8,7 @@ void f(char *s, long n) {}
 /*@ requires \valid(ptr + (0 .. size - 1));
     ensures ! \valid(ptr + (0 .. size + 1));
     // In pure ACSL, the following predicate is true;
-    // however at runtime, its evalulation results in UB ==> false.
+    // however at runtime, its evaluation results in UB ==> false.
     // ensures  ! \valid(ptr + (0 .. SIZE_MAX*SIZE_MAX)); */
 void g(long *ptr, size_t size) {}
 extern void *malloc(size_t p);

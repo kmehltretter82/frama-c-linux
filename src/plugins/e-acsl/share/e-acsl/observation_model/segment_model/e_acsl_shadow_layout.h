@@ -148,7 +148,7 @@ NOTE: Above memory layout scheme generally applies to Linux Kernel/gcc/glibc.
   necessarily grows from program break upwards. Typically mmap will allocate
   memory somewhere closer to stack. */
 
-/* Struct representing a contigous memory region. Effectively this describes
+/* Struct representing a contiguous memory region. Effectively this describes
  * a memory segment, such as heap, stack or segments in the shadow memory
  * used to track them. */
 struct memory_segment {
@@ -204,7 +204,7 @@ struct memory_layout {
   memory_partition data;
   memory_partition idata;
   memory_partition rdata;
-  // The TLS is stored on the heap and is indistiguishable from it
+  // The TLS is stored on the heap and is indistinguishable from it
 #endif
   int is_initialized_pre_main;
   int is_initialized_main;
@@ -274,7 +274,7 @@ void clean_shadow_layout();
  * memory space Ms is computed by [min(Ma) - min(Ms)], where min(Ma) and min(Ms)
  * denote least addresses in application and shadow spaces Ma and Ms respectively.
  *
- * Correspondense between a shadow address S and an application address A
+ * Correspondence between a shadow address S and an application address A
  * using a displacement offset OFF is therefore as follows:
  *    OFF = A - S
  *    S = A - OFF

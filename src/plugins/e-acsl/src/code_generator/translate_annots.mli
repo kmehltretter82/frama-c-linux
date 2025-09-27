@@ -42,7 +42,7 @@ val post_code_annotation:
 (** Translate the postconditions of the current code annotation in the
     environment.
 
-    If necessarry, the statement contract previously built by
+    If necessary, the statement contract previously built by
     {!pre_code_annotation} is popped from the environment. Some care
     should be taken to call this function at the right time to pop the right
     contract. *)

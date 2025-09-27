@@ -57,7 +57,7 @@ implementation:
 
 #### `ensuresec_ee.c`
 
-Multithread program serving as an exemple Ensuresec e-commerce ecosystem
+Multithread program serving as an example Ensuresec e-commerce ecosystem
 program. The program contains `check` assertions that will be violated during
 its execution without halting the program.
 
