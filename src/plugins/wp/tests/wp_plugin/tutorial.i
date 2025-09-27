@@ -18,7 +18,7 @@ int max(int x, int y) {
 }
 
 /*@ ensures qed_ok: \result==((x>0)?x:-x); */
-int absolue(int x) {
+int absolute(int x) {
   return (x >= 0) ? x : -x;
 }
 
@@ -64,7 +64,7 @@ int racine(int n) {
 /*@ requires n>=0;
   @ ensures (\result*\result) <= n < (\result+1)*(\result+1);
   @*/
-int racine_defaut(int n) {
+int racine_default(int n) {
   int r = (n/2) + 1;
   /*@ loop invariant ONLY_PROVED_BY_CVC3: n<(r+1)*(r+1) ;*/
   while (r*r > n)

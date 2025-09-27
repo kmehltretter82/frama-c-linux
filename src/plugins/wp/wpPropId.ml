@@ -251,7 +251,7 @@ module PropIdRaw =
   end)
 
 (* -------------------------------------------------------------------------- *)
-(* --- Lagacy Naming                                                      --- *)
+(* --- Legacy Naming                                                      --- *)
 (* -------------------------------------------------------------------------- *)
 
 module NameUniquify(D:Datatype.S_with_collections)(S:sig

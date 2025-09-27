@@ -58,7 +58,7 @@ let ac = {
   idempotent = false ;
   invertible = false ;
   neutral = E_none ;
-  absorbant = E_none ;
+  absorbent = E_none ;
 }
 
 (* Functions -> Z *)
@@ -72,8 +72,8 @@ let library = "cbits"
 let balance = Lang.Left
 
 let op_lxor = { ac with neutral = E_int 0 ; invertible = true }
-let op_lor  = { ac with neutral = E_int 0 ; absorbant = E_int (-1); idempotent = true }
-let op_land = { ac with neutral = E_int (-1); absorbant = E_int 0 ; idempotent = true }
+let op_lor  = { ac with neutral = E_int 0 ; absorbent = E_int (-1); idempotent = true }
+let op_land = { ac with neutral = E_int (-1); absorbent = E_int 0 ; idempotent = true }
 
 let f_lnot = Lang.extern_f ~library ~result "lnot"
 let f_lor  = Lang.extern_f ~library ~result ~category:(Operator op_lor) ~balance "lor"
@@ -478,7 +478,7 @@ let smp2 f zf = (* f(c1,c2) ~> zf(c1,c2),  f(c1,c2,...) ~> f(zf(c1,c2),...) *)
             end
         in let others = smp2 others
         in let c12 = e_zint !z12 in
-        if others = [] || F.is_absorbant f c12
+        if others = [] || F.is_absorbent f c12
         then c12
         else if F.is_neutral f c12
         then e_fun f others
@@ -603,7 +603,7 @@ let smp_lnot = function
   | _ -> raise Not_found
 
 (* -------------------------------------------------------------------------- *)
-(* --- Comparision with L-AND / L-OR / L-NOT                              --- *)
+(* --- Comparison with L-AND / L-OR / L-NOT                              --- *)
 (* -------------------------------------------------------------------------- *)
 
 let smp_leq_improved f a b =
@@ -713,7 +713,7 @@ let smp_eq_with_lnot a b =
     e_eq e b
 
 (* -------------------------------------------------------------------------- *)
-(* --- Comparision with LSL / LSR                                         --- *)
+(* --- Comparison with LSL / LSR                                         --- *)
 (* -------------------------------------------------------------------------- *)
 
 let two_power_k k =
@@ -805,7 +805,7 @@ let smp_eq_with_lsr a0 b0 =
       (e_zint (Integer.shift_left b1 a2))
       (e_fun f_land [e_zint (Integer.lognot (two_power_k_minus1 a2));e])
   with Not_found ->
-    (* This rule takes into acount several cases.
+    (* This rule takes into account several cases.
        One of them is
        (a>>p) == (b>>(n+p)) <==> (a&~((2**p)-1)) == (b>>n)&~((2**p)-1)
        That rule is similar to
@@ -847,7 +847,7 @@ let smp_leq_with_lsr x y =
     smp_leq_improved f_lsr x y
 
 
-(* Rewritting at export *)
+(* Rewriting at export *)
 let bitk_export k e = F.e_fun ~result:Logic.Bool f_bit_export [e;k]
 let export_eq_with_land a b =
   let es = match_fun f_land a in
@@ -1058,7 +1058,7 @@ let is_cint_simplifier =
        under the knowledge that  [(not t) ==> (var in dom)].
        Note: [~add_bonus] has not effect on the correctness.
          It is a parameter that can be used in order to get better results.
-       Bonus: Add additionnal hypothesis when we could deduce better constraint
+       Bonus: Add additional hypothesis when we could deduce better constraint
        on the variable *)
     let module Tool = struct
       exception Stop
@@ -1214,7 +1214,7 @@ let is_cint_simplifier =
             | (quant,var), None -> e_bind quant var t
             | (quant,var), Some (tvar,var_domain) ->
               domain <- IntDomain.remove tvar domain;
-              (* Bonus: Add additionnal hypothesis in forall when we could
+              (* Bonus: Add additional hypothesis in forall when we could
                  deduce a better constraint on the variable *)
               let add_bonus = match term_pol with
                 | Polarity.Both -> false

@@ -188,7 +188,7 @@ module MemEva = MemVal.Make(MemVal.Eva)
 (* --- Generator & Model                                                  --- *)
 (* -------------------------------------------------------------------------- *)
 
-(* Each model must be instanciated statically because of registered memory
+(* Each model must be instantiated statically because of registered memory
    models identifiers and Frama-C states *)
 
 module MakeVar(V : MemVar.VarUsage)(M : Memory.Model)

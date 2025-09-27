@@ -19,7 +19,7 @@
 
     The realization of the theory proceeds into several stages, 
     following the Coq definition of type [Z]. We take advantage of the 
-    bitwize representation of positive integers provided by the [positive] 
+    bitwise representation of positive integers provided by the [positive] 
     type in Coq. The successive stages are:
       - properties of {!trailing:bit-functions} (finally ending by 1-sequence or 0-sequence);
       - bits of {!positive:positive} integers [p>0];

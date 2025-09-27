@@ -124,7 +124,7 @@ sig
   (** For projectification. Must be unique among models. *)
 
   val hypotheses : MemoryContext.partition -> MemoryContext.partition
-  (** Computes the memory model partitionning of the memory locations.
+  (** Computes the memory model partitioning of the memory locations.
       This function typically adds new elements to the partition received
       in input (that can be empty). *)
 
@@ -174,7 +174,7 @@ sig
       Might fail on memory models not supporting pointers. *)
 
   val pointer_val : loc -> term
-  (** Return the adress value (a pointer) of an abstract location.
+  (** Return the address value (a pointer) of an abstract location.
       Might fail on memory models not capable of representing pointers. *)
 
   val field : loc -> fieldinfo -> loc
@@ -212,7 +212,7 @@ sig
 
   val domain : c_object -> loc -> domain
   (** Compute the set of chunks that hold the value of an object with
-      the given C-type. It is safe to retun an over-approximation of the
+      the given C-type. It is safe to return an over-approximation of the
       chunks involved. *)
 
   val is_well_formed : sigma -> pred
@@ -454,7 +454,7 @@ sig
   (** {2 Frames}
 
       Frames are compilation environment for ACSL. A frame typically
-      manages the current function, formal paramters, the memory environments
+      manages the current function, formal parameters, the memory environments
       at different labels and the [\result] and [\exit_status] values.
 
       The frame also holds the {i gamma} environment responsible for
@@ -484,7 +484,7 @@ sig
   (** Update a frame with a specific environment for the given label. *)
   val set_at_frame : frame -> Clabels.c_label -> sigma -> unit
 
-  (** Chek if a frame already has a specific envioronement for the given label. *)
+  (** Check if a frame already has a specific envioronement for the given label. *)
   val has_at_frame : frame -> Clabels.c_label -> bool
 
   (** Same as [mem_at_frame] but for the current frame. *)
@@ -569,7 +569,7 @@ sig
 
   (** Returns the memory state at the requested label.
       Uses the local environment for [Here] and the current frame
-      otherwize. *)
+      otherwise. *)
   val mem_at : env -> Clabels.c_label -> sigma
 
   (** Returns a new environment where the current memory state is
@@ -608,7 +608,7 @@ sig
     env -> from list -> region
 
   (** Computes the region assigned by an assigns clause.
-      [None] means everyhting is assigned. *)
+      [None] means everything is assigned. *)
   val assigned_of_assigns :
     env -> assigns -> region option
 

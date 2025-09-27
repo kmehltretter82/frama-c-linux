@@ -20,10 +20,10 @@ type value
 (** Creates an empty environment *)
 val context : typing_context -> context
 
-(** Parse a pattern and enrich the environement with pattern variables *)
+(** Parse a pattern and enrich the environment with pattern variables *)
 val pa_pattern : context -> lexpr -> pattern
 
-(** Parse value according to the environement *)
+(** Parse value according to the environment *)
 val pa_value : context -> lexpr -> value
 
 (** Return a value that equals the pattern *)

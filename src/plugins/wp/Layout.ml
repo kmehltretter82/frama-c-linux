@@ -57,7 +57,7 @@ struct
     | TArray (te, n) ->
       begin
         match Option.bind Ctypes.get_int n with
-        | None -> failwith "Wp.Layout: unkown array size"
+        | None -> failwith "Wp.Layout: unknown array size"
         | Some n -> Index(te,n)
       end
     | _ -> failwith "Wp.Layout: not an array-type"

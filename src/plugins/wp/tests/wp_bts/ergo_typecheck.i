@@ -8,7 +8,7 @@ typedef struct
 my_type  var = {0};
 
 /*@
-  @ ensures  var_divded : var == {\old(var) \with
+  @ ensures  var_divided : var == {\old(var) \with
   @                                 .a = {\old(var.a) \with
   @                                     [0] = (unsigned int) 0,
   @                                     [1] = (unsigned int) 1},

@@ -379,7 +379,7 @@ module SplitMax =
     let option_name = "-wp-max-split"
     let default = 1000
     let arg_name = "n"
-    let help = "Set maximum number of splitted sub-goals (default 1000)"
+    let help = "Set maximum number of split sub-goals (default 1000)"
   end)
 
 let () = Parameter_customize.set_group wp_strategy
@@ -965,7 +965,7 @@ module TruncPropIdFileName =
     let help =
       "Truncate basename of proof obligation files after <n> characters.\n\
        Since numbers can be added as suffixes to make theses names unique,\n\
-       filename lengths can be highter to <n>. No truncation is performed\n\
+       filename lengths can be higher to <n>. No truncation is performed\n\
        when the value equals to zero (default: 60)."
   end)
 

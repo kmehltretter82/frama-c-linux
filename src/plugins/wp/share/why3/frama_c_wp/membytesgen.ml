@@ -30,7 +30,7 @@ let all_types = [ (false, 8) ; (false, 16) ; (false, 32) ; (false, 64)
 (* ---  Value Encode/Decode                                               --- *)
 (* -------------------------------------------------------------------------- *)
 
-let value_codec_preambule fmt () =
+let value_codec_preamble fmt () =
   fprintf fmt "%a@," pp_use_list
     [ "int.Int", None
     ; "int.ComputerDivision", None
@@ -122,14 +122,14 @@ let value_codec_all_symbols fmt size =
   value_codec_lemma_decode_encode fmt size
 
 let value_codec fmt () =
-  fprintf fmt "%a@," value_codec_preambule () ;
+  fprintf fmt "%a@," value_codec_preamble () ;
   List.iter (fprintf fmt "%a" value_codec_all_symbols) all_sizes
 
 (* -------------------------------------------------------------------------- *)
 (* ---  Init Encode/Decode                                                --- *)
 (* -------------------------------------------------------------------------- *)
 
-let init_codec_preambule fmt () =
+let init_codec_preamble fmt () =
   fprintf fmt "%a@," pp_use_list
     [ "bool.Bool", None
     ; "frama_c_wp.sequence.Seq", None ]
@@ -175,7 +175,7 @@ let init_codec_all_symbols fmt size =
   init_codec_lemma_decode_encode fmt size
 
 let init_codec fmt () =
-  fprintf fmt "%a@," init_codec_preambule () ;
+  fprintf fmt "%a@," init_codec_preamble () ;
   List.iter (fprintf fmt "%a" init_codec_all_symbols) all_sizes
 
 (* -------------------------------------------------------------------------- *)
@@ -195,7 +195,7 @@ let offset fmt () =
 (* ---  RWBytes                                                           --- *)
 (* -------------------------------------------------------------------------- *)
 
-let rwbytes_preambule fmt () =
+let rwbytes_preamble fmt () =
   fprintf fmt "%a@,@," pp_use_list
     [ "int.Int", None ; "map.Map", Some "M" ;
       "frama_c_wp.sequence.Seq", Some "S" ; "Offset", None] ;
@@ -309,7 +309,7 @@ let rwbytes_all_lemmas fmt size =
   List.iter (rwbytes_read_write_sep fmt size) all_sizes
 
 let rwbytes fmt le =
-  fprintf fmt "%a@," rwbytes_preambule () ;
+  fprintf fmt "%a@," rwbytes_preamble () ;
   List.iter (fprintf fmt "%a" (rwbytes_read le)) all_sizes ;
   List.iter (fprintf fmt "%a" (rwbytes_write le)) all_sizes ;
   List.iter (fprintf fmt "%a" rwbytes_all_lemmas) all_sizes
@@ -318,7 +318,7 @@ let rwbytes fmt le =
 (* ---  ValueBlockRW                                                      --- *)
 (* -------------------------------------------------------------------------- *)
 
-let value_blockrw_preambule fmt () =
+let value_blockrw_preamble fmt () =
   fprintf fmt "%a@,@," pp_use_list
     [ "int.Int", None
     ; "frama_c_wp.cint.Cint", None
@@ -389,7 +389,7 @@ let value_blockrw_all_lemmas fmt size =
   List.iter (value_blockrw_read_write_sep fmt size) all_types
 
 let value_blockrw fmt () =
-  fprintf fmt "%a@," value_blockrw_preambule () ;
+  fprintf fmt "%a@," value_blockrw_preamble () ;
   List.iter (fprintf fmt "%a" value_blockrw_read) all_types ;
   List.iter (fprintf fmt "%a" value_blockrw_write) all_types ;
   List.iter (fprintf fmt "%a" value_blockrw_all_lemmas) all_types
@@ -398,7 +398,7 @@ let value_blockrw fmt () =
 (* ---  InitBlockRW                                                       --- *)
 (* -------------------------------------------------------------------------- *)
 
-let init_blockrw_preambule fmt () =
+let init_blockrw_preamble fmt () =
   fprintf fmt "%a@,@," pp_use_list
     [ "bool.Bool", None
     ; "int.Int", None
@@ -453,7 +453,7 @@ let init_blockrw_all_lemmas fmt size =
   List.iter (init_blockrw_read_write_sep fmt size) all_sizes
 
 let init_blockrw fmt () =
-  fprintf fmt "%a@," init_blockrw_preambule () ;
+  fprintf fmt "%a@," init_blockrw_preamble () ;
   List.iter (fprintf fmt "%a" init_blockrw_read) all_sizes ;
   List.iter (fprintf fmt "%a" init_blockrw_write) all_sizes ;
   List.iter (fprintf fmt "%a" init_blockrw_all_lemmas) all_sizes
@@ -462,7 +462,7 @@ let init_blockrw fmt () =
 (* ---  MemBytes                                                          --- *)
 (* -------------------------------------------------------------------------- *)
 
-let membytes_preambule fmt () =
+let membytes_preamble fmt () =
   fprintf fmt "%a@,@," pp_use_list
     [ "int.Int", None
     ; "map.Map", None
@@ -633,7 +633,7 @@ let membytes_context fmt () =
 |}
 
 let membytes fmt () =
-  fprintf fmt "%a@," membytes_preambule () ;
+  fprintf fmt "%a@," membytes_preamble () ;
   List.iter (fprintf fmt "%a" membytes_read) all_types ;
   List.iter (fprintf fmt "%a" membytes_write) all_types ;
   List.iter (fprintf fmt "%a" membytes_all_lemmas) all_types ;

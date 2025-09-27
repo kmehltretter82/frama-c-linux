@@ -73,7 +73,7 @@ let ty_repeat = function
 
 (*--- Qed Symbols ---*)
 
-let f_cons = Lang.extern_f ~library ~typecheck:ty_cons "cons" (* rewriten in concat(elt) *)
+let f_cons = Lang.extern_f ~library ~typecheck:ty_cons "cons" (* rewritten in concat(elt) *)
 let f_nil  = Lang.extern_f ~library ~typecheck:ty_nil ~category:L.Constructor "nil"
 let f_elt = Lang.extern_f ~library ~category:L.Constructor ~typecheck:ty_elt ~link:l_elt "elt"
 
@@ -83,7 +83,7 @@ let concatenation = L.(Operator {
     commutative = false ;
     idempotent = false ;
     neutral = E_fun(f_nil,[]) ;
-    absorbant = E_none ;
+    absorbent = E_none ;
   })
 
 let f_nth    = Lang.extern_f ~library ~typecheck:ty_nth "nth"

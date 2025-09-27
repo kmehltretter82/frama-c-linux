@@ -506,7 +506,7 @@ such patterns.
 
 The user selects an expression $\mathtt{bit\_test}(n,k)$ with $k$
 a \emph{constant} integer value greater or equal to 0 and lower than
-128. The tactic uses this test to thighten the bounds of $n$.
+128. The tactic uses this test to tighten the bounds of $n$.
 
 $$\TACTIC{\Delta\models\,G}{%
 \begin{array}[t]{ll}
@@ -531,7 +531,7 @@ the equality is decomposed into $N$ bit-tests equalities:
 \sigma(\Delta) & \models & \sigma(G)
 \end{array}
 }\]
-where $\sigma$ is the following subsitution:
+where $\sigma$ is the following substitution:
 \[ \sigma \equiv
 \left[ a=b \quad \leftarrow
 \bigwedge_{k\in 0..N-1} \mathtt{bit\_test}(a,k) = \mathtt{bit\_test}(b,k)
@@ -580,7 +580,7 @@ $x \& y$, both directions $x \% (y - 1)$ and $y \% (x - 1)$ can be considered.
 
 Since establishing that $m$ is a positive power of 2 can be hard, the tactic has
 several behaviors. If \textsf{Qed} can prove immediately that an operand $m$ (or
-$m+1$ for bitmaks) is a positive power of 2, the tactic only generates the guard
+$m+1$ for bitmask) is a positive power of 2, the tactic only generates the guard
 $0 \leq b$ and the rewritten goal. If it is not the case, the tactic appears
 with the name ``Mod-Mask (hard)'' in the GUI. In this situation, the guard
 consists of two conditions: $0 \leq b$ and $m$ (or $m+1$) is a positive power of
@@ -1077,7 +1077,7 @@ weakest precondition calculus.
   In this case, a warning is emitted for potential runtime errors.
   Refer to Section~\ref{wp-model-arith} for details.
 \item[\tt -wp-(no)-init-const] use initializers for global const variables
-  (defaut is: \texttt{yes}).
+  (default is: \texttt{yes}).
 \item[\tt -wp-(no)-split] Splits conditional statements into separated goals (default is: \texttt{no}).
 \item[\tt -wp-(no)-split-switch] Splits switch statements into sepeared goals (default is: \texttt{yes}).
 \item[\tt -wp-split-max <{\it n}>]
@@ -1788,7 +1788,7 @@ by a link (`\user{link};'). The available tags are depicted on figure~\ref{wp-dr
                   $x \odot y \odot z = (x \odot y) \odot z$ \\
 \texttt{right:} & balance the operator on right during export to solvers (requires the associative tag):
                       $x \odot y \odot z = x \odot (y \odot z)$ \\
-\texttt{absorbant:} \user{a-link}\texttt{:} & specify \user{a-link} as being the absorbant element of the symbol: \\
+\texttt{absorbent:} \user{a-link}\texttt{:} & specify \user{a-link} as being the absorbent element of the symbol: \\
                      & $\user{a-link} \odot x = \user{a-link}$ \\
                      & $x \odot \user{a-link} = \user{a-link}$ \\
 \texttt{neutral:} \user{e-link}\texttt{:} & specify \user{e-link} as being the neutral element of the symbol: \\
@@ -1858,7 +1858,7 @@ Notice that the Why3 standard library is already in the load-path by default.
 \subsection{Proof Session \& Cache}
 \label{wp-cache}
 
-The \textsf{WP} plugin can use a session directory to store informations to be used from one execution to another one.
+The \textsf{WP} plugin can use a session directory to store information to be used from one execution to another one.
 It is used to store proof scripts edited from the TIP (see Section~\ref{wp-proof-editor}) and to replay them from the command line.
 And it is also used to speedup the invocation of provers by reusing previous runs.
 
@@ -1980,7 +1980,7 @@ proof strategies:
   can be recovered easily.
 \end{itemize}
 
-To activate proof strategies and seach for new scripts for unproven goals, user
+To activate proof strategies and search for new scripts for unproven goals, user
 shall activate the \verb+tip+ prover from the command line, with
 \verb+-wp-prover tip+, or use the interfactive \textsf{TIP} from the graphical
 user interface.

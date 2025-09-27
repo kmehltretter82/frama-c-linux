@@ -24,7 +24,7 @@ open Definitions
 
 let ainf = Some e_zero
 let asup n = Some (e_int (n-1))
-let arange k n = p_and (p_leq e_zero k) (p_lt k (e_int n))
+let arrange k n = p_and (p_leq e_zero k) (p_lt k (e_int n))
 
 let equation = function
   | Set(a,b) -> p_equal a b
@@ -597,7 +597,7 @@ struct
     | Sarray(l,obj,n) ->
       let x = Lang.freshvar ~basename:"k" Logic.Int in
       let k = e_var x in
-      [x],M.shift l obj k,arange k n
+      [x],M.shift l obj k,arrange k n
     | Srange(l,obj,a,b) ->
       let x = Lang.freshvar ~basename:"k" Logic.Int in
       let k = e_var x in

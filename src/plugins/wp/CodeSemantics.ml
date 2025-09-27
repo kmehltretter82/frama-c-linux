@@ -475,7 +475,7 @@ struct
         | TComp { cstruct ; cfields = Some fields }
           when cstruct && (* not for union... *)
                (List.length initl) < (List.length fields) ->
-          (* default init for unintialized field of a struct *)
+          (* default init for uninitialized field of a struct *)
           List.fold_left
             (fun acc f ->
                if List.exists

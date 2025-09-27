@@ -344,7 +344,7 @@ Proof.
 Qed.
 
 (** * Link between Bit extraction and bitwise operators *)
-(** ** Some properties of bit extration *)
+(** ** Some properties of bit extraction *)
 (** ** Logical operators *)
 								  
 (* Why3 goal *)

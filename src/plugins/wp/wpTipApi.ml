@@ -420,7 +420,7 @@ let () =
   let get_node = R.param_opt printSequent ~name:"node"
       ~descr:(Md.plain "Proof Node") (module Node) in
   let get_indent = R.param_opt printSequent ~name:"indent"
-      ~descr:(Md.plain "Number of identation spaces") (module D.Jint) in
+      ~descr:(Md.plain "Number of indentation spaces") (module D.Jint) in
   let get_margin = R.param_opt printSequent ~name:"margin"
       ~descr:(Md.plain "Maximial text width") (module D.Jint) in
   let get_iformat = R.param_opt printSequent ~name:"iformat"

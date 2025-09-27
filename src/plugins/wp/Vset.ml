@@ -183,7 +183,7 @@ let concretize = function
 let inter xs ys = e_fun f_inter [xs;ys]
 
 (* -------------------------------------------------------------------------- *)
-(* --- Emptyness                                                          --- *)
+(* --- Emptiness                                                          --- *)
 (* -------------------------------------------------------------------------- *)
 
 let p_empty s = p_equal s (e_fun f_empty [])

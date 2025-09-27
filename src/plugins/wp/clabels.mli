@@ -49,7 +49,7 @@ val to_logic : c_label -> Cil_types.logic_label
 val of_logic : Cil_types.logic_label -> c_label
 (** Assumes the logic label only comes from normalized or non-ambiguous
     labels. Ambiguous labels are: Old, LoopEntry and LoopCurrent, since
-    they points to different program points dependending on the context. *)
+    they point to different program points depending on the context. *)
 
 val is_post : Cil_types.logic_label -> bool
 (** Checks whether the logic-label is [Post] or [to_logic post] *)
