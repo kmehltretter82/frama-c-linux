@@ -40,7 +40,7 @@ let dkey_transformation_action =
 
 let dkey_transformation_visit =
   Options.register_category
-    ~help:"Prints visitor informations during the transformation"
+    ~help:"Prints visitor information during the transformation"
     "transformation-visit"
 
 let has_volatile_attr t =
@@ -48,7 +48,7 @@ let has_volatile_attr t =
 let add_volatile_attr = Ast_types.add_attributes [ ("volatile", []) ]
 
 (* This function replaces spaces in type names.
-   Note: A previous version also made sure all caracters were either a-z, A-Z or
+   Note: A previous version also made sure all characters were either a-z, A-Z or
    0-9 (or raised Not_found), it does not seem to be necessary so it was removed
    to simplify the code, but maybe it'll break something (?).
 *)
@@ -65,7 +65,7 @@ let typename (t: typ) =
 
    Due to CIL decomposition, it is impossible to find the final volatile lvalue
    when the path to that volatile lvalue contents a volatile pointer.
-   In a simpliest way, volatile of volatile are not handle by volatile clauses.
+   In a simplest way, volatile of volatile are not handle by volatile clauses.
 
    From that limitation and type constraints, there is no needs to distinguish
    `*p` from `p` (only one of these lvalue is volatile).
@@ -467,7 +467,7 @@ let get_called_ptr = function
   | Mem e -> Some e
   | _ -> None
 
-let get_cannonical_call ~source f tf =
+let get_canonical_call ~source f tf =
   let name =
     match tf.tnode with
     | TNamed ti when Ast_types.is_fun tf -> ti.torig_name
@@ -504,7 +504,7 @@ let get_pointer_call ~index ~source f =
   | Some _ -> res
   | None ->
     if Options.BindingCall.get () then
-      get_cannonical_call ~source f tf
+      get_canonical_call ~source f tf
     else None
 
 let add_eventual_cast_to_expression lval_typ e =
@@ -604,7 +604,7 @@ type vmap = {
 
 (** Builds a table of volatile clauses.
     This table can be viewed as a map from term_lhost to a map from term_lval
-    to (reads, writes) fonctions. *)
+    to (reads, writes) functions. *)
 let build_volatile_table vmap =
   let add_fct kind loc map path = function
     | None -> map
@@ -688,7 +688,7 @@ let get_volatile_access ~is_wr_access fct_name binding_map kf_tbl vol_tbl lval =
       match B_MAP.find_binding ~is_wr_access binding_map typ with
       | Some f -> found f
       | None ->
-        (* 3 - Looking into kernel functions for a name infered from the type value. *)
+        (* 3 - Looking into kernel functions for a name inferred from the type value. *)
         match find_typename ~is_wr_access kf_tbl typ with
         | Some fct -> found fct
         | None ->

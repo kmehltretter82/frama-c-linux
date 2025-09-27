@@ -99,7 +99,7 @@ val pretty_extern_vars: Format.formatter -> VInfoSet.t -> unit
     the varinfo name as key and additional attributes as values. *)
 val json_of_varinfo_map : int VInfoMap.t -> Yojson.t
 
-(** Handling entry points informations *)
+(** Handling entry points information *)
 val number_entry_points : int VInfoMap.t -> int
 ;;
 

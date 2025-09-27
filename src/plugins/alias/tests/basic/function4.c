@@ -1,4 +1,4 @@
-// funxtion with address agument
+// function with address argument
 //  {a, b} are aliased
 
 int * addr(int* x)

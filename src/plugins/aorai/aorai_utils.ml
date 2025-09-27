@@ -756,7 +756,7 @@ let mk_term_from_vi vi =
     (Ctype Cil_const.intType)
 
 (** Given an lval term 'host' and an integer value 'off', it returns a lval term host[off]. *)
-let mk_offseted_array host off =
+let mk_offsetted_array host off =
   Logic_const.term
     (TLval(Logic_const.addTermOffsetLval (TIndex(mk_int_term (off),TNoOffset)) host))
     (Ctype Cil_const.intType)
@@ -768,7 +768,7 @@ let int2enumstate nums =
 let int2enumstate_exp loc nums = new_exp ~loc (Const (CEnum (find_enum nums)))
 
 (** Given an lval term 'host' and an integer value 'off', it returns a lval term host[off]. *)
-let mk_offseted_array_states_as_enum host off =
+let mk_offsetted_array_states_as_enum host off =
   let enum = find_enum off in
   Logic_const.term
     (TLval
@@ -1029,7 +1029,7 @@ let pred_of_condition subst subst_res label cond =
     | TFalse -> kf, pfalse
     | TRel(rel,t1,t2) ->
       kf,
-      unamed (change_vars subst subst_res kf label (prel (rel,t1,t2)).pred_content)
+      unnamed (change_vars subst subst_res kf label (prel (rel,t1,t2)).pred_content)
   in
   snd (aux None true cond)
 

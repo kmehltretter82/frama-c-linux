@@ -382,7 +382,7 @@ let gen_section_warnings env =
       (* Failure are supposed to stop the analyses right away, so that no
          report will be generated. On the other hand, Error messages can be
          triggered without stopping everything. Applying the same treatment
-         to a Failure catched by an evil plugin cannot hurt.
+         to a Failure caught by an evil plugin cannot hurt.
       *)
       let prelude =
         if env.is_draft then

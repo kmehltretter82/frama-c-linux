@@ -33,7 +33,7 @@ let _pretty_node fmt = function
    Experimentally, to first force gtk to create a header button for the column,
    you should:
    - add first the column to the table;
-   - explicitely set the widget of the header (and this widget should not be a
+   - explicitly set the widget of the header (and this widget should not be a
      button itself).
      Otherwise, this function will return None. *)
 let get_column_header_button (col: GTree.view_column) =

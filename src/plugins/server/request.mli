@@ -35,7 +35,7 @@ type 'b output = (module Output with type t = 'b)
 (** {2 Signals}
 
     A signal is a one-way message from server to client for indicating that
-    something happened. To avoid unecessary noise, the client must be registered
+    something happened. To avoid unnecessary noise, the client must be registered
     on each signal it is interested in. The client will then send a proper get
     requests to the server to retrieve the updated data.
 
@@ -89,7 +89,7 @@ val register :
     The API below allows for creating requests with
     named and optional parameters. Although such requests
     could be defined with simple registration and {i record} datatypes,
-    the helpers below allow more flexibility and a better correspondance
+    the helpers below allow more flexibility and a better correspondence
     between optional parameters and OCaml option types.
 
     To register a request with named parameters and/or named results,
@@ -98,7 +98,7 @@ val register :
     function:
 
     {[
-      (* ---- Exemple of Request Registration --- *)
+      (* ---- Example of Request Registration --- *)
       let () =
         let s = Request.signature () in
         let get_a = Request.param s ~name:"a" ~descr:"..." (module A) in
@@ -151,7 +151,7 @@ val register_sig :
     {i before} its final registration. The obtained getters and setters
     shall be only used within the registered process.
 
-    The correspondance between input/output JSON syntax and OCaml values
+    The correspondence between input/output JSON syntax and OCaml values
     is summarized in the tables below.Abstract_domain
 
     For named input parameters:
@@ -192,7 +192,7 @@ val param_opt : (unit,'b) signature ->
 
 (** Named output parameter. If a default value is provided, the JSON output
     field is initialized with it. Otherwise, it shall be set at each invocation
-    of the request processing funciton. *)
+    of the request processing function. *)
 val result : ('a,unit) signature ->
   name:string ->
   descr:Markdown.text ->

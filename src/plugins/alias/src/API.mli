@@ -118,7 +118,7 @@ module Abstract_state : sig
   (** set of variables associated with given vertex *)
   val get_vars : v -> t -> VarSet.t
 
-  (** set of lvals which can be used to refered to the given vertex
+  (** set of lvals which can be used to refer to the given vertex
       Example graph: <a> → <b> -t→ <c>
       The lvals corresponding to the rightmost vertex are <c, b.t, a->t>:
       - c:    simply refers to a variable associated with the vertex.
@@ -230,6 +230,6 @@ val call_function: Abstract_state.t -> kernel_function -> lval option -> exp lis
 
 
 (** [simplify_lval lv] returns a lval where every index of an array is
-    replaced by 0, evey pointer arithmetic is simplified to an access
+    replaced by 0, every pointer arithmetic is simplified to an access
     to an array *)
 val simplify_lval: lval -> lval

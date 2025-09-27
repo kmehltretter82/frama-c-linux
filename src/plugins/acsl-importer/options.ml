@@ -76,7 +76,7 @@ module AddonIntegerCast =
     (struct
       let option_name = "-acsl-import-addon-integer-cast"
       let help =
-        "allows and explicits casts from integer to C integral types"
+        "allows and explicit casts from integer to C integral types"
     end)
 
 module Run =
@@ -130,10 +130,10 @@ module UnroolLoopFunctionLevel =
     (struct
       let option_name = "-acsl-import-ulevel-spec"
       let arg_name = "spec1,...,specs"
-      let help = "an unrolling specification <m@f:tag@n> adds a 'loop unfold \"tag\", <n>;' to the loop of the function <f> of occurence <m>.\n \
+      let help = "an unrolling specification <m@f:tag@n> adds a 'loop unfold \"tag\", <n>;' to the loop of the function <f> of occurrence <m>.\n \
                   An unrolling specification <c@f:tag@n> adds a 'loop unfold \"tag\", <n>;' to all loops of category <c> of the function <f> where allowed loop categories are: 'while', 'for' and 'do-while'.\n \
                   The specification is considered as a set of elementary specifications: spec1,...,specs.\n \
-                  Categories, function names and loop occurence numbers can be omitted. \
+                  Categories, function names and loop occurrence numbers can be omitted. \
                   The priority ordering used for choosing the (\"tag\", unrolling value <n>) pair is: m@f:tag@n > c@f:tag@n > f:tag@n > c:tag@n > :tag@n.\n \
                   The default value for optional tags is the empty string which leads to add a loop pragmas without tags.\n \
                   Nothing is done for loops having already a clause 'loop unfold ...'."

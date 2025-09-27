@@ -76,7 +76,7 @@ function extended_Euclid:
 
 # 2.2.3 <acsl_stmt_spec> and <label_name>
 
-function abrupt_terminaison:
+function abrupt_termination:
   at body:
     contract:
       breaks x % 11 == 0 && x == \old(x);

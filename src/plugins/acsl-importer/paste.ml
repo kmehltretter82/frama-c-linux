@@ -1628,7 +1628,7 @@ let () =
                    "Removing clause: %a@."
                    Cil_printer.pp_extended clause_extension;
                  (* note: the remove_extended never fails even if the clause
-                    is not found and there are two possibile emiter for it. *)
+                    is not found and there are two possible emiter for it. *)
                  Annotations.remove_extended Emitter.end_user (*from C file*)
                    (Option.get self#current_kf)
                    clause_extension;
@@ -1782,7 +1782,7 @@ let dkey = Options.register_category "trace-actions"
 let paste_fun_spec kf ~pfile ~pline ~cfile s ast =
   init_pasting ~pfile  ~pline ~cfile ast ;
   Options.debug ~level:2 ~dkey
-    "Set current fonction to %a@." Kernel_function.pretty kf ;
+    "Set current function to %a@." Kernel_function.pretty kf ;
   current_function := Some kf ;
   paste_fun_spec s
 
@@ -1790,7 +1790,7 @@ let paste_fun_spec kf ~pfile ~pline ~cfile s ast =
 let paste_code_annot kf stmt ~pfile ~pline ~cfile s ast=
   init_pasting ~pfile ~pline ~cfile ast;
   Options.debug ~level:2 ~dkey
-    "Set current fonction to %a@." Kernel_function.pretty kf ;
+    "Set current function to %a@." Kernel_function.pretty kf ;
   current_function := Some kf ;
   paste_code_annot (S_Stmt.singleton stmt) s
 

@@ -11,7 +11,7 @@ exception Cannot_fold
 open Pdg_types
 
 open PdgTypes
-(** Types data_state and Node.t come froms this module *)
+(** Types data_state and Node.t come from this module *)
 
 val make : PdgTypes.LocInfo.t -> Locations.Zone.t -> data_state
 val empty : data_state

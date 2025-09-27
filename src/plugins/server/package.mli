@@ -7,7 +7,7 @@
 (**************************************************************************)
 
 (* -------------------------------------------------------------------------- *)
-(* --- Constituant of the Server API                                      --- *)
+(* --- Constituent of the Server API                                      --- *)
 (* -------------------------------------------------------------------------- *)
 
 type plugin = Kernel | Plugin of string
@@ -214,7 +214,7 @@ type pp = {
 }
 
 (** Quoted string *)
-val litteral : string -> Markdown.text
+val literal : string -> Markdown.text
 
 val md_jtype : pp -> jtype -> Markdown.text
 val md_tags : ?title:string -> tagInfo list -> Markdown.table

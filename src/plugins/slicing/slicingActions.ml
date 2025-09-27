@@ -118,7 +118,7 @@ let mk_fct_user_crit fi crit = mk_fct_crit fi (SlicingInternals.CcUserMark crit)
 let mk_crit_fct_top fi m = mk_fct_user_crit fi (SlicingInternals.CuTop m)
 let mk_crit_fct_user_select fi select = mk_fct_user_crit fi (SlicingInternals.CuSelect select)
 
-let mk_crit_prop_persit_marks fi node_marks =
+let mk_crit_prop_persist_marks fi node_marks =
   mk_fct_crit fi (SlicingInternals.CcPropagate node_marks)
 
 (** build an action to apply the criteria to the given slice. *)

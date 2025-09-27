@@ -426,7 +426,7 @@ end
 module H = struct
   include Hashtbl.Make(RKey)
   let structural_descr =
-    Structural_descr.t_hashtbl_unchanged_hashs (Descr.str RKey.descr)
+    Structural_descr.t_hashtbl_unchanged_hashes (Descr.str RKey.descr)
 end
 
 module FctIndex = struct

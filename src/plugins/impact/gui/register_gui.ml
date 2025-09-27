@@ -134,7 +134,7 @@ let impact_highlighter buffer loc ~start ~stop =
       let t = make_tag buffer ~name [`BACKGROUND color ] in
       apply_tag buffer t start stop
     in
-    let hilight kf s =
+    let highlight kf s =
       if Highlighted_stmt.mem kf s then
         tag "hilighed_impact" "green"
       else
@@ -142,7 +142,7 @@ let impact_highlighter buffer loc ~start ~stop =
           (fun sel -> if Cil_datatype.Stmt.equal sel s then
               tag "selected_impact" "cyan")
     in
-    apply_on_stmt hilight loc
+    apply_on_stmt highlight loc
 
 let impact_statement restrict s =
   let kf = Kernel_function.find_englobing_kf s in
@@ -320,7 +320,7 @@ let file_tree_decorate (file_tree:Filetree.t) =
     file_tree#append_pixbuf_column
       ~title:"Impact"
       (fun globs ->
-         let is_hilighted = function
+         let is_highlighted = function
            | GFun ({svar = v }, _) ->
              Highlighted_stmt.mem_kf (Globals.Functions.get v)
            |  _ -> false
@@ -328,7 +328,7 @@ let file_tree_decorate (file_tree:Filetree.t) =
          let id =
            (* laziness of && is used for efficiency *)
            if Enabled.get () && SelectedStmt.get_option () <> None &&
-              List.exists is_hilighted globs then "gtk-apply"
+              List.exists is_highlighted globs then "gtk-apply"
            else ""
          in
          [ `STOCK_ID id ])

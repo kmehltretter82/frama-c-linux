@@ -189,7 +189,7 @@ let nbAcceptSt  = "aorai_NbAcceptStates"                 (* Deprecated ? *)
 let nbTrans     = "aorai_NbTrans"                        (* Deprecated ? *)
 
 (* C Macros *)
-let macro_ligth = "aorai_Macro_Prop_St_Tr_Without_Conds" (* Deprecated ? *)
+let macro_light = "aorai_Macro_Prop_St_Tr_Without_Conds" (* Deprecated ? *)
 let macro_full  = "aorai_Macro_Prop_St_Tr"               (* Deprecated ? *)
 let macro_pure  = "aorai_Macro_Op_without_sub_call"      (* Deprecated ? *)
 

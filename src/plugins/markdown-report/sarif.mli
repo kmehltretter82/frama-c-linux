@@ -564,7 +564,7 @@ end
 
 module Fix: sig
   type t = {
-    description: (Message.t [@defaut Message.default]);
+    description: (Message.t [@default Message.default]);
     fileChanges: FileChange.t list;
   }[@@deriving yojson]
 end

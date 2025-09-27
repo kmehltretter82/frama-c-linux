@@ -117,7 +117,7 @@ val data_to_json : 'a data -> 'a -> json
 
 (**
    Declare the derived names for the provided type.
-   Shall not be used directely.
+   Shall not be used directly.
 *)
 val derived : package:package -> id:ident -> jtype -> jtype
 
@@ -149,7 +149,7 @@ val declare :
     type [t = r record] with fields of type [(r,a) field].
 
     {[
-      (* ---- Exemple of Record Data --- *)
+      (* ---- Example of Record Data --- *)
       type r
       let s = Record.signature () in
       let fd_a = Record.field s ~name:"a" ~descr:"..." (module A) in
@@ -321,7 +321,7 @@ end
 
     These datatype functors come into three flavors:
     - [Index()] for projectified datatypes,
-    - [Static()] for project independant datatypes,
+    - [Static()] for project independent datatypes,
     - [Identified()] for projectified values already identified by integers.
     - [Tagged()] for projectified values already identified by strings.
 

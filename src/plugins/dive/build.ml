@@ -247,7 +247,7 @@ let find_compatible_callstacks stmt callstack =
   else if Kernel_function.equal kf (Callstack.top_kf callstack)
   then
     (* slight improvement which only work when there is no recursion
-       and which is only usefull because you currently can't have
+       and which is only useful because you currently can't have
        all callstacks due to memexec -> in this particular case
        we are sure not to miss the only admissible callstack *)
     [callstack]
@@ -717,7 +717,7 @@ let add_localizable context = function
 (* --- Visibility handling --- *)
 
 let remove_dependencies context node =
-  (* Remove incomming edges *)
+  (* Remove incoming edges *)
   Context.remove_node_deps context node;
   (* Reset the writes computation status *)
   node.node_writes_computation <- NotDone;
@@ -725,7 +725,7 @@ let remove_dependencies context node =
 
 let remove_disconnected context =
   let roots = Context.get_roots context in
-  let l = Graph.find_independant_nodes (Context.get_graph context) roots in
+  let l = Graph.find_independent_nodes (Context.get_graph context) roots in
   List.iter (Context.remove_node context) l
 
 let reduce_to_horizon context range new_root =
@@ -736,13 +736,13 @@ let reduce_to_horizon context range new_root =
   and roots = Context.get_roots context
   and backward_bfs = Graph.bfs ~iter_succ:Graph.iter_pred ?limit:range.backward
   and forward_bfs = Graph.bfs ~iter_succ:Graph.iter_succ ?limit:range.forward in
-  let bacward_nodes = backward_bfs graph roots
+  let backward_nodes = backward_bfs graph roots
   and forward_nodes = forward_bfs graph roots in
   (* Table of visible nodes *)
   let module Table = Hashtbl.Make (Graph.Node) in
   let visible = Table.create 13 in
   let is_visible = Table.mem visible in
-  List.iter (fun n -> Table.add visible n true) (bacward_nodes @ forward_nodes);
+  List.iter (fun n -> Table.add visible n true) (backward_nodes @ forward_nodes);
   (* Find nodes to hide / remove *)
   let update node =
     if not (is_visible node) then

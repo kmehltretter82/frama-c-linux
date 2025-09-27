@@ -133,7 +133,7 @@ let () = Boot.Main.extend main
 
    The propagation of the marks to the function call depend on a
    {!type:SlicingTypes.Internals.t_call_option}.
-   Chosing this level makes it possible to obtain a more or less precise result.
+   Choosing this level makes it possible to obtain a more or less precise result.
 
    {3 High level commands}
 

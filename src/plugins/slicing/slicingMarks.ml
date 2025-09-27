@@ -140,7 +140,7 @@ end
 
 (** a [SlicingInternals.pdg_mark] is associated with each element of the PDG in a slice.
   * The first component gives the mark propagated from a user request, while
-  * the second one is used to propagate informations to the called functions.
+  * the second one is used to propagate information to the called functions.
 *)
 
 let mk_m1 m1 = { SlicingInternals.m1 = m1 ; m2 = Mark.bottom }

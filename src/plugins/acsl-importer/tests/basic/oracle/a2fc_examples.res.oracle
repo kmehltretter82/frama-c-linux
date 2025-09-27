@@ -78,7 +78,7 @@ int extended_Euclid(int x, int y, int *p, int *q)
   return x;
 }
 
-int abrupt_terminaison(int x)
+int abrupt_termination(int x)
 {
   int __retres;
   while (x > 0) {

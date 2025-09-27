@@ -16,7 +16,7 @@
     to say what has to be kept in the result. It uses the generic PDG
     marking facility {{:../pdg/PdgMarks.ml}PdgMarks} and
     {{:../pdg/Marks.ml}Marks},
-  - and a second one (module {!module:Transform}) that read thoses results to
+  - and a second one (module {!module:Transform}) that read those results to
     produce a new application. This part mainly use the kernel AST
     transformation Filter which provides a functor that filters an application
     to create another one.

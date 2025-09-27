@@ -59,7 +59,7 @@ let compare_pdg_mark p1 p2 =
     let r = compare_mark p1.m1 p2.m1 in
     if r = 0 then compare_mark p1.m2 p2.m2 else r
 
-(** Type for all the informations related to any function,
+(** Type for all the information related to any function,
  * even if we don't have its definition.  *)
 type fct_info = {
   fi_kf : Cil_types.kernel_function;

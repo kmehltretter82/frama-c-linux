@@ -101,7 +101,7 @@ val exp : map -> exp -> node option
 
 (** {2 Low-level Navigation through Memory Maps}
 
-    For optimized access, all the fonctions in this section return
+    For optimized access, all the functions in this section return
     unnormalized nodes and may raise [Not_found] for not localized routes. *)
 
 (** Unormalized.

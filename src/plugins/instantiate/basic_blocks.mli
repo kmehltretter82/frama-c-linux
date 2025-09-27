@@ -35,7 +35,7 @@ val const_of: typ -> typ
 val size_t: unit -> typ
 
 (** Create a function definition from a name and a type
-    - [vdefined] is positionned to [true]
+    - [vdefined] is positioned to [true]
     - formals are registered to FormalsDecl
 *)
 val prepare_definition: string -> typ -> fundec
@@ -74,7 +74,7 @@ val tdivide: ?loc:location -> term -> term -> term
 (** [pbounds_incl_excl ~loc low v up] builds [low <= v < up]. *)
 val pbounds_incl_excl: ?loc:location -> term -> term -> term -> predicate
 
-(** [plet_len_div_size ~loc ~name_ext ltyp bytes_len pred] buils a predicate:
+(** [plet_len_div_size ~loc ~name_ext ltyp bytes_len pred] builds a predicate:
     - [\let name = bytes_len / sizeof(ltyp) ; < pred name >]
 
     with [name = "__fc_<name_ext>len"]. For example, if [pred len] generates an

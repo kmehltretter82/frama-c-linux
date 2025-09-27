@@ -77,7 +77,7 @@ module S = struct
 
   (* transform "{ ... L1: /*@annot*/ S1; ... }"
           into "{ ... L1: {/*label attrib*/ /*@annot*/ S1; } ... }"
-     note: S1 cannot be a declaration beacause it is a labeled statement
+     note: S1 cannot be a declaration because it is a labeled statement
      returns None when the list is unmodified *)
   let get_processed_label ss =
     let is_annot = Cabs.(function | CODE_ANNOT _ ->true

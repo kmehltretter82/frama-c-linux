@@ -534,7 +534,7 @@ let run server =
     scheduler := Offline ;
     set_active false ;
   with exn ->
-    Senv.feedback "Server interruped (fatal error)." ;
+    Senv.feedback "Server interrupted (fatal error)." ;
     emitter := nop ;
     scheduler := Offline ;
     set_active false ;

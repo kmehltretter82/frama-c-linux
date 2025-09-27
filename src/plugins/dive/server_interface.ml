@@ -177,7 +177,7 @@ module NodeKind = struct
   let unknown =   tag "unknown"   "an unresolved memory location"
   let alarm =     tag "alarm"     "an alarm emitted by Frama-C"
   let absolute =  tag "absolute"  "a memory location designated by a range \
-                                   of adresses"
+                                   of addresses"
   let error =     tag "error"     "a placeholder node when an error prevented \
                                    the generation process"
   let const =     tag "const"     "a numeric constant literal"

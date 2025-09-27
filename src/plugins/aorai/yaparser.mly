@@ -29,7 +29,7 @@ let to_seq c =
      max_rep = Some Data_for_aorai.cst_one;
    }]
 
-let is_no_repet (min,max) =
+let is_no_repeat (min,max) =
   let is_one c = Option.fold ~some:Data_for_aorai.is_cst_one ~none:false c in
   is_one min && is_one max
 
@@ -304,7 +304,7 @@ seq_elt:
       | [ s ] when Data_for_aorai.is_single s ->
         [ { s with min_rep = min; max_rep = max } ]
       | l ->
-        if is_no_repet (min,max) then
+        if is_no_repeat (min,max) then
           l (* [ a; [b;c]; d] is equivalent to [a;b;c;d] *)
         else [ { condition = None; nested = l; min_rep = min; max_rep = max } ]
   }

@@ -43,7 +43,7 @@ module Keys = struct
 
   let dkey_transformation_visit =
     register_category
-      ~help:"Prints visitor informations during the transformation"
+      ~help:"Prints visitor information during the transformation"
       "transformation-visit"
 
   let wkey name status =
@@ -90,7 +90,7 @@ module Enabled =
   False (struct
     let option_name = "-volatile"
     let help =
-      "builds a new projet (named \"" ^ plugin_name
+      "builds a new project (named \"" ^ plugin_name
       ^"\") where volatile accesses are simulated by function calls"
   end)
 

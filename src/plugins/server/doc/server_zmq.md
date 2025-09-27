@@ -18,7 +18,7 @@ $ frama-c [options...] -then -server-zmq ipc:///tmp/my-server.io
 ## Input Message Format
 
 Each input message consists of a list of commands. Each command takes
-a fixed number of parts from the incomming ZeroMQ message. The first part
+a fixed number of parts from the incoming ZeroMQ message. The first part
 of each command is a single string identifying the command:
 
 | Commands | Parts | Part 1 | Part 2 | Part 3 | Part 4 |
@@ -35,7 +35,7 @@ of each command is a single string identifying the command:
 ## Output Message Format
 
 Each output message consists of a list of replies. Each reply takes
-a fixed number of parts from the incomming ZeroMQ message. The first part
+a fixed number of parts from the incoming ZeroMQ message. The first part
 of each reply is a finel string identifying the reply:
 
 | Replies | Parts | Part 1 | Part 2 | Part 3 |
@@ -53,7 +53,7 @@ of each reply is a finel string identifying the reply:
 The two special responses `"WRONG"` and `"NONE"` are used to handle special issues
 with the ZeroMQ layer protocol: `WRONG(message)` signals an error in the message formats;
 `NONE` is used in the special case where the reply message from the server is completely
-empty. This generaly means that the server is busy or idled.
+empty. This generally means that the server is busy or idled.
 
 ## Data Format
 

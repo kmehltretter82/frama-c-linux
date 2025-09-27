@@ -10,7 +10,7 @@
     include functions/variables from the C stdlib in the metrics. *)
 
 (** Visitor to compute various syntactic metrics.
-    In particular, it fetches all necessary informations to compute
+    In particular, it fetches all necessary information to compute
     cyclomatic complexity .
 *)
 class type sloc_visitor = object

@@ -222,8 +222,8 @@ let import ~iDir ~pfile ~init_typenames ast =
     typecheck ~iDir ext_spec_file ast;
     let mode = match (Options.continue_after_typing ()), (Options.continue_after_parsing ()) with
       | true,true  -> ""
-      | true,false -> "ful parsing (without import)"
-      | false,_    -> "ful typing (without import)"
+      | true,false -> "full parsing (without import)"
+      | false,_    -> "full typing (without import)"
     in
     Options.feedback "Success%s for %s" mode (Filename.basename pfile) ;
     Paste.MacroIndex.clear_macro_table Paste.MacroIndex.Sfile ;

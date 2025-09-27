@@ -39,7 +39,7 @@ val translate_crit_to_select :
 val mk_fct_crit : fct_info -> fct_crit -> criterion
 val mk_crit_fct_user_select : fct_info -> select -> criterion
 val mk_crit_fct_top : fct_info -> sl_mark -> criterion
-val mk_crit_prop_persit_marks : fct_info -> select -> criterion
+val mk_crit_prop_persist_marks : fct_info -> select -> criterion
 val mk_ff_user_select : fct_slice -> select -> criterion
 val mk_crit_choose_call : fct_slice -> stmt -> criterion
 val mk_crit_change_call : fct_slice -> stmt -> called_fct -> criterion
