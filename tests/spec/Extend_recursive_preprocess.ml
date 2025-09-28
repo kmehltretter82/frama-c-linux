@@ -41,7 +41,7 @@ let preprocess_fooo_ptree = List.map preprocess_fooo_ptree_element
 let preprocess_foo_ptree (id,data) = (id ^ "_ok",data)
 
 let ext_fooo_visitor vis ext =
-  let aux p = unamed (Pand(p,p)) in
+  let aux p = unnamed (Pand(p,p)) in
   match ext with
   | Ext_preds pred ->
     if Visitor_behavior.is_copy vis#behavior then

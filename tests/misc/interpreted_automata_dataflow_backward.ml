@@ -40,7 +40,7 @@ struct
       | Skip | Prop _ | Leave _ | Return (None,_) ->
         v (* Nothing to do *)
       | Enter b ->
-        Set.diff v (Set.of_list b.blocals) (* If unconditionnaly initialized, they should not be there *)
+        Set.diff v (Set.of_list b.blocals) (* If unconditionally initialized, they should not be there *)
       | Instr (Set ((Var vi, NoOffset), exp, _), _)
       | Instr (Local_init (vi, AssignInit (SingleInit exp), _), _) ->
         Set.union (Set.remove vi v) (vars exp)

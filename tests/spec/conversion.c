@@ -1,4 +1,4 @@
-/* bts 60: 1 should be lifted to a real number implicitely.  */
+/* bts 60: 1 should be lifted to a real number implicitly.  */
 
 /*@ ensures 1.0 == 1; */
 void f(void);

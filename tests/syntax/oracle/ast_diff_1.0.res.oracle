@@ -1,6 +1,6 @@
 [kernel] Parsing ast_diff_1.i (no preprocessing)
 [kernel] Parsing ast_diff_2.c (with preprocessing)
-[AST diff test] Showing correspondances between orig_default and default
+[AST diff test] Showing correspondences between orig_default and default
 [AST diff test] Variable S:  => S
 [AST diff test] Variable X:  => X
 [AST diff test] Variable Y: N/A
