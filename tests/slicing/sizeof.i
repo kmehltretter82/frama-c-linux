@@ -9,7 +9,7 @@
   STDOPT: +"-deps -slice-return SizeOfE_tab_1 -no-slice-callers -then-on 'Slicing export' -set-project-as-default -print -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -check -no-deps"
   STDOPT: +"-deps -slice-return SizeOfE_pt_tab_1 -no-slice-callers -then-on 'Slicing export' -set-project-as-default -print -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -check -no-deps"
   STDOPT: +"-deps -slice-return SizeOfE_pt_tab_2 -no-slice-callers -then-on 'Slicing export' -set-project-as-default -print -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -check -no-deps"
-  STDOPT: +"-deps -slice-return SizeOfE_tab_acces_1 -no-slice-callers -then-on 'Slicing export' -set-project-as-default -print -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -check -no-deps"
+  STDOPT: +"-deps -slice-return SizeOfE_tab_access_1 -no-slice-callers -then-on 'Slicing export' -set-project-as-default -print -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -check -no-deps"
   STDOPT: +"-deps -slice-annot main -then-on 'Slicing export' -set-project-as-default -print -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -check -no-deps"
   STDOPT: +"-deps -slice-assert main -then-on 'Slicing export' -set-project-as-default -print -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -check -no-deps"
 */
@@ -78,7 +78,7 @@ unsigned int SizeOfE_pt_tab_2 (void) {
   int tab[5] = {0,1,2,3,4};
   return sizeof(&(tab[i])) ;
 }
-unsigned int SizeOfE_tab_acces_1 (void) {
+unsigned int SizeOfE_tab_access_1 (void) {
   int x = 1;
   int i = 2;
   int *p = &x;
@@ -100,7 +100,7 @@ int main (void) {
   r += SizeOfE_tab_1 ();
   r += SizeOfE_pt_tab_1 ();
   r += SizeOfE_pt_tab_2 ();
-  r += SizeOfE_tab_acces_1 ();
+  r += SizeOfE_tab_access_1 ();
   //@ slice_preserve_expr r;
   return r;
 }

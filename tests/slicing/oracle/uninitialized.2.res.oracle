@@ -22,7 +22,8 @@
 [eva] Done for function g
 [eva] Recording results for main
 [eva] Done for function main
-[eva] uninitialized.c:30: assertion 'Eva,initialization' got final status invalid.
+[eva] uninitialized.c:30: 
+  assertion 'Eva,initialization' got final status invalid.
 [slicing] initializing slicing ...
 [slicing] interpreting slicing requests from the command line...
 [pdg] computing for function main

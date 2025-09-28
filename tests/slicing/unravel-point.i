@@ -13,7 +13,7 @@
 
    */
 
-/* Small example devired from examples given for UNRAVEL tool : */
+/* Small example derived from examples given for UNRAVEL tool : */
 
 
 

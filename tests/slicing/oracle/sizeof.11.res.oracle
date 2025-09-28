@@ -41,10 +41,10 @@
   Called from sizeof.i:102.
 [eva] Recording results for SizeOfE_pt_tab_2
 [eva] Done for function SizeOfE_pt_tab_2
-[eva] computing for function SizeOfE_tab_acces_1 <- main.
+[eva] computing for function SizeOfE_tab_access_1 <- main.
   Called from sizeof.i:103.
-[eva] Recording results for SizeOfE_tab_acces_1
-[eva] Done for function SizeOfE_tab_acces_1
+[eva] Recording results for SizeOfE_tab_access_1
+[eva] Done for function SizeOfE_tab_access_1
 [eva] Recording results for main
 [eva] Done for function main
 [from] Computing for function SizeOfE_pt1
@@ -61,8 +61,8 @@
 [from] Done for function SizeOfE_pt_tab_2
 [from] Computing for function SizeOfE_tab_1
 [from] Done for function SizeOfE_tab_1
-[from] Computing for function SizeOfE_tab_acces_1
-[from] Done for function SizeOfE_tab_acces_1
+[from] Computing for function SizeOfE_tab_access_1
+[from] Done for function SizeOfE_tab_access_1
 [from] Computing for function SizeOf_1
 [from] Done for function SizeOf_1
 [from] Computing for function SizeOf_2
@@ -85,7 +85,7 @@
   \result FROM \nothing
 [from] Function SizeOfE_tab_1:
   \result FROM \nothing
-[from] Function SizeOfE_tab_acces_1:
+[from] Function SizeOfE_tab_access_1:
   \result FROM \nothing
 [from] Function SizeOf_1:
   \result FROM \nothing
@@ -104,8 +104,8 @@
 [slicing] applying all slicing requests...
 [slicing] applying 1 actions...
 [slicing] applying actions: 1/1...
-[pdg] computing for function SizeOfE_tab_acces_1
-[pdg] done for function SizeOfE_tab_acces_1
+[pdg] computing for function SizeOfE_tab_access_1
+[pdg] done for function SizeOfE_tab_access_1
 [pdg] computing for function SizeOfE_pt_tab_2
 [pdg] done for function SizeOfE_pt_tab_2
 [pdg] computing for function SizeOfE_pt_tab_1
@@ -209,7 +209,7 @@ unsigned int SizeOfE_pt_tab_2_slice_1(void)
   return __retres;
 }
 
-unsigned int SizeOfE_tab_acces_1_slice_1(void)
+unsigned int SizeOfE_tab_access_1_slice_1(void)
 {
   unsigned int __retres;
   int i;
@@ -251,7 +251,7 @@ void main(void)
   r = (int)((unsigned int)r + tmp_6);
   tmp_7 = SizeOfE_pt_tab_2_slice_1();
   r = (int)((unsigned int)r + tmp_7);
-  tmp_8 = SizeOfE_tab_acces_1_slice_1();
+  tmp_8 = SizeOfE_tab_access_1_slice_1();
   r = (int)((unsigned int)r + tmp_8);
   /*@ \slicing::slice_preserve_expr r; */ ;
   return;

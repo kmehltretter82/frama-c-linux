@@ -51,8 +51,8 @@ let apply () = Slicing.Api.Request.apply_next_internal (); print_project ()
 (*--------------------------*)
 
 (** clear a previously computed project and load a new source file,
- * starting at [entry_point] to be specified iif it is different from [main].
- * DOESN'T WORK at the moment because CIL datas are not cleared...*)
+ * starting at [entry_point] to be specified if it is different from [main].
+ * DOESN'T WORK at the moment because CIL data are not cleared...*)
 (* [Julien 25/06/2007:] Should be possible to do now (?) *)
                                                               (*
 let load_source_file ?entry_point filename  =
