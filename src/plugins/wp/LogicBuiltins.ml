@@ -285,7 +285,7 @@ let find_lib file =
       | [] -> Wp_parameters.abort "File '%a' not found"
                 Filepath.pretty file
       | dir::dirs ->
-        let path = Filepath.(dir / (to_string_abs file)) in
+        let path = Filepath.(dir / to_string_abs file) in
         if Filesystem.exists path then path else lookup file dirs
     in
     lookup file (cdriver_ro ()).includes

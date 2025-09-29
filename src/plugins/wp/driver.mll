@@ -446,7 +446,7 @@ and bal = parse
       let inc = open_in (Filepath.to_string_abs file) in
       let lex = Lexing.from_channel inc in
       let position = {
-        lex.Lexing.lex_curr_p with Lexing.pos_fname = (Filepath.to_string_abs file)
+        lex.Lexing.lex_curr_p with Lexing.pos_fname = Filepath.to_string_abs file
       } in
       let input = { current = tok lex ; position = position ; lexbuf = lex } in
       try

@@ -864,7 +864,7 @@ let prepare_editor_cmd s line filename =
   s ^ " &"
 
 let open_in_external_viewer ?(line=1) (file : Filepath.t) =
-  let filename = Format.asprintf "'%a'" Filepath.pretty_abs file in
+  let filename = Format.asprintf "'%s'" (Filepath.to_string_abs ~quoted:true file) in
   let editor = Configuration.find_string ~default:"emacs +%d %s" "editor" in
   if editor = "" then
     Gui_parameters.feedback "no external viewer configured in Preferences"
