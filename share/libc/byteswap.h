@@ -64,19 +64,7 @@
       | (((x) & 0x000000000000ff00ull) << 40)                                 \
       | (((x) & 0x00000000000000ffull) << 56))
 
-#  define __bswap_64(x) \
-     (__extension__                                                           \
-      ({ union __fc_bswap { __extension__ unsigned long long int __ll;        \
-                 unsigned int __l[2]; } __w, __r;                             \
-         if (__builtin_constant_p (x))                                        \
-           __r.__ll = __bswap_constant_64 (x);                                \
-         else                                                                 \
-           {                                                                  \
-             __w.__ll = (x);                                                  \
-             __r.__l[0] = __bswap_32 (__w.__l[1]);                            \
-             __r.__l[1] = __bswap_32 (__w.__l[0]);                            \
-           }                                                                  \
-         __r.__ll; }))
+#  define __bswap_64(x) __bswap_constant_64 (x)
 
 
 /* The following definitions must all be macros since otherwise some
