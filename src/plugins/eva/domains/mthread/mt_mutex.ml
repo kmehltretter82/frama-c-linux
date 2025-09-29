@@ -14,7 +14,7 @@ type value = Value.t
 module Mutex =
 struct
   include Mutex
-  let name = "Mt_thread.Mutex"
+  let datatype_name = "Mt_thread.Mutex"
   let key_name = "mutex"
   let of_value x =
     let open Result.Operators in

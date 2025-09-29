@@ -11,6 +11,7 @@ module Static = struct
     include Datatype.Unit
     type state = t
 
+    let datatype_name = "Eva.Unit_domain"
     let name = "unit"
     let structure = Abstract.Domain.Unit
 

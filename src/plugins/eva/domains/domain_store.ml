@@ -11,6 +11,7 @@ open Eval
 
 module type InputDomain = sig
   include Datatype.S
+  val name: string
   val top: t
   val join: t -> t -> t
 end
@@ -41,7 +42,7 @@ end
 
 module Make (Domain: InputDomain) = struct
 
-  let name = Domain.name ^ ".Store"
+  let datatype_name = Domain.datatype_name ^ ".Store"
 
   (* This module stores the resulting states of an Eva analysis. They depends on
      the set of parameters with which the analysis has been run, and must be
@@ -62,7 +63,7 @@ module Make (Domain: InputDomain) = struct
       (Datatype.Bool)
       (struct
         let dependencies = dependencies
-        let name = name ^ ".Storage"
+        let name = datatype_name ^ ".Storage"
         let default () = false
       end)
 
@@ -79,7 +80,7 @@ module Make (Domain: InputDomain) = struct
      If the domain is unmarshallable, its states cannot be saved on the
      disk, and this boolean should not be saved either. *)
   module Storage =
-    (val (if Descr.is_unmarshable Domain.descr
+    (val (if Descr.is_unmarshable Domain.datatype_descr
           then (module Bool_Ref)
           else (module Bool_Ref_State)) : Ref)
 
@@ -87,7 +88,7 @@ module Make (Domain: InputDomain) = struct
     State_builder.Option_ref (Domain)
       (struct
         let dependencies = dependencies
-        let name = name ^ ".Global_State"
+        let name = datatype_name ^ ".Global_State"
       end)
 
   module States_by_callstack =
@@ -96,14 +97,14 @@ module Make (Domain: InputDomain) = struct
   module Table_By_Callstack =
     Cil_state_builder.Stmt_hashtbl(States_by_callstack)
       (struct
-        let name = name ^ ".Table_By_Callstack"
+        let name = datatype_name ^ ".Table_By_Callstack"
         let size = size
         let dependencies = dependencies
       end)
   module Table =
     Cil_state_builder.Stmt_hashtbl (Domain)
       (struct
-        let name = name ^ ".Table"
+        let name = datatype_name ^ ".Table"
         let size = size
         let dependencies = [ Table_By_Callstack.self ]
       end)
@@ -111,14 +112,14 @@ module Make (Domain: InputDomain) = struct
   module AfterTable_By_Callstack =
     Cil_state_builder.Stmt_hashtbl (States_by_callstack)
       (struct
-        let name = name ^ ".AfterTable_By_Callstack"
+        let name = datatype_name ^ ".AfterTable_By_Callstack"
         let size = size
         let dependencies = dependencies
       end)
   module AfterTable =
     Cil_state_builder.Stmt_hashtbl (Domain)
       (struct
-        let name = name ^ ".AfterTable"
+        let name = datatype_name ^ ".AfterTable"
         let size = size
         let dependencies = [ AfterTable_By_Callstack.self ]
       end)
@@ -128,7 +129,7 @@ module Make (Domain: InputDomain) = struct
       (Kernel_function.Hashtbl)
       (States_by_callstack)
       (struct
-        let name = name ^ ".Called_Functions_By_Callstack"
+        let name = datatype_name ^ ".Called_Functions_By_Callstack"
         let size = 11
         let dependencies = dependencies
       end)
@@ -138,7 +139,7 @@ module Make (Domain: InputDomain) = struct
       (Kernel_function.Hashtbl)
       (Domain)
       (struct
-        let name = name ^ ".Called_Functions_Memo"
+        let name = datatype_name ^ ".Called_Functions_Memo"
         let size = 11
         let dependencies = [ Called_Functions_By_Callstack.self ]
       end)

@@ -529,6 +529,8 @@ let entry_formals s = s.main_formals
 (* Lattice structure for the abstract state above *)
 module Traces = struct
 
+  let name = "traces"
+
   (** impossible for normal values start must be bigger than current *)
   let new_empty () = { start = Node.start; current = Base (Node.start, Graph.empty);
                        call_declared_function = false;
@@ -544,7 +546,7 @@ module Traces = struct
       include Datatype.Serializable_undefined
 
       type t = state
-      let name = "traces"
+      let name = "Eva.Traces_domain.Traces"
 
       let reprs = [empty]
 

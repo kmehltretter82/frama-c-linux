@@ -158,11 +158,13 @@ module Memory = struct
      [deps] and [syntactic_deps] are caches that can be rebuilt from [values]
      and [vars_exp/lv] for [syntactic_deps], and from [zones] for [deps]. *)
 
+  let name = "symbolic-locations"
+
   include Datatype.Make_with_collections(struct
       include Datatype.Serializable_undefined
 
       type t = memory
-      let name = "symbolic-locations"
+      let name = "Eva.Symbolic_locs.Memory"
 
       let reprs = [ { values = List.hd K2V.M.reprs;
                       zones = List.hd K2Z.reprs;

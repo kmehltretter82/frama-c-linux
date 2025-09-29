@@ -6,7 +6,10 @@
 (*                                                                        *)
 (**************************************************************************)
 
-include Domain_store.Make (Cvalue.Model)
+include Domain_store.Make (struct
+    include Cvalue.Model
+    let name = "cvalue"
+  end)
 
 let is_reachable stmt =
   match get_stmt_state_by_callstack ~after:false stmt with

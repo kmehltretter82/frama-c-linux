@@ -11,16 +11,14 @@ open Eval
 
 
 
-module type InputDomain = sig
-  include Datatype.S
-  val top: t
-  val join: t -> t -> t
-end
+module type InputDomain = Domain_store.InputDomain
 
 
 
 module type LeafDomain = sig
   type t
+
+  val name: string
 
   type context = unit
   val context_dependencies: context Abstract_context.dependencies
@@ -56,6 +54,8 @@ end
 
 
 module Complete (Domain: InputDomain) = struct
+
+  let name = Domain.name
 
   type context = unit
   let context_dependencies = Abstract_context.Leaf (module Unit_context)

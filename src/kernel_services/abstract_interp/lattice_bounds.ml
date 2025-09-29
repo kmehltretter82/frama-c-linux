@@ -171,7 +171,7 @@ module Bottom = struct
         include Datatype.Serializable_undefined
         type t = X.t or_bottom
         let () = incr counter
-        let name = X.name ^ "+bottom(" ^ string_of_int !counter ^ ")"
+        let name = X.datatype_name ^ "+bottom(" ^ string_of_int !counter ^ ")"
         let reprs = `Bottom :: Stdlib.List.map (fun v -> `Value v) X.reprs
         let structural_descr = Structural_descr.t_unknown
         let hash = Common.hash X.hash
@@ -254,7 +254,7 @@ module Top = struct
         include Datatype.Serializable_undefined
         type t = X.t or_top
         let () = incr counter
-        let name = X.name ^ "+top(" ^ string_of_int !counter ^ ")"
+        let name = X.datatype_name ^ "+top(" ^ string_of_int !counter ^ ")"
         let reprs = `Top :: Stdlib.List.map (fun v -> `Value v) X.reprs
         let structural_descr = Structural_descr.t_unknown
         let hash = Common.hash X.hash
@@ -343,7 +343,7 @@ module TopBottom = struct
         include Datatype.Serializable_undefined
         type t = X.t or_top_bottom
         let () = incr counter
-        let name = X.name ^ "+top_bottom(" ^ string_of_int !counter ^ ")"
+        let name = X.datatype_name ^ "+top_bottom(" ^ string_of_int !counter ^ ")"
         let reprs = `Bottom :: `Top :: (Stdlib.List.map (fun v -> `Value v) X.reprs)
         let structural_descr = Structural_descr.t_unknown
         let hash = Common.hash X.hash

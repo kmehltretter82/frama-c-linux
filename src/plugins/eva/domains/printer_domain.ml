@@ -20,6 +20,7 @@ module Simple : Simpler_domains.Simple_Cvalue = struct
   (* In this domain, the states contain nothing. We use [unit] as type formal
      the state and we reuse [Datatype.Unit] as a base for our domain. *)
   include Datatype.Unit
+  let datatype_name = "Eva.Printer_domain.Simple"
   let name = "printer"
 
   (* --- Lattice operators --- *)

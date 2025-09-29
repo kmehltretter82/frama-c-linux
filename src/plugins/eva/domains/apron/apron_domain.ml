@@ -411,6 +411,7 @@ module Make (Man : Input) = struct
   include Domain_builder.Complete
       (struct
         include D
+        let name = Man.name
         let top = top
         let join = join
       end)

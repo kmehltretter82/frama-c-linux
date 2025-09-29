@@ -30,6 +30,8 @@ module Make
   include (Domain : Datatype.S_with_collections with type t = Domain.t)
   include (Domain : Abstract_domain.Lattice with type state = Domain.state)
 
+  let name = Domain.name
+
   let structure = Abstract.Domain.Leaf (Domain.key, (module Domain))
 
   let log_category = Domain.log_category

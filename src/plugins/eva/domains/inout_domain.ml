@@ -25,12 +25,15 @@ type inout = {
 (* Lattice structure for the abstract state above *)
 module LatticeInout = struct
 
+  (* Name of the domain *)
+  let name = "inout"
+
   (* Frama-C "datatype" for type [inout] *)
   include Datatype.Make_with_collections(struct
       include Datatype.Serializable_undefined
 
       type t = inout
-      let name = "inout"
+      let name = "Eva.Inout_domain.LatticeInout"
 
       let reprs = [ {
           over_outputs = List.hd Zone.reprs;

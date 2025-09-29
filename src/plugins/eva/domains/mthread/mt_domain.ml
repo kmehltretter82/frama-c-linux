@@ -19,7 +19,7 @@ module BuiltinsResults = struct
     let dependencies = [ Ast.self ]
   end
   include Hptmap.Make (Cil_datatype.Varinfo_Id) (Value) (Info)
-  let cache_name s = Hptmap_sig.PersistentCache (name ^ "." ^ s)
+  let cache_name s = Hptmap_sig.PersistentCache (datatype_name ^ "." ^ s)
 
   let top = empty
 
@@ -95,7 +95,7 @@ module State = struct
 
   include Datatype.Make_with_collections (struct
       type t = state
-      let name = "mthread"
+      let name = "Eva.Mt_domain.State"
       let reprs = [ default ; top ]
 
       let copy state =
@@ -275,7 +275,10 @@ module Domain = struct
   include Datatype_with_Lattice
   include Queries
   include Transfer
-  include Domain_builder.Complete (Datatype_with_Lattice)
+  include Domain_builder.Complete (struct
+      include Datatype_with_Lattice
+      let name = "mthread"
+    end)
 
   let value_dependencies = Main_values.cval
   let location_dependencies = Main_locations.ploc
