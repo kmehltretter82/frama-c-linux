@@ -31,9 +31,10 @@ let check_flag spec flag =
     warn "Flag 0 is ignored when flag - is also specified."; false
   | FZero, #numeric_specifier -> true
   | FMinus, cs when cs <> `n -> true
-  | FSpace, #signed_specifier when List.mem FPlus spec.f_flags ->
+  | FSpace, (#signed_specifier | #float_specifier)
+    when List.mem FPlus spec.f_flags ->
     warn "Flag ' ' is ignored when flag + is also specified."; false
-  | FSpace, #signed_specifier -> true
+  | FSpace, (#signed_specifier | #float_specifier) -> true
   | FPlus, (#signed_specifier | #float_specifier) -> true
   | _ ->
     warn "Flag %a and conversion specififer %a are not compatibles."
