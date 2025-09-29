@@ -42,7 +42,7 @@ $(TARGETS) : %.log: $$(SOURCE) $(FRAMAC) $(MAKEFILE_LIST)
 
 %.dot: SOURCE = $(word 1,$(subst ., ,$*)).log
 $(CFG_TARGETS) : %.dot: $$(SOURCE) $(MAKEFILE_LIST)
-	cp html_summary/'<main>.dot' $*.dot
+	cp html_summary/_main_.dot $*.dot
 
 %.pdf: SOURCE = $(word 1,$(subst ., ,$*)).dot
 $(PDF_CFG_TARGETS) : %.pdf: $$(SOURCE) $(MAKEFILE_LIST)
