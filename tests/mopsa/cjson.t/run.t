@@ -2,7 +2,7 @@ Test with an already existing mopsa-db.json, to remove dependencies on mopsa.
 Note that mopsa-db.json by default always contains absolute paths. We manually
 relativized those in our mopsa-db.json to allow them to be versioned.
 
-  $ frama-c -mopsa-db mopsa-db.json
+  $ frama-c -no-autoload-plugins -mopsa-db mopsa-db.json
   [kernel] targets:
     [executable] cJSON_test
     [library   ] libcjson.a
@@ -15,30 +15,30 @@ relativized those in our mopsa-db.json to allow them to be versioned.
     [library   ] libcjson_utils.so.1.7.14
 
 Test invalid command lines
-  $ frama-c -mopsa-db test.c # error: invalid JSON file
+  $ frama-c -no-autoload-plugins -mopsa-db test.c # error: invalid JSON file
   [kernel] User Error: mopsa-db: invalid JSON file 'test.c': Line 23, bytes 0-34:
     Invalid token '#include <stdio.h>
     #include <stdl'
   [kernel] Frama-C aborted: invalid user input.
   [1]
 
-  $ frama-c -mopsa-target foo # error: -mopsa-target without -mopsa-db
+  $ frama-c -no-autoload-plugins -mopsa-target foo # error: -mopsa-target without -mopsa-db
   [kernel] User Error: cannot use option '-mopsa-target' without '-mopsa-db'.
   [kernel] Frama-C aborted: invalid user input.
   [1]
 
-  $ frama-c -mopsa-list-deps foo # error: -mopsa-list-deps without -mopsa-db
+  $ frama-c -no-autoload-plugins -mopsa-list-deps foo # error: -mopsa-list-deps without -mopsa-db
   [kernel] User Error: cannot use option '-mopsa-list-deps' without '-mopsa-db'.
   [kernel] Frama-C aborted: invalid user input.
   [1]
 
-  $ frama-c -mopsa-db mopsa-db.json -mopsa-list-deps cJSON_test
+  $ frama-c -no-autoload-plugins -mopsa-db mopsa-db.json -mopsa-list-deps cJSON_test
   [kernel:mopsa-db] Warning: 
     library '$TESTCASE_ROOT/libm.a' not found in mopsa-db, ignoring
   [kernel] dependencies:
     $TESTCASE_ROOT/cJSON.c:	 -I '.'
     $TESTCASE_ROOT/test.c:	 -I '.'
-  $ frama-c -mopsa-db mopsa-db.json -mopsa-target cJSON_test
+  $ frama-c -no-autoload-plugins -mopsa-db mopsa-db.json -mopsa-target cJSON_test
   [kernel:mopsa-db] Warning: 
     library '$TESTCASE_ROOT/libm.a' not found in mopsa-db, ignoring
   [kernel] Parsing cJSON.c (with preprocessing)
