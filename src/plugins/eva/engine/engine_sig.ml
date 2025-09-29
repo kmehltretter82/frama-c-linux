@@ -116,7 +116,19 @@ module type Initialization = sig
 end
 
 
-(** Analysis of functions, built by the functor [Compute_functions.Make]. *)
+(** Analysis of a function body by iteration over its interpreted automata,
+    built by the functor [Iterator.Computer]. *)
+module type Iterator = sig
+  type state
+
+  val compute:
+    save_results:bool -> Callstack.t ->
+    state -> (Partition.key * state) list * Eval.cacheable
+end
+
+
+(** Complete analysis of functions,
+    built by the functor [Compute_functions.Make]. *)
 module type Compute =
 sig
   type state

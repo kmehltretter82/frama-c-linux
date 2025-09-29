@@ -703,6 +703,8 @@ module Computer
      end)
 = struct
 
+  type state = Engine.Dom.t
+
   let compute ~save_results callstack state =
     let kf = Callstack.top_kf callstack in
     let module Dataflow =

@@ -33,11 +33,4 @@ module Computer
        val treat_statement_assigns:
          pos:Position.t -> assigns -> Engine.Dom.t -> Engine.Dom.t
      end)
-  : sig
-
-    val compute:
-      save_results:bool ->
-      Callstack.t -> Engine.Dom.t ->
-      (Partition.key * Engine.Dom.t) list * Eval.cacheable
-
-  end
+  : Engine_sig.Iterator with type state = Engine.Dom.t
