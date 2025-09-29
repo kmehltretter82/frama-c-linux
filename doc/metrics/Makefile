@@ -51,5 +51,5 @@ install: $(TARGET)
 	@cp $(TARGET) "$(DWNLDDIR)/$(DOCNAME)"
 
 clean::
-	-$(RM) *~ *.aux *.log *.nav *.out *.snm *.toc *.lof *.pp *.bnf *.pdf *.bbl *.blg *.cb* auto/
+	-$(RM) *~ *.aux *.log *.nav *.out *.snm *.toc *.lof *.pp *.bnf *.pdf *.bbl *.blg *.cb* auto/ *.fdb_latexmk
 	-$(RM) *.log
