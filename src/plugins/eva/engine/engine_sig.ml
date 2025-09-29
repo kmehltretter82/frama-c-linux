@@ -7,6 +7,7 @@
 (**************************************************************************)
 
 open Cil_types
+open Eva_ast_types
 open Eval
 
 (** Kind of function that is analyzed: a body, a specification, a builtin, an
@@ -97,6 +98,21 @@ module type Transfer_specification = sig
   val compute_using_specification:
     warn:bool -> (location, value) call -> spec ->
     state -> (Partition.key * state) list
+end
+
+
+(** Initialization of variables, built by functor [Initialization.Make]. *)
+module type Initialization = sig
+  type state
+
+  (** Compute the initial state for an analysis (as in {!initial_state}),
+      but also bind the formal parameters of the function given as argument. *)
+  val initial_state_with_formals :
+    lib_entry:bool -> Cil_types.kernel_function -> state or_bottom
+
+  (** Initializes a local variable in the current state. *)
+  val initialize_local_variable:
+    pos:Position.t -> varinfo -> init -> state -> state or_bottom
 end
 
 

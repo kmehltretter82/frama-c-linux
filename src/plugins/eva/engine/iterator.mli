@@ -26,7 +26,7 @@ module Computer
     (_ : Engine_sig.Transfer_stmt with type state = Engine.Dom.t
                                    and type value = Engine.Val.t)
     (* Initialization of local variables. *)
-    (_: Initialization.S with type state := Engine.Dom.t)
+    (_: Engine_sig.Initialization with type state := Engine.Dom.t)
     (* Transfer functions for the logic on the Engine domain. *)
     (_ : Engine_sig.Transfer_logic with type state = Engine.Dom.t)
     (_: sig

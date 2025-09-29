@@ -61,7 +61,7 @@ let record_fireable edge =
 module Make_Dataflow
     (Engine : Engine_sig.S)
     (Transfer : Engine_sig.Transfer_stmt with type state = Engine.Dom.t)
-    (Init: Initialization.S with type state := Engine.Dom.t)
+    (Init: Engine_sig.Initialization with type state := Engine.Dom.t)
     (Logic : Engine_sig.Transfer_logic with type state = Engine.Dom.t)
     (Spec: sig
        val treat_statement_assigns:
@@ -695,7 +695,7 @@ end
 module Computer
     (Engine : Engine_sig.S)
     (Transfer : Engine_sig.Transfer_stmt with type state = Engine.Dom.t)
-    (Init: Initialization.S with type state := Engine.Dom.t)
+    (Init: Engine_sig.Initialization with type state := Engine.Dom.t)
     (Logic : Engine_sig.Transfer_logic with type state = Engine.Dom.t)
     (Spec: sig
        val treat_statement_assigns:

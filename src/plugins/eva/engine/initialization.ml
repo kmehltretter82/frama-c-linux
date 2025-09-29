@@ -12,14 +12,6 @@ open Cil_types
 open Eval
 open Eva_ast
 
-module type S = sig
-  type state
-  val initial_state_with_formals :
-    lib_entry:bool -> kernel_function -> state or_bottom
-  val initialize_local_variable:
-    pos:Position.t -> varinfo -> init -> state -> state or_bottom
-end
-
 type padding_initialization = [
   | `Initialized
   | `Uninitialized
@@ -70,6 +62,8 @@ module Make
 = struct
 
   incr counter;;
+
+  type state = Engine.Dom.t
 
   (* Evaluation in the top state: we do not want a location to depend on
      other globals. *)
