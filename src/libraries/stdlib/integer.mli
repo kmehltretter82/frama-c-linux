@@ -19,6 +19,7 @@ type 'a formatter = Format.formatter -> 'a -> unit
 
 (** This module contains all Z operators. [lsl] and [asr] are using our own
     functions {!Integer.shift_left} and {!Integer.shift_right}.
+    @since Frama-C+dev
 *)
 module Operators : sig
   include module type of Z.Compare
@@ -67,7 +68,8 @@ module Operators : sig
 end
 
 (** {!Operators} module is included to have operators at top level, but still
-    allow to open only instead of {!Integer} when needed. *)
+    allow to open only instead of {!Integer} when needed.
+*)
 include module type of Operators
 
 (**************************************************************************)
@@ -140,7 +142,11 @@ val equal : t -> t -> bool
 val compare : t -> t -> int
 
 val leq : t -> t -> bool
+(** @since Frama-C+dev *)
+
 val geq : t -> t -> bool
+(** @since Frama-C+dev *)
+
 val lt  : t -> t -> bool
 val gt  : t -> t -> bool
 
