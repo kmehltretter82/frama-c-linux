@@ -6,20 +6,9 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cil_types
-open Eval
-
 module Make
     (Engine: Engine_sig.S)
     (_ : Engine_sig.Transfer_logic with type state = Engine.Dom.t)
-  : sig
-
-    val treat_statement_assigns:
-      pos:Position.t -> assigns -> Engine.Dom.t -> Engine.Dom.t
-
-    val compute_using_specification:
-      warn:bool ->
-      (Engine.Loc.location, Engine.Val.t) call -> spec ->
-      Engine.Dom.t -> (Partition.key*Engine.Dom.t) list
-
-  end
+  : Engine_sig.Transfer_specification with type state = Engine.Dom.t
+                                       and type value = Engine.Val.t
+                                       and type location = Engine.Loc.location

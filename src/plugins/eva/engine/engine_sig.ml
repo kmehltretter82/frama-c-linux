@@ -85,6 +85,21 @@ module type Transfer_logic = sig
 end
 
 
+(** Interpretation of function specification,
+    built by functor [Transfer_specification.Make]. *)
+module type Transfer_specification = sig
+  type value
+  type location
+  type state
+
+  val treat_statement_assigns: pos:Position.t -> assigns -> state -> state
+
+  val compute_using_specification:
+    warn:bool -> (location, value) call -> spec ->
+    state -> (Partition.key * state) list
+end
+
+
 (** Analysis of functions, built by the functor [Compute_functions.Make]. *)
 module type Compute =
 sig

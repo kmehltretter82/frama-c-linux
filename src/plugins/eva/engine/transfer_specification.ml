@@ -183,6 +183,10 @@ module Make
     (Logic : Engine_sig.Transfer_logic with type state = Engine.Dom.t)
 = struct
 
+  type state = Engine.Dom.t
+  type value = Engine.Val.t
+  type location = Engine.Loc.location
+
   module Domain = Engine.Dom
   module Location = Engine.Loc
   module Transfer_inout = Transfer_inout.Make (Engine)
