@@ -52,18 +52,18 @@
 [mt] *** Thread jobs[0] computed
 [mt] *** Computing thread #3, iteration 1 (first iteration)
 [mt] philo.c:19: Warning: 
-  During mutex lock: invalid mutex id. Non-integer value: {0; 1; 2} Ignoring.
+  During mutex lock: invalid mutex id. Non-integer or imprecise value: {0; 1; 2}. Ignoring.
 [eva] FRAMAC_SHARE/mt/mthread_pthread.c:46: Warning: Not a valid mutex id '0'.
 [mt] philo.c:20: Warning: 
-  During mutex lock: invalid mutex id. Non-integer value: {0; 1; 2} Ignoring.
+  During mutex lock: invalid mutex id. Non-integer or imprecise value: {0; 1; 2}. Ignoring.
 [mt] philo.c:25: 
   Sending message on queue, content [0] ∈ {1; 3; 4; 5}
                                     [1] ∈ UNINITIALIZED
 [mt] philo.c:27: Warning: 
-  During mutex unlock: invalid mutex id. Non-integer value: {0; 1; 2} Ignoring.
+  During mutex unlock: invalid mutex id. Non-integer or imprecise value: {0; 1; 2}. Ignoring.
 [eva] FRAMAC_SHARE/mt/mthread_pthread.c:56: Warning: Not a valid mutex id '0'.
 [mt] philo.c:28: Warning: 
-  During mutex unlock: invalid mutex id. Non-integer value: {0; 1; 2} Ignoring.
+  During mutex unlock: invalid mutex id. Non-integer or imprecise value: {0; 1; 2}. Ignoring.
 [mt] *** Thread #3 computed
 [mt] ***** Threads computed for iteration 1.
 [mt] ***** Computing shared variables
@@ -138,18 +138,18 @@
 [mt] *** Computing thread #3, iteration 3
     (potential shared vars changed, interferences changed)
 [mt] philo.c:19: Warning: 
-  During mutex lock: invalid mutex id. Non-integer value: {0; 1; 2} Ignoring.
+  During mutex lock: invalid mutex id. Non-integer or imprecise value: {0; 1; 2}. Ignoring.
 [eva] FRAMAC_SHARE/mt/mthread_pthread.c:46: Warning: Not a valid mutex id '0'.
 [mt] philo.c:20: Warning: 
-  During mutex lock: invalid mutex id. Non-integer value: {0; 1; 2} Ignoring.
+  During mutex lock: invalid mutex id. Non-integer or imprecise value: {0; 1; 2}. Ignoring.
 [mt] philo.c:25: 
   Sending message on queue, content [0] ∈ {1; 3; 4; 5}
                                     [1] ∈ UNINITIALIZED
 [mt] philo.c:27: Warning: 
-  During mutex unlock: invalid mutex id. Non-integer value: {0; 1; 2} Ignoring.
+  During mutex unlock: invalid mutex id. Non-integer or imprecise value: {0; 1; 2}. Ignoring.
 [eva] FRAMAC_SHARE/mt/mthread_pthread.c:56: Warning: Not a valid mutex id '0'.
 [mt] philo.c:28: Warning: 
-  During mutex unlock: invalid mutex id. Non-integer value: {0; 1; 2} Ignoring.
+  During mutex unlock: invalid mutex id. Non-integer or imprecise value: {0; 1; 2}. Ignoring.
 [mt] *** Thread #3 computed
 [mt] ***** Threads computed for iteration 3.
 [mt] ***** Computing shared variables
@@ -205,18 +205,18 @@
 [mt] *** Thread jobs[0] computed
 [mt] *** Computing thread #3, iteration 4 (thread initial memory state changed)
 [mt] philo.c:19: Warning: 
-  During mutex lock: invalid mutex id. Non-integer value: {0; 1; 2} Ignoring.
+  During mutex lock: invalid mutex id. Non-integer or imprecise value: {0; 1; 2}. Ignoring.
 [eva] FRAMAC_SHARE/mt/mthread_pthread.c:46: Warning: Not a valid mutex id '0'.
 [mt] philo.c:20: Warning: 
-  During mutex lock: invalid mutex id. Non-integer value: {0; 1; 2} Ignoring.
+  During mutex lock: invalid mutex id. Non-integer or imprecise value: {0; 1; 2}. Ignoring.
 [mt] philo.c:25: 
   Sending message on queue, content [0] ∈ {1; 3; 4; 5}
                                     [1] ∈ UNINITIALIZED
 [mt] philo.c:27: Warning: 
-  During mutex unlock: invalid mutex id. Non-integer value: {0; 1; 2} Ignoring.
+  During mutex unlock: invalid mutex id. Non-integer or imprecise value: {0; 1; 2}. Ignoring.
 [eva] FRAMAC_SHARE/mt/mthread_pthread.c:56: Warning: Not a valid mutex id '0'.
 [mt] philo.c:28: Warning: 
-  During mutex unlock: invalid mutex id. Non-integer value: {0; 1; 2} Ignoring.
+  During mutex unlock: invalid mutex id. Non-integer or imprecise value: {0; 1; 2}. Ignoring.
 [mt] *** Thread #3 computed
 [mt] ***** Threads computed for iteration 4.
 [mt] ***** Computing shared variables
