@@ -22,9 +22,9 @@ let play_analysis () =
   end;
   try
     Main.apply ();
-    Log.treat_deferred_error ();
     (* Printing code, if required, have to be done at end. *)
     if Kernel.PrintCode.get () then File.pretty_ast ();
+    Log.treat_deferred_error ();
     (* Easier to handle option -set-project-as-default at the last moment:
        no need to worry about nested [Project.on] *)
     Project.set_keep_current (Kernel.Set_project_as_default.get ());
