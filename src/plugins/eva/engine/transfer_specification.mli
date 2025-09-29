@@ -11,7 +11,7 @@ open Eval
 
 module Make
     (Engine: Engine_sig.S)
-    (_ : Transfer_logic.S with type state = Engine.Dom.t)
+    (_ : Engine_sig.Transfer_logic with type state = Engine.Dom.t)
   : sig
 
     val treat_statement_assigns:

@@ -180,7 +180,7 @@ let precise_loc_of_assign env kind term =
 
 module Make
     (Engine: Engine_sig.S)
-    (Logic : Transfer_logic.S with type state = Engine.Dom.t)
+    (Logic : Engine_sig.Transfer_logic with type state = Engine.Dom.t)
 = struct
 
   module Domain = Engine.Dom

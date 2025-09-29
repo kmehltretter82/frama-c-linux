@@ -28,7 +28,7 @@ module Computer
     (* Initialization of local variables. *)
     (_: Initialization.S with type state := Engine.Dom.t)
     (* Transfer functions for the logic on the Engine domain. *)
-    (_ : Transfer_logic.S with type state = Engine.Dom.t)
+    (_ : Engine_sig.Transfer_logic with type state = Engine.Dom.t)
     (_: sig
        val treat_statement_assigns:
          pos:Position.t -> assigns -> Engine.Dom.t -> Engine.Dom.t

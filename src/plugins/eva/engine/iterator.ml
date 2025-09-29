@@ -62,7 +62,7 @@ module Make_Dataflow
     (Engine : Engine_sig.S)
     (Transfer : Engine_sig.Transfer_stmt with type state = Engine.Dom.t)
     (Init: Initialization.S with type state := Engine.Dom.t)
-    (Logic : Transfer_logic.S with type state = Engine.Dom.t)
+    (Logic : Engine_sig.Transfer_logic with type state = Engine.Dom.t)
     (Spec: sig
        val treat_statement_assigns:
          pos:Position.t -> assigns -> Engine.Dom.t -> Engine.Dom.t
@@ -696,7 +696,7 @@ module Computer
     (Engine : Engine_sig.S)
     (Transfer : Engine_sig.Transfer_stmt with type state = Engine.Dom.t)
     (Init: Initialization.S with type state := Engine.Dom.t)
-    (Logic : Transfer_logic.S with type state = Engine.Dom.t)
+    (Logic : Engine_sig.Transfer_logic with type state = Engine.Dom.t)
     (Spec: sig
        val treat_statement_assigns:
          pos:Position.t -> assigns -> Engine.Dom.t -> Engine.Dom.t
