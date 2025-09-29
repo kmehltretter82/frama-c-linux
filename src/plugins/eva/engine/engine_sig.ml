@@ -80,10 +80,7 @@ end
 
 (** Interpretation of statements, built by functor [Transfer_stmt.Make]. *)
 module type Transfer_stmt = sig
-
   type state
-  type value
-  type loc
 
   val assign: pos:Position.t -> state -> lval -> exp -> state or_bottom
 

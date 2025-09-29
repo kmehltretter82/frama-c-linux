@@ -83,8 +83,6 @@ module Make (Engine: Engine_sig.S) = struct
   include Cvalue_domain.Getters (Domain)
 
   type state = Domain.t
-  type value = Value.t
-  type loc = Location.location
 
   (* When using a product of domains, a product of states may have no
      concretization (if the domains have inferred incompatible properties)
