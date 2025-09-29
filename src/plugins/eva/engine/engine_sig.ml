@@ -25,6 +25,31 @@ type 'state call_result = {
   kind: call_kind;
 }
 
+(** Interpretation of statements, built by functor [Transfer_stmt.Make]. *)
+module type Transfer_stmt = sig
+
+  type state
+  type value
+  type loc
+
+  val assign: pos:Position.t -> state -> lval -> exp -> state or_bottom
+
+  val assume: pos:Position.t -> state -> exp -> bool -> state or_bottom
+
+  val call:
+    pos:Position.local ->
+    lval option -> lhost -> exp list -> state -> state call_result
+
+  val check_unspecified_sequence:
+    pos:Position.t ->
+    state ->
+    (* TODO *)
+    (stmt * lval list * lval list * lval list * stmt ref list) list ->
+    unit or_bottom
+
+  val enter_scope: pos:Position.t -> varinfo list -> state -> state
+end
+
 (** Analysis of functions, built by the functor [Compute_functions.Make]. *)
 module type Compute =
 sig

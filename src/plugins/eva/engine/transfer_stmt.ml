@@ -9,22 +9,6 @@
 open Cil_types
 open Eval
 
-module type S = sig
-  type state
-  type value
-  type loc
-  val assign: pos:Position.t -> state -> lval -> exp -> state or_bottom
-  val assume: pos:Position.t -> state -> exp -> bool -> state or_bottom
-  val call:
-    pos:Position.local -> lval option -> lhost -> exp list -> state ->
-    state Engine_sig.call_result
-  val check_unspecified_sequence:
-    pos:Position.t ->
-    state -> (stmt * lval list * lval list * lval list * stmt ref list) list ->
-    unit or_bottom
-  val enter_scope: pos:Position.t -> varinfo list -> state -> state
-end
-
 (* Reference filled in by the callwise-inout callback *)
 module InOutCallback =
   State_builder.Option_ref (Inout_type)

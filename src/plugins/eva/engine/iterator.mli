@@ -23,8 +23,8 @@ module Computer
     (* Abstractions with the evaluator. *)
     (Engine: Engine_sig.S)
     (* Transfer functions for statement on the Engine domain. *)
-    (_ : Transfer_stmt.S with type state = Engine.Dom.t
-                          and type value = Engine.Val.t)
+    (_ : Engine_sig.Transfer_stmt with type state = Engine.Dom.t
+                                   and type value = Engine.Val.t)
     (* Initialization of local variables. *)
     (_: Initialization.S with type state := Engine.Dom.t)
     (* Transfer functions for the logic on the Engine domain. *)

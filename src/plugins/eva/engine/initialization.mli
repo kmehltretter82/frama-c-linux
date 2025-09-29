@@ -28,5 +28,5 @@ module Make
     (Domain: Abstract.Domain.External)
     (_: Evaluation_sig.S with type state = Domain.state
                           and type loc = Domain.location)
-    (_: Transfer_stmt.S with type state = Domain.t)
+    (_: Engine_sig.Transfer_stmt with type state = Domain.t)
   : S with type state := Domain.t
