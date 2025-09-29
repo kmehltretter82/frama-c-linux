@@ -23,13 +23,14 @@
 import React from 'react';
 
 import { Item, SideBar, SidebarTitle } from 'dome/frame/sidebars';
-import { Icon } from 'dome/controls/icons';
 import { LED } from 'dome/controls/displays';
 import * as Forms from 'dome/layout/forms';
+import { Dropdown } from 'dome/dialogs';
+import { Button } from 'dome/frame/toolbars';
 
 import * as Params from 'frama-c/kernel/api/parameters';
 
-import { IsSetElement, SelectedPlugins } from '.';
+import { IsSetElement, OptionsHelp, SelectedPlugins } from '.';
 import { recordRemotes } from './forms';
 
 // --------------------------------------------------------------------------
@@ -98,7 +99,8 @@ export function OptionsSidebar(props: SideBarProps): React.JSX.Element {
   return (
     <SideBar>
       <SidebarTitle label='Plugins'>
-        <Icon id="HELP" size={14} title='List of plugins' />
+        <Dropdown control={<Button icon="HELP" title='List of plugins' />}
+        ><OptionsHelp/></Dropdown>
       </SidebarTitle>
       { plugins.map(p => <SidebarItem key={p.name}
           plugin={p}

@@ -278,7 +278,7 @@ export function SidebarTitle(props: SidebarTitleProps): JSX.Element {
   return (
     <Hbox className={className}>
       <Hbox><Title label={label} title={label}/></Hbox>
-      { children}
+      { children }
     </Hbox>
   );
 }

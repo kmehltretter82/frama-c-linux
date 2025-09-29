@@ -25,6 +25,7 @@ import React from 'react';
 import { Modal, showModal } from 'dome/dialogs';
 import { alpha } from 'dome/data/compare';
 import { LSplit } from 'dome/layout/splitters';
+import { Hbox } from 'dome/layout/boxes';
 
 import * as Server from 'frama-c/server';
 import * as Params from 'frama-c/kernel/api/parameters';
@@ -65,6 +66,17 @@ export function usePluginsContextById(id: string): PContextById {
 // --------------------------------------------------------------------------
 // --- Options
 // --------------------------------------------------------------------------
+
+export function OptionsHelp(): React.JSX.Element {
+  return <Hbox className='framac-options-help'>
+    <p>The form on the left is highlighted in red in the sidebar,
+       and the one on the right is highlighted in blue.</p>
+    <ul>
+      <li>Ctrl + click to change the form on the right.</li>
+      <li>Click to change the form on the left.</li>
+    </ul>
+  </Hbox>;
+}
 
 const defaultSelected: SelectedPlugins = ['kernel', 'Eva'];
 
