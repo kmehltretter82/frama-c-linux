@@ -35,3 +35,7 @@ let ( <  ) : type n. n finite -> n finite -> bool = fun l r -> l <  r
 let ( <= ) : type n. n finite -> n finite -> bool = fun l r -> l <= r
 let ( >  ) : type n. n finite -> n finite -> bool = fun l r -> l >  r
 let ( >= ) : type n. n finite -> n finite -> bool = fun l r -> l >= r
+
+(* Deprecated *)
+
+let strenghten = strengthen

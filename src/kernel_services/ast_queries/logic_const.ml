@@ -443,3 +443,7 @@ let pdangling ?(loc=Cil_datatype.Location.unknown) (l,p) =
 
 let pseparated  ?(loc=Cil_datatype.Location.unknown) seps =
   unnamed ~loc (Pseparated seps)
+
+(* Deprecated *)
+
+let unamed = unnamed
