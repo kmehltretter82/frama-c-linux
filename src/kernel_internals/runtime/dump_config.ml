@@ -42,13 +42,13 @@ let dump_to_json () =
      * "ocamlc", `String System_config.ocamlc ;
      * "ocamlopt", `String System_config.ocamlopt ;
      * "ocaml_wflags", `String System_config.ocaml_wflags ; *)
-    "datadir", `String (System_config.Share.main:>string) ;
+    "datadir", `String (Filepath.to_string_abs System_config.Share.main) ;
     "datadirs",
     list string (Filepath.to_string_list System_config.Share.dirs) ;
-    "framac_libc", `String (System_config.Share.libc:>string) ;
+    "framac_libc", `String (Filepath.to_string_abs System_config.Share.libc) ;
     "plugin_dir",
     list string (Filepath.to_string_list System_config.Plugins.dirs) ;
-    "lib_dir", `String (System_config.Lib.main:>string) ;
+    "lib_dir", `String (Filepath.to_string_abs System_config.Lib.main) ;
     "lib_dirs",
     list string (Filepath.to_string_list System_config.Lib.dirs) ;
     "preprocessor", `String System_config.Preprocessor.command ;

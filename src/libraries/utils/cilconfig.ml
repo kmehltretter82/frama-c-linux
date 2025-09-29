@@ -138,13 +138,13 @@ let saveConfiguration (fname : Filepath.t) =
   try
     let open Filesystem.Operators in
     let$ oc = Filesystem.with_open_out_exn fname in
-    Kernel.debug "Saving configuration to %s@." (fname :> string);
+    Kernel.debug "Saving configuration to %a@." Filepath.pretty_abs fname;
     H.iter (fun k c ->
         output_string oc (k ^ "\n");
         output_string oc ((configToString c) ^ "\n"))
       configurationData
   with _ ->
-    Kernel.warning "Cannot open configuration file %s\n" (fname :> string)
+    Kernel.warning "Cannot open configuration file %a\n" Filepath.pretty_abs fname
 
 
 (** Make some regular expressions early *)
@@ -208,7 +208,7 @@ let loadConfiguration (fname : Filepath.t) : unit =
   let open Filesystem.Operators in
   try
     let$ ic = Filesystem.with_open_in_exn fname in
-    Kernel.debug "Loading configuration from %s@." (fname :> string);
+    Kernel.debug "Loading configuration from %a@." Filepath.pretty_abs fname;
     while true do
       let k = input_line ic in
       let s = input_line ic in

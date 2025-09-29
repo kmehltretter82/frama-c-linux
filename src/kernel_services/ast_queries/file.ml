@@ -102,13 +102,14 @@ let from_filename ?cpp f =
         Filepath.pretty f;
     if extra_by_file <> "" then [extra_by_file] else jcdb_flags
   in
-  if Filename.check_suffix (f:>string) ".i" then begin
+  let fname = Filepath.to_string_abs f in
+  if Filename.check_suffix fname ".i" then begin
     NoCPP f
   end else
     let suf =
       try
-        let suf_idx = String.rindex (f:>string) '.' in
-        String.sub (f:>string) suf_idx (String.length (f:>string) - suf_idx)
+        let suf_idx = String.rindex fname '.' in
+        String.sub fname suf_idx (String.length fname - suf_idx)
       with Not_found -> (* raised by String.rindex if '.' \notin f *)
         ""
     in
@@ -309,7 +310,7 @@ let get_machdep () =
   in
   let res =
     Result.bind
-      (Yaml_unix.of_file (Fpath.v (file:>string)))
+      (Yaml_unix.of_file (Fpath.v (Filepath.to_string_abs file)))
       Machdep.mach_of_yaml
   in
   match res with
@@ -428,7 +429,7 @@ let adjust_pwd fp cpp_command =
       | None -> cwd
       | Some d -> d
     in
-    if cwd <> dir then Some dir, "cd " ^ (dir :> string) ^ " && " ^ cpp_command
+    if cwd <> dir then Some dir, "cd " ^ (Filepath.to_string_abs dir) ^ " && " ^ cpp_command
     else None, cpp_command
   else None, cpp_command
 
@@ -483,7 +484,8 @@ let build_cpp_cmd = function
           let machdep_dir =
             Machdep.generate_machdep_header ~censored_macros (get_machdep())
           in
-          [(machdep_dir:>string); (System_config.Share.libc:>string)]
+          [(Filepath.to_string_abs machdep_dir);
+           (Filepath.to_string_abs System_config.Share.libc)]
         end
       else []
     in
@@ -537,7 +539,7 @@ let build_cpp_cmd = function
     in
     let workdir, cpp_command_with_chdir = adjust_pwd f cpp_command in
     if workdir <> None then
-      Parse_env.set_workdir ppf ((Option.get workdir) :> string);
+      Parse_env.set_workdir ppf (Filepath.to_string_abs (Option.get workdir));
     Kernel.feedback ~dkey:Kernel.dkey_pp
       "preprocessing with \"%s\""
       cpp_command_with_chdir;
@@ -619,7 +621,7 @@ let parse_cabs cpp_command = function
         let ppf' =
           try Logic_preprocess.file ".c"
                 (replace_in_cpp_cmd cmdl "")
-                (ppf : Filepath.t :> string)
+                (Filepath.to_string_abs ppf)
           with Sys_error _ as e ->
             safe_remove_file ppf;
             Kernel.abort "preprocessing of annotations failed (%s)"
@@ -640,7 +642,7 @@ let parse_cabs cpp_command = function
     Kernel.feedback "Parsing %a (external front-end)"
       Filepath.pretty f;
     (match Hashtbl.find_opt check_suffixes suf with
-     | Some parse -> parse (f:>string)
+     | Some parse -> parse (Filepath.to_string_abs f)
      | None ->
        Kernel.abort
          "could not find a suitable plugin for parsing %a."
@@ -655,7 +657,7 @@ let to_cil_cabs cpp_cmds_and_args f =
     Kernel.abort "@[stopping on@ file %S@ that@ has@ errors.%t@]"
       (get_name f)
       (fun fmt ->
-         if Filename.check_suffix (get_name f :> string) ".c" &&
+         if Filename.check_suffix (get_name f) ".c" &&
             not (Kernel.is_debug_key_enabled Kernel.dkey_pp)
          then
            Format.fprintf fmt "@ Add@ '-kernel-msg-key pp'@ \
@@ -1723,7 +1725,7 @@ let compute_sources_table cpp_commands =
     | Some (cpp_cmd, _ppf) ->
       let tmp_file =
         Temp_files.file ~prefix:"audit_produce_sources" ~suffix:".txt" () in
-      let tmp_file' = (tmp_file :> string) in
+      let tmp_file' = Filepath.to_string_abs tmp_file in
       let cmd_for_sources = cpp_cmd ^ " -H -MM >/dev/null 2>" ^ tmp_file' in
       let exit_code = Sys.command cmd_for_sources in
       if exit_code = 0

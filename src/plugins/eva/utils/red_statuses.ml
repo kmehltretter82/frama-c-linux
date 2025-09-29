@@ -183,7 +183,7 @@ let print_information fmt { loc; kf; alarm; kind; text; status; contexts } =
 let output file =
   Self.feedback "Listing red statuses in file %a"
     Filepath.pretty file;
-  let channel = open_out (file:>string) in
+  let channel = open_out (Filepath.to_string_abs file) in
   let fmt = Format.formatter_of_out_channel channel in
   Format.pp_set_margin fmt 1000000;
   Format.fprintf fmt "@[<v>";

@@ -348,7 +348,7 @@ module MYTREE = struct
 
   let make_file hide sort_order (path, globs) =
     let storage =
-      default_storage (path : Filepath.t :> string) (Array.of_list globs)
+      default_storage (Filepath.to_string_abs path) (Array.of_list globs)
     in
     let sons = make_list_globals hide sort_order globs in
     storage, sons

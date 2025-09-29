@@ -512,7 +512,7 @@ let report_number name nb opt =
   if nb > 0 then R.feedback "%s%4d" name nb ;
   let file = opt () in
   if not (Filepath.is_empty file) then
-    let out = open_out (file:>string) in
+    let out = open_out (Filepath.to_string_abs file) in
     output_string out (string_of_int nb) ;
     flush out ; close_out out
 

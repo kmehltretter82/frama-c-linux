@@ -12,7 +12,7 @@
 *)
 
 (** A normalized (absolute) path. *)
-type t = private string
+type t
 
 
 (* ************************************************************************* *)
@@ -145,6 +145,10 @@ val basename: t -> string
 (** Equivalent to [Filename.dirname].
     @since 28.0-Nickel *)
 val dirname: t -> t
+
+(** Equivalent to [Filename.extension].
+    @since Frama-C+dev *)
+val extension: t -> string
 
 (** [extend ~existence file ext] returns the normalized path to the file
     [file] ^ [ext]. Note that it does not introduce a dot.

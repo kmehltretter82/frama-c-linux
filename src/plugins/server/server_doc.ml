@@ -315,7 +315,7 @@ let pp_one_page ~root ~page ~title body =
   let full_path = Filepath.(root / page) in
   ignore (Filesystem.make_dir ~parents:true (Filepath.dirname full_path) 0o755);
   try
-    let chan = open_out (full_path:>string) in
+    let chan = open_out (Filepath.to_string_abs full_path) in
     let fmt = Format.formatter_of_out_channel chan in
     let title = Md.plain title in
     Markdown.(pp_pandoc ~page fmt (pandoc ~title body))
@@ -336,7 +336,7 @@ let dump ~root ?(meta=true) () =
            | None -> Markdown.section ~title page.descr
            | Some file ->
              if Filesystem.exists file
-             then Markdown.rawfile (file :> string) @ page.descr
+             then Markdown.rawfile (Filepath.to_string_abs file ) @ page.descr
              else (
                Senv.warning "Can not find %a file"
                  Filepath.pretty file ;
@@ -346,12 +346,12 @@ let dump ~root ?(meta=true) () =
          pp_one_page ~root ~page:path ~title (intro @ body) ;
          if meta then
            let path = Filepath.(root / (path ^ ".json")) in
-           Yojson.Basic.to_file (path:>string) (metadata page) ;
+           Yojson.Basic.to_file (Filepath.to_string_abs path) (metadata page) ;
       ) !pages ;
     Senv.feedback "[doc] Page: 'readme.md'" ;
     if meta then
       let path = Filepath.(root / "readme.md.json") in
-      Yojson.Basic.to_file (path:>string) maindata ;
+      Yojson.Basic.to_file (Filepath.to_string_abs path) maindata ;
       let body =
         [ Md.H1 (Md.plain "Presentation", None);
           Md.Block (Md.text (Md.format "Version %s" System_config.Version.id))]

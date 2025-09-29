@@ -10,15 +10,16 @@
 
 let () =
   begin
-    Wutil.share := (System_config.Share.main :> string);
+    Wutil.share := Filepath.to_string_abs System_config.Share.main;
     Wutil.flush := (fun msg -> Gui_parameters.warning "%s" msg);
   end
 
 let framac_logo, framac_icon =
   try
     let img ext =
-      Some (GdkPixbuf.from_file
-              ((System_config.Share.main:>string) ^ "/frama-c." ^ ext))
+      Some (GdkPixbuf.from_file (
+          (Filepath.to_string_abs System_config.Share.main) ^ "/frama-c." ^ ext
+        ))
     in
     img "png", img "ico"
   with
@@ -863,7 +864,7 @@ let prepare_editor_cmd s line filename =
   s ^ " &"
 
 let open_in_external_viewer ?(line=1) (file : Filepath.t) =
-  let filename = Format.asprintf "%S" (file :> string) in
+  let filename = Format.asprintf "'%s'" (Filepath.to_string_abs ~quoted:true file) in
   let editor = Configuration.find_string ~default:"emacs +%d %s" "editor" in
   if editor = "" then
     Gui_parameters.feedback "no external viewer configured in Preferences"

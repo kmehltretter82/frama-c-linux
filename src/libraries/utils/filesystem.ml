@@ -13,33 +13,33 @@ open Filepath
 (* -------------------------------------------------------------------------- *)
 
 let exists (p : t) =
-  Sys.file_exists (p :> string)
+  Sys.file_exists (Filepath.to_string_abs p)
 
 let is_file (p : t) =
   try
-    (Unix.stat (p :> string)).Unix.st_kind = Unix.S_REG
+    (Unix.stat (Filepath.to_string_abs p)).Unix.st_kind = Unix.S_REG
   with _ -> false
 
-let is_dir (p : t) = Sys.is_directory (p :> string)
+let is_dir (p : t) = Sys.is_directory (Filepath.to_string_abs p)
 
 let readdir (p : t) =
-  Sys.readdir (p :> string)
+  Sys.readdir (Filepath.to_string_abs p)
 
 let list_dir (p : t) =
-  Sys.readdir (p :> string)
+  Sys.readdir (Filepath.to_string_abs p)
   |> Array.to_list
 
 let iter_dir (f : string -> unit) (p : t) : unit =
-  Sys.readdir (p :> string)
+  Sys.readdir (Filepath.to_string_abs p)
   |> Array.iter (fun s -> f s)
 
 let fold_dir (f : string -> 'a -> 'a) (p : t) (acc : 'a) : 'a =
-  Sys.readdir (p :> string)
+  Sys.readdir (Filepath.to_string_abs p)
   |> Array.fold_left (fun acc s ->  f s acc) acc
 
 let remove_file (p : t) =
   try
-    Unix.unlink (p :> string)
+    Unix.unlink (Filepath.to_string_abs p)
   with Unix.Unix_error _ -> ()
 
 let rec remove_dir (p : t) =
@@ -49,10 +49,11 @@ let rec remove_dir (p : t) =
          let f = p / a in
          if is_dir f then remove_dir f else remove_file f
       ) (readdir p) ;
-    Unix.rmdir (p :> string)
+    Unix.rmdir (Filepath.to_string_abs p)
   with Unix.Unix_error _ | Sys_error _ -> ()
 
-let rename (s : t) (t : t) = Sys.rename (s :> string) (t :> string)
+let rename (s : t) (t : t) =
+  Sys.rename (Filepath.to_string_abs s) (Filepath.to_string_abs t)
 
 let rec make_dir ?(parents=false) (p: t) perm =
   if exists p then
@@ -62,14 +63,14 @@ let rec make_dir ?(parents=false) (p: t) perm =
     else false
   else begin
     begin
-      try Unix.mkdir (p :> string) perm
+      try Unix.mkdir (Filepath.to_string_abs p) perm
       with
       | Unix.Unix_error (Unix.ENOENT,_,_) when parents ->
         let parent = Filepath.dirname p in
         if p <> parent then
           begin
             ignore (make_dir ~parents parent perm);
-            Unix.mkdir (p :> string) perm
+            Unix.mkdir (Filepath.to_string_abs p) perm
           end
       | e -> raise e
     end;
@@ -111,7 +112,7 @@ let temp_dir ~prefix ~suffix =
 (* -------------------------------------------------------------------------- *)
 
 let digest_raw (p : t) =
-  Digest.file (p :> string)
+  Digest.file (Filepath.to_string_abs p)
 
 let digest (p : t) =
   digest_raw p |> Digest.to_hex
@@ -177,7 +178,8 @@ let with_open_in_exn
   let flags, perm =
     flags_and_perm ~if_missing ~binary ~blocking Open_rdonly
   in
-  open_in_gen flags perm (p :> string) |> protect_file_op ~close:close_in job
+  open_in_gen flags perm (Filepath.to_string_abs p)
+  |> protect_file_op ~close:close_in job
 
 let with_open_in ?if_missing ?binary ?blocking p job =
   try Ok (with_open_in_exn ?if_missing ?binary ?blocking p job)
@@ -194,7 +196,8 @@ let with_open_out_exn
   let flags, perm =
     flags_and_perm ~if_exists ~if_missing ~binary ~blocking Open_wronly
   in
-  open_out_gen flags perm (p :> string) |> protect_file_op ~close:close_out job
+  open_out_gen flags perm (Filepath.to_string_abs p)
+  |> protect_file_op ~close:close_out job
 
 let with_open_out ?if_missing ?if_exists ?binary ?blocking p job =
   try Ok (with_open_out_exn ?if_missing ?if_exists ?binary ?blocking p job)
@@ -210,11 +213,11 @@ module Compressed : sig
     (Channel.output, 'a) exn_processor
 end = struct
   let with_open_in_exn (p : t) job =
-    Channel.open_in_bin (p :> string)
+    Channel.open_in_bin (Filepath.to_string_abs p)
     |> protect_file_op ~close:Channel.close_in job
 
   let with_open_out_exn ?compress (p : t) job =
-    Channel.open_out_bin ?compress (p :> string)
+    Channel.open_out_bin ?compress (Filepath.to_string_abs p)
     |> protect_file_op ~close:Channel.close_out job
 end
 

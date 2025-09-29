@@ -18,14 +18,14 @@ let parse_to_cabs ~original (path : Filepath.t) =
     Kernel.feedback ~level:2 "Parsing %a" Filepath.pretty path;
     Errorloc.clear_errors () ;
     let lexbuf, lexer =
-      Clexer.init ~filename:(path :> string) Clexer.initial in
+      Clexer.init ~filename:(Filepath.to_string_abs path) Clexer.initial in
     (* The pwd during preprocessing might have changed, e.g. if a JCDB has
        been used; we may need to adjust Errorloc's working directory to
        compensate for it, otherwise relative line directives previously added
        by the preprocessor will be invalid. *)
     let pwd =
       match Parse_env.get_workdir path with
-      | None -> (Filepath.pwd () :> string)
+      | None -> Filepath.(to_string_abs (pwd ()))
       | Some workdir -> workdir
     in
     Errorloc.setCurrentWorkingDirectory pwd;

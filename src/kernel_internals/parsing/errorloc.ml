@@ -46,7 +46,7 @@ let startParsing fname lexer =
       let i = { lexbuf; menhir_pos; current_working_directory = None } in
       (* Initialize lexer buffer. *)
       lexbuf.Lexing.lex_curr_p <-
-        { Lexing.pos_fname = (filename :> string);
+        { Lexing.pos_fname = Filepath.to_string_abs filename;
           Lexing.pos_lnum  = 1;
           Lexing.pos_bol   = 0;
           Lexing.pos_cnum  = 0
@@ -105,7 +105,7 @@ let setCurrentFile n =
   end else begin
     let pos = current.lexbuf.Lexing.lex_curr_p in
     current.lexbuf.Lexing.lex_curr_p <- {
-      pos with Lexing.pos_fname = (norm :> string);
+      pos with Lexing.pos_fname = Filepath.to_string_abs norm;
                Lexing.pos_lnum = (Option.get !currentLine);
                Lexing.pos_bol = pos.Lexing.pos_cnum;
     }

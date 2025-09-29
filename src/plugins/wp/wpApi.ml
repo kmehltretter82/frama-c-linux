@@ -405,7 +405,7 @@ let () = S.option gmodel ~name:"script"
     ~get:(fun wpo ->
         match ProofSession.get wpo with
         | NoScript -> None
-        | Script a | Deprecated a -> Some (a :> string))
+        | Script a | Deprecated a -> Some (Filepath.to_string_abs a))
 
 let () = S.column gmodel ~name:"saved"
     ~descr:(Md.plain "Saved Script")

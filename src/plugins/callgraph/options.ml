@@ -88,7 +88,7 @@ let dump output g =
   feedback ~level:2 "dumping the graph into file %a"
     Fc_Filepath.pretty file;
   try
-    let cout = open_out (file:>string) in
+    let cout = open_out (Fc_Filepath.to_string_abs file) in
     output cout g;
     close_out cout
   with e ->

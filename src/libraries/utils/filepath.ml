@@ -137,6 +137,8 @@ let basename p = Filename.basename p
 
 let dirname p = Filename.dirname p
 
+let extension p = Filename.extension p
+
 let extend ?existence t ext = of_string ?existence (t ^ ext)
 
 let concat ?existence t s = of_string ?existence (t ^ "/" ^ s)

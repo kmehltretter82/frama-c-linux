@@ -47,7 +47,7 @@ module CACHEDIR = WpContext.StaticGenerator(Datatype.Unit)
           Wp_parameters.get_session_dir ~force:false "cache"
     end)
 
-let get_dir () = (CACHEDIR.get () :> string)
+let get_dir () = Filepath.to_string_abs (CACHEDIR.get ())
 
 let is_session_dir path =
   0 = Filepath.compare

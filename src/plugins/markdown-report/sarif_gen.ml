@@ -234,10 +234,10 @@ let gen_run remarks =
   let artifacts = gen_artifacts () in
   let symbolicDirs =
     List.map (fun (key, (dir : Filepath.t)) ->
-        (key, (dir :> string))
+        (key, (Filepath.to_string_abs dir))
       ) (Filepath.all_symbolic_dirs ())
   in
-  let pwd = (Filepath.pwd () :> string) in
+  let pwd = Filepath.(to_string_abs (pwd ())) in
   let uriBases = ("PWD", pwd) :: symbolicDirs in
   let uriBases =
     if not (Mdr_params.SarifDeterministic.get ())

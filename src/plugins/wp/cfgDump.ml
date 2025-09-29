@@ -17,13 +17,13 @@ let node () = incr knode ; !knode
 
 let fopen kf bhv =
   begin
-    let name =
+    let filename =
       match bhv with
       | None -> Kernel_function.get_name kf
       | Some bname -> Kernel_function.get_name kf ^ "_" ^ bname
     in
-    let file = Filename.concat (Wp_parameters.get_output () :> string) name in
-    Wp_parameters.feedback "CFG %a -> %s@." Kernel_function.pretty kf name ;
+    let file = Filepath.(Wp_parameters.get_output () / filename |> to_string_abs) in
+    Wp_parameters.feedback "CFG %a -> %s@." Kernel_function.pretty kf filename ;
     let fout = open_out (file ^ ".dot") in
     fc := Some (fout,file) ;
     out := Format.formatter_of_out_channel fout ;

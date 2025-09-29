@@ -443,13 +443,15 @@ and bal = parse
       Wp_parameters.feedback ~dkey:dkey_driver ~ontty "Loading driver '%a'"
         Filepath.pretty file;
       let driver_dir = Filepath.dirname file in
-      let inc = open_in (file :> string) in
+      let inc = open_in (Filepath.to_string_abs file) in
       let lex = Lexing.from_channel inc in
-      let position = { lex.Lexing.lex_curr_p with Lexing.pos_fname = (file :> string) } in
+      let position = {
+        lex.Lexing.lex_curr_p with Lexing.pos_fname = Filepath.to_string_abs file
+      } in
       let input = { current = tok lex ; position = position ; lexbuf = lex } in
       try
         lex.Lexing.lex_curr_p <- position ;
-	parse ~driver_dir:(driver_dir :> string) "qed" input ;
+	parse ~driver_dir:(Filepath.to_string_abs driver_dir) "qed" input ;
 	close_in inc
       with Failure msg ->
 	close_in inc ;
@@ -469,7 +471,7 @@ and bal = parse
         Hashtbl.find loaded drivers
       with Not_found ->
         let driver_basename (file : Filepath.t) =
-        let base = Filename.basename (file :> string) in
+        let base = Filepath.basename file in
         try Filename.chop_extension base
         with Invalid_argument _ -> base in
         let drvs = List.map driver_basename drivers in

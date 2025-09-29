@@ -808,7 +808,7 @@ let export gstat specfile =
 
       | Rformat.CMD a | Rformat.ARG(a,_) ->
         Wp_parameters.error "Report '%s': unknown command '%s'"
-          (specfile :> string)
+          (Filepath.to_string_abs specfile)
           a
       | Rformat.TEXT ->
         if !section <> END then
