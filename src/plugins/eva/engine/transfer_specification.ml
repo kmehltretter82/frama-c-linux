@@ -178,10 +178,7 @@ let precise_loc_of_assign env kind term =
       pp_clause (kind, term) pp_eval_error e;
     None
 
-module Make
-    (Engine: Engine_sig.S)
-    (Logic : Engine_sig.Transfer_logic with type state = Engine.Dom.t)
-= struct
+module Make (Engine: Engine_sig.S) = struct
 
   type state = Engine.Dom.t
   type value = Engine.Val.t
@@ -189,7 +186,8 @@ module Make
 
   module Domain = Engine.Dom
   module Location = Engine.Loc
-  module Transfer_inout = Transfer_inout.Make (Engine)
+  module Logic = Engine.Transfer_logic
+  module Transfer_inout = Engine.Transfer_inout
   module Interferences = Engine.Interferences
   include Cvalue_domain.Getters (Domain)
 

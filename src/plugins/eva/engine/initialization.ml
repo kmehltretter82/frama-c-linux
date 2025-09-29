@@ -54,21 +54,17 @@ let (>>>) t f = match t with
 
 let counter = ref 0
 
-module Make
-    (Domain: Abstract.Domain.External)
-    (Eva: Evaluation_sig.S with type state = Domain.state
-                            and type loc = Domain.location)
-    (Transfer: Engine_sig.Transfer_stmt with type state = Domain.t)
-= struct
+module Make (Engine: Engine_sig.S) = struct
 
   incr counter;;
 
   type state = Engine.Dom.t
+  module Domain = Engine.Dom
 
   (* Evaluation in the top state: we do not want a location to depend on
      other globals. *)
   let lval_to_loc lval =
-    fst (Eva.lvaluate ~for_writing:false Domain.top lval)
+    fst (Engine.Eval.lvaluate ~for_writing:false Domain.top lval)
     >>> fun (_valuation, loc) -> loc
 
   include Cvalue_domain.Getters (Domain)
@@ -105,7 +101,7 @@ module Make
   (* Applies a single initializer, using the standard transfer function on
      assignments. Warns if the results is bottom. *)
   let apply_eva_single_initializer ~source ~pos state lval expr =
-    match Transfer.assign state ~pos lval expr with
+    match Engine.Transfer_stmt.assign state ~pos lval expr with
     | `Bottom ->
       if not (Position.is_local pos) then
         Self.warning ~pos ~source ~once:true

@@ -8,9 +8,5 @@
 
 (** Creation of the initial state of abstract domain. *)
 
-module Make
-    (Domain: Abstract.Domain.External)
-    (_: Evaluation_sig.S with type state = Domain.state
-                          and type loc = Domain.location)
-    (_: Engine_sig.Transfer_stmt with type state = Domain.t)
-  : Engine_sig.Initialization with type state = Domain.t
+module Make (Engine: Engine_sig.S) :
+  Engine_sig.Initialization with type state = Engine.Dom.t

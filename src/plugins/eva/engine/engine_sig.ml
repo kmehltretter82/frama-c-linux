@@ -244,6 +244,24 @@ module type S = sig
       plus the evaluation engine for these abstractions. *)
   include Abstractions.S_with_evaluation
 
+  module Transfer_inout : Transfer_inout
+    with type location = Loc.location
+     and type value = Val.t
+     and type valuation = Eval.Valuation.t
+
+  module Transfer_stmt : Transfer_stmt with type state = Dom.t
+
+  module Transfer_logic : Transfer_logic with type state = Dom.t
+
+  module Transfer_specification : Transfer_specification
+    with type state = Dom.t
+     and type value = Val.t
+     and type location = Loc.location
+
+  module Initialization : Initialization with type state = Dom.t
+
+  module Iterator : Iterator with type state = Dom.t
+
   module Compute : Compute
     with type state = Dom.t
      and type value = Val.t

@@ -43,18 +43,43 @@ let save_results kf =
 module type Engine = Engine_sig.S_with_results
 
 module Make (Abstract: Abstractions.S) = struct
-  module rec Compute' : Engine_sig.Compute =
-    Compute_functions.Make (Engine)
-  and Interference' : Engine_sig.Interferences =
-    Interferences.Make (Engine)
+
+  module Eval' =
+    Evaluation.Make (Abstract.Ctx) (Abstract.Val) (Abstract.Loc) (Abstract.Dom)
+
+  module rec Transfer_inout' : Engine_sig.Transfer_inout =
+    Transfer_inout.Make (Engine)
+
+  and Transfer_stmt' : Engine_sig.Transfer_stmt =
+    Transfer_stmt.Make (Engine)
+
+  and Transfer_logic' : Engine_sig.Transfer_logic =
+    Transfer_logic.Make (Engine.Dom)
+
+  and Transfer_specification' : Engine_sig.Transfer_specification =
+    Transfer_specification.Make (Engine)
+
+  and Initialization' : Engine_sig.Initialization = Initialization.Make (Engine)
+  and Iterator' : Engine_sig.Iterator  = Iterator.Make (Engine)
+  and Compute' : Engine_sig.Compute = Compute_functions.Make (Engine)
+  and Interference' : Engine_sig.Interferences = Interferences.Make (Engine)
+
   and Engine : Engine_sig.S_with_results
     with module Ctx = Abstract.Ctx
      and module Val = Abstract.Val
      and module Loc = Abstract.Loc
      and module Dom = Abstract.Dom =
   struct
+
     include Abstract
-    module Eval = Evaluation.Make (Ctx) (Val) (Loc) (Dom)
+
+    module Eval = Eval'
+    module Transfer_inout = Transfer_inout'
+    module Transfer_stmt = Transfer_stmt'
+    module Transfer_logic = Transfer_logic'
+    module Transfer_specification = Transfer_specification'
+    module Initialization = Initialization'
+    module Iterator = Iterator'
     module Compute = Compute'
     module Interferences = Interference'
 

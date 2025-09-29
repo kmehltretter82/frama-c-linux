@@ -140,12 +140,8 @@ let register_signal_handler () =
 
 module Make (Engine: Engine_sig.S) = struct
 
-  module Transfer = Transfer_stmt.Make (Engine)
-  module Logic = Transfer_logic.Make (Engine.Dom)
-  module Spec = Transfer_specification.Make (Engine) (Logic)
-  module Init = Initialization.Make (Engine.Dom) (Engine.Eval) (Transfer)
-
-  module Computer = Iterator.Computer (Engine) (Transfer) (Init) (Logic) (Spec)
+  module Logic = Engine.Transfer_logic
+  module Spec = Engine.Transfer_specification
 
   include Cvalue_domain.Getters (Engine.Dom)
 
@@ -214,7 +210,7 @@ module Make (Engine: Engine_sig.S) = struct
   (* Interprets a [call] in the state [state] by analyzing
      the body of the called function. *)
   let compute_using_body fundec ~save_results call state =
-    let result = Computer.compute ~save_results call.callstack state in
+    let result = Engine.Iterator.compute ~save_results call.callstack state in
     Summary.FunctionStats.recompute @@ Globals.Functions.get fundec.svar ;
     result
 
@@ -447,7 +443,7 @@ module Make (Engine: Engine_sig.S) = struct
       Kernel_function.pretty kf;
     let initial_state =
       Eva_utils.protect
-        (fun () -> Init.initial_state_with_formals ~lib_entry kf)
+        (fun () -> Engine.Initialization.initial_state_with_formals ~lib_entry kf)
         ~cleanup:(fun () -> post_analysis_cleanup ~aborted:true)
     in
     match initial_state with

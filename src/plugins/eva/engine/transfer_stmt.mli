@@ -8,5 +8,5 @@
 
 val current_kf_inout: unit -> Inout_type.t option
 
-module Make (Abstract: Engine_sig.S) :
-  Engine_sig.Transfer_stmt with type state = Abstract.Dom.t
+module Make (Engine: Engine_sig.S) :
+  Engine_sig.Transfer_stmt with type state = Engine.Dom.t

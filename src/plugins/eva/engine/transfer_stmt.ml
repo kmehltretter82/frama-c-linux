@@ -78,7 +78,6 @@ module Make (Engine: Engine_sig.S) = struct
   module Domain = Engine.Dom
   module Eval = Engine.Eval
   module EvaAstDeps = Eva_ast.MakeDepsOf (Location)
-  module Transfer_inout = Transfer_inout.Make (Engine)
   module Interferences = Engine.Interferences
   include Cvalue_domain.Getters (Domain)
 
@@ -226,7 +225,7 @@ module Make (Engine: Engine_sig.S) = struct
       Alarmset.emit ~pos alarms;
       let* assigned, valuation = eval in
       let access =
-        Transfer_inout.register_assign_lval pos valuation lval expr
+        Engine.Transfer_inout.register_assign_lval pos valuation lval expr
       in
       let domain_valuation = Eval.to_domain_valuation valuation in
       let lvalue = { lval; lloc } in
@@ -248,7 +247,7 @@ module Make (Engine: Engine_sig.S) = struct
     (* TODO: check not comparable. *)
     Alarmset.emit ~pos alarms;
     let* valuation = eval in
-    let access = Transfer_inout.register_read_exp pos valuation expr in
+    let access = Engine.Transfer_inout.register_read_exp pos valuation expr in
     let+ state =
       Domain.assume ~pos expr positive (Eval.to_domain_valuation valuation) state
     in
@@ -697,7 +696,8 @@ module Make (Engine: Engine_sig.S) = struct
       let access =
         (* Register call arguments to Inout_access *)
         let+ call, _, valuation = eval in
-        Transfer_inout.register_call_args (Position.of_local pos) valuation call
+        let position = Position.of_local pos in
+        Engine.Transfer_inout.register_call_args position valuation call
       in
       let access = Bottom.value ~bottom:Inout_access.Access.bottom access in
       (* The special Frama_C_ functions to print states are handled here. *)
