@@ -18,6 +18,8 @@
 Open Source Release <next-release>
 ###############################################################################
 
+o!  Kernel    [2025-09-29] Filepath.t is now abstract. An equivalent result can
+              be obtained using Filepath.to_string_abs or Filepath.pretty_abs
 -   ACSL-Importer [2025-09-24] Open-sourced plug-in ACSL Importer for
               importation of annotations from external files
 -   Volatile  [2025-09-24] Open-sourced plug-in Volatile for specification
