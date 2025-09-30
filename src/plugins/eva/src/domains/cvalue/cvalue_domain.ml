@@ -386,62 +386,30 @@ module State = struct
   (* ------------------------------------------------------------------------ *)
 
   module Store = struct
+    (* Do not register the Locals_scoping.clobbered_set part of the state. *)
 
-    let register_global_state b s =
-      Cvalue_results.register_global_state b (Bottom.map fst s)
-    let register_initial_state callstack kf (state, _clob) =
-      Cvalue_results.register_initial_state callstack kf state
-    let register_state_before_stmt callstack stmt (state, _clob) =
-      Cvalue_results.register_state_before_stmt callstack stmt state
-    let register_state_after_stmt callstack stmt (state, _clob) =
-      Cvalue_results.register_state_after_stmt callstack stmt state
-
-    let lift_tbl tbl =
-      let h = Callstack.Hashtbl.create 7 in
-      let process callstack state =
-        Callstack.Hashtbl.replace h callstack (state, Locals_scoping.top ())
-      in
-      Callstack.Hashtbl.iter process tbl;
-      h
-
-    let select ?selection tbl =
-      match selection with
-      | None -> tbl
-      | Some list ->
-        let new_tbl = Callstack.Hashtbl.create (List.length list) in
-        let add cs =
-          let s = Callstack.Hashtbl.find_opt tbl cs in
-          Option.iter (Callstack.Hashtbl.replace new_tbl cs) s
-        in
-        List.iter add list;
-        new_tbl
+    let set_global_state b s =
+      Cvalue_results.set_global_state b (Bottom.map fst s)
+    let set_initial_state ?callstack kf (state, _clob) =
+      Cvalue_results.set_initial_state ?callstack kf state
+    let set_stmt_state ?callstack ~after stmt (state, _clob) =
+      Cvalue_results.set_stmt_state ?callstack ~after stmt state
 
     let get_global_state () =
       let+ state = Cvalue_results.get_global_state () in
       state, Locals_scoping.top ()
 
-    let get_initial_state kf =
-      let+ state = Cvalue_results.get_initial_state kf in
+    let get_initial_state ?callstack kf =
+      let+ state = Cvalue_results.get_initial_state ?callstack kf in
       state, Locals_scoping.top ()
 
-    let get_initial_state_by_callstack ?selection kf =
-      match Cvalue_results.get_initial_state_by_callstack ?selection kf with
-      | `Top -> `Top
-      | `Bottom -> `Bottom
-      | `Value tbl -> `Value (lift_tbl (select ?selection tbl))
-
-    let get_stmt_state ~after stmt =
-      let+ state = Cvalue_results.get_stmt_state ~after stmt in
+    let get_stmt_state ?callstack ~after stmt =
+      let+ state = Cvalue_results.get_stmt_state ?callstack ~after stmt in
       state, Locals_scoping.top ()
 
-    let get_stmt_state_by_callstack ?selection ~after stmt =
-      match Cvalue_results.get_stmt_state_by_callstack ?selection ~after stmt with
-      | `Top -> `Top
-      | `Bottom -> `Bottom
-      | `Value tbl -> `Value (lift_tbl (select ?selection tbl))
-
-    let mark_as_computed = Cvalue_results.mark_as_computed
-    let is_computed = Cvalue_results.is_computed
+    let kf_callstacks = Cvalue_results.kf_callstacks
+    let stmt_callstacks = Cvalue_results.stmt_callstacks
+    let is_enabled = Cvalue_results.is_enabled
   end
 
   let get_state_before stmt =

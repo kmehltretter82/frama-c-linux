@@ -305,77 +305,43 @@ module Make
     Left.overwrite bases ~on:left_on ~by:left_by,
     Right.overwrite bases ~on:right_on ~by:right_by
 
-  let merge_tbl left_tbl right_tbl =
-    let tbl = Callstack.Hashtbl.create 7 in
-    let merge callstack left =
-      try
-        let right = Callstack.Hashtbl.find right_tbl callstack in
-        Callstack.Hashtbl.replace tbl callstack (left, right)
-      with
-        Not_found -> ()
-    in
-    Callstack.Hashtbl.iter merge left_tbl;
-    if Callstack.Hashtbl.length tbl > 0 then `Value tbl else `Bottom
-
-  let lift_tbl f tbl =
-    let new_tbl = Callstack.Hashtbl.create 7 in
-    let lift cs t = Callstack.Hashtbl.replace new_tbl cs (f t) in
-    Callstack.Hashtbl.iter lift tbl;
-    `Value new_tbl
-
-  let merge_callstack_tbl left right =
-    match left, right with
-    | `Top, `Top -> `Top
-    | `Value left, `Value right -> merge_tbl left right
-    | `Top, `Value right -> lift_tbl (fun t -> Left.top, t) right
-    | `Value left, `Top -> lift_tbl (fun t -> t, Right.top) left
-    | `Bottom, _ | _, `Bottom -> `Bottom
-
   module Store = struct
-    let register_global_state b state =
-      Left.Store.register_global_state b (state >>-: fst);
-      Right.Store.register_global_state b (state >>-: snd)
-    let register_initial_state callstack kf (left, right) =
-      Left.Store.register_initial_state callstack kf left;
-      Right.Store.register_initial_state callstack kf right
-    let register_state_before_stmt callstack stmt (left, right) =
-      Left.Store.register_state_before_stmt callstack stmt left;
-      Right.Store.register_state_before_stmt callstack stmt right
-    let register_state_after_stmt callstack stmt (left, right) =
-      Left.Store.register_state_after_stmt callstack stmt left;
-      Right.Store.register_state_after_stmt callstack stmt right
+    let set_global_state b state =
+      Left.Store.set_global_state b (state >>-: fst);
+      Right.Store.set_global_state b (state >>-: snd)
+    let set_initial_state ?callstack kf (left, right) =
+      Left.Store.set_initial_state ?callstack kf left;
+      Right.Store.set_initial_state ?callstack kf right
+    let set_stmt_state ?callstack ~after stmt (left, right) =
+      Left.Store.set_stmt_state ?callstack ~after stmt left;
+      Right.Store.set_stmt_state ?callstack ~after stmt right
 
     let get_global_state () =
-      Left.Store.get_global_state () >>- fun left ->
-      Right.Store.get_global_state () >>-: fun right ->
+      let+ left = Left.Store.get_global_state ()
+      and+ right = Right.Store.get_global_state () in
       left, right
-    let get_initial_state kf =
-      Left.Store.get_initial_state kf >>- fun left ->
-      Right.Store.get_initial_state kf >>-: fun right ->
+
+    let get_initial_state ?callstack kf =
+      let+ left = Left.Store.get_initial_state ?callstack kf
+      and+ right = Right.Store.get_initial_state ?callstack kf in
       left, right
-    let get_initial_state_by_callstack ?selection kf =
-      let left_tbl, right_tbl =
-        Left.Store.get_initial_state_by_callstack ?selection kf,
-        Right.Store.get_initial_state_by_callstack ?selection kf
-      in
-      merge_callstack_tbl left_tbl right_tbl
 
-    let get_stmt_state ~after stmt =
-      Left.Store.get_stmt_state ~after stmt >>- fun left ->
-      Right.Store.get_stmt_state ~after stmt >>-: fun right ->
+    let get_stmt_state ?callstack ~after stmt =
+      let+ left = Left.Store.get_stmt_state ?callstack ~after stmt
+      and+ right = Right.Store.get_stmt_state ?callstack ~after stmt in
       left, right
-    let get_stmt_state_by_callstack ?selection ~after stmt =
-      let left_tbl, right_tbl =
-        Left.Store.get_stmt_state_by_callstack ?selection ~after stmt,
-        Right.Store.get_stmt_state_by_callstack ?selection ~after stmt
-      in
-      merge_callstack_tbl left_tbl right_tbl
 
-    let mark_as_computed () =
-      Left.Store.mark_as_computed ();
-      Right.Store.mark_as_computed ()
+    let kf_callstacks kf =
+      match Left.Store.kf_callstacks kf with
+      | `Top -> Right.Store.kf_callstacks kf
+      | `Value _ as x -> x
 
-    let is_computed () = Left.Store.is_computed () && Right.Store.is_computed ()
+    let stmt_callstacks stmt =
+      match Left.Store.stmt_callstacks stmt with
+      | `Top -> Right.Store.stmt_callstacks stmt
+      | `Value _ as x -> x
+
+    let is_enabled () = Left.Store.is_enabled () && Right.Store.is_enabled ()
   end
 
   let post_analysis = function

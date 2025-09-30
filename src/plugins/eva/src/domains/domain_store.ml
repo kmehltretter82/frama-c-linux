@@ -13,31 +13,23 @@ module type InputDomain = sig
   include Datatype.S
   val name: string
   val top: t
-  val join: t -> t -> t
 end
 
 module type S = sig
   type t
-  val register_global_state: bool -> t or_bottom -> unit
-  val register_initial_state: Callstack.t -> kernel_function -> t -> unit
-  val register_state_before_stmt: Callstack.t -> stmt -> t -> unit
-  val register_state_after_stmt: Callstack.t -> stmt -> t -> unit
 
-  (** Allows accessing the states inferred by an Eva analysis after it has
-      been computed with the domain enabled. *)
+  val set_global_state: bool -> t or_bottom -> unit
+  val set_initial_state: ?callstack:Callstack.t -> kernel_function -> t -> unit
+  val set_stmt_state: ?callstack:Callstack.t -> after:bool -> stmt -> t -> unit
+
   val get_global_state: unit -> t or_bottom
-  val get_initial_state: kernel_function -> t or_bottom
-  val get_initial_state_by_callstack:
-    ?selection:Callstack.t list ->
-    kernel_function -> t Callstack.Hashtbl.t or_top_bottom
+  val get_initial_state: ?callstack:Callstack.t -> kernel_function -> t or_bottom
+  val get_stmt_state: ?callstack:Callstack.t -> after:bool -> stmt -> t or_bottom
 
-  val get_stmt_state: after:bool -> stmt -> t or_bottom
-  val get_stmt_state_by_callstack:
-    ?selection:Callstack.t list ->
-    after:bool -> stmt -> t Callstack.Hashtbl.t or_top_bottom
+  val kf_callstacks: kernel_function -> Callstack.t Seq.t or_top
+  val stmt_callstacks: stmt -> Callstack.t Seq.t or_top
 
-  val mark_as_computed: unit -> unit
-  val is_computed: unit -> bool
+  val is_enabled: unit -> bool
 end
 
 module Make (Domain: InputDomain) = struct
@@ -144,46 +136,13 @@ module Make (Domain: InputDomain) = struct
         let dependencies = [ Called_Functions_By_Callstack.self ]
       end)
 
-  let update_callstack_table ~after stmt callstack v =
-    let find,add =
-      if after
-      then AfterTable_By_Callstack.find, AfterTable_By_Callstack.add
-      else Table_By_Callstack.find, Table_By_Callstack.add
-    in
-    try
-      let by_callstack = find stmt in
-      begin try
-          let o = Callstack.Hashtbl.find by_callstack callstack in
-          Callstack.Hashtbl.replace by_callstack callstack (Domain.join o v)
-        with Not_found ->
-          Callstack.Hashtbl.add by_callstack callstack v
-      end;
-    with Not_found ->
-      let r = Callstack.Hashtbl.create 7 in
-      Callstack.Hashtbl.add r callstack v;
-      add stmt r
 
-  let register_global_state storage state =
+  let set_global_state storage state =
     Storage.set storage;
     if storage then
       match state with
       | `Bottom -> ()
       | `Value state -> Global_State.set state
-
-  let register_initial_state callstack kf state =
-    if Storage.get () then
-      let by_callstack =
-        try Called_Functions_By_Callstack.find kf
-        with Not_found ->
-          let h = Callstack.Hashtbl.create 7 in
-          Called_Functions_By_Callstack.add kf h;
-          h
-      in
-      try
-        let old = Callstack.Hashtbl.find by_callstack callstack in
-        Callstack.Hashtbl.replace by_callstack callstack (Domain.join old state)
-      with Not_found ->
-        Callstack.Hashtbl.add by_callstack callstack state
 
   let get_global_state () =
     if not (Storage.get ())
@@ -192,90 +151,74 @@ module Make (Domain: InputDomain) = struct
       | None -> `Bottom
       | Some state -> `Value state
 
-  let get_initial_state kf =
-    if not (Storage.get ())
-    then `Value Domain.top
-    else
-      try `Value (Called_Functions_Memo.find kf)
-      with Not_found ->
+
+  let set_initial_state ?callstack kf state =
+    if Storage.get () then
+      match callstack with
+      | None -> Called_Functions_Memo.replace kf state
+      | Some callstack ->
+        let create _kf = Callstack.Hashtbl.create 7 in
+        let by_callstack = Called_Functions_By_Callstack.memo create kf in
+        Callstack.Hashtbl.replace by_callstack callstack state
+
+  let get_initial_state ?callstack kf =
+    if Storage.get ()
+    then
       try
-        let by_callstack = Called_Functions_By_Callstack.find kf in
-        let state =
-          Callstack.Hashtbl.fold
-            (fun _cs state acc -> Bottom.join Domain.join acc (`Value state))
-            by_callstack `Bottom
-        in
-        ignore (state >>-: Called_Functions_Memo.add kf);
-        state
+        match callstack with
+        | None -> `Value (Called_Functions_Memo.find kf)
+        | Some callstack ->
+          let cs_tbl = Called_Functions_By_Callstack.find kf in
+          `Value (Callstack.Hashtbl.find cs_tbl callstack)
       with Not_found -> `Bottom
+    else `Value Domain.top
 
-  let select ?selection tbl =
-    match selection with
-    | None -> tbl
-    | Some list ->
-      let new_tbl = Callstack.Hashtbl.create (List.length list) in
-      let add cs =
-        let state_opt = Callstack.Hashtbl.find_opt tbl cs in
-        Option.iter (Callstack.Hashtbl.replace new_tbl cs) state_opt
-      in
-      List.iter add list;
-      new_tbl
-
-  let get_state_by_callstack ?selection find key =
-    if not (Storage.get ())
-    then `Top
-    else
-      try `Value (select ?selection (find key))
-      with Not_found -> `Bottom
-
-  let get_initial_state_by_callstack ?selection kf =
-    get_state_by_callstack ?selection Called_Functions_By_Callstack.find kf
-
-  let get_stmt_state ~after s =
-    if not (Storage.get ())
-    then `Value Domain.top
-    else
-      let (find, add), find_by_callstack =
+  let set_stmt_state ?callstack ~after stmt state =
+    if Storage.get () then
+      match callstack with
+      | None ->
         if after
-        then AfterTable.(find, add), AfterTable_By_Callstack.find
-        else Table.(find, add), Table_By_Callstack.find
-      in
-      try `Value (find s)
-      with Not_found ->
-        let ho = try Some (find_by_callstack s) with Not_found -> None in
-        let state =
-          match ho with
-          | None -> `Bottom
-          | Some h ->
-            Callstack.Hashtbl.fold
-              (fun _cs state acc -> Bottom.join Domain.join acc (`Value state))
-              h `Bottom
+        then AfterTable.add stmt state
+        else Table.add stmt state
+      | Some callstack ->
+        let create _stmt = Callstack.Hashtbl.create 7 in
+        let by_callstack =
+          if after
+          then AfterTable_By_Callstack.memo create stmt
+          else Table_By_Callstack.memo create stmt
         in
-        ignore (state >>-: add s);
-        state
+        Callstack.Hashtbl.replace by_callstack callstack state
 
-  let get_stmt_state_by_callstack ?selection ~after stmt =
-    let find =
-      if after
-      then AfterTable_By_Callstack.find
-      else Table_By_Callstack.find
-    in
-    get_state_by_callstack ?selection find stmt
+  let get_stmt_state ?callstack ~after stmt =
+    if Storage.get () then
+      try
+        match callstack with
+        | None ->
+          if after
+          then `Value (AfterTable.find stmt)
+          else `Value (Table.find stmt)
+        | Some callstack ->
+          let cs_tbl =
+            if after
+            then AfterTable_By_Callstack.find stmt
+            else Table_By_Callstack.find stmt
+          in
+          `Value (Callstack.Hashtbl.find cs_tbl callstack)
+      with Not_found -> `Bottom
+    else `Value Domain.top
 
-  let register_state_before_stmt callstack stmt state =
-    if Storage.get ()
-    then update_callstack_table ~after:false stmt callstack state
 
-  let register_state_after_stmt callstack stmt state =
-    if Storage.get ()
-    then update_callstack_table ~after:true stmt callstack state
+  let kf_callstacks kf =
+    if Storage.get () then
+      try `Value (Called_Functions_By_Callstack.find kf |> Callstack.Hashtbl.to_seq_keys)
+      with Not_found -> `Value Seq.empty
+    else `Top
 
-  let mark_as_computed () =
-    (* Precompute consolidated states if required. *)
-    if Storage.get () && Parameters.JoinResults.get () then
-      Table_By_Callstack.iter
-        (fun s _ -> ignore (get_stmt_state ~after:false s));
-    Table_By_Callstack.mark_as_computed ()
+  let stmt_callstacks stmt =
+    if Storage.get () then
+      try `Value (Table_By_Callstack.find stmt |> Callstack.Hashtbl.to_seq_keys)
+      with Not_found -> `Value Seq.empty
+    else `Top
 
-  let is_computed () = Storage.get () && Table_By_Callstack.is_computed ()
+  let is_enabled () = Storage.get ()
 end

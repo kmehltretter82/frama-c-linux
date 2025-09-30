@@ -16,7 +16,6 @@ module type InputDomain = sig
   val name: string
 
   val top: t
-  val join: t -> t -> t
 end
 
 (** Automatic storage of the states computed during the analysis. *)
@@ -26,28 +25,23 @@ module type S = sig
   (** Called once at the analysis beginning for the entry state of the main
       function. The boolean indicates whether the states of this domain must be
       saved during the analysis, according to options -eva-no-results. If it is
-      false, register functions do nothing, and get functions return Top. *)
-  val register_global_state: bool -> t or_bottom -> unit
+      false, all set functions do nothing, and get functions return Top. *)
+  val set_global_state: bool -> t or_bottom -> unit
 
-  val register_initial_state: Callstack.t -> kernel_function -> t -> unit
-  val register_state_before_stmt: Callstack.t -> stmt -> t -> unit
-  val register_state_after_stmt: Callstack.t -> stmt -> t -> unit
+  val set_initial_state: ?callstack:Callstack.t -> kernel_function -> t -> unit
+  val set_stmt_state: ?callstack:Callstack.t -> after:bool -> stmt -> t -> unit
 
   (** Allows accessing the states inferred by an Eva analysis after it has
       been computed with the domain enabled. *)
+
   val get_global_state: unit -> t or_bottom
-  val get_initial_state: kernel_function -> t or_bottom
-  val get_initial_state_by_callstack:
-    ?selection:Callstack.t list ->
-    kernel_function -> t Callstack.Hashtbl.t or_top_bottom
+  val get_initial_state: ?callstack:Callstack.t -> kernel_function -> t or_bottom
+  val get_stmt_state: ?callstack:Callstack.t -> after:bool -> stmt -> t or_bottom
 
-  val get_stmt_state: after:bool -> stmt -> t or_bottom
-  val get_stmt_state_by_callstack:
-    ?selection:Callstack.t list ->
-    after:bool -> stmt -> t Callstack.Hashtbl.t or_top_bottom
+  val kf_callstacks: kernel_function -> Callstack.t Seq.t or_top
+  val stmt_callstacks: stmt -> Callstack.t Seq.t or_top
 
-  val mark_as_computed: unit -> unit
-  val is_computed: unit -> bool
+  val is_enabled: unit -> bool
 end
 
 module Make (Domain : InputDomain) : S with type t := Domain.t

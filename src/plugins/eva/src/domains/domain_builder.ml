@@ -635,42 +635,25 @@ module Restrict
 
   module Store = struct
 
-    let register_global_state b state =
-      let state = state >>-: get_state in
-      Domain.Store.register_global_state b state
+    let set_global_state b state =
+      Domain.Store.set_global_state b (state >>-: get_state)
+    let set_initial_state ?callstack kf s =
+      Domain.Store.set_initial_state ?callstack kf (get_state s)
+    let set_stmt_state ?callstack ~after stmt s =
+      Domain.Store.set_stmt_state ?callstack ~after stmt (get_state s)
 
-    let lift_register f state = f (get_state state)
+    let inject s =
+      let+ state = s in Some (state, Mode.all)
 
-    let register_initial_state callstack kf =
-      lift_register (Domain.Store.register_initial_state callstack kf)
-    let register_state_before_stmt callstack stmt =
-      lift_register (Domain.Store.register_state_before_stmt callstack stmt)
-    let register_state_after_stmt callstack stmt =
-      lift_register (Domain.Store.register_state_after_stmt callstack stmt)
+    let get_global_state () =
+      Domain.Store.get_global_state () |> inject
+    let get_initial_state ?callstack kf =
+      Domain.Store.get_initial_state ?callstack kf |> inject
+    let get_stmt_state ?callstack ~after stmt =
+      Domain.Store.get_stmt_state ?callstack ~after stmt |> inject
 
-    let inject state = Some (state, Mode.all)
-
-    let get_global_state () = Domain.Store.get_global_state () >>-: inject
-    let get_initial_state kf = Domain.Store.get_initial_state kf >>-: inject
-    let get_stmt_state ~after stmt =
-      Domain.Store.get_stmt_state ~after stmt >>-: inject
-
-    let inject_table = function
-      | `Top -> `Top
-      | `Bottom -> `Bottom
-      | `Value t ->
-        let module Hashtbl = Callstack.Hashtbl in
-        let table = Hashtbl.create (Hashtbl.length t) in
-        Hashtbl.iter (fun key s -> Hashtbl.add table key (inject s)) t;
-        `Value table
-
-    let get_initial_state_by_callstack ?selection kf =
-      inject_table (Domain.Store.get_initial_state_by_callstack ?selection kf)
-    let get_stmt_state_by_callstack ?selection ~after stmt =
-      inject_table
-        (Domain.Store.get_stmt_state_by_callstack ?selection ~after stmt)
-
-    let mark_as_computed = Domain.Store.mark_as_computed
-    let is_computed = Domain.Store.is_computed
+    let kf_callstacks = Domain.Store.kf_callstacks
+    let stmt_callstacks = Domain.Store.stmt_callstacks
+    let is_enabled = Domain.Store.is_enabled
   end
 end

@@ -622,10 +622,11 @@ module Domain = struct
      account, according to the domain name. Need to be applied after the domain
      has been built, in case of a domain functor. *)
   let use_no_results : type c v l. (c, v, l) name = fun name (module D) ->
-    let register = D.Store.register_global_state in
     let results () = not (Parameters.NoResultsDomains.mem name) in
-    let f storage state = register (storage && results ()) state in
-    let module S = struct include D.Store let register_global_state = f end in
+    let module S = struct
+      include D.Store
+      let set_global_state b = D.Store.set_global_state (b && results ())
+    end in
     (module struct include D module Store = S end)
 
 

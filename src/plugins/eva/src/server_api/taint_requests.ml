@@ -176,8 +176,8 @@ module EvaTaints = struct
      - Untainted: cannot be modified by the attacker."
 
   let () =
-    let taint_computed = Taint_domain.Store.is_computed in
-    let enable () = Analysis.is_computed () && taint_computed () in
+    let taint_enabled = Taint_domain.Store.is_enabled in
+    let enable () = Analysis.is_computed () && taint_enabled () in
     Server.Kernel_ast.Information.register
       ~id:"eva.taint" ~label:"Taint" ~title: "Taint status according to Eva"
       ~descr:eva_taints_descr ~enable print_taint
@@ -259,7 +259,7 @@ let get_predicate = function
   | _ -> Error Irrelevant
 
 let is_tainted_property ip =
-  if Analysis.is_computed () && Taint_domain.Store.is_computed () then
+  if Analysis.is_computed () && Taint_domain.Store.is_enabled () then
     let (let+) = Result.bind in
     let kinstr = Property.get_kinstr ip in
     let+ predicate = get_predicate ip in

@@ -83,19 +83,34 @@ let get_results () =
   let after_states = Stmt.Hashtbl.create 128 in
   let kf_initial_states = Kernel_function.Hashtbl.create 128 in
   let copy_states stmt =
-    let copy h ~after stmt =
-      match Cvalue_results.get_stmt_state_by_callstack ~after stmt with
-      | `Top | `Bottom -> ()
-      | `Value states -> Stmt.Hashtbl.add h stmt (CS.Hashtbl.copy states)
-    in
-    copy before_states ~after:false stmt;
-    copy after_states ~after:true stmt;
+    match Cvalue_results.stmt_callstacks stmt with
+    | `Top -> ()
+    | `Value callstacks ->
+      let copy_callstack by_cs ~after stmt callstack =
+        match Cvalue_results.get_stmt_state ~callstack ~after stmt with
+        | `Bottom -> ()
+        | `Value state -> CS.Hashtbl.replace by_cs callstack state
+      in
+      let copy h ~after stmt =
+        let by_cs = CS.Hashtbl.create (Seq.length callstacks) in
+        Seq.iter (copy_callstack by_cs ~after stmt) callstacks;
+        Stmt.Hashtbl.replace h stmt by_cs
+      in
+      copy before_states ~after:false stmt;
+      copy after_states ~after:true stmt;
   in
   let copy_kf kf =
-    match Cvalue_results.get_initial_state_by_callstack kf with
-    | `Top | `Bottom -> ()
-    | `Value hstack ->
-      Kernel_function.Hashtbl.add kf_initial_states kf (CS.Hashtbl.copy hstack);
+    match Cvalue_results.kf_callstacks kf with
+    | `Top -> ()
+    | `Value callstacks ->
+      let by_cs = CS.Hashtbl.create (Seq.length callstacks) in
+      let copy_callstack callstack =
+        match Cvalue_results.get_initial_state ~callstack kf with
+        | `Bottom -> ()
+        | `Value state -> CS.Hashtbl.replace by_cs callstack state
+      in
+      Seq.iter copy_callstack callstacks;
+      Kernel_function.Hashtbl.replace kf_initial_states kf by_cs;
       try
         let fundec = Kernel_function.get_definition kf in
         List.iter copy_states fundec.sallstmts
@@ -144,28 +159,28 @@ let set_results results =
   Parameters.change_correctness ();
   (* Those two functions may clear Self.state. Start by them *)
   (* Initial state *)
-  Cvalue_results.register_global_state true results.initial_state;
+  Cvalue_results.set_global_state true results.initial_state;
   (* Initial args *)
   begin match results.initial_args with
     | None -> use_default_main_args ()
     | Some l -> set_main_args l
   end;
   (* Pre- and post-states *)
-  let register_states register (tbl: stmt_by_callstack Stmt.Hashtbl.t) =
+  let register_states ~after (tbl: stmt_by_callstack Stmt.Hashtbl.t) =
     let copy stmt (h:stmt_by_callstack) =
       let aux_callstack callstack state =
-        register callstack stmt state;
+        Cvalue_results.set_stmt_state ~callstack ~after stmt state;
       in
       Callstack.Hashtbl.iter aux_callstack h
     in
     Stmt.Hashtbl.iter copy tbl
   in
-  register_states Cvalue_results.register_state_before_stmt results.before_states;
-  register_states Cvalue_results.register_state_after_stmt results.after_states;
+  register_states ~after:false results.before_states;
+  register_states ~after:true results.after_states;
   (* Kf initial state *)
   let aux_initial_state kf h =
     let aux_callstack callstack state =
-      Cvalue_results.register_initial_state callstack kf state
+      Cvalue_results.set_initial_state ~callstack kf state
     in
     Callstack.Hashtbl.iter aux_callstack h
   in
@@ -189,7 +204,6 @@ let set_results results =
   in
   Property.Hashtbl.iter aux_statuses results.statuses;
   let b = Parameters.ResultsAll.get () in
-  Cvalue_domain.State.Store.register_global_state b
+  Cvalue_domain.State.Store.set_global_state b
     (`Value Cvalue_domain.State.top);
-  Self.ComputationState.set Computed;
-  Cvalue_results.mark_as_computed ()
+  Self.ComputationState.set Computed
