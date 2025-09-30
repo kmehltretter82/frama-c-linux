@@ -8,7 +8,6 @@
 
 (** Signature of abstractions used in the Eva engine. *)
 
-
 (** Signature of the context abstractions used in the engine. *)
 module type Context = Abstract.Context.External
 

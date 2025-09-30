@@ -71,7 +71,22 @@ let substitution_visitor table =
   in
   { Eva_ast.Rewrite.default with rewrite_varinfo }
 
-module Make (Engine: Engine_sig.S) = struct
+module type Engine_Subset = sig
+  include Engine_abstractions_sig.S
+
+  module Transfer_inout : Engine_sig.Transfer_inout
+    with type location = Loc.location
+     and type value = Val.t
+     and type valuation = Eval.Valuation.t
+
+  module Interferences : Engine_sig.Interferences with type state = Dom.t
+
+  module Compute : Engine_sig.Compute with type state = Dom.t
+                                       and type value = Val.t
+                                       and type loc = Loc.location
+end
+
+module Make (Engine: Engine_Subset) = struct
 
   module Value = Engine.Val
   module Location = Engine.Loc

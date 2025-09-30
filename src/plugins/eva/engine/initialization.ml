@@ -54,7 +54,13 @@ let (>>>) t f = match t with
 
 let counter = ref 0
 
-module Make (Engine: Engine_sig.S) = struct
+
+module type Engine_Subset = sig
+  include Engine_abstractions_sig.S
+  module Transfer_stmt : Engine_sig.Transfer_stmt with type state = Dom.t
+end
+
+module Make (Engine: Engine_Subset) = struct
 
   incr counter;;
 

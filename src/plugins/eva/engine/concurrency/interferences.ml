@@ -169,7 +169,14 @@ end
 
 (* Interferences Functor *)
 
-module Make (Engine : Engine_sig.S_with_results) =
+module type Engine_Subset = sig
+  include Engine_abstractions_sig.S
+  include Engine_sig.Results with type state := Dom.state
+                              and type value := Val.t
+                              and type location := Loc.location
+end
+
+module Make (Engine : Engine_Subset) =
 struct
   module Dom = Engine.Dom
   module ThreadTable = Thread.Hashtbl

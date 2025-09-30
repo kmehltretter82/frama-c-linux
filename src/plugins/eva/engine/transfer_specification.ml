@@ -178,7 +178,18 @@ let precise_loc_of_assign env kind term =
       pp_clause (kind, term) pp_eval_error e;
     None
 
-module Make (Engine: Engine_sig.S) = struct
+
+module type Engine_Subset = sig
+  include Engine_abstractions_sig.S
+  module Transfer_inout : Engine_sig.Transfer_inout
+    with type location = Loc.location
+     and type value = Val.t
+     and type valuation = Eval.Valuation.t
+  module Interferences : Engine_sig.Interferences with type state = Dom.t
+  module Transfer_logic : Engine_sig.Transfer_logic with type state = Dom.t
+end
+
+module Make (Engine: Engine_Subset) = struct
 
   type state = Engine.Dom.t
   type value = Engine.Val.t

@@ -10,11 +10,10 @@
 
 open Eval
 
-module Make (Engine : Engine_sig.S) = struct
+module Make (Engine : Engine_abstractions_sig.S) = struct
   module Location = Engine.Loc
   module Eval = Engine.Eval
   module EvaAstDeps = Eva_ast.MakeDepsOf (Location)
-  module Interferences = Engine.Interferences
 
   type location = Location.location
   type value = Engine.Val.t

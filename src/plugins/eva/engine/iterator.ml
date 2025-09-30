@@ -58,8 +58,18 @@ let record_fireable edge =
   | _ -> ()
 
 
+module type Engine_Subset = sig
+  include Engine_abstractions_sig.S
+  module Initialization : Engine_sig.Initialization with type state = Dom.t
+  module Transfer_stmt : Engine_sig.Transfer_stmt with type state = Dom.t
+  module Transfer_logic : Engine_sig.Transfer_logic with type state = Dom.t
+  module Transfer_specification : sig
+    val treat_statement_assigns: pos:Position.t -> assigns -> Dom.t -> Dom.t
+  end
+end
+
 module Make_Dataflow
-    (Engine : Engine_sig.S)
+    (Engine : Engine_Subset)
     (AnalysisParam : sig
        val kf: Cil_types.kernel_function
        val callstack: Callstack.t
@@ -686,7 +696,7 @@ module Make_Dataflow
 end
 
 
-module Make (Engine : Engine_sig.S) = struct
+module Make (Engine : Engine_Subset) = struct
 
   type state = Engine.Dom.t
 

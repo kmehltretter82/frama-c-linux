@@ -8,6 +8,14 @@
 
 type thread_id = int
 
-module Make (Engine : Engine_sig.S_with_results) :
+(** Subset of [Engine_sig.S] required by this functor. *)
+module type Engine_Subset = sig
+  include Engine_abstractions_sig.S
+  include Engine_sig.Results with type state := Dom.state
+                              and type value := Val.t
+                              and type location := Loc.location
+end
+
+module Make (Engine : Engine_Subset) :
   Engine_sig.Interferences with
   type state = Engine.Dom.t
