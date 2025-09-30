@@ -19,6 +19,14 @@
   Declaration of variadic function asprintf.
 [kernel:libc:format] printf.c:8: Warning: Multiple usage of flag '-'.
 [kernel:libc:format] printf.c:8: Warning: 
-  Flag ' ' and conversion specififer e are not compatibles.
+  Flag ' ' is ignored when flag + is also specified.
+[kernel:libc:format] printf.c:8: Warning: 
+  Flag 0 is ignored when flag - is also specified.
 [kernel:variadic] printf.c:8: 
-  Fallback translation of call printf to a call to the specialized version printf_fallback_1.
+  Translating call to printf to a call to the specialized version printf_va_1.
+[kernel:libc:format] printf.c:11: Warning: 
+  Flag ' ' is ignored when flag + is also specified.
+[kernel:libc:format] printf.c:11: Warning: 
+  Flag ' ' is ignored when flag + is also specified.
+[kernel:variadic] printf.c:11: 
+  Translating call to printf to a call to the specialized version printf_va_2.

@@ -60,7 +60,7 @@ int main()
   printf("%" PRIxLEAST64, uleast64);
   printf("%" PRIdFAST32, ifast32);
 
-  printf("%f %Le\n", f, L);
+  printf("%f %Le % f %0f % e\n", f, L, f, f, f);
 
   printf("%c\n", c);
   //printf("%c%lc\n", c, win);
