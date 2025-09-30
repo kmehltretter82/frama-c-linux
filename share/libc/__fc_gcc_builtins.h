@@ -72,6 +72,19 @@ _Bool __builtin_uaddl_overflow(unsigned long a, unsigned long b, unsigned long* 
  */
 _Bool __builtin_uaddll_overflow(unsigned long long a, unsigned long long b, unsigned long long* res);
 
+// NB: technically, the types of a, b and *res could differ, but we assume that
+// this is not the case
+
+#define __builtin_add_overflow(a,b,res) \
+  _Generic((a), \
+    int: __builtin_sadd_overflow, \
+    unsigned int: __builtin_uadd_overflow, \
+    long: __builtin_saddl_overflow, \
+    unsigned long: __builtin_uaddl_overflow, \
+    long long: __builtin_saddll_overflow, \
+    unsigned long long: __builtin_uaddll_overflow \
+  )(a,b,res)
+
 /*@
   requires valid_res: \valid(res);
   assigns \result, *res \from a, b;
@@ -125,6 +138,19 @@ _Bool __builtin_usubl_overflow(unsigned long a, unsigned long b, unsigned long* 
   ensures result_overflow: a - b == (unsigned long long)(a - b) ? \result == 0 : \result == 1;
  */
 _Bool __builtin_usubll_overflow(unsigned long long a, unsigned long long b, unsigned long long* res);
+
+// NB: technically, the types of a, b and *res could differ, but we assume that
+// this is not the case
+
+#define __builtin_sub_overflow(a,b,res) \
+  _Generic((a), \
+    int: __builtin_ssub_overflow, \
+    unsigned int: __builtin_usub_overflow, \
+    long: __builtin_ssubl_overflow, \
+    unsigned long: __builtin_usubl_overflow, \
+    long long: __builtin_ssubll_overflow, \
+    unsigned long long: __builtin_usubll_overflow \
+  )(a,b,res)
 
 /*@
   requires valid_res: \valid(res);
@@ -185,7 +211,7 @@ _Bool __builtin_umulll_overflow(unsigned long long a, unsigned long long b, unsi
 
 #define __builtin_mul_overflow(a,b,res) \
   _Generic((a), \
-    int: __built_smul_overflow, \
+    int: __builtin_smul_overflow, \
     unsigned int: __builtin_umul_overflow, \
     long: __builtin_smull_overflow, \
     unsigned long: __builtin_umull_overflow, \
