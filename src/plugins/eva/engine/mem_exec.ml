@@ -33,7 +33,7 @@ let counter = ref 0
 
 module Make
     (Value : Datatype.S)
-    (Domain : Abstract_domain.S)
+    (Domain : Engine_abstractions_sig.Domain)
 = struct
 
   incr counter;

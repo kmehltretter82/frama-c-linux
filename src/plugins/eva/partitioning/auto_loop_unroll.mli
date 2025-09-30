@@ -8,7 +8,7 @@
 
 (** Heuristic for automatic loop unrolling. *)
 
-module Make (Abstract: Abstractions.S_with_evaluation) : sig
+module Make (Abstract: Engine_abstractions_sig.S) : sig
 
   val compute:
     max_unroll:int -> Abstract.Dom.t -> Eva_automata.loop -> int option

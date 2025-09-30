@@ -274,7 +274,7 @@ let cross_equality loop (lval : Eva_ast.lval) =
   | Some lval -> lval
   | None | exception No_equality -> lval
 
-module Make (Abstract: Abstractions.S_with_evaluation) = struct
+module Make (Abstract: Engine_abstractions_sig.S) = struct
 
   open Eval
   open Abstract

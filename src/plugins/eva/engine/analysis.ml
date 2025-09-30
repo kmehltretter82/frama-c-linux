@@ -65,10 +65,10 @@ module Make (Abstract: Abstractions.S) = struct
   and Interference' : Engine_sig.Interferences = Interferences.Make (Engine)
 
   and Engine : Engine_sig.S_with_results
-    with module Ctx = Abstract.Ctx
-     and module Val = Abstract.Val
-     and module Loc = Abstract.Loc
-     and module Dom = Abstract.Dom =
+    with type Ctx.t = Abstract.Ctx.t
+     and type Val.t = Abstract.Val.t
+     and type Loc.location = Abstract.Loc.location
+     and type Dom.state = Abstract.Dom.state =
   struct
 
     include Abstract

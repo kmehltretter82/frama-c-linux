@@ -242,7 +242,7 @@ end
 module type S = sig
   (** The four abstractions: values, locations, states and evaluation context,
       plus the evaluation engine for these abstractions. *)
-  include Abstractions.S_with_evaluation
+  include Engine_abstractions_sig.S
 
   module Transfer_inout : Transfer_inout
     with type location = Loc.location

@@ -16,7 +16,7 @@
     Partitioning index relies on an heuristics on the cvalue domain,
     and is very inefficient without it. *)
 
-module Make (Domain: Abstract.Domain.External) : sig
+module Make (Domain: Engine_abstractions_sig.Domain) : sig
   type t
 
   (** Creates an empty index. *)

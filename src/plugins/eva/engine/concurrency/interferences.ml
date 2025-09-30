@@ -26,7 +26,7 @@ let pp_map iteri pp_key pp_val fmt map =
   iteri (pp fmt) map
 
 (** An interference from on or several threads. *)
-module Interference (Dom : Abstract.Domain.External) =
+module Interference (Dom : Engine_abstractions_sig.Domain) =
 struct
   type t = {
     (** The interference state. *)
@@ -85,7 +85,7 @@ end
 (* Set of interferences stored as a map from the set of mutexes surely
    locked to the corresponding interferences states. *)
 
-module ByMutexes (Dom : Abstract.Domain.External) =
+module ByMutexes (Dom : Engine_abstractions_sig.Domain) =
 struct
   module Interference = Interference (Dom)
   type t = Interference.t MutexesMap.t
@@ -102,7 +102,7 @@ end
 (* Set of interferences stored as a map from position to the
    interference generated at this control state. *)
 
-module ByPosition (Dom : Abstract.Domain.External) =
+module ByPosition (Dom : Engine_abstractions_sig.Domain) =
 struct
   module Interference = Interference (Dom)
 

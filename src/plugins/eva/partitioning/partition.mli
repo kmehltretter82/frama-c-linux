@@ -173,7 +173,7 @@ exception InvalidAction
 (** Flows are used to transfer states from one partition to another, by
     applying transfer functions and partitioning actions. They do not enforce
     the unicity of keys. *)
-module MakeFlow (Abstract: Abstractions.S_with_evaluation) :
+module MakeFlow (Abstract: Engine_abstractions_sig.S) :
 sig
   type state = Abstract.Dom.t
   type t
