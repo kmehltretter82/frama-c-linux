@@ -175,13 +175,25 @@ let run () =
   let open Yojson.Basic in
   let open Util in
   let db_path = Kernel.MopsaDb.get () in
+  (* here, db_path exists (checked by Filepath constructor) *)
+  let adjusted_db_path =
+    if Filesystem.is_dir db_path then
+      let new_path = Filepath.(db_path / "mopsa-db.json") in
+      if Filesystem.exists new_path then new_path
+      else
+        Kernel.abort
+          "mopsa-db: directory '%a' does not contain a mopsa-db.json file"
+          Filepath.pretty db_path
+    else
+      db_path
+  in
   let json =
     try
-      from_file (Filepath.to_string_abs db_path)
+      from_file (Filepath.to_string_abs adjusted_db_path)
     with
     | Yojson.Json_error s ->
       Kernel.abort "mopsa-db: invalid JSON file '%a': %s"
-        Filepath.pretty db_path s
+        Filepath.pretty adjusted_db_path s
   in
   let targets =
     json |> member "contents" |> to_list |> filter_map

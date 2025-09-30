@@ -5,6 +5,19 @@ This file has two different testing modes:
 Building the project with make will produce lots of messages, both from Make
 itself, and from GCC (e.g. warnings about sprintf)
   $ ./run-mopsa-build-if-available.sh
+
+Test error message: does not exist
+  $ frama-c -no-autoload-plugins -mopsa-db unknown-db.json
+  [kernel] User Error: directory or json file 'unknown-db.json' does not exist
+  [kernel] Frama-C aborted: invalid user input.
+  [1]
+
+Test error message: dir does not contain mopsa-db.json
+  $ frama-c -no-autoload-plugins -mopsa-db programs
+  [kernel] User Error: mopsa-db: directory 'programs' does not contain a mopsa-db.json file
+  [kernel] Frama-C aborted: invalid user input.
+  [1]
+
   $ frama-c -mopsa-db mopsa-db.json
   [kernel] targets:
     [library   ] library/libpolarssl.a
