@@ -14,11 +14,14 @@
             __fc_stdout->__fc_FILE_data, (indirect: *(format + (0 ..))),
             *(param2 + (0 ..)), param1, param0;
  */
-int printf_va_1(char const *restrict format, int param0, int param1,
+int printf_va_1(char const * restrict format, int param0, int param1,
                 char *param2);
 
-void main(void) {
+void main(void)
+{
   int n = 5;
-  printf("%d, %*s", 42, n, (char *)"hello"); /* printf_va_1 */
+  printf("%d, %*s",42,n,(char *)"hello"); /* printf_va_1 */
   return;
 }
+
+

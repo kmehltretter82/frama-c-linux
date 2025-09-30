@@ -62,6 +62,7 @@ doc/aorai/**/*.[ch]  -check-indent
 doc/developer/**/*.[ch] -check-indent
 doc/eva/**/*.[ch] -check-indent
 doc/rte/**/*.[ch] -check-indent
+doc/userman/examples/generated/*.[ch] -check-indent
 share/**/*.[ch] -check-indent
 
 src/plugins/wp/doc/**/*.[ch] -check-indent
