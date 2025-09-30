@@ -175,6 +175,11 @@ let run () =
   let open Yojson.Basic in
   let open Util in
   let db_path = Kernel.MopsaDb.get () in
+  (* if we entered this function with db_path = empty, then one of the other
+     mopsa-related options was set. Assume '.' for db_path. *)
+  let db_path =
+    if Filepath.is_empty db_path then Filepath.of_string "." else db_path
+  in
   (* here, db_path exists (checked by Filepath constructor) *)
   let adjusted_db_path =
     if Filesystem.is_dir db_path then
@@ -268,13 +273,12 @@ let run_once, _ =
     [Kernel.MopsaTarget.self; Kernel.MopsaDb.self] run
 
 let main () =
-  if not (Filepath.is_empty (Kernel.MopsaDb.get ())) then run_once ()
-  else if not (Kernel.MopsaTarget.is_empty ()) then
-    Kernel.abort "cannot use option '%s' without '%s'."
-      Kernel.MopsaTarget.name Kernel.MopsaDb.name
-  else if not (Kernel.MopsaListDeps.is_empty ()) then
-    Kernel.abort "cannot use option '%s' without '%s'."
-      Kernel.MopsaListDeps.name Kernel.MopsaDb.name
+  let enabled =
+    not (Kernel.MopsaDb.is_empty ()) ||
+    not (Kernel.MopsaTarget.is_empty ()) ||
+    not (Kernel.MopsaListDeps.is_empty ())
+  in
+  if enabled then run_once ()
 
 let () =
   Cmdline.run_after_configuring_stage main

@@ -22,23 +22,13 @@ Test invalid command lines
   [kernel] Frama-C aborted: invalid user input.
   [1]
 
-  $ frama-c -no-autoload-plugins -mopsa-target foo # error: -mopsa-target without -mopsa-db
-  [kernel] User Error: cannot use option '-mopsa-target' without '-mopsa-db'.
-  [kernel] Frama-C aborted: invalid user input.
-  [1]
-
-  $ frama-c -no-autoload-plugins -mopsa-list-deps foo # error: -mopsa-list-deps without -mopsa-db
-  [kernel] User Error: cannot use option '-mopsa-list-deps' without '-mopsa-db'.
-  [kernel] Frama-C aborted: invalid user input.
-  [1]
-
-  $ frama-c -no-autoload-plugins -mopsa-db mopsa-db.json -mopsa-list-deps cJSON_test
+  $ frama-c -no-autoload-plugins -mopsa-list-deps cJSON_test
   [kernel:mopsa-db] Warning: 
     library '$TESTCASE_ROOT/libm.a' not found in mopsa-db, ignoring
   [kernel] dependencies:
     $TESTCASE_ROOT/cJSON.c:	 -I '.'
     $TESTCASE_ROOT/test.c:	 -I '.'
-  $ frama-c -no-autoload-plugins -mopsa-db mopsa-db.json -mopsa-target cJSON_test
+  $ frama-c -no-autoload-plugins -mopsa-target cJSON_test
   [kernel:mopsa-db] Warning: 
     library '$TESTCASE_ROOT/libm.a' not found in mopsa-db, ignoring
   [kernel] Parsing cJSON.c (with preprocessing)
