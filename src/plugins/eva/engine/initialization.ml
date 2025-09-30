@@ -123,7 +123,7 @@ module Make
      Auxiliary function used for string and wide string literals: [zero] is the
      null character and [constant] builds the Eva constant form a character.
      Applies [apply_eva_single_initializer] for each character. *)
-  let init_char_array_aux ~pos zero constant lval seq state =
+  let init_char_array_aux ~source ~pos zero constant lval seq state =
     let _, size = Ast_types.array_elem_type_and_size lval.typ in
     (* Adds [zero] characters to the sequence. *)
     let seq =
@@ -132,8 +132,6 @@ module Make
       | Some size ->
         Seq.take (Z.to_int size) (Seq.append seq (Seq.repeat zero))
     in
-    (* TODO: provide appropriate loc in AST *)
-    let source = fst Cil_datatype.Location.unknown in
     (* Initializes i-nth element with character [c]. *)
     let init_element state i c =
       let index_i = Z.of_int i in
@@ -147,7 +145,7 @@ module Make
     Seq.fold_lefti init_element state seq
 
   (* Initializes array [lval] from string literal [str] in [state]. *)
-  let init_char_array ~pos lval str state =
+  let init_char_array ~source ~pos lval str state =
     if not (Ast_types.is_any_char_array lval.typ) then
       Self.fatal
         "Initialization of %a of type %a with a string literal, \
@@ -156,10 +154,10 @@ module Make
     let zero = '\000' in
     let seq = String.to_seq str in
     let constant c = CChr c in
-    init_char_array_aux ~pos zero constant lval seq state
+    init_char_array_aux ~source ~pos zero constant lval seq state
 
   (* Initializes array [lval] from wide string literal [list] in [state]. *)
-  let init_wchar_array ~pos lval list state =
+  let init_wchar_array ~source ~pos lval list state =
     if not (Ast_types.is_wchar_array lval.typ) then
       Self.fatal
         "Initialization of %a of type %a with a wide string literal, \
@@ -168,7 +166,7 @@ module Make
     let zero = Int64.zero in
     let constant i = CInt64 (Z.of_int64 i, Machine.wchar_kind (), None) in
     let seq = List.to_seq list in
-    init_char_array_aux ~pos zero constant lval seq state
+    init_char_array_aux ~source ~pos zero constant lval seq state
 
   let get_string_literal e =
     match e.node with
@@ -181,12 +179,12 @@ module Make
   let apply_eva_single_initializer_or_str ~source ~pos state lval expr =
     if Ast_types.is_any_char_array lval.typ then begin
       match get_string_literal expr with
-      | Some (Str s) -> init_char_array ~pos lval s state
+      | Some (Str s) -> init_char_array ~source ~pos lval s state
       | None | Some (Wstr _) ->
         Self.fatal "Single init of a char array can only be a string literal"
     end else if Ast_types.is_wchar_array lval.typ then begin
       match get_string_literal expr with
-      | Some (Wstr ws) -> init_wchar_array ~pos lval ws state
+      | Some (Wstr ws) -> init_wchar_array ~source ~pos lval ws state
       | None | Some (Str _) ->
         Self.fatal "Single init of a wchar array can only be a wide string literal"
     end else
@@ -223,6 +221,7 @@ module Make
   (* Initializes a varinfo, padding bits + optionaly an initializer. *)
   let initialize_var_not_lib_entry ~pos ~local vi init state =
     ignore (warn_unknown_size vi);
+    let source = fst vi.vdecl in
     let typ = vi.vtype in
     let lval = Eva_ast.Build.var vi in
     let volatile_everywhere = Ast_types.has_qualifier "volatile" typ in
@@ -245,8 +244,8 @@ module Make
     (* Applies the real initializer on top. *)
     match init with
     | None -> state
-    | Some (StrInit (Str s)) -> init_char_array ~pos lval s state
-    | Some (StrInit (Wstr a)) -> init_wchar_array ~pos lval a state
+    | Some (StrInit (Str s)) -> init_char_array ~source ~pos lval s state
+    | Some (StrInit (Wstr a)) -> init_wchar_array ~source ~pos lval a state
     | Some (CInit init) ->
       apply_eva_initializer ~pos ~top_volatile:false lval init state
 
