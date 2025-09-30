@@ -79,7 +79,6 @@ module Make (Engine: Engine_sig.S) = struct
   module Eval = Engine.Eval
   module EvaAstDeps = Eva_ast.MakeDepsOf (Location)
   module Interferences = Engine.Interferences
-  include Cvalue_domain.Getters (Domain)
 
   type state = Domain.t
 
@@ -555,7 +554,7 @@ module Make (Engine: Engine_sig.S) = struct
 
   (* For non scalar expressions, prints the offsetmap of the cvalue domain. *)
   let show_offsm =
-    match get_cvalue, Location.get Main_locations.PLoc.key with
+    match Engine.Dom.get_cvalue, Location.get Main_locations.PLoc.key with
     | None, _ | _, None ->
       fun fmt _ _ _ -> Unicode.pp_top fmt
     | Some get_cvalue, Some get_ploc ->
@@ -657,7 +656,7 @@ module Make (Engine: Engine_sig.S) = struct
     Populate_spec.populate_funspec kf [`Assigns];
     let stmt, callstack = pos in
     let stack_with_call = Callstack.push kf stmt callstack in
-    let cvalue_state = get_cvalue_or_top state in
+    let cvalue_state = Engine.Dom.get_cvalue_or_top state in
     Cvalue_callbacks.apply_call_hooks stack_with_call kf cvalue_state `Builtin;
     Cvalue_callbacks.apply_call_results_hooks stack_with_call kf cvalue_state
       (`Builtin ([cvalue_state], None))

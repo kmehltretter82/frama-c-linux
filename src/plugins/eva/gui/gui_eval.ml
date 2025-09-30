@@ -125,7 +125,6 @@ end
 module Make (X: Analysis.Engine) = struct
 
   module Analysis = X
-  include Cvalue_domain.Getters (X.Dom)
 
   let get_precise_loc =
     match X.Loc.get Main_locations.PLoc.key with
@@ -190,7 +189,7 @@ module Make (X: Analysis.Engine) = struct
     let lv = Eva_ast.translate_lval lv in
     let loc, alarms = X.eval_lval_to_loc state lv in
     let ok = Alarmset.is_empty alarms in
-    let state = get_cvalue_or_top state in
+    let state = Analysis.Dom.get_cvalue_or_top state in
     let aux loc (acc_res, acc_ok) =
       let res, ok =
         match lv.node with (* catch simplest pattern *)
@@ -254,7 +253,7 @@ module Make (X: Analysis.Engine) = struct
     }
 
   let null_to_offsetmap state (_:unit) =
-    let state = get_cvalue_or_top state in
+    let state = Analysis.Dom.get_cvalue_or_top state in
     match Cvalue.Model.find_base_or_default Base.null state with
     | `Bottom -> GO_InvalidLoc, false, false
     | `Top -> GO_Top, false, false
@@ -319,17 +318,17 @@ module Make (X: Analysis.Engine) = struct
 
   let env_here kf here callstack =
     let pre = pre_kf kf callstack in
-    let here = get_cvalue_or_top here in
+    let here = Analysis.Dom.get_cvalue_or_top here in
     let c_labels = Eval_annots.c_labels kf callstack in
     Eval_terms.env_annot ~c_labels ~pre ~here ()
 
   let env_pre _kf here _callstack =
-    let here = get_cvalue_or_top here in
+    let here = Analysis.Dom.get_cvalue_or_top here in
     Eval_terms.env_pre_f ~pre:here ()
 
   let env_post kf post callstack =
     let pre = pre_kf kf callstack in
-    let post = get_cvalue_or_top post in
+    let post = Analysis.Dom.get_cvalue_or_top post in
     let result =
       if Function_calls.use_spec_instead_of_definition kf then
         None

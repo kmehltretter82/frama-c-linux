@@ -67,8 +67,6 @@ module Make (Engine: Engine_sig.S) = struct
     fst (Engine.Eval.lvaluate ~for_writing:false Domain.top lval)
     >>> fun (_valuation, loc) -> loc
 
-  include Cvalue_domain.Getters (Domain)
-
   (* ------------------------- Apply initializer ---------------------------- *)
 
   (* Conventions:
@@ -326,7 +324,7 @@ module Make (Engine: Engine_sig.S) = struct
   (* Use the values supplied in [actuals] for the formals of [kf], and
      bind them in [state] *)
   let add_supplied_main_formals kf actuals state =
-    match get_cvalue with
+    match Engine.Dom.get_cvalue with
     | None -> Self.abort "API function [set_main_args] cannot be \
                           used without the Cvalue domain"
     | Some get_cvalue ->
@@ -431,7 +429,7 @@ module Make (Engine: Engine_sig.S) = struct
     else `Bottom
 
   let print_initial_cvalue_state state =
-    let cvalue_state = get_cvalue_or_bottom state in
+    let cvalue_state = Engine.Dom.get_cvalue_or_bottom state in
     (* Do not show string literal nor variables from libc specifications. *)
     let print_base base =
       try

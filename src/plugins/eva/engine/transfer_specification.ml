@@ -189,7 +189,6 @@ module Make (Engine: Engine_sig.S) = struct
   module Logic = Engine.Transfer_logic
   module Transfer_inout = Engine.Transfer_inout
   module Interferences = Engine.Interferences
-  include Cvalue_domain.Getters (Domain)
 
   (* Most transfer functions about logic return a list of states instead of a
      single state, and an empty list instead of bottom. We thus use this monad
@@ -248,7 +247,7 @@ module Make (Engine: Engine_sig.S) = struct
   let set_location loc = set_ploc (Main_locations.PLoc.make loc)
 
   let make_env state =
-    Eval_terms.env_assigns ~pre:(get_cvalue_or_top state)
+    Eval_terms.env_assigns ~pre:(Engine.Dom.get_cvalue_or_top state)
 
   (* Evaluates the location affected by an assigns, allocates, frees or \from
      clause. Returns None if the clause cannot be interpreted. *)
@@ -348,7 +347,7 @@ module Make (Engine: Engine_sig.S) = struct
         Bottom.iter (Cvalue.V_Offsetmap.iter_on_values warn) offsm
     in
     let check_one_state state =
-      let cvalue_state = get_cvalue_or_top state in
+      let cvalue_state = Engine.Dom.get_cvalue_or_top state in
       List.iter (check_one_assign cvalue_state) assigns
     in
     List.iter check_one_state states

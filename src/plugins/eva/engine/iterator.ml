@@ -71,7 +71,6 @@ module Make_Dataflow
   module Domain = Engine.Dom
   module Transfer_stmt = Engine.Transfer_stmt
   module Transfer_logic = Engine.Transfer_logic
-  include Cvalue_domain.Getters (Domain)
 
   (* --- Analysis parameters --- *)
 
@@ -446,7 +445,7 @@ module Make_Dataflow
       record_fireable e;
     flow
 
-  let gather_cvalues states = match get_cvalue with
+  let gather_cvalues states = match Engine.Dom.get_cvalue with
     | Some get -> List.map get states
     | None -> []
 
@@ -657,7 +656,7 @@ module Make_Dataflow
         then VertexTable.memo merged_states v get_smashed_store
         else `Bottom
     and lift_to_cvalues table =
-      StmtTable.map (fun _ s -> get_cvalue_or_top s) (Lazy.force table)
+      StmtTable.map (fun _ -> Engine.Dom.get_cvalue_or_top) (Lazy.force table)
     in
     let merged_pre_states = lazy
       (StmtTable.map' (fun s (v,_) -> get_merged_states ~all:true s v) automaton.stmt_table)
@@ -680,7 +679,7 @@ module Make_Dataflow
       Cvalue_callbacks.{ before_stmts = merged_pre_cvalues;
                          after_stmts = merged_post_cvalues }
     in
-    let cvalue_init = get_cvalue_or_top initial_state in
+    let cvalue_init = Engine.Dom.get_cvalue_or_top initial_state in
     let results = `Body (states, Mem_exec.new_counter ()) in
     Cvalue_callbacks.apply_call_results_hooks callstack kf cvalue_init results;
 

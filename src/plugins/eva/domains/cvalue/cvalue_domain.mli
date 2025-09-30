@@ -25,8 +25,11 @@ val find_subpart : State.t -> prefix -> Subpart.t option
 
 (** Special getters. *)
 
-module Getters (Dom : Abstract.Domain.External) : sig
-  val get_cvalue : (Dom.t -> Cvalue.Model.t) option
-  val get_cvalue_or_top : Dom.t -> Cvalue.Model.t
-  val get_cvalue_or_bottom : Dom.t Lattice_bounds.or_bottom -> Cvalue.Model.t
+module type Getters = sig
+  type t
+  val get_cvalue : (t -> Cvalue.Model.t) option
+  val get_cvalue_or_top : t -> Cvalue.Model.t
+  val get_cvalue_or_bottom : t Lattice_bounds.or_bottom -> Cvalue.Model.t
 end
+
+module Getters (Dom : Abstract.Domain.External) : Getters with type t := Dom.t

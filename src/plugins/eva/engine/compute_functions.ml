@@ -143,8 +143,6 @@ module Make (Engine: Engine_sig.S) = struct
   module Logic = Engine.Transfer_logic
   module Spec = Engine.Transfer_specification
 
-  include Cvalue_domain.Getters (Engine.Dom)
-
   type state = Engine.Dom.t
   type loc = Engine.Loc.location
   type value = Engine.Val.t
@@ -160,11 +158,11 @@ module Make (Engine: Engine_sig.S) = struct
     | Some get -> fun location -> get location
 
   let apply_call_hooks call state =
-    let cvalue_state = get_cvalue_or_top state in
+    let cvalue_state = Engine.Dom.get_cvalue_or_top state in
     Cvalue_callbacks.apply_call_hooks call.callstack call.kf cvalue_state
 
   let apply_call_results_hooks call state =
-    let cvalue_state = get_cvalue_or_top state in
+    let cvalue_state = Engine.Dom.get_cvalue_or_top state in
     Cvalue_callbacks.apply_call_results_hooks call.callstack call.kf cvalue_state
 
   (* ----- Mem Exec cache --------------------------------------------------- *)
@@ -229,7 +227,8 @@ module Make (Engine: Engine_sig.S) = struct
     let states =
       Spec.compute_using_specification ~warn:true call spec state
     in
-    let cvalue_states = List.map (fun (_, s) -> get_cvalue_or_top s) states in
+    let get_cvalue (_key, state) = Engine.Dom.get_cvalue_or_top state in
+    let cvalue_states = List.map get_cvalue states in
     apply_call_results_hooks call state (`Spec cvalue_states);
     states, Eval.Cacheable
 
@@ -291,8 +290,8 @@ module Make (Engine: Engine_sig.S) = struct
       Engine_sig.{ states; cacheable = Cacheable; kind = `Builtin }
     | `Value final_state ->
       let cvalue_call = get_cvalue_call call in
-      let post = get_cvalue_or_top final_state in
-      let pre = get_cvalue_or_top state in
+      let post = Engine.Dom.get_cvalue_or_top final_state in
+      let pre = Engine.Dom.get_cvalue_or_top state in
       let cvalue_states =
         Builtins.apply_builtin builtin cvalue_call ~pre ~post
       in

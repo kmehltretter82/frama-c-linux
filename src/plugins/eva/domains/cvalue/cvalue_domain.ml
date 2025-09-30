@@ -493,6 +493,13 @@ let distinct_subpart (a, _) (b, _) =
 let find_subpart (s, _) prefix = Cvalue.Model.find_prefix s prefix
 
 
+module type Getters = sig
+  type t
+  val get_cvalue : (t -> Cvalue.Model.t) option
+  val get_cvalue_or_top : t -> Cvalue.Model.t
+  val get_cvalue_or_bottom : t Lattice_bounds.or_bottom -> Cvalue.Model.t
+end
+
 module Getters (Dom : Abstract.Domain.External) = struct
   let get_cvalue =
     match Dom.get State.key with

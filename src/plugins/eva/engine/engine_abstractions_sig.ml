@@ -23,7 +23,12 @@ end
 module type Location = Abstract.Location.External
 
 (** Signature of the abstract domain used in the engine. *)
-module type Domain = Abstract.Domain.External
+module type Domain = sig
+  include Abstract.Domain.External
+
+  (** Direct access to the cvalue component of the abstract domain. *)
+  include Cvalue_domain.Getters with type t := state
+end
 
 
 (* The four abstractions used in Eva (Context, Value, Location, Domain),

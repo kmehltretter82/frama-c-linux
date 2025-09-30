@@ -71,7 +71,14 @@ module Make (Abstract: Abstractions.S) = struct
      and type Dom.state = Abstract.Dom.state =
   struct
 
-    include Abstract
+    module Ctx = Abstract.Ctx
+    module Val = Abstract.Val
+    module Loc = Abstract.Loc
+
+    module Dom = struct
+      include Abstract.Dom
+      include Cvalue_domain.Getters (Abstract.Dom)
+    end
 
     module Eval = Eval'
     module Transfer_inout = Transfer_inout'
