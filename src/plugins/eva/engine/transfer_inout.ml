@@ -10,31 +10,6 @@
 
 open Eval
 
-module type S = sig
-  type location
-  type value
-  type valuation
-  val register_logic_assign :
-    Position.t -> location Eval.logic_assign -> location ->
-    Inout_access.t
-  val register_assign_lval :
-    Position.t -> valuation ->
-    Eva_ast.lval -> Eva_ast.exp ->
-    Inout_access.t
-  val register_assign_var :
-    Position.t -> valuation ->
-    Eva_ast.varinfo -> Eva_ast.exp ->
-    Inout_access.t
-  val register_read_exp :
-    Position.t -> valuation ->
-    Eva_ast.exp ->
-    Inout_access.t
-  val register_call_args :
-    Position.t -> valuation ->
-    (location, value) Eval.call ->
-    Inout_access.t
-end
-
 module Make (Engine : Engine_sig.S) = struct
   module Location = Engine.Loc
   module Eval = Engine.Eval
