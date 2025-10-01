@@ -55,11 +55,11 @@ e-acsl-gcc -I $framac_exe \
 # Check compilation return code and exit script in case of error
 if [[ $? -ne 0 ]]; then
   error_code=$?
-  printf "Error while executing e-acsl-gcc\n" > $output_log
-  printf "\nSTDOUT:\n" >> $output_log
-  cat $out_log >> $output_log
-  printf "\nSTDERR:\n" >> $output_log
-  cat $err_log >> $output_log
+  printf "Error while executing e-acsl-gcc\n" | tee $output_log
+  printf "\nSTDOUT:\n" | tee -a $output_log
+  cat $out_log | tee -a $output_log
+  printf "\nSTDERR:\n" | tee -a $output_log
+  cat $err_log | tee -a $output_log
   exit $error_code
 fi
 
@@ -69,11 +69,11 @@ $result_dir/$test_name.e-acsl 1>$exec_out_log 2>$exec_err_log
 # Check execution return code and exit script in case of error
 if [[ $? -ne 0 ]]; then
   error_code=$?
-  printf "Error while executing $result_dir/$test_name.e-acsl\n" > $output_log
-  printf "\nSTDOUT:\n" >> $output_log
-  cat $exec_out_log >> $output_log
-  printf "\nSTDERR:\n" >> $output_log
-  cat $exec_err_log >> $output_log
+  printf "Error while executing $result_dir/$test_name.e-acsl\n" | tee $output_log
+  printf "\nSTDOUT:\n" | tee -a $output_log
+  cat $exec_out_log | tee -a $output_log
+  printf "\nSTDERR:\n" | tee -a $output_log
+  cat $exec_err_log | tee -a $output_log
   exit $error_code
 fi
 
@@ -81,8 +81,8 @@ fi
 # output log
 
 ## Create temporary files
-tmp_filter_input=$(mktemp) || (printf "unable to create temp file\n" > $output_log && exit 1)
-tmp_filter_output=$(mktemp) || (printf "unable to create temp file\n" > $output_log && exit 1)
+tmp_filter_input=$(mktemp) || (printf "unable to create temp file\n" | tee $output_log && exit 1)
+tmp_filter_output=$(mktemp) || (printf "unable to create temp file\n" | tee $output_log && exit 1)
 cp $exec_err_log $tmp_filter_input
 
 ## Split the filter command on character | to extract the subcommands and apply
@@ -92,11 +92,11 @@ for filter in "${filters[@]}"; do
   cat $tmp_filter_input | $filter > $tmp_filter_output
   if [[ $? -ne 0 ]]; then
     error_code=$?
-    printf "Error while filtering output with command '$filter'\n" > $output_log
-    printf "\nFILTER INPUT:\n" >> $output_log
-    cat $tmp_filter_input >> $output_log
-    printf "\nFILTER OUTPUT:\n" >> $output_log
-    cat $tmp_filter_output >> $output_log
+    printf "Error while filtering output with command '$filter'\n" | tee $output_log
+    printf "\nFILTER INPUT:\n" | tee -a $output_log
+    cat $tmp_filter_input | tee -a $output_log
+    printf "\nFILTER OUTPUT:\n" | tee -a $output_log
+    cat $tmp_filter_output | tee -a $output_log
     exit $error_code
   fi
   cp $tmp_filter_output $tmp_filter_input
