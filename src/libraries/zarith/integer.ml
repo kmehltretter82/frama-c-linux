@@ -14,11 +14,6 @@ type 'a formatter = Format.formatter -> 'a -> unit
 (* Conversions *)
 (* ----------- *)
 
-(* These functions can raise Z.Overflow, so we make it explicit. *)
-let to_int_exn = to_int
-let to_int64_exn = to_int64
-let to_int32_exn = to_int32
-
 let wrap to_int i = try Some (to_int i) with Z.Overflow -> None
 let to_int_opt = wrap to_int
 let to_int64_opt = wrap to_int64
@@ -109,7 +104,7 @@ type digits = {
 let rec pp_digits d fmt n v =
   if gt v zero || n < d.nbits then
     begin
-      let r = to_int_exn (logand v d.bmask) in
+      let r = to_int (logand v d.bmask) in
       let k = d.bsize in
       pp_digits d fmt Stdlib.(n + k) (shift_right_trunc v k) ;
       if gt v d.bmask || Stdlib.(n + k) < d.nbits
@@ -148,9 +143,9 @@ let pretty_hex fmt v =
     if gt v two_power_60 then
       let quo, rem = ediv_rem v two_power_60 in
       aux quo;
-      Format.fprintf fmt "%015LX" (to_int64_exn rem)
+      Format.fprintf fmt "%015LX" (to_int64 rem)
     else
-      Format.fprintf fmt "%LX" (to_int64_exn v)
+      Format.fprintf fmt "%LX" (to_int64 v)
   in
   if equal v zero then Format.pp_print_string fmt "0"
   else if gt v zero then (Format.pp_print_string fmt "0x"; aux v)
@@ -175,7 +170,7 @@ let cast ~size ~signed ~value =
 let extract_bits ~start ~stop v =
   assert (geq start zero && geq stop start);
   (*Format.printf "%a[%a..%a]@\n" pretty v pretty start pretty stop;*)
-  let r = extract v (to_int_exn start) (to_int_exn (length start stop)) in
+  let r = extract v (to_int start) (to_int (length start stop)) in
   (*Format.printf "%a[%a..%a]=%a@\n" pretty v pretty start pretty stop pretty r;*)
   r
 
@@ -233,3 +228,8 @@ let c_div_rem = div_rem
 
 let pgcd = gcd
 let ppcm = lcm
+
+(* These functions can raise Z.Overflow, so we make it explicit. *)
+let to_int_exn = to_int
+let to_int32_exn = to_int32
+let to_int64_exn = to_int64

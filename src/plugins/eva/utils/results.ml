@@ -654,7 +654,7 @@ let as_integer evaluation =
 
 let as_int evaluation =
   try
-    Result.map Integer.to_int_exn (as_integer evaluation)
+    Result.map Integer.to_int (as_integer evaluation)
   with Z.Overflow ->
     Result.error Top
 

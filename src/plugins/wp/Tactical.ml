@@ -131,7 +131,7 @@ let selected = function
   | Multi _s -> e_true (* For now, do not provide this *)
 
 let get_int_z z =
-  try Some (Integer.to_int_exn z) with Z.Overflow -> None
+  try Some (Integer.to_int z) with Z.Overflow -> None
 
 let get_int = function
   | Empty -> None

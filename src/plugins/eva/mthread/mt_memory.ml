@@ -175,7 +175,7 @@ let extract_pointer value =
   | Base.Var (v, _), i
   | Base.Allocated (v, _, _), i ->
     begin
-      try Result.Ok (v, Integer.to_int_exn (Ival.project_int i))
+      try Result.Ok (v, Integer.to_int (Ival.project_int i))
       with Ival.Not_Singleton_Int | Z.Overflow ->
         error "Not a correct pointer, incorrect offset: %a" Ival.pretty i
     end
@@ -184,7 +184,7 @@ let extract_pointer value =
       Cvalue.V.pretty value
 
 let to_int i =
-  try Result.Ok (Integer.to_int_exn i)
+  try Result.Ok (Integer.to_int i)
   with Z.Overflow -> error "Overflow on integer %a" Integer.pretty i
 
 let extract_int value =
@@ -210,7 +210,7 @@ let extract_int_list ~cardinal value =
     then
       Ival.to_int_seq ival |>
       List.of_seq |>
-      List.map Integer.to_int_exn |>
+      List.map Integer.to_int |>
       Result.ok
     else error "Imprecise value: %a" Ival.pretty ival
   with

@@ -48,7 +48,7 @@ let zero_or_one = [| Int.zero ; Int.one |]
 let inject_singleton e = [| e |]
 
 let inject_periodic ~from ~period ~number =
-  let l = Int.to_int_exn number in
+  let l = Int.to_int number in
   let s = Array.make l Int.zero in
   let v = ref from in
   let i = ref 0 in
@@ -104,7 +104,7 @@ type set_or_itv =
 let fuse_intervals s =
   (* Add interval [b..e[ to the list [acc]. The interval can be a singleton. *)
   let add_itv acc (b, e) =
-    let nb = Int.to_int_exn (Int.sub e b) in
+    let nb = Int.to_int (Int.sub e b) in
     (* If the interval is too small, uses a Set instead of Itv. *)
     if nb > 3
     then Itv (b, Int.pred e) :: acc
@@ -613,7 +613,7 @@ let complement_under ~min ~max set =
   let card = Int.succ (Int.sub e b) in
   if Int.(leq card zero) then `Bottom
   else if Int.leq card (Int.of_int !small_cardinal)
-  then `Set (Array.init (Int.to_int_exn card) (fun i -> Int.add b (Int.of_int i)))
+  then `Set (Array.init (Int.to_int card) (fun i -> Int.add b (Int.of_int i)))
   else `Top (b, e, Int.one)
 
 (* ------------------------------ Arithmetics ------------------------------- *)

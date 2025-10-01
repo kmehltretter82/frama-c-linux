@@ -227,7 +227,7 @@ let translate_lval lval = match lval.node with
 
 let translate_constant = function
   | CInt64 (i, _, _) -> begin
-      try Coeff.s_of_int (Integer.to_int_exn i) (* TODO: skip OCaml int type *)
+      try Coeff.s_of_int (Integer.to_int i) (* TODO: skip OCaml int type *)
       with Z.Overflow | Failure _ -> raise (Out_of_Scope "translate_constant big int")
     end
   | _ -> raise (Out_of_Scope "translate_constant not integer")

@@ -119,7 +119,7 @@ module Value = struct
       let ival = Cvalue.V.project_ival cvalue in
       match Ival.project_small_set ival with
       | Some l ->
-        Result.ok (List.map Integer.to_int_exn l)
+        Result.ok (List.map Integer.to_int l)
       | None ->
         Result.error "Too many values to enumerate, try increasing ilevel."
     with Cvalue.V.Not_based_on_null | Ival.Not_Singleton_Int ->

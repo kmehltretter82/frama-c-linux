@@ -79,23 +79,14 @@ val of_int : int -> t
 val of_int32 : Int32.t -> t
 val of_int64 : Int64.t -> t
 
-(**
-   @raise Z.Overflow if too big
-   @since 24.0-Chromium
-*)
-val to_int_exn : t -> int
+val to_int : t -> int
+(** @raise Z.Overflow if too big *)
 
-(**
-   @raise Z.Overflow if too big
-   @since 24.0-Chromium
-*)
-val to_int32_exn : t -> int32
+val to_int32 : t -> Int32.t
+(** @raise Z.Overflow if too big *)
 
-(**
-   @raise Z.Overflow if too big
-   @since 24.0-Chromium
-*)
-val to_int64_exn : t -> int64
+val to_int64 : t -> Int64.t
+(** @raise Z.Overflow if too big *)
 
 (**
    Returns [Some i] if the number can be converted to an [int],
@@ -396,3 +387,28 @@ val ppcm : t -> t -> t
 (** [ppcm v 0 == ppcm 0 v == 0]. Result is always positive. *)
 [@@deprecated "Use lcm instead."]
 [@@migrate { repl = Rel.lcm } ]
+
+
+(**
+   @raise Z.Overflow if too big
+   @since 24.0-Chromium
+*)
+val to_int_exn : t -> int
+[@@deprecated "Use to_int instead."]
+[@@migrate { repl = Rel.to_int } ]
+
+(**
+   @raise Z.Overflow if too big
+   @since 24.0-Chromium
+*)
+val to_int32_exn : t -> int32
+[@@deprecated "Use to_int32 instead."]
+[@@migrate { repl = Rel.to_int32 } ]
+
+(**
+   @raise Z.Overflow if too big
+   @since 24.0-Chromium
+*)
+val to_int64_exn : t -> int64
+[@@deprecated "Use to_int64 instead."]
+[@@migrate { repl = Rel.to_int64 } ]

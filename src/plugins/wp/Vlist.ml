@@ -168,7 +168,7 @@ let rewrite_length e =
 let match_natural k =
   match F.repr k with
   | L.Kint z ->
-    let k = try Integer.to_int_exn z with Z.Overflow -> raise Not_found in
+    let k = try Integer.to_int z with Z.Overflow -> raise Not_found in
     if 0 <= k then k else raise Not_found
   | _ -> raise Not_found
 

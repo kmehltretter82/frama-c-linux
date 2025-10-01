@@ -93,7 +93,7 @@ class engine =
 
     method pp_int _ fmt z =
       try
-        let n = Integer.to_int_exn z in
+        let n = Integer.to_int z in
         if -256 <= n && n <= 256 then
           Format.pp_print_int fmt n
         else

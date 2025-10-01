@@ -50,14 +50,14 @@ module Type : Type = struct
 
   let inject_singleton e =
     if Int.leq 0z e && Int.leq e 32z
-    then small_nums.(Int.to_int_exn e)
+    then small_nums.(Int.to_int e)
     else Int (Int_val.inject_singleton e)
 
   let inject_int i =
     try
       let e = Int_val.project_int i in
       if Int.leq Int.zero e && Int.leq e 32z
-      then small_nums.(Int.to_int_exn e)
+      then small_nums.(Int.to_int e)
       else Int i
     with Int_val.Not_Singleton ->
       if Int_val.(equal top i) then top else Int i
@@ -226,7 +226,7 @@ let inject_interval ~min ~max ~rem ~modu =
 let subdivide ~size = function
   | Bottom -> raise Can_not_subdiv
   | Float fval ->
-    let fkind = match Integer.to_int_exn size with
+    let fkind = match Integer.to_int size with
       | 32 -> Fval.Single
       | 64 -> Fval.Double
       | _ -> raise Can_not_subdiv (* see Value/Value#105 *)
@@ -956,10 +956,10 @@ let reinterpret_as_float kind i =
     in
     match kind with
     | Cil_types.FDouble ->
-      let conv v = Fval.F.of_float (Int64.float_of_bits (Int.to_int64_exn v)) in
+      let conv v = Fval.F.of_float (Int64.float_of_bits (Int.to_int64 v)) in
       reinterpret 64 Fval.Double Typed_float.Double conv
     | Cil_types.FFloat ->
-      let conv v = Fval.F.of_float(Int32.float_of_bits (Int.to_int32_exn v)) in
+      let conv v = Fval.F.of_float(Int32.float_of_bits (Int.to_int32 v)) in
       reinterpret 32 Fval.Single Typed_float.Single conv
     | Cil_types.FLongDouble ->
       (* currently always imprecise *)

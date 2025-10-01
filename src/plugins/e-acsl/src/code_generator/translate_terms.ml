@@ -69,7 +69,7 @@ let constant_to_exp ~loc env t c =
        Analyses_types.Str_Z
      (* too large integer *)
      | C_float fkind ->
-       Cil.kfloat ~loc fkind (Int64.to_float (Integer.to_int64_exn n)), C_number
+       Cil.kfloat ~loc fkind (Int64.to_float (Integer.to_int64 n)), C_number
      | C_integer kind ->
        let cast = Typing.get_cast ~logic_env t in
        match cast, kind with

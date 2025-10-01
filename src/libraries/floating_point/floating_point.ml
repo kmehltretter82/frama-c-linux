@@ -167,7 +167,7 @@ let smallest_denormal_float_of = function
 let unit_in_the_last_place_of format = ldexp 1.0 (- sig_size format)
 
 (* Only compute 2^7 or 2^10 below, so no overflow. *)
-let two_power n = Integer.(to_int_exn (two_power_of_int n))
+let two_power n = Integer.(to_int (two_power_of_int n))
 
 let minimal_exponent_of format = 2 - two_power (exp_size format - 1)
 let maximal_exponent_of format = two_power (exp_size format - 1) - 1

@@ -129,7 +129,7 @@ and compile_context_insensitive {Interlang.enode; origin} =
                 (Str (Integer.to_string n)))),
         Str_Z
       | C_float fkind ->
-        Cil.kfloat ~loc fkind (Int64.to_float (Integer.to_int64_exn n)), C_number
+        Cil.kfloat ~loc fkind (Int64.to_float (Integer.to_int64 n)), C_number
       | C_integer kind ->
         match cast, kind with
         | Some ty, (ILongLong | IULongLong) when Gmp_types.Z.is_t ty ->

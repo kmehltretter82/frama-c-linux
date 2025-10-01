@@ -152,13 +152,13 @@ struct
   let ranges rg =
     Tmap.interf
       (fun _ a b ->
-         try Some(Integer.to_int_exn a,Integer.to_int_exn b)
+         try Some(Integer.to_int a,Integer.to_int b)
          with Z.Overflow -> None
       ) rg.vmin rg.vmax
 
   let small = function
     | None -> None
-    | Some z -> try Some(Integer.to_int_exn z) with Z.Overflow -> None
+    | Some z -> try Some(Integer.to_int z) with Z.Overflow -> None
 
   let bounds rg =
     Tmap.merge
