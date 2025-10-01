@@ -67,12 +67,15 @@ val predicate_to_exp_ref:
    predicate ->
    exp * Assert.t * Env.t) ref
 
-val term_to_exp_ref:
-  (adata:Assert.t ->
-   kernel_function ->
-   Env.t ->
-   term ->
-   exp * Assert.t * Env.t) ref
+module Translate_terms : sig
+  val to_exp_ref:
+    (adata:Assert.t ->
+     ?inplace:bool ->
+     kernel_function ->
+     Env.t ->
+     term ->
+     exp * Assert.t * Env.t) ref
+end
 
 val gmp_to_sizet_ref:
   (adata:Assert.t ->

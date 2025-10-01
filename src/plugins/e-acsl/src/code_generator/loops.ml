@@ -28,14 +28,17 @@ let predicate_to_exp_ref
   ref (fun ~adata:_ _kf _env _p ->
       Extlib.mk_labeled_fun "predicate_to_exp_ref")
 
-let term_to_exp_ref
-  : (adata:Assert.t ->
-     kernel_function ->
-     Env.t ->
-     term ->
-     exp * Assert.t * Env.t) ref
-  =
-  ref (fun ~adata:_ _kf _env _t -> Extlib.mk_labeled_fun "term_to_exp_ref")
+module Translate_terms = struct
+  let to_exp_ref
+    : (adata:Assert.t ->
+       ?inplace:bool ->
+       kernel_function ->
+       Env.t ->
+       term ->
+       exp * Assert.t * Env.t) ref
+    = ref @@ fun ~adata:_ ?inplace:_ _kf _env _t -> Extlib.mk_labeled_fun "Loops.Translate_terms.to_exp_ref"
+  let to_exp ~adata ?inplace kf env t = !to_exp_ref ~adata ?inplace kf env t
+end
 
 (**************************************************************************)
 (************************* Loop annotations *******************************)
@@ -58,7 +61,7 @@ let handle_annotations env kf stmt =
              let open Current_loc.Operators in
              let<> UpdatedCurrentLoc = t.term_loc in
              if Gmp_types.is_t ty then Error.not_yet "loop variant using GMP";
-             let e, _, env = !term_to_exp_ref ~adata:Assert.no_data kf env t in
+             let e, _, env = Translate_terms.to_exp ~adata:Assert.no_data kf env t in
              let vi_old, e_old, env =
                Env.new_var
                  ~loc
@@ -98,7 +101,7 @@ let handle_annotations env kf stmt =
             in
             let logic_env = Env.Logic_env.get env in
             Typing.preprocess_term ~use_gmp_opt:true ~logic_env tapp;
-            let e, _, env = !term_to_exp_ref ~adata:Assert.no_data kf env t in
+            let e, _, env = Translate_terms.to_exp ~adata:Assert.no_data kf env t in
             let e_tapp, _, env =
               Logic_functions.app_to_exp
                 ~adata:Assert.no_data
@@ -204,7 +207,7 @@ let handle_annotations env kf stmt =
                    the old value and the current value, we need to retrieve the
                    expression for the term [t]. *)
                 let e, _, env =
-                  !term_to_exp_ref ~adata:Assert.no_data kf env t
+                  Translate_terms.to_exp ~adata:Assert.no_data kf env t
                 in
                 Assert.register
                   ~loc
@@ -268,7 +271,6 @@ let handle_annotations env kf stmt =
 (**************************** Nested loops ********************************)
 (**************************************************************************)
 let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
-  let term_to_exp = !term_to_exp_ref ~adata:Assert.no_data in
   let logic_env = Env.Logic_env.get env in
   match lscope_vars with
   | [] ->
@@ -306,7 +308,7 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
       mk_nested_loops ~loc mk_innermost_block kf env lscope_vars'
     in
     (* initialize the loop counter to [t1] *)
-    let e1, _, env = term_to_exp kf (Env.push env) t1 in
+    let e1, _, env = Translate_terms.to_exp ~adata:Assert.no_data kf (Env.push env) t1 in
     let init_blk, env = Env.pop_and_get
         env
         (Gmp.assign ~loc:e1.eloc lv_x x e1)
@@ -334,7 +336,7 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
       ~use_gmp_opt:false
       ~ctx:Typing.c_int
       ~logic_env guard;
-    let guard_exp, _, env = term_to_exp kf (Env.push env) guard in
+    let guard_exp, _, env = Translate_terms.to_exp ~adata:Assert.no_data kf (Env.push env) guard in
     let break_stmt = Smart_stmt.break ~loc:guard_exp.eloc in
     let guard_blk, env = Env.pop_and_get
         env
@@ -350,7 +352,7 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
     (* increment the loop counter [x++];
        previous typing ensures that [x++] fits type [ty] *)
     let tlv_one = t_plus_one ~ty:ctx tlv in
-    let incr, _, env = term_to_exp kf (Env.push env) tlv_one in
+    let incr, _, env = Translate_terms.to_exp ~adata:Assert.no_data kf (Env.push env) tlv_one in
     let next_blk, env = Env.pop_and_get
         env
         (Gmp.assign ~loc:incr.eloc lv_x x incr)
@@ -404,7 +406,7 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
   | Lvs_let(lv, t) :: lscope_vars' ->
     let ty = Typing.get_typ ~logic_env t in
     let vi_of_lv, exp_of_lv, env = Env.Logic_binding.add ~ty env kf lv in
-    let e, _, env = term_to_exp kf env t in
+    let e, _, env = Translate_terms.to_exp ~adata:Assert.no_data kf env t in
     let let_stmt = Gmp.init_set ~loc (Cil.var vi_of_lv) exp_of_lv  e in
     let stmts, env =
       mk_nested_loops ~loc mk_innermost_block kf env lscope_vars'

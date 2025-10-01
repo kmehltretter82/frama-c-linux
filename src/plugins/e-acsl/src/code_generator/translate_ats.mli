@@ -63,13 +63,15 @@ end
 (********************** Forward references ********************************)
 (**************************************************************************)
 
-val term_to_exp_ref:
-  (adata:Assert.t ->
-   ?inplace:bool ->
-   kernel_function ->
-   Env.t ->
-   term ->
-   exp * Assert.t * Env.t) ref
+module Translate_terms : sig
+  val to_exp_ref:
+    (adata:Assert.t ->
+     ?inplace:bool ->
+     kernel_function ->
+     Env.t ->
+     term ->
+     exp * Assert.t * Env.t) ref
+end
 
 val predicate_to_exp_ref:
   (adata:Assert.t ->
