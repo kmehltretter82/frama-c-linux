@@ -661,7 +661,7 @@ struct
     let is_set = Dir_name.is_set
 
     let expected ~dir path =
-      if dir <> Filesystem.is_dir path then
+      if dir <> Filesystem.dir_exists path then
         P.L.abort "%a is expected to be a %s"
           pretty path (if dir then "directory" else "file")
 

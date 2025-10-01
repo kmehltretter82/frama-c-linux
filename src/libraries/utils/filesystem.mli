@@ -44,10 +44,14 @@ val dir_exists: Filepath.t -> bool
     Returns [false] if any errors happen when [stat]'ing the file.
     @since 22.0-Titanium *)
 val is_file: Filepath.t -> bool
+[@@deprecated "use file_exists instead."]
+[@@migrate { repl = Rel.file_exists }]
 
 (** Equivalent to [Sys.is_directory].
     @since 28.0-Nickel *)
 val is_dir: Filepath.t -> bool
+[@@deprecated "use dir_exists instead."]
+[@@migrate { repl = Rel.dir_exists }]
 
 (** Contents of a directory.
     @since 31.0-Gallium *)

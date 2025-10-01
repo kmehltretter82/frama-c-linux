@@ -58,7 +58,7 @@ let get_usable_dir ?(make=false) () =
   let parents = is_session_dir path in
   if not (Filesystem.exists path) && make then
     ignore (Filesystem.make_dir ~parents path 0o755);
-  if not (Filesystem.is_dir path) then begin
+  if not (Filesystem.dir_exists path) then begin
     Wp_parameters.warning ~current:false ~once:true
       "Cache path %a is not a directory"
       Filepath.pretty path;

@@ -371,7 +371,7 @@ let () =
     fun () ->
       if not (Senv.Doc.is_empty ()) then
         let root = Senv.Doc.get () in
-        if Filesystem.is_dir root then
+        if Filesystem.dir_exists root then
           begin
             Senv.feedback "[doc] Root: '%a'" Filepath.pretty root ;
             Package.iter package ;

@@ -15,7 +15,7 @@ let dot_file = ref Filepath.empty
 (* Performs some checks before calling [open_in f], reporting ["errmsg: <f>"]
    in case of error. *)
 let check_and_open_in (f : Filepath.t) errmsg =
-  if not (Filesystem.is_file f) then
+  if not (Filesystem.file_exists f) then
     Aorai_option.abort "%s: %a" errmsg Filepath.pretty f;
   open_in (Filepath.to_string_abs f)
 

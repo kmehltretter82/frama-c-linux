@@ -1118,8 +1118,7 @@ let make_gui_dir () =
       try Sys.getenv "HOME" (*Unix like*) with Not_found ->
         "." in
     let dir = Fc_Filepath.of_string (home ^ "/" ^ ".frama-c-wp") in
-    if Filesystem.exists dir && Filesystem.is_dir dir then
-      Filesystem.remove_dir dir;
+    Filesystem.remove_dir dir;
     make_output_dir dir ; dir
   with _ ->
     make_tmp_dir ()
@@ -1162,8 +1161,7 @@ let get_output_dir d =
 let default = Fc_Filepath.(concat (pwd ()) "/.frama-c")
 
 let has_session () =
-  Session.is_set () ||
-  ( Filesystem.exists default && Filesystem.is_dir default )
+  Session.is_set () || Filesystem.dir_exists default
 
 let get_session ~force () =
   if force then
