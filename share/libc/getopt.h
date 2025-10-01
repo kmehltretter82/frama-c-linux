@@ -28,9 +28,13 @@ struct option
 # define optional_argument	2
 
 
-/*@ 
-  assigns \result, *optarg, optind, opterr, optopt, *(longopts[0..].flag)
-             \from argc, argv[0..argc-1], shortopts[0..], longopts[0..];
+/*@
+  assigns \result, optind, opterr, optopt, *(longopts[0..].flag)
+    \from indirect:argc, indirect:argv[0 .. argc-1][0..],
+          indirect:shortopts[0..], indirect:longopts[0..];
+  assigns optarg
+    \from indirect:argc, argv[0 .. argc-1],
+          indirect:shortopts[0..], indirect:longopts[0..];
  */
 extern int getopt_long (int argc, char *const argv[],
 			const char *shortopts,
