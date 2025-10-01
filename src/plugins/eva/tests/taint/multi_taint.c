@@ -1,5 +1,5 @@
 /* run.config*
-   STDOPT: +" -eva-domains taint -eva-msg-key=d-taint -eva-auto-taint -eva-no-taint-singletons"
+   STDOPT: +"-eva-auto-taint -eva-no-taint-singletons"
 */
 #include "__fc_builtin.h"
 #include <stdio.h>
