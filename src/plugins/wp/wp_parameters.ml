@@ -1092,8 +1092,10 @@ let has_out () = not @@ Fc_Filepath.is_empty (OutputDir.get ())
 
 let make_output_dir dir =
   try
-    if Filesystem.make_dir ~parents:true dir 0o770 then
+    if not @@ Filesystem.dir_exists dir then begin
+      Filesystem.make_dir ~perm:0o770 dir;
       debug ~dkey "Created output directory '%a'" Fc_Filepath.pretty dir
+    end
   with Unix.Unix_error (err,_,_) ->
     let msg = Unix.error_message err in
     abort

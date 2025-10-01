@@ -563,7 +563,7 @@ let generate () =
           let out = OUT.get () in
           let dir = Filepath.(out / path) in
           let file = Filepath.(dir / "index.ts") in
-          ignore (Filesystem.make_dir ~parents:true dir 0o755) ;
+          Filesystem.make_dir dir ;
           Filesystem.with_formatter_exn file (makePackage pkg path) ;
         end
     end

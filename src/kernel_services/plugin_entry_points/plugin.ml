@@ -387,7 +387,7 @@ struct
           Fc_Filepath.pretty path (if dir then "directory" else "file")
 
     let mk_dir d =
-      try ignore @@ Filesystem.make_dir ~parents:true d 0o755
+      try Filesystem.make_dir d
       with Unix.Unix_error _ ->
         L.abort "cannot create %s directory `%a'" D.name Fc_Filepath.pretty d
 

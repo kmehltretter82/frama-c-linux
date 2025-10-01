@@ -86,27 +86,20 @@ let rec remove_dir (p : t) =
 let rename (s : t) (t : t) =
   Sys.rename (Filepath.to_string_abs s) (Filepath.to_string_abs t)
 
-let rec make_dir ?(parents=false) (p: t) perm =
-  if exists p then
-    if not (is_dir p) then
-      failwith (Format.asprintf "mkdir: %a exists but is not a directory"
-                  Filepath.pretty p)
-    else false
-  else begin
-    begin
-      try Unix.mkdir (Filepath.to_string_abs p) perm
-      with
-      | Unix.Unix_error (Unix.ENOENT,_,_) when parents ->
-        let parent = Filepath.dirname p in
-        if p <> parent then
-          begin
-            ignore (make_dir ~parents parent perm);
-            Unix.mkdir (Filepath.to_string_abs p) perm
-          end
-      | e -> raise e
-    end;
-    true
-  end
+let rec make_dir ?(parents=true) ?(perm=0o755) (p: t) =
+  try
+    Unix.mkdir (Filepath.to_string_abs p) perm
+  with
+  | Unix.Unix_error (Unix.ENOENT,_,_) when parents ->
+    let parent = Filepath.dirname p in
+    if p <> parent then (* Prevent infinite recursion; can it ever happen ? *)
+      make_dir ~parents ~perm parent;
+    Unix.mkdir (Filepath.to_string_abs p) perm
+  | Unix.Unix_error (Unix.EEXIST,_,_) ->
+    if not (dir_exists p) then
+      failwith @@
+      Format.asprintf "mkdir: %a exists but is not a directory"
+        Filepath.pretty p
 
 
 (* -------------------------------------------------------------------------- *)
@@ -322,3 +315,14 @@ let%test _ = file_exists (_test_file ())
 let%test _ = not (file_exists (_test_dir ()))
 let%test _ = not (dir_exists (_test_file ()))
 let%test _ = dir_exists (_test_dir ())
+let%test _ =
+  try make_dir (_test_file ()); false (* path exists and is not a directory *)
+  with Failure _ -> true
+let%test _ =
+  let p = _test_filename () in
+  make_dir p;
+  dir_exists p
+let%test _ =
+  let p = _test_filename () in
+  make_dir (p / "subdir");
+  dir_exists (p / "subdir")

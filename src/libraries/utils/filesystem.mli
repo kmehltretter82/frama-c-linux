@@ -65,20 +65,18 @@ val iter_dir: (string -> unit) -> Filepath.t -> unit
     @since 31.0-Gallium *)
 val fold_dir: (string -> 'a -> 'a) -> Filepath.t -> 'a -> 'a
 
-(** [make_dir ?parents name perm] creates directory [name] with permission
-    [perm]. If [parents] is true, recursively create parent directories
-    if needed. [parents] defaults to false.
+(** [make_dir ?parents ?perm filepath] creates directory [filepath] with
+    permission [perm] (default is 0o755)). If [parents] is true (the default),
+    recursively create parent directories if needed.
     Note that this function may create some of the parent directories
     and then fail to create the children, e.g. if [perm] does not allow
     user execution of the created directory. This will leave the filesystem
     in a modified state before raising an exception.
-    Returns [true] if the directory was created, [false] otherwise.
     @raise Unix.Unix_error if cannot create [name] or its parents.
-    @raise Failure if the path exists but is not a directory
     @since 19.0-Potassium
     @before 28.0-Nickel [name] argument was of type [string] and the returned
     type was [unit]. Also, the function did not check for path's existence. *)
-val make_dir : ?parents:bool -> Filepath.t -> Unix.file_perm -> bool
+val make_dir : ?parents:bool -> ?perm:int -> Filepath.t -> unit
 
 (** Tries to delete a file and never fails.
     @before 31.0-Gallium it was Extlib.safe_remove *)
