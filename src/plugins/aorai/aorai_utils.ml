@@ -177,10 +177,10 @@ let isCrossableAtInit tr func =
               with Division_by_zero -> t)
            | Shiftlt, TConst(Integer(i1,_)), TConst(Integer(i2,_)) ->
              { t with term_node =
-                        TConst(Integer(Integer.shift_left i1 i2,None)) }
+                        TConst(Integer(Integer.shift_left_z i1 i2,None)) }
            | Shiftrt, TConst(Integer(i1,_)), TConst(Integer(i2,_)) ->
              { t with term_node =
-                        TConst(Integer(Integer.shift_right i1 i2,None)) }
+                        TConst(Integer(Integer.shift_right_z i1 i2,None)) }
            | Lt, _, _ -> comparison ((<) 0) t1 t2
            | Gt, _, _ -> comparison ((>) 0) t1 t2
            | Le, _, _ -> comparison ((<=) 0) t1 t2

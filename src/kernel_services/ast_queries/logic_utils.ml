@@ -2500,8 +2500,8 @@ and constFoldBinOpToInt ~machdep bop e1 e2 =
       | BOr -> Some (Integer.logor i1 i2)
       | BXor -> Some (Integer.logxor i1 i2)
 
-      | Shiftlt when Integer.(geq i2 zero) -> Some (Integer.shift_left i1 i2)
-      | Shiftrt when Integer.(geq i2 zero) -> Some (Integer.shift_right i1 i2)
+      | Shiftlt when Integer.(geq i2 zero) -> Some (Integer.shift_left_z i1 i2)
+      | Shiftrt when Integer.(geq i2 zero) -> Some (Integer.shift_right_z i1 i2)
       | Shiftlt | Shiftrt -> None
 
       | Cil_types.Eq -> comp Integer.equal

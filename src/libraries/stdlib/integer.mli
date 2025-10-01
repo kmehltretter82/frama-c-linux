@@ -17,8 +17,7 @@ type 'a formatter = Format.formatter -> 'a -> unit
 (** {3 Operators} *)
 (**************************************************************************)
 
-(** This module contains all Z operators. [lsl] and [asr] are using our own
-    functions {!Integer.shift_left} and {!Integer.shift_right}.
+(** This module contains all Z operators.
     @since Frama-C+dev
 *)
 module Operators : sig
@@ -54,11 +53,11 @@ module Operators : sig
   val (~!): t -> t
   (** Bit-wise logical negation {!Z.lognot}. *)
 
-  val (lsl): t -> t -> t
-  (** Bit-wise shift to the left {!Integer.shift_left}. *)
+  val (lsl): t -> int -> t
+  (** Bit-wise shift to the left {!Z.shift_left}. *)
 
-  val (asr): t -> t -> t
-  (** Bit-wise shift to the right {!Integer.shift_right}. *)
+  val (asr): t -> int -> t
+  (** Bit-wise shift to the right {!Z.shift_right}. *)
 
   val ( ~$ ) : int -> t
   (** Conversion from [int] using {!Z.of_int}. *)
@@ -67,8 +66,8 @@ module Operators : sig
   (** Power {!Z.pow}. *)
 end
 
-(** {!Operators} module is included to have operators at top level, but still
-    allow to open only instead of {!Integer} when needed.
+(** {!Operators} module is included to have operators at top level, but kept
+    to allow openning only operators when needed.
 *)
 include module type of Operators
 
@@ -176,11 +175,21 @@ val two_power_of_int : int -> t
 val power_int_positive_int_opt : int -> int -> t option
 (** Exponentiation *)
 
-val shift_left : t -> t -> t
-(** @raise Invalid_argument if second argument (count) is negative *)
+val shift_left : t -> int -> t
+(** Implemented by [Z.shift_left]. *)
 
-val shift_right : t -> t -> t
-(** @raise Invalid_argument if second argument (count) is negative *)
+val shift_right : t -> int -> t
+(** Implemented by [Z.shift_right]. *)
+
+val shift_left_z : t -> t -> t
+(** Convert the second argument via {!of_int} then call {!Z.shift_left}.
+    @since Frama-C+dev
+*)
+
+val shift_right_z : t -> t -> t
+(** Convert the second argument via {!of_int} then call {!Z.shift_right}.
+    @since Frama-C+dev
+*)
 
 val shift_right_logical : t -> t -> t
 (** @raise Invalid_argument if any argument is negative *)

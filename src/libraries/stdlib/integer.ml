@@ -43,12 +43,12 @@ let power_int_positive_int_opt n e =
   with Invalid_argument _ -> None
 
 (* We redefine shifts to operate on t instead of int. *)
-let shift_left x y = shift_left x (to_int y)
-let shift_right x y = shift_right x (to_int y)
+let shift_left_z x y = shift_left x (to_int y)
+let shift_right_z x y = shift_right x (to_int y)
 let shift_right_logical x y = (* no meaning for negative value of x *)
   if (lt x zero)
   then raise (Invalid_argument "Integer.shift_right_logical")
-  else shift_right x y
+  else shift_right_z x y
 
 let is_zero v = equal v zero
 let is_one  v = equal v one
@@ -207,14 +207,14 @@ module Operators = struct
   let ( lor )  = ( lor )
   let ( lxor ) = ( lxor )
   let ( ~! )  = ( ~! )
-  let ( lsl ) = shift_left
-  let ( asr ) = shift_right
+  let ( lsl ) = ( lsl )
+  let ( asr ) = ( asr )
   let ( ~$ ) = ( ~$ )
   let ( ** ) = ( ** )
 end
 
-(* We want our own shift operators and relationnal operators at top level. *)
-include Operators
+(* We also want relationnal operators at top level. *)
+include Compare
 
 (* Deprecated *)
 
@@ -240,3 +240,4 @@ let e_div_rem = ediv_rem
 let c_div = div
 let c_rem = rem
 let c_div_rem = div_rem
+

@@ -506,8 +506,7 @@ let smp_bitk_positive = function
       match F.repr a with
       | Logic.Kint za ->
         let zk = match_positive_or_null_integer k (* simplifies constants *)
-        in if Integer.is_zero (Integer.logand za
-                                 (Integer.shift_left Integer.one zk))
+        in if Integer.(is_zero (za land (shift_left_z one zk)))
         then e_false else e_true
       | Logic.Fun( f , [e;n] ) when Fun.equal f f_lsr
                                  && is_positive_or_null n ->
@@ -735,7 +734,7 @@ let smp_eq_with_lsl_cst a0 b0 =
       e_false
     else
       (* a2>=0 && 0==(b1 & ((2**a2)-1)) ==> ( (e<<a2)==b1 <==> e==(b1>>a2) ) *)
-      e_eq e (e_zint (Integer.shift_right b1 a2))
+      e_eq e (e_zint (Integer.shift_right_z b1 a2))
   with Not_found -> (* looks at the fistt arg of a0 *)
     let a1,e= match_integer_arg1 es in
     if is_negative e then raise Not_found ;
@@ -802,7 +801,7 @@ let smp_eq_with_lsr a0 b0 =
     *)
     (* build (e&~((2**a2)-1)) == (b1<<a2) *)
     e_eq
-      (e_zint (Integer.shift_left b1 a2))
+      (e_zint (Integer.shift_left_z b1 a2))
       (e_fun f_land [e_zint (Integer.lognot (two_power_k_minus1 a2));e])
   with Not_found ->
     (* This rule takes into account several cases.
@@ -883,9 +882,9 @@ let () =
         let bi_land = mk_builtin "f_land" f_land ~eq:smp_eq_with_land ~leq:smp_leq_with_land
             smp_land in
         let bi_lsl  = mk_builtin "f_lsl" f_lsl ~eq:smp_eq_with_lsl ~leq:smp_leq_with_lsl
-            (smp_shift Integer.shift_left) in
+            (smp_shift Integer.shift_left_z) in
         let bi_lsr  = mk_builtin "f_lsr" f_lsr ~eq:smp_eq_with_lsr ~leq:smp_leq_with_lsr
-            (smp_shift Integer.shift_right) in
+            (smp_shift Integer.shift_right_z) in
 
         List.iter
           begin fun (_name, { f; eq; leq; smp }) ->
@@ -1388,16 +1387,16 @@ module Masks = struct
     try
       let n = match_positive_or_null_integer n in
       let v = eval_exn ctx x in (* may raise Bottom *)
-      mk ~set:(Integer.shift_right v.set n) (* cannot build a bottom *)
-        ~unset:(Integer.shift_right v.unset n)
+      mk ~set:(Integer.shift_right_z v.set n) (* cannot build a bottom *)
+        ~unset:(Integer.shift_right_z v.unset n)
     with Not_found -> top
 
   let eval_lsl eval_exn ctx x n =
     try
       let n = match_positive_or_null_integer n in
       let v = eval_exn ctx x in (* may raise Bottom *)
-      mk ~set:(Integer.shift_left v.set n) (* cannot build a bottom *)
-        ~unset:(Integer.shift_left v.unset n)
+      mk ~set:(Integer.shift_left_z v.set n) (* cannot build a bottom *)
+        ~unset:(Integer.shift_left_z v.unset n)
     with Not_found -> top
 
   let eval_to_cint eval_exn ctx iota e =
@@ -1484,8 +1483,8 @@ module Masks = struct
   let reduce_lsr reduce_exn ctx v e n =
     try (* yes, that uses the opposite shift *)
       let n = match_positive_or_null_integer n in
-      reduce_exn ctx e (mk ~set:(Integer.shift_left v.set   n)
-                          ~unset:(Integer.shift_left v.unset n))
+      reduce_exn ctx e (mk ~set:(Integer.shift_left_z v.set   n)
+                          ~unset:(Integer.shift_left_z v.unset n))
     with Not_found -> ctx
 
   let reduce_lsl narrow_exn t reduce_exn ctx v e n =
@@ -1493,8 +1492,8 @@ module Masks = struct
       let n = match_positive_or_null_integer n in
       (* the lowest bits of the left shift have to be set *)
       let ctx = narrow_exn ctx t { top with unset = two_power_k_minus1 n } in
-      reduce_exn ctx e (mk ~set:(Integer.shift_right v.set n)
-                          ~unset:(Integer.shift_right v.unset n))
+      reduce_exn ctx e (mk ~set:(Integer.shift_right_z v.set n)
+                          ~unset:(Integer.shift_right_z v.unset n))
     with Not_found -> ctx
 
 end

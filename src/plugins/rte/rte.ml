@@ -309,8 +309,7 @@ let shift_overflow_assertion ~signed ~remove_trivial ~on_alarm (exp, op, lexp, r
       | Some lval64, Some rval64 ->
         (* both operands are constant: check result is representable in
            result type *)
-        if Integer.geq rval64 Integer.zero
-        && Integer.gt (Integer.shift_left lval64 rval64) maxValResult
+        if Integer.(rval64 >= zero && (shift_left_z lval64 rval64) >= maxValResult)
         then
           overflow_alarm ~invalid:true ()
     end

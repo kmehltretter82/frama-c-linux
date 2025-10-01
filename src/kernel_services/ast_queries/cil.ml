@@ -2387,12 +2387,12 @@ let isSigned = function
 
 let max_signed_number nrBits =
   let n = nrBits-1 in
-  Integer.pred (Integer.shift_left Integer.one (Integer.of_int n))
+  Integer.(pred (shift_left one n))
 let max_unsigned_number nrBits =
-  Integer.pred (Integer.shift_left Integer.one (Integer.of_int nrBits))
+  Integer.(pred (shift_left one nrBits))
 let min_signed_number nrBits =
   let n = nrBits-1 in
-  Integer.neg (Integer.shift_left Integer.one (Integer.of_int n))
+  Integer.(neg (shift_left one n))
 
 let debugTruncation = false
 
@@ -2407,7 +2407,7 @@ let fitsInInt k i =
       unsignedbits
   in
   let max_strict_bound =
-    Integer.shift_left Integer.one (Integer.of_int nrBits)
+    Integer.(shift_left one nrBits)
   in
   let min_bound = if signed then Integer.neg max_strict_bound
     else Integer.zero
@@ -2426,13 +2426,13 @@ let truncateInteger64 (k: ikind) i =
     i, false
   else
     let i' =
-      let nrBits = Integer.of_int (8 * (bytesSizeOfInt k)) in
-      let max_strict_bound = Integer.shift_left Integer.one nrBits in
+      let nrBits = 8 * (bytesSizeOfInt k) in
+      let max_strict_bound = Integer.(shift_left one nrBits) in
       let modulo = Integer.erem i max_strict_bound in
       let signed = isSigned k in
       if signed then
         let max_signed_strict_bound =
-          Integer.shift_right max_strict_bound Integer.one
+          Integer.shift_right max_strict_bound 1
         in
         if Integer.geq modulo max_signed_strict_bound then
           Integer.sub modulo max_strict_bound
@@ -3872,7 +3872,7 @@ and constFoldBinOp ~loc (machdep: bool) bop e1 e2 tres =
         kinteger64 ~loc ~kind:tk (Integer.logxor i1 i2)
       | Shiftlt, Const(CInt64(i1,_ik1,_)),Const(CInt64(i2,_,_))
         when shiftInBounds i2 ->
-        kinteger64 ~loc ~kind:tk (Integer.shift_left i1 i2)
+        kinteger64 ~loc ~kind:tk (Integer.shift_left_z i1 i2)
       | Shiftlt, Const(CInt64(z,_,_)), _
         when Integer.equal z Integer.zero -> e1''
       | Shiftlt, _, Const(CInt64(z,_,_))
@@ -3883,7 +3883,7 @@ and constFoldBinOp ~loc (machdep: bool) bop e1 e2 tres =
           kinteger64 ~loc ~kind:tk
             (Integer.shift_right_logical i1 i2)
         else
-          kinteger64 ~loc ~kind:tk (Integer.shift_right i1 i2)
+          kinteger64 ~loc ~kind:tk (Integer.shift_right_z i1 i2)
       | Shiftrt, Const(CInt64(z,_,_)), _
         when Integer.equal z Integer.zero -> e1''
       | Shiftrt, _, Const(CInt64(z,_,_))
@@ -4424,9 +4424,9 @@ let rec constFoldTermNodeAtTop = function
       | PlusA -> constFoldTermBinOp Integer.add
       | MinusA -> constFoldTermBinOp Integer.sub
       | Mult -> constFoldTermBinOp Integer.mul
-      | Shiftlt -> constFoldTermBinOp Integer.shift_left
+      | Shiftlt -> constFoldTermBinOp Integer.shift_left_z
       | Shiftrt -> (* right-shifting Lintegers is always arithmetic *)
-        constFoldTermBinOp Integer.shift_right
+        constFoldTermBinOp Integer.shift_right_z
       | BAnd -> constFoldTermBinOp Integer.logand
       | BXor -> constFoldTermBinOp Integer.logxor
       | BOr -> constFoldTermBinOp Integer.logor

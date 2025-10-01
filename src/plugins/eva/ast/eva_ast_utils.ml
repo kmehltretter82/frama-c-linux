@@ -222,10 +222,10 @@ let apply_binop_to_integers binop i1 i2 ikind =
     | BAnd -> Integer.logand
     | BOr -> Integer.logor
     | BXor -> Integer.logxor
-    | Shiftlt when shift_in_bounds i2 -> Integer.shift_left
+    | Shiftlt when shift_in_bounds i2 -> Integer.shift_left_z
     | Shiftrt when shift_in_bounds i2 ->
       if Cil.isSigned ikind
-      then Integer.shift_right
+      then Integer.shift_right_z
       else Integer.shift_right_logical
     | Eq -> bool Integer.equal
     | Ne -> bool (fun x y -> not (Integer.equal x y))
