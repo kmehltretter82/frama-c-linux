@@ -18,16 +18,24 @@ module Senv = Server_parameters
 let package =
   Package.package ~name:"parameters" ~title:"All Frama-C parameters" ()
 
+(* Ignore any parameter with an invalid name. *)
+let is_valid_parameter_name name =
+  let is_valid_char = function
+    | 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '-'  -> true
+    | _ -> false
+  in
+  name.[0] = '-' && String.for_all is_valid_char name
+
 (* Should a parameter be exported? *)
 let is_exported_parameter (p : Typed_parameter.parameter) =
-  p.visible && p.reconfigurable
+  p.visible && p.reconfigurable && is_valid_parameter_name p.name
 
 (* Translates a parameter name into a valid camlCase request. *)
 let camlCaseParameterName name =
   match String.split_on_char '-' name with
   | "" :: head :: tail ->
     List.fold_left (^) head (List.map String.capitalize_ascii tail)
-  | _ -> Senv.fatal "Invalid parameter %s" name
+  | _ -> Senv.fatal "Invalid parameter name %s" name
 
 module ParameterType = struct
   type t = Typed_parameter.parameter
