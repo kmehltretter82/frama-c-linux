@@ -52,17 +52,6 @@ struct
 
   type 'a t = Node of 'a option * 'a t M.t
 
-(*
-  open Unmarshal
-  let help dkey =
-    let key' = t_list dkey in
-    let tmp = [| Abstract; Abstract |] in
-    let t = Structure (Sum [| [| t_tuple tmp |] |]) in
-    tmp.(0) <- t_option key';
-    tmp.(1) <- M.descr t;
-    t
-*)
-
   let empty = Node (None, M.empty)
 
   (*s To find a mapping in a trie is easy: when all the elements of the
