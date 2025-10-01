@@ -93,11 +93,9 @@ val extract_pointer : value -> pointer conversion
 val extract_int : value -> int conversion
 val extract_int_possibly_zero : value -> (int * [`Exact | `WithZero]) conversion
 val extract_constant_string : value -> string conversion
-val extract_non_wide_string : Base.cstring -> string conversion
 
 (** Fails if [value] represents more than [cardinal] integers. *)
 val extract_int_list : cardinal:int -> value -> int list conversion
-
 
 val int_to_value: int -> value
 

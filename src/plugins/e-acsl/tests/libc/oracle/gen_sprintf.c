@@ -5,21 +5,7 @@
 #include "stdint.h"
 #include "stdio.h"
 #include "time.h"
-char *__gen_e_acsl_literal_string;
 extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
-
-void __e_acsl_globals_init(void)
-{
-  static char __e_acsl_already_run = 0;
-  if (! __e_acsl_already_run) {
-    __e_acsl_already_run = 1;
-    __gen_e_acsl_literal_string = "%d";
-    __e_acsl_store_block((void *)__gen_e_acsl_literal_string,sizeof("%d"));
-    __e_acsl_full_init((void *)__gen_e_acsl_literal_string);
-    __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string);
-  }
-  return;
-}
 
 int main(void)
 {
@@ -28,7 +14,6 @@ int main(void)
   int __gen_e_acsl_sprintf_res;
   int __retres;
   __e_acsl_memory_init((int *)0,(char ***)0,8UL);
-  __e_acsl_globals_init();
   {
     char buf[4];
     __e_acsl_store_block((void *)(buf),4UL);
@@ -66,7 +51,7 @@ int main(void)
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
     }
     /*@ assert !\initialized(&buf[0 .. 3]); */ ;
-    __gen_e_acsl_sprintf_res = sprintf(buf,__gen_e_acsl_literal_string,10); /* sprintf_va_1 */
+    __gen_e_acsl_sprintf_res = sprintf(buf,"%d",10); /* sprintf_va_1 */
     if (__gen_e_acsl_sprintf_res >= 0) __e_acsl_initialize((void *)(buf),
                                                            (size_t)(__gen_e_acsl_sprintf_res + 1L));
     {
@@ -169,8 +154,7 @@ int main(void)
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
     }
     /*@ assert !\initialized(&buf_0[0 .. 3]); */ ;
-    __gen_e_acsl_snprintf_res = snprintf(buf_0,(size_t)2,
-                                         __gen_e_acsl_literal_string,10); /* snprintf_va_1 */
+    __gen_e_acsl_snprintf_res = snprintf(buf_0,(size_t)2,"%d",10); /* snprintf_va_1 */
     if (__gen_e_acsl_snprintf_res >= 0) {
       unsigned long __gen_e_acsl_n;
       if (2UL <= (size_t)__gen_e_acsl_snprintf_res) __gen_e_acsl_n = (size_t)2;
@@ -290,8 +274,7 @@ int main(void)
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
     }
     /*@ assert !\initialized(&buf_1[0 .. 3]); */ ;
-    __gen_e_acsl_snprintf_res_2 = snprintf(buf_1,(size_t)4,
-                                           __gen_e_acsl_literal_string,10); /* snprintf_va_2 */
+    __gen_e_acsl_snprintf_res_2 = snprintf(buf_1,(size_t)4,"%d",10); /* snprintf_va_2 */
     if (__gen_e_acsl_snprintf_res_2 >= 0) {
       unsigned long __gen_e_acsl_n_2;
       if (4UL <= (size_t)__gen_e_acsl_snprintf_res_2) __gen_e_acsl_n_2 = (size_t)4;

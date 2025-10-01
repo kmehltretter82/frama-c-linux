@@ -41,7 +41,6 @@ let vars _l = Vars.empty
 let occurs _x _l = false
 
 let null = ()
-let literal ~eid _ = ignore eid
 let cvar _x = ()
 let pointer_loc _t = ()
 let pointer_val () = e_zero

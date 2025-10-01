@@ -1513,29 +1513,27 @@
   Frama_C_entropy_source FROM Frama_C_entropy_source (and SELF)
   \result FROM Frama_C_entropy_source; min; max
 [from] Function memchr:
-  \result FROM s; c; t[0..3]; empty_or_non_terminated[0]; non_terminated[0];
+  \result FROM s; c; ""[0]; "a"[0..1]; "aa"[0..2]; "aaa"[0..3]; "aaaa"[0..4];
+               "aaaaa"[0..5]; "aaaaaa"[0..6]; "aaaaaaaaa"[0..9];
+               "aaaaaaaaaa"[0..10]; "aaaaaaaaaaa"[0..11];
+               "aaaaaaaaaaaa"[0..12]; "aaaaaaaaaaaaa"[0..13]; "abc"[0..3];
+               "\000bc"[0..3]; ""[0]; "b\000c"[0..3]; t[0..3];
+               empty_or_non_terminated[0]; non_terminated[0];
                non_terminated2[2..3]; empty_or_uninitialized[0];
                uninitialized[0]; s[0..1]; t[0..3]; s; s; a[3..99]; a[3..99];
-               s[0..3]; loc_char_array[0..4]; x; unterminated_string[0..11];
-               maybe_init[0..1]; u[0..199]; r[0..200]; t[0..999999];
-               s[0..19]; a[0..99]; a[0..99]; t_0[0..3]; t_1[0..3]; t_2[0..3];
-               t_3[0..3]; t_4[0..3]; ""[bits 0 to 7]; "a"[bits 0 to 15];
-               "aa"[bits 0 to 23]; "aaa"; "aaaa"[bits 0 to 39];
-               "aaaaa"[bits 0 to 47]; "aaaaaa"[bits 0 to 55];
-               "aaaaaaaaa"[bits 0 to 79]; "aaaaaaaaaa"[bits 0 to 87];
-               "aaaaaaaaaaa"[bits 0 to 95]; "aaaaaaaaaaaa"[bits 0 to 103];
-               "aaaaaaaaaaaaa"[bits 0 to 111]; "abc"; "\000bc";
-               ""[bits 0 to 7]; "b\000c"; "Hello World\n"[bits 0 to 103];
-               "abc\000\000\000abc"[bits 0 to 79];
-               "Bonjour Monde\n"[bits 0 to 119]; "abc"; "ABCD"[bits 0 to 39];
-               "efg"[bits 8 to 31]; "EFGH"[bits 8 to 39];
-               "mno\000pqr"[bits 0 to 63]; "MNOP\000QRS"[bits 0 to 71];
-               "abcde"[bits 0 to 47]; "\000bcdef"[bits 0 to 55];
-               "bcd\000efg"[bits 0 to 63]; "abc"; "bcd\000eg"[bits 0 to 55];
-               "abc"; "\000bc"; ""[bits 0 to 7]; "b\000c"; "abc"; "\000bc";
-               ""[bits 0 to 7]; "b\000c"; "abc"; "\000bc"; ""[bits 0 to 7];
-               "b\000c"; "abc"; "\000bc"; ""[bits 0 to 7]; "b\000c"; 
-               "abc"; "\000bc"; ""[bits 0 to 7]; "b\000c"
+               s[0..3]; "Hello World\n"[0..12]; "abc\000\000\000abc"[0..9];
+               "Bonjour Monde\n"[0..14]; loc_char_array[0..4]; x;
+               unterminated_string[0..11]; "abc"[0..3]; "ABCD"[0..4];
+               "efg"[1..3]; "EFGH"[1..4]; "mno\000pqr"[0..7];
+               "MNOP\000QRS"[0..8]; maybe_init[0..1]; u[0..199]; r[0..200];
+               t[0..999999]; s[0..19]; "abcde"[0..5]; "\000bcdef"[0..6];
+               "bcd\000efg"[0..7]; a[0..99]; "abc"[0..3]; "bcd\000eg"[0..6];
+               a[0..99]; t_0[0..3]; "abc"[0..3]; "\000bc"[0..3]; ""[0];
+               "b\000c"[0..3]; t_1[0..3]; "abc"[0..3]; "\000bc"[0..3]; 
+               ""[0]; "b\000c"[0..3]; t_2[0..3]; "abc"[0..3]; "\000bc"[0..3];
+               ""[0]; "b\000c"[0..3]; t_3[0..3]; "abc"[0..3]; "\000bc"[0..3];
+               ""[0]; "b\000c"[0..3]; t_4[0..3]; "abc"[0..3]; "\000bc"[0..3];
+               ""[0]; "b\000c"[0..3]
 [from] Function memchr_big_array:
   NO EFFECTS
 [from] Function memchr_bitfields:
@@ -1619,24 +1617,22 @@
     _res_1; sz4b; _s_1; _ss_2; _res_2; sz4c; _s_2; _ss_3; _res_3; sz4d; 
     _s_3; _ss_4; _res_4; memchr_misc_static_str; memchr_misc_zero_str
 [inout] Inputs for function memchr_misc:
-    nondet; memchr_misc_static_str; memchr_misc_zero_str;
-    "Hello World\n"[bits 0 to 103]; "abc\000\000\000abc"[bits 0 to 79];
-    "Bonjour Monde\n"[bits 0 to 119]
+    "Hello World\n"[0..12]; "abc\000\000\000abc"[0..9];
+    "Bonjour Monde\n"[0..14]; nondet; memchr_misc_static_str;
+    memchr_misc_zero_str
 [inout] Out (internal) for function memchr_misc2:
     c; s1; sz5; _p; tmp; _ss; _res; sz6; _p_0; tmp_1; _ss_0; _res_0; j; 
     sz7; _s; _ss_1; _res_1; maybe_init[0..1]; sz8; _s_0; _ss_2; _res_2
 [inout] Inputs for function memchr_misc2:
-    nondet; "abc"; "ABCD"[bits 0 to 39]; "efg"[bits 8 to 31];
-    "EFGH"[bits 8 to 39]; "mno\000pqr"[bits 0 to 63];
-    "MNOP\000QRS"[bits 0 to 71]
+    "abc"[0..3]; "ABCD"[0..4]; "efg"[1..3]; "EFGH"[1..4]; "mno\000pqr"[0..7];
+    "MNOP\000QRS"[0..8]; nondet
 [inout] Out (internal) for function memchr_misc_array:
     Frama_C_entropy_source; c; i; sz3; _s; _ss; _res
 [inout] Inputs for function memchr_misc_array:
-    Frama_C_entropy_source; tab_str[0..11]; ""[bits 0 to 7]; "a"[bits 0 to 15];
-    "aa"[bits 0 to 23]; "aaa"; "aaaa"[bits 0 to 39]; "aaaaa"[bits 0 to 47];
-    "aaaaaa"[bits 0 to 55]; "aaaaaaaaa"[bits 0 to 79];
-    "aaaaaaaaaa"[bits 0 to 87]; "aaaaaaaaaaa"[bits 0 to 95];
-    "aaaaaaaaaaaa"[bits 0 to 103]; "aaaaaaaaaaaaa"[bits 0 to 111]
+    Frama_C_entropy_source; tab_str[0..11]; ""[0]; "a"[0..1]; "aa"[0..2];
+    "aaa"[0..3]; "aaaa"[0..4]; "aaaaa"[0..5]; "aaaaaa"[0..6];
+    "aaaaaaaaa"[0..9]; "aaaaaaaaaa"[0..10]; "aaaaaaaaaaa"[0..11];
+    "aaaaaaaaaaaa"[0..12]; "aaaaaaaaaaaaa"[0..13]
 [inout] Out (internal) for function memchr_no_zero_but_ok:
     c; s[0..19]; z1; _s; _ss; _res; z2; _s_0; _ss_0; _res_0; z3; _p; tmp_1;
     _ss_1; _res_1; z4; _p_0; tmp_3; _ss_2; _res_2; z5; _p_1; tmp_5; _ss_3;
@@ -1647,7 +1643,7 @@
     c; s; o; tmp; z1; _s; _ss; _res; z2; _s_0; _ss_0; _res_0; z3; _s_1; 
     _ss_1; _res_1; z4; _s_2; _ss_2; _res_2; t[0..3]; z5; _s_3; _ss_3; _res_3
 [inout] Inputs for function memchr_small_sets:
-    nondet; "abc"; "\000bc"; "b\000c"
+    "abc"[0..3]; "\000bc"[0..3]; "b\000c"[0..3]; nondet
 [inout] Out (internal) for function memchr_small_sets_chars:
     c; res[0..4]; t_0[0..3]; s; o; tmp; _s; _ss; _res; _s_0; _ss_0; _res_0;
     _s_1; _ss_1; _res_1; _s_2; _ss_2; _res_2; _s_3; _ss_3; _res_3; t_1[0..3];
@@ -1660,20 +1656,21 @@
     s_3; o_3; tmp_23; _s_19; _ss_19; _res_19; _s_20; _ss_20; _res_20; _s_21;
     _ss_21; _res_21; _s_22; _ss_22; _res_22; _s_23; _ss_23; _res_23
 [inout] Inputs for function memchr_small_sets_chars:
-    nondet; "abc"; "\000bc"; "b\000c"; "abc"; "\000bc"; "b\000c"; "abc";
-    "\000bc"; "b\000c"; "abc"; "\000bc"; "b\000c"; "abc"; "\000bc"; "b\000c"
+    "abc"[0..3]; "\000bc"[0..3]; "b\000c"[0..3]; "abc"[0..3]; "\000bc"[0..3];
+    "b\000c"[0..3]; "abc"[0..3]; "\000bc"[0..3]; "b\000c"[0..3]; "abc"[0..3];
+    "\000bc"[0..3]; "b\000c"[0..3]; "abc"[0..3]; "\000bc"[0..3];
+    "b\000c"[0..3]; nondet
 [inout] Out (internal) for function memchr_small_sets_n:
     c; s; n; tmp; z1; _p; tmp_0; _ss; _res; z2; _p_0; tmp_2; _ss_0; _res_0;
     z3a; _p_1; tmp_4; _ss_1; _res_1; z3b; _p_2; tmp_6; _ss_2; _res_2; z3; 
     _p_3; tmp_8; _ss_3; _res_3; z4; _p_4; tmp_10; _ss_4; _res_4
 [inout] Inputs for function memchr_small_sets_n:
-    nondet; "abcde"[bits 0 to 47]; "\000bcdef"[bits 0 to 55];
-    "bcd\000efg"[bits 0 to 63]
+    "abcde"[0..5]; "\000bcdef"[0..6]; "bcd\000efg"[0..7]; nondet
 [inout] Out (internal) for function memchr_unbounded_n:
     c; n; s; zu1; _s; _ss; _res; o; tmp_0; zu2; _s_0; _ss_0; _res_0; zu3; 
     _s_1; _ss_1; _res_1
 [inout] Inputs for function memchr_unbounded_n:
-    nondet; "abc"; "bcd\000eg"[bits 0 to 55]
+    "abc"[0..3]; "bcd\000eg"[0..6]; nondet
 [inout] Out (internal) for function memchr_zero_termination:
     c; empty_or_non_terminated[0]; z1; _s; _ss; _res; non_terminated[0]; 
     z2; _s_0; _ss_0; _res_0; non_terminated2[0..3]; o; tmp_1
@@ -1713,17 +1710,15 @@
     Frama_C_entropy_source; memchr_misc_static_str; memchr_misc_zero_str;
     __retres
 [inout] Inputs for function main:
-    Frama_C_entropy_source; tab_str[0..11]; nondet; memchr_misc_static_str;
-    memchr_misc_zero_str; ""[bits 0 to 7]; "a"[bits 0 to 15];
-    "aa"[bits 0 to 23]; "aaa"; "aaaa"[bits 0 to 39]; "aaaaa"[bits 0 to 47];
-    "aaaaaa"[bits 0 to 55]; "aaaaaaaaa"[bits 0 to 79];
-    "aaaaaaaaaa"[bits 0 to 87]; "aaaaaaaaaaa"[bits 0 to 95];
-    "aaaaaaaaaaaa"[bits 0 to 103]; "aaaaaaaaaaaaa"[bits 0 to 111]; "abc";
-    "\000bc"; "b\000c"; "Hello World\n"[bits 0 to 103];
-    "abc\000\000\000abc"[bits 0 to 79]; "Bonjour Monde\n"[bits 0 to 119];
-    "abc"; "ABCD"[bits 0 to 39]; "efg"[bits 8 to 31]; "EFGH"[bits 8 to 39];
-    "mno\000pqr"[bits 0 to 63]; "MNOP\000QRS"[bits 0 to 71];
-    "abcde"[bits 0 to 47]; "\000bcdef"[bits 0 to 55];
-    "bcd\000efg"[bits 0 to 63]; "abc"; "bcd\000eg"[bits 0 to 55]; "abc";
-    "\000bc"; "b\000c"; "abc"; "\000bc"; "b\000c"; "abc"; "\000bc"; "b\000c";
-    "abc"; "\000bc"; "b\000c"; "abc"; "\000bc"; "b\000c"
+    Frama_C_entropy_source; tab_str[0..11]; ""[0]; "a"[0..1]; "aa"[0..2];
+    "aaa"[0..3]; "aaaa"[0..4]; "aaaaa"[0..5]; "aaaaaa"[0..6];
+    "aaaaaaaaa"[0..9]; "aaaaaaaaaa"[0..10]; "aaaaaaaaaaa"[0..11];
+    "aaaaaaaaaaaa"[0..12]; "aaaaaaaaaaaaa"[0..13]; "abc"[0..3]; "\000bc"[0..3];
+    "b\000c"[0..3]; "Hello World\n"[0..12]; "abc\000\000\000abc"[0..9];
+    "Bonjour Monde\n"[0..14]; "abc"[0..3]; "ABCD"[0..4]; "efg"[1..3];
+    "EFGH"[1..4]; "mno\000pqr"[0..7]; "MNOP\000QRS"[0..8]; "abcde"[0..5];
+    "\000bcdef"[0..6]; "bcd\000efg"[0..7]; "abc"[0..3]; "bcd\000eg"[0..6];
+    "abc"[0..3]; "\000bc"[0..3]; "b\000c"[0..3]; "abc"[0..3]; "\000bc"[0..3];
+    "b\000c"[0..3]; "abc"[0..3]; "\000bc"[0..3]; "b\000c"[0..3]; "abc"[0..3];
+    "\000bc"[0..3]; "b\000c"[0..3]; "abc"[0..3]; "\000bc"[0..3];
+    "b\000c"[0..3]; nondet; memchr_misc_static_str; memchr_misc_zero_str

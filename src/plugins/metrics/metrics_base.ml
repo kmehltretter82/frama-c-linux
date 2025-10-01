@@ -336,6 +336,7 @@ let consider_function ~libc vinfo =
       ) && (libc || not (Cil.is_in_libc vinfo.vattr))
 
 let consider_variable ~libc vinfo =
+  not (Ast_info.is_string_literal vinfo) &&
   (libc || not (Cil.is_in_libc vinfo.vattr))
 
 let float_to_string f =

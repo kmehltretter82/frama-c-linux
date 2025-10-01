@@ -10,12 +10,12 @@
 
 Goal Assertion 'ZERO' (file issue-364.i, line 5):
 Assume { (* Heap *) Type: linked(Malloc_0). }
-Prove: valid_rd(Malloc_0, shift_sint8(global(Str_1), 3), 1).
+Prove: valid_rd(Malloc_0, shift_sint8(global(K___fc_lit_string1_23), 3), 1).
 
 ------------------------------------------------------------
 
 Goal Assertion 'OVER' (file issue-364.i, line 6):
-Let a = global(Str_1).
+Let a = global(K___fc_lit_string1_23).
 Assume {
   (* Heap *)
   Type: linked(Malloc_0).

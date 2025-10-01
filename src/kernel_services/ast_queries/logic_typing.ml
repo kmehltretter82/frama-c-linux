@@ -1120,7 +1120,7 @@ struct
   let mk_at_here idx =
     let rec needs_at idx =
       match idx.term_node with
-      | TConst _ | TSizeOf _ | TSizeOfE _ | TSizeOfStr _
+      | TConst _ | TSizeOf _ | TSizeOfE _
       | TAlignOf _ | TAlignOfE _ | Tat _ | Ttypeof _ | Ttype _
       | Tempty_set | Tbase_addr _ | Toffset _ | Tblock_length _ | Tnull
         -> false
@@ -1208,7 +1208,17 @@ struct
         (* transforms '(T[size])ptr' into an equivalent '*(T( * )[size])ptr'
            to get an explicit access to the memory *)
         mk_mem (c_mk_cast ~force e oldt (Cil_const.mk_tptr newt)) TNoOffset
-      else begin
+      else if Ast_types.(is_array oldt && is_array newt) then begin
+        let new_elt = Ast_types.element_type newt in
+        if Ast_types.is_void new_elt then begin
+          (* void array denotes a polymorphic array for now.
+              Make sure to change that when
+              we add a proper logic type for array
+          *)
+          if force then Logic_utils.mk_cast ~loc ~force newt e
+          else e
+        end else Logic_utils.mk_cast ~loc ~force newt e
+      end else begin
         match Ast_types.unroll_node newt, e.term_node with
         | TEnum ei, TConst (LEnum { eihost = ei'})
           when ei.ename = ei'.ename && not force -> e
@@ -1445,6 +1455,7 @@ struct
         match Ast_types.unroll_node ot, Ast_types.unroll_node nt with
         | TPtr _, TPtr _ when Ast_types.is_void_ptr nt ->
           nt, e
+        | TArray _, TArray(elt,_) when Ast_types.is_void elt -> ot, e
         | (TInt _ | TEnum _ | TPtr _ ), TVoid ->
           ot, e
         | TComp comp1, TComp comp2 when comp1.ckey = comp2.ckey ->
@@ -1489,6 +1500,13 @@ struct
                    | _ -> false)
       then begin
         let t,e = c_cast_to ty1 ty2 oterm in Ctype t, e
+      end else if Ast_types.is_array ty1 && Ast_types.is_array ty2 then begin
+        let elt2 = Ast_types.element_type ty2 in
+        if Ast_types.is_void elt2 then ot, oterm
+        else if overloaded then raise Not_applicable
+        else
+          C.error loc "invalid implicit conversion from '%a' to '%a'"
+            Cil_printer.pp_typ ty1 Cil_printer.pp_typ ty2
       end else if overloaded then raise Not_applicable
       else if (* not overloaded: raise an error. *)
         Ast_types.is_array ty1 &&
@@ -1735,6 +1753,14 @@ struct
       implicit_conversion ~overloaded loc { oterm with term_type = ot} ot nt
     in
     env, t, e
+
+  let typeOf_string_literal loc s =
+    let typ = Cil.typeOf_string_literal ~loc s in
+    Ctype (Ast_types.remove_qualifiers_deep typ)
+
+  let typeOf_wstring_literal loc w =
+    let typ = Cil.typeOf_wstring_literal ~loc w in
+    Ctype (Ast_types.remove_qualifiers_deep typ)
 
   let convertible (t1,t) (t2,_) =
     let res =
@@ -2141,7 +2167,7 @@ struct
       | TLval(TVar v, TNoOffset) ->
         known_vars, kont (eta_expand term.term_loc term.term_name env v)
       | TConst _ | TLval _ | TSizeOf _ | TSizeOfE _
-      | TSizeOfStr _ | TAlignOf _ | TAlignOfE _
+      | TAlignOf _ | TAlignOfE _
       | TUnOp _ | TBinOp _ | TCast _ | TAddrOf _ | TStartOf _
       | Tapp _  | TDataCons _ | Tbase_addr _ | Toffset _
       | Tblock_length _ | Tnull
@@ -2454,7 +2480,7 @@ struct
       | TCast (true,_,t) | Tat (t, _) | Tcomprehension (t,_,_) | Tlet (_, t)
         -> aux t
 
-      | Trange _ | TConst _ | TSizeOf _ | TSizeOfE _ | TSizeOfStr _ | TAlignOf _
+      | Trange _ | TConst _ | TSizeOf _ | TSizeOfE _ | TAlignOf _
       | TAlignOfE _ | TUnOp (_,_) | TBinOp (_,_,_) | TCast (false,_,_)
       | Tlambda (_,_) | TDataCons (_,_) | Tbase_addr (_,_)
       | Toffset (_,_) | Tblock_length (_,_) | Tnull | Tapp _
@@ -2622,11 +2648,6 @@ struct
          Ctype t -> TSizeOf t,Linteger
        | _ -> if ctxt.silent then raise Backtrack;
          ctxt.error loc "sizeof can only handle C types")
-    (* NB: don't forget to add the case of literal string
-              when they are authorized in the logic *)
-    | PLsizeofE
-        { lexpr_node = PLconstant (StringConstant s | WStringConstant s) } ->
-      TSizeOfStr s, Linteger
     | PLsizeofE lexpr ->
       let t = term (drop_qualifiers env) lexpr in
       (match Logic_const.unroll_ltdef t.term_type with
@@ -2645,10 +2666,10 @@ struct
       let t = Logic_utils.parse_float ~loc s in
       t.term_node , t.term_type
     | PLconstant (StringConstant s) ->
-      TConst (LStr (unescape s)), Ctype Cil_const.charPtrType
+      TConst (LStr (unescape s)), typeOf_string_literal loc s
     | PLconstant (WStringConstant s) ->
-      TConst (LWStr (wcharlist_of_string s)),
-      Ctype (Cil_const.mk_tptr (Machine.wchar_type ()))
+      let l = wcharlist_of_string s in
+      TConst (LWStr l), typeOf_wstring_literal loc l
     | PLvar x ->
       let old_val info =
         let typ =

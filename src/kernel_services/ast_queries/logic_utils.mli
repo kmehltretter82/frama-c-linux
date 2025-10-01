@@ -513,12 +513,12 @@ val constFoldTermToInt: ?machdep:bool -> term -> Integer.t option
 (**
    A [cilVisitor] (by copy) that simplifies expressions of the type
    [const int x = v], where [v] is an integer and [x] is a global variable.
-   Requires a mapping from [varinfo] to [init option]
+   Requires a mapping from [varinfo] to [init_or_str option]
    (e.g. based on [Globals.Vars.find]).
 
    @since Silicon-20161101
 *)
-class simplify_const_lval: (varinfo -> init option) -> Cil.cilVisitor
+class simplify_const_lval: (varinfo -> init_or_str option) -> Cil.cilVisitor
 
 (** {2 Type-checking hackery} *)
 

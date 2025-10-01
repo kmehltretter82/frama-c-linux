@@ -6,10 +6,13 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Observation of literal strings in C expressions. *)
+(**
+   demote a generated variable holding a string literal into a standard
+   char (or wide char) array. This can imply a formal
+   AST change if said variable is used to initialize a _local_ array.
+   Do nothing if the variable is not a string literal as per
+   {!Ast_info.is_string_literal}
 
-open Cil_types
-
-val subst_all_literals_in_exp: Env.t -> kernel_function -> exp -> exp * Env.t
-(** Replace any sub-expression of the given exp that is a literal string by an
-    observed variable. *)
+   @since Frama-C+dev
+*)
+val demote : Cil_types.varinfo -> unit

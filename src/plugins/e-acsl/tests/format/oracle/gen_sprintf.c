@@ -5,27 +5,12 @@
 #include "stdint.h"
 #include "stdio.h"
 #include "time.h"
-char *__gen_e_acsl_literal_string;
 extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
-
-void __e_acsl_globals_init(void)
-{
-  static char __e_acsl_already_run = 0;
-  if (! __e_acsl_already_run) {
-    __e_acsl_already_run = 1;
-    __gen_e_acsl_literal_string = "%d";
-    __e_acsl_store_block((void *)__gen_e_acsl_literal_string,sizeof("%d"));
-    __e_acsl_full_init((void *)__gen_e_acsl_literal_string);
-    __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string);
-  }
-  return;
-}
 
 int main(void)
 {
   int __retres;
   __e_acsl_memory_init((int *)0,(char ***)0,8UL);
-  __e_acsl_globals_init();
   {
     char buf[4];
     __e_acsl_store_block((void *)(buf),4UL);
@@ -63,7 +48,7 @@ int main(void)
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
     }
     /*@ assert !\initialized(&buf[0 .. 3]); */ ;
-    __e_acsl_builtin_sprintf("d",buf,__gen_e_acsl_literal_string,10);
+    __e_acsl_builtin_sprintf("d",buf,"%d",10);
     {
       int __gen_e_acsl_size_2;
       int __gen_e_acsl_if_2;
@@ -164,8 +149,7 @@ int main(void)
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
     }
     /*@ assert !\initialized(&buf_0[0 .. 3]); */ ;
-    __e_acsl_builtin_snprintf("d",buf_0,(size_t)2,
-                              __gen_e_acsl_literal_string,10);
+    __e_acsl_builtin_snprintf("d",buf_0,(size_t)2,"%d",10);
     {
       int __gen_e_acsl_size_4;
       int __gen_e_acsl_if_4;
@@ -291,8 +275,7 @@ int main(void)
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_8);
     }
     /*@ assert !\initialized(&buf_1[0 .. 3]); */ ;
-    __e_acsl_builtin_snprintf("d",buf_1,(size_t)4,
-                              __gen_e_acsl_literal_string,10);
+    __e_acsl_builtin_snprintf("d",buf_1,(size_t)4,"%d",10);
     {
       int __gen_e_acsl_size_6;
       int __gen_e_acsl_if_6;

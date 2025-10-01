@@ -176,7 +176,7 @@ let call (env:env) (l:logic_info) (ds:domain list) : domain =
 let iadd_logic_var m v = ignore @@ add_logic_var m v
 
 let rec add_term (env:env) (t:term) : domain = match t.term_node with
-  | TConst _  | TSizeOf _ | TSizeOfE _ | TSizeOfStr _ | TAlignOf _ | TAlignOfE _
+  | TConst _  | TSizeOf _ | TSizeOfE _ | TAlignOf _ | TAlignOfE _
   | Tnull | Tempty_set | Ttypeof _ | Ttype _  | Trange _ -> pure
   | TLval lval -> add_term_lval env lval
   | TAddrOf lval | TStartOf lval -> ptr @@ add_addr_lval env lval

@@ -198,7 +198,6 @@ class annot_visitor kf flags on_alarm = object (self)
     match exp.enode with
     | SizeOf _
     | SizeOfE _
-    | SizeOfStr _
     | AlignOf _
     | AlignOfE _ -> Cil.SkipChildren
     | _ ->
@@ -339,7 +338,6 @@ class annot_visitor kf flags on_alarm = object (self)
         | BinOp _ -> ()
         | SizeOf _
         | SizeOfE _
-        | SizeOfStr _
         | AlignOf _
         | AlignOfE _ -> assert false
       in

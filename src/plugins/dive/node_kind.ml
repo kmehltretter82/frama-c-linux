@@ -52,10 +52,6 @@ struct
     | AbsoluteMemory, AbsoluteMemory -> 0
     | AbsoluteMemory, _ -> 1
     | _, AbsoluteMemory -> -1
-    | String (i1,_), String (i2,_) ->
-      Datatype.Int.compare i1 i2
-    | String _, _ -> 1
-    | _, String _ -> -1
     | Const e1, Const e2 ->
       Cil_datatype.Exp.compare e1 e2
     | Const _, _ -> 1
@@ -75,7 +71,6 @@ struct
     | Alarm (stmt1, alarm1), Alarm (stmt2, alarm2) ->
       Stmt.equal stmt1 stmt2 && Alarms.equal alarm1 alarm2
     | AbsoluteMemory, AbsoluteMemory -> true
-    | String (i,_), String (j,_) -> Datatype.Int.equal i j
     | Const e1, Const e2 -> Cil_datatype.Exp.equal e1 e2
     | Error s1, Error s2 -> Datatype.String.equal s1 s2
     | _ -> false
@@ -92,7 +87,6 @@ struct
     | Alarm (stmt, alarm) ->
       Hashtbl.hash (5, Stmt.hash stmt, Alarms.hash alarm)
     | AbsoluteMemory -> 6
-    | String (i, _) -> Hashtbl.hash (7, i)
     | Const e -> Hashtbl.hash (8, Cil_datatype.Exp.hash e)
     | Error s -> Hashtbl.hash (9, s)
 end
@@ -103,26 +97,22 @@ include Datatype.Make (DatatypeInput)
 let get_base = function
   | Scalar (vi,_,_) | Composite (vi) -> Some vi
   | Scattered _ | Unknown _ | Alarm _ | AbsoluteMemory
-  | String _ | Const _ | Error _ -> None
+  | Const _ | Error _ -> None
 
 let to_lval = function
   | Scalar (vi,_typ,offset) -> Some (Cil_types.Var vi, offset)
   | Composite (vi) -> Some (Cil_types.Var vi, Cil_types.NoOffset)
   | Scattered (lval,_) -> Some lval
   | Unknown (lval,_) -> Some lval
-  | Alarm (_,_) | AbsoluteMemory | String _ | Const _ | Error _ -> None
+  | Alarm (_,_) | AbsoluteMemory | Const _ | Error _ -> None
 
 let pretty fmt = function
   | (Scalar _ | Composite _ | Scattered _ | Unknown _) as kind ->
-    Cil_printer.pp_lval fmt (Option.get (to_lval kind))
+    Printer.pp_lval fmt (Option.get (to_lval kind))
   | Alarm (_stmt,alarm) ->
-    Cil_printer.pp_predicate fmt (Alarms.create_predicate alarm)
+    Printer.pp_predicate fmt (Alarms.create_predicate alarm)
   | AbsoluteMemory ->
     Format.fprintf fmt "%s" (Kernel.AbsoluteValidRange.get ())
-  | String (_, CSString s) ->
-    Format.fprintf fmt "%S" s
-  | String (_, CSWstring s) ->
-    Format.fprintf fmt "L\"%s\"" (Escape.escape_wstring s)
   | Const e ->
     Format.fprintf fmt "%a" Cil_printer.pp_exp e
   | Error s ->

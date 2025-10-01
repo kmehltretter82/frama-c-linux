@@ -166,10 +166,6 @@ sig
   val null : loc
   (** Return the location of the null pointer *)
 
-  val literal : eid:int -> Cstring.cst -> loc
-  (** Return the memory location of a constant string,
-      the id is a unique identifier. *)
-
   val cvar : varinfo -> loc
   (** Return the location of a C variable. *)
 
@@ -424,7 +420,7 @@ sig
 
   type warned_hyp = Warning.Set.t * (pred * pred)
 
-  val init : sigma:sigma -> varinfo -> init option -> warned_hyp list
+  val init : sigma:sigma -> varinfo -> init_or_str option -> warned_hyp list
   (** Express that some variable has some initial value at the
       given memory state. The first predicate states the value,
       the second, the initialization status.

@@ -61,7 +61,7 @@ let pp_from_ref = Extlib.mk_fun "Cil.pp_from_ref"
 let pp_behavior_ref = Extlib.mk_fun "Cil.pp_behavior_ref"
 
 let default_behavior_name = "default!"
-let is_default_mk_behavior ~name ~assumes = name = default_behavior_name && assumes = []
+let is_default_mk_behavior ~name ~assumes = name = default_behavior_name && assumes =[]
 let is_default_behavior b = is_default_mk_behavior ~name:b.b_name ~assumes:b.b_assumes
 
 let find_default_behavior spec =
@@ -386,6 +386,10 @@ class type cilVisitor = object
   (** Initializers for globals, pass the global where this occurs, and the
       offset *)
 
+  method vstr_literal: varinfo -> str_literal -> str_literal visitAction
+
+  method vinit_or_str: varinfo -> init_or_str -> init_or_str visitAction
+
   method vlocal_init: varinfo -> local_init -> local_init visitAction
 
   method vtype: typ -> typ visitAction
@@ -544,6 +548,8 @@ class internal_genericCilVisitor current_func behavior queue: cilVisitor =
     method vfunc (_f:fundec) = DoChildren
     method vglob (_g:global) = DoChildren
     method vinit (_forg: varinfo) (_off: offset) (_i:init) = DoChildren
+    method vstr_literal _ _ = DoChildren
+    method vinit_or_str _ _ = DoChildren
     method vlocal_init _ _ = DoChildren
     method vtype (_t:typ) = DoChildren
     method vcompinfo _ = DoChildren
@@ -831,6 +837,11 @@ let copy_logic_label is_copy l =
        if needed. *)
   end else l
 
+let nopChildren _vis elt = elt
+
+let visitCilStr_literal vis vi lit =
+  doVisitCil vis id (vis#vstr_literal vi) nopChildren lit
+
 let rec visitCilTerm vis t =
   Current_loc.with_loc t.term_loc
     (doVisitCil vis (fun x-> x) vis#vterm childrenTerm) t
@@ -865,7 +876,6 @@ and childrenTermNode vis tn =
     let t' = vTyp t in if t' != t then TSizeOf t' else tn
   | TSizeOfE t ->
     let t' = vTerm t in if  t' != t then TSizeOfE t' else tn
-  | TSizeOfStr _ -> tn
   | TAlignOf t ->
     let t' = vTyp t in if t' != t then TAlignOf t' else tn
   | TAlignOfE t ->
@@ -1593,8 +1603,6 @@ and childrenExp (vis: cilVisitor) (e: exp) : exp =
   | SizeOfE e1 ->
     let e1' = vExp e1 in
     if e1' != e1 then new_exp (SizeOfE e1') else e
-  | SizeOfStr _s -> e
-
   | AlignOf t ->
     let t' = vTyp t in
     if t' != t then new_exp (AlignOf t') else e
@@ -1652,6 +1660,18 @@ and visitCilInit (vis: cilVisitor) (forglob: varinfo)
       if t' != t || initl' != initl then CompoundInit (t', initl') else i
   in
   doVisitCil vis id (vis#vinit forglob atoff) childrenInit i
+
+and visitCilInit_or_str vis vi i =
+  let childrenInit_or_str vis i =
+    match i with
+    | CInit init ->
+      let init' = visitCilInit vis vi NoOffset init in
+      if init != init' then CInit init' else i
+    | StrInit lit ->
+      let lit' = visitCilStr_literal vis vi lit in
+      if lit' != lit then StrInit lit' else i
+  in
+  doVisitCil vis id (vis#vinit_or_str vi) childrenInit_or_str i
 
 and visitCilLval (vis: cilVisitor) (lv: lval) : lval =
   doVisitCil vis id vis#vlval childrenLval lv
@@ -2293,7 +2313,7 @@ and childrenGlobal (vis: cilVisitor) (g: global) : global =
     let inito' = Visitor_behavior.cinitinfo vis#behavior inito in
     (match inito'.init with
        None -> ()
-     | Some i -> let i' = visitCilInit vis v NoOffset i in
+     | Some i -> let i' = visitCilInit_or_str vis v i in
        if i' != i then inito'.init <- Some i');
     if v' != v || inito' != inito then GVar (v', inito', l) else g
   | GPragma (a, l) -> begin
@@ -2485,7 +2505,7 @@ let integer ~loc (i: int) = new_exp ~loc (Const (integer_constant i))
 
 let kfloat ~loc k f =
   let f = Floating_point.round_if_single_precision k f in
-  new_exp ~loc (Const (CReal (f, k, None)))
+  new_exp ~loc (Const (CReal(f,k,None)))
 
 let zero      ~loc = integer ~loc 0
 let one       ~loc = integer ~loc 1
@@ -2721,8 +2741,6 @@ let var vi : lval = (Var vi, NoOffset)
 
 let evar ?(loc=Location.unknown) vi = new_exp ~loc (Lval (var vi))
 
-let mkString ~loc s = new_exp ~loc (Const(CStr s))
-
 let mkLoop ?sattr ~(guard:exp) ~(body: stmt list) () : stmt list =
   (* Do it like this so that the pretty printer recognizes it *)
   [ mkStmt ~valid_sid:true ?sattr
@@ -2805,6 +2823,14 @@ let no_op_coerce typ t =
   | Ltype ({lt_name="set"},_) -> true
   | _ -> false
 
+let typeOf_string_literal ?(loc=Cil_datatype.Location.unknown) s =
+  let len = kinteger ~loc (Machine.sizeof_kind()) (String.length s + 1) in
+  Cil_const.(mk_tarray ~tattr:[("const",[])] charType (Some len))
+
+let typeOf_wstring_literal ?(loc=Cil_datatype.Location.unknown) l =
+  let len = kinteger ~loc (Machine.sizeof_kind()) (List.length l + 1) in
+  Cil_const.mk_tarray ~tattr:[("const",[])] (Machine.wchar_type()) (Some len)
+
 (**** Compute the type of an expression ****)
 let rec typeOf (e: exp) : typ =
   match e.enode with
@@ -2815,15 +2841,6 @@ let rec typeOf (e: exp) : typ =
    * don't believe me. *)
   | Const(CChr _) -> Cil_const.intType
 
-  (* The type of a string is a pointer to characters ! The only case when
-   * you would want it to be an array is as an argument to sizeof, but we
-   * have SizeOfStr for that *)
-  | Const(CStr _s) -> Machine.string_literal_type ()
-
-  | Const(CWStr _s) ->
-    let typ = Ast_types.add_attributes [("const",[])] (Machine.wchar_type ()) in
-    Cil_const.mk_tptr typ
-
   | Const(CReal (_, fk, _)) -> Cil_const.mk_tfloat fk
 
   | Const(CEnum {eival=v}) -> typeOf v
@@ -2831,8 +2848,8 @@ let rec typeOf (e: exp) : typ =
   (* l-values used as r-values lose their qualifiers (C99 6.3.2.1:2) *)
   | Lval lv -> Ast_types.remove_qualifiers (typeOfLval lv)
 
-  | SizeOf _ | SizeOfE _ | SizeOfStr _ -> Machine.sizeof_type ()
-  | AlignOf _ | AlignOfE _ -> Machine.sizeof_type ()
+  | SizeOf _ | SizeOfE _ -> (Machine.sizeof_type ())
+  | AlignOf _ | AlignOfE _ -> (Machine.sizeof_type ())
   | UnOp (_, _, t) -> t
   | BinOp (_, _, _, t) -> t
   | CastE (t, _) -> t
@@ -3066,7 +3083,7 @@ let selfTypSize = TypSize.self
 let rank : ikind -> int =
   function
   (* these are just unique numbers representing the integer
-      conversion rank. *)
+     conversion rank. *)
   | IBool | IChar | ISChar | IUChar -> 1
   | IShort | IUShort -> 2
   | IInt | IUInt -> 3
@@ -3679,35 +3696,24 @@ and constFold (machdep: bool) (e: exp) : exp =
   (* Characters are integers *)
   | Const(CChr c) -> new_exp ~loc (Const(charConstToIntConstant c))
   | Const(CEnum {eival = v}) -> constFold machdep v
-  | Const (CReal _ | CWStr _ | CStr _ | CInt64 _) -> e (* a constant *)
+  | Const (CReal _ | CInt64 _) -> e (* a constant *)
   | SizeOf t when machdep ->
     begin
       try kinteger ~loc (Machine.sizeof_kind ()) (bytesSizeOf t)
       with SizeOfError _ -> e
     end
-  | SizeOfE { enode = Const (CWStr l) } when machdep ->
-    let len = List.length l in
-    let wchar_size = bitsSizeOfInt (Machine.wchar_kind ()) / 8 in
-    kinteger ~loc (Machine.sizeof_kind ()) ((len + 1) * wchar_size)
   | SizeOfE e when machdep ->
     constFold machdep (new_exp ~loc:e.eloc (SizeOf (typeOf e)))
-  | SizeOfStr s when machdep ->
-    kinteger ~loc (Machine.sizeof_kind ()) (1 + String.length s)
   | AlignOf t when machdep ->
     begin
       try kinteger ~loc (Machine.sizeof_kind ()) (bytesAlignOf t)
       with SizeOfError _ -> e
     end
-  | AlignOfE e when machdep -> begin
-      (* The alignment of an expression is not always the alignment of its
-       * type. I know that for strings this is not true *)
-      match e.enode with
-      | Const (CStr _) when not (Machine.msvcMode ()) ->
-        kinteger ~loc (Machine.sizeof_kind ()) (Machine.alignof_str ())
-      (* For an array, it is the alignment of the array ! *)
-      | _ -> constFold machdep (new_exp ~loc:e.eloc (AlignOf (typeOf e)))
-    end
-  | AlignOfE _ | AlignOf _ | SizeOfStr _ | SizeOfE _ | SizeOf _ ->
+  | AlignOfE e when machdep ->
+    (* The alignment of an expression is not always the alignment of its
+     * type. I know that for strings this is not true *)
+    constFold machdep (new_exp ~loc:e.eloc (AlignOf (typeOf e)))
+  | AlignOfE _ | AlignOf _ | SizeOfE _ | SizeOf _ ->
     e (* Depends on machdep. Do not evaluate in this case*)
 
   | CastE (t, e) -> begin
@@ -4039,13 +4045,9 @@ let compareConstant c1 c2 =
      | _ -> false)
   | CInt64 (i1,k1,_), CInt64(i2,k2,_) ->
     k1 = k2 && Integer.equal i1 i2
-  | CStr s1, CStr s2 -> s1 = s2
-  | CWStr l1, CWStr l2 ->
-    (try List.for_all2 (fun x y -> Int64.compare x y = 0) l1 l2
-     with Invalid_argument _ -> false)
   | CChr c1, CChr c2 -> c1 = c2
   | CReal(f1,k1,_), CReal(f2,k2,_) -> k1 = k2 && f1 = f2
-  | (CEnum _ | CInt64 _ | CStr _ | CWStr _ | CChr _ | CReal _), _ -> false
+  | (CEnum _ | CInt64 _ | CChr _ | CReal _), _ -> false
 
 (* Iterate over all globals, including the global initializer *)
 let iterGlobals (fl: file) (doone: global -> unit) : unit =
@@ -4246,6 +4248,30 @@ let makeFormalVar fdec ?(ghost=fdec.svar.vghost) ?(where = "$") ?loc name typ : 
 let makeGlobalVar ?source ?temp ?referenced ?ghost ?loc name typ =
   makeVarinfo ?source ?temp ?referenced ?ghost ?loc true false name typ
 
+let create_string_literal =
+  let module StrLitCounter =
+    State_builder.SharedCounter(struct let name = "StrLitCounter" end)
+  in
+  fun ?(loc=Cil_datatype.Location.unknown) s ->
+    let i = StrLitCounter.next() in
+    let vname = "__fc_lit_string" ^ (string_of_int i) in
+    let typ = typeOf_string_literal ~loc s in
+    let var = makeGlobalVar ~source:true ~temp:false ~loc vname typ in
+    var.vattr <- Ast_attributes.(add (fc_literal,[]) var.vattr);
+    var
+
+let create_wstring_literal =
+  let module WStrLitCounter =
+    State_builder.SharedCounter(struct let name = "WStrLitCounter" end)
+  in
+  fun ?(loc=Cil_datatype.Location.unknown) l ->
+    let i = WStrLitCounter.next() in
+    let vname = "__fc_lit_wstring" ^ (string_of_int i) in
+    let typ = typeOf_wstring_literal ~loc l in
+    let var = makeGlobalVar ~source:true ~temp:false ~loc vname typ in
+    var.vattr <- Ast_attributes.(add (fc_literal,[]) var.vattr);
+    var
+
 let mkPureExprInstr ~fundec ~scope ?loc e =
   let loc = match loc with None -> e.eloc | Some l -> l in
   let typ = typeOf e in
@@ -4357,7 +4383,6 @@ let rec constFoldTermNodeAtTop = function
       try integer_lconstant (bytesSizeOf typ)
       with SizeOfError _ -> t
     end
-  | TSizeOfStr str -> integer_lconstant (String.length str + 1)
   | TAlignOf typ as t ->
     begin
       try integer_lconstant (bytesAlignOf typ)
@@ -4925,7 +4950,7 @@ let rec isConstantGen is_varinfo_cst f e = match e.enode with
   | Lval (Var vi, offset) ->
     is_varinfo_cst vi && isConstantOffsetGen is_varinfo_cst f offset
   | Lval _ -> false
-  | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _ | AlignOfE _ -> true
+  | SizeOf _ | SizeOfE _ | AlignOf _ | AlignOfE _ -> true
   (* see ISO 6.6.6 *)
   | CastE(t,{ enode = Const(CReal _)}) when Ast_types.is_integral t -> true
   | CastE(t, e) ->
@@ -4962,7 +4987,7 @@ let isIntegerConstant ?(is_varinfo_cst = alphafalse) e =
   isConstantGen is_varinfo_cst
     (function
       | CInt64 _ | CChr _ | CEnum _ -> true
-      | CStr _ | CWStr _ | CReal _ -> false)
+      | CReal _ -> false)
     e
 
 let getCompField cinfo fieldName =
@@ -5095,7 +5120,7 @@ let rec is_boolean_result e =
        | Div | Mod | Shiftlt | Shiftrt | BAnd | BXor | BOr), _, _, _) -> false
   | UnOp (LNot, _, _) -> true
   | UnOp ((Neg | BNot), _, _) -> false
-  | Lval _ | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _
+  | Lval _ | SizeOf _ | SizeOfE _ | AlignOf _
   | AlignOfE _ | AddrOf _ | StartOf _ -> false
 
 
@@ -6322,7 +6347,7 @@ let extract_varinfos_from_lval vlval =
 
 let rec free_vars_term bound_vars t = match t.term_node with
   | TConst _   | TSizeOf _
-  | TSizeOfStr _ | TAlignOf _
+  | TAlignOf _
   | Tnull
   | Ttype _ -> Logic_var.Set.empty
   | TLval lv

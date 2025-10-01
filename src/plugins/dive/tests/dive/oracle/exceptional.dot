@@ -14,7 +14,9 @@ digraph G {
   cp13 [label=<"lorem ipsum">, shape=box3d, fillcolor="#AACCFF",
         color="#88AAFF", style="filled", ];
   
-  subgraph cluster_cs_1 { label=<main>; cp13;cp11;cp9;cp7;cp5;cp3;cp2;
+  subgraph cluster_cs_1 { label=<main>; cp11;cp9;cp7;cp5;cp3;cp2;
+     };
+  subgraph cluster_file_1 { label=<exceptional.i>; cp13;
      };
   
   cp3 -> cp2;

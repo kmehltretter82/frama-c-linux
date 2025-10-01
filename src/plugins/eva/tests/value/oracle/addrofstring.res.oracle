@@ -15,9 +15,9 @@
 [from] ====== DEPENDENCIES COMPUTED ======
   These dependencies hold at termination for the executions that terminate:
 [from] Function main:
-  \result FROM "bar"[bits 8 to 15]
+  \result FROM "bar"[1]
 [from] ====== END OF DEPENDENCIES ======
 [inout] Out (internal) for function main:
     p; __retres
 [inout] Inputs for function main:
-    "bar"[bits 8 to 15]
+    "bar"[1]

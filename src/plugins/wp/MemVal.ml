@@ -45,7 +45,6 @@ sig
   type state = State.t
 
   val null : t
-  val literal: eid:int -> Cstring.cst -> int * t
   val cvar : varinfo -> t
 
   val field : t -> Cil_types.fieldinfo -> t
@@ -145,21 +144,6 @@ let () = Context.register
 (* -------------------------------------------------------------------------- *)
 (* ---  Utilities                                                         --- *)
 (* -------------------------------------------------------------------------- *)
-(* Wp utilities *)
-module Cstring =
-struct
-  include Cstring
-
-  let str_cil ~eid cstr =
-    let enode = match cstr with
-      | C_str str -> Const (CStr str)
-      | W_str wstr -> Const (CWStr wstr)
-    in {
-      eid = eid;
-      enode = enode;
-      eloc = Location.unknown;
-    }
-end
 
 (* Value utilities *)
 module Base =
@@ -224,7 +208,6 @@ struct
       | Base.Var (vi, _) -> Format.sprintf "MVar_%s" (LogicUsage.basename vi)
       | Base.CLogic_Var (_, _, _) -> assert false (* not supposed to append. *)
       | Base.Null -> "MNull"
-      | Base.String (eid, _) -> Format.sprintf "MStr_%d" eid
       | Base.Allocated (vi, _dealloc, _) ->
         Format.sprintf "MAlloc_%s" (LogicUsage.basename vi)
 
@@ -270,13 +253,6 @@ struct
     loc_v = V.null;
     loc_t = a_null;
   }
-
-  let literal ~eid cstr =
-    let bid, v = V.literal ~eid cstr in
-    {
-      loc_v = v;
-      loc_t = a_global (F.e_int bid)
-    }
 
   let cvar x = {
     loc_v = V.cvar x;
@@ -768,9 +744,6 @@ struct
   type state = Model.t
 
   let null = V.inject Base.null Ival.zero
-  let literal ~eid cstr =
-    let b = Base.of_string_exp (Cstring.str_cil ~eid cstr) in
-    Base.id b, V.inject b Ival.zero
   let cvar x = V.inject (Base.of_varinfo x) Ival.zero
 
   let field v fd =

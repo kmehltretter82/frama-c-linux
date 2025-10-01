@@ -387,7 +387,6 @@ and pp_exp_node fmt = function
   | Lval(lval) -> Format.fprintf fmt "Lval(%a)"        pp_lval lval
   | SizeOf(typ) -> Format.fprintf fmt "SizeOf(%a)"      pp_typ typ
   | SizeOfE(exp) -> Format.fprintf fmt "SizeOfE(%a)"     pp_exp exp
-  | SizeOfStr(string) -> Format.fprintf fmt "SizeOfStr(%a)"   pp_string string
   | AlignOf(typ) -> Format.fprintf fmt "AlignOf(%a)"     pp_typ typ
   | AlignOfE(exp) -> Format.fprintf fmt "AlignOfE(%a)"    pp_exp exp
   | UnOp(unop,exp,typ) -> Format.fprintf fmt "UnOp(%a,%a,%a)"        pp_unop unop  pp_exp exp  pp_typ typ
@@ -400,8 +399,6 @@ and pp_exp_node fmt = function
 and pp_constant fmt = function
   | CInt64(integer,ikind,string_option) ->
     Format.fprintf fmt "CInt64(%a,%a,%a)" pp_integer integer  pp_ikind ikind  (pp_option pp_string) string_option
-  | CStr(string) -> Format.fprintf fmt "CStr(%a)"  pp_string string
-  | CWStr(int64_list) -> Format.fprintf fmt "CWStr(%a)"  (pp_list pp_int64) int64_list
   | CChr(char) -> Format.fprintf fmt "CChr(%a)"  pp_char char
   | CReal(float,fkind,string_option) ->
     Format.fprintf fmt "CReal(%a,%a,%a)"  pp_float float  pp_fkind fkind  (pp_option pp_string) string_option
@@ -452,7 +449,16 @@ and pp_init fmt = function
     Format.fprintf fmt "CompoundInit(%a,%a)"  pp_typ typ
       (pp_list (pp_pair pp_offset pp_init)) offset_init_pair_list
 
-and pp_initinfo fmt initinfo = Format.fprintf fmt "{%a}" (pp_option pp_init) initinfo.init
+and pp_str_literal fmt = function
+  | Str s -> Format.fprintf fmt "Str(%S)" s
+  | Wstr l -> Format.fprintf fmt "Wstr(%a)" (pp_list pp_int64) l
+
+and pp_init_or_str fmt = function
+  | CInit init -> Format.fprintf fmt "Init(%a)" pp_init init
+  | StrInit si -> pp_str_literal fmt si
+
+and pp_initinfo fmt initinfo =
+  Format.fprintf fmt "{%a}" (pp_option pp_init_or_str) initinfo.init
 
 and pp_fundec fmt fundec =
   if print_full_fundec then
@@ -654,7 +660,6 @@ and pp_term_node fmt = function
   | TLval(term_lval) -> Format.fprintf fmt "TLval(%a)"  pp_term_lval term_lval
   | TSizeOf(typ) -> Format.fprintf fmt "TSizeOf(%a)"  pp_typ typ
   | TSizeOfE(term) -> Format.fprintf fmt "TSizeOfE(%a)"  pp_term term
-  | TSizeOfStr(string) -> Format.fprintf fmt "TSizeOfStr(%a)"  pp_string string
   | TAlignOf(typ) -> Format.fprintf fmt "TAlignOf(%a)"  pp_typ typ
   | TAlignOfE(term) -> Format.fprintf fmt "TAlignOfE(%a)"  pp_term term
   | TUnOp(unop,term) -> Format.fprintf fmt "TUnOp(%a,%a)"  pp_unop unop  pp_term term

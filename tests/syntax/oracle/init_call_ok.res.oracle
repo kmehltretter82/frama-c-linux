@@ -17,7 +17,7 @@ int main(void)
   char c[2] = {(char)0, (char)1};
   tmp = h();
   char d[1] = {(char)tmp};
-  char e[5] = {(char)'a', (char)'b', (char)'c', (char)'d', (char)'\000'};
+  char e[5U] = "abcd";
   tmp_0 = h();
   struct __anonstruct_A_1 A = {.A = {tmp_0, 2, 3, 4, 5, 6, 7, 8}, .i = 9};
   __retres = 0;

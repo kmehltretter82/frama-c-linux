@@ -79,8 +79,8 @@
 /* *********************************************************** */
 /* start of dictionary required to compile the obfuscated code */
 /* *********************************************************** */
-// literal strings
-#define LS1 "ti\rti"
+#define __fc_lit_string1 "ti\rti"
+#define __fc_lit_string2 "ti\rti"
 /* ********************************************************* */
 /* end of dictionary required to compile the obfuscated code */
 /* ********************************************************* */
@@ -140,7 +140,7 @@ int F3(int f2)
 int main(int *f3)
 {
   int V4;
-  if (LS1 == LS1) F2(f3);
+  if (__fc_lit_string1 == __fc_lit_string2) F2(f3);
   V4 = 0;
   return V4;
 }

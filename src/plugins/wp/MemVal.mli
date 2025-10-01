@@ -40,11 +40,6 @@ sig
 
   val null : t
 
-  (** [literal eid cstr] returns the pair of base identifier and abstract value
-      corresponding to the concrete string constant [cstr] of unique expression
-      identifier [eid]. [eid] should be a valid identifier for [cstr]. **)
-  val literal: eid:int -> Cstring.cst -> int * t
-
   (** [cvar x] returns the abstract value corresponding to &[x]. **)
   val cvar : Cil_types.varinfo -> t
 

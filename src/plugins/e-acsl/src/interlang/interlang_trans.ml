@@ -113,7 +113,8 @@ and compile_context_insensitive {Interlang.enode; origin} =
     let cast = Typing.get_cast ~logic_env origin in
     let mk_real s =
       let s = Gmp.Q.normalize_str s in
-      Cil.mkString ~loc s
+      Cil.mkAddrOrStartOf ~loc
+        (Cil.var (Globals.Vars.add_string_literal ~loc (Str s)))
     in
     let e, strnum =
       let open Analyses_types in
@@ -121,14 +122,23 @@ and compile_context_insensitive {Interlang.enode; origin} =
       | Nan -> assert false
       | Real -> Error.not_yet "real number constant"
       | Rational -> mk_real (Integer.to_string n), Str_R
-      | Gmpz -> Cil.mkString ~loc (Integer.to_string n), Str_Z
+      | Gmpz ->
+        Cil.mkAddrOrStartOf ~loc
+          (Cil.var
+             (Globals.Vars.add_string_literal ~loc
+                (Str (Integer.to_string n)))),
+        Str_Z
       | C_float fkind ->
         Cil.kfloat ~loc fkind (Int64.to_float (Integer.to_int64_exn n)), C_number
       | C_integer kind ->
         match cast, kind with
         | Some ty, (ILongLong | IULongLong) when Gmp_types.Z.is_t ty ->
           (* too large integer *)
-          Cil.mkString ~loc (Integer.to_string n),  Str_Z
+          Cil.mkAddrOrStartOf ~loc
+            (Cil.var
+               (Globals.Vars.add_string_literal ~loc
+                  (Str (Integer.to_string n)))),
+          Str_Z
         | Some ty, _ when Gmp_types.Q.is_t ty ->
           mk_real (Integer.to_string n),  Str_R
         | (None | Some _), _ ->

@@ -39,8 +39,9 @@ class coverageAuxVisitor ~libc = object(self)
         match init with
         | { init = None } -> None
         | { init = Some init } ->
-          ignore (Visitor.visitFramacInit (self:>Visitor.frama_c_visitor)
-                    vi NoOffset init);
+          ignore
+            (Visitor.visitFramacInit_or_str (self:>Visitor.frama_c_visitor)
+               vi init);
           Some init
       with Not_found -> (* not a global *) None
     else None
@@ -87,7 +88,7 @@ class callableFunctionsVisitor ~libc = object(self)
   method! visit_non_function_var vi =
     let r = super#visit_non_function_var vi in
     (match r with
-     | None -> ()
+     | None | Some (StrInit _) -> ()
      | Some init -> initializers <- (vi, init) :: initializers
     );
     r
@@ -119,7 +120,7 @@ end
 type coverage_metrics = {
   syntactic: Cil_datatype.Varinfo.Set.t;
   semantic: Cil_datatype.Varinfo.Set.t;
-  initializers: (Cil_types.varinfo * Cil_types.init) list;
+  initializers: (Cil_types.varinfo * Cil_types.init_or_str) list;
 }
 
 class deadCallsVisitor fmt ~libc cov_metrics =
@@ -183,9 +184,9 @@ class deadCallsVisitor fmt ~libc cov_metrics =
         in
         List.iter (fun (vinit, init) ->
             current_initializer <- Some vinit;
-            ignore (Visitor.visitFramacInit
-                      (self:>Visitor.frama_c_visitor)
-                      vinit NoOffset init);
+            ignore
+              (Visitor.visitFramacInit_or_str
+                 (self:>Visitor.frama_c_visitor) vinit init);
             current_initializer <- None;
           ) sorted_initializers;
         Format.fprintf fmt "@]"
@@ -408,7 +409,6 @@ let percent_coverage ~libc cov_metrics =
   and nsem = cardinality ~libc cov_metrics.semantic in
   let percent = (float_of_int nsem) /. (float_of_int nsyn) *. 100.0 in
   percent
-;;
 
 let compute ~libc =
   assert (Eva.Analysis.is_computed ());
@@ -416,7 +416,6 @@ let compute ~libc =
   let main = fst (Globals.entry_point ()) in
   let syntactic, initializers = compute_syntactic ~libc main in
   { syntactic; semantic; initializers }
-;;
 
 (* Reexport a simpler function *)
 let compute_syntactic ~libc kf =

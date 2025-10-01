@@ -658,7 +658,7 @@
 [eva:final-states] Values at end of function test_strstr:
   s ∈ {{ "aba" ; "bab" }}
   needle ∈ {{ "a" ; "b" }}
-  res ∈ {{ NULL ; "aba" + {0; 1; 2; 3} ; "bab" + {0; 1; 2; 3} }}
+  res ∈ {{ NULL ; "aba"{[0], [1], [2], [3]} ; "bab"{[0], [1], [2], [3]} }}
 [eva:final-states] Values at end of function test_strtok:
   __fc_strtok_ptr ∈ {{ "constant!" + [0..9] }}
   buf[0..1] ∈ [--..--]
@@ -684,9 +684,9 @@
   strsig ∈ {{ &__fc_strsignal[0] }}
   c ∈ {{ "haystack" }}
   d ∈ {97; 110}
-  chr1 ∈ {{ "haystack" + {2; 7} }}
+  chr1 ∈ {{ "haystack"{[2], [7]} }}
   nul1 ∈ {{ "haystack" + [0..8] }}
-  chr2 ∈ {{ NULL ; "haystack" + {1} }}
+  chr2 ∈ {{ NULL ; "haystack"[1] }}
   nul2 ∈ {{ "haystack" + [0..8] }}
   pdest[0..8] ∈ [--..--] or UNINITIALIZED
        [9] ∈ UNINITIALIZED

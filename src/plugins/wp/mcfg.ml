@@ -88,7 +88,7 @@ module type S = sig
     WpPropId.prop_id option -> WpPropId.assigns_desc -> t_prop -> t_prop
 
   val label  : t_env -> stmt option -> Clabels.c_label -> t_prop -> t_prop
-  val init : t_env -> varinfo -> init option -> t_prop -> t_prop
+  val init : t_env -> varinfo -> init_or_str option -> t_prop -> t_prop
   val const : t_env -> varinfo -> t_prop -> t_prop
   val assign : t_env -> stmt -> lval -> exp -> t_prop -> t_prop
   val return : t_env -> stmt -> exp option -> t_prop -> t_prop

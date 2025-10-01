@@ -47,7 +47,9 @@ let constant_to_exp_il t c =
 let constant_to_exp ~loc env t c =
   let mk_real s =
     let s = Gmp.Q.normalize_str s in
-    Cil.mkString ~loc s, Analyses_types.Str_R
+    Cil.mkAddrOrStartOf ~loc
+      (Cil.var (Globals.Vars.add_string_literal ~loc (Str s))),
+    Analyses_types.Str_R
   in
   match c with
   | Boolean b ->
@@ -59,7 +61,12 @@ let constant_to_exp ~loc env t c =
      | Nan -> assert false
      | Real -> Error.not_yet "real number constant"
      | Rational -> mk_real (Integer.to_string n)
-     | Gmpz -> Cil.mkString ~loc (Integer.to_string n), Analyses_types.Str_Z
+     | Gmpz ->
+       Cil.mkAddrOrStartOf ~loc
+         (Cil.var
+            (Globals.Vars.add_string_literal ~loc
+               (Str (Integer.to_string n)))),
+       Analyses_types.Str_Z
      (* too large integer *)
      | C_float fkind ->
        Cil.kfloat ~loc fkind (Int64.to_float (Integer.to_int64_exn n)), C_number
@@ -68,7 +75,11 @@ let constant_to_exp ~loc env t c =
        match cast, kind with
        | Some ty, (ILongLong | IULongLong) when Gmp_types.Z.is_t ty ->
          (* too large integer *)
-         Cil.mkString ~loc (Integer.to_string n), Analyses_types.Str_Z
+         Cil.mkAddrOrStartOf ~loc
+           (Cil.var
+              (Globals.Vars.add_string_literal ~loc
+                 (Str (Integer.to_string n)))),
+         Analyses_types.Str_Z
        | Some ty, _ when Gmp_types.Q.is_t ty ->
          mk_real (Integer.to_string n)
        | (None | Some _), _ ->
@@ -79,8 +90,7 @@ let constant_to_exp ~loc env t c =
             representation, the kind would be ignored in the generated code and
             so [1] would be generated. *)
          Cil.kinteger64 ~loc ~kind n, Analyses_types.C_number)
-  | LStr s -> Cil.new_exp ~loc (Const (CStr s)), Analyses_types.C_number
-  | LWStr s -> Cil.new_exp ~loc (Const (CWStr s)), Analyses_types.C_number
+  | LStr _ | LWStr _ -> Options.not_yet_implemented "ACSL String literals"
   | LChr c -> Cil.new_exp ~loc (Const (CChr c)), Analyses_types.C_number
   | LReal lr ->
     if lr.r_lower = lr.r_upper
@@ -370,10 +380,6 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
     let e = Cil.sizeOf ~loc (Cil.typeOf e') in
     let adata = Assert.register_term ~loc ~force:true t e adata in
     e, adata, env, Analyses_types.C_number, "sizeof"
-  | TSizeOfStr s ->
-    let e = Cil.new_exp ~loc (SizeOfStr s) in
-    let adata = Assert.register_term ~loc t e adata in
-    e, adata, env, Analyses_types.C_number, "sizeofstr"
   | TAlignOf ty ->
     let e = Cil.new_exp ~loc (AlignOf ty) in
     let adata = Assert.register_term ~loc t e adata in

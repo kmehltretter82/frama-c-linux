@@ -13,8 +13,7 @@
 [eva] Recording results for f
 [eva] Done for function f
 [eva] preprocess.c:25: assertion got status valid.
-[eva] preprocess.c:28: 
-  cannot evaluate ACSL term, unsupported ACSL construct: constant strings
+[eva] preprocess.c:28: cannot evaluate ACSL term, unsupported logic var tmp
 [eva:alarm] preprocess.c:28: Warning: 
   assertion 'backslash_string' got status unknown.
 [eva] Recording results for main
@@ -46,7 +45,7 @@ int main(void)
   int __retres;
   int y_0 = f(42);
   /*@ assert x ≡ 1; */ ;
-  /*@ assert backslash_string: *("\\" + 0) ≡ '\\'; */ ;
+  /*@ assert backslash_string: (\let tmp = "\\"; tmp[0]) ≡ '\\'; */ ;
   __retres = 0;
   return __retres;
 }

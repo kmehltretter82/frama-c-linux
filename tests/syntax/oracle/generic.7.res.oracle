@@ -1,7 +1,7 @@
 [kernel] Parsing generic.c (with preprocessing)
 [kernel] generic.c:66: User Error: 
   no compatible types and no default type in _Generic selection:
-  controlling expression: '"abc"' (type: char *);
+  controlling expression: '__fc_lit_string1' (type: char *);
   candidate types: char const *
   64    #endif
   65    #ifdef INCOMPATIBLE_QUALIFIED_TYPE

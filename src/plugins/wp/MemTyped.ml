@@ -604,9 +604,6 @@ module BASE = WpContext.Generator(Varinfo)
 
 let null = MemAddr.null (* as a loc *)
 
-let literal ~eid cst =
-  shift (MemAddr.global (STRING.get (eid,cst))) (C_int (Ctypes.c_char ())) F.e_zero
-
 let cvar x = MemAddr.global (BASE.get x)
 
 let pointer_loc t = t

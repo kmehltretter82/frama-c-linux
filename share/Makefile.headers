@@ -23,7 +23,7 @@ HDRCK?=frama-c-hdrck
 HEADER_STRICT?=yes
 
 # Defines where to find the header directories
-HEADER_DIRS?=headers $(wildcard src/plugins/*/headers)
+HEADER_DIRS?=headers
 
 # Can be set to a directory
 # - <dir>: directory containing the files to manage

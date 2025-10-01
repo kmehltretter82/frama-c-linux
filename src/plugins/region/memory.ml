@@ -526,7 +526,7 @@ and offset (r: node) (ty: typ) (ofs: offset) : node =
 and exp (m: map) (e: exp) : node option =
   match e.enode with
   | Const _
-  | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _ | AlignOfE _ -> None
+  | SizeOf _ | SizeOfE _ | AlignOf _ | AlignOfE _ -> None
   | Lval lv -> points_to @@ lval m lv
   | AddrOf lv | StartOf lv -> Some (lval m lv)
   | CastE(_, e) -> exp m e

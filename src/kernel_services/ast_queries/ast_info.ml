@@ -15,7 +15,7 @@ open Cil
 
 let is_integral_const = function
   | CInt64 _ | CEnum _ | CChr _ -> true
-  | CStr _ | CWStr _ | CReal _ -> false
+  | CReal _ -> false
 
 let rec possible_value_of_integral_const = function
   | CInt64 (i,_,_) -> Some i
@@ -54,6 +54,8 @@ let is_non_null_expr e =
   | Const c when is_integral_const c ->
     not (Integer.equal (value_of_integral_const c) Integer.zero)
   | _ -> false
+
+let is_string_literal vi = Ast_attributes.(contains fc_literal vi.vattr)
 
 (* ************************************************************************** *)
 (** {2 Logical terms} *)

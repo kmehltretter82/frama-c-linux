@@ -7,7 +7,6 @@
 #include "stdio.h"
 #include "stdlib.h"
 #include "time.h"
-char *__gen_e_acsl_literal_string;
 extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 
 /*@ requires
@@ -84,6 +83,16 @@ extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
  */
 char *__gen_e_acsl_realpath(char const * restrict file_name,
                             char * restrict resolved_name);
+
+int main(int argc, char const **argv)
+{
+  int __retres;
+  __e_acsl_memory_init(& argc,(char ***)(& argv),8UL);
+  char *cwd = __gen_e_acsl_realpath(".",(char *)0);
+  __retres = 0;
+  __e_acsl_memory_clean();
+  return __retres;
+}
 
 /*@ requires
       valid_file_name_or_null:
@@ -320,30 +329,6 @@ char *__gen_e_acsl_realpath(char const * restrict file_name,
     __e_acsl_delete_block((void *)(& resolved_name));
     return __retres;
   }
-}
-
-void __e_acsl_globals_init(void)
-{
-  static char __e_acsl_already_run = 0;
-  if (! __e_acsl_already_run) {
-    __e_acsl_already_run = 1;
-    __gen_e_acsl_literal_string = ".";
-    __e_acsl_store_block((void *)__gen_e_acsl_literal_string,sizeof("."));
-    __e_acsl_full_init((void *)__gen_e_acsl_literal_string);
-    __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string);
-  }
-  return;
-}
-
-int main(int argc, char const **argv)
-{
-  int __retres;
-  __e_acsl_memory_init(& argc,(char ***)(& argv),8UL);
-  __e_acsl_globals_init();
-  char *cwd = __gen_e_acsl_realpath(__gen_e_acsl_literal_string,(char *)0);
-  __retres = 0;
-  __e_acsl_memory_clean();
-  return __retres;
 }
 
 

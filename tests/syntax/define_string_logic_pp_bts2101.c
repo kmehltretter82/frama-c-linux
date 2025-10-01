@@ -4,7 +4,7 @@ to"
 #define BAR 'to\
 toblublihyu'
 
-/*@ predicate p(char * x) = x[0] == 't'; */
+/*@ predicate p(char x[]) = x[0] == 't'; */
 
 int main(void)
 {

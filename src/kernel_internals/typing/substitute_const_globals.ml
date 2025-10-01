@@ -52,6 +52,7 @@ class constGlobSubstVisitorClass : cilVisitor = object
   (* Visit expressions and replace lvals, with a registered varinfo in
      [vi_to_init_opt], with respective initializing constant expressions. *)
   method! vexpr e =
+    let loc = e.eloc in
     match e.enode with
     | Lval (Var vi, (NoOffset | Index _ as offset)) ->
       (* Support for variables and array, on arithmetic types only. *)
@@ -59,16 +60,15 @@ class constGlobSubstVisitorClass : cilVisitor = object
         | None ->
           (* Since [vi] is a global, we replace it with the zero expression,
              i.e. the implicit initializer for such globals. *)
-          let newexp = zero ~loc:e.eloc in
-          ChangeTo newexp
+          ChangeTo (zero ~loc)
         | Some init ->
           let offset = constFoldOffset true offset in
-          let zero_exp = zero ~loc:e.eloc in
+          let zero_exp = zero ~loc in
           let rec find_replace current_offset current_init current_newexp =
             match current_init with
             | SingleInit si ->
               if Cil_datatype.OffsetStructEq.equal offset current_offset
-              then new_exp ~loc:e.eloc si.enode
+              then new_exp ~loc si.enode
               else current_newexp
             | CompoundInit (ct, initl) ->
               (* We are dealing with an array: recursively [find_replace] among
@@ -84,8 +84,31 @@ class constGlobSubstVisitorClass : cilVisitor = object
                 ~initl
                 ~acc:current_newexp
           in
-          let newexp = find_replace NoOffset init zero_exp in
-          ChangeTo newexp
+          (match init, offset with
+           | CInit i,_ ->
+             let newexp = find_replace NoOffset i zero_exp in
+             ChangeTo newexp
+           | StrInit (Str s), Index (i,NoOffset) ->
+             let l = Z.of_int (String.length s) in
+             (match Cil.constFoldToInt i with
+              | Some z when Z.leq Z.zero z && Z.lt z l ->
+                let c = s.[Z.to_int z] in
+                ChangeTo (Cil.new_exp ~loc (Const (CChr c)))
+              | Some z when Z.equal z l ->
+                ChangeTo (Cil.new_exp ~loc (Const (CChr '\000')))
+              | Some _ | None -> DoChildren
+             )
+           | StrInit (Wstr l), Index(i,NoOffset) ->
+             let len = Z.of_int (List.length l) in
+             (match Cil.constFoldToInt i with
+              | Some z when Z.leq Z.zero z && Z.lt z len ->
+                let c = List.nth l (Z.to_int z) in
+                ChangeTo
+                  (Cil.kinteger64 ~loc ~kind:(Machine.wchar_kind()) (Z.of_int64 c))
+              | Some z when Z.equal z len ->
+                ChangeTo (Cil.kinteger64 ~loc ~kind:(Machine.wchar_kind()) Z.zero)
+              | Some _ | None -> DoChildren)
+           | StrInit _, _ -> DoChildren)
         | exception Not_found ->
           DoChildren
       end

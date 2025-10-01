@@ -1204,8 +1204,9 @@ module Base_checker = struct
         end;
         match e.enode with
         | Const (CEnum ei) -> self#check_ei ei
-        | Lval lv when
+        | Lval ((Var v, _) as lv) when
             Ast_types.is_array (Cil.typeOfLval lv)
+            && (not (Ast_info.is_string_literal v))
             && (Stack.is_empty accept_array || not (Stack.top accept_array)) ->
           check_abort "%a is an array, but used as an lval"
             Printer.pp_lval lv

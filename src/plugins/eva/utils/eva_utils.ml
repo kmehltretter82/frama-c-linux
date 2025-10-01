@@ -141,7 +141,7 @@ let lval_to_exp =
 
 let rec height_expr expr =
   match expr.enode with
-  | Const _ | SizeOf _ | SizeOfStr _ | AlignOf _ -> 0
+  | Const _ | SizeOf _ | AlignOf _ -> 0
   | Lval lv | AddrOf lv | StartOf lv  -> height_lval lv + 1
   | UnOp (_,e,_) | CastE (_, e) | SizeOfE e | AlignOfE e
     -> height_expr e + 1

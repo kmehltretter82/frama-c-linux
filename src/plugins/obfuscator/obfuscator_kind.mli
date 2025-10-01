@@ -15,7 +15,7 @@ type k =
   | Function
   | Global_var
   | Label
-  | Literal_string
+  | String_literal
   | Local_var
   | Logic_var
   | Predicate

@@ -213,6 +213,7 @@ let frama_c_mutable      = "fc_mutable"
 let fc_stdlib            = "fc_stdlib"
 let fc_stdlib_generated  = "fc_stdlib_generated"
 let fc_local_static      = "fc_local_static"
+let fc_literal           = "fc_literal"
 let frama_c_destructor   = "fc_destructor"
 let fc_oldstyleproto     = "FC_OLDSTYLEPROTO"
 let fc_missingproto      = "missingproto"
@@ -225,6 +226,7 @@ let () =
     ; fc_stdlib
     ; fc_stdlib_generated
     ; fc_local_static
+    ; fc_literal
     ; frama_c_destructor
     ]
 

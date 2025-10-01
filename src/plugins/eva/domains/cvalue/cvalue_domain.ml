@@ -29,6 +29,8 @@ let filter_generated_and_locals kf =
 let print_final_state kf values =
   let outs = Eva_dynamic.Inout.kf_outputs kf in
   let outs = Locations.Zone.filter_base (filter_generated_and_locals kf) outs in
+  (* NB: there's no need to filter the variables representing string literals
+     here, since by definition they won't appear as _output_ of any function. *)
   let print_filtered_state fmt =
     if Cvalue.Model.(equal values bottom)
     then Format.fprintf fmt "@[  NON TERMINATING FUNCTION@]"
@@ -55,6 +57,14 @@ let print_final_state kf values =
   in
   Self.printf ~dkey:Self.dkey_final_states ~header "%t" print_filtered_state
 
+let pretty_wo_string_literal fmt s =
+  let filtered =
+    if Self.(is_debug_key_enabled dkey_include_string_literal)
+    then s
+    else Cvalue.Model.filter_base (fun b -> not (Base.is_string_literal b)) s
+  in
+  Cvalue.Model.pretty fmt filtered
+
 module State = struct
 
   type state = Cvalue.Model.t * Locals_scoping.clobbered_set
@@ -79,7 +89,7 @@ module State = struct
       let structural_descr =
         Structural_descr.t_tuple
           [| Cvalue.Model.packed_descr; Locals_scoping.packed_descr |]
-      let pretty fmt (s, _) = Cvalue.Model.pretty fmt s
+      let pretty fmt (s, _) = pretty_wo_string_literal fmt s
       let equal (a, _) (b, _) = Cvalue.Model.equal a b
       let compare (a, _) (b, _) = Cvalue.Model.compare a b
       let hash (s, _) = Cvalue.Model.hash s

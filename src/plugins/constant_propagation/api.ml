@@ -223,7 +223,7 @@ class propagate project fnames ~cast_intro = object(self)
              const_integer m ikind
            | _ -> raise Cannot_expand)
 
-        | Base.String _ | Base.Var _ | Base.Allocated _
+        | Base.Var _ | Base.Allocated _
         | Base.CLogic_Var _ -> raise Cannot_change
       in
       PropagationParameters.debug "Replacing %a with %a"

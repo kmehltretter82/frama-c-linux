@@ -12,8 +12,6 @@ open Cil_datatype
 let warn kind name =
   Options.warning ~once:true "unobfuscated %s name `%s'" kind name
 
-let has_literal_string = ref false
-
 class visitor = object
 
   inherit Visitor.frama_c_inplace
@@ -65,25 +63,16 @@ class visitor = object
     ei.einame <- Dictionary.fresh Obfuscator_kind.Enum ei.einame;
     Cil.DoChildren
 
-  method! vexpr e = match e.enode with
-    | Const(CStr str) ->
-      has_literal_string := true;
-      (* ignore the result: will be handle by hacking the pretty printer *)
-      (try
-         ignore (Dictionary.id_of_literal_string str)
-       with Not_found ->
-         ignore (Dictionary.fresh Obfuscator_kind.Literal_string str));
-      Cil.SkipChildren
-    | _ ->
-      Cil.DoChildren
-
   method! vvdec vi =
     (* Varinfo can be visited (and obfuscated) more than once:
        functions for their declaration and definition, variables
        as parts of the type of the function, and in the body of
        the function declaration, etc. Thus we make sure that the
-       obfuscator does not visit them twice *)
-    if Varinfo.Hashtbl.mem varinfos_visited vi then
+       obfuscator does not visit them twice.
+       Moreover, string literals have their own special treatment.
+    *)
+    if Varinfo.Hashtbl.mem varinfos_visited vi || Ast_info.is_string_literal vi
+    then
       Cil.SkipChildren
     else begin
       if Ast_types.is_fun vi.vtype then begin
@@ -188,8 +177,6 @@ class visitor = object
      | _ -> ());
     Cil.DoChildren
 
-  initializer has_literal_string := false
-
 end
 
 let obfuscate_behaviors () =
@@ -226,20 +213,29 @@ let obfuscate_behaviors () =
          (fun e kf l -> Annotations.remove_disjoint e kf l)
          (fun e kf l -> Annotations.add_disjoint e kf l))
 
+let define_string_lit fmt v =
+  Format.fprintf fmt "#define %s %a@\n"
+    v.vname Cil_printer.pp_str_literal (Globals.Vars.get_string_literal v)
+
 module UpdatePrinter (X: Printer.PrinterClass) = struct
   (* obfuscated printer *)
-  class printer = object
+  class printer = object(self)
     inherit X.printer as super
-    method! constant fmt = function
-      | CStr str -> Format.fprintf fmt "%s" (Dictionary.id_of_literal_string str)
-      | c -> super#constant fmt c
 
     method! file fmt ast =
-      if !has_literal_string then begin
+      let literal_strings =
+        Globals.Vars.fold
+          (fun v _ acc ->
+             if Ast_info.is_string_literal v then
+               Cil_datatype.Varinfo.Set.add v acc
+             else acc)
+          Cil_datatype.Varinfo.Set.empty
+      in
+      if not (Cil_datatype.Varinfo.Set.is_empty literal_strings) then begin
         let string_fmt =
-          if Options.Literal_string.is_default () then fmt
+          if Options.String_literal.is_default () then fmt
           else begin
-            let file = Options.Literal_string.get () in
+            let file = Options.String_literal.get () in
             try
               let cout = open_out file in
               Format.formatter_of_out_channel cout
@@ -255,7 +251,8 @@ module UpdatePrinter (X: Printer.PrinterClass) = struct
 /* *********************************************************** */@\n\
 /* start of dictionary required to compile the obfuscated code */@\n\
 /* *********************************************************** */@\n";
-        Dictionary.pretty_kind string_fmt Obfuscator_kind.Literal_string;
+        Cil_datatype.Varinfo.Set.iter
+          (define_string_lit string_fmt) literal_strings;
         Format.fprintf string_fmt "\
 /* ********************************************************* */@\n\
 /* end of dictionary required to compile the obfuscated code */@\n\
@@ -265,10 +262,32 @@ module UpdatePrinter (X: Printer.PrinterClass) = struct
           Format.fprintf fmt "\
 /* include the dictionary of literal strings */@\n\
 @[#include \"%s\"@]@\n@\n"
-            (Options.Literal_string.get ())
+            (Options.String_literal.get ())
         end
       end;
       super#file fmt ast
+
+    method! lval fmt lv =
+      match lv with
+      | Var v, (NoOffset | Index _ as o)
+        when Ast_info.is_string_literal v ->
+        Format.fprintf fmt "%s%a" v.vname self#offset o
+      | _ -> super#lval fmt lv
+
+    method! term_lval fmt lv =
+      match lv with
+      | TVar { lv_origin = Some v }, (TNoOffset | TIndex _ as o)
+        when Ast_info.is_string_literal v ->
+        Format.fprintf fmt "%s%a" v.vname self#term_offset o
+      | _ -> super#term_lval fmt lv
+
+    method! global fmt g =
+      match g with
+      (* do not output literal string globals even with -print-as-is
+         (which makes little sense with -obfuscate anyways)
+      *)
+      | GVarDecl (v,_) | GVar(v,_,_) when Ast_info.is_string_literal v -> ()
+      | _ -> super#global fmt g
 
   end
 end

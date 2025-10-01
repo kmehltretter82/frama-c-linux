@@ -543,7 +543,6 @@ and is_same_term_node t t' env =
   | TAlignOf t, TAlignOf t' -> is_same_type t t' env
   | TSizeOfE t, TSizeOfE t'
   | TAlignOfE t, TAlignOfE t' -> is_same_term t t' env
-  | TSizeOfStr s, TSizeOfStr s' -> String.length s = String.length s'
   | TUnOp(op,t), TUnOp(op',t') -> equal_unop op op' && is_same_term t t' env
   | TBinOp(op,t1,t2), TBinOp(op',t1',t2') ->
     equal_binop op op' && is_same_term t1 t1' env && is_same_term t2 t2' env
@@ -596,7 +595,7 @@ and is_same_term_node t t' env =
       let env = add_logic_vars [v.l_var_info] [v'.l_var_info] env in
       is_same_term t t' env
     end else false
-  | (TConst _ | TLval _ | TSizeOf _ | TSizeOfE _ | TSizeOfStr _ | TAlignOf _
+  | (TConst _ | TLval _ | TSizeOf _ | TSizeOfE _ | TAlignOf _
     | TAlignOfE _ |  TUnOp _ | TBinOp _ | TCast _ | TAddrOf _ | TStartOf _
     | Tapp _ | Tlambda _ | TDataCons _ | Tif _ | Tat _ | Tbase_addr _
     | Toffset _ | Tblock_length _ | Tnull | TUpdate _
@@ -896,7 +895,16 @@ and is_same_init i i' env =
     (is_same_list is_same_compound_init) l l' env
   | (SingleInit _ | CompoundInit _), _ -> false
 
-and is_same_initinfo i i' env = is_same_opt is_same_init i.init i'.init env
+and is_same_init_or_str i i' env =
+  match i,i' with
+  | CInit i, CInit i' -> is_same_init i i' env
+  | StrInit (Str s), StrInit (Str s') -> String.equal s s'
+  | StrInit (Wstr s), StrInit (Wstr s') ->
+    is_same_list (fun v v' _ -> Int64.equal v v') s s' env
+  | (CInit _ | StrInit _), _ -> false
+
+and is_same_initinfo i i' env =
+  is_same_opt is_same_init_or_str i.init i'.init env
 
 and is_same_local_init i i' env =
   match i, i' with
@@ -921,7 +929,7 @@ and is_same_constant c c' env =
      | `Same ei'' -> Cil_datatype.Enumitem.equal ei' ei''
      | `Not_present -> false)
   | CEnum _, _ | _, CEnum _ -> false
-  | (CInt64 _ | CStr _ | CWStr _ | CChr _ | CReal _), _ ->
+  | (CInt64 _ | CChr _ | CReal _), _ ->
     Cil_datatype.Constant.equal c c'
 
 and is_same_exp e e' env =
@@ -930,7 +938,6 @@ and is_same_exp e e' env =
   | Lval lv, Lval lv' -> is_same_lval lv lv' env
   | SizeOf t, SizeOf t' -> is_same_type t t' env
   | SizeOfE e, SizeOfE e' -> is_same_exp e e' env
-  | SizeOfStr s, SizeOfStr s' -> String.length s = String.length s'
   | AlignOf t, AlignOf t' -> is_same_type t t' env
   | AlignOfE e, AlignOfE e' -> is_same_exp e e' env
   | UnOp(op,e,t), UnOp(op',e',t') ->
@@ -941,8 +948,9 @@ and is_same_exp e e' env =
   | CastE(t,e), CastE(t',e') -> is_same_type t t' env && is_same_exp e e' env
   | AddrOf lv, AddrOf lv' -> is_same_lval lv lv' env
   | StartOf lv, StartOf lv' -> is_same_lval lv lv' env
-  | (Const _ | Lval _ | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _
-    | AlignOfE _ | UnOp _ | BinOp _  | CastE _ | AddrOf _ | StartOf _),_-> false
+  | (Const _ | Lval _ | SizeOf _ | SizeOfE _ | AlignOf _
+    | AlignOfE _ | UnOp _ | BinOp _  | CastE _
+    | AddrOf _ | StartOf _),_-> false
 
 and is_same_lval lv lv' env =
   is_same_pair is_same_lhost is_same_offset lv lv' env

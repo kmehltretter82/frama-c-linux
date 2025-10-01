@@ -299,7 +299,7 @@ struct
     match instr with
     | Skip _ | Code_annot _ -> w
     | Set(lv,e,_) -> W.assign env.we s lv e w
-    | Local_init(x,AssignInit i,_) -> W.init env.we x (Some i) w
+    | Local_init(x,AssignInit i,_) -> W.init env.we x (Some (CInit i)) w
     | Local_init(x,ConsInit (vf, args, kind), loc) ->
       Cil.treat_constructor_as_func
         begin fun r fct args _loc ->

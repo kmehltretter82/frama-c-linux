@@ -1,4 +1,6 @@
 [kernel] Parsing sys_stat_h.c (with preprocessing)
+[kernel] sys_stat_h.c:19: Warning: 
+  Too many initializers for character array non_terminated
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed

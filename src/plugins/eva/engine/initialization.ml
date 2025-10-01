@@ -111,13 +111,84 @@ module Make
   (* Applies a single initializer, using the standard transfer function on
      assignments. Warns if the results is bottom. *)
   let apply_eva_single_initializer ~source ~pos state lval expr =
-    match Transfer.assign ~pos state lval expr with
+    match Transfer.assign state ~pos lval expr with
     | `Bottom ->
       if not (Position.is_local pos) then
         Self.warning ~pos ~source ~once:true
           "evaluation of initializer '%a' failed@." Eva_ast.pp_exp expr;
       raise Initialization_failed
     | `Value v -> v
+
+  (* Initializes array [lval] with sequence of characters [seq] in [state].
+     Auxiliary function used for string and wide string literals: [zero] is the
+     null character and [constant] builds the Eva constant form a character.
+     Applies [apply_eva_single_initializer] for each character. *)
+  let init_char_array_aux ~source ~pos zero constant lval seq state =
+    let _, size = Ast_types.array_elem_type_and_size lval.typ in
+    (* Adds [zero] characters to the sequence. *)
+    let seq =
+      match Option.bind (Cil.constFoldToInt ~machdep:true) size with
+      | None -> Seq.append seq (Seq.return zero)
+      | Some size ->
+        Seq.take (Z.to_int size) (Seq.append seq (Seq.repeat zero))
+    in
+    (* Initializes i-nth element with character [c]. *)
+    let init_element state i c =
+      let index_i = Z.of_int i in
+      let index_cst = Const (CInt64 (index_i, Machine.sizeof_kind (), None)) in
+      let index_exp = Eva_ast_builder.mk_exp index_cst in
+      let index = Index (index_exp, NoOffset) in
+      let lval = Eva_ast.(add_offset lval index) in
+      let expr = Eva_ast_builder.mk_exp (Const (constant c)) in
+      apply_eva_single_initializer ~pos ~source state lval expr
+    in
+    Seq.fold_lefti init_element state seq
+
+  (* Initializes array [lval] from string literal [str] in [state]. *)
+  let init_char_array ~source ~pos lval str state =
+    if not (Ast_types.is_any_char_array lval.typ) then
+      Self.fatal
+        "Initialization of %a of type %a with a string literal, \
+         which can only be used to initialize a char array."
+        Eva_ast_printer.pp_lval lval Printer.pp_typ lval.typ;
+    let zero = '\000' in
+    let seq = String.to_seq str in
+    let constant c = CChr c in
+    init_char_array_aux ~source ~pos zero constant lval seq state
+
+  (* Initializes array [lval] from wide string literal [list] in [state]. *)
+  let init_wchar_array ~source ~pos lval list state =
+    if not (Ast_types.is_wchar_array lval.typ) then
+      Self.fatal
+        "Initialization of %a of type %a with a wide string literal, \
+         which can only be used to initialize a wide char array."
+        Eva_ast_printer.pp_lval lval Printer.pp_typ lval.typ;
+    let zero = Int64.zero in
+    let constant i = CInt64 (Z.of_int64 i, Machine.wchar_kind (), None) in
+    let seq = List.to_seq list in
+    init_char_array_aux ~source ~pos zero constant lval seq state
+
+  let get_string_literal e =
+    match e.node with
+    | Lval { node = Var v, NoOffset } ->
+      Some (Globals.Vars.get_string_literal v)
+    | _ -> None
+
+  (* Applies a single initializer, with the special case of char or wchar arrays
+     being initialized with string literals. *)
+  let apply_eva_single_initializer_or_str ~source ~pos state lval expr =
+    if Ast_types.is_any_char_array lval.typ then begin
+      match get_string_literal expr with
+      | Some (Str s) -> init_char_array ~source ~pos lval s state
+      | None | Some (Wstr _) ->
+        Self.fatal "Single init of a char array can only be a string literal"
+    end else if Ast_types.is_wchar_array lval.typ then begin
+      match get_string_literal expr with
+      | Some (Wstr ws) -> init_wchar_array ~source ~pos lval ws state
+      | None | Some (Str _) ->
+        Self.fatal "Single init of a wchar array can only be a wide string literal"
+    end else
+      apply_eva_single_initializer ~source ~pos state lval expr
 
   (* Applies an initializer. If [top_volatile] is true, sets volatile locations
      to top without applying the initializer. Otherwise, lets the standard
@@ -129,7 +200,7 @@ module Make
       match init with
       | SingleInit (exp, loc) ->
         let source = fst loc in
-        apply_eva_single_initializer ~pos ~source state lval exp
+        apply_eva_single_initializer_or_str ~pos ~source state lval exp
       | CompoundInit (_typ, l) ->
         let doinit state (off, init) =
           let lval = Eva_ast.add_offset lval off in
@@ -150,6 +221,7 @@ module Make
   (* Initializes a varinfo, padding bits + optionaly an initializer. *)
   let initialize_var_not_lib_entry ~pos ~local vi init state =
     ignore (warn_unknown_size vi);
+    let source = fst vi.vdecl in
     let typ = vi.vtype in
     let lval = Eva_ast.Build.var vi in
     let volatile_everywhere = Ast_types.has_qualifier "volatile" typ in
@@ -172,7 +244,9 @@ module Make
     (* Applies the real initializer on top. *)
     match init with
     | None -> state
-    | Some init ->
+    | Some (StrInit (Str s)) -> init_char_array ~source ~pos lval s state
+    | Some (StrInit (Wstr a)) -> init_wchar_array ~source ~pos lval a state
+    | Some (CInit init) ->
       apply_eva_initializer ~pos ~top_volatile:false lval init state
 
 
@@ -190,15 +264,15 @@ module Make
         let lval = Eva_ast.translate_lval lval
         and exp = Eva_ast.translate_exp exp
         and source = fst exp.eloc in
-        apply_eva_single_initializer ~pos ~source state lval exp
+        apply_eva_single_initializer_or_str ~pos ~source state lval exp
       else state
     | CompoundInit (typ, l) ->
       if Ast_types.has_qualifier "volatile" typ || not (Ast_types.is_const typ)
       then state (* initializer is not useful *)
       else
-        let doinit off init _typ state =
-          apply_cil_const_initializer
-            ~pos state (Cil.addOffsetLval off lval) init
+        let doinit offset init _typ state =
+          let lval = Cil.addOffsetLval offset lval in
+          apply_cil_const_initializer ~pos state lval init
         in
         Cil.foldLeftCompound ~implicit:true ~doinit ~ct:typ ~initl:l ~acc:state
 
@@ -206,40 +280,34 @@ module Make
      set, or when [vi] is extern. [const] initializers, explicit or implicit,
      are taken into account *)
   let initialize_var_lib_entry ~pos vi init state =
-    if Ast_types.has_qualifier "const" vi.vtype && not (vi.vstorage = Extern)
-       && not (Ast_types.has_attribute_memory_block Ast_attributes.frama_c_mutable vi.vtype)
-    then (* Fully const base. Ignore -lib-entry altogether. *)
-      let init = Option.map Eva_ast.translate_init init in
-      initialize_var_not_lib_entry ~pos ~local:false vi init state
-    else
-      let unknown_size =  warn_unknown_size vi in
-      let state =
-        if unknown_size then
-          (* the type is unknown, initialize everything to Top *)
-          let lval = Eva_ast.Build.var vi in
-          let loc = lval_to_loc lval in
-          let v = Abstract_domain.Top in
-          Domain.initialize_variable lval loc ~initialized:true v state
-        else
-          (* Add padding everywhere. *)
-          let state =
-            initialize_var_padding vi ~local:false ~lib_entry:true state
-          in
-          (* Then initialize non-padding bits according to the type. *)
-          let kind = Abstract_domain.Global in
-          Domain.initialize_variable_using_type kind vi state
-      in
-      (* If needed, initializes const fields according to the initializer
-         (or generate one if there are none). In the first phase, they have been
-         set to generic values. *)
-      if Ast_types.is_const vi.vtype && not (vi.vstorage = Extern)
-      then
-        let init = match init with
-          | None -> Cil.makeZeroInit ~loc:vi.vdecl vi.vtype
-          | Some init -> init
+    let unknown_size =  warn_unknown_size vi in
+    let state =
+      if unknown_size then
+        (* the type is unknown, initialize everything to Top *)
+        let lval = Eva_ast.Build.var vi in
+        let loc = lval_to_loc lval in
+        let v = Abstract_domain.Top in
+        Domain.initialize_variable lval loc ~initialized:true v state
+      else
+        (* Add padding everywhere. *)
+        let state =
+          initialize_var_padding vi ~local:false ~lib_entry:true state
         in
-        apply_cil_const_initializer ~pos state (Cil.var vi) init
-      else state
+        (* Then initialize non-padding bits according to the type. *)
+        let kind = Abstract_domain.Global in
+        Domain.initialize_variable_using_type kind vi state
+    in
+    (* If needed, initializes const fields according to the initializer
+       (or generate one if there are none). In the first phase, they have been
+       set to generic values. *)
+    if Ast_types.is_const vi.vtype && not (vi.vstorage = Extern)
+    then
+      let init = match init with
+        | None -> Cil.makeZeroInit ~loc:vi.vdecl vi.vtype
+        | Some init -> init
+      in
+      apply_cil_const_initializer ~pos state (Cil.var vi) init
+    else state
 
 
   (* ------------- Adds formal argument of the main function  --------------- *)
@@ -298,10 +366,21 @@ module Make
   (* ------------------------ High-level functions -------------------------- *)
 
   let initialize_local_variable ~pos vi init state =
-    try
-      `Value
-        (initialize_var_not_lib_entry ~pos ~local:true vi (Some init) state)
+    let init = Some (CInit init) in
+    try `Value (initialize_var_not_lib_entry ~pos ~local:true vi init state)
     with Initialization_failed -> `Bottom
+
+  let is_fully_const vi =
+    let frama_c_mutable = Ast_attributes.frama_c_mutable in
+    Ast_types.has_qualifier "const" vi.vtype
+    && not (Ast_types.has_attribute_memory_block frama_c_mutable vi.vtype)
+
+  let get_cinit vi = function
+    | Cil_types.CInit init -> init
+    | StrInit _ ->
+      Self.fatal
+        "Initializer StrInit for variable %a, which is not a string literal"
+        Printer.pp_varinfo vi
 
   let initialize_global_variable ~lib_entry vi init state =
     let open Current_loc.Operators in
@@ -309,14 +388,15 @@ module Make
     let pos = Position.global_init vi in
     let state = Domain.enter_scope Abstract_domain.Global [vi] state in
     if vi.vsource then
-      if lib_entry || (vi.vstorage = Extern)
+      if (lib_entry && not (is_fully_const vi || Ast_info.is_string_literal vi))
+      || vi.vstorage = Extern
       then
-        initialize_var_lib_entry ~pos vi init.init state
+        let cinit = Option.map (get_cinit vi) init.init in
+        initialize_var_lib_entry ~pos vi cinit state
       else
-        let init = Option.map Eva_ast.translate_init init.init in
+        let init = Option.map Eva_ast.translate_init_or_str init.init in
         initialize_var_not_lib_entry ~pos ~local:false vi init state
     else state
-
 
   (* Compute the initial state with all global variable initialized. *)
   let compute_global_state ~lib_entry () =
@@ -362,18 +442,14 @@ module Make
 
   let print_initial_cvalue_state state =
     let cvalue_state = get_cvalue_or_bottom state in
-    (* Do not show variables from the frama-c libc specifications. *)
+    (* Do not show string literal nor variables from libc specifications. *)
     let print_base base =
       try
-        let varinfo = Base.to_varinfo base in
-        not (Cil.is_in_libc varinfo.vattr)
+        let vi = Base.to_varinfo base in
+        not (Cil.is_in_libc vi.vattr || Ast_info.is_string_literal vi)
       with Base.Not_a_C_variable -> true
     in
-    let cvalue_state =
-      if Kernel.PrintLibc.get ()
-      then cvalue_state
-      else Cvalue.Model.filter_base print_base cvalue_state
-    in
+    let cvalue_state = Cvalue.Model.filter_base print_base cvalue_state in
     Self.printf ~dkey:Self.dkey_initial_state
       ~header:(fun fmt -> Format.pp_print_string fmt
                   "Values of globals at initialization")

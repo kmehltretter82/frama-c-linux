@@ -271,7 +271,7 @@ module rec Transfer
     | BinOp((MinusPP | PlusA | MinusA | Mult | Div | Mod |Shiftlt | Shiftrt
             | Lt | Gt | Le | Ge | Eq | Ne | BAnd | BXor | BOr | LAnd | LOr),
             _, _, _)
-    | UnOp _ | Const _ | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _
+    | UnOp _ | Const _ | SizeOf _ | SizeOfE _ | AlignOf _
     | AlignOfE _ ->
       None
 
@@ -290,6 +290,9 @@ module rec Transfer
               "monitoring %a from %a."
               Printer.pp_varinfo vi_e
               Printer.pp_lval (lhost, NoOffset);
+            (* String literals can't be monitored. In case we have one,
+               drop the attribute. *)
+            Demote_string_literal.demote vi_e;
             Varinfo.Hptset.add vi_e state
           end
       end else
@@ -332,6 +335,7 @@ module rec Transfer
       Options.feedback ~level:4 ~dkey "monitoring %a from annotation of %a."
         Printer.pp_varinfo vi
         Kernel_function.pretty kf;
+      Demote_string_literal.demote vi;
       Varinfo.Hptset.add vi varinfos
     in
     match thost with
@@ -370,7 +374,7 @@ module rec Transfer
              register_term kf varinfos t2
            else
              assert false)
-    | TConst _ | TSizeOf _ | TSizeOfE _ | TSizeOfStr _ | TAlignOf _
+    | TConst _ | TSizeOf _ | TSizeOfE _ | TAlignOf _
     | TAlignOfE _ | Tnull | Ttype _ | TUnOp _ | TBinOp _ ->
       varinfos
     | Tlambda(_, _) -> Error.not_yet "lambda function"
@@ -430,7 +434,7 @@ module rec Transfer
       | Tbase_addr(_, t) | Toffset(_, t) | Tblock_length(_, t) | Tlet(_, t) ->
         state_ref := register_term kf !state_ref t;
         Cil.DoChildren
-      | TConst _ | TSizeOf _ | TSizeOfStr _ | TAlignOf _  | Tnull | Ttype _
+      | TConst _ | TSizeOf _ | TAlignOf _  | Tnull | Ttype _
       | Tempty_set ->
         (* no left-value inside inside: skip for efficiency *)
         Cil.SkipChildren
@@ -469,10 +473,16 @@ module rec Transfer
       ();
     !state_ref
 
-  let rec do_init vi init state = match init with
-    | SingleInit e -> handle_assignment state (Var vi, NoOffset) e
-    | CompoundInit(_, l) ->
-      List.fold_left (fun state (_, init) -> do_init vi init state) state l
+  let do_init vi init state =
+    let rec aux init state =
+      match init with
+      | SingleInit e -> handle_assignment state (Var vi, NoOffset) e
+      | CompoundInit(_, l) ->
+        List.fold_left (fun state (_, init) -> aux init state) state l
+    in
+    match init with
+    | CInit i -> aux i state
+    | StrInit _ -> state (* string literal, we do not need to monitor anything per se. *)
 
   let register_initializers state =
     let do_one vi init state = match init.init with
@@ -602,6 +612,21 @@ module rec Transfer
             Kernel_function.pretty
             kf;
           state
+      else if Functions.Libc.has_replacement (Kernel_function.get_name kf) then
+        (* these are functions that get their own built-in instrumentation.
+           To be on the safe side, if any of their arguments is a string
+           literal replacement, we force it to be seen as a normal, monitored
+           variable.
+        *)
+        List.fold_left
+          (fun state arg ->
+             match base_addr arg with
+             | Some vi when Ast_info.is_string_literal vi ->
+               Demote_string_literal.demote vi;
+               Varinfo.Hptset.add vi state
+             | _ -> state
+          )
+          state args
       else
         state
     in
@@ -634,7 +659,7 @@ module rec Transfer
       let state = handle_assignment state lv e in
       Dataflow.Done (Some state)
     | Local_init(v,AssignInit i,_) ->
-      let state = do_init v i state in
+      let state = do_init v (CInit i) state in
       Dataflow.Done (Some state)
     | Local_init(v,ConsInit(f,args,Constructor),_) ->
       do_call None f (Cil.mkAddrOfVi v :: args) state
@@ -834,7 +859,7 @@ and apply_on_vi_base_from_exp f ?kf ?stmt e = match e.enode with
   | BinOp((PlusA | MinusA | Mult | Div | Mod |Shiftlt | Shiftrt | Lt | Gt | Le
           | Ge | Eq | Ne | BAnd | BXor | BOr | LAnd | LOr), _, _, _)
   | Const _ -> (* possible in case of static address *) false
-  | UnOp _ | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _ | AlignOfE _ ->
+  | UnOp _ | SizeOf _ | SizeOfE _ | AlignOf _ | AlignOfE _ ->
     Options.fatal "[pre_analysis] unexpected expression %a" Exp.pretty e
 
 let must_monitor_lval = apply_on_vi_base_from_lval must_monitor_vi

@@ -139,7 +139,6 @@ let rec occurs x = function
 let source = "Tree Model"
 
 let null = Null
-let literal ~eid:_ _ = Warning.error ~source "No Literal"
 let pointer_loc _t = Warning.error ~source "No Pointer Loc"
 let pointer_val _v = Warning.error ~source "No Pointer Val"
 

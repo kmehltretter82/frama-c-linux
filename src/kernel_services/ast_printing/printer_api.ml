@@ -234,6 +234,10 @@ class type extensible_printer_type = object
 
   method init:  Format.formatter -> init -> unit
 
+  method str_literal: Format.formatter -> str_literal -> unit
+
+  method init_or_str: Format.formatter -> init_or_str -> unit
+
   (** Print initializers. This can be slow. *)
   method file: Format.formatter -> file -> unit
 
@@ -418,7 +422,9 @@ module type S_pp = sig
   val pp_lval: Format.formatter -> lval -> unit
   val pp_field: Format.formatter -> fieldinfo -> unit
   val pp_offset: Format.formatter -> offset -> unit
+  val pp_str_literal: Format.formatter -> str_literal -> unit
   val pp_init: Format.formatter -> init -> unit
+  val pp_init_or_str: Format.formatter -> init_or_str -> unit
   val pp_binop: Format.formatter -> binop -> unit
   val pp_unop: Format.formatter -> unop -> unit
   val pp_attribute: Format.formatter -> attribute -> unit

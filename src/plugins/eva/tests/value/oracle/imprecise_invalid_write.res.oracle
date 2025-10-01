@@ -10,7 +10,7 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   x ∈ {0}
-  s ∈ {{ "abc" }}
+  s ∈ {{ (int *)"abc" }}
 [eva] computing for function main1 <- main.
   Called from imprecise_invalid_write.i:22.
 [eva:alarm] imprecise_invalid_write.i:5: Warning: 

@@ -29,7 +29,7 @@ module Dictionary =
       let help = "generate the dictionary into file <f> (on stdout by default)"
     end)
 
-module Literal_string =
+module String_literal =
   Empty_string
     (struct
       let option_name = "-obfuscator-string-dictionary"
@@ -38,4 +38,4 @@ module Literal_string =
                   (in the same place than the code by default)"
     end)
 
-let states = [ Run.self; Dictionary.self; Literal_string.self ]
+let states = [ Run.self; Dictionary.self; String_literal.self ]

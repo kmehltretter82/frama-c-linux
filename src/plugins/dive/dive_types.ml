@@ -13,7 +13,6 @@ type node_kind =
   | Unknown of Cil_types.lval * Cil_types.stmt
   | Alarm of Cil_types.stmt * Alarms.alarm
   | AbsoluteMemory
-  | String of int * Base.cstring
   | Const of Cil_types.exp
   | Error of string
 

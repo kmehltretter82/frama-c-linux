@@ -148,10 +148,15 @@ class printer_with_annot () = object (self)
     end;
     (* Out of tree global annotations are pretty printed before the first
        variable declaration of the first function definition. *)
-    (match glob with
-     | GFunDecl _ | GFun _ -> print_spec <- Ast.is_def_or_last_decl glob;
-     | _ -> ());
-    super#global fmt glob
+    match glob with
+    | GFunDecl _ | GFun _ ->
+      print_spec <- Ast.is_def_or_last_decl glob;
+      super#global fmt glob
+    | GVar (v,_,_) | GVarDecl(v,_)
+      when Ast_info.is_string_literal v && not (Kernel.PrintAsIs.get()) ->
+      ()
+    | _ -> super#global fmt glob
+
 
   method private begin_annotation fmt =
     self#pp_open_annotation ~block:false fmt
@@ -238,6 +243,24 @@ class printer_with_annot () = object (self)
           when Kernel.PrintReturn.get () -> return
         | _ -> skind
       end
+
+  method private var_as_str_literal fmt v =
+    let s = Globals.Vars.get_string_literal v in
+    self#str_literal fmt s
+
+  method! lval fmt lv =
+    match lv with
+    | Var v, (NoOffset | Index _ as o)
+      when Ast_info.is_string_literal v && not (Kernel.PrintAsIs.get()) ->
+      Format.fprintf fmt "%a%a" self#var_as_str_literal v self#offset o
+    | _ -> super#lval fmt lv
+
+  method! term_lval fmt lv =
+    match lv with
+    | TVar { lv_origin = Some v }, (TNoOffset | TIndex _ as o)
+      when Ast_info.is_string_literal v && not (Kernel.PrintAsIs.get()) ->
+      Format.fprintf fmt "%a%a" self#var_as_str_literal v self#term_offset o
+    | _ -> super#term_lval fmt lv
 
 end (* class printer_with_annot *)
 

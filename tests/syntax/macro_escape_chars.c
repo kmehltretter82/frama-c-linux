@@ -14,7 +14,7 @@ extern int fputs(const char*, FILE*);
 
 #define BAR "\\"
 
-/*@ predicate foo(char* s) = \true; */
+/*@ predicate foo(char s[]) = \true; */
 
 /*@ lemma test1: foo(BAR); */
 

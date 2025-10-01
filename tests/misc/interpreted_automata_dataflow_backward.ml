@@ -23,7 +23,7 @@ struct
   let rec vars exp =
     match exp.enode with
     | Const _
-    | SizeOf _ | SizeOfE _ | SizeOfStr _
+    | SizeOf _ | SizeOfE _
     | AlignOf _ | AlignOfE _
     | AddrOf _ | StartOf _ ->
       Set.empty

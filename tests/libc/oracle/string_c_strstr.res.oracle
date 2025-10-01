@@ -281,13 +281,11 @@
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function strstr:
   __retres ∈
-          {{ NULL ; "" ; "abcd" ; "abcd" ; "abcd" + {1} ; "abcd" + {2} ;
-             "abcd" + {3} ; "abcd" ; "abcd" + {1} ; "abcd" + {2} ;
-             "ababa" + {1} ; "ababab" + {1} ; "abababa" + {1} ;
-             "abababab" + {1} ; "ababababa" + {1} ; "abbababab" + {2} ;
-             "abbababab" + {3} ; "abacabcabcab" + {4} ;
-             "nanabanabanana" + {3} ; "nanabanabanana" + {4} ;
-             "nanabanabanana" + {1} ; "nanabanabanana" + {8} ;
-             "_ _\255_ _" + {2} }}
+          {{ NULL ; "" ; "abcd" ; "abcd" ; "abcd"[1] ; "abcd"[2] ;
+             "abcd"[3] ; "abcd" ; "abcd"[1] ; "abcd"[2] ; "ababa"[1] ;
+             "ababab"[1] ; "abababa"[1] ; "abababab"[1] ; "ababababa"[1] ;
+             "abbababab"[2] ; "abbababab"[3] ; "abacabcabcab"[4] ;
+             "nanabanabanana"[3] ; "nanabanabanana"[4] ;
+             "nanabanabanana"[1] ; "nanabanabanana"[8] ; "_ _\377_ _"[2] }}
 [eva:final-states] Values at end of function main:
   __retres ∈ {0}

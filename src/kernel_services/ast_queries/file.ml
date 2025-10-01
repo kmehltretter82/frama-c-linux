@@ -739,7 +739,13 @@ let files_to_cabs_cil files cpp_commands =
   (* Perform symbolic merge of all files *)
   Kernel.feedback ~level:2 "symbolic link";
   let merged_file = Mergecil.merge cil_files "whole_program" in
+  Kernel.feedback ~dkey:Kernel.dkey_file_transform
+    "Initial AST right after link@\n%a"
+    Cil_printer.pp_file merged_file;
   Logic_utils.complete_types merged_file;
+  Kernel.feedback ~dkey:Kernel.dkey_file_transform
+    "Ast after completing logic types@\n%a"
+    Cil_printer.pp_file merged_file;
   if Kernel.UnspecifiedAccess.get () then
     Undefined_sequence.check_sequences merged_file;
   merged_file, cabs_files

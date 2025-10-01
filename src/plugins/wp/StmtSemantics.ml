@@ -400,7 +400,7 @@ struct
       let here = Sigma.create () in
       let next = Sigma.create () in
       (*TODO: make something of warnings *)
-      let init = C.init ~sigma:next vi (Some init) in
+      let init = C.init ~sigma:next vi (Some (CInit init)) in
       let hyp_value = Lang.F.p_all (fun (_, h) -> fst h) init in
       let hyp_init =  Lang.F.p_all (fun (_, h) -> snd h) init in
       let hyp = Lang.F.p_and hyp_init hyp_value in

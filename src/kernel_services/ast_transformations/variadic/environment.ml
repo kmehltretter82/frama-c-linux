@@ -12,7 +12,7 @@ module Table = Datatype.String.Hashtbl
 
 type t =
   {
-    globals: varinfo Table.t;
+    globals: (varinfo * init_or_str option) Table.t;
     functions: varinfo Table.t;
     typedefs: typeinfo Table.t;
     structs: compinfo Table.t;
@@ -30,8 +30,13 @@ let empty () : t =
     enums = Table.create 17;
   }
 
-let add_global (env : t) (vi : varinfo) : unit  =
-  Table.add env.globals vi.vname vi
+let add_global (env : t) (vi : varinfo) (init: init_or_str option) : unit  =
+  let v = Table.find_opt env.globals vi.vname in
+  let init = match v with
+    | None -> init
+    | Some v -> snd v
+  in
+  Table.replace env.globals vi.vname (vi,init)
 
 let add_function (env : t) (vi : varinfo) : unit  =
   Table.add env.functions vi.vname vi
@@ -47,7 +52,10 @@ let add_enuminfo (env : t) (enuminfo : enuminfo) : unit  =
   Table.add env.enums enuminfo.eorig_name enuminfo
 
 let find_global (env : t) (vname : string) : varinfo  =
-  Table.find env.globals vname
+  fst (Table.find env.globals vname)
+
+let find_global_init env vname =
+  snd (Table.find env.globals vname)
 
 let find_function (env : t) (vname : string) : varinfo =
   Table.find env.functions vname
@@ -89,8 +97,9 @@ let from_file (file : file) : t =
       begin match glob with
         | GFunDecl(_,vi,_) | GFun ({svar = vi}, _) ->
           add_function env vi
-        | GVarDecl (vi,_) | GVar (vi, _, _) ->
-          add_global env vi
+        | GVarDecl (vi,_) -> add_global env vi None
+        | GVar (vi, init, _) ->
+          add_global env vi init.init
         | GType (typeinfo,_) ->
           add_typeinfo env typeinfo
         | GCompTag (compinfo,_) ->

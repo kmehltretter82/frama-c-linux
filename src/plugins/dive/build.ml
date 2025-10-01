@@ -53,7 +53,8 @@ struct
 
   let in_init vi init =
     let vis = visitor () in
-    ignore (Visitor.visitFramacInit (vis :> Visitor.frama_c_inplace) vi NoOffset init);
+    ignore (Visitor.visitFramacInit_or_str
+              (vis :> Visitor.frama_c_inplace) vi init);
     List.rev vis#get_acc
 
   let in_alarm = function
@@ -182,7 +183,6 @@ let enumerate_cells ~is_folded_base gstmt lval =
       end
     | CLogic_Var _ -> Seq.return (Error "logic variables not supported")
     | Null -> Seq.return AbsoluteMemory
-    | String (i,cs) -> Seq.return (String (i, cs))
   in
   try
     Location_Bits.to_seq_i location.loc |> Seq.flat_map map_base
@@ -233,7 +233,7 @@ let build_node_locality gstmt node_kind =
             make_local callstack
           | None -> make_global vi
         end
-      | Scattered _ | Unknown _ | Alarm _ | AbsoluteMemory | String _ | Const _
+      | Scattered _ | Unknown _ | Alarm _ | AbsoluteMemory | Const _
       | Error _ ->
         make_local callstack
     end
@@ -272,7 +272,7 @@ let add_or_update_node ~context gstmt node_kind =
   begin match node_kind with (* Some nodes don't have read or write deps *)
     | Alarm _ ->
       node.node_reads_computation <- Done
-    | Unknown _ | Const _ | String _ ->
+    | Unknown _ | Const _ ->
       node.node_writes_computation <- Done
     | Error _ ->
       node.node_reads_computation <- Done;
@@ -343,7 +343,7 @@ let build_node_writes context node =
 
       | GlobalInit (vi, initinfo) as origin ->
         let init = match initinfo.init with
-          | None -> SingleInit (Cil.zero ~loc:vi.vdecl)
+          | None -> CInit (SingleInit (Cil.zero ~loc:vi.vdecl))
           | Some init -> init
         in
         build_init_deps ~origin (Global vi) vi init
@@ -396,7 +396,7 @@ let build_node_writes context node =
       in
       Cil.treat_constructor_as_func as_func dest f args k loc
     | Local_init (vi, AssignInit init, _)  ->
-      build_init_deps ~origin gstmt vi init
+      build_init_deps ~origin gstmt vi (CInit init)
     | Asm _ | Skip _ | Code_annot _ -> Seq.empty (* Cases not returned by Studia *)
 
   and build_return_deps ~callstack call_stmt args kf : deps_builder =
@@ -432,8 +432,9 @@ let build_node_writes context node =
     let lvals = EnumLvals.in_init vi init in
     let exp =
       match init with
-      | CompoundInit _ -> None (* Do not generate nodes for Compounds for now *)
-      | SingleInit exp -> Some exp
+      | CInit (CompoundInit _) -> None (* Do not generate nodes for Compounds for now *)
+      | StrInit _ -> None (* same as a compound init *)
+      | CInit (SingleInit exp) -> Some exp
     in
     build_lvals_deps ~origin gstmt Data ?exp lvals
 
@@ -480,7 +481,7 @@ let build_node_writes context node =
     build_scattered_deps ~callstack stmt lval
   | Alarm (stmt, alarm) ->
     build_alarm_deps ~callstack stmt alarm
-  | Unknown _ | AbsoluteMemory | String _ | Const _ | Error _ ->
+  | Unknown _ | AbsoluteMemory | Const _ | Error _ ->
     Seq.empty
 
 
@@ -530,7 +531,7 @@ let build_node_reads context node =
       in
       Cil.treat_constructor_as_func as_func dest f args k loc
     | Local_init (vi, AssignInit init, _)
-      when init_contains_read zone stmt vi init ->
+      when init_contains_read zone stmt vi (CInit init) ->
       build_var_deps ~callstack stmt vi
     | Call (_, callee, args, _) ->
       build_call_deps callstack zone stmt callee args
@@ -597,7 +598,7 @@ let build_node_reads context node =
     build_reads_deps callstack zone
   | Scattered (_lval,stmt) ->
     build_stmt_deps ~callstack None stmt
-  | Alarm _ | Unknown _ | AbsoluteMemory | Const _ | String _ | Error _ ->
+  | Alarm _ | Unknown _ | AbsoluteMemory | Const _ | Error _ ->
     Seq.empty
 
 

@@ -96,6 +96,10 @@ val fc_stdlib_generated : string
 (** Attribute added by Frama-C's parser. *)
 val fc_oldstyleproto : string
 
+(** Attribute of globals that represent a (wide)string literal.
+    @since Frama-C+dev *)
+val fc_literal: string
+
 (** Attribute added by cabs2cil on functions calls encountered before any
     declaration/definition.
 *)

@@ -16,21 +16,6 @@ let dkey = Options.Dkey.translation
 (* Expressions *)
 (* ************************************************************************** *)
 
-let replace_literal_string_in_exp env kf_opt (* None for globals *) e =
-  (* do not touch global initializers because they accept only constants;
-     replace literal strings elsewhere *)
-  match kf_opt with
-  | None -> e, env
-  | Some kf -> Literal_observer.subst_all_literals_in_exp env kf e
-
-let replace_literal_strings_in_args env kf_opt (* None for globals *) args =
-  List.fold_right
-    (fun a (args, env) ->
-       let a, env = replace_literal_string_in_exp env kf_opt a in
-       a :: args, env)
-    args
-    ([], env)
-
 (* rewrite names of functions for which we have alternative definitions in the
    RTL. *)
 let rename_caller ~loc caller args =
@@ -75,24 +60,73 @@ let rename_caller ~loc caller args =
   else
     caller, args
 
-let rec inject_in_init env kf_opt vi off = function
-  | SingleInit e as init ->
-    if vi.vglob then Global_observer.add_initializer vi off init;
-    let e, env = replace_literal_string_in_exp env kf_opt e in
-    SingleInit e, env
-  | CompoundInit(typ, l) ->
-    (* inject in all single initializers that can be built from the compound
-       version *)
-    let l, env =
-      List.fold_left
-        (fun (l, env) (off', i) ->
-           let new_off = Cil.addOffset off' off in
-           let i, env = inject_in_init env kf_opt vi new_off i in
-           (off', i) :: l, env)
-        ([], env)
-        l
-    in
-    CompoundInit(typ, List.rev l), env
+let init_one_char vi idx chr =
+  let loc = vi.vdecl in
+  let off =
+    Index (Cil.kinteger ~loc (Machine.sizeof_kind()) idx,NoOffset)
+  in
+  let i = SingleInit (Cil.new_exp ~loc (Const (CChr chr))) in
+  Global_observer.add_initializer vi off i
+
+let init_one_wchar vi idx chr =
+  let loc = vi.vdecl in
+  let off =
+    Index (Cil.kinteger ~loc (Machine.sizeof_kind()) idx,NoOffset)
+  in
+  let kind = Machine.wchar_kind() in
+  let i = SingleInit (Cil.kinteger64 ~loc ~kind (Z.of_int64 chr)) in
+  Global_observer.add_initializer vi off i
+
+let init_lit_str vi s =
+  if not (Ast_types.is_any_char_array vi.vtype) then
+    Options.fatal "Literal string can only be used to initialize char arrays";
+  let slen = String.length s in
+  let _, alen = Ast_types.array_elem_type_and_size vi.vtype in
+  let alen = Option.bind (Cil.constFoldToInt ~machdep:true) alen in
+  let alen = Option.map Z.to_int alen in
+  let alen = Option.value ~default:(slen + 1) alen in
+  String.iteri (init_one_char vi) s;
+  for i = slen to alen - 1 do
+    init_one_char vi i (Char.chr 0)
+  done
+
+let init_lit_wstr vi s =
+  if not (Ast_types.is_wchar_array vi.vtype) then
+    Options.fatal
+      "Wide Literal string can only be used to initialize wide char arrays";
+  let slen = List.length s in
+  let _, alen = Ast_types.array_elem_type_and_size vi.vtype in
+  let alen = Option.bind (Cil.constFoldToInt ~machdep:true) alen in
+  let alen = Option.map Z.to_int alen in
+  let alen = Option.value ~default:(slen + 1) alen in
+  List.iteri (init_one_wchar vi) s;
+  for i = slen to alen - 1 do
+    init_one_wchar vi i Int64.zero
+  done
+
+let inject_in_init env vi off i =
+  let rec aux env off = function
+    | SingleInit e as init ->
+      if vi.vglob then Global_observer.add_initializer vi off init;
+      SingleInit e, env
+    | CompoundInit(typ, l) ->
+      (* inject in all single initializers that can be built from the compound
+         version *)
+      let l, env =
+        List.fold_left
+          (fun (l, env) (off', i) ->
+             let new_off = Cil.addOffset off' off in
+             let i, env = aux env new_off i in
+             (off', i) :: l, env)
+          ([], env)
+          l
+      in
+      CompoundInit(typ, List.rev l), env
+  in
+  match i with
+  | CInit i -> let i, env = aux env off i in CInit i, env
+  | StrInit (Str s) -> init_lit_str vi s; i, env
+  | StrInit (Wstr l) -> init_lit_wstr vi l; i, env
 
 let inject_in_local_init ~loc env kf vi = function
   | ConsInit (fvi, sz :: _, _) as init
@@ -103,7 +137,6 @@ let inject_in_local_init ~loc env kf vi = function
     init, env
 
   | ConsInit (caller, args, kind) ->
-    let args, env = replace_literal_strings_in_args env (Some kf) args in
     let caller, args = rename_caller ~loc caller args in
     let _, env =
       if Libc.is_writing_memory caller then begin
@@ -115,8 +148,10 @@ let inject_in_local_init ~loc env kf vi = function
     ConsInit(caller, args, kind), env
 
   | AssignInit init ->
-    let init, env = inject_in_init env (Some kf) vi NoOffset init in
-    AssignInit init, env
+    let init, env = inject_in_init env vi NoOffset (CInit init) in
+    match init with
+    | CInit init -> AssignInit init, env
+    | _ -> assert false
 
 (* ************************************************************************** *)
 (* Instructions and statements *)
@@ -152,12 +187,10 @@ let add_initializer loc ?vi lv ?(post=false) stmt env kf =
 
 let inject_in_instr env kf stmt = function
   | Set(lv, e, loc) ->
-    let e, env = replace_literal_string_in_exp env (Some kf) e in
     let env = add_initializer loc lv stmt env kf in
     Set(lv, e, loc), env
 
   | Call(result, caller, args, loc) ->
-    let args, env = replace_literal_strings_in_args env (Some kf) args in
     let caller, args =
       match caller with
       | Var fvi ->
@@ -344,20 +377,16 @@ let rec inject_in_substmt env kf stmt = match stmt.skind with
     let instr, env = inject_in_instr env kf stmt instr in
     Instr instr, env
 
-  | Return(Some e, loc)  ->
-    let e, env = replace_literal_string_in_exp env (Some kf) e in
-    Return(Some e, loc), env
+  | Return(Some e, loc)  -> Return(Some e, loc), env
 
   | If(e, blk1, blk2, loc) ->
     let env = inject_in_block env kf blk1 in
     let env = inject_in_block env kf blk2 in
-    let e, env = replace_literal_string_in_exp env (Some kf) e in
     If(e, blk1, blk2, loc), env
 
   | Switch(e, blk, stmts, loc) ->
     (* [blk] and [stmts] are visited at the same time *)
     let env = inject_in_block env kf blk in
-    let e, env = replace_literal_string_in_exp env (Some kf) e in
     Switch(e, blk, stmts, loc), env
 
   | Loop(_ (* ignore AST annotations *), blk, loc, stmt_opt1, stmt_opt2) ->
@@ -386,9 +415,7 @@ let rec inject_in_substmt env kf stmt = match stmt.skind with
     in
     UnspecifiedSequence (List.rev l), env
 
-  | Throw(Some(e, ty), loc) ->
-    let e, env = replace_literal_string_in_exp env (Some kf) e in
-    Throw(Some(e, ty), loc), env
+  | Throw(Some(e, ty), loc) -> Throw(Some(e, ty), loc), env
 
   | TryCatch(blk, l, _loc) as skind ->
     let env = inject_in_block env kf blk in
@@ -642,7 +669,7 @@ let inject_in_global main global =
   let var_def vi init =
     Global_observer.add vi;
     unghost_vi vi;
-    let _init, _env = inject_in_init Env.empty None vi NoOffset init in
+    let _init, _env = inject_in_init Env.empty vi NoOffset init in
     (* ignore the new initializer that handles literal strings
            since they are not substituted in global initializers
            (see  [replace_literal_string_in_exp]) *)

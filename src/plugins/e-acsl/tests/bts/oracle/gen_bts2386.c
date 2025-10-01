@@ -5,7 +5,6 @@
 #include "stdint.h"
 #include "stdio.h"
 #include "time.h"
-char *__gen_e_acsl_literal_string;
 extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 
 void f(void const *s, int c, unsigned long n)
@@ -66,17 +65,22 @@ void f(void const *s, int c, unsigned long n)
   return;
 }
 
+char const __fc_lit_string1[11UL] = "1234567890";
 void __e_acsl_globals_init(void)
 {
   static char __e_acsl_already_run = 0;
   if (! __e_acsl_already_run) {
     __e_acsl_already_run = 1;
-    __gen_e_acsl_literal_string = "1234567890";
-    __e_acsl_store_block((void *)__gen_e_acsl_literal_string,
-                         sizeof("1234567890"));
-    __e_acsl_full_init((void *)__gen_e_acsl_literal_string);
-    __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string);
+    __e_acsl_store_block((void *)(__fc_lit_string1),11UL);
+    __e_acsl_full_init((void *)(& __fc_lit_string1));
+    __e_acsl_mark_readonly((void *)(__fc_lit_string1));
   }
+  return;
+}
+
+void __e_acsl_globals_clean(void)
+{
+  __e_acsl_delete_block((void *)(__fc_lit_string1));
   return;
 }
 
@@ -85,12 +89,13 @@ int main(void)
   int __retres;
   __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   __e_acsl_globals_init();
-  char const *s = __gen_e_acsl_literal_string;
+  char const *s = __fc_lit_string1;
   __e_acsl_store_block((void *)(& s),8UL);
   __e_acsl_full_init((void *)(& s));
   f((void const *)s,'0',(unsigned long)11);
   __retres = 0;
   __e_acsl_delete_block((void *)(& s));
+  __e_acsl_globals_clean();
   __e_acsl_memory_clean();
   return __retres;
 }

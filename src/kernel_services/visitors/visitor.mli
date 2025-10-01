@@ -173,6 +173,18 @@ val visitFramacLogicVarDecl: frama_c_visitor -> logic_var -> logic_var
     offset. *)
 val visitFramacInit: frama_c_visitor -> varinfo -> offset -> init -> init
 
+(** Visit a global initialization, possibly of a string array.
+    @since Frama-C+dev
+*)
+val visitFramacInit_or_str:
+  frama_c_visitor -> varinfo -> init_or_str -> init_or_str
+
+(** Visit a (wide-)string literal.
+    @since Frama-C+dev
+*)
+val visitFramacStr_literal:
+  frama_c_visitor -> varinfo -> str_literal -> str_literal
+
 (** Visit a list of attributes *)
 val visitFramacAttributes: frama_c_visitor -> attribute list -> attribute list
 

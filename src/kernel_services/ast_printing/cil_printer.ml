@@ -299,6 +299,7 @@ module Precedence = struct
     (* Multiplicative *)
     | BinOp((Div|Mod|Mult),_,_,_) -> multiplicativeLevel
     (* Unary *)
+    | StartOf((Var v,_)) when Ast_info.is_string_literal v -> 0
     | CastE(_,_)
     | AddrOf(_)
     | StartOf(_)
@@ -306,7 +307,7 @@ module Precedence = struct
     (* Lvals *)
     | Lval(Mem _ , _) -> derefStarLevel
     | Lval(Var _, (Field _|Index _)) -> indexLevel
-    | SizeOf _ | SizeOfE _ | SizeOfStr _ -> sizeOfLevel
+    | SizeOf _ | SizeOfE _ -> sizeOfLevel
     | AlignOf _ | AlignOfE _ -> alignOfLevel
     | Lval(Var _, NoOffset) -> 0        (* Plain variables *)
     | Const _ -> 0                        (* Constants *)
@@ -338,7 +339,7 @@ module Precedence = struct
     | TLval(TMem _ , _) -> derefStarLevel
     | TLval(TVar _, (TField _|TIndex _|TModel _)) -> indexLevel
     | TLval(TResult _,(TField _|TIndex _|TModel _)) -> indexLevel
-    | TSizeOf _ | TSizeOfE _ | TSizeOfStr _ -> sizeOfLevel
+    | TSizeOf _ | TSizeOfE _ -> sizeOfLevel
     | TAlignOf _ | TAlignOfE _ -> alignOfLevel
     (* VP: I'm not sure I understand why sizeof(x) and f(x) should
        have a separated treatment wrt parentheses. *)
@@ -490,6 +491,9 @@ type annot_ctxt =
   | In_simple_annot  (** in /*@ ... */ annotation *)
   | In_nested_annot  (** in /@ ... @/ annotation *)
 
+let pp_wstring fmt s =
+  Format.fprintf fmt "L\"%s\"" (Escape.escape_wstring s)
+
 class cil_printer () = object (self)
 
   val mutable logic_printer_enabled = true
@@ -631,24 +635,6 @@ class cil_printer () = object (self)
         else Format.asprintf "(%a)" self#ikind ik
       in
       fprintf fmt "%s%a" prefix (pretty_C_constant suffix ik) i
-
-    | CStr(s) -> fprintf fmt "\"%s\"" (Escape.escape_string s)
-    | CWStr [] -> fprintf fmt "L\"\""
-    | CWStr(s) -> (* non-empty list of characters... *)
-      (* text ("L\"" ^ escape_string s ^ "\"")  *)
-      fprintf fmt "L";
-      List.iter
-        (fun elt ->
-           if (elt >= Int64.zero &&
-               elt <= (Int64.of_int 255)) then
-             fprintf fmt "%S"
-               (Escape.escape_char (Char.chr (Int64.to_int elt)))
-           else
-             fprintf fmt "\"\\x%LX\"" elt;
-           fprintf fmt "@ ")
-        s;
-      (* we cannot print L"\xabcd" "feedme" as L"\xabcdfeedme" --
-       * the former has 7 wide characters and the later has 3. *)
 
     | CChr(c) -> fprintf fmt "'%s'" (Escape.escape_char c)
     | CReal(_, _, Some s) -> fprintf fmt "%s" s
@@ -809,9 +795,6 @@ class cil_printer () = object (self)
     | SizeOfE e ->
       fprintf fmt "%a(%a)"
         self#pp_keyword "sizeof" self#exp_non_decay e
-    | SizeOfStr s ->
-      fprintf fmt "%a(%a)"
-        self#pp_keyword "sizeof" self#constant (CStr s)
     (* __alignof__ is a gcc extension, which seems to have a subtle
        semantic difference with newer C11 _Alignof, as mentioned in
        https://gcc.gnu.org/bugzilla/show_bug.cgi?id=52023
@@ -922,6 +905,15 @@ class cil_printer () = object (self)
            ignore (List.fold_left print_next_index curr_index tl));
         Format.fprintf fmt "@]}"
       end
+
+  method str_literal fmt = function
+    | Str s -> Format.fprintf fmt "\"%s\"" (Escape.escape_string s)
+    | Wstr l -> pp_wstring fmt l
+
+  method init_or_str fmt i =
+    match i with
+    | CInit i -> self#init fmt i
+    | StrInit lit -> self#str_literal fmt lit
 
   (** What terminator to print after an instruction. sometimes we want to
       print sequences of instructions separated by comma *)
@@ -1256,7 +1248,7 @@ class cil_printer () = object (self)
   method initinfo fmt io =
     match io.init with
     | None -> fprintf fmt "{}"
-    | Some i -> fprintf fmt "%a" self#init i
+    | Some i -> fprintf fmt "%a" self#init_or_str i
 
   method fundec fmt fd =  fprintf fmt "%a" self#varinfo fd.svar
 
@@ -1805,7 +1797,7 @@ class cil_printer () = object (self)
               | None -> ()
               | Some i ->
                 fprintf fmt " =@ ";
-                self#init fmt i;
+                self#init_or_str fmt i;
              );
              fprintf fmt ";") ;
         fprintf fmt "@]@\n";
@@ -2511,7 +2503,6 @@ class cil_printer () = object (self)
       fprintf fmt "%a(%a)" self#pp_acsl_keyword "sizeof" (self#typ None) t
     | TSizeOfE e ->
       fprintf fmt "%a(%a)" self#pp_acsl_keyword "sizeof" self#term e
-    | TSizeOfStr s -> fprintf fmt "%a(%S)" self#pp_acsl_keyword "sizeof" s
     | TAlignOf e ->
       fprintf fmt "%a(%a)" self#pp_acsl_keyword "alignof" (self#typ None) e
     | TAlignOfE e ->

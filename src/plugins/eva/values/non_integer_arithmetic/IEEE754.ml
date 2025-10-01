@@ -563,7 +563,7 @@ module Make (Model : Modeling) = struct
     Repr { exact ; absolute ; relative ; format = in_format }
 
   let constant _ _ = function
-    | CInt64 _ | CTopInt _ | CString _ | CChr _ | CEnum _ -> Top
+    | CInt64 _ | CTopInt _ | CChr _ | CEnum _ -> Top
     | CReal (f, fkind, None) ->
       let Format format = format_of_fkind fkind in
       let exact = Scalar.of_float f |> Exact.singleton in

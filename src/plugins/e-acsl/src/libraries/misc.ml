@@ -101,7 +101,7 @@ let rec ptr_base ~loc exp =
     let base = ptr_base ~loc exp in
     add_casts casts base
   | Const _ | Lval _ | UnOp _ -> exp
-  | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _ | AlignOfE _
+  | SizeOf _ | SizeOfE _ | AlignOf _ | AlignOfE _
     -> assert false
 
 let ptr_base_and_base_addr ~loc e =

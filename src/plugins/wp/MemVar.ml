@@ -376,8 +376,6 @@ struct
 
   let null = Loc M.null
 
-  let literal ~eid cst = Loc (M.literal ~eid cst)
-
   let cvar x = match V.param x with
     | NotUsed | ByValue | ByShift -> Val(CVAL,x,[])
     | ByAddr -> Val(HEAP,x,[])

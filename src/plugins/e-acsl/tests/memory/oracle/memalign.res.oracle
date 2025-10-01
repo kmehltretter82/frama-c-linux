@@ -17,8 +17,12 @@
   Ignoring complete and disjoint behaviors annotations.
 [e-acsl] FRAMAC_SHARE/libc/stdlib.h:951: Warning: 
   E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:951: Warning: 
+  E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/stdlib.h:967: Warning: 
   E-ACSL construct `\fresh' is not yet supported. Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:951: Warning: 
+  E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
 [eva] FRAMAC_SHARE/libc/stdlib.h:951: Warning: 
   ignoring unsupported allocates clause

@@ -18,31 +18,31 @@
   \result FROM \nothing
 [from] Function printf_va_1:
   S___fc_stdout[0].__fc_FILE_data
-               FROM param0; S___fc_stdout[0]; "%d\n" (and SELF)
-  \result FROM param0; S___fc_stdout[0]; "%d\n"
+               FROM "%d\n"[0..3]; param0; S___fc_stdout[0] (and SELF)
+  \result FROM "%d\n"[0..3]; param0; S___fc_stdout[0]
 [from] Function printf_va_2:
   S___fc_stdout[0].__fc_FILE_data
-               FROM param0; S___fc_stdout[0]; "%d\n" (and SELF)
-  \result FROM param0; S___fc_stdout[0]; "%d\n"
+               FROM "%d\n"[0..3]; param0; S___fc_stdout[0] (and SELF)
+  \result FROM "%d\n"[0..3]; param0; S___fc_stdout[0]
 [from] Function printf_va_3:
   S___fc_stdout[0].__fc_FILE_data
-               FROM param0; param1; S___fc_stdout[0];
-                    "%d,%d\n"[bits 0 to 55] (and SELF)
-  \result FROM param0; param1; S___fc_stdout[0]; "%d,%d\n"[bits 0 to 55]
+               FROM "%d,%d\n"[0..6]; param0; param1;
+                    S___fc_stdout[0] (and SELF)
+  \result FROM "%d,%d\n"[0..6]; param0; param1; S___fc_stdout[0]
 [from] Function printf_va_4:
   S___fc_stdout[0].__fc_FILE_data
-               FROM param0; S___fc_stdout[0]; "%d\n" (and SELF)
-  \result FROM param0; S___fc_stdout[0]; "%d\n"
+               FROM "%d\n"[0..3]; param0; S___fc_stdout[0] (and SELF)
+  \result FROM "%d\n"[0..3]; param0; S___fc_stdout[0]
 [from] Function printf_va_5:
   S___fc_stdout[0].__fc_FILE_data
-               FROM param0; S___fc_stdout[0]; "%d\n" (and SELF)
-  \result FROM param0; S___fc_stdout[0]; "%d\n"
+               FROM "%d\n"[0..3]; param0; S___fc_stdout[0] (and SELF)
+  \result FROM "%d\n"[0..3]; param0; S___fc_stdout[0]
 [from] Function main:
   x FROM \nothing
   y FROM \nothing
   S___fc_stdout[0].__fc_FILE_data
-               FROM S___fc_stdout[0]; "%d\n"; "%d\n";
-                    "%d,%d\n"[bits 0 to 55]; "%d\n"; "%d\n" (and SELF)
+               FROM "%d\n"[0..3]; "%d\n"[0..3]; "%d,%d\n"[0..6];
+                    "%d\n"[0..3]; "%d\n"[0..3]; S___fc_stdout[0] (and SELF)
   \result FROM \nothing
 [from] ====== END OF DEPENDENCIES ======
 [inout] Out (internal) for function f:
@@ -52,5 +52,5 @@
 [inout] Out (internal) for function main:
     x; y; S___fc_stdout[0].__fc_FILE_data
 [inout] Inputs for function main:
-    x; y; S___fc_stdout[0]; "%d\n"; "%d\n"; "%d,%d\n"[bits 0 to 55]; "%d\n";
-    "%d\n"
+    x; y; "%d\n"[0..3]; "%d\n"[0..3]; "%d,%d\n"[0..6]; "%d\n"[0..3];
+    "%d\n"[0..3]; S___fc_stdout[0]

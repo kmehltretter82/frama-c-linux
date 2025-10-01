@@ -2,7 +2,10 @@ open Logic_typing
 open Cil_types
 
 let load_theory = function
-  | { pred_content = Papp (_, [], [ { term_node = TConst(LStr _name) } ] ) } ->
+  | { pred_content =
+        Papp (_, [],
+              [ { term_node = TCast (_,_,{ term_node = TConst(LStr _name) })}])}
+    ->
     raise Not_found
   | _ -> assert false
 

@@ -19,7 +19,7 @@ val compute_semantic: libc:bool -> Cil_datatype.Varinfo.Set.t
 type coverage_metrics = {
   syntactic: Cil_datatype.Varinfo.Set.t; (** syntactically reachable functions *)
   semantic: Cil_datatype.Varinfo.Set.t; (** semantically reachable functions *)
-  initializers: (Cil_types.varinfo * Cil_types.init) list;  (** initializers *)
+  initializers: (Cil_types.varinfo * Cil_types.init_or_str) list;  (** initializers *)
 }
 
 val percent_coverage : libc:bool -> coverage_metrics -> float

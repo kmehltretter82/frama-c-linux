@@ -95,7 +95,7 @@
   empty_buf ∈ {0}
   buf[0..9] ∈ [--..--]
   buf2[0..13] ∈ [--..--] or UNINITIALIZED
-  v[0].iov_base ∈ {{ "A small string" }}
+  v[0].iov_base ∈ {{ (void *)"A small string" }}
    [0].iov_len ∈ {15}
    [1] ∈ {0}
    [2].iov_base ∈ {{ (void *)&buf }}

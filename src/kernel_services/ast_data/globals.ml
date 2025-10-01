@@ -52,6 +52,16 @@ module Vars = struct
 
   exception AlreadyExists of varinfo * initinfo
 
+  let get_string_literal vi =
+    match find vi with
+    | { init = Some (StrInit lit) } -> lit
+    | _ ->
+      Kernel.fatal
+        "Variable %a is not a string literal" Cil_printer.pp_varinfo vi
+    | exception Not_found ->
+      Kernel.fatal
+        "Variable %a is not a known global" Cil_printer.pp_varinfo vi
+
   let add vi info =
     ignore
       (memo
@@ -60,6 +70,26 @@ module Vars = struct
          vi)
 
   let add_decl vi = add vi { init = None }
+
+  let add_string_literal ~loc s =
+    let var =
+      match s with
+      | Str s -> Cil.create_string_literal ~loc s
+      | Wstr s -> Cil.create_wstring_literal ~loc s
+    in
+    let init = { init = Some (StrInit s) } in
+    add var init;
+    let glob = GVar(var,init,loc) in
+    let ast = Ast.get () in
+    let rec insert acc = function
+      | [] -> List.rev_append acc [glob]
+      | ((GVar _ | GVarDecl _ | GFun _ | GFunDecl _) :: _) as tl ->
+        List.rev_append acc  (glob :: tl)
+      | hd :: tl -> insert (hd::acc) tl
+    in
+    ast.globals <- insert [] ast.globals;
+    Ast.mark_as_grown ();
+    var
 
   let get_astinfo_ref : (Cil_types.varinfo -> string * syntactic_scope) ref =
     Extlib.mk_fun "get_astinfo_ref"

@@ -391,9 +391,6 @@ struct
   let occurs x l = M.occurs x @@ LOADER.loc l
   let null = LOADER.Null
 
-  let literal ~eid:eid str =
-    LOADER.make (M.literal ~eid str) (R.literal ~eid str)
-
   let cvar v = LOADER.make (M.cvar v) (R.cvar v)
   let field = LOADER.field
   let shift = LOADER.shift

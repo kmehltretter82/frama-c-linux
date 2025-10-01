@@ -1,4 +1,5 @@
 [kernel] Parsing printf.c (with preprocessing)
+[kernel] printf.c:73: Warning: Too many initializers for character array hashes
 [kernel:variadic] FRAMAC_SHARE/libc/wchar.h:555: 
   Declaration of variadic function fwprintf.
 [kernel:variadic] FRAMAC_SHARE/libc/wchar.h:557: 
@@ -698,8 +699,7 @@ int main(void)
   size_t z;
   ptrdiff_t t;
   char *string = (char *)"Hello world !\n";
-  wchar_t *wstring = (wchar_t *)L"H" "e" "l" "l" "o" " " "w" "o" "r" "l" "d"
-    " " "!" "\\n" ;
+  wchar_t *wstring = (wchar_t *)L"Hello world !\n";
   char c = (char)'4';
   unsigned char uhh = (unsigned char)42;
   unsigned short uh = (unsigned short)42;
@@ -740,7 +740,7 @@ int main(void)
   printf("%p ",(void *)string); /* printf_va_25 */
   printf("%d %*.*u\n",1,- (-1),2,ui); /* printf_va_26 */
   printf("Hello %- 0+#20.10lx %% %s world %d !",ui,string,42); /* printf_fallback_1 */
-  char hashes[4] = {(char)'#', (char)'#', (char)'#', (char)'#'};
+  char hashes[4] = "####";
   printf("%.*s",4,hashes); /* printf_va_27 */
   printf("%.4s",hashes); /* printf_va_28 */
   printf("%*c",4,'#'); /* printf_va_29 */

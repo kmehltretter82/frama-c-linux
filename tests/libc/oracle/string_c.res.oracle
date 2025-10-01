@@ -1044,8 +1044,12 @@
   ss ∈ {{ (unsigned char const *)&s }}
   __retres ∈ {{ NULL ; (void *)&s{[0], [1]} }}
 [eva:final-states] Values at end of function memcmp:
-  p1 ∈ {{ "hallo" ; "hallo" ; "a\000b" ; "a\000b" }}
-  p2 ∈ {{ (unsigned char const *)&hello ; "a\000c" ; "a\000c" }}
+  p1 ∈
+    {{ (unsigned char const *)"hallo" ; (unsigned char const *)"hallo" ;
+       (unsigned char const *)"a\000b" ; (unsigned char const *)"a\000b" }}
+  p2 ∈
+    {{ (unsigned char const *)&hello ; (unsigned char const *)"a\000c" ;
+       (unsigned char const *)"a\000c" }}
   __retres ∈ {-4; -1; 0}
 [eva:final-states] Values at end of function memcpy:
   dest[0] ∈ {65; 97; 104}
@@ -1090,7 +1094,7 @@
 [eva:final-states] Values at end of function strchr:
   ch ∈ {0; 72; 104; 108}
   i ∈ {0; 2; 5}
-  __retres ∈ {{ NULL ; "hello" + {0; 2; 5} }}
+  __retres ∈ {{ NULL ; "hello"{[0], [2], [5]} }}
 [eva:final-states] Values at end of function strcmp:
   i ∈ {0; 1; 4; 5}
   __retres ∈ {-111; -104; -32; 0; 111}
@@ -1131,9 +1135,9 @@
   i ∈ {0; 2; 4; 5}
 [eva:final-states] Values at end of function strrchr:
   ch ∈ {0; 72; 104; 108}
-  __retres ∈ {{ NULL ; "hello" + {0; 3; 5} }}
+  __retres ∈ {{ NULL ; "hello"{[0], [3], [5]} }}
 [eva:final-states] Values at end of function strstr:
-  __retres ∈ {{ NULL ; "hello" + {0; 2; 3} }}
+  __retres ∈ {{ NULL ; "hello"{[0], [2], [3]} }}
 [eva:final-states] Values at end of function test_memchr:
   s[0] ∈ {1}
    [1] ∈ {2}
@@ -1220,7 +1224,7 @@
   p ∈ {{ &s[0] }}
 [eva:final-states] Values at end of function test_strchr:
   s ∈ {{ "hello" }}
-  p ∈ {{ "hello" + {5} }}
+  p ∈ {{ "hello"[5] }}
 [eva:final-states] Values at end of function test_strcmp:
   hello[0] ∈ {104}
        [1] ∈ {97}
@@ -1270,7 +1274,7 @@
   n ∈ {0}
 [eva:final-states] Values at end of function test_strrchr:
   s ∈ {{ "hello" }}
-  p ∈ {{ "hello" + {5} }}
+  p ∈ {{ "hello"[5] }}
 [eva:final-states] Values at end of function test_strstr:
   s ∈ {{ "hello" }}
   p ∈ {{ "hello" }}

@@ -1,4 +1,5 @@
 [kernel] Parsing strings_h.c (with preprocessing)
+[kernel] strings_h.c:14: Warning: Too many initializers for character array s
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed

@@ -40,12 +40,6 @@ let add_initializer vi offset init =
     with Not_found ->
       Options.fatal "variable %a is not monitored" Printer.pp_varinfo vi
 
-let rec literal_in_initializer env kf = function
-  | SingleInit exp ->
-    snd (Literal_observer.subst_all_literals_in_exp env kf exp)
-  | CompoundInit (_, l) ->
-    List.fold_left (fun env (_, i) -> literal_in_initializer env kf i) env l
-
 (* Create a global kernel function named [name].
    Return a triple (varinfo * fundec * kernel_function) of the created
    global function. *)
@@ -82,51 +76,46 @@ let mk_function name =
 let mk_init_function () =
   (* Create and register [__e_acsl_globals_init] function with definition
      for initialization of global variables *)
-  let vi, fundec, kf = mk_function function_init_name in
+  let vi, fundec, _ = mk_function function_init_name in
   (* Now generate the statements. The generation is done only now because it
      depends on the local variable [already_run] whose generation required the
      existence of [fundec] *)
   let env = Env.push Env.empty in
   (* 2-stage observation of initializers: temporal analysis must be performed
      after generating observers of **all** globals *)
-  let env, stmts =
+  let stmts =
     Varinfo.Hashtbl.fold_sorted
       (fun vi l stmts ->
          List.fold_left
-           (fun (env, stmts) (off, init) ->
-              let env = literal_in_initializer env kf init in
-              let stmt = Temporal.generate_global_init vi off init in
-              env, match stmt with None -> stmts | Some stmt -> stmt :: stmts)
+           (fun stmts (off,init) ->
+              match Temporal.generate_global_init vi off init with
+              | None -> stmts
+              | Some stmt -> stmt :: stmts
+           )
            stmts
-           !l)
+           !l
+      )
       tbl
-      (env, [])
+      []
   in
   (* allocation and initialization of globals *)
   let stmts =
     Varinfo.Hashtbl.fold_sorted
       (fun vi _ stmts ->
          if Misc.is_fc_or_compiler_builtin vi then stmts
-         else
+         else begin
+           let stmts =
+             if Ast_types.is_const vi.vtype then
+               (* a const global can't be modified after initialization. *)
+               Smart_stmt.mark_readonly vi :: stmts
+             else stmts
+           in
            (* a global is both allocated and initialized *)
            Smart_stmt.store_stmt vi
            :: Smart_stmt.initialize ~loc:Location.unknown (Cil.var vi)
-           :: stmts)
+           :: stmts
+         end)
       tbl
-      stmts
-  in
-  (* literal strings allocations and initializations *)
-  let stmts =
-    Literal_strings.fold
-      (fun s vi stmts ->
-         let loc = Location.unknown in
-         let e = Cil.new_exp ~loc (Const (CStr s)) in
-         let str_size = Cil.new_exp ~loc (SizeOfStr s) in
-         Smart_stmt.assigns ~loc ~result:(Cil.var vi) e
-         :: Smart_stmt.store_stmt ~str_size vi
-         :: Smart_stmt.full_init_stmt vi
-         :: Smart_stmt.mark_readonly vi
-         :: stmts)
       stmts
   in
   (* create a new code block with generated statements *)

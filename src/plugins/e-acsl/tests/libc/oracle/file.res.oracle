@@ -3,7 +3,11 @@
   E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/stdio.h:176: Warning: 
   no assigns clause generated for function valid_read_string because pointers as arguments is not yet supported
-[e-acsl] FRAMAC_SHARE/libc/__fc_string_axiomatic.h:263: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/__fc_string_axiomatic.h:282: Warning: 
+  E-ACSL construct `logic functions or predicates performing read accesses'
+  is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/__fc_string_axiomatic.h:282: Warning: 
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
   Ignoring annotation.

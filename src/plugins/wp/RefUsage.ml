@@ -338,7 +338,7 @@ and expr (e:Cil_types.exp) : model = match e.enode with
 
   (* Logics *)
   | Const _
-  | SizeOf _ | SizeOfE _ | SizeOfStr _  | AlignOf _ | AlignOfE _ -> nothing
+  | SizeOf _ | SizeOfE _ | AlignOf _ | AlignOfE _ -> nothing
 
   (* Unary *)
   | UnOp((Neg|BNot|LNot),e,_) -> mexpr e
@@ -390,7 +390,7 @@ and term (env:ctx) (t:term) : model = match t.term_node with
 
   (* Logics *)
   | TConst _
-  | TSizeOf _ | TSizeOfE _ | TSizeOfStr _ | TAlignOf _ | TAlignOfE _
+  | TSizeOf _ | TSizeOfE _ | TAlignOf _ | TAlignOfE _
   | Ttypeof _ | Ttype _ -> nothing
 
   (* Unary *)
@@ -570,7 +570,10 @@ let cinit vi init =
     | CompoundInit(_,loi) ->
       List.fold_left (fun a (ofs,init) -> aux (offset m ofs) a init)
         a loi
-  in aux (cval vi) E.bot init
+  in
+  match init with
+  | CInit init -> aux (cval vi) E.bot init
+  | StrInit _s -> e_value (shift (cval vi) E.bot)
 
 let cfun_code env kf = (* Visits term/pred of code annotations and C exp *)
   let update_code_env v = env.global.code <- E.cup env.global.code v in
@@ -617,7 +620,8 @@ let cfun_code env kf = (* Visits term/pred of code annotations and C exp *)
           do_lval (func,NoOffset); List.iter do_exp args_list
         | Some called_kf -> do_args called_kf args_list
       end
-    | Instr(Local_init (v,AssignInit i,_)) -> update_code_env (cinit v i)
+    | Instr(Local_init (v,AssignInit i,_)) ->
+      update_code_env (cinit v (CInit i))
     | Instr(Local_init (v,ConsInit (f,args,kind),_)) ->
       let kf = Globals.Functions.get f in
       (match kind with

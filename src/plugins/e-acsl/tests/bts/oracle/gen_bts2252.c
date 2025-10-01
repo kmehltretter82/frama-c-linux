@@ -8,7 +8,6 @@
 #include "stdlib.h"
 #include "string.h"
 #include "time.h"
-char *__gen_e_acsl_literal_string;
 extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 
 /*@ requires valid_nstring_src: valid_read_nstring(src, n);
@@ -32,6 +31,7 @@ extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 char *__gen_e_acsl_strncpy(char * restrict dest, char const * restrict src,
                            size_t n);
 
+char const __fc_lit_string1[10UL] = "Test Code";
 /*@ requires valid_nstring_src: valid_read_nstring(src, n);
     requires room_nstring: \valid(dest + (0 .. n - 1));
     requires separation: \separated(dest + (0 .. n - 1), src + (0 .. n - 1));
@@ -350,12 +350,16 @@ void __e_acsl_globals_init(void)
   static char __e_acsl_already_run = 0;
   if (! __e_acsl_already_run) {
     __e_acsl_already_run = 1;
-    __gen_e_acsl_literal_string = "Test Code";
-    __e_acsl_store_block((void *)__gen_e_acsl_literal_string,
-                         sizeof("Test Code"));
-    __e_acsl_full_init((void *)__gen_e_acsl_literal_string);
-    __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string);
+    __e_acsl_store_block((void *)(__fc_lit_string1),10UL);
+    __e_acsl_full_init((void *)(& __fc_lit_string1));
+    __e_acsl_mark_readonly((void *)(__fc_lit_string1));
   }
+  return;
+}
+
+void __e_acsl_globals_clean(void)
+{
+  __e_acsl_delete_block((void *)(__fc_lit_string1));
   return;
 }
 
@@ -365,7 +369,7 @@ int main(void)
   int i;
   __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   __e_acsl_globals_init();
-  char *srcbuf = (char *)__gen_e_acsl_literal_string;
+  char *srcbuf = (char *)(__fc_lit_string1);
   __e_acsl_store_block((void *)(& srcbuf),8UL);
   __e_acsl_full_init((void *)(& srcbuf));
   int loc = 1;
@@ -413,6 +417,7 @@ int main(void)
   __retres = 0;
   __e_acsl_delete_block((void *)(& destbuf));
   __e_acsl_delete_block((void *)(& srcbuf));
+  __e_acsl_globals_clean();
   __e_acsl_memory_clean();
   return __retres;
 }

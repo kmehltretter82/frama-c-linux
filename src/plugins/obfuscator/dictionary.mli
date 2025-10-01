@@ -9,7 +9,7 @@
 val fresh: Obfuscator_kind.t -> string -> string
 (** Generate a fresh name of the given kind *)
 
-val id_of_literal_string: string -> string
+val id_of_string_literal: string -> string
 (** @return the generated name for a literal string.
     @raise Not_found if no name has already been generated. *)
 

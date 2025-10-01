@@ -334,7 +334,7 @@
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function memcmp:
   p1 ∈ {{ (unsigned char const *)&b }}
-  p2 ∈ {{ "abc\000\000\000\000" }}
+  p2 ∈ {{ (unsigned char const *)"abc\000\000\000\000" }}
   __retres ∈ {0}
 [eva:final-states] Values at end of function memset:
   p ∈ {{ (unsigned char *)&b }}

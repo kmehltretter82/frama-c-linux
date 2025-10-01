@@ -23,7 +23,7 @@ val translate_offset : Cil_types.offset -> offset
 val translate_unop : Cil_types.unop -> unop
 val translate_binop : Cil_types.binop -> binop
 val translate_init : Cil_types.init -> init
-
+val translate_init_or_str : Cil_types.init_or_str -> init_or_str
 
 (* Relations *)
 

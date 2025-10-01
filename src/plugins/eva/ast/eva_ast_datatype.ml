@@ -41,7 +41,6 @@ and hash_exp e =
 and hash_constant c =
   match c with
   | CTopInt ikind -> Hashtbl.hash (1, ikind)
-  | CString base -> Hashtbl.hash (2, Base.hash base)
   | CChr c -> Hashtbl.hash (3, c)
   | CReal (fn, fk, _) -> Hashtbl.hash (4, fn, fk)
   | CInt64 (n, k, _) -> Hashtbl.hash (5, n, k)

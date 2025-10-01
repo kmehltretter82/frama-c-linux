@@ -361,7 +361,7 @@ end = struct
       let error = not_yet "tset comprehension" in
       let error = do_term ?error env t in
       do_opt do_predicate ?error env p_opt
-    | TConst _ | TSizeOf _ | TAlignOf _ | TSizeOfStr _ | Tnull | Ttype _
+    | TConst _ | TSizeOf _ | TAlignOf _ | Tnull | Ttype _
     | Tempty_set ->
       error
 
