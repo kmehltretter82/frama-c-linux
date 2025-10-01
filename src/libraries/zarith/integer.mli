@@ -6,7 +6,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Extension of [Big_int] compatible with [Zarith].
+(** Extension of {!Z} from with [Zarith].
     @since Nitrogen-20111001 *)
 
 type t = Z.t
@@ -166,20 +166,20 @@ val is_even : t -> bool
 val length : t -> t -> t (** b - a + 1 *)
 
 val two_power : t -> t
-(** Computes [2^n]
+(** Computes [2^n].
     @raise Z.Overflow for exponents greater than 1024 *)
 
 val two_power_of_int : int -> t
-(** Computes [2^n] *)
+(** Computes [2^n]. *)
 
 val power_int_positive_int_opt : int -> int -> t option
-(** Exponentiation *)
+(** Exponentiation. *)
 
 val shift_left : t -> int -> t
-(** Implemented by [Z.shift_left]. *)
+(** Implemented by {!Z.shift_left}. *)
 
 val shift_right : t -> int -> t
-(** Implemented by [Z.shift_right]. *)
+(** Implemented by {!Z.shift_right}. *)
 
 val shift_left_z : t -> t -> t
 (** Convert the second argument via {!of_int} then call {!Z.shift_left}.
@@ -204,7 +204,7 @@ val max : t -> t -> t
 
 val ediv : t -> t -> t
 (** Euclidean division (that returns a positive rem).
-    Implemented by [Z.ediv]
+    Implemented by {!Z.ediv}
 
     Equivalent to C division if both operands are positive.
     Equivalent to a floored division if b > 0 (rounds downwards),
@@ -214,37 +214,37 @@ val ediv : t -> t -> t
 
 val erem : t -> t -> t
 (** Remainder of the Euclidean division (always positive).
-    Implemented by [Z.erem] *)
+    Implemented by {!Z.erem}. *)
 
 val ediv_rem: t -> t -> (t * t)
 (** [ediv_rem a b] returns [(ediv a b, erem a b)].
-    Implemented by [Z.ediv_rem] *)
+    Implemented by {!Z.ediv_rem}. *)
 
 val div : t -> t -> t
 (** Truncated division towards 0 (like in C99).
-    Implemented by [Z.div] *)
+    Implemented by {!Z.div}. *)
 
 val rem : t -> t -> t
 (** Remainder of the truncated division towards 0 (like in C99).
-    Implemented by [Z.rem] *)
+    Implemented by {!Z.rem}. *)
 
 val div_rem : t -> t -> t * t
 (** [div_rem a b] returns [(div a b, rem a b)].
-    Implemented by [Z.div_rem] *)
+    Implemented by {!Z.div_rem}. *)
 
 val gcd : t -> t -> t
-(** Implemented by [Z.gcd] *)
+(** Implemented by {!Z.gcd}. *)
 
 val lcm : t -> t -> t
-(** Implemented by [Z.lcm] *)
+(** Implemented by {!Z.lcm}. *)
 
 val round_up_to_r : min:t -> r:t -> modu:t -> t
 (** [round_up_to_r m r modu] is the smallest number [n] such that
-    [n]>=[m] and [n] = [r] modulo [modu] *)
+    [n]>=[m] and [n] = [r] modulo [modu]. *)
 
 val round_down_to_r : max:t -> r:t -> modu:t -> t
 (** [round_down_to_r m r modu] is the largest number [n] such that
-    [n]<=[m] and [n] = [r] modulo [modu] *)
+    [n]<=[m] and [n] = [r] modulo [modu]. *)
 
 val popcount: t -> int
 
@@ -347,7 +347,7 @@ val min_int64 : t
 
 val e_div : t -> t -> t
 (** Euclidean division (that returns a positive rem).
-    Implemented by [Z.ediv]
+    Implemented by {!Z.ediv}
 
     Equivalent to C division if both operands are positive.
     Equivalent to a floored division if b > 0 (rounds downwards),
@@ -359,40 +359,40 @@ val e_div : t -> t -> t
 
 val e_rem : t -> t -> t
 (** Remainder of the Euclidean division (always positive).
-    Implemented by [Z.erem] *)
+    Implemented by {!Z.erem}. *)
 [@@deprecated "Use erem instead."]
 [@@migrate { repl = Rel.erem } ]
 
 val e_div_rem: t -> t -> (t * t)
 (** [e_div_rem a b] returns [(e_div a b, e_rem a b)].
-    Implemented by [Z.ediv_rem] *)
+    Implemented by {!Z.ediv_rem}. *)
 [@@deprecated "Use ediv_rem instead."]
 [@@migrate { repl = Rel.ediv_rem } ]
 
 val c_div : t -> t -> t
 (** Truncated division towards 0 (like in C99).
-    Implemented by [Z.div] *)
+    Implemented by {!Z.div}. *)
 [@@deprecated "Use div instead."]
 [@@migrate { repl = Rel.div } ]
 
 val c_rem : t -> t -> t
 (** Remainder of the truncated division towards 0 (like in C99).
-    Implemented by [Z.rem] *)
+    Implemented by {!Z.rem}. *)
 [@@deprecated "Use rem instead."]
 [@@migrate { repl = Rel.rem } ]
 
 val c_div_rem : t -> t -> t * t
 (** [c_div_rem a b] returns [(c_div a b, c_rem a b)].
-    Implemented by [Z.div_rem] *)
+    Implemented by {!Z.div_rem}. *)
 [@@deprecated "Use div_rem instead."]
 [@@migrate { repl = Rel.div_rem } ]
 
 val pgcd : t -> t -> t
-(** [pgcd v 0 == pgcd 0 v == abs v]. Result is always positive *)
+(** [pgcd v 0 == pgcd 0 v == abs v]. Result is always positive. *)
 [@@deprecated "Use gcd instead."]
 [@@migrate { repl = Rel.gcd } ]
 
 val ppcm : t -> t -> t
-(** [ppcm v 0 == ppcm 0 v == 0]. Result is always positive *)
+(** [ppcm v 0 == ppcm 0 v == 0]. Result is always positive. *)
 [@@deprecated "Use lcm instead."]
 [@@migrate { repl = Rel.lcm } ]
