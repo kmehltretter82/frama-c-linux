@@ -421,7 +421,7 @@
 [eva] computing for function f9 <- test_promote <- main.
   Called from behaviors1.i:609.
 [eva] using specification for function f9
-[eva] behaviors1.i:601: 
+[eva:acsl:unsupported] behaviors1.i:601: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function length
 [eva] behaviors1.i:609: 
   function f9, behavior b1: assumes got status invalid; behavior not evaluated.
@@ -433,13 +433,13 @@
 [eva] computing for function f10 <- test_narrow <- main.
   Called from behaviors1.i:634.
 [eva] using specification for function f10
-[eva] behaviors1.i:616: 
+[eva:acsl:unsupported] behaviors1.i:616: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function fl
-[eva] behaviors1.i:619: 
+[eva:acsl:unsupported] behaviors1.i:619: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function fl
-[eva] behaviors1.i:622: 
+[eva:acsl:unsupported] behaviors1.i:622: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function fl
-[eva] behaviors1.i:625: 
+[eva:acsl:unsupported] behaviors1.i:625: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function fl
 [eva] Done for function f10
 [eva] Recording results for test_narrow

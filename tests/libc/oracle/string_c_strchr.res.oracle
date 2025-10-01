@@ -66,7 +66,7 @@
   function strchr, behavior found: postcondition 'result_same_base' got status valid.
 [eva] FRAMAC_SHARE/libc/string.h:196: 
   function strchr, behavior found: postcondition 'result_in_length' got status valid.
-[eva] FRAMAC_SHARE/libc/string.h:198: 
+[eva:acsl:unsupported] FRAMAC_SHARE/libc/string.h:198: 
   cannot evaluate ACSL term, unsupported logic var p
 [eva:alarm] FRAMAC_SHARE/libc/string.h:198: Warning: 
   function strchr, behavior found: postcondition 'result_first_occurrence' got status unknown.

@@ -7,7 +7,8 @@
         [1] ∈ {STATUS_OK}
   p_status ∈ {{ &status[0] }}
   x ∈ {0}
-[eva] status.acsl:10: cannot evaluate ACSL term, unsupported logic var st
+[eva:acsl:unsupported] status.acsl:10: 
+  cannot evaluate ACSL term, unsupported logic var st
 [eva:alarm] status.acsl:10: Warning: 
   function main: precondition ∀ enum __anonenum_STATUS_1 st[2];
                                 status ≡

@@ -14,7 +14,7 @@
 [eva] using specification for function memset
 [eva] FRAMAC_SHARE/libc/stdlib.c:59: 
   function memset: precondition 'valid_s' got status valid.
-[eva] FRAMAC_SHARE/libc/string.h:147: 
+[eva:acsl:unsupported] FRAMAC_SHARE/libc/string.h:147: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memset
 [eva] Done for function memset
 [eva] Recording results for calloc

@@ -69,7 +69,7 @@ let track_alarms b = function
 let display_evaluation_error ~loc = function
   | CAlarm -> ()
   | pa ->
-    Self.result ~source:(fst loc) ~once:true
+    Self.result ~dkey:Self.dkey_acsl_unsupported ~source:(fst loc) ~once:true
       "cannot evaluate ACSL term, %a" pretty_logic_evaluation_error pa
 
 (* Warning mode use when performing _reductions_ in the logic ( ** not **

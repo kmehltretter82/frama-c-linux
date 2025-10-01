@@ -128,6 +128,11 @@ let dkey_include_string_literal =
     ~help:"when printing a state, \
            also include globals representing string literals"
 
+let dkey_acsl_unsupported =
+  register_category "acsl:unsupported" ~default:true
+    ~help:"messages about ACSL term evaluation errors"
+
+
 (* ----- Warning categories ------------------------------------------------- *)
 
 let wkey_alarm =
