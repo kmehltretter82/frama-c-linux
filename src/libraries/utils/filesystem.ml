@@ -12,8 +12,39 @@ open Filepath
 (* --- File system                                                        --- *)
 (* -------------------------------------------------------------------------- *)
 
+type file_kind =
+  | File
+  | Directory
+  | CharacterDevice
+  | BlockDevice
+  | SymbolicLink
+  | NamedPipe
+  | Socket
+
+let convert_file_kind : Unix.file_kind -> file_kind = function
+  | S_REG -> File
+  | S_DIR -> Directory
+  | S_CHR -> CharacterDevice
+  | S_BLK -> BlockDevice
+  | S_LNK -> SymbolicLink
+  | S_FIFO -> NamedPipe
+  | S_SOCK -> Socket
+
+let file_kind (p : t) =
+  try
+    let stats = Unix.stat (Filepath.to_string_abs p) in
+    Ok (convert_file_kind stats.st_kind)
+  with Unix.Unix_error (error_code, _, _) ->
+    Error (Unix.error_message error_code)
+
 let exists (p : t) =
-  Sys.file_exists (Filepath.to_string_abs p)
+  file_kind p |> Result.is_ok
+
+let file_exists (p : t) =
+  file_kind p = Ok (File)
+
+let dir_exists (p : t) =
+  file_kind p = Ok (Directory)
 
 let is_file (p : t) =
   try
@@ -265,3 +296,29 @@ let iter_lines p job =
       job (input_line in_channel) ;
     done
   with End_of_file -> ()
+
+
+(* -------------------------------------------------------------------------- *)
+(* --- Tests                                                              --- *)
+(* -------------------------------------------------------------------------- *)
+
+let _test_file () =
+  let filepath = temp_file ~prefix:"" ~suffix:"" in
+  Extlib.safe_at_exit (fun () -> remove_file filepath);
+  filepath
+
+let _test_dir () =
+  let filepath = temp_dir ~prefix:"" ~suffix:"" in
+  Extlib.safe_at_exit (fun () -> remove_dir filepath);
+  filepath
+
+let _test_filename () =
+  let filepath = temp_file ~prefix:"" ~suffix:"" in
+  remove_file filepath;
+  filepath
+
+let%test _ = not (file_exists Filepath.empty)
+let%test _ = file_exists (_test_file ())
+let%test _ = not (file_exists (_test_dir ()))
+let%test _ = not (dir_exists (_test_file ()))
+let%test _ = dir_exists (_test_dir ())

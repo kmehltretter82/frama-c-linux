@@ -10,9 +10,34 @@
 (** {2 File system} *)
 (* ************************************************************************* *)
 
+(** This type is used to determine the type of *)
+type file_kind =
+  | File
+  | Directory
+  | CharacterDevice
+  | BlockDevice
+  | SymbolicLink
+  | NamedPipe
+  | Socket
+
+(** [file_kind p] returns the file kind of the given path [p]. On failure -
+    for instance if the file does not exist - returns an error string.
+    @since Frama-C+dev *)
+val file_kind: Filepath.t -> (file_kind, string) result
+
 (** Equivalent to [Sys.file_exists].
     @since 28.0-Nickel *)
 val exists: Filepath.t -> bool
+
+(** [file_exists p] returns whether the path points to an existing regular file.
+    It is equivalent to [file_kind p = Ok (File)]
+    @since Frama-C+dev *)
+val file_exists: Filepath.t -> bool
+
+(** [dir_exists] returns whether the path points to an existing directory,
+     It is equivalent to [file_kind p = Ok (Directory)]
+     @since Frama-C+dev *)
+val dir_exists: Filepath.t -> bool
 
 (** [is_file f] returns [true] iff [f] points to a regular file
     (or a symbolic link pointing to a file).
