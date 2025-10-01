@@ -126,69 +126,31 @@
 [eva] Done for function f6
 [eva] computing for function f7 <- main.
   Called from secureflow.c:215.
-[eva] secureflow.c:173: 
-  cannot evaluate ACSL term, unsupported ACSL construct: logic function security_status
 [eva] secureflow.c:173: assertion got status valid.
-[eva] secureflow.c:174: 
-  cannot evaluate ACSL term, unsupported ACSL construct: logic function security_status
 [eva] secureflow.c:174: assertion got status valid.
-[eva] secureflow.c:175: 
-  cannot evaluate ACSL term, unsupported ACSL construct: logic function security_status
 [eva] secureflow.c:175: assertion got status valid.
-[eva] secureflow.c:178: 
-  cannot evaluate ACSL term, unsupported ACSL construct: logic function security_status
 [eva:alarm] secureflow.c:178: Warning: assertion got status unknown.
 [eva:taint-interference] secureflow.c:179: Warning: 
   indirect interference on x_0; y_0
-[eva] secureflow.c:180: 
-  cannot evaluate ACSL term, unsupported ACSL construct: logic function security_status
 [eva:alarm] secureflow.c:180: Warning: assertion got status unknown.
-[eva] secureflow.c:181: 
-  cannot evaluate ACSL term, unsupported ACSL construct: logic function security_status
 [eva:alarm] secureflow.c:181: Warning: assertion got status unknown.
-[eva] secureflow.c:182: 
-  cannot evaluate ACSL term, unsupported ACSL construct: logic function security_status
 [eva:alarm] secureflow.c:182: Warning: assertion got status unknown.
-[eva] secureflow.c:187: 
-  cannot evaluate ACSL term, unsupported ACSL construct: logic function security_status
 [eva] secureflow.c:187: assertion got status valid.
-[eva] secureflow.c:188: 
-  cannot evaluate ACSL term, unsupported ACSL construct: logic function security_status
 [eva] secureflow.c:188: assertion got status valid.
-[eva] secureflow.c:189: 
-  cannot evaluate ACSL term, unsupported ACSL construct: logic function security_status
 [eva] secureflow.c:189: assertion got status valid.
 [eva:taint-interference] secureflow.c:190: Warning: direct interference on z_0
-[eva] secureflow.c:191: 
-  cannot evaluate ACSL term, unsupported ACSL construct: logic function security_status
 [eva:alarm] secureflow.c:191: Warning: assertion got status unknown.
-[eva] secureflow.c:192: 
-  cannot evaluate ACSL term, unsupported ACSL construct: logic function security_status
 [eva] secureflow.c:192: assertion got status valid.
-[eva] secureflow.c:193: 
-  cannot evaluate ACSL term, unsupported ACSL construct: logic function security_status
 [eva] secureflow.c:193: assertion got status valid.
-[eva] secureflow.c:195: 
-  cannot evaluate ACSL term, unsupported ACSL construct: logic function security_status
 [eva] secureflow.c:195: assertion got status valid.
 [eva:alarm] secureflow.c:196: Warning: 
   accessing out of bounds index. assert 0 ≤ secret;
 [eva:alarm] secureflow.c:196: Warning: 
   accessing out of bounds index. assert secret < 512;
-[eva] secureflow.c:197: 
-  cannot evaluate ACSL term, unsupported ACSL construct: logic function security_status
 [eva:alarm] secureflow.c:197: Warning: assertion got status unknown.
-[eva] secureflow.c:198: 
-  cannot evaluate ACSL term, unsupported ACSL construct: logic function security_status
 [eva:alarm] secureflow.c:198: Warning: assertion got status unknown.
-[eva] secureflow.c:200: 
-  cannot evaluate ACSL term, unsupported ACSL construct: logic function security_status
 [eva:alarm] secureflow.c:200: Warning: assertion got status unknown.
-[eva] secureflow.c:201: 
-  cannot evaluate ACSL term, unsupported ACSL construct: logic function security_status
 [eva:alarm] secureflow.c:201: Warning: assertion got status unknown.
-[eva] secureflow.c:205: 
-  cannot evaluate ACSL term, unsupported ACSL construct: logic function security_status
 [eva:alarm] secureflow.c:205: Warning: assertion got status unknown.
 [eva] Recording results for f7
 [eva] Done for function f7
