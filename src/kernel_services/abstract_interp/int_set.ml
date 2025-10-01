@@ -254,7 +254,7 @@ let make_top_from_set s =
   let max = O.max_elt s in
   let modu = O.fold
       (fun x acc ->
-         if Int.equal x min then acc else Int.pgcd (Int.sub x min) acc)
+         if Int.equal x min then acc else Int.gcd (Int.sub x min) acc)
       s Int.zero
   in
   (min, max, modu)
@@ -279,7 +279,7 @@ let add_ps ps x =
     let new_modu =
       if Int.equal x min
       then modu
-      else Int.pgcd (Int.sub x min) modu
+      else Int.gcd (Int.sub x min) modu
     in
     let new_min = Int.min min x in
     let new_max = Int.max max x in
@@ -488,7 +488,7 @@ let join l1 s1 l2 s2 =
     let accum acc x =
       if Int.equal x min
       then acc
-      else Int.pgcd (Int.sub x min) acc
+      else Int.gcd (Int.sub x min) acc
     in
     let modu = ref Int.zero in
     for j = 0 to pred l1 do

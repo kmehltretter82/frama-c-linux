@@ -232,11 +232,11 @@ val div_rem : t -> t -> t * t
 (** [div_rem a b] returns [(div a b, rem a b)].
     Implemented by [Z.div_rem] *)
 
-val pgcd : t -> t -> t
-(** [pgcd v 0 == pgcd 0 v == abs v]. Result is always positive *)
+val gcd : t -> t -> t
+(** Implemented by [Z.gcd] *)
 
-val ppcm : t -> t -> t
-(** [ppcm v 0 == ppcm 0 v == 0]. Result is always positive *)
+val lcm : t -> t -> t
+(** Implemented by [Z.lcm] *)
 
 val round_up_to_r : min:t -> r:t -> modu:t -> t
 (** [round_up_to_r m r modu] is the smallest number [n] such that
@@ -386,3 +386,13 @@ val c_div_rem : t -> t -> t * t
     Implemented by [Z.div_rem] *)
 [@@deprecated "Use div_rem instead."]
 [@@migrate { repl = Rel.div_rem } ]
+
+val pgcd : t -> t -> t
+(** [pgcd v 0 == pgcd 0 v == abs v]. Result is always positive *)
+[@@deprecated "Use gcd instead."]
+[@@migrate { repl = Rel.gcd } ]
+
+val ppcm : t -> t -> t
+(** [ppcm v 0 == ppcm 0 v == 0]. Result is always positive *)
+[@@deprecated "Use lcm instead."]
+[@@migrate { repl = Rel.lcm } ]

@@ -200,7 +200,7 @@ let max_max x y =
   | Some x, Some y -> Some (Int.max x y)
 
 let join t1 t2 =
-  let modu = Int.(pgcd (pgcd t1.modu t2.modu) (abs (sub t1.rem t2.rem))) in
+  let modu = Int.(gcd (gcd t1.modu t2.modu) (abs (sub t1.rem t2.rem))) in
   let rem = Int.erem t1.rem modu in
   let min = min_min t1.min t2.min in
   let max = max_max t1.max t2.max in
@@ -275,7 +275,7 @@ let compute_r_common r1 m1 r2 m2 =
 
        Thus k1*m1 = k2*m2 is a multiple of m1 and m2, i.e. is a multiple
        of ppcm(m1,m2). Thus x = y mod ppcm(m1,m2). *)
-    let ppcm = Integer.ppcm m1 m2 in
+    let ppcm = Integer.lcm m1 m2 in
     (* x may be bigger than the ppcm, we normalize it. *)
     (Int.erem x ppcm, ppcm)
 
@@ -336,7 +336,7 @@ let widen ?(size=Integer.zero) ?(hint = Datatype.Integer.Set.empty) t1 t2 =
         in
         Datatype.Integer.Set.(union hint (of_list limits))
     in
-    let modu = Int.(pgcd (pgcd t1.modu t2.modu) (abs (sub t1.rem t2.rem))) in
+    let modu = Int.(gcd (gcd t1.modu t2.modu) (abs (sub t1.rem t2.rem))) in
     let rem = Int.erem t1.rem modu in
     let min =
       if bound_compare t1.min t2.min = 0 then t2.min else
@@ -440,7 +440,7 @@ let add_singleton_int i t =
   make ~min ~max ~rem ~modu:t.modu
 
 let add t1 t2 =
-  let modu = Int.pgcd t1.modu t2.modu in
+  let modu = Int.gcd t1.modu t2.modu in
   let rem = Int.erem (Int.add t1.rem t2.rem) modu in
   let min =
     opt_map2
@@ -488,7 +488,7 @@ let abs t =
       | Some mn, Some mx -> Some (Int.(max (neg mn) mx))
       | _, _ -> None
     in
-    let modu = Int.(pgcd t.modu (add t.rem t.rem)) in
+    let modu = Int.(gcd t.modu (add t.rem t.rem)) in
     let rem = Int.erem t.rem modu in
     build_interval ~min:(Some Int.zero) ~max ~rem ~modu
 
@@ -579,7 +579,7 @@ let scale_rem ~pos f t =
   assert (not (Int.is_zero f));
   let f = if Int.lt f Int.zero then Int.neg f else f in
   let rem_f a = if pos then Int.erem a f else Int.rem a f in
-  let modu = Int.pgcd f t.modu in
+  let modu = Int.gcd f t.modu in
   let rr = Int.erem t.rem modu in
   let binf, bsup =
     if pos
@@ -647,8 +647,8 @@ let mul t1 t2 =
      let modu2 = Int.mul multipl1 multipl2 in
      let modu = Int.ppcm modu1 modu2 in    *)
   let modu =
-    Int.(pgcd
-           (pgcd (mul t1.modu t2.modu) (mul t1.rem t2.modu))
+    Int.(gcd
+           (gcd (mul t1.modu t2.modu) (mul t1.rem t2.modu))
            (mul t2.rem t1.modu))
   in
   let rem = Int.erem (Int.mul t1.rem t2.rem) modu in
@@ -702,7 +702,7 @@ let cast ~size ~signed t =
   let factor = Int.two_power size
   and mask = Int.two_power (Int.pred size) in
   let best_effort () =
-    let modu = Int.pgcd factor t.modu in
+    let modu = Int.gcd factor t.modu in
     let rem = Int.erem t.rem modu in
     let min =
       if signed

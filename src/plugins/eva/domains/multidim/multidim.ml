@@ -178,7 +178,7 @@ let mod_integer (o,sum) i =
     if Integer.(lt (add (mul d b) o) i)
     then (o,sum) (* hull is ok, this is our result *)
     else
-      let d' = Integer.pgcd d i in
+      let d' = Integer.gcd d i in
       let b' = Integer.(pred (ediv i d')) in
       let o' = Integer.erem o d' in
       o', Terms.(normalize (merge [(d',b')] tail))

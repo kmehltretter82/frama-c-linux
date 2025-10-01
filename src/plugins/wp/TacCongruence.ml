@@ -118,7 +118,7 @@ let rec compare cmp a b =
   | IDIV_K( a,p ) , IDIV_K( b,q ) when
       not Integer.(equal p zero) &&
       not Integer.(equal q zero) ->
-    let g = Integer.pgcd (Integer.abs p) (Integer.abs q) in
+    let g = Integer.gcd (Integer.abs p) (Integer.abs q) in
     let ka = Integer.ediv p g in
     let kb = Integer.ediv q g in
     compare_div cmp (F.e_times ka a) (F.e_times kb b) (F.e_zint g)
@@ -142,14 +142,14 @@ let rec equal eq a b =
     else
       eq F.e_one F.e_zero
   | IMUL_K( k,a ) , IMUL_K( k',b ) ->
-    let r = Integer.pgcd k k' in
+    let r = Integer.gcd k k' in
     eq (F.e_times (Integer.div k r) a)
       (F.e_times (Integer.div k' r) b)
 
   | IDIV_K( a,p ) , IDIV_K( b,q ) when
       not Integer.(equal p zero) &&
       not Integer.(equal q zero) ->
-    let g = Integer.pgcd (Integer.abs p) (Integer.abs q) in
+    let g = Integer.gcd (Integer.abs p) (Integer.abs q) in
     let ka = Integer.ediv p g in
     let kb = Integer.ediv q g in
     compare_div EQ (F.e_times ka a) (F.e_times kb b) (F.e_zint g)

@@ -147,7 +147,7 @@ let make_top_from_set s =
     then Int.zero, min
     else
       let modu =
-        Int_set.fold (fun x acc -> Int.pgcd (Int.sub x min) acc) s Int.zero
+        Int_set.fold (fun x acc -> Int.gcd (Int.sub x min) acc) s Int.zero
       in
       Int.erem min modu, modu
   in
@@ -322,7 +322,7 @@ let join v1 v2 =
   | Set s, Itv i
   | Itv i, Set s ->
     let min, max, r, modu = Int_interval.min_max_rem_modu i in
-    let f elt modu = Int.pgcd modu (Int.abs (Int.sub r elt)) in
+    let f elt modu = Int.gcd modu (Int.abs (Int.sub r elt)) in
     let modu = Int_set.fold f s modu in
     let rem = Int.erem r modu in
     let min = match min with

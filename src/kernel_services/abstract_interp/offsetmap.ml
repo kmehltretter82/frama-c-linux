@@ -1434,7 +1434,7 @@ module Make
             (* The value in the node is repeated every [m] bits, and we have
                read every [period] bits. Once we have read [lcm period m] bits,
                we will have read all possible combinations. *)
-            if start -~ since >= Int.ppcm period m
+            if start -~ since >= Int.lcm period m
             then Some node_ending
             else None
       in

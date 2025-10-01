@@ -57,16 +57,6 @@ let is_even v = is_zero (logand one v)
 
 let length u v = succ (sub v u)
 
-let pgcd u v =
-  if is_zero v then abs u (* Zarith raises an exception on zero arguments *)
-  else if is_zero u then abs v
-  else gcd u v
-
-let ppcm u v =
-  if u = zero || v = zero
-  then zero
-  else lcm u v
-
 let round_down_to_zero v modu =
   mul (ediv v modu) modu
 
@@ -241,3 +231,5 @@ let c_div = div
 let c_rem = rem
 let c_div_rem = div_rem
 
+let pgcd = gcd
+let ppcm = lcm

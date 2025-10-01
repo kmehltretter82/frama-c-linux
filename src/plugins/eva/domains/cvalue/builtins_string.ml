@@ -139,7 +139,7 @@ let read_char kind offset cvalue acc =
 let search_offsetmap_range kind offsetmap validity ~min ~max ~v_size acc =
   let size = kind.size in
   (* Reads will repeat themselves every [modu] bits. *)
-  let modu = Integer.ppcm v_size size in
+  let modu = Integer.lcm v_size size in
   let max_reads = Integer.(to_int_exn (ediv modu size)) in
   (* Performs [max_reads] consecutive reads from offsets {[min] + k[modu]},
      bound by [max]. *)
