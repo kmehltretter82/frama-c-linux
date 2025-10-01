@@ -830,6 +830,36 @@ let () =
     (fun a_name -> Logic_builtin.register (mk_builtin_logic_info a_name))
     a_names
 
+(* Registers ACSL logic function security_status. *)
+let lf_name_security_status = "security_status"
+let () =
+  let security_status_logic_function =
+    { bl_name = lf_name_security_status;
+      bl_labels = [];
+      bl_params = ["x"];
+      bl_type = Some (Ctype Cil_const.intType);
+      bl_profile = [("x", Lvar "x")];
+    }
+  in
+  if not (Logic_env.is_logic_function lf_name_security_status)
+  then Logic_builtin.register security_status_logic_function
+
+(* Registers ACSL logic constants public/private. *)
+let () =
+  let mk_builtin_logic_info a_name =
+    { bl_name = a_name;
+      bl_labels = [];
+      bl_params = [];
+      bl_type = Some (Ctype Cil_const.intType);
+      bl_profile = [];
+    }
+  in
+  List.iter
+    (fun a_name ->
+       if not (Logic_env.is_logic_function a_name)
+       then Logic_builtin.register (mk_builtin_logic_info a_name))
+    [public_taint_namespace; private_taint_namespace]
+
 (* Registers AST attributes corresponding to public/private taint namespaces. *)
 let () =
   let register_ast_attribute_type attr =
@@ -949,6 +979,28 @@ module TaintLogic = struct
                 state) state_map
         | _ -> state
       end
+    | _, Prel (Req, {term_node = Tapp (f, _, [arg])}, t)
+      when f.l_var_info.lv_name = lf_name_security_status ->
+      begin
+        match t.term_node with
+        | TLval (TVar {lv_name}, TNoOffset) ->
+          let open Lattice_bounds.Top.Operators in
+          let+ state_map = state in
+          let taint_names = term_taint_namespaces arg in
+          let positive =
+            if String.equal lv_name public_taint_namespace then
+              not positive
+            else
+              positive
+          in
+          LatticeMultiTaint.mapi (fun key state ->
+              if List.mem key taint_names then
+                reduce_by_taint_predicate "\\tainted"
+                  cvalue_env state arg positive
+              else
+                state) state_map
+        | _ -> state
+      end
     | _ -> state
 
   let evaluate_taint_predicate cvalue_env zone term =
@@ -989,6 +1041,26 @@ module TaintLogic = struct
             evaluate_taint_predicate cvalue_env zone arg
           | _ -> Unknown
         end
+      | Prel (Req, {term_node = Tapp (f, _, [arg])}, t)
+        when f.l_var_info.lv_name = lf_name_security_status ->
+        begin
+          match t.term_node with
+          | TLval (TVar {lv_name}, TNoOffset)
+            when String.equal lv_name public_taint_namespace
+              || String.equal lv_name private_taint_namespace ->
+            let state =
+              match state with
+              | `Top -> LatticeSingleTaint.top
+              | `Value state_map ->
+                LatticeMultiTaint.find_or_empty private_taint_namespace
+                  state_map
+            in
+            let zone = Zone.join state.locs_data state.locs_control in
+            (if lv_name = public_taint_namespace
+             then Abstract_interp.inv_truth else Fun.id) @@
+            evaluate_taint_predicate cvalue_env zone arg
+          | _ -> Unknown
+        end
       | Ptrue -> True
       | Pfalse -> False
       | Pand (p1, p2) ->
@@ -1005,13 +1077,7 @@ module TaintLogic = struct
           | False, False -> False
           | _ -> Unknown
         end
-      | Pnot p ->
-        begin
-          match evaluate p with
-          | True -> False
-          | False -> True
-          | Unknown -> Unknown
-        end
+      | Pnot p -> Abstract_interp.inv_truth (evaluate p)
       | _ -> Unknown
     in
     evaluate predicate

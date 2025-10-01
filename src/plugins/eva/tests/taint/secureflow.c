@@ -1,4 +1,5 @@
 /* run.config*
+   STDOPT:
  */
 
 #include "__fc_builtin.h"
@@ -162,6 +163,48 @@ void f6(void) {
   /*@ check !\tainted(private:w); */
 }
 
+int array[512];
+
+void f7(void) {
+  int __attribute__((public)) x, y, z;
+  int* ptr_array[2] = {&x, &y};
+  int* q;
+
+  /*@ assert security_status(x) == public; */
+  /*@ assert security_status(y) == public; */
+  /*@ assert security_status(ptr_array) == public; */
+
+  int secret_idx = !!secret;
+  /*@ assert security_status(secret_idx) == private; */
+  *ptr_array[secret_idx] = 2;
+  /*@ assert security_status(*ptr_array[secret_idx]) == private; */
+  /*@ assert security_status(x) == private; */
+  /*@ assert security_status(y) == private; */
+
+  /* We can make both x and y public again. */
+  x = 0;
+  y = 0;
+  /*@ assert security_status(x) == public; */
+  /*@ assert security_status(y) == public; */
+  /*@ assert security_status(ptr_array) == public; */
+  z = *ptr_array[secret_idx];
+  /*@ assert security_status(z) == private; */
+  /*@ assert security_status(x) == public; */
+  /*@ assert security_status(y) == public; */
+
+  /*@ assert security_status(array) == public; */
+  array[secret] = 1;
+  /*@ assert security_status(array) == private; */
+  /*@ assert security_status(array[0]) == private; */
+  array[array[secret]] = 1;
+  /*@ assert security_status(array) == private; */
+  /*@ assert security_status(array[0]) == private; */
+
+  int* p = &array[0];
+  *(p + array[secret]) = 1;
+  /*@ assert security_status(*p) == private; */
+}
+
 int main(void) {
   f1();
   f2();
@@ -169,5 +212,6 @@ int main(void) {
   f4();
   f5();
   f6();
+  f7();
   return 0;
 }

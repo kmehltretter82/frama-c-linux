@@ -1,2 +1,28 @@
 2d1
 < [eva:experimental] Warning: The taint domain is experimental.
+197c196
+< [scope:rm_asserts] removing 3 assertion(s)
+---
+> [scope:rm_asserts] removing 4 assertion(s)
+225c224,226
+<   array[0..511] ∈ {0; 1}
+---
+>   array[0] ∈ {0; 1}
+>        [1] ∈ {1}
+>        [2..511] ∈ {0; 1}
+257c258,260
+<   array[0..511] ∈ {0; 1}
+---
+>   array[0] ∈ {0; 1}
+>        [1] ∈ {1}
+>        [2..511] ∈ {0; 1}
+300c303,304
+<   array[0..1] FROM secret; array[0..511] (and SELF)
+---
+>   array[0] FROM secret; array[0..511] (and SELF)
+>        [1] FROM secret; array[0..511]
+321c325,326
+<   array[0..1] FROM secret; array[0..511] (and SELF)
+---
+>   array[0] FROM secret; array[0..511] (and SELF)
+>        [1] FROM secret; array[0..511]
