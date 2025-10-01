@@ -42,7 +42,7 @@
         "builtins", "builtins:missing-spec", "builtins:override",
         "ensures-false", "experimental", "libc", "libc:unsupported-spec",
         "locals-escaping", "malloc", "malloc:imprecise", "signed-overflow",
-        "taint", "unknown-size"
+        "taint", "taint-interference", "unknown-size"
       ],
       "disabled": [
         "acsl", "acsl:unsupported", "assigns:invalid-location",

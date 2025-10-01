@@ -1,0 +1,281 @@
+[kernel] Parsing secureflow.c (with preprocessing)
+[eva:experimental] Warning: The taint domain is experimental.
+[eva] Analyzing a complete application starting at main
+[eva] Computing initial state
+[eva] Initial state computed
+[eva:initial-state] Values of globals at initialization
+  secret ∈ [--..--]
+  extern_data[0..4] ∈ [--..--]
+  global_key[0..4] ∈ {0}
+  user_input ∈ [--..--]
+  x ∈ {0}
+  y ∈ {0}
+  z ∈ {0}
+  w ∈ {0}
+  funcs[0].f ∈ {{ &write_z }}
+       [1].f ∈ {{ &write_w }}
+[eva] computing for function f1 <- main.
+  Called from secureflow.c:166.
+[eva:taint-interference] secureflow.c:15: Warning: 
+  direct interference on global_key[0]
+[eva:partition] secureflow.c:14: starting to merge loop iterations
+[eva:taint-interference] secureflow.c:15: Warning: 
+  direct interference on global_key[0..1]
+[eva:taint-interference] secureflow.c:15: Warning: 
+  direct interference on global_key[0..2]
+[eva:taint-interference] secureflow.c:15: Warning: 
+  direct interference on global_key[0..4]
+[eva:alarm] secureflow.c:18: Warning: check got status unknown.
+[eva:alarm] secureflow.c:19: Warning: check got status unknown.
+[eva] Recording results for f1
+[eva] Done for function f1
+[eva] computing for function f2 <- main.
+  Called from secureflow.c:167.
+[eva:taint-interference] secureflow.c:27: Warning: 
+  interference on assume condition involving secret
+[eva] secureflow.c:28: check got status valid.
+[eva] secureflow.c:29: check got status valid.
+[eva:alarm] secureflow.c:30: Warning: check got status unknown.
+[eva] computing for function assigns_from <- f2 <- main.
+  Called from secureflow.c:32.
+[eva] using specification for function assigns_from
+[eva:garbled-mix:assigns] secureflow.c:32: 
+  The specification of function assigns_from
+  has generated a garbled mix of addresses for assigns clause \result.
+[eva] Done for function assigns_from
+[eva:taint-interference] secureflow.c:32: Warning: direct interference on v
+[eva:alarm] secureflow.c:33: Warning: check got status unknown.
+[eva] Recording results for f2
+[eva] Done for function f2
+[eva] computing for function f3 <- main.
+  Called from secureflow.c:168.
+[eva] secureflow.c:51: check got status valid.
+[eva] secureflow.c:52: check got status valid.
+[eva] secureflow.c:53: check got status valid.
+[eva] secureflow.c:54: check got status valid.
+[eva] secureflow.c:55: check got status valid.
+[eva] secureflow.c:56: check got status valid.
+[eva:taint-interference] secureflow.c:57: Warning: 
+  interference on assume condition involving secret
+[eva:alarm] secureflow.c:62: Warning: check got status unknown.
+[eva:alarm] secureflow.c:63: Warning: check got status unknown.
+[eva:alarm] secureflow.c:64: Warning: check got status unknown.
+[eva] Recording results for f3
+[eva] Done for function f3
+[eva] computing for function f4 <- main.
+  Called from secureflow.c:169.
+[eva:taint-interference] secureflow.c:73: Warning: 
+  interference on assume condition involving secret; user_input
+[eva:taint-interference] secureflow.c:74: Warning: indirect interference on y
+[eva:alarm] secureflow.c:75: Warning: check got status unknown.
+[eva:taint-interference] secureflow.c:78: Warning: indirect interference on z
+[eva:alarm] secureflow.c:79: Warning: check got status unknown.
+[eva] secureflow.c:83: check got status valid.
+[eva:alarm] secureflow.c:84: Warning: check got status unknown.
+[eva:alarm] secureflow.c:85: Warning: check got status unknown.
+[eva:taint-interference] secureflow.c:87: Warning: indirect interference on y; z
+[eva:alarm] secureflow.c:88: Warning: check got status unknown.
+[eva:alarm] secureflow.c:89: Warning: check got status unknown.
+[eva] Recording results for f4
+[eva] Done for function f4
+[eva] computing for function f5 <- main.
+  Called from secureflow.c:170.
+[eva] secureflow.c:109: check got status valid.
+[eva] secureflow.c:110: check got status valid.
+[eva:taint-interference] secureflow.c:112: Warning: 
+  interference on assume condition involving secret
+[eva] computing for function write_x <- f5 <- main.
+  Called from secureflow.c:113.
+[eva] secureflow.c:113: function write_x: precondition got status valid.
+[eva] Recording results for write_x
+[eva] Done for function write_x
+[eva] computing for function write_y <- f5 <- main.
+  Called from secureflow.c:115.
+[eva] secureflow.c:115: function write_y: precondition got status valid.
+[eva] Recording results for write_y
+[eva] Done for function write_y
+[eva:alarm] secureflow.c:117: Warning: check got status unknown.
+[eva:alarm] secureflow.c:118: Warning: check got status unknown.
+[eva] secureflow.c:119: check got status valid.
+[eva] secureflow.c:120: check got status valid.
+[eva] secureflow.c:123: check got status valid.
+[eva:taint-interference] secureflow.c:124: Warning: 
+  interference on assume condition involving secret
+[eva:alarm] secureflow.c:131: Warning: check got status unknown.
+[eva] Recording results for f5
+[eva] Done for function f5
+[eva] computing for function f6 <- main.
+  Called from secureflow.c:171.
+[eva] computing for function write_z <- f6 <- main.
+  Called from secureflow.c:147.
+[eva:taint-interference] secureflow.c:136: Warning: direct interference on z
+[eva] Recording results for write_z
+[eva] Done for function write_z
+[eva] computing for function write_w <- f6 <- main.
+  Called from secureflow.c:148.
+[eva] Recording results for write_w
+[eva] Done for function write_w
+[eva:alarm] secureflow.c:150: Warning: check got status unknown.
+[eva] secureflow.c:151: check got status valid.
+[eva] secureflow.c:158: Reusing old results for call to write_z
+[eva] secureflow.c:159: Reusing old results for call to write_w
+[eva:alarm] secureflow.c:161: Warning: check got status unknown.
+[eva] secureflow.c:162: check got status valid.
+[eva] Recording results for f6
+[eva] Done for function f6
+[eva] Recording results for main
+[eva] Done for function main
+[eva] ====== VALUES COMPUTED ======
+[eva:final-states] Values at end of function f1:
+  global_key[0..4] ∈ [--..--]
+  local_key[0..4] ∈ [--..--]
+[eva:final-states] Values at end of function f2:
+  zero ∈ {0}
+  one ∈ {1}
+  ptr ∈ {{ &zero ; &one }}
+  v ∈
+   {{ garbled mix of &{zero; one}
+    (origin: Library function {secureflow.c:32}) }}
+[eva:final-states] Values at end of function f3:
+  s.n ∈ {0}
+   .p.a ∈ {1}
+   .p.b ∈ {2.}
+  t.n ∈ {3}
+   .p.a ∈ {4}
+   .p.b ∈ {5.}
+  u.n ∈ {0; 3}
+   .p.a ∈ {1; 4}
+   .p.b ∈ [2. .. 5.]
+[eva:final-states] Values at end of function f4:
+  x ∈ {1}
+  y ∈ {0; 1}
+  z ∈ {0; 1}
+  p ∈ {{ &y ; &z }}
+[eva:final-states] Values at end of function write_w:
+  w ∈ {42}
+[eva:final-states] Values at end of function write_x:
+  s.x ∈ {3}
+   .y ∈ {2}
+[eva:final-states] Values at end of function write_y:
+  s.x ∈ {1}
+   .y ∈ {4}
+[eva:final-states] Values at end of function f5:
+  s.x ∈ {0; 1}
+   .y ∈ {2; 4}
+[eva:final-states] Values at end of function write_z:
+  z ∈ [--..--]
+[eva:final-states] Values at end of function f6:
+  z ∈ [--..--]
+  w ∈ {42}
+  p ∈ {{ &write_z }}
+  q ∈ {{ &write_w }}
+[eva:final-states] Values at end of function main:
+  global_key[0..4] ∈ [--..--]
+  x ∈ {1}
+  y ∈ {0; 1}
+  z ∈ [--..--]
+  w ∈ {42}
+  __retres ∈ {0}
+[from] Computing for function f1
+[from] Done for function f1
+[from] Computing for function f2
+[from] Computing for function assigns_from <-f2
+[from] Done for function assigns_from
+[from] Done for function f2
+[from] Computing for function f3
+[from] Done for function f3
+[from] Computing for function f4
+[from] Done for function f4
+[from] Computing for function write_w
+[from] Done for function write_w
+[from] Computing for function write_x
+[from] Done for function write_x
+[from] Computing for function write_y
+[from] Done for function write_y
+[from] Computing for function f5
+[from] Done for function f5
+[from] Computing for function write_z
+[from] Done for function write_z
+[from] Computing for function f6
+[from] Done for function f6
+[from] Computing for function main
+[from] Done for function main
+[from] ====== DEPENDENCIES COMPUTED ======
+  These dependencies hold at termination for the executions that terminate:
+[from] Function assigns_from:
+  \result FROM x; zero; one
+[from] Function f1:
+  global_key[0..4] FROM extern_data[0..4] (and SELF)
+[from] Function f2:
+  NO EFFECTS
+[from] Function f3:
+  NO EFFECTS
+[from] Function f4:
+  x FROM \nothing
+  y FROM secret; user_input (and SELF)
+  z FROM secret; user_input (and SELF)
+[from] Function write_w:
+  w FROM w_arg
+[from] Function write_x:
+  s.x FROM p; a
+[from] Function write_y:
+  s.y FROM p; b
+[from] Function f5:
+  NO EFFECTS
+[from] Function write_z:
+  z FROM z_arg
+[from] Function f6:
+  z FROM secret
+  w FROM \nothing
+[from] Function main:
+  global_key[0..4] FROM extern_data[0..4] (and SELF)
+  x FROM \nothing
+  y FROM secret; user_input (and SELF)
+  z FROM secret
+  w FROM \nothing
+  \result FROM \nothing
+[from] ====== END OF DEPENDENCIES ======
+[inout] Out (internal) for function f1:
+    global_key[0..4]; local_key[0..4]; i
+[inout] Inputs for function f1:
+    extern_data[0..4]
+[inout] Out (internal) for function f2:
+    zero; one; ptr; tmp; v
+[inout] Inputs for function f2:
+    secret
+[inout] Out (internal) for function f3:
+    s; t; u
+[inout] Inputs for function f3:
+    secret
+[inout] Out (internal) for function f4:
+    x; y; z; p
+[inout] Inputs for function f4:
+    secret; user_input
+[inout] Out (internal) for function write_w:
+    w
+[inout] Inputs for function write_w:
+    \nothing
+[inout] Out (internal) for function write_x:
+    s.x
+[inout] Inputs for function write_x:
+    \nothing
+[inout] Out (internal) for function write_y:
+    s.y
+[inout] Inputs for function write_y:
+    \nothing
+[inout] Out (internal) for function f5:
+    s
+[inout] Inputs for function f5:
+    secret
+[inout] Out (internal) for function write_z:
+    z
+[inout] Inputs for function write_z:
+    \nothing
+[inout] Out (internal) for function f6:
+    z; w; p; q
+[inout] Inputs for function f6:
+    secret; w; funcs[0..1]
+[inout] Out (internal) for function main:
+    global_key[0..4]; x; y; z; w; __retres
+[inout] Inputs for function main:
+    secret; extern_data[0..4]; user_input; w; funcs[0..1]

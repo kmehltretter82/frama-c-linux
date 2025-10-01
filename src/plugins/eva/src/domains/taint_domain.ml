@@ -41,6 +41,11 @@ let ignore_singletons () = not (Parameters.TaintSingletons.get ())
 (* Default namespace for taints, when no custom one is provided by the user. *)
 let default_taint_namespace = "default"
 
+(* Custom taint namespaces for secure-flow/non-interference analysis. *)
+let private_taint_namespace = "private"
+let public_taint_namespace = "public"
+
+
 type taint_state = {
   (* Over-approximation of the memory locations that are tainted due to a data
      dependency. *)
@@ -66,6 +71,11 @@ let dkey_debug = Self.register_category "d-taint-debug"
 let wkey =
   Self.register_warn_category "taint"
     ~help:"warnings related to the taint analysis from \"-eva-domains taint\""
+
+let wkey_interference =
+  Self.register_warn_category "taint-interference"
+    ~help:"warnings related to the taint analysis when performing \
+           secure-flow/interference analysis."
 
 module LatticeSingleTaint = struct
 
@@ -290,7 +300,7 @@ module TransferSingleTaint = struct
      - its memory location (as a zone);
      - its indirect dependencies, i.e. the memory zone its location depends on;
      - whether its location is a singleton. *)
-  let compute_zones lval to_loc =
+  let compute_lval_zones to_loc lval =
     match (lval : Eva_ast.lval).node with
     | Var vi, NoOffset ->
       (* Special case for direct access to variable: do not use [to_loc] here,
@@ -314,31 +324,58 @@ module TransferSingleTaint = struct
       ~size:Int_Base.zero
 
   let dont_taint_singleton valuation to_loc =
-    let to_loc_improved lval =
-      let curr_exp = Eva_ast.Build.lval lval in
-      match valuation.Abstract_domain.find curr_exp with
-      | `Top -> to_loc lval
-      | `Value r ->
-        match r.value.v with
-        | `Bottom -> bottom_loc
-        | `Value v ->
-          if Cvalue.V.cardinal_zero_or_one v then bottom_loc else to_loc lval
+    fun lval ->
+    let lv_exp = Eva_ast.Build.lval lval in
+    match valuation.Abstract_domain.find lv_exp with
+    | `Top ->
+      to_loc lval
+    | `Value r ->
+      match r.value.v with
+      | `Bottom -> bottom_loc
+      | `Value v ->
+        if Cvalue.V.cardinal_zero_or_one v then bottom_loc else to_loc lval
+
+  let rec has_attribute attribute typ =
+    let typ = Ast_types.unroll typ in
+    match typ.tnode with
+    | TArray (base_typ, _) -> has_attribute attribute base_typ
+    | _ -> Ast_types.has_attribute attribute typ
+
+  let has_attribute_namespace ~namespace zone =
+    let base_has_attribute base =
+      match Base.typeof base with
+      | None -> false
+      | Some typ -> has_attribute namespace typ
     in
-    to_loc_improved
+    try Zone.fold_bases (fun b acc -> acc || base_has_attribute b) zone false
+    with Abstract_interp.Error_Top -> false
+
+  let warn_on_assign_interference ~direct ~pos zone =
+    let has_tainted_public_base =
+      has_attribute_namespace ~namespace:public_taint_namespace zone
+    in
+    if has_tainted_public_base then
+      let source = fst (Position.loc pos) in
+      let kind = if direct then "direct" else "indirect" in
+      Self.warning ~wkey:wkey_interference ~source ~once:true
+        "@[<v>@[<hv 2>%s interference on@ @[<hov>%a@]@]"
+        kind Zone.pretty zone
 
   (* Propagates data- and control-taints for an assignment [lval = exp]. *)
-  let assign_aux lval exp v to_loc state =
-    let lv_zone, lv_indirect_zone, singleton = compute_zones lval to_loc in
-    let to_loc_chosen =
-      if ignore_singletons () then
-        (* Do not data-taint [lval] in case it contains a singleton value. *)
-        dont_taint_singleton v to_loc
-      else
-        (* [lval] becomes data-tainted if a memory location on which the value
-           of [exp] depends on is data-tainted. *)
-        to_loc
+  let assign_aux ~pos lval exp v to_loc state =
+    let lv_zone, lv_indirect_zone, singleton = compute_lval_zones to_loc lval in
+    let exp_zone =
+      let to_loc =
+        if ignore_singletons () then
+          (* Do not data-taint [lval] in case it contains a singleton value. *)
+          dont_taint_singleton v to_loc
+        else
+          (* Data-taint [lval] in case a memory location on which the value of
+             [exp] depends on is data-tainted. *)
+          to_loc
+      in
+      Eva_ast.PreciseDepsOf.zone_of_exp to_loc exp
     in
-    let exp_zone = Eva_ast.PreciseDepsOf.zone_of_exp to_loc_chosen exp in
     let data_tainted = Zone.intersects state.locs_data exp_zone in
     (* [lval] becomes control-tainted if:
        - the current call depends on a tainted assume statements of a caller;
@@ -351,15 +388,25 @@ module TransferSingleTaint = struct
       || Zone.intersects state.locs_control exp_zone
       || LatticeSingleTaint.intersects state lv_indirect_zone
     in
-    let update tainted locs =
+    let update ~warn tainted locs =
       if tainted
-      then Zone.join locs lv_zone
+      then begin
+        warn ~pos lv_zone;
+        Zone.join locs lv_zone
+      end
       else if singleton
       then Zone.diff locs lv_zone
       else locs
     in
-    { state with locs_data = update data_tainted state.locs_data;
-                 locs_control = update ctrl_tainted state.locs_control; }
+    let locs_data =
+      update ~warn:(warn_on_assign_interference ~direct:true)
+        data_tainted state.locs_data
+    in
+    let locs_control =
+      update ~warn:(warn_on_assign_interference ~direct:false)
+        ctrl_tainted state.locs_control
+    in
+    { state with locs_data; locs_control; }
 
   let assign ~pos lv exp _v valuation state =
     let state =
@@ -369,9 +416,19 @@ module TransferSingleTaint = struct
       | Some stmt ->
         let state = filter_active_tainted_assumes stmt state in
         let to_loc = loc_of_lval valuation in
-        assign_aux lv.Eval.lval exp valuation to_loc state
+        assign_aux ~pos lv.Eval.lval exp valuation to_loc state
     in
     `Value state
+
+  let warn_on_assume_interference ~pos zone =
+    let has_tainted_private_base =
+      has_attribute_namespace ~namespace:private_taint_namespace zone
+    in
+    if has_tainted_private_base then
+      let source = fst (Position.loc pos) in
+      Self.warning ~wkey:wkey_interference ~source ~once:true
+        "@[<v>@[<hv 2>interference on assume condition involving@ @[<hov>%a@]@]"
+        Zone.pretty zone
 
   let assume ~pos exp _b valuation state =
     let state =
@@ -383,8 +440,13 @@ module TransferSingleTaint = struct
         (* Add [stmt] as assume statement in [state] as soon as [exp] is tainted. *)
         let to_loc = loc_of_lval valuation in
         let exp_zone = Eva_ast.PreciseDepsOf.zone_of_exp to_loc exp in
-        if not state.dependent_call && LatticeSingleTaint.intersects state exp_zone
-        then { state with assume_stmts = Stmt.Set.add stmt state.assume_stmts; }
+        if LatticeSingleTaint.intersects state exp_zone
+        then begin
+          warn_on_assume_interference ~pos exp_zone;
+          if not state.dependent_call
+          then { state with assume_stmts = Stmt.Set.add stmt state.assume_stmts; }
+          else state
+        end
         else state
     in
     `Value state
@@ -401,7 +463,8 @@ module TransferSingleTaint = struct
       let to_loc = loc_of_lval valuation in
       List.fold_left
         (fun s { Eval.concrete; formal; _ } ->
-           assign_aux (Eva_ast.Build.var formal) concrete valuation to_loc s)
+           assign_aux ~pos:(Position.of_local pos) (Eva_ast.Build.var formal)
+             concrete valuation to_loc s)
         state
         call.Eval.arguments
     in
@@ -663,7 +726,26 @@ module Domain = struct
 
   (* Scoping and Initialization. *)
 
-  let enter_scope _kind _vars state = state
+  let enter_scope kind vars state =
+    match kind with
+    | Abstract_domain.Formal _ | Result _ ->
+      state
+    | Global | Local _ ->
+      let open Lattice_bounds.Top.Operators in
+      let+ state_map = state in
+      let namespace = private_taint_namespace in
+      let taint_state = LatticeMultiTaint.find_or_empty namespace state_map in
+      let locs_data =
+        List.fold_left (fun locs_data vi ->
+            if TransferSingleTaint.has_attribute namespace vi.vtype then
+              let vi_zone = Locations.zone_of_varinfo vi in
+              Zone.join locs_data vi_zone
+            else
+              locs_data)
+          taint_state.locs_data vars
+      in
+      let taint_state = { taint_state with locs_data } in
+      LatticeMultiTaint.add namespace taint_state state_map
 
   let remove_bases_per_taint bases state =
     let remove = Zone.filter_base (fun b -> not (Base.Hptset.mem b bases)) in
@@ -747,6 +829,17 @@ let () =
   List.iter
     (fun a_name -> Logic_builtin.register (mk_builtin_logic_info a_name))
     a_names
+
+(* Registers AST attributes corresponding to public/private taint namespaces. *)
+let () =
+  let register_ast_attribute_type attr =
+    let a_class = Ast_attributes.AttrType in
+    match Ast_attributes.find_known attr with
+    | Some { attr_class } when attr_class = a_class -> ()
+    | None | Some _ -> Ast_attributes.register a_class attr
+  in
+  List.iter register_ast_attribute_type
+    [public_taint_namespace; private_taint_namespace]
 
 let rec parse_lval names kind typing_context loc arg =
   match arg.Logic_ptree.lexpr_node with

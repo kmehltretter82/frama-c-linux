@@ -1,0 +1,14 @@
+2d1
+< [eva:experimental] Warning: The taint domain is experimental.
+120,121c119,126
+< [eva] secureflow.c:158: Reusing old results for call to write_z
+< [eva] secureflow.c:159: Reusing old results for call to write_w
+---
+> [eva] computing for function write_z <- f6 <- main.
+>   Called from secureflow.c:158.
+> [eva] Recording results for write_z
+> [eva] Done for function write_z
+> [eva] computing for function write_w <- f6 <- main.
+>   Called from secureflow.c:159.
+> [eva] Recording results for write_w
+> [eva] Done for function write_w
