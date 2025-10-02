@@ -120,13 +120,14 @@ struct
     let on = register_dynamic "on" D.unit D.unit (fun () -> set true)
     let off = register_dynamic "off" D.unit D.unit (fun () -> set false)
 
-    let generic_add_option name help visible value =
+    let generic_add_option name help visible safe value =
       Cmdline.add_option
         name
         ~plugin:P.shortname
         ~group
         ~help
         ~visible
+        ~safe
         ~ext_help:!Parameter_customize.optional_help_ref
         stage
         (Cmdline.Unit (fun () -> set value))
@@ -166,7 +167,7 @@ struct
         if opp then Format.asprintf "%s (%s)" X.help (opp_msg name)
         else X.help
       in
-      generic_add_option name help is_visible true
+      generic_add_option name help is_visible is_safe true
 
     let add_negative_option name =
       let neg_name = negative_option_name name in
@@ -184,7 +185,7 @@ struct
         else
           is_visible, mk_help s
       in
-      generic_add_option neg_name neg_help neg_visible false;
+      generic_add_option neg_name neg_help neg_visible is_safe false;
       neg_name
 
     let negative_option_ref = ref None
@@ -209,7 +210,7 @@ struct
       let reconfigurable = is_parameter_reconfigurable stage in
       let p =
         Typed_parameter.create ~name ~help:X.help ~accessor:accessor
-          ~visible:is_visible ~reconfigurable ~is_set
+          ~visible:is_visible ~safe:is_safe ~reconfigurable ~is_set
       in
       add_parameter !Parameter_customize.group_ref stage p;
       Parameter_customize.reset ();
@@ -290,6 +291,7 @@ struct
         ~argname:X.arg_name
         ~help:X.help
         ~visible:is_visible
+        ~safe:is_safe
         ~ext_help:!Parameter_customize.optional_help_ref
         ~plugin:P.shortname
         ~group
@@ -317,7 +319,7 @@ struct
       let reconfigurable = is_parameter_reconfigurable stage in
       let p =
         Typed_parameter.create ~name ~help:X.help ~accessor
-          ~visible:is_visible ~reconfigurable ~is_set:is_set
+          ~visible:is_visible ~safe:is_safe ~reconfigurable ~is_set:is_set
       in
       add_parameter !Parameter_customize.group_ref stage p;
       add_option X.option_name;
@@ -355,6 +357,7 @@ struct
         ~argname:X.arg_name
         ~help:X.help
         ~visible:is_visible
+        ~safe:is_safe
         ~ext_help:!Parameter_customize.optional_help_ref
         ~plugin:P.shortname
         ~group
@@ -382,7 +385,7 @@ struct
       let reconfigurable = is_parameter_reconfigurable stage in
       let p =
         Typed_parameter.create ~name ~help:X.help ~accessor
-          ~visible:is_visible ~reconfigurable ~is_set:is_set
+          ~visible:is_visible ~safe:is_safe ~reconfigurable ~is_set:is_set
       in
       add_parameter !Parameter_customize.group_ref stage p;
       add_option X.option_name;
@@ -420,6 +423,7 @@ struct
         ~argname:X.arg_name
         ~help
         ~visible:is_visible
+        ~safe:is_safe
         ~ext_help:!Parameter_customize.optional_help_ref
         ~plugin:P.shortname
         ~group
@@ -484,7 +488,7 @@ struct
       let reconfigurable = is_parameter_reconfigurable stage in
       let p =
         Typed_parameter.create ~name ~help:X.help ~accessor
-          ~visible:is_visible ~reconfigurable ~is_set
+          ~visible:is_visible ~safe:is_safe  ~reconfigurable ~is_set
       in
       add_parameter !Parameter_customize.group_ref stage p;
       add_option X.option_name;
@@ -552,6 +556,7 @@ struct
         ~argname:X.arg_name
         ~help:X.help
         ~visible:is_visible
+        ~safe:is_safe
         ~ext_help:!Parameter_customize.optional_help_ref
         ~plugin:P.shortname
         ~group
@@ -574,7 +579,7 @@ struct
       let reconfigurable = is_parameter_reconfigurable stage in
       let p =
         Typed_parameter.create ~name ~help:X.help ~accessor
-          ~visible:is_visible ~reconfigurable ~is_set
+          ~visible:is_visible ~safe:is_safe ~reconfigurable ~is_set
       in
       add_parameter !Parameter_customize.group_ref stage p;
       add_option X.option_name;
@@ -741,13 +746,14 @@ struct
       let reconfigurable = is_parameter_reconfigurable stage in
       let p =
         Typed_parameter.create ~name ~help:X.help ~accessor
-          ~visible:is_visible ~reconfigurable ~is_set
+          ~visible:is_visible ~safe:is_safe ~reconfigurable ~is_set
       in
       add_parameter !Parameter_customize.group_ref stage p;
       Cmdline.add_option option_name
         ~argname:X.arg_name
         ~help:X.help
         ~visible:is_visible
+        ~safe:is_safe
         ~ext_help:!Parameter_customize.optional_help_ref
         ~plugin:P.shortname
         ~group

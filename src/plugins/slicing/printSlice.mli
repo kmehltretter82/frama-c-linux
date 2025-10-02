@@ -21,4 +21,4 @@ val print_fct_stmts :
   Cil_types.kernel_function ->
   unit
 
-val build_dot_project : string -> string -> unit
+val build_dot_project : Filepath.t -> string -> unit

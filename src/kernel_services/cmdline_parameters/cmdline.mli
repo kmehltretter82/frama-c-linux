@@ -250,6 +250,7 @@ val add_option:
   ?argname:string ->
   help:string ->
   visible:bool ->
+  safe:bool ->
   ext_help:(unit,Format.formatter,unit) format ->
   option_setting ->
   unit

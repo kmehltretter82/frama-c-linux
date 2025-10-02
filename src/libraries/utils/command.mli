@@ -66,3 +66,27 @@ val spawn :
     @before 29.0-Copper Async.Cancel was Db.Cancel
     @before 31.0-Gallium this function was named [command]
 *)
+
+(* ************************************************************************* *)
+(** {2 Specialized command} *)
+(* ************************************************************************* *)
+
+(** Specialized command for the Graphviz's dot program to process dot files.
+    @since Frama-C+dev *)
+module Dot :
+sig
+  type format = Jpeg | Pdf | Png | Svg
+
+  (** [format_to_string format] convert [format] to a string corresponding to
+      the variant name in lowercase. It can be used to derive a file
+      extension. *)
+  val format_to_string : format -> string
+
+  (** [Dot.spawn ~format ~output input] create a process to run dot on [input]
+      dot file to generate [output] file with output format [format].
+      @raise Sys_error when a system error occurs
+      @raise Async.Cancel when the computation is interrupted or on timeout *)
+  val spawn :
+    ?timeout:int -> ?layout:string -> format:format -> output:Filepath.t -> Filepath.t ->
+    Unix.process_status
+end

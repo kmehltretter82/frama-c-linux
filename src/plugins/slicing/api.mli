@@ -53,7 +53,7 @@ module Project : sig
 
   (** Print a representation of the slicing project (call graph)
       in a dot file which name is the given string. *)
-  val print_dot : filename:string -> title:string -> unit
+  val print_dot : filepath:Filepath.t -> title:string -> unit
 
   (** {2 No needs of Journalization} *)
 

@@ -2932,6 +2932,13 @@ module SafeArrays =
 \end{ocamlcode}
 \end{example}
 
+\begin{important}
+In particular, options that could be used to make \framac launch arbitrary
+commands (such as \lstinline|-cpp-command|) or execute arbitrary code
+(such as \lstinline|-load-module|) should be marked as unsafe using function
+\texttt{Parameter\_customize.is\_unsafe}\scodeidxdef{Parameter\_customize}{is\_unsafe}
+\end{important}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Initialization Steps}\label{adv:init}

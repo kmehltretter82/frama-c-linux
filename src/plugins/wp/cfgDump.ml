@@ -41,8 +41,9 @@ let flush () =
     | None -> ()
     | Some (fout,file) ->
       close_out fout ;
-      ignore (Sys.command
-                (Printf.sprintf "dot -Tpdf %s.dot > %s.pdf" file file))
+      let input = Filepath.of_string (file ^ ".dot")
+      and output = Filepath.of_string (file ^ ".pdf") in
+      ignore @@ Command.Dot.(spawn ~format:Pdf ~output input)
   end
 
 (* -------------------------------------------------------------------------- *)

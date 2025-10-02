@@ -86,9 +86,11 @@ val close : dot -> unit
 val is_dot_installed : unit -> bool
 (** Memoized *)
 
+type target = Jpeg | Pdf | Png | Svg
+
 val layout :
   ?force:bool ->
-  ?target:string ->
+  ?target:target ->
   ?engine:string ->
   ?output:string -> dot -> string
 (** Invoke [dot] command (if installed) with specified target and engine.

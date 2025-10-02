@@ -493,25 +493,22 @@ module Html = struct
     let thread_name = Thread.label th.th_eva_thread in
     let filename = Filepath.sanitize_filename thread_name in
     let generator fmt = Mt_cfg.dot_fprint_graph fmt th.th_cfg f_stmt in
-    let tmp_file = generate_dot ~generator filename in
+    let dot_file = generate_dot ~generator filename in
     if not (Mt_options.ConcatDotFilesTo.is_empty ()) then begin
       let name = Thread.label th.th_eva_thread in
       let output = Mt_options.ConcatDotFilesTo.get () in
-      append_file ~input:tmp_file ~output ~name
+      append_file ~input:dot_file ~output ~name
     end;
     let dot_output_format = "svg" in
     let link_fname =
       (Format.asprintf "%s.%s" filename dot_output_format) in
-    let output_file = Filepath.(default_dir / link_fname) in
-    let args = [ "-Tsvg"; Filepath.to_string_abs tmp_file;
-                 "-o"; Filepath.to_string_abs output_file ] in
+    let output = Filepath.(default_dir / link_fname) in
     let fail s =
-      Mt_self.error "%s when generating graph for thread %a. \
-                     Run 'dot %s' to restart generation"
-        s ThreadState.pretty th (String.concat " " args)
+      Mt_self.error "%s when generating graph for thread %a."
+        s ThreadState.pretty th
     in
     begin
-      match Command.spawn ~timeout:60 "dot" args with
+      match Command.Dot.(spawn ~timeout:60 ~format:Svg ~output dot_file) with
       | Unix.WEXITED 0 -> ()
       | Unix.WEXITED code ->
         fail (Printf.sprintf "Error (code %d)" code)
@@ -555,23 +552,18 @@ module Html = struct
     let unicode = suspend_unicode () in
     let name = "thread_inheritance_graph" in
     let generator fmt = TGDot.fprint_graph fmt graph in
-    let tmp_file = generate_dot ~generator name in
+    let dot_file = generate_dot ~generator name in
     if not (Mt_options.ConcatDotFilesTo.is_empty ()) then begin
       let output = Mt_options.ConcatDotFilesTo.get () in
-      append_file ~input:tmp_file ~output ~name
+      append_file ~input:dot_file ~output ~name
     end;
-    let dot_output_format = "svg" in
-    let link_fname = Format.sprintf "%s.%s" name dot_output_format in
-    let output_file = Filepath.(default_dir / link_fname) in
-    let cmd =
-      Format.sprintf "dot -T%s '%s' -o '%s'"
-        dot_output_format
-        (Filepath.to_string_abs ~quoted:true tmp_file)
-        (Filepath.to_string_abs ~quoted:true output_file)
-    in
-    let ret = Sys.command cmd in
-    if ret <> 0 then
-      Mt_self.error "Something bad happened when running %s" cmd;
+    let format = Command.Dot.Svg in
+    let output_ext = Command.Dot.format_to_string format in
+    let link_fname = Format.sprintf "%s.%s" name output_ext in
+    let output = Filepath.(default_dir / link_fname) in
+    let status = Command.Dot.(spawn ~format ~output dot_file) in
+    if status <> Unix.WEXITED 0 then
+      Mt_self.error "Something bad happened when running dot";
     Kernel.Unicode.set unicode;
     link_fname
   ;;

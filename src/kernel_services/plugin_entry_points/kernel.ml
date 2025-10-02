@@ -962,6 +962,7 @@ module LoadState =
 let () = Parameter_customize.set_group saveload
 let () = Parameter_customize.set_cmdline_stage Cmdline.Extending
 let () = Parameter_customize.do_not_projectify ()
+let () = Parameter_customize.is_unsafe ()
 module LoadModule =
   String_list
     (struct
@@ -977,6 +978,7 @@ module LoadModule =
 let () = Parameter_customize.set_group saveload
 let () = Parameter_customize.set_cmdline_stage Cmdline.Extending
 let () = Parameter_customize.do_not_projectify ()
+let () = Parameter_customize.is_unsafe ()
 module LoadLibrary =
   String_list
     (struct
@@ -991,6 +993,7 @@ module LoadLibrary =
 let () = Parameter_customize.set_group saveload
 let () = Parameter_customize.set_cmdline_stage Cmdline.Extending
 let () = Parameter_customize.do_not_projectify ()
+let () = Parameter_customize.is_unsafe ()
 module LoadPlugin =
   String_list
     (struct
@@ -1121,6 +1124,7 @@ module PreprocessAnnot =
 
 let () = Parameter_customize.set_group parsing
 let () = Parameter_customize.do_not_reset_on_copy ()
+let () = Parameter_customize.is_unsafe ()
 module CppCommand =
   P.Empty_string
     (struct
@@ -1137,6 +1141,7 @@ module CppCommand =
 let () = Parameter_customize.set_group parsing
 let () = Parameter_customize.do_not_reset_on_copy ()
 let () = Parameter_customize.no_category ()
+let () = Parameter_customize.is_unsafe ()
 module CppExtraArgs =
   String_list
     (struct
@@ -1150,6 +1155,7 @@ module CppExtraArgs =
 
 let () = Parameter_customize.set_group parsing
 let () = Parameter_customize.do_not_reset_on_copy ()
+let () = Parameter_customize.is_unsafe ()
 module CppExtraArgsPerFile =
   Filepath_map
     (struct

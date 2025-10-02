@@ -255,6 +255,12 @@ let option_setting_and_warn warn = function
   | Float f -> Float (fun x -> warn (); f x)
   | String f -> String (fun s -> warn (); f s)
 
+let option_setting_and_abort abort = function
+  | Unit _ -> Unit (fun _ -> abort ())
+  | Int _ -> Int (fun _ -> abort ())
+  | Float _ -> Float (fun _ -> abort ())
+  | String _ -> String (fun _ -> abort ())
+
 exception Cannot_parse of string * string
 let raise_error name because = raise (Cannot_parse(name, because))
 
@@ -521,6 +527,7 @@ type cmdline_option =
     argname: string;
     mutable ohelp: string;
     ovisible: bool;
+    osafe: bool;
     ext_help: (unit,Format.formatter,unit) format;
     mutable setting: option_setting }
 
@@ -616,11 +623,23 @@ end = struct
 
   end
 
+  let check_sandbox option =
+    (* Prevent unsafe functions from being used in sandbox mode *)
+    let sandbox_mode = Sys.getenv_opt "FRAMAC_SANDBOX" |> Option.is_some in
+    if sandbox_mode && not option.osafe then
+      let abort () =
+        Kernel_log.abort
+          "%s cannot be used in sandbox mode."
+          option.oname
+      in
+      option.setting <- option_setting_and_abort abort option.setting
+
   let add_option shortname ~group option =
     assert (option.oname <> "");
     Hashtbl.replace all_options option.oname option;
     Option_names.add option.oname false;
     let g = find_group shortname group in
+    check_sandbox option;
     g := option :: !g
 
   (* table name_of_the_original_option --> aliases *)
@@ -679,7 +698,9 @@ end = struct
       replace !options_in_group
 
   let replace_option_setting option ~plugin ~group setting =
-    change_option option ~plugin ~group (fun o -> o.setting <- setting)
+    change_option option ~plugin ~group
+      (fun o -> o.setting <- setting;
+        check_sandbox o)
 
   let replace_option_help option ~plugin ~group help =
     change_option option ~plugin ~group (fun o -> o.ohelp <- help)
@@ -718,7 +739,7 @@ struct
 
   let add_for_parsing option = Hashtbl.add options option.oname option
 
-  let add name plugin ?(argname="") help visible ext_help setting =
+  let add name plugin ?(argname="") help visible safe ext_help setting =
     (*    L.debug ~level:4 "Cmdline: [%s] registers %S for stage %s."
           plugin name S.name;*)
     let help = if help = "" then "undocumented" else help in
@@ -728,6 +749,7 @@ struct
         ohelp = help;
         ext_help = ext_help;
         ovisible = visible;
+        osafe = safe;
         setting = setting }
     in
     add_for_parsing o;
@@ -815,7 +837,7 @@ let run_after_setting_files = After_setting.extend
 type stage = Early | Extending | Extended | Exiting | Loading | Configuring
 
 let add_option
-    name ~plugin ~group stage ?argname ~help ~visible ~ext_help setting =
+    name ~plugin ~group stage ?argname ~help ~visible ~safe ~ext_help setting =
   if name <> "" then
     let add = match stage with
       | Early -> Early_Stage.add
@@ -825,7 +847,7 @@ let add_option
       | Loading -> Loading_Stage.add
       | Configuring -> Configuring_Stage.add
     in
-    add name plugin ~group ?argname help visible ext_help setting
+    add name plugin ~group ?argname help visible safe ext_help setting
 
 let add_option_without_action
     name ~plugin ~group ?(argname="") ~help ~visible ~ext_help () =
@@ -833,7 +855,7 @@ let add_option_without_action
     plugin
     ~group
     { oname = name; argname = argname;
-      ohelp = help; ext_help = ext_help; ovisible = visible;
+      ohelp = help; ext_help = ext_help; ovisible = visible; osafe = true;
       setting = Unit (fun () -> assert false) }
 
 let add_aliases orig ~plugin ~group ?visible ?deprecated stage aliases =
@@ -1060,7 +1082,11 @@ let low_print_option_help fmt print_invisible o =
     in
     let name = o.oname in
     if print_invisible || o.ovisible then begin
-      print_helpline fmt (name ^ ty) o.ohelp o.ext_help;
+      let help =
+        if o.osafe then o.ohelp else
+          o.ohelp ^ " [unsafe in sandbox mode]"
+      in
+      print_helpline fmt (name ^ ty) help o.ext_help;
       List.iter
         (fun o ->
            if print_invisible || o.ovisible then
@@ -1210,13 +1236,18 @@ let list_plugins () =
 let pp_option_help name =
   try
     let option = Hashtbl.find Plugin.all_options name in
-    let help =
-      if option.oname = name then option.ohelp else
-        "alias for " ^ option.oname ^ "\n" ^ option.ohelp
+    let help = option.ohelp in
+    let help = (* Add alias information *)
+      if option.oname = name then help else
+        "alias for " ^ option.oname ^ "\n" ^ help
+    in
+    let help = (* Add sandbox mode information *)
+      if option.osafe then help else
+        help ^ "\nThis function is unsafe in sandbox mode."
     in
     let argname = option.argname in
     let name = if argname = "" then name else name ^ " <" ^ argname ^ ">" in
-    let print fmt = print_helpline fmt name help option.ext_help in
+    let print fmt = print_helpline fmt name help (option.ext_help) in
     Log.print_on_output print
   with Not_found ->
     let print fmt = Format.fprintf fmt "Invalid option %s@." name in

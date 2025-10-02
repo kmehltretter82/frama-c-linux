@@ -18,12 +18,12 @@ let nth_name basename n =
 (* generate the nth .jpg file (generate to .dot file and then remove it) *)
 let print_proj basename title n =
   let name = nth_name basename n in
-  let dot_name = (name^".dot") in
-  let jpg_name = (name^".jpg") in
-  Slicing.Api.Project.print_dot ~filename:dot_name ~title:title;
+  let dot_file = Filepath.of_string (name ^ ".dot") in
+  let jpg_file = Filepath.of_string (name ^ ".jpg") in
+  Slicing.Api.Project.print_dot ~filepath:dot_file ~title:title;
   if use_dot then
-    ignore (Sys.command ("dot -Tjpg -o "^jpg_name^" "^dot_name^" 2>/dev/null"));
-  Sys.remove dot_name;
+    ignore @@ Command.Dot.(spawn ~format:Jpeg ~output:jpg_file dot_file);
+  Filesystem.remove_file dot_file;
   n+1
 ;;
 

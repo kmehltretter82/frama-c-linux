@@ -18,6 +18,10 @@
 Open Source Release <next-release>
 ###############################################################################
 
+-   Kernel    [2025-10-02] Added an experimental sandbox mode enabled when the
+              environment variable FRAMAC_SANDBOX is set which prevent any 
+              user-supplied custom commands from being executed. Forbidden 
+              commands are marked as unsafe in the help output.
 -*! Kernel    [2025-10-01] Make string literal global arrays. Fixes #@1392
 o!  Kernel    [2025-09-29] Filepath.t is now abstract. An equivalent result can
               be obtained using Filepath.to_string_abs or Filepath.pretty_abs
