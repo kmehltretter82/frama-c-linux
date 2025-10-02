@@ -512,16 +512,16 @@ parse
              oneline_comment lexbuf}
 
 {
-  let file suffix cpp filename =
+  let file suffix cpp filepath =
     reset ();
     let scan_references = Kernel.EagerLoadSources.get () in
-    match Parse_env.open_source ~scan_references filename with
+    match Parse_env.open_source ~scan_references filepath with
     | Error msg -> Kernel.abort "logic_preprocess: %s" msg
     | Ok source ->
       let lex = Lexing.from_string source in
-      let prefix = Filename.basename filename in
+      let prefix = Filepath.basename filepath in
       let ppname = Temp_files.file ~prefix ~suffix:".pp" () in
-      let workdir_opt = Parse_env.get_workdir (Filepath.of_string filename) in
+      let workdir_opt = Parse_env.get_workdir filepath in
       Option.iter
         (fun workdir -> Parse_env.set_workdir ppname workdir)
         workdir_opt;

@@ -20,4 +20,6 @@
     @raises Sys_error if the file cannot be opened or read.
 *)
 
-val file: string -> (Filepath.t -> Filepath.t -> string) -> string -> Filepath.t
+val file:
+  string -> (Filepath.t -> Filepath.t -> string) ->
+  Filepath.t -> Filepath.t

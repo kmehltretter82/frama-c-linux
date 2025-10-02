@@ -75,15 +75,15 @@ let scan_source_for_references ~workdir contents =
         store_referenced_source file
     ) lines
 
-let open_source ~scan_references fname =
-  let fp = Filepath.of_string fname in
+let open_source ~scan_references fp =
   try
     let s = SourceFiles.find fp in
     Ok s
   with Not_found ->
   try
     Kernel.feedback ~dkey:Kernel.dkey_file_source
-      "opening source file: %S" fname;
+      "opening source file: %a"
+      Filepath.pretty fp;
     let open Filesystem.Operators in
     let$ inchan = Filesystem.with_open_in_exn ~binary:true fp in
     let contents = really_input_string inchan (in_channel_length inchan) in

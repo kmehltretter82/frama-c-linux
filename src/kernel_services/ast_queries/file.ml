@@ -621,7 +621,7 @@ let parse_cabs cpp_command = function
         let ppf' =
           try Logic_preprocess.file ".c"
                 (replace_in_cpp_cmd cmdl "")
-                (Filepath.to_string_abs ppf)
+                ppf
           with Sys_error msg ->
             safe_remove_file ppf;
             Kernel.abort "preprocessing of annotations failed (%s)" msg
@@ -668,12 +668,12 @@ let () =
     let preprocess =
       replace_in_cpp_cmd (get_preprocessor_command ()) "-nostdinc"
     in
+    let path = Filepath.of_string f in
     let ppf =
-      try Logic_preprocess.file ".c" preprocess f
+      try Logic_preprocess.file ".c" preprocess path
       with Sys_error msg ->
         Kernel.abort "preprocessing of annotations failed (%s)" msg
     in
-    let path = Filepath.of_string f in
     let (cil,(_,defs)) = Frontc.parse ~original:path ppf in
     cil.fileName <- path;
     safe_remove_file ppf;
