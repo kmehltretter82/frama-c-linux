@@ -960,7 +960,7 @@ let () = Information.register
 let () = Information.register
     ~id:"kernel.ast.typeinfo"
     ~label:"Type"
-    ~title:"Type of C/ASCL expression"
+    ~title:"Type of C/ACSL expression"
     begin fun fmt loc ->
       let open Printer in
       match loc with

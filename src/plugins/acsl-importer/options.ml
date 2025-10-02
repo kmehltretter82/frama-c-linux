@@ -12,7 +12,7 @@ include Plugin.Register
     (struct
       let name = "ACSL importer"
       let shortname = "acsl-import"
-      let help = "external ASCL files importer"
+      let help = "external ACSL files importer"
     end)
 let dkey = register_category "trace-options"
 
