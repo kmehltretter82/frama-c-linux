@@ -23,6 +23,7 @@ import PivotTable from 'frama-c/kernel/PivotTable';
 import Locations from 'frama-c/kernel/Locations';
 import Properties from 'frama-c/kernel/Properties';
 import { RecordingLogs, ServerLogs } from 'frama-c/kernel/ServerLogs';
+import { ButtonOptions } from 'frama-c/options';
 
 import 'frama-c/kernel/style.css';
 
@@ -56,6 +57,11 @@ Ivette.registerSidebar({
   icon: 'PROJECT',
   title: 'Projects',
   children: <Projects />
+});
+
+Ivette.registerToolbar({
+  id: 'ivette.parameters',
+  children: <ButtonOptions />
 });
 
 Ivette.registerToolbar({

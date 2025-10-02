@@ -26,6 +26,7 @@ import { Modal, showModal } from 'dome/dialogs';
 import { alpha } from 'dome/data/compare';
 import { LSplit } from 'dome/layout/splitters';
 import { Hbox } from 'dome/layout/boxes';
+import * as Toolbar from 'dome/frame/toolbars';
 
 import * as Server from 'frama-c/server';
 import * as Params from 'frama-c/kernel/api/parameters';
@@ -158,4 +159,12 @@ export function showOptionsModal(): void {
       <Options/>
     </Modal>
   );
+}
+
+export function ButtonOptions(): React.JSX.Element {
+  return <Toolbar.Button
+    icon='SETTINGS'
+    onClick={showOptionsModal}
+    title='Open parameters'
+  />
 }
