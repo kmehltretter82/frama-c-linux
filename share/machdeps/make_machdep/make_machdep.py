@@ -204,7 +204,6 @@ standard_source_files = [
     ("alignof_longdouble.c", "number"),
     ("alignof_void.c", "number"),
     ("alignof_fun.c", "number"),
-    ("alignof_str.c", "number"),
     ("alignof_aligned.c", "number"),
     ("alignof_max_align_t.c", "number"),
     ("size_t.c", "type"),
@@ -249,7 +248,6 @@ gcc_alignof_source_files = [
     ("gcc_alignof_longdouble.c", "number"),
     ("gcc_alignof_void.c", "number"),
     ("gcc_alignof_fun.c", "number"),
-    ("gcc_alignof_str.c", "number"),
     ("gcc_alignof_aligned.c", "number"),
     ("gcc_alignof_max_align_t.c", "number"),
 ]

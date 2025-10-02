@@ -142,7 +142,6 @@ end
 
 module type AlignofInfo = sig
   include TypesInfo
-  val str: unit -> int
   val aligned: unit -> int
   val max: unit -> int
 end
@@ -156,7 +155,6 @@ module Alignof = struct
   let float () = the_machine.machdep.alignof_float
   let double () = the_machine.machdep.alignof_double
   let longdouble () = the_machine.machdep.alignof_longdouble
-  let str () = the_machine.machdep.alignof_str
   let aligned () = the_machine.machdep.alignof_aligned
   let void () = the_machine.machdep.alignof_void
   let func () = the_machine.machdep.alignof_fun
@@ -174,7 +172,6 @@ module GCCAlignof = struct
   let float () = the_machine.machdep.gcc_alignof_float
   let double () = the_machine.machdep.gcc_alignof_double
   let longdouble () = the_machine.machdep.gcc_alignof_longdouble
-  let str () = the_machine.machdep.gcc_alignof_str
   let aligned () = the_machine.machdep.gcc_alignof_aligned
   let void () = the_machine.machdep.gcc_alignof_void
   let func () = the_machine.machdep.gcc_alignof_fun

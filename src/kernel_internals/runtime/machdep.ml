@@ -57,7 +57,6 @@ type mach = {
   alignof_float: int;
   alignof_double: int;
   alignof_longdouble: int;
-  alignof_str: int;
   alignof_void: int;
   alignof_fun: int;
   alignof_aligned: int;
@@ -71,7 +70,6 @@ type mach = {
   gcc_alignof_float: int [@ default -1];
   gcc_alignof_double: int [@ default -1];
   gcc_alignof_longdouble: int [@ default -1];
-  gcc_alignof_str: int [@ default -1];
   gcc_alignof_void: int [@ default -1];
   gcc_alignof_fun: int [@ default -1];
   gcc_alignof_aligned: int [@ default -1];
@@ -140,7 +138,6 @@ let dummy = {
   alignof_float = 4;
   alignof_double = 8;
   alignof_longdouble = 16;
-  alignof_str = 1;
   alignof_void = -1;
   alignof_fun = -1;
   alignof_aligned = 16;
@@ -154,7 +151,6 @@ let dummy = {
   gcc_alignof_float = -1;
   gcc_alignof_double = -1;
   gcc_alignof_longdouble = -1;
-  gcc_alignof_str = -1;
   gcc_alignof_void = -1;
   gcc_alignof_fun = -1;
   gcc_alignof_aligned = -1;
@@ -216,11 +212,11 @@ module Machdep = struct
        wint_t=%s;sig_atomic_t=%s;time_t=%s;max_align_t=%s;\
        alignof_short=%d;alignof_int=%d;alignof_long=%d;alignof_longlong=%d;\
        alignof_ptr=%d;alignof_float=%d;alignof_double=%d;alignof_longdouble=%d;\
-       alignof_str=%d;alignof_void=%d;alignof_fun=%d;alignof_aligned=%d;\
+       alignof_void=%d;alignof_fun=%d;alignof_aligned=%d;\
        alignof_max_align_t=%d;max_extended_alignment=%d;\
        gcc_alignof_short=%d;gcc_alignof_int=%d;gcc_alignof_long=%d;\
        gcc_alignof_longlong=%d;gcc_alignof_ptr=%d;gcc_alignof_float=%d;\
-       gcc_alignof_double=%d;gcc_alignof_longdouble=%d;gcc_alignof_str=%d;\
+       gcc_alignof_double=%d;gcc_alignof_longdouble=%d;\
        gcc_alignof_void=%d;gcc_alignof_fun=%d;gcc_alignof_aligned=%d;\
        gcc_alignof_max_align_t=%d;\
        char_is_unsigned=%b;little_endian=%b;has__builtin_va_list=%b;\
@@ -266,7 +262,6 @@ module Machdep = struct
       mach.alignof_float
       mach.alignof_double
       mach.alignof_longdouble
-      mach.alignof_str
       mach.alignof_void
       mach.alignof_fun
       mach.alignof_aligned
@@ -280,7 +275,6 @@ module Machdep = struct
       mach.gcc_alignof_float
       mach.gcc_alignof_double
       mach.gcc_alignof_longdouble
-      mach.gcc_alignof_str
       mach.gcc_alignof_void
       mach.gcc_alignof_fun
       mach.gcc_alignof_aligned

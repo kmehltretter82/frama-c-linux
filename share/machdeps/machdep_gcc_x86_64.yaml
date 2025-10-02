@@ -9,7 +9,6 @@ alignof_longlong: 8
 alignof_max_align_t: 16
 alignof_ptr: 8
 alignof_short: 2
-alignof_str: 1
 alignof_void: 1
 bufsiz: '8192'
 char_is_unsigned: false
@@ -545,7 +544,6 @@ gcc_alignof_longlong: 8
 gcc_alignof_max_align_t: 16
 gcc_alignof_ptr: 8
 gcc_alignof_short: 2
-gcc_alignof_str: 1
 gcc_alignof_void: 1
 has__builtin_va_list: true
 host_name_max: '64'

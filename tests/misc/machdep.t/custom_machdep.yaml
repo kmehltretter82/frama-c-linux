@@ -9,7 +9,6 @@ alignof_longlong: 4
 alignof_max_align_t: 16
 alignof_ptr: 4
 alignof_short: 2
-alignof_str: 1
 alignof_void: 1
 max_align_t: long double
 max_extended_alignment: 0

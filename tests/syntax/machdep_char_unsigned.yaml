@@ -22,7 +22,6 @@ alignof_float: 2
 alignof_double: 2
 alignof_longdouble: 2
 alignof_max_align_t: 2
-alignof_str: 0
 alignof_fun: 0
 alignof_void: 0
 max_align_t: long long

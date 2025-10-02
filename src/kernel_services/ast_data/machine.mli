@@ -75,7 +75,6 @@ module Sizeof : TypesInfo
 
 module type AlignofInfo = sig
   include TypesInfo
-  val str: unit -> int
   val aligned: unit -> int
   val max: unit -> int
 end

@@ -66,12 +66,6 @@ alignof_short:
 
   type: integer
 
-alignof_str:
-
-  description:  alignment of string
-
-  type: integer
-
 alignof_void:
 
   description:  alignment of void. Negative if unsupported
@@ -164,13 +158,6 @@ gcc_alignof_ptr:
 gcc_alignof_short:
 
   description:  GCC __alignof__ 'short' type
-
-  type: integer
-  optional: true
-
-gcc_alignof_str:
-
-  description:  GCC __alignof__ string
 
   type: integer
   optional: true
