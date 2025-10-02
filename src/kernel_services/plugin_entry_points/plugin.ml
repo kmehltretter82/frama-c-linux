@@ -388,7 +388,7 @@ struct
 
     let mk_dir d =
       try Filesystem.make_dir d
-      with Unix.Unix_error _ ->
+      with Sys_error _ ->
         L.abort "cannot create %s directory `%a'" D.name Fc_Filepath.pretty d
 
     let get_dir ?(create_path=false) s =

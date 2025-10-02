@@ -1096,8 +1096,7 @@ let make_output_dir dir =
       Filesystem.make_dir ~perm:0o770 dir;
       debug ~dkey "Created output directory '%a'" Fc_Filepath.pretty dir
     end
-  with Unix.Unix_error (err,_,_) ->
-    let msg = Unix.error_message err in
+  with Sys_error msg ->
     abort
       "System Error (%s)@\nCan not create output directory '%a'"
       msg Fc_Filepath.pretty dir

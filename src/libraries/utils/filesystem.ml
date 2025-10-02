@@ -9,6 +9,40 @@
 open Filepath
 
 (* -------------------------------------------------------------------------- *)
+(* --- Error handling                                                     --- *)
+(* -------------------------------------------------------------------------- *)
+
+(* Filesystem Exceptions *)
+
+let error_message : exn -> string = function
+  | Sys_error msg -> msg
+  | Unix.Unix_error (code, _, _) -> Unix.error_message code
+  | _ -> assert false
+
+(* Convert Unix_error to Sys_error *)
+let convert_exception : exn -> exn = function
+  | Unix.Unix_error _ as exn -> Sys_error (error_message exn)
+  | exn -> exn
+
+let raise_exception format =
+  Format.kasprintf (fun msg -> raise (Sys_error msg)) format
+
+(* Errors *)
+
+type error = string * Filepath.t
+type nonrec 'a result = ('a,error) result
+
+let convert_error (p : t) (exn : exn) : 'a result =
+  Error (error_message exn, p)
+
+(* Invalid arguments *)
+
+let check_nonempty p =
+  if is_empty p then
+    invalid_arg "path should not be empty"
+
+
+(* -------------------------------------------------------------------------- *)
 (* --- File system                                                        --- *)
 (* -------------------------------------------------------------------------- *)
 
@@ -31,11 +65,12 @@ let convert_file_kind : Unix.file_kind -> file_kind = function
   | S_SOCK -> Socket
 
 let file_kind (p : t) =
+  check_nonempty p;
   try
     let stats = Unix.stat (Filepath.to_string_abs p) in
     Ok (convert_file_kind stats.st_kind)
-  with Unix.Unix_error (error_code, _, _) ->
-    Error (Unix.error_message error_code)
+  with Unix.Unix_error _ as exn ->
+    convert_error p exn
 
 let exists (p : t) =
   file_kind p |> Result.is_ok
@@ -53,20 +88,18 @@ let is_file (p : t) =
 
 let is_dir (p : t) = Sys.is_directory (Filepath.to_string_abs p)
 
-let readdir (p : t) =
+let read_dir (p : t) =
+  check_nonempty p;
   Sys.readdir (Filepath.to_string_abs p)
 
 let list_dir (p : t) =
-  Sys.readdir (Filepath.to_string_abs p)
-  |> Array.to_list
+  read_dir p |> Array.to_list
 
 let iter_dir (f : string -> unit) (p : t) : unit =
-  Sys.readdir (Filepath.to_string_abs p)
-  |> Array.iter (fun s -> f s)
+  read_dir p |> Array.iter (fun s -> f s)
 
 let fold_dir (f : string -> 'a -> 'a) (p : t) (acc : 'a) : 'a =
-  Sys.readdir (Filepath.to_string_abs p)
-  |> Array.fold_left (fun acc s ->  f s acc) acc
+  read_dir p |> Array.fold_left (fun acc s ->  f s acc) acc
 
 let remove_file (p : t) =
   try
@@ -75,18 +108,21 @@ let remove_file (p : t) =
 
 let rec remove_dir (p : t) =
   try
-    Array.iter
-      (fun a ->
-         let f = p / a in
-         if is_dir f then remove_dir f else remove_file f
-      ) (readdir p) ;
+    iter_dir
+      (fun s ->
+         let f = p / s in
+         if dir_exists f then remove_dir f else remove_file f
+      ) p;
     Unix.rmdir (Filepath.to_string_abs p)
-  with Unix.Unix_error _ | Sys_error _ -> ()
+  with Unix.Unix_error _ -> ()
 
 let rename (s : t) (t : t) =
+  check_nonempty s;
+  check_nonempty t;
   Sys.rename (Filepath.to_string_abs s) (Filepath.to_string_abs t)
 
 let rec make_dir ?(parents=true) ?(perm=0o755) (p: t) =
+  check_nonempty p;
   try
     Unix.mkdir (Filepath.to_string_abs p) perm
   with
@@ -94,39 +130,34 @@ let rec make_dir ?(parents=true) ?(perm=0o755) (p: t) =
     let parent = Filepath.dirname p in
     if p <> parent then (* Prevent infinite recursion; can it ever happen ? *)
       make_dir ~parents ~perm parent;
-    Unix.mkdir (Filepath.to_string_abs p) perm
+    make_dir ~parents:false ~perm p
   | Unix.Unix_error (Unix.EEXIST,_,_) ->
     if not (dir_exists p) then
-      failwith @@
-      Format.asprintf "mkdir: %a exists but is not a directory"
-        Filepath.pretty p
+      raise_exception "%a exists but is not a directory" Filepath.pretty p
+  | exn ->
+    raise (convert_exception exn)
 
 
 (* -------------------------------------------------------------------------- *)
 (* --- Temporary files                                                    --- *)
 (* -------------------------------------------------------------------------- *)
 
-exception Temp_file_error of string
-
 let temp_file ~prefix ~suffix =
-  try
-    Filename.temp_file prefix suffix |> Filepath.of_string
-  with Sys_error s ->
-    raise (Temp_file_error s)
+  Filename.temp_file prefix suffix |> Filepath.of_string
 
 let temp_dir ~prefix ~suffix =
   (* temp_dir is introduced in Ocaml 5.1 *)
   let rec one_try limit =
-    let dir = Filename.temp_file prefix suffix in
     try
+      let dir = Filename.temp_file prefix suffix in
       Unix.unlink dir;
-      Unix.mkdir dir 0o700 ;
+      Unix.mkdir dir 0o700;
       Filepath.of_string dir
-    with Unix.Unix_error(err,_,_) ->
-      if limit < 0 then
-        raise (Temp_file_error (Unix.error_message err))
-      else
-        one_try (pred limit)
+    with
+    | Unix.Unix_error _ when limit >= 0 ->
+      one_try (pred limit)
+    | exn ->
+      raise (convert_exception exn)
   in
   one_try 10
 
@@ -136,7 +167,11 @@ let temp_dir ~prefix ~suffix =
 (* -------------------------------------------------------------------------- *)
 
 let digest_raw (p : t) =
-  Digest.file (Filepath.to_string_abs p)
+  check_nonempty p;
+  try
+    Digest.file (Filepath.to_string_abs p)
+  with exn ->
+    raise (convert_exception exn)
 
 let digest (p : t) =
   digest_raw p |> Digest.to_hex
@@ -152,7 +187,7 @@ let same_digest (p1 : t) (p2 : t) =
 type action_if_missing = Create of int | DoNotCreate
 type action_if_exists = Error | Append | Truncate
 
-type ('ch,'a) safe_processor = ('ch -> 'a) -> ('a,string) result
+type ('ch,'a) safe_processor = ('ch -> 'a) -> 'a result
 type ('ch,'a) exn_processor = ('ch -> 'a) -> 'a
 
 let flags_and_perm ?if_exists ~if_missing ~binary ~blocking default =
@@ -188,10 +223,6 @@ let protect_file_op ~(close: 'ch -> unit) (job: 'ch -> 'a) (channel: 'ch) =
   close channel;
   r
 
-let check_nonempty p =
-  if is_empty p then
-    invalid_arg "path should not be empty"
-
 let with_open_in_exn
     ?(if_missing=DoNotCreate)
     ?(binary=false)
@@ -207,7 +238,7 @@ let with_open_in_exn
 
 let with_open_in ?if_missing ?binary ?blocking p job =
   try Ok (with_open_in_exn ?if_missing ?binary ?blocking p job)
-  with Sys_error s -> Error s
+  with Sys_error m -> Error (m,p)
 
 let with_open_out_exn
     ?(if_missing=Create 0o666)
@@ -225,7 +256,7 @@ let with_open_out_exn
 
 let with_open_out ?if_missing ?if_exists ?binary ?blocking p job =
   try Ok (with_open_out_exn ?if_missing ?if_exists ?binary ?blocking p job)
-  with Sys_error s -> Error s
+  with Sys_error m -> Error (m,p)
 
 module Compressed : sig
   val with_open_in_exn :
@@ -237,10 +268,12 @@ module Compressed : sig
     (Channel.output, 'a) exn_processor
 end = struct
   let with_open_in_exn (p : t) job =
+    check_nonempty p;
     Channel.open_in_bin (Filepath.to_string_abs p)
     |> protect_file_op ~close:Channel.close_in job
 
   let with_open_out_exn ?compress (p : t) job =
+    check_nonempty p;
     Channel.open_out_bin ?compress (Filepath.to_string_abs p)
     |> protect_file_op ~close:Channel.close_out job
 end
@@ -267,7 +300,7 @@ let with_formatter_exn p job =
 
 let with_formatter p job =
   try Ok (with_formatter_exn p job)
-  with Sys_error s -> Error s
+  with Sys_error m -> Error (m, p)
 
 let rec bincopy buffer in_channel out_channel =
   let s = Bytes.length buffer in
@@ -310,14 +343,16 @@ let _test_filename () =
   remove_file filepath;
   filepath
 
-let%test _ = not (file_exists Filepath.empty)
+let%test _ =
+  try ignore (file_exists Filepath.empty); false
+  with Invalid_argument _ -> true
 let%test _ = file_exists (_test_file ())
 let%test _ = not (file_exists (_test_dir ()))
 let%test _ = not (dir_exists (_test_file ()))
 let%test _ = dir_exists (_test_dir ())
 let%test _ =
   try make_dir (_test_file ()); false (* path exists and is not a directory *)
-  with Failure _ -> true
+  with Sys_error _ -> true
 let%test _ =
   let p = _test_filename () in
   make_dir p;

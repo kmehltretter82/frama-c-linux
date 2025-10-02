@@ -624,7 +624,7 @@ let gen_report ~draft:is_draft () =
     match result with
     | Ok () ->
       Mdr_params.result "Report %a generated" Filepath.pretty file
-    | Error s ->
+    | Error (msg, _) ->
       Mdr_params.warning
         "Unable to open %a for writing (%s). No report generated"
-        Filepath.pretty file s
+        Filepath.pretty file msg

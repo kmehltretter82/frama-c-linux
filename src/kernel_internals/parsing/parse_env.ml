@@ -99,3 +99,4 @@ let open_source ~scan_references fname =
     Ok contents
   with Sys_error s ->
     Error s
+

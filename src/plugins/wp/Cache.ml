@@ -226,7 +226,7 @@ let cleanup_cache () =
                  end
           ) dir ;
     with
-    | Unix.Unix_error _ as exn ->
+    | Sys_error _ as exn ->
       Wp_parameters.warning ~current:false
         "Can not cleanup cache (%s)" (Printexc.to_string exn)
     | Not_found ->

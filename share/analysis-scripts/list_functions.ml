@@ -153,7 +153,7 @@ let print_json fp funinfos_json =
   match result with
   | Ok () ->
     Self.debug "List written to: %a" Filepath.pretty fp
-  | Error msg ->
+  | Error (msg, _) ->
     Self.abort "cannot write JSON to %a: %s"
       Filepath.pretty fp msg
 

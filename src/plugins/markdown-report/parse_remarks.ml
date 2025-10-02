@@ -73,9 +73,9 @@ let parse_line env line =
       in
       match result with
       | Ok () -> ()
-      | Error err ->
+      | Error (msg, _) ->
         Mdr_params.error
-          "Unable to open included remarks file %s (%s), Ignoring." f err
+          "Unable to open included remarks file %s (%s), Ignoring." f msg
     end else begin
       env.current_markdown <- line :: env.current_markdown;
     end
@@ -105,9 +105,9 @@ let get_remarks f =
     Filepath.pretty f;
   match Filesystem.with_open_in f (parse_remarks (empty_env ())) with
   | Ok { remarks } -> remarks
-  | Error err ->
+  | Error (msg, _) ->
     Mdr_params.error
       "Unable to open remarks file %a (%s). \
        No additional remarks will be included in the report."
-      Filepath.pretty f err;
+      Filepath.pretty f msg;
     Datatype.String.Map.empty

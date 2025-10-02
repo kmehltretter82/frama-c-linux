@@ -146,7 +146,7 @@
       let debug = Kernel.KeepTempFiles.get () in
       let ppname =
         try Temp_files.file ~prefix:"ppannot" ~suffix ()
-        with Filesystem.Temp_file_error s ->
+        with Sys_error s ->
           Kernel.abort
             "Could not open temporary file for logic preprocessing: %s" s
       in
