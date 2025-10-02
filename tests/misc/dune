@@ -8,9 +8,9 @@
   (enabled_if (and (= %{os_type} Unix) (<> %{system} macosx)))
 )
 
-(cram
+(cram ; macOS ARM has a different memory layout
   (applies_to pragma-pack-gcc)
-  (enabled_if %{bin-available:gcc})
+  (enabled_if (and %{bin-available:gcc} (<> %{system} macosx)))
   (deps pragma-pack.c pragma-pack-utils.h)
 )
 
