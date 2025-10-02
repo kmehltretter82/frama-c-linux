@@ -1611,7 +1611,7 @@ and childrenExp (vis: cilVisitor) (e: exp) : exp =
   | SizeOfE e1 ->
     let e1' = vExp e1 in
     if e1' != e1 then new_exp (SizeOfE e1') else e
-  
+
   | AlignOf (t, i) ->
     let t' = vTyp t in
     if t' != t then new_exp (AlignOf (t', i)) else e
@@ -6724,9 +6724,6 @@ end
 let typeDeepDropAllAttributes t =
   let vis = new dropAttributes () in
   visitCilType vis t
-
-let int_of_enumitem ei =
-  Option.get @@ constFoldToInt ei.eival
 
 (* ****************************** *)
 (* Forward deprecated definitions *)

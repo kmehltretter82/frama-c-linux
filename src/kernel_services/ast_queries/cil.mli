@@ -2042,8 +2042,6 @@ val separate_switch_succs: stmt -> stmt list * stmt
     true, and the second if the condition is false. *)
 val separate_if_succs: stmt -> stmt * stmt
 
-val int_of_enumitem: enumitem -> Z.t
-
 (**/**)
 
 val switch_case_state_self: State.t

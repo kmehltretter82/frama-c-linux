@@ -269,7 +269,9 @@ val is_object : typ -> bool
 val is_struct : typ -> bool
 
 (** True if the argument is a type that directly (modulo name) contains a
-    bitfield. *)
+    bitfield.
+    @since Frama-C+dev
+*)
 val has_bitfield : typ -> bool
 
 (** True if the argument is a union type. *)

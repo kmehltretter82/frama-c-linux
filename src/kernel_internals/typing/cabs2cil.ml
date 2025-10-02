@@ -3998,13 +3998,16 @@ let solveAlignas ~original_type alignas_specifiers =
     begin match Option.map Z.to_int @@ constFoldToInt ~machdep:true alignas with
       | exception Z.Overflow ->
         Kernel.abort ~current:true
-          "Can't handle a value that big for _Alignas (%a)" Cil_printer.pp_exp alignas
+          "Can't handle a value that big for _Alignas (%a)"
+          Cil_printer.pp_exp alignas
       | None ->
         Kernel.abort ~current:true (* C11 6.7.5 § 3 *)
-          "Invalid _Alignas(%a): shall evaluate to a constant" Cil_printer.pp_exp alignas ;
+          "Invalid _Alignas(%a): shall evaluate to a constant"
+          Cil_printer.pp_exp alignas ;
       | Some value when not @@ (value = 0 || is_power_of_two value) ->
         Kernel.abort  ~current:true (* C11 6.2.8 § 4 *)
-          "Invalid _Alignas(%a): shall be 0 or a positive power of 2" Cil_printer.pp_exp alignas ;
+          "Invalid _Alignas(%a): shall be 0 or a positive power of 2"
+          Cil_printer.pp_exp alignas ;
       | Some value -> alignas, value
     end
   in

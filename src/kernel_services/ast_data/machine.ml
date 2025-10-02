@@ -322,3 +322,27 @@ let init ~initLogicBuiltins machdep =
     TheMachine.mark_as_computed ()
 
   end
+
+(* DEPRECATED functions *)
+let sizeof_short () = Sizeof.short ()
+let sizeof_int () = Sizeof.int ()
+let sizeof_long () = Sizeof.long ()
+let sizeof_longlong () = Sizeof.longlong ()
+let sizeof_ptr () = Sizeof.ptr ()
+let sizeof_float () = Sizeof.float ()
+let sizeof_double () = Sizeof.double ()
+let sizeof_longdouble () = Sizeof.longdouble ()
+let sizeof_void () = Sizeof.void ()
+let sizeof_fun () = Sizeof.func ()
+
+let alignof_short () = Alignof.short ()
+let alignof_int () = Alignof.int ()
+let alignof_long () = Alignof.long ()
+let alignof_longlong () = Alignof.longlong ()
+let alignof_ptr () = Alignof.ptr ()
+let alignof_float () = Alignof.float ()
+let alignof_double () = Alignof.double ()
+let alignof_longdouble () = Alignof.longdouble ()
+let alignof_void () = Alignof.void ()
+let alignof_fun () = Alignof.func ()
+let alignof_aligned () = Alignof.aligned ()
