@@ -603,12 +603,10 @@
     logic.c:571: assigns clause on addresses
       (read in 1 statement, propagated through 1 statement)
       garbled mix of &{b; c; t_0; w}
-[eva] logic.c:530: 
-  Cannot evaluate range bound __fc_len - 1
-  (unsupported logic var __fc_len). Approximating
-[eva] logic.c:533: 
-  Cannot evaluate range bound __fc_len
-  (unsupported logic var __fc_len). Approximating
+[eva:acsl:unsupported] logic.c:530: 
+  Cannot evaluate range bound __fc_len - 1 (unsupported logic var __fc_len). Approximating.
+[eva:acsl:unsupported] logic.c:533: 
+  Cannot evaluate range bound __fc_len (unsupported logic var __fc_len). Approximating.
 [scope:rm_asserts] removing 5 assertion(s)
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function alarms:
