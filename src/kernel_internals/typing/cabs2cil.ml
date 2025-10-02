@@ -2515,7 +2515,7 @@ let makeGlobalVarinfo (isadef: bool) (vi: varinfo) : varinfo * bool =
       oldvi.vinline <- oldvi.vinline && vi.vinline;
 
       begin
-        (* C11 6.7.5 § 7 - Check _Alignas coherence, and update accordingly. *)
+        (* C17 6.7.5 § 8 - Check _Alignas coherence, and update accordingly. *)
 
         let same_alignas_value al1 al2 =
           Option.equal Z.equal
@@ -4001,11 +4001,11 @@ let solveAlignas ~original_type alignas_specifiers =
           "Can't handle a value that big for _Alignas (%a)"
           Cil_printer.pp_exp alignas
       | None ->
-        Kernel.abort ~current:true (* C11 6.7.5 § 3 *)
+        Kernel.abort ~current:true (* C17 6.7.5 § 1 *)
           "Invalid _Alignas(%a): shall evaluate to a constant"
           Cil_printer.pp_exp alignas ;
       | Some value when not @@ (value = 0 || is_power_of_two value) ->
-        Kernel.abort  ~current:true (* C11 6.2.8 § 4 *)
+        Kernel.abort  ~current:true (* C17 6.2.8 § 4 *)
           "Invalid _Alignas(%a): shall be 0 or a positive power of 2"
           Cil_printer.pp_exp alignas ;
       | Some value -> alignas, value
@@ -4014,7 +4014,7 @@ let solveAlignas ~original_type alignas_specifiers =
   let alignas = match alignas_specifiers with
     | [] -> None
     | hd :: tl ->
-      (* C11 6.7.5 § 6 *)
+      (* C17 6.7.5 § 7 *)
       let foldMaxAlignas acc alignas =
         let align, value = doAlignas alignas in
         if value > snd acc then align, value else acc
@@ -4023,11 +4023,12 @@ let solveAlignas ~original_type alignas_specifiers =
   in
   match alignas with
   | None -> None
-  | Some (_alignas, 0) -> None (* C11 6.7.5 § 6 *)
+  | Some (_alignas, 0) -> None (* C17 6.7.5 § 7 *)
   | Some (alignas, v) ->
+    (* C17 6.7.5 § 3 *)
+
     let original_align = Cil.bytesAlignOf original_type in
 
-    (* C11 6.7.5 § 1 *)
     if v < original_align then
       Kernel.abort ~current:true
         "Invalid _Alignas(%a): shall not reduce original alignof(%a): %d"
@@ -4035,7 +4036,6 @@ let solveAlignas ~original_type alignas_specifiers =
         Cil_printer.pp_typ original_type
         original_align ;
 
-    (* C11 6.7.5 § 1 *)
     if extended_align = 0 && v > max_align then
       Kernel.abort ~current:true
         "Invalid _Alignas(%a): exceeds alignof(max_align_t): %d, \
@@ -4043,7 +4043,6 @@ let solveAlignas ~original_type alignas_specifiers =
         Cil_printer.pp_exp alignas
         max_align ;
 
-    (* C11 6.7.5 § 1 *)
     if v > extended_align && extended_align > 0 then
       Kernel.abort ~current:true
         "Invalid _Alignas(%a): exceeds max extended alignment: %d"
@@ -4472,7 +4471,7 @@ and makeVarInfoCabs
           "'%s' elements are already ghost" n;
   end ;
 
-  begin (* C11 6.7.5 § 2 *)
+  begin (* C17 6.7.5 § 2 *)
     if Ast_types.is_fun vtype && alignas <> [] then
       Kernel.abort ~once:true ~current:true
         "_Alignas not allowed on functions" ;
@@ -5193,7 +5192,7 @@ and makeCompType loc ghost (isstruct: bool)
           end
       in
       if None <> fbitfield && Option.is_some falignas then
-        (* C11 6.7.5 § 2 *)
+        (* C17 6.7.5 § 2 *)
         Kernel.abort ~once:true ~current:true
           "_Alignas not allowed on bitfields" ;
       (* Compute the order of the field in the structure *)
@@ -9355,7 +9354,7 @@ and doDecl local_env (isglobal: bool) (def: Cabs.definition) : chunk =
       let bt,sto,alignas,inl,attrs = doSpecList idloc local_env.is_ghost n specs in
 
       if alignas <> [] then
-        (* C11 6.7.5 § 2 *)
+        (* C17 6.7.5 § 2 *)
         Kernel.abort ~once:true ~current:true
           "_Alignas not allowed on functions" ;
 
