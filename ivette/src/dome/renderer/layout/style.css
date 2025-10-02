@@ -333,6 +333,7 @@
         margin-top: 4px;
         position:relative;
         border-radius: 4px;
+        overflow: visible; /* keep the caret visible */
         background-color: var(--background-block-form);
         padding: 2px 8px 2px 2px;
 
