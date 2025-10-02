@@ -151,7 +151,7 @@ function getActions<A>(
   return (
     <Forms.Actions>
       <Forms.ResetButton state={state} title="Reset" equal={equal} />
-      <Forms.CommitButton state={state} title="Commit" equal={equal} />
+      <Forms.CommitButton state={state} title="Apply" equal={equal} />
     </Forms.Actions>
   );
 }
@@ -294,9 +294,7 @@ function Form(props: FormProps): React.JSX.Element {
 
   return (
     <Vfill style={style}>
-      <SidebarTitle label={id}>
-        <Remote iconSize={14} remote={remote} />
-      </SidebarTitle>
+      <SidebarTitle label={id}><Remote remote={remote} /></SidebarTitle>
       <Forms.SidebarForm style={{ overflowY: 'auto' }}>
         { params.map(s =>
           <FormSection key={s[0]} label={s[0]} params={s[1]} id={id}
