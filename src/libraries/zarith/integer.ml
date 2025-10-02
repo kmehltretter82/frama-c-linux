@@ -6,6 +6,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(** Frama-C creates aliases for external libraries so that we can shadow them
+   like here. {!Z} refers to Zarith module. *)
 include Z
 
 type 'a formatter = Format.formatter -> 'a -> unit
@@ -14,7 +16,7 @@ type 'a formatter = Format.formatter -> 'a -> unit
 (* Conversions *)
 (* ----------- *)
 
-let wrap to_int i = try Some (to_int i) with Z.Overflow -> None
+let wrap to_int i = try Some (to_int i) with Overflow -> None
 let to_int_opt = wrap to_int
 let to_int64_opt = wrap to_int64
 let to_int32_opt = wrap to_int32

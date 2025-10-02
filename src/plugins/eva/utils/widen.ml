@@ -218,7 +218,7 @@ class widen_visitor init_widen_hints init_enclosing_loops = object(self)
               aux_offset typ_e off;
               try
                 let size = Cil.lenOfArray64 size in
-                if Integer.(gt size zero) then
+                if Integer.gt size 0z then
                   self#add_index_hints size idx
               with Cil.LenOfArray _ -> ()
             end

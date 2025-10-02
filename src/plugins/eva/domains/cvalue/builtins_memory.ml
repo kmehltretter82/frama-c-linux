@@ -370,7 +370,7 @@ let memset_typ_offsm_int full_typ i =
         (* Update [full_offsm] between [offset] and [offset+size-1], and store
            exactly [v] there *)
         let update size v =
-          let bounds = (offset, Int.(pred (add offset size))) in
+          let bounds = (offset, Int.pred (Int.add offset size)) in
           let vinit = V_Or_Uninitialized.initialized v in
           V_Offsetmap.add bounds (vinit, size, Rel.zero) offsm
         in

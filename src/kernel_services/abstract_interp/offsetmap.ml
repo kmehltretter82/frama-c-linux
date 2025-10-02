@@ -647,7 +647,7 @@ module Make
   (* creates a fresh tree that binds [0..size-1] to the isotropic value [v].
      if [size] if 0, returns [Empty]. *)
   let isotropic_interval size v =
-    if Int.(equal size zero) then Empty
+    if Int.equal size 0z then Empty
     else
       nNode (pred size) Integer.zero m_empty size m_empty Rel.zero Integer.one v
 
@@ -1566,7 +1566,7 @@ module Make
 
   let copy_slice ~validity ~offsets ~size tree =
     let offsets = Tr_offset.trim_by_validity offsets size validity in
-    if Int.(equal size zero) then `Value Empty
+    if Int.equal size 0z then `Value Empty
     else match offsets with
       | Tr_offset.Invalid -> `Bottom
       | _ ->
@@ -1640,7 +1640,7 @@ module Make
      Otherwise, interprets independent writes of the value [v] of size [size]
      at possible offsets, starting from [offset] until [abs_max].  *)
   let update_itv_with_rem ~exact ~once ~offset ~abs_max ~size ~rem v curr_off tree =
-    if Int.(equal size zero) then curr_off, tree else
+    if Int.equal size 0z then curr_off, tree else
       let off1, t1 = keep_above ~offset:abs_max curr_off tree in
       let off2, t2 = keep_below ~offset curr_off tree in
       if exact then
@@ -2020,7 +2020,7 @@ module Make
 
   (** pastes [from] (of size [size]) at all [offsets] in [dst] *)
   let paste_slice ~validity ~exact ~from:src ~size ~offsets dst =
-    if Int.(equal size zero) then (* nothing to do *) `Value dst
+    if Int.equal size 0z then (* nothing to do *) `Value dst
     else
       let size_ok =
         Ival.is_singleton_int offsets
@@ -2098,15 +2098,15 @@ module Make
 
   let create_isotropic ~size v =
     assert (Int.geq size Int.zero);
-    if Int.(equal size zero) then Empty
+    if Int.equal size 0z then Empty
     else begin
       assert (V.is_isotropic v);
       isotropic_interval size v
     end
 
   let create ~size v ~size_v =
-    assert (Int.geq size Int.zero);
-    if Int.(equal size zero) then Empty
+    assert (Int.geq size 0z);
+    if Int.equal size 0z then Empty
     else snd (Int.zero, interval_aux (pred size) Rel.zero size_v v)
 
   let cardinal_zero_or_one offsetmap =
@@ -2705,7 +2705,7 @@ module Int_Intervals = struct
          in [min..start_max+size-1]. Create an englobing offsetmap, then update
          it for all intervals. *)
       let aux_min_max min start_max =
-        if Int.(equal size zero) then Bottom else
+        if Int.equal size 0z then Bottom else
           let max = pred (start_max +~ size) in
           let curr_off, ifalse = aux_create_interval ~min ~max false in
           let validity = Base.Known (min, max) in

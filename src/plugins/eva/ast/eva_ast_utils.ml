@@ -210,7 +210,7 @@ let apply_binop_to_integers binop i1 i2 ikind =
   (* Can a shift operation be safely computed ? *)
   let shift_in_bounds i2 =
     let size = Integer.of_int (Cil.bitsSizeOfInt ikind) in
-    Integer.(geq i2 zero && lt i2 size)
+    Integer.geq i2 0z && Integer.lt i2 size
   in
   let bool op x y = if op x y then Integer.one else Integer.zero in
   let integer_op = function

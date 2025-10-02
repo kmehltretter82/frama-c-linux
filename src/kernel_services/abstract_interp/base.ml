@@ -184,8 +184,8 @@ let min_valid_absolute_address = MinValidAbsoluteAddress.get
 let max_valid_absolute_address = MaxValidAbsoluteAddress.get
 
 let validity_from_size size =
-  assert Int.(geq size zero);
-  if Int.(equal size zero) then Empty
+  assert (Int.geq size 0z);
+  if Int.equal size 0z then Empty
   else Known (Int.zero, Int.pred size)
 
 let validity_from_known_size size =
@@ -250,7 +250,7 @@ let for_writing = function
   | Read _ | Object_pointer | Any_pointer -> false
 
 let is_empty_access = function
-  | Read size | Write size -> Int.(equal zero size)
+  | Read size | Write size -> Int.equal 0z size
   | Object_pointer | Any_pointer -> true
 
 (* Computes the last valid offset for an access of the base [base] with [max]

@@ -192,9 +192,9 @@ let cardinal_estimate v ~size =
     then Int.one
     else
       let bits_of_float =
-        if Integer.(size = 32z)
+        if Integer.equal size 32z
         then Fval.bits_of_float32_list
-        else if Integer.(size = 64z)
+        else if Integer.equal size 64z
         then Fval.bits_of_float64_list
         else (fun _ -> [Int.zero, Int.pred (Int.two_power size)])
       in

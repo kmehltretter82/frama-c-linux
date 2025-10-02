@@ -87,7 +87,7 @@ let array_bounds array_size =
   | Some size_exp ->
     match Cil.constFoldToInt size_exp with
     | None -> None
-    | Some size when Integer.(gt size zero) -> Some Integer.(zero, pred size)
+    | Some size when Integer.gt size 0z -> Some (0z, Integer.pred size)
     | Some _ -> None
 
 let array_range array_size =

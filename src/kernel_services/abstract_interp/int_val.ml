@@ -813,7 +813,7 @@ let extract_bit = function
 
 let set_bit_on ~size bit =
   let mask = match bit with
-    | Sign -> Int.(neg (two_power_of_int size))
+    | Sign -> Int.neg (Int.two_power_of_int size)
     | Bit i -> Int.(two_power_of_int i)
   in
   fun v -> Int.logor mask v

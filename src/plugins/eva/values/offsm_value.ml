@@ -21,7 +21,7 @@ let default size =
 (* This function creates a dummy validity, sufficient to read [size]
    bits starting from [start] *)
 let enough_validity ~start ~size =
-  Base.Known (Int.zero, Int.(add start (pred size)))
+  Base.Known (0z, Int.add start (Int.pred size))
 
 (* copy [size] bits from [start] in [o]. If [o] has size [size_o],
    [size+start <= size_o] must hold. *)
@@ -96,7 +96,7 @@ let explode_range o (b, e) =
     | `Zero ->
       r := basic_add ~start ~size V.singleton_zero !r
     | `One ->
-      let v = V.inject_int (Integer.(pred (two_power size))) in
+      let v = V.inject_int (Integer.pred (Integer.two_power size)) in
       r := basic_add ~start ~size v !r
     | `ZeroOne -> () (* keep the underlying value unchanged *)
   in
@@ -202,7 +202,7 @@ let is_zero =
    V_Or_Uninitialized values, and instead directly reasoning on Ival. *)
 let is_all_ones size (v, _size_v, off) =
   Rel.equal Rel.zero off &&
-  let n = Int.(pred (two_power size)) in
+  let n = Int.pred (Int.two_power size) in
   let one = V_Or_Uninitialized.initialized (V.inject_int n) in
   V_Or_Uninitialized.equal one v
 

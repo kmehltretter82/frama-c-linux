@@ -641,7 +641,7 @@ module V = struct
   let merge_neutral_element = singleton_zero
 
   let all_values ~size v =
-    if Int.(equal size zero) then true
+    if Int.equal size 0z then true
     else
       try
         let i = project_ival v in
@@ -936,7 +936,7 @@ module V_Offsetmap = struct
         if Integer.is_zero cardinal then Integer.one else cardinal
       in
       let cardinalf = CardinalEstimate.of_integer cardinal in
-      let repeat = Integer.(ediv (length start stop) size) in
+      let repeat = Integer.ediv (Integer.length start stop) size in
       (* If a value is "cut", we still count it as if it were whole. *)
       let repeat = Integer.(max repeat one) in
       let cardinalf_repeated = CardinalEstimate.power cardinalf repeat in

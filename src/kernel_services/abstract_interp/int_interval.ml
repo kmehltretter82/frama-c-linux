@@ -329,10 +329,13 @@ let widen ?(size=Integer.zero) ?(hint = Datatype.Integer.Set.empty) t1 t2 =
       else if Integer.is_zero size
       then hint
       else
+        (* Integer includes a function size so we rename it here to avoid
+           shadowing it. *)
+        let ssize = size in
         let limits =
-          Integer.[ neg (two_power (pred size));
-                    pred (two_power (pred size));
-                    pred (two_power size); ]
+          Integer.[ neg (two_power (pred ssize));
+                    pred (two_power (pred ssize));
+                    pred (two_power ssize); ]
         in
         Datatype.Integer.Set.(union hint (of_list limits))
     in
