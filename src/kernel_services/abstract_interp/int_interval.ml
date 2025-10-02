@@ -275,7 +275,7 @@ let compute_r_common r1 m1 r2 m2 =
 
        Thus k1*m1 = k2*m2 is a multiple of m1 and m2, i.e. is a multiple
        of ppcm(m1,m2). Thus x = y mod ppcm(m1,m2). *)
-    let ppcm = Integer.lcm m1 m2 in
+    let ppcm = Z.lcm m1 m2 in
     (* x may be bigger than the ppcm, we normalize it. *)
     (Int.erem x ppcm, ppcm)
 
@@ -315,7 +315,7 @@ let narrow = meet
 
 type widen_hint = Datatype.Integer.Set.t
 
-let widen ?(size=Integer.zero) ?(hint = Datatype.Integer.Set.empty) t1 t2 =
+let widen ?(size=Z.zero) ?(hint = Datatype.Integer.Set.empty) t1 t2 =
   if equal t1 t2 then t2
   else
     (* Add possible interval limits deducted from the bitsize *)
@@ -324,18 +324,18 @@ let widen ?(size=Integer.zero) ?(hint = Datatype.Integer.Set.empty) t1 t2 =
          This can (rarely) happen on structures or arrays that have been
          reinterpreted as one value by the offsetmaps. In this case, do not
          use limits, and do not create arbitrarily large integers. *)
-      if Integer.gt size 128z
+      if Z.gt size 128z
       then Datatype.Integer.Set.empty
-      else if Integer.is_zero size
+      else if Z.is_zero size
       then hint
       else
         (* Integer includes a function size so we rename it here to avoid
            shadowing it. *)
         let ssize = size in
         let limits =
-          Integer.[ neg (two_power (pred ssize));
-                    pred (two_power (pred ssize));
-                    pred (two_power ssize); ]
+          Z.[ neg (two_power (pred ssize));
+              pred (two_power (pred ssize));
+              pred (two_power ssize); ]
         in
         Datatype.Integer.Set.(union hint (of_list limits))
     in
@@ -378,7 +378,7 @@ let cardinal_less_than t n =
 let cardinal_zero_or_one t =
   match t.min, t.max with
   | None, _ | _, None -> false
-  | Some min, Some max -> Integer.equal min max
+  | Some min, Some max -> Z.equal min max
 
 (* TODO? *)
 let diff v _ = `Value v
@@ -414,12 +414,12 @@ let fold_enum f v acc =
 let to_seq ?(increasing=true) t =
   let start, is_before_last =
     match t.min, t.max with
-    | Some l, Some u -> if increasing then l, Integer.geq u else u, Integer.leq l
+    | Some l, Some u -> if increasing then l, Z.geq u else u, Z.leq l
     | Some l, None when increasing -> l, fun _ -> true (* Infinite sequence *)
     | None, Some u when not increasing -> u, fun _ -> true (* Infinite sequence *)
     | _ -> raise Error_Top
   in
-  let next = if increasing then Integer.add else Integer.sub in
+  let next = if increasing then Z.add else Z.sub in
   let rec aux i () =
     if is_before_last i
     then Seq.Cons (i, aux (next i t.modu))
@@ -624,7 +624,7 @@ let c_rem t1 t2 =
          | _ -> None)
       in
       (* Bound the result: no more than |x|, and no more than |y|-1 *)
-      let pos_rem = Integer.max (Int.abs min2) (Int.abs max2) in
+      let pos_rem = Z.max (Int.abs min2) (Int.abs max2) in
       let bound = Int.pred pos_rem in
       let bound = Option.fold ~some:(Int.min bound) ~none:bound max_x in
       (* Compute result bounds using sign information *)

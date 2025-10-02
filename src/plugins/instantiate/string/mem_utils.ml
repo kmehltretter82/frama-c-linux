@@ -25,7 +25,7 @@ let exp_type_of_pointed x =
   let no_cast = Cil.stripCasts x in
   if not (Ast_types.is_ptr (Cil.typeOf no_cast)) then
     match Cil.constFoldToInt x with
-    | Some t when Integer.(equal t (of_int 0)) ->
+    | Some t when Z.(equal t (of_int 0)) ->
       Of_null (Ast_types.direct_pointed_type (Cil.typeOf x))
     | _ ->
       No_pointed

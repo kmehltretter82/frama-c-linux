@@ -90,29 +90,29 @@ struct
   module Exp = Eva_ast.Exp
 
   type t =
-    | Const of Integer.t
-    | Exp of Eva_ast.exp * Integer.t (* x + c *)
-    | Ptroffset of Eva_ast.exp * Cil_types.offset * Integer.t (* (x - &b.offset) + c *)
+    | Const of Z.t
+    | Exp of Eva_ast.exp * Z.t (* x + c *)
+    | Ptroffset of Eva_ast.exp * Cil_types.offset * Z.t (* (x - &b.offset) + c *)
 
   let pretty fmt : t -> unit = function
-    | Const i -> Integer.pretty fmt i
-    | Exp (e,i) when Integer.is_zero i -> Exp.pretty fmt e
-    | Exp (e,i) when Integer.(lt i zero) ->
-      Format.fprintf fmt "%a - %a" Exp.pretty e Integer.pretty (Integer.neg i)
+    | Const i -> Z.pretty fmt i
+    | Exp (e,i) when Z.is_zero i -> Exp.pretty fmt e
+    | Exp (e,i) when Z.(lt i zero) ->
+      Format.fprintf fmt "%a - %a" Exp.pretty e Z.pretty (Z.neg i)
     | Exp (e,i) ->
-      Format.fprintf fmt "%a + %a" Exp.pretty e Integer.pretty i
+      Format.fprintf fmt "%a + %a" Exp.pretty e Z.pretty i
     | _ -> raise Not_implemented
 
   let hash : t -> int = function
-    | Const i -> Hashtbl.hash (1, Integer.hash i)
-    | Exp (e, i) -> Hashtbl.hash (2, Exp.hash e, Integer.hash i)
+    | Const i -> Hashtbl.hash (1, Z.hash i)
+    | Exp (e, i) -> Hashtbl.hash (2, Exp.hash e, Z.hash i)
     | Ptroffset _ -> raise Not_implemented
 
   let compare (b1 : t) (b2 : t) : int =
     match b1, b2 with
-    | Const i1, Const i2 -> Integer.compare i1 i2
+    | Const i1, Const i2 -> Z.compare i1 i2
     | Exp (e1, i1), Exp (e2, i2) ->
-      Exp.compare e1 e2 <?> lazy (Integer.compare i1 i2)
+      Exp.compare e1 e2 <?> lazy (Z.compare i1 i2)
     | Ptroffset _, Ptroffset _ -> raise Not_implemented
     | Const _, _ -> 1
     | _, Const _-> -1
@@ -121,13 +121,13 @@ struct
 
   let equal (b1 : t) (b2 : t) : bool =
     match b1, b2 with
-    | Const i1, Const i2 -> Integer.equal i1 i2
+    | Const i1, Const i2 -> Z.equal i1 i2
     | Exp (e1, i1), Exp (e2, i2) ->
-      Exp.equal e1 e2 && Integer.equal i1 i2
+      Exp.equal e1 e2 && Z.equal i1 i2
     | Ptroffset _, Ptroffset _ -> raise Not_implemented
     | _, _ -> false
 
-  let of_integer (i : Integer.t) : t =
+  let of_integer (i : Z.t) : t =
     Const i
 
   exception UnsupportedBoundExpression
@@ -137,26 +137,26 @@ struct
   let rec linearity vi (exp : Eva_ast.exp) =
     match exp.node with
     | Const _
-    | AddrOf _ | StartOf _ -> Integer.zero
+    | AddrOf _ | StartOf _ -> Z.zero
     | Lval {node = Var vi', NoOffset} ->
       if Var.equal  vi' vi
-      then Integer.one
-      else Integer.zero
+      then Z.one
+      else Z.zero
     | Lval _ -> raise UnsupportedBoundExpression
     | UnOp (Neg, e, _typ) ->
-      Integer.neg (linearity vi e)
+      Z.neg (linearity vi e)
     | UnOp (_, e, _typ) | CastE (_typ, e) ->
-      if Integer.is_zero (linearity vi e)
-      then Integer.zero
+      if Z.is_zero (linearity vi e)
+      then Z.zero
       else raise NonLinear
     | BinOp (op, e1, e2, _typ) ->
       let l1 = linearity vi e1 and l2 = linearity vi e2 in
       match op with
-      | PlusA|PlusPI -> Integer.add l1 l2
-      | MinusA|MinusPI -> Integer.sub l1 l2
+      | PlusA|PlusPI -> Z.add l1 l2
+      | MinusA|MinusPI -> Z.sub l1 l2
       | _ ->
-        if Integer.(is_zero l1 && is_zero l2)
-        then Integer.zero
+        if Z.(is_zero l1 && is_zero l2)
+        then Z.zero
         else raise NonLinear
 
   let check_support exp =
@@ -174,14 +174,14 @@ struct
         begin match Eva_ast.(fold_to_integer e1, fold_to_integer e2) with
           | None, Some i -> Exp (e1, i)
           | Some i, None -> Exp (e2, i)
-          | _ -> Exp (exp, Integer.zero)
+          | _ -> Exp (exp, Z.zero)
         end
       | BinOp ((MinusA|MinusPI), e1, e2, _typ) ->
         begin match Eva_ast.fold_to_integer e2 with
-          | Some i -> Exp (e1, Integer.neg i)
-          | None -> Exp (exp, Integer.zero)
+          | Some i -> Exp (e1, Z.neg i)
+          | None -> Exp (exp, Z.zero)
         end
-      | _ -> Exp (exp, Integer.zero)
+      | _ -> Exp (exp, Z.zero)
 
   let _of_ptr ~base_offset e =
     (* TODO: verify type compatibility between e and base_offset *)
@@ -200,20 +200,20 @@ struct
     | Const i -> Some i
     | Exp (e, i) ->
       begin try
-          Some (Integer.add (Int_val.project_int (oracle e)) i)
+          Some (Z.add (Int_val.project_int (oracle e)) i)
         with Ival.Not_Singleton_Int ->
           None
       end
     | Ptroffset _ -> raise Not_implemented
 
   let succ = function
-    | Const i -> Const (Integer.succ i)
-    | Exp (e, i) -> Exp (e, Integer.succ i)
+    | Const i -> Const (Z.succ i)
+    | Exp (e, i) -> Exp (e, Z.succ i)
     | Ptroffset _ -> raise Not_implemented
 
   let pred = function
-    | Const i -> Const (Integer.pred i)
-    | Exp (e, i) -> Exp (e, Integer.pred i)
+    | Const i -> Const (Z.pred i)
+    | Exp (e, i) -> Exp (e, Z.pred i)
     | Ptroffset _ -> raise Not_implemented
 
   let incr vi i b =
@@ -222,16 +222,16 @@ struct
       | Const _ -> Some b
       | Exp (e, j) ->
         let l = linearity vi e in
-        if Integer.is_zero l
+        if Z.is_zero l
         then Some b
-        else i |> Option.map (fun i -> Exp (e, Integer.(sub j (mul l i))))
+        else i |> Option.map (fun i -> Exp (e, Z.(sub j (mul l i))))
       | Ptroffset (e, base, j) ->
         let l = linearity vi e in
-        if Integer.is_zero l
+        if Z.is_zero l
         then Some b
         else
           i |> Option.map (fun i ->
-              Ptroffset (e, base, Integer.(sub j (mul l i))))
+              Ptroffset (e, base, Z.(sub j (mul l i))))
     with NonLinear -> None
 
   let incr_or_constantify ~oracle vi i b =
@@ -240,10 +240,10 @@ struct
     | None -> Option.map (fun c -> Const c) (to_integer ~oracle b)
 
   let cmp_int i1 i2 =
-    let r = Integer.sub i1 i2 in
-    if Integer.is_zero r
+    let r = Z.sub i1 i2 in
+    if Z.is_zero r
     then Equal
-    else if Integer.(lt r zero) then Lower else Greater
+    else if Z.(lt r zero) then Lower else Greater
 
   let cmp ~oracle b1 b2 =
     if b1 == b2
@@ -257,12 +257,12 @@ struct
         let i1 = to_int_val ~oracle b1 and i2 = to_int_val ~oracle b2 in
         let r = Int_val.(add i1 (neg i2)) in
         match Int_val.min_and_max r with
-        | Some min, Some max when Integer.is_zero min && Integer.is_zero max ->
+        | Some min, Some max when Z.is_zero min && Z.is_zero max ->
           Equal
-        | Some l, _ when Integer.(geq l zero) ->
-          if Integer.(gt l zero) then Greater else GreaterOrEqual
-        | _, Some u when Integer.(leq u zero) ->
-          if Integer.(lt u zero) then Lower else LowerOrEqual
+        | Some l, _ when Z.(geq l zero) ->
+          if Z.(gt l zero) then Greater else GreaterOrEqual
+        | _, Some u when Z.(leq u zero) ->
+          if Z.(lt u zero) then Lower else LowerOrEqual
         | _ -> Uncomparable
 
   let eq ?(oracle=no_oracle) b1 b2 =
@@ -293,14 +293,14 @@ struct
       let+ i1,i2 = Top.product
           (lower_integer ~oracle:(oracle Left) b1)
           (lower_integer ~oracle:(oracle Right) b2) in
-      Const (Integer.min i1 i2)
+      Const (Z.min i1 i2)
 
   let upper_bound ~oracle b1 b2 =
     if b1 == b2 || eq b1 b2 then `Value b1 else
       let+ i1,i2 = Top.product
           (upper_integer ~oracle:(oracle Left) b1)
           (upper_integer ~oracle:(oracle Right) b2) in
-      Const (Integer.max i1 i2)
+      Const (Z.max i1 i2)
 
   let lower_const ~oracle b =
     lower_integer ~oracle b >>-: of_integer
@@ -393,7 +393,7 @@ sig
   val update : oracle:oracle -> (submemory -> submemory or_bottom) ->
     t -> bound -> bound -> t or_top_bottom
   val incr_bound :
-    oracle:oracle -> Cil_types.varinfo -> Integer.t option -> t -> t or_top
+    oracle:oracle -> Cil_types.varinfo -> Z.t option -> t -> t or_top
   val map : (submemory -> submemory) -> t -> t
   val fold : (submemory -> 'a -> 'a) -> (bit -> 'b -> 'a) -> t -> 'b -> 'a
   val add_segmentation_bounds : oracle:oracle -> bound list -> t -> t

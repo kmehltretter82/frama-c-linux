@@ -43,7 +43,7 @@ module G = struct
         (Datatype.Option(Datatype.Integer)) (* upper bound, or +infty *)
     let pretty fmt (min, max: t) =
       match min, max with
-      | Some min, Some max when Integer.equal min max ->
+      | Some min, Some max when Z.equal min max ->
         Format.fprintf fmt "{%a}" Abstract_interp.Int.pretty min
       | _ ->
         let pp_bound sign fmt = function
@@ -53,28 +53,28 @@ module G = struct
         Format.fprintf fmt "[%a .. %a]" (pp_bound '-') min (pp_bound '+') max
 
     let inject_range n1 n2 : t =
-      Some (Integer.of_int (min n1 n2)), Some (Integer.of_int (max n1 n2))
+      Some (Z.of_int (min n1 n2)), Some (Z.of_int (max n1 n2))
 
     let enlarge i (b1, b2: t) : t =
-      (Option.map (Integer.min i) b1, Option.map (Integer.max i) b2)
+      (Option.map (Z.min i) b1, Option.map (Z.max i) b2)
 
     let lift fmin fmax (bmin1, bmax1: t) (bmin2, bmax2: t) : t =
       (opt2 fmin bmin1 bmin2, opt2 fmax bmax1 bmax2)
 
     let equal (bmin1, bmax1: t) (bmin2, bmax2: t) =
-      Option.equal Integer.equal bmin1 bmin2 &&
-      Option.equal Integer.equal bmax1 bmax2
+      Option.equal Z.equal bmin1 bmin2 &&
+      Option.equal Z.equal bmax1 bmax2
 
     let is_included (bmin1, bmax1: t) (bmin2, bmax2: t) =
       (match bmin1, bmin2 with
        | _, None -> true
        | None, Some _ -> false
-       | Some b1, Some b2 -> Integer.leq b2 b1)
+       | Some b1, Some b2 -> Z.leq b2 b1)
       &&
       (match bmax1, bmax2 with
        | _, None -> true
        | None, Some _ -> false
-       | Some b1, Some b2 -> Integer.leq b1 b2)
+       | Some b1, Some b2 -> Z.leq b1 b2)
 
     (* This function computes how much the bounds of [i2] have increased from
        those of [i1], i.e. [diff [1 .. 4]  [-2 .. 8]] is [-3 .. 4]
@@ -82,39 +82,39 @@ module G = struct
     let delta (i1: t) (i2: t) : t =
       let min1, max1 = i1 in
       let min2, max2 = i2 in
-      let delta_min = opt2 Integer.sub min2 min1 in
-      let delta_max = opt2 Integer.sub max2 max1 in
+      let delta_min = opt2 Z.sub min2 min1 in
+      let delta_max = opt2 Z.sub max2 max1 in
       (* we may need to reorder the pointwise subtractions. See the second
          example above. *)
-      let min = opt2 Integer.min delta_min delta_max in
-      let max = opt2 Integer.max delta_min delta_max in
+      let min = opt2 Z.min delta_min delta_max in
+      let max = opt2 Z.max delta_min delta_max in
       min, max
 
-    let join = lift Integer.min Integer.max
-    let add = lift Integer.add Integer.add
+    let join = lift Z.min Z.max
+    let add = lift Z.add Z.add
 
     let narrow (min1, max1: t) (min2, max2: t) : t or_bottom =
       let minb = match min1, min2 with
-        | Some i1, Some i2 -> Some (Integer.max i1 i2)
+        | Some i1, Some i2 -> Some (Z.max i1 i2)
         | None, i | i, None -> i
       in
       let maxb = match max1, max2 with
-        | Some i1, Some i2 -> Some (Integer.min i1 i2)
+        | Some i1, Some i2 -> Some (Z.min i1 i2)
         | None, i | i, None -> i
       in
       match minb, maxb with
-      | Some min, Some max when Integer.lt max min -> `Bottom
+      | Some min, Some max when Z.lt max min -> `Bottom
       | min, max -> `Value (min, max)
 
     let succ (b1, b2: t): t =
-      (Option.map Integer.succ b1, Option.map Integer.succ b2)
+      (Option.map Z.succ b1, Option.map Z.succ b2)
 
     let neg (bmin, bmax: t) : t =
-      Option.map Integer.neg bmax, Option.map Integer.neg bmin
+      Option.map Z.neg bmax, Option.map Z.neg bmin
 
     let mul_ct k (bmin, bmax: t) : t =
-      let mul = Integer.mul k in
-      if Integer.leq k Integer.zero then
+      let mul = Z.mul k in
+      if Z.leq k Z.zero then
         Option.map mul bmax, Option.map mul bmin
       else
         Option.map mul bmin, Option.map mul bmax
@@ -124,7 +124,7 @@ module G = struct
       let mul_inf = function
         | None -> None
         | Some i as v ->
-          if Integer.equal i Integer.zero then v else None
+          if Z.equal i Z.zero then v else None
       in
       (* b2 * bmin1 *)
       let mulmin = match bmin1 with
@@ -138,7 +138,7 @@ module G = struct
       in
       join mulmin mulmax
 
-    let zero = Some Integer.zero, Some Integer.zero
+    let zero = Some Z.zero, Some Z.zero
 
     (* Widening between two bounds. Unstable bounds are widened to infty
        aggressively, unless [threshold] is supplied. This widening
@@ -146,7 +146,7 @@ module G = struct
        widening of Ival. *)
     let widen ?threshold (min1, max1: t) (min2, max2: t) : t =
       let widen_unstable_min b1 b2 =
-        if Option.equal Integer.equal b1 b2 then b1 else None
+        if Option.equal Z.equal b1 b2 then b1 else None
       in
       let widen_unstable_max b1 b2 =
         match threshold with
@@ -156,8 +156,8 @@ module G = struct
           match b1, b2 with
           | None, _ | _, None -> None
           | Some ib1, Some ib2 ->
-            if Integer.equal ib1 ib2 then b1
-            else if Integer.leq ib1 n && Integer.leq ib2 n then Some n
+            if Z.equal ib1 ib2 then b1
+            else if Z.leq ib1 n && Z.leq ib2 n then Some n
             else None
       in
       (widen_unstable_min min1 min2, widen_unstable_max max1 max2)
@@ -167,35 +167,35 @@ module G = struct
 
     type classify =
       | ContainsZero
-      | Positive (* strictly *) of Integer.t * Integer.t option
-      | Negative (* strictly *) of Integer.t option * Integer.t
+      | Positive (* strictly *) of Z.t * Z.t option
+      | Negative (* strictly *) of Z.t option * Z.t
 
     let classify_sign (min, max: t) =
       match min, max with
       | None, None -> ContainsZero
       | Some min, Some max ->
-        if Integer.gt min Integer.zero
+        if Z.gt min Z.zero
         then Positive (min, Some max)
-        else if Integer.lt max Integer.zero
+        else if Z.lt max Z.zero
         then Negative (Some min, max)
         else ContainsZero
       | Some min, max ->
-        if Integer.gt min Integer.zero
+        if Z.gt min Z.zero
         then Positive (min, max)
         else ContainsZero
       | min, Some max ->
-        if Integer.lt max Integer.zero
+        if Z.lt max Z.zero
         then Negative (min, max)
         else ContainsZero
 
     let div_towards_minus_infty x y =
-      if Integer.gt y Integer.zero
-      then Integer.ediv x y
-      else Integer.(ediv (neg x) (neg y))
+      if Z.gt y Z.zero
+      then Z.ediv x y
+      else Z.(ediv (neg x) (neg y))
     let div_towards_plus_infty x y =
-      if Integer.lt y Integer.zero
-      then Integer.ediv x y
-      else Integer.(ediv (neg x) (neg y))
+      if Z.lt y Z.zero
+      then Z.ediv x y
+      else Z.(ediv (neg x) (neg y))
 
     (* Computes the possible [n] such that [(add b)^n = r], when [f^n]
        is [f] consecutive applications of [f]. *)
@@ -213,41 +213,41 @@ module G = struct
                          is possible *)
               None
             | Some maxr ->
-              if Integer.gt maxr Integer.zero then
+              if Z.gt maxr Z.zero then
                 Some (div_towards_minus_infty maxr minb)
               else
-                Some Integer.zero (* each iteration pulls us away *)
+                Some Z.zero (* each iteration pulls us away *)
           end
         | Negative (_minb, maxb) -> begin
             (* Symmetric case *)
             match fst r with
             | None -> None
             | Some minr ->
-              if Integer.lt minr Integer.zero then
+              if Z.lt minr Z.zero then
                 Some (div_towards_minus_infty minr maxb)
               else
-                Some Integer.zero
+                Some Z.zero
           end
       in
       let nb_min =
         match classify_sign r with
         | ContainsZero ->
-          Some Integer.zero (* already reached with 0 iterations *)
+          Some Z.zero (* already reached with 0 iterations *)
         | Positive (minr, _maxr) -> begin
             match snd b with
             | None -> (* max increment is variable, we cannot derive a bound *)
-              Some Integer.zero
+              Some Z.zero
             | Some maxb ->
-              if Integer.gt maxb Integer.zero then
+              if Z.gt maxb Z.zero then
                 Some (div_towards_plus_infty minr maxb)
               else
                 None (* bottom. Not currently returned *)
           end
         | Negative (_minr, maxr) -> begin (* symmetric *)
             match fst b with
-            | None -> Some Integer.zero
+            | None -> Some Z.zero
             | Some minb ->
-              if Integer.lt minb Integer.zero then
+              if Z.lt minb Z.zero then
                 Some (div_towards_plus_infty maxr minb)
               else
                 None
@@ -451,7 +451,7 @@ module G = struct
              - use the max of those values as threshold. *)
           let (min, max as w) = Bounds.widen i1.nb i2.nb in
           (* Limit min bound to 0 *)
-          if min = None then (Some Integer.zero, max) else w
+          if min = None then (Some Z.zero, max) else w
         else
           Bounds.join i1.nb i2.nb
       in
@@ -647,13 +647,13 @@ module G = struct
         (* Normalizes the initial values [ct1] according to the coefficients
            computed in [m2] *)
         let ct1 = remove_coeffs m2.coeffs i1 ct1 in
-        let nb = Bounds.enlarge (Integer.of_int i1) m2.nb in
+        let nb = Bounds.enlarge (Z.of_int i1) m2.nb in
         let ii = MultipleIterations { m2 with nb } in
         ct1, ct2, (stmt1, ii) :: q, true
 
       | MultipleIterations m1, PreciseIteration i2 ->
         let ct2 = remove_coeffs m1.coeffs i2 ct2 in
-        let nb = Bounds.enlarge (Integer.of_int i2) m1.nb in
+        let nb = Bounds.enlarge (Z.of_int i2) m1.nb in
         let ii = MultipleIterations { m1 with nb } in
         ct1, ct2, (stmt1, ii) :: q, true
 
@@ -954,7 +954,7 @@ module G = struct
            Cil_datatype.Typ.equal typ vi.vtype &&
            Ival.is_zero o &&
            (match loc.Locations.size with
-            | Int_Base.Value size -> Integer.equal size (Integer.succ max)
+            | Int_Base.Value size -> Z.equal size (Z.succ max)
             | Int_Base.Top -> false)
         then b
         else raise Untranslatable
@@ -979,7 +979,7 @@ module G = struct
   let translate_exp state to_loc to_v e =
     let ptr_size e =
       let typ_pointed = Ast_types.direct_pointed_type e.typ in
-      try Integer.of_int (Cil.bytesSizeOf typ_pointed)
+      try Z.of_int (Cil.bytesSizeOf typ_pointed)
       with Cil.SizeOfError _ -> raise Untranslatable
     in
     (* This function translates the expression as a precise gauge. For any

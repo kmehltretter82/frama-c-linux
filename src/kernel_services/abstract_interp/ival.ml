@@ -192,9 +192,9 @@ let cardinal_estimate v ~size =
     then Int.one
     else
       let bits_of_float =
-        if Integer.equal size 32z
+        if Z.equal size 32z
         then Fval.bits_of_float32_list
-        else if Integer.equal size 64z
+        else if Z.equal size 64z
         then Fval.bits_of_float64_list
         else (fun _ -> [Int.zero, Int.pred (Int.two_power size)])
       in
@@ -226,7 +226,7 @@ let inject_interval ~min ~max ~rem ~modu =
 let subdivide ~size = function
   | Bottom -> raise Can_not_subdiv
   | Float fval ->
-    let fkind = match Integer.to_int size with
+    let fkind = match Z.to_int size with
       | 32 -> Fval.Single
       | 64 -> Fval.Double
       | _ -> raise Can_not_subdiv (* see Value/Value#105 *)
@@ -291,7 +291,7 @@ let widen ?size ?hint t1 t2 =
     | Float f2 ->
       let f1 = project_float t1 in
       let prec =
-        match Option.bind Integer.to_int_opt size with
+        match Option.bind Z.to_int_opt size with
         | Some 32 -> Float_sig.Single
         | Some 64 -> Float_sig.Double
         | Some 128 -> Float_sig.Long_Double
@@ -610,7 +610,7 @@ let backward_mult_pos_left min_right max_right result =
   inject_range min_left max_left
 
 let backward_mult_neg_left min_right max_right result =
-  backward_mult_pos_left (Integer.neg max_right) (Infty.neg min_right) (neg_int result)
+  backward_mult_pos_left (Z.neg max_right) (Infty.neg min_right) (neg_int result)
 
 let backward_mult_int_left ~right ~result =
   match min_and_max right with
@@ -872,7 +872,7 @@ let cast_int_to_float_inverse_not_nan ~single_precision (min, max) =
        values on each extremity. *)
     let min = ceil min in
     let max = floor max in
-    let conv f = try  Some (Integer.of_float f) with Z.Overflow -> None in
+    let conv f = try  Some (Z.of_float f) with Z.Overflow -> None in
     let r = inject_range (conv min) (conv max) in
     (* Kernel.result "Cast I->F inv:  %a -> %a@." pretty f pretty r; *)
     r
@@ -918,7 +918,7 @@ let reinterpret_as_float kind i =
     let reinterpret size kind format conv =
       let minf, maxf = Typed_float.finite_range_of ~format in
       let min_f, max_f = Typed_float.(bits_encoding minf, bits_encoding maxf) in
-      let size = Integer.of_int size in
+      let size = Z.of_int size in
       let i = cast_int_to_int ~size ~signed:true i in
       (* Intersect [i'] with [i], and return the (finite) bounds directly. *)
       let bounds_narrow i' =
@@ -934,7 +934,7 @@ let reinterpret_as_float kind i =
       let s_s_max_f = Int.succ s_max_f (* first 'positive' NaN *) in
       let s_s_min_f = Int.succ s_min_f (* first 'negative' NaN  *) in
       (* positive floats *)
-      let f_pos = inject_range (Some Integer.zero) (Some s_max_f) in
+      let f_pos = inject_range (Some Z.zero) (Some s_max_f) in
       (* negative floats *)
       let f_neg = inject_range None (Some s_min_f) in
       (* 'positive' NaNs *)

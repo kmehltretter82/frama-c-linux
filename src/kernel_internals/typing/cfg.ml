@@ -412,10 +412,10 @@ let xform_switch_block ?(keepSwitch=false) b =
                 let suffix =
                   match isInteger e with
                   | Some value ->
-                    if Integer.lt value Integer.zero then
-                      "neg_" ^ Integer.to_string (Integer.neg value)
+                    if Z.lt value Z.zero then
+                      "neg_" ^ Z.to_string (Z.neg value)
                     else
-                      Integer.to_string value
+                      Z.to_string value
                   | None ->
                     "exp"
                 in
@@ -564,7 +564,7 @@ let xform_switch_block ?(keepSwitch=false) b =
                     let pred =
                       match ce.enode with
                         Const (CInt64 (z,_,_))
-                        when Integer.equal z Integer.zero
+                        when Z.equal z Z.zero
                         ->
                         new_exp ~loc:ce.eloc (UnOp(LNot,e,Cil_const.intType))
                       | _ ->

@@ -136,7 +136,7 @@ struct
     | Compose cc -> pc fmt cc
     | Multi _ -> ()
   and pc fmt = function
-    | Tactical.Cint k -> Integer.pretty fmt k
+    | Tactical.Cint k -> Z.pretty fmt k
     | Range(a,b) -> Format.fprintf fmt "%d..%d" a b
     | Code(_,f,[]) -> Format.fprintf fmt "%s()" f
     | Code(_,f,x::xs) ->

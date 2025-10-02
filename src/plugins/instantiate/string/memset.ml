@@ -98,11 +98,11 @@ let generate_requires loc ptr value len =
       let low, up = match Ast_types.unroll_logic value.term_type with
         | Ctype { tnode = TInt ((IChar|ISChar|IUChar) as kind) } ->
           let bits = bitsSizeOfInt kind in
-          let plus_one = Integer.(add one) in
+          let plus_one = Z.(add one) in
           let low, up = if (isSigned kind) then
               (min_signed_number bits), (plus_one (max_signed_number bits))
             else
-              Integer.zero, (plus_one (max_unsigned_number bits))
+              Z.zero, (plus_one (max_unsigned_number bits))
           in
           let integer ?loc i = term ?loc (TConst (Integer (i, None))) Linteger in
           (integer ~loc low), (integer ~loc up)
@@ -161,8 +161,8 @@ let generate_spec (_t, e) loc { svar = vi } =
 let memset_value e =
   let ff = 255z in
   match (Cil.constFold false e).enode with
-  | Const(CInt64(ni, _, _)) when Integer.is_zero ni -> Some 0
-  | Const(CInt64(ni, _, _)) when Integer.equal ni ff -> Some 255
+  | Const(CInt64(ni, _, _)) when Z.is_zero ni -> Some 0
+  | Const(CInt64(ni, _, _)) when Z.equal ni ff -> Some 255
   | _ -> None
 
 let rec contains_union_type t =

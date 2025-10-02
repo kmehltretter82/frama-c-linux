@@ -323,7 +323,7 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
     let guard =
       match t2.term_node with
       | TBinOp (PlusA, t2_minus_one, {term_node = TConst(Integer (n, _))}) when
-          Integer.is_one n ->
+          Z.is_one n ->
         Logic_const.term ~loc
           (TBinOp(Le, tlv, t2_minus_one))
           Linteger

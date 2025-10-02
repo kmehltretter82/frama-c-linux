@@ -48,7 +48,7 @@ let of_string s =
   | _ ->
     let r = Str.regexp ":" in
     let conv s =
-      try Integer.of_string s
+      try Z.of_string s
       with Invalid_argument _ ->
         raise (Self.Cannot_build ("unknown split strategy " ^ s))
     in

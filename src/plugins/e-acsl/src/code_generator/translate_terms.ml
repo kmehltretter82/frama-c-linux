@@ -60,16 +60,16 @@ let constant_to_exp ~loc env t c =
     (match ity with
      | Nan -> assert false
      | Real -> Error.not_yet "real number constant"
-     | Rational -> mk_real (Integer.to_string n)
+     | Rational -> mk_real (Z.to_string n)
      | Gmpz ->
        Cil.mkAddrOrStartOf ~loc
          (Cil.var
             (Globals.Vars.add_string_literal ~loc
-               (Str (Integer.to_string n)))),
+               (Str (Z.to_string n)))),
        Analyses_types.Str_Z
      (* too large integer *)
      | C_float fkind ->
-       Cil.kfloat ~loc fkind (Int64.to_float (Integer.to_int64 n)), C_number
+       Cil.kfloat ~loc fkind (Int64.to_float (Z.to_int64 n)), C_number
      | C_integer kind ->
        let cast = Typing.get_cast ~logic_env t in
        match cast, kind with
@@ -78,10 +78,10 @@ let constant_to_exp ~loc env t c =
          Cil.mkAddrOrStartOf ~loc
            (Cil.var
               (Globals.Vars.add_string_literal ~loc
-                 (Str (Integer.to_string n)))),
+                 (Str (Z.to_string n)))),
          Analyses_types.Str_Z
        | Some ty, _ when Gmp_types.Q.is_t ty ->
-         mk_real (Integer.to_string n)
+         mk_real (Z.to_string n)
        | (None | Some _), _ ->
          (* do not keep the initial string representation because the generated
             constant must reflect its type computed by the type system. For

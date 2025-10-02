@@ -30,12 +30,12 @@ type selection =
   | Multi of selection list
 
 and compose = private
-  | Cint of Integer.t
+  | Cint of Z.t
   | Range of int * int
   | Code of term * string * selection list
 
 val int : int -> selection
-val cint : Integer.t -> selection
+val cint : Z.t -> selection
 val range : int -> int -> selection
 val compose : string -> selection list -> selection
 val multi : selection list -> selection

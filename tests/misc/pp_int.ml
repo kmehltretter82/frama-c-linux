@@ -1,5 +1,5 @@
 (* -------------------------------------------------------------------------- *)
-(* --- Test for Integer.pp_int and Integer.pp_hex                         --- *)
+(* --- Test for Z.pp_int and Z.pp_hex                                     --- *)
 (* -------------------------------------------------------------------------- *)
 
 let pp_bin_naive ~sep fmt x =
@@ -26,15 +26,15 @@ let pp_bar fmt c =
 
 let testvalue ~nbits ~sep ~tbin ~thex fmt x =
   begin
-    let v = Integer.of_int x in
-    let v2 = Integer.(lognot v) in
+    let v = Z.of_int x in
+    let v2 = Z.(lognot v) in
     pp_bar fmt '-' ;
     Format.fprintf fmt "value   '%d' '%x'@\n" x x ;
     Format.fprintf fmt "refhex  '%a'@\n" (pp_hex_naive ~sep) x ;
-    Format.fprintf fmt "pp_hex  '%s%a'@\n" thex (Integer.pp_hex ~nbits ~sep) v ;
+    Format.fprintf fmt "pp_hex  '%s%a'@\n" thex (Z.pp_hex ~nbits ~sep) v ;
     Format.fprintf fmt "refbin  '%a'@\n" (pp_bin_naive ~sep) x ;
-    Format.fprintf fmt "pp_bin  '%s%a'@\n" tbin (Integer.pp_bin ~nbits ~sep) v ;
-    Format.fprintf fmt "pp_neg  '%s%a'@\n" tbin (Integer.pp_bin ~nbits ~sep) v2 ;
+    Format.fprintf fmt "pp_bin  '%s%a'@\n" tbin (Z.pp_bin ~nbits ~sep) v ;
+    Format.fprintf fmt "pp_neg  '%s%a'@\n" tbin (Z.pp_bin ~nbits ~sep) v2 ;
   end
 
 let testdata data fmt =

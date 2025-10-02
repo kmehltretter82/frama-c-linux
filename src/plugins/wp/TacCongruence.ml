@@ -11,10 +11,10 @@ open Qed.Logic
 
 (* Only integer patterns *)
 type pattern =
-  | IMUL_K of Integer.t * F.term
-  | IDIV_K of F.term * Integer.t
+  | IMUL_K of Z.t * F.term
+  | IDIV_K of F.term * Z.t
   | QDIV of F.term * F.term
-  | Ival of F.term * Integer.t option
+  | Ival of F.term * Z.t option
   | Rval of F.term
 
 let pattern e =
@@ -25,7 +25,7 @@ let pattern e =
   | Div(a,b) when F.is_int e ->
     begin match F.repr b with
       | Kint k ->
-        if Integer.(equal k zero) then raise Not_found ;
+        if Z.(equal k zero) then raise Not_found ;
         IDIV_K(a,k)
       | _ -> Ival(e,None)
     end
@@ -35,11 +35,11 @@ let pattern e =
       raise Not_found
 (*
 let pp_pattern fmt = function
-  | Ival(_,Some z) -> Format.fprintf fmt "(%s : constant)" (Integer.to_string z)
+  | Ival(_,Some z) -> Format.fprintf fmt "(%s : constant)" (Z.to_string z)
   | Ival(e,None) -> Format.fprintf fmt "@[<hov 2>(%a : int)@]" F.pp_term e
   | Rval e -> Format.fprintf fmt "@[<hov 2>(%a : real)@]" F.pp_term e
-  | IMUL_K(k,e) -> Format.fprintf fmt "@[<hov 2>%s.(%a : int)@]" (Integer.to_string k) F.pp_term e
-  | IDIV_K(e,k) -> Format.fprintf fmt "@[<hov 2>(%a : int)/%s@]" F.pp_term e (Integer.to_string k)
+  | IMUL_K(k,e) -> Format.fprintf fmt "@[<hov 2>%s.(%a : int)@]" (Z.to_string k) F.pp_term e
+  | IDIV_K(e,k) -> Format.fprintf fmt "@[<hov 2>(%a : int)/%s@]" F.pp_term e (Z.to_string k)
   | QDIV(a,b) -> Format.fprintf fmt "@[<hov 2>(%a : real)@,/(%a : real)@]" F.pp_term a F.pp_term b
 *)
 
@@ -49,7 +49,7 @@ let to_term = function
   | QDIV(a,b) -> F.e_div a b
   | Ival(e,_) | Rval e -> e
 
-let pdiv a b = let k = Integer.div a b in Ival(F.e_zint k,Some k)
+let pdiv a b = let k = Z.div a b in Ival(F.e_zint k,Some k)
 
 let nzero x = F.p_neq F.e_zero x
 let positive x = F.p_lt F.e_zero x
@@ -58,9 +58,9 @@ let negative x = F.p_lt x F.e_zero
 type cmp = LEQ | LT | EQ
 
 let icmp cmp a b = match cmp with
-  | LEQ -> Integer.leq a b
-  | LT -> Integer.lt a b
-  | EQ -> Integer.equal a b
+  | LEQ -> Z.leq a b
+  | LT -> Z.lt a b
+  | EQ -> Z.equal a b
 
 let fcmp cmp a b = match cmp with
   | LEQ -> F.p_leq a b
@@ -88,39 +88,39 @@ let compare_div cmp a b g =
 let rec compare cmp a b =
   match a, b with
   | IMUL_K( k,a ) , Ival(_,Some n) ->
-    if Integer.(lt zero k) then compare cmp (pattern a) (pdiv n k) else
-    if Integer.(lt k zero) then compare cmp (pdiv n k) (pattern a) else
-    if icmp cmp Integer.zero n then F.p_true else F.p_false
+    if Z.(lt zero k) then compare cmp (pattern a) (pdiv n k) else
+    if Z.(lt k zero) then compare cmp (pdiv n k) (pattern a) else
+    if icmp cmp Z.zero n then F.p_true else F.p_false
   | Ival(_,Some n) , IMUL_K( k,a ) ->
-    if Integer.(lt zero k) then compare cmp (pdiv n k) (pattern a) else
-    if Integer.(lt k zero) then compare cmp (pattern a) (pdiv n k) else
-    if icmp cmp Integer.zero n then F.p_true else F.p_false
+    if Z.(lt zero k) then compare cmp (pdiv n k) (pattern a) else
+    if Z.(lt k zero) then compare cmp (pattern a) (pdiv n k) else
+    if icmp cmp Z.zero n then F.p_true else F.p_false
   | IDIV_K( a,k ) , Ival(b,_) ->
-    if Integer.(lt zero k) then
+    if Z.(lt zero k) then
       let c = F.e_times k (F.e_add b F.e_one) in
       fcmp cmp a c
     else
-    if Integer.(lt k zero) then
+    if Z.(lt k zero) then
       let c = F.e_times k (F.e_sub b F.e_one) in
       fcmp cmp c a
     else
       raise Not_found
   | Ival(a,_) , IDIV_K( b,k ) ->
-    if Integer.(lt zero k) then
+    if Z.(lt zero k) then
       let c = F.e_times k (F.e_sub a F.e_one) in
       fcmp cmp c b
     else
-    if Integer.(lt k zero) then
+    if Z.(lt k zero) then
       let c = F.e_times k (F.e_add a F.e_one) in
       fcmp cmp b c
     else
       raise Not_found
   | IDIV_K( a,p ) , IDIV_K( b,q ) when
-      not Integer.(equal p zero) &&
-      not Integer.(equal q zero) ->
-    let g = Integer.gcd (Integer.abs p) (Integer.abs q) in
-    let ka = Integer.ediv p g in
-    let kb = Integer.ediv q g in
+      not Z.(equal p zero) &&
+      not Z.(equal q zero) ->
+    let g = Z.gcd (Z.abs p) (Z.abs q) in
+    let ka = Z.ediv p g in
+    let kb = Z.ediv q g in
     compare_div cmp (F.e_times ka a) (F.e_times kb b) (F.e_zint g)
 
   | QDIV(a,u) , QDIV(b,v) -> compare_ratio cmp a u b v
@@ -136,22 +136,22 @@ let rec equal eq a b =
   match a , b with
   | IMUL_K( k,a ) , Ival(_,Some n)
   | Ival(_,Some n) , IMUL_K( k,a ) ->
-    let r = Integer.rem k n in
-    if Integer.equal r Integer.zero then
+    let r = Z.rem k n in
+    if Z.equal r Z.zero then
       equal eq (pattern a) (pdiv n k)
     else
       eq F.e_one F.e_zero
   | IMUL_K( k,a ) , IMUL_K( k',b ) ->
-    let r = Integer.gcd k k' in
-    eq (F.e_times (Integer.div k r) a)
-      (F.e_times (Integer.div k' r) b)
+    let r = Z.gcd k k' in
+    eq (F.e_times (Z.div k r) a)
+      (F.e_times (Z.div k' r) b)
 
   | IDIV_K( a,p ) , IDIV_K( b,q ) when
-      not Integer.(equal p zero) &&
-      not Integer.(equal q zero) ->
-    let g = Integer.gcd (Integer.abs p) (Integer.abs q) in
-    let ka = Integer.ediv p g in
-    let kb = Integer.ediv q g in
+      not Z.(equal p zero) &&
+      not Z.(equal q zero) ->
+    let g = Z.gcd (Z.abs p) (Z.abs q) in
+    let ka = Z.ediv p g in
+    let kb = Z.ediv q g in
     compare_div EQ (F.e_times ka a) (F.e_times kb b) (F.e_zint g)
 
   | QDIV(a,u) , QDIV(b,v) -> eq_ratio eq a u b v

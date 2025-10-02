@@ -168,7 +168,7 @@ let rewrite_length e =
 let match_natural k =
   match F.repr k with
   | L.Kint z ->
-    let k = try Integer.to_int z with Z.Overflow -> raise Not_found in
+    let k = try Z.to_int z with Z.Overflow -> raise Not_found in
     if 0 <= k then k else raise Not_found
   | _ -> raise Not_found
 
@@ -203,10 +203,10 @@ and get_nth_repeat k x n f =
   if n = 0 then raise Not_found ;
   let m = match_natural (rewrite_length x) in
   if m = 0 then raise Not_found ;
-  let en = Integer.of_int n in
-  let em = Integer.of_int m in
-  let ek = Integer.of_int k in
-  if Integer.(geq ek (mul en em)) then f (k -(n*m))
+  let en = Z.of_int n in
+  let em = Z.of_int m in
+  let ek = Z.of_int k in
+  if Z.(geq ek (mul en em)) then f (k -(n*m))
   else get_nth (k mod m) x
 
 let rewrite_nth s k =

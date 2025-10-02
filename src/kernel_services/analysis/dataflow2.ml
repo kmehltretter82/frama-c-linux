@@ -401,7 +401,7 @@ module Forwards(T : ForwardsTransfer) = struct
             let exp = match exp_case.enode with
               (* This helps when switch is used on boolean expressions. *)
               | Const (CInt64 (z,_,_))
-                when Integer.equal z Integer.zero ->
+                when Z.equal z Z.zero ->
                 new_exp ~loc:exp_sw.eloc (UnOp(LNot,exp_sw,Cil_const.intType))
               | _ ->
                 Cil.new_exp ~loc:exp_case.eloc

@@ -359,8 +359,8 @@ val string: string Type.t
 module Formatter: S with type t = Format.formatter
 val formatter: Format.formatter Type.t
 
-module Integer: S_with_collections with type t = Integer.t
-val integer: Integer.t Type.t
+module Integer: S_with_collections with type t = Z.t
+val integer: Z.t Type.t
 
 module Rational: S_with_collections with type t = Q.t
 val rational : Rational.t Type.t

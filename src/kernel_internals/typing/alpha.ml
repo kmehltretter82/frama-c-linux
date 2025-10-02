@@ -22,7 +22,7 @@ let alphaSeparator = '_'
     (to start searching for a fresh name) and the list
  * of suffixes, each with some data associated with the newAlphaName that
  * created the suffix. *)
-type 'a alphaTableData = Integer.t * (Integer.t * 'a) list
+type 'a alphaTableData = Z.t * (Z.t * 'a) list
 
 type 'a undoAlphaElement =
     AlphaChangedSuffix of 'a alphaTableData ref * 'a alphaTableData (* The
@@ -93,7 +93,7 @@ let splitNameForAlpha ~(lookupname: string) =
      String.sub lookupname startSuffix (len - startSuffix))
   end
 
-let make_suffix n = (String.make 1 alphaSeparator) ^ (Integer.to_string n)
+let make_suffix n = (String.make 1 alphaSeparator) ^ (Z.to_string n)
 
 let make_full_suffix infix n = infix ^ make_suffix n
 
@@ -104,24 +104,24 @@ let make_full_suffix infix n = infix ^ make_suffix n
 *)
 let find_unused_suffix min infix sibling l =
   let rec aux v =
-    if List.exists (fun (n,_) -> Integer.equal n v) l
+    if List.exists (fun (n,_) -> Z.equal n v) l
     || H.mem sibling (make_full_suffix infix v)
     then begin
       Kernel.debug ~dkey:Kernel.dkey_alpha
         "%s is already taken" (make_full_suffix infix v);
-      aux (Integer.succ v)
+      aux (Z.succ v)
     end else v
   in aux min
 
 let get_suffix_idx rename_mode infix =
   match rename_mode with
-  | Add_new_suffix -> infix, Integer.minus_one
-  | Incr_last_suffix when infix = "" -> infix, Integer.minus_one
+  | Add_new_suffix -> infix, Z.minus_one
+  | Incr_last_suffix when infix = "" -> infix, Z.minus_one
   | Incr_last_suffix ->
     (* by construction there is at least one alphaSeparator in the infix *)
     let idx = String.rindex infix alphaSeparator in
     String.sub infix 0 idx,
-    Integer.of_string
+    Z.of_string
       (String.sub infix (idx + 1) (String.length infix - idx - 1))
 
 (* Create a new name based on a given name. The new name is formed from a
@@ -143,7 +143,7 @@ let alphaWorker      ~(alphaTable: 'a alphaTable)
   let infix, curr_idx = get_suffix_idx rename_mode infix in
   Kernel.debug ~dkey:Kernel.dkey_alpha
     "Alpha worker: lookupname=%s prefix=%s infix=%s index=%s create=%B."
-    lookupname prefix infix (Integer.to_string curr_idx) make_new;
+    lookupname prefix infix (Z.to_string curr_idx) make_new;
   let newname, (olddata: 'a) =
     try
       let infixes = H.find alphaTable prefix in
@@ -151,15 +151,15 @@ let alphaWorker      ~(alphaTable: 'a alphaTable)
       let min, suffixes = !rc in
       (* We have seen this prefix *)
       Kernel.debug ~dkey:Kernel.dkey_alpha "Old min %s. Old suffixes: @[%a@]"
-        (Integer.to_string min)
+        (Z.to_string min)
         (Pretty_utils.pp_list
-           (fun fmt (s,_) -> Format.fprintf fmt "%s" (Integer.to_string s)))
+           (fun fmt (s,_) -> Format.fprintf fmt "%s" (Z.to_string s)))
         suffixes;
       (* Save the undo info *)
       Option.iter (fun l -> l := AlphaChangedSuffix (rc, !rc) :: !l) undolist;
       let newname, newmin, (olddata: 'a), newsuffixes =
         match
-          List.filter (fun (n, _) -> Integer.equal n curr_idx) suffixes
+          List.filter (fun (n, _) -> Z.equal n curr_idx) suffixes
         with
         | [] -> (* never seen this index before *)
           lookupname, min, data, (curr_idx, data) :: suffixes
@@ -169,7 +169,7 @@ let alphaWorker      ~(alphaTable: 'a alphaTable)
              but select the first available index available *)
           if make_new then begin
             let newmin =
-              find_unused_suffix (Integer.succ min) infix infixes suffixes
+              find_unused_suffix (Z.succ min) infix infixes suffixes
             in
             let newsuffix = make_suffix newmin in
             let newinfix = make_full_suffix infix newmin in
@@ -180,7 +180,7 @@ let alphaWorker      ~(alphaTable: 'a alphaTable)
             in
             H.add
               infixes newinfix
-              (ref (Integer.minus_one, [(Integer.minus_one, data)]));
+              (ref (Z.minus_one, [(Z.minus_one, data)]));
             Option.iter (fun l -> l := AlphaAddedSuffix (prefix, newsuffix) :: !l) undolist;
             base ^ newsuffix, newmin, l, (newmin, data) :: suffixes
           end else lookupname, min, data, suffixes
@@ -198,7 +198,7 @@ let alphaWorker      ~(alphaTable: 'a alphaTable)
             let h = H.create 3 in H.add alphaTable prefix h; h
         in
         H.add infixes infix
-          (ref (Integer.minus_one, [ (curr_idx, data) ]));
+          (ref (Z.minus_one, [ (curr_idx, data) ]));
         Kernel.debug ~dkey:Kernel.dkey_alpha " First seen. ";
         lookupname, data  (* Return the original name *)
       end

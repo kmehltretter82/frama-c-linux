@@ -30,8 +30,8 @@ val is_bottom_offset : precise_offset -> bool
 
 val imprecise_offset : precise_offset -> Ival.t
 
-(*val _scale_offset : Integer.t -> precise_offset -> precise_offset*)
-val shift_offset_by_singleton : Integer.t -> precise_offset -> precise_offset
+(*val _scale_offset : Z.t -> precise_offset -> precise_offset*)
+val shift_offset_by_singleton : Z.t -> precise_offset -> precise_offset
 val shift_offset : Ival.t -> precise_offset -> precise_offset
 
 

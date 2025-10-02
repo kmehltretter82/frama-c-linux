@@ -61,7 +61,7 @@ module PLoc = struct
     | Precise offset ->
       begin try
           let field = fst (Cil.fieldBitsOffset field) in
-          let field_i = Integer.of_int field in
+          let field_i = Z.of_int field in
           Precise (Precise_locs.shift_offset_by_singleton field_i offset)
         with Cil.SizeOfError _ -> Precise (Precise_locs.offset_top)
       end
@@ -182,7 +182,7 @@ module PLoc = struct
       begin try
           let offset_ival = Precise_locs.imprecise_offset offset in
           let field = fst (Cil.fieldBitsOffset field) in
-          let field_i = Integer.of_int (- field) in
+          let field_i = Z.of_int (- field) in
           let ival = Ival.add_singleton_int field_i offset_ival in
           if Ival.is_bottom ival
           then `Bottom
@@ -207,7 +207,7 @@ module PLoc = struct
         let new_index = match size with
           | Int_Base.Top -> Ival.top
           | Int_Base.Value size ->
-            if Integer.is_zero size
+            if Z.is_zero size
             then Ival.top
             else Ival.scale_div ~pos:true size new_index
         in

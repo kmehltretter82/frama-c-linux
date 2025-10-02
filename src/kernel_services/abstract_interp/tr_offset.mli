@@ -12,10 +12,10 @@
 
 type t = private
   | Invalid (** No location is valid *)
-  | Set of Integer.t list (** Limited number of locations *)
-  | Interval of Integer.t * Integer.t * Integer.t
+  | Set of Z.t list (** Limited number of locations *)
+  | Interval of Z.t * Z.t * Z.t
   (** [Interval(min, max, modulo)]*)
-  | Overlap of Integer.t * Integer.t * Origin.t option
+  | Overlap of Z.t * Z.t * Origin.t option
   (** [Overlap(min, max, origin)]
       - [origin]: the location covers the entire range [min..max],
                   but consecutive offsets overlap *)
@@ -29,7 +29,7 @@ val pretty: t Pretty_utils.formatter
     constructor is returned. When specified, the [origin] argument is used as
     the source of this imprecision . *)
 val trim_by_validity :
-  ?origin:Origin.t -> Ival.t -> Integer.t -> Base.validity -> t
+  ?origin:Origin.t -> Ival.t -> Z.t -> Base.validity -> t
 
 (** This is a more complete specification of this function, for a single offset
     [o]. We want to write [size>0 bits], on a base possibly valid between

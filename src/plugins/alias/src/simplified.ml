@@ -9,7 +9,7 @@
 open Cil_types
 open Cil_datatype
 
-let nul_exp = Cil.kinteger64 ~loc:Location.unknown ~repr:"0.." ~kind:IInt Integer.zero
+let nul_exp = Cil.kinteger64 ~loc:Location.unknown ~repr:"0.." ~kind:IInt Z.zero
 let is_nul_exp = Cil_datatype.ExpStructEq.equal nul_exp
 
 module HL = Lval.Hashtbl

@@ -185,11 +185,11 @@ let f_iter f =
 
 let i_bounds i =
   if signed i then
-    let m = Integer.two_power_of_int (i_bits i - 1) in
-    Integer.neg m , Integer.pred m
+    let m = Z.two_power_of_int (i_bits i - 1) in
+    Z.neg m , Z.pred m
   else
-    let m = Integer.two_power_of_int (i_bits i) in
-    Integer.zero , Integer.pred m
+    let m = Z.two_power_of_int (i_bits i) in
+    Z.zero , Z.pred m
 
 let bounds i = i_memo i_bounds i
 
@@ -217,7 +217,7 @@ let f_name = f_memo (Pretty_utils.to_string pp_float)
 (* --- Array Info                                                         --- *)
 (* -------------------------------------------------------------------------- *)
 
-let char c = Integer.to_int64 (Cil.charConstToInt c)
+let char c = Z.to_int64 (Cil.charConstToInt c)
 
 let constant e =
   let open Current_loc.Operators in
@@ -225,9 +225,9 @@ let constant e =
   match (Cil.constFold true e).enode with
   | Const(CInt64(k,_,_)) ->
     begin
-      try Integer.to_int64 k
+      try Z.to_int64 k
       with Z.Overflow ->
-        Warning.error "Array size too large (%a)" Integer.pretty_hex k
+        Warning.error "Array size too large (%a)" Z.pretty_hex k
     end
   | _ -> Warning.error "Non-constant expression (%a)" Printer.pp_exp e
 
@@ -241,12 +241,12 @@ let array_size = function
 
 let get_int e =
   match (Cil.constFold true e).enode with
-  | Const(CInt64(k,_,_)) -> Some (Integer.to_int k)
+  | Const(CInt64(k,_,_)) -> Some (Z.to_int k)
   | _ -> None
 
 let get_int64 e =
   match (Cil.constFold true e).enode with
-  | Const(CInt64(k,_,_)) -> Some (Integer.to_int64 k)
+  | Const(CInt64(k,_,_)) -> Some (Z.to_int64 k)
   | _ -> None
 
 let dimension t =

@@ -20,7 +20,7 @@ let register_builtin name builtin =
 let frama_c_cardinal _state = function
   | [_, v] ->
     let nb = match Cvalue.V.cardinal v with
-      | None -> Cvalue.V.inject_int Integer.minus_one
+      | None -> Cvalue.V.inject_int Z.minus_one
       | Some i -> Cvalue.V.inject_int i
     in
     Builtins.Result [nb]
@@ -163,7 +163,7 @@ let aux_split f state = function
     let states =
       try
         let max_card =
-          Integer.to_int (Ival.project_int (V.project_ival_bottom card))
+          Z.to_int (Ival.project_int (V.project_ival_bottom card))
         in
         f ~warn:true lv state max_card
       with V.Not_based_on_null | Ival.Not_Singleton_Int ->

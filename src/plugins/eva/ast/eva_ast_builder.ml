@@ -146,7 +146,7 @@ struct
     let i', _truncated = Cil.truncateInteger64 ikind i in
     mk_exp (Const (CInt64 (i', ikind, None)))
 
-  let int ~ikind i = integer ~ikind (Integer.of_int i)
+  let int ~ikind i = integer ~ikind (Z.of_int i)
 
   let zero = int ~ikind:IInt 0
   let one = int ~ikind:IInt 1
@@ -223,10 +223,10 @@ let zero_typed (typ : Cil_types.typ) =
   match typ.tnode with
   | TFloat fk -> mk_exp (Const (CReal (0., fk, None)))
   | TEnum {ekind = ik }
-  | TInt ik -> mk_exp (Const (CInt64 (Integer.zero, ik, None)))
+  | TInt ik -> mk_exp (Const (CInt64 (Z.zero, ik, None)))
   | TPtr _ ->
     let ik = Machine.uintptr_kind () in
-    let zero = mk_exp (Const (CInt64 (Integer.zero, ik, None))) in
+    let zero = mk_exp (Const (CInt64 (Z.zero, ik, None))) in
     Build.cast typ zero
   | _ ->
     Self.fatal ~current:true "non-scalar type %a" Printer.pp_typ typ

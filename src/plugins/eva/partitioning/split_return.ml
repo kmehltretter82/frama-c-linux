@@ -202,7 +202,7 @@ module ReturnUsage = struct
 
   (* For functions returning pointers, add a split on NULL/non-NULL *)
   let add_null_pointers_split (ru: return_split): return_split =
-    let null_set = Datatype.Integer.Set.singleton Integer.zero in
+    let null_set = Datatype.Integer.Set.singleton Z.zero in
     let aux kf acc =
       if Ast_types.is_ptr (Kernel_function.get_return_type kf) then
         add_split kf null_set acc

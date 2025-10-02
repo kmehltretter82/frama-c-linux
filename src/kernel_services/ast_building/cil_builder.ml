@@ -142,7 +142,7 @@ struct
 
   type const' =
     | Int of int
-    | Integer of Integer.t
+    | Integer of Z.t
     | CilConstant of Cil_types.constant
   and var' =
     | CilVar of Cil_types.varinfo
@@ -197,7 +197,7 @@ struct
 
   let rec pretty_const fmt = function
     | Int i -> Format.pp_print_int fmt i
-    | Integer i -> Integer.pretty fmt i
+    | Integer i -> Z.pretty fmt i
     | CilConstant c -> Printer.pp_constant fmt c
   and pretty_var fmt = function
     | CilVar vi -> Printer.pp_varinfo fmt vi
@@ -485,7 +485,7 @@ struct
 
   let rec build_constant = function
     | CilConstant const -> const
-    | Int i -> mk_cint IInt (Integer.of_int i)
+    | Int i -> mk_cint IInt (Z.of_int i)
     | Integer i -> mk_cint IInt i
 
   and build_var ~scope = function

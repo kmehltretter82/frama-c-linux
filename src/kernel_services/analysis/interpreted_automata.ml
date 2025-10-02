@@ -607,7 +607,7 @@ let variant_predicate stmt v =
   let loc = stmt_loc stmt in
   let v_start = Logic_const.tat ~loc (v, BuiltinLabel LoopCurrent) in
   let rel1 = Rlt, v_start, Logic_const.tat ~loc (v, BuiltinLabel Here)
-  and rel2 = Rle, Logic_const.tint ~loc Integer.zero, v_start in
+  and rel2 = Rle, Logic_const.tint ~loc Z.zero, v_start in
   let pred1 = Logic_const.prel ~loc rel1 in
   let pred2 = Logic_const.prel ~loc rel2 in
   Logic_const.pand ~loc (pred1, pred2)

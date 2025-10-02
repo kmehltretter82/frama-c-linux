@@ -87,7 +87,7 @@ let array_bounds array_size =
   | Some size_exp ->
     match Cil.constFoldToInt size_exp with
     | None -> None
-    | Some size when Integer.gt size 0z -> Some (0z, Integer.pred size)
+    | Some size when Z.gt size 0z -> Some (0z, Z.pred size)
     | Some _ -> None
 
 let array_range array_size =
@@ -128,8 +128,8 @@ let rec of_int_val ~base_typ ~typ ival =
     | TArray (elem_typ, array_size) ->
       let* range, rem =
         try
-          let elem_size = Integer.of_int (Cil.bitsSizeOf elem_typ) in
-          if Integer.is_zero elem_size then (* array of elements of size 0 *)
+          let elem_size = Z.of_int (Cil.bitsSizeOf elem_typ) in
+          if Z.is_zero elem_size then (* array of elements of size 0 *)
             if Int_val.is_zero ival then (* the whole range is valid *)
               let+ range = Top.of_option (array_range array_size) in
               range, ival
@@ -160,8 +160,8 @@ let rec of_int_val ~base_typ ~typ ival =
           | [] -> `Top
           | fi :: q ->
             let offset, width = Cil.fieldBitsOffset fi in
-            let l = Integer.(of_int offset) in
-            let u = Integer.(pred (add l (of_int width))) in
+            let l = Z.(of_int offset) in
+            let u = Z.(pred (add l (of_int width))) in
             let matches =
               if width = 0 then
                 Int_val.(equal ival (inject_singleton l))
@@ -173,7 +173,7 @@ let rec of_int_val ~base_typ ~typ ival =
               if Ast_types.has_qualifier "volatile" fi.ftype then
                 `Top
               else
-                let sub_ival = Int_val.add_singleton (Integer.neg l) ival in
+                let sub_ival = Int_val.add_singleton (Z.neg l) ival in
                 let+ sub' = of_int_val ~base_typ:fi.ftype ~typ sub_ival in
                 Field (fi, sub')
             else

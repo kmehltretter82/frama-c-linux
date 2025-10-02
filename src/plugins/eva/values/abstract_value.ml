@@ -28,7 +28,7 @@ type 'v truth =
                            inconsistent truth value for the assertion. *)
 
 type bound_kind = Alarms.bound_kind = Lower_bound | Upper_bound
-type bound = Int of Integer.t | Float of float * fkind
+type bound = Int of Z.t | Float of float * fkind
 
 type pointer_comparison = Equality | Relation | Subtraction
 
@@ -67,7 +67,7 @@ module type S = sig
 
   (** [inject_int typ i] returns an abstract value representing integer [i]
       for the C type [typ]. *)
-  val inject_int : typ -> Integer.t -> t
+  val inject_int : typ -> Z.t -> t
 
   (** Abstract value representing all integers; it can be equal to [top]. *)
   val top_int : t

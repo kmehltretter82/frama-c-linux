@@ -51,7 +51,7 @@ val vars_in_lval : lval -> Cil_datatype.Varinfo.Set.t
 (** Constant conversion and folding. *)
 
 val const_fold: exp -> exp
-val fold_to_integer: exp -> Integer.t option
+val fold_to_integer: exp -> Z.t option
 
 val is_zero_ptr : exp -> bool
 

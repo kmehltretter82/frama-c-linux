@@ -21,7 +21,7 @@ type watchpoint =
   { name_lv : Eva_ast.exp;
     loc: Locations.location;
     v: watch;
-    mutable remaining_count: Integer.t;
+    mutable remaining_count: Z.t;
     mutable stmts: Cil_datatype.Stmt.Set.t }
 
 let watch_table : watchpoint list ref = ref []
@@ -70,9 +70,9 @@ let make_watch_value target_value = Value target_value
 let make_watch_cardinal target_value =
   try
     let target_value = Cvalue.V.project_ival target_value in
-    Cardinal (Integer.to_int (Ival.project_int target_value))
+    Cardinal (Z.to_int (Ival.project_int target_value))
   with V.Not_based_on_null | Ival.Not_Singleton_Int
-     | Z.Overflow (* from Integer.to_int *) ->
+     | Z.Overflow (* from Z.to_int *) ->
     raise Builtins.Outside_builtin_possibilities
 
 let () =
@@ -104,12 +104,12 @@ let watch_hook _callstack stmt states =
              "%a %a"
              Eva_ast.pp_exp name
              V.pretty vs;
-           if Integer.is_zero current ||
+           if Z.is_zero current ||
               (Cil_datatype.Stmt.Set.mem stmt set)
            then ()
            else
-             let current = Integer.pred current in
-             if Integer.is_zero current then
+             let current = Z.pred current in
+             if Z.is_zero current then
                Self.abort "Watchpoint builtin: countdown to zero";
              w.remaining_count <- current;
              w.stmts <- Cil_datatype.Stmt.Set.add stmt set;

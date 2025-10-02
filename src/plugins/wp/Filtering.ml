@@ -197,7 +197,7 @@ struct
       begin match F.repr k with
         | Kint z ->
           let d =
-            try Dindex(Integer.to_int z) with Z.Overflow -> Darray in
+            try Dindex(Z.to_int z) with Z.Overflow -> Darray in
           X( x , ds @ [ d ] )
         | _ ->
           let ds = ds @ [ Darray ] in

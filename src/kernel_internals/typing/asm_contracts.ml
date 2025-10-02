@@ -82,7 +82,7 @@ let access_elts ~loc ?size tlv =
       Logic_const.trange
         ~loc
         (Some (Logic_const.tinteger ~loc 0),
-         Some (Logic_const.tint ~loc (Integer.pred l)))
+         Some (Logic_const.tint ~loc (Z.pred l)))
   in
   Logic_const.addTermOffsetLval (TIndex(range,TNoOffset)) tlv
 

@@ -362,10 +362,10 @@ let packing_pragma_stack = Stack.create ()
 let current_packing_pragma = ref None
 let pretty_current_packing_pragma fmt =
   let align =
-    Option.value ~default:(Integer.of_int (Machine.alignof_aligned ()))
+    Option.value ~default:(Z.of_int (Machine.alignof_aligned ()))
       !current_packing_pragma
   in
-  Integer.pretty fmt align
+  Z.pretty fmt align
 
 (* Checks if [n] is a valid alignment for #pragma pack, and emits a warning
    if it is not the case. Returns the value to be set as current packing pragma.
@@ -378,16 +378,16 @@ let pretty_current_packing_pragma fmt =
    with such pragmas, we emulate GCC's current behavior but emit a warning.
    This is the only case when this function returns [None]. *)
 let get_valid_pragma_pack_alignment n =
-  if Integer.is_zero n && Machine.gccMode () then begin
+  if Z.is_zero n && Machine.gccMode () then begin
     Kernel.warning ~current:true "GCC accepts pack(0) but does not specify its \
                                   behavior; considering it equivalent to pack()";
     true, None
   end
   else begin
-    let valid = Integer.( n = 1z || n = 2z || n = 4z || n = 8z || n = 16z ) in
+    let valid = Z.( n = 1z || n = 2z || n = 4z || n = 8z || n = 16z ) in
     if not valid then
       Kernel.warning ~current:true "ignoring invalid packing alignment (%a)"
-        Integer.pretty n;
+        Z.pretty n;
     valid, Some n
   end
 
@@ -404,7 +404,7 @@ let process_pack_pragma name args =
           let is_valid, new_pragma = get_valid_pragma_pack_alignment n in
           if is_valid then begin
             Kernel.feedback ~dkey:Kernel.dkey_typing_pragma ~current:true
-              "packing pragma: setting alignment to %a" Integer.pretty n;
+              "packing pragma: setting alignment to %a" Z.pretty n;
             current_packing_pragma := new_pragma; None
           end else
             Some (name, args)
@@ -417,7 +417,7 @@ let process_pack_pragma name args =
           if is_valid then begin
             Kernel.feedback ~dkey:Kernel.dkey_typing_pragma ~current:true
               "packing pragma: pushing alignment %t, setting alignment to %a"
-              pretty_current_packing_pragma Integer.pretty n;
+              pretty_current_packing_pragma Z.pretty n;
             Stack.push !current_packing_pragma packing_pragma_stack;
             current_packing_pragma:= new_pragma; None
           end else
@@ -474,12 +474,12 @@ let is_power_of_two i = i > 0 && i land (i-1) = 0
    also return [None]. *)
 let eval_aligned_attrparams aps =
   match aps with
-  | [] -> Some (Integer.of_int (Machine.alignof_aligned ()))
+  | [] -> Some (Z.of_int (Machine.alignof_aligned ()))
   | [ap] ->
     begin
       match Cil.intOfAttrparam ap with
       | None -> None
-      | Some n -> if is_power_of_two n then Some (Integer.of_int n) else None
+      | Some n -> if is_power_of_two n then Some (Z.of_int n) else None
     end
   | _ -> (* 'aligned(m,n,...)' is not a valid syntax *) None
 
@@ -506,7 +506,7 @@ let combine_aligned_attributes attrs =
             end else
               match acc, align with
               | None, a | a, None -> a
-              | Some old_n, Some new_n -> Some (Integer.max old_n new_n)
+              | Some old_n, Some new_n -> Some (Z.max old_n new_n)
           end
         | _ -> assert false (* attributes were previously filtered by name *)
 
@@ -556,16 +556,16 @@ let process_pragmas_pack_align_comp_attributes loc ci cattrs =
         else begin
           Kernel.feedback ~source ~dkey:Kernel.dkey_typing_pragma
             "adding aligned(%a) attribute to comp '%s' due to packing pragma"
-            Integer.pretty n ci.cname;
+            Z.pretty n ci.cname;
           Ast_attributes.replace_params "aligned" [AInt n] cattrs
         end
       | Some local ->
         (* The largest aligned wins with GCC. Don't know
            with other compilers. *)
-        let align = Integer.max n local in
+        let align = Z.max n local in
         Kernel.feedback ~source ~dkey:Kernel.dkey_typing_pragma
           "setting aligned(%a) attribute to comp '%s' due to packing pragma"
-          Integer.pretty align ci.cname;
+          Z.pretty align ci.cname;
         Ast_attributes.replace_params "aligned" [AInt align] cattrs
     in
     force_packed_attribute with_aligned_attributes
@@ -573,7 +573,7 @@ let process_pragmas_pack_align_comp_attributes loc ci cattrs =
     Ast_attributes.drop "aligned" cattrs
   | None, Some false ->
     force_packed_attribute
-      (Ast_attributes.replace_params "aligned" [AInt Integer.one] cattrs)
+      (Ast_attributes.replace_params "aligned" [AInt Z.one] cattrs)
 
 (* Takes into account the possible effect of '#pragma pack' directives on
    field [fi], and checks the alignment of aligned() attributes.
@@ -604,20 +604,20 @@ let process_pragmas_pack_align_field_attributes fi fattrs cattr =
          its type alignment, so we get the maximum of both. Then, we apply
          the pragma pack: the final alignment will be the minimum between what
          we had and [n]. *)
-      let type_align = Integer.of_int (Cil.bytesAlignOf fi.ftype) in
+      let type_align = Z.of_int (Cil.bytesAlignOf fi.ftype) in
       let existing_align =
-        Option.fold field_align ~none:type_align ~some:(Integer.max type_align)
+        Option.fold field_align ~none:type_align ~some:(Z.max type_align)
       in
-      let new_align = Integer.min n existing_align in
+      let new_align = Z.min n existing_align in
       Kernel.feedback ~dkey:Kernel.dkey_typing_pragma ~current:true
         "%s aligned(%a) attribute to field '%s.%s' due to packing pragma"
         (if Option.is_none field_align then "adding" else "setting")
-        Integer.pretty new_align fi.fcomp.cname fi.fname;
+        Z.pretty new_align fi.fcomp.cname fi.fname;
       Ast_attributes.replace_params "aligned" [AInt new_align] fattrs
   | None, Some true ->
     Ast_attributes.drop "aligned" fattrs
   | None, Some false ->
-    Ast_attributes.replace_params "aligned" [AInt Integer.one] fattrs
+    Ast_attributes.replace_params "aligned" [AInt Z.one] fattrs
 
 
 (***** COMPUTED GOTO ************)
@@ -1171,15 +1171,15 @@ let constFoldType (t:typ) : typ =
   visitCilType constFoldTypeVisitor t
 
 let to_integer i =
-  match Integer.to_int_opt i with
+  match Z.to_int_opt i with
   | Some i -> i
   | None ->
     Kernel.error ~current:true "integer too large: %a"
-      Integer.pretty_hex i;
+      Z.pretty_hex i;
     -1
 
 let constFoldToInteger e =
-  try Option.map Integer.to_int (Cil.constFoldToInt e)
+  try Option.map Z.to_int (Cil.constFoldToInt e)
   with Z.Overflow ->
     Kernel.error ~current:true
       "integer constant too large in expression %a"
@@ -1368,7 +1368,7 @@ let checkBool (ot : typ) (_ : exp) =
 let rec isConstTrueFalse c: [ `CTrue | `CFalse ] =
   match c with
   | CInt64 (n,_,_) ->
-    if Integer.( n = 0z ) then `CFalse else `CTrue
+    if Z.( n = 0z ) then `CFalse else `CTrue
   | CChr c ->
     if Char.code c = 0 then `CFalse else `CTrue
   | CReal(f, _, _) ->
@@ -1386,7 +1386,7 @@ and isExpTrueFalse e: [ `CTrue | `CFalse | `CUnknown ] =
       match Cil.constFoldToInt e with
       | None -> `CUnknown
       | Some i ->
-        if Integer.(equal zero i) then `CFalse else `CTrue
+        if Z.(equal zero i) then `CFalse else `CTrue
     end
   | _ -> `CUnknown
 
@@ -1396,7 +1396,7 @@ let rec isCabsZeroExp e = match e.expr_node with
      | SINGLE_INIT e -> isCabsZeroExp e
      | NO_INIT | COMPOUND_INIT _ -> false)
   | CONSTANT (CONST_INT i) ->
-    Result.fold ~error:(fun _ -> false) ~ok:Integer.is_zero (Cil.parseIntRes i)
+    Result.fold ~error:(fun _ -> false) ~ok:Z.is_zero (Cil.parseIntRes i)
   | _ -> false
 
 module BlockChunk =
@@ -2109,7 +2109,7 @@ struct
         let constFold = constFold true in
         let e'' = if Machine.lower_constants () then constFold e' else e' in
         (match constFoldToInt e, constFoldToInt e'' with
-         | Some i1, Some i2 when not (Integer.equal i1 i2) ->
+         | Some i1, Some i2 when not (Z.equal i1 i2) ->
            Kernel.feedback ~once:true ~source:(fst e.eloc)
              "Case label %a exceeds range of %a for switch expression. \
               Nothing to worry."
@@ -2917,7 +2917,7 @@ let rec collectInitializer
         match leno with
         | Some len -> begin
             match constFoldToInt len with
-            | Some ni when Integer.geq ni Integer.zero -> to_integer ni, false
+            | Some ni when Z.geq ni Z.zero -> to_integer ni, false
             | _ -> (* VLA cannot have initializers, and this should have
                       been captured beforehand. *)
               Kernel.fatal "Trying to initialize a variable-length array"
@@ -3809,7 +3809,7 @@ let rec evaluate_cond_exp = function
   | CEExp (_,e) ->
     (match Cil.constFoldToInt e with
      | None -> `CUnknown
-     | Some z when Integer.is_zero z -> `CFalse
+     | Some z when Z.is_zero z -> `CFalse
      | Some _ -> `CTrue)
   | CEAnd (e1,e2) ->
     let r = evaluate_cond_exp e1 in
@@ -4174,8 +4174,8 @@ let rec doSpecList loc ghost (suggestedAnonName: string)
       let a = extraAttrs @ (getTypeAttrs ()) in
       enum.eattr <- enum.eattr @ (doAttributes ghost a);
       let res = mk_tenum enum in
-      let smallest = ref Integer.zero in
-      let largest = ref Integer.zero in
+      let smallest = ref Z.zero in
+      let largest = ref Z.zero in
       (* Life is fun here. ANSI says: enum constants are ints,
          and there's an implementation-dependent underlying integer
          type for the enum, which must be capable of holding all the
@@ -4192,9 +4192,9 @@ let rec doSpecList loc ghost (suggestedAnonName: string)
          – otherwise EI = int if T is signed and unsigned int otherwise
          Note that these rules make the enum unsigned if possible *)
       let updateEnum i : ikind =
-        if Integer.lt i !smallest then
+        if Z.lt i !smallest then
           smallest := i;
-        if Integer.gt i !largest then
+        if Z.gt i !largest then
           largest := i;
         if Machine.msvcMode () then
           IInt
@@ -4261,7 +4261,7 @@ let rec doSpecList loc ghost (suggestedAnonName: string)
       enum.eitems <- List.map (fun (_, x) -> x) fields;
       (* Pick the enum's kind - see discussion above *)
       begin
-        let unsigned = Integer.geq !smallest Integer.zero in
+        let unsigned = Z.geq !smallest Z.zero in
         let smallKind = intKindForValue !smallest unsigned in
         let largeKind = intKindForValue !largest unsigned in
         let real_kind =
@@ -4438,7 +4438,7 @@ and doAttr ghost (a: Cabs.attribute) : attribute list =
             AInt v64
           | _ ->
             Kernel.error ~current:true "Invalid attribute constant: %s" str;
-            AInt Integer.one
+            AInt Z.one
         end
       | Cabs.CONSTANT (Cabs.CONST_FLOAT str) ->
         ACons ("__fc_float", [AStr str])
@@ -4663,7 +4663,7 @@ and doType (ghost:bool) (context: type_context)
           (match cst.enode with
            | Const(CInt64(i, _, _)) ->
              begin
-               if Integer.lt i Integer.zero then
+               if Z.lt i Z.zero then
                  Kernel.error ~once:true ~current:true
                    "Array length is negative."
                else
@@ -4674,18 +4674,18 @@ and doType (ghost:bool) (context: type_context)
                      if Cil.isCompleteType bt &&
                         not (Cil.is_variably_modified_type bt)
                      then
-                       Integer.of_int @@ bytesSizeOf bt
+                       Z.of_int @@ bytesSizeOf bt
                      else
                        (* Incomplete types can't be array elements,
                           and multi-dimensional VLAs are currently unsupported.
                           In both cases an error has already been raised,
                           we just check here that the size is not widely off.*)
-                       Integer.one
+                       Z.one
                    in
                    let size_t = bitsSizeOfInt (Machine.sizeof_kind ()) in
                    let size_max = Cil.max_unsigned_number size_t in
-                   let array_size = Integer.mul i elem_size in
-                   if Integer.gt array_size size_max then
+                   let array_size = Z.mul i elem_size in
+                   if Z.gt array_size size_max then
                      Kernel.warning ~wkey:Kernel.wkey_large_array
                        ~once:true ~current:true
                        "Array length is too large.";
@@ -5059,7 +5059,7 @@ and makeCompType loc ghost (isstruct: bool)
               end;
               let ftype =
                 Ast_types.add_attributes
-                  [(Ast_attributes.bitfield_attribute_name, [AInt (Integer.of_int s)])]
+                  [(Ast_attributes.bitfield_attribute_name, [AInt (Z.of_int s)])]
                   ftype
               in
               w, ftype
@@ -5133,7 +5133,7 @@ and makeCompType loc ghost (isstruct: bool)
       begin
         match Cil.constFoldToInt ~machdep:true cond_exp with
         | Some i ->
-          if Integer.(equal i zero) then
+          if Z.(equal i zero) then
             Kernel.error ~source:(fst loc) "static assertion failed%s%s@."
               (if s <> "" then ": " else "") s
         | None ->
@@ -5606,7 +5606,7 @@ and doExp local_env
            * I'm missing some architecture dependent behavior. *)
           let value = reduce_multichar (Machine.wchar_type ()) char_list in
           let result = kinteger64 ~loc ~kind:(Machine.wchar_kind ())
-              (Integer.of_int64 value)
+              (Z.of_int64 value)
           in
           finishExp [] (unspecified_chunk empty) result (typeOf result)
 
@@ -7731,11 +7731,11 @@ and compileCondExp ?(hide=false) ~ghost ce st sf =
   | CEExp (se, e) -> begin
       match e.enode with
       | Const(CInt64(i,_,_))
-        when (not (Integer.equal i Integer.zero)) && canDrop sf ->
+        when (not (Z.equal i Z.zero)) && canDrop sf ->
         full_clean_up_chunk_locals sf;
         se @@@ st
       | Const(CInt64(z,_,_))
-        when (Integer.equal z Integer.zero) && canDrop st ->
+        when (Z.equal z Z.zero) && canDrop st ->
         full_clean_up_chunk_locals st;
         se @@@ sf
       | _ ->
@@ -8322,7 +8322,7 @@ and doInit local_env asconst preinit so acc initl =
                 match constFoldToInt idxe', isNotEmpty doidx with
                 | Some x, false ->
                   begin
-                    match Integer.to_int_opt x with
+                    match Z.to_int_opt x with
                     | Some x' -> x', doidx
                     | None ->
                       Errorloc.abort_context
@@ -9156,7 +9156,7 @@ and doDecl local_env (isglobal: bool) (def: Cabs.definition) : chunk =
       begin
         match Cil.constFoldToInt ~machdep:true cond_exp with
         | Some i ->
-          if Integer.(equal i zero) then
+          if Z.(equal i zero) then
             Kernel.error ~current:true "static assertion failed%s%s@."
               (if s <> "" then ": " else "") s
         | None ->

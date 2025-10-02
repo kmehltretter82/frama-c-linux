@@ -60,7 +60,7 @@ let inject_periodic ~from ~period ~number =
   done;
   s
 
-module O = Set.Make (Integer)
+module O = Set.Make (Z)
 
 let inject_list list =
   let o = List.fold_left (fun o r -> O.add r o) O.empty list in
@@ -169,7 +169,7 @@ let cardinal =
       l
   else Array.length
 
-let for_all f (a : Integer.t array) =
+let for_all f (a : Z.t array) =
   let l = Array.length a in
   let rec c i = i = l || ((f a.(i)) && c (succ i)) in
   c 0
@@ -239,7 +239,7 @@ let to_seq ?(increasing=true) =
 
 (* ------------------------------- Set or top ------------------------------- *)
 
-type set_or_top = [ `Set of t | `Top of Integer.t * Integer.t * Integer.t ]
+type set_or_top = [ `Set of t | `Top of Z.t * Z.t * Z.t ]
 type set_or_top_or_bottom = [ `Bottom | set_or_top ]
 
 type pre_set =
@@ -329,7 +329,7 @@ let set_to_ival_under set =
 
 (* ------------------------------ Apply and map ----------------------------- *)
 
-let apply_bin_1_strict_incr f x (s : Integer.t array) =
+let apply_bin_1_strict_incr f x (s : Z.t array) =
   let r, l = Array.zero_copy s in
   let rec c i =
     if i = l
@@ -341,7 +341,7 @@ let apply_bin_1_strict_incr f x (s : Integer.t array) =
   in
   c 0
 
-let apply_bin_1_strict_decr f x (s : Integer.t array) =
+let apply_bin_1_strict_decr f x (s : Z.t array) =
   let r, l = Array.zero_copy s in
   let rec c i =
     if i = l
@@ -353,7 +353,7 @@ let apply_bin_1_strict_decr f x (s : Integer.t array) =
   in
   c 0
 
-let apply2 f (s1 : Integer.t array) (s2 : Integer.t array) =
+let apply2 f (s1 : Z.t array) (s2 : Z.t array) =
   let ps = ref empty_ps in
   let l1 = Array.length s1 in
   let l2 = Array.length s2 in
@@ -365,7 +365,7 @@ let apply2 f (s1 : Integer.t array) (s2 : Integer.t array) =
   done;
   inject_ps !ps
 
-let apply2_notzero f (s1 : Integer.t array) s2 =
+let apply2_notzero f (s1 : Z.t array) s2 =
   inject_ps_or_bottom
     (Array.fold_left
        (fun acc v1 ->
@@ -379,7 +379,7 @@ let apply2_notzero f (s1 : Integer.t array) s2 =
        empty_ps
        s1)
 
-let map_set_decr f (s : Integer.t array) =
+let map_set_decr f (s : Z.t array) =
   let r, l = Array.zero_copy s in
   let rec c srcindex dstindex last =
     if srcindex < 0
@@ -399,7 +399,7 @@ let map_set_decr f (s : Integer.t array) =
   in
   c (l-2) 0 (f s.(pred l))
 
-let map_set_strict_decr f (s : Integer.t array) =
+let map_set_strict_decr f (s : Z.t array) =
   let r, l = Array.zero_copy s in
   let rec c i =
     if i = l
@@ -411,7 +411,7 @@ let map_set_strict_decr f (s : Integer.t array) =
   in
   c 0
 
-let map_set_incr f (s : Integer.t array) =
+let map_set_incr f (s : Z.t array) =
   let r, l = Array.zero_copy s in
   let rec c srcindex dstindex last =
     if srcindex = l

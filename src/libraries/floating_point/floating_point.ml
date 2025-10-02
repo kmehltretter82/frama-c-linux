@@ -43,8 +43,8 @@ let max_64_float = +9.22337203685477478e+18
    raise Float_Non_representable_as_Int64. This is the most reasonable as
    a floating-point number may represent an exponentially large integer. *)
 let truncate_to_integer f =
-  let convert f = Integer.of_int64 (Int64.of_float f) in
-  let shift n = Integer.(add (two_power_of_int 63)) n in
+  let convert f = Z.of_int64 (Int64.of_float f) in
+  let shift n = Z.(add (two_power_of_int 63)) n in
   let unsigned x = convert (x +. min_64_float) |> shift in
   if min_64_float <= f then
     if f <= max_64_float then Integer (convert f)
@@ -167,7 +167,7 @@ let smallest_denormal_float_of = function
 let unit_in_the_last_place_of format = ldexp 1.0 (- sig_size format)
 
 (* Only compute 2^7 or 2^10 below, so no overflow. *)
-let two_power n = Integer.(to_int (two_power_of_int n))
+let two_power n = Z.(to_int (two_power_of_int n))
 
 let minimal_exponent_of format = 2 - two_power (exp_size format - 1)
 let maximal_exponent_of format = two_power (exp_size format - 1) - 1

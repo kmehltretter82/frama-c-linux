@@ -21,7 +21,7 @@ module type S = sig
   (** [widen ~size ~hint v1 v2] is an over-approximation of [join v1 v2].
       [size] is the size (in bits) of the widened value, and [hint] is some
       hint for the widening. *)
-  val widen : ?size:Integer.t -> ?hint:widen_hint -> t -> t -> t
+  val widen : ?size:Z.t -> ?hint:widen_hint -> t -> t -> t
 
   val pretty_typ: Cil_types.typ option -> t Pretty_utils.formatter
 
@@ -40,7 +40,7 @@ module type S = sig
 
   val extract_bits :
     topify:Origin.kind ->
-    start:Integer.t -> stop:Integer.t -> size:Integer.t ->
+    start:Z.t -> stop:Z.t -> size:Z.t ->
     t ->
     bool * t
   (** Extract the bits between [start] and [stop] in the value of type [t],
@@ -51,8 +51,8 @@ module type S = sig
 
   val shift_bits:
     topify:Origin.kind ->
-    offset:Integer.t ->
-    size:Integer.t ->
+    offset:Z.t ->
+    size:Z.t ->
     t -> t
   (** Left-shift the given value, of size [size], by [offset] bits.
       [topify] indicates which operation caused this shift to take place,
@@ -79,7 +79,7 @@ module type S = sig
   (** Value that can be passed to {!merge_distinct_bits} as the starting value.
       This value must be neutral wrt. merging of values. *)
 
-  val anisotropic_cast : size:Integer.t -> t -> t
+  val anisotropic_cast : size:Z.t -> t -> t
   (** Optionally change the representation of the given value, under the
       assumption that it fits in [size] bits. Returning the value argument
       is always correct. *)

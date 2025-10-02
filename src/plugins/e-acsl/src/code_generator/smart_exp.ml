@@ -46,7 +46,7 @@ let lnot ~loc e =
       | UnOp (LNot, e, _) -> e
       | _ -> Cil.new_exp ~loc (UnOp (LNot, e, Cil_const.intType))
     end
-  | Some i when Integer.equal i Integer.zero ->
+  | Some i when Z.equal i Z.zero ->
     (* The expression is an integer equal to zero, directly return one. *)
     Cil.one ~loc
   | _ ->

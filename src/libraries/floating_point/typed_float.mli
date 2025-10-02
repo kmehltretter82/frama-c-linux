@@ -219,5 +219,5 @@ val trunc : 'f t -> 'f t
 val round : 'f t -> 'f t
 
 (** Returns the bits encoding of a given typed floating point number,
-    represented as an [Integer]. *)
-val bits_encoding : 'f t -> Integer.t
+    represented as a {!Z.t}. *)
+val bits_encoding : 'f t -> Z.t

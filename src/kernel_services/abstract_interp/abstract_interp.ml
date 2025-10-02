@@ -246,18 +246,18 @@ module Make_Hashconsed_Lattice_Set
 end
 
 module Int = struct
-  include (Integer: module type of Integer with type t = Integer.t)
-  include (Datatype.Integer: Datatype.S_with_collections with type t:=Integer.t)
+  include (Z: module type of Z with type t = Z.t)
+  include (Datatype.Integer: Datatype.S_with_collections with type t:=Z.t)
 
   let e_rem = erem
 
   let pretty fmt v =
     if not (Kernel.BigIntsHex.is_default ()) then
       let max = of_int (Kernel.BigIntsHex.get ()) in
-      if gt (abs v) max then Integer.pretty_hex fmt v
-      else Integer.pretty fmt v
+      if gt (abs v) max then Z.pretty_hex fmt v
+      else Z.pretty fmt v
     else
-      Integer.pretty fmt v
+      Z.pretty fmt v
 
   (** execute [f] on [inf], [inf + step], ... *)
   let fold f ~inf ~sup ~step acc =

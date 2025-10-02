@@ -53,7 +53,7 @@ module type S = sig
   val empty: t
   (** offsetmap containing no interval. *)
 
-  val size_from_validity: Base.validity -> Integer.t Lattice_bounds.or_bottom
+  val size_from_validity: Base.validity -> Z.t Lattice_bounds.or_bottom
   (** [size_from_validity v] returns the size to be used when creating a
       new offsetmap for a base with validity [v]. This is a convention that
       must be shared by all modules that create offsetmaps, because operations
@@ -181,7 +181,7 @@ module type S = sig
   val find :
     validity:Base.validity ->
     ?conflate_bottom:bool ->
-    offsets:Ival.t -> size:Integer.t ->
+    offsets:Ival.t -> size:Z.t ->
     t -> v Lattice_bounds.or_bottom
   (** Find the value bound to a set of intervals, expressed as an ival, in the
       given rangemap. *)
@@ -195,7 +195,7 @@ module type S = sig
 
   val copy_slice:
     validity:Base.validity ->
-    offsets:Ival.t -> size:Integer.t ->
+    offsets:Ival.t -> size:Z.t ->
     t -> t Lattice_bounds.or_bottom
   (** [copy_slice ~validity ~offsets ~size m] copies and merges the slices of
       [m] starting at offsets [offsets] and of size [size]. Offsets invalid

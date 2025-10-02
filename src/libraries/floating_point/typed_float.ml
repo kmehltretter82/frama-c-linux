@@ -359,15 +359,15 @@ let normalize integral fractional exponent format =
      approximation, the nearest one, and an over approximation. *)
   let numerator = !numerator and denominator = !denominator in
   let* exponent = normalize_exponent_on_format ~format !exponent in
-  let significant, reminder = Integer.ediv_rem numerator denominator in
-  let lower_bound = Float.ldexp Integer.(to_float significant) exponent in
-  let upper_bound = Float.ldexp Integer.(succ significant |> to_float) exponent in
+  let significant, reminder = Z.ediv_rem numerator denominator in
+  let lower_bound = Float.ldexp Z.(to_float significant) exponent in
+  let upper_bound = Float.ldexp Z.(succ significant |> to_float) exponent in
   (* Determining if the rounding to nearest comes down to round down. *)
   let double_reminder = Z.shift_left reminder 1 in
   let is_zero = Z.(equal double_reminder zero) in
   let is_half_denominator = Z.(equal double_reminder denominator) in
   let less_than_half_denominator = Z.Compare.(double_reminder < denominator) in
-  let is_last_bit_zero = Integer.(equal (logand significant one) zero) in
+  let is_last_bit_zero = Z.(equal (logand significant one) zero) in
   let tie_to_even = is_half_denominator && is_last_bit_zero in
   let nearest_is_down = is_zero || less_than_half_denominator || tie_to_even in
   (* Assigning each floating-point number to one of the computed bound. *)

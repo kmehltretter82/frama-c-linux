@@ -595,7 +595,7 @@ let transfer_switch_from_guard transfer_guard stmt state =
           match exp_case.enode with
           (* This helps when switch is used on boolean expressions. *)
           | Const (CInt64 (z,_,_))
-            when Integer.equal z Integer.zero ->
+            when Z.equal z Z.zero ->
             Cil.new_exp ~loc:cond.eloc (UnOp(LNot,cond,Cil_const.intType))
           | _ -> Cil.new_exp ~loc:exp_case.eloc
                    (BinOp (Eq, cond, exp_case, Cil_const.intType))

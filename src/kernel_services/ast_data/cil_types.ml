@@ -360,7 +360,7 @@ and attributes = attribute list
 
 (** The type of parameters of attributes *)
 and attrparam =
-  | AInt of Integer.t                  (** An integer constant *)
+  | AInt of Z.t                  (** An integer constant *)
   | AStr of string                       (** A string constant *)
   | ACons of string * attrparam list
   (** Constructed attributes. These are printed [foo(a1,a2,...,an)]. The list
@@ -776,7 +776,7 @@ and exp_node =
 
 (** Literal scalar constants *)
 and constant =
-  | CInt64 of Integer.t * ikind * string option
+  | CInt64 of Z.t * ikind * string option
   (** Integer constant. Give the ikind (see ISO9899 6.1.3.2) and the
       textual representation. Textual representation is always set to Some s
       when it comes from user code. This allows us to print a
@@ -1321,7 +1321,7 @@ and location = Filepath.position * Filepath.position
 
 and logic_constant =
   | Boolean of bool
-  | Integer of Integer.t * string option
+  | Integer of Z.t * string option
   (** Integer constant with a textual representation.  *)
   | LStr of string (** String constant. *)
   | LWStr of int64 list (** Wide character string constant. *)

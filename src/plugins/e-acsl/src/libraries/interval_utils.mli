@@ -19,9 +19,9 @@ val meet : ival -> ival -> ival
 val is_singleton_int : ival -> bool
 val bottom : ival
 val top_ival : ival
-val singleton : Integer.t -> ival
+val singleton : Z.t -> ival
 val singleton_of_int : int -> ival
-val ival : Integer.t -> Integer.t -> ival
+val ival : Z.t -> Z.t -> ival
 val interv_of_unknown_block : ival lazy_t
 
 val unify : ival -> ival

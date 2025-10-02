@@ -103,7 +103,7 @@ val get_int64 : exp -> int64 option
 val signed : c_int -> bool
 (** [true] if signed *)
 
-val bounds: c_int -> Integer.t * Integer.t
+val bounds: c_int -> Z.t * Z.t
 (** domain, bounds included *)
 
 val i_bits : c_int -> int

@@ -146,11 +146,11 @@ let print_std_includes fmt globs =
 
 let pretty_C_constant suffix k fmt i =
   let nb_signed_bits =
-    Integer.pred (Integer.of_int (8 * (Cil.bytesSizeOfInt k)))
+    Z.pred (Z.of_int (8 * (Cil.bytesSizeOfInt k)))
   in
-  let max_strict_signed = Integer.two_power nb_signed_bits in
-  let most_neg = Integer.neg max_strict_signed in
-  if Integer.equal most_neg i then
+  let max_strict_signed = Z.two_power nb_signed_bits in
+  let most_neg = Z.neg max_strict_signed in
+  if Z.equal most_neg i then
     (* sm: quirk here: if you print -2147483648 then this is two
        tokens in C, and the second one is too large to represent in
        a signed int..
@@ -158,7 +158,7 @@ let pretty_C_constant suffix k fmt i =
     (* in gcc this avoids a warning, but it might avoid a real
        problem on another compiler or a 64-bit architecture *)
     Format.fprintf fmt "(-%a-1)"
-      Datatype.Integer.pretty (Integer.pred max_strict_signed)
+      Datatype.Integer.pretty (Z.pred max_strict_signed)
   else
     Format.fprintf fmt "%a%s" Datatype.Integer.pretty i suffix
 
@@ -776,7 +776,7 @@ class cil_printer () = object (self)
     | UnOp(u,e1,_) ->
       (match u, e1 with
        | Neg, {enode = Const (CInt64 (v, _, _))}
-         when Integer.geq v Integer.zero ->
+         when Z.geq v Z.zero ->
          fprintf fmt "-%a" (self#exp_prec level) e1
        | _ ->
          fprintf fmt "%a %a" self#unop u (self#exp_prec level) e1)
@@ -888,7 +888,7 @@ class cil_printer () = object (self)
           let designator_needed =
             match prev_index, curr_index with
             | None, _ | _, None -> true
-            | Some p, Some c -> not (Integer.equal (Integer.succ p) c)
+            | Some p, Some c -> not (Z.equal (Z.succ p) c)
           in
           if designator_needed then designated_init fmt di
           else self#init fmt init;
@@ -901,7 +901,7 @@ class cil_printer () = object (self)
         (match initl with
          | [] -> ()
          | i::tl ->
-           let curr_index = print_index (Some Integer.minus_one) i in
+           let curr_index = print_index (Some Z.minus_one) i in
            ignore (List.fold_left print_next_index curr_index tl));
         Format.fprintf fmt "@]}"
       end
@@ -985,7 +985,7 @@ class cil_printer () = object (self)
           BinOp((PlusA|PlusPI),
                 {enode = Lval(lv')},
                 {enode=Const(CInt64(one,_,_))},_)
-          when LvalStructEq.equal lv lv' && Integer.equal one Integer.one
+          when LvalStructEq.equal lv lv' && Z.equal one Z.one
                && not state.print_cil_as_is ->
           fprintf fmt "%a ++%s"
             (self#lval_prec Precedence.indexLevel) lv
@@ -993,7 +993,7 @@ class cil_printer () = object (self)
         | BinOp((MinusA|MinusPI),
                 {enode = Lval(lv')},
                 {enode=Const(CInt64(one,_,_))}, _)
-          when LvalStructEq.equal lv lv' && Integer.equal one Integer.one
+          when LvalStructEq.equal lv lv' && Z.equal one Z.one
                && not state.print_cil_as_is ->
           fprintf fmt "%a --%s"
             (self#lval_prec Precedence.indexLevel) lv
@@ -1002,7 +1002,7 @@ class cil_printer () = object (self)
         | BinOp((PlusA|PlusPI),
                 {enode = Lval(lv')},
                 {enode = Const(CInt64(mone,_,_))},_)
-          when LvalStructEq.equal lv lv' && Integer.equal mone Integer.minus_one
+          when LvalStructEq.equal lv lv' && Z.equal mone Z.minus_one
                && not state.print_cil_as_is ->
           fprintf fmt "%a --%s"
             (self#lval_prec Precedence.indexLevel) lv

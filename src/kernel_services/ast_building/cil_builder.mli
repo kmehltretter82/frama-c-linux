@@ -104,11 +104,11 @@ sig
   val of_int : int -> [> const]
 
   (** Implicitly converted to type [int] when converted into C constant *)
-  val of_integer : Integer.t -> [> const]
+  val of_integer : Z.t -> [> const]
 
   (** Default kind is [int]. Value is truncated if necessary. *)
   val of_cint :
-    ?kind:Cil_types.ikind -> Integer.t -> [> const]
+    ?kind:Cil_types.ikind -> Z.t -> [> const]
 
   (** Default kind is [double].
       Value is rounded to simple precision if necessary. *)

@@ -508,7 +508,7 @@ val extract_contract :
 
 (** {2 Constant folding} *)
 
-val constFoldTermToInt: ?machdep:bool -> term -> Integer.t option
+val constFoldTermToInt: ?machdep:bool -> term -> Z.t option
 
 (**
    A [cilVisitor] (by copy) that simplifies expressions of the type

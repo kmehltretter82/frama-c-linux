@@ -9,7 +9,7 @@
 open Eval
 
 let offsetmap_of_v ~typ v =
-  let size = Integer.of_int (Cil.bitsSizeOf typ) in
+  let size = Z.of_int (Cil.bitsSizeOf typ) in
   let v = Cvalue.V.anisotropic_cast ~size v in
   let v = Cvalue.V_Or_Uninitialized.initialized v in
   Cvalue.V_Offsetmap.create ~size v ~size_v:size

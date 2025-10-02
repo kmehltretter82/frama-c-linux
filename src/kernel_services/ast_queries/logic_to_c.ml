@@ -32,9 +32,9 @@ let logic_var_to_var { lv_origin = lv } =
 
 let create_const_list loc kind low high =
   let rec aux acc i =
-    if Integer.lt i low then acc
+    if Z.lt i low then acc
     else
-      aux (new_exp ~loc (Const (CInt64 (i,kind,None)))::acc) (Integer.pred i)
+      aux (new_exp ~loc (Const (CInt64 (i,kind,None)))::acc) (Z.pred i)
   in aux [] high
 
 let range low high =

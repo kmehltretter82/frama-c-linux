@@ -501,7 +501,7 @@ module Make
       let+ new_value = remove_special_float expr fkind value in
       new_value, origin
     | TInt IBool when Kernel.InvalidBool.get () ->
-      let one = Abstract_value.Int Integer.one in
+      let one = Abstract_value.Int Z.one in
       let truth = Value.assume_bounded Alarms.Upper_bound one value in
       let alarm () = Alarms.Invalid_bool (Eva_ast.to_cil_lval lval) in
       let+ new_value = interpret_truth ~alarm value truth in
@@ -516,8 +516,8 @@ module Make
   let reduce_shift_rhs typ expr value =
     let open Evaluated.Operators in
     let size = Cil.bitsSizeOf typ in
-    let size_int = Abstract_value.Int (Integer.of_int (size - 1)) in
-    let zero_int = Abstract_value.Int Integer.zero in
+    let size_int = Abstract_value.Int (Z.of_int (size - 1)) in
+    let zero_int = Abstract_value.Int Z.zero in
     let alarm () =
       Alarms.Invalid_shift (Eva_ast.to_cil_exp expr, Some size)
     in
@@ -533,7 +533,7 @@ module Make
     let* v2 = reduce_shift_rhs typ e2 v2 in
     if warn_negative && Bit_utils.is_signed_int_enum_pointer typ then
       (* Cannot shift a negative value *)
-      let zero_int = Abstract_value.Int Integer.zero in
+      let zero_int = Abstract_value.Int Z.zero in
       let alarm () =
         Alarms.Invalid_shift (Eva_ast.to_cil_exp e1, None)
       in
@@ -545,8 +545,8 @@ module Make
   (* Emits alarms for an index out of bound, and reduces its value. *)
   let assume_valid_index ~size ~size_expr ~index_expr value =
     let open Evaluated.Operators in
-    let size_int = Abstract_value.Int (Integer.pred size) in
-    let zero_int = Abstract_value.Int Integer.zero in
+    let size_int = Abstract_value.Int (Z.pred size) in
+    let zero_int = Abstract_value.Int Z.zero in
     let alarm () =
       Alarms.Index_out_of_bound (Eva_ast.to_cil_exp index_expr, None)
     in
@@ -577,7 +577,7 @@ module Make
         Alarms.(Overflow (Signed, cil_expr, max_int, Upper_bound))
       in
       let truth1 = assume_non_equal context typ v1 min_int in
-      let truth2 = assume_non_equal context typ v2 Integer.minus_one in
+      let truth2 = assume_non_equal context typ v2 Z.minus_one in
       let truth = disjunctive_truth (v1, truth1) (v2, truth2) in
       reduce_both_by_truth ~alarm (Some e1, v1) (e2, v2) truth
     | _ -> return (v1, v2)
@@ -676,11 +676,11 @@ module Make
   let cast_integer overflow_kind expr ~src ~dst value =
     let open Evaluated.Operators in
     let* value =
-      if Eval_typ.(Integer.lt (range_lower_bound src) (range_lower_bound dst))
+      if Eval_typ.(Z.lt (range_lower_bound src) (range_lower_bound dst))
       then truncate_lower_bound overflow_kind expr dst value
       else return value
     in
-    if Eval_typ.(Integer.gt (range_upper_bound src) (range_upper_bound dst))
+    if Eval_typ.(Z.gt (range_upper_bound src) (range_upper_bound dst))
     then truncate_upper_bound overflow_kind expr dst value
     else return value
 
@@ -739,14 +739,14 @@ module Make
 
   let truncate_float_bound fkind bound bound_kind expr value =
     let next_int, prev_float, is_beyond = match bound_kind with
-      | Alarms.Upper_bound -> Integer.succ, Fval.F.prev_float, Integer.geq
-      | Alarms.Lower_bound -> Integer.pred, Fval.F.next_float, Integer.leq
+      | Alarms.Upper_bound -> Z.succ, Fval.F.prev_float, Z.geq
+      | Alarms.Lower_bound -> Z.pred, Fval.F.next_float, Z.leq
     in
     let ibound = next_int bound in
-    let fbound = Integer.to_float ibound in
+    let fbound = Z.to_float ibound in
     let fbound = Floating_point.round_if_single_precision fkind fbound in
     let float_bound =
-      if is_beyond (Integer.of_float fbound) ibound
+      if is_beyond (Z.of_float fbound) ibound
       then prev_float (Fval.kind fkind) fbound
       else fbound
     in
@@ -1081,7 +1081,7 @@ module Make
             let size = Cil.lenOfArray64 array_size in
             (* Handle the special GCCism of zero-sized arrays: Frama-C
                pretends their size is unknown, exactly like GCC. *)
-            if Integer.is_zero size
+            if Z.is_zero size
             then `Value index, Alarmset.none
             else
               let size_expr = Option.get array_size in (* array_size exists *)

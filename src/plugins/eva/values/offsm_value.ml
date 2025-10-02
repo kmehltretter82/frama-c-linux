@@ -68,7 +68,7 @@ let inject ~size v =
 (** Reading a given bit *)
 
 let read_bit o bit =
-  let v = basic_find ~start:bit ~size:Integer.one o in
+  let v = basic_find ~start:bit ~size:Z.one o in
   let v = V_Or_Uninitialized.get_v v in
   try
     let i = V.project_ival_bottom v in
@@ -84,30 +84,30 @@ let read_bit o bit =
 let explode_range o (b, e) =
   (* result. only [b..e] will be modified *)
   let r = ref o in
-  let bit i = read_bit o (Integer.of_int i) in
+  let bit i = read_bit o (Z.of_int i) in
   (* value + start of the constant interval *)
   let vstart = ref (bit b, b)  in
   (* Write the current value between [snd !vstart] and [i] inclusive *)
   let write_current i =
     let v, start = !vstart in
-    let start = Integer.of_int start in
-    let size = Integer.length start i in
+    let start = Z.of_int start in
+    let size = Z.length start i in
     match v with
     | `Zero ->
       r := basic_add ~start ~size V.singleton_zero !r
     | `One ->
-      let v = V.inject_int (Integer.pred (Integer.two_power size)) in
+      let v = V.inject_int (Z.pred (Z.two_power size)) in
       r := basic_add ~start ~size v !r
     | `ZeroOne -> () (* keep the underlying value unchanged *)
   in
   for i = b+1 to e do
     let v = bit i in
     if v <> fst !vstart then begin (* previous interval finished, write it *)
-      write_current (Integer.of_int (i-1));
+      write_current (Z.of_int (i-1));
       vstart :=  (v, i);
     end
   done;
-  write_current (Integer.of_int e);
+  write_current (Z.of_int e);
   !r
 
 (** Decompose an offsetmap into ranges of consecutive equal bits. Non-constant
@@ -115,7 +115,7 @@ let explode_range o (b, e) =
 let explode o =
   let r = ref o in
   let aux (e, b) _ =
-    r := explode_range !r (Integer.to_int e, Integer.to_int b)
+    r := explode_range !r (Z.to_int e, Z.to_int b)
   in
   V_Offsetmap.iter aux o;
   List.rev (V_Offsetmap.fold (fun r v acc -> (r, v) :: acc) !r [])
@@ -271,7 +271,7 @@ let sign_bit size offsm =
     then Int.pred size
     else Int.zero
   in
-  let sign_v = basic_find ~start:sign_bit ~size:Integer.one offsm in
+  let sign_v = basic_find ~start:sign_bit ~size:Z.one offsm in
   Cvalue.V_Or_Uninitialized.get_v sign_v
 
 (* Creates an offsetmap of size [size] filled with the sign bit of [offsm]. *)
@@ -392,7 +392,7 @@ module Offsm
 
   let inject_int typ i =
     try
-      let size = Integer.of_int (Cil.bitsSizeOf typ) in
+      let size = Z.of_int (Cil.bitsSizeOf typ) in
       O (inject ~size (V.inject_int i))
     with Cil.SizeOfError _ -> Top
 
@@ -465,7 +465,7 @@ end
 (*          Reduced product between Cvalues and Offsetmaps values             *)
 (* -------------------------------------------------------------------------- *)
 
-let size typ = Integer.of_int (Cil.bitsSizeOf typ)
+let size typ = Z.of_int (Cil.bitsSizeOf typ)
 
 (* Extract an offsetmap from a pair, by converting the value when needed. *)
 let to_offsm typ v = function

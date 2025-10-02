@@ -133,7 +133,7 @@ let ik_attrs_range ik attrs =
   let i_bits =
     match bitfield_size_attributes attrs with
     | None -> Cil.bitsSizeOfInt ik
-    | Some size -> Integer.to_int size
+    | Some size -> Z.to_int size
   in
   { i_bits; i_signed = Cil.isSigned ik }
 
@@ -145,7 +145,7 @@ let range_inclusion r1 r2 =
   | false, true ->  r1.i_bits <= r2.i_bits-1
 
 let range_lower_bound r =
-  if r.i_signed then Cil.min_signed_number r.i_bits else Integer.zero
+  if r.i_signed then Cil.min_signed_number r.i_bits else Z.zero
 
 let range_upper_bound r =
   if r.i_signed

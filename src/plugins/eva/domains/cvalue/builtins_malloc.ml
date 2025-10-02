@@ -111,12 +111,12 @@ let extract_size sizev_bytes =
     let sizei_bytes = Cvalue.V.project_ival sizev_bytes in
     begin match Ival.min_and_max sizei_bytes with
       | Some smin, Some smax ->
-        assert (Integer.(geq smin zero));
-        smin, Integer.min smax max
+        assert (Z.(geq smin zero));
+        smin, Z.min smax max
       | _ -> assert false (* Cil invariant: cast to size_t *)
     end
   with V.Not_based_on_null -> (* size is a garbled mix *)
-    Integer.zero, max
+    Z.zero, max
 
 (* Name of the base that will be given to a malloced variable, determined
    using the callstack. *)
@@ -175,10 +175,10 @@ let mutate_name_to_weak vi =
 
 (* This type represents the size requested to malloc/realloc and co. *)
 type typed_size = {
-  min_bytes: Integer.t (* minimum size requested, in bytes *);
-  max_bytes: Integer.t (* maximum size requested, in bytes *);
+  min_bytes: Z.t (* minimum size requested, in bytes *);
+  max_bytes: Z.t (* maximum size requested, in bytes *);
   elem_typ: typ (* "guessed type" for the elements of the new variable *);
-  nb_elems: Integer.t option (* number of elements of size [sizeof(elem_typ)].
+  nb_elems: Z.t option (* number of elements of size [sizeof(elem_typ)].
                                 None if [min<>max] *);
 }
 
@@ -251,9 +251,9 @@ let weaken_type typ =
 
 (* size for which the base is certain to be valid *)
 let size_sure_valid b = match Base.validity b with
-  | Base.Invalid | Base.Empty | Base.Unknown (_, None, _) -> Integer.zero
+  | Base.Invalid | Base.Empty | Base.Unknown (_, None, _) -> Z.zero
   | Base.Known (_, up) | Base.Unknown (_, Some up, _)
-  | Base.Variable { Base.min_alloc = up } -> Integer.succ up
+  | Base.Variable { Base.min_alloc = up } -> Z.succ up
 
 (* Create a new offsetmap initialized to [bottom] on the entire allocable
    range, with the first [max_alloc] bits set to [v].
@@ -505,7 +505,7 @@ let () =
 (* --------------------------------- Calloc --------------------------------- *)
 
 let zero_to_max_bytes () = Ival.inject_range
-    (Some Integer.zero) (Some (Bit_utils.max_byte_size ()))
+    (Some Z.zero) (Some (Bit_utils.max_byte_size ()))
 
 let alloc_size_ok intended_size =
   try
@@ -706,11 +706,11 @@ let free_automatic_bases stack state =
    copied to [new_base]. *)
 let realloc_copy_one size ~src_state ~dst_state new_base b =
   let size_char = Bit_utils.sizeofchar () in
-  let size_bits = Integer.mul size size_char in
+  let size_bits = Z.mul size size_char in
   let up = match Base.validity b with
     | Base.Known (_, up) | Base.Unknown (_, _, up)
     | Base.Variable { Base.max_alloc = up } -> up
-    | Base.Invalid | Base.Empty -> Integer.zero
+    | Base.Invalid | Base.Empty -> Z.zero
 
   in
   let size_to_copy = Int.min (Int.succ up) size_bits in
@@ -758,8 +758,8 @@ let realloc_alloc_copy weak bases_to_realloc null_in_arg sizev state =
       else
         (* Compute the maximal size that is guaranteed to be copied across all
            bases *)
-        let aux_valid size b = Integer.min size (size_sure_valid b) in
-        let size_new_loc = Integer.mul size_max (Bit_utils.sizeofchar ()) in
+        let aux_valid size b = Z.min size (size_sure_valid b) in
+        let size_new_loc = Z.mul size_max (Bit_utils.sizeofchar ()) in
         let size_sure_valid = List.fold_left aux_valid size_new_loc lbases in
         (* Replace the bits [0..size_sure_valid] by [bottom]. Those [bottom]
            will be overwritten in the call to [realloc_copy_one]. *)

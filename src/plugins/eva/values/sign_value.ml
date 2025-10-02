@@ -82,8 +82,8 @@ let top_int = top
 
 (* [inject_int] creates an abstract value corresponding to the singleton [i]. *)
 let inject_int _ i =
-  if Integer.lt i Integer.zero then neg
-  else if Integer.gt i Integer.zero then pos
+  if Z.lt i Z.zero then neg
+  else if Z.gt i Z.zero then pos
   else zero
 
 let constant _context _expr = function

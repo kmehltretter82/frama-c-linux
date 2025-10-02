@@ -28,7 +28,7 @@ let pretty fmt = function
 let reduce_offset_by_validity origin ival size validity =
   (* Reduces [ival] so that all accesses fit within [min] and [max]. *)
   let reduce_for_bounds min max =
-    if Integer.is_zero size
+    if Z.is_zero size
     then Set []
     else
       let max_valid = Int.sub max (Int.pred size) in

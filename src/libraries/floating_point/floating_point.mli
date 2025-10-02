@@ -43,9 +43,9 @@ val round_if_single_precision : Cil_types.fkind -> float -> float
 (** {2 Floating-point operations} *)
 
 type truncated_to_integer =
-  | Integer of Integer.t (** The given float has been successfully truncated. *)
-  | Underflow            (** The given float would underflow if truncated. *)
-  | Overflow             (** The given float would overflow if truncated. *)
+  | Integer of Z.t (** The given float has been successfully truncated. *)
+  | Underflow      (** The given float would underflow if truncated. *)
+  | Overflow       (** The given float would overflow if truncated. *)
 
 (** Truncates a given floating point number, i.e returns the closest
     integer rounded toward zero, regardless of the current rounding mode.

@@ -1573,17 +1573,17 @@ let formatter = Formatter.ty
 module Integer =
   Make_with_collections
     (struct
-      type t = Integer.t
+      type t = Z.t
       let name = "Datatype.Integer"
-      let reprs = [ Integer.zero ]
+      let reprs = [ Z.zero ]
       let structural_descr = Structural_descr.t_abstract
-      let equal = Integer.equal
-      let compare = Integer.compare
-      let hash = Integer.hash
+      let equal = Z.equal
+      let compare = Z.compare
+      let hash = Z.hash
       let rehash = identity
       let copy = identity
       (* TODO: this should take into account kernel's option -big-ints-hex *)
-      let pretty = Integer.pretty
+      let pretty = Z.pretty
       let mem_project = never_any_project
     end)
 let integer = Integer.ty

@@ -98,7 +98,7 @@ let isCrossableAtInit tr func =
     if Kernel.LibEntry.get() then t
     else begin
       let bool_res test =
-        if test then Cil.lconstant Integer.one else Cil.lzero ()
+        if test then Cil.lconstant Z.one else Cil.lzero ()
       in
       let bool3_res dft test =
         match test with
@@ -109,7 +109,7 @@ let isCrossableAtInit tr func =
       let is_true t =
         match t with
         | TConst(Integer(i,_)) ->
-          Bool3.bool3_of_bool (not (Integer.is_zero i))
+          Bool3.bool3_of_bool (not (Z.is_zero i))
         | TConst(LChr c) -> Bool3.bool3_of_bool (not (Char.code c <> 0))
         | TConst(LReal r) -> Bool3.bool3_of_bool (not (r.r_nearest <> 0.))
         | TConst(LStr _ | LWStr _) -> Bool3.True
@@ -127,7 +127,7 @@ let isCrossableAtInit tr func =
           let t1 = aux t1 in
           (match op,t1.term_node with
            | Neg, TConst(Integer(i,_)) ->
-             { t with term_node = TConst(Integer(Integer.neg i,None)) }
+             { t with term_node = TConst(Integer(Z.neg i,None)) }
            | Neg, TConst(LReal r) ->
              let f = ~-. (r.r_nearest) in
              let r = {
@@ -145,7 +145,7 @@ let isCrossableAtInit tr func =
           let rec comparison comp t1 t2 =
             match t1.term_node,t2.term_node with
             | TConst (Integer(i1,_)), TConst (Integer(i2,_)) ->
-              bool_res (comp (Integer.compare i1 i2))
+              bool_res (comp (Z.compare i1 i2))
             | TConst (LChr c1), TConst (LChr c2) ->
               bool_res (comp (Char.compare c1 c2))
             | TConst(LReal r1), TConst (LReal r2) ->
@@ -158,29 +158,29 @@ let isCrossableAtInit tr func =
           (match op, t1.term_node, t2.term_node with
            | PlusA, TConst(Integer(i1,_)), TConst(Integer(i2,_)) ->
              { t with term_node =
-                        TConst(Integer(Integer.add i1 i2,None))}
+                        TConst(Integer(Z.add i1 i2,None))}
            | MinusA, TConst(Integer(i1,_)), TConst(Integer(i2,_)) ->
              { t with term_node =
-                        TConst(Integer(Integer.sub i1 i2,None)) }
+                        TConst(Integer(Z.sub i1 i2,None)) }
            | Mult, TConst(Integer(i1,_)), TConst(Integer(i2,_)) ->
              { t with term_node =
-                        TConst(Integer(Integer.mul i1 i2,None)) }
+                        TConst(Integer(Z.mul i1 i2,None)) }
            | Div, TConst(Integer(i1,_)), TConst(Integer(i2,_)) ->
              (try
                 { t with term_node =
-                           TConst(Integer(Integer.div i1 i2,None)) }
+                           TConst(Integer(Z.div i1 i2,None)) }
               with Division_by_zero -> t)
            | Mod, TConst(Integer(i1,_)), TConst(Integer(i2,_)) ->
              (try
                 { t with term_node =
-                           TConst(Integer(Integer.rem i1 i2,None)) }
+                           TConst(Integer(Z.rem i1 i2,None)) }
               with Division_by_zero -> t)
            | Shiftlt, TConst(Integer(i1,_)), TConst(Integer(i2,_)) ->
              { t with term_node =
-                        TConst(Integer(Integer.shift_left_z i1 i2,None)) }
+                        TConst(Integer(Z.shift_left_z i1 i2,None)) }
            | Shiftrt, TConst(Integer(i1,_)), TConst(Integer(i2,_)) ->
              { t with term_node =
-                        TConst(Integer(Integer.shift_right_z i1 i2,None)) }
+                        TConst(Integer(Z.shift_right_z i1 i2,None)) }
            | Lt, _, _ -> comparison ((<) 0) t1 t2
            | Gt, _, _ -> comparison ((>) 0) t1 t2
            | Le, _, _ -> comparison ((<=) 0) t1 t2
@@ -229,7 +229,7 @@ let isCrossableAtInit tr func =
                  (fun o i _ t ->
                     match o with
                     | Index({ enode = Const(CInt64(i2,_,_))},_)
-                      when Integer.equal i1 i2 -> aux_init oth i
+                      when Z.equal i1 i2 -> aux_init oth i
                     | _ -> t)
                ~ct ~initl ~acc:None
            | _ -> None)
@@ -262,7 +262,7 @@ let isCrossableAtInit tr func =
     let rec comparison t1 t2 =
       match t1.term_node,t2.term_node with
       | TConst (Integer(i1,_)), TConst (Integer(i2,_)) ->
-        Bool3.bool3_of_bool (comp (Integer.compare i1 i2))
+        Bool3.bool3_of_bool (comp (Z.compare i1 i2))
       | TConst (LChr c1), TConst (LChr c2) ->
         Bool3.bool3_of_bool (comp (Char.compare c1 c2))
       | TConst(LReal r1), TConst (LReal r2) ->
@@ -299,7 +299,7 @@ let isCrossableAtInit tr func =
 (** Returns an int constant expression which represents the given int value. *)
 let mk_int_exp value =
   new_exp ~loc:Cil_datatype.Location.unknown
-    (Const(CInt64(Integer.of_int value,IInt,Some(string_of_int value))))
+    (Const(CInt64(Z.of_int value,IInt,Some(string_of_int value))))
 
 (** This function rewrites a cross condition into an ACSL expression.
     Moreover, by giving current operation name and its status (call or
@@ -575,7 +575,7 @@ let crosscond_to_exp generated_kf curr_f curr_status loc cond res =
          stmts1 @ stmts2, vars1 @ vars2,
          Cil_datatype.Varinfo.Set.union defs1 defs2,
          Cil.mkBinOp ~loc LOr e1 e2
-       | Some i when Integer.is_zero i -> expnode_convert c2
+       | Some i when Z.is_zero i -> expnode_convert c2
        | Some _ -> [], [], Cil_datatype.Varinfo.Set.empty,e1)
     | TAnd (c1, c2) ->
       let stmts1, vars1, defs1, e1 = expnode_convert c1 in
@@ -585,7 +585,7 @@ let crosscond_to_exp generated_kf curr_f curr_status loc cond res =
          stmts1 @ stmts2, vars1 @vars2,
          Cil_datatype.Varinfo.Set.union defs1 defs2,
          Cil.mkBinOp ~loc LAnd e1 e2
-       | Some i when Integer.is_zero i ->
+       | Some i when Z.is_zero i ->
          [], [], Cil_datatype.Varinfo.Set.empty, e1
        | Some _ -> expnode_convert c2)
     | TNot (c1) ->
@@ -593,7 +593,7 @@ let crosscond_to_exp generated_kf curr_f curr_status loc cond res =
       (match Cil.isInteger e1 with
        | None ->
          stmts1, vars1, defs1, Cil.new_exp ~loc (UnOp(LNot, e1,Cil_const.intType))
-       | Some i when Integer.is_zero i ->
+       | Some i when Z.is_zero i ->
          [], [], Cil_datatype.Varinfo.Set.empty, Cil.one ~loc
        | Some _ -> [], [], Cil_datatype.Varinfo.Set.empty, Cil.zero ~loc)
     | TCall (f,None) ->
@@ -747,7 +747,7 @@ let mk_gvar_enum ?init name name_enuminfo =
 (** {b Terms management / computation} *)
 
 (** Return an integer constant term from the given value. *)
-let mk_int_term value = Cil.lconstant (Integer.of_int value)
+let mk_int_term value = Cil.lconstant (Z.of_int value)
 
 (** Returns a term representing the variable associated to the given varinfo *)
 let mk_term_from_vi vi =

@@ -41,9 +41,9 @@ let test z is_hex nbits has_sep =
   guard (nbits >= 0 && nbits <= 1024);
   let sep = if has_sep then Some "_" else None in
   let pp z = if is_hex then
-      Integer.pp_hex ~nbits ?sep z
+      Z.pp_hex ~nbits ?sep z
     else
-      Integer.pp_bin ~nbits ?sep z
+      Z.pp_bin ~nbits ?sep z
   in
   let s = Format.asprintf "%a" pp z in
   reparse z s

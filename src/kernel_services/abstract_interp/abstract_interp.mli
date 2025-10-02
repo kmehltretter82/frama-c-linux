@@ -48,7 +48,7 @@ end
 open Lattice_type
 
 module Int : sig
-  include module type of Integer with type t = Integer.t
+  include module type of Z with type t = Z.t
   include Lattice_Value with type t := t
 
   val fold : (t -> 'a -> 'a) -> inf:t -> sup:t -> step:t -> 'a -> 'a

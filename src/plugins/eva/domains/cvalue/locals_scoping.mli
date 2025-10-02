@@ -35,7 +35,7 @@ val offsetmap_contains_local: Cvalue.V_Offsetmap.t -> bool
 val make_escaping:
   exact:bool ->
   escaping:Base.Hptset.t ->
-  on_escaping:(b:Base.t -> itv:Integer.t * Integer.t -> v:Cvalue.V.t -> unit) ->
+  on_escaping:(b:Base.t -> itv:Z.t * Z.t -> v:Cvalue.V.t -> unit) ->
   within:Base.SetLattice.t ->
   Cvalue.Model.t -> Cvalue.Model.t
 (** [make_escaping ~exact ~escaping ~on_escaping ~within state] changes all

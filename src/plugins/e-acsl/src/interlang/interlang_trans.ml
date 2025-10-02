@@ -121,15 +121,15 @@ and compile_context_insensitive {Interlang.enode; origin} =
       match ity with
       | Nan -> assert false
       | Real -> Error.not_yet "real number constant"
-      | Rational -> mk_real (Integer.to_string n), Str_R
+      | Rational -> mk_real (Z.to_string n), Str_R
       | Gmpz ->
         Cil.mkAddrOrStartOf ~loc
           (Cil.var
              (Globals.Vars.add_string_literal ~loc
-                (Str (Integer.to_string n)))),
+                (Str (Z.to_string n)))),
         Str_Z
       | C_float fkind ->
-        Cil.kfloat ~loc fkind (Int64.to_float (Integer.to_int64 n)), C_number
+        Cil.kfloat ~loc fkind (Int64.to_float (Z.to_int64 n)), C_number
       | C_integer kind ->
         match cast, kind with
         | Some ty, (ILongLong | IULongLong) when Gmp_types.Z.is_t ty ->
@@ -137,10 +137,10 @@ and compile_context_insensitive {Interlang.enode; origin} =
           Cil.mkAddrOrStartOf ~loc
             (Cil.var
                (Globals.Vars.add_string_literal ~loc
-                  (Str (Integer.to_string n)))),
+                  (Str (Z.to_string n)))),
           Str_Z
         | Some ty, _ when Gmp_types.Q.is_t ty ->
-          mk_real (Integer.to_string n),  Str_R
+          mk_real (Z.to_string n),  Str_R
         | (None | Some _), _ ->
           (* do not keep the initial string representation because the generated
              constant must reflect its type computed by the type system. For

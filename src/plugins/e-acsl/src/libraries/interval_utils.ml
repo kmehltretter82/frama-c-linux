@@ -81,7 +81,7 @@ let join i1 i2 = match i1, i2 with
         (* if the interval of integers fits into the float types, then return
            this float type; otherwise return Rational *)
         (try
-           let to_float n = Int64.to_float (Integer.to_int64 n) in
+           let to_float n = Int64.to_float (Z.to_int64 n) in
            let mini, maxi = to_float min, to_float max in
            let minf, maxf = match k with
              | FFloat -> Floating_point.finite_range_of Single
@@ -138,7 +138,7 @@ let meet i1 i2 = match i1, i2 with
         (* if the float type fits into the interval of integers, then return
            this float type; otherwise return Rational *)
         (try
-           let to_float n = Int64.to_float (Integer.to_int64 n) in
+           let to_float n = Int64.to_float (Z.to_int64 n) in
            let mini, maxi = to_float min, to_float max in
            if mini <= f && maxi >= f then Float(k, Some f) else Ival Ival.bottom
          with Z.Overflow | Exit ->
@@ -157,7 +157,7 @@ let meet i1 i2 = match i1, i2 with
         (* if the float type fits into the interval of integers, then return
            this float type; otherwise return Rational *)
         (try
-           let to_float n = Int64.to_float (Integer.to_int64 n) in
+           let to_float n = Int64.to_float (Z.to_int64 n) in
            let mini, maxi = to_float min, to_float max in
            let minf, maxf = match k with
              | FFloat -> Floating_point.finite_range_of Single
@@ -198,19 +198,19 @@ let extract_ival = function
 let bottom = Ival Ival.bottom
 let top_ival = Ival (Ival.inject_range None None)
 let singleton n = Ival (Ival.inject_singleton n)
-let singleton_of_int n = singleton (Integer.of_int n)
+let singleton_of_int n = singleton (Z.of_int n)
 let ival min max = Ival (Ival.inject_range (Some min) (Some max))
 
 let interv_of_unknown_block =
   (* since we have no idea of the size of this block, we take the largest
      possible one which is unfortunately quite large *)
-  lazy (ival Integer.zero (Bit_utils.max_byte_address ()))
+  lazy (ival Z.zero (Bit_utils.max_byte_address ()))
 
 let ival_of_ikind ik =
   let n = Cil.bitsSizeOf (Cil_const.mk_tint ik) in
   let l, u =
     if Cil.isSigned ik then Cil.min_signed_number n, Cil.max_signed_number n
-    else Integer.zero, Cil.max_unsigned_number n
+    else Z.zero, Cil.max_unsigned_number n
   in
   Ival.inject_range (Some l) (Some u)
 
@@ -235,7 +235,7 @@ let extended_interv_of_typ ty = match interv_of_typ ty with
   | Ival iv ->
     let l,u = Ival.min_int iv, Ival.max_int iv in
     let u = match u with
-      | Some u -> Some (Integer.add u Integer.one)
+      | Some u -> Some (Z.add u Z.one)
       | None -> None
     in
     Ival (Ival.inject_range l u);
@@ -258,7 +258,7 @@ let ikind_of_ival iv =
     | Some l, Some u ->
       begin
         try
-          let is_pos = Integer.geq l Integer.zero in
+          let is_pos = Z.geq l Z.zero in
           let lkind = Cil.intKindForValue l is_pos in
           let ukind = Cil.intKindForValue u is_pos in
           (* kind corresponding to the interval *)

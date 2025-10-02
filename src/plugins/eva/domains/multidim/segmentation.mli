@@ -21,7 +21,7 @@ sig
   type t
   exception UnsupportedBoundExpression
   val of_exp : Eva_ast.exp -> t
-  val of_integer : Integer.t -> t
+  val of_integer : Z.t -> t
   val succ : t -> t
 end
 
@@ -46,7 +46,7 @@ sig
   val update : oracle:oracle -> (submemory -> submemory or_bottom) ->
     t -> bound -> bound -> t or_top_bottom
   val incr_bound :
-    oracle:oracle -> Cil_types.varinfo -> Integer.t option -> t -> t or_top
+    oracle:oracle -> Cil_types.varinfo -> Z.t option -> t -> t or_top
   val map : (submemory -> submemory) -> t -> t
   val fold : (submemory -> 'a -> 'a) -> (bit -> 'b -> 'a) -> t -> 'b -> 'a
   val add_segmentation_bounds : oracle:oracle -> bound list -> t -> t

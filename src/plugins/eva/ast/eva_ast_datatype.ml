@@ -104,6 +104,6 @@ module Constant = Datatype.Make_with_collections (struct
     let compare = compare_constant
     let equal = equal_constant
     let hash = hash_constant
-    let reprs = [ CInt64 (Integer.zero, IInt, None) ]
+    let reprs = [ CInt64 (Z.zero, IInt, None) ]
     let pretty = Eva_ast_printer.pp_constant
   end)

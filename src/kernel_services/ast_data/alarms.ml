@@ -36,11 +36,11 @@ type alarm =
   | Overflow of
       overflow_kind
       * exp
-      * Integer.t (* the bound *)
+      * Z.t (* the bound *)
       * bound_kind
   | Float_to_int of
       exp
-      * Integer.t (* the bound *)
+      * Z.t (* the bound *)
       * bound_kind
   | Not_separated of lval * lval
   | Overlap of lval * lval
@@ -72,8 +72,8 @@ module D =
           Invalid_shift (e, None);
           Pointer_comparison (None, e);
           Differing_blocks (e, e);
-          Overflow (Signed, e, Integer.one, Lower_bound);
-          Float_to_int (e, Integer.one, Lower_bound);
+          Overflow (Signed, e, Z.one, Lower_bound);
+          Float_to_int (e, Z.one, Lower_bound);
           Not_separated (lv, lv);
           Overlap (lv, lv);
           Uninitialized lv;
@@ -135,7 +135,7 @@ module D =
             let n = Exp.compare e1 e2 in
             if n = 0 then
               let n = Stdlib.compare b1 b2 in
-              if n = 0 then Integer.compare n1 n2 else n
+              if n = 0 then Z.compare n1 n2 else n
             else
               n
           else
@@ -144,7 +144,7 @@ module D =
           let n = Exp.compare e1 e2 in
           if n = 0 then
             let n = Stdlib.compare b1 b2 in
-            if n = 0 then Integer.compare n1 n2 else n
+            if n = 0 then Z.compare n1 n2 else n
           else
             n
         | Not_separated(lv11, lv12), Not_separated(lv21, lv22)
@@ -198,9 +198,9 @@ module D =
         | Differing_blocks (e1, e2) ->
           Hashtbl.hash (nb a, Exp.hash e1, Exp.hash e2)
         | Overflow(s, e, n, b) ->
-          Hashtbl.hash (s, nb a, Exp.hash e, Integer.hash n, b)
+          Hashtbl.hash (s, nb a, Exp.hash e, Z.hash n, b)
         | Float_to_int(e, n, b) ->
-          Hashtbl.hash (nb a, Exp.hash e, Integer.hash n, b)
+          Hashtbl.hash (nb a, Exp.hash e, Z.hash n, b)
         | Not_separated(lv1, lv2) | Overlap(lv1, lv2) ->
           Hashtbl.hash (nb a, Lval.hash lv1, Lval.hash lv2)
         | Uninitialized lv -> Hashtbl.hash (nb a, Lval.hash lv)
@@ -256,8 +256,8 @@ module D =
             (match b with Lower_bound -> ">" | Upper_bound -> "<")
             Datatype.Integer.pretty
             ((match b with
-                | Lower_bound -> Integer.sub
-                | Upper_bound -> Integer.add) n Integer.one)
+                | Lower_bound -> Z.sub
+                | Upper_bound -> Z.add) n Z.one)
         | Not_separated(lv1, lv2) ->
           Format.fprintf fmt "Not_separated(@[%a@],@ @[%a@])"
             Lval.pretty lv1 Lval.pretty lv2
@@ -559,9 +559,9 @@ let create_predicate ?(loc=Location.unknown) alarm =
       let t = Logic_const.tlogic_coerce ~loc te Lreal in
       let n =
         (match bound with
-         | Lower_bound -> Integer.sub
-         | Upper_bound -> Integer.add)
-          n Integer.one
+         | Lower_bound -> Z.sub
+         | Upper_bound -> Z.add)
+          n Z.one
       in
       let tn = Logic_const.tlogic_coerce ~loc (Logic_const.tint ~loc n) Lreal in
       Logic_const.prel ~loc

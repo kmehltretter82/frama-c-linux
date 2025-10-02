@@ -402,11 +402,11 @@ let memset_typ_offsm_int full_typ i =
         | TArray (typelt, nb) -> begin
             let nb = Cil.lenOfArray64 nb in (* always succeeds, we computed the
                                                size of the entire type earlier *)
-            if Integer.(gt nb zero) then begin
+            if Z.(gt nb zero) then begin
               let sizeelt = Int.of_int (Cil.bitsSizeOf typelt) in
               (* Do the first cell *)
               let offsm' = aux typelt offset offsm in
-              if Integer.(gt nb one) then begin
+              if Z.(gt nb one) then begin
                 (* Copy the result *)
                 let src = Ival.inject_singleton offset in
                 let copy =

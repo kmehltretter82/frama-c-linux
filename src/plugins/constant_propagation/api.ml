@@ -15,7 +15,7 @@ exception Cannot_change
 
 (* Build the term [p+i], assuming that [p] has pointer type *)
 let plus_pi ~loc p i =
-  if Integer.(equal zero i) then
+  if Z.(equal zero i) then
     p
   else
     Cil.mkBinOp ~loc PlusPI p (Cil.kinteger64 ~loc i)
@@ -148,7 +148,7 @@ class propagate project fnames ~cast_intro = object(self)
               let typ_pointed = Ast_types.(unroll (direct_pointed_type typ_e)) in
               if Ast_types.is_void typ_pointed then
                 raise Bit_utils.NoMatchingOffset;
-              let offset = Integer.mul offset 8z in
+              let offset = Z.mul offset 8z in
               let m = Bit_utils.MatchType typ_pointed in
               let off, _ = Bit_utils.(find_offset vi.vtype ~offset m) in
               Cil.mkAddrOrStartOf ~loc (Var vi, off)
@@ -165,13 +165,13 @@ class propagate project fnames ~cast_intro = object(self)
                   in
                   array, Int_Base.project size
                 in
-                let div,rem = Integer.ediv_rem offset sizeof_pointed in
+                let div,rem = Z.ediv_rem offset sizeof_pointed in
                 array,div,rem
               in
               let expr' =
                 if array then
                   let off_idx =
-                    if Integer.is_zero idx
+                    if Z.is_zero idx
                     then NoOffset
                     else Index (Cil.kinteger64 ~loc idx, NoOffset)
                   in
@@ -180,7 +180,7 @@ class propagate project fnames ~cast_intro = object(self)
                   let start = Cil.mkAddrOrStartOf ~loc (Var vi, NoOffset) in
                   plus_pi ~loc start idx
               in
-              if Integer.is_zero rem then expr'
+              if Z.is_zero rem then expr'
               else
                 plus_pi ~loc
                   (self#add_cast

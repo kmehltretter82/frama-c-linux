@@ -175,7 +175,7 @@ let extract_pointer value =
   | Base.Var (v, _), i
   | Base.Allocated (v, _, _), i ->
     begin
-      try Result.Ok (v, Integer.to_int (Ival.project_int i))
+      try Result.Ok (v, Z.to_int (Ival.project_int i))
       with Ival.Not_Singleton_Int | Z.Overflow ->
         error "Not a correct pointer, incorrect offset: %a" Ival.pretty i
     end
@@ -184,8 +184,8 @@ let extract_pointer value =
       Cvalue.V.pretty value
 
 let to_int i =
-  try Result.Ok (Integer.to_int i)
-  with Z.Overflow -> error "Overflow on integer %a" Integer.pretty i
+  try Result.Ok (Z.to_int i)
+  with Z.Overflow -> error "Overflow on integer %a" Z.pretty i
 
 let extract_int value =
   try Cvalue.V.project_ival value |> Ival.project_int |> to_int
@@ -196,9 +196,9 @@ let extract_int_possibly_zero value =
   match Cvalue.V.project_ival value |> Ival.project_small_set with
   | Some [v] ->
     to_int v |> Result.map (fun v -> v, `Exact)
-  | Some [v1; v2] when Integer.is_zero v1 ->
+  | Some [v1; v2] when Z.is_zero v1 ->
     to_int v2 |> Result.map (fun v -> v, `WithZero)
-  | Some [v1; v2] when Integer.is_zero v2 ->
+  | Some [v1; v2] when Z.is_zero v2 ->
     to_int v1 |> Result.map (fun v -> v, `WithZero)
   | Some _ | None | exception Cvalue.V.Not_based_on_null ->
     error "Non-integer or imprecise value: %a" Cvalue.V.pretty value
@@ -210,7 +210,7 @@ let extract_int_list ~cardinal value =
     then
       Ival.to_int_seq ival |>
       List.of_seq |>
-      List.map Integer.to_int |>
+      List.map Z.to_int |>
       Result.ok
     else error "Imprecise value: %a" Ival.pretty ival
   with

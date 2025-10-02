@@ -19,7 +19,7 @@ let not_yet ~what =
   Options.warning "Not yet: %s" what
 
 (* [int_to_predicate ~loc lop te i] create a predicate where [te] [lop] [i]. *)
-let int_to_predicate ~loc ~lop te (i: Integer.t) =
+let int_to_predicate ~loc ~lop te (i: Z.t) =
   let ti = Logic_const.tint i in
   Logic_const.prel ~loc (lop, te, ti)
 
@@ -45,7 +45,7 @@ let interval_to_predicate_opt ~loc te min max =
 (* [congruence_to_predicate_opt ~loc te rem modulo] may create a congruence
    predicate where [te] mod [modulo] equals [rem] *)
 let congruence_to_predicate_opt ~loc te rem modulo =
-  if Integer.(equal modulo one) then None
+  if Z.(equal modulo one) then None
   else
     let tmodulo = Logic_const.tint ~loc modulo in
     let tbinop = TBinOp(Mod, te, tmodulo) in
@@ -101,7 +101,7 @@ let valid_to_predicate_opt ~loc t valid =
     let p = Logic_const.pvalid_range ~loc (here_lbl, t, tbmn, tbmx) in
     Some p
   | Base.Unknown (_, _, _) -> None
-  | Base.Variable { Base.min_alloc = bmn } when Integer.(equal bmn minus_one) ->
+  | Base.Variable { Base.min_alloc = bmn } when Z.(equal bmn minus_one) ->
     not_yet ~what:"Invalid Base.Variable above max_alloc";
     None
   | Base.Variable { Base.min_alloc = bmn; Base.max_alloc = bmx } ->

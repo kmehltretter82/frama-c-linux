@@ -101,7 +101,7 @@ let project_singleton_int cvalue possible_values =
   try
     Cvalue.V.project_ival cvalue
     |> Ival.project_int
-    |> Integer.to_int
+    |> Z.to_int
     |> find
   with Cvalue.V.Not_based_on_null | Ival.Not_Singleton_Int | Z.Overflow ->
     None

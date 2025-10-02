@@ -151,13 +151,13 @@ struct
   include Base
 
   let bitsize_from_validity = function
-    | Invalid -> Integer.zero
-    | Empty -> Integer.zero
+    | Invalid -> Z.zero
+    | Empty -> Z.zero
     | Known (_, m)
-    | Unknown (_, _, m) -> Integer.succ m
-    | Variable { max_allocable } -> Integer.succ max_allocable
+    | Unknown (_, _, m) -> Z.succ m
+    | Variable { max_allocable } -> Z.succ max_allocable
 
-  let size_from_validity b = Integer.(ediv (bitsize_from_validity b) (of_int 8))
+  let size_from_validity b = Z.(ediv (bitsize_from_validity b) (of_int 8))
 end
 
 
@@ -419,14 +419,14 @@ struct
   (* ---  Lifting                                                           --- *)
   (* -------------------------------------------------------------------------- *)
   let field l fd =
-    let offs = Integer.of_int (Ctypes.field_offset fd) in
+    let offs = Z.of_int (Ctypes.field_offset fd) in
     {
       loc_v = V.field l.loc_v fd;
       loc_t = a_shift l.loc_t (F.e_bigint offs);
     }
 
   let shift l obj k =
-    let size = Integer.of_int (Ctypes.sizeof_object obj) in
+    let size = Z.of_int (Ctypes.sizeof_object obj) in
     let offs = F.e_times size k in
     {
       loc_v = V.shift l.loc_v obj k;
@@ -598,12 +598,12 @@ struct
     | Base.Known (min_valid, max_valid)
     | Base.Unknown (min_valid, Some max_valid, _) ->
       (* valid between min_valid .. max_valid inclusive *)
-      let mn = F.e_bigint Integer.(ediv min_valid (of_int 8)) in
-      let mx = F.e_bigint Integer.(ediv max_valid (of_int 8)) in
+      let mn = F.e_bigint Z.(ediv min_valid (of_int 8)) in
+      let mx = F.e_bigint Z.(ediv max_valid (of_int 8)) in
       Vset.range (Some mn) (Some mx)
     | Base.Variable { Base.min_alloc = min_valid } ->
       (* valid between 0 .. min_valid inclusive *)
-      let mn_valid = F.e_bigint Integer.(ediv min_valid (of_int 8)) in
+      let mn_valid = F.e_bigint Z.(ediv min_valid (of_int 8)) in
       Vset.range (Some F.e_zero) (Some mn_valid)
     | Base.Unknown (_, None, _) -> Vset.empty
 
@@ -747,13 +747,13 @@ struct
   let cvar x = V.inject (Base.of_varinfo x) Ival.zero
 
   let field v fd =
-    let bsize = Ctypes.field_offset fd |> Integer.of_int in
+    let bsize = Ctypes.field_offset fd |> Z.of_int in
     let offs = Ival.inject_singleton bsize in
     Cvalue.V.shift offs v
   let shift v obj t =
-    let bsize = 8 * Ctypes.sizeof_object obj |> Integer.of_int in
+    let bsize = 8 * Ctypes.sizeof_object obj |> Z.of_int in
     let offs = match F.repr t with
-      | Logic.Kint z -> Ival.inject_singleton (Integer.mul bsize z)
+      | Logic.Kint z -> Ival.inject_singleton (Z.mul bsize z)
       | _ -> Ival.top in
     Cvalue.V.shift offs v
   let base_addr v =
@@ -764,7 +764,7 @@ struct
   let load state v obj =
     let bsize = 8 * Ctypes.sizeof_object obj in
     let bits = Locations.loc_bytes_to_loc_bits v in
-    let int_base = bsize |> Integer.of_int |> Int_Base.inject in
+    let int_base = bsize |> Z.of_int |> Int_Base.inject in
     let vloc = Locations.make_loc bits int_base in
     Cvalue.Model.find state vloc
 

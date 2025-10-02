@@ -793,7 +793,7 @@ struct
 
   let e_int64 z = e_zint (Z.of_string (Int64.to_string z))
   let e_fact k e = e_times (Z.of_int k) e
-  let e_bigint z = e_zint (Z.of_string (Integer.to_string z))
+  let e_bigint z = e_zint (Z.of_string (Z.to_string z))
   let e_range a b = e_sum [b;e_one;e_opp a]
 
   let e_setfield r f v =
@@ -819,7 +819,7 @@ struct
   let p_lift f = f
 
   let is_zero e = match QED.repr e with
-    | Kint z -> Integer.equal z Integer.zero
+    | Kint z -> Z.equal z Z.zero
     | _ -> false
 
   let eqp = equal

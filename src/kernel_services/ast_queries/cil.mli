@@ -328,7 +328,7 @@ exception LenOfArray of incorrect_array_length
     integer. Raises {!Cil.LenOfArray} if not able to compute the length, such
     as when there is no length or the length is not a constant. *)
 val lenOfArray: exp option -> int
-val lenOfArray64: exp option -> Integer.t
+val lenOfArray64: exp option -> Z.t
 
 (** Return a named fieldinfo in compinfo, or raise Not_found *)
 val getCompField: compinfo -> string -> fieldinfo
@@ -659,7 +659,7 @@ val mone: loc:Location.t -> exp
     [repr].
     @raise Not_representable if no ikind is provided and the integer is not
     representable. *)
-val kinteger64: loc:location -> ?repr:string -> ?kind:ikind -> Integer.t -> exp
+val kinteger64: loc:location -> ?repr:string -> ?kind:ikind -> Z.t -> exp
 
 (** Construct an integer of a given kind. Converts the integer to int64 and
     then uses kinteger64. This might truncate the value if you use a kind
@@ -678,7 +678,7 @@ val kfloat: loc:location -> fkind -> float -> exp
 
 (** True if the given expression is a (possibly cast'ed)
     character or an integer constant *)
-val isInteger: exp -> Integer.t option
+val isInteger: exp -> Z.t option
 
 (** True if the expression is a compile-time constant.
     [is_varinfo_cst] indicates whether a variable should
@@ -736,7 +736,7 @@ val interpret_character_constant: int64 list -> constant * typ
     (This is the official way of interpreting character constants, according to
     ISO C 6.4.4.4.10, which says that character constants are chars cast to ints)
     Returns CInt64(sign-extended c, IInt, None) *)
-val charConstToInt: char -> Integer.t
+val charConstToInt: char -> Z.t
 val charConstToIntConstant: char -> constant
 
 (** Do constant folding on an expression. If the first argument is [true] then
@@ -749,7 +749,7 @@ val constFold: bool -> exp -> exp
     resulting integer value, if the const-folding was complete, is returned.
     The [machdep] optional parameter, which is set to [true] by default,
     forces the simplification of architecture-dependent expressions. *)
-val constFoldToInt: ?machdep:bool -> exp -> Integer.t option
+val constFoldToInt: ?machdep:bool -> exp -> Z.t option
 
 (** Do constant folding on an term at toplevel only.
     This uses compiler-dependent information and will
@@ -786,7 +786,7 @@ val same_int64 : ?machdep:bool -> exp -> exp -> bool
 val increm: exp -> int -> exp
 
 (** Increment an expression. Can be arithmetic or pointer type *)
-val increm64: exp -> Integer.t -> exp
+val increm64: exp -> Z.t -> exp
 
 (** Makes an lvalue out of a given variable *)
 val var: varinfo -> lval
@@ -937,14 +937,14 @@ val typeOf_wstring_literal: ?loc:location -> int64 list -> typ
 val is_fully_arithmetic: typ -> bool
 (** Returns [true] whenever the type contains only arithmetic types *)
 
-(** Convert a string representing a C integer literal to an Integer.
+(** Convert a string representing a C integer literal to an Z.
     Handles the prefixes 0x and 0 and the suffixes L, U, UL, LL, ULL. *)
-val parseInt: string -> Integer.t
+val parseInt: string -> Z.t
 
 (** Like [parseInt], but returns [Error message] in case of failure, instead of
     aborting Frama-C.
     @since 24.0-Chromium *)
-val parseIntRes: string -> (Integer.t, string) result
+val parseIntRes: string -> (Z.t, string) result
 
 (** Like [parseInt], but converts to an expression. *)
 val parseIntExp: loc:location -> string -> exp
@@ -1857,25 +1857,25 @@ val frank: fkind -> int
 (** Represents an integer as for a given kind.
     Returns a flag saying whether the value was changed
     during truncation (because it was too large to fit in k). *)
-val truncateInteger64: ikind -> Integer.t -> Integer.t * bool
+val truncateInteger64: ikind -> Z.t -> Z.t * bool
 
 (** Returns the maximal value representable in a signed integer type of the
     given size (in bits)
 *)
-val max_signed_number: int -> Integer.t
+val max_signed_number: int -> Z.t
 
 (** Returns the smallest value representable in a signed integer type of the
     given size (in bits)
 *)
-val min_signed_number: int -> Integer.t
+val min_signed_number: int -> Z.t
 
 (** Returns the maximal value representable in a unsigned integer type of the
     given size (in bits)
 *)
-val max_unsigned_number: int -> Integer.t
+val max_unsigned_number: int -> Z.t
 
 (** True if the integer fits within the kind's range *)
-val fitsInInt: ikind -> Integer.t -> bool
+val fitsInInt: ikind -> Z.t -> bool
 
 (** True if the float is finite for the kind's range *)
 val isFiniteFloat: fkind -> float -> bool
@@ -1890,7 +1890,7 @@ exception Not_representable
     The kind will be unsigned if the 2nd argument is true.
     @raise Not_representable if the bigint is not representable.
 *)
-val intKindForValue: Integer.t -> bool -> ikind
+val intKindForValue: Z.t -> bool -> ikind
 
 (** The size of a type, in bytes. Returns a constant expression or a "sizeof"
     expression if it cannot compute the size. This function is architecture
@@ -1974,7 +1974,7 @@ val lone : ?loc:location -> unit -> term
 val lmone : ?loc:location -> unit -> term
 
 (** The given constant logic term *)
-val lconstant : ?loc:location -> Integer.t -> term
+val lconstant : ?loc:location -> Z.t -> term
 
 (** Bind all free variables with an universal quantifier *)
 val close_predicate : predicate -> predicate

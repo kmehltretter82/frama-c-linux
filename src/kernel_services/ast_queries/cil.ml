@@ -2387,12 +2387,12 @@ let isSigned = function
 
 let max_signed_number nrBits =
   let n = nrBits-1 in
-  Integer.(pred (shift_left one n))
+  Z.(pred (shift_left one n))
 let max_unsigned_number nrBits =
-  Integer.(pred (shift_left one nrBits))
+  Z.(pred (shift_left one nrBits))
 let min_signed_number nrBits =
   let n = nrBits-1 in
-  Integer.(neg (shift_left one n))
+  Z.(neg (shift_left one n))
 
 let debugTruncation = false
 
@@ -2407,12 +2407,12 @@ let fitsInInt k i =
       unsignedbits
   in
   let max_strict_bound =
-    Integer.(shift_left one nrBits)
+    Z.(shift_left one nrBits)
   in
-  let min_bound = if signed then Integer.neg max_strict_bound
-    else Integer.zero
+  let min_bound = if signed then Z.neg max_strict_bound
+    else Z.zero
   in
-  let fits = Integer.leq min_bound i && Integer.lt i max_strict_bound in
+  let fits = Z.leq min_bound i && Z.lt i max_strict_bound in
   if debugTruncation then
     Kernel.debug "Fits in %a %a : %b@."
       !pp_ikind_ref k Datatype.Integer.pretty i fits;
@@ -2427,21 +2427,21 @@ let truncateInteger64 (k: ikind) i =
   else
     let i' =
       let nrBits = 8 * (bytesSizeOfInt k) in
-      let max_strict_bound = Integer.(shift_left one nrBits) in
-      let modulo = Integer.erem i max_strict_bound in
+      let max_strict_bound = Z.(shift_left one nrBits) in
+      let modulo = Z.erem i max_strict_bound in
       let signed = isSigned k in
       if signed then
         let max_signed_strict_bound =
-          Integer.shift_right max_strict_bound 1
+          Z.shift_right max_strict_bound 1
         in
-        if Integer.geq modulo max_signed_strict_bound then
-          Integer.sub modulo max_strict_bound
-        else if Integer.lt modulo (Integer.neg max_signed_strict_bound)
-        then Integer.add modulo max_strict_bound
+        if Z.geq modulo max_signed_strict_bound then
+          Z.sub modulo max_strict_bound
+        else if Z.lt modulo (Z.neg max_signed_strict_bound)
+        then Z.add modulo max_strict_bound
         else modulo
       else
-      if Integer.lt modulo Integer.zero then
-        Integer.add modulo max_strict_bound
+      if Z.lt modulo Z.zero then
+        Z.add modulo max_strict_bound
       else
         modulo
     in
@@ -2496,10 +2496,10 @@ let kinteger64 ~loc ?repr ?kind i =
   new_exp ~loc (Const (CInt64(i' , kind,  repr)))
 
 (* Construct an integer of a given kind. *)
-let kinteger ~loc kind (i: int) = kinteger64 ~loc ~kind (Integer.of_int i)
+let kinteger ~loc kind (i: int) = kinteger64 ~loc ~kind (Z.of_int i)
 
 (* Construct an integer. Use only for values that fit on 31 bits *)
-let integer_constant i = CInt64(Integer.of_int i, IInt, None)
+let integer_constant i = CInt64(Z.of_int i, IInt, None)
 (* Construct an integer. Use only for values that fit on 31 bits *)
 let integer ~loc (i: int) = new_exp ~loc (Const (integer_constant i))
 
@@ -2511,15 +2511,15 @@ let zero      ~loc = integer ~loc 0
 let one       ~loc = integer ~loc 1
 let mone      ~loc = integer ~loc (-1)
 
-let integer_lconstant v = TConst (Integer (Integer.of_int v,None))
+let integer_lconstant v = TConst (Integer (Z.of_int v,None))
 
 let lconstant ?(loc=Location.unknown) v =
   { term_node = TConst (Integer (v,None)); term_loc = loc;
     term_name = []; term_type = Linteger;}
 
-let lzero ?(loc=Location.unknown) () = lconstant ~loc Integer.zero
-let lone  ?(loc=Location.unknown) () = lconstant ~loc Integer.one
-let lmone ?(loc=Location.unknown) () = lconstant ~loc (Integer.minus_one)
+let lzero ?(loc=Location.unknown) () = lconstant ~loc Z.zero
+let lone  ?(loc=Location.unknown) () = lconstant ~loc Z.one
+let lmone ?(loc=Location.unknown) () = lconstant ~loc (Z.minus_one)
 
 (** Given the character c in a (CChr c), sign-extend it to 32 bits.
     (This is the official way of interpreting character constants, according
@@ -2528,8 +2528,8 @@ let lmone ?(loc=Location.unknown) () = lconstant ~loc (Integer.minus_one)
 let charConstToInt c =
   let c' = Char.code c in
   if c' < 128
-  then Integer.of_int c'
-  else Integer.of_int (c' - 256)
+  then Z.of_int c'
+  else Z.of_int (c' - 256)
 
 let charConstToIntConstant c =
   CInt64(charConstToInt c, IInt, None)
@@ -2544,10 +2544,10 @@ let rec isInteger e = match e.enode with
 let isZero (e: exp) : bool =
   match isInteger e with
   | None -> false
-  | Some i -> Integer.equal i Integer.zero
+  | Some i -> Z.equal i Z.zero
 
 let rec isLogicZero t = match t.term_node with
-  | TConst (Integer (n,_)) -> Integer.equal n Integer.zero
+  | TConst (Integer (n,_)) -> Z.equal n Z.zero
   | TConst (LChr c) -> Char.code c = 0
   | TCast(_, _, t) -> isLogicZero t
   | _ -> false
@@ -2594,17 +2594,17 @@ let parseIntAux (str:string) =
   (* Convert to integer. To prevent overflow we do the arithmetic
    * on Big_int and we take care of overflow. We work only with
    * positive integers since the lexer takes care of the sign *)
-  let rec toInt base (acc: Integer.t) (idx: int) =
+  let rec toInt base (acc: Z.t) (idx: int) =
     let doAcc what =
-      if Integer.geq what base
+      if Z.geq what base
       then
         Error (Format.asprintf
                  "Invalid digit %a in integer literal '%s' in base %a."
-                 Integer.pretty what
+                 Z.pretty what
                  str
-                 Integer.pretty base)
+                 Z.pretty base)
       else
-        let acc' = Integer.add what (Integer.mul base acc) in
+        let acc' = Z.add what (Z.mul base acc) in
         toInt base acc' (idx + 1)
     in
     if idx >= l - suffixlen then begin
@@ -2612,11 +2612,11 @@ let parseIntAux (str:string) =
     end else
       let ch = String.get str idx in
       if ch >= '0' && ch <= '9' then
-        doAcc (Integer.of_int (Char.code ch - Char.code '0'))
+        doAcc (Z.of_int (Char.code ch - Char.code '0'))
       else if  ch >= 'a' && ch <= 'f'  then
-        doAcc (Integer.of_int (10 + Char.code ch - Char.code 'a'))
+        doAcc (Z.of_int (10 + Char.code ch - Char.code 'a'))
       else if  ch >= 'A' && ch <= 'F'  then
-        doAcc (Integer.of_int (10 + Char.code ch - Char.code 'A'))
+        doAcc (Z.of_int (10 + Char.code ch - Char.code 'A'))
       else
         Error (Format.asprintf
                  "Invalid character %c in integer literal: %s" ch str)
@@ -2625,13 +2625,13 @@ let parseIntAux (str:string) =
     if octalhexbin && l >= 2 then
       (match String.get str 1 with
        | 'x' | 'X' (* Hexadecimal number *) ->
-         toInt Integer.(of_int 16) Integer.zero 2
+         toInt Z.(of_int 16) Z.zero 2
        | 'b' | 'B' ->  (* Binary number *)
-         toInt Integer.(of_int 2) Integer.zero 2
+         toInt Z.(of_int 2) Z.zero 2
        | _ -> (* Octal number *)
-         toInt Integer.(of_int 8) Integer.zero 1)
+         toInt Z.(of_int 8) Z.zero 1)
     else
-      toInt Integer.(of_int 10) Integer.zero 0
+      toInt Z.(of_int 10) Z.zero 0
   in
   i,kinds
 
@@ -3242,7 +3242,7 @@ and intOfAttrparam (a:attrparam) : int option =
     match a with
     | AInt(n) ->
       Extlib.the ~exn:(SizeOfError ("Overflow in integer attribute.", Cil_const.voidType))
-        (Integer.to_int_opt n)
+        (Z.to_int_opt n)
     | ABinOp(PlusA, a1, a2) -> doit a1 + doit a2
     | ABinOp(MinusA, a1, a2) -> doit a1 - doit a2
     | ABinOp(Mult, a1, a2) -> doit a1 * doit a2
@@ -3465,7 +3465,7 @@ and bitsSizeOfEmptyArray typ =
   | TArray (_, None) -> 0
   | TArray (_, Some e) -> begin
       match constFoldToInt e with
-      | Some i when Integer.is_zero i ->
+      | Some i when Z.is_zero i ->
         (* Used for GCC extension of non-C99 flexible array members.
            Note that Cabs2cil no longer rewrites top-level zero-sized arrays,
            so this can also happen in such cases. *)
@@ -3551,9 +3551,9 @@ and bitsSizeOf t =
            let norm_typ = Cil_const.mk_tarray ~tattr:t.tattr bt (Some v) in
            match v with
              { enode = Const(CInt64(l,_,_)) } ->
-             let sz = Integer.mul (Integer.of_int (bitsSizeOf bt)) l in
+             let sz = Z.mul (Z.of_int (bitsSizeOf bt)) l in
              let sz' =
-               match Integer.to_int_opt sz with
+               match Z.to_int_opt sz with
                | Some i -> i
                | None ->
                  raise
@@ -3629,7 +3629,7 @@ and bitsOffset (baset: typ) (off: offset) : int * int =
     | Index(e, off) -> begin
         let ei =
           match constFoldToInt e with
-          | Some i -> Integer.to_int i
+          | Some i -> Z.to_int i
           | None -> raise (SizeOfError ("Index is not constant", baset))
         in
         let bt = Ast_types.direct_element_type baset in
@@ -3669,10 +3669,10 @@ and constFold (machdep: bool) (e: exp) : exp =
           match unop with
           | Neg ->
             let repr = Option.map (fun s -> "-" ^ s) repr in
-            kinteger64 ~loc ?repr ~kind:tk (Integer.neg i)
-          | BNot -> kinteger64 ~loc ~kind:tk (Integer.lognot i)
+            kinteger64 ~loc ?repr ~kind:tk (Z.neg i)
+          | BNot -> kinteger64 ~loc ~kind:tk (Z.lognot i)
           | LNot ->
-            if Integer.equal i Integer.zero then one ~loc
+            if Z.equal i Z.zero then one ~loc
             else zero ~loc
         end
       | _ -> if e1 == e1c then e else new_exp ~loc (UnOp(unop, e1c, tres))
@@ -3746,11 +3746,11 @@ and constFold (machdep: bool) (e: exp) : exp =
       (* We don't treat cast to long double, as we don't really know
          how to handle this type anyway. *)
       | Const (CInt64(i,_,_)), TFloat FFloat when t.tattr = [] ->
-        let f = Integer.to_float i in
+        let f = Z.to_float i in
         let f = Floating_point.round_to_single_precision f in
         new_exp ~loc (Const (CReal (f,FFloat,None)))
       | Const (CInt64(i,_,_)), TFloat FDouble when t.tattr = [] ->
-        let f = Integer.to_float i in
+        let f = Z.to_float i in
         new_exp ~loc (Const (CReal (f,FDouble,None)))
       | _, _ -> new_exp ~loc (CastE (t, e))
     end
@@ -3809,8 +3809,8 @@ and constFoldBinOp ~loc (machdep: bool) bop e1 e2 tres =
            compiler sort it out. *)
         if machdep then
           try
-            (Integer.geq i2 Integer.zero)
-            && Integer.lt i2 (Integer.of_int (bitsSizeOf (typeOf e1')))
+            (Z.geq i2 Z.zero)
+            && Z.lt i2 (Z.of_int (bitsSizeOf (typeOf e1')))
           with SizeOfError _ -> false
         else false
       in
@@ -3819,93 +3819,93 @@ and constFoldBinOp ~loc (machdep: bool) bop e1 e2 tres =
       let e2'' = mkInt e2' in
       match bop, e1''.enode, e2''.enode with
       | PlusA, Const(CInt64(z,_,_)), _
-        when Integer.equal z Integer.zero -> e2''
+        when Z.equal z Z.zero -> e2''
       | (PlusA | MinusA), _, Const(CInt64(z,_,_))
-        when Integer.equal z Integer.zero -> e1''
+        when Z.equal z Z.zero -> e1''
       | PlusPI, _, Const(CInt64(z,_,_))
-        when Integer.equal z Integer.zero -> e1''
+        when Z.equal z Z.zero -> e1''
       | MinusPI, _, Const(CInt64(z,_,_))
-        when Integer.equal z Integer.zero -> e1''
+        when Z.equal z Z.zero -> e1''
       | PlusA, Const(CInt64(i1,ik1,_)),Const(CInt64(i2,ik2,_)) when ik1 = ik2 ->
-        kinteger64 ~loc ~kind:tk (Integer.add i1 i2)
+        kinteger64 ~loc ~kind:tk (Z.add i1 i2)
       | MinusA, Const(CInt64(i1,ik1,_)),Const(CInt64(i2,ik2,_))
         when ik1 = ik2 ->
-        kinteger64 ~loc ~kind:tk (Integer.sub i1 i2)
+        kinteger64 ~loc ~kind:tk (Z.sub i1 i2)
       | Mult, Const(CInt64(i1,ik1,_)), Const(CInt64(i2,ik2,_)) when ik1 = ik2 ->
-        kinteger64 ~loc ~kind:tk (Integer.mul i1 i2)
+        kinteger64 ~loc ~kind:tk (Z.mul i1 i2)
       | Mult, Const(CInt64(z,_,_)), _
-        when Integer.equal z Integer.zero -> e1''
+        when Z.equal z Z.zero -> e1''
       | Mult, Const(CInt64(one,_,_)), _
-        when Integer.equal one Integer.one -> e2''
+        when Z.equal one Z.one -> e2''
       | Mult, _,    Const(CInt64(z,_,_))
-        when Integer.equal z Integer.zero -> e2''
+        when Z.equal z Z.zero -> e2''
       | Mult, _, Const(CInt64(one,_,_))
-        when Integer.equal one Integer.one -> e1''
+        when Z.equal one Z.one -> e1''
       | Div, Const(CInt64(i1,ik1,_)),Const(CInt64(i2,ik2,_)) when ik1 = ik2 ->
         begin
-          try kinteger64 ~loc ~kind:tk (Integer.div i1 i2)
+          try kinteger64 ~loc ~kind:tk (Z.div i1 i2)
           with Division_by_zero -> new_exp ~loc (BinOp(bop, e1', e2', tres))
         end
       | Div, Const(CInt64(i1,ik1,_)),Const(CInt64(i2,ik2,_))
         when bytesSizeOfInt ik1 = bytesSizeOfInt ik2 -> begin
-          try kinteger64 ~loc ~kind:tk (Integer.div i1 i2)
+          try kinteger64 ~loc ~kind:tk (Z.div i1 i2)
           with Division_by_zero -> new_exp ~loc (BinOp(bop, e1', e2', tres))
         end
       | Div, _, Const(CInt64(one,_,_))
-        when Integer.equal one Integer.one -> e1''
+        when Z.equal one Z.one -> e1''
       | Mod, Const(CInt64(i1,ik1,_)),Const(CInt64(i2,ik2,_)) when ik1 = ik2 ->
         begin
-          try kinteger64 ~loc ~kind:tk (Integer.rem i1 i2)
+          try kinteger64 ~loc ~kind:tk (Z.rem i1 i2)
           with Division_by_zero -> new_exp ~loc (BinOp(bop, e1', e2', tres))
         end
       | BAnd, Const(CInt64(i1,ik1,_)),Const(CInt64(i2,ik2,_)) when ik1 = ik2 ->
-        kinteger64 ~loc ~kind:tk (Integer.logand i1 i2)
+        kinteger64 ~loc ~kind:tk (Z.logand i1 i2)
       | BAnd, Const(CInt64(z,_,_)), _
-        when Integer.equal z Integer.zero -> e1''
+        when Z.equal z Z.zero -> e1''
       | BAnd, _, Const(CInt64(z,_,_))
-        when Integer.equal z Integer.zero -> e2''
+        when Z.equal z Z.zero -> e2''
       | BOr, Const(CInt64(i1,ik1,_)),Const(CInt64(i2,ik2,_)) when ik1 = ik2 ->
-        kinteger64 ~loc ~kind:tk (Integer.logor i1 i2)
+        kinteger64 ~loc ~kind:tk (Z.logor i1 i2)
       | BOr, _, _ when isZero e1' -> e2'
       | BOr, _, _ when isZero e2' -> e1'
       | BXor, Const(CInt64(i1,ik1,_)),Const(CInt64(i2,ik2,_)) when ik1 = ik2 ->
-        kinteger64 ~loc ~kind:tk (Integer.logxor i1 i2)
+        kinteger64 ~loc ~kind:tk (Z.logxor i1 i2)
       | Shiftlt, Const(CInt64(i1,_ik1,_)),Const(CInt64(i2,_,_))
         when shiftInBounds i2 ->
-        kinteger64 ~loc ~kind:tk (Integer.shift_left_z i1 i2)
+        kinteger64 ~loc ~kind:tk (Z.shift_left_z i1 i2)
       | Shiftlt, Const(CInt64(z,_,_)), _
-        when Integer.equal z Integer.zero -> e1''
+        when Z.equal z Z.zero -> e1''
       | Shiftlt, _, Const(CInt64(z,_,_))
-        when Integer.equal z Integer.zero -> e1''
+        when Z.equal z Z.zero -> e1''
       | Shiftrt, Const(CInt64(i1,ik1,_)),Const(CInt64(i2,_,_))
         when shiftInBounds i2 ->
         if isunsigned ik1 then
           kinteger64 ~loc ~kind:tk
-            (Integer.shift_right_logical i1 i2)
+            (Z.shift_right_logical i1 i2)
         else
-          kinteger64 ~loc ~kind:tk (Integer.shift_right_z i1 i2)
+          kinteger64 ~loc ~kind:tk (Z.shift_right_z i1 i2)
       | Shiftrt, Const(CInt64(z,_,_)), _
-        when Integer.equal z Integer.zero -> e1''
+        when Z.equal z Z.zero -> e1''
       | Shiftrt, _, Const(CInt64(z,_,_))
-        when Integer.equal z Integer.zero -> e1''
+        when Z.equal z Z.zero -> e1''
       | Eq, Const(CInt64(i1,ik1,_)),Const(CInt64(i2,ik2,_)) ->
         let i1', i2', _ = convertInts i1 ik1 i2 ik2 in
-        if Integer.equal i1' i2' then one ~loc else zero ~loc
+        if Z.equal i1' i2' then one ~loc else zero ~loc
       | Ne, Const(CInt64(i1,ik1,_)),Const(CInt64(i2,ik2,_)) ->
         let i1', i2', _ = convertInts i1 ik1 i2 ik2 in
-        if Integer.equal i1' i2' then zero ~loc else one ~loc
+        if Z.equal i1' i2' then zero ~loc else one ~loc
       | Le, Const(CInt64(i1,ik1,_)),Const(CInt64(i2,ik2,_)) ->
         let i1', i2', _ = convertInts i1 ik1 i2 ik2 in
-        if Integer.leq i1' i2' then one ~loc else zero ~loc
+        if Z.leq i1' i2' then one ~loc else zero ~loc
       | Ge, Const(CInt64(i1,ik1,_)),Const(CInt64(i2,ik2,_)) ->
         let i1', i2', _ = convertInts i1 ik1 i2 ik2 in
-        if Integer.geq i1' i2' then one ~loc else zero ~loc
+        if Z.geq i1' i2' then one ~loc else zero ~loc
       | Lt, Const(CInt64(i1,ik1,_)),Const(CInt64(i2,ik2,_)) ->
         let i1', i2', _ = convertInts i1 ik1 i2 ik2 in
-        if Integer.lt i1' i2' then one ~loc else zero ~loc
+        if Z.lt i1' i2' then one ~loc else zero ~loc
       | Gt, Const(CInt64(i1,ik1,_)),Const(CInt64(i2,ik2,_)) ->
         let i1', i2', _ = convertInts i1 ik1 i2 ik2 in
-        if Integer.gt i1' i2' then one ~loc else zero ~loc
+        if Z.gt i1' i2' then one ~loc else zero ~loc
       | Eq, Const(CReal(f1,fk1,_)),Const(CReal(f2,fk2,_)) when fk1 = fk2 ->
         if f1 = f2 then one ~loc else zero ~loc
       | Ne, Const(CReal(f1,fk1,_)),Const(CReal(f2,fk2,_)) when fk1 = fk2 ->
@@ -3971,7 +3971,7 @@ let bitsSizeOfBitfield typlv =
   match Ast_types.unroll typlv with
   | { tnode = TInt _; tattr } | { tnode = TEnum _; tattr } as t ->
     (match Ast_attributes.(find_params bitfield_attribute_name tattr) with
-     | [AInt i] -> Integer.to_int i
+     | [AInt i] -> Z.to_int i
      | _ -> bitsSizeOf t)
   | t -> bitsSizeOf t
 
@@ -4025,9 +4025,9 @@ let interpret_character_constant char_list =
   else begin
     let orig_rep = None (* Some("'" ^ (String.escaped str) ^ "'") *) in
     if value <= (Int64.of_int32 Int32.max_int) then
-      (CInt64(Integer.of_int64 value,IULong,orig_rep)), Cil_const.ulongType
+      (CInt64(Z.of_int64 value,IULong,orig_rep)), Cil_const.ulongType
     else
-      (CInt64(Integer.of_int64 value,IULongLong,orig_rep)), Cil_const.ulongLongType
+      (CInt64(Z.of_int64 value,IULongLong,orig_rep)), Cil_const.ulongLongType
   end
 
 let invalidStmt = mkStmt (Instr (Skip Location.unknown))
@@ -4041,10 +4041,10 @@ let compareConstant c1 c2 =
   | CEnum e1, CEnum e2 ->
     e1.einame = e2.einame && e1.eihost.ename = e2.eihost.ename &&
     (match constFoldToInt e1.eival, constFoldToInt e2.eival with
-     | Some i1, Some i2 -> Integer.equal i1 i2
+     | Some i1, Some i2 -> Z.equal i1 i2
      | _ -> false)
   | CInt64 (i1,k1,_), CInt64(i2,k2,_) ->
-    k1 = k2 && Integer.equal i1 i2
+    k1 = k2 && Z.equal i1 i2
   | CChr c1, CChr c2 -> c1 = c2
   | CReal(f1,k1,_), CReal(f2,k2,_) -> k1 = k2 && f1 = f2
   | (CEnum _ | CInt64 _ | CChr _ | CReal _), _ -> false
@@ -4402,11 +4402,11 @@ let rec constFoldTermNodeAtTop = function
         | n1 -> TUnOp (op, {t1 with term_node = n1})
       in
       match op with
-      | Neg -> constFoldTermUnOp Integer.neg
-      | BNot -> constFoldTermUnOp Integer.lognot
+      | Neg -> constFoldTermUnOp Z.neg
+      | BNot -> constFoldTermUnOp Z.lognot
       | LNot -> constFoldTermUnOp
-                  (fun i -> if Integer.is_zero i
-                    then Integer.one else Integer.zero)
+                  (fun i -> if Z.is_zero i
+                    then Z.one else Z.zero)
     end
   | TBinOp (op, ({term_node = n1} as t1), ({term_node = n2} as t2)) ->
     begin
@@ -4421,31 +4421,31 @@ let rec constFoldTermNodeAtTop = function
 
       in
       match op with
-      | PlusA -> constFoldTermBinOp Integer.add
-      | MinusA -> constFoldTermBinOp Integer.sub
-      | Mult -> constFoldTermBinOp Integer.mul
-      | Shiftlt -> constFoldTermBinOp Integer.shift_left_z
+      | PlusA -> constFoldTermBinOp Z.add
+      | MinusA -> constFoldTermBinOp Z.sub
+      | Mult -> constFoldTermBinOp Z.mul
+      | Shiftlt -> constFoldTermBinOp Z.shift_left_z
       | Shiftrt -> (* right-shifting Lintegers is always arithmetic *)
-        constFoldTermBinOp Integer.shift_right_z
-      | BAnd -> constFoldTermBinOp Integer.logand
-      | BXor -> constFoldTermBinOp Integer.logxor
-      | BOr -> constFoldTermBinOp Integer.logor
+        constFoldTermBinOp Z.shift_right_z
+      | BAnd -> constFoldTermBinOp Z.logand
+      | BXor -> constFoldTermBinOp Z.logxor
+      | BOr -> constFoldTermBinOp Z.logor
       | Lt | Gt | Le | Ge | Eq | Ne | LAnd | LOr ->
         let bool_op = match op with
-          | Lt -> Integer.lt
-          | Gt -> Integer.gt
-          | Le -> Integer.leq
-          | Ge -> Integer.geq
-          | Eq -> Integer.equal
-          | Ne -> (fun i1 i2 -> not (Integer.equal i1 i2))
+          | Lt -> Z.lt
+          | Gt -> Z.gt
+          | Le -> Z.leq
+          | Ge -> Z.geq
+          | Eq -> Z.equal
+          | Ne -> (fun i1 i2 -> not (Z.equal i1 i2))
           | LAnd ->
-            (fun i1 i2 -> not (Integer.is_zero i1) && not (Integer.is_zero i2))
+            (fun i1 i2 -> not (Z.is_zero i1) && not (Z.is_zero i2))
           | LOr ->
-            (fun i1 i2 -> not (Integer.is_zero i1) || not (Integer.is_zero i2))
+            (fun i1 i2 -> not (Z.is_zero i1) || not (Z.is_zero i2))
           | _ -> assert false
         in
         constFoldTermBinOp
-          (fun i1 i2 -> if bool_op i1 i2 then Integer.one else Integer.zero)
+          (fun i1 i2 -> if bool_op i1 i2 then Z.one else Z.zero)
       | _ ->
         TBinOp (op, {t1 with term_node = n1}, {t2 with term_node = n2})
     end
@@ -4870,7 +4870,7 @@ let rec integralPromotion t = (* c.f. ISO 6.3.1.1 *)
     begin match Ast_attributes.(find_params bitfield_attribute_name tattr) with
       | [AInt size] ->
         (* This attribute always fits in int. *)
-        let size = Integer.to_int size in
+        let size = Z.to_int size in
         let sizeofint = bitsSizeOf intType in
         let tattr = remove_attributes_for_integral_promotion tattr in
         let kind =
@@ -5023,7 +5023,7 @@ let sameSign ?(machdep=false) (ik1 : ikind) (ik2 : ikind) =
 
 let same_int64 ?(machdep=true) e1 e2 =
   match constFoldToInt ~machdep e1, constFoldToInt ~machdep e2 with
-  | Some i, Some i' -> Integer.equal i i'
+  | Some i, Some i' -> Z.equal i i'
   | _ -> false
 
 (* how type qualifiers must be checked *)
@@ -5101,7 +5101,7 @@ let rec have_compatible_qualifiers_deep ?(context=Identical) t1 t2 =
 
 let rec is_nullptr e =
   match e.enode with
-  | Const (CInt64 (i,_,_)) -> Integer.is_zero i
+  | Const (CInt64 (i,_,_)) -> Z.is_zero i
   | CastE (t,e) when Ast_types.is_ptr t -> is_nullptr e
   | _ -> false
 
@@ -5111,7 +5111,7 @@ let rec is_boolean_result e =
   match e.enode with
   | Const _ ->
     (match isInteger e with
-     | Some i -> Integer.is_zero i || Integer.is_one i
+     | Some i -> Z.is_zero i || Z.is_one i
      | None -> false)
   | CastE (_, e) -> is_boolean_result e
   | BinOp ((Lt | Gt | Le | Ge | Eq | Ne | LAnd | LOr), _, _, _) -> true
@@ -5621,7 +5621,7 @@ let rec castReduce fromsource force =
           (* Old cast can be removed...*)
           if need_cast ~force newt typ'' then res e'
           else (* In fact, both casts can be removed. *) e'
-        | _, Const (CInt64 (i, _, _)) when Integer.is_zero i -> res e'
+        | _, Const (CInt64 (i, _, _)) when Z.is_zero i -> res e'
         | _ -> res e
       end
 
@@ -5881,14 +5881,14 @@ let lenOfArray64 eo =
     None -> raise (LenOfArray Not_constant)
   | Some e -> begin
       match (constFold true e).enode with
-      | Const(CInt64(ni, _, _)) when Integer.geq ni Integer.zero ->
+      | Const(CInt64(ni, _, _)) when Z.geq ni Z.zero ->
         ni
       | Const(CInt64 _) -> raise (LenOfArray Negative)
       | Const _ -> raise (LenOfArray Not_integer)
       | _ -> raise (LenOfArray Not_constant)
     end
 let lenOfArray eo =
-  match Integer.to_int_opt (lenOfArray64 eo) with
+  match Z.to_int_opt (lenOfArray64 eo) with
   | None -> raise (LenOfArray Too_big)
   | Some l -> l
 
@@ -5897,7 +5897,7 @@ let rec makeZeroInit ~loc (t: typ) : init =
   let t' = Ast_types.unroll t in
   match t'.tnode with
   | TInt ik ->
-    SingleInit (new_exp ~loc (Const(CInt64(Integer.zero, ik, None))))
+    SingleInit (new_exp ~loc (Const(CInt64(Z.zero, ik, None))))
   | TFloat fk -> SingleInit(new_exp ~loc (Const(CReal(0.0, fk, None))))
   | TEnum _ -> SingleInit (zero ~loc)
   | TComp comp when comp.cstruct ->
@@ -5923,7 +5923,7 @@ let rec makeZeroInit ~loc (t: typ) : init =
   | TArray (bt, Some len) ->
     let n =
       match constFoldToInt len with
-      | Some n -> Integer.to_int n
+      | Some n -> Z.to_int n
       | _ -> Kernel.fatal ~current:true "Cannot understand length of array"
     in
     let initbt = makeZeroInit ~loc bt in
@@ -5969,7 +5969,7 @@ let foldLeftCompound
         | Some lene -> begin
             match constFoldToInt lene with
             | Some i ->
-              let len_array = Integer.to_int i in
+              let len_array = Z.to_int i in
               let len_init = List.length initl in
               if len_array <= len_init then
                 default () (* enough elements in the initializers list *)
@@ -5985,7 +5985,7 @@ let foldLeftCompound
                    Works because [initl] is sorted by Cabs2cil.*)
                 let good_offset i off = match off with
                   | Index (i', NoOffset) ->
-                    Integer.(equal (Option.get (constFoldToInt i')) (of_int i))
+                    Z.(equal (Option.get (constFoldToInt i')) (of_int i))
                   | _ -> Kernel.fatal ~current:true
                            "Invalid initializer"
                 in

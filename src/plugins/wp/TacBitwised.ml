@@ -9,7 +9,7 @@
 open Lang
 
 let range a n =
-  let vmax = Integer.two_power_of_int n in
+  let vmax = Z.two_power_of_int n in
   F.p_and (F.p_leq F.e_zero a) (F.p_lt a (F.e_zint vmax))
 
 (* starts from 0 *)

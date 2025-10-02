@@ -40,7 +40,7 @@ and exp_node =
 and constant =
   | CTopInt of ikind (* an unknown integer; currently introduced when
                         sizeof/alignof cannot be evaluated as a constant *)
-  | CInt64 of Integer.t * ikind * string option
+  | CInt64 of Z.t * ikind * string option
   | CChr of char
   | CReal of float * fkind * string option
   | CEnum of Cil_types.enumitem * exp (* the translated expression that this enumitem refers to *)

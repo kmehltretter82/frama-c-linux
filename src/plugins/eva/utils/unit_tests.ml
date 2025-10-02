@@ -25,8 +25,8 @@ module Sign = struct
   module Sign = struct
     include Sign_value
     let zero = zero
-    let pos = inject_int Cil_const.uintType Integer.one
-    let neg = inject_int Cil_const.uintType Integer.minus_one
+    let pos = inject_int Cil_const.uintType Z.one
+    let neg = inject_int Cil_const.uintType Z.minus_one
     let pos_or_zero = join zero pos
     let neg_or_zero = join zero neg
     let pos_neg = join pos neg
@@ -34,14 +34,14 @@ module Sign = struct
 
   module Ival = struct
     include Ival
-    let positive = inject_range (Some Integer.one) None
-    let negative = inject_range None (Some Integer.minus_one)
+    let positive = inject_range (Some Z.one) None
+    let negative = inject_range None (Some Z.minus_one)
     let pos irange =
       let max = Eval_typ.range_upper_bound irange in
-      inject_range (Some Integer.one) (Some max)
+      inject_range (Some Z.one) (Some max)
     let neg irange =
       let min = Eval_typ.range_lower_bound irange in
-      inject_range (Some min) (Some Integer.minus_one)
+      inject_range (Some min) (Some Z.minus_one)
   end
 
   module Cval = Main_values.CVal

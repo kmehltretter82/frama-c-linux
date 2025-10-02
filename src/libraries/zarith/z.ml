@@ -36,7 +36,7 @@ let shift_left_z x y = shift_left x (to_int y)
 let shift_right_z x y = shift_right x (to_int y)
 let shift_right_logical x y = (* no meaning for negative value of x *)
   if (lt x zero)
-  then raise (Invalid_argument "Integer.shift_right_logical")
+  then raise (Invalid_argument "Z.shift_right_logical")
   else shift_right_z x y
 
 let is_zero v = equal v zero

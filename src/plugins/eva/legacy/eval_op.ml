@@ -85,7 +85,7 @@ let reduce_by_initialized_defined f loc state =
       if v' != v then begin
         if V_Or_Uninitialized.is_bottom v' then raise Reduce_to_bottom;
         let il = Int.max offl ll and ih = Int.min offh lh in
-        let abs_shift = Integer.erem (Rel.add_abs offl shift) modu in
+        let abs_shift = Z.erem (Rel.add_abs offl shift) modu in
         (* il and ih are the bounds of the interval to reduce.
            We change the initialized flags in the following cases:
            - either we overwrite entire values, or the partly overwritten

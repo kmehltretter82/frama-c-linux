@@ -450,7 +450,7 @@ and compare_attributes config  l1 l2 =
 and compare_attrparam_list config l1 l2 =
   compare_list (compare_attrparam config) l1 l2
 and compare_attrparam config a1 a2 = match a1, a2 with
-  | AInt i1, AInt i2 -> Integer.compare i1 i2
+  | AInt i1, AInt i2 -> Z.compare i1 i2
   | AStr s1, AStr s2 -> s1 =?= s2
   | ACons ((s1: string), l1), ACons (s2, l2) ->
     let r1 = (=?=) s1 s2 in
@@ -493,7 +493,7 @@ and compare_array_sizes e1o e2o =
     match i1, i2 with
     | None, None -> (* inconclusive. do not return 0 *)
       !compare_exp_struct_eq e1 e2
-    | _ -> Option.compare Integer.compare i1 i2
+    | _ -> Option.compare Z.compare i1 i2
   in
   Option.compare compare_non_empty_size e1o e2o
 
@@ -695,7 +695,7 @@ end
 
 module Exp = struct
   let pretty_ref = ref (fun _ _ -> assert false)
-  let zero = CInt64 (Integer.zero, IChar, None)
+  let zero = CInt64 (Z.zero, IChar, None)
   let dummy = { eid = -1; enode = Const zero; eloc = Location.dummy }
   include Make_with_collections
       (struct
@@ -930,7 +930,7 @@ end
    representations differ. *)
 let compare_constant ~strict c1 c2 = match c1, c2 with
   | CInt64(v1,k1,s1), CInt64(v2,k2,s2) ->
-    let r = compare_chain Integer.compare v1 v2 Extlib.compare_basic k1 k2 in
+    let r = compare_chain Z.compare v1 v2 Extlib.compare_basic k1 k2 in
     if r = 0 && strict
     then Option.compare Datatype.String.compare s1 s2
     else r
@@ -953,7 +953,7 @@ let hash_const c =
   match c with
   | CChr _ -> Hashtbl.hash c
   | CReal (fn,fk,_) -> Hashtbl.hash fn + Hashtbl.hash fk
-  | CInt64 (n,k,_) -> Integer.hash n + Hashtbl.hash k
+  | CInt64 (n,k,_) -> Z.hash n + Hashtbl.hash k
   | CEnum ei -> 95 + Enumitem.hash ei
 
 module type Make_cmp_input = sig
@@ -1164,7 +1164,7 @@ struct
   include Datatype.Serializable_undefined
   type t = constant
   let name = "Constant"
-  let dummy = CInt64(Integer.zero, IInt, Some "0")
+  let dummy = CInt64(Z.zero, IInt, Some "0")
   let reprs = [ dummy ]
   let compare ~structural = (fun _ -> compare_constant) structural
   let hash = hash_const
@@ -1714,7 +1714,7 @@ let compare_logic_real r1 r2 =
 
 let compare_logic_constant c1 c2 = match c1,c2 with
   | Boolean b1, Boolean b2 -> compare b1 b2
-  | Integer (i1,_), Integer(i2,_) -> Integer.compare i1 i2
+  | Integer (i1,_), Integer(i2,_) -> Z.compare i1 i2
   | LStr s1, LStr s2 -> Datatype.String.compare s1 s2
   | LWStr s1, LWStr s2 -> compare_list Datatype.Int64.compare s1 s2
   | LChr c1, LChr c2 -> Datatype.Char.compare c1 c2
@@ -1935,7 +1935,7 @@ let hash_logic_constant = function
   | LWStr l -> hash_list Datatype.Int64.hash l
   | LChr c  -> Datatype.Char.hash c
   | Boolean b -> Datatype.Bool.hash b
-  | Integer(n, _) -> Integer.hash n
+  | Integer(n, _) -> Z.hash n
   | LReal r ->
     if is_exact_float r then Datatype.Float.hash r.r_lower
     else Datatype.String.hash r.r_literal

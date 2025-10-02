@@ -19,7 +19,7 @@ val filter : tau -> term -> bool
 
 type bindings = (var * selection) list
 
-val complexity : bindings -> Integer.t
+val complexity : bindings -> Z.t
 val cardinal : int -> bindings -> int option
 (** less than limit *)
 

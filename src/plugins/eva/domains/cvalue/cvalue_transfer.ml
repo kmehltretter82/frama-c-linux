@@ -68,10 +68,10 @@ let reduce valuation lval value t =
     | `Top -> t (* Cannot reduce without the location of the lvalue. *)
 
 let is_smaller_value typ v1 v2 =
-  let size = Integer.of_int (Cil.bitsSizeOf typ) in
+  let size = Z.of_int (Cil.bitsSizeOf typ) in
   let card1 = Cvalue.V.cardinal_estimate v1 ~size
   and card2 = Cvalue.V.cardinal_estimate v2 ~size in
-  Integer.lt card1 card2
+  Z.lt card1 card2
 
 (* Update the state according to a Valuation. *)
 let update valuation t =

@@ -39,7 +39,7 @@ module Location_Bytes : sig
 
   type widen_hint = Ival.widen_hint
 
-  val widen : ?size:Integer.t -> ?hint:widen_hint -> t -> t -> t
+  val widen : ?size:Z.t -> ?hint:widen_hint -> t -> t -> t
 
   include Datatype.S_with_collections with type t := t
 
@@ -153,7 +153,7 @@ module Location_Bytes : sig
   (** [cardinal_less_than v card] returns the cardinal of [v] if it is less
       than [card], or raises [Not_less_than]. *)
 
-  val cardinal: t -> Integer.t option (** None if the cardinal is unbounded *)
+  val cardinal: t -> Z.t option (** None if the cardinal is unbounded *)
 
   val find_lonely_key : t -> Base.t * Ival.t
   (** if there is only one base [b] in the location, then returns the

@@ -202,7 +202,7 @@ let validity b =
   | Null ->
     let mn = min_valid_absolute_address ()in
     let mx = max_valid_absolute_address () in
-    if Integer.gt mx mn then
+    if Z.gt mx mn then
       Known (mn, mx)
     else
       Invalid
@@ -240,8 +240,8 @@ let final_empty_struct = function
   | _ -> false
 
 type access =
-  | Read of Integer.t
-  | Write of Integer.t
+  | Read of Z.t
+  | Write of Z.t
   | Object_pointer
   | Any_pointer
 

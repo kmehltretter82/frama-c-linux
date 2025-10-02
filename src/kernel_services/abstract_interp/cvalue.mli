@@ -86,7 +86,7 @@ module V : sig
   val cast_int_to_int: size:Int.t -> signed:bool -> t -> t
 
   val reinterpret_as_float: Cil_types.fkind -> t -> t
-  val reinterpret_as_int: signed:bool -> size:Integer.t -> t -> t
+  val reinterpret_as_int: signed:bool -> size:Z.t -> t -> t
   val cast_float_to_float: Fval.kind -> t -> t
   val cast_float_to_int : signed:bool -> size:int -> t -> t
   val cast_float_to_int_inverse :

@@ -23,7 +23,7 @@ let ikind_limits ikind =
   if isSigned ikind then
     (min_signed_number bits, max_signed_number bits)
   else
-    (Integer.zero, max_unsigned_number bits)
+    (Z.zero, max_unsigned_number bits)
 
 let logscale x limit =
   Float.(to_int (min 100. (100. *. log (max x 1.) /. log limit)))
@@ -34,7 +34,7 @@ let log2scale x limit =
   Float.(logscale (log x) (log limit))
 
 let cardinal_range cardinal limit =
-  let s = log2scale (Integer.to_float cardinal) (Integer.to_float limit) in
+  let s = log2scale (Z.to_float cardinal) (Z.to_float limit) in
   if s > 98 then Wide else Normal s
 
 let integer_range cardinal ikind =
@@ -57,8 +57,8 @@ let float_range fkind l u =
 let evaluate cvalue typ =
   let cardinal = Cvalue.V.cardinal cvalue in
   match typ.Cil_types.tnode, cardinal with
-  | _, Some card when Integer.is_zero card -> Empty
-  | _, Some card when Integer.is_one card -> Singleton
+  | _, Some card when Z.is_zero card -> Empty
+  | _, Some card when Z.is_one card -> Singleton
   | TInt ikind, Some cardinal -> integer_range cardinal ikind
   | TFloat fkind, _ ->
     begin match Ival.min_and_max_float (Cvalue.V.project_ival cvalue) with

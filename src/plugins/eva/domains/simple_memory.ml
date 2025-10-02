@@ -105,7 +105,7 @@ module Make_Memory (Info: sig val name: string end) (Value: Value) = struct
          Cil_datatype.Typ.equal typ vi.vtype &&
          Ival.is_zero o &&
          (match size with
-          | Int_Base.Value size -> Integer.equal size (Integer.succ max)
+          | Int_Base.Value size -> Z.equal size (Z.succ max)
           | Int_Base.Top -> false)
       then Precise
       else Imprecise

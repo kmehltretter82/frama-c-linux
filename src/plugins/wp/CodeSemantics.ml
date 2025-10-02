@@ -508,7 +508,7 @@ struct
              the last consecutive indices having
              the same value, but that have not yet initialized. *)
           | (_,None) -> acc (* nothing was delayed *)
-          | (il,Some (i0,_,exp)) when Integer.lt il i0 ->
+          | (il,Some (i0,_,exp)) when Z.lt il i0 ->
             (* Added pred: \forall i \in [il .. i0] ; t[i]==exp *)
             init_range ~sigma lv ty il i0 (Some exp) :: acc
           | (_il,Some (_i0,off,exp)) ->
@@ -520,10 +520,10 @@ struct
         let add_missing_indices acc i0 = function
           (* adds eventual default value for missing indices. *)
           | (i1, _) ->
-            if Integer.geq i0 i1 then (* no hole *) acc
+            if Z.geq i0 i1 then (* no hole *) acc
             else (* defaults values
                     Added pred: \forall i \in [i0 .. i1[ ; t[i]==default *)
-              init_range ~sigma lv ty i0 (Integer.pred i1) None :: acc
+              init_range ~sigma lv ty i0 (Z.pred i1) None :: acc
         in
         let acc, delayed =
           List.fold_left
@@ -532,7 +532,7 @@ struct
                let idx,acc = match off with
                  | Index({enode=Const CInt64 (idx,_,_)}, _) ->
                    (match delayed with
-                    | (iprev, _) when Integer.lt iprev idx ->
+                    | (iprev, _) when Z.lt iprev idx ->
                       (* CIL invariant broken.
                          without that invariant, an algo with a 2sd pass
                          is required for introducing default values *)
@@ -540,7 +540,7 @@ struct
                     | _ -> ()) ;
                    idx,
                    (* adds default values for missing indices *)
-                   add_missing_indices acc (Integer.succ idx) delayed
+                   add_missing_indices acc (Z.succ idx) delayed
                  | _ -> (* CIL invariant broken. *)
                    WpLog.fatal "CIL invariant broken: unknown initialized index"
                in
@@ -549,7 +549,7 @@ struct
                    match delayed with
                    | (i_prev,(Some (_,_,init_delayed) as delayed_info))
                      when Wp_parameters.InitWithForall.get ()
-                       && Integer.equal (Integer.pred i_prev) idx
+                       && Z.equal (Z.pred i_prev) idx
                        && ExpStructEq.equal init_delayed init ->
                      acc, (idx,delayed_info)
                    | _ -> (* flush the delayed init, and store the new one *)
@@ -567,7 +567,7 @@ struct
             (List.rev initl)
         in
         let acc = make_quant acc delayed in
-        add_missing_indices acc Integer.zero delayed
+        add_missing_indices acc Z.zero delayed
       | _ ->
         List.fold_left
           (fun acc (off,init) ->

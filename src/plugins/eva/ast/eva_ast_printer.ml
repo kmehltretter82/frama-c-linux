@@ -129,7 +129,7 @@ and pp_constant fmt = function
   | CInt64 (_, _, Some s) ->
     Format.fprintf fmt "%s" s
   | CInt64 (i, _, None) ->
-    Integer.pretty fmt i
+    Z.pretty fmt i
   | CChr c ->
     Format.fprintf fmt "'%s'" (Escape.escape_char c)
   | CReal (_, _, Some s) ->

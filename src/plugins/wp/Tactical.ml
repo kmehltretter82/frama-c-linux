@@ -77,7 +77,7 @@ type selection =
   | Multi of selection list
 
 and compose =
-  | Cint of Integer.t
+  | Cint of Z.t
   | Range of int * int
   | Code of term * string * selection list
 
@@ -101,7 +101,7 @@ let eq_clause a b =
 let eq_compose a b =
   a == b ||
   match a,b with
-  | Cint n, Cint m -> Integer.equal n m
+  | Cint n, Cint m -> Z.equal n m
   | Range(a,b) , Range(p,q) -> a = b && p = q
   | Code(ta,_,_), Code(tb,_,_) -> Lang.F.equal ta tb
   | (Cint _ | Range _ | Code _), (Cint _ | Range _ | Code _) -> false
@@ -131,7 +131,7 @@ let selected = function
   | Multi _s -> e_true (* For now, do not provide this *)
 
 let get_int_z z =
-  try Some (Integer.to_int z) with Z.Overflow -> None
+  try Some (Z.to_int z) with Z.Overflow -> None
 
 let get_int = function
   | Empty -> None
@@ -173,7 +173,7 @@ let rec pp_selection fmt = function
     Format.fprintf fmt "Term %d in %a" (Lang.F.QED.id t) pp_clause c
   | Clause c -> pp_clause fmt c
   | Compose(Cint k) ->
-    Format.fprintf fmt "Constant '%a'" Integer.pretty k
+    Format.fprintf fmt "Constant '%a'" Z.pretty k
   | Compose(Range(a,b)) ->
     Format.fprintf fmt "Range '%d..%d'" a b
   | Compose(Code(_,id,es)) ->
@@ -185,7 +185,7 @@ let rec pp_selection fmt = function
     List.iter (fun e -> Format.fprintf fmt "(%a)" pp_selection e) es ;
     Format.fprintf fmt "@]"
 
-let int a = Compose(Cint (Integer.of_int a))
+let int a = Compose(Cint (Z.of_int a))
 let cint a = Compose(Cint a)
 let range a b = Compose(Range(a,b))
 let compose id es =

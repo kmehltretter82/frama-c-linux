@@ -80,7 +80,7 @@ struct
         in
         try
           match Logic_utils.constFoldTermToInt t with
-          | Some n -> Partition.IntLimit (Integer.to_int n)
+          | Some n -> Partition.IntLimit (Z.to_int n)
           | None   -> Partition.ExpLimit (Logic_to_c.term_to_exp t)
         with Z.Overflow | Logic_to_c.No_conversion ->
           warn "invalid loop unrolling parameter; ignoring";
