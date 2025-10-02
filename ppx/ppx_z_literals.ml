@@ -1,6 +1,7 @@
 open Ppxlib
 
-let conv_to_z  loc = [%expr Z.of_int]
+(** We use {!Fc_z} instead of {!Z} to allow using this ppx inside [z.ml]. *)
+let conv_to_z  loc = [%expr Fc_z.of_int [@alert "-fc_z"]]
 
 let rewriter conv loc s =
   let number =

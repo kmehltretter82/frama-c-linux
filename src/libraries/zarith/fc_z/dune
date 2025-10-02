@@ -1,0 +1,10 @@
+; This library is only used to allow including Z from Zarith inside another file
+; named Z. Also if we want to use ppx_z_literals into our module Z, we need to
+; use this library inside the ppx as well.
+
+(include_subdirs no)
+
+(library
+ (name fc_z)
+ (public_name frama-c.fc_z)
+ (libraries zarith))
