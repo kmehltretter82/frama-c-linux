@@ -71,6 +71,8 @@ val spawn :
 (** {2 Specialized command} *)
 (* ************************************************************************* *)
 
+(** Specialized command for the Graphviz's dot program to process dot files.
+    @since Frama-C+dev *)
 module Dot :
 sig
   type format = Jpeg | Pdf | Png | Svg
@@ -83,8 +85,7 @@ sig
   (** [Dot.spawn ~format ~output input] create a process to run dot on [input]
       dot file to generate [output] file with output format [format].
       @raise Sys_error when a system error occurs
-      @raise Async.Cancel when the computation is interrupted or on timeout
-      @since Frama-C+dev *)
+      @raise Async.Cancel when the computation is interrupted or on timeout *)
   val spawn :
     ?timeout:int -> ?layout:string -> format:format -> output:Filepath.t -> Filepath.t ->
     Unix.process_status
