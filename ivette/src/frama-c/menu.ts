@@ -174,13 +174,21 @@ function addHelpMenuItems(): void {
     onClick: showCreditsModal,
     kind: 'normal',
   });
+}
+
+function addEditMenuItems(): void {
   Dome.addMenuItem({
     menu: 'Edit',
-    label: 'Option',
+    label: 'Parameters',
     id: 'frama_c_options',
     onClick: showOptionsModal,
     kind: 'normal',
-    key: 'Cmd+Shift+o'
+    key: 'Cmd+P'
+  });
+  Dome.addMenuItem({
+    menu: 'Edit',
+    id: 'edit_params_separator',
+    kind: 'separator',
   });
 }
 
@@ -246,6 +254,7 @@ export function addProjectSubMenu(others?: Dome.MenuItemProps[]): void {
 export function init(): void {
   addFileMenuItems();
   addHelpMenuItems();
+  addEditMenuItems();
   Dome.addMenu('Project');
   addProjectSubMenu();
 }
