@@ -19,7 +19,7 @@ type t
     - Functions suffixed by [_int] expect arguments that are integers. Hence,
       they will fail on an ival with constructor [Float]. Conversely, [_float]
       suffixed functions expect float arguments: the constructor [Float], or
-      the singleton set [ [| Int.zero |] ], that can be tested by {!is_zero}.
+      the singleton set [ [| Z.zero |] ], that can be tested by {!is_zero}.
 
     - see the comment in {!Lattice_type} about over- and under-approximations,
       and exact operations.

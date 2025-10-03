@@ -11,7 +11,7 @@ open Lattice_bounds
 open Bottom.Operators
 
 let small_cardinal = Int_set.get_small_cardinal
-let small_cardinal_Int () = Int.of_int (small_cardinal ())
+let small_cardinal_Int () = Z.of_int (small_cardinal ())
 
 type widen_hint = Z.Set.t
 
@@ -66,20 +66,20 @@ let one = Set Int_set.one
 let minus_one = Set Int_set.minus_one
 let zero_or_one = Set Int_set.zero_or_one
 
-let positive_integers = Itv (Int_interval.inject_range (Some Int.zero) None)
-let negative_integers = Itv (Int_interval.inject_range None (Some Int.zero))
+let positive_integers = Itv (Int_interval.inject_range (Some Z.zero) None)
+let negative_integers = Itv (Int_interval.inject_range None (Some Z.zero))
 
 let inject_singleton e = Set (Int_set.inject_singleton e)
 
 let make ~min ~max ~rem ~modu =
   match min, max with
   | Some mn, Some mx ->
-    assert (Int.leq mn mx);
-    if Int.equal mx mn
+    assert (Z.leq mn mx);
+    if Z.equal mx mn
     then inject_singleton mn
     else
-      let l = Int.succ (Int.ediv (Int.sub mx mn) modu) in
-      if Int.leq l (small_cardinal_Int ())
+      let l = Z.succ (Z.ediv (Z.sub mx mn) modu) in
+      if Z.leq l (small_cardinal_Int ())
       then Set (Int_set.inject_periodic ~from:mn ~period:modu ~number:l)
       else Itv (Int_interval.make ~min ~max ~rem ~modu)
   | _ -> Itv (Int_interval.make ~min ~max ~rem ~modu)
@@ -89,20 +89,20 @@ let check_make ~min ~max ~rem ~modu =
   make ~min ~max ~rem ~modu
 
 let inject_interval ~min ~max ~rem:r ~modu =
-  assert ((Int.geq r Int.zero ) && (Int.geq modu Int.one) && (Int.lt r modu));
+  assert ((Z.geq r Z.zero ) && (Z.geq modu Z.one) && (Z.lt r modu));
   let fix_bound fix bound = match bound with
     | None -> None
-    | Some b -> Some (if Int.equal b (Int.erem r modu) then b else fix b)
+    | Some b -> Some (if Z.equal b (Z.erem r modu) then b else fix b)
   in
-  let min = fix_bound (fun min -> Int.round_up_to_r ~min ~r ~modu) min
-  and max = fix_bound (fun max -> Int.round_down_to_r ~max ~r ~modu) max in
+  let min = fix_bound (fun min -> Z.round_up_to_r ~min ~r ~modu) min
+  and max = fix_bound (fun max -> Z.round_down_to_r ~max ~r ~modu) max in
   make ~min ~max ~rem:r ~modu
 
-let inject_range min max = make ~min ~max ~rem:Int.zero ~modu:Int.one
+let inject_range min max = make ~min ~max ~rem:Z.zero ~modu:Z.one
 
 let check_make_or_bottom ~min ~max ~rem ~modu =
   match min, max with
-  | Some mn, Some mx when Int.gt mn mx -> `Bottom
+  | Some mn, Some mx when Z.gt mn mx -> `Bottom
   | _, _ -> `Value (check_make ~min ~max ~rem ~modu)
 
 (* ------------------------- Sets and Intervals ---------------------------- *)
@@ -114,7 +114,7 @@ let inject_itv i =
   match Int_interval.cardinal i with
   | None -> Itv i
   | Some card ->
-    if Int.leq card (small_cardinal_Int ())
+    if Z.leq card (small_cardinal_Int ())
     then
       let min, max, rem, modu = Int_interval.min_max_rem_modu i in
       make ~min ~max ~rem ~modu
@@ -127,7 +127,7 @@ let inject_set s = Set s
    these results as proper integer abstractions of type t.*)
 
 let inject_pre_itv ~min ~max ~modu =
-  let rem = Int.erem min modu in
+  let rem = Z.erem min modu in
   Itv (Int_interval.make ~min:(Some min) ~max:(Some max) ~rem ~modu)
 
 let inject_set_or_top = function
@@ -144,12 +144,12 @@ let make_top_from_set s =
   let min = Int_set.min s in
   let rem, modu =
     if Int_set.cardinal s = 1
-    then Int.zero, min
+    then Z.zero, min
     else
       let modu =
-        Int_set.fold (fun x acc -> Int.gcd (Int.sub x min) acc) s Int.zero
+        Int_set.fold (fun x acc -> Z.gcd (Z.sub x min) acc) s Z.zero
       in
-      Int.erem min modu, modu
+      Z.erem min modu, modu
   in
   let max = Some (Int_set.max s) in
   let min = Some min in
@@ -176,19 +176,19 @@ let make_range = function
 let min_le_elt min elt =
   match min with
   | None -> true
-  | Some m -> Int.leq m elt
+  | Some m -> Z.leq m elt
 
 let max_ge_elt max elt =
   match max with
   | None -> true
-  | Some m -> Int.geq m elt
+  | Some m -> Z.geq m elt
 
 let is_zero x = equal x zero
 let is_one = equal one
 
 let contains_zero = function
-  | Itv i -> Int_interval.mem Int.zero i
-  | Set s -> Int_set.mem Int.zero s
+  | Itv i -> Int_interval.mem Z.zero i
+  | Set s -> Int_set.mem Z.zero s
 
 let contains_non_zero = function
   | Itv _ -> true (* at least two values *)
@@ -248,27 +248,27 @@ let cardinal_zero_or_one = function
   | Itv _ -> false
 
 let cardinal = function
-  | Set s -> Some (Int.of_int (Int_set.cardinal s))
+  | Set s -> Some (Z.of_int (Int_set.cardinal s))
   | Itv i -> Int_interval.cardinal i
 
 let cardinal_estimate ~size = function
-  | Set s -> Int.of_int (Int_set.cardinal s)
-  | Itv i -> Option.value ~default:(Int.two_power size) (Int_interval.cardinal i)
+  | Set s -> Z.of_int (Int_set.cardinal s)
+  | Itv i -> Option.value ~default:(Z.two_power size) (Int_interval.cardinal i)
 
 let cardinal_less_than v n =
   let c =
     match v with
-    | Set s -> Int.of_int (Int_set.cardinal s)
+    | Set s -> Z.of_int (Int_set.cardinal s)
     | Itv i -> Extlib.the ~exn:Not_less_than (Int_interval.cardinal i)
   in
-  if Int.leq c (Int.of_int n)
-  then Int.to_int c (* This is smaller than the original [n] *)
+  if Z.leq c (Z.of_int n)
+  then Z.to_int c (* This is smaller than the original [n] *)
   else raise Not_less_than
 
 let cardinal_is_less_than v n =
   match cardinal v with
   | None -> false
-  | Some c -> Int.leq c (Int.of_int n)
+  | Some c -> Z.leq c (Z.of_int n)
 
 let diff_if_one value rem =
   match rem with
@@ -280,16 +280,16 @@ let diff_if_one value rem =
       | Itv i ->
         let min, max, rem, modu = Int_interval.min_max_rem_modu i in
         match min, max with
-        | Some mn, _ when Int.equal v mn ->
-          check_make_or_bottom ~min:(Some (Int.add mn modu)) ~max ~rem ~modu
-        | _, Some mx when Int.equal v mx ->
-          check_make_or_bottom ~min ~max:(Some (Int.sub mx modu)) ~rem ~modu
+        | Some mn, _ when Z.equal v mn ->
+          check_make_or_bottom ~min:(Some (Z.add mn modu)) ~max ~rem ~modu
+        | _, Some mx when Z.equal v mx ->
+          check_make_or_bottom ~min ~max:(Some (Z.sub mx modu)) ~rem ~modu
         | Some mn, Some mx when
-            Int.equal (Int.sub mx mn) (Int.mul modu (small_cardinal_Int ()))
+            Z.equal (Z.sub mx mn) (Z.mul modu (small_cardinal_Int ()))
             && Int_interval.mem v i ->
           let list =
             Int_interval.fold_int
-              (fun i acc -> if Int.equal i v then acc else i :: acc)
+              (fun i acc -> if Z.equal i v then acc else i :: acc)
               i []
           in
           `Value (Set (Int_set.inject_list list))
@@ -312,8 +312,8 @@ let is_included t1 t2 =
     let min, max, rem, modu = Int_interval.min_max_rem_modu i in
     (* Inclusion of bounds is needed for the entire inclusion *)
     min_le_elt min (Int_set.min s) && max_ge_elt max (Int_set.max s)
-    && (Int.equal Int.one modu (* Top side contains all integers, we're done *)
-        || Int_set.for_all (fun x -> Int.equal (Int.erem x modu) rem) s)
+    && (Z.is_one modu (* Top side contains all integers, we're done *)
+        || Int_set.for_all (fun x -> Z.equal (Z.erem x modu) rem) s)
 
 let join v1 v2 =
   match v1, v2 with
@@ -322,16 +322,16 @@ let join v1 v2 =
   | Set s, Itv i
   | Itv i, Set s ->
     let min, max, r, modu = Int_interval.min_max_rem_modu i in
-    let f elt modu = Int.gcd modu (Int.abs (Int.sub r elt)) in
+    let f elt modu = Z.gcd modu (Z.abs (Z.sub r elt)) in
     let modu = Int_set.fold f s modu in
-    let rem = Int.erem r modu in
+    let rem = Z.erem r modu in
     let min = match min with
         None -> None
-      | Some m -> Some (Int.min m (Int_set.min s))
+      | Some m -> Some (Z.min m (Int_set.min s))
     in
     let max = match max with
         None -> None
-      | Some m -> Some (Int.max m (Int_set.max s))
+      | Some m -> Some (Z.max m (Int_set.max s))
     in
     Itv (Int_interval.make ~min ~max ~rem ~modu)
 
@@ -345,11 +345,11 @@ let link v1 v2 =
       | None -> None
       | Some bound ->
         let cur = ref bound in
-        Int_set.iter (fun e -> if Int.equal e (add !cur modu) then cur := e) s;
+        Int_set.iter (fun e -> if Z.equal e (add !cur modu) then cur := e) s;
         Some !cur
     in
-    let min = move_bound Int.sub min
-    and max = move_bound Int.add max in
+    let min = move_bound Z.sub min
+    and max = move_bound Z.add max in
     check_make ~min ~max ~rem ~modu
 
 let meet v1 v2 =
@@ -379,9 +379,9 @@ let intersects v1 v2 =
     Int_set.exists (fun i -> Int_interval.mem i itv) s
 
 let complement_under ~size ~signed i =
-  let max = Int.two_power_of_int (if signed then size - 1 else size) in
-  let min = if signed then Int.neg max else Int.zero in
-  let max = Int.pred max in
+  let max = Z.two_power_of_int (if signed then size - 1 else size) in
+  let min = if signed then Z.neg max else Z.zero in
+  let max = Z.pred max in
   match i with
   | Set set ->
     inject_set_or_top_or_bottom (Int_set.complement_under ~min ~max set)
@@ -422,7 +422,7 @@ let abs = function
 
 
 let scale f v =
-  if Int.is_zero f
+  if Z.is_zero f
   then zero
   else
     match v with
@@ -430,19 +430,19 @@ let scale f v =
     | Itv i-> Itv (Int_interval.scale f i)
 
 let scale_div ~pos f v =
-  assert (not (Int.is_zero f));
+  assert (not (Z.is_zero f));
   match v with
   | Set s -> Set (Int_set.scale_div ~pos f s)
   | Itv i -> inject_itv (Int_interval.scale_div ~pos f i)
 
 let scale_div_or_bottom ~pos f v =
-  if Int.is_zero f then `Bottom else `Value (scale_div ~pos f v)
+  if Z.is_zero f then `Bottom else `Value (scale_div ~pos f v)
 
 (* TODO: a more precise result could be obtained by transforming
    Itv(min,max,r,m) into Itv(min,max,r/f,m/gcd(m,f)). But this is
    more complex to implement when pos or f is negative. *)
 let scale_div_under ~pos f v =
-  assert (not (Int.is_zero f));
+  assert (not (Z.is_zero f));
   match v with
   | Set s -> `Value (Set (Int_set.scale_div ~pos f s))
   | Itv i -> Int_interval.scale_div_under ~pos f i >>-: inject_itv
@@ -478,7 +478,7 @@ let scale_rem ~pos f = function
   | Itv i -> inject_itv (Int_interval.scale_rem ~pos f i)
 
 let scale_rem_or_bottom ~pos f v =
-  if Int.is_zero f then `Bottom else `Value (scale_rem ~pos f v)
+  if Z.is_zero f then `Bottom else `Value (scale_rem ~pos f v)
 
 let c_rem x y =
   match y with
@@ -496,15 +496,15 @@ let c_rem x y =
     [shift_left] and [shift_right]. [op] and [scale] must verify
     [scale a b == op (inject_singleton a) b] *)
 let shift_aux scale op (x: t) (y: t) =
-  narrow (inject_range (Some Int.zero) None) y >>-: fun y ->
+  narrow (inject_range (Some Z.zero) None) y >>-: fun y ->
   try
     match y with
-    | Set s -> Int_set.map_reduce (fun n -> scale (Int.two_power n) x) join s
+    | Set s -> Int_set.map_reduce (fun n -> scale (Z.two_power n) x) join s
     | Itv _ ->
-      let min = Option.map Int.two_power (min_int y) in
-      let max = Option.map Int.two_power (max_int y) in
-      let modu = match min with None -> Int.one | Some m -> m in
-      let factor = check_make ~min ~max ~rem:Int.zero ~modu in
+      let min = Option.map Z.two_power (min_int y) in
+      let max = Option.map Z.two_power (max_int y) in
+      let modu = match min with None -> Z.one | Some m -> m in
+      let factor = check_make ~min ~max ~rem:Z.zero ~modu in
       op x factor
   with Z.Overflow ->
     (* We only preserve the sign of the result *)
@@ -525,13 +525,13 @@ let compare_min_max min max =
   match min, max with
   | None, _ -> -1
   | _, None -> -1
-  | Some min, Some max -> Int.compare min max
+  | Some min, Some max -> Z.compare min max
 
 let compare_max_min max min =
   match max, min with
   | None, _ -> 1
   | _, None -> 1
-  | Some max, Some min -> Int.compare max min
+  | Some max, Some min -> Z.compare max min
 
 let forward_le_int i1 i2 =
   if compare_max_min (max_int i1) (min_int i2) <= 0 then Comp.True
@@ -559,8 +559,8 @@ let forward_comp op i1 i2 =
 
 let backward_le_int max v = narrow v (inject_range None max)
 let backward_ge_int min v = narrow v (inject_range min None)
-let backward_lt_int max v = backward_le_int (Option.map Int.pred max) v
-let backward_gt_int min v = backward_ge_int (Option.map Int.succ min) v
+let backward_lt_int max v = backward_le_int (Option.map Z.pred max) v
+let backward_gt_int min v = backward_ge_int (Option.map Z.succ min) v
 
 let backward_comp_left op l r =
   match op with
@@ -576,29 +576,29 @@ let backward_comp_left op l r =
 let create_all_values ~signed ~size =
   let min, max =
     if signed then
-      let b = Int.two_power_of_int (size - 1) in
-      Int.neg b, Int.pred b
+      let b = Z.two_power_of_int (size - 1) in
+      Z.neg b, Z.pred b
     else
-      let b = Int.two_power_of_int size in
-      Int.zero, Int.pred b
+      let b = Z.two_power_of_int size in
+      Z.zero, Z.pred b
   in
   inject_range (Some min) (Some max)
 
 let cast_int_to_int ~size ~signed value =
   if equal top value
-  then create_all_values ~size:(Int.to_int size) ~signed
+  then create_all_values ~size:(Z.to_int size) ~signed
   else
     let result =
       match value with
       | Itv i -> inject_itv (Int_interval.cast ~size ~signed i)
       | Set s ->
         let all =
-          create_all_values ~size:(Int.to_int size) ~signed
+          create_all_values ~size:(Z.to_int size) ~signed
         in
         if is_included value all
         then value
         else
-          let rem_f value = Int.cast ~size ~signed ~value in
+          let rem_f value = Z.cast ~size ~signed ~value in
           Set (Int_set.map rem_f s)
     in
     (* If sharing is no longer preserved, please change Cvalue.V.cast *)
@@ -609,15 +609,15 @@ let all_values ~size = function
     begin
       let min, max, _, modu = Int_interval.min_max_rem_modu i in
       match min, max with
-      | None, _ | _, None -> Int.is_one modu
+      | None, _ | _, None -> Z.is_one modu
       | Some mn, Some mx ->
-        Int.is_one modu &&
-        Int.leq
-          (Int.two_power size)
-          (Int.length mn mx)
+        Z.is_one modu &&
+        Z.leq
+          (Z.two_power size)
+          (Z.length mn mx)
     end
   | Set s as v ->
-    let siz = Int.to_int size in
+    let siz = Z.to_int size in
     Int_set.cardinal s >= 1 lsl siz &&
     equal
       (cast_int_to_int ~size ~signed:false v)
@@ -632,11 +632,11 @@ let subdivide = function
     t1, t2
 
 let extract_bits ~start ~stop = function
-  | Set s -> Set (Int_set.map (Int.extract_bits ~start ~stop) s)
+  | Set s -> Set (Int_set.map (Z.extract_bits ~start ~stop) s)
   | Itv _ as d ->
     try
-      let dived = scale_div ~pos:true (Int.two_power start) d in
-      let factor = Int.two_power (Int.length start stop) in
+      let dived = scale_div ~pos:true (Z.two_power start) d in
+      let factor = Z.two_power (Z.length start stop) in
       scale_rem ~pos:true factor dived
     with Z.Overflow -> top
 
@@ -677,7 +677,7 @@ end
 module type BitOperator =
 sig
   (* Concrete version of the bitwise operator *)
-  val concrete_bitwise : Int.t -> Int.t -> Int.t
+  val concrete_bitwise : Z.t -> Z.t -> Z.t
   (* Printable version of the operator *)
   val representation : string
   (* forward is given here as the lifted function of some bit operator op
@@ -700,7 +700,7 @@ end
 
 module And : BitOperator =
 struct
-  let concrete_bitwise = Int.logand
+  let concrete_bitwise = Z.logand
 
   let representation = "&"
 
@@ -721,7 +721,7 @@ end
 
 module Or : BitOperator =
 struct
-  let concrete_bitwise = Int.logor
+  let concrete_bitwise = Z.logor
 
   let representation = "|"
 
@@ -742,7 +742,7 @@ end
 
 module Xor : BitOperator =
 struct
-  let concrete_bitwise = Int.logxor
+  let concrete_bitwise = Z.logxor
 
   let representation = "^"
 
@@ -767,8 +767,8 @@ let significant_bits (v : t) : int option =
 
 let extract_sign (v : t) : bit_value =
   match min_and_max v with
-  | _, Some u when Int.(lt u zero) -> On
-  | Some l, _ when Int.(geq l zero) -> Off
+  | _, Some u when Z.(lt u zero) -> On
+  | Some l, _ when Z.(geq l zero) -> Off
   | _, _ -> Both
 
 let extract_bit (i : int) (v : t) : bit_value =
@@ -780,7 +780,7 @@ let extract_bit (i : int) (v : t) : bit_value =
     | None, _ | _, None -> Both
     | Some l, Some u ->
       (* It does not take modulo into account *)
-      if Int.(geq (sub u l) (two_power_of_int i)) (* u - l >= mask *)
+      if Z.(geq (sub u l) (two_power_of_int i)) (* u - l >= mask *)
       then Both
       else Bit.union (bit_value l) (bit_value u)
 
@@ -788,12 +788,12 @@ let reduce_sign v = function
   | Both -> `Value v
   | On ->
     begin match v with
-      | Set s -> Int_set.filter Int.(gt zero) s >>-: inject_set
+      | Set s -> Int_set.filter Z.(gt zero) s >>-: inject_set
       | Itv itv -> Int_interval.reduce_sign itv true >>-: inject_itv
     end
   | Off ->
     begin match v with
-      | Set s -> Int_set.filter Int.(leq zero) s >>-: inject_set
+      | Set s -> Int_set.filter Z.(leq zero) s >>-: inject_set
       | Itv itv -> Int_interval.reduce_sign itv false >>-: inject_itv
     end
 
@@ -813,10 +813,10 @@ let extract_bit = function
 
 let set_bit_on ~size bit =
   let mask = match bit with
-    | Sign -> Int.neg (Int.two_power_of_int size)
-    | Bit i -> Int.(two_power_of_int i)
+    | Sign -> Z.neg (Z.two_power_of_int size)
+    | Bit i -> Z.(two_power_of_int i)
   in
-  fun v -> Int.logor mask v
+  fun v -> Z.logor mask v
 
 let reduce_bit = function
   | Sign -> reduce_sign
@@ -838,7 +838,7 @@ struct
   type bit_mask = bit_value array * bit_value
 
   (* Converts an integer [x] into a bit array of size [n]. *)
-  let int_to_bit_array n (x : Int.t) =
+  let int_to_bit_array n (x : Z.t) =
     let make i = if Z.testbit x i then On else Off in
     Array.init n make
 
@@ -848,7 +848,7 @@ struct
     | Set s when Int_set.cardinal s = 1 -> (* singleton : build a full mask  *)
       let x = Int_set.min s in
       let n = Z.numbits x in
-      int_to_bit_array n x, if Int.(geq x zero) then Off else On
+      int_to_bit_array n x, if Z.(geq x zero) then Off else On
     | v ->
       let _,_,r,modu = min_max_rem_modu v in (* requires cardinal > 1 *)
       (* Find how much [modu] can be divided by two. *)
@@ -866,13 +866,13 @@ struct
       and b2 = try b2.(i) with _ -> s2 in
       let b = Op.forward b1 b2 in
       if i >= size || b = Both
-      then rem, Int.two_power_of_int i
+      then rem, Z.two_power_of_int i
       else
         (* [rem] starts at 0, so we only need to turn on the 1 bits. *)
         let rem = if b = On then set_bit_on ~size (Bit i) rem else rem in
         step (i+1) rem
     in
-    step 0 Int.zero
+    step 0 Z.zero
 
   (* The number of bits on which the result should be significant *)
   let result_size (v1 : t) (v2 : t) : int option =
@@ -898,7 +898,7 @@ struct
      possible to reduce the operands leading to a result (without an
      exponential cost)  meaning that sometimes small sets can be obtained but
      the algorithm will fail to find them. *)
-  let compute_small_set ~size (v1 : t) (v2 : t) (r : Int.t) (modu : Int.t) =
+  let compute_small_set ~size (v1 : t) (v2 : t) (r : Z.t) (modu : Z.t) =
     let set_bit i acc (r, v1, v2) =
       let b1 = extract_bit i v1
       and b2 = extract_bit i v2 in
@@ -959,7 +959,7 @@ struct
       r, v1, v2
     in
     (* The result is 0 at the beginning, and [set_bit] turns on the 1 bits. *)
-    let r = ref (Int.zero, v1, v2) in
+    let r = ref (Z.zero, v1, v2) in
     (* Sets the sign bit, and then the bits from size to 0. *)
     r := set_bit Sign !r;
     for i = (size - 1) downto 0 do
@@ -1000,5 +1000,5 @@ let bitwise_signed_not v =
   | Set s -> Set (Int_set.bitwise_signed_not s)
 
 let bitwise_unsigned_not ~size v =
-  let size = Int.of_int size in
+  let size = Z.of_int size in
   cast_int_to_int ~size ~signed:false (bitwise_signed_not v)

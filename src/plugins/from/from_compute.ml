@@ -9,7 +9,6 @@
 open Cil_types
 open Cil
 open Cil_datatype
-open Abstract_interp
 open Locations
 
 exception Call_did_not_take_place
@@ -91,7 +90,7 @@ let compute_using_prototype_for_state state kf assigns =
           List.fold_left
             (fun acc coff ->
                let (base,width) = bitsOffset rt_typ coff in
-               let size = Int_Base.inject (Int.of_int width) in
+               let size = Int_Base.inject (Z.of_int width) in
                From_memory.add_to_return
                  ~start:base ~size ~m:acc inputs_deps
             )

@@ -205,7 +205,7 @@ class propagate project fnames ~cast_intro = object(self)
               if not (Cil.fitsInInt ikind v) then
                 PropagationParameters.error "Constant found by Value (%a) \
                                              does not fit inside type %a. Please report"
-                  Abstract_interp.Int.pretty v
+                  Z.pretty v
                   Printer.pp_typ typ;
               Cil.kinteger64 ~loc ~kind:ikind v
             with Ival.Not_Singleton_Int -> raise Cannot_expand

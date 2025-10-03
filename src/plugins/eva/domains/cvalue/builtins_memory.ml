@@ -106,15 +106,15 @@ let copy_offsetmap ~name ~exact ~size ~src ~dst ~dst_expr state =
 (* Returns the min and max size of a copy from an Ival.t. *)
 let min_max_size size =
   let min, max = Ival.min_and_max size in
-  let min = Option.fold min ~none:Int.zero ~some:Int.(max zero) in
+  let min = Option.fold min ~none:Z.zero ~some:Z.(max zero) in
   let max_max = Bit_utils.max_bit_size () in
-  let max = Option.fold max ~none:max_max ~some:Int.(max zero) in
+  let max = Option.fold max ~none:max_max ~some:Z.(max zero) in
   min, max
 
 (* Computes the remaining [src], [dst] and [size] to be copied after [factor]
    bits have already been copied. *)
 let shift ~factor:i src dst size =
-  let new_size = Int.sub size i in
+  let new_size = Z.sub size i in
   let ival = Ival.inject_singleton i in
   let new_src = Location_Bits.shift ival src in
   let new_dst = Location_Bits.shift ival dst in
@@ -128,7 +128,7 @@ let copy_remaining_size_by_size ~name ~src ~dst ~dst_expr ~size state =
   let exception Result of Cvalue.Model.t in
   let do_size size (state, previous_size) =
     (* First iteration: this copy has already been performed, skip. *)
-    if Int.(equal previous_size minus_one)
+    if Z.(equal previous_size minus_one)
     then state, size
     else
       (* Copy data between [previous_size] and [size]. *)
@@ -142,7 +142,7 @@ let copy_remaining_size_by_size ~name ~src ~dst ~dst_expr ~size state =
       if not (Cvalue.Model.is_reachable new_state) then raise (Result state);
       new_state, size
   in
-  try fst (Ival.fold_int do_size size (state, Int.minus_one))
+  try fst (Ival.fold_int do_size size (state, Z.minus_one))
   with Result state -> state
 
 (* Copy the value at location [src_loc] to location [dst_loc] in [state]. *)
@@ -163,14 +163,14 @@ let imprecise_copy ~name ~src_loc ~dst_loc ~dst_expr state =
   if Model.is_reachable new_state then new_state else state
 
 (* Creates the location {loc + [min_size..max_size-1]} of size char. *)
-let char_location loc ?(min_size=Int.zero) max_size =
+let char_location loc ?(min_size=Z.zero) max_size =
   let size_char = Bit_utils.sizeofchar () in
-  let max = Int.sub max_size size_char in
+  let max = Z.sub max_size size_char in
   (* Use ranges modulo char_bits to read and write byte-by-byte, which can
      preserve some precision.*)
   let shift =
     Ival.inject_interval ~min:(Some min_size) ~max:(Some max)
-      ~rem:Int.zero ~modu:size_char
+      ~rem:Z.zero ~modu:size_char
   in
   let loc = Location_Bits.shift shift loc in
   make_loc loc (Int_Base.inject size_char)
@@ -182,7 +182,7 @@ let compute_memcpy ~name ~dst_expr ~dst ~src ~size state =
   (* First step: copy the bits we are sure to copy, i.e. for the minimum size
      [size_min] if it is not zero. *)
   let state, (deps_table, written_zone) =
-    if Int.gt size_min Int.zero
+    if Z.gt size_min Z.zero
     then
       let state =
         copy_offsetmap ~name ~exact:true ~size:size_min ~src ~dst ~dst_expr state
@@ -194,7 +194,7 @@ let compute_memcpy ~name ~dst_expr ~dst ~src ~size state =
     else state, empty_deps
   in
   (* Stop here if the first copy failed or if there is nothing more to copy. *)
-  if not (Cvalue.Model.is_reachable state) || Int.equal size_min size_max
+  if not (Cvalue.Model.is_reachable state) || Z.equal size_min size_max
   then state, deps_table, written_zone
   else
     (* Second step: size is imprecise, we will now copy some bits that we are
@@ -262,7 +262,7 @@ let frama_c_memset_imprecise state dst_expr dst v size =
   let exact = Location_Bits.cardinal_zero_or_one dst in
   (* Write [v] everywhere that is written, between [dst] and [dst+size_min]. *)
   let state, min_zone =
-    if Int.gt size_min Int.zero then
+    if Z.gt size_min Z.zero then
       let size = size_min in
       let value = Cvalue.V_Or_Uninitialized.initialized v in
       let from = Cvalue.V_Offsetmap.create ~size ~size_v:8z value in
@@ -278,7 +278,7 @@ let frama_c_memset_imprecise state dst_expr dst v size =
   (* Write [v] everywhere that might be written, ie between
      [dst+size_min] and [dst+size_max-1]. *)
   let state, extra_zone =
-    if Int.gt size_max size_min then
+    if Z.gt size_max size_min then
       let loc = char_location dst ~min_size:size_min size_max in
       warn_imprecise_write ~name:"memset" dst_expr loc v;
       let state = Cvalue.Model.add_binding ~exact:false state loc v in
@@ -299,8 +299,8 @@ let frama_c_memset_imprecise state dst_expr dst v size =
           | Some minb, Some maxb -> minb, maxb
           | _ -> raise Not_found
         in
-        let sure = Int.sub (Int.add minb size_min) maxb in
-        if Int.gt sure Int.zero then
+        let sure = Z.sub (Z.add minb size_min) maxb in
+        if Z.gt sure Z.zero then
           let dst_loc = Location_Bits.inject base (Ival.inject_singleton maxb) in
           let vuninit = V_Or_Uninitialized.initialized v in
           let size_v = Bit_utils.sizeofchar () in
@@ -350,11 +350,11 @@ let imprecision_descr = function
     not just to 'i%repeated modulo 8'. May raise ImpreciseMemset. *)
 let memset_typ_offsm_int full_typ i =
   try
-    let size = Int.of_int (Cil.bitsSizeOf full_typ) in
+    let size = Z.of_int (Cil.bitsSizeOf full_typ) in
     let vi = V_Or_Uninitialized.initialized (Cvalue.V.inject_int i) in
     let size_char = Bit_utils.sizeofchar () in
     let full_offsm = V_Offsetmap.create ~size vi ~size_v:size_char in
-    if Int.is_zero i then
+    if Z.is_zero i then
       full_offsm (* Shortcut: no need to follow the type, this offsetmap is
                     optimally precise *)
     else
@@ -370,7 +370,7 @@ let memset_typ_offsm_int full_typ i =
         (* Update [full_offsm] between [offset] and [offset+size-1], and store
            exactly [v] there *)
         let update size v =
-          let bounds = (offset, Int.pred (Int.add offset size)) in
+          let bounds = (offset, Z.pred (Z.add offset size)) in
           let vinit = V_Or_Uninitialized.initialized v in
           V_Offsetmap.add bounds (vinit, size, Rel.zero) offsm
         in
@@ -383,7 +383,7 @@ let memset_typ_offsm_int full_typ i =
           let v = Cvalue.V.cast_int_to_int ~size ~signed v in
           update size v
         | TFloat _ ->
-          let size = Int.of_int (Cil.bitsSizeOf styp) in
+          let size = Z.of_int (Cil.bitsSizeOf styp) in
           let v = V_Or_Uninitialized.get_v (find size) in
           let v' = Cvalue_forward.reinterpret styp v in
           let f = Ival.project_float (Cvalue.V.project_ival v') in
@@ -392,8 +392,8 @@ let memset_typ_offsm_int full_typ i =
           if Fval.is_finite f = True then update size v' else update size v
         | TComp { cstruct = true ; cfields = l} -> (* struct *)
           let aux_field offsm fi =
-            let offset_fi = Int.of_int (fst (Cil.fieldBitsOffset fi)) in
-            aux fi.ftype (Int.add offset offset_fi) offsm
+            let offset_fi = Z.of_int (fst (Cil.fieldBitsOffset fi)) in
+            aux fi.ftype (Z.add offset offset_fi) offsm
           in
           List.fold_left aux_field offsm (Option.value ~default:[] l)
         | TComp { cstruct = false ; cfields = l} -> (* union *)
@@ -403,7 +403,7 @@ let memset_typ_offsm_int full_typ i =
             let nb = Cil.lenOfArray64 nb in (* always succeeds, we computed the
                                                size of the entire type earlier *)
             if Z.(gt nb zero) then begin
-              let sizeelt = Int.of_int (Cil.bitsSizeOf typelt) in
+              let sizeelt = Z.of_int (Cil.bitsSizeOf typelt) in
               (* Do the first cell *)
               let offsm' = aux typelt offset offsm in
               if Z.(gt nb one) then begin
@@ -416,7 +416,7 @@ let memset_typ_offsm_int full_typ i =
                 (* Paste on all offsets > 1 *)
                 let dst =
                   let idx =
-                    Ival.inject_range (Some Int.one) (Some (Int.pred nb))
+                    Ival.inject_range (Some Z.one) (Some (Z.pred nb))
                   in
                   let idx_size = Ival.scale sizeelt idx in
                   Ival.add_singleton_int offset idx_size
@@ -441,7 +441,7 @@ let memset_typ_offsm_int full_typ i =
           raise (ImpreciseMemset UnsupportedType)
         | TNamed _ -> assert false (* unrolled *)
       in
-      aux full_typ Int.zero full_offsm
+      aux full_typ Z.zero full_offsm
   with Cil.SizeOfError _ | Abstract_interp.Error_Top ->
     raise (ImpreciseMemset ImpreciseTypeSize)
 
@@ -477,7 +477,7 @@ let frama_c_memset_precise state dst_expr dst v (exp_size, size) =
     (* Extract the location, check that it is precise. *)
     if Location_Bits.(is_bottom dst || not (cardinal_zero_or_one dst)) then
       raise (ImpreciseMemset NotSingletonLoc);
-    if not (Int.gt size Int.zero) then
+    if not (Z.gt size Z.zero) then
       raise (ImpreciseMemset NegativeOrNullSize);
     (* Now, try to find a type that matches [size]. *)
     let typ =
@@ -533,8 +533,8 @@ let frama_c_memset state actuals =
       (* Keep only the first byte of the value argument *)
       let _, v = Cvalue.V.extract_bits
           ~topify:Origin.Misalign_read
-          ~start:Int.zero ~stop:(Int.pred (Bit_utils.sizeofchar ()))
-          ~size:(Int.of_int (Cil.bitsSizeOfInt IInt))
+          ~start:Z.zero ~stop:(Z.pred (Bit_utils.sizeofchar ()))
+          ~size:(Z.of_int (Cil.bitsSizeOfInt IInt))
           v
       in
       let state, sure_output, over_output =
@@ -617,9 +617,9 @@ let frama_c_interval_split _state actuals =
         let lower = Ival.project_int (Cvalue.V.project_ival lower) in
         let i = ref lower in
         let r = ref [] in
-        while (Int.leq !i upper) do
+        while (Z.leq !i upper) do
           r := Cvalue.V.inject_int !i :: !r;
-          i := Int.succ !i;
+          i := Z.succ !i;
         done;
         Builtins.Result !r
       with

@@ -7,7 +7,6 @@
 (**************************************************************************)
 
 open Cil_types
-open Abstract_interp
 
 (* Auxiliary module for inference of split criterion. We collect all the
    usages of a function call, and all places where they are compared against
@@ -71,7 +70,7 @@ module ReturnUsage = struct
       let v = Z.Set.add i u.ret_compared in
       let u = { u with ret_compared = v } in
       if debug then Format.printf
-          "[Usage] Comparing %a to %a@." Printer.pp_lval lv Int.pretty i;
+          "[Usage] Comparing %a to %a@." Printer.pp_lval lv Z.pretty i;
       MapLval.add lv u uf
     else
       uf
@@ -96,12 +95,12 @@ module ReturnUsage = struct
        then add ct lv
        else uf
      | UnOp (LNot, {enode = Lval lv}, _) ->
-       add_compare_ct uf Int.zero lv
+       add_compare_ct uf Z.zero lv
 
      | UnOp (LNot, {enode = CastE (typ, {enode = Lval lv})}, _)
        when Ast_types.is_integral_or_pointer typ &&
             Ast_types.is_integral_or_pointer (Cil.typeOfLval lv) ->
-       add_compare_ct uf Int.zero lv
+       add_compare_ct uf Z.zero lv
 
      | _ -> uf)
 
@@ -113,12 +112,12 @@ module ReturnUsage = struct
   let rec add_direct_comparison uf e =
     match e.enode with
     | Lval lv ->
-      add_compare_ct uf Int.zero lv
+      add_compare_ct uf Z.zero lv
 
     | CastE (typ, {enode = Lval lv})
       when Ast_types.is_integral_or_pointer typ &&
            Ast_types.is_integral_or_pointer (Cil.typeOfLval lv) ->
-      add_compare_ct uf Int.zero lv
+      add_compare_ct uf Z.zero lv
 
     | BinOp ((LAnd | LOr), e1, e2, _) ->
       add_direct_comparison (add_direct_comparison uf e1) e2
@@ -271,7 +270,7 @@ let kf_strategy =
 let pretty_strategies fmt =
   Format.fprintf fmt "@[<v>";
   let open Split_strategy in
-  let pp_list = Pretty_utils.pp_list ~sep:",@ " Int.pretty in
+  let pp_list = Pretty_utils.pp_list ~sep:",@ " Z.pretty in
   let pp_one user_auto pp = function
     | NoSplit -> ()
     | FullSplit ->

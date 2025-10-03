@@ -92,7 +92,7 @@ let pretty_slice fmt s =
 
 let location_with_size_aux p sbytes =
   Locations.loc_bytes_to_loc_bits p,
-  Abstract_interp.Int.of_int (size_char_in_bits * sbytes)
+  Z.of_int (size_char_in_bits * sbytes)
 
 let location_with_size p sbytes =
   let locb, size = location_with_size_aux p sbytes in
@@ -146,7 +146,7 @@ let write_slice ~p ~sbytes ~slice ~exact state =
   let pointer = Locations.loc_bytes_to_loc_bits (location_of_pointer p) in
   Cvalue.Model.paste_offsetmap
     ~from:slice ~dst_loc:pointer
-    ~size:(Abstract_interp.Int.of_int (sbytes * size_char_in_bits))
+    ~size:(Z.of_int (sbytes * size_char_in_bits))
     ~exact
     state
 

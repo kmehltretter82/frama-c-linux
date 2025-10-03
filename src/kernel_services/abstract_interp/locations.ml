@@ -170,9 +170,9 @@ module Location_Bytes = struct
         else
           match card, Ival.cardinal i with
           | None, _ | _, None -> None
-          | Some c1, Some c2 -> Some (Int.add c1 c2)
+          | Some c1, Some c2 -> Some (Z.add c1 c2)
       in
-      M.fold aux_base m (Some Int.zero)
+      M.fold aux_base m (Some Z.zero)
 
   let top_with_origin origin = Top (Base.SetLattice.top, origin)
 
@@ -289,8 +289,8 @@ module Location_Bytes = struct
     | Map m1, Map m2 ->
       (* The two locations may overlap if there are two offsets i1 and i2 such
          that |i1-i2| < size (and |i1-i2| > 0 when partial is true). *)
-      let pred_size = Int.pred size in
-      let min = if partial then Int.one else Int.zero in
+      let pred_size = Z.pred size in
+      let min = if partial then Z.one else Z.zero in
       let size_itv = Ival.inject_range (Some min) (Some pred_size) in
       let decide_both _ x y =
         let abs_diff = Ival.abs_int (Ival.sub_int x y) in
@@ -411,7 +411,7 @@ module Zone = struct
     let f base _ =
       match Base.bits_sizeof base with
       | Top -> Int_Intervals.top
-      | Value size -> Int_Intervals.inject_bounds Int.zero size
+      | Value size -> Int_Intervals.inject_bounds Z.zero size
     in
     Map (M.from_shape f bases)
 
@@ -454,7 +454,7 @@ type access = Read | Write | Object_pointer | Any_pointer
 
 let project_size = function
   | Int_Base.Value size -> size
-  | Int_Base.Top -> Int.zero
+  | Int_Base.Top -> Z.zero
 
 (* Conversion into Base.access. A location valid for an access of unknown size
    must be at least valid for an empty access, so accesses of unknown sizes are
@@ -531,7 +531,7 @@ let filter_base f loc =
 let int_base_size_of_varinfo v =
   try
     let s = bitsSizeOf v.vtype in
-    let s = Int.of_int s in
+    let s = Z.of_int s in
     Int_Base.inject s
   with Cil.SizeOfError (msg, _) ->
     Abstract_interp.feedback_approximation
@@ -548,7 +548,7 @@ let loc_of_base v =
 let loc_of_typoffset b typ offset =
   try
     let offs, size = Cil.bitsOffset typ offset in
-    let size = Int_Base.inject (Int.of_int size) in
+    let size = Int_Base.inject (Z.of_int size) in
     make_loc (Location_Bits.inject b (Ival.of_int offs)) size
   with SizeOfError _ as _e ->
     make_loc (Location_Bits.inject b Ival.top) Int_Base.top
@@ -594,7 +594,7 @@ let pretty_english ~prefix fmt { loc = m ; size = size } =
     let print_binding fmt (k, v) =
       ( match Ival.is_zero v, Base.validity k, size with
           true, Base.Known (_,s1), Int_Base.Value s2 when
-            Int.equal (Int.succ s1) s2 ->
+            Z.equal (Z.succ s1) s2 ->
           Format.fprintf fmt "@[<h>%a@]" Base.pretty k
         | _ ->
           Format.fprintf fmt "@[<h>%a with offsets %a@]"
@@ -696,7 +696,7 @@ let invalid_part l = l (* TODO (but rarely useful) *)
 
 let overlaps ~partial l1 l2 =
   try
-    let size = Int.max (Int_Base.project l1.size) (Int_Base.project l2.size) in
+    let size = Z.max (Int_Base.project l1.size) (Int_Base.project l2.size) in
     Location_Bits.overlaps ~partial ~size l1.loc l2.loc
   with Abstract_interp.Error_Top -> true
 

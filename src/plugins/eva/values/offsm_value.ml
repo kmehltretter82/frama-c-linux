@@ -21,11 +21,11 @@ let default size =
 (* This function creates a dummy validity, sufficient to read [size]
    bits starting from [start] *)
 let enough_validity ~start ~size =
-  Base.Known (0z, Int.add start (Int.pred size))
+  Base.Known (0z, Z.add start (Z.pred size))
 
 (* copy [size] bits from [start] in [o]. If [o] has size [size_o],
    [size+start <= size_o] must hold. *)
-let basic_copy ?(start=Int.zero) ~size o =
+let basic_copy ?(start=Z.zero) ~size o =
   let validity = enough_validity ~start ~size in
   let offsets = Ival.inject_singleton start in
   match V_Offsetmap.copy_slice ~validity ~offsets ~size o with
@@ -34,7 +34,7 @@ let basic_copy ?(start=Int.zero) ~size o =
 
 (* paste [src] of size [size_src] starting at [start] in [r]. If [r] has size
    [size_r], [size+start <= size_r] must hold. *)
-let basic_paste ?(start=Int.zero) ~src ~size_src dst =
+let basic_paste ?(start=Z.zero) ~src ~size_src dst =
   let size = size_src in
   let validity = enough_validity ~start ~size in
   let exact = true in
@@ -45,7 +45,7 @@ let basic_paste ?(start=Int.zero) ~src ~size_src dst =
   | `Value r -> r
 
 (* Reads [size] bits starting at [start] in [o], as a single value *)
-let basic_find ?(start=Int.zero) ~size o =
+let basic_find ?(start=Z.zero) ~size o =
   let validity = enough_validity ~start ~size in
   let offsets = Ival.inject_singleton start in
   let v = V_Offsetmap.find ~validity ~offsets ~size o in
@@ -53,7 +53,7 @@ let basic_find ?(start=Int.zero) ~size o =
   V_Or_Uninitialized.map (fun v -> V.reinterpret_as_int ~signed:false ~size v) v
 
 (* Paste [v] of size [size] at position [start] in [o] *)
-let basic_add ?(start=Int.zero) ~size v o =
+let basic_add ?(start=Z.zero) ~size v o =
   let validity = enough_validity ~start ~size in
   let offsets = Ival.inject_singleton start in
   let v = V_Or_Uninitialized.initialized v in
@@ -121,7 +121,7 @@ let explode o =
   List.rev (V_Offsetmap.fold (fun r v acc -> (r, v) :: acc) !r [])
 
 (** Subpart of an offsetmap (as understood by advanced iterators) *)
-type offsm_range = V_Or_Uninitialized.t * Int.t * Rel.t
+type offsm_range = V_Or_Uninitialized.t * Z.t * Rel.t
 
 module V_OffsetmapSentinel = struct
   include Cvalue.V_Offsetmap
@@ -142,17 +142,17 @@ let explode = CacheExplode.merge explode
     an offsetmap) as a single value. *)
 let extract size vv =
   let d = default size in
-  let o = V_Offsetmap.add ~exact:true (Int.zero, Int.pred size) vv d in
+  let o = V_Offsetmap.add ~exact:true (Z.zero, Z.pred size) vv d in
   basic_find ~size o
 
 
 (** Offsetmap operations on ranges *)
 
 let equal_offsm_range (v1, s1, r1: offsm_range) (v2, s2, r2: offsm_range) =
-  V_Or_Uninitialized.equal v1 v2 && Int.equal s1 s2 && Rel.equal r1 r2
+  V_Or_Uninitialized.equal v1 v2 && Z.equal s1 s2 && Rel.equal r1 r2
 
 (** Offsetmap as decomposed into a list of ranges *)
-type offsm_as_list = ((Int.t * Int.t) * offsm_range) list
+type offsm_as_list = ((Z.t * Z.t) * offsm_range) list
 
 let rec merge_list (f: _ -> offsm_range -> offsm_range -> offsm_range) (l1: offsm_as_list) (l2: offsm_as_list) : offsm_as_list =
   match l1, l2 with
@@ -160,20 +160,20 @@ let rec merge_list (f: _ -> offsm_range -> offsm_range -> offsm_range) (l1: offs
   | [], _ :: _ | _ :: _, [] -> assert false
   | ((e1, b1 as i1), (v1, s1, r1 as vv1)) :: q1,
     ((e2, b2 as i2), (v2, s2, r2 as vv2)) :: q2 ->
-    assert (Int.equal e1 e2);
+    assert (Z.equal e1 e2);
     if b1 = b2 then
       (i1, f i1 vv1 vv2) :: merge_list f q1 q2
-    else if Int.lt b1 b2 then
+    else if Z.lt b1 b2 then
       (* vv1 is shorter, split vv2 in two. The value for the second part (vv2')
          starts at [e1] while the second part itself starts at [b1 + 1]:
          correct the offset appropriately. *)
-      let d = Rel.sub_abs e1 (Int.succ b1) in
-      let vv2' = (Int.succ b1, b2), (v2, s2, Rel.add d r2) in
+      let d = Rel.sub_abs e1 (Z.succ b1) in
+      let vv2' = (Z.succ b1, b2), (v2, s2, Rel.add d r2) in
       ((e1, b1), f i1 vv1 vv2) :: merge_list f q1 (vv2' :: q2)
     else
       (* Reverse case: vv2 is shorter, split vv1 *)
-      let d = Rel.sub_abs e1 (Int.succ b2) in
-      let vv1' = (Int.succ b2, b1), (v1, s1, Rel.add d r1) in
+      let d = Rel.sub_abs e1 (Z.succ b2) in
+      let vv1' = (Z.succ b2, b1), (v1, s1, Rel.add d r1) in
       ((e1, b2), f i2 vv1 vv2) :: merge_list f (vv1' :: q1) q2
 
 let map2 f o1 o2 =
@@ -201,8 +201,8 @@ let is_zero =
    [off] is not [zero]. Also, we could improve the function by not creating
    V_Or_Uninitialized values, and instead directly reasoning on Ival. *)
 let is_all_ones size (v, _size_v, off) =
-  Rel.equal Rel.zero off &&
-  let n = Int.pred (Int.two_power size) in
+  Rel.is_zero off &&
+  let n = Z.pred (Z.two_power size) in
   let one = V_Or_Uninitialized.initialized (V.inject_int n) in
   V_Or_Uninitialized.equal one v
 
@@ -215,14 +215,14 @@ let same_concr (v1, _, _ as vv1: offsm_range) (vv2: offsm_range) =
   equal_offsm_range vv1 vv2 && V_Or_Uninitialized.cardinal_zero_or_one v1
 
 let aux_or (b, e) (vv1: offsm_range) (vv2: offsm_range) =
-  let size = Int.length b e in
+  let size = Z.length b e in
   if is_zero size vv1 || is_all_ones size vv2 || same_concr vv1 vv2 then vv2
   else if is_zero size vv2 || is_all_ones size vv1 then vv1
   else
     lift V.bitwise_or size vv1 vv2
 
 let aux_and (b, e) (vv1: offsm_range) (vv2: offsm_range) =
-  let size = Int.length b e in
+  let size = Z.length b e in
   if is_zero size vv1 || is_all_ones size vv2 || same_concr vv1 vv2 then vv1
   else if is_zero size vv2 || is_all_ones size vv1 then vv2
   else
@@ -234,11 +234,11 @@ let aux_and (b, e) (vv1: offsm_range) (vv2: offsm_range) =
 
 (* O is neutral for xor, and  v ^ v = 0 *)
 let aux_xor (b, e) (vv1: offsm_range) (vv2: offsm_range) =
-  let size = Int.length b e in
+  let size = Z.length b e in
   if is_zero size vv1 then vv2
   else if is_zero size vv2 then vv1
   else if same_concr vv1 vv2 then
-    (V_Or_Uninitialized.initialized V.singleton_zero, Int.one, Rel.zero)
+    (V_Or_Uninitialized.initialized V.singleton_zero, Z.one, Rel.zero)
   else lift V.bitwise_xor size vv1 vv2
 
 let bitwise_or = map2 aux_or
@@ -268,8 +268,8 @@ type shift_direction = Left | Right
 let sign_bit size offsm =
   let sign_bit =
     if Machine.little_endian ()
-    then Int.pred size
-    else Int.zero
+    then Z.pred size
+    else Z.zero
   in
   let sign_v = basic_find ~start:sign_bit ~size:Z.one offsm in
   Cvalue.V_Or_Uninitialized.get_v sign_v
@@ -278,7 +278,7 @@ let sign_bit size offsm =
 let signed_default ~size ~size_offsm offsm =
   let default_v = sign_bit size_offsm offsm in
   let v = V_Or_Uninitialized.initialized default_v in
-  V_Offsetmap.create ~size ~size_v:Int.one v
+  V_Offsetmap.create ~size ~size_v:Z.one v
 
 let shift ~size ~signed offsm shift_direction n =
   let result =
@@ -286,15 +286,15 @@ let shift ~size ~signed offsm shift_direction n =
     then signed_default ~size ~size_offsm:size offsm
     else default size
   in
-  if Int.lt n Int.zero || Int.geq n size
+  if Z.lt n Z.zero || Z.geq n size
   then result (* Undefined behavior: we don't care about the result. *)
   else
-    let size_copy = Int.sub size n in
+    let size_copy = Z.sub size n in
     let little_endian = Machine.little_endian () in
     let start_copy, start_paste =
       if (shift_direction = Left) = little_endian
-      then Int.zero, n
-      else n, Int.zero
+      then Z.zero, n
+      else n, Z.zero
     in
     let data = basic_copy ~start:start_copy ~size:size_copy offsm in
     basic_paste ~start:start_paste ~src:data ~size_src:size_copy result
@@ -303,9 +303,9 @@ let shift ~size ~signed offsm shift_direction n =
 
 let cast ~old_size ~new_size ~signed offsm =
   let little_endian = Machine.little_endian () in
-  if Int.equal old_size new_size then offsm
-  else if Int.lt new_size old_size then (* Truncation *)
-    let start = if little_endian then Int.zero else Int.sub old_size new_size in
+  if Z.equal old_size new_size then offsm
+  else if Z.lt new_size old_size then (* Truncation *)
+    let start = if little_endian then Z.zero else Z.sub old_size new_size in
     basic_copy ~start ~size:new_size offsm
   else (* Extension *)
     let result =
@@ -313,7 +313,7 @@ let cast ~old_size ~new_size ~signed offsm =
       then signed_default ~size:new_size ~size_offsm:old_size offsm
       else default new_size
     in
-    let start = if little_endian then Int.zero else Int.sub new_size old_size in
+    let start = if little_endian then Z.zero else Z.sub new_size old_size in
     basic_paste ~start ~src:offsm ~size_src:old_size result
 
 
@@ -452,8 +452,8 @@ module Offsm
     let open Eval_typ in
     match o, src_type, dst_type with
     | O o, (TSInt src | TSPtr src), (TSInt dst | TSPtr dst) ->
-      let old_size = Int.of_int src.i_bits in
-      let new_size = Int.of_int dst.i_bits in
+      let old_size = Z.of_int src.i_bits in
+      let new_size = Z.of_int dst.i_bits in
       let signed = src.i_signed in
       `Value (O (cast ~old_size ~new_size ~signed o))
     | _ -> `Value Top

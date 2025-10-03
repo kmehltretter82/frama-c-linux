@@ -11,8 +11,6 @@ open Cil_types
 
 open Misc
 
-module AI = Abstract_interp
-
 module Options = Reduc_options
 
 let not_yet ~what =
@@ -78,7 +76,7 @@ let ival_to_predicate_opt ~loc t ival =
       Some pors
     | None ->
       match Ival.min_max_r_mod ival with
-      | (None, None, _, modulo) when AI.Int.is_one modulo ->(*Top*) None
+      | (None, None, _, modulo) when Z.is_one modulo ->(*Top*) None
       | (min, max, rem, modulo) ->
         let pint = interval_to_predicate_opt ~loc t min max in
         let pcon = congruence_to_predicate_opt ~loc t rem modulo in

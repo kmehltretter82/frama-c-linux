@@ -38,8 +38,8 @@ let shift_right_logical x y = (* no meaning for negative value of x *)
   then raise (Invalid_argument "Z.shift_right_logical")
   else shift_right_z x y
 
-let is_zero v = equal v zero
-let is_one  v = equal v one
+let is_zero = equal zero
+let is_one  = equal one
 
 let length u v = succ (sub v u)
 

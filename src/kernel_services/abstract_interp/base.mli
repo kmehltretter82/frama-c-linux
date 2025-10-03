@@ -9,15 +9,13 @@
 (** Abstraction of the base of an addressable memory zone, together with
     the validity of the zone.*)
 
-open Abstract_interp
-
 (** Validity for variables that might change size. *)
 type variable_validity = private {
   mutable weak : bool (** Indicate that the variable is weak, i.e. that
                           it may represent multiple memory locations *);
-  mutable min_alloc : Int.t (** First bit guaranteed to be valid; can be -1 *);
-  mutable max_alloc : Int.t (** Last possibly valid bit *);
-  max_allocable: Int.t (** Maximum valid bit after size increase *);
+  mutable min_alloc : Z.t (** First bit guaranteed to be valid; can be -1 *);
+  mutable max_alloc : Z.t (** Last possibly valid bit *);
+  max_allocable: Z.t (** Maximum valid bit after size increase *);
 }
 
 (** Whether the allocated base has been obtained via calls to
@@ -36,8 +34,8 @@ type base = private
 
 and validity =
   | Empty (** For 0-sized bases *)
-  | Known of Int.t * Int.t (** Valid between those two bits *)
-  | Unknown of Int.t * Int.t option * Int.t
+  | Known of Z.t * Z.t (** Valid between those two bits *)
+  | Unknown of Z.t * Z.t option * Z.t
   (** Unknown(b,k,e) indicates:
       If k is [None], potentially valid between b and e
       If k is [Some k], then b <= k <= e, and the base is
@@ -90,7 +88,7 @@ val validity : t -> validity
     or [Known (0, size-1)] if [size > 0].
     [size] must not be negative.
     @since Aluminium-20160501 *)
-val validity_from_size : Int.t -> validity
+val validity_from_size : Z.t -> validity
 val validity_from_type : Cil_types.varinfo -> validity
 
 type range_validity =
@@ -107,10 +105,10 @@ val valid_range: validity -> range_validity
 val is_weak_validity: validity -> bool
 
 val create_variable_validity:
-  weak:bool -> min_alloc:Int.t -> max_alloc:Int.t -> variable_validity
+  weak:bool -> min_alloc:Z.t -> max_alloc:Z.t -> variable_validity
 
 val update_variable_validity:
-  variable_validity -> weak:bool -> min_alloc:Int.t -> max_alloc:Int.t -> unit
+  variable_validity -> weak:bool -> min_alloc:Z.t -> max_alloc:Z.t -> unit
 (** Update the corresponding fields of the variable validity. Bases
     already weak cannot be made 'strong' through this function, and the
     validity bounds can only grow. *)
@@ -150,8 +148,8 @@ val is_null : t -> bool
 val null_set: Hptset.t
 (** Set containing only the base {!null}. *)
 
-val min_valid_absolute_address: unit -> Int.t
-val max_valid_absolute_address: unit -> Int.t
+val min_valid_absolute_address: unit -> Z.t
+val max_valid_absolute_address: unit -> Z.t
 (** Bounds for option absolute-valid-range *)
 
 
@@ -164,7 +162,7 @@ val bits_sizeof : t -> Int_Base.t
       past the last element of the array object", non-array object being viewed
       as array of one element).
     - Any_pointer: object pointer, function pointer or NULL. *)
-type access = Read of Int.t | Write of Int.t | Object_pointer | Any_pointer
+type access = Read of Z.t | Write of Z.t | Object_pointer | Any_pointer
 
 val is_valid_offset : access -> t -> Ival.t -> bool
 (** [is_valid_offset access b offset] holds iff the ival [offset] (expressed in
@@ -191,7 +189,7 @@ val is_weak : t -> bool
     Only possible for {!Allocated} bases. *)
 
 val id : t -> int
-val is_aligned_by : t -> Int.t -> bool
+val is_aligned_by : t -> Z.t -> bool
 
 
 (** {2 Registering bases}

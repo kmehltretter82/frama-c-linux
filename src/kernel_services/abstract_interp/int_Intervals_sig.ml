@@ -9,9 +9,7 @@
 (** Sets of intervals with a lattice structure. Consecutive intervals are
     automatically fused. *)
 
-open Abstract_interp
-
-type itv = Int.t * Int.t
+type itv = Z.t * Z.t
 
 module type S = sig
 
@@ -19,7 +17,7 @@ module type S = sig
 
   val is_top: t -> bool
 
-  val inject_bounds: Int.t -> Int.t -> t
+  val inject_bounds: Z.t -> Z.t -> t
   val inject_itv: itv -> t
   val inject: itv list -> t
   val from_ival_size: Ival.t -> Int_Base.t -> t

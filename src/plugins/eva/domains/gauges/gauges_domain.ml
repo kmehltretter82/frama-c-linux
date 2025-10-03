@@ -44,11 +44,11 @@ module G = struct
     let pretty fmt (min, max: t) =
       match min, max with
       | Some min, Some max when Z.equal min max ->
-        Format.fprintf fmt "{%a}" Abstract_interp.Int.pretty min
+        Format.fprintf fmt "{%a}" Z.pretty min
       | _ ->
         let pp_bound sign fmt = function
           | None -> Format.fprintf fmt "%coo" sign
-          | Some i -> Abstract_interp.Int.pretty fmt i
+          | Some i -> Z.pretty fmt i
         in
         Format.fprintf fmt "[%a .. %a]" (pp_bound '-') min (pp_bound '+') max
 

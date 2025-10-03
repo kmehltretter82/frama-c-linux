@@ -280,7 +280,9 @@ end
 
 (* Typing constraints are enforced directly in the .mli *)
 module Rel = struct
-  include Int
+  include Z
+
+  let e_rem = erem
 
   let check ~rem ~modu =
     zero <= rem && rem < modu

@@ -170,7 +170,7 @@ let mod_integer (o,sum) i =
   (* We must then ensure that the set of represented offset is < i,
      i.e. that the highest possible value is < i.
      After normalization, this reduces to check that d*b + o < i.
-     If it is not the case, we coarcen (d,b) to d' = pgcd(d,i) and use the
+     If it is not the case, we coarcen (d,b) to d' = gcd(d,i) and use the
      greatest possible b' = i / d' *)
   match sum with
   | [] -> (o,[])

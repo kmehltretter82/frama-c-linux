@@ -166,8 +166,8 @@ let rec pretty_bits_internal env bfinfo typ ~align ~start ~stop =
   assert (if (Z.lt start Z.zero
               || Z.lt stop Z.minus_one) then
             (Format.printf "start: %a stop: %a@."
-               Abstract_interp.Int.pretty start
-               Abstract_interp.Int.pretty stop;
+               Z.pretty start
+               Z.pretty stop;
              false) else true);
   let update_types typ = env.types <- update_types env.types typ in
 
@@ -184,11 +184,11 @@ let rec pretty_bits_internal env bfinfo typ ~align ~start ~stop =
       (if Kernel.debug_atleast 1 then String.make 1 c else "")
       (fun fmt ->
          if Z.equal stop (max_bit_address ()) then
-           Format.fprintf fmt "bits %a to .." Abstract_interp.Int.pretty start
+           Format.fprintf fmt "bits %a to .." Z.pretty start
          else
            Format.fprintf fmt "bits %a to %a"
-             Abstract_interp.Int.pretty start
-             Abstract_interp.Int.pretty stop
+             Z.pretty start
+             Z.pretty stop
       )
       (if cond then (env.misaligned <- true ; "#") else "")
   in
@@ -196,9 +196,9 @@ let rec pretty_bits_internal env bfinfo typ ~align ~start ~stop =
               || Z.lt start Z.zero
               || Z.lt stop Z.minus_one) then
             (Format.printf "req_s: %a start: %a stop: %a@."
-               Abstract_interp.Int.pretty req_size
-               Abstract_interp.Int.pretty start
-               Abstract_interp.Int.pretty stop;
+               Z.pretty req_size
+               Z.pretty start
+               Z.pretty stop;
              false) else true);
   let typ = Ast_types.unroll typ in
   match typ.tnode with
@@ -345,7 +345,7 @@ let rec pretty_bits_internal env bfinfo typ ~align ~start ~stop =
             (Z.sub align (Z.mul start_case size))
             env.rh_size
         in
-        Format.fprintf env.fmt "[%a]" Abstract_interp.Int.pretty start_case;
+        Format.fprintf env.fmt "[%a]" Z.pretty start_case;
         pretty_bits_internal env Other typ
           ~align:new_align
           ~start:rem_start_size
@@ -383,11 +383,11 @@ let rec pretty_bits_internal env bfinfo typ ~align ~start ~stop =
           | ArrayPart(start_index,stop_index,typ,align,start,stop) ->
             if Z.equal start_index stop_index then
               Format.fprintf env.fmt "[%a]"
-                Abstract_interp.Int.pretty start_index
+                Z.pretty start_index
             else
               Format.fprintf env.fmt "[%a..%a]"
-                Abstract_interp.Int.pretty start_index
-                Abstract_interp.Int.pretty stop_index ;
+                Z.pretty start_index
+                Z.pretty stop_index ;
             pretty_bits_internal env Other typ ~align ~start ~stop
         in
         let rec do_all_parts = function
@@ -421,7 +421,7 @@ let pretty_bits typ ~use_align ~align ~rh_size ~start ~stop fmt =
   if Z.lt start Z.zero then
     (Format.fprintf fmt "[%sbits %a to %a]#(negative offsets)"
        (if Kernel.debug_atleast 1 then "?" else "")
-       Abstract_interp.Int.pretty start Abstract_interp.Int.pretty stop;
+       Z.pretty start Z.pretty stop;
      true, None)
   else
     let env = {
@@ -501,9 +501,9 @@ let minus_one_expr = Cil.mone ~loc:Cil_datatype.Location.unknown
 
 let rec find_offset typ ~offset om =
   (* Format.printf "Searching offset %a in %a, size %a@."
-     Abstract_interp.Int.pretty offset
+     Z.pretty offset
      Printer.pp_typ typ
-     Abstract_interp.Int.pretty size; *)
+     Z.pretty size; *)
   let loc = Cil_datatype.Location.unknown in
   if Z.is_zero offset && offset_matches om typ then
     NoOffset, typ

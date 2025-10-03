@@ -11,15 +11,15 @@ open Abstract_interp
 
 type variable_validity = {
   mutable weak: bool;
-  mutable min_alloc : Int.t;
-  mutable max_alloc : Int.t;
-  max_allocable: Int.t (* not mutable, determined when the base is created *);
+  mutable min_alloc : Z.t;
+  mutable max_alloc : Z.t;
+  max_allocable: Z.t (* not mutable, determined when the base is created *);
 }
 
 type validity =
   | Empty
-  | Known of Int.t * Int.t
-  | Unknown of Int.t * Int.t option * Int.t
+  | Known of Z.t * Z.t
+  | Unknown of Z.t * Z.t option * Z.t
   | Variable of variable_validity
   | Invalid
 
@@ -28,37 +28,37 @@ let pretty_validity fmt v =
   | Empty -> Format.fprintf fmt "Empty"
   | Unknown (b,k,e)  ->
     Format.fprintf fmt "Unknown %a/%a/%a"
-      Int.pretty b (Pretty_utils.pp_opt Int.pretty) k Int.pretty e
-  | Known (b,e)  -> Format.fprintf fmt "Known %a-%a" Int.pretty b Int.pretty e
+      Z.pretty b (Pretty_utils.pp_opt Z.pretty) k Z.pretty e
+  | Known (b,e)  -> Format.fprintf fmt "Known %a-%a" Z.pretty b Z.pretty e
   | Invalid -> Format.fprintf fmt "Invalid"
   | Variable variable_v ->
     Format.fprintf fmt "Variable [0..%a--%a]"
-      Int.pretty variable_v.min_alloc Int.pretty variable_v.max_alloc
+      Z.pretty variable_v.min_alloc Z.pretty variable_v.max_alloc
 
 module Validity = Datatype.Make
     (struct
       type t = validity
       let name = "Base.validity"
       let structural_descr = Structural_descr.t_abstract
-      let reprs = [ Known (Int.zero, Int.one) ]
+      let reprs = [ Known (Z.zero, Z.one) ]
 
       (* Invalid > Variable > Unknown > Known > Empty *)
       let compare v1 v2 = match v1, v2 with
         | Empty, Empty -> 0
         | Known (b1, e1), Known (b2, e2) ->
-          let c = Int.compare b1 b2 in
-          if c = 0 then Int.compare e1 e2 else c
+          let c = Z.compare b1 b2 in
+          if c = 0 then Z.compare e1 e2 else c
         | Unknown (b1, m1, e1), Unknown (b2, m2, e2) ->
-          let c = Int.compare b1 b2 in
+          let c = Z.compare b1 b2 in
           if c = 0 then
-            let c = Option.compare Int.compare m1 m2 in
-            if c = 0 then Int.compare e1 e2 else c
+            let c = Option.compare Z.compare m1 m2 in
+            if c = 0 then Z.compare e1 e2 else c
           else c
         | Variable v1, Variable v2 ->
-          let c = Int.compare v1.min_alloc v2.min_alloc in
+          let c = Z.compare v1.min_alloc v2.min_alloc in
           if c = 0 then
-            let c = Int.compare v1.max_alloc v2.max_alloc in
-            if c = 0 then Int.compare v1.max_allocable v2.max_allocable
+            let c = Z.compare v1.max_alloc v2.max_alloc in
+            if c = 0 then Z.compare v1.max_allocable v2.max_allocable
             else c
           else c
         | Invalid, Invalid -> 0
@@ -76,11 +76,11 @@ module Validity = Datatype.Make
       let hash v = match v with
         | Empty -> 13
         | Invalid -> 37
-        | Known (b, e) -> Hashtbl.hash (3, Int.hash b, Int.hash e)
+        | Known (b, e) -> Hashtbl.hash (3, Z.hash b, Z.hash e)
         | Unknown (b, m, e) ->
-          Hashtbl.hash (7, Int.hash b, Extlib.opt_hash Int.hash m, Int.hash e)
+          Hashtbl.hash (7, Z.hash b, Extlib.opt_hash Z.hash m, Z.hash e)
         | Variable variable_v ->
-          Hashtbl.hash (Int.hash variable_v.min_alloc, Int.hash variable_v.max_alloc)
+          Hashtbl.hash (Z.hash variable_v.min_alloc, Z.hash variable_v.max_alloc)
 
       let pretty = pretty_validity
       let mem_project = Datatype.never_any_project
@@ -147,20 +147,20 @@ let dep_absolute = [Kernel.AbsoluteValidRange.self]
 
 module MinValidAbsoluteAddress =
   State_builder.Ref
-    (Abstract_interp.Int)
+    (Z)
     (struct
       let name = "MinValidAbsoluteAddress"
       let dependencies = dep_absolute
-      let default () = Abstract_interp.Int.zero
+      let default () = Z.zero
     end)
 
 module MaxValidAbsoluteAddress =
   State_builder.Ref
-    (Abstract_interp.Int)
+    (Z)
     (struct
       let name = "MaxValidAbsoluteAddress"
       let dependencies = dep_absolute
-      let default () = Abstract_interp.Int.minus_one
+      let default () = Z.minus_one
     end)
 
 let () =
@@ -170,11 +170,11 @@ let () =
              (fun min max ->
                 (* let mul_CHAR_BIT = Int64.mul (Int64.of_int (bitsSizeOf charType)) in *)
                 (* the above is what we would like to write but it is too early *)
-                let mul_CHAR_BIT = Int.mul 8z in
+                let mul_CHAR_BIT = Z.mul 8z in
                 MinValidAbsoluteAddress.set
-                  (mul_CHAR_BIT (Int.of_string min));
+                  (mul_CHAR_BIT (Z.of_string min));
                 MaxValidAbsoluteAddress.set
-                  ((Int.pred (mul_CHAR_BIT (Int.succ (Int.of_string max))))))
+                  ((Z.pred (mul_CHAR_BIT (Z.succ (Z.of_string max))))))
        with End_of_file | Scanf.Scan_failure _ | Failure _
           | Invalid_argument _ as e ->
          Kernel.abort "Invalid -absolute-valid-range integer-integer: each integer may be in decimal, hexadecimal (0x, 0X), octal (0o) or binary (0b) notation and has to hold in 64 bits. A correct example is -absolute-valid-range 1-0xFFFFFF0.@\nError was %S@."
@@ -184,9 +184,9 @@ let min_valid_absolute_address = MinValidAbsoluteAddress.get
 let max_valid_absolute_address = MaxValidAbsoluteAddress.get
 
 let validity_from_size size =
-  assert (Int.geq size 0z);
-  if Int.equal size 0z then Empty
-  else Known (Int.zero, Int.pred size)
+  assert (Z.geq size 0z);
+  if Z.is_zero size then Empty
+  else Known (Z.zero, Z.pred size)
 
 let validity_from_known_size size =
   match size with
@@ -194,7 +194,7 @@ let validity_from_known_size size =
     (* all start to be valid at offset 0 *)
     validity_from_size size
   | Int_Base.Top ->
-    Unknown (Int.zero, None, Bit_utils.max_bit_address ())
+    Unknown (Z.zero, None, Bit_utils.max_bit_address ())
 
 let validity b =
   match b with
@@ -250,20 +250,20 @@ let for_writing = function
   | Read _ | Object_pointer | Any_pointer -> false
 
 let is_empty_access = function
-  | Read size | Write size -> Int.is_zero size
+  | Read size | Write size -> Z.is_zero size
   | Object_pointer | Any_pointer -> true
 
 (* Computes the last valid offset for an access of the base [base] with [max]
    valid bits: [max - size + 1] for an access of size [size]. *)
 let last_valid_offset base max = function
   | Read size | Write size ->
-    if Int.is_zero size
+    if Z.is_zero size
     (* For an access of size 0, [max] is the last valid offset, unless the base
        ends by an empty struct, in which case [max+1] is also a valid offset. *)
-    then if final_empty_struct base then Int.succ max else max
-    else Int.sub max (Int.pred size)
+    then if final_empty_struct base then Z.succ max else max
+    else Z.sub max (Z.pred size)
   | Object_pointer | Any_pointer ->
-    Int.succ max (* A pointer can point just beyond its object. *)
+    Z.succ max (* A pointer can point just beyond its object. *)
 
 let offset_for_validity ~bitfield access base =
   match validity base with
@@ -295,8 +295,8 @@ let offset_is_in_validity access base ival =
   let is_valid_for_bounds min_bound max_bound =
     match Ival.min_and_max ival with
     | Some min, Some max ->
-      Int.geq min min_bound &&
-      Int.leq max (last_valid_offset base max_bound access)
+      Z.geq min min_bound &&
+      Z.leq max (last_valid_offset base max_bound access)
     | _, _ -> false
   in
   match validity base with
@@ -305,7 +305,7 @@ let offset_is_in_validity access base ival =
   | Known (min, max)
   | Unknown (min, Some max, _) -> is_valid_for_bounds min max
   | Unknown (_, None, _) -> false (* All accesses are possibly invalid. *)
-  | Variable v -> is_valid_for_bounds Int.zero v.min_alloc
+  | Variable v -> is_valid_for_bounds Z.zero v.min_alloc
 
 let is_valid_offset access base offset =
   Ival.is_bottom offset
@@ -322,15 +322,15 @@ let is_function base =
 let equal v w = (id v) = (id w)
 
 let is_aligned_by b alignment =
-  if Int.is_zero alignment
+  if Z.is_zero alignment
   then false
   else
     try
       match b with
       | Var (v,_) | Allocated(v,_,_) ->
-        Int.is_zero (Int.erem (Int.of_int (Cil.bytesAlignOf v.vtype)) alignment)
+        Z.is_zero (Z.erem (Z.of_int (Cil.bytesAlignOf v.vtype)) alignment)
       | CLogic_Var (_, ty, _) ->
-        Int.is_zero (Int.erem (Int.of_int (Cil.bytesAlignOf ty)) alignment)
+        Z.is_zero (Z.erem (Z.of_int (Cil.bytesAlignOf ty)) alignment)
       | Null -> true
     with Cil.SizeOfError _ -> false
 
@@ -383,7 +383,7 @@ let validity_from_type v =
     let max_valid = Bit_utils.sizeof_vid v in
     match max_valid with
     | Int_Base.Top ->
-      Unknown (Int.zero, None, Bit_utils.max_bit_address ())
+      Unknown (Z.zero, None, Bit_utils.max_bit_address ())
     | Int_Base.Value size -> validity_from_size size
 
 type range_validity =
@@ -395,7 +395,7 @@ let valid_range = function
   | Empty -> Valid_range None
   | Known (min_valid,max_valid)
   | Unknown (min_valid,_,max_valid)-> Valid_range (Some (min_valid, max_valid))
-  | Variable variable_v -> Valid_range (Some (Int.zero, variable_v.max_alloc))
+  | Variable variable_v -> Valid_range (Some (Z.zero, variable_v.max_alloc))
 
 let is_weak_validity = function
   | Variable { weak } -> weak
@@ -406,8 +406,8 @@ let create_variable_validity ~weak ~min_alloc ~max_alloc =
   { weak; min_alloc; max_alloc; max_allocable }
 
 let update_variable_validity v ~weak ~min_alloc ~max_alloc =
-  v.min_alloc <- Int.min min_alloc v.min_alloc;
-  v.max_alloc <- Int.max max_alloc v.max_alloc;
+  v.min_alloc <- Z.min min_alloc v.min_alloc;
+  v.max_alloc <- Z.max max_alloc v.max_alloc;
   if weak then v.weak <- true
 
 

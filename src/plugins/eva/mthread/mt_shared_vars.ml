@@ -420,8 +420,6 @@ module Aux(X:
 struct
   include X
 
-  open Abstract_interp
-
   (* YYY: this is not the good approach, as a write t[i] = foo with i imprecise
      will result in a huge location, instead of a unique location with many
      offsets. However, extracting the real location require changes at many
@@ -435,7 +433,7 @@ struct
         let by_size = H.create 4 in
         let aux_itv (ib, ie) =
           let loc = Location_Bits.inject b (Ival.inject_singleton ib) in
-          let size = Int.succ (Int.sub ie ib) in
+          let size = Z.succ (Z.sub ie ib) in
           try
             let prev = H.find by_size size in
             let loc = Location_Bits.join prev loc in
