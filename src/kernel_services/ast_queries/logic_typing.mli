@@ -32,6 +32,17 @@ val ctype_of_array_elem: logic_type -> typ
 val arithmetic_conversion:
   Cil_types.logic_type -> Cil_types.logic_type -> Cil_types.logic_type
 
+exception Typing_error of location * string
+
+(** @param explicit defaults to false, when true it means that the coercion must
+           be explicitly introduced (when possible) e.g. we really want the
+           wrapping behavior in the term [(int) (INT_MAX+1)].
+    @raise Typing_error when the cast is illegal.
+    @since Frama-C+dev
+*)
+val mk_cast:
+  ?explicit:bool -> Cil_types.term -> Cil_types.logic_type -> Cil_types.term
+
 (** Local logic environment *)
 module Lenv : sig
   type t
