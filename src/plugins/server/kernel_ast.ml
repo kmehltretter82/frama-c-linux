@@ -804,6 +804,11 @@ module GlobalVars = struct
       ~data:(module Data.Jbool)
       ~get:(fun vi -> vi.vsource);
     States.column model
+      ~name:"stringLiteral"
+      ~descr:(Md.plain "Does the variable represent a string literal?")
+      ~data:(module Data.Jbool)
+      ~get:Ast_info.is_string_literal;
+    States.column model
       ~name:"sloc"
       ~descr:(Md.plain "Source location")
       ~data:(module Position)
