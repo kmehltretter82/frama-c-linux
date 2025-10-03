@@ -26,11 +26,28 @@ int getopt(int argc, char * const argv[], const char *optstring) {
   if (optind >= argc) {
     return -1;
   }
-  int nondet_ind = Frama_C_interval(1, argc - 1);
-  int nondet_indlen = Frama_C_interval(0, strlen(argv[nondet_ind])-1);
-  optarg = Frama_C_nondet_ptr(0, &argv[nondet_ind][nondet_indlen]);
-  optind = Frama_C_interval(1, argc + 1);
-  return Frama_C_nondet(-1, Frama_C_unsigned_char_interval(0, UCHAR_MAX));
+  int ind = Frama_C_interval(1, argc - 1);
+  int len = strlen(argv[ind]);
+  int arg = Frama_C_interval(0, len - 1);
+  int opt = Frama_C_interval(arg+1, len - 1);
+
+  // Move optind forward
+  optind = Frama_C_interval(optind, argc);
+
+  if (Frama_C_nondet(0, 1)) {
+    // Normal case
+    optarg = Frama_C_nondet_ptr(0, &argv[ind][arg]);
+    return argv[ind][opt];
+  }
+  else if (Frama_C_nondet(0, 1)) {
+    // No more characters
+    return -1;
+  }
+  else {
+    // Error case
+    optopt = argv[ind][opt];
+    return Frama_C_nondet('?', ':');
+  }
 }
 
 int getopt_long (int argc, char *const argv[],
