@@ -196,7 +196,7 @@ end = struct
     else memo_dep f t profile
 
   let clear () =
-    Options.feedback ~dkey ~level:4 "clearing the typing tables";
+    Options.debug ~dkey ~level:4 "clearing the typing tables";
     Misc.Id_term.Hashtbl.clear tbl;
     Id_term_in_profile.Hashtbl.clear dep_tbl
 
@@ -327,7 +327,9 @@ let rec type_term
     ?ctx
     ~profile
     t =
-  Options.feedback ~dkey ~level:5 "typing (sub-)term %a" Printer.pp_term t;
+  Options.debug ~dkey ~level:5 "typing (sub-)term '%a'%a"
+    Printer.pp_term t
+    (Pretty_utils.pp_opt ~pre:" in context '" ~suf:"'" Number_ty.pretty) ctx;
   let open Current_loc.Operators in
   let<> UpdatedCurrentLoc = t.term_loc in
   let ctx = Option.map (mk_ctx ~use_gmp_opt) ctx in
@@ -759,7 +761,7 @@ and type_bound_variables ~profile (t1, lv, t2) =
   ignore(type_term ~use_gmp_opt:false ~ctx ~profile t2)
 
 and type_predicate ~profile p =
-  Options.feedback ~dkey ~level:3 "typing predicate: %a" Printer.pp_predicate p;
+  Options.debug ~dkey ~level:3 "typing predicate: %a" Printer.pp_predicate p;
   let
     do_both f g = (try f() with e -> try g(); raise e with | _ -> raise e); g()
   in
@@ -860,15 +862,16 @@ and ctx_relation ~profile t1 t2 =
   in mk_ctx ~use_gmp_opt:true ty
 
 let type_term ~use_gmp_opt ?ctx ~profile t =
-  Options.feedback ~dkey ~level:4 "typing term '%a' in ctx '%a'."
-    Printer.pp_term t (Pretty_utils.pp_opt Number_ty.pretty) ctx;
+  Options.debug ~dkey ~level:4 "typing term '%a'%a."
+    Printer.pp_term t
+    (Pretty_utils.pp_opt ~pre:" in context '" ~suf:"'" Number_ty.pretty) ctx;
   ignore (type_term ~use_gmp_opt ?ctx ~profile t);
   while not (Stack.is_empty pending_typing) do
     Stack.pop pending_typing ()
   done
 
 let type_named_predicate ~profile p =
-  Options.feedback ~dkey ~level:3 "typing predicate '%a'."
+  Options.debug ~dkey ~level:3 "typing predicate: %a."
     Printer.pp_predicate p;
   ignore (type_predicate ~profile p);
   while not (Stack.is_empty pending_typing) do
