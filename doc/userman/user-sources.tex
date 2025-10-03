@@ -44,14 +44,19 @@ analyze with \FramaC.
 Adding option \optiondef{-}{mopsa-target} will instruct \FramaC to parse
 the source files used to build the given target. For instance, if a
 target \texttt{app} has been built using \texttt{main.o} and \texttt{util.o},
-which were in turn built using \texttt{main.c} and \texttt{util.c}, running:
+which were in turn built using \texttt{main.c} and \texttt{util.c}, run:
 
 \begin{frama-c-commands}
 $ frama-c -mopsa-db mopsa-db.json -mopsa-target app
 \end{frama-c-commands}
 
-Is equivalent to running \verb|frama-c main.c util.c|, plus the appropriate
-preprocessing flags (if any).
+It amounts to running \verb|frama-c main.c util.c| (with relevant
+preprocessing flags, if any).
+
+Note that \verb|-mopsa-db| can accept a directory name, in which case it will
+search for a file named \verb|mopsa-db.json| inside it. Also, if absent when
+another Mopsa-DB-related option is set, it behaves as if the user had added
+\verb|-mopsa-db $PWD|, i.e. set it to the current directory.
 
 Other Mopsa-DB-related options are available, but they are only occasionally
 useful:
