@@ -18,6 +18,8 @@
 Open Source Release <next-release>
 ###############################################################################
 
+-   Eva       [2025-10-03] New warning category `acsl:unsupported` for messages
+              about unsupported ACSL terms.
 -!  Kernel    [2025-10-03] Replaced message key `pp:keep-temp-files` with kernel
               option `-keep-temp-files`.
 -   Kernel    [2025-10-02] Added an experimental sandbox mode enabled when the
