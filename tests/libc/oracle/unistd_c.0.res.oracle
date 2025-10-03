@@ -7,45 +7,46 @@
   
 [eva] computing for function getopt <- main.
   Called from unistd_c.c:61.
-[eva] computing for function Frama_C_interval <- getopt <- main.
-  Called from FRAMAC_SHARE/libc/unistd.c:29.
-[eva] using specification for function Frama_C_interval
-[eva] FRAMAC_SHARE/libc/unistd.c:29: 
-  function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
-[eva:alarm] FRAMAC_SHARE/libc/unistd.c:30: Warning: 
-  out of bounds read. assert \valid_read(argv + nondet_ind);
-[eva] FRAMAC_SHARE/libc/unistd.c:30: Call to builtin strlen
-[eva:alarm] FRAMAC_SHARE/libc/unistd.c:30: Warning: 
-  function strlen: precondition 'valid_string_s' got status unknown.
-[eva] computing for function Frama_C_interval <- getopt <- main.
-  Called from FRAMAC_SHARE/libc/unistd.c:30.
-[eva:alarm] FRAMAC_SHARE/libc/unistd.c:30: Warning: 
-  function Frama_C_interval: precondition 'order' got status unknown.
-[eva] Done for function Frama_C_interval
-[eva:alarm] FRAMAC_SHARE/libc/unistd.c:31: Warning: 
-  out of bounds read. assert \valid_read(argv + nondet_ind);
-[eva] computing for function Frama_C_nondet_ptr <- getopt <- main.
-  Called from FRAMAC_SHARE/libc/unistd.c:31.
-[eva] using specification for function Frama_C_nondet_ptr
-[eva] Done for function Frama_C_nondet_ptr
-[eva:alarm] FRAMAC_SHARE/libc/unistd.c:32: Warning: 
-  signed overflow. assert argc + 1 ≤ 2147483647;
-[eva] computing for function Frama_C_interval <- getopt <- main.
-  Called from FRAMAC_SHARE/libc/unistd.c:32.
-[eva] FRAMAC_SHARE/libc/unistd.c:32: 
-  function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
-[eva] computing for function Frama_C_unsigned_char_interval <- getopt <- main.
-  Called from FRAMAC_SHARE/libc/unistd.c:33.
-[eva] using specification for function Frama_C_unsigned_char_interval
-[eva] FRAMAC_SHARE/libc/unistd.c:33: 
-  function Frama_C_unsigned_char_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_unsigned_char_interval
 [eva] computing for function Frama_C_nondet <- getopt <- main.
-  Called from FRAMAC_SHARE/libc/unistd.c:33.
+  Called from FRAMAC_SHARE/libc/unistd.c:32.
 [eva] using specification for function Frama_C_nondet
 [eva] Done for function Frama_C_nondet
+[eva] computing for function Frama_C_interval <- getopt <- main.
+  Called from FRAMAC_SHARE/libc/unistd.c:38.
+[eva] using specification for function Frama_C_interval
+[eva] FRAMAC_SHARE/libc/unistd.c:38: 
+  function Frama_C_interval: precondition 'order' got status valid.
+[eva] Done for function Frama_C_interval
+[eva] computing for function Frama_C_interval <- getopt <- main.
+  Called from FRAMAC_SHARE/libc/unistd.c:41.
+[eva:alarm] FRAMAC_SHARE/libc/unistd.c:41: Warning: 
+  function Frama_C_interval: precondition 'order' got status unknown.
+[eva] Done for function Frama_C_interval
+[eva:alarm] FRAMAC_SHARE/libc/unistd.c:44: Warning: 
+  out of bounds read. assert \valid_read(argv + ind);
+[eva] FRAMAC_SHARE/libc/unistd.c:44: Call to builtin strlen
+[eva:alarm] FRAMAC_SHARE/libc/unistd.c:44: Warning: 
+  function strlen: precondition 'valid_string_s' got status unknown.
+[eva] computing for function Frama_C_interval <- getopt <- main.
+  Called from FRAMAC_SHARE/libc/unistd.c:48.
+[eva] FRAMAC_SHARE/libc/unistd.c:48: 
+  function Frama_C_interval: precondition 'order' got status valid.
+[eva] Done for function Frama_C_interval
+[eva:alarm] FRAMAC_SHARE/libc/unistd.c:48: Warning: 
+  out of bounds read. assert \valid_read(argv + ind);
+[eva] computing for function Frama_C_nondet <- getopt <- main.
+  Called from FRAMAC_SHARE/libc/unistd.c:50.
+[eva] Done for function Frama_C_nondet
+[eva] computing for function Frama_C_nondet <- getopt <- main.
+  Called from FRAMAC_SHARE/libc/unistd.c:52.
+[eva] Done for function Frama_C_nondet
+[eva] computing for function Frama_C_interval <- getopt <- main.
+  Called from FRAMAC_SHARE/libc/unistd.c:54.
+[eva] FRAMAC_SHARE/libc/unistd.c:54: 
+  function Frama_C_interval: precondition 'order' got status valid.
+[eva] Done for function Frama_C_interval
+[eva:alarm] FRAMAC_SHARE/libc/unistd.c:54: Warning: 
+  out of bounds read. assert \valid_read(argv + ind);
 [eva] Recording results for getopt
 [eva] Done for function getopt
 [eva] computing for function main_long <- main.
@@ -53,70 +54,48 @@
 [eva] computing for function getopt_long <- main_long <- main.
   Called from unistd_c.c:32.
 [eva] computing for function Frama_C_nondet <- getopt_long <- main_long <- main.
-  Called from FRAMAC_SHARE/libc/unistd.c:42.
+  Called from FRAMAC_SHARE/libc/unistd.c:72.
 [eva] Done for function Frama_C_nondet
-[eva] computing for function Frama_C_interval <- getopt_long <- main_long <- main.
-  Called from FRAMAC_SHARE/libc/unistd.c:44.
-[eva] FRAMAC_SHARE/libc/unistd.c:44: 
-  function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
-[eva:alarm] FRAMAC_SHARE/libc/unistd.c:45: Warning: 
-  out of bounds read. assert \valid_read(argv + nondet_ind);
-[eva] FRAMAC_SHARE/libc/unistd.c:45: Call to builtin strlen
-[eva:alarm] FRAMAC_SHARE/libc/unistd.c:45: Warning: 
-  function strlen: precondition 'valid_string_s' got status unknown.
-[eva] computing for function Frama_C_interval <- getopt_long <- main_long <- main.
-  Called from FRAMAC_SHARE/libc/unistd.c:45.
-[eva:alarm] FRAMAC_SHARE/libc/unistd.c:45: Warning: 
+[eva] computing for function getopt <- getopt_long <- main_long <- main.
+  Called from FRAMAC_SHARE/libc/unistd.c:73.
+[eva] computing for function Frama_C_nondet <- getopt <- getopt_long <- 
+                          main_long <- main.
+  Called from FRAMAC_SHARE/libc/unistd.c:32.
+[eva] Done for function Frama_C_nondet
+[eva] computing for function Frama_C_interval <- getopt <- getopt_long <- 
+                          main_long <- main.
+  Called from FRAMAC_SHARE/libc/unistd.c:38.
+[eva:alarm] FRAMAC_SHARE/libc/unistd.c:38: Warning: 
   function Frama_C_interval: precondition 'order' got status unknown.
 [eva] Done for function Frama_C_interval
-[eva:alarm] FRAMAC_SHARE/libc/unistd.c:46: Warning: 
-  out of bounds read. assert \valid_read(argv + nondet_ind);
-[eva] computing for function Frama_C_nondet_ptr <- getopt_long <- main_long <- main.
-  Called from FRAMAC_SHARE/libc/unistd.c:46.
-[eva] Done for function Frama_C_nondet_ptr
-[eva] computing for function Frama_C_interval <- getopt_long <- main_long <- main.
-  Called from FRAMAC_SHARE/libc/unistd.c:47.
-[eva] FRAMAC_SHARE/libc/unistd.c:47: 
-  function Frama_C_interval: precondition 'order' got status valid.
+[eva] computing for function Frama_C_interval <- getopt <- getopt_long <- 
+                          main_long <- main.
+  Called from FRAMAC_SHARE/libc/unistd.c:41.
 [eva] Done for function Frama_C_interval
-[eva] FRAMAC_SHARE/libc/unistd.c:48: Call to builtin strlen
-[eva] FRAMAC_SHARE/libc/unistd.c:48: 
-  function strlen: precondition 'valid_string_s' got status valid.
-[eva] computing for function Frama_C_interval <- getopt_long <- main_long <- main.
+[eva] FRAMAC_SHARE/libc/unistd.c:44: Call to builtin strlen
+[eva] computing for function Frama_C_interval <- getopt <- getopt_long <- 
+                          main_long <- main.
   Called from FRAMAC_SHARE/libc/unistd.c:48.
-[eva] FRAMAC_SHARE/libc/unistd.c:48: 
-  function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] computing for function Frama_C_nondet <- getopt_long <- main_long <- main.
+[eva] computing for function Frama_C_nondet <- getopt <- getopt_long <- 
+                          main_long <- main.
   Called from FRAMAC_SHARE/libc/unistd.c:50.
 [eva] Done for function Frama_C_nondet
-[eva:partition] FRAMAC_SHARE/libc/unistd.c:53: starting to merge loop iterations
-[eva:alarm] FRAMAC_SHARE/libc/unistd.c:53: Warning: 
-  out of bounds read. assert \valid_read(&(longopts + n_longopts)->name);
+[eva] computing for function Frama_C_nondet <- getopt <- getopt_long <- 
+                          main_long <- main.
+  Called from FRAMAC_SHARE/libc/unistd.c:52.
+[eva] Done for function Frama_C_nondet
+[eva] computing for function Frama_C_interval <- getopt <- getopt_long <- 
+                          main_long <- main.
+  Called from FRAMAC_SHARE/libc/unistd.c:54.
+[eva] Done for function Frama_C_interval
+[eva] Recording results for getopt
+[eva] Done for function getopt
 [eva] computing for function Frama_C_interval <- getopt_long <- main_long <- main.
-  Called from FRAMAC_SHARE/libc/unistd.c:57.
-[eva] FRAMAC_SHARE/libc/unistd.c:57: 
+  Called from FRAMAC_SHARE/libc/unistd.c:76.
+[eva] FRAMAC_SHARE/libc/unistd.c:76: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva:alarm] FRAMAC_SHARE/libc/unistd.c:62: Warning: 
-  out of bounds read. assert \valid_read(argv + nondet_ind_0);
-[eva] FRAMAC_SHARE/libc/unistd.c:62: Call to builtin strlen
-[eva:alarm] FRAMAC_SHARE/libc/unistd.c:62: Warning: 
-  function strlen: precondition 'valid_string_s' got status unknown.
-[eva] computing for function Frama_C_interval <- getopt_long <- main_long <- main.
-  Called from FRAMAC_SHARE/libc/unistd.c:62.
-[eva:alarm] FRAMAC_SHARE/libc/unistd.c:62: Warning: 
-  function Frama_C_interval: precondition 'order' got status unknown.
-[eva] Done for function Frama_C_interval
-[eva:alarm] FRAMAC_SHARE/libc/unistd.c:63: Warning: 
-  out of bounds read. assert \valid_read(argv + nondet_ind_0);
-[eva] computing for function Frama_C_nondet_ptr <- getopt_long <- main_long <- main.
-  Called from FRAMAC_SHARE/libc/unistd.c:63.
-[eva] Done for function Frama_C_nondet_ptr
-[eva] computing for function Frama_C_nondet <- getopt_long <- main_long <- main.
-  Called from FRAMAC_SHARE/libc/unistd.c:76.
-[eva] Done for function Frama_C_nondet
 [eva] Recording results for getopt_long
 [eva] Done for function getopt_long
 [eva] computing for function atof <- main_long <- main.
@@ -126,48 +105,7 @@
   function atof: precondition 'valid_nptr' got status unknown.
 [eva] Done for function atof
 [eva:partition] unistd_c.c:32: starting to merge loop iterations
-[eva] computing for function getopt_long <- main_long <- main.
-  Called from unistd_c.c:32.
-[eva] computing for function Frama_C_nondet <- getopt_long <- main_long <- main.
-  Called from FRAMAC_SHARE/libc/unistd.c:42.
-[eva] Done for function Frama_C_nondet
-[eva] computing for function Frama_C_interval <- getopt_long <- main_long <- main.
-  Called from FRAMAC_SHARE/libc/unistd.c:44.
-[eva:alarm] FRAMAC_SHARE/libc/unistd.c:44: Warning: 
-  function Frama_C_interval: precondition 'order' got status unknown.
-[eva] Done for function Frama_C_interval
-[eva] FRAMAC_SHARE/libc/unistd.c:45: Call to builtin strlen
-[eva] computing for function Frama_C_interval <- getopt_long <- main_long <- main.
-  Called from FRAMAC_SHARE/libc/unistd.c:45.
-[eva] Done for function Frama_C_interval
-[eva] computing for function Frama_C_nondet_ptr <- getopt_long <- main_long <- main.
-  Called from FRAMAC_SHARE/libc/unistd.c:46.
-[eva] Done for function Frama_C_nondet_ptr
-[eva] computing for function Frama_C_interval <- getopt_long <- main_long <- main.
-  Called from FRAMAC_SHARE/libc/unistd.c:47.
-[eva] Done for function Frama_C_interval
-[eva] FRAMAC_SHARE/libc/unistd.c:48: Call to builtin strlen
-[eva] computing for function Frama_C_interval <- getopt_long <- main_long <- main.
-  Called from FRAMAC_SHARE/libc/unistd.c:48.
-[eva] Done for function Frama_C_interval
-[eva] computing for function Frama_C_nondet <- getopt_long <- main_long <- main.
-  Called from FRAMAC_SHARE/libc/unistd.c:50.
-[eva] Done for function Frama_C_nondet
-[eva] computing for function Frama_C_interval <- getopt_long <- main_long <- main.
-  Called from FRAMAC_SHARE/libc/unistd.c:57.
-[eva] Done for function Frama_C_interval
-[eva] FRAMAC_SHARE/libc/unistd.c:62: Call to builtin strlen
-[eva] computing for function Frama_C_interval <- getopt_long <- main_long <- main.
-  Called from FRAMAC_SHARE/libc/unistd.c:62.
-[eva] Done for function Frama_C_interval
-[eva] computing for function Frama_C_nondet_ptr <- getopt_long <- main_long <- main.
-  Called from FRAMAC_SHARE/libc/unistd.c:63.
-[eva] Done for function Frama_C_nondet_ptr
-[eva] computing for function Frama_C_nondet <- getopt_long <- main_long <- main.
-  Called from FRAMAC_SHARE/libc/unistd.c:76.
-[eva] Done for function Frama_C_nondet
-[eva] Recording results for getopt_long
-[eva] Done for function getopt_long
+[eva] unistd_c.c:32: Reusing old results for call to getopt_long
 [eva] computing for function atof <- main_long <- main.
   Called from unistd_c.c:41.
 [eva] Done for function atof
@@ -177,24 +115,25 @@
 [eva] Done for function main_long
 [eva] Recording results for main
 [eva] Done for function main
-[scope:rm_asserts] removing 3 assertion(s)
+[scope:rm_asserts] removing 2 assertion(s)
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function getopt:
   Frama_C_entropy_source ∈ [--..--]
   optarg ∈ {{ NULL ; &S_1_S_argv[0] }}
   optind ∈ [1..2147483647]
-  nondet_ind ∈ {1} or UNINITIALIZED
-  nondet_indlen ∈ {0} or UNINITIALIZED
-  __retres ∈ [-1..255]
+  optopt ∈ [--..--]
+  __retres ∈ [-128..127]
 [eva:final-states] Values at end of function getopt_long:
   Frama_C_entropy_source ∈ [--..--]
-  optarg ∈ {{ NULL ; &S_0_S_argv[0] ; &S_1_S_argv[0] }}
-  optind ∈ [0..2147483647]
-  __retres ∈ [-1..1008]
+  optarg ∈ {{ NULL ; &S_1_S_argv[0] }}
+  optind ∈ [1..2147483647]
+  optopt ∈ [--..--]
+  __retres ∈ [-128..127]
 [eva:final-states] Values at end of function main_long:
   Frama_C_entropy_source ∈ [--..--]
-  optarg ∈ {{ NULL ; &S_0_S_argv[0] ; &S_1_S_argv[0] }}
-  optind ∈ [0..2147483646]
+  optarg ∈ {{ NULL ; &S_1_S_argv[0] }}
+  optind ∈ [1..2147483647]
+  optopt ∈ [--..--]
   long_options[0].name ∈ {{ "exact" }}
               [0]{.has_arg; .flag} ∈ {0}
               [0].val ∈ {101}
@@ -232,12 +171,13 @@
   c ∈ {-1}
   x ∈ {1; 3} or UNINITIALIZED
   tolerance ∈ [-inf .. inf] ∪ {NaN} or UNINITIALIZED
-  binf ∈ {{ NULL ; &S_0_S_argv[0] ; &S_1_S_argv[0] }} or UNINITIALIZED
-  input_file ∈ {{ NULL ; &S_0_S_argv[0] ; &S_1_S_argv[0] }} or UNINITIALIZED
+  binf ∈ {{ NULL ; &S_1_S_argv[0] }} or UNINITIALIZED
+  input_file ∈ {{ NULL ; &S_1_S_argv[0] }} or UNINITIALIZED
   __retres ∈ {0; 1}
 [eva:final-states] Values at end of function main:
   Frama_C_entropy_source ∈ [--..--]
-  optarg ∈ {{ NULL ; &S_0_S_argv[0] ; &S_1_S_argv[0] }}
-  optind ∈ [0..2147483646]
+  optarg ∈ {{ NULL ; &S_1_S_argv[0] }}
+  optind ∈ [1..2147483647]
+  optopt ∈ [--..--]
   r ∈ {0; 1}
   __retres ∈ {0}

@@ -22,80 +22,89 @@ int optind = 1;
 char *optarg;
 int opterr = 1; // initial value is not zero (zero silences error messages)
 
-int getopt(int argc, char * const argv[], const char *optstring) {
-  if (optind >= argc) {
-    return -1;
-  }
-  int ind = Frama_C_interval(1, argc - 1);
-  int len = strlen(argv[ind]);
-  int arg = Frama_C_interval(0, len - 1);
-  int opt = Frama_C_interval(arg+1, len - 1);
+/* Note this implementation only supports the POSIXLY_CORRECT behaviour where
+   the processing of arguments stops whenver a nonoption argument is
+   encountered. A more general implementation would permute the argv contents
+   so that eventually all the nonoptions are at the end. */
 
-  // Move optind forward
-  optind = Frama_C_interval(optind, argc);
-
-  if (Frama_C_nondet(0, 1)) {
-    // Normal case
-    optarg = Frama_C_nondet_ptr(0, &argv[ind][arg]);
-    return argv[ind][opt];
-  }
-  else if (Frama_C_nondet(0, 1)) {
-    // No more characters
+int getopt(int argc, char * const argv[], const char *optstring)
+{
+  if (optind >= argc || Frama_C_nondet(0, 1)) {
+    // No more options
     return -1;
   }
   else {
-    // Error case
-    optopt = argv[ind][opt];
-    return Frama_C_nondet('?', ':');
+    // Option found at index ind
+    int ind = Frama_C_interval(optind, argc - 1);
+
+    // Move optind forward
+    optind = Frama_C_interval(ind, argc);
+
+    // Retrieve the argument length
+    int len = strlen(argv[ind]);
+    //@ admit len > 0; // The argument is necessarily nonempty
+
+    // Choose an option character
+    char c = argv[ind][Frama_C_interval(0, len - 1)];
+
+    if (Frama_C_nondet(0, 1)) { // Normal case
+      // Set optarg
+      if (Frama_C_nondet(0, 1)) {
+        // If there is an argument to the option, point to it
+        optarg = &argv[ind][Frama_C_interval(0, len - 1)];
+      }
+      else {
+        optarg = 0;
+      }
+      return c;
+    } else { // Error case
+      optopt = c;
+      return optstring[0] == ':' ? ':' : '?';
+    }
   }
 }
 
 int getopt_long (int argc, char *const argv[],
                  const char *optstring,
-                 const struct option *longopts, int *longind) {
-  if (optind >= argc) {
-    return -1;
-  }
+                 const struct option *longopts, int *longind)
+{
+  // (Possibly) same behaviour as getopt() if no/short option is found
   if (Frama_C_nondet(0, 1)) {
-    // found short option
-    int nondet_ind = Frama_C_interval(1, argc - 1);
-    int nondet_indlen = Frama_C_interval(0, strlen(argv[nondet_ind])-1);
-    optarg = Frama_C_nondet_ptr(0, &argv[nondet_ind][nondet_indlen]);
-    optind = Frama_C_interval(1, argc + 1);
-    return optstring[Frama_C_interval(0, strlen(optstring)-1)];
-  }
-  if (Frama_C_nondet(0, 1)) {
-    // found long option; compute length of options array
-    int n_longopts = 0;
-    while (longopts[n_longopts].name != 0) { // note: in theory we should check
-                                             // that all fields are 0
-      n_longopts++;
-    }
-    int nondet_ind = Frama_C_interval(0, n_longopts-1);
-    const struct option *p = &longopts[nondet_ind];
+    return getopt(argc, argv, optstring);
+  } else {
+    // found long option at index ind
+    int ind = Frama_C_interval(0, INT_MAX);
+    //@ admit \valid(&longopts[ind]) && longopts[ind].name != 0;
+    const struct option *p = &longopts[ind];
+
+    // Move optind forward
+    optind = Frama_C_interval(ind, argc);
+
+    // Retrieve the argument length
+    int len = strlen(argv[ind]);
+    //@ admit len > 0; // The argument is necessarily nonempty
+
+    // Set longind
     if (longind) {
-      *longind = nondet_ind;
+      *longind = ind;
     }
-    int nondet_indlen = Frama_C_interval(0, strlen(argv[nondet_ind])-1);
-    optarg = Frama_C_nondet_ptr(0, &argv[nondet_ind][nondet_indlen]);
-    optind = nondet_ind;
-    if (!p->flag) return p->val;
+
+    // Set optarg
+    if (Frama_C_nondet(0, 1)) {
+      // If there is an argument to the option, point to it
+      optarg = &argv[ind][Frama_C_interval(0, len - 1)];
+    }
     else {
-      /* from the manpage: "... flag points to a variable which is set to val
-         if the option is found, but left unchanged if the option is not
-         found" */
-      if (Frama_C_nondet(0, 1)) {
-        *(p->flag) = p->val;
-      }
+      optarg = 0;
+    }
+
+    // Set or return the value
+    if (p->flag) {
+      *(p->flag) = p->val;
       return 0;
     }
-  } else {
-    if (Frama_C_nondet(0, 1)) {
-      // all command-lines options have been parsed
-      return -1;
-    } else {
-      // found option character not in optstring
-      return optstring[0] == ':' ? ':' : '?';
+    else {
+      return p->val;
     }
   }
 }
