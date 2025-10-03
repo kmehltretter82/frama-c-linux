@@ -83,10 +83,6 @@ let dkey_linker_find = register_category "linker:find"
 
 let dkey_loops = register_category "natural-loops"
 
-let dkey_pp_keep_temp_files =
-  register_category
-    ~help:"keep temporary preprocessor intermediate output files"
-    "pp:keep-temp-files"
 let dkey_rmtmps = register_category "parser:rmtmps"
 let dkey_referenced = register_category "parser:referenced"
 
@@ -513,7 +509,7 @@ module PrintMachdepBuiltinMacros =
         "print on standard output the content of the generated __fc_builtin_macros.h"
     end)
 
-let () = Parameter_customize.set_group help
+let () = Parameter_customize.set_group grp_debug
 let () = Parameter_customize.set_negative_option_name ""
 module DumpDependencies =
   P.Filepath
@@ -614,7 +610,7 @@ let () =
   | None -> ()
   | Some n -> GeneralVerbose.set n
 
-let () = Parameter_customize.set_group messages
+let () = Parameter_customize.set_group grp_debug
 let () = Parameter_customize.do_not_projectify ()
 let () = Parameter_customize.set_cmdline_stage Cmdline.Early
 let () = Parameter_customize.is_reconfigurable ()
@@ -758,7 +754,7 @@ module PrintCode =
       let help = "pretty print original code with its comments"
     end)
 
-let () = Parameter_customize.set_group inout_source
+let () = Parameter_customize.set_group grp_debug
 let () = Parameter_customize.do_not_projectify ()
 module PrintAsIs =
   False
@@ -1241,7 +1237,7 @@ module FramaCStdLib =
          inconsistent mix of system and Frama-C header files"
     end)
 
-let () = Parameter_customize.set_group parsing
+let () = Parameter_customize.set_group grp_debug
 module Orig_name =
   False(struct
     let option_name = "-orig-name"
@@ -2002,9 +1998,7 @@ let () =
 (** {2 Checks} *)
 (* ************************************************************************* *)
 
-let checks = add_group "Checks"
-
-let () = Parameter_customize.set_group checks
+let () = Parameter_customize.set_group grp_debug
 let () = Parameter_customize.do_not_projectify ()
 let () = Parameter_customize.do_not_reset_on_copy ()
 module Check =
@@ -2015,7 +2009,7 @@ module Check =
                 Tree"
   end)
 
-let () = Parameter_customize.set_group checks
+let () = Parameter_customize.set_group grp_debug
 let () = Parameter_customize.do_not_projectify ()
 module Copy =
   False(struct
@@ -2025,7 +2019,7 @@ module Copy =
       "always perform a copy of the original AST before analysis begin"
   end)
 
-let () = Parameter_customize.set_group checks
+let () = Parameter_customize.set_group inout_source
 let () = Parameter_customize.do_not_projectify ()
 let () = Parameter_customize.set_negative_option_name ""
 module TypeCheck =
@@ -2078,7 +2072,7 @@ module CacheSize =
 let () = CacheSize.set_range ~min:1 ~max:10
 let () = CacheSize.add_update_hook (fun _ i -> Binary_cache.set_cache_size i)
 
-let () = Parameter_customize.set_group performance
+let () = Parameter_customize.set_group grp_debug
 let () = Parameter_customize.set_negative_option_name ""
 let () = Parameter_customize.set_cmdline_stage Cmdline.Early
 module Deterministic =
@@ -2094,7 +2088,6 @@ module Deterministic =
 (** {2 Other options} *)
 (* ************************************************************************* *)
 
-let () = Parameter_customize.set_group checks
 let () = Parameter_customize.do_not_projectify ()
 let () = Parameter_customize.set_negative_option_name ""
 let () = Parameter_customize.set_cmdline_stage Cmdline.Early
@@ -2105,4 +2098,19 @@ module Permissive =
       let option_name = "-permissive"
       let help =
         "perform less verifications on validity of command-line options"
+    end)
+
+(* ************************************************************************* *)
+(** {2 Debug options} *)
+(* ************************************************************************* *)
+
+let () = Parameter_customize.set_group grp_debug
+let () = Parameter_customize.do_not_projectify ()
+let () = Parameter_customize.set_cmdline_stage Cmdline.Early
+module KeepTempFiles =
+  False
+    (struct
+      let module_name = "KeepTempFiles"
+      let option_name = "-keep-temp-files"
+      let help = "Keep temporary intermediate files"
     end)

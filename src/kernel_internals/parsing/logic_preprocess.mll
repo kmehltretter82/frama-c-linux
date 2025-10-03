@@ -143,7 +143,7 @@
   let preprocess_annots suffix cpp outfile =
     let open Filesystem.Operators in
     if !has_annot then begin
-      let debug = Kernel.is_debug_key_enabled Kernel.dkey_pp_keep_temp_files in
+      let debug = Kernel.KeepTempFiles.get () in
       let ppname =
         try Temp_files.file ~prefix:"ppannot" ~suffix ()
         with Filesystem.Temp_file_error s ->

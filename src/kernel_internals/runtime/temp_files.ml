@@ -8,12 +8,10 @@
 
 open Filesystem
 
-let dkey = Kernel.dkey_pp_keep_temp_files
-
 let cleanup_at_exit f = Extlib.safe_at_exit (fun () -> remove_file f)
 
 let should_keep_temp_file = function
-  | None -> Kernel.is_debug_key_enabled dkey
+  | None -> Kernel.KeepTempFiles.get ()
   | Some b -> b
 
 let file ?keep ~prefix ~suffix () =
@@ -28,7 +26,7 @@ let file ?keep ~prefix ~suffix () =
       if not (should_keep_temp_file keep) then
         remove_file file
       else if exists file then
-        Kernel.debug ~dkey "Not removing file %a@." Filepath.pretty file
+        Kernel.debug "Not removing file %a@." Filepath.pretty file
     end;
   file
 
@@ -44,6 +42,6 @@ let dir ?keep ~prefix ~suffix () =
       if not (should_keep_temp_file keep) then
         remove_dir dir
       else if exists dir then
-        Kernel.debug ~dkey  "Not removing dir %a@." Filepath.pretty dir;
+        Kernel.debug  "Not removing dir %a@." Filepath.pretty dir;
     end;
   dir

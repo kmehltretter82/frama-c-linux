@@ -9,7 +9,6 @@
 open Mt_self
 
 let grp_models = add_group "Extraction of models"
-let grp_debug = add_group "Debug"
 let grp_cfg = add_group "Multithreaded control-flow-graph"
 (*let grp_misc = add_group "Misc"*)
 let grp_analysis = add_group "Analysis"

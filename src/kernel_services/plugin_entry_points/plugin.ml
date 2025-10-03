@@ -35,6 +35,7 @@ module type S_no_log = sig
   module State_dir () : Parameter_sig.User_dir_opt
   val help: Cmdline.Group.t
   val messages: Cmdline.Group.t
+  val grp_debug: Cmdline.Group.t
   val add_plugin_output_aliases:
     ?visible:bool -> ?deprecated:bool -> string list -> unit
 end
@@ -249,6 +250,7 @@ struct
   (* ************************************************************************ *)
 
   let messages = add_group "Output Messages"
+  let grp_debug = add_group "Debug"
 
   include Parameter_builder.Make
       (struct
@@ -455,8 +457,8 @@ struct
          if Help.get () then Cmdline.plugin_help P.shortname else Cmdline.nop);
     Help.add_aliases [ prefix ^ "h" ]
 
-  let output_mode modname optname =
-    Parameter_customize.set_group messages;
+  let output_mode ?(group=messages) modname optname =
+    Parameter_customize.set_group group;
     Parameter_customize.do_not_projectify ();
     Parameter_customize.is_reconfigurable ();
     if is_kernel () then begin
@@ -599,7 +601,7 @@ struct
       end
   end
 
-  let debug_optname = output_mode "Debug" "debug"
+  let debug_optname = output_mode ~group:grp_debug "Debug" "debug"
   module Debug = struct
     include
       Int(struct
