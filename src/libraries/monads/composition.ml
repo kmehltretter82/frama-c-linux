@@ -14,25 +14,35 @@ end
 (* Using [Based_on_map] here, as the natural way to write the [bind] is through
    [map] and [flatten]. *)
 module Make
-    (Int : Monad.S)
-    (Ext : Monad.S)
-    (X : Axiom with type 'a interior = 'a Int.t and type 'a exterior = 'a Ext.t)
-  = Monad.Make_based_on_map (struct
-    type 'a t = 'a Int.t Ext.t
-    let return  x = Ext.return (Int.return x)
-    let map   f m = Ext.map (Int.map f) m
-    let flatten m = Ext.map X.swap m |> Ext.flatten |> Ext.map Int.flatten
+    (Interior : Monad.S)
+    (Exterior : Monad.S)
+    (X : Axiom
+     with type 'a interior = 'a Interior.t
+      and type 'a exterior = 'a Exterior.t)
+  =
+  Monad.Make_based_on_map (struct
+    type 'a t = 'a Interior.t Exterior.t
+    let return  x = Exterior.return (Interior.return x)
+    let map   f m = Exterior.map (Interior.map f) m
+    let flatten m =
+      Exterior.map X.swap m |> Exterior.flatten |> Exterior.map Interior.flatten
   end)
 
 (* As for the previous functor and for the exact same reason, we use
    [Based_on_map_with_product]. *)
 module Make_with_product
-    (Int : Monad.S_with_product) (Ext : Monad.S_with_product)
-    (X : Axiom with type 'a interior = 'a Int.t and type 'a exterior = 'a Ext.t)
-  = Monad.Make_based_on_map_with_product (struct
-    type 'a t = 'a Int.t Ext.t
-    let return  x = Ext.return (Int.return x)
-    let map   f m = Ext.map (Int.map f) m
-    let flatten m = Ext.map X.swap m |> Ext.flatten |> Ext.map Int.flatten
-    let product l r = Ext.product l r |> Ext.map (fun (l, r) -> Int.product l r)
+    (Interior : Monad.S_with_product)
+    (Exterior : Monad.S_with_product)
+    (X : Axiom
+     with type 'a interior = 'a Interior.t
+      and type 'a exterior = 'a Exterior.t)
+  =
+  Monad.Make_based_on_map_with_product (struct
+    type 'a t = 'a Interior.t Exterior.t
+    let return  x = Exterior.return (Interior.return x)
+    let map   f m = Exterior.map (Interior.map f) m
+    let flatten m =
+      Exterior.map X.swap m |> Exterior.flatten |> Exterior.map Interior.flatten
+    let product l r =
+      Exterior.product l r |> Exterior.map (fun (l, r) -> Interior.product l r)
   end)
