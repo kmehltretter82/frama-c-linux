@@ -41,8 +41,9 @@
         "*", "alarm", "assigns", "assigns:missing", "assigns:missing-result",
         "builtins", "builtins:missing-spec", "builtins:override",
         "ensures-false", "experimental", "libc", "libc:unsupported-spec",
-        "locals-escaping", "malloc", "malloc:imprecise", "signed-overflow",
-        "taint", "taint-interference", "unknown-size"
+        "locals-escaping", "malloc", "malloc:imprecise", "secure-flow",
+        "secure-flow:condition", "secure-flow:direct",
+        "secure-flow:indirect", "signed-overflow", "taint", "unknown-size"
       ],
       "disabled": [
         "acsl", "acsl:unsupported", "assigns:invalid-location",

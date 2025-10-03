@@ -366,19 +366,15 @@ module TransferSingleTaint = struct
     try Zone.fold_bases (fun b acc -> acc || base_has_attribute b) zone false
     with Abstract_interp.Error_Top -> false
 
-  let warn_on_assign_interference ~direct ~pos zone =
+  let warn_on_assign_interference ~wkey ~pos zone =
     let has_tainted_public_base =
       has_attribute_namespace ~namespace:public_taint_namespace zone
     in
     if has_tainted_public_base then
       let source = fst (Position.loc pos) in
-      let kind, wkey =
-        if direct then "direct", wkey_secure_flow_direct
-        else "indirect", wkey_secure_flow_indirect
-      in
       Self.warning ~wkey ~source ~once:true
-        "@[<v>@[<hv 2>%s interference on:@ @[<hov>%a@]@]"
-        kind Zone.pretty zone
+        "@[<v>@[<hv 2>interference on:@ @[<hov>%a@]@]"
+        Zone.pretty zone
 
   (* Propagates data- and control-taints for an assignment [lval = exp]. *)
   let assign_aux ~pos lval exp v to_loc state =
@@ -418,11 +414,11 @@ module TransferSingleTaint = struct
       else locs
     in
     let locs_data =
-      update ~warn:(warn_on_assign_interference ~direct:true)
+      update ~warn:(warn_on_assign_interference ~wkey:wkey_secure_flow_direct)
         data_tainted state.locs_data
     in
     let locs_control =
-      update ~warn:(warn_on_assign_interference ~direct:false)
+      update ~warn:(warn_on_assign_interference ~wkey:wkey_secure_flow_indirect)
         ctrl_tainted state.locs_control
     in
     { state with locs_data; locs_control; }
