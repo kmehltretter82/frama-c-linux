@@ -72,10 +72,26 @@ let wkey =
   Self.register_warn_category "taint"
     ~help:"warnings related to the taint analysis from \"-eva-domains taint\""
 
-let wkey_interference =
-  Self.register_warn_category "taint-interference"
-    ~help:"warnings related to the taint analysis when performing \
-           secure-flow/interference analysis."
+let wkey_secure_flow =
+  Self.register_warn_category "secure-flow"
+    ~help:"warnings related to secure-flow analysis from \"-eva-domains taint\""
+[@@ warning "-32"]
+
+let wkey_secure_flow_direct =
+  Self.register_warn_category "secure-flow:direct"
+    ~help:"warnings related to direct interference when performing \
+           secure-flow analysis from \"-eva-domains taint\""
+
+let wkey_secure_flow_indirect =
+  Self.register_warn_category "secure-flow:indirect"
+    ~help:"warnings related to indirect interference when performing \
+           secure-flow analysis from \"-eva-domains taint\""
+
+let wkey_secure_flow_assume =
+  Self.register_warn_category "secure-flow:condition"
+    ~help:"warnings related to assume conditions involving private data when \
+           performing secure-flow analysis from \"-eva-domains taint\""
+
 
 module LatticeSingleTaint = struct
 
@@ -356,9 +372,12 @@ module TransferSingleTaint = struct
     in
     if has_tainted_public_base then
       let source = fst (Position.loc pos) in
-      let kind = if direct then "direct" else "indirect" in
-      Self.warning ~wkey:wkey_interference ~source ~once:true
-        "@[<v>@[<hv 2>%s interference on@ @[<hov>%a@]@]"
+      let kind, wkey =
+        if direct then "direct", wkey_secure_flow_direct
+        else "indirect", wkey_secure_flow_indirect
+      in
+      Self.warning ~wkey ~source ~once:true
+        "@[<v>@[<hv 2>%s interference on:@ @[<hov>%a@]@]"
         kind Zone.pretty zone
 
   (* Propagates data- and control-taints for an assignment [lval = exp]. *)
@@ -426,8 +445,8 @@ module TransferSingleTaint = struct
     in
     if has_tainted_private_base then
       let source = fst (Position.loc pos) in
-      Self.warning ~wkey:wkey_interference ~source ~once:true
-        "@[<v>@[<hv 2>interference on assume condition involving@ @[<hov>%a@]@]"
+      Self.warning ~wkey:wkey_secure_flow_assume ~source ~once:true
+        "@[<v>@[<hv 2>assume condition involving private data:@ @[<hov>%a@]@]"
         Zone.pretty zone
 
   let assume ~pos exp _b valuation state =

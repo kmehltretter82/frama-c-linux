@@ -106,7 +106,7 @@ void write_x(struct foo* p, int a) { p->x = a; }
 void write_y(struct foo* p, int b) { p->y = b; }
 
 void f5(void) {
-  struct foo s = {1, 2};
+  struct foo __attribute__((public)) s = {1, 2};
   /*@ check !\tainted(private:s.x); */
   /*@ check !\tainted(private:s.x); */
 
