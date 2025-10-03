@@ -13,6 +13,6 @@
 (include_subdirs no)
 
 (library
- (name fc_z)
- (public_name frama-c.fc_z)
+ (name fc_internal_z)
+ (public_name frama-c.fc_internal_z)
  (libraries zarith))

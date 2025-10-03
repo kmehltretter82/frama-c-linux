@@ -6,7 +6,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-include Fc_z [@@alert "-fc_z"]
+include Fc_internal_z [@@alert "-fc_internal_z"]
 
 (* ----------- *)
 (* Conversions *)

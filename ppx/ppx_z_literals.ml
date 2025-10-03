@@ -8,8 +8,9 @@
 
 open Ppxlib
 
-(** We use {!Fc_z} instead of {!Z} to allow using this ppx inside [z.ml]. *)
-let conv_to_z  loc = [%expr Fc_z.of_int [@alert "-fc_z"]]
+(** We use {!Fc_internal_z} instead of {!Z} to allow using this ppx inside
+    [z.ml]. *)
+let conv_to_z  loc = [%expr Fc_internal_z.of_int [@alert "-fc_internal_z"]]
 
 let rewriter conv loc s =
   let number =

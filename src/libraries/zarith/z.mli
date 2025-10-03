@@ -6,13 +6,19 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Extension of [Z] from Zarith. {!Fc_z} only includes to [Zarith.Z] module, it
-    is mandatory if we want to call this module [Z] without shadowing Zarith's
-    module. This solution is a bit ugly and could be replace by [root_module]
-    in kernel dune file, but this does not work for now...
-    @since Frama-C+dev *)
+(** Extension of [Z] from Zarith. {!Fc_internal_z} only includes to [Zarith.Z]
+    module, it is mandatory if we want to call this module [Z] without
+    shadowing Zarith's module. This solution is a bit ugly and could be
+    replace by [root_module] in kernel dune file, but this does not work for
+    now...
+    @before Frama-C+dev this module was called [Integer]
+*)
 
-include module type of Fc_z with type t = Fc_z.t [@@alert "-fc_z"]
+(** Previous version of this file did not include [Z], so many more functions
+    and operators are available now.
+    @since Frama-C+dev
+*)
+include module type of Fc_internal_z with type t = Fc_internal_z.t [@@alert "-fc_internal_z"]
 
 (**************************************************************************)
 (** {3 Operators} *)
