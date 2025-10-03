@@ -6,6 +6,28 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(** The set of functions in Filesystem are provided both as a convenient way
+    to use [Filepath.t] directly (without conversion) and to be safer variants
+    than the standard library's or Unix library's.
+
+    They are safer in several ways:
+
+    - some of them are intended to never fail ([dir_exists], [remove_file],
+      etc.);
+    - some of them return a [Result.t] ([file_kind], [with_open_in], etc.) which
+      forces the caller to be careful about the possible errors;
+    - the others will uniformly raise [Sys_error] - possibly converted from
+      [Unix_error] - so the handling of exceptions is a bit lighter;
+    - all the functions taking a file path as argument will check that the
+      path is not empty and may raise [Invalid_argument] if it is not the case.
+
+    The module documentation should mention all the possible exceptions raised
+    and the caller should always catch [Sys_error] if needed. Empty file paths
+    are considered a programmation error, and the emptiness should be checked
+    by the caller beforehand. Thus, the caller should not catch
+    [Invalid_argument].
+*)
+
 (* ************************************************************************* *)
 (** {2 Error handling} *)
 (* ************************************************************************* *)
