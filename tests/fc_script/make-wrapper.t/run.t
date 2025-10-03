@@ -25,7 +25,9 @@ to get a more verbose output for Make.
     Neither code nor specification for function external,
      generating default assigns. See -generated-spec-* options for more info
   [kernel] User Error: warning annot:missing-spec treated as fatal error.
+  [eva] Clean up and save partial results.
   [kernel] Frama-C aborted: invalid user input.
+  [kernel] Warning: attempting to save on non-zero exit code: modifying filename into `make-for-make-wrapper.eva/framac.sav.error'.
   
   ***** make-wrapper recommendations *****
   
