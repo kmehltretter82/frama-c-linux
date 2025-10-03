@@ -9,7 +9,7 @@ include
 module M =
   String_multiple_map
     (struct
-      include Datatype.Integer
+      include Z
       type key = string
       let of_string arg =
         try Z.of_string arg

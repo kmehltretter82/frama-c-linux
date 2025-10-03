@@ -215,13 +215,12 @@ module V = struct
       fmt m
 
   let pretty_enumitem_set enuminfo fmt l =
-    let module S = Datatype.Integer.Map in
     let assoc ei = Cil.constFoldToInt ei.eival |> Option.map (fun i -> i, ei) in
     let lookup_map =
-      List.to_seq enuminfo.eitems |> Seq.filter_map assoc |> S.of_seq
+      List.to_seq enuminfo.eitems |> Seq.filter_map assoc |> Z.Map.of_seq
     in
     let pretty_item fmt i =
-      match S.find_opt i lookup_map with
+      match Z.Map.find_opt i lookup_map with
       | Some ei -> Printer.pp_varname fmt ei.eiorig_name
       | None -> Format.fprintf fmt "%a" Z.pretty i
     in

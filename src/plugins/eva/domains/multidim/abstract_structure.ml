@@ -199,7 +199,7 @@ struct
     module FSet = Cil_datatype.Fieldinfo.Set
 
     include FMap
-    include FMap.Make (Datatype.Integer)
+    include FMap.Make (Z)
     let keys map = fold (fun k _ set -> FSet.add k set) map FSet.empty
   end
 

@@ -249,12 +249,12 @@ module D =
             (String.capitalize_ascii (string_of_overflow_kind s))
             Printer.pp_exp e
             (match b with Lower_bound -> ">=" | Upper_bound -> "<=")
-            Datatype.Integer.pretty n
+            Z.pretty n
         | Float_to_int(e, n, b) ->
           Format.fprintf fmt "Float_to_int(@[%a@]@ %s@ @[%a@])"
             Printer.pp_exp e
             (match b with Lower_bound -> ">" | Upper_bound -> "<")
-            Datatype.Integer.pretty
+            Z.pretty
             ((match b with
                 | Lower_bound -> Z.sub
                 | Upper_bound -> Z.add) n Z.one)

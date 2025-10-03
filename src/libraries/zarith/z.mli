@@ -18,7 +18,17 @@
     and operators are available now.
     @since Frama-C+dev
 *)
-include module type of Fc_internal_z with type t = Fc_internal_z.t [@@alert "-fc_internal_z"]
+include module type of Fc_internal_z with type t = Fc_internal_z.t
+  [@@alert "-fc_internal_z"]
+
+(** {!Z.t} is a Frama-C {!Datatype}, and comes with usual {!compare}, {!equal},
+    {!hash} and {!pretty} functions.
+    @since Frama-C+dev
+*)
+include Datatype.S_with_collections with type t := t
+
+(** @since Frama-C+dev *)
+val integer: t Type.t
 
 (**************************************************************************)
 (** {3 Operators} *)

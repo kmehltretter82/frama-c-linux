@@ -1573,17 +1573,20 @@ let formatter = Formatter.ty
 module Integer =
   Make_with_collections
     (struct
-      type t = Z.t
+      [@@@alert "-fc_internal_z"]
+      type t = Fc_internal_z.t
       let name = "Datatype.Integer"
-      let reprs = [ Z.zero ]
+      let reprs = [ Fc_internal_z.zero ]
       let structural_descr = Structural_descr.t_abstract
-      let equal = Z.equal
-      let compare = Z.compare
-      let hash = Z.hash
+      let equal = Fc_internal_z.equal
+      let compare = Fc_internal_z.compare
+      let hash = Fc_internal_z.hash
       let rehash = identity
       let copy = identity
-      (* TODO: this should take into account kernel's option -big-ints-hex *)
-      let pretty = Z.pretty
+      let pretty fmt v =
+        (* This version is an old version of {!Z.pretty}. It is a temporary
+           solution until this module is removed. *)
+        Format.pp_print_string fmt (Fc_internal_z.to_string v)
       let mem_project = never_any_project
     end)
 let integer = Integer.ty
@@ -1601,7 +1604,10 @@ module Rational =
       let rehash = identity
       let mem_project = never_any_project
       let pretty fmt q = Format.pp_print_float fmt (Q.to_float q)
-      let hash q = Stdlib.Hashtbl.hash (Z.hash (Q.num q), Z.hash (Q.den q))
+      let hash q =
+        Stdlib.Hashtbl.hash
+          (Fc_internal_z.hash (Q.num q), Fc_internal_z.hash (Q.den q))
+      [@@alert "-fc_internal_z"]
     end)
 let rational = Rational.ty
 

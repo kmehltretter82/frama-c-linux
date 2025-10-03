@@ -2619,7 +2619,7 @@ let const_fold_trange_bounds typ b e =
 let extract = function None -> raise CannotSimplify | Some i -> i
 
 let lift_set_index f i typ =
-  let module S = Datatype.Integer.Set in
+  let module S = Z.Set in
   let add_index acc i = S.union acc (f i) in
   match i.term_node with
   | Tunion tl ->
@@ -2637,7 +2637,7 @@ let lift_set_index f i typ =
     incomplete. [loff] must have an integral type. Returns a set of values
     when [loff] contains ranges. *)
 let find_initial_value init loff =
-  let module S = Datatype.Integer.Set in
+  let module S = Z.Set in
   let rec aux loff init =
     match loff, init with
     | TNoOffset, SingleInit e -> S.singleton (extract (Cil.constFoldToInt e))
@@ -2720,7 +2720,7 @@ class simplify_const_lval global_find_init = object (self)
              expected logic type (plain/Set) *)
           let typ = Logic_const.plain_or_set Fun.id t.term_type in
           let aux i l = Logic_const.term (TConst (Integer (i,None))) typ :: l in
-          let l = Datatype.Integer.Set.fold aux itvs [] in
+          let l = Z.Set.fold aux itvs [] in
           match l, Logic_const.is_plain_type t.term_type with
           | [i], true -> Cil.ChangeTo i
           | _, false -> Cil.ChangeTo (Logic_const.term (Tunion l) t.term_type)

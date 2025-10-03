@@ -8,7 +8,7 @@
 
 open Cil_datatype
 
-module IntSet = Datatype.Integer.Set
+module IntSet = Z.Set
 module FloatSet = Datatype.Float.Set
 
 module Num_hints_stmt = Stmt.Map.Make(IntSet)

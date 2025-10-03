@@ -39,8 +39,8 @@ module G = struct
 
   module Bounds = struct
     include Datatype.Pair
-        (Datatype.Option(Datatype.Integer)) (* lower bound, or -infty *)
-        (Datatype.Option(Datatype.Integer)) (* upper bound, or +infty *)
+        (Datatype.Option(Z)) (* lower bound, or -infty *)
+        (Datatype.Option(Z)) (* upper bound, or +infty *)
     let pretty fmt (min, max: t) =
       match min, max with
       | Some min, Some max when Z.equal min max ->

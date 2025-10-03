@@ -13,7 +13,7 @@ open Bottom.Operators
 let small_cardinal = Int_set.get_small_cardinal
 let small_cardinal_Int () = Int.of_int (small_cardinal ())
 
-type widen_hint = Datatype.Integer.Set.t
+type widen_hint = Z.Set.t
 
 (* --------------------------------- Datatype ------------------------------- *)
 

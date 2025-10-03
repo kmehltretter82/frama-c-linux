@@ -313,9 +313,9 @@ let meet t1 t2 =
 
 let narrow = meet
 
-type widen_hint = Datatype.Integer.Set.t
+type widen_hint = Z.Set.t
 
-let widen ?(size=Z.zero) ?(hint = Datatype.Integer.Set.empty) t1 t2 =
+let widen ?(size=Z.zero) ?(hint = Z.Set.empty) t1 t2 =
   if equal t1 t2 then t2
   else
     (* Add possible interval limits deducted from the bitsize *)
@@ -325,7 +325,7 @@ let widen ?(size=Z.zero) ?(hint = Datatype.Integer.Set.empty) t1 t2 =
          reinterpreted as one value by the offsetmaps. In this case, do not
          use limits, and do not create arbitrarily large integers. *)
       if Z.gt size 128z
-      then Datatype.Integer.Set.empty
+      then Z.Set.empty
       else if Z.is_zero size
       then hint
       else
@@ -337,7 +337,7 @@ let widen ?(size=Z.zero) ?(hint = Datatype.Integer.Set.empty) t1 t2 =
               pred (two_power (pred ssize));
               pred (two_power ssize); ]
         in
-        Datatype.Integer.Set.(union hint (of_list limits))
+        Z.Set.(union hint (of_list limits))
     in
     let modu = Int.(gcd (gcd t1.modu t2.modu) (abs (sub t1.rem t2.rem))) in
     let rem = Int.erem t1.rem modu in
@@ -347,7 +347,7 @@ let widen ?(size=Z.zero) ?(hint = Datatype.Integer.Set.empty) t1 t2 =
         | None -> None
         | Some min2 ->
           try
-            let v = Datatype.Integer.Set.nearest_elt_le min2 thresholds
+            let v = Z.Set.nearest_elt_le min2 thresholds
             in Some (Int.round_up_to_r ~r:rem ~modu ~min:v)
           with Not_found -> None
     in
@@ -357,7 +357,7 @@ let widen ?(size=Z.zero) ?(hint = Datatype.Integer.Set.empty) t1 t2 =
         | None -> None
         | Some max2 ->
           try
-            let v = Datatype.Integer.Set.nearest_elt_ge max2 thresholds
+            let v = Z.Set.nearest_elt_ge max2 thresholds
             in Some (Int.round_down_to_r ~r:rem ~modu ~max:v)
           with Not_found -> None
     in

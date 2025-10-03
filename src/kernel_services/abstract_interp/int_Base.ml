@@ -27,15 +27,15 @@ let hash = function
 
 let pretty fmt = function
   | Top -> Format.fprintf fmt "Top"
-  | Value i -> Format.fprintf fmt "<%a>" Int.pretty i
+  | Value i -> Format.fprintf fmt "<%a>" Z.pretty i
 
 include Datatype.Make
     (struct
       type t = i (*= Top | Value of Z.t *)
       let name = "Int_Base.t"
       let structural_descr =
-        Structural_descr.t_sum [| [| Datatype.Integer.packed_descr |] |]
-      let reprs = Top :: List.map (fun v -> Value v) Datatype.Integer.reprs
+        Structural_descr.t_sum [| [| Z.packed_descr |] |]
+      let reprs = Top :: List.map (fun v -> Value v) Z.reprs
       let equal = equal
       let compare = compare
       let hash = hash

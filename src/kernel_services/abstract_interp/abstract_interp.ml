@@ -247,7 +247,6 @@ end
 
 module Int = struct
   include (Z: module type of Z with type t = Z.t)
-  include (Datatype.Integer: Datatype.S_with_collections with type t:=Z.t)
 
   let e_rem = erem
 

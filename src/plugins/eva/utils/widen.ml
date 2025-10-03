@@ -9,7 +9,7 @@
 open Cil_types
 open Cil_datatype
 
-module IntSet = Datatype.Integer.Set
+module IntSet = Z.Set
 module FloatSet = Datatype.Float.Set
 
 let dkey = Widen_hints_ext.dkey

@@ -78,7 +78,7 @@ end
 
 include Type
 
-type widen_hint = Datatype.Integer.Set.t * Datatype.Float.Set.t
+type widen_hint = Z.Set.t * Datatype.Float.Set.t
 
 let hash = function
   | Bottom -> 311

@@ -21,20 +21,20 @@ module ReturnUsage = struct
   type return_usage_by_lv = {
     ret_callees: Kernel_function.Hptset.t (* all the functions that put their
                                              results in this lvalue *);
-    ret_compared: Datatype.Integer.Set.t (* all the constant values this
+    ret_compared: Z.Set.t (* all the constant values this
                                             lvalue is compared against *);
   }
   (* Per-function usage: all interesting lvalues are mapped to the way
      they are used *)
   and return_usage_per_fun = return_usage_by_lv MapLval.t
 
-  module RUDatatype = Kernel_function.Map.Make(Datatype.Integer.Set)
+  module RUDatatype = Kernel_function.Map.Make(Z.Set)
 
   let find_or_default uf lv =
     try MapLval.find lv uf
     with Not_found -> {
         ret_callees = Kernel_function.Hptset.empty;
-        ret_compared = Datatype.Integer.Set.empty;
+        ret_compared = Z.Set.empty;
       }
 
   (* Treat a [Call] instruction. Immediate calls (no functions pointers)
@@ -68,7 +68,7 @@ module ReturnUsage = struct
   let add_compare_ct uf i lv =
     if Ast_types.is_integral_or_pointer (Cil.typeOfLval lv) then
       let u = find_or_default uf lv in
-      let v = Datatype.Integer.Set.add i u.ret_compared in
+      let v = Z.Set.add i u.ret_compared in
       let u = { u with ret_compared = v } in
       if debug then Format.printf
           "[Usage] Comparing %a to %a@." Printer.pp_lval lv Int.pretty i;
@@ -128,16 +128,16 @@ module ReturnUsage = struct
 
   (* Per-program split strategy. Functions are mapped
      to the values their return code should be split against. *)
-  type return_split = Datatype.Integer.Set.t Kernel_function.Map.t
+  type return_split = Z.Set.t Kernel_function.Map.t
 
 
   (* add to [kf] hints to split on all integers in [s]. *)
   let add_split kf s (ru:return_split) : return_split =
     let cur =
       try Kernel_function.Map.find kf ru
-      with Not_found -> Datatype.Integer.Set.empty
+      with Not_found -> Z.Set.empty
     in
-    let s = Datatype.Integer.Set.union cur s in
+    let s = Z.Set.union cur s in
     Kernel_function.Map.add kf s ru
 
 
@@ -145,7 +145,7 @@ module ReturnUsage = struct
      are tested against *)
   let summarize_by_lv (uf: return_usage_per_fun): return_split =
     let aux _lv u acc =
-      if Datatype.Integer.Set.is_empty u.ret_compared then acc
+      if Z.Set.is_empty u.ret_compared then acc
       else
         let aux_kf kf ru = add_split kf u.ret_compared ru in
         Kernel_function.Hptset.fold aux_kf u.ret_callees acc
@@ -202,7 +202,7 @@ module ReturnUsage = struct
 
   (* For functions returning pointers, add a split on NULL/non-NULL *)
   let add_null_pointers_split (ru: return_split): return_split =
-    let null_set = Datatype.Integer.Set.singleton Z.zero in
+    let null_set = Z.Set.singleton Z.zero in
     let aux kf acc =
       if Ast_types.is_ptr (Kernel_function.get_return_type kf) then
         add_split kf null_set acc
@@ -242,7 +242,7 @@ let compute_auto () =
 let find_auto_strategy kf =
   try
     let s = Kernel_function.Map.find kf (compute_auto ()) in
-    Split_strategy.SplitEqList (Datatype.Integer.Set.elements s)
+    Split_strategy.SplitEqList (Z.Set.elements s)
   with Not_found -> Split_strategy.NoSplit
 
 module KfStrategy = Kernel_function.Make_Table(Split_strategy)
@@ -296,7 +296,7 @@ let pretty_strategies fmt =
     | SplitAuto ->
       let pp_auto kf s =
         if not (Parameters.SplitReturnFunction.mem kf) then
-          let s = SplitEqList (Datatype.Integer.Set.elements s) in
+          let s = SplitEqList (Z.Set.elements s) in
           pp_one "auto" (pp_kf kf) s
       in
       let auto = compute_auto () in

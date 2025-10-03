@@ -202,3 +202,22 @@ end
 
 (* We also want relationnal operators at top level. *)
 include Compare
+
+(* -------- *)
+(* Datatype *)
+(* -------- *)
+
+include Datatype.Make_with_collections (struct
+    type nonrec t = t
+    let name = "Zarith.Z"
+    let reprs = [ zero ]
+    let structural_descr = Structural_descr.t_abstract
+    let equal = equal
+    let compare = compare
+    let hash = hash
+    let rehash = Datatype.identity
+    let copy = Datatype.identity
+    let pretty = pretty
+    let mem_project = Datatype.never_any_project
+  end)
+let integer = ty

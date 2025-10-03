@@ -19,7 +19,7 @@ include Datatype.S_with_collections
 include Eva_lattice_type.Full_AI_Lattice_with_cardinality with type t := t
 
 (** Hints for the widening: set of relevant thresholds. *)
-type widen_hint = Datatype.Integer.Set.t
+type widen_hint = Z.Set.t
 
 (** [widen ~size ~hint t1 t2] is an over-approximation of [join t1 t2].
     [size] is the size (in bits) of the widened value, [hint] is a set of

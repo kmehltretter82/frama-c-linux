@@ -158,9 +158,9 @@ let pretty_C_constant suffix k fmt i =
     (* in gcc this avoids a warning, but it might avoid a real
        problem on another compiler or a 64-bit architecture *)
     Format.fprintf fmt "(-%a-1)"
-      Datatype.Integer.pretty (Z.pred max_strict_signed)
+      Z.pretty (Z.pred max_strict_signed)
   else
-    Format.fprintf fmt "%a%s" Datatype.Integer.pretty i suffix
+    Format.fprintf fmt "%a%s" Z.pretty i suffix
 
 let pred_body = function
   | LBpred a -> a
@@ -2243,7 +2243,7 @@ class cil_printer () = object (self)
   method attrparam fmt a =
     let level = Precedence.getParenthLevelAttrParam a in
     match a with
-    | AInt n -> fprintf fmt "%a" Datatype.Integer.pretty n
+    | AInt n -> fprintf fmt "%a" Z.pretty n
     | AStr s -> fprintf fmt "\"%s\"" (Escape.escape_string s)
     | ACons(s, []) -> fprintf fmt "%s" s
     | ACons("__fc_assign", [a1; a2]) ->
@@ -2332,7 +2332,7 @@ class cil_printer () = object (self)
     | Integer(_, Some s) when print_as_source s ->
       fprintf fmt "%s" s (* Always print the text if there is one, unless
                             we want to print it as hexa *)
-    | Integer(i, _) ->  Datatype.Integer.pretty fmt i
+    | Integer(i, _) ->  Z.pretty fmt i
     | LStr(s) -> fprintf fmt "\"%s\"" (Escape.escape_string s)
     | LWStr(s) ->
       (* text ("L\"" ^ escape_string s ^ "\"")  *)

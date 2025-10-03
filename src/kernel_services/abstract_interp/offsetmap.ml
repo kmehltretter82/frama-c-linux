@@ -209,7 +209,7 @@ module Make
             open Structural_descr
             let r = Recursive.create ()
             let structural_descr =
-              let p_bint = Datatype.Integer.packed_descr in
+              let p_bint = Z.packed_descr in
               t_sum
                 [| [| p_bint;
                       p_bint;

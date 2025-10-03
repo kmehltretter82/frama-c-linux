@@ -304,23 +304,23 @@ let inject_ps_or_bottom = function
    ival (while maintaining the ival invariants that the "Set"
    constructor is used only for small sets of elements. *)
 let set_to_ival_under set =
-  let card = Int.Set.cardinal set in
+  let card = Z.Set.cardinal set in
   if card <= !small_cardinal
   then
     let a = Array.make card Int.zero in
-    ignore (Int.Set.fold (fun elt i -> Array.set a i elt; i + 1) set 0);
+    ignore (Z.Set.fold (fun elt i -> Array.set a i elt; i + 1) set 0);
     `Set a
   else
     (* If by chance the set is contiguous. *)
   if (Int.equal
-        (Int.sub (Int.Set.max_elt set) (Int.Set.min_elt set))
+        (Int.sub (Z.Set.max_elt set) (Z.Set.min_elt set))
         (Int.of_int (card - 1)))
-  then `Top (Int.Set.min_elt set, Int.Set.max_elt set, Int.one)
+  then `Top (Z.Set.min_elt set, Z.Set.max_elt set, Int.one)
   (* Else: arbitrarily drop some elements of the under approximation. *)
   else
     let a = Array.make !small_cardinal Int.zero in
     try
-      ignore (Int.Set.fold (fun elt i ->
+      ignore (Z.Set.fold (fun elt i ->
           if i = !small_cardinal then raise Exit;
           Array.set a i elt;
           i + 1) set 0);
@@ -537,8 +537,8 @@ let join s1 s2 =
   join l1 s1 l2 s2
 
 let link s1 s2 =
-  let s1 = Array.fold_right Int.Set.add s1 Int.Set.empty in
-  let s2 = Array.fold_right Int.Set.add s2 s1 in
+  let s1 = Array.fold_right Z.Set.add s1 Z.Set.empty in
+  let s2 = Array.fold_right Z.Set.add s2 s1 in
   set_to_ival_under s2
 
 let meet s1 s2 =
@@ -632,8 +632,8 @@ let add_under s1 s2 =
     let set =
       Array.fold_left (fun acc i1 ->
           Array.fold_left (fun acc i2 ->
-              Int.Set.add (Int.add i1 i2) acc) acc s2)
-        Int.Set.empty s1
+              Z.Set.add (Int.add i1 i2) acc) acc s2)
+        Z.Set.empty s1
     in
     set_to_ival_under set
 

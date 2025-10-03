@@ -2415,7 +2415,7 @@ let fitsInInt k i =
   let fits = Z.leq min_bound i && Z.lt i max_strict_bound in
   if debugTruncation then
     Kernel.debug "Fits in %a %a : %b@."
-      !pp_ikind_ref k Datatype.Integer.pretty i fits;
+      !pp_ikind_ref k Z.pretty i fits;
   fits
 
 (* Represents an integer as for a given kind.
@@ -2447,7 +2447,7 @@ let truncateInteger64 (k: ikind) i =
     in
     if debugTruncation then
       Kernel.debug ~level:3 "Truncate %a to %a: %a"
-        Datatype.Integer.pretty i !pp_ikind_ref k Datatype.Integer.pretty i';
+        Z.pretty i !pp_ikind_ref k Z.pretty i';
     i', true
 
 exception Not_representable
@@ -2479,7 +2479,7 @@ let isExactFloat fk r =
    specified  *)
 let kinteger64 ~loc ?repr ?kind i =
   if debugTruncation then
-    Kernel.debug ~level:3 "kinteger64 %a" Datatype.Integer.pretty i;
+    Kernel.debug ~level:3 "kinteger64 %a" Z.pretty i;
   let kind = match kind with
     | None ->
       (* compute the best ikind: [int] whenever possible and, if no signed type
@@ -3726,7 +3726,7 @@ and constFold (machdep: bool) (e: exp) : exp =
         begin
           (* If the cast has attributes, leave it alone. *)
           Kernel.debug ~dkey "ConstFold to %a : %a@."
-            !pp_ikind_ref nk Datatype.Integer.pretty i;
+            !pp_ikind_ref nk Z.pretty i;
           (* Downcasts might truncate silently *)
           kinteger64 ~loc ~kind:nk i
         end

@@ -341,7 +341,7 @@ let alloc_fresh weak deallocation prefix sizev _state =
   register_malloced_base ~stack new_base;
   new_base, max_alloc
 
-module Base_with_Size = Datatype.Pair (Base.Base) (Datatype.Integer)
+module Base_with_Size = Datatype.Pair (Base.Base) (Z)
 
 (* Extremely aggressive and imprecise allocation: a single weak base for each
    region. *)

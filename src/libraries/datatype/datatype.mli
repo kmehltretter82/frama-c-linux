@@ -359,8 +359,13 @@ val string: string Type.t
 module Formatter: S with type t = Format.formatter
 val formatter: Format.formatter Type.t
 
-module Integer: S_with_collections with type t = Z.t
-val integer: Z.t Type.t
+module Integer: S_with_collections with type t = Fc_internal_z.t
+  [@@deprecated "Use Z instead."]
+  [@@alert "-fc_internal_z"]
+
+val integer: Fc_internal_z.t Type.t
+[@@deprecated "Use Z.integer instead."]
+[@@alert "-fc_internal_z"]
 
 module Rational: S_with_collections with type t = Q.t
 val rational : Rational.t Type.t

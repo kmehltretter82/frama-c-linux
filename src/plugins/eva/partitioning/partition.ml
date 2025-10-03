@@ -38,7 +38,7 @@ type split_monitor = {
   split_kind : split_kind;
   split_loc : Cil_datatype.Location.t;
   split_limit : int;
-  mutable split_values : Datatype.Integer.Set.t;
+  mutable split_values : Z.Set.t;
 }
 [@@deriving eq,ord]
 
@@ -52,7 +52,7 @@ let new_monitor
     split_kind = kind;
     split_loc;
     split_limit = limit;
-    split_values = Datatype.Integer.Set.empty;
+    split_values = Z.Set.empty;
   }
 
 module SplitTerm = Datatype.Make_with_collections (struct
@@ -81,7 +81,7 @@ module SplitTerm = Datatype.Make_with_collections (struct
 module SplitMonitor = Datatype.Make_with_collections (
   struct
     include Datatype.Serializable_undefined
-    module Values = Datatype.Integer.Set
+    module Values = Z.Set
 
     type t = split_monitor [@@deriving eq,ord]
 
@@ -92,7 +92,7 @@ module SplitMonitor = Datatype.Make_with_collections (
         split_kind = Static;
         split_loc = Cil_datatype.Location.unknown;
         split_limit = 0;
-        split_values = Datatype.Integer.Set.empty
+        split_values = Z.Set.empty
       }]
 
     let pretty fmt m =
@@ -263,7 +263,7 @@ struct
   module Stamp = Datatype.Option (IntPair)
   module BranchList = Datatype.List (BranchDatatype)
   module LoopList = Datatype.List (LoopUnrolling)
-  module Splits = SplitMap.Make (Datatype.Integer)
+  module Splits = SplitMap.Make (Z)
   module DSplits = SplitMap.Make (SplitMonitor)
 
   (* Initial key, before any partitioning *)
@@ -341,7 +341,7 @@ struct
         Pretty_utils.pp_list ~pre:"{@[" ~sep:" ;@ " ~suf:"@]}"
           (fun fmt (t, i) -> Format.fprintf fmt "%a:%a"
               SplitTerm.pretty t
-              Datatype.Integer.pretty i)
+              Z.pretty i)
           fmt
           (SplitMap.bindings key.splits)
     end)
@@ -507,7 +507,7 @@ struct
 
   let split_by_value ~monitor state exp =
     let source = fst monitor.split_loc in
-    let module SplitValues = Datatype.Integer.Set in
+    let module SplitValues = Z.Set in
     let valuation, ival = evaluate_exp_to_ival ~source state exp in
     (* Build a state with the lvalue set to a singleton *)
     let build i acc =
