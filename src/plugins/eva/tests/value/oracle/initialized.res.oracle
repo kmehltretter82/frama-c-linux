@@ -67,11 +67,11 @@
 [eva] computing for function g2 <- main.
   Called from initialized.c:194.
 [eva:alarm] initialized.c:50: Warning: 
-  pointer downcast. assert (unsigned int)(&b4) ≤ 2147483647;
+  pointer downcast. assert (unsigned int)(&b4) ≤ 0x7FFFFFFF;
 [eva:alarm] initialized.c:50: Warning: 
-  signed overflow. assert -2147483648 ≤ (int)(&b4) + (int)(&b4);
+  signed overflow. assert -0x80000000 ≤ (int)(&b4) + (int)(&b4);
 [eva:alarm] initialized.c:50: Warning: 
-  signed overflow. assert (int)(&b4) + (int)(&b4) ≤ 2147483647;
+  signed overflow. assert (int)(&b4) + (int)(&b4) ≤ 0x7FFFFFFF;
 [eva:garbled-mix:write] initialized.c:50: 
   Assigning imprecise value to t[6]
   because of arithmetic operation on addresses.

@@ -129,8 +129,6 @@ let pp_hex ?(nbits=1) ?(sep="") fmt v =
     ( Format.pp_print_string fmt "1x" ;
       pp_digits { nbits ; sep ; bsize=16 ;
                   bmask = bmask_hex ; pp = pp_hex_neg } fmt 0 (lognot v) )
-let pretty fmt v =
-  Format.pp_print_string fmt (to_string v)
 
 let pretty_hex fmt v =
   let two_power_60 = two_power_of_int 60 in
@@ -145,6 +143,18 @@ let pretty_hex fmt v =
   if equal v zero then Format.pp_print_string fmt "0"
   else if gt v zero then (Format.pp_print_string fmt "0x"; aux v)
   else (Format.pp_print_string fmt "-0x"; aux (neg v))
+
+let print_big_ints_hex = ref (-1)
+
+let set_big_ints_hex x = print_big_ints_hex := x
+
+let pretty fmt v =
+  let pp () = Format.pp_print_string fmt (to_string v) in
+  if !print_big_ints_hex < 0 then pp ()
+  else
+    let max = of_int !print_big_ints_hex in
+    if gt (abs v) max then pretty_hex fmt v
+    else pp ()
 
 (* ------------- *)
 (* Miscellaneous *)

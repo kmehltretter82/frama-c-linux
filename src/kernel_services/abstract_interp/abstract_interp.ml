@@ -251,14 +251,6 @@ module Int = struct
 
   let e_rem = erem
 
-  let pretty fmt v =
-    if not (Kernel.BigIntsHex.is_default ()) then
-      let max = of_int (Kernel.BigIntsHex.get ()) in
-      if gt (abs v) max then Z.pretty_hex fmt v
-      else Z.pretty fmt v
-    else
-      Z.pretty fmt v
-
   (** execute [f] on [inf], [inf + step], ... *)
   let fold f ~inf ~sup ~step acc =
     (*    Format.printf "Int.fold: inf:%a sup:%a step:%a@\n"

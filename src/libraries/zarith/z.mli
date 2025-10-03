@@ -162,16 +162,23 @@ val cast: size:t -> signed:bool -> value:t -> t
 (** {3 Printers} *)
 (**************************************************************************)
 
-(** Prints the integer in decimal format. See also {!pretty_hex}.
+(** Set a maximum above which big ints will be printed in hexadecimal.
+    A Negative value turns off this option.
+    @since Frama-C+dev
+*)
+val set_big_ints_hex: int -> unit
 
-    @before 25.0-Manganese there was an optional [hexa] argument. *)
-val pretty : t Pretty_utils.formatter
-
-(** Prints the integer in hexadecimal format (replaces [hexa] optional
-    argument of {!pretty} from older versions).
-
-    @since 25.0-Manganese *)
+(** Prints the integer in hexadecimal format.
+    @since 25.0-Manganese
+*)
 val pretty_hex : t Pretty_utils.formatter
+
+(** Prints the integer in either decimal or hexadecimal depending on
+    the value set via {!set_big_ints_hex}.
+    @before 25.0-Manganese there was an optional [hexa] argument.
+    @before Frama-C+dev Only printed in decimal
+*)
+val pretty : t Pretty_utils.formatter
 
 (** Print binary format. Digits are output by blocs of 4 bits
     separated by [~sep] with at least [~nbits] total bits. If [nbits] is
