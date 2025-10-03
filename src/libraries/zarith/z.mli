@@ -30,50 +30,52 @@ include module type of Fc_internal_z with type t = Fc_internal_z.t [@@alert "-fc
 module Operators : sig
   include module type of Compare
 
-  val (~-): t -> t
   (** Negation {!neg}. *)
+  val (~-): t -> t
 
-  val (+): t -> t -> t
   (** Addition {!add}. *)
+  val (+): t -> t -> t
 
-  val (-): t -> t -> t
   (** Subtraction {!sub}. *)
+  val (-): t -> t -> t
 
-  val ( * ): t -> t -> t
   (** Multiplication {!mul}. *)
+  val ( * ): t -> t -> t
 
-  val (/): t -> t -> t
   (** Truncated division {!div}. *)
+  val (/): t -> t -> t
 
-  val (mod): t -> t -> t
   (** Remainder {!rem}. *)
+  val (mod): t -> t -> t
 
-  val (land): t -> t -> t
   (** Bit-wise logical and {!logand}. *)
+  val (land): t -> t -> t
 
-  val (lor): t -> t -> t
   (** Bit-wise logical inclusive or {!logor}. *)
+  val (lor): t -> t -> t
 
-  val (lxor): t -> t -> t
   (** Bit-wise logical exclusive or {!logxor}. *)
+  val (lxor): t -> t -> t
 
-  val (~!): t -> t
   (** Bit-wise logical negation {!lognot}. *)
+  val (~!): t -> t
 
-  val (lsl): t -> int -> t
   (** Bit-wise shift to the left {!shift_left}. *)
+  val (lsl): t -> int -> t
 
-  val (asr): t -> int -> t
   (** Bit-wise shift to the right {!shift_right}. *)
+  val (asr): t -> int -> t
 
-  val ( ~$ ) : int -> t
   (** Conversion from [int] using {!of_int}. *)
+  val ( ~$ ) : int -> t
 
-  val ( ** ) : t -> int -> t
   (** Power {!pow}. *)
+  val ( ** ) : t -> int -> t
 end
 
-(** Compare operators are not at top level in Zarith. *)
+(** Compare operators are not at top level in Zarith.
+    @since Frama-C+dev
+*)
 include module type of Compare
 
 (**************************************************************************)
@@ -102,45 +104,57 @@ val to_int64_opt : t -> int64 option
 (** {3 Basic functions, most of them from Z} *)
 (**************************************************************************)
 
+(** Return [true] if the given argument is equal to {!zero}. *)
 val is_zero : t -> bool
+
+(** Return [true] if the given argument is equal to {!one}. *)
 val is_one : t -> bool
 
+(** Return [true] if the given argument is even. *)
 val is_even : t -> bool
 
-val length : t -> t -> t (** b - a + 1 *)
+(** Compute [b - a + 1]. *)
+val length : t -> t -> t
 
-val two_power : t -> t
-(** Computes [2^n].
-    @raise Overflow for exponents greater than 1024 *)
-
-val two_power_of_int : int -> t
 (** Computes [2^n]. *)
+val two_power_of_int : int -> t
 
-val shift_left_z : t -> t -> t
+(** Calls {!two_power_of_int} after converting the argument using {!to_int}.
+    @raises Overflow is the argument is greater than 1024
+*)
+val two_power : t -> t
+
 (** Convert the second argument via {!of_int} then call {!shift_left}.
+    This function was previously called [shift_left] but it was renamed to avoid
+    shadowing [Z] function.
     @since Frama-C+dev
 *)
+val shift_left_z : t -> t -> t
 
-val shift_right_z : t -> t -> t
 (** Convert the second argument via {!of_int} then call {!shift_right}.
+    This function was previously called [shift_right] but it was renamed to
+    avoid shadowing [Z] function.
     @since Frama-C+dev
 *)
+val shift_right_z : t -> t -> t
 
-val shift_right_logical : t -> t -> t
 (** @raise Invalid_argument if any argument is negative *)
+val shift_right_logical : t -> t -> t
 
-val round_up_to_r : min:t -> r:t -> modu:t -> t
 (** [round_up_to_r m r modu] is the smallest number [n] such that
-    [n]>=[m] and [n] = [r] modulo [modu]. *)
+    [n]>=[m] and [n] = [r] modulo [modu].
+*)
+val round_up_to_r : min:t -> r:t -> modu:t -> t
 
-val round_down_to_r : max:t -> r:t -> modu:t -> t
 (** [round_down_to_r m r modu] is the largest number [n] such that
-    [n]<=[m] and [n] = [r] modulo [modu]. *)
+    [n]<=[m] and [n] = [r] modulo [modu].
+*)
+val round_down_to_r : max:t -> r:t -> modu:t -> t
 
-val extract_bits : start:t -> stop:t -> t -> t
 (** [extract_bits ~start ~stop v] is a shortcut for [extract v pos length]
     where [pos] and [length] are computed using [start] and [stop].
 *)
+val extract_bits : start:t -> stop:t -> t -> t
 
 val cast: size:t -> signed:bool -> value:t -> t
 
@@ -159,18 +173,20 @@ val pretty : t Pretty_utils.formatter
     @since 25.0-Manganese *)
 val pretty_hex : t Pretty_utils.formatter
 
-val pp_bin : ?nbits:int -> ?sep:string -> t Pretty_utils.formatter
 (** Print binary format. Digits are output by blocs of 4 bits
     separated by [~sep] with at least [~nbits] total bits. If [nbits] is
     non positive, it will be ignored.
 
     Positive values are prefixed with ["0b"] and negative values
-    are printed as their 2-complement ([lnot]) with prefix ["1b"]. *)
+    are printed as their 2-complement ([lnot]) with prefix ["1b"].
+*)
+val pp_bin : ?nbits:int -> ?sep:string -> t Pretty_utils.formatter
 
-val pp_hex : ?nbits:int -> ?sep:string -> t Pretty_utils.formatter
 (** Print hexadecimal format. Digits are output by blocs of 16 bits
     (4 hex digits) separated by [~sep] with at least [~nbits] total bits.
     If [nbits] is non positive, it will be ignored.
 
     Positive values are preffixed with ["0x"] and negative values
-    are printed as their 2-complement ([lnot]) with prefix ["1x"]. *)
+    are printed as their 2-complement ([lnot]) with prefix ["1x"].
+*)
+val pp_hex : ?nbits:int -> ?sep:string -> t Pretty_utils.formatter

@@ -22,7 +22,7 @@ let to_int32_opt = wrap to_int32
 (* ------------------------- *)
 
 let two_power_of_int k =
-  1z lsl k
+  shift_left one k
 
 let two_power n =
   let k = to_int n in
@@ -164,10 +164,7 @@ let cast ~size ~signed ~value =
 
 let extract_bits ~start ~stop v =
   assert (geq start zero && geq stop start);
-  (*Format.printf "%a[%a..%a]@\n" pretty v pretty start pretty stop;*)
-  let r = extract v (to_int start) (to_int (length start stop)) in
-  (*Format.printf "%a[%a..%a]=%a@\n" pretty v pretty start pretty stop pretty r;*)
-  r
+  extract v (to_int start) (to_int (length start stop))
 
 (* --------- *)
 (* Operators *)
