@@ -26,7 +26,7 @@
   assertion got status invalid (stopping propagation).
 [eva] annot_valid.i:53: assertion got status valid.
 [eva] annot_valid.i:56: assertion got status valid.
-[eva] annot_valid.i:57: 
+[eva:acsl:unsupported] annot_valid.i:57: 
   cannot evaluate ACSL term, \at() on a C label is unsupported
 [eva:alarm] annot_valid.i:57: Warning: assertion got status unknown.
 [eva:alarm] annot_valid.i:62: Warning: 

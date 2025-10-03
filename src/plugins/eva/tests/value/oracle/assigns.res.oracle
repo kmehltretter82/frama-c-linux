@@ -72,9 +72,8 @@
 [eva] computing for function j <- main1 <- main.
   Called from assigns.i:54.
 [eva] using specification for function j
-[eva] assigns.i:32: 
-  Cannot evaluate range bound foo(*p)
-  (unsupported ACSL construct: logic function foo). Approximating
+[eva:acsl:unsupported] assigns.i:32: 
+  Cannot evaluate range bound foo(*p) (unsupported ACSL construct: logic function foo). Approximating.
 [eva] Done for function j
 [eva] computing for function assigns_post <- main1 <- main.
   Called from assigns.i:56.

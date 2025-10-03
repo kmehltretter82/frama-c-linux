@@ -9,10 +9,10 @@
   NULL_GLOBAL_LOOSING_BITS_ONE_BY_ONE ∈ {0}
 [eva] computing for function main1 <- main.
   Called from loop1.i:25.
-[eva] loop1.i:8: 
+[eva:acsl:unsupported] loop1.i:8: 
   cannot evaluate ACSL term, no environment to evaluate \at(_,LoopCurrent)
 [eva:alarm] loop1.i:8: Warning: assertion got status unknown.
-[eva] loop1.i:9: 
+[eva:acsl:unsupported] loop1.i:9: 
   cannot evaluate ACSL term, no environment to evaluate \at(_,LoopEntry)
 [eva:alarm] loop1.i:9: Warning: assertion got status unknown.
 [eva:partition] loop1.i:5: starting to merge loop iterations

@@ -44,9 +44,10 @@
         "taint", "unknown-size"
       ],
       "disabled": [
-        "assigns:invalid-location", "garbled-mix", "garbled-mix:assigns",
-        "garbled-mix:summary", "garbled-mix:write", "loop-unroll",
-        "loop-unroll:auto", "loop-unroll:missing", "loop-unroll:missing:for",
+        "acsl", "acsl:unsupported", "assigns:invalid-location",
+        "garbled-mix", "garbled-mix:assigns", "garbled-mix:summary",
+        "garbled-mix:write", "loop-unroll", "loop-unroll:auto",
+        "loop-unroll:missing", "loop-unroll:missing:for",
         "loop-unroll:partial", "malloc:weak", "recursion", "watchpoint"
       ]
     }

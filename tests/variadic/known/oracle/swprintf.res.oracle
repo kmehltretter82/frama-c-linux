@@ -36,9 +36,8 @@
 [eva] Analyzing a complete application starting at main
 [eva] using specification for function wmemset
 [eva] using specification for function swprintf
-[eva] FRAMAC_SHARE/libc/wchar.h:557: 
-  Cannot evaluate range bound wformat_length(format) - 1
-  (unsupported ACSL construct: logic function wformat_length). Approximating
+[eva:acsl:unsupported] FRAMAC_SHARE/libc/wchar.h:557: 
+  Cannot evaluate range bound wformat_length(format) - 1 (unsupported ACSL construct: logic function wformat_length). Approximating.
 [eva:alarm] swprintf.c:12: Warning: 
   function swprintf_va_1: precondition \valid(ws + (0 .. n - 1)) ∨
                                        \valid(ws +

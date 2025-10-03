@@ -13,7 +13,8 @@
 [eva] Recording results for f
 [eva] Done for function f
 [eva] preprocess.c:25: assertion got status valid.
-[eva] preprocess.c:28: cannot evaluate ACSL term, unsupported logic var tmp
+[eva:acsl:unsupported] preprocess.c:28: 
+  cannot evaluate ACSL term, unsupported logic var tmp
 [eva:alarm] preprocess.c:28: Warning: 
   assertion 'backslash_string' got status unknown.
 [eva] Recording results for main

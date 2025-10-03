@@ -77,6 +77,8 @@ val wkey_unknown_size : warn_category
 val wkey_ensures_false : warn_category
 val wkey_watchpoint : warn_category
 val wkey_recursion : warn_category
+val wkey_acsl : warn_category
+val wkey_acsl_unsupported : warn_category
 
 (** {2 Logging.} *)
 

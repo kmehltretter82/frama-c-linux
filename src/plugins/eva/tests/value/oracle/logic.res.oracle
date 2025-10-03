@@ -15,7 +15,7 @@
   arr_ptr_arr[0..5] ∈ {0}
 [eva] computing for function eq_tsets <- main.
   Called from logic.c:577.
-[eva] logic.c:103: 
+[eva:acsl:unsupported] logic.c:103: 
   cannot evaluate ACSL term, unsupported ACSL construct: == operation on non-supported type set<_#8>
 [eva:alarm] logic.c:103: Warning: assertion got status unknown.
 [eva] logic.c:105: assertion got status valid.
@@ -40,17 +40,17 @@
 [eva] logic.c:130: assertion got status valid.
 [eva:alarm] logic.c:131: Warning: assertion got status unknown.
 [eva:alarm] logic.c:132: Warning: assertion got status unknown.
-[eva] logic.c:134: 
+[eva:acsl:unsupported] logic.c:134: 
   cannot evaluate ACSL term, unsupported ACSL construct: == operation on non-supported type struct ts
 [eva:alarm] logic.c:134: Warning: assertion got status unknown.
-[eva] logic.c:135: 
+[eva:acsl:unsupported] logic.c:135: 
   cannot evaluate ACSL term, unsupported ACSL construct: != operation on non-supported type int [10]
 [eva:alarm] logic.c:135: Warning: assertion got status unknown.
 [eva] logic.c:137: assertion got status valid.
 [eva] logic.c:138: assertion got status valid.
 [eva] logic.c:139: assertion got status valid.
 [eva] logic.c:141: assertion got status valid.
-[eva] logic.c:143: 
+[eva:acsl:unsupported] logic.c:143: 
   cannot evaluate ACSL term, unsupported ACSL construct: set intersection
 [eva:alarm] logic.c:143: Warning: assertion got status unknown.
 [eva] Recording results for eq_tsets
@@ -143,9 +143,11 @@
   Called from logic.c:584.
 [eva] logic.c:90: assertion got status valid.
 [eva] logic.c:91: assertion got status valid.
-[eva] logic.c:31: cannot evaluate ACSL term, \at() on a C label is unsupported
+[eva:acsl:unsupported] logic.c:31: 
+  cannot evaluate ACSL term, \at() on a C label is unsupported
 [eva:alarm] logic.c:92: Warning: assertion got status unknown.
-[eva] logic.c:92: cannot evaluate ACSL term, \at() on a C label is unsupported
+[eva:acsl:unsupported] logic.c:92: 
+  cannot evaluate ACSL term, \at() on a C label is unsupported
 [eva] logic.c:93: assertion got status valid.
 [eva] computing for function f <- pred <- main.
   Called from logic.c:94.
@@ -158,9 +160,11 @@
 [eva] logic.c:55: assertion got status valid.
 [eva] logic.c:56: assertion got status valid.
 [eva] logic.c:57: assertion got status valid.
-[eva] logic.c:35: cannot evaluate ACSL term, \at() on a C label is unsupported
+[eva:acsl:unsupported] logic.c:35: 
+  cannot evaluate ACSL term, \at() on a C label is unsupported
 [eva:alarm] logic.c:58: Warning: assertion got status unknown.
-[eva] logic.c:58: cannot evaluate ACSL term, \at() on a C label is unsupported
+[eva:acsl:unsupported] logic.c:58: 
+  cannot evaluate ACSL term, \at() on a C label is unsupported
 [eva] Recording results for g
 [eva] Done for function g
 [eva] computing for function unsup <- pred <- main.
@@ -170,7 +174,7 @@
 [eva] Done for function unsup
 [eva] computing for function h <- pred <- main.
   Called from logic.c:97.
-[eva] logic.c:69: 
+[eva:acsl:unsupported] logic.c:69: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function h_acsl
 [eva:alarm] logic.c:69: Warning: assertion got status unknown.
 [eva:alarm] logic.c:70: Warning: assertion got status unknown.
@@ -548,7 +552,7 @@
 [eva:alarm] logic.c:531: Warning: assertion 'unknown' got status unknown.
 [eva:alarm] logic.c:533: Warning: 
   assertion 'invalid' got status invalid (stopping propagation).
-[eva] logic.c:538: 
+[eva:acsl:unsupported] logic.c:538: 
   cannot evaluate ACSL term, unsupported ACSL construct: \let binding
 [eva:alarm] logic.c:538: Warning: assertion 'unsupported' got status unknown.
 [eva] Recording results for plet
@@ -599,12 +603,10 @@
     logic.c:571: assigns clause on addresses
       (read in 1 statement, propagated through 1 statement)
       garbled mix of &{b; c; t_0; w}
-[eva] logic.c:530: 
-  Cannot evaluate range bound __fc_len - 1
-  (unsupported logic var __fc_len). Approximating
-[eva] logic.c:533: 
-  Cannot evaluate range bound __fc_len
-  (unsupported logic var __fc_len). Approximating
+[eva:acsl:unsupported] logic.c:530: 
+  Cannot evaluate range bound __fc_len - 1 (unsupported logic var __fc_len). Approximating.
+[eva:acsl:unsupported] logic.c:533: 
+  Cannot evaluate range bound __fc_len (unsupported logic var __fc_len). Approximating.
 [scope:rm_asserts] removing 5 assertion(s)
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function alarms:

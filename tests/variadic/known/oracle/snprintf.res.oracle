@@ -22,12 +22,11 @@
 [kernel:variadic] snprintf.c:15: 
   Translating call to snprintf to a call to the specialized version snprintf_va_2.
 [eva] Analyzing a complete application starting at main
-[eva] FRAMAC_SHARE/libc/string.h:147: 
+[eva:acsl:unsupported] FRAMAC_SHARE/libc/string.h:147: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memset
 [eva] using specification for function snprintf
-[eva] FRAMAC_SHARE/libc/stdio.h:239: 
-  Cannot evaluate range bound format_length(format) - 1
-  (unsupported ACSL construct: logic function format_length). Approximating
+[eva:acsl:unsupported] FRAMAC_SHARE/libc/stdio.h:239: 
+  Cannot evaluate range bound format_length(format) - 1 (unsupported ACSL construct: logic function format_length). Approximating.
 [eva:alarm] snprintf.c:12: Warning: 
   function snprintf_va_1: precondition \valid(s + (0 .. n - 1)) ∨
                                        \valid(s +

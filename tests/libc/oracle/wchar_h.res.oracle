@@ -202,7 +202,7 @@
 [eva] wchar_h.c:73: 
   function wcsdup: precondition 'valid_wstring' got status valid.
 [eva] Done for function wcsdup
-[eva] wchar_h.c:74: 
+[eva:acsl:unsupported] wchar_h.c:74: 
   cannot evaluate ACSL term, unsupported ACSL construct: wide constant strings
 [eva:alarm] wchar_h.c:74: Warning: check got status unknown.
 [eva] Recording results for main

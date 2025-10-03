@@ -9,7 +9,7 @@
 [eva:alarm] copy_logic.i:16: Warning: assertion got status unknown.
 [eva:alarm] copy_logic.i:17: Warning: 
   signed overflow. assert y + x ≤ 2147483647;
-[eva] copy_logic.i:18: 
+[eva:acsl:unsupported] copy_logic.i:18: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function f
 [eva:alarm] copy_logic.i:18: Warning: assertion got status unknown.
 [eva] ====== VALUES COMPUTED ======

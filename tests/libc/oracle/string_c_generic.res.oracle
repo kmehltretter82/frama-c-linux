@@ -12,7 +12,7 @@
   function strcpy: precondition 'room_string' got status valid.
 [eva] string_c_generic.c:56: 
   function strcpy: precondition 'separation' got status valid.
-[eva] FRAMAC_SHARE/libc/string.h:420: 
+[eva:acsl:unsupported] FRAMAC_SHARE/libc/string.h:420: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function strcmp
 [eva:alarm] FRAMAC_SHARE/libc/string.h:420: Warning: 
   function strcpy: postcondition 'equal_contents' got status unknown.
@@ -26,7 +26,7 @@
   function strcmp: precondition 'valid_string_s1' got status valid.
 [eva] string_c_generic.c:57: 
   function strcmp: precondition 'valid_string_s2' got status valid.
-[eva] FRAMAC_SHARE/libc/string.h:170: 
+[eva:acsl:unsupported] FRAMAC_SHARE/libc/string.h:170: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function strcmp
 [eva:alarm] FRAMAC_SHARE/libc/string.h:170: Warning: 
   function strcmp: postcondition 'acsl_c_equiv' got status unknown.
@@ -144,7 +144,7 @@
   Called from string_c_generic.c:72.
 [eva] string_c_generic.c:72: 
   function memset: precondition 'valid_s' got status valid.
-[eva] FRAMAC_SHARE/libc/string.h:147: 
+[eva:acsl:unsupported] FRAMAC_SHARE/libc/string.h:147: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memset
 [eva:alarm] FRAMAC_SHARE/libc/string.h:147: Warning: 
   function memset: postcondition 'acsl_c_equiv' got status unknown.
@@ -166,7 +166,7 @@
   function strncpy: postcondition 'result_ptr' got status valid.
 [eva] FRAMAC_SHARE/libc/string.h:433: 
   function strncpy: postcondition 'initialization' got status valid.
-[eva] FRAMAC_SHARE/libc/string.h:436: 
+[eva:acsl:unsupported] FRAMAC_SHARE/libc/string.h:436: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function strcmp
 [eva:alarm] FRAMAC_SHARE/libc/string.h:436: Warning: 
   function strncpy, behavior complete: postcondition 'equal_after_copy' got status unknown.
@@ -186,7 +186,7 @@
   function memcmp: precondition 'danglingness,s1' got status valid.
 [eva] string_c_generic.c:74: 
   function memcmp: precondition 'danglingness,s2' got status valid.
-[eva] FRAMAC_SHARE/libc/string.h:43: 
+[eva:acsl:unsupported] FRAMAC_SHARE/libc/string.h:43: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memcmp
 [eva:alarm] FRAMAC_SHARE/libc/string.h:43: Warning: 
   function memcmp: postcondition 'logic_spec' got status unknown.
@@ -200,7 +200,7 @@
   function strncpy: precondition 'room_nstring' got status valid.
 [eva] string_c_generic.c:78: 
   function strncpy: precondition 'separation' got status valid.
-[eva] FRAMAC_SHARE/libc/string.h:439: 
+[eva:acsl:unsupported] FRAMAC_SHARE/libc/string.h:439: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memcmp
 [eva:alarm] FRAMAC_SHARE/libc/string.h:439: Warning: 
   function strncpy, behavior partial: postcondition 'equal_prefix' got status unknown.
@@ -214,7 +214,7 @@
   function strncmp: precondition 'valid_string_s2' got status valid.
 [eva:partition] FRAMAC_SHARE/libc/string.c:140: 
   starting to merge loop iterations
-[eva] FRAMAC_SHARE/libc/string.h:177: 
+[eva:acsl:unsupported] FRAMAC_SHARE/libc/string.h:177: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function strncmp
 [eva:alarm] FRAMAC_SHARE/libc/string.h:177: Warning: 
   function strncmp: postcondition 'acsl_c_equiv' got status unknown.
@@ -292,7 +292,7 @@
   function strchr, behavior found: postcondition 'result_same_base' got status valid.
 [eva] FRAMAC_SHARE/libc/string.h:196: 
   function strchr, behavior found: postcondition 'result_in_length' got status valid.
-[eva] FRAMAC_SHARE/libc/string.h:198: 
+[eva:acsl:unsupported] FRAMAC_SHARE/libc/string.h:198: 
   cannot evaluate ACSL term, unsupported logic var p
 [eva:alarm] FRAMAC_SHARE/libc/string.h:198: Warning: 
   function strchr, behavior found: postcondition 'result_first_occurrence' got status unknown.
