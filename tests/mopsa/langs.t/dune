@@ -6,7 +6,7 @@
 
 (plugin
  (optional)
- (name directories)
+ (name mopsa-langs)
  (libraries mopsa-langs.core)
  (site
   (frama-c plugins)))
