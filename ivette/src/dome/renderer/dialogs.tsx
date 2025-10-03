@@ -311,9 +311,20 @@ export async function showOpenDir(
 // --------------------------------------------------------------------------
 
 export const modalLoader = new GlobalState<boolean>(false);
-export function showModal(val: React.ReactNode): void {
-  modalLoader.setValue(false);
-  modal.setValue(val);
+
+export function showModal(
+  content: React.ReactNode,
+  onClose?: (callback: () => void) => void
+): void {
+  const setModal = (): void => {
+    modalLoader.setValue(false);
+    modal.setValue({ content, onClose });
+  };
+
+  const current = modal.getValue();
+  if(current !== undefined && current.onClose) {
+    current.onClose(setModal);
+  } else setModal();
 }
 export function closeModal(): void { showModal(undefined); }
 

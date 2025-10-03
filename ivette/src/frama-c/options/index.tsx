@@ -8,10 +8,9 @@
 
 import React from 'react';
 
-import { Modal, showModal } from 'dome/dialogs';
+import { Modal, showMessageBox, showModal } from 'dome/dialogs';
 import { alpha } from 'dome/data/compare';
 import { LSplit } from 'dome/layout/splitters';
-import { Hbox } from 'dome/layout/boxes';
 import * as Toolbar from 'dome/frame/toolbars';
 
 import * as Server from 'frama-c/server';
@@ -53,17 +52,6 @@ export function usePluginsContextById(id: string): PContextById {
 // --------------------------------------------------------------------------
 // --- Options
 // --------------------------------------------------------------------------
-
-export function OptionsHelp(): React.JSX.Element {
-  return <Hbox className='framac-options-help'>
-    <p>The form on the left is highlighted in red in the sidebar,
-       and the one on the right is highlighted in blue.</p>
-    <ul>
-      <li>Ctrl + click to change the form on the right.</li>
-      <li>Click to change the form on the left.</li>
-    </ul>
-  </Hbox>;
-}
 
 const defaultSelected: SelectedPlugins = ['kernel', 'Eva'];
 
@@ -139,11 +127,27 @@ export default function Options(): React.JSX.Element {
 /* --- Frama-C Options Modal                                              --- */
 /* -------------------------------------------------------------------------- */
 
+async function onClose(callback: () => void): Promise<void> {
+  const confirm = await showMessageBox({
+    block: true,
+    buttons: [
+      { label: 'Cancel' },
+      { label: 'Ok', value: true }
+    ],
+    message: 'This modal will be close',
+    details: 'If you do not apply your local changes, you will lose them.\n'
+    +'Confirm that you want to close or cancel.'
+  });
+
+  if(confirm === true) callback();
+}
+
 export function showOptionsModal(): void {
   showModal(
     <Modal className='modal-framac-options' label='Frama-C options'>
       <Options/>
-    </Modal>
+    </Modal>,
+    onClose
   );
 }
 

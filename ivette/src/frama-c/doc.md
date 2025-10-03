@@ -147,3 +147,28 @@ The list of projects is shown below, and these actions are available:
 * [icon-duplicate]: duplicate the project.
 * [icon-save]: save the project onto a save file.
 * [icon-trash]: delete the project; confirmation will be requested.
+
+## Options {#framac-options}
+
+The frama-c settings can be modified from Ivette.
+There is one form per plugin available.
+
+[icon-warning] If you close the modal window without applying the changes, you will lose the local changes.
+
+[icon-warning] Applying the changes modifies the frama-c settings but does not restart the analysis.
+
+The options are opened in a modal window divided into three columns.
+
+* 1: list of plugins
+* 2: left form (Ctrl+click in the list to change)
+* 3: right form (click in the list to change)
+
+Icons and colours:
+
+* [led-warning]: means that there are local changes in a form.
+* An orange section title means that the section contains locally modified fields.
+* An orange border means that the field is modified locally.
+* [led-active]: means that fields have been modified by the user in a form or section.
+* An blue field label means that the field has been modified by the user.
+* [icon-reload]: reset field or form.
+* [icon-push]: apply modifications of field or form.
