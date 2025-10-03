@@ -1,3 +1,11 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;                                                                        ;;
+;;  SPDX-License-Identifier LGPL-2.1                                      ;;
+;;  Copyright (C)                                                         ;;
+;;  CEA (Commissariat à l'énergie atomique et aux énergies alternatives)  ;;
+;;                                                                        ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 ; This library is only used to allow including Z from Zarith inside another file
 ; named Z. Also if we want to use ppx_z_literals into our module Z, we need to
 ; use this library inside the ppx as well.

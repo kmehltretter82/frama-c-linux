@@ -1,3 +1,11 @@
+(**************************************************************************)
+(*                                                                        *)
+(*  SPDX-License-Identifier LGPL-2.1                                      *)
+(*  Copyright (C)                                                         *)
+(*  CEA (Commissariat à l'énergie atomique et aux énergies alternatives)  *)
+(*                                                                        *)
+(**************************************************************************)
+
 open Ppxlib
 
 (** We use {!Fc_z} instead of {!Z} to allow using this ppx inside [z.ml]. *)
