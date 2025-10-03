@@ -128,14 +128,6 @@ let dkey_include_string_literal =
     ~help:"when printing a state, \
            also include globals representing string literals"
 
-let dkey_acsl =
-  register_category "acsl"
-    ~help:"messages about evaluation of ACSL terms and predicates"
-
-let dkey_acsl_unsupported =
-  register_category "acsl:unsupported" ~default:true
-    ~help:"messages about ACSL terms not supported by Eva"
-
 
 (* ----- Warning categories ------------------------------------------------- *)
 
@@ -266,6 +258,15 @@ let wkey_recursion =
     ~help:"a recursive call is analyzed"
     ~default:Log.Wfeedback
 
+let wkey_acsl =
+  register_warn_category "acsl"
+    ~help:"messages about evaluation of ACSL terms and predicates"
+    ~default:Log.Wfeedback
+
+let wkey_acsl_unsupported =
+  register_warn_category "acsl:unsupported"
+    ~help:"messages about ACSL terms not supported by Eva"
+    ~default:Log.Wfeedback
 
 (* ----- Log with positions ------------------------------------------------- *)
 

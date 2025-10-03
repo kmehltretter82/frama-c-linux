@@ -49,8 +49,6 @@ val dkey_precision_settings : category
 val dkey_callstacks : category
 val dkey_callstack_hash : category
 val dkey_include_string_literal: category
-val dkey_acsl : category
-val dkey_acsl_unsupported : category
 
 (** {2 Warning categories.} *)
 
@@ -79,6 +77,8 @@ val wkey_unknown_size : warn_category
 val wkey_ensures_false : warn_category
 val wkey_watchpoint : warn_category
 val wkey_recursion : warn_category
+val wkey_acsl : warn_category
+val wkey_acsl_unsupported : warn_category
 
 (** {2 Logging.} *)
 

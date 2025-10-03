@@ -69,7 +69,7 @@ let track_alarms b = function
 let display_evaluation_error ~loc = function
   | CAlarm -> ()
   | pa ->
-    Self.feedback ~dkey:Self.dkey_acsl_unsupported ~source:(fst loc) ~once:true
+    Self.warning ~wkey:Self.wkey_acsl_unsupported ~source:(fst loc) ~once:true
       "cannot evaluate ACSL term, %a" pretty_logic_evaluation_error pa
 
 (* Warning mode use when performing _reductions_ in the logic ( ** not **
@@ -1094,7 +1094,7 @@ let rec eval_term ~alarm_mode env t =
         | Cvalue.V.Not_based_on_null -> None, None
         | LogicEvalError e ->
           if e <> CAlarm then
-            Self.feedback ~dkey:Self.dkey_acsl_unsupported
+            Self.warning ~wkey:Self.wkey_acsl_unsupported
               ~source:(fst t.term_loc) ~once:true
               "Cannot evaluate range bound %a (%a). Approximating."
               Printer.pp_term term pretty_logic_evaluation_error e;
