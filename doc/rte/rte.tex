@@ -2,7 +2,8 @@
 \newcommand{\brclose}{\mbox{\tt ]}}
 \newcommand{\cbopen}{\mbox{\tt \{}}
 \newcommand{\cbclose}{\mbox{\tt \}}}
-\newcommand{\cnn}{\mbox{ISO C99}}
+\newcommand{\cnn}{\mbox{ISO C23}}
+\newcommand{\iso}[2]{\cnn{}~\mbox{#1\if #2\empty\else~§~#2\fi}}
 \newcommand{\optsigned}{\mbox{\lstinline|-rte-signed|}}
 \newcommand{\optnodowncast}{\mbox{\lstinline|-rte-no-downcast|}}
 \newcommand{\rte}{\textsf{RTE}\xspace}
@@ -51,8 +52,8 @@ implementation choice.  Also note that annotations are dependent of the {\it
   machine dependency} used on Frama-C command-line, especially the size of
 integer types.
 
-The C language ISO standard \cite{standardc99} will be referred to as \cnn{}
-(of which specific paragraphs are cited, such as \mbox{6.2.5.9}).
+The C language ISO standard \cite{standardc23} will be referred to as \cnn{}
+(of which specific paragraphs are cited, such as \iso{6.2.5}{9}).
 
 %%\section{Generated Annotations}
 
@@ -149,7 +150,7 @@ by making such wide-ranging and easily checkable assumptions.  {\bf Therefore
 
 \section{Integer operations}
 
-According to \mbox{6.2.5.9}, operations on unsigned integers ``can never
+According to \iso{6.2.5}{11}, operations on unsigned integers ``can never
 overflow'' (as long as the result is defined, which excludes division by zero):
 they are reduced modulo a value which is one greater than the largest value of
 their unsigned integer type (typically $2^n$ for $n$-bit integers).  So in fact,
@@ -309,7 +310,7 @@ Actually, by setting the option \texttt{-warn-signed-downcast} (which is unset
 by default), the \rte{} plug-in infers these second (stronger) assertions when
 treating the cast of the expression to a \lstinline|signed char|.  Since the
 value represented by the expression cannot in general be represented as a
-\lstinline|signed char|, and following \cnn{} paragraph \mbox{6.3.1.3.3} (on
+\lstinline|signed char|, and following paragraph \iso{6.3.1.3}{3} (on
 downcasting to a signed type), an {\it implementation-defined behavior} happens
 whenever the result falls outside the range \lstinline|[-128,127]|.  Thus, with
 a single annotation, the \rte{} plug-in prevents both an undefined behavior
@@ -331,7 +332,7 @@ ix = - ix;
 
 \subsection{Division and modulo}
 
-As of \cnn{} paragraph \mbox{6.5.5}, an undefined behavior occurs whenever the
+As of \iso{6.5.6}{6}, an undefined behavior occurs whenever the
 value of the second operand of operators \lstinline|/| and \lstinline|%| is
 zero. The corresponding runtime error is usually referred to as ``division by
 zero''.  This may happen for both signed and unsigned operations.
@@ -359,7 +360,7 @@ z = y / x;
 
 \subsection{Bitwise shift operators}
 
-\cnn{} paragraph \mbox{6.5.7} defines undefined and implementation defined
+\iso{6.5.8}{} defines undefined and implementation defined
 behaviors for bitwise shift operators.  The type of the result is the type of
 the promoted left operand.
 
@@ -438,11 +439,10 @@ Dereferencing a pointer is an undefined behavior if:
 
 \item the pointer has an invalid value: null pointer, misaligned address for the
   type of object pointed to, address of an object after the end of its lifetime
-  (see \cnn{} paragraph \mbox{6.5.3.2.4});
+  (see \iso{6.5.4.2}{4});
 
 \item the pointer points one past the last element of an array object: such a
-  pointer has a valid value, but should not be dereferenced (\cnn{} paragraph
-  \mbox{6.5.6.8}).
+  pointer has a valid value, but should not be dereferenced (\iso{6.5.7}{9}).
 \end{itemize}
 
 The \rte{} plug-in generates annotations to prevent this type of undefined
@@ -456,7 +456,7 @@ and write accesses, for which \lstinline|\valid(p)| annotations are emitted (the
 locations must be readable and writable).
 
 Since an array subscripting \lstinline|E1[E2]| is identical to
-\lstinline|(*((E1) + (E2)))| (\cnn{} paragraph \mbox{6.5.2.1.2}), the ``invalid
+\lstinline|(*((E1) + (E2)))| (\iso{6.5.3.3}{2}), the ``invalid
 access'' undefined behaviors naturally extend to array indexing, and \rte{} will
 generate similar annotations.  However, when the array is known, \rte{} attempts
 to generate simpler assertions.  Typically, on an access \lstinline|t[i]| where
@@ -480,7 +480,7 @@ Similarly, if \lstinline|t| is declared as \lstinline|int t[10][10]|, the access
 
 Finally, dereferencing a pointer to a functions leads to the emission of
 a \lstinline|\valid_function| predicate, to protect against a possibly
-invalid pointer (\cnn{} 6.3.2.3:8). Those assertions are generated provided
+invalid pointer (\iso{6.3.2.3}{8}). Those assertions are generated provided
 option \lstinline|-rte-pointer-call| is set.
 
 
@@ -563,14 +563,10 @@ Notice the annotation generated for the call \lstinline|(*(buff.data[i].f))(a)|.
 
 \end{example}
 
-%%\section{String literal modification}
-
-%%6.4.5 (not so frequent)
-
 \section{Unsigned overflow annotations}
 
 \cnn{} states that {\it unsigned} integer arithmetic is modular: overflows do
-not occur (paragraph \mbox{6.2.5.9} of \cnn{}).  On the other hand, most
+not occur (\iso{6.2.5}{11}).  On the other hand, most
 first-order solvers used in deductive verification (excluding dedicated
 bit-vector solvers such as \cite{Boolector}) either provide only non-modular
 arithmetic operators, or are much more efficient when no modulo operation is
@@ -620,7 +616,7 @@ unsigned int f(unsigned int a, unsigned int b) {
 
 Downcasting an integer type to an unsigned type is a well-defined behavior,
 since the value is converted using a modulo operation just as for unsigned
-overflows (\cnn{} paragraph {6.3.1.3.2}). The \rte{} plug-in offers the
+overflows (\iso{6.3.1.3}{2}). The \rte{} plug-in offers the
 possibility to generate assertions preventing such occurrences of modular
 operations with the \lstinline|-warn-unsigned-downcast| option.
 
@@ -655,8 +651,8 @@ unsigned char f(int a, int b) {
 \section{Cast from floating-point to integer types}
 
 Casting a value from a real floating type to an integer type is
-allowed only if the value fits within the integer range (ISO C99
-paragraph \mbox{6.3.1.4}), the conversion being done with a truncation
+allowed only if the value fits within the integer range (\iso{6.3.1.4}{}),
+the conversion being done with a truncation
 towards zero semantics for the fractional part of the real floating
 value.  The \rte{} plug-in generates annotations that ensure that no
 undefined behavior can occur on such casts.
@@ -687,7 +683,7 @@ An expression which is the operand of a \lstinline|sizeof| (or
 \lstinline|__alignof|, a \gcc{} operator parsed by Cil) is ignored by \rte{}, as
 are all its sub-expressions.  This is an approximation, since the operand of
 \lstinline|sizeof| may sometimes be evaluated at runtime, for instance on
-variable sized arrays: see the example in \cnn{} paragraph \mbox{6.5.3.4.7}.
+variable sized arrays: see the example in \iso{6.5.4.4}{8}.
 Still, the transformation performed by Cil on the source code actually ends up
 with a statically evaluated \lstinline|sizeof| (see the example below).  Thus
 the approximation performed by \rte{} seems to be on the safe side.
@@ -747,16 +743,16 @@ Reading an uninitialized value can be an undefined behavior in the two following
 cases:
 
 \begin{itemize}
-\item \mbox{ISO C11 6.3.2.1}\footnote{here we use C11 as it is clearer than C99}
-      a variable whose address is never taken is read before being initialized,
+\item \iso{6.3.2.1}{1} a variable whose address is never taken is read before
+      being initialized,
 \item a memory location that has never been initialized is read and it happens
       that it was a trap representation for the type used for the access.
 \end{itemize}
 
 More generally, reading an uninitialized location always results in an
-indeterminate value (\mbox{6.7.9.10}). Such a value is either an unspecified
+indeterminate value (\iso{6.7.11}{11}). Such a value is either an unspecified
 value or a trap representation. Only reading a trap representation is an
-undefined behavior (\mbox{6.2.6.1.5}). It corresponds to the second case above.
+undefined behavior (\iso{6.2.6.1}{5}). It corresponds to the second case above.
 
 However for (most) types that do not have trap representation, reading an
 unspecified value is generally not a desirable behavior. Thus, \rte{} is
@@ -798,30 +794,19 @@ them.
 \section{Undefined behaviors not covered by \rte{}}
 
 One should be aware that \rte{} only covers a small subset of all possible
-undefined behaviors (see annex J.2 of \cite{standardc99} for a complete list).
+undefined behaviors (see annex J.2 of \cite{standardc23} for a complete list).
 
 In particular, undefined behaviors related to the following operations are not
 considered:
 
 \begin{itemize}
 \item Use of relational operators for the comparison of pointers that do not
-  point to the same aggregate or union (\cnn{} 6.5.8)
+  point to the same aggregate or union (\iso{6.5.9}{6})
 \item Demotion of a real floating type to a smaller floating type
-  producing a value outside of the representable range (\cnn{} 6.3.1.5)
+  producing a value outside of the representable range (\iso{6.3.1.5}{2})
 \item Conversion between two pointer types produces a result that is incorrectly
-  aligned (\cnn{} 6.3.2.3)
+  aligned (\iso{6.3.2.3}{7})
 \end{itemize}
-
-%% \Section{Others}
-%% ISO 6.3.1.3 / 6.3.1.4 / 6.3.1.5
-%% convert an integer type to another signed integer type that cannot represent its value: implementation defined.
-%% convert a real floating type to an integer: if the value of the integral part cannot be represented by the integer type, undefined.
-%% convert an integer to a real floating type :
-%% if the value being converted is outside the range of values that can be represented,
-%% undefined (does not happen with IEEE floating types, event if real floating = float and integer type = unsigned long long).
-%% If in range but not exact, round to nearest higher or nearest lower representable value (implementation defined).
-%% Value analysis rounds to nearest lower silently (?).
-%% demote a real floating type to another and procuce a value outside the range = undefined
 
 \chapter{Plug-in Options}
 
