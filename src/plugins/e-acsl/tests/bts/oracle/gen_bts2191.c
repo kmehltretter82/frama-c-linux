@@ -65,8 +65,6 @@ int main(int argc, char **argv)
                                                     sizeof(char),
                                                     (void *)_G[0].str,
                                                     (void *)(& _G[0].str));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"_G[0].str",
-                                   (void *)_G[0].str);
       __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,
                                      "sizeof(char)",0,sizeof(char));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
@@ -75,6 +73,8 @@ int main(int argc, char **argv)
       __gen_e_acsl_and = __gen_e_acsl_valid_read;
     }
     else __gen_e_acsl_and = 0;
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"_G[0].str",
+                                 (void *)_G[0].str);
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
     __gen_e_acsl_assert_data.pred_txt = "\\valid_read(_G[0].str)";

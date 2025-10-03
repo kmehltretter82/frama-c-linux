@@ -267,8 +267,6 @@ int main(int argc, char const **argv)
       __gen_e_acsl_valid_read_3 = __e_acsl_valid_read((void *)*p,
                                                       sizeof(char),
                                                       (void *)*p,(void *)p);
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"*p",
-                                   (void *)*p);
       __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
                                      "sizeof(char)",0,sizeof(char));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
@@ -277,6 +275,8 @@ int main(int argc, char const **argv)
       __gen_e_acsl_and_3 = __gen_e_acsl_valid_read_3;
     }
     else __gen_e_acsl_and_3 = 0;
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"*p",
+                                 (void *)*p);
     __gen_e_acsl_assert_data_2.blocking = 1;
     __gen_e_acsl_assert_data_2.kind = "Assertion";
     __gen_e_acsl_assert_data_2.pred_txt = "\\valid_read(*p)";

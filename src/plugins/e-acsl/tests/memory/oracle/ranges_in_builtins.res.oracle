@@ -1,4 +1,14 @@
 [e-acsl] beginning translation.
+[e-acsl] ranges_in_builtins.c:53: Warning: 
+  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
+[e-acsl] ranges_in_builtins.c:62: Warning: 
+  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
+[e-acsl] ranges_in_builtins.c:65: Warning: 
+  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
+[e-acsl] ranges_in_builtins.c:74: Warning: 
+  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
+[e-acsl] ranges_in_builtins.c:74: Warning: 
+  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
 [e-acsl] ranges_in_builtins.c:75: Warning: 
   E-ACSL construct `arithmetic over set of pointers or arrays'
   is not yet supported.

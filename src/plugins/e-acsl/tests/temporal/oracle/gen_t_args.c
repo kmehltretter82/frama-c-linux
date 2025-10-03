@@ -95,8 +95,6 @@ int main(int argc, char const **argv)
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
       __gen_e_acsl_valid_3 = __e_acsl_valid((void *)*argv,sizeof(char const),
                                             (void *)*argv,(void *)argv);
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"*argv",
-                                   (void *)*argv);
       __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_3,
                                      "sizeof(char const)",0,
                                      sizeof(char const));
@@ -105,6 +103,8 @@ int main(int argc, char const **argv)
       __gen_e_acsl_and = __gen_e_acsl_valid_3;
     }
     else __gen_e_acsl_and = 0;
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"*argv",
+                                 (void *)*argv);
     __gen_e_acsl_assert_data_3.blocking = 1;
     __gen_e_acsl_assert_data_3.kind = "Assertion";
     __gen_e_acsl_assert_data_3.pred_txt = "\\valid(*argv)";

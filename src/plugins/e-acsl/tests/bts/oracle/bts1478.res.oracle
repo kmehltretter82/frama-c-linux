@@ -1,2 +1,6 @@
 [e-acsl] beginning translation.
+[e-acsl] bts1478.c:10: Warning: 
+  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
+[e-acsl] bts1478.c:11: Warning: 
+  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".

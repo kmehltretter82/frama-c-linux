@@ -694,7 +694,7 @@ pid_t __gen_e_acsl_waitpid(pid_t pid, int *stat_loc, int options)
     __gen_e_acsl_assert_data.pred_txt = "\\false";
     __gen_e_acsl_assert_data.file = "FRAMAC_SHARE/libc/stdlib.h";
     __gen_e_acsl_assert_data.fct = "exit";
-    __gen_e_acsl_assert_data.line = 689;
+    __gen_e_acsl_assert_data.line = 753;
     __gen_e_acsl_assert_data.name = "never_terminates";
     __e_acsl_assert(0,& __gen_e_acsl_assert_data);
     return;
@@ -717,7 +717,7 @@ pid_t __gen_e_acsl_waitpid(pid_t pid, int *stat_loc, int options)
     __gen_e_acsl_assert_data.pred_txt = "\\false";
     __gen_e_acsl_assert_data.file = "FRAMAC_SHARE/libc/stdlib.h";
     __gen_e_acsl_assert_data.fct = "abort";
-    __gen_e_acsl_assert_data.line = 675;
+    __gen_e_acsl_assert_data.line = 739;
     __gen_e_acsl_assert_data.name = "never_terminates";
     __e_acsl_assert(0,& __gen_e_acsl_assert_data);
     return;
@@ -4697,6 +4697,7 @@ int main(int argc, char const **argv)
   {
     pid_t pid_251 = __gen_e_acsl_fork();
     if (! pid_251) {
+      /*@ assert Eva: pointer_alignment: \aligned(pstr,alignof(int)); */
       __e_acsl_builtin_printf("i","%n",(int *)pstr);
       __gen_e_acsl_exit(0);
     }

@@ -203,8 +203,6 @@ void *__gen_e_acsl_read_value(void *arg)
                                                     sizeof(int),
                                                     (void *)values[__gen_e_acsl_idx],
                                                     (void *)(& values[__gen_e_acsl_idx]));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"values[idx]",
-                                   (void *)values[__gen_e_acsl_idx]);
       __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,
                                      "sizeof(int)",0,sizeof(int));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
@@ -213,38 +211,38 @@ void *__gen_e_acsl_read_value(void *arg)
       __gen_e_acsl_and = __gen_e_acsl_valid_read;
     }
     else __gen_e_acsl_and = 0;
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"values[idx]",
+                                 (void *)values[__gen_e_acsl_idx]);
     if (__gen_e_acsl_and) {
       int __gen_e_acsl_initialized_2;
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
-        {.values = (void *)0};
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,
-                                   "__gen_e_acsl_idx",0,__gen_e_acsl_idx);
-      __gen_e_acsl_assert_data_4.blocking = 1;
-      __gen_e_acsl_assert_data_4.kind = "RTE";
-      __gen_e_acsl_assert_data_4.pred_txt = "__gen_e_acsl_idx < 10";
-      __gen_e_acsl_assert_data_4.file = "parallel_threads.c";
-      __gen_e_acsl_assert_data_4.fct = "read_value";
-      __gen_e_acsl_assert_data_4.line = 61;
-      __gen_e_acsl_assert_data_4.name = "index_bound";
-      __e_acsl_assert(__gen_e_acsl_idx < 10,& __gen_e_acsl_assert_data_4);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
         {.values = (void *)0};
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,
                                    "__gen_e_acsl_idx",0,__gen_e_acsl_idx);
       __gen_e_acsl_assert_data_5.blocking = 1;
       __gen_e_acsl_assert_data_5.kind = "RTE";
-      __gen_e_acsl_assert_data_5.pred_txt = "0 <= __gen_e_acsl_idx";
+      __gen_e_acsl_assert_data_5.pred_txt = "__gen_e_acsl_idx < 10";
       __gen_e_acsl_assert_data_5.file = "parallel_threads.c";
       __gen_e_acsl_assert_data_5.fct = "read_value";
       __gen_e_acsl_assert_data_5.line = 61;
       __gen_e_acsl_assert_data_5.name = "index_bound";
-      __e_acsl_assert(0 <= __gen_e_acsl_idx,& __gen_e_acsl_assert_data_5);
+      __e_acsl_assert(__gen_e_acsl_idx < 10,& __gen_e_acsl_assert_data_5);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
+        {.values = (void *)0};
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_6,
+                                   "__gen_e_acsl_idx",0,__gen_e_acsl_idx);
+      __gen_e_acsl_assert_data_6.blocking = 1;
+      __gen_e_acsl_assert_data_6.kind = "RTE";
+      __gen_e_acsl_assert_data_6.pred_txt = "0 <= __gen_e_acsl_idx";
+      __gen_e_acsl_assert_data_6.file = "parallel_threads.c";
+      __gen_e_acsl_assert_data_6.fct = "read_value";
+      __gen_e_acsl_assert_data_6.line = 61;
+      __gen_e_acsl_assert_data_6.name = "index_bound";
+      __e_acsl_assert(0 <= __gen_e_acsl_idx,& __gen_e_acsl_assert_data_6);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
       __gen_e_acsl_initialized_2 = __e_acsl_initialized((void *)values[__gen_e_acsl_idx],
                                                         sizeof(int));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"values[idx]",
-                                   (void *)values[__gen_e_acsl_idx]);
       __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,
                                      "sizeof(int)",0,sizeof(int));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
@@ -253,8 +251,8 @@ void *__gen_e_acsl_read_value(void *arg)
       __gen_e_acsl_and_2 = __gen_e_acsl_initialized_2;
     }
     else __gen_e_acsl_and_2 = 0;
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"*((int *)arg)",
-                                 0,*((int *)arg));
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"values[idx]",
+                                 (void *)values[__gen_e_acsl_idx]);
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Precondition";
     __gen_e_acsl_assert_data.pred_txt = "!(\\let idx = *((int *)arg);\n  \\valid_read(values[idx]) && \\initialized(values[idx]))";
@@ -330,8 +328,6 @@ void *__gen_e_acsl_write_value(void *arg)
                                           sizeof(int),
                                           (void *)values[__gen_e_acsl_idx],
                                           (void *)(& values[__gen_e_acsl_idx]));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"values[idx]",
-                                   (void *)values[__gen_e_acsl_idx]);
       __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,
                                      "sizeof(int)",0,sizeof(int));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
@@ -340,38 +336,38 @@ void *__gen_e_acsl_write_value(void *arg)
       __gen_e_acsl_and = __gen_e_acsl_valid;
     }
     else __gen_e_acsl_and = 0;
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"values[idx]",
+                                 (void *)values[__gen_e_acsl_idx]);
     if (__gen_e_acsl_and) {
       int __gen_e_acsl_initialized_2;
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
-        {.values = (void *)0};
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,
-                                   "__gen_e_acsl_idx",0,__gen_e_acsl_idx);
-      __gen_e_acsl_assert_data_4.blocking = 1;
-      __gen_e_acsl_assert_data_4.kind = "RTE";
-      __gen_e_acsl_assert_data_4.pred_txt = "__gen_e_acsl_idx < 10";
-      __gen_e_acsl_assert_data_4.file = "parallel_threads.c";
-      __gen_e_acsl_assert_data_4.fct = "write_value";
-      __gen_e_acsl_assert_data_4.line = 32;
-      __gen_e_acsl_assert_data_4.name = "index_bound";
-      __e_acsl_assert(__gen_e_acsl_idx < 10,& __gen_e_acsl_assert_data_4);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
         {.values = (void *)0};
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,
                                    "__gen_e_acsl_idx",0,__gen_e_acsl_idx);
       __gen_e_acsl_assert_data_5.blocking = 1;
       __gen_e_acsl_assert_data_5.kind = "RTE";
-      __gen_e_acsl_assert_data_5.pred_txt = "0 <= __gen_e_acsl_idx";
+      __gen_e_acsl_assert_data_5.pred_txt = "__gen_e_acsl_idx < 10";
       __gen_e_acsl_assert_data_5.file = "parallel_threads.c";
       __gen_e_acsl_assert_data_5.fct = "write_value";
       __gen_e_acsl_assert_data_5.line = 32;
       __gen_e_acsl_assert_data_5.name = "index_bound";
-      __e_acsl_assert(0 <= __gen_e_acsl_idx,& __gen_e_acsl_assert_data_5);
+      __e_acsl_assert(__gen_e_acsl_idx < 10,& __gen_e_acsl_assert_data_5);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
+        {.values = (void *)0};
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_6,
+                                   "__gen_e_acsl_idx",0,__gen_e_acsl_idx);
+      __gen_e_acsl_assert_data_6.blocking = 1;
+      __gen_e_acsl_assert_data_6.kind = "RTE";
+      __gen_e_acsl_assert_data_6.pred_txt = "0 <= __gen_e_acsl_idx";
+      __gen_e_acsl_assert_data_6.file = "parallel_threads.c";
+      __gen_e_acsl_assert_data_6.fct = "write_value";
+      __gen_e_acsl_assert_data_6.line = 32;
+      __gen_e_acsl_assert_data_6.name = "index_bound";
+      __e_acsl_assert(0 <= __gen_e_acsl_idx,& __gen_e_acsl_assert_data_6);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
       __gen_e_acsl_initialized_2 = __e_acsl_initialized((void *)values[__gen_e_acsl_idx],
                                                         sizeof(int));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"values[idx]",
-                                   (void *)values[__gen_e_acsl_idx]);
       __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,
                                      "sizeof(int)",0,sizeof(int));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
@@ -380,9 +376,8 @@ void *__gen_e_acsl_write_value(void *arg)
       __gen_e_acsl_and_2 = __gen_e_acsl_initialized_2;
     }
     else __gen_e_acsl_and_2 = 0;
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
-                                 "*((int *)\\old(arg))",0,
-                                 *((int *)__gen_e_acsl_at));
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"values[idx]",
+                                 (void *)values[__gen_e_acsl_idx]);
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Postcondition";
     __gen_e_acsl_assert_data.pred_txt = "\\let idx = *((int *)\\old(arg));\n\\valid(values[idx]) && \\initialized(values[idx])";
@@ -452,7 +447,7 @@ int __gen_e_acsl_usleep(useconds_t usec)
     __gen_e_acsl_assert_data.pred_txt = "\\false";
     __gen_e_acsl_assert_data.file = "FRAMAC_SHARE/libc/stdlib.h";
     __gen_e_acsl_assert_data.fct = "exit";
-    __gen_e_acsl_assert_data.line = 689;
+    __gen_e_acsl_assert_data.line = 753;
     __gen_e_acsl_assert_data.name = "never_terminates";
     __e_acsl_assert(0,& __gen_e_acsl_assert_data);
     __e_acsl_delete_block((void *)(& status));
@@ -957,7 +952,6 @@ int __gen_e_acsl_pthread_create(pthread_t * restrict thread,
       int __gen_e_acsl_valid_2;
       __gen_e_acsl_valid_2 = __e_acsl_valid(arg,sizeof(char),arg,
                                             (void *)(& arg));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,"arg",arg);
       __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_4,
                                      "sizeof(char)",0,sizeof(char));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,
@@ -965,6 +959,7 @@ int __gen_e_acsl_pthread_create(pthread_t * restrict thread,
                                    __gen_e_acsl_valid_2);
       __gen_e_acsl_or_2 = __gen_e_acsl_valid_2;
     }
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,"arg",arg);
     __gen_e_acsl_assert_data_4.blocking = 1;
     __gen_e_acsl_assert_data_4.kind = "Precondition";
     __gen_e_acsl_assert_data_4.pred_txt = "arg == \\null || \\valid((char *)arg)";
@@ -981,19 +976,19 @@ int __gen_e_acsl_pthread_create(pthread_t * restrict thread,
     int __gen_e_acsl_or_3;
     int __gen_e_acsl_or_4;
     int __gen_e_acsl_or_5;
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
       {.values = (void *)0};
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,"\\result",0,
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_6,"\\result",0,
                                  __retres);
     if (__retres == 0) {
       int __gen_e_acsl_initialized;
       __gen_e_acsl_initialized = __e_acsl_initialized((void *)__gen_e_acsl_at,
                                                       sizeof(pthread_t));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_5,
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_6,
                                    "\\old(thread)",(void *)__gen_e_acsl_at);
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_5,
+      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_6,
                                      "sizeof(pthread_t)",0,sizeof(pthread_t));
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_6,
                                    "\\initialized(\\old(thread))",0,
                                    __gen_e_acsl_initialized);
       __gen_e_acsl_and = __gen_e_acsl_initialized;
@@ -1001,31 +996,31 @@ int __gen_e_acsl_pthread_create(pthread_t * restrict thread,
     else __gen_e_acsl_and = 0;
     if (__gen_e_acsl_and) __gen_e_acsl_or_3 = 1;
     else {
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,"\\result",0,
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_6,"\\result",0,
                                    __retres);
       __gen_e_acsl_or_3 = __retres == 11;
     }
     if (__gen_e_acsl_or_3) __gen_e_acsl_or_4 = 1;
     else {
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,"\\result",0,
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_6,"\\result",0,
                                    __retres);
       __gen_e_acsl_or_4 = __retres == 22;
     }
     if (__gen_e_acsl_or_4) __gen_e_acsl_or_5 = 1;
     else {
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,"\\result",0,
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_6,"\\result",0,
                                    __retres);
       __gen_e_acsl_or_5 = __retres == 1;
     }
-    __gen_e_acsl_assert_data_5.blocking = 1;
-    __gen_e_acsl_assert_data_5.kind = "Postcondition";
-    __gen_e_acsl_assert_data_5.pred_txt = "(\\result == 0 && \\initialized(\\old(thread))) || \\result == 11 ||\n\\result == 22 || \\result == 1";
-    __gen_e_acsl_assert_data_5.file = "FRAMAC_SHARE/libc/pthread.h";
-    __gen_e_acsl_assert_data_5.fct = "pthread_create";
-    __gen_e_acsl_assert_data_5.line = 354;
-    __gen_e_acsl_assert_data_5.name = "initialization/success_or_error";
-    __e_acsl_assert(__gen_e_acsl_or_5,& __gen_e_acsl_assert_data_5);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
+    __gen_e_acsl_assert_data_6.blocking = 1;
+    __gen_e_acsl_assert_data_6.kind = "Postcondition";
+    __gen_e_acsl_assert_data_6.pred_txt = "(\\result == 0 && \\initialized(\\old(thread))) || \\result == 11 ||\n\\result == 22 || \\result == 1";
+    __gen_e_acsl_assert_data_6.file = "FRAMAC_SHARE/libc/pthread.h";
+    __gen_e_acsl_assert_data_6.fct = "pthread_create";
+    __gen_e_acsl_assert_data_6.line = 354;
+    __gen_e_acsl_assert_data_6.name = "initialization/success_or_error";
+    __e_acsl_assert(__gen_e_acsl_or_5,& __gen_e_acsl_assert_data_6);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
     __e_acsl_delete_block((void *)(& arg));
     __e_acsl_delete_block((void *)(& start_routine));
     __e_acsl_delete_block((void *)(& attr));

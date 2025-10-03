@@ -122,9 +122,6 @@ int main(void)
                                           sizeof(int),
                                           (void *)(& (d2.p[1])->arr[0]),
                                           (void *)0);
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,
-                                 "&(d2.p[1])->arr[2]",
-                                 (void *)(& (d2.p[1])->arr[2]));
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_4,
                                    "sizeof(int)",0,sizeof(int));
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,

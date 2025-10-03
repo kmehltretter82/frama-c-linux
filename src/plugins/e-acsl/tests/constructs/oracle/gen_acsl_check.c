@@ -52,9 +52,6 @@ void g(int a, int *b)
     __gen_e_acsl_assert_data_3.name = "mem_access";
     __e_acsl_assert(__gen_e_acsl_valid_read,& __gen_e_acsl_assert_data_3);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"a",0,a);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"*(b + 1)",0,
-                                 *(b + 1));
     __gen_e_acsl_assert_data.blocking = 0;
     __gen_e_acsl_assert_data.kind = "Assertion";
     __gen_e_acsl_assert_data.pred_txt = "a / *(b + 1) == 0";

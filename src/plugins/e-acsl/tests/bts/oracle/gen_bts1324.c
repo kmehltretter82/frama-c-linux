@@ -100,29 +100,29 @@ int __gen_e_acsl_sorted(int *t, int n)
         __gen_e_acsl_assert_data.name = "mem_access";
         __e_acsl_assert(__gen_e_acsl_valid_read,& __gen_e_acsl_assert_data);
         __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
-        __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+        __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
           {.values = (void *)0};
         __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)(t + (
                                                                  __gen_e_acsl_i - 1L)),
                                                         sizeof(int),
                                                         (void *)t,
                                                         (void *)(& t));
-        __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"t",
+        __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"t",
                                      (void *)t);
-        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,
                                      "__gen_e_acsl_i",0,__gen_e_acsl_i);
-        __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
+        __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_3,
                                        "sizeof(int)",0,sizeof(int));
-        __gen_e_acsl_assert_data_2.blocking = 1;
-        __gen_e_acsl_assert_data_2.kind = "RTE";
-        __gen_e_acsl_assert_data_2.pred_txt = "\\valid_read(t + (long)(__gen_e_acsl_i - 1))";
-        __gen_e_acsl_assert_data_2.file = "bts1324.i";
-        __gen_e_acsl_assert_data_2.fct = "sorted";
-        __gen_e_acsl_assert_data_2.line = 6;
-        __gen_e_acsl_assert_data_2.name = "mem_access";
+        __gen_e_acsl_assert_data_3.blocking = 1;
+        __gen_e_acsl_assert_data_3.kind = "RTE";
+        __gen_e_acsl_assert_data_3.pred_txt = "\\valid_read(t + (long)(__gen_e_acsl_i - 1))";
+        __gen_e_acsl_assert_data_3.file = "bts1324.i";
+        __gen_e_acsl_assert_data_3.fct = "sorted";
+        __gen_e_acsl_assert_data_3.line = 6;
+        __gen_e_acsl_assert_data_3.name = "mem_access";
         __e_acsl_assert(__gen_e_acsl_valid_read_2,
-                        & __gen_e_acsl_assert_data_2);
-        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
+                        & __gen_e_acsl_assert_data_3);
+        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
         if (*(t + (__gen_e_acsl_i - 1L)) <= *(t + __gen_e_acsl_i)) ;
         else {
           __gen_e_acsl_forall = 0;
@@ -141,19 +141,19 @@ int __gen_e_acsl_sorted(int *t, int n)
     __gen_e_acsl_assumes_value = __e_acsl_contract_get_behavior_assumes
     ((__e_acsl_contract_t const *)__gen_e_acsl_contract,0UL);
     if (__gen_e_acsl_assumes_value) {
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
         {.values = (void *)0};
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,"\\result",0,
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,"\\result",0,
                                    __retres);
-      __gen_e_acsl_assert_data_3.blocking = 1;
-      __gen_e_acsl_assert_data_3.kind = "Postcondition";
-      __gen_e_acsl_assert_data_3.pred_txt = "\\result == 1";
-      __gen_e_acsl_assert_data_3.file = "bts1324.i";
-      __gen_e_acsl_assert_data_3.fct = "sorted";
-      __gen_e_acsl_assert_data_3.line = 7;
-      __gen_e_acsl_assert_data_3.name = "yes";
-      __e_acsl_assert(__retres == 1,& __gen_e_acsl_assert_data_3);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
+      __gen_e_acsl_assert_data_5.blocking = 1;
+      __gen_e_acsl_assert_data_5.kind = "Postcondition";
+      __gen_e_acsl_assert_data_5.pred_txt = "\\result == 1";
+      __gen_e_acsl_assert_data_5.file = "bts1324.i";
+      __gen_e_acsl_assert_data_5.fct = "sorted";
+      __gen_e_acsl_assert_data_5.line = 7;
+      __gen_e_acsl_assert_data_5.name = "yes";
+      __e_acsl_assert(__retres == 1,& __gen_e_acsl_assert_data_5);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
     }
     __e_acsl_contract_clean(__gen_e_acsl_contract);
     __e_acsl_delete_block((void *)(& t));

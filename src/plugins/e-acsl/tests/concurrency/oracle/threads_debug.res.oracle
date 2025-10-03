@@ -6,14 +6,32 @@
 [e-acsl] Warning: annotating undefined function `pthread_cond_init':
   the generated program may miss memory instrumentation
   if there are memory-related annotations.
+[e-acsl] parallel_threads.c:82: Warning: 
+  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
+[e-acsl] parallel_threads.c:82: Warning: 
+  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
+[e-acsl] parallel_threads.c:85: Warning: 
+  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
+[e-acsl] parallel_threads.c:85: Warning: 
+  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
+[e-acsl] parallel_threads.c:85: Warning: 
+  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
+[e-acsl] parallel_threads.c:61: Warning: 
+  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
+[e-acsl] parallel_threads.c:61: Warning: 
+  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
+[e-acsl] parallel_threads.c:32: Warning: 
+  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
+[e-acsl] parallel_threads.c:32: Warning: 
+  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/unistd.h:1295: Warning: 
   E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:685: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:749: Warning: 
   E-ACSL construct `terminates clause' is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:685: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:749: Warning: 
   E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:688: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:752: Warning: 
   E-ACSL construct `abnormal termination case in behavior'
   is not yet supported.
   Ignoring annotation.
@@ -39,6 +57,8 @@
   E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/pthread.h:349: Warning: 
   E-ACSL construct `\valid_function' is not yet supported. Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/pthread.h:350: Warning: 
+  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/pthread.h:347: Warning: 
   E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/pthread.h:309: Warning: 

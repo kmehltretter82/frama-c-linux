@@ -47,8 +47,6 @@ void f(void const *s, int c, unsigned long n)
   {
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
       {.values = (void *)0};
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"p",(void *)p);
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"s",(void *)s);
     __gen_e_acsl_assert_data_2.blocking = 1;
     __gen_e_acsl_assert_data_2.kind = "Assertion";
     __gen_e_acsl_assert_data_2.pred_txt = "p - (unsigned char const *)s == 0";

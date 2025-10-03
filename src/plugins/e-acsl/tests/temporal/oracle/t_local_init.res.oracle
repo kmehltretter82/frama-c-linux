@@ -1,2 +1,10 @@
 [e-acsl] beginning translation.
+[e-acsl] t_local_init.c:36: Warning: 
+  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
+[e-acsl] t_local_init.c:43: Warning: 
+  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
+[e-acsl] t_local_init.c:48: Warning: 
+  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
+[e-acsl] t_local_init.c:53: Warning: 
+  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".

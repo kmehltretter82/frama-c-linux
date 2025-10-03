@@ -1,2 +1,6 @@
 [e-acsl] beginning translation.
+[e-acsl] offset.c:15: Warning: 
+  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
+[e-acsl] offset.c:17: Warning: 
+  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".

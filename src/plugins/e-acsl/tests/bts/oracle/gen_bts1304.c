@@ -26,7 +26,9 @@ union msg {
 void read_sensor_4(unsigned int *m)
 {
   __e_acsl_store_block((void *)(& m),8UL);
+  /*@ assert Eva: pointer_alignment: \aligned(m,alignof(unsigned int)); */
   __e_acsl_initialize((void *)m,sizeof(unsigned int));
+  /*@ assert Eva: pointer_alignment: \aligned(m,alignof(unsigned int)); */
   *m = (unsigned int)0;
   __e_acsl_delete_block((void *)(& m));
   return;
@@ -41,6 +43,10 @@ int main(void)
   __e_acsl_store_block((void *)(buf),16UL);
   i = 0;
   while ((unsigned long)i < sizeof(buf) / (unsigned long)4) {
+    /*@ assert
+          Eva: pointer_alignment:
+            \aligned((unsigned char *)buf,alignof(unsigned int));
+    */
     read_sensor_4((unsigned int *)(buf) + i);
     i ++;
   }
@@ -49,8 +55,6 @@ int main(void)
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __gen_e_acsl_initialized = __e_acsl_initialized((void *)(buf),
                                                     sizeof(union msg));
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,
-                                 "(unsigned char *)buf",(void *)(buf));
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,
                                    "sizeof(union msg)",0,sizeof(union msg));
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,

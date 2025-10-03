@@ -1,2 +1,11 @@
 [e-acsl] beginning translation.
+[e-acsl] bts1304.i:32: Warning: 
+  E-ACSL construct `\aligned' is not yet supported. Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
+[eva:alarm] bts1304.i:31: Warning: 
+  unaligned pointer creation.
+  assert \aligned((unsigned char *)buf,alignof(unsigned int));
+[eva:alarm] bts1304.i:24: Warning: 
+  unaligned pointer creation. assert \aligned(m,alignof(unsigned int));
+[eva:alarm] bts1304.i:24: Warning: 
+  unaligned pointer creation. assert \aligned(m,alignof(unsigned int));
