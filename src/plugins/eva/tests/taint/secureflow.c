@@ -192,7 +192,7 @@ void f7(void) {
   /*@ assert security_status(x) == public; */
   /*@ assert security_status(y) == public; */
 
-  /*@ assert security_status(array) == public; */
+  /*@ assert public == security_status(array); */
   array[secret] = 1;
   /*@ assert security_status(array) == private; */
   /*@ assert security_status(array[0]) == private; */
@@ -205,6 +205,16 @@ void f7(void) {
   /*@ assert security_status(*p) == private; */
 }
 
+extern unsigned int non_secret;
+
+unsigned int add(unsigned int x, unsigned int y) { return x + y; }
+
+void f8(void) {
+  unsigned int sum = add(secret, non_secret);
+  /*@ assert private == security_status(sum) ||
+             public ==  security_status(sum); */
+}
+
 int main(void) {
   f1();
   f2();
@@ -213,5 +223,6 @@ int main(void) {
   f5();
   f6();
   f7();
+  f8();
   return 0;
 }

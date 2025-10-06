@@ -15,8 +15,9 @@
   funcs[0].f ∈ {{ &write_z }}
        [1].f ∈ {{ &write_w }}
   array[0..511] ∈ {0}
+  non_secret ∈ [--..--]
 [eva] computing for function f1 <- main.
-  Called from secureflow.c:209.
+  Called from secureflow.c:219.
 [eva:secure-flow:direct] secureflow.c:16: Warning: 
   interference on: global_key[0]
 [eva:partition] secureflow.c:15: starting to merge loop iterations
@@ -31,7 +32,7 @@
 [eva] Recording results for f1
 [eva] Done for function f1
 [eva] computing for function f2 <- main.
-  Called from secureflow.c:210.
+  Called from secureflow.c:220.
 [eva:secure-flow:condition] secureflow.c:28: Warning: 
   assume condition involving private data: secret
 [eva] secureflow.c:29: check got status valid.
@@ -49,7 +50,7 @@
 [eva] Recording results for f2
 [eva] Done for function f2
 [eva] computing for function f3 <- main.
-  Called from secureflow.c:211.
+  Called from secureflow.c:221.
 [eva] secureflow.c:52: check got status valid.
 [eva] secureflow.c:53: check got status valid.
 [eva] secureflow.c:54: check got status valid.
@@ -64,7 +65,7 @@
 [eva] Recording results for f3
 [eva] Done for function f3
 [eva] computing for function f4 <- main.
-  Called from secureflow.c:212.
+  Called from secureflow.c:222.
 [eva:secure-flow:condition] secureflow.c:74: Warning: 
   assume condition involving private data: secret; user_input
 [eva:secure-flow:indirect] secureflow.c:75: Warning: interference on: y
@@ -80,7 +81,7 @@
 [eva] Recording results for f4
 [eva] Done for function f4
 [eva] computing for function f5 <- main.
-  Called from secureflow.c:213.
+  Called from secureflow.c:223.
 [eva] secureflow.c:110: check got status valid.
 [eva] secureflow.c:111: check got status valid.
 [eva:secure-flow:condition] secureflow.c:113: Warning: 
@@ -109,7 +110,7 @@
 [eva] Recording results for f5
 [eva] Done for function f5
 [eva] computing for function f6 <- main.
-  Called from secureflow.c:214.
+  Called from secureflow.c:224.
 [eva] computing for function write_z <- f6 <- main.
   Called from secureflow.c:148.
 [eva:secure-flow:direct] secureflow.c:137: Warning: interference on: z
@@ -128,7 +129,7 @@
 [eva] Recording results for f6
 [eva] Done for function f6
 [eva] computing for function f7 <- main.
-  Called from secureflow.c:215.
+  Called from secureflow.c:225.
 [eva] secureflow.c:173: assertion got status valid.
 [eva] secureflow.c:174: assertion got status valid.
 [eva] secureflow.c:175: assertion got status valid.
@@ -156,10 +157,21 @@
 [eva:alarm] secureflow.c:205: Warning: assertion got status unknown.
 [eva] Recording results for f7
 [eva] Done for function f7
+[eva] computing for function f8 <- main.
+  Called from secureflow.c:226.
+[eva] computing for function add <- f8 <- main.
+  Called from secureflow.c:213.
+[eva] Recording results for add
+[eva] Done for function add
+[eva:alarm] secureflow.c:214: Warning: assertion got status unknown.
+[eva] Recording results for f8
+[eva] Done for function f8
 [eva] Recording results for main
 [eva] Done for function main
 [scope:rm_asserts] removing 3 assertion(s)
 [eva] ====== VALUES COMPUTED ======
+[eva:final-states] Values at end of function add:
+  __retres ∈ [--..--]
 [eva:final-states] Values at end of function f1:
   global_key[0..4] ∈ [--..--]
   local_key[0..4] ∈ [--..--]
@@ -194,6 +206,8 @@
            [1] ∈ {{ &y_0 }}
   secret_idx ∈ {0; 1}
   p ∈ {{ &array[0] }}
+[eva:final-states] Values at end of function f8:
+  sum ∈ [--..--]
 [eva:final-states] Values at end of function write_w:
   w ∈ {42}
 [eva:final-states] Values at end of function write_x:
@@ -220,6 +234,8 @@
   w ∈ {42}
   array[0..511] ∈ {0; 1}
   __retres ∈ {0}
+[from] Computing for function add
+[from] Done for function add
 [from] Computing for function f1
 [from] Done for function f1
 [from] Computing for function f2
@@ -232,6 +248,8 @@
 [from] Done for function f4
 [from] Computing for function f7
 [from] Done for function f7
+[from] Computing for function f8
+[from] Done for function f8
 [from] Computing for function write_w
 [from] Done for function write_w
 [from] Computing for function write_x
@@ -248,6 +266,8 @@
 [from] Done for function main
 [from] ====== DEPENDENCIES COMPUTED ======
   These dependencies hold at termination for the executions that terminate:
+[from] Function add:
+  \result FROM x_0; y_0
 [from] Function assigns_from:
   \result FROM x; zero; one
 [from] Function f1:
@@ -263,6 +283,8 @@
 [from] Function f7:
   array[0..1] FROM secret; array[0..511] (and SELF)
        [2..511] FROM secret (and SELF)
+[from] Function f8:
+  NO EFFECTS
 [from] Function write_w:
   w FROM w_arg
 [from] Function write_x:
@@ -286,6 +308,10 @@
        [2..511] FROM secret (and SELF)
   \result FROM \nothing
 [from] ====== END OF DEPENDENCIES ======
+[inout] Out (internal) for function add:
+    __retres
+[inout] Inputs for function add:
+    \nothing
 [inout] Out (internal) for function f1:
     global_key[0..4]; local_key[0..4]; i
 [inout] Inputs for function f1:
@@ -306,6 +332,10 @@
     array[0..511]; x_0; y_0; z_0; ptr_array[0..1]; secret_idx; p
 [inout] Inputs for function f7:
     secret; array[0..511]
+[inout] Out (internal) for function f8:
+    sum
+[inout] Inputs for function f8:
+    secret; non_secret
 [inout] Out (internal) for function write_w:
     w
 [inout] Inputs for function write_w:
@@ -333,4 +363,5 @@
 [inout] Out (internal) for function main:
     global_key[0..4]; x; y; z; w; array[0..511]; __retres
 [inout] Inputs for function main:
-    secret; extern_data[0..4]; user_input; w; funcs[0..1]; array[0..511]
+    secret; extern_data[0..4]; user_input; w; funcs[0..1]; array[0..511];
+    non_secret

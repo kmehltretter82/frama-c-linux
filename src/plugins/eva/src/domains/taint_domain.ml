@@ -1018,7 +1018,7 @@ module TaintLogic = struct
       end
     | _ -> state
 
-  let evaluate_tainted_term cvalue_env zone term =
+  let evaluate_taint_term cvalue_env zone term =
     match eval_term_zone cvalue_env term with
     | None -> Alarmset.Unknown
     | Some (_under, over) ->
@@ -1046,7 +1046,25 @@ module TaintLogic = struct
       | "\\tainted_indirectly" -> state.locs_control
       | "\\tainted" | _ -> Zone.join state.locs_data state.locs_control
     in
-    evaluate_tainted_term cvalue_env zone term
+    evaluate_taint_term cvalue_env zone term
+
+  let evaluate_security_status_predicate cvalue_env state arg t =
+    let state =
+      match state with
+      | `Top ->
+        LatticeSingleTaint.top
+      | `Value state_map ->
+        LatticeMultiTaint.find_or_empty private_taint_namespace state_map
+    in
+    let zone = Zone.join state.locs_data state.locs_control in
+    match t.term_node with
+    | TLval (TVar {lv_name}, TNoOffset)
+      when String.equal lv_name private_taint_namespace ->
+      evaluate_taint_term cvalue_env zone arg
+    | TLval (TVar {lv_name}, TNoOffset)
+      when String.equal lv_name public_taint_namespace ->
+      Abstract_interp.inv_truth @@ evaluate_taint_term cvalue_env zone arg
+    | _ -> Unknown
 
   let evaluate_predicate cvalue_env state predicate =
     let rec evaluate predicate =
@@ -1058,26 +1076,17 @@ module TaintLogic = struct
             evaluate_taint_predicate cvalue_env state lv_name arg
           | _ -> Unknown
         end
-      | Prel (Req, {term_node = Tapp (f, _, [arg])}, t)
-        when f.l_var_info.lv_name = lf_name_security_status ->
-        begin
-          match t.term_node with
-          | TLval (TVar {lv_name}, TNoOffset)
-            when String.equal lv_name public_taint_namespace
-              || String.equal lv_name private_taint_namespace ->
-            let state =
-              match state with
-              | `Top -> LatticeSingleTaint.top
-              | `Value state_map ->
-                LatticeMultiTaint.find_or_empty private_taint_namespace
-                  state_map
-            in
-            let zone = Zone.join state.locs_data state.locs_control in
-            (if lv_name = public_taint_namespace
-             then Abstract_interp.inv_truth else Fun.id) @@
-            evaluate_tainted_term cvalue_env zone arg
-          | _ -> Unknown
-        end
+      | Prel (Req | Rneq as rop, {term_node = Tapp (f, _, [arg])}, t)
+      | Prel (Req | Rneq as rop, t, {term_node = Tapp (f, _, [arg])}) ->
+        if String.equal f.l_var_info.lv_name lf_name_security_status then
+          let op_truth =
+            match rop with
+            | Req -> Fun.id
+            | Rneq -> Abstract_interp.inv_truth
+            | _ -> assert false
+          in
+          op_truth @@ evaluate_security_status_predicate cvalue_env state arg t
+        else Unknown
       | Ptrue -> True
       | Pfalse -> False
       | Pand (p1, p2) ->
