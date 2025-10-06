@@ -35,10 +35,6 @@ let two_power n =
   else
     two_power_of_int k
 
-let power_int_positive_int_opt n e =
-  try Some (Big_int_Z.power_int_positive_int n e)
-  with Invalid_argument _ -> None
-
 (* We redefine shifts to operate on t instead of int. *)
 let shift_left_z x y = shift_left x (to_int y)
 let shift_right_z x y = shift_right x (to_int y)
@@ -235,3 +231,7 @@ let ppcm = lcm
 let to_int_exn = to_int
 let to_int32_exn = to_int32
 let to_int64_exn = to_int64
+
+let power_int_positive_int_opt n e =
+  try Some (Big_int_Z.power_int_positive_int n e)
+  with Invalid_argument _ -> None

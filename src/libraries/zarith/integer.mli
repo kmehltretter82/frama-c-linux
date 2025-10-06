@@ -109,9 +109,6 @@ val two_power : t -> t
 val two_power_of_int : int -> t
 (** Computes [2^n]. *)
 
-val power_int_positive_int_opt : int -> int -> t option
-(** Exponentiation *)
-
 val shift_left_z : t -> t -> t
 (** Convert the second argument via {!of_int} then call {!shift_left}.
     @since Frama-C+dev
@@ -303,3 +300,11 @@ val to_int32_exn : t -> int32
 val to_int64_exn : t -> int64
 [@@deprecated "Use to_int64 instead."]
 [@@migrate { repl = Rel.to_int64 } ]
+
+val power_int_positive_int_opt : int -> int -> t option
+(** Exponentiation *)
+[@@deprecated "Use Big_int_Z.power_int_positive_int instead."]
+[@@migrate { repl = (fun x y ->
+    try Some (Big_int_Z.power_int_positive_int x y)
+    with Invalid_argument _ -> None)
+  } ]
