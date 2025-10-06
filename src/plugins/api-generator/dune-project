@@ -7,5 +7,5 @@
 ;;                                                                        ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(name frama-c-api-generator)
+(name frama-c-api_generator)
 (using dune_site 0.1)
