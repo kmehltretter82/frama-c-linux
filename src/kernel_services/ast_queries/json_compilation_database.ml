@@ -283,7 +283,7 @@ let parse_compilation_entry jcdb_dir r =
 let compute_flags_from_file () =
   let database = Kernel.CompilationDb.get () in
   let jcdb_dir, jcdb_path =
-    if Filesystem.is_dir database then
+    if Filesystem.dir_exists database then
       database, Filepath.(database / "compile_commands.json")
     else Filepath.dirname database, database
   in

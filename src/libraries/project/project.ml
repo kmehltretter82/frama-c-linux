@@ -444,7 +444,7 @@ let temp_file ~prefix ~suffix =
     let file = Filesystem.temp_file ~prefix ~suffix in
     Extlib.safe_at_exit (fun () -> Filesystem.remove_file file);
     file
-  with Filesystem.Temp_file_error s ->
+  with Sys_error s ->
     abort "cannot create temporary file: %s" s
 
 let save_projects ?compress selection projects (filename : Filepath.t) =

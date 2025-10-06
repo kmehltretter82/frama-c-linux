@@ -17,8 +17,8 @@ let output format context filename =
   Self.result "output to %a" Filepath.pretty filename;
   match Filesystem.with_open_out filename output_function with
   | Ok () -> ()
-  | Error error ->
-    Self.warning "failed to output graph: %s" error
+  | Error (msg, _) ->
+    Self.warning "failed to output graph: %s" msg
 
 let main () =
   if not (Self.FromBases.is_empty () &&

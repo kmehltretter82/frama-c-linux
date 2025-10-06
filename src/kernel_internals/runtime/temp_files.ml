@@ -18,7 +18,7 @@ let file ?keep ~prefix ~suffix () =
   let file =
     try
       temp_file ~prefix ~suffix
-    with Filesystem.Temp_file_error s ->
+    with Sys_error s ->
       Kernel.abort "Cannot open temporary file: %s" s
   in
   Extlib.safe_at_exit
@@ -34,7 +34,7 @@ let dir ?keep ~prefix ~suffix () =
   let dir =
     try
       temp_dir ~prefix ~suffix
-    with Filesystem.Temp_file_error s ->
+    with Sys_error s ->
       Kernel.abort "Cannot create temporary dir: %s" s
   in
   Extlib.safe_at_exit

@@ -56,9 +56,9 @@ let is_session_dir path =
 let get_usable_dir ?(make=false) () =
   let path = CACHEDIR.get () in
   let parents = is_session_dir path in
-  if not (Filesystem.exists path) && make then
-    ignore (Filesystem.make_dir ~parents path 0o755);
-  if not (Filesystem.is_dir path) then begin
+  if make then
+    Filesystem.make_dir ~parents path;
+  if not (Filesystem.dir_exists path) then begin
     Wp_parameters.warning ~current:false ~once:true
       "Cache path %a is not a directory"
       Filepath.pretty path;
@@ -226,7 +226,7 @@ let cleanup_cache () =
                  end
           ) dir ;
     with
-    | Unix.Unix_error _ as exn ->
+    | Sys_error _ as exn ->
       Wp_parameters.warning ~current:false
         "Can not cleanup cache (%s)" (Printexc.to_string exn)
     | Not_found ->

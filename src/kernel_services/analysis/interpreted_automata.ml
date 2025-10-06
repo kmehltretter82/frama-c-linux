@@ -1345,9 +1345,9 @@ struct
     let to_dot_file pp_value result filepath =
       match Filesystem.with_open_out filepath (to_dot_output pp_value result) with
       | Ok () -> ()
-      | Error error ->
+      | Error (msg, _) ->
         Kernel.warning "cannot output automaton to dot file %a: %s"
-          Filepath.pretty filepath error
+          Filepath.pretty filepath msg
 
     let as_table (_automaton,_wto,states) =
       states

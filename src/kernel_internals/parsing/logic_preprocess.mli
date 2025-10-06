@@ -17,7 +17,9 @@
     to the name of intermediate files generated for preprocessing annotations
     (gcc preprocessing differs between .c and .cxx files)
 
-    @raises Sys_error if the file cannot be opened.
+    @raises Sys_error if the file cannot be opened or read.
 *)
 
-val file: string -> (Filepath.t -> Filepath.t -> string) -> string -> Filepath.t
+val file:
+  string -> (Filepath.t -> Filepath.t -> string) ->
+  Filepath.t -> Filepath.t

@@ -182,7 +182,7 @@ let run () =
   in
   (* here, db_path exists (checked by Filepath constructor) *)
   let adjusted_db_path =
-    if Filesystem.is_dir db_path then
+    if Filesystem.dir_exists db_path then
       let new_path = Filepath.(db_path / "mopsa-db.json") in
       if Filesystem.exists new_path then new_path
       else

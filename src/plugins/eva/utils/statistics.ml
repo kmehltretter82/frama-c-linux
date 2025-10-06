@@ -290,8 +290,8 @@ let export_as_csv_to_channel out_channel =
 let export_as_csv_to_file filename =
   match Filesystem.with_open_out filename export_as_csv_to_channel with
   | Ok () -> ()
-  | Error error ->
-    Self.warning "failed to output statistics: %s" error
+  | Error (msg, _) ->
+    Self.warning "failed to output statistics: %s" msg
 
 let export_as_csv ?filename () =
   match filename with

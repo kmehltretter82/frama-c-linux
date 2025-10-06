@@ -313,7 +313,7 @@ let metadata page : json =
 
 let pp_one_page ~root ~page ~title body =
   let full_path = Filepath.(root / page) in
-  ignore (Filesystem.make_dir ~parents:true (Filepath.dirname full_path) 0o755);
+  Filesystem.make_dir (Filepath.dirname full_path);
   try
     let chan = open_out (Filepath.to_string_abs full_path) in
     let fmt = Format.formatter_of_out_channel chan in
@@ -371,7 +371,7 @@ let () =
     fun () ->
       if not (Senv.Doc.is_empty ()) then
         let root = Senv.Doc.get () in
-        if Filesystem.is_dir root then
+        if Filesystem.dir_exists root then
           begin
             Senv.feedback "[doc] Root: '%a'" Filepath.pretty root ;
             Package.iter package ;

@@ -734,7 +734,7 @@ module Html = struct
       page_table, PageTable.add page_table, PageTable.find page_table
     in
 
-    (try Filesystem.make_dir default_dir 0o777 |> ignore with _ -> ());
+    (try Filesystem.make_dir default_dir with _ -> ());
 
     let main_page = mk_html_page "Summary" main_page_name in
     (* Initialize one page with a buffer, a link name, a formatter

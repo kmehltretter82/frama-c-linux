@@ -171,7 +171,7 @@ let get_marks_dir ~force =
 
 let remove_marks ~dry =
   let marks = get_marks_dir ~force:false in
-  if Filesystem.exists marks && Filesystem.is_dir marks then
+  if Filesystem.dir_exists marks then
     if dry
     then Wp_parameters.feedback "[dry] remove marks"
     else Filesystem.remove_dir marks
@@ -182,7 +182,7 @@ let reset_marks () =
 
 let mark goal =
   let marks = get_marks_dir ~force:false in
-  if Filesystem.exists marks && Filesystem.is_dir marks then
+  if Filesystem.dir_exists marks then
     let mark = Filepath.(marks / (goal.po_sid ^ ".json")) in
     if Filesystem.exists mark then ()
     else close_out @@ open_out (Filepath.to_string_abs mark)
@@ -191,9 +191,9 @@ module StringSet = Datatype.String.Set
 
 let remove_unmarked_files ~dry =
   let dir = get_script_dir ~force:false in
-  if Filesystem.exists dir && Filesystem.is_dir dir then
+  if Filesystem.dir_exists dir then
     let marks = get_marks_dir ~force:false in
-    if Filesystem.exists marks && Filesystem.is_dir marks then
+    if Filesystem.dir_exists marks then
       begin
         let files = Filesystem.fold_dir StringSet.add dir StringSet.empty in
         let marks = Filesystem.fold_dir StringSet.add marks StringSet.empty in

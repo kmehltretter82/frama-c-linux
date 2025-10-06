@@ -37,16 +37,16 @@ let startParsing fname lexer =
       fname (Lexing.lexeme_start_p lexbuf).Lexing.pos_fname
   | None ->
     let scan_references = Kernel.EagerLoadSources.get () in
-    match Parse_env.open_source ~scan_references fname with
+    let filepath = Filepath.of_string fname in
+    match Parse_env.open_source ~scan_references filepath with
     | Error msg -> Kernel.fatal "%s" msg
     | Ok in_str ->
       let lexbuf = Lexing.from_string in_str in
       let menhir_pos, lexer = MenhirLib.ErrorReports.wrap lexer in
-      let filename = Filepath.of_string fname in
       let i = { lexbuf; menhir_pos; current_working_directory = None } in
       (* Initialize lexer buffer. *)
       lexbuf.Lexing.lex_curr_p <-
-        { Lexing.pos_fname = Filepath.to_string_abs filename;
+        { Lexing.pos_fname = Filepath.to_string_abs filepath;
           Lexing.pos_lnum  = 1;
           Lexing.pos_bol   = 0;
           Lexing.pos_cnum  = 0

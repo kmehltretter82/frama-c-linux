@@ -307,10 +307,12 @@ struct
       else List.map add_plugin System_config.Share.dirs
 
     let find ~is_dir relative =
-      let exception Found of Fc_Filepath.t in
+      let exception Found of Fc_Filepath.t * Filesystem.file_kind in
       let check_presence dir =
         let path = Fc_Filepath.(dir / relative) in
-        if Filesystem.exists path then raise (Found path)
+        match Filesystem.file_kind path with
+        | Error _ -> ()
+        | Ok file_kind -> raise (Found (path, file_kind))
       in
       try
         List.iter check_presence (dirs ()) ;
@@ -320,11 +322,11 @@ struct
           relative
           (if is_kernel then "" else "/" ^ P.name)
       with
-      | Found path when is_dir <> Filesystem.is_dir path ->
+      | Found (path, file_kind) when is_dir <> (file_kind = Directory) ->
         L.abort "%a is expected to be a %s"
           Fc_Filepath.pretty path
           (if is_dir then "directory" else "file")
-      | Found path -> path
+      | Found (path, _) -> path
 
     let get_dir = find ~is_dir:true
     let get_file = find ~is_dir:false
@@ -380,13 +382,13 @@ struct
     let is_set = Dir_name.is_set
 
     let expected ~dir path =
-      if dir <> Filesystem.is_dir path then
+      if dir <> Filesystem.dir_exists path then
         L.abort "%a is expected to be a %s"
           Fc_Filepath.pretty path (if dir then "directory" else "file")
 
     let mk_dir d =
-      try ignore @@ Filesystem.make_dir ~parents:true d 0o755
-      with Unix.Unix_error _ ->
+      try Filesystem.make_dir d
+      with Sys_error _ ->
         L.abort "cannot create %s directory `%a'" D.name Fc_Filepath.pretty d
 
     let get_dir ?(create_path=false) s =

@@ -6,7 +6,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val open_source : scan_references:bool -> string -> (string, string) result
+val open_source : scan_references:bool -> Filepath.t -> (string, string) result
 
 val set_workdir : Filepath.t -> string -> unit
 

@@ -1092,10 +1092,11 @@ let has_out () = not @@ Fc_Filepath.is_empty (OutputDir.get ())
 
 let make_output_dir dir =
   try
-    if Filesystem.make_dir ~parents:true dir 0o770 then
+    if not @@ Filesystem.dir_exists dir then begin
+      Filesystem.make_dir ~perm:0o770 dir;
       debug ~dkey "Created output directory '%a'" Fc_Filepath.pretty dir
-  with Unix.Unix_error (err,_,_) ->
-    let msg = Unix.error_message err in
+    end
+  with Sys_error msg ->
     abort
       "System Error (%s)@\nCan not create output directory '%a'"
       msg Fc_Filepath.pretty dir
@@ -1118,8 +1119,7 @@ let make_gui_dir () =
       try Sys.getenv "HOME" (*Unix like*) with Not_found ->
         "." in
     let dir = Fc_Filepath.of_string (home ^ "/" ^ ".frama-c-wp") in
-    if Filesystem.exists dir && Filesystem.is_dir dir then
-      Filesystem.remove_dir dir;
+    Filesystem.remove_dir dir;
     make_output_dir dir ; dir
   with _ ->
     make_tmp_dir ()
@@ -1162,8 +1162,7 @@ let get_output_dir d =
 let default = Fc_Filepath.(concat (pwd ()) "/.frama-c")
 
 let has_session () =
-  Session.is_set () ||
-  ( Filesystem.exists default && Filesystem.is_dir default )
+  Session.is_set () || Filesystem.dir_exists default
 
 let get_session ~force () =
   if force then
