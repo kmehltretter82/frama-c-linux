@@ -1018,13 +1018,35 @@ module TaintLogic = struct
       end
     | _ -> state
 
-  let evaluate_taint_predicate cvalue_env zone term =
+  let evaluate_tainted_term cvalue_env zone term =
     match eval_term_zone cvalue_env term with
     | None -> Alarmset.Unknown
     | Some (_under, over) ->
       if Zone.intersects over zone
       then Alarmset.Unknown
       else Alarmset.False
+
+  let evaluate_taint_predicate cvalue_env state predicate_name term =
+    let state =
+      match state with
+      | `Top -> LatticeSingleTaint.top
+      | `Value state_map ->
+        let taint_names = term_taint_namespaces term in
+        let states_list =
+          List.map
+            (fun key -> LatticeMultiTaint.find_or_empty key state_map)
+            taint_names
+        in
+        List.fold_left LatticeSingleTaint.join
+          LatticeSingleTaint.empty states_list
+    in
+    let zone =
+      match predicate_name with
+      | "\\tainted_directly" -> state.locs_data
+      | "\\tainted_indirectly" -> state.locs_control
+      | "\\tainted" | _ -> Zone.join state.locs_data state.locs_control
+    in
+    evaluate_tainted_term cvalue_env zone term
 
   let evaluate_predicate cvalue_env state predicate =
     let rec evaluate predicate =
@@ -1033,27 +1055,7 @@ module TaintLogic = struct
         begin
           match lv_name with
           | "\\tainted" | "\\tainted_directly" | "\\tainted_indirectly" ->
-            let state =
-              match state with
-              | `Top -> LatticeSingleTaint.top
-              | `Value state_map ->
-                let taint_names = term_taint_namespaces arg in
-                let states_list =
-                  List.map
-                    (fun key -> LatticeMultiTaint.find_or_empty key state_map)
-                    taint_names
-                in
-                List.fold_left LatticeSingleTaint.join
-                  LatticeSingleTaint.empty states_list
-            in
-            let zone =
-              match lv_name with
-              | "\\tainted" -> Zone.join state.locs_data state.locs_control
-              | "\\tainted_directly" -> state.locs_data
-              | "\\tainted_indirectly" -> state.locs_control
-              | _ -> assert false
-            in
-            evaluate_taint_predicate cvalue_env zone arg
+            evaluate_taint_predicate cvalue_env state lv_name arg
           | _ -> Unknown
         end
       | Prel (Req, {term_node = Tapp (f, _, [arg])}, t)
@@ -1073,7 +1075,7 @@ module TaintLogic = struct
             let zone = Zone.join state.locs_data state.locs_control in
             (if lv_name = public_taint_namespace
              then Abstract_interp.inv_truth else Fun.id) @@
-            evaluate_taint_predicate cvalue_env zone arg
+            evaluate_tainted_term cvalue_env zone arg
           | _ -> Unknown
         end
       | Ptrue -> True
