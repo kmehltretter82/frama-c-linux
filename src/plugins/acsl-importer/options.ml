@@ -76,7 +76,8 @@ module AddonIntegerCast =
     (struct
       let option_name = "-acsl-import-addon-integer-cast"
       let help =
-        "allows and explicit casts from integer to C integral types"
+        "elucidates implicit and explicit casts from integers to C integral \
+         types"
     end)
 
 module Run =
@@ -84,7 +85,7 @@ module Run =
     (struct
       let option_name = "-acsl-import-run"
       let help =
-        "runs the plugin otherwise, just configure the parameters"
+        "runs the plugin (other options just configure its parameters)"
     end)
 
 module UnroolLoopCondition =

@@ -965,7 +965,7 @@ module TruncPropIdFileName =
     let help =
       "Truncate basename of proof obligation files after <n> characters.\n\
        Since numbers can be added as suffixes to make theses names unique,\n\
-       filename lengths can be higher to <n>. No truncation is performed\n\
+       filename lengths can be longer than <n>. No truncation is performed\n\
        when the value equals to zero (default: 60)."
   end)
 

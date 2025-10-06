@@ -35,7 +35,7 @@ Options taking a string as argument should preferably be written
                     (opposite option is -wp-no-havoc)
 -wp-init-const      Use initializers for global const variables. (set by
                     default, opposite option is -wp-no-init-const)
--wp-max-split <n>   Set maximum number of splitted sub-goals (default 1000)
+-wp-max-split <n>   Set maximum number of split sub-goals (default 1000)
 -wp-precond-weakening  Discard pre-conditions of side behaviours (sound but
                     incomplete optimisation). (opposite option is
                     -wp-no-precond-weakening)
@@ -190,7 +190,7 @@ Options taking a string as argument should preferably be written
                     after <n> characters.
                     Since numbers can be added as suffixes to make theses
                     names unique,
-                    filename lengths can be highter to <n>. No truncation is
+                    filename lengths can be longer than <n>. No truncation is
                     performed
                     when the value equals to zero (default: 60).
 -wp-out <dir>       Set working directory for generated files.

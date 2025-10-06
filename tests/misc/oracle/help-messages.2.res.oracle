@@ -18,8 +18,8 @@ Options taking a string as argument should preferably be written
 -acsl-import-addon-ensures-and-exits  adds ensures_and_exits extension clause
                     (opposite option is
                     -acsl-import-no-addon-ensures-and-exits)
--acsl-import-addon-integer-cast  allows and explicits casts from integer to C
-                    integral types (opposite option is
+-acsl-import-addon-integer-cast  elucidates implicit and explicit casts from
+                    integers to C integral types (opposite option is
                     -acsl-import-no-addon-integer-cast)
 -acsl-import-include-dirs <d1,...,dn>  directories for searching ACSL files
                     to include (preferably use
@@ -28,20 +28,21 @@ Options taking a string as argument should preferably be written
                     -acsl-import-no-keep-unused-symbols)
 -acsl-import-parse-only  parses the ACSL files without typing nor imports
                     (opposite option is -acsl-import-no-parse-only)
--acsl-import-run    runs the plugin otherwise, just configure the parameters
-                    (set by default, opposite option is -acsl-import-no-run)
+-acsl-import-run    runs the plugin (other options just configure its
+                    parameters) (set by default, opposite option is
+                    -acsl-import-no-run)
 -acsl-import-type-only  parses and types the ACSL files without imports
                     (opposite option is -acsl-import-no-type-only)
 -acsl-import-ulevel-spec <spec1,...,specs>  an unrolling specification
                     <m@f:tag@n> adds a 'loop unfold "tag", <n>;' to the loop
-                    of the function <f> of occurence <m>.
+                    of the function <f> of occurrence <m>.
                      An unrolling specification <c@f:tag@n> adds a 'loop
                     unfold "tag", <n>;' to all loops of category <c> of the
                     function <f> where allowed loop categories are: 'while',
                     'for' and 'do-while'.
                      The specification is considered as a set of elementary
                     specifications: spec1,...,specs.
-                     Categories, function names and loop occurence numbers
+                     Categories, function names and loop occurrence numbers
                     can be omitted. The priority ordering used for choosing
                     the ("tag", unrolling value <n>) pair is: m@f:tag@n >
                     c@f:tag@n > f:tag@n > c:tag@n > :tag@n.
