@@ -5,42 +5,108 @@
 
    STDOPT: +"-h"
    STDOPT: +"-kernel-h"
-   STDOPT: +"-load-plugin acsl-importer -acsl-import-h"
-   STDOPT: +"-load-plugin alias -alias-h"
-   STDOPT: +"-load-plugin aorai -aorai-h"
-   STDOPT: +"-load-plugin callgraph -cg-h"
-   STDOPT: +"-load-plugin dive -dive-h"
-   STDOPT: +"-load-plugin e-acsl -e-acsl-h"
-   STDOPT: +"-load-plugin eva -eva-h"
-   STDOPT: +"-load-plugin from -from-h"
-   STDOPT: +"-load-plugin impact -impact-h"
-   STDOPT: +"-load-plugin inout -inout-h"
-   STDOPT: +"-load-plugin instantiate -instantiate-h"
-   STDOPT: +"-load-plugin loop-analysis -loop-h"
-   STDOPT: +"-load-plugin markdown-report -mdr-h"
-   STDOPT: +"-load-plugin metrics -metrics-h"
-   STDOPT: +"-load-plugin eva.mthread -mt-h"
-   STDOPT: +"-load-plugin nonterm -nonterm-h"
-   STDOPT: +"-load-plugin obfuscator -obfuscator-h"
-   STDOPT: +"-load-plugin occurrence -occurrence-h"
-   STDOPT: +"-load-plugin pdg -pdg-h"
-   STDOPT: +"-load-plugin reduc -reduc-h"
-   STDOPT: +"-load-plugin region -region-h"
-   STDOPT: +"-load-plugin report -report-h"
-   STDOPT: +"-load-plugin rtegen -rte-h"
-   STDOPT: +"-load-plugin scope -scope-h"
-   STDOPT: +"-load-plugin security_slicing -security-slicing-h"
-   STDOPT: +"-load-plugin constant_propagation -scf-h"
-   STDOPT: +"-load-plugin api_generator -server-tsc-h"
-   STDOPT: +"-load-plugin slicing -slicing-h"
-   STDOPT: +"-load-plugin sparecode -sparecode-h"
-   STDOPT: +"-load-plugin studia -studia-h"
-   STDOPT: +"-load-plugin users -users-h"
-   STDOPT: +"-load-plugin volatile -volatile-h"
 
+   PLUGIN: acsl-importer
+   STDOPT: +"-acsl-import-h"
+
+   PLUGIN: alias
+   STDOPT: +"-alias-h"
+
+   PLUGIN: aorai
+   STDOPT: +"-aorai-h"
+
+   PLUGIN: callgraph
+   STDOPT: +"-cg-h"
+
+   PLUGIN: dive
+   STDOPT: +"-dive-h"
+
+   PLUGIN: e-acsl
+   STDOPT: +"-e-acsl-h"
+
+   PLUGIN: eva
+   STDOPT: +"-eva-h"
+
+   PLUGIN: from
+   STDOPT: +"-from-h"
+
+   PLUGIN: impact
+   STDOPT: +"-impact-h"
+
+   PLUGIN: inout
+   STDOPT: +"-inout-h"
+
+   PLUGIN: instantiate
+   STDOPT: +"-instantiate-h"
+
+   PLUGIN: loop-analysis
+   STDOPT: +"-loop-h"
+
+   PLUGIN: markdown-report
+   STDOPT: +"-mdr-h"
+
+   PLUGIN: metrics
+   STDOPT: +"-metrics-h"
+
+   PLUGIN: eva.mthread
+   STDOPT: +"-mt-h"
+
+   PLUGIN: nonterm
+   STDOPT: +"-nonterm-h"
+
+   PLUGIN: obfuscator
+   STDOPT: +"-obfuscator-h"
+
+   PLUGIN: occurrence
+   STDOPT: +"-occurrence-h"
+
+   PLUGIN: pdg
+   STDOPT: +"-pdg-h"
+
+   PLUGIN: reduc
+   STDOPT: +"-reduc-h"
+
+   PLUGIN: region
+   STDOPT: +"-region-h"
+
+   PLUGIN: report
+   STDOPT: +"-report-h"
+
+   PLUGIN: rtegen
+   STDOPT: +"-rte-h"
+
+   PLUGIN: scope
+   STDOPT: +"-scope-h"
+
+   PLUGIN: security_slicing
+   STDOPT: +"-security-slicing-h"
+
+   PLUGIN: constant_propagation
+   STDOPT: +"-scf-h"
+
+   PLUGIN: api_generator
+   STDOPT: +"-server-tsc-h"
+
+   PLUGIN: slicing
+   STDOPT: +"-slicing-h"
+
+   PLUGIN: sparecode
+   STDOPT: +"-sparecode-h"
+
+   PLUGIN: studia
+   STDOPT: +"-studia-h"
+
+   PLUGIN: users
+   STDOPT: +"-users-h"
+
+   PLUGIN: volatile
+   STDOPT: +"-volatile-h"
+
+   PLUGIN: wp
    FILTER: sed -e 's+\(proof process .default: \).*+\1<nproc>\)+g'
-   STDOPT: +"-load-plugin wp -wp-h"
+   STDOPT: +"-wp-h"
 
+   PLUGIN: server
    ENABLED_IF: %{lib-available:zmq}
-   STDOPT: +"-load-plugin server -server-h"
+   STDOPT: +"-server-h"
 */
