@@ -20,6 +20,7 @@ Open Source Release <next-release>
 
 o!  Kernel    [2025-10-06] Renamed the module FCHashtbl to Hashtbl, the old
               module FCHashtbl is now deprecated.
+-*  Alias     [2025-10-06] Enable loop detection when compiling as a release
 -   Eva       [2025-10-03] New warning category `acsl:unsupported` for messages
               about unsupported ACSL terms.
 -!  Kernel    [2025-10-03] Replaced message key `pp:keep-temp-files` with kernel

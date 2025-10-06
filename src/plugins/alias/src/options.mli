@@ -39,4 +39,5 @@ end
 
 module DebugKeys : sig
   val show_libc_vars : category
+  val show_internal_state : category
 end

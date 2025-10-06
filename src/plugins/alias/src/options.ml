@@ -64,4 +64,7 @@ module DebugKeys = struct
   let show_libc_vars =
     let help = "include variables stemming from the C library in output" in
     register_category ~help "printer:show-libc-vars"
+  let show_internal_state =
+    let help = "print internal representation of abstract state" in
+    register_category ~help "debug:internal-state"
 end

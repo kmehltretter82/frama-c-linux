@@ -55,6 +55,19 @@ module G = struct
     | [] -> None
     | [v] -> Some v
     | _ -> Options.fatal "Invariant violated: more than one successor"
+
+  let check_loop v1 v2 =
+    if v1 = v2 then
+      Options.warning ~once:true ~wkey:Options.Warn.incoherent
+        "loop on vertex %d (following unsafe cast?); analysis may be unsound" v1
+
+  let add_edge g v1 v2 =
+    check_loop v1 v2;
+    add_edge g v1 v2
+
+  let add_edge_e g ((v1, _, v2) as edge) =
+    check_loop v1 v2;
+    add_edge_e g edge
 end
 
 type v = G.V.t
@@ -242,7 +255,7 @@ end
 
 
 module Pretty = struct
-  let pp_debug fmt s =
+  let pp_internal fmt s =
     Format.fprintf fmt "@[<v>";
     Format.fprintf fmt "@[Edges:";
     G.iter_edges_e
@@ -301,8 +314,15 @@ module Pretty = struct
     in
     if G.nb_vertex s.graph = 0
     then Format.fprintf fmt "<empty>"
-    else (G.iter_edges_e pp_edge s.graph;
-          G.iter_vertex pp_unconnected_vertex s.graph)
+    else begin
+      G.iter_edges_e pp_edge s.graph;
+      G.iter_vertex pp_unconnected_vertex s.graph
+    end;
+    if Options.is_debug_key_enabled Options.DebugKeys.show_internal_state
+    then begin
+      Format.pp_print_newline fmt ();
+      pp_internal fmt s
+    end
 
   let pp_aliases fmt s =
     let alias_sets = Readout.alias_sets_lvals s in
@@ -320,7 +340,7 @@ let assert_invariants s : unit =
      and are integer between 0 and node_counter, and have at most 1 successor *)
   assert (!node_counter >= 0);
   let assert_vertex v =
-    Options.debug ~level:11 "checking coherence of vertex %d" v;
+    Options.debug ~level:5 "checking coherence of vertex %d" v;
     assert (v >= 0);
     assert (v < !node_counter);
     assert (VMap.mem v s.vmap);
@@ -335,11 +355,8 @@ let assert_invariants s : unit =
   in
   G.iter_vertex assert_vertex s.graph;
   let assert_edge v1 v2 =
-    Options.debug ~level:11
+    Options.debug ~level:5
       "checking coherence of edge %d %t %d" v1 Unicode.pp_right_arrow v2;
-    if v1 = v2 then
-      Options.warning ~once:true ~wkey:Options.Warn.incoherent
-        "loop on vertex %d (following unsafe cast?); analysis may be unsound" v1;
     assert (G.mem_vertex s.graph v1);
     assert (G.mem_vertex s.graph v2)
   in
@@ -368,7 +385,6 @@ let assert_invariants s =
   try assert (assert_invariants s; true)
   with Assert_failure _ as exn ->
     let bt = Printexc.get_raw_backtrace () in
-    Options.debug "incoherent graph:@ @[%a@]" Pretty.pp_debug s;
     Options.debug "incoherent graph:@ @[%a@]" Pretty.pp_graph s;
     Printexc.raise_with_backtrace exn bt
 
@@ -450,7 +466,7 @@ let rec find_or_create_lval_vertex ((lhost, offset) : lval) s : V.t * state =
   in
   let hv, s = find_or_create_lhost s lhost in
   let v, s = find_or_create_offset hv s offset in
-  Options.debug ~level:7 "graph after find_or_create_lval_vertex @[%a@] (%d):@ %a"
+  Options.debug ~level:5 "graph after find_or_create_lval_vertex @[%a@] (%d):@ %a"
     Printer.pp_lval (lhost, offset) v Pretty.pp_graph s;
   v, s
 
@@ -458,7 +474,7 @@ and find_or_create_ref_vertex lv s : V.t * state =
   let v1, s = find_or_create_lval_vertex lv s in
   let va, s = create_empty_vertex s in
   let s = {s with graph = G.add_edge s.graph va v1} in
-  Options.debug ~level:7 "graph after find_or_create_ref_vertex @[%a@] (%d):@ %a"
+  Options.debug ~level:5 "graph after find_or_create_ref_vertex @[%a@] (%d):@ %a"
     LvalOrRef.pretty (LvalOrRef.Ref lv) va Pretty.pp_graph s;
   va, s
 
@@ -530,35 +546,33 @@ let rec join_without_check s v1 v2 : state =
     E.Map.fold merge_succs succ_pairs s
 
 let join s v1 v2 : state =
-  Options.debug ~level:6 "graph before join(%d,%d):@;<2>@[%a@]" v1 v2 Pretty.pp_graph s;
+  Options.debug ~level:5 "graph before join(%d,%d):@;<2>@[%a@]" v1 v2 Pretty.pp_graph s;
   assert_invariants s;
   let res = join_without_check s v1 v2 in
-  Options.debug ~level:6 "graph after join(%d,%d):@;<2>@[%a@]" v1 v2 Pretty.pp_graph res;
+  Options.debug ~level:5 "graph after join(%d,%d):@;<2>@[%a@]" v1 v2 Pretty.pp_graph res;
   begin try assert_invariants res
     with Assert_failure _ ->
       Options.debug "join(%d,%d) failed" v1 v2;
-      Options.debug "graph before join(%d,%d):@;<2>@[%a@]" v1 v2 Pretty.pp_debug s;
-      Options.debug "graph after join(%d,%d):@;<2>@[ %a@]" v1 v2 Pretty.pp_debug res;
-      assert_invariants res
+      Options.debug "before join:@;<2>@[%a@]" Pretty.pp_internal s;
+      Options.debug "after join:@;<2>@[ %a@]" Pretty.pp_internal res
   end;
   res
 
 let merge_set s (vs:VSet.t) : V.t * state =
   let v0 = VSet.choose vs in
   if VSet.cardinal vs < 2 then v0, s else begin
-    Options.debug ~level:6 "graph before merge_set %a:@;<2>@[%a@]"
-      VSet.pretty vs Pretty.pp_debug s;
+    Options.debug ~level:5 "graph before merge_set %a:@;<2>@[%a@]"
+      VSet.pretty vs Pretty.pp_internal s;
     assert (G.mem_vertex s.graph v0);
     let result = VSet.fold (fun v acc -> merge acc v0 v) vs s in
-    Options.debug ~level:6 "graph after merge_set %a:@;<2>@[%a@]"
-      VSet.pretty vs Pretty.pp_debug result;
+    Options.debug ~level:5 "graph after merge_set %a:@;<2>@[%a@]"
+      VSet.pretty vs Pretty.pp_internal result;
     v0, result
   end
 
 (* may operate on an unsound state, where nodes may have multiple successors
    of the same edge type *)
 let rec join_succs s v =
-  Options.debug ~level:8 "joining successors of %d" v;
   if not @@ G.mem_vertex s.graph v then s else
     let edge_map =
       List.fold_left (fun m e ->
@@ -624,8 +638,6 @@ let is_included s s' =
   (* tests if s is included in s', at least as the nodes with lval *)
   assert_invariants s;
   assert_invariants s';
-  Options.debug ~level:8 "testing equal %a AND @.%a"
-    Pretty.pp_graph s (pretty ~debug:true) s';
   let exception Not_included in
   try
     let iter_varmap (var : varinfo) v : unit =
@@ -654,8 +666,6 @@ let is_empty s = compare s empty = 0
 let shift s : state =
   assert_invariants s;
   if is_empty s then s else begin
-    Options.debug ~level:8 "before shift: node_counter=%d@.%a"
-      !node_counter Pretty.pp_debug s;
     let max_idx = G.fold_vertex max s.graph 0 in
     let min_idx = G.fold_vertex min s.graph max_idx in
     let offset = !node_counter - min_idx in
@@ -670,8 +680,6 @@ let shift s : state =
        varmap = VarMap.map shift varmap;
        vmap = shift_vmap (fun (key, l) -> shift key, l) vmap}
     in
-    Options.debug ~level:8 "after shift: node_counter=%d@.%a"
-      !node_counter Pretty.pp_debug result;
     asserting_invariants result
   end
 
@@ -701,11 +709,6 @@ let union_find vmap intersections =
 let union s1 s2 : state =
   assert_invariants s1;
   assert_invariants s2;
-
-  Options.debug ~level:4 "Union: First graph:%a" Pretty.pp_graph s1;
-  Options.debug ~level:5 "Union: First graph:%a" Pretty.pp_debug s1;
-  Options.debug ~level:4 "Union: Second graph:%a" Pretty.pp_graph s2;
-  Options.debug ~level:5 "Union: Second graph:%a" Pretty.pp_debug s2;
   let new_graph =
     G.fold_vertex
       (fun v2 g -> G.add_vertex g v2)
@@ -725,9 +728,6 @@ let union s1 s2 : state =
     union_find new_vmap @@ Seq.map snd intersections
   in
   let new_varmap = VarMap.union (fun _ l _r -> Some l) s1.varmap s2.varmap in
-  Options.debug ~level:7 "Union: sets to be joined:@[";
-  VMap.iter (fun _ set -> Options.debug ~level:7 "%a" VSet.pretty set) sets_to_be_joined;
-  Options.debug ~level:7 "@]";
   let s = {graph = new_graph; varmap = new_varmap; vmap = new_vmap} in
   let merged_nodes, s =
     VMap.fold
@@ -737,16 +737,12 @@ let union s1 s2 : state =
   in
   let s = List.fold_left join_succs s merged_nodes in
   Options.debug ~level:4 "Union: Result graph:%a" Pretty.pp_graph s;
-  Options.debug ~level:5 "Union: Result graph:%a" Pretty.pp_debug s;
   begin try assert_invariants s
     with Assert_failure _ ->
       Options.debug "union failed";
-      Options.debug "Union: First graph:%a" Pretty.pp_graph s1;
-      Options.debug "Union: First graph:%a" Pretty.pp_debug s1;
-      Options.debug "Union: Second graph:%a" Pretty.pp_graph s2;
-      Options.debug "Union: Second graph:%a" Pretty.pp_debug s2;
-      Options.debug "Union: Result graph:%a" Pretty.pp_graph s;
-      Options.debug "Union: Result graph:%a" Pretty.pp_debug s;
+      Options.debug "Union: First graph:%a" Pretty.pp_internal s1;
+      Options.debug "Union: Second graph:%a" Pretty.pp_internal s2;
+      Options.debug "Union: Result graph:%a" Pretty.pp_internal s;
       assert_invariants s
   end;
   s
