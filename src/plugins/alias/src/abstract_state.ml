@@ -55,6 +55,19 @@ module G = struct
     | [] -> None
     | [v] -> Some v
     | _ -> Options.fatal "Invariant violated: more than one successor"
+
+  let check_loop v1 v2 =
+    if v1 = v2 then
+      Options.warning ~once:true ~wkey:Options.Warn.incoherent
+        "loop on vertex %d (following unsafe cast?); analysis may be unsound" v1
+
+  let add_edge g v1 v2 =
+    check_loop v1 v2;
+    add_edge g v1 v2
+
+  let add_edge_e g ((v1, _, v2) as edge) =
+    check_loop v1 v2;
+    add_edge_e g edge
 end
 
 type v = G.V.t
@@ -337,9 +350,6 @@ let assert_invariants s : unit =
   let assert_edge v1 v2 =
     Options.debug ~level:11
       "checking coherence of edge %d %t %d" v1 Unicode.pp_right_arrow v2;
-    if v1 = v2 then
-      Options.warning ~once:true ~wkey:Options.Warn.incoherent
-        "loop on vertex %d (following unsafe cast?); analysis may be unsound" v1;
     assert (G.mem_vertex s.graph v1);
     assert (G.mem_vertex s.graph v2)
   in
