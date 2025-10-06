@@ -636,7 +636,8 @@ let rec remove_dumb_gotos (env:restricted_env) : Node.t Node.Map.t * restricted_
   let used_nodes = add_map env.datas used_nodes in
   let how_many_preds = Node.Hashtbl.create 10 in
   let incr_how_many_preds n =
-    Node.Hashtbl.replace how_many_preds n (succ (Node.Hashtbl.find_def how_many_preds n 0))
+    let nb_preds = Node.Hashtbl.find_default ~default:0 how_many_preds n in
+    Node.Hashtbl.replace how_many_preds n (succ nb_preds)
   in
   let subst =
     Node.Map.fold (fun n e acc ->

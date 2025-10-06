@@ -207,9 +207,9 @@ struct
 
   let add_last_analysis thread concurrent_writes shared_bases =
     (* Retrieve the interferences  *)
+    let default = ByPosition.empty in
     let old_interferences_by_pos =
-      ThreadTable.find_def current.interferences_by_pos thread
-        ByPosition.empty
+      ThreadTable.find_default ~default current.interferences_by_pos thread
     in
     let new_interferences_by_pos =
       let add (stmt, cs as pos) acc_map =

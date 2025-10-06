@@ -25,7 +25,10 @@ module type S = sig
   val fold_sorted_by_value:
     cmp:('a -> 'a -> int) -> (key -> 'a -> 'b -> 'b) -> 'a t -> 'b -> 'b
 
+  val find_default: default:'a -> 'a t -> key  -> 'a
+
   val find_def: 'a t -> key  -> 'a -> 'a
+  [@@deprecated "Use find_default instead."]
 
   val memo: 'a t -> key -> (key -> 'a) -> 'a
 
@@ -58,10 +61,12 @@ module Make(H: HashedType) : S with type key = H.t  = struct
   let iter_sorted_by_value ~cmp f h =
     iter_sorted_by_entry ~cmp:(fun (_ka,va) (_kb,vb) -> cmp va vb) f h
 
-  let find_def h k v =
+  let find_default ~default h k =
     match find_opt h k with
-    | None -> v
+    | None -> default
     | Some v -> v
+
+  let find_def h k default = find_default ~default h k
 
   let memo tbl k f =
     try find tbl k

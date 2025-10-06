@@ -1123,7 +1123,7 @@ struct
       table
 
     let find table v =
-      Vertex.Hashtbl.find_def table v []
+      Vertex.Hashtbl.find_default ~default:[] table v
 
     let is_head table v =
       match find table v with
@@ -1177,9 +1177,10 @@ module UnrollUnnatural  = struct
 
     let needed = Vertex.Hashtbl.create 10 in
     let need v s =
+      let default = Vertex_Set.Set.empty in
       Vertex.Hashtbl.replace needed v
         (Vertex_Set.Set.add s
-           (Vertex.Hashtbl.find_def needed v Vertex_Set.Set.empty))
+           (Vertex.Hashtbl.find_default ~default needed v))
     in
 
     need g.entry_point Vertex.Set.empty;
@@ -1227,7 +1228,8 @@ module UnrollUnnatural  = struct
     in
 
     let do_node n =
-      let s = Vertex.Hashtbl.find_def needed n Vertex_Set.Set.empty in
+      let default = Vertex_Set.Set.empty in
+      let s = Vertex.Hashtbl.find_default ~default needed n in
       Vertex_Set.Set.iter (do_version n) s;
     in
 
@@ -1235,14 +1237,15 @@ module UnrollUnnatural  = struct
       match a with
       | Wto.Node n -> do_node n
       | Wto.Component (n,l) ->
+        let default = Vertex_Set.Set.empty in
         let rec aux s =
           do_node n;
           partition_ext l;
-          let s' = Vertex.Hashtbl.find_def needed n Vertex_Set.Set.empty in
+          let s' = Vertex.Hashtbl.find_default ~default needed n in
           if not (Vertex_Set.Set.equal s s') then
             aux s'
         in
-        aux (Vertex.Hashtbl.find_def needed n Vertex_Set.Set.empty)
+        aux (Vertex.Hashtbl.find_default ~default needed n)
     and partition_ext l =
       List.iter component_ext l
     in
