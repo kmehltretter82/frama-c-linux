@@ -122,7 +122,7 @@ val t_sum: pack array array -> t
 
 val t_set_unchanged_compares: t -> t
 val t_map_unchanged_compares: t -> t -> t
-val t_hashtbl_unchanged_hashs: t -> t -> t
+val t_hashtbl_unchanged_hashes: t -> t -> t
 
 (** Packed versions of predefined descriptors. *)
 
@@ -156,3 +156,9 @@ val cleanup: t -> t
 val are_consistent: t -> t -> bool
 (** Not symmetrical: check that the second argument is a correct refinement of
     the first one. *)
+
+(** {3 Deprecated definitions}  *)
+
+val t_hashtbl_unchanged_hashs: t -> t -> t
+[@@deprecated "Use t_hashtbl_unchanged_hashes instead."]
+[@@migrate { repl = Rel.t_hashtbl_unchanged_hashes } ]

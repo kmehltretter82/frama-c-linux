@@ -28,7 +28,7 @@ VERSION_SAFE=$(subst ~,-,$(VERSION))
 
 ifeq ($(findstring +dev,$(VERSION)),+dev)
 
-# Developpement version, generate the manuals
+# Development version, generate the manuals
 default: all
 
 else
@@ -93,6 +93,7 @@ all: \
 	manuals/eva-manual$(FC_SUFFIX).pdf \
 	manuals/mthread-manual$(FC_SUFFIX).pdf \
 	manuals/metrics-manual$(FC_SUFFIX).pdf \
+	manuals/mthread-manual$(FC_SUFFIX).pdf \
 	manuals/volatile-manual$(FC_SUFFIX).pdf \
 	manuals/wp-manual$(FC_SUFFIX).pdf \
 
@@ -118,6 +119,7 @@ manuals/hello$(FC_SUFFIX).tar.gz: developer/hello.tar.gz
 manuals/eva-manual$(FC_SUFFIX).pdf: eva/main.pdf
 manuals/mthread-manual$(FC_SUFFIX).pdf: eva/mthread.pdf
 manuals/metrics-manual$(FC_SUFFIX).pdf: metrics/metrics.pdf
+manuals/mthread-manual$(FC_SUFFIX).pdf: eva/mthread.pdf
 manuals/volatile-manual$(FC_SUFFIX).pdf: ../src/plugins/volatile/doc/manual/volatile.pdf
 manuals/wp-manual$(FC_SUFFIX).pdf: ../src/plugins/wp/doc/manual/wp.pdf
 

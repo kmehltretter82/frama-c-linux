@@ -170,7 +170,7 @@ let example_msg =
      @[<v 1>\
      Directives of \"test_config[_<mode>]\" files:@  \
      COMMENT: <comment>  @[<v 0># Just a comment line.@]@  \
-     FILEREG: <regexp>   @[<v 0># Ignores the files in suites whose name doesn't matche the pattern.@]@  \
+     FILEREG: <regexp>   @[<v 0># Ignores the files in suites whose name doesn't match the pattern.@]@  \
      DONTRUN:            @[<v 0># Ignores the file.@]@  \
      EXECNOW: ([LOG|BIN] <file>)+ <command>  @[<v 0># Defines the command to execute to build a 'LOG' (textual) 'BIN' (binary) targets.@ \
      # Note: the textual targets are compared to oracles.@]@  \
@@ -322,7 +322,7 @@ let argspec =
      " disable the generation of the enabled_if dune field: tests are never disabled (for CI purpose)");
 
     ("-dune-alias", Arg.String (fun s -> default_dune_alias := s),
-     " <name> Use @<name> as dune alias to exectute tests (defaults to "^ !default_dune_alias ^")");
+     " <name> Use @<name> as dune alias to execute tests (defaults to "^ !default_dune_alias ^")");
   ]
 
 let fail s =
@@ -858,7 +858,7 @@ end = struct
 
   let split_list =
     (* considers blanks (not preceded by '\'), tabs and commas as separators *)
-    let nonsep_regexp = Str.regexp "[\\] " in (* removed for beeing reintroduced *)
+    let nonsep_regexp = Str.regexp "[\\] " in (* removed for being reintroduced *)
     let sep_regexp = Str.regexp "[\t ,]+" in
     fun s -> (* splits on '\ ' first then on ' ' or ',' *)
       let r = List.fold_left (fun acc -> function
@@ -1766,7 +1766,7 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config ~modules ~en
         command_string ~env ~result_fmt ~oracle_fmt
           { test_name ; file; options; toplevel; nb_files; directory; nth; timeout;
             macros; log_files; bin_files;
-            filter = (* from a global directive applyed to all OPT tests  *)
+            filter = (* from a global directive applied to all OPT tests  *)
               (match config.dc_filter with None -> None | Some s -> Some (Macros.expand ~file macros s));
             exit_code = get_exit_code ~file exit_code;
             execnow=false;

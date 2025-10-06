@@ -27,7 +27,7 @@ Program Dependence Graph computation.
 
 ** tests/pdg/inter_alias2.c
    Test the PDG with pointers.
-   Show that the alias analysis merge the contexts and the precison problem.
+   Show that the alias analysis merge the contexts and the precision problem.
 
 ** tests/pdg/inter_alias.c
    Test the PDG with pointers.

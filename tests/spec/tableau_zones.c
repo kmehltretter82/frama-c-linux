@@ -4,7 +4,7 @@
   @*/
 int f(int *p,int n) {
   *p = n;
-  return 0; //NdV not sure it is correct, but the return statelent was
+  return 0; //NdV not sure it is correct, but the return statement was
             // missing anyway
 }
 

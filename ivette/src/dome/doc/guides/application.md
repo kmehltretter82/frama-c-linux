@@ -27,7 +27,7 @@ web page holding the main application window, and is named the `Renderer` proces
 Both kind of process communicates through the message-passing API provided by
 the **Electron** framework.
 
-When several instances of your application are running simultaneously, each invokation
+When several instances of your application are running simultaneously, each invocation
 have its own window, running its owan, separate `Renderer` process. However, the
 **Dome** framework automatically makes them sharing the same `Main` process.
 

@@ -165,7 +165,7 @@ let register ?source name kinds link =
 let register_type ?source name builtin =
   let driver = cdriver_rw () in
   if Hashtbl.mem driver.htypes name then
-    Wp_parameters.warning ?source "Redifinition of type %s" name ;
+    Wp_parameters.warning ?source "Redefinition of type %s" name ;
   Hashtbl.add driver.htypes name builtin
 
 let iter_table f =

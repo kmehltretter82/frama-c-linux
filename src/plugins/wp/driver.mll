@@ -302,7 +302,7 @@ and bal = parse
     commutative = false ;
     idempotent = false ;
     neutral = E_none ;
-    absorbant = E_none ;
+    absorbent = E_none ;
   }
 
   let op_elt input =
@@ -338,9 +338,9 @@ and bal = parse
       | ID "neutral" ->
 	  skip input ; let e = op_elt input in
 	  op_link { op with neutral = e } input
-      | ID "absorbant" ->
+      | ID "absorbent" ->
 	  skip input ; let e = op_elt input in
-	  op_link { op with absorbant = e } input
+	  op_link { op with absorbent = e } input
       | ID t -> failwith (Printf.sprintf "Unknown tag '%s'" t)
       | _ -> failwith "Missing <tag> or <link>"
 

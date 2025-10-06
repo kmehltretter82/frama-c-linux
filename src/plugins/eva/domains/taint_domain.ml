@@ -38,7 +38,7 @@ let auto_taint_res_functions = (* auto taint the result *) [
 let auto_taint () = Parameters.AutoTaint.get ()
 let ignore_singletons () = not (Parameters.TaintSingletons.get ())
 
-(* Default namespace for taints, when no custum one is provided by the user. *)
+(* Default namespace for taints, when no custom one is provided by the user. *)
 let default_taint_namespace = "default"
 
 type taint_state = {
@@ -321,10 +321,10 @@ module TransferSingleTaint = struct
     in
     to_loc_improved
 
-  (* Propagates data- and control-taints for an assignement [lval = exp]. *)
+  (* Propagates data- and control-taints for an assignment [lval = exp]. *)
   let assign_aux lval exp v to_loc state =
     let lv_zone, lv_indirect_zone, singleton = compute_zones lval to_loc in
-    let to_loc_choosen =
+    let to_loc_chosen =
       if ignore_singletons () then
         (* Do not data-taint [lval] in case it contains a singleton value. *)
         dont_taint_singleton v to_loc
@@ -333,7 +333,7 @@ module TransferSingleTaint = struct
            of [exp] depends on is data-tainted. *)
         to_loc
     in
-    let exp_zone = Eva_ast.PreciseDepsOf.zone_of_exp to_loc_choosen exp in
+    let exp_zone = Eva_ast.PreciseDepsOf.zone_of_exp to_loc_chosen exp in
     let data_tainted = Zone.intersects state.locs_data exp_zone in
     (* [lval] becomes control-tainted if:
        - the current call depends on a tainted assume statements of a caller;

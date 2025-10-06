@@ -150,7 +150,7 @@ module Make(N:sig
       Returns a pair (loop,partition) where
       - [loop] tells whether we are in a loop or not and gives the vertex of
         this loop with the lowest level. This vertex is also the deepest in the
-        stack and the neareast vertex from the root that is below [vertex] in
+        stack and the nearest vertex from the root that is below [vertex] in
         the spanning tree built by the DFS);
       - [partition] is returned completed.
 

@@ -2229,7 +2229,7 @@ and reduce_by_predicate ~alarm_mode env positive p =
       begin
         try
           (* ugly, but eval_predicate_content does not exist yet *)
-          let p = Logic_const.unamed ~loc p_content in
+          let p = Logic_const.unnamed ~loc p_content in
           let p' = if positive then p else Logic_const.pnot ~loc p in
           (* Evaluate the predicate before reducing. In some cases, although
              evaluation results in Bottom, reduction fails to reduce the

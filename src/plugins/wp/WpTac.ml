@@ -58,7 +58,7 @@ let is_dnf e = is_dnf_repr (repr e)
 
 (** CNF/DNF tools **)
 
-exception Absorbant
+exception Absorbent
 exception TooBig
 
 type xf_t = term list
@@ -86,7 +86,7 @@ let normalize_cf ts =
   (* TODO: use something like Qed.Term.conjunction *)
   let c = e_and ts in
   match repr c with
-  | False -> raise Absorbant
+  | False -> raise Absorbent
   | True -> []
   | And cf -> cf
   | _ -> [ c ]
@@ -95,7 +95,7 @@ let normalize_df ts =
   (* TODO: use something like Qed.Term.disjunction *)
   let c = e_or ts in
   match repr c with
-  | True -> raise Absorbant
+  | True -> raise Absorbent
   | False -> []
   | Or cf -> cf
   | _ -> [ c ]
@@ -114,9 +114,9 @@ type repr = QED.repr
 type cnf_dnt_tools = {
   normalize_xf: xf_t -> xf_t ;
   is_neutral_repr: repr -> bool ;
-  is_absorbant_repr: repr -> bool ;
+  is_absorbent_repr: repr -> bool ;
   neutral: term ;
-  absorbant: term ;
+  absorbent: term ;
   mk_top: xf_t -> term ;
   mk_sub: xf_t -> term ;
   sub_args: term -> xf_t ;
@@ -129,9 +129,9 @@ type cnf_dnt_tools = {
 let cnf_record = {
   normalize_xf=normalize_cf;
   is_neutral_repr=is_true_repr;
-  is_absorbant_repr=is_false_repr;
+  is_absorbent_repr=is_false_repr;
   neutral=e_true;
-  absorbant=e_false;
+  absorbent=e_false;
   mk_top=e_and;
   mk_sub=e_or;
   sub_args=disj_args;
@@ -144,9 +144,9 @@ let cnf_record = {
 let dnf_record = {
   normalize_xf=normalize_df;
   is_neutral_repr=is_false_repr;
-  is_absorbant_repr=is_true_repr;
+  is_absorbent_repr=is_true_repr;
   neutral=e_false;
-  absorbant=e_true;
+  absorbent=e_true;
   mk_top=e_or;
   mk_sub=e_and;
   sub_args=conj_args;
@@ -173,7 +173,7 @@ let pp_xf ~pol fmt = function
 
 let pp_xNf ~pol ~depth fmt xNf =
   let pp_xNf fmt = function
-    | [] -> Format.fprintf fmt " (%sNF %s absorbant);@?"
+    | [] -> Format.fprintf fmt " (%sNF %s absorbent);@?"
               (if pol then "C" else "D") (if pol then "FALSE" else "TRUE ")
     | xf -> List.iter (fun x -> Format.fprintf fmt "%s %a @?" (if pol then "||" else "&&") Lang.F.pp_term x) xf;
   in
@@ -209,7 +209,7 @@ let cnf_dnf ~pol ~depth e =
 
       | Or  xs when not pol -> flatten acc xs
       | And xs when     pol -> flatten acc xs
-      | repr when tool.is_absorbant_repr  repr -> raise Absorbant
+      | repr when tool.is_absorbent_repr  repr -> raise Absorbent
       | repr when tool.is_neutral_repr    repr -> acc
       | repr when is_cnf_dnf_literal_repr repr -> literal acc e
       | repr when tool.is_sub_repr        repr -> normalized acc e
@@ -225,11 +225,11 @@ let cnf_dnf ~pol ~depth e =
     ignore pol ;
     ignore depth ;
     match cnf2 with
-    | ([]::_) -> raise Absorbant (* @absorbant @ _ = @absorbant *)
+    | ([]::_) -> raise Absorbent (* @absorbent @ _ = @absorbent *)
     | _ ->
       (* TODO: uses Qed.Term.consequence_style *)
       let cf,cnf = List.fold_left
-          (fun (cf,cnf) -> function | [] -> raise Absorbant | [x] -> (x::cf),cnf | df -> cf,(df::cnf))
+          (fun (cf,cnf) -> function | [] -> raise Absorbent | [x] -> (x::cf),cnf | df -> cf,(df::cnf))
           neutral cnf1
       in
       let cf = if cf1=[] && cf=[] then cf2 else tool.normalize_xf cf@cf1@cf2 in
@@ -240,35 +240,35 @@ let cnf_dnf ~pol ~depth e =
   let dNf2cNf ~tool ~pol ~depth (dNf:xNf_t) : xNf_t =
     let pp_i fmt () = (pp_indent ~pol) fmt depth in
     let df2cNf (df:xf_t) : xNf_t = match df with
-      | []  -> raise Absorbant (* #neutral = @absorbant *)
+      | []  -> raise Absorbent (* #neutral = @absorbent *)
       | [_]  -> df,[]
       | _ -> [],[df]
     in
     let c_df_cNf2cNf (df:xf_t) (cNf:xNf_t) : xNf_t =  c_cNf_cNf2cNf ~tool ~pol ~depth (df2cNf df) cNf
     in
     (* (d1#...#dm) # (c1@...@cn) = (c1#d1#...#dm) @ ... @ (cn#d1#...#dm)
-       (d1#...#dm) # @neutral/#absorbant = @neutral = ([],[]) *)
+       (d1#...#dm) # @neutral/#absorbent = @neutral = ([],[]) *)
     let d_df_cf2cNf (df:xf_t) (cf:xf_t) : xNf_t = match df with
       | [] -> cf,[]  (* #neutral # (c1@...@cn) = (c1@...@cn) *)
       | df -> List.fold_left (fun (acc:xNf_t) (x:term) -> c_df_cNf2cNf (x::df) acc) neutral cf
     in
     (* (d1#...#dm) # (D1@...@Dn) = (D1#d1#...#dm) @ ... @ (Dn#d1#...#dm)
-       (d1#...#dm) # @neutral/#absorbant = @neutral = ([],[]) *)
+       (d1#...#dm) # @neutral/#absorbent = @neutral = ([],[]) *)
     (*[LC] TODO: check function never called *)
     let _d_df_cnf2cNf (df:xf_t) (cnf:xnf_t) : xNf_t = match df with
       | [] -> ([],cnf) (* #neutral # (D1@...@Dn) = (D1@...@Dn) *)
       | df -> List.fold_left (fun (acc:xNf_t) (df':xf_t) -> c_df_cNf2cNf (df'@df) acc) neutral cnf
     in
     (* (c1@...@cn) # (c1'@...@ck'@D1@...@Dm) = ((c1@...@cn)#c1') @ ... @ ((c1@...@cn)#c1k') @ ((c1@...@cn)#D1) @ ...@ ((c1@...@cn)#Dm)
-       (c1@...@cn) # @neutral/#absorbant = @neutral *)
+       (c1@...@cn) # @neutral/#absorbent = @neutral *)
     let d_cf_cNf2cNf (cf:xf_t) (cNf':xNf_t) : xNf_t =
       let r = match cf,cNf' with
         | _,([],[]) -> debugN 4 "%a> d_cf_cNf2cNf cas1/4@." pp_i ();
-          cNf'     (* (c1@...@cn) # @neutral/#absorbant= @neutral *)
+          cNf'     (* (c1@...@cn) # @neutral/#absorbent= @neutral *)
         | [],_      -> debugN 4 "%a> d_cf_cNf2cNf cas2/4@." pp_i ();
-          neutral  (* @neutral/#absorbant # (c1'@...@ck'@D1@...@Dm) = @neutral *)
+          neutral  (* @neutral/#absorbent # (c1'@...@ck'@D1@...@Dm) = @neutral *)
         | _, (_,[]::_) -> debugN 4 "%a> d_cf_cNf2cNf cas3/4@." pp_i ();
-          cf,[]    (* (c1@...@cn) # #neutral/@absorbant= (c1@...@cn) *)
+          cf,[]    (* (c1@...@cn) # #neutral/@absorbent= (c1@...@cn) *)
         | _,(cf',cnf') -> debugN 4 "%a> d_cf_cNf2cNf cas4/4  cf(%d) cNf(%d,%d)@." pp_i ()
                             (List.length cf) (List.length cf') (List.length cnf');
           if 2048 < (List.length cf)*((List.length cf')+(List.length cnf')) then raise TooBig ;
@@ -285,8 +285,8 @@ let cnf_dnf ~pol ~depth e =
       debugN 3 "%a> d_cNf_dnff2cNf cNf(%d,%d) dnf(%d)=...@." pp_i ()
         (List.length (fst cNf)) (List.length (snd cNf)) (List.length dnf);
       match dnf with
-      | [] -> cNf        (* (c1@...@ck@D1@...@Dn) # @absorbant/#neutral = (D1@...@Dn) *)
-      | []::_ -> neutral (* (c1@...@ck@D1@...@Dn) # @neutral/#absorbant = @neutral *)
+      | [] -> cNf        (* (c1@...@ck@D1@...@Dn) # @absorbent/#neutral = (D1@...@Dn) *)
+      | []::_ -> neutral (* (c1@...@ck@D1@...@Dn) # @neutral/#absorbent = @neutral *)
       | cf::[]-> d_cf_cNf2cNf cf cNf (* (c1@...@ck@D1@...@Dn) # (c11@...@c1k) = (c11@...@c1k) # (c1@...@ck@D1@...@Dn) *)
       | cf::dnf -> (* (c1@...@ck@D1@...@Dn) # ((c11@...@c1k)#C2#...#Cm) =
                       ((c11@...@c1k)#(c1@...@ck@D1@...#@n)) @ (C2#...#Cm) *)
@@ -296,7 +296,7 @@ let cnf_dnf ~pol ~depth e =
       (if pol then "D" else "C") (if pol then "C" else "D") depth pol (pp_xNf ~pol:(not pol) ~depth) dNf;
     (* (d1#...#dk)#(C1#...#Cm) = (d1#...#dk) # (C1#...#Cm) *)
     let r = match dNf with
-      | [],[] -> raise Absorbant (* #neutral = @absorbant *)
+      | [],[] -> raise Absorbent (* #neutral = @absorbent *)
       | ([_] as df),dnf -> d_cNf_dnf2cNf (df,[])   dnf
       | df,dnf          -> d_cNf_dnf2cNf ([],[df]) dnf
     in
@@ -318,7 +318,7 @@ let cnf_dnf ~pol ~depth e =
         in
         let cf,cnf,cxf = flat ~tool ~pol e in
         (* [cf@cnf] part is into normal form, but the [cxf] part isn't.
-           May raise Absorbant.
+           May raise Absorbent.
         *)
         let (cf,cnf) as cNf = c_cf_cnf2cNf cf cnf in
         let depth = if depth <> -1 && (not pol) then depth-1 else depth in
@@ -330,7 +330,7 @@ let cnf_dnf ~pol ~depth e =
           List.fold_left c_cNf_cdf2cNf cNf cxf
         with | TooBig -> debug "Too big CNF/DNF@." ;
           (cf@cxf),cnf
-      with | Absorbant -> [],[[]]
+      with | Absorbent -> [],[[]]
   in
   let tool = tools ~pol in
   let cNf = cnf_dnf ~depth ~pol e in
@@ -339,14 +339,14 @@ let cnf_dnf ~pol ~depth e =
     | [],[] -> tool.neutral
     | cf,cnf ->
       let mk_sub = function
-        | [] -> raise Absorbant
+        | [] -> raise Absorbent
         | df ->
           let r = tool.mk_sub df in
-          if tool.is_absorbant_repr (F.repr r) then raise Absorbant
+          if tool.is_absorbent_repr (F.repr r) then raise Absorbent
           else r
       in
       tool.mk_top (cf@(List.map mk_sub cnf))
-  with Absorbant -> tool.absorbant
+  with Absorbent -> tool.absorbent
 
 let cnf_dnf ~pol ?(depth=(-1)) = cnf_dnf ~pol ~depth
 

@@ -91,7 +91,7 @@ requests responses, it must periodically send _polling_ requests to simply get
 back the expected responses.
 
 To implement those features, the Client-Server protocol consists of a sequence of
-paired _intput messages_ and _output messages_. Each single input message consists of
+paired _input messages_ and _output messages_. Each single input message consists of
 a list of _commands_:
 
 | Commands | Parameters | Description |

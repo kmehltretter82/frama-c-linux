@@ -254,7 +254,7 @@ let rec translate_expr eval oracle expr = match expr.node with
   | AddrOf _ | StartOf _  -> raise (Out_of_Scope "translate_expr addr")
 (* Expressions that cannot be translated by [translate_expr] are replaced
    using an oracle. Of course, this oracle must be sound!. If the oracle
-   cannot find a suitable replacement, it can re-raise the expresssion. *)
+   cannot find a suitable replacement, it can re-raise the expression. *)
 and translate_expr_linearize eval oracle expr =
   try translate_expr eval oracle expr
   with Out_of_Scope _ as e -> oracle expr e

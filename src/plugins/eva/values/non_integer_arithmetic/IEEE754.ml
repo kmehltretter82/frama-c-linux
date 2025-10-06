@@ -388,7 +388,7 @@ module Make (Model : Modeling) = struct
   let is_addition_exact l r =
     is_linear_exact (exact l) (Exact.neg (exact r))
 
-  let is_substraction_exact l r =
+  let is_subtraction_exact l r =
     is_linear_exact (exact l) (exact r)
 
   let ( + ) l r =
@@ -420,7 +420,7 @@ module Make (Model : Modeling) = struct
       let* x = exact l and* y = Exact.neg (exact r) in
       let relative = a_x_plus_b_y_over_x_plus_y ~a ~x ~b ~y result in
       let absolute = Absolute.(absolute l - absolute r) in
-      let* exactly_computed = is_substraction_exact l r in
+      let* exactly_computed = is_subtraction_exact l r in
       if not exactly_computed then
         let* expr = let+ l = exact l and+ r = exact r in Sub (l, r) in
         let* approx = Exact.(approx l - approx r) in

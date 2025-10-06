@@ -62,7 +62,7 @@ let test_nearest kf f =
     (* Test that all statements (except the first one) have as common ancestor
        the first statement of f, unless one of them is unreachable. *)
     begin match Dominators.nearest_common_ancestor all_but_first with
-      | None -> (* At leats one statement is unreachable. *) ()
+      | None -> (* At least one statement is unreachable. *) ()
       | Some ancestor -> assert (first == ancestor)
     end;
 
@@ -71,7 +71,7 @@ let test_nearest kf f =
        supposes that frama-c's normalization removed all but one return statement.
     *)
     begin match Dominators.nearest_common_child all_but_last with
-      | None -> (* At leats one statement is unreachable. *) ()
+      | None -> (* At least one statement is unreachable. *) ()
       | Some child -> assert (last == child)
     end
   end

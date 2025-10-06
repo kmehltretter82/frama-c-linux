@@ -212,7 +212,7 @@ let cleanup_tag b tag =
   b#remove_tag tag ~start:b#start_iter ~stop:b#end_iter
 
 (* This table shall not be projectified: it contains trans-project
-   informations *)
+   information *)
 module IntHashtbl =
   Hashtbl.Make(struct
     type t = int

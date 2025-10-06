@@ -107,7 +107,7 @@ let split_pointer ~warn lv state max_card =
     in an expression, an lvalue, or the offset of an lvalue (respectively). We
     use a recursive descent instead of a visitor because we want to impose an
     order to the visit. In particular, we want to see 'i' before 't[i]' when
-    examing 't[i]+1', as it is important to proceed by case analysis on 'i'
+    examining 't[i]+1', as it is important to proceed by case analysis on 'i'
     first, then on 't[i]'. *)
 let rec gather_lv_in_exp acc e =
   match e.node with

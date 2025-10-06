@@ -633,7 +633,7 @@ struct
 
   end
 
-  let weigth e = e.size
+  let weight e = e.size
   let atom_min a b = if 0 < COMPARE.compare a b then b else a
 
   let compare a b =
@@ -645,14 +645,14 @@ struct
       then COMPARE.compare a b
       else COMPARE.compare (atom_min a a') (atom_min b b')
 
-  exception Absorbant
+  exception Absorbent
 
-  let compare_raising_absorbant a b =
+  let compare_raising_absorbent a b =
     if a == b then 0
     else
       let negate ~abs e =
         let ne = !extern_not e in
-        if abs == ne then raise Absorbant ; ne in
+        if abs == ne then raise Absorbent ; ne in
       let a' = if is_prop a then negate ~abs:b a else a in
       let b' = if is_prop b then negate ~abs:a b else b in
       if a == b' || a' == b
@@ -1144,9 +1144,9 @@ struct
     | Operator op -> is_element op.neutral e
     | _ -> false
 
-  let is_absorbant f e =
+  let is_absorbent f e =
     match Fun.category f with
-    | Operator op -> is_element op.absorbant e
+    | Operator op -> is_element op.absorbent e
     | _ -> false
 
   let op_fun f op xs tau =
@@ -1161,9 +1161,9 @@ struct
       then List.sort compare xs
       else xs
     in
-    if op.absorbant <> E_none &&
-       List.exists (is_element op.absorbant) xs
-    then element tau op.absorbant
+    if op.absorbent <> E_none &&
+       List.exists (is_element op.absorbent) xs
+    then element tau op.absorbent
     else
       let xs =
         if op.neutral <> E_none
@@ -1459,7 +1459,7 @@ struct
     if List.exists is_real ts then r_add kts else i_add kts
 
   (* a and b normalized *)
-  let substraction a b =
+  let subtraction a b =
     let kts = unfold_affine1 [] Z.one a in
     let kts = unfold_affine1 kts Z.minus_one b in
     let kts = List.sort compare_monoms kts in
@@ -1630,7 +1630,7 @@ struct
     | [] -> acc
     | x::others ->
       match x.repr with
-      | False  -> raise Absorbant
+      | False  -> raise Absorbent
       | True   -> fold_and acc others
       | And xs -> fold_and (fold_and acc xs) others
       | _      -> fold_and (x::acc) others
@@ -1640,7 +1640,7 @@ struct
     | [] -> acc
     | x::others ->
       match x.repr with
-      | True  -> raise Absorbant
+      | True  -> raise Absorbent
       | False -> fold_or acc others
       | Or xs -> fold_or (fold_or acc xs) others
       | _     -> fold_or (x::acc) others
@@ -1648,16 +1648,16 @@ struct
   let conjunction ts =
     try
       let ms = fold_and [] ts in
-      let ms = List.sort_uniq compare_raising_absorbant ms in
+      let ms = List.sort_uniq compare_raising_absorbent ms in
       c_and ms
-    with Absorbant -> e_false
+    with Absorbent -> e_false
 
   let disjunction ts =
     try
       let ms = fold_or [] ts in
-      let ms = List.sort_uniq compare_raising_absorbant ms in
+      let ms = List.sort_uniq compare_raising_absorbent ms in
       c_or ms
-    with Absorbant -> e_true
+    with Absorbent -> e_true
 
   module Consequence =
   struct
@@ -1678,7 +1678,7 @@ struct
       match ts with
       | [] -> ts
       | t :: tws ->
-        if absorb == t then raise Absorbant ;
+        if absorb == t then raise Absorbent ;
         let cmp = compare filter t in
         if cmp < 0
         then gen w hws ts else
@@ -1696,7 +1696,7 @@ struct
   let consequence_and = Consequence.(filter CONJ)
   let consequence_or  = Consequence.(filter DISJ)
 
-  let merge hs hs0 = List.sort_uniq compare_raising_absorbant (hs@hs0)
+  let merge hs hs0 = List.sort_uniq compare_raising_absorbent (hs@hs0)
 
   let rec implication hs b = match b.repr with
     | Imply(hs0,b0) -> implication_imply hs b hs0 b0
@@ -1710,15 +1710,15 @@ struct
         | []  -> e_true (* [And hs] implies [b0] *)
         | [b] -> implication hs' b
         | bs' -> c_imply hs' (if bs'==bs then b0 else c_and bs')
-      with Absorbant -> implication_false hs' (* [And hs] implies [Not b0] *)
-    with Absorbant -> e_true (* [False = And (hs@hs0)] *)
+      with Absorbent -> implication_false hs' (* [And hs] implies [Not b0] *)
+    with Absorbent -> e_true (* [False = And (hs@hs0)] *)
   and implication_or hs0 hs b0 bs = try
       let hs'= merge hs0 hs in
       match consequence_or hs bs with
       | []  -> implication_false hs' (* [And hs] implies [Not b0] *)
       | [b] -> implication hs' b
       | bs' -> c_imply hs' (if bs'==bs then b0 else c_or bs')
-    with Absorbant -> e_true (* [False = And (hs@hs0)] or [And hs] implies [b] *)
+    with Absorbent -> e_true (* [False = And (hs@hs0)] or [And hs] implies [b] *)
   and implication_imply hs b hs0 b0 = try
       match consequence_and hs [b0] with
       | [] -> e_true (* [And hs] implies [b0] *)
@@ -1730,10 +1730,10 @@ struct
             | And bs -> implication_and hs0 hs b0 bs
             | Or bs  -> implication_or  hs0 hs b0 bs
             | _ -> c_imply (merge hs0 hs) b0
-        with Absorbant -> e_true (* [False = And (hs@hs0)] *)
-    with Absorbant -> (* [And hs] implies [Not b0] *)
+        with Absorbent -> e_true (* [False = And (hs@hs0)] *)
+    with Absorbent -> (* [And hs] implies [Not b0] *)
     try implication_false (merge hs hs0)
-    with Absorbant -> e_true  (* [False = And (hs@hs0)] *)
+    with Absorbent -> e_true  (* [False = And (hs@hs0)] *)
   and implication_false hs =
     e_not (c_and hs)
 
@@ -1743,14 +1743,14 @@ struct
           | [] -> e_true
           | [x] -> consequence_aux hs x
           | hs -> if hs==xs then x else c_and hs
-        with Absorbant -> e_false
+        with Absorbent -> e_false
       end
     | Or xs -> begin try
           match consequence_and hs xs with
           | [] -> e_false
           | [x] -> consequence_aux hs x
           | hs -> if hs==xs then x else c_or hs
-        with Absorbant -> e_true
+        with Absorbent -> e_true
       end
     | Not x -> e_not (consequence_aux hs x)
     | Imply (xs, b) -> begin
@@ -1764,7 +1764,7 @@ struct
               | _,     false, [] -> b'
               | true,  false, _  -> c_imply xs' b'
               | false, _,     _  -> implication xs' b'
-            with Absorbant -> e_false
+            with Absorbent -> e_false
           end
       end
     | _ -> x
@@ -1992,7 +1992,7 @@ struct
           | Or bs -> implication_or [] hs b bs
           | Imply(hs0,b0) -> implication_imply hs b hs0 b0
           | _ -> c_imply hs b
-      with Absorbant -> implication_false hs (* [And hs] implies [Not b] *)
+      with Absorbent -> implication_false hs (* [And hs] implies [Not b] *)
 
   let e_imply hs p =
     match p.repr with
@@ -2000,12 +2000,12 @@ struct
     | _ ->
       try
         let hs = fold_and [] hs in
-        let hs = List.sort_uniq compare_raising_absorbant hs in
+        let hs = List.sort_uniq compare_raising_absorbent hs in
         match hs with
         | []  -> p
         | [a] -> imply1 a p
         | _   -> imply2 hs p
-      with Absorbant -> e_true
+      with Absorbent -> e_true
 
   let () = cached_not := function
       | And xs -> e_or (List.map e_not xs)
@@ -2119,7 +2119,7 @@ struct
   let e_prod = multiplication
   let e_opp x = e_times Z.minus_one x
   let e_add x y = addition [x;y]
-  let e_sub x y = substraction x y
+  let e_sub x y = subtraction x y
   let e_mul x y = multiplication [x;y]
 
   (* -------------------------------------------------------------------------- *)
@@ -2578,7 +2578,7 @@ struct
       | Lambda -> xs
       | Forall | Exists -> List.filter (fun x -> Vars.mem x e.vars) xs
     in (* let_intro_case have to be called sequentially because of cases like
-          '\forall x y, 42 = x + y -> P' where we detect two let-in variables in parralel
+          '\forall x y, 42 = x + y -> P' where we detect two let-in variables in parallel
           but we can only simplify one in practice.*)
     let rec aux e xs =
       let e, xs, changed = List.fold_right (fun x (e, xs', b) ->

@@ -221,7 +221,7 @@
 
 (define-derived-mode acsl-mode c-mode
   "ACSL"
-  "Major mode for C annoted with ACSL."
+  "Major mode for C annotated with ACSL."
   (acsl-font-lock-init)
   (acsl-keymap-init)
   (acsl-indent-init)

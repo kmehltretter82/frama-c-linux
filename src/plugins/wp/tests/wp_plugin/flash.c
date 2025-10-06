@@ -64,7 +64,7 @@ MODULE: @PTEST_NAME@
 int RD(int *p);
 
 /* -------------------------------------------------------------------------- */
-/* --- Instrumentation of writen values via function WR                   --- */
+/* --- Instrumentation of written values via function WR                   --- */
 /* -------------------------------------------------------------------------- */
 
 //@ ghost int WR_time ;

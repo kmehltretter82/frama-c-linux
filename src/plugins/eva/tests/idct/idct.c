@@ -98,7 +98,7 @@ void idct (long m1[8][8], long m2[8][8])
           ftmp1 -= 0.5;
         else
           ftmp1 += 0.5;
-/* For symetrical rounding. */
+/* For symmetrical rounding. */
         mc1[i][j] = ftmp1;
 /* The rounding itself. mc1
  * contains now the cosines reprensented in 2's complement form, fixed
@@ -110,7 +110,7 @@ void idct (long m1[8][8], long m2[8][8])
           ftmp2 -= 0.5;
         else
           ftmp2 += 0.5;
-/* For symetrical rounding. */
+/* For symmetrical rounding. */
         mc2[i][j] = ftmp2;
 /* The rounding itself. mc2
  * contains now the cosines reprensented in 2's complement form, fixed

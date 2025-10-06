@@ -44,7 +44,7 @@ module Make : Memory.Compiler ->
     (** fold bind *)
 
     val (@:) : env -> c_label -> node
-    (** LabelMap.find with refined excpetion.
+    (** LabelMap.find with refined exception.
         @raise LabelNotFound instead of [Not_found] *)
 
     val (@-) : env -> (c_label -> bool) -> env

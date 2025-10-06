@@ -91,7 +91,7 @@ const baseStatus : { [key:string]: BaseProps } = {
   'PASSED': { icon: 'CHECK', label: 'Passed', kind: 'positive', title: 'Passed Test' },
   'DOOMED': { icon: 'CROSS', label: 'Doomed', kind: 'negative', title: 'Doomed Test' },
   'FAILED': { icon: 'WARNING', label: 'Failed', kind: 'negative', title: 'Prover Failure' },
-  'UNKNOWN': { icon: 'ATTENTION', label: 'Unknown', kind: 'warning', title: 'Prover Stucked' },
+  'UNKNOWN': { icon: 'ATTENTION', label: 'Unknown', kind: 'warning', title: 'Prover Stuck' },
   'TIMEOUT': { icon: 'HELP', label: 'Timeout', kind: 'warning', title: 'Prover Timeout' },
   'STEPOUT': { icon: 'HELP', label: 'Stepout', kind: 'warning', title: 'Prover Stepout' },
   'COMPUTING': { icon: 'EXECUTE', label: 'Running', kind: 'default', title: 'Prover is running' },

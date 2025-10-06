@@ -57,7 +57,7 @@ val equal : t -> t -> bool
 val is_empty : t -> bool
 
 (** [singleton ?status alarm] creates the map [set alarm status none]:
-    [alarm] has a by default an unkown status (which can be overridden through
+    [alarm] has a by default an unknown status (which can be overridden through
     [status]), and all others have a True status. *)
 val singleton : ?status:status -> alarm -> t
 

@@ -369,7 +369,7 @@ let iter_exp : exp iterator = iter_alarms Cil.visitCilExpr
 let iter_instr : instr iterator = iter_alarms Cil.visitCilInstr
 let iter_stmt : stmt iterator = iter_alarms Cil.visitCilStmt
 
-(** {2 Regitration} *)
+(** {2 Registration} *)
 
 let status ~invalid =
   if invalid then Some Property_status.False_if_reachable else None

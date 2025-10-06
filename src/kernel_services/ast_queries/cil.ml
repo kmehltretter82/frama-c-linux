@@ -683,7 +683,7 @@ let block_of_transient b =
   if Ast_attributes.contains vis_tmp_attr b.battrs then begin
     if b.blocals <> [] then
       Kernel.fatal
-        "Block that is supposed to be transient declares local variabels";
+        "Block that is supposed to be transient declares local variables";
     b.battrs <- Ast_attributes.drop vis_tmp_attr b.battrs;
     b.bscoping <- false
   end;

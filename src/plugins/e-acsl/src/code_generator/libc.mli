@@ -26,4 +26,4 @@ val update_memory_model:
     with the given [args].
     @return a tuple [result_opt, env] where [result_opt] is an option with
     the lvalue for the result of the function and [env] is the updated
-    environement. *)
+    environment. *)

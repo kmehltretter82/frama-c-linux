@@ -424,7 +424,7 @@ let iter f =
 
 let key kd = Md.plain (Printf.sprintf "`$%s`" kd)
 let index kd = Md.plain (Printf.sprintf "`#%s`" kd)
-let litteral tag = Md.plain (Printf.sprintf "`\"%s\"`" tag)
+let literal tag = Md.plain (Printf.sprintf "`\"%s\"`" tag)
 
 type pp = {
   self: Md.text ;
@@ -438,7 +438,7 @@ let rec md_jtype pp = function
   | Jnumber -> Md.emph "number"
   | Jboolean -> Md.emph "boolean"
   | Jstring | Jalpha -> Md.emph "string"
-  | Jtag a -> litteral a
+  | Jtag a -> literal a
   | Jkey kd -> key kd
   | Jindex kd -> index kd
   | Jdata(id,_) | Jenum(id,_) -> pp.ident id
@@ -455,7 +455,7 @@ and md_jlist pp sep js =
 and fields pp fjs =
   Md.glue ~sep:(Md.plain ",") @@
   List.map (fun (fd,js) ->
-      litteral fd @
+      literal fd @
       match js with
       | Joption js -> Md.code ":?" @ md_jtype pp js
       | _ -> Md.code ":" @ md_jtype pp js
@@ -478,7 +478,7 @@ let md_tags ?(title="Tags") (tags : tagInfo list) =
     ] in
   let row tg = [
     tg.tg_label ;
-    litteral tg.tg_name ;
+    literal tg.tg_name ;
     tg.tg_descr ;
   ] in
   Md.{ caption = None ; header ; content = List.map row tags  }
@@ -492,12 +492,12 @@ let md_fields ?(title="Field") pp (fields : fieldInfo list) =
   let row f =
     match f.fd_type with
     | Joption js -> [
-        litteral f.fd_name @ Md.plain "(opt.)" ;
+        literal f.fd_name @ Md.plain "(opt.)" ;
         md_jtype pp js ;
         f.fd_descr ;
       ]
     | _ -> [
-        litteral f.fd_name ;
+        literal f.fd_name ;
         md_jtype pp f.fd_type ;
         f.fd_descr ;
       ]

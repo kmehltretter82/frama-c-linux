@@ -168,7 +168,7 @@ value_parameters=(
   "-no-val-show-progress[show progression messages during analysis]"
   "-val-show-time=[prints the time spent analyzing function calls, when it exceeds <n> seconds]:integer"
   "-val-show-perf[compute and shows a summary of the time spent analyzing function calls]"
-  "-val-show-slevel=[period for showing consumption of the alloted slevel during analysis]:integer"
+  "-val-show-slevel=[period for showing consumption of the allotted slevel during analysis]:integer"
   "-val-print-callstacks[when printing a message, also show the current call stack]"
 
 # value_interpreter

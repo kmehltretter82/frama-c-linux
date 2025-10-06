@@ -236,8 +236,8 @@ module BranchDatatype = Datatype.Make_with_collections (struct
      this number varies from a state to another, as it is computed from
      an expression evaluated when we enter the loop.
    - Splits: track the splits applied to the state as a map from the term of
-     the split to its value. Terms can be C expresssions or ACSL predicates.
-     Since the split creates states in which the expression evalutates to a
+     the split to its value. Terms can be C expressions or ACSL predicates.
+     Since the split creates states in which the expression evaluates to a
      singleton, the values of the map are integers.
      Static splits are only evaluated when the annotation is encountered
      whereas dynamic splits are reevaluated regularly; a list of active
@@ -526,7 +526,7 @@ struct
           SplitValues.add i monitor.split_values;
         (i, state) :: acc
       | `Bottom -> (* This value cannot be set in the state ; the evaluation of
-                      expr was unprecise *)
+                      expr was imprecise *)
         acc
     in
     try

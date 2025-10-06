@@ -881,7 +881,7 @@ let prop_persistent_marks fi to_prop actions =
     let a =
       match node_marks with
       | PdgMarks.SelList node_marks ->
-        SlicingActions.mk_crit_prop_persit_marks fi node_marks
+        SlicingActions.mk_crit_prop_persist_marks fi node_marks
       | PdgMarks.SelTopMarks marks ->
         assert (PdgTypes.Pdg.is_top pdg);
         let m = SlicingMarks.merge_marks marks in

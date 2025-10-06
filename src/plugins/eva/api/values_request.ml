@@ -630,7 +630,7 @@ let () =
   in
   Request.register_sig ~package getProbeInfo
     ~kind:`GET ~name:"getProbeInfo"
-    ~descr:(Md.plain "Probe informations")
+    ~descr:(Md.plain "Probe information")
     begin fun rq marker ->
       match probe marker with
       | None -> set_evaluable rq false

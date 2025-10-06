@@ -14,7 +14,7 @@ Options taking a string as argument should preferably be written
 
 ***** LIST OF AVAILABLE OPTIONS:
 
--volatile           builds a new projet (named "Volatile") where volatile
+-volatile           builds a new project (named "Volatile") where volatile
                     accesses are simulated by function calls (opposite option
                     is -no-volatile)
 -volatile-basetype  use base-type for int, float and enums for the

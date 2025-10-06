@@ -229,7 +229,7 @@ extern int setvbuf(FILE * restrict stream,
 */
 
 // Direct specifications for variadic functions are unsupported;
-// use the Variadic mocule instead.
+// use the Variadic module instead.
 extern int fprintf(FILE * restrict stream,
      const char * restrict format, ...);
 extern int fscanf(FILE * restrict stream,

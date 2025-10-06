@@ -88,7 +88,7 @@ module Make_Dataflow
 
   (* --- Plugin parameters --- *)
 
-  let hierachical_convergence : bool =
+  let hierarchical_convergence : bool =
     Parameters.HierarchicalConvergence.get ()
 
   let interpreter_mode =
@@ -557,10 +557,10 @@ module Make_Dataflow
     | Wto.Node v ->
       ignore (process_vertex v)
     | Wto.Component (v, w) as component ->
-      (* Reset the component if hierachical_convergence is set.
+      (* Reset the component if hierarchical_convergence is set.
          Otherwise, only resets the widening counter for this component. This
          is especially useful for nested loops. *)
-      if hierachical_convergence
+      if hierarchical_convergence
       then reset_component (v :: Wto.flatten w)
       else Partitioning.reset_widening_counter (get_vertex_widening v);
       (* Iterate until convergence *)

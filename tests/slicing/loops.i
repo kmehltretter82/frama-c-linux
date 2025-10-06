@@ -149,7 +149,7 @@ void test_infinite_loop_5 (int ctrl1, int ctrl2, int no_ctrl,
   while (ctrl1) {
     G += data1 ;
     if (no_ctrl) { /* Don't control the final value of G.
-                    * It only controls the terminaison of the function.
+                    * It only controls the termination of the function.
                     */
       G += no_data ;   /* Don't affect ... */
       while (1)

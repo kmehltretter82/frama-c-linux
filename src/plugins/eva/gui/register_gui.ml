@@ -556,7 +556,7 @@ let find_loc kf fdec block =
     | [] -> None
     | s :: _ -> Some (GL_Stmt (kf, s))
 
-let add_keybord_shortcut_evaluate main_ui =
+let add_keyboard_shortcut_evaluate main_ui =
   (* The currently selected statement is stored to enable a keyboard shortcut
      to activate it. [None] means that there is no selection or the selected
      element is not part of a statement. *)
@@ -723,7 +723,7 @@ let main (main_ui:main_ui) =
   main_ui#register_source_highlighter active_highlighter;
   let panel_red = Gui_red.make_panel main_ui in
   main_ui#register_panel (value_panel (red_checkbox panel_red));
-  add_keybord_shortcut_evaluate main_ui;
+  add_keyboard_shortcut_evaluate main_ui;
 ;;
 
 let () = Design.register_extension main

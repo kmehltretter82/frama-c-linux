@@ -8,7 +8,7 @@
 
 (** Gadt describing the structure of a tree of different data types,
     and providing fast accessors of its nodes.
-    The leafs must provide a key from a Key module, see key.mli for details. *)
+    The leaves must provide a key from a Key module, see key.mli for details. *)
 
 (** Equality witness between types. *)
 type (_,_) eq = Eq : ('a,'a) eq

@@ -155,7 +155,7 @@ hello.tar.gz: hello.tar
 ###########
 
 clean:
-	rm -f *.aux *~ *.log *.blg *.bbl *.toc *.lof *.idx *.ilg *.ind
+	rm -f *.aux *~ *.log *.blg *.bbl *.toc *.lof *.idx *.ilg *.ind *.fdb_latexmk
 	rm -rf _whizzy* *.raux *.wdvi *.out
 	rm -f *.haux *.htoc
 

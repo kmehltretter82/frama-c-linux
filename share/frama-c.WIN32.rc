@@ -6,7 +6,7 @@
 #                                                                        #
 ##########################################################################
 
-# Default font for all widgets The first exisiting font is used.
+# Default font for all widgets The first existing font is used.
 style "general" 
 {
         font_name = "Sans"

@@ -52,7 +52,7 @@ let warn_unknown_size vi =
 
 (* A bottom in any part of an initializer results in a bottom for the
    whole initialization. Thus, the following monad raises an exception on a
-   bottom case; the exception is catched by the root initialization functions
+   bottom case; the exception is caught by the root initialization functions
    to return a proper `Bottom. *)
 exception Initialization_failed
 
@@ -218,7 +218,7 @@ module Make
 
   (* ----------------------- Non Lib-entry mode ----------------------------- *)
 
-  (* Initializes a varinfo, padding bits + optionaly an initializer. *)
+  (* Initializes a varinfo, padding bits + optionally an initializer. *)
   let initialize_var_not_lib_entry ~pos ~local vi init state =
     ignore (warn_unknown_size vi);
     let source = fst vi.vdecl in
@@ -426,7 +426,7 @@ module Make
       end)
   let () = Ast.add_monotonic_state InitialState.self
 
-  (* The computation depends on the lib_entry option, which is a corrrectness
+  (* The computation depends on the lib_entry option, which is a correctness
      parameter of the analyzer: the InitialState memoization is thus safely
      cleaned when lib_entry changes. *)
   let global_state ~lib_entry =

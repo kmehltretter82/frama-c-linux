@@ -6,7 +6,7 @@ requests from the command line or JSON scripts.
 
 The `-server-script` option of the Frama-C/Server plug-in takes a (list of)
 script file `<file.json>`, parse it and execute its commands, and output the
-reponses in file `<file.out.json>`.
+responses in file `<file.out.json>`.
 
 ## Input Script Format
 
@@ -26,6 +26,6 @@ Each command leads to an assiated JSON record, with the following fields:
 | Output Field | Format | Description |
 |:------|:-------|:-----------:|
 | `id` | _any_ ? | The command identifier (as provided in input) |
-| `data` | _any_ ? | The request output parameters (if successfull) |
-| `error` | _string_ ? | The request error message (in case of occurence) |
+| `data` | _any_ ? | The request output parameters (if successful) |
+| `error` | _string_ ? | The request error message (in case of occurrence) |
 | `at` | _any_ ? | Wrongly encoded part of the request (when appropriate) |

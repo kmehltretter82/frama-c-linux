@@ -33,7 +33,7 @@ int __finitef(float f)
   union __fc_u_finitef { float f ; unsigned short w[2] ; } u ;
   unsigned short usExp ;
 
-  u.f = f ;            /* Initilize for word access */
+  u.f = f ;            /* Initialize for word access */
   usExp = (u.w[1] & 0x7F80) ;   /* Isolate the exponent */
   usExp >>= 7 ;                 /* Right align */
 
@@ -46,7 +46,7 @@ int __finite(double d)
   union __fc_u_finite { double d ; unsigned short w[4] ; } u ;
   unsigned short usExp ;
 
-  u.d = d ;            /* Initilize for word access */
+  u.d = d ;            /* Initialize for word access */
   usExp = (u.w[3] & 0x7F80) ;   /* Isolate the exponent */
   usExp >>= 7 ;                 /* Right align */
 

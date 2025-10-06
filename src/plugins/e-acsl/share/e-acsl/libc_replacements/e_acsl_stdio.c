@@ -33,7 +33,7 @@
 
 /* An abbreviated type is a character that describes a given primitive or a
    pointer type that may be expected by a formatting directive of a
-   function such as `printf`. Correspondance between abbreviated and actual
+   function such as `printf`. Correspondence between abbreviated and actual
    types is given via macro ::abbreviated_types.
 
    Abbreviated type values are ad-hoc with one convention:
@@ -138,7 +138,7 @@ static abbrev_t size2abbrf(int size) {
   return '\0';
 }
 
-/* Partial mapping of primitive abreviated type to a pointer of the same type,
+/* Partial mapping of primitive abbreviated type to a pointer of the same type,
    e.g., 'd' (int) -> 's' (*) */
 static char abbr2ptr(char c) {
   switch (c) {
@@ -216,14 +216,14 @@ typedef struct {
     int index;  /* Argument index this specification refers to */
     _Bool expl; /* Set to 1 if the argument has been numbered via $ */
   } arg;
-  struct flags {     /* Flags */
-    _Bool specified; /* set if any of the below flags are set */
-    _Bool minus;     /* - */
-    _Bool plus;      /* + */
-    _Bool space;     /* ' ' */
-    _Bool hash;      /* # */
-    _Bool zero;      /* 0 */
-    _Bool apostroph; /* ' */
+  struct flags {      /* Flags */
+    _Bool specified;  /* set if any of the below flags are set */
+    _Bool minus;      /* - */
+    _Bool plus;       /* + */
+    _Bool space;      /* ' ' */
+    _Bool hash;       /* # */
+    _Bool zero;       /* 0 */
+    _Bool apostrophe; /* ' */
   } flags;
   int field_width;  /* Field width, INT_MIN if not given, -1 if '*' */
   int precision;    /* Format precision, INT_MIN if not given, -1 if '*' */
@@ -257,7 +257,7 @@ static void print_directive(format_directive *dir, char *rem) {
   print_format_flag(minus, "-");
   print_format_flag(space, " ");
   print_format_flag(hash, "#");
-  print_format_flag(apostroph, "'");
+  print_format_flag(apostrophe, "'");
   print_format_flag(zero, "0");
 #  undef print_format_flag
   rtl_printf(">\n");
@@ -340,7 +340,7 @@ static char *fetch_format_flags(char *fmt, format_directive *dir) {
       set_format_flag(space);
       break;
     case '\'':
-      set_format_flag(apostroph);
+      set_format_flag(apostrophe);
       break;
     case '0':
       set_format_flag(zero);
@@ -561,7 +561,7 @@ static void validate_applications(format_directive *dir) {
   /* ' flag separates thousands by commas. It is applicable only to
      i, d, u, f, F, g, or G conversion specifiers. For other specifiers
      its behaviour is undefined. */
-  if (dir->flags.apostroph)
+  if (dir->flags.apostrophe)
     validate_application(dir, "idufFgG", "'", desc);
 
   /* # flag converts a value to an alternative form. It is applicable only to
@@ -606,7 +606,7 @@ static void validate_applications(format_directive *dir) {
     private_assert(is_length_char(dir->length.mod),
                    FMT_ERROR "bad length specifier [%c]\n", dir->length.mod);
 
-    /* Conver length modifier to a string */
+    /* Convert length modifier to a string */
     char lm_kind[3];
     int i = 0;
     lm_kind[i++] = dir->length.mod;

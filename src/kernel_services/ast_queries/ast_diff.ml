@@ -1320,7 +1320,7 @@ and enuminfo_correspondence ?loc ei env =
   Enuminfo.memo add ei
 
 (* For now, all enumitems are treated with their parent enuminfo: if
-   we don't find one, we let enuminfo_correspondance do the job. *)
+   we don't find one, we let enuminfo_correspondence do the job. *)
 and enumitem_correspondence ?loc ei env =
   let add ei =
     match enuminfo_correspondence ?loc ei.eihost env with

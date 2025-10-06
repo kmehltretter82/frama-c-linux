@@ -37,7 +37,7 @@ let check_flag spec flag =
   | FSpace, (#signed_specifier | #float_specifier) -> true
   | FPlus, (#signed_specifier | #float_specifier) -> true
   | _ ->
-    warn "Flag %a and conversion specififer %a are not compatibles."
+    warn "Flag %a and conversion specifier %a are not compatible."
       pp_flag flag
       pp_cs (spec.f_conversion_specifier,spec.f_capitalize);
     raise Invalid_format
@@ -76,7 +76,7 @@ let check_f_specification spec =
     try ignore (Format_typer.type_f_specifier ~find_typedef spec)
     with Format_typer.Invalid_specifier ->
       warn "Length modifier %a and conversion specifier %a \
-            are not compatibles."
+            are not compatible."
         (Pretty_utils.pp_opt pp_lm) spec.f_length_modifier
         pp_cs (spec.f_conversion_specifier,spec.f_capitalize);
       raise Invalid_format
@@ -95,7 +95,7 @@ let check_s_specification spec =
     try ignore (Format_typer.type_s_specifier ~find_typedef spec)
     with Format_typer.Invalid_specifier ->
       warn "Length modifier %a and conversion specifier %a \
-            are not compatibles."
+            are not compatible."
         (Pretty_utils.pp_opt pp_lm) spec.s_length_modifier
         pp_cs (spec.s_conversion_specifier,false);
       raise Invalid_format
@@ -182,7 +182,7 @@ let parse_int b =
   in
   if neg then -i else i
 
-let parse_assignement_suppression b =
+let parse_assignment_suppression b =
   match Buffer.peek b with
   | '*' -> Buffer.consume b; true
   | _ -> false
@@ -285,7 +285,7 @@ let parse_f_spec b =
   }
 
 let parse_s_spec b =
-  let s_assignment_suppression = parse_assignement_suppression b in
+  let s_assignment_suppression = parse_assignment_suppression b in
   let s_field_width = parse_s_fw b in
   let s_length_modifier = parse_lm b in
   let s_conversion_specifier = parse_s_cs b in

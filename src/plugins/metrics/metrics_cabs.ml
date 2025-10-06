@@ -534,7 +534,7 @@ module Halstead = struct
 
   let pp_metrics ppf cabs_visitor =
     let metrics = get_metrics cabs_visitor in
-    (* Compute the metrics from the informations gathered by the visitor. *)
+    (* Compute the metrics from the information gathered by the visitor. *)
     let minutes = (int_of_float metrics.time_to_implement) / 60 in
     let _hours, _minutes = minutes / 60, minutes mod 60 in
 

@@ -693,11 +693,11 @@ end = functor (Out : Out_language) -> struct
       compile ~lb:Vars.empty ~conds:[] @@ without_foralls ctor.predicate
     in
     let body =
-      let falltrough = Out.mk_false l_type in
+      let fallthrough = Out.mk_false l_type in
       List.fold_right
         extract_ctor
         (InductiveDefinition.ctors_of_inductive li)
-        falltrough
+        fallthrough
     in
     let li = {li with l_profile; l_type} in
     li.l_body <- Out.mk_logic_body @@ Out.visit (li_use_updater li.l_var_info li) body;

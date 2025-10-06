@@ -93,8 +93,8 @@ val get_current : unit -> t option
     This should only be called during the analysis of a function. *)
 val get_current_exn : unit -> t
 
-(** [with_callstack ~finally cs job] creates a wrapper arround [job] such that
-    the wrapped executions happen in environnement where the current callstack
+(** [with_callstack ~finally cs job] creates a wrapper around [job] such that
+    the wrapped executions happen in environment where the current callstack
     returned by {!get_current} is set to [cs]. When [job] returns or raises an
     exception, [finally] is called and then the current callstack is restored to
     its previous value. *)

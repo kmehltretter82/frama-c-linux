@@ -246,7 +246,7 @@ let rec normalize_condition exp positive =
     mk_exp (BinOp (op, zero_typed typ, exp, Cil_const.intType))
 
 
-(* --- Hide mk optional paremeters --- *)
+(* --- Hide mk optional parameters --- *)
 
 let mk_exp = mk_exp ~origin:Built
 let mk_lval = mk_lval ~origin:Built

@@ -181,7 +181,7 @@ Plugin E-ACSL 24.0 (Chromium)
 -* E-ACSL       [2021-07-16] Fix crash when using some built-in labels
                 (frama-c/e-acsl#173).
 -  E-ACSL       [2021-07-06] Support for \sum.
--* E-ACSL       [2021-06-22] Fix a crash that occured when using certain
+-* E-ACSL       [2021-06-22] Fix a crash that occurred when using certain
                 combinations of nested blocks and annotations.
 -* E-ACSL       [2021-06-16] Fix literal string replacements in function
                 arguments during a local initialization.
@@ -483,7 +483,7 @@ Plugin E-ACSL 0.6 (Magnesium_20151002)
                 small runs of the E-ACSL plugin.
 -* E-ACSL       [2015-12-08] Fix bug #1817 about incorrect initialization of
                 literal strings in global arrays with compound initializers.
--* runtime      [2015-11-06] Fix a crash occuring when using a recent libc
+-* runtime      [2015-11-06] Fix a crash occurring when using a recent libc
                 while GMP headers provided by E-ACSL are used.
 
 ###############################################################################
@@ -535,7 +535,7 @@ Plugin E-ACSL 0.4.1 (Neon_20140301)
 Plugin E-ACSL 0.4 (Neon_20140301)
 ###############################################################################
 
--* E-ACSL       [2014-01-28] Fix bug #1634 occuring in presence of static
+-* E-ACSL       [2014-01-28] Fix bug #1634 occurring in presence of static
                 addresses.
 -* E-ACSL       [2013-09-26] Fix incorrectness which may occur in presence
                 of aliasing.

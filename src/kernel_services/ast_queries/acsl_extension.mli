@@ -59,7 +59,7 @@ type extension_same =
     untyped content of the extension before parsing the rest of the processed
     file. By default, this function is the identity.
 
-    The [typer] is applied when transforming the untyped AST to Cil. It recieves
+    The [typer] is applied when transforming the untyped AST to Cil. It receives
     the typing context of the annotation that can be used to type the received
     logic expressions (see [Logic_typing.typing_context]), and the location of
     the annotation.

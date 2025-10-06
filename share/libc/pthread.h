@@ -271,7 +271,7 @@ extern int pthread_cancel(pthread_t thread);
 
 /*@ requires valid_cond: \valid(cond);
     assigns \result \from \nothing;
-    ensures sucess: \result == 0;
+    ensures success: \result == 0;
 */
 extern int pthread_cond_broadcast(pthread_cond_t *cond);
 

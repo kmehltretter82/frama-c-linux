@@ -62,7 +62,7 @@ For the Program Dependence Graph tests, see  ppc/tests/pdg.
    data confidentiality. Test -slice-calls option.
 
 ** tests/slicing/mark_all_slices.c
-   tests for the newly created (04/2007) persistant selection.
+   tests for the newly created (04/2007) persistent selection.
 
 ** tests/slicing/min_call.c
    the source code is included from tests/slicing/select_return.c,

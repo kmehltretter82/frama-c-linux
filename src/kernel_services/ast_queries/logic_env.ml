@@ -150,7 +150,7 @@ module Axiomatics =
       let size = 17
     end)
 
-module ModuleOccurence =
+module ModuleOccurrence =
   Datatype.Pair
     (Datatype.Option
        (Datatype.Pair
@@ -159,7 +159,7 @@ module ModuleOccurence =
     (Cil_datatype.Location)
 
 module Modules =
-  State_builder.Hashtbl(Datatype.String.Hashtbl)(ModuleOccurence)
+  State_builder.Hashtbl(Datatype.String.Hashtbl)(ModuleOccurrence)
     (struct
       let name = "Logic_env.Modules"
       let dependencies = []

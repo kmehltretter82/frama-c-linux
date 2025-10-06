@@ -65,7 +65,7 @@ int pimInit(tVoid)
   return 1;
 }
 
-/*KO: conditional intializers */
+/*KO: conditional initializers */
 #if 0
 typedef long int time_t;
 struct time_t_is_integer {

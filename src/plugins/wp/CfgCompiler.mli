@@ -150,7 +150,7 @@ val concat : cfg -> cfg -> cfg
 *)
 
 val meta : ?stmt:stmt -> ?descr:string -> node -> cfg
-(** Attach meta informations to a node.
+(** Attach meta information to a node.
     Formally, it is equivalent to [nop]. *)
 
 val goto : node -> node -> cfg
@@ -230,7 +230,7 @@ val havoc : node -> memory_effects:node sequence -> node -> cfg
 
     Note: the effects are collected in the {i final} control-flow,
     when {!compile} is invoked. The portion of the sub-graph in the sequence
-    shall be concatenated to the [cfg] before compiling-it, otherwize it would be
+    shall be concatenated to the [cfg] before compiling-it, otherwise it would be
     considered empty and [havoc] would be a nop (no connection between a and b).
 *)
 
@@ -249,7 +249,7 @@ val havoc : node -> memory_effects:node sequence -> node -> cfg
     state at this node.
 
     Nodes absent from the map are unreachable. Whenever possible,
-    predicate [F.ptrue] is returned for inconditionally accessible
+    predicate [F.ptrue] is returned for unconditionally accessible
     nodes.
 
     ~name: identifier used for debugging

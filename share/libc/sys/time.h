@@ -30,7 +30,7 @@ __FC_EXTERN int __fc_tz;
 /*@
   requires valid_path: valid_read_string(path);
   requires valid_times_or_null: \valid_read(times+(0..1)) || times == \null;
-  requires intialized_times_or_null:initialization:
+  requires initialized_times_or_null:initialization:
     \initialized(times+(0..1)) || times == \null;
   assigns \result \from indirect:path[0..strlen(path)],
     indirect:times, indirect:times[0..1];
@@ -41,7 +41,7 @@ extern int utimes(const char *path, const struct timeval times[2]);
     //missing: errno
   requires valid_fd: 0 <= fd < __FC_MAX_OPEN_FILES;
   requires valid_times_or_null: \valid_read(times+(0..1)) || times == \null;
-  requires intialized_times_or_null:initialization:
+  requires initialized_times_or_null:initialization:
     \initialized(times+(0..1)) || times == \null;
   assigns \result \from indirect:fd, indirect:times, indirect:times[0..1];
 */
@@ -144,7 +144,7 @@ struct itimerval {
 */
 extern int getitimer(int which, struct itimerval *curr_value);
 
-// TODO: replace with a predicate, when Value will be able to evalute it
+// TODO: replace with a predicate, when Value will be able to evaluate it
 // precisely
 #define __VALID_ITIMERVAL(tv) (0 <= (tv)->it_value.tv_usec <= 999999 &&    \
                              0 <= (tv)->it_interval.tv_usec <= 999999)

@@ -122,7 +122,7 @@ export interface ColumnProps<Row, Cell> {
   disableSort?: boolean;
   /**
      Default column visibility. With `'never'` or `'always'` the column
-     visibility is forced and can not be modified by the user. Otherwize,
+     visibility is forced and can not be modified by the user. Otherwise,
      the user can change visibility through the column header context menu.
    */
   visible?: boolean | 'never' | 'always';
@@ -803,7 +803,7 @@ export interface ColumnGroupProps {
    also means that columns rendered in a group never goes outside of this group.
    Column groups hence provide hierarchical column ordering.
 
-   The immediate children of a Table component are implicitely rendered in a
+   The immediate children of a Table component are implicitly rendered in a
    column group initialized at index `[i]` for the `i`-th child. To cancel
    this implicit root column group, just pack your columns inside a classical
    React fragment: `<Table … ><>{children}</></Table>`.
@@ -1019,7 +1019,7 @@ function makeResizers(
     const a = resizing[k];
     const b = resizing[k + 1];
     if ((!a.fixed || !b.fixed) && a.right && b.left) {
-      const index = k; // Otherwize use dynamic value of k
+      const index = k; // Otherwise use dynamic value of k
       const rcol = a.right;
       const lcol = b.left;
       const offset = state.offset ?? 0;

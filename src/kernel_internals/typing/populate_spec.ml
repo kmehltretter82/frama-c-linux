@@ -171,7 +171,7 @@ sig
 
   (* Generator's clause : exits, assigns, requires, allocates or terminates. *)
   type clause
-  (* Store informations regarding original specification clauses. *)
+  (* Store information regarding original specification clauses. *)
   type behaviors
 
   (* Used for messages in logs/warnings, etc. *)
@@ -775,7 +775,7 @@ let get_config_custom () =
 (* Create the final configuration used for the specification.
    First we create the configuration to be used (either from command line
    parameters, or specific modes for builtins and frama-c's stdlib).
-   Then we activate clauses selected for the generation, skiping all other
+   Then we activate clauses selected for the generation, skipping all other
    clauses.
 *)
 let activated_config kf clauses =

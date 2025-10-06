@@ -19,7 +19,7 @@ val create: loc:location -> spec -> t
     spec) *)
 
 val translate_preconditions: kernel_function -> Env.t -> t -> Env.t
-(** Translate the preconditions of the given contract into the environement *)
+(** Translate the preconditions of the given contract into the environment *)
 
 val translate_postconditions: kernel_function -> Env.t -> Env.t
 (** Translate the postconditions of the given contract into the environment *)

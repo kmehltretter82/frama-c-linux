@@ -48,7 +48,7 @@ val pretty : ?vbox:int -> Format.formatter -> message -> unit
 
 (** Buffer for creating messages.
 
-    The buffer grows on demand, but is protected against huge mesages.
+    The buffer grows on demand, but is protected against huge messages.
     Maximal size is around 2 billions ASCII characters, which sould be enough
     to store more than 25kloc source text. *)
 type buffer
@@ -93,7 +93,7 @@ val trim : buffer -> int * int
 val shrink : buffer -> unit
 
 (** [truncate buffer size] truncates the content of [buffer] if longer than
-    [size] characters. Returns true if the bufffer has been truncated. *)
+    [size] characters. Returns true if the buffer has been truncated. *)
 val truncate : buffer -> int -> bool
 
 (* -------------------------------------------------------------------------- *)

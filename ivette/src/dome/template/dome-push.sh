@@ -21,7 +21,7 @@ fi
 
 if [ ! -z "$(git status --porcelain)" ]
 then
-    echo "Local non-commited modifications, aborted."
+    echo "Local non-committed modifications, aborted."
     exit 1
 fi
 

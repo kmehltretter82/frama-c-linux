@@ -27,7 +27,7 @@
 [e-acsl] quantif.i:97: Warning: 
   invalid E-ACSL construct
   `invalid guard p1(i, 2, 2) in quantification
-  failded_missing_upper_bound: \forall integer i; 0 <= i ==> p1(i, 2, 2). 
+  failed_missing_upper_bound: \forall integer i; 0 <= i ==> p1(i, 2, 2). 
   Missing upper bound for i. '.
   Ignoring annotation.
 [e-acsl] quantif.i:99: Warning: 
@@ -95,7 +95,7 @@
 [eva:alarm] quantif.i:95: Warning: 
   assertion 'failed_missing_lower_bound' got status unknown.
 [eva:alarm] quantif.i:97: Warning: 
-  assertion 'failded_missing_upper_bound' got status unknown.
+  assertion 'failed_missing_upper_bound' got status unknown.
 [eva:alarm] quantif.i:99: Warning: 
   assertion 'failed_invalid_upper_bound_1' got status unknown.
 [eva:alarm] quantif.i:101: Warning: 

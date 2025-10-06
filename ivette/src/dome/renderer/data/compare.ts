@@ -22,13 +22,13 @@ import FastCompare from 'react-fast-compare';
 
 /**
    Interface for comparison functions.
-   These function shall fullfill the following contract:
+   These function shall fulfill the following contract:
    - `compare(x,y) === 0` shall be an equivalence relation
      (reflexive, symmetric, transitive)
    - `compare(x,y) <= 0` shall be a complete order
      (reflexive, antisymetric, transitive)
    - `compare(x,y) < 0` shall be a complete strict order
-     (anti-reflexive, asymetric, transitive)
+     (anti-reflexive, asymmetric, transitive)
 */
 export interface Order<A> {
   (x: A, y: A): number;

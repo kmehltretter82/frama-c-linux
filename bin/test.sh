@@ -436,7 +436,7 @@ function TestDir
 
     FindPtestDir "$1"
 
-    # Add cramtests aliases from this folder unless @runtest is positionned,
+    # Add cramtests aliases from this folder unless @runtest is positioned,
     # meaning we're already running all cram tests
     if [[ ! "${DUNE_ALIAS[*]}" =~ "@runtest" ]]; then
         # Find all files and folders ending with ".t" except run.t files, and
@@ -531,7 +531,7 @@ function Register
     done
 
     if [ "$GENERATE" = "yes" ]; then
-        # Keep only one occurence of each folder
+        # Keep only one occurrence of each folder
         PTESTS_DIR=($(IFS=$'\n'; sort -u <<< "${PTESTS_DIR[*]}"))
     fi
 }

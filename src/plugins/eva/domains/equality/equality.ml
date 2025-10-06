@@ -236,7 +236,7 @@ module Set = struct
       with NonExchangeable -> remove_from_equalities elt map
     else map
 
-  (* [remove lval map] removes any occurence of the lvalue [lval] in the [map].
+  (* [remove lval map] removes any occurrence of the lvalue [lval] in the [map].
      When possible, [lval] is replaced by an equal lvalue or expression in any
      term of [map] that contains [lval]. Otherwise, these terms are simply
      removed as well. *)

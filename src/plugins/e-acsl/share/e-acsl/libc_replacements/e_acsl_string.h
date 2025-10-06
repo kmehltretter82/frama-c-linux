@@ -59,7 +59,7 @@ long valid_nstring(char *s, long n, int wrtbl);
 
    This function is very similar to ::valid_nstring. It is possible make it
    more concise (say define it as a macro with types provided explicitly) yet
-   it is left this way for readibility reasons. */
+   it is left this way for readability reasons. */
 long valid_nwstring(wchar_t *s, long n, int wrtbl);
 
 /*! \brief Same as ::valid_nstring but check a NUL-terminated string */

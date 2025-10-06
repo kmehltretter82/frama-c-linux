@@ -55,7 +55,7 @@ let effects_of_call stmt zlval effects  =
     let out = inout.Inout_type.over_outputs in
     if Zone.intersects out zlval then
       if Eva.Analysis.use_spec_instead_of_definition kf then
-        (true, indirect) (* Direct effect: there is no body for this funtion. *)
+        (true, indirect) (* Direct effect: there is no body for this function. *)
       else
         (direct, true) (* Indirect effect *)
     else
@@ -91,7 +91,7 @@ class find_write_insts zlval = object (self)
       in
       match i with
       | Set _ | Local_init(_, AssignInit _, _) ->
-        (* Effect only throuh the written l-value *)
+        (* Effect only through the written l-value *)
         let z = Inout.stmt_outputs stmt in
         if Zone.intersects z zlval then begin
           res <- Assign stmt :: res

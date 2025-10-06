@@ -86,7 +86,7 @@ Using "Alt+Click" to select an expression in the AST component creates an
 already pinned column.
 
 One can also evaluate an arbitrary expression:
-- first select a statement (or any expresion within a statement)
+- first select a statement (or any expression within a statement)
   in the AST component. This will be the program point where the evaluation
   takes place.
 - then use the shortcut "Ctrl+E", or the menu entry _Edit -> Evaluate_,
@@ -132,7 +132,7 @@ executions reaching the given program point.
 In the component titlebar, the button [icon-items.list] enables the view by
 callstack: the table shows one row per callstack for which the selected
 program point has been reached by the analysis.
-Clicking on the number in the leftmost columm displays the row callstack
+Clicking on the number in the leftmost column displays the row callstack
 at the bottom of the component, as a list of call sites, going back to the
 _main_ function. A click on a call site selects it in the **AST** component.
 

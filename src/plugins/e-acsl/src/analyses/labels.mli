@@ -30,7 +30,7 @@ val preprocess: file -> unit
     should be translated. *)
 
 val reset: unit -> unit
-(** Reset the results of the pre-anlaysis. *)
+(** Reset the results of the pre-analysis. *)
 
 val _debug: unit -> unit
 (** Print internal state of labels translation. *)

@@ -30,7 +30,7 @@ val round_if_single_precision : Cil_types.fkind -> float -> float
 (** {2 Floating-point operations} *)
 
 type truncated_to_integer =
-  | Integer of Integer.t (** The given float has been succesfully truncated. *)
+  | Integer of Integer.t (** The given float has been successfully truncated. *)
   | Underflow            (** The given float would underflow if truncated. *)
   | Overflow             (** The given float would overflow if truncated. *)
 

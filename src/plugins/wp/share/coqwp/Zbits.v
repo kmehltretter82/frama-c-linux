@@ -1194,15 +1194,15 @@ Proof.
   destruct e; simpl; rewrite H; auto.
 Qed.									  
 									  
-(** Absorbant element of bitwise operators *)
+(** Absorbent element of bitwise operators *)
 
-Definition absorbant {A: Type} (a: A) (f: A -> A -> A) :=
+Definition absorbent {A: Type} (a: A) (f: A -> A -> A) :=
   forall x: A, f a x  = a.
 
-Lemma Z_bitwise_absorbant (a:bool) :
-  forall f, absorbant a f -> absorbant (if a then (-1) else 0) (Z_bitwise f).
+Lemma Z_bitwise_absorbent (a:bool) :
+  forall f, absorbent a f -> absorbent (if a then (-1) else 0) (Z_bitwise f).
 Proof.
-  unfold absorbant. intros. Zbit_bitwise k.
+  unfold absorbent. intros. Zbit_bitwise k.
   destruct a; simpl; rewrite H; auto.
 Qed.									  
 
@@ -1647,20 +1647,20 @@ Proof.
   unfold neutral. auto.
 Qed.
   
-(** ** Absorbant elements of bitwise operators *)
+(** ** Absorbent elements of bitwise operators *)
   
-(** Zero is the absorbant element of land *)
-Theorem land_0: absorbant 0 land.
+(** Zero is the absorbent element of land *)
+Theorem land_0: absorbent 0 land.
 Proof.
-  apply (Z_bitwise_absorbant false andb).
-  unfold absorbant. auto.
+  apply (Z_bitwise_absorbent false andb).
+  unfold absorbent. auto.
 Qed.						       
 
-(** Minus one is the absorbant element of lor *)
-Theorem lor_1: absorbant (-1) lor.
+(** Minus one is the absorbent element of lor *)
+Theorem lor_1: absorbent (-1) lor.
 Proof.
-  apply (Z_bitwise_absorbant true orb).
-  unfold absorbant. auto.
+  apply (Z_bitwise_absorbent true orb).
+  unfold absorbent. auto.
 Qed.						       
 
 (** ** De Morgan laws of bitwise operators *)

@@ -10,7 +10,7 @@
     to build them based on minimal definitions. Those tools are provided
     for advanced users that would like to define their own monads. Any
     user that only wants to use the monads provided by the kernel can
-    completly ignore them.
+    completely ignore them.
     @since 31.0-Gallium *)
 
 
@@ -25,7 +25,7 @@
       call [bind f m] comes down to performing the computation [m] before
       applying the next computation step, represented by the function [f],
       to the resulting value.
-    - [map] applies a function through the monad. One can examplify it by
+    - [map] applies a function through the monad. One can exemplify it by
       making a parallel with the list [map] operator.
     - [flatten] is used to handle nested applications of the monad.
 
@@ -269,14 +269,14 @@ module Make_based_on_map_with_product (M : Based_on_map_with_product) :
 
 
 
-(** {3 Detailled explanations and category theory}
+(** {3 Detailed explanations and category theory}
 
     To be pedantic, the map based approach defines a monad as a categoric
     functor equipped with two natural transformations. This does sound
     frightening but this breaks down to rather simple concepts.
 
-    Let's start at the beginning. A category is just a collection of objets
-    and arrows (or morphisms) between those objets that satisfies two
+    Let's start at the beginning. A category is just a collection of objects
+    and arrows (or morphisms) between those objects that satisfies two
     properties: there exists a morphism from all objects to themselves, i.e
     an identity, and if there is a morphism between objects [a] and [b] and
     a morphism between objects [b] and [c], then there must be a morphism
@@ -285,7 +285,7 @@ module Make_based_on_map_with_product (M : Based_on_map_with_product) :
     There is a strong parallel between categories and type systems. Indeed,
     if one uses the collection of all types as objects, then for all types
     ['a] and ['b], the function [f : 'a -> 'b] can be seen as a morphism
-    between the objets ['a] and ['b]. As functions are naturally associative
+    between the objects ['a] and ['b]. As functions are naturally associative
     and, for any type ['a], one can trivially defines the identity function
     ['a -> 'a], one can conclude that types along with all functions of
     arity one forms a category.

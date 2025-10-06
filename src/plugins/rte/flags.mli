@@ -10,7 +10,7 @@
 (** Filtering Categories of Alarms *)
 (* -------------------------------------------------------------------------- *)
 
-(** Flags for controling the low-level API. Each flag control whether
+(** Flags for controlling the low-level API. Each flag control whether
     a category of alarms will be visited or not. *)
 type t = {
   remove_trivial: bool;

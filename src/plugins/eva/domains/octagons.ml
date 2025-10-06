@@ -1733,7 +1733,7 @@ module Domain = struct
   let assign_variable lvalue expr assigned valuation state =
     let eval_exp, eval_deps = evaluator_from_valuation valuation in
     let variable = Variable.make_lval lvalue in
-    (* Remove lvals refering to the variable *)
+    (* Remove lvals referring to the variable *)
     let lvalue_zone = (eval_deps variable).data in
     let modified = Locations.Zone.join state.modified lvalue_zone in
     let state = { state with modified } in

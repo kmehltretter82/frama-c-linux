@@ -26,7 +26,7 @@ type vertex_info =
   | NoneInfo
   | LoopHead of { stmt : stmt; level : int }
 
-(** Control flow informations for outgoing edges, if any. *)
+(** Control flow information for outgoing edges, if any. *)
 type 'a control =
   | Edges (** control flow is only given by vertex edges. *)
   | Loop of 'a (** start of a Loop stmt, with breaking vertex. *)

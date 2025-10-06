@@ -1,4 +1,4 @@
-/* This example initializes an important nomber of thread in a convoluted
+/* This example initializes an important number of thread in a convoluted
    manner (all thread uses the function main, but depending on their
    argument, they create other threads or not) */
 

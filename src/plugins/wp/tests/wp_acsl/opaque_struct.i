@@ -47,7 +47,7 @@ void initialized_assigns(void){
 void uninitialized_assigns(void){
   g();
   /* NOTE:
-     both shoud FAIL as we cannot prove that:
+     both should FAIL as we cannot prove that:
      - it is still uninitialized,
      - it has been initialized.
   */

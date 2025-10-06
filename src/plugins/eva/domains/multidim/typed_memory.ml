@@ -61,7 +61,7 @@ end
 
 module Make (Config : Config) (V : Value) =
 struct
-  (* Recursively instanciate the typed memory *)
+  (* Recursively instantiate the typed memory *)
   module rec ProtoMemory : ProtoMemory with type value = V.t =
   struct
     type value = V.t
@@ -100,7 +100,7 @@ struct
     let are_scalar_compatible s1 s2 =
       are_typ_compatible s1.scalar_type s2.scalar_type
 
-    let are_aray_compatible a1 a2 =
+    let are_array_compatible a1 a2 =
       are_typ_compatible a1.array_cell_type a2.array_cell_type
 
     let are_compinfo_compatible ci1 ci2 =
@@ -267,7 +267,7 @@ struct
         are_scalar_compatible s1 s2 &&
         V.is_included s1.scalar_value s2.scalar_value
       | Array a1, Array a2 ->
-        are_aray_compatible a1 a2 &&
+        are_array_compatible a1 a2 &&
         A.is_included a1.array_value a2.array_value
       | Struct s1, Struct s2 ->
         are_structs_compatible s1 s2 &&
@@ -310,7 +310,7 @@ struct
           let size = typ_size s1.scalar_type in
           let scalar_value = f ~size s1.scalar_value s2.scalar_value in
           Scalar { s1 with scalar_value }
-        | Array a1, Array a2 when are_aray_compatible a1 a2 ->
+        | Array a1, Array a2 when are_array_compatible a1 a2 ->
           begin match A.unify ~oracle aux a1.array_value a2.array_value with
             | `Top -> Raw (Bit.join (raw m1) (raw m2))
             | `Value array_value -> Array { a1 with array_value }
@@ -322,7 +322,7 @@ struct
             Array { a1 with array_value }
           in
           begin match m with
-            | `Top -> weak_erase b2 (Array a1) (* Should not happen unless oracle is very unprecise *)
+            | `Top -> weak_erase b2 (Array a1) (* Should not happen unless oracle is very imprecise *)
             | `Value m -> m
           end
         | Raw b1, Array a2 ->
@@ -332,7 +332,7 @@ struct
             Array { a2 with array_value }
           in
           begin match m with
-            | `Top -> weak_erase b1 (Array a2) (* Should not happen unless oracle is very unprecise *)
+            | `Top -> weak_erase b1 (Array a2) (* Should not happen unless oracle is very imprecise *)
             | `Value m -> m
           end
         | Struct s1, Struct s2 when are_structs_compatible s1 s2 ->
@@ -523,7 +523,7 @@ struct
 
   let pretty = pretty_root
 
-  (* Constuctors *)
+  (* Constructors *)
 
   let top = of_raw Bit.top
   let zero = of_raw Bit.zero

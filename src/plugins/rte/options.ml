@@ -78,7 +78,7 @@ module DoPointerCall =
 
 (* uses results of basic constant propagation in order to check
    validity / invalidity of generated assertions, emitting a status if possible.
-   Notice that annotations that can be considered valid from syntaxical rules
+   Notice that annotations that can be considered valid from syntactical rules
    are also considered as trivial.
 *)
 module Trivial =

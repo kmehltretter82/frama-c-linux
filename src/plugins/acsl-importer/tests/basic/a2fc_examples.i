@@ -35,7 +35,7 @@ int extended_Euclid(int x, int y, int *p, int *q) {
 }
 
 // ###### 2.2.3 <acsl_stmt_pec>
-int abrupt_terminaison(int x) {  
+int abrupt_termination(int x) {  
   while (x > 0) {  
 body: {
       if (x % 11 == 0) break;

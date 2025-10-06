@@ -233,7 +233,7 @@ export const { extname } = path;
    Promisified [Node `fs.stat`](https://nodejs.org/dist/latest-v12.x/docs/api/fs.html#fs_fs_stat_path_callback).
 
    Returns a (promised) [Node `fs.Stats`](https://nodejs.org/dist/latest-v12.x/docs/api/fs.html#fs_class_fs_stats) object,
-   including the following usefull fields and methods (and more):
+   including the following useful fields and methods (and more):
    - `stats.isFile()` returns `true` for a regular file
    - `stats.isDirectory()` returns `true` for a directory
    - `stats.mode` the bitfield (integer) of the file access mode
@@ -440,7 +440,7 @@ export function rmDir(path: string, options?: RmDirOptions): Promise<void> {
 // --------------------------------------------------------------------------
 
 /**
-   Renames of file of direcory.
+   Renames of file of directory.
 
    Promisified
    [Node `fs.rename`](https://nodejs.org/dist/latest-v12.x/docs/api/fs.html#fs_fs_rename_oldpath_newpath_callback)

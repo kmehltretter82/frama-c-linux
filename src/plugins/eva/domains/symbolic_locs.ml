@@ -99,7 +99,7 @@ end
    - if the expression is a binop between two expressions, each containing an
      lvalue with a non-singleton value.
 
-   In both cases, the value will not be infered by the cvalue domain.
+   In both cases, the value will not be inferred by the cvalue domain.
    Otherwise, the value should be inferred by the cvalue domain, or can be
    precisely computed from values inferred by the cvalue domain. *)
 let interesting_exp get_locs get_val e =
@@ -585,7 +585,7 @@ module D : Abstract_domain.Leaf
   let filter = Memory.filter
 
   (* Efficient version of [reuse], but the resulting state does not satisfy
-     the [_check state], as some extra dependenies of keys removed from the
+     the [_check state], as some extra dependencies of keys removed from the
      [current_input] may remain. *)
   let reuse bases ~current_input ~previous_output =
     let into = Memory.diff bases current_input in

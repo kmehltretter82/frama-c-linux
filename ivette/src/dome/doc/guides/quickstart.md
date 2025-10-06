@@ -2,7 +2,7 @@
 subtitle: Quick Start
 ---
 
-We strongly recommand to use [**Yarn**](https://reactjs.org)
+We strongly recommend to use [**Yarn**](https://reactjs.org)
 for installing the necessary Node packages and their dependencies.
 
 Then, prepare a directory for developing your application, and download

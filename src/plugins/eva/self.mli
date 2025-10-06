@@ -88,7 +88,7 @@ val wkey_acsl_unsupported : warn_category
     If [position] is given, then message will be located at this position.
     Otherwise if [current] or [source] are given, then the current position
     tracked by the kernel or the given location will respectively be used.
-    [stacktrace] optional parameter controls wheter the call stack must
+    [stacktrace] optional parameter controls whether the call stack must
     be printed at the end of the message and always default to false.
 
     See {!Log.Messages} for documentation *)

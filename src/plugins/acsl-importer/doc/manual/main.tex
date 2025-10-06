@@ -411,7 +411,7 @@ The option {\tt\/-acsl-import-ulevel-spec <spec$_{1}$,...,spec$_{s}$>} adds \ver
 An unrolling specification \verb|<m@f:tag@n>| adds an annotation '{\tt\/loop unfold "tag", <n>;}' to the {\tt m$_{th}$} loop of the function \verb|<f>|.
 An unrolling specification \verb|<c@f:tag@n>| adds an annotation '{\tt\/loop unfold "tag", <n>;}' to all loops of category \verb|<c>| of the function \verb|<f>|, where allowed loop categories are: \verb|while|, \verb|for| and \verb|do-while|.\\
 A specification is considered as a set of elementary specifications: {\tt\/spec$_{1}$}, ..., {\tt\/spec$_{s}$}.\\
-Categories, function names and loop occurence numbers can be omitted.
+Categories, function names and loop occurrence numbers can be omitted.
 The priority ordering used for choosing the (\verb|"tag"| name, unrolling value \verb|<n>|) pair is: \verb|<m@f:tag@n>| > \verb|<c@f:tag@n>| > \verb|<f:tag@n>| > \verb|<c:tag@n>| > \verb|<:tag@n>|.\\
 The default value for optional tags is the empty string which leads to add unrolling loop pragmas without tags.\\
 Nothing is done for loops having already a clause '{\tt\/loop unfold} ...'.\\

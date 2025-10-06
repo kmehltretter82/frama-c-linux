@@ -235,7 +235,7 @@ let subdivide size cvalue =
 
 (* We subdivide the evaluation of an expression by splitting the possible values
    of a list of lvalues. Each disjunct of a subdivision contains its hypothesis,
-   that is the list of values asssumed for these lvalues.
+   that is the list of values assumed for these lvalues.
    For a given subdivison, all these hypothesis lists should have the same
    length (the number of lvalues on which the subdivision is done). We ensure
    this invariant through length indexed lists, by using GADT. *)

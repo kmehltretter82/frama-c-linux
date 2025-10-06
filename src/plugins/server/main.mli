@@ -135,7 +135,7 @@ val once : (unit -> unit) -> unit
 
 (** Register an asynchronous task on the server.
     When the server is not working in background, this is
-    equivalent to [Task.call] ; otherwize,
+    equivalent to [Task.call] ; otherwise,
     the continuation is scheduled on the server
     like an [`EXEC] request. *)
 val async : ('a -> 'b) -> 'a -> 'b Task.task

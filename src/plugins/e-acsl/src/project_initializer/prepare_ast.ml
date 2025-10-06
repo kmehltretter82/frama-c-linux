@@ -111,7 +111,7 @@ let dup_fundec loc spec sound_verdict_vi kf vi new_vi =
            cannot have unnamed formals (see bts #2303). *)
         Varname.get
           ~scope:Varname.Function
-          (Functions.RTL.mk_gen_name "unamed_formal")
+          (Functions.RTL.mk_gen_name "unnamed_formal")
       else
         vi.vname
     in
@@ -368,7 +368,7 @@ struct
      statement. *)
   let stmt_refs: stmt ref list ref = ref []
 
-  (* List of [stmt] containing other statements that need to be udpated if
+  (* List of [stmt] containing other statements that need to be updated if
      they point to a labeled statement. *)
   let stmts: stmt list ref = ref []
 
@@ -623,7 +623,7 @@ let must_duplicate kf vi =
   && (* it is not a generated function *)
   not (Misc.is_fc_stdlib_generated vi)
   &&
-  ((* either explicitely listed as to be not instrumented *)
+  ((* either explicitly listed as to be not instrumented *)
     not (Functions.instrument kf)
     ||
     (* or: *)
@@ -672,7 +672,7 @@ let prepare_global (globals, new_defs) = function
       else if not (!is_libc_writing_memory_ref vi)
            && (spec_contains_mem_property (Annotations.funspec kf)) then
         (* Only display the warning for functions where E-ACSL does not
-           explicitely update its memory model. *)
+           explicitly update its memory model. *)
         (* TODO: this warning could be more precise if emitted during code
            generation; see also E-ACSL issue #85 about partial verdicts *)
         Options.warning

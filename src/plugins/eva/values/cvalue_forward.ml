@@ -347,7 +347,7 @@ let forward_minus_pp ~typ ev1 ev2 =
       else Ival.scale_div ~pos:true size minus_offs
     with Abstract_interp.Error_Top -> Ival.top
   in
-  if not (Parameters.WarnPointerSubstraction.get ()) then
+  if not (Parameters.WarnPointerSubtraction.get ()) then
     (* Generate garbled mix if the two pointers disagree on their base *)
     let minus_val = V.add_untyped ~factor:Int_Base.minus_one ev1 ev2 in
     try

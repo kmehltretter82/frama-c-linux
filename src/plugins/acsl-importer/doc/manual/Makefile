@@ -21,7 +21,7 @@ $(PLUGIN).pdf: $(DOCUMENT).pdf
 	@echo "Final copy: $@"
 	cp $< $@
 
-$(DOCUMENT).pdf: $(DOCUMENT).tex macros.sty user-changes.tex bib.bib $(FRAMAC_DOC)
+$(DOCUMENT).pdf: $(DOCUMENT).tex macros.tex user-changes.tex bib.bib $(FRAMAC_DOC)
 	@echo "Build $@"
 	latexmk -pdf $(DOCUMENT)
 

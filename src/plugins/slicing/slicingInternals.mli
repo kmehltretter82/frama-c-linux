@@ -45,7 +45,7 @@ val pdg_mark_packed_descr : Structural_descr.pack
 
 val compare_pdg_mark : pdg_mark -> pdg_mark -> int
 
-(** Type for all the informations related to any function,
+(** Type for all the information related to any function,
     even if we don't have its definition.  *)
 type fct_info = {
   fi_kf : Cil_types.kernel_function;

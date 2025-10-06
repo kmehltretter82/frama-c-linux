@@ -141,7 +141,7 @@ val nbTrans      : string
 (* C Macros *)
 
 (** DEPRECATED ?*)
-val macro_ligth  : string
+val macro_light  : string
 
 (** DEPRECATED ?*)
 val macro_full   : string

@@ -18,12 +18,12 @@ open Lang.F
 
 
 (** Introduce universally quantified formulae: head forall quantifiers
-    are instanciated to fresh variables in current pool and left-implies are
+    are instantiated to fresh variables in current pool and left-implies are
     extracted, recursively. *)
 val forall_intro: Lang.F.pred -> Lang.F.pred list * Lang.F.pred
 
 (** Introduce existential quantified formulae: head exist quantifiers
-    are instanciated to fresh variables, recursively. *)
+    are instantiated to fresh variables, recursively. *)
 val exist_intro: Lang.F.pred -> Lang.F.pred
 
 (** {2 Sequent} *)

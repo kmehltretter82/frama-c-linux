@@ -73,7 +73,7 @@ Open Source Release 31.0 (Gallium)
               keep states separated from builtin calls, function specifications
               and disjunctions in ACSL assertions.
 *!  Kernel    [2025-04-25] Init is always available in logic annotations
-o!  Kernel    [2025-04-23] Remove allegedly unused optionnal normalizations on
+o!  Kernel    [2025-04-23] Remove allegedly unused optional normalizations on
               while loops and conditionals (`setDoTransformWhile` and
               `setDoAlternateConditional`).
 o   Eva       [2025-04-23] In the Eva API, exports statistics about an analysis
@@ -81,7 +81,7 @@ o   Eva       [2025-04-23] In the Eva API, exports statistics about an analysis
 -   Eva       [2025-04-18] New option -eva-partition-history-function which
               overrides the value of -eva-partition-history on given functions.
 -*  Kernel    [2025-04-14] Add support for initializer overrides in
-              structures using compound litterals (fix #@1514).
+              structures using compound literals (fix #@1514).
 -   Kernel    [2025-04-14] Unused static or inline functions are now removed
               from the AST by default (this can affect Metrics coverage values).
 o!  Kernel    [2025-04-14] Building types via `Cil_const` now uses
@@ -779,7 +779,7 @@ Open Source Release 20.0 (Calcium)
 -   Eva       [2019-10-21] New octagon domain inferring relations of the form
               l ≤ ±X±Y ≤ e between pairs of integer variables X and Y. Enabled
               with option -eva-octagon-domain. Only infers relations between
-              pairs of scalar variables occuring in a same instruction.
+              pairs of scalar variables occurring in a same instruction.
               Intra-procedural by default; octagons can be propagated through
               function calls with option -eva-octagon-through-calls.
 -   ACSL      [2019-10-04] Support for ghost parameters
@@ -794,7 +794,7 @@ o   Eva       [2019-09-16] Dynamic registration of abstract values and domains:
               contributed by madroach) and use -thread where needed.
 -*  Eva       [2019-08-21] Fixes the reduction by the negation of \initialized
               and \dangling predicates on imprecise lvalues.
--*  Kernel    [2019-08-20] Fixes a rare but critical bug which occured when
+-*  Kernel    [2019-08-20] Fixes a rare but critical bug which occurred when
               Frama-C internally switched the current project in presence of >2
               projects and destroyed the old current project at about the same
               time: the Frama-C internal state became inconsistent and lead to
@@ -846,7 +846,7 @@ Open Source Release 19.0 (Potassium)
 -   Eva       [2019-04-03] New option -eva-precision to globally configure the
               analysis from 0 (fast but imprecise) to 11 (accurate but slow).
               A precision of 5 is often a reasonable trade-off. This meta-option
-              automatically sets up other options that can also be overriden.
+              automatically sets up other options that can also be overridden.
 -   Inout     [2019-04-01] Fix performance issue when initializing large arrays.
 -   ACSL      [2019-03-08] Add check annotation, similar to assert except that
               it does not introduce additional hypotheses on the program state
@@ -924,7 +924,7 @@ Open Source Release 18.0 (Argon)
               specific (aka C++ constructors and mutable fields) circumstances.
               Fixes #2395.
 -   Kernel    [2018-09-14] New warning (disabled by default) when multiple side
-              effects are unsequenced (CERT-EXP10-C recommandation).
+              effects are unsequenced (CERT-EXP10-C recommendation).
               Fixes #@492
 -   Eva       [2018-09-13] Remove option -val-warn-left-shift-negative, and
               comply with kernel option -warn-[left|right]-shift-negative.
@@ -952,7 +952,7 @@ o!  Constant Propagation [2018-09-12] Removing Db API for Constant Propagation
 -!  Eva       [2018-08-28] Rename plug-in shortname from 'value' to 'eva'. Eva
               is now properly named Eva in all logs, in the GUI, and as the
               emitter of the alarms.
--!  Kernel    [2018-08-23] Introduce Filepath dataype for more consistent
+-!  Kernel    [2018-08-23] Introduce Filepath datatype for more consistent
               normalization of filenames
 -*  Kernel    [2018-08-23] Do not allow compound assignments to const variables
               Fixes #@384
@@ -1160,7 +1160,7 @@ o  Kernel     [2017-10-11] sizeof() and alignof() applied to a function can now
               Non-sensical expressions are now rejected at parsing type.
 -  Eva        [2017-10-10] Uses assigns clauses to over-approximate the effects
               of assembly statements. Warns if no assigns clause is provided.
--* Eva        [2017-10-10] Fixes a performance issue in offsetmaps, that occured
+-* Eva        [2017-10-10] Fixes a performance issue in offsetmaps, that occurred
               when reading or copying values smaller than cells in large arrays.
 -  Eva        [2017-10-10] The backward propagation tries to reduce integer
               values by considering separately the bounds of their intervals.
@@ -1195,7 +1195,7 @@ o! ACSL       [2017-08-24] Refactor handling of logic labels in AST
 -* Kernel     [2017-08-03] Strip bitfield attribute when performing integral
               promotions on bitfields of size short or char. Fixes incorrect
               attributes on the resulting expression.
--! ACSL       [2017-08-03] Explicitely disallow /* and */ in ACSL annotations.
+-! ACSL       [2017-08-03] Explicitly disallow /* and */ in ACSL annotations.
               Allows to re-use logic parser for parsing annotations in external
               files that can use /* ... */ as comments. As a consequence,
               expressions like y/*p are thus rejected, but this was already the
@@ -1291,7 +1291,7 @@ Open Source Release 15.0 (Phosphorus-20170501)
               becomes Frama_C_malloc_fresh.
 -  Eva        [2017-03-31] New option -val-builtins-list
 -* Scope      [2017-03-31] Fix bug in the functions of Db.Scope in presence of
-              alarms refering to volatile memory locations, or to variables
+              alarms referring to volatile memory locations, or to variables
               that leave scope. Also impacts Eva option -remove-redundant-alarms
 -  Eva        [2017-03-31] Activate option -remove-redundant-alarms by default.
 -  Inout      [2017-03-28] Option -inout-callwise is now always active, and will
@@ -1409,7 +1409,7 @@ Open Source Release 14.0 (Silicon-20161101)
               Frama_C_memchr and Frama_C_rawmemchr
 -  Value      [2016-09-20] valid_string and valid_read_string predicates
               are now evaluated by Value
--* Eva        [2016-09-18] Fix bug in equality domain, after assignements
+-* Eva        [2016-09-18] Fix bug in equality domain, after assignments
               lv = e where the modified locations intersect those involved in
               computing lv
 -* Eva        [2016-09-18] fix performance bug in the equality domain,
@@ -1740,7 +1740,7 @@ o  Ptests     [2015-07-29] New LOG: directive.
 -  Report     [2015-07-19] New export format (.csv), through option -report-csv.
 o! Callgraph  [2015-07-16] Remove Cil.Callgraph, Db.Syntactic_callgraph and
               Db.Semantic_callgraph which are all replaced by the single
-              plug-in Callgraph. See Changelog_detailled.md for further detail
+              plug-in Callgraph. See Changelog_detailed.md for further detail
               about this change.
 -! Callgraph  [2015-07-16] New plug-in callgraph which merges the old
               Syntactic_callgraph and Semantic_callgraph plug-ins (now
@@ -2099,7 +2099,7 @@ o! Cil        [2014-03-24] The ikind for Cil.kinteger64 is now optional.
               and pointers
 -  Semantic Constant Folding [2014-03-13] Floating-point constants can now
               be propagated.
--* Semantic Constant Folding [2014-03-13] Fix crashes and/or multiple declations
+-* Semantic Constant Folding [2014-03-13] Fix crashes and/or multiple declarations
               when a global was referenced in the constant-folded project
               earlier than in the original one.
 -  Value      [2014-03-12] Improve precision of &.
@@ -2178,7 +2178,7 @@ o! Kernel     [2014-01-21] Removed Db.Dominators. Use the Dominators kernel
               containing addresses.
 -* Kernel     [2014-01-18] Fixed parsing bug with decimal single-precision
               floating-point literals representing numbers above MAX_FLOAT.
--! Value      [2014-01-16] Replace mostly-inoperant option -memory-footprint
+-! Value      [2014-01-16] Replace mostly-inoperative option -memory-footprint
               by an environment variable FRAMA_C_MEMORY_FOOTPRINT
 o  Ptests     [2014-01-16] Use ptests.opt whenever possible.
 o! Kernel     [2014-01-14] For building a datatype, you now need to use
@@ -2448,7 +2448,7 @@ o  Kernel     [2013-06-21] adding a category do not set debugging level to 1.
 -* Project    [2013-06-17] Fix messages about projects.
 -* Slicing    [2013-06-17] Fix crash in presence of assertions involving
               sizeof(t), where t is an array. Fixes similar bug with option
-              -remove-redudant-alarms
+              -remove-redundant-alarms
 -! Inout      [2013-06-13] Inputs of an instruction whose evaluation fails
               now include the sub-expressions for which evaluation succeeds
 -* Value      [2013-06-12] Fix crash when the creation of the initial state
@@ -2458,7 +2458,7 @@ o  Kernel     [2013-06-21] adding a category do not set debugging level to 1.
 -  Value      [2013-06-11] Assertions on dead code now get a "true because
               unreachable" status.
 -  Kernel     [2013-06-23] The annotation 'loop pragma UNROLL "done", n;'
-              disables the unrolling of the annoted loop. Option -ulevel-force
+              disables the unrolling of the annotated loop. Option -ulevel-force
               has to to used for enabling the transformation of such a loop.
               This pragma is introduced by the unrolling process in order to
               prevent unrolling on source code obtained by a previous frama-C
@@ -2667,7 +2667,7 @@ o* Kernel     [2013-01-16] Visitor no longer crashes when a non-function global
 o! Kernel     [2013-01-10] Remove method is_annot_before from visitors
               (it return only 'true').
 -* Makefile   [2013-01-08] Compile OcamlGraph less often: fixes issue #1343.
--  Value      [2013-01-08] More agressive analysis of statements with improperly
+-  Value      [2013-01-08] More aggressive analysis of statements with improperly
               sequenced accesses when option -unspecified-access is used.
 o  Kernel     [2013-01-04] New methods videntified_term and
               videntified_predicate for the visitor.
@@ -2846,8 +2846,8 @@ o  Kernel     [2012-07-30] API of dynamic plug-ins is now documented as
               -slicing-exported-project-postfix (from #!1249 entry).
 -  Gui        [2012-07-27] Fixed bugs when the consolidation graph cannot
               be displayed (fixed bts #1122).
--  Kernel     [2012-07-24] The annotation 'loop pragma UNROLL "completly", n;'
-              unroll 'n' times the annoted loop and then add it a clause
+-  Kernel     [2012-07-24] The annotation 'loop pragma UNROLL "completely", n;'
+              unroll 'n' times the annotated loop and then add it a clause
               'loop invariant \false;'. The remaining loop should be death code.
 o  Kernel     [2012-07-24] Changes in interface of StringHashtbl options.
 -! Inout      [2012-07-22] Option -inout-callwise restarts Value when it is
@@ -2922,7 +2922,7 @@ o! Value      [2012-06-18] Made type Ival.tt private.
               code branches. Fixes issue #1194.
 o  Makefile   [2012-06-12] Use ocamldoc.opt whenever possible.
 -  Rte        [2012-06-11] Reuse behaviors names when -rte-precond is used
-              on fonctions with multiple behaviors.
+              on functions with multiple behaviors.
 o! Kernel     [2012-06-11] New API for Annotations which merges old
               Annotations, Globals.Annotations and operations of Kernel_function
               over function contracts.
@@ -3636,8 +3636,8 @@ o! Value      [2011-02-02] Renamed copy to copy_offsmap in Offsetmaps.
 o  Kernel     [2011-02-01] New syntactic context for memory accesses with
               user-supplied validity range.
 +  WP         [2011-01-31] Option -wp-warnings to display additional
-              informations for 'Stronger' and 'Degenerated' goals.
-+  WP         [2011-01-24] Option -wp-split-dim <n> to limit spliting
+              information for 'Stronger' and 'Degenerated' goals.
++  WP         [2011-01-24] Option -wp-split-dim <n> to limit splitting
               up to 2**n sub-goals (see -wp-split option).
 -! Kernel     [2011-01-27] Handle errors better when they occur when exiting
               Frama-C. Slight semantic changes for exit code:
@@ -4168,7 +4168,7 @@ Open Source Release 4.1 (Beryllium-20090901)
               Frama-C now requires ocamlgraph 1.2.
 -  Logic      [2009-08-25]"reads" clauses on logic functions and predicates,
               which disappeared with the introduction of axiomatic blocks,
-              have been ressurrected. Beware that the semantics is slightly
+              have been resurrected. Beware that the semantics is slightly
               different from before: see ACSL document for details. It is used
               to automatically generate footprint axioms.
 -  GUI        [2009-08-18] Improved display of summary information when
@@ -4583,7 +4583,7 @@ Open Source Release 1.2 (Hydrogen-20080502)
 
 o* Makefile   [2008-05-21] Fixed bug in "make clean-doc" (and "make distclean").
 -  GUI        [2008-05-19] All internal options are available in the GUI
-              preferences pannel.
+              preferences panel.
 
 ###############################################################################
 Open Source Release 1.1 (Hydrogen-20080501)

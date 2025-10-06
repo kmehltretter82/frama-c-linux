@@ -118,7 +118,7 @@ let update_node_values node ~typ ~cvalue ~taint =
       node.node_taint <- Some (
           Option.fold ~some:(join_taint taint) ~none:taint node.node_taint)) taint
 
-let find_independant_nodes g roots =
+let find_independent_nodes g roots =
   let module Dfs = Graph.Traverse.Dfs (struct
       include G
       (* Consider the graph as unoriented *)

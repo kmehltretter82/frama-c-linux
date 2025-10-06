@@ -166,7 +166,7 @@ let mod_integer (o,sum) i =
     if Integer.is_zero rem then None else Some (rem, b)
   in
   let sum = List.filter_map non_zero_rem sum in
-  let sum = Terms.(normalize (reorder sum)) in (* order was not preserverd *)
+  let sum = Terms.(normalize (reorder sum)) in (* order was not preserved *)
   (* We must then ensure that the set of represented offset is < i,
      i.e. that the highest possible value is < i.
      After normalization, this reduces to check that d*b + o < i.

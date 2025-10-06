@@ -133,12 +133,12 @@ Plugin resources should only be loaded if the plugin is loaded.
 Follow these steps:
 
 * Add the images folder to your plugin
-* Complete the `pkg.json` by adding the `ressources` field. Example :
+* Complete the `pkg.json` by adding the `resources` field. Example :
 
 ``` js
 {
   "name": "Frama-C/Eva",
-  "ressources": ["./images/"]
+  "resources": ["./images/"]
 }
 ```
-* Add images to `.md` with ` ![alt](<ressources.from>/<image-name>)`. Using the previous example, add `![alt](frama-c/plugins/eva/images/<image-name>)`.
+* Add images to `.md` with ` ![alt](<resources.from>/<image-name>)`. Using the previous example, add `![alt](frama-c/plugins/eva/images/<image-name>)`.

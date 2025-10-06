@@ -33,18 +33,18 @@ unsigned char uchar_range (unsigned char i) {
 //@ lemma L01: lnot: qed_ok: ~(-1) == 0 ;
 
 //@ lemma L10: land: neutral:   qed_ok: (55 & -1) == 55 ;
-//@ lemma L11: land: absorbant: qed_ok: (55 & 0)  == 0 ;
+//@ lemma L11: land: absorbent: qed_ok: (55 & 0)  == 0 ;
 //@ lemma L12: land:            qed_ok: (3  & 2)  == 2;
 //@ lemma L13: land:            qed_ok: (55 & 7 & 1)   == 1;
 
 //@ lemma L20: lor:  neutral:   qed_ok: (55 | 0)  == 55 ;
-//@ lemma L21: lor:  absorbant: qed_ok: (55 | -1) == (-1) ;
+//@ lemma L21: lor:  absorbent: qed_ok: (55 | -1) == (-1) ;
 
 //@ lemma L30: lxor_neutral: qed_ok: (55 ^ 0) == 55 ;
 
 //@ axiomatic undefined_x { logic integer x ; }
 
-//@ lemma L14: land: absorbant: qed_ok: (1 & x & 2)  == 0 ;
+//@ lemma L14: land: absorbent: qed_ok: (1 & x & 2)  == 0 ;
 //@ lemma L15: land:            qed_ok: (3 & x & 2)  == (2 & x) ;
 //@ lemma L16: land:            qed_ok: (3 & x & -2) == (2 & x) ;
 

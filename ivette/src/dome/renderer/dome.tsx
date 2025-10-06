@@ -147,7 +147,7 @@ export class Event<A = void> {
   }
 
   /**
-     Number of currenty registered listeners.
+     Number of currently registered listeners.
    */
   listenerCount(): number {
     return System.emitter.listenerCount(this.name);
@@ -205,7 +205,7 @@ export const reload = new Event('dome.reload');
 ipcRenderer.on('dome.ipc.reload', () => reload.emit());
 
 /**
-   Dome « Find » event. Trigered by [Cmd+F] and [Edit > Find] menu.
+   Dome « Find » event. Triggered by [Cmd+F] and [Edit > Find] menu.
  */
 export const find = new Event('dome.find');
 ipcRenderer.on('dome.ipc.find', () => find.emit());
@@ -227,7 +227,7 @@ ipcRenderer.on('dome.ipc.command', (_event, argv, wdir) => {
 export const windowSettings = new Event(Settings.window);
 
 /** Global Settings event.
-    Emiited when global settings are updated. */
+    Emitted when global settings are updated. */
 export const globalSettings = new Event(Settings.global);
 
 // --------------------------------------------------------------------------
@@ -631,7 +631,7 @@ export interface PromiseHook<A> {
 /**
    Hook to re-render when a Promise returns.
    The promise will be typically created by using `React.useMemo()`.
-   The hook returns three informations:
+   The hook returns three information:
    - result: the promise result if it succeeds, undefined otherwise;
    - error: the promise error if it fails, undefined otherwise;
    - loading: the promise status, true if the promise is still running.
@@ -682,7 +682,7 @@ export function useCache<K, V>(r: (k: K) => V, s?: Serialize<K>): (k: K) => V {
 interface Clock {
   timer?: NodeJS.Timeout;
   pending: number; // Number of listeners
-  time: number; // Ellapsed time since firts pending
+  time: number; // Elapsed time since first pending
   event: string; // Tic events
   period: number; // Period
 }
@@ -1111,7 +1111,7 @@ export function useGlobalSettings<A extends Json.json>(
 
 
 // --------------------------------------------------------------------------
-// --- Path ressources
+// --- Path resources
 // --------------------------------------------------------------------------
 
 export function getResourcesPath(): string {
@@ -1121,8 +1121,8 @@ export function getResourcesPath(): string {
 }
 
 export function getResourcePath(filePath: string): string {
-  const ressourcesPath = getResourcesPath();
-  return path.join(ressourcesPath, filePath);
+  const resourcesPath = getResourcesPath();
+  return path.join(resourcesPath, filePath);
 }
 
 // --------------------------------------------------------------------------

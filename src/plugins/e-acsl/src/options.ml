@@ -272,7 +272,7 @@ let setup ?(rtl=false) () =
     if rtl then
       Kernel.CppExtraArgs.add "-DE_ACSL_CONCURRENCY_PTHREAD"
   end;
-  (* Additionnal kernel options while parsing the RTL project. *)
+  (* Additional kernel options while parsing the RTL project. *)
   if rtl then begin
     Kernel.KeepUnusedFunctions.set "none";
     Kernel.CppExtraArgs.add

@@ -30,7 +30,7 @@ let filter_seq n hs seq =
 
 let process value n0 sequent =
 
-  (* Transfrom seq into: hyps => (forall n, goal) *)
+  (* Transform seq into: hyps => (forall n, goal) *)
   let n = Lang.freshvar ~basename:"n" Qed.Logic.Int in
   let i = Lang.freshvar ~basename:"i" Qed.Logic.Int in
   let vn = F.e_var n in

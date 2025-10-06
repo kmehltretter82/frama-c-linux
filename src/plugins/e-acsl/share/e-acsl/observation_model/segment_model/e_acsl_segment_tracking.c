@@ -424,7 +424,7 @@ uintptr_t static_info(uintptr_t addr, char type) {
 #ifdef E_ACSL_TEMPORAL /*{{{*/
 uint32_t static_temporal_info(uintptr_t addr, int origin) {
   /* NOTE: No checking for allocated blocks, since an invalid
-   timestamp is zero and ununsed memory is nullified then an invalid
+   timestamp is zero and unused memory is nullified then an invalid
    timestamp is also returned for allocated memory */
   if (origin) {
     int allocated = static_allocated_one(addr);
@@ -1144,7 +1144,7 @@ void print_memory_partition(struct memory_partition *p) {
 
 #  if E_ACSL_OS_IS_LINUX
 /*! \brief Print the content of the `/proc/self/maps` file that is used to
-    retrieve the addresses informations of some segments. */
+    retrieve the addresses information of some segments. */
 static void print_all_segments() {
   FILE *maps = fopen("/proc/self/maps", "r");
   DVASSERT(maps != NULL, "Unable to open /proc/self/maps: %s\n",

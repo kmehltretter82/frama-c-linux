@@ -52,7 +52,7 @@ sig
   val flow_size : flow -> int
   val tank_size : tank -> int
 
-  (* --- Reset state (for hierchical convergence) --- *)
+  (* --- Reset state (for hierarchical convergence) --- *)
 
   (* These functions reset the part of the state of the analysis which has
      been obtained after a widening. *)

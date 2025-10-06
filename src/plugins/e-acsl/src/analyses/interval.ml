@@ -112,7 +112,7 @@ end = struct
 
   (* The interval of the logic function
      //@ logic integer f (integer x) = x + 1;
-     depends on the interval of [x]. The same term [x+1] can be infered to be
+     depends on the interval of [x]. The same term [x+1] can be inferred to be
      in different intervals if the function [f] is applied several times with
      different arguments. In this case, we add the interval of [x] as a key
      to retrieve the type of [x+1].
@@ -308,7 +308,7 @@ let infer_sum_product oper lambda min max = match lambda, min, max with
            in
            lb, ub
          | s ->
-           Options.fatal "unexpect logic function '%s'" s
+           Options.fatal "unexpected logic function '%s'" s
        in
        Ival (Ival.inject_range lb ub)
      with
@@ -664,7 +664,7 @@ and compute_logic_env_if_branches logic_env t =
   let add_eq logic_env x v = Logic_env.refine logic_env x (get_res (ival v)) in
   let t_branch, f_branch =
     (* we do not discriminate between strict and weak inequalities. This is
-       slighlty less precise but allow for better reusing of the code in the
+       slightly less precise but allow for better reusing of the code in the
        case of recursive functions, the main advantage in typing
        conditionals is for recursive functions. *)
     match t.term_node with
@@ -875,7 +875,7 @@ let typer_visitor ~logic_env = object
 
   method !vpredicate p =
     (* Do not raise a warning for e-acsl errors at preprocessing time,
-       those errrors are stored in the table and warnings are raised at
+       those errors are stored in the table and warnings are raised at
        translation time *)
     (try infer_predicate ~logic_env p
      with Error.Not_yet _ | Error.Typing_error _  -> ());

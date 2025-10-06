@@ -38,7 +38,7 @@ then
     echo "Command 'git.sh cat <file> <command>' executes the given command"
     echo "in each git repository and concat their output to the given file."
     echo ""
-    echo "Otherwize, 'git.sh <command>' broadcast the command"
+    echo "Otherwise, 'git.sh <command>' broadcast the command"
     echo "to all '.git' repository accessible from the root."
     echo "The default command is 'status -s -b'."
     echo ""

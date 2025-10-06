@@ -2,7 +2,7 @@
    OPT: -ulevel 2 -typecheck -print
  */
 
-/* small test cases to verify C labels are correclty managed into annotations */
+/* small test cases to verify C labels are correctly managed into annotations */
 int X ;
 void main (int c) {
   for (int i = 0 ; i < 10 ;) {

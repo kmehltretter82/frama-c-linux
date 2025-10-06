@@ -257,7 +257,7 @@ let prove_node env node prv =
   else Task.return false
 
 (* -------------------------------------------------------------------------- *)
-(* --- Auto & Seach Mode (DEPRECATED)                                     --- *)
+(* --- Auto & Search Mode (DEPRECATED)                                    --- *)
 (* -------------------------------------------------------------------------- *)
 
 let rec auto env ?(depth=0) node : bool Task.task =

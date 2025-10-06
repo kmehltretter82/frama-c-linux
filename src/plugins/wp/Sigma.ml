@@ -139,8 +139,8 @@ let merge a b =
   ref merged , !pa, !pb
 
 let choose a b =
-  let merge_chunck _ x y = if F.Var.compare x y <= 0 then x else y in
-  ref @@ Heap.Map.union merge_chunck !a !b
+  let merge_chunk _ x y = if F.Var.compare x y <= 0 then x else y in
+  ref @@ Heap.Map.union merge_chunk !a !b
 
 let join a b =
   if a == b then Passive.empty else

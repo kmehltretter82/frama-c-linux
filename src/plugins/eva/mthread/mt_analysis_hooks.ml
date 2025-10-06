@@ -556,7 +556,7 @@ let hook_send_msg analysis state : hook_sig = function
       let sbytes = conv (Mt_memory.extract_int size) "invalid message size" in
       if sbytes <= 0 then
         conv (Error (string_of_int sbytes)) "invalid message length";
-      let q = conv (find_queue offset) "unkwown queue" in
+      let q = conv (find_queue offset) "unknown queue" in
       let content = Mt_memory.read_slice ~p:content ~sbytes state in
       let state = QueueOp.check_and_write analysis state q QueueOp.send in
       let action = SendMsg (q, (content, sbytes)) in

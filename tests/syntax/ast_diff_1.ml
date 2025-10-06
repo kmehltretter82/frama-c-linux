@@ -40,13 +40,13 @@ let cmp_var v1 v2 =
     cmp_fun (Option.get kf1) (Option.get kf2)
   end
 
-let show_correspondances () =
+let show_correspondences () =
   if Kernel.AstDiff.get () then begin
-    result "Showing correspondances between %s and %s"
+    result "Showing correspondences between %s and %s"
       (Project.get_name (Ast_diff.Orig_project.get()))
       (Project.get_name (Project.current()));
     Ast_diff.Varinfo.iter_sorted ~cmp:cmp_var show_var;
     Ast_diff.Kernel_function.iter_sorted ~cmp:cmp_fun show_fun;
   end
 
-let () = Boot.Main.extend show_correspondances
+let () = Boot.Main.extend show_correspondences

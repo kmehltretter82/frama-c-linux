@@ -27,7 +27,7 @@ type model = Real | Float
 val configure : model -> WpContext.rollback
 
 val ftau : c_float -> tau
-(** model independant *)
+(** model independent *)
 
 val tau_of_float : c_float -> tau
 (** with respect to model *)

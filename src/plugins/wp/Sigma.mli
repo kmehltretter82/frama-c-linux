@@ -22,7 +22,7 @@ module F = Lang.F
     lazily, that represents the contents of this slice of memory at a given
     program point.
 
-    Remark: memory chunks are not required to be independant from each other,
+    Remark: memory chunks are not required to be independent from each other,
     provided the memory model implementation is consistent with the chosen
     representation. Conversely, a given object might be represented by
     several memory chunks.
@@ -78,7 +78,7 @@ sig
   val is_framed : t -> bool
   (** Whether the chunk is local to a function call.
 
-      Means the chunk is separated from anyother call side-effects.
+      Means the chunk is separated from another call side-effects.
       If [true], entails that a function assigning everything can not modify
       the chunk. Only used for optimisation, it would be safe to always
       return [false]. *)
@@ -196,7 +196,7 @@ val havoc : sigma -> domain -> sigma
 (** All the chunks in the provided footprint are generated and made fresh.
 
     Existing chunk variables {i outside} the footprint are copied into the new
-    environment. The original environement itself is kept unchanged. More
+    environment. The original environment itself is kept unchanged. More
     efficient than iterating [havoc_chunk] over the footprint.
 *)
 

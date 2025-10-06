@@ -50,7 +50,7 @@ type cfg_concur = {
   (** Does this node contains a concurrent access? We do not distinguish
       the information by zone accessed, as this only used to display the cfg,
       not to compute information. This information is *not* correctly computed
-      when the cfg is created, and must be upated later using XXX *)
+      when the cfg is created, and must be updated later using XXX *)
 }
 
 
@@ -178,7 +178,7 @@ module CfgNode : sig
   *)
   val iter: ?f_before:(t -> unit) -> ?f_after:(t -> unit) -> t -> unit
 
-  (** Same iterator as above, except that the fonction also receives as
+  (** Same iterator as above, except that the function also receives as
       argument the path between the initial node and the visited node
       (starting from the visited node) *)
   val iter_with_prevs:

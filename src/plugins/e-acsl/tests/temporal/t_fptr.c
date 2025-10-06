@@ -1,5 +1,5 @@
 /* run.config
-   COMMENT: Check simple case of calling functions via pointer derefernce
+   COMMENT: Check simple case of calling functions via pointer dereference
 */
 
 int *foo(int *p) {

@@ -29,7 +29,7 @@ void f (void) {
 	     TEST #2: c2fc2_Wr_int(&y,c2fc2_Rd_INT(&)) */
 
   /* So, the use of the option -volatile-binding is hightly recommended.
-     That allows to catch by the same fonction all volatile accesses
+     That allows to catch by the same function all volatile accesses
      of a given C-type what ever are the typename aliases for this C-type */
 }
 

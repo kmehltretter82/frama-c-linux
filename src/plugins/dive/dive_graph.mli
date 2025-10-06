@@ -34,7 +34,7 @@ val create_dependency : t -> origin:origin -> kind:dependency_kind ->
 val remove_dependency : t -> node * dependency * node -> unit
 val remove_dependencies : t -> node -> unit
 
-val find_independant_nodes : t -> node list -> node list
+val find_independent_nodes : t -> node list -> node list
 val bfs : ?iter_succ:((node -> unit) -> t -> node -> unit) -> ?limit:int ->
   t -> node list -> node list
 

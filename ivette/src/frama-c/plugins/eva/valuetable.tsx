@@ -190,7 +190,7 @@ function Stmt(props: StmtProps): JSX.Element | null {
 
 
 /* -------------------------------------------------------------------------- */
-/* --- Informations on the alarms in a given callstack                    --- */
+/* --- Information on the alarms in a given callstack                     --- */
 /* -------------------------------------------------------------------------- */
 
 function AlarmsInfos(probe?: Probe): Request<callstack, JSX.Element> {
@@ -212,7 +212,7 @@ function AlarmsInfos(probe?: Probe): Request<callstack, JSX.Element> {
 
 
 /* -------------------------------------------------------------------------- */
-/* --- Informations on the selected callstack                             --- */
+/* --- Information on the selected callstack                              --- */
 /* -------------------------------------------------------------------------- */
 
 interface StackInfosProps {
@@ -531,7 +531,7 @@ async function CallsiteCell(props: CallsiteCellProps): Promise<JSX.Element> {
     }
     case 'Summary': {
       const text = '∑';
-      const title = 'Summary: value consolidated accross all callstacks';
+      const title = 'Summary: value consolidated across all callstacks';
       return <td className={cls} title={title}>{text}</td>;
     }
     default: {
@@ -735,7 +735,7 @@ async function ScopeSection(props: ScopeProps): Promise<JSX.Element> {
 /* --- programs scopes (mainly functions).                                --- */
 /* -------------------------------------------------------------------------- */
 
-/* Informations on one scope */
+/* Information on one scope */
 class ScopeInfos {
   readonly scope: Ast.decl;                 // Scope decl
   readonly pinned = new Set<Ast.marker>();  // Pinned markers
@@ -781,7 +781,7 @@ class ScopeInfos {
 
 }
 
-/* State keeping tracks of informations for every relevant scopes */
+/* State keeping tracks of information for every relevant scopes */
 class ScopesManager {
 
   private readonly cache = new Map<Ast.decl, ScopeInfos>();
@@ -947,7 +947,7 @@ function useEvaluationMode(props: EvaluationModeProps): void {
 
 
 /* -------------------------------------------------------------------------- */
-/* --- Eva Table Complet Component                                        --- */
+/* --- Eva Table Complete Component                                       --- */
 /* -------------------------------------------------------------------------- */
 
 /* Table's state. It is global for when the user changes the view. */

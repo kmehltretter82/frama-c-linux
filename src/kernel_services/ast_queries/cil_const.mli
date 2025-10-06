@@ -17,7 +17,7 @@
 open Cil_types
 
 (**/**)
-(* Reference to [Ast_types.add_attributes] to avoid circular dependancies
+(* Reference to [Ast_types.add_attributes] to avoid circular dependencies
    Ideally we want to move everything related to types in [Ast_types], but it
    also requires moving a few things from [Logic_const] to [Ast_types]. We do
    not use [Extlib.mk_fun] here because [mk_typ] is called later at toplevel
@@ -147,7 +147,7 @@ val charPtrType: typ
     @since 30.0-Zinc *)
 val scharPtrType: typ
 
-(** unisgned char *
+(** unsigned char *
     @since 30.0-Zinc *)
 val ucharPtrType: typ
 

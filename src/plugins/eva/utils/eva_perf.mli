@@ -15,7 +15,7 @@ val stop: Callstack.t -> unit
 (** Reset the internal state of the module. *)
 val reset: unit -> unit
 
-(** Display a complete summary of performance informations. Can be
+(** Display a complete summary of performance information. Can be
     called during the analysis. *)
 val display: Format.formatter -> unit
 

@@ -1,5 +1,5 @@
 /* run.config
-  COMMENT: Compile RTL with debug and debug verbose informations
+  COMMENT: Compile RTL with debug and debug verbose information
   STDOPT:#"-e-acsl-debug 1"
  */
 /* run.config_dev

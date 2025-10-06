@@ -300,7 +300,7 @@ let normalize integral fractional exponent format =
      and a power of two, the one we want to keep. The power of five part is
      multiplied with the numerator or the denominator depending on the sign
      of the exponent. The missing [ 2 ^ l ] from the denominator is taken
-     into account by substracting [l] to the exponent. *)
+     into account by subtracting [l] to the exponent. *)
   let shift_power_two = Z.(pow (of_int 5)) (abs initial_exponent) in
   let is_positive_exponent = Stdlib.(initial_exponent >= 0) in
   let num_factor = if is_positive_exponent then shift_power_two else Z.one in

@@ -325,11 +325,11 @@ following syntactic information from the source code:
   lazy logical operators, loops).
 \end{itemize}
 
-These informations are computed both for the complete source code, and
+This information is computed both for the complete source code, and
 on a per-function basis -- except for the number of functions
 declared.
 
-Cyclomatic complexity is then derived from these informations, both for the
+Cyclomatic complexity is then derived from this information, both for the
 full code and for each defined function.
 
 \section{Halstead complexity}
@@ -341,7 +341,7 @@ of the code and to go beyond pure complexity measures.
 \subsection{Calculation}
 \label{sec:halstead_computation}
 
-Halstead complexity measures first need the following informations from the
+Halstead complexity measures first need the following information from the
 source code:
 \begin{itemize}
 \item $\eta_{1}$ is the number of distinct operators;
@@ -350,7 +350,7 @@ source code:
 \item $N_{2}$ is the total number of operands;
 \end{itemize}
 
-From the above informations, Halstead defines the following measures:
+From the above information, Halstead defines the following measures:
 \begin{center}
   \begin{tabular}{lcl}
     Program vocabulary        &  $\eta$     & $\eta_{1} + \eta_{2}$ \\

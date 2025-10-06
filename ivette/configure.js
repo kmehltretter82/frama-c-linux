@@ -57,13 +57,13 @@ function delPublicFolder() {
   catch (err) { error(`Error deleting folder: ${err}`); }
 }
 
-function copyExtraRessources(pkg, id) {
-  if(!pkg.ressources || !Array.isArray(pkg.ressources)) return;
-  pkg.ressources.forEach((ressource) => {
-    if(ressource)
+function copyExtraResources(pkg, id) {
+  if(!pkg.resources || !Array.isArray(pkg.resources)) return;
+  pkg.resources.forEach((resource) => {
+    if(resource)
       mergeDirectories(
-        path.join('./src', id, ressource),
-        path.join(pluginsPath, id, ressource)
+        path.join('./src', id, resource),
+        path.join(pluginsPath, id, resource)
       );
   })
 }
@@ -71,8 +71,8 @@ function copyExtraRessources(pkg, id) {
 function configure(pkg, id) {
   if (!pkg.done) {
     pkg.done = true;
-    /** add plugins extra ressources in public folder */
-    copyExtraRessources(pkg, id);
+    /** add plugins extra resources in public folder */
+    copyExtraResources(pkg, id);
     for(let parent = id;;) {
       parent = path.dirname(parent);
       if (!parent || parent === '.') break;
@@ -86,7 +86,7 @@ function configure(pkg, id) {
 }
 
 delPublicFolder(); // Delete public folder
-mergeDirectories('./src/renderer/ressources',  pluginsPath); // merge permanent ressources
+mergeDirectories('./src/renderer/resources',  pluginsPath); // merge permanent resources
 
 packages.forEach(configure);
 fs.writeFileSync(loader, buffer);

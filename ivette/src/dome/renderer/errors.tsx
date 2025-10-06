@@ -74,7 +74,7 @@ export class Catch extends React.Component<CatchProps, CatchState, unknown> {
 
   logerr(): void {
     const { error, info } = this.state;
-    D.error('Catched error:', error, info);
+    D.error('Caught error:', error, info);
   }
 
   reload(): void {

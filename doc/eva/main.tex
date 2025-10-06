@@ -1115,7 +1115,7 @@ and also in a way that launched with adequate options,
 
 The latter condition is harder than the former.
 Observing results (with the GUI or observation functions
-described in section \ref{buitins_observation}) can help to iterate towards
+described in section \ref{builtins_observation}) can help to iterate towards
 a solution. Be creative. The continuation of this tutorial can be found online
 at \url{https://frama-c.com/category/skein/}\footnote{Note that some
   messages and options have changed since the tutorial was posted. Using an
@@ -2413,7 +2413,7 @@ Section \ref{boucles-traitement} introduces different ways for
 the user to influence the analyzer's strategy with respect to
 loops.
 
-\section{Functions}\label{fonctions}
+\section{Functions}\label{functions}
 
 Without special instructions from the user, function calls are
 handled as if the body of the function had been expanded at the
@@ -2421,7 +2421,7 @@ call site. In the following example, the body of \lstinline|f| is analyzed again
 at each analysis of the body of the loop. The result of the analysis
 is as precise as the result obtained for the example in section \ref{boucles}.
 
-\csource{examples/fonctions.c}
+\csource{examples/functions.c}
 
 Calls to variadic functions are handled by the \textsf{Variadic} plug-in, which
 translates calls to variadic functions into semantically-equivalent calls,
@@ -2457,7 +2457,7 @@ available, the only additional information expected by the plug-in is
 the name of the function that the analysis should start from. Specifying the
 wrong entry point can lead to incorrect results. For instance, let us
 assume that the actual entry point for the example of section
-\ref{fonctions} is not the function \lstinline|main_1| but the following
+\ref{functions} is not the function \lstinline|main_1| but the following
 \lstinline|main_main| function:
 
 \listinginput{17}{examples/main.c}
@@ -2465,7 +2465,7 @@ assume that the actual entry point for the example of section
 If the user specifies the wrong
 entry point \lstinline|main_1|, the plug-in will provide the
 same answer for variable \lstinline|y| at the end of function \lstinline|f| as
-in sections \ref{boucles} and \ref{fonctions}: the set of even numbers
+in sections \ref{boucles} and \ref{functions}: the set of even numbers
 between 0 and 256. This set is not the expected answer if the actual
 entry point is the function \lstinline|main_main|, because it does not
 contain the value 15.
@@ -4025,7 +4025,7 @@ Two kinds of value partitioning are available:
   The partitioning is maintained at each program point according to the current
   value of the given expression \lstinline|e|. At each assignment of a variable
   on which \lstinline|e| depends, the partitioning is updated to ensure that the
-  expression always evalutes to a singleton in each analysis state, until a
+  expression always evaluates to a singleton in each analysis state, until a
   merge annotation is encountered.
 \end{description}
 
@@ -4101,7 +4101,7 @@ There are four limitations to the value partitioning:
   per expression. If two \lstinline|split| annotations use the same expression,
   only the latest one encountered on the path will be kept. Although it is a
   limitation, it can be used to define strategies where a case-based reasoning
-  is controlled accross the whole program.
+  is controlled across the whole program.
 \item When the expression is complex, the ability of \Eva{} to reason
   precisely by cases depends on the enabled abstract domains (see section
   \ref{sec:eva}) and their capability to learn from the value of the expression.
@@ -4320,7 +4320,7 @@ However, the properties inferred by a specific domain at a program point may be
 inspected by using the directive \lstinline+Frama_C_dump_each+ or
 \lstinline+Frama_C_domain_show_each+ in the analyzed source code, and by
 enabling the log category of the given domain. These directives are described
-in Section~\ref{buitins_observation}, and the log category of each domain
+in Section~\ref{builtins_observation}, and the log category of each domain
 is given by Figure~\ref{fig:eva-domains}.
 
 \subsection{Symbolic equalities}
@@ -5802,7 +5802,7 @@ Note that reads of volatile variables also return a non-deterministic
 value.
 
 \section{Observing intermediate results}
-\label{buitins_observation}
+\label{builtins_observation}
 
 In addition to using the graphical user interface, it is also possible
 to obtain information about the value of variables at a particular

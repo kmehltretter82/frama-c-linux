@@ -46,7 +46,7 @@ end
 (** When selecting or propagating marks in a function,
     the marks are most of the time associated to pdg nodes,
     but we also need to associate marks to input locations
-    in order to propage information to the callers about undefined data.
+    in order to propagate information to the callers about undefined data.
 *)
 type select_elem = private
   | SelNode of PdgTypes.Node.t * Locations.Zone.t option

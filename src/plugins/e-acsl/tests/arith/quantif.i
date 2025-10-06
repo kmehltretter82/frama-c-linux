@@ -93,7 +93,7 @@ int main(void) {
       \forall real i; 0 <= i < 10 ==> p1((integer)i, 2, 2); */
   /*@ assert failed_missing_lower_bound:
       \forall integer i; i < 10 ==> p1(i, 2, 2); */
-  /*@ assert failded_missing_upper_bound:
+  /*@ assert failed_missing_upper_bound:
       \forall integer i; 0 <= i ==> p1(i, 2, 2); */
   /*@ assert failed_invalid_upper_bound_1:
       \forall integer i,j; 0 <= i < j ==> p1(i, j, 2); */

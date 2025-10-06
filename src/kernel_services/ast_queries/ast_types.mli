@@ -146,7 +146,7 @@ val is_volatile : typ -> bool
 (** {2 Ghost Attribute} *)
 (* ************************************************************************* *)
 
-(** Add the ghost attribute to a type (does nothing if the type is alreay
+(** Add the ghost attribute to a type (does nothing if the type is already
     ghost).
 *)
 val add_ghost : typ -> typ

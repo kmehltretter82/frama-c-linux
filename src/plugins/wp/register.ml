@@ -45,7 +45,7 @@ let wp_insert_memory_context model =
   end
 
 (* ------------------------------------------------------------------------ *)
-(* ---  Printing informations                                           --- *)
+(* ---  Printing information                                           --- *)
 (* ------------------------------------------------------------------------ *)
 
 let do_print_index fmt = function

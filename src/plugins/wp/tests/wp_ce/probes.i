@@ -5,7 +5,7 @@
    DONTRUN:
 */
 
-// Matrix addessing
+// Matrix addressing
 
 int a[3][4][5];
 

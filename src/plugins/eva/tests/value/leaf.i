@@ -13,7 +13,7 @@ int **f_int_star_int_star_int(int x);
 
 int f_star_int_cint(const int *x);
 
-/* 3 identicals prototypes */
+/* 3 identical prototypes */
 int f_star_int_int(int *x);
 int f_tab_int_int(int x[]);
 int f_tab3_int_int(int x[3]);
@@ -66,7 +66,7 @@ void main() {
   f_tab_int_int(&T[10]);   /* only T[10] modified */
 
   st_star_cint_1 = f_st_star_cint_st_star_cint(st_star_cint_2); /* only st_star_cint_1 modified */
-  st_star_int_1  = f_st_star_int_st_star_int (st_star_int_2) ;  /* st_star_int_1 modifed, v2 SHOULD BE modified */
+  st_star_int_1  = f_st_star_int_st_star_int (st_star_int_2) ;  /* st_star_int_1 modified, v2 SHOULD BE modified */
   st_tab3_int_1  = f_st_tab3_int_st_tab3_int (st_tab3_int_2) ;  /* only st_tab3_int_1 modified */
   
   f_star_st_star_cint_int(&st_star_cint_3); /* st_star_cint_3.p modified */

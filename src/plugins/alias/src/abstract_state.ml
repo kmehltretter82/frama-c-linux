@@ -314,7 +314,7 @@ module Pretty = struct
     Pretty_utils.pp_list ~empty:"<none>" ~sep:"@;<2>" LSet.pretty fmt alias_sets
 end
 
-(* invariants of type t must be true before and after each functon call *)
+(* invariants of type t must be true before and after each function call *)
 let assert_invariants s : unit =
   (* check that all vertex of the graph have entries in vmap,
      and are integer between 0 and node_counter, and have at most 1 successor *)
@@ -379,7 +379,7 @@ let pretty ?(debug = false) fmt s =
   if debug then Pretty.pp_graph fmt s
   else Pretty.pp_aliases fmt s
 
-(* NOTE on "constant vertex": a constant vertex represents an unamed
+(* NOTE on "constant vertex": a constant vertex represents an unnamed
    scalar value (type bottom in steensgaard's paper), or the address
    of a variable. It means that in [vmap], its associated VarSet is
    empty.  By definition, constant vertex cannot be associated to a
@@ -586,7 +586,7 @@ let set_type s v1 v2 : state =
     match G.psucc_opt s.graph v1 with
     | None -> s.graph, s.vmap
     | Some v2 ->
-      (* if v2 is a constant node supress it directly *)
+      (* if v2 is a constant node suppress it directly *)
       if VarSet.is_empty (VMap.find v2 s.vmap)
       then G.remove_vertex s.graph v2, VMap.remove v2 s.vmap
       else G.remove_edge s.graph v1 v2, s.vmap

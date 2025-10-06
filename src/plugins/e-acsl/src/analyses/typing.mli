@@ -85,11 +85,11 @@ val clear: unit -> unit
     predicate. *)
 
 val get_number_ty: logic_env:Logic_env.t -> term -> number_ty
-(** @return the infered type for the given term. *)
+(** @return the inferred type for the given term. *)
 
 val get_effective_ty: logic_env:Logic_env.t -> term -> number_ty
-(** @return the necessary cast infered by the type system if any, or the type
-    infered for the given term otherwise *)
+(** @return the necessary cast inferred by the type system if any, or the type
+    inferred for the given term otherwise *)
 
 val get_typ: logic_env:Logic_env.t -> term -> typ
 (** Get the type which the given term must be generated to. *)
@@ -115,7 +115,7 @@ val unsafe_set:
 (*****************************************************************************)
 
 val typ_of_lty: logic_type -> typ
-(** @return the C type that correponds to the given logic type. *)
+(** @return the C type that corresponds to the given logic type. *)
 
 (*****************************************************************************)
 (** {2 Typing processing} *)

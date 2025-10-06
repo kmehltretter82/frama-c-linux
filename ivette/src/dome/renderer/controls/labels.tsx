@@ -27,7 +27,7 @@ import './style.css';
 export type IconKind =
   'default' | 'disabled' | 'warning' | 'positive' | 'negative';
 
-/** Labels support fowarding refs to their inner [<label/>] element. */
+/** Labels support forwarding refs to their inner [<label/>] element. */
 export interface LabelProps {
   /** Text of the label. Prepend to other children elements. */
   label?: string;

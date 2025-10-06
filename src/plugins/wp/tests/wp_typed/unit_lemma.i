@@ -11,7 +11,7 @@
   }
 */
 
-/*@ axiomatic Poluted {
+/*@ axiomatic Polluted {
     predicate H(integer x) ;
     lemma Foo: 
       H(0) ==>

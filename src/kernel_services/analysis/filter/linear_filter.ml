@@ -139,7 +139,7 @@ module Make (Field : Field.S) = struct
      if an infinite series converge and to compute its limit. This is done
      by grouping iterations by pack of size [e] and factorizing the common
      state matrix power. This leads to an infinite geometric series in the
-     matrix space. If the spectral radius of this matrix is stricly lower
+     matrix space. If the spectral radius of this matrix is strictly lower
      than one, then the series converge and its limit at infinity can be
      computed as (I - A^e)^(-1). *)
   let invariant : type n. n filter -> int -> n invariant option = fun f e ->
@@ -199,7 +199,7 @@ module Make (Field : Field.S) = struct
         let add_recent_contrib t acc = Matrix.(acc + contributions t) in
         let recent = Finite.for_each add_recent_contrib maximal_delay zero in
         (* Old contributions come from all the previous iterations, for which
-           the filter is forgeting more and more. This implies a limit
+           the filter is forgetting more and more. This implies a limit
            computation, as described previously. *)
         let add_old_contrib t acc = Matrix.(acc + state t * limit) in
         let old = Finite.for_each add_old_contrib exponent zero in
@@ -236,11 +236,11 @@ module Make (Field : Field.S) = struct
         let add_recent_contrib = add_contribution compute_recent_contrib in
         let recent = Finite.for_each add_recent_contrib maximal_delay zero in
         (* For the old contributions, we use the same factorization as described
-           previously. However, this time the common term is not independant
+           previously. However, this time the common term is not independent
            from the exponent (i.e the index of the infinite sum). However, for
            each index [k], that common term actually behave the same, it is
-           just a matter of rewritting. Thus, by computing the maximal deviation
-           of this finite common up to rewritting term, we can actually consider
+           just a matter of rewriting. Thus, by computing the maximal deviation
+           of this finite common up to rewriting term, we can actually consider
            it as a constant and thus use the same technique as previously
            described. *)
         let compute_old_contrib t = Matrix.(state t * limit) in
@@ -251,7 +251,7 @@ module Make (Field : Field.S) = struct
            series. We do not use the same method as before because we observe
            experimentaly that it produces an under approximation. Even if we do
            not have a proof of why it is the case, our intuition is that by
-           grouping the infinite sum with our rewritting, we do introduce
+           grouping the infinite sum with our rewriting, we do introduce
            correlations that lead to an underapproximation. Those correlations
            are however ignored through a norm based approach and thus the
            computation is correct. *)

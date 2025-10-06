@@ -29,7 +29,7 @@ void private_assert_fail(int expr, const char *file, int line, char *fmt, ...);
 void private_abort_fail(const char *file, int line, char *fmt, ...);
 void raise_abort(const char *file, int line);
 
-/* Instances of assertions shared accross different memory models */
+/* Instances of assertions shared across different memory models */
 
 /*! \brief Abort the execution if the size of the pointer computed during
  * instrumentation (\p _ptr_sz) does not match the size of the pointer used

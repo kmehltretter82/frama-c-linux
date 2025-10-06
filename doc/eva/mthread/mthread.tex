@@ -692,7 +692,7 @@ either dereference their argument if the id is passed as a pointer
 
 
 As hinted by the comments, not all functions are properly stubbed. The
-\verb+*setcancel+ functions, which are related to the cancelability of
+\verb+*setcancel+ functions, which are related to the cancellability of
 a thread, are not given a body; for now, we implicitly assume that
 \verb+pthread_cancel+ always succeed in stopping a
 thread. For functions
@@ -1481,7 +1481,7 @@ detect and handle.  Their prototypes can be found in the file
   \item Thread canceling, through function \verb+Frama_C_thread_cancel+
 
     \it (This functions currently cancels the thread regardless of any
-    potential cancelability state notion, such as the one available in
+    potential cancellability state notion, such as the one available in
     \pthreads.)
   \end{itemize}
 

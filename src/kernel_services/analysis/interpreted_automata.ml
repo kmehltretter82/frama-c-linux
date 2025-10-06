@@ -297,7 +297,7 @@ module MakeGraph (Vertex : Datatype.S_with_hashtbl) (Edge : Datatype.S) = struct
       | None -> ()
     end;
 
-    (* Instanciate Dot module *)
+    (* Instantiate Dot module *)
     let module Dot = Graph.Graphviz.Dot (
       struct
         type t = G.t
@@ -340,7 +340,7 @@ module MakeGraph (Vertex : Datatype.S_with_hashtbl) (Edge : Datatype.S) = struct
       | Wto.Node (v) -> v, [component]
     in
     (* Build a table of vertices that should not be passed through to get
-       a path to an exit. At the begining it only contains the component head. *)
+       a path to an exit. At the beginning it only contains the component head. *)
     let table = VTable.create (G.nb_vertex graph) in
     VTable.add table head ();
     (* Filter elements at the top level of the wto, in reverse order *)
@@ -353,7 +353,7 @@ module MakeGraph (Vertex : Datatype.S_with_hashtbl) (Edge : Datatype.S) = struct
           f (Wto.Node v :: acc) l
       | Wto.Component (v, w) :: l ->
         let vertices = v :: Wto.flatten w in (* All vertices of the sub wto *)
-        List.iter (fun v -> VTable.add table v ()) vertices; (* Temporarilly add them *)
+        List.iter (fun v -> VTable.add table v ()) vertices; (* Temporarily add them *)
         let succs = List.flatten (List.map (G.succ graph) vertices) in
         if List.for_all (VTable.mem table) succs then
           f acc l

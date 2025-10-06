@@ -17,7 +17,7 @@
    - Strings can store more bits than the bitvector they represent;
      for instance a bitvector of size 11 is stored in a 2-bytes
      string. We (currently) do not store the actual size of the
-     bitvector, which has to be provided in some informations (such as
+     bitvector, which has to be provided in some information (such as
      concat). We rely on the invariant that the extra bits are set to
      0 (this is important e.g. for equality testing). An alternative
      design could have been not to explicitly ignore these extra bits

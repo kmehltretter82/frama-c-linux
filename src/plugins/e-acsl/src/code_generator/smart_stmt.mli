@@ -61,7 +61,7 @@ val rtl_call:
   loc:location -> ?result:lval -> ?prefix:string -> string -> exp list -> stmt
 (** Construct a call to a library function with the given name.
 
-    [prefix] defaults to the E-ACSL RTL API prefix and can be explicitely
+    [prefix] defaults to the E-ACSL RTL API prefix and can be explicitly
     provided to call functions without this prefix.
 
     @raise Rtl.Symbols.Unregistered if the given string does not represent

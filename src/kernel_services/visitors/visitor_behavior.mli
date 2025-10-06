@@ -110,7 +110,7 @@ end
 module Get: Get
 
 (** Get operations on behaviors, allows to get the original representative of
-    an element of the {b new} AST in the curent state of the visitor.
+    an element of the {b new} AST in the current state of the visitor.
 
     [Get_orig.ast_element vis new_e] with [new_e] of type [ast_element] gets the
     original representative of [new_e] in [vis]. For example for

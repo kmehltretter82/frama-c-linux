@@ -108,7 +108,7 @@ module Space (Field : Field.S) : sig
     (** Matrices addition. The dimensions compatibility is statically ensured. *)
     val ( + ) : ('n, 'm) matrix -> ('n, 'm) matrix -> ('n, 'm) matrix
 
-    (** Matrices substraction. As for the addition, the dimensions compatibility
+    (** Matrices subtraction. As for the addition, the dimensions compatibility
         is statically ensured. *)
     val ( - ) : ('n, 'm) matrix -> ('n, 'm) matrix -> ('n, 'm) matrix
 

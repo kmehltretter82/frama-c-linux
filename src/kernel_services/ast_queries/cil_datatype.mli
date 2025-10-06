@@ -154,7 +154,7 @@ module ExpStructEq: S_with_collections with type t = exp
 module ExpStructEqStrict: S_with_collections with type t = exp
 
 (**
-   Structural equality, with structural comparaison in case of sizeof
+   Structural equality, with structural comparison in case of sizeof
    (instead of id).
    Different expressions with the same size within sizeof are equal.
 
@@ -164,8 +164,8 @@ module ExpStructEqSized: S_with_collections with type t = exp
 
 (**
    Structural equality, with strict constant comparison as in {!ConstantStrict}
-   and with structural comparaison in case of sizeof (instead of id).
-   Different expressions with the same size winthin sizeof are equal.
+   and with structural comparison in case of sizeof (instead of id).
+   Different expressions with the same size within sizeof are equal.
 
    @since 28.0-Nickel
 *)

@@ -177,7 +177,7 @@ type attribute_class =
   *)
   | AttrUnknown
 
-(** Registered informations about an attribute. *)
+(** Registered information about an attribute. *)
 type attribute_info = {
   attr_class : attribute_class; (** Class of the attribute. *)
   attr_ignore: bool; (** Ignore the attribute when comparing types. *)

@@ -13,7 +13,7 @@
 (** Prover Stats *)
 type pstats = {
   tmin : float ; (** minimum prover time (non-smoke proof only) *)
-  tval : float ; (** cummulated prover time (non-smoke proof only) *)
+  tval : float ; (** cumulated prover time (non-smoke proof only) *)
   tmax : float ; (** maximum prover time (non-smoke proof only) *)
   tnbr : float ; (** number of non-smoke proofs *)
   time : float ; (** cumulated prover time (smoke and non-smoke) *)
@@ -25,7 +25,7 @@ type pstats = {
     Remark: for each sub-goal, only the _best_ prover result is kept *)
 type stats = {
   best : VCS.verdict ; (** provers best verdict (not verdict of the goal) *)
-  provers : (VCS.prover * pstats) list ; (** meaningfull provers *)
+  provers : (VCS.prover * pstats) list ; (** meaningful provers *)
   tactics : int ; (** number of tactics *)
   proved : int ; (** number of proved sub-goals *)
   timeout : int ; (** number of timeouts and stepouts sub-goals *)

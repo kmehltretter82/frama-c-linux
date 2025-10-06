@@ -112,7 +112,7 @@ let () =
 
 let () =
   Request.register ~package ~kind:`SET ~name:"load"
-    ~descr:(Md.plain "Load a save file. Returns an error, if not successfull.")
+    ~descr:(Md.plain "Load a save file. Returns an error, if not successful.")
     ~input:(module Jfile)
     ~output:(module Joption(Jstring))
     (fun file ->
@@ -122,7 +122,7 @@ let () =
 
 let () =
   Request.register ~package ~kind:`SET ~name:"save"
-    ~descr:(Md.plain "Save the current session. Returns an error, if not successfull.")
+    ~descr:(Md.plain "Save the current session. Returns an error, if not successful.")
     ~input:(module Jfile)
     ~output:(module Joption(Jstring))
     (fun file ->

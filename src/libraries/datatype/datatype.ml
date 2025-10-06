@@ -1380,7 +1380,7 @@ module With_hashtbl(X: S) = struct
           | Some cmp -> fold_sorted ~cmp
 
         let structural_descr =
-          Structural_descr.t_hashtbl_unchanged_hashs (Descr.str D.descr)
+          Structural_descr.t_hashtbl_unchanged_hashes (Descr.str D.descr)
       end)
       (D)
 

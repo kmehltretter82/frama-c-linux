@@ -792,7 +792,7 @@ struct
           | Property.IPPredicate {Property.ip_pred} -> ip_pred
           | _ -> assert false
         in
-        (* Functons called at this point *)
+        (* Functions called at this point *)
         let called = Statuses_by_call.all_functions_with_preconditions stmt in
         let warn_missing = false in
         let add_by_kf kf acc =

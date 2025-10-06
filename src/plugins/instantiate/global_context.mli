@@ -34,7 +34,7 @@ val get_logic_function: string -> (unit -> logic_info) -> logic_info
     is created using [f].
 
     [f] must return:
-    - the axiomatic in a form [name, list of the defintions (incl. functions)]
+    - the axiomatic in a form [name, list of the definitions (incl. functions)]
     - all functions that are part of the axiomatic definition
 
     Note that function overloading is not supported.

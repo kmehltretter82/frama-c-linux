@@ -179,7 +179,7 @@ Plugin WP 23.0 (Vanadium)
                            control flow graph and local variable scoping.
                            Support for stmt contracts has been removed.
                            Support for looping gotos has been removed.
-                           Altough unsound, the legacy engine is still
+                           Although unsound, the legacy engine is still
                            accessible via -wp-legacy option.
 - WP          [2021-01-25] Improved -wp-unfold-assigns <depth>
                            Now recursively applies to all compounds
@@ -592,7 +592,7 @@ Plugin WP 0.4 (Nitrogen_20111001)
 -  Gui        [2011-06-29] New menu options to prove preconditions at one
 	      or all call sites.
 -  Cmd        [2011-06-17] Added option -wp-proof-trace to obtain more
-	      informations from provers when available (option 'Trace' in GUI).
+	      information from provers when available (option 'Trace' in GUI).
 -! Ergo       [2011-06-17] Alt-Ergo is always used with builtin arrays.
 	      Removed option -wp-arrays.
 -  Vampire    [2011-06-10] Support for Vampire as back-end prover.
@@ -636,9 +636,9 @@ Plugin WP 0.3 (Carbon_20110201)
 -  Cmd        [2011-03-23] Adding version in -wp-help.
 +* WP         [2011-03-10] Proof of requires of the main entry point (bug #675).
 -  Cmd        [2011-01-31] Option -wp-warnings to display additional
-	      informations for 'Stronger' and 'Degenerated' goals.
--  WP         [2011-01-24] New spliting algorithm. See option -wp-split.
-	      Option -wp-split-dim <n> to limit spliting up to 2**n sub-goals.
+	      information for 'Stronger' and 'Degenerated' goals.
+-  WP         [2011-01-24] New splitting algorithm. See option -wp-split.
+	      Option -wp-split-dim <n> to limit splitting up to 2**n sub-goals.
 -  WP         [2011-01-24] When -rte-precond is not used,
 	      wp generates a separate proof obligation for each call site.
 -  Cmd	      [2011-01-20] Options -wp-status-xxx to refine goal selection

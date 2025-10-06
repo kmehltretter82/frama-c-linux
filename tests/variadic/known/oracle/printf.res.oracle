@@ -83,7 +83,7 @@
 [kernel:variadic] printf.c:69: 
   Translating call to printf to a call to the specialized version printf_va_26.
 [kernel:libc:format] printf.c:71: Warning: 
-  Flag ' ' and conversion specififer x are not compatibles.
+  Flag ' ' and conversion specifier x are not compatible.
 [kernel:variadic] printf.c:71: 
   Fallback translation of call printf to a call to the specialized version printf_fallback_1.
 [kernel:variadic] printf.c:74: 

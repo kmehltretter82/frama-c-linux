@@ -224,11 +224,11 @@ class SocketClient extends Client {
             case 'CMDLINEON': this.emitCmdLine(true); break;
             case 'CMDLINEOFF': this.emitCmdLine(false); break;
             default:
-              D.warn('Misformed data', data);
+              D.warn('Malformed data', data);
           }
         }
       } catch (err) {
-        D.warn('Misformed JSON', data, err);
+        D.warn('Malformed JSON', data, err);
       }
     }
   }

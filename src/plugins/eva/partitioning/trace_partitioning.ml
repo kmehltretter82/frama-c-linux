@@ -100,7 +100,7 @@ struct
 
   let initial_tank (states : state list) : tank =
     let flow = Flow.initial states in
-    (* Split the initial partition according to the global split seetings *)
+    (* Split the initial partition according to the global split settings *)
     let states = List.fold_left Flow.transfer_keys flow universal_splits in
     { tank_states = Flow.to_partition states }
 
@@ -202,7 +202,7 @@ struct
     List.map (fun (k, s) -> combine ~caller ~callee:k, s) result
 
 
-  (* Reset state (for hierchical convergence) *)
+  (* Reset state (for hierarchical convergence) *)
 
   let reset_store (s : store) : unit =
     let is_eternal key _state = not (Key.exceed_rationing key) in

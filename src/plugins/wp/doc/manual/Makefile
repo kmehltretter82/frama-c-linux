@@ -64,7 +64,7 @@ swap3.log-file: ../../${GREP_DIR}/oracle_qualif/manual.2.res.oracle
 clean::
 	@echo "Cleaning WP"
 	rm -f $(LOGS)
-	rm -f wp.pdf wp.cb wp.cb2 wp.log wp.out wp.aux wp.blg wp.bbl *~
+	rm -f wp.pdf wp.cb wp.cb2 wp.log wp.out wp.aux wp.blg wp.bbl wp.fdb_latexmk *~
 
 logs: $(LOGS)
 	rm -f $(LOGS) wp.pdf

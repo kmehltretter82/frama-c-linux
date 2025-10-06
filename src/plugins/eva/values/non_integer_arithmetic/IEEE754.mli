@@ -29,7 +29,7 @@
     semantics heavily relies on multiplications and divisions, it is preferable
     to provide an abstraction as precise as possible on those operations, like
     the relative forms described {{:https://theses.hal.science/tel-03566701}
-    here}. Moreover, the relative error semantics for additions and substractions
+    here}. Moreover, the relative error semantics for additions and subtractions
     is defined based on an expression of the form {m (ax \pm by) / (x \pm y)}.
     This expression can be precisely computed even in intervals, as described
     {{:https://theses.hal.science/tel-01094485v1} here}, and is optimal if

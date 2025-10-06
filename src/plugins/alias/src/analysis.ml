@@ -193,7 +193,7 @@ module T = struct
 
   module StmtStartData = Stmt_table
 
-  let copy x = x (* we only have persistant data *)
+  let copy x = x (* we only have persistent data *)
 
   let pretty fmt a =
     match a with

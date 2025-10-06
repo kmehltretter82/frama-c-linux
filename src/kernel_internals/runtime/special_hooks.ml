@@ -174,7 +174,7 @@ let flush_json_files () =
     written
 
 (* Registers an exit hook that flushes Json objects and writes JSON files. This
-   hook must be run last (in case other hooks modifiy JSON objects), so it is
+   hook must be run last (in case other hooks modify JSON objects), so it is
    registered after the extended stage, when plug-ins have been loaded. *)
 let () =
   Cmdline.run_after_extended_stage

@@ -601,7 +601,7 @@ and print_def fmt def =
   | LINKAGE (n, _, dl) ->
     fprintf fmt "@[<2>extern@ %s@ {%a@;}@]" n (pp_list print_def) dl
 
-(*  print abstrac_syntax -> ()
+(*  print abstract_syntax -> ()
  **              Pretty printing the given abstract syntax program.
 *)
 let printFile fmt ((_fname, defs) : file) = print_defs fmt defs

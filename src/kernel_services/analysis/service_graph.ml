@@ -87,7 +87,7 @@ struct
         add_edge_e g (E.create src l dst)
   end
 
-  type incomming_service =
+  type incoming_service =
     | Fresh_if_unchanged
     | Unknown_cycle
     | To_be_confirmed of node vertex
@@ -163,8 +163,8 @@ struct
   let entry_point_ref = ref None
 
   let make_vertex g callg initial_roots node =
-    let mk incomming_s =
-      let v = match incomming_s with
+    let mk incoming_s =
+      let v = match incoming_s with
         | Fresh_if_unchanged | Unknown_cycle ->
           let rec v = { node = node; is_root = true; root = v } in v
         | To_be_confirmed root | Final root ->
@@ -173,7 +173,7 @@ struct
       (match G.V.entry_point () with
        | Some e when G.V.equal node e -> entry_point_ref := Some v
        | None | Some _ -> ());
-      let s = match incomming_s with
+      let s = match incoming_s with
         | Fresh_if_unchanged | Unknown_cycle | Final _ -> In_service v.root
         | To_be_confirmed root -> Maybe_fresh root
       in

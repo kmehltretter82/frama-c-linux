@@ -332,7 +332,7 @@ let rec of_trigger ~cnv t =
       | F_call s ->
         let ls = Why3.Theory.(ns_find_ls (get_namespace cnv.th) (cut_path s)) in
         Why3.Term.t_app_infer ls (List.map (fun e -> of_trigger ~cnv e) l)
-      | _ -> why3_failure "can not convert extented calls in triggers"
+      | _ -> why3_failure "can not convert extended calls in triggers"
     end
   | TgProp (f,l) ->
     begin
@@ -340,7 +340,7 @@ let rec of_trigger ~cnv t =
       | F_call s ->
         let ls = Why3.Theory.(ns_find_ls (get_namespace cnv.th) (cut_path s)) in
         Why3.Term.t_app_infer ls (List.map (fun e -> of_trigger ~cnv e) l)
-      | _ -> why3_failure "can not convert extented calls in triggers"
+      | _ -> why3_failure "can not convert extended calls in triggers"
     end
 
 let rec of_term ~cnv expected t : Why3.Term.term =

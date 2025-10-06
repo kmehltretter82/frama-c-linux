@@ -14,7 +14,7 @@
     This language is currently subject to frequent modifications, so
     documentation remains scant for the moment.
 
-    Since it is an intermediate language betwen E-ACSL and Cil its
+    Since it is an intermediate language between E-ACSL and Cil its
     characteristics are situated somewhere between the two languages,
     i.e. Interlang expressions (of type {!exp}) are reminiscent of
     both Cil expressions ([Cil_types.exp]) and logic terms ([Cil_types.term]).

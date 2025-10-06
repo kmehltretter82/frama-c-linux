@@ -595,7 +595,7 @@ module Make
       | Shiftlt ->
         let warn_negative = Kernel.LeftShiftNegative.get () in
         reduce_shift ~warn_negative typ arg1 arg2
-      | MinusPP when Parameters.WarnPointerSubstraction.get () ->
+      | MinusPP when Parameters.WarnPointerSubtraction.get () ->
         let kind = Abstract_value.Subtraction in
         let truth = Value.assume_comparable kind v1 v2 in
         let alarm () =

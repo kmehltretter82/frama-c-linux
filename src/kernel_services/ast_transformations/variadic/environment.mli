@@ -6,7 +6,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* Builds an environement to resolve names of globals and functions which
+(* Builds an environment to resolve names of globals and functions which
    can then be used, even if Frama-C global tables are not filled yet. *)
 
 type t

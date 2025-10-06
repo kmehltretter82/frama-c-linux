@@ -261,7 +261,7 @@ function textOf(text: string): CS.Text {
    All methods are bound to `this`. */
 export class TextBuffer extends TextProxy {
 
-  // --- Private part (we avoid unecessary conversions from/to text)
+  // --- Private part (we avoid unnecessary conversions from/to text)
   // --- Invariant: only one of proxy, text or contents holds data
 
   private text = CS.Text.empty;

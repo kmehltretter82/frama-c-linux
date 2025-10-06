@@ -72,7 +72,7 @@ sig
 
      - [label] shall be very short.
      - [title] shall succinctly describe the kind of information.
-     - [descr] optional longer description explaining the informations
+     - [descr] optional longer description explaining the information
      - [enable] optional dynamical filter for enabling this information
 
      The printer shall raise [Not_found] exception when there is no

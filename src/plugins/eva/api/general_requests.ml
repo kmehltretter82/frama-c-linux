@@ -412,7 +412,7 @@ module EvaTaints = struct
     | data, indirect ->
       let sep = match data with Untainted -> "but" | _ -> "and" in
       Format.fprintf fmt
-        "%s to the value, %s %s to values used to compute lvalues adresses"
+        "%s to the value, %s %s to values used to compute lvalues addresses"
         (to_string data) sep (to_string indirect)
 
   let print_taint fmt marker =

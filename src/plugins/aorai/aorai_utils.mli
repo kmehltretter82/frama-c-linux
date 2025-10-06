@@ -46,7 +46,7 @@ val initGlobals : Cil_types.kernel_function -> bool -> unit
    the post condition of a C function are defined by the set of states
    authorized just before/after the call, as such as the set of crossable
    transitions. The following functions generates abstract pre and post-conditions
-   by using only informations deduced from the buchi automata.
+   by using only information deduced from the buchi automata.
 *)
 
 (** base lhost corresponding to curState. *)
@@ -169,8 +169,8 @@ val all_actions_preds:
   Data_for_aorai.state -> predicate list
 
 (** Given an lval term 'host' and an integer value 'off', it returns a lval term host[off]. *)
-val mk_offseted_array : Cil_types.term_lval -> int -> Cil_types.term
-val mk_offseted_array_states_as_enum :
+val mk_offsetted_array : Cil_types.term_lval -> int -> Cil_types.term
+val mk_offsetted_array_states_as_enum :
   Cil_types.term_lval -> int -> Cil_types.term
 
 (** Returns a term representing the given logic variable

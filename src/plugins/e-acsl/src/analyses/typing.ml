@@ -356,7 +356,7 @@ let rec type_term
     | TAlignOf _ ->
       let i = Interval.get_from_profile ~profile t in
       (* a constant or a left value directly under a lambda should be a gmp
-         if the infered context for the lambda is gmp *)
+         if the inferred context for the lambda is gmp *)
       ty_of_interv ?ctx ~use_gmp_opt:under_lambda i
 
     | TLval ((TVar {lv_type = Ctype { tnode = TInt ik }}, _) as tlv) ->
@@ -544,7 +544,7 @@ let rec type_term
            Thus using [Option.get] is fine *)
         ty_of_logic_ty ~profile (Option.get li.l_type)
       else begin
-        (* TODO: what if the type of the parameter is smaller than the infered
+        (* TODO: what if the type of the parameter is smaller than the inferred
            type of the argument? For now, it is silently ignored (both
            statically and at runtime)... *)
         (* TODO: recursive call in arguments of function call *)
@@ -937,7 +937,7 @@ let typing_visitor profile = object
 
   method !vpredicate p =
     (* Do not raise a warning for e-acsl errors at preprocessing time,
-       those errrors are stored in the table and warnings are raised at
+       those errors are stored in the table and warnings are raised at
        translation time *)
     ignore
       (try type_named_predicate ~profile p

@@ -1068,7 +1068,7 @@ struct
       (* [decide_leaf] and [decide_tree] are the actions to perform respectively
          on the [leaf] and on the [tree] when they are disjoint.
          If the merge is not symmetric, they depend on the side the leaf comes
-         froms, and similarly for [decide_both] and [cache]. *)
+         from, and similarly for [decide_both] and [cache]. *)
       let decide_leaf = if right then decide_right else decide_left
       and decide_tree = if right then decide_left else decide_right
       and decide_both =

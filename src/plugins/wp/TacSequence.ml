@@ -57,7 +57,7 @@ class sequence =
                   F.pp_term s ;
                 Tactical.Not_configured
               | ns ->
-                (* NB. the term is rewriten in itself when the initial term is not a sum *)
+                (* NB. the term is rewritten in itself when the initial term is not a sum *)
                 let pos = F.p_all positive ns in
                 let cat =
                   concat ~result (List.map (repeat ~result a) ns) in

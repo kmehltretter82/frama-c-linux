@@ -518,7 +518,7 @@ export interface SearchFieldProps {
   hints?: Hint[];
   /** Hint selection callback. */
   onHint?: (hint: Hint) => void;
-  /** Current search pattern. Usefull to update hints. */
+  /** Current search pattern. Useful to update hints. */
   onPattern?: (pattern: string) => void;
   /** Search to perform when Enter is hit. Useful for modes without hints. */
   onEnter?: (pattern: string) => void;

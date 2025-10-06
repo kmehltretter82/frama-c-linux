@@ -133,8 +133,8 @@ val description : (text * text) list -> block
 
 (** [codeblock lang "...."] returns a [Code_block] for [code],
     written in [lang] with the given formatted content.
-    The code block content placed inside an englobing hv-box, trimed
-    and finally splitted into lines. *)
+    The code block content placed inside an englobing hv-box, trimmed
+    and finally split into lines. *)
 val codeblock : ?lang:string -> ('a,Format.formatter,unit,block) format4 -> 'a
 
 (** {2 Document Elements}

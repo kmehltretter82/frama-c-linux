@@ -12,7 +12,7 @@
 int main(void) {
   int i = 0;
   /* Assuming here that arr is allocated first, and arr2 is allocated second
-     and that there is no gap betwee [arr] and [arr2]. This behaviour is
+     and that there is no gap between [arr] and [arr2]. This behaviour is
      compiler specific but still likely. At least this is the case for some
      current versions of GCC/Clang */
   int arr[] = {1, 2, 3, 4};
