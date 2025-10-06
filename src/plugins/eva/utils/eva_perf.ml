@@ -196,7 +196,8 @@ let compute_stat_by_fun ~total_duration ~current_time =
   let find_calls caller =
     KfHashtbl.memo stat_by_caller caller (fun _ -> KfHashtbl.create 32)
   in
-  let find_stat hashtbl kf = KfHashtbl.find_def hashtbl kf empty_stat in
+  let default = empty_stat in
+  let find_stat hashtbl kf = KfHashtbl.find_default ~default hashtbl kf in
   let add_stat hashtbl kf new_stat =
     let old_stat = find_stat hashtbl kf in
     let stat = merge_stat old_stat new_stat in

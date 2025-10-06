@@ -242,9 +242,11 @@ module type Map = sig
 end
 
 module type Hashtbl_with_descr = sig
-  include FCHashtbl.S
+  include Hashtbl.S
   val structural_descr: Structural_descr.t -> Structural_descr.t
 end
+
+module Fc_hashtbl = Hashtbl
 
 module type Hashtbl = sig
   include Hashtbl_with_descr
@@ -1363,7 +1365,7 @@ module With_hashtbl(X: S) = struct
   module Hashtbl =
     Hashtbl
       (struct
-        include FCHashtbl.Make(D)
+        include Fc_hashtbl.Make(D)
 
         (* Override "sorted" iterators by using the datatype comparison
            function if it has been supplied *)
@@ -1419,7 +1421,7 @@ struct
          let structural_descr = Structural_descr.t_abstract
          let equal = X.equal
          let compare = X.compare
-         let hash = FCHashtbl.hash
+         let hash = Fc_hashtbl.hash
          let rehash = identity
          let copy = X.copy
          let pretty = X.pretty

@@ -84,7 +84,8 @@ let add_at_for_stmt data stmt =
 let at_for_stmt stmt =
   let retrieve stmt =
     if !preprocess_done then
-      let ats_ref = Stmt.Hashtbl.find_def at_data_for_stmts stmt (ref []) in
+      let default = ref [] in
+      let ats_ref = Stmt.Hashtbl.find_default ~default at_data_for_stmts stmt in
       Result.Ok !ats_ref
     else Error.not_memoized ()
   in

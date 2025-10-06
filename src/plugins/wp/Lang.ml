@@ -248,7 +248,7 @@ struct
     | Wtype(p,m,s) -> String.concat "." (p @ m :: s)
 
   let hash = function
-    | Mtype a | Mrecord(a,_) -> FCHashtbl.hash a
+    | Mtype a | Mrecord(a,_) -> Hashtbl.hash a
     | Comp (c, KValue) -> Compinfo.hash c
     | Comp (c, KInit) -> 13 * Compinfo.hash c
     | Atype lt -> Logic_type_info.hash lt
@@ -379,7 +379,7 @@ struct
     | Cfield(f, KInit) -> field_init_id f
 
   let hash = function
-    | Mfield(_,_,f,_) -> FCHashtbl.hash f
+    | Mfield(_,_,f,_) -> Hashtbl.hash f
     | Cfield(f, KValue) -> Fieldinfo.hash f
     | Cfield(f, KInit) -> 13 * Fieldinfo.hash f
 

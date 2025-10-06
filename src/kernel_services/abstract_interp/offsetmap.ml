@@ -2846,7 +2846,7 @@ module Make_bitwise(V: sig
       Int_Intervals.fold aux_itv itvs `Bottom
     with Error_Top -> find_imprecise ~validity m
 
-  module V_Hashtbl = FCHashtbl.Make(V)
+  module V_Hashtbl = Hashtbl.Make(V)
 
   (* Map indexed by sorted lists of integers. Used by function [fold_fuse_same]
      below, to sort bound values by increasing intervals. *)

@@ -15,7 +15,8 @@ module NodeRef = Datatype.Pair_with_collections
     (Node_kind) (Callstack)
 
 module Index = Datatype.Int.Hashtbl
-module NodeTable = FCHashtbl.Make (NodeRef)
+module NodeTable = Hashtbl.Make (NodeRef)
+
 module NodeSet = Graph.Node.Set
 module BaseSet = Cil_datatype.Varinfo.Set
 

@@ -114,7 +114,7 @@ module GColumn = struct
 end
 
 (* Hash tables indexed by GTree columns *)
-module HColumns = FCHashtbl.Make(GColumn)
+module HColumns = Hashtbl.Make(GColumn)
 
 (* Description of the columns of the widget. The [gui_selection] information
    refers to what the column is displaying *)
