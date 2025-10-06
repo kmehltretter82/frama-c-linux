@@ -52,6 +52,8 @@ let
 
     # Internal tests
     internal-tests = oself.callPackage ./internal-tests.nix {
+      # we use clang-format for linting. Be sure to keep
+      # that in sync with tools/lint/lint.ml
       clang = pkgs.clang_18;
       llvmPackages = pkgs.llvmPackages_18;
     };

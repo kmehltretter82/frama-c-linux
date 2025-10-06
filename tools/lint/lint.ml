@@ -21,6 +21,9 @@ type tool_cmds =
 (** The only part to modify for adding a new external formatters *)
 
 (** Supported indent formatters *)
+(* if you add formatters or change targetted versions, be sure
+   to keep the CI configuration in sync in nix/pkgs.nix.
+*)
 let external_formatters = [
   { kind = "C";
     extensions = [ ".c" ; ".i"; ".h"; ".cpp"; ".hpp"; ".ii"; ".cc" ];
@@ -28,7 +31,7 @@ let external_formatters = [
     available_cmd = "clang-format --version > /dev/null 2> /dev/null";
     check_cmd = "clang-format --dry-run -Werror" ;
     update_cmd = "clang-format -i" ;
-    version_cmd = "clang-format --version | grep -E '1[1-9]|20'"
+    version_cmd = "clang-format --version | grep -E '(1[89]|20)\\.[0-9]+\\.[0-9]+'"
   }
   ;
   { kind = "Python";
