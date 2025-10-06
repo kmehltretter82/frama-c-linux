@@ -1063,6 +1063,12 @@ struct
       let tag = Info.tag (PStmtStart(f,s)) in
       Format.fprintf fmt "@{<%s>%a@}" tag (super#stmtkind sattr next) sk
 
+    method! global fmt = function
+      | GVar(vi, _, _) | GVarDecl(vi, _) when Ast_info.is_string_literal vi ->
+        Format.fprintf fmt "@[%a = %a;@.@]"
+          self#vdecl vi self#str_literal (Globals.Vars.get_string_literal vi)
+      | g -> super#global fmt g
+
     initializer force_brace <- true
 
   end
