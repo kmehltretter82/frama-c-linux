@@ -48,6 +48,7 @@ void f3(void) {
   struct nested s = {0, {1, 2.0}};
   struct nested t = {3, {4, 5.0}};
   struct nested u;
+  struct nested __attribute__((public)) v;
 
   /*@ check !\tainted(private:s.n); */
   /*@ check !\tainted(private:s.p.a); */
@@ -63,6 +64,9 @@ void f3(void) {
   /*@ check \tainted(private:u.n); */
   /*@ check \tainted(private:u.p.a); */
   /*@ check \tainted(private:u.p.b); */
+
+  v = u;
+  /*@ check \tainted(private:v); */
 }
 
 extern int user_input;

@@ -881,7 +881,7 @@ let () =
     let a_class = Ast_attributes.AttrType in
     match Ast_attributes.find_known attr with
     | Some { attr_class } when attr_class = a_class -> ()
-    | None | Some _ -> Ast_attributes.register a_class attr
+    | None | Some _ -> Ast_attributes.register ~ignore:true a_class attr
   in
   List.iter register_ast_attribute_type
     [public_taint_namespace; private_taint_namespace]
