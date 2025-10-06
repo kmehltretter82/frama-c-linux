@@ -359,7 +359,7 @@ module S =
     (struct
       type t = po
       include Datatype.Undefined
-      let hash a = FCHashtbl.hash a.po_gid
+      let hash a = Hashtbl.hash a.po_gid
       let equal a b = (a.po_gid = b.po_gid)
       let compare a b =
         let c = Index.compare a.po_idx b.po_idx in

@@ -494,6 +494,8 @@ module type Hashtbl = sig
   val add_hook_on_change: ((key, data) hashtbl_event -> unit) -> unit
 end
 
+module Fc_hashtbl = Hashtbl
+
 module Hashtbl
     (H: Datatype.Hashtbl)
     (Data: Datatype.S)
@@ -733,7 +735,7 @@ struct
   (* OCaml module typing requires to name this module. Too bad :-( *)
   module W = struct
 
-    module HW = FCHashtbl.Make
+    module HW = Fc_hashtbl.Make
         (struct
           include Data
           let equal = Data.equal_internal

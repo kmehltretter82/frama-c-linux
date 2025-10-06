@@ -224,7 +224,7 @@ end
 
 (** Marshallable collectors with hashtbl-like interface. *)
 module type Hashtbl_with_descr = sig
-  include FCHashtbl.S
+  include Hashtbl.S
   val structural_descr: Structural_descr.t -> Structural_descr.t
 end
 

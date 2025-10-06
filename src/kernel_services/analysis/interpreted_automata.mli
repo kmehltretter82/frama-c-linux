@@ -300,7 +300,7 @@ module BackwardAnalysis (D : Domain) : DataflowAnalysis
 module type Graph = sig
   include Graph.Sig.I
 
-  module VTable : FCHashtbl.S with type key = vertex
+  module VTable : Hashtbl.S with type key = vertex
 
   type wto = vertex Wto.partition
   module WTO : Wto.S with type node = vertex

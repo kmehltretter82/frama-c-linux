@@ -25,7 +25,7 @@ struct
   let pretty fmt = function
     | C_str s -> Format.fprintf fmt "%S" s
     | W_str _ -> Format.fprintf fmt "\"L<...>\""
-  let hash (c:t) = FCHashtbl.hash c land 0xFFFF
+  let hash (c:t) = Hashtbl.hash c land 0xFFFF
 end
 
 let pretty = STR.pretty

@@ -24,7 +24,7 @@ module Node : sig
   type t
   module Map : Qed.Idxmap.S with type key = t
   module Set : Qed.Idxset.S with type elt = t
-  module Hashtbl : FCHashtbl.S with type key = t
+  module Hashtbl : Hashtbl.S with type key = t
   val tag: t -> int
   val compare: t -> t -> int
   val equal: t -> t -> bool

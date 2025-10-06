@@ -180,7 +180,7 @@ module Edge = Datatype.Make_with_collections (struct
 module type Graph = sig
   include Graph.Sig.I
 
-  module VTable : FCHashtbl.S with type key = vertex
+  module VTable : Hashtbl.S with type key = vertex
 
   type wto = V.t Wto.partition
   module WTO : Wto.S with type node = V.t
