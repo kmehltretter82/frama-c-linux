@@ -142,6 +142,7 @@
 [eva] secureflow.c:188: assertion got status valid.
 [eva] secureflow.c:189: assertion got status valid.
 [eva:secure-flow:direct] secureflow.c:190: Warning: interference on: z_0
+[eva:secure-flow:indirect] secureflow.c:190: Warning: interference on: z_0
 [eva:alarm] secureflow.c:191: Warning: assertion got status unknown.
 [eva] secureflow.c:192: assertion got status valid.
 [eva] secureflow.c:193: assertion got status valid.

@@ -953,7 +953,7 @@ module TaintLogic = struct
     | Some _ as x -> x
     | None -> eval_term_deps cvalue_env term
 
-  let reduce_by_taint_predicate predicate_name cvalue_env state term positive =
+  let reduce_by_taint_predicate cvalue_env state predicate_name term positive =
     match eval_term_zone cvalue_env term with
     | None -> state
     | Some (under, _over) ->
@@ -967,6 +967,15 @@ module TaintLogic = struct
       | "\\tainted_indirectly" ->
         { state with locs_control = zone_op state.locs_control under }
       | _ -> state
+
+  let reduce_by_security_status_predicate cvalue_env state term positive =
+    let open Lattice_bounds.Top.Operators in
+    let+ state_map = state in
+    LatticeMultiTaint.mapi (fun key state ->
+        if String.equal key private_taint_namespace then
+          reduce_by_taint_predicate cvalue_env state "\\tainted" term positive
+        else
+          state) state_map
 
   let rec reduce_by_predicate cvalue_env state predicate positive =
     match positive, predicate.pred_content with
@@ -989,33 +998,30 @@ module TaintLogic = struct
           let taint_names = term_taint_namespaces arg in
           LatticeMultiTaint.mapi (fun key state ->
               if List.mem key taint_names then
-                reduce_by_taint_predicate lv_name cvalue_env state arg positive
+                reduce_by_taint_predicate cvalue_env state lv_name arg positive
               else
                 state) state_map
         | _ -> state
       end
-    | _, Prel (Req, {term_node = Tapp (f, _, [arg])}, t)
-      when f.l_var_info.lv_name = lf_name_security_status ->
-      begin
-        match t.term_node with
-        | TLval (TVar {lv_name}, TNoOffset) ->
-          let open Lattice_bounds.Top.Operators in
-          let+ state_map = state in
-          let taint_names = term_taint_namespaces arg in
-          let positive =
-            if String.equal lv_name public_taint_namespace then
-              not positive
-            else
-              positive
-          in
-          LatticeMultiTaint.mapi (fun key state ->
-              if List.mem key taint_names then
-                reduce_by_taint_predicate "\\tainted"
-                  cvalue_env state arg positive
+    | _, Prel (Rneq, t1, t2)->
+      let p = Logic_const.unnamed ~loc:predicate.pred_loc (Prel (Req, t1, t2)) in
+      reduce_by_predicate cvalue_env state p (not positive)
+    | _, (Prel (Req, {term_node = Tapp (f, _, [arg])}, t)
+         | Prel (Req, t, {term_node = Tapp (f, _, [arg])})) ->
+      if String.equal f.l_var_info.lv_name lf_name_security_status then
+        begin
+          match t.term_node with
+          | TLval (TVar {lv_name}, TNoOffset) ->
+            let positive =
+              if String.equal lv_name public_taint_namespace then
+                not positive
               else
-                state) state_map
-        | _ -> state
-      end
+                positive
+            in
+            reduce_by_security_status_predicate cvalue_env state arg positive
+          | _ -> state
+        end
+      else state
     | _ -> state
 
   let evaluate_taint_term cvalue_env zone term =
