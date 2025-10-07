@@ -64,7 +64,7 @@ let canceled = ref false
 let cancel () = canceled := true
 
 let warn_error exn =
-  Kernel.failure
+  Cmdline.Kernel_log.failure
     "Unexpected Async.daemon exception:@\n%s"
     (Printexc.to_string exn)
 
