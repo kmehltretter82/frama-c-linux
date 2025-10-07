@@ -38,6 +38,8 @@ let auto_taint_res_functions = (* auto taint the result *) [
 let auto_taint () = Parameters.AutoTaint.get ()
 let ignore_singletons () = not (Parameters.TaintSingletons.get ())
 
+let secure_flow_analysis () = Parameters.TaintSecureFlow.get ()
+
 (* Default namespace for taints, when no custom one is provided by the user. *)
 let default_taint_namespace = "default"
 
@@ -406,7 +408,7 @@ module TransferSingleTaint = struct
     let update ~warn tainted locs =
       if tainted
       then begin
-        warn ~pos lv_zone;
+        if secure_flow_analysis () then warn ~pos lv_zone;
         Zone.join locs lv_zone
       end
       else if singleton
@@ -457,9 +459,10 @@ module TransferSingleTaint = struct
         let exp_zone = Eva_ast.PreciseDepsOf.zone_of_exp to_loc exp in
         if LatticeSingleTaint.intersects state exp_zone
         then begin
-          warn_on_assume_interference ~pos exp_zone;
-          if not state.dependent_call
-          then { state with assume_stmts = Stmt.Set.add stmt state.assume_stmts; }
+          if secure_flow_analysis () then
+            warn_on_assume_interference ~pos exp_zone;
+          if not state.dependent_call then
+            { state with assume_stmts = Stmt.Set.add stmt state.assume_stmts; }
           else state
         end
         else state
@@ -742,25 +745,32 @@ module Domain = struct
   (* Scoping and Initialization. *)
 
   let enter_scope kind vars state =
-    match kind with
-    | Abstract_domain.Formal _ | Result _ ->
+    if not (secure_flow_analysis ()) then
       state
-    | Global | Local _ ->
-      let open Lattice_bounds.Top.Operators in
-      let+ state_map = state in
-      let namespace = private_taint_namespace in
-      let taint_state = LatticeMultiTaint.find_or_empty namespace state_map in
-      let locs_data =
-        List.fold_left (fun locs_data vi ->
-            if TransferSingleTaint.has_attribute namespace vi.vtype then
-              let vi_zone = Locations.zone_of_varinfo vi in
-              Zone.join locs_data vi_zone
-            else
-              locs_data)
-          taint_state.locs_data vars
-      in
-      let taint_state = { taint_state with locs_data } in
-      LatticeMultiTaint.add namespace taint_state state_map
+    else
+      begin
+        match kind with
+        | Abstract_domain.Formal _ | Result _ ->
+          state
+        | Global | Local _ ->
+          let open Lattice_bounds.Top.Operators in
+          let+ state_map = state in
+          let namespace = private_taint_namespace in
+          let taint_state =
+            LatticeMultiTaint.find_or_empty namespace state_map
+          in
+          let locs_data =
+            List.fold_left (fun locs_data vi ->
+                if TransferSingleTaint.has_attribute namespace vi.vtype then
+                  let vi_zone = Locations.zone_of_varinfo vi in
+                  Zone.join locs_data vi_zone
+                else
+                  locs_data)
+              taint_state.locs_data vars
+          in
+          let taint_state = { taint_state with locs_data } in
+          LatticeMultiTaint.add namespace taint_state state_map
+      end
 
   let remove_bases_per_taint bases state =
     let remove = Zone.filter_base (fun b -> not (Base.Hptset.mem b bases)) in

@@ -66,6 +66,9 @@ Options taking a string as argument should preferably be written
                     octagons inferred at the end. The interprocedural
                     analysis is more precise but slower. (opposite option is
                     -eva-no-octagon-through-calls)
+-eva-taint-secureflow  Perform secure-flow (non-interference) analysis via
+                    the taint domain. (opposite option is
+                    -eva-no-taint-secureflow)
 -eva-traces-dot <FILENAME>  Output to the given filename the Cfg in dot
                     format.
 -eva-traces-project  Try to convert the Cfg into a program in a new project.

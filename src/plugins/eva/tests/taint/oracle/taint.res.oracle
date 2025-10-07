@@ -25,9 +25,6 @@
   default:
     Locations (data): tainted; t; u; x
     Locations (control): w; buf[0..1]
-  private:
-    Locations (data): \nothing
-    Locations (control): \nothing
   ==END OF DUMP==
 [eva] Recording results for taint_basic
 [eva] Done for function taint_basic
@@ -40,17 +37,11 @@
   default:
     Locations (data): \nothing
     Locations (control): \nothing
-  private:
-    Locations (data): \nothing
-    Locations (control): \nothing
   ==END OF DUMP==
 [eva] taint.c:53: 
   Frama_C_dump_each:
   # taint:
   default:
-    Locations (data): \nothing
-    Locations (control): \nothing
-  private:
     Locations (data): \nothing
     Locations (control): \nothing
   ==END OF DUMP==
@@ -59,9 +50,6 @@
   # taint:
   default:
     Locations (data): x
-    Locations (control): \nothing
-  private:
-    Locations (data): \nothing
     Locations (control): \nothing
   ==END OF DUMP==
 [eva] taint.c:53: 
@@ -70,9 +58,6 @@
   default:
     Locations (data): x
     Locations (control): y
-  private:
-    Locations (data): \nothing
-    Locations (control): \nothing
   ==END OF DUMP==
 [eva] taint.c:50: 
   Frama_C_dump_each:
@@ -80,9 +65,6 @@
   default:
     Locations (data): x
     Locations (control): x; y
-  private:
-    Locations (data): \nothing
-    Locations (control): \nothing
   ==END OF DUMP==
 [eva] taint.c:53: 
   Frama_C_dump_each:
@@ -90,9 +72,6 @@
   default:
     Locations (data): x
     Locations (control): x; y
-  private:
-    Locations (data): \nothing
-    Locations (control): \nothing
   ==END OF DUMP==
 [eva] taint.c:63: 
   Frama_C_dump_each:
@@ -100,9 +79,6 @@
   default:
     Locations (data): x
     Locations (control): x; y
-  private:
-    Locations (data): \nothing
-    Locations (control): \nothing
   ==END OF DUMP==
 [eva] Recording results for taint_assume_1
 [eva] Done for function taint_assume_1
@@ -114,9 +90,6 @@
   default:
     Locations (data): x
     Locations (control): x; y
-  private:
-    Locations (data): \nothing
-    Locations (control): \nothing
   ==END OF DUMP==
 [eva] Recording results for taint_assume_2
 [eva] Done for function taint_assume_2
@@ -128,19 +101,10 @@
   default:
     Locations (data): x; y; t
     Locations (control): \nothing
-  private:
-    Locations (data): \nothing
-    Locations (control): \nothing
   ==END OF DUMP==
 [eva] Recording results for taint_undet_locs
 [eva] Done for function taint_undet_locs
-[eva] computing for function taints <- main.
-  Called from taint.c:222.
-[eva] computing for function Frama_C_interval <- taints <- main.
-  Called from taint.c:207.
-[eva] Done for function Frama_C_interval
-[eva] Recording results for taints
-[eva] Done for function taints
+[eva] taint.c:222: Reusing old results for call to taints
 [eva] computing for function taint_spec_assigns <- main.
   Called from taint.c:223.
 [eva] using specification for function taint_spec_assigns
@@ -157,9 +121,6 @@
   default:
     Locations (data): t
     Locations (control): x
-  private:
-    Locations (data): \nothing
-    Locations (control): \nothing
   ==END OF DUMP==
 [eva] Recording results for taint_goto_1
 [eva] Done for function taint_goto_1
@@ -171,9 +132,6 @@
   default:
     Locations (data): t
     Locations (control): x; y
-  private:
-    Locations (data): \nothing
-    Locations (control): \nothing
   ==END OF DUMP==
 [eva] Recording results for taint_goto_2
 [eva] Done for function taint_goto_2
@@ -188,9 +146,6 @@
   default:
     Locations (data): tainted; t; u; x; t
     Locations (control): t; u; w; x; y; buf[0..1]
-  private:
-    Locations (data): \nothing
-    Locations (control): \nothing
   ==END OF DUMP==
 [eva] Recording results for taint_basic
 [eva] Done for function taint_basic
@@ -219,9 +174,6 @@
   default:
     Locations (data): tainted; t; y
     Locations (control): w
-  private:
-    Locations (data): \nothing
-    Locations (control): \nothing
   ==END OF DUMP==
 [eva] Recording results for taint_infinite_while
 [eva] Done for function taint_infinite_while

@@ -1,5 +1,5 @@
 /* run.config*
-   STDOPT: +"-eva-warn-key=acsl:unsupported=inactive"
+   STDOPT: +"-eva-taint-secureflow -eva-warn-key=acsl:unsupported=inactive"
  */
 
 #include "__fc_builtin.h"
