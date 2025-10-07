@@ -149,9 +149,23 @@ class annot_visitor kf flags on_alarm = object (self)
     end;
     Cil.DoChildren
 
+  method private check_aligned ptr typ =
+    if self#do_pointer_alignment () then begin
+      Options.debug "exp %a: validity of potential unaligned_pointer checked\n"
+        Printer.pp_exp ptr;
+      self#generate_assertion Rte.pointer_alignment (ptr, typ)
+    end
+
+  method private check_aligned_access lval =
+    match lval with
+    | Mem e, _ -> self#check_aligned e (Cil.typeOf e)
+    | _ -> ()
+
   (* assigned left values are checked for valid access *)
   method! vinst = function
-    | Set (lval,_,_) -> self#check_assigned lval
+    | Set (lval,_,_) ->
+      self#check_aligned_access lval ;
+      self#check_assigned lval
     | Call (ret_opt,func,argl,_) ->
       (* Do not emit alarms on Eva builtins such as Frama_C_show_each, that should
          have no effect on analyses. *)
@@ -176,6 +190,7 @@ class annot_visitor kf flags on_alarm = object (self)
       if is_builtin
       then Cil.SkipChildren
       else begin
+        Option.iter self#check_aligned_access ret_opt ;
         self#treat_call ret_opt;
         (* Alarm if the call is through a pointer. Done in DoChildrenPost to get a
            more pleasant ordering of annotations. *)
@@ -278,16 +293,20 @@ class annot_visitor kf flags on_alarm = object (self)
            | _ -> ())
 
         | Lval lval ->
+          (* Note that we have two checks related to alignment, the lval might:
+             - have been created via a violation of strict aliasing
+             - be an access via an unaligned pointer
+           *)
           (match Ast_types.unroll_node (Cil.typeOfLval lval) with
            | TPtr _ ->
              if self#do_pointer_value ()
              then self#generate_assertion Rte.pointer_value exp ;
              (* This control can be removed if we check strict aliasing *)
-             if self#do_pointer_alignment ()
-             then self#generate_assertion Rte.pointer_alignment (exp, Cil.typeOf exp) ;
+             self#check_aligned exp (Cil.typeOf exp) ;
            | TInt IBool when self#do_bool_value () ->
              self#generate_assertion Rte.bool_value lval
            | _ -> ());
+          self#check_aligned_access lval ;
           (* left values are checked for valid access *)
           if self#do_mem_access () then begin
             Options.debug
@@ -313,12 +332,10 @@ class annot_visitor kf flags on_alarm = object (self)
            | TPtr _, TInt _ ->
              if self#do_pointer_value () then
                self#generate_assertion Rte.pointer_value exp ;
-             if self#do_pointer_alignment () then
-               self#generate_assertion Rte.pointer_alignment (e, ty)
+             self#check_aligned e ty
 
            | TPtr _, TPtr _ ->
-             if self#do_pointer_alignment () then
-               self#generate_assertion Rte.pointer_alignment (e, ty)
+             self#check_aligned e ty
 
            | TInt kind, TInt _ ->
              let signed = Cil.isSigned kind in

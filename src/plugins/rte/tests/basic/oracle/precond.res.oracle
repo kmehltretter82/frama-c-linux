@@ -53,6 +53,9 @@ int g(int *p, int i)
   int __retres;
   if (i >= 1) {
     /*@ assert rte: signed_overflow: -2147483648 ≤ i - 1; */
+    /*@ assert
+          rte: pointer_alignment: \aligned(p + (int)(i - 1),alignof(int));
+    */
     /*@ assert rte: mem_access: \valid_read(p + (int)(i - 1)); */
     __retres = *(p + (i - 1));
     goto return_label;
@@ -68,6 +71,7 @@ int g(int *p, int i)
 int h(int *p)
 {
   int __retres;
+  /*@ assert rte: pointer_alignment: \aligned(p + 3,alignof(int)); */
   /*@ assert rte: mem_access: \valid_read(p + 3); */
   __retres = *(p + 3);
   return __retres;
@@ -129,6 +133,7 @@ cell *tabtop_set(top **tab_top, int i, int v)
   /*@ assert rte: pointer_alignment: \aligned(tab_top,alignof(top *)); */
   /*@ assert rte: pointer_alignment: \aligned(*(tab_top + i),alignof(top));
   */
+  /*@ assert rte: pointer_alignment: \aligned(tab_top + i,alignof(top *)); */
   /*@ assert rte: mem_access: \valid_read(tab_top + i); */
   tmp = top_set(*(tab_top + i),v);
   return tmp;
@@ -184,6 +189,7 @@ int main(void)
   /*@ assert rte: mem_access: \valid_read(pc); */
   next_val(*pc);
   /*@ assert rte: pointer_alignment: \aligned(V,alignof(cell)); */
+  /*@ assert rte: pointer_alignment: \aligned((cell *)V,alignof(cell)); */
   /*@ assert rte: mem_access: \valid_read((cell *)V); */
   next_val(*((cell *)V));
   T.pred = & c;

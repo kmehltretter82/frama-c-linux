@@ -1,5 +1,10 @@
+/* run.config
+   STDOPT: #"-print"
+*/
+
 #include <stdlib.h>
 #include <stdint.h>
+#include <string.h>
 
 volatile int nondet;
 
@@ -124,6 +129,50 @@ void must_not_trigger_failure(void){
   int *p = (int*) malloc_ok_for_any_type ;
 }
 
+// the following examples invoke strict-aliasing violation, that we do not
+// detect however, we need to guarantee that we still detect unaligned pointers
+// when such a violation happens and pointers are then read.
+
+void strict_aliasing(void){
+  char c ;
+  short *p1, *p2, *p3;
+
+  *((char**)&p1) = &c ;
+  short* r1 = p1;
+
+  char* ptr = &c ;
+  memcpy(&p2, &ptr, sizeof(ptr));
+  short* r2 = p2;
+
+  for(int i = 0 ; i < sizeof(ptr) ; i++){
+    ((char*)&p3)[i] = ((char*)&ptr)[i] ;
+  }
+  short* r3 = p3;
+}
+
+// because of the above example, many pointers cannot be trusted locally. For
+// example, global pointers, pointers in a structure, pointers pointed-to ...
+// For this reason, locally, we can only trust local and formal pointers,
+// provided that their address has not been taken.
+
+struct X { int* p; };
+
+int* g;
+
+int* test(void);
+
+void untrusted_sources(struct X x, int** pp, int* p){
+  if(nondet){int* i = g;}
+  if(nondet){int* i = g;}
+  if(nondet){int* i = *pp;}
+
+  &p ;
+  if(nondet){int* i = p;}
+
+  int* l ;
+  &l ;
+  if(nondet){int* i = l;}
+}
 
 volatile int32_t i32_nondet;
 
@@ -136,4 +185,5 @@ int main(void){
   ptr_to_ptr_syn(&x);
   int8_t a;
   ptr_to_ptr_sem_caller(&a);
+  strict_aliasing();
 }

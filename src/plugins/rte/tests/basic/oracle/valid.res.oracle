@@ -214,12 +214,23 @@ int main(void)
         rte: pointer_alignment:
           \aligned(*(p.znexts + i0),alignof(struct P *));
   */
+  /*@ assert
+        rte: pointer_alignment: \aligned(p.znexts + i0,alignof(struct P **));
+  */
   /*@ assert rte: mem_access: \valid_read(p.znexts + i0); */
   /*@ assert
         rte: pointer_alignment:
           \aligned(*(*(p.znexts + i0) + i1),alignof(struct P));
   */
+  /*@ assert
+        rte: pointer_alignment:
+          \aligned(*(p.znexts + i0) + i1,alignof(struct P *));
+  */
   /*@ assert rte: mem_access: \valid_read(*(p.znexts + i0) + i1); */
+  /*@ assert
+        rte: pointer_alignment:
+          \aligned(*(*(p.znexts + i0) + i1) + i2,alignof(struct P));
+  */
   /*@ assert
         rte: mem_access: \valid_read(&(*(*(p.znexts + i0) + i1) + i2)->val);
   */
@@ -410,12 +421,23 @@ int main(void)
         rte: pointer_alignment:
           \aligned(*(p.znexts + i0),alignof(struct P *));
   */
+  /*@ assert
+        rte: pointer_alignment: \aligned(p.znexts + i0,alignof(struct P **));
+  */
   /*@ assert rte: mem_access: \valid_read(p.znexts + i0); */
   /*@ assert
         rte: pointer_alignment:
           \aligned(*(*(p.znexts + i0) + i1),alignof(struct P));
   */
+  /*@ assert
+        rte: pointer_alignment:
+          \aligned(*(p.znexts + i0) + i1,alignof(struct P *));
+  */
   /*@ assert rte: mem_access: \valid_read(*(p.znexts + i0) + i1); */
+  /*@ assert
+        rte: pointer_alignment:
+          \aligned(*(*(p.znexts + i0) + i1) + i2,alignof(struct P));
+  */
   /*@ assert
         rte: mem_access: \valid_read(&(*(*(p.znexts + i0) + i1) + i2)->val);
   */
