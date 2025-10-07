@@ -669,6 +669,7 @@ module Unicode = struct
     if default then clear () else set old;
     r
 end
+let () = Unicode.add_update_hook (fun _ curr -> Fclib.Unicode.use_unicode curr)
 
 let () = Parameter_customize.set_group messages
 let () = Parameter_customize.do_not_projectify ()

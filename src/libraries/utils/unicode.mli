@@ -11,6 +11,11 @@
     ASCII-based replacement if -no-unicode option is set.
     @since Frama-C+dev *)
 
+(** This function can be used to turn on or off the use of unicode UTF-8
+    caracters in messages.
+*)
+val use_unicode : bool -> unit
+
 type printer = Format.formatter -> unit
 
 (** Set operations. *)
