@@ -1,9 +1,9 @@
 /* run.config
-   STDOPT: +"-slice-calls printf1 -float-normal -eva-remove-redundant-alarms -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  "
-   STDOPT: +"-slice-calls printf2 -float-normal -eva-remove-redundant-alarms -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  "
-   STDOPT: +"-slice-calls printf3 -float-normal -eva-remove-redundant-alarms -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  "
-   STDOPT: +"-slice-calls printf4 -float-normal -eva-remove-redundant-alarms -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  "
-   STDOPT: +"-slice-calls printf5 -float-normal -eva-remove-redundant-alarms -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  "
+   STDOPT: +"-slice-calls printf1 -float-print norm -eva-remove-redundant-alarms -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  "
+   STDOPT: +"-slice-calls printf2 -float-print norm -eva-remove-redundant-alarms -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  "
+   STDOPT: +"-slice-calls printf3 -float-print norm -eva-remove-redundant-alarms -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  "
+   STDOPT: +"-slice-calls printf4 -float-print norm -eva-remove-redundant-alarms -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  "
+   STDOPT: +"-slice-calls printf5 -float-print norm -eva-remove-redundant-alarms -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  "
    */
 /* Small example derived from examples given for UNRAVEL tool : */
 

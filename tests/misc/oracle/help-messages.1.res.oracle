@@ -222,12 +222,17 @@ Options taking a string as argument should preferably be written
 -eager-load-sources  when loading a source, try to load all referenced
                     sources in memory (opposite option is
                     -no-eager-load-sources)
--float-hex          display floats as hexadecimal (opposite option is
-                    -no-float-hex)
--float-normal       display floats with internal routine (opposite option is
-                    -no-float-normal)
--float-relative     display float intervals as [lower_bound ++ width]
-                    (opposite option is -no-float-relative)
+-float-hex          [DEPRECATED] display floats as hexadecimal. This option
+                    is deprecated, use '-float-print hex' instead. (opposite
+                    option is -no-float-hex)
+-float-normal       [DEPRECATED] display floats with internal routine. This
+                    option is deprecated, use '-float-print norm' instead.
+                    (opposite option is -no-float-normal)
+-float-print <default|norm|hex>  Control how floats will be printed :
+                    'default' will print the float as is, 'norm' will use an
+                    internal routine to normalize it using decimals, and
+                    'hex' is the same than 'norm' but in hexadecimal. Default
+                    value is 'default'
 -keep-comments      try to keep comments in C code (opposite option is
                     -no-keep-comments)
 -ocode <filename>   when printing code, redirects the output to file

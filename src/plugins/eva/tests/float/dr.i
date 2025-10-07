@@ -1,6 +1,6 @@
 /* run.config*
   STDOPT:
-  STDOPT: #"-float-hex"
+  STDOPT: #"-float-print hex"
   STDOPT: #"-eva-all-rounding-modes-constants"
 */
 

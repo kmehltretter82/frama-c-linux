@@ -1,5 +1,5 @@
 /* run.config*
-   OPT:  -eva @EVA_CONFIG@ -float-normal -lib-entry
+   OPT:  -eva @EVA_CONFIG@ -float-print norm -lib-entry
 */
 
 typedef struct S { float y; } S;

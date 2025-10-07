@@ -1,6 +1,6 @@
 /* run.config*
-  OPT: -eva @EVA_CONFIG@ -eva-slevel 10 -big-ints-hex 0 -machdep ppc_32 -float-normal -kernel-warn-key parser:decimal-float=warning
-  OPT: -eva @EVA_CONFIG@ -eva-slevel 10 -big-ints-hex 0 -machdep x86_32 -float-normal -kernel-warn-key parser:decimal-float=warning
+  OPT: -eva @EVA_CONFIG@ -eva-slevel 10 -big-ints-hex 0 -machdep ppc_32 -float-print norm -kernel-warn-key parser:decimal-float=warning
+  OPT: -eva @EVA_CONFIG@ -eva-slevel 10 -big-ints-hex 0 -machdep x86_32 -float-print norm -kernel-warn-key parser:decimal-float=warning
 */
 
 float f = 3.14;

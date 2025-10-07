@@ -6,6 +6,15 @@
 (*                                                                        *)
 (**************************************************************************)
 
+type float_display =
+  | Default
+  | NormDec
+  | NormHex
+
+let float_print_mode = ref Default
+
+let set_float_display kind = float_print_mode := kind
+
 type rounding =
   | Nearest_even
   | Upward
@@ -103,20 +112,24 @@ let string_of_rounding_mode = function
 let ensure_round_nearest_even () =
   if Stdlib.(get_rounding_mode () <> Nearest_even) then
     let mode = string_of_rounding_mode (get_rounding_mode ()) in
-    let () = Kernel.failure "pretty: rounding mode (%s) <> FE_TONEAREST" mode in
+    let () =
+      Cmdline.Kernel_log.failure
+        "pretty: rounding mode (%s) <> FE_TONEAREST" mode
+    in
     set_rounding_mode Nearest_even
 
 let pretty fmt f =
-  let use_hex = Kernel.FloatHex.get () in
   (* should always arrive here with nearest_even *)
   ensure_round_nearest_even () ;
-  if not (use_hex || Kernel.FloatNormal.get ()) then
+  match !float_print_mode with
+  | Default ->
     let r = Format.sprintf "%.*g" 12 f in
     let contains = String.contains r in
     let is_not_integer = contains '.' || contains 'e' || contains 'E' in
     let dot = if is_not_integer || not (is_finite f) then "" else "." in
     Format.fprintf fmt "%s%s" r dot
-  else pretty_normal ~use_hex fmt f
+  | NormDec -> pretty_normal ~use_hex:false fmt f
+  | NormHex -> pretty_normal ~use_hex:true fmt f
 
 
 let suffix_of_fkind = function

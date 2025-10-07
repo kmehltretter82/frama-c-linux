@@ -1,5 +1,5 @@
 /* run.config*
-   OPT: -eva @EVA_CONFIG@ -eva-slevel 1000 -float-normal
+   OPT: -eva @EVA_CONFIG@ -eva-slevel 1000 -float-print norm
 */
 
 #include "__fc_builtin.h"

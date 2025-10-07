@@ -397,14 +397,17 @@ module AstDiff: Parameter_sig.Bool
             (path:name). *)
 module SymbolicPath: Parameter_sig.Filepath_map with type value = string
 
+module FloatPrint: Parameter_sig.S with type t = Floating_point.float_display
+(** Behavior of option "-float-print"
+    @since Frama-C+dev *)
+
 module FloatNormal: Parameter_sig.Bool
 (** Behavior of option "-float-normal" *)
-
-module FloatRelative: Parameter_sig.Bool
-(** Behavior of option "-float-relative" *)
+[@@deprecated "Use FloatPrint with 'norm' mode instead."]
 
 module FloatHex: Parameter_sig.Bool
 (** Behavior of option "-float-hex" *)
+[@@deprecated "Use FloatPrint with 'hex' mode instead."]
 
 module BigIntsHex: Parameter_sig.Int
 (** Behavior of option "-hexadecimal-big-integers" *)
