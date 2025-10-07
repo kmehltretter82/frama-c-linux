@@ -23,7 +23,7 @@ module Filename =
       let option_name = "-cg"
       let arg_name = "filename"
       let file_kind = "DOT"
-      let existence = Fc_Filepath.Indifferent
+      let existence = Fclib.Filepath.Indifferent
       let help = "dump the callgraph to the file \
                   <filename> in dot format"
     end)
@@ -86,9 +86,9 @@ module Uncalled_leaf =
 let dump output g =
   let file = Filename.get () in
   feedback ~level:2 "dumping the graph into file %a"
-    Fc_Filepath.pretty file;
+    Fclib.Filepath.pretty file;
   try
-    let cout = open_out (Fc_Filepath.to_string_abs file) in
+    let cout = open_out (Fclib.Filepath.to_string_abs file) in
     output cout g;
     close_out cout
   with e ->

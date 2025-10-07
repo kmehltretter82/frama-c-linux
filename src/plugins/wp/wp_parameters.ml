@@ -754,7 +754,7 @@ module Library =
       let option_name = "-wp-library"
       let arg_name = "dir,..."
       let file_kind = "Why3 load path"
-      let existence = Fc_Filepath.Must_exist
+      let existence = Fclib.Filepath.Must_exist
       let help = "Load path for importing why3 theories"
     end)
 
@@ -765,7 +765,7 @@ module Drivers =
       let option_name = "-wp-driver"
       let arg_name = "file,..."
       let file_kind = "WP library"
-      let existence = Fc_Filepath.Must_exist
+      let existence = Fclib.Filepath.Must_exist
       let help = "Load drivers for linking to external libraries"
     end)
 
@@ -996,7 +996,7 @@ module Report =
       let option_name = "-wp-report"
       let arg_name = "report,..."
       let file_kind = "Report"
-      let existence = Fc_Filepath.Indifferent
+      let existence = Fclib.Filepath.Indifferent
       let help = "Report specification file(s)"
     end)
 
@@ -1007,7 +1007,7 @@ module ReportJson =
     let option_name = "-wp-report-json"
     let arg_name ="file.json"
     let file_kind = "JSON report"
-    let existence = Fc_Filepath.Indifferent
+    let existence = Fclib.Filepath.Indifferent
     let help = "Output proof results in JSON format."
   end)
 let () = on_reset ReportJson.clear
@@ -1060,7 +1060,7 @@ module CheckMemoryContext =
 let () = Parameter_customize.set_group wp_po
 module OutputDir =
   Filepath(struct
-    let existence = Fc_Filepath.Indifferent
+    let existence = Fclib.Filepath.Indifferent
     let option_name = "-wp-out"
     let arg_name = "dir"
     let file_kind = "directory"
@@ -1088,27 +1088,27 @@ module CounterExamples =
 
 let dkey = register_category "output"
 
-let has_out () = not @@ Fc_Filepath.is_empty (OutputDir.get ())
+let has_out () = not @@ Fclib.Filepath.is_empty (OutputDir.get ())
 
 let make_output_dir dir =
   try
     if not @@ Filesystem.dir_exists dir then begin
       Filesystem.make_dir ~perm:0o770 dir;
-      debug ~dkey "Created output directory '%a'" Fc_Filepath.pretty dir
+      debug ~dkey "Created output directory '%a'" Fclib.Filepath.pretty dir
     end
   with Sys_error msg ->
     abort
       "System Error (%s)@\nCan not create output directory '%a'"
-      msg Fc_Filepath.pretty dir
+      msg Fclib.Filepath.pretty dir
 
 (*[LC] Do not projectify this reference : it is common to all projects *)
-let unique_tmp : Fc_Filepath.t option ref = ref None
-let make_tmp_dir () : Fc_Filepath.t =
+let unique_tmp : Fclib.Filepath.t option ref = ref None
+let make_tmp_dir () : Fclib.Filepath.t =
   match !unique_tmp with
   | None ->
     let tmp = Temp_files.dir ~prefix:"wp" ~suffix:".dir" () in
     unique_tmp := Some tmp ;
-    debug ~dkey "Created temporary directory '%a'" Fc_Filepath.pretty tmp ;
+    debug ~dkey "Created temporary directory '%a'" Fclib.Filepath.pretty tmp ;
     tmp
   | Some tmp -> tmp
 
@@ -1118,7 +1118,7 @@ let make_gui_dir () =
       try Sys.getenv "USERPROFILE" (*Win32*) with Not_found ->
       try Sys.getenv "HOME" (*Unix like*) with Not_found ->
         "." in
-    let dir = Fc_Filepath.of_string (home ^ "/" ^ ".frama-c-wp") in
+    let dir = Fclib.Filepath.of_string (home ^ "/" ^ ".frama-c-wp") in
     Filesystem.remove_dir dir;
     make_output_dir dir ; dir
   with _ ->
@@ -1131,14 +1131,14 @@ let base_output () =
   | None ->
     let output =
       let dir = OutputDir.get () in
-      if Fc_Filepath.is_empty dir then
+      if Fclib.Filepath.is_empty dir then
         if is_interactive ()
         then make_gui_dir ()
         else make_tmp_dir ()
       else
         ( make_output_dir dir ; dir ) in
     base_output := Some output;
-    Fc_Filepath.add_symbolic_dir "WPOUT" output ; output
+    Fclib.Filepath.add_symbolic_dir "WPOUT" output ; output
   | Some output -> output
 
 let get_output () =
@@ -1147,19 +1147,19 @@ let get_output () =
   let name = Project.get_name project in
   if name = "default" then base
   else
-    let dir = Fc_Filepath.(base / name) in
+    let dir = Fclib.Filepath.(base / name) in
     make_output_dir dir ; dir
 
 let get_output_dir d =
   let base = get_output () in
-  let path = Fc_Filepath.(base / d) in
+  let path = Fclib.Filepath.(base / d) in
   make_output_dir path ; path
 
 (* -------------------------------------------------------------------------- *)
 (* --- Session dir                                                        --- *)
 (* -------------------------------------------------------------------------- *)
 
-let default = Fc_Filepath.(concat (pwd ()) "/.frama-c")
+let default = Fclib.Filepath.(concat (pwd ()) "/.frama-c")
 
 let has_session () =
   Session.is_set () || Filesystem.dir_exists default
@@ -1175,7 +1175,7 @@ let get_session ~force () =
 
 let get_session_dir ~force d =
   let base = get_session ~force () in
-  let path = Fc_Filepath.(base / d) in
+  let path = Fclib.Filepath.(base / d) in
   if force then make_output_dir path ; path
 
 (* -------------------------------------------------------------------------- *)
@@ -1188,7 +1188,7 @@ let has_print_generated () = has_dkey cat_print_generated
 
 let print_generated ?header file =
   let header = match header with
-    | None -> Fc_Filepath.to_string file
+    | None -> Fclib.Filepath.to_string file
     | Some head -> head in
   debug ~dkey:cat_print_generated "%S@\n%t@." header
     begin fun fmt ->

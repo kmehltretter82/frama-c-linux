@@ -290,7 +290,7 @@ struct
               "set the plug-in share directory to <dir> (may be used if the \
                plug-in is not installed at the same place as Frama-C)"
             else empty_string
-          let existence = Fc_Filepath.Must_exist
+          let existence = Fclib.Filepath.Must_exist
           let file_kind = ""
         end)
 
@@ -300,16 +300,16 @@ struct
 
     let add_plugin path =
       if is_kernel then path
-      else Fc_Filepath.(path / plugin_subpath)
+      else Fclib.Filepath.(path / plugin_subpath)
 
     let dirs () =
       if is_visible && is_set () then [ get () ]
       else List.map add_plugin System_config.Share.dirs
 
     let find ~is_dir relative =
-      let exception Found of Fc_Filepath.t * Filesystem.file_kind in
+      let exception Found of Fclib.Filepath.t * Filesystem.file_kind in
       let check_presence dir =
-        let path = Fc_Filepath.(dir / relative) in
+        let path = Fclib.Filepath.(dir / relative) in
         match Filesystem.file_kind path with
         | Error _ -> ()
         | Ok file_kind -> raise (Found (path, file_kind))
@@ -324,7 +324,7 @@ struct
       with
       | Found (path, file_kind) when is_dir <> (file_kind = Directory) ->
         L.abort "%a is expected to be a %s"
-          Fc_Filepath.pretty path
+          Fclib.Filepath.pretty path
           (if is_dir then "directory" else "file")
       | Found (path, _) -> path
 
@@ -335,8 +335,8 @@ struct
   module Make_user_dir_root
       (D: sig
          val name : string
-         val default_root : unit -> Fc_Filepath.t
-         val kernel_get : unit -> Fc_Filepath.t
+         val default_root : unit -> Fclib.Filepath.t
+         val kernel_get : unit -> Fclib.Filepath.t
          val is_visible : bool
        end)
   =
@@ -367,16 +367,16 @@ struct
             then Format.asprintf "set the plug-in %s directory to <dir>" D.name
             else empty_string
 
-          let existence = Fc_Filepath.Indifferent
+          let existence = Fclib.Filepath.Indifferent
           let file_kind = ""
         end)
 
     let get () =
       if Dir_name.is_set () then Dir_name.get ()
       else match Sys.getenv_opt var_name with
-        | Some s when s <> "" -> Fc_Filepath.of_string s
+        | Some s when s <> "" -> Fclib.Filepath.of_string s
         | _ when is_kernel -> D.default_root ()
-        | _ -> Fc_Filepath.(D.kernel_get () / P.shortname)
+        | _ -> Fclib.Filepath.(D.kernel_get () / P.shortname)
 
     let set = Dir_name.set
     let is_set = Dir_name.is_set
@@ -384,15 +384,15 @@ struct
     let expected ~dir path =
       if dir <> Filesystem.dir_exists path then
         L.abort "%a is expected to be a %s"
-          Fc_Filepath.pretty path (if dir then "directory" else "file")
+          Fclib.Filepath.pretty path (if dir then "directory" else "file")
 
     let mk_dir d =
       try Filesystem.make_dir d
       with Sys_error _ ->
-        L.abort "cannot create %s directory `%a'" D.name Fc_Filepath.pretty d
+        L.abort "cannot create %s directory `%a'" D.name Fclib.Filepath.pretty d
 
     let get_dir ?(create_path=false) s =
-      let dir = Fc_Filepath.(get () / s) in
+      let dir = Fclib.Filepath.(get () / s) in
       if Filesystem.exists dir
       then (expected ~dir:true dir ; dir)
       else if create_path
@@ -403,7 +403,7 @@ struct
       let base_dir = get_dir ?create_path @@ Filename.dirname s in
       (* No need to create anything here, as the path of sub-directories has
          been already created by [get_dir] for computing [base_dir]. *)
-      let path = Fc_Filepath.(base_dir / Filename.basename s) in
+      let path = Fclib.Filepath.(base_dir / Filename.basename s) in
       if Filesystem.exists path then expected ~dir:false path ;
       path
   end
@@ -411,7 +411,7 @@ struct
   module Session = Make_user_dir_root
       (struct
         let name = "session"
-        let default_root () = Fc_Filepath.of_string "./.frama-c"
+        let default_root () = Fclib.Filepath.of_string "./.frama-c"
         let kernel_get () = !session_ref ()
         let is_visible = !session_visible_ref
       end)
@@ -531,7 +531,7 @@ struct
 
     let pp_source fmt = function
       | None -> ()
-      | Some src -> Format.fprintf fmt "%a:" Fc_Filepath.pp_pos src
+      | Some src -> Format.fprintf fmt "%a:" Fclib.Filepath.pp_pos src
   end
 
   (* Output must be synchronized with functions [prefix_*] in module Log. *)
