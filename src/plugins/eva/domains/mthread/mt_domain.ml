@@ -164,6 +164,8 @@ let reset state =
 module Datatype_with_Lattice = struct
   include State
 
+  let name = "mthread"
+
   let is_included l r =
     Mt_thread.Register.is_included l.threads r.threads
     && Mt_mutex.Register.is_included l.mutexes r.mutexes
@@ -275,10 +277,7 @@ module Domain = struct
   include Datatype_with_Lattice
   include Queries
   include Transfer
-  include Domain_builder.Complete (struct
-      include Datatype_with_Lattice
-      let name = "mthread"
-    end)
+  include Domain_builder.Complete (Datatype_with_Lattice)
 
   let value_dependencies = Main_values.cval
   let location_dependencies = Main_locations.ploc

@@ -22,12 +22,7 @@ module Static = struct
   end
 
   include D
-  include Domain_builder.Complete
-      (struct
-        include D
-        let top = top
-        let join = join
-      end)
+  include Domain_builder.Complete (D)
 end
 
 module Make
