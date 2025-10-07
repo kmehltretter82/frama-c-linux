@@ -35,7 +35,7 @@ struct
   open Cvalue
   include V_Or_Uninitialized
 
-  let name = datatype_name
+  let name = "multidim"
 
   let to_integer cvalue =
     try  Some (Ival.project_int (V.project_ival (get_v cvalue)))
