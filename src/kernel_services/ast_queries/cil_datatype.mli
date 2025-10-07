@@ -9,9 +9,10 @@
 (** Datatypes of some useful CIL types.
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
-(* This module should not be exported, but we need the alias and OCaml
-   requires us to export it. *)
+(** This module should not be exported, but we need the alias and OCaml
+    requires us to export it. *)
 module UtilsFilepath = Filepath
+[@@deprecated "Use Filepath instead."]
 
 open Cil_types
 
@@ -54,7 +55,7 @@ end
     @since Nitrogen-20111001
 *)
 module Position: sig
-  include S_with_collections_pretty with type t = UtilsFilepath.position
+  include S_with_collections_pretty with type t = Filepath.position
   val unknown : t
   val pp_with_col : Format.formatter -> t -> unit
   val of_lexing_pos : Lexing.position -> t
