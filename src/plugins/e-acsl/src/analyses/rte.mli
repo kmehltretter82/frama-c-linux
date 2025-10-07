@@ -17,5 +17,5 @@ val exp: ?warn:bool -> kernel_function -> stmt -> exp -> code_annotation list
 (** RTEs of a given exp, as a list of code annotations. *)
 
 val get_state_selection_with_dependencies: unit -> State_selection.t
-(** Equivalent to [State_selection.with_dependencies RteGen.Api.self]
+(** Equivalent to [State_selection.with_dependencies RteGen.Generator.self]
     if the RTE plug-in is enabled, empty otherwise. *)

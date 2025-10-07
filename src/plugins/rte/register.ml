@@ -6,68 +6,23 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let _ignore =
-  Dynamic.register
-    ~comment:"Generate all RTE annotations in the given function."
-    ~plugin:"RteGen"
-    "do_all_rte"
-    (Datatype.func Kernel_function.ty Datatype.unit)
-    Api.do_all_rte
-
-let _ignore =
-  Dynamic.register
-    ~comment:"The emitter used for generating RTE annotations"
-    ~plugin:"RteGen"
-    "emitter"
-    Emitter.ty
-    Generator.emitter
-
-(* retrieve list of generated rte annotations for a given stmt *)
-let _ignore =
-  Dynamic.register
-    ~comment:"Get the list of annotations previously emitted by RTE for the \
-              given statement."
-    ~plugin:"RteGen"
-    "get_rte_annotations"
-    (Datatype.func
-       Cil_datatype.Stmt.ty
-       (let module L = Datatype.List(Cil_datatype.Code_annotation) in L.ty))
-    Generator.get_registered_annotations
-
-let _ignore =
-  Dynamic.register
-    ~comment:"Generate RTE annotations corresponding to the given stmt of \
-              the given function."
-    ~plugin:"RteGen"
-    "stmt_annotations"
-    (Datatype.func2 Kernel_function.ty Cil_datatype.Stmt.ty
-       (let module L = Datatype.List(Cil_datatype.Code_annotation) in L.ty))
-    Visit.get_annotations_stmt
-
-let _ignore =
-  Dynamic.register
-    ~comment:"Generate RTE annotations corresponding to the given exp \
-              of the given stmt in the given function."
-    ~plugin:"RteGen"
-    "exp_annotations"
-    (Datatype.func3 Kernel_function.ty Cil_datatype.Stmt.ty Cil_datatype.Exp.ty
-       (let module L = Datatype.List(Cil_datatype.Code_annotation) in L.ty))
-    Visit.get_annotations_exp
-
-let _ignore =
-  let kf = Kernel_function.ty in
-  Dynamic.register
-    ~plugin:"RteGen"
-    "all_statuses"
-    Datatype.(list (triple string (func2 kf bool unit) (func kf bool)))
-    Generator.all_statuses
+let compute () =
+  (* compute RTE annotations, whether Enabled is set or not *)
+  Ast.compute () ;
+  let include_function kf =
+    let fsel = Options.FunctionSelection.get () in
+    Kernel_function.Set.is_empty fsel
+    || Kernel_function.Set.mem kf fsel
+  in
+  Globals.Functions.iter
+    (fun kf -> if include_function kf then Visit.annotate kf)
 
 let main () =
   (* reset "rte generated" properties for all functions *)
   if Options.Enabled.get () then begin
     Options.feedback ~dkey:Options.dkey_annot ~level:2
       "generating annotations";
-    Api.compute ();
+    compute ();
     Options.feedback ~dkey:Options.dkey_annot ~level:2
       "annotations computed"
   end

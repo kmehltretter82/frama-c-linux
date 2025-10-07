@@ -17,4 +17,4 @@ let exp ?warn:_ kf stmt e =
   RteGen.Visit.get_annotations_exp kf stmt e
 
 let get_state_selection_with_dependencies () =
-  State_selection.with_dependencies RteGen.Api.self
+  State_selection.with_dependencies RteGen.Generator.self

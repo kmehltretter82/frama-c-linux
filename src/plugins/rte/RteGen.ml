@@ -15,5 +15,7 @@ module Generator = Generator
 (** Visitors to iterate over Alarms and/or generate Code-Annotations *)
 module Visit = Visit
 
+let compute = Register.compute
+
 (** Replaces old Db API *)
 module Api = Api

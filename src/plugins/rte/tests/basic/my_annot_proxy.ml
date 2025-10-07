@@ -4,7 +4,7 @@ let print () =
 
 let print_status () =
   Kernel.log "printing status";
-  let rte_state_getter_list = RteGen.Api.get_all_status () in
+  let rte_state_getter_list = RteGen.Generator.all_statuses in
   Globals.Functions.iter
     (fun kf ->
        Kernel.log "kf = %s" (Kernel_function.get_name kf) ;
@@ -23,7 +23,7 @@ let main () =
   if not(Ast.is_computed ()) then Ast.compute () ;
   print ();
 
-  Globals.Functions.iter (fun kf -> RteGen.Api.annotate_kf kf);
+  Globals.Functions.iter (fun kf -> RteGen.Visit.annotate kf);
   print () ;
   print_status ();
 

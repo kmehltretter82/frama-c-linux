@@ -32,16 +32,23 @@ module Visit : sig
   val get_annotations_lval:
     ?flags:Flags.t -> kernel_function -> stmt -> lval -> code_annotation list
 
-  type on_alarm = kernel_function -> stmt -> invalid:bool -> Alarms.alarm -> unit
-  type 'a iterator = ?flags:Flags.t -> on_alarm ->
-    Kernel_function.t -> Cil_types.stmt -> 'a -> unit
+  type on_alarm =
+    kernel_function -> stmt -> invalid:bool -> Alarms.alarm -> unit
+  type 'a iterator =
+    ?flags:Flags.t -> on_alarm -> Kernel_function.t -> stmt -> 'a -> unit
+
   val iter_lval : lval iterator
   val iter_exp : exp iterator
   val iter_instr : instr iterator
   val iter_stmt : stmt iterator
+
   val register :
     Emitter.t -> kernel_function -> stmt -> invalid:bool -> Alarms.alarm ->
     code_annotation * bool
 end
 
+(** Same result as having [-rte] on the command line *)
+val compute : unit -> unit
+
 module Api : module type of Api
+[@@ deprecated "Use Visit, Flags and Generator modules"]
