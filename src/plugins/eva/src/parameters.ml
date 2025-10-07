@@ -251,14 +251,14 @@ module OctagonCall =
 let () = add_precision_dep OctagonCall.parameter
 
 let () = Parameter_customize.set_group domains
-module AutoTaint =
+module TaintAuto =
   False
     (struct
-      let option_name = "-eva-auto-taint"
-      let help = "Automatically taints the function parameters of \
+      let option_name = "-eva-taint-auto"
+      let help = "Automatically taint the function parameters of \
                   user input based functions (scanf, fgets, etc)."
     end)
-let () = add_precision_dep AutoTaint.parameter
+let () = add_precision_dep TaintAuto.parameter
 
 let () = Parameter_customize.set_group domains
 let () = Parameter_customize.is_invisible ()

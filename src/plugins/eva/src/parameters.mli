@@ -24,7 +24,7 @@ module EqualityCallFunction:
 
 module OctagonCall: Parameter_sig.Bool
 
-module AutoTaint: Parameter_sig.Bool
+module TaintAuto: Parameter_sig.Bool
 module TaintSingletons: Parameter_sig.Bool
 module TaintSecureFlow: Parameter_sig.Bool
 

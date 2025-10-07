@@ -23,9 +23,6 @@ Options taking a string as argument should preferably be written
 
 *** ABSTRACT DOMAINS
 
--eva-auto-taint     Automatically taints the function parameters of user
-                    input based functions (scanf, fgets, etc). (opposite
-                    option is -eva-no-auto-taint)
 -eva-domains <d1,...,dn>  Enable a list of analysis domains. Available
                     domains are: cvalue, mthread, equality, taint, traces,
                     symbolic-locations, sign, printer, bitwise, octagon,
@@ -66,6 +63,9 @@ Options taking a string as argument should preferably be written
                     octagons inferred at the end. The interprocedural
                     analysis is more precise but slower. (opposite option is
                     -eva-no-octagon-through-calls)
+-eva-taint-auto     Automatically taint the function parameters of user input
+                    based functions (scanf, fgets, etc). (opposite option is
+                    -eva-no-taint-auto)
 -eva-taint-secureflow  Perform secure-flow (non-interference) analysis via
                     the taint domain. (opposite option is
                     -eva-no-taint-secureflow)

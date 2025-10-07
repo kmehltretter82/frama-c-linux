@@ -35,7 +35,7 @@ let auto_taint_res_functions = (* auto taint the result *) [
   "getc"
 ]
 
-let auto_taint () = Parameters.AutoTaint.get ()
+let auto_taint () = Parameters.TaintAuto.get ()
 let ignore_singletons () = not (Parameters.TaintSingletons.get ())
 
 let secure_flow_analysis () = Parameters.TaintSecureFlow.get ()

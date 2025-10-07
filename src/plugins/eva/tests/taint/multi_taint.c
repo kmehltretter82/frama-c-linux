@@ -1,5 +1,5 @@
 /* run.config*
-   STDOPT: +"-eva-auto-taint -eva-no-taint-singletons"
+   STDOPT: +"-eva-taint-auto -eva-no-taint-singletons"
 */
 #include "__fc_builtin.h"
 #include <stdio.h>
