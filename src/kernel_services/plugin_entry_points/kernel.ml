@@ -10,8 +10,6 @@
 (** {2 Kernel as an almost standard plug-in} *)
 (* ************************************************************************* *)
 
-module FcPlugin = Plugin
-
 let () = Plugin.register_kernel ()
 
 let () = Plugin.is_session_visible ()
@@ -557,11 +555,11 @@ let _ =
     (object
       method fold: 'a. (string -> 'a -> 'a) -> 'a -> 'a =
         fun f acc ->
-        FcPlugin.fold_on_plugins (fun p acc -> f p.FcPlugin.p_shortname acc) acc
+        Plugin.fold_on_plugins (fun p acc -> f p.Plugin.p_shortname acc) acc
       method mem name =
         try
-          FcPlugin.iter_on_plugins
-            (fun p -> if name = p.FcPlugin.p_shortname then raise Exit);
+          Plugin.iter_on_plugins
+            (fun p -> if name = p.Plugin.p_shortname then raise Exit);
           false
         with Exit -> true
     end)
