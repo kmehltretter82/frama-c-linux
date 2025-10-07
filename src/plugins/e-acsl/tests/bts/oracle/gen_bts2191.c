@@ -64,12 +64,27 @@ int main(int argc, char **argv)
       int __gen_e_acsl_valid_read;
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
         {.values = (void *)0};
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
+        {.values = (void *)0};
+      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_3,
+                                     "alignof(char)",0,_Alignof(char));
+      __e_acsl_assert_copy_values(& __gen_e_acsl_assert_data_2,
+                                  & __gen_e_acsl_assert_data_3);
+      /*@ assert E_ACSL: alignof(char) != 0; */
+      {
+        __gen_e_acsl_assert_data_3.blocking = 1;
+        __gen_e_acsl_assert_data_3.kind = "RTE";
+        __gen_e_acsl_assert_data_3.pred_txt = "alignof(char) != 0";
+        __gen_e_acsl_assert_data_3.file = "bts2191.c";
+        __gen_e_acsl_assert_data_3.fct = "main";
+        __gen_e_acsl_assert_data_3.line = 14;
+        __e_acsl_assert(_Alignof(char) != 0UL,& __gen_e_acsl_assert_data_3);
+        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
+      }
       __gen_e_acsl_aligned = __e_acsl_aligned((void *)_G[0].str,
                                               _Alignof(char));
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"_G[0].str",
                                    (void *)_G[0].str);
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
-                                     "alignof(char)",0,_Alignof(char));
       __gen_e_acsl_assert_data_2.blocking = 1;
       __gen_e_acsl_assert_data_2.kind = "RTE";
       __gen_e_acsl_assert_data_2.pred_txt = "\\aligned(_G[0].str,alignof(char))";

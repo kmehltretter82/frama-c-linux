@@ -113,13 +113,29 @@ struct list *__gen_e_acsl_f(struct list *l)
         __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
         __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
           {.values = (void *)0};
+        __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
+          {.values = (void *)0};
+        __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_3,
+                                       "alignof(struct list)",0,
+                                       _Alignof(struct list));
+        __e_acsl_assert_copy_values(& __gen_e_acsl_assert_data_2,
+                                    & __gen_e_acsl_assert_data_3);
+        /*@ assert E_ACSL: alignof(struct list) != 0; */
+        {
+          __gen_e_acsl_assert_data_3.blocking = 1;
+          __gen_e_acsl_assert_data_3.kind = "RTE";
+          __gen_e_acsl_assert_data_3.pred_txt = "alignof(struct list) != 0";
+          __gen_e_acsl_assert_data_3.file = "valid_in_contract.c";
+          __gen_e_acsl_assert_data_3.fct = "f";
+          __gen_e_acsl_assert_data_3.line = 17;
+          __e_acsl_assert(_Alignof(struct list) != 0UL,
+                          & __gen_e_acsl_assert_data_3);
+          __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
+        }
         __gen_e_acsl_aligned = __e_acsl_aligned((void *)l->next,
                                                 _Alignof(struct list));
         __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"l->next",
                                      (void *)l->next);
-        __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
-                                       "alignof(struct list)",0,
-                                       _Alignof(struct list));
         __gen_e_acsl_assert_data_2.blocking = 1;
         __gen_e_acsl_assert_data_2.kind = "RTE";
         __gen_e_acsl_assert_data_2.pred_txt = "\\aligned(l->next,alignof(struct list))";
@@ -147,42 +163,42 @@ struct list *__gen_e_acsl_f(struct list *l)
     __gen_e_acsl_assumes_value = __e_acsl_contract_get_behavior_assumes
     ((__e_acsl_contract_t const *)__gen_e_acsl_contract,0UL);
     if (__gen_e_acsl_assumes_value) {
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
-        {.values = (void *)0};
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"\\result",
-                                   (void *)__retres);
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"\\old(l)",
-                                   (void *)__gen_e_acsl_at_2);
-      __gen_e_acsl_assert_data_3.blocking = 1;
-      __gen_e_acsl_assert_data_3.kind = "Postcondition";
-      __gen_e_acsl_assert_data_3.pred_txt = "\\result == \\old(l)";
-      __gen_e_acsl_assert_data_3.file = "valid_in_contract.c";
-      __gen_e_acsl_assert_data_3.fct = "f";
-      __gen_e_acsl_assert_data_3.line = 15;
-      __gen_e_acsl_assert_data_3.name = "B1";
-      __e_acsl_assert(__retres == __gen_e_acsl_at_2,
-                      & __gen_e_acsl_assert_data_3);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
-    }
-    __gen_e_acsl_assumes_value = __e_acsl_contract_get_behavior_assumes
-    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,1UL);
-    if (__gen_e_acsl_assumes_value) {
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
         {.values = (void *)0};
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,"\\result",
                                    (void *)__retres);
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,"\\old(l)",
-                                   (void *)__gen_e_acsl_at);
+                                   (void *)__gen_e_acsl_at_2);
       __gen_e_acsl_assert_data_4.blocking = 1;
       __gen_e_acsl_assert_data_4.kind = "Postcondition";
       __gen_e_acsl_assert_data_4.pred_txt = "\\result == \\old(l)";
       __gen_e_acsl_assert_data_4.file = "valid_in_contract.c";
       __gen_e_acsl_assert_data_4.fct = "f";
-      __gen_e_acsl_assert_data_4.line = 18;
-      __gen_e_acsl_assert_data_4.name = "B2";
-      __e_acsl_assert(__retres == __gen_e_acsl_at,
+      __gen_e_acsl_assert_data_4.line = 15;
+      __gen_e_acsl_assert_data_4.name = "B1";
+      __e_acsl_assert(__retres == __gen_e_acsl_at_2,
                       & __gen_e_acsl_assert_data_4);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
+    }
+    __gen_e_acsl_assumes_value = __e_acsl_contract_get_behavior_assumes
+    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,1UL);
+    if (__gen_e_acsl_assumes_value) {
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
+        {.values = (void *)0};
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_5,"\\result",
+                                   (void *)__retres);
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_5,"\\old(l)",
+                                   (void *)__gen_e_acsl_at);
+      __gen_e_acsl_assert_data_5.blocking = 1;
+      __gen_e_acsl_assert_data_5.kind = "Postcondition";
+      __gen_e_acsl_assert_data_5.pred_txt = "\\result == \\old(l)";
+      __gen_e_acsl_assert_data_5.file = "valid_in_contract.c";
+      __gen_e_acsl_assert_data_5.fct = "f";
+      __gen_e_acsl_assert_data_5.line = 18;
+      __gen_e_acsl_assert_data_5.name = "B2";
+      __e_acsl_assert(__retres == __gen_e_acsl_at,
+                      & __gen_e_acsl_assert_data_5);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
     }
     __e_acsl_contract_clean(__gen_e_acsl_contract);
     __e_acsl_delete_block((void *)(& l));

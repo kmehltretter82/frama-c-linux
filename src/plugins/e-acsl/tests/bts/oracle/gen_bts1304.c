@@ -56,13 +56,29 @@ int main(void)
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
       {.values = (void *)0};
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
+      {.values = (void *)0};
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_3,
+                                   "alignof(union msg)",0,
+                                   _Alignof(union msg));
+    __e_acsl_assert_copy_values(& __gen_e_acsl_assert_data_2,
+                                & __gen_e_acsl_assert_data_3);
+    /*@ assert E_ACSL: alignof(union msg) != 0; */
+    {
+      __gen_e_acsl_assert_data_3.blocking = 1;
+      __gen_e_acsl_assert_data_3.kind = "RTE";
+      __gen_e_acsl_assert_data_3.pred_txt = "alignof(union msg) != 0";
+      __gen_e_acsl_assert_data_3.file = "bts1304.i";
+      __gen_e_acsl_assert_data_3.fct = "main";
+      __gen_e_acsl_assert_data_3.line = 32;
+      __e_acsl_assert(_Alignof(union msg) != 0UL,
+                      & __gen_e_acsl_assert_data_3);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
+    }
     __gen_e_acsl_aligned = __e_acsl_aligned((void *)(buf),
                                             _Alignof(union msg));
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,
                                  "(unsigned char *)buf",(void *)(buf));
-    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
-                                   "alignof(union msg)",0,
-                                   _Alignof(union msg));
     __gen_e_acsl_assert_data_2.blocking = 1;
     __gen_e_acsl_assert_data_2.kind = "RTE";
     __gen_e_acsl_assert_data_2.pred_txt = "\\aligned((unsigned char *)buf,alignof(union msg))";

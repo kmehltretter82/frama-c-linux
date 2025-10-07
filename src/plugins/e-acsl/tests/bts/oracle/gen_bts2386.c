@@ -50,12 +50,28 @@ void f(void const *s, int c, unsigned long n)
       {.values = (void *)0};
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
       {.values = (void *)0};
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
+      {.values = (void *)0};
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_4,
+                                   "alignof(unsigned char const)",0,
+                                   _Alignof(unsigned char const));
+    __e_acsl_assert_copy_values(& __gen_e_acsl_assert_data_3,
+                                & __gen_e_acsl_assert_data_4);
+    /*@ assert E_ACSL: alignof(unsigned char const) != 0; */
+    {
+      __gen_e_acsl_assert_data_4.blocking = 1;
+      __gen_e_acsl_assert_data_4.kind = "RTE";
+      __gen_e_acsl_assert_data_4.pred_txt = "alignof(unsigned char const) != 0";
+      __gen_e_acsl_assert_data_4.file = "bts2386.c";
+      __gen_e_acsl_assert_data_4.fct = "f";
+      __gen_e_acsl_assert_data_4.line = 8;
+      __e_acsl_assert(_Alignof(unsigned char const) != 0UL,
+                      & __gen_e_acsl_assert_data_4);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
+    }
     __gen_e_acsl_aligned = __e_acsl_aligned((void *)s,
                                             _Alignof(unsigned char const));
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"s",(void *)s);
-    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_3,
-                                   "alignof(unsigned char const)",0,
-                                   _Alignof(unsigned char const));
     __gen_e_acsl_assert_data_3.blocking = 1;
     __gen_e_acsl_assert_data_3.kind = "RTE";
     __gen_e_acsl_assert_data_3.pred_txt = "\\aligned(s,alignof(unsigned char const))";

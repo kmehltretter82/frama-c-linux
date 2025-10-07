@@ -55,10 +55,25 @@ void g(int a, int *b)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
       {.values = (void *)0};
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
+      {.values = (void *)0};
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_5,
+                                   "alignof(int)",0,_Alignof(int));
+    __e_acsl_assert_copy_values(& __gen_e_acsl_assert_data_4,
+                                & __gen_e_acsl_assert_data_5);
+    /*@ assert E_ACSL: alignof(int) != 0; */
+    {
+      __gen_e_acsl_assert_data_5.blocking = 1;
+      __gen_e_acsl_assert_data_5.kind = "RTE";
+      __gen_e_acsl_assert_data_5.pred_txt = "alignof(int) != 0";
+      __gen_e_acsl_assert_data_5.file = "acsl_check.c";
+      __gen_e_acsl_assert_data_5.fct = "g";
+      __gen_e_acsl_assert_data_5.line = 15;
+      __e_acsl_assert(_Alignof(int) != 0UL,& __gen_e_acsl_assert_data_5);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
+    }
     __gen_e_acsl_aligned = __e_acsl_aligned((void *)(b + 1),_Alignof(int));
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,"b",(void *)b);
-    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_4,
-                                   "alignof(int)",0,_Alignof(int));
     __gen_e_acsl_assert_data_4.blocking = 1;
     __gen_e_acsl_assert_data_4.kind = "RTE";
     __gen_e_acsl_assert_data_4.pred_txt = "\\aligned(b + 1,alignof(int))";

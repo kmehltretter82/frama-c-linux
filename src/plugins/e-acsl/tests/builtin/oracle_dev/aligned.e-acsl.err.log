@@ -1,0 +1,9 @@
+Error while executing ./aligned.e-acsl
+
+STDOUT:
+
+STDERR:
+aligned.c: In function 'main'
+aligned.c:20: Error: Assertion failed:
+	The failing predicate is:
+	2 - 2 ≢ 0.

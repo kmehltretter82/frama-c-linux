@@ -375,7 +375,7 @@ and denominator_zero_guard ~loc ~ctx ~adata ~kf ~env ~name ?root denom =
       ~loc
       kf
       env
-      Typing.gmpz (*TODO: must be generalised *)
+      ctx
       ~name:(name ^ "_guard")
       Ne
       e

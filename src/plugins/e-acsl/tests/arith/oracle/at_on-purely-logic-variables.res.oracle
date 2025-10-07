@@ -16,6 +16,8 @@
 [eva:alarm] at_on-purely-logic-variables.c:29: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status invalid.
 [eva:alarm] at_on-purely-logic-variables.c:29: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] at_on-purely-logic-variables.c:29: Warning: 
   assertion got status unknown.
 [eva:alarm] at_on-purely-logic-variables.c:34: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status invalid.

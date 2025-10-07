@@ -26,10 +26,25 @@ int f(void)
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
       {.values = (void *)0};
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
+      {.values = (void *)0};
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_3,
+                                   "alignof(char)",0,_Alignof(char));
+    __e_acsl_assert_copy_values(& __gen_e_acsl_assert_data_2,
+                                & __gen_e_acsl_assert_data_3);
+    /*@ assert E_ACSL: alignof(char) != 0; */
+    {
+      __gen_e_acsl_assert_data_3.blocking = 1;
+      __gen_e_acsl_assert_data_3.kind = "RTE";
+      __gen_e_acsl_assert_data_3.pred_txt = "alignof(char) != 0";
+      __gen_e_acsl_assert_data_3.file = "bts1837.i";
+      __gen_e_acsl_assert_data_3.fct = "f";
+      __gen_e_acsl_assert_data_3.line = 11;
+      __e_acsl_assert(_Alignof(char) != 0UL,& __gen_e_acsl_assert_data_3);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
+    }
     __gen_e_acsl_aligned = __e_acsl_aligned((void *)S,_Alignof(char));
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"S",(void *)S);
-    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
-                                   "alignof(char)",0,_Alignof(char));
     __gen_e_acsl_assert_data_2.blocking = 1;
     __gen_e_acsl_assert_data_2.kind = "RTE";
     __gen_e_acsl_assert_data_2.pred_txt = "\\aligned(S,alignof(char))";
@@ -59,15 +74,15 @@ int f(void)
   {
     int __gen_e_acsl_initialized;
     int __gen_e_acsl_and;
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
       {.values = (void *)0};
     __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& s1),
                                                     sizeof(char *));
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"&s1",
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,"&s1",
                                  (void *)(& s1));
-    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_3,
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_4,
                                    "sizeof(char *)",0,sizeof(char *));
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,
                                  "\\initialized(&s1)",0,
                                  __gen_e_acsl_initialized);
     if (__gen_e_acsl_initialized) {
@@ -76,38 +91,38 @@ int f(void)
                                                       sizeof(char),
                                                       (void *)s1,
                                                       (void *)(& s1));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"s1",
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,"s1",
                                    (void *)s1);
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_3,
+      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_4,
                                      "sizeof(char)",0,sizeof(char));
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,
                                    "\\valid_read(s1)",0,
                                    __gen_e_acsl_valid_read_2);
       __gen_e_acsl_and = __gen_e_acsl_valid_read_2;
     }
     else __gen_e_acsl_and = 0;
-    __gen_e_acsl_assert_data_3.blocking = 1;
-    __gen_e_acsl_assert_data_3.kind = "Assertion";
-    __gen_e_acsl_assert_data_3.pred_txt = "\\valid_read(s1)";
-    __gen_e_acsl_assert_data_3.file = "bts1837.i";
-    __gen_e_acsl_assert_data_3.fct = "f";
-    __gen_e_acsl_assert_data_3.line = 12;
-    __e_acsl_assert(__gen_e_acsl_and,& __gen_e_acsl_assert_data_3);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
+    __gen_e_acsl_assert_data_4.blocking = 1;
+    __gen_e_acsl_assert_data_4.kind = "Assertion";
+    __gen_e_acsl_assert_data_4.pred_txt = "\\valid_read(s1)";
+    __gen_e_acsl_assert_data_4.file = "bts1837.i";
+    __gen_e_acsl_assert_data_4.fct = "f";
+    __gen_e_acsl_assert_data_4.line = 12;
+    __e_acsl_assert(__gen_e_acsl_and,& __gen_e_acsl_assert_data_4);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
   }
   /*@ assert \valid_read(s1); */ ;
   {
     int __gen_e_acsl_initialized_2;
     int __gen_e_acsl_and_2;
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
       {.values = (void *)0};
     __gen_e_acsl_initialized_2 = __e_acsl_initialized((void *)(& s2),
                                                       sizeof(char *));
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,"&s2",
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_5,"&s2",
                                  (void *)(& s2));
-    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_4,
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_5,
                                    "sizeof(char *)",0,sizeof(char *));
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,
                                  "\\initialized(&s2)",0,
                                  __gen_e_acsl_initialized_2);
     if (__gen_e_acsl_initialized_2) {
@@ -116,24 +131,24 @@ int f(void)
                                                       sizeof(char),
                                                       (void *)s2,
                                                       (void *)(& s2));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,"s2",
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_5,"s2",
                                    (void *)s2);
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_4,
+      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_5,
                                      "sizeof(char)",0,sizeof(char));
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,
                                    "\\valid_read(s2)",0,
                                    __gen_e_acsl_valid_read_3);
       __gen_e_acsl_and_2 = __gen_e_acsl_valid_read_3;
     }
     else __gen_e_acsl_and_2 = 0;
-    __gen_e_acsl_assert_data_4.blocking = 1;
-    __gen_e_acsl_assert_data_4.kind = "Assertion";
-    __gen_e_acsl_assert_data_4.pred_txt = "\\valid_read(s2)";
-    __gen_e_acsl_assert_data_4.file = "bts1837.i";
-    __gen_e_acsl_assert_data_4.fct = "f";
-    __gen_e_acsl_assert_data_4.line = 13;
-    __e_acsl_assert(__gen_e_acsl_and_2,& __gen_e_acsl_assert_data_4);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
+    __gen_e_acsl_assert_data_5.blocking = 1;
+    __gen_e_acsl_assert_data_5.kind = "Assertion";
+    __gen_e_acsl_assert_data_5.pred_txt = "\\valid_read(s2)";
+    __gen_e_acsl_assert_data_5.file = "bts1837.i";
+    __gen_e_acsl_assert_data_5.fct = "f";
+    __gen_e_acsl_assert_data_5.line = 13;
+    __e_acsl_assert(__gen_e_acsl_and_2,& __gen_e_acsl_assert_data_5);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
   }
   /*@ assert \valid_read(s2); */ ;
   __retres = 0;
