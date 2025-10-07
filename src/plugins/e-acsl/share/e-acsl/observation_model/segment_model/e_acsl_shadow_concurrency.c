@@ -173,7 +173,7 @@ static void fill_thread_layout_tls(memory_partition *ptls) {
   // since we need to register them in case the program uses one of them
   // inside the thread
   collect_safe_locations();
-  set_application_segment(&ptls->application, get_tls_start(0), get_tls_size(),
+  set_application_segment(&ptls->application, get_tls_start(), get_tls_size(),
                           "thread_tls", NULL);
   set_shadow_segment(&ptls->primary, &ptls->application, 1,
                      "thread_tls_primary");
