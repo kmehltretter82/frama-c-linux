@@ -117,6 +117,8 @@ val dkey_rmtmps: category
 val dkey_referenced: category
 
 val dkey_task: category
+[@@deprecated "Use Task.dkey via Cmdline.Kernel_log instead."]
+[@@migrate { repl = Task.dkey } ]
 
 val dkey_typing_global: category
 

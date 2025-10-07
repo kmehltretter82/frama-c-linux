@@ -126,6 +126,7 @@ let dkey_prop_status_reg = register_category "prop-status:register"
 
 let dkey_prop_status_graph = register_category "prop-status:graph"
 
+(* Deprecated *)
 let dkey_task = register_category "task"
 
 let dkey_typing_global = register_category "typing:global"
