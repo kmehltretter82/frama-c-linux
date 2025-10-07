@@ -384,14 +384,16 @@ and denominator_zero_guard ~loc ~ctx ~adata ~kf ~env ~name ?root denom =
   in
   let p = Logic_const.prel ~loc (Rneq, denom, zero) in
   let cond, env =
-    Assert.runtime_check
+    Assert.runtime_check_with_msg
       ~adata:adata2
+      ~loc
+      ~name:"denominator not zero"
+      (Format.asprintf "%a@?" Printer.pp_predicate p)
       ~pred_kind:Assert
-      (Env.annotation_kind env)
+      RTE
       kf
       env
       guard
-      p
   in
   let env = Assert.do_pending_register_data env in
   let adata, env = Assert.merge_right ~loc env adata2 adata in

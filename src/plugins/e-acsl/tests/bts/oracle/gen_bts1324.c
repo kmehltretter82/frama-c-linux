@@ -118,6 +118,7 @@ int __gen_e_acsl_sorted(int *t, int n)
           __gen_e_acsl_assert_data_3.file = "bts1324.i";
           __gen_e_acsl_assert_data_3.fct = "sorted";
           __gen_e_acsl_assert_data_3.line = 6;
+          __gen_e_acsl_assert_data_3.name = "denominator not zero";
           __e_acsl_assert(_Alignof(int) != 0UL,& __gen_e_acsl_assert_data_3);
           __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
         }
@@ -175,6 +176,7 @@ int __gen_e_acsl_sorted(int *t, int n)
           __gen_e_acsl_assert_data_6.file = "bts1324.i";
           __gen_e_acsl_assert_data_6.fct = "sorted";
           __gen_e_acsl_assert_data_6.line = 6;
+          __gen_e_acsl_assert_data_6.name = "denominator not zero";
           __e_acsl_assert(_Alignof(int) != 0UL,& __gen_e_acsl_assert_data_6);
           __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
         }

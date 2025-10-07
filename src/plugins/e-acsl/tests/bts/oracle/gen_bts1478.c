@@ -61,6 +61,7 @@ void __gen_e_acsl_loop(void)
       __gen_e_acsl_assert_data_4.file = "bts1478.c";
       __gen_e_acsl_assert_data_4.fct = "loop";
       __gen_e_acsl_assert_data_4.line = 10;
+      __gen_e_acsl_assert_data_4.name = "denominator not zero";
       __e_acsl_assert(_Alignof(int) != 0UL,& __gen_e_acsl_assert_data_4);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
     }
@@ -113,6 +114,7 @@ void __gen_e_acsl_loop(void)
       __gen_e_acsl_assert_data_7.file = "bts1478.c";
       __gen_e_acsl_assert_data_7.fct = "loop";
       __gen_e_acsl_assert_data_7.line = 11;
+      __gen_e_acsl_assert_data_7.name = "denominator not zero";
       __e_acsl_assert(_Alignof(int) != 0UL,& __gen_e_acsl_assert_data_7);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
     }

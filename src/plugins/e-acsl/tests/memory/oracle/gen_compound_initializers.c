@@ -141,6 +141,7 @@ int main(int argc, char **argv)
         __gen_e_acsl_assert_data_4.file = "compound_initializers.c";
         __gen_e_acsl_assert_data_4.fct = "main";
         __gen_e_acsl_assert_data_4.line = 24;
+        __gen_e_acsl_assert_data_4.name = "denominator not zero";
         __e_acsl_assert(_Alignof(char) != 0UL,& __gen_e_acsl_assert_data_4);
         __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
       }
@@ -213,6 +214,7 @@ int main(int argc, char **argv)
         __gen_e_acsl_assert_data_7.file = "compound_initializers.c";
         __gen_e_acsl_assert_data_7.fct = "main";
         __gen_e_acsl_assert_data_7.line = 25;
+        __gen_e_acsl_assert_data_7.name = "denominator not zero";
         __e_acsl_assert(_Alignof(char) != 0UL,& __gen_e_acsl_assert_data_7);
         __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
       }
@@ -273,6 +275,7 @@ int main(int argc, char **argv)
       __gen_e_acsl_assert_data_10.file = "compound_initializers.c";
       __gen_e_acsl_assert_data_10.fct = "main";
       __gen_e_acsl_assert_data_10.line = 26;
+      __gen_e_acsl_assert_data_10.name = "denominator not zero";
       __e_acsl_assert(_Alignof(char) != 0UL,& __gen_e_acsl_assert_data_10);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_10);
     }

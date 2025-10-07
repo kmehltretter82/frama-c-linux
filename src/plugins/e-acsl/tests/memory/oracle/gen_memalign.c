@@ -639,11 +639,12 @@ void *__gen_e_acsl_aligned_alloc(size_t alignment, size_t size)
       /*@ assert E_ACSL: \old(alignment) != 0; */
       {
         __gen_e_acsl_assert_data_6.blocking = 1;
-        __gen_e_acsl_assert_data_6.kind = "Postcondition";
+        __gen_e_acsl_assert_data_6.kind = "RTE";
         __gen_e_acsl_assert_data_6.pred_txt = "\\old(alignment) != 0";
         __gen_e_acsl_assert_data_6.file = "FRAMAC_SHARE/libc/stdlib.h";
         __gen_e_acsl_assert_data_6.fct = "aligned_alloc";
         __gen_e_acsl_assert_data_6.line = 549;
+        __gen_e_acsl_assert_data_6.name = "denominator not zero";
         __e_acsl_assert(__gen_e_acsl_at_2 != 0UL,
                         & __gen_e_acsl_assert_data_6);
         __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);

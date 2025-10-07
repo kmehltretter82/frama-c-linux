@@ -281,6 +281,7 @@ int main(int argc, char const **argv)
         __gen_e_acsl_assert_data_5.file = "t_global_init.c";
         __gen_e_acsl_assert_data_5.fct = "main";
         __gen_e_acsl_assert_data_5.line = 50;
+        __gen_e_acsl_assert_data_5.name = "denominator not zero";
         __e_acsl_assert(_Alignof(char) != 0UL,& __gen_e_acsl_assert_data_5);
         __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
       }

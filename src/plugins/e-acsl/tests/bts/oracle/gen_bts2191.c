@@ -78,6 +78,7 @@ int main(int argc, char **argv)
         __gen_e_acsl_assert_data_3.file = "bts2191.c";
         __gen_e_acsl_assert_data_3.fct = "main";
         __gen_e_acsl_assert_data_3.line = 14;
+        __gen_e_acsl_assert_data_3.name = "denominator not zero";
         __e_acsl_assert(_Alignof(char) != 0UL,& __gen_e_acsl_assert_data_3);
         __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
       }

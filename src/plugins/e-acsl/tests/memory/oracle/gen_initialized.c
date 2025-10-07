@@ -114,6 +114,7 @@ int main(void)
       __gen_e_acsl_assert_data_6.file = "initialized.c";
       __gen_e_acsl_assert_data_6.fct = "main";
       __gen_e_acsl_assert_data_6.line = 19;
+      __gen_e_acsl_assert_data_6.name = "denominator not zero";
       __e_acsl_assert(_Alignof(int) != 0UL,& __gen_e_acsl_assert_data_6);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
     }
@@ -244,6 +245,7 @@ int main(void)
       __gen_e_acsl_assert_data_12.file = "initialized.c";
       __gen_e_acsl_assert_data_12.fct = "main";
       __gen_e_acsl_assert_data_12.line = 33;
+      __gen_e_acsl_assert_data_12.name = "denominator not zero";
       __e_acsl_assert(_Alignof(int) != 0UL,& __gen_e_acsl_assert_data_12);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_12);
     }
@@ -346,6 +348,7 @@ int main(void)
       __gen_e_acsl_assert_data_17.file = "initialized.c";
       __gen_e_acsl_assert_data_17.fct = "main";
       __gen_e_acsl_assert_data_17.line = 39;
+      __gen_e_acsl_assert_data_17.name = "denominator not zero";
       __e_acsl_assert(_Alignof(int) != 0UL,& __gen_e_acsl_assert_data_17);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_17);
     }
@@ -808,6 +811,7 @@ int main(void)
       __gen_e_acsl_assert_data_37.file = "initialized.c";
       __gen_e_acsl_assert_data_37.fct = "main";
       __gen_e_acsl_assert_data_37.line = 69;
+      __gen_e_acsl_assert_data_37.name = "denominator not zero";
       __e_acsl_assert(_Alignof(int) != 0UL,& __gen_e_acsl_assert_data_37);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_37);
     }
@@ -863,6 +867,7 @@ int main(void)
       __gen_e_acsl_assert_data_40.file = "initialized.c";
       __gen_e_acsl_assert_data_40.fct = "main";
       __gen_e_acsl_assert_data_40.line = 74;
+      __gen_e_acsl_assert_data_40.name = "denominator not zero";
       __e_acsl_assert(_Alignof(int) != 0UL,& __gen_e_acsl_assert_data_40);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_40);
     }
@@ -918,6 +923,7 @@ int main(void)
       __gen_e_acsl_assert_data_43.file = "initialized.c";
       __gen_e_acsl_assert_data_43.fct = "main";
       __gen_e_acsl_assert_data_43.line = 76;
+      __gen_e_acsl_assert_data_43.name = "denominator not zero";
       __e_acsl_assert(_Alignof(int) != 0UL,& __gen_e_acsl_assert_data_43);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_43);
     }
@@ -998,6 +1004,7 @@ int main(void)
       __gen_e_acsl_assert_data_47.file = "initialized.c";
       __gen_e_acsl_assert_data_47.fct = "main";
       __gen_e_acsl_assert_data_47.line = 85;
+      __gen_e_acsl_assert_data_47.name = "denominator not zero";
       __e_acsl_assert(_Alignof(int) != 0UL,& __gen_e_acsl_assert_data_47);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_47);
     }
@@ -1056,6 +1063,7 @@ int main(void)
       __gen_e_acsl_assert_data_50.file = "initialized.c";
       __gen_e_acsl_assert_data_50.fct = "main";
       __gen_e_acsl_assert_data_50.line = 90;
+      __gen_e_acsl_assert_data_50.name = "denominator not zero";
       __e_acsl_assert(_Alignof(char) != 0UL,& __gen_e_acsl_assert_data_50);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_50);
     }
@@ -1086,6 +1094,7 @@ int main(void)
       __gen_e_acsl_assert_data_52.file = "initialized.c";
       __gen_e_acsl_assert_data_52.fct = "main";
       __gen_e_acsl_assert_data_52.line = 90;
+      __gen_e_acsl_assert_data_52.name = "denominator not zero";
       __e_acsl_assert(_Alignof(int) != 0UL,& __gen_e_acsl_assert_data_52);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_52);
     }
@@ -1152,6 +1161,7 @@ int main(void)
       __gen_e_acsl_assert_data_55.file = "initialized.c";
       __gen_e_acsl_assert_data_55.fct = "main";
       __gen_e_acsl_assert_data_55.line = 92;
+      __gen_e_acsl_assert_data_55.name = "denominator not zero";
       __e_acsl_assert(_Alignof(char) != 0UL,& __gen_e_acsl_assert_data_55);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_55);
     }
@@ -1182,6 +1192,7 @@ int main(void)
       __gen_e_acsl_assert_data_57.file = "initialized.c";
       __gen_e_acsl_assert_data_57.fct = "main";
       __gen_e_acsl_assert_data_57.line = 92;
+      __gen_e_acsl_assert_data_57.name = "denominator not zero";
       __e_acsl_assert(_Alignof(int) != 0UL,& __gen_e_acsl_assert_data_57);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_57);
     }
@@ -1243,6 +1254,7 @@ int main(void)
       __gen_e_acsl_assert_data_60.file = "initialized.c";
       __gen_e_acsl_assert_data_60.fct = "main";
       __gen_e_acsl_assert_data_60.line = 93;
+      __gen_e_acsl_assert_data_60.name = "denominator not zero";
       __e_acsl_assert(_Alignof(int) != 0UL,& __gen_e_acsl_assert_data_60);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_60);
     }
@@ -1297,6 +1309,7 @@ int main(void)
       __gen_e_acsl_assert_data_63.file = "initialized.c";
       __gen_e_acsl_assert_data_63.fct = "main";
       __gen_e_acsl_assert_data_63.line = 94;
+      __gen_e_acsl_assert_data_63.name = "denominator not zero";
       __e_acsl_assert(_Alignof(int) != 0UL,& __gen_e_acsl_assert_data_63);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_63);
     }
@@ -1351,6 +1364,7 @@ int main(void)
       __gen_e_acsl_assert_data_66.file = "initialized.c";
       __gen_e_acsl_assert_data_66.fct = "main";
       __gen_e_acsl_assert_data_66.line = 95;
+      __gen_e_acsl_assert_data_66.name = "denominator not zero";
       __e_acsl_assert(_Alignof(int) != 0UL,& __gen_e_acsl_assert_data_66);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_66);
     }
@@ -1411,6 +1425,7 @@ int main(void)
       __gen_e_acsl_assert_data_69.file = "initialized.c";
       __gen_e_acsl_assert_data_69.fct = "main";
       __gen_e_acsl_assert_data_69.line = 98;
+      __gen_e_acsl_assert_data_69.name = "denominator not zero";
       __e_acsl_assert(_Alignof(char) != 0UL,& __gen_e_acsl_assert_data_69);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_69);
     }
@@ -1441,6 +1456,7 @@ int main(void)
       __gen_e_acsl_assert_data_71.file = "initialized.c";
       __gen_e_acsl_assert_data_71.fct = "main";
       __gen_e_acsl_assert_data_71.line = 98;
+      __gen_e_acsl_assert_data_71.name = "denominator not zero";
       __e_acsl_assert(_Alignof(int) != 0UL,& __gen_e_acsl_assert_data_71);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_71);
     }
@@ -1507,6 +1523,7 @@ int main(void)
       __gen_e_acsl_assert_data_74.file = "initialized.c";
       __gen_e_acsl_assert_data_74.fct = "main";
       __gen_e_acsl_assert_data_74.line = 100;
+      __gen_e_acsl_assert_data_74.name = "denominator not zero";
       __e_acsl_assert(_Alignof(char) != 0UL,& __gen_e_acsl_assert_data_74);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_74);
     }
@@ -1537,6 +1554,7 @@ int main(void)
       __gen_e_acsl_assert_data_76.file = "initialized.c";
       __gen_e_acsl_assert_data_76.fct = "main";
       __gen_e_acsl_assert_data_76.line = 100;
+      __gen_e_acsl_assert_data_76.name = "denominator not zero";
       __e_acsl_assert(_Alignof(int) != 0UL,& __gen_e_acsl_assert_data_76);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_76);
     }
@@ -1598,6 +1616,7 @@ int main(void)
       __gen_e_acsl_assert_data_79.file = "initialized.c";
       __gen_e_acsl_assert_data_79.fct = "main";
       __gen_e_acsl_assert_data_79.line = 101;
+      __gen_e_acsl_assert_data_79.name = "denominator not zero";
       __e_acsl_assert(_Alignof(int) != 0UL,& __gen_e_acsl_assert_data_79);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_79);
     }
@@ -1657,6 +1676,7 @@ int main(void)
       __gen_e_acsl_assert_data_82.file = "initialized.c";
       __gen_e_acsl_assert_data_82.fct = "main";
       __gen_e_acsl_assert_data_82.line = 103;
+      __gen_e_acsl_assert_data_82.name = "denominator not zero";
       __e_acsl_assert(_Alignof(char) != 0UL,& __gen_e_acsl_assert_data_82);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_82);
     }
@@ -1687,6 +1707,7 @@ int main(void)
       __gen_e_acsl_assert_data_84.file = "initialized.c";
       __gen_e_acsl_assert_data_84.fct = "main";
       __gen_e_acsl_assert_data_84.line = 103;
+      __gen_e_acsl_assert_data_84.name = "denominator not zero";
       __e_acsl_assert(_Alignof(int) != 0UL,& __gen_e_acsl_assert_data_84);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_84);
     }
@@ -1748,6 +1769,7 @@ int main(void)
       __gen_e_acsl_assert_data_87.file = "initialized.c";
       __gen_e_acsl_assert_data_87.fct = "main";
       __gen_e_acsl_assert_data_87.line = 104;
+      __gen_e_acsl_assert_data_87.name = "denominator not zero";
       __e_acsl_assert(_Alignof(int) != 0UL,& __gen_e_acsl_assert_data_87);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_87);
     }
@@ -1802,6 +1824,7 @@ int main(void)
       __gen_e_acsl_assert_data_90.file = "initialized.c";
       __gen_e_acsl_assert_data_90.fct = "main";
       __gen_e_acsl_assert_data_90.line = 105;
+      __gen_e_acsl_assert_data_90.name = "denominator not zero";
       __e_acsl_assert(_Alignof(int) != 0UL,& __gen_e_acsl_assert_data_90);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_90);
     }
@@ -1856,6 +1879,7 @@ int main(void)
       __gen_e_acsl_assert_data_93.file = "initialized.c";
       __gen_e_acsl_assert_data_93.fct = "main";
       __gen_e_acsl_assert_data_93.line = 106;
+      __gen_e_acsl_assert_data_93.name = "denominator not zero";
       __e_acsl_assert(_Alignof(int) != 0UL,& __gen_e_acsl_assert_data_93);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_93);
     }
@@ -1916,6 +1940,7 @@ int main(void)
       __gen_e_acsl_assert_data_96.file = "initialized.c";
       __gen_e_acsl_assert_data_96.fct = "main";
       __gen_e_acsl_assert_data_96.line = 109;
+      __gen_e_acsl_assert_data_96.name = "denominator not zero";
       __e_acsl_assert(_Alignof(char) != 0UL,& __gen_e_acsl_assert_data_96);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_96);
     }
@@ -1946,6 +1971,7 @@ int main(void)
       __gen_e_acsl_assert_data_98.file = "initialized.c";
       __gen_e_acsl_assert_data_98.fct = "main";
       __gen_e_acsl_assert_data_98.line = 109;
+      __gen_e_acsl_assert_data_98.name = "denominator not zero";
       __e_acsl_assert(_Alignof(int) != 0UL,& __gen_e_acsl_assert_data_98);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_98);
     }
@@ -2012,6 +2038,7 @@ int main(void)
       __gen_e_acsl_assert_data_101.file = "initialized.c";
       __gen_e_acsl_assert_data_101.fct = "main";
       __gen_e_acsl_assert_data_101.line = 111;
+      __gen_e_acsl_assert_data_101.name = "denominator not zero";
       __e_acsl_assert(_Alignof(char) != 0UL,& __gen_e_acsl_assert_data_101);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_101);
     }
@@ -2043,6 +2070,7 @@ int main(void)
       __gen_e_acsl_assert_data_103.file = "initialized.c";
       __gen_e_acsl_assert_data_103.fct = "main";
       __gen_e_acsl_assert_data_103.line = 111;
+      __gen_e_acsl_assert_data_103.name = "denominator not zero";
       __e_acsl_assert(_Alignof(int) != 0UL,& __gen_e_acsl_assert_data_103);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_103);
     }
@@ -2105,6 +2133,7 @@ int main(void)
       __gen_e_acsl_assert_data_106.file = "initialized.c";
       __gen_e_acsl_assert_data_106.fct = "main";
       __gen_e_acsl_assert_data_106.line = 112;
+      __gen_e_acsl_assert_data_106.name = "denominator not zero";
       __e_acsl_assert(_Alignof(int) != 0UL,& __gen_e_acsl_assert_data_106);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_106);
     }
@@ -2161,6 +2190,7 @@ int main(void)
       __gen_e_acsl_assert_data_109.file = "initialized.c";
       __gen_e_acsl_assert_data_109.fct = "main";
       __gen_e_acsl_assert_data_109.line = 113;
+      __gen_e_acsl_assert_data_109.name = "denominator not zero";
       __e_acsl_assert(_Alignof(int) != 0UL,& __gen_e_acsl_assert_data_109);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_109);
     }
@@ -2223,6 +2253,7 @@ int main(void)
       __gen_e_acsl_assert_data_112.file = "initialized.c";
       __gen_e_acsl_assert_data_112.fct = "main";
       __gen_e_acsl_assert_data_112.line = 116;
+      __gen_e_acsl_assert_data_112.name = "denominator not zero";
       __e_acsl_assert(_Alignof(char) != 0UL,& __gen_e_acsl_assert_data_112);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_112);
     }
@@ -2254,6 +2285,7 @@ int main(void)
       __gen_e_acsl_assert_data_114.file = "initialized.c";
       __gen_e_acsl_assert_data_114.fct = "main";
       __gen_e_acsl_assert_data_114.line = 116;
+      __gen_e_acsl_assert_data_114.name = "denominator not zero";
       __e_acsl_assert(_Alignof(int) != 0UL,& __gen_e_acsl_assert_data_114);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_114);
     }
@@ -2322,6 +2354,7 @@ int main(void)
       __gen_e_acsl_assert_data_117.file = "initialized.c";
       __gen_e_acsl_assert_data_117.fct = "main";
       __gen_e_acsl_assert_data_117.line = 118;
+      __gen_e_acsl_assert_data_117.name = "denominator not zero";
       __e_acsl_assert(_Alignof(char) != 0UL,& __gen_e_acsl_assert_data_117);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_117);
     }
@@ -2353,6 +2386,7 @@ int main(void)
       __gen_e_acsl_assert_data_119.file = "initialized.c";
       __gen_e_acsl_assert_data_119.fct = "main";
       __gen_e_acsl_assert_data_119.line = 118;
+      __gen_e_acsl_assert_data_119.name = "denominator not zero";
       __e_acsl_assert(_Alignof(int) != 0UL,& __gen_e_acsl_assert_data_119);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_119);
     }
@@ -2419,6 +2453,7 @@ int main(void)
       __gen_e_acsl_assert_data_122.file = "initialized.c";
       __gen_e_acsl_assert_data_122.fct = "main";
       __gen_e_acsl_assert_data_122.line = 121;
+      __gen_e_acsl_assert_data_122.name = "denominator not zero";
       __e_acsl_assert(_Alignof(int) != 0UL,& __gen_e_acsl_assert_data_122);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_122);
     }
@@ -2475,6 +2510,7 @@ int main(void)
       __gen_e_acsl_assert_data_125.file = "initialized.c";
       __gen_e_acsl_assert_data_125.fct = "main";
       __gen_e_acsl_assert_data_125.line = 122;
+      __gen_e_acsl_assert_data_125.name = "denominator not zero";
       __e_acsl_assert(_Alignof(int) != 0UL,& __gen_e_acsl_assert_data_125);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_125);
     }
@@ -2531,6 +2567,7 @@ int main(void)
       __gen_e_acsl_assert_data_128.file = "initialized.c";
       __gen_e_acsl_assert_data_128.fct = "main";
       __gen_e_acsl_assert_data_128.line = 123;
+      __gen_e_acsl_assert_data_128.name = "denominator not zero";
       __e_acsl_assert(_Alignof(int) != 0UL,& __gen_e_acsl_assert_data_128);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_128);
     }
@@ -2587,6 +2624,7 @@ int main(void)
       __gen_e_acsl_assert_data_131.file = "initialized.c";
       __gen_e_acsl_assert_data_131.fct = "main";
       __gen_e_acsl_assert_data_131.line = 124;
+      __gen_e_acsl_assert_data_131.name = "denominator not zero";
       __e_acsl_assert(_Alignof(int) != 0UL,& __gen_e_acsl_assert_data_131);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_131);
     }
@@ -2643,6 +2681,7 @@ int main(void)
       __gen_e_acsl_assert_data_134.file = "initialized.c";
       __gen_e_acsl_assert_data_134.fct = "main";
       __gen_e_acsl_assert_data_134.line = 125;
+      __gen_e_acsl_assert_data_134.name = "denominator not zero";
       __e_acsl_assert(_Alignof(int) != 0UL,& __gen_e_acsl_assert_data_134);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_134);
     }
@@ -2699,6 +2738,7 @@ int main(void)
       __gen_e_acsl_assert_data_137.file = "initialized.c";
       __gen_e_acsl_assert_data_137.fct = "main";
       __gen_e_acsl_assert_data_137.line = 126;
+      __gen_e_acsl_assert_data_137.name = "denominator not zero";
       __e_acsl_assert(_Alignof(int) != 0UL,& __gen_e_acsl_assert_data_137);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_137);
     }
@@ -2757,6 +2797,7 @@ int main(void)
       __gen_e_acsl_assert_data_140.file = "initialized.c";
       __gen_e_acsl_assert_data_140.fct = "main";
       __gen_e_acsl_assert_data_140.line = 128;
+      __gen_e_acsl_assert_data_140.name = "denominator not zero";
       __e_acsl_assert(_Alignof(int) != 0UL,& __gen_e_acsl_assert_data_140);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_140);
     }
@@ -2813,6 +2854,7 @@ int main(void)
       __gen_e_acsl_assert_data_143.file = "initialized.c";
       __gen_e_acsl_assert_data_143.fct = "main";
       __gen_e_acsl_assert_data_143.line = 129;
+      __gen_e_acsl_assert_data_143.name = "denominator not zero";
       __e_acsl_assert(_Alignof(int) != 0UL,& __gen_e_acsl_assert_data_143);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_143);
     }
@@ -2869,6 +2911,7 @@ int main(void)
       __gen_e_acsl_assert_data_146.file = "initialized.c";
       __gen_e_acsl_assert_data_146.fct = "main";
       __gen_e_acsl_assert_data_146.line = 130;
+      __gen_e_acsl_assert_data_146.name = "denominator not zero";
       __e_acsl_assert(_Alignof(int) != 0UL,& __gen_e_acsl_assert_data_146);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_146);
     }
@@ -2930,6 +2973,7 @@ int main(void)
       __gen_e_acsl_assert_data_149.file = "initialized.c";
       __gen_e_acsl_assert_data_149.fct = "main";
       __gen_e_acsl_assert_data_149.line = 139;
+      __gen_e_acsl_assert_data_149.name = "denominator not zero";
       __e_acsl_assert(_Alignof(int) != 0UL,& __gen_e_acsl_assert_data_149);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_149);
     }

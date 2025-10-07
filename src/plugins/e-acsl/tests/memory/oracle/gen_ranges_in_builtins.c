@@ -480,6 +480,7 @@ int main(void)
       __gen_e_acsl_assert_data_14.file = "ranges_in_builtins.c";
       __gen_e_acsl_assert_data_14.fct = "main";
       __gen_e_acsl_assert_data_14.line = 53;
+      __gen_e_acsl_assert_data_14.name = "denominator not zero";
       __e_acsl_assert(_Alignof(char) != 0UL,& __gen_e_acsl_assert_data_14);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_14);
     }
@@ -636,6 +637,7 @@ int main(void)
       __gen_e_acsl_assert_data_19.file = "ranges_in_builtins.c";
       __gen_e_acsl_assert_data_19.fct = "main";
       __gen_e_acsl_assert_data_19.line = 62;
+      __gen_e_acsl_assert_data_19.name = "denominator not zero";
       __e_acsl_assert(_Alignof(char) != 0UL,& __gen_e_acsl_assert_data_19);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_19);
     }
@@ -709,6 +711,7 @@ int main(void)
       __gen_e_acsl_assert_data_22.file = "ranges_in_builtins.c";
       __gen_e_acsl_assert_data_22.fct = "main";
       __gen_e_acsl_assert_data_22.line = 65;
+      __gen_e_acsl_assert_data_22.name = "denominator not zero";
       __e_acsl_assert(_Alignof(char) != 0UL,& __gen_e_acsl_assert_data_22);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_22);
     }
@@ -740,6 +743,7 @@ int main(void)
       __gen_e_acsl_assert_data_24.file = "ranges_in_builtins.c";
       __gen_e_acsl_assert_data_24.fct = "main";
       __gen_e_acsl_assert_data_24.line = 65;
+      __gen_e_acsl_assert_data_24.name = "denominator not zero";
       __e_acsl_assert(_Alignof(float) != 0UL,& __gen_e_acsl_assert_data_24);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_24);
     }
@@ -819,6 +823,7 @@ int main(void)
       __gen_e_acsl_assert_data_27.file = "ranges_in_builtins.c";
       __gen_e_acsl_assert_data_27.fct = "main";
       __gen_e_acsl_assert_data_27.line = 74;
+      __gen_e_acsl_assert_data_27.name = "denominator not zero";
       __e_acsl_assert(_Alignof(char) != 0UL,& __gen_e_acsl_assert_data_27);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_27);
     }
@@ -871,6 +876,7 @@ int main(void)
       __gen_e_acsl_assert_data_30.file = "ranges_in_builtins.c";
       __gen_e_acsl_assert_data_30.fct = "main";
       __gen_e_acsl_assert_data_30.line = 74;
+      __gen_e_acsl_assert_data_30.name = "denominator not zero";
       __e_acsl_assert(_Alignof(int *) != 0UL,& __gen_e_acsl_assert_data_30);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_30);
     }
@@ -903,6 +909,7 @@ int main(void)
       __gen_e_acsl_assert_data_32.file = "ranges_in_builtins.c";
       __gen_e_acsl_assert_data_32.fct = "main";
       __gen_e_acsl_assert_data_32.line = 74;
+      __gen_e_acsl_assert_data_32.name = "denominator not zero";
       __e_acsl_assert(_Alignof(int) != 0UL,& __gen_e_acsl_assert_data_32);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_32);
     }

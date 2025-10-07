@@ -65,6 +65,7 @@ void f(void const *s, int c, unsigned long n)
       __gen_e_acsl_assert_data_4.file = "bts2386.c";
       __gen_e_acsl_assert_data_4.fct = "f";
       __gen_e_acsl_assert_data_4.line = 8;
+      __gen_e_acsl_assert_data_4.name = "denominator not zero";
       __e_acsl_assert(_Alignof(unsigned char const) != 0UL,
                       & __gen_e_acsl_assert_data_4);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);

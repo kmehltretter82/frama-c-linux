@@ -201,6 +201,7 @@ void __gen_e_acsl_CountInd_fun4_here(__e_acsl_mpz_t *__retres_arg, int *arr,
         __gen_e_acsl_assert_data_4.file = "count.c";
         __gen_e_acsl_assert_data_4.fct = "CountInd_fun4_here";
         __gen_e_acsl_assert_data_4.line = 17;
+        __gen_e_acsl_assert_data_4.name = "denominator not zero";
         __e_acsl_assert(_Alignof(int) != 0UL,& __gen_e_acsl_assert_data_4);
         __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
       }
@@ -287,6 +288,7 @@ void __gen_e_acsl_CountInd_fun4_here(__e_acsl_mpz_t *__retres_arg, int *arr,
           __gen_e_acsl_assert_data_7.file = "count.c";
           __gen_e_acsl_assert_data_7.fct = "CountInd_fun4_here";
           __gen_e_acsl_assert_data_7.line = 22;
+          __gen_e_acsl_assert_data_7.name = "denominator not zero";
           __e_acsl_assert(_Alignof(int) != 0UL,& __gen_e_acsl_assert_data_7);
           __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
         }

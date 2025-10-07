@@ -388,6 +388,7 @@ size_t __gen_e_acsl_fread(void * restrict ptr, size_t size, size_t nmemb,
       __gen_e_acsl_assert_data_3.file = "FRAMAC_SHARE/libc/stdio.h";
       __gen_e_acsl_assert_data_3.fct = "fread";
       __gen_e_acsl_assert_data_3.line = 379;
+      __gen_e_acsl_assert_data_3.name = "denominator not zero";
       __e_acsl_assert(_Alignof(char) != 0UL,& __gen_e_acsl_assert_data_3);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
     }
@@ -604,6 +605,7 @@ size_t __gen_e_acsl_fread(void * restrict ptr, size_t size, size_t nmemb,
       __gen_e_acsl_assert_data_10.file = "FRAMAC_SHARE/libc/stdio.h";
       __gen_e_acsl_assert_data_10.fct = "fread";
       __gen_e_acsl_assert_data_10.line = 385;
+      __gen_e_acsl_assert_data_10.name = "denominator not zero";
       __e_acsl_assert(_Alignof(char) != 0UL,& __gen_e_acsl_assert_data_10);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_10);
     }

@@ -376,6 +376,7 @@ int __gen_e_acsl_pthread_create(pthread_t * restrict thread,
         __gen_e_acsl_assert_data_6.file = "FRAMAC_SHARE/libc/pthread.h";
         __gen_e_acsl_assert_data_6.fct = "pthread_create";
         __gen_e_acsl_assert_data_6.line = 350;
+        __gen_e_acsl_assert_data_6.name = "denominator not zero";
         __e_acsl_assert(_Alignof(char) != 0UL,& __gen_e_acsl_assert_data_6);
         __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
       }

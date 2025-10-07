@@ -69,6 +69,7 @@ void g(int a, int *b)
       __gen_e_acsl_assert_data_5.file = "acsl_check.c";
       __gen_e_acsl_assert_data_5.fct = "g";
       __gen_e_acsl_assert_data_5.line = 15;
+      __gen_e_acsl_assert_data_5.name = "denominator not zero";
       __e_acsl_assert(_Alignof(int) != 0UL,& __gen_e_acsl_assert_data_5);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
     }
