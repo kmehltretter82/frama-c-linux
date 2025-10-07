@@ -138,6 +138,14 @@ let rec find_lval_vertex ((lhost, offset) : lval) s : V.t =
   find_offset hv offset
 
 
+let add_field_and_cast f lv =
+  let off = Field(f,NoOffset) in
+  match lv with
+  | Mem p, NoOffset when Ast_types.is_void_ptr (Cil.typeOf p) ->
+    let newt = Cil_const.(mk_tptr (mk_tcomp f.fcomp)) in
+    Mem (Cil.mkCast ~newt p), off
+  | _ -> Cil.addOffsetLval off lv
+
 module Readout = struct
 
   (* Reconstruct all lvals that are represented by the given node.
@@ -163,12 +171,10 @@ module Readout = struct
         let modified_predecessors = List.map
             (fun e ->
                let pred_lvals = checking_for_cycles s visited @@ E.src e in
-               let modify_lval lv = match E.label e with
-                 | Field f -> Cil.addOffsetLval (Field (f, NoOffset)) lv
+               let modify_lval lv =
+                 match E.label e with
+                 | Field f -> add_field_and_cast f lv
                  | Pointer ->
-                   (* TODO: This Cil.typeOfLval may crash with a fatal kernel
-                      error for certain reconstructed lvals involving a union
-                      type. See tests/known_bugs/union_readback.c *)
                    let ty = Cil.typeOfLval lv in
                    if Ast_types.is_array ty then
                      Cil.addOffsetLval (Index (Simplified.nul_exp, NoOffset)) lv
