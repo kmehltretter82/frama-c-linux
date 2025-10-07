@@ -2,8 +2,8 @@ let
   sources = import ./sources.nix {};
   # we use clang-format for linting. Be sure to keep
   # that in sync with tools/lint/lint.ml
-  clang = pkgs.clang_18;
-  llvmPackages = pkgs.llvmPackages_18;
+  clang = pkgs.clang_19;
+  llvmPackages = pkgs.llvmPackages_19;
   ocamlOverlay = oself: osuper: {
     # External Packages
     alt-ergo = oself.callPackage ./alt-ergo.nix {};
