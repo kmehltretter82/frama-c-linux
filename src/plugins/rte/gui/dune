@@ -10,7 +10,7 @@
  (alias frama-c-configure)
  (deps (universe))
  (action (progn
-          (echo "Rtegen GUI:" %{lib-available:frama-c-studia.gui} "\n")
+          (echo "Rtegen GUI:" %{lib-available:frama-c-rtegen.gui} "\n")
           (echo "  - Frama-C GUI:" %{lib-available:frama-c.gui} "\n")
           (echo "  - Rtegen:" %{lib-available:frama-c-rtegen.core} "\n")
 
