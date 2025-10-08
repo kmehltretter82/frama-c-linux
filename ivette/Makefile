@@ -173,8 +173,8 @@ include $(DOME)/template/makefile
 clean:
 	@rm -f yarn-error.log
 	@rm -f .eslint-cache
-	@rm -f *.stamp
-	@rm -f *.back
+	@rm -f .*.stamp
+	@rm -f .*.back
 	@rm -fr node_modules
 	@rm -fr dist
 	@rm -fr out
