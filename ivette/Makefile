@@ -21,7 +21,7 @@ COPYRIGHT=CEA LIST / LSL
 # --- Ivette Compilation
 # --------------------------------------------------------------------------
 
-.PHONY: all app dev
+.PHONY: all app dev clean
 
 all: api pkg lint dome-app
 app: api dome-app
@@ -165,6 +165,27 @@ $(NODEBIN)/%:
 # --------------------------------------------------------------------------
 include $(DOME)/template/makefile
 # --------------------------------------------------------------------------
+
+# --------------------------------------------------------------------------
+# --- Cleaning Development Files
+# --------------------------------------------------------------------------
+
+clean:
+	@rm -f yarn-error.log
+	@rm -f .eslint-cache
+	@rm -f *.stamp
+	@rm -f *.back
+	@rm -fr node_modules
+	@rm -fr dist
+	@rm -fr out
+	@rm -fr doc/html
+	@rm -f src/renderer/loader.ts
+	@rm -f src/renderer/sandbox.ts
+	@rm -fr src/renderer/public
+	@rm -f src/dome/doc/guides/icons.md
+	@rm -f icon.icns
+	@rm -fr src/frama-c/kernel/api
+	@rm -fr src/frama-c/plugins/*/api
 
 # --------------------------------------------------------------------------
 # --- Ivette Installation
