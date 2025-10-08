@@ -17,6 +17,15 @@
   )
 )
 
+(rule
+ (alias install)
+ (enabled_if
+  (and
+   (= %{env:FRAMAC_DEVELOPER=no} "yes")
+   (not %{lib-available:frama-c-metrics.core})))
+ (action (echo "WARNING: Metrics disabled. Run 'dune build @frama-c-configure' for more details\n"))
+)
+
 ( library
   (name metrics)
   (optional)

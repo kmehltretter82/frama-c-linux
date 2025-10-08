@@ -19,6 +19,15 @@
   )
 )
 
+(rule
+ (alias install)
+ (enabled_if
+  (and
+   (= %{env:FRAMAC_DEVELOPER=no} "yes")
+   (not %{lib-available:frama-c-studia.gui})))
+ (action (echo "WARNING: Studia GUI disabled. Run 'dune build @frama-c-configure' for more details\n"))
+)
+
 ( library
   (name studia_gui)
   (public_name frama-c-studia.gui)

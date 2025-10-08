@@ -16,6 +16,16 @@
   )
 )
 
+(rule
+ (alias install)
+ (enabled_if
+  (and
+   (= %{env:FRAMAC_DEVELOPER=no} "yes")
+   (not %{lib-available:frama-c-users.core})))
+ (action (echo "WARNING: Users disabled. Run 'dune build @frama-c-configure' for more details\n"))
+)
+
+
 (library
   (name Users)
   (optional)

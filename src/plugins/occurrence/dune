@@ -16,6 +16,15 @@
   )
 )
 
+(rule
+ (alias install)
+ (enabled_if
+  (and
+   (= %{env:FRAMAC_DEVELOPER=no} "yes")
+   (not %{lib-available:frama-c-occurrence.core})))
+ (action (echo "WARNING: Occurrence disabled. Run 'dune build @frama-c-configure' for more details\n"))
+)
+
 ( library
   (name occurrence)
   (optional)

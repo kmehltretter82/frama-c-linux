@@ -20,6 +20,15 @@
    (echo " - apron.polkaMPQ:" %{lib-available:apron.polkaMPQ} "\n")
    (echo " - apron.apron:" %{lib-available:apron.apron} "\n"))))
 
+(rule
+ (alias install)
+ (enabled_if
+  (and
+   (= %{env:FRAMAC_DEVELOPER=no} "yes")
+   (not %{lib-available:frama-c-eva.core})))
+ (action (echo "WARNING: Eva disabled. Run 'dune build @frama-c-configure' for more details\n"))
+)
+
 (library
  (name eva)
  (optional)

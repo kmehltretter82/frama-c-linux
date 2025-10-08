@@ -32,6 +32,15 @@
   )
 )
 
+(rule
+ (alias install)
+ (enabled_if
+  (and
+   (= %{env:FRAMAC_DEVELOPER=no} "yes")
+   (not %{lib-available:frama-c.kernel})))
+ (action (echo "WARNING: Frama-C disabled. Run 'dune build @frama-c-configure' for more details\n"))
+)
+
 (library
   (name frama_c_kernel)
   (public_name frama-c.kernel)

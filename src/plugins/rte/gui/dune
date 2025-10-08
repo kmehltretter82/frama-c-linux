@@ -18,6 +18,15 @@
   )
 )
 
+(rule
+ (alias install)
+ (enabled_if
+  (and
+   (= %{env:FRAMAC_DEVELOPER=no} "yes")
+   (not %{lib-available:frama-c-rtegen.gui})))
+ (action (echo "WARNING: Rtegen GUI disabled. Run 'dune build @frama-c-configure' for more details\n"))
+)
+
 ( library
   (name rtegen_gui)
   (public_name frama-c-rtegen.gui)

@@ -17,6 +17,15 @@
   )
 )
 
+(rule
+ (alias install)
+ (enabled_if
+  (and
+   (= %{env:FRAMAC_DEVELOPER=no} "yes")
+   (not %{lib-available:frama-c-markdown-report.eva-info.core})))
+ (action (echo "WARNING: Markdown-report.eva-info disabled. Run 'dune build @frama-c-configure' for more details\n"))
+)
+
 ( library
   (name markdown_report_eva_info)
   (public_name frama-c-markdown-report.eva-info.core)

@@ -14,6 +14,15 @@
           (echo " - Frama-C:" %{lib-available:frama-c.kernel} "\n")
           (echo " - WP:" %{lib-available:frama-c-wp.core} "\n"))))
 
+(rule
+ (alias install)
+ (enabled_if
+  (and
+   (= %{env:FRAMAC_DEVELOPER=no} "yes")
+   (not %{lib-available:frama-c-volatile.core})))
+ (action (echo "WARNING: Volatile disabled. Run 'dune build @frama-c-configure' for more details\n"))
+)
+
 (library
  (optional)
  (name volatile)

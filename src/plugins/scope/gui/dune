@@ -17,6 +17,15 @@
   )
 )
 
+(rule
+ (alias install)
+ (enabled_if
+  (and
+   (= %{env:FRAMAC_DEVELOPER=no} "yes")
+   (not %{lib-available:frama-c-scope.gui})))
+ (action (echo "WARNING: Scope GUI disabled. Run 'dune build @frama-c-configure' for more details\n"))
+)
+
 (library
   (name scope_gui)
   (public_name frama-c-scope.gui)
