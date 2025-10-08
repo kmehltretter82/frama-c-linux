@@ -35,6 +35,7 @@ import { State, GlobalState, useGlobalState } from './data/states';
 import * as Json from 'dome/data/json';
 import * as Settings from 'dome/data/settings';
 
+import * as MenuBar from '../main/menubar';
 import * as path from 'path';
 
 import './dark.css';
@@ -527,9 +528,49 @@ export interface PopupMenuItemProps {
   checked?: boolean;
   /** Item selection callback. */
   onClick?: (() => void);
+  /** submenu */
+  submenu?: PopupMenuItem[] ;
 }
 
 export type PopupMenuItem = PopupMenuItemProps | 'separator';
+
+/** Sanitize label for create an ID */
+function sanitizeLabel(str: string): string {
+  return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
+    .trim().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
+}
+
+/** Calc unique ID for menu item */
+function getId(item: PopupMenuItemProps, fctList: string[]): string {
+  const baseId = item.id ?? sanitizeLabel(item.label);
+  let count = 0;
+  let newId = baseId;
+  while (fctList.includes(newId)) newId = baseId+'_'+count++;
+  return newId;
+}
+
+/** Return transformed menu item and save item in Record*/
+function getItem(
+  item: PopupMenuItem,
+  fctList: Record<string, PopupMenuItemProps | undefined>
+): MenuBar.PopupMenuItem {
+  if (item === 'separator') return { type: 'separator' };
+  const { label, display, enabled, checked, submenu } = item;
+  const newId = getId(item, Object.keys(fctList));
+  fctList[newId] = item;
+  const newItem: MenuBar.PopupMenuItem = { label,
+      id: newId,
+      type: checked !== undefined ? 'checkbox' : 'normal',
+      display: !!(display ?? true),
+      enabled: !!(enabled ?? true),
+      checked: checked,
+    };
+  if(submenu) {
+    newItem.submenu = submenu.map(e => getItem(e, fctList));
+    newItem.type = 'submenu';
+  }
+  return newItem;
+}
 
 /**
    Popup a contextual menu.
@@ -555,25 +596,19 @@ export function popupMenu(
   items: PopupMenuItem[],
   callback?: (item: string | undefined) => void
 ): void {
-  const ipcItems = items.map((item) => {
-    if (!item) return undefined;
-    if (item === 'separator') return item;
-    return {
-      label: item.label,
-      id: item.id,
-      display: !!(item.display ?? true),
-      enabled: !!(item.enabled ?? true),
-      checked: !!(item.checked ?? false),
-    };
-  });
-  ipcRenderer.invoke('dome.popup', ipcItems).then((index: number) => {
-    const item = items[index];
-    if (item && item !== 'separator') {
-      const { id, label, onClick } = item;
-      if (onClick) onClick();
-      if (callback) callback(id || label);
-    } else {
-      if (callback) callback(undefined);
+  const itemsRecord: Record<string, PopupMenuItemProps | undefined> = {};
+  const ipcItems = items.map((item) => getItem(item, itemsRecord));
+
+  ipcRenderer.invoke('dome.popup', ipcItems).then((menuId?: string) => {
+    if(menuId) {
+      const item = itemsRecord[menuId];
+      if (item) {
+        const { id, label, onClick } = item;
+        if (onClick) onClick();
+        if (callback) callback(id || label);
+      } else {
+        if (callback) callback(undefined);
+      }
     }
   });
 }
