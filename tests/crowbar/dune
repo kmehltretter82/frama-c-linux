@@ -13,4 +13,10 @@
   (deps ../../src/init/boot/empty_file.exe (package frama-c) (package crowbar_utils))
 )
 
+(cram
+  (applies_to constfold)
+  (enabled_if false) ; Turn off this test for now because of CI issues
+  (deps
+    (package frama-c-eva)
+    (package frama-c-inout))
 )
