@@ -13,6 +13,15 @@
            (echo "ACSL importer:" %{lib-available:frama-c-acsl-importer.core} "\n")
            (echo " - Frama-C:" %{lib-available:frama-c.kernel} "\n"))))
 
+(rule
+ (alias install)
+ (enabled_if
+  (and
+   (= %{env:FRAMAC_DEVELOPER=no} "yes")
+   (not %{lib-available:frama-c-acsl-importer.core})))
+ (action (echo "WARNING: ACSL-importer disabled. Run 'dune build @frama-c-configure' for more details\n"))
+)
+
 (library
  (optional)
  (name acsl_importer)

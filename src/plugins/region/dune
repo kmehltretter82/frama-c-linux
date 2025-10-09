@@ -15,6 +15,15 @@
    (echo "  - Server:" %{lib-available:frama-c-server.core} "\n")
    (echo "  - UnionFind:" %{lib-available:unionFind} "\n"))))
 
+(rule
+ (alias install)
+ (enabled_if
+  (and
+   (= %{env:FRAMAC_DEVELOPER=no} "yes")
+   (not %{lib-available:frama-c-region.core})))
+ (action (echo "WARNING: Region disabled. Run 'dune build @frama-c-configure' for more details\n"))
+)
+
 (env
  (release
   (flags -noassert)))
