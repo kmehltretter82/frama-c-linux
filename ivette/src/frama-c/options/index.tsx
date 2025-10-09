@@ -12,6 +12,7 @@ import { Modal, showMessageBox, showModal } from 'dome/dialogs';
 import { alpha } from 'dome/data/compare';
 import { LSplit } from 'dome/layout/splitters';
 import * as Toolbar from 'dome/frame/toolbars';
+import { GlobalState } from 'dome/data/states';
 
 import * as Server from 'frama-c/server';
 import * as Params from 'frama-c/kernel/api/parameters';
@@ -53,7 +54,11 @@ export function usePluginsContextById(id: string): PContextById {
 // --- Options
 // --------------------------------------------------------------------------
 
+/** left and right form selected */
 const defaultSelected: SelectedPlugins = ['kernel', 'Eva'];
+
+/** number of forms modified */
+export const countFormsModified = new GlobalState<number>(0);
 
 export default function Options(): React.JSX.Element {
   /** Remotes */
@@ -128,18 +133,22 @@ export default function Options(): React.JSX.Element {
 /* -------------------------------------------------------------------------- */
 
 async function onClose(callback: () => void): Promise<void> {
-  const confirm = await showMessageBox({
-    block: true,
-    buttons: [
-      { label: 'Cancel' },
-      { label: 'Ok', value: true }
-    ],
-    message: 'This modal will be close',
-    details: 'If you do not apply your local changes, you will lose them.\n'
-    +'Confirm that you want to close or cancel.'
-  });
+  if(countFormsModified.getValue() > 0) {
+    const confirm = await showMessageBox({
+        block: true,
+        buttons: [
+        { label: 'Cancel' },
+        { label: 'Ok', value: true }
+      ],
+      message: 'This modal will be close',
+      details: 'If you do not apply your local changes, you will lose them.\n'
+      +'Confirm that you want to close or cancel.'
+    });
 
-  if(confirm === true) callback();
+    if(confirm === true) callback();
+  } else {
+    callback();
+  }
 }
 
 export function showOptionsModal(): void {

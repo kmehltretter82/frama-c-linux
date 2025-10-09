@@ -14,7 +14,7 @@ import * as Forms from 'dome/layout/forms';
 
 import * as Params from 'frama-c/kernel/api/parameters';
 
-import { IsSetElement, SelectedPlugins } from '.';
+import { countFormsModified, IsSetElement, SelectedPlugins } from '.';
 import { recordRemotes } from './forms';
 import { HelpButton } from 'dome/help';
 
@@ -36,6 +36,12 @@ function SidebarItem(props: SideBarItemProps): React.JSX.Element {
   const { plugin, selected, isSet, remote, onSelection } = props;
   const controller = Forms.useController(remote);
   const isModified = controller.hasReset() || controller.hasCommit();
+
+  React.useEffect(() => {
+    const current = countFormsModified.getValue();
+    if(isModified) countFormsModified.setValue(current + 1);
+    else countFormsModified.setValue(current - 1);
+  }, [isModified]);
 
   return <Item key={plugin.name}
       title={plugin.help}
@@ -65,6 +71,10 @@ interface SideBarProps {
 export function OptionsSidebar(props: SideBarProps): React.JSX.Element {
   const { selectedState, isSetElement, plugins, remotes } = props;
   const [selected, setSelected] = selectedState;
+
+  React.useEffect(() => {
+    countFormsModified.setValue(countFormsModified.getValue()+plugins.length);
+  }, [plugins.length]);
 
   const onSelection = React.useCallback(
     (e: React.MouseEvent, p: Params.plugin) => {
