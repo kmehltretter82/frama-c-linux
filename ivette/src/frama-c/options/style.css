@@ -22,17 +22,6 @@
   width: 100%;
   height: 100%;
 
-  .dome-xSideBar {
-    .dome-xSideBarItem {
-      &.options-left-form {
-        background-color: var(--selected-button-tabs-left);
-      }
-      &.options-right-form {
-        background-color: var(--selected-button-tabs-right);
-      }
-    }
-  }
-
   .framac-options-forms {
     display: flex;
     flex-direction: row;

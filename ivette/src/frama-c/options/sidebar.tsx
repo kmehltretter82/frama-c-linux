@@ -45,16 +45,14 @@ function SidebarItem(props: SideBarItemProps): React.JSX.Element {
 
   return <Item key={plugin.name}
       title={plugin.help}
-      className={
-        selected[0] === plugin.name ? 'options-left-form' :
-        selected[1] === plugin.name ? 'options-right-form' :
-        undefined
-      }
       label={plugin.name}
+      selected={selected[0] === plugin.name || selected[1] === plugin.name}
       onSelection={(e) => onSelection(e, plugin)}
     >
       {isModified && <LED status='warning' title='Pending modification'/>}
       {isSet && <LED status='active' title='Modified fields'/>}
+      {selected[0] === plugin.name && '(left)'}
+      {selected[1] === plugin.name && '(right)'}
     </Item>;
 }
 
