@@ -64,7 +64,7 @@ module CSVFile =
       let option_name = "-report-csv"
       let arg_name = "name"
       let file_kind = "CSV"
-      let existence = Fc_Filepath.Indifferent
+      let existence = Fclib.Filepath.Indifferent
       let help = "if set, output properties as a csv file of the given name"
     end)
 
@@ -158,7 +158,7 @@ module Output =
       let option_name = "-report-output"
       let arg_name = "*.json"
       let file_kind = "JSON"
-      let existence = Fc_Filepath.Indifferent
+      let existence = Fclib.Filepath.Indifferent
       let help = "Output -report-classify in JSON format"
     end)
 
@@ -177,7 +177,7 @@ module OutputReviews =
       let option_name = "-report-output-reviews"
       let arg_name = "file"
       let file_kind = "Text"
-      let existence = Fc_Filepath.Indifferent
+      let existence = Fclib.Filepath.Indifferent
       let help = "Output number of reviews to <file>"
     end)
 
@@ -188,7 +188,7 @@ module OutputErrors =
       let option_name = "-report-output-errors"
       let arg_name = "file"
       let file_kind = "Text"
-      let existence = Fc_Filepath.Indifferent
+      let existence = Fclib.Filepath.Indifferent
       let help = "Output number of errors to <file>"
     end)
 
@@ -199,7 +199,7 @@ module OutputUnclassified =
       let option_name = "-report-output-unclassified"
       let arg_name = "file"
       let file_kind = "Text"
-      let existence = Fc_Filepath.Indifferent
+      let existence = Fclib.Filepath.Indifferent
       let help = "Output number of unclassified to <file>"
     end)
 

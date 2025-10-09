@@ -3,7 +3,7 @@
  PLUGIN:
    EXECNOW: BIN absorb.sav LOG absorb_sav.res LOG absorb_sav.err @frama-c@ -save ./absorb.sav @PTEST_FILE@ > ./absorb_sav.res 2> ./absorb_sav.err
  PLUGIN: @EVA_PLUGINS@
-   EXECNOW: BIN absorb.sav2 LOG absorb_sav2.res LOG absorb_sav2.err @frama-c@ -load %{dep:./absorb.sav} -eva @EVA_CONFIG@ -float-hex -save ./absorb.sav2 > ./absorb_sav2.res 2> ./absorb_sav2.err
+   EXECNOW: BIN absorb.sav2 LOG absorb_sav2.res LOG absorb_sav2.err @frama-c@ -load %{dep:./absorb.sav} -eva @EVA_CONFIG@ -float-print hex -save ./absorb.sav2 > ./absorb_sav2.res 2> ./absorb_sav2.err
  COMMENT: the following CMD redefinition omits adding @PTEST_FILE@ on purpose.
  CMD: @frama-c@ @PTEST_OPTIONS@
    OPT: -load %{dep:./absorb.sav2} -deps -out -input

@@ -318,7 +318,7 @@ module TracesDot = Filepath
       let option_name = "-eva-traces-dot"
       let arg_name = "FILENAME"
       let file_kind = "DOT"
-      let existence = Fc_Filepath.Indifferent
+      let existence = Fclib.Filepath.Indifferent
       let help = "Output to the given filename the Cfg in dot format."
     end)
 
@@ -1018,7 +1018,7 @@ module ValPerfFlamegraphs =
       let option_name = "-eva-flamegraph"
       let arg_name = "file"
       let file_kind = "Text for flamegraph"
-      let existence = Fc_Filepath.Indifferent
+      let existence = Fclib.Filepath.Indifferent
       let help = "Dump a summary of the time spent analyzing function calls \
                   in a format suitable for the Flamegraph tool \
                   (http://www.brendangregg.com/flamegraphs.html)"
@@ -1061,7 +1061,7 @@ module ReportRedStatuses =
       let option_name = "-eva-report-red-statuses"
       let arg_name = "filename"
       let file_kind = "CSV"
-      let existence = Fc_Filepath.Indifferent
+      let existence = Fclib.Filepath.Indifferent
       let help = "Output the list of \"red properties\" in a csv file of the \
                   given name. These are the properties which were invalid for \
                   some states. Their consolidated status may not be invalid, \
@@ -1075,7 +1075,7 @@ module StatisticsFile =
       let option_name = "-eva-statistics-file"
       let arg_name = "file.csv"
       let file_kind = "CSV"
-      let existence = Fc_Filepath.Indifferent
+      let existence = Fclib.Filepath.Indifferent
       let help = "Dump some internal statistics about the analysis"
     end)
 

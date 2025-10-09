@@ -472,4 +472,4 @@ let parse str =
 let parse_exn str =
   match parse str with
   | Ok parsed -> parsed
-  | Error msg -> Kernel.abort ~current:true "%s" msg
+  | Error msg -> Cmdline.Kernel_log.abort ~current:true "%s" msg

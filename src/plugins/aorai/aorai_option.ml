@@ -26,7 +26,7 @@ module Ya =
       let option_name = "-aorai-automata"
       let arg_name = "f"
       let file_kind = "Ya"
-      let existence = Fc_Filepath.Must_exist
+      let existence = Fclib.Filepath.Must_exist
       let help = "considers the property described by the ya automata \
                   (in Ya language) from file <f>."
     end)

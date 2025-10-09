@@ -6,6 +6,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(* Deprecated *)
 module UtilsFilepath = Filepath
 
 module type S_with_collections = sig
@@ -171,7 +172,7 @@ end
 (**************************************************************************)
 
 module Position =  struct
-  let pretty_ref = ref UtilsFilepath.pp_pos
+  let pretty_ref = ref Filepath.pp_pos
   let unknown = Filepath.empty_pos
   let dummy = unknown
   let of_lexing_pos p = {

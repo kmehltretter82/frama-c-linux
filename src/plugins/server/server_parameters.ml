@@ -51,7 +51,7 @@ module Doc = P.Filepath
       let option_name = "-server-doc"
       let arg_name = "dir"
       let file_kind = "Directory"
-      let existence = Fc_Filepath.Must_exist
+      let existence = Fclib.Filepath.Must_exist
       let help = "Output a markdown documentation of the server in <dir>"
     end)
 

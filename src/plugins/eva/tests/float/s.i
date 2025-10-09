@@ -1,5 +1,5 @@
 /* run.config*
-   STDOPT: #"-float-hex"
+   STDOPT: #"-float-print hex"
 
 */
 

@@ -1,6 +1,6 @@
 /* run.config*
-   STDOPT: #"-float-normal"
-   STDOPT: #"-float-normal -simplify-cfg"
+   STDOPT: #"-float-print norm"
+   STDOPT: #"-float-print norm -simplify-cfg"
 */
 
 int result1, result3, result4;

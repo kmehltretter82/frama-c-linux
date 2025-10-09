@@ -10,8 +10,6 @@
 (** {2 Kernel as an almost standard plug-in} *)
 (* ************************************************************************* *)
 
-module FcPlugin = Plugin
-
 let () = Plugin.register_kernel ()
 
 let () = Plugin.is_session_visible ()
@@ -128,6 +126,7 @@ let dkey_prop_status_reg = register_category "prop-status:register"
 
 let dkey_prop_status_graph = register_category "prop-status:graph"
 
+(* Deprecated *)
 let dkey_task = register_category "task"
 
 let dkey_typing_global = register_category "typing:global"
@@ -375,6 +374,19 @@ module Kernel_function_set(X: Input_with_arg) =
       include X
     end)
 
+module Enum
+    (X: sig
+       type t
+       val default: t
+       val values: (t * string) list
+       include Input end
+    ) =
+  P.Enum
+    (struct
+      let () = Parameter_customize.set_module_name X.module_name
+      include X
+    end)
+
 (* ************************************************************************* *)
 (** {2 Installation Information} *)
 (* ************************************************************************* *)
@@ -557,11 +569,11 @@ let _ =
     (object
       method fold: 'a. (string -> 'a -> 'a) -> 'a -> 'a =
         fun f acc ->
-        FcPlugin.fold_on_plugins (fun p acc -> f p.FcPlugin.p_shortname acc) acc
+        Plugin.fold_on_plugins (fun p acc -> f p.Plugin.p_shortname acc) acc
       method mem name =
         try
-          FcPlugin.iter_on_plugins
-            (fun p -> if name = p.FcPlugin.p_shortname then raise Exit);
+          Plugin.iter_on_plugins
+            (fun p -> if name = p.Plugin.p_shortname then raise Exit);
           false
         with Exit -> true
     end)
@@ -670,6 +682,7 @@ module Unicode = struct
     if default then clear () else set old;
     r
 end
+let () = Unicode.add_update_hook (fun _ curr -> Fclib.Unicode.use_unicode curr)
 
 let () = Parameter_customize.set_group messages
 let () = Parameter_customize.do_not_projectify ()
@@ -850,23 +863,45 @@ end
 
 let () = Parameter_customize.set_group inout_source
 let () = Parameter_customize.do_not_projectify ()
+module FloatPrint =
+  Enum
+    (struct
+      type t = Floating_point.float_display
+      let module_name = "FloatPrint"
+      let option_name = "-float-print"
+      let default = Floating_point.Default
+      let values = [
+        (Floating_point.Default, "default");
+        (Floating_point.NormDec, "norm");
+        (Floating_point.NormHex, "hex");
+      ]
+      let help =
+        "Control how floats will be printed : 'default' will print the float \
+         as is, 'norm' will use an internal routine to normalize it using \
+         decimals, and 'hex' is the same than 'norm' but in hexadecimal. \
+         Default value is 'default'"
+    end)
+let () = FloatPrint.add_update_hook (fun _ -> Floating_point.set_float_display)
+
+let () = Parameter_customize.set_group inout_source
+let () = Parameter_customize.do_not_projectify ()
 module FloatNormal =
   False
     (struct
       let option_name = "-float-normal"
       let module_name = "FloatNormal"
-      let help = "display floats with internal routine"
+      let help =
+        "[DEPRECATED] display floats with internal routine. This option is \
+         deprecated, use '-float-print norm' instead."
     end)
-
-let () = Parameter_customize.set_group inout_source
-let () = Parameter_customize.do_not_projectify ()
-module FloatRelative =
-  False
-    (struct
-      let option_name = "-float-relative"
-      let module_name = "FloatRelative"
-      let help = "display float intervals as [lower_bound ++ width]"
-    end)
+let () =
+  FloatNormal.add_update_hook (fun _ curr ->
+      warning "Option -float-normal is deprecated. Use -float-print norm \
+               instead.";
+      if curr
+      then FloatPrint.set NormDec
+      else FloatPrint.(set (get_default ()))
+    )
 
 let () = Parameter_customize.set_group inout_source
 let () = Parameter_customize.do_not_projectify ()
@@ -875,8 +910,18 @@ module FloatHex =
     (struct
       let option_name = "-float-hex"
       let module_name = "FloatHex"
-      let help = "display floats as hexadecimal"
+      let help =
+        "[DEPRECATED] display floats as hexadecimal. This option is \
+         deprecated, use '-float-print hex' instead."
     end)
+let () =
+  FloatHex.add_update_hook (fun _ curr ->
+      warning "Option -float-hex is deprecated. Use -float-print hex \
+               instead.";
+      if curr
+      then FloatPrint.set NormHex
+      else FloatPrint.(set (get_default ()))
+    )
 
 let () = Parameter_customize.set_group inout_source
 let () = Parameter_customize.do_not_projectify ()

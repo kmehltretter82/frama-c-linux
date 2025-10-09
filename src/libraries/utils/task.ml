@@ -6,6 +6,10 @@
 (*                                                                        *)
 (**************************************************************************)
 
+let dkey =
+  let help = "prints debug informations about tasks executions" in
+  Cmdline.Kernel_log.register_category ~help "task"
+
 (* -------------------------------------------------------------------------- *)
 (* --- Error Messages                                                     --- *)
 (* -------------------------------------------------------------------------- *)
@@ -208,7 +212,7 @@ let set_time cmd t = match cmd.chrono with
 
 let start_command ~timeout ?time ?stdout ?stderr cmd args =
   begin
-    Kernel.debug ~dkey:Kernel.dkey_task "execute task '@[<hov 4>%t'@]"
+    Cmdline.Kernel_log.debug ~dkey "execute task '@[<hov 4>%t'@]"
       (fun fmt ->
          Format.pp_print_string fmt cmd ;
          List.iter
@@ -240,7 +244,7 @@ let ping_command cmd coin =
         if cmd.timeout > 0.0 && time_now > cmd.time_stop then
           begin
             set_time cmd (time_now -. cmd.time_start) ;
-            Kernel.debug ~dkey:Kernel.dkey_task "timeout '%s'" cmd.name ;
+            Cmdline.Kernel_log.debug ~dkey "timeout '%s'" cmd.name ;
             cmd.time_killed <- true ;
             kill () ;
           end ;
@@ -249,22 +253,22 @@ let ping_command cmd coin =
     | Command.Result (Unix.WEXITED s|Unix.WSIGNALED s|Unix.WSTOPPED s)
       when cmd.time_killed ->
       set_chrono cmd ;
-      Kernel.debug ~dkey:Kernel.dkey_task "timeout '%s' [%d]" cmd.name s ;
+      Cmdline.Kernel_log.debug ~dkey "timeout '%s' [%d]" cmd.name s ;
       Return (Timeout cmd.timeout)
 
     | Command.Result (Unix.WEXITED s) ->
       set_chrono cmd ;
-      Kernel.debug ~dkey:Kernel.dkey_task "exit '%s' [%d]" cmd.name s ;
+      Cmdline.Kernel_log.debug ~dkey "exit '%s' [%d]" cmd.name s ;
       Return (Result s)
 
     | Command.Result (Unix.WSIGNALED s|Unix.WSTOPPED s) ->
       set_chrono cmd ;
-      Kernel.debug ~dkey:Kernel.dkey_task "signal '%s' [%d]" cmd.name s ;
+      Cmdline.Kernel_log.debug ~dkey "signal '%s' [%d]" cmd.name s ;
       Return Canceled
 
   with e ->
     set_chrono cmd ;
-    Kernel.debug ~dkey:Kernel.dkey_task
+    Cmdline.Kernel_log.debug ~dkey
       "failure '%s' [%s]" cmd.name (Printexc.to_string e) ;
     Return (Failed e)
 

@@ -1,0 +1,6 @@
+########################################
+# HEADER_SPEC: CIL #
+########################################
+
+cilconfig.ml header_spec=CIL
+cilconfig.mli header_spec=CIL

@@ -6,6 +6,19 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(** {2 pretty modes} *)
+
+(** Determine how floats will be printed.
+    @since frama-c+dev *)
+type float_display =
+  | Default (* Printed normally *)
+  | NormDec (* Normalized in decimals *)
+  | NormHex (* Normalized in hexadecimals *)
+
+(** Change the printer mode for floats.
+    @since frama-c+dev *)
+val set_float_display : float_display -> unit
+
 (** {2 Rounding modes} *)
 
 type rounding =

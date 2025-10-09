@@ -1,6 +1,6 @@
 /* run.config*
   
-  STDOPT: #"-float-normal -main F2"
+  STDOPT: #"-float-print norm -main F2"
 */
 
 struct T1 {

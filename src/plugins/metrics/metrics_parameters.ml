@@ -35,7 +35,7 @@ module OutputFile =
       let option_name = "-metrics-output"
       let arg_name = "filename"
       let file_kind = "Text, HTML or JSON"
-      let existence = Fc_Filepath.Indifferent
+      let existence = Fclib.Filepath.Indifferent
       let help = "print some metrics into the specified file; \
                   the output format is recognized through the extension: \
                   .text/.txt for text, .html/.htm for HTML, or .json for JSON."

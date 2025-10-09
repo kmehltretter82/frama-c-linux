@@ -581,7 +581,7 @@ module type Builder = sig
   (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
   module Empty_string(_: Input_with_arg): String
 
-  module Fc_Filepath = Filepath
+  module Fc_Filepath = Filepath [@@deprecated "Use Fclib.Filepath instead."]
 
   module Filepath(_: sig
       include Input_with_arg
@@ -687,7 +687,7 @@ module type Builder = sig
   module Filepath_list
       (_: sig
          include Input_with_arg
-         val existence: Fc_Filepath.existence
+         val existence: Fclib.Filepath.existence
          val file_kind: string
          (** see [Filepath] module. *)
        end): Filepath_list
@@ -699,14 +699,14 @@ module type Builder = sig
       (V: Value_datatype)
       (_: sig
          include Input_with_arg
-         val default: V.t Fc_Filepath.Map.t
-         val existence: Fc_Filepath.existence
+         val default: V.t Fclib.Filepath.Map.t
+         val existence: Fclib.Filepath.existence
          val file_kind: string
        end):
     Map
-    with type key = Fc_Filepath.t
+    with type key = Fclib.Filepath.t
      and type value = V.t
-     and type t = V.t Fc_Filepath.Map.t
+     and type t = V.t Fclib.Filepath.Map.t
 
   (** Parameter is a map where multibindings are **not** allowed. *)
   module Make_map

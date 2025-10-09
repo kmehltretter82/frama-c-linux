@@ -9,6 +9,11 @@
 (** High Level Interface to Command.
     @since Carbon-20101201 *)
 
+(** Prints debug informations about tasks.
+    @since Frama-C+dev
+*)
+val dkey : Cmdline.Kernel_log.category
+
 (* ************************************************************************* *)
 (** {2 Task} *)
 (* ************************************************************************* *)

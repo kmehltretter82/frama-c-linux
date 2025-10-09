@@ -509,6 +509,7 @@ struct
   (** {3 Filepath} *)
   (* ************************************************************************ *)
 
+  (* Deprecated module, Use [Fclib.Filepath] instead. *)
   module Fc_Filepath = Filepath
 
   let normalize_filepath ~existence ~file_kind s =
@@ -536,7 +537,7 @@ struct
 
     include Build
         (struct
-          include Fc_Filepath
+          include Fclib.Filepath
           include X
           let default () = Filepath.empty
           let functor_name = "Filepath"
@@ -640,13 +641,13 @@ struct
        end): Parameter_sig.User_dir_opt
   =
   struct
-    open Fc_Filepath
+    open Fclib.Filepath
 
     module Dir_name =
       Filepath
         (struct
           include Info
-          let existence = Fc_Filepath.Indifferent
+          let existence = Fclib.Filepath.Indifferent
           let file_kind = ""
         end)
 
@@ -1453,13 +1454,13 @@ struct
   module Filepath_list
       (X: sig
          include Parameter_sig.Input_with_arg
-         val existence: Fc_Filepath.existence
+         val existence: Fclib.Filepath.existence
          val file_kind: string
        end) =
     Make_list
       (struct
-        include Fc_Filepath
-        let to_string s = Fc_Filepath.to_string_abs s
+        include Fclib.Filepath
+        let to_string s = Fclib.Filepath.to_string_abs s
 
         let of_string s =
           [ normalize_filepath ~existence:X.existence ~file_kind:X.file_kind s ]
@@ -1618,22 +1619,22 @@ struct
       (V: Parameter_sig.Value_datatype)
       (X: sig
          include Parameter_sig.Input_with_arg
-         val existence: Fc_Filepath.existence
-         val default: V.t Fc_Filepath.Map.t
+         val existence: Fclib.Filepath.existence
+         val default: V.t Fclib.Filepath.Map.t
        end) =
     Make_map
       (struct
-        include Fc_Filepath
+        include Fclib.Filepath
         let of_string s =
           try
-            [ Fc_Filepath.of_string ~existence:X.existence s ]
+            [ Fclib.Filepath.of_string ~existence:X.existence s ]
           with
-          | Fc_Filepath.No_file ->
+          | Fclib.Filepath.No_file ->
             P.L.abort "file '%s' not found" s
-          | Fc_Filepath.File_exists ->
+          | Fclib.Filepath.File_exists ->
             P.L.abort "file '%s' already exists" s
-        let to_string p = Fc_Filepath.to_string_rel p
-        let pretty = Fc_Filepath.pretty_rel
+        let to_string p = Fclib.Filepath.to_string_rel p
+        let pretty = Fclib.Filepath.pretty_rel
       end)
       (V)
       (struct include X let dependencies = [] end)

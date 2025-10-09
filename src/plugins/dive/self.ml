@@ -20,7 +20,7 @@ module OutputDot = Filepath
       let option_name = "-dive-output-dot"
       let arg_name = "output.dot"
       let file_kind = "DOT"
-      let existence = Fc_Filepath.Indifferent
+      let existence = Fclib.Filepath.Indifferent
       let help = "Outputs the built graph in DOT format to the specified file."
     end)
 
@@ -29,7 +29,7 @@ module OutputJson = Filepath
       let option_name = "-dive-output-json"
       let arg_name = "output.json"
       let file_kind = "JSON"
-      let existence = Fc_Filepath.Indifferent
+      let existence = Fclib.Filepath.Indifferent
       let help = "Outputs the built graph in JSON format to the specified."
     end)
 
