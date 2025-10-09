@@ -266,6 +266,13 @@ kernel-tests:
     - ./nix/build-proxy.sh kernel-tests
   <<: *coverage
 
+crowbar-tests:
+  when: manual
+  stage: tests
+  script:
+    - ./nix/build-proxy.sh crowbar-tests
+  allow_failure: true
+
 plugins-tests:
   stage: tests
   script:
