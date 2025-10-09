@@ -1,5 +1,9 @@
 let
   sources = import ./sources.nix {};
+  # we use clang-format for linting. Be sure to keep
+  # that in sync with tools/lint/lint.ml
+  clang = pkgs.clang_19;
+  llvmPackages = pkgs.llvmPackages_19;
   ocamlOverlay = oself: osuper: {
     # External Packages
     alt-ergo = oself.callPackage ./alt-ergo.nix {};
@@ -11,14 +15,14 @@ let
     why3 = oself.callPackage ./why3.nix {
       coqPackages = pkgs.coqPackages_8_19 ;
     };
-
     # Helpers
     mk_tests = oself.callPackage ./mk_tests.nix {};
     mk_plugin = oself.callPackage ./mk_plugin.nix {};
 
     # Shells containing checkers (hdrck, ocp-indent, Frama-C for plugins)
     frama-c-checkers-shell = oself.callPackage ./frama-c-checkers-shell.nix {
-      git = pkgs.git ;
+      git = pkgs.git;
+      clang = clang;
     };
     plugin-checkers-shell = oself.callPackage ./plugin-checkers-shell.nix {
       git = pkgs.git ;
@@ -52,8 +56,8 @@ let
 
     # Internal tests
     internal-tests = oself.callPackage ./internal-tests.nix {
-      clang = pkgs.clang_18;
-      llvmPackages = pkgs.llvmPackages_18;
+      clang = clang;
+      llvmPackages = llvmPackages;
     };
 
     # Release
