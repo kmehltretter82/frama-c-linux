@@ -680,6 +680,14 @@ let shift s : state =
       VMap.of_seq @@ Stdlib.Seq.map shift_elem @@ VMap.to_seq vmap
     in
     let {graph; varmap; vmap} = s in
+    if max_idx + offset + 1 < 0 then
+      Options.fatal
+        "Cannot create more nodes. Current indices are:@\n\
+         node_counter: %d;@\n\
+         min_idx: %d;@\n\
+         max_idx: %d;@\n\
+         offset: %d."
+        !node_counter min_idx max_idx offset;
     node_counter := max_idx + offset + 1;
     let result =
       {graph = G.map_vertex shift graph;
