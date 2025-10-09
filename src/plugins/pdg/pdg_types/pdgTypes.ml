@@ -432,7 +432,7 @@ module Pdg = struct
 
   let fi_descr =
     PdgIndex.FctIndex.t_descr
-      ~ni:(Descr.str Node.descr) ~ci:Structural_descr.t_unit
+      ~ni:(Descr.str Node.datatype_descr) ~ci:Structural_descr.t_unit
 
   type def = {
     graph : G.t ;

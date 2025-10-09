@@ -199,7 +199,7 @@ module Build(H:Datatype.S_with_collections)(D:Datatype.S):
 struct
   include
     State_builder.Hashtbl(H.Hashtbl)(D)
-      (Info(struct let name = "Ast_diff." ^ D.name end))
+      (Info(struct let name = "Ast_diff." ^ D.datatype_name end))
   let pretty_data = D.pretty
 end
 

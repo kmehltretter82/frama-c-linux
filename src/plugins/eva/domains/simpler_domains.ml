@@ -92,6 +92,9 @@ type cvalue = Cvalue.V.t
 module type Simple_Cvalue = sig
   include Datatype.S
 
+  (** Domain name *)
+  val name: string
+
   (** Lattice structure. *)
 
   val top: t

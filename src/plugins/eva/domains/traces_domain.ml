@@ -332,6 +332,23 @@ type loops =
 module Loops = struct
   type t = loops
 
+  let packed_descr =
+    let open Structural_descr in
+    let r = Recursive.create () in
+    let base = [| Node.packed_descr; Graph.packed_descr |] in
+    let open_loop =
+      [| Stmt.packed_descr;
+         Node.packed_descr;
+         Graph.packed_descr;
+         Node.packed_descr;
+         Graph.packed_descr;
+         recursive_pack r |]
+    in
+    let unroll_loop = [| Stmt.packed_descr; recursive_pack r |] in
+    let loops = t_sum [| base; open_loop; unroll_loop |] in
+    Recursive.update r loops;
+    pack loops
+
   let rec is_included l1 l2 = match l1, l2 with
     | Base _, (OpenLoop _ | UnrollLoop _)
     | (OpenLoop _ | UnrollLoop _), Base _ ->
@@ -491,14 +508,17 @@ let rec join_loops ~all_edges_ever_created l1 l2 =
       | `Value l -> `Value (OpenLoop(stmt,s,last,c,g,l))
     end
 
+module VarinfoList = Datatype.List (Varinfo)
+module GraphRef = Datatype.Ref (Graph)
+module LoopStartTable = Stmt.Hashtbl.Make (Datatype.Pair (Node) (Graph))
 
 type state = { start : Node.t; current : loops;
                call_declared_function: bool;
-               globals : Cil_types.varinfo list;
-               main_formals : Cil_types.varinfo list;
+               globals : VarinfoList.t;
+               main_formals : VarinfoList.t;
                (** kind of memoization of the edges *)
-               all_edges_ever_created : Graph.t ref;
-               all_loop_start : (Node.t * Graph.t) Stmt.Hashtbl.t;
+               all_edges_ever_created : GraphRef.t;
+               all_loop_start : LoopStartTable.t;
              }
 
 let start s = s.start
@@ -508,6 +528,8 @@ let entry_formals s = s.main_formals
 
 (* Lattice structure for the abstract state above *)
 module Traces = struct
+
+  let name = "traces"
 
   (** impossible for normal values start must be bigger than current *)
   let new_empty () = { start = Node.start; current = Base (Node.start, Graph.empty);
@@ -524,18 +546,27 @@ module Traces = struct
       include Datatype.Serializable_undefined
 
       type t = state
-      let name = "traces"
+      let name = "Eva.Traces_domain.Traces"
 
       let reprs = [empty]
 
-      let structural_descr = Structural_descr.t_record
-          [| Descr.pack Datatype.Int.descr;
-             Descr.pack Datatype.Int.descr;
-             Descr.pack Graph.descr;
-             Descr.pack Datatype.Bool.descr;
-             Structural_descr.pack Structural_descr.t_abstract;
-             Structural_descr.pack Structural_descr.t_abstract;
-          |]
+      let structural_descr =
+        let start = Node.packed_descr in
+        let current = Loops.packed_descr in
+        let call_declared_function = Datatype.Bool.packed_descr in
+        let globals = VarinfoList.packed_descr in
+        let main_formals = VarinfoList.packed_descr in
+        let all_edges_ever_created = GraphRef.packed_descr in
+        let all_loop_start = LoopStartTable.packed_descr in
+        Structural_descr.t_record [|
+          start;
+          current;
+          call_declared_function;
+          globals;
+          main_formals;
+          all_edges_ever_created;
+          all_loop_start;
+        |]
 
       let compare m1 m2 =
         let c = Node.compare m1.start m2.start in

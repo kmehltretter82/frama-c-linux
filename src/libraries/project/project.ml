@@ -568,7 +568,7 @@ module Descr = struct
              Before_load.apply p;
              Descr.t_list tbl_on_disk)
       in
-      Descr.dependent_pair descr unmarshal_states
+      Descr.dependent_pair datatype_descr unmarshal_states
     in
     let final_one_state =
       Descr.transform
@@ -587,7 +587,7 @@ module Descr = struct
     in
     Descr.t_pair
       (Descr.t_list final_one_state)
-      (Descr.t_option D.descr) (* the last saved project *)
+      (Descr.t_option D.datatype_descr) (* the last saved project *)
 
   let input_val = Descr.input_val
 

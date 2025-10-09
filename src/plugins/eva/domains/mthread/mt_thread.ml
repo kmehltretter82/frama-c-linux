@@ -19,7 +19,6 @@ let return_lval thread =
 module Thread =
 struct
   include Thread
-  let name = "Mt_thread.Thread"
   let key_name = "thread"
   let of_value x =
     let open Result.Operators in

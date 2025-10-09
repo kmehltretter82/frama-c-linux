@@ -100,26 +100,6 @@ type thread_state = {
 module ThreadState = struct
   type t = thread_state
 
-(*
-  open Unmarshal
-
-  let help =
-    let l = t_list Locations.Location_Bytes.Datatype.descr in
-    let rec descr = Structure (Sum [|
-      [| Id.descr;
-         Structure (Sum [| [| descr|] |]);
-         Kernel_function.Datatype.descr;
-         Stack.descr;
-         Relations_type.Model.Datatype.descr;
-         l;
-         Trace.descr;
-         t_bool;
-         MapVarAccesses.Datatype.descr;
-         CfgNode.descr
-      |]  |]) in
-    descr
-*)
-
   let label th = Thread.label th.th_eva_thread
   let is_main th = Thread.is_main th.th_eva_thread
   let pretty fmt th = Thread.pretty fmt th.th_eva_thread

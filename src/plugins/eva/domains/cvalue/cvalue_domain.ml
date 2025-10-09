@@ -83,7 +83,7 @@ module State = struct
     struct
       include Datatype.Serializable_undefined
       type t = state
-      let name = Cvalue.Model.name ^ "+clobbered_set"
+      let name = Cvalue.Model.datatype_name ^ "+clobbered_set"
       let reprs =
         List.map (fun s -> s, Locals_scoping.bottom ()) Cvalue.Model.reprs
       let structural_descr =

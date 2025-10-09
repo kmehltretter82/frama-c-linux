@@ -11,6 +11,10 @@ open Eval
 
 module type InputDomain = sig
   include Datatype.S
+
+  (* The domain name, shown in some logs and in the GUI. *)
+  val name: string
+
   val top: t
   val join: t -> t -> t
 end

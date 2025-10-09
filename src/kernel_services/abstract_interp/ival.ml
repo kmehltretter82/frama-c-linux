@@ -742,7 +742,7 @@ include (
     (struct
       type ival = t
       type t = ival
-      let name = Int.name ^ " lattice_mod"
+      let name = "ival"
       open Structural_descr
       let structural_descr =
         t_sum
@@ -989,5 +989,3 @@ let bitwise_not ~size ~signed v =
     bitwise_signed_not v
   else
     bitwise_unsigned_not ~size v
-
-let name = "ival"

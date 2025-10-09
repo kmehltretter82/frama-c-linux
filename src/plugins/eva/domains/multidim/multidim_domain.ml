@@ -35,6 +35,8 @@ struct
   open Cvalue
   include V_Or_Uninitialized
 
+  let name = "multidim"
+
   let to_integer cvalue =
     try  Some (Ival.project_int (V.project_ival (get_v cvalue)))
     with V.Not_based_on_null | Ival.Not_Singleton_Int -> None

@@ -19,8 +19,8 @@ module Bottom : sig
   include Monad.S_with_product with type 'a t = 'a or_bottom
 
   (** Datatype constructor *)
-  module Make_Datatype (Domain: Datatype.S) :
-    Datatype.S_with_collections with type t = Domain.t or_bottom
+  module Make_Datatype (X: Datatype.S) :
+    Datatype.S_with_collections with type t = X.t or_bottom
 
   (** Bounds a semi-lattice *)
   module Bound_Lattice (Lattice: Lattice_type.Join_Semi_Lattice) : sig
@@ -82,8 +82,8 @@ module Top : sig
   include Monad.S_with_product with type 'a t = 'a or_top
 
   (** Datatype constructor *)
-  module Make_Datatype (Domain: Datatype.S) :
-    Datatype.S_with_collections with type t = Domain.t or_top
+  module Make_Datatype (X: Datatype.S) :
+    Datatype.S_with_collections with type t = X.t or_top
 
   (** Bounds a semi-lattice *)
   module Bound_Lattice (Lattice: Lattice_type.Join_Semi_Lattice) : sig
@@ -132,8 +132,8 @@ module TopBottom: sig
   val flatten : [< 'a t t] -> [> 'a t]
 
   (** Datatype constructor *)
-  module Make_Datatype (Domain: Datatype.S) :
-    Datatype.S_with_collections with type t = Domain.t or_top_bottom
+  module Make_Datatype (X: Datatype.S) :
+    Datatype.S_with_collections with type t = X.t or_top_bottom
 
   (** Operators. In presence of simultaneous `Bottom and `Top in and+ / and*,
       everything narrows down to `Bottom. Every operators is redefined to

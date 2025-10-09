@@ -1123,12 +1123,14 @@ module State = struct
       deps: Deps.t;
     }
 
+  let name = "octagon"
+
   include Datatype.Make_with_collections
       (struct
         type t = state
         include Datatype.Serializable_undefined
 
-        let name = "octagon"
+        let name = "Eva.Octagons.State"
         let structural_descr =
           Structural_descr.t_record
             [| Octagons.packed_descr;

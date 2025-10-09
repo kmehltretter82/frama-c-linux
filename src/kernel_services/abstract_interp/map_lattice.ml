@@ -109,13 +109,13 @@ module Make_Map_Lattice
 
   let join =
     let decide _ v1 v2 = Value.join v1 v2
-    and name = Printf.sprintf "Map_Lattice(%s).join" Value.name in
+    and name = Printf.sprintf "Map_Lattice(%s).join" Value.datatype_name in
     KVMap.join ~cache:(Hptmap_sig.PersistentCache name)
       ~symmetric:true ~idempotent:true ~decide
 
   let link =
     let decide _k v1 v2 = Value.link v1 v2 in
-    let name = Printf.sprintf "Map_Lattice(%s).link" Value.name in
+    let name = Printf.sprintf "Map_Lattice(%s).link" Value.datatype_name in
     KVMap.join ~cache:(Hptmap_sig.PersistentCache name)
       ~symmetric:true ~idempotent:true ~decide
 
@@ -150,7 +150,7 @@ module Make_Map_Lattice
       let r = Value.narrow v1 v2 in
       if Value.equal Value.bottom r then None else Some r
     in
-    let name = Printf.sprintf "Map_Lattice(%s).narrow" Value.name in
+    let name = Printf.sprintf "Map_Lattice(%s).narrow" Value.datatype_name in
     KVMap.inter ~cache:(Hptmap_sig.PersistentCache name)
       ~symmetric:true ~idempotent:true ~decide
 
@@ -159,12 +159,13 @@ module Make_Map_Lattice
       let r = Value.meet v1 v2 in
       if Value.equal Value.bottom r then None else Some r
     in
-    let name = Printf.sprintf "Map_Lattice(%s).meet" Value.name in
+    let name = Printf.sprintf "Map_Lattice(%s).meet" Value.datatype_name in
     KVMap.inter ~cache:(Hptmap_sig.PersistentCache name)
       ~symmetric:true ~idempotent:true ~decide
 
   let is_included =
-    let name = Format.asprintf "Map_Lattice(%s).is_included" Value.name in
+    let name =
+      Format.asprintf "Map_Lattice(%s).is_included" Value.datatype_name in
     let decide_fst _ _ = false in
     let decide_snd _ _ = true in
     let decide_both _ v1 v2 = Value.is_included v1 v2 in
@@ -174,7 +175,8 @@ module Make_Map_Lattice
       ~decide_fast ~decide_fst ~decide_snd ~decide_both
 
   let intersects =
-    let name = Format.asprintf "Map_Lattice(%s).intersects" Value.name in
+    let name =
+      Format.asprintf "Map_Lattice(%s).intersects" Value.datatype_name in
     KVMap.symmetric_binary_predicate
       (Hptmap_sig.PersistentCache name)
       KVMap.ExistentialPredicate
@@ -183,7 +185,7 @@ module Make_Map_Lattice
       ~decide_both:(fun _ x y -> Value.intersects x y)
 
   let diff =
-    let name = Format.asprintf "Map_Lattice(%s).diff" Value.name in
+    let name = Format.asprintf "Map_Lattice(%s).diff" Value.datatype_name in
     let decide_both _key v1 v2 =
       let v = Value.diff v1 v2 in
       if Value.(equal bottom v) then None else Some v
@@ -468,7 +470,7 @@ module Make_MapSet_Lattice
        (struct
          type tt = t
          type t = tt
-         let name = KVMap.name ^ " mapset_lattice"
+         let name = KVMap.datatype_name ^ " mapset_lattice"
          let structural_descr =
            Structural_descr.t_sum
              [| [| KSet.packed_descr; Structural_descr.p_abstract |];

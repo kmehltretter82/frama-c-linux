@@ -44,7 +44,7 @@ module Make (K : Field.S) (Computation : IEEE754.Computation) = struct
 
   include Datatype.Make (struct
       type t = subset
-      let name = "Field.Interval(" ^ K.name ^ ")"
+      let name = "Field.Interval(" ^ K.datatype_name ^ ")"
       let reprs = [ zero ; one ; top ]
       let structural_descr = structural_descr
       let mem_project = Datatype.never_any_project

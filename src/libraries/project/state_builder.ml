@@ -218,12 +218,12 @@ struct
     let v = find src in
     if Datatype.copy == FCDatatype.undefined then
       abort "cannot copy project: unimplemented `copy' function in datatype \
-             `%s' for state `%s'" Datatype.name !internal_name;
+             `%s' for state `%s'" Datatype.datatype_name !internal_name;
     change ~force:false dst { v with state = Datatype.copy v.state }
 
   (* ******* TOUCH THE FOLLOWING AT YOUR OWN RISK: DANGEROUS CODE ******** *)
 
-  let must_save = ref (not (Descr.is_unmarshable Datatype.descr))
+  let must_save = ref (not (Descr.is_unmarshable Datatype.datatype_descr))
 
   let marshal : (Datatype.t -> Obj.t) ref = ref Obj.repr
   let unmarshal : (Obj.t -> Datatype.t) ref = ref Obj.obj
@@ -279,7 +279,9 @@ struct
 
   let self =
     let descr =
-      if !must_save then Descr.pack Datatype.descr else Structural_descr.p_unit
+      if !must_save
+      then Descr.pack Datatype.datatype_descr
+      else Structural_descr.p_unit
     in
     State.create
       (* we will marshal the value [()] if the state is unmarshable *)
@@ -815,7 +817,7 @@ module SharedCounter(Info : sig val name : string end) = struct
     Register
       (struct
         include Datatype.Int
-        let descr =
+        let datatype_descr =
           Descr.transform
             Descr.t_int
             (fun n ->
@@ -852,7 +854,7 @@ module Counter(Info : sig val name : string end) = struct
     Register
       (struct
         include Datatype.Ref(Datatype.Int)
-        let descr =
+        let datatype_descr =
           Descr.transform
             (Descr.t_ref Descr.t_int)
             (fun n ->
@@ -1050,7 +1052,7 @@ module Hashcons
   module D = Datatype.Make_with_collections (struct
       include Datatype.Serializable_undefined
       type t = hashconsed
-      let name = "Hashconsed(" ^ Data.name ^ "," ^ Info.name ^ ")"
+      let name = "Hashconsed(" ^ Data.datatype_name ^ "," ^ Info.name ^ ")"
 
       let reprs = [ { key = List.hd Data.reprs; id = 0 } ]
 
@@ -1090,7 +1092,7 @@ module Hashcons
           List.map unsafe_hashcons uniq_values
       end)
       (struct
-        let name = "Hashconstable(" ^ Data.name ^ "," ^ Info.name ^ ")"
+        let name = "Hashconstable(" ^ Data.datatype_name ^ "," ^ Info.name ^ ")"
         let dependencies = Info.dependencies
         let size = 128
       end)

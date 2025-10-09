@@ -12,19 +12,15 @@
 open Cil_types
 open Eval
 
-module type InputDomain = sig
-  (** The [name] value from Datatype should be the domain name and will be used
-      in some logs and in the GUI for the end-user. *)
-  include Datatype.S
-  val top: t
-  val join: t -> t -> t
-end
+module type InputDomain = Domain_store.InputDomain
 
 (** Part of an abstract domain signature automatically built by the
     {!Complete} functor. These functions can be redefined to achieve
     better precision or performance. See {!Abstract_domain} for more details. *)
 module type LeafDomain = sig
   type t
+
+  val name: string
 
   type context = unit
   val context_dependencies: context Abstract_context.dependencies

@@ -493,7 +493,8 @@ module Make(Ord: Datatype.S)(Value: Value) = struct
   include Datatype.Make
       (struct
         type t = rangemap
-        let name = "(" ^ Ord.name ^ ", " ^ Value.name ^ ") rangemap"
+        let name =
+          "(" ^ Ord.datatype_name ^ ", " ^ Value.datatype_name ^ ") rangemap"
         open Structural_descr
         let r = Recursive.create ()
         let structural_descr =

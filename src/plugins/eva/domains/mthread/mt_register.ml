@@ -36,7 +36,7 @@ module Make (Key : Key_sig) (Status : Status_sig) = struct
     let dependencies = [ Ast.self ]
   end
   include Hptmap.Make (Key) (Status) (Info)
-  let cache_name s = Hptmap_sig.PersistentCache (name ^ "." ^ s)
+  let cache_name s = Hptmap_sig.PersistentCache (datatype_name ^ "." ^ s)
   let find key map = try Some (find key map) with Not_found -> None
 
   type status = Status.t

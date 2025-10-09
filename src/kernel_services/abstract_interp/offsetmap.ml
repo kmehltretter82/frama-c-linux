@@ -204,7 +204,7 @@ module Make
       module D = Datatype.Make
           (struct
             type t = V.t offsetmap
-            let name = Printf.sprintf "Offsetmap(%s)" V.name
+            let name = Printf.sprintf "Offsetmap(%s)" V.datatype_name
             let reprs = [ Empty ]
             open Structural_descr
             let r = Recursive.create ()
@@ -276,7 +276,7 @@ module Make
             let initial_values = []
           end)
           (struct
-            let name = name
+            let name = datatype_name
             let dependencies = [ Ast.self ]
             let size = 137
           end)
@@ -303,8 +303,9 @@ module Make
         let hashed_node = NewoHashconsTbl.merge tentative_new_node in
         if hashed_node == tentative_new_node
         then begin
-          if current_counter = max_int
-          then Kernel.fatal "Offsetmap(%s): internal maximum exceeded" V.name;
+          if current_counter = max_int then
+            Kernel.fatal "Offsetmap(%s): internal maximum exceeded"
+              V.datatype_name;
           counter := Stdlib.succ current_counter;
         end;
         hashed_node

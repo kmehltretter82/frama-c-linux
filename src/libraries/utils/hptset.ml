@@ -126,7 +126,7 @@ module Make
   let find x s = find_key x s
 
   let inter =
-    let name = Format.sprintf "Hptset(%s).inter" X.name in
+    let name = Format.sprintf "Hptset(%s).inter" X.datatype_name in
     inter
       ~cache:(Hptmap_sig.PersistentCache name)
       ~symmetric:true
@@ -145,7 +145,7 @@ module Make
     i1
 
   let union =
-    let name = Format.sprintf "Hptset(%s).union" X.name in
+    let name = Format.sprintf "Hptset(%s).union" X.datatype_name in
     join ~cache:(Hptmap_sig.PersistentCache name) ~decide:(fun _ () () -> ())
       ~symmetric:true ~idempotent:true
 
@@ -156,7 +156,7 @@ module Make
   let for_all f s = for_all (fun k () -> f k) s
 
   let subset =
-    let name = Format.sprintf "Hptset(%s).subset" X.name in
+    let name = Format.sprintf "Hptset(%s).subset" X.datatype_name in
     binary_predicate (Hptmap_sig.PersistentCache name) UniversalPredicate
       ~decide_fast:decide_fast_inclusion
       ~decide_fst:(fun _ () -> false)
@@ -171,7 +171,7 @@ module Make
         ~pre:"@[<hov 1>{" ~sep:",@ " ~suf:"}@]" iter X.pretty
 
   let intersects =
-    let name = Format.asprintf "Hptset(%s).intersects" X.name in
+    let name = Format.asprintf "Hptset(%s).intersects" X.datatype_name in
     symmetric_binary_predicate
       (Hptmap_sig.PersistentCache name)
       ExistentialPredicate
@@ -197,7 +197,7 @@ module Make
       ~decide_both ~decide_left ~decide_right
 
   let diff =
-    let name = Format.sprintf "Hptset(%s).diff" X.name in
+    let name = Format.sprintf "Hptset(%s).diff" X.datatype_name in
     merge
       ~cache:(Hptmap_sig.PersistentCache name)
       ~symmetric:false
