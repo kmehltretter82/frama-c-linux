@@ -42,7 +42,11 @@
       padding-top: 5px;
 
       .dome-xSideBarSection {
-
+        &:has(.dome-xForm-label.field-is-set){
+          .dome-xSideBarSection-title label {
+            color: var(--primary-button-color)
+          }
+        }
         &:has(> .dome-xSideBarSection-content .options-field-modified) {
           .dome-xSideBarSection-title label {
             color: var(--warning)
@@ -54,12 +58,13 @@
         }
       }
 
-      .dome-xForm-field-block:has(> .dome-xForm-field .options-field-modified) {
+      .dome-xForm-field-block:has(> .dome-xForm-field .options-field-modified),
+      .dome-xForm-field-block:has(.dome-xForm-label.options-field-modified) {
         box-shadow: -4px 0px 4px var(--warning);
       }
 
     }
   }
 
-  label.field-is-set { color: var(--primary-button-active) }
+  label.field-is-set { color: var(--primary-button-color) }
 }

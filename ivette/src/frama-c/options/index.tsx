@@ -17,15 +17,20 @@ import { GlobalState } from 'dome/data/states';
 import * as Server from 'frama-c/server';
 import * as Params from 'frama-c/kernel/api/parameters';
 
-import { OptionsForms, SectionParams, useRemotes } from './forms';
+import { OptionsForms, useRemotes } from './forms';
 import { OptionsSidebar } from './sidebar';
 import './style.css';
+import { DEVEL } from 'dome/system';
 
 // --------------------------------------------------------------------------
 // --------------------------------------------------------------------------
 
+/** left and right form selected => [left, right] */
 export type SelectedPlugins = [string, string];
+/** recording of elements modified by the user */
 export type IsSetElement = Record<string, boolean>;
+/** Parameters by section */
+export type SectionParams = [string, Params.parameter[]];
 
 interface PContext {
   params: Record<string, SectionParams[]>;
@@ -54,13 +59,12 @@ export function usePluginsContextById(id: string): PContextById {
 // --- Options
 // --------------------------------------------------------------------------
 
-/** left and right form selected */
-const defaultSelected: SelectedPlugins = ['kernel', 'Eva'];
+const defaultSelected: SelectedPlugins = ['kernel', ''];
 
-/** number of forms modified */
+/** Number of forms modified */
 export const countFormsModified = new GlobalState<number>(0);
 
-export default function Options(): React.JSX.Element {
+export default function Options(): React.JSX.Element | null {
   /** Remotes */
   const remotesState = useRemotes();
   const [remotes,] = remotesState;
@@ -79,12 +83,12 @@ export default function Options(): React.JSX.Element {
     else Server.onReady(fetchPlugins);
   }, []);
 
-  /** List of plugins set, true if plugin contain field set by the user */
+  /** List of plugins set, true if plugin contains a field set by the user */
   const [isSetElement, setIsSetElement] = React.useState<IsSetElement>({});
   const addPluginsSet = React.useCallback((value: IsSetElement) => {
     setIsSetElement(prev => ({ ...prev, ...value })); }, [setIsSetElement]);
 
-  /** Plugins parameters */
+  /** Set of parameters (grouped by section) for each plugin name */
   const [params, setParams] =
     React.useState<Record<string, SectionParams[]>>({});
   React.useEffect(() => {
@@ -97,17 +101,19 @@ export default function Options(): React.JSX.Element {
         const sortedParams = params.sort((a, b) => alpha(a[0], b[0]));
         setParams(v => ({ ...v, [id]: sortedParams }));
       } catch (err) {
-        // eslint-disable-next-line no-console
-        console.warn("Error :", id, err);
+        if(DEVEL) {
+          // eslint-disable-next-line no-console
+          console.warn("Error :", id, err);
+        }
       }
     };
     plugins.map(p => fetchParams(p.name));
   }, [plugins, addPluginsSet]);
 
-  return (<>
-  { Object.keys(params).length === plugins.length
-    && Object.keys(params).length > 0
-    && <PLUGINSCONTEXT.Provider value={{ params, isSetElement, addPluginsSet }}>
+  if(Object.keys(params).length !== plugins.length
+    || Object.keys(params).length <= 0) return null;
+  return (
+    <PLUGINSCONTEXT.Provider value={{ params, isSetElement, addPluginsSet }}>
       <div className='framac-options'>
         <LSplit settings="frama-c.options" unfold={true}>
           <OptionsSidebar
@@ -117,15 +123,13 @@ export default function Options(): React.JSX.Element {
             isSetElement={isSetElement}
           />
           <OptionsForms
-            plugins={plugins}
             selectedState={selectedState}
             remotesState={remotesState}
             />
         </LSplit>
       </div>
     </PLUGINSCONTEXT.Provider>
-  }
-  </>);
+  );
 }
 
 /* -------------------------------------------------------------------------- */
@@ -140,9 +144,8 @@ async function onClose(): Promise<boolean> {
       { label: 'Cancel' },
       { label: 'Ok', value: true }
     ],
-    message: 'This modal will be close',
-    details: 'If you do not apply your local changes, you will lose them.\n'
-    +'Confirm that you want to close or cancel.'
+    message: 'Close Frama-C parameters?',
+    details: 'Any parameter changes that have not been applied will be lost.'
   });
   return !!confirm;
 }
@@ -160,6 +163,6 @@ export function ButtonOptions(): React.JSX.Element {
   return <Toolbar.Button
     icon='SETTINGS'
     onClick={showOptionsModal}
-    title='Open parameters'
+    title='Open Frama-C parameters'
   />;
 }

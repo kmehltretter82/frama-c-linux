@@ -27,9 +27,7 @@ interface SideBarItemProps {
   selected: SelectedPlugins;
   isSet: boolean;
   remote: Forms.BufferController;
-  onSelection: (
-    e: React.MouseEvent<Element, MouseEvent>,
-    p: Params.plugin) => void
+  onSelection: (e: React.MouseEvent<Element, MouseEvent>) => void
 }
 
 function SidebarItem(props: SideBarItemProps): React.JSX.Element {
@@ -43,17 +41,20 @@ function SidebarItem(props: SideBarItemProps): React.JSX.Element {
     else countFormsModified.setValue(current - 1);
   }, [isModified]);
 
-  return <Item key={plugin.name}
+  return (
+    <Item
+      key={plugin.name}
       title={plugin.help}
       label={plugin.name}
       selected={selected[0] === plugin.name || selected[1] === plugin.name}
-      onSelection={(e) => onSelection(e, plugin)}
+      onSelection={(e) => onSelection(e)}
     >
       {isModified && <LED status='warning' title='Pending modification'/>}
       {isSet && <LED status='active' title='Modified fields'/>}
       {selected[0] === plugin.name && '(left)'}
       {selected[1] === plugin.name && '(right)'}
-    </Item>;
+    </Item>
+  );
 }
 
 interface SideBarProps {
@@ -97,7 +98,7 @@ export function OptionsSidebar(props: SideBarProps): React.JSX.Element {
       { plugins.map(p => <SidebarItem key={p.name}
           plugin={p}
           isSet={isSetElement[p.name]}
-          onSelection={onSelection}
+          onSelection={(e: React.MouseEvent) => onSelection(e, p)}
           selected={selected}
           remote={remotes[p.name]} />
         )

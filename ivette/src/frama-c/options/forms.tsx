@@ -15,7 +15,7 @@ import { Section, SidebarTitle } from 'dome/frame/sidebars';
 import { LSplit } from 'dome/layout/splitters';
 import { classes } from 'dome/misc/utils';
 import { Vfill } from 'dome/layout/boxes';
-import { LED } from 'dome/controls/displays';
+import { DEVEL } from 'dome/system';
 
 import * as Server from 'frama-c/server';
 import * as Params from 'frama-c/kernel/api/parameters';
@@ -68,9 +68,9 @@ function useField<A>(
   return Forms.useBuffer(remote, sField);
 }
 
-function useIsSet(
+function useIsSet<A>(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  formId: string, sectionId: string, id: string, stateFC: State<any>
+  formId: string, sectionId: string, id: string, stateFC: State<A>
 ): boolean {
   const { isSetElement, addPluginsSet } = usePluginsContextById(id);
   const state = useSyncValue(stateFC);
@@ -84,8 +84,10 @@ function useIsSet(
           [sectionId]: true,
           [id]: true });
       } catch (err) {
-        // eslint-disable-next-line no-console
-        console.warn("Error :", id, err);
+        if(DEVEL) {
+          // eslint-disable-next-line no-console
+          console.warn("Error :", id, err);
+        }
       }
     };
     fetchIsSet(id);
@@ -107,31 +109,28 @@ interface FieldProps {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function isState(s: State<any>, params: Params.parameter): boolean {
-  // eslint-disable-next-line no-console
-  if(!s) console.warn(`${params.name} : ${params.state} : ${params.type}`);
+  if(DEVEL) {
+    // eslint-disable-next-line no-console
+    if(!s) console.warn(`${params.name} : ${params.state} : ${params.type}`);
+  }
   return !!s;
 }
 
-function getActions<A>(
-  state: Forms.FieldState<A>,
-  equal?: (a: A, b: A) => boolean,
-): JSX.Element | undefined {
+function getActions<A>(state: Forms.FieldState<A>): JSX.Element | undefined {
   if(!state) return undefined;
   return (
     <Forms.Actions>
-      <Forms.ResetButton state={state} title="Reset" equal={equal} />
-      <Forms.CommitButton state={state} title="Apply" equal={equal} />
+      <Forms.ResetButton state={state} title="Reset" />
+      <Forms.CommitButton state={state} title="Apply" />
     </Forms.Actions>
   );
 }
 
 function getClasses<A>(
   state: Forms.FieldState<A>,
-  name: string,
   isSet: boolean,
 ): string | undefined {
   return classes(
-    "field"+name,
     !Forms.isStable(state) && "options-field-modified",
     isSet && 'field-is-set',
   );
@@ -142,22 +141,23 @@ function BoolField(props: FieldProps)
   const { formId, sectionId, param, remote } = props;
   const { name, help, state } = param;
   const sBool = Params[state as keyof typeof Params] as State<boolean>;
-  const isSet = useIsSet(formId, sectionId, name, sBool);
+  const isSet = useIsSet<boolean>(formId, sectionId, name, sBool);
   const vState = useField(remote, sBool, false);
 
   if(!vState || !isState(sBool, param)) return null;
-  return <Forms.Field
-      className={isSet ? 'field-is-set' : undefined}
+  return (
+    <Forms.Field
+      className={getClasses(vState, isSet)}
       label={name}
       title={help}
       actions={getActions(vState)}
-      >
-      <div className={getClasses(vState, name, isSet)} />
+    >
       <Forms.ButtonField
         label={vState.value ? "Enabled" : "disabled"}
         state={vState}
         />
-    </Forms.Field>;
+    </Forms.Field>
+  );
 }
 
 function NumberField(props: FieldProps)
@@ -165,7 +165,7 @@ function NumberField(props: FieldProps)
   const { formId, sectionId, param, remote } = props;
   const { name, help, state, range } = props.param;
   const sNumb = Params[state as keyof typeof Params] as State<number>;
-  const isSet = useIsSet(formId, sectionId, name, sNumb);
+  const isSet = useIsSet<number>(formId, sectionId, name, sNumb);
   const vState = useField(remote, sNumb, 0);
   let min = 0;
   let max = 100000;
@@ -185,7 +185,7 @@ function NumberField(props: FieldProps)
       min={min}
       max={max}
       state={vState as Forms.FieldState<number | undefined>}
-      className={getClasses(vState, name, isSet)}
+      className={getClasses(vState, isSet)}
       actions={getActions(vState)}
     />;
 }
@@ -195,7 +195,7 @@ function StringField(props: FieldProps)
   const { formId, sectionId, param, remote } = props;
   const { name, help, state } = param;
   const sStr = Params[state as keyof typeof Params] as State<string>;
-  const isSet = useIsSet(formId, sectionId, name, sStr);
+  const isSet = useIsSet<string>(formId, sectionId, name, sStr);
   const vState = useField(remote, sStr, '');
 
   if(!vState || !isState(sStr, param)) return null;
@@ -205,7 +205,7 @@ function StringField(props: FieldProps)
       title={help}
       state={vState as Forms.FieldState<string | undefined>}
       latency={100}
-      className={getClasses(vState, name, isSet)}
+      className={getClasses(vState, isSet)}
       actions={getActions(vState)}
     />;
 }
@@ -221,7 +221,6 @@ function getField(props: FieldProps)
   }
 }
 
-export type SectionParams = [string, Params.parameter[]];
 interface FormSectionProps {
   id: string;
   label: string;
@@ -232,7 +231,6 @@ interface FormSectionProps {
 function FormSection(props: FormSectionProps): React.JSX.Element {
   const { id, label, params, remote } = props;
   const sectionId = `${id}-${label}`;
-  const { isSetElement } = usePluginsContextById(id);
   const fieldsSorted = React.useMemo(() =>
     params.sort((a, b) => alpha(a.name, b.name)), [params]);
 
@@ -244,24 +242,22 @@ function FormSection(props: FormSectionProps): React.JSX.Element {
   return<Section key={sectionId}
       label={label}
       defaultUnfold={false}
-      summary={isSetElement[sectionId] ? <LED status='active'/> : undefined}
       settings={`form-section-${sectionId}-fold`}
     >{fields}</Section>;
 }
 
 interface FormProps {
   id: string;
-  style?: React.CSSProperties;
   remotesState: recordRemotesState;
 }
 
 function Form(props: FormProps): React.JSX.Element {
-  const { id, style, remotesState } = props;
+  const { id, remotesState } = props;
   const { params } = usePluginsContextById(id);
   const remote = useRemote(id, remotesState);
 
   return (
-    <Vfill style={style}>
+    <Vfill>
       <SidebarTitle label={id}><Remote remote={remote} /></SidebarTitle>
       <Forms.SidebarForm style={{ overflowY: 'auto' }}>
         { params.map(s =>
@@ -277,8 +273,7 @@ function Form(props: FormProps): React.JSX.Element {
 // --- Forms
 // --------------------------------------------------------------------------
 
-interface FormsProps {
-  plugins: Params.plugin[];
+interface OptionsFormsProps {
   selectedState: [
     SelectedPlugins,
     React.Dispatch<React.SetStateAction<SelectedPlugins>>
@@ -286,7 +281,7 @@ interface FormsProps {
   remotesState: recordRemotesState;
 }
 
-export function OptionsForms(props: FormsProps): React.JSX.Element {
+export function OptionsForms(props: OptionsFormsProps): React.JSX.Element {
   const { selectedState, remotesState } = props;
   const [ [left, right], ] = selectedState;
 
@@ -294,12 +289,25 @@ export function OptionsForms(props: FormsProps): React.JSX.Element {
     <div className='framac-options-forms'>
       <AliveScope>
         <LSplit settings="frama.c.options.forms" unfold={true}>
-          <KeepAlive cacheKey={left} saveName>
+          <KeepAlive cacheKey={left}>
             <Form id={left} remotesState={remotesState} />
           </KeepAlive>
-          <KeepAlive cacheKey={right} saveName>
-            <Form id={right} remotesState={remotesState} />
-          </KeepAlive>
+          { right === '' ?
+              <div style={{
+                width: '100%',
+                height: '100%',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                fontSize: '1.2em'
+              }}>
+                Select the form by left-clicking on it in the sidebar.
+              </div>
+            :
+              <KeepAlive cacheKey={right}>
+                <Form id={right} remotesState={remotesState} />
+              </KeepAlive>
+          }
         </LSplit>
       </AliveScope>
     </div>
