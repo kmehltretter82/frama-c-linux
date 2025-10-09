@@ -34,37 +34,6 @@ export type recordRemotesState = [
   (id: string, remote:Forms.BufferController) => void
 ];
 
-export type FieldType = boolean | string | number;
-
-interface Option<FieldType> {
-  /** Option ID */
-  id?: string;
-  /** label */
-  label: string;
-  /** description for tooltip */
-  title?: string;
-  /** option state */
-  state: Forms.FieldState<FieldType>;
-  /** default value */
-  default: FieldType;
-}
-
-export interface BoolOption extends Option<boolean> {
-  // labelButton?: {on: string, off: string};
-}
-
-export interface StringOption extends Option<string> {
-  choices?: Record<string, string>;
-  multiple?: boolean;
-}
-
-// TODO : Add float
-
- export interface NumberOption extends Option<number> {
-  min?: number;
-  max?: number;
-}
-
 export function useRemotes(): recordRemotesState {
   const [remotes, setRemotes] = React.useState<recordRemotes>({});
 
