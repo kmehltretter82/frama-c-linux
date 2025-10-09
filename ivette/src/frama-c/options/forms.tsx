@@ -198,7 +198,6 @@ function NumberField(props: FieldProps)
   const sNumb = Params[state as keyof typeof Params] as State<number>;
   const isSet = useIsSet(formId, sectionId, name, sNumb);
   const vState = useField(remote, sNumb, 0);
-
   let min = 0;
   let max = 100000;
   let step = 1;

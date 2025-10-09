@@ -315,7 +315,12 @@ export function setTitle(title: string): void {
 
 export type ModalInfos = {
   content: React.ReactNode,
-  onClose?: (callback: () => void) => void
+  /**
+   * onClose will be called before the modal is closed.
+   * The function must return false if the modal should not be closed,
+   * true otherwise.
+   */
+  onClose?: () => boolean | Promise<boolean>
 }
 export const modal = new GlobalState<ModalInfos | undefined>(undefined);
 

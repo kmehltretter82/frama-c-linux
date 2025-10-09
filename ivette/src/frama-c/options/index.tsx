@@ -132,23 +132,19 @@ export default function Options(): React.JSX.Element {
 /* --- Frama-C Options Modal                                              --- */
 /* -------------------------------------------------------------------------- */
 
-async function onClose(callback: () => void): Promise<void> {
-  if(countFormsModified.getValue() > 0) {
-    const confirm = await showMessageBox({
-        block: true,
-        buttons: [
-        { label: 'Cancel' },
-        { label: 'Ok', value: true }
-      ],
-      message: 'This modal will be close',
-      details: 'If you do not apply your local changes, you will lose them.\n'
-      +'Confirm that you want to close or cancel.'
-    });
-
-    if(confirm === true) callback();
-  } else {
-    callback();
-  }
+async function onClose(): Promise<boolean> {
+  if(countFormsModified.getValue() <= 0) return true;
+  const confirm = await showMessageBox({
+      block: true,
+      buttons: [
+      { label: 'Cancel' },
+      { label: 'Ok', value: true }
+    ],
+    message: 'This modal will be close',
+    details: 'If you do not apply your local changes, you will lose them.\n'
+    +'Confirm that you want to close or cancel.'
+  });
+  return !!confirm;
 }
 
 export function showOptionsModal(): void {

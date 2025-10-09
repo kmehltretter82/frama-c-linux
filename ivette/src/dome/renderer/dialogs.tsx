@@ -312,10 +312,16 @@ export async function showOpenDir(
 
 export const modalLoader = new GlobalState<boolean>(false);
 
-export function showModal(
+/**
+ * ShowModal defines the content of the modal.
+ * If the current modal has an onClose() function,
+ * it will be called before the update.
+ * The return value of onClose() can prevents the update from happening.
+ */
+export async function showModal(
   content: React.ReactNode,
-  onClose?: (callback: () => void) => void
-): void {
+  onClose?: () => boolean | Promise<boolean>
+): Promise<void> {
   const setModal = (): void => {
     modalLoader.setValue(false);
     modal.setValue({ content, onClose });
@@ -323,7 +329,8 @@ export function showModal(
 
   const current = modal.getValue();
   if(current !== undefined && current.onClose) {
-    current.onClose(setModal);
+    const closeModal = await current.onClose();
+    if(closeModal) setModal();
   } else setModal();
 }
 export function closeModal(): void { showModal(undefined); }
