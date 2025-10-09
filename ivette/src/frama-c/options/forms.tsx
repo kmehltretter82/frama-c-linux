@@ -326,10 +326,10 @@ export function OptionsForms(props: FormsProps): React.JSX.Element {
     <div className='framac-options-forms'>
       <AliveScope>
         <LSplit settings="frama.c.options.forms" unfold={true}>
-          <KeepAlive key={left} id={left}>
+          <KeepAlive cacheKey={left} saveName>
             <Form id={left} remotesState={remotesState} />
           </KeepAlive>
-          <KeepAlive key={right} id={right}>
+          <KeepAlive cacheKey={right} saveName>
             <Form id={right} remotesState={remotesState} />
           </KeepAlive>
         </LSplit>
