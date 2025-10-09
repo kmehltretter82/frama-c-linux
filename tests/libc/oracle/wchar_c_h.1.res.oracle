@@ -179,21 +179,39 @@
 [eva] wchar_c_h.c:54: 
   function wcsncat: precondition 'separation' got status valid.
 [eva] Done for function wcsncat
+[eva:alarm] wchar_c_h.c:57: Warning: 
+  unaligned pointer creation.
+  assert \aligned((char const *)"",alignof(wchar_t const));
 [eva] wchar_c_h.c:57: Call to builtin wcslen
 [eva:alarm] wchar_c_h.c:57: Warning: 
   function wcslen: precondition 'valid_string_s' got status invalid.
+[eva:alarm] wchar_c_h.c:58: Warning: 
+  unaligned pointer creation.
+  assert \aligned((char const *)"A",alignof(wchar_t const));
 [eva] wchar_c_h.c:58: Call to builtin wcslen
 [eva:alarm] wchar_c_h.c:58: Warning: 
   function wcslen: precondition 'valid_string_s' got status invalid.
+[eva:alarm] wchar_c_h.c:59: Warning: 
+  unaligned pointer creation.
+  assert \aligned((char const *)"ABCD",alignof(wchar_t const));
 [eva] wchar_c_h.c:59: Call to builtin wcslen
 [eva:alarm] wchar_c_h.c:59: Warning: 
   function wcslen: precondition 'valid_string_s' got status invalid.
+[eva:alarm] wchar_c_h.c:61: Warning: 
+  unaligned pointer creation.
+  assert \aligned((char const *)"",alignof(wchar_t const));
 [eva] wchar_c_h.c:61: Call to builtin wcschr
 [eva:alarm] wchar_c_h.c:61: Warning: 
   function wcschr: precondition 'valid_wstring_src' got status invalid.
+[eva:alarm] wchar_c_h.c:62: Warning: 
+  unaligned pointer creation.
+  assert \aligned((char const *)"A",alignof(wchar_t const));
 [eva] wchar_c_h.c:62: Call to builtin wcschr
 [eva:alarm] wchar_c_h.c:62: Warning: 
   function wcschr: precondition 'valid_wstring_src' got status invalid.
+[eva:alarm] wchar_c_h.c:63: Warning: 
+  unaligned pointer creation.
+  assert \aligned((char const *)"ABCD",alignof(wchar_t const));
 [eva] wchar_c_h.c:63: Call to builtin wcschr
 [eva:alarm] wchar_c_h.c:63: Warning: 
   function wcschr: precondition 'valid_wstring_src' got status invalid.

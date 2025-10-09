@@ -45,19 +45,29 @@
 [eva:alarm] search_h.c:35: Warning: 
   pointer comparison. assert \pointer_comparable(node, (void *)0);
 [eva:alarm] search_h.c:40: Warning: 
+  unaligned pointer creation. assert \aligned(node,alignof(struct element *));
+[eva:alarm] search_h.c:40: Warning: 
   accessing uninitialized left-value.
   assert \initialized((struct element **)node);
 [eva:alarm] search_h.c:40: Warning: 
   out of bounds read. assert \valid_read((struct element **)node);
+[eva:alarm] search_h.c:40: Warning: 
+  unaligned pointer creation.
+  assert \aligned(*((struct element **)node),alignof(struct element));
 [eva:alarm] search_h.c:40: Warning: 
   pointer comparison.
   assert
   \pointer_comparable((void *)*((struct element **)node), (void *)elementptr);
 [eva:alarm] search_h.c:42: Warning: 
+  unaligned pointer creation. assert \aligned(node,alignof(struct element *));
+[eva:alarm] search_h.c:42: Warning: 
   accessing uninitialized left-value.
   assert \initialized((struct element **)node);
 [eva:alarm] search_h.c:42: Warning: 
   out of bounds read. assert \valid_read((struct element **)node);
+[eva:alarm] search_h.c:42: Warning: 
+  unaligned pointer creation.
+  assert \aligned(*((struct element **)node),alignof(struct element));
 [eva:alarm] search_h.c:42: Warning: 
   out of bounds write. assert \valid(&(*((struct element **)node))->count);
 [eva] search_h.c:42: Warning: 
@@ -82,7 +92,7 @@
     search_h.c:34: assigns clause on addresses
       (read in 2 statements, propagated through 1 statement)
       garbled mix of &{__malloc_main_l30}
-[scope:rm_asserts] removing 2 assertion(s)
+[scope:rm_asserts] removing 4 assertion(s)
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   __fc_heap_status ∈ [--..--]

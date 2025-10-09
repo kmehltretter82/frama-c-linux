@@ -5,6 +5,8 @@
 [eva:alarm] sum_with_unspecified_sequence.c:14: Warning: 
   out of bounds read. assert \valid_read(list);
 [eva:alarm] sum_with_unspecified_sequence.c:14: Warning: 
+  unaligned pointer creation. assert \aligned(*list,alignof(int));
+[eva:alarm] sum_with_unspecified_sequence.c:14: Warning: 
   out of bounds read. assert \valid_read((int *)*list);
 [eva:alarm] sum_with_unspecified_sequence.c:14: Warning: 
   signed overflow.
@@ -16,6 +18,8 @@
   (tmp_unfold_5 from vararg)
 [eva:alarm] sum_with_unspecified_sequence.c:14: Warning: 
   out of bounds read. assert \valid_read(list);
+[eva:alarm] sum_with_unspecified_sequence.c:14: Warning: 
+  unaligned pointer creation. assert \aligned(*list,alignof(int));
 [eva:alarm] sum_with_unspecified_sequence.c:14: Warning: 
   out of bounds read. assert \valid_read((int *)*list);
 [eva:alarm] sum_with_unspecified_sequence.c:14: Warning: 
@@ -48,6 +52,7 @@ int sum(int n, void * const *__va_params)
   {
     int tmp_unfold_5;
     /*@ assert Eva: mem_access: \valid_read(list); */
+    /*@ assert Eva: pointer_alignment: \aligned(*list,alignof(int)); */
     /*@ assert Eva: mem_access: \valid_read((int *)*list); */
     tmp_unfold_5 = *((int *)*list);
     list ++;
@@ -62,6 +67,7 @@ int sum(int n, void * const *__va_params)
     {
       int tmp;
       /*@ assert Eva: mem_access: \valid_read(list); */
+      /*@ assert Eva: pointer_alignment: \aligned(*list,alignof(int)); */
       /*@ assert Eva: mem_access: \valid_read((int *)*list); */
       tmp = *((int *)*list);
       list ++;
