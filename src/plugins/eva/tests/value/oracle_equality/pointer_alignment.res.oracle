@@ -1,0 +1,26 @@
+39,40d38
+< [eva:alarm] pointer_alignment.c:76: Warning: 
+<   unaligned pointer creation. assert \aligned(any_mod2,alignof(int));
+43,46d40
+< [eva:alarm] pointer_alignment.c:80: Warning: 
+<   unaligned pointer creation. assert \aligned(any_mod2,alignof(long));
+< [eva:alarm] pointer_alignment.c:82: Warning: 
+<   unaligned pointer creation. assert \aligned(any_mod4,alignof(long));
+266,267c260,261
+<   i_ptr ∈ [0..196],0%4
+<   l_ptr ∈ [0..392],0%8
+---
+>   i_ptr ∈ [0..192],0%8
+>   l_ptr ∈ [0..384],0%32
+269,270c263,264
+<   any_mod2 ∈ [0..192],0%8
+<   any_mod4 ∈ [0..392],0%8
+---
+>   any_mod2 ∈ [0..192],0%16
+>   any_mod4 ∈ [0..384],0%32
+275,276c269,270
+<   i_ptr ∈ [0..196],0%4
+<   l_ptr ∈ [0..392],0%8
+---
+>   i_ptr ∈ [0..192],0%8
+>   l_ptr ∈ [0..384],0%32
