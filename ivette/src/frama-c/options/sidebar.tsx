@@ -34,12 +34,16 @@ function SidebarItem(props: SideBarItemProps): React.JSX.Element {
   const { plugin, selected, isSet, remote, onSelection } = props;
   const controller = Forms.useController(remote);
   const isModified = controller.hasReset() || controller.hasCommit();
+  const init = React.useRef(true);
 
   React.useEffect(() => {
-    const current = countFormsModified.getValue();
-    if(isModified) countFormsModified.setValue(current + 1);
-    else countFormsModified.setValue(current - 1);
-  }, [isModified]);
+    if(init.current) init.current = false;
+    else {
+      const current = countFormsModified.getValue();
+      if(isModified) countFormsModified.setValue(current + 1);
+      else countFormsModified.setValue(current - 1);
+    }
+  }, [isModified, init]);
 
   return (
     <Item
@@ -70,10 +74,7 @@ interface SideBarProps {
 export function OptionsSidebar(props: SideBarProps): React.JSX.Element {
   const { selectedState, isSetElement, plugins, remotes } = props;
   const [selected, setSelected] = selectedState;
-
-  React.useEffect(() => {
-    countFormsModified.setValue(countFormsModified.getValue()+plugins.length);
-  }, [plugins.length]);
+  countFormsModified.setValue(0);
 
   const onSelection = React.useCallback(
     (e: React.MouseEvent, p: Params.plugin) => {
