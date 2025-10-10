@@ -7,6 +7,9 @@
 #                                                                        #
 ##########################################################################
 
+# Example of installation of this pre-push hook (client side):
+# - (cd .git/hooks/ && ln -s ../../dev/git-hooks/pre-push.sh pre-push)
+
 ROOT=$(git rev-parse --show-toplevel)
 
 echo "Pre-push Hook..."
