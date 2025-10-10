@@ -16,6 +16,7 @@ let dkey = Senv.dkey_protocol
 
 let socket_group = Senv.add_group "Sockets"
 
+let () = Parameter_customize.is_not_reconfigurable ()
 let () = Parameter_customize.set_group socket_group
 module Socket = Senv.String
     (struct
