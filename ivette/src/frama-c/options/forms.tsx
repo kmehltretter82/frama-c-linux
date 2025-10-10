@@ -15,7 +15,7 @@ import { Section, SidebarTitle } from 'dome/frame/sidebars';
 import { LSplit } from 'dome/layout/splitters';
 import { classes } from 'dome/misc/utils';
 import { Vfill } from 'dome/layout/boxes';
-import { DEVEL } from 'dome/system';
+import { Debug } from 'dome/system';
 
 import * as Server from 'frama-c/server';
 import * as Params from 'frama-c/kernel/api/parameters';
@@ -24,6 +24,7 @@ import { SelectedPlugins, usePluginsContextById } from '.';
 import { State, useServerField, useSyncValue } from '../states';
 import { Remote } from './actions';
 
+const D = new Debug('OptionsForms');
 
 // --------------------------------------------------------------------------
 // --------------------------------------------------------------------------
@@ -84,10 +85,7 @@ function useIsSet<A>(
           [sectionId]: true,
           [id]: true });
       } catch (err) {
-        if(DEVEL) {
-          // eslint-disable-next-line no-console
-          console.warn("Error :", id, err);
-        }
+        D.warn("Error on isSetParameter: ", id, err);
       }
     };
     fetchIsSet(id);
@@ -107,12 +105,8 @@ interface FieldProps {
   remote: Forms.BufferController,
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function isState(s: State<any>, params: Params.parameter): boolean {
-  if(DEVEL) {
-    // eslint-disable-next-line no-console
-    if(!s) console.warn(`${params.name} : ${params.state} : ${params.type}`);
-  }
+function isState<A>(s: State<A>, params: Params.parameter): boolean {
+  if(!s) D.warn(`${params.name} : ${params.state} : ${params.type}`);
   return !!s;
 }
 
@@ -144,7 +138,7 @@ function BoolField(props: FieldProps)
   const isSet = useIsSet<boolean>(formId, sectionId, name, sBool);
   const vState = useField(remote, sBool, false);
 
-  if(!vState || !isState(sBool, param)) return null;
+  if(!vState || !isState<boolean>(sBool, param)) return null;
   return (
     <Forms.Field
       className={getClasses(vState, isSet)}
@@ -167,10 +161,13 @@ function NumberField(props: FieldProps)
   const sNumb = Params[state as keyof typeof Params] as State<number>;
   const isSet = useIsSet<number>(formId, sectionId, name, sNumb);
   const vState = useField(remote, sNumb, 0);
+
+  if(!vState || !isState<number>(sNumb, param)) return null;
+
+  /* Arbitrary limits which should always be overwritten by the range below. */
   let min = 0;
   let max = 100000;
   let step = 1;
-  if(!vState || !isState(sNumb, param)) return null;
   if(range && range.length === 2
     && typeof range[0] === "number" && typeof range[1] === "number") {
     min = range[0];
@@ -198,7 +195,7 @@ function StringField(props: FieldProps)
   const isSet = useIsSet<string>(formId, sectionId, name, sStr);
   const vState = useField(remote, sStr, '');
 
-  if(!vState || !isState(sStr, param)) return null;
+  if(!vState || !isState<string>(sStr, param)) return null;
   return <Forms.TextField
       label={name}
       placeholder='value'

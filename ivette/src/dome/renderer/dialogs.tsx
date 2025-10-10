@@ -322,16 +322,11 @@ export async function showModal(
   content: React.ReactNode,
   onClose?: () => boolean | Promise<boolean>
 ): Promise<void> {
-  const setModal = (): void => {
+  const current = modal.getValue();
+  if (current === undefined || !current.onClose || await current.onClose()) {
     modalLoader.setValue(false);
     modal.setValue({ content, onClose });
-  };
-
-  const current = modal.getValue();
-  if(current !== undefined && current.onClose) {
-    const closeModal = await current.onClose();
-    if(closeModal) setModal();
-  } else setModal();
+  }
 }
 export function closeModal(): void { showModal(undefined); }
 

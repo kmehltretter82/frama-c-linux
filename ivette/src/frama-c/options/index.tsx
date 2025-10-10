@@ -20,7 +20,9 @@ import * as Params from 'frama-c/kernel/api/parameters';
 import { OptionsForms, useRemotes } from './forms';
 import { OptionsSidebar } from './sidebar';
 import './style.css';
-import { DEVEL } from 'dome/system';
+import { Debug } from 'dome/system';
+
+const D = new Debug('Options');
 
 // --------------------------------------------------------------------------
 // --------------------------------------------------------------------------
@@ -101,17 +103,15 @@ export default function Options(): React.JSX.Element | null {
         const sortedParams = params.sort((a, b) => alpha(a[0], b[0]));
         setParams(v => ({ ...v, [id]: sortedParams }));
       } catch (err) {
-        if(DEVEL) {
-          // eslint-disable-next-line no-console
-          console.warn("Error :", id, err);
-        }
+        D.warn("Error on getPluginParameters: ", id, err);
       }
     };
     plugins.map(p => fetchParams(p.name));
   }, [plugins, addPluginsSet]);
 
-  if(Object.keys(params).length !== plugins.length
-    || Object.keys(params).length <= 0) return null;
+  const paramsNb = Object.keys(params).length;
+  if (paramsNb !== plugins.length || paramsNb <= 0) return null;
+
   return (
     <PLUGINSCONTEXT.Provider value={{ params, isSetElement, addPluginsSet }}>
       <div className='framac-options'>
