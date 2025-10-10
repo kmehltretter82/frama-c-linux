@@ -20,11 +20,7 @@ int main(void) {
     /* The two array fields written directly are necessarily private. */
     /*@ assert security_status(arr[1]) == private; */
     /*@ assert security_status(arr[2]) == private; */
-
-    /* However, field [0], which is written with a public value in a public
-     * context, is also treated as private because of the private array
-     * summary. */
-    /*@ assert security_status(arr[0]) == private; */
+    /*@ assert security_status(arr[0]) == public; */
 
     return 0;
 }
