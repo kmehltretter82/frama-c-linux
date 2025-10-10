@@ -60,7 +60,7 @@ val verify_assigns:
 
 
 (** [accept_base ~formals ~locals kf b] returns [true] if and only if [b] is:
-    - a global
+    - a global except if it represents a string literal
     - a formal or local of one of the callers of [kf]
     - a formal or local of [kf] and the corresponding argument is [true]. *)
 val accept_base:

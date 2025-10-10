@@ -35,8 +35,8 @@
 [inout] Out (internal) for function cmp:
     __retres
 [inout] Inputs for function cmp:
-    T[0..9]; "V1.2"[0]
+    T[0..9]
 [inout] Out (internal) for function main:
     T[0..9]; r
 [inout] Inputs for function main:
-    "V1.2"[0]
+    \nothing

@@ -22,9 +22,9 @@
 [from] ====== DEPENDENCIES COMPUTED ======
   These dependencies hold at termination for the executions that terminate:
 [from] Function main:
-  \result FROM "bla"[3]; L"bli"[3]; "bar"{[1]; [3]}; L"foO"{[1]; [3]}
+  \result FROM \nothing
 [from] ====== END OF DEPENDENCIES ======
 [inout] Out (internal) for function main:
     p; q; c; wc; __retres
 [inout] Inputs for function main:
-    "bla"[3]; L"bli"[3]; "bar"{[1]; [3]}; L"foO"{[1]; [3]}
+    \nothing

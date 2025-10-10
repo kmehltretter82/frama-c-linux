@@ -813,15 +813,14 @@
   \result FROM size; malloc_next_free
 [from] Function printf_va_1:
   __fc_initial_stdout.__fc_FILE_data
-                     FROM __fc_initial_stdout; "%d\n"[0..3];
-                          param0 (and SELF)
-  \result FROM __fc_initial_stdout; "%d\n"[0..3]; param0
+                     FROM __fc_initial_stdout; param0 (and SELF)
+  \result FROM __fc_initial_stdout; param0
 [from] Function main:
   MEMORY[0..3] FROM malloc_next_free (and SELF)
         [4..0x3FF] FROM malloc_next_free (and SELF)
   __fc_initial_stdout.__fc_FILE_data
                      FROM MEMORY[0..0x3FF]; __fc_initial_stdout;
-                          "%d\n"[0..3]; malloc_next_free (and SELF)
+                          malloc_next_free (and SELF)
   malloc_next_free FROM malloc_next_free (and SELF)
 [from] ====== END OF DEPENDENCIES ======
 [inout] Out (internal) for function malloc:
@@ -832,4 +831,4 @@
     MEMORY[0..0x3FF]; __fc_initial_stdout.__fc_FILE_data; curr; head; i;
     malloc_next_free
 [inout] Inputs for function main:
-    MEMORY[0..0x3FF]; __fc_initial_stdout; "%d\n"[0..3]; malloc_next_free
+    MEMORY[0..0x3FF]; __fc_initial_stdout; malloc_next_free

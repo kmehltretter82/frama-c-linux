@@ -821,7 +821,7 @@
 [inout] Out (internal) for function buggy:
     c; p; tmp
 [inout] Inputs for function buggy:
-    maybe; "d"[0]
+    maybe
 [inout] InOut (internal) for function buggy:
   Operational inputs:
     maybe; "d"[0]
@@ -844,7 +844,7 @@
     tm[0..999]; um{[0..998]; [999][bits 0 to 15]}; ttyp[0..999]; s[0..4]; 
     p; ty{.ts; .ti}
 [inout] Inputs for function many:
-    maybe; "abcd"[0..4]
+    maybe
 [inout] InOut (internal) for function many:
   Operational inputs:
     maybe; "abcd"[0..4]; ty.[bits 16 to 31]
@@ -859,8 +859,7 @@
     ptop2[2..749]; ptop3[2..797]; ptop4[2..798]; garbledsize[10..99];
     pgarbledsize; dstmaybesize1[0..14]; dstmaybesize2[0..5]; maybesize
 [inout] Inputs for function test:
-    i; src[0..19]; maybe; "d"[0]; "abcd"[0..4]; v1; v2;
-    v4{.x; .y; .p; .padding[0..3]}; t[0..3]
+    i; src[0..19]; maybe; v1; v2; v4{.x; .y; .p; .padding[0..3]}; t[0..3]
 [inout] InOut (internal) for function test:
   Operational inputs:
     i; src[0..19]; maybe; "d"[0]; "abcd"[0..4]; v1{.p; .padding[0..23]}; 
@@ -898,8 +897,7 @@
     dst5[0..99]; tm[0..999]; um{[0..998]; [999][bits 0 to 15]}; ttyp[0..999];
     v1{.x; .y}; v2; v3; v4; v5; t[1..3]
 [inout] Inputs for function main:
-    i; src[0..19]; maybe; "d"[0]; "abcd"[0..4]; v1; v2;
-    v4{.x; .y; .p; .padding[0..3]}; t[0..3]
+    i; src[0..19]; maybe; v1; v2; v4{.x; .y; .p; .padding[0..3]}; t[0..3]
 [inout] InOut (internal) for function main:
   Operational inputs:
     i; src[0..19]; maybe; "d"[0]; "abcd"[0..4]; v1{.p; .padding[0..23]}; 
