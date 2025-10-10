@@ -1,6 +1,6 @@
 /*  run.config
     COMMENT: Track security status of loops and branches modifying arrays.
-    STDOPT: +"-eva-slevel 1"
+    STDOPT: +"-eva-auto-loop-unroll 10"
 */
 
 extern unsigned int __fc_private secret;
@@ -23,10 +23,7 @@ int main(void) {
 
     for (i = 1u; i < 10u; i++) {
         array[i] = 0;
-        // The updates in the previous loop have made the entire array
-        // private, and since weak updates are monotone, we cannot make it
-        // public again.
-        /*@ assert security_status(array[i]) == private; */
+        /*@ assert security_status(array[i]) == public; */
     }
 
     return 0;
