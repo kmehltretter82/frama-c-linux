@@ -278,7 +278,7 @@ val is_formal_or_local: varinfo -> t -> bool
 val get_called : lhost -> t option
 (** Returns the static call to function [lval], if any.
     [None] means a dynamic call through function pointer.
-    @before Frama-C+dev [lhost] parameter was an expression.
+    @before 32.0-Germanium [lhost] parameter was an expression.
 *)
 
 (* ************************************************************************* *)

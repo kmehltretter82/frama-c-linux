@@ -147,7 +147,7 @@ val basename: t -> string
 val dirname: t -> t
 
 (** Equivalent to [Filename.extension].
-    @since Frama-C+dev *)
+    @since 32.0-Germanium *)
 val extension: t -> string
 
 (** [extend ~existence file ext] returns the normalized path to the file
@@ -197,7 +197,7 @@ val is_relative: ?base:t -> t -> bool
     function takes a file {i name} so path separators like / and \ are
     replaced.
 
-    @since Frama-C+dev *)
+    @since 32.0-Germanium *)
 val sanitize_filename: string -> string
 
 (* ************************************************************************* *)

@@ -247,7 +247,7 @@ val is_any_char_array : typ -> bool
 
 (** True if the argument is an array of wchar_t. Can only be used after
     Machdep has been set.
-    @since Frama-C+dev
+    @since 32.0-Germanium
 *)
 val is_wchar_array : typ -> bool
 

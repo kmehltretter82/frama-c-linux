@@ -24,14 +24,14 @@ module Vars: sig
   (** Retrieve the (wide)string literal associated to a given varinfo.
       Fatal error if the variable does not have the corresponding attribute
       (see {!Ast_info.is_string_literal})
-      @since Frama-C+dev
+      @since 32.0-Germanium
   *)
   val get_string_literal: varinfo -> str_literal
 
   (** Creates a new global holding a (wide)string literal and insert it
       into the Ast, marking it as grown.
       @return the newly created varinfo
-      @since Frama-C+dev
+      @since 32.0-Germanium
   *)
   val add_string_literal: loc:location -> str_literal -> varinfo
 

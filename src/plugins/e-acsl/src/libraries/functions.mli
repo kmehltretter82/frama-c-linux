@@ -11,7 +11,7 @@ open Cil_types
 val has_fundef: lhost -> bool
 (** @return [true] if a function whose name is given via [lhost] is defined and
     [false] otherwise.
-    @before Frama-C+dev Function parameter was an expression. *)
+    @before 32.0-Germanium Function parameter was an expression. *)
 
 val check: kernel_function -> bool
 (** @return [true] iff code must be generated for annotations of the given
@@ -70,17 +70,17 @@ module Libc: sig
   val is_memcpy: lhost -> bool
   (** Return [true] if [lhost] captures a function name that matches [memcpy] or
       an equivalent function.
-      @before Frama-C+dev Function parameter was an expression. *)
+      @before 32.0-Germanium Function parameter was an expression. *)
 
   val is_memset: lhost -> bool
   (** Return [true] if [lhost] captures a function name that matches [memset] or
       an equivalent function.
-      @before Frama-C+dev Function parameter was an expression. *)
+      @before 32.0-Germanium Function parameter was an expression. *)
 
   val is_vla_free: lhost -> bool
   (** Return [true] if [lhost] captures a function name that matches
       a function that allocates memory for a variable-size array..
-      @before Frama-C+dev Function parameter was an expression. *)
+      @before 32.0-Germanium Function parameter was an expression. *)
 
   val is_vla_free_name: string -> bool
   (** Return [true] if [string] captures a function name that matches

@@ -71,7 +71,7 @@ val is_non_null_expr: exp -> bool
 
 (** [true] if the varinfo is a global variable representing a
     string literal.
-    @since Frama-C+dev
+    @since 32.0-Germanium
 *)
 val is_string_literal: varinfo -> bool
 

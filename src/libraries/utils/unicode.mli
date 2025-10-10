@@ -9,7 +9,7 @@
 (** Pretty printers of unicode symbols.
     Each function in this module prints a single unicode symbol, or an
     ASCII-based replacement if -no-unicode option is set.
-    @since Frama-C+dev *)
+    @since 32.0-Germanium *)
 
 (** This function can be used to turn on or off the use of unicode UTF-8
     caracters in messages.

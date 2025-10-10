@@ -260,7 +260,7 @@ val compFullName: compinfo -> string
     or not part of an aggregate. Useful for arrays without size in
     the square brackets. Unless you know what you are doing, this parameter
     should always left untouched. Default value: [false].
-    @before Frama-C+dev [last_field] was not exposed and always [false] when
+    @before 32.0-Germanium [last_field] was not exposed and always [false] when
     using this function
 *)
 val isCompleteType: ?allowZeroSizeArrays:bool -> ?last_field:bool -> typ -> bool
@@ -926,12 +926,12 @@ val typeOf: exp -> typ
 
 val typeOf_string_literal: ?loc:location -> string -> typ
 (** Returns the type (a char array of fixed length) of a string literal
-    @since Frama-C+dev
+    @since 32.0-Germanium
 *)
 
 val typeOf_wstring_literal: ?loc:location -> int64 list -> typ
 (** Return the type (a wchar_t array of fixed length) of a wide string literal
-    @since Frama-C+dev
+    @since 32.0-Germanium
 *)
 
 val is_fully_arithmetic: typ -> bool
@@ -1066,7 +1066,7 @@ val block_from_unspecified_sequence:
     the parameters corresponding to the call to [f], of kind [kind],
     initializing [v] with arguments [args].
     @since Phosphorus-20170501-beta1
-    @before Frama-C+dev [action] took an expression instead of an lhost.
+    @before 32.0-Germanium [action] took an expression instead of an lhost.
 *)
 val treat_constructor_as_func:
   (lval option -> lhost -> exp list -> location -> 'a) ->
@@ -1309,7 +1309,7 @@ class type cilVisitor = object
 
   method vlhost: lhost -> lhost visitAction
   (** Invoked on each lhost occurrence.
-      @since Frama-C+dev
+      @since 32.0-Germanium
   *)
 
   method voffs: offset -> offset visitAction
@@ -1350,12 +1350,12 @@ class type cilVisitor = object
 
   method vstr_literal: varinfo -> str_literal -> str_literal visitAction
   (** (Wide-)string literal
-      @since Frama-C+dev
+      @since 32.0-Germanium
   *)
 
   method vinit_or_str: varinfo -> init_or_str -> init_or_str visitAction
   (** Global Initializers (either normal one or (wide) string)
-      @since Frama-C+dev
+      @since 32.0-Germanium
   *)
 
   method vlocal_init: varinfo -> local_init -> local_init visitAction
@@ -1576,7 +1576,7 @@ val visitCilEnumInfo: cilVisitor -> enuminfo -> enuminfo
 val visitCilLval: cilVisitor -> lval -> lval
 
 (** Visit an lhost.
-    @since Frama-C+dev
+    @since 32.0-Germanium
 *)
 val visitCilLhost: cilVisitor -> lhost -> lhost
 
@@ -1653,12 +1653,12 @@ val visitCilInit: cilVisitor -> varinfo -> offset -> init -> init
 
 (** Visit a (wide-)string literal. The [varinfo] is its representative
     (see {!Globals.Vars.get_string_literal} for more information)
-    @since Frama-C+dev
+    @since 32.0-Germanium
 *)
 val visitCilStr_literal: cilVisitor -> varinfo -> str_literal -> str_literal
 
 (** Visit a normal initializer or a string literal.
-    @since Frama-C+dev
+    @since 32.0-Germanium
 *)
 val visitCilInit_or_str: cilVisitor -> varinfo -> init_or_str -> init_or_str
 
@@ -1929,7 +1929,7 @@ val create_string_literal: ?loc:Cil_types.location -> string -> varinfo
     definition in an AST. Use {!Globals.Vars.add_string_literal} to properly
     create a new global.
 
-    @since Frama-C+dev
+    @since 32.0-Germanium
 *)
 
 val create_wstring_literal: ?loc:Cil_types.location -> int64 list -> varinfo
@@ -1939,7 +1939,7 @@ val create_wstring_literal: ?loc:Cil_types.location -> int64 list -> varinfo
     definition in an AST. Use {!Globals.Vars.add_string_literal} to properly
     create a new global.
 
-    @since Frama-C+dev
+    @since 32.0-Germanium
 *)
 
 

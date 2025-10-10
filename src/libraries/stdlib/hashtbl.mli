@@ -67,8 +67,8 @@ module type S = sig
 
   (** Same as {!Stdlib.Hashtbl.find} but returns [~default] if the key is not
       found.
-      @before Frama-C+dev Was named [find_def] and [~default] was not named and
-      the last argument.
+      @before 32.0-Germanium Was named [find_def] and [~default] was not named
+      and the last argument.
   *)
   val find_default: default:'a -> 'a t -> key  -> 'a
 

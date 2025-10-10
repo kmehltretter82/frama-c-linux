@@ -140,7 +140,7 @@ val is_local: t -> Cil_types.fundec -> bool
 val is_formal: t -> Cil_types.fundec -> bool
 val is_block_local: t -> Cil_types.block -> bool
 val is_function : t -> bool
-(** @since Frama-C+dev *)
+(** @since 32.0-Germanium *)
 val is_string_literal: t -> bool
 
 (** {2 NULL base} *)

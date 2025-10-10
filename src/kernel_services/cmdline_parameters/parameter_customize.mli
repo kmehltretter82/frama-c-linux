@@ -73,7 +73,7 @@ val is_invisible: unit -> unit
 
 val is_unsafe: unit -> unit
 (** Prevent the parameter from being changed from default in sandbox mode.
-    @since Frama-C+dev
+    @since 32.0-Germanium
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
 *)
 

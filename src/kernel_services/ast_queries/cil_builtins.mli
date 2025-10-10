@@ -101,7 +101,7 @@ val add_custom_builtin: (unit -> (string * typ * typ list * bool)) -> unit
 val builtinLoc: location
 
 (** DEPRECATED: does nothing.
-    @before Frama-C+dev initialize the C built-ins. Should be called once per
+    @before 32.0-Germanium initialize the C built-ins. Should be called once per
     project, after the machine has been set.
 *)
 val init_builtins: unit -> unit
