@@ -33,13 +33,8 @@ int main(void) {
     /*@ assert security_status(a.a_simple[0].s_x) == public; */
     /*@ assert security_status(a.a_simple[0].s_inner.i_y) == public; */
     a.a_simple[1].s_inner.i_y = secret;
-    /* The update of a.a_simple[1].s_inner.i_y did not affect another array
-     * element's s_x field, but it did affect another array element's
-     * s_inner.i_y field. In other words, the analysis is struct field
-     * sensitive even for arrays of structs: Arrays of structs have summary
-     * structs that are updated field-sensitively. */
     /*@ assert security_status(a.a_simple[0].s_x) == public; */
-    /*@ assert security_status(a.a_simple[0].s_inner.i_y) == private; */
+    /*@ assert security_status(a.a_simple[0].s_inner.i_y) == public; */
 
     struct multi_array m;
     m.m_a[0].a_simple[1].s_inner.i_y = 46;
