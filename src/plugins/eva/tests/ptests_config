@@ -1,6 +1,6 @@
 # Default tests
 
-DEFAULT_SUITES= builtins float idct numerors traces value mthread taint
+DEFAULT_SUITES= builtins float idct numerors traces value mthread taint taint/sf
 
 ## Diff/default domain tests
 apron_SUITES = builtins float idct value taint

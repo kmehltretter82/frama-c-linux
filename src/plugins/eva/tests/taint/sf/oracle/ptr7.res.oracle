@@ -1,0 +1,36 @@
+[kernel] Parsing ptr7.c (with preprocessing)
+[eva:experimental] Warning: The taint domain is experimental.
+[eva] Analyzing a complete application starting at main
+[eva] Computing initial state
+[eva] Initial state computed
+[eva:initial-state] Values of globals at initialization
+  x ∈ [--..--]
+  y ∈ [--..--]
+  arr[0..9] ∈ [--..--]
+[eva] ptr7.c:14: assertion got status valid.
+[eva] ptr7.c:15: assertion got status valid.
+[eva:alarm] ptr7.c:17: Warning: assertion got status unknown.
+[eva] ptr7.c:20: assertion got status valid.
+[eva:alarm] ptr7.c:21: Warning: assertion got status unknown.
+[eva] ptr7.c:23: assertion got status valid.
+[eva:alarm] ptr7.c:24: Warning: assertion got status unknown.
+[eva:alarm] ptr7.c:33: Warning: 
+  assertion got status invalid (stopping propagation).
+[eva] Recording results for main
+[eva] Done for function main
+[scope:rm_asserts] removing 1 assertion(s)
+[eva] ====== VALUES COMPUTED ======
+[eva:final-states] Values at end of function main:
+  NON TERMINATING FUNCTION
+[from] Computing for function main
+[from] Non-terminating function main (no dependencies)
+[from] Done for function main
+[from] ====== DEPENDENCIES COMPUTED ======
+  These dependencies hold at termination for the executions that terminate:
+[from] Function main:
+  NON TERMINATING - NO EFFECTS
+[from] ====== END OF DEPENDENCIES ======
+[inout] Out (internal) for function main:
+    x; arr[1..3]; p; x_idx
+[inout] Inputs for function main:
+    x
