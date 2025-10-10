@@ -19,14 +19,14 @@
 [eva] computing for function f1 <- main.
   Called from secureflow.c:223.
 [eva:secure-flow:direct] secureflow.c:16: Warning: 
-  interference on: global_key[0]
+  direct non-interference violation on {global_key[0]}
 [eva:partition] secureflow.c:15: starting to merge loop iterations
 [eva:secure-flow:direct] secureflow.c:16: Warning: 
-  interference on: global_key[0..1]
+  direct non-interference violation on {global_key[0..1]}
 [eva:secure-flow:direct] secureflow.c:16: Warning: 
-  interference on: global_key[0..2]
+  direct non-interference violation on {global_key[0..2]}
 [eva:secure-flow:direct] secureflow.c:16: Warning: 
-  interference on: global_key[0..4]
+  direct non-interference violation on {global_key[0..4]}
 [eva:alarm] secureflow.c:19: Warning: check got status unknown.
 [eva:alarm] secureflow.c:20: Warning: check got status unknown.
 [eva] Recording results for f1
@@ -34,7 +34,7 @@
 [eva] computing for function f2 <- main.
   Called from secureflow.c:224.
 [eva:secure-flow:condition] secureflow.c:28: Warning: 
-  assume condition involving private data: secret
+  non-interference violation on condition involving {secret}
 [eva] secureflow.c:29: check got status valid.
 [eva] secureflow.c:30: check got status valid.
 [eva:alarm] secureflow.c:31: Warning: check got status unknown.
@@ -45,7 +45,8 @@
   The specification of function assigns_from
   has generated a garbled mix of addresses for assigns clause \result.
 [eva] Done for function assigns_from
-[eva:secure-flow:direct] secureflow.c:33: Warning: interference on: v
+[eva:secure-flow:direct] secureflow.c:33: Warning: 
+  direct non-interference violation on {v}
 [eva:alarm] secureflow.c:34: Warning: check got status unknown.
 [eva] Recording results for f2
 [eva] Done for function f2
@@ -58,26 +59,30 @@
 [eva] secureflow.c:57: check got status valid.
 [eva] secureflow.c:58: check got status valid.
 [eva:secure-flow:condition] secureflow.c:59: Warning: 
-  assume condition involving private data: secret
+  non-interference violation on condition involving {secret}
 [eva:alarm] secureflow.c:64: Warning: check got status unknown.
 [eva:alarm] secureflow.c:65: Warning: check got status unknown.
 [eva:alarm] secureflow.c:66: Warning: check got status unknown.
-[eva:secure-flow:indirect] secureflow.c:68: Warning: interference on: v
+[eva:secure-flow:indirect] secureflow.c:68: Warning: 
+  indirect non-interference violation on {v}
 [eva:alarm] secureflow.c:69: Warning: check got status unknown.
 [eva] Recording results for f3
 [eva] Done for function f3
 [eva] computing for function f4 <- main.
   Called from secureflow.c:226.
 [eva:secure-flow:condition] secureflow.c:78: Warning: 
-  assume condition involving private data: secret; user_input
-[eva:secure-flow:indirect] secureflow.c:79: Warning: interference on: y
+  non-interference violation on condition involving {secret; user_input}
+[eva:secure-flow:indirect] secureflow.c:79: Warning: 
+  indirect non-interference violation on {y}
 [eva:alarm] secureflow.c:80: Warning: check got status unknown.
-[eva:secure-flow:indirect] secureflow.c:83: Warning: interference on: z
+[eva:secure-flow:indirect] secureflow.c:83: Warning: 
+  indirect non-interference violation on {z}
 [eva:alarm] secureflow.c:84: Warning: check got status unknown.
 [eva] secureflow.c:88: check got status valid.
 [eva:alarm] secureflow.c:89: Warning: check got status unknown.
 [eva:alarm] secureflow.c:90: Warning: check got status unknown.
-[eva:secure-flow:indirect] secureflow.c:92: Warning: interference on: y; z
+[eva:secure-flow:indirect] secureflow.c:92: Warning: 
+  indirect non-interference violation on {y; z}
 [eva:alarm] secureflow.c:93: Warning: check got status unknown.
 [eva:alarm] secureflow.c:94: Warning: check got status unknown.
 [eva] Recording results for f4
@@ -87,17 +92,19 @@
 [eva] secureflow.c:114: check got status valid.
 [eva] secureflow.c:115: check got status valid.
 [eva:secure-flow:condition] secureflow.c:117: Warning: 
-  assume condition involving private data: secret
+  non-interference violation on condition involving {secret}
 [eva] computing for function write_x <- f5 <- main.
   Called from secureflow.c:118.
 [eva] secureflow.c:118: function write_x: precondition got status valid.
-[eva:secure-flow:indirect] secureflow.c:105: Warning: interference on: s.x
+[eva:secure-flow:indirect] secureflow.c:105: Warning: 
+  indirect non-interference violation on {s.x}
 [eva] Recording results for write_x
 [eva] Done for function write_x
 [eva] computing for function write_y <- f5 <- main.
   Called from secureflow.c:120.
 [eva] secureflow.c:120: function write_y: precondition got status valid.
-[eva:secure-flow:indirect] secureflow.c:110: Warning: interference on: s.y
+[eva:secure-flow:indirect] secureflow.c:110: Warning: 
+  indirect non-interference violation on {s.y}
 [eva] Recording results for write_y
 [eva] Done for function write_y
 [eva:alarm] secureflow.c:122: Warning: check got status unknown.
@@ -106,8 +113,9 @@
 [eva] secureflow.c:125: check got status valid.
 [eva] secureflow.c:128: check got status valid.
 [eva:secure-flow:condition] secureflow.c:129: Warning: 
-  assume condition involving private data: secret
-[eva:secure-flow:indirect] secureflow.c:131: Warning: interference on: s.x
+  non-interference violation on condition involving {secret}
+[eva:secure-flow:indirect] secureflow.c:131: Warning: 
+  indirect non-interference violation on {s.x}
 [eva:alarm] secureflow.c:136: Warning: check got status unknown.
 [eva] Recording results for f5
 [eva] Done for function f5
@@ -115,7 +123,8 @@
   Called from secureflow.c:228.
 [eva] computing for function write_z <- f6 <- main.
   Called from secureflow.c:152.
-[eva:secure-flow:direct] secureflow.c:141: Warning: interference on: z
+[eva:secure-flow:direct] secureflow.c:141: Warning: 
+  direct non-interference violation on {z}
 [eva] Recording results for write_z
 [eva] Done for function write_z
 [eva] computing for function write_w <- f6 <- main.
@@ -136,15 +145,18 @@
 [eva] secureflow.c:178: assertion got status valid.
 [eva] secureflow.c:179: assertion got status valid.
 [eva:alarm] secureflow.c:182: Warning: assertion got status unknown.
-[eva:secure-flow:indirect] secureflow.c:183: Warning: interference on: x_0; y_0
+[eva:secure-flow:indirect] secureflow.c:183: Warning: 
+  indirect non-interference violation on {x_0; y_0}
 [eva:alarm] secureflow.c:184: Warning: assertion got status unknown.
 [eva:alarm] secureflow.c:185: Warning: assertion got status unknown.
 [eva:alarm] secureflow.c:186: Warning: assertion got status unknown.
 [eva] secureflow.c:191: assertion got status valid.
 [eva] secureflow.c:192: assertion got status valid.
 [eva] secureflow.c:193: assertion got status valid.
-[eva:secure-flow:direct] secureflow.c:194: Warning: interference on: z_0
-[eva:secure-flow:indirect] secureflow.c:194: Warning: interference on: z_0
+[eva:secure-flow:direct] secureflow.c:194: Warning: 
+  direct non-interference violation on {z_0}
+[eva:secure-flow:indirect] secureflow.c:194: Warning: 
+  indirect non-interference violation on {z_0}
 [eva:alarm] secureflow.c:195: Warning: assertion got status unknown.
 [eva] secureflow.c:196: assertion got status valid.
 [eva] secureflow.c:197: assertion got status valid.

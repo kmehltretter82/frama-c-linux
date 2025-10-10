@@ -91,7 +91,7 @@ let wkey_secure_flow_indirect =
 
 let wkey_secure_flow_assume =
   Self.register_warn_category "secure-flow:condition"
-    ~help:"warnings related to assume conditions involving private data when \
+    ~help:"warnings related to interference on conditions when \
            performing secure-flow analysis from \"-eva-domains taint\""
 
 
@@ -374,9 +374,15 @@ module TransferSingleTaint = struct
     in
     if has_tainted_public_base then
       let source = fst (Position.loc pos) in
+      let kind =
+        if Self.wkey_name wkey = Self.wkey_name wkey_secure_flow_direct then
+          "direct"
+        else
+          "indirect"
+      in
       Self.warning ~wkey ~source ~once:true
-        "@[<v>@[<hv 2>interference on:@ @[<hov>%a@]@]"
-        Zone.pretty zone
+        "@[<v>@[<hv 2>%s non-interference violation on@ @[<hov>{%a}@]@]"
+        kind Zone.pretty zone
 
   (* Propagates data- and control-taints for an assignment [lval = exp]. *)
   let assign_aux ~pos lval exp v to_loc state =
@@ -444,7 +450,8 @@ module TransferSingleTaint = struct
     if has_tainted_private_base then
       let source = fst (Position.loc pos) in
       Self.warning ~wkey:wkey_secure_flow_assume ~source ~once:true
-        "@[<v>@[<hv 2>assume condition involving private data:@ @[<hov>%a@]@]"
+        "@[<v>@[<hv 2>non-interference violation on condition \
+         involving@ @[<hov>{%a}@]@]"
         Zone.pretty zone
 
   let assume ~pos exp _b valuation state =
