@@ -10,7 +10,7 @@
     @since Carbon-20101201 *)
 
 (** Prints debug informations about tasks.
-    @since Frama-C+dev
+    @since 32.0-Germanium
 *)
 val dkey : Cmdline.Kernel_log.category
 

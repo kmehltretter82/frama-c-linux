@@ -399,7 +399,7 @@ module SymbolicPath: Parameter_sig.Filepath_map with type value = string
 
 module FloatPrint: Parameter_sig.S with type t = Floating_point.float_display
 (** Behavior of option "-float-print"
-    @since Frama-C+dev *)
+    @since 32.0-Germanium *)
 
 module FloatNormal: Parameter_sig.Bool
 (** Behavior of option "-float-normal" *)

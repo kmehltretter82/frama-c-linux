@@ -138,7 +138,7 @@ val visitFramacExpr: frama_c_visitor -> exp -> exp
 val visitFramacLval: frama_c_visitor -> lval -> lval
 
 (** Visit a lhost.
-    @since Frama-C+dev.
+    @since 32.0-Germanium.
 *)
 val visitFramacLhost: frama_c_visitor -> lhost -> lhost
 
@@ -174,13 +174,13 @@ val visitFramacLogicVarDecl: frama_c_visitor -> logic_var -> logic_var
 val visitFramacInit: frama_c_visitor -> varinfo -> offset -> init -> init
 
 (** Visit a global initialization, possibly of a string array.
-    @since Frama-C+dev
+    @since 32.0-Germanium
 *)
 val visitFramacInit_or_str:
   frama_c_visitor -> varinfo -> init_or_str -> init_or_str
 
 (** Visit a (wide-)string literal.
-    @since Frama-C+dev
+    @since 32.0-Germanium
 *)
 val visitFramacStr_literal:
   frama_c_visitor -> varinfo -> str_literal -> str_literal

@@ -271,7 +271,7 @@ module type Messages = sig
       or add it (e.g. via [add_debug_keys]) after registration.
       @since Fluorine-20130401
       @before 30.0-Zinc [?help] parameter was not present
-      @before Frama-C+dev [?default] parameter was not present
+      @before 32.0-Germanium [?default] parameter was not present
   *)
 
   val pp_category: Format.formatter -> category -> unit
@@ -333,7 +333,7 @@ module type Messages = sig
     ?help:string -> ?default:warn_status -> string -> warn_category
   (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
       @before 30.0-Zinc [?help] parameter was not present
-      @before Frama-C+dev [?default] parameter was not present
+      @before 32.0-Germanium [?default] parameter was not present
   *)
 
   val is_warn_category: string -> bool

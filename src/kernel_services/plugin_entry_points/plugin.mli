@@ -68,7 +68,7 @@ module type S_no_log = sig
 
   val grp_debug: Cmdline.Group.t
   (** Group containing debug options.
-      @since Frama-C+dev *)
+      @since 32.0-Germanium *)
 
   val add_plugin_output_aliases:
     ?visible:bool -> ?deprecated:bool -> string list -> unit

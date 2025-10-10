@@ -908,7 +908,7 @@ and init =
     arrays. See {!Ast_info.is_string_literal} and
     {!Globals.Vars.get_string_literal} to respectively check whether a
     varinfo corresponds to a string literal and retrieve its value.
-    @since Frama-C+dev
+    @since 32.0-Germanium
 *)
 and str_literal =
   | Str of string
@@ -928,7 +928,7 @@ and str_literal =
       underlying wide character type. *)
 
 (** Initializers of global variables.
-    @since Frama-C+dev *)
+    @since 32.0-Germanium *)
 and init_or_str =
   | CInit of init (** standard initialisation. *)
   | StrInit of str_literal (** string literal. *)
@@ -1261,7 +1261,7 @@ and instr =
       return [false]) to the one of the formals of the function.
       If the type of the result variable is not the same as the declared type of
       the function result then an implicit cast exists.
-      @before Frama-C+dev the function was an expression instead of a lhost.
+      @before 32.0-Germanium the function was an expression instead of a lhost.
   *)
   | Local_init of varinfo * local_init * location
   (** initialization of a local variable. The corresponding varinfo must

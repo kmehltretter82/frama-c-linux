@@ -44,4 +44,4 @@ end
 
 val get_project_debug_name: t -> string
 (** @return a project name appended with its id.
-    @since Frama-C+dev *)
+    @since 32.0-Germanium *)

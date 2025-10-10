@@ -17,7 +17,7 @@ module UtilsFilepath = Filepath
 open Cil_types
 
 (** All datatypes in this module include a dummy.
-    @since Frama-C+dev
+    @since 32.0-Germanium
 *)
 module type S_with_collections = sig
   include Datatype.S_with_collections
@@ -25,7 +25,7 @@ module type S_with_collections = sig
 end
 
 (** All datatypes in this module include a dummy.
-    @since Frama-C+dev
+    @since 32.0-Germanium
 *)
 module type S = sig
   include Datatype.S

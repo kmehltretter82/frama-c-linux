@@ -93,7 +93,7 @@ val clear_all: unit -> unit
 
 val get_pid: t -> int
 (** Project ID. Recommended way of identifying a project.
-    @since Frama-C+dev *)
+    @since 32.0-Germanium *)
 
 val get_name: t -> string
 (** Project name. Two projects may have the same name. *)
@@ -106,7 +106,7 @@ val get_unique_name: t -> string
 
 val get_debug_name: t -> string
 (** @return a project name appended with its id.
-    @since Frama-C+dev *)
+    @since 32.0-Germanium *)
 
 val set_name: t -> string -> unit
 (** Set the name of the given project.
@@ -122,7 +122,7 @@ exception Unknown_project
 val from_pid: int -> t
 (** Return a project based on {!pid}.
     @raise Unknown_project if no project has this unique name.
-    @since Frama-C+dev *)
+    @since 32.0-Germanium *)
 
 val from_unique_name: string -> t
 (** Return a project based on {!unique_name}.

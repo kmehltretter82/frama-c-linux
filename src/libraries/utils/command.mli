@@ -72,7 +72,7 @@ val spawn :
 (* ************************************************************************* *)
 
 (** Specialized command for the Graphviz's dot program to process dot files.
-    @since Frama-C+dev *)
+    @since 32.0-Germanium *)
 module Dot :
 sig
   type format = Jpeg | Pdf | Png | Svg

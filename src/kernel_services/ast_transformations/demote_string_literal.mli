@@ -13,6 +13,6 @@
    Do nothing if the variable is not a string literal as per
    {!Ast_info.is_string_literal}
 
-   @since Frama-C+dev
+   @since 32.0-Germanium
 *)
 val demote : Cil_types.varinfo -> unit

@@ -41,7 +41,7 @@ type nonrec 'a result = ('a,error) result
 (* ************************************************************************* *)
 
 (** This type is used to determine the type of file a path refers to.
-    @since Frama-C+dev *)
+    @since 32.0-Germanium *)
 type file_kind =
   | File
   | Directory
@@ -54,7 +54,7 @@ type file_kind =
 (** [file_kind p] returns the file kind of the given path [p]. On failure -
     for instance if the file does not exist - returns an error string.
     @raise Invalid_argument if [p] is empty
-    @since Frama-C+dev *)
+    @since 32.0-Germanium *)
 val file_kind: Filepath.t -> file_kind result
 
 (** [exists p] returns whether the path [p] points to an existing file (of any
@@ -66,13 +66,13 @@ val exists: Filepath.t -> bool
 (** [file_exists p] returns whether the path points to an existing regular file.
     It is equivalent to [file_kind p = Ok (File)]
     @raise Invalid_argument if [p] is empty
-    @since Frama-C+dev *)
+    @since 32.0-Germanium *)
 val file_exists: Filepath.t -> bool
 
 (** [dir_exists p] returns whether the path points to an existing directory,
     It is equivalent to [file_kind p = Ok (Directory)]
     @raise Invalid_argument if [p] is empty
-    @since Frama-C+dev *)
+    @since 32.0-Germanium *)
 val dir_exists: Filepath.t -> bool
 
 (** [is_file f] returns [true] iff [f] points to a regular file
@@ -121,7 +121,7 @@ val fold_dir: (string -> 'a -> 'a) -> Filepath.t -> 'a -> 'a
     @since 19.0-Potassium
     @before 28.0-Nickel [name] argument was of type [string]. Also, the function
     did not check for path's existence.
-    @before Frama-C+dev the function raised {!Invalid_argument} instead of
+    @before 32.0-Germanium the function raised {!Invalid_argument} instead of
     {!Sys_error} when the path pointed to an existing file that was not a
     directory. Also the [perm] argument was not named and the return type was
     [bool] to indicate whether the directory has actually been created or if it
@@ -153,13 +153,13 @@ val rename: Filepath.t -> Filepath.t -> unit
 (** Similar to {!Filename.temp_file}.
     @raise Sys_error if the temp file cannot be created.
     @since 31.0-Gallium
-    @before Frama-C+dev raised a removed [Temp_file] exception *)
+    @before 32.0-Germanium raised a removed [Temp_file] exception *)
 val temp_file: prefix:string -> suffix:string -> Filepath.t
 
 (** Similar to {!Filename.temp_dir}.
     @raise Sys_error if the temp dir cannot be created.
     @since 31.0-Gallium
-    @before Frama-C+dev raised a removed [Temp_file] exception *)
+    @before 32.0-Germanium raised a removed [Temp_file] exception *)
 val temp_dir: prefix:string -> suffix:string -> Filepath.t
 
 

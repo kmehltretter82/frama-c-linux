@@ -212,7 +212,7 @@ val strip_underscore: string -> string
 
 (** Same as [String.escaped], but avoid escaping UTF8 characters encoded on
     several chars.
-    @since Frama-C+dev *)
+    @since 32.0-Germanium *)
 val escape_non_utf8: string -> string
 
 (** Escape string for use in HTML tag. *)
@@ -226,7 +226,7 @@ val html_escape: string -> string
     Cf. {{:https://datatracker.ietf.org/doc/html/rfc3986#section-2.3}} for the
     list of unreserved characters.
 
-    @since Frama-C+dev *)
+    @since 32.0-Germanium *)
 val percent_encode: string -> string
 
 (** [format_string_of_stag stag] returns the string corresponding to [stag],

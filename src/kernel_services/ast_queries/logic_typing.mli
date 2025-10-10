@@ -38,7 +38,7 @@ exception Typing_error of location * string
            be explicitly introduced (when possible) e.g. we really want the
            wrapping behavior in the term [(int) (INT_MAX+1)].
     @raise Typing_error when the cast is illegal.
-    @since Frama-C+dev
+    @since 32.0-Germanium
 *)
 val mk_cast:
   ?explicit:bool -> Cil_types.term -> Cil_types.logic_type -> Cil_types.term

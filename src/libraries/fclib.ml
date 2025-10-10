@@ -7,7 +7,7 @@
 (**************************************************************************)
 
 (** Module aliases for all our libraries. Useful when shadowing module's name.
-    @since Frama-C+dev
+    @since 32.0-Germanium
 *)
 
 (** {2 Floating point} *)
