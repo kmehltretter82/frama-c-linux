@@ -96,6 +96,7 @@
 //#include "__fc_libc.h" //keep this; used by check_full_libc.sh
 #include "__fc_machdep.h"
 #include "fcntl.h"
+#include "__fc_scanf_stub_helper.h"
 #include "__fc_select.h"
 #include "__fc_string_axiomatic.h"
 #include "__fc_strto_axiomatic.h"

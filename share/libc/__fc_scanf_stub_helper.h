@@ -6,27 +6,12 @@
 /*                                                                        */
 /**************************************************************************/
 
-#include "__fc_builtin.c"
-#include "__fc_file.c"
-#include "argz.c"
-#include "assert.c"
-#include "ctype.c"
-#include "errno.c"
-#include "error.c"
-#include "fenv.c"
-#include "glob.c"
-#include "inttypes.c"
-#include "locale.c"
-#include "math.c"
-#include "netdb.c"
-#include "netinet/in.c"
-#include "pwd.c"
-#include "signal.c"
-#include "sys/socket.c"
-#include "stdatomic.c"
-#include "stdio.c"
-#include "stdlib.c"
-#include "string.c"
-#include "time.c"
-#include "unistd.c"
-#include "wchar.c"
+/* ISO C: 7.10 and 5.2.4.2.1 */
+#ifndef __FC_SCANF_STUB_HELPER_H
+#define __FC_SCANF_STUB_HELPER_H
+
+enum length_modifier {
+  NONE, HH, H, L, LL, J, Z, T, UPPER_L
+};
+
+#endif

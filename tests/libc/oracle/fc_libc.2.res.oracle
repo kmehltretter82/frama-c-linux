@@ -48,6 +48,7 @@
 [kernel] Parsing FRAMAC_SHARE/libc/__fc_inet.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/libc/__fc_integer.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/libc/__fc_libc.h (with preprocessing)
+[kernel] Parsing FRAMAC_SHARE/libc/__fc_scanf_stub_helper.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/libc/__fc_select.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/libc/__fc_string_axiomatic.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/libc/__fc_strto_axiomatic.h (with preprocessing)

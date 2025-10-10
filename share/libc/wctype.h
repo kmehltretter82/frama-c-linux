@@ -139,6 +139,36 @@ wctype_t wctype(const char *property);
 */
 wctype_t wctype_l(const char *property, locale_t locale);
 
+/*@
+  assigns \result \from wc, indirect:desc;
+*/
+wint_t towctrans(wint_t wc, wctrans_t desc);
+
+/*@
+  assigns \result \from wc, indirect:desc, indirect:locale;
+*/
+wint_t towctrans_l(wint_t wc, wctrans_t desc, locale_t locale);
+
+/*@
+  assigns \result \from wc;
+*/
+wint_t towlower(wint_t wc);
+
+/*@
+  assigns \result \from wc, indirect:locale;
+*/
+wint_t towupper(wint_t wc, locale_t locale);
+
+/*@
+  assigns \result \from indirect:charclass;
+*/
+wctrans_t wctrans(const char *charclass);
+
+/*@
+  assigns \result \from indirect:charclass, indirect:locale;
+*/
+wctrans_t wctrans_l(const char *charclass, locale_t locale);
+
 __END_DECLS
 
 __POP_FC_STDLIB

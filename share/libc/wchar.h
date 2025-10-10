@@ -32,6 +32,8 @@ __PUSH_FC_STDLIB
 #include "string.h"
 #include "stdarg.h"
 
+#include "locale.h" // for locale_t
+
 __BEGIN_DECLS
 
 /*@
@@ -246,6 +248,7 @@ extern wchar_t *fgetws(wchar_t * restrict ws, int n, FILE * restrict stream);
 */
 
 /*@
+  //missing: assigns \from 'current locale'
   requires valid_wstring_ws1: valid_read_wstring(ws1);
   requires valid_wstring_ws2: valid_read_wstring(ws2);
   assigns \result \from indirect:ws1[0..], indirect:ws2[0..];
@@ -549,6 +552,253 @@ unsigned long wcstoul(const wchar_t *restrict nptr,
 */
 unsigned long long wcstoull(const wchar_t *restrict nptr,
                             wchar_t **restrict endptr, int base);
+
+/*@
+  assigns \result \from c;
+*/
+wint_t btowc(int c);
+
+/*@
+  assigns \result, *stream \from wc, *stream;
+*/
+wint_t fputwc(wchar_t wc, FILE *stream);
+
+/*@
+  assigns \result, *stream \from ws[0..], *stream;
+*/
+int fputws(const wchar_t *restrict ws, FILE *restrict stream);
+
+/*@
+  assigns \result, *stream \from *stream, mode;
+*/
+int fwide(FILE *stream, int mode);
+
+/*@
+  assigns \result, *stream \from *stream;
+*/
+wint_t fgetwc(FILE *stream);
+
+/*@
+  assigns \result, *stream \from *stream;
+*/
+wint_t getwc(FILE *stream);
+
+/*@
+  //missing: assigns \result, *__fc_stdin \from *__fc_stdin;
+  assigns \result \from \nothing;
+*/
+wint_t getwchar(void);
+
+/*@
+  assigns \result, *stream \from wc, *stream;
+*/
+wint_t ungetwc(wint_t wc, FILE *stream);
+
+/*@
+  assigns \result, *ps \from s[0 .. n-1], *ps;
+*/
+size_t mbrlen(const char *restrict s, size_t n, mbstate_t *restrict ps);
+
+/*@
+  assigns \result, dst[0 .. len-1], *ps \from (*src)[0 .. nms-1], *ps;
+*/
+size_t mbsnrtowcs(wchar_t *restrict dst, const char **restrict src, size_t nms,
+                  size_t len, mbstate_t *restrict ps);
+
+/*@
+  assigns \result, dst[0 .. len-1], *ps \from (*src)[0 .. ], *ps;
+*/
+size_t mbsrtowcs(wchar_t *restrict dst, const char **restrict src, size_t len,
+                 mbstate_t *restrict ps);
+
+//requires access to __fc_fopen from stdio.h
+//FILE *open_wmemstream(wchar_t **bufp, size_t *sizep);
+
+/*@
+  assigns \result, *stream \from wc, *stream;
+*/
+wint_t putwc(wchar_t wc, FILE *stream);
+
+/*@
+  //missing: assigns \result, *__fc_stdout \from *__fc_stdout, wc;
+  assigns \result \from wc;
+*/
+wint_t putwchar(wchar_t wc);
+
+/*@
+  assigns *stream \from format[0 .. wcslen(format)], indirect: args;
+  assigns \result \from indirect:format[0 .. wcslen(format)], indirect:args;
+*/
+int vfwprintf(FILE *restrict stream, const wchar_t *restrict format,
+              va_list args);
+
+/*@
+  assigns *stream \from format[0 .. wcslen(format)], *stream;
+  // missing: assign args
+*/
+int vfwscanf(FILE *restrict stream, const wchar_t *restrict format,
+             va_list args);
+
+/*@
+  assigns wcs[0 .. maxlen-1] \from format[0 .. wcslen(format)],
+                                   indirect:maxlen, args;
+*/
+int vswprintf(wchar_t *restrict wcs, size_t maxlen,
+              const wchar_t *restrict format, va_list args);
+
+// This function cannot currently have a sound specification due to not being
+// able to 'assigns args'.
+int vswscanf(const wchar_t *restrict stream, const wchar_t *restrict format,
+             va_list args);
+
+/*@
+  //missing:assigns *__fc_stdout \from format[0 .. wcslen(format)], indirect: args;
+  assigns \result \from indirect:format[0 .. wcslen(format)], indirect:args;
+*/
+int vwprintf(const wchar_t *restrict format, va_list args);
+
+/*@
+  // missing: assigns args; assigns *__fc_stdin \from *__fc_stdin;
+  assigns \result \from indirect:format[0 .. wcslen(format)],
+                        indirect:args;
+*/
+int vwscanf(const wchar_t *restrict format, va_list args);
+
+/*@
+  assigns \result \from ws1;
+  assigns ws1[0 ..] \from ws2[0 ..];
+*/
+wchar_t *wcpcpy(wchar_t *restrict ws1, const wchar_t *restrict ws2);
+
+/*@
+  assigns \result \from ws1, indirect:n;
+  assigns ws1[0 .. n-1] \from ws2[0 .. n-1];
+*/
+wchar_t *wcpncpy(wchar_t *restrict ws1, const wchar_t *restrict ws2, size_t n);
+
+/*@
+  assigns s[0..], *ps \from wc, *ps;
+*/
+size_t wcrtomb(char *restrict s, wchar_t wc, mbstate_t *restrict ps);
+
+/*@
+  assigns \result \from indirect:ws1[0..], indirect:ws2[0..], indirect:locale;
+*/
+int wcscasecmp_l(const wchar_t *ws1, const wchar_t *ws2, locale_t locale);
+
+/*@
+  //missing: assigns \from 'current locale'
+  assigns \result \from indirect:ws1[0 .. ], indirect:ws2[0 .. ];
+*/
+int wcscoll(const wchar_t *ws1, const wchar_t *ws2);
+
+/*@
+  assigns \result \from indirect:ws1[0 .. ], indirect:ws2[0 .. ],
+                        indirect:locale;
+*/
+int wcscoll_l(const wchar_t *ws1, const wchar_t *ws2, locale_t locale);
+
+/*@
+  assigns wcs[0 .. maxsize-1] \from indirect:maxsize,
+                                    indirect:format[0 .. wcslen(format)],
+                                    indirect:*timeptr;
+  assigns \result \from indirect:maxsize,
+                        indirect:format[0 .. wcslen(format)],
+                        indirect:*timeptr;
+*/
+size_t wcsftime(wchar_t *restrict wcs, size_t maxsize,
+                const wchar_t *restrict format,
+                const struct tm *restrict timeptr);
+
+/*@
+  //missing: assigns \from 'current locale'
+  assigns \result \from indirect:ws1[0 .. n-1], indirect:ws2[0 ..  n-1], n;
+*/
+int wcsncasecmp(const wchar_t *ws1, const wchar_t *ws2, size_t n);
+
+/*@
+  assigns \result \from indirect:ws1[0 .. n-1], indirect:ws2[0 ..  n-1], n,
+                        indirect:locale;
+*/
+int wcsncasecmp_l(const wchar_t *ws1, const wchar_t *ws2, size_t n,
+                  locale_t locale);
+
+/*@
+  assigns \result \from ws[0 .. maxlen-1];
+*/
+size_t wcsnlen(const wchar_t *ws, size_t maxlen);
+
+/*@
+  assigns dst[0 .. len-1], *ps \from src[0 .. nwc-1], indirect:nwc,
+                                     indirect:len, *ps;
+*/
+size_t wcsnrtombs(char *restrict dst, const wchar_t **restrict src, size_t nwc,
+                  size_t len, mbstate_t *restrict ps);
+
+/*@
+  assigns dst[0 .. len-1], *ps \from (*src)[0 .. wcslen(*src)-1], indirect:len,
+                                     *ps;
+*/
+size_t wcsrtombs(char *restrict dst, const wchar_t **restrict src, size_t len,
+                 mbstate_t *restrict ps);
+
+/*@
+  assigns \result \from indirect:nptr, indirect:nptr[0 .. wcslen(nptr)];
+  assigns *endptr \from nptr, indirect:nptr[0 .. wcslen(nptr)],
+                              indirect:endptr;
+*/
+double wcstod(const wchar_t *restrict nptr, wchar_t **restrict endptr);
+
+/*@
+  assigns \result \from indirect:nptr, indirect:nptr[0 .. wcslen(nptr)];
+  assigns *endptr \from nptr, indirect:nptr[0 .. wcslen(nptr)],
+                              indirect:endptr;
+*/
+float wcstof(const wchar_t *restrict nptr, wchar_t **restrict endptr);
+
+/*@
+  assigns ws[0..] \from ws[0..],
+      indirect:ws, indirect:*saveptr, indirect:delim[0..wcslen(delim)];
+  assigns (*saveptr)[0..] \from (*saveptr)[0..],
+      indirect:ws, indirect:*saveptr, indirect:delim[0..wcslen(delim)];
+  assigns \result \from ws, *saveptr, indirect:ws[0..],
+      indirect:(*saveptr)[0..], indirect:delim[0..wcslen(delim)];
+  assigns *saveptr \from \old(*saveptr), ws,
+                         indirect:(*saveptr)[0..],
+                         indirect:delim[0..wcslen(delim)];
+*/
+wchar_t *wcstok(wchar_t *restrict ws, const wchar_t *restrict delim,
+                wchar_t **restrict saveptr);
+
+/*@
+  assigns \result \from indirect:nptr, indirect:nptr[0 .. wcslen(nptr)];
+  assigns *endptr \from nptr, indirect:nptr[0 .. wcslen(nptr)],
+                              indirect:endptr;
+*/
+long double wcstold(const wchar_t *restrict nptr, wchar_t **restrict endptr);
+
+/*@
+  assigns \result \from pwcs;
+  ensures result_minus_one_or_null_or_width: \result >= -1;
+*/
+int wcswidth(const wchar_t *pwcs, size_t n);
+
+/*@
+  //missing: assigns \from 'current locale'
+  assigns \result, *ws1 \from ws2[0 .. n-1], indirect:n;
+*/
+size_t wcsxfrm(wchar_t *restrict ws1, const wchar_t *restrict ws2, size_t n);
+
+/*@
+  assigns \result, *ws1 \from ws2[0 .. n-1], indirect:n, indirect:locale;
+*/
+size_t wcsxfrm_l(wchar_t *restrict ws1, const wchar_t *restrict ws2, size_t n,
+                 locale_t locale);
+
+/*@
+  assigns \result \from c;
+*/
+int wctob(wint_t c);
 
 /* It is unclear whether these are more often in wchar.h or stdio.h */
 
