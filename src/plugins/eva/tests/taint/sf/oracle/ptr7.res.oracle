@@ -14,23 +14,36 @@
 [eva:alarm] ptr7.c:21: Warning: assertion got status unknown.
 [eva] ptr7.c:23: assertion got status valid.
 [eva:alarm] ptr7.c:24: Warning: assertion got status unknown.
-[eva:alarm] ptr7.c:33: Warning: 
-  assertion got status invalid (stopping propagation).
+[eva] ptr7.c:32: assertion got status valid.
+[eva] ptr7.c:35: assertion got status valid.
+[eva] ptr7.c:37: assertion got status valid.
+[eva] ptr7.c:38: assertion got status valid.
 [eva] Recording results for main
 [eva] Done for function main
-[scope:rm_asserts] removing 1 assertion(s)
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
-  NON TERMINATING FUNCTION
+  x ∈ {23}
+  y ∈ {42}
+  arr[0] ∈ [--..--]
+     [1] ∈ {0; 23}
+     [2] ∈ {42}
+     [3] ∈ {2}
+     [4..9] ∈ [--..--]
+  p ∈ {{ &y }}
+  x_idx ∈ {0; 1}
+  __retres ∈ {0}
 [from] Computing for function main
-[from] Non-terminating function main (no dependencies)
 [from] Done for function main
 [from] ====== DEPENDENCIES COMPUTED ======
   These dependencies hold at termination for the executions that terminate:
 [from] Function main:
-  NON TERMINATING - NO EFFECTS
+  x FROM \nothing
+  y FROM \nothing
+  arr[1] FROM x
+     [2..3] FROM \nothing
+  \result FROM \nothing
 [from] ====== END OF DEPENDENCIES ======
 [inout] Out (internal) for function main:
-    x; arr[1..3]; p; x_idx
+    x; y; arr[1..3]; p; x_idx; __retres
 [inout] Inputs for function main:
     x

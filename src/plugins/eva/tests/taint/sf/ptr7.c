@@ -23,14 +23,13 @@ int main(void) {
     /*@ assert security_status(p) == public; */
     /*@ assert security_status(*p) == private; */
 
-    // weak updates of arr
     *p = 0;
     p[1] = 1;
     *(p + 2) = 2;
     p[x_idx] = x;
     p++;
     *p = 42;
-    /*@ assert security_status(*p) == private; */
+    /*@ assert security_status(*p) == public; */
 
     p = &y;
     /*@ assert security_status(*p) == public; */
