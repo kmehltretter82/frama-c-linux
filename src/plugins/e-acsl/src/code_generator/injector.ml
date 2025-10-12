@@ -274,7 +274,8 @@ let add_new_block_in_stmt env kf stmt =
     (* Remove local variables which scopes ended via goto/break/continue. *)
     let del_vars = Exit_points.delete_vars stmt in
     let env = Memory_observer.delete_from_set env kf del_vars in
-    if Kernel_function.is_return_stmt kf stmt then
+    match stmt.skind with
+    | Return _ ->
       let env =
         if Functions.check kf then
           (* must generate the post_block before including [stmt] (the
@@ -299,7 +300,7 @@ let add_new_block_in_stmt env kf stmt =
       in
       let new_stmt = Smart_stmt.block stmt b in
       new_stmt, env
-    else (* i.e. not (is_return stmt) *)
+    | _ -> (* i.e. not (is_return stmt) *)
       (* must generate [pre_block] which includes [stmt] before generating
          [post_block] *)
       let pre_block, env =

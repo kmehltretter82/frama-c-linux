@@ -10,7 +10,7 @@ extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 void f1(void)
 {
   {
-    /*@ ghost int o = 0; */
+    int o = 0;
     o ++;
   }
   return;
@@ -51,7 +51,7 @@ void f2(void)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
   }
   {
-    /*@ ghost int o = 0; */
+    int o = 0;
     int *p = & o;
     {
       int __gen_e_acsl_initialized;
