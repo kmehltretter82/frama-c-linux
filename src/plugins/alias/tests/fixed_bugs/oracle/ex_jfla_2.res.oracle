@@ -106,4 +106,4 @@
   { *x; *z; s1->fst; s2->snd; t; a; c }  { *y; s1->snd; b }
 [alias] May-aliases at the end of function main:
   { *x; *z; s1->fst; s2->snd; t; a; c }  { *y; s1->snd; b }
-[alias] node counter: 121
+[alias] node counter: 103

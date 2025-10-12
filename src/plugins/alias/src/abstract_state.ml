@@ -672,31 +672,21 @@ let empty : state = {graph = G.empty; varmap = VarMap.empty; vmap = VMap.empty}
 
 let is_empty s = compare s empty = 0
 
-(* add an int to all vertex values *)
-let shift s : state =
+(* refresh vertex values to an interval. *)
+let refresh s : state =
   assert_invariants s;
   if is_empty s then s else begin
-    let max_idx = G.fold_vertex max s.graph 0 in
-    let min_idx = G.fold_vertex min s.graph max_idx in
-    let offset = !node_counter - min_idx in
-    let shift x = x + offset in
-    let shift_vmap shift_elem vmap =
-      VMap.of_seq @@ Stdlib.Seq.map shift_elem @@ VMap.to_seq vmap
+    let fill_map idx map =
+      let map = VMap.add idx !node_counter map in incr node_counter; map
     in
+    let map_idx = G.fold_vertex fill_map s.graph VMap.empty in
+    let convert idx = VMap.find idx map_idx in
+    let vmap_convert idx value acc = VMap.add (convert idx) value acc in
     let {graph; varmap; vmap} = s in
-    if max_idx + offset + 1 < 0 then
-      Options.fatal
-        "Cannot create more nodes. Current indices are:@\n\
-         node_counter: %d;@\n\
-         min_idx: %d;@\n\
-         max_idx: %d;@\n\
-         offset: %d."
-        !node_counter min_idx max_idx offset;
-    node_counter := max_idx + offset + 1;
     let result =
-      {graph = G.map_vertex shift graph;
-       varmap = VarMap.map shift varmap;
-       vmap = shift_vmap (fun (key, l) -> shift key, l) vmap}
+      {graph = G.map_vertex convert graph;
+       varmap = VarMap.map convert varmap;
+       vmap = VMap.fold vmap_convert vmap VMap.empty}
     in
     asserting_invariants result
   end
@@ -832,7 +822,7 @@ let call s (res : lval option) (args : exp list) (summary : Summary.t) : state =
   assert_invariants s;
   let formals = summary.Summary.formals in
   assert (List.length args = List.length formals);
-  let summary_state = shift @@ Option.get summary.state in
+  let summary_state = refresh @@ Option.get summary.state in
 
   (* pair up formals and their corresponding arguments,
      as well as the bound result with the returned value *)
@@ -874,7 +864,8 @@ let call s (res : lval option) (args : exp list) (summary : Summary.t) : state =
         Some (v1, v2)
       with Not_found -> None
     in
-    !s, List.filter_map find_vertex arg_formal_pairs
+    let args = List.filter_map find_vertex arg_formal_pairs in
+    !s, args
   in
 
   let find_global (vi, v1) =

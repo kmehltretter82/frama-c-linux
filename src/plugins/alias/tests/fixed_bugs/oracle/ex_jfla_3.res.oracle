@@ -105,4 +105,4 @@
 [alias] May-aliases at the end of function main:
   { *x; *y; *z; s1->fst; s1->snd; s2->fst; s2->snd; t; a; b; c; s.fst; s.snd }
   { x; y; z }  { s1; s2 }
-[alias] node counter: 86
+[alias] node counter: 78
