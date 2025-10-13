@@ -501,11 +501,11 @@ function reset(): void {
 // --- Popup Menu Management
 // --------------------------------------------------------------------------
 
-interface PopupMenuItemProps {
+export interface PopupMenuItem {
   /** Item label. */
   label?: string;
   /** Menu identifier.  */
-  id?: string;
+  id?: number;
   /** type item */
   type: 'separator' | 'checkbox' | 'normal' | 'submenu';
   /** Displayed item, default is `true`. */
@@ -518,11 +518,9 @@ interface PopupMenuItemProps {
   submenu?: PopupMenuItem[];
 }
 
-export type PopupMenuItem = PopupMenuItemProps;
-
 function getMenu(
   items: PopupMenuItem[],
-  callback: (s?: string) => void,
+  callback: (id?: number) => void,
   level = 0
 ): Menu {
   const menu = new Menu();
@@ -533,7 +531,7 @@ function getMenu(
       const menuItem: Electron.MenuItemConstructorOptions = {
         type, enabled, checked,
         label: label || `#${level}-${++kid}`,
-        click: (): void => callback(item.id || undefined)
+        click: (): void => callback(item.id)
       };
       if (submenu) {
         menuItem.submenu = getMenu(submenu, callback, level + 1);
@@ -546,12 +544,10 @@ function getMenu(
 }
 
 function handlePopupMenu(_: IpcMainInvokeEvent, items: PopupMenuItem[]):
-  Promise<string | undefined> {
+  Promise<number | undefined> {
   return new Promise((resolve) => {
-    let selected: string | undefined = undefined;
-    const menu = getMenu(items, (value) => {
-      selected = value;
-    });
+    let selected: number | undefined = undefined;
+    const menu = getMenu(items, (value) => selected = value);
     menu.popup({ callback: () => resolve(selected) });
   });
 }
