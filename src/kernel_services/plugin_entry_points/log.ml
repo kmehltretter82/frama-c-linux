@@ -200,7 +200,7 @@ let echo_substring fmt text pos len =
   Format.pp_print_string fmt s
 
 let echo_firstline fmt text p q width =
-  let t = try String.index_from text p '\n' with Not_found -> succ q in
+  let t = try String.index_from text p '\n' with Not_found -> q in
   let n = min width (t-p) in
   echo_substring fmt text p n
 
