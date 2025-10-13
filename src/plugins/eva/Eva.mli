@@ -543,6 +543,184 @@ module Parameters: sig
   val use_global_value_partitioning: Cil_types.varinfo -> unit
 end
 
+module Eva_perf: sig
+  (** Statistics about the analysis performance. *)
+
+  (** Statistic about the analysis time of a function or a callstack. *)
+  type stat = {
+    nb_calls: int;
+    (** How many times the given function or callstack has been analyzed. *)
+    self_duration: float;
+    (** Time spent analyzing the function or callstack itself. *)
+    total_duration: float;
+    (** Total time, including the analysis of other functions called. *)
+    called: Kernel_function.Hptset.t;
+    (** Set of functions called from this function or callstack. *)
+  }
+
+  type 'a by_fun = (Cil_types.kernel_function * 'a) list
+
+  (** Returns a list of the functions with the longest total analysis time,
+      sorted by decreasing analysis time. Each function [f] is associated to
+      its stat and the unsorted list of stats of all function calls from [f]. *)
+  val compute_stat_by_fun: unit -> (stat * stat by_fun) by_fun
+
+  (** Statistics about each analyzed callstack. *)
+  module StatByCallstack : sig
+    type callstack = Cil_types.kernel_function list
+
+    (** Get the current analysis statistic for a callstack. *)
+    val get: callstack -> stat
+
+    (** Iterate on the statistic of every analyzed callstack. *)
+    val iter: (callstack -> stat -> unit) -> unit
+
+    (** Set a hook on statistics computation *)
+    val add_hook_on_change:
+      ((callstack, stat) State_builder.hashtbl_event -> unit) -> unit
+
+  end
+end
+
+module Statistics: sig
+  (** This module keeps track of statistics collected by Eva during an
+      analysis. *)
+
+  (** Type of statistics. Type parameter ['ty] is either bound to [int] or
+      [float] for integer and float statistics respectively and ['k] show whether
+      a statistic is tied:
+      - to [kernel_function],
+      - to Cil [stmt],
+      - to the whole program, with [unit].  *)
+  type ('k, 'ty) t
+
+  (** {2 Registered statistics } *)
+
+  (** Max heap size in kilobytes until the statistics are exported. *)
+  val memory_usage : (unit, int) t
+
+  (** Number of alarms emitted by the analysis. *)
+  val alarm_count : (unit, int) t
+
+  (** Ratio in [0, 1] of statements reached by the analysis to all statements in
+      analyzed functions. *)
+  val stmt_coverage : (unit, float) t
+
+  (** Ratio in [0, 1] of functions reached by the analysis to all functions in
+      source files. *)
+  val fun_coverage : (unit, float) t
+
+  (** Analysis time of the main function, including children. *)
+  val analysis_duration : (unit, float) t
+
+  (** Number of times each statement has been interpreted. *)
+  val iterations : (Cil_types.stmt, int) t
+
+  (** Count of memexec cache hits. *)
+  val memexec_hits : (Cil_types.kernel_function, int) t
+
+  (** Count of memexec cache misses. *)
+  val memexec_misses : (Cil_types.kernel_function, int) t
+
+  (** Maximum number of successive widening computed at each widening
+      statement. *)
+  val max_widenings : (Cil_types.stmt, int) t
+
+  (** Maximum number of loop unrolling computed at each loop statement. *)
+  val max_unrolling : (Cil_types.stmt, int) t
+
+  (** Count of state index hits. *)
+  val partitioning_index_hits : (unit, int) t
+
+  (** Count of state index misses. *)
+  val partitioning_index_misses : (unit, int) t
+
+
+  (** {2 Statistics registration } *)
+
+  type _ typ =
+    | Int : int typ
+    | Float : float typ
+
+  (** Registers a statistic tied to the whole program. *)
+  val register_global_stat : string -> 'ty typ -> (unit, 'ty) t
+
+  (** Registers a statistic tied to functions. *)
+  val register_function_stat :
+    string -> 'ty typ -> (Cil_types.kernel_function, 'ty) t
+
+  (** Registers a statistic tied to statements. *)
+  val register_statement_stat : string -> 'ty typ -> (Cil_types.stmt, 'ty) t
+
+  (** Add a hook function that will be called when the statistics are exported.
+      Is can be used to update the statistics before they are actually used. *)
+  val add_compute_hook : (unit -> unit) -> unit
+
+
+  (** {2 Statistics retrieval } *)
+
+  (** Get the current stat value for a given element (statement, function or unit
+      according to the statistic type). **)
+  val get : ('k, 'ty) t -> 'k -> 'ty
+
+
+  (** {2 Statistics update } *)
+
+  (** Set the stat to the given value. *)
+  val set : ('k, 'ty) t -> 'k -> 'ty -> unit
+
+  (** Adds 1 to the stat or set it to 1 if the stat is currently undefined. *)
+  val incr : ('k, int) t -> 'k -> unit
+
+  (** Add a custom amount to the stat or set it to this amount the stat is
+      currently undefined. *)
+  val add : ('k, 'ty) t -> 'k -> 'ty -> unit
+
+  (** Set the stat to the maximum between the current value and the given
+      value. *)
+  val grow : ('k, 'ty) t -> 'k -> 'ty -> unit
+end
+
+module Export: sig
+  open Cil_types
+
+  (* -------------------------------------------------------------------------- *)
+  (* --- Annotation Generator                                               --- *)
+  (* -------------------------------------------------------------------------- *)
+
+  (** Generates a predicate characterizing the domain of the l-value. *)
+  val export_value :
+    loc:location -> ?name:string list -> lval -> Results.request -> predicate
+
+  (**
+     Generates a collection of predicates for each l-value that is read by the
+     instruction or the branching condition of the statement. Other kinds of
+     statements, like loops, blocks and exceptions are not visited.
+
+     More precisely, for set and call instructions: the written l-values from
+     left-hand-side are not visited, but their inner l-values are visited; any
+     l-value from the right-hand-side of the instruction is also visited.
+  *)
+  val export_stmt :
+    ?callstack:Callstack.t -> ?name:string list -> stmt -> predicate list
+
+  (** Emitter used for generating domain assertions. *)
+  val emitter : Emitter.t
+
+  (**
+     Creates a visitor that can be used to generate new annotations for all
+     visited instructions. The generated assertions are associated with the local
+     {!emitter}. They are all assigned a valid status by {!Analysis.emitter}.
+  *)
+  val generator : unit -> Visitor.frama_c_inplace
+
+  (**
+     Creates a visitor that can be used to remove all generated annotations from
+     {!emitter}. This will also remove their associated status.
+  *)
+  val cleaner : unit -> Visitor.frama_c_inplace
+end
+
 module Eva_annotations: sig
   (** Register special annotations to locally guide the Eva analysis:
 
@@ -810,45 +988,6 @@ module Cvalue_callbacks: sig
   val register_call_results_hook: call_results_hook -> unit
 end
 
-module Eva_perf: sig
-  (** Statistics about the analysis performance. *)
-
-  (** Statistic about the analysis time of a function or a callstack. *)
-  type stat = {
-    nb_calls: int;
-    (** How many times the given function or callstack has been analyzed. *)
-    self_duration: float;
-    (** Time spent analyzing the function or callstack itself. *)
-    total_duration: float;
-    (** Total time, including the analysis of other functions called. *)
-    called: Kernel_function.Hptset.t;
-    (** Set of functions called from this function or callstack. *)
-  }
-
-  type 'a by_fun = (Cil_types.kernel_function * 'a) list
-
-  (** Returns a list of the functions with the longest total analysis time,
-      sorted by decreasing analysis time. Each function [f] is associated to
-      its stat and the unsorted list of stats of all function calls from [f]. *)
-  val compute_stat_by_fun: unit -> (stat * stat by_fun) by_fun
-
-  (** Statistics about each analyzed callstack. *)
-  module StatByCallstack : sig
-    type callstack = Cil_types.kernel_function list
-
-    (** Get the current analysis statistic for a callstack. *)
-    val get: callstack -> stat
-
-    (** Iterate on the statistic of every analyzed callstack. *)
-    val iter: (callstack -> stat -> unit) -> unit
-
-    (** Set a hook on statistics computation *)
-    val add_hook_on_change:
-      ((callstack, stat) State_builder.hashtbl_event -> unit) -> unit
-
-  end
-end
-
 module Logic_inout: sig
   (** Functions used by the Inout and From plugins to interpret predicate
       and assigns clauses. This API may change according to these plugins
@@ -915,143 +1054,4 @@ module Unit_tests: sig
 
   (** Runs some programmatic tests on Eva. *)
   val run: unit -> unit
-end
-
-module Export: sig
-  open Cil_types
-
-  (* -------------------------------------------------------------------------- *)
-  (* --- Annotation Generator                                               --- *)
-  (* -------------------------------------------------------------------------- *)
-
-  (** Generates a predicate characterizing the domain of the l-value. *)
-  val export_value :
-    loc:location -> ?name:string list -> lval -> Results.request -> predicate
-
-  (**
-     Generates a collection of predicates for each l-value that is read by the
-     instruction or the branching condition of the statement. Other kinds of
-     statements, like loops, blocks and exceptions are not visited.
-
-     More precisely, for set and call instructions: the written l-values from
-     left-hand-side are not visited, but their inner l-values are visited; any
-     l-value from the right-hand-side of the instruction is also visited.
-  *)
-  val export_stmt :
-    ?callstack:Callstack.t -> ?name:string list -> stmt -> predicate list
-
-  (** Emitter used for generating domain assertions. *)
-  val emitter : Emitter.t
-
-  (**
-     Creates a visitor that can be used to generate new annotations for all
-     visited instructions. The generated assertions are associated with the local
-     {!emitter}. They are all assigned a valid status by {!Analysis.emitter}.
-  *)
-  val generator : unit -> Visitor.frama_c_inplace
-
-  (**
-     Creates a visitor that can be used to remove all generated annotations from
-     {!emitter}. This will also remove their associated status.
-  *)
-  val cleaner : unit -> Visitor.frama_c_inplace
-end
-
-module Statistics: sig
-  (** This module keeps track of statistics collected by Eva during an
-      analysis. *)
-
-  (** Type of statistics. Type parameter ['ty] is either bound to [int] or
-      [float] for integer and float statistics respectively and ['k] show whether
-      a statistic is tied:
-      - to [kernel_function],
-      - to Cil [stmt],
-      - to the whole program, with [unit].  *)
-  type ('k, 'ty) t
-
-  (** {2 Registered statistics } *)
-
-  (** Max heap size in kilobytes until the statistics are exported. *)
-  val memory_usage : (unit, int) t
-
-  (** Number of alarms emitted by the analysis. *)
-  val alarm_count : (unit, int) t
-
-  (** Ratio in [0, 1] of statements reached by the analysis to all statements in
-      analyzed functions. *)
-  val stmt_coverage : (unit, float) t
-
-  (** Ratio in [0, 1] of functions reached by the analysis to all functions in
-      source files. *)
-  val fun_coverage : (unit, float) t
-
-  (** Analysis time of the main function, including children. *)
-  val analysis_duration : (unit, float) t
-
-  (** Number of times each statement has been interpreted. *)
-  val iterations : (Cil_types.stmt, int) t
-
-  (** Count of memexec cache hits. *)
-  val memexec_hits : (Cil_types.kernel_function, int) t
-
-  (** Count of memexec cache misses. *)
-  val memexec_misses : (Cil_types.kernel_function, int) t
-
-  (** Maximum number of successive widening computed at each widening
-      statement. *)
-  val max_widenings : (Cil_types.stmt, int) t
-
-  (** Maximum number of loop unrolling computed at each loop statement. *)
-  val max_unrolling : (Cil_types.stmt, int) t
-
-  (** Count of state index hits. *)
-  val partitioning_index_hits : (unit, int) t
-
-  (** Count of state index misses. *)
-  val partitioning_index_misses : (unit, int) t
-
-
-  (** {2 Statistics registration } *)
-
-  type _ typ =
-    | Int : int typ
-    | Float : float typ
-
-  (** Registers a statistic tied to the whole program. *)
-  val register_global_stat : string -> 'ty typ -> (unit, 'ty) t
-
-  (** Registers a statistic tied to functions. *)
-  val register_function_stat :
-    string -> 'ty typ -> (Cil_types.kernel_function, 'ty) t
-
-  (** Registers a statistic tied to statements. *)
-  val register_statement_stat : string -> 'ty typ -> (Cil_types.stmt, 'ty) t
-
-  (** Add a hook function that will be called when the statistics are exported.
-      Is can be used to update the statistics before they are actually used. *)
-  val add_compute_hook : (unit -> unit) -> unit
-
-
-  (** {2 Statistics retrieval } *)
-
-  (** Get the current stat value for a given element (statement, function or unit
-      according to the statistic type). **)
-  val get : ('k, 'ty) t -> 'k -> 'ty
-
-
-  (** {2 Statistics update } *)
-
-  (** Set the stat to the given value. *)
-  val set : ('k, 'ty) t -> 'k -> 'ty -> unit
-
-  (** Adds 1 to the stat or set it to 1 if the stat is currently undefined. *)
-  val incr : ('k, int) t -> 'k -> unit
-
-  (** Add a custom amount to the stat or set it to this amount the stat is
-      currently undefined. *)
-  val add : ('k, 'ty) t -> 'k -> 'ty -> unit
-
-  (** Set the stat to the maximum between the current value and the given
-      value. *)
-  val grow : ('k, 'ty) t -> 'k -> 'ty -> unit
 end
