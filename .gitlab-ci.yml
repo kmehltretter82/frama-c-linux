@@ -92,6 +92,13 @@ variables:
 ################################################################################
 ### PREPARE
 
+check-stable-pipeline:
+  stage: prepare
+  script:
+    - ./nix/check-stable-pipeline.sh
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+
 check-makefile:
   stage: prepare
   script:
