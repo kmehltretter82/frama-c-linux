@@ -13,7 +13,7 @@ compiling Frama-C 32.0.
 - ppx_deriving_yaml.0.3.0
 - ppx_deriving_yojson.3.9.0
 - unionFind.20220122
-- why3.1.8.1 (for wp)
+- why3.1.8.2 (for wp)
 - alt-ergo.2.5.4 (for wp, optional)
 - yojson.2.2.2
 - zarith.1.14
