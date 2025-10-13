@@ -1,0 +1,155 @@
+In any region map, each region is carcterized by (at least) its size,
+its content, and the memory accesses.
+Memory access kinds are: read \texttt{R}, write \texttt{W}, shift
+\texttt{S}, and initialization \texttt{I}. Each access is paired with a C type
+that defines the size of all memory locations included in the region.
+
+\subsection{Primitive regions}
+
+Shown in Table \ref{table-region-navigation-primitive}, primitive regions
+are defined as region which only include accesses paired with primitive
+C types, which are represented as
+\texttt{i} for \texttt{int}, \texttt{s} for \texttt{short},
+\texttt{d} for \texttt{double}, \texttt{f} for \texttt{float},
+ \texttt{b} for \texttt{bool}.
+
+\begin{table}[h!]
+\begin{center}
+\begin{tabular}{|m{1.8cm}|m{10cm}|}
+\hline
+    \centering Region & Meaning
+\\
+\hline
+    {\centering{\includegraphics[height=1.1cm]{"images/example-primitive-read.png"}}}
+&
+    Primitive region with read access of \texttt{int}.
+\\
+\hline
+    {\centering{\includegraphics[height=1.1cm]{"images/example-primitive-rw.png"}}}
+&
+    Primitive region with read \& write accesses of \texttt{int}.
+\\
+\hline
+    {\centering{\includegraphics[height=1.1cm]{"images/example-primitive-write.png"}}}
+&
+    Primitive region with write access of \texttt{int}.
+\\
+\hline
+\end{tabular}
+\end{center}
+\vspace{-15px}
+\caption{Example of primitive regions}
+\label{table-region-navigation-primitive}
+\end{table}
+
+\subsection{Pointer regions}
+
+Shown in Table \ref{table-region-navigation-pointer},
+pointer regions are regions whose accesses are of C type pointer.
+Dereferencing one of the pointer region's pointers (accessing the pointed value)
+is interpreted as a pointer read access.
+The representation of pointer referencing is shown in the region arc examples
+in Table \ref{table-region-navigation-arcs}.
+
+\begin{table}[h!]
+\begin{center}
+\begin{tabular}{|m{1.8cm}|m{10cm}|}
+\hline
+    \centering Region & Meaning
+\\
+\hline
+    {\centering{\includegraphics[height=1.1cm]{"images/example-pointer-read.png"}}}
+&
+    Pointer region with read access.
+\\
+\hline
+    {\centering{\includegraphics[height=1.1cm]{"images/example-pointer-rw.png"}}}
+&
+    Pointer region with read \& write accesses.
+\\
+\hline
+    {\centering{\includegraphics[height=1.1cm]{"images/example-pointer-write.png"}}}
+&
+    Pointer region with write access.
+
+    The addresses contained in this region are never read,
+    therefore, no arrow can be added to another region.
+\\
+\hline
+\end{tabular}
+\end{center}
+\vspace{-15px}
+\caption{Example of pointer regions}
+\label{table-region-navigation-pointer}
+\end{table}
+
+\subsection{Compound regions}
+
+Shown in Table \ref{table-region-navigation-compound},
+compound regions are accessed with a \texttt{struct} C type.
+The representation and the shape of the region depends on the accessed
+fields of the structure.
+
+\begin{table}[h!]
+\begin{center}
+\begin{tabular}{|m{2cm}|m{10cm}|}
+\hline
+    \centering Region & Meaning
+\\
+\hline
+    {\centering{\includegraphics[width=2cm]{"images/example-compound-region.png"}}}
+&
+    Compound region with at least three fields named \texttt{x}, \texttt{z} and
+    \texttt{arr}, where the last one is an array of size \texttt{4}.
+
+    Between the fields \texttt{x} and \texttt{z}, there may be any combination
+    of padding and unaccessed field of total size 32 bits.
+\\
+\hline
+\end{tabular}
+\end{center}
+\vspace{-15px}
+\caption{Example of a compound region}
+\label{table-region-navigation-compound}
+\end{table}
+
+
+\subsection{Region arcs in the region map}
+
+A region map is defined by its regions and the relaitons between them.
+Those relations are represneted as arcs in the region map, as shown in Table \ref{table-region-navigation-arcs}.
+
+\begin{table}[h!]
+\begin{center}
+\begin{tabular}{|m{5cm}|m{10cm}|}
+\hline
+\centering Region arc & Meaning
+\\
+\hline
+{\centering{\includegraphics[height=1.1cm]{"images/example-labeling.png"}}}
+&
+The colored primitive region is labelled by the variable named \texttt{\_retres}.
+\\\hline
+{\centering{\includegraphics[height=1.1cm]{"images/example-labeling-array.png"}}}
+&
+The colored primitive region is labelled by the variable named \texttt{y}, an array of size 2.
+\\
+\hline
+{\centering{\includegraphics[height=1cm]{"images/example-compound-field.png"}}}
+&
+The field \texttt{z} on the left is represented by the right colored region.
+\\
+\hline
+{\centering{\includegraphics[height=1.1cm]{"images/example-pointer.png"}}}
+&
+The right region is pointed by the left pointer region.
+
+All the addresses in the left pointer region reference the values in the right region.
+\\
+\hline
+\end{tabular}
+\end{center}
+\vspace{-15px}
+\caption{Arc examples in the region map}
+\label{table-region-navigation-arcs}
+\end{table}

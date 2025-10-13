@@ -1,0 +1,47 @@
+
+\subsubsection{Motivating example}
+\begin{wrapfigure}[3]{R}{6.5cm}
+\centering
+\vspace{-35pt}
+\includegraphics[width=6.5cm]{"images/pointer-1.jpg"}
+\caption{Region map motivating example}
+\label{img-region-motivating-example}
+\vspace{-15pt}
+\end{wrapfigure}
+
+\par
+
+In the WP memory model named Typed, typed accesses with different type size
+are considered to be in separated memory locations. Therefore, the WP Typed
+memory model is unsound when applied to this example\footnote{If the architecture sets the
+length of an \texttt{int} to be double the length of a \texttt{short}}:
+
+\begin{lstlisting}[linewidth=6cm]
+void g(short x, int y) {
+    x = 1;
+    short *p = (short *) &y;
+    p[0] = 0;
+    p[1] = 1;
+}
+\end{lstlisting}
+
+One can read the \emph{region map} represented in Figure \ref{img-region-motivating-example} as:
+
+\begin{itemize}
+    \item White nodes are \emph{region labels} and represent variables.
+    \item Region labels for arrays are formed as \texttt{variable[length]},
+    for example \texttt{y[2]}.
+    \item The upper pink region (whose label is \texttt{y[2]}) is accessed
+    only by writing a \texttt{short} value. The representation \texttt{W(s)}
+    is a compact form, meaning \texttt{W} for the write access and \texttt{s}
+    specifies the C type \texttt{short}. The pink color is a redondant
+    representation of a write access of a primitive type, as demonstrated for
+    the region labelled \texttt{x}.
+    \item The centered orange region, labelled \texttt{p}, is accessed as
+    a pointer in read and write access. The representation \texttt{RW*} is
+    a compact form meaning \texttt{R} for the read access, \texttt{W} for the
+    write access, and \texttt{*} represents the pointer type.
+    \item An arrow links the region \texttt{p} to the region \texttt{y[2]},
+    meaning that the pointer \texttt{p} points to the region
+    \texttt{y[2]}\footnote{More specifically, it points to some of its memory locations.}.
+\end{itemize}
