@@ -117,9 +117,15 @@ type warn_status =
   (** emit a message. Execution continues, but exit status will not be 0 *)
   | Wabort (** emit a message and abort execution *)
 
-(** @since Beryllium-20090601-beta1
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
-module type Messages = sig
+(**
+   @since Beryllium-20090601-beta1
+   @since Frama-C+dev
+   All formatters now interpret semantic tags for ANSI styling, as
+   defined in {!Ansi_escape} module.
+   @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
+*)
+module type Messages =
+sig
 
   type category
   (** category for debugging/verbose messages. Must be registered before
@@ -166,7 +172,7 @@ module type Messages = sig
       @since Beryllium-20090601-beta1
       @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
-  val debug   : ?level:int -> ?dkey:category -> 'a pretty_printer
+  val debug : ?level:int -> ?dkey:category -> 'a pretty_printer
   (** Debugging information dedicated to Plugin developers.
       Default level is 1. The debugging key is used in message headers.
       See also [set_debug_keys] and [set_debug_keyset].
