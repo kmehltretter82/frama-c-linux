@@ -46,8 +46,6 @@ exception AbortFatal of string (* plug-in *)
 (* --- Terminal Management                                                --- *)
 (* -------------------------------------------------------------------------- *)
 
-open Format
-
 type lock =
   | Ready
   | Locked
@@ -302,9 +300,8 @@ let do_transient terminal message =
       let fmt = terminal.formatter in
       echo_firstline fmt text 0 (String.length text) 80 ;
       if terminal.isatty
-      then terminal.clean <- false
+      then (terminal.clean <- false ; Format.pp_print_flush fmt ())
       else Format.pp_print_newline fmt () ;
-      Format.pp_print_flush fmt () ;
     end
 
 (* -------------------------------------------------------------------------- *)
@@ -620,12 +617,12 @@ type 'a pretty_printer =
   ?current:bool -> ?source:Filepath.position ->
   ?emitwith:(event -> unit) -> ?echo:bool -> ?once:bool ->
   ?append:(Format.formatter -> unit) ->
-  ('a,formatter,unit) format -> 'a
+  ('a,Format.formatter,unit) format -> 'a
 
 type ('a,'b) pretty_aborter =
   ?current:bool -> ?source:Filepath.position -> ?echo:bool ->
   ?append:(Format.formatter -> unit) ->
-  ('a,formatter,unit,'b) format4 -> 'a
+  ('a,Format.formatter,unit,'b) format4 -> 'a
 
 let log_channel channel ?(kind=Result) ?current ?source ?emitwith ?echo ?once
     ?append text =
@@ -789,7 +786,7 @@ sig
     ?current:bool -> ?source:Filepath.position ->
     ?append:(Format.formatter -> unit) ->
     ?header:(Format.formatter -> unit) ->
-    ('a,formatter,unit) format -> 'a
+    ('a,Format.formatter,unit) format -> 'a
 
   val result  : ?level:int -> ?dkey:category -> 'a pretty_printer
   val has_tty : unit -> bool
@@ -803,7 +800,7 @@ sig
   val verify  : bool -> ('a,bool) pretty_aborter
 
   val not_yet_implemented : ?current:bool -> ?source:Filepath.position ->
-    ('a,formatter,unit,'b) format4 -> 'a
+    ('a,Format.formatter,unit,'b) format4 -> 'a
   val deprecated : string -> now:string -> ('a -> 'b) -> 'a -> 'b
 
   val with_result  : (event option -> 'b) -> ('a,'b) pretty_aborter

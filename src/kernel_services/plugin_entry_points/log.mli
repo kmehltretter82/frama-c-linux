@@ -9,8 +9,6 @@
 (** Logging Services for Frama-C Kernel and Plugins.
     @since Beryllium-20090601-beta1 *)
 
-open Format
-
 type kind = Result | Feedback | Debug | Warning | Error | Failure
 (** @since Beryllium-20090601-beta1 *)
 
@@ -41,7 +39,7 @@ type 'a pretty_printer =
   ?current:bool -> ?source:Filepath.position ->
   ?emitwith:(event -> unit) -> ?echo:bool -> ?once:bool ->
   ?append:(Format.formatter -> unit) ->
-  ('a,formatter,unit) format -> 'a
+  ('a,Format.formatter,unit) format -> 'a
 (**
     Generic type for the various logging channels which are not aborting
     Frama-C. The first line will be prefixed (plugin name, location, message
@@ -62,7 +60,7 @@ type 'a pretty_printer =
 type ('a,'b) pretty_aborter =
   ?current:bool -> ?source:Filepath.position -> ?echo:bool ->
   ?append:(Format.formatter -> unit) ->
-  ('a,formatter,unit,'b) format4 -> 'a
+  ('a,Format.formatter,unit,'b) format4 -> 'a
 (** Same as {!Log.pretty_printer} except that channels having this type
     denote a fatal error aborting Frama-C.
     @since Beryllium-20090601-beta1
@@ -149,7 +147,7 @@ module type Messages = sig
     ?current:bool -> ?source:Filepath.position ->
     ?append:(Format.formatter -> unit) ->
     ?header:(Format.formatter -> unit) ->
-    ('a,formatter,unit) format -> 'a
+    ('a,Format.formatter,unit) format -> 'a
   (** Outputs the formatted message on [stdout]. Levels and
       key-categories are taken into account like event messages.
       The header formatted message is emitted as a regular [result]
@@ -211,7 +209,7 @@ module type Messages = sig
       @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
   val not_yet_implemented : ?current:bool -> ?source:Filepath.position ->
-    ('a,formatter,unit,'b) format4 -> 'a
+    ('a,Format.formatter,unit,'b) format4 -> 'a
   (** raises [FeatureRequest] but {i does not} send any message.
       If the exception is not caught, Frama-C displays a feature-request
       message to the user.
