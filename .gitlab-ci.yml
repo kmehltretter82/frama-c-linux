@@ -113,20 +113,20 @@ unstoppable-pipeline:
   <<: *do_not_stop_pipeline_template
   only:
     variables:
-      - $DEFAULT == $CI_COMMIT_BRANCH
+      - $DEFAULT == $CI_COMMIT_REF_NAME
 
 do-not-stop-pipeline:
   <<: *do_not_stop_pipeline_template
   when: manual
   except:
     variables:
-      - $DEFAULT == $CI_COMMIT_BRANCH
+      - $DEFAULT == $CI_COMMIT_REF_NAME
 
 check-publish:
   stage: prepare
   script: >
     [[ "$RELEASE" == "no" ]] &&
-    [[ "$DEFAULT" == "$CI_COMMIT_BRANCH" ]] &&
+    [[ "$DEFAULT" == "$CI_COMMIT_REF_NAME" ]] &&
     [[ "$DEFAULT" == "master" ]]
   <<: *when_publish
 
@@ -692,8 +692,8 @@ release-branch:
     REPOSITORY: "frama-c"
   <<: *prepare_ssh_template
   script:
-    - (! git merge-base --is-ancestor a1e186c68a6418a53b3dc06237f49e8dcbf75f4a origin/$CI_COMMIT_BRANCH)
-    - BRANCH="$CI_COMMIT_BRANCH" nix-shell -p coreutils openssh --run './nix/frama-c-public/publish-branch.sh'
+    - (! git merge-base --is-ancestor a1e186c68a6418a53b3dc06237f49e8dcbf75f4a origin/$CI_COMMIT_REF_NAME)
+    - BRANCH="$CI_COMMIT_REF_NAME" nix-shell -p coreutils openssh --run './nix/frama-c-public/publish-branch.sh'
     # Note: BRANCH must be defined here, since we cannot *evaluate* a variable in 'variables'
   <<: *when_release
   when: manual

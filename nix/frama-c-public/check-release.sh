@@ -9,7 +9,7 @@
 
 # This script is meant to be run in CI. In particular, it requires the
 # following environment variables:
-# - CI_COMMIT_BRANCH (GitLab variable): the branch the commit belongs to
+# - CI_COMMIT_REF_NAME (GitLab variable): the branch the commit belongs to
 # - DEFAULT (CI variable): the default branch configured in .gitlab-ci.yml
 # - PUBLISH (CI variable): indicating publish mode in .gitlab-ci.yml
 #
@@ -45,10 +45,10 @@ else
   exit_red   "PUBLISH MODE DETECTED"
 fi
 
-if [[ "$DEFAULT" == "$CI_COMMIT_BRANCH" ]] ; then
+if [[ "$DEFAULT" == "$CI_COMMIT_REF_NAME" ]] ; then
   echo_green "The branch is the default branch"
 else
-  exit_red   "THIS BRANCH ($CI_COMMIT_BRANCH) IS NOT THE DEFAULT ($DEFAULT)"
+  exit_red   "THIS BRANCH ($CI_COMMIT_REF_NAME) IS NOT THE DEFAULT ($DEFAULT)"
 fi
 
 if [[ "$DEFAULT" == "stable/$LOWER_CODENAME" ]] ; then
