@@ -824,9 +824,9 @@
     maybe
 [inout] InOut (internal) for function buggy:
   Operational inputs:
-    maybe; "d"[0]
+    maybe
   Operational inputs on termination:
-    maybe; "d"[0]
+    maybe
   Sure outputs:
     c; p; tmp
 [inout] Out (internal) for function copy_0:
@@ -862,10 +862,10 @@
     i; src[0..19]; maybe; v1; v2; v4{.x; .y; .p; .padding[0..3]}; t[0..3]
 [inout] InOut (internal) for function test:
   Operational inputs:
-    i; src[0..19]; maybe; "d"[0]; "abcd"[0..4]; v1{.p; .padding[0..23]}; 
-    v2; v4{.x; {.p; .padding[0..3]}}; t{[0]; [3]}; a; b
+    i; src[0..19]; maybe; "abcd"[0..4]; v1{.p; .padding[0..23]}; v2;
+    v4{.x; {.p; .padding[0..3]}}; t{[0]; [3]}; a; b
   Operational inputs on termination:
-    src[0..19]; maybe; "d"[0]; "abcd"[0..4]; v1{.p; .padding[0..23]}; v2;
+    src[0..19]; maybe; "abcd"[0..4]; v1{.p; .padding[0..23]}; v2;
     v4{.x; {.p; .padding[0..3]}}; t{[0]; [3]}; a; b
   Sure outputs:
     dst1[1..5]; dst2[1..10]; dst3[5..9]; dst4[5..14]; tm[0]; um[0]; ttyp[0];
@@ -900,8 +900,8 @@
     i; src[0..19]; maybe; v1; v2; v4{.x; .y; .p; .padding[0..3]}; t[0..3]
 [inout] InOut (internal) for function main:
   Operational inputs:
-    i; src[0..19]; maybe; "d"[0]; "abcd"[0..4]; v1{.p; .padding[0..23]}; 
-    v2; v4{.x; {.p; .padding[0..3]}}; t{[0]; [3]}
+    i; src[0..19]; maybe; "abcd"[0..4]; v1{.p; .padding[0..23]}; v2;
+    v4{.x; {.p; .padding[0..3]}}; t{[0]; [3]}
   Operational inputs on termination:
     \nothing
   Sure outputs:

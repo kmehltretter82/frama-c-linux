@@ -502,7 +502,7 @@ let get_external_aux ?stmt kf =
         r
       else !ref_get_external kf
 
-let extract_inout_from_froms assigns =
+let extract_inout_from_froms kf assigns =
   let Eva.Assigns.{ return = deps_return; memory = deps_table } = assigns in
   let in_return = Eva.Deps.to_zone deps_return in
   let in_, out_ =
@@ -521,7 +521,9 @@ let extract_inout_from_froms assigns =
       in
       Eva.Assigns.Memory.fold aux_from m (Zone.bottom, Zone.bottom)
   in
-  (Zone.join in_return in_), out_
+  let in_ = Zone.join in_return in_ in
+  let externalize = externalize_zone ~with_formals:false kf in
+  externalize in_, externalize out_
 
 
 [@@@ warning "-60"]
@@ -655,7 +657,7 @@ module Callwise = struct
       | `Spec _states
       | `Builtin (_states, None) -> compute_using_spec pre_state kf
       | `Builtin (_states, Some (froms,sure_out)) ->
-        let in_, out_ = extract_inout_from_froms froms in
+        let in_, out_ = extract_inout_from_froms kf froms in
         {
           over_inputs_if_termination = in_;
           over_inputs = in_;
