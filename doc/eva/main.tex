@@ -4687,7 +4687,7 @@ information-flow analysis, that tracks how data originating from untrusted or
 sensitive sources---such as external inputs or secrets---propagate through the
 program and potentially influence its execution.
 
-The initial taint must be specified by the user with ACSL annotations
+The initial taint must be specified by the user with \acsl{} annotations
 \lstinline|//@ taint <lvalues>;| on a statement, or a clause
 \lstinline|taints <lvalues>;| in a function contract.
 
@@ -4708,10 +4708,10 @@ annotation, or at the return of the function with the \texttt{taints} clause.
       int write(char *buf, int n);
 \end{listing-nonumber}
 
-The taint is then propagated during the Eva analysis, which computes an
+The taint is then propagated during the \Eva{} analysis, which computes an
 over-approximation of the set of tainted locations at each program point.
 
-The ACSL predicate \lstinline|\tainted| can be used to verify that some
+The \acsl{} predicate \lstinline|\tainted| can be used to verify that some
 values are \emph{not} tainted.
 Indeed, the domain only infers over-approximations of the tainted locations:
 while locations in the over-approximations \emph{may be} tainted,
@@ -4737,14 +4737,13 @@ not tainted anymore.
 \end{listing-nonumber}
 
 Taint analysis accounts for both data and control dependencies: a value may
-become tainted either directly, through assignments and computations that use
-tainted data, or indirectly, through control flow that depends on tainted
+become tainted either directly, through assignments that use tainted data, or
+indirectly, through control flow and computations that depends on tainted
 values. To reflect this distinction, the predicates
 \lstinline|\tainted_directly| and \lstinline|\tainted_indirectly| refine the
-general \lstinline|\tainted| predicate. In the same spirit as
-\lstinline|\tainted|, \lstinline|\tainted_directly| can be used to verify that a
-value is \emph{not} directly tainted, while \lstinline|\tainted_indirectly| to
-verify that a value is \emph{not} indirectly tainted.
+general \lstinline|\tainted| predicate: \lstinline|\tainted_directly| (resp.
+\lstinline|\tainted_indirectly|) can be used to verify that a value is
+\emph{not} directly (resp. indirectly) tainted.
 
 \begin{listing-nonumber}
   void fun(int a, int b, int t) {
@@ -4764,7 +4763,7 @@ verify that a value is \emph{not} indirectly tainted.
 \end{listing-nonumber}
 
 As with \lstinline|\tainted|, the predicates \lstinline|\tainted_directly| and
-\lstinline|\tainted_indirectly| can be used in ACSL assertions to refine the
+\lstinline|\tainted_indirectly| can be used in \acsl{} assertions to refine the
 over-approximation of tainted locations, with respect to direct and indirect
 taints respectively.
 

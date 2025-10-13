@@ -486,7 +486,7 @@
     logic,loop,model,module,predicate,reads,real,requires,sizeof,strong,struct,
     terminates,returns,type,union,variant,
     dynamic_split,merge,pragma,slevel,split,taints,taint,unroll,widen_hints,
-    \\tainted,
+    \\tainted,\\tainted_directly,\\tainted_indirectly,
     Here,LoopCurrent,LoopEntry,Pre,Post,Old,
     \\Cons,\\Down,\\NearestAway,\\NearestEven,\\Nil,\\ToZero,\\Up,
     \\as,\\at,\\allocable,\\allocation,\\automatic,\\base_addr,\\block_length,\\dangling,
