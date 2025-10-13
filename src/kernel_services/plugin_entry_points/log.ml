@@ -77,13 +77,12 @@ let is_ready t =
 let term_clean t =
   if t.isatty && not t.clean then
     begin
-      let u = "\r\027[K" in
       (* TERM escape commands:
          "\r" is carriage return ;
          "\027[K" is CSI command EL 'Erase in Line' ;
          See https://en.wikipedia.org/wiki/ANSI_escape_code
       *)
-      Format.pp_print_string t.formatter u;
+      Format.pp_print_string t.formatter "\r\027[K" ;
       t.clean <- true ;
     end
 
@@ -191,17 +190,6 @@ let print_delayed job =
 (* --- Echo Line(s)                                                       --- *)
 (* -------------------------------------------------------------------------- *)
 
-let echo_substring fmt text pos len =
-  (* Do replace by Format.pp_print_substring_as as soon as OCaml 5.1 is
-     the minimal version supported by Frama-C *)
-  let s = String.sub text pos len in
-  Format.pp_print_string fmt s
-
-let echo_firstline fmt text p q width =
-  let t = try String.index_from text p '\n' with Not_found -> q in
-  let n = min width (t-p) in
-  echo_substring fmt text p n
-
 let formatter_with_indentation fmt amount =
   let blank = String.make amount ' ' in
   let begining_of_line = ref false in
@@ -292,15 +280,20 @@ let do_echo terminal evt =
   else
     echo_event evt terminal
 
-let do_transient terminal message =
+let do_transient terminal ~plugin message =
   if not (Rich_text.is_empty message) && not (delayed_echo terminal) then
     begin
       term_clean terminal ;
-      let text = Rich_text.to_string ~truncate:max_message_length message in
       let fmt = terminal.formatter in
-      echo_firstline fmt text 0 (String.length text) 80 ;
+      Format.fprintf fmt "@{<bold>[%s]@} " plugin ;
+      let width = max 40 (77 - String.length plugin) in
+      let newline =
+        try Rich_text.index message '\n'
+        with Not_found -> max_int in
+      let truncate = min newline width in
+      Rich_text.pretty fmt ~truncate message ;
       if terminal.isatty
-      then (terminal.clean <- false ; Format.pp_print_flush fmt ())
+      then terminal.clean <- false
       else Format.pp_print_newline fmt () ;
     end
 
@@ -467,7 +460,7 @@ let logtransient channel format =
     (fun _fmt ->
        try
          let message = Rich_text.Buffer.contents buffer in
-         do_transient channel.terminal message ;
+         do_transient channel.terminal ~plugin:channel.plugin message ;
          close_buffer channel
        with e ->
          close_buffer channel ;
@@ -988,7 +981,7 @@ struct
     | None -> Wactive
     | exception Not_found -> wnot_registered s
 
-  let channel = new_channel P.channel
+  let std = new_channel P.channel
 
   let internal_register_tag_handlers _c (_ope,_close) = ()
   (* BM->LOIC: I need to keep this code around to be able to handle
@@ -1017,7 +1010,7 @@ struct
   *)
 
   let register_tag_handlers h =
-    internal_register_tag_handlers channel h
+    internal_register_tag_handlers std h
 
   let to_be_log verbose debug =
     match verbose , debug with
@@ -1030,20 +1023,20 @@ struct
   let log ?(kind=Result) ?(verbose=0) ?(debug=0) ?current ?source ?emitwith
       ?echo ?once ?append text =
     if to_be_log verbose debug then
-      logwithfinal finally_unit channel ~kind ?current ?source ?emitwith ?echo
+      logwithfinal finally_unit std ~kind ?current ?source ?emitwith ?echo
         ?once ?append text
     else Pretty_utils.nullprintf text
 
   let result ?(level=1) ?dkey ?current ?source ?emitwith ?echo ?once ?append
       text =
     if verbose_atleast level && has_debug_key dkey then
-      logwithfinal finally_unit channel ~kind:Result ?category:dkey ?current
+      logwithfinal finally_unit std ~kind:Result ?category:dkey ?current
         ?source ?emitwith ?echo ?once ?append text
     else Pretty_utils.nullprintf text
 
   let transient channel = channel.terminal.isatty
 
-  let has_tty () = transient channel
+  let has_tty () = transient std
 
   let feedback ?(ontty=`Message) ?(level=1) ?dkey ?current ?source ?emitwith
       ?echo ?once ?append text =
@@ -1051,16 +1044,16 @@ struct
       if verbose_atleast level && has_debug_key dkey
       then
         match ontty with
-        | `Feedback -> if transient channel then `Transient else `Message
-        | `Transient -> if transient channel then `Transient else `Silent
-        | `Silent -> if transient channel then `Silent else `Message
+        | `Feedback -> if transient std then `Transient else `Message
+        | `Transient -> if transient std then `Transient else `Silent
+        | `Silent -> if transient std then `Silent else `Message
         | `Message -> `Message
       else `Silent
     in match mode with
     | `Message ->
-      logwithfinal finally_unit channel ~kind:Feedback ?category:dkey ?current
+      logwithfinal finally_unit std ~kind:Feedback ?category:dkey ?current
         ?source ?emitwith ?echo ?once ?append text
-    | `Transient -> logtransient channel text
+    | `Transient -> logtransient std text
     | `Silent -> Pretty_utils.nullprintf text
 
   let should_output_debug level dkey =
@@ -1072,7 +1065,7 @@ struct
 
   let debug ?level ?dkey ?current ?source ?emitwith ?echo ?once ?append text =
     if should_output_debug level dkey then
-      logwithfinal finally_unit channel ~kind:Debug ?category:dkey ?current
+      logwithfinal finally_unit std ~kind:Debug ?category:dkey ?current
         ?source ?emitwith ?echo ?once ?append text
     else
       Pretty_utils.nullprintf text
@@ -1080,7 +1073,7 @@ struct
   let force_error = function
     | None ->
       { evt_kind = Failure;
-        evt_plugin = channel.plugin;
+        evt_plugin = std.plugin;
         evt_category = Some unreported_error;
         evt_message = Rich_text.of_string "Silent error";
         evt_source = None
@@ -1094,26 +1087,26 @@ struct
     let evt = force_error evt in update_deferred_exn (DFatal evt)
 
   let error ?current ?source ?emitwith ?echo ?once ?append text =
-    logwithfinal finally_user_error channel ~kind:Error ?current ?source
+    logwithfinal finally_user_error std ~kind:Error ?current ?source
       ?emitwith ?echo ?once ?append text
 
   let abort ?current ?source ?echo ?append text =
-    logwithfinal (finally_raise (AbortError P.channel)) channel ~kind:Error
+    logwithfinal (finally_raise (AbortError P.channel)) std ~kind:Error
       ?current ?source ?echo ?append text
 
   let failure ?current ?source ?emitwith ?echo ?once ?append text =
-    logwithfinal finally_internal_error channel ~kind:Failure ?current ?source
+    logwithfinal finally_internal_error std ~kind:Failure ?current ?source
       ?emitwith ?echo ?once ?append text
 
   let fatal ?current ?source ?echo ?append text =
-    logwithfinal (finally_raise (AbortFatal P.channel)) channel ~kind:Failure
+    logwithfinal (finally_raise (AbortFatal P.channel)) std ~kind:Failure
       ?current ?source ?echo ?append text
 
   let verify assertion ?current ?source ?echo ?append text =
     if assertion then
       Format.kfprintf (fun _ -> true) Pretty_utils.null text
     else
-      logwithfinal finally_false channel ~kind:Failure ?current ?source ?echo
+      logwithfinal finally_false std ~kind:Failure ?current ?source ?echo
         ?append text
 
   let logwith finally ?(wkey="") ?emitwith ?once ?current ?source ?echo ?append
@@ -1162,7 +1155,7 @@ struct
             | Some app ->
               Some (fun fmt -> app fmt; append_once_suffix fmt)
         in
-        logwithfinal finally channel ~kind ?category ?current ?source ?emitwith
+        logwithfinal finally std ~kind ?category ?current ?source ?emitwith
           ?once ?echo ?append text
       end
     else Pretty_utils.with_null (fun () -> finally None) text
@@ -1172,23 +1165,23 @@ struct
       text
 
   let with_result finally ?current ?source ?echo ?append text =
-    logwithfinal finally channel ~kind:Result ?current ?source ?echo ?append
+    logwithfinal finally std ~kind:Result ?current ?source ?echo ?append
       text
 
   let with_warning finally ?current ?source ?echo ?append text =
-    logwithfinal finally channel ~kind:Warning ?current ?source ?echo ?append
+    logwithfinal finally std ~kind:Warning ?current ?source ?echo ?append
       text
 
   let with_error finally ?current ?source ?echo ?append text =
-    logwithfinal finally channel ~kind:Error ?current ?source ?echo ?append
+    logwithfinal finally std ~kind:Error ?current ?source ?echo ?append
       text
 
   let with_failure finally ?current ?source ?echo ?append text =
-    logwithfinal finally channel ~kind:Failure ?current ?source ?echo ?append
+    logwithfinal finally std ~kind:Failure ?current ?source ?echo ?append
       text
 
   let register kd f =
-    let em = channel.emitters.(nth_kind kd) in
+    let em = std.emitters.(nth_kind kd) in
     em.listeners <- em.listeners @ [f]
 
   let not_yet_implemented ?(current=false) ?source text =
@@ -1197,7 +1190,7 @@ struct
     let finally fmt =
       Format.pp_print_flush fmt ();
       let msg = Buffer.contents buffer in
-      raise (FeatureRequest(source,channel.plugin,msg)) in
+      raise (FeatureRequest(source,std.plugin,msg)) in
     let fmt = Format.formatter_of_buffer buffer in
     Format.kfprintf finally fmt text
 
@@ -1222,7 +1215,7 @@ struct
       begin
         (* Header is a regular message *)
         let header = match header with None -> noprint | Some h -> h in
-        logwithfinal finally_unit channel ~fire:false ~kind:Result
+        logwithfinal finally_unit std ~fire:false ~kind:Result
           ?category:dkey ?current ?source  "%t" header;
         let bol = ref true in
         let fmt = delayed_terminal stdout in

@@ -25,7 +25,9 @@ type t = {
 let empty = { plain = "" ; tags = [] }
 let is_empty text = text.plain = "" && text.tags = []
 let of_string plain =  { empty with plain }
+let plain text = text.plain
 let size text = String.length text.plain
+let index text c = String.index text.plain c
 
 let contains text c =
   String.contains text.plain c
@@ -108,7 +110,6 @@ let to_string ?prefix ?suffix ?truncate ?ellipsis text =
   Option.iter (fun f -> f fmt) suffix;
   Format.pp_print_flush fmt ();
   Buffer.contents string_buffer
-
 
 (* -------------------------------------------------------------------------- *)
 (* --- Buffers for building rich text                                     --- *)

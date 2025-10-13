@@ -33,8 +33,15 @@ val of_string : string -> t
 (** [length text] returns the number of characters in the text. *)
 val size : t -> int
 
+(** [plain text] returns the plain string in the text (without any tag). *)
+val plain : t -> string
+
 (** [contains text c] returns whether [text] contains the character [c]. *)
 val contains : t -> char -> bool
+
+(** [index text c] finds the first index of character [c].
+    @raises Not_found if not found *)
+val index : t -> char -> int
 
 (** [pretty fmt text] pretty-prints the text onto the given formatter
     [fmt], with the semantic tags.
