@@ -7,7 +7,7 @@
 (**************************************************************************)
 
 (** This modules provides utilities to use semantic tags to output color
-    and style informations on capable terminals.
+    and style information on capable terminals.
 
     Standard tags can be used in format strings as in the following example.
 
@@ -34,7 +34,8 @@
     For both versions, the semantic tags handlers have to be activated using
     the [enable] or [enable_on] functions below.
 
-    See {!Format.stag} for details about semantic tags. *)
+    See {!Format.stag} for details about semantic tags.
+    @since Frama-C+dev *)
 
 (** [is_supported ()] returns whether the current terminal supports ansi
     escape sequence, i.e. if it exports a [TERM] environnement

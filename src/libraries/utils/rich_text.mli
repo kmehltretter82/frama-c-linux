@@ -16,7 +16,10 @@
     sequences in terminals. When the text is pretty printed, the semantic
     tags are output in the usual way on the formatter (which can translate the
     semantic tags to html markup for instance). See {!Format} for more details
-    about semantic tags. *)
+    about semantic tags.
+
+    @before Frama-C+dev the buffer functions were used to build plain strings
+    instead of rich text *)
 
 type t (** Text with tags *)
 
@@ -86,9 +89,8 @@ val to_string :
   ?ellipsis:string ->
   t -> string
 
-(** [need_truncation ?truncate text] returns whether
-    [to_string ?truncate text] or [pretty ?truncate fmt text] will truncate
-    the text. *)
+(** [need_truncation ?truncate text] returns whether {!to_string}, {!pretty} or
+    {!sprintf} will truncate the text. *)
 val need_truncation : ?truncate:truncation -> t -> bool
 
 (* -------------------------------------------------------------------------- *)
