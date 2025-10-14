@@ -9,6 +9,7 @@
 import * as Dome from 'dome';
 import * as Ivette from 'ivette';
 import * as Display from 'ivette/display';
+import { showHelp } from 'dome/help';
 import * as States from 'frama-c/states';
 import * as Server from 'frama-c/server';
 import * as Ast from 'frama-c/kernel/api/ast';
@@ -53,6 +54,11 @@ export function buildMenu(
   attr: Ast.markerAttributesData,
 ): void {
   function addSubMenu(submenu: Dome.PopupMenuItem[]): void {
+    const helpItem = {
+      label: 'Help',
+      onClick: () => showHelp('eva-studia'),
+    };
+    submenu.push(helpItem);
     menu.push({ label: 'Studia', submenu });
   }
   const { marker, kind } = attr;
