@@ -52,59 +52,36 @@ export function buildMenu(
   menu: Dome.PopupMenuItem[],
   attr: Ast.markerAttributesData,
 ): void {
+  function addSubMenu(submenu: Dome.PopupMenuItem[]): void {
+    menu.push({ label: 'Studia', submenu });
+  }
   const { marker, kind } = attr;
   switch (kind) {
     case 'LVAL':
-      menu.push({
-        label: 'Studia',
-        id: 'studia',
-        submenu: [{
-            label: 'Studia: select reads of l-value',
-            id: 'studia-reads',
-            onClick: () => computeStudiaSelection('Reads', marker, attr.descr)
-          }, {
-            label: 'Studia: select writes to l-value',
-            id: 'studia-writes',
-            onClick: () => computeStudiaSelection('Writes', marker, attr.descr)
-          }
-        ]
-      }
-      );
-      return;
     case 'DVAR':
     case 'LVAR':
-      menu.push({
-        label: 'Studia',
-        id: 'studia',
-        submenu: [{
-            label: 'Studia: select reads of l-value',
-            id: 'studia-reads',
-            onClick: () => computeStudiaSelection('Reads', marker, attr.descr)
-          }, {
-            label: 'Studia: select writes to l-value',
-            id: 'studia-writes',
-            onClick: () => computeStudiaSelection('Writes', marker, attr.descr)
-          }
-        ]
-      }
-      );
+      addSubMenu([
+        {
+          label: `Select reads`,
+          onClick: () => computeStudiaSelection('Reads', marker, attr.descr)
+        },
+        {
+          label: `Select writes`,
+          onClick: () => computeStudiaSelection('Writes', marker, attr.descr)
+        }
+      ]);
       return;
     case 'STMT':
-      menu.push({
-        label: 'Studia',
-        id: 'studia',
-        submenu: [{
-            label: 'Studia: select reads of l-value',
-            id: 'studia-reads',
-            onClick: () => computeStudiaSelection('Reads', marker, attr.descr)
-          }, {
-            label: 'Studia: select writes to l-value',
-            id: 'studia-writes',
-            onClick: () => computeStudiaSelection('Writes', marker, attr.descr)
-          }
-        ]
-      }
-      );
+      addSubMenu([
+        {
+          label: 'Select reads of…',
+          onClick: () => Ivette.focusSearchMode(studiaReadsMode.id)
+        },
+        {
+          label: 'Select writes to…',
+          onClick: () => Ivette.focusSearchMode(studiaWritesMode.id)
+        }
+      ]);
       return;
   }
 }
