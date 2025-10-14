@@ -19,72 +19,8 @@ void f1(void)
 void f2(void)
 {
   {
-    int __gen_e_acsl_initialized_2;
-    int __gen_e_acsl_and_2;
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
-      {.values = (void *)0};
-    __gen_e_acsl_initialized_2 = __e_acsl_initialized((void *)(& p),
-                                                      sizeof(int *));
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"&p",
-                                 (void *)(& p));
-    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
-                                   "sizeof(int *)",0,sizeof(int *));
-    if (__gen_e_acsl_initialized_2) {
-      int __gen_e_acsl_valid_2;
-      __gen_e_acsl_valid_2 = __e_acsl_valid((void *)p,sizeof(int),(void *)p,
-                                            (void *)(& p));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"p",
-                                   (void *)p);
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
-                                     "sizeof(int)",0,sizeof(int));
-      __gen_e_acsl_and_2 = __gen_e_acsl_valid_2;
-    }
-    else __gen_e_acsl_and_2 = 0;
-    __gen_e_acsl_assert_data_2.blocking = 1;
-    __gen_e_acsl_assert_data_2.kind = "RTE";
-    __gen_e_acsl_assert_data_2.pred_txt = "\\valid(p)";
-    __gen_e_acsl_assert_data_2.file = "issue-framac-1620.c";
-    __gen_e_acsl_assert_data_2.fct = "f2";
-    __gen_e_acsl_assert_data_2.line = 21;
-    __gen_e_acsl_assert_data_2.name = "mem_access";
-    __e_acsl_assert(__gen_e_acsl_and_2,& __gen_e_acsl_assert_data_2);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
-  }
-  {
     int o = 0;
     int *p = & o;
-    {
-      int __gen_e_acsl_initialized;
-      int __gen_e_acsl_and;
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data =
-        {.values = (void *)0};
-      __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& p),
-                                                      sizeof(int *));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"&p",
-                                   (void *)(& p));
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,
-                                     "sizeof(int *)",0,sizeof(int *));
-      if (__gen_e_acsl_initialized) {
-        int __gen_e_acsl_valid;
-        __gen_e_acsl_valid = __e_acsl_valid((void *)p,sizeof(int),(void *)p,
-                                            (void *)(& p));
-        __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"p",
-                                     (void *)p);
-        __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,
-                                       "sizeof(int)",0,sizeof(int));
-        __gen_e_acsl_and = __gen_e_acsl_valid;
-      }
-      else __gen_e_acsl_and = 0;
-      __gen_e_acsl_assert_data.blocking = 1;
-      __gen_e_acsl_assert_data.kind = "RTE";
-      __gen_e_acsl_assert_data.pred_txt = "\\valid(p)";
-      __gen_e_acsl_assert_data.file = "issue-framac-1620.c";
-      __gen_e_acsl_assert_data.fct = "f2";
-      __gen_e_acsl_assert_data.line = 21;
-      __gen_e_acsl_assert_data.name = "mem_access";
-      __e_acsl_assert(__gen_e_acsl_and,& __gen_e_acsl_assert_data);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
-    }
     *p = 1;
   }
   return;
