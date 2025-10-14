@@ -290,6 +290,11 @@ function useHelpHistory(): History {
   };
 }
 
+interface DocModalProps {
+  /** Selected id. */
+  id?: string;
+}
+
 /**
   * Each chapter must have a unique identifier.
   * If a chapter is saved with an existing identifier, the identifier will be
@@ -300,12 +305,16 @@ function useHelpHistory(): History {
   * #+ <title> <{#<id>-<subid>} | ||#<id>-<subid>||> with alphanumeric <subid>
   * which can optionally be compounded with - (unrelated to depth level).
 */
-function GeneralDocModal(): JSX.Element {
+function GeneralDocModal(props: DocModalProps): JSX.Element {
   const [ chapters, ] = useGlobalState(docChapters);
 
   const [ unfoldAll, setUnfoldAll ] = React.useState<boolean|undefined>(true);
+
   const history = useHelpHistory();
   const selectedId = React.useMemo(() => history.current, [history]);
+
+  /* eslint-disable react-hooks/exhaustive-deps */
+  React.useEffect(() => { if (props.id) history.addElement(props.id); }, []);
 
   const indexes = React.useMemo(() => {
     const news = getIndexes(chapters.sort((a, b) => {
@@ -418,7 +427,7 @@ function GeneralDocModal(): JSX.Element {
   );
 }
 
-export function showHelp(): void {
-  if(!modal.getValue()) showModal(<GeneralDocModal/>);
+export function showHelp(id?: string): void {
+  if(!modal.getValue()) showModal(<GeneralDocModal id={id}/>);
   else closeModal();
 }
