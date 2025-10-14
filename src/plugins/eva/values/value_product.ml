@@ -58,7 +58,6 @@ module Make
     left, right
 
   let zero = Left.zero, Right.zero
-  let one  = Left.one , Right.one
   let top_int = Left.top_int, Right.top_int
   let inject_int typ i = Left.inject_int typ i, Right.inject_int typ i
 

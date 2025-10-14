@@ -24,7 +24,6 @@ let pos =         { pos = true;  zero = false; neg = false }
 let neg_or_zero = { pos = false; zero = true;  neg = true  }
 let neg =         { pos = false; zero = false; neg = true  }
 let zero =        { pos = false; zero = true;  neg = false }
-let one =         { pos = true; zero = false;  neg = false }
 let non_zero =    { pos = true;  zero = false; neg = true  }
 let ge_zero v = not v.neg
 let le_zero v = not v.pos

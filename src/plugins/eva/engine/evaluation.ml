@@ -583,7 +583,7 @@ module Make
     | _ -> return (v1, v2)
 
   let assume_valid_binop context typ (e1, v1 as arg1) op (e2, v2 as arg2) =
-    if Ast_types.is_integral typ then
+    if Ast_types.is_integral typ || Ast_types.is_ptr typ then
       match op with
       | Div | Mod ->
         (* The behavior of a%b is undefined if the behavior of a/b is undefined,
@@ -606,24 +606,22 @@ module Make
       | _ -> return (v1, v2)
     else return (v1, v2)
 
-  (* Pretty prints the result of a comparison independently of the value
-     abstractions used. *)
-  let pretty_zero_or_one fmt v =
-    let print = Format.pp_print_string fmt in
-    if Value.(equal v zero) then print "{0}"
-    else if Value.(equal v one) then print "{1}"
-    else print "{0; 1}"
+  (* If possible, prints only the cvalue component of an abstract value. *)
+  let pretty_cvalue fmt v =
+    match Value.get Main_values.CVal.key with
+    | Some get -> Cvalue.V.pretty fmt (get v)
+    | None -> Value.pretty fmt v
 
-  let forward_comparison ~compute typ kind (e1, v1) (e2, v2) =
+  let forward_comparison ~compute ~typ_res ~typ_arg kind (e1, v1) (e2, v2) =
     let truth = Value.assume_comparable kind v1 v2 in
     let alarm () =
       let cil_e1 = Option.map Eva_ast.to_cil_exp e1
       and cil_e2 = Eva_ast.to_cil_exp e2 in
       Alarms.Pointer_comparison (cil_e1, cil_e2)
     in
-    let propagate_all = propagate_all_pointer_comparison typ in
+    let propagate_all = propagate_all_pointer_comparison typ_arg in
     let args, alarms =
-      if warn_pointer_comparison typ then
+      if warn_pointer_comparison typ_arg then
         if propagate_all
         then `Value (v1, v2), snd (interpret_truth ~alarm (v1, v2) truth)
         else reduce_both_by_truth ~alarm (e1, v1) (e2, v2) truth
@@ -634,37 +632,40 @@ module Make
       if is_true truth || not propagate_all
       then result
       else
-        let zero_or_one = Value.(join zero one) in
-        if Ast_types.is_ptr typ then
+        let zero = Value.inject_int typ_res Integer.zero in
+        let one = Value.inject_int typ_res Integer.one in
+        let zero_or_one = Value.join zero one in
+        if Ast_types.is_ptr typ_arg then
           Self.result
             ~current:true ~once:true
             ~dkey:Self.dkey_pointer_comparison
-            "evaluating condition to {0; 1} instead of %a because of UPCPA"
-            (Bottom.pretty pretty_zero_or_one) result;
+            "evaluating condition to {0; 1} instead of %a because of %s"
+            (Bottom.pretty pretty_cvalue) result
+            Parameters.UndefinedPointerComparisonPropagateAll.name;
         `Value zero_or_one
     in
     value, alarms
 
-  let forward_binop context typ (e1, v1 as arg1) op arg2 =
+  let forward_binop context ~typ_res (e1, v1 as arg1) op arg2 =
     let open Evaluated.Operators in
-    let typ_e1 = Ast_types.unroll e1.typ in
+    let typ_arg = Ast_types.unroll e1.typ in
     match comparison_kind op with
     | Some kind ->
-      let compute v1 v2 = Value.forward_binop context typ_e1 op v1 v2 in
+      let compute v1 v2 = Value.forward_binop context typ_arg op v1 v2 in
       (* Detect zero expressions created by the evaluator *)
       let e1 = if Eva_ast.is_zero_ptr e1 then None else Some e1 in
-      forward_comparison ~compute typ_e1 kind (e1, v1) arg2
+      forward_comparison ~compute ~typ_res ~typ_arg kind (e1, v1) arg2
     | None ->
-      let& v1, v2 = assume_valid_binop context typ arg1 op arg2 in
-      Value.forward_binop context typ_e1 op v1 v2
+      let& v1, v2 = assume_valid_binop context typ_arg arg1 op arg2 in
+      Value.forward_binop context typ_arg op v1 v2
 
-  let forward_unop context unop (e, v as arg) =
-    let typ = Ast_types.unroll e.typ in
+  let forward_unop context ~typ_res unop (e, v as arg) =
+    let typ_arg = Ast_types.unroll e.typ in
     if unop = LNot then
       let kind = Abstract_value.Equality in
-      let compute _ v = Value.forward_unop context typ unop v in
-      forward_comparison ~compute typ kind (None, Value.zero) arg
-    else Value.forward_unop context typ unop v, Alarmset.none
+      let compute _ v = Value.forward_unop context typ_arg unop v in
+      forward_comparison ~compute ~typ_res ~typ_arg kind (None, Value.zero) arg
+    else Value.forward_unop context typ_arg unop v, Alarmset.none
 
   (* ------------------------------------------------------------------------
                                     Casts
@@ -934,19 +935,19 @@ module Make
       let v = assume_pointer env.context expr value in
       compute_reduction v false
 
-    | UnOp (op, e, typ) ->
+    | UnOp (op, e, typ_res) ->
       let* v, volatile = root_forward_eval env e in
-      let* v = forward_unop env.context op (e, v) in
+      let* v = forward_unop env.context ~typ_res op (e, v) in
       let may_overflow = op = Neg in
-      let v = handle_overflow ~may_overflow env.context expr typ v in
+      let v = handle_overflow ~may_overflow env.context expr typ_res v in
       compute_reduction v volatile
 
-    | BinOp (op, e1, e2, typ) ->
+    | BinOp (op, e1, e2, typ_res) ->
       let* v1, volatile1 = root_forward_eval env e1 in
       let* v2, volatile2 = root_forward_eval env e2 in
-      let* v = forward_binop env.context typ (e1, v1) op (e2, v2) in
+      let* v = forward_binop env.context ~typ_res (e1, v1) op (e2, v2) in
       let may_overflow = may_overflow op in
-      let v = handle_overflow ~may_overflow env.context expr typ v in
+      let v = handle_overflow ~may_overflow env.context expr typ_res v in
       compute_reduction v (volatile1 || volatile2)
 
     | CastE (dst_typ, e) ->

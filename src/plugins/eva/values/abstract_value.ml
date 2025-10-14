@@ -61,12 +61,16 @@ module type S = sig
 
   (** {3 Constructors } *)
 
+  (** Abstract value representing integer 0. Used to reduce the value of
+      conditional expression when interpreting if-then-else statement. *)
   val zero: t
-  val one: t
-  val top_int : t
+
+  (** [inject_int typ i] returns an abstract value representing integer [i]
+      for the C type [typ]. *)
   val inject_int : typ -> Integer.t -> t
-  (** Abstract address for the given varinfo. (With type "pointer to the type
-      of the variable" if the abstract values are typed.) *)
+
+  (** Abstract value representing all integers; it can be equal to [top]. *)
+  val top_int : t
 
   (** {3 Alarms } *)
 
