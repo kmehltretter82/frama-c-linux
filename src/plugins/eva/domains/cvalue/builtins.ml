@@ -101,11 +101,9 @@ let () =
 
 let warn_incompatible_type ~source name kf =
   let kf_typ = Kernel_function.get_type kf in
-  let machdep_name = Machine.machdep_name () in
   Self.warning ~wkey:Self.wkey_builtins_override ~source ~once:true
-    "The builtin %s will not be used for function %a of incompatible type.@ \
-     (got: %a. Machdep is %s)."
-    name Kernel_function.pretty kf Printer.pp_typ kf_typ machdep_name
+    "Builtin %s will not be used for function %a of incompatible type %a."
+    name Kernel_function.pretty kf Printer.pp_typ kf_typ
 
 let warn_user_specification ~source kf =
   Self.warning ~wkey:Self.wkey_builtins_missing_spec ~source ~once:true
