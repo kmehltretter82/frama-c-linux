@@ -435,7 +435,10 @@ export function useVariableFilter(): VariablesFilterRet {
   const showVariable = React.useMemo(() => {
     return (vi: Ast.globalsData): boolean => {
       const visible =
-        (stdlib || !vi.stdlib)
+        /* Never show global variables representing string literals.
+           If needed, add a new filter to show these variables. */
+        !vi.stringLiteral
+        && (stdlib || !vi.stdlib)
         && (extern || !vi.extern) && (nonExtern || vi.extern)
         && (isConst || !vi.const) && (nonConst || vi.const)
         && (volatile || !vi.volatile) && (nonVolatile || vi.volatile)
