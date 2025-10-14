@@ -364,7 +364,7 @@ let print_alarm fmt (category,count) =
     | Float_to_int -> "illegal conversion", "s", " from floating-point to integer"
     | Other -> "other", "s", ""
   in
-  Format.fprintf fmt "  @{<bold>@{<red>%4i@}@} %s%s%s@;"
+  Format.fprintf fmt "  @{<bold,red>%4i@} %s%s%s@;"
     count str (if count > 1 then plural else "") str'
 
 let print_alarms fmt {prog_alarms; alarms_statuses} =

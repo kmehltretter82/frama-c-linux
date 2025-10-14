@@ -97,7 +97,13 @@ struct
     let current = StyleSet.add style prev in
     Stack.push current stack
 
-  (* If a style must be maintained after pop, it is returned *)
+  (* If a style must be maintained after pop, it is returned.
+     This functions relies on StyleSet.compare = compare_style, which must
+     ignore the color attribute on Foreground and Background. This way, when
+     looking for a foreground (resp. background) color in the previous state,
+     we find the original foreground (resp. background) style, even if the
+     color does not match; the found color is the original color to be restored.
+  *)
   let pop (stack : t) (style : style) : style option =
     ignore @@ Stack.pop_opt stack; (* In particular, ignore empty stacks *)
     let previous = Stack.top_opt stack in

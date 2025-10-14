@@ -253,7 +253,7 @@ struct
       | { evt_category = None ; evt_source = None } -> false
       | _ -> true
     in
-    (* whenever the first line of the event shall be printed along the header *)
+    (* whenever the header-part shall be separated from the message-part *)
     let lonely_header =
       long_header &&
       (Rich_text.size header + Rich_text.size evt.evt_message > 80 ||
