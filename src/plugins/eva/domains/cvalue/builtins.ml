@@ -105,6 +105,12 @@ let warn_incompatible_type ~source name kf =
     "Builtin %s will not be used for function %a of incompatible type %a."
     name Kernel_function.pretty kf Printer.pp_typ kf_typ
 
+let warn_no_specification ~source kf =
+  Self.warning ~wkey:Self.wkey_builtins_missing_spec ~source ~once:true
+    "The builtin for function %a will not be used, as its frama-c libc \
+     specification is not available."
+    Kernel_function.pretty kf
+
 let warn_user_specification ~source kf =
   Self.warning ~wkey:Self.wkey_builtins_missing_spec ~source ~once:true
     "No Frama-C libc specification found for function %a, for which a \
@@ -112,12 +118,11 @@ let warn_user_specification ~source kf =
      by the user."
     Kernel_function.pretty kf
 
-let warn_no_specification ~source kf =
-  Self.warning ~source ~once:true
-    ~wkey:Self.wkey_builtins_missing_spec
-    "The builtin for function %a will not be used, as its frama-c libc \
-     specification is not available."
-    Kernel_function.pretty kf
+let warn_builtin_override ~source kf bname =
+  let fname = Kernel_function.get_name kf in
+  Self.warning ~wkey:Self.wkey_builtins_override ~source ~once:true
+    "Definition of function %s is overridden by %s"
+    fname (if fname = bname then "its builtin" else "builtin " ^ bname)
 
 let is_frama_c_builtin kf =
   let vi = Kernel_function.get_vi kf in
@@ -154,21 +159,6 @@ let inconsistent_builtin_typ kf = function
       || List.exists2 (fun (_, t, _) u -> need_cast t u) args expected_args
     | _ -> assert false
 
-(* Warns if the builtin [bname] overrides the function definition [kf]. *)
-let warn_builtin_override kf source bname =
-  let internal =
-    (* TODO: treat this 'internal' *)
-    let file = source.Filepath.pos_path in
-    Filepath.is_relative ~base:System_config.Share.main file
-  in
-  if Kernel_function.is_definition kf && not internal
-  then
-    let fname = Kernel_function.get_name kf in
-    Self.warning ~source ~once:true
-      ~wkey:Self.wkey_builtins_override
-      "function %s: definition will be overridden by %s"
-      fname (if fname = bname then "its builtin" else "builtin " ^ bname)
-
 let prepare_builtin kf (name, builtin, cacheable, expected_typ) =
   let source = fst (Kernel_function.get_location kf) in
   if inconsistent_builtin_typ kf expected_typ
@@ -177,9 +167,6 @@ let prepare_builtin kf (name, builtin, cacheable, expected_typ) =
     match find_builtin_specification kf with
     | None -> warn_no_specification ~source kf
     | Some spec ->
-      if not (Kernel_function.is_in_libc kf) && not (is_frama_c_builtin kf)
-      then warn_user_specification ~source kf;
-      warn_builtin_override kf source name;
       BuiltinsOverride.add kf;
       Hashtbl.replace builtins_table kf (name, builtin, cacheable, spec)
 
@@ -202,7 +189,20 @@ let prepare_builtins () =
     (fun (kf, name) -> prepare_builtin kf (Hashtbl.find table name));
   BuiltinsOverride.mark_as_computed ()
 
-let find_builtin_override = Hashtbl.find_opt builtins_table
+(* Emits warning if builtin [name] overrides function definition [kf], or if
+   the Frama-C specification of [kf] is missing. *)
+let check_builtin kf (name, _, _, _) =
+  let source = fst (Kernel_function.get_location kf) in
+  if not (Kernel_function.is_in_libc kf || is_frama_c_builtin kf)
+  then warn_user_specification ~source kf;
+  let is_internal = Filepath.is_relative ~base:System_config.Share.libc in
+  if Kernel_function.is_definition kf && not (is_internal source.pos_path)
+  then warn_builtin_override ~source kf name
+
+let find_builtin_override kf =
+  let builtin = Hashtbl.find_opt builtins_table kf in
+  Option.iter (check_builtin kf) builtin;
+  builtin
 
 let is_builtin_overridden kf =
   if not (BuiltinsOverride.is_computed ())
