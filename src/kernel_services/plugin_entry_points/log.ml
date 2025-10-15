@@ -290,8 +290,8 @@ let do_transient terminal ~plugin message =
       let newline =
         try Rich_text.index message '\n'
         with Not_found -> max_int in
-      let truncate = min newline width in
-      Rich_text.pretty fmt ~truncate message ;
+      let message = Rich_text.truncate ~end_pos:(min newline width) message in
+      Rich_text.pretty fmt message ;
       if terminal.isatty
       then terminal.clean <- false
       else Format.pp_print_newline fmt () ;
@@ -459,7 +459,7 @@ let logtransient channel format =
   Rich_text.Buffer.kbprintf
     (fun _fmt ->
        try
-         let message = Rich_text.Buffer.contents buffer in
+         let message = Rich_text.Buffer.contents ~trim:true buffer in
          do_transient channel.terminal ~plugin:channel.plugin message ;
          close_buffer channel
        with e ->
@@ -1266,3 +1266,46 @@ struct
       label Format.(pp_print_list ~pp_sep:pp_print_cut print_one_elt) l
 
 end
+
+(* ------------------------------------------------------------------------- *)
+(* --- Tests                                                             --- *)
+(* ------------------------------------------------------------------------- *)
+
+let test_terminal () =
+  let buffer = Buffer.create 13 in
+  let fmt = Format.formatter_of_buffer buffer in
+  Format.pp_set_mark_tags fmt true;
+  let validate_result expected =
+    Format.pp_print_flush fmt ();
+    let result = Buffer.contents buffer in
+    let success = result = expected in
+    if not success then
+      Format.eprintf "wrong output: %S given, %S expected@."
+        result expected;
+    success
+  in
+  let channel = new_channel "test" in
+  set_terminal channel.terminal true fmt;
+  channel, validate_result
+
+let%test _ =
+  let channel, validate = test_terminal () in
+  logtransient channel "abcd";
+  logtransient channel "abc";
+  validate "<bold>[test]</bold> abcd\r\027[K<bold>[test]</bold> abc"
+
+let%test _ =
+  let channel, validate = test_terminal () in
+  logtransient channel "abc\ndef";
+  validate "<bold>[test]</bold> abc"
+
+let%test _ =
+  let channel, validate = test_terminal () in
+  logtransient channel "@{<a>  abc\ndef@}";
+  validate "<bold>[test]</bold> <a>abc</a>"
+
+let%test _ =
+  let channel, validate = test_terminal () in
+  logtransient channel "  abc\n@{<a>@}def";
+  validate "<bold>[test]</bold> abc"
+

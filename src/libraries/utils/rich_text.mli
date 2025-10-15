@@ -43,6 +43,11 @@ val contains : t -> char -> bool
     @raises Not_found if not found *)
 val index : t -> char -> int
 
+(** [truncate ~start_pos ~end_pos text] truncate the text [text] to the range
+    from [start_pos] (included, default to 0) to [end_pos] (excluded, default
+    to the text size). All tags outside this range are removed. *)
+val truncate : ?start_pos:int -> ?end_pos:int -> t -> t
+
 (** [pretty fmt text] pretty-prints the text onto the given formatter
     [fmt], with the semantic tags.
     The original text has been {i already} laid out with respect to

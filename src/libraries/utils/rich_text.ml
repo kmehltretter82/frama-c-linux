@@ -32,6 +32,26 @@ let index text c = String.index text.plain c
 let contains text c =
   String.contains text.plain c
 
+let rec offset_tag ~limit ~offset tag =
+  assert (offset <= limit);
+  if tag.q < offset || tag.p >= limit
+  then None (* Remove tags out of bounds *)
+  else Some
+      { p = max 0 (tag.p - offset);
+        q = min tag.q limit - offset;
+        tag = tag.tag;
+        children = offset_tags ~limit ~offset tag.children;
+      }
+and offset_tags ~limit ~offset tags =
+  List.filter_map (offset_tag ~limit ~offset) tags
+
+let truncate ?(start_pos=0) ?(end_pos) text =
+  let n = size text in
+  let end_pos = Option.value ~default:n end_pos |> min n in
+  { plain = String.sub text.plain start_pos (end_pos - start_pos);
+    tags = offset_tags ~limit:end_pos ~offset:start_pos text.tags;
+  }
+
 let need_truncation ?truncate text =
   let length = String.length text.plain in
   match truncate with
@@ -138,9 +158,9 @@ struct
 
   let trim_end buffer =
     let rec lookup_bwd text k =
-      if k >= 0 && is_blank (Buffer.nth text k) then
+      if k > 0 && is_blank (Buffer.nth text (pred k)) then
         lookup_bwd text (pred k) else k
-    in lookup_bwd buffer.content (pred (Buffer.length buffer.content))
+    in lookup_bwd buffer.content (Buffer.length buffer.content)
 
   let push_tag buffer tag =
     let p = Buffer.length buffer.content in
@@ -198,19 +218,6 @@ struct
     buffer.revtags <- [];
     buffer.stack <- []
 
-  let clamp l u x =
-    assert (l < u);
-    max l (min u x)
-
-  let rec offset_tag ~limit n tag =
-    { p = clamp 0 limit (tag.p - n);
-      q = clamp 0 limit (tag.q - n);
-      tag = tag.tag;
-      children = offset_tags ~limit n tag.children
-    }
-  and offset_tags ~limit n tags =
-    List.map (offset_tag ~limit n) tags
-
   let contents ?(trim=true) buffer =
     Format.pp_print_flush buffer.formatter ();
     (* The following lines requires that the formatter have been flushed *)
@@ -218,13 +225,12 @@ struct
     if trim then
       let p = trim_begin buffer in
       let q = trim_end buffer in
-      let length = q+1-p in
       let plain =
-        if p <= q
-        then Buffer.sub buffer.content p length
+        if p < q
+        then Buffer.sub buffer.content p (q - p)
         else ""
       in
-      let tags = List.rev buffer.revtags |> offset_tags ~limit:length p in
+      let tags = List.rev buffer.revtags |> offset_tags ~limit:q ~offset:p in
       { plain ; tags }
     else
       let plain = Buffer.contents buffer.content
