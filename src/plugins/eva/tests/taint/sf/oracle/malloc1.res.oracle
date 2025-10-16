@@ -19,13 +19,13 @@
 [from] Function main:
   __fc_heap_status FROM __fc_heap_status (and SELF)
   __fc_errno FROM __fc_heap_status
-  __malloc_main_l17[0..1] FROM __fc_heap_status
-  __calloc_main_l21[0] FROM __fc_heap_status
-  __malloc_main_l24.b FROM __fc_heap_status; secret
+  __malloc_main_l15[0..1] FROM __fc_heap_status
+  __calloc_main_l19[0] FROM __fc_heap_status
+  __malloc_main_l22.b FROM __fc_heap_status; secret
   \result FROM \nothing
 [from] ====== END OF DEPENDENCIES ======
 [inout] Out (internal) for function main:
-    __fc_heap_status; __fc_errno; p; q; r; __retres; __malloc_main_l17[0..1];
-    __calloc_main_l21[0]; __malloc_main_l24.b
+    __fc_heap_status; __fc_errno; p; q; r; __retres; __malloc_main_l15[0..1];
+    __calloc_main_l19[0]; __malloc_main_l22.b
 [inout] Inputs for function main:
     __fc_heap_status; secret

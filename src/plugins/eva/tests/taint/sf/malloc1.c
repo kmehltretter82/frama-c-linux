@@ -1,10 +1,8 @@
 /* run.config
    COMMENT: Test basic malloc and calloc calls
-   DEPS: security_calloc.h
    STDOPT: +"-eva-verbose 0 -eva-no-alloc-returns-null" #"-eva-no-alloc-returns-null"
  */
 #include <stdlib.h>
-#include "security_calloc.h"
 
 struct foo {
     int a;

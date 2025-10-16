@@ -1,6 +1,6 @@
 [kernel] Parsing malloc4.c (with preprocessing)
 [eva:experimental] Warning: The taint domain is experimental.
-[eva:secure-flow:condition] malloc4.c:14: Warning: 
+[eva:secure-flow:condition] malloc4.c:12: Warning: 
   non-interference violation on condition involving {secret}
 [from] Computing for function main
 [from] Computing for function malloc <-main
@@ -19,10 +19,10 @@
 [from] Function main:
   __fc_heap_status FROM __fc_heap_status; secret (and SELF)
   __fc_errno FROM __fc_heap_status; secret (and SELF)
-  __malloc_main_l15 FROM __fc_heap_status; secret (and SELF)
+  __malloc_main_l13 FROM __fc_heap_status; secret (and SELF)
   \result FROM \nothing
 [from] ====== END OF DEPENDENCIES ======
 [inout] Out (internal) for function main:
-    __fc_heap_status; __fc_errno; p; __retres; __malloc_main_l15
+    __fc_heap_status; __fc_errno; p; __retres; __malloc_main_l13
 [inout] Inputs for function main:
     __fc_heap_status; secret

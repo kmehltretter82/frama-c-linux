@@ -11,20 +11,20 @@
   non-interference violation on condition involving {secret}
 [eva:secure-flow:condition] funcall12.c:23: Warning: 
   non-interference violation on condition involving {secret}
-[eva:alarm] funcall12.c:24: Warning: assertion got status unknown.
+[eva:alarm] funcall12.c:26: Warning: assertion got status unknown.
 [eva] computing for function func_a <- main.
-  Called from funcall12.c:27.
+  Called from funcall12.c:29.
 [eva] Recording results for func_a
 [eva] Done for function func_a
 [eva] computing for function func_b <- main.
-  Called from funcall12.c:27.
+  Called from funcall12.c:29.
 [eva] Recording results for func_b
 [eva] Done for function func_b
 [eva] computing for function func_c <- main.
-  Called from funcall12.c:27.
+  Called from funcall12.c:29.
 [eva] using specification for function func_c
 [eva] Done for function func_c
-[eva:alarm] funcall12.c:28: Warning: 
+[eva:alarm] funcall12.c:30: Warning: 
   assertion got status invalid (stopping propagation).
 [eva] Recording results for main
 [eva] Done for function main
