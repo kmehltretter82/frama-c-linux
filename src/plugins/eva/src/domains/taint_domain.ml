@@ -857,17 +857,17 @@ let () =
     a_names
 
 (* Registers ACSL logic function security_status. *)
-let lf_name_security_status = "security_status"
+let lf_security_status_name = "security_status"
 let () =
   let security_status_logic_function =
-    { bl_name = lf_name_security_status;
+    { bl_name = lf_security_status_name;
       bl_labels = [];
       bl_params = ["x"];
       bl_type = Some (Ctype Cil_const.intType);
       bl_profile = [("x", Lvar "x")];
     }
   in
-  if not (Logic_env.is_logic_function lf_name_security_status)
+  if not (Logic_env.is_logic_function lf_security_status_name)
   then Logic_builtin.register security_status_logic_function
 
 (* Registers ACSL logic constants public/private. *)
@@ -1020,7 +1020,7 @@ module TaintLogic = struct
     | _, (Prel (Req, {term_node = Tapp (f, _, [arg])}, t)
          | Prel (Req, t, {term_node = Tapp (f, _, [arg])})) ->
       if secure_flow_analysis () &&
-         String.equal f.l_var_info.lv_name lf_name_security_status then
+         String.equal f.l_var_info.lv_name lf_security_status_name then
         begin
           match t.term_node with
           | TLval (TVar {lv_name}, TNoOffset) ->
@@ -1097,7 +1097,7 @@ module TaintLogic = struct
       | Prel (Req | Rneq as rop, {term_node = Tapp (f, _, [arg])}, t)
       | Prel (Req | Rneq as rop, t, {term_node = Tapp (f, _, [arg])}) ->
         if secure_flow_analysis () &&
-           String.equal f.l_var_info.lv_name lf_name_security_status then
+           String.equal f.l_var_info.lv_name lf_security_status_name then
           let op_truth =
             match rop with
             | Req -> Fun.id
