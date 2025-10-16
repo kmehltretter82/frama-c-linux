@@ -4840,21 +4840,20 @@ int main(void) {
 \end{listing-nonumber}
 
 \begin{frama-c-commands}
-frama-c -eva -eva-domains taint -eva-taint-secureflow \
-        -eva-warn-key=acsl:unsupported=inactive sf.c
+frama-c -eva -eva-domains taint -eva-taint-secureflow sf.c
 \end{frama-c-commands}
 
 \Eva{} emits the following warnings:
 \begin{logs}
-[eva:secure-flow:condition] sf.c:8: Warning: 
+[eva:secure-flow:condition] sf.c:8: Warning:
   non-interference violation on condition involving {user_input; secret}
-[eva:secure-flow:indirect] sf.c:9: Warning: 
+[eva:secure-flow:indirect] sf.c:9: Warning:
   indirect non-interference violation on {y}
-[eva:secure-flow:indirect] sf.c:12: Warning: 
+[eva:secure-flow:indirect] sf.c:12: Warning:
   indirect non-interference violation on {z}
 [eva:alarm] sf.c:17: Warning: assertion got status unknown.
 [eva:alarm] sf.c:18: Warning: assertion got status unknown.
-[eva:secure-flow:indirect] sf.c:23: Warning: 
+[eva:secure-flow:indirect] sf.c:23: Warning:
   indirect non-interference violation on {y; z}
 [eva:alarm] sf.c:24: Warning: assertion got status unknown.
 [eva:alarm] sf.c:25: Warning: assertion got status unknown.

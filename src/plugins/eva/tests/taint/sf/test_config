@@ -1,2 +1,2 @@
 DEPS: security_macro.h
-STDOPT: +"-cpp-extra-args=\"-include security_macro.h\" -eva-domains taint -eva-msg-key=d-taint -eva-taint-secureflow -eva-warn-key=acsl:unsupported=inactive"
+STDOPT: +"-cpp-extra-args=\"-include security_macro.h\" -eva-domains taint -eva-msg-key=d-taint -eva-taint-secureflow"
