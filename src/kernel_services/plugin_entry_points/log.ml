@@ -287,11 +287,13 @@ let do_transient terminal ~plugin message =
       let fmt = terminal.formatter in
       Format.fprintf fmt "@{<bold>[%s]@} " plugin ;
       let width = max 40 (77 - String.length plugin) in
-      let newline =
-        try Rich_text.index message '\n'
-        with Not_found -> max_int in
-      let message = Rich_text.sub ~end_pos:(min newline width) message in
-      Rich_text.pretty fmt message ;
+      let message =
+        try
+          let newline = Rich_text.index message '\n' in
+          Rich_text.sub ~end_pos:newline message
+        with Not_found -> message
+      in
+      Rich_text.pretty ~truncate:(`Right width) ~ellipsis:"..." fmt message ;
       if terminal.isatty
       then terminal.clean <- false
       else Format.pp_print_newline fmt () ;
