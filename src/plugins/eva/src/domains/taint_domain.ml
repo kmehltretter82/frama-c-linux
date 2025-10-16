@@ -830,7 +830,9 @@ include Domain
 let registered =
   let name = "taint"
   and descr = "Taint analysis" in
-  Abstractions.Domain.register ~name ~descr ~experimental:true (module Domain)
+  let auto_enable = Parameters.TaintSecureFlow.get in
+  Abstractions.Domain.register ~name ~descr
+    ~experimental:true ~auto_enable (module Domain)
 
 
 exception Parse_error of string option
