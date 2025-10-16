@@ -1,5 +1,5 @@
 /* run.config*
-   STDOPT: +"-eva-taint-secureflow -eva-warn-key=acsl:unsupported=inactive"
+   STDOPT: +"-eva-taint-secureflow"
  */
 
 #include "__fc_builtin.h"
@@ -219,6 +219,23 @@ void f8(void) {
              public ==  security_status(sum); */
 }
 
+void f9(void) {
+  int x = user_input;
+  //@ taint toto:x;
+  int __attribute__((public)) result1, result2;
+
+  result1 = x;
+  //@ check security_status(result1) == public;
+  //@ assert security_status(result1) == public;
+
+  if (result1)
+    result2 = x;
+  else
+    result2 = user_input;
+  //@ check security_status(result2) == public;
+  //@ assert security_status(result2) == public;
+}
+
 int main(void) {
   f1();
   f2();
@@ -228,5 +245,6 @@ int main(void) {
   f6();
   f7();
   f8();
+  f9();
   return 0;
 }

@@ -1,25 +1,25 @@
-186c186
+204c204
 < [scope:rm_asserts] removing 3 assertion(s)
 ---
 > [scope:rm_asserts] removing 4 assertion(s)
-219c219,221
+237c237,239
 <   array[0..511] ∈ {0; 1}
 ---
 >   array[0] ∈ {0; 1}
 >        [1] ∈ {1}
 >        [2..511] ∈ {0; 1}
-253c255,257
+275c277,279
 <   array[0..511] ∈ {0; 1}
 ---
 >   array[0] ∈ {0; 1}
 >        [1] ∈ {1}
 >        [2..511] ∈ {0; 1}
-302c306,307
+326c330,331
 <   array[0..1] FROM secret; array[0..511] (and SELF)
 ---
 >   array[0] FROM secret; array[0..511] (and SELF)
 >        [1] FROM secret; array[0..511]
-325c330,331
+351c356,357
 <   array[0..1] FROM secret; array[0..511] (and SELF)
 ---
 >   array[0] FROM secret; array[0..511] (and SELF)
