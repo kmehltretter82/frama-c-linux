@@ -18,6 +18,10 @@
   has generated a garbled mix of addresses for assigns clause \result.
 [eva] Done for function __res_state
 [eva:alarm] resolv_h.c:16: Warning: 
+  unaligned pointer creation.
+  assert \aligned(tmp_0,alignof(struct __res_state));
+  (tmp_0 from __res_state())
+[eva:alarm] resolv_h.c:16: Warning: 
   out of bounds read.
   assert \valid_read(&tmp_0->options);
   (tmp_0 from __res_state())

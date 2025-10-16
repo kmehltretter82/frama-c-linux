@@ -141,6 +141,8 @@
   Called from array_access.c:21.
 [eva] Done for function any_int
 [eva:alarm] array_access.c:21: Warning: 
+  unaligned pointer creation. assert \aligned((char *)ch,alignof(int));
+[eva:alarm] array_access.c:21: Warning: 
   out of bounds read.
   assert \valid_read((int *)((char *)ch) + tmp_0);
   (tmp_0 from any_int())

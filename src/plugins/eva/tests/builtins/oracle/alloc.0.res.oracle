@@ -35,11 +35,15 @@
 [eva:alarm] alloc.c:26: Warning: 
   pointer downcast. assert (unsigned int)q ≤ 2147483647;
 [eva:alarm] alloc.c:26: Warning: 
+  unaligned pointer creation. assert \aligned((int)(-((int)q)),alignof(int));
+[eva:alarm] alloc.c:26: Warning: 
   signed overflow. assert -2147483648 ≤ -((int)q);
 [eva:alarm] alloc.c:26: Warning: 
   signed overflow. assert -((int)q) ≤ 2147483647;
 [eva:garbled-mix:write] alloc.c:26: 
   Assigning imprecise value to r because of arithmetic operation on addresses.
+[eva:alarm] alloc.c:27: Warning: 
+  unaligned pointer creation. assert \aligned(r,alignof(int));
 [eva:alarm] alloc.c:27: Warning: out of bounds write. assert \valid(r);
 [eva:alarm] alloc.c:27: Warning: out of bounds read. assert \valid_read(r + 1);
 [eva] alloc.c:32: Call to builtin malloc

@@ -100,6 +100,10 @@
 [eva] computing for function f1 <- main.
   Called from cast_fun.i:136.
 [eva] Done for function f1
+[eva:alarm] cast_fun.i:140: Warning: 
+  unaligned pointer creation. assert \aligned(&f1,alignof(int));
+[eva:alarm] cast_fun.i:141: Warning: 
+  unaligned pointer creation. assert \aligned(y,alignof(int));
 [eva] computing for function f1 <- main.
   Called from cast_fun.i:142.
 [eva] Done for function f1

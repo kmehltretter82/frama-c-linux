@@ -245,8 +245,8 @@
   NON TERMINATING FUNCTION
 [eva:final-states] Values at end of function pointer_index:
   k1 ∈ [0..10]
-  k2 ∈ [-1..8]
-  k3 ∈ [-2..7]
+  k2 ∈ [-1..9]
+  k3 ∈ [-3..7]
   k4 ∈ [-3..7]
   p ∈ {{ &u[3] }}
   l ∈ {0; 1}
@@ -290,8 +290,8 @@
   ti_7[0..3] ∈ {0; 10; 12}
       [4..6] ∈ {0; 10}
   k1 ∈ [0..10]
-  k2 ∈ [-1..8]
-  k3 ∈ [-2..7]
+  k2 ∈ [-1..9]
+  k3 ∈ [-3..7]
   k4 ∈ [-3..7]
 [from] Computing for function f10
 [from] Done for function f10

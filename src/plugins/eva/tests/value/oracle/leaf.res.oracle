@@ -44,6 +44,8 @@
   has generated a garbled mix of addresses for assigns clause \result.
 [eva] Done for function f_int_star_int
 [eva] leaf.i:51: Frama_C_show_each_F: [-2147483648..2147483647]
+[eva:alarm] leaf.i:52: Warning: 
+  unaligned pointer creation. assert \aligned(p,alignof(int));
 [eva:alarm] leaf.i:52: Warning: out of bounds write. assert \valid(p);
 [eva] leaf.i:53: Frama_C_show_each_F: {5}
 [eva] computing for function f_int_star_int_star_int <- main.

@@ -263,6 +263,8 @@
 [eva] computing for function escaping <- main.
   Called from strlen.c:358.
 [eva:alarm] strlen.c:222: Warning: 
+  unaligned pointer creation. assert \aligned((char *)s,alignof(int));
+[eva:alarm] strlen.c:222: Warning: 
   pointer downcast. assert (unsigned int)(&x) ≤ 2147483647;
 [eva:locals-escaping] strlen.c:222: Warning: 
   locals {x} escaping the scope of a block of escaping through s

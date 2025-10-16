@@ -236,6 +236,10 @@
   signed overflow. assert (int)p + (int)q ≤ 2147483647;
 [eva:garbled-mix:write] gauges.c:188: 
   Assigning imprecise value to z because of arithmetic operation on addresses.
+[eva:alarm] gauges.c:189: Warning: 
+  unaligned pointer creation. assert \aligned(z,alignof(int));
+[eva:alarm] gauges.c:190: Warning: 
+  unaligned pointer creation. assert \aligned(r,alignof(int));
 [eva:alarm] gauges.c:190: Warning: out of bounds write. assert \valid(r);
 [eva:alarm] gauges.c:192: Warning: out of bounds write. assert \valid(p);
 [eva:alarm] gauges.c:193: Warning: out of bounds write. assert \valid(q);

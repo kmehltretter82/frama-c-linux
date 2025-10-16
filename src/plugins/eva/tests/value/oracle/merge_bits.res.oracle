@@ -23,6 +23,8 @@
 [eva] merge_bits.i:25: Frama_C_show_each_F: {16777216}
 [eva] merge_bits.i:26: Frama_C_show_each_F: {67305985}
 [eva] merge_bits.i:27: Frama_C_show_each_F: {16843008}
+[eva:alarm] merge_bits.i:28: Warning: 
+  unaligned pointer creation. assert \aligned(&T[2],alignof(int));
 [eva] merge_bits.i:29: Frama_C_show_each_F: {1048577}
 [eva] Recording results for merge_bits
 [eva] Done for function merge_bits

@@ -12,11 +12,15 @@
 [eva:alarm] va_list2.c:15: Warning: 
   out of bounds read. assert \valid_read(args);
 [eva:alarm] va_list2.c:15: Warning: 
+  unaligned pointer creation. assert \aligned(*args,alignof(int));
+[eva:alarm] va_list2.c:15: Warning: 
   out of bounds read. assert \valid_read((int *)*args);
 [eva] va_list2.c:16: 
   Frama_C_show_each_i: {{ garbled mix of &{S_0_S___va_params} (origin: Well) }}
 [eva:alarm] va_list2.c:20: Warning: 
   out of bounds read. assert \valid_read(args);
+[eva:alarm] va_list2.c:20: Warning: 
+  unaligned pointer creation. assert \aligned(*args,alignof(float));
 [eva:alarm] va_list2.c:20: Warning: 
   out of bounds read. assert \valid_read((float *)*args);
 [eva:alarm] va_list2.c:20: Warning: 

@@ -56,6 +56,8 @@
 [eva] invalid_pointer.c:66: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
+[eva:alarm] invalid_pointer.c:67: Warning: 
+  unaligned pointer creation. assert \aligned(x,alignof(int));
 [eva] computing for function Frama_C_interval <- int_conversion <- main.
   Called from invalid_pointer.c:68.
 [eva] invalid_pointer.c:68: 
@@ -70,8 +72,12 @@
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva:alarm] invalid_pointer.c:73: Warning: 
+  unaligned pointer creation. assert \aligned(x,alignof(int));
+[eva:alarm] invalid_pointer.c:73: Warning: 
   invalid pointer creation.
   assert \null ≡ (int *)x ∨ \object_pointer((int *)x);
+[eva:alarm] invalid_pointer.c:74: Warning: 
+  unaligned pointer creation. assert \aligned(undet,alignof(int));
 [eva:alarm] invalid_pointer.c:74: Warning: 
   invalid pointer creation.
   assert \null ≡ (int *)undet ∨ \object_pointer((int *)undet);
@@ -95,12 +101,16 @@
   invalid pointer creation.
   assert \null ≡ u.pointer ∨ \object_pointer(u.pointer);
 [eva:alarm] invalid_pointer.c:105: Warning: 
+  unaligned pointer creation. assert \aligned(u.pointer,alignof(int));
+[eva:alarm] invalid_pointer.c:105: Warning: 
   invalid pointer creation.
   assert \null ≡ u.pointer ∨ \object_pointer(u.pointer);
 [eva] Recording results for union_pointer
 [eva] Done for function union_pointer
 [eva] computing for function write_pointer <- main.
   Called from invalid_pointer.c:200.
+[eva:alarm] invalid_pointer.c:115: Warning: 
+  unaligned pointer creation. assert \aligned(p,alignof(int));
 [eva:alarm] invalid_pointer.c:115: Warning: 
   invalid pointer creation. assert \null ≡ p ∨ \object_pointer(p);
 [eva:alarm] invalid_pointer.c:118: Warning: 
@@ -122,6 +132,10 @@
 [eva] invalid_pointer.c:140: assertion got status valid.
 [eva] invalid_pointer.c:141: Frama_C_show_each_object_pointer: {{ &x + {0; 4} }}
 [eva:alarm] invalid_pointer.c:142: Warning: 
+  unaligned pointer creation.
+  assert
+  \aligned((uintptr_t)((uintptr_t)(&x) + (uintptr_t)undet),alignof(int));
+[eva:alarm] invalid_pointer.c:142: Warning: 
   invalid pointer creation.
   assert
   \null ≡ (int *)((uintptr_t)((uintptr_t)(&x) + (uintptr_t)undet)) ∨
@@ -129,7 +143,7 @@
 [eva] invalid_pointer.c:143: assertion got status valid.
 [eva] invalid_pointer.c:144: assertion got status valid.
 [eva] invalid_pointer.c:145: 
-  Frama_C_show_each_object_pointer_char: {{ &x + {0; 1; 2; 3; 4} }}
+  Frama_C_show_each_object_pointer_char: {{ &x + {0; 4} }}
 [eva] computing for function Frama_C_interval <- object_pointer_predicate <- main.
   Called from invalid_pointer.c:146.
 [eva] invalid_pointer.c:146: 
@@ -154,6 +168,8 @@
   assert \null ≡ (int *)50 ∨ \object_pointer((int *)50);
 [eva:alarm] invalid_pointer.c:165: Warning: assertion got status unknown.
 [eva] invalid_pointer.c:166: Frama_C_show_each_absolute_20: {20}
+[eva:alarm] invalid_pointer.c:167: Warning: 
+  unaligned pointer creation. assert \aligned(undet,alignof(int));
 [eva:alarm] invalid_pointer.c:167: Warning: 
   invalid pointer creation.
   assert \null ≡ (int *)undet ∨ \object_pointer((int *)undet);
@@ -235,11 +251,11 @@
   s1 ∈ {0}
 [eva:final-states] Values at end of function int_conversion:
   Frama_C_entropy_source ∈ [--..--]
-  x ∈ [15..31]
-  p ∈ [0..31]
+  x ∈ {16; 20; 24; 28}
+  p ∈ {0; 4; 8; 12; 16; 20; 24; 28}
 [eva:final-states] Values at end of function object_pointer_predicate:
   Frama_C_entropy_source ∈ [--..--]
-  p ∈ [10..31]
+  p ∈ {12; 16; 20; 24; 28}
   i ∈ [0..20]
 [eva:final-states] Values at end of function pointer_computation:
   Frama_C_entropy_source ∈ [--..--]
@@ -380,11 +396,11 @@
    [127] ∈ {127}
   p ∈ {{ &t[128] }}
 [eva:final-states] Values at end of function union_pointer:
-  p ∈ [0..31]
-  u{.integer; .pointer} ∈ [0..31]
+  p ∈ {0; 4; 8; 12; 16; 20; 24; 28}
+  u{.integer; .pointer} ∈ {0; 4; 8; 12; 16; 20; 24; 28}
 [eva:final-states] Values at end of function write_pointer:
   p ∈ {42}
-  q ∈ {{ &x + {0; 1; 2; 3; 4} }}
+  q ∈ {{ &x + {0; 4} }}
 [eva:final-states] Values at end of function main:
   Frama_C_entropy_source ∈ [--..--]
   __fc_signal_handlers[0..9] ∈ {0}

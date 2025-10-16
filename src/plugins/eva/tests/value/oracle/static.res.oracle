@@ -20,6 +20,8 @@
 [eva] Recording results for f
 [eva] Done for function f
 [eva] static.i:20: Reusing old results for call to f
+[eva:alarm] static.i:22: Warning: 
+  unaligned pointer creation. assert \aligned(&T[1],alignof(int));
 [eva] Recording results for main
 [eva] Done for function main
 [eva] ====== VALUES COMPUTED ======

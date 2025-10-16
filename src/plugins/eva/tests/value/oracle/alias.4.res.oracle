@@ -58,6 +58,8 @@
   char1 ∈ {0}
   ll1 ∈ {0}
 [eva:partition] alias.i:185: starting to merge loop iterations
+[eva:alarm] alias.i:190: Warning: 
+  unaligned pointer creation. assert \aligned(*PTR2,alignof(int));
 [eva:alarm] alias.i:191: Warning: 
   pointer comparison. assert \pointer_comparable((void *)PTR2, (void *)PTR1);
 [eva:alarm] alias.i:199: Warning: signed overflow. assert c + 1 ≤ 2147483647;
@@ -80,7 +82,7 @@
   y ∈ {0; 3; 77}
   z ∈ {-33}
   PTR1 ∈ {{ &p[1] ; &q[2] }}
-  PTR2 ∈ [--..--]
+  PTR2 ∈ [0..4294967292],0%4
   i_0 ∈ {100}
 [from] Computing for function main6
 [from] Done for function main6

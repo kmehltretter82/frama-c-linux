@@ -1,5 +1,5 @@
 /* run.config*
-   STDOPT: #"-eva-warn-key garbled-mix"
+   STDOPT: #"-eva-warn-key garbled-mix -no-warn-unaligned-pointer"
 */
 
 /* Test the soundness and the precision of backward reductions for

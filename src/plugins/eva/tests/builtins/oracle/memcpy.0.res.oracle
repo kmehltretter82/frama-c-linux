@@ -156,7 +156,13 @@
 [eva] memcpy.c:109: function memcpy: precondition 'separation' got status valid.
 [eva:imprecision] memcpy.c:109: 
   In memcpy builtin: too many sizes to enumerate, possible loss of precision
+[eva:alarm] memcpy.c:113: Warning: 
+  unaligned pointer creation. assert \aligned((char *)ptop1,alignof(int));
+[eva:alarm] memcpy.c:115: Warning: 
+  unaligned pointer creation. assert \aligned(pptop,alignof(int));
 [eva:partition] memcpy.c:114: starting to merge loop iterations
+[eva:alarm] memcpy.c:118: Warning: 
+  unaligned pointer creation. assert \aligned(pptop,alignof(int));
 [eva] memcpy.c:118: Call to builtin memcpy
 [eva:alarm] memcpy.c:118: Warning: 
   function memcpy: precondition 'valid_dest' got status unknown.
@@ -164,7 +170,13 @@
 [eva] memcpy.c:118: function memcpy: precondition 'separation' got status valid.
 [kernel:approximation] memcpy.c:118: 
   too many locations to update in array. Approximating.
+[eva:alarm] memcpy.c:121: Warning: 
+  unaligned pointer creation. assert \aligned(&ptop2[750],alignof(int));
+[eva:alarm] memcpy.c:123: Warning: 
+  unaligned pointer creation. assert \aligned(pptop,alignof(int));
 [eva:partition] memcpy.c:122: starting to merge loop iterations
+[eva:alarm] memcpy.c:126: Warning: 
+  unaligned pointer creation. assert \aligned(pptop,alignof(int));
 [eva] memcpy.c:126: Call to builtin memcpy
 [eva:alarm] memcpy.c:126: Warning: 
   function memcpy: precondition 'valid_dest' got status unknown.
@@ -172,7 +184,15 @@
 [eva] memcpy.c:126: function memcpy: precondition 'separation' got status valid.
 [kernel:approximation] memcpy.c:126: 
   too many locations to update in array. Approximating.
+[eva:alarm] memcpy.c:129: Warning: 
+  unaligned pointer creation. assert \aligned(&ptop3[2],alignof(int));
+[eva:alarm] memcpy.c:131: Warning: 
+  unaligned pointer creation. assert \aligned(pptop,alignof(int));
+[eva:alarm] memcpy.c:132: Warning: 
+  unaligned pointer creation. assert \aligned(pptop,alignof(int));
 [eva:partition] memcpy.c:130: starting to merge loop iterations
+[eva:alarm] memcpy.c:135: Warning: 
+  unaligned pointer creation. assert \aligned(pptop,alignof(int));
 [eva] memcpy.c:135: Call to builtin memcpy
 [eva:alarm] memcpy.c:135: Warning: 
   function memcpy: precondition 'valid_dest' got status unknown.
@@ -180,7 +200,15 @@
 [eva] memcpy.c:135: function memcpy: precondition 'separation' got status valid.
 [kernel:approximation] memcpy.c:135: 
   too many locations to update in array. Approximating.
+[eva:alarm] memcpy.c:138: Warning: 
+  unaligned pointer creation. assert \aligned(&ptop4[2],alignof(int));
+[eva:alarm] memcpy.c:140: Warning: 
+  unaligned pointer creation. assert \aligned(pptop,alignof(int));
+[eva:alarm] memcpy.c:141: Warning: 
+  unaligned pointer creation. assert \aligned(pptop,alignof(int));
 [eva:partition] memcpy.c:139: starting to merge loop iterations
+[eva:alarm] memcpy.c:144: Warning: 
+  unaligned pointer creation. assert \aligned(pptop,alignof(int));
 [eva] memcpy.c:144: Call to builtin memcpy
 [eva:alarm] memcpy.c:144: Warning: 
   function memcpy: precondition 'valid_dest' got status unknown.
@@ -188,6 +216,10 @@
 [eva] memcpy.c:144: function memcpy: precondition 'separation' got status valid.
 [kernel:approximation] memcpy.c:144: 
   too many locations to update in array. Approximating.
+[eva:alarm] memcpy.c:148: Warning: 
+  unaligned pointer creation. assert \aligned(&garbledsize[10],alignof(int));
+[eva:alarm] memcpy.c:149: Warning: 
+  unaligned pointer creation. assert \aligned(pgarbledsize,alignof(int));
 [eva] memcpy.c:149: Call to builtin memcpy
 [eva:alarm] memcpy.c:149: Warning: 
   function memcpy: precondition 'valid_dest' got status unknown.
@@ -1140,6 +1172,38 @@
              - Assertion 'Eva,pointer_downcast' (file memcpy.c, line 91)
 [    -    ] Assertion 'Eva,pointer_downcast' (file memcpy.c, line 95)
             tried with Eva.
+[    -    ] Assertion 'Eva,pointer_alignment' (file memcpy.c, line 113)
+            tried with Eva.
+[    -    ] Assertion 'Eva,pointer_alignment' (file memcpy.c, line 115)
+            tried with Eva.
+[    -    ] Assertion 'Eva,pointer_alignment' (file memcpy.c, line 118)
+            tried with Eva.
+[    -    ] Assertion 'Eva,pointer_alignment' (file memcpy.c, line 121)
+            tried with Eva.
+[    -    ] Assertion 'Eva,pointer_alignment' (file memcpy.c, line 123)
+            tried with Eva.
+[    -    ] Assertion 'Eva,pointer_alignment' (file memcpy.c, line 126)
+            tried with Eva.
+[    -    ] Assertion 'Eva,pointer_alignment' (file memcpy.c, line 129)
+            tried with Eva.
+[    -    ] Assertion 'Eva,pointer_alignment' (file memcpy.c, line 131)
+            tried with Eva.
+[    -    ] Assertion 'Eva,pointer_alignment' (file memcpy.c, line 132)
+            tried with Eva.
+[    -    ] Assertion 'Eva,pointer_alignment' (file memcpy.c, line 135)
+            tried with Eva.
+[    -    ] Assertion 'Eva,pointer_alignment' (file memcpy.c, line 138)
+            tried with Eva.
+[    -    ] Assertion 'Eva,pointer_alignment' (file memcpy.c, line 140)
+            tried with Eva.
+[    -    ] Assertion 'Eva,pointer_alignment' (file memcpy.c, line 141)
+            tried with Eva.
+[    -    ] Assertion 'Eva,pointer_alignment' (file memcpy.c, line 144)
+            tried with Eva.
+[    -    ] Assertion 'Eva,pointer_alignment' (file memcpy.c, line 148)
+            tried with Eva.
+[    -    ] Assertion 'Eva,pointer_alignment' (file memcpy.c, line 149)
+            tried with Eva.
 [  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file memcpy.c, line 72)
 
             by Eva.
@@ -1492,7 +1556,7 @@
    108 Completely validated
      1 Locally validated
     46 Considered valid
-    32 To be validated
+    48 To be validated
      4 Alarms emitted
-   191 Total
+   207 Total
 --------------------------------------------------------------------------------

@@ -1,3 +1,7 @@
+/* run.config*
+   STDOPT: +"-no-warn-unaligned-pointer"
+*/
+
 #include "__fc_builtin.h"
 #include "string.h"
 #include <wchar.h>

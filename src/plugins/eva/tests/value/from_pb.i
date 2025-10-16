@@ -1,5 +1,5 @@
 /* run.config*
-  
+
   STDOPT: #"-main main0"
   STDOPT: #"-main main1"
   STDOPT: #"-main main2"
@@ -28,13 +28,13 @@ void main1(){
 
 void main2(){
   if (j)
-    {if (c) ((int*)((char*)T+1))[0]=i; else T[1]=d;}
+    {if (c) ((int*)((char*)T+4))[0]=i; else T[1]=d;}
   else x=k;
 }
 
 
 void main3(){
-  int* p = ((int*)((char*)T+1));
+  int* p = ((int*)((char*)T+4));
 
   if (c) { p[0]=i;  p[1]=d;}  else T[1] = x;
 

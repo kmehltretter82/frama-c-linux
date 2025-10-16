@@ -118,7 +118,11 @@
   .bitf ∈ {0}
   .[bits 65 to 95] ∈
   {{ garbled mix of &{b} (origin: Misaligned read {bitfield.i:70}) }}
+[eva:alarm] bitfield.i:74: Warning: 
+  unaligned pointer creation. assert \aligned(c->next.next,alignof(struct A));
 [eva:partition] bitfield.i:69: starting to merge loop iterations
+[eva:alarm] bitfield.i:70: Warning: 
+  unaligned pointer creation. assert \aligned(c,alignof(struct A));
 [eva] computing for function leaf <- imprecise_bts_1671 <- main.
   Called from bitfield.i:70.
 [eva] Done for function leaf
@@ -126,10 +130,14 @@
   Frama_C_show_each:
   {{ garbled mix of &{b} (origin: Misaligned read {bitfield.i:70}) }}
 [eva:alarm] bitfield.i:72: Warning: 
+  unaligned pointer creation. assert \aligned(c,alignof(struct A));
+[eva:alarm] bitfield.i:72: Warning: 
   out of bounds write. assert \valid(&c->bitf);
 [eva] bitfield.i:73: 
   Frama_C_show_each:
   {{ garbled mix of &{b} (origin: Misaligned read {bitfield.i:70}) }}
+[eva:alarm] bitfield.i:74: Warning: 
+  unaligned pointer creation. assert \aligned(c,alignof(struct A));
 [eva:alarm] bitfield.i:74: Warning: 
   out of bounds read. assert \valid_read(&c->next.next);
 [eva] computing for function leaf <- imprecise_bts_1671 <- main.
@@ -213,7 +221,7 @@
       (read in 4 statements, propagated through 2 statements)
       garbled mix of &{b; ee}
 [eva] bitfield.i:102: assertion 'Eva,initialization' got final status invalid.
-[scope:rm_asserts] removing 1 assertion(s)
+[scope:rm_asserts] removing 3 assertion(s)
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function char_short:
   S.c ∈ {1}
@@ -499,11 +507,17 @@ void imprecise_bts_1671(void)
   ee.next.prev = (struct foo **)(& b);
   c = & ee;
   while (foo) {
+    /*@ assert Eva: pointer_alignment: \aligned(c,alignof(struct A)); */
     leaf(c);
     Frama_C_show_each(ee);
+    /*@ assert Eva: pointer_alignment: \aligned(c,alignof(struct A)); */
     /*@ assert Eva: mem_access: \valid(&c->bitf); */
     c->bitf = (int __attribute__((__FRAMA_C_BITFIELD_SIZE__(1))))0;
     Frama_C_show_each(ee);
+    /*@ assert
+          Eva: pointer_alignment: \aligned(c->next.next,alignof(struct A));
+    */
+    /*@ assert Eva: pointer_alignment: \aligned(c,alignof(struct A)); */
     /*@ assert Eva: mem_access: \valid_read(&c->next.next); */
     c = (struct A *)c->next.next;
   }

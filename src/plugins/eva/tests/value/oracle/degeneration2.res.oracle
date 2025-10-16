@@ -15,6 +15,8 @@
 [eva:garbled-mix:write] degeneration2.i:14: 
   Assigning imprecise value to A because of arithmetic operation on addresses.
 [eva:alarm] degeneration2.i:17: Warning: 
+  unaligned pointer creation. assert \aligned(A,alignof(int));
+[eva:alarm] degeneration2.i:17: Warning: 
   accessing uninitialized left-value. assert \initialized((int *)A);
 [eva:alarm] degeneration2.i:17: Warning: 
   out of bounds read. assert \valid_read((int *)A);

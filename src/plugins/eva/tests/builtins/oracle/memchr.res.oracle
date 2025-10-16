@@ -455,6 +455,8 @@
 [eva] computing for function memchr_escaping <- main.
   Called from memchr.c:662.
 [eva:alarm] memchr.c:264: Warning: 
+  unaligned pointer creation. assert \aligned((char *)s,alignof(int));
+[eva:alarm] memchr.c:264: Warning: 
   pointer downcast. assert (unsigned int)(&x) ≤ 2147483647;
 [eva:locals-escaping] memchr.c:264: Warning: 
   locals {x} escaping the scope of a block of memchr_escaping through s

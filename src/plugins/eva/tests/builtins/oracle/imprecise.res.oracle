@@ -52,6 +52,8 @@
   pointer downcast. assert (unsigned int)(&k) ≤ 2147483647;
 [eva:garbled-mix:write] imprecise.c:19: 
   Assigning imprecise value to p because of arithmetic operation on addresses.
+[eva:alarm] imprecise.c:20: Warning: 
+  unaligned pointer creation. assert \aligned(p,alignof(int));
 [eva:alarm] imprecise.c:20: Warning: out of bounds write. assert \valid(p);
 [eva] imprecise.c:21: 
   Frama_C_dump_each:
@@ -75,6 +77,8 @@
   s2.[bits 0 to ..] ∈ {0} or UNINITIALIZED
   ==END OF DUMP==
 [eva:alarm] imprecise.c:22: Warning: 
+  unaligned pointer creation. assert \aligned(p,alignof(int));
+[eva:alarm] imprecise.c:22: Warning: 
   pointer downcast. assert (unsigned int)p ≤ 2147483647;
 [eva] Recording results for write_garbled
 [from] Computing for function write_garbled
@@ -97,6 +101,10 @@
   function memset: precondition 'valid_s' got status unknown.
 [eva:acsl:unsupported] FRAMAC_SHARE/libc/string.h:147: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memset
+[eva:alarm] imprecise.c:52: Warning: 
+  unaligned pointer creation. assert \aligned(&v2,alignof(int));
+[eva:alarm] imprecise.c:53: Warning: 
+  unaligned pointer creation. assert \aligned(p2,alignof(int));
 [eva:alarm] imprecise.c:53: Warning: out of bounds write. assert \valid(p2);
 [eva:alarm] imprecise.c:53: Warning: 
   pointer downcast. assert (unsigned int)(&addr) ≤ 2147483647;
@@ -133,7 +141,8 @@
 [eva] imprecise.c:76: 
   Frama_C_dump_each:
   # cvalue:
-  NULL[rbits 800 to 1607] ∈ [--..--] or ESCAPINGADDR
+  NULL[rbits 800 to 1599] ∈ [--..--] or ESCAPINGADDR
+      [rbits 1600 to 1607] ∈ [--..--]
   __fc_heap_status ∈ [--..--]
   __fc_strtok_ptr ∈ {0}
   v ∈ [--..--]
@@ -153,10 +162,14 @@
   s2.[bits 0 to ..] ∈ {0} or UNINITIALIZED
   ==END OF DUMP==
 [eva:alarm] imprecise.c:77: Warning: 
+  unaligned pointer creation. assert \aligned(p_gm_null,alignof(int *));
+[eva:alarm] imprecise.c:77: Warning: 
   out of bounds read. assert \valid_read(p_gm_null);
 [eva:alarm] imprecise.c:77: Warning: 
   accessing left-value that contains escaping addresses.
   assert ¬\dangling(p_gm_null);
+[eva:alarm] imprecise.c:77: Warning: 
+  unaligned pointer creation. assert \aligned(*p_gm_null,alignof(int));
 [kernel:annot:missing-spec] imprecise.c:77: Warning: 
   Neither code nor specification for function gm_f2,
    generating default assigns. See -generated-spec-* options for more info
@@ -167,7 +180,8 @@
 [eva] imprecise.c:78: 
   Frama_C_dump_each:
   # cvalue:
-  NULL[rbits 800 to 1607] ∈ [--..--] or ESCAPINGADDR
+  NULL[rbits 800 to 1599] ∈ [--..--] or ESCAPINGADDR
+      [rbits 1600 to 1607] ∈ [--..--]
   __fc_heap_status ∈ [--..--]
   __fc_strtok_ptr ∈ {0}
   v ∈ [--..--]
@@ -182,7 +196,7 @@
     .[bits 262144 to 17179869183]# ∈ {0; 19; 20} or UNINITIALIZED repeated %8 
     .[bits 17179869184 to ..]# ∈ {0; 20} or UNINITIALIZED repeated %8 
   t[0..9] ∈ {0}
-  p_gm_null ∈ [100..197]
+  p_gm_null ∈ [100..196],0%4
   s1.[bits 0 to ..] ∈ {0} or UNINITIALIZED
   s2.[bits 0 to ..] ∈ {0} or UNINITIALIZED
   ==END OF DUMP==
@@ -220,6 +234,8 @@
 [eva] computing for function overlap <- main.
   Called from imprecise.c:151.
 [eva:alarm] imprecise.c:122: Warning: 
+  unaligned pointer creation. assert \aligned(&t_char[v],alignof(int));
+[eva:alarm] imprecise.c:122: Warning: 
   out of bounds write. assert \valid((int *)(&t_char[v]));
 [eva] Recording results for overlap
 [from] Computing for function overlap
@@ -232,6 +248,8 @@
 [eva:alarm] imprecise.c:136: Warning: assertion got status unknown.
 [kernel:approximation] imprecise.c:137: 
   too many locations to update in array. Approximating.
+[eva:alarm] imprecise.c:140: Warning: 
+  unaligned pointer creation. assert \aligned(&t_big,alignof(int));
 [eva:alarm] imprecise.c:140: Warning: 
   accessing uninitialized left-value.
   assert \initialized((int *)(&t_big) + 48);
@@ -248,6 +266,7 @@
     imprecise.c:19: arithmetic operation on addresses
       (read in 1 statement, propagated through 1 statement)
       garbled mix of &{j; k}
+[scope:rm_asserts] removing 1 assertion(s)
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function cast_address:
   p ∈ {{ &x }}
@@ -255,8 +274,9 @@
   c2# ∈ {{ (? *)&x }}%32, bits 0 to 7 
   c3 ∈ {{ garbled mix of &{x} (origin: Misaligned read {imprecise.c:68}) }}
 [eva:final-states] Values at end of function garbled_mix_null:
-  NULL[rbits 800 to 1607] ∈ [--..--] or ESCAPINGADDR
-  p_gm_null ∈ [100..197]
+  NULL[rbits 800 to 1599] ∈ [--..--] or ESCAPINGADDR
+      [rbits 1600 to 1607] ∈ [--..--]
+  p_gm_null ∈ [100..196],0%4
 [eva:final-states] Values at end of function invalid_assigns_imprecise:
   p ∈ {0}
 [eva:final-states] Values at end of function many_writes:
@@ -296,16 +316,17 @@
   vx ∈ {1}
   vy ∈ {1} or UNINITIALIZED
 [eva:final-states] Values at end of function write_garbled:
-  NULL[rbits 800 to 1607] ∈
-      {{ garbled mix of &{j; k}
-       (origin: Misaligned write {imprecise.c:22}) }}
+  NULL[rbits 800 to 1599] ∈
+      {{ NULL + [--..--] ; (? *)&j ; (? *)&k{[0], [1], [2], [3], [4]} }} repeated %32 
+      [rbits 1600 to 1607] ∈ [--..--]
   i ∈ {1}
-  j ∈ {{ NULL + [1..197] ; (int)&j ; &k + [0..16] }}
+  j ∈ {{ NULL + [1..196] ; (int)&j ; (int)&k{[0], [1], [2], [3], [4]} }}
   k[0..4] ∈
-   {{ garbled mix of &{j; k} (origin: Misaligned write {imprecise.c:22}) }}
-  p ∈ {{ NULL + [100..197] ; &j ; &k + [0..16] }}
+   {{ NULL + [--..--] ; (int)&j ; (int)&k{[0], [1], [2], [3], [4]} }}
+  p ∈ {{ NULL + [100..196],0%4 ; &j ; &k{[0], [1], [2], [3], [4]} }}
 [eva:final-states] Values at end of function main:
-  NULL[rbits 800 to 1607] ∈ [--..--] or ESCAPINGADDR
+  NULL[rbits 800 to 1599] ∈ [--..--] or ESCAPINGADDR
+      [rbits 1600 to 1607] ∈ [--..--]
   v1.[bits 0 to 7] ∈ {1}
     .[bits 8 to ..] ∈ {0} or UNINITIALIZED
   v2.[bits 0 to 31] ∈ {0} or UNINITIALIZED
@@ -316,7 +337,7 @@
     .[bits 262144 to 17179869183]# ∈
     {0; 19; 20} or UNINITIALIZED repeated %8 
     .[bits 17179869184 to ..]# ∈ {0; 20} or UNINITIALIZED repeated %8 
-  p_gm_null ∈ [100..197]
+  p_gm_null ∈ [100..196],0%4
 [from] Computing for function cast_address
 [from] Done for function cast_address
 [from] Computing for function garbled_mix_null
@@ -354,10 +375,10 @@
 [from] Function gm_f1:
   \result FROM \nothing
 [from] Function gm_f2:
-  NULL[100..200] FROM NULL[100..200] (and SELF)
-  \result FROM NULL[100..200]
+  NULL[100..199] FROM NULL[100..199] (and SELF)
+  \result FROM NULL[100..199]
 [from] Function garbled_mix_null:
-  NULL[100..200] FROM NULL[100..200] (and SELF)
+  NULL[100..199] FROM NULL[100..199] (and SELF)
   p_gm_null FROM \nothing
 [from] Function invalid_assigns_imprecise:
   NO EFFECTS
@@ -381,7 +402,8 @@
 [from] Function write_garbled:
   NULL[100..200] FROM \nothing (and SELF)
 [from] Function main:
-  NULL[100..200] FROM NULL[100..200] (and SELF)
+  NULL[100..199] FROM NULL[100..199] (and SELF)
+      [200] FROM \nothing (and SELF)
   v1.[bits 0 to 7] FROM \nothing
   v2.[bits 32 to 63] FROM \nothing
   v3.[bits 0 to 34359738359] FROM \nothing (and SELF)
@@ -394,8 +416,8 @@
 [from] call to Frama_C_dump_each at imprecise.c:76 (by garbled_mix_null):
   \result FROM \nothing
 [from] call to gm_f2 at imprecise.c:77 (by garbled_mix_null):
-  NULL[100..200] FROM NULL[100..200] (and SELF)
-  \result FROM NULL[100..200]
+  NULL[100..199] FROM NULL[100..199] (and SELF)
+  \result FROM NULL[100..199]
 [from] call to Frama_C_dump_each at imprecise.c:78 (by garbled_mix_null):
   \result FROM \nothing
 [from] call to f at imprecise.c:11 (by invalid_assigns_imprecise):
@@ -420,7 +442,7 @@
 [from] call to cast_address at imprecise.c:147 (by main):
   NO EFFECTS
 [from] call to garbled_mix_null at imprecise.c:148 (by main):
-  NULL[100..200] FROM NULL[100..200] (and SELF)
+  NULL[100..199] FROM NULL[100..199] (and SELF)
   p_gm_null FROM \nothing
 [from] call to weak_update_imprecise_size at imprecise.c:149 (by main):
   NO EFFECTS
@@ -431,7 +453,8 @@
 [from] call to paste_big at imprecise.c:152 (by main):
   NO EFFECTS
 [from] entry point:
-  NULL[100..200] FROM NULL[100..200] (and SELF)
+  NULL[100..199] FROM NULL[100..199] (and SELF)
+      [200] FROM \nothing (and SELF)
   v1.[bits 0 to 7] FROM \nothing
   v2.[bits 32 to 63] FROM \nothing
   v3.[bits 0 to ..] FROM \nothing (and SELF)
@@ -450,14 +473,14 @@
   Sure outputs:
     p; c1; c2; c3
 [inout] Out (internal) for function garbled_mix_null:
-    NULL[100..200]; p_gm_null
+    NULL[100..199]; p_gm_null
 [inout] Inputs for function garbled_mix_null:
-    NULL[100..200]; p_gm_null
+    NULL[100..199]; p_gm_null
 [inout] InOut (internal) for function garbled_mix_null:
   Operational inputs:
-    NULL[100..200]
+    NULL[100..199]
   Operational inputs on termination:
-    NULL[100..200]
+    NULL[100..199]
   Sure outputs:
     p_gm_null
 [inout] Out (internal) for function invalid_assigns_imprecise:
@@ -542,12 +565,12 @@
     NULL[100..200]; v1.[bits 0 to 7]; v2.[bits 32 to 63]; v3.[bits 0 to ..];
     v5.[bits 0 to ..]; p_gm_null
 [inout] Inputs for function main:
-    NULL[100..200]; v; v1.[bits 0 to 7]; p_gm_null
+    NULL[100..199]; v; v1.[bits 0 to 7]; p_gm_null
 [inout] InOut (internal) for function main:
   Operational inputs:
-    NULL[100..200]; v; v1.[bits 0 to 7]
+    NULL[100..199]; v; v1.[bits 0 to 7]
   Operational inputs on termination:
-    NULL[100..200]; v; v1.[bits 0 to 7]
+    NULL[100..199]; v; v1.[bits 0 to 7]
   Sure outputs:
     v1.[bits 0 to 7]; v2.[bits 32 to 63]; p_gm_null
 [eva] Analyzing an incomplete application starting at main
@@ -593,6 +616,8 @@
   Called from imprecise.c:145.
 [eva:alarm] imprecise.c:19: Warning: 
   pointer downcast. assert (unsigned int)(&k) ≤ 2147483647;
+[eva:alarm] imprecise.c:20: Warning: 
+  unaligned pointer creation. assert \aligned(p,alignof(int));
 [eva:alarm] imprecise.c:20: Warning: out of bounds write. assert \valid(p);
 [eva] imprecise.c:21: 
   Frama_C_dump_each:
@@ -625,6 +650,8 @@
   S_1_S_p_gm_null[0..1] ∈ [--..--]
   ==END OF DUMP==
 [eva:alarm] imprecise.c:22: Warning: 
+  unaligned pointer creation. assert \aligned(p,alignof(int));
+[eva:alarm] imprecise.c:22: Warning: 
   pointer downcast. assert (unsigned int)p ≤ 2147483647;
 [eva] Recording results for write_garbled
 [from] Computing for function write_garbled
@@ -641,6 +668,10 @@
 [eva:alarm] imprecise.c:45: Warning: out of bounds write. assert \valid(p);
 [eva:alarm] imprecise.c:46: Warning: out of bounds read. assert \valid_read(p);
 [eva] imprecise.c:51: Call to builtin memset
+[eva:alarm] imprecise.c:52: Warning: 
+  unaligned pointer creation. assert \aligned(&v2,alignof(int));
+[eva:alarm] imprecise.c:53: Warning: 
+  unaligned pointer creation. assert \aligned(p2,alignof(int));
 [eva:alarm] imprecise.c:53: Warning: out of bounds write. assert \valid(p2);
 [eva:alarm] imprecise.c:53: Warning: 
   pointer downcast. assert (unsigned int)(&addr) ≤ 2147483647;
@@ -671,7 +702,8 @@
 [eva] imprecise.c:76: 
   Frama_C_dump_each:
   # cvalue:
-  NULL[rbits 800 to 1607] ∈ [--..--] or ESCAPINGADDR
+  NULL[rbits 800 to 1599] ∈ [--..--] or ESCAPINGADDR
+      [rbits 1600 to 1607] ∈ [--..--]
   __fc_heap_status ∈ [--..--]
   __fc_strtok_ptr ∈ {{ NULL ; &S___fc_strtok_ptr[0] }}
   v ∈ [--..--]
@@ -698,17 +730,22 @@
   S_1_S_p_gm_null[0..1] ∈ [--..--]
   ==END OF DUMP==
 [eva:alarm] imprecise.c:77: Warning: 
+  unaligned pointer creation. assert \aligned(p_gm_null,alignof(int *));
+[eva:alarm] imprecise.c:77: Warning: 
   out of bounds read. assert \valid_read(p_gm_null);
 [eva:alarm] imprecise.c:77: Warning: 
   accessing left-value that contains escaping addresses.
   assert ¬\dangling(p_gm_null);
+[eva:alarm] imprecise.c:77: Warning: 
+  unaligned pointer creation. assert \aligned(*p_gm_null,alignof(int));
 [eva] computing for function gm_f2 <- garbled_mix_null <- main.
   Called from imprecise.c:77.
 [eva] Done for function gm_f2
 [eva] imprecise.c:78: 
   Frama_C_dump_each:
   # cvalue:
-  NULL[rbits 800 to 1607] ∈ [--..--] or ESCAPINGADDR
+  NULL[rbits 800 to 1599] ∈ [--..--] or ESCAPINGADDR
+      [rbits 1600 to 1607] ∈ [--..--]
   __fc_heap_status ∈ [--..--]
   __fc_strtok_ptr ∈ {{ NULL ; &S___fc_strtok_ptr[0] }}
   v ∈ [--..--]
@@ -723,7 +760,7 @@
   t[0] ∈ {{ NULL ; (struct s *)&S_0_t }}
    [1] ∈ {{ NULL ; (struct s *)&S_1_t }}
    [2..9] ∈ {{ NULL ; (struct s *)&S_0_t ; (struct s *)&S_1_t }}
-  p_gm_null ∈ [100..197]
+  p_gm_null ∈ [100..196],0%4
   s1.[bits 0 to ..] ∈ [--..--] or UNINITIALIZED
   s2.[bits 0 to ..] ∈ [--..--] or UNINITIALIZED
   S___fc_strtok_ptr[0..1] ∈ [--..--]
@@ -761,6 +798,8 @@
 [eva] computing for function overlap <- main.
   Called from imprecise.c:151.
 [eva:alarm] imprecise.c:122: Warning: 
+  unaligned pointer creation. assert \aligned(&t_char[v],alignof(int));
+[eva:alarm] imprecise.c:122: Warning: 
   out of bounds write. assert \valid((int *)(&t_char[v]));
 [eva] Recording results for overlap
 [from] Computing for function overlap
@@ -769,6 +808,8 @@
 [eva] computing for function paste_big <- main.
   Called from imprecise.c:152.
 [eva] imprecise.c:133: Call to builtin memset
+[eva:alarm] imprecise.c:140: Warning: 
+  unaligned pointer creation. assert \aligned(&t_big,alignof(int));
 [eva:alarm] imprecise.c:140: Warning: 
   accessing uninitialized left-value.
   assert \initialized((int *)(&t_big) + 48);
@@ -785,6 +826,7 @@
     imprecise.c:19: arithmetic operation on addresses
       (read in 1 statement, propagated through 1 statement)
       garbled mix of &{j; k}
+[scope:rm_asserts] removing 1 assertion(s)
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function cast_address:
   p ∈ {{ &x }}
@@ -792,8 +834,9 @@
   c2# ∈ {{ (? *)&x }}%32, bits 0 to 7 
   c3 ∈ {{ garbled mix of &{x} (origin: Misaligned read {imprecise.c:68}) }}
 [eva:final-states] Values at end of function garbled_mix_null:
-  NULL[rbits 800 to 1607] ∈ [--..--] or ESCAPINGADDR
-  p_gm_null ∈ [100..197]
+  NULL[rbits 800 to 1599] ∈ [--..--] or ESCAPINGADDR
+      [rbits 1600 to 1607] ∈ [--..--]
+  p_gm_null ∈ [100..196],0%4
 [eva:final-states] Values at end of function invalid_assigns_imprecise:
   p ∈ {0}
 [eva:final-states] Values at end of function many_writes:
@@ -830,16 +873,17 @@
   vx ∈ {1}
   vy ∈ {1} or UNINITIALIZED
 [eva:final-states] Values at end of function write_garbled:
-  NULL[rbits 800 to 1607] ∈
-      {{ garbled mix of &{j; k}
-       (origin: Misaligned write {imprecise.c:22}) }}
+  NULL[rbits 800 to 1599] ∈
+      {{ NULL + [--..--] ; (? *)&j ; (? *)&k{[0], [1], [2], [3], [4]} }} repeated %32 
+      [rbits 1600 to 1607] ∈ [--..--]
   i ∈ {1}
-  j ∈ {{ NULL + [1..197] ; (int)&j ; &k + [0..16] }}
+  j ∈ {{ NULL + [1..196] ; (int)&j ; (int)&k{[0], [1], [2], [3], [4]} }}
   k[0..4] ∈
-   {{ garbled mix of &{j; k} (origin: Misaligned write {imprecise.c:22}) }}
-  p ∈ {{ NULL + [100..197] ; &j ; &k + [0..16] }}
+   {{ NULL + [--..--] ; (int)&j ; (int)&k{[0], [1], [2], [3], [4]} }}
+  p ∈ {{ NULL + [100..196],0%4 ; &j ; &k{[0], [1], [2], [3], [4]} }}
 [eva:final-states] Values at end of function main:
-  NULL[rbits 800 to 1607] ∈ [--..--] or ESCAPINGADDR
+  NULL[rbits 800 to 1599] ∈ [--..--] or ESCAPINGADDR
+      [rbits 1600 to 1607] ∈ [--..--]
   v1.[bits 0 to 7] ∈ {1}
     .[bits 8 to ..] ∈ [--..--] or UNINITIALIZED
   v2.[bits 0 to 31] ∈ [--..--] or UNINITIALIZED
@@ -847,7 +891,7 @@
     .[bits 64 to ..] ∈ [--..--] or UNINITIALIZED
   v3.[bits 0 to ..] ∈ [--..--] or UNINITIALIZED
   v5.[bits 0 to ..] ∈ [--..--] or UNINITIALIZED
-  p_gm_null ∈ [100..197]
+  p_gm_null ∈ [100..196],0%4
 [from] Computing for function cast_address
 [from] Done for function cast_address
 [from] Computing for function garbled_mix_null
@@ -885,10 +929,10 @@
 [from] Function gm_f1:
   \result FROM \nothing
 [from] Function gm_f2:
-  NULL[100..200] FROM NULL[100..200] (and SELF)
-  \result FROM NULL[100..200]
+  NULL[100..199] FROM NULL[100..199] (and SELF)
+  \result FROM NULL[100..199]
 [from] Function garbled_mix_null:
-  NULL[100..200] FROM NULL[100..200] (and SELF)
+  NULL[100..199] FROM NULL[100..199] (and SELF)
   p_gm_null FROM \nothing
 [from] Function invalid_assigns_imprecise:
   NO EFFECTS
@@ -912,7 +956,8 @@
 [from] Function write_garbled:
   NULL[100..200] FROM \nothing (and SELF)
 [from] Function main:
-  NULL[100..200] FROM NULL[100..200] (and SELF)
+  NULL[100..199] FROM NULL[100..199] (and SELF)
+      [200] FROM \nothing (and SELF)
   v1.[bits 0 to 7] FROM \nothing
   v2.[bits 32 to 63] FROM \nothing
   v3.[bits 0 to 34359738359] FROM \nothing (and SELF)
@@ -925,8 +970,8 @@
 [from] call to Frama_C_dump_each at imprecise.c:76 (by garbled_mix_null):
   \result FROM \nothing
 [from] call to gm_f2 at imprecise.c:77 (by garbled_mix_null):
-  NULL[100..200] FROM NULL[100..200] (and SELF)
-  \result FROM NULL[100..200]
+  NULL[100..199] FROM NULL[100..199] (and SELF)
+  \result FROM NULL[100..199]
 [from] call to Frama_C_dump_each at imprecise.c:78 (by garbled_mix_null):
   \result FROM \nothing
 [from] call to f at imprecise.c:11 (by invalid_assigns_imprecise):
@@ -951,7 +996,7 @@
 [from] call to cast_address at imprecise.c:147 (by main):
   NO EFFECTS
 [from] call to garbled_mix_null at imprecise.c:148 (by main):
-  NULL[100..200] FROM NULL[100..200] (and SELF)
+  NULL[100..199] FROM NULL[100..199] (and SELF)
   p_gm_null FROM \nothing
 [from] call to weak_update_imprecise_size at imprecise.c:149 (by main):
   NO EFFECTS
@@ -962,7 +1007,8 @@
 [from] call to paste_big at imprecise.c:152 (by main):
   NO EFFECTS
 [from] entry point:
-  NULL[100..200] FROM NULL[100..200] (and SELF)
+  NULL[100..199] FROM NULL[100..199] (and SELF)
+      [200] FROM \nothing (and SELF)
   v1.[bits 0 to 7] FROM \nothing
   v2.[bits 32 to 63] FROM \nothing
   v3.[bits 0 to ..] FROM \nothing (and SELF)
@@ -981,14 +1027,14 @@
   Sure outputs:
     p; c1; c2; c3
 [inout] Out (internal) for function garbled_mix_null:
-    NULL[100..200]; p_gm_null
+    NULL[100..199]; p_gm_null
 [inout] Inputs for function garbled_mix_null:
-    NULL[100..200]; p_gm_null
+    NULL[100..199]; p_gm_null
 [inout] InOut (internal) for function garbled_mix_null:
   Operational inputs:
-    NULL[100..200]
+    NULL[100..199]
   Operational inputs on termination:
-    NULL[100..200]
+    NULL[100..199]
   Sure outputs:
     p_gm_null
 [inout] Out (internal) for function invalid_assigns_imprecise:
@@ -1073,11 +1119,11 @@
     NULL[100..200]; v1.[bits 0 to 7]; v2.[bits 32 to 63]; v3.[bits 0 to ..];
     v5.[bits 0 to ..]; p_gm_null
 [inout] Inputs for function main:
-    NULL[100..200]; v; v1.[bits 0 to 7]; p_gm_null
+    NULL[100..199]; v; v1.[bits 0 to 7]; p_gm_null
 [inout] InOut (internal) for function main:
   Operational inputs:
-    NULL[100..200]; v; v1.[bits 0 to 7]
+    NULL[100..199]; v; v1.[bits 0 to 7]
   Operational inputs on termination:
-    NULL[100..200]; v; v1.[bits 0 to 7]
+    NULL[100..199]; v; v1.[bits 0 to 7]
   Sure outputs:
     v1.[bits 0 to 7]; v2.[bits 32 to 63]; p_gm_null
