@@ -183,18 +183,8 @@
 [eva] Done for function f8
 [eva] computing for function f9 <- main.
   Called from secureflow.c:248.
-[eva:secure-flow:direct] secureflow.c:227: Warning: 
-  direct non-interference violation on {result1}
 [eva] secureflow.c:228: check got status valid.
 [eva] secureflow.c:229: assertion got status valid.
-[eva:secure-flow:condition] secureflow.c:231: Warning: 
-  non-interference violation on condition involving {result1}
-[eva:secure-flow:direct] secureflow.c:232: Warning: 
-  direct non-interference violation on {result2}
-[eva:secure-flow:indirect] secureflow.c:232: Warning: 
-  indirect non-interference violation on {result2}
-[eva:secure-flow:indirect] secureflow.c:234: Warning: 
-  indirect non-interference violation on {result2}
 [eva] secureflow.c:235: check got status valid.
 [eva] secureflow.c:236: assertion got status valid.
 [eva] Recording results for f9
