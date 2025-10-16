@@ -59,11 +59,10 @@ type truncation = [ `None | `Left of int | `Middle of int | `Right of int ]
     The original text has been {i already} laid out with respect to
     horizontal and vertical boxes, and this layout will be output as-it-is
     into the formatter.
-    @param truncate do not print more than [truncate] characters; if the text
-    length is bigger than this number, than the middle part of the text is
-    replaced by [ellipsis].
+    @param truncate defines the maximum size of the printed text and the
+    position of the truncation if the text exceed this size
     @param ellipsis when [truncate] is given and the text length is bigger than
-    [truncate], then [ellipsis] is printed instead of the truncated middle
+    the specified size, then [ellipsis] is printed instead of the truncated
     part. *)
 val pretty :
   ?truncate:truncation ->
@@ -76,12 +75,11 @@ val pretty :
     @param prefix a pretty printing function called at the beginning of the
     print
     @param suffix a pretty printing function called at the end of the print
-    @param truncate do not print more than [truncate] characters; if the
-    text length is bigger than this number, than the middle part of the
-    text is replaced by [ellipsis]
-    @param ellipsis when [truncate] is given and the text length is
-    bigger than [truncate], then [ellipsis] is printed instead of the truncated
-    middle part *)
+    @param truncate defines the maximum size of the string and the position of
+    the truncation if the text exceed this size
+    @param ellipsis when [truncate] is given and the text length is bigger than
+    the specified size, then [ellipsis] is printed instead of the truncated
+    part. *)
 val to_string :
   ?prefix:(Format.formatter -> unit) ->
   ?suffix:(Format.formatter -> unit) ->
@@ -149,14 +147,13 @@ end
     @param indent defines the maximum indentation as in {!create}, defaults
     to 20
     @param margin defines the right-margin as in {!create}, defaults to 40
-    @param truncate do not print more than [truncate] characters; if the
-    (trimed) text length is bigger than this number, than the middle part of
-    the text is replaced by [ellipsis]
-    @param ellipsis when [truncate] is given and the (trimmed) text length is
-    bigger than [truncate], then [ellipsis] is printed instead of the
-    truncated middle part
     @param trim if set to true, remove leading and trailing whitespace
-    (including tabulations, line feed and carriage returns) *)
+    (including tabulations, line feed and carriage returns)
+    @param truncate defines the maximum size of the printed text and the
+    position of the truncation if the (trimmed) text exceed this size
+    @param ellipsis when [truncate] is given and the (trimmed) text length is
+    bigger than the specified size, then [ellipsis] is printed instead of the
+    truncated part. *)
 val sprintf  :
   ?indent:int ->
   ?margin:int ->
