@@ -46,7 +46,10 @@ val index : t -> char -> int
 (** [truncate ~start_pos ~end_pos text] truncate the text [text] to the range
     from [start_pos] (included, default to 0) to [end_pos] (excluded, default
     to the text size). All tags outside this range are removed. *)
-val truncate : ?start_pos:int -> ?end_pos:int -> t -> t
+val sub : ?start_pos:int -> ?end_pos:int -> t -> t
+
+(** Indicates the total available space and the position of the truncation *)
+type truncation = [ `None | `Left of int | `Middle of int | `Right of int ]
 
 (** [pretty fmt text] pretty-prints the text onto the given formatter
     [fmt], with the semantic tags.
@@ -60,7 +63,7 @@ val truncate : ?start_pos:int -> ?end_pos:int -> t -> t
     [truncate], then [ellipsis] is printed instead of the truncated middle
     part. *)
 val pretty :
-  ?truncate:int ->
+  ?truncate:truncation ->
   ?ellipsis:string ->
   Format.formatter ->
   t ->
@@ -79,16 +82,14 @@ val pretty :
 val to_string :
   ?prefix:(Format.formatter -> unit) ->
   ?suffix:(Format.formatter -> unit) ->
-  ?truncate:int ->
+  ?truncate:truncation ->
   ?ellipsis:string ->
   t -> string
-
 
 (** [need_truncation ?truncate text] returns whether
     [to_string ?truncate text] or [pretty ?truncate fmt text] will truncate
     the text. *)
-val need_truncation : ?truncate:int -> t -> bool
-
+val need_truncation : ?truncate:truncation -> t -> bool
 
 (* -------------------------------------------------------------------------- *)
 (** {2 Buffers for building rich text}                                        *)
@@ -158,7 +159,7 @@ val sprintf  :
   ?indent:int ->
   ?margin:int ->
   ?trim:bool ->
-  ?truncate:int ->
+  ?truncate:truncation ->
   ?ellipsis:string ->
   ('a, Format.formatter,unit,string) format4 ->
   'a

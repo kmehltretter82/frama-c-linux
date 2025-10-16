@@ -45,32 +45,54 @@ let rec offset_tag ~limit ~offset tag =
 and offset_tags ~limit ~offset tags =
   List.filter_map (offset_tag ~limit ~offset) tags
 
-let truncate ?(start_pos=0) ?(end_pos) text =
+let sub ?(start_pos=0) ?(end_pos) text =
   let n = size text in
   let end_pos = Option.value ~default:n end_pos |> min n in
   { plain = String.sub text.plain start_pos (end_pos - start_pos);
     tags = offset_tags ~limit:end_pos ~offset:start_pos text.tags;
   }
 
-let need_truncation ?truncate text =
+type truncation = [`None | `Left of int | `Middle of int | `Right of int]
+
+let need_truncation ?(truncate : truncation = `None) text =
   let length = String.length text.plain in
   match truncate with
-  | None -> false
-  | Some size -> size < length
+  | `None -> false
+  | `Left size | `Middle size | `Right size -> size < length
 
-let pretty ?truncate ?(ellipsis="[...]") fmt text =
+let pretty ?(truncate : truncation = `None) ?(ellipsis="[...]") fmt text =
   let length = String.length text.plain in
-  (* Truncate the text if requested *)
+  (* Truncate the text if requested
+     truncate_start, truncate_end : position of the truncation ;
+     length of truncation L = truncate_end - truncate_start ;
+     total    size = (length - L) + ellipsis_length ;
+     hence       L = length - size + ellipsis_length *)
   let truncate_start, truncate_end =
     match truncate with
-    | Some size when size < length ->
+    | `Left size | `Middle size | `Right size
+      when size <= String.length ellipsis -> (0, length)
+
+    | `Middle size when size < length ->
       let ellipsis_length = String.length ellipsis in
-      if ellipsis_length >= size
-      then (0, length)
-      else
-        let size_left = (size - ellipsis_length) / 2 in
-        let size_right = ((size - ellipsis_length) - size_left) in
-        (size_left, length - size_right)
+      let size_left = (size - ellipsis_length) / 2 in
+      let size_right = ((size - ellipsis_length) - size_left) in
+      (size_left, length - size_right)
+    (* L = length - size_right - size_left *)
+    (* L = length - ((size - ellipsis_length) - size_left) - size_left *)
+    (* L = length - (size - ellipsis_length) + size_left - size_left *)
+    (* L = length - size + ellipsis_length *)
+
+    | `Right size when size < length ->
+      let ellipsis_length = String.length ellipsis in
+      (size - ellipsis_length, length)
+    (* L = length - (size - ellipsis_length) *)
+    (* L = length - size + ellipsis_length *)
+
+    | `Left size when size < length ->
+      let ellipsis_length = String.length ellipsis in
+      (0, length - size + ellipsis_length)
+    (* L = length - size + ellipsis_length *)
+
     | _ ->
       max_int, max_int (* Do not truncate until max_int, hopefully never *)
   in
@@ -121,12 +143,13 @@ let pretty ?truncate ?(ellipsis="[...]") fmt text =
   in
   aux ~force_ellipsis:true 0 (String.length text.plain) text.tags
 
-let to_string ?prefix ?suffix ?truncate ?ellipsis text =
-  let length = Option.value ~default:(size text) truncate in
+let to_string ?prefix ?suffix ?(truncate:truncation = `None) ?ellipsis text =
+  let length = match truncate with
+    | `None -> size text | `Right size | `Middle size | `Left size -> size in
   let string_buffer = Buffer.create length in
   let fmt = Format.formatter_of_buffer string_buffer in
   Option.iter (fun f -> f fmt) prefix;
-  pretty ?truncate ?ellipsis fmt text;
+  pretty ~truncate ?ellipsis fmt text;
   Option.iter (fun f -> f fmt) suffix;
   Format.pp_print_flush fmt ();
   Buffer.contents string_buffer
@@ -274,7 +297,7 @@ let sprintf ?(indent=20) ?(margin=40) ?trim ?truncate ?ellipsis format =
 (* --- Tests                                                              --- *)
 (* -------------------------------------------------------------------------- *)
 
-let test_pretty ?(truncate=12) format output =
+let test_pretty ?(truncate=`Middle 12) format output =
   let prefix fmt = Format.pp_set_mark_tags fmt true in
   let text = mprintf format in
   let result = to_string ~prefix ~truncate text in
@@ -291,7 +314,7 @@ let%test _ = test_pretty "" ""
 let%test _ = test_pretty "01234" "01234"
 
 (* Truncate size < ellipsis length *)
-let%test _ = test_pretty ~truncate:2 "0123456789" "[...]"
+let%test _ = test_pretty ~truncate:(`Middle 2) "0123456789" "[...]"
 
 (* truncation basic test *)
 let%test _ = test_pretty "01234567890123456789" "012[...]6789"
@@ -320,15 +343,15 @@ let%test _ =
 let%test _ =
   test_pretty "0@{<a>123456@}78901@{<b>2345678@}9" "0<a>12</a>[...]<b>678</b>9"
 let%test _ =
-  test_pretty ~truncate:17
+  test_pretty ~truncate:(`Middle 17)
     "0@{<a>1@{<b>2@{<c>3@{<d>4@}5@}6@}789012@{<e>3@{<f>4@{<g>5@}6@}7@}8@}9"
     "0<a>1<b>2<c>3<d>4</d>5</c></b>[...]<e><f>4<g>5</g>6</f>7</e>8</a>9"
 let%test _ =
-  test_pretty ~truncate:17
+  test_pretty ~truncate:(`Middle 17)
     "0@{<a>1@{<b>2@{<c>3@{<d>4@}5@}6@}789012@{<e>@{<f>@{<g>345@}6@}7@}8@}9"
     "0<a>1<b>2<c>3<d>4</d>5</c></b>[...]<e><f><g>45</g>6</f>7</e>8</a>9"
 let%test _ =
-  test_pretty ~truncate:17
+  test_pretty ~truncate:(`Middle 17)
     "0@{<a>1@{<b>2@{<c>3@{<d>456@}@}@}789012@{<e>3@{<f>4@{<g>5@}6@}7@}8@}9"
     "0<a>1<b>2<c>3<d>45</d></c></b>[...]<e><f>4<g>5</g>6</f>7</e>8</a>9"
 
@@ -337,3 +360,15 @@ let%test _ = test_pretty "  0@{<a>12345678@}9   " "0<a>12345678</a>9"
 
 (* Trim and truncate with stags *)
 let%test _ = test_pretty "0@{<a>123456789012345678@}9" "0<a>12[...]678</a>9"
+
+(* Truncation on Middle *)
+let%test _ =
+  test_pretty ~truncate:(`Middle 12) "0123456789xxx9876543210" "012[...]3210"
+
+(* Truncation on Left *)
+let%test _ =
+  test_pretty ~truncate:(`Left 12)   "0123456789xxx9876543210" "[...]6543210"
+
+(* Truncation on Right *)
+let%test _ =
+  test_pretty ~truncate:(`Right 12)  "0123456789xxx9876543210" "0123456[...]"

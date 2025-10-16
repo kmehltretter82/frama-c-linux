@@ -271,8 +271,8 @@ end
 
 let echo_event evt terminal =
   term_clean terminal ;
-  let truncate = if terminal.isatty then Some max_message_length else None in
-  Event.pretty ?truncate terminal.formatter evt
+  let truncate = if terminal.isatty then `Middle max_message_length else `None in
+  Event.pretty ~truncate terminal.formatter evt
 
 let do_echo terminal evt =
   if delayed_echo terminal then
@@ -290,7 +290,7 @@ let do_transient terminal ~plugin message =
       let newline =
         try Rich_text.index message '\n'
         with Not_found -> max_int in
-      let message = Rich_text.truncate ~end_pos:(min newline width) message in
+      let message = Rich_text.sub ~end_pos:(min newline width) message in
       Rich_text.pretty fmt message ;
       if terminal.isatty
       then terminal.clean <- false
@@ -1308,4 +1308,3 @@ let%test _ =
   let channel, validate = test_terminal () in
   logtransient channel "  abc\n@{<a>@}def";
   validate "<bold>[test]</bold> abc"
-
