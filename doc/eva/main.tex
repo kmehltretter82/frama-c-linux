@@ -4769,20 +4769,22 @@ taints respectively.
 
 \subsubsection{Secure-flow analysis}
 The option \texttt{-eva-taint-secureflow} enables a secure-flow analysis based
-on the taint domain (as such, it requires the taint domain to be active). This
-analysis detects violations of the non-interference property---that is, the
-absence of unauthorized information flows between security levels.
-Non-interference requires that changes to high-security (e.g., \texttt{private})
-data do not influence low-security (e.g., \texttt{public}) data, whether through
-explicit data dependencies or implicit control dependencies. In other words, a
-program satisfies non-interference if an observer with access only to public
-information cannot deduce anything about private information from its behavior.
+on the taint domain. As such, it requires the taint domain to be active.
 
-Data may be assigned a security level---either \lstinline|private| or
-\lstinline|public|)---by using the \lstinline|__attribute__((...))| type
-annotation. A current limitation restricts these annotations to aggregate types
-as a whole; they cannot be specified for individual members or elements within
-an aggregate.
+This analysis aims at verifying non-interference properties---that is, the
+absence of unauthorized information flows between security levels---and detects
+when they are violated. Non-interference requires that changes to high-security
+\texttt{private} data do not influence low-security \texttt{public} data,
+whether through explicit data dependencies or implicit control dependencies. In
+other words, a program satisfies non-interference if an observer with access
+only to public information cannot deduce anything about private information from
+its behavior.
+
+To instruct the analysis, data may be assigned a security level---either
+\lstinline|private| or \lstinline|public|---by using \lstinline|__attribute__|
+type annotation. A current limitation restricts these annotations to aggregate
+types as a whole; they cannot be specified for individual members or elements
+within an aggregate.
 
 \begin{listing-nonumber}
   int __attribute__((private)) secret;
@@ -4857,7 +4859,6 @@ frama-c -eva -eva-domains taint -eva-taint-secureflow sf.c
   indirect non-interference violation on {y; z}
 [eva:alarm] sf.c:24: Warning: assertion got status unknown.
 [eva:alarm] sf.c:25: Warning: assertion got status unknown.
-
 \end{logs}
 
 Warnings classified as \lstinline|eva:secure-flow| are non-interference
