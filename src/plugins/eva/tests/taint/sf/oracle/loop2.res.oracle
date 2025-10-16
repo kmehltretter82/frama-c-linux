@@ -10,6 +10,10 @@
 [eva] loop2.c:41: assertion got status valid.
 [eva] computing for function gcd <- main.
   Called from loop2.c:42.
+[eva:secure-flow:condition] loop2.c:11: Warning: 
+  non-interference violation on condition involving {a; b}
+[eva:secure-flow:condition] loop2.c:12: Warning: 
+  non-interference violation on condition involving {a; b}
 [eva:partition] loop2.c:11: starting to merge loop iterations
 [eva] Recording results for gcd
 [eva] Done for function gcd
@@ -23,8 +27,14 @@
 [eva] loop2.c:51: assertion got status valid.
 [eva] computing for function foo <- main.
   Called from loop2.c:52.
+[eva:secure-flow:condition] loop2.c:24: Warning: 
+  non-interference violation on condition involving {b}
+[eva:secure-flow:condition] loop2.c:26: Warning: 
+  non-interference violation on condition involving {a; b}
 [eva:partition] loop2.c:26: starting to merge loop iterations
 [eva:partition] loop2.c:24: starting to merge loop iterations
+[eva:secure-flow:condition] loop2.c:34: Warning: 
+  non-interference violation on condition involving {a; b}
 [eva:partition] loop2.c:32: starting to merge loop iterations
 [eva] Recording results for foo
 [eva] Done for function foo
@@ -32,6 +42,10 @@
 [eva] loop2.c:56: assertion got status valid.
 [eva] computing for function foo <- main.
   Called from loop2.c:57.
+[eva:secure-flow:condition] loop2.c:23: Warning: 
+  non-interference violation on condition involving {a}
+[eva:secure-flow:condition] loop2.c:25: Warning: 
+  non-interference violation on condition involving {a}
 [eva] Recording results for foo
 [eva] Done for function foo
 [eva:alarm] loop2.c:58: Warning: assertion got status unknown.

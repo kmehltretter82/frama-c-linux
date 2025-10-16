@@ -10,6 +10,8 @@
   Called from jump2.c:20.
 [eva:secure-flow:condition] jump2.c:9: Warning: 
   non-interference violation on condition involving {secret; n}
+[eva:secure-flow:condition] jump2.c:13: Warning: 
+  non-interference violation on condition involving {n}
 [eva:partition] jump2.c:8: starting to merge loop iterations
 [eva] Recording results for compute
 [eva] Done for function compute

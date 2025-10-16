@@ -10,6 +10,10 @@
   Called from jump6.c:48.
 [eva:secure-flow:condition] jump6.c:12: Warning: 
   non-interference violation on condition involving {secret; n}
+[eva:secure-flow:condition] jump6.c:15: Warning: 
+  non-interference violation on condition involving {n}
+[eva:secure-flow:condition] jump6.c:16: Warning: 
+  non-interference violation on condition involving {tmp}
 [eva] Recording results for compute
 [eva] Done for function compute
 [eva:alarm] jump6.c:49: Warning: assertion got status unknown.
@@ -21,6 +25,10 @@
 [eva:partition] jump6.c:30: starting to merge loop iterations
 [eva:alarm] jump6.c:36: Warning: assertion got status unknown.
 [eva] jump6.c:41: assertion got status valid.
+[eva:secure-flow:condition] jump6.c:29: Warning: 
+  non-interference violation on condition involving {n}
+[eva:secure-flow:condition] jump6.c:35: Warning: 
+  non-interference violation on condition involving {i}
 [eva:partition] jump6.c:26: starting to merge loop iterations
 [eva] Recording results for compute2
 [eva] Done for function compute2

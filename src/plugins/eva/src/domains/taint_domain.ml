@@ -359,18 +359,16 @@ module TransferSingleTaint = struct
     | TArray (base_typ, _) -> has_attribute attribute base_typ
     | _ -> Ast_types.has_attribute attribute typ
 
-  let has_attribute_namespace ~namespace zone =
+
+  let warn_on_assign_interference ~wkey ~pos zone =
     let base_has_attribute base =
       match Base.typeof base with
       | None -> false
-      | Some typ -> has_attribute namespace typ
+      | Some typ -> has_attribute public_taint_namespace typ
     in
-    try Zone.fold_bases (fun b acc -> acc || base_has_attribute b) zone false
-    with Abstract_interp.Error_Top -> false
-
-  let warn_on_assign_interference ~wkey ~pos zone =
     let has_tainted_public_base =
-      has_attribute_namespace ~namespace:public_taint_namespace zone
+      try Zone.fold_bases (fun b acc -> acc || base_has_attribute b) zone false
+      with Abstract_interp.Error_Top -> false
     in
     if has_tainted_public_base then
       let source = fst (Position.loc pos) in
@@ -444,15 +442,11 @@ module TransferSingleTaint = struct
     `Value state
 
   let warn_on_assume_interference ~pos zone =
-    let has_tainted_private_base =
-      has_attribute_namespace ~namespace:private_taint_namespace zone
-    in
-    if has_tainted_private_base then
-      let source = fst (Position.loc pos) in
-      Self.warning ~wkey:wkey_secure_flow_assume ~source ~once:true
-        "@[<v>@[<hv 2>non-interference violation on condition \
-         involving@ @[<hov>{%a}@]@]"
-        Zone.pretty zone
+    let source = fst (Position.loc pos) in
+    Self.warning ~wkey:wkey_secure_flow_assume ~source ~once:true
+      "@[<v>@[<hv 2>non-interference violation on condition \
+       involving@ @[<hov>{%a}@]@]"
+      Zone.pretty zone
 
   let assume ~pos exp _b valuation state =
     let state =

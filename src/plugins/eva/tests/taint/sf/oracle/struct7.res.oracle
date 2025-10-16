@@ -7,6 +7,8 @@
   secret ∈ [--..--]
 [eva:secure-flow:condition] struct7.c:17: Warning: 
   non-interference violation on condition involving {secret; i}
+[eva:secure-flow:condition] struct7.c:17: Warning: 
+  non-interference violation on condition involving {i}
 [eva:partition] struct7.c:17: starting to merge loop iterations
 [eva:alarm] struct7.c:21: Warning: assertion got status unknown.
 [eva] Recording results for main
