@@ -1019,7 +1019,8 @@ module TaintLogic = struct
       reduce_by_predicate cvalue_env state p (not positive)
     | _, (Prel (Req, {term_node = Tapp (f, _, [arg])}, t)
          | Prel (Req, t, {term_node = Tapp (f, _, [arg])})) ->
-      if String.equal f.l_var_info.lv_name lf_name_security_status then
+      if secure_flow_analysis () &&
+         String.equal f.l_var_info.lv_name lf_name_security_status then
         begin
           match t.term_node with
           | TLval (TVar {lv_name}, TNoOffset) ->
@@ -1095,7 +1096,8 @@ module TaintLogic = struct
         end
       | Prel (Req | Rneq as rop, {term_node = Tapp (f, _, [arg])}, t)
       | Prel (Req | Rneq as rop, t, {term_node = Tapp (f, _, [arg])}) ->
-        if String.equal f.l_var_info.lv_name lf_name_security_status then
+        if secure_flow_analysis () &&
+           String.equal f.l_var_info.lv_name lf_name_security_status then
           let op_truth =
             match rop with
             | Req -> Fun.id
