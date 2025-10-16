@@ -1023,13 +1023,11 @@ module TaintLogic = struct
          String.equal f.l_var_info.lv_name lf_security_status_name then
         begin
           match t.term_node with
-          | TLval (TVar {lv_name}, TNoOffset) ->
-            let positive =
-              if String.equal lv_name public_taint_namespace then
-                not positive
-              else
-                positive
-            in
+          | TLval (TVar {lv_name}, TNoOffset)
+            when String.equal lv_name public_taint_namespace ->
+            reduce_by_security_status_predicate cvalue_env state arg (not positive)
+          | TLval (TVar {lv_name}, TNoOffset)
+            when String.equal lv_name private_taint_namespace ->
             reduce_by_security_status_predicate cvalue_env state arg positive
           | _ -> state
         end
