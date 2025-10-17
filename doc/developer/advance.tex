@@ -1519,6 +1519,48 @@ defining new polymorphic formatting functions. It has been introduced
 for the same purpose than standard \lstinline{Format.kfprintf}-like
 functions.
 
+\subsection{Font styling and Colors}
+
+When output is directed to a terminal, \framac leverages the terminal's support
+for \href{https://en.wikipedia.org/wiki/ANSI_escape_code}{ANSI escape codes} to
+apply font styles and colors. This allows developers to enhance output
+appearance using
+\href{https://ocaml.org/manual/5.4/api/Format.html#tags}{semantic tags} with the
+standard formatter.
+
+For example, to print a word in bold, you can write:
+
+\begin{ocamlcode}
+Format.printf "this will output the word @{<bold>bold@} with a bold font"
+\end{ocamlcode}
+
+Semantic tags are opened and closed using \texttt{@\{<tag>} and \texttt{@\}},
+where \texttt{<tag>} is one of the supported styling tags. The formatter
+automatically translates these tags into the appropriate ANSI escape codes when
+the output device supports them; otherwise, they are ignored.
+
+Semantic tags work with all logging functions. When logs are written both to the
+terminal and to a file (with a parameter \texttt{-plugin-log}), only the
+terminal output will render the styles--the file output will contain plain ASCII
+text.
+
+\begin{ocamlcode}
+Self.result "Hello, this is @{<bold>Foo@} Logs !"
+\end{ocamlcode}
+
+This will display \texttt{Foo} in bold on the terminal, but without formatting
+when redirected to a file.
+
+You can also combine multiple tags by separating them with commas. For example,
+to print bold red text:
+
+\begin{ocamlcode}
+Self.result "Hello, this is @{<bold,red>Foo@} Logs !"
+\end{ocamlcode}
+
+The full list of supported tags is available in
+\texttt{src/libraries/utils/ansi\_escape.mli}.
+
 \subsection{Advanced Logging Services}
 
 \subsubsection{Message Emission}
@@ -1649,12 +1691,24 @@ and the channel name, like for plug-ins.
 It is possible to ask \lstinline{Log} to redirect its output to
 another channel:
 \begin{description}
-  %% item
-  \logroutine{set\_output}{ out flush}%
-  The parameters are the same than those of
-  \lstinline{Format.make_formatter}: \lstinline{out} outputs a
-  (sub)-string and \lstinline{flush} actually writes the buffered
-  text to the underlying device.
+%% item
+  \logroutine{set\_formatter}{ ?isatty fmt}%
+  Redefines the formatter the logs are written to. The formatter can be
+  built with \lstinline{Format} functions like \lstinline{make_formatter}
+  \lstinline{formatter_of_out_channel} or \lstinline{formatter_of_buffer}.
+  Every \lstinline{Log} function will output to this formatter instead of
+  \lstinline{Format.std_formatter} after this function have been called. Copied
+  outputs to file (with \lstinline{-plugin-log} parameters) will still be
+  copied. This function takes an optional \lstinline{isatty} parameter; set it
+  to true if the redirection target can interpret ANSI escape codes.
+  The original formatter can be reset with \lstinline{reset_stdout}.
+
+%% item
+  \logroutine{reset\_stdout}{ ?isatty ()}%
+  Reset the logs formatter to \lstinline{Format.std_formatter}. This function
+  should be called to restore the original state of \lstinline{Log} when
+  \lstinline{set_formatter} has been previously called. The optional parameter
+  should always be set to \lstinline{Cmdline.tty}.
 \end{description}
 
 It is also possible to have a momentary direct access to

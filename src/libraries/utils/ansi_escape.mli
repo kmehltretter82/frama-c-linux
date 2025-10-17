@@ -47,28 +47,32 @@ val is_supported : unit -> bool
     @return a reset function that can be called to reset styles. *)
 val enable_on : Format.formatter -> (unit -> unit)
 
-(** Output colors *)
+(** Output colors. The associated string semantic tag is documented for each
+    constructor. Note that there exists variants prefixed with "fg" and "bg"
+    for each colors, for foreground and background. When no prefix is used,
+    it means the foreground color. *)
 type color =
-  | Black
-  | Red
-  | Green
-  | Yellow
-  | Blue
-  | Magenta
-  | Cyan
-  | White
-  | Orange
+  | Black   (** ["black"] *)
+  | Red     (** ["red"]   *)
+  | Green   (** ["green"] *)
+  | Yellow  (** ["yellow"] *)
+  | Blue    (** ["blue"] *)
+  | Magenta (** ["magenta"] *)
+  | Cyan    (** ["cyan"] *)
+  | White   (** ["white"] *)
+  | Orange  (** ["orange"] *)
 
-(** Output Styles *)
+(** Output Styles. The associated string semantic tag is documented for each
+    constructor. *)
 type style =
-  | Bold
-  | Faint
-  | Italic
-  | Underline
-  | Blink
-  | Strike
-  | Foreground of color
-  | Background of color
+  | Bold                (** ["bold"] *)
+  | Faint               (** ["faint"] *)
+  | Italic              (** ["italic"] *)
+  | Underline           (** ["underline"] *)
+  | Blink               (** ["blink"] *)
+  | Strike              (** ["strike"] *)
+  | Foreground of color (** ["fgxxxx"] where ["xxxx"] is the color tag *)
+  | Background of color (** ["bgxxxx"] where ["xxxx"] is the color tag *)
 
 (** Extension of semantic tags for style information *)
 type Format.stag += Style_tag of style
