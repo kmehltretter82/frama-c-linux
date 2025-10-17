@@ -242,7 +242,6 @@ let inject_in_instr env kf stmt = function
 let add_new_block_in_stmt env kf stmt =
   (* Add temporal analysis instrumentations *)
   let env = Temporal.handle_stmt stmt env kf in
-  let logic_env = Env.Logic_env.get env in
   let new_stmt, env =
     if Functions.check kf then
       let env =
@@ -250,11 +249,14 @@ let add_new_block_in_stmt env kf stmt =
         if stmt.ghost then begin
           stmt.ghost <- false;
           (* translate potential RTEs of ghost code *)
-          let rtes = Rte.stmt ~warn:false kf stmt in
-          List.iter
-            (Typing.preprocess_rte ~logic_env)
-            rtes;
-          Translate_rtes.rte_annots Printer.pp_stmt stmt kf env rtes
+          (* deactivate RTE checks in ghost code to fix issue frama-c#1620 *)
+          (* let logic_env = Env.Logic_env.get env in
+             let rtes = Rte.stmt ~warn:false kf stmt in
+             List.iter
+             (Typing.preprocess_rte ~logic_env)
+             rtes;
+             Translate_rtes.rte_annots Printer.pp_stmt stmt kf env rtes *)
+          env
         end else
           env
       in
@@ -274,7 +276,8 @@ let add_new_block_in_stmt env kf stmt =
     (* Remove local variables which scopes ended via goto/break/continue. *)
     let del_vars = Exit_points.delete_vars stmt in
     let env = Memory_observer.delete_from_set env kf del_vars in
-    if Kernel_function.is_return_stmt kf stmt then
+    match stmt.skind with
+    | Return _ ->
       let env =
         if Functions.check kf then
           (* must generate the post_block before including [stmt] (the
@@ -299,7 +302,7 @@ let add_new_block_in_stmt env kf stmt =
       in
       let new_stmt = Smart_stmt.block stmt b in
       new_stmt, env
-    else (* i.e. not (is_return stmt) *)
+    | _ -> (* i.e. not (is_return stmt) *)
       (* must generate [pre_block] which includes [stmt] before generating
          [post_block] *)
       let pre_block, env =

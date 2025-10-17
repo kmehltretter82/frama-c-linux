@@ -388,7 +388,6 @@ module Offsm
   (* Simple values cannot be injected because we do not known their type
      (hence size in bits *)
   let zero = Top
-  let one = Top
   let top_int = Top
 
   let inject_int typ i =
