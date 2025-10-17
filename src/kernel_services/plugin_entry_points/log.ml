@@ -287,13 +287,11 @@ let do_transient terminal ~plugin message =
       let fmt = terminal.formatter in
       Format.fprintf fmt "@{<bold>[%s]@} " plugin ;
       let width = max 40 (77 - String.length plugin) in
-      let message =
-        try
-          let newline = Rich_text.index message '\n' in
-          Rich_text.sub ~end_pos:newline message
-        with Not_found -> message
-      in
-      Rich_text.pretty ~truncate:(`Right width) ~ellipsis:"..." fmt message ;
+      let ellipsis = "…" in
+      let limit =
+        try String.length ellipsis + Rich_text.index message '\n'
+        with Not_found -> width in
+      Rich_text.pretty ~truncate:(`Right limit) ~ellipsis fmt message ;
       if terminal.isatty
       then terminal.clean <- false
       else Format.pp_print_newline fmt () ;
@@ -1299,14 +1297,14 @@ let%test _ =
 let%test _ =
   let channel, validate = test_terminal () in
   logtransient channel "abc\ndef";
-  validate "<bold>[test]</bold> abc"
+  validate "<bold>[test]</bold> abc…"
 
 let%test _ =
   let channel, validate = test_terminal () in
   logtransient channel "@{<a>  abc\ndef@}";
-  validate "<bold>[test]</bold> <a>abc</a>"
+  validate "<bold>[test]</bold> <a>abc…</a>"
 
 let%test _ =
   let channel, validate = test_terminal () in
   logtransient channel "  abc\n@{<a>@}def";
-  validate "<bold>[test]</bold> abc"
+  validate "<bold>[test]</bold> abc…"
