@@ -13,7 +13,7 @@
 [alias] analysing instruction: *c = d;
 [alias] May-aliases after instruction  *c = d;  are  { *a; b }  { *c; d }
 [alias] analysing instruction: a = c;
-[alias] May-aliases after instruction  a = c;  are  { a; c }  { *a; *c; b; d }
+[alias] May-aliases after instruction  a = c;  are  { *a; *c; b; d }  { a; c }
 [alias] analysing instruction: __retres = 0;
-[alias] May-aliases after instruction  __retres = 0;  are  { a; c }  { *a; *c; b; d }
-[alias] May-aliases at the end of function main: { a; c }  { *a; *c; b; d }
+[alias] May-aliases after instruction  __retres = 0;  are  { *a; *c; b; d }  { a; c }
+[alias] May-aliases at the end of function main: { *a; *c; b; d }  { a; c }

@@ -325,11 +325,12 @@ module Pretty = struct
     end
 
   let pp_aliases fmt s =
-    let alias_sets = Readout.alias_sets_lvals s in
+    let alias_sets = List.map lvals_filter_libc @@ Readout.alias_sets_lvals s in
     let alias_sets =
+      List.stable_sort LSet.compare @@ (* sort for more robust oracles *)
       List.filter
         (fun lvals -> LSet.cardinal lvals >= 2)
-        (List.map lvals_filter_libc alias_sets)
+        alias_sets
     in
     Pretty_utils.pp_list ~empty:"<none>" ~sep:"@;<2>" LSet.pretty fmt alias_sets
 end

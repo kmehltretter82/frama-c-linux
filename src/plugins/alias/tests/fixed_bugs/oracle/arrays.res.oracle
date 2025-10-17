@@ -6,22 +6,22 @@
 [alias] May-aliases after instruction  t[0] = a;  are  { a; t[0..] }
 [alias] analysing instruction: z = & t;
 [alias] May-aliases after instruction  z = & t;  are
-  { *z; t }  { (*z)[0..]; a; t[0..] }
+  { (*z)[0..]; a; t[0..] }  { *z; t }
 [alias] analysing instruction: q = z;
 [alias] May-aliases after instruction  q = z;  are
-  { z; q }  { *z; *q; t }  { (*z)[0..]; (*q)[0..]; a; t[0..] }
+  { (*z)[0..]; (*q)[0..]; a; t[0..] }  { *z; *q; t }  { z; q }
 [alias] analysing instruction: b = (*(z + 0))[0];
 [alias] May-aliases after instruction  b = (*(z + 0))[0];  are
-  { z; q }  { *z; *q; t }  { (*z)[0..]; (*q)[0..]; a; b; t[0..] }
+  { (*z)[0..]; (*q)[0..]; a; b; t[0..] }  { *z; *q; t }  { z; q }
 [alias] analysing instruction: n = (*(q + 0))[0];
 [alias] May-aliases after instruction  n = (*(q + 0))[0];  are
-  { z; q }  { *z; *q; t }  { (*z)[0..]; (*q)[0..]; a; b; n; t[0..] }
+  { (*z)[0..]; (*q)[0..]; a; b; n; t[0..] }  { *z; *q; t }  { z; q }
 [alias] analysing instruction: printf("%d\n%d\n",a == b,a == n);
 [alias:undefined:fn] arrays.c:17: Warning: function printf has no definition
 [alias] May-aliases after instruction  printf("%d\n%d\n",a == b,a == n);  are
-  { z; q }  { *z; *q; t }  { (*z)[0..]; (*q)[0..]; a; b; n; t[0..] }
+  { (*z)[0..]; (*q)[0..]; a; b; n; t[0..] }  { *z; *q; t }  { z; q }
 [alias] analysing instruction: __retres = 0;
 [alias] May-aliases after instruction  __retres = 0;  are
-  { z; q }  { *z; *q; t }  { (*z)[0..]; (*q)[0..]; a; b; n; t[0..] }
+  { (*z)[0..]; (*q)[0..]; a; b; n; t[0..] }  { *z; *q; t }  { z; q }
 [alias] May-aliases at the end of function main:
-  { z; q }  { *z; *q; t }  { (*z)[0..]; (*q)[0..]; a; b; n; t[0..] }
+  { (*z)[0..]; (*q)[0..]; a; b; n; t[0..] }  { *z; *q; t }  { z; q }

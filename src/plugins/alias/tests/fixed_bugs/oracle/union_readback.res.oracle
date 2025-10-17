@@ -2,5 +2,5 @@
 [alias] analysing function: f
 [alias] analysing instruction: flag.r.v = o;
 [alias] May-aliases after instruction  flag.r.v = o;  are
-  { o; flag.r.v }  { *o; *(flag.r.v) }
-[alias] May-aliases at the end of function f: { o; flag.r.v }  { *o; *(flag.r.v) }
+  { *o; *(flag.r.v) }  { o; flag.r.v }
+[alias] May-aliases at the end of function f: { *o; *(flag.r.v) }  { o; flag.r.v }

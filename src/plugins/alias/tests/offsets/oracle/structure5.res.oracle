@@ -29,12 +29,12 @@
 [alias] May-aliases after instruction  z->c = a;  are  { z->s; y1 }  { z->c; a }
 [alias] analysing instruction: t->t = (struct struct_2_t *)z;
 [alias] May-aliases after instruction  t->t = (struct struct_2_t *)z;  are
-  { (t->t)->s; z->s; y1 }  { t->t; z }  { (t->t)->c; z->c; a }
+  { (t->t)->s; z->s; y1 }  { (t->t)->c; z->c; a }  { t->t; z }
 [alias] analysing instruction: t->d = a;
 [alias] May-aliases after instruction  t->d = a;  are
-  { (t->t)->s; z->s; y1 }  { t->t; z }  { (t->t)->c; z->c; t->d; a }
+  { (t->t)->s; z->s; y1 }  { (t->t)->c; z->c; t->d; a }  { t->t; z }
 [alias] analysing instruction: __retres = 0;
 [alias] May-aliases after instruction  __retres = 0;  are
-  { (t->t)->s; z->s; y1 }  { t->t; z }  { (t->t)->c; z->c; t->d; a }
+  { (t->t)->s; z->s; y1 }  { (t->t)->c; z->c; t->d; a }  { t->t; z }
 [alias] May-aliases at the end of function main:
-  { (t->t)->s; z->s; y1 }  { t->t; z }  { (t->t)->c; z->c; t->d; a }
+  { (t->t)->s; z->s; y1 }  { (t->t)->c; z->c; t->d; a }  { t->t; z }
