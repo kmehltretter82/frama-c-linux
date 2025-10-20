@@ -126,13 +126,21 @@ val is_even : t -> bool
 (** Compute [b - a + 1]. *)
 val length : t -> t -> t
 
-(** Computes [2^n]. *)
-val two_power_of_int : int -> t
+(** Computes [2^n]. [?limit] can be used to raise an {!Overflow} if the exponent
+    is too big. Default value is [1024].
+    @raises Overflow if the argument is greater than [?limit]
+    @before Frama-C+dev [?limit] argument was not present and all values were
+    accepted
+*)
+val two_power_of_int : ?limit:int -> int -> t
 
 (** Calls {!two_power_of_int} after converting the argument using {!to_int}.
-    @raises Overflow is the argument is greater than 1024
+    The default value of [?limit] is set by {!two_power_of_int}.
+    @raises Overflow if the argument is greater than limit or if the conversion
+    fails
+    @before Frama-C+dev [?limit] argument was not present and fixed at [1024]
 *)
-val two_power : t -> t
+val two_power : ?limit:int -> t -> t
 
 (** Convert the second argument via {!of_int} then call {!shift_left}.
     This function was previously called [shift_left] but it was renamed to avoid

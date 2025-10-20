@@ -28,6 +28,9 @@ let min_int64 = of_int64 Int64.min_int
 let le = leq
 let ge = geq
 
+let two_power_of_int k = two_power_of_int k
+let two_power n = two_power n
+
 let shift_left = shift_left_z
 let shift_right = shift_right_z
 

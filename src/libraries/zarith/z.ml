@@ -21,15 +21,14 @@ let to_int32_opt = wrap to_int32
 (* Basic functions and utils *)
 (* ------------------------- *)
 
-let two_power_of_int k =
-  shift_left one k
-
-let two_power n =
-  let k = to_int n in
-  if k > 1024 then
+let two_power_of_int ?(limit = 1024) k =
+  if k > limit then
     raise Overflow
   else
-    two_power_of_int k
+    shift_left one k
+
+let two_power ?limit n =
+  two_power_of_int ?limit (to_int n)
 
 (* We redefine shifts to operate on t instead of int. *)
 let shift_left_z x y = shift_left x (to_int y)
