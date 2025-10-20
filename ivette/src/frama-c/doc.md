@@ -148,27 +148,32 @@ The list of projects is shown below, and these actions are available:
 * [icon-save]: save the project onto a save file.
 * [icon-trash]: delete the project; confirmation will be requested.
 
-## Options {#framac-options}
+## Frama-C Parameters {#framac-options}
 
-The frama-c settings can be modified from Ivette.
-There is one form per plugin available.
+All frama-c parameters can be modified from Ivette via the _Edit_ -> _Parameters_
+menu or the _Ctrl+P_ shortcut.
+This opens a modal window listing all available Frama-C plug-ins and their
+parameters.
 
-[icon-warning] If you close the modal window without applying the changes, you will lose the local changes.
+[icon-warning] When closing the modal window, any local change that has not been
+applied to Frama-C is lost.
 
-[icon-warning] Applying the changes modifies the frama-c settings but does not restart the analysis.
+[icon-warning] Applying the changes modifies the Frama-C settings but does not
+restart any analysis.
 
-The options are opened in a modal window divided into three columns.
+The parameters modal window is divided into three columns:
+* 1: a list of available plugins
+* 2: a left form with parameters of the Frama-C kernel (Ctrl+click in the plug-in list to change)
+* 3: a right form: click in the plug-in list to change the selected plug-in
 
-* 1: list of plugins
-* 2: left form (Ctrl+click in the list to change)
-* 3: right form (click in the list to change)
+In the list of plug-ins:
+* [led-warning] signals local changes which have not been applied yet (and will be lost if the window is closed).
+* [led-active] indicates parameters which have already been modified for this Frama-C session.
 
-Icons and colours:
+In each plug-in form:
+* Orange titles or fields signal local modifications which have not been applied yet.
+* Blue titles or fields indicate parameters which have already been modified for this Frama-C session.
 
-* [led-warning]: means that there are local changes in a form.
-* An orange section title means that the section contains locally modified fields.
-* An orange border means that the field is modified locally.
-* [led-active]: means that fields have been modified by the user in a form or section.
-* An blue field label means that the field has been modified by the user.
-* [icon-reload]: reset field or form.
-* [icon-push]: apply modifications of field or form.
+Buttons:
+* [icon-reload]: reset field or form (without applying modification to Frama-C).
+* [icon-push]: apply local modifications of field or form to Frama-C.
