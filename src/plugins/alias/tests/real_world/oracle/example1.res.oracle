@@ -174,4 +174,3 @@
 [alias] May-aliases after instruction  __retres = 0;  are
   { a->n1; b->n1 }  { a->n2; b->n2 }
 [alias] May-aliases at the end of function main: { a->n1; b->n1 }  { a->n2; b->n2 }
-[alias] node counter: 90

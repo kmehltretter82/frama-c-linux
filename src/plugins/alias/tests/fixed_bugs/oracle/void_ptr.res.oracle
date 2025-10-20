@@ -72,4 +72,3 @@
     (((struct Active_dir *)enter_dir_entry)->fts_ent)->fts_link;
     fts_read_sp_0->fts_link; (enter_dir_ad.fts_ent)->fts_link; tmp }
   { (fts_read_sp.ht)->bucket.data; enter_dir_entry }
-[alias] node counter: 53

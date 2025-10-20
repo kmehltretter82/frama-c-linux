@@ -320,7 +320,7 @@ let compute () =
     Stmt_table.iter (print_stmt_table_elt Format.std_formatter);
   if Options.ShowFunctionTable.get () then
     Function_table.iter (print_function_table_elt Format.std_formatter);
-  Options.feedback "node counter: %d" !Abstract_state.node_counter
+  Options.debug ~level:2 "node counter: %d" !Abstract_state.node_counter
 
 let clear () =
   computed_flag := false;

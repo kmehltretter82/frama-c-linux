@@ -17,4 +17,3 @@
   cycle during readout of vertex 5, (following unsafe cast?); analysis may be unsound
 [alias] May-aliases after instruction  p = (int *)(& q);  are  { *p; f; q; p }
 [alias] May-aliases at the end of function f: { *p; f; q; p }
-[alias] node counter: 8

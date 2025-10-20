@@ -16,4 +16,3 @@
   unsafe cast from void (*)(void) to int; analysis may be unsound
 [alias] May-aliases after instruction  int g = (int)tmp;  are  { v.t[0..]; tmp }
 [alias] May-aliases at the end of function f: { v.t[0..]; tmp }
-[alias] node counter: 8

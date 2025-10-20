@@ -17,4 +17,3 @@
 [alias] analysing instruction: __retres = 0;
 [alias] May-aliases after instruction  __retres = 0;  are  <none>
 [alias] May-aliases at the end of function main: <none>
-[alias] node counter: 14

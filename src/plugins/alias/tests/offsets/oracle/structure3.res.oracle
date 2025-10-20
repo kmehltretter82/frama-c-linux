@@ -18,4 +18,3 @@
 [alias] analysing instruction: __retres = 0;
 [alias] May-aliases after instruction  __retres = 0;  are  { (z.t)->s; y1.s; y2.s }
 [alias] May-aliases at the end of function main: { (z.t)->s; y1.s; y2.s }
-[alias] node counter: 20

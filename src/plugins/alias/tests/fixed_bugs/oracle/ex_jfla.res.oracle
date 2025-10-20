@@ -97,4 +97,3 @@
 [alias] May-aliases after instruction  __retres = 0;  are
   { *w; s1->a; t; a; c }  { s1->b; b }
 [alias] May-aliases at the end of function main: { *w; s1->a; t; a; c }  { s1->b; b }
-[alias] node counter: 81

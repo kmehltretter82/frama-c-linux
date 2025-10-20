@@ -41,4 +41,3 @@
   { (*z)[0..]; (*q)[0..]; a; b; n; t[0..] }  { *z; *q; t }  { z; q }
 [alias] May-aliases at the end of function main:
   { (*z)[0..]; (*q)[0..]; a; b; n; t[0..] }  { *z; *q; t }  { z; q }
-[alias] node counter: 22

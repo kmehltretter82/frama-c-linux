@@ -22,4 +22,3 @@
 [alias] analysing instruction: __retres = 0;
 [alias] May-aliases after instruction  __retres = 0;  are  { mat[0..]; x; y }
 [alias] May-aliases at the end of function main: { mat[0..]; x; y }
-[alias] node counter: 12

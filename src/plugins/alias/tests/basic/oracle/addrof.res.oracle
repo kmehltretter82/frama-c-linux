@@ -16,4 +16,3 @@
   { *(*b); *a; *y; x; z }  { *b; a; y }
 [alias] May-aliases at the end of function main:
   { *(*b); *a; *y; x; z }  { *b; a; y }
-[alias] node counter: 18

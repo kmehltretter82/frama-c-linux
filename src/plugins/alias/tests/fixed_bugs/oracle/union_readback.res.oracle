@@ -4,4 +4,3 @@
 [alias] May-aliases after instruction  flag.r.v = o;  are
   { *o; *(flag.r.v) }  { o; flag.r.v }
 [alias] May-aliases at the end of function f: { *o; *(flag.r.v) }  { o; flag.r.v }
-[alias] node counter: 6

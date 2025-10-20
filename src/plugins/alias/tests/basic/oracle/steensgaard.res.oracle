@@ -15,4 +15,3 @@
 [alias] analysing instruction: __retres = 0;
 [alias] May-aliases after instruction  __retres = 0;  are  { *b; *c; a; y }  { b; c }
 [alias] May-aliases at the end of function main: { *b; *c; a; y }  { b; c }
-[alias] node counter: 18

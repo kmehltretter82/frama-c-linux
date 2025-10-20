@@ -14,4 +14,3 @@
 [alias] May-aliases after instruction  __retres = 0;  are
   { *x; mat[0..] }  { mat; x }
 [alias] May-aliases at the end of function main: { *x; mat[0..] }  { mat; x }
-[alias] node counter: 9
