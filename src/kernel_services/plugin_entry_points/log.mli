@@ -9,8 +9,6 @@
 (** Logging Services for Frama-C Kernel and Plugins.
     @since Beryllium-20090601-beta1 *)
 
-open Format
-
 type kind = Result | Feedback | Debug | Warning | Error | Failure
 (** @since Beryllium-20090601-beta1 *)
 
@@ -19,15 +17,29 @@ type event = {
   evt_plugin : string ;
   evt_category : string option ; (** message or warning category *)
   evt_source : Filepath.position option ;
-  evt_message : string ;
+  evt_message : Rich_text.t ;
 }
 (** @since Beryllium-20090601-beta1 *)
+
+module Event :
+sig
+  type t = event
+  (** Pretty prints the event header and message. This function outputs the
+      semantic tags if any in the event message.
+      @param truncate if set, the output will be truncated if the message size
+      is bigger than the given integer.  *)
+  val pretty : ?truncate:Rich_text.truncation -> Format.formatter -> t -> unit
+
+  (** Extract the message as a string. The output will be truncated
+      if the message is too long. *)
+  val message : t -> string
+end
 
 type 'a pretty_printer =
   ?current:bool -> ?source:Filepath.position ->
   ?emitwith:(event -> unit) -> ?echo:bool -> ?once:bool ->
   ?append:(Format.formatter -> unit) ->
-  ('a,formatter,unit) format -> 'a
+  ('a,Format.formatter,unit) format -> 'a
 (**
     Generic type for the various logging channels which are not aborting
     Frama-C. The first line will be prefixed (plugin name, location, message
@@ -48,7 +60,7 @@ type 'a pretty_printer =
 type ('a,'b) pretty_aborter =
   ?current:bool -> ?source:Filepath.position -> ?echo:bool ->
   ?append:(Format.formatter -> unit) ->
-  ('a,formatter,unit,'b) format4 -> 'a
+  ('a,Format.formatter,unit,'b) format4 -> 'a
 (** Same as {!Log.pretty_printer} except that channels having this type
     denote a fatal error aborting Frama-C.
     @since Beryllium-20090601-beta1
@@ -105,9 +117,15 @@ type warn_status =
   (** emit a message. Execution continues, but exit status will not be 0 *)
   | Wabort (** emit a message and abort execution *)
 
-(** @since Beryllium-20090601-beta1
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
-module type Messages = sig
+(**
+   @since Beryllium-20090601-beta1
+   @since Frama-C+dev
+   All formatters now interpret semantic tags for ANSI styling, as
+   defined in {!Ansi_escape} module.
+   @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
+*)
+module type Messages =
+sig
 
   type category
   (** category for debugging/verbose messages. Must be registered before
@@ -135,7 +153,7 @@ module type Messages = sig
     ?current:bool -> ?source:Filepath.position ->
     ?append:(Format.formatter -> unit) ->
     ?header:(Format.formatter -> unit) ->
-    ('a,formatter,unit) format -> 'a
+    ('a,Format.formatter,unit) format -> 'a
   (** Outputs the formatted message on [stdout]. Levels and
       key-categories are taken into account like event messages.
       The header formatted message is emitted as a regular [result]
@@ -154,7 +172,7 @@ module type Messages = sig
       @since Beryllium-20090601-beta1
       @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
-  val debug   : ?level:int -> ?dkey:category -> 'a pretty_printer
+  val debug : ?level:int -> ?dkey:category -> 'a pretty_printer
   (** Debugging information dedicated to Plugin developers.
       Default level is 1. The debugging key is used in message headers.
       See also [set_debug_keys] and [set_debug_keyset].
@@ -197,7 +215,7 @@ module type Messages = sig
       @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
   val not_yet_implemented : ?current:bool -> ?source:Filepath.position ->
-    ('a,formatter,unit,'b) format4 -> 'a
+    ('a,Format.formatter,unit,'b) format4 -> 'a
   (** raises [FeatureRequest] but {i does not} send any message.
       If the exception is not caught, Frama-C displays a feature-request
       message to the user.
@@ -459,11 +477,17 @@ val get_current_source : unit -> Filepath.position
 val clean : unit -> unit
 (** Flushes the last transient message if necessary. *)
 
-val set_output : ?isatty:bool -> (string -> int -> int -> unit) ->
-  (unit -> unit) -> unit
-(** This function has the same parameters as Format.make_formatter.
+val set_formatter : ?isatty:bool -> Format.formatter -> unit
+(** Set the formatter for log outputs. This formatter is {!Format.std_formatter}
+    by default and can be changed if the log output must be redirected.
     @since Beryllium-20090901
+    @before Frama-C+dev was [set_output] and took formatter output functions as
+    arguments
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
+
+val reset_stdout : isatty:bool -> unit -> unit
+(** Reset the log formatter to [Format.std_formatter].
+    @since Frama-C+dev *)
 
 val print_on_output : (Format.formatter -> unit) -> unit
 (** Direct printing on output.
@@ -497,9 +521,6 @@ val check_not_yet: (event -> bool) ref
     not reprinted. Currently set in {!module-type:Messages}. Not for the casual
     user.
 *)
-
-val tty : (unit -> bool) ref
-(** Callback for command-line option '-(no)-tty' *)
 
 val cmdline_error_occurred: (exn -> unit) ref
 

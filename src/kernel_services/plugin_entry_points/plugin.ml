@@ -528,25 +528,7 @@ struct
           list_of_bool (has_ch 'w' || has_ch 'a') Log.Warning
         in
         Parse_OK kinds
-
-    let pp_source fmt = function
-      | None -> ()
-      | Some src -> Format.fprintf fmt "%a:" Fclib.Filepath.pp_pos src
   end
-
-  (* Output must be synchronized with functions [prefix_*] in module Log. *)
-  let pp_event_prefix fmt event =
-    let pp_dkey fmt = (Pretty_utils.pp_opt ~pre:(format_of_string ":")
-                         Format.pp_print_string) fmt event.Log.evt_category
-    in
-    match event.Log.evt_kind with
-    | Log.Error ->
-      Format.fprintf fmt "[%s%t] user error:" event.Log.evt_plugin pp_dkey
-    | Log.Warning ->
-      Format.fprintf fmt "[%s%t] warning:" event.Log.evt_plugin pp_dkey
-    | Log.Failure ->
-      Format.fprintf fmt "[%s%t] failure:" event.Log.evt_plugin pp_dkey
-    | _ -> Format.fprintf fmt "[%s%t]" event.Log.evt_plugin pp_dkey
 
   (* Note: because of the imperative nature of Log listeners, and the
      fact that they cannot be removed, whenever the -log option is
@@ -565,11 +547,7 @@ struct
         | LogToFile.Parse_OK kinds ->
           let fmt = File_formatters.get filename in
           Log.add_listener ~plugin:plugin_name ~kind:kinds
-            (fun event ->
-               Format.fprintf fmt "%a%a %s@."
-                 LogToFile.pp_source event.Log.evt_source
-                 pp_event_prefix event
-                 event.Log.evt_message);
+            (Log.Event.pretty fmt)
       ) new_entries
 
   let () =

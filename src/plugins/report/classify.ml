@@ -333,7 +333,7 @@ let monitor_log_event (evt : Log.event) =
       | Warning -> warnings
       | Error | Failure -> errors
       | Result | Feedback | Debug -> raise Exit in
-    let msg = evt.evt_message in
+    let msg = Log.Event.message evt in
     let source = evt.evt_source in
     let category = Log.evt_category evt in
     let lookup ~category ~msg =

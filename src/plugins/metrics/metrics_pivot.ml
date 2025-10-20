@@ -471,7 +471,7 @@ let visit_messages () =
           loc_of_pos pos, funcname
       in
       let domain = Message (ev.evt_kind) in
-      let text = ev.evt_message in
+      let text = Log.Event.message ev in
       add_entry ~func ~plugin ~text loc domain
     )
 

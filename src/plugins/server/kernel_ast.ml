@@ -597,7 +597,7 @@ struct
       ~name:"descr"
       ~descr:(Md.plain "Marker description")
       ~data:(module Jstring)
-      ~get:(fun (tag, _) -> Rich_text.to_string descr_localizable tag)
+      ~get:(fun (tag, _) -> Rich_text.sprintf "%a" descr_localizable tag)
       model
 
   let () =
@@ -661,7 +661,7 @@ struct
     let libc = Kernel.PrintLibc.get () in
     try
       if not libc then Kernel.PrintLibc.set true ;
-      let txt = Rich_text.to_string Printer_tag.pp_localizable (PGlobal g) in
+      let txt = Rich_text.sprintf "%a" Printer_tag.pp_localizable (PGlobal g) in
       if not libc then Kernel.PrintLibc.set false ;
       if Kernel_function.is_entry_point kf then (txt ^ " /* main */") else txt
     with err ->
@@ -767,7 +767,7 @@ module GlobalVars = struct
       ~name:"type"
       ~descr:(Md.plain "Type")
       ~data:(module Jstring)
-      ~get:(fun vi -> Rich_text.to_string Printer.pp_typ vi.vtype);
+      ~get:(fun vi -> Rich_text.sprintf "%a" Printer.pp_typ vi.vtype);
     States.column model
       ~name:"stdlib"
       ~descr:(Md.plain "Is the variable from the Frama-C stdlib?")
