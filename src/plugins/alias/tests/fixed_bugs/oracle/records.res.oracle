@@ -44,3 +44,4 @@
   { z->field; q->field; a; b; n; t.field }  { z; q }
 [alias] May-aliases at the end of function main:
   { z->field; q->field; a; b; n; t.field }  { z; q }
+[alias] node counter: 19

@@ -19,3 +19,4 @@
 [alias] May-aliases after instruction  *key = s2;  are
   { *key; s2; "a" }  { s3; "b" }
 [alias] May-aliases at the end of function CPS_ParseKey: { *key; s2; "a"; s3; "b" }
+[alias] node counter: 20

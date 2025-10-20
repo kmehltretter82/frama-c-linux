@@ -8,3 +8,4 @@
 [alias] May-aliases after instruction  tmp = (void *)*((int *)(t));  are
   { t[0..]; tmp }
 [alias] May-aliases at the end of function f: { t[0..]; tmp }
+[alias] node counter: 4

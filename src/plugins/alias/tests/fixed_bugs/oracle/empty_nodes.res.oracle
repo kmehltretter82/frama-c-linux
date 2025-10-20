@@ -12,3 +12,4 @@
 [alias] analysing instruction: f(a,a,a);
 [alias] May-aliases after instruction  f(a,a,a);  are  <none>
 [alias] May-aliases at the end of function g: <none>
+[alias] node counter: 25

@@ -39,3 +39,4 @@
 [alias] May-aliases at the end of function main:
   { *(*(*a)); *(*(*b)); *(*(*c)); *(*i); *(*j); *x; *y; t; u }
   { *(*a); *(*b); *(*c); *i; *j; x; y }  { *a; *b; *c; i; j }  { a; b; c }
+[alias] node counter: 46

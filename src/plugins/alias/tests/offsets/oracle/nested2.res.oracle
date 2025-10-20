@@ -46,3 +46,4 @@
 [alias] May-aliases at the end of function main:
   { (t->t)->s[0..]; z1->s[0..] }  { (t->t)->s; z1->s }
   { (t->t)->c; z1->c; t->d; a }  { t->t; z1 }
+[alias] node counter: 24

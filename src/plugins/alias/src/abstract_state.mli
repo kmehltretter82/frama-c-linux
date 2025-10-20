@@ -85,3 +85,6 @@ val pretty_summary :  ?debug:bool -> Format.formatter -> summary -> unit
 (** [call a res args s] computes the abstract state after the
     instruction res=f(args), with f summarized by [s]. [a] is the abstract state before the call *)
 val call: t -> lval option -> exp list -> summary -> t
+
+val node_counter : int ref
+(** for debug purposes only *)

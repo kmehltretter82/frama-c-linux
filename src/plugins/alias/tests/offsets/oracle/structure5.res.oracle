@@ -44,3 +44,4 @@
   { (t->t)->s; z->s; y1 }  { (t->t)->c; z->c; t->d; a }  { t->t; z }
 [alias] May-aliases at the end of function main:
   { (t->t)->s; z->s; y1 }  { (t->t)->c; z->c; t->d; a }  { t->t; z }
+[alias] node counter: 24
