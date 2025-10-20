@@ -331,11 +331,12 @@ module Pretty = struct
     end
 
   let pp_aliases fmt s =
-    let alias_sets = Readout.alias_sets_lvals s in
+    let alias_sets = List.map lvals_filter_libc @@ Readout.alias_sets_lvals s in
     let alias_sets =
+      List.stable_sort LSet.compare @@ (* sort for more robust oracles *)
       List.filter
         (fun lvals -> LSet.cardinal lvals >= 2)
-        (List.map lvals_filter_libc alias_sets)
+        alias_sets
     in
     Pretty_utils.pp_list ~empty:"<none>" ~sep:"@;<2>" LSet.pretty fmt alias_sets
 end
@@ -614,21 +615,24 @@ let set_type s v1 v2 : state =
   let new_g = G.add_edge g v1 v2 in
   asserting_invariants {s with graph = new_g; vmap = new_vmap}
 
-let assignment s lv (e:exp) : state =
+let assignment s lv exp : state =
   assert_invariants s;
-  match Ast_types.is_ptr (Cil.typeOf e), LvalOrRef.from_exp e with
-  | false, _ | _, None -> s
-  | true, Some y ->
-    let v1, s = find_or_create_lval_vertex (Lval.simplify lv) s in
-    let v2, s = find_or_create_lval_or_ref_vertex y s in
-    if List.mem v2 (G.psucc s.graph v1) || List.mem v1 (G.psucc s.graph v2)
-    then
-      let () =
-        Options.warning ~source:(fst e.eloc)
-          "ignoring assignment of the form: %a = %a"
-          Printer.pp_lval lv Printer.pp_exp e;
-      in s
-    else asserting_invariants @@ join s v1 v2
+  let v1, s = find_or_create_lval_vertex (Lval.simplify lv) s in
+  match exp with
+  | None -> s
+  | Some e ->
+    match Ast_types.is_ptr (Cil.typeOf e), LvalOrRef.from_exp e with
+    | false, _ | _, None -> s
+    | true, Some y ->
+      let v2, s = find_or_create_lval_or_ref_vertex y s in
+      if List.mem v2 (G.psucc s.graph v1) || List.mem v1 (G.psucc s.graph v2)
+      then
+        let () =
+          Options.warning ~source:(fst e.eloc)
+            "ignoring assignment of the form: %a = %a"
+            Printer.pp_lval lv Printer.pp_exp e;
+        in s
+      else asserting_invariants @@ join s v1 v2
 
 (* assignment x = allocate(y) *)
 let assignment_x_allocate_y s lv : state =
@@ -860,7 +864,7 @@ let call s (res : lval option) (args : exp list) (summary : Summary.t) : state =
   in
 
   (* for each pair (lv1,lv2) find (or create) the corresponding vertices *)
-  let s, vertex_pairs =
+  let s, arg_formal_vertex_pairs =
     let s = ref s in
     let find_vertex (lv1, lv2) =
       try
@@ -872,6 +876,16 @@ let call s (res : lval option) (args : exp list) (summary : Summary.t) : state =
     in
     !s, List.filter_map find_vertex arg_formal_pairs
   in
+
+  let find_global (vi, v1) =
+    try
+      ignore @@ Globals.Vars.find vi;
+      Some (VarMap.find vi s.varmap, v1)
+    with Not_found -> None
+  in
+  let global_pairs = List.filter_map find_global @@ VarMap.bindings summary_state.varmap in
+
+  let vertex_pairs = arg_formal_vertex_pairs @ global_pairs in
 
   (* merge the function graph;
      for every arg/formal vertex pair (v1,v2) and every edge v2→v create edge v1→v. *)
@@ -888,8 +902,8 @@ let call s (res : lval option) (args : exp list) (summary : Summary.t) : state =
     List.fold_left transfer_succs g vertex_pairs
   in
 
-  (* garbage collect: remove leaf vertices from g that originate from sum_state *)
-  let vertices_to_add_to_g, g =
+  (* garbage collect: remove leaf vertices from g that originate from summary_state *)
+  let vertices_added_to_g, g =
     let g = ref g in
     let remove_if_leaf v _ =
       if G.in_degree !g v = 0
@@ -905,7 +919,7 @@ let call s (res : lval option) (args : exp list) (summary : Summary.t) : state =
     varmap = s.varmap;
     vmap =
       let left_bias _ l _ = Some l in
-      VMap.union left_bias s.vmap vertices_to_add_to_g}
+      VMap.union left_bias s.vmap vertices_added_to_g}
   in
 
   asserting_invariants
