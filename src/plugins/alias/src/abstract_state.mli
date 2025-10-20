@@ -51,10 +51,6 @@ val alias_sets_lvals : t -> LSet.t list
 val find_transitive_closure : lval -> t -> (v * LSet.t) list
 val is_included : t -> t -> bool
 
-(** check all the invariants that must be true on an abstract value
-    before and after each function call or transformation of the graph) *)
-val assert_invariants : t -> unit
-
 (** Functions for Steensgaard's algorithm, see the paper *)
 val join : t -> v -> v -> t
 
@@ -85,3 +81,6 @@ val pretty_summary :  ?debug:bool -> Format.formatter -> summary -> unit
 (** [call a res args s] computes the abstract state after the
     instruction res=f(args), with f summarized by [s]. [a] is the abstract state before the call *)
 val call: t -> lval option -> exp list -> summary -> t
+
+val node_counter : int ref
+(** for debug purposes only *)
