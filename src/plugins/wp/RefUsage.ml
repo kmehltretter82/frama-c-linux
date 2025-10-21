@@ -523,7 +523,7 @@ and pred (env:ctx) p : value = match p.pred_content with
   | Pobject_pointer (_,t) | Pvalid_function t ->
     unescape ((term env) t)
   | Paligned(t, n) ->
-    E.fcup (fun t -> unescape ((term env) t)) [t;n]
+    E.cup (unescape (term env t)) (vterm env n)
   | Pseparated ts ->
     E.fcup (fun t -> unescape ((term env) t)) ts
   | Pfresh(_, _, t1, t2) ->
