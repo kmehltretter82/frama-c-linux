@@ -58,7 +58,7 @@ let dkey = Kernel_log.register_category "cmdline"
 
 let quiet_ref = ref false
 let deterministic = ref false
-let tty = ref Unix.(isatty stdout)
+let tty = ref Unix.(isatty stdout && Ansi_escape.is_supported ())
 let permissive = ref false
 let compress_saved_session = ref true
 

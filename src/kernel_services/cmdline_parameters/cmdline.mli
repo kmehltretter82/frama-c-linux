@@ -356,7 +356,7 @@ val deterministic: bool
 
 val tty: bool
 (** Indicates whether the standard output should be considered as a tty.
-    Defaults to [Unix.isattty Unix.stdout].
+    Defaults to [Unix.isattty Unix.stdout && Ansi_escape.is_supported ()].
     @since Frama-C+dev *)
 
 val permissive: bool
