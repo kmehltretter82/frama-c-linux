@@ -45,7 +45,7 @@
 [eva:alarm] FRAMAC_SHARE/libc/stdlib.h:624: Warning: 
   function malloc, behavior allocation: postcondition 'allocation' got status unknown.
 [eva:alarm] FRAMAC_SHARE/libc/stdlib.h:625: Warning: 
-  function malloc, behavior allocation: postcondition 'aligned' got status unknown.
+  function malloc, behavior allocation: postcondition 'alignment' got status unknown.
 [eva:alarm] FRAMAC_SHARE/libc/stdlib.h:626: Warning: 
   function malloc, behavior allocation: postcondition 'errno_same' got status unknown.
 [eva] Recording results for malloc

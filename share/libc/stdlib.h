@@ -546,7 +546,7 @@ extern long int jrand48 (unsigned short xsubi[3]);
       assigns __fc_heap_status \from size, __fc_heap_status;
       assigns \result \from indirect:size, indirect:__fc_heap_status;
       ensures allocation: \fresh(\result,size);
-      ensures aligned: \aligned(\result, alignment);
+      ensures alignment: \aligned(\result, alignment);
       ensures errno_same: __fc_errno == \old(__fc_errno);
     behavior no_allocation:
       assumes cannot_allocate: !is_allocable(size);
@@ -567,7 +567,7 @@ extern long int jrand48 (unsigned short xsubi[3]);
       assigns __fc_heap_status \from size, __fc_heap_status;
       assigns \result \from indirect:size, indirect:__fc_heap_status;
       ensures allocation: \fresh(\result,size);
-      ensures aligned: \aligned(\result, alignment);
+      ensures alignment: \aligned(\result, alignment);
       ensures errno_same: __fc_errno == \old(__fc_errno);
     behavior no_allocation_cannot_allocate:
       assumes cannot_allocate: !is_allocable(size);
@@ -598,7 +598,7 @@ extern void* aligned_alloc (size_t alignment, size_t size);
   behavior allocation:
     assumes can_allocate: is_allocable(nmemb * size);
     ensures allocation: \fresh(\result, nmemb * size);
-    ensures aligned: \aligned(\result, alignof(max_align_t));
+    ensures alignment: \aligned(\result, alignof(max_align_t));
     ensures initialization: \initialized(((char *)\result)+(0..nmemb*size-1));
     ensures zero_initialization: \subset(((char *)\result)[0..nmemb*size-1], {0});
     ensures errno_same: __fc_errno == \old(__fc_errno);
@@ -622,7 +622,7 @@ extern void *calloc(size_t nmemb, size_t size);
   @   assigns __fc_heap_status \from size, __fc_heap_status;
   @   assigns \result \from indirect:size, indirect:__fc_heap_status;
   @   ensures allocation: \fresh(\result,size);
-  @   ensures aligned: \aligned(\result, alignof(max_align_t));
+  @   ensures alignment: \aligned(\result, alignof(max_align_t));
   @   ensures errno_same: __fc_errno == \old(__fc_errno);
   @ behavior no_allocation:
   @   assumes cannot_allocate: !is_allocable(size);
@@ -664,7 +664,7 @@ extern void free(void *p);
      allocates \result;
      assigns   \result \from size, __fc_heap_status;
      ensures   allocation: \fresh(\result,size);
-     ensures   aligned: \aligned(\result, alignof(max_align_t));
+     ensures   alignment: \aligned(\result, alignof(max_align_t));
      ensures   errno_same: __fc_errno == \old(__fc_errno);
 
    behavior deallocation:

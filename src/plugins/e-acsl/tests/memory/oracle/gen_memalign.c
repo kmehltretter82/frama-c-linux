@@ -24,7 +24,7 @@ int __gen_e_acsl_is_implementation_alignment(unsigned long n);
     behavior allocation:
       assumes can_allocate: is_allocable(size);
       ensures allocation: \fresh{Old, Here}(\result,\old(size));
-      ensures aligned: \aligned(\result,\old(alignment));
+      ensures alignment: \aligned(\result,\old(alignment));
       ensures errno_same: __fc_errno == \old(__fc_errno);
       assigns __fc_heap_status, \result;
       assigns __fc_heap_status \from size, __fc_heap_status;
@@ -544,7 +544,7 @@ int __gen_e_acsl_posix_memalign(void **memptr, size_t alignment, size_t size)
     behavior allocation:
       assumes can_allocate: is_allocable(size);
       ensures allocation: \fresh{Old, Here}(\result,\old(size));
-      ensures aligned: \aligned(\result,\old(alignment));
+      ensures alignment: \aligned(\result,\old(alignment));
       ensures errno_same: __fc_errno == \old(__fc_errno);
       assigns __fc_heap_status, \result;
       assigns __fc_heap_status \from size, __fc_heap_status;
@@ -653,7 +653,7 @@ void *__gen_e_acsl_aligned_alloc(size_t alignment, size_t size)
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_5,"\\result",
                                    __retres);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,
-                                   "allocation: aligned: \\aligned(\\result,\\old(alignment))",
+                                   "allocation: alignment: \\aligned(\\result,\\old(alignment))",
                                    0,__gen_e_acsl_aligned);
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_7 =
         {.values = (void *)0};
@@ -676,7 +676,7 @@ void *__gen_e_acsl_aligned_alloc(size_t alignment, size_t size)
       __gen_e_acsl_assert_data_5.file = "FRAMAC_SHARE/libc/stdlib.h";
       __gen_e_acsl_assert_data_5.fct = "aligned_alloc";
       __gen_e_acsl_assert_data_5.line = 549;
-      __gen_e_acsl_assert_data_5.name = "allocation/aligned";
+      __gen_e_acsl_assert_data_5.name = "allocation/alignment";
       __e_acsl_assert(__gen_e_acsl_aligned,& __gen_e_acsl_assert_data_5);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
     }
