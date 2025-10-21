@@ -70,18 +70,26 @@ are shown in the component titlebar.
 
 ## Locations {#framac-locations}
 
-Some user actions may select several AST elements at once.
-This is the case when:
-- selecting all calls to a given function, via the 'Go to caller' contextual
-  menu on a function declaration;
-- selecting all statements that may read or write a given lvalue,
-  via the 'Studia' contextual menu in the [AST](#framac-ast) component.
+Some user actions may select several AST elements at once, for instance
+when using these contextual menu entries in the [AST](#framac-ast) component:
+- 'Go to caller' (on a function declaration) selects all calls to the given function;
+- 'Studia' (on a lvalue) selects all statements that may read or write the given lvalue;
+- 'Impact analysis' (on a statement) selects all statements impacted by the given statement.
 
-In this case, this component lists all selected elements in a table.
-Left-clicking on a row globally selects the related component.
+In this case, this component lists all selected elements in a table, with
+their source code location and their scope (the global declaration in which
+they appear).
+Left-clicking on a row globally selects the related AST element in Ivette.
 Above the table, a short label indicates the origin of the selection.
 
-In the component titlebar, the [icon-trash] button clears the current selection.
+In the component titlebar:
+- the [icon-angle.left] [icon-angle.right] buttons allow cycling between selected elements;
+- the [icon-filter] button allows filtering selected elements according to their scope
+  (the function or variable declaration in which they appear);
+- the [icon-trash] button clears the current selection.
+
+In the sidebar, the [icon-multicheck] icon signals functions and variable
+declarations containing at least one element listed in this component.
 
 ## Messages {#framac-messages}
 
