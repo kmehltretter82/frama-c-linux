@@ -23,7 +23,7 @@ machdep_%.yaml: machdep_gcc_%.yaml Makefile
 	@sed -e 's/sizeof_fun: .*/sizeof_fun: -1/' \
              -e 's/sizeof_void: .*/sizeof_void: -1/' \
              -e 's/alignof_fun: .*/alignof_fun: -1/' \
-						 -e 's/alignof_void: .*/alignof_void: -1/' \
+             -e 's/alignof_void: .*/alignof_void: -1/' \
              -e 's/alignof_aligned: .*/alignof_aligned: -1/' \
              -e 's/max_extended_alignment: .*/max_extended_alignment: 0/' \
              -e 's/compiler: .*/compiler: generic/' \
