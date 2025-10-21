@@ -106,28 +106,25 @@ let rec pp_digits d fmt n v =
       d.pp fmt r ;
     end
 
-let pp_bin ?(nbits=1) ?(sep="") fmt v =
+let pp_aux ~is_bin ~bsize ~bmask ~pp_pos ~pp_neg ?(nbits=1) ?(sep="") fmt v =
+  let sz, so = if is_bin then "0b", "1b" else "0x", "1x" in
   let nbits = if nbits <= 0 then 1 else nbits in
-  if leq zero v then
-    ( Format.pp_print_string fmt "0b" ;
-      pp_digits { nbits ; sep ; bsize=4 ;
-                  bmask = bmask_bin ; pp = pp_bin_pos } fmt 0 v )
-  else
-    ( Format.pp_print_string fmt "1b" ;
-      pp_digits { nbits ; sep ; bsize=4 ;
-                  bmask = bmask_bin ; pp = pp_bin_neg } fmt 0 (lognot v) )
+  if leq zero v then begin
+    Format.pp_print_string fmt sz ;
+    pp_digits { nbits; sep; bsize; bmask; pp = pp_pos } fmt 0 v
+  end
+  else begin
+    Format.pp_print_string fmt so ;
+    pp_digits { nbits; sep; bsize; bmask; pp = pp_neg } fmt 0 (lognot v)
+  end
 
-let pp_hex ?(nbits=1) ?(sep="") fmt v =
-  let nbits = if nbits <= 0 then 1 else nbits in
-  if leq zero v then
-    ( Format.pp_print_string fmt "0x" ;
-      pp_digits { nbits ; sep ; bsize=16 ;
-                  bmask = bmask_hex ; pp = pp_hex_pos } fmt 0 v )
+let pp_bin =
+  pp_aux ~is_bin:true ~bsize:4 ~bmask:bmask_bin ~pp_pos:pp_bin_pos
+    ~pp_neg:pp_bin_neg
 
-  else
-    ( Format.pp_print_string fmt "1x" ;
-      pp_digits { nbits ; sep ; bsize=16 ;
-                  bmask = bmask_hex ; pp = pp_hex_neg } fmt 0 (lognot v) )
+let pp_hex =
+  pp_aux ~is_bin:false ~bsize:16 ~bmask:bmask_hex ~pp_pos:pp_hex_pos
+    ~pp_neg:pp_hex_neg
 
 let pretty_hex fmt v =
   let two_power_60 = two_power_of_int 60 in
