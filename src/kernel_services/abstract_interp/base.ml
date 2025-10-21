@@ -250,7 +250,7 @@ let for_writing = function
   | Read _ | Object_pointer | Any_pointer -> false
 
 let is_empty_access = function
-  | Read size | Write size -> Int.equal 0z size
+  | Read size | Write size -> Int.is_zero size
   | Object_pointer | Any_pointer -> true
 
 (* Computes the last valid offset for an access of the base [base] with [max]

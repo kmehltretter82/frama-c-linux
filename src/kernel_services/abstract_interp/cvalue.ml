@@ -640,7 +640,7 @@ module V = struct
   let merge_neutral_element = singleton_zero
 
   let all_values ~size v =
-    if Int.equal size 0z then true
+    if Int.is_zero size then true
     else
       try
         let i = project_ival v in
@@ -910,7 +910,7 @@ module V_Or_Uninitialized = struct
     let vcard v = V.cardinal_estimate v ~size in
     match v with
     | C_init_noesc(v) -> vcard v
-    | C_uninit_noesc(v) | C_init_esc(v) -> Z.add Z.one (vcard v)
+    | C_uninit_noesc(v) | C_init_esc(v) -> Z.succ (vcard v)
     | C_uninit_esc(v) -> Z.add 2z (vcard v)
 
 end

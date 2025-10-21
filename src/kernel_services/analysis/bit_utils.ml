@@ -511,7 +511,7 @@ let rec find_offset typ ~offset om =
     match Ast_types.unroll_node typ with
     | TArray (typ_elt, _) ->
       let size_elt = Z.of_int (Cil.bitsSizeOf typ_elt) in
-      if Z.(equal size_elt zero) then
+      if Z.is_zero size_elt then
         begin
           (* array of elements of size 0 - trying to recompute the original
              offset in the case of multidimensional incomplete arrays is

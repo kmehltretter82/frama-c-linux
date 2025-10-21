@@ -5133,7 +5133,7 @@ and makeCompType loc ghost (isstruct: bool)
       begin
         match Cil.constFoldToInt ~machdep:true cond_exp with
         | Some i ->
-          if Z.(equal i zero) then
+          if Z.is_zero i then
             Kernel.error ~source:(fst loc) "static assertion failed%s%s@."
               (if s <> "" then ": " else "") s
         | None ->
@@ -9156,7 +9156,7 @@ and doDecl local_env (isglobal: bool) (def: Cabs.definition) : chunk =
       begin
         match Cil.constFoldToInt ~machdep:true cond_exp with
         | Some i ->
-          if Z.(equal i zero) then
+          if Z.is_zero i then
             Kernel.error ~current:true "static assertion failed%s%s@."
               (if s <> "" then ": " else "") s
         | None ->
