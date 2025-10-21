@@ -20,7 +20,7 @@ import { Label, Cell } from 'dome/controls/labels';
 import {
   IconButton, Multiselect, MultiselectItem
 } from 'dome/controls/buttons';
-import { Space } from 'dome/frame/toolbars';
+import { Inset } from 'dome/frame/toolbars';
 import { Dropdown } from 'dome/dialogs';
 import { TitleBar } from 'ivette';
 import * as Display from 'ivette/display';
@@ -192,7 +192,7 @@ export default function LocationsTable(): JSX.Element {
   const getDecl = States.useSyncArrayGetter(Ast.declAttributes);
   const getAttr = States.useSyncArrayGetter(Ast.markerAttributes);
   const { label, title, markers, index, scopes } = useSelection();
-  const prevscopesRef = React.useRef< Ast.decl[] | undefined>(undefined);
+  const previousScopesRef = React.useRef< Ast.decl[]>([]);
   React.useEffect(() => {
     model.replaceAllDataWith(
       markers.map((marker, index): Data => {
@@ -209,27 +209,28 @@ export default function LocationsTable(): JSX.Element {
   const positionLabel = `${indexLabel} / ${size}`;
 
   /** filter */
-  const [visibleScopes, setVisibleScopes] = React.useState<Set<string>>(
-    new Set(scopes));
+  const [visibleScopes, setVisibleScopes] =
+    React.useState<Set<string>>(new Set(scopes));
 
   React.useEffect(() => {
-    const isScopesChanged = !prevscopesRef?.current
-      || prevscopesRef.current.length !== scopes?.length
-      || !prevscopesRef.current?.every(e => scopes && scopes.includes(e));
+    const previousScopes = previousScopesRef.current;
+    const isScopesChanged =
+      previousScopes.length !== scopes?.length
+      || !previousScopes.every(e => scopes.includes(e));
     if(isScopesChanged) {
       setVisibleScopes(new Set(scopes));
-      prevscopesRef.current = scopes;
+      previousScopesRef.current = scopes ?? [];
     }
   }, [scopes]);
 
-  const setVisible = React.useCallback((a: string) => {
+  const setVisible = React.useCallback((a: Ast.decl) => {
     if(visibleScopes.has(a)) visibleScopes.delete(a);
     else visibleScopes.add(a);
     setVisibleScopes(new Set(visibleScopes));
   }, [visibleScopes, setVisibleScopes]);
 
   React.useEffect(() => {
-    model.setFilter(({ decl }, ) => visibleScopes.has(decl.decl));
+    model.setFilter(({ decl }) => visibleScopes.has(decl.decl));
   }, [model, visibleScopes]);
 
   const itemsComp = scopes && scopes.map((e, i) =>
@@ -243,24 +244,32 @@ export default function LocationsTable(): JSX.Element {
     />
   );
 
-  const filter = <Multiselect>
-    <MultiselectItem key={'all'} item={{
-       label: visibleScopes.size === scopes?.length ?
-         'Uncheck all' : 'Check all',
-       enabled: true,
-       checked: visibleScopes.size === scopes?.length,
-       onClick: () => {
-          if(visibleScopes.size !== scopes?.length)
-            setVisibleScopes(new Set(scopes));
-          else setVisibleScopes(new Set([]));
-        }
-      }}
-    />
-    <MultiselectItem key={'separator'} item='separator' />
-    { itemsComp && itemsComp }
+  const allChecked = visibleScopes.size === scopes?.length;
+  const checkAllItem =
+    { label: allChecked ? 'Uncheck all' : 'Check all',
+      enabled: true,
+      checked: false,
+      onClick: () => setVisibleScopes(new Set(allChecked ? [] : scopes)),
+    };
+
+  const filter =
+    <Multiselect>
+      <MultiselectItem key={'all'} item={checkAllItem} />
+      <MultiselectItem key={'separator'} item='separator' />
+      {itemsComp && itemsComp}
     </Multiselect>;
-  const filterKind = visibleScopes.size === scopes?.length ? 'positive' :
+
+  const filterKind =
+    visibleScopes.size === scopes?.length ? 'positive' :
     visibleScopes.size === 0 ? 'negative' : 'warning';
+
+  const filterEnabled = scopes && scopes.length > 1;
+
+  const filterButton =
+    <IconButton
+      icon='FILTER' kind={filterKind} enabled={filterEnabled}
+      title='Filtering options'
+    />;
 
   // Component
   return (
@@ -278,22 +287,23 @@ export default function LocationsTable(): JSX.Element {
           enabled={(-1) <= kindex && kindex + 1 < size}
           onClick={() => goToNextVisibleIndex(kindex, model)}
         />
-        <Space />
+        <Inset />
         <Label
           className='component-info'
           display={0 < size}
           label={positionLabel}
           title='Current location index / Number of locations' />
-        <Space />
-        { scopes && scopes.length > 1 &&
-          <Dropdown control={ <IconButton icon='FILTER' kind={filterKind} /> }
-          >{filter}</Dropdown>
-        }
+        <Inset />
+        <Dropdown control={filterButton}>
+          {filter}
+        </Dropdown>
+        <Inset />
         <IconButton
           icon='TRASH'
           title='Cancel selected locations'
           onClick={clearSelection}
         />
+        <Inset />
       </TitleBar>
       <Label className='locations' label={label} title={title} />
       <Table
