@@ -120,7 +120,7 @@ class engine =
         match rformat with
         | `Ratio ->
           let { Q.num = num ; Q.den = den } = q in
-          if Z.equal den Z.one then
+          if Z.is_one den then
             Format.fprintf fmt "%s.0" (Z.to_string num)
           else
             Format.fprintf fmt "(%s.0/%s)"

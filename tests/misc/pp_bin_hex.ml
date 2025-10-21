@@ -18,7 +18,7 @@ let () =
     List.iter
       (fun z ->
          testcase z ;
-         if not (Z.equal z Z.zero) then
+         if not (Z.is_zero z) then
            testcase (Z.neg z)
       ) [
       Z.of_string "0" ;

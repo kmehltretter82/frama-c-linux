@@ -564,7 +564,7 @@ let xform_switch_block ?(keepSwitch=false) b =
                     let pred =
                       match ce.enode with
                         Const (CInt64 (z,_,_))
-                        when Z.equal z Z.zero
+                        when Z.is_zero z
                         ->
                         new_exp ~loc:ce.eloc (UnOp(LNot,e,Cil_const.intType))
                       | _ ->

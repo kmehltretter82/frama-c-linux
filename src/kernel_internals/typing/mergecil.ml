@@ -2450,9 +2450,9 @@ and equalExps (x: exp) (y: exp) : bool =
       ((* CIL changes (unsigned)0 into 0U during printing.. *)
         match xc,yc with
         | CInt64(xv,_,_),CInt64(yv,_,_) ->
-          (Z.equal xv Z.zero)
+          Z.is_zero xv
           && (* ok if they're both 0 *)
-          (Z.equal yv Z.zero)
+          Z.is_zero yv
         | _,_ -> false
       )
     | Lval(xl), Lval(yl) ->          (equalLvals xl yl)

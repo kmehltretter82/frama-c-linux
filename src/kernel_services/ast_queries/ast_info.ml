@@ -46,13 +46,13 @@ let rec uncast e = match e.enode with
 let is_null_expr e =
   match (uncast (Cil.constFold true e)).enode with
   | Const c when is_integral_const c ->
-    Z.equal (value_of_integral_const c) Z.zero
+    Z.is_zero (value_of_integral_const c)
   | _ -> false
 
 let is_non_null_expr e =
   match (uncast (Cil.constFold true e)).enode with
   | Const c when is_integral_const c ->
-    not (Z.equal (value_of_integral_const c) Z.zero)
+    not (Z.is_zero (value_of_integral_const c))
   | _ -> false
 
 let is_string_literal vi = Ast_attributes.(contains fc_literal vi.vattr)
@@ -294,7 +294,7 @@ let constant_term loc i =
 
 let rec is_null_term t = match t.term_node with
   | TConst c when is_integral_logic_const c ->
-    Z.equal (value_of_integral_logic_const c) Z.zero
+    Z.is_zero (value_of_integral_logic_const c)
   | TCast(false, _,t) -> is_null_term t
   | _ -> false
 

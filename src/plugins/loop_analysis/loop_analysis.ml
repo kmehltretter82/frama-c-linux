@@ -450,7 +450,7 @@ module Store(* (B:sig *)
           begin
             try
               let increment = Varinfo.Map.find vi induction_variables in
-              assert (not (Z.equal increment Z.zero));
+              assert (not (Z.is_zero increment));
               if Z.gt increment Z.zero then
                 maybe_insert vi true bound offset Cil_types.Ne
               else
@@ -497,7 +497,7 @@ module Store(* (B:sig *)
                 begin
                   try
                     let increment = Varinfo.Map.find vi induction_variables in
-                    assert (not (Z.equal increment Z.zero));
+                    assert (not (Z.is_zero increment));
                     if Z.gt increment Z.zero then
                       match min_max_int vi' with
                       | (_, Some max_bound') ->
@@ -513,7 +513,7 @@ module Store(* (B:sig *)
                   with Not_found -> (* try other variable as increment *)
                   try
                     let increment = Varinfo.Map.find vi' induction_variables in
-                    assert (not (Z.equal increment Z.zero));
+                    assert (not (Z.is_zero increment));
                     if Z.gt increment Z.zero then
                       match min_max_int vi with
                       | (_, Some max_bound) ->

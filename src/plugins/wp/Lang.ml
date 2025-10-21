@@ -819,7 +819,7 @@ struct
   let p_lift f = f
 
   let is_zero e = match QED.repr e with
-    | Kint z -> Z.equal z Z.zero
+    | Kint z -> Z.is_zero z
     | _ -> false
 
   let eqp = equal

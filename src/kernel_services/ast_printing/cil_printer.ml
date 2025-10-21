@@ -985,7 +985,7 @@ class cil_printer () = object (self)
           BinOp((PlusA|PlusPI),
                 {enode = Lval(lv')},
                 {enode=Const(CInt64(one,_,_))},_)
-          when LvalStructEq.equal lv lv' && Z.equal one Z.one
+          when LvalStructEq.equal lv lv' && Z.is_one one
                && not state.print_cil_as_is ->
           fprintf fmt "%a ++%s"
             (self#lval_prec Precedence.indexLevel) lv
@@ -993,7 +993,7 @@ class cil_printer () = object (self)
         | BinOp((MinusA|MinusPI),
                 {enode = Lval(lv')},
                 {enode=Const(CInt64(one,_,_))}, _)
-          when LvalStructEq.equal lv lv' && Z.equal one Z.one
+          when LvalStructEq.equal lv lv' && Z.is_one one
                && not state.print_cil_as_is ->
           fprintf fmt "%a --%s"
             (self#lval_prec Precedence.indexLevel) lv

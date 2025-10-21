@@ -2544,10 +2544,10 @@ let rec isInteger e = match e.enode with
 let isZero (e: exp) : bool =
   match isInteger e with
   | None -> false
-  | Some i -> Z.equal i Z.zero
+  | Some i -> Z.is_zero i
 
 let rec isLogicZero t = match t.term_node with
-  | TConst (Integer (n,_)) -> Z.equal n Z.zero
+  | TConst (Integer (n,_)) -> Z.is_zero n
   | TConst (LChr c) -> Char.code c = 0
   | TCast(_, _, t) -> isLogicZero t
   | _ -> false
@@ -3672,7 +3672,7 @@ and constFold (machdep: bool) (e: exp) : exp =
             kinteger64 ~loc ?repr ~kind:tk (Z.neg i)
           | BNot -> kinteger64 ~loc ~kind:tk (Z.lognot i)
           | LNot ->
-            if Z.equal i Z.zero then one ~loc
+            if Z.is_zero i then one ~loc
             else zero ~loc
         end
       | _ -> if e1 == e1c then e else new_exp ~loc (UnOp(unop, e1c, tres))
@@ -3819,13 +3819,13 @@ and constFoldBinOp ~loc (machdep: bool) bop e1 e2 tres =
       let e2'' = mkInt e2' in
       match bop, e1''.enode, e2''.enode with
       | PlusA, Const(CInt64(z,_,_)), _
-        when Z.equal z Z.zero -> e2''
+        when Z.is_zero z -> e2''
       | (PlusA | MinusA), _, Const(CInt64(z,_,_))
-        when Z.equal z Z.zero -> e1''
+        when Z.is_zero z -> e1''
       | PlusPI, _, Const(CInt64(z,_,_))
-        when Z.equal z Z.zero -> e1''
+        when Z.is_zero z -> e1''
       | MinusPI, _, Const(CInt64(z,_,_))
-        when Z.equal z Z.zero -> e1''
+        when Z.is_zero z -> e1''
       | PlusA, Const(CInt64(i1,ik1,_)),Const(CInt64(i2,ik2,_)) when ik1 = ik2 ->
         kinteger64 ~loc ~kind:tk (Z.add i1 i2)
       | MinusA, Const(CInt64(i1,ik1,_)),Const(CInt64(i2,ik2,_))
@@ -3834,13 +3834,13 @@ and constFoldBinOp ~loc (machdep: bool) bop e1 e2 tres =
       | Mult, Const(CInt64(i1,ik1,_)), Const(CInt64(i2,ik2,_)) when ik1 = ik2 ->
         kinteger64 ~loc ~kind:tk (Z.mul i1 i2)
       | Mult, Const(CInt64(z,_,_)), _
-        when Z.equal z Z.zero -> e1''
+        when Z.is_zero z -> e1''
       | Mult, Const(CInt64(one,_,_)), _
-        when Z.equal one Z.one -> e2''
+        when Z.is_one one -> e2''
       | Mult, _,    Const(CInt64(z,_,_))
-        when Z.equal z Z.zero -> e2''
+        when Z.is_zero z -> e2''
       | Mult, _, Const(CInt64(one,_,_))
-        when Z.equal one Z.one -> e1''
+        when Z.is_one one -> e1''
       | Div, Const(CInt64(i1,ik1,_)),Const(CInt64(i2,ik2,_)) when ik1 = ik2 ->
         begin
           try kinteger64 ~loc ~kind:tk (Z.div i1 i2)
@@ -3852,7 +3852,7 @@ and constFoldBinOp ~loc (machdep: bool) bop e1 e2 tres =
           with Division_by_zero -> new_exp ~loc (BinOp(bop, e1', e2', tres))
         end
       | Div, _, Const(CInt64(one,_,_))
-        when Z.equal one Z.one -> e1''
+        when Z.is_one one -> e1''
       | Mod, Const(CInt64(i1,ik1,_)),Const(CInt64(i2,ik2,_)) when ik1 = ik2 ->
         begin
           try kinteger64 ~loc ~kind:tk (Z.rem i1 i2)
@@ -3861,9 +3861,9 @@ and constFoldBinOp ~loc (machdep: bool) bop e1 e2 tres =
       | BAnd, Const(CInt64(i1,ik1,_)),Const(CInt64(i2,ik2,_)) when ik1 = ik2 ->
         kinteger64 ~loc ~kind:tk (Z.logand i1 i2)
       | BAnd, Const(CInt64(z,_,_)), _
-        when Z.equal z Z.zero -> e1''
+        when Z.is_zero z -> e1''
       | BAnd, _, Const(CInt64(z,_,_))
-        when Z.equal z Z.zero -> e2''
+        when Z.is_zero z -> e2''
       | BOr, Const(CInt64(i1,ik1,_)),Const(CInt64(i2,ik2,_)) when ik1 = ik2 ->
         kinteger64 ~loc ~kind:tk (Z.logor i1 i2)
       | BOr, _, _ when isZero e1' -> e2'
@@ -3874,9 +3874,9 @@ and constFoldBinOp ~loc (machdep: bool) bop e1 e2 tres =
         when shiftInBounds i2 ->
         kinteger64 ~loc ~kind:tk (Z.shift_left_z i1 i2)
       | Shiftlt, Const(CInt64(z,_,_)), _
-        when Z.equal z Z.zero -> e1''
+        when Z.is_zero z -> e1''
       | Shiftlt, _, Const(CInt64(z,_,_))
-        when Z.equal z Z.zero -> e1''
+        when Z.is_zero z -> e1''
       | Shiftrt, Const(CInt64(i1,ik1,_)),Const(CInt64(i2,_,_))
         when shiftInBounds i2 ->
         if isunsigned ik1 then
@@ -3885,9 +3885,9 @@ and constFoldBinOp ~loc (machdep: bool) bop e1 e2 tres =
         else
           kinteger64 ~loc ~kind:tk (Z.shift_right_z i1 i2)
       | Shiftrt, Const(CInt64(z,_,_)), _
-        when Z.equal z Z.zero -> e1''
+        when Z.is_zero z -> e1''
       | Shiftrt, _, Const(CInt64(z,_,_))
-        when Z.equal z Z.zero -> e1''
+        when Z.is_zero z -> e1''
       | Eq, Const(CInt64(i1,ik1,_)),Const(CInt64(i2,ik2,_)) ->
         let i1', i2', _ = convertInts i1 ik1 i2 ik2 in
         if Z.equal i1' i2' then one ~loc else zero ~loc

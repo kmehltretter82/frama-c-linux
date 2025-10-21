@@ -581,11 +581,11 @@ let smp_shift zf =
   (* f(e1,0)~>e1, c2>0==>f(c1,c2)~>zf(c1,c2), c2>0==>f(0,c2)~>0 *)
   function
   | [e1;e2] -> begin match (F.repr e1), (F.repr e2) with
-      | _, Logic.Kint c2 when Z.equal c2 Z.zero -> e1
+      | _, Logic.Kint c2 when Z.is_zero c2 -> e1
       | Logic.Kint c1, Logic.Kint c2 when Z.leq Z.zero c2 ->
         (* undefined when c2 is negative *)
         e_zint (zf c1 c2)
-      | Logic.Kint c1, _ when Z.equal c1 Z.zero && is_positive_or_null e2 ->
+      | Logic.Kint c1, _ when Z.is_zero c1 && is_positive_or_null e2 ->
         (* undefined when c2 is negative *)
         e1
       | _ -> raise Not_found

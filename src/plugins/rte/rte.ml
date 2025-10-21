@@ -207,7 +207,7 @@ let divmod_assertion ~remove_trivial ~on_alarm divisor =
     | None -> (* divisor is not a constant *)
       alarm ();
     | Some v64 ->
-      if Z.equal v64 Z.zero then
+      if Z.is_zero v64 then
         (* divide by 0 *)
         alarm ~invalid:true ()
         (* else divide by constant which is not 0: nothing to assert *)

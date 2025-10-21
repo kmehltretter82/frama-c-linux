@@ -6209,7 +6209,7 @@ and doExp local_env
                shouldn't have side effect";
           let cond_is_true =
             match (Cil.constFold true cond).enode with
-            | Const (CInt64 (v,_,_)) -> not (Z.equal v Z.zero)
+            | Const (CInt64 (v,_,_)) -> not (Z.is_zero v)
             | Const (CReal(v,_,_)) -> Fc_float.compare v 0. <> 0
             | Const (CChr c) -> Char.code c <> 0
             | _ ->
@@ -7731,11 +7731,11 @@ and compileCondExp ?(hide=false) ~ghost ce st sf =
   | CEExp (se, e) -> begin
       match e.enode with
       | Const(CInt64(i,_,_))
-        when (not (Z.equal i Z.zero)) && canDrop sf ->
+        when (not (Z.is_zero i)) && canDrop sf ->
         full_clean_up_chunk_locals sf;
         se @@@ st
       | Const(CInt64(z,_,_))
-        when (Z.equal z Z.zero) && canDrop st ->
+        when Z.is_zero z && canDrop st ->
         full_clean_up_chunk_locals st;
         se @@@ sf
       | _ ->

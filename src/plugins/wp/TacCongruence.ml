@@ -137,7 +137,7 @@ let rec equal eq a b =
   | IMUL_K( k,a ) , Ival(_,Some n)
   | Ival(_,Some n) , IMUL_K( k,a ) ->
     let r = Z.rem k n in
-    if Z.equal r Z.zero then
+    if Z.is_zero r then
       equal eq (pattern a) (pdiv n k)
     else
       eq F.e_one F.e_zero

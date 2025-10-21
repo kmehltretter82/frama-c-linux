@@ -2477,7 +2477,7 @@ and constFoldUnOpToInt ~machdep unop e =
     | Neg -> Some (Z.neg i)
     | BNot -> Some (Z.lognot i)
     | LNot ->
-      Some (if Z.equal i Z.zero then Z.one else Z.zero)
+      Some (if Z.is_zero i then Z.one else Z.zero)
 
 and constFoldBinOpToInt ~machdep bop e1 e2 =
   match constFoldTermToInt ~machdep e1, constFoldTermToInt ~machdep e2 with

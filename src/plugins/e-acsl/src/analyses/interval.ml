@@ -294,7 +294,7 @@ let infer_sum_product oper lambda min max = match lambda, min, max with
              Extlib.opt_map2
                (fun m max ->
                   match max_lambda with
-                  | Some ml when Z.lt ml Z.zero && not (Z.equal m Z.one) ->
+                  | Some ml when Z.lt ml Z.zero && not (Z.is_one m) ->
                     (* when [lambda] is necessarily negative with an odd number
                        of iterations (>1), the result is necessarily negative,
                        so smaller than the maximal (positive) value. Therefore,

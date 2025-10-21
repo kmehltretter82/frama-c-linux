@@ -124,7 +124,7 @@ module G = struct
       let mul_inf = function
         | None -> None
         | Some i as v ->
-          if Z.equal i Z.zero then v else None
+          if Z.is_zero i then v else None
       in
       (* b2 * bmin1 *)
       let mulmin = match bmin1 with

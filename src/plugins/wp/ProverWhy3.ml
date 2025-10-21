@@ -256,7 +256,7 @@ struct
       let int = Z.to_string (Z.abs z) in
       why3_real Why3.Ty.ty_real ~radix:10 ~neg ~int ()
     in
-    if Z.equal Z.one q.den
+    if Z.is_one q.den
     then mk_real_int q.num
     else
       t_app ~cnv ~f:["real"] ~l:"Real" ~p:["infix /"]
