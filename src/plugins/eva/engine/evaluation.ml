@@ -632,8 +632,8 @@ module Make
       if is_true truth || not propagate_all
       then result
       else
-        let zero = Value.inject_int typ_res Integer.zero in
-        let one = Value.inject_int typ_res Integer.one in
+        let zero = Value.inject_int typ_res Z.zero in
+        let one = Value.inject_int typ_res Z.one in
         let zero_or_one = Value.join zero one in
         if Ast_types.is_ptr typ_arg then
           Self.result
