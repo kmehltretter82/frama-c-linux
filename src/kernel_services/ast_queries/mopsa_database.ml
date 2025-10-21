@@ -234,7 +234,7 @@ let run () =
         Kernel.CppExtraArgsPerFile.add (fname, args);
       ) deps;
 
-    let deps_files = List.map fst deps in
+    let deps_files = List.(sort_uniq Filepath.compare (map fst deps)) in
     let count_before_filter = List.length deps_files in
     let deps_files = List.filter (fun s ->
         not (List.mem s (Kernel.MopsaExcludeSources.get ()))

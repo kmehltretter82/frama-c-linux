@@ -36,3 +36,10 @@
     ../../src/init/boot/empty_file.exe
   )
 )
+
+(cram
+  (applies_to no-duplicate-sources)
+  (deps
+    ../../src/init/boot/empty_file.exe
+  )
+)
