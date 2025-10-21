@@ -2,40 +2,188 @@
    STDOPT: +"-eva-taint-secureflow"
  */
 
-#include "__fc_builtin.h"
+#define __fc_private __attribute__((private))
+#define __fc_public __attribute__((public))
 
-extern int __attribute__((private)) secret;
-extern int __attribute__((private)) extern_data[5];
+extern int __fc_private secret;
 
-int __attribute__((public)) global_key[5] = {0, 0, 0, 0, 0};
+void annot(void) {
+  // Non-private variables are considered public by security_status
+  unsigned int __fc_public non_secret;
+  unsigned int non_classified;
 
-void f1(void) {
-  int local_key[5] = {0, 0, 0, 0, 0};
+  //@ check security_status(secret) == private;
+  //@ check security_status(non_secret) == public;
+  //@ check security_status(non_classified) == public;
+}
 
-  for (int i = 0; i < 5; i++) {
-    global_key[i] = extern_data[i];
-    local_key[i] = extern_data[i];
-  }
-  /*@ check \tainted(private:global_key); */
-  /*@ check \tainted(private:local_key); */
+void direct_interference(void) {
+  // Do not warn about direct non-interference violations on variables without a
+  // specified security level
+  unsigned int __fc_public non_secret;
+  unsigned int non_classified;
+
+  non_secret = secret;     // Should warn
+  non_classified = secret; // Should not warn
+}
+
+void indirect_interference(void) {
+  // Do not warn about indirect non-interference violations on variables without
+  // a specified security level. Also warn on conditions depending on private
+  // data
+  unsigned int __fc_public non_secret;
+  unsigned int non_classified;
+
+  // Should warn about condition
+  if (secret)
+    non_secret = 1; // Should warn
+  else
+    non_classified = 1; // Should not warn
+}
+
+/*@ assigns *x \from *x;
+  @ admit ensures security_status(*x) == public; */
+void sanitize(int *x);
+
+void public_after_sanitize(void) {
+  int non_classified = secret;
+
+  //@ check security_status(non_classified) == public;
+  sanitize(&non_classified);
+  //@ check security_status(non_classified) == public;
+}
+
+/*@ requires security_status(x) == private && security_status(y) == public;
+  @ admit ensures security_status(\result) == private;
+  @ assigns \result \from x, y;
+ */
+int add(unsigned int x, unsigned int y) {
+  //@ check security_status(x) == private;
+  //@ check security_status(y) == public;
+  int result = x + y;
+  /*@ check security_status(result) == private; */
+  return result;
+}
+
+void annot_contract(void) {
+  unsigned int non_classified = 1;
+  unsigned int r = add(secret, non_classified);
+  /*@ check security_status(r) == private; */
 }
 
 /*@ assigns \result \from *x, x; */
-extern int assigns_from(int* x);
+extern int assigns_from(int *x);
 
-void f2(void) {
+void direct_interference_from_assigns(void) {
   int zero = 0, one = 1;
-  int* ptr = (secret ? &zero : &one);
-  /*@ check !\tainted(private:zero); */
-  /*@ check !\tainted(private:one); */
-  /*@ check \tainted(private:ptr); */
 
-  int __attribute__((public)) v = assigns_from(ptr);
-  /*@ check \tainted(private:v); */
+  // Should warn on the condition
+  int *ptr = (secret ? &zero : &one);
+  /*@ check security_status(zero) == public; */
+  /*@ check security_status(one) == public; */
+  /*@ check security_status(ptr) == private; */
+
+  int __fc_public v = assigns_from(ptr); // Should warn
+  /*@ check security_status(v) == private; */
+}
+
+void indirect_interference_goto() {
+  int __fc_public x, y, z;
+
+  // Should warn on condition
+  if (secret > 0) {
+    x = 1; // Should warn
+    goto L;
+  } else {
+  // This is always executed, 'y' must remain public
+  L:
+    y = 0;
+  }
+  z = 1;
+  /*@ check security_status(y) == public; */
+  /*@ check security_status(z) == public; */
+  /*@ check security_status(x) == private; */
+}
+
+void indirect_interference_ptr_array(void) {
+  int __fc_public x, y, z;
+  int *ptr_array[2] = {&x, &y};
+  int *q;
+
+  /*@ check security_status(x) == public; */
+  /*@ check security_status(y) == public; */
+  /*@ check security_status(ptr_array) == public; */
+
+  int secret_idx = !!secret;
+  /*@ check security_status(secret_idx) == private; */
+  *ptr_array[secret_idx] = 2;
+  /*@ check security_status(*ptr_array[secret_idx]) == private; */
+  /*@ check security_status(x) == private; */
+  /*@ check security_status(y) == private; */
+
+  /* We can make both x and y public again. */
+  x = 0;
+  y = 0;
+  /*@ check security_status(x) == public; */
+  /*@ check security_status(y) == public; */
+  /*@ check security_status(ptr_array) == public; */
+  z = *ptr_array[secret_idx];
+  /*@ check security_status(z) == private; */
+  /*@ check security_status(x) == public; */
+  /*@ check security_status(y) == public; */
+}
+
+void set_y(int *y) { *y = 1; }
+
+void set_xy(int *x, int *y) {
+  *x = 1;
+  if (secret) {
+    set_y(y);
+  }
+}
+
+void indirect_interference_fun_call(void) {
+  int __fc_public x;
+  int y;
+
+  /*@ check security_status(x) == public; */
+  /*@ check security_status(y) == public; */
+  set_xy(&x, &y);
+  /*@ check security_status(x) == public; */
+  /*@ check security_status(y) == private; */
+
+  y = 0;
+  /*@ check security_status(y) == public; */
+  if (secret) {     // Should warn on condition
+    set_xy(&x, &y); // Should warn on x
+    /*@ check security_status(x) == private; */
+  }
+  /*@ check security_status(x) == private; */
+  /*@ check security_status(y) == private; */
+
+  set_xy(&x, &y);
+  /*@ check security_status(x) == public; */
+}
+
+void direct_interference_array(void) {
+  int __fc_public array[5];
+
+  //@ loop unroll 5;
+  for (int i = 0; i < 5; i++)
+    if (i % 2 == 0) {
+      array[i] = secret;
+    }
+
+  //@ check security_status(array) == private;
+  //@ check security_status(array[0]) == private;
+  //@ check security_status(array[1]) == public;
+  //@ check security_status(array[2]) == private;
+  //@ check security_status(array[3]) == public;
+  //@ check security_status(array[4]) == private;
 }
 
 struct pair {
-  int a;
+  int a[5];
   double b;
 };
 
@@ -44,185 +192,41 @@ struct nested {
   struct pair p;
 };
 
-void f3(void) {
-  struct nested s = {0, {1, 2.0}};
-  struct nested t = {3, {4, 5.0}};
+void indirect_interference_struct(void) {
+  struct nested s = {0, {{0, 1, 2}, 2.0}};
+  struct nested t = {3, {{4}, 5.0}};
   struct nested u;
-  struct nested __attribute__((public)) v;
+  struct nested __fc_public v;
 
-  /*@ check !\tainted(private:s.n); */
-  /*@ check !\tainted(private:s.p.a); */
-  /*@ check !\tainted(private:s.p.b); */
-  /*@ check !\tainted(private:t.n); */
-  /*@ check !\tainted(private:t.p.a); */
-  /*@ check !\tainted(private:t.p.b); */
-  if (secret) {
+  //@ check security_status(s.n) == public;
+  //@ check security_status(s.p.a) == public;
+  //@ check security_status(s.p.b) == public;
+  //@ check security_status(t.n) == public;
+  //@ check security_status(t.p.a) == public;
+  //@ check security_status(t.p.b) == public;
+  if (secret) { // Should warn on condition
     u = s;
   } else {
     u = t;
   }
-  /*@ check \tainted(private:u.n); */
-  /*@ check \tainted(private:u.p.a); */
-  /*@ check \tainted(private:u.p.b); */
+  //@ check security_status(u.n) == private;
+  //@ check security_status(u.p.a) == private;
+  //@ check security_status(u.p.b) == private;
 
-  v = u;
-  /*@ check \tainted(private:v); */
+  v = u; // Should warn
+  //@ check security_status(v) == private;
+  v.n = 0;
+  v.p.a[2] = v.p.a[3] = 0;
+  //@ check security_status(v.n) == public;
+  //@ check security_status(v.p.a) == private;
+  //@ check security_status(v.p.a[2]) == public;
+  //@ check security_status(v.p.a[3]) == public;
 }
 
-extern int user_input;
-int __attribute__((public)) x, y, z;
-
-void f4(void) {
-  int* p;
-
-  if (user_input == secret) {
-    y = 1;
-    /*@ check \tainted(private:y); */
-    p = &y;
-  } else {
-    z = 1;
-    /*@ check \tainted(private:z); */
-    p = &z;
-  }
-  x = 1;
-  /*@ check !\tainted(private:x); */
-  /*@ check \tainted(private:y); */
-  /*@ check \tainted(private:z); */
-
-  *p = 1;
-  /*@ check \tainted(private:p); */
-  /*@ check \tainted(private:*p); */
-}
-
-struct foo {
-  int x;
-  int y;
-};
-
-/*@ requires \valid(p);
-    assigns p->x;
- */
-void write_x(struct foo* p, int a) { p->x = a; }
-
-/*@ requires \valid(p);
-    assigns p->y;
- */
-void write_y(struct foo* p, int b) { p->y = b; }
-
-void f5(void) {
-  struct foo __attribute__((public)) s = {1, 2};
-  /*@ check !\tainted(private:s.x); */
-  /*@ check !\tainted(private:s.x); */
-
-  if (secret) {
-    write_x(&s, 3);
-  } else {
-    write_y(&s, 4);
-  }
-  /*@ check \tainted(private:s.x); */
-  /*@ check \tainted(private:s.y); */
-  /*@ check !\tainted_directly(private:s.x); */
-  /*@ check !\tainted_directly(private:s.y); */
-
-  s.x = 0;
-  /*@ check !\tainted(private:s.x); */
-  if (secret) {
-    /*@ assigns s.x; */
-    s.x = 1;
-  } else {
-    /*@ assigns \nothing; */
-    __asm__("nop");
-  }
-  /*@ check \tainted(private:s.x); */
-}
-
-int z, w;
-
-void write_z(int z_arg) { z = z_arg; }
-
-void write_w(int w_arg) { w = w_arg; }
-
-struct func_descriptor {
-  void (*f)(int);
-};
-
-struct func_descriptor funcs[] = {{write_z}, {write_w}};
-
-void f6(void) {
-  funcs[0].f(secret);  // write z
-  funcs[1].f(42);      // write w
-
-  /*@ check \tainted(private:z); */
-  /*@ check !\tainted(private:w); */
-
-  z = w = 0;
-
-  void (*p)(int) = write_z;
-  void (*q)(int) = write_w;
-
-  p(secret);  // write z
-  q(42);      // write w
-
-  /*@ check \tainted(private:z); */
-  /*@ check !\tainted(private:w); */
-}
-
-int array[512];
-
-void f7(void) {
-  int __attribute__((public)) x, y, z;
-  int* ptr_array[2] = {&x, &y};
-  int* q;
-
-  /*@ assert security_status(x) == public; */
-  /*@ assert security_status(y) == public; */
-  /*@ assert security_status(ptr_array) == public; */
-
-  int secret_idx = !!secret;
-  /*@ assert security_status(secret_idx) == private; */
-  *ptr_array[secret_idx] = 2;
-  /*@ assert security_status(*ptr_array[secret_idx]) == private; */
-  /*@ assert security_status(x) == private; */
-  /*@ assert security_status(y) == private; */
-
-  /* We can make both x and y public again. */
-  x = 0;
-  y = 0;
-  /*@ assert security_status(x) == public; */
-  /*@ assert security_status(y) == public; */
-  /*@ assert security_status(ptr_array) == public; */
-  z = *ptr_array[secret_idx];
-  /*@ assert security_status(z) == private; */
-  /*@ assert security_status(x) == public; */
-  /*@ assert security_status(y) == public; */
-
-  /*@ assert public == security_status(array); */
-  array[secret] = 1;
-  /*@ assert security_status(array) == private; */
-  /*@ assert security_status(array[0]) == private; */
-  array[array[secret]] = 1;
-  /*@ assert security_status(array) == private; */
-  /*@ assert security_status(array[0]) == private; */
-
-  int* p = &array[0];
-  *(p + array[secret]) = 1;
-  /*@ assert security_status(*p) == private; */
-}
-
-extern unsigned int non_secret;
-
-unsigned int add(unsigned int x, unsigned int y) { return x + y; }
-
-void f8(void) {
-  unsigned int sum = add(secret, non_secret);
-  /*@ assert private == security_status(sum) ||
-             public ==  security_status(sum); */
-}
-
-void f9(void) {
-  int x = user_input;
+void interference_on_private_only(void) {
+  int x = 0, y = 0;
   //@ taint toto:x;
-  int __attribute__((public)) result1, result2;
+  int __fc_public result1, result2;
 
   result1 = x;
   //@ check security_status(result1) == public;
@@ -231,20 +235,23 @@ void f9(void) {
   if (result1)
     result2 = x;
   else
-    result2 = user_input;
+    result2 = y;
   //@ check security_status(result2) == public;
   //@ assert security_status(result2) == public;
 }
 
 int main(void) {
-  f1();
-  f2();
-  f3();
-  f4();
-  f5();
-  f6();
-  f7();
-  f8();
-  f9();
+  annot();
+  direct_interference();
+  indirect_interference();
+  public_after_sanitize();
+  annot_contract();
+  direct_interference_from_assigns();
+  indirect_interference_goto();
+  indirect_interference_ptr_array();
+  indirect_interference_fun_call();
+  direct_interference_array();
+  indirect_interference_struct();
+  interference_on_private_only();
   return 0;
 }

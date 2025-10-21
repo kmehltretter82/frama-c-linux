@@ -1,14 +1,18 @@
 2d1
 < [eva:experimental] Warning: The taint domain is experimental.
-136,137c135,142
-< [eva] secureflow.c:163: Reusing old results for call to write_z
-< [eva] secureflow.c:164: Reusing old results for call to write_w
+129c128,132
+< [eva] secureflow.c:141: Reusing old results for call to set_y
 ---
-> [eva] computing for function write_z <- f6 <- main.
->   Called from secureflow.c:163.
-> [eva] Recording results for write_z
-> [eva] Done for function write_z
-> [eva] computing for function write_w <- f6 <- main.
->   Called from secureflow.c:164.
-> [eva] Recording results for write_w
-> [eva] Done for function write_w
+> [eva] computing for function set_y <- set_xy <- indirect_interference_fun_call <- 
+>                           main.
+>   Called from secureflow.c:141.
+> [eva] Recording results for set_y
+> [eva] Done for function set_y
+137c140,144
+< [eva] secureflow.c:141: Reusing old results for call to set_y
+---
+> [eva] computing for function set_y <- set_xy <- indirect_interference_fun_call <- 
+>                           main.
+>   Called from secureflow.c:141.
+> [eva] Recording results for set_y
+> [eva] Done for function set_y

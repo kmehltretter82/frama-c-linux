@@ -5,401 +5,402 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   secret ∈ [--..--]
-  extern_data[0..4] ∈ [--..--]
-  global_key[0..4] ∈ {0}
-  user_input ∈ [--..--]
-  x ∈ {0}
-  y ∈ {0}
-  z ∈ {0}
-  w ∈ {0}
-  funcs[0].f ∈ {{ &write_z }}
-       [1].f ∈ {{ &write_w }}
-  array[0..511] ∈ {0}
-  non_secret ∈ [--..--]
-[eva] computing for function f1 <- main.
-  Called from secureflow.c:240.
-[eva:secure-flow:direct] secureflow.c:16: Warning: 
-  direct non-interference violation on {global_key[0]}
-[eva:partition] secureflow.c:15: starting to merge loop iterations
-[eva:secure-flow:direct] secureflow.c:16: Warning: 
-  direct non-interference violation on {global_key[0..1]}
-[eva:secure-flow:direct] secureflow.c:16: Warning: 
-  direct non-interference violation on {global_key[0..2]}
-[eva:secure-flow:direct] secureflow.c:16: Warning: 
-  direct non-interference violation on {global_key[0..4]}
-[eva:alarm] secureflow.c:19: Warning: check got status unknown.
-[eva:alarm] secureflow.c:20: Warning: check got status unknown.
-[eva] Recording results for f1
-[eva] Done for function f1
-[eva] computing for function f2 <- main.
-  Called from secureflow.c:241.
-[eva:secure-flow:condition] secureflow.c:28: Warning: 
+[eva] computing for function annot <- main.
+  Called from secureflow.c:244.
+[eva:alarm] secureflow.c:15: Warning: check got status unknown.
+[eva] secureflow.c:16: check got status valid.
+[eva] secureflow.c:17: check got status valid.
+[eva] Recording results for annot
+[eva] Done for function annot
+[eva] computing for function direct_interference <- main.
+  Called from secureflow.c:245.
+[eva:secure-flow:direct] secureflow.c:26: Warning: 
+  direct non-interference violation on {non_secret}
+[eva] Recording results for direct_interference
+[eva] Done for function direct_interference
+[eva] computing for function indirect_interference <- main.
+  Called from secureflow.c:246.
+[eva:secure-flow:condition] secureflow.c:38: Warning: 
   non-interference violation on condition involving {secret}
-[eva] secureflow.c:29: check got status valid.
-[eva] secureflow.c:30: check got status valid.
-[eva:alarm] secureflow.c:31: Warning: check got status unknown.
-[eva] computing for function assigns_from <- f2 <- main.
-  Called from secureflow.c:33.
+[eva:secure-flow:indirect] secureflow.c:39: Warning: 
+  indirect non-interference violation on {non_secret}
+[eva] Recording results for indirect_interference
+[eva] Done for function indirect_interference
+[eva] computing for function public_after_sanitize <- main.
+  Called from secureflow.c:247.
+[eva:alarm] secureflow.c:51: Warning: check got status unknown.
+[eva] computing for function sanitize <- public_after_sanitize <- main.
+  Called from secureflow.c:52.
+[eva] using specification for function sanitize
+[eva] Done for function sanitize
+[eva] secureflow.c:53: check got status valid.
+[eva] Recording results for public_after_sanitize
+[eva] Done for function public_after_sanitize
+[eva] computing for function annot_contract <- main.
+  Called from secureflow.c:248.
+[eva] computing for function add <- annot_contract <- main.
+  Called from secureflow.c:70.
+[eva:alarm] secureflow.c:70: Warning: 
+  function add: precondition got status unknown.
+[eva:alarm] secureflow.c:61: Warning: check got status unknown.
+[eva] secureflow.c:62: check got status valid.
+[eva:alarm] secureflow.c:64: Warning: check got status unknown.
+[eva] Recording results for add
+[eva] Done for function add
+[eva:alarm] secureflow.c:71: Warning: check got status unknown.
+[eva] Recording results for annot_contract
+[eva] Done for function annot_contract
+[eva] computing for function direct_interference_from_assigns <- main.
+  Called from secureflow.c:249.
+[eva:secure-flow:condition] secureflow.c:81: Warning: 
+  non-interference violation on condition involving {secret}
+[eva] secureflow.c:82: check got status valid.
+[eva] secureflow.c:83: check got status valid.
+[eva:alarm] secureflow.c:84: Warning: check got status unknown.
+[eva] computing for function assigns_from <- direct_interference_from_assigns <- 
+                          main.
+  Called from secureflow.c:86.
 [eva] using specification for function assigns_from
-[eva:garbled-mix:assigns] secureflow.c:33: 
+[eva:garbled-mix:assigns] secureflow.c:86: 
   The specification of function assigns_from
   has generated a garbled mix of addresses for assigns clause \result.
 [eva] Done for function assigns_from
-[eva:secure-flow:direct] secureflow.c:33: Warning: 
+[eva:secure-flow:direct] secureflow.c:86: Warning: 
   direct non-interference violation on {v}
-[eva:alarm] secureflow.c:34: Warning: check got status unknown.
-[eva] Recording results for f2
-[eva] Done for function f2
-[eva] computing for function f3 <- main.
-  Called from secureflow.c:242.
-[eva] secureflow.c:53: check got status valid.
-[eva] secureflow.c:54: check got status valid.
-[eva] secureflow.c:55: check got status valid.
-[eva] secureflow.c:56: check got status valid.
-[eva] secureflow.c:57: check got status valid.
-[eva] secureflow.c:58: check got status valid.
-[eva:secure-flow:condition] secureflow.c:59: Warning: 
+[eva:alarm] secureflow.c:87: Warning: check got status unknown.
+[eva] Recording results for direct_interference_from_assigns
+[eva] Done for function direct_interference_from_assigns
+[eva] computing for function indirect_interference_goto <- main.
+  Called from secureflow.c:250.
+[eva:secure-flow:condition] secureflow.c:94: Warning: 
   non-interference violation on condition involving {secret}
-[eva:alarm] secureflow.c:64: Warning: check got status unknown.
-[eva:alarm] secureflow.c:65: Warning: check got status unknown.
-[eva:alarm] secureflow.c:66: Warning: check got status unknown.
-[eva:secure-flow:indirect] secureflow.c:68: Warning: 
-  indirect non-interference violation on {v}
-[eva:alarm] secureflow.c:69: Warning: check got status unknown.
-[eva] Recording results for f3
-[eva] Done for function f3
-[eva] computing for function f4 <- main.
-  Called from secureflow.c:243.
-[eva:secure-flow:condition] secureflow.c:78: Warning: 
-  non-interference violation on condition involving {secret; user_input}
-[eva:secure-flow:indirect] secureflow.c:79: Warning: 
-  indirect non-interference violation on {y}
-[eva:alarm] secureflow.c:80: Warning: check got status unknown.
-[eva:secure-flow:indirect] secureflow.c:83: Warning: 
-  indirect non-interference violation on {z}
-[eva:alarm] secureflow.c:84: Warning: check got status unknown.
-[eva] secureflow.c:88: check got status valid.
-[eva:alarm] secureflow.c:89: Warning: check got status unknown.
-[eva:alarm] secureflow.c:90: Warning: check got status unknown.
-[eva:secure-flow:indirect] secureflow.c:92: Warning: 
-  indirect non-interference violation on {y; z}
-[eva:alarm] secureflow.c:93: Warning: check got status unknown.
-[eva:alarm] secureflow.c:94: Warning: check got status unknown.
-[eva] Recording results for f4
-[eva] Done for function f4
-[eva] computing for function f5 <- main.
-  Called from secureflow.c:244.
+[eva:secure-flow:indirect] secureflow.c:95: Warning: 
+  indirect non-interference violation on {x}
+[eva] secureflow.c:103: check got status valid.
+[eva] secureflow.c:104: check got status valid.
+[eva:alarm] secureflow.c:105: Warning: check got status unknown.
+[eva] Recording results for indirect_interference_goto
+[eva] Done for function indirect_interference_goto
+[eva] computing for function indirect_interference_ptr_array <- main.
+  Called from secureflow.c:251.
+[eva] secureflow.c:113: check got status valid.
 [eva] secureflow.c:114: check got status valid.
 [eva] secureflow.c:115: check got status valid.
-[eva:secure-flow:condition] secureflow.c:117: Warning: 
-  non-interference violation on condition involving {secret}
-[eva] computing for function write_x <- f5 <- main.
-  Called from secureflow.c:118.
-[eva] secureflow.c:118: function write_x: precondition got status valid.
-[eva:secure-flow:indirect] secureflow.c:105: Warning: 
-  indirect non-interference violation on {s.x}
-[eva] Recording results for write_x
-[eva] Done for function write_x
-[eva] computing for function write_y <- f5 <- main.
-  Called from secureflow.c:120.
-[eva] secureflow.c:120: function write_y: precondition got status valid.
-[eva:secure-flow:indirect] secureflow.c:110: Warning: 
-  indirect non-interference violation on {s.y}
-[eva] Recording results for write_y
-[eva] Done for function write_y
+[eva:alarm] secureflow.c:118: Warning: check got status unknown.
+[eva:secure-flow:indirect] secureflow.c:119: Warning: 
+  indirect non-interference violation on {x; y}
+[eva:alarm] secureflow.c:120: Warning: check got status unknown.
+[eva:alarm] secureflow.c:121: Warning: check got status unknown.
 [eva:alarm] secureflow.c:122: Warning: check got status unknown.
-[eva:alarm] secureflow.c:123: Warning: check got status unknown.
-[eva] secureflow.c:124: check got status valid.
-[eva] secureflow.c:125: check got status valid.
+[eva] secureflow.c:127: check got status valid.
 [eva] secureflow.c:128: check got status valid.
-[eva:secure-flow:condition] secureflow.c:129: Warning: 
-  non-interference violation on condition involving {secret}
-[eva:secure-flow:indirect] secureflow.c:131: Warning: 
-  indirect non-interference violation on {s.x}
-[eva:alarm] secureflow.c:136: Warning: check got status unknown.
-[eva] Recording results for f5
-[eva] Done for function f5
-[eva] computing for function f6 <- main.
-  Called from secureflow.c:245.
-[eva] computing for function write_z <- f6 <- main.
-  Called from secureflow.c:152.
-[eva:secure-flow:direct] secureflow.c:141: Warning: 
+[eva] secureflow.c:129: check got status valid.
+[eva:secure-flow:direct] secureflow.c:130: Warning: 
   direct non-interference violation on {z}
-[eva] Recording results for write_z
-[eva] Done for function write_z
-[eva] computing for function write_w <- f6 <- main.
-  Called from secureflow.c:153.
-[eva] Recording results for write_w
-[eva] Done for function write_w
-[eva:alarm] secureflow.c:155: Warning: check got status unknown.
+[eva:alarm] secureflow.c:131: Warning: check got status unknown.
+[eva] secureflow.c:132: check got status valid.
+[eva] secureflow.c:133: check got status valid.
+[eva] Recording results for indirect_interference_ptr_array
+[eva] Done for function indirect_interference_ptr_array
+[eva] computing for function indirect_interference_fun_call <- main.
+  Called from secureflow.c:252.
+[eva] secureflow.c:149: check got status valid.
+[eva] secureflow.c:150: check got status valid.
+[eva] computing for function set_xy <- indirect_interference_fun_call <- main.
+  Called from secureflow.c:151.
+[eva:secure-flow:condition] secureflow.c:140: Warning: 
+  non-interference violation on condition involving {secret}
+[eva] computing for function set_y <- set_xy <- indirect_interference_fun_call <- 
+                          main.
+  Called from secureflow.c:141.
+[eva] Recording results for set_y
+[eva] Done for function set_y
+[eva] Recording results for set_xy
+[eva] Done for function set_xy
+[eva] secureflow.c:152: check got status valid.
+[eva:alarm] secureflow.c:153: Warning: check got status unknown.
 [eva] secureflow.c:156: check got status valid.
-[eva] secureflow.c:163: Reusing old results for call to write_z
-[eva] secureflow.c:164: Reusing old results for call to write_w
-[eva:alarm] secureflow.c:166: Warning: check got status unknown.
-[eva] secureflow.c:167: check got status valid.
-[eva] Recording results for f6
-[eva] Done for function f6
-[eva] computing for function f7 <- main.
-  Called from secureflow.c:246.
-[eva] secureflow.c:177: assertion got status valid.
-[eva] secureflow.c:178: assertion got status valid.
-[eva] secureflow.c:179: assertion got status valid.
-[eva:alarm] secureflow.c:182: Warning: assertion got status unknown.
-[eva:secure-flow:indirect] secureflow.c:183: Warning: 
-  indirect non-interference violation on {x_0; y_0}
-[eva:alarm] secureflow.c:184: Warning: assertion got status unknown.
-[eva:alarm] secureflow.c:185: Warning: assertion got status unknown.
-[eva:alarm] secureflow.c:186: Warning: assertion got status unknown.
-[eva] secureflow.c:191: assertion got status valid.
-[eva] secureflow.c:192: assertion got status valid.
-[eva] secureflow.c:193: assertion got status valid.
-[eva:secure-flow:direct] secureflow.c:194: Warning: 
-  direct non-interference violation on {z_0}
-[eva:secure-flow:indirect] secureflow.c:194: Warning: 
-  indirect non-interference violation on {z_0}
-[eva:alarm] secureflow.c:195: Warning: assertion got status unknown.
-[eva] secureflow.c:196: assertion got status valid.
-[eva] secureflow.c:197: assertion got status valid.
-[eva] secureflow.c:199: assertion got status valid.
-[eva:alarm] secureflow.c:200: Warning: 
-  accessing out of bounds index. assert 0 ≤ secret;
-[eva:alarm] secureflow.c:200: Warning: 
-  accessing out of bounds index. assert secret < 512;
-[eva:alarm] secureflow.c:201: Warning: assertion got status unknown.
-[eva:alarm] secureflow.c:202: Warning: assertion got status unknown.
-[eva:alarm] secureflow.c:204: Warning: assertion got status unknown.
-[eva:alarm] secureflow.c:205: Warning: assertion got status unknown.
-[eva:alarm] secureflow.c:209: Warning: assertion got status unknown.
-[eva] Recording results for f7
-[eva] Done for function f7
-[eva] computing for function f8 <- main.
-  Called from secureflow.c:247.
-[eva] computing for function add <- f8 <- main.
-  Called from secureflow.c:217.
-[eva] Recording results for add
-[eva] Done for function add
-[eva:alarm] secureflow.c:218: Warning: assertion got status unknown.
-[eva] Recording results for f8
-[eva] Done for function f8
-[eva] computing for function f9 <- main.
-  Called from secureflow.c:248.
-[eva] secureflow.c:228: check got status valid.
-[eva] secureflow.c:229: assertion got status valid.
-[eva] secureflow.c:235: check got status valid.
-[eva] secureflow.c:236: assertion got status valid.
-[eva] Recording results for f9
-[eva] Done for function f9
+[eva:secure-flow:condition] secureflow.c:157: Warning: 
+  non-interference violation on condition involving {secret}
+[eva] computing for function set_xy <- indirect_interference_fun_call <- main.
+  Called from secureflow.c:158.
+[eva:secure-flow:indirect] secureflow.c:139: Warning: 
+  indirect non-interference violation on {x}
+[eva] secureflow.c:141: Reusing old results for call to set_y
+[eva] Recording results for set_xy
+[eva] Done for function set_xy
+[eva:alarm] secureflow.c:159: Warning: check got status unknown.
+[eva:alarm] secureflow.c:161: Warning: check got status unknown.
+[eva:alarm] secureflow.c:162: Warning: check got status unknown.
+[eva] computing for function set_xy <- indirect_interference_fun_call <- main.
+  Called from secureflow.c:164.
+[eva] secureflow.c:141: Reusing old results for call to set_y
+[eva] Recording results for set_xy
+[eva] Done for function set_xy
+[eva] secureflow.c:165: check got status valid.
+[eva] Recording results for indirect_interference_fun_call
+[eva] Done for function indirect_interference_fun_call
+[eva] computing for function direct_interference_array <- main.
+  Called from secureflow.c:253.
+[eva:secure-flow:direct] secureflow.c:174: Warning: 
+  direct non-interference violation on {array[0]}
+[eva:secure-flow:direct] secureflow.c:174: Warning: 
+  direct non-interference violation on {array[2]}
+[eva:secure-flow:direct] secureflow.c:174: Warning: 
+  direct non-interference violation on {array[4]}
+[eva:alarm] secureflow.c:177: Warning: check got status unknown.
+[eva:alarm] secureflow.c:178: Warning: check got status unknown.
+[eva] secureflow.c:179: check got status valid.
+[eva:alarm] secureflow.c:180: Warning: check got status unknown.
+[eva] secureflow.c:181: check got status valid.
+[eva:alarm] secureflow.c:182: Warning: check got status unknown.
+[eva] Recording results for direct_interference_array
+[eva] Done for function direct_interference_array
+[eva] computing for function indirect_interference_struct <- main.
+  Called from secureflow.c:254.
+[eva] secureflow.c:201: check got status valid.
+[eva] secureflow.c:202: check got status valid.
+[eva] secureflow.c:203: check got status valid.
+[eva] secureflow.c:204: check got status valid.
+[eva] secureflow.c:205: check got status valid.
+[eva] secureflow.c:206: check got status valid.
+[eva:secure-flow:condition] secureflow.c:207: Warning: 
+  non-interference violation on condition involving {secret}
+[eva:alarm] secureflow.c:212: Warning: check got status unknown.
+[eva:alarm] secureflow.c:213: Warning: check got status unknown.
+[eva:alarm] secureflow.c:214: Warning: check got status unknown.
+[eva:secure-flow:indirect] secureflow.c:216: Warning: 
+  indirect non-interference violation on {v}
+[eva:alarm] secureflow.c:217: Warning: check got status unknown.
+[eva] secureflow.c:220: check got status valid.
+[eva:alarm] secureflow.c:221: Warning: check got status unknown.
+[eva] secureflow.c:222: check got status valid.
+[eva] secureflow.c:223: check got status valid.
+[eva] Recording results for indirect_interference_struct
+[eva] Done for function indirect_interference_struct
+[eva] computing for function interference_on_private_only <- main.
+  Called from secureflow.c:255.
+[eva] secureflow.c:232: check got status valid.
+[eva] secureflow.c:233: assertion got status valid.
+[eva] secureflow.c:239: check got status valid.
+[eva] secureflow.c:240: assertion got status valid.
+[eva] Recording results for interference_on_private_only
+[eva] Done for function interference_on_private_only
 [eva] Recording results for main
 [eva] Done for function main
-[scope:rm_asserts] removing 3 assertion(s)
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function add:
-  __retres ∈ [--..--]
-[eva:final-states] Values at end of function f1:
-  global_key[0..4] ∈ [--..--]
-  local_key[0..4] ∈ [--..--]
-[eva:final-states] Values at end of function f2:
+  result ∈ [--..--]
+[eva:final-states] Values at end of function annot:
+  
+[eva:final-states] Values at end of function annot_contract:
+  non_classified ∈ {1}
+  r ∈ [--..--]
+[eva:final-states] Values at end of function direct_interference:
+  non_secret ∈ [--..--]
+  non_classified ∈ [--..--]
+[eva:final-states] Values at end of function direct_interference_array:
+  array[0] ∈ [--..--]
+       [1] ∈ UNINITIALIZED
+       [2] ∈ [--..--]
+       [3] ∈ UNINITIALIZED
+       [4] ∈ [--..--]
+[eva:final-states] Values at end of function direct_interference_from_assigns:
   zero ∈ {0}
   one ∈ {1}
   ptr ∈ {{ &zero ; &one }}
   v ∈
    {{ garbled mix of &{zero; one}
-    (origin: Library function {secureflow.c:33}) }}
-[eva:final-states] Values at end of function f3:
-  s.n ∈ {0}
-   .p.a ∈ {1}
+    (origin: Library function {secureflow.c:86}) }}
+[eva:final-states] Values at end of function indirect_interference:
+  non_secret ∈ {1} or UNINITIALIZED
+  non_classified ∈ {1} or UNINITIALIZED
+[eva:final-states] Values at end of function indirect_interference_goto:
+  x ∈ {1} or UNINITIALIZED
+  y ∈ {0}
+  z ∈ {1}
+[eva:final-states] Values at end of function indirect_interference_ptr_array:
+  x ∈ {0}
+  y ∈ {0}
+  z ∈ {0}
+  ptr_array[0] ∈ {{ &x }}
+           [1] ∈ {{ &y }}
+  secret_idx ∈ {0; 1}
+[eva:final-states] Values at end of function indirect_interference_struct:
+  s{.n; .p.a[0]} ∈ {0}
+   .p.a[1] ∈ {1}
+   .p.a[2] ∈ {2}
+   .p.a[3..4] ∈ {0}
    .p.b ∈ {2.}
   t.n ∈ {3}
-   .p.a ∈ {4}
+   .p.a[0] ∈ {4}
+   .p.a[1..4] ∈ {0}
    .p.b ∈ {5.}
   u.n ∈ {0; 3}
-   .p.a ∈ {1; 4}
+   .p.a[0] ∈ {0; 4}
+   .p.a[1] ∈ {0; 1}
+   .p.a[2] ∈ {0; 2}
+   .p.a[3..4] ∈ {0}
    .p.b ∈ [2. .. 5.]
-  v.n ∈ {0; 3}
-   .p.a ∈ {1; 4}
+  v.n ∈ {0}
+   .p.a[0] ∈ {0; 4}
+   .p.a[1] ∈ {0; 1}
+   .p.a[2..4] ∈ {0}
    .p.b ∈ [2. .. 5.]
-[eva:final-states] Values at end of function f4:
+[eva:final-states] Values at end of function interference_on_private_only:
+  x ∈ {0}
+  y ∈ {0}
+  result1 ∈ {0}
+  result2 ∈ {0}
+[eva:final-states] Values at end of function public_after_sanitize:
+  non_classified ∈ [--..--]
+[eva:final-states] Values at end of function set_y:
+  y ∈ {1}
+[eva:final-states] Values at end of function set_xy:
+  x ∈ {1}
+  y ∈ {0; 1} or UNINITIALIZED
+[eva:final-states] Values at end of function indirect_interference_fun_call:
   x ∈ {1}
   y ∈ {0; 1}
-  z ∈ {0; 1}
-  p ∈ {{ &y ; &z }}
-[eva:final-states] Values at end of function f7:
-  array[0..511] ∈ {0; 1}
-  x_0 ∈ {0}
-  y_0 ∈ {0}
-  z_0 ∈ {0}
-  ptr_array[0] ∈ {{ &x_0 }}
-           [1] ∈ {{ &y_0 }}
-  secret_idx ∈ {0; 1}
-  p ∈ {{ &array[0] }}
-[eva:final-states] Values at end of function f8:
-  sum ∈ [--..--]
-[eva:final-states] Values at end of function f9:
-  x_0 ∈ [--..--]
-  result1 ∈ [--..--]
-  result2 ∈ [--..--]
-[eva:final-states] Values at end of function write_w:
-  w ∈ {42}
-[eva:final-states] Values at end of function write_x:
-  s.x ∈ {3}
-   .y ∈ {2}
-[eva:final-states] Values at end of function write_y:
-  s.x ∈ {1}
-   .y ∈ {4}
-[eva:final-states] Values at end of function f5:
-  s.x ∈ {0; 1}
-   .y ∈ {2; 4}
-[eva:final-states] Values at end of function write_z:
-  z ∈ [--..--]
-[eva:final-states] Values at end of function f6:
-  z ∈ [--..--]
-  w ∈ {42}
-  p ∈ {{ &write_z }}
-  q ∈ {{ &write_w }}
 [eva:final-states] Values at end of function main:
-  global_key[0..4] ∈ [--..--]
-  x ∈ {1}
-  y ∈ {0; 1}
-  z ∈ [--..--]
-  w ∈ {42}
-  array[0..511] ∈ {0; 1}
   __retres ∈ {0}
 [from] Computing for function add
 [from] Done for function add
-[from] Computing for function f1
-[from] Done for function f1
-[from] Computing for function f2
-[from] Computing for function assigns_from <-f2
+[from] Computing for function annot
+[from] Done for function annot
+[from] Computing for function annot_contract
+[from] Done for function annot_contract
+[from] Computing for function direct_interference
+[from] Done for function direct_interference
+[from] Computing for function direct_interference_array
+[from] Done for function direct_interference_array
+[from] Computing for function direct_interference_from_assigns
+[from] Computing for function assigns_from <-direct_interference_from_assigns
 [from] Done for function assigns_from
-[from] Done for function f2
-[from] Computing for function f3
-[from] Done for function f3
-[from] Computing for function f4
-[from] Done for function f4
-[from] Computing for function f7
-[from] Done for function f7
-[from] Computing for function f8
-[from] Done for function f8
-[from] Computing for function f9
-[from] Done for function f9
-[from] Computing for function write_w
-[from] Done for function write_w
-[from] Computing for function write_x
-[from] Done for function write_x
-[from] Computing for function write_y
-[from] Done for function write_y
-[from] Computing for function f5
-[from] Done for function f5
-[from] Computing for function write_z
-[from] Done for function write_z
-[from] Computing for function f6
-[from] Done for function f6
+[from] Done for function direct_interference_from_assigns
+[from] Computing for function indirect_interference
+[from] Done for function indirect_interference
+[from] Computing for function indirect_interference_goto
+[from] Done for function indirect_interference_goto
+[from] Computing for function indirect_interference_ptr_array
+[from] Done for function indirect_interference_ptr_array
+[from] Computing for function indirect_interference_struct
+[from] Done for function indirect_interference_struct
+[from] Computing for function interference_on_private_only
+[from] Done for function interference_on_private_only
+[from] Computing for function public_after_sanitize
+[from] Computing for function sanitize <-public_after_sanitize
+[from] Done for function sanitize
+[from] Done for function public_after_sanitize
+[from] Computing for function set_y
+[from] Done for function set_y
+[from] Computing for function set_xy
+[from] Done for function set_xy
+[from] Computing for function indirect_interference_fun_call
+[from] Done for function indirect_interference_fun_call
 [from] Computing for function main
 [from] Done for function main
 [from] ====== DEPENDENCIES COMPUTED ======
   These dependencies hold at termination for the executions that terminate:
 [from] Function add:
-  \result FROM x_0; y_0
+  \result FROM x; y
+[from] Function annot:
+  NO EFFECTS
+[from] Function annot_contract:
+  NO EFFECTS
 [from] Function assigns_from:
   \result FROM x; zero; one
-[from] Function f1:
-  global_key[0..4] FROM extern_data[0..4] (and SELF)
-[from] Function f2:
+[from] Function direct_interference:
   NO EFFECTS
-[from] Function f3:
+[from] Function direct_interference_array:
   NO EFFECTS
-[from] Function f4:
-  x FROM \nothing
-  y FROM secret; user_input (and SELF)
-  z FROM secret; user_input (and SELF)
-[from] Function f7:
-  array[0..1] FROM secret; array[0..511] (and SELF)
-       [2..511] FROM secret (and SELF)
-[from] Function f8:
+[from] Function direct_interference_from_assigns:
   NO EFFECTS
-[from] Function f9:
+[from] Function indirect_interference:
   NO EFFECTS
-[from] Function write_w:
-  w FROM w_arg
-[from] Function write_x:
-  s.x FROM p; a
-[from] Function write_y:
-  s.y FROM p; b
-[from] Function f5:
+[from] Function indirect_interference_goto:
   NO EFFECTS
-[from] Function write_z:
-  z FROM z_arg
-[from] Function f6:
-  z FROM secret
-  w FROM \nothing
+[from] Function indirect_interference_ptr_array:
+  NO EFFECTS
+[from] Function indirect_interference_struct:
+  NO EFFECTS
+[from] Function interference_on_private_only:
+  NO EFFECTS
+[from] Function sanitize:
+  non_classified FROM non_classified (and SELF)
+[from] Function public_after_sanitize:
+  NO EFFECTS
+[from] Function set_y:
+  y FROM y
+[from] Function set_xy:
+  x FROM x
+  y FROM secret; y (and SELF)
+[from] Function indirect_interference_fun_call:
+  NO EFFECTS
 [from] Function main:
-  global_key[0..4] FROM extern_data[0..4] (and SELF)
-  x FROM \nothing
-  y FROM secret; user_input (and SELF)
-  z FROM secret
-  w FROM \nothing
-  array[0..1] FROM secret; array[0..511] (and SELF)
-       [2..511] FROM secret (and SELF)
   \result FROM \nothing
 [from] ====== END OF DEPENDENCIES ======
 [inout] Out (internal) for function add:
-    __retres
+    result
 [inout] Inputs for function add:
     \nothing
-[inout] Out (internal) for function f1:
-    global_key[0..4]; local_key[0..4]; i
-[inout] Inputs for function f1:
-    extern_data[0..4]
-[inout] Out (internal) for function f2:
+[inout] Out (internal) for function annot:
+    \nothing
+[inout] Inputs for function annot:
+    \nothing
+[inout] Out (internal) for function annot_contract:
+    non_classified; r; tmp
+[inout] Inputs for function annot_contract:
+    secret
+[inout] Out (internal) for function direct_interference:
+    non_secret; non_classified
+[inout] Inputs for function direct_interference:
+    secret
+[inout] Out (internal) for function direct_interference_array:
+    array{[0]; [2]; [4]}; i
+[inout] Inputs for function direct_interference_array:
+    secret
+[inout] Out (internal) for function direct_interference_from_assigns:
     zero; one; ptr; tmp; v
-[inout] Inputs for function f2:
+[inout] Inputs for function direct_interference_from_assigns:
     secret
-[inout] Out (internal) for function f3:
+[inout] Out (internal) for function indirect_interference:
+    non_secret; non_classified
+[inout] Inputs for function indirect_interference:
+    secret
+[inout] Out (internal) for function indirect_interference_goto:
+    x; y; z
+[inout] Inputs for function indirect_interference_goto:
+    secret
+[inout] Out (internal) for function indirect_interference_ptr_array:
+    x; y; z; ptr_array[0..1]; secret_idx
+[inout] Inputs for function indirect_interference_ptr_array:
+    secret
+[inout] Out (internal) for function indirect_interference_struct:
     s; t; u; v
-[inout] Inputs for function f3:
+[inout] Inputs for function indirect_interference_struct:
     secret
-[inout] Out (internal) for function f4:
-    x; y; z; p
-[inout] Inputs for function f4:
-    secret; user_input
-[inout] Out (internal) for function f7:
-    array[0..511]; x_0; y_0; z_0; ptr_array[0..1]; secret_idx; p
-[inout] Inputs for function f7:
-    secret; array[0..511]
-[inout] Out (internal) for function f8:
-    sum
-[inout] Inputs for function f8:
-    secret; non_secret
-[inout] Out (internal) for function f9:
-    x_0; result1; result2
-[inout] Inputs for function f9:
-    user_input
-[inout] Out (internal) for function write_w:
-    w
-[inout] Inputs for function write_w:
+[inout] Out (internal) for function interference_on_private_only:
+    x; y; result1; result2
+[inout] Inputs for function interference_on_private_only:
     \nothing
-[inout] Out (internal) for function write_x:
-    s.x
-[inout] Inputs for function write_x:
-    \nothing
-[inout] Out (internal) for function write_y:
-    s.y
-[inout] Inputs for function write_y:
-    \nothing
-[inout] Out (internal) for function f5:
-    s
-[inout] Inputs for function f5:
+[inout] Out (internal) for function public_after_sanitize:
+    non_classified
+[inout] Inputs for function public_after_sanitize:
     secret
-[inout] Out (internal) for function write_z:
-    z
-[inout] Inputs for function write_z:
+[inout] Out (internal) for function set_y:
+    y
+[inout] Inputs for function set_y:
     \nothing
-[inout] Out (internal) for function f6:
-    z; w; p; q
-[inout] Inputs for function f6:
-    secret; w; funcs[0..1]
+[inout] Out (internal) for function set_xy:
+    x; y
+[inout] Inputs for function set_xy:
+    secret
+[inout] Out (internal) for function indirect_interference_fun_call:
+    x; y
+[inout] Inputs for function indirect_interference_fun_call:
+    secret
 [inout] Out (internal) for function main:
-    global_key[0..4]; x; y; z; w; array[0..511]; __retres
+    __retres
 [inout] Inputs for function main:
-    secret; extern_data[0..4]; user_input; w; funcs[0..1]; array[0..511];
-    non_secret
+    secret
