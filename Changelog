@@ -25,8 +25,9 @@ Open Source Release 32.0 (Germanium)
 -*  Kernel    [2025-10-21] Fixes typing of arith operators where one operand
               is a set. Fixes ##2725
 -!  Kernel    [2025-10-16] Enable color and font styling on terminals 
+-!  Kernel    [2025-10-20] Enable color and font styling on terminals 
               supporting ANSI escape codes.
--   Alias     [2025-06-23] Recognise aliases created as side effect of function
+-   Alias     [2025-10-20] Recognise aliases created as side effect of function
 o!  Kernel    [2025-10-09] Create aliases for all internal libraries modules
               via `Fclib` module.
 o!  Kernel    [2025-10-06] Renamed the module FCHashtbl to Hashtbl, the old
