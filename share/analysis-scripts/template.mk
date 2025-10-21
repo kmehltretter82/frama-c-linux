@@ -41,10 +41,7 @@ FCFLAGS     += \
 EVAFLAGS    += \
   -eva-warn-key builtins:missing-spec=abort \
   -eva-warn-key libc:unsupported-spec=abort \
-  -eva-warn-key recursion=abort \
-
-# Note: if the code has recursive calls, manually review them, add assigns as
-# needed, and remove the line '-eva-warn-key recursion=abort' above
+  -eva-warn-key assigns:missing=abort \
 
 ## WP-specific flags
 WPFLAGS    += \
