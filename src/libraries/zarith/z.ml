@@ -41,8 +41,6 @@ let shift_right_logical x y = (* no meaning for negative value of x *)
 let is_zero v = equal v zero
 let is_one  v = equal v one
 
-let is_even v = is_zero (logand one v)
-
 let length u v = succ (sub v u)
 
 let round_down_to_zero v modu =

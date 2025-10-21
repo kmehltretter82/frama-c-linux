@@ -120,9 +120,6 @@ val is_zero : t -> bool
 (** Return [true] if the given argument is equal to {!one}. *)
 val is_one : t -> bool
 
-(** Return [true] if the given argument is even. *)
-val is_even : t -> bool
-
 (** Compute [b - a + 1]. *)
 val length : t -> t -> t
 
