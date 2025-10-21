@@ -9,8 +9,8 @@
 open Abstract_interp
 module Bottom = Lattice_bounds.Bottom
 
-(* This module uses Bigints everywhere. Set up some notations *)
-let pretty_int = Int.pretty
+(* This module uses Zarith everywhere. Set up some notations *)
+let pretty_int = Z.pretty
 let ( =~ ) = Z.equal
 let ( <>~ ) x y = not (Z.equal x y)
 let ( <~ ) = Z.lt
