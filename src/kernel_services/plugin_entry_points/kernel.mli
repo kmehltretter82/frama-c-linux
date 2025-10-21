@@ -183,6 +183,7 @@ val wkey_int_conversion: warn_category
 val wkey_merge_conversion: warn_category
 
 val wkey_alignof_bitfield: warn_category
+(** @since Frama-C+dev *)
 
 val wkey_initializer_overrides: warn_category
 
@@ -728,7 +729,9 @@ module InvalidPointer: Parameter_sig.Bool
 (** Behavior of option "-warn-invalid-pointer" *)
 
 module UnalignedPointer: Parameter_sig.Bool
-(** Behavior of option "-warn-unaligned-pointer" *)
+(** Behavior of option "-warn-unaligned-pointer"
+    @since Frama-C+dev
+*)
 
 module AbsoluteValidRange: Parameter_sig.String
 (** Behavior of option "-absolute-valid-range" *)

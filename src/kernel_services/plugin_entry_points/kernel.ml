@@ -194,6 +194,7 @@ let wkey_merge_conversion =
 
 let wkey_alignof_bitfield =
   register_warn_category "typing:alignof-bitfield"
+    ~help:"warning related to use of alignof on bitfield storage"
 
 let wkey_initializer_overrides =
   register_warn_category "typing:initializer-overrides"
