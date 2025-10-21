@@ -473,7 +473,6 @@ let pointer_alignment ~remove_trivial ~on_alarm (expr, t) =
   | Maybe ->
     on_alarm ~invalid:false (Alarms.Unaligned_pointer (expr, pointed))
 
-
 let bool_value ~remove_trivial ~on_alarm lv =
   match remove_trivial, lv with
   | true, (Var vi, NoOffset)
