@@ -52,7 +52,7 @@ module Base_checker = struct
       val known_logic_info = Logic_var.Hashtbl.create 7
       val mutable local_vars = Varinfo.Set.empty
       val known_logic_vars = Logic_var.Hashtbl.create 7
-      val switch_cases = Stmt.Hashtbl.create 7
+      val switch_cases = ref (Stmt.Hashtbl.create 7)
       val unspecified_sequence_calls = Stack.create ()
       val mutable labelled_stmt = []
       val mutable logic_labels = [ BuiltinLabel Init ]
@@ -260,7 +260,6 @@ module Base_checker = struct
         end else begin self#add_spec_behavior_names f.sspec; end;
         labelled_stmt <- [];
         Stmt.Hashtbl.clear known_stmts;
-        Stmt.Hashtbl.clear switch_cases;
         local_vars <- Varinfo.Set.empty;
         List.iter
           (fun x -> local_vars <- Varinfo.Set.add x local_vars) f.slocals;
@@ -268,17 +267,6 @@ module Base_checker = struct
           Format.fprintf fmt "@[%a (%d)@]" Printer.pp_stmt stmt stmt.sid
         in
         let check f =
-          if Stmt.Hashtbl.length switch_cases <> 0 then
-            begin
-              Stmt.Hashtbl.iter
-                (fun x _ ->
-                   check_abort
-                     "In function %a, statement %a \
-                      does not appear in body of switch while porting a \
-                      case or default label."
-                     Printer.pp_varinfo f.svar print_stmt x)
-                switch_cases
-            end;
           List.iter
             (fun stmt ->
                try
@@ -377,6 +365,29 @@ module Base_checker = struct
         ;
         labelled_stmt <- !s :: labelled_stmt
 
+      method private check_switch_post s remaining_cases =
+        Stmt.Hashtbl.iter
+          (fun x _ ->
+             check_abort
+               "@[<v 2>This switch statement is referencing a statement that \
+                does not appear in its body:@\n%a@\n\
+                The referenced statement is:@\n%a@]"
+               Printer.pp_stmt s
+               Printer.pp_stmt x)
+          remaining_cases
+
+      method private check_labels s =
+        let check_one = function
+          | Case _ | Default _ when not @@ Stmt.Hashtbl.mem !switch_cases s ->
+            check_abort
+              "@[<v 2>This switch case is either not referenced by a switch \
+               statement or not referenced by the innermost one:@\n%a@]"
+              Printer.pp_stmt s
+          | _ -> ()
+        in
+        List.iter check_one s.labels;
+        Stmt.Hashtbl.remove !switch_cases s
+
       method private check_try_catch_decl (decl,_) =
         match decl with
         | Catch_exn(v,l) ->
@@ -386,7 +397,7 @@ module Base_checker = struct
 
       method! vstmt_aux s =
         Stmt.Hashtbl.add known_stmts s s;
-        Stmt.Hashtbl.remove switch_cases s;
+        self#check_labels s;
         self#push_behavior_stack ();
         self#remove_unspecified_sequence_calls s;
         if is_normalized then begin
@@ -431,9 +442,16 @@ module Base_checker = struct
         (match s.skind with
          | Goto (l,_) ->
            self#check_label l; Cil.ChangeDoChildrenPost(s,post_action)
-         | Switch(_,_,cases,loc) ->
-           List.iter (fun s -> Stmt.Hashtbl.add switch_cases s loc) cases;
-           Cil.ChangeDoChildrenPost(s,post_action)
+         | Switch(_,_,cases,_) ->
+           let previous_switch_cases = !switch_cases in
+           switch_cases :=
+             List.to_seq cases
+             |> Seq.map (fun s -> s, ())
+             |> Stmt.Hashtbl.of_seq;
+           Cil.ChangeDoChildrenPost(s, fun s ->
+               self#check_switch_post s !switch_cases;
+               switch_cases := previous_switch_cases;
+               post_action s)
          | UnspecifiedSequence seq ->
            let calls =
              List.fold_left
