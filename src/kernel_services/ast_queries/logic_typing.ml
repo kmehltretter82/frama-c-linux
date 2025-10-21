@@ -558,6 +558,10 @@ let rec arithmetic_conversion ty1 ty2 =
   | Ltype ({lt_name="set"} as lt,[t1]),
     Ltype ({lt_name="set"},[t2]) ->
     Ltype(lt,[arithmetic_conversion t1 t2])
+  | Ltype ({lt_name="set"} as lt,[t1]), t2 ->
+    Ltype(lt, [arithmetic_conversion t1 t2])
+  | t1, Ltype({lt_name = "set"} as lt, [t2]) ->
+    Ltype(lt, [arithmetic_conversion t1 t2])
   | _ ->
     Kernel.fatal
       ~current:true
