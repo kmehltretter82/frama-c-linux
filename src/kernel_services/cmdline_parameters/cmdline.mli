@@ -354,6 +354,11 @@ val deterministic: bool
     are acceptable, as reproducibility is more important.
     @since Aluminium-20160501 *)
 
+val tty: bool
+(** Indicates whether the standard output should be considered as a tty.
+    Defaults to [Unix.isattty Unix.stdout].
+    @since Frama-C+dev *)
+
 val permissive: bool
 (** Downgrades some command-line errors to warnings, such as
     unknown option names and invalid values for some options

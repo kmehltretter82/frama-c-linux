@@ -20,6 +20,8 @@ val get_initial_state: unit -> Cvalue.Model.t option
     if any. *)
 val get_main_args: unit -> Cvalue.V.t list option
 
+[@@@ api_start]
+
 (** Internal temporary API: please do not use it, as it should be removed in a
     future version. *)
 
@@ -47,6 +49,9 @@ type results
 
 val get_results: unit -> results
 val set_results: results -> unit
+
+[@@@ api_end]
+
 val merge: results -> results -> results
 
 (** Change the callstacks for the results for which this is meaningful.

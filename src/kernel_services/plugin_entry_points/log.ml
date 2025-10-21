@@ -28,7 +28,7 @@ type event = {
   evt_plugin : string ;
   evt_category : string option;
   evt_source : Filepath.position option ;
-  evt_message : string ;
+  evt_message : Rich_text.t ;
 }
 
 let kernel_channel_name = "kernel"
@@ -46,8 +46,6 @@ exception AbortFatal of string (* plug-in *)
 (* --- Terminal Management                                                --- *)
 (* -------------------------------------------------------------------------- *)
 
-open Format
-
 type lock =
   | Ready
   | Locked
@@ -58,10 +56,7 @@ type terminal = {
   mutable isatty : bool ;
   mutable clean : bool ;
   mutable delayed : (terminal -> unit) list ;
-  mutable output : string -> int -> int -> unit ;
-  (* Same as Format.make_formatter *)
-  mutable flush : unit -> unit ;
-  (* Same as Format.make_formatter *)
+  mutable formatter : Format.formatter ;
 }
 
 let delayed_echo t =
@@ -82,25 +77,23 @@ let is_ready t =
 let term_clean t =
   if t.isatty && not t.clean then
     begin
-      let u = "\r\027[K" in
       (* TERM escape commands:
          "\r" is carriage return ;
          "\027[K" is CSI command EL 'Erase in Line' ;
          See https://en.wikipedia.org/wiki/ANSI_escape_code
       *)
-      t.output u 0 (String.length u) ;
+      Format.pp_print_string t.formatter "\r\027[K" ;
       t.clean <- true ;
     end
 
-let set_terminal t isatty output flush =
+let set_terminal t isatty formatter =
   begin
     (* Ensures previous terminal state is clean *)
     assert (is_ready t) ;
     term_clean t ;
     (* Now reconfigure the terminal *)
     t.isatty <- isatty ;
-    t.output <- output ;
-    t.flush <- flush ;
+    t.formatter <- formatter;
     t.clean <- true ;
   end
 
@@ -109,22 +102,21 @@ let stdout = {
   clean = true ;
   delayed = [] ;
   isatty = Unix.isatty Unix.stdout ;
-  output = output_substring stdout ;
-  flush =  (fun () -> flush stdout);
+  formatter = Format.std_formatter ;
 }
 
 let clean () = term_clean stdout
 
-let set_output ?(isatty=false) output flush =
-  set_terminal stdout isatty output flush
+let set_formatter ?(isatty=false) formatter =
+  set_terminal stdout isatty formatter
+
+let reset_stdout ~isatty () =
+  set_terminal stdout isatty Format.std_formatter
+
 
 (* -------------------------------------------------------------------------- *)
 (* --- Locked Formatter                                                   --- *)
 (* -------------------------------------------------------------------------- *)
-
-type delayed =
-  | Delayed of terminal
-  | Formatter of (string -> int -> int -> unit) * (unit -> unit)
 
 let lock_terminal t =
   begin
@@ -132,7 +124,7 @@ let lock_terminal t =
       failwith "Console is already locked" ;
     term_clean t ;
     t.lock <- Locked ;
-    Format.make_formatter t.output t.flush ;
+    t.formatter
   end
 
 let unlock_terminal t fmt =
@@ -156,26 +148,38 @@ let print_on_output job =
 (* --- Delayed Lock until first write                                     --- *)
 (* -------------------------------------------------------------------------- *)
 
+let formatter_with ?output:new_output ?flush:new_flush fmt =
+  let old_output, old_flush = Format.pp_get_formatter_output_functions fmt () in
+  let output = match new_output with
+    | None -> old_output
+    | Some output -> output old_output
+  and flush = match new_flush with
+    | None -> old_flush
+    | Some flush -> flush old_flush
+  in
+  let new_fmt = Format.make_formatter output flush in
+  let stag_functions =  Format.pp_get_formatter_stag_functions fmt () in
+  Format.pp_set_formatter_stag_functions new_fmt stag_functions;
+  Format.pp_set_mark_tags new_fmt (Format.pp_get_mark_tags fmt ());
+  Format.pp_set_print_tags new_fmt (Format.pp_get_print_tags fmt ());
+  new_fmt
+
 let delayed_terminal terminal =
   if is_locked terminal then
     failwith "Console is already locked" ;
   terminal.lock <- DelayedLock ;
-  let d = ref (Delayed terminal) in
-  let d_output d text k n =
-    match !d with
-    | Delayed t ->
-      t.lock <- Locked ;
-      d := Formatter( t.output , t.flush ) ;
-      t.output text k n
-    | Formatter(out,_) ->
-      out text k n
+  let delayed = ref true in
+  let output regular_output text k n =
+    if !delayed then begin
+      terminal.lock <- Locked ;
+      delayed := false ;
+    end;
+    regular_output text k n
+  and flush regular_flush () =
+    if not !delayed then (* otherwise, nothing to flush yet ! *)
+      regular_flush ()
   in
-  let d_flush d () =
-    match !d with
-    | Delayed _ -> () (* nothing to flush yet ! *)
-    | Formatter(_,flush) -> flush ()
-  in
-  Format.make_formatter (d_output d) (d_flush d)
+  formatter_with ~output ~flush terminal.formatter
 
 let print_delayed job =
   let fmt = delayed_terminal stdout in
@@ -186,88 +190,89 @@ let print_delayed job =
 (* --- Echo Line(s)                                                       --- *)
 (* -------------------------------------------------------------------------- *)
 
-(* whenever the first line of the event shall be printed along the prefix *)
-let is_first_line_prefixed = function
-  | { evt_category = None ; evt_source = None } -> true
-  | _ -> false
-
-let is_single_line text =
-  try ignore (String.index_from text 0 '\n') ; false
-  with Not_found -> true
-
-let echo_firstline output text p q width =
-  let t = try String.index_from text p '\n' with Not_found -> succ q in
-  let n = min width (t-p) in
-  output text p n
-
-let echo_newline output =
-  output "\n" 0 1
-
-(* output indentation unless the first line is along the prefix. *)
-let echo_line output ~is_prefixed text k n =
-  if not is_prefixed then output "  " 0 2;
-  output text k n
-
-(* [is_prefixed] can only be true for the first line. *)
-let rec echo_lines ?(is_prefixed=false) output text p q =
-  if p <= q then
-    let t = try String.index_from text p '\n' with Not_found -> (-1) in
-    if t < 0 || t > q then begin
-      (* incomplete, last line *)
-      echo_line output ~is_prefixed text p (q+1-p) ;
-      echo_newline output ;
+let formatter_with_indentation fmt amount =
+  let blank = String.make amount ' ' in
+  let begining_of_line = ref false in
+  let rec output old_output text p n =
+    if n > 0 then begin
+      (* Output indentation on each begining of a line *)
+      if !begining_of_line then old_output blank 0 amount;
+      match String.index_from_opt text p '\n' with
+      | Some t when t >= 0 && t <= p + n ->
+        (* complete line *)
+        let len = t + 1 - p in
+        old_output text p len;
+        begining_of_line := true;
+        output old_output text (t + 1) (n - len)
+      | _ ->
+        (* incomplete or last line *)
+        old_output text p n;
+        begining_of_line := false;
     end
-    else begin
-      (* complete line *)
-      echo_line output ~is_prefixed text p (t+1-p) ;
-      echo_lines output text (t+1) q ;
-    end
+  in
+  formatter_with ~output fmt
 
 (* -------------------------------------------------------------------------- *)
-(* --- Echo Event                                                         --- *)
+(* --- Events                                                             --- *)
 (* -------------------------------------------------------------------------- *)
 
-let add_source buffer = function
-  | None -> ()
-  | Some src ->
-    let fmt = Format.formatter_of_buffer buffer in
-    Format.fprintf fmt "%a: @?" Filepath.pp_pos src
+module Event =
+struct
+  type t = event
 
-let add_category buffer = function
-  | None -> ()
-  | Some a -> Buffer.add_char buffer ':' ; Buffer.add_string buffer a
+  let pp_source fmt = function
+    | None -> ()
+    | Some pos ->
+      Format.fprintf fmt "%a: @?" Filepath.pp_pos pos
 
-let add_kind buffer = function
-  | Result | Feedback | Debug -> ()
-  | Error   -> Buffer.add_string buffer "User Error: "
-  | Warning -> Buffer.add_string buffer "Warning: "
-  | Failure -> Buffer.add_string buffer "Failure: "
+  let pp_category fmt = function
+    | None -> ()
+    | Some name ->
+      Format.fprintf fmt ":%s" name
+
+  let pp_kind fmt = function
+    | Result | Feedback | Debug -> ()
+    | Error   -> Format.fprintf fmt "@{<red>User Error:@} "
+    | Warning -> Format.fprintf fmt "@{<orange>Warning:@} "
+    | Failure -> Format.fprintf fmt "@{<red>Failure:@} "
+
+  let pp_message ?truncate fmt buffer =
+    if Rich_text.need_truncation ?truncate buffer then
+      Format.pp_print_string fmt "(truncated message) ";
+    Rich_text.pretty ?truncate fmt buffer
+
+  let pretty ?truncate fmt evt =
+    let header = Rich_text.mprintf ~trim:false "@{<bold>[%s%a] %a%a@}"
+        evt.evt_plugin
+        pp_category evt.evt_category
+        pp_source evt.evt_source
+        pp_kind evt.evt_kind
+    in
+    let pp_header fmt header = Rich_text.pretty fmt header in
+    let long_header = match evt with
+      | { evt_category = None ; evt_source = None } -> false
+      | _ -> true
+    in
+    (* whenever the header-part shall be separated from the message-part *)
+    let lonely_header =
+      long_header &&
+      (Rich_text.size header + Rich_text.size evt.evt_message > 80 ||
+       Rich_text.contains evt.evt_message '\n')
+    in
+    let fmt = formatter_with_indentation fmt 2 in
+    Format.fprintf fmt "%a%t%a@."
+      pp_header header
+      (fun fmt -> if lonely_header then Format.pp_force_newline fmt ())
+      (pp_message ?truncate) evt.evt_message
+
+  let message event =
+    Rich_text.to_string event.evt_message
+end
 
 let echo_event evt terminal =
   term_clean terminal ;
-  let buffer = Buffer.create 120 in
-  Buffer.add_char buffer '[' ;
-  Buffer.add_string buffer evt.evt_plugin ;
-  add_category buffer evt.evt_category ;
-  Buffer.add_string buffer "] " ;
-  add_source buffer evt.evt_source ;
-  add_kind buffer evt.evt_kind ;
-  let header = Buffer.contents buffer in
-  let header_length = String.length header in
-  let text = evt.evt_message in
-  let size = String.length text in
-  let output = terminal.output in
-  output header 0 header_length ;
-  if header_length + size <= 80 && is_single_line text then begin
-    output text 0 size;
-    echo_newline output
-  end
-  else begin
-    let is_prefixed = is_first_line_prefixed evt in
-    if not is_prefixed then echo_newline output;
-    echo_lines output ~is_prefixed text 0 (String.length text - 1)
-  end;
-  terminal.flush ()
+  let truncate = if terminal.isatty then `Middle max_message_length else `None in
+  Event.pretty ~truncate terminal.formatter evt
 
 let do_echo terminal evt =
   if delayed_echo terminal then
@@ -275,15 +280,21 @@ let do_echo terminal evt =
   else
     echo_event evt terminal
 
-let do_transient terminal text p q =
-  if p <= q && not (delayed_echo terminal) then
+let do_transient terminal ~plugin message =
+  if not (Rich_text.is_empty message) && not (delayed_echo terminal) then
     begin
       term_clean terminal ;
-      echo_firstline terminal.output text p q 80 ;
+      let fmt = terminal.formatter in
+      Format.fprintf fmt "@{<bold>[%s]@} " plugin ;
+      let width = max 40 (77 - String.length plugin) in
+      let ellipsis = "…" in
+      let limit =
+        try String.length ellipsis + Rich_text.index message '\n'
+        with Not_found -> width in
+      Rich_text.pretty ~truncate:(`Right limit) ~ellipsis fmt message ;
       if terminal.isatty
       then terminal.clean <- false
-      else terminal.output "\n" 0 1 ;
-      terminal.flush () ;
+      else Format.pp_print_newline fmt () ;
     end
 
 (* -------------------------------------------------------------------------- *)
@@ -318,8 +329,6 @@ type ontty = [
   | `Transient (* Temporary visible, only on console *)
   | `Silent    (* Not visible on console *)
 ]
-
-let tty = ref (fun () -> false)
 
 type channel = {
   locked_buffer : Rich_text.buffer ; (* already allocated top-level buffer *)
@@ -375,7 +384,7 @@ let new_channel plugin =
     let c = {
       plugin = plugin ;
       stack = 0 ;
-      locked_buffer = Rich_text.create () ;
+      locked_buffer = Rich_text.Buffer.create () ;
       emitters = emitters ;
       terminal = stdout ;
     } in
@@ -435,7 +444,7 @@ let notify e =
 
 let open_buffer c =
   if c.stack > 0 then
-    ( c.stack <- succ c.stack ; Rich_text.create () )
+    ( c.stack <- succ c.stack ; Rich_text.Buffer.create () )
   else
     ( c.stack <- 1 ; c.locked_buffer )
 
@@ -443,23 +452,20 @@ let close_buffer c =
   if c.stack > 1 then
     c.stack <- pred c.stack
   else
-    Rich_text.shrink c.locked_buffer
+    Rich_text.Buffer.reset c.locked_buffer
 
-let logtransient channel text =
+let logtransient channel format =
   let buffer = open_buffer channel in
-  Rich_text.kprintf
-    (fun fmt ->
+  Rich_text.Buffer.kbprintf
+    (fun _fmt ->
        try
-         Format.pp_print_newline fmt () ;
-         Format.pp_print_flush fmt () ;
-         ignore (Rich_text.truncate buffer max_message_length) ;
-         let p,q = Rich_text.trim buffer in
-         do_transient channel.terminal (Rich_text.contents buffer) p q ;
+         let message = Rich_text.Buffer.contents ~trim:true buffer in
+         do_transient channel.terminal ~plugin:channel.plugin message ;
          close_buffer channel
        with e ->
          close_buffer channel ;
          raise e
-    ) buffer text
+    ) buffer format
 
 let locked_listeners = ref false
 
@@ -472,30 +478,21 @@ let logwithfinal finally channel
     ?emitwith        (* additional emitter *)
     ?(echo=true)     (* echo on terminal *)
     ?(once=false)    (* log and emit only once *)
-    ?append          (* additional text *)
+    ?(append=ignore) (* additional text *)
     text =
+  let source = get_source current source in
   let buffer = open_buffer channel in
-  Format.pp_open_vbox (Rich_text.formatter buffer) 0 ;
-  Rich_text.kprintf
+  Rich_text.Buffer.bprintf buffer "%a" Format.pp_open_vbox 0 ;
+  Rich_text.Buffer.kbprintf
     (fun fmt ->
        try
-         (match append with None -> () | Some k -> k fmt) ;
+         append fmt;
          Format.pp_close_box fmt () ;
          Format.pp_print_newline fmt () ;
          Format.pp_print_flush fmt () ;
-         let truncated =
-           if channel.terminal.isatty
-           then Rich_text.truncate buffer max_message_length
-           else false
-         in
-         let p,q = Rich_text.trim buffer in
+         let message = Rich_text.Buffer.contents buffer in
          let output =
-           if p <= q then
-             let source = get_source current source in
-             let message = Rich_text.range buffer p q in
-             let message =
-               if truncated then "(truncated message) " ^ message else message
-             in
+           if not (Rich_text.is_empty message) then
              let event = {
                evt_kind = kind ;
                evt_plugin = channel.plugin ;
@@ -573,7 +570,9 @@ let deferred_raise ~fatal event msg =
   let pp_pos fmt pos = Format.fprintf fmt "%a: " Filepath.pp_pos pos in
   let pp_pos_opt = Pretty_utils.pp_opt pp_pos in
   let print_event fmt =
-    Format.fprintf fmt "@\n%a%s" pp_pos_opt event.evt_source event.evt_message
+    Format.fprintf fmt "@\n%a%a"
+      pp_pos_opt event.evt_source
+      (Event.pp_message ?truncate:None) event.evt_message
   in
   let append = Some print_event in
   let exn =
@@ -611,12 +610,12 @@ type 'a pretty_printer =
   ?current:bool -> ?source:Filepath.position ->
   ?emitwith:(event -> unit) -> ?echo:bool -> ?once:bool ->
   ?append:(Format.formatter -> unit) ->
-  ('a,formatter,unit) format -> 'a
+  ('a,Format.formatter,unit) format -> 'a
 
 type ('a,'b) pretty_aborter =
   ?current:bool -> ?source:Filepath.position -> ?echo:bool ->
   ?append:(Format.formatter -> unit) ->
-  ('a,formatter,unit,'b) format4 -> 'a
+  ('a,Format.formatter,unit,'b) format4 -> 'a
 
 let log_channel channel ?(kind=Result) ?current ?source ?emitwith ?echo ?once
     ?append text =
@@ -630,8 +629,9 @@ let echo e =
     | Created c -> do_echo c.terminal e
   with Not_found ->
     let msg =
-      Format.sprintf "[unknown channel %s]:%s"
-        e.evt_plugin e.evt_message
+      Format.asprintf "[unknown channel %s]:%a"
+        e.evt_plugin
+        (Event.pp_message ?truncate:None) e.evt_message
     in failwith msg
 
 (* ------------------------------------------------------------------------- *)
@@ -779,7 +779,7 @@ sig
     ?current:bool -> ?source:Filepath.position ->
     ?append:(Format.formatter -> unit) ->
     ?header:(Format.formatter -> unit) ->
-    ('a,formatter,unit) format -> 'a
+    ('a,Format.formatter,unit) format -> 'a
 
   val result  : ?level:int -> ?dkey:category -> 'a pretty_printer
   val has_tty : unit -> bool
@@ -793,7 +793,7 @@ sig
   val verify  : bool -> ('a,bool) pretty_aborter
 
   val not_yet_implemented : ?current:bool -> ?source:Filepath.position ->
-    ('a,formatter,unit,'b) format4 -> 'a
+    ('a,Format.formatter,unit,'b) format4 -> 'a
   val deprecated : string -> now:string -> ('a -> 'b) -> 'a -> 'b
 
   val with_result  : (event option -> 'b) -> ('a,'b) pretty_aborter
@@ -981,7 +981,7 @@ struct
     | None -> Wactive
     | exception Not_found -> wnot_registered s
 
-  let channel = new_channel P.channel
+  let std = new_channel P.channel
 
   let internal_register_tag_handlers _c (_ope,_close) = ()
   (* BM->LOIC: I need to keep this code around to be able to handle
@@ -1010,7 +1010,7 @@ struct
   *)
 
   let register_tag_handlers h =
-    internal_register_tag_handlers channel h
+    internal_register_tag_handlers std h
 
   let to_be_log verbose debug =
     match verbose , debug with
@@ -1023,20 +1023,20 @@ struct
   let log ?(kind=Result) ?(verbose=0) ?(debug=0) ?current ?source ?emitwith
       ?echo ?once ?append text =
     if to_be_log verbose debug then
-      logwithfinal finally_unit channel ~kind ?current ?source ?emitwith ?echo
+      logwithfinal finally_unit std ~kind ?current ?source ?emitwith ?echo
         ?once ?append text
     else Pretty_utils.nullprintf text
 
   let result ?(level=1) ?dkey ?current ?source ?emitwith ?echo ?once ?append
       text =
     if verbose_atleast level && has_debug_key dkey then
-      logwithfinal finally_unit channel ~kind:Result ?category:dkey ?current
+      logwithfinal finally_unit std ~kind:Result ?category:dkey ?current
         ?source ?emitwith ?echo ?once ?append text
     else Pretty_utils.nullprintf text
 
-  let transient channel = channel.terminal.isatty && !tty ()
+  let transient channel = channel.terminal.isatty
 
-  let has_tty () = transient channel
+  let has_tty () = transient std
 
   let feedback ?(ontty=`Message) ?(level=1) ?dkey ?current ?source ?emitwith
       ?echo ?once ?append text =
@@ -1044,16 +1044,16 @@ struct
       if verbose_atleast level && has_debug_key dkey
       then
         match ontty with
-        | `Feedback -> if transient channel then `Transient else `Message
-        | `Transient -> if transient channel then `Transient else `Silent
-        | `Silent -> if transient channel then `Silent else `Message
+        | `Feedback -> if transient std then `Transient else `Message
+        | `Transient -> if transient std then `Transient else `Silent
+        | `Silent -> if transient std then `Silent else `Message
         | `Message -> `Message
       else `Silent
     in match mode with
     | `Message ->
-      logwithfinal finally_unit channel ~kind:Feedback ?category:dkey ?current
+      logwithfinal finally_unit std ~kind:Feedback ?category:dkey ?current
         ?source ?emitwith ?echo ?once ?append text
-    | `Transient -> logtransient channel text
+    | `Transient -> logtransient std text
     | `Silent -> Pretty_utils.nullprintf text
 
   let should_output_debug level dkey =
@@ -1065,7 +1065,7 @@ struct
 
   let debug ?level ?dkey ?current ?source ?emitwith ?echo ?once ?append text =
     if should_output_debug level dkey then
-      logwithfinal finally_unit channel ~kind:Debug ?category:dkey ?current
+      logwithfinal finally_unit std ~kind:Debug ?category:dkey ?current
         ?source ?emitwith ?echo ?once ?append text
     else
       Pretty_utils.nullprintf text
@@ -1073,9 +1073,9 @@ struct
   let force_error = function
     | None ->
       { evt_kind = Failure;
-        evt_plugin = channel.plugin;
+        evt_plugin = std.plugin;
         evt_category = Some unreported_error;
-        evt_message = "Silent error";
+        evt_message = Rich_text.of_string "Silent error";
         evt_source = None
       }
     | Some evt -> evt
@@ -1087,26 +1087,26 @@ struct
     let evt = force_error evt in update_deferred_exn (DFatal evt)
 
   let error ?current ?source ?emitwith ?echo ?once ?append text =
-    logwithfinal finally_user_error channel ~kind:Error ?current ?source
+    logwithfinal finally_user_error std ~kind:Error ?current ?source
       ?emitwith ?echo ?once ?append text
 
   let abort ?current ?source ?echo ?append text =
-    logwithfinal (finally_raise (AbortError P.channel)) channel ~kind:Error
+    logwithfinal (finally_raise (AbortError P.channel)) std ~kind:Error
       ?current ?source ?echo ?append text
 
   let failure ?current ?source ?emitwith ?echo ?once ?append text =
-    logwithfinal finally_internal_error channel ~kind:Failure ?current ?source
+    logwithfinal finally_internal_error std ~kind:Failure ?current ?source
       ?emitwith ?echo ?once ?append text
 
   let fatal ?current ?source ?echo ?append text =
-    logwithfinal (finally_raise (AbortFatal P.channel)) channel ~kind:Failure
+    logwithfinal (finally_raise (AbortFatal P.channel)) std ~kind:Failure
       ?current ?source ?echo ?append text
 
   let verify assertion ?current ?source ?echo ?append text =
     if assertion then
       Format.kfprintf (fun _ -> true) Pretty_utils.null text
     else
-      logwithfinal finally_false channel ~kind:Failure ?current ?source ?echo
+      logwithfinal finally_false std ~kind:Failure ?current ?source ?echo
         ?append text
 
   let logwith finally ?(wkey="") ?emitwith ?once ?current ?source ?echo ?append
@@ -1155,7 +1155,7 @@ struct
             | Some app ->
               Some (fun fmt -> app fmt; append_once_suffix fmt)
         in
-        logwithfinal finally channel ~kind ?category ?current ?source ?emitwith
+        logwithfinal finally std ~kind ?category ?current ?source ?emitwith
           ?once ?echo ?append text
       end
     else Pretty_utils.with_null (fun () -> finally None) text
@@ -1165,23 +1165,23 @@ struct
       text
 
   let with_result finally ?current ?source ?echo ?append text =
-    logwithfinal finally channel ~kind:Result ?current ?source ?echo ?append
+    logwithfinal finally std ~kind:Result ?current ?source ?echo ?append
       text
 
   let with_warning finally ?current ?source ?echo ?append text =
-    logwithfinal finally channel ~kind:Warning ?current ?source ?echo ?append
+    logwithfinal finally std ~kind:Warning ?current ?source ?echo ?append
       text
 
   let with_error finally ?current ?source ?echo ?append text =
-    logwithfinal finally channel ~kind:Error ?current ?source ?echo ?append
+    logwithfinal finally std ~kind:Error ?current ?source ?echo ?append
       text
 
   let with_failure finally ?current ?source ?echo ?append text =
-    logwithfinal finally channel ~kind:Failure ?current ?source ?echo ?append
+    logwithfinal finally std ~kind:Failure ?current ?source ?echo ?append
       text
 
   let register kd f =
-    let em = channel.emitters.(nth_kind kd) in
+    let em = std.emitters.(nth_kind kd) in
     em.listeners <- em.listeners @ [f]
 
   let not_yet_implemented ?(current=false) ?source text =
@@ -1190,7 +1190,7 @@ struct
     let finally fmt =
       Format.pp_print_flush fmt ();
       let msg = Buffer.contents buffer in
-      raise (FeatureRequest(source,channel.plugin,msg)) in
+      raise (FeatureRequest(source,std.plugin,msg)) in
     let fmt = Format.formatter_of_buffer buffer in
     Format.kfprintf finally fmt text
 
@@ -1215,16 +1215,15 @@ struct
       begin
         (* Header is a regular message *)
         let header = match header with None -> noprint | Some h -> h in
-        logwithfinal finally_unit channel ~fire:false ~kind:Result
+        logwithfinal finally_unit std ~fire:false ~kind:Result
           ?category:dkey ?current ?source  "%t" header;
         let bol = ref true in
-        let stdout = { stdout with output = spynewline bol stdout.output } in
         let fmt = delayed_terminal stdout in
+        let fmt = formatter_with ~output:(spynewline bol) fmt in
         try
           Format.kfprintf
             begin fun fmt ->
               append fmt ;
-              Format.pp_print_flush fmt () ;
               unlock_terminal stdout fmt ;
               if not !bol then Format.pp_print_newline fmt () ;
             end
@@ -1267,3 +1266,45 @@ struct
       label Format.(pp_print_list ~pp_sep:pp_print_cut print_one_elt) l
 
 end
+
+(* ------------------------------------------------------------------------- *)
+(* --- Tests                                                             --- *)
+(* ------------------------------------------------------------------------- *)
+
+let test_terminal () =
+  let buffer = Buffer.create 13 in
+  let fmt = Format.formatter_of_buffer buffer in
+  Format.pp_set_mark_tags fmt true;
+  let validate_result expected =
+    Format.pp_print_flush fmt ();
+    let result = Buffer.contents buffer in
+    let success = result = expected in
+    if not success then
+      Format.eprintf "wrong output: %S given, %S expected@."
+        result expected;
+    success
+  in
+  let channel = new_channel "test" in
+  set_terminal channel.terminal true fmt;
+  channel, validate_result
+
+let%test _ =
+  let channel, validate = test_terminal () in
+  logtransient channel "abcd";
+  logtransient channel "abc";
+  validate "<bold>[test]</bold> abcd\r\027[K<bold>[test]</bold> abc"
+
+let%test _ =
+  let channel, validate = test_terminal () in
+  logtransient channel "abc\ndef";
+  validate "<bold>[test]</bold> abc…"
+
+let%test _ =
+  let channel, validate = test_terminal () in
+  logtransient channel "@{<a>  abc\ndef@}";
+  validate "<bold>[test]</bold> <a>abc…</a>"
+
+let%test _ =
+  let channel, validate = test_terminal () in
+  logtransient channel "  abc\n@{<a>@}def";
+  validate "<bold>[test]</bold> abc…"

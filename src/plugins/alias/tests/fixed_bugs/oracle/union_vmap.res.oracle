@@ -1,44 +1,21 @@
 [kernel] Parsing union_vmap.c (with preprocessing)
 [alias] analysing global variable definition: __fc_lit_string1 = "a";
 [alias] May-aliases after global variable definition  __fc_lit_string1  are  <none>
-[alias] May-alias graph after global variable definition  __fc_lit_string1  is
-  <empty>
 [alias] analysing global variable definition: __fc_lit_string2 = "b";
 [alias] May-aliases after global variable definition  __fc_lit_string2  are  <none>
-[alias] May-alias graph after global variable definition  __fc_lit_string2  is
-  <empty>
 [alias] analysing function: CPS_ParseKey
 [alias] analysing instruction: char *s2 = CPS_SplitWord((char *)"a");
 [alias] analysing function: CPS_SplitWord
 [alias] May-aliases at the end of function CPS_SplitWord: <none>
-[alias] May-alias graph at the end of function CPS_SplitWord:
-  <empty>
-[alias] Summary of function CPS_SplitWord:
-  formals: line    returns: line    state: <none>
 [alias] May-aliases after instruction  char *s2 = CPS_SplitWord((char *)"a");  are
-  <none>
-[alias] May-alias graph after instruction  char *s2 = CPS_SplitWord((char *)"a");
-  is    4:{ s2 } → 3:{  }   6:{  } → 3:{  }
+  { s2; "a" }
 [alias] analysing instruction: char *s3 = CPS_SplitWord((char *)"b");
 [alias] May-aliases after instruction  char *s3 = CPS_SplitWord((char *)"b");  are
-  <none>
-[alias] May-alias graph after instruction  char *s3 = CPS_SplitWord((char *)"b");
-  is
-  4:{ s2 } → 3:{  }   6:{  } → 3:{  }   10:{ s3 } → 9:{  }   12:{  } → 9:{  }
+  { s2; "a" }  { s3; "b" }
 [alias] analysing instruction: *key = s3;
-[alias] May-aliases after instruction  *key = s3;  are  { *key; s3 }
-[alias] May-alias graph after instruction  *key = s3;  is
-  4:{ s2 } → 3:{  }   6:{  } → 3:{  }   12:{  } → 16:{  }
-  14:{ key } → 15:{ s3 }   15:{ s3 } → 16:{  }
+[alias] May-aliases after instruction  *key = s3;  are
+  { *key; s3; "b" }  { s2; "a" }
 [alias] analysing instruction: *key = s2;
-[alias] May-aliases after instruction  *key = s2;  are  { *key; s2 }
-[alias] May-alias graph after instruction  *key = s2;  is
-  6:{  } → 19:{  }   10:{ s3 } → 9:{  }   12:{  } → 9:{  }
-  17:{ key } → 18:{ s2 }   18:{ s2 } → 19:{  }
-[alias] May-aliases at the end of function CPS_ParseKey: { *key; s2; s3 }
-[alias] May-alias graph at the end of function CPS_ParseKey:
-  4:{ s2; s3 } → 3:{  }   6:{  } → 3:{  }   12:{  } → 3:{  }
-  14:{ key } → 4:{ s2; s3 }
-[alias] Summary of function CPS_ParseKey:
-  formals:     returns: <none>    state: { *key; s2; s3 }
-[alias] Analysis complete
+[alias] May-aliases after instruction  *key = s2;  are
+  { *key; s2; "a" }  { s3; "b" }
+[alias] May-aliases at the end of function CPS_ParseKey: { *key; s2; "a"; s3; "b" }
