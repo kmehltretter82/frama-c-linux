@@ -8,6 +8,8 @@
   Called from malloc-optimistic.c:135.
 [eva] malloc-optimistic.c:16: Frama_C_show_each_1_1: {1}
 [eva] malloc-optimistic.c:16: Frama_C_show_each_1_1: {0}
+[eva:builtins:missing-spec] malloc-optimistic.c:6: Warning: 
+  No Frama-C libc specification found for function malloc, for which a builtin is used; its soundness relies on the specification provided by the user.
 [eva] malloc-optimistic.c:17: Call to builtin malloc
 [eva:malloc:new] malloc-optimistic.c:17: allocating variable __malloc_main1_l17
 [eva] malloc-optimistic.c:17: Call to builtin malloc
@@ -19,6 +21,8 @@
   out of bounds write. assert \valid(p + i);
 [eva] Recording results for main1
 [eva] Done for function main1
+[eva:builtins:missing-spec] malloc-optimistic.c:9: Warning: 
+  No Frama-C libc specification found for function free, for which a builtin is used; its soundness relies on the specification provided by the user.
 [eva] malloc-optimistic.c:136: Call to builtin free
 [eva:malloc] malloc-optimistic.c:136: strong free on bases: {__malloc_main1_l17}
 [eva] computing for function main2 <- main.
