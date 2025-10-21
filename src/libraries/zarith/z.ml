@@ -134,7 +134,7 @@ let pretty_hex fmt v =
     else
       Format.fprintf fmt "%LX" (to_int64 v)
   in
-  if equal v zero then Format.pp_print_string fmt "0"
+  if is_zero v then Format.pp_print_string fmt "0"
   else if gt v zero then (Format.pp_print_string fmt "0x"; aux v)
   else (Format.pp_print_string fmt "-0x"; aux (neg v))
 
@@ -161,7 +161,7 @@ let cast ~size ~signed ~value =
   else
     let mask = two_power (sub size one) in
     let p_mask = pred mask in
-    if equal (logand mask value) zero then
+    if is_zero (logand mask value) then
       logand value p_mask
     else
       logor (lognot p_mask) value

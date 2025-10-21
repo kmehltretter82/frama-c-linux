@@ -38,7 +38,7 @@ let cast ~src ~dst = match src, dst with
     dst
 
 (* a-b; or 0 if negative *)
-let length a b = Z.max Z.zero (Z.add Z.one (Z.sub a b))
+let length a b = Z.max Z.zero (Z.succ (Z.sub a b))
 
 (* minimal distance between two intervals given by their respective lower and
    upper bounds, i.e. the length between the lower bound of the second interval

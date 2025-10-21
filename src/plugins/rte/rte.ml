@@ -116,7 +116,7 @@ let uminus_assertion ~remove_trivial ~on_alarm exp =
   let size = Cil.bitsSizeOf t in
   let min_ty = Cil.min_signed_number size in
   (* alarm is bound <= exp, hence bound must be MIN_INT+1 *)
-  let bound = Z.add Z.one min_ty in
+  let bound = Z.succ min_ty in
   let alarm ?(invalid=false) () =
     let a = Alarms.Overflow(Alarms.Signed, exp, bound, Lower_bound) in
     on_alarm ~invalid a

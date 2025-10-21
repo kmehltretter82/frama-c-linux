@@ -235,7 +235,7 @@ let extended_interv_of_typ ty = match interv_of_typ ty with
   | Ival iv ->
     let l,u = Ival.min_int iv, Ival.max_int iv in
     let u = match u with
-      | Some u -> Some (Z.add u Z.one)
+      | Some u -> Some (Z.succ u)
       | None -> None
     in
     Ival (Ival.inject_range l u);
