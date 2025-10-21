@@ -3,7 +3,7 @@ int main3(void)
 {
   int x = 0;
   int i = 2;
-  L: case 10: x ++;
+  L: x ++;
   goto break_cont_1;
   x ++;
   break_cont_1: if (i > x) goto L;

@@ -1,12 +1,9 @@
 /* run.config
 LOG: ./@PTEST_NAME@_@PTEST_NUMBER@.i
-EXIT: 1
 OPT: @EVA_OPTIONS@ -main main1 -slice-return main1 -then-on 'Slicing export' -print -ocode ./@PTEST_NAME@_@PTEST_NUMBER@.i -then ./@PTEST_NAME@_@PTEST_NUMBER@.i -no-deps 
 LOG: ./@PTEST_NAME@_@PTEST_NUMBER@.i
-EXIT: 0
 OPT: @EVA_OPTIONS@ -main main2 -slice-return main2 -then-on 'Slicing export' -print -ocode ./@PTEST_NAME@_@PTEST_NUMBER@.i -then ./@PTEST_NAME@_@PTEST_NUMBER@.i -no-deps 
 LOG: ./@PTEST_NAME@_@PTEST_NUMBER@.i
-EXIT: 1
 OPT: @EVA_OPTIONS@ -main main3 -slice-return main3 -then-on 'Slicing export' -print -ocode ./@PTEST_NAME@_@PTEST_NUMBER@.i -then ./@PTEST_NAME@_@PTEST_NUMBER@.i -no-deps 
 */
 

@@ -3,7 +3,7 @@ int main1(void)
 {
   int x = 0;
   int i = 1;
-  L: case 10: x ++;
+  L: x ++;
   if (i > x) goto L;
   return x;
 }
