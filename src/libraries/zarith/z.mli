@@ -208,7 +208,7 @@ val pp_bin : ?nbits:int -> ?sep:string -> t Pretty_utils.formatter
     (4 hex digits) separated by [~sep] with at least [~nbits] total bits.
     If [nbits] is non positive, it will be ignored.
 
-    Positive values are preffixed with ["0x"] and negative values
+    Positive values are prefixed with ["0x"] and negative values
     are printed as their 2-complement ([lnot]) with prefix ["1x"].
 *)
 val pp_hex : ?nbits:int -> ?sep:string -> t Pretty_utils.formatter
