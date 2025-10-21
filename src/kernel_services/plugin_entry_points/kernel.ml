@@ -699,7 +699,7 @@ module TTY =
     end)
 let () =
   Cmdline.run_after_early_stage (fun () ->
-      if TTY.get () && Ansi_escape.is_supported () then
+      if TTY.get () then
         let _reset = Ansi_escape.enable_on Format.std_formatter in ())
 
 let () = Parameter_customize.set_group messages
