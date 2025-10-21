@@ -994,22 +994,13 @@
   a[0..99] FROM val1; val2; nondet (and SELF)
   a[0..99] FROM val1; val2; nondet (and SELF)
 [from] Function strnlen:
-  \result FROM n; "Hello World\n"[0..12]; "abc\000\000\000abc"[0..9]; 
-               ""[0]; "a"[0..1]; "aa"[0..2]; "aaa"[0..3]; "aaaa"[0..4];
-               "aaaaa"[0..5]; "aaaaaa"[0..6]; "aaaaaaaaa"[0..9];
-               "aaaaaaaaaa"[0..10]; "aaaaaaaaaaa"[0..11];
-               "aaaaaaaaaaaa"[0..12]; "aaaaaaaaaaaaa"[0..13];
-               unterminated_string[0..11]; "abc"[0..3]; "\000bc"[0..3];
-               ""[0]; "b\000c"[0..3]; t[0..3]; empty_or_non_terminated[0];
-               non_terminated[0]; non_terminated2[2..3];
-               empty_or_uninitialized[0]; uninitialized[0]; s[0..1]; 
-               t[0..3]; s; s; a[3..99]; a[3..99]; s[0..3];
-               "Bonjour Monde\n"[0..14]; loc_char_array[0..4]; x;
-               "abc"[0..3]; "ABCD"[0..4]; "efg"[1..3]; "EFGH"[1..4];
-               "mno\000pqr"[0..7]; "MNOP\000QRS"[0..8]; maybe_init[0..1];
-               u[0..199]; r[0..200]; t[0..999999]; s[0..19]; "abcde"[0..5];
-               "\000bcdef"[0..6]; "bcd\000efg"[0..7]; a[0..99]; "abc"[0..3];
-               "bcd\000eg"[0..6]; a[0..99]; buf[0..99]
+  \result FROM n; unterminated_string[0..11]; t[0..3];
+               empty_or_non_terminated[0]; non_terminated[0];
+               non_terminated2[2..3]; empty_or_uninitialized[0];
+               uninitialized[0]; s[0..1]; t[0..3]; s; s; a[3..99]; a[3..99];
+               s[0..3]; loc_char_array[0..4]; x; maybe_init[0..1]; u[0..199];
+               r[0..200]; t[0..999999]; s[0..19]; a[0..99]; a[0..99];
+               buf[0..99]
 [from] Function big_array:
   NO EFFECTS
 [from] Function bitfields:
@@ -1098,13 +1089,8 @@
     sz4; sz5; sz6; sz7; sz8; x; z; i; str; s1; tmp; s2; tmp_0; j;
     maybe_init[0..1]
 [inout] Inputs for function misc:
-    Frama_C_entropy_source; static_str; "Hello World\n"[0..12]; zero_str;
-    "abc\000\000\000abc"[0..8]; tab_str[0..11]; ""[0]; "a"[0..1]; "aa"[0..2];
-    "aaa"[0..3]; "aaaa"[0..4]; "aaaaa"[0..5]; "aaaaaa"[0..6];
-    "aaaaaaaaa"[0..9]; "aaaaaaaaaa"[0..10]; "aaaaaaaaaaa"[0..11];
-    "aaaaaaaaaaaa"[0..12]; "aaaaaaaaaaaaa"[0..12]; unterminated_string[0..11];
-    "Bonjour Monde\n"[0..13]; "abc"[0..3]; "ABCD"[0..4]; "efg"[1..3];
-    "EFGH"[1..4]; "mno\000pqr"[0..7]; "MNOP\000QRS"[0..8]; nondet
+    Frama_C_entropy_source; static_str; zero_str; tab_str[0..11];
+    unterminated_string[0..11]; nondet
 [inout] Out (internal) for function negative_offsets:
     Frama_C_entropy_source; buf[0..99]; i; len1; len2; len3; len4; len5; 
     len6; offset1; offset2; offset3; offset4; offset5; offset6; p
@@ -1117,16 +1103,16 @@
 [inout] Out (internal) for function small_sets:
     s; o; tmp; z1; tmp_0; z2; tmp_1; z3; tmp_2; z4; tmp_3; t[0..3]; z5; tmp_4
 [inout] Inputs for function small_sets:
-    "abc"[0..3]; "\000bc"[0..2]; "b\000c"[0..3]; nondet
+    nondet
 [inout] Out (internal) for function small_sets_n:
     s; p; tmp; n; tmp_0; z1; tmp_1; z2; tmp_2; z3a; tmp_3; z3; tmp_4; tmp_5;
     z4; tmp_6
 [inout] Inputs for function small_sets_n:
-    "abcde"[0..5]; "\000bcdef"[0..4]; "bcd\000efg"[0..7]; nondet
+    nondet
 [inout] Out (internal) for function unbounded_n:
     n; s; zu1; tmp; o; tmp_0; zu2; tmp_1; zu3; tmp_2
 [inout] Inputs for function unbounded_n:
-    "abc"[0..3]; "bcd\000eg"[0..6]; nondet
+    nondet
 [inout] Out (internal) for function zero_termination:
     empty_or_non_terminated[0]; z1; tmp; non_terminated[0];
     non_terminated2[0..3]; o; tmp_0
@@ -1135,12 +1121,5 @@
 [inout] Out (internal) for function main:
     Frama_C_entropy_source; __retres
 [inout] Inputs for function main:
-    Frama_C_entropy_source; static_str; "Hello World\n"[0..12]; zero_str;
-    "abc\000\000\000abc"[0..8]; tab_str[0..11]; ""[0]; "a"[0..1]; "aa"[0..2];
-    "aaa"[0..3]; "aaaa"[0..4]; "aaaaa"[0..5]; "aaaaaa"[0..6];
-    "aaaaaaaaa"[0..9]; "aaaaaaaaaa"[0..10]; "aaaaaaaaaaa"[0..11];
-    "aaaaaaaaaaaa"[0..12]; "aaaaaaaaaaaaa"[0..12]; unterminated_string[0..11];
-    "abc"[0..3]; "\000bc"[0..2]; "b\000c"[0..3]; "Bonjour Monde\n"[0..13];
-    "abc"[0..3]; "ABCD"[0..4]; "efg"[1..3]; "EFGH"[1..4]; "mno\000pqr"[0..7];
-    "MNOP\000QRS"[0..8]; "abcde"[0..5]; "\000bcdef"[0..4]; "bcd\000efg"[0..7];
-    "abc"[0..3]; "bcd\000eg"[0..6]; nondet
+    Frama_C_entropy_source; static_str; zero_str; tab_str[0..11];
+    unterminated_string[0..11]; nondet

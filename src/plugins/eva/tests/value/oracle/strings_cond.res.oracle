@@ -38,8 +38,8 @@
 [inout] Out (internal) for function foo:
     s
 [inout] Inputs for function foo:
-    "Bla"[0..3]
+    \nothing
 [inout] Out (internal) for function main:
     \nothing
 [inout] Inputs for function main:
-    "Bla"[0..3]
+    \nothing

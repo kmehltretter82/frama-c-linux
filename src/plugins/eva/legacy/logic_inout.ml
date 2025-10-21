@@ -336,7 +336,7 @@ let is_local kf base =
 let accept_base ~formals ~locals kf =
   let all_callers = compute_all_callers kf in
   fun base ->
-    Base.is_global base
+    (Base.is_global base && not (Base.is_string_literal base))
     || (formals && is_formal kf base)
     || (locals && is_local kf base)
     || is_local_or_formal_of_caller all_callers base

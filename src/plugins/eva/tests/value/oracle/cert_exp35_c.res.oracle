@@ -41,12 +41,10 @@
 [from] Function addressee:
   \result FROM \nothing
 [from] Function printf_va_1:
-  S___fc_stdout[0].__fc_FILE_data
-               FROM tmp; "Hello, %s!\n"[0..11]; S___fc_stdout[0] (and SELF)
-  \result FROM tmp; "Hello, %s!\n"[0..11]; S___fc_stdout[0]
+  S___fc_stdout[0].__fc_FILE_data FROM tmp; S___fc_stdout[0] (and SELF)
+  \result FROM tmp; S___fc_stdout[0]
 [from] Function main:
-  S___fc_stdout[0].__fc_FILE_data
-               FROM "Hello, %s!\n"[0..11]; S___fc_stdout[0] (and SELF)
+  S___fc_stdout[0].__fc_FILE_data FROM S___fc_stdout[0] (and SELF)
   \result FROM \nothing
 [from] ====== END OF DEPENDENCIES ======
 [inout] Out (internal) for function addressee:
@@ -56,4 +54,4 @@
 [inout] Out (internal) for function main:
     tmp; __retres; S___fc_stdout[0].__fc_FILE_data
 [inout] Inputs for function main:
-    "Hello, %s!\n"[0..11]; S___fc_stdout[0]
+    S___fc_stdout[0]

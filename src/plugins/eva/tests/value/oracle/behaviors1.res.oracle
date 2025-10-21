@@ -660,7 +660,7 @@
   a FROM \nothing
   \result FROM p
 [from] Function f9:
-  \result FROM n; "a"[0]
+  \result FROM n
 [from] Function f_123_comp_2345_comp_disj:
   \result FROM a; b
 [from] Function f_123_comp_disj:
@@ -774,7 +774,7 @@
 [inout] Out (internal) for function test_promote:
     x; r
 [inout] Inputs for function test_promote:
-    nondet; "a"[0]
+    nondet
 [inout] Out (internal) for function test_small1:
     x
 [inout] Inputs for function test_small1:
@@ -806,4 +806,4 @@
 [inout] Out (internal) for function main:
     T[0..4]; __retres
 [inout] Inputs for function main:
-    nondet; "a"[0]
+    nondet

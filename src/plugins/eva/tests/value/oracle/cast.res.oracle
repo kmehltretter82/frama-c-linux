@@ -114,9 +114,8 @@
 [from] Function any_int_4:
   \result FROM \nothing
 [from] Function printf_va_1:
-  S___fc_stdout[0].__fc_FILE_data
-               FROM "%ud\n"[0..4]; param0; S___fc_stdout[0] (and SELF)
-  \result FROM "%ud\n"[0..4]; param0; S___fc_stdout[0]
+  S___fc_stdout[0].__fc_FILE_data FROM param0; S___fc_stdout[0] (and SELF)
+  \result FROM param0; S___fc_stdout[0]
 [from] Function main1:
   G FROM \nothing
   H FROM \nothing
@@ -128,22 +127,16 @@
   e FROM \nothing
   uc FROM \nothing
   ull FROM \nothing
-  S___fc_stdout[0].__fc_FILE_data
-               FROM "%ud\n"[0..4]; S___fc_stdout[0] (and SELF)
+  S___fc_stdout[0].__fc_FILE_data FROM S___fc_stdout[0] (and SELF)
 [from] Function printf_va_2:
   S___fc_stdout[0].__fc_FILE_data
-               FROM "cast:%d formule:%d\n"[0..19]; param0; param1;
-                    S___fc_stdout[0] (and SELF)
-  \result FROM "cast:%d formule:%d\n"[0..19]; param0; param1;
-               S___fc_stdout[0]
+               FROM param0; param1; S___fc_stdout[0] (and SELF)
+  \result FROM param0; param1; S___fc_stdout[0]
 [from] Function printf_va_3:
-  S___fc_stdout[0].__fc_FILE_data
-               FROM "usc: %ud"[0..8]; param0; S___fc_stdout[0] (and SELF)
-  \result FROM "usc: %ud"[0..8]; param0; S___fc_stdout[0]
+  S___fc_stdout[0].__fc_FILE_data FROM param0; S___fc_stdout[0] (and SELF)
+  \result FROM param0; S___fc_stdout[0]
 [from] Function main2:
-  S___fc_stdout[0].__fc_FILE_data
-               FROM "cast:%d formule:%d\n"[0..19]; "usc: %ud"[0..8];
-                    S___fc_stdout[0] (and SELF)
+  S___fc_stdout[0].__fc_FILE_data FROM S___fc_stdout[0] (and SELF)
 [from] Function main:
   G FROM \nothing
   H FROM \nothing
@@ -155,9 +148,7 @@
   e FROM \nothing
   uc FROM \nothing
   ull FROM \nothing
-  S___fc_stdout[0].__fc_FILE_data
-               FROM "%ud\n"[0..4]; "cast:%d formule:%d\n"[0..19];
-                    "usc: %ud"[0..8]; S___fc_stdout[0] (and SELF)
+  S___fc_stdout[0].__fc_FILE_data FROM S___fc_stdout[0] (and SELF)
 [from] ====== END OF DEPENDENCIES ======
 [inout] Out (internal) for function any_int_4:
     i_0; __retres
@@ -166,13 +157,12 @@
 [inout] Out (internal) for function main1:
     G; H; K; L; I; c; d; e; uc; ull; S___fc_stdout[0].__fc_FILE_data
 [inout] Inputs for function main1:
-    G; H; K; L; I; c; "%ud\n"[0..4]; S___fc_stdout[0]
+    G; H; K; L; I; c; S___fc_stdout[0]
 [inout] Out (internal) for function main2:
     min; max; i_0; G_0; S___fc_stdout[0].__fc_FILE_data
 [inout] Inputs for function main2:
-    "cast:%d formule:%d\n"[0..19]; "usc: %ud"[0..8]; S___fc_stdout[0]
+    S___fc_stdout[0]
 [inout] Out (internal) for function main:
     G; H; K; L; I; c; d; e; uc; ull; S___fc_stdout[0].__fc_FILE_data
 [inout] Inputs for function main:
-    G; H; K; L; I; c; "%ud\n"[0..4]; "cast:%d formule:%d\n"[0..19];
-    "usc: %ud"[0..8]; S___fc_stdout[0]
+    G; H; K; L; I; c; S___fc_stdout[0]
