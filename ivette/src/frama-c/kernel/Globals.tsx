@@ -208,7 +208,7 @@ interface FctItemProps {
 function FctItem(props: FctItemProps): JSX.Element {
   const { fct, scope, icon } = props;
   const { name, signature, main, stdlib, builtin, defined, decl } = fct;
-  const { scopes } = Locations.useSelection();
+  const { scopes, label: selectionLabel } = Locations.useSelection();
   const className = classes(
     main && 'globals-main',
     (stdlib || builtin) && 'globals-stdlib',
@@ -230,7 +230,7 @@ function FctItem(props: FctItemProps): JSX.Element {
       {attributes && <span className="globals-attr">{attributes}</span>}
       {scopes && scopes.includes(decl) &&
          <Icon id='MULTICHECK' kind='selected'
-          title='In the scope of multi-selection'/>
+          title={'Selected in the Locations panel: ' + selectionLabel} />
       }
     </Item>
   );
@@ -392,7 +392,7 @@ function VarItem(props: VarItemProps): JSX.Element {
   const { name, type, decl } = variable;
   const varMarker = React.useMemo(
     () => States.getDeclaration(decl).self, [decl]);
-  const { markers } = Locations.useSelection();
+  const { markers, label: selectionLabel } = Locations.useSelection();
   return (
     <Item
       key={decl}
@@ -404,7 +404,7 @@ function VarItem(props: VarItemProps): JSX.Element {
     >
       {markers && markers.includes(varMarker) &&
          <Icon id='MULTICHECK' kind='selected'
-          title='In the scope of multi-selection'/>
+          title={'Selected in the Locations panel: ' + selectionLabel} />
       }
     </Item>
   );
