@@ -1570,6 +1570,9 @@ module Formatter =
     end)
 let formatter = Formatter.ty
 
+(* The module {!Z} is now a Datatype and should be used instead of {!Integer}.
+   To avoid circular dependencies, we cannot define it directly with {!Z}, so
+   we define it from scratch using {!Fc_internal_z}. *)
 module Integer =
   Make_with_collections
     (struct
