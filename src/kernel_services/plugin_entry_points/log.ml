@@ -1271,7 +1271,8 @@ end
 (* --- Tests                                                             --- *)
 (* ------------------------------------------------------------------------- *)
 
-let test_terminal () =
+(* Only used in inline tests removed in release mode. *)
+let _test_terminal () =
   let buffer = Buffer.create 13 in
   let fmt = Format.formatter_of_buffer buffer in
   Format.pp_set_mark_tags fmt true;
@@ -1289,22 +1290,22 @@ let test_terminal () =
   channel, validate_result
 
 let%test _ =
-  let channel, validate = test_terminal () in
+  let channel, validate = _test_terminal () in
   logtransient channel "abcd";
   logtransient channel "abc";
   validate "<bold>[test]</bold> abcd\r\027[K<bold>[test]</bold> abc"
 
 let%test _ =
-  let channel, validate = test_terminal () in
+  let channel, validate = _test_terminal () in
   logtransient channel "abc\ndef";
   validate "<bold>[test]</bold> abc…"
 
 let%test _ =
-  let channel, validate = test_terminal () in
+  let channel, validate = _test_terminal () in
   logtransient channel "@{<a>  abc\ndef@}";
   validate "<bold>[test]</bold> <a>abc…</a>"
 
 let%test _ =
-  let channel, validate = test_terminal () in
+  let channel, validate = _test_terminal () in
   logtransient channel "  abc\n@{<a>@}def";
   validate "<bold>[test]</bold> abc…"
