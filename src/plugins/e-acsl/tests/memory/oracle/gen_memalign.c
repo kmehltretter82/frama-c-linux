@@ -9,11 +9,11 @@
 #include "time.h"
 extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 
+int __gen_e_acsl_is_alignment(unsigned long n);
+
 int __gen_e_acsl_is_valid_alignment(unsigned long n);
 
-int __gen_e_acsl_is_implementation_alignment(unsigned long n);
-
-/*@ requires valid_alignment: is_implementation_alignment(alignment);
+/*@ requires valid_alignment: is_valid_alignment(alignment);
     requires alignment_modulo: size % alignment == 0;
     assigns __fc_heap_status, \result, __fc_errno;
     assigns __fc_heap_status \from size, __fc_heap_status;
@@ -533,7 +533,7 @@ int __gen_e_acsl_posix_memalign(void **memptr, size_t alignment, size_t size)
   }
 }
 
-/*@ requires valid_alignment: is_implementation_alignment(alignment);
+/*@ requires valid_alignment: is_valid_alignment(alignment);
     requires alignment_modulo: size % alignment == 0;
     assigns __fc_heap_status, \result, __fc_errno;
     assigns __fc_heap_status \from size, __fc_heap_status;
@@ -569,27 +569,26 @@ void *__gen_e_acsl_aligned_alloc(size_t alignment, size_t size)
   void *__retres;
   __e_acsl_store_block((void *)(& __retres),8UL);
   {
-    int __gen_e_acsl_is_implementation_alignment_2;
+    int __gen_e_acsl_is_valid_alignment_2;
     __gen_e_acsl_at = errno;
     __gen_e_acsl_at_2 = alignment;
     __gen_e_acsl_contract = __e_acsl_contract_init(2UL);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
-    __gen_e_acsl_is_implementation_alignment_2 = __gen_e_acsl_is_implementation_alignment
+    __gen_e_acsl_is_valid_alignment_2 = __gen_e_acsl_is_valid_alignment
     (alignment);
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,"alignment",0,
                                    alignment);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
-                                 "valid_alignment: is_implementation_alignment(alignment)",
-                                 0,
-                                 __gen_e_acsl_is_implementation_alignment_2);
+                                 "valid_alignment: is_valid_alignment(alignment)",
+                                 0,__gen_e_acsl_is_valid_alignment_2);
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Precondition";
-    __gen_e_acsl_assert_data.pred_txt = "is_implementation_alignment(alignment)";
+    __gen_e_acsl_assert_data.pred_txt = "is_valid_alignment(alignment)";
     __gen_e_acsl_assert_data.file = "FRAMAC_SHARE/libc/stdlib.h";
     __gen_e_acsl_assert_data.fct = "aligned_alloc";
     __gen_e_acsl_assert_data.line = 539;
     __gen_e_acsl_assert_data.name = "valid_alignment";
-    __e_acsl_assert(__gen_e_acsl_is_implementation_alignment_2,
+    __e_acsl_assert(__gen_e_acsl_is_valid_alignment_2,
                     & __gen_e_acsl_assert_data);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
@@ -718,7 +717,7 @@ void *__gen_e_acsl_aligned_alloc(size_t alignment, size_t size)
 
 /*@ assigns \result;
     assigns \result \from n; */
-int __gen_e_acsl_is_valid_alignment(unsigned long n)
+int __gen_e_acsl_is_alignment(unsigned long n)
 {
   int __gen_e_acsl_and;
   if (n > 0UL) {
@@ -749,46 +748,24 @@ int __gen_e_acsl_is_valid_alignment(unsigned long n)
 
 /*@ assigns \result;
     assigns \result \from n; */
-int __gen_e_acsl_is_implementation_alignment(unsigned long n)
+int __gen_e_acsl_is_valid_alignment(unsigned long n)
 {
+  int __gen_e_acsl_is_alignment_3;
   int __gen_e_acsl_and;
-  int __gen_e_acsl_and_2;
-  if (n > 0UL) {
-    __e_acsl_mpz_t __gen_e_acsl_;
-    __e_acsl_mpz_t __gen_e_acsl__2;
-    __e_acsl_mpz_t __gen_e_acsl_sub;
-    __e_acsl_mpz_t __gen_e_acsl_band;
-    unsigned long __gen_e_acsl__3;
-    __gmpz_init_set_ui(__gen_e_acsl_,n);
-    __gmpz_init_set_si(__gen_e_acsl__2,1L);
-    __gmpz_init(__gen_e_acsl_sub);
-    __gmpz_sub(__gen_e_acsl_sub,(__e_acsl_mpz_struct const *)(__gen_e_acsl_),
-               (__e_acsl_mpz_struct const *)(__gen_e_acsl__2));
-    __gmpz_init(__gen_e_acsl_band);
-    __gmpz_and(__gen_e_acsl_band,
-               (__e_acsl_mpz_struct const *)(__gen_e_acsl_),
-               (__e_acsl_mpz_struct const *)(__gen_e_acsl_sub));
-    __gen_e_acsl__3 = __gmpz_get_ui((__e_acsl_mpz_struct const *)(__gen_e_acsl_band));
-    __gen_e_acsl_and = __gen_e_acsl__3 == 0UL;
-    __gmpz_clear(__gen_e_acsl_);
-    __gmpz_clear(__gen_e_acsl__2);
-    __gmpz_clear(__gen_e_acsl_sub);
-    __gmpz_clear(__gen_e_acsl_band);
-  }
+  __gen_e_acsl_is_alignment_3 = __gen_e_acsl_is_alignment(n);
+  if (__gen_e_acsl_is_alignment_3) __gen_e_acsl_and = n < 268435456UL;
   else __gen_e_acsl_and = 0;
-  if (__gen_e_acsl_and) __gen_e_acsl_and_2 = n < 268435456UL;
-  else __gen_e_acsl_and_2 = 0;
-  return __gen_e_acsl_and_2;
+  return __gen_e_acsl_and;
 }
 
 /*@ assigns \result;
     assigns \result \from n; */
 int __gen_e_acsl_is_posix_alignment(unsigned long n)
 {
-  int __gen_e_acsl_is_valid_alignment_2;
+  int __gen_e_acsl_is_alignment_2;
   int __gen_e_acsl_and_2;
-  __gen_e_acsl_is_valid_alignment_2 = __gen_e_acsl_is_valid_alignment(n);
-  if (__gen_e_acsl_is_valid_alignment_2) __gen_e_acsl_and_2 = (int)(n % 8UL) == 0;
+  __gen_e_acsl_is_alignment_2 = __gen_e_acsl_is_alignment(n);
+  if (__gen_e_acsl_is_alignment_2) __gen_e_acsl_and_2 = (int)(n % 8UL) == 0;
   else __gen_e_acsl_and_2 = 0;
   return __gen_e_acsl_and_2;
 }
