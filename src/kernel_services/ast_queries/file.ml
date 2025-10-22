@@ -629,9 +629,12 @@ let parse_cabs cpp_command = function
                   "trying to preprocess annotation with an unknown \
                    preprocessor."; true))
       then begin
+        let cstd_opt = c_standard_option cmdl in
         let clang_no_warn = silence_cpp_machdep_warnings cmdl in
         let cmdl =
-          List.fold_left (fun acc s -> acc ^ " " ^ s) cmdl clang_no_warn
+          List.fold_left
+            (fun acc s -> acc ^ " " ^ s)
+            cmdl (cstd_opt @ clang_no_warn)
         in
         let ppf' =
           try Logic_preprocess.file ".c"
