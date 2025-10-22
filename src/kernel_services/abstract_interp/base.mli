@@ -162,7 +162,8 @@ val bits_sizeof : t -> Int_Base.t
 
 (** Minimum alignment (in bytes) of the base: the address of a variable
     represented by base [b] is known to be a multiple of [alignof b].
-    [alignof Null] is zero. *)
+    [alignof Null] is zero.
+    @since Frama-C+dev *)
 val alignof : t -> int
 
 (** Access kind: read/write of k bits, or no access:
