@@ -246,34 +246,37 @@ module Make_Hashconsed_Lattice_Set
 end
 
 module Int = struct
-  include (Z: module type of Z with type t = Z.t)
 
-  let e_rem = erem
+  include (Integer: module type of Integer with type t = Integer.t)
+  [@@alert "-deprecated"]
+
+  include (Datatype.Integer: Datatype.S_with_collections with type t := t)
+  [@@alert "-deprecated"]
 
   (** execute [f] on [inf], [inf + step], ... *)
   let fold f ~inf ~sup ~step acc =
     (*    Format.printf "Int.fold: inf:%a sup:%a step:%a@\n"
            pretty inf pretty sup pretty step; *)
-    let nb_loop = ediv (sub sup inf) step in
+    let nb_loop = Z.ediv (Z.sub sup inf) step in
     let rec fold_incr ~counter ~inf acc =
       if equal counter 1000z then
         feedback_approximation "enumerating %a integers" pretty nb_loop;
-      if leq inf sup then begin
+      if Z.leq inf sup then begin
         (*          Format.printf "Int.fold: %a@\n" pretty inf; *)
-        fold_incr ~counter:(succ counter) ~inf:(add step inf) (f inf acc)
+        fold_incr ~counter:(Z.succ counter) ~inf:(Z.add step inf) (f inf acc)
       end else acc
     in
     let rec fold_decr ~counter ~sup acc =
       if equal counter 1000z then
         feedback_approximation "enumerating %a integers" pretty nb_loop;
-      if leq inf sup then begin
+      if Z.leq inf sup then begin
         (*          Format.printf "Int.fold: %a@\n" pretty inf; *)
-        fold_decr ~counter:(succ counter) ~sup:(add step sup) (f sup acc)
+        fold_decr ~counter:(Z.succ counter) ~sup:(Z.add step sup) (f sup acc)
       end else acc
     in
-    if leq zero step
-    then fold_incr ~counter:zero ~inf acc
-    else fold_decr ~counter:zero ~sup acc
+    if Z.leq Z.zero step
+    then fold_incr ~counter:Z.zero ~inf acc
+    else fold_decr ~counter:Z.zero ~sup acc
 
 end
 

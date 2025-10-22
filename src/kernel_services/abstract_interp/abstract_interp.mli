@@ -46,11 +46,10 @@ end
 
 
 module Int : sig
-  include module type of Z with type t = Z.t
+  include module type of Integer with type t = Integer.t
+    [@@alert "-deprecated"]
 
-  val e_rem: t -> t -> t
-  [@@deprecated "Use Z.erem instead."]
-  [@@migrate { repl = Z.erem } ]
+  include Datatype.S_with_collections with type t := t
 
   val fold : (t -> 'a -> 'a) -> inf:t -> sup:t -> step:t -> 'a -> 'a
   (** Fold the function on the value between [inf] and [sup] at every
@@ -58,7 +57,10 @@ module Int : sig
       go increasing, if [step] is negative the first value is [sup]
       and values go decreasing *)
   [@@deprecated "Use Int_interval.fold_int instead"]
-end [@@deprecated "Use Z instead"]
+end
+[@@deprecated "Use Z module instead. You can use OCamlmig (see \
+               Frama-C Plugin Development Guide) or integer.mli for migration \
+               hints"]
 
 (** "Relative" integers. They are subtraction between two absolute integers *)
 module Rel : sig
