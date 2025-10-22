@@ -536,7 +536,7 @@ export interface ItemProps {
 export type MultiselectItemProps = ItemProps | 'separator'
 
 export function MultiselectItem({ item }: {item: MultiselectItemProps})
-: React.JSX.Element {
+: React.JSX.Element | null {
   if(item === 'separator')
     return <div className='dome-xMenu-Item-separator' />;
 
@@ -544,7 +544,9 @@ export function MultiselectItem({ item }: {item: MultiselectItemProps})
     'dome-xMenu-Item',
     !item.enabled && 'dome-xMenu-Item-disabled'
   );
-  return <div title={item.title} className={className}
+
+  if(item.display === false) return null;
+  return <div title={item.title} className={className} id={item.id}
       onClick={() => item.enabled && item.onClick()}
     >
       <Icon id='CHECK' size={14} visible={item.checked}/>
@@ -552,7 +554,7 @@ export function MultiselectItem({ item }: {item: MultiselectItemProps})
     </div>;
 }
 
-export function Multiselect({ children }: {children: React.ReactNode[]})
+export function Multiselect({ children }: {children: React.ReactNode})
 : React.JSX.Element { return <Vbox>{ children }</Vbox>; }
 
 // --------------------------------------------------------------------------

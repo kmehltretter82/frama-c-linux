@@ -468,6 +468,7 @@ meter::-webkit-meter-even-less-good-value  {
   flex-wrap: nowrap;
   align-items: center;
   align-content: center;
+  padding: 0 5px;
   gap: 5px;
 
   &:not(.dome-xMenu-Item-disabled) {
