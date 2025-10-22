@@ -14,10 +14,10 @@ let is_negative e = F.p_lt e F.e_zero  (* n < 0 *)
 
 (* Requires 2^i < n && 0 <= i < j *)
 let rec log2m i j n =
-  let b = Integer.two_power_of_int j in
-  if Integer.lt b n then log2m j (2*j) n else
+  let b = Z.two_power_of_int j in
+  if Z.lt b n then log2m j (2*j) n else
     (* 2^i < n <= 2^j *)
-  if Integer.equal b n then j else
+  if Z.equal b n then j else
     (* 2^i < n < 2^j *)
     log2d i j n
 
@@ -25,8 +25,8 @@ let rec log2m i j n =
 and log2d i j n =
   if succ i = j then i else
     let k = (i+j)/2 in
-    let a = Integer.two_power_of_int k in
-    let c = Integer.compare a n in
+    let a = Z.two_power_of_int k in
+    let c = Z.compare a n in
     if c > 0 then log2d i k n else (* a=2^k > n *)
     if c < 0 then log2d k j n else (* a=2^k < n *)
       k
@@ -43,7 +43,7 @@ and log2d i j n =
 *)
 
 let land_leq ~positive es n = (* land(e_1,...,e_n) <= n *)
-  if Integer.(le zero n) then
+  if Z.(leq zero n) then
     (* From theorem LAND-1 when 0<=n:
        (exist i, 0 <= e_i <= n) |- 0 <= land(e_1,...,e_n) <= n *)
     let a = F.e_zint n in
@@ -58,24 +58,24 @@ let land_leq ~positive es n = (* land(e_1,...,e_n) <= n *)
        (forall i, e_i <= n < 0) |- land(e_1,...,e_n) <= n < 0*)
     let a = F.e_zint n in
     let case1 = F.p_any (fun e -> F.p_leq e a) es in
-    if Integer.(lt n minus_one) then case1 else
+    if Z.(lt n minus_one) then case1 else
       (* From theorem LAND-2: when -1 == n
          (forall i, e_i < 0) && -1 <= 0 <= n |- land(e_1,...e_n) <= -1 <= 0 <= n *)
       let case2 = F.p_any is_negative es in
       F.p_or case1 case2
 
 let leq_land ~positive n es = (* n <= land(e_1,...,e_n) *)
-  if Integer.(le n zero) then
+  if Z.(leq n zero) then
     (* From theorem LAND-1 when n<=0:
        (exist i, n <= 0 <= e_i) |- n <= 0 <= land(e_1,...,e_n) *)
     F.p_any is_positive es
   else
   if positive then raise Not_found else
-    let p = log2m 0 1 (Integer.neg n) in
+    let p = log2m 0 1 (Z.neg n) in
     (* Have n <= -2^p < 0
        From theorem LAND-2: when n <= -2^p < 0
        (forall i, n <= -2^p <= e_i < 0) |- n <= land(e_1,...e_n) < 0 *)
-    let a = F.e_zint Integer.(neg (two_power_of_int p)) in
+    let a = F.e_zint Z.(neg (two_power_of_int p)) in
     F.p_all (fun e -> F.p_and (is_negative e) (F.p_lt a e)) es
 
 (* Theorem LOR-1: partially derived from Cbits.uint_lor_inf
@@ -90,12 +90,12 @@ let leq_land ~positive n es = (* n <= land(e_1,...,e_n) *)
 *)
 
 let lor_leq ~positive es n = (* lor(e_1,...,e_n) <= n *)
-  if Integer.(le zero n) then
-    let p = log2m 0 1 (Integer.succ n) in
+  if Z.(leq zero n) then
+    let p = log2m 0 1 (Z.succ n) in
     (* Have 0 <= 2^p <= n+1, hence 0 <= 2^p-1 <= n.
        From theorem LOR-1 when 0 <= 2^p-1 <= n
        (forall i, 0<= e_i <= 2^p-1 <=n) ==> 0<=lor(e_1,...,e_n) <= 2^p-1 <=n *)
-    let a = F.e_zint (Integer.two_power_of_int p) in
+    let a = F.e_zint (Z.two_power_of_int p) in
     let case1 = F.p_all (fun e -> F.p_and (is_positive e) (F.p_lt e a)) es in
     if positive then case1 else
       (* From theorem LOR-2 when 0<=n:
@@ -106,7 +106,7 @@ let lor_leq ~positive es n = (* lor(e_1,...,e_n) <= n *)
     raise Not_found
 
 let leq_lor ~positive n es = (* n <= lor(e_1,...,e_n) *)
-  if Integer.(le zero n) then
+  if Z.(leq zero n) then
     (* From theorem LOR-1 when 0<=n:
        (forall i, 0 <= n <= e_i) |- 0 <= n <= lor(e_1,...,e_n) *)
     let a = F.e_zint n in
@@ -137,7 +137,7 @@ type pattern =
 type sigma = {
   plor : bool ;
   pland : bool ;
-  mutable bound : Integer.t ;
+  mutable bound : Z.t ;
   mutable terms : F.term list ;
 }
 
@@ -157,18 +157,18 @@ let matches s p e = try pmatch s p e ; true with Exit -> false
 let patterns : (pattern * (sigma -> F.pred)) list =
   [
     LEQ(INT,LAND) , (fun s -> leq_land ~positive:s.pland s.bound s.terms) ;
-    LT(INT,LAND) , (fun s -> leq_land ~positive:s.pland (Integer.succ s.bound) s.terms) ;
+    LT(INT,LAND) , (fun s -> leq_land ~positive:s.pland (Z.succ s.bound) s.terms) ;
     LEQ(LAND,INT) , (fun s -> land_leq ~positive:s.pland s.terms s.bound) ;
-    LT(LAND,INT) , (fun s -> land_leq ~positive:s.pland s.terms (Integer.pred s.bound)) ;
+    LT(LAND,INT) , (fun s -> land_leq ~positive:s.pland s.terms (Z.pred s.bound)) ;
     LEQ(INT,LOR) , (fun s -> leq_lor ~positive:s.plor s.bound s.terms) ;
-    LT(INT,LOR) , (fun s -> leq_lor ~positive:s.plor (Integer.succ s.bound) s.terms) ;
+    LT(INT,LOR) , (fun s -> leq_lor ~positive:s.plor (Z.succ s.bound) s.terms) ;
     LEQ(LOR,INT) , (fun s -> lor_leq ~positive:s.plor s.terms s.bound) ;
-    LT(LOR,INT) , (fun s -> lor_leq ~positive:s.plor s.terms (Integer.pred s.bound)) ;
+    LT(LOR,INT) , (fun s -> lor_leq ~positive:s.plor s.terms (Z.pred s.bound)) ;
   ]
 
 let select_goal ~pland ~plor g =
   try
-    let s = { pland ; plor ; bound = Integer.zero ; terms = [] } in
+    let s = { pland ; plor ; bound = Z.zero ; terms = [] } in
     let (_,f) = List.find (fun (p,_) -> matches s p g) patterns in
     Some (f s)
   with Not_found -> None

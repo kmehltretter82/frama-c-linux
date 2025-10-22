@@ -40,7 +40,7 @@ let warn_unknown_size =
 
 type validity_hidden_base =
   | UnknownValidity (* Base is maybe invalid on its entire validity *)
-  | KnownThenUnknownValidity of Integer.t (* Base is valid on i bits, then
+  | KnownThenUnknownValidity of Z.t (* Base is valid on i bits, then
                                              maybe invalid on the remainder of its validity *)
 
 let stdlib_attribute = (Ast_attributes.fc_stdlib_generated, [])
@@ -54,7 +54,7 @@ let create_hidden_base ~libc ~valid ~hidden_var_name ~name_desc pointed_typ =
     (* Add a special case for void* pointers: we do not want to compute the
        size of void *)
     let validity = match Ast_types.unroll_node pointed_typ with
-      | TVoid -> Base.Unknown (Integer.zero, None, Bit_utils.max_bit_address ())
+      | TVoid -> Base.Unknown (Z.zero, None, Bit_utils.max_bit_address ())
       | _ -> Base.validity_from_type hidden_var
     in
     match validity with
@@ -64,8 +64,8 @@ let create_hidden_base ~libc ~valid ~hidden_var_name ~name_desc pointed_typ =
          to be valid *)
       (match valid with
        | KnownThenUnknownValidity size -> (*except here, for size bits*)
-         let size = Integer.pred size in
-         assert (Integer.le size b);
+         let size = Z.pred size in
+         assert (Z.leq size b);
          Base.Unknown (a, Some size, b)
        | UnknownValidity -> Base.Unknown (a, None, b)
       )
@@ -126,7 +126,7 @@ let initialize_var_using_type varinfo state =
           let i =
             match Ast_attributes.find_params "arraylen" attr with
             | [AInt i] -> i
-            | _ -> Integer.of_int context_max_width
+            | _ -> Z.of_int context_max_width
           in
           let arr_pointed_typ =
             Cil_const.mk_tarray typ' (Some (Cil.kinteger64 ~loc:varinfo.vdecl i))
@@ -138,7 +138,7 @@ let initialize_var_using_type varinfo state =
           (* Make first cell of the array valid. The NULL pointer takes
              care of a potential invalid pointer. *)
           let valid =
-            try KnownThenUnknownValidity (Integer.of_int (Cil.bitsSizeOf typ'))
+            try KnownThenUnknownValidity (Z.of_int (Cil.bitsSizeOf typ'))
             with Cil.SizeOfError _ -> UnknownValidity
           in
           let hidden_base =
@@ -181,7 +181,7 @@ let initialize_var_using_type varinfo state =
     | TArray (typ, len) ->
       begin try
           let size = Cil.lenOfArray len in
-          let size_elt = Integer.of_int (Cil.bitsSizeOf typ) in
+          let size_elt = Z.of_int (Cil.bitsSizeOf typ) in
           let psize = pred size in
           let state = ref state in
           let typ = Ast_types.unroll typ in
@@ -238,7 +238,7 @@ let initialize_var_using_type varinfo state =
               in
               assert (Abstract_interp.Rel.(equal offset zero));
               let ncells = size - max_precise_size in
-              let total_size = Integer.mul size_elt (Integer.of_int ncells) in
+              let total_size = Z.mul size_elt (Z.of_int ncells) in
               let offsm_repeat = Cvalue.V_Offsetmap.create
                   ~size_v:modu ~size:total_size v in
               let loc = Location_Bits.shift
@@ -325,7 +325,7 @@ let initialize_var_using_type varinfo state =
         Eva_utils.create_new_var hidden_var_name Cil_const.charType
       in
       hidden_var.vdescr <- Some (name_desc^"_WELL");
-      let validity = Base.Known (Integer.zero, Bit_utils.max_bit_address ()) in
+      let validity = Base.Known (Z.zero, Bit_utils.max_bit_address ()) in
       let hidden_base = Base.register_memory_var hidden_var validity in
       make_well hidden_base state (Lazy.force loc)
     | TNamed _ -> assert false

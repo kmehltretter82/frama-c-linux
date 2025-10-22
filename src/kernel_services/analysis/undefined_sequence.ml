@@ -27,7 +27,7 @@ let check_sequences file =
     | Index(i1,offs1), Index(i2,offs2) ->
       (match Cil.constFoldToInt i1, Cil.constFoldToInt i2 with
        | Some c1, Some c2 ->
-         Integer.equal c1 c2 &&
+         Z.equal c1 c2 &&
          may_overlap_offset offs1 offs2
        | None, _ | _, None ->
          may_overlap_offset offs1 offs2

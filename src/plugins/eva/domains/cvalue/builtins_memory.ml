@@ -265,7 +265,7 @@ let frama_c_memset_imprecise state dst_expr dst v size =
     if Int.gt size_min Int.zero then
       let size = size_min in
       let value = Cvalue.V_Or_Uninitialized.initialized v in
-      let from = Cvalue.V_Offsetmap.create ~size ~size_v:Integer.eight value in
+      let from = Cvalue.V_Offsetmap.create ~size ~size_v:8z value in
       warn_imprecise_offsm_write ~name:"memset" dst_expr from;
       let state =
         Cvalue.Model.paste_offsetmap ~from ~size ~exact ~dst_loc:dst state
@@ -370,7 +370,7 @@ let memset_typ_offsm_int full_typ i =
         (* Update [full_offsm] between [offset] and [offset+size-1], and store
            exactly [v] there *)
         let update size v =
-          let bounds = (offset, Int.(pred (add offset size))) in
+          let bounds = (offset, Int.pred (Int.add offset size)) in
           let vinit = V_Or_Uninitialized.initialized v in
           V_Offsetmap.add bounds (vinit, size, Rel.zero) offsm
         in
@@ -402,11 +402,11 @@ let memset_typ_offsm_int full_typ i =
         | TArray (typelt, nb) -> begin
             let nb = Cil.lenOfArray64 nb in (* always succeeds, we computed the
                                                size of the entire type earlier *)
-            if Integer.(gt nb zero) then begin
+            if Z.(gt nb zero) then begin
               let sizeelt = Int.of_int (Cil.bitsSizeOf typelt) in
               (* Do the first cell *)
               let offsm' = aux typelt offset offsm in
-              if Integer.(gt nb one) then begin
+              if Z.(gt nb one) then begin
                 (* Copy the result *)
                 let src = Ival.inject_singleton offset in
                 let copy =
@@ -617,7 +617,7 @@ let frama_c_interval_split _state actuals =
         let lower = Ival.project_int (Cvalue.V.project_ival lower) in
         let i = ref lower in
         let r = ref [] in
-        while (Int.le !i upper) do
+        while (Int.leq !i upper) do
           r := Cvalue.V.inject_int !i :: !r;
           i := Int.succ !i;
         done;

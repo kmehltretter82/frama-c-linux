@@ -39,12 +39,12 @@ module Make
     | Int_Base.Top, size
     | size, Int_Base.Top -> size
     | Int_Base.Value lsize as size, Int_Base.Value rsize ->
-      if Integer.equal lsize rsize then size else
+      if Z.equal lsize rsize then size else
         Self.fatal
           "Location product: inconsistent size of the same location \
            represented by %a (size %a) and %a (size %a)."
-          Left.pretty_loc l Integer.pretty lsize
-          Right.pretty_loc r Integer.pretty rsize
+          Left.pretty_loc l Z.pretty lsize
+          Right.pretty_loc r Z.pretty rsize
 
   let enumerate_valid_bits access (l, r) =
     Locations.Zone.narrow

@@ -8,7 +8,7 @@
 
 open Cil_datatype
 
-module IntSet = Datatype.Integer.Set
+module IntSet = Z.Set
 module FloatSet = Datatype.Float.Set
 
 module Num_hints_stmt = Stmt.Map.Make(IntSet)
@@ -225,7 +225,7 @@ let float_hints stmto baseo hints =
 
 (* default set of hints. Depends on the machdep *)
 let default () =
-  let int_default = IntSet.of_list (List.map Integer.of_int [-1;0;1]) in
+  let int_default = IntSet.of_list (List.map Z.of_int [-1;0;1]) in
   let max_32 = Floating_point.largest_finite_float_of Single in
   let positives = [ 0.0 ; 1.0 ; 10.0 ; 1e10 ; max_32 ; 1e80 ] in
   let negatives = List.map (fun x -> -.x) positives in

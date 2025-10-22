@@ -148,15 +148,15 @@ module type S = sig
 
   val forward_cast: dst:prec -> t -> t
   val backward_cast: src:prec -> t -> t or_bottom
-  val cast_int_to_float: prec -> Integer.t option -> Integer.t option -> t
+  val cast_int_to_float: prec -> Z.t option -> Z.t option -> t
 
   (** Bitwise reinterpretation of a floating-point interval of double precision
       into consecutive ranges of integers. *)
-  val bits_of_float64_list : t -> (Integer.t * Integer.t) list
+  val bits_of_float64_list : t -> (Z.t * Z.t) list
 
   (** Bitwise reinterpretation of a floating-point interval of single precision
       into consecutive ranges of integers. *)
-  val bits_of_float32_list : t -> (Integer.t * Integer.t) list
+  val bits_of_float32_list : t -> (Z.t * Z.t) list
 
   (** Subdivides an interval of a given precision into two intervals.
       Raises {!Abstract_interp.Can_not_subdiv} if it can't be subdivided.

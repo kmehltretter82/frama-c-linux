@@ -15,7 +15,9 @@
           (echo "  - Qed:" %{lib-available:qed} "\n")
           (echo "  - Rtegen:" %{lib-available:frama-c-rtegen.core} "\n")
           (echo "  - Why3:" %{lib-available:why3} "\n")
-          (echo "  - Zarith:" %{lib-available:zarith} "\n"))))
+          (echo "  - Zarith:" %{lib-available:zarith} "\n")
+          (echo "  - ppx_z_literals:" %{lib-available:frama-c.ppx_z_literals} "\n")))
+)
 
 (rule
  (alias install)
@@ -42,7 +44,9 @@
       (  -> wp_eva.disabled.ml)))
   (foreign_stubs (language c) (names cores))
   (instrumentation (backend landmarks))
-  (instrumentation (backend bisect_ppx)))
+  (instrumentation (backend bisect_ppx))
+  (preprocess (pps frama-c.ppx_z_literals))
+)
 
 (plugin (optional) (name wp) (libraries frama-c-wp.core) (site (frama-c plugins)))
 

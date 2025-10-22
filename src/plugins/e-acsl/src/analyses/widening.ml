@@ -13,13 +13,13 @@ open Interval_utils
 let is_lower l1 l2 =
   match l1, l2 with
   | None, _ -> true
-  | Some l1, Some l2 -> Integer.compare l1 l2 <= 0
+  | Some l1, Some l2 -> Z.compare l1 l2 <= 0
   | Some _, None -> false
 
 let is_higher u1 u2 =
   match u1, u2 with
   | None, _ -> true
-  | Some u1, Some u2 -> Integer.compare u1 u2 >= 0
+  | Some u1, Some u2 -> Z.compare u1 u2 >= 0
   | Some _, None -> false
 
 let widen_ival_naive _ _ =

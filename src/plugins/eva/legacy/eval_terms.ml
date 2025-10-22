@@ -280,9 +280,9 @@ let bind_logic_vars env lvs =
     | Lreal -> bind_logic_var top_float
     | Ctype ctyp when Ast_types.is_integral ctyp ->
       let base = Base.of_c_logic_var lv in
-      let size = Integer.of_int (Cil.bitsSizeOf ctyp) in
+      let size = Z.of_int (Cil.bitsSizeOf ctyp) in
       let v = Cvalue.V_Or_Uninitialized.initialized V.top_int in
-      let state = Model.add_base_value base ~size v ~size_v:Integer.one state in
+      let state = Model.add_base_value base ~size v ~size_v:Z.one state in
       state, logic_vars
     | _ -> unsupported_lvar lv
   in
@@ -561,8 +561,8 @@ let pass_logic_cast exn typ trm =
     in
     let sityp = Bit_utils.is_signed_int_enum_pointer typ in
     let sisexpr = Bit_utils.is_signed_int_enum_pointer typeoftrm in
-    if (Integer.ge styp sexpr && sityp = sisexpr) (* larger, same signedness *)
-    || (Integer.gt styp sexpr && sityp) (* strictly larger and signed *)
+    if (Z.geq styp sexpr && sityp = sisexpr) (* larger, same signedness *)
+    || (Z.gt styp sexpr && sityp) (* strictly larger and signed *)
     then ()
     else raise exn
 
@@ -593,11 +593,11 @@ let constraint_trange idx size_arr =
         | Some size ->
           let low = match low with (* constrained l.h.s *)
             | Some _ -> low
-            | None -> Some (Logic_const.tint ~loc Integer.zero)
+            | None -> Some (Logic_const.tint ~loc Z.zero)
           in
           let up = match up with (* constrained r.h.s *)
             | Some _ -> up
-            | None -> Some (Logic_const.tint ~loc (Integer.pred size))
+            | None -> Some (Logic_const.tint ~loc (Z.pred size))
           in
           Logic_const.trange ~loc (low, up)
       end
@@ -692,8 +692,8 @@ let inline logic_info =
    and the \Positive and \Negative constructors (handled in eval_term). They can
    only be compared through equality and disequality; no other operation exists
    on this type, so our interpretation remains correct. *)
-let positive_cvalue = Cvalue.V.inject_int Integer.one
-let negative_cvalue = Cvalue.V.inject_int Integer.minus_one
+let positive_cvalue = Cvalue.V.inject_int Z.one
+let negative_cvalue = Cvalue.V.inject_int Z.minus_one
 
 let is_true = function
   | `True | `TrueReduced _ -> true
@@ -738,7 +738,7 @@ let cast ~src_typ ~dst_typ v =
       else c_alarm ()
 
     | (TSInt dst | TSPtr dst), (TSInt _ | TSPtr _) ->
-      let size = Integer.of_int dst.i_bits in
+      let size = Z.of_int dst.i_bits in
       let signed = dst.i_signed in
       V.cast_int_to_int ~signed ~size v
 
@@ -770,7 +770,7 @@ let eval_logic_charlen wrapper env v ldeps =
   let eover =
     let v, alarms = apply_logic_builtin wrapper env [v] in
     if alarms && not (Cvalue.V.is_bottom v)
-    then Cvalue.V.inject_ival (Ival.inject_range (Some Integer.minus_one) None)
+    then Cvalue.V.inject_ival (Ival.inject_range (Some Z.minus_one) None)
     else v
   in
   let eunder = under_from_over eover in
@@ -802,7 +802,7 @@ let eval_logic_charchr builtin env s c ldeps_s ldeps_c =
 
 (* Evaluates the logical functions memchr_off/wmemchr_off. *)
 let eval_logic_memchr_off builtin env s c n =
-  let minus_one = Cvalue.V.inject_int Integer.minus_one in
+  let minus_one = Cvalue.V.inject_int Z.minus_one in
   let positive = Cvalue.V.inject_ival Ival.positive_integers in
   let pred_n = Cvalue.V.add_untyped ~factor:Int_Base.one n.eover minus_one in
   let n_pos = Cvalue.V.narrow positive pred_n in
@@ -1238,11 +1238,11 @@ let rec eval_term ~alarm_mode env t =
            frontiers are always 0 or 8*k-1 (because validity is in bits and
            starts on zero), so we add 1 everywhere, then divide by eight. *)
         let convert start_bits end_bits =
-          let congr_succ i = Integer.(equal zero (e_rem (succ i) eight)) in
-          let congr_or_zero i = Integer.(equal zero i || congr_succ i) in
+          let congr_succ i = Z.(equal zero (erem (succ i) (of_int 8))) in
+          let congr_or_zero i = Z.(equal zero i || congr_succ i) in
           assert (congr_or_zero start_bits || congr_or_zero end_bits);
-          let start_bytes = Integer.(e_div (Integer.succ start_bits) eight) in
-          let end_bytes =   Integer.(e_div (Integer.succ end_bits)   eight) in
+          let start_bytes = Z.(ediv (Z.succ start_bits) (of_int 8)) in
+          let end_bytes =   Z.(ediv (Z.succ end_bits)   (of_int 8)) in
           Ival.inject_range (Some start_bytes) (Some end_bytes)
         in
         match Base.validity b with
@@ -1391,7 +1391,7 @@ and eval_known_logic_function ~alarm_mode env li labels args =
           try String.index str '\x00'
           with Not_found -> String.length str
         in
-        einteger (Cvalue.V.inject_int (Integer.of_int length))
+        einteger (Cvalue.V.inject_int (Z.of_int length))
       | _ ->
         let r = eval_term ~alarm_mode env arg in
         let builtin =
@@ -1570,18 +1570,18 @@ and eval_quantifier_extremum backward_left ~min ~max eval_term =
   let project r = Cvalue.V.project_ival r.eover in
   match Ival.min_and_max (project min),
         Ival.min_and_max (project max) with
-  | (min, Some b), (Some e, max) when Integer.le b e ->
+  | (min, Some b), (Some e, max) when Z.leq b e ->
     (* All integers between [b] and [e] are necessarily in the range to be
        considered. If [e-b] is small enough, evaluate [eval_term i] for each [i]
        between [b] and [e]. Otherwise, evaluate [eval_term] for the bound [b]
        and [e], and for the interval [b+1..e-1]. We could be more precise by
        subdividing the interval. *)
     let r =
-      if Integer.equal e b
+      if Z.equal e b
       then eval_term (Cvalue.V.inject_int b)
       else
         let fold =
-          if Integer.(le (sub e b) (of_int 10))
+          if Z.(leq (sub e b) (of_int 10))
           then Ival.fold_enum
           else Ival.fold_int_bounds
         in
@@ -1596,8 +1596,8 @@ and eval_quantifier_extremum backward_left ~min ~max eval_term =
        the evaluation of [eval_term] for these integers, and we can reduce
        these evaluations to only keep results greater (or lower, according to
        [backward_left]) than [r]. *)
-    let below = eval_ival (Ival.inject_range min (Some (Integer.pred b)))
-    and above = eval_ival (Ival.inject_range (Some (Integer.succ e)) max) in
+    let below = eval_ival (Ival.inject_range min (Some (Z.pred b)))
+    and above = eval_ival (Ival.inject_range (Some (Z.succ e)) max) in
     let below = { below with eover = backward_left below.eover r.eover }
     and above = { above with eover = backward_left above.eover r.eover } in
     join_eval_result r (join_eval_result below above)
@@ -1987,7 +1987,7 @@ and reduce_by_valid env positive access (tset: term) =
          in
          let li = if op = PlusPI then li else Ival.neg_int li in
          let typ_p = Ast_types.direct_pointed_type rtlv.etype in
-         let sbits = Integer.of_int (Cil.bitsSizeOf typ_p) in
+         let sbits = Z.of_int (Cil.bitsSizeOf typ_p) in
          (* Compute the offsets expected by [aux], which are [i *
             8 * sizeof( *tlv)] *)
          let li = Ival.scale sbits li in

@@ -24,11 +24,11 @@ let (<?>) c lcmp =
 (* Types compatibility *)
 
 let typ_size t = (* raises Cil.SizeOfError *)
-  Integer.of_int (Cil.bitsSizeOf t)
+  Z.of_int (Cil.bitsSizeOf t)
 
 let are_typ_compatible t1 t2 =
   Cil_datatype.TypNoAttrs.equal t1 t2 ||
-  try Integer.equal (typ_size t1) (typ_size t2)
+  try Z.equal (typ_size t1) (typ_size t2)
   with Cil.SizeOfError _ -> false
 
 (* Input modules *)
@@ -53,7 +53,7 @@ sig
   val pretty : Format.formatter -> t -> unit
   val of_bit : typ:Cil_types.typ -> bit -> t
   val to_bit : t -> bit
-  val to_integer : t -> Integer.t option
+  val to_integer : t -> Z.t option
   val is_included : t -> t -> bool
   val join : t -> t -> t
 end
@@ -237,7 +237,7 @@ struct
 
     let rec to_singleton_int = function
       | Scalar s -> V.to_integer s.scalar_value
-      | Raw (Zero _) -> Some Integer.zero
+      | Raw (Zero _) -> Some Z.zero
       | Union u -> to_singleton_int u.union_value
       | _ -> None
 
@@ -452,7 +452,7 @@ struct
                     and u' = Bound.(succ (of_integer u)) in
                     let weak =
                       weak ||
-                      Option.is_some exp && not (Integer.equal l u)
+                      Option.is_some exp && not (Z.equal l u)
                     in
                     `Value (l', u', weak)
                 end

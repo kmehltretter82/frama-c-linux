@@ -55,7 +55,7 @@ sig
 
   val int: ikind:Cil_types.ikind -> int -> exp
   val float: fkind:Cil_types.fkind -> float -> exp
-  val integer: ikind:Cil_types.ikind -> Integer.t -> exp
+  val integer: ikind:Cil_types.ikind -> Z.t -> exp
   val bool: bool -> exp (* convert booleans to an expression 0 or 1 *)
 
   val cast: typ -> exp -> exp (* (typ)x *)

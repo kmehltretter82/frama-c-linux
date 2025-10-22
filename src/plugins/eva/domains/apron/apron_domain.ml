@@ -227,7 +227,7 @@ let translate_lval lval = match lval.node with
 
 let translate_constant = function
   | CInt64 (i, _, _) -> begin
-      try Coeff.s_of_int (Integer.to_int_exn i) (* TODO: skip OCaml int type *)
+      try Coeff.s_of_int (Z.to_int i) (* TODO: skip OCaml int type *)
       with Z.Overflow | Failure _ -> raise (Out_of_Scope "translate_constant big int")
     end
   | _ -> raise (Out_of_Scope "translate_constant not integer")
@@ -308,13 +308,13 @@ let truncate_interval typ interval =
 let interval_to_ival interval =
   let inf = scalar_to_int interval.Interval.inf
   and sup = scalar_to_int interval.Interval.sup in
-  let inf = Option.map Integer.of_int inf
-  and sup = Option.map Integer.of_int sup in
+  let inf = Option.map Z.of_int inf
+  and sup = Option.map Z.of_int sup in
   Some (Ival.inject_range inf sup)
 
 let int_to_scalar positive = function
   | None -> Scalar.of_infty positive
-  | Some integer -> Scalar.of_mpqf (Mpqf.of_string (Integer.to_string integer))
+  | Some integer -> Scalar.of_mpqf (Mpqf.of_string (Z.to_string integer))
 
 let ival_to_interval = function
   | None -> Interval.top

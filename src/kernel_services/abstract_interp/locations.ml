@@ -307,7 +307,7 @@ module Location_Bytes = struct
 
   (* Computes widening thresholds according to the validity of [base]. *)
   let validity_widen_hints base =
-    let zero = Datatype.Integer.Set.singleton Integer.zero in
+    let zero = Z.Set.singleton Z.zero in
     let int_thresholds =
       match Base.validity base with
       | Base.Known (_, m)
@@ -316,8 +316,8 @@ module Location_Bytes = struct
         (* Try the frontier of the block: further accesses are invalid
            anyway. This also works great for constant strings (this computes
            the offset of the null terminator). *)
-        let bound = Integer.(pred (e_div (succ m) eight)) in
-        Datatype.Integer.Set.add bound zero
+        let bound = Z.(pred (ediv (succ m) 8z)) in
+        Z.Set.add bound zero
       | Base.Empty | Base.Invalid -> zero
     in
     int_thresholds, Datatype.Float.Set.empty

@@ -172,7 +172,7 @@ module Interval = struct
     match value with
     | None -> value
     | Some value ->
-      let size = Integer.of_int range.Eval_typ.i_bits in
+      let size = Z.of_int range.Eval_typ.i_bits in
       let signed = range.Eval_typ.i_signed in
       Some (Ival.cast_int_to_int ~signed ~size value)
 

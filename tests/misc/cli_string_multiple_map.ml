@@ -9,13 +9,13 @@ include
 module M =
   String_multiple_map
     (struct
-      include Datatype.Integer
+      include Z
       type key = string
       let of_string arg =
-        try Integer.of_string arg
+        try Z.of_string arg
         with Failure _ ->
           raise (Cannot_build "expecting an integer")
-      let to_string = Integer.to_string
+      let to_string = Z.to_string
     end)
     (struct
       let option_name = "-multiple-map"
@@ -27,7 +27,7 @@ module M =
 
 let main () =
   let print k v =
-    feedback "%s => %a" k (Pretty_utils.pp_list ~sep:";@," Integer.pretty) v
+    feedback "%s => %a" k (Pretty_utils.pp_list ~sep:";@," Z.pretty) v
   in
   Datatype.String.Map.iter print (M.get ())
 

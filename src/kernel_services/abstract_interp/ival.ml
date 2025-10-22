@@ -49,15 +49,15 @@ module Type : Type = struct
   let top = Int Int_val.top
 
   let inject_singleton e =
-    if Int.le Int.zero e && Int.le e Int.thirtytwo
-    then small_nums.(Int.to_int_exn e)
+    if Int.leq 0z e && Int.leq e 32z
+    then small_nums.(Int.to_int e)
     else Int (Int_val.inject_singleton e)
 
   let inject_int i =
     try
       let e = Int_val.project_int i in
-      if Int.le Int.zero e && Int.le e Int.thirtytwo
-      then small_nums.(Int.to_int_exn e)
+      if Int.leq Int.zero e && Int.leq e 32z
+      then small_nums.(Int.to_int e)
       else Int i
     with Int_val.Not_Singleton ->
       if Int_val.(equal top i) then top else Int i
@@ -78,7 +78,7 @@ end
 
 include Type
 
-type widen_hint = Datatype.Integer.Set.t * Datatype.Float.Set.t
+type widen_hint = Z.Set.t * Datatype.Float.Set.t
 
 let hash = function
   | Bottom -> 311
@@ -192,9 +192,9 @@ let cardinal_estimate v ~size =
     then Int.one
     else
       let bits_of_float =
-        if Integer.(equal size (of_int 32))
+        if Z.equal size 32z
         then Fval.bits_of_float32_list
-        else if Integer.(equal size (of_int 64))
+        else if Z.equal size 64z
         then Fval.bits_of_float64_list
         else (fun _ -> [Int.zero, Int.pred (Int.two_power size)])
       in
@@ -211,7 +211,7 @@ let cardinal_less_than v n =
 let cardinal_is_less_than v n =
   match cardinal v with
   | None -> false
-  | Some c -> Int.le c (Int.of_int n)
+  | Some c -> Int.leq c (Int.of_int n)
 
 let inject_top min max rem modu =
   match min, max with
@@ -226,7 +226,7 @@ let inject_interval ~min ~max ~rem ~modu =
 let subdivide ~size = function
   | Bottom -> raise Can_not_subdiv
   | Float fval ->
-    let fkind = match Integer.to_int_exn size with
+    let fkind = match Z.to_int size with
       | 32 -> Fval.Single
       | 64 -> Fval.Double
       | _ -> raise Can_not_subdiv (* see Value/Value#105 *)
@@ -291,7 +291,7 @@ let widen ?size ?hint t1 t2 =
     | Float f2 ->
       let f1 = project_float t1 in
       let prec =
-        match Option.bind Integer.to_int_opt size with
+        match Option.bind Z.to_int_opt size with
         | Some 32 -> Float_sig.Single
         | Some 64 -> Float_sig.Double
         | Some 128 -> Float_sig.Long_Double
@@ -503,8 +503,8 @@ let c_rem v1 v2 =
 let create_all_values ~signed ~size =
   inject_int (Int_val.create_all_values ~signed ~size)
 
-let big_int_64 = Int.of_int 64
-let big_int_32 = Int.thirtytwo
+let big_int_64 = 64z
+let big_int_32 = 32z
 
 let cast_int_to_int ~size ~signed = function
   | Bottom -> bottom
@@ -593,7 +593,7 @@ module Infty = struct
     | None -> None
     | Some a -> match b with
       | None -> Some Int.zero
-      | Some b -> Some (Int.e_div a b)
+      | Some b -> Some (Int.ediv a b)
 
   let neg = function
     | Some a -> Some (Int.neg a)
@@ -610,7 +610,7 @@ let backward_mult_pos_left min_right max_right result =
   inject_range min_left max_left
 
 let backward_mult_neg_left min_right max_right result =
-  backward_mult_pos_left (Integer.neg max_right) (Infty.neg min_right) (neg_int result)
+  backward_mult_pos_left (Z.neg max_right) (Infty.neg min_right) (neg_int result)
 
 let backward_mult_int_left ~right ~result =
   match min_and_max right with
@@ -827,7 +827,7 @@ let cast_float_to_int_inverse ~single_precision i =
   match min_and_max i with
   | Some min, Some max when Int.lt exact_min min && Int.lt max exact_max ->
     let minf =
-      if Int.le min Int.zero then
+      if Int.leq min Int.zero then
         (* min is negative. We want to return [(float)((real)(min-1)+epsilon)],
            as converting this number to int will truncate all the fractional
            part (C99 6.3.1.4). Given [exact_min] and [exact_max], 1ulp
@@ -843,7 +843,7 @@ let cast_float_to_int_inverse ~single_precision i =
     in
     (* All operations are dual w.r.t. the min bound. *)
     let maxf =
-      if Int.le Int.zero max
+      if Int.leq Int.zero max
       then
         (* This float is finite because max is big enough *)
         Fval.F.prev_float fkind (Int.to_float (Int.succ max))
@@ -872,7 +872,7 @@ let cast_int_to_float_inverse_not_nan ~single_precision (min, max) =
        values on each extremity. *)
     let min = ceil min in
     let max = floor max in
-    let conv f = try  Some (Integer.of_float f) with Z.Overflow -> None in
+    let conv f = try  Some (Z.of_float f) with Z.Overflow -> None in
     let r = inject_range (conv min) (conv max) in
     (* Kernel.result "Cast I->F inv:  %a -> %a@." pretty f pretty r; *)
     r
@@ -918,7 +918,7 @@ let reinterpret_as_float kind i =
     let reinterpret size kind format conv =
       let minf, maxf = Typed_float.finite_range_of ~format in
       let min_f, max_f = Typed_float.(bits_encoding minf, bits_encoding maxf) in
-      let size = Integer.of_int size in
+      let size = Z.of_int size in
       let i = cast_int_to_int ~size ~signed:true i in
       (* Intersect [i'] with [i], and return the (finite) bounds directly. *)
       let bounds_narrow i' =
@@ -934,7 +934,7 @@ let reinterpret_as_float kind i =
       let s_s_max_f = Int.succ s_max_f (* first 'positive' NaN *) in
       let s_s_min_f = Int.succ s_min_f (* first 'negative' NaN  *) in
       (* positive floats *)
-      let f_pos = inject_range (Some Integer.zero) (Some s_max_f) in
+      let f_pos = inject_range (Some Z.zero) (Some s_max_f) in
       (* negative floats *)
       let f_neg = inject_range None (Some s_min_f) in
       (* 'positive' NaNs *)
@@ -956,10 +956,10 @@ let reinterpret_as_float kind i =
     in
     match kind with
     | Cil_types.FDouble ->
-      let conv v = Fval.F.of_float (Int64.float_of_bits (Int.to_int64_exn v)) in
+      let conv v = Fval.F.of_float (Int64.float_of_bits (Int.to_int64 v)) in
       reinterpret 64 Fval.Double Typed_float.Double conv
     | Cil_types.FFloat ->
-      let conv v = Fval.F.of_float(Int32.float_of_bits (Int.to_int32_exn v)) in
+      let conv v = Fval.F.of_float(Int32.float_of_bits (Int.to_int32 v)) in
       reinterpret 32 Fval.Single Typed_float.Single conv
     | Cil_types.FLongDouble ->
       (* currently always imprecise *)

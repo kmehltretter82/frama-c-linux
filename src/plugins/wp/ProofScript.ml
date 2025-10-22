@@ -89,7 +89,7 @@ let j_kint = j_select "kint"
 let j_range = j_select "range"
 let j_id a = "id" , `String a
 let j_at s = "at" , `Int s.id
-let j_int z = "val" , `String (Integer.to_string z)
+let j_int z = "val" , `String (Z.to_string z)
 let j_min a = "min" , `Int a
 let j_max b = "max" , `Int b
 let j_kind s = "kind" , `String (s_kind s)
@@ -149,7 +149,7 @@ let j_kind js = js >? "kind" |> Json.string
 let j_occur js = js >? "occur" |> Json.int
 let j_id js = js >? "id" |> Json.string
 let j_args js = js >? "args" |> Json.list
-let j_val js = js >? "val" |> Json.string |> Integer.of_string
+let j_val js = js >? "val" |> Json.string |> Z.of_string
 let j_min js = js >? "min" |> Json.int
 let j_max js = js >? "max" |> Json.int
 

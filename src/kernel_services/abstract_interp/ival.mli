@@ -29,12 +29,12 @@ include Datatype.S_with_collections with type t := t
 include Lattice_type.Full_AI_Lattice_with_cardinality with type t := t
 
 (** Widening hints: set of relevant integer and floating-point thresholds. *)
-type widen_hint = Datatype.Integer.Set.t * Datatype.Float.Set.t
+type widen_hint = Z.Set.t * Datatype.Float.Set.t
 
 (** [widen ~size ~hint t1 t2] is an over-approximation of [join t1 t2].
     [size] is the size (in bits) of the widened value, and [hint] is a set of
     relevant thresholds. *)
-val widen : ?size:Integer.t -> ?hint:widen_hint -> t -> t -> t
+val widen : ?size:Z.t -> ?hint:widen_hint -> t -> t -> t
 
 val is_bottom : t -> bool
 
@@ -47,7 +47,7 @@ val add_int : t -> t -> t
 val add_int_under : t -> t -> t
 (** Underapproximation of the same operation *)
 
-val add_singleton_int: Integer.t -> t -> t
+val add_singleton_int: Z.t -> t -> t
 (** Addition of an integer ival with an integer. Exact operation. *)
 
 val neg_int : t -> t
@@ -59,19 +59,19 @@ val abs_int: t -> t
 val sub_int : t -> t -> t
 val sub_int_under: t -> t -> t
 
-val min_int : t -> Integer.t option
+val min_int : t -> Z.t option
 (** A [None] result means the argument is unbounded.
     Raises [Error_Bottom] if the argument is bottom. *)
 
-val max_int : t -> Integer.t option
+val max_int : t -> Z.t option
 (** A [None] result means the argument is unbounded.
     Raises [Error_Bottom] if the argument is bottom. *)
 
 val min_max_r_mod :
-  t -> Integer.t option * Integer.t option * Integer.t * Integer.t
+  t -> Z.t option * Z.t option * Z.t * Z.t
 
 val min_and_max :
-  t -> Integer.t option * Integer.t option
+  t -> Z.t option * Z.t option
 (** Returns the minimal and maximal integers represented by an ival.
     [None] means the argument is unbounded.
     @raise Abstract_interp.Error_Bottom if the argument is bottom. *)
@@ -130,17 +130,17 @@ val project_float : t -> Fval.t
 
 (** Building Ival *)
 
-val inject_singleton : Integer.t -> t
+val inject_singleton : Z.t -> t
 
 val inject_float : Fval.t -> t
 val inject_float_interval : float -> float -> t
 
-val inject_range : Integer.t option -> Integer.t option -> t
+val inject_range : Z.t option -> Z.t option -> t
 (** [None] means unbounded. The interval is inclusive. *)
 
 val inject_interval:
-  min: Integer.t option -> max: Integer.t option ->
-  rem: Integer.t -> modu: Integer.t ->
+  min: Z.t option -> max: Z.t option ->
+  rem: Z.t -> modu: Z.t ->
   t
 (** Builds the set of integers between [min] and [max] included and congruent
     to [rem] modulo [modulo]. For [min] and [max], [None] is the corresponding
@@ -157,19 +157,19 @@ exception Not_Singleton_Int
 
 val project_int_val : t -> Int_val.t option
 
-val project_int : t -> Integer.t
+val project_int : t -> Z.t
 (** @raise Not_Singleton_Int when the cardinal of the argument is not 1,
     or if it is not an integer. *)
 
 val is_small_set: t -> bool
 
-val project_small_set: t -> Integer.t list option
+val project_small_set: t -> Z.t list option
 
-val cardinal: t -> Integer.t option
+val cardinal: t -> Z.t option
 (** [cardinal v] returns [n] if [v] has finite cardinal [n], or [None] if
     the cardinal is not finite. *)
 
-val cardinal_estimate: t -> size:Integer.t -> Integer.t
+val cardinal_estimate: t -> size:Z.t -> Z.t
 (** [cardinal_estimate v ~size] returns an estimation of the cardinal
     of [v], knowing that [v] fits in [size] bits. *)
 
@@ -182,12 +182,12 @@ val cardinal_less_than : t -> int -> int
 val cardinal_is_less_than: t -> int -> bool
 (** Same than cardinal_less_than but just return if it is the case. *)
 
-val fold_int : (Integer.t -> 'a -> 'a) -> t -> 'a -> 'a
+val fold_int : (Z.t -> 'a -> 'a) -> t -> 'a -> 'a
 (** Iterate on the integer values of the ival in increasing order.
     Raise {!Abstract_interp.Error_Top} if the argument is a float or a
     potentially infinite integer. *)
 
-val fold_int_decrease : (Integer.t -> 'a -> 'a) -> t -> 'a -> 'a
+val fold_int_decrease : (Z.t -> 'a -> 'a) -> t -> 'a -> 'a
 (** Iterate on the integer values of the ival in decreasing order.
     Raise {!Abstract_Interp.Error_Top} if the argument is a float or a
     potentially infinite integer. *)
@@ -203,14 +203,14 @@ val fold_int_bounds: (t -> 'a -> 'a) -> t -> 'a -> 'a
     [max] are infinite, [f] is called with an argument [i'] unreduced
     in the corresponding direction(s). *)
 
-val to_int_seq: t -> Integer.t Seq.t
+val to_int_seq: t -> Z.t Seq.t
 (** Builds a sequence of integer values of the ival in increasing order.
     The resulting sequence might be infinite.
     @raise {!Abstract_interp.Error_Top} if the argument is a floating-point
     interval or an infinite integer interval. *)
 
 (** Subdivisions into two intervals *)
-val subdivide: size:Integer.t -> t -> t * t
+val subdivide: size:Z.t -> t -> t * t
 
 
 (** [has_greater_min_bound i1 i2] returns 1 if the interval [i1] has a better
@@ -223,18 +223,18 @@ val has_greater_min_bound : t -> t -> int
     be bottom. *)
 val has_smaller_max_bound : t -> t -> int
 
-val scale : Integer.t -> t -> t
+val scale : Z.t -> t -> t
 (** [scale f v] returns the interval of elements [x * f] for [x] in [v].
     The operation is exact, except when [v] is a float. *)
 
-val scale_div : pos:bool -> Integer.t -> t -> t
+val scale_div : pos:bool -> Z.t -> t -> t
 (** [scale_div ~pos:false f v] is an over-approximation of the set of
     elements [x c_div f] for [x] in [v].
 
     [scale_div ~pos:true f v] is an over-approximation of the set of
     elements [x e_div f] for [x] in [v]. *)
 
-val scale_div_under : pos:bool -> Integer.t -> t -> t
+val scale_div_under : pos:bool -> Z.t -> t -> t
 (** [scale_div_under ~pos:false f v] is an under-approximation of the
     set of elements [x c_div f] for [x] in [v].
 
@@ -243,7 +243,7 @@ val scale_div_under : pos:bool -> Integer.t -> t -> t
 
 val div : t -> t -> t (** Integer division *)
 
-val scale_rem : pos:bool -> Integer.t -> t -> t
+val scale_rem : pos:bool -> Z.t -> t -> t
 (** [scale_rem ~pos:false f v] is an over-approximation of the set of
     elements [x c_rem f] for [x] in [v].
 
@@ -258,12 +258,12 @@ val interp_boolean : contains_zero:bool -> contains_non_zero:bool -> t
 
 (** Extract bits from [start] to [stop] from the given Ival, [start]
     and [stop] being included. [size]  is the size of the entire ival. *)
-val extract_bits: start:Integer.t -> stop:Integer.t -> size:Integer.t -> t -> t
+val extract_bits: start:Z.t -> stop:Z.t -> size:Z.t -> t -> t
 val create_all_values: signed:bool -> size:int -> t
 
 (** [all_values ~size v] returns true iff v contains all integer values
     representable in [size] bits. *)
-val all_values: size:Integer.t -> t -> bool
+val all_values: size:Z.t -> t -> bool
 
 val backward_mult_int_left: right:t -> result:t -> t option Lattice_bounds.or_bottom
 
@@ -286,7 +286,7 @@ val of_int64 : int64 -> t
 
 (** Casts *)
 
-val cast_int_to_int : size:Integer.t -> signed:bool -> t -> t
+val cast_int_to_int : size:Z.t -> signed:bool -> t -> t
 
 val cast_int_to_float : Fval.kind -> t -> t
 
@@ -308,7 +308,7 @@ val reinterpret_as_float: Cil_types.fkind -> t -> t
 (** Bitwise reinterpretation of the given value as a float of the
     given kind. *)
 
-val reinterpret_as_int: size:Integer.t -> signed:bool -> t -> t
+val reinterpret_as_int: size:Z.t -> signed:bool -> t -> t
 (** Bitwise reinterpretation of the given value, of size [size], as an integer
     of the given signedness (and size). *)
 

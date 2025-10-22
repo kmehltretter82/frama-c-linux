@@ -25,7 +25,7 @@
 
     which is verified for normal multidimensional arrays handling.
 *)
-type index = Integer.t * (Integer.t * Integer.t) list (* o, [dᵢ,bᵢ]ᵢ *)
+type index = Z.t * (Z.t * Z.t) list (* o, [dᵢ,bᵢ]ᵢ *)
 
 include Datatype.S with type t = index
 
@@ -33,34 +33,34 @@ include Datatype.S with type t = index
 
 val zero : t
 val of_int : int -> t
-val of_integer : Integer.t -> t
+val of_integer : Z.t -> t
 val of_ival : Ival.t -> t (* Raises Abstract_interp.Error_Bottom and Error_Top *)
 
 (* Properties *)
 
 val is_zero : t -> bool
 val is_singleton : t -> bool
-val hull : t -> Integer.t * Integer.t (* start * size *)
+val hull : t -> Z.t * Z.t (* start * size *)
 
 (* Decomposition *)
 
-val first_dimension : t -> (Integer.t * t) option
+val first_dimension : t -> (Z.t * t) option
 
 (* Arithmetic *)
 
 val add : t -> t -> t
 (* slightly faster than add since no normalization takes place *)
 val add_int : t -> int -> t
-val add_integer : t -> Integer.t -> t
+val add_integer : t -> Z.t -> t
 val sub_int : t -> int -> t
-val sub_integer : t -> Integer.t -> t
+val sub_integer : t -> Z.t -> t
 
 val mul : t -> t -> t
 val mul_int : t -> int -> t
-val mul_integer : t -> Integer.t -> t
+val mul_integer : t -> Z.t -> t
 
 val mod_int : t -> int -> t
-val mod_integer : t -> Integer.t -> t
+val mod_integer : t -> Z.t -> t
 
 (* Conversion from Cil *)
 

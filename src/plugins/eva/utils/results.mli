@@ -221,7 +221,7 @@ val eval_callee : Cil_types.lhost -> request -> Kernel_function.t list result
 val as_int : value evaluation -> int result
 
 (** Converts the value into a singleton unbounded integer. *)
-val as_integer : value evaluation -> Integer.t result
+val as_integer : value evaluation -> Z.t result
 
 (** Converts the value into a floating point number. *)
 val as_float : value evaluation -> float result

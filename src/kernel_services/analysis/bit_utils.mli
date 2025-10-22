@@ -10,7 +10,7 @@
 
 open Cil_types
 
-val sizeofchar: unit -> Integer.t
+val sizeofchar: unit -> Z.t
 (** [sizeof(char)] in bits *)
 
 val sizeofpointer: unit -> int
@@ -53,17 +53,17 @@ val sizeof_pointed_lval: lval -> Int_Base.t
 (** @return the size of the type pointed by a pointer type of the [lval] in
     bits. Never call it on a non pointer type [lval]. *)
 
-val max_bit_address : unit -> Integer.t
+val max_bit_address : unit -> Z.t
 (** @return the maximal possible offset in bits of a memory base. *)
 
-val max_bit_size : unit -> Integer.t
+val max_bit_size : unit -> Z.t
 (** @return the maximal possible size in bits of a memory base. *)
 
-val max_byte_address : unit -> Integer.t
+val max_byte_address : unit -> Z.t
 (** @return the maximal possible offset in bytes of a memory base.
     @since Aluminium-20160501 *)
 
-val max_byte_size : unit -> Integer.t
+val max_byte_size : unit -> Z.t
 (** @return the maximal possible size in bytes of a memory base.
     @since Aluminium-20160501 *)
 
@@ -73,9 +73,9 @@ val pretty_bits:
   typ ->
   use_align:bool ->
   align:Abstract_interp.Rel.t ->
-  rh_size:Integer.t ->
-  start:Integer.t ->
-  stop:Integer.t -> Format.formatter -> bool * typ option
+  rh_size:Z.t ->
+  start:Z.t ->
+  stop:Z.t -> Format.formatter -> bool * typ option
 (** Pretty prints a range of bits in a type for the user.
     Tries to find field names and array indexes, whenever possible. *)
 
@@ -89,7 +89,7 @@ val type_compatible: typ -> typ -> bool
     one additional criterion: *)
 type offset_match =
   | MatchType of typ (** Offset that has this type (modulo attributes) *)
-  | MatchSize of Integer.t (** Offset that has a type of this size *)
+  | MatchSize of Z.t (** Offset that has a type of this size *)
   | MatchFirst (** Return first symbolic offset that matches *)
   | MatchLast (** Return the longest offset that matches*)
 
@@ -103,4 +103,4 @@ exception NoMatchingOffset
     sub-arrays.)
     @raise NoMatchingOffset when no offset matches. *)
 val find_offset:
-  typ -> offset:Integer.t -> offset_match -> Cil_types.offset * Cil_types.typ
+  typ -> offset:Z.t -> offset_match -> Cil_types.offset * Cil_types.typ

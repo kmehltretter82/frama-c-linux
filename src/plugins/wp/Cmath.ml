@@ -184,8 +184,8 @@ let domain_abs _x = true
 let builtin_abs f z e =
   let open Qed.Logic in
   match F.repr e with
-  | Times(k,a) -> e_times (Integer.abs k) (e_fun f [a])
-  | Kint k -> e_zint (Integer.abs k)
+  | Times(k,a) -> e_times (Z.abs k) (e_fun f [a])
+  | Kint k -> e_zint (Z.abs k)
   | Kreal r when Q.lt r Q.zero -> e_real (Q.neg r)
   | _ ->
     match is_true (e_leq z e) with

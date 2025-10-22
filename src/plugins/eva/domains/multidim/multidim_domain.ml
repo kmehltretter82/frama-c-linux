@@ -59,7 +59,7 @@ struct
 
   let of_bit ~typ:_ = function
     | Abstract_memory.Uninitialized -> uninitialized
-    | Zero i -> make i (V.inject_int Integer.zero)
+    | Zero i -> make i (V.inject_int Z.zero)
     | Any (Top, i) -> make i (V.top_with_origin Origin.unknown)
     | Any (Set s, i) ->
       let v =
@@ -407,7 +407,7 @@ struct
       | BinOp ((PlusA|PlusPI), e1, e2, _typ) when is_dst e2 ->
         Eva_ast.fold_to_integer e1
       | BinOp ((MinusA|MinusPI), e1, e2, _typ) when is_dst e1 ->
-        Option.map Integer.neg (Eva_ast.fold_to_integer e2)
+        Option.map Z.neg (Eva_ast.fold_to_integer e2)
       | _ -> None
     in
     (* [oracle] must be the oracle before the (non-invertible)

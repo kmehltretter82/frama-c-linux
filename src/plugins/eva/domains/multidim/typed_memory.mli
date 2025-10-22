@@ -42,7 +42,7 @@ sig
   val pretty : Format.formatter -> t -> unit
   val of_bit : typ:Cil_types.typ -> bit -> t
   val to_bit : t -> bit
-  val to_integer : t -> Integer.t option
+  val to_integer : t -> Z.t option
   val is_included : t -> t -> bool
   val join : t -> t -> t
 end
@@ -98,7 +98,7 @@ sig
     t -> t -> t
 
   (* Bounds update for array segmentations *)
-  val incr_bound : oracle:oracle -> Cil_types.varinfo -> Integer.t option ->
+  val incr_bound : oracle:oracle -> Cil_types.varinfo -> Z.t option ->
     t -> t
 
   (* Pretty prints memory *)

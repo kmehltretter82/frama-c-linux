@@ -9,7 +9,7 @@
 open Cil_types
 open Cil_datatype
 
-module IntSet = Datatype.Integer.Set
+module IntSet = Z.Set
 module FloatSet = Datatype.Float.Set
 
 let dkey = Widen_hints_ext.dkey
@@ -111,7 +111,7 @@ class widen_visitor init_widen_hints init_enclosing_loops = object(self)
         | None -> ()
         | Some i ->
           let base = Base.of_varinfo vi in
-          let threshold = IntSet.singleton (Integer.pred i) in
+          let threshold = IntSet.singleton (Z.pred i) in
           self#add_int_thresholds ~base threshold
       in
       List.iter process (find_candidates exp);
@@ -119,15 +119,15 @@ class widen_visitor init_widen_hints init_enclosing_loops = object(self)
     | _ -> Cil.DoChildren
 
   method! vexpr (e:exp) = begin
-    let with_succ v = [v ; Integer.succ v]
-    and with_pred v = [Integer.pred v ; v ]
-    and with_s_p_ v = [Integer.pred v; v; Integer.succ v]
+    let with_succ v = [v ; Z.succ v]
+    and with_pred v = [Z.pred v ; v ]
+    and with_s_p_ v = [Z.pred v; v; Z.succ v]
     and default_visit _e = Cil.DoChildren
     and unop_visit e =
       match e with
       | {enode=(CastE(_, { enode=Lval (Var varinfo, _)})
                | Lval (Var varinfo, _))} ->
-        let int_thresholds = IntSet.singleton Integer.zero in
+        let int_thresholds = IntSet.singleton Z.zero in
         let base = Base.of_varinfo varinfo in
         self#add_int_thresholds ~base int_thresholds;
         Cil.DoChildren
@@ -172,8 +172,8 @@ class widen_visitor init_widen_hints init_enclosing_loops = object(self)
   method private add_index_hints size idx =
     (* add the bounds [size-shift, size-shift-1] to the hints for [vidx] *)
     let add_hint vidx size shift =
-      let bound1 = Integer.sub size shift in
-      let bound2 = Integer.(sub bound1 one) in
+      let bound1 = Z.sub size shift in
+      let bound2 = Z.(sub bound1 one) in
       let int_thresholds = IntSet.of_list [bound1; bound2] in
       self#add_int_thresholds ~base:(Base.of_varinfo vidx) int_thresholds
     in
@@ -190,7 +190,7 @@ class widen_visitor init_widen_hints init_enclosing_loops = object(self)
           (* See if either [e1] or [e2] is constant. If so, find a variable in
              the other expression and add a hint for this variable, shifted. *)
           let shift' s =
-            if op = PlusA then Integer.add shift s else Integer.sub shift s
+            if op = PlusA then Z.add shift s else Z.sub shift s
           in
           match Cil.constFoldToInt e1 with
           | Some shift1 -> aux_idx e2 (shift' shift1)
@@ -202,7 +202,7 @@ class widen_visitor init_widen_hints init_enclosing_loops = object(self)
         end
       | _ -> ()
     in
-    aux_idx idx Integer.zero
+    aux_idx idx Z.zero
 
   (* Find an array access and infer hints for the variables involved. We visit
      the l-value ourselves. This way, we catch all accesses, including in
@@ -218,7 +218,7 @@ class widen_visitor init_widen_hints init_enclosing_loops = object(self)
               aux_offset typ_e off;
               try
                 let size = Cil.lenOfArray64 size in
-                if Integer.(gt size zero) then
+                if Z.gt size 0z then
                   self#add_index_hints size idx
               with Cil.LenOfArray _ -> ()
             end
@@ -242,7 +242,7 @@ let base_of_static_hvars hvars =
     (* syntactic constraints prevent this from happening *)
     Self.fatal "unsupported lhost: %a" Printer.pp_lval (Mem e, offset)
 
-type threshold = Int_th of Integer.t | Real_th of float
+type threshold = Int_th of Z.t | Real_th of float
 
 (* try parsing as int, then as float *)
 let threshold_of_threshold_term ht =

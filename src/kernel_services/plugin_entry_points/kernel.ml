@@ -936,10 +936,12 @@ module BigIntsHex =
     let module_name = "BigIntsHex"
     let option_name = "-big-ints-hex"
     let arg_name = "max"
-    let help = "display integers larger than <max> using hexadecimal \
-                notation"
+    let help = "display integers larger than <max> using hexadecimal notation. \
+                A negative value disable this option. Disabled by default."
     let default = -1
   end)
+let () = BigIntsHex.add_update_hook (fun _ i -> Z.set_big_ints_hex i)
+
 
 let () = Parameter_customize.set_group inout_source
 module EagerLoadSources =

@@ -53,7 +53,7 @@ let from_prototype kf =
     let make_range length = match length with
       | None -> Logic_const.trange ~loc (Some zero, None)
       | Some length ->
-        let high = Logic_const.tint ~loc (Integer.pred length) in
+        let high = Logic_const.tint ~loc (Z.pred length) in
         Logic_const.trange ~loc (Some zero, Some high)
     in
     (* Generate the required numbers of [[..]] until with find a non-array

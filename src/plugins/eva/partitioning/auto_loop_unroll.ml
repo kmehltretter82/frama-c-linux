@@ -507,13 +507,13 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
         if not (is_true (Val.assume_non_zero delta)) then raise Not_found;
         (* Possible iterations numbers to exit the loop. *)
         let iter_nb = binop Div (binop MinusA v_exit v_init) delta in
-        let bound = Abstract_value.Int (Integer.of_int limit) in
+        let bound = Abstract_value.Int (Z.of_int limit) in
         (* Use the iteration number if it is always smaller than the [limit].
            Otherwise use [limit]. *)
         let limit =
           if is_true (Val.assume_bounded Alarms.Upper_bound bound iter_nb)
           then iter_nb
-          else Val.inject_int typ (Integer.of_int limit)
+          else Val.inject_int typ (Z.of_int limit)
         in
         (* Computes the possible values of [lval] as the end of the loop, as
            [v_init] + [limit] × [v_delta]. *)

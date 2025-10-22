@@ -15,7 +15,7 @@
 type 'value builtin = 'value list -> 'value Eval.or_bottom
 
 (** Set of relevant thresholds for the widening. *)
-type widen_hint = Datatype.Integer.Set.t * Datatype.Float.Set.t
+type widen_hint = Z.Set.t * Datatype.Float.Set.t
 
 (** Abstraction of the values variables are mapped to. *)
 module type Value = sig

@@ -38,7 +38,7 @@ type split_monitor = {
   split_kind : split_kind;
   split_loc : Cil_datatype.Location.t;
   split_limit : int;
-  mutable split_values : Datatype.Integer.Set.t;
+  mutable split_values : Z.Set.t;
 }
 [@@deriving eq,ord]
 
@@ -52,7 +52,7 @@ let new_monitor
     split_kind = kind;
     split_loc;
     split_limit = limit;
-    split_values = Datatype.Integer.Set.empty;
+    split_values = Z.Set.empty;
   }
 
 module SplitTerm = Datatype.Make_with_collections (struct
@@ -81,7 +81,7 @@ module SplitTerm = Datatype.Make_with_collections (struct
 module SplitMonitor = Datatype.Make_with_collections (
   struct
     include Datatype.Serializable_undefined
-    module Values = Datatype.Integer.Set
+    module Values = Z.Set
 
     type t = split_monitor [@@deriving eq,ord]
 
@@ -92,7 +92,7 @@ module SplitMonitor = Datatype.Make_with_collections (
         split_kind = Static;
         split_loc = Cil_datatype.Location.unknown;
         split_limit = 0;
-        split_values = Datatype.Integer.Set.empty
+        split_values = Z.Set.empty
       }]
 
     let pretty fmt m =
@@ -246,7 +246,7 @@ type key = {
   ration_stamp : stamp;
   branches : branch list;
   loops : LoopUnrolling.t list;
-  splits : Integer.t SplitMap.t; (* term -> value *)
+  splits : Z.t SplitMap.t; (* term -> value *)
   dynamic_splits : split_monitor SplitMap.t; (* term -> monitor *)
 }
 
@@ -263,7 +263,7 @@ struct
   module Stamp = Datatype.Option (IntPair)
   module BranchList = Datatype.List (BranchDatatype)
   module LoopList = Datatype.List (LoopUnrolling)
-  module Splits = SplitMap.Make (Datatype.Integer)
+  module Splits = SplitMap.Make (Z)
   module DSplits = SplitMap.Make (SplitMonitor)
 
   (* Initial key, before any partitioning *)
@@ -341,7 +341,7 @@ struct
         Pretty_utils.pp_list ~pre:"{@[" ~sep:" ;@ " ~suf:"@]}"
           (fun fmt (t, i) -> Format.fprintf fmt "%a:%a"
               SplitTerm.pretty t
-              Datatype.Integer.pretty i)
+              Z.pretty i)
           fmt
           (SplitMap.bindings key.splits)
     end)
@@ -411,7 +411,7 @@ type action =
   | Incr_loop
   | Add_branch of int * int
   | Ration of rationing
-  | Restrict of Eva_ast.exp * Integer.t list
+  | Restrict of Eva_ast.exp * Z.t list
   | Split of split_monitor
   | Merge of Eva_annotations.split_term
   | Update_dynamic_splits
@@ -503,11 +503,11 @@ struct
     in
     valuation, ival
 
-  exception Split_limit of Integer.t option
+  exception Split_limit of Z.t option
 
   let split_by_value ~monitor state exp =
     let source = fst monitor.split_loc in
-    let module SplitValues = Datatype.Integer.Set in
+    let module SplitValues = Z.Set in
     let valuation, ival = evaluate_exp_to_ival ~source state exp in
     (* Build a state with the lvalue set to a singleton *)
     let build i acc =
@@ -534,7 +534,7 @@ struct
       begin match Ival.cardinal ival with
         | None -> raise (Split_limit None)
         | Some c as count ->
-          if Integer.(gt c (of_int monitor.split_limit)) then
+          if Z.(gt c (of_int monitor.split_limit)) then
             raise (Split_limit count)
       end;
       (* For each integer of the ival, build a new state *)
@@ -542,7 +542,7 @@ struct
         let result = Ival.fold_int build ival [] in
         let c = SplitValues.cardinal monitor.split_values in
         if c > monitor.split_limit then
-          raise (Split_limit (Some (Integer.of_int c)));
+          raise (Split_limit (Some (Z.of_int c)));
         result
       with Abstract_interp.Error_Top -> (* The ival is float *)
         raise (Split_limit None)
@@ -551,7 +551,7 @@ struct
       let pp_count fmt =
         match count with
         | None -> ()
-        | Some c -> Format.fprintf fmt " (%a)" Integer.pretty c
+        | Some c -> Format.fprintf fmt " (%a)" Z.pretty c
       in
       fail ~source "split on more than %d values%t prevented ; try to improve \
                     the analysis precision or look at the option -eva-split-limit \
@@ -560,7 +560,7 @@ struct
 
   let eval_exp_to_int ~source state exp =
     let _valuation, ival = evaluate_exp_to_ival ~source state exp in
-    try Integer.to_int_exn (Ival.project_int ival)
+    try Z.to_int (Ival.project_int ival)
     with
     | Ival.Not_Singleton_Int ->
       fail ~source "this partitioning parameter must evaluate to a singleton"
@@ -572,8 +572,8 @@ struct
       Abstract_domain.{ states; result = None }
     in
     match Abstract.Dom.evaluate_predicate env state predicate with
-    | True -> [ Integer.one, state ]
-    | False -> [ Integer.zero, state ]
+    | True -> [ Z.one, state ]
+    | False -> [ Z.zero, state ]
     | Unknown ->
       let source = fst (predicate.Cil_types.pred_loc) in
       let aux positive =
@@ -585,7 +585,7 @@ struct
           Self.warning ~source ~once:true
             "failing to learn perfectly from split predicate";
         if Abstract.Dom.equal state' state then raise Operation_failed;
-        let value = if positive then Integer.one else Integer.zero in
+        let value = if positive then Z.one else Z.zero in
         value, state'
       in
       Bottom.list_values [ aux true; aux false ]

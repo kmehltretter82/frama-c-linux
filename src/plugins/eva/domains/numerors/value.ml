@@ -57,14 +57,13 @@ module Make (Model : IEEE754.Modeling) = struct
 
   let compute_error_hints_multipliers format =
     let open Scalar in
-    let two = Z.of_int 2 in
     let ulp = Typed_float.unit_in_the_last_place_of ~format in
     let ulp = Model.Scalar.of_float (Typed_float.to_float ulp) in
     let hints = ref Hints.(empty |> add zero |> add ulp |> add one) in
     let to_scalar z = Z.to_string z |> of_string in
     for i = 0 to 6 do
-      let exponent = Z.pow two i |> Z.to_int in
-      let hint = Z.pow two exponent |> to_scalar in
+      let exponent = Z.pow 2z i |> Z.to_int in
+      let hint = Z.pow 2z exponent |> to_scalar in
       hints := Hints.add (ulp * hint) !hints
     done ;
     let positive = !hints in

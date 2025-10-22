@@ -58,7 +58,7 @@ let pp_tuple5
   Format.fprintf fmt "%(%)%a%(%)%a%(%)%a%(%)%a%(%)%a%(%)"
     pre fmt1 a sep fmt2 b sep fmt3 c sep fmt4 d sep fmt5 e suf
 
-let pp_integer fmt = Format.fprintf fmt "Integer(%a)" Integer.pretty
+let pp_integer fmt = Format.fprintf fmt "Integer(%a)" Z.pretty
 let pp_int64 fmt i64 = Format.fprintf fmt "Int64(%s)" (Int64.to_string i64)
 let pp_string = Format.pp_print_string
 let pp_bool = Format.pp_print_bool

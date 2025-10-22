@@ -93,16 +93,16 @@ class engine =
 
     method pp_int _ fmt z =
       try
-        let n = Integer.to_int_exn z in
+        let n = Z.to_int z in
         if -256 <= n && n <= 256 then
           Format.pp_print_int fmt n
         else
           raise Z.Overflow
       with Z.Overflow ->
       match iformat with
-      | `Dec -> Integer.pretty fmt z
-      | `Hex -> Integer.pp_hex ~sep:"," fmt z
-      | `Bin -> Integer.pp_bin ~sep:"," fmt z
+      | `Dec -> Z.pretty fmt z
+      | `Hex -> Z.pp_hex ~sep:"," fmt z
+      | `Bin -> Z.pp_bin ~sep:"," fmt z
 
     (* --- Reals --- *)
 
@@ -120,7 +120,7 @@ class engine =
         match rformat with
         | `Ratio ->
           let { Q.num = num ; Q.den = den } = q in
-          if Z.equal den Z.one then
+          if Z.is_one den then
             Format.fprintf fmt "%s.0" (Z.to_string num)
           else
             Format.fprintf fmt "(%s.0/%s)"

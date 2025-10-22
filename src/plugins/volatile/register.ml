@@ -75,19 +75,19 @@ struct
 
   exception Unsupported
   type t =
-    | Lram   of Integer.t     (* absolute addr *)
+    | Lram   of Z.t     (* absolute addr *)
     | Lvar   of varinfo       (* [x] *)
     | Lfield of t * fieldinfo (* [e.f] *)
 
   let rec pretty fmt = function
     | Lvar x -> Varinfo.pretty fmt x
-    | Lram p -> Format.fprintf fmt "&%s" (Integer.to_string p)
+    | Lram p -> Format.fprintf fmt "&%s" (Z.to_string p)
     | Lfield (e, fd) ->
       Format.fprintf fmt "%a:%a" pretty e Fieldinfo.pretty fd
 
   let rec compare a b =
     match a, b with
-    | Lram p , Lram q -> Integer.compare p q
+    | Lram p , Lram q -> Z.compare p q
     | Lram _ , _ -> -1
     | _ , Lram _ -> 1
     | Lvar x , Lvar y -> Varinfo.compare x y
@@ -122,9 +122,9 @@ struct
   let rec to_const t =
     match t.term_node with
     | TCast (false, _, e) -> to_const e
-    | Tnull -> Integer.zero
+    | Tnull -> Z.zero
     | TConst (Integer (i, _)) -> i
-    | TBinOp (PlusA, a, b) -> Integer.add (to_const a) (to_const b)
+    | TBinOp (PlusA, a, b) -> Z.add (to_const a) (to_const b)
     | _ -> raise Unsupported
 
   let rec of_term t =

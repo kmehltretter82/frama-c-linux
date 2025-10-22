@@ -218,7 +218,8 @@ Options taking a string as argument should preferably be written
 -ast-diff           creates a new project and computes a diff of the AST from
                     the current one (opposite option is -no-ast-diff)
 -big-ints-hex <max>  display integers larger than <max> using hexadecimal
-                    notation
+                    notation. A negative value disable this option. Disabled
+                    by default.
 -eager-load-sources  when loading a source, try to load all referenced
                     sources in memory (opposite option is
                     -no-eager-load-sources)

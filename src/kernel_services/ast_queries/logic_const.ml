@@ -267,12 +267,11 @@ let tboolean ?loc b =
 
 (** An integer constant (of type integer). *)
 let tinteger ?loc i =
-  term ?loc (TConst (Integer (Integer.of_int i,None))) Linteger
+  term ?loc (TConst (Integer (Z.of_int i,None))) Linteger
 
 (** An integer constant (of type integer) from an int64 . *)
-let tinteger_s64
-    ?loc i64 =
-  term ?loc (TConst (Integer (Integer.of_int64 i64,None))) Linteger
+let tinteger_s64 ?loc i64 =
+  term ?loc (TConst (Integer (Z.of_int64 i64,None))) Linteger
 
 let tint ?loc i =
   term ?loc (TConst (Integer (i,None))) Linteger

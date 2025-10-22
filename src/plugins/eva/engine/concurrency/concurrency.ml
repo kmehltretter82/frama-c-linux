@@ -16,17 +16,17 @@ module Name = struct
 
     type t =
       | String of string
-      | Integer of Integer.t
+      | Integer of Z.t
       | Pointer of Varinfo.t * OffsetStructEq.t
-      | RawPointer of Varinfo.t * Integer.t (* Offset in bits *)
+      | RawPointer of Varinfo.t * Z.t (* Offset in bits *)
     [@@deriving eq, ord]
 
     let name = "Eva.Concurrency.Name"
-    let reprs = [Integer Integer.zero]
+    let reprs = [Integer Z.zero]
 
     let pretty fmt = function
       | String s -> Format.pp_print_string fmt s
-      | Integer i -> Integer.pretty fmt i
+      | Integer i -> Z.pretty fmt i
       | Pointer (v, o) ->
         let last_offset = Cil.lastOffset o in
         let o =
@@ -44,13 +44,13 @@ module Name = struct
         in
         Format.fprintf fmt "%a%a" Varinfo.pretty v OffsetStructEq.pretty o
       | RawPointer (v, o) ->
-        Format.fprintf fmt "&%a + %a" Varinfo.pretty v Integer.pretty o
+        Format.fprintf fmt "&%a + %a" Varinfo.pretty v Z.pretty o
 
     let hash = function
       | String s -> Hashtbl.hash (1, s)
-      | Integer i -> Hashtbl.hash (2, Integer.hash i)
+      | Integer i -> Hashtbl.hash (2, Z.hash i)
       | Pointer (v, o) -> Hashtbl.hash (3, Varinfo.hash v, OffsetStructEq.hash o)
-      | RawPointer (v, o) -> Hashtbl.hash (4, Varinfo.hash v, Integer.hash o)
+      | RawPointer (v, o) -> Hashtbl.hash (4, Varinfo.hash v, Z.hash o)
   end
 
   include Prototype
@@ -86,7 +86,7 @@ module Name = struct
     try
       let base, ival = Locations.Location_Bytes.find_lonely_binding cvalue in
       let byte_offset = Ival.project_int ival in
-      let bits_offset = Integer.(mul byte_offset (of_int 8)) in
+      let bits_offset = Z.(mul byte_offset (of_int 8)) in
       of_address base bits_offset
     with Not_found | Ival.Not_Singleton_Int -> None
 end

@@ -297,7 +297,7 @@ val tinteger_s64: ?loc:Location.t -> int64 -> term
 
 (** integer constant
     @since Oxygen-20120901 *)
-val tint: ?loc:Location.t -> Integer.t -> term
+val tint: ?loc:Location.t -> Z.t -> term
 
 (** real constant *)
 val treal: ?loc:Location.t -> float -> term

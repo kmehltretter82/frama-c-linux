@@ -18,15 +18,15 @@ module CardinalEstimate = struct
 
   let zero = None
   let one = Some 0.0
-  let of_integer x = Some(log10 (Integer.to_float x))
+  let of_integer x = Some(log10 (Z.to_float x))
   let infinite = Some(infinity)
   let mul a b = match (a,b) with
     | None, _ | _, None -> None
     | Some(a), Some(b) -> Some(a +. b);;
   let power a b = match a with
     | None -> None
-    | a when Integer.is_one b -> a
-    | Some(a) -> Some( a *. (Integer.to_float b))
+    | a when Z.is_one b -> a
+    | Some(a) -> Some( a *. (Z.to_float b))
 
   let pretty fmt a = match a with
     | None -> Format.fprintf fmt "0"
@@ -215,15 +215,14 @@ module V = struct
       fmt m
 
   let pretty_enumitem_set enuminfo fmt l =
-    let module S = Datatype.Integer.Map in
     let assoc ei = Cil.constFoldToInt ei.eival |> Option.map (fun i -> i, ei) in
     let lookup_map =
-      List.to_seq enuminfo.eitems |> Seq.filter_map assoc |> S.of_seq
+      List.to_seq enuminfo.eitems |> Seq.filter_map assoc |> Z.Map.of_seq
     in
     let pretty_item fmt i =
-      match S.find_opt i lookup_map with
+      match Z.Map.find_opt i lookup_map with
       | Some ei -> Printer.pp_varname fmt ei.eiorig_name
-      | None -> Format.fprintf fmt "%a" Integer.pretty i
+      | None -> Format.fprintf fmt "%a" Z.pretty i
     in
     Pretty_utils.pp_iter ~pre:"@[<hov 1>{" ~suf:"}@]" ~sep:";@ "
       List.iter pretty_item fmt l
@@ -428,7 +427,7 @@ module V = struct
     let integer_part'= on_null ~size ~signed integer_part in
     (* no_garble indicates that we do _not_ create a (new) garbled mix *)
     let no_garble =
-      Int.ge size (Int.of_int (Bit_utils.sizeofpointer ())) ||
+      Int.geq size (Int.of_int (Bit_utils.sizeofpointer ())) ||
       is_bottom pointer_part || is_imprecise pointer_part
     in
     if no_garble && integer_part' == integer_part then
@@ -599,7 +598,7 @@ module V = struct
       else
         (* Keep precision if we are reading all the bits of an address *)
         let ptr_size =
-          Integer.of_int (Cil.bitsSizeOfInt (Machine.uintptr_kind ()))
+          Z.of_int (Cil.bitsSizeOfInt (Machine.uintptr_kind ()))
         in
         if Int.equal start Int.zero &&
            Int.equal (Int.succ stop) ptr_size &&
@@ -614,7 +613,7 @@ module V = struct
       inject_ival (Ival.scale (Int.two_power factor) i)
     with
     | Not_based_on_null  ->
-      if Integer.is_zero factor
+      if Z.is_zero factor
       then v
       else topify origin v
     | Z.Overflow -> top_int
@@ -625,7 +624,7 @@ module V = struct
     else value
 
   let shift_bits ~topify ~offset ~size v =
-    let v = restrict_topint_to_size v (Integer.to_int_exn size) in
+    let v = restrict_topint_to_size v (Z.to_int size) in
     shift_left_by_integer ~topify offset v
 
   let merge_distinct_bits ~topify:origin ~conflate_bottom value acc =
@@ -641,7 +640,7 @@ module V = struct
   let merge_neutral_element = singleton_zero
 
   let all_values ~size v =
-    if Int.(equal size zero) then true
+    if Int.is_zero size then true
     else
       try
         let i = project_ival v in
@@ -911,8 +910,8 @@ module V_Or_Uninitialized = struct
     let vcard v = V.cardinal_estimate v ~size in
     match v with
     | C_init_noesc(v) -> vcard v
-    | C_uninit_noesc(v) | C_init_esc(v) -> Integer.add Integer.one (vcard v)
-    | C_uninit_esc(v) -> Integer.add Integer.two (vcard v)
+    | C_uninit_noesc(v) | C_init_esc(v) -> Z.succ (vcard v)
+    | C_uninit_esc(v) -> Z.add 2z (vcard v)
 
 end
 
@@ -933,12 +932,12 @@ module V_Offsetmap = struct
          instance before the minimum of absolute valid range, that
          have a cardinal of zero; we ignore them. *)
       let cardinal =
-        if Integer.is_zero cardinal then Integer.one else cardinal
+        if Z.is_zero cardinal then Z.one else cardinal
       in
       let cardinalf = CardinalEstimate.of_integer cardinal in
-      let repeat = Integer.(e_div (length start stop) size) in
+      let repeat = Z.ediv (Z.length start stop) size in
       (* If a value is "cut", we still count it as if it were whole. *)
-      let repeat = Integer.(max repeat one) in
+      let repeat = Z.(max repeat one) in
       let cardinalf_repeated = CardinalEstimate.power cardinalf repeat in
       CardinalEstimate.mul accu cardinalf_repeated
     in

@@ -246,39 +246,32 @@ module Make_Hashconsed_Lattice_Set
 end
 
 module Int = struct
-  include (Integer: module type of Integer with type t = Integer.t)
-  include (Datatype.Integer: Datatype.S_with_collections with type t:=Integer.t)
+  include (Z: module type of Z with type t = Z.t)
 
-  let pretty fmt v =
-    if not (Kernel.BigIntsHex.is_default ()) then
-      let max = of_int (Kernel.BigIntsHex.get ()) in
-      if gt (abs v) max then Integer.pretty_hex fmt v
-      else Integer.pretty fmt v
-    else
-      Integer.pretty fmt v
+  let e_rem = erem
 
   (** execute [f] on [inf], [inf + step], ... *)
   let fold f ~inf ~sup ~step acc =
     (*    Format.printf "Int.fold: inf:%a sup:%a step:%a@\n"
            pretty inf pretty sup pretty step; *)
-    let nb_loop = e_div (sub sup inf) step in
+    let nb_loop = ediv (sub sup inf) step in
     let rec fold_incr ~counter ~inf acc =
-      if equal counter onethousand then
+      if equal counter 1000z then
         feedback_approximation "enumerating %a integers" pretty nb_loop;
-      if le inf sup then begin
+      if leq inf sup then begin
         (*          Format.printf "Int.fold: %a@\n" pretty inf; *)
         fold_incr ~counter:(succ counter) ~inf:(add step inf) (f inf acc)
       end else acc
     in
     let rec fold_decr ~counter ~sup acc =
-      if equal counter onethousand then
+      if equal counter 1000z then
         feedback_approximation "enumerating %a integers" pretty nb_loop;
-      if le inf sup then begin
+      if leq inf sup then begin
         (*          Format.printf "Int.fold: %a@\n" pretty inf; *)
         fold_decr ~counter:(succ counter) ~sup:(add step sup) (f sup acc)
       end else acc
     in
-    if le zero step
+    if leq zero step
     then fold_incr ~counter:zero ~inf acc
     else fold_decr ~counter:zero ~sup acc
 

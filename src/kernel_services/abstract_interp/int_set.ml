@@ -48,7 +48,7 @@ let zero_or_one = [| Int.zero ; Int.one |]
 let inject_singleton e = [| e |]
 
 let inject_periodic ~from ~period ~number =
-  let l = Int.to_int_exn number in
+  let l = Int.to_int number in
   let s = Array.make l Int.zero in
   let v = ref from in
   let i = ref 0 in
@@ -60,7 +60,7 @@ let inject_periodic ~from ~period ~number =
   done;
   s
 
-module O = Set.Make (Integer)
+module O = Set.Make (Z)
 
 let inject_list list =
   let o = List.fold_left (fun o r -> O.add r o) O.empty list in
@@ -104,7 +104,7 @@ type set_or_itv =
 let fuse_intervals s =
   (* Add interval [b..e[ to the list [acc]. The interval can be a singleton. *)
   let add_itv acc (b, e) =
-    let nb = Int.to_int_exn (Int.sub e b) in
+    let nb = Int.to_int (Int.sub e b) in
     (* If the interval is too small, uses a Set instead of Itv. *)
     if nb > 3
     then Itv (b, Int.pred e) :: acc
@@ -169,7 +169,7 @@ let cardinal =
       l
   else Array.length
 
-let for_all f (a : Integer.t array) =
+let for_all f (a : Z.t array) =
   let l = Array.length a in
   let rec c i = i = l || ((f a.(i)) && c (succ i)) in
   c 0
@@ -239,7 +239,7 @@ let to_seq ?(increasing=true) =
 
 (* ------------------------------- Set or top ------------------------------- *)
 
-type set_or_top = [ `Set of t | `Top of Integer.t * Integer.t * Integer.t ]
+type set_or_top = [ `Set of t | `Top of Z.t * Z.t * Z.t ]
 type set_or_top_or_bottom = [ `Bottom | set_or_top ]
 
 type pre_set =
@@ -254,7 +254,7 @@ let make_top_from_set s =
   let max = O.max_elt s in
   let modu = O.fold
       (fun x acc ->
-         if Int.equal x min then acc else Int.pgcd (Int.sub x min) acc)
+         if Int.equal x min then acc else Int.gcd (Int.sub x min) acc)
       s Int.zero
   in
   (min, max, modu)
@@ -279,7 +279,7 @@ let add_ps ps x =
     let new_modu =
       if Int.equal x min
       then modu
-      else Int.pgcd (Int.sub x min) modu
+      else Int.gcd (Int.sub x min) modu
     in
     let new_min = Int.min min x in
     let new_max = Int.max max x in
@@ -304,23 +304,23 @@ let inject_ps_or_bottom = function
    ival (while maintaining the ival invariants that the "Set"
    constructor is used only for small sets of elements. *)
 let set_to_ival_under set =
-  let card = Int.Set.cardinal set in
+  let card = Z.Set.cardinal set in
   if card <= !small_cardinal
   then
     let a = Array.make card Int.zero in
-    ignore (Int.Set.fold (fun elt i -> Array.set a i elt; i + 1) set 0);
+    ignore (Z.Set.fold (fun elt i -> Array.set a i elt; i + 1) set 0);
     `Set a
   else
     (* If by chance the set is contiguous. *)
   if (Int.equal
-        (Int.sub (Int.Set.max_elt set) (Int.Set.min_elt set))
+        (Int.sub (Z.Set.max_elt set) (Z.Set.min_elt set))
         (Int.of_int (card - 1)))
-  then `Top (Int.Set.min_elt set, Int.Set.max_elt set, Int.one)
+  then `Top (Z.Set.min_elt set, Z.Set.max_elt set, Int.one)
   (* Else: arbitrarily drop some elements of the under approximation. *)
   else
     let a = Array.make !small_cardinal Int.zero in
     try
-      ignore (Int.Set.fold (fun elt i ->
+      ignore (Z.Set.fold (fun elt i ->
           if i = !small_cardinal then raise Exit;
           Array.set a i elt;
           i + 1) set 0);
@@ -329,7 +329,7 @@ let set_to_ival_under set =
 
 (* ------------------------------ Apply and map ----------------------------- *)
 
-let apply_bin_1_strict_incr f x (s : Integer.t array) =
+let apply_bin_1_strict_incr f x (s : Z.t array) =
   let r, l = Array.zero_copy s in
   let rec c i =
     if i = l
@@ -341,7 +341,7 @@ let apply_bin_1_strict_incr f x (s : Integer.t array) =
   in
   c 0
 
-let apply_bin_1_strict_decr f x (s : Integer.t array) =
+let apply_bin_1_strict_decr f x (s : Z.t array) =
   let r, l = Array.zero_copy s in
   let rec c i =
     if i = l
@@ -353,7 +353,7 @@ let apply_bin_1_strict_decr f x (s : Integer.t array) =
   in
   c 0
 
-let apply2 f (s1 : Integer.t array) (s2 : Integer.t array) =
+let apply2 f (s1 : Z.t array) (s2 : Z.t array) =
   let ps = ref empty_ps in
   let l1 = Array.length s1 in
   let l2 = Array.length s2 in
@@ -365,7 +365,7 @@ let apply2 f (s1 : Integer.t array) (s2 : Integer.t array) =
   done;
   inject_ps !ps
 
-let apply2_notzero f (s1 : Integer.t array) s2 =
+let apply2_notzero f (s1 : Z.t array) s2 =
   inject_ps_or_bottom
     (Array.fold_left
        (fun acc v1 ->
@@ -379,7 +379,7 @@ let apply2_notzero f (s1 : Integer.t array) s2 =
        empty_ps
        s1)
 
-let map_set_decr f (s : Integer.t array) =
+let map_set_decr f (s : Z.t array) =
   let r, l = Array.zero_copy s in
   let rec c srcindex dstindex last =
     if srcindex < 0
@@ -399,7 +399,7 @@ let map_set_decr f (s : Integer.t array) =
   in
   c (l-2) 0 (f s.(pred l))
 
-let map_set_strict_decr f (s : Integer.t array) =
+let map_set_strict_decr f (s : Z.t array) =
   let r, l = Array.zero_copy s in
   let rec c i =
     if i = l
@@ -411,7 +411,7 @@ let map_set_strict_decr f (s : Integer.t array) =
   in
   c 0
 
-let map_set_incr f (s : Integer.t array) =
+let map_set_incr f (s : Z.t array) =
   let r, l = Array.zero_copy s in
   let rec c srcindex dstindex last =
     if srcindex = l
@@ -488,7 +488,7 @@ let join l1 s1 l2 s2 =
     let accum acc x =
       if Int.equal x min
       then acc
-      else Int.pgcd (Int.sub x min) acc
+      else Int.gcd (Int.sub x min) acc
     in
     let modu = ref Int.zero in
     for j = 0 to pred l1 do
@@ -537,8 +537,8 @@ let join s1 s2 =
   join l1 s1 l2 s2
 
 let link s1 s2 =
-  let s1 = Array.fold_right Int.Set.add s1 Int.Set.empty in
-  let s2 = Array.fold_right Int.Set.add s2 s1 in
+  let s1 = Array.fold_right Z.Set.add s1 Z.Set.empty in
+  let s2 = Array.fold_right Z.Set.add s2 s1 in
   set_to_ival_under s2
 
 let meet s1 s2 =
@@ -611,9 +611,9 @@ let complement_under ~min ~max set =
   done;
   let b, e = Int.succ (get (!index-1)), Int.pred (get !index) in
   let card = Int.succ (Int.sub e b) in
-  if Int.(le card zero) then `Bottom
-  else if Int.le card (Int.of_int !small_cardinal)
-  then `Set (Array.init (Int.to_int_exn card) (fun i -> Int.add b (Int.of_int i)))
+  if Int.(leq card zero) then `Bottom
+  else if Int.leq card (Int.of_int !small_cardinal)
+  then `Set (Array.init (Int.to_int card) (fun i -> Int.add b (Int.of_int i)))
   else `Top (b, e, Int.one)
 
 (* ------------------------------ Arithmetics ------------------------------- *)
@@ -632,22 +632,22 @@ let add_under s1 s2 =
     let set =
       Array.fold_left (fun acc i1 ->
           Array.fold_left (fun acc i2 ->
-              Int.Set.add (Int.add i1 i2) acc) acc s2)
-        Int.Set.empty s1
+              Z.Set.add (Int.add i1 i2) acc) acc s2)
+        Z.Set.empty s1
     in
     set_to_ival_under set
 
 let neg s = map_set_strict_decr Int.neg s
 
 let abs s =
-  if Int.(ge s.(0) zero)
+  if Int.(s.(0) >= zero)
   then s
-  else if Int.(le s.(Array.length s - 1) zero)
+  else if Int.leq s.(Array.length s - 1) 0z
   then neg s
   else map Int.abs s
 
 let scale f s =
-  if Int.ge f Int.zero
+  if Int.(f >= 0z)
   then apply_bin_1_strict_incr Int.mul f s
   else apply_bin_1_strict_decr Int.mul f s
 
@@ -660,20 +660,20 @@ let scale_div ~pos f s =
   assert (not (Int.is_zero f));
   let div_f =
     if pos
-    then fun a -> Int.e_div a f
-    else fun a -> Int.c_div a f
+    then fun a -> Int.ediv a f
+    else fun a -> Int.div a f
   in
-  if Int.lt f Int.zero
+  if Int.(f < 0z)
   then map_set_decr div_f s
   else map_set_incr div_f s
 
 let scale_rem ~pos f s =
   assert (not (Int.is_zero f));
-  let f = if Int.lt f Int.zero then Int.neg f else f in
-  let rem_f a = if pos then Int.e_rem a f else Int.c_rem a f in
+  let f = if Int.(f < 0z) then Int.neg f else f in
+  let rem_f a = if pos then Int.erem a f else Int.rem a f in
   map rem_f s
 
-let c_rem s1 s2 = apply2_notzero Int.c_rem s1 s2
+let c_rem s1 s2 = apply2_notzero Int.rem s1 s2
 
 let bitwise_signed_not = map_set_strict_decr Int.lognot
 

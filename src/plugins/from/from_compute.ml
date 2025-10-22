@@ -428,7 +428,7 @@ struct
             let implicit =
               not (Ast_types.is_array ct &&
                    (Ast_types.(is_scalar (direct_element_type ct))
-                    || Ast_info.array_size ct > (Integer.of_int 100)))
+                    || Ast_info.array_size ct > 100z))
             in
             let r = Cil.foldLeftCompound ~implicit ~doinit ~ct ~initl ~acc in
             if implicit then r else

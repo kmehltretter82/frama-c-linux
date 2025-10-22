@@ -64,13 +64,13 @@ module type S = sig
   (** {2 Creating an offsetmap} *)
 
   (** [size] must be strictly greater than zero. *)
-  val create: size:Integer.t -> v -> t
+  val create: size:Z.t -> v -> t
 
   val empty: t
   (** offsetmap containing no interval. *)
 
   val size_from_validity:
-    Base.validity -> Integer.t Lattice_bounds.or_bottom
+    Base.validity -> Z.t Lattice_bounds.or_bottom
   (** [size_from_validity v] returns the size to be used when creating a
       new offsetmap for a base with validity [v]. This is a convention that
       should be shared by all modules that create offsetmaps.
@@ -116,7 +116,7 @@ module type S = sig
       [fold] instead. *)
   val fold_join_itvs:
     cache:Hptmap_sig.cache_type ->
-    (Integer.t -> Integer.t -> v -> 'a) ->
+    (Z.t -> Z.t -> v -> 'a) ->
     ('a -> 'a -> 'a) ->
     'a ->
     intervals -> t -> 'a

@@ -364,7 +364,7 @@ module Rewriting = struct
                 if Ast_types.is_ptr typ
                 then
                   let scale = Cil.(bytesSizeOf (Ast_types.direct_pointed_type typ)) in
-                  Arith.mul_integer (Integer.of_int scale) v2
+                  Arith.mul_integer (Z.of_int scale) v2
                 else v2
               in
               let add_v2 var =
@@ -420,10 +420,10 @@ module Rewriting = struct
   (* Returns the range of the expression X-Y when the comparison X#Y holds. *)
   let comparison_range =
     function
-    | Eva_ast.Lt -> Ival.inject_range None (Some Integer.minus_one)
-    | Gt -> Ival.inject_range (Some Integer.one) None
-    | Le -> Ival.inject_range None (Some Integer.zero)
-    | Ge -> Ival.inject_range (Some Integer.zero) None
+    | Eva_ast.Lt -> Ival.inject_range None (Some Z.minus_one)
+    | Gt -> Ival.inject_range (Some Z.one) None
+    | Le -> Ival.inject_range None (Some Z.zero)
+    | Ge -> Ival.inject_range (Some Z.zero) None
     | Eq -> Ival.zero
     | Ne -> Ival.top
     | _ -> assert false
@@ -1243,7 +1243,7 @@ module State = struct
     | Field (fi, sub) ->
       let* sub_coeff = offset_to_coeff eval fi.ftype sub in
       begin try
-          let byte_offset = Integer.of_int (fst (Cil.fieldBitsOffset fi) / 8) in
+          let byte_offset = Z.of_int (fst (Cil.fieldBitsOffset fi) / 8) in
           let coeff = Ival.add_singleton_int byte_offset sub_coeff in
           `Value coeff
         with Cil.SizeOfError _ -> `Top
@@ -1261,7 +1261,7 @@ module State = struct
         try `Value (Cil.bytesSizeOf elem_type)
         with Cil.SizeOfError _ -> `Top
       in
-      Ival.(add_int (scale (Integer.of_int elem_size) index) sub_coeff)
+      Ival.(add_int (scale (Z.of_int elem_size) index) sub_coeff)
 
   let mk_variable_builder (eval : evaluator) (_: t) =
     let (let*) x f = Option.bind f (Top.to_option x) in

@@ -198,7 +198,7 @@ let bounds_int v =
   try
     let i = Cvalue.V.project_ival v in
     match Ival.min_and_max i with
-    | None, None -> let v = Cvalue.V.inject_int Integer.zero in v, v
+    | None, None -> let v = Cvalue.V.inject_int Z.zero in v, v
     | Some i, None | None, Some i -> let v = Cvalue.V.inject_int i in v, v
     | Some i1, Some i2 -> Cvalue.V.inject_int i1, Cvalue.V.inject_int i2
   with Cvalue.V.Not_based_on_null -> assert false
@@ -319,7 +319,7 @@ module Hypotheses = struct
      Raises Can_not_subdiv if no subvalue of the initial list can be split. *)
   let split sizes subvalues =
     let rec split:
-      type l. (Integer.t, l) llist -> l subvalues -> l subvalues list =
+      type l. (Z.t, l) llist -> l subvalues -> l subvalues list =
       fun sizes subvalues ->
         match sizes, subvalues with
         | Nil, Nil -> [ Nil ]

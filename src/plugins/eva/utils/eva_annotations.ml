@@ -141,7 +141,7 @@ module Slevel = Register (struct
           | TConst (LStr "default") -> SlevelDefault
           | TConst (LStr "merge") -> SlevelMerge
           | TConst (LStr "full") -> SlevelFull
-          | TConst (Integer (i, _)) -> SlevelLocal (Integer.to_int_exn i)
+          | TConst (Integer (i, _)) -> SlevelLocal (Z.to_int i)
           | _ -> SlevelDefault (* be kind. Someone is bound to write a visitor
                                   that will simplify our term into something
                                   unrecognizable... *)
@@ -189,7 +189,7 @@ module Unroll = Register (struct
       | Ext_terms [
           {term_node = TConst (LStr "auto")};
           {term_node = TConst (Integer (i, _))}] ->
-        UnrollAuto (Integer.to_int_exn i)
+        UnrollAuto (Z.to_int i)
       | _ -> assert false
 
     let print fmt = function
@@ -301,7 +301,7 @@ module Subdivision = Register (struct
 
     let export i = Ext_terms [Logic_const.tinteger i]
     let import = function
-      | Ext_terms [{term_node = TConst (Integer (i, _))}] -> Integer.to_int_exn i
+      | Ext_terms [{term_node = TConst (Integer (i, _))}] -> Z.to_int i
       | _ -> assert false
 
     let print fmt i = Format.pp_print_int fmt i

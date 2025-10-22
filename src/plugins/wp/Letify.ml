@@ -344,18 +344,18 @@ struct
       add_lit p (add_lit (e_leq a b) (add_lit (e_neq a b) sigma))
     | Neq _ | Fun _ | Not _ -> add_lit p sigma
     | Bind (Forall,Int,fb) ->
-      let bound = Integer.of_int (Wp_parameters.BoundForallUnfolding.get ()) in
+      let bound = Z.of_int (Wp_parameters.BoundForallUnfolding.get ()) in
       begin match extract_forall_equality fb with
         | Some (csta,cstb) when
-            Integer.le csta cstb &&
-            Integer.le (Integer.sub cstb csta) bound ->
+            Z.leq csta cstb &&
+            Z.leq (Z.sub cstb csta) bound ->
           let rec aux sigma i =
-            if Integer.lt cstb i then sigma
+            if Z.lt cstb i then sigma
             else begin
               let eq = F.QED.e_apply p [e_zint i] in
               (* qed should be able to simplify it directly *)
               let sigma = add_pred sigma eq in
-              aux sigma (Integer.succ i)
+              aux sigma (Z.succ i)
             end
           in
           aux sigma csta

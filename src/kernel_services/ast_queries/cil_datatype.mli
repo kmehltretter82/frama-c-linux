@@ -382,7 +382,7 @@ module Lexpr: S with type t = Logic_ptree.lexpr
 val drop_non_logic_attributes : (attributes -> attributes) ref
 val drop_fc_internal_attributes : (attributes -> attributes) ref
 val drop_ignored_attributes : (attributes -> attributes) ref
-val constfoldtoint : (exp -> Integer.t option) ref
+val constfoldtoint : (exp -> Z.t option) ref
 val punrollType: (typ -> typ) ref
 val punrollLogicType: (logic_type -> logic_type) ref
 val clear_caches: unit -> unit

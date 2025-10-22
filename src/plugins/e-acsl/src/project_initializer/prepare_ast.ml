@@ -276,7 +276,7 @@ let sufficiently_aligned vi algn =
       (fun acc attr ->
          match attr with
          | ("align", [AInt i]) ->
-           let alignment = Integer.to_int_exn i in
+           let alignment = Z.to_int i in
            if acc <> 0 && acc <> alignment then begin
              (* multiple align attributes with different values *)
              Options.error
@@ -456,7 +456,7 @@ let prepare_fundec kf =
                      storage of 32-bit timestamps in a 1:1 shadow. *)
                   if require_alignment vi 4 then
                     vi.vattr <-
-                      ("aligned", [ AInt Integer.four ]) :: vi.vattr)
+                      ("aligned", [ AInt 4z ]) :: vi.vattr)
                blk.blocals;
              blk)
       else

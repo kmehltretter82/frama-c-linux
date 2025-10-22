@@ -58,8 +58,8 @@ val pointer_range: unit -> integer_range
 val range_inclusion: integer_range -> integer_range -> bool
 (** Checks inclusion of two integer ranges. *)
 
-val range_lower_bound: integer_range -> Integer.t
-val range_upper_bound: integer_range -> Integer.t
+val range_lower_bound: integer_range -> Z.t
+val range_upper_bound: integer_range -> Z.t
 
 (** Abstraction of scalar types -- in particular, all those that can be involved
     in a cast. Enum and integers are coalesced. *)

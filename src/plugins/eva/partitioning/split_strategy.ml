@@ -12,7 +12,7 @@ open Abstract_interp
 type split_strategy =
   | NoSplit
   | SplitAuto
-  | SplitEqList of Datatype.Integer.t list
+  | SplitEqList of Z.t list
   | FullSplit
 [@@ deriving eq, ord]
 
@@ -35,7 +35,7 @@ include Datatype.Make (struct
       | FullSplit -> Format.pp_print_string fmt "full split"
       | SplitEqList l ->
         Format.fprintf fmt "Split on \\result == %a"
-          (Pretty_utils.pp_list ~sep:",@ " Datatype.Integer.pretty) l
+          (Pretty_utils.pp_list ~sep:",@ " Z.pretty) l
 
     let copy = Datatype.identity
   end)
@@ -48,7 +48,7 @@ let of_string s =
   | _ ->
     let r = Str.regexp ":" in
     let conv s =
-      try Integer.of_string s
+      try Z.of_string s
       with Invalid_argument _ ->
         raise (Self.Cannot_build ("unknown split strategy " ^ s))
     in
@@ -61,4 +61,4 @@ let to_string = function
   | SplitEqList l ->
     Format.asprintf "%t"
       (fun fmt ->
-         Pretty_utils.pp_list ~sep:":" Datatype.Integer.pretty fmt l)
+         Pretty_utils.pp_list ~sep:":" Z.pretty fmt l)

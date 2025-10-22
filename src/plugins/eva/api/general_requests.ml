@@ -635,11 +635,11 @@ module AlarmCategory = struct
       | Memory_access -> Memory_access (lv, For_reading)
       | Index_out_of_bound-> Index_out_of_bound (e, None)
       | Invalid_shift -> Invalid_shift (e, None)
-      | Overflow -> Overflow (Signed, e, Integer.one, Lower_bound)
+      | Overflow -> Overflow (Signed, e, Z.one, Lower_bound)
       | Uninitialized -> Uninitialized lv
       | Dangling -> Dangling lv
       | Nan_or_infinite -> Is_nan_or_infinite (e, FFloat)
-      | Float_to_int -> Float_to_int (e, Integer.one, Lower_bound)
+      | Float_to_int -> Float_to_int (e, Z.one, Lower_bound)
       | Other -> assert false
 
     let register alarm_category =

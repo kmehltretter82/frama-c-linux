@@ -13,7 +13,7 @@ open Bottom.Operators
 let small_cardinal = Int_set.get_small_cardinal
 let small_cardinal_Int () = Int.of_int (small_cardinal ())
 
-type widen_hint = Datatype.Integer.Set.t
+type widen_hint = Z.Set.t
 
 (* --------------------------------- Datatype ------------------------------- *)
 
@@ -74,12 +74,12 @@ let inject_singleton e = Set (Int_set.inject_singleton e)
 let make ~min ~max ~rem ~modu =
   match min, max with
   | Some mn, Some mx ->
-    assert (Int.le mn mx);
+    assert (Int.leq mn mx);
     if Int.equal mx mn
     then inject_singleton mn
     else
-      let l = Int.succ (Int.e_div (Int.sub mx mn) modu) in
-      if Int.le l (small_cardinal_Int ())
+      let l = Int.succ (Int.ediv (Int.sub mx mn) modu) in
+      if Int.leq l (small_cardinal_Int ())
       then Set (Int_set.inject_periodic ~from:mn ~period:modu ~number:l)
       else Itv (Int_interval.make ~min ~max ~rem ~modu)
   | _ -> Itv (Int_interval.make ~min ~max ~rem ~modu)
@@ -89,10 +89,10 @@ let check_make ~min ~max ~rem ~modu =
   make ~min ~max ~rem ~modu
 
 let inject_interval ~min ~max ~rem:r ~modu =
-  assert ((Int.ge r Int.zero ) && (Int.ge modu Int.one) && (Int.lt r modu));
+  assert ((Int.geq r Int.zero ) && (Int.geq modu Int.one) && (Int.lt r modu));
   let fix_bound fix bound = match bound with
     | None -> None
-    | Some b -> Some (if Int.equal b (Int.e_rem r modu) then b else fix b)
+    | Some b -> Some (if Int.equal b (Int.erem r modu) then b else fix b)
   in
   let min = fix_bound (fun min -> Int.round_up_to_r ~min ~r ~modu) min
   and max = fix_bound (fun max -> Int.round_down_to_r ~max ~r ~modu) max in
@@ -114,7 +114,7 @@ let inject_itv i =
   match Int_interval.cardinal i with
   | None -> Itv i
   | Some card ->
-    if Int.le card (small_cardinal_Int ())
+    if Int.leq card (small_cardinal_Int ())
     then
       let min, max, rem, modu = Int_interval.min_max_rem_modu i in
       make ~min ~max ~rem ~modu
@@ -127,7 +127,7 @@ let inject_set s = Set s
    these results as proper integer abstractions of type t.*)
 
 let inject_pre_itv ~min ~max ~modu =
-  let rem = Int.e_rem min modu in
+  let rem = Int.erem min modu in
   Itv (Int_interval.make ~min:(Some min) ~max:(Some max) ~rem ~modu)
 
 let inject_set_or_top = function
@@ -147,9 +147,9 @@ let make_top_from_set s =
     then Int.zero, min
     else
       let modu =
-        Int_set.fold (fun x acc -> Int.pgcd (Int.sub x min) acc) s Int.zero
+        Int_set.fold (fun x acc -> Int.gcd (Int.sub x min) acc) s Int.zero
       in
-      Int.e_rem min modu, modu
+      Int.erem min modu, modu
   in
   let max = Some (Int_set.max s) in
   let min = Some min in
@@ -176,12 +176,12 @@ let make_range = function
 let min_le_elt min elt =
   match min with
   | None -> true
-  | Some m -> Int.le m elt
+  | Some m -> Int.leq m elt
 
 let max_ge_elt max elt =
   match max with
   | None -> true
-  | Some m -> Int.ge m elt
+  | Some m -> Int.geq m elt
 
 let is_zero x = equal x zero
 let is_one = equal one
@@ -261,14 +261,14 @@ let cardinal_less_than v n =
     | Set s -> Int.of_int (Int_set.cardinal s)
     | Itv i -> Extlib.the ~exn:Not_less_than (Int_interval.cardinal i)
   in
-  if Int.le c (Int.of_int n)
-  then Int.to_int_exn c (* This is smaller than the original [n] *)
+  if Int.leq c (Int.of_int n)
+  then Int.to_int c (* This is smaller than the original [n] *)
   else raise Not_less_than
 
 let cardinal_is_less_than v n =
   match cardinal v with
   | None -> false
-  | Some c -> Int.le c (Int.of_int n)
+  | Some c -> Int.leq c (Int.of_int n)
 
 let diff_if_one value rem =
   match rem with
@@ -313,7 +313,7 @@ let is_included t1 t2 =
     (* Inclusion of bounds is needed for the entire inclusion *)
     min_le_elt min (Int_set.min s) && max_ge_elt max (Int_set.max s)
     && (Int.equal Int.one modu (* Top side contains all integers, we're done *)
-        || Int_set.for_all (fun x -> Int.equal (Int.e_rem x modu) rem) s)
+        || Int_set.for_all (fun x -> Int.equal (Int.erem x modu) rem) s)
 
 let join v1 v2 =
   match v1, v2 with
@@ -322,9 +322,9 @@ let join v1 v2 =
   | Set s, Itv i
   | Itv i, Set s ->
     let min, max, r, modu = Int_interval.min_max_rem_modu i in
-    let f elt modu = Int.pgcd modu (Int.abs (Int.sub r elt)) in
+    let f elt modu = Int.gcd modu (Int.abs (Int.sub r elt)) in
     let modu = Int_set.fold f s modu in
-    let rem = Int.e_rem r modu in
+    let rem = Int.erem r modu in
     let min = match min with
         None -> None
       | Some m -> Some (Int.min m (Int_set.min s))
@@ -586,14 +586,14 @@ let create_all_values ~signed ~size =
 
 let cast_int_to_int ~size ~signed value =
   if equal top value
-  then create_all_values ~size:(Int.to_int_exn size) ~signed
+  then create_all_values ~size:(Int.to_int size) ~signed
   else
     let result =
       match value with
       | Itv i -> inject_itv (Int_interval.cast ~size ~signed i)
       | Set s ->
         let all =
-          create_all_values ~size:(Int.to_int_exn size) ~signed
+          create_all_values ~size:(Int.to_int size) ~signed
         in
         if is_included value all
         then value
@@ -612,12 +612,12 @@ let all_values ~size = function
       | None, _ | _, None -> Int.is_one modu
       | Some mn, Some mx ->
         Int.is_one modu &&
-        Int.le
+        Int.leq
           (Int.two_power size)
           (Int.length mn mx)
     end
   | Set s as v ->
-    let siz = Int.to_int_exn size in
+    let siz = Int.to_int size in
     Int_set.cardinal s >= 1 lsl siz &&
     equal
       (cast_int_to_int ~size ~signed:false v)
@@ -768,7 +768,7 @@ let significant_bits (v : t) : int option =
 let extract_sign (v : t) : bit_value =
   match min_and_max v with
   | _, Some u when Int.(lt u zero) -> On
-  | Some l, _ when Int.(ge l zero) -> Off
+  | Some l, _ when Int.(geq l zero) -> Off
   | _, _ -> Both
 
 let extract_bit (i : int) (v : t) : bit_value =
@@ -780,7 +780,7 @@ let extract_bit (i : int) (v : t) : bit_value =
     | None, _ | _, None -> Both
     | Some l, Some u ->
       (* It does not take modulo into account *)
-      if Int.(ge (sub u l) (two_power_of_int i)) (* u - l >= mask *)
+      if Int.(geq (sub u l) (two_power_of_int i)) (* u - l >= mask *)
       then Both
       else Bit.union (bit_value l) (bit_value u)
 
@@ -793,7 +793,7 @@ let reduce_sign v = function
     end
   | Off ->
     begin match v with
-      | Set s -> Int_set.filter Int.(le zero) s >>-: inject_set
+      | Set s -> Int_set.filter Int.(leq zero) s >>-: inject_set
       | Itv itv -> Int_interval.reduce_sign itv false >>-: inject_itv
     end
 
@@ -813,7 +813,7 @@ let extract_bit = function
 
 let set_bit_on ~size bit =
   let mask = match bit with
-    | Sign -> Int.(neg (two_power_of_int size))
+    | Sign -> Int.neg (Int.two_power_of_int size)
     | Bit i -> Int.(two_power_of_int i)
   in
   fun v -> Int.logor mask v
@@ -848,7 +848,7 @@ struct
     | Set s when Int_set.cardinal s = 1 -> (* singleton : build a full mask  *)
       let x = Int_set.min s in
       let n = Z.numbits x in
-      int_to_bit_array n x, if Int.(ge x zero) then Off else On
+      int_to_bit_array n x, if Int.(geq x zero) then Off else On
     | v ->
       let _,_,r,modu = min_max_rem_modu v in (* requires cardinal > 1 *)
       (* Find how much [modu] can be divided by two. *)

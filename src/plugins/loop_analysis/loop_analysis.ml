@@ -34,11 +34,11 @@ module Binary(* :BINARY_SEMILATTICE *) = struct
   open Cil_types
 
   type binary =
-    | ConstantInt of Integer.t
+    | ConstantInt of Z.t
     | ConstantVar of varinfo
     (* The contents of a variable at the beginning of the loop and a
        fixed offset. *)
-    | AffineRef of varinfo * Integer.t
+    | AffineRef of varinfo * Z.t
     | Boolean of conds
     | Unknown
 
@@ -53,11 +53,11 @@ module Binary(* :BINARY_SEMILATTICE *) = struct
   and conds = cond list
 
   let rec binary_compare a b = match (a,b) with
-    | ConstantInt i1, ConstantInt i2 -> Integer.compare i1 i2
+    | ConstantInt i1, ConstantInt i2 -> Z.compare i1 i2
     | ConstantVar v1, ConstantVar v2 -> Cil_datatype.Varinfo.compare v1 v2
     | AffineRef (v1,i1), AffineRef(v2,i2) ->
       let res = Cil_datatype.Varinfo.compare v1 v2 in
-      if res == 0 then Integer.compare i1 i2 else res
+      if res == 0 then Z.compare i1 i2 else res
     | Boolean _c1, Boolean _c2 -> assert false
     | Unknown, Unknown -> 0
     | Unknown, _ -> 1 | _, Unknown -> -1
@@ -93,22 +93,22 @@ module Binary(* :BINARY_SEMILATTICE *) = struct
 
   let add b1 b2 = match b1, b2 with
     | Unknown, _ | _, Unknown -> Unknown
-    | ConstantInt(i1), ConstantInt(i2) -> ConstantInt(Integer.add i1 i2)
+    | ConstantInt(i1), ConstantInt(i2) -> ConstantInt(Z.add i1 i2)
     | ConstantInt(i1), AffineRef(v,i2) | AffineRef(v,i2), ConstantInt(i1) ->
-      AffineRef(v,Integer.add i1 i2)
+      AffineRef(v,Z.add i1 i2)
     | _ -> Unknown
 
   let neg = function
     | Unknown -> Unknown
-    | ConstantInt(i) -> ConstantInt(Integer.neg i)
+    | ConstantInt(i) -> ConstantInt(Z.neg i)
     | _ -> Unknown
 
 
   let pretty fmt = function
-    | ConstantInt(i) -> Format.fprintf fmt "%a" Integer.pretty i
+    | ConstantInt(i) -> Format.fprintf fmt "%a" Z.pretty i
     | AffineRef(v,i) -> Format.fprintf fmt "ref<%a>+%a"
                           Cil_datatype.Varinfo.pretty v
-                          Integer.pretty i
+                          Z.pretty i
     | Unknown -> Format.fprintf fmt "unknown"
     | ConstantVar(v) -> Format.fprintf fmt "%a" Cil_datatype.Varinfo.pretty v
     | Boolean _ -> Format.fprintf fmt "bools"
@@ -195,11 +195,11 @@ module Binary(* :BINARY_SEMILATTICE *) = struct
 
 
   let join a b = match (a,b) with
-    | ConstantInt(ia), ConstantInt(ib) when Integer.equal ia ib  -> a
+    | ConstantInt(ia), ConstantInt(ib) when Z.equal ia ib  -> a
     | ConstantVar(va), ConstantVar(vb)
       when Cil_datatype.Varinfo.equal va vb  -> a
     | AffineRef(va,ia), AffineRef(vb,ib)
-      when Cil_datatype.Varinfo.equal va vb && Integer.equal ia ib -> a
+      when Cil_datatype.Varinfo.equal va vb && Z.equal ia ib -> a
     | Boolean(condsa), Boolean(condsb) -> Boolean(join_conds condsa condsb)
     | Unknown, Unknown -> Unknown
     | _,_ -> Unknown
@@ -249,7 +249,7 @@ module Store(* (B:sig *)
       | (Var(vi),NoOffset) when not vi.vaddrof ->
         Some(
           try Varinfo.Map.find vi map
-          with Not_found -> B.AffineRef(vi,Integer.zero))
+          with Not_found -> B.AffineRef(vi,Z.zero))
       | _ -> None
 
   let join2_stmts stmt1 stmt2 =
@@ -264,13 +264,13 @@ module Store(* (B:sig *)
   ;;
 
   let pretty_increment fmt increment =
-    if Integer.(equal increment one) then Format.fprintf fmt "++"
-    else if Integer.(equal increment minus_one) then Format.fprintf fmt "--"
-    else if Integer.(gt increment zero) then
-      Format.fprintf fmt " += %a" Integer.pretty increment
-    else if Integer.(lt increment zero) then
-      Format.fprintf fmt " -= %a" Integer.pretty
-        (Integer.neg increment)
+    if Z.(equal increment one) then Format.fprintf fmt "++"
+    else if Z.(equal increment minus_one) then Format.fprintf fmt "--"
+    else if Z.(gt increment zero) then
+      Format.fprintf fmt " += %a" Z.pretty increment
+    else if Z.(lt increment zero) then
+      Format.fprintf fmt " -= %a" Z.pretty
+        (Z.neg increment)
     else assert false (* should never happen *)
 
   let do_instr instr (value,conds) =
@@ -354,7 +354,7 @@ module Store(* (B:sig *)
     (* Induction variables is a map from each Varinfo to its increment. *)
     let induction_variables = Varinfo.Map.fold  (fun key bin acc -> match bin with
         | B.AffineRef(vi,offset)
-          when not (Integer.is_zero offset) && Varinfo.equal vi key ->
+          when not (Z.is_zero offset) && Varinfo.equal vi key ->
           Varinfo.Map.add key offset acc
         | _ -> acc) result Varinfo.Map.empty in
 
@@ -364,7 +364,7 @@ module Store(* (B:sig *)
        value. *)
     let new_ = Varinfo.Map.fold (fun key bin acc -> match bin with
         | B.AffineRef(vi,offset)
-          when Integer.is_zero offset && Varinfo.equal vi key -> acc
+          when Z.is_zero offset && Varinfo.equal vi key -> acc
         | _ -> Varinfo.Map.add key B.Unknown acc
       ) result value in
 
@@ -381,8 +381,8 @@ module Store(* (B:sig *)
           | B.AffineRef(vi,offset) ->
             begin
               match value_min_max stmt vi with
-              | Some imin, _ when smaller -> Integer.add imin offset
-              | _, Some imax when not smaller -> Integer.add imax offset
+              | Some imin, _ when smaller -> Z.add imin offset
+              | _, Some imax when not smaller -> Z.add imax offset
               | _, _ -> raise Not_found
             end
           | _ -> raise Not_found (* TODO: handle comparison between pointers *)
@@ -391,33 +391,33 @@ module Store(* (B:sig *)
         Options.debug "maybe_insert: function %a, found var %a, smaller: %b, \
                        initial %a, increment %a, bound %a, offset %a, binop '%a'"
           Kernel_function.pretty (Kernel_function.find_englobing_kf stmt)
-          Printer.pp_varinfo vi smaller Integer.pretty initial Integer.pretty increment
-          Integer.pretty bound Integer.pretty offset Printer.pp_binop binop;
-        let bound = Integer.sub bound initial in
+          Printer.pp_varinfo vi smaller Z.pretty initial Z.pretty increment
+          Z.pretty bound Z.pretty offset Printer.pp_binop binop;
+        let bound = Z.sub bound initial in
         let bound_offset =
-          if smaller then Integer.sub bound offset
-          else Integer.add bound offset
+          if smaller then Z.sub bound offset
+          else Z.add bound offset
         in
         (* remainder is used for two purposes:
            1. in the case of '!=' loops, to warn if the termination condition
               may be missed;
            2. in '<=' and '>=' loops, to adjust for the last iteration *)
-        let divident = Integer.sub bound offset in
-        let remainder = Integer.e_rem divident increment in
+        let divident = Z.sub bound offset in
+        let remainder = Z.erem divident increment in
         (* check if induction variable may miss termination condition *)
-        if binop = Cil_types.Ne && not Integer.(equal remainder zero) then
+        if binop = Cil_types.Ne && not Z.(equal remainder zero) then
           Options.warning ~current:true
             "termination condition may not be reached (infinite loop?)@;\
              loop amounts to: for (%a = 0; %a != %a; %a%a)"
             Printer.pp_varinfo vi
-            Printer.pp_varinfo vi Integer.pretty divident
+            Printer.pp_varinfo vi Z.pretty divident
             Printer.pp_varinfo vi pretty_increment increment
         else
           try
-            let value = (Integer.to_int_exn (Integer.c_div bound_offset increment)) in
+            let value = (Z.to_int (Z.div bound_offset increment)) in
             let adjusted_value =
-              if (binop = Cil_types.Le && Integer.(equal remainder zero))
-              || (not Integer.(equal remainder zero))
+              if (binop = Cil_types.Le && Z.(equal remainder zero))
+              || (not Z.(equal remainder zero))
               then value + 1
               else value
             in
@@ -426,7 +426,7 @@ module Store(* (B:sig *)
                 success := true;
                 add_loop_bound stmt adjusted_value
               end
-          with Z.Overflow -> (* overflow in Integer.to_int_exn *)
+          with Z.Overflow -> (* overflow in Z.to_int *)
             ()
       (* TODO: check if this is useful and does not cause false alarms
          else
@@ -450,8 +450,8 @@ module Store(* (B:sig *)
           begin
             try
               let increment = Varinfo.Map.find vi induction_variables in
-              assert (not (Integer.equal increment Integer.zero));
-              if Integer.gt increment Integer.zero then
+              assert (not (Z.is_zero increment));
+              if Z.gt increment Z.zero then
                 maybe_insert vi true bound offset Cil_types.Ne
               else
                 maybe_insert vi false bound offset Cil_types.Ne
@@ -466,9 +466,9 @@ module Store(* (B:sig *)
                 begin
                   match min_max_int vi, min_max_int vi' with
                   | (Some min_bound, _), (_, Some max_bound') ->
-                    let b1 = Integer.add min_bound offset in
+                    let b1 = Z.add min_bound offset in
                     maybe_insert vi' false b1 offset' Cil_types.Lt;
-                    let b2 = Integer.add max_bound' offset' in
+                    let b2 = Z.add max_bound' offset' in
                     maybe_insert vi true b2 offset Cil_types.Lt
                   | _, _ -> ()
                 end
@@ -476,9 +476,9 @@ module Store(* (B:sig *)
                 begin
                   match min_max_int vi, min_max_int vi' with
                   | (Some min_bound, _), (_, Some max_bound') ->
-                    let b1 = Integer.add min_bound offset in
+                    let b1 = Z.add min_bound offset in
                     maybe_insert vi' false b1 offset' Cil_types.Le;
-                    let b2 = Integer.add max_bound' offset' in
+                    let b2 = Z.add max_bound' offset' in
                     maybe_insert vi true b2 offset Cil_types.Le
                   | a, b ->
                     Options.debug "failed to get min/max bounds?@.\
@@ -486,44 +486,44 @@ module Store(* (B:sig *)
                                    -   get_min_max_int_for_vi(%a)=%a"
                       Printer.pp_varinfo vi
                       (Pretty_utils.pp_pair
-                         (Pretty_utils.pp_opt Integer.pretty)
-                         (Pretty_utils.pp_opt Integer.pretty)) a
+                         (Pretty_utils.pp_opt Z.pretty)
+                         (Pretty_utils.pp_opt Z.pretty)) a
                       Printer.pp_varinfo vi'
                       (Pretty_utils.pp_pair
-                         (Pretty_utils.pp_opt Integer.pretty)
-                         (Pretty_utils.pp_opt Integer.pretty)) b
+                         (Pretty_utils.pp_opt Z.pretty)
+                         (Pretty_utils.pp_opt Z.pretty)) b
                 end
               | B.Ne(B.AffineRef(vi, offset),B.AffineRef(vi', offset')) ->
                 begin
                   try
                     let increment = Varinfo.Map.find vi induction_variables in
-                    assert (not (Integer.equal increment Integer.zero));
-                    if Integer.gt increment Integer.zero then
+                    assert (not (Z.is_zero increment));
+                    if Z.gt increment Z.zero then
                       match min_max_int vi' with
                       | (_, Some max_bound') ->
-                        let b = Integer.add max_bound' offset' in
+                        let b = Z.add max_bound' offset' in
                         maybe_insert vi true b offset Cil_types.Lt
                       | _ -> ()
                     else
                       match min_max_int vi' with
                       | (Some min_bound', _) ->
-                        let b = Integer.add min_bound' offset in
+                        let b = Z.add min_bound' offset in
                         maybe_insert vi false b offset' Cil_types.Lt
                       | _ -> ()
                   with Not_found -> (* try other variable as increment *)
                   try
                     let increment = Varinfo.Map.find vi' induction_variables in
-                    assert (not (Integer.equal increment Integer.zero));
-                    if Integer.gt increment Integer.zero then
+                    assert (not (Z.is_zero increment));
+                    if Z.gt increment Z.zero then
                       match min_max_int vi with
                       | (_, Some max_bound) ->
-                        let b = Integer.add max_bound offset in
+                        let b = Z.add max_bound offset in
                         maybe_insert vi' true b offset' Cil_types.Lt;
                       | _ -> ()
                     else
                       match min_max_int vi with
                       | (Some min_bound, _) ->
-                        let b = Integer.add min_bound offset' in
+                        let b = Z.add min_bound offset' in
                         maybe_insert vi' false b offset Cil_types.Lt
                       | _ -> ()
                   with Not_found -> ()
@@ -551,7 +551,7 @@ module Store(* (B:sig *)
     Varinfo.Map.merge (fun vi b1 b2 -> match (b1,b2) with
         | Some b1, Some b2 -> Some(B.join b1 b2)
         | Some b, None | None, Some b ->
-          Some(B.join (B.AffineRef(vi,Integer.zero)) b)
+          Some(B.join (B.AffineRef(vi,Z.zero)) b)
         | None,None -> assert false) m1 m2
   ;;
 

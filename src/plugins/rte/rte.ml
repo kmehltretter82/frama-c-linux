@@ -38,12 +38,12 @@ let valid_index ~remove_trivial ~on_alarm e size =
     let v_e = get_expr_val e in
     let v_size = get_expr_val size in
     let neg_ok =
-      Option.fold ~none:false ~some:(Integer.le Integer.zero) v_e
+      Option.fold ~none:false ~some:(Z.leq Z.zero) v_e
       || Cil.isUnsignedInteger (Cil.typeOf e)
     in
     if not neg_ok then alarm Lower_bound;
     let pos_ok = match v_e, v_size with
-      | Some v_e, Some v_size -> Integer.lt v_e v_size
+      | Some v_e, Some v_size -> Z.lt v_e v_size
       | None, _ | _, None -> false
     in
     if not pos_ok then alarm Upper_bound
@@ -116,7 +116,7 @@ let uminus_assertion ~remove_trivial ~on_alarm exp =
   let size = Cil.bitsSizeOf t in
   let min_ty = Cil.min_signed_number size in
   (* alarm is bound <= exp, hence bound must be MIN_INT+1 *)
-  let bound = Integer.add Integer.one min_ty in
+  let bound = Z.succ min_ty in
   let alarm ?(invalid=false) () =
     let a = Alarms.Overflow(Alarms.Signed, exp, bound, Lower_bound) in
     on_alarm ~invalid a
@@ -126,7 +126,7 @@ let uminus_assertion ~remove_trivial ~on_alarm exp =
     | None -> alarm ()
     | Some a64 ->
       (* constant operand *)
-      if Integer.equal a64 min_ty then
+      if Z.equal a64 min_ty then
         alarm ~invalid:true ()
   end
   else alarm ()
@@ -140,7 +140,7 @@ let mult_sub_add_assertion ~signed ~remove_trivial ~on_alarm (exp,op,lexp,rexp) 
   let size = Cil.bitsSizeOf t in
   let min_ty, max_ty =
     if signed then Cil.min_signed_number size, Cil.max_signed_number size
-    else Integer.zero, Cil.max_unsigned_number size
+    else Z.zero, Cil.max_unsigned_number size
   in
   let alarm ?(invalid=false) bk =
     let bound = match bk with
@@ -159,29 +159,29 @@ let mult_sub_add_assertion ~signed ~remove_trivial ~on_alarm (exp,op,lexp,rexp) 
     | Some l, Some r, _ -> (* both operands are constant *)
       let warn r =
         let warn bk = alarm ~invalid:true bk in
-        if Integer.gt r max_ty then warn Upper_bound
-        else if Integer.lt r min_ty then warn Lower_bound
+        if Z.gt r max_ty then warn Upper_bound
+        else if Z.lt r min_ty then warn Lower_bound
       in
       (match op with
-       | MinusA -> warn (Integer.sub l r)
-       | PlusA -> warn (Integer.add l r)
-       | Mult -> warn (Integer.mul l r)
+       | MinusA -> warn (Z.sub l r)
+       | PlusA -> warn (Z.add l r)
+       | Mult -> warn (Z.mul l r)
        | _ -> assert false)
 
     | _, Some v , PlusA | Some v, _, PlusA ->
-      if Integer.(gt v zero) then alarm Upper_bound
-      else if Integer.(lt v zero) then alarm Lower_bound (* signed only *)
+      if Z.(gt v zero) then alarm Upper_bound
+      else if Z.(lt v zero) then alarm Lower_bound (* signed only *)
 
     | _, Some r , MinusA ->
-      if Integer.(gt r zero) then alarm Lower_bound
-      else if Integer.(lt r zero) then alarm Upper_bound (* signed only *)
+      if Z.(gt r zero) then alarm Lower_bound
+      else if Z.(lt r zero) then alarm Upper_bound (* signed only *)
 
     | Some l, None , MinusA ->
       if signed then begin
         (* The possible range for [-r] is [-max_int .. -min_int] i.e.
            [min_int+1..max_int+1]; we need to check [l] w.r.t [-1]. *)
-        if Integer.(gt l minus_one) then alarm Upper_bound
-        else if Integer.(lt l minus_one) then alarm Lower_bound
+        if Z.(gt l minus_one) then alarm Upper_bound
+        else if Z.(lt l minus_one) then alarm Lower_bound
       end
       else begin
         (* Only negative overflows are possible, since r is positive. (TODO:
@@ -190,7 +190,7 @@ let mult_sub_add_assertion ~signed ~remove_trivial ~on_alarm (exp,op,lexp,rexp) 
       end
 
     | Some v, None, Mult | None, Some v, Mult
-      when Integer.is_zero v || Integer.is_one v -> ()
+      when Z.is_zero v || Z.is_one v -> ()
 
     | None, None, _ | Some _, None, _ | None, Some _, _ -> alarms ()
   end
@@ -207,7 +207,7 @@ let divmod_assertion ~remove_trivial ~on_alarm divisor =
     | None -> (* divisor is not a constant *)
       alarm ();
     | Some v64 ->
-      if Integer.equal v64 Integer.zero then
+      if Z.is_zero v64 then
         (* divide by 0 *)
         alarm ~invalid:true ()
         (* else divide by constant which is not 0: nothing to assert *)
@@ -233,10 +233,10 @@ let signed_div_assertion ~remove_trivial ~on_alarm (exp, lexp, rexp) =
   if remove_trivial then begin
     let min = Cil.min_signed_number size in
     match get_expr_val lexp, get_expr_val rexp with
-    | Some e1, _ when not (Integer.equal e1 min) ->
+    | Some e1, _ when not (Z.equal e1 min) ->
       (* dividend is constant, with an unproblematic value *)
       ()
-    | _, Some e2 when not (Integer.equal e2 Integer.minus_one) ->
+    | _, Some e2 when not (Z.equal e2 Z.minus_one) ->
       (* divisor is constant, with an unproblematic value *)
       ()
     | Some _, Some _ ->
@@ -263,9 +263,9 @@ let shift_assertion ~remove_trivial ~on_alarm (exp, upper_bound) =
          any) *)
       let upper_bound_ok = match upper_bound with
         | None -> true
-        | Some u -> Integer.lt c64 (Integer.of_int u)
+        | Some u -> Z.lt c64 (Z.of_int u)
       in
-      if not (Integer.ge c64 Integer.zero && upper_bound_ok) then
+      if not (Z.geq c64 Z.zero && upper_bound_ok) then
         alarm ~invalid:true ()
   end
   else alarm ()
@@ -309,8 +309,7 @@ let shift_overflow_assertion ~signed ~remove_trivial ~on_alarm (exp, op, lexp, r
       | Some lval64, Some rval64 ->
         (* both operands are constant: check result is representable in
            result type *)
-        if Integer.ge rval64 Integer.zero
-        && Integer.gt (Integer.shift_left lval64 rval64) maxValResult
+        if Z.(rval64 >= zero && (shift_left_z lval64 rval64) >= maxValResult)
         then
           overflow_alarm ~invalid:true ()
     end
@@ -329,7 +328,7 @@ let downcast_assertion ~remove_trivial ~on_alarm (dst_type, exp) =
     let dst_min, dst_max =
       if dst_signed
       then Cil.min_signed_number dst_size, Cil.max_signed_number dst_size
-      else Integer.zero, Cil.max_unsigned_number dst_size
+      else Z.zero, Cil.max_unsigned_number dst_size
     in
     let overflow_kind =
       if Ast_types.is_ptr src_type
@@ -350,8 +349,8 @@ let downcast_assertion ~remove_trivial ~on_alarm (dst_type, exp) =
     match remove_trivial, get_expr_val exp with
     | true, Some a64 ->
       let invalid = true in
-      if Integer.lt a64 dst_min then alarm ~invalid dst_min  Lower_bound
-      else if Integer.gt a64 dst_max then alarm ~invalid dst_max Upper_bound
+      if Z.lt a64 dst_min then alarm ~invalid dst_min  Lower_bound
+      else if Z.gt a64 dst_max then alarm ~invalid dst_max Upper_bound
     | _ -> alarms ()
 
 (* assertion for casting a floating-point value to an integer *)
@@ -363,7 +362,7 @@ let float_to_int_assertion ~remove_trivial ~on_alarm (ty, exp) =
     let size = Cil.bitsSizeOfBitfield ty in
     let largest = Cil.max_unsigned_number size in
     let max_ty = if signed then Cil.max_signed_number size else largest in
-    let min_ty = if signed then Cil.min_signed_number size else Integer.zero in
+    let min_ty = if signed then Cil.min_signed_number size else Z.zero in
     let bound = function Lower_bound -> min_ty | Upper_bound -> max_ty in
     let build_alarm b = Alarms.Float_to_int (exp, bound b, b) in
     let alarm ?(invalid = false) b = on_alarm ~invalid (build_alarm b) in
@@ -379,8 +378,8 @@ let float_to_int_assertion ~remove_trivial ~on_alarm (ty, exp) =
         match Floating_point.truncate_to_integer f with
         | Underflow -> alarm Lower_bound
         | Overflow  -> alarm Upper_bound
-        | Integer i when Integer.lt i min_ty -> alarm ~invalid:true Lower_bound
-        | Integer i when Integer.gt i max_ty -> alarm ~invalid:true Upper_bound
+        | Integer i when Z.lt i min_ty -> alarm ~invalid:true Lower_bound
+        | Integer i when Z.gt i max_ty -> alarm ~invalid:true Upper_bound
         | Integer _ -> ()
     end
   | _ -> ()
@@ -414,7 +413,7 @@ let is_safe_pointer_value = function
   | CastE (_typ, e) ->
     (* 0 can always be converted into a NULL pointer. *)
     let v = get_expr_val e in
-    Option.fold ~none:false ~some:Integer.(equal zero) v
+    Option.fold ~none:false ~some:Z.(equal zero) v
   | _ -> false
 
 let pointer_value ~remove_trivial ~on_alarm expr =

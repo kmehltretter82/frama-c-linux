@@ -307,7 +307,7 @@ module State = struct
     let state = Model.empty_map in
     let min_valid = Base.min_valid_absolute_address () in
     let max_valid = Base.max_valid_absolute_address () in
-    if Integer.le min_valid max_valid
+    if Z.leq min_valid max_valid
     then begin
       (* Bind everything between [0..max] to bottom. Offsetmaps cannot
          contain holes, which can happen when min > 0 holds. *)
@@ -321,7 +321,7 @@ module State = struct
       in
       let offsm =
         V_Offsetmap.add
-          (min_valid, max_valid) (v, Integer.one, Abstract_interp.Rel.zero) bot
+          (min_valid, max_valid) (v, Z.one, Abstract_interp.Rel.zero) bot
       in
       Cvalue.Model.add_base Base.null offsm state, Locals_scoping.bottom ()
     end

@@ -28,7 +28,7 @@ class annotateFunFromDeclspec =
           Cil_datatype.Location.unknown i
       | AUnOp(Neg,AInt i) ->
         Ast_info.constant_term
-          Cil_datatype.Location.unknown (Integer.neg i)
+          Cil_datatype.Location.unknown (Z.neg i)
       | AStr s
       | ACons(s,[]) ->
         begin try

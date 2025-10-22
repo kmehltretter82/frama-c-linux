@@ -12,7 +12,7 @@ module Comp = Abstract_interp.Comp
 type kind =
   { search: Ival.t;         (* Set of possible characters searched. *)
     stop_at_0: bool;        (* Does the search stop when encountering \0. *)
-    size: Integer.t;        (* Size in bits of a character. *)
+    size: Z.t;        (* Size in bits of a character. *)
     signed: bool;           (* Whether the characters are signed. *)
     limit: Ival.t option; } (* Limit in bits of the search. *)
 
@@ -42,8 +42,8 @@ let the_max_int ival = Option.get (Ival.max_int ival)
 
 let pos_min_int ival =
   match Ival.min_int ival with
-  | None -> Integer.zero
-  | Some i -> Integer.(max zero i)
+  | None -> Z.zero
+  | Some i -> Z.(max zero i)
 
 let make_interval ~min ~max =
   Ival.inject_interval ~min:(Some min) ~max:(Some max)
@@ -66,14 +66,14 @@ let break ~offset ~from read =
    the last offset in which the search may start. The maximal length is the
    length for the first offset or the period of [offset]. *)
 let read_exact_char ~offset ~from =
-  let min = Integer.max (the_max_int from) (pos_min_int offset) in
+  let min = Z.max (the_max_int from) (pos_min_int offset) in
   let offset = backward_comp_left Comp.Le offset min in
   let length = Ival.sub_int offset from in
   if not (Ival.is_singleton_int offset)
   then
     let _, _, _, modu = Ival.min_max_r_mod offset in
-    let start_length = Integer.sub (pos_min_int offset) (pos_min_int from) in
-    let max_length = Integer.max start_length modu in
+    let start_length = Z.sub (pos_min_int offset) (pos_min_int from) in
+    let max_length = Z.max start_length modu in
     let length = backward_comp_left Comp.Lt length max_length in
     offset, length
   else offset, length
@@ -139,13 +139,13 @@ let read_char kind offset cvalue acc =
 let search_offsetmap_range kind offsetmap validity ~min ~max ~v_size acc =
   let size = kind.size in
   (* Reads will repeat themselves every [modu] bits. *)
-  let modu = Integer.ppcm v_size size in
-  let max_reads = Integer.(to_int_exn (e_div modu size)) in
+  let modu = Z.lcm v_size size in
+  let max_reads = Z.to_int (Z.ediv modu size) in
   (* Performs [max_reads] consecutive reads from offsets {[min] + k[modu]},
      bound by [max]. *)
   let search_until ~max acc =
     let rec read_index count ~min res =
-      let rem = Integer.e_rem min modu in
+      let rem = Z.erem min modu in
       let offsets = make_interval ~min ~max ~rem ~modu in
       let cvalue = Cvalue.V_Offsetmap.find ~validity ~offsets ~size offsetmap in
       let cvalue = Cvalue.V_Or_Uninitialized.inject_or_bottom cvalue in
@@ -159,22 +159,22 @@ let search_offsetmap_range kind offsetmap validity ~min ~max ~v_size acc =
          use the narrow of the [from] for the next ranges of the offsetmap. *)
       let from = Ival.narrow res.from t.from in
       let res = { read; from; stop = res.stop || t.stop; } in
-      let min = Integer.add min kind.size in
+      let min = Z.add min kind.size in
       if (Ival.is_singleton_int offsets && res.stop)
-      || Integer.gt min max || count >= max_reads
+      || Z.gt min max || count >= max_reads
       then res
       else read_index (count + 1) ~min res
     in
     read_index 1 ~min acc
   in
   (* The maximal offset we are sure to read from. *)
-  let sure_offset = Integer.max min (the_max_int acc.from) in
-  let sure_max = Integer.pred (Integer.add sure_offset modu) in
+  let sure_offset = Z.max min (the_max_int acc.from) in
+  let sure_max = Z.pred (Z.add sure_offset modu) in
   (* If one of the read characters stops the search, the other characters will
      lead to imprecise results — as they are all periodic until [max]. Thus we
      perform a first read of the range until the maximal sure read offset. *)
   let acc =
-    if Integer.lt sure_max max
+    if Z.lt sure_max max
     then search_until ~max:sure_max acc
     else acc
   in
@@ -185,17 +185,17 @@ let fold_offsm kind ~validity ~start ~max ~rem offsetmap acc =
   let modu = kind.size in
   let process_range (start, max) (v, v_size, v_shift) acc =
     if acc.stop then acc else
-      let min = Integer.round_up_to_r ~min:start ~r:rem ~modu in
-      if Integer.gt min max then acc else
+      let min = Z.round_up_to_r ~min:start ~r:rem ~modu in
+      if Z.gt min max then acc else
         let v_start = Abstract_interp.Rel.add_abs start v_shift in
         (* Only one read of the value is needed when:
            - the ending cut is aligned with the reads, meaning that no read
              overlaps between two ranges of the offsetmap.
            - and either the value is isotropic, or the repeated value has the
              same size than the reads. *)
-        if Integer.equal rem (Integer.e_rem (Integer.succ max) modu) &&
+        if Z.equal rem (Z.erem (Z.succ max) modu) &&
            (Cvalue.V_Or_Uninitialized.is_isotropic v ||
-            Integer.equal min v_start && Integer.equal v_size kind.size)
+            Z.equal min v_start && Z.equal v_size kind.size)
         then
           let offset = make_interval ~min ~max ~rem ~modu in
           read_char kind offset v acc
@@ -212,7 +212,7 @@ let search_offsm kind ~validity ~offset ~rem offsetmap =
   let start = pos_min_int offset in
   (* Compute the maximal bit that can be read in the offsetmap. *)
   let base_max = match Base.valid_range validity with
-    | Base.Invalid_range -> Integer.zero (* should not happen *)
+    | Base.Invalid_range -> Z.zero (* should not happen *)
     | Base.Valid_range None -> Bit_utils.max_bit_address ()
     | Base.Valid_range (Some (_min, max)) -> max
   in
@@ -220,15 +220,15 @@ let search_offsm kind ~validity ~offset ~rem offsetmap =
   let limit_max = Option.bind Ival.max_int kind.limit in
   let max = match Ival.max_int offset, limit_max with
     | Some max_start, Some max_limit ->
-      let max = Integer.(add max_start (pred max_limit)) in
-      Integer.min base_max max
+      let max = Z.(add max_start (pred max_limit)) in
+      Z.min base_max max
     | _, _ -> base_max
   in
   (* Starts the search with an empty accumulator. *)
   let acc = { read = empty; from = offset; stop = false } in
   let acc = fold_offsm kind ~validity ~start ~max ~rem offsetmap acc in
   (* Alarm if the search does not stop before the end of the offsetmap. *)
-  if not acc.stop && Integer.gt (Integer.add max kind.size) base_max
+  if not acc.stop && Z.gt (Z.add max kind.size) base_max
   then { acc.read with alarm = true }
   else acc.read
 
@@ -339,8 +339,8 @@ let reduce_by_validity ~size cvalue =
 type char = Char | Wide
 
 let bits_size = function
-  | Char -> Integer.eight
-  | Wide -> Integer.of_int (Cil.bitsSizeOf (Machine.wchar_type ()))
+  | Char -> 8z
+  | Wide -> Z.of_int (Cil.bitsSizeOf (Machine.wchar_type ()))
 
 let signed_char = function
   | Char -> not (Machine.char_is_unsigned ())
@@ -349,7 +349,7 @@ let signed_char = function
 (* Converts the searched characters into char; needed for strchr and memchr. *)
 let searched_char ~size ~signed cvalue =
   let ival = Cvalue.V.project_ival cvalue in
-  if size = Integer.eight
+  if size = 8z
   then Ival.cast_int_to_int ~size ~signed ival
   else ival
 

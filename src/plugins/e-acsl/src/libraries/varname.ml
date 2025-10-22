@@ -63,7 +63,7 @@ let of_unop = function
 
 let rec of_exp ?default exp = match exp.enode with
   | Lval (Var {vorig_name}, NoOffset) -> vorig_name
-  | Const (CInt64 (i, _, _)) -> "const_" ^ Integer.to_string i
+  | Const (CInt64 (i, _, _)) -> "const_" ^ Z.to_string i
   | BinOp (op, x, y, _) -> of_binop op ^ of_exp x ^ "_" ^ of_exp y
   | UnOp (op, x, _) -> of_unop op ^ of_exp x
   | e ->

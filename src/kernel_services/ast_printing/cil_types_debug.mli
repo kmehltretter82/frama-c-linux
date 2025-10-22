@@ -40,7 +40,7 @@ val pp_tuple5 :
   (Format.formatter -> 'p -> unit) ->
   (Format.formatter -> 'q -> unit) ->
   Format.formatter -> 'm * 'n * 'o * 'p * 'q -> unit
-val pp_integer : Format.formatter -> Integer.t -> unit
+val pp_integer : Format.formatter -> Z.t -> unit
 val pp_int64 : Format.formatter -> int64 -> unit
 val pp_string : Format.formatter -> string -> unit
 val pp_bool : Format.formatter -> bool -> unit

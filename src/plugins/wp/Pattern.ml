@@ -23,14 +23,14 @@ and node =
   | Pvar of pvar
   | Named of pvar * ast
   | Range of int * int
-  | Int of Integer.t
+  | Int of Z.t
   | Bool of bool
   | String of string
   | Not of ast
   | Assoc of assoc * ast list
   | Binop of ast * binop * ast
   | Call of string * ast list * bool (* trailing .. *)
-  | Times of Integer.t * ast
+  | Times of Z.t * ast
   | List of ast list
   | Field of ast * string
   | Get of ast * ast
@@ -83,7 +83,7 @@ let pint ctxt ~loc a =
   with _ -> ctxt.typing.error loc "Invalid int %S" a
 
 let pinteger ctxt ~loc a =
-  try Integer.of_string a
+  try Z.of_string a
   with _ -> ctxt.typing.error loc "Invalid integer %S" a
 
 let pvar ctxt ~loc x =
@@ -132,7 +132,7 @@ let rec parse ctxt p =
     { loc ; value = Call(lf,List.map (parse ctxt) ps,trail) }
   | PLunop(Uminus,a) ->
     let a = parse ctxt a in
-    { loc = a.loc ; value = Times(Integer.minus_one,a) }
+    { loc = a.loc ; value = Times(Z.minus_one,a) }
   | PLunop(Ubw_not,a) ->
     let a = parse ctxt a in
     { loc = a.loc ; value = Call("lf:lnot",[a],false) }
@@ -150,7 +150,7 @@ let rec parse ctxt p =
   | PLbinop(a,Bsub,b) ->
     let a = parse ctxt a in
     let b = parse ctxt b in
-    let b = { loc = b.loc ; value = Times(Integer.minus_one,b) } in
+    let b = { loc = b.loc ; value = Times(Z.minus_one,b) } in
     assoc `Add a b
   | PLbinop(a,Badd,b) -> assoc `Add (parse ctxt a) (parse ctxt b)
   | PLbinop(a,Bbw_or,b) -> assoc `Bor (parse ctxt a) (parse ctxt b)
@@ -200,7 +200,7 @@ let rec pp fmt (a : ast) =
   | Pvar x -> Format.pp_print_string fmt x.value
   | Named (x,v) -> Format.fprintf fmt "%s:%a" x.value pp v
   | Range(a,b) -> Format.fprintf fmt "(%d..%d)" a b
-  | Int n -> Integer.pretty fmt n
+  | Int n -> Z.pretty fmt n
   | Bool b -> Format.pp_print_string fmt (if b then "\\true" else "\\false")
   | String s -> Format.fprintf fmt "%S" s
   | Assoc(`Band,[]) -> Format.pp_print_string fmt "-1"
@@ -235,7 +235,7 @@ let rec pp fmt (a : ast) =
       | `Lsl -> "<<"
       | `Lsr -> ">>"
     in Format.fprintf fmt "@[<hov 2>(%a@ %s %a)@]" pp a op pp b
-  | Times(k,v) -> Format.fprintf fmt "%a*%a" Integer.pretty k pp v
+  | Times(k,v) -> Format.fprintf fmt "%a*%a" Z.pretty k pp v
   | Get(a,k) -> Format.fprintf fmt "@[<hov 2>%a[@,%a]@]" pp a pp k
   | Set(a,k,v) -> Format.fprintf fmt "@[<hov 2>%a[@,%a@ -> %a]@]" pp a pp k pp v
   | List [] -> Format.pp_print_string fmt "[| |]"
@@ -304,7 +304,7 @@ let rec pmatch env (p : pattern) e =
   | Named(x,p) , _ -> merge env x e ; pmatch env p e
   | Range(a,b) , Kint n ->
     begin
-      match Integer.to_int_opt n with
+      match Z.to_int_opt n with
       | Some v when a <= v && v <= b -> ()
       | _ -> raise Not_found
     end
@@ -333,8 +333,8 @@ let rec pmatch env (p : pattern) e =
   | Binop(p,`Lsl,q) , Fun(lf,[a;b]) when lf == Cint.f_lsl -> pbinop env p q a b
   | Binop(p,`Lsr,q) , Fun(lf,[a;b]) when lf == Cint.f_lsr -> pbinop env p q a b
   | Times(b,p) , Times(a,e) ->
-    let q,r = Integer.c_div_rem a b in
-    if Integer.is_zero r then pmatch env p (Lang.F.e_times q e)
+    let q,r = Z.div_rem a b in
+    if Z.is_zero r then pmatch env p (Lang.F.e_times q e)
     else raise Not_found
   | Get(pa,pk) , Aget(a,k) ->
     pmatch env pa a ; pmatch env pk k

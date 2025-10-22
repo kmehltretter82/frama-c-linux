@@ -13,7 +13,7 @@ let show_aorai_variable state fmt var_name =
   let cvalue = Cvalue.Model.find state (Locations.loc_of_varinfo vi) in
   try
     let i = Ival.project_int (Cvalue.V.project_ival cvalue) in
-    let state_name = Data_for_aorai.getStateName (Integer.to_int_exn i) in
+    let state_name = Data_for_aorai.getStateName (Z.to_int i) in
     Format.fprintf fmt "%s" state_name
   with Cvalue.V.Not_based_on_null | Ival.Not_Singleton_Int |
        Z.Overflow | Not_found ->

@@ -31,9 +31,9 @@ type alarm =
   | Differing_blocks of exp * exp
   (** The two expressions (which evaluate to
       pointers) must point to the same allocated block *)
-  | Overflow of overflow_kind * exp * Integer.t * bound_kind
+  | Overflow of overflow_kind * exp * Z.t * bound_kind
   (** Integer parameters is the bound *)
-  | Float_to_int of exp * Integer.t * bound_kind
+  | Float_to_int of exp * Z.t * bound_kind
   (** Integer parameter is the bound for the integer type. The actual alarm
       is [exp < bound+1] or [bound-1 < exp]. *)
   | Not_separated of lval * lval

@@ -199,7 +199,7 @@ let rec to_integer e =
 let is_zero exp =
   match to_integer exp with
   | None -> false
-  | Some i -> Integer.is_zero i
+  | Some i -> Z.is_zero i
 
 let is_zero_ptr exp =
   is_zero exp && Ast_types.is_ptr exp.typ
@@ -209,30 +209,30 @@ let is_zero_ptr exp =
 let apply_binop_to_integers binop i1 i2 ikind =
   (* Can a shift operation be safely computed ? *)
   let shift_in_bounds i2 =
-    let size = Integer.of_int (Cil.bitsSizeOfInt ikind) in
-    Integer.(ge i2 zero && lt i2 size)
+    let size = Z.of_int (Cil.bitsSizeOfInt ikind) in
+    Z.geq i2 0z && Z.lt i2 size
   in
-  let bool op x y = if op x y then Integer.one else Integer.zero in
+  let bool op x y = if op x y then Z.one else Z.zero in
   let integer_op = function
-    | PlusA -> Integer.add
-    | MinusA -> Integer.sub
-    | Mult -> Integer.mul
-    | Div -> Integer.c_div
-    | Mod -> Integer.c_rem
-    | BAnd -> Integer.logand
-    | BOr -> Integer.logor
-    | BXor -> Integer.logxor
-    | Shiftlt when shift_in_bounds i2 -> Integer.shift_left
+    | PlusA -> Z.add
+    | MinusA -> Z.sub
+    | Mult -> Z.mul
+    | Div -> Z.div
+    | Mod -> Z.rem
+    | BAnd -> Z.logand
+    | BOr -> Z.logor
+    | BXor -> Z.logxor
+    | Shiftlt when shift_in_bounds i2 -> Z.shift_left_z
     | Shiftrt when shift_in_bounds i2 ->
       if Cil.isSigned ikind
-      then Integer.shift_right
-      else Integer.shift_right_logical
-    | Eq -> bool Integer.equal
-    | Ne -> bool (fun x y -> not (Integer.equal x y))
-    | Le -> bool Integer.le
-    | Ge -> bool Integer.ge
-    | Lt -> bool Integer.lt
-    | Gt -> bool Integer.gt
+      then Z.shift_right_z
+      else Z.shift_right_logical
+    | Eq -> bool Z.equal
+    | Ne -> bool (fun x y -> not (Z.equal x y))
+    | Le -> bool Z.leq
+    | Ge -> bool Z.geq
+    | Lt -> bool Z.lt
+    | Gt -> bool Z.gt
     | _ -> raise Not_found
   in
   try Some (integer_op binop i1 i2)
@@ -281,7 +281,7 @@ and const_fold_cast (t : typ) (e : exp) : exp  =
         | Overflow | Underflow | Integer _ -> default ()
       end
     (* int -> float *)
-    | `Int i, `Float fkind -> Build.float ~fkind (Integer.to_float i)
+    | `Int i, `Float fkind -> Build.float ~fkind (Z.to_float i)
     | _, _ -> default ()
 
 and const_fold_unop (op : unop) (e : exp) (t : typ) : exp =
@@ -289,10 +289,10 @@ and const_fold_unop (op : unop) (e : exp) (t : typ) : exp =
   let default () = mk_exp (UnOp (op, e, t)) in
   match op, to_value e, type_kind t with
   (* Integer operations *)
-  | Neg, `Int i, `Int ikind -> Build.integer ~ikind (Integer.neg i)
-  | BNot, `Int i, `Int ikind -> Build.integer ~ikind (Integer.lognot i)
+  | Neg, `Int i, `Int ikind -> Build.integer ~ikind (Z.neg i)
+  | BNot, `Int i, `Int ikind -> Build.integer ~ikind (Z.lognot i)
   | LNot, `Int i, `Int _ ->
-    if Integer.(equal i zero) then Build.one else Build.zero
+    if Z.(equal i zero) then Build.one else Build.zero
   (* Float operations *)
   | Neg, `Float f, `Float fkind ->
     mk_exp (Const (CReal (-.f, fkind, None)))
@@ -316,9 +316,9 @@ and const_fold_binop (op : binop) (e1 : exp) (e2 : exp) (t : typ) : exp =
   | `Int _, i1, i2 ->
     (* These three functions always return false when the value is not a
        constant integer — so [is_non_zero] is not the opposite of [is_zero]. *)
-    let is_zero = function `Int i -> Integer.is_zero i | _ -> false in
-    let is_one = function `Int i -> Integer.is_one i | _ -> false in
-    let is_non_zero = function `Int i -> not (Integer.is_zero i) | _ -> false in
+    let is_zero = function `Int i -> Z.is_zero i | _ -> false in
+    let is_one = function `Int i -> Z.is_one i | _ -> false in
+    let is_non_zero = function `Int i -> not (Z.is_zero i) | _ -> false in
     begin
       match op with
       | PlusA when is_zero i1 -> e2

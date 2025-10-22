@@ -23,7 +23,7 @@ val is_integral_const: constant -> bool
 (** returns the value of the corresponding integer literal or [None]
     if the constant is not an integer (i.e. {!is_integral_const} returns false).
 *)
-val possible_value_of_integral_const: constant -> Integer.t option
+val possible_value_of_integral_const: constant -> Z.t option
 
 (** returns the value of the corresponding integer constant expression, or
     [None] if the expression is not a constant expression or does not
@@ -32,13 +32,13 @@ val possible_value_of_integral_const: constant -> Integer.t option
     @before 26.0-Iron the function only returned [Some v] when the
     expression was an integer literal (i.e. [Const c]).
 *)
-val possible_value_of_integral_expr: exp -> Integer.t option
+val possible_value_of_integral_expr: exp -> Z.t option
 
 (** returns the value of the corresponding integer literal. It is
     the responsibility of the caller to ensure the constant is indeed
     an integer constant. If unsure, use {!possible_value_of_integral_const}.
 *)
-val value_of_integral_const: constant -> Integer.t
+val value_of_integral_const: constant -> Z.t
 
 (** returns the value of the corresponding integer constant expression. It
     is the responsibility of the caller to ensure that the argument is indeed
@@ -48,7 +48,7 @@ val value_of_integral_const: constant -> Integer.t
     @before 26.0-Iron the function would fail if the expression was not an
     integer literal (see {!possible_value_of_integral_expr}).
 *)
-val value_of_integral_expr: exp -> Integer.t
+val value_of_integral_expr: exp -> Z.t
 
 (** [true] iff the expression is a constant expression that evaluates to
     a null pointer, i.e. 0 or a cast to 0.
@@ -84,17 +84,17 @@ val is_integral_logic_const: logic_constant -> bool
     enum)]. [false] otherwise.
     @since Oxygen-20120901 *)
 
-val possible_value_of_integral_logic_const: logic_constant -> Integer.t option
+val possible_value_of_integral_logic_const: logic_constant -> Z.t option
 (** @return [Some n] if the constant has integral type [(integer, char,
     enum)]. [None] otherwise.
     @since Oxygen-20120901 *)
 
-val value_of_integral_logic_const: logic_constant -> Integer.t
+val value_of_integral_logic_const: logic_constant -> Z.t
 (** @return the value of the constant.
     Assume the argument is an integral constant.
     @since Oxygen-20120901 *)
 
-val possible_value_of_integral_term: term -> Integer.t option
+val possible_value_of_integral_term: term -> Z.t option
 (** @return [Some n] if the term has integral type [(integer, char,
     enum)]. [None] Otherwise.
     @since Oxygen-20120901 *)
@@ -163,7 +163,7 @@ val merge_assigns: ?warn:bool -> funbehavior list -> assigns
     warnings. *)
 
 val variable_term: location -> logic_var -> term
-val constant_term: location -> Integer.t -> term
+val constant_term: location -> Z.t -> term
 val is_null_term: term -> bool
 
 
@@ -188,8 +188,8 @@ val block_of_local: fundec -> varinfo -> block
 (** {2 Types} *)
 (* ************************************************************************** *)
 
-val direct_array_size: typ -> Integer.t
-val array_size: typ -> Integer.t
+val direct_array_size: typ -> Z.t
+val array_size: typ -> Z.t
 
 (* ************************************************************************** *)
 (** {2 Functions} *)

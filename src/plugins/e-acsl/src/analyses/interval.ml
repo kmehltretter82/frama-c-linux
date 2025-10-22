@@ -38,7 +38,7 @@ let cast ~src ~dst = match src, dst with
     dst
 
 (* a-b; or 0 if negative *)
-let length a b = Z.max Z.zero (Z.add Z.one (Z.sub a b))
+let length a b = Z.max Z.zero (Z.succ (Z.sub a b))
 
 (* minimal distance between two intervals given by their respective lower and
    upper bounds, i.e. the length between the lower bound of the second interval
@@ -294,7 +294,7 @@ let infer_sum_product oper lambda min max = match lambda, min, max with
              Extlib.opt_map2
                (fun m max ->
                   match max_lambda with
-                  | Some ml when Z.lt ml Z.zero && not (Z.equal m Z.one) ->
+                  | Some ml when Z.lt ml Z.zero && not (Z.is_one m) ->
                     (* when [lambda] is necessarily negative with an odd number
                        of iterations (>1), the result is necessarily negative,
                        so smaller than the maximal (positive) value. Therefore,
@@ -357,7 +357,7 @@ let rec infer ~force ~logic_env t =
         | [] -> assert false
         | ei :: l -> if ei == enumitem then n else find_idx (n + 1) l
       in
-      let n = Integer.of_int (find_idx 0 enumitem.eihost.eitems) in
+      let n = Z.of_int (find_idx 0 enumitem.eihost.eitems) in
       singleton n
     | TLval lv -> infer_term_lval ~force ~logic_env lv
     | TSizeOf ty -> infer_sizeof ty
@@ -418,7 +418,7 @@ let rec infer ~force ~logic_env t =
                 Consequently the result of the difference belongs to
                 [0; \block_length(t)] *)
              let nb_bytes = if n mod 8 = 0 then n / 8 else n / 8 + 1 in
-             ival Integer.zero (Integer.of_int nb_bytes)
+             ival Z.zero (Z.of_int nb_bytes)
            with Cil.SizeOfError _ ->
              Lazy.force interv_of_unknown_block
          end
@@ -915,7 +915,7 @@ let joins_from_profile ~profile terms =
   List.fold_right (fun t acc -> join (get_from_profile ~profile t) acc) terms bottom
 
 let join_plus_one ~profile t1 t2 =
-  let plus_one i = lift_arith_binop Ival.add_int i (singleton Integer.one)
+  let plus_one i = lift_arith_binop Ival.add_int i (singleton Z.one)
   in
   join (plus_one (get_from_profile ~profile t1)) (get_from_profile ~profile t2)
 

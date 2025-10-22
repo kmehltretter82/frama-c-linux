@@ -44,7 +44,7 @@ sig
 end
 
 (* Size type for memory abstraction *)
-type size = Integer.t
+type size = Z.t
 
 (* Oracles for memory abstraction *)
 type side = Left | Right
@@ -67,7 +67,7 @@ sig
   val raw : t -> bit
   val of_value : Cil_types.typ -> value -> t
   val to_value : Cil_types.typ -> t -> value
-  val to_singleton_int : t -> Integer.t option
+  val to_singleton_int : t -> Z.t option
   val weak_erase : bit -> t -> t
   val is_included : t -> t -> bool
   val unify : oracle:bioracle ->
@@ -79,7 +79,7 @@ sig
   val update : oracle:oracle ->
     (weak:bool -> Cil_types.typ -> t -> t or_bottom) ->
     weak:bool -> Abstract_offset.t -> t -> t or_bottom
-  val incr_bound : oracle:oracle -> Cil_types.varinfo -> Integer.t option ->
+  val incr_bound : oracle:oracle -> Cil_types.varinfo -> Z.t option ->
     t -> t
   val add_segmentation_bounds : oracle:oracle -> typ:Cil_types.typ ->
     Eva_ast.exp list -> t -> t

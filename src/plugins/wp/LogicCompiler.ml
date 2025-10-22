@@ -40,7 +40,7 @@ struct
   type result = loc Memory.result
 
   type signature =
-    | CST of Integer.t
+    | CST of Z.t
     | SIG of sig_param list
   and sig_param =
     | Sig_value of logic_var (* to be replaced by the value *)

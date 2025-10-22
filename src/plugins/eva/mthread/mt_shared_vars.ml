@@ -428,7 +428,7 @@ struct
      places. Ideally, those locations should be stocked directly the RW
      constructor itself. This has been done for W, but not for R. *)
   let fold_location f m acc =
-    let module H = Datatype.Integer.Hashtbl in
+    let module H = Z.Hashtbl in
     let aux b itvs v acc =
       try
         let l = Int_Intervals.project_set itvs in

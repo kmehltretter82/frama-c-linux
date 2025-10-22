@@ -43,18 +43,18 @@ type env = {
 }
 
 let rec complexity = function
-  | [] -> Integer.one
+  | [] -> Z.one
   | (_,v) :: bindings ->
     match v with
     | Tactical.Compose(Tactical.Range(a,b)) when a < b ->
-      let n = Integer.of_int (b+1-a) in
-      Integer.mul n (complexity bindings)
+      let n = Z.of_int (b+1-a) in
+      Z.mul n (complexity bindings)
     | _ -> complexity bindings
 
 let cardinal limit bindings =
   let n = complexity bindings in
-  if Integer.le n (Integer.of_int limit)
-  then Some (Integer.to_int_exn n) else None
+  if Z.leq n (Z.of_int limit)
+  then Some (Z.to_int n) else None
 
 let rec bind_exists bindings property =
   match bindings with

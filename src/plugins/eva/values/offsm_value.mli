@@ -9,7 +9,7 @@
 type offsm_or_top = O of Cvalue.V_Offsetmap.t | Top
 
 val cast :
-  old_size: Integer.t -> new_size: Integer.t -> signed: bool ->
+  old_size: Z.t -> new_size: Z.t -> signed: bool ->
   Cvalue.V_Offsetmap.t -> Cvalue.V_Offsetmap.t
 
 module Offsm : Abstract_value.Leaf with type t = offsm_or_top

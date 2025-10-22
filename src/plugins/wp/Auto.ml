@@ -111,31 +111,31 @@ struct
   let update merge x v ofs map =
     match Repr.term v with
     | Int v ->
-      let v0 = Integer.add v ofs in
+      let v0 = Z.add v ofs in
       let v1 = try merge v0 (Tmap.find x map) with Not_found -> v0 in
       Tmap.add x v1 map
     | _ -> map
 
   type rg = {
-    mutable vmin : Integer.t F.Tmap.t ;
-    mutable vmax : Integer.t F.Tmap.t ;
+    mutable vmin : Z.t F.Tmap.t ;
+    mutable vmax : Z.t F.Tmap.t ;
   }
 
   let set_vmin rg x v ofs =
-    rg.vmin <- update Integer.max x v ofs rg.vmin
+    rg.vmin <- update Z.max x v ofs rg.vmin
 
   let set_vmax rg x v ofs =
-    rg.vmax <- update Integer.min x v ofs rg.vmax
+    rg.vmax <- update Z.min x v ofs rg.vmax
 
   let rec add_bound rg p =
     match Repr.term p with
     | And ps -> List.iter (add_bound rg) ps
     | Lt(a,b) when Lang.F.is_int a && Lang.F.is_int b ->
-      set_vmax rg a b Integer.minus_one ;
-      set_vmin rg b a Integer.one ;
+      set_vmax rg a b Z.minus_one ;
+      set_vmin rg b a Z.one ;
     | Leq(a,b) when Lang.F.is_int a && Lang.F.is_int b ->
-      set_vmax rg a b Integer.zero ;
-      set_vmin rg b a Integer.zero ;
+      set_vmax rg a b Z.zero ;
+      set_vmin rg b a Z.zero ;
     | _ -> ()
 
   let compute hs =
@@ -152,13 +152,13 @@ struct
   let ranges rg =
     Tmap.interf
       (fun _ a b ->
-         try Some(Integer.to_int_exn a,Integer.to_int_exn b)
+         try Some(Z.to_int a,Z.to_int b)
          with Z.Overflow -> None
       ) rg.vmin rg.vmax
 
   let small = function
     | None -> None
-    | Some z -> try Some(Integer.to_int_exn z) with Z.Overflow -> None
+    | Some z -> try Some(Z.to_int z) with Z.Overflow -> None
 
   let bounds rg =
     Tmap.merge

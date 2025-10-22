@@ -40,7 +40,7 @@ type exp = {enode : exp_node; origin : term option}
 and exp_node =
   | True
   | False
-  | Integer of Integer.t
+  | Integer of Z.t
   | BinOp of binop_node
   | Lval of lval
   | SizeOf of typ
@@ -99,7 +99,7 @@ module Pretty = struct
   and pp_exp_node fmt = function
     | True -> fprintf fmt "true"
     | False -> fprintf fmt "false"
-    | Integer n -> Integer.pretty fmt n
+    | Integer n -> Z.pretty fmt n
     | BinOp {binop; op1; op2} ->
       fprintf fmt "@[%a@]@ %a@ @[%a@]" pp_exp op1 pp_binop binop pp_exp op2
     | Lval lval -> pp_lval fmt lval

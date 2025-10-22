@@ -64,7 +64,7 @@ val term_has_lv_from_vi: term -> bool
 val name_of_binop: binop -> string
 (** @return the name of the given binop as a string. *)
 
-val finite_min_and_max: Ival.t -> Integer.t * Integer.t
+val finite_min_and_max: Ival.t -> Z.t * Z.t
 (** [finite_min_and_max i] takes the finite ival [i] and returns its bounds. *)
 
 module Id_term: Datatype.S_with_hashtbl with type t = term

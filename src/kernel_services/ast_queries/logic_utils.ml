@@ -158,7 +158,7 @@ let plain_array_to_ptr ty =
                   !Cil.pp_typ_ref tarr
           in
           (* Normally, overflow is checked in bitsSizeOf itself *)
-          let la = AInt (Integer.of_int len) in
+          let la = AInt (Z.of_int len) in
           [ ("arraylen",[la]) ]
         with Cil.SizeOfError _ ->
           Kernel.warning ~current:true
@@ -331,7 +331,7 @@ let constant_to_lconstant c = match c with
 
 let lconstant_to_constant c = match c with
   | Boolean b ->
-    CInt64 ((if b then Integer.one else Integer.zero), IBool, None)
+    CInt64 ((if b then Z.one else Z.zero), IBool, None)
   | Integer (i,s) ->
     begin
       try
@@ -339,7 +339,7 @@ let lconstant_to_constant c = match c with
       with Cil.Not_representable ->
         Kernel.abort
           "Cannot represent logical integer in C: %a"
-          Integer.pretty i
+          Z.pretty i
     end
   | LStr _ | LWStr _ ->
     (* TODO: generate globals on the fly? *)
@@ -509,8 +509,8 @@ let is_boolean_exp e =
 let get_bool_kind e =
   match Cil.isInteger e with
   | Some i ->
-    if Integer.(equal i zero) then `False else
-    if Integer.(equal i one) then `True else
+    if Z.(equal i zero) then `False else
+    if Z.(equal i one) then `True else
       `Term
   | None -> if is_boolean_exp e then `Bool else `Term
 
@@ -694,10 +694,10 @@ let array_with_range arr size =
     else mk_cast ~loc Cil_const.charPtrType arr
   and range_end =
     Logic_const.term ~loc:size.term_loc
-      (TBinOp (MinusA, size, Cil.lconstant Integer.one))
+      (TBinOp (MinusA, size, Cil.lconstant Z.one))
       size.term_type
   in
-  let range = Logic_const.trange (Some (Cil.lconstant Integer.zero),
+  let range = Logic_const.trange (Some (Cil.lconstant Z.zero),
                                   Some (range_end)) in
   Logic_const.term ~loc(TBinOp (PlusPI, arr, range)) char_ptr
 
@@ -836,7 +836,7 @@ let is_same_c_binop (b1: binop) b2 = b1 = b2
 
 let rec is_same_attrparam p1 p2 =
   match p1,p2 with
-  | AInt i1, AInt i2 -> Integer.equal i1 i2
+  | AInt i1, AInt i2 -> Z.equal i1 i2
   | AStr s1, AStr s2 -> is_same_string s1 s2
   | ACons (s1, p1), ACons (s2, p2) ->
     is_same_string s1 s2 && is_same_list is_same_attrparam p1 p2
@@ -2405,7 +2405,7 @@ let is_max_function li = is_min_max_function "\\max" li
 let is_min_function li = is_min_max_function "\\min" li
 
 
-let rec constFoldTermToInt ?(machdep=true) (e: term) : Integer.t option =
+let rec constFoldTermToInt ?(machdep=true) (e: term) : Z.t option =
   match e.term_node with
   | TBinOp(bop, e1, e2) -> constFoldBinOpToInt ~machdep bop e1 e2
   | TUnOp(unop, e) -> constFoldUnOpToInt ~machdep unop e
@@ -2421,7 +2421,7 @@ let rec constFoldTermToInt ?(machdep=true) (e: term) : Integer.t option =
       | _ -> None
     end
   | TAlignOf t -> begin
-      try Some (Integer.of_int (Cil.bytesAlignOf t))
+      try Some (Z.of_int (Cil.bytesAlignOf t))
       with Cil.SizeOfError _ -> None
     end
   | TAlignOfE _ -> None (* exp case is very complex, and possibly incorrect *)
@@ -2431,16 +2431,16 @@ let rec constFoldTermToInt ?(machdep=true) (e: term) : Integer.t option =
   | Tif (c, e1, e2) ->
     let open Option.Operators in
     let* i = constFoldTermToInt ~machdep c in
-    constFoldTermToInt ~machdep (if Integer.is_zero i then e2 else e1)
-  | Tnull -> Some Integer.zero
+    constFoldTermToInt ~machdep (if Z.is_zero i then e2 else e1)
+  | Tnull -> Some Z.zero
   | Tapp (li, _, [{term_node = (Tunion args |
                                 TCast (true, _, {term_node = Tunion args}))}])
     when is_max_function li ->
-    constFoldMinMax ~machdep Integer.max args
+    constFoldMinMax ~machdep Z.max args
   | Tapp (li, _, [{term_node = (Tunion args |
                                 TCast (true, _, {term_node = Tunion args}))}])
     when is_min_function li ->
-    constFoldMinMax ~machdep Integer.min args
+    constFoldMinMax ~machdep Z.min args
 
   | TLval _ | TAddrOf _ | TStartOf _ | Tapp _ | Tlambda _ | TDataCons _
   | Tat _ | Tbase_addr _ | Tblock_length _
@@ -2464,7 +2464,7 @@ and constFoldCastToInt ~machdep typ e =
 
 and constFoldSizeOfToInt ~machdep typ =
   if machdep then
-    try Some (Integer.of_int (bytesSizeOf typ))
+    try Some (Z.of_int (bytesSizeOf typ))
     with SizeOfError _ -> None
   else None
 
@@ -2474,42 +2474,42 @@ and constFoldUnOpToInt ~machdep unop e =
   | None -> None
   | Some i ->
     match unop with
-    | Neg -> Some (Integer.neg i)
-    | BNot -> Some (Integer.lognot i)
+    | Neg -> Some (Z.neg i)
+    | BNot -> Some (Z.lognot i)
     | LNot ->
-      Some (if Integer.equal i Integer.zero then Integer.one else Integer.zero)
+      Some (if Z.is_zero i then Z.one else Z.zero)
 
 and constFoldBinOpToInt ~machdep bop e1 e2 =
   match constFoldTermToInt ~machdep e1, constFoldTermToInt ~machdep e2 with
   | Some i1, Some i2 -> begin
-      let comp op = Some (if op i1 i2 then Integer.one else Integer.zero) in
+      let comp op = Some (if op i1 i2 then Z.one else Z.zero) in
       let logic op =
-        let b1 = not (Integer.is_zero i1) and b2 = not (Integer.is_zero i2) in
-        Some (if op b1 b2 then Integer.one else Integer.zero)
+        let b1 = not (Z.is_zero i1) and b2 = not (Z.is_zero i2) in
+        Some (if op b1 b2 then Z.one else Z.zero)
       in
       match bop with
-      | PlusA -> Some (Integer.add i1 i2)
-      | MinusA -> Some (Integer.sub i1 i2)
+      | PlusA -> Some (Z.add i1 i2)
+      | MinusA -> Some (Z.sub i1 i2)
       | PlusPI | MinusPI | MinusPP -> None
-      | Mult -> Some (Integer.mul i1 i2)
+      | Mult -> Some (Z.mul i1 i2)
       | Div ->
-        if Integer.(equal zero i2) && Integer.(is_zero (e_rem i1 i2)) then None
-        else Some (Integer.e_div i1 i2)
-      | Mod -> if Integer.(equal zero i2) then None else Some (Integer.e_rem i1 i2)
-      | BAnd -> Some (Integer.logand i1 i2)
-      | BOr -> Some (Integer.logor i1 i2)
-      | BXor -> Some (Integer.logxor i1 i2)
+        if Z.(equal zero i2) && Z.(is_zero (erem i1 i2)) then None
+        else Some (Z.ediv i1 i2)
+      | Mod -> if Z.(equal zero i2) then None else Some (Z.erem i1 i2)
+      | BAnd -> Some (Z.logand i1 i2)
+      | BOr -> Some (Z.logor i1 i2)
+      | BXor -> Some (Z.logxor i1 i2)
 
-      | Shiftlt when Integer.(ge i2 zero) -> Some (Integer.shift_left i1 i2)
-      | Shiftrt when Integer.(ge i2 zero) -> Some (Integer.shift_right i1 i2)
+      | Shiftlt when Z.(geq i2 zero) -> Some (Z.shift_left_z i1 i2)
+      | Shiftrt when Z.(geq i2 zero) -> Some (Z.shift_right_z i1 i2)
       | Shiftlt | Shiftrt -> None
 
-      | Cil_types.Eq -> comp Integer.equal
-      | Cil_types.Ne -> comp (fun i1 i2 -> not (Integer.equal i1 i2))
-      | Cil_types.Le -> comp Integer.le
-      | Cil_types.Ge -> comp Integer.ge
-      | Cil_types.Lt -> comp Integer.lt
-      | Cil_types.Gt -> comp Integer.gt
+      | Cil_types.Eq -> comp Z.equal
+      | Cil_types.Ne -> comp (fun i1 i2 -> not (Z.equal i1 i2))
+      | Cil_types.Le -> comp Z.leq
+      | Cil_types.Ge -> comp Z.geq
+      | Cil_types.Lt -> comp Z.lt
+      | Cil_types.Gt -> comp Z.gt
 
       | LAnd -> logic (&&)
       | LOr -> logic (||)
@@ -2523,16 +2523,16 @@ and constFoldToffset t =
   | TStartOf (TVar v, offset) | TAddrOf (TVar v, offset) -> begin
       try
         let start, _width = bitsLogicOffset v.lv_type offset in
-        let size_char = Integer.eight in
-        if Integer.(is_zero (e_rem start size_char)) then
-          Some (Integer.e_div start size_char)
+        let size_char = 8z in
+        if Z.(is_zero (erem start size_char)) then
+          Some (Z.ediv start size_char)
         else None (* bitfields *)
       with Cil.SizeOfError _ -> None
     end
   | _ -> None
 
 (* This function supposes that ~machdep is [true] *)
-and bitsLogicOffset ltyp off : Integer.t * Integer.t =
+and bitsLogicOffset ltyp off : Z.t * Z.t =
   let rec loopOff typ width start = function
     | TNoOffset -> start, width
     | TIndex(e, off) -> begin
@@ -2541,25 +2541,25 @@ and bitsLogicOffset ltyp off : Integer.t * Integer.t =
           | None -> raise (SizeOfError ("Index is not constant", typ))
         in
         let typ_e = Ast_types.direct_element_type typ in
-        let size_e = Integer.of_int (Cil.bitsSizeOf typ_e) in
-        loopOff typ size_e (Integer.(add start (mul ei size_e))) off
+        let size_e = Z.of_int (Cil.bitsSizeOf typ_e) in
+        loopOff typ size_e (Z.(add start (mul ei size_e))) off
       end
     | TField(f, off) ->
       if f.fcomp.cstruct then begin
         (* Force the computation of the fields fsize_in_bits and
            foffset_in_bits *)
         ignore (Cil.bitsOffset typ (Field (f, NoOffset)));
-        let size = Integer.of_int (Option.get f.fsize_in_bits) in
-        let offset_f = Integer.of_int (Option.get f.foffset_in_bits) in
-        loopOff f.ftype size (Integer.add start offset_f) off
+        let size = Z.of_int (Option.get f.fsize_in_bits) in
+        let offset_f = Z.of_int (Option.get f.foffset_in_bits) in
+        loopOff f.ftype size (Z.add start offset_f) off
       end
       else
         (* All union fields start at offset 0 *)
-        loopOff f.ftype (Integer.of_int (Cil.bitsSizeOf f.ftype)) start off
+        loopOff f.ftype (Z.of_int (Cil.bitsSizeOf f.ftype)) start off
     | TModel _ -> raise (SizeOfError ("bitsLogicOffset on model field", typ))
   in
   match Ast_types.unroll_logic ltyp with
-  | Ctype typ -> loopOff typ Integer.zero Integer.zero off
+  | Ctype typ -> loopOff typ Z.zero Z.zero off
   | _ -> raise (SizeOfError ("bitsLogicOffset on logic type", Cil_const.voidPtrType))
 
 (* Handle \min(\union(args)) or \max(\union(args)), depending on [f] *)
@@ -2575,14 +2575,14 @@ and constFoldMinMax ~machdep f args =
     List.fold_left aux (constFoldTermToInt ~machdep arg) args
 
 let rec fold_itv f b e acc =
-  if Integer.equal b e then f acc b
-  else fold_itv f (Integer.succ b) e (f acc b)
+  if Z.equal b e then f acc b
+  else fold_itv f (Z.succ b) e (f acc b)
 
 (* Find the initializer for index [i] in [init] *)
 let find_init_by_index init i =
   let same_offset (off, _) = match off with
     | Index (i', NoOffset) ->
-      Integer.equal i (Option.get (Cil.isInteger i'))
+      Z.equal i (Option.get (Cil.isInteger i'))
     | _ -> false
   in
   snd (List.find same_offset init)
@@ -2604,14 +2604,14 @@ let const_fold_trange_bounds typ b e =
   let extract = function None -> raise CannotSimplify | Some i -> i in
   let b = match b with
     | Some tb -> extract (constFoldTermToInt tb)
-    | None -> Integer.zero
+    | None -> Z.zero
   in
   let e = match e with
     | Some te -> extract (constFoldTermToInt te)
     | None ->
       match Ast_types.unroll_node typ with
       | TArray (_, Some size) ->
-        Integer.pred (extract (Cil.isInteger size))
+        Z.pred (extract (Cil.isInteger size))
       | _ -> raise CannotSimplify
   in
   b, e
@@ -2619,7 +2619,7 @@ let const_fold_trange_bounds typ b e =
 let extract = function None -> raise CannotSimplify | Some i -> i
 
 let lift_set_index f i typ =
-  let module S = Datatype.Integer.Set in
+  let module S = Z.Set in
   let add_index acc i = S.union acc (f i) in
   match i.term_node with
   | Tunion tl ->
@@ -2637,7 +2637,7 @@ let lift_set_index f i typ =
     incomplete. [loff] must have an integral type. Returns a set of values
     when [loff] contains ranges. *)
 let find_initial_value init loff =
-  let module S = Datatype.Integer.Set in
+  let module S = Z.Set in
   let rec aux loff init =
     match loff, init with
     | TNoOffset, SingleInit e -> S.singleton (extract (Cil.constFoldToInt e))
@@ -2645,13 +2645,13 @@ let find_initial_value init loff =
       (* Add the initializer at offset [Index(i, loff)] to [acc]. *)
       let single_index i =
         try aux loff (find_init_by_index l i)
-        with Not_found -> S.singleton Integer.zero
+        with Not_found -> S.singleton Z.zero
       in
       lift_set_index single_index i typ
     | TField (f, loff), CompoundInit (_, l) ->
       if f.fcomp.cstruct then
         try aux loff (find_init_by_field l f)
-        with Not_found -> S.singleton Integer.zero
+        with Not_found -> S.singleton Z.zero
       else (* too complex, a value might be written through another field *)
         raise CannotSimplify
     | TNoOffset, CompoundInit _
@@ -2660,14 +2660,14 @@ let find_initial_value init loff =
   in
   try
     match init with
-    | None -> Some (S.singleton Integer.zero)
+    | None -> Some (S.singleton Z.zero)
     | Some (CInit init) -> Some (aux loff init)
     | Some (StrInit (Str s)) ->
       (match loff with
        | TIndex(t,TNoOffset) ->
          let len = Z.of_int @@ String.length s in
          let single_index i =
-           if Z.equal i len then S.singleton Integer.zero
+           if Z.equal i len then S.singleton Z.zero
            else if Z.geq Z.zero i && Z.lt i len then
              S.singleton (Z.of_int (Char.code s.[Z.to_int i]))
            else raise CannotSimplify
@@ -2680,7 +2680,7 @@ let find_initial_value init loff =
        | TIndex(t,TNoOffset) ->
          let len = Z.of_int @@ List.length l in
          let single_index i =
-           if Z.equal i len then S.singleton Integer.zero
+           if Z.equal i len then S.singleton Z.zero
            else if Z.geq Z.zero i && Z.lt i len then
              S.singleton (Z.of_int64 (List.nth l (Z.to_int i)))
            else raise CannotSimplify
@@ -2720,7 +2720,7 @@ class simplify_const_lval global_find_init = object (self)
              expected logic type (plain/Set) *)
           let typ = Logic_const.plain_or_set Fun.id t.term_type in
           let aux i l = Logic_const.term (TConst (Integer (i,None))) typ :: l in
-          let l = Datatype.Integer.Set.fold aux itvs [] in
+          let l = Z.Set.fold aux itvs [] in
           match l, Logic_const.is_plain_type t.term_type with
           | [i], true -> Cil.ChangeTo i
           | _, false -> Cil.ChangeTo (Logic_const.term (Tunion l) t.term_type)

@@ -193,9 +193,9 @@ let comparison_to_exp
 let conditional_to_exp ?(name="if") ~loc kf t_opt e1 (e2, env2) (e3, env3) =
   let env = Env.pop (Env.pop env3) in
   match e1.enode with
-  | Const(CInt64(n, _, _)) when Integer.is_zero n ->
+  | Const(CInt64(n, _, _)) when Z.is_zero n ->
     e3, Env.transfer ~from:env3 env
-  | Const(CInt64(n, _, _)) when Integer.is_one n ->
+  | Const(CInt64(n, _, _)) when Z.is_one n ->
     e2, Env.transfer ~from:env2 env
   | _ ->
     let ty = match t_opt with

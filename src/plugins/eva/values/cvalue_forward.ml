@@ -26,7 +26,7 @@ let may_be_suffix s1 s2 =
   let is_suffix s1 s2 =
     let sub2 = String.sub s2.string (s2.length - s1.length) s1.length in
     String.equal s1.string sub2 &&
-    let delta = Integer.of_int (s1.length - s2.length) in
+    let delta = Z.of_int (s1.length - s2.length) in
     let off2 = Ival.add_singleton_int delta s2.offset in
     not (Ival.is_bottom (Ival.narrow s1.offset off2))
   in
@@ -147,8 +147,8 @@ let are_comparable_reason kind ev1 ev2 =
       then false, `Rel_different_bases
       else
         (* If both addresses are valid, they can be compared for equality. *)
-      if (possible_pointer (Base.Read Integer.one) rest_1) &&
-         (possible_pointer (Base.Read Integer.one) rest_2)
+      if (possible_pointer (Base.Read Z.one) rest_1) &&
+         (possible_pointer (Base.Read Z.one) rest_2)
       then
         (* But beware of the comparisons of literal strings. *)
         if are_comparable_string rest_1 rest_2
@@ -238,13 +238,13 @@ let assume_not_nan ~assume_finite fkind v =
 
 let nearly_valid_bits = function
   | Base.Empty
-  | Base.Invalid -> Integer.zero, Integer.zero
-  | Base.Known (min, max) | Base.Unknown (min, _, max) -> min, Integer.succ max
-  | Base.Variable variable -> Integer.zero, Integer.succ variable.Base.max_alloc
+  | Base.Invalid -> Z.zero, Z.zero
+  | Base.Known (min, max) | Base.Unknown (min, _, max) -> min, Z.succ max
+  | Base.Variable variable -> Z.zero, Z.succ variable.Base.max_alloc
 
 let nearly_valid_offset base =
   let min, max = nearly_valid_bits base in
-  let to_byte bound = Some (Integer.e_div bound (Bit_utils.sizeofchar ())) in
+  let to_byte bound = Some (Z.ediv bound (Bit_utils.sizeofchar ())) in
   Ival.inject_range (to_byte min) (to_byte max)
 
 let assume_pointer loc =
@@ -330,7 +330,7 @@ let assume_bounded bound_kind bound value =
 type integer_range = Eval_typ.integer_range = { i_bits: int; i_signed: bool }
 
 let rewrap_integer range value =
-  let size = Integer.of_int range.i_bits in
+  let size = Z.of_int range.i_bits in
   V.cast_int_to_int ~signed:range.i_signed ~size value
 
 
@@ -342,7 +342,7 @@ let forward_minus_pp ~typ ev1 ev2 =
   let conv minus_offs =
     try
       let size = Int_Base.project (Bit_utils.osizeof_pointed typ) in
-      if Integer.is_one size
+      if Z.is_one size
       then minus_offs
       else Ival.scale_div ~pos:true size minus_offs
     with Abstract_interp.Error_Top -> Ival.top
@@ -471,7 +471,7 @@ type scalar_typ = Eval_typ.scalar_typ =
   | TSFloat of fkind
 
 let reinterpret_as_int range v =
-  let size = Integer.of_int range.i_bits in
+  let size = Z.of_int range.i_bits in
   Cvalue.V.reinterpret_as_int ~signed:range.i_signed ~size v
 
 let reinterpret typ v =

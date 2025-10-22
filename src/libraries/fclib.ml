@@ -23,6 +23,11 @@ module Linear = Linear
 module Nat = Nat
 module Rational = Rational
 
+(** {2 Zarith} *)
+
+(** @since Frama-C+dev *)
+module Z = Z
+
 (** {2 Datatype} *)
 
 module Datatype = Datatype
@@ -55,7 +60,7 @@ module State_topological = State_topological
 module Extlib = Extlib
 module FCHashtbl = FCHashtbl
 module Hashtbl = Hashtbl
-module Integer = Integer
+module Integer = Integer [@@deprecated "Use Fclib.Z instead."]
 module List = List
 module Option = Option
 module Result = Result

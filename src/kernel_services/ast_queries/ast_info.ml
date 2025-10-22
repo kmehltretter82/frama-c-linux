@@ -20,7 +20,7 @@ let is_integral_const = function
 let rec possible_value_of_integral_const = function
   | CInt64 (i,_,_) -> Some i
   | CEnum {eival = e} -> possible_value_of_integral_expr e
-  | CChr c -> Some (Integer.of_int (Char.code c))
+  | CChr c -> Some (Z.of_int (Char.code c))
   (* This is against the ISO C norm! See Cil.charConstToInt  *)
   | _ -> None
 
@@ -46,13 +46,13 @@ let rec uncast e = match e.enode with
 let is_null_expr e =
   match (uncast (Cil.constFold true e)).enode with
   | Const c when is_integral_const c ->
-    Integer.equal (value_of_integral_const c) Integer.zero
+    Z.is_zero (value_of_integral_const c)
   | _ -> false
 
 let is_non_null_expr e =
   match (uncast (Cil.constFold true e)).enode with
   | Const c when is_integral_const c ->
-    not (Integer.equal (value_of_integral_const c) Integer.zero)
+    not (Z.is_zero (value_of_integral_const c))
   | _ -> false
 
 let is_string_literal vi = Ast_attributes.(contains fc_literal vi.vattr)
@@ -68,7 +68,7 @@ let is_integral_logic_const = function
 let possible_value_of_integral_logic_const = function
   | Integer(i,_) -> Some i
   | LEnum {eival = e} -> possible_value_of_integral_expr e
-  | LChr c -> Some (Integer.of_int (Char.code c))
+  | LChr c -> Some (Z.of_int (Char.code c))
   (* This is against the ISO C norm! See Cil.charConstToInt  *)
   | _ -> None
 
@@ -294,7 +294,7 @@ let constant_term loc i =
 
 let rec is_null_term t = match t.term_node with
   | TConst c when is_integral_logic_const c ->
-    Integer.equal (value_of_integral_logic_const c) Integer.zero
+    Z.is_zero (value_of_integral_logic_const c)
   | TCast(false, _,t) -> is_null_term t
   | _ -> false
 
@@ -410,16 +410,16 @@ let block_of_local (fdec:fundec) vi =
 let direct_array_size ty =
   match Ast_types.unroll_node ty with
   | TArray(_ty,Some size) -> value_of_integral_expr size
-  | TArray(_ty,None) -> Integer.zero
+  | TArray(_ty,None) -> Z.zero
   | _ -> assert false
 
 let rec array_size ty =
   match Ast_types.unroll_node ty with
   | TArray(elemty,Some _) ->
     if Ast_types.is_array elemty then
-      Integer.mul (direct_array_size ty) (array_size elemty)
+      Z.mul (direct_array_size ty) (array_size elemty)
     else direct_array_size ty
-  | TArray(_,None) -> Integer.zero
+  | TArray(_,None) -> Z.zero
   | _ -> assert false
 
 (* ************************************************************************** *)

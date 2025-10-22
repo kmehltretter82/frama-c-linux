@@ -170,7 +170,7 @@ let () =
              (fun min max ->
                 (* let mul_CHAR_BIT = Int64.mul (Int64.of_int (bitsSizeOf charType)) in *)
                 (* the above is what we would like to write but it is too early *)
-                let mul_CHAR_BIT = Int.mul Int.eight in
+                let mul_CHAR_BIT = Int.mul 8z in
                 MinValidAbsoluteAddress.set
                   (mul_CHAR_BIT (Int.of_string min));
                 MaxValidAbsoluteAddress.set
@@ -184,8 +184,8 @@ let min_valid_absolute_address = MinValidAbsoluteAddress.get
 let max_valid_absolute_address = MaxValidAbsoluteAddress.get
 
 let validity_from_size size =
-  assert Int.(ge size zero);
-  if Int.(equal size zero) then Empty
+  assert (Int.geq size 0z);
+  if Int.equal size 0z then Empty
   else Known (Int.zero, Int.pred size)
 
 let validity_from_known_size size =
@@ -202,7 +202,7 @@ let validity b =
   | Null ->
     let mn = min_valid_absolute_address ()in
     let mx = max_valid_absolute_address () in
-    if Integer.gt mx mn then
+    if Z.gt mx mn then
       Known (mn, mx)
     else
       Invalid
@@ -240,8 +240,8 @@ let final_empty_struct = function
   | _ -> false
 
 type access =
-  | Read of Integer.t
-  | Write of Integer.t
+  | Read of Z.t
+  | Write of Z.t
   | Object_pointer
   | Any_pointer
 
@@ -250,7 +250,7 @@ let for_writing = function
   | Read _ | Object_pointer | Any_pointer -> false
 
 let is_empty_access = function
-  | Read size | Write size -> Int.(equal zero size)
+  | Read size | Write size -> Int.is_zero size
   | Object_pointer | Any_pointer -> true
 
 (* Computes the last valid offset for an access of the base [base] with [max]
@@ -274,11 +274,10 @@ let offset_for_validity ~bitfield access base =
     if bitfield
     then Ival.inject_range (Some min) (Some max)
     else
-      Ival.inject_interval ~min:(Some min) ~max:(Some max) ~rem:Int.zero
-        ~modu:Int.eight
+      Ival.inject_interval ~min:(Some min) ~max:(Some max) ~rem:0z ~modu:8z
   | Variable variable_v ->
     let maxv = last_valid_offset base variable_v.max_alloc access in
-    Ival.inject_range (Some Int.zero) (Some maxv)
+    Ival.inject_range (Some 0z) (Some maxv)
 
 let valid_offset ?(bitfield=true) access base =
   if for_writing access && is_read_only base
@@ -296,8 +295,8 @@ let offset_is_in_validity access base ival =
   let is_valid_for_bounds min_bound max_bound =
     match Ival.min_and_max ival with
     | Some min, Some max ->
-      Int.ge min min_bound &&
-      Int.le max (last_valid_offset base max_bound access)
+      Int.geq min min_bound &&
+      Int.leq max (last_valid_offset base max_bound access)
     | _, _ -> false
   in
   match validity base with
@@ -329,9 +328,9 @@ let is_aligned_by b alignment =
     try
       match b with
       | Var (v,_) | Allocated(v,_,_) ->
-        Int.is_zero (Int.e_rem (Int.of_int (Cil.bytesAlignOf v.vtype)) alignment)
+        Int.is_zero (Int.erem (Int.of_int (Cil.bytesAlignOf v.vtype)) alignment)
       | CLogic_Var (_, ty, _) ->
-        Int.is_zero (Int.e_rem (Int.of_int (Cil.bytesAlignOf ty)) alignment)
+        Int.is_zero (Int.erem (Int.of_int (Cil.bytesAlignOf ty)) alignment)
       | Null -> true
     with Cil.SizeOfError _ -> false
 

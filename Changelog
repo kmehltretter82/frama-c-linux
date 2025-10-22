@@ -18,6 +18,14 @@
 Open Source Release <next-release>
 ###############################################################################
 
+o!  Kernel    [2025-10-22] Renamed the module Integer to Z and deprecated
+              Integer. Few changes in Z API's compared to Integer, Z is also
+              now a Datatype which replaces `Datatype.Integer` (now deprecated
+              too). Use OCamlmig for a smoother migration (cf. manual).
+o   Kernel    [2025-10-22] Frama-C now includes a custom PPX which adds a
+              literal to convert integers to Z.t. You can now do `42z` instead
+              of `Z.of_int 42`
+
 ###############################################################################
 Open Source Release 32.0 (Germanium)
 ###############################################################################

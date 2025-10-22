@@ -289,7 +289,7 @@ sig
   val e_fact : int -> term -> term
 
   val e_int64 : int64 -> term
-  val e_bigint : Integer.t -> term
+  val e_bigint : Z.t -> term
   val e_float : float -> term
   val e_setfield : term -> field -> term -> term
   val e_range : term -> term -> term

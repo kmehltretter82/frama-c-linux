@@ -8,7 +8,7 @@
 
 (** Big integers with an additional top element. *)
 
-type i = Top | Value of Integer.t
+type i = Top | Value of Z.t
 
 include Datatype.S with type t = i
 
@@ -21,8 +21,8 @@ val neg: t -> t
 val is_zero: t -> bool
 val is_top: t -> bool
 
-val inject: Integer.t -> t
-val project: t -> Integer.t
+val inject: Z.t -> t
+val project: t -> Z.t
 (** @raise Error_Top if the argument is {!Top}. *)
 
 val cardinal_zero_or_one: t -> bool

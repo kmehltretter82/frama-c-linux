@@ -745,16 +745,16 @@ let compute_on_cilast ~libc =
    pointers. *)
 class locals_size_visitor kf callstack = object
 
-  val mutable locals_size_no_temps = Integer.zero
+  val mutable locals_size_no_temps = Z.zero
   method get_locals_size_no_temps = locals_size_no_temps
 
-  val mutable locals_size_temps = Integer.zero
+  val mutable locals_size_temps = Z.zero
   method get_locals_size_temps = locals_size_temps
 
-  val mutable max_size_calls_no_temps = Integer.zero
+  val mutable max_size_calls_no_temps = Z.zero
   method get_max_size_calls_no_temps = max_size_calls_no_temps
 
-  val mutable max_size_calls_temps = Integer.zero
+  val mutable max_size_calls_temps = Z.zero
   method get_max_size_calls_temps = max_size_calls_temps
 
   inherit Visitor.frama_c_inplace
@@ -778,17 +778,17 @@ class locals_size_visitor kf callstack = object
           ignore (Visitor.visitFramacKf
                     (new_vis :> Visitor.frama_c_visitor) kf');
           let call_size_no_temps =
-            Integer.add new_vis#get_max_size_calls_no_temps
+            Z.add new_vis#get_max_size_calls_no_temps
               new_vis#get_locals_size_no_temps
           in
           let call_size_temps =
-            Integer.add new_vis#get_max_size_calls_temps
+            Z.add new_vis#get_max_size_calls_temps
               new_vis#get_locals_size_temps
           in
           max_size_calls_no_temps <-
-            Integer.max max_size_calls_no_temps call_size_no_temps;
+            Z.max max_size_calls_no_temps call_size_no_temps;
           max_size_calls_temps <-
-            Integer.max max_size_calls_temps call_size_temps
+            Z.max max_size_calls_temps call_size_temps
         with Not_found ->
           (* should not happen *)
           Metrics_parameters.fatal ~current:true
@@ -809,12 +809,12 @@ class locals_size_visitor kf callstack = object
         | Some size ->
           Metrics_parameters.debug "@[function %a:@;sizeof(%a) = %a (%s)@]"
             Kernel_function.pretty kf
-            Printer.pp_varinfo vi Integer.pretty size
+            Printer.pp_varinfo vi Z.pretty size
             (if vi.vtemp then "temp" else "non-temp");
           if vi.vtemp then
-            locals_size_temps <- Integer.add locals_size_temps size
+            locals_size_temps <- Z.add locals_size_temps size
           else
-            locals_size_no_temps <- Integer.add locals_size_no_temps size
+            locals_size_no_temps <- Z.add locals_size_no_temps size
       end;
     Cil.DoChildren
 
@@ -826,10 +826,10 @@ let compute_locals_size kf =
   ignore (Visitor.visitFramacKf (vis :> Visitor.frama_c_visitor) kf);
   Metrics_parameters.result "@[%a\t%a\t%a\t%a\t%a@]"
     Kernel_function.pretty kf
-    Integer.pretty vis#get_locals_size_no_temps
-    Integer.pretty
-    (Integer.add vis#get_locals_size_no_temps vis#get_locals_size_temps)
-    Integer.pretty vis#get_max_size_calls_no_temps
-    Integer.pretty
-    (Integer.add vis#get_max_size_calls_no_temps vis#get_max_size_calls_temps)
+    Z.pretty vis#get_locals_size_no_temps
+    Z.pretty
+    (Z.add vis#get_locals_size_no_temps vis#get_locals_size_temps)
+    Z.pretty vis#get_max_size_calls_no_temps
+    Z.pretty
+    (Z.add vis#get_max_size_calls_no_temps vis#get_max_size_calls_temps)
 ;;

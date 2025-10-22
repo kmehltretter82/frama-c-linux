@@ -8,34 +8,34 @@
 
 open Abstract_interp
 
-type i = Top | Value of Integer.t
+type i = Top | Value of Z.t
 
 let equal i1 i2 = match i1, i2 with
   | Top, Top -> true
-  | Value i1, Value i2 -> Integer.equal i1 i2
+  | Value i1, Value i2 -> Z.equal i1 i2
   | Top, Value _ | Value _, Top -> false
 
 let compare i1 i2 = match i1, i2 with
   | Top, Top -> 0
-  | Value i1, Value i2 -> Integer.compare i1 i2
+  | Value i1, Value i2 -> Z.compare i1 i2
   | Top, Value _ -> -1
   | Value _, Top -> 1
 
 let hash = function
   | Top -> 37
-  | Value i -> Integer.hash i
+  | Value i -> Z.hash i
 
 let pretty fmt = function
   | Top -> Format.fprintf fmt "Top"
-  | Value i -> Format.fprintf fmt "<%a>" Int.pretty i
+  | Value i -> Format.fprintf fmt "<%a>" Z.pretty i
 
 include Datatype.Make
     (struct
-      type t = i (*= Top | Value of Integer.t *)
+      type t = i (*= Top | Value of Z.t *)
       let name = "Int_Base.t"
       let structural_descr =
-        Structural_descr.t_sum [| [| Datatype.Integer.packed_descr |] |]
-      let reprs = Top :: List.map (fun v -> Value v) Datatype.Integer.reprs
+        Structural_descr.t_sum [| [| Z.packed_descr |] |]
+      let reprs = Top :: List.map (fun v -> Value v) Z.reprs
       let equal = equal
       let compare = compare
       let hash = hash

@@ -9,7 +9,7 @@
 type split_strategy =
   | NoSplit
   | SplitAuto
-  | SplitEqList of Datatype.Integer.t list
+  | SplitEqList of Z.t list
   | FullSplit
 
 include Parameter_sig.Value_datatype with type t = split_strategy

@@ -1084,13 +1084,13 @@ module Make (F: Float_sig.S) = struct
       | None -> Cst.neg_infinity prec
       | Some v ->
         let round = if F.is_exact prec then Near else Down in
-        F.of_float round prec (Integer.to_float v)
+        F.of_float round prec (Z.to_float v)
     in
     let max = match max with
       | None -> Cst.neg_infinity prec
       | Some v ->
         let round = if F.is_exact prec then Near else Up in
-        F.of_float round prec (Integer.to_float v)
+        F.of_float round prec (Z.to_float v)
     in
     FRange.inject min max
 
@@ -1101,9 +1101,9 @@ module Make (F: Float_sig.S) = struct
     let neg_infinity = Cst.neg_infinity prec
     and pos_infinity = Cst.pos_infinity prec in
     let itvs_nan =
-      let smallest_neg_nan = Integer.succ (bits_of_float neg_infinity) in
-      let biggest_neg_nan  = Integer.minus_one in
-      let smallest_pos_nan = Integer.succ (bits_of_float pos_infinity) in
+      let smallest_neg_nan = Z.succ (bits_of_float neg_infinity) in
+      let biggest_neg_nan  = Z.minus_one in
+      let smallest_pos_nan = Z.succ (bits_of_float pos_infinity) in
       let biggest_pos_nan  = max_int in
       [(smallest_neg_nan, biggest_neg_nan);
        (smallest_pos_nan, biggest_pos_nan)]
@@ -1119,16 +1119,16 @@ module Make (F: Float_sig.S) = struct
 
   let bits_of_float64_list =
     let bits_of_float f =
-      Integer.of_int64 (Int64.bits_of_float (F.to_float f))
+      Z.of_int64 (Int64.bits_of_float (F.to_float f))
     in
-    let max_int = Integer.of_int64 Int64.max_int in
+    let max_int = Z.of_int64 Int64.max_int in
     bits_of_float_list ~prec:Double ~bits_of_float ~max_int
 
   let bits_of_float32_list =
     let bits_of_float f =
-      Integer.of_int32 (Int32.bits_of_float (F.to_float f))
+      Z.of_int32 (Int32.bits_of_float (F.to_float f))
     in
-    let max_int = Integer.of_int32 Int32.max_int in
+    let max_int = Z.of_int32 Int32.max_int in
     bits_of_float_list ~prec:Single ~bits_of_float ~max_int
 
   (* ------------------------------------------------------------------------

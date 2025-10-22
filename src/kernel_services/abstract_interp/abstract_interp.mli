@@ -45,11 +45,8 @@ module Comp: sig
 end
 
 
-open Lattice_type
-
 module Int : sig
-  include module type of Integer with type t = Integer.t
-  include Lattice_Value with type t := t
+  include module type of Z with type t = Z.t
 
   val fold : (t -> 'a -> 'a) -> inf:t -> sup:t -> step:t -> 'a -> 'a
   (** Fold the function on the value between [inf] and [sup] at every
@@ -75,7 +72,11 @@ module Rel : sig
   val add_abs : Int.t -> t -> Int.t
   val add : t -> t -> t
   val sub_abs : Int.t -> Int.t -> t
+  val erem: t -> Int.t -> t
+
   val e_rem: t -> Int.t -> t
+  [@@deprecated "Use erem instead."]
+  [@@migrate { repl = Rel.erem } ]
 
   val check: rem:t -> modu:Int.t -> bool
 end

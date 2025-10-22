@@ -89,7 +89,7 @@ module Make
       | Base.Known (min, max) | Base.Unknown (min, _, max) ->
         match Int_Intervals.project_singleton range with
         | Some (min', max') ->
-          if Integer.equal min min' && Integer.equal max max' then
+          if Z.equal min min' && Z.equal max max' then
             Base.Hptset.empty
           else
             Base.Hptset.singleton b

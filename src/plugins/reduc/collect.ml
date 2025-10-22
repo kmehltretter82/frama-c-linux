@@ -80,12 +80,12 @@ and collect_fields acc fld =
   List.map (fun off -> Field (fld, off)) offs @ acc
 
 and collect_array typ acc = function
-  | x when Integer.is_zero x -> acc
+  | x when Z.is_zero x -> acc
   | x ->
     let offs = collect_off typ in
     let exp = Cil.kinteger64 ~loc:Location.unknown x in
     let acc' = acc @ List.map (fun off -> Index(exp ,off)) offs in
-    collect_array typ acc' (Integer.add x Integer.minus_one)
+    collect_array typ acc' (Z.add x Z.minus_one)
 
 let collect_varinfo acc x =
   let offs = collect_off x.vtype in

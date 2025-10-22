@@ -530,7 +530,7 @@ module ModelMerging =
 let compare_int e1 e2 =
   match (constFold true e1), (constFold true e2) with
   | {enode = Const(CInt64(i, _, _))}, {enode = Const(CInt64(i', _, _))} ->
-    Integer.compare i i'
+    Z.compare i i'
   | e1,e2 -> Cil_datatype.Exp.compare e1 e2
 (* not strictly accurate, but should do the trick anyway *)
 
@@ -2450,9 +2450,9 @@ and equalExps (x: exp) (y: exp) : bool =
       ((* CIL changes (unsigned)0 into 0U during printing.. *)
         match xc,yc with
         | CInt64(xv,_,_),CInt64(yv,_,_) ->
-          (Integer.equal xv Integer.zero)
+          Z.is_zero xv
           && (* ok if they're both 0 *)
-          (Integer.equal yv Integer.zero)
+          Z.is_zero yv
         | _,_ -> false
       )
     | Lval(xl), Lval(yl) ->          (equalLvals xl yl)
