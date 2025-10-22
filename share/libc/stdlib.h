@@ -536,7 +536,7 @@ extern long int jrand48 (unsigned short xsubi[3]);
 */
 
 /*@
-  #if __STDC_VERSION__ == 201112L
+#if __STDC_VERSION__ == 201112L
     requires valid_alignment: is_valid_alignment(alignment);
     requires alignment_modulo: size % alignment == 0;
   #endif
@@ -548,6 +548,9 @@ extern long int jrand48 (unsigned short xsubi[3]);
       assumes valid_alignment: is_valid_alignment(alignment);
       #endif
       assumes can_allocate: is_allocable(size);
+      #if __STDC__VERSION != 201112L
+      assumes valid_alignment: is_valid_alignment(alignment);
+      #endif
       assigns __fc_heap_status \from size, __fc_heap_status;
       assigns \result \from indirect:size, indirect:__fc_heap_status;
       ensures allocation: \fresh(\result,size);
@@ -555,14 +558,14 @@ extern long int jrand48 (unsigned short xsubi[3]);
       ensures errno_same: __fc_errno == \old(__fc_errno);
     behavior no_allocation:
       assumes cannot_allocate: !is_allocable(size);
-      #if __STDC_VERSION == 201112L
+      #if __STDC_VERSION != 201112L
       assumes valid_alignment: is_valid_alignment(alignment);
       #endif
       allocates \nothing;
       assigns \result \from \nothing;
       ensures null_result: \result==\null;
       ensures errno_set: __fc_errno == ENOMEM;
-    #if __STDC_VERSION == 201112L
+    #if __STDC_VERSION != 201112L
     behavior no_allocation_invalid_align:
       assumes cannot_allocate: !is_valid_alignment(alignment);
       allocates \nothing;
