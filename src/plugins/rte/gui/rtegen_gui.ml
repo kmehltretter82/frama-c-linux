@@ -7,4 +7,4 @@
 (**************************************************************************)
 
 let () =
-  Property_navigator.Rte.register_get_all_status RteGen.Api.get_all_status
+  Property_navigator.Rte.register_get_all_status (fun () -> RteGen.Generator.all_statuses)
