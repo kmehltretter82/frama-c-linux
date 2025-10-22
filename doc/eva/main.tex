@@ -1472,12 +1472,11 @@ The choice between these two kinds of alarms is influenced by
 option \lstinline|-unsafe-arrays|, as described
 page \pageref{unsafe-arrays}.
 
-Note that line 6 or 8 in this example could be considered as
+Note that line 6 of this example could also be considered as
 problematic in the strictest interpretation of the standard.
-\Eva{} omits warnings for these two lines according
-to the attitude described in \ref{norme_pratique}. An option
-to warn about these lines could happen if there was demand for
-this feature.
+By default, \Eva{} does not emit alarm for this line,
+but the \lstinline|-warn-invalid-pointer| parameter enables
+alarms on such invalid pointer arithmetic.
 
 \subsubsection{Unaligned pointer}
 
