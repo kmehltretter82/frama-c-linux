@@ -35,6 +35,7 @@ Plugin E-ACSL 32.0 (Germanium)
                              Fixes (#@1622).
 -* E-ACSL       [2025-10-15] Fix ghost code generation and deactivate RTE checks
                              in ghost code (#@1620).
+- E-ACSL        [2025-10-07] support \aligned built-in predicate
 - E-ACSL        [2025-08-08] Inductive extractions may be unsound if
                              inductive predicate has multiple matching cases
                              for some given arguments. Render this explicit.
@@ -44,7 +45,6 @@ Plugin E-ACSL 32.0 (Germanium)
 Plugin E-ACSL 31.0 (Gallium)
 ###############################################################################
 
-- E-ACSL        [..........] support \aligned built-in predicate
 - E-ACSL        [2025-04-14] support certain forms of inductive definitions
 - E-ACSL        [2025-04-24] better sharing of generated functions
 -* E-ACSL       [2025-04-01] fix missing variables in failed assertion summaries
