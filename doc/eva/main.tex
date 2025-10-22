@@ -6044,19 +6044,6 @@ They are listed here for completeness.
 
 \end{comment}
 
-\subsection{Memory representation}
-These builtins allow to perform queries over the current abstract memory state.
-\begin{itemize}
-\item \lstinline|Frama_C_is_base_aligned(p,n)| checks that the pointer argument
-  \lstinline|p| is aligned on \lstinline|n| bytes, assuming that
-  \lstinline|\base_addr(p)| is itself aligned according to the alignment
-  of its type (as defined by the current \lstinline+machdep+).
-\item \lstinline|Frama_C_offset(p)| returns the possible offsets of
-  \lstinline|p| with respect to its base address. That is,
-  \lstinline|Frama_C_offset(p) == \offset(p)| holds (but
-  \lstinline|Frama_C_offset(p)| can be used outside of ACSL fragments).
-\end{itemize}
-
 \subsection{State-splitting builtins}
 
 The builtins below can be used to ``split'' abstract values in
