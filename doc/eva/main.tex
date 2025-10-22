@@ -1479,6 +1479,40 @@ to the attitude described in \ref{norme_pratique}. An option
 to warn about these lines could happen if there was demand for
 this feature.
 
+\subsubsection{Unaligned pointer}
+
+On each pointer of the analyzed program, \Eva{} checks that all the addresses
+it may point to are properly aligned according to the pointer type.
+The alignment of each C type depends on the target platform,
+defined through the \lstinline|-machdep| parameter. \lstinline|_Alignas|
+specifiers are properly taken into account.
+
+Whenever \Eva{} is unable to verify the alignment of a pointer, it emits an
+alarm.
+Such alarm uses the \acsl{} predicate \lstinline|\aligned(p, alignof(type))|
+to express that pointer \lstinline|p| must be aligned according to its
+\lstinline|type|, meaning that the address pointed to by \lstinline|p| must be
+a multiple of the alignment of \lstinline|type| in the target platform.
+The \lstinline|\aligned| predicate can also be used in standard \acsl{}
+assertions to verify more properties on pointer alignment.
+
+\csource{examples/alarms/pointer_alignment.c}
+
+In the above example, the analysis emits alignment alarms on the conversion of
+\lstinline|c| and \lstinline|c2| as a pointer to \lstinline|int|.
+On the other hand, the next two conversions are valid and no alarm is emitted.
+
+\begin{logs}
+[eva:alarm] pointer_alignment.c:5: Warning:
+  unaligned pointer creation. assert \aligned((char *)c,alignof(int));
+[eva:alarm] pointer_alignment.c:6: Warning:
+  unaligned pointer creation. assert \aligned((char *)c2,alignof(int));
+\end{logs}
+
+All alignment alarms can be disabled with the
+\lstinline|-no-warn-unaligned-pointer| parameter.
+
+
 \subsubsection{Invalid pointer arithmetic}
 
 By default, \Eva{} does \emph{not} emit alarms on invalid pointer arithmetic:
