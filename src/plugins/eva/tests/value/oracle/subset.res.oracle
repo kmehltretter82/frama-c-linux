@@ -100,9 +100,9 @@
 [from] ====== DEPENDENCIES COMPUTED ======
   These dependencies hold at termination for the executions that terminate:
 [from] Function fopen:
-  \result FROM _p__fc_fopen; "bla"[0..3]
+  \result FROM _p__fc_fopen
 [from] Function fopen2:
-  \result FROM _p__fc_fopen; "bli"[0..3]
+  \result FROM _p__fc_fopen
 [from] Function main1:
   NO EFFECTS
 [from] Function main2:
@@ -117,7 +117,7 @@
 [inout] Out (internal) for function main1:
     p
 [inout] Inputs for function main1:
-    _p__fc_fopen; "bla"[0..3]; "bli"[0..3]
+    _p__fc_fopen
 [inout] Out (internal) for function main2:
     x; y; z
 [inout] Inputs for function main2:
@@ -133,4 +133,4 @@
 [inout] Out (internal) for function main:
     \nothing
 [inout] Inputs for function main:
-    _p__fc_fopen; "bla"[0..3]; "bli"[0..3]; v
+    _p__fc_fopen; v

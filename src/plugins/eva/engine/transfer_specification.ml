@@ -12,9 +12,11 @@ open Eval
 (* Applied to the list of behaviors of a function specification, returns the
    default behavior and the list of non-default behaviors. The incoming list
    should not be empty (it contains at least the default behavior). *)
-let extract_default_behavior =
+let get_default_behavior kf =
   let rec extract acc = function
-    | [] -> assert false
+    | [] ->
+      Self.abort "No default behavior in the specification of function %a."
+        Kernel_function.pretty kf
     | behavior :: tail ->
       if behavior.b_name = Cil.default_behavior_name
       then behavior, acc @ tail
@@ -529,7 +531,7 @@ module Make
     let kf, kinstr = Callstack.top_call call.callstack in
     if warn then warn_allocates kf spec.spec_behavior;
     (* The default behavior, and the list of other behaviors. *)
-    let default_bhv, behaviors = extract_default_behavior spec.spec_behavior in
+    let default_bhv, behaviors = get_default_behavior kf spec.spec_behavior in
     let find_behavior name = List.find (fun b -> b.b_name = name) behaviors in
     (* List of complete sets of behaviors. *)
     let complete_behaviors =

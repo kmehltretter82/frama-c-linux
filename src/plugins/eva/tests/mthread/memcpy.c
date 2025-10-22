@@ -1,5 +1,5 @@
 /* run.config*
-   STDOPT: +"-eva-builtin memcpy:Frama_C_memcpy -mt-verbose 3 -eva-warn-key builtins:override=inactive"
+   STDOPT: +"-eva-builtin memcpy:Frama_C_memcpy -mt-verbose 3 -eva-warn-key builtins:override=inactive,builtins:missing-spec=inactive"
 */
 
 // Make sure that Mthread respects options -val-builtin and -val-use-spec

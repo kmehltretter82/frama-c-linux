@@ -810,15 +810,11 @@
 [from] Function cos:
   \result FROM x
 [from] Function printf_va_1:
-  S___fc_stdout[0].__fc_FILE_data
-               FROM "For all-zero input, the proposed IDCT shall generate all-zero "[0..62];
-                     S___fc_stdout[0] (and SELF)
-  \result FROM "For all-zero input, the proposed IDCT shall generate all-zero "[0..62];
-                S___fc_stdout[0]
+  S___fc_stdout[0].__fc_FILE_data FROM S___fc_stdout[0] (and SELF)
+  \result FROM S___fc_stdout[0]
 [from] Function printf_va_2:
-  S___fc_stdout[0].__fc_FILE_data
-               FROM "output.\n"[0..8]; S___fc_stdout[0] (and SELF)
-  \result FROM "output.\n"[0..8]; S___fc_stdout[0]
+  S___fc_stdout[0].__fc_FILE_data FROM S___fc_stdout[0] (and SELF)
+  \result FROM S___fc_stdout[0]
 [from] Function sqrt:
   \result FROM x
 [from] Function IEEE_1180_1990_dctf:
@@ -853,10 +849,8 @@
   idct_mc1[0..7][0..7] FROM idct_init (and SELF)
   idct_mc2[0..7][0..7] FROM idct_init (and SELF)
   S___fc_stdout[0].__fc_FILE_data
-               FROM "For all-zero input, the proposed IDCT shall generate all-zero "[0..62];
-                     "output.\n"[0..8]; M1[0..7][0..7]; idct_init;
-                    idct_mc1[0..7][0..7]; idct_mc2[0..7][0..7];
-                    S___fc_stdout[0] (and SELF)
+               FROM M1[0..7][0..7]; idct_init; idct_mc1[0..7][0..7];
+                    idct_mc2[0..7][0..7]; S___fc_stdout[0] (and SELF)
   \result FROM M1[0..7][0..7]; IEEE_1180_1990_rand_randx;
                IEEE_1180_1990_rand_z; IEEE_1180_1990_dctf_mcos[0..7][0..7];
                IEEE_1180_1990_dctf_init;
@@ -902,12 +896,10 @@
     idct_init; idct_mc1[0..7][0..7]; idct_mc2[0..7][0..7]; __retres;
     S___fc_stdout[0].__fc_FILE_data
 [inout] Inputs for function main:
-    "For all-zero input, the proposed IDCT shall generate all-zero "[0..62];
-    "output.\n"[0..8]; M1[0..7][0..7]; IEEE_1180_1990_rand_randx;
-    IEEE_1180_1990_rand_z; IEEE_1180_1990_dctf_mcos[0..7][0..7];
-    IEEE_1180_1990_dctf_init; IEEE_1180_1990_idctf_mcos[0..7][0..7];
-    IEEE_1180_1990_idctf_init; idct_init; idct_mc1[0..7][0..7];
-    idct_mc2[0..7][0..7]; S___fc_stdout[0]
+    M1[0..7][0..7]; IEEE_1180_1990_rand_randx; IEEE_1180_1990_rand_z;
+    IEEE_1180_1990_dctf_mcos[0..7][0..7]; IEEE_1180_1990_dctf_init;
+    IEEE_1180_1990_idctf_mcos[0..7][0..7]; IEEE_1180_1990_idctf_init;
+    idct_init; idct_mc1[0..7][0..7]; idct_mc2[0..7][0..7]; S___fc_stdout[0]
 [report] Computing properties status...
 --------------------------------------------------------------------------------
 --- Global Properties

@@ -140,7 +140,7 @@ depends: [
   "ocp-indent" { with-dev-setup & >= "1.8.1" }
   "odoc" { with-doc }
   "unionFind" { >= "20220109" }
-  "why3" { >= "1.8.0" & < "1.9.0" }
+  "why3" { >= "1.8.2" & < "1.9.0" }
   "yaml" { >= "3.0.0" }
   "yojson" {>= "1.6.0" & (>= "2.0.1" | !with-test)}
   "zarith" { >= "1.13" }
@@ -190,6 +190,7 @@ Run 'ivette' once to finalize installation (requires an internet connection).
 Once finalized, 'ivette' will work offline.
 Finalization also requires Node v20 or v22 and Yarn:
 - install NVM (https://github.com/nvm-sh/nvm)
+- run 'nvm install 22'
 - run 'nvm use 22'
 - run 'npm install --global yarn'" { success }
 ]

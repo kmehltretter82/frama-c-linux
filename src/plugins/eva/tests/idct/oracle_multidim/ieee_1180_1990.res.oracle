@@ -236,41 +236,27 @@
 < [from] Done for function printf_va_1
 < [from] Computing for function printf_va_2 <-main
 < [from] Done for function printf_va_2
-812,821d665
+812,817d665
 < [from] Function printf_va_1:
-<   S___fc_stdout[0].__fc_FILE_data
-<                FROM "For all-zero input, the proposed IDCT shall generate all-zero "[0..62];
-<                      S___fc_stdout[0] (and SELF)
-<   \result FROM "For all-zero input, the proposed IDCT shall generate all-zero "[0..62];
-<                 S___fc_stdout[0]
+<   S___fc_stdout[0].__fc_FILE_data FROM S___fc_stdout[0] (and SELF)
+<   \result FROM S___fc_stdout[0]
 < [from] Function printf_va_2:
+<   S___fc_stdout[0].__fc_FILE_data FROM S___fc_stdout[0] (and SELF)
+<   \result FROM S___fc_stdout[0]
+851,853d698
 <   S___fc_stdout[0].__fc_FILE_data
-<                FROM "output.\n"[0..8]; S___fc_stdout[0] (and SELF)
-<   \result FROM "output.\n"[0..8]; S___fc_stdout[0]
-855,859d698
-<   S___fc_stdout[0].__fc_FILE_data
-<                FROM "For all-zero input, the proposed IDCT shall generate all-zero "[0..62];
-<                      "output.\n"[0..8]; M1[0..7][0..7]; idct_init;
-<                     idct_mc1[0..7][0..7]; idct_mc2[0..7][0..7];
-<                     S___fc_stdout[0] (and SELF)
-902,903c741
+<                FROM M1[0..7][0..7]; idct_init; idct_mc1[0..7][0..7];
+<                     idct_mc2[0..7][0..7]; S___fc_stdout[0] (and SELF)
+896,897c741
 <     idct_init; idct_mc1[0..7][0..7]; idct_mc2[0..7][0..7]; __retres;
 <     S___fc_stdout[0].__fc_FILE_data
 ---
 >     idct_init; idct_mc1[0..7][0..7]; idct_mc2[0..7][0..7]; __retres
-905,910c743,746
-<     "For all-zero input, the proposed IDCT shall generate all-zero "[0..62];
-<     "output.\n"[0..8]; M1[0..7][0..7]; IEEE_1180_1990_rand_randx;
-<     IEEE_1180_1990_rand_z; IEEE_1180_1990_dctf_mcos[0..7][0..7];
-<     IEEE_1180_1990_dctf_init; IEEE_1180_1990_idctf_mcos[0..7][0..7];
-<     IEEE_1180_1990_idctf_init; idct_init; idct_mc1[0..7][0..7];
-<     idct_mc2[0..7][0..7]; S___fc_stdout[0]
+902c746
+<     idct_init; idct_mc1[0..7][0..7]; idct_mc2[0..7][0..7]; S___fc_stdout[0]
 ---
->     M1[0..7][0..7]; IEEE_1180_1990_rand_randx; IEEE_1180_1990_rand_z;
->     IEEE_1180_1990_dctf_mcos[0..7][0..7]; IEEE_1180_1990_dctf_init;
->     IEEE_1180_1990_idctf_mcos[0..7][0..7]; IEEE_1180_1990_idctf_init;
 >     idct_init; idct_mc1[0..7][0..7]; idct_mc2[0..7][0..7]
-1132,1154d967
+1124,1146d967
 < [    -    ] Assertion 'Eva,initialization' (file idct.c, line 129)
 <             assert Eva: initialization: \initialized(&tmp1[i][j]);
 <             tried with Eva.
@@ -294,7 +280,7 @@
 <             assert Eva: initialization: \initialized(&tmp1[i][j]);
 <             By RedundantAlarms, with pending:
 <              - Assertion 'Eva,initialization' (file idct.c, line 145)
-1158,1180d970
+1150,1172d970
 < [    -    ] Assertion 'Eva,initialization' (file idct.c, line 163)
 <             assert Eva: initialization: \initialized(&tmp1[i][j]);
 <             tried with Eva.
@@ -318,11 +304,11 @@
 <             assert Eva: initialization: \initialized(&tmp1[i][j]);
 <             By RedundantAlarms, with pending:
 <              - Assertion 'Eva,initialization' (file idct.c, line 180)
-1202,1204d991
+1194,1196d991
 < [    -    ] Assertion 'Eva,initialization' (file ieee_1180_1990.c, line 109)
 <             assert Eva: initialization: \initialized(&tmp1[i][j]);
 <             tried with Eva.
-1208,1241d994
+1200,1233d994
 < [    -    ] Assertion 'Eva,initialization' (file ieee_1180_1990.c, line 116)
 <             assert Eva: initialization: \initialized(&tmp2[i][j]);
 <             tried with Eva.
@@ -357,11 +343,11 @@
 < [    -    ] Assertion 'Eva,float_to_int' (file ieee_1180_1990.c, line 124)
 <             assert Eva: float_to_int: tmp2[i][j] - 0.5 < 2147483648;
 <             tried with Eva.
-1262,1264d1014
+1254,1256d1014
 < [    -    ] Assertion 'Eva,initialization' (file ieee_1180_1990.c, line 150)
 <             assert Eva: initialization: \initialized(&tmp1[i][j]);
 <             tried with Eva.
-1268,1301d1017
+1260,1293d1017
 < [    -    ] Assertion 'Eva,initialization' (file ieee_1180_1990.c, line 157)
 <             assert Eva: initialization: \initialized(&tmp2[i][j]);
 <             tried with Eva.
@@ -396,7 +382,7 @@
 < [    -    ] Assertion 'Eva,float_to_int' (file ieee_1180_1990.c, line 165)
 <             assert Eva: float_to_int: tmp2[i][j] - 0.5 < 2147483648;
 <             tried with Eva.
-1401,1417c1117,1123
+1393,1409c1117,1123
 < [ Partial ] Assertion 'Eva,initialization' (file ieee_1180_1990.c, line 358)
 <             assert Eva: initialization: \initialized(&res[i].pmse[j][k]);
 <             By RedundantAlarms, with pending:
@@ -422,7 +408,7 @@
 >             reachability of stmt line 196 in main
 >             by Eva.
 > [  Dead   ] Instance of 'Pre-condition (file FRAMAC_SHARE/libc/stdio.h, line 237)' at call 'printf_va_1' (file ieee_1180_1990.c, line 195)
-1421,1422c1127,1130
+1413,1414c1127,1130
 <             by Eva.
 < [  Valid  ] Instance of 'Pre-condition (file FRAMAC_SHARE/libc/stdio.h, line 237)' at call 'printf_va_2' (file ieee_1180_1990.c, line 196)
 ---
@@ -430,18 +416,18 @@
 >             By Eva because:
 >              - Unreachable call 'printf_va_1' (file ieee_1180_1990.c, line 195)
 > [  Dead   ] Instance of 'Pre-condition (file FRAMAC_SHARE/libc/stdio.h, line 237)' at call 'printf_va_2' (file ieee_1180_1990.c, line 196)
-1426c1134,1136
+1418c1134,1136
 <             by Eva.
 ---
 >             Locally valid, but unreachable.
 >             By Eva because:
 >              - Unreachable call 'printf_va_2' (file ieee_1180_1990.c, line 196)
-1483,1484c1193
+1475,1476c1193
 <     36 Completely validated
 <     16 Locally validated
 ---
 >     34 Completely validated
-1486,1487c1195,1198
+1478,1479c1195,1198
 <     56 To be validated
 <    160 Total
 ---

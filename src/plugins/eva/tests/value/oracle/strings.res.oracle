@@ -325,14 +325,14 @@
 [from] Function strcmp:
   \result FROM s1_0; s2_0; tc[0..29]; long_chain_0[0..30]
 [from] Function long_chain:
-  \result FROM nondet; "really really really long chain"[0..31]
+  \result FROM nondet
 [from] Function strcpy:
   NON TERMINATING - NO EFFECTS
 [from] Function string_writes:
   s5 FROM nondet; s3
   s6 FROM nondet; s3
   R FROM nondet; s3
-  \result FROM s4; "tutu"[0]
+  \result FROM s4
 [from] Function strlen:
   \result FROM s1[0..4]; s
 [from] Function u:
@@ -340,7 +340,7 @@
 [from] Function string_comparison:
   s5 FROM s3; s8
   s6 FROM s3; s4; s8
-  cc FROM "toto"[0]
+  cc FROM \nothing
   Q FROM s7 (and SELF)
   R FROM s3; s4 (and SELF)
   S FROM \nothing (and SELF)
@@ -351,7 +351,7 @@
   X FROM s3 (and SELF)
   Y FROM s3; s8 (and SELF)
   Z FROM s3; s4; s8 (and SELF)
-  \result FROM "toto"[0]
+  \result FROM \nothing
 [from] Function string_reads:
   s1{[3]; [6]} FROM cc
   R FROM \nothing (and SELF)
@@ -364,7 +364,7 @@
   s1{[3]; [6]} FROM cc
   s5 FROM s3; s8
   s6 FROM s3; s4; s8
-  cc FROM "toto"[0]
+  cc FROM \nothing
   Q FROM s7 (and SELF)
   R FROM nondet; s3; s4
   S FROM \nothing (and SELF)
@@ -383,7 +383,7 @@
 [inout] Out (internal) for function long_chain:
     tc[0..29]; long_chain_0[0..31]; x
 [inout] Inputs for function long_chain:
-    nondet; "really really really long chain"[0..31]
+    nondet
 [inout] Out (internal) for function strcpy:
     src; ldst; b[0..4]; tmp_unfold_46; tmp_1_unfold_46; tmp_0_unfold_46;
     tmp_unfold_49; tmp_1_unfold_49; tmp_0_unfold_49; tmp_unfold_52;
@@ -395,7 +395,7 @@
 [inout] Out (internal) for function string_writes:
     s5; s6; R; c; tmp; __retres
 [inout] Inputs for function string_writes:
-    nondet; s3; s4; "tutu"[0]; s5; s6; cc
+    nondet; s3; s4; s5; s6; cc
 [inout] Out (internal) for function strlen:
     s; l; tmp_unfold_106; tmp_unfold_109; tmp_unfold_112; tmp_unfold_115;
     tmp_unfold_118; tmp_unfold_121
@@ -406,12 +406,12 @@
     tmp_3; tmp_4; tmp_5; tmp_6; tmp_7; tmp_8; tmp_9; tmp_10; tmp_11; tmp_12;
     tmp_13; tmp_14; __retres
 [inout] Inputs for function string_comparison:
-    s3; s4; s5; s6; s7; s8; cc; "toto"[0]
+    s3; s4; s5; s6; s7; s8; cc
 [inout] Out (internal) for function string_reads:
     s1{[3]; [6]}; R; S; T; p; tmp; tmp_0; tmp_1; tmp_2; a[0..9]; b[0..4];
     tmp_3; tmp_4; __retres
 [inout] Inputs for function string_reads:
-    s1[0..5]; cc; "Not ok"[0..6]
+    s1[0..5]; cc
 [inout] Out (internal) for function wide_string_comparison:
     w1; w2; w3; res
 [inout] Inputs for function wide_string_comparison:
@@ -419,5 +419,4 @@
 [inout] Out (internal) for function main:
     s1{[3]; [6]}; s5; s6; cc; Q; R; S; T; U; V; W; X; Y; Z
 [inout] Inputs for function main:
-    nondet; s1[0..5]; s3; s4; "tutu"[0]; s5; s6; s7; s8; cc; "Not ok"[0..6];
-    "toto"[0]; "really really really long chain"[0..31]
+    nondet; s1[0..5]; s3; s4; s5; s6; s7; s8; cc

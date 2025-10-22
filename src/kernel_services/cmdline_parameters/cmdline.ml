@@ -58,7 +58,7 @@ let dkey = Kernel_log.register_category "cmdline"
 
 let quiet_ref = ref false
 let deterministic = ref false
-let tty = ref Unix.(isatty stdout)
+let tty = ref Unix.(isatty stdout && Ansi_escape.is_supported ())
 let permissive = ref false
 let compress_saved_session = ref true
 
@@ -279,7 +279,18 @@ let warning name msg =
 
 let all_options = match Array.to_list Sys.argv with
   | [] -> assert false
-  | _binary :: l -> l
+  | _binary :: l ->
+    let all =
+      match Sys.getenv_opt "FRAMAC_DEVONLY_OPTIONS_PRE" with
+      | Some s -> String.split_on_char ' ' s @ l
+      | None -> l
+    in
+    let all =
+      match Sys.getenv_opt "FRAMAC_DEVONLY_OPTIONS_POST" with
+      | Some s -> all @ String.split_on_char ' ' s
+      | None -> all
+    in
+    all
 
 let get_option_and_arg option arg =
   try
