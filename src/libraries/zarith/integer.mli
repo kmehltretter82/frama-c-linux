@@ -103,8 +103,8 @@ val e_div : t -> t -> t
 [@@migrate { repl = Z.ediv } ]
 
 val e_rem : t -> t -> t
-[@@deprecated "Use Z.e_rem instead."]
-[@@migrate { repl = Z.e_rem } ]
+[@@deprecated "Use Z.erem instead."]
+[@@migrate { repl = Z.erem } ]
 (** Remainder of the Euclidean division (always positive).
     Implemented by [Z.erem] *)
 
