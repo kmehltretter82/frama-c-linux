@@ -100,8 +100,8 @@ let rec compile ({origin} as exp) =
 and compile_context_insensitive {Interlang.enode; origin} =
   let* {kf; loc} = M.read in
   match enode with
-  | True -> M.return (Cil.one ~loc, None)
-  | False -> M.return (Cil.zero ~loc, None)
+  | True -> M.return (Cil.one ~loc, Some (Analyses_types.C_number, ""))
+  | False -> M.return (Cil.zero ~loc, Some (Analyses_types.C_number, ""))
   | Integer n ->
     (* cf Translate_terms.constant_to_exp *)
     let origin = match origin with
