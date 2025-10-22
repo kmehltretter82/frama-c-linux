@@ -2368,21 +2368,6 @@ handled when placed at the top-level of the type of a global variable
 or formal argument. Other \lstinline|const| locations are considered
 writable.
 
-\subsection{Alignment of memory accesses}
-
-\Eva{} currently does not check that memory accesses are
-properly aligned in memory. It assumes that non-aligned accesses have
-only a small time penalty (instead of causing an exception) and that the
-programmer is aware of this penalty and is accessing (or seems to be accessing)
-memory in a misaligned way on purpose. %% A more restrictive option
-%% would be quick to implement if someone needed it. Meanwhile,
-%% instructions to explicitly check for the alignment of some accesses
-%% can be inserted in the code following the howto at
-%% \url{http://bts.frama-c.com/dokuwiki/doku.php?id=mantis:frama-c:explicit_alignment_howto}.
-% Removed: not in open-source version
-
-%TODOBY: incomplete: many other kind of UB are not tracked
-
 \section{Loops}
 \label{boucles}
 
