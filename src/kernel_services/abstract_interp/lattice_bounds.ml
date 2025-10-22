@@ -15,6 +15,15 @@ type 'a or_top = [ `Value of 'a | `Top ]
 type 'a or_top_bottom = [ `Value of 'a | `Bottom | `Top ]
 
 
+(* Internal representation of OCaml types above, used for safe unmarshalling.
+   Polymorphic variants with parameters are boxed with an extra header word
+   to store the value, as compared to normal variants. Polymorphic variants
+   with no parameters are unboxed.
+   Cf https://ocaml.org/docs/memory-representation *)
+let make_structural_descr x =
+  Structural_descr.t_sum [| [| Datatype.Int.packed_descr; x |] |]
+
+
 
 (** Common functions *)
 
@@ -173,7 +182,7 @@ module Bottom = struct
         let () = incr counter
         let name = X.datatype_name ^ "+bottom(" ^ string_of_int !counter ^ ")"
         let reprs = `Bottom :: Stdlib.List.map (fun v -> `Value v) X.reprs
-        let structural_descr = Structural_descr.t_unknown
+        let structural_descr = make_structural_descr X.packed_descr
         let hash = Common.hash X.hash
         let equal = (Common.equal X.equal :> t -> t -> bool)
         let compare = Common.compare X.compare
@@ -256,7 +265,7 @@ module Top = struct
         let () = incr counter
         let name = X.datatype_name ^ "+top(" ^ string_of_int !counter ^ ")"
         let reprs = `Top :: Stdlib.List.map (fun v -> `Value v) X.reprs
-        let structural_descr = Structural_descr.t_unknown
+        let structural_descr = make_structural_descr X.packed_descr
         let hash = Common.hash X.hash
         let equal = (Common.equal X.equal :> t -> t -> bool)
         let compare = Common.compare X.compare
@@ -345,7 +354,7 @@ module TopBottom = struct
         let () = incr counter
         let name = X.datatype_name ^ "+top_bottom(" ^ string_of_int !counter ^ ")"
         let reprs = `Bottom :: `Top :: (Stdlib.List.map (fun v -> `Value v) X.reprs)
-        let structural_descr = Structural_descr.t_unknown
+        let structural_descr = make_structural_descr X.packed_descr
         let hash = Common.hash X.hash
         let equal = (Common.equal X.equal :> t -> t -> bool)
         let compare = Common.compare X.compare
