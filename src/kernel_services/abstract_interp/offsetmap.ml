@@ -10,20 +10,16 @@ open Abstract_interp
 module Bottom = Lattice_bounds.Bottom
 
 (* This module uses Zarith everywhere. Set up some notations *)
-let pretty_int = Z.pretty
-let ( =~ ) = Z.equal
-let ( <>~ ) x y = not (Z.equal x y)
-let ( <~ ) = Z.lt
-let ( >~ ) = Z.gt
-let ( <=~ ) = Z.leq
-let ( >=~ ) = Z.geq
-let ( +~ ) = Z.add
-let ( -~ ) = Z.sub
-(* let ( *~ ) = Z.mul *)
+let ( =~ )  = Z.(=)
+let ( <>~ ) = Z.(<>)
+let ( <~ )  = Z.(<)
+let ( >~ )  = Z.(>)
+let ( <=~ ) = Z.(<=)
+let ( >=~ ) = Z.(>=)
+let ( +~ ) = Z.(+)
+let ( -~ ) = Z.(-)
 let ( /~ ) = Z.ediv
 let ( %~ ) = Z.erem
-let succ = Z.succ
-let pred = Z.pred
 
 (** Offsetmaps are unbalanced trees that map intervals to values, with
     the additional properties that the shape of the tree is entirely determined
@@ -138,7 +134,7 @@ module Make
 
   let pretty_offset_aux s curr_off ppf tree =
     if tree == Empty
-    then Format.fprintf ppf "@[empty at %a@]" pretty_int curr_off
+    then Format.fprintf ppf "@[empty at %a@]" Z.pretty curr_off
     else
       let rec pretty_offset s curr_off ppf tree =
         match tree with
@@ -147,10 +143,10 @@ module Make
           pretty_offset "" (curr_off +~ offl) ppf subl;
           Format.fprintf ppf "@[%s[%a..%a] -> (%a, %a, %a);@]@ "
             s
-            pretty_int curr_off
-            pretty_int (max +~ curr_off)
+            Z.pretty curr_off
+            Z.pretty (max +~ curr_off)
             Rel.pretty rem
-            pretty_int modu
+            Z.pretty modu
             V.pretty v;
           pretty_offset "" (curr_off +~ offr) ppf subr;
       in pretty_offset s curr_off ppf tree
@@ -158,7 +154,7 @@ module Make
 
   let _pretty_offset fmt (off, t) =
     Format.fprintf fmt "@[<v><off: %a>@ %a@]"
-      pretty_int off (pretty_offset_aux "r" off) t;
+      Z.pretty off (pretty_offset_aux "r" off) t;
   ;;
 
   let pretty fmt t =
@@ -172,16 +168,16 @@ module Make
       | Node (max, offl, subl, offr, subr, rem, modu, v, tag) ->
         Format.fprintf fmt "@[<h 2>@[[%a..%a]@ (%a, %a,@ %a){%d,%x}@]@\n@[<h 2>-- \
                             %a -->@\n%a@]@\n@[<h 2>-- %a -->@\n%a@]@]"
-          pretty_int curr_off
-          pretty_int (curr_off +~ max)
+          Z.pretty curr_off
+          Z.pretty (curr_off +~ max)
           Rel.pretty rem
-          pretty_int modu
+          Z.pretty modu
           V.pretty v
           tag
           (Extlib.address_of_value tree)
-          pretty_int offl
+          Z.pretty offl
           aux_pdebug (curr_off +~ offl, subl)
-          pretty_int offr
+          Z.pretty offr
           aux_pdebug (curr_off +~ offr, subr)
     in
     aux_pdebug fmt (curr_off, tree);
@@ -375,7 +371,7 @@ module Make
     else if min2 <=~ Z.zero && max2 >=~ Z.zero then false
     else
       let signature_interval min max =
-        Z.logxor (pred min) max
+        Z.logxor (Z.pred min) max
       in
       signature_interval min1 max1 >~ signature_interval min2 max2
 
@@ -395,13 +391,13 @@ module Make
       | End -> printf "@ E@."
       | Right (o, Node(max, _, _, _, _subr, _, _, _, _),z ) ->
         fprintf ppf "@[<h 2> [%a,%a] R@\n%a@]"
-          pretty_int o
-          pretty_int (o +~ max)
+          Z.pretty o
+          Z.pretty (o +~ max)
           aux z
       | Left (o, Node(max, _, _, _, _subr, _, _, _, _),z ) ->
         fprintf ppf "@[<h 2> [%a,%a] L@\n%a@]"
-          pretty_int o
-          pretty_int (o +~ max)
+          Z.pretty o
+          Z.pretty (o +~ max)
           aux z
       |  Right (_, Empty, _) | Left (_, Empty, _) -> assert false
     in aux ppf z;
@@ -485,7 +481,7 @@ module Make
       | Empty -> curr_off (* This bit is bound, unless [m] itself is empty *)
       | Node (_, offl, subl, _, _, _, _, _, _) -> min (curr_off +~ offl) subl
     and max curr_off = function
-      | Empty -> pred curr_off (* [curr_off] is not bound, [curr_off-1] is. *)
+      | Empty -> Z.pred curr_off (* [curr_off] is not bound, [curr_off-1] is. *)
       | Node (_, _, _, offr, subr, _, _, _, _) -> max (curr_off +~ offr) subr
     in
     assert (m != Empty);
@@ -598,7 +594,7 @@ module Make
           then
             begin
               let curr_offr, new_subr = rezip zr (offset +~ noffr) nsubr in
-              let new_max = succ (max +~ nmax) in
+              let new_max = Z.succ (max +~ nmax) in
               let new_offr = curr_offr -~ curr_off
               in
               new_max, new_offr, new_subr
@@ -620,7 +616,7 @@ module Make
               ~left_offset:offset ~left ~right_offset:curr_off ~right:curr_vv
           then (
             let new_curr_offl, new_subl = rezip zl (offset +~ noffl) nsubl in
-            let succ_nmax = succ nmax in
+            let succ_nmax = Z.succ nmax in
             let lmax = max +~ succ_nmax in
             let new_offl = new_curr_offl -~ offset in
             let new_offr = offr +~ succ_nmax in
@@ -642,14 +638,14 @@ module Make
       then Rel.zero, Z.one
       else rem, modu
     in
-    nNode span Z.zero m_empty (succ span) m_empty rem modu v
+    nNode span Z.zero m_empty (Z.succ span) m_empty rem modu v
 
   (* creates a fresh tree that binds [0..size-1] to the isotropic value [v].
      if [size] if 0, returns [Empty]. *)
   let isotropic_interval size v =
     if Z.is_zero size then Empty
     else
-      nNode (pred size) Z.zero m_empty size m_empty Rel.zero Z.one v
+      nNode (Z.pred size) Z.zero m_empty size m_empty Rel.zero Z.one v
 
   (** Smart add node:
       Adds a node to the current tree and merges (new) consecutive intervals
@@ -677,9 +673,9 @@ module Make
             else
               begin
                 (*     Format.printf "L@ co:%a@ t:%a@ [%a...%a]@.@."
-                       pretty_int curr_off
+                       Z.pretty curr_off
                        (pretty_offset curr_off) tree
-                       pretty_int min pretty_int max
+                       Z.pretty min Z.pretty max
                        ; *)
                 let new_curr_offl, new_node =
                   aux_add (curr_off +~ noffl) nsubl
@@ -696,7 +692,7 @@ module Make
                 let new_offl = abs_min -~ min in
                 let new_max = max -~ min in
                 make_node
-                  min new_max new_offl tree (succ new_max) m_empty rem modu v
+                  min new_max new_offl tree (Z.succ new_max) m_empty rem modu v
               end
             else
               begin
@@ -731,7 +727,7 @@ module Make
     | Node (max, offl, subl, offr, subr, rem, modu, _v, _) ->
       assert (Rel.check ~rem ~modu);
       assert (not (is_empty subl) || Z.is_zero offl);
-      assert (not (is_empty subr) || offr =~ succ max);
+      assert (not (is_empty subr) || offr =~ Z.succ max);
       let abs_min = curr_off
       and abs_max = curr_off +~ max in
       let aux offset tree =
@@ -764,7 +760,7 @@ module Make
     else
       let max_test =
         if amax1 <~ amax2
-        then (succ mabs_max) %~ m1 =~ r1
+        then (Z.succ mabs_max) %~ m1 =~ r1
         else true
       in
       let ok_min = amin1 =~ amin2 || mabs_min %~ m1 =~ r1
@@ -964,7 +960,7 @@ module Make
           cache (abs_offl1, subl1) (abs_offl2, subl2), abs_min1, rem1, rem2
         else if abs_min1 <~ abs_min2 then
           let new_offl1, new_subl1 =
-            add_node ~min:abs_min1 ~max:(pred abs_min2)
+            add_node ~min:abs_min1 ~max:(Z.pred abs_min2)
               rem1 modu1 v1 abs_offl1 subl1
           in
           let new_rem1 = realign ~offset:o1 ~new_offset:o2 rem1 modu1 in
@@ -973,7 +969,7 @@ module Make
         else
           begin (* abs_min1 >~ abs_min2 *)
             let new_offl2, new_subl2 =
-              add_node ~min:abs_min2 ~max:(pred abs_min1) rem2 modu2
+              add_node ~min:abs_min2 ~max:(Z.pred abs_min1) rem2 modu2
                 v2 abs_offl2 subl2
             in
             let new_rem2 = realign ~offset:o2 ~new_offset:o1 rem2 modu2 in
@@ -987,7 +983,7 @@ module Make
         if abs_max1 =~ abs_max2 then
           cache (abs_offr1, subr1) (abs_offr2, subr2), abs_max1
         else if abs_max1 <~ abs_max2 then
-          let min = succ abs_max1 in
+          let min = Z.succ abs_max1 in
           let rem2 = realign ~offset:o2 ~new_offset:min rem2 modu2 in
           let new_offr2, new_subr2 =
             add_node ~min ~max:abs_max2 rem2 modu2 v2 abs_offr2 subr2
@@ -995,7 +991,7 @@ module Make
           cache (abs_offr1, subr1) (new_offr2, new_subr2), abs_max1
         else
           begin (* abs_max1 >~ abs_max2 *)
-            let min = succ abs_max2 in
+            let min = Z.succ abs_max2 in
             let rem1 = Rel.erem (Rel.add (Rel.sub_abs o1 min) rem1) modu1 in
             let new_offr1, new_subr1 =
               add_node ~min ~max:abs_max1 rem1 modu1 v1 abs_offr1 subr1
@@ -1035,7 +1031,7 @@ module Make
       if Machine.little_endian () then
         start,stop
       else
-        let mmodu = pred modu in
+        let mmodu = Z.pred modu in
         mmodu -~ stop, mmodu -~ start
     in
     V.extract_bits ~start ~stop ~size:modu v
@@ -1065,13 +1061,13 @@ module Make
       let abs_max = curr_off +~ max in
       (*  last bit to be read,
           be it in the current node or one of its successors *)
-      let max_bit = pred (offset +~ size) in
+      let max_bit = Z.pred (offset +~ size) in
       (* for this function, [min >= offset && min >= curr_off] holds *)
       let extract_single_step min acc =
         assert (not (V.is_isotropic v));
         let interval_offset = min -~ offset in
         let start = (min -~ rem) %~ modu in
-        let modu_end = if rem =~ Z.zero then pred modu else pred rem in
+        let modu_end = if rem =~ Z.zero then Z.pred modu else Z.pred rem in
         (* where do we stop reading ?
            either at the end of the current slice (round_up_to_r min) or
            at the end of the interval (abs_max)
@@ -1085,10 +1081,10 @@ module Make
         (*       Format.printf "Single step: interval offset %a length %a \
                  start %a stop %a total length %a offset %a max bit %a\
                  @\n current offset %a Rem %a modu %a V %a@."
-                 pretty_int interval_offset pretty_int (Z.length start stop)
-                 pretty_int start pretty_int stop pretty_int size
-                 pretty_int offset pretty_int max_bit
-                 pretty_int curr_off pretty_int rem pretty_int modu V.pretty v ; *)
+                 Z.pretty interval_offset Z.pretty (Z.length start stop)
+                 Z.pretty start Z.pretty stop Z.pretty size
+                 Z.pretty offset Z.pretty max_bit
+                 Z.pretty curr_off Z.pretty rem Z.pretty modu V.pretty v ; *)
         (* we ignore the 'inform' information here (and everywhere else in
            this module, since we do not propagate it), because it is mostly
            redundant with the 'origin' information in garbled mix *)
@@ -1115,14 +1111,14 @@ module Make
         while !start_point <=~ stop do
           let read_end, result = extract_single_step !start_point !acc in
           acc := result;
-          start_point := succ read_end;
+          start_point := Z.succ read_end;
         done;
         !acc;
     in
     (* Format.printf "extract_bits_and_stitch istart@ %a@ size %a\
        coff %a abs_max -- val %a@\n  acc %a res %a@."
-       pretty_int offset pretty_int size pretty_int curr_off
-       (\* pretty_int (curr_off +~ (get_max node)) *\)
+       Z.pretty offset Z.pretty size Z.pretty curr_off
+       (\* Z.pretty (curr_off +~ (get_max node)) *\)
        V.pretty v  V.pretty acc V.pretty r; *)
     r
   ;;
@@ -1139,8 +1135,8 @@ module Make
     then
       rem1, modu1, V.anisotropic_cast ~size:modu1 (merge_v modu1 v1 v2)
       (*  Format.printf "f_aux_merge: [%a, %a]@.(%a %a %a)@.(%a %a %a)@."
-          pretty_int abs_min pretty_int abs_max pretty_int rem1 pretty_int
-          modu1 V.pretty v1 pretty_int rem2 pretty_int modu2 V.pretty v2 ; *)
+          Z.pretty abs_min Z.pretty abs_max Z.pretty rem1 Z.pretty
+          modu1 V.pretty v1 Z.pretty rem2 Z.pretty modu2 V.pretty v2 ; *)
     else
       let topify = Origin.Merge in
       let offset = abs_min in
@@ -1162,9 +1158,9 @@ module Make
          reinterpreted, so the alignment is always zero here. *)
       let rem = Rel.zero in
       (*     Format.printf "1: (%a, %a, %a);@.2: (%a, %a, %a);@.[%a--%a] -> %a/%a@."
-             pretty_int rem1 pretty_int modu1 V.pretty v1
-             pretty_int rem2 pretty_int modu2 V.pretty v2
-             pretty_int abs_min pretty_int abs_max
+             Z.pretty rem1 Z.pretty modu1 V.pretty v1
+             Z.pretty rem2 Z.pretty modu2 V.pretty v2
+             Z.pretty abs_min Z.pretty abs_max
              V.pretty v1' V.pretty v2'; *)
       rem, size, merge_v size v1' v2'
   ;;
@@ -1407,7 +1403,7 @@ module Make
     | Empty -> assert false
     | Node (max, _, _, _, _subr, rrel, m, v, _) ->
       let r = (Rel.add_abs cur_off rrel) %~ m in
-      let read_ending = pred (start +~ size) in
+      let read_ending = Z.pred (start +~ size) in
       let node_ending = cur_off +~ max in
       let isotropic = V.is_isotropic v in
       let read_fit_in_node = read_ending <=~ node_ending in
@@ -1469,7 +1465,7 @@ module Make
              may overlap with the next node, and must be performed. So
              we rewind by [pred size] bits, then round up to the next periodic
              index that must be read. *)
-          let min_next = (succ read_ahead) -~ (pred size) in
+          let min_next = (Z.succ read_ahead) -~ (Z.pred size) in
           Z.round_up_to_r ~min:min_next ~r ~modu:period
       in
       (* Do not read past [max]. *)
@@ -1508,7 +1504,7 @@ module Make
      performs the read of each node. *)
   let read_successive_nodes ~read_one_node acc =
     fun ~offset node zipper ~start ~size ->
-    let read_end = pred (start +~ size) in
+    let read_end = Z.pred (start +~ size) in
     let rec read_nodes offset node zipper acc =
       let node_end = offset +~ (get_max node) in
       let t = read_one_node ~offset node ~start ~size acc in
@@ -1550,7 +1546,7 @@ module Make
       let min = (Z.max offset start) -~ start in
       (* Same kind of reasoning for the end of the current copy. *)
       let node_end = offset +~ max in
-      let read_end = pred (start +~ size) in
+      let read_end = Z.pred (start +~ size) in
       let max = (Z.min read_end node_end) -~ start in
       (* For the first node, if the read starts in the middle of the node,
          realign the value wrt the offset of the read (but not wrt the offset of
@@ -1573,7 +1569,7 @@ module Make
         let read_one_node = copy_one_node in
         let neutral = m_empty in
         let read_nodes = read_successive_nodes ~read_one_node neutral in
-        let read_value v size = interval_aux (pred size) Rel.zero size v in
+        let read_value v size = interval_aux (Z.pred size) Rel.zero size v in
         read ~offsets ~size tree ~read_value ~read_nodes ~join
 
   (* Keep the part of the tree strictly under (i.e. strictly on the left) of a
@@ -1594,7 +1590,7 @@ module Make
           curr_off,
           nNode max offl subl (new_offr -~ curr_off) new_subr rem m v
         else
-          let new_max = pred (offset -~ curr_off) in
+          let new_max = Z.pred (offset -~ curr_off) in
           add_node
             ~min:curr_off ~max:(new_max +~ curr_off)
             rem m v
@@ -1605,7 +1601,7 @@ module Make
      given offset. *)
   let rec keep_above ~offset curr_off tree =
     match tree with
-    | Empty -> (succ offset), tree
+    | Empty -> (Z.succ offset), tree
     | Node (max, offl, subl, offr, subr, rem, m, v, _) ->
       let new_offr = offr +~ curr_off in
       let abs_max = curr_off +~ max in
@@ -1630,7 +1626,7 @@ module Make
       else
         (* the cut happens somewhere in this node it should be cut
            accordingly and reinjected into its right subtree *)
-        let min = succ offset in
+        let min = Z.succ offset in
         let new_reml = realign ~offset:curr_off ~new_offset:min rem m in
         add_node ~min ~max:abs_max new_reml m v new_offr subr
   ;;
@@ -1703,7 +1699,7 @@ module Make
             left_tree := new_left_tree;
             left_offset := new_left_offset;
             if not end_reached then imp_move_right impz
-            else impz.offset <- succ abs_max
+            else impz.offset <- Z.succ abs_max
         done;
         union !left_offset !left_tree off1 t1
   ;;
@@ -1724,7 +1720,7 @@ module Make
 
         let new_offl, new_subl, undone_left =
           let last_read_max_offset = curr_off -~ size in
-          if pred (mn +~ size) <~ curr_off then
+          if Z.pred (mn +~ size) <~ curr_off then
             let new_mx = Z.round_down_to_r
                 ~max:last_read_max_offset ~r ~modu:period
             in
@@ -1739,7 +1735,7 @@ module Make
 
         and new_offr, new_subr, undone_right =
           let abs_max = curr_off +~ max in
-          let first_read_min_offset = succ abs_max in
+          let first_read_min_offset = Z.succ abs_max in
           if mx >~ abs_max then
             let new_mn = Z.round_up_to_r
                 ~min:first_read_min_offset ~r ~modu:period
@@ -1766,14 +1762,14 @@ module Make
             let update = update_itv ~exact in
             if size =~ period
             then
-              let abs_max = pred (size +~ max) in
+              let abs_max = Z.pred (size +~ max) in
               update ~offset:min ~abs_max ~size v curr_off tree
             else
               let offset = ref min in
               let o = ref curr_off in
               let t = ref tree in
               while !offset <=~ max do
-                let abs_max = pred (size +~ !offset) in
+                let abs_max = Z.pred (size +~ !offset) in
                 let o', t' =
                   update ~offset:!offset ~abs_max ~size v !o !t
                 in
@@ -1798,7 +1794,7 @@ module Make
     match offsets with
     | Tr_offset.Overlap _ -> false
     | Tr_offset.Interval(mn, mx, period) ->
-      let number = succ ((mx -~ mn) /~ period) in
+      let number = Z.succ ((mx -~ mn) /~ period) in
       let plevel = !plevel in
       if number <=~ Z.of_int plevel || period =~ size then false
       else true
@@ -1821,7 +1817,7 @@ module Make
       update_itv ~exact ~offset:mn ~abs_max:mx ~size:Z.one v curr_off t
 
     | Tr_offset.Interval(mn, mx, period) ->
-      let number = succ ((mx -~ mn) /~ period) in
+      let number = Z.succ ((mx -~ mn) /~ period) in
       let plevel = !plevel in
       assert (period >=~ size); (* Checked by Tr_offset *)
       if number <=~ Z.of_int plevel || period =~ size then
@@ -1832,8 +1828,8 @@ module Make
              [period] unnecessarily, warn the user *)
           Abstract_interp.feedback_approximation
             "more than %d(%a) locations to update in array. Approximating."
-            plevel pretty_int number;
-        let abs_max = pred (mx +~ size) in
+            plevel Z.pretty number;
+        let abs_max = Z.pred (mx +~ size) in
         let v =
           if Z.is_zero (period %~ size) then v
           else
@@ -1851,7 +1847,7 @@ module Make
       List.fold_left
         (fun (curr_off, m) offset ->
            update_itv ~exact ~offset ~size
-             ~abs_max:(pred (offset +~ size)) v curr_off m
+             ~abs_max:(Z.pred (offset +~ size)) v curr_off m
         ) (curr_off, t) s
 
     | Tr_offset.Invalid  ->
@@ -2057,9 +2053,9 @@ module Make
           match typ with
           | None ->
             Format.fprintf fmt "[rbits %a to %a]"
-              pretty_int bk pretty_int ek ;
+              Z.pretty bk Z.pretty ek ;
             (* misalign condition: *)
-            (not (Rel.is_zero rel_offs) || (ek -~ bk <>~ pred modu))
+            (not (Rel.is_zero rel_offs) || (ek -~ bk <>~ Z.pred modu))
             && not (V.is_isotropic v),
             None
 
@@ -2075,13 +2071,13 @@ module Make
           if Rel.is_zero rel_offs && (Z.length bk ek) %~ modu =~ Z.zero
           then
             (if Z.length bk ek >~ modu then
-               Format.fprintf fmt " repeated %%%a " pretty_int modu)
+               Format.fprintf fmt " repeated %%%a " Z.pretty modu)
           else (
             let b_bits = Rel.erem (Rel.sub Rel.zero rel_offs) modu  in
             let e_bits = Rel.add_abs (ek -~ bk) b_bits in
             Format.fprintf fmt "%s%%%a, bits %a to %a "
               (if e_bits >~ modu then " repeated " else "")
-              pretty_int modu Rel.pretty b_bits pretty_int e_bits
+              Z.pretty modu Rel.pretty b_bits Z.pretty e_bits
           );
         Format.fprintf fmt "@]";
       end
@@ -2107,18 +2103,18 @@ module Make
   let create ~size v ~size_v =
     assert (Z.geq size 0z);
     if Z.is_zero size then Empty
-    else snd (Z.zero, interval_aux (pred size) Rel.zero size_v v)
+    else snd (Z.zero, interval_aux (Z.pred size) Rel.zero size_v v)
 
   let cardinal_zero_or_one offsetmap =
     (singleton_tag offsetmap) <> 0
 
   let of_list fold l size_elt =
-    let s = pred size_elt in
+    let s = Z.pred size_elt in
     let n = ref Z.zero in
     let addw acc v =
       let e = !n +~ s in
       let r = append_basic_itv ~min:!n ~max:e ~v acc in
-      n := succ e;
+      n := Z.succ e;
       r
     in
     let r = fold addw m_empty l in
@@ -2164,7 +2160,7 @@ module Make
              [min..min_range-1] with unchanged value.  *)
           let acc =
             if min <~ min_range
-            then snd (add_node ~min ~max:(pred min_range) rem modu v offset acc)
+            then snd (add_node ~min ~max:(Z.pred min_range) rem modu v offset acc)
             else acc
           in
           (* On the intersection between [min..max] and the validity, updates
@@ -2180,7 +2176,7 @@ module Make
              changes, the relative value alignment must be recomputed.  *)
           if max >~ max_range
           then
-            let new_min = succ max_range in
+            let new_min = Z.succ max_range in
             let new_rem = realign ~offset:min ~new_offset:new_min rem modu in
             snd (add_node ~min:new_min ~max new_rem modu v offset acc)
           else acc
@@ -2302,11 +2298,11 @@ module Int_Intervals_Map = struct
   let enlarge_itv co m ~prev_min ~new_min ~prev_max ~new_max : itvs =
     let co, m as i =
       if new_max >~ prev_max then
-        add_itv ~min:(succ prev_max) ~max:new_max false co m
+        add_itv ~min:(Z.succ prev_max) ~max:new_max false co m
       else co, m
     in
     if new_min <~ prev_min then
-      add_itv ~min:new_min ~max:(pred prev_min) false co m
+      add_itv ~min:new_min ~max:(Z.pred prev_min) false co m
     else i
 
   (* shrinks the offsetmap [m] from range [prev_min..prev_max] to
@@ -2315,11 +2311,11 @@ module Int_Intervals_Map = struct
   let shrink_itv co m ~prev_min ~new_min ~prev_max ~new_max : itvs =
     let co, m as i =
       if new_max <~ prev_max then
-        keep_below ~offset:(succ new_max) co m
+        keep_below ~offset:(Z.succ new_max) co m
       else co, m
     in
     if new_min >~ prev_min then
-      keep_above ~offset:(pred new_min) co m
+      keep_above ~offset:(Z.pred new_min) co m
     else i
 
   (* Resize size [m] to size [new_min..new_max], by enlarging or shrinking
@@ -2328,15 +2324,15 @@ module Int_Intervals_Map = struct
     let co, m as i =
       if new_max =~ prev_max then co, m
       else if new_max >~ prev_max then
-        add_itv ~min:(succ prev_max) ~max:new_max false co m
+        add_itv ~min:(Z.succ prev_max) ~max:new_max false co m
       else (* new_max <~ prev_max *)
-        keep_below ~offset:(succ new_max) co m
+        keep_below ~offset:(Z.succ new_max) co m
     in
     if new_min =~ prev_min then i
     else if new_min <~ prev_min then
-      add_itv ~min:new_min ~max:(pred prev_min) false co m
+      add_itv ~min:new_min ~max:(Z.pred prev_min) false co m
     else (* new_min >~ prev_min *)
-      keep_above ~offset:(pred new_min) co m
+      keep_above ~offset:(Z.pred new_min) co m
 
 
   (* normalizes a non-empty offsetmap [m], by removing an eventual rightmost
@@ -2349,7 +2345,7 @@ module Int_Intervals_Map = struct
       curr_off, node, curr_off +~ max
     | Node (_, offl, subl, _, Empty, _, _, false, _) ->
       (* we are the rightmost interval, and false; keep only the left tree *)
-      curr_off +~ offl, subl, pred curr_off
+      curr_off +~ offl, subl, Z.pred curr_off
     | Node (max, offl, subl, offr, (Node _ as subr), _, _, v, _) ->
       (* Normalize the right tree and rebuild. *)
       let new_rcurr_off, new_rtree, rbit =
@@ -2377,7 +2373,7 @@ module Int_Intervals_Map = struct
       curr_off, node, curr_off
     | Node (max, _, Empty, offr, subr, _, _, false, _) ->
       (* we are the leftmost interval, and false; keep only the right tree *)
-      curr_off +~ offr, subr, succ (curr_off +~ max)
+      curr_off +~ offr, subr, Z.succ (curr_off +~ max)
     | Node (max, offl, (Node _ as subl), offr, subr, _, _, v, _) ->
       (* normalize the left subtree and rebuild *)
       let new_lcurr_off, new_ltree, lbit =
@@ -2706,7 +2702,7 @@ module Int_Intervals = struct
          it for all intervals. *)
       let aux_min_max min start_max =
         if Z.is_zero size then Bottom else
-          let max = pred (start_max +~ size) in
+          let max = Z.pred (start_max +~ size) in
           let curr_off, ifalse = aux_create_interval ~min ~max false in
           let validity = Base.Known (min, max) in
           let curr_off', i =
@@ -2748,7 +2744,7 @@ module Int_Intervals = struct
         | None, _ | _, None -> Bottom (* imprecise *)
         | Some min, Some start_max ->
           (* See if using [from_ival_size] would cause an approximation *)
-          let max = pred (start_max +~ size) in
+          let max = Z.pred (start_max +~ size) in
           let validity = Base.Known (min, max) in
           let offsets = Tr_offset.trim_by_validity ival size validity in
           if Int_Intervals_Map.update_aux_tr_offsets_approximates offsets size
