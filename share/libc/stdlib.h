@@ -535,13 +535,18 @@ extern long int jrand48 (unsigned short xsubi[3]);
       is_alignment(n) && n < __FC_IMPLEM_MAX_ALIGN;
 */
 
-#if __STDC_VERSION__ == 201112L
-/*@ requires valid_alignment: is_valid_alignment(alignment);
+/*@
+  #if __STDC_VERSION__ == 201112L
+    requires valid_alignment: is_valid_alignment(alignment);
     requires alignment_modulo: size % alignment == 0;
+  #endif
     allocates \result;
     assigns __fc_heap_status \from size, __fc_heap_status;
     assigns \result, __fc_errno \from indirect:size, indirect:__fc_heap_status;
     behavior allocation:
+      #if __STDC__VERSION == 201112L
+      assumes valid_alignment: is_valid_alignment(alignment);
+      #endif
       assumes can_allocate: is_allocable(size);
       assigns __fc_heap_status \from size, __fc_heap_status;
       assigns \result \from indirect:size, indirect:__fc_heap_status;
@@ -550,42 +555,24 @@ extern long int jrand48 (unsigned short xsubi[3]);
       ensures errno_same: __fc_errno == \old(__fc_errno);
     behavior no_allocation:
       assumes cannot_allocate: !is_allocable(size);
-      allocates \nothing;
-      assigns \result \from \nothing;
-      ensures null_result: \result==\null;
-      ensures errno_set: __fc_errno == ENOMEM;
-    complete behaviors;
-    disjoint behaviors;
-*/
-#else
-/*@ allocates \result;
-    assigns __fc_heap_status \from size, __fc_heap_status;
-    assigns \result, __fc_errno \from indirect:size, indirect:__fc_heap_status;
-    behavior allocation:
-      assumes can_allocate: is_allocable(size);
+      #if __STDC_VERSION == 201112L
       assumes valid_alignment: is_valid_alignment(alignment);
-      assigns __fc_heap_status \from size, __fc_heap_status;
-      assigns \result \from indirect:size, indirect:__fc_heap_status;
-      ensures allocation: \fresh(\result,size);
-      ensures alignment: \aligned(\result, alignment);
-      ensures errno_same: __fc_errno == \old(__fc_errno);
-    behavior no_allocation_cannot_allocate:
-      assumes cannot_allocate: !is_allocable(size);
+      #endif
       allocates \nothing;
       assigns \result \from \nothing;
       ensures null_result: \result==\null;
       ensures errno_set: __fc_errno == ENOMEM;
+    #if __STDC_VERSION == 201112L
     behavior no_allocation_invalid_align:
       assumes cannot_allocate: !is_valid_alignment(alignment);
       allocates \nothing;
       assigns \result \from \nothing;
       ensures null_result: \result==\null;
       ensures errno_set: __fc_errno == EINVAL;
-
+    #endif
     complete behaviors;
     disjoint behaviors;
 */
-#endif
 extern void* aligned_alloc (size_t alignment, size_t size);
 
 /* ISO C: 7.20.3.1 */

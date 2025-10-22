@@ -423,7 +423,7 @@ char *__gen_e_acsl_realpath(char const * restrict file_name,
     __gen_e_acsl_assert_data_2.pred_txt = "resolved_name == \\null || \\valid(resolved_name + (0 .. 4096 - 1))";
     __gen_e_acsl_assert_data_2.file = "FRAMAC_SHARE/libc/stdlib.h";
     __gen_e_acsl_assert_data_2.fct = "realpath";
-    __gen_e_acsl_assert_data_2.line = 1103;
+    __gen_e_acsl_assert_data_2.line = 1090;
     __gen_e_acsl_assert_data_2.name = "resolved_name_null_or_allocated";
     __e_acsl_assert(__gen_e_acsl_or,& __gen_e_acsl_assert_data_2);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
@@ -454,7 +454,7 @@ char *__gen_e_acsl_realpath(char const * restrict file_name,
       __gen_e_acsl_assert_data_4.pred_txt = "__fc_errno == 22";
       __gen_e_acsl_assert_data_4.file = "FRAMAC_SHARE/libc/stdlib.h";
       __gen_e_acsl_assert_data_4.fct = "realpath";
-      __gen_e_acsl_assert_data_4.line = 1114;
+      __gen_e_acsl_assert_data_4.line = 1101;
       __gen_e_acsl_assert_data_4.name = "null_file_name/errno_set";
       __e_acsl_assert(errno == 22,& __gen_e_acsl_assert_data_4);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
@@ -463,7 +463,7 @@ char *__gen_e_acsl_realpath(char const * restrict file_name,
       __gen_e_acsl_assert_data_3.pred_txt = "\\result == \\null";
       __gen_e_acsl_assert_data_3.file = "FRAMAC_SHARE/libc/stdlib.h";
       __gen_e_acsl_assert_data_3.fct = "realpath";
-      __gen_e_acsl_assert_data_3.line = 1113;
+      __gen_e_acsl_assert_data_3.line = 1100;
       __gen_e_acsl_assert_data_3.name = "null_file_name/null_result";
       __e_acsl_assert(__retres == (char *)0,& __gen_e_acsl_assert_data_3);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
@@ -484,7 +484,7 @@ char *__gen_e_acsl_realpath(char const * restrict file_name,
       __gen_e_acsl_assert_data_7.pred_txt = "__fc_errno == 12";
       __gen_e_acsl_assert_data_7.file = "FRAMAC_SHARE/libc/stdlib.h";
       __gen_e_acsl_assert_data_7.fct = "realpath";
-      __gen_e_acsl_assert_data_7.line = 1129;
+      __gen_e_acsl_assert_data_7.line = 1116;
       __gen_e_acsl_assert_data_7.name = "not_enough_memory/errno_set";
       __e_acsl_assert(errno == 12,& __gen_e_acsl_assert_data_7);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
@@ -493,7 +493,7 @@ char *__gen_e_acsl_realpath(char const * restrict file_name,
       __gen_e_acsl_assert_data_6.pred_txt = "\\result == \\null";
       __gen_e_acsl_assert_data_6.file = "FRAMAC_SHARE/libc/stdlib.h";
       __gen_e_acsl_assert_data_6.fct = "realpath";
-      __gen_e_acsl_assert_data_6.line = 1128;
+      __gen_e_acsl_assert_data_6.line = 1115;
       __gen_e_acsl_assert_data_6.name = "not_enough_memory/null_result";
       __e_acsl_assert(__retres == (char *)0,& __gen_e_acsl_assert_data_6);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
@@ -513,7 +513,7 @@ char *__gen_e_acsl_realpath(char const * restrict file_name,
       __gen_e_acsl_assert_data_9.pred_txt = "\\result == \\old(resolved_name)";
       __gen_e_acsl_assert_data_9.file = "FRAMAC_SHARE/libc/stdlib.h";
       __gen_e_acsl_assert_data_9.fct = "realpath";
-      __gen_e_acsl_assert_data_9.line = 1141;
+      __gen_e_acsl_assert_data_9.line = 1128;
       __gen_e_acsl_assert_data_9.name = "resolved_name_buffer/resolved_result";
       __e_acsl_assert(__retres == __gen_e_acsl_at,
                       & __gen_e_acsl_assert_data_9);
@@ -531,7 +531,7 @@ char *__gen_e_acsl_realpath(char const * restrict file_name,
       __gen_e_acsl_assert_data_10.pred_txt = "\\result == \\null";
       __gen_e_acsl_assert_data_10.file = "FRAMAC_SHARE/libc/stdlib.h";
       __gen_e_acsl_assert_data_10.fct = "realpath";
-      __gen_e_acsl_assert_data_10.line = 1147;
+      __gen_e_acsl_assert_data_10.line = 1134;
       __gen_e_acsl_assert_data_10.name = "filesystem_error/null_result";
       __e_acsl_assert(__retres == (char *)0,& __gen_e_acsl_assert_data_10);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_10);
