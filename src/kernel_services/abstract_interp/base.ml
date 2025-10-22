@@ -146,9 +146,10 @@ let bits_sizeof v =
 let alignof base =
   try
     match base with
-    | Null -> 0
+    | Null -> 0 (* Address of null is 0. *)
     | CLogic_Var (_, typ, _) -> Cil.bytesAlignOf typ
     | Var (vi, _) | Allocated (vi, _, _) -> Cil.bytesAlignOfVarinfo vi
+  (* Any address is possible: no alignment constraint. *)
   with Cil.SizeOfError _ -> 1
 
 let dep_absolute = [Kernel.AbsoluteValidRange.self]
