@@ -3,7 +3,7 @@
   syntax error:
   Location: line 221, between columns 25 and 26, before or at token: _Alignas
   219   #ifdef ALIGNAS_FUNCTION_3
-  220   // note: no smart message, we just check that it is not capture as an attribute
+  220   // note: no smart message, we just check that it is not captured as an attribute
   221   void c17_6_7_5_2_c(int x) _Alignas(8) ;
                                  ^
   222   #endif

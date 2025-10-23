@@ -55,8 +55,8 @@ struct Al4
 void c17_6_2_8_1(void) // _Alignas cannot specify a weaker alignment
 // + c17_6_2_8_2       // _Alignas(n) with n <= _Alignof(max_align_t) always allowed
 {
-  // Note: on our test archictecture long int == long long int
-  // Note: on our test archictecture alignof(double) == 4
+  // Note: on our test architecture long int == long long int
+  // Note: on our test architecture alignof(double) == 4
 
   _Static_assert(_Alignof(max_align_t) == 16);
 
@@ -204,7 +204,7 @@ struct c17_6_7_5_2_b
 #endif
 
 #ifdef ALIGNAS_FUNCTION_1
-// note: no smart message, we just check that it is not capture as an attribute
+// note: no smart message, we just check that it is not captured as an attribute
 void c17_6_7_5_2_c(int x) _Alignas(8)
 {
 }
@@ -217,7 +217,7 @@ _Alignas(8) void c17_6_7_5_2_c(int x)
 #endif
 
 #ifdef ALIGNAS_FUNCTION_3
-// note: no smart message, we just check that it is not capture as an attribute
+// note: no smart message, we just check that it is not captured as an attribute
 void c17_6_7_5_2_c(int x) _Alignas(8) ;
 #endif
 
