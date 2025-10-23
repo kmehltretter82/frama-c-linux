@@ -500,12 +500,12 @@ validity:
 void f(void)
 {
   int a[4];
-  /*@ assert rte: pointer_value: \null == &a[4] && \object_pointer(&a[4]); */
+  /*@ assert rte: pointer_value: \null == &a[4] || \object_pointer(&a[4]); */
   int *p = & a[4];
-  /*@ assert rte: pointer_value: \null == p + 1 && \object_pointer(p + 1); */
+  /*@ assert rte: pointer_value: \null == p + 1 || \object_pointer(p + 1); */
   p ++;
   /*@ assert
-        rte: pointer_value: \null == (int *)4 && \object_pointer((int *)4);
+        rte: pointer_value: \null == (int *)4 || \object_pointer((int *)4);
   */
   int *q = (int *)4;
   return;
@@ -535,7 +535,7 @@ void f(void)
   int *p1 = (int *)(a1);
   /*@ assert rte: pointer_alignment: \aligned((char *)a2,alignof(int)); */
   int *p2 = (int *)(a2);
-  /*@ assert rte: pointer_alignment: \aligned((int)1,alignof(int)); */
+  /*@ assert rte: pointer_alignment: \aligned((int*)1,alignof(int)); */
   int *q = (int *)1;
   return;
 }
@@ -559,7 +559,7 @@ void f(void)
   short *p2;
   char *ptr = & c;
   memcpy(& p2,& ptr,sizeof(ptr));
-  /*@ assert rte: pointer_value: \null == p2 && \object_pointer(p2); */
+  /*@ assert rte: pointer_value: \null == p2 || \object_pointer(p2); */
   /*@ assert rte: pointer_alignment: \aligned(p2,alignof(short)); */
   short *r2 = p2;
   return;
@@ -593,7 +593,7 @@ Section~\ref{sec:initialization}.
 
 Pointer alignment is handled like what we previously explained in
 Section~\ref{subsec:invalid-pointer}. Validity for dereferencing is handled
-via the \acsl{} built-in predicate \lstinline|valid(p)|: \lstinline|valid(s)|
+via the \acsl{} built-in predicate \lstinline|\valid(p)|: \lstinline|\valid(s)|
 (where \lstinline|s| is a set of terms) holds if and only if dereferencing any
 $\lstinline|p| \in \lstinline|s|$ is safe (i.e. points to a safely allocated
 memory location).  A distinction is made for read accesses, that generate
