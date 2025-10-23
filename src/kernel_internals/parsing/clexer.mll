@@ -149,6 +149,7 @@ let init_lexicon () =
   valid "_Alignas" (fun loc -> ALIGNAS loc) ;
   c23 "alignof" (fun loc -> ALIGNOF loc) ;
   valid "_Alignof" (fun loc -> ALIGNOF loc) ;
+  valid "_Generic" (fun loc -> GENERIC loc) ;
   (*** Implementation specific keywords ***)
   valid "__signed__" (fun loc -> SIGNED loc) ;
   valid "__inline__" (fun loc -> INLINE loc) ;
@@ -204,7 +205,6 @@ let init_lexicon () =
   unsupported "_Complex" ;
   unsupported "_Decimal32" ;
   unsupported "_Decimal64" ;
-  valid "_Generic" (fun loc -> GENERIC loc) ;
   unsupported "_Imaginary" ;
   unsupported "__int128" ;
   unsupported "__uint128_t"
