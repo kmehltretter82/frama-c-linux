@@ -35,16 +35,16 @@ module type S = sig
 
   (** {2 Creating basic offsetmaps} *)
 
-  val create: size:Int.t -> v -> size_v:Int.t -> t
+  val create: size:Z.t -> v -> size_v:Z.t -> t
   (** [create ~size v ~size_v] creates an offsetmap of size [size] in which the
       intervals [k*size_v .. (k+1)*size_v-1] with [0<= k <= size/size_v] are all
       mapped to [v].  *)
 
-  val create_isotropic: size:Int.t -> v -> t
+  val create_isotropic: size:Z.t -> v -> t
   (** Same as {!create}, but for values that are isotropic. In this case,
       [size_v] is automatically computed. *)
 
-  val of_list: ((t -> v -> t) -> t -> 'l -> t) -> 'l -> Int.t -> t
+  val of_list: ((t -> v -> t) -> t -> 'l -> t) -> 'l -> Z.t -> t
   (** [from_list fold c size] creates an offsetmap by applying the iterator
       [fold] to the container [c], the elements of [c] being supposed to
       be of size [size]. [c] must be such that [fold] is called at least
@@ -65,7 +65,7 @@ module type S = sig
   (** {2 Iterators} *)
 
   val iter:
-    ((Int.t * Int.t) -> (v * Int.t * Rel.t) -> unit) ->
+    ((Z.t * Z.t) -> (v * Z.t * Rel.t) -> unit) ->
     t -> unit
   (** [iter f m] calls [f] on all the intervals bound in [m], in increasing
       order. The arguments of [f (min, max) (v, size, offset)] are as follows:
@@ -78,15 +78,15 @@ module type S = sig
   *)
 
   val fold:
-    ((Int.t * Int.t) -> (v * Int.t * Rel.t) -> 'a -> 'a) ->
+    ((Z.t * Z.t) -> (v * Z.t * Rel.t) -> 'a -> 'a) ->
     t -> 'a -> 'a
   (** Same as [iter], but with an accumulator. *)
 
   val fold_between:
     ?direction:[`LTR | `RTL] ->
     entire:bool ->
-    Int.t * Int.t ->
-    ((Int.t * Int.t) -> (v * Int.t * Rel.t) -> 'a -> 'a) ->
+    Z.t * Z.t ->
+    ((Z.t * Z.t) -> (v * Z.t * Rel.t) -> 'a -> 'a) ->
     t -> 'a -> 'a
   (** [fold_between ~direction:`LTR ~entire (start, stop) m acc] is similar to
       [fold f m acc], except that only the intervals that intersect [start..stop]
@@ -204,7 +204,7 @@ module type S = sig
 
   (** {2 Adding values} *)
 
-  val add : ?exact:bool -> (Int.t * Int.t) -> (v * Int.t * Rel.t) -> t -> t
+  val add : ?exact:bool -> (Z.t * Z.t) -> (v * Z.t * Rel.t) -> t -> t
   (** [add (min, max) (v, size, offset) m] maps the interval
       [min..max] (inclusive) to the value [v] in [m]. [v] is assumed as having
       size [size]. If [stop-start+1] is greater than [size], [v] repeats itself
@@ -218,7 +218,7 @@ module type S = sig
     validity:Base.validity ->
     exact:bool ->
     offsets:Ival.t ->
-    size:Int.t ->
+    size:Z.t ->
     v ->
     t -> t Lattice_bounds.or_bottom
   (** [update ?origin ~validity ~exact ~offsets ~size v m] writes [v],
@@ -233,7 +233,7 @@ module type S = sig
     validity:Base.validity ->
     exact:bool ->
     offsets:Ival.t ->
-    size:Int.t ->
+    size:Z.t ->
     v ->
     t -> t Lattice_bounds.or_bottom
   (** Same as {!update}, except that no over-approximation on the set
@@ -254,7 +254,7 @@ module type S = sig
     validity:Base.validity ->
     exact:bool ->
     from:t ->
-    size:Int.t ->
+    size:Z.t ->
     offsets:Ival.t ->
     t -> t Lattice_bounds.or_bottom
 

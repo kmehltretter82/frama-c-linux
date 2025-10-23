@@ -562,11 +562,11 @@ let to_do_on_select
               main_ui#pretty_information
                 "This is a C enumeration constant, \
                  defined in %a with a value of %a.@."
-                Gui_printers.pp_typ typ_enum Abstract_interp.Int.pretty i
+                Gui_printers.pp_typ typ_enum Z.pretty i
             | _ ->
               main_ui#pretty_information
                 "This is a constant C expression of type %a, equal to %a.@."
-                Gui_printers.pp_typ typ Abstract_interp.Int.pretty i
+                Gui_printers.pp_typ typ Z.pretty i
           end
         | None ->
           main_ui#pretty_information "This is a pure C expression of type %a.@."

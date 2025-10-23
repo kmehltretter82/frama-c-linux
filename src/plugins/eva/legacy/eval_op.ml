@@ -13,7 +13,7 @@ open Abstract_interp
 open Lattice_bounds
 
 let offsetmap_of_v ~typ v =
-  let size = Int.of_int (Cil.bitsSizeOf typ) in
+  let size = Z.of_int (Cil.bitsSizeOf typ) in
   let v = V_Or_Uninitialized.initialized v in
   V_Offsetmap.create ~size v ~size_v:size
 
@@ -75,7 +75,7 @@ let reduce_by_initialized_defined f loc state =
     if Base.is_weak base then raise Unchanged;
     let size = Int_Base.project loc.Locations.size in
     let ll = Ival.project_int offset in
-    let lh = Int.pred (Int.add ll size) in
+    let lh = Z.pred (Z.add ll size) in
     let offsm = match Model.find_base_or_default base state with
       | `Bottom | `Top -> raise Unchanged
       | `Value offsm -> offsm
@@ -84,7 +84,7 @@ let reduce_by_initialized_defined f loc state =
       let v' = f v in
       if v' != v then begin
         if V_Or_Uninitialized.is_bottom v' then raise Reduce_to_bottom;
-        let il = Int.max offl ll and ih = Int.min offh lh in
+        let il = Z.max offl ll and ih = Z.min offh lh in
         let abs_shift = Z.erem (Rel.add_abs offl shift) modu in
         (* il and ih are the bounds of the interval to reduce.
            We change the initialized flags in the following cases:
@@ -93,9 +93,9 @@ let reduce_by_initialized_defined f loc state =
            - or we do not lose information on misaligned or partial values:
              the result is a singleton *)
         if V_Or_Uninitialized.(cardinal_zero_or_one v' || is_isotropic v') ||
-           ((Int.equal offl il || Int.equal (Int.erem ll modu) abs_shift) &&
-            (Int.equal offh ih ||
-             Int.equal (Int.erem (Int.succ lh) modu) abs_shift))
+           ((Z.equal offl il || Z.equal (Z.erem ll modu) abs_shift) &&
+            (Z.equal offh ih ||
+             Z.equal (Z.erem (Z.succ lh) modu) abs_shift))
         then
           let diff = Rel.sub_abs il offl in
           let shift_il = Rel.erem (Rel.sub shift diff) modu in
@@ -150,8 +150,8 @@ let make_loc_contiguous loc =
     else
       let min, max, _rem, modu = Ival.min_max_r_mod offset in
       match min, max, loc.Locations.size with
-      | Some min, Some max, Int_Base.Value size when Int.equal modu size ->
-        let size' = Int.add (Int.sub max min) modu in
+      | Some min, Some max, Int_Base.Value size when Z.equal modu size ->
+        let size' = Z.add (Z.sub max min) modu in
         let i = Ival.inject_singleton min in
         let loc_bits = Locations.Location_Bits.inject base i in
         Locations.make_loc loc_bits (Int_Base.inject size')
@@ -224,8 +224,8 @@ let find_offsm_under validity ival size offsm acc =
     List.fold_left find acc list
   | Tr_offset.Interval (min, max, modu) ->
     let process (start, _stop) (v, v_size, v_offset) acc =
-      if Rel.(equal v_offset zero) && Int.equal v_size size
-         && Int.equal (Int.erem (Int.sub start min) modu) Int.zero
+      if Rel.(is_zero v_offset) && Z.equal v_size size
+         && Z.is_zero (Z.erem (Z.sub start min) modu)
       then add_if_singleton v acc
       else acc
     in

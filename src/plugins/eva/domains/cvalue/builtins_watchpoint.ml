@@ -39,7 +39,7 @@ let add_watch make_watch state actuals =
     let size =
       try
         let size = Cvalue.V.project_ival size in
-        Int.mul 8z (Ival.project_int size)
+        Z.mul 8z (Ival.project_int size)
       with V.Not_based_on_null | Ival.Not_Singleton_Int ->
         raise Builtins.Outside_builtin_possibilities
     in

@@ -100,7 +100,7 @@ module V = struct
 
   let of_int64 i = inject_ival (Ival.of_int64 i)
 
-  let inject_int (v:Int.t) =
+  let inject_int (v:Z.t) =
     inject_ival (Ival.inject_singleton v)
 
   let inject_float f =
@@ -150,7 +150,7 @@ module V = struct
          is of type [typ_match]. If no such offset exists, find an offset
          that does not have the proper type. *)
       let conv_offset ioffset =
-        let ioffsbits = Int.mul ioffset (Bit_utils.sizeofchar ()) in
+        let ioffsbits = Z.mul ioffset (Bit_utils.sizeofchar ()) in
         let find_match om =
           fst (Bit_utils.find_offset typ_base ~offset:ioffsbits om)
         in
@@ -427,7 +427,7 @@ module V = struct
     let integer_part'= on_null ~size ~signed integer_part in
     (* no_garble indicates that we do _not_ create a (new) garbled mix *)
     let no_garble =
-      Int.geq size (Int.of_int (Bit_utils.sizeofpointer ())) ||
+      Z.geq size (Z.of_int (Bit_utils.sizeofpointer ())) ||
       is_bottom pointer_part || is_imprecise pointer_part
     in
     if no_garble && integer_part' == integer_part then
@@ -600,9 +600,9 @@ module V = struct
         let ptr_size =
           Z.of_int (Cil.bitsSizeOfInt (Machine.uintptr_kind ()))
         in
-        if Int.equal start Int.zero &&
-           Int.equal (Int.succ stop) ptr_size &&
-           Int.equal size ptr_size
+        if Z.equal start Z.zero &&
+           Z.equal (Z.succ stop) ptr_size &&
+           Z.equal size ptr_size
         then false, v
         else true, topify origin v
 
@@ -610,7 +610,7 @@ module V = struct
   let shift_left_by_integer ~topify:origin factor v =
     try
       let i = project_ival_bottom v in
-      inject_ival (Ival.scale (Int.two_power factor) i)
+      inject_ival (Ival.scale (Z.two_power factor) i)
     with
     | Not_based_on_null  ->
       if Z.is_zero factor
@@ -640,7 +640,7 @@ module V = struct
   let merge_neutral_element = singleton_zero
 
   let all_values ~size v =
-    if Int.is_zero size then true
+    if Z.is_zero size then true
     else
       try
         let i = project_ival v in
@@ -655,15 +655,15 @@ module V = struct
     inject_ival (Ival.create_all_values ~signed ~size)
 
   let cardinal_estimate lb ~size = match lb with
-    | Top _ -> Int.two_power size (* TODO: this could be very slow when [size]
+    | Top _ -> Z.two_power size (* TODO: this could be very slow when [size]
                                      is big *)
     | Map m ->
       let card =
         M.fold (fun _ v card ->
-            Int.add card (Ival.cardinal_estimate v ~size)
-          ) m Int.zero
+            Z.add card (Ival.cardinal_estimate v ~size)
+          ) m Z.zero
       in
-      Int.min card (Int.two_power size)
+      Z.min card (Z.two_power size)
 
   let add_untyped ~factor v1 v2 =
     add_untyped ~origin:Origin.Arith ~factor v1 v2

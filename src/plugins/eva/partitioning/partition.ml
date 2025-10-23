@@ -610,7 +610,7 @@ struct
           else begin
             Self.result ~once:true ~current:true
               "cannot properly split on \\result == %a"
-              Abstract_interp.Int.pretty i;
+              Z.pretty i;
             None
           end
 

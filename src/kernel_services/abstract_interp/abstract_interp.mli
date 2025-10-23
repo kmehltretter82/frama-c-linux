@@ -46,14 +46,21 @@ end
 
 
 module Int : sig
-  include module type of Z with type t = Z.t
+  include module type of Integer with type t = Integer.t
+    [@@alert "-deprecated"]
+
+  include Datatype.S_with_collections with type t := t
 
   val fold : (t -> 'a -> 'a) -> inf:t -> sup:t -> step:t -> 'a -> 'a
   (** Fold the function on the value between [inf] and [sup] at every
       step. If [step] is positive the first value is [inf] and values
       go increasing, if [step] is negative the first value is [sup]
       and values go decreasing *)
+  [@@deprecated "Use Int_interval.fold_int instead"]
 end
+[@@deprecated "Use Z module instead. You can use OCamlmig (see \
+               Frama-C Plugin Development Guide) or integer.mli for migration \
+               hints"]
 
 (** "Relative" integers. They are subtraction between two absolute integers *)
 module Rel : sig
@@ -69,16 +76,16 @@ module Rel : sig
   val is_zero: t -> bool
 
   val sub : t -> t -> t
-  val add_abs : Int.t -> t -> Int.t
+  val add_abs : Z.t -> t -> Z.t
   val add : t -> t -> t
-  val sub_abs : Int.t -> Int.t -> t
-  val erem: t -> Int.t -> t
+  val sub_abs : Z.t -> Z.t -> t
+  val erem: t -> Z.t -> t
 
-  val e_rem: t -> Int.t -> t
+  val e_rem: t -> Z.t -> t
   [@@deprecated "Use erem instead."]
   [@@migrate { repl = Rel.erem } ]
 
-  val check: rem:t -> modu:Int.t -> bool
+  val check: rem:t -> modu:Z.t -> bool
 end
 
 module Make_Lattice_Set

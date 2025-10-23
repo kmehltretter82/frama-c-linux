@@ -3085,7 +3085,7 @@ type stackElem =
     InArray of offset * typ * int * int ref (* offset of parent, base type,
                                              * length, current index. If the
                                              * array length is unspecified we
-                                             * use Int.max_int  *)
+                                             * use Z.max_int  *)
   | InComp  of offset * compinfo * offset list (* offset of parent,
                                                      base comp, current fields *)
 

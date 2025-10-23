@@ -45,15 +45,15 @@ include Datatype.Make
       let mem_project = Datatype.never_any_project
     end)
 
-let minus_one = Value Int.minus_one
-let one = Value Int.one
-let zero = Value Int.zero
+let minus_one = Value Z.minus_one
+let one = Value Z.one
+let zero = Value Z.zero
 let is_zero x = equal x zero
 let top = Top
 let is_top v = (v = Top)
 let neg x =
   match x with
-  | Value v -> Value (Int.neg v)
+  | Value v -> Value (Z.neg v)
   | Top -> x
 let inject i = Value i
 

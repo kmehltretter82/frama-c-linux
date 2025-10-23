@@ -6,8 +6,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Abstract_interp
-
 (* To be completed with more involved strategies *)
 type split_strategy =
   | NoSplit
@@ -27,7 +25,7 @@ include Datatype.Make (struct
       | NoSplit -> 0
       | SplitAuto -> 1
       | FullSplit -> 2
-      | SplitEqList l -> 3 + Hashtbl.hash (List.map Int.hash l)
+      | SplitEqList l -> 3 + Hashtbl.hash (List.map Z.hash l)
 
     let pretty fmt = function
       | NoSplit -> Format.pp_print_string fmt "no split"

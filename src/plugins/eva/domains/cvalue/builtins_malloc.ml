@@ -194,18 +194,17 @@ type typed_size = {
 let guess_intended_malloc_type stack sizev constant_size =
   let size_min, size_max = extract_size sizev in
   let nb_elems elem_size =
-    if constant_size && Int.equal size_min size_max
-    then Some (if Int.(equal elem_size zero) then Int.zero
-               else Int.ediv size_min elem_size)
+    if constant_size && Z.equal size_min size_max
+    then Some Z.(if is_zero elem_size then zero else ediv size_min elem_size)
     else None
   in
   let mk_typed_size t =
     match Ast_types.unroll_node t with
     | TPtr t when not (Ast_types.is_void t) ->
-      let s = Int.of_int (Cil.bytesSizeOf t) in
-      if Int.(equal s zero) ||
-         (Int.equal (Int.erem size_min s) Int.zero &&
-          Int.equal (Int.erem size_max s) Int.zero)
+      let s = Z.of_int (Cil.bytesSizeOf t) in
+      if Z.(is_zero s ||
+            (is_zero (erem size_min s) &&
+             is_zero (erem size_max s)))
       then
         { min_bytes = size_min; max_bytes = size_max;
           elem_typ = t; nb_elems = nb_elems s }
@@ -220,7 +219,7 @@ let guess_intended_malloc_type stack sizev constant_size =
     | _ -> raise Exit
   with Exit | Cil.SizeOfError _ -> (* Default, use char *)
     { min_bytes = size_min; max_bytes = size_max; elem_typ = Cil_const.charType;
-      nb_elems = nb_elems Int.one }
+      nb_elems = nb_elems Z.one }
 
 (* Helper function to create the best type for a new base.  Builds an
    array type with the appropriate number of elements if needed.  When
@@ -233,7 +232,7 @@ let type_from_nb_elems tsize =
   match tsize.nb_elems with
   | None -> Cil_const.mk_tarray typ None
   | Some nb ->
-    if Int.equal Int.one nb
+    if Z.is_one nb
     then typ
     else
       let loc = Current_loc.get () in
@@ -262,12 +261,12 @@ let offsm_with_v v validity max_alloc =
   let size = Bottom.non_bottom (V_Offsetmap.size_from_validity validity) in
   let offsm = V_Offsetmap.create_isotropic ~size V_Or_Uninitialized.bottom in
   (* max_alloc is -1 when allocating an empty base *)
-  if Int.(lt max_alloc zero) then
+  if Z.(lt max_alloc zero) then
     (* malloc(0) => nothing to uninitialize *)
     offsm
   else (* malloc(i > 0) => uninitialize i bytes *)
-    V_Offsetmap.add ~exact:true (Int.zero, max_alloc)
-      (v, Int.one, Rel.zero) offsm
+    V_Offsetmap.add ~exact:true (Z.zero, max_alloc)
+      (v, Z.one, Rel.zero) offsm
 
 (* add [v] as a possible value for the bits [0..max_valid_bits] of
    [base] in [state].
@@ -307,9 +306,9 @@ let wrap_fallible_alloc ?returns_null ret orig_state state_after_alloc =
   else [ success ]
 
 let pp_validity fmt (v1, v2) =
-  if Int.equal v1 v2
-  then Format.fprintf fmt "0..%a" Int.pretty v1
-  else Format.fprintf fmt "0..%a/%a" Int.pretty v1 Int.pretty v2
+  if Z.equal v1 v2
+  then Format.fprintf fmt "0..%a" Z.pretty v1
+  else Format.fprintf fmt "0..%a/%a" Z.pretty v1 Z.pretty v2
 
 
 (* --------------------------------- Malloc --------------------------------- *)
@@ -328,11 +327,11 @@ let alloc_fresh weak deallocation prefix sizev _state =
     (if weak = Weak then "weak " else "") Printer.pp_varinfo var;
   let size_char = Bit_utils.sizeofchar () in
   (* Sizes are in bits *)
-  let min_alloc = Int.(pred (mul size_char tsize.min_bytes)) in
-  let max_alloc = Int.(pred (mul size_char tsize.max_bytes)) in
+  let min_alloc = Z.(pred (mul size_char tsize.min_bytes)) in
+  let max_alloc = Z.(pred (mul size_char tsize.max_bytes)) in
   (* NOTE: min_alloc/max_alloc may be -1 if the size is zero *)
-  assert Int.(geq min_alloc Int.minus_one);
-  assert Int.(geq max_alloc min_alloc);
+  assert Z.(geq min_alloc Z.minus_one);
+  assert Z.(geq max_alloc min_alloc);
   (* note that min_alloc may be negative (-1) if the allocated size is 0 *)
   let weak = match weak with Weak -> true | Strong -> false in
   let variable_v = Base.create_variable_validity ~weak ~min_alloc ~max_alloc in
@@ -382,7 +381,7 @@ let create_weakest_base region =
   Self.warning ~wkey:wkey_imprecise_alloc ~current:true ~once:true
     "allocating a single weak variable for ALL dynamic allocations %s: %a"
     (string_of_region region) Printer.pp_varinfo var;
-  let min_alloc = Int.minus_one in
+  let min_alloc = Z.minus_one in
   let max_alloc = Bit_utils.max_bit_address () in
   let variable_v =
     Base.create_variable_validity ~weak:true ~min_alloc ~max_alloc
@@ -424,10 +423,10 @@ let update_variable_validity ?(make_weak=false) base sizev =
   | Base.Allocated (vi, _deallocation, (Base.Variable variable_v)) ->
     if make_weak && (variable_v.Base.weak = false) then
       mutate_name_to_weak vi;
-    let min_sure_bits = Int.(pred (mul (of_int 8) size_min)) in
-    let max_valid_bits = Int.(pred (mul (of_int 8) size_max)) in
-    if not (Int.equal variable_v.Base.min_alloc min_sure_bits) ||
-       not (Int.equal variable_v.Base.max_alloc max_valid_bits)
+    let min_sure_bits = Z.(pred (mul (of_int 8) size_min)) in
+    let max_valid_bits = Z.(pred (mul (of_int 8) size_max)) in
+    if not (Z.equal variable_v.Base.min_alloc min_sure_bits) ||
+       not (Z.equal variable_v.Base.max_alloc max_valid_bits)
     then begin
       Self.result ~dkey ~current:true ~once:false
         "@[resizing variable `%a'@ (%a) to fit %a@]"
@@ -713,12 +712,12 @@ let realloc_copy_one size ~src_state ~dst_state new_base b =
     | Base.Invalid | Base.Empty -> Z.zero
 
   in
-  let size_to_copy = Int.min (Int.succ up) size_bits in
+  let size_to_copy = Z.min (Z.succ up) size_bits in
   let src = Location_Bits.inject b Ival.zero in
   match Cvalue.Model.copy_offsetmap src size_to_copy src_state with
   | `Bottom -> assert false
   | `Value offsetmap ->
-    if Int.gt size_to_copy Int.zero then
+    if Z.gt size_to_copy Z.zero then
       Cvalue.Model.paste_offsetmap
         ~from:offsetmap ~dst_loc:new_base ~size:size_to_copy
         ~exact:false dst_state
@@ -744,7 +743,7 @@ let realloc_alloc_copy weak bases_to_realloc null_in_arg sizev state =
   in
   (* Make sure that [ret] will be present in the result: we bind it at least
      to bottom everywhere *)
-  let dst_state = add_uninitialized state base Int.minus_one in
+  let dst_state = add_uninitialized state base Z.minus_one in
   let ret = V.inject base Ival.zero in
   let loc_bits = Locations.loc_bytes_to_loc_bits ret in
   (* get bases to free and copy *)
@@ -763,13 +762,13 @@ let realloc_alloc_copy weak bases_to_realloc null_in_arg sizev state =
         let size_sure_valid = List.fold_left aux_valid size_new_loc lbases in
         (* Replace the bits [0..size_sure_valid] by [bottom]. Those [bottom]
            will be overwritten in the call to [realloc_copy_one]. *)
-        if Int.gt size_sure_valid Int.zero then
-          V_Offsetmap.add (Int.zero, Int.pred size_sure_valid)
-            (V_Or_Uninitialized.bottom, Int.one, Rel.zero) offsm
+        if Z.gt size_sure_valid Z.zero then
+          V_Offsetmap.add (Z.zero, Z.pred size_sure_valid)
+            (V_Or_Uninitialized.bottom, Z.one, Rel.zero) offsm
         else offsm
     in
     Cvalue.Model.paste_offsetmap
-      ~from:offsm ~dst_loc:loc_bits ~size:(Int.succ max_valid) ~exact:false
+      ~from:offsm ~dst_loc:loc_bits ~size:(Z.succ max_valid) ~exact:false
       dst_state
   in
   (* Copy the old bases *)

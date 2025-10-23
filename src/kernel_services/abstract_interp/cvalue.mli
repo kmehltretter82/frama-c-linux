@@ -73,7 +73,7 @@ module V : sig
 
   val inject_comp_result: Comp.result -> t
 
-  val inject_int : Int.t -> t
+  val inject_int : Z.t -> t
   val inject_float : Fval.t -> t
   val interp_boolean : contains_zero:bool -> contains_non_zero:bool -> t
 
@@ -83,7 +83,7 @@ module V : sig
       they should be clipped at the validity of the base. The C standard does
       not say that [p+(1ULL<<32+1)] is the same as [p+1], it says that
       [p+(1ULL<<32+1)] is invalid. *)
-  val cast_int_to_int: size:Int.t -> signed:bool -> t -> t
+  val cast_int_to_int: size:Z.t -> signed:bool -> t -> t
 
   val reinterpret_as_float: Cil_types.fkind -> t -> t
   val reinterpret_as_int: signed:bool -> size:Z.t -> t -> t
@@ -125,12 +125,12 @@ module V : sig
 
   (** [all_values ~size v] returns true iff v contains all integer values
       representable in [size] bits. *)
-  val all_values : size:Int.t -> t -> bool
+  val all_values : size:Z.t -> t -> bool
   val create_all_values : signed:bool -> size:int -> t
 
   (** [cardinal_estimate v ~size] returns an estimation of the cardinal
       of [v], knowing that [v] fits in [size] bits. *)
-  val cardinal_estimate: t -> size:Int.t -> Int.t
+  val cardinal_estimate: t -> size:Z.t -> Z.t
 end
 
 (** Values with 'undefined' and 'escaping addresses' flags. *)

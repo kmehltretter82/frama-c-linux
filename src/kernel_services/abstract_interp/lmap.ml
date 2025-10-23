@@ -143,7 +143,7 @@ struct
               let orig = Origin.current Origin.Misalign_write in
               Offsetmap.update_imprecise_everywhere ~validity orig v offm
             | Int_Base.Value size ->
-              assert (Int.geq size Int.zero);
+              assert (Z.geq size Z.zero);
               Offsetmap.update ?origin ~validity ~exact ~offsets ~size v offm
           in
           match offm' with
@@ -431,7 +431,7 @@ struct
           let update_weak_base_validity base o1 o2 =
             if Base.is_weak base && not (Offsetmap.equal o1 o2) then
               match Base.validity base with
-              | Base.Variable v when Int.lt v.max_alloc v.max_allocable ->
+              | Base.Variable v when Z.lt v.max_alloc v.max_allocable ->
                 (* Increasing [max_alloc] is never unsound as any access beyond
                    [min_alloc] will generate an alarm anyway. *)
                 Base.update_variable_validity v ~weak:true
@@ -449,7 +449,7 @@ struct
 
     let paste_offsetmap ~from ~dst_loc ~size ~exact m =
       let loc_dst = make_loc dst_loc (Int_Base.inject size) in
-      assert (Int.leq Int.zero size);
+      assert (Z.leq Z.zero size);
       let exact = exact && cardinal_zero_or_one loc_dst in
       (* TODO: do we want to alter exact here? *)
       let had_non_bottom = ref false in

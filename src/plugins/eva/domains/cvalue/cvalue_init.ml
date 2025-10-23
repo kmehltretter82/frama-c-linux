@@ -236,7 +236,7 @@ let initialize_var_using_type varinfo state =
                 Option.get (Cvalue.V_Offsetmap.fold
                               (fun _itv v _ -> Some v) offsm_joined None)
               in
-              assert (Abstract_interp.Rel.(equal offset zero));
+              assert (Abstract_interp.Rel.is_zero offset);
               let ncells = size - max_precise_size in
               let total_size = Z.mul size_elt (Z.of_int ncells) in
               let offsm_repeat = Cvalue.V_Offsetmap.create
