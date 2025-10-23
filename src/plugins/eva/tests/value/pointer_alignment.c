@@ -240,8 +240,10 @@ struct Packed {
 
 void alignment_in_packed_struct (void) {
 
-  // All pointers below are aligned: no alarm.
-  c_ptr = &st_packed;
+  c_ptr = &st_packed; // Aligned pointer: no alarm
+
+  /* [c_ptr] is aligned but &st_packed.s is an unaligned short pointer,
+     before its conversion to char*. */
   c_ptr = (char *) &st_packed.s;
   c_ptr = (char *) &st_packed.i;
 

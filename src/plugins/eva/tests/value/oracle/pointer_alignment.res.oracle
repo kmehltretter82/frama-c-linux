@@ -19,7 +19,7 @@
   st ∈ {0}
   st_packed ∈ {0}
 [eva] computing for function int_constant_to_ptr <- main.
-  Called from pointer_alignment.c:339.
+  Called from pointer_alignment.c:341.
 [eva:alarm] pointer_alignment.c:40: Warning: 
   unaligned pointer creation. assert \aligned((int)1,alignof(short));
 [eva:alarm] pointer_alignment.c:41: Warning: 
@@ -29,7 +29,7 @@
 [eva] Recording results for int_constant_to_ptr
 [eva] Done for function int_constant_to_ptr
 [eva] computing for function int_to_ptr <- main.
-  Called from pointer_alignment.c:340.
+  Called from pointer_alignment.c:342.
 [eva] computing for function int_to_ptr_aux <- int_to_ptr <- main.
   Called from pointer_alignment.c:87.
 [eva:alarm] pointer_alignment.c:72: Warning: 
@@ -53,7 +53,7 @@
 [eva] Recording results for int_to_ptr
 [eva] Done for function int_to_ptr
 [eva] computing for function ptr_to_int <- main.
-  Called from pointer_alignment.c:341.
+  Called from pointer_alignment.c:343.
 [eva:alarm] pointer_alignment.c:99: Warning: 
   unaligned pointer creation. assert \aligned(&s,alignof(int));
 [eva:alarm] pointer_alignment.c:100: Warning: 
@@ -63,7 +63,7 @@
 [eva] Recording results for ptr_to_int
 [eva] Done for function ptr_to_int
 [eva] computing for function addrof_to_ptr <- main.
-  Called from pointer_alignment.c:342.
+  Called from pointer_alignment.c:344.
 [eva:alarm] pointer_alignment.c:144: Warning: 
   unaligned pointer creation. assert \aligned(&c,alignof(short));
 [eva:alarm] pointer_alignment.c:145: Warning: 
@@ -95,7 +95,7 @@
 [eva] Recording results for addrof_to_ptr
 [eva] Done for function addrof_to_ptr
 [eva] computing for function alignment_in_array <- main.
-  Called from pointer_alignment.c:343.
+  Called from pointer_alignment.c:345.
 [eva:alarm] pointer_alignment.c:181: Warning: 
   unaligned pointer creation. assert \aligned(&t[1],alignof(short));
 [eva:alarm] pointer_alignment.c:182: Warning: 
@@ -125,7 +125,7 @@
 [eva] Recording results for alignment_in_array
 [eva] Done for function alignment_in_array
 [eva] computing for function alignment_in_struct <- main.
-  Called from pointer_alignment.c:344.
+  Called from pointer_alignment.c:346.
 [eva:alarm] pointer_alignment.c:224: Warning: 
   unaligned pointer creation. assert \aligned(&st.c1,alignof(short));
 [eva:alarm] pointer_alignment.c:225: Warning: 
@@ -143,49 +143,47 @@
 [eva] Recording results for alignment_in_struct
 [eva] Done for function alignment_in_struct
 [eva] computing for function alignment_in_packed_struct <- main.
-  Called from pointer_alignment.c:345.
-[eva:alarm] pointer_alignment.c:249: Warning: 
+  Called from pointer_alignment.c:347.
+[eva:alarm] pointer_alignment.c:251: Warning: 
   unaligned pointer creation. assert \aligned(&st_packed,alignof(short));
-[eva:alarm] pointer_alignment.c:250: Warning: 
+[eva:alarm] pointer_alignment.c:252: Warning: 
   unaligned pointer creation. assert \aligned(&st_packed,alignof(int));
-[eva:alarm] pointer_alignment.c:253: Warning: 
+[eva:alarm] pointer_alignment.c:255: Warning: 
   unaligned pointer creation. assert \aligned(&st_packed.i,alignof(short));
 [eva] Recording results for alignment_in_packed_struct
 [eva] Done for function alignment_in_packed_struct
 [eva] computing for function unaligned_pointer_creation <- main.
-  Called from pointer_alignment.c:346.
-[eva:alarm] pointer_alignment.c:273: Warning: 
-  unaligned pointer creation. assert \aligned(p,alignof(int));
-[eva:alarm] pointer_alignment.c:274: Warning: 
-  unaligned pointer creation. assert \aligned(p,alignof(int));
+  Called from pointer_alignment.c:348.
 [eva:alarm] pointer_alignment.c:275: Warning: 
   unaligned pointer creation. assert \aligned(p,alignof(int));
-[eva:alarm] pointer_alignment.c:280: Warning: 
-  unaligned pointer creation. assert \aligned(u.ptr,alignof(int));
-[eva:alarm] pointer_alignment.c:281: Warning: 
-  unaligned pointer creation. assert \aligned(u.ptr,alignof(int));
+[eva:alarm] pointer_alignment.c:276: Warning: 
+  unaligned pointer creation. assert \aligned(p,alignof(int));
+[eva:alarm] pointer_alignment.c:277: Warning: 
+  unaligned pointer creation. assert \aligned(p,alignof(int));
 [eva:alarm] pointer_alignment.c:282: Warning: 
+  unaligned pointer creation. assert \aligned(u.ptr,alignof(int));
+[eva:alarm] pointer_alignment.c:283: Warning: 
+  unaligned pointer creation. assert \aligned(u.ptr,alignof(int));
+[eva:alarm] pointer_alignment.c:284: Warning: 
   unaligned pointer creation. assert \aligned(u.ptr,alignof(int));
 [eva] Recording results for unaligned_pointer_creation
 [eva] Done for function unaligned_pointer_creation
 [eva] computing for function aligned_predicate <- main.
-  Called from pointer_alignment.c:347.
-[eva] pointer_alignment.c:302: check 'true' got status valid.
-[eva] pointer_alignment.c:303: check 'true' got status valid.
+  Called from pointer_alignment.c:349.
 [eva] pointer_alignment.c:304: check 'true' got status valid.
 [eva] pointer_alignment.c:305: check 'true' got status valid.
 [eva] pointer_alignment.c:306: check 'true' got status valid.
 [eva] pointer_alignment.c:307: check 'true' got status valid.
 [eva] pointer_alignment.c:308: check 'true' got status valid.
 [eva] pointer_alignment.c:309: check 'true' got status valid.
+[eva] pointer_alignment.c:310: check 'true' got status valid.
 [eva] pointer_alignment.c:311: check 'true' got status valid.
-[eva] pointer_alignment.c:312: check 'true' got status valid.
 [eva] pointer_alignment.c:313: check 'true' got status valid.
 [eva] pointer_alignment.c:314: check 'true' got status valid.
 [eva] pointer_alignment.c:315: check 'true' got status valid.
 [eva] pointer_alignment.c:316: check 'true' got status valid.
-[eva:alarm] pointer_alignment.c:318: Warning: check 'false' got status unknown.
-[eva:alarm] pointer_alignment.c:319: Warning: check 'false' got status unknown.
+[eva] pointer_alignment.c:317: check 'true' got status valid.
+[eva] pointer_alignment.c:318: check 'true' got status valid.
 [eva:alarm] pointer_alignment.c:320: Warning: check 'false' got status unknown.
 [eva:alarm] pointer_alignment.c:321: Warning: check 'false' got status unknown.
 [eva:alarm] pointer_alignment.c:322: Warning: check 'false' got status unknown.
@@ -193,9 +191,11 @@
 [eva:alarm] pointer_alignment.c:324: Warning: check 'false' got status unknown.
 [eva:alarm] pointer_alignment.c:325: Warning: check 'false' got status unknown.
 [eva:alarm] pointer_alignment.c:326: Warning: check 'false' got status unknown.
-[eva:alarm] pointer_alignment.c:328: Warning: 
+[eva:alarm] pointer_alignment.c:327: Warning: check 'false' got status unknown.
+[eva:alarm] pointer_alignment.c:328: Warning: check 'false' got status unknown.
+[eva:alarm] pointer_alignment.c:330: Warning: 
   check 'unknown' got status unknown.
-[eva:alarm] pointer_alignment.c:331: Warning: 
+[eva:alarm] pointer_alignment.c:333: Warning: 
   check 'unknown' got status unknown.
 [eva] Recording results for aligned_predicate
 [eva] Done for function aligned_predicate
