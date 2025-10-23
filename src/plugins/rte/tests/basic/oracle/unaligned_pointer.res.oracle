@@ -4,7 +4,8 @@
 [rte:annot] annotating function addrof_to_ptr
 [rte:annot] annotating function int_constant_to_ptr
 [rte] unaligned_pointer.c:15: Warning: 
-  guaranteed RTE: assert pointer_alignment: \aligned((int)1,alignof(int32_t));
+  guaranteed RTE:
+  assert pointer_alignment: \aligned((int32_t *)1,alignof(int32_t));
 [rte:annot] annotating function int_to_ptr
 [rte:annot] annotating function int_to_ptr_caller
 [rte:annot] annotating function main
@@ -41,7 +42,9 @@ void int_constant_to_ptr(void)
   int32_t *p1 = (int32_t *)4;
   int32_t *p2 = (int32_t *)8;
   if (nondet) {
-    /*@ assert rte: pointer_alignment: \aligned((int)1,alignof(int32_t)); */
+    /*@ assert
+          rte: pointer_alignment: \aligned((int32_t *)1,alignof(int32_t));
+    */
     int32_t *p3 = (int32_t *)1;
   }
   return;
@@ -49,12 +52,19 @@ void int_constant_to_ptr(void)
 
 void int_to_ptr(int32_t vunknown, int32_t vok, int32_t vko)
 {
-  /*@ assert rte: pointer_alignment: \aligned(vunknown,alignof(int32_t)); */
+  /*@ assert
+        rte: pointer_alignment:
+          \aligned((int32_t *)vunknown,alignof(int32_t));
+  */
   int32_t *p1 = (int32_t *)vunknown;
-  /*@ assert rte: pointer_alignment: \aligned(vok,alignof(int32_t)); */
+  /*@ assert
+        rte: pointer_alignment: \aligned((int32_t *)vok,alignof(int32_t));
+  */
   int32_t *p2 = (int32_t *)vok;
   if (nondet) {
-    /*@ assert rte: pointer_alignment: \aligned(vko,alignof(int32_t)); */
+    /*@ assert
+          rte: pointer_alignment: \aligned((int32_t *)vko,alignof(int32_t));
+    */
     int32_t *p3 = (int32_t *)vko;
   }
   return;

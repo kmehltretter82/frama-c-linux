@@ -322,8 +322,10 @@ class annot_visitor kf flags on_alarm = object (self)
              self#generate_assertion Rte.downcast_assertion (ty, e)
 
            | TPtr _, TInt _ ->
-             self#check_pointer_value e ;
-             self#check_aligned e ty
+             (* keep cast here, else, we do not have a pointer anymore to
+                emit the alarm. *)
+             self#check_pointer_value exp ;
+             self#check_aligned exp ty
 
            | TPtr _, TPtr _ ->
              self#check_aligned e ty
