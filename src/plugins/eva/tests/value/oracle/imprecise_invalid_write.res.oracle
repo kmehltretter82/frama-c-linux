@@ -30,6 +30,7 @@
   pointer downcast. assert (unsigned int)(&main1) ≤ 2147483647;
 [eva:garbled-mix:write] imprecise_invalid_write.i:9: 
   Assigning imprecise value to p because of arithmetic operation on addresses.
+[kernel] Warning: Unknown alignment of base main1: Undefined alignof on a function.
 [eva:alarm] imprecise_invalid_write.i:10: Warning: 
   unaligned pointer creation. assert \aligned(p,alignof(int));
 [eva:alarm] imprecise_invalid_write.i:10: Warning: 

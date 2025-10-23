@@ -149,8 +149,11 @@ let alignof base =
     | Null -> 0 (* Address of null is 0. *)
     | CLogic_Var (_, typ, _) -> Cil.bytesAlignOf typ
     | Var (vi, _) | Allocated (vi, _, _) -> Cil.bytesAlignOfVarinfo vi
-  (* Any address is possible: no alignment constraint. *)
-  with Cil.SizeOfError _ -> 1
+  with Cil.SizeOfError (msg, _) ->
+    (* Any address is possible: no alignment constraint. *)
+    Kernel.warning ~once:true
+      "Unknown alignment of base %a: %s" pretty base msg;
+    1
 
 let dep_absolute = [Kernel.AbsoluteValidRange.self]
 

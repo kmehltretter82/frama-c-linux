@@ -100,6 +100,7 @@
 [eva] computing for function f1 <- main.
   Called from cast_fun.i:136.
 [eva] Done for function f1
+[kernel] Warning: Unknown alignment of base f1: Undefined alignof on a function.
 [eva:alarm] cast_fun.i:140: Warning: 
   unaligned pointer creation. assert \aligned(&f1,alignof(int));
 [eva:alarm] cast_fun.i:141: Warning: 
