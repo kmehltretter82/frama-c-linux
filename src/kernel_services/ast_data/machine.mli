@@ -225,65 +225,65 @@ val init_builtins_ref: (unit -> unit) ref
 
 val sizeof_short: unit -> int
 [@@ deprecated "Use Sizeof.short instead"]
-[@@ migrate { repl = Machine.Sizeof.short}]
+[@@ migrate { repl = Rel.Sizeof.short}]
 val sizeof_int: unit -> int
 [@@ deprecated "Use Sizeof.int instead"]
-[@@ migrate { repl = Machine.Sizeof.int}]
+[@@ migrate { repl = Rel.Sizeof.int}]
 val sizeof_long: unit -> int
 [@@ deprecated "Use Sizeof.long instead"]
-[@@ migrate { repl = Machine.Sizeof.long}]
+[@@ migrate { repl = Rel.Sizeof.long}]
 val sizeof_longlong: unit -> int
 [@@ deprecated "Use Sizeof.longlong instead"]
-[@@ migrate { repl = Machine.Sizeof.longlong}]
+[@@ migrate { repl = Rel.Sizeof.longlong}]
 val sizeof_ptr: unit -> int
 [@@ deprecated "Use Sizeof.ptr instead"]
-[@@ migrate { repl = Machine.Sizeof.ptr}]
+[@@ migrate { repl = Rel.Sizeof.ptr}]
 val sizeof_float: unit -> int
 [@@ deprecated "Use Sizeof.float instead"]
-[@@ migrate { repl = Machine.Sizeof.float}]
+[@@ migrate { repl = Rel.Sizeof.float}]
 val sizeof_double: unit -> int
 [@@ deprecated "Use Sizeof.double instead"]
-[@@ migrate { repl = Machine.Sizeof.double}]
+[@@ migrate { repl = Rel.Sizeof.double}]
 val sizeof_longdouble: unit -> int
 [@@ deprecated "Use Sizeof.longdouble instead"]
-[@@ migrate { repl = Machine.Sizeof.longdouble}]
+[@@ migrate { repl = Rel.Sizeof.longdouble}]
 val sizeof_void: unit -> int
 [@@ deprecated "Use Sizeof.void instead"]
-[@@ migrate { repl = Machine.Sizeof.void}]
+[@@ migrate { repl = Rel.Sizeof.void}]
 val sizeof_fun: unit -> int
 [@@ deprecated "Use Sizeof.func instead"]
-[@@ migrate { repl = Machine.Sizeof.func}]
+[@@ migrate { repl = Rel.Sizeof.func}]
 
 val alignof_short: unit -> int
 [@@ deprecated "Use Alignof.short instead"]
-[@@ migrate { repl = Machine.Alignof.short}]
+[@@ migrate { repl = Rel.Alignof.short}]
 val alignof_int: unit -> int
 [@@ deprecated "Use Alignof.int instead"]
-[@@ migrate { repl = Machine.Alignof.int}]
+[@@ migrate { repl = Rel.Alignof.int}]
 val alignof_long: unit -> int
 [@@ deprecated "Use Alignof.long instead"]
-[@@ migrate { repl = Machine.Alignof.long}]
+[@@ migrate { repl = Rel.Alignof.long}]
 val alignof_longlong: unit -> int
 [@@ deprecated "Use Alignof.longlong instead"]
-[@@ migrate { repl = Machine.Alignof.longlong}]
+[@@ migrate { repl = Rel.Alignof.longlong}]
 val alignof_ptr: unit -> int
 [@@ deprecated "Use Alignof.ptr instead"]
-[@@ migrate { repl = Machine.Alignof.ptr}]
+[@@ migrate { repl = Rel.Alignof.ptr}]
 val alignof_float: unit -> int
 [@@ deprecated "Use Alignof.float instead"]
-[@@ migrate { repl = Machine.Alignof.float}]
+[@@ migrate { repl = Rel.Alignof.float}]
 val alignof_double: unit -> int
 [@@ deprecated "Use Alignof.double instead"]
-[@@ migrate { repl = Machine.Alignof.double}]
+[@@ migrate { repl = Rel.Alignof.double}]
 val alignof_longdouble: unit -> int
 [@@ deprecated "Use Alignof.longdouble instead"]
-[@@ migrate { repl = Machine.Alignof.longdouble}]
+[@@ migrate { repl = Rel.Alignof.longdouble}]
 val alignof_void: unit -> int
 [@@ deprecated "Use Alignof.void instead"]
-[@@ migrate { repl = Machine.Alignof.void}]
+[@@ migrate { repl = Rel.Alignof.void}]
 val alignof_fun: unit -> int
 [@@ deprecated "Use Alignof.func instead"]
-[@@ migrate { repl = Machine.Alignof.func}]
+[@@ migrate { repl = Rel.Alignof.func}]
 val alignof_aligned: unit -> int
 [@@ deprecated "Use Alignof.aligned instead"]
-[@@ migrate { repl = Machine.Alignof.aligned}]
+[@@ migrate { repl = Rel.Alignof.aligned}]
