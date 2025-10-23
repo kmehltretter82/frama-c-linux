@@ -452,12 +452,12 @@ let silence_cpp_machdep_warnings cmdl =
 let c_standard_option cmdl =
   let exe = cpp_name cmdl in
   if exe = "clang" || exe = "gcc"
-  then match Kernel.Std.get () with
+  then match Kernel.CStd.get () with
     | C11 -> [ "-std=c11" ]
     | C17 -> [ "-std=c17" ]
     | C23 -> [ "-std=c2x" ] (* still supported most of the time, unlike c23 *)
   else if exe = "cl" (* MSVC *)
-  then match Kernel.Std.get () with
+  then match Kernel.CStd.get () with
     | C11 -> [ "/std:c11" ]
     | C17 -> [ "/std:c17" ]
     | C23 -> [ "/std:c23" ] (* not supported, we hope they will use this name *)

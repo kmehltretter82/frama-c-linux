@@ -93,7 +93,7 @@ let gcc key builder = compiler ("GCC", Machine.gccMode ()) key builder
 let msvc key builder = compiler ("MSVC", Machine.msvcMode ()) key builder
 
 let c23 key builder =
-  if Kernel.Std.get() = Kernel.C23
+  if Kernel.CStd.get() = Kernel.C23
   then add key builder
 
 let filename_keyword () =

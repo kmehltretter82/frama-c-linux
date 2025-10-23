@@ -1305,7 +1305,7 @@ type iso_c = C11 | C17 | C23
 
 let () = Parameter_customize.set_group parsing
 let () = Parameter_customize.do_not_reset_on_copy ()
-module Std =
+module CStd =
   P.Enum
     (struct
       type t = iso_c

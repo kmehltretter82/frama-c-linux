@@ -600,7 +600,7 @@ val normalization_parameters: unit -> Typed_parameter.t list
 
 type iso_c = C11 | C17 | C23
 
-module Std: Parameter_sig.S with type t = iso_c
+module CStd: Parameter_sig.S with type t = iso_c
 (** ISO C version to consider.
     @since Frama-C+dev
 *)
