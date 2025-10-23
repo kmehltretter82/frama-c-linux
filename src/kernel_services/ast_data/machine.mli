@@ -50,7 +50,8 @@ val time_t: unit -> string
 (** {2 Types}                                                            *)
 (* ***********************************************************************)
 
-module type TypesInfo = sig
+(** @since Frama-C+dev *)
+module type SizeofInfo = sig
   val short: unit -> int
   val int: unit -> int
   val long: unit -> int
@@ -70,7 +71,7 @@ end
 (** @since Frama-C+dev
     @before Frama-C+dev These functions were at top-level and named sizeof_<type>
 *)
-module Sizeof : TypesInfo
+module Sizeof : SizeofInfo
 
 (* ***********************************************************************)
 (** {2 [_Alignof] and GCC [__alignof__] getters}                         *)
@@ -78,7 +79,7 @@ module Sizeof : TypesInfo
 
 (** @since Frama-C+dev *)
 module type AlignofInfo = sig
-  include TypesInfo
+  include SizeofInfo
   val aligned: unit -> int (** might be -1 if unsupported in current machdep *)
   val max: unit -> int
   (** alignment for max_align_t, note that it might not be the maximal

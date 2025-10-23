@@ -114,7 +114,7 @@ let wint_t () = the_machine.machdep.wint_t
 let sig_atomic_t () = the_machine.machdep.sig_atomic_t
 let time_t () = the_machine.machdep.time_t
 
-module type TypesInfo = sig
+module type SizeofInfo = sig
   val short: unit -> int
   val int: unit -> int
   val long: unit -> int
@@ -127,7 +127,7 @@ module type TypesInfo = sig
   val func: unit -> int
 end
 
-module Sizeof = struct
+module Sizeof : SizeofInfo = struct
   let short () = the_machine.machdep.sizeof_short
   let int () = the_machine.machdep.sizeof_int
   let long () = the_machine.machdep.sizeof_long
@@ -141,12 +141,12 @@ module Sizeof = struct
 end
 
 module type AlignofInfo = sig
-  include TypesInfo
+  include SizeofInfo
   val aligned: unit -> int
   val max: unit -> int
 end
 
-module Alignof = struct
+module Alignof : AlignofInfo = struct
   let short () = the_machine.machdep.alignof_short
   let int () = the_machine.machdep.alignof_int
   let long () = the_machine.machdep.alignof_long
@@ -163,7 +163,7 @@ end
 
 let max_extended_alignment () = the_machine.machdep.max_extended_alignment
 
-module GCCAlignof = struct
+module GCCAlignof : AlignofInfo = struct
   let short () = the_machine.machdep.gcc_alignof_short
   let int () = the_machine.machdep.gcc_alignof_int
   let long () = the_machine.machdep.gcc_alignof_long
