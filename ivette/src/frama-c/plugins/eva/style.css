@@ -461,10 +461,6 @@ tr:first-of-type > .eva-table-callsite-box {
     display: inline;
   }
 
-  .dome-xForm-field-block:has(> .dome-xForm-field .eva-field-modified) {
-    box-shadow: -4px 0px 4px var(--warning);
-  }
-
   .dome-xForm-field-block:has(.dome-xForm-field .hidden-field) {
     display: none;
   }

@@ -251,4 +251,32 @@ export function Overlay(props: OverlayProps): JSX.Element {
   );
 }
 
+// --------------------------------------------------------------------------
+// --- TitleBar
+// --------------------------------------------------------------------------
+
+export interface TitleBarProps {
+  /** Label. */
+  label: string;
+  /** Additional CSS class. */
+  className?: string;
+  /** Other elements. */
+  children?: React.ReactNode;
+}
+
+/** TitleBar */
+export function TitleBar(props: TitleBarProps): JSX.Element {
+  const { label, children } = props;
+  const className = classes(
+    'dome-xTitleBar',
+    props.className,
+  );
+  return (
+    <Hbox className={className}>
+      <Hbox><Title label={label} title={label}/></Hbox>
+      <Hbox>{ children }</Hbox>
+    </Hbox>
+  );
+}
+
 /* -------------------------------------------------------------------------- */

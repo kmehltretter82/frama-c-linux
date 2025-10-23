@@ -32,7 +32,7 @@ import * as Utils from 'dome/misc/utils';
 import { Label } from 'dome/controls/labels';
 import { Icon, IconKind, SVG } from 'dome/controls/icons';
 import { Checkbox, Radio, SelectMenu, Button } from 'dome/controls/buttons';
-import { Hbox } from 'dome/layout/boxes';
+import { Hbox, TitleBar, TitleBarProps } from 'dome/layout/boxes';
 
 export type FieldError =
   | undefined | boolean | string
@@ -699,6 +699,8 @@ export interface FormProps extends FilterProps, Children {
   className?: string;
   /** Additional container style. */
   style?: React.CSSProperties;
+  /** TitleBar */
+  titleBar?: React.JSX.Element;
 }
 
 interface FormLayoutProps extends FormProps {
@@ -707,19 +709,23 @@ interface FormLayoutProps extends FormProps {
 
 function FormLayout(props: FormLayoutProps): JSX.Element | null {
   const { className, style, children,
-    layout = DEFAULT_MODE, ...filter } = props;
+    layout = DEFAULT_MODE, titleBar, ...filter } = props;
   const { hidden, disabled } = useContext(filter);
   const css = Utils.classes(
+    'dome-xForm',
     'dome-xForm-'+(layout === DEFAULT_MODE ? "grid" : layout),
     className
   );
   if (hidden) return null;
   return (
-    <div className={css} style={style}>
-      <CONTEXT.Provider value={{ hidden, disabled, layout }}>
-        {children}
-      </CONTEXT.Provider>
-    </div>
+    <>
+      { titleBar }
+      <div className={css} style={style}>
+        <CONTEXT.Provider value={{ hidden, disabled, layout }}>
+          {children}
+        </CONTEXT.Provider>
+      </div>
+    </>
   );
 }
 
@@ -737,6 +743,16 @@ export function SidebarForm(props: FormProps): JSX.Element {
  */
    export function PageForm(props: FormProps): JSX.Element {
   return <FormLayout layout="page" {...props} />;
+}
+
+/** FormTitle */
+
+export function FormTitle(props: TitleBarProps): JSX.Element {
+  return (
+    <TitleBar label={props.label} className='dome-xFormTitle'>
+      {props.children}
+    </TitleBar>
+  );
 }
 
 // --------------------------------------------------------------------------

@@ -96,20 +96,8 @@
     }
 
     .dome-xSideBarTitle {
-      flex-wrap: wrap;
-      justify-content: space-between;
-      position:sticky;
-      top:0;
-      z-index: 10;
-      padding: 5px;
       border-bottom: solid 1px var(--border-discrete);
       background-color: var(--background-sidebar);
-
-      .dome-xBoxes-hbox {
-        max-width: 100%;
-        flex-wrap: wrap;
-        align-content: center;
-      }
     }
 }
 

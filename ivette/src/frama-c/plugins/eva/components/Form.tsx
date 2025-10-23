@@ -162,7 +162,7 @@ export function EvaFormOptions(
       !EvaDef.fieldsAlwaysVisible.includes(name);
     return classes(
       "field"+name,
-      !Forms.isStable(state) && "eva-field-modified",
+      !Forms.isStable(state) && "modified",
       notVisible ? "hidden-field" : "visible-field"
     );
   }

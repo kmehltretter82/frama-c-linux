@@ -386,17 +386,19 @@ function GeneralDocModal(): JSX.Element {
               />
             </div>
           </SidebarTitle>
-          <Tree
-            unfoldAll={unfoldAll}
-            setUnfoldAll={setUnfoldAll}
-            selected={selectedId}
-            onClick={(id) => history.addElement(id) }
-          >
-            { tableOfContent.map((tree, i) => <Nodes
-                key={i}
-                tree={tree}
-              ></Nodes> ) }
-          </Tree>
+          <div className="globals-scrollable-area">
+            <Tree
+              unfoldAll={unfoldAll}
+              setUnfoldAll={setUnfoldAll}
+              selected={selectedId}
+              onClick={(id) => history.addElement(id) }
+            >
+              { tableOfContent.map((tree, i) => <Nodes
+                  key={i}
+                  tree={tree}
+                ></Nodes> ) }
+            </Tree>
+          </div>
         </SideBar>
         <Markdown
           patterns={currentDoc?.patterns}

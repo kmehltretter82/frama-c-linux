@@ -11,7 +11,7 @@ import { AliveScope, KeepAlive } from 'react-activation';
 
 import * as Forms from 'dome/layout/forms';
 import { alpha } from 'dome/data/compare';
-import { Section, SidebarTitle } from 'dome/frame/sidebars';
+import { Section } from 'dome/frame/sidebars';
 import { LSplit } from 'dome/layout/splitters';
 import { classes } from 'dome/misc/utils';
 import { Vfill } from 'dome/layout/boxes';
@@ -125,7 +125,7 @@ function getClasses<A>(
   isSet: boolean,
 ): string | undefined {
   return classes(
-    !Forms.isStable(state) && "options-field-modified",
+    !Forms.isStable(state) && 'modified',
     isSet && 'field-is-set',
   );
 }
@@ -252,11 +252,13 @@ function Form(props: FormProps): React.JSX.Element {
   const { id, remotesState } = props;
   const { params } = usePluginsContextById(id);
   const remote = useRemote(id, remotesState);
+  const titleBar = <Forms.FormTitle label={id}>
+      <Remote remote={remote} />
+    </Forms.FormTitle>;
 
   return (
     <Vfill>
-      <SidebarTitle label={id}><Remote remote={remote} /></SidebarTitle>
-      <Forms.SidebarForm style={{ overflowY: 'auto' }}>
+      <Forms.SidebarForm titleBar={titleBar} >
         { params.map(s =>
           <FormSection key={s[0]} label={s[0]} params={s[1]} id={id}
             remote={remote}

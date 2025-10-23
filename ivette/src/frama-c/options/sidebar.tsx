@@ -96,14 +96,16 @@ export function OptionsSidebar(props: SideBarProps): React.JSX.Element {
       <SidebarTitle label='Plugins'>
         <HelpButton id="framac-options" size={14} />
       </SidebarTitle>
-      { plugins.map(p => <SidebarItem key={p.name}
-          plugin={p}
-          isSet={isSetElement[p.name]}
-          onSelection={(e: React.MouseEvent) => onSelection(e, p)}
-          selected={selected}
-          remote={remotes[p.name]} />
-        )
-      }
+      <div className="globals-scrollable-area">
+        { plugins.map(p => <SidebarItem key={p.name}
+            plugin={p}
+            isSet={isSetElement[p.name]}
+            onSelection={(e: React.MouseEvent) => onSelection(e, p)}
+            selected={selected}
+            remote={remotes[p.name]} />
+          )
+        }
+      </div>
     </SideBar>
   );
 }
