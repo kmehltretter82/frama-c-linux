@@ -131,9 +131,9 @@ by making such wide-ranging and easily checkable assumptions.  {\bf Therefore,
 \rte{} may also generate annotations that are not related to runtime errors:
 \begin{itemize}
 \item absence of unsigned overflows checking, although unsigned overflows are
-  well-defined, some plug-ins may wish to avoid them ;
-\item accesses to arrays that are embedded in a struct occur withing valid
-  bounds, this is stricter than verifying that the accesses occurs within the
+  well-defined, some plug-ins may wish to avoid them;
+\item accesses to arrays that are embedded in a struct occur within valid
+  bounds, this is stricter than verifying that the accesses occur within the
   struct.
 \end{itemize}
 
@@ -458,9 +458,9 @@ According to \cnn{}, different operations related to pointers can cause
 undefined behaviors. We can mainly distinguish three cases:
 \begin{itemize}
   \item the value of the pointer becomes invalid: creating such a pointer is an
-    undefined behavior ;
+    undefined behavior;
   \item it is illegal to dereference the pointer (which might be because of its
-    type) ;
+    type);
   \item the pointer is converted to a type that cannot always handle it.
 \end{itemize}
 This section covers this topic.
