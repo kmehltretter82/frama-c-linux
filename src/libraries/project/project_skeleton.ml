@@ -10,27 +10,24 @@
 (** {2 Type declaration} *)
 (* ************************************************************************** *)
 
-type t = { pid: int; mutable name: string; mutable unique_name: string }
+type t = { pid: int; mutable name: string }
 type project = t
 
 (* ************************************************************************** *)
 (** {2 Constructor} *)
 (* ************************************************************************** *)
 
-let dummy = { pid = 0; name = ""; unique_name = "(id: 0)"}
+let dummy = { pid = 0; name = "" }
 
 module Make_setter () = struct
-
-  let make_unique_name s id = Format.asprintf "%s (id: %d)" s id
 
   let make =
     let pid = ref 0 in
     fun name ->
       incr pid;
-      { pid = !pid; name = name; unique_name = make_unique_name name !pid }
+      { pid = !pid; name = name }
 
   let set_name p s =
-    p.unique_name <- make_unique_name s p.pid;
     p.name <- s
 
 end
