@@ -268,9 +268,6 @@ let assume_pointer loc =
     else if ok then `True else `Unknown loc
   with Abstract_interp.Error_Top -> `Unknown loc
 
-let rec gcd a b =
-  if b = 0 then abs a else gcd b (a mod b)
-
 let assume_aligned modulo loc =
   let rem = Integer.zero in
   let modu = Integer.of_int modulo in
@@ -283,7 +280,7 @@ let assume_aligned modulo loc =
       then ival, false
       else Ival.narrow ival target, true
     else
-      let modu = Integer.of_int (gcd modulo base_alignof) in
+      let modu = Integer.of_int (Int.gcd modulo base_alignof) in
       let target = Ival.inject_interval ~min:None ~max:None ~rem ~modu in
       Ival.narrow ival target, true
   in

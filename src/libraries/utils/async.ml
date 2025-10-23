@@ -110,11 +110,9 @@ let flush = do_yield ~warn_on_delayed:false ~forced:true
 
 (* ---- Sleeping ---- *)
 
-let rec gcd a b = if b = 0 then a else gcd b (a mod b)
-
 (* n=0 means no periodic daemons (yet) *)
 let merge_period n { debounced = p } =
-  if p > 0.0 then gcd (int_of_float (p *. 1000.0)) n else n
+  if p > 0.0 then Int.gcd (int_of_float (p *. 1000.0)) n else n
 
 let sleep ms =
   if ms > 0 then
