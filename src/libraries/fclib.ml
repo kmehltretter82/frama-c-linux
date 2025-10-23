@@ -55,6 +55,7 @@ module State_topological = State_topological
 module Extlib = Extlib
 module FCHashtbl = FCHashtbl
 module Hashtbl = Hashtbl
+module Int = Int
 module Integer = Integer
 module List = List
 module Option = Option
