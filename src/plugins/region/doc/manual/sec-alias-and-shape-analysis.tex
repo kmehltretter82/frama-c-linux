@@ -1,0 +1,43 @@
+The region map analysis is based on the creation of simple region and then
+merges each simple region with relevant ones to build more complex regions.
+
+\subsection{Compound merge}
+
+
+\begin{lstlisting}
+struct S {
+    int a, b, c[4];
+};
+void job (int k) {
+    struct S s;
+    s.a = 1;
+    s.c[k] = 1;
+}\end{lstlisting}
+
+\begin{table}[h!]
+\begin{center}
+\begin{tabular}{|m{5cm}|m{10cm}|}
+\hline
+\centering Region compound merge & Meaning
+\\
+\hline
+{\centering{\includegraphics[width=5cm]{"images/example-compound-merge-field-a.png"}}}
+&
+Regions created by analysing the statement \texttt{s.a = 1}.
+\\\hline
+{\centering{\includegraphics[width=5cm]{"images/example-compound-merge-field-c.png"}}}
+&
+Regions created by analysing the statement \texttt{s.c[k] = 1}.
+\\
+\hline \hline
+{\centering{\includegraphics[width=5cm]{"images/example-compound-merge-field-a-c.png"}}}
+&
+Resulting regions from the merge after analysing both statements.
+\\
+\hline
+\end{tabular}
+\end{center}
+\vspace{-15px}
+\caption{Examples of region arcs}
+\label{table-region-navigation-arcs}
+\end{table}
