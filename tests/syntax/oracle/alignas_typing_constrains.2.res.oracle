@@ -1,7 +1,7 @@
 [kernel] Parsing alignas_typing_constrains.c (with preprocessing)
 [kernel] Parsing alignas_typing_constrains_companion.c (with preprocessing)
 [kernel] ==========================================================
-[kernel] Computed alignements
+[kernel] Computed alignments
 [kernel] Compound: union UAlF
   _Alignof(field) == 8
 [kernel] Compound: struct Al1

@@ -35,7 +35,7 @@ void int_constant_to_ptr (void){
   i_ptr = (int *) 4;
   l_ptr = (int *) 8;
 
-  // Completely invalid alignement: invalid alarms.
+  // Completely invalid alignment: invalid alarms.
 
   if (nondet) { s_ptr = (short *) 1; }
   if (nondet) { i_ptr = (int *) 2; }
@@ -49,7 +49,7 @@ void int_to_ptr_aux (unsigned int limit){
   unsigned int any_mod4 = 2 * any_mod2;
   unsigned int any_mod8 = 2 * any_mod4;
 
-  /* Valid alignement. */
+  /* Valid alignment. */
 
   c_ptr = (char *) any;
   c_ptr = (char *) any_mod2;
@@ -138,7 +138,7 @@ void addrof_to_ptr (void) {
     i_ptr = l_ptr;
   }
 
-  /* All pointer conversion below may create a pointer with invalid alignement:
+  /* All pointer conversion below may create a pointer with invalid alignment:
      unknown alarms should be emitted. */
 
   s_ptr = &c;

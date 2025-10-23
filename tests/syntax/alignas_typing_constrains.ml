@@ -28,7 +28,7 @@ let visit_type _name t _ns =
 
 let run () =
   Kernel.feedback "==========================================================" ;
-  Kernel.feedback "Computed alignements" ;
+  Kernel.feedback "Computed alignments" ;
   Globals.Types.iter_types visit_type ;
   Globals.Functions.iter visit_kf ;
   Kernel.feedback "=========================================================="

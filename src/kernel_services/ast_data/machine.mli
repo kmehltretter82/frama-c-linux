@@ -83,7 +83,7 @@ module type AlignofInfo = sig
   val aligned: unit -> int (** might be -1 if unsupported in current machdep *)
   val max: unit -> int
   (** alignment for max_align_t. Note that:
-      - it might not be the maximal alignement supported by the machine.
+      - it might not be the maximal alignment supported by the machine.
         For this, use {!max_extended_alignment}.
       - if the machdep does not define it, the call warns (once) and it is
         computed as the maximum of the known alignment values.

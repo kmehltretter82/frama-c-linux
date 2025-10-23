@@ -633,7 +633,7 @@ and varinfo = {
   (** The storage-class *)
 
   mutable valignas: exp option;
-  (** The alignement specification, if some is specified.
+  (** The alignment specification, if some is specified.
       Use {!Cil.bytesAlignOfVarinfo} to get the actual alignment.
       @since Frama-C+dev
   *)

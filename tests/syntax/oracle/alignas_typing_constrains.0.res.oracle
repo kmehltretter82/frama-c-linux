@@ -1,6 +1,6 @@
 [kernel] Parsing alignas_typing_constrains.c (with preprocessing)
 [kernel] ==========================================================
-[kernel] Computed alignements
+[kernel] Computed alignments
 [kernel] Compound: struct Al1
   _Alignof(c) == 1
 [kernel] Compound: struct Al4
