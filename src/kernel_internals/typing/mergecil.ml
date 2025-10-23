@@ -934,8 +934,7 @@ let equalModuloPackedAlign attrs1 attrs2 =
 
 
 (* Checks if fields [f1] and [f2] (contained in the composite types
-   [typ_ci1] and [typ_ci2] respectively) are equal except for
-   alignment-related attributes.
+   [typ_ci1] and [typ_ci2] respectively) are equal.
    Raises [Failure] if the fields are not equivalent.
    If [mustCheckOffsets] is true, then there is already a difference in the
    composite type, so each field must be checked. *)
