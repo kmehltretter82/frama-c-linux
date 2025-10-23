@@ -1,3 +1,7 @@
+/* run.config*
+   STDOPT: +"-no-warn-unaligned-pointer"
+*/
+
 char t[300];
 
 int main(unsigned char u){

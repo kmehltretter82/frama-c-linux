@@ -1,3 +1,7 @@
+/* run.config*
+   STDOPT: +"-no-warn-unaligned-pointer"
+*/
+
 char T[] = { 1,0,0,0,1,2,3,4,5,0,1,1,1 } ;
 
 volatile int nondet;
