@@ -69,13 +69,3 @@ val ( <  ) : 'n finite -> 'n finite -> bool
 val ( <= ) : 'n finite -> 'n finite -> bool
 val ( >  ) : 'n finite -> 'n finite -> bool
 val ( >= ) : 'n finite -> 'n finite -> bool
-
-(** {2 Deprecated definitions.} *)
-
-(** If [f] is an element of any finite subset of cardinal [n + 1], it may
-    also be an element of any finite subset of cardinal [n]. The call
-    [strenghten n f] allows to prove that fact to the type system. [None]
-    is returned if and only if [f] is the last element of its subset. *)
-val strenghten : 'n nat -> 'n succ finite -> 'n finite option
-[@@deprecated "Use strengthen instead."]
-[@@migrate { repl = Rel.strengthen } ]

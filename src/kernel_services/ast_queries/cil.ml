@@ -6724,11 +6724,3 @@ end
 let typeDeepDropAllAttributes t =
   let vis = new dropAttributes () in
   visitCilType vis t
-
-(* ****************************** *)
-(* Forward deprecated definitions *)
-(* ****************************** *)
-
-let dummyInstr = Cil_datatype.Instr.dummy
-let dummyStmt  = Cil_datatype.Stmt.dummy
-let dummyFile  = Cil_datatype.File.dummy

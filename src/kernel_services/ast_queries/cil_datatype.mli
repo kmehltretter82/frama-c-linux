@@ -9,11 +9,6 @@
 (** Datatypes of some useful CIL types.
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
-(** This module should not be exported, but we need the alias and OCaml
-    requires us to export it. *)
-module UtilsFilepath = Filepath
-[@@deprecated "Use Filepath instead."]
-
 open Cil_types
 
 (** All datatypes in this module include a dummy.

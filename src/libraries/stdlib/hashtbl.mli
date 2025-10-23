@@ -72,10 +72,6 @@ module type S = sig
   *)
   val find_default: default:'a -> 'a t -> key  -> 'a
 
-  val find_def: 'a t -> key -> 'a -> 'a
-  [@@deprecated "Use Hashtbl.find_default instead."]
-  [@@migrate { repl = fun h k default -> Rel.find_default ~default h k }]
-
   val memo: 'a t -> key -> (key -> 'a) -> 'a
   (** [memo tbl k f] returns the binding of [k] in [tbl]. If there is
       no binding, add the binding [f k] associated to [k] in [tbl] and return

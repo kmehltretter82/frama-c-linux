@@ -448,7 +448,3 @@ let pseparated ?loc seps =
 
 let paligned ?loc (p, n) =
   unnamed ?loc (Paligned(p, n))
-
-(* Deprecated *)
-
-let unamed = unnamed

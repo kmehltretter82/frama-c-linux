@@ -6,9 +6,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* Deprecated *)
-module UtilsFilepath = Filepath
-
 module type S_with_collections = sig
   include Datatype.S_with_collections
   val dummy: t

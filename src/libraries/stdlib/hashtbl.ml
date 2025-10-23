@@ -27,9 +27,6 @@ module type S = sig
 
   val find_default: default:'a -> 'a t -> key  -> 'a
 
-  val find_def: 'a t -> key  -> 'a -> 'a
-  [@@deprecated "Use find_default instead."]
-
   val memo: 'a t -> key -> (key -> 'a) -> 'a
 
 end
@@ -65,8 +62,6 @@ module Make(H: HashedType) : S with type key = H.t  = struct
     match find_opt h k with
     | None -> default
     | Some v -> v
-
-  let find_def h k default = find_default ~default h k
 
   let memo tbl k f =
     try find tbl k

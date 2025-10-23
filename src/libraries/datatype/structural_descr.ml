@@ -350,7 +350,3 @@ let are_consistent d1 d2 =
   Unmarshal_tbl.clear unmarshal_consistent_visited;
   Tbl.clear consistent_visited;
   b
-
-(* Deprecated *)
-
-let t_hashtbl_unchanged_hashs = t_hashtbl_unchanged_hashes

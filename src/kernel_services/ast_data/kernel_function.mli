@@ -203,11 +203,6 @@ val is_return_stmt: t -> stmt -> bool
 (** {2 Getters} *)
 (* ************************************************************************* *)
 
-val dummy: unit -> t
-(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
-[@@deprecated "use Cil_datatype.Kf.dummy instead."]
-[@@migrate { repl = (fun () -> Cil_datatype.Kf.dummy) } ]
-
 val get_vi : t -> varinfo
 val get_id: t -> int
 (** @return the identifier of the function (which is the identifier of the

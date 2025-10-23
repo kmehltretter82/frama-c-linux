@@ -2068,23 +2068,3 @@ val set_extension_handler:
     @since 21.0-Scandium
     @before 30.0-Zinc This function did not take a [plugin:string] parameter
 *)
-
-(* ************************************************************************* *)
-(** {2 Deprecated definitions}                                               *)
-(* ************************************************************************* *)
-
-(** A instr to serve as a placeholder *)
-val dummyInstr: instr
-[@@deprecated "Use Cil_datatype.Instr.dummy instead."]
-[@@migrate { repl = Cil_datatype.Instr.dummy } ]
-
-(** A statement consisting of just [dummyInstr].
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
-val dummyStmt: stmt
-[@@deprecated "Use Cil_datatype.Stmt.dummy instead."]
-[@@migrate { repl = Cil_datatype.Stmt.dummy } ]
-
-(** A dummy file *)
-val dummyFile: file
-[@@deprecated "Use Cil_datatype.Stmt.dummy instead."]
-[@@migrate { repl = Cil_datatype.Stmt.dummy } ]

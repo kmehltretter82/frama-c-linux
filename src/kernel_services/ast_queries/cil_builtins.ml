@@ -397,9 +397,3 @@ let builtinLoc: location = Location.unknown
 let () =
   Machine.init_builtins_ref := init_builtins
 [@@alert "-machine_init_builtins_ref"]
-
-(* init_builtins should only be called through mechanism above.
-   The dummy definition below ought to be removed together with
-   its deprecated export in the .mli.
-*)
-let init_builtins = Extlib.nop
