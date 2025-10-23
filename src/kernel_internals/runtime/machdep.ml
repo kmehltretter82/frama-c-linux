@@ -142,7 +142,7 @@ let dummy = {
   alignof_fun = -1;
   alignof_aligned = 16;
   alignof_max_align_t = 16;
-  max_extended_alignment = 0;
+  max_extended_alignment = -1;
   gcc_alignof_short = -1;
   gcc_alignof_int = -1;
   gcc_alignof_long = -1;
@@ -636,7 +636,7 @@ let gen_all_defines fmt mach =
   if String.length mach.max_align_t > 0 then
     gen_define_string fmt "__MAX_ALIGN_T" mach.max_align_t;
   let implem_max_align =
-    if mach.max_extended_alignment > 0
+    if mach.max_extended_alignment >= 0
     then mach.max_extended_alignment
     else mach.alignof_max_align_t
   in

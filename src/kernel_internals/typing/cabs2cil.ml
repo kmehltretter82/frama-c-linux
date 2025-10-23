@@ -4036,7 +4036,7 @@ let solveAlignas ~original_type alignas_specifiers =
         Cil_printer.pp_typ original_type
         original_align ;
 
-    if extended_align = 0 && v > max_align then
+    if extended_align = -1 && v > max_align then
       Kernel.abort ~current:true
         "Invalid _Alignas(%a): exceeds alignof(max_align_t): %d, \
          and machdep does not allow extended alignment"

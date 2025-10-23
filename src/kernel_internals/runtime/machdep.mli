@@ -55,7 +55,7 @@ type mach = {
   alignof_fun: int;       (** [_Alignof(<function type>)]. Negative if unsupported. *)
   alignof_aligned: int;   (** Alignment of a type with aligned attribute *)
   alignof_max_align_t: int; (** [_Alignof(max_align_t)]. Negative if unsupported. *)
-  max_extended_alignment: int; (** non 0 if extended alignment is supported. *)
+  max_extended_alignment: int; (** non -1 if extended alignment is supported. *)
   gcc_alignof_short: int;      (** GCC [__alignof__(short)]. Negative if unsupported.  *)
   gcc_alignof_int: int;        (** GCC [__alignof__(int)]. Negative if unsupported.  *)
   gcc_alignof_long: int;       (** GCC [__alignof__(long)]. Negative if unsupported.  *)

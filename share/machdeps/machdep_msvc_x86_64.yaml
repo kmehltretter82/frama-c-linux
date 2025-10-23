@@ -11,7 +11,7 @@ alignof_ptr: 8
 alignof_short: 2
 alignof_void: -1
 max_align_t: double # taken from cstddef
-max_extended_alignment: 0
+max_extended_alignment: -1
 char_is_unsigned: false
 compiler: msvc
 cpp_arch_flags:

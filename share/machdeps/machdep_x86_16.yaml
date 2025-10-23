@@ -11,7 +11,7 @@ alignof_ptr: 4
 alignof_short: 2
 alignof_void: -1
 max_align_t: struct __machdep_max_align_t { int __max_align; } __attribute__ ((aligned (16)))
-max_extended_alignment: 0
+max_extended_alignment: -1
 char_is_unsigned: false
 compiler: generic
 cpp_arch_flags:

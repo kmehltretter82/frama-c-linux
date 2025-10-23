@@ -164,7 +164,7 @@ val lower_constants: unit -> bool
 val insert_implicit_casts: unit -> bool
 
 val max_extended_alignment: unit -> int
-(** 0 if it it not known to be supported
+(** -1 if the platform does not support extended alignments
     @since Frama-C+dev
 *)
 

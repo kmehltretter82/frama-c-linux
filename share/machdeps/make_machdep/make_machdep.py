@@ -414,7 +414,7 @@ align_test = 1
 if machdep["alignof_max_align_t"] is not None:
     align_test = 2 * machdep["alignof_max_align_t"]
 
-machdep["max_extended_alignment"] = 0
+machdep["max_extended_alignment"] = -1
 
 while test_possible_alignas(align_test):
     machdep["max_extended_alignment"] = align_test
