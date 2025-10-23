@@ -121,6 +121,12 @@ let may_be_reduced_lval lval =
   | Var _ -> may_be_reduced_offset offset
   | Mem _ -> true
 
+let is_packed_struct_field lval =
+  match lval.node with
+  | Mem _, _ | _, NoOffset -> false
+  | Var vi, _ -> Ast_types.is_struct vi.vtype
+                 && Ast_types.has_attribute "packed" vi.vtype
+
 let warn_pointer_comparison typ =
   match Parameters.WarnPointerComparison.get () with
   | `None -> false
@@ -949,10 +955,15 @@ module Make
     | Const constant -> internal_forward_eval_constant env expr constant
     | Lval _lval -> assert false
 
-    | AddrOf v | StartOf v ->
-      let* loc, _ = lval_to_loc env ~for_writing:false ~reduction:false v in
+    | AddrOf lval | StartOf lval ->
+      let* loc, _ = lval_to_loc env ~for_writing:false ~reduction:false lval in
       let* value = Loc.to_value loc, Alarmset.none in
       let v = assume_pointer env.context expr value in
+      let v =
+        if is_packed_struct_field lval
+        then let* v in assume_aligned expr expr.typ v
+        else v
+      in
       compute_reduction v false
 
     | UnOp (op, e, typ_res) ->

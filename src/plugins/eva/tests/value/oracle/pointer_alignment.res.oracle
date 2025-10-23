@@ -144,10 +144,20 @@
 [eva] Done for function alignment_in_struct
 [eva] computing for function alignment_in_packed_struct <- main.
   Called from pointer_alignment.c:347.
+[eva:alarm] pointer_alignment.c:247: Warning: 
+  unaligned pointer creation. assert \aligned(&st_packed.s,alignof(short));
+[eva:alarm] pointer_alignment.c:248: Warning: 
+  unaligned pointer creation. assert \aligned(&st_packed.i,alignof(int));
 [eva:alarm] pointer_alignment.c:251: Warning: 
   unaligned pointer creation. assert \aligned(&st_packed,alignof(short));
 [eva:alarm] pointer_alignment.c:252: Warning: 
   unaligned pointer creation. assert \aligned(&st_packed,alignof(int));
+[eva:alarm] pointer_alignment.c:253: Warning: 
+  unaligned pointer creation. assert \aligned(&st_packed.s,alignof(short));
+[eva:alarm] pointer_alignment.c:254: Warning: 
+  unaligned pointer creation. assert \aligned(&st_packed.i,alignof(int));
+[eva:alarm] pointer_alignment.c:255: Warning: 
+  unaligned pointer creation. assert \aligned(&st_packed.i,alignof(int));
 [eva:alarm] pointer_alignment.c:255: Warning: 
   unaligned pointer creation. assert \aligned(&st_packed.i,alignof(short));
 [eva] Recording results for alignment_in_packed_struct
@@ -221,7 +231,7 @@
   assertion 'Eva,pointer_alignment' got final status invalid.
 [eva] pointer_alignment.c:227: 
   assertion 'Eva,pointer_alignment' got final status invalid.
-[scope:rm_asserts] removing 4 assertion(s)
+[scope:rm_asserts] removing 7 assertion(s)
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function addrof_to_ptr:
   c_ptr ∈
