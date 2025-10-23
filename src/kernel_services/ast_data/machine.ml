@@ -158,7 +158,22 @@ module Alignof : AlignofInfo = struct
   let aligned () = the_machine.machdep.alignof_aligned
   let void () = the_machine.machdep.alignof_void
   let func () = the_machine.machdep.alignof_fun
-  let max () = the_machine.machdep.alignof_max_align_t
+  let max () =
+    if the_machine.machdep.alignof_max_align_t <> -1
+    then the_machine.machdep.alignof_max_align_t
+    else begin
+      Kernel.warning ~once:true
+        "alignof(max_align_t) not specified in the current machdep, \
+         computing it from known supported values" ;
+      max 1 (short ()) |>
+      max (int ()) |>
+      max (long ()) |>
+      max (longlong ()) |>
+      max (ptr ()) |>
+      max (float ()) |>
+      max (double ()) |>
+      max (longdouble ())
+    end
 end
 
 let max_extended_alignment () = the_machine.machdep.max_extended_alignment
@@ -175,7 +190,22 @@ module GCCAlignof : AlignofInfo = struct
   let aligned () = the_machine.machdep.gcc_alignof_aligned
   let void () = the_machine.machdep.gcc_alignof_void
   let func () = the_machine.machdep.gcc_alignof_fun
-  let max () = the_machine.machdep.gcc_alignof_max_align_t
+  let max () =
+    if the_machine.machdep.gcc_alignof_max_align_t <> -1
+    then the_machine.machdep.gcc_alignof_max_align_t
+    else begin
+      Kernel.warning ~once:true
+        "__alignof__(max_align_t) not specified in the current machdep, \
+         computing it from known supported values" ;
+      max 1 (short ()) |>
+      max (int ()) |>
+      max (long ()) |>
+      max (longlong ()) |>
+      max (ptr ()) |>
+      max (float ()) |>
+      max (double ()) |>
+      max (longdouble ())
+    end
 end
 
 (* Misc *)
