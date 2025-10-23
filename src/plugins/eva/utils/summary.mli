@@ -12,6 +12,7 @@ type alarm_category =
   | Division_by_zero
   | Memory_access
   | Index_out_of_bound
+  | Unaligned_pointer
   | Invalid_shift
   | Overflow
   | Uninitialized

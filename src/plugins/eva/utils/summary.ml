@@ -12,6 +12,7 @@ type alarm_category =
   | Division_by_zero
   | Memory_access
   | Index_out_of_bound
+  | Unaligned_pointer
   | Invalid_shift
   | Overflow
   | Uninitialized
@@ -24,23 +25,25 @@ module AlarmCategory =
 struct
   type t = alarm_category
 
-  let of_alarm = function
-    | Alarms.Division_by_zero _ -> Division_by_zero
-    | Memory_access _           -> Memory_access
-    | Index_out_of_bound _      -> Index_out_of_bound
-    | Invalid_shift _           -> Invalid_shift
-    | Overflow _                -> Overflow
-    | Uninitialized _           -> Uninitialized
-    | Dangling _                -> Dangling
+  let of_alarm : Alarms.t -> alarm_category = function
+    | Division_by_zero _   -> Division_by_zero
+    | Memory_access _      -> Memory_access
+    | Unaligned_pointer _  -> Unaligned_pointer
+    | Index_out_of_bound _ -> Index_out_of_bound
+    | Invalid_shift _      -> Invalid_shift
+    | Overflow _           -> Overflow
+    | Uninitialized _      -> Uninitialized
+    | Dangling _           -> Dangling
     | Is_nan_or_infinite _
-    | Is_nan _                  -> Nan_or_infinite
-    | Float_to_int _            -> Float_to_int
-    | _                         -> Other
+    | Is_nan _             -> Nan_or_infinite
+    | Float_to_int _       -> Float_to_int
+    | _                    -> Other
 
   let id = function
     | Division_by_zero    -> 0
     | Memory_access       -> 1
     | Index_out_of_bound  -> 2
+    | Unaligned_pointer   -> 3
     | Invalid_shift       -> 4
     | Overflow            -> 5
     | Uninitialized       -> 6
@@ -356,6 +359,7 @@ let print_alarm fmt (category,count) =
     | Division_by_zero -> "division", "s", " by zero"
     | Memory_access -> "invalid memory access", "es", ""
     | Index_out_of_bound -> "access", "es", " out of bounds index"
+    | Unaligned_pointer -> "unaligned pointer", "s", ""
     | Overflow -> "integer overflow", "s", ""
     | Invalid_shift -> "invalid shift", "s", ""
     | Uninitialized -> "access", "es", " to uninitialized left-values"
