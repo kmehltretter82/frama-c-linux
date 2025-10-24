@@ -2283,10 +2283,13 @@ and reduce_by_predicate ~alarm_mode env positive p =
         in
         match to_int align.eover with
         | Some align when align > 0 ->
-          let reduce _typ v =
-            reduce_value_with_truth (Cvalue_forward.assume_aligned align) v
-          in
-          reduce_exact_location ~alarm_mode env reduce t
+          begin
+            let assume_aligned = Cvalue_forward.assume_aligned align in
+            let reduce _typ = reduce_value_with_truth assume_aligned in
+            try reduce_exact_location ~alarm_mode env reduce t
+            with Reduce_to_bottom -> overwrite_current_state env Model.bottom
+               | LogicEvalError _ -> env
+          end
         | Some _ | None -> env
       end
 
