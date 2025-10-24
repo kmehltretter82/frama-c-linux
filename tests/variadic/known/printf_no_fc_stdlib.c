@@ -1,5 +1,5 @@
 /* run.config
-   STDOPT: #"-no-frama-c-stdlib"
+   STDOPT: #"-no-frama-c-stdlib" +"-kernel-msg-key=\"-variadic\""
 */
 #include <stdio.h>
 
