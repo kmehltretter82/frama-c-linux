@@ -109,9 +109,12 @@ let translate_variadics (file : file) =
              Cil.SkipChildren
            | Some { vf_class = NoTranslation } ->
              Cil.SkipChildren
-           | Some _ ->
+           | Some { vf_class = Defined | Aggregator _ | Unknown } ->
              Generic.add_vpar vi;
-             Cil.DoChildren)
+             Cil.DoChildren
+           | Some { vf_class = Misc | FormatFun _ | Overload _ } ->
+             Cil.SkipChildren
+          )
 
         | GFun ({svar = vi} as fundec, _) ->
           if Table.mem classification vi then begin

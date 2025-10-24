@@ -470,6 +470,38 @@ int main(void)
   Translating call to printf to a call to the specialized version printf_va_16.
 [kernel:typing:variadic] printf_wrong_types.c:36: Warning: 
   Incorrect type for argument 2. The argument will be cast from RC (unsigned int) to int.
+[kernel:variadic] FRAMAC_SHARE/libc/stdio.h:233: 
+  Declaration of variadic function fprintf.
+[kernel:variadic] FRAMAC_SHARE/libc/stdio.h:235: 
+  Declaration of variadic function fscanf.
+[kernel:variadic] FRAMAC_SHARE/libc/stdio.h:237: 
+  Declaration of variadic function printf.
+[kernel:variadic] FRAMAC_SHARE/libc/stdio.h:238: 
+  Declaration of variadic function scanf.
+[kernel:variadic] FRAMAC_SHARE/libc/stdio.h:239: 
+  Declaration of variadic function snprintf.
+[kernel:variadic] FRAMAC_SHARE/libc/stdio.h:241: 
+  Declaration of variadic function sprintf.
+[kernel:variadic] FRAMAC_SHARE/libc/stdio.h:243: 
+  Declaration of variadic function sscanf.
+[kernel:variadic] FRAMAC_SHARE/libc/stdio.h:604: 
+  Declaration of variadic function dprintf.
+[kernel:variadic] FRAMAC_SHARE/libc/stdio.h:233: 
+  Declaration of variadic function fprintf.
+[kernel:variadic] FRAMAC_SHARE/libc/stdio.h:235: 
+  Declaration of variadic function fscanf.
+[kernel:variadic] FRAMAC_SHARE/libc/stdio.h:237: 
+  Declaration of variadic function printf.
+[kernel:variadic] FRAMAC_SHARE/libc/stdio.h:238: 
+  Declaration of variadic function scanf.
+[kernel:variadic] FRAMAC_SHARE/libc/stdio.h:239: 
+  Declaration of variadic function snprintf.
+[kernel:variadic] FRAMAC_SHARE/libc/stdio.h:241: 
+  Declaration of variadic function sprintf.
+[kernel:variadic] FRAMAC_SHARE/libc/stdio.h:243: 
+  Declaration of variadic function sscanf.
+[kernel:variadic] FRAMAC_SHARE/libc/stdio.h:604: 
+  Declaration of variadic function dprintf.
 [eva] Analyzing a complete application starting at main
 [eva] using specification for function printf
 [eva:alarm] printf_wrong_types.c:30: Warning: 

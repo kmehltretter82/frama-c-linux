@@ -19,6 +19,7 @@ module Replacements =
     end)
 
 let add new_vi old_vi =
+  File.never_remove_global old_vi.Cil_types.vname;
   Replacements.add new_vi old_vi
 
 let find new_vi =
