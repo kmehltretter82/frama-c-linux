@@ -1627,10 +1627,17 @@ and bind_comprehension_quantifiers env quantifiers predicate =
 and eval_let_binding ~alarm_mode env logic_info =
   match logic_info with
   | { l_labels = []; l_tparams = []; l_profile = []; l_body = LBterm term } ->
-    let var = logic_info.l_var_info in
-    let env = bind_logic_vars env [var] in
-    let var_term = Logic_const.tvar var in
-    reduce_left_by_relation ~alarm_mode env true var_term Req term
+    begin
+      let var = logic_info.l_var_info in
+      let env = bind_logic_vars env [var] in
+      let var_term = Logic_const.tvar var in
+      try reduce_left_by_relation ~alarm_mode env true var_term Req term
+      with Reduce_to_bottom ->
+        Self.warning ~current:true ~once:true
+          "ignoring \\let binding of logic variable %a evaluating to bottom"
+          Printer.pp_logic_var var;
+        env
+    end
   | _ -> unsupported "\\let binding"
 
 (* -------------------------------------------------------------------------- *)
