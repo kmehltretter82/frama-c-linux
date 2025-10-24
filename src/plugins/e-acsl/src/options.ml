@@ -134,6 +134,14 @@ module Interlang_force =
       let help = "crash if interlang compilation fails"
     end)
 
+module Interlang_opt =
+  True
+    (struct
+      let option_name = "-e-acsl-interlang-opt"
+      let help = "enables optimisations while generating the intermediate \
+                  language."
+    end)
+
 module Widening_arguments_base =
   Int
     (struct
@@ -229,6 +237,9 @@ module Dkey = struct
   let interlang_not_covered =
     let help = "encountered constructs unsupported by indirect compilation scheme" in
     register_category ~help "interlang:not_covered"
+  let interlang_print_opt =
+    let help = "prints a comparison with non-optimized expressions" in
+    register_category ~help "interlang:print_opt"
 end
 
 let setup ?(rtl=false) () =

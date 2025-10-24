@@ -398,17 +398,15 @@ char *__gen_e_acsl_realpath(char const * restrict file_name,
       int __gen_e_acsl_size;
       int __gen_e_acsl_if;
       int __gen_e_acsl_valid;
-      __gen_e_acsl_size = 1 * (((4096 - 1) - 0) + 1);
+      __gen_e_acsl_size = 1 * 4096;
       if (__gen_e_acsl_size <= 0) __gen_e_acsl_if = 0;
       else __gen_e_acsl_if = __gen_e_acsl_size;
-      __gen_e_acsl_valid = __e_acsl_valid((void *)(resolved_name + 1 * 0),
+      __gen_e_acsl_valid = __e_acsl_valid((void *)(resolved_name + 0),
                                           (size_t)__gen_e_acsl_if,
                                           (void *)resolved_name,
                                           (void *)(& resolved_name));
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,
                                    "resolved_name",(void *)resolved_name);
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
-                                   "sizeof(char)",0,1);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
                                    "sizeof(char)",0,1);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,"size",0,

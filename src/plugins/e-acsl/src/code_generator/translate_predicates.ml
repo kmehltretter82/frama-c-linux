@@ -15,7 +15,6 @@ let dkey = Options.Dkey.translation
 
 module IL = struct
   include Interlang
-  include Interlang_build
 end
 module M = Interlang_gen.M
 open M.Operators
@@ -49,14 +48,6 @@ let translate_rte_exp_ref
 (* Transforming predicates into C expressions (if any) *)
 (* ************************************************************************** *)
 
-let relation_to_binop_il = function
-  | Rlt -> Interlang.Lt
-  | Rgt -> Gt
-  | Rle -> Le
-  | Rge -> Ge
-  | Req -> Eq
-  | Rneq -> Ne
-
 let relation_to_binop = function
   | Rlt -> Lt
   | Rgt -> Gt
@@ -78,10 +69,10 @@ let predicate_content_to_exp_il p =
         (Typing.get_effective_ty ~logic_env t1)
         (Typing.get_effective_ty ~logic_env t2)
     in
-    let binop = relation_to_binop_il rel in
+    let rel = Interlang_gen.of_relation rel in
     let* op1 = Translate_terms.to_exp_il t1 in
     let* op2 = Translate_terms.to_exp_il t2 in
-    M.return @@ IL.Exp.of_exp_node @@ BinOp {ity; binop; op1; op2}
+    M.return @@ Interlang.Exp.binop rel ity op1 op2
   | _ -> M.not_covered Printer.pp_predicate p
 
 (* Convert an ACSL predicate into a corresponding C expression (if any) in the

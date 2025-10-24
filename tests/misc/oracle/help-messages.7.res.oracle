@@ -40,6 +40,9 @@ Options taking a string as argument should preferably be written
                     option is -e-acsl-no-interlang)
 -e-acsl-interlang-force  crash if interlang compilation fails (opposite
                     option is -e-acsl-no-interlang-force)
+-e-acsl-interlang-opt  enables optimisations while generating the
+                    intermediate language. (set by default, opposite option
+                    is -e-acsl-no-interlang-opt)
 -e-acsl-project <prj>  the name of the generated project is <prj> (default to
                     "e-acsl") (preferably use -e-acsl-project="prj")
 -e-acsl-replace-libc-functions  replace some libc functions (such as strcpy)

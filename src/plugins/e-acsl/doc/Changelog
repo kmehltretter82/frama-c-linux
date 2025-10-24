@@ -29,6 +29,10 @@ Plugin E-ACSL <next-release>
 Plugin E-ACSL 32.0 (Germanium)
 ###############################################################################
 
+- E-ACSL        [2025-10-23] New option -e-acsl-interlang-opt. Optimizes out
+                             GMP integers when suitable.
+-* E-ACSL       [2025-10-22] Booleans are no longer translated as GMP numbers.
+                             Fixes (#@1622).
 -* E-ACSL       [2025-10-15] Fix ghost code generation and deactivate RTE checks
                              in ghost code (#@1620).
 - E-ACSL        [2025-08-08] Inductive extractions may be unsound if

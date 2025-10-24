@@ -94,8 +94,7 @@ let rec compile ({origin} as exp) =
     M.modifying_env (fun env ->
         Typed_number.add_cast ~loc:t.term_loc ?name env kf cast strnum (Some t) e)
   | Some _, None (* [origin] is [None] when it stems from predicates. *)
-  | None, None -> M.return e (* no cast required *)
-  | None, Some _ -> Options.fatal "source information missing for cast"
+  | None, _ -> M.return e (* no cast required *)
 
 and compile_context_insensitive {Interlang.enode; origin} =
   let* {kf; loc} = M.read in
@@ -194,7 +193,7 @@ and compile_context_insensitive {Interlang.enode; origin} =
     M.return (e, Some (Analyses_types.C_number, "sizeof"))
 
 and compile_div_mod ~origin {ity; binop; op1; op2} =
-  assert (binop = Div || binop = Mod);
+  assert (Interlang.Helpers.is_div_or_mod binop);
   let* {kf; loc} = M.read in
   let ty = Typing.typ_of_number_ty ity in
   let binop = compile_binop binop in
