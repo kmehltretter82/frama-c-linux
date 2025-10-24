@@ -146,6 +146,7 @@ depends: [
   "zarith" { >= "1.13" }
 
   # PPXs
+  "ppxlib" { >= "0.33.0" }
   "ppx_deriving"
   "ppx_deriving_yojson"
   "ppx_deriving_yaml" { >= "0.2.0" }
