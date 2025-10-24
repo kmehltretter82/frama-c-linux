@@ -21,6 +21,7 @@ module Assert_print_data: Parameter_sig.Bool
 module Concurrency: Parameter_sig.Bool
 module Interlang: Parameter_sig.Bool
 module Interlang_force: Parameter_sig.Bool
+module Interlang_opt: Parameter_sig.Bool
 
 module Functions: Parameter_sig.Kernel_function_set
 module Instrument: Parameter_sig.Kernel_function_set
@@ -50,6 +51,7 @@ module Dkey: sig
   val env: category
   val interlang_translation: category
   val interlang_not_covered: category
+  val interlang_print_opt: category
 end
 
 val setup: ?rtl:bool -> unit -> unit

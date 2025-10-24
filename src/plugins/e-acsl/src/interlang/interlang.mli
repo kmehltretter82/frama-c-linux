@@ -29,6 +29,7 @@
 open Cil_types
 open Analyses_types
 
+
 type binop =
   | Plus | Minus | Mult | Div | Mod
   | Lt | Gt | Le | Ge | Eq | Ne
@@ -77,4 +78,24 @@ module Pretty : sig
   val pp_offset : Format.formatter -> offset -> unit
   val pp_exp : Format.formatter -> exp -> unit
   val pp_exp_node : Format.formatter -> exp_node -> unit
+end
+
+module Exp : sig
+  val of_exp_node : ?origin:term -> exp_node -> exp
+  val of_lval : ?origin:term -> lval -> exp
+  val of_integer : origin:term -> Z.t -> exp
+  val of_sizeof : origin:term -> typ -> exp
+
+  (** Transforms a Cil binary operator to an {!Interlang} binary operator.
+      Not all Cil operators are supported (yet). *)
+  val binop :
+    ?origin:term -> binop -> Analyses_types.number_ty -> exp -> exp -> exp
+end
+
+module Lhost : sig
+  val of_varinfo : ?name:string -> Cil_types.varinfo -> lhost
+end
+
+module Helpers : sig
+  val is_div_or_mod : binop -> bool
 end

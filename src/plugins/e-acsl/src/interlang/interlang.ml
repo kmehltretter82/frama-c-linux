@@ -13,7 +13,6 @@ open Analyses_datatype
 type binop =
   | Plus | Minus | Mult | Div | Mod
   | Lt | Gt | Le | Ge | Eq | Ne (* arithmetic comparison *)
-(* | LAnd | LOr *)
 
 module Varinfo = struct
   type t =
@@ -58,6 +57,9 @@ and offset =
   | Field of fieldinfo * offset
   | Index of exp * offset
 
+let of_bool = function
+  | true -> True
+  | false -> False
 
 module Pretty = struct
   open Format
@@ -83,7 +85,7 @@ module Pretty = struct
     | Var vi -> pp_varinfo fmt vi
     | Mem exp -> fprintf fmt "*@[%a@]" pp_exp exp
 
-  and pp_lval fmt (host,offset) =
+  and pp_lval fmt (host, offset) =
     pp_lhost fmt host;
     pp_offset fmt offset
 
@@ -104,4 +106,122 @@ module Pretty = struct
       fprintf fmt "@[%a@]@ %a@ @[%a@]" pp_exp op1 pp_binop binop pp_exp op2
     | Lval lval -> pp_lval fmt lval
     | SizeOf ty -> fprintf fmt "SizeOf(@[%a])" Printer.pp_typ ty
+end
+
+
+module Optimization = struct
+  open Integer
+  let plus e1 e2 =
+    match e1.enode, e2.enode with
+    | Integer z1, _ when is_zero z1 -> Some e2.enode
+    | _, Integer z2 when is_zero z2 -> Some e1.enode
+    | Integer z1, Integer z2 -> Some (Integer (add z1 z2))
+    | _ -> None
+
+  let minus e1 e2 =
+    match e1.enode, e2.enode with
+    | Integer z1, Integer z2 when is_zero z1 -> Some (Integer (Z.neg z2))
+    | _, Integer z2 when is_zero z2 -> Some e1.enode
+    | Integer z1, Integer z2 -> Some (Integer (sub z1 z2))
+    | _ -> None
+
+  let mult e1 e2 =
+    match e1.enode, e2.enode with
+    | Integer z1, _ when is_zero z1 -> Some (Integer zero)
+    | _, Integer z2 when is_zero z2 -> Some (Integer zero)
+    | Integer z1, _ when is_one z1 -> Some e2.enode
+    | _, Integer z2 when is_one z2 -> Some e1.enode
+    | Integer z1, Integer z2 -> Some (Integer (mul z1 z2))
+    | _ -> None
+  let div e1 e2 =
+    match e1.enode, e2.enode with
+    | Integer z1, _ when is_zero z1 -> Some (Integer zero)
+    | Integer z1, Integer z2 when not (is_zero z2) ->
+      Some (Integer (e_div z1 z2))
+    | _ -> None
+
+  let modulo e1 e2 =
+    match e1.enode, e2.enode with
+    | Integer z1, _ when is_zero z1 -> Some (Integer zero)
+    | Integer z1, Integer z2 -> Some (Integer (e_rem z1 z2))
+    | _ -> None
+
+  let lt e1 e2 =
+    match e1.enode, e2.enode with
+    | Integer z1, Integer z2 -> Some (of_bool @@ lt z1 z2)
+    | _ -> None
+  let gt e1 e2 =
+    match e1.enode, e2.enode with
+    | Integer z1, Integer z2 -> Some (of_bool @@ gt z1 z2)
+    | _ -> None
+  let le e1 e2 =
+    match e1.enode, e2.enode with
+    | Integer z1, Integer z2 -> Some (of_bool @@ le z1 z2)
+    | _ -> None
+
+  let ge e1 e2 =
+    match e1.enode, e2.enode with
+    | Integer z1, Integer z2 -> Some (of_bool @@ ge z1 z2)
+    | _ -> None
+
+  let eq e1 e2 =
+    match e1.enode, e2.enode with
+    | Integer z1, Integer z2 -> Some (of_bool @@ equal z1 z2)
+    | _ -> None
+
+  let ne e1 e2 =
+    match e1.enode, e2.enode with
+    | Integer z1, Integer z2 -> Some (of_bool @@ not @@ equal z1 z2)
+    | _ -> None
+end
+
+module Exp_node = struct
+  let of_binop bop =
+    let open Optimization in
+    match bop with
+    | Plus -> plus
+    | Minus -> minus
+    | Mult -> mult
+    | Div -> div
+    | Mod -> modulo
+    | Lt -> lt
+    | Gt -> gt
+    | Le -> le
+    | Ge -> ge
+    | Eq -> eq
+    | Ne -> ne
+end
+
+module Exp = struct
+
+  let of_exp_node ?origin enode = {enode; origin}
+
+  let of_lval ?origin lval = of_exp_node ?origin @@ Lval lval
+
+  let of_integer ~origin n = of_exp_node ~origin @@ Integer n
+
+  let of_sizeof ~origin ty = of_exp_node ~origin @@ SizeOf ty
+
+  let binop ?origin bop ity e1 e2 =
+    let org = BinOp {binop = bop; ity; op1 = e1; op2 = e2} in
+    let res = if not @@ Options.Interlang_opt.get () then org
+      else match Exp_node.of_binop bop e1 e2 with
+        | Some e ->
+          Options.debug ~dkey:Options.Dkey.interlang_print_opt ~level:3
+            "@[%a@] => @[%a@]"
+            Pretty.pp_exp_node org Pretty.pp_exp_node e;
+          e
+        | None -> org
+    in of_exp_node ?origin res
+end
+
+module Lhost = struct
+  let of_varinfo ?name vi =
+    let name = Option.value ~default:vi.vname name in
+    Var (Varinfo.logic {vi with vorig_name = name})
+end
+
+module Helpers = struct
+  let is_div_or_mod = function
+    | (Div | Mod) -> true | _ -> false
 end
