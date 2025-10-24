@@ -174,6 +174,12 @@ void untrusted_sources(struct X x, int** pp, int* p){
   if(nondet){int* i = l;}
 }
 
+void trusted_sources(int* p){
+  int* l ;
+  int* i1 = p ;
+  int* i2 = l ;
+}
+
 volatile int32_t i32_nondet;
 
 int main(void){
