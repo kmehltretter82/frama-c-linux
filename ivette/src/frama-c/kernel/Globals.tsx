@@ -17,13 +17,17 @@ import * as Dome from 'dome';
 import * as Json from 'dome/data/json';
 import { classes } from 'dome/misc/utils';
 import { alpha } from 'dome/data/compare';
-import { Section, Item, SidebarTitle } from 'dome/frame/sidebars';
+import { Section, Item, SidebarTitle, makeBadge } from 'dome/frame/sidebars';
 import {
-  Button, ItemProps, Multiselect, MultiselectItem, MultiselectItemProps
+  Button, IconButton, ItemProps,
+  Multiselect, MultiselectItem, MultiselectItemProps
 } from 'dome/controls/buttons';
 import { Label } from 'dome/controls/labels';
 import * as Toolbar from 'dome/frame/toolbars';
 import { Hbox } from 'dome/layout/boxes';
+import * as Forms from 'dome/layout/forms';
+import { Tree, Node } from 'dome/frame/tree';
+import { RState } from 'dome/data/states';
 import { Dropdown } from 'dome/dialogs';
 import { Icon } from 'dome/controls/icons';
 
@@ -34,6 +38,7 @@ import * as Ast from 'frama-c/kernel/api/ast';
 import * as Locations from 'frama-c/kernel/Locations';
 import { computationState } from 'frama-c/plugins/eva/api/general';
 import * as Eva from 'frama-c/plugins/eva/api/general';
+import path from 'path';
 
 
 // --------------------------------------------------------------------------
@@ -202,11 +207,11 @@ function List(props: ListProps): JSX.Element {
 interface FctItemProps {
   fct: functionsData,
   scope: States.Scope,
-  icon?: string
+  addIcon: boolean
 }
 
 function FctItem(props: FctItemProps): JSX.Element {
-  const { fct, scope, icon } = props;
+  const { fct, scope, addIcon } = props;
   const { name, signature, main, stdlib, builtin, defined, decl } = fct;
   const { scopes, label: selectionLabel } = Locations.useSelection();
   const className = classes(
@@ -220,7 +225,8 @@ function FctItem(props: FctItemProps): JSX.Element {
   return (
     <Item
       key={decl}
-      icon={icon}
+      icon={addIcon ? 'FUNCTION' : undefined}
+      kind={'positive'}
       className={className}
       label={name}
       title={signature}
@@ -363,7 +369,8 @@ export function Functions(props: ScrollableParent): JSX.Element {
     fcts
       .filter(showFunction)
       .sort((f, g) => alpha(f.name, g.name))
-      .map((fct) => <FctItem key={fct.decl} fct={fct} scope={scope}/>);
+      .map((fct) =>
+        <FctItem key={fct.decl} fct={fct} scope={scope} addIcon={false}/>);
 
   return (
     <List
@@ -384,11 +391,11 @@ export function Functions(props: ScrollableParent): JSX.Element {
 interface VarItemProps {
   variable: Ast.globalsData,
   scope: States.Scope,
-  icon?: string
+  addIcon: boolean
 }
 
 function VarItem(props: VarItemProps): JSX.Element {
-  const { variable, scope, icon } = props;
+  const { variable, scope, addIcon } = props;
   const { name, type, decl } = variable;
   const varMarker = React.useMemo(
     () => States.getDeclaration(decl).self, [decl]);
@@ -396,7 +403,8 @@ function VarItem(props: VarItemProps): JSX.Element {
   return (
     <Item
       key={decl}
-      icon={icon}
+      icon={addIcon ? 'VARIABLE' : undefined}
+      kind={'positive'}
       label={name}
       title={type}
       selected={decl === scope}
@@ -471,25 +479,38 @@ export function useVariableFilter(): VariablesFilterRet {
   // Context menu to change filter settings
   /* eslint-disable max-len */
   const contextVarMenuItems: MultiselectItemProps[] = [
-    menuItem({ label: 'Show stdlib variables', state: stdlibState }),
+    menuItem({ label: 'Show stdlib variables',
+               state: stdlibState }),
     'separator',
-    menuItem({ label: 'Show extern variables', state: externState }),
-    menuItem({ label: 'Show non-extern variables', state: nonExternState }),
+    menuItem({ label: 'Show extern variables',
+               state: externState }),
+    menuItem({ label: 'Show non-extern variables',
+               state: nonExternState }),
     'separator',
-    menuItem({ label: 'Show const variables', state: isConstState }),
-    menuItem({ label: 'Show non-const variables', state: nonConstState }),
+    menuItem({ label: 'Show const variables',
+               state: isConstState }),
+    menuItem({ label: 'Show non-const variables',
+               state: nonConstState }),
     'separator',
-    menuItem({ label: 'Show volatile variables', state: volatileState }),
-    menuItem({ label: 'Show non-volatile variables', state: nonVolatileState }),
+    menuItem({ label: 'Show volatile variables',
+               state: volatileState }),
+    menuItem({ label: 'Show non-volatile variables',
+               state: nonVolatileState }),
     'separator',
-    menuItem({ label: 'Show ghost variables', state: ghostState }),
-    menuItem({ label: 'Show non-ghost variables', state: nonGhostState }),
+    menuItem({ label: 'Show ghost variables',
+               state: ghostState }),
+    menuItem({ label: 'Show non-ghost variables',
+               state: nonGhostState }),
     'separator',
-    menuItem({ label: 'Show variables with explicit initializer', state: initState }),
-    menuItem({ label: 'Show variables without explicit initializer', state: nonInitState }),
+    menuItem({ label: 'Show variables with explicit initializer',
+               state: initState }),
+    menuItem({ label: 'Show variables without explicit initializer',
+               state: nonInitState }),
     'separator',
-    menuItem({ label: 'Show variables from the source code', state: sourceState }),
-    menuItem({ label: 'Show variables generated from analyses', state: nonSourceState }),
+    menuItem({ label: 'Show variables from the source code',
+               state: sourceState }),
+    menuItem({ label: 'Show variables generated from analyses',
+               state: nonSourceState }),
   ];
   /* eslint-enable max-len */
 
@@ -511,7 +532,8 @@ export function Variables(props: ScrollableParent): JSX.Element {
     variables
       .filter(showVariable)
       .sort((v1, v2) => alpha(v1.name, v2.name))
-      .map((v) => <VarItem key={v.decl} scope={scope} variable={v}/>);
+      .map((v) =>
+        <VarItem key={v.decl} scope={scope} variable={v} addIcon={false}/>);
 
   return (
     <List
@@ -538,15 +560,60 @@ interface DeclarationsProps {
   defaultUnfold?: boolean;
 }
 
-function makeItem(
+const isAcsl = (d: Ast.declAttributesData): boolean => {
+  switch(d.kind) {
+    case 'TYPEDEF':
+    case 'ENUM':
+    case 'UNION':
+    case 'STRUCT':
+    case 'GLOBAL':
+    case 'FUNCTION':
+      return false;
+    default:
+      return true;
+  }
+};
+
+const getIcon = (d: Ast.declAttributesData): string => {
+  switch(d.kind) {
+    case 'TYPEDEF':
+    case 'ENUM':
+    case 'UNION':
+    case 'STRUCT':
+      return 'TYPE';
+    default:
+      return d.kind;
+  }
+};
+
+const getName = (d: Ast.declAttributesData): string => {
+  switch(d.kind) {
+    case 'TYPEDEF': return 'typedef ' + d.name;
+    case 'ENUM': return 'enum ' + d.name;
+    case 'UNION': return 'union ' + d.name;
+    case 'STRUCT': return 'struct ' + d.name;
+    default: return d.name;
+  }
+};
+
+interface AttrItemProps {
+  dattrs: Ast.declAttributesData,
   scope: States.Scope,
-  attributes: Ast.declAttributesData
-): JSX.Element {
-  const { decl, name, label } = attributes;
+  addIcon: boolean
+}
+
+function AttrItem(props: AttrItemProps): JSX.Element {
+  const { dattrs, scope, addIcon } = props;
+  const { decl, label } = dattrs;
+  const name = getName(dattrs);
+  const icon = !addIcon ? undefined : getIcon(dattrs);
+  const iconkind = isAcsl(dattrs) ? 'default' : 'positive';
   return (
     <Item
       key={decl}
       label={name}
+      icon={icon}
+      kind={iconkind}
       title={label}
       selected={decl === scope}
       onSelection={() => States.setCurrentScope(decl)}
@@ -564,7 +631,8 @@ export function Declarations(props: DeclarationsProps): JSX.Element {
       data
         .filter(filter)
         .sort((d1, d2) => alpha(d1.name, d2.name))
-        .map((d) => makeItem(scope, d))
+        .map((d) =>
+          <AttrItem key={d.decl} dattrs={d} scope={scope} addIcon={false}/>)
     , [scope, data, filter]
   );
   return (
@@ -587,7 +655,7 @@ export function Declarations(props: DeclarationsProps): JSX.Element {
 
 const filterTypes = (d: Ast.declAttributesData): boolean => {
   switch (d.kind) {
-    case 'TYPE':
+    case 'TYPEDEF':
     case 'ENUM':
     case 'UNION':
     case 'STRUCT':
@@ -611,6 +679,89 @@ export function Types(): JSX.Element {
 // --------------------------------------------------------------------------
 // --- Global Annotations Section
 // --------------------------------------------------------------------------
+
+interface AnnotFilterRet {
+  contextAnnotFilter: React.JSX.Element,
+  showAnnotation: (decl: Ast.declAttributesData) => boolean
+}
+
+export function useAnnotFilter(): AnnotFilterRet {
+  const useFlipSettings = (label: string, b: boolean): setting => {
+    return Dome.useFlipSettings('ivette.annotations.' + label, b);
+  };
+
+  const ltypesState = useFlipSettings('ltypes', false);
+  const lfunPredsState = useFlipSettings('lfunPreds', false);
+  const laxiomaticsState = useFlipSettings('laxiomatics', true);
+  const lemmasState = useFlipSettings('lemmas', true);
+  const lmodulesState = useFlipSettings('lmodules', true);
+  const linvariantsState = useFlipSettings('linvariants', true);
+  const lmodelState = useFlipSettings('lmodel', true);
+  const lvolatileState = useFlipSettings('lvolatile', true);
+  const slextensionsState = useFlipSettings('lextensions', false);
+
+  const [ltypes, ] = ltypesState;
+  const [lfunPreds, ] = lfunPredsState;
+  const [laxiomatics, ] = laxiomaticsState;
+  const [lemmas, ] = lemmasState;
+  const [lmodules, ] = lmodulesState;
+  const [linvariants, ] = linvariantsState;
+  const [lmodel, ] = lmodelState;
+  const [lvolatile, ] = lvolatileState;
+  const [lextensions, ] = slextensionsState;
+
+  const showAnnotation = React.useMemo(() => {
+    return (d: Ast.declAttributesData): boolean => {
+      const annot = [
+        'LTYPE', 'LFUNPRED', 'AXIOMATIC', 'LEMMA',
+        'MODULE', 'INVARIANT', 'MODEL', 'VOLATILE', 'EXTENSION'
+      ];
+      const visible = annot.includes(d.kind)
+        && (ltypes || d.kind !== 'LTYPE')
+        && (lfunPreds || d.kind !== 'LFUNPRED')
+        && (laxiomatics || d.kind !== 'AXIOMATIC')
+        && (lemmas || d.kind !== 'LEMMA')
+        && (lmodules || d.kind !== 'MODULE')
+        && (linvariants || d.kind !== 'INVARIANT')
+        && (lmodel || d.kind !== 'MODEL')
+        && (lvolatile || d.kind !== 'VOLATILE')
+        && (lextensions || d.kind !== 'EXTENSION');
+        return !!visible;
+      };
+  }, [ltypes, lfunPreds, laxiomatics, lemmas, lmodules,
+    linvariants, lmodel, lvolatile, lextensions
+  ]);
+
+  const contextMenuItems: MultiselectItemProps[] = [
+    menuItem({ label: 'Show Logic Types',
+               state: ltypesState }),
+    menuItem({ label: 'Show Predicates and Logic Functions',
+               state: lfunPredsState }),
+    menuItem({ label: 'Show Axiomatic Definitions',
+               state: laxiomaticsState }),
+    menuItem({ label: 'Show Lemmas',
+               state: lemmasState }),
+    menuItem({ label: 'Show Logic Modules',
+               state: lmodulesState }),
+    menuItem({ label: 'Show Invariants',
+               state: linvariantsState }),
+    menuItem({ label: 'Show Model Fields',
+               state: lmodelState }),
+    menuItem({ label: 'Show Volatile Annotations',
+               state: lvolatileState }),
+    menuItem({ label: 'Show ACSL Extensions',
+               state: slextensionsState }),
+  ];
+
+  const itemsComp = contextMenuItems.map(
+    (e, i) => <MultiselectItem key={i} item={e} />);
+  const contextAnnotFilter = <Multiselect>{ itemsComp }</Multiselect>;
+
+  return {
+    contextAnnotFilter,
+    showAnnotation: showAnnotation,
+  };
+}
 
 export function GlobalAnnots(): JSX.Element {
   return <>
@@ -675,138 +826,370 @@ export function GlobalAnnots(): JSX.Element {
 // --- Files Section
 // --------------------------------------------------------------------------
 
+interface Dir {
+  id: string;
+  label: string;
+  path: string[],
+  files: File[];
+  dir: Dir[];
+}
+interface File {
+  id: string;
+  label: string,
+  ext: string,
+  path: string[],
+  types: Ast.declAttributesData[],
+  fcts: functionsData[],
+  vars: Ast.globalsData[],
+  annot: Ast.declAttributesData[]
+}
+type FileList = {[key: string]: File };
+
+
+function Nodes(props: {
+  dir: Dir[], files: File[],
+  scope: States.Scope,
+  prevCompact?: boolean
+}): React.ReactNode {
+  const { dir, files, prevCompact  = false, scope } = props;
+  const dirComp = dir.map(item =>
+    <DirNode key={item.id} dir={item}
+      scope={scope} prevCompact={prevCompact} />
+  );
+  const filesComp = files.map(file =>
+    <Node icon={'FILE'} key={file.id} id={file.id}
+      label={file.label} title={`${file.path.join('/')}/${file.label}`}
+    ><Items {...file} scope={scope} /></Node>);
+
+  return <>{dirComp}{filesComp}</>;
+}
+
+function DirNode(props: {
+  dir: Dir,
+  scope: States.Scope,
+  prevCompact?: boolean
+}): React.ReactNode {
+  const { dir, scope, prevCompact = false } = props;
+  const label = prevCompact ? `../${dir.label}` : dir.label;
+  const toCompact =  dir.dir.length === 1 && dir.files.length === 0;
+  const path = `${dir.path.join('/')}/${dir.label}`;
+
+  return toCompact ?
+    <Nodes key={dir.id} dir={dir.dir} files={dir.files}
+      scope={scope} prevCompact={true}/>
+    :
+    <Node key={dir.id} icon={'FOLDER'} id={dir.id} label={label} title={path}>
+      { dir.dir.length > 0 || dir.files.length > 0 ?
+        <Nodes dir={dir.dir} files={dir.files}
+        scope={scope} prevCompact={false}/>
+        : null }
+    </Node>;
+}
+
+interface ItemsProps {
+  types?: Ast.declAttributesData[],
+  fcts?: functionsData[],
+  vars?: Ast.globalsData[],
+  annot?: Ast.declAttributesData[]
+  addIcon?: boolean;
+  scope: States.Scope;
+}
+
+function Items(props: ItemsProps): JSX.Element | null {
+  const { types, fcts, vars, annot, addIcon = true, scope } = props;
+  return <>
+    { types &&
+      types.map(t =>
+        <AttrItem
+          key={t.decl} dattrs={t} scope={scope} addIcon={addIcon} />)}
+    { fcts &&
+      fcts.map(f =>
+        <FctItem
+          key={f.decl} fct={f} scope={scope} addIcon={addIcon} />) }
+    { vars &&
+      vars.map(v =>
+        <VarItem
+          key={v.decl} variable={v} scope={scope} addIcon={addIcon} />)}
+    { annot &&
+      annot.map(a =>
+        <AttrItem
+          key={a.decl} dattrs={a} scope={scope} addIcon={addIcon} />)}
+  </>;
+}
+
+
 type FilesProps = {
+  searchByName: string | undefined;
+  unfoldAllState: RState<boolean | undefined>;
+  showTypesState: [boolean, () => void];
   showFunction: (fct: functionsData) => boolean;
   showFctsState: [boolean, () => void];
-  showVariable: (vi: Ast.globalsData) => boolean
+  showVariable: (vi: Ast.globalsData) => boolean;
   showVarsState: [boolean, () => void];
+  showAnnotation: (annot: Ast.declAttributesData) => boolean;
+  showAnnotState: [boolean, () => void];
+  dispInList: boolean;
+  contextFctFilter: React.JSX.Element;
+  contextVarFilter: React.JSX.Element;
+  contextAnnotFilter: React.JSX.Element;
 } & ScrollableParent
 
 export function Files(props: FilesProps): JSX.Element {
-  const { showFunction, showFctsState, showVariable, showVarsState,
-    scrollableParent } = props;
+  const { showTypesState, showFunction, showFctsState,
+    showVariable, showVarsState, showAnnotation, showAnnotState,
+    scrollableParent, dispInList, searchByName, unfoldAllState,
+    contextFctFilter, contextAnnotFilter, contextVarFilter,
+  } = props;
+
+  const filterByName = React.useCallback((val: { name: string }): boolean => {
+      return searchByName ? val.name.includes(searchByName) : true;
+    }, [searchByName]);
+
   // Hooks
   const scope = States.useCurrentScope();
-  const getDecl = States.useSyncArrayGetter(Ast.declAttributes);
-  const currentSection = React.useMemo(() => {
-    return getDecl(scope)?.source.file;
-  }, [scope, getDecl]);
 
   // functions
   const ker = States.useSyncArrayProxy(Ast.functions);
   const eva = States.useSyncArrayProxy(Eva.functions);
-  const fcts = React.useMemo(() => computeFcts(ker, eva), [ker, eva]);
+  const fctsSorted = React.useMemo(() =>
+    computeFcts(ker, eva)
+    .sort((f, g) => alpha(f.name, g.name)
+  ), [ker, eva]);
   const [showFcts, ] = showFctsState;
+  const _fctsFiltered = React.useMemo(() => {
+    if(!showFcts) return [];
+    return fctsSorted.filter(showFunction);
+  }, [fctsSorted, showFunction, showFcts]);
+  const fctsFiltered = React.useMemo(() => {
+    if(!searchByName) return _fctsFiltered;
+    return _fctsFiltered.filter(filterByName);
+  }, [_fctsFiltered, searchByName, filterByName]);
 
   // Variables
   const variables = States.useSyncArrayData(Ast.globals);
+  const varsSorted = React.useMemo(() =>
+    variables.sort((f, g) => alpha(f.name, g.name)
+  ), [variables]);
   const [showVars, ] = showVarsState;
+  const _varsFiltered = React.useMemo(() => {
+    if(!showVars) return [];
+    return varsSorted.filter(showVariable)
+      .sort((v1, v2) => alpha(v1.name, v2.name));
+  }, [varsSorted, showVariable, showVars]);
+  const varsFiltered = React.useMemo(() => {
+    if(!searchByName) return _varsFiltered;
+    return _varsFiltered.filter(filterByName);
+  }, [_varsFiltered, searchByName, filterByName]);
 
-  interface InfosFile {
-    label: string,
-    fcts: functionsData[],
-    vars: Ast.globalsData[]
-  }
+  // declaration for types and annotations
+  const declarations = States.useSyncArrayData(Ast.declAttributes);
+  const declarationsSorted = React.useMemo(() =>
+    declarations.sort((v1, v2) => {
+        const cmp = alpha(v1.kind, v2.kind);
+        if(cmp !== 0) return cmp;
+        return alpha(v1.name, v2.name);
+    }), [declarations]);
 
-  type InfosFileList = {[key: string]: InfosFile };
+  // types
+  const [showTypes, ] = showTypesState;
+  const _typesFiltered = React.useMemo(() => {
+    if(!showTypes) return [];
+    return declarationsSorted.filter(filterTypes);
+  }, [declarationsSorted, showTypes]);
+  const typesFiltered = React.useMemo(() => {
+    if(!searchByName) return _typesFiltered;
+    return _typesFiltered.filter(filterByName);
+  }, [_typesFiltered, searchByName, filterByName]);
+
+  // Annotations
+  const [showAnnot, ] = showAnnotState;
+  const _annotsFiltered = React.useMemo(() => {
+    if(!showAnnot) return [];
+    return declarationsSorted.filter(showAnnotation);
+  }, [declarationsSorted, showAnnotation, showAnnot]);
+  const annotsFiltered = React.useMemo(() => {
+    if(!searchByName) return _annotsFiltered;
+    return _annotsFiltered.filter(filterByName);
+  }, [_annotsFiltered, searchByName, filterByName]);
+
   const files = React.useMemo(() => {
-    const newFiles: InfosFileList = {};
-
+    const newFiles: FileList = {};
     function createFileIfNeeded(loc: Ast.source): void {
       if (!newFiles[loc.file])
-        newFiles[loc.file] = { label: loc.base, fcts: [], vars: [] };
+        newFiles[loc.file] = {
+          id: loc.file,
+          label: loc.base,
+          path: loc.dir.split('/').filter(Boolean),
+          ext: path.extname(loc.base),
+          types: [],
+          fcts: [],
+          vars: [],
+          annot: []
+        };
     }
-
-    fcts.filter(showFunction)
-    .sort((f, g) => alpha(f.name, g.name))
-    .forEach((fct) => {
+    typesFiltered.forEach((elt) => {
+      createFileIfNeeded(elt.source);
+      newFiles[elt.source.file].types.push(elt);
+    });
+    fctsFiltered.forEach((fct) => {
       createFileIfNeeded(fct.sloc);
       newFiles[fct.sloc.file].fcts.push(fct);
     });
-
-    variables.filter(showVariable)
-      .sort((v1, v2) => alpha(v1.name, v2.name))
-      .forEach((elt) => {
-        createFileIfNeeded(elt.sloc);
-        newFiles[elt.sloc.file].vars.push(elt);
-      });
+    varsFiltered.forEach((elt) => {
+      createFileIfNeeded(elt.sloc);
+      newFiles[elt.sloc.file].vars.push(elt);
+    });
+    annotsFiltered.forEach((elt) => {
+      createFileIfNeeded(elt.source);
+      newFiles[elt.source.file].annot.push(elt);
+    });
 
     return newFiles;
-  }, [fcts, showFunction, variables, showVariable]);
+  }, [typesFiltered, fctsFiltered, varsFiltered, annotsFiltered]);
 
-  function getList([path, infos]: [string, InfosFile]): JSX.Element | null {
-    const { label, fcts, vars } = infos;
-    const fctsComp: JSX.Element[] = showFcts ?
-      fcts.map(fct =>
-        <FctItem key={fct.decl} fct={fct} scope={scope} icon='FUNCTION'/>)
-      : [];
-    const varsComp: JSX.Element[] = showVars ? vars.map((v) =>
-      <VarItem key={v.decl} scope={scope} variable={v} icon='VARIABLE'/>) : [];
-    const items = fctsComp.concat(varsComp);
-    if(items.length === 0) return null;
+  const tree = React.useMemo(() => {
+    const newTree: Dir[] = [];
 
-    return (
-      <Section
-        key={path}
-        label={label}
-        title={path}
-        infos={currentSection === path ? '(active)' : undefined}
-        className='globals-section'
-      >
-        <InfiniteScrollList scrollableParent={scrollableParent} >
-          {items}
-        </InfiniteScrollList>
-      </Section>
-    );
-  }
+    function addPath(current: Dir[], path: string[], index: number = 0): Dir {
+      const dirpath = index === 0 ? [] : path.slice(0, index);
+      const dirId =  `${dirpath.join('/')}/${path[index]}`;
 
-  return <>
-    {
-      Object.entries(files)
-        .sort((v1, v2) => alpha(v1[1].label, v2[1].label))
-        .map(elt => getList(elt))
+      const next = current.find(e => e.id === dirId) ??
+          current[current.push(
+            { id: dirId, label: path[index], path: dirpath, files: [], dir: [] }
+          )-1];
+
+      if(path.length === index + 1) return next;
+      return addPath(next.dir, path, index + 1);
     }
-  </>;
+
+    Object.entries(files).forEach(([, file]) => {
+      addPath(newTree, file.path, 0).files.push(file);
+    });
+
+    return newTree;
+  }, [ files ]);
+
+  const [ unfoldAll, setUnfoldAll ] = unfoldAllState;
+  return (
+    <Tree
+      unfoldAll={unfoldAll}
+      setUnfoldAll={setUnfoldAll}
+      sticky={true}
+      className='sidebar-files-tree'
+      >
+      <div style={dispInList ? { display: 'none' } : { display: 'block' }}>
+        <InfiniteScrollList scrollableParent={scrollableParent} >
+          { Object.entries(tree).map(elt =>
+              <DirNode key={elt[0]} dir={elt[1]} scope={scope} />
+            )
+          }
+        </InfiniteScrollList >
+      </div>
+      <div style={dispInList ? { display: 'block' } : { display: 'none' }}>
+        <InfiniteScrollList scrollableParent={scrollableParent} >
+            { showTypes ? <Node key='typesFiltered' id='typesFiltered'
+              label={'Types'} title={'Types'}
+              actions={makeBadge(typesFiltered.length)}
+              ><Items types={typesFiltered} scope={scope} addIcon={false}/>
+              </Node> : <></>
+            }
+            { showFcts ? <Node key='fctsFiltered' id='fctsFiltered'
+              label={'Functions'} title={'Functions'}  actions={<>
+                  <Dropdown control={ <Toolbar.Button icon='FILTER' /> }
+                  >{contextFctFilter}</Dropdown>
+                  {makeBadge(fctsFiltered.length)}
+                </>}
+              ><Items fcts={fctsFiltered} scope={scope} addIcon={false} />
+              </Node> : <></>
+            }
+            { showVars ? <Node key='varsFiltered' id='varsFiltered'
+              label={'Variables'} title={'Variables'}
+              actions={<>
+                  <Dropdown control={ <Toolbar.Button icon='FILTER' /> }
+                  >{contextVarFilter}</Dropdown>
+                  {makeBadge(varsFiltered.length)}
+                </>}
+              ><Items vars={varsFiltered} scope={scope} addIcon={false} />
+              </Node> : <></>
+            }
+            { showAnnot ? <Node key='annotsFiltered' id='annotsFiltered'
+              label={'Annotations'} title={'Annotations'}
+              actions={<>
+                  <Dropdown control={ <Toolbar.Button icon='FILTER' /> }
+                  >{contextAnnotFilter}</Dropdown>
+                  {makeBadge(annotsFiltered.length)}
+                </>}
+              ><Items annot={annotsFiltered} scope={scope} addIcon={false} />
+              </Node> : <></>
+            }
+        </InfiniteScrollList >
+      </div>
+    </Tree>
+  );
 }
 
-interface SidebarFilesTitleProps {
+interface SidebarFilesToolProps {
+  searchByNameState: Forms.FieldState<string | undefined>;
+  unfoldAllState: RState<boolean | undefined>;
+  showTypesState: [boolean, () => void];
   showFctsState: [boolean, () => void];
   contextFctFilter: React.JSX.Element;
   showVarsState: [boolean, () => void];
   contextVarFilter: React.JSX.Element;
+  showAnnotState: [boolean, () => void];
+  contextAnnotFilter: React.JSX.Element;
 }
 
-function SidebarFilesTitle(props: SidebarFilesTitleProps): JSX.Element {
-  const { showFctsState, contextFctFilter,
-          showVarsState, contextVarFilter } = props;
-  const [showFcts, flipShowFcts] = showFctsState;
-  const [showVars, flipShowVars] = showVarsState;
+function SidebarFilesTools(props: SidebarFilesToolProps): React.JSX.Element {
+  const searchByNameState = props.searchByNameState;
+  const [showTypes, flipShowTypes] = props.showTypesState;
+  const [showFcts, flipShowFcts] = props.showFctsState;
+  const [showVars, flipShowVars] = props.showVarsState;
+  const [showAnnot, flipShowAnnot] = props.showAnnotState;
+
+  const typesButton = <Toolbar.Button icon="T" title={'Show types'}
+    selected={showTypes}  onClick={() => flipShowTypes()} />;
+  const fctsButton = <Toolbar.Button icon="F" title={'Show functions'}
+    selected={showFcts}  onClick={() => flipShowFcts()} />;
+  const varsButton = <Toolbar.Button icon="V" title={'Show variables'}
+    selected={showVars}  onClick={() => flipShowVars()} />;
+  const annotsButton = <Toolbar.Button icon="A" title={'Show annotations'}
+    selected={showAnnot}  onClick={() => flipShowAnnot()} />;
 
   return (
-    <SidebarTitle label='Files'>
-      <Hbox>
-        <Toolbar.ButtonGroup>
-          <Toolbar.Button
-            icon="FUNCTION"
-            title={'Show functions'}
-            selected={showFcts}
-            onClick={() => flipShowFcts()}
-            />
+    <div className='sidebar-files-tools'>
+      <Hbox className='sidebar-files-tools-filter'>
+        <Hbox>
+          { typesButton }
+          <Toolbar.ButtonGroup>
+            { fctsButton }
           <Dropdown control={ <Toolbar.Button icon='FILTER' /> }
-          >{contextFctFilter}</Dropdown>
-        </Toolbar.ButtonGroup>
-        <Toolbar.ButtonGroup>
-          <Toolbar.Button
-            icon="VARIABLE"
-            title={'Show variables'}
-            selected={showVars}
-            onClick={() => flipShowVars()}
-            />
+          >{props.contextFctFilter}</Dropdown>
+          </Toolbar.ButtonGroup>
+          <Toolbar.ButtonGroup>
+            { varsButton }
           <Dropdown control={ <Toolbar.Button icon='FILTER' /> }
-          >{contextVarFilter}</Dropdown>
-        </Toolbar.ButtonGroup>
+          >{props.contextVarFilter}</Dropdown>
+          </Toolbar.ButtonGroup>
+          <Toolbar.ButtonGroup>
+            { annotsButton }
+          <Dropdown control={ <Toolbar.Button icon='FILTER' /> }
+          >{props.contextAnnotFilter}</Dropdown>
+          </Toolbar.ButtonGroup>
+        </Hbox>
       </Hbox>
-    </SidebarTitle>
+      <Forms.TextField
+          label=''
+          placeholder='Search'
+          state={searchByNameState}
+          actions={<IconButton
+            icon='TRASH'
+            onClick={() =>
+              searchByNameState.onChanged(undefined, undefined, false)}
+          />}
+        />
+    </div>
   );
 }
 
@@ -817,7 +1200,21 @@ function SidebarFilesTitle(props: SidebarFilesTitleProps): JSX.Element {
 export function GlobalByFiles(): JSX.Element {
   const scrollableArea = React.useRef<HTMLDivElement>(null);
 
-  // functions
+  // display in list
+  const [dispInList, flipDispInList] =
+    Dome.useFlipSettings('ivette.sidebar.file.disp.inlist', false);
+
+  // For input text
+  const searchByNameState = Forms.useState<string|undefined>(undefined);
+
+  // For unfoldAll tree
+  const unfoldAllState = React.useState<boolean | undefined>(true);
+
+  // Types
+  const showTypesState =
+    Dome.useFlipSettings('ivette.files.show.types', true);
+
+  // Functions
   const { showFunction, contextFctFilter } = useFunctionFilter();
   const showFctsState =
     Dome.useFlipSettings('ivette.files.show.functions', true);
@@ -827,19 +1224,72 @@ export function GlobalByFiles(): JSX.Element {
   const showVarsState =
     Dome.useFlipSettings('ivette.files.show.globals', true);
 
+  // Annotations
+  const { showAnnotation, contextAnnotFilter } = useAnnotFilter();
+  const showAnnotState =
+    Dome.useFlipSettings('ivette.files.show.annotations', true);
+
+  const [unfoldAll, setUnfoldAll] = unfoldAllState;
+
   return (<>
-      <SidebarFilesTitle
+      <SidebarTitle label='Files'>
+        <Hbox>
+          <Toolbar.ButtonGroup>
+            <Toolbar.Button
+              icon="CHEVRON.CONTRACT"
+              title={'Fold all'}
+              disabled={unfoldAll === false}
+              onClick={() => setUnfoldAll(false)}
+              />
+            <Toolbar.Button
+              icon='CHEVRON.EXPAND'
+              title={'Unfold all'}
+              disabled={unfoldAll}
+              onClick={() => setUnfoldAll(true)}
+              />
+          </Toolbar.ButtonGroup>
+          <Toolbar.ButtonGroup>
+            <Toolbar.Button
+              icon="ITEMS.LIST"
+              title={'Display in list'}
+              selected={dispInList}
+              onClick={() => flipDispInList()}
+              />
+            <Toolbar.Button
+              icon='TREE'
+              title={'Display in tree'}
+              selected={!dispInList}
+              onClick={() => flipDispInList()}
+              />
+          </Toolbar.ButtonGroup>
+        </Hbox>
+      </SidebarTitle>
+      <SidebarFilesTools
+        searchByNameState={searchByNameState}
+        unfoldAllState={unfoldAllState}
+        showTypesState={showTypesState}
         showFctsState={showFctsState}
         contextFctFilter={contextFctFilter}
         showVarsState={showVarsState}
         contextVarFilter={contextVarFilter}
+        showAnnotState={showAnnotState}
+        contextAnnotFilter={contextAnnotFilter}
       />
       <div ref={scrollableArea} className="globals-scrollable-area">
         <Files scrollableParent={scrollableArea}
+          searchByName={searchByNameState.value}
+          unfoldAllState={unfoldAllState}
+          showTypesState={showTypesState}
           showFctsState={showFctsState}
           showFunction={showFunction}
           showVarsState={showVarsState}
           showVariable={showVariable}
+          showAnnotState={showAnnotState}
+          showAnnotation={showAnnotation}
+          dispInList={dispInList}
+          contextFctFilter={contextFctFilter}
+          contextVarFilter={contextVarFilter}
+          contextAnnotFilter={contextAnnotFilter}
         />
       </div>
     </>

@@ -25,11 +25,15 @@ import { Actions } from 'dome/layout/forms';
 
 export type FoldIconPosition = 'left' | 'right';
 
-type TreeContext = { depth: number; } & Omit<TreeProps, "children">;
+type TreeContext = {
+  depth: number;
+  heightSticky: number;
+} & Omit<TreeProps, 'children' | 'className'>;
 
 const CONTEXT_DEFAULT: TreeContext = {
   foldButtonPosition: 'left',
   depth: 0,
+  heightSticky: 0,
 };
 const CONTEXT = React.createContext<TreeContext>(CONTEXT_DEFAULT);
 
@@ -41,15 +45,18 @@ function useContext(props: Partial<TreeContext>): TreeContext {
     foldButtonPosition: props.foldButtonPosition || Parent.foldButtonPosition,
     selected: props.selected || Parent.selected,
     depth: props.depth || Parent.depth,
+    heightSticky: props.heightSticky || Parent.heightSticky,
     onClick: props.onClick,
   };
 }
 
 interface TreeProps {
+  className?: string;
   unfoldAll?: boolean ; /* default false */
   setUnfoldAll?: (v: boolean|undefined) => void;
   foldButtonPosition?: FoldIconPosition;
   selected?: string;
+  sticky?: boolean;
   onClick?: (id: string) => void;
   children?: React.ReactNode ; /* only nodes */
 }
@@ -57,7 +64,7 @@ interface TreeProps {
 export function Tree(props: TreeProps): JSX.Element {
   const {
       unfoldAll, setUnfoldAll, foldButtonPosition,
-      selected, onClick
+      selected, sticky, onClick, className
     } = props;
 
   const context = useContext({
@@ -67,10 +74,14 @@ export function Tree(props: TreeProps): JSX.Element {
     foldButtonPosition: foldButtonPosition,
     selected,
   });
+  const treeClass = classes(
+    'dome-xTree',
+    sticky && 'dome-xTree-sticky',
+    className);
 
   return (
     <CONTEXT.Provider value={context}>
-      <div className={'dome-xTree'}>
+      <div className={treeClass}>
         <div className='dome-xTree-nodes'>
           { props.children }
         </div>
@@ -93,6 +104,13 @@ export function Node(props: NodeProps): JSX.Element {
 
   const context = React.useContext(CONTEXT);
   const countChildren = React.Children.count(children);
+  const hasSubTree = countChildren > 0;
+
+  const ref = React.useRef<HTMLDivElement>(null);
+  const [height, setHeight] = React.useState(0);
+  React.useEffect(() => {
+    if (ref.current) setHeight(ref.current.offsetHeight);
+  }, [context]);
 
   const [ unfold, setUnfold ] = React.useState(
     context.unfoldAll !== undefined ? context.unfoldAll : false);
@@ -107,7 +125,7 @@ export function Node(props: NodeProps): JSX.Element {
 
   const className = classes(
     'dome-xTree-node',
-    countChildren > 0 ? "dome-xTree-has-subtree" : "",
+    hasSubTree ? "dome-xTree-has-subtree" : "",
     unfold ? 'dome-xTree-show-children' : 'dome-xTree-hide-children',
     context.selected === id && 'dome-xTree-selected'
   );
@@ -115,39 +133,51 @@ export function Node(props: NodeProps): JSX.Element {
     'dome-xTree-subtree',
     unfold ? 'dome-xTree-subtree-visible' : 'dome-xTree-subtree-hidden'
   );
-  const style = styles(context.depth > 0 && { marginLeft: `10px` });
+  const topDepth = (context.heightSticky).toString()+'px';
+  const zIndex = (100 - context.depth);
+  const style = styles(context.depth > 0 && {
+    marginLeft: `10px`,
+    top: topDepth,
+    zIndex: zIndex
+  });
 
   /** ************************************************************ */
 
   const foldIconPosition = context?.foldButtonPosition || 'left';
   const foldIcon = <IconButton
       className='dome-xTree-folding-button'
-      style={{ visibility: countChildren > 0 ? 'visible' : 'hidden' }}
+      style={{ visibility: hasSubTree ? 'visible' : 'hidden' }}
       icon={ "ANGLE.DOWN" }
       onClick={() => flipUnfold()}
     />;
 
   return (
-    <CONTEXT.Provider value={{ ...context, depth: context.depth+1 }}>
-      <div className={className} style={style}
-        onClick={() => context.onClick && context.onClick(id) }
-      >
-          <div>
-            { foldIconPosition === 'left' && foldIcon }
-            <Label icon={icon} title={title}
-              label={label}
-            ></Label>
-          </div>
-          <Actions>
-            { actions && actions }
-            { foldIconPosition === 'right' && foldIcon }
-          </Actions>
-      </div>
-      { countChildren > 0 &&
-        <div className={classSubtree} style={style}>
-          { children }
+    <CONTEXT.Provider value={{
+      ...context,
+      depth: context.depth+1,
+      heightSticky: context.heightSticky+height
+    }}>
+      <div>
+        <div ref={ref} className={className} style={style}
+          onClick={() => context.onClick ? context.onClick(id) : flipUnfold() }
+        >
+            <div>
+              { foldIconPosition === 'left' && foldIcon }
+              <Label icon={icon} title={title}
+                label={label}
+              ></Label>
+            </div>
+            <Actions>
+              { actions && actions }
+              { foldIconPosition === 'right' && foldIcon }
+            </Actions>
         </div>
-      }
+        { hasSubTree &&
+          <div className={classSubtree} style={style}>
+            { children }
+          </div>
+        }
+      </div>
     </CONTEXT.Provider>
   );
 }

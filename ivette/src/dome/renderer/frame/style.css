@@ -188,6 +188,8 @@
     flex-flow: row nowrap ;
     align-items: center ;
     scroll-margin-top: 30px;
+
+    &:hover { background-color: var(--background-softer); }
 }
 
 .dome-xSideBarItem.dome-active {
@@ -730,17 +732,16 @@ input:checked + .dome-xSwitch-slider:before {
   background-color: inherit;
   padding-bottom: 5px;
 
-  .dome-xTree-nodes {
-    overflow-y: auto;
+  &.dome-xTree-sticky .dome-xTree-node.dome-xTree-has-subtree {
+    position: sticky;
+    top: 0px;
+    z-index: 100;
   }
 
-  div.dome-xTree-subtree {
-    overflow: hidden;
-
-    &.dome-xTree-subtree-hidden {
-      height: 0;
-      visibility: hidden;
-    }
+  .dome-xTree-subtree.dome-xTree-subtree-hidden,
+  .dome-xTree-subtree.dome-xTree-subtree-hidden *{
+    height: 0;
+    visibility: hidden;
   }
 
   .dome-xTree-node {
@@ -750,11 +751,13 @@ input:checked + .dome-xSwitch-slider:before {
     justify-content: space-between;
     border-radius: 7px;
     gap: 10px;
+    background-color: var(--background-sidebar);
 
     &>div {
       display: flex;
       flex-direction: row;
       flex-wrap: nowrap;
+      align-items: center;
 
       &:first-child { min-width: 0; }
       &:last-child {
