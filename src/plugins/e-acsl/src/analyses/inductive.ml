@@ -157,7 +157,12 @@ end = struct
     in_args, Option.get out_arg
 
   let all_modes ~li =
-    Complete :: List.mapi (fun i _ -> Incomplete (i + 1)) li.l_profile
+    let incomplete_modes =
+      if List.length li.l_profile > 1
+      then List.mapi (fun i _ -> Incomplete (i + 1)) li.l_profile
+      else []
+    in
+    Complete :: incomplete_modes
 
   let select_mode ~usable_vars ~li args modes =
     let check_mode mode =
