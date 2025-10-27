@@ -145,9 +145,7 @@ let get_funspec callsite kf =
   Populate_spec.populate_funspec ?loc ~do_body:true kf [`Assigns];
   Annotations.funspec kf
 
-let analysis_target ~recursion_depth call =
-  let callsite = Callstack.top_callsite call.callstack
-  and kf = call.kf in
+let analysis_target ?(recursion_depth = -1) kf callsite =
   match Builtins.find_builtin_override kf with
   | Some (name, builtin, cache, spec) ->
     `Builtin (name, builtin, cache, spec)
@@ -165,11 +163,9 @@ let analysis_target ~recursion_depth call =
         then `Spec (get_funspec callsite kf)
         else `Body (def, save_results def)
 
-let define_analysis_target ?(recursion_depth = -1) call  =
-  let kind = analysis_target ~recursion_depth call in
+let register_analysis_target call analysis_target  =
   register_call call;
-  register_status call.kf kind;
-  kind
+  register_status call.kf analysis_target
 
 
 type t = (analysis_status * Callers.t) Kernel_function.Map.t

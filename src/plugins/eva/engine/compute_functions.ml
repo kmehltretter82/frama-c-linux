@@ -327,15 +327,10 @@ module Make (Engine: Engine_sig.S) = struct
     let finally () = Eva_perf.stop callstack in
     Callstack.with_callstack ~finally callstack job x
 
-  (* Interprets a [call] in the state [state],
-     using a builtin, the specification or the body of the called function,
-     according to [Function_calls.register].
-     Exported in [Engine_sig.Compute] and used by [Transfer_stmt] when
-     interpreting a call statement. *)
-  let compute_call call recursion =
-    with_callstack call.callstack @@ fun state ->
-    let recursion_depth = Option.map (fun r -> r.depth) recursion in
-    let target = Function_calls.define_analysis_target ?recursion_depth call in
+  (* Interprets a [call] in the state [state], using a builtin, specification or
+     the body of the called function according to [target]. *)
+  let compute_call_with_target call target state =
+    Function_calls.register_analysis_target call target;
     match target with
     | `Builtin builtin_info -> compute_builtin builtin_info call state
     | `Spec _ as spec -> compute_using_spec_or_body spec call state
@@ -345,7 +340,26 @@ module Make (Engine: Engine_sig.S) = struct
       then compute_and_cache_call compute call state
       else compute call state
 
+  (* Defines the target of the analysis of a call, and analyze it.
+     Exported in [Engine_sig.Compute] and used by [Transfer_stmt] when
+     interpreting a call statement. *)
+  let compute_call call recursion =
+    with_callstack call.callstack @@ fun state ->
+    let kf = call.kf in
+    let callsite = Callstack.top_callsite call.callstack in
+    let recursion_depth = Option.map (fun r -> r.depth) recursion in
+    let target = Function_calls.analysis_target ?recursion_depth kf callsite in
+    compute_call_with_target call target state
+
   (* ----- Main call -------------------------------------------------------- *)
+
+  (* Abort if the main function is interpreted by a builtin. *)
+  let check_main_function_target kf = function
+    | `Builtin _ ->
+      Self.abort
+        "Cannot analyze program from main function %a, for which a builtin is used."
+        Kernel_function.pretty kf
+    | `Spec _ | `Body _ -> ()
 
   let compute_main_call kf init_state =
 
@@ -362,6 +376,7 @@ module Make (Engine: Engine_sig.S) = struct
         Engine.Interferences.inject_init_state th kf init_state
       in
       let call = { kf; callstack; arguments = []; rest = []; return = None; } in
+      check_main_function_target kf (Function_calls.analysis_target kf Kglobal);
       let final_result = compute_call call None init_state in
       let final_states = List.map snd (final_result.states) in
       let final_state = Bottom.of_list ~join:Engine.Dom.join final_states in
