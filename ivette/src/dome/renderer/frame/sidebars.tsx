@@ -18,9 +18,9 @@
 import React from 'react';
 import { useFlipSettings } from 'dome';
 import { Badge } from 'dome/controls/icons';
-import { Label, Title } from 'dome/controls/labels';
+import { Label } from 'dome/controls/labels';
 import { classes } from 'dome/misc/utils';
-import { Hbox } from 'dome/layout/boxes';
+import { Hbox, TitleBar, TitleBarProps } from 'dome/layout/boxes';
 import { IconButton, IconButtonProps } from 'dome/controls/buttons';
 import { Dropdown } from 'dome/dialogs';
 
@@ -259,27 +259,12 @@ export function Item(props: ItemProps): JSX.Element {
 // --- SideBar Title
 // --------------------------------------------------------------------------
 
-export interface SidebarTitleProps {
-  /** Label. */
-  label: string;
-  /** Additional CSS class. */
-  className?: string;
-  /** Other elements. */
-  children?: React.ReactNode;
+export function SidebarTitle(props: TitleBarProps): JSX.Element {
+  return (
+    <TitleBar label={props.label} className='dome-xSideBarTitle'>
+      {props.children}
+    </TitleBar>
+  );
 }
 
-/** Sidebar Title. */
-export function SidebarTitle(props: SidebarTitleProps): JSX.Element {
-  const { label, children } = props;
-  const className = classes(
-    'dome-xSideBarTitle',
-    props.className,
-  );
-  return (
-    <Hbox className={className}>
-      <Hbox><Title label={label} title={label}/></Hbox>
-      { children}
-    </Hbox>
-  );
-}
 // --------------------------------------------------------------------------

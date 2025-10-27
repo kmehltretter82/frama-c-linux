@@ -21,6 +21,7 @@ import * as Ast from 'frama-c/kernel/api/ast';
 import * as States from 'frama-c/states';
 import * as Projects from 'frama-c/kernel/Projects';
 import { showAboutModal, showCreditsModal } from './help';
+import { showOptionsModal } from './options';
 
 const cFilter = {
   name: 'C source files',
@@ -175,6 +176,22 @@ function addHelpMenuItems(): void {
   });
 }
 
+function addEditMenuItems(): void {
+  Dome.addMenuItem({
+    menu: 'Edit',
+    label: 'Frama-C Parameters',
+    id: 'frama_c_options',
+    onClick: showOptionsModal,
+    kind: 'normal',
+    key: 'Cmd+P'
+  });
+  Dome.addMenuItem({
+    menu: 'Edit',
+    id: 'edit_params_separator',
+    kind: 'separator',
+  });
+}
+
 async function duplicateCurrentProject(): Promise<void> {
   const current = await Server.send(Project.getCurrent, null);
   Projects.duplicateProject(current);
@@ -237,6 +254,7 @@ export function addProjectSubMenu(others?: Dome.MenuItemProps[]): void {
 export function init(): void {
   addFileMenuItems();
   addHelpMenuItems();
+  addEditMenuItems();
   Dome.addMenu('Project');
   addProjectSubMenu();
 }

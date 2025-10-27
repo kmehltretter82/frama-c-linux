@@ -313,19 +313,28 @@ export function setTitle(title: string): void {
 // --- Window Modal Container
 // --------------------------------------------------------------------------
 
-export const modal = new GlobalState<React.ReactNode | undefined>(undefined);
+export type ModalInfos = {
+  content: React.ReactNode,
+  /**
+   * onClose will be called before the modal is closed.
+   * The function must return false if the modal should not be closed,
+   * true otherwise.
+   */
+  onClose?: () => boolean | Promise<boolean>
+}
+export const modal = new GlobalState<ModalInfos | undefined>(undefined);
 
 function ModalContainer(): JSX.Element | null {
-  const [ modalContent, ] = useGlobalState(modal);
+  const [ modalInfos, ] = useGlobalState(modal);
 
-  if(modalContent === undefined) return null;
+  if(modalInfos?.content === undefined) return null;
   return (
     <div className="dome-xModal-overlay" >
       <div
         className="dome-xModal"
         onClick={(event) => event.stopPropagation()}
       >
-        {modalContent}
+        {modalInfos.content}
       </div>
     </div>
   );
