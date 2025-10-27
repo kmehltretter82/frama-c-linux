@@ -48,7 +48,13 @@ let show_rte_of_kf kf =
 let main () =
   Ast.compute () ;
   Kernel.SignedOverflow.on ();
-  let do_rte = RteGen.Api.do_rte in
+  let flags =
+    RteGen.{ (Flags.all ()) with
+             Flags.unsigned_overflow = false;
+             signed_downcast = false;
+             unsigned_downcast = false; }
+  in
+  let do_rte = RteGen.Visit.annotate ~flags in
   Globals.Functions.iter (fun kf -> do_rte kf);
   print () ;
   Globals.Functions.iter show_rte_of_kf

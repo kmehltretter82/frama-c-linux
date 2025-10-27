@@ -13,7 +13,7 @@ type t = {
   cint : bool ;
   kernel : (unit -> bool) ;
   option : string ;
-  status : unit -> RteGen.Api.status_accessor ;
+  status : unit -> RteGen.Generator.status_accessor ;
 }
 
 let option name =
@@ -21,10 +21,7 @@ let option name =
   with _ -> false
 
 let status db kf =
-  try
-    (* Absolutely forbidden to use 'set' from RteGen.Api :
-       this disables the generation of the associated RTE. *)
-    let (_,_,get) = db () in get kf
+  try let (_,_,get) = db () in get kf
   with Failure _ ->
     Wp_parameters.warning ~once:true
       "Missing RTE plug-in: can not generate conditions" ;
@@ -60,33 +57,33 @@ let generator =
   [
     { name = "memory access" ;
       kernel = always ; option = "-rte-mem" ; cint = false ;
-      status = RteGen.Api.get_memAccess_status } ;
+      status = (fun () -> RteGen.Generator.Mem_access.accessor) } ;
     { name = "division by zero" ;
       kernel = always ; option = "-rte-div" ; cint = false ;
-      status = RteGen.Api.get_divMod_status } ;
+      status = (fun () -> RteGen.Generator.Div_mod.accessor) } ;
     { name = "signed overflow" ; cint = true ;
       kernel = Kernel.SignedOverflow.get ; option = "" ;
-      status = RteGen.Api.get_signedOv_status } ;
+      status = (fun () -> RteGen.Generator.Signed_overflow.accessor) } ;
     { name = "unsigned overflow" ; cint = true ;
       kernel = Kernel.UnsignedOverflow.get ; option = "" ;
-      status = RteGen.Api.get_unsignedOv_status } ;
+      status = (fun () -> RteGen.Generator.Unsigned_overflow.accessor) } ;
     { name = "signed downcast" ; cint = true ; option = "" ;
       kernel = Kernel.SignedDowncast.get ;
-      status = RteGen.Api.get_signed_downCast_status } ;
+      status = (fun () -> RteGen.Generator.Signed_downcast.accessor) } ;
     { name = "unsigned downcast" ; cint = true ; option = "" ;
       kernel = Kernel.UnsignedDowncast.get ;
-      status = RteGen.Api.get_unsignedDownCast_status } ;
+      status = (fun () -> RteGen.Generator.Unsigned_downcast.accessor) } ;
     { name = "invalid bool value" ; cint = false ;
       option = "-warn-invalid-bool" ;
       kernel = Kernel.InvalidBool.get ;
-      status = RteGen.Api.get_bool_value_status } ;
+      status = (fun () -> RteGen.Generator.Bool_value.accessor) } ;
   ]
 
 let generate model kf =
   let update = ref false in
   let cint = WpContext.on_context (model,WpContext.Kf kf) Cint.current () in
   List.iter (configure ~update ~generate:true kf cint) generator ;
-  if !update then RteGen.Api.annotate_kf kf
+  if !update then RteGen.Visit.annotate kf
 
 let generate_all model =
   Wp_parameters.iter_kf (generate model)

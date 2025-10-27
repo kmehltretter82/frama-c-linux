@@ -73,7 +73,5 @@ end
 
 type 'a m = 'a M.t (** an abbreviation for the monad type *)
 
-(** Transforms a Cil binary operator to an {!Interlang} binary operator.
-    Not all Cil operators are supported (yet).
-    @raise Not_covered if the {!Interlang} does not yet support the operator *)
-val binop : Cil_types.binop -> Interlang.binop
+val of_binop: Cil_types.binop -> Interlang.binop
+val of_relation: Cil_types.relation -> Interlang.binop

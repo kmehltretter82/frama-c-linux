@@ -4,7 +4,7 @@ let print () =
 
 let print_status () =
   Kernel.log "printing status";
-  let _, _, get_signedOv_status = RteGen.Api.get_signedOv_status () in
+  let _, _, get_signedOv_status = RteGen.Generator.Signed_overflow.accessor in
   Globals.Functions.iter
     (fun kf ->
        Kernel.log "kf = %s rte_gen_status = %b\n"
@@ -22,12 +22,12 @@ let main () =
   if not(Ast.is_computed ()) then Ast.compute () ;
   print ();
 
-  Globals.Functions.iter (fun kf -> RteGen.Api.annotate_kf kf);
+  Globals.Functions.iter (fun kf -> RteGen.Visit.annotate kf);
   print () ;
   print_status ();
 
   Kernel.log "Removing some rte annotations" ;
-  let _, set_signed, _ = RteGen.Api.get_signedOv_status () in
+  let _, set_signed, _ = RteGen.Generator.Signed_overflow.accessor in
   let emitter = Dynamic.get ~plugin:"RteGen" "emitter" Emitter.ty in
   let filter = function
     | Alarms.Overflow _ -> true
@@ -43,7 +43,7 @@ let main () =
     (fun kf ->
        if !one_on_two then begin
          set_signed kf false;
-         RteGen.Api.annotate_kf kf
+         RteGen.Visit.annotate kf
        end;
        one_on_two := not !one_on_two);
   print ()  ;

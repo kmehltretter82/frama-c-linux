@@ -11,7 +11,7 @@ open Interlang
 
 
 module Exp = struct
-  let of_exp_node ?origin enode = {enode; origin}
+  let of_exp_node ?origin enode = Interlang.Exp.of_exp_node ?origin enode
   let of_lval ?origin lval = of_exp_node ?origin @@ Lval lval
   let of_integer ~origin n = of_exp_node ~origin @@ Integer n
   let of_sizeof ~origin ty = of_exp_node ~origin @@ SizeOf ty

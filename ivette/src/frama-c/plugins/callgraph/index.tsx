@@ -195,7 +195,8 @@ function Callgraph(): JSX.Element {
 
   /** Specific nodes*/
   const selectedFunctions = React.useMemo<Set<string>>(() => {
-    return new Set(multipleSelection.map(elt => elt as string));
+    if(!multipleSelection) return new Set();
+    return new Set(multipleSelection as string[]);
   }, [multipleSelection]);
 
   const taintedFunctions =  React.useMemo(() => {

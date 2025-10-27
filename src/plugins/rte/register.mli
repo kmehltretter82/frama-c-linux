@@ -6,4 +6,4 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Register the plugin in the Frama-C kernel. Nothing is exported. *)
+val compute : unit -> unit

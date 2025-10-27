@@ -259,263 +259,229 @@ int main(void)
   }
   /*@ assert x / 3 == -1; */ ;
   {
-    __e_acsl_mpz_t __gen_e_acsl__13;
-    __e_acsl_mpz_t __gen_e_acsl__14;
-    int __gen_e_acsl_div_guard_2;
-    __e_acsl_mpz_t __gen_e_acsl_div_2;
-    __e_acsl_mpz_t __gen_e_acsl__15;
-    int __gen_e_acsl_eq_7;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_9 =
       {.values = (void *)0};
-    __gmpz_init_set_str(__gen_e_acsl__13,"309485009821345068724781055",10);
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_10 =
-      {.values = (void *)0};
-    __gmpz_init_set_si(__gen_e_acsl__14,0L);
-    __gen_e_acsl_div_guard_2 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl__13),
-                                          (__e_acsl_mpz_struct const *)(__gen_e_acsl__14));
-    __gmpz_init(__gen_e_acsl_div_2);
-    /*@ assert E_ACSL: 0xffffffffffffffffffffff != 0; */
-    {
-      __gen_e_acsl_assert_data_10.blocking = 1;
-      __gen_e_acsl_assert_data_10.kind = "Assertion";
-      __gen_e_acsl_assert_data_10.pred_txt = "0xffffffffffffffffffffff != 0";
-      __gen_e_acsl_assert_data_10.file = "arith.i";
-      __gen_e_acsl_assert_data_10.fct = "main";
-      __gen_e_acsl_assert_data_10.line = 18;
-      __e_acsl_assert(__gen_e_acsl_div_guard_2 != 0,
-                      & __gen_e_acsl_assert_data_10);
-    }
-    __gmpz_tdiv_q(__gen_e_acsl_div_2,
-                  (__e_acsl_mpz_struct const *)(__gen_e_acsl__13),
-                  (__e_acsl_mpz_struct const *)(__gen_e_acsl__13));
-    __gmpz_init_set_si(__gen_e_acsl__15,1L);
-    __gen_e_acsl_eq_7 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_div_2),
-                                   (__e_acsl_mpz_struct const *)(__gen_e_acsl__15));
     __gen_e_acsl_assert_data_9.blocking = 1;
     __gen_e_acsl_assert_data_9.kind = "Assertion";
     __gen_e_acsl_assert_data_9.pred_txt = "0xffffffffffffffffffffff / 0xffffffffffffffffffffff == 1";
     __gen_e_acsl_assert_data_9.file = "arith.i";
     __gen_e_acsl_assert_data_9.fct = "main";
     __gen_e_acsl_assert_data_9.line = 18;
-    __e_acsl_assert(__gen_e_acsl_eq_7 == 0,& __gen_e_acsl_assert_data_9);
-    __gmpz_clear(__gen_e_acsl__13);
-    __gmpz_clear(__gen_e_acsl__14);
-    __gmpz_clear(__gen_e_acsl_div_2);
-    __gmpz_clear(__gen_e_acsl__15);
+    __e_acsl_assert(1,& __gen_e_acsl_assert_data_9);
   }
   /*@ assert 0xffffffffffffffffffffff / 0xffffffffffffffffffffff == 1; */ ;
   {
     __e_acsl_mpz_t __gen_e_acsl_x_7;
-    __e_acsl_mpz_t __gen_e_acsl__16;
-    __e_acsl_mpz_t __gen_e_acsl__17;
+    __e_acsl_mpz_t __gen_e_acsl__13;
+    __e_acsl_mpz_t __gen_e_acsl__14;
     int __gen_e_acsl_mod_guard;
     __e_acsl_mpz_t __gen_e_acsl_mod;
-    __e_acsl_mpz_t __gen_e_acsl__18;
+    __e_acsl_mpz_t __gen_e_acsl__15;
     __e_acsl_mpz_t __gen_e_acsl_neg_7;
-    int __gen_e_acsl_eq_8;
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_11 =
+    int __gen_e_acsl_eq_7;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_10 =
       {.values = (void *)0};
     __gmpz_init_set_si(__gen_e_acsl_x_7,(long)x);
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_12 =
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_11 =
       {.values = (void *)0};
-    __gmpz_init_set_si(__gen_e_acsl__16,2L);
-    __gmpz_init_set_si(__gen_e_acsl__17,0L);
-    __gen_e_acsl_mod_guard = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl__16),
-                                        (__e_acsl_mpz_struct const *)(__gen_e_acsl__17));
+    __gmpz_init_set_si(__gen_e_acsl__13,2L);
+    __gmpz_init_set_si(__gen_e_acsl__14,0L);
+    __gen_e_acsl_mod_guard = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl__13),
+                                        (__e_acsl_mpz_struct const *)(__gen_e_acsl__14));
     __gmpz_init(__gen_e_acsl_mod);
     /*@ assert E_ACSL: 2 != 0; */
     {
-      __gen_e_acsl_assert_data_12.blocking = 1;
-      __gen_e_acsl_assert_data_12.kind = "Assertion";
-      __gen_e_acsl_assert_data_12.pred_txt = "2 != 0";
-      __gen_e_acsl_assert_data_12.file = "arith.i";
-      __gen_e_acsl_assert_data_12.fct = "main";
-      __gen_e_acsl_assert_data_12.line = 19;
+      __gen_e_acsl_assert_data_11.blocking = 1;
+      __gen_e_acsl_assert_data_11.kind = "Assertion";
+      __gen_e_acsl_assert_data_11.pred_txt = "2 != 0";
+      __gen_e_acsl_assert_data_11.file = "arith.i";
+      __gen_e_acsl_assert_data_11.fct = "main";
+      __gen_e_acsl_assert_data_11.line = 19;
       __e_acsl_assert(__gen_e_acsl_mod_guard != 0,
-                      & __gen_e_acsl_assert_data_12);
+                      & __gen_e_acsl_assert_data_11);
     }
     __gmpz_tdiv_r(__gen_e_acsl_mod,
                   (__e_acsl_mpz_struct const *)(__gen_e_acsl_x_7),
-                  (__e_acsl_mpz_struct const *)(__gen_e_acsl__16));
-    __gmpz_init_set_si(__gen_e_acsl__18,1L);
+                  (__e_acsl_mpz_struct const *)(__gen_e_acsl__13));
+    __gmpz_init_set_si(__gen_e_acsl__15,1L);
     __gmpz_init(__gen_e_acsl_neg_7);
     __gmpz_neg(__gen_e_acsl_neg_7,
-               (__e_acsl_mpz_struct const *)(__gen_e_acsl__18));
-    __gen_e_acsl_eq_8 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_mod),
+               (__e_acsl_mpz_struct const *)(__gen_e_acsl__15));
+    __gen_e_acsl_eq_7 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_mod),
                                    (__e_acsl_mpz_struct const *)(__gen_e_acsl_neg_7));
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_11,"x",0,x);
-    __gen_e_acsl_assert_data_11.blocking = 1;
-    __gen_e_acsl_assert_data_11.kind = "Assertion";
-    __gen_e_acsl_assert_data_11.pred_txt = "x % 2 == -1";
-    __gen_e_acsl_assert_data_11.file = "arith.i";
-    __gen_e_acsl_assert_data_11.fct = "main";
-    __gen_e_acsl_assert_data_11.line = 19;
-    __e_acsl_assert(__gen_e_acsl_eq_8 == 0,& __gen_e_acsl_assert_data_11);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_11);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_10,"x",0,x);
+    __gen_e_acsl_assert_data_10.blocking = 1;
+    __gen_e_acsl_assert_data_10.kind = "Assertion";
+    __gen_e_acsl_assert_data_10.pred_txt = "x % 2 == -1";
+    __gen_e_acsl_assert_data_10.file = "arith.i";
+    __gen_e_acsl_assert_data_10.fct = "main";
+    __gen_e_acsl_assert_data_10.line = 19;
+    __e_acsl_assert(__gen_e_acsl_eq_7 == 0,& __gen_e_acsl_assert_data_10);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_10);
     __gmpz_clear(__gen_e_acsl_x_7);
-    __gmpz_clear(__gen_e_acsl__16);
-    __gmpz_clear(__gen_e_acsl__17);
+    __gmpz_clear(__gen_e_acsl__13);
+    __gmpz_clear(__gen_e_acsl__14);
     __gmpz_clear(__gen_e_acsl_mod);
-    __gmpz_clear(__gen_e_acsl__18);
+    __gmpz_clear(__gen_e_acsl__15);
     __gmpz_clear(__gen_e_acsl_neg_7);
   }
   /*@ assert x % 2 == -1; */ ;
   {
-    __e_acsl_mpz_t __gen_e_acsl__19;
+    __e_acsl_mpz_t __gen_e_acsl__16;
     __e_acsl_mpz_t __gen_e_acsl_neg_8;
-    __e_acsl_mpz_t __gen_e_acsl__20;
+    __e_acsl_mpz_t __gen_e_acsl__17;
     __e_acsl_mpz_t __gen_e_acsl_neg_9;
-    __e_acsl_mpz_t __gen_e_acsl__21;
+    __e_acsl_mpz_t __gen_e_acsl__18;
     int __gen_e_acsl_mod_guard_2;
     __e_acsl_mpz_t __gen_e_acsl_mod_2;
-    __e_acsl_mpz_t __gen_e_acsl__22;
+    __e_acsl_mpz_t __gen_e_acsl__19;
     __e_acsl_mpz_t __gen_e_acsl_neg_10;
-    int __gen_e_acsl_eq_9;
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_13 =
+    int __gen_e_acsl_eq_8;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_12 =
       {.values = (void *)0};
-    __gmpz_init_set_si(__gen_e_acsl__19,3L);
+    __gmpz_init_set_si(__gen_e_acsl__16,3L);
     __gmpz_init(__gen_e_acsl_neg_8);
     __gmpz_neg(__gen_e_acsl_neg_8,
-               (__e_acsl_mpz_struct const *)(__gen_e_acsl__19));
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_14 =
+               (__e_acsl_mpz_struct const *)(__gen_e_acsl__16));
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_13 =
       {.values = (void *)0};
-    __gmpz_init_set_si(__gen_e_acsl__20,2L);
+    __gmpz_init_set_si(__gen_e_acsl__17,2L);
     __gmpz_init(__gen_e_acsl_neg_9);
     __gmpz_neg(__gen_e_acsl_neg_9,
-               (__e_acsl_mpz_struct const *)(__gen_e_acsl__20));
-    __gmpz_init_set_si(__gen_e_acsl__21,0L);
+               (__e_acsl_mpz_struct const *)(__gen_e_acsl__17));
+    __gmpz_init_set_si(__gen_e_acsl__18,0L);
     __gen_e_acsl_mod_guard_2 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_neg_9),
-                                          (__e_acsl_mpz_struct const *)(__gen_e_acsl__21));
+                                          (__e_acsl_mpz_struct const *)(__gen_e_acsl__18));
     __gmpz_init(__gen_e_acsl_mod_2);
     /*@ assert E_ACSL: -2 != 0; */
     {
-      __gen_e_acsl_assert_data_14.blocking = 1;
-      __gen_e_acsl_assert_data_14.kind = "Assertion";
-      __gen_e_acsl_assert_data_14.pred_txt = "-2 != 0";
-      __gen_e_acsl_assert_data_14.file = "arith.i";
-      __gen_e_acsl_assert_data_14.fct = "main";
-      __gen_e_acsl_assert_data_14.line = 20;
+      __gen_e_acsl_assert_data_13.blocking = 1;
+      __gen_e_acsl_assert_data_13.kind = "Assertion";
+      __gen_e_acsl_assert_data_13.pred_txt = "-2 != 0";
+      __gen_e_acsl_assert_data_13.file = "arith.i";
+      __gen_e_acsl_assert_data_13.fct = "main";
+      __gen_e_acsl_assert_data_13.line = 20;
       __e_acsl_assert(__gen_e_acsl_mod_guard_2 != 0,
-                      & __gen_e_acsl_assert_data_14);
+                      & __gen_e_acsl_assert_data_13);
     }
     __gmpz_tdiv_r(__gen_e_acsl_mod_2,
                   (__e_acsl_mpz_struct const *)(__gen_e_acsl_neg_8),
                   (__e_acsl_mpz_struct const *)(__gen_e_acsl_neg_9));
-    __gmpz_init_set_si(__gen_e_acsl__22,1L);
+    __gmpz_init_set_si(__gen_e_acsl__19,1L);
     __gmpz_init(__gen_e_acsl_neg_10);
     __gmpz_neg(__gen_e_acsl_neg_10,
-               (__e_acsl_mpz_struct const *)(__gen_e_acsl__22));
-    __gen_e_acsl_eq_9 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_mod_2),
+               (__e_acsl_mpz_struct const *)(__gen_e_acsl__19));
+    __gen_e_acsl_eq_8 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_mod_2),
                                    (__e_acsl_mpz_struct const *)(__gen_e_acsl_neg_10));
-    __gen_e_acsl_assert_data_13.blocking = 1;
-    __gen_e_acsl_assert_data_13.kind = "Assertion";
-    __gen_e_acsl_assert_data_13.pred_txt = "-3 % -2 == -1";
-    __gen_e_acsl_assert_data_13.file = "arith.i";
-    __gen_e_acsl_assert_data_13.fct = "main";
-    __gen_e_acsl_assert_data_13.line = 20;
-    __e_acsl_assert(__gen_e_acsl_eq_9 == 0,& __gen_e_acsl_assert_data_13);
-    __gmpz_clear(__gen_e_acsl__19);
+    __gen_e_acsl_assert_data_12.blocking = 1;
+    __gen_e_acsl_assert_data_12.kind = "Assertion";
+    __gen_e_acsl_assert_data_12.pred_txt = "-3 % -2 == -1";
+    __gen_e_acsl_assert_data_12.file = "arith.i";
+    __gen_e_acsl_assert_data_12.fct = "main";
+    __gen_e_acsl_assert_data_12.line = 20;
+    __e_acsl_assert(__gen_e_acsl_eq_8 == 0,& __gen_e_acsl_assert_data_12);
+    __gmpz_clear(__gen_e_acsl__16);
     __gmpz_clear(__gen_e_acsl_neg_8);
-    __gmpz_clear(__gen_e_acsl__20);
+    __gmpz_clear(__gen_e_acsl__17);
     __gmpz_clear(__gen_e_acsl_neg_9);
-    __gmpz_clear(__gen_e_acsl__21);
+    __gmpz_clear(__gen_e_acsl__18);
     __gmpz_clear(__gen_e_acsl_mod_2);
-    __gmpz_clear(__gen_e_acsl__22);
+    __gmpz_clear(__gen_e_acsl__19);
     __gmpz_clear(__gen_e_acsl_neg_10);
   }
   /*@ assert -3 % -2 == -1; */ ;
   {
-    __e_acsl_mpz_t __gen_e_acsl__23;
-    __e_acsl_mpz_t __gen_e_acsl__24;
+    __e_acsl_mpz_t __gen_e_acsl__20;
+    __e_acsl_mpz_t __gen_e_acsl__21;
     __e_acsl_mpz_t __gen_e_acsl_neg_11;
-    __e_acsl_mpz_t __gen_e_acsl__25;
+    __e_acsl_mpz_t __gen_e_acsl__22;
     int __gen_e_acsl_mod_guard_3;
     __e_acsl_mpz_t __gen_e_acsl_mod_3;
-    __e_acsl_mpz_t __gen_e_acsl__26;
-    int __gen_e_acsl_eq_10;
+    __e_acsl_mpz_t __gen_e_acsl__23;
+    int __gen_e_acsl_eq_9;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_14 =
+      {.values = (void *)0};
+    __gmpz_init_set_si(__gen_e_acsl__20,3L);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_15 =
       {.values = (void *)0};
-    __gmpz_init_set_si(__gen_e_acsl__23,3L);
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_16 =
-      {.values = (void *)0};
-    __gmpz_init_set_si(__gen_e_acsl__24,2L);
+    __gmpz_init_set_si(__gen_e_acsl__21,2L);
     __gmpz_init(__gen_e_acsl_neg_11);
     __gmpz_neg(__gen_e_acsl_neg_11,
-               (__e_acsl_mpz_struct const *)(__gen_e_acsl__24));
-    __gmpz_init_set_si(__gen_e_acsl__25,0L);
+               (__e_acsl_mpz_struct const *)(__gen_e_acsl__21));
+    __gmpz_init_set_si(__gen_e_acsl__22,0L);
     __gen_e_acsl_mod_guard_3 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_neg_11),
-                                          (__e_acsl_mpz_struct const *)(__gen_e_acsl__25));
+                                          (__e_acsl_mpz_struct const *)(__gen_e_acsl__22));
     __gmpz_init(__gen_e_acsl_mod_3);
     /*@ assert E_ACSL: -2 != 0; */
     {
-      __gen_e_acsl_assert_data_16.blocking = 1;
-      __gen_e_acsl_assert_data_16.kind = "Assertion";
-      __gen_e_acsl_assert_data_16.pred_txt = "-2 != 0";
-      __gen_e_acsl_assert_data_16.file = "arith.i";
-      __gen_e_acsl_assert_data_16.fct = "main";
-      __gen_e_acsl_assert_data_16.line = 21;
+      __gen_e_acsl_assert_data_15.blocking = 1;
+      __gen_e_acsl_assert_data_15.kind = "Assertion";
+      __gen_e_acsl_assert_data_15.pred_txt = "-2 != 0";
+      __gen_e_acsl_assert_data_15.file = "arith.i";
+      __gen_e_acsl_assert_data_15.fct = "main";
+      __gen_e_acsl_assert_data_15.line = 21;
       __e_acsl_assert(__gen_e_acsl_mod_guard_3 != 0,
-                      & __gen_e_acsl_assert_data_16);
+                      & __gen_e_acsl_assert_data_15);
     }
     __gmpz_tdiv_r(__gen_e_acsl_mod_3,
-                  (__e_acsl_mpz_struct const *)(__gen_e_acsl__23),
+                  (__e_acsl_mpz_struct const *)(__gen_e_acsl__20),
                   (__e_acsl_mpz_struct const *)(__gen_e_acsl_neg_11));
-    __gmpz_init_set_si(__gen_e_acsl__26,1L);
-    __gen_e_acsl_eq_10 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_mod_3),
-                                    (__e_acsl_mpz_struct const *)(__gen_e_acsl__26));
-    __gen_e_acsl_assert_data_15.blocking = 1;
-    __gen_e_acsl_assert_data_15.kind = "Assertion";
-    __gen_e_acsl_assert_data_15.pred_txt = "3 % -2 == 1";
-    __gen_e_acsl_assert_data_15.file = "arith.i";
-    __gen_e_acsl_assert_data_15.fct = "main";
-    __gen_e_acsl_assert_data_15.line = 21;
-    __e_acsl_assert(__gen_e_acsl_eq_10 == 0,& __gen_e_acsl_assert_data_15);
-    __gmpz_clear(__gen_e_acsl__23);
-    __gmpz_clear(__gen_e_acsl__24);
+    __gmpz_init_set_si(__gen_e_acsl__23,1L);
+    __gen_e_acsl_eq_9 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_mod_3),
+                                   (__e_acsl_mpz_struct const *)(__gen_e_acsl__23));
+    __gen_e_acsl_assert_data_14.blocking = 1;
+    __gen_e_acsl_assert_data_14.kind = "Assertion";
+    __gen_e_acsl_assert_data_14.pred_txt = "3 % -2 == 1";
+    __gen_e_acsl_assert_data_14.file = "arith.i";
+    __gen_e_acsl_assert_data_14.fct = "main";
+    __gen_e_acsl_assert_data_14.line = 21;
+    __e_acsl_assert(__gen_e_acsl_eq_9 == 0,& __gen_e_acsl_assert_data_14);
+    __gmpz_clear(__gen_e_acsl__20);
+    __gmpz_clear(__gen_e_acsl__21);
     __gmpz_clear(__gen_e_acsl_neg_11);
-    __gmpz_clear(__gen_e_acsl__25);
+    __gmpz_clear(__gen_e_acsl__22);
     __gmpz_clear(__gen_e_acsl_mod_3);
-    __gmpz_clear(__gen_e_acsl__26);
+    __gmpz_clear(__gen_e_acsl__23);
   }
   /*@ assert 3 % -2 == 1; */ ;
   {
     __e_acsl_mpz_t __gen_e_acsl_x_8;
-    __e_acsl_mpz_t __gen_e_acsl__27;
+    __e_acsl_mpz_t __gen_e_acsl__24;
     __e_acsl_mpz_t __gen_e_acsl_mul_2;
-    __e_acsl_mpz_t __gen_e_acsl__28;
+    __e_acsl_mpz_t __gen_e_acsl__25;
     __e_acsl_mpz_t __gen_e_acsl_y;
     __e_acsl_mpz_t __gen_e_acsl_add_2;
     __e_acsl_mpz_t __gen_e_acsl_add_3;
-    __e_acsl_mpz_t __gen_e_acsl__29;
+    __e_acsl_mpz_t __gen_e_acsl__26;
     __e_acsl_mpz_t __gen_e_acsl_sub_2;
     __e_acsl_mpz_t __gen_e_acsl_sub_3;
     __e_acsl_mpz_t __gen_e_acsl_add_4;
-    __e_acsl_mpz_t __gen_e_acsl__30;
+    __e_acsl_mpz_t __gen_e_acsl__27;
     __e_acsl_mpz_t __gen_e_acsl_neg_12;
-    int __gen_e_acsl_eq_11;
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_17 =
+    int __gen_e_acsl_eq_10;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_16 =
       {.values = (void *)0};
     __gmpz_init_set_si(__gen_e_acsl_x_8,(long)x);
-    __gmpz_init_set_si(__gen_e_acsl__27,2L);
+    __gmpz_init_set_si(__gen_e_acsl__24,2L);
     __gmpz_init(__gen_e_acsl_mul_2);
     __gmpz_mul(__gen_e_acsl_mul_2,
                (__e_acsl_mpz_struct const *)(__gen_e_acsl_x_8),
-               (__e_acsl_mpz_struct const *)(__gen_e_acsl__27));
-    __gmpz_init_set_si(__gen_e_acsl__28,3L);
+               (__e_acsl_mpz_struct const *)(__gen_e_acsl__24));
+    __gmpz_init_set_si(__gen_e_acsl__25,3L);
     __gmpz_init_set_si(__gen_e_acsl_y,(long)y);
     __gmpz_init(__gen_e_acsl_add_2);
     __gmpz_add(__gen_e_acsl_add_2,
-               (__e_acsl_mpz_struct const *)(__gen_e_acsl__28),
+               (__e_acsl_mpz_struct const *)(__gen_e_acsl__25),
                (__e_acsl_mpz_struct const *)(__gen_e_acsl_y));
     __gmpz_init(__gen_e_acsl_add_3);
     __gmpz_add(__gen_e_acsl_add_3,
                (__e_acsl_mpz_struct const *)(__gen_e_acsl_mul_2),
                (__e_acsl_mpz_struct const *)(__gen_e_acsl_add_2));
-    __gmpz_init_set_si(__gen_e_acsl__29,4L);
+    __gmpz_init_set_si(__gen_e_acsl__26,4L);
     __gmpz_init(__gen_e_acsl_sub_2);
     __gmpz_sub(__gen_e_acsl_sub_2,
                (__e_acsl_mpz_struct const *)(__gen_e_acsl_add_3),
-               (__e_acsl_mpz_struct const *)(__gen_e_acsl__29));
+               (__e_acsl_mpz_struct const *)(__gen_e_acsl__26));
     __gmpz_init(__gen_e_acsl_sub_3);
     __gmpz_sub(__gen_e_acsl_sub_3,
                (__e_acsl_mpz_struct const *)(__gen_e_acsl_x_8),
@@ -524,376 +490,343 @@ int main(void)
     __gmpz_add(__gen_e_acsl_add_4,
                (__e_acsl_mpz_struct const *)(__gen_e_acsl_sub_2),
                (__e_acsl_mpz_struct const *)(__gen_e_acsl_sub_3));
-    __gmpz_init_set_si(__gen_e_acsl__30,10L);
+    __gmpz_init_set_si(__gen_e_acsl__27,10L);
     __gmpz_init(__gen_e_acsl_neg_12);
     __gmpz_neg(__gen_e_acsl_neg_12,
-               (__e_acsl_mpz_struct const *)(__gen_e_acsl__30));
-    __gen_e_acsl_eq_11 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_add_4),
+               (__e_acsl_mpz_struct const *)(__gen_e_acsl__27));
+    __gen_e_acsl_eq_10 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_add_4),
                                     (__e_acsl_mpz_struct const *)(__gen_e_acsl_neg_12));
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_17,"x",0,x);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_17,"y",0,y);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_17,"x",0,x);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_17,"y",0,y);
-    __gen_e_acsl_assert_data_17.blocking = 1;
-    __gen_e_acsl_assert_data_17.kind = "Assertion";
-    __gen_e_acsl_assert_data_17.pred_txt = "((x * 2 + (3 + y)) - 4) + (x - y) == -10";
-    __gen_e_acsl_assert_data_17.file = "arith.i";
-    __gen_e_acsl_assert_data_17.fct = "main";
-    __gen_e_acsl_assert_data_17.line = 23;
-    __e_acsl_assert(__gen_e_acsl_eq_11 == 0,& __gen_e_acsl_assert_data_17);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_17);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_16,"x",0,x);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_16,"y",0,y);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_16,"x",0,x);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_16,"y",0,y);
+    __gen_e_acsl_assert_data_16.blocking = 1;
+    __gen_e_acsl_assert_data_16.kind = "Assertion";
+    __gen_e_acsl_assert_data_16.pred_txt = "((x * 2 + (3 + y)) - 4) + (x - y) == -10";
+    __gen_e_acsl_assert_data_16.file = "arith.i";
+    __gen_e_acsl_assert_data_16.fct = "main";
+    __gen_e_acsl_assert_data_16.line = 23;
+    __e_acsl_assert(__gen_e_acsl_eq_10 == 0,& __gen_e_acsl_assert_data_16);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_16);
     __gmpz_clear(__gen_e_acsl_x_8);
-    __gmpz_clear(__gen_e_acsl__27);
+    __gmpz_clear(__gen_e_acsl__24);
     __gmpz_clear(__gen_e_acsl_mul_2);
-    __gmpz_clear(__gen_e_acsl__28);
+    __gmpz_clear(__gen_e_acsl__25);
     __gmpz_clear(__gen_e_acsl_y);
     __gmpz_clear(__gen_e_acsl_add_2);
     __gmpz_clear(__gen_e_acsl_add_3);
-    __gmpz_clear(__gen_e_acsl__29);
+    __gmpz_clear(__gen_e_acsl__26);
     __gmpz_clear(__gen_e_acsl_sub_2);
     __gmpz_clear(__gen_e_acsl_sub_3);
     __gmpz_clear(__gen_e_acsl_add_4);
-    __gmpz_clear(__gen_e_acsl__30);
+    __gmpz_clear(__gen_e_acsl__27);
     __gmpz_clear(__gen_e_acsl_neg_12);
   }
   /*@ assert ((x * 2 + (3 + y)) - 4) + (x - y) == -10; */ ;
   {
-    __e_acsl_mpz_t __gen_e_acsl__31;
-    __e_acsl_mpz_t __gen_e_acsl__32;
-    int __gen_e_acsl_eq_12;
-    __e_acsl_mpz_t __gen_e_acsl_eq_13;
-    int __gen_e_acsl_eq_14;
-    __e_acsl_mpz_t __gen_e_acsl_eq_15;
+    __e_acsl_mpz_t __gen_e_acsl__28;
+    __e_acsl_mpz_t __gen_e_acsl__29;
+    __e_acsl_mpz_t __gen_e_acsl__30;
     int __gen_e_acsl_not;
-    __e_acsl_mpz_t __gen_e_acsl__33;
-    int __gen_e_acsl_eq_16;
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_18 =
+    __e_acsl_mpz_t __gen_e_acsl__31;
+    int __gen_e_acsl_eq_11;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_17 =
       {.values = (void *)0};
-    __gmpz_init_set_si(__gen_e_acsl__31,0L);
-    __gmpz_init_set_si(__gen_e_acsl__32,1L);
-    __gen_e_acsl_eq_12 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl__31),
-                                    (__e_acsl_mpz_struct const *)(__gen_e_acsl__32));
-    __gmpz_init_set_si(__gen_e_acsl_eq_13,(long)(__gen_e_acsl_eq_12 == 0));
-    __gen_e_acsl_eq_14 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl__31),
+    __gmpz_init_set_si(__gen_e_acsl__28,0L);
+    __gmpz_init_set_si(__gen_e_acsl__29,1L);
+    __gmpz_init_set_si(__gen_e_acsl__30,0L);
+    __gen_e_acsl_not = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl__29),
+                                  (__e_acsl_mpz_struct const *)(__gen_e_acsl__30));
+    __gmpz_init_set_si(__gen_e_acsl__31,(long)(__gen_e_acsl_not == 0));
+    __gen_e_acsl_eq_11 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl__28),
                                     (__e_acsl_mpz_struct const *)(__gen_e_acsl__31));
-    __gmpz_init_set_si(__gen_e_acsl_eq_15,(long)(__gen_e_acsl_eq_14 == 0));
-    __gen_e_acsl_not = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_eq_15),
-                                  (__e_acsl_mpz_struct const *)(__gen_e_acsl__31));
-    __gmpz_init_set_si(__gen_e_acsl__33,(long)(__gen_e_acsl_not == 0));
-    __gen_e_acsl_eq_16 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_eq_13),
-                                    (__e_acsl_mpz_struct const *)(__gen_e_acsl__33));
-    __gen_e_acsl_assert_data_18.blocking = 1;
-    __gen_e_acsl_assert_data_18.kind = "Assertion";
-    __gen_e_acsl_assert_data_18.pred_txt = "(0 == 1) == !(0 == 0)";
-    __gen_e_acsl_assert_data_18.file = "arith.i";
-    __gen_e_acsl_assert_data_18.fct = "main";
-    __gen_e_acsl_assert_data_18.line = 25;
-    __e_acsl_assert(__gen_e_acsl_eq_16 == 0,& __gen_e_acsl_assert_data_18);
+    __gen_e_acsl_assert_data_17.blocking = 1;
+    __gen_e_acsl_assert_data_17.kind = "Assertion";
+    __gen_e_acsl_assert_data_17.pred_txt = "(0 == 1) == !(0 == 0)";
+    __gen_e_acsl_assert_data_17.file = "arith.i";
+    __gen_e_acsl_assert_data_17.fct = "main";
+    __gen_e_acsl_assert_data_17.line = 25;
+    __e_acsl_assert(__gen_e_acsl_eq_11 == 0,& __gen_e_acsl_assert_data_17);
+    __gmpz_clear(__gen_e_acsl__28);
+    __gmpz_clear(__gen_e_acsl__29);
+    __gmpz_clear(__gen_e_acsl__30);
     __gmpz_clear(__gen_e_acsl__31);
-    __gmpz_clear(__gen_e_acsl__32);
-    __gmpz_clear(__gen_e_acsl_eq_13);
-    __gmpz_clear(__gen_e_acsl_eq_15);
-    __gmpz_clear(__gen_e_acsl__33);
   }
   /*@ assert (0 == 1) == !(0 == 0); */ ;
   {
-    __e_acsl_mpz_t __gen_e_acsl__34;
-    __e_acsl_mpz_t __gen_e_acsl__35;
+    __e_acsl_mpz_t __gen_e_acsl__32;
+    __e_acsl_mpz_t __gen_e_acsl__33;
     __e_acsl_mpz_t __gen_e_acsl_neg_13;
     int __gen_e_acsl_le;
-    __e_acsl_mpz_t __gen_e_acsl__36;
-    int __gen_e_acsl_gt;
-    __e_acsl_mpz_t __gen_e_acsl_gt_2;
-    int __gen_e_acsl_eq_17;
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_19 =
+    __e_acsl_mpz_t __gen_e_acsl__34;
+    __e_acsl_mpz_t __gen_e_acsl__35;
+    int __gen_e_acsl_eq_12;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_18 =
       {.values = (void *)0};
-    __gmpz_init_set_si(__gen_e_acsl__34,0L);
-    __gmpz_init_set_si(__gen_e_acsl__35,1L);
+    __gmpz_init_set_si(__gen_e_acsl__32,0L);
+    __gmpz_init_set_si(__gen_e_acsl__33,1L);
     __gmpz_init(__gen_e_acsl_neg_13);
     __gmpz_neg(__gen_e_acsl_neg_13,
-               (__e_acsl_mpz_struct const *)(__gen_e_acsl__35));
-    __gen_e_acsl_le = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl__34),
+               (__e_acsl_mpz_struct const *)(__gen_e_acsl__33));
+    __gen_e_acsl_le = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl__32),
                                  (__e_acsl_mpz_struct const *)(__gen_e_acsl_neg_13));
-    __gmpz_init_set_si(__gen_e_acsl__36,(long)(__gen_e_acsl_le <= 0));
-    __gen_e_acsl_gt = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl__34),
-                                 (__e_acsl_mpz_struct const *)(__gen_e_acsl__34));
-    __gmpz_init_set_si(__gen_e_acsl_gt_2,(long)(__gen_e_acsl_gt > 0));
-    __gen_e_acsl_eq_17 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl__36),
-                                    (__e_acsl_mpz_struct const *)(__gen_e_acsl_gt_2));
-    __gen_e_acsl_assert_data_19.blocking = 1;
-    __gen_e_acsl_assert_data_19.kind = "Assertion";
-    __gen_e_acsl_assert_data_19.pred_txt = "(0 <= -1) == (0 > 0)";
-    __gen_e_acsl_assert_data_19.file = "arith.i";
-    __gen_e_acsl_assert_data_19.fct = "main";
-    __gen_e_acsl_assert_data_19.line = 26;
-    __e_acsl_assert(__gen_e_acsl_eq_17 == 0,& __gen_e_acsl_assert_data_19);
+    __gmpz_init_set_si(__gen_e_acsl__34,(long)(__gen_e_acsl_le <= 0));
+    __gmpz_init_set_si(__gen_e_acsl__35,0L);
+    __gen_e_acsl_eq_12 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl__34),
+                                    (__e_acsl_mpz_struct const *)(__gen_e_acsl__35));
+    __gen_e_acsl_assert_data_18.blocking = 1;
+    __gen_e_acsl_assert_data_18.kind = "Assertion";
+    __gen_e_acsl_assert_data_18.pred_txt = "(0 <= -1) == (0 > 0)";
+    __gen_e_acsl_assert_data_18.file = "arith.i";
+    __gen_e_acsl_assert_data_18.fct = "main";
+    __gen_e_acsl_assert_data_18.line = 26;
+    __e_acsl_assert(__gen_e_acsl_eq_12 == 0,& __gen_e_acsl_assert_data_18);
+    __gmpz_clear(__gen_e_acsl__32);
+    __gmpz_clear(__gen_e_acsl__33);
+    __gmpz_clear(__gen_e_acsl_neg_13);
     __gmpz_clear(__gen_e_acsl__34);
     __gmpz_clear(__gen_e_acsl__35);
-    __gmpz_clear(__gen_e_acsl_neg_13);
-    __gmpz_clear(__gen_e_acsl__36);
-    __gmpz_clear(__gen_e_acsl_gt_2);
   }
   /*@ assert (0 <= -1) == (0 > 0); */ ;
   {
+    __e_acsl_mpz_t __gen_e_acsl__36;
     __e_acsl_mpz_t __gen_e_acsl__37;
-    __e_acsl_mpz_t __gen_e_acsl__38;
     __e_acsl_mpz_t __gen_e_acsl_neg_14;
     int __gen_e_acsl_ge;
+    __e_acsl_mpz_t __gen_e_acsl__38;
     __e_acsl_mpz_t __gen_e_acsl__39;
-    int __gen_e_acsl_le_2;
-    __e_acsl_mpz_t __gen_e_acsl_le_3;
-    int __gen_e_acsl_eq_18;
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_20 =
+    int __gen_e_acsl_eq_13;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_19 =
       {.values = (void *)0};
-    __gmpz_init_set_si(__gen_e_acsl__37,0L);
-    __gmpz_init_set_si(__gen_e_acsl__38,1L);
+    __gmpz_init_set_si(__gen_e_acsl__36,0L);
+    __gmpz_init_set_si(__gen_e_acsl__37,1L);
     __gmpz_init(__gen_e_acsl_neg_14);
     __gmpz_neg(__gen_e_acsl_neg_14,
-               (__e_acsl_mpz_struct const *)(__gen_e_acsl__38));
-    __gen_e_acsl_ge = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl__37),
+               (__e_acsl_mpz_struct const *)(__gen_e_acsl__37));
+    __gen_e_acsl_ge = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl__36),
                                  (__e_acsl_mpz_struct const *)(__gen_e_acsl_neg_14));
-    __gmpz_init_set_si(__gen_e_acsl__39,(long)(__gen_e_acsl_ge >= 0));
-    __gen_e_acsl_le_2 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl__37),
-                                   (__e_acsl_mpz_struct const *)(__gen_e_acsl__37));
-    __gmpz_init_set_si(__gen_e_acsl_le_3,(long)(__gen_e_acsl_le_2 <= 0));
-    __gen_e_acsl_eq_18 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl__39),
-                                    (__e_acsl_mpz_struct const *)(__gen_e_acsl_le_3));
-    __gen_e_acsl_assert_data_20.blocking = 1;
-    __gen_e_acsl_assert_data_20.kind = "Assertion";
-    __gen_e_acsl_assert_data_20.pred_txt = "(0 >= -1) == (0 <= 0)";
-    __gen_e_acsl_assert_data_20.file = "arith.i";
-    __gen_e_acsl_assert_data_20.fct = "main";
-    __gen_e_acsl_assert_data_20.line = 27;
-    __e_acsl_assert(__gen_e_acsl_eq_18 == 0,& __gen_e_acsl_assert_data_20);
+    __gmpz_init_set_si(__gen_e_acsl__38,(long)(__gen_e_acsl_ge >= 0));
+    __gmpz_init_set_si(__gen_e_acsl__39,1L);
+    __gen_e_acsl_eq_13 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl__38),
+                                    (__e_acsl_mpz_struct const *)(__gen_e_acsl__39));
+    __gen_e_acsl_assert_data_19.blocking = 1;
+    __gen_e_acsl_assert_data_19.kind = "Assertion";
+    __gen_e_acsl_assert_data_19.pred_txt = "(0 >= -1) == (0 <= 0)";
+    __gen_e_acsl_assert_data_19.file = "arith.i";
+    __gen_e_acsl_assert_data_19.fct = "main";
+    __gen_e_acsl_assert_data_19.line = 27;
+    __e_acsl_assert(__gen_e_acsl_eq_13 == 0,& __gen_e_acsl_assert_data_19);
+    __gmpz_clear(__gen_e_acsl__36);
     __gmpz_clear(__gen_e_acsl__37);
-    __gmpz_clear(__gen_e_acsl__38);
     __gmpz_clear(__gen_e_acsl_neg_14);
+    __gmpz_clear(__gen_e_acsl__38);
     __gmpz_clear(__gen_e_acsl__39);
-    __gmpz_clear(__gen_e_acsl_le_3);
   }
   /*@ assert (0 >= -1) == (0 <= 0); */ ;
   {
     __e_acsl_mpz_t __gen_e_acsl__40;
     __e_acsl_mpz_t __gen_e_acsl__41;
-    int __gen_e_acsl_ne_2;
-    __e_acsl_mpz_t __gen_e_acsl_ne_3;
-    int __gen_e_acsl_ne_4;
-    __e_acsl_mpz_t __gen_e_acsl_ne_5;
-    int __gen_e_acsl_not_2;
     __e_acsl_mpz_t __gen_e_acsl__42;
-    int __gen_e_acsl_eq_19;
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_21 =
+    int __gen_e_acsl_not_2;
+    __e_acsl_mpz_t __gen_e_acsl__43;
+    int __gen_e_acsl_eq_14;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_20 =
       {.values = (void *)0};
-    __gmpz_init_set_si(__gen_e_acsl__40,0L);
-    __gmpz_init_set_si(__gen_e_acsl__41,1L);
-    __gen_e_acsl_ne_2 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl__40),
-                                   (__e_acsl_mpz_struct const *)(__gen_e_acsl__41));
-    __gmpz_init_set_si(__gen_e_acsl_ne_3,(long)(__gen_e_acsl_ne_2 != 0));
-    __gen_e_acsl_ne_4 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl__40),
-                                   (__e_acsl_mpz_struct const *)(__gen_e_acsl__40));
-    __gmpz_init_set_si(__gen_e_acsl_ne_5,(long)(__gen_e_acsl_ne_4 != 0));
-    __gen_e_acsl_not_2 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_ne_5),
-                                    (__e_acsl_mpz_struct const *)(__gen_e_acsl__40));
-    __gmpz_init_set_si(__gen_e_acsl__42,(long)(__gen_e_acsl_not_2 == 0));
-    __gen_e_acsl_eq_19 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_ne_3),
+    __gmpz_init_set_si(__gen_e_acsl__40,1L);
+    __gmpz_init_set_si(__gen_e_acsl__41,0L);
+    __gmpz_init_set_si(__gen_e_acsl__42,0L);
+    __gen_e_acsl_not_2 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl__41),
                                     (__e_acsl_mpz_struct const *)(__gen_e_acsl__42));
-    __gen_e_acsl_assert_data_21.blocking = 1;
-    __gen_e_acsl_assert_data_21.kind = "Assertion";
-    __gen_e_acsl_assert_data_21.pred_txt = "(0 != 1) == !(0 != 0)";
-    __gen_e_acsl_assert_data_21.file = "arith.i";
-    __gen_e_acsl_assert_data_21.fct = "main";
-    __gen_e_acsl_assert_data_21.line = 28;
-    __e_acsl_assert(__gen_e_acsl_eq_19 == 0,& __gen_e_acsl_assert_data_21);
+    __gmpz_init_set_si(__gen_e_acsl__43,(long)(__gen_e_acsl_not_2 == 0));
+    __gen_e_acsl_eq_14 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl__40),
+                                    (__e_acsl_mpz_struct const *)(__gen_e_acsl__43));
+    __gen_e_acsl_assert_data_20.blocking = 1;
+    __gen_e_acsl_assert_data_20.kind = "Assertion";
+    __gen_e_acsl_assert_data_20.pred_txt = "(0 != 1) == !(0 != 0)";
+    __gen_e_acsl_assert_data_20.file = "arith.i";
+    __gen_e_acsl_assert_data_20.fct = "main";
+    __gen_e_acsl_assert_data_20.line = 28;
+    __e_acsl_assert(__gen_e_acsl_eq_14 == 0,& __gen_e_acsl_assert_data_20);
     __gmpz_clear(__gen_e_acsl__40);
     __gmpz_clear(__gen_e_acsl__41);
-    __gmpz_clear(__gen_e_acsl_ne_3);
-    __gmpz_clear(__gen_e_acsl_ne_5);
     __gmpz_clear(__gen_e_acsl__42);
+    __gmpz_clear(__gen_e_acsl__43);
   }
   /*@ assert (0 != 1) == !(0 != 0); */ ;
   {
-    __e_acsl_mpz_t __gen_e_acsl__43;
-    int __gen_e_acsl_ne_6;
-    __e_acsl_mpz_t __gen_e_acsl_ne_7;
     __e_acsl_mpz_t __gen_e_acsl__44;
-    int __gen_e_acsl_ne_8;
-    __e_acsl_mpz_t __gen_e_acsl_ne_9;
-    int __gen_e_acsl_not_3;
     __e_acsl_mpz_t __gen_e_acsl__45;
-    int __gen_e_acsl_eq_20;
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_22 =
+    __e_acsl_mpz_t __gen_e_acsl__46;
+    int __gen_e_acsl_not_3;
+    __e_acsl_mpz_t __gen_e_acsl__47;
+    int __gen_e_acsl_eq_15;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_21 =
       {.values = (void *)0};
-    __gmpz_init_set_si(__gen_e_acsl__43,0L);
-    __gen_e_acsl_ne_6 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl__43),
-                                   (__e_acsl_mpz_struct const *)(__gen_e_acsl__43));
-    __gmpz_init_set_si(__gen_e_acsl_ne_7,(long)(__gen_e_acsl_ne_6 != 0));
-    __gmpz_init_set_si(__gen_e_acsl__44,1L);
-    __gen_e_acsl_ne_8 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl__44),
-                                   (__e_acsl_mpz_struct const *)(__gen_e_acsl__43));
-    __gmpz_init_set_si(__gen_e_acsl_ne_9,(long)(__gen_e_acsl_ne_8 != 0));
-    __gen_e_acsl_not_3 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_ne_9),
-                                    (__e_acsl_mpz_struct const *)(__gen_e_acsl__43));
-    __gmpz_init_set_si(__gen_e_acsl__45,(long)(__gen_e_acsl_not_3 == 0));
-    __gen_e_acsl_eq_20 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_ne_7),
-                                    (__e_acsl_mpz_struct const *)(__gen_e_acsl__45));
-    __gen_e_acsl_assert_data_22.blocking = 1;
-    __gen_e_acsl_assert_data_22.kind = "Assertion";
-    __gen_e_acsl_assert_data_22.pred_txt = "(0 != 0) == !(1 != 0)";
-    __gen_e_acsl_assert_data_22.file = "arith.i";
-    __gen_e_acsl_assert_data_22.fct = "main";
-    __gen_e_acsl_assert_data_22.line = 30;
-    __e_acsl_assert(__gen_e_acsl_eq_20 == 0,& __gen_e_acsl_assert_data_22);
-    __gmpz_clear(__gen_e_acsl__43);
-    __gmpz_clear(__gen_e_acsl_ne_7);
+    __gmpz_init_set_si(__gen_e_acsl__44,0L);
+    __gmpz_init_set_si(__gen_e_acsl__45,1L);
+    __gmpz_init_set_si(__gen_e_acsl__46,0L);
+    __gen_e_acsl_not_3 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl__45),
+                                    (__e_acsl_mpz_struct const *)(__gen_e_acsl__46));
+    __gmpz_init_set_si(__gen_e_acsl__47,(long)(__gen_e_acsl_not_3 == 0));
+    __gen_e_acsl_eq_15 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl__44),
+                                    (__e_acsl_mpz_struct const *)(__gen_e_acsl__47));
+    __gen_e_acsl_assert_data_21.blocking = 1;
+    __gen_e_acsl_assert_data_21.kind = "Assertion";
+    __gen_e_acsl_assert_data_21.pred_txt = "(0 != 0) == !(1 != 0)";
+    __gen_e_acsl_assert_data_21.file = "arith.i";
+    __gen_e_acsl_assert_data_21.fct = "main";
+    __gen_e_acsl_assert_data_21.line = 30;
+    __e_acsl_assert(__gen_e_acsl_eq_15 == 0,& __gen_e_acsl_assert_data_21);
     __gmpz_clear(__gen_e_acsl__44);
-    __gmpz_clear(__gen_e_acsl_ne_9);
     __gmpz_clear(__gen_e_acsl__45);
+    __gmpz_clear(__gen_e_acsl__46);
+    __gmpz_clear(__gen_e_acsl__47);
   }
   /*@ assert (0 != 0) == !(1 != 0); */ ;
   {
-    __e_acsl_mpz_t __gen_e_acsl__46;
-    __e_acsl_mpz_t __gen_e_acsl_y_2;
-    __e_acsl_mpz_t __gen_e_acsl__47;
-    int __gen_e_acsl_div_guard_3;
-    __e_acsl_mpz_t __gen_e_acsl_div_3;
     __e_acsl_mpz_t __gen_e_acsl__48;
-    int __gen_e_acsl_eq_21;
+    __e_acsl_mpz_t __gen_e_acsl_y_2;
+    __e_acsl_mpz_t __gen_e_acsl__49;
+    int __gen_e_acsl_div_guard_2;
+    __e_acsl_mpz_t __gen_e_acsl_div_2;
+    __e_acsl_mpz_t __gen_e_acsl__50;
+    int __gen_e_acsl_eq_16;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_22 =
+      {.values = (void *)0};
+    __gmpz_init_set_si(__gen_e_acsl__48,4L);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_23 =
       {.values = (void *)0};
-    __gmpz_init_set_si(__gen_e_acsl__46,4L);
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_24 =
-      {.values = (void *)0};
     __gmpz_init_set_si(__gen_e_acsl_y_2,(long)y);
-    __gmpz_init_set_si(__gen_e_acsl__47,0L);
-    __gen_e_acsl_div_guard_3 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_y_2),
-                                          (__e_acsl_mpz_struct const *)(__gen_e_acsl__47));
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_24,"y",0,y);
-    __e_acsl_assert_copy_values(& __gen_e_acsl_assert_data_23,
-                                & __gen_e_acsl_assert_data_24);
-    __gmpz_init(__gen_e_acsl_div_3);
+    __gmpz_init_set_si(__gen_e_acsl__49,0L);
+    __gen_e_acsl_div_guard_2 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_y_2),
+                                          (__e_acsl_mpz_struct const *)(__gen_e_acsl__49));
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_23,"y",0,y);
+    __e_acsl_assert_copy_values(& __gen_e_acsl_assert_data_22,
+                                & __gen_e_acsl_assert_data_23);
+    __gmpz_init(__gen_e_acsl_div_2);
     /*@ assert E_ACSL: y != 0; */
     {
-      __gen_e_acsl_assert_data_24.blocking = 1;
-      __gen_e_acsl_assert_data_24.kind = "Assertion";
-      __gen_e_acsl_assert_data_24.pred_txt = "y != 0";
-      __gen_e_acsl_assert_data_24.file = "arith.i";
-      __gen_e_acsl_assert_data_24.fct = "main";
-      __gen_e_acsl_assert_data_24.line = 31;
-      __e_acsl_assert(__gen_e_acsl_div_guard_3 != 0,
-                      & __gen_e_acsl_assert_data_24);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_24);
+      __gen_e_acsl_assert_data_23.blocking = 1;
+      __gen_e_acsl_assert_data_23.kind = "Assertion";
+      __gen_e_acsl_assert_data_23.pred_txt = "y != 0";
+      __gen_e_acsl_assert_data_23.file = "arith.i";
+      __gen_e_acsl_assert_data_23.fct = "main";
+      __gen_e_acsl_assert_data_23.line = 31;
+      __e_acsl_assert(__gen_e_acsl_div_guard_2 != 0,
+                      & __gen_e_acsl_assert_data_23);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_23);
     }
-    __gmpz_tdiv_q(__gen_e_acsl_div_3,
-                  (__e_acsl_mpz_struct const *)(__gen_e_acsl__46),
+    __gmpz_tdiv_q(__gen_e_acsl_div_2,
+                  (__e_acsl_mpz_struct const *)(__gen_e_acsl__48),
                   (__e_acsl_mpz_struct const *)(__gen_e_acsl_y_2));
-    __gmpz_init_set_si(__gen_e_acsl__48,2L);
-    __gen_e_acsl_eq_21 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_div_3),
-                                    (__e_acsl_mpz_struct const *)(__gen_e_acsl__48));
-    __gen_e_acsl_assert_data_23.blocking = 1;
-    __gen_e_acsl_assert_data_23.kind = "Assertion";
-    __gen_e_acsl_assert_data_23.pred_txt = "4 / y == 2";
-    __gen_e_acsl_assert_data_23.file = "arith.i";
-    __gen_e_acsl_assert_data_23.fct = "main";
-    __gen_e_acsl_assert_data_23.line = 31;
-    __e_acsl_assert(__gen_e_acsl_eq_21 == 0,& __gen_e_acsl_assert_data_23);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_23);
-    __gmpz_clear(__gen_e_acsl__46);
-    __gmpz_clear(__gen_e_acsl_y_2);
-    __gmpz_clear(__gen_e_acsl__47);
-    __gmpz_clear(__gen_e_acsl_div_3);
+    __gmpz_init_set_si(__gen_e_acsl__50,2L);
+    __gen_e_acsl_eq_16 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_div_2),
+                                    (__e_acsl_mpz_struct const *)(__gen_e_acsl__50));
+    __gen_e_acsl_assert_data_22.blocking = 1;
+    __gen_e_acsl_assert_data_22.kind = "Assertion";
+    __gen_e_acsl_assert_data_22.pred_txt = "4 / y == 2";
+    __gen_e_acsl_assert_data_22.file = "arith.i";
+    __gen_e_acsl_assert_data_22.fct = "main";
+    __gen_e_acsl_assert_data_22.line = 31;
+    __e_acsl_assert(__gen_e_acsl_eq_16 == 0,& __gen_e_acsl_assert_data_22);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_22);
     __gmpz_clear(__gen_e_acsl__48);
+    __gmpz_clear(__gen_e_acsl_y_2);
+    __gmpz_clear(__gen_e_acsl__49);
+    __gmpz_clear(__gen_e_acsl_div_2);
+    __gmpz_clear(__gen_e_acsl__50);
   }
   /*@ assert 4 / y == 2; */ ;
   {
-    __e_acsl_mpz_t __gen_e_acsl__49;
+    __e_acsl_mpz_t __gen_e_acsl__51;
     __e_acsl_mpz_t __gen_e_acsl_z;
     __e_acsl_mpz_t __gen_e_acsl_add_5;
     __e_acsl_mpz_t __gen_e_acsl_y_3;
-    __e_acsl_mpz_t __gen_e_acsl__50;
+    __e_acsl_mpz_t __gen_e_acsl__52;
     __e_acsl_mpz_t __gen_e_acsl_sub_4;
-    __e_acsl_mpz_t __gen_e_acsl__51;
-    int __gen_e_acsl_div_guard_4;
-    __e_acsl_mpz_t __gen_e_acsl_div_4;
+    __e_acsl_mpz_t __gen_e_acsl__53;
+    int __gen_e_acsl_div_guard_3;
+    __e_acsl_mpz_t __gen_e_acsl_div_3;
     __e_acsl_mpz_t __gen_e_acsl_add_6;
-    int __gen_e_acsl_eq_22;
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_25 =
+    int __gen_e_acsl_eq_17;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_24 =
       {.values = (void *)0};
-    __gmpz_init_set_si(__gen_e_acsl__49,1L);
+    __gmpz_init_set_si(__gen_e_acsl__51,1L);
     __gmpz_init_set_si(__gen_e_acsl_z,z);
     __gmpz_init(__gen_e_acsl_add_5);
     __gmpz_add(__gen_e_acsl_add_5,
                (__e_acsl_mpz_struct const *)(__gen_e_acsl_z),
-               (__e_acsl_mpz_struct const *)(__gen_e_acsl__49));
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_26 =
+               (__e_acsl_mpz_struct const *)(__gen_e_acsl__51));
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_25 =
       {.values = (void *)0};
     __gmpz_init_set_si(__gen_e_acsl_y_3,(long)y);
-    __gmpz_init_set_ui(__gen_e_acsl__50,123456789123456789UL);
+    __gmpz_init_set_ui(__gen_e_acsl__52,123456789123456789UL);
     __gmpz_init(__gen_e_acsl_sub_4);
     __gmpz_sub(__gen_e_acsl_sub_4,
                (__e_acsl_mpz_struct const *)(__gen_e_acsl_y_3),
-               (__e_acsl_mpz_struct const *)(__gen_e_acsl__50));
-    __gmpz_init_set_si(__gen_e_acsl__51,0L);
-    __gen_e_acsl_div_guard_4 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_sub_4),
-                                          (__e_acsl_mpz_struct const *)(__gen_e_acsl__51));
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_26,"y",0,y);
-    __e_acsl_assert_copy_values(& __gen_e_acsl_assert_data_25,
-                                & __gen_e_acsl_assert_data_26);
-    __gmpz_init(__gen_e_acsl_div_4);
+               (__e_acsl_mpz_struct const *)(__gen_e_acsl__52));
+    __gmpz_init_set_si(__gen_e_acsl__53,0L);
+    __gen_e_acsl_div_guard_3 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_sub_4),
+                                          (__e_acsl_mpz_struct const *)(__gen_e_acsl__53));
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_25,"y",0,y);
+    __e_acsl_assert_copy_values(& __gen_e_acsl_assert_data_24,
+                                & __gen_e_acsl_assert_data_25);
+    __gmpz_init(__gen_e_acsl_div_3);
     /*@ assert E_ACSL: y - 123456789123456789 != 0; */
     {
-      __gen_e_acsl_assert_data_26.blocking = 1;
-      __gen_e_acsl_assert_data_26.kind = "Assertion";
-      __gen_e_acsl_assert_data_26.pred_txt = "y - 123456789123456789 != 0";
-      __gen_e_acsl_assert_data_26.file = "arith.i";
-      __gen_e_acsl_assert_data_26.fct = "main";
-      __gen_e_acsl_assert_data_26.line = 34;
-      __e_acsl_assert(__gen_e_acsl_div_guard_4 != 0,
-                      & __gen_e_acsl_assert_data_26);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_26);
+      __gen_e_acsl_assert_data_25.blocking = 1;
+      __gen_e_acsl_assert_data_25.kind = "Assertion";
+      __gen_e_acsl_assert_data_25.pred_txt = "y - 123456789123456789 != 0";
+      __gen_e_acsl_assert_data_25.file = "arith.i";
+      __gen_e_acsl_assert_data_25.fct = "main";
+      __gen_e_acsl_assert_data_25.line = 34;
+      __e_acsl_assert(__gen_e_acsl_div_guard_3 != 0,
+                      & __gen_e_acsl_assert_data_25);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_25);
     }
-    __gmpz_tdiv_q(__gen_e_acsl_div_4,
+    __gmpz_tdiv_q(__gen_e_acsl_div_3,
                   (__e_acsl_mpz_struct const *)(__gen_e_acsl_add_5),
                   (__e_acsl_mpz_struct const *)(__gen_e_acsl_sub_4));
     __gmpz_init(__gen_e_acsl_add_6);
     __gmpz_add(__gen_e_acsl_add_6,
-               (__e_acsl_mpz_struct const *)(__gen_e_acsl__49),
-               (__e_acsl_mpz_struct const *)(__gen_e_acsl_div_4));
-    __gen_e_acsl_eq_22 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_add_6),
-                                    (__e_acsl_mpz_struct const *)(__gen_e_acsl__49));
-    __e_acsl_assert_register_long(& __gen_e_acsl_assert_data_25,"z",0,z);
-    __gen_e_acsl_assert_data_25.blocking = 1;
-    __gen_e_acsl_assert_data_25.kind = "Assertion";
-    __gen_e_acsl_assert_data_25.pred_txt = "1 + (z + 1) / (y - 123456789123456789) == 1";
-    __gen_e_acsl_assert_data_25.file = "arith.i";
-    __gen_e_acsl_assert_data_25.fct = "main";
-    __gen_e_acsl_assert_data_25.line = 34;
-    __e_acsl_assert(__gen_e_acsl_eq_22 == 0,& __gen_e_acsl_assert_data_25);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_25);
-    __gmpz_clear(__gen_e_acsl__49);
+               (__e_acsl_mpz_struct const *)(__gen_e_acsl__51),
+               (__e_acsl_mpz_struct const *)(__gen_e_acsl_div_3));
+    __gen_e_acsl_eq_17 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_add_6),
+                                    (__e_acsl_mpz_struct const *)(__gen_e_acsl__51));
+    __e_acsl_assert_register_long(& __gen_e_acsl_assert_data_24,"z",0,z);
+    __gen_e_acsl_assert_data_24.blocking = 1;
+    __gen_e_acsl_assert_data_24.kind = "Assertion";
+    __gen_e_acsl_assert_data_24.pred_txt = "1 + (z + 1) / (y - 123456789123456789) == 1";
+    __gen_e_acsl_assert_data_24.file = "arith.i";
+    __gen_e_acsl_assert_data_24.fct = "main";
+    __gen_e_acsl_assert_data_24.line = 34;
+    __e_acsl_assert(__gen_e_acsl_eq_17 == 0,& __gen_e_acsl_assert_data_24);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_24);
+    __gmpz_clear(__gen_e_acsl__51);
     __gmpz_clear(__gen_e_acsl_z);
     __gmpz_clear(__gen_e_acsl_add_5);
     __gmpz_clear(__gen_e_acsl_y_3);
-    __gmpz_clear(__gen_e_acsl__50);
+    __gmpz_clear(__gen_e_acsl__52);
     __gmpz_clear(__gen_e_acsl_sub_4);
-    __gmpz_clear(__gen_e_acsl__51);
-    __gmpz_clear(__gen_e_acsl_div_4);
+    __gmpz_clear(__gen_e_acsl__53);
+    __gmpz_clear(__gen_e_acsl_div_3);
     __gmpz_clear(__gen_e_acsl_add_6);
   }
   /*@ assert 1 + (z + 1) / (y - 123456789123456789) == 1; */ ;
   {
-    __e_acsl_mpz_t __gen_e_acsl__52;
+    __e_acsl_mpz_t __gen_e_acsl__54;
     __e_acsl_mpz_t __gen_e_acsl_x_9;
     __e_acsl_mpz_t __gen_e_acsl_sub_5;
     __e_acsl_mpz_t __gen_e_acsl_neg_15;
     __e_acsl_mpz_t __gen_e_acsl_add_7;
-    int __gen_e_acsl_eq_23;
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_27 =
+    int __gen_e_acsl_eq_18;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_26 =
       {.values = (void *)0};
-    __gmpz_init_set_si(__gen_e_acsl__52,1L);
+    __gmpz_init_set_si(__gen_e_acsl__54,1L);
     __gmpz_init_set_si(__gen_e_acsl_x_9,(long)x);
     __gmpz_init(__gen_e_acsl_sub_5);
     __gmpz_sub(__gen_e_acsl_sub_5,
-               (__e_acsl_mpz_struct const *)(__gen_e_acsl__52),
+               (__e_acsl_mpz_struct const *)(__gen_e_acsl__54),
                (__e_acsl_mpz_struct const *)(__gen_e_acsl_x_9));
     __gmpz_init(__gen_e_acsl_neg_15);
     __gmpz_neg(__gen_e_acsl_neg_15,
@@ -901,20 +834,20 @@ int main(void)
     __gmpz_init(__gen_e_acsl_add_7);
     __gmpz_add(__gen_e_acsl_add_7,
                (__e_acsl_mpz_struct const *)(__gen_e_acsl_neg_15),
-               (__e_acsl_mpz_struct const *)(__gen_e_acsl__52));
-    __gen_e_acsl_eq_23 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_sub_5),
+               (__e_acsl_mpz_struct const *)(__gen_e_acsl__54));
+    __gen_e_acsl_eq_18 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_sub_5),
                                     (__e_acsl_mpz_struct const *)(__gen_e_acsl_add_7));
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_27,"x",0,x);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_27,"x",0,x);
-    __gen_e_acsl_assert_data_27.blocking = 1;
-    __gen_e_acsl_assert_data_27.kind = "Assertion";
-    __gen_e_acsl_assert_data_27.pred_txt = "1 - x == -x + 1";
-    __gen_e_acsl_assert_data_27.file = "arith.i";
-    __gen_e_acsl_assert_data_27.fct = "main";
-    __gen_e_acsl_assert_data_27.line = 36;
-    __e_acsl_assert(__gen_e_acsl_eq_23 == 0,& __gen_e_acsl_assert_data_27);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_27);
-    __gmpz_clear(__gen_e_acsl__52);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_26,"x",0,x);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_26,"x",0,x);
+    __gen_e_acsl_assert_data_26.blocking = 1;
+    __gen_e_acsl_assert_data_26.kind = "Assertion";
+    __gen_e_acsl_assert_data_26.pred_txt = "1 - x == -x + 1";
+    __gen_e_acsl_assert_data_26.file = "arith.i";
+    __gen_e_acsl_assert_data_26.fct = "main";
+    __gen_e_acsl_assert_data_26.line = 36;
+    __e_acsl_assert(__gen_e_acsl_eq_18 == 0,& __gen_e_acsl_assert_data_26);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_26);
+    __gmpz_clear(__gen_e_acsl__54);
     __gmpz_clear(__gen_e_acsl_x_9);
     __gmpz_clear(__gen_e_acsl_sub_5);
     __gmpz_clear(__gen_e_acsl_neg_15);
@@ -926,54 +859,54 @@ int main(void)
   {
     __e_acsl_mpz_t __gen_e_acsl_a;
     __e_acsl_mpz_t __gen_e_acsl_b;
-    __e_acsl_mpq_t __gen_e_acsl__53;
-    __e_acsl_mpq_t __gen_e_acsl__54;
-    __e_acsl_mpq_t __gen_e_acsl_add_8;
     __e_acsl_mpq_t __gen_e_acsl__55;
     __e_acsl_mpq_t __gen_e_acsl__56;
+    __e_acsl_mpq_t __gen_e_acsl_add_8;
+    __e_acsl_mpq_t __gen_e_acsl__57;
+    __e_acsl_mpq_t __gen_e_acsl__58;
     __e_acsl_mpq_t __gen_e_acsl_sub_6;
-    int __gen_e_acsl_gt_3;
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_28 =
+    int __gen_e_acsl_gt;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_27 =
       {.values = (void *)0};
     __gmpz_init_set_si(__gen_e_acsl_a,(long)a);
     __gmpz_init_set_si(__gen_e_acsl_b,(long)b);
-    __gmpq_init(__gen_e_acsl__53);
-    __gmpq_set_z(__gen_e_acsl__53,
+    __gmpq_init(__gen_e_acsl__55);
+    __gmpq_set_z(__gen_e_acsl__55,
                  (__e_acsl_mpz_struct const *)(__gen_e_acsl_a));
-    __gmpq_init(__gen_e_acsl__54);
-    __gmpq_set_z(__gen_e_acsl__54,
+    __gmpq_init(__gen_e_acsl__56);
+    __gmpq_set_z(__gen_e_acsl__56,
                  (__e_acsl_mpz_struct const *)(__gen_e_acsl_b));
     __gmpq_init(__gen_e_acsl_add_8);
     __gmpq_add(__gen_e_acsl_add_8,
-               (__e_acsl_mpq_struct const *)(__gen_e_acsl__53),
-               (__e_acsl_mpq_struct const *)(__gen_e_acsl__54));
-    __gmpq_init(__gen_e_acsl__55);
-    __gmpq_set_d(__gen_e_acsl__55,2.);
-    __gmpq_init(__gen_e_acsl__56);
-    __gmpq_set_d(__gen_e_acsl__56,1.);
-    __gmpq_init(__gen_e_acsl_sub_6);
-    __gmpq_sub(__gen_e_acsl_sub_6,
                (__e_acsl_mpq_struct const *)(__gen_e_acsl__55),
                (__e_acsl_mpq_struct const *)(__gen_e_acsl__56));
-    __gen_e_acsl_gt_3 = __gmpq_cmp((__e_acsl_mpq_struct const *)(__gen_e_acsl_add_8),
-                                   (__e_acsl_mpq_struct const *)(__gen_e_acsl_sub_6));
-    __e_acsl_assert_register_short(& __gen_e_acsl_assert_data_28,"a",0,a);
-    __e_acsl_assert_register_short(& __gen_e_acsl_assert_data_28,"b",0,b);
-    __gen_e_acsl_assert_data_28.blocking = 1;
-    __gen_e_acsl_assert_data_28.kind = "Assertion";
-    __gen_e_acsl_assert_data_28.pred_txt = "a + b > 2. - 1.";
-    __gen_e_acsl_assert_data_28.file = "arith.i";
-    __gen_e_acsl_assert_data_28.fct = "main";
-    __gen_e_acsl_assert_data_28.line = 39;
-    __e_acsl_assert(__gen_e_acsl_gt_3 > 0,& __gen_e_acsl_assert_data_28);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_28);
+    __gmpq_init(__gen_e_acsl__57);
+    __gmpq_set_d(__gen_e_acsl__57,2.);
+    __gmpq_init(__gen_e_acsl__58);
+    __gmpq_set_d(__gen_e_acsl__58,1.);
+    __gmpq_init(__gen_e_acsl_sub_6);
+    __gmpq_sub(__gen_e_acsl_sub_6,
+               (__e_acsl_mpq_struct const *)(__gen_e_acsl__57),
+               (__e_acsl_mpq_struct const *)(__gen_e_acsl__58));
+    __gen_e_acsl_gt = __gmpq_cmp((__e_acsl_mpq_struct const *)(__gen_e_acsl_add_8),
+                                 (__e_acsl_mpq_struct const *)(__gen_e_acsl_sub_6));
+    __e_acsl_assert_register_short(& __gen_e_acsl_assert_data_27,"a",0,a);
+    __e_acsl_assert_register_short(& __gen_e_acsl_assert_data_27,"b",0,b);
+    __gen_e_acsl_assert_data_27.blocking = 1;
+    __gen_e_acsl_assert_data_27.kind = "Assertion";
+    __gen_e_acsl_assert_data_27.pred_txt = "a + b > 2. - 1.";
+    __gen_e_acsl_assert_data_27.file = "arith.i";
+    __gen_e_acsl_assert_data_27.fct = "main";
+    __gen_e_acsl_assert_data_27.line = 39;
+    __e_acsl_assert(__gen_e_acsl_gt > 0,& __gen_e_acsl_assert_data_27);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_27);
     __gmpz_clear(__gen_e_acsl_a);
     __gmpz_clear(__gen_e_acsl_b);
-    __gmpq_clear(__gen_e_acsl__53);
-    __gmpq_clear(__gen_e_acsl__54);
-    __gmpq_clear(__gen_e_acsl_add_8);
     __gmpq_clear(__gen_e_acsl__55);
     __gmpq_clear(__gen_e_acsl__56);
+    __gmpq_clear(__gen_e_acsl_add_8);
+    __gmpq_clear(__gen_e_acsl__57);
+    __gmpq_clear(__gen_e_acsl__58);
     __gmpq_clear(__gen_e_acsl_sub_6);
   }
   /*@ assert a + b > 2. - 1.; */ ;

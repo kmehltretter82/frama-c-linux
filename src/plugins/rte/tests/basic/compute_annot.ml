@@ -4,7 +4,7 @@ let print () =
 
 let print_status () =
   Kernel.log "printing status";
-  let  _, _, get_signedOv_status = RteGen.Api.get_signedOv_status () in
+  let  _, _, get_signedOv_status = RteGen.Generator.Signed_overflow.accessor in
   Globals.Functions.iter
     (fun kf ->
        Kernel.log "kf = %s rte_gen_status = %b\n"
@@ -23,7 +23,7 @@ let main () =
 
   Kernel.log "computing rte-div annotations" ;
   Dynamic.Parameter.Bool.set "-rte-div" true ;
-  RteGen.Api.compute () ;
+  RteGen.compute () ;
   print ();
   print_status ();
 
@@ -34,7 +34,7 @@ let main () =
     | _ -> false
   in
   Alarms.remove ~filter emitter;
-  RteGen.Api.compute () ;
+  RteGen.compute () ;
   print ();
   print_status ()
 

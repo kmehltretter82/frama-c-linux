@@ -17,8 +17,11 @@ import * as States from 'frama-c/states';
 import { CompactModel } from 'dome/table/arrays';
 import { Table, Column, Renderer } from 'dome/table/views';
 import { Label, Cell } from 'dome/controls/labels';
-import { IconButton } from 'dome/controls/buttons';
-import { Space } from 'dome/frame/toolbars';
+import {
+  IconButton, Multiselect, MultiselectItem
+} from 'dome/controls/buttons';
+import { Inset } from 'dome/frame/toolbars';
+import { Dropdown } from 'dome/dialogs';
 import { TitleBar } from 'ivette';
 import * as Display from 'ivette/display';
 import * as Ast from 'frama-c/kernel/api/ast';
@@ -34,6 +37,7 @@ export interface MultiSelection {
   label: string;
   title?: string;
   markers: Ast.marker[];
+  scopes?: Ast.decl[];
   index?: number;
 }
 
@@ -44,7 +48,19 @@ const MultiSelection = new GlobalState<MultiSelection>(emptySelection);
 
 export function useSelection(): MultiSelection {
   const [s] = useGlobalState(MultiSelection);
-  return s;
+  const [scopes, setScopes] = React.useState<Ast.decl[]>([]);
+  const getAttr = States.useSyncArrayGetter(Ast.markerAttributes);
+
+  React.useEffect(() => {
+    const newScopes = new Set<Ast.decl>();
+    s.markers.forEach(marker => {
+      const scope = getAttr(marker)?.scope;
+      if(scope) newScopes.add(scope);
+    });
+    setScopes([...newScopes]);
+  }, [s, setScopes, getAttr]);
+
+  return { ...s, scopes };
 }
 
 function updateSelection(s: MultiSelection): void {
@@ -109,6 +125,23 @@ function gotoIndex(index: number): void {
     updateSelection({ ...selection, index });
 }
 
+function goToNextVisibleIndex(currentIndex: number, model: Model): void {
+  const selection = MultiSelection.getValue();
+  const nextIndex = currentIndex + 1;
+  if (nextIndex >= selection.markers.length) return;
+  const iTab = model.getIndexOf(selection.markers[nextIndex]);
+  if(iTab !== undefined) updateSelection({ ...selection, index: nextIndex });
+  else return goToNextVisibleIndex(nextIndex, model);
+}
+
+function goToPrevVisibleIndex(currentIndex: number, model: Model): void {
+  const selection = MultiSelection.getValue();
+  const prevIndex = currentIndex - 1;
+  if (prevIndex < 0) return;
+  const iTab = model.getIndexOf(selection.markers[prevIndex]);
+  if(iTab !== undefined) updateSelection({ ...selection, index: prevIndex });
+  else return goToPrevVisibleIndex(prevIndex, model);
+}
 
 {
   Server.onReady(clearSelection);
@@ -158,7 +191,8 @@ export default function LocationsTable(): JSX.Element {
   const model = React.useMemo(() => new Model(), []);
   const getDecl = States.useSyncArrayGetter(Ast.declAttributes);
   const getAttr = States.useSyncArrayGetter(Ast.markerAttributes);
-  const { label, title, markers, index } = useSelection();
+  const { label, title, markers, index, scopes } = useSelection();
+  const previousScopesRef = React.useRef< Ast.decl[]>([]);
   React.useEffect(() => {
     model.replaceAllDataWith(
       markers.map((marker, index): Data => {
@@ -174,6 +208,69 @@ export default function LocationsTable(): JSX.Element {
   const indexLabel = index === undefined ? '…' : index + 1;
   const positionLabel = `${indexLabel} / ${size}`;
 
+  /** filter */
+  const [visibleScopes, setVisibleScopes] =
+    React.useState<Set<string>>(new Set(scopes));
+
+  React.useEffect(() => {
+    const previousScopes = previousScopesRef.current;
+    const isScopesChanged =
+      previousScopes.length !== scopes?.length
+      || !previousScopes.every(e => scopes.includes(e));
+    if(isScopesChanged) {
+      setVisibleScopes(new Set(scopes));
+      previousScopesRef.current = scopes ?? [];
+    }
+  }, [scopes]);
+
+  const setVisible = React.useCallback((a: Ast.decl) => {
+    if(visibleScopes.has(a)) visibleScopes.delete(a);
+    else visibleScopes.add(a);
+    setVisibleScopes(new Set(visibleScopes));
+  }, [visibleScopes, setVisibleScopes]);
+
+  React.useEffect(() => {
+    model.setFilter(({ decl }) => visibleScopes.has(decl.decl));
+  }, [model, visibleScopes]);
+
+  const itemsComp = scopes && scopes.map((e, i) =>
+    <MultiselectItem key={i} item={{
+       label: getDecl(e)?.name || e,
+       id: e,
+       enabled: true,
+       checked: visibleScopes.has(e),
+       onClick: () => setVisible(e)
+      }}
+    />
+  );
+
+  const allChecked = visibleScopes.size === scopes?.length;
+  const checkAllItem =
+    { label: allChecked ? 'Uncheck all' : 'Check all',
+      enabled: true,
+      checked: false,
+      onClick: () => setVisibleScopes(new Set(allChecked ? [] : scopes)),
+    };
+
+  const filter =
+    <Multiselect>
+      <MultiselectItem key={'all'} item={checkAllItem} />
+      <MultiselectItem key={'separator'} item='separator' />
+      {itemsComp && itemsComp}
+    </Multiselect>;
+
+  const filterKind =
+    visibleScopes.size === scopes?.length ? 'positive' :
+    visibleScopes.size === 0 ? 'negative' : 'warning';
+
+  const filterEnabled = scopes && scopes.length > 1;
+
+  const filterButton =
+    <IconButton
+      icon='FILTER' kind={filterKind} enabled={filterEnabled}
+      title='Filtering options'
+    />;
+
   // Component
   return (
     <>
@@ -182,33 +279,38 @@ export default function LocationsTable(): JSX.Element {
           icon='ANGLE.LEFT'
           title='Previous location'
           enabled={0 < kindex}
-          onClick={() => gotoIndex(kindex - 1)}
+          onClick={() => goToPrevVisibleIndex(kindex, model)}
         />
         <IconButton
           icon='ANGLE.RIGHT'
           title='Next location'
           enabled={(-1) <= kindex && kindex + 1 < size}
-          onClick={() => gotoIndex(kindex + 1)}
+          onClick={() => goToNextVisibleIndex(kindex, model)}
         />
-        <Space />
+        <Inset />
         <Label
           className='component-info'
           display={0 < size}
           label={positionLabel}
           title='Current location index / Number of locations' />
-        <Space />
+        <Inset />
+        <Dropdown control={filterButton}>
+          {filter}
+        </Dropdown>
+        <Inset />
         <IconButton
           icon='TRASH'
           title='Cancel selected locations'
           onClick={clearSelection}
         />
+        <Inset />
       </TitleBar>
       <Label className='locations' label={label} title={title} />
       <Table
         model={model}
         display={size > 0}
         selection={selected}
-        onSelection={(_row, _key, index) => gotoIndex(index)}
+        onSelection={(row) => gotoIndex(row.index) }
         settings="ivette.locations.table"
       >
         <Column

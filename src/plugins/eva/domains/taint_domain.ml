@@ -101,6 +101,11 @@ module LatticeSingleTaint = struct
             assume_stmts = Stmt.Set.empty;
             dependent_call = false; } ]
 
+      let structural_descr =
+        Structural_descr.t_record
+          [| Zone.packed_descr; Zone.packed_descr;
+             Stmt.Set.packed_descr; Datatype.Bool.packed_descr |]
+
       let compare t1 t2 =
         let (<?>) c (cmp,x,y) = if c = 0 then cmp x y else c in
         Zone.compare t1.locs_data t2.locs_data

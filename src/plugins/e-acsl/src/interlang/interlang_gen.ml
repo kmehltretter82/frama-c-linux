@@ -48,8 +48,8 @@ end
 
 type 'a m = 'a M.t
 
-let binop : Cil_types.binop -> Interlang.binop = function
-  | Cil_types.PlusA -> Interlang.Plus
+let of_binop : Cil_types.binop -> Interlang.binop = function
+  | Cil_types.PlusA -> Plus
   | MinusA -> Minus
   | Mult -> Mult
   | Lt -> Lt
@@ -61,3 +61,11 @@ let binop : Cil_types.binop -> Interlang.binop = function
   | Div -> Div
   | Mod -> Mod
   | _ -> raise Not_covered
+
+let of_relation = function
+  | Rlt -> Lt
+  | Rgt -> Gt
+  | Rle -> Le
+  | Rge -> Ge
+  | Req -> Eq
+  | Rneq -> Ne

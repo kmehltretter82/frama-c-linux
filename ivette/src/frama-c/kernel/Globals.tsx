@@ -25,6 +25,7 @@ import { Label } from 'dome/controls/labels';
 import * as Toolbar from 'dome/frame/toolbars';
 import { Hbox } from 'dome/layout/boxes';
 import { Dropdown } from 'dome/dialogs';
+import { Icon } from 'dome/controls/icons';
 
 import * as Ivette from 'ivette';
 import * as Server from 'frama-c/server';
@@ -198,12 +199,16 @@ function List(props: ListProps): JSX.Element {
 // --- Function items
 // --------------------------------------------------------------------------
 
-function makeFctItem(
+interface FctItemProps {
   fct: functionsData,
   scope: States.Scope,
   icon?: string
-): JSX.Element {
+}
+
+function FctItem(props: FctItemProps): JSX.Element {
+  const { fct, scope, icon } = props;
   const { name, signature, main, stdlib, builtin, defined, decl } = fct;
+  const { scopes, label: selectionLabel } = Locations.useSelection();
   const className = classes(
     main && 'globals-main',
     (stdlib || builtin) && 'globals-stdlib',
@@ -223,6 +228,10 @@ function makeFctItem(
       onSelection={() => States.setCurrentScope(decl)}
     >
       {attributes && <span className="globals-attr">{attributes}</span>}
+      {scopes && scopes.includes(decl) &&
+         <Icon id='MULTICHECK' kind='selected'
+          title={'Selected in the Locations panel: ' + selectionLabel} />
+      }
     </Item>
   );
 }
@@ -256,12 +265,8 @@ interface FunctionFilterRet {
 }
 
 export function useFunctionFilter(): FunctionFilterRet {
-  const getMarker = States.useSyncArrayGetter(Ast.markerAttributes);
-  const { markers } = Locations.useSelection();
-  const multipleSelection: States.Scope[] =
-    React.useMemo(
-      () => markers.map((m) => getMarker(m)?.scope)
-      , [getMarker, markers]);
+  const { scopes } = Locations.useSelection();
+  const multipleSelection = React.useMemo(() => scopes || [], [scopes]);
   const multipleSelectionActive = multipleSelection.length > 0;
   const evaComputed = States.useSyncValue(computationState) === 'computed';
 
@@ -358,7 +363,7 @@ export function Functions(props: ScrollableParent): JSX.Element {
     fcts
       .filter(showFunction)
       .sort((f, g) => alpha(f.name, g.name))
-      .map((fct) => makeFctItem(fct, scope));
+      .map((fct) => <FctItem key={fct.decl} fct={fct} scope={scope}/>);
 
   return (
     <List
@@ -376,12 +381,18 @@ export function Functions(props: ScrollableParent): JSX.Element {
 // --- Global variables section
 // --------------------------------------------------------------------------
 
-function makeVarItem(
+interface VarItemProps {
+  variable: Ast.globalsData,
   scope: States.Scope,
-  props: Ast.globalsData,
   icon?: string
-): JSX.Element {
-  const { name, type, decl } = props;
+}
+
+function VarItem(props: VarItemProps): JSX.Element {
+  const { variable, scope, icon } = props;
+  const { name, type, decl } = variable;
+  const varMarker = React.useMemo(
+    () => States.getDeclaration(decl).self, [decl]);
+  const { markers, label: selectionLabel } = Locations.useSelection();
   return (
     <Item
       key={decl}
@@ -390,7 +401,12 @@ function makeVarItem(
       title={type}
       selected={decl === scope}
       onSelection={() => States.setCurrentScope(decl)}
-    />
+    >
+      {markers && markers.includes(varMarker) &&
+         <Icon id='MULTICHECK' kind='selected'
+          title={'Selected in the Locations panel: ' + selectionLabel} />
+      }
+    </Item>
   );
 }
 
@@ -495,7 +511,7 @@ export function Variables(props: ScrollableParent): JSX.Element {
     variables
       .filter(showVariable)
       .sort((v1, v2) => alpha(v1.name, v2.name))
-      .map((v) => makeVarItem(scope, v));
+      .map((v) => <VarItem key={v.decl} scope={scope} variable={v}/>);
 
   return (
     <List
@@ -721,11 +737,11 @@ export function Files(props: FilesProps): JSX.Element {
   function getList([path, infos]: [string, InfosFile]): JSX.Element | null {
     const { label, fcts, vars } = infos;
     const fctsComp: JSX.Element[] = showFcts ?
-      fcts.map(fct => makeFctItem(fct, scope, 'FUNCTION'))
+      fcts.map(fct =>
+        <FctItem key={fct.decl} fct={fct} scope={scope} icon='FUNCTION'/>)
       : [];
-    const varsComp: JSX.Element[] = showVars ?
-      vars.map((v) => makeVarItem(scope, v, 'VARIABLE'))
-      : [];
+    const varsComp: JSX.Element[] = showVars ? vars.map((v) =>
+      <VarItem key={v.decl} scope={scope} variable={v} icon='VARIABLE'/>) : [];
     const items = fctsComp.concat(varsComp);
     if(items.length === 0) return null;
 
