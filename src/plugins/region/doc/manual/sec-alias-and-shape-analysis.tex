@@ -1,8 +1,20 @@
 The region map analysis is based on the creation of simple region and then
 merges each simple region with relevant ones to build more complex regions.
 
-\subsection{Compound merge}
+\subsection{Alias analysis}
 
+\begin{itemize}
+    \item modular
+    \item over-approximation
+    \item flow-insensitive analysis
+    \item field/shape analysis
+    \item type access analysis (for heterogenous access analysis)
+\end{itemize}
+
+
+\subsection{Shape analysis}
+\label{sec-region-shape-analysis}
+\subsubsection{Compound merge}
 
 \begin{lstlisting}
 struct S {
@@ -18,7 +30,7 @@ void job (int k) {
 \begin{center}
 \begin{tabular}{|m{5cm}|m{10cm}|}
 \hline
-\centering Region compound merge & Meaning
+\centering Compatible compound merge & Meaning
 \\
 \hline
 {\centering{\includegraphics[width=5cm]{"images/example-compound-merge-field-a.png"}}}
@@ -33,6 +45,9 @@ Regions created by analysing the statement \texttt{s.c[k] = 1}.
 {\centering{\includegraphics[width=5cm]{"images/example-compound-merge-field-a-c.png"}}}
 &
 Resulting regions from the merge after analysing both statements.
+
+Since field positions and sizes are compatible among themselves,
+the resulting region does not collapses into a garbled region.
 \\
 \hline
 \end{tabular}

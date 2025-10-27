@@ -15,24 +15,38 @@ C types, which are represented as
 
 \begin{table}[h!]
 \begin{center}
-\begin{tabular}{|m{1.8cm}|m{10cm}|}
+\begin{tabular}{|m{4cm}|m{10cm}|}
 \hline
     \centering Region & Meaning
 \\
 \hline
     {\centering{\includegraphics[height=1.1cm]{"images/example-primitive-read.png"}}}
 &
-    Primitive region with read access of \texttt{int}.
+    Primitive region with read access of \texttt{int}
+
+    (gray for only primitive read with a unique type).
 \\
 \hline
     {\centering{\includegraphics[height=1.1cm]{"images/example-primitive-rw.png"}}}
 &
     Primitive region with read \& write accesses of \texttt{int}.
+
+    (green for primitive read \& write with a unique type)
 \\
 \hline
     {\centering{\includegraphics[height=1.1cm]{"images/example-primitive-write.png"}}}
 &
     Primitive region with write access of \texttt{int}.
+
+    (pink for only primitive write with a unique type)
+\\
+\hline
+    {\centering{\includegraphics[height=1.4cm]{"images/example-garbled-with-more-details.png"}}}
+&
+    Primitive region with heterogenous access:
+    an \texttt{int} and a \texttt{float}.
+
+    (red for heterogenous accesses)
 \\
 \hline
 \end{tabular}
@@ -42,6 +56,7 @@ C types, which are represented as
 \label{table-region-navigation-primitive}
 \end{table}
 
+\pagebreak
 \subsection{Pointer regions}
 
 Shown in Table \ref{table-region-navigation-pointer},
@@ -61,19 +76,25 @@ in Table \ref{table-region-navigation-arcs}.
     {\centering{\includegraphics[height=1.1cm]{"images/example-pointer-read.png"}}}
 &
     Pointer region with read access.
+
+    (yellow for only pointer read)
 \\
 \hline
     {\centering{\includegraphics[height=1.1cm]{"images/example-pointer-rw.png"}}}
 &
     Pointer region with read \& write accesses.
+
+    (orange for pointer read \& write)
 \\
 \hline
     {\centering{\includegraphics[height=1.1cm]{"images/example-pointer-write.png"}}}
 &
     Pointer region with write access.
 
-    The addresses contained in this region are never read,
-    therefore, no arrow can be added to another region.
+    NB: The addresses contained in this region are never read,
+    therefore, no arrow is pointing to another region from it.
+
+    (pink for only pointer write, same as primitive write)
 \\
 \hline
 \end{tabular}
@@ -88,7 +109,7 @@ in Table \ref{table-region-navigation-arcs}.
 Shown in Table \ref{table-region-navigation-compound},
 compound regions are accessed with a \texttt{struct} C type.
 The representation and the shape of the region depends on the accessed
-fields of the structure.
+fields of the structure, see Section \ref{sec-region-shape-analysis}.
 
 \begin{table}[h!]
 \begin{center}
@@ -102,8 +123,10 @@ fields of the structure.
     Compound region with at least three fields named \texttt{x}, \texttt{z} and
     \texttt{arr}, where the last one is an array of size \texttt{4}.
 
-    Between the fields \texttt{x} and \texttt{z}, there may be any combination
-    of padding and unaccessed field of total size 32 bits.
+    NB: Between the fields \texttt{x} and \texttt{z}, there may be any combination
+    of paddings and unaccessed fields of total size 32 bits.
+
+    (no color on structures)
 \\
 \hline
 \end{tabular}
@@ -117,7 +140,8 @@ fields of the structure.
 \subsection{Region arcs in the region map}
 
 A region map is defined by its regions and the relaitons between them.
-Those relations are represneted as arcs in the region map, as shown in Table \ref{table-region-navigation-arcs}.
+Those relations are represneted as arcs in the region map, as shown in
+Table \ref{table-region-navigation-arcs}.
 
 \begin{table}[h!]
 \begin{center}

@@ -5,22 +5,23 @@ The \Region plug-in is invoked from the \FramaC{} command line.
 It is a dynamically loaded plug-in, distributed with the kernel since the
 \textsf{Gallium} release of \FramaC{}.
 
+\texttt{\$> frama-c file.c -region}
 
-
-The \Region plugin generates a \emph{region map}: an overapproximation of a
+For each function, the \Region plugin generates a single \emph{region map}:
+an overapproximation of a
 map dispatching memory locations into regions using alias and shape analysis.
 A region map is defined as a graph (acyclic when no pointer is
 involved) whose paths start with program variables represented as labels.
 \begin{table}[h!]
 \begin{center}
-\begin{tabular}{|m{2cm}|m{6.4cm}|}
+\begin{tabular}{|m{2cm}|m{10cm}|}
 \hline
     \centering Region label & Meaning
 \\
 \hline
-    {\centering{\includegraphics[width=2cm]{"images/example-region-label.png"}}}
+{\centering{\includegraphics[width=2cm]{"images/example-region-label.png"}}}
 &
-    A region label (not a region) representing the program variable \texttt{s}.
+A region label (not a region) representing the program variable \texttt{s}.
 \\
 \hline
 \end{tabular}
@@ -45,7 +46,7 @@ involved) whose paths start with program variables represented as labels.
 
 %\input{"region-examples/pointer-2.tex"}
 
-\pagebreak
+
 \section{Alias and shape analysis}
 
 \input{"sec-alias-and-shape-analysis.tex"}
