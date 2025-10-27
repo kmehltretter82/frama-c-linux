@@ -115,101 +115,104 @@ let setCurrentFile n =
    plus up to [ctx] lines before and after (if they exist),
    similar to 'grep -C<ctx>'.
    Most exceptions are silently caught and printing is stopped if they occur. *)
-let pp_context_from_file ?(ctx=2) fmt (start_pos, pos) =
+let pp_context_from_file ?(ctx=2) fmt ((start_pos, pos) as loc) =
   let open Filesystem.Operators in
-  let start_pos =
-    if Filepath.equal start_pos.Filepath.pos_path pos.Filepath.pos_path
-    then start_pos
-    else pos
-  in
-  try
-    let$ in_ch = Filesystem.with_open_in_exn pos.pos_path in
-    let first_error_line, start_char, last_error_line =
-      min start_pos.pos_lnum pos.pos_lnum,
-      (start_pos.pos_cnum - start_pos.pos_bol),
-      max start_pos.pos_lnum pos.pos_lnum
+  (* We cannot give any context on unknown locations *)
+  if loc == Cil_datatype.Location.unknown then ()
+  else
+    let start_pos =
+      if Filepath.equal start_pos.Filepath.pos_path pos.Filepath.pos_path
+      then start_pos
+      else pos
     in
-
-    (** Add an offset to the starting position if we're not on the first column.
-        This is used to underline only the problem and not its preceding
-        character, for example :
-        [
-          Cannot resolve variable y
-            int x = t[y];
-                     ^^
-          (* becomes *)
-          Cannot resolve variable y
-            int x = t[y];
-                      ^
-        ]
-        Since there are no preceding character when the error starts on the
-        first column, we do not need an offset.
-    *)
-    let start_char = if start_char = 1 then start_char else start_char + 1 in
-
-    (* The difference between the first and last error lines can be very
-        large; in this case, we print only the first and last [error_ctx]
-        lines, with "..." between them. *)
-    let first_to_print = max (first_error_line-ctx) 1 in
-    let last_to_print = last_error_line+ctx in
-    let error_ctx = 3 in
-    let error_height = last_error_line - first_error_line + 1 in
-    let compress_error = error_height > 2 * error_ctx + 1 + 2 in
-    let i = ref 1 in
     try
-      (* advance to line *)
-      while !i < first_to_print do
-        ignore (input_line in_ch);
-        incr i
-      done;
-      (* print context before first error line *)
-      while !i < first_error_line do
-        let line = input_line in_ch in
-        Format.fprintf fmt "%-6d%s\n" !i line;
-        incr i
-      done;
-      (* if more than one line of context, print blank line *)
-      if last_error_line <> first_error_line then
-        Format.fprintf fmt "\n";
-      (* print error lines *)
-      while !i <= last_error_line do
-        let line = input_line in_ch in
-        if compress_error && !i = first_error_line + error_ctx then
-          Format.fprintf fmt "%d-%d [... omitted ...]\n"
-            (first_error_line + error_ctx) (last_error_line - error_ctx)
-        else if compress_error && !i > first_error_line + error_ctx &&
-                !i <= last_error_line - error_ctx then
-          () (* ignore line *)
-        else begin
+      let$ in_ch = Filesystem.with_open_in_exn pos.pos_path in
+      let first_error_line, start_char, last_error_line =
+        min start_pos.pos_lnum pos.pos_lnum,
+        (start_pos.pos_cnum - start_pos.pos_bol),
+        max start_pos.pos_lnum pos.pos_lnum
+      in
+
+      (** Add an offset to the starting position if we're not on the first column.
+          This is used to underline only the problem and not its preceding
+          character, for example :
+          [
+            Cannot resolve variable y
+              int x = t[y];
+                       ^^
+            (* becomes *)
+            Cannot resolve variable y
+              int x = t[y];
+                        ^
+          ]
+          Since there are no preceding character when the error starts on the
+          first column, we do not need an offset.
+      *)
+      let start_char = if start_char = 1 then start_char else start_char + 1 in
+
+      (* The difference between the first and last error lines can be very
+          large; in this case, we print only the first and last [error_ctx]
+          lines, with "..." between them. *)
+      let first_to_print = max (first_error_line-ctx) 1 in
+      let last_to_print = last_error_line+ctx in
+      let error_ctx = 3 in
+      let error_height = last_error_line - first_error_line + 1 in
+      let compress_error = error_height > 2 * error_ctx + 1 + 2 in
+      let i = ref 1 in
+      try
+        (* advance to line *)
+        while !i < first_to_print do
+          ignore (input_line in_ch);
+          incr i
+        done;
+        (* print context before first error line *)
+        while !i < first_error_line do
+          let line = input_line in_ch in
           Format.fprintf fmt "%-6d%s\n" !i line;
+          incr i
+        done;
+        (* if more than one line of context, print blank line *)
+        if last_error_line <> first_error_line then
+          Format.fprintf fmt "\n";
+        (* print error lines *)
+        while !i <= last_error_line do
+          let line = input_line in_ch in
+          if compress_error && !i = first_error_line + error_ctx then
+            Format.fprintf fmt "%d-%d [... omitted ...]\n"
+              (first_error_line + error_ctx) (last_error_line - error_ctx)
+          else if compress_error && !i > first_error_line + error_ctx &&
+                  !i <= last_error_line - error_ctx then
+            () (* ignore line *)
+          else begin
+            Format.fprintf fmt "%-6d%s\n" !i line;
+          end;
+          incr i
+        done;
+        (* if more than one line of context, print blank line,
+            otherwise print arrows *)
+        if last_error_line <> first_error_line then
+          Format.fprintf fmt "\n"
+        else begin
+          let len = pos.pos_cnum - pos.pos_bol - start_char + 1 in
+          (* output at least one '^' *)
+          let len = if len <= 0 then 1 else len in
+          let cursor =
+            String.make 6 ' ' ^
+            String.make (start_char - 1) ' ' ^
+            String.make len '^'
+          in
+          Format.fprintf fmt "%s\n" cursor
         end;
-        incr i
-      done;
-      (* if more than one line of context, print blank line,
-          otherwise print arrows *)
-      if last_error_line <> first_error_line then
-        Format.fprintf fmt "\n"
-      else begin
-        let len = pos.pos_cnum - pos.pos_bol - start_char + 1 in
-        (* output at least one '^' *)
-        let len = if len <= 0 then 1 else len in
-        let cursor =
-          String.make 6 ' ' ^
-          String.make (start_char - 1) ' ' ^
-          String.make len '^'
-        in
-        Format.fprintf fmt "%s\n" cursor
-      end;
-      while !i <= last_to_print do
-        let line = input_line in_ch in
-        Format.fprintf fmt "%-6d%s\n" !i line;
-        incr i
-      done;
-    with End_of_file ->
-      if !i <= last_error_line then (* could not reach line, print warning *)
-        Kernel.warning "end of file reached before line %d" last_error_line
-      else (* context after line n, no warning *) ()
-  with Sys_error _ -> ()
+        while !i <= last_to_print do
+          let line = input_line in_ch in
+          Format.fprintf fmt "%-6d%s\n" !i line;
+          incr i
+        done;
+      with End_of_file ->
+        if !i <= last_error_line then (* could not reach line, print warning *)
+          Kernel.warning "end of file reached before line %d" last_error_line
+        else (* context after line n, no warning *) ()
+    with Sys_error _ -> ()
 
 
 let pp_pos fmt pos =

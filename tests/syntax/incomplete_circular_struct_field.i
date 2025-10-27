@@ -1,5 +1,5 @@
 /* run.config*
- EXIT: 125
+ EXIT: 1
    STDOPT:
 */
 struct incomplete {

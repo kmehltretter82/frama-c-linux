@@ -1,42 +1,6 @@
 [kernel] Parsing incomplete_circular_struct_field.i (no preprocessing)
 [kernel] <unknown location>: User Error: 
   field `' is declared with incomplete type struct incomplete
-[kernel] Current source was: <unknown>
-  The full backtrace is:
-  Raised at Stdlib.invalid_arg in file "stdlib.ml", line 30, characters 20-45
-  Called from Frama_c_kernel__Filesystem.with_open_in_exn in file "src/libraries/utils/filesystem.ml", line 232, characters 2-18
-  Called from Frama_c_kernel__Errorloc.pp_context_from_file in file "src/kernel_internals/parsing/errorloc.ml", lines 126-211, characters 4-52
-  Called from Frama_c_kernel__Log.logwithfinal.(fun) in file "src/kernel_services/plugin_entry_points/log.ml", line 489, characters 9-19
-  Re-raised at Frama_c_kernel__Log.logwithfinal.(fun) in file "src/kernel_services/plugin_entry_points/log.ml", line 528, characters 9-16
-  Called from Frama_c_kernel__Cabs2cil.makeCompType.addFieldGroup.addFieldInfo in file "src/kernel_internals/typing/cabs2cil.ml", line 5112, characters 6-23
-  Called from Stdlib__Fun.protect in file "fun.ml", line 34, characters 8-15
-  Re-raised at Stdlib__Fun.protect in file "fun.ml", line 39, characters 6-52
-  Called from Frama_c_kernel__Cabs2cil.makeCompType in file "src/kernel_internals/typing/cabs2cil.ml", line 5149, characters 22-50
-  Called from Frama_c_kernel__Cabs2cil.doSpecList in file "src/kernel_internals/typing/cabs2cil.ml", line 4145, characters 6-75
-  Called from Frama_c_kernel__Cabs2cil.doOnlyTypedef in file "src/kernel_internals/typing/cabs2cil.ml", line 9737, characters 4-49
-  Called from Frama_c_kernel__Cabs2cil.doDecl in file "src/kernel_internals/typing/cabs2cil.ml", line 9127, characters 4-38
-  Called from Stdlib__Fun.protect in file "fun.ml", line 34, characters 8-15
-  Re-raised at Stdlib__Fun.protect in file "fun.ml", line 39, characters 6-52
-  Called from Frama_c_kernel__Cabs2cil.convFile.doOneGlobal in file "src/kernel_internals/typing/cabs2cil.ml", line 10334, characters 12-35
-  Called from Stdlib__List.iter in file "list.ml", line 112, characters 12-15
-  Called from Frama_c_kernel__Cabs2cil.convFile in file "src/kernel_internals/typing/cabs2cil.ml", line 10338, characters 2-25
-  Called from Frama_c_kernel__Frontc.parse in file "src/kernel_internals/typing/frontc.ml", line 57, characters 12-34
-  Called from Frama_c_kernel__File.to_cil_cabs in file "src/kernel_services/ast_queries/file.ml", line 652, characters 12-36
-  Called from Frama_c_kernel__File.files_to_cabs_cil.(fun) in file "src/kernel_services/ast_queries/file.ml", line 730, characters 46-72
-  Called from Stdlib__List.fold_left in file "list.ml", line 123, characters 24-34
-  Called from Frama_c_kernel__File.files_to_cabs_cil in file "src/kernel_services/ast_queries/file.ml", line 730, characters 17-89
-  Called from Frama_c_kernel__File.prepare_from_c_files in file "src/kernel_services/ast_queries/file.ml", line 1850, characters 24-60
-  Called from Frama_c_kernel__File.init_from_cmdline in file "src/kernel_services/ast_queries/file.ml", line 1927, characters 4-27
-  Called from Frama_c_kernel__Ast.force_compute in file "src/kernel_services/ast_data/ast.ml", line 98, characters 2-28
-  Called from Frama_c_kernel__Ast.compute in file "src/kernel_services/ast_data/ast.ml", line 106, characters 53-71
-  Called from Frama_c_kernel__Boot.play_analysis in file "src/kernel_internals/runtime/boot.ml", line 17, characters 6-20
-  Called from Frama_c_kernel__Cmdline.play_in_toplevel_one_shot in file "src/kernel_services/cmdline_parameters/cmdline.ml", line 981, characters 2-9
-  Called from Frama_c_kernel__Cmdline.play_in_toplevel in file "src/kernel_services/cmdline_parameters/cmdline.ml", line 1037, characters 18-64
-  Called from Frama_c_kernel__Cmdline.catch_toplevel_run in file "src/kernel_services/cmdline_parameters/cmdline.ml", line 229, characters 4-8
-  
-  Unexpected error (Invalid_argument("path should not be empty")).
-  Please report as 'crash' at https://git.frama-c.com/pub/frama-c/issues
-  Your Frama-C version is 32.0+dev (Germanium).
-  Note that a version and a backtrace alone often do not contain enough
-  information to understand the bug. Guidelines for reporting bugs are at:
-  https://git.frama-c.com/pub/frama-c/-/wikis/Guidelines-for-reporting-bugs
+[kernel] <unknown location>: User Error: 
+  field __anonCompField1 declaration contains a circular reference to type struct incomplete
+[kernel] Frama-C aborted: invalid user input.
