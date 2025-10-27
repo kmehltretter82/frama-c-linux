@@ -1250,7 +1250,10 @@ type_spec:   /* ISO 6.7.2 */
 struct_decl_list:
 | /* empty */ { [] }
 | decl_spec_list SEMICOLON struct_decl_list
-    { FIELD (fst $1, [(missingFieldDecl, None)]) :: $3 }
+    {
+      let loc = Cil_datatype.Location.of_lexing_loc $sloc in
+      FIELD (fst $1, [(missingFieldDecl loc, None)]) :: $3
+    }
 /*(* GCC allows extra semicolons *)*/
 | SEMICOLON struct_decl_list { $2 }
 | decl_spec_list field_decl_list SEMICOLON struct_decl_list
@@ -1280,7 +1283,10 @@ field_decl: /* (* ISO 6.7.2. Except that we allow unnamed fields. *) */
     let al' = al @ $4 in
     ((n,decl,al',loc), Some $3)
   }
-| COLON expression { (missingFieldDecl, Some $2) }
+| COLON expression {
+      let loc = Cil_datatype.Location.of_lexing_loc $sloc in
+      (missingFieldDecl loc, Some $2)
+    }
 ;
 
 enum_list: /* (* ISO 6.7.2.2 *) */

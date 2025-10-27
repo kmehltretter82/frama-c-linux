@@ -33,7 +33,8 @@ module Comments: sig
   val fold: (Cabs.cabsloc -> string -> 'a -> 'a) -> 'a -> 'a
 end
 
-val missingFieldDecl : string * Cabs.decl_type * 'a list * Cabs.cabsloc
+val missingFieldDecl :
+  Cabs.cabsloc -> string * Cabs.decl_type * 'a list * Cabs.cabsloc
 val isStatic : Cabs.spec_elem list -> bool
 val isExtern : Cabs.spec_elem list -> bool
 val isInline : Cabs.spec_elem list -> bool
