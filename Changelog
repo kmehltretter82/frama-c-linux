@@ -22,6 +22,8 @@ Open Source Release <next-release>
 Open Source Release 32.0 (Germanium)
 ###############################################################################
 
+-*  ACSL      [2025-10-27] Check well-formedness of inductive definitions as
+              suggested by ACSL manual. Fixes #@1601
 o   Rte       [2025-10-22] The API inherited from Db is now deprecated
 -*  Kernel    [2025-10-21] Fixes typing of arith operators where one operand
               is a set. Fixes ##2725
