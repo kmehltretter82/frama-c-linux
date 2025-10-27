@@ -35,6 +35,7 @@ import { State, GlobalState, useGlobalState } from './data/states';
 import * as Json from 'dome/data/json';
 import * as Settings from 'dome/data/settings';
 
+import * as MenuBar from '../main/menubar';
 import * as path from 'path';
 
 import './dark.css';
@@ -527,9 +528,33 @@ export interface PopupMenuItemProps {
   checked?: boolean;
   /** Item selection callback. */
   onClick?: (() => void);
+  /** Submenu */
+  submenu?: PopupMenuItem[];
 }
 
 export type PopupMenuItem = PopupMenuItemProps | 'separator';
+
+/** Return transformed menu items with unique ids, and an index with each
+ *  original item bound to the id of the transformed item. */
+function transformItems(items: PopupMenuItem[])
+  : [MenuBar.PopupMenuItem[], PopupMenuItemProps[]] {
+  let currentId = 0;
+  const indexItems: PopupMenuItemProps[] = [];
+  function getItem(item: PopupMenuItem): MenuBar.PopupMenuItem {
+    if (item === 'separator') return { type: 'separator' };
+    const { label, display, enabled, checked } = item;
+    if (item.submenu) {
+      const submenu = item.submenu.map(getItem);
+      return { type: 'submenu', submenu, label, display, enabled, checked };
+    }
+    const type = item.checked === undefined ? 'normal' : 'checkbox';
+    const id = currentId++;
+    indexItems.push(item);
+    return { label, display, enabled, checked, type, id };
+  }
+  const ipcItems = items.map(getItem);
+  return [ipcItems, indexItems];
+}
 
 /**
    Popup a contextual menu.
@@ -555,23 +580,13 @@ export function popupMenu(
   items: PopupMenuItem[],
   callback?: (item: string | undefined) => void
 ): void {
-  const ipcItems = items.map((item) => {
-    if (!item) return undefined;
-    if (item === 'separator') return item;
-    return {
-      label: item.label,
-      id: item.id,
-      display: !!(item.display ?? true),
-      enabled: !!(item.enabled ?? true),
-      checked: !!(item.checked ?? false),
-    };
-  });
-  ipcRenderer.invoke('dome.popup', ipcItems).then((index: number) => {
-    const item = items[index];
-    if (item && item !== 'separator') {
-      const { id, label, onClick } = item;
+  const [ipcItems, indexItems] = transformItems(items);
+
+  ipcRenderer.invoke('dome.popup', ipcItems).then((itemId?: number) => {
+    if(itemId !== undefined) {
+      const { id, label, onClick } = indexItems[itemId];
       if (onClick) onClick();
-      if (callback) callback(id || label);
+      if (callback) callback(id ?? label);
     } else {
       if (callback) callback(undefined);
     }
