@@ -293,14 +293,12 @@ function useHelpHistory(): History {
   * #+ <title> <{#<id>-<subid>} | ||#<id>-<subid>||> with alphanumeric <subid>
   * which can optionally be compounded with - (unrelated to depth level).
 */
-function GeneralDocModal({ id }: {id?: string}): JSX.Element {
+function GeneralDocModal(): JSX.Element {
   const [ chapters, ] = useGlobalState(docChapters);
 
   const [ unfoldAll, setUnfoldAll ] = React.useState<boolean|undefined>(true);
   const history = useHelpHistory();
   const selectedId = React.useMemo(() => history.current, [history]);
-
-  React.useEffect(() => { if(id) addInHistory(id); }, [id]);
 
   const indexes = React.useMemo(() => {
     const news = getIndexes(chapters.sort((a, b) => {
@@ -414,5 +412,6 @@ function GeneralDocModal({ id }: {id?: string}): JSX.Element {
 }
 
 export function showHelp(id?: string): void {
-  showModal(<GeneralDocModal id={id}/>);
+  if(id) addInHistory(id);
+  showModal(<GeneralDocModal/>);
 }
