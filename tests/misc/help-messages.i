@@ -3,7 +3,9 @@
    COMMENT: should be done automatically but then it would not be stable if one
    COMMENT: locally internalize a plug-in.
 
+   FILTER: sed -e 's/^This is Frama-C [1-9][0-9]*.*$/This is Frama-C XX.X/g'
    STDOPT: +"-h"
+
    STDOPT: +"-kernel-h"
 
    PLUGIN: acsl-importer
