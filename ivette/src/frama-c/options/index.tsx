@@ -154,7 +154,7 @@ async function onClose(): Promise<boolean> {
 
 export function showOptionsModal(): void {
   showModal(
-    <Modal className='modal-framac-options' label='Frama-C options'>
+    <Modal className='modal-framac-options' label='Frama-C Parameters'>
       <Options/>
     </Modal>,
     onClose

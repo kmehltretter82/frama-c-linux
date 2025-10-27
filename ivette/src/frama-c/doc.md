@@ -148,7 +148,7 @@ The list of projects is shown below, and these actions are available:
 * [icon-save]: save the project onto a save file.
 * [icon-trash]: delete the project; confirmation will be requested.
 
-## Frama-C Parameters {#framac-options}
+## Frama-C Parameters {#framac-parameters}
 
 All frama-c parameters can be modified from Ivette via the _Edit_ -> _Parameters_
 menu or the _Ctrl+P_ shortcut.

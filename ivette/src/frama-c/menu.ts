@@ -179,7 +179,7 @@ function addHelpMenuItems(): void {
 function addEditMenuItems(): void {
   Dome.addMenuItem({
     menu: 'Edit',
-    label: 'Parameters',
+    label: 'Frama-C Parameters',
     id: 'frama_c_options',
     onClick: showOptionsModal,
     kind: 'normal',

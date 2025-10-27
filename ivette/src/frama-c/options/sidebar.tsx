@@ -93,7 +93,7 @@ export function OptionsSidebar(props: SideBarProps): React.JSX.Element {
   return (
     <SideBar>
       <SidebarTitle label='Plugins'>
-        <HelpButton id="framac-options" size={14} />
+        <HelpButton id="framac-parameters" size={14} />
       </SidebarTitle>
       <div className="globals-scrollable-area">
         { plugins.map(p => <SidebarItem key={p.name}
