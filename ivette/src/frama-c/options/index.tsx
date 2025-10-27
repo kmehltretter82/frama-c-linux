@@ -67,6 +67,8 @@ const defaultSelected: SelectedPlugins = ['kernel', ''];
 export const countFormsModified = new GlobalState<number>(0);
 
 export default function Options(): React.JSX.Element | null {
+  React.useEffect(() => countFormsModified.setValue(0), []);
+
   /** Remotes */
   const remotesState = useRemotes();
   const [remotes,] = remotesState;

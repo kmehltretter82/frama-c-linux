@@ -74,7 +74,6 @@ interface SideBarProps {
 export function OptionsSidebar(props: SideBarProps): React.JSX.Element {
   const { selectedState, isSetElement, plugins, remotes } = props;
   const [selected, setSelected] = selectedState;
-  countFormsModified.setValue(0);
 
   const onSelection = React.useCallback(
     (e: React.MouseEvent, p: Params.plugin) => {
