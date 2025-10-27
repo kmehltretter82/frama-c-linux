@@ -534,6 +534,10 @@ void plet () {
     Frama_C_show_each_bottom(t);
   }
 
+  /* \let bindings evaluating to bottom are ignored. */
+  int uninit;
+  /*@ assert uninitialized: \let v = uninit; v == v; */
+
   /* Unsupported \let bindings. */
   /*@ assert unsupported: \let id = (\lambda integer y; y); id(42) == 42; */
 }
