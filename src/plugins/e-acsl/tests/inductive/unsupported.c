@@ -26,15 +26,6 @@
   }
 @*/
 
-// negative occurrence of recursive hypothesis
-/*@
-  inductive even(ℤ x) {
-    case zero: \forall ℤ a; even(0);
-    case pos: \forall ℤ a; a >= 2 ==> !even(a-1) ==> even(a);
-    case neg: \forall ℤ a; a <= -2 ==> !even(a+1) ==> even(a);
-  }
-@*/
-
 // c does not occur in the conclusion (and is not bound by a recursive hypothesis)
 /*@
     inductive eq(ℤ x, ℤ y) {
@@ -71,8 +62,6 @@ int main() {
   /*@ assert P3(2,3); @*/
   /*@ assert eq(2, 2); */
   /*@ assert !eq(2, 3); */
-  /*@ assert even(2); @*/
-  /*@ assert !even(3); @*/
 
   int *ptr = (int *)&t;
   /*@ assert is_max(ptr, 1, 1); */
