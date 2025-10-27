@@ -329,8 +329,7 @@ module Make (Engine: Engine_sig.S) = struct
 
   (* Interprets a [call] in the state [state], using a builtin, specification or
      the body of the called function according to [target]. *)
-  let compute_call_with_target call target =
-    with_callstack call.callstack @@ fun state ->
+  let compute_call_with_target call target state =
     Function_calls.register_analysis_target call target;
     match target with
     | `Builtin builtin_info -> compute_builtin builtin_info call state
@@ -345,11 +344,12 @@ module Make (Engine: Engine_sig.S) = struct
      Exported in [Engine_sig.Compute] and used by [Transfer_stmt] when
      interpreting a call statement. *)
   let compute_call call recursion =
+    with_callstack call.callstack @@ fun state ->
     let kf = call.kf in
     let callsite = Callstack.top_callsite call.callstack in
     let recursion_depth = Option.map (fun r -> r.depth) recursion in
     let target = Function_calls.analysis_target ?recursion_depth kf callsite in
-    compute_call_with_target call target
+    compute_call_with_target call target state
 
   (* ----- Main call -------------------------------------------------------- *)
 
@@ -376,9 +376,8 @@ module Make (Engine: Engine_sig.S) = struct
         Engine.Interferences.inject_init_state th kf init_state
       in
       let call = { kf; callstack; arguments = []; rest = []; return = None; } in
-      let target = Function_calls.analysis_target kf Kglobal in
-      check_main_function_target kf target;
-      let final_result = compute_call_with_target call target init_state in
+      check_main_function_target kf (Function_calls.analysis_target kf Kglobal);
+      let final_result = compute_call call None init_state in
       let final_states = List.map snd (final_result.states) in
       let final_state = Bottom.of_list ~join:Engine.Dom.join final_states in
       final_state
