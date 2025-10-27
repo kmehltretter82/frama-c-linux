@@ -66,10 +66,12 @@ if [[ $error_code -ne 0 ]]; then
 fi
 
 # Execute the compiled test file
-$result_dir/$test_name.e-acsl 1>$exec_out_log 2>$exec_err_log
+# (Run in a grouping expression { } to be able to capture shell messages like
+#  "Aborted")
+{ $result_dir/$test_name.e-acsl; } 1>$exec_out_log 2>$exec_err_log
+error_code=$?
 
 # Check execution return code and exit script in case of error
-error_code=$?
 if [[ $error_code -ne $expected_exit_code ]]; then
   printf "Error while executing $result_dir/$test_name.e-acsl\n" | tee $output_log
   printf "Expected exit code $expected_exit_code, got $error_code\n" | tee -a $output_log
@@ -104,6 +106,10 @@ for filter in "${filters[@]}"; do
   fi
   cp $tmp_filter_output $tmp_filter_input
 done
+
+# Filter messages from this script because they are localized and appear anyway
+# if the test fails.
+cat $tmp_filter_input | sed -e "s/^\.\.\/\.\.\/wrapper\.sh.*//g" > $tmp_filter_output
 
 ## Filtering done, copy output to the output log and remove temporary files
 cp $tmp_filter_output $output_log
