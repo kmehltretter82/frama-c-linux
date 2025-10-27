@@ -5027,7 +5027,7 @@ and makeCompType loc ghost (isstruct: bool)
           else (* valid flexible array member *) ()
         else
           Kernel.error ~source
-            "field `%s' is declared with incomplete type %a"
+            "field '%s' is declared with incomplete type '%a'"
             n Cil_datatype.Typ.pretty ftype
       end;
       let fbitfield, ftype =
