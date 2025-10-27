@@ -110,68 +110,67 @@ end
 
 
 module Optimization = struct
-  open Integer
   let plus e1 e2 =
     match e1.enode, e2.enode with
-    | Integer z1, _ when is_zero z1 -> Some e2.enode
-    | _, Integer z2 when is_zero z2 -> Some e1.enode
-    | Integer z1, Integer z2 -> Some (Integer (add z1 z2))
+    | Integer z1, _ when Z.is_zero z1 -> Some e2.enode
+    | _, Integer z2 when Z.is_zero z2 -> Some e1.enode
+    | Integer z1, Integer z2 -> Some (Integer (Z.add z1 z2))
     | _ -> None
 
   let minus e1 e2 =
     match e1.enode, e2.enode with
-    | Integer z1, Integer z2 when is_zero z1 -> Some (Integer (Z.neg z2))
-    | _, Integer z2 when is_zero z2 -> Some e1.enode
-    | Integer z1, Integer z2 -> Some (Integer (sub z1 z2))
+    | Integer z1, Integer z2 when Z.is_zero z1 -> Some (Integer (Z.neg z2))
+    | _, Integer z2 when Z.is_zero z2 -> Some e1.enode
+    | Integer z1, Integer z2 -> Some (Integer (Z.sub z1 z2))
     | _ -> None
 
   let mult e1 e2 =
     match e1.enode, e2.enode with
-    | Integer z1, _ when is_zero z1 -> Some (Integer zero)
-    | _, Integer z2 when is_zero z2 -> Some (Integer zero)
-    | Integer z1, _ when is_one z1 -> Some e2.enode
-    | _, Integer z2 when is_one z2 -> Some e1.enode
-    | Integer z1, Integer z2 -> Some (Integer (mul z1 z2))
+    | Integer z1, _ when Z.is_zero z1 -> Some (Integer Z.zero)
+    | _, Integer z2 when Z.is_zero z2 -> Some (Integer Z.zero)
+    | Integer z1, _ when Z.is_one z1 -> Some e2.enode
+    | _, Integer z2 when Z.is_one z2 -> Some e1.enode
+    | Integer z1, Integer z2 -> Some (Integer (Z.mul z1 z2))
     | _ -> None
   let div e1 e2 =
     match e1.enode, e2.enode with
-    | Integer z1, _ when is_zero z1 -> Some (Integer zero)
-    | Integer z1, Integer z2 when not (is_zero z2) ->
-      Some (Integer (e_div z1 z2))
+    | Integer z1, _ when Z.is_zero z1 -> Some (Integer Z.zero)
+    | Integer z1, Integer z2 when not (Z.is_zero z2) ->
+      Some (Integer (Z.ediv z1 z2))
     | _ -> None
 
   let modulo e1 e2 =
     match e1.enode, e2.enode with
-    | Integer z1, _ when is_zero z1 -> Some (Integer zero)
-    | Integer z1, Integer z2 -> Some (Integer (e_rem z1 z2))
+    | Integer z1, _ when Z.is_zero z1 -> Some (Integer Z.zero)
+    | Integer z1, Integer z2 -> Some (Integer (Z.erem z1 z2))
     | _ -> None
 
   let lt e1 e2 =
     match e1.enode, e2.enode with
-    | Integer z1, Integer z2 -> Some (of_bool @@ lt z1 z2)
+    | Integer z1, Integer z2 -> Some (of_bool @@ Z.leq z1 z2)
     | _ -> None
   let gt e1 e2 =
     match e1.enode, e2.enode with
-    | Integer z1, Integer z2 -> Some (of_bool @@ gt z1 z2)
+    | Integer z1, Integer z2 -> Some (of_bool @@ Z.gt z1 z2)
     | _ -> None
   let le e1 e2 =
     match e1.enode, e2.enode with
-    | Integer z1, Integer z2 -> Some (of_bool @@ le z1 z2)
+    | Integer z1, Integer z2 -> Some (of_bool @@ Z.leq z1 z2)
     | _ -> None
 
   let ge e1 e2 =
     match e1.enode, e2.enode with
-    | Integer z1, Integer z2 -> Some (of_bool @@ ge z1 z2)
+    | Integer z1, Integer z2 -> Some (of_bool @@ Z.geq z1 z2)
     | _ -> None
 
   let eq e1 e2 =
     match e1.enode, e2.enode with
-    | Integer z1, Integer z2 -> Some (of_bool @@ equal z1 z2)
+    | Integer z1, Integer z2 -> Some (of_bool @@ Z.equal z1 z2)
     | _ -> None
 
   let ne e1 e2 =
     match e1.enode, e2.enode with
-    | Integer z1, Integer z2 -> Some (of_bool @@ not @@ equal z1 z2)
+    | Integer z1, Integer z2 -> Some (of_bool @@ not @@ Z.equal z1 z2)
     | _ -> None
 end
 
