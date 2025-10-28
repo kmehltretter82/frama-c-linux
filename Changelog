@@ -22,6 +22,9 @@ Open Source Release <next-release>
 Open Source Release 32.0 (Germanium)
 ###############################################################################
 
+-   Ivette    [2025-10-27] Improved Files sidebar. It now displays global
+              annotations, with filters for the different kind of annotations.
+              It has also been restyled.
 -   Ivette    [2025-10-27] New panel to view and modify Frama-C parameters.
 -*  ACSL      [2025-10-27] Check well-formedness of inductive definitions as
               suggested by ACSL manual. Fixes #@1601
