@@ -942,7 +942,7 @@ export function Files(props: FilesProps): JSX.Element {
   } = props;
 
   const filterByName = React.useCallback((val: { name: string }): boolean => {
-      return searchByName ? val.name.includes(searchByName) : true;
+      return searchByName ? RegExp(searchByName, 'i').test(val.name) : true;
     }, [searchByName]);
 
   // Hooks
