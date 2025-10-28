@@ -422,6 +422,7 @@ function Popup(props: PopupProps): JSX.Element | null {
       ref={popupRef}
       className="dome-xPopup"
       style={stylePopup}
+      onClick={(e: React.MouseEvent) => e.stopPropagation()}
     >{children}</div>,
     document.body
   );
