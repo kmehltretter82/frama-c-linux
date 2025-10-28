@@ -47,7 +47,7 @@ int f(struct P ***pppp_0, struct P **ppp_0, struct P *pp_0, struct P p_0,
   tmp = g();
   /*@ assert
         rte: pointer_alignment:
-          \aligned((int *)((int)(0 + tmp)),alignof(int));
+          \aligned((void *)((int)(0 + tmp)),alignof(int));
   */
   j_0 = (int *)(0 + tmp);
   i_0 = (int *)(& j_0);

@@ -189,7 +189,6 @@ int main(void)
   /*@ assert rte: mem_access: \valid_read(pc); */
   next_val(*pc);
   /*@ assert rte: pointer_alignment: \aligned(V,alignof(cell)); */
-  /*@ assert rte: pointer_alignment: \aligned((cell *)V,alignof(cell)); */
   /*@ assert rte: mem_access: \valid_read((cell *)V); */
   next_val(*((cell *)V));
   T.pred = & c;
