@@ -1,3 +1,4 @@
+.make*
 /feedback
 /VERSION
 /VERSION_CODENAME
@@ -9,3 +10,5 @@
 /macros.tex
 /anr-logo.png
 /fc-macros.tex
+/frama-c-book.cls
+/cealistlogo.jpg
