@@ -386,6 +386,11 @@ label.locations {
         align-items: center;
         justify-content: space-between;
         background-color: var(--background-sidebar);
+
+        & > .dome-xBoxes-hbox {
+          flex-shrink: 1;
+          flex-wrap: wrap;
+        }
     }
 
     .dome-xForm-field {
