@@ -3,7 +3,8 @@
 [eva:alarm] exceptional.i:5: Warning: 
   unaligned pointer creation.
   assert
-  \aligned((unsigned int)((unsigned int)((unsigned int)p * 2) / 2),alignof(int));
+  \aligned((void *)((unsigned int)((unsigned int)((unsigned int)p * 2) / 2)),
+  alignof(int));
 [eva:garbled-mix:write] exceptional.i:5: 
   Assigning imprecise value to __retres
   because of arithmetic operation on addresses.
