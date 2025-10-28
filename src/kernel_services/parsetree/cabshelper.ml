@@ -96,7 +96,7 @@ end
 
 (*********** HELPER FUNCTIONS **********)
 
-let missingFieldDecl = (Cil.missingFieldName, JUSTBASE, [], cabslu)
+let missingFieldDecl loc = (Cil.missingFieldName, JUSTBASE, [], loc)
 
 let rec isStatic = function
     [] -> false
