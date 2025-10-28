@@ -161,8 +161,9 @@ val typeof : t -> Cil_types.typ option
 val bits_sizeof : t -> Int_Base.t
 
 (** Minimum alignment (in bytes) of the base: the address of a variable
-    represented by base [b] is known to be a multiple of [alignof b].
-    [alignof Null] is zero.
+    represented by base [b] is known to be a multiple of [alignof b]. Returns 1
+    if the alignment is unknown (for instance for void and function types on
+    some machdep). [alignof Null] is zero.
     @since Frama-C+dev *)
 val alignof : t -> int
 
