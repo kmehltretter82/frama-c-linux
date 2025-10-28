@@ -129,7 +129,7 @@
 [eva:alarm] alias.i:273: Warning: signed overflow. assert c2 + 2 ≤ 2147483647;
 [eva:partition] alias.i:279: starting to merge loop iterations
 [eva:alarm] alias.i:284: Warning: 
-  unaligned pointer creation. assert \aligned(*PTR2,alignof(int));
+  unaligned pointer creation. assert \aligned((void *)*PTR2,alignof(int));
 [eva:alarm] alias.i:285: Warning: 
   pointer comparison. assert \pointer_comparable((void *)PTR2, (void *)PTR1);
 [eva:alarm] alias.i:292: Warning: signed overflow. assert c1 + 1 ≤ 2147483647;

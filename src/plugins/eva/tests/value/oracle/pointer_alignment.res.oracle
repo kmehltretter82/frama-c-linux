@@ -21,11 +21,11 @@
 [eva] computing for function int_constant_to_ptr <- main.
   Called from pointer_alignment.c:341.
 [eva:alarm] pointer_alignment.c:40: Warning: 
-  unaligned pointer creation. assert \aligned((int)1,alignof(short));
+  unaligned pointer creation. assert \aligned((void *)1,alignof(short));
 [eva:alarm] pointer_alignment.c:41: Warning: 
-  unaligned pointer creation. assert \aligned((int)2,alignof(int));
+  unaligned pointer creation. assert \aligned((void *)2,alignof(int));
 [eva:alarm] pointer_alignment.c:42: Warning: 
-  unaligned pointer creation. assert \aligned((int)4,alignof(long));
+  unaligned pointer creation. assert \aligned((void *)4,alignof(long));
 [eva] Recording results for int_constant_to_ptr
 [eva] Done for function int_constant_to_ptr
 [eva] computing for function int_to_ptr <- main.
@@ -33,17 +33,17 @@
 [eva] computing for function int_to_ptr_aux <- int_to_ptr <- main.
   Called from pointer_alignment.c:87.
 [eva:alarm] pointer_alignment.c:72: Warning: 
-  unaligned pointer creation. assert \aligned(any,alignof(short));
+  unaligned pointer creation. assert \aligned((void *)any,alignof(short));
 [eva:alarm] pointer_alignment.c:74: Warning: 
-  unaligned pointer creation. assert \aligned(any,alignof(int));
+  unaligned pointer creation. assert \aligned((void *)any,alignof(int));
 [eva:alarm] pointer_alignment.c:76: Warning: 
-  unaligned pointer creation. assert \aligned(any_mod2,alignof(int));
+  unaligned pointer creation. assert \aligned((void *)any_mod2,alignof(int));
 [eva:alarm] pointer_alignment.c:78: Warning: 
-  unaligned pointer creation. assert \aligned(any,alignof(long));
+  unaligned pointer creation. assert \aligned((void *)any,alignof(long));
 [eva:alarm] pointer_alignment.c:80: Warning: 
-  unaligned pointer creation. assert \aligned(any_mod2,alignof(long));
+  unaligned pointer creation. assert \aligned((void *)any_mod2,alignof(long));
 [eva:alarm] pointer_alignment.c:82: Warning: 
-  unaligned pointer creation. assert \aligned(any_mod4,alignof(long));
+  unaligned pointer creation. assert \aligned((void *)any_mod4,alignof(long));
 [eva] Recording results for int_to_ptr_aux
 [eva] Done for function int_to_ptr_aux
 [eva] computing for function int_to_ptr_aux <- int_to_ptr <- main.
@@ -59,7 +59,7 @@
 [eva:alarm] pointer_alignment.c:100: Warning: 
   unaligned pointer creation. assert \aligned(p,alignof(int));
 [eva:alarm] pointer_alignment.c:101: Warning: 
-  unaligned pointer creation. assert \aligned(addr,alignof(int));
+  unaligned pointer creation. assert \aligned((void *)addr,alignof(int));
 [eva] Recording results for ptr_to_int
 [eva] Done for function ptr_to_int
 [eva] computing for function addrof_to_ptr <- main.

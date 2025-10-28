@@ -22,7 +22,8 @@
 [eva] Analyzing a complete application starting at main
 [eva:alarm] printf_garbled_mix.c:6: Warning: 
   unaligned pointer creation.
-  assert \aligned((uintptr_t)((uintptr_t)((int *)a) * 2),alignof(int));
+  assert
+  \aligned((void *)((uintptr_t)((uintptr_t)((int *)a) * 2)),alignof(int));
 [eva:garbled-mix:write] printf_garbled_mix.c:6: 
   Assigning imprecise value to b because of arithmetic operation on addresses.
 [eva:alarm] printf_garbled_mix.c:7: Warning: 
@@ -74,7 +75,7 @@ void main(void)
   int a[2] = {1, 2};
   /*@ assert
         Eva: pointer_alignment:
-          \aligned((uintptr_t)((uintptr_t)((int *)a) * 2),alignof(int));
+          \aligned((void *)((uintptr_t)((uintptr_t)((int *)a) * 2)),alignof(int));
   */
   int *b = (int *)((uintptr_t)(a) * (uintptr_t)2);
   /*@ assert Eva: pointer_alignment: \aligned(b,alignof(int)); */

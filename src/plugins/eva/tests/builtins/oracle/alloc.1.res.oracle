@@ -18,7 +18,8 @@
 [eva:alarm] alloc.c:51: Warning: 
   pointer downcast. assert (unsigned int)q ≤ 2147483647;
 [eva:alarm] alloc.c:51: Warning: 
-  unaligned pointer creation. assert \aligned((int)(-((int)q)),alignof(int));
+  unaligned pointer creation.
+  assert \aligned((void *)((int)(-((int)q))),alignof(int));
 [eva:alarm] alloc.c:51: Warning: 
   signed overflow. assert -2147483648 ≤ -((int)q);
 [eva:alarm] alloc.c:51: Warning: 

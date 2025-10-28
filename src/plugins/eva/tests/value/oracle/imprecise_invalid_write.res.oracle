@@ -17,7 +17,7 @@
 [eva] computing for function main1 <- main.
   Called from imprecise_invalid_write.i:22.
 [eva:alarm] imprecise_invalid_write.i:5: Warning: 
-  unaligned pointer creation. assert \aligned(c,alignof(int));
+  unaligned pointer creation. assert \aligned((void *)c,alignof(int));
 [eva:alarm] imprecise_invalid_write.i:5: Warning: 
   out of bounds write. assert \valid((int *)c);
 [eva] imprecise_invalid_write.i:5: Warning: 

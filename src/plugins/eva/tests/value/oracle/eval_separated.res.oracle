@@ -15,7 +15,7 @@
   pointer downcast. assert (unsigned int)(&q) ≤ 2147483647;
 [eva:alarm] eval_separated.c:11: Warning: 
   unaligned pointer creation.
-  assert \aligned((int)((int)(&q) + (int)(&q)),alignof(int));
+  assert \aligned((void *)((int)((int)(&q) + (int)(&q))),alignof(int));
 [eva:alarm] eval_separated.c:11: Warning: 
   signed overflow. assert -2147483648 ≤ (int)(&q) + (int)(&q);
 [eva:alarm] eval_separated.c:11: Warning: 
@@ -26,7 +26,7 @@
   pointer downcast. assert (unsigned int)(&r) ≤ 2147483647;
 [eva:alarm] eval_separated.c:12: Warning: 
   unaligned pointer creation.
-  assert \aligned((int)((int)(&r) + (int)(&r)),alignof(int));
+  assert \aligned((void *)((int)((int)(&r) + (int)(&r))),alignof(int));
 [eva:alarm] eval_separated.c:12: Warning: 
   signed overflow. assert -2147483648 ≤ (int)(&r) + (int)(&r);
 [eva:alarm] eval_separated.c:12: Warning: 

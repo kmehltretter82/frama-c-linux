@@ -237,7 +237,7 @@
 [eva:garbled-mix:write] gauges.c:188: 
   Assigning imprecise value to z because of arithmetic operation on addresses.
 [eva:alarm] gauges.c:189: Warning: 
-  unaligned pointer creation. assert \aligned(z,alignof(int));
+  unaligned pointer creation. assert \aligned((void *)z,alignof(int));
 [eva:alarm] gauges.c:190: Warning: 
   unaligned pointer creation. assert \aligned(r,alignof(int));
 [eva:alarm] gauges.c:190: Warning: out of bounds write. assert \valid(r);

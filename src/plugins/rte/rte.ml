@@ -465,11 +465,6 @@ let pointer_alignment ~remove_trivial ~on_alarm (expr, t) =
   assert (Ast_types.is_ptr t) ;
   let pointed_to = Ast_types.direct_pointed_type t in
   let expr = Cil.stripCasts expr in
-  let expr =
-    if not @@ Ast_types.is_ptr @@ Cil.typeOf expr
-    then Cil.mkCast ~check:false ~newt:Cil_const.voidPtrType expr
-    else expr
-  in
   match trivially_aligned expr pointed_to with
   | Yes ->
     if not remove_trivial

@@ -12,7 +12,7 @@
 [eva:alarm] alias.i:13: Warning: out of bounds write. assert \valid(y);
 [eva:alarm] alias.i:15: Warning: out of bounds read. assert \valid_read(x + 1);
 [eva:alarm] alias.i:17: Warning: 
-  unaligned pointer creation. assert \aligned(P,alignof(int));
+  unaligned pointer creation. assert \aligned((void *)P,alignof(int));
 [eva:alarm] alias.i:18: Warning: out of bounds read. assert \valid_read(y);
 [eva] Recording results for f
 [eva] Done for function f

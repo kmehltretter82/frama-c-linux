@@ -61,7 +61,7 @@
   pointer downcast. assert (unsigned int)(&t3) ≤ 2147483647;
 [eva:alarm] assigns.i:52: Warning: 
   unaligned pointer creation.
-  assert \aligned((int)(2 * (int)(&t3)),alignof(int));
+  assert \aligned((void *)((int)(2 * (int)(&t3))),alignof(int));
 [eva:alarm] assigns.i:52: Warning: 
   signed overflow. assert -2147483648 ≤ 2 * (int)(&t3);
 [eva:alarm] assigns.i:52: Warning: 
@@ -952,7 +952,8 @@ void main1(void)
   g(2 * (int)(& T));
   /*@ assert Eva: pointer_downcast: (unsigned int)(&t3) ≤ 2147483647; */
   /*@ assert
-        Eva: pointer_alignment: \aligned((int)(2 * (int)(&t3)),alignof(int));
+        Eva: pointer_alignment:
+          \aligned((void *)((int)(2 * (int)(&t3))),alignof(int));
   */
   /*@ assert Eva: signed_overflow: -2147483648 ≤ 2 * (int)(&t3); */
   /*@ assert Eva: signed_overflow: 2 * (int)(&t3) ≤ 2147483647; */

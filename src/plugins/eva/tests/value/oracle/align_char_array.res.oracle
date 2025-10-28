@@ -27,7 +27,7 @@
   pointer downcast. assert (unsigned int)((char (*)[10])t) ≤ 2147483647;
 [eva:alarm] align_char_array.c:25: Warning: 
   unaligned pointer creation.
-  assert \aligned((int)((int)((char (*)[10])t) + 3),alignof(int));
+  assert \aligned((void *)((int)((int)((char (*)[10])t) + 3)),alignof(int));
 [eva:alarm] align_char_array.c:25: Warning: 
   signed overflow. assert -2147483648 ≤ (int)((char (*)[10])t) + 3;
 [eva:alarm] align_char_array.c:25: Warning: 
@@ -36,7 +36,7 @@
   pointer downcast. assert (unsigned int)((char (*)[10])t) ≤ 2147483647;
 [eva:alarm] align_char_array.c:26: Warning: 
   unaligned pointer creation.
-  assert \aligned((int)((int)((char (*)[10])t) + 3),alignof(int));
+  assert \aligned((void *)((int)((int)((char (*)[10])t) + 3)),alignof(int));
 [eva:alarm] align_char_array.c:26: Warning: 
   signed overflow. assert -2147483648 ≤ (int)((char (*)[10])t) + 3;
 [eva:alarm] align_char_array.c:26: Warning: 
@@ -45,7 +45,7 @@
   pointer downcast. assert (unsigned int)((char (*)[10])t) ≤ 2147483647;
 [eva:alarm] align_char_array.c:27: Warning: 
   unaligned pointer creation.
-  assert \aligned((int)((int)((char (*)[10])t) + 2),alignof(int));
+  assert \aligned((void *)((int)((int)((char (*)[10])t) + 2)),alignof(int));
 [eva:alarm] align_char_array.c:27: Warning: 
   signed overflow. assert -2147483648 ≤ (int)((char (*)[10])t) + 2;
 [eva:alarm] align_char_array.c:27: Warning: 
@@ -54,7 +54,7 @@
   pointer downcast. assert (unsigned int)((char (*)[10])t) ≤ 2147483647;
 [eva:alarm] align_char_array.c:28: Warning: 
   unaligned pointer creation.
-  assert \aligned((int)((int)((char (*)[10])t) + 2),alignof(int));
+  assert \aligned((void *)((int)((int)((char (*)[10])t) + 2)),alignof(int));
 [eva:alarm] align_char_array.c:28: Warning: 
   signed overflow. assert -2147483648 ≤ (int)((char (*)[10])t) + 2;
 [eva:alarm] align_char_array.c:28: Warning: 

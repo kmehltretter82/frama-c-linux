@@ -57,7 +57,7 @@
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva:alarm] invalid_pointer.c:67: Warning: 
-  unaligned pointer creation. assert \aligned(x,alignof(int));
+  unaligned pointer creation. assert \aligned((void *)x,alignof(int));
 [eva] computing for function Frama_C_interval <- int_conversion <- main.
   Called from invalid_pointer.c:68.
 [eva] invalid_pointer.c:68: 
@@ -72,12 +72,12 @@
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva:alarm] invalid_pointer.c:73: Warning: 
-  unaligned pointer creation. assert \aligned(x,alignof(int));
+  unaligned pointer creation. assert \aligned((void *)x,alignof(int));
 [eva:alarm] invalid_pointer.c:73: Warning: 
   invalid pointer creation.
   assert \null ≡ (int *)x ∨ \object_pointer((int *)x);
 [eva:alarm] invalid_pointer.c:74: Warning: 
-  unaligned pointer creation. assert \aligned(undet,alignof(int));
+  unaligned pointer creation. assert \aligned((void *)undet,alignof(int));
 [eva:alarm] invalid_pointer.c:74: Warning: 
   invalid pointer creation.
   assert \null ≡ (int *)undet ∨ \object_pointer((int *)undet);
@@ -134,7 +134,7 @@
 [eva:alarm] invalid_pointer.c:142: Warning: 
   unaligned pointer creation.
   assert
-  \aligned((uintptr_t)((uintptr_t)(&x) + (uintptr_t)undet),alignof(int));
+  \aligned((void *)((uintptr_t)((uintptr_t)(&x) + (uintptr_t)undet)),alignof(int));
 [eva:alarm] invalid_pointer.c:142: Warning: 
   invalid pointer creation.
   assert
@@ -169,7 +169,7 @@
 [eva:alarm] invalid_pointer.c:165: Warning: assertion got status unknown.
 [eva] invalid_pointer.c:166: Frama_C_show_each_absolute_20: {20}
 [eva:alarm] invalid_pointer.c:167: Warning: 
-  unaligned pointer creation. assert \aligned(undet,alignof(int));
+  unaligned pointer creation. assert \aligned((void *)undet,alignof(int));
 [eva:alarm] invalid_pointer.c:167: Warning: 
   invalid pointer creation.
   assert \null ≡ (int *)undet ∨ \object_pointer((int *)undet);

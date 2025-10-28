@@ -491,6 +491,11 @@ let create_predicate ?(loc=Location.unknown) alarm =
          Logic_const.prel ~loc (Rlt, t1, t2))
 
     | Unaligned_pointer (e, typ) ->
+      let e =
+        if not @@ Ast_types.is_ptr @@ Cil.typeOf e
+        then Cil.mkCast ~check:false ~newt:Cil_const.voidPtrType e
+        else e
+      in
       let loc = best_loc ~loc e.eloc in
       let t = Logic_utils.expr_to_term e in
       let align = Logic_const.talignof ~loc typ in

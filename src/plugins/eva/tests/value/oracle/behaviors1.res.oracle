@@ -311,7 +311,7 @@
 [eva] Done for function f
 [eva:alarm] behaviors1.i:473: Warning: 
   unaligned pointer creation.
-  assert \aligned(tmp,alignof(int));
+  assert \aligned((void *)tmp,alignof(int));
   (tmp from f(& a, & b))
 [eva] computing for function f <- test_assigns <- main.
   Called from behaviors1.i:474.
@@ -321,14 +321,14 @@
 [eva] Done for function f
 [eva:alarm] behaviors1.i:474: Warning: 
   unaligned pointer creation.
-  assert \aligned(tmp_0,alignof(int));
+  assert \aligned((void *)tmp_0,alignof(int));
   (tmp_0 from f((int *)0, & b))
 [eva] computing for function f <- test_assigns <- main.
   Called from behaviors1.i:475.
 [eva] Done for function f
 [eva:alarm] behaviors1.i:475: Warning: 
   unaligned pointer creation.
-  assert \aligned(tmp_1,alignof(int));
+  assert \aligned((void *)tmp_1,alignof(int));
   (tmp_1 from f((int *)0, (int *)0))
 [eva] Recording results for test_assigns
 [eva] Done for function test_assigns
