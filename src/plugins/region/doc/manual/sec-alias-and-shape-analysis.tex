@@ -12,8 +12,27 @@ merges each simple region with relevant ones to build more complex regions.
 \end{itemize}
 
 
+
 \subsection{Shape analysis}
 \label{sec-region-shape-analysis}
+
+\subsubsection{Different sizes merge}
+
+A region is a collection of memory locations. The size of a region is defined
+as the greater size of elementary memory blocks necessary to represent all the
+memory locations contained in the region. If a memory location has a strictly
+greater size than the region size, then this memory location is represented by
+an array to correspond to the memory location size.
+Each region is caracterized by a size which is definied as the GCD among
+all the sizes of the memory locations it includes. A merge of two regions
+with different sizes will result into a region that includes a set of
+elementary memory blocks of smaller size so that each previous memory location
+are now represented as a multiple of the merged elementary memory blocks.
+
+For instance, a region of size 160 bits (e.g. a structure with five 32-bits
+\texttt{int}) that is also accessed using a 16-bits \texttt{short} pointer will
+degenerate into a garbled primitive region of size 16-bits.
+
 \subsubsection{Compound merge}
 
 \begin{lstlisting}
@@ -53,6 +72,6 @@ the resulting region does not collapses into a garbled region.
 \end{tabular}
 \end{center}
 \vspace{-15px}
-\caption{Examples of region arcs}
-\label{table-region-navigation-arcs}
+\caption{Example of compound merge}
+\label{table-compound-merge}
 \end{table}
