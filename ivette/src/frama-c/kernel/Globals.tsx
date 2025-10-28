@@ -1096,7 +1096,7 @@ export function Files(props: FilesProps): JSX.Element {
             }
             { showFcts ? <Node key='fctsFiltered' id='fctsFiltered'
               label={'Functions'} title={'Functions'}  actions={<>
-                  <Dropdown control={ <Toolbar.Button icon='FILTER' /> }
+                  <Dropdown control={ <IconButton icon='FILTER' /> }
                   >{contextFctFilter}</Dropdown>
                   {makeBadge(fctsFiltered.length)}
                 </>}
@@ -1106,7 +1106,7 @@ export function Files(props: FilesProps): JSX.Element {
             { showVars ? <Node key='varsFiltered' id='varsFiltered'
               label={'Variables'} title={'Variables'}
               actions={<>
-                  <Dropdown control={ <Toolbar.Button icon='FILTER' /> }
+                  <Dropdown control={ <IconButton icon='FILTER' /> }
                   >{contextVarFilter}</Dropdown>
                   {makeBadge(varsFiltered.length)}
                 </>}
@@ -1116,7 +1116,7 @@ export function Files(props: FilesProps): JSX.Element {
             { showAnnot ? <Node key='annotsFiltered' id='annotsFiltered'
               label={'Annotations'} title={'Annotations'}
               actions={<>
-                  <Dropdown control={ <Toolbar.Button icon='FILTER' /> }
+                  <Dropdown control={ <IconButton icon='FILTER' /> }
                   >{contextAnnotFilter}</Dropdown>
                   {makeBadge(annotsFiltered.length)}
                 </>}
