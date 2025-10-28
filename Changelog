@@ -58,10 +58,10 @@ o!  Kernel    [2025-09-29] Filepath.t is now abstract. An equivalent result can
               importation of annotations from external files
 -   Volatile  [2025-09-24] Open-sourced plug-in Volatile for specification
               of volatile accesses
--   Eva       [2025-09-22] New predicates \tainted_direct and \tainted_indirect
-              to evaluate if an expression is directly or indirectly tainted,
-              according to the taint domain.
-              \tainted(x) now holds whether x is directly or indirectly tainted.
+-   Eva       [2025-09-22] New predicates `\tainted_direct` and
+              `\tainted_indirect` to evaluate if an expression is directly or
+              indirectly tainted according to the taint domain. `\tainted(x)`
+              now holds whether `x` is directly or indirectly tainted.
 -   Ivette    [2025-09-18] Improved usability of filter menus in the sidebar.
 -   Kernel    [2025-09-11] Added options related to Mopsa-build databases,
               which are similar to JSON compilation databases, but also track
@@ -69,17 +69,17 @@ o!  Kernel    [2025-09-29] Filepath.t is now abstract. An equivalent result can
               -mopsa-db and -mopsa-target.
 -!  Kernel    [2025-09-11] Renamed option -json-compilation-database to
               -compilation-db.
--   Eva       [2025-09-05] New option -mt-threads-lib selects a threads library:
-              stubbed files for this library are automatically loaded.
+-   Eva       [2025-09-05] New option `-mt-threads-lib` selects a threads
+              library: stubbed files for this library are automatically loaded.
 -   Eva       [2025-09-05] The mthread domain is automatically enabled when
               running an Mthread analysis.
 -   Eva       [2025-09-05] Add support of loops to the numerors domain.
--   Eva       [2025-09-02] On successive analyses (with -then or in Ivette),
+-   Eva       [2025-09-02] On successive analyses (with `-then` or in Ivette),
               Eva now re-evaluates the status of any previous alarms.
 -   Kernel    [2025-08-29] In options -*-warn-key, statuses 'active', 'once'
               and 'err-once' have been renamed 'warning', 'warning-once'
               and 'error-once' respectively.
--   Eva       [2025-08-28] '-eva-warn-key help' prints a short description of
+-   Eva       [2025-08-28] `-eva-warn-key help` prints a short description of
               warning categories and their default status.
 o!  Kernel    [2025-07-22] Cil_types.Call now takes a lhost instead of an
               expression as node for the function being called.
@@ -91,15 +91,15 @@ o!  Kernel    [2025-07-22] Uniformization of dummies for Cil datatypes. All
               initialization (fix #@563)
 -   Ivette    [2025-07-17] Menu and actions on AST elements are also available
               in other components, including the Inspector and the values table.
--   Eva       [2025-07-11] New option -eva-auto-taint taints user inputs of some
-              libc functions (scanf, fgets, etc) with special name 'auto'.
+-   Eva       [2025-07-11] New option `-eva-auto-taint` taints user inputs of
+              some libc functions (scanf, fgets, etc) with special name `auto`.
 -   Eva       [2025-07-11] The taint domain can now propagate several taints,
-              each identified by a unique name. Annotation '//@ taint n:x' adds
-              a taint of variable 'x' with name 'n', and predicate 'tainted(n:e)
-              evaluates if expression 'e' is tainted by the taint of name 'n'.
+              each identified by a unique name. Annotation `//@ taint n:x` adds
+              a taint of variable `x` with name `n`; predicate `\tainted(n:e)`
+              evaluates if expression `e` is tainted by the taint of name `n`.
 o   Kernel    [2025-07-03] Deprecate `Project.unique_name`. Use `pid` or  `name`
               instead depending on the use-case.
--*  Eva       [2025-07-01] -eva-precision does not overwrite parameters
+-*  Eva       [2025-07-01] `-eva-precision` does not overwrite parameters
               explicitly set, even to their default value.
 -*  Kernel    [2025-06-30] Do not define __STDC_* macros in logic_preprocess,
               avoiding spurious warnings from preprocessor (fix #@1536)
