@@ -1044,7 +1044,7 @@ export function Files(props: FilesProps): JSX.Element {
       newFiles[elt.source.file].annot.push(elt);
     });
 
-    return newFiles;
+    return Object.entries(newFiles).sort((f, g) => alpha(f[0], g[0]));
   }, [typesFiltered, fctsFiltered, varsFiltered, annotsFiltered]);
 
   const tree = React.useMemo(() => {
@@ -1063,7 +1063,7 @@ export function Files(props: FilesProps): JSX.Element {
       return addPath(next.dir, path, index + 1);
     }
 
-    Object.entries(files).forEach(([, file]) => {
+    files.forEach(([, file]) => {
       addPath(newTree, file.path, 0).files.push(file);
     });
 
