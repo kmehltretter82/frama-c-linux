@@ -22,6 +22,25 @@ Open Source Release <next-release>
 Open Source Release 32.0 (Germanium)
 ###############################################################################
 
+-   Kernel    [2025-10-29] New machdep for macOS ARM
+-   Kernel    [2025-10-29] New option -std (defaults to c11) for selecting ISO C
+              standard, no more warnings when using C11 features
+-   Kernel    [2025-10-29] Add support for C11+ _Alignof/alignof and ACSL
+              counterparts
+-   Kernel    [2025-10-29] New warning key typing:alignof-bitfield to manage
+              warnings related to use of _Alignof on bitfield storage
+-   Kernel    [2025-10-29] Add support for C11+ _Alignas/alignas
+-   Kernel    [2025-10-29] Add support for ACSL predicate \aligned
+-*  Kernel    [2025-10-29] Fix support for GCC __alignof__
+-   Kernel    [2025-10-29] New option -warn-unaligned-pointer (enabled by
+              default) to warn against unaligned pointer creation
+o   Kernel    [2025-10-29] Deprecated Machine.sizeof_* and Machine.alignof_*,
+              replaced by modules Machine.Sizeof and Machine.Alignof
+-   Libc      [2025-10-29] Add specifications related to pointer alignment
+-   Eva       [2025-10-29] Add support for pointer alignment verification
+-   Eva       [2025-10-29] Add support for the ACSL predicate \aligned
+-   Rte       [2025-10-29] Add generation of pointer alignment annotation
+-   Instantiate [2025-10-29] Add specifications related to pointer alignment
 -   Ivette    [2025-10-27] Improved Files sidebar. It now displays global
               annotations, with filters for the different kind of annotations.
               It has also been restyled.
