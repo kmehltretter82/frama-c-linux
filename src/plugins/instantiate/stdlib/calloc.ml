@@ -80,6 +80,7 @@ let make_behavior_allocation loc alloc_type num size =
   let alloc   = allocates_result ~loc ptr_type in
   let ensures = [
     Normal, fresh_result ~loc ptr_type len ;
+    Normal, aligned_result ~loc ptr_type ;
     Normal, pset_len_to_zero ~loc alloc_type num size ;
     Normal, pinitialized_len ~loc alloc_type num size
   ] in

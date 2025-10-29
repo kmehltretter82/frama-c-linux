@@ -130,7 +130,7 @@
     width: 100%;
     height: 100%;
     overflow-x: hidden;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 
 .globals-info {
@@ -359,6 +359,55 @@ label.locations {
     input {
         color: var(--text);
         padding: 5px 12px;
+    }
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- Sidebar Files                                                      --- */
+/* -------------------------------------------------------------------------- */
+
+.sidebar-files-tree {
+  .dome-xTree-node {
+      font-size: 1.05em;
+      font-weight: bold;
+    }
+}
+
+.sidebar-files-tools {
+    display: block;
+    padding: 5px;
+    background-color: var(--background-sidebar);
+
+    .sidebar-files-tools-filter {
+        display: flex;
+        flex-wrap: wrap;
+        flex-direction: row;
+        flex-shrink: 1;
+        align-items: center;
+        justify-content: space-between;
+        background-color: var(--background-sidebar);
+
+        & > .dome-xBoxes-hbox {
+          flex-shrink: 1;
+          flex-wrap: wrap;
+        }
+    }
+
+    .dome-xForm-field {
+        display: flex;
+        padding: 3px 5px;
+        border-radius: 5px;
+        background-color: var(--background-block-form);
+
+        .dome-xForm-text-field {
+            flex-grow: 1;
+            flex-shrink:1;
+            min-width: 0;
+        }
+    }
+
+    .dome-xForm-label {
+        display: none;
     }
 }
 

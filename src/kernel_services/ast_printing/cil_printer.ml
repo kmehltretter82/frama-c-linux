@@ -251,6 +251,7 @@ module Precedence = struct
     | Pvalid_function _
     | Pinitialized _
     | Pdangling _
+    | Paligned _
     | Pseparated _
     | Pat _
     | Pfresh _ -> 0
@@ -713,7 +714,7 @@ class cil_printer () = object (self)
       self#storage v.vstorage
       self#attributes stom_noreturn
       (if stom_noreturn = [] then "" else " ")
-      (self#typ ?fundecl name) v.vtype
+      (self#typ ?fundecl ?alignas:v.valignas name) v.vtype
       self#attributes rest
 
   method lhost fmt = function
@@ -769,6 +770,10 @@ class cil_printer () = object (self)
     parent_non_decay <- false;
     let level = Precedence.getParenthLevel e in
     (* fprintf fmt "/* eid:%d */" e.eid; *)
+    let alignof_kw = function
+      | `Standard -> "_Alignof"
+      | `GCC -> "__alignof__"
+    in
     match e.enode with
     | Const(c) -> self#constant fmt c
     | Lval(l) -> self#lval fmt l
@@ -795,12 +800,10 @@ class cil_printer () = object (self)
     | SizeOfE e ->
       fprintf fmt "%a(%a)"
         self#pp_keyword "sizeof" self#exp_non_decay e
-    (* __alignof__ is a gcc extension, which seems to have a subtle
-       semantic difference with newer C11 _Alignof, as mentioned in
-       https://gcc.gnu.org/bugzilla/show_bug.cgi?id=52023
-       Neither cookie nor keyword for you. *)
-    | AlignOf t -> fprintf fmt "__alignof__(%a)" (self#typ None) t
-    | AlignOfE e -> fprintf fmt "__alignof__(%a)" self#exp_non_decay e
+    | AlignOf (t, i) ->
+      fprintf fmt "%a(%a)" (self#pp_keyword) (alignof_kw i) (self#typ None) t
+    | AlignOfE (e, i) ->
+      fprintf fmt "%a(%a)" (self#pp_keyword) (alignof_kw i) self#exp_non_decay e
     | AddrOf ((Var v, NoOffset))
       when Datatype.String.Hashtbl.mem rename_builtins v.vname ->
       self#varinfo fmt v
@@ -1873,12 +1876,13 @@ class cil_printer () = object (self)
           fprintf fmt "%s@\n" s
 
   method fieldinfo fmt fi =
-    fprintf fmt "%a %s%a;"
+    fprintf fmt "%a%a %s%a;"
       (self#typ
          (Some (fun fmt ->
               if fi.fname <> Cil.missingFieldName then
                 self#varname fmt fi.fname)))
       fi.ftype
+      (self#alignas ~space:true) fi.falignas
       (match fi.fbitfield with
        | None -> ""
        | Some i -> ": " ^ string_of_int i ^ " ")
@@ -1919,6 +1923,10 @@ class cil_printer () = object (self)
     | Extern -> fprintf fmt "%a " self#pp_keyword "extern"
     | Register -> fprintf fmt "%a " self#pp_keyword "register"
 
+  method private alignas ~space fmt = function
+    | None -> fprintf fmt ""
+    | Some e -> fprintf fmt "%s_Alignas(%a)" (if space then " " else "") self#exp e
+
   method fkind fmt = function
     | FFloat -> fprintf fmt "float"
     | FDouble -> fprintf fmt "double"
@@ -1958,11 +1966,14 @@ class cil_printer () = object (self)
   method typename fmt tinfo =
     self#varname fmt tinfo.tname
 
-  method typ ?fundecl nameOpt
+  method typ ?fundecl ?alignas nameOpt
       fmt (t:typ) =
     let pname fmt space = match nameOpt with
       | None -> ()
       | Some pp -> if space then pp_print_char fmt ' '; pp fmt in
+    let palignas fmt space = match alignas with
+      | None -> ()
+      | alignas -> self#alignas fmt ~space alignas in
     let printAttributes fmt (a: attributes) =
       match nameOpt with
       | None when not state.print_cil_input && not (Machine.msvcMode ()) -> ()
@@ -1973,32 +1984,37 @@ class cil_printer () = object (self)
       | _ ->  self#attributes fmt a
     in
     match t.tnode with
-    | TVoid -> fprintf fmt "void%a%a" self#attributes t.tattr pname true
+    | TVoid ->
+      fprintf fmt "void%a%a%a" self#attributes t.tattr palignas true pname true
 
     | TInt ikind ->
-      fprintf fmt "%a%a%a"
+      fprintf fmt "%a%a%a%a"
         (self#typeref t self#ikind) ikind
         self#attributes t.tattr
+        palignas true
         pname true
 
     | TFloat fkind ->
-      fprintf fmt "%a%a%a"
+      fprintf fmt "%a%a%a%a"
         (self#typeref t self#fkind) fkind
         self#attributes t.tattr
+        palignas true
         pname true
 
     | TComp comp -> (* A reference to a struct *)
-      fprintf fmt "%a %a%a%a"
+      fprintf fmt "%a %a%a%a%a"
         self#compkind comp
         (self#typeref t self#compname) comp
         self#attributes t.tattr
+        palignas true
         pname true
 
     | TEnum enum ->
-      fprintf fmt "%a %a%a%a"
+      fprintf fmt "%a %a%a%a%a"
         self#pp_keyword "enum"
         (self#typeref t self#enumname) enum
         self#attributes t.tattr
+        palignas true
         pname true
 
     | TPtr bt ->
@@ -2023,7 +2039,12 @@ class cil_printer () = object (self)
         | _ -> None, bt
       in
       let name' =
-        fun fmt -> fprintf fmt "*%a%a" printAttributes t.tattr pname (t.tattr <> [])
+        fun fmt ->
+          let attr = t.tattr <> [] in
+          fprintf fmt "*%a%a%a"
+            printAttributes t.tattr
+            palignas attr
+            pname (attr || alignas <> None)
       in
       let name'' =
         fun fmt ->
@@ -2061,9 +2082,12 @@ class cil_printer () = object (self)
         | _ -> ()
       in
       let name' fmt =
-        if filter_printing_attributes a = [] then pname fmt false
-        else if nameOpt = None then printAttributes fmt a
-        else fprintf fmt "(%a%a)" printAttributes a pname true
+        if filter_printing_attributes a = [] then
+          fprintf fmt "%a%a" palignas true pname false
+        else if nameOpt = None then
+          fprintf fmt "%a%a" printAttributes a palignas true
+        else
+          fprintf fmt "(%a%a%a)" printAttributes a palignas true pname true
       in
       self#typ
         (Some (fun fmt ->
@@ -2078,6 +2102,7 @@ class cil_printer () = object (self)
         elemt
 
     | TFun (restyp, args, isvararg) ->
+      (* Note: no printing of _Alignas here, since it does not make sense. *)
       let name' fmt =
         if filter_printing_attributes t.tattr = [] then pname fmt false
         else if nameOpt = None then printAttributes fmt t.tattr
@@ -2131,12 +2156,14 @@ class cil_printer () = object (self)
       self#typ (Some pp_params) fmt restyp
 
     | TNamed ti ->
-      fprintf fmt "%a%a%a"
+      fprintf fmt "%a%a%a%a"
         (self#typeref t self#typename) ti
         self#attributes t.tattr
+        palignas true
         pname true
 
     | TBuiltin_va_list ->
+      (* Note: no printing of _Alignas here, since it does not make sense. *)
       fprintf fmt "__builtin_va_list%a%a"
         self#attributes t.tattr
         pname true
@@ -2242,6 +2269,10 @@ class cil_printer () = object (self)
 
   method attrparam fmt a =
     let level = Precedence.getParenthLevelAttrParam a in
+    let alignof_kw = function
+      | `Standard -> "_Alignof"
+      | `GCC -> "__alignof__"
+    in
     match a with
     | AInt n -> fprintf fmt "%a" Z.pretty n
     | AStr s -> fprintf fmt "\"%s\"" (Escape.escape_string s)
@@ -2263,8 +2294,10 @@ class cil_printer () = object (self)
       fprintf fmt "%a(%a)"
         self#pp_keyword "sizeof"
         (self#typ None) t
-    | AAlignOfE a -> fprintf fmt "__alignof__(%a)" self#attrparam a
-    | AAlignOf t -> fprintf fmt "__alignof__(%a)" (self#typ None) t
+    | AAlignOfE (a, i) ->
+      fprintf fmt "%a(%a)" self#pp_keyword (alignof_kw i) self#attrparam a
+    | AAlignOf (t, i) ->
+      fprintf fmt "%a(%a)" self#pp_keyword (alignof_kw i) (self#typ None) t
     | AUnOp(u,a1) ->
       fprintf fmt "%a %a" self#unop u (self#attribute_prec level) a1
     | ABinOp(b,a1,a2) ->
@@ -2888,6 +2921,10 @@ class cil_printer () = object (self)
       fprintf fmt "@[%a%a(@[%a@])@]"
         self#pp_acsl_keyword "\\dangling"
         self#labels [l] self#term p
+    | Paligned (p, n) ->
+      fprintf fmt "@[%a(@[%a@],@[%a@])@]"
+        self#pp_acsl_keyword "\\aligned"
+        self#term p self#term n
     | Pfresh (l1,l2,e1,e2) ->
       fprintf fmt "@[%a%a(@[%a@],@[%a@])@]"
         self#pp_acsl_keyword "\\fresh"

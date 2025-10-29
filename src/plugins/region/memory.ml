@@ -69,8 +69,8 @@ type map = {
 
 let bitsSizeOf ty =
   try Cil.bitsSizeOf ty with
-  | Cil.SizeOfError (_, { tnode = TFun _ }) -> Machine.sizeof_fun () * 8
-  | Cil.SizeOfError (_, { tnode = TVoid  }) -> Machine.sizeof_void () * 8
+  | Cil.SizeOfError (_, { tnode = TFun _ }) -> Machine.Sizeof.func () * 8
+  | Cil.SizeOfError (_, { tnode = TVoid  }) -> Machine.Sizeof.void () * 8
 
 let sizeof = function Blob -> 0 | Cell(s,_) | Compound(s,_,_) -> s
 let cranges = function Blob | Cell _ -> [] | Compound(_,_,R rs) -> rs

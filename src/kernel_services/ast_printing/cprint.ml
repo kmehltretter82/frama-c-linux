@@ -165,6 +165,7 @@ let rec print_specifiers fmt (specs: spec_elem list) =
     | SpecCV CV_GHOST -> fprintf fmt "\\ghost"
     | SpecAttr al -> print_attribute fmt al
     | SpecType bt -> print_type_spec fmt bt
+    | SpecAlignas e -> fprintf fmt "_Alignas(%a)" print_expression e
   in
   Pretty_utils.pp_list ~sep:"@ " print_spec_elem fmt specs
 
@@ -365,9 +366,13 @@ and print_expression_level (lvl: int) fmt (exp : expression) =
       fprintf fmt "sizeof%a" print_expression exp
     | TYPE_SIZEOF (bt,dt) ->
       fprintf fmt "sizeof(@[%a@])" print_onlytype (bt,dt)
-    | EXPR_ALIGNOF exp ->
-      fprintf fmt "__alignof__%a" print_expression exp
-    | TYPE_ALIGNOF (bt,dt) ->
+    | EXPR_ALIGNOF (exp, `Standard) ->
+      fprintf fmt "_Alignof(%a)" print_expression exp
+    | TYPE_ALIGNOF (bt,dt, `Standard) ->
+      fprintf fmt "_Alignof(@[%a@])" print_onlytype (bt, dt)
+    | EXPR_ALIGNOF (exp, `GCC) ->
+      fprintf fmt "__alignof__(%a)" print_expression exp
+    | TYPE_ALIGNOF (bt,dt, `GCC) ->
       fprintf fmt "__alignof__(@[%a@])" print_onlytype (bt, dt)
     | INDEX (exp, idx) ->
       fprintf fmt "%a[@[%a@]]"

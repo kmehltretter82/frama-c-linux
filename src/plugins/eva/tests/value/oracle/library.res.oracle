@@ -90,6 +90,8 @@
   The specification of function f_star_int
   has generated a garbled mix of addresses for assigns clause \result.
 [eva] Done for function f_star_int
+[eva:alarm] library.i:32: Warning: 
+  unaligned pointer creation. assert \aligned(G1,alignof(int));
 [eva:alarm] library.i:32: Warning: out of bounds write. assert \valid(G1);
 [eva:alarm] library.i:33: Warning: out of bounds read. assert \valid_read(G);
 [eva:alarm] library.i:33: Warning: out of bounds read. assert \valid_read(*G);
@@ -116,13 +118,15 @@
   The specification of function i has generated a garbled mix of addresses
   for assigns clause \result.
 [eva] Done for function i
+[eva:alarm] library.i:42: Warning: 
+  unaligned pointer creation. assert \aligned(pf,alignof(float));
 [eva:alarm] library.i:42: Warning: out of bounds read. assert \valid_read(pf);
 [eva:alarm] library.i:42: Warning: 
   non-finite float value. assert \is_finite(*pf);
+[eva:alarm] library.i:43: Warning: 
+  unaligned pointer creation. assert \aligned(pf,alignof(float));
 [eva:alarm] library.i:43: Warning: out of bounds write. assert \valid(pf);
 [eva:alarm] library.i:44: Warning: out of bounds write. assert \valid(pf);
-[eva:alarm] library.i:44: Warning: 
-  non-finite float value. assert \is_finite(*pf);
 [eva:alarm] library.i:44: Warning: 
   non-finite float value. assert \is_finite(\add_float(*pf, *pf));
 [eva] computing for function k <- main.
@@ -132,6 +136,8 @@
   The specification of function k has generated a garbled mix of addresses
   for assigns clause \result.
 [eva] Done for function k
+[eva:alarm] library.i:46: Warning: 
+  unaligned pointer creation. assert \aligned(pd,alignof(double));
 [eva:alarm] library.i:46: Warning: out of bounds write. assert \valid(pd);
 [eva] Recording results for main
 [eva] Done for function main
@@ -149,7 +155,7 @@
 [eva] library.i:38: assertion 'Eva,function_pointer' got final status invalid.
 [eva] library.i:39: assertion 'Eva,function_pointer' got final status invalid.
 [eva] library.i:40: assertion 'Eva,function_pointer' got final status invalid.
-[scope:rm_asserts] removing 1 assertion(s)
+[scope:rm_asserts] removing 2 assertion(s)
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   G0 ∈ [--..--]
@@ -157,17 +163,13 @@
   x ∈ {3}
   y ∈ {4}
   h ∈ [--..--]
-  pf ∈ {{ &S_gpf + {0; 1; 2; 3; 4} }}
+  pf ∈ {{ &S_gpf{[0], [1]} }}
   vf ∈ [-3.40282346639e+38 .. 3.40282346639e+38]
   pd ∈ {{ &S_gpd + [0..8] }}
   S_gpi[0..1] ∈ [--..--]
   S_0_S_0_S_0_S_G[0] ∈ {1}
                  [1] ∈ [--..--]
-  S_gpf[0][bits 0 to 7]# ∈
-       [-3.40282346639e+38 .. 3.40282346639e+38]%32, bits 0 to 7 
-       {[0][bits 8 to 31]; [1][bits 0 to 23]} ∈ [--..--]
-       [1][bits 24 to 31]# ∈
-       [-3.40282346639e+38 .. 3.40282346639e+38]%32, bits 24 to 31 
+  S_gpf[0..1] ∈ [-3.40282346639e+38 .. 3.40282346639e+38]
   S_gpd[0..1] ∈ [--..--]
 [from] Computing for function main
 [from] Computing for function f_int <-main

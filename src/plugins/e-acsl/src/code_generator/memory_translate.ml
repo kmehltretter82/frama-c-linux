@@ -132,7 +132,7 @@ let rec eliminate_ranges_from_index_of_toffset ~loc toffset quantifiers =
 
 (* \base_addr, \block_length, \offset and \freeable *)
 let call ~loc kf name ctx env es =
-  assert (List.mem name ["base_addr"; "block_length"; "offset"; "freeable"]);
+  assert (List.mem name ["base_addr"; "block_length"; "offset"; "freeable"; "aligned"]);
   let e, env =
     Env.rtl_call_to_new_var
       ~loc

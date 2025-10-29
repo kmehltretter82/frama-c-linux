@@ -55,6 +55,7 @@ void free_int(int *ptr)
     behavior allocation:
       assumes allocable: is_allocable(num * size);
       ensures fresh_result: \fresh{Old, Here}(\result,num * size);
+      ensures aligned_result: \aligned(\result,16);
       ensures
         zero_initialization: ∀ ℤ j0; 0 ≤ j0 < num ⇒ *(\result + j0) ≡ 0;
       ensures
@@ -90,6 +91,7 @@ int *calloc_int(size_t num, size_t size)
     behavior allocation:
       assumes allocable: is_allocable(size);
       ensures fresh_result: \fresh{Old, Here}(\result,size);
+      ensures aligned_result: \aligned(\result,16);
       assigns \result, __fc_heap_status;
       assigns \result \from __fc_heap_status, size;
       assigns __fc_heap_status \from __fc_heap_status, size;
@@ -180,6 +182,7 @@ void free_int(int *ptr)
       assumes allocable: is_allocable(num * size);
       ensures
         fresh_result: \fresh{Old, Here}(\result,\old(num) * \old(size));
+      ensures aligned_result: \aligned(\result,16);
       ensures
         zero_initialization: ∀ ℤ j0; 0 ≤ j0 < \old(num) ⇒ *(\result + j0) ≡ 0;
       ensures
@@ -216,6 +219,7 @@ int *calloc_int(size_t num, size_t size)
     behavior allocation:
       assumes allocable: is_allocable(size);
       ensures fresh_result: \fresh{Old, Here}(\result,\old(size));
+      ensures aligned_result: \aligned(\result,16);
       assigns \result, __fc_heap_status;
       assigns \result \from __fc_heap_status, size;
       assigns __fc_heap_status \from __fc_heap_status, size;

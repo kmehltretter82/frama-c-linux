@@ -9,6 +9,7 @@
 import * as Dome from 'dome';
 import * as Ivette from 'ivette';
 import * as Display from 'ivette/display';
+import { showHelp } from 'dome/help';
 import * as States from 'frama-c/states';
 import * as Server from 'frama-c/server';
 import * as Ast from 'frama-c/kernel/api/ast';
@@ -52,41 +53,41 @@ export function buildMenu(
   menu: Dome.PopupMenuItem[],
   attr: Ast.markerAttributesData,
 ): void {
+  function addSubMenu(submenu: Dome.PopupMenuItem[]): void {
+    const helpItem = {
+      label: 'Help',
+      onClick: () => showHelp('eva-studia'),
+    };
+    submenu.push(helpItem);
+    menu.push({ label: 'Studia', submenu });
+  }
   const { marker, kind } = attr;
   switch (kind) {
     case 'LVAL':
-      menu.push({
-        label: 'Studia: select reads of l-value',
-        onClick: () => computeStudiaSelection('Reads', marker, attr.descr)
-      });
-      menu.push({
-        label: 'Studia: select writes to l-value',
-        onClick: () => computeStudiaSelection('Writes', marker, attr.descr)
-      });
-      return;
     case 'DVAR':
     case 'LVAR':
-      {
-        const name = attr.name || attr.descr;
-        menu.push({
-          label: `Studia: select reads of ${name}`,
-          onClick: () => computeStudiaSelection('Reads', marker, name)
-        });
-        menu.push({
-          label: `Studia: select writes to ${name}`,
-          onClick: () => computeStudiaSelection('Writes', marker, name)
-        });
-      }
+      addSubMenu([
+        {
+          label: `Select reads`,
+          onClick: () => computeStudiaSelection('Reads', marker, attr.descr)
+        },
+        {
+          label: `Select writes`,
+          onClick: () => computeStudiaSelection('Writes', marker, attr.descr)
+        }
+      ]);
       return;
     case 'STMT':
-      menu.push({
-        label: `Studia: select reads of …`,
-        onClick: () => Ivette.focusSearchMode(studiaReadsMode.id)
-      });
-      menu.push({
-        label: `Studia: select writes to …`,
-        onClick: () => Ivette.focusSearchMode(studiaWritesMode.id)
-      });
+      addSubMenu([
+        {
+          label: 'Select reads of…',
+          onClick: () => Ivette.focusSearchMode(studiaReadsMode.id)
+        },
+        {
+          label: 'Select writes to…',
+          onClick: () => Ivette.focusSearchMode(studiaWritesMode.id)
+        }
+      ]);
       return;
   }
 }

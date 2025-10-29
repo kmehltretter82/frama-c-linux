@@ -425,15 +425,21 @@ end
 (* --- Decl Printer                                                       --- *)
 (* -------------------------------------------------------------------------- *)
 
+let with_print_libc f =
+  if Kernel.PrintLibc.get () then
+    f ()
+  else
+    let finally =
+      if Kernel.PrintLibc.is_set ()
+      then fun () -> Kernel.PrintLibc.unsafe_set false
+      else fun () -> Kernel.PrintLibc.clear ()
+    in
+    Kernel.PrintLibc.unsafe_set true;
+    Fun.protect ~finally f
+
 let print_global_ast global =
-  let stacked_libc = Kernel.PrintLibc.get () in
-  try
-    if not stacked_libc then Kernel.PrintLibc.set true ;
-    let printer = PrinterTag.(with_unfold_precond (fun _ -> true) pp_global) in
-    let ast = Jbuffer.to_json printer global in
-    if not stacked_libc then Kernel.PrintLibc.set false ; ast
-  with err ->
-    if not stacked_libc then Kernel.PrintLibc.set false ; raise err
+  let printer = PrinterTag.(with_unfold_precond (fun _ -> true) pp_global) in
+  with_print_libc (fun () -> Jbuffer.to_json printer global)
 
 let () = Request.register ~package
     ~kind:`GET ~name:"printDeclaration"
@@ -657,15 +663,10 @@ struct
   let key kf = Printf.sprintf "kf#%d" (Kernel_function.get_id kf)
 
   let signature kf =
-    let g = Kernel_function.get_global kf in
-    let libc = Kernel.PrintLibc.get () in
-    try
-      if not libc then Kernel.PrintLibc.set true ;
-      let txt = Rich_text.sprintf "%a" Printer_tag.pp_localizable (PGlobal g) in
-      if not libc then Kernel.PrintLibc.set false ;
-      if Kernel_function.is_entry_point kf then (txt ^ " /* main */") else txt
-    with err ->
-      if not libc then Kernel.PrintLibc.set false ; raise err
+    let g = Printer_tag.PGlobal (Kernel_function.get_global kf) in
+    let to_string () = Rich_text.sprintf "%a" Printer_tag.pp_localizable g in
+    let txt = with_print_libc to_string in
+    if Kernel_function.is_entry_point kf then (txt ^ " /* main */") else txt
 
   let is_builtin kf =
     Cil_builtins.has_fc_builtin_attr (Kernel_function.get_vi kf)

@@ -20,6 +20,7 @@ volatile double volatile_d;
 
 /* Tests the summary on most kinds of alarms. */
 void alarms (void) {
+  char c[4];
   int x = 0, y = 0;
   int *p, *q;
   int t[10] = {0};
@@ -28,6 +29,7 @@ void alarms (void) {
   p = &x + undet;
   *p = x;                 // invalid write memory access
   x = t[undet];           // out of bound index + uninitialized read
+  p = (int *)c;           // unaligned pointer
   x = 100 / undet;        // division by zero
   x = undet + undet;      // overflow
   x = undet << undet;     // invalid shift

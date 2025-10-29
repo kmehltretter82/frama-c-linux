@@ -48,6 +48,12 @@ alignof_longlong:
 
   type: integer
 
+alignof_max_align_t:
+
+  description:  alignment of 'max_align_t' type
+
+  type: integer
+
 alignof_ptr:
 
   description:  alignment of 'void*' type
@@ -60,9 +66,9 @@ alignof_short:
 
   type: integer
 
-alignof_str:
+alignof_void:
 
-  description:  alignment of string
+  description:  alignment of void. Negative if unsupported
 
   type: integer
 
@@ -71,6 +77,97 @@ max_align_t:
   description: definition of 'max_align_t' (in stddef.h)
 
   type: string
+
+max_extended_alignment:
+
+  description: maximal value that can be given to _Alignas.
+               0 if only standard alignments are supported.
+
+  type: integer
+
+gcc_alignof_aligned:
+
+  description: GCC __alignof__ a type with 'aligned' attribute
+
+  type: integer
+  optional: true
+
+gcc_alignof_double:
+
+  description: GCC __alignof__ 'double' type
+
+  type: integer
+  optional: true
+
+gcc_alignof_float:
+
+  description: GCC __alignof__ 'float' type
+
+  type: integer
+  optional: true
+
+gcc_alignof_fun:
+
+  description: (non-standard) GCC __alignof__ a function type. Negative if unsupported
+
+  type: integer
+  optional: true
+
+gcc_alignof_int:
+
+  description:  GCC __alignof__ 'int' type
+
+  type: integer
+  optional: true
+
+gcc_alignof_long:
+
+  description:  GCC __alignof__ 'long' type
+
+  type: integer
+  optional: true
+
+gcc_alignof_longdouble:
+
+  description:  GCC __alignof__ 'long double' type
+
+  type: integer
+  optional: true
+
+gcc_alignof_longlong:
+
+  description:  GCC __alignof__ 'long long' type
+
+  type: integer
+  optional: true
+
+gcc_alignof_max_align_t:
+
+  description:  GCC __alignof__ 'max_align_t' type
+
+  type: integer
+  optional: true
+
+gcc_alignof_ptr:
+
+  description:  GCC __alignof__ 'void*' type
+
+  type: integer
+  optional: true
+
+gcc_alignof_short:
+
+  description:  GCC __alignof__ 'short' type
+
+  type: integer
+  optional: true
+
+gcc_alignof_void:
+
+  description:  GCC __alignof__ void
+
+  type: integer
+  optional: true
 
 bufsiz:
 

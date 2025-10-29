@@ -25,13 +25,6 @@ inductive P3(integer a, integer b) {
   }
  */
 /*@
-inductive even(integer x) {
-  case zero: \forall integer a; even(0);
-  case pos: \forall integer a; a >= 2 ==> !even(a - 1) ==> even(a);
-  case neg: \forall integer a; a <= -2 ==> !even(a + 1) ==> even(a);
-  }
- */
-/*@
 inductive eq(integer x, integer y) {
   case c: \forall integer a, integer b, integer c;
             a == c ==> b == c ==> eq(a, b);
@@ -96,8 +89,6 @@ int main(void)
   /*@ assert P3(2, 3); */ ;
   /*@ assert eq(2, 2); */ ;
   /*@ assert !eq(2, 3); */ ;
-  /*@ assert even(2); */ ;
-  /*@ assert !even(3); */ ;
   int *ptr = (int *)(& t);
   __e_acsl_store_block((void *)(& ptr),8UL);
   __e_acsl_full_init((void *)(& ptr));

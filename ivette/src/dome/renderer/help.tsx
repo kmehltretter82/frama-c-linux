@@ -12,11 +12,10 @@
  */
 
 import React from 'react';
-import { modal } from 'dome';
 import { GlobalState, useGlobalState } from 'dome/data/states';
 
 import { IconButton } from './controls/buttons';
-import { Modal, showModal, closeModal } from './dialogs';
+import { Modal, showModal } from './dialogs';
 import { Markdown, Pattern } from './text/markdown';
 import { SideBar, SidebarTitle } from './frame/sidebars';
 import { Tree, Node } from './frame/tree';
@@ -40,7 +39,6 @@ interface HelpButtonProps {
 
 export function HelpButton(props: HelpButtonProps): JSX.Element {
   const { id, size } = props;
-  const history = useHelpHistory();
 
   return (
     <IconButton
@@ -48,11 +46,7 @@ export function HelpButton(props: HelpButtonProps): JSX.Element {
       size={size}
       className='dome-xDoc-icon'
       title={'Help'}
-      onClick={() => {
-          history.addElement(id);
-          showModal(<GeneralDocModal />);
-        }
-      }
+      onClick={() => showHelp(id)}
     />
   );
 }
@@ -259,34 +253,33 @@ interface History {
   isLastpos: () => boolean;
 }
 
-function useHelpHistory(): History {
-  const [ history, setHistory ] = useGlobalState(docHistory);
-  const [ position, setPosition ] = useGlobalState(posHistory);
-  const current = React.useMemo(() => history[position], [history, position]);
+/**
+ * Adds an ID to the current position + 1 in the history.
+ * The end of the history is deleted.
+ * The ID is deleted from the history before being added to avoid duplicates.
+ */
+function addInHistory(id: string): void {
+  const history = docHistory.getValue();
+  const position = posHistory.getValue();
+  if (id === history[position]) return;
+  const newHistory = history.toSpliced(position+1).filter(v => v !== id);
+  if(newHistory.push(id) > 20) newHistory.shift();
+  docHistory.setValue(newHistory);
+  posHistory.setValue(newHistory.length-1);
+}
 
-  function addElement(id: string): void {
-    if (id === current) return;
-    const newHistory = history.toSpliced(position+1);
-    if(newHistory.push(id) > 20) newHistory.shift();
-    setHistory(newHistory);
-    setPosition(newHistory.length-1);
-  }
-  function previous(): void {
-    setPosition(position > 0 ? position-1 : 0 );
-  }
-  function next(): void {
-    setPosition(position < history.length-1 ? position+1 : position );
-  }
-  function isFirstpos(): boolean { return position === 0; }
-  function isLastpos(): boolean { return position === history.length-1; }
+function useHelpHistory(): History {
+  const [ history, ] = useGlobalState(docHistory);
+  const [ pos, setPos ] = useGlobalState(posHistory);
+  const current = React.useMemo(() => history[pos], [history, pos]);
 
   return {
     current: current,
-    addElement: addElement,
-    previous: previous,
-    next: next,
-    isFirstpos: isFirstpos,
-    isLastpos: isLastpos
+    addElement: (id: string): void => addInHistory(id),
+    previous: (): void => setPos(pos > 0 ? pos-1 : 0 ),
+    next: (): void => setPos(pos < history.length-1 ? pos+1 : pos ),
+    isFirstpos: (): boolean => pos === 0,
+    isLastpos: (): boolean => pos === history.length-1
   };
 }
 
@@ -393,17 +386,19 @@ function GeneralDocModal(): JSX.Element {
               />
             </div>
           </SidebarTitle>
-          <Tree
-            unfoldAll={unfoldAll}
-            setUnfoldAll={setUnfoldAll}
-            selected={selectedId}
-            onClick={(id) => history.addElement(id) }
-          >
-            { tableOfContent.map((tree, i) => <Nodes
-                key={i}
-                tree={tree}
-              ></Nodes> ) }
-          </Tree>
+          <div className="globals-scrollable-area">
+            <Tree
+              unfoldAll={unfoldAll}
+              setUnfoldAll={setUnfoldAll}
+              selected={selectedId}
+              onClick={(id) => history.addElement(id) }
+            >
+              { tableOfContent.map((tree, i) => <Nodes
+                  key={i}
+                  tree={tree}
+                ></Nodes> ) }
+            </Tree>
+          </div>
         </SideBar>
         <Markdown
           patterns={currentDoc?.patterns}
@@ -418,7 +413,7 @@ function GeneralDocModal(): JSX.Element {
   );
 }
 
-export function showHelp(): void {
-  if(!modal.getValue()) showModal(<GeneralDocModal/>);
-  else closeModal();
+export function showHelp(id?: string): void {
+  if(id) addInHistory(id);
+  showModal(<GeneralDocModal/>);
 }

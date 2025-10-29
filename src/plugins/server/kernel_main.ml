@@ -18,19 +18,183 @@ module Senv = Server_parameters
 let package =
   Package.package ~name:"parameters" ~title:"All Frama-C parameters" ()
 
+(* Ignore any parameter with an invalid name. *)
+let is_valid_parameter_name name =
+  let is_valid_char = function
+    | 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '-'  -> true
+    | _ -> false
+  in
+  name.[0] = '-' && String.for_all is_valid_char name
+
+(* Should a parameter be exported? *)
+let is_exported_parameter (p : Typed_parameter.parameter) =
+  p.visible && p.reconfigurable && is_valid_parameter_name p.name
+
 (* Translates a parameter name into a valid camlCase request. *)
-let camlCaseParameter name =
+let camlCaseParameterName name =
   match String.split_on_char '-' name with
   | "" :: head :: tail ->
     List.fold_left (^) head (List.map String.capitalize_ascii tail)
-  | _ -> Senv.fatal "Invalid parameter %s" name
+  | _ -> Senv.fatal "Invalid parameter name %s" name
+
+module ParameterType = struct
+  type t = Typed_parameter.parameter
+
+  let descr = Markdown.plain "Type of a command-line parameter"
+  let jtype = Data.declare ~package ~name:"parameterType" ~descr Jstring
+
+  let to_json (parameter : t) =
+    match parameter.accessor with
+    | Bool _ -> `String "Bool"
+    | Int _ -> `String "Int"
+    | Float _ -> `String "Float"
+    | String _ -> `String "String"
+
+  let of_json _ = Data.failure "ParameterType.of_json not implemented"
+end
+
+
+module ParameterRange = struct
+  type t = Typed_parameter.parameter
+
+  let jtype =
+    let descr = Md.plain "Range of values for an integer or float parameter, \
+                          or list of possible values of a string parameter" in
+    Data.declare ~package ~name:"parameterRange" ~descr
+      (Junion [ Jnull ; Jtuple [Jnumber; Jnumber] ; Jarray Jstring ])
+
+  let to_json (parameter : t) =
+    match parameter.accessor with
+    | Bool _ -> `Null
+    | Int (_accessor, range) ->
+      let min, max = range () in `List [`Int min ; `Int max]
+    | Float (_accessor, range) ->
+      let min, max = range () in `List [`Float min ; `Float max]
+    | String (_accessor, values) ->
+      match values () with
+      | [] -> `Null
+      | list -> `List (List.map (fun s -> `String s) list)
+
+  let of_json _ = Data.failure "ParameterRange.of_json not implemented"
+end
+
+module ParameterData = struct
+
+  type parameter
+  let jparameter : parameter Record.signature = Record.signature ()
+
+  let field name descr =
+    Record.field jparameter ~name ~descr:(Md.plain descr) (module Jstring)
+
+  let name = field "name" "parameter name"
+  let help = field "help" "parameter help message"
+  let state = field "state" "name of the synchronized state for this parameter"
+
+  let typ =
+    let descr = Md.plain "Parameter type : bool, int, float or string" in
+    Record.field jparameter ~name:"type" ~descr (module ParameterType)
+
+  let range =
+    let descr = Md.plain "Range of values for an integer or float parameter, \
+                          or list of possible values for a string parameter" in
+    Record.field jparameter ~name:"range" ~descr (module ParameterRange)
+
+  let is_set =
+    let descr = Md.plain "Has the parameter been set by the user?" in
+    Record.field jparameter ~name:"isSet" ~descr (module Jbool)
+
+  let data = Record.publish ~package ~name:"parameter"
+      ~descr:(Md.plain "Information about a Frama-C parameter") jparameter
+
+  module R : Record.S with type r = parameter = (val data)
+
+  type t = Typed_parameter.t
+
+  let jtype = R.jtype
+
+  let to_json (parameter: t) =
+    R.default |>
+    R.set name parameter.name |>
+    R.set help parameter.help |>
+    R.set typ parameter |>
+    R.set state (camlCaseParameterName parameter.name) |>
+    R.set range parameter |>
+    R.set is_set (parameter.is_set ()) |>
+    R.to_json
+
+  let of_json _ = Data.failure "Parameter.of_json not implemented"
+end
+
+module PluginData = struct
+
+  type plugin
+  let jplugin : plugin Record.signature = Record.signature ()
+
+  let field name =
+    let descr = Md.plain ("Plug-in " ^ name) in
+    Record.field jplugin ~name ~descr (module Jstring)
+
+  let name = field "name"
+  let shortname = field "shortname"
+  let help = field "help"
+
+  let data = Record.publish ~package ~name:"plugin"
+      ~descr:(Md.plain "Information about a Frama-C plug-in") jplugin
+
+  module R : Record.S with type r = plugin = (val data)
+
+  type t = Plugin.plugin
+
+  let jtype = R.jtype
+
+  let to_json (plugin: t) =
+    R.default |>
+    R.set name plugin.p_name |>
+    R.set shortname plugin.p_shortname |>
+    R.set help plugin.p_help |>
+    R.to_json
+
+  let of_json _ = Data.failure "Plugin.of_json not implemented"
+end
+
+let () = Request.register
+    ~package ~kind:`GET ~name:"getPlugins"
+    ~descr:(Md.plain "Return the list of available Frama-C plug-ins")
+    ~input:(module Junit) ~output:(module Jlist (PluginData))
+    (fun () -> Plugin.fold_on_plugins (fun p acc -> p :: acc) [])
+
+let () = Request.register
+    ~package ~kind:`GET ~name:"getPluginParameters"
+    ~descr:(Md.plain "Return the list of parameters of a Frama-C plug-in")
+    ~input:(module Jstring)
+    ~output:(module Jlist (Jpair (Jstring) (Jlist (ParameterData))))
+    begin fun name ->
+      try
+        let plugin = Plugin.get_from_name name in
+        let add group params acc =
+          (group, List.filter is_exported_parameter params) :: acc
+        in
+        Hashtbl.fold add plugin.p_parameters []
+      with Not_found -> Data.failure "No plug-in of name %S" name
+    end
+
+let () = Request.register
+    ~package ~kind:`GET ~name:"isSetParameter"
+    ~descr:(Md.plain "Has the given parameter been set?")
+    ~input:(module Jstring)
+    ~output:(module Jbool)
+    begin fun name ->
+      try (Typed_parameter.get name).is_set ()
+      with Not_found -> Data.failure "No parameter of name %S" name
+    end
+
 
 (* Registers a synchronized state for the given parameter. *)
 let register_parameter parameter =
   let open Typed_parameter in
   let parameter_name = parameter.name in
   let descr = Md.plain ("State of parameter " ^ parameter_name) in
-  let name = camlCaseParameter parameter_name in
+  let name = camlCaseParameterName parameter_name in
   let register data accessor =
     let add_hook f = accessor.add_update_hook (fun _ x -> f x) in
     ignore
@@ -46,20 +210,12 @@ let register_parameter parameter =
 (* Registers requests for all parameters of the given plugin. *)
 let register_plugin_parameters plugin =
   let register_group _group list =
-    let is_visible p = p.Typed_parameter.visible && p.reconfigurable in
-    List.iter register_parameter (List.filter is_visible list)
+    List.iter register_parameter (List.filter is_exported_parameter list)
   in
   Hashtbl.iter register_group plugin.Plugin.p_parameters
 
 (* Automatically registers requests for all Frama-C parameters. *)
-let register_all () =
-  (* For now, only registers parameters from the kernel and some plugins. *)
-  let whitelist = [ "kernel"; "Eva"; "WP"; "rtegen" ] in
-  let register plugin =
-    if List.mem plugin.Plugin.p_name whitelist
-    then register_plugin_parameters plugin
-  in
-  Plugin.iter_on_plugins register
+let register_all () = Plugin.iter_on_plugins register_plugin_parameters
 
 let apply_once =
   let once = ref true in

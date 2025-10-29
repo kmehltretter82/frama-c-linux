@@ -55,7 +55,7 @@ get_matching_branch () {
 fc_dir="$(dirname "$(dirname "$(readlink -f "$0")")")"
 
 git_current_branch="$(git branch --show-current)"
-: "${git_current_branch:=${CI_COMMIT_BRANCH:-}}"
+: "${git_current_branch:=${CI_COMMIT_REF_NAME:-}}"
 echo "currently on branch $git_current_branch"
 [[ -n $git_current_branch ]]
 plugin_repo=

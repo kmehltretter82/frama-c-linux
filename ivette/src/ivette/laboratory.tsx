@@ -1246,17 +1246,19 @@ function ViewBar(): JSX.Element {
 
   return (<>
       <Sidebars.SidebarTitle label='Views & Components' />
-      <ViewSection key='views' />
-      {groups.map((group) =>
+      <div className="globals-scrollable-area">
+        <ViewSection key='views' />
+        {groups.map((group) =>
+          <GroupSection
+            key={group.id}
+            filter={inGroup(group)} {...group} />)}
         <GroupSection
-          key={group.id}
-          filter={inGroup(group)} {...group} />)}
-      <GroupSection
-        key='components'
-        filter={inNoGroup(allGroups)} {...Components} />
-      <GroupSection
-        key='sandbox'
-        filter={inGroup(Sandbox)} {...Sandbox} />
+          key='components'
+          filter={inNoGroup(allGroups)} {...Components} />
+        <GroupSection
+          key='sandbox'
+          filter={inGroup(Sandbox)} {...Sandbox} />
+      </div>
     </>
   );
 }

@@ -496,12 +496,8 @@ if dyncallees:
 # unsupported C11 or non-standard specific features
 
 unsupported_keywords = {
-    "_Alignas": "C11 construct",
-    "_Alignof": "C11 construct",
     "_Complex": "C11 construct",
     "_Imaginary": "C11 construct",
-    "alignas": "C11 construct",
-    "alignof": "C11 construct",  # stdalign.h may use these symbols
     "__int128": "non-standard construct (GNU extension)",
     "__uint128_t": "non-standard construct (GNU extension)",
 }

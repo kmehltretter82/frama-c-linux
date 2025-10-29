@@ -7,7 +7,7 @@ struct foo { int x; int y[0]; };
 struct bar { struct foo z; };
 
 void main() {
-unsigned char T[100];
+  _Alignas(_Alignof(struct foo)) unsigned char T[100];
   struct foo * F=T;
   F->x=4;
   F->y[0]=5;

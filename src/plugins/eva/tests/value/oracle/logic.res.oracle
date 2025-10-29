@@ -14,7 +14,7 @@
   arr_ptr[0..2] ∈ {0}
   arr_ptr_arr[0..5] ∈ {0}
 [eva] computing for function eq_tsets <- main.
-  Called from logic.c:577.
+  Called from logic.c:581.
 [eva:acsl:unsupported] logic.c:103: 
   cannot evaluate ACSL term, unsupported ACSL construct: == operation on non-supported type set<_#8>
 [eva:alarm] logic.c:103: Warning: assertion got status unknown.
@@ -56,20 +56,20 @@
 [eva] Recording results for eq_tsets
 [eva] Done for function eq_tsets
 [eva] computing for function eq_char <- main.
-  Called from logic.c:578.
+  Called from logic.c:582.
 [eva] logic.c:149: Frama_C_show_each: {-126}
 [eva] logic.c:150: assertion got status valid.
 [eva] logic.c:151: assertion got status valid.
 [eva] Recording results for eq_char
 [eva] Done for function eq_char
 [eva] computing for function casts <- main.
-  Called from logic.c:579.
+  Called from logic.c:583.
 [eva] logic.c:155: assertion got status valid.
 [eva] logic.c:156: assertion got status valid.
 [eva] Recording results for casts
 [eva] Done for function casts
 [eva] computing for function empty_tset <- main.
-  Called from logic.c:580.
+  Called from logic.c:584.
 [eva] computing for function f_empty_tset <- empty_tset <- main.
   Called from logic.c:166.
 [eva] using specification for function f_empty_tset
@@ -80,7 +80,7 @@
 [eva] Recording results for empty_tset
 [eva] Done for function empty_tset
 [eva] computing for function reduce_by_equal <- main.
-  Called from logic.c:581.
+  Called from logic.c:585.
 [eva:alarm] logic.c:172: Warning: accessing out of bounds index. assert 0 ≤ v;
 [eva:alarm] logic.c:172: Warning: accessing out of bounds index. assert v < 10;
 [eva:alarm] logic.c:173: Warning: assertion got status unknown.
@@ -88,7 +88,7 @@
 [eva] Recording results for reduce_by_equal
 [eva] Done for function reduce_by_equal
 [eva] computing for function alarms <- main.
-  Called from logic.c:582.
+  Called from logic.c:586.
 [eva:alarm] logic.c:182: Warning: assertion 'ASSUME' got status unknown.
 [eva:alarm] logic.c:184: Warning: assertion 'UNK' got status unknown.
 [eva] logic.c:185: Frama_C_show_each: {-1; 1}
@@ -112,7 +112,7 @@
 [eva] Recording results for alarms
 [eva] Done for function alarms
 [eva] computing for function cond_in_lval <- main.
-  Called from logic.c:583.
+  Called from logic.c:587.
 [eva] computing for function select_like <- cond_in_lval <- main.
   Called from logic.c:228.
 [eva] using specification for function select_like
@@ -140,7 +140,7 @@
 [eva] Recording results for cond_in_lval
 [eva] Done for function cond_in_lval
 [eva] computing for function pred <- main.
-  Called from logic.c:584.
+  Called from logic.c:588.
 [eva] logic.c:90: assertion got status valid.
 [eva] logic.c:91: assertion got status valid.
 [eva:acsl:unsupported] logic.c:31: 
@@ -189,7 +189,7 @@
 [eva] Recording results for pred
 [eva] Done for function pred
 [eva] computing for function float_sign <- main.
-  Called from logic.c:585.
+  Called from logic.c:589.
 [eva] logic.c:251: assertion got status valid.
 [eva] logic.c:252: assertion got status valid.
 [eva] logic.c:253: assertion got status valid.
@@ -198,7 +198,7 @@
 [eva] Recording results for float_sign
 [eva] Done for function float_sign
 [eva] computing for function min_max <- main.
-  Called from logic.c:586.
+  Called from logic.c:590.
 [eva] computing for function Frama_C_interval <- min_max <- main.
   Called from logic.c:274.
 [eva] using specification for function Frama_C_interval
@@ -223,7 +223,7 @@
 [eva] Recording results for min_max
 [eva] Done for function min_max
 [eva] computing for function assign_tsets <- main.
-  Called from logic.c:587.
+  Called from logic.c:591.
 [eva] computing for function assign_tsets_aux <- assign_tsets <- main.
   Called from logic.c:269.
 [eva] using specification for function assign_tsets_aux
@@ -231,7 +231,7 @@
 [eva] Recording results for assign_tsets
 [eva] Done for function assign_tsets
 [eva] computing for function check_and_assert <- main.
-  Called from logic.c:588.
+  Called from logic.c:592.
 [eva:alarm] logic.c:295: Warning: assertion got status unknown.
 [eva] logic.c:296: Frama_C_show_each_42: {42}
 [eva] logic.c:297: check got status valid.
@@ -245,7 +245,7 @@
 [eva] Recording results for check_and_assert
 [eva] Done for function check_and_assert
 [eva] computing for function min_max_quantifier <- main.
-  Called from logic.c:589.
+  Called from logic.c:593.
 [eva] logic.c:321: check 'valid' got status valid.
 [eva] logic.c:322: check 'valid' got status valid.
 [eva] logic.c:323: check 'valid' got status valid.
@@ -307,7 +307,7 @@
 [eva] Recording results for min_max_quantifier
 [eva] Done for function min_max_quantifier
 [eva] computing for function int_abs <- main.
-  Called from logic.c:590.
+  Called from logic.c:594.
 [eva] computing for function abs <- int_abs <- main.
   Called from logic.c:365.
 [eva] using specification for function abs
@@ -429,7 +429,7 @@
 [eva] Recording results for int_abs
 [eva] Done for function int_abs
 [eva] computing for function float_abs <- main.
-  Called from logic.c:591.
+  Called from logic.c:595.
 [eva] computing for function fabs <- float_abs <- main.
   Called from logic.c:421.
 [eva] using specification for function fabs
@@ -480,7 +480,7 @@
 [eva] Recording results for float_abs
 [eva] Done for function float_abs
 [eva] computing for function set_comprehension <- main.
-  Called from logic.c:592.
+  Called from logic.c:596.
 [eva:alarm] logic.c:444: Warning: assertion got status unknown.
 [eva] logic.c:445: Frama_C_show_each_10_100: [10..100]
 [eva:alarm] logic.c:448: Warning: assertion got status unknown.
@@ -516,7 +516,7 @@
 [eva] Recording results for set_comprehension
 [eva] Done for function set_comprehension
 [eva] computing for function set_comprehension_assigns <- main.
-  Called from logic.c:593.
+  Called from logic.c:597.
 [eva] computing for function multi_memset <- set_comprehension_assigns <- main.
   Called from logic.c:503.
 [eva] using specification for function multi_memset
@@ -524,7 +524,7 @@
 [eva] Recording results for set_comprehension_assigns
 [eva] Done for function set_comprehension_assigns
 [eva] computing for function plet <- main.
-  Called from logic.c:594.
+  Called from logic.c:598.
 [eva] computing for function Frama_C_interval <- plet <- main.
   Called from logic.c:508.
 [eva] logic.c:508: 
@@ -552,45 +552,48 @@
 [eva:alarm] logic.c:531: Warning: assertion 'unknown' got status unknown.
 [eva:alarm] logic.c:533: Warning: 
   assertion 'invalid' got status invalid (stopping propagation).
-[eva:acsl:unsupported] logic.c:538: 
+[eva:alarm] logic.c:539: Warning: assertion 'uninitialized' got status unknown.
+[eva:acsl:unsupported] logic.c:542: 
   cannot evaluate ACSL term, unsupported ACSL construct: \let binding
-[eva:alarm] logic.c:538: Warning: assertion 'unsupported' got status unknown.
+[eva:alarm] logic.c:542: Warning: assertion 'unsupported' got status unknown.
 [eva] Recording results for plet
+[eva] logic.c:539: Warning: 
+  ignoring \let binding of logic variable v evaluating to bottom
 [eva] Done for function plet
 [eva] computing for function reduce_base_addr <- main.
-  Called from logic.c:595.
+  Called from logic.c:599.
 [eva] computing for function Frama_C_interval <- reduce_base_addr <- main.
-  Called from logic.c:549.
-[eva] logic.c:549: 
+  Called from logic.c:553.
+[eva] logic.c:553: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] logic.c:553: check 'valid' got status valid.
-[eva] logic.c:554: check 'valid' got status valid.
-[eva:alarm] logic.c:556: Warning: check 'unknown' got status unknown.
-[eva:alarm] logic.c:557: Warning: check 'unknown' got status unknown.
-[eva:alarm] logic.c:561: Warning: assertion got status unknown.
-[eva] logic.c:562: 
+[eva] logic.c:557: check 'valid' got status valid.
+[eva] logic.c:558: check 'valid' got status valid.
+[eva:alarm] logic.c:560: Warning: check 'unknown' got status unknown.
+[eva:alarm] logic.c:561: Warning: check 'unknown' got status unknown.
+[eva:alarm] logic.c:565: Warning: assertion got status unknown.
+[eva] logic.c:566: 
   Frama_C_show_each:
   {{ NULL ; &c ; &t_0 + [0..196],0%4 }}, {{ &c ; &t_0 + [0..196],0%4 }}
-[eva:alarm] logic.c:567: Warning: assertion got status unknown.
-[eva] logic.c:568: 
+[eva:alarm] logic.c:571: Warning: assertion got status unknown.
+[eva] logic.c:572: 
   Frama_C_domain_show_each:
   p : # cvalue: {{ NULL ; &a ; &c ; &t_0 + [0..196],0%4 ;
                    &u_0 + [0..196],0%4 }}
   r : # cvalue: {{ &a }} or UNINITIALIZED
 [eva] computing for function garbled_mix <- reduce_base_addr <- main.
-  Called from logic.c:571.
+  Called from logic.c:575.
 [eva] using specification for function garbled_mix
-[eva:garbled-mix:assigns] logic.c:571: 
+[eva:garbled-mix:assigns] logic.c:575: 
   The specification of function garbled_mix
   has generated a garbled mix of addresses for assigns clause \result.
 [eva] Done for function garbled_mix
-[eva:alarm] logic.c:572: Warning: assertion got status unknown.
-[eva] logic.c:573: 
+[eva:alarm] logic.c:576: Warning: assertion got status unknown.
+[eva] logic.c:577: 
   Frama_C_show_each:
   {{ NULL ; &c ; &t_0 + [0..196],0%4 }},
   {{ garbled mix of &{c; t_0}
-  (origin: Library function {logic.c:571}) }}
+  (origin: Library function {logic.c:575}) }}
 [eva] Recording results for reduce_base_addr
 [eva] Done for function reduce_base_addr
 [eva] Recording results for main
@@ -600,7 +603,7 @@
     logic.c:411: assigns clause on addresses
       (read in 1 statement, propagated through 1 statement)
       garbled mix of &{x_0}
-    logic.c:571: assigns clause on addresses
+    logic.c:575: assigns clause on addresses
       (read in 1 statement, propagated through 1 statement)
       garbled mix of &{b; c; t_0; w}
 [eva:acsl:unsupported] logic.c:530: 
@@ -747,7 +750,7 @@
   Frama_C_entropy_source ∈ [--..--]
   offset ∈ [0..49]
   p ∈ {{ NULL ; &c ; &t_0 + [0..196],0%4 }}
-  q ∈ {{ garbled mix of &{c; t_0} (origin: Library function {logic.c:571}) }}
+  q ∈ {{ garbled mix of &{c; t_0} (origin: Library function {logic.c:575}) }}
   r ∈ {{ &a }} or UNINITIALIZED
 [eva:final-states] Values at end of function reduce_by_equal:
   a[0..8] ∈ {1}

@@ -131,6 +131,8 @@
       (fun (i,t) -> Hashtbl.add all_kw i t;)
       [
         "admit", (fun _ -> ADMIT);
+        "alignof", (fun _ -> ALIGNOF);
+        "_Alignof", (fun _ -> ALIGNOF);
         "allocates", (fun _ -> ALLOCATES);
         "assert", (fun _ -> ASSERT);
         "assigns", (fun _ -> ASSIGNS);
@@ -240,6 +242,7 @@
         "\\ghost", GHOST;
         "\\initialized", INITIALIZED;
         "\\dangling", DANGLING;
+        "\\aligned", ALIGNED;
         "\\in", IN;
         "\\inter", INTER;
         "\\lambda", LAMBDA;

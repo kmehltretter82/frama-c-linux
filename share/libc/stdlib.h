@@ -17,6 +17,7 @@ __PUSH_FC_STDLIB
 #include "__fc_alloc_axiomatic.h"
 #include "__fc_string_axiomatic.h"
 #include "errno.h"
+#include <stddef.h>
 
 __BEGIN_DECLS
 
@@ -527,6 +528,56 @@ extern long int mrand48 (void);
 */
 extern long int jrand48 (unsigned short xsubi[3]);
 
+/*@ predicate is_alignment(integer n) =
+      n > 0 && ((size_t)n & ((size_t)n - 1)) == 0;
+*/
+/*@ predicate is_valid_alignment(integer n) =
+      is_alignment(n) && n < __FC_IMPLEM_MAX_ALIGN;
+*/
+
+/*@
+#if __STDC_VERSION__ == 201112L
+    requires valid_alignment: is_valid_alignment(alignment);
+    requires alignment_modulo: size % alignment == 0;
+  #endif
+    allocates \result;
+    assigns __fc_heap_status \from size, __fc_heap_status;
+    assigns \result, __fc_errno \from indirect:size, indirect:__fc_heap_status;
+    behavior allocation:
+      #if __STDC__VERSION == 201112L
+      assumes valid_alignment: is_valid_alignment(alignment);
+      #endif
+      assumes can_allocate: is_allocable(size);
+      #if __STDC__VERSION != 201112L
+      assumes valid_alignment: is_valid_alignment(alignment);
+      #endif
+      assigns __fc_heap_status \from size, __fc_heap_status;
+      assigns \result \from indirect:size, indirect:__fc_heap_status;
+      ensures allocation: \fresh(\result,size);
+      ensures alignment: \aligned(\result, alignment);
+      ensures errno_same: __fc_errno == \old(__fc_errno);
+    behavior no_allocation:
+      assumes cannot_allocate: !is_allocable(size);
+      #if __STDC_VERSION != 201112L
+      assumes valid_alignment: is_valid_alignment(alignment);
+      #endif
+      allocates \nothing;
+      assigns \result \from \nothing;
+      ensures null_result: \result==\null;
+      ensures errno_set: __fc_errno == ENOMEM;
+    #if __STDC_VERSION != 201112L
+    behavior no_allocation_invalid_align:
+      assumes cannot_allocate: !is_valid_alignment(alignment);
+      allocates \nothing;
+      assigns \result \from \nothing;
+      ensures null_result: \result==\null;
+      ensures errno_set: __fc_errno == EINVAL;
+    #endif
+    complete behaviors;
+    disjoint behaviors;
+*/
+extern void* aligned_alloc (size_t alignment, size_t size);
+
 /* ISO C: 7.20.3.1 */
 /*@
   allocates \result;
@@ -537,6 +588,7 @@ extern long int jrand48 (unsigned short xsubi[3]);
   behavior allocation:
     assumes can_allocate: is_allocable(nmemb * size);
     ensures allocation: \fresh(\result, nmemb * size);
+    ensures alignment: \aligned(\result, alignof(max_align_t));
     ensures initialization: \initialized(((char *)\result)+(0..nmemb*size-1));
     ensures zero_initialization: \subset(((char *)\result)[0..nmemb*size-1], {0});
     ensures errno_same: __fc_errno == \old(__fc_errno);
@@ -560,6 +612,7 @@ extern void *calloc(size_t nmemb, size_t size);
   @   assigns __fc_heap_status \from size, __fc_heap_status;
   @   assigns \result \from indirect:size, indirect:__fc_heap_status;
   @   ensures allocation: \fresh(\result,size);
+  @   ensures alignment: \aligned(\result, alignof(max_align_t));
   @   ensures errno_same: __fc_errno == \old(__fc_errno);
   @ behavior no_allocation:
   @   assumes cannot_allocate: !is_allocable(size);
@@ -601,6 +654,7 @@ extern void free(void *p);
      allocates \result;
      assigns   \result \from size, __fc_heap_status;
      ensures   allocation: \fresh(\result,size);
+     ensures   alignment: \aligned(\result, alignof(max_align_t));
      ensures   errno_same: __fc_errno == \old(__fc_errno);
 
    behavior deallocation:
@@ -942,8 +996,8 @@ extern size_t wcstombs(char * restrict s,
 /*@
   // Returns true iff n is a suitable alignment according to POSIX, i.e.,
   // a power of two multiple of sizeof(void *).
-  predicate is_suitable_alignment(integer n) =
-     n > 0 && n % sizeof(void*) == 0 && ((size_t)n & ((size_t)n - 1)) == 0;
+  predicate is_posix_alignment(integer n) =
+     is_alignment(n) && n % sizeof(void*) == 0 ;
 */
 
 // Note: this specification should ideally use a more specific predicate,
@@ -955,11 +1009,11 @@ extern size_t wcstombs(char * restrict s,
   assigns \result \from indirect:alignment, indirect:size,
                         indirect:__fc_heap_status;
   behavior invalid_alignment:
-    assumes alignment_not_suitable: !is_suitable_alignment(alignment);
+    assumes alignment_not_suitable: !is_posix_alignment(alignment);
     assigns \result \from indirect:alignment;
     ensures result_einval: \result == EINVAL;
   behavior allocation:
-    assumes alignment_is_suitable: is_suitable_alignment(alignment);
+    assumes alignment_is_suitable: is_posix_alignment(alignment);
     assumes can_allocate: is_allocable(size);
     assigns __fc_heap_status \from indirect:alignment, size, __fc_heap_status;
     assigns \result \from indirect:alignment, indirect:size,
@@ -967,7 +1021,7 @@ extern size_t wcstombs(char * restrict s,
     ensures allocation: \fresh(*memptr,size);
     ensures result_zero: \result == 0;
   behavior no_allocation:
-    assumes alignment_is_suitable: is_suitable_alignment(alignment);
+    assumes alignment_is_suitable: is_posix_alignment(alignment);
     assumes cannot_allocate: !is_allocable(size);
     allocates \nothing;
     assigns \result \from indirect:alignment;

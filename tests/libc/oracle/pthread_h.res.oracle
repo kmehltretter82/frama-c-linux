@@ -76,6 +76,8 @@
   Called from pthread_h.c:39.
 [eva] Done for function printf_va_5
 [eva:alarm] pthread_h.c:42: Warning: 
+  unaligned pointer creation. assert \aligned(retv,alignof(int));
+[eva:alarm] pthread_h.c:42: Warning: 
   out of bounds read. assert \valid_read(retv);
 [eva] computing for function printf_va_6 <- main.
   Called from pthread_h.c:42.

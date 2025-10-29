@@ -28,7 +28,7 @@ void main() {
   {
     int z;
     p[0] = &z;
-    p[1] = 42;
+    p[1] = 44;
   }
   //@ assert !\dangling(&p[0..1]);
 

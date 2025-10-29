@@ -1,3 +1,7 @@
+/* run.config*
+   STDOPT: +"-no-warn-unaligned-pointer"
+*/
+
 typedef struct {
   int a;
   int b;
@@ -14,7 +18,7 @@ void main1 () {
   //@ assert \valid(p+3);
   p[3]=1;
   long *q = ((int*)&t[v])+1;
-  //@ assert \valid(q+3);  
+  //@ assert \valid(q+3);
   q[3]=1;
   p = p;
   q = q;
@@ -26,7 +30,7 @@ void main2() {
   ts *r = ((int*)&u[v])+1;
   ts *s = ((int*)&u[v])+1;
 
-  //@ assert \valid(&p->b);  
+  //@ assert \valid(&p->b);
   p->a = 1;
   //@ assert \valid(&q->a);
   q->a = 2;
@@ -111,7 +115,7 @@ void main7 () {
   //@ assert !\valid(p+(0..1000));
   //@ assert !\valid(p+(-1..9));
   //@ assert \valid(p+(0..9));
-  
+
   int t7_2[10000];
   p = t7_2;
   //@ assert !\valid(p+(0..10000));
@@ -163,12 +167,12 @@ void main9() {
   p->t[0] = 1;
   p->t[99] = 2;
   //@ assert \valid(&p->t[0..99]);
-  
+
 }
 
 void main10() {
   char t[40];
-  char *p; 
+  char *p;
   int u[20];
   int *q;
 

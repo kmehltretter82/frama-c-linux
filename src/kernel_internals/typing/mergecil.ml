@@ -934,14 +934,25 @@ let equalModuloPackedAlign attrs1 attrs2 =
 
 
 (* Checks if fields [f1] and [f2] (contained in the composite types
-   [typ_ci1] and [typ_ci2] respectively) are equal except for
-   alignment-related attributes.
+   [typ_ci1] and [typ_ci2] respectively) are equal.
    Raises [Failure] if the fields are not equivalent.
    If [mustCheckOffsets] is true, then there is already a difference in the
    composite type, so each field must be checked. *)
 let checkFieldsEqualModuloPackedAlign ~mustCheckOffsets f1 f2 =
   if f1.fbitfield <> f2.fbitfield then
     raise (Failure "different bitfield info");
+
+  let same_alignas_value al1 al2 =
+    Option.equal Z.equal
+      (Cil.constFoldToInt al1)
+      (Cil.constFoldToInt al2)
+  in
+  begin match f1.falignas, f2.falignas with
+    | None, None -> ()
+    | Some a1, Some a2 when same_alignas_value a1 a2 -> ()
+    | _ -> raise (Failure "incompatible _Alignas specification");
+  end;
+
   if mustCheckOffsets || not (equal_attributes_for_merge f1.fattr f2.fattr) then
     (* different attributes: check if the difference is only due
        to aligned/packed attributes, and if the offsets are the same,
@@ -2458,8 +2469,8 @@ and equalExps (x: exp) (y: exp) : bool =
     | Lval(xl), Lval(yl) ->          (equalLvals xl yl)
     | SizeOf(_xt), SizeOf(_yt) ->      true (*INC: xt == yt*)  (* identical types *)
     | SizeOfE(xe), SizeOfE(ye) ->    (equalExps xe ye)
-    | AlignOf(_xt), AlignOf(_yt) ->    true (*INC: xt == yt*)
-    | AlignOfE(xe), AlignOfE(ye) ->  (equalExps xe ye)
+    | AlignOf(_xt, _), AlignOf(_yt, _) ->    true (*INC: xt == yt*)
+    | AlignOfE(xe, _), AlignOfE(ye, _) ->  (equalExps xe ye)
     | UnOp(xop,xe,_xt), UnOp(yop,ye,_yt) ->
       xop = yop &&
       (equalExps xe ye) &&

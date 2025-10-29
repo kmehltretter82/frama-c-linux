@@ -43,8 +43,8 @@
 [eva:final-states] Values at end of function g:
   
 [eva:final-states] Values at end of function main:
-  p ∈ {{ NULL + {3} ; &a }}
-  q ∈ {{ NULL + {2} ; &b }}
+  p ∈ {{ NULL + {8} ; &a }}
+  q ∈ {{ NULL + {4} ; &b }}
   r ∈ {2}
   s ∈ [--..--]
   __retres ∈

@@ -139,6 +139,7 @@ let rank_predicate = function
   | Pallocable _ -> 22
   | Pfreeable _ -> 23
   | Pfresh _ -> 24
+  | Paligned _ -> 25
 
 
 (**************************************************************************)
@@ -459,8 +460,14 @@ and compare_attrparam config a1 a2 = match a1, a2 with
       compare_attrparam_list config l1 l2
   | ASizeOf t1, ASizeOf t2 -> compare_type config t1 t2
   | ASizeOfE p1, ASizeOfE p2 -> compare_attrparam config p1 p2
-  | AAlignOf t1, AAlignOf t2 -> compare_type config t1 t2
-  | AAlignOfE p1, AAlignOfE p2 -> compare_attrparam config p1 p2
+  | AAlignOf (t1, i1), AAlignOf (t2, i2) ->
+    compare_chain
+      (Cil_types.compare_standard_or_gcc) i1 i2
+      (compare_type config) t1 t2
+  | AAlignOfE (p1, i1), AAlignOfE (p2, i2) ->
+    compare_chain
+      (Cil_types.compare_standard_or_gcc) i1 i2
+      (compare_attrparam config) p1 p2
   | AUnOp (op1, a1), AUnOp (op2, a2) ->
     compare_chain (=?=) op1 op2 (compare_attrparam config) a1 a2
   | ABinOp (op1, a1, a1'), ABinOp (op2, a2, a2') ->
@@ -632,7 +639,7 @@ struct
       end)
 end
 
-module Typ= struct
+module Typ = struct
   include
     MakeTyp
       (struct
@@ -754,6 +761,7 @@ module Varinfo_Id = struct
     vtype    = Typ.dummy;
     vattr = [];
     vstorage = NoStorage;
+    valignas = None;
     vglob = false;
     vdefined = false;
     vformal = false;
@@ -825,6 +833,7 @@ module Fieldinfo = struct
     fname      = "@dummy_fieldinfo@";
     ftype      = Typ.dummy;
     fbitfield  = None;
+    falignas   = None;
     fattr      = [];
     floc       = Location.dummy;
     faddrof    = false;
@@ -832,7 +841,7 @@ module Fieldinfo = struct
     foffset_in_bits = None;
   }
 
-  include  Make_with_collections
+  include Make_with_collections
       (struct
         type t = fieldinfo
         let name = "fieldinfo"
@@ -849,6 +858,7 @@ module Fieldinfo = struct
                            fname = "";
                            ftype = typ;
                            fbitfield = None;
+                           falignas = None;
                            fattr = [];
                            floc = loc;
                            faddrof = false;
@@ -1061,10 +1071,16 @@ struct
     | SizeOfE e1, SizeOfE e2 -> compare_exp e1 e2
     | SizeOfE _, _ -> 1
     | _, SizeOfE _ -> -1
-    | AlignOf ty1, AlignOf ty2 -> Typ.compare ty1 ty2
+    | AlignOf (ty1, i1), AlignOf (ty2, i2) ->
+      compare_chain
+        Cil_types.compare_standard_or_gcc i1 i2
+        Typ.compare ty1 ty2
     | AlignOf _, _ -> 1
     | _, AlignOf _ -> -1
-    | AlignOfE e1, AlignOfE e2 -> compare_exp e1 e2
+    | AlignOfE (e1, i1), AlignOfE (e2, i2) ->
+      compare_chain
+        Cil_types.compare_standard_or_gcc i1 i2
+        compare_exp e1 e2
     | AlignOfE _, _ -> 1
     | _, AlignOfE _ -> -1
     | UnOp(op1,e1,ty1), UnOp(op2,e2,ty2) ->
@@ -1128,8 +1144,12 @@ struct
     | Lval lv -> hash_lval ((prime*acc) lxor 42) lv
     | SizeOf t -> (prime*acc) lxor Typ.hash t
     | SizeOfE e -> hash_exp ((prime*acc) lxor 75) e
-    | AlignOf t -> (prime*acc) lxor Typ.hash t
-    | AlignOfE e -> hash_exp ((prime*acc) lxor 153) e
+    | AlignOf (t, i) ->
+      let r = (prime * acc) lxor Hashtbl.hash i in
+      (prime * r) lxor Typ.hash t
+    | AlignOfE (e, i) ->
+      let r = (prime * acc) lxor Hashtbl.hash i in
+      hash_exp ((prime * r) lxor 153) e
     | UnOp(op,e,ty) ->
       let res = hash_exp ((prime*acc) lxor Hashtbl.hash op) e in
       (prime*res) lxor Typ.hash ty
@@ -1919,12 +1939,16 @@ and compare_predicate p1 p2 =
           let c = compare_term t1 t2 in
           if c <> 0 then c
           else compare_term n1 n2
+    | Paligned (t1,n1), Paligned (t2,n2) ->
+      let c = compare_term t1 t2 in
+      if c <> 0 then c
+      else compare_term n1 n2
     | Pseparated(seps1), Pseparated(seps2) ->
       compare_list compare_term seps1 seps2
     | (Pfalse | Ptrue | Papp _ | Prel _ | Pand _ | Por _ | Pimplies _
       | Piff _ | Pnot _ | Pif _ | Plet _ | Pforall _ | Pexists _
       | Pat _ | Pvalid _ | Pvalid_read _ | Pobject_pointer _ | Pvalid_function _
-      | Pinitialized _ | Pdangling _
+      | Pinitialized _ | Pdangling _ | Paligned _
       | Pfresh _ | Pallocable _ | Pfreeable _ | Pxor _ | Pseparated _
       ), _ -> assert false
 
@@ -2172,6 +2196,9 @@ and hash_predicate (acc, depth, tot) p =
         hash_one_term
         (acc + 97, tot - 1)
         seps
+    | Paligned (t,n) ->
+      let hasht, tott = hash_term (acc + 101 , depth - 1, tot - 3) t in
+      hash_term (hasht, depth - 1, tott) n
   end
 
 let hash_fct f t = try fst (f (0,10,100) t) with StopRecursion n -> n
@@ -2180,7 +2207,7 @@ module Logic_constant = struct
   let pretty_ref = ref (fun _ _ -> assert false)
   let dummy = LStr "@dummy_logic_constant@"
 
-  include  Make_with_collections
+  include Make_with_collections
       (struct
         type t = logic_constant
         let name = "Logic_constant"

@@ -25,15 +25,18 @@ type analysis_target =
   | `Spec of Cil_types.funspec
   | `Body of Cil_types.fundec * bool ]
 
-(** Define the analysis target of a function according to Eva parameters.
-    Also registers the call in tables for the functions below. *)
-val define_analysis_target:
-  ?recursion_depth:int -> ('l, 'v) Eval.call -> analysis_target
+(** Returns the analysis target of a given function at a given callsite
+    according to Eva parameters. *)
+val analysis_target:
+  ?recursion_depth:int -> kernel_function -> kinstr -> analysis_target
 
 (** Returns true if the Eva analysis use the specification of the given
     function instead of its body to interpret its calls. *)
 val use_spec_instead_of_definition:
   ?recursion_depth:int -> kernel_function -> bool
+
+(** Registers the analysis of a call with a given target for functions below. *)
+val register_analysis_target: ('l, 'v) Eval.call -> analysis_target -> unit
 
 
 (** Returns true if the function has been analyzed. *)

@@ -61,7 +61,7 @@ let pp_from_ref = Extlib.mk_fun "Cil.pp_from_ref"
 let pp_behavior_ref = Extlib.mk_fun "Cil.pp_behavior_ref"
 
 let default_behavior_name = "default!"
-let is_default_mk_behavior ~name ~assumes = name = default_behavior_name && assumes =[]
+let is_default_mk_behavior ~name ~assumes = name = default_behavior_name && assumes = []
 let is_default_behavior b = is_default_mk_behavior ~name:b.b_name ~assumes:b.b_assumes
 
 let find_default_behavior spec =
@@ -140,9 +140,11 @@ let update_var_type v t =
 
 (* Make a varinfo. Used mostly as a helper function below  *)
 let makeVarinfo
-    ?(source=true) ?(temp=false) ?(referenced=false) ?(ghost=false) ?(loc=Location.unknown)
+    ?(source=true) ?(temp=false) ?(referenced=false) ?(ghost=false) ?alignas
+    ?(loc=Location.unknown)
     global formal name typ
   =
+
   let vi =
     { vorig_name = name;
       vname = name;
@@ -156,6 +158,7 @@ let makeVarinfo
       vinline = false;
       vattr = [];
       vstorage = NoStorage;
+      valignas = alignas;
       vaddrof = false;
       vreferenced = referenced;
       vdescr = None;
@@ -1334,6 +1337,10 @@ and childrenPredicateNode vis p =
     let s' = visitCilLogicLabel vis s in
     let t' = vTerm t in
     if t' != t || s != s' then Pdangling (s',t') else p
+  | Paligned (t,n) ->
+    let t' = vTerm t in
+    let n' = vTerm n in
+    if t' != t || n' != n then Paligned (t',n') else p
   | Pseparated seps ->
     let seps' = Extlib.map_no_copy vTerm seps in
     if seps' != seps then Pseparated seps' else p
@@ -1597,18 +1604,21 @@ and childrenExp (vis: cilVisitor) (e: exp) : exp =
   | Const c ->
     let c' = visitCilConst vis c in
     if c' != c then new_exp (Const c') else e
+
   | SizeOf t ->
     let t'= vTyp t in
     if t' != t then new_exp (SizeOf t') else e
   | SizeOfE e1 ->
     let e1' = vExp e1 in
     if e1' != e1 then new_exp (SizeOfE e1') else e
-  | AlignOf t ->
+
+  | AlignOf (t, i) ->
     let t' = vTyp t in
-    if t' != t then new_exp (AlignOf t') else e
-  | AlignOfE e1 ->
+    if t' != t then new_exp (AlignOf (t', i)) else e
+  | AlignOfE (e1, i) ->
     let e1' = vExp e1 in
-    if e1' != e1 then new_exp (AlignOfE e1') else e
+    if e1' != e1 then new_exp (AlignOfE (e1', i)) else e
+
   | Lval lv ->
     let lv' = vLval lv in
     if lv' != lv then new_exp (Lval lv') else e
@@ -2104,12 +2114,12 @@ and childrenAttrparam (vis: cilVisitor) (aa: attrparam) : attrparam =
   | ASizeOfE e ->
     let e' = fAttrP e in
     if e' != e then ASizeOfE e' else aa
-  | AAlignOf t ->
+  | AAlignOf (t, i) ->
     let t' = fTyp t in
-    if t' != t then AAlignOf t' else aa
-  | AAlignOfE e ->
+    if t' != t then AAlignOf (t', i) else aa
+  | AAlignOfE (e, i) ->
     let e' = fAttrP e in
-    if e' != e then AAlignOfE e' else aa
+    if e' != e then AAlignOfE (e', i) else aa
   | AUnOp (uo, e1) ->
     let e1' = fAttrP e1 in
     if e1' != e1 then AUnOp (uo, e1') else aa
@@ -2329,10 +2339,10 @@ and childrenGlobal (vis: cilVisitor) (g: global) : global =
 let bytesSizeOfInt (ik: ikind): int =
   match ik with
   | IChar | ISChar | IUChar | IBool -> 1
-  | IInt | IUInt -> Machine.sizeof_int ()
-  | IShort | IUShort -> Machine.sizeof_short ()
-  | ILong | IULong -> Machine.sizeof_long ()
-  | ILongLong | IULongLong -> Machine.sizeof_longlong ()
+  | IInt | IUInt -> Machine.Sizeof.int ()
+  | IShort | IUShort -> Machine.Sizeof.short ()
+  | ILong | IULong -> Machine.Sizeof.long ()
+  | ILongLong | IULongLong -> Machine.Sizeof.longlong ()
 
 let bitsSizeOfInt ik = 8 * bytesSizeOfInt ik
 
@@ -2341,18 +2351,18 @@ let intKindForSize (s:int) (unsigned:bool) : ikind =
   if unsigned then
     (* Test the most common sizes first *)
     if s = 1 then IUChar
-    else if s = sizeof_int () then IUInt
-    else if s = sizeof_long () then IULong
-    else if s = sizeof_short () then IUShort
-    else if s = sizeof_longlong () then IULongLong
+    else if s = Sizeof.int () then IUInt
+    else if s = Sizeof.long () then IULong
+    else if s = Sizeof.short () then IUShort
+    else if s = Sizeof.longlong () then IULongLong
     else raise Not_found
   else
     (* Test the most common sizes first *)
   if s = 1 then ISChar
-  else if s = sizeof_int () then IInt
-  else if s = sizeof_long () then ILong
-  else if s = sizeof_short () then IShort
-  else if s = sizeof_longlong () then ILongLong
+  else if s = Sizeof.int () then IInt
+  else if s = Sizeof.long () then ILong
+  else if s = Sizeof.short () then IShort
+  else if s = Sizeof.longlong () then ILongLong
   else raise Not_found
 
 let uint64_t () = Cil_const.mk_tint (intKindForSize 8 true)
@@ -2363,9 +2373,9 @@ let int32_t  () = Cil_const.mk_tint (intKindForSize 4 false)
 let int16_t  () = Cil_const.mk_tint (intKindForSize 2 false)
 
 let floatKindForSize (s:int) =
-  if s = Machine.sizeof_double () then FDouble
-  else if s = Machine.sizeof_float () then FFloat
-  else if s = Machine.sizeof_longdouble () then FLongDouble
+  if s = Machine.Sizeof.double () then FDouble
+  else if s = Machine.Sizeof.float () then FFloat
+  else if s = Machine.Sizeof.longdouble () then FLongDouble
   else raise Not_found
 
 (** Returns true if and only if the given integer type is signed. *)
@@ -3157,24 +3167,46 @@ type offsetAcc =
 (* Hack to prevent infinite recursion in alignments *)
 let ignoreAlignmentAttrs = ref false
 
+let foldAlignasToInt = function
+  | None -> None
+  | Some v ->
+    match !constfoldtoint v with
+    | None -> Kernel.fatal "%a should be a constant expresion" !pp_exp_ref v
+    | Some v when not @@ Z.fits_int v -> Kernel.fatal "_Alignas is too big"
+    | Some v when Z.equal Z.zero v -> None
+    | Some v -> Some (Z.to_int v)
+
 (* Get the minimum alignment in bytes for a given type *)
-let rec bytesAlignOf t =
+let rec bytesAlignOf ~standard_or_gcc t =
   let open Machine in
   let alignOfType () =
+    let get_alignof : (module Machine.AlignofInfo) =
+      match standard_or_gcc with
+      | `Standard -> (module Machine.Alignof)
+      | `GCC -> (module Machine.GCCAlignof)
+    in
+    let module Alignof = (val get_alignof) in
     match t.tnode with
     | TInt (IChar|ISChar|IUChar|IBool) -> 1
-    | TInt (IShort|IUShort) -> alignof_short ()
-    | TInt (IInt|IUInt) -> alignof_int ()
-    | TInt (ILong|IULong) -> alignof_long ()
-    | TInt (ILongLong|IULongLong) -> alignof_longlong ()
-    | TEnum ei ->  bytesAlignOf (Cil_const.mk_tint ei.ekind)
-    | TFloat FFloat -> alignof_float ()
-    | TFloat FDouble -> alignof_double ()
-    | TFloat FLongDouble -> alignof_longdouble ()
-    | TNamed t -> bytesAlignOf t.ttype
-    | TArray (t, _) -> bytesAlignOf t
-    | TPtr _ | TBuiltin_va_list -> alignof_ptr ()
-
+    | TInt (IShort|IUShort)->
+      Alignof.short ()
+    | TInt (IInt|IUInt) ->
+      Alignof.int ()
+    | TInt (ILong|IULong) ->
+      Alignof.long ()
+    | TInt (ILongLong|IULongLong) ->
+      Alignof.longlong ()
+    | TEnum ei ->  bytesAlignOf ~standard_or_gcc (Cil_const.mk_tint ei.ekind)
+    | TFloat FFloat ->
+      Alignof.float ()
+    | TFloat FDouble ->
+      Alignof.double ()
+    | TFloat FLongDouble ->
+      Alignof.longdouble ()
+    | TNamed t -> bytesAlignOf ~standard_or_gcc t.ttype
+    | TArray (t, _) -> bytesAlignOf ~standard_or_gcc t
+    | TPtr _ | TBuiltin_va_list ->
+      Alignof.ptr ()
     (* For composite types get the maximum alignment of any field inside *)
     | TComp c ->
       (* On GCC the zero-width fields do not contribute to the alignment. On
@@ -3194,15 +3226,14 @@ let rec bytesAlignOf t =
            (* Bitfields with zero width do not contribute to the alignment in
             * GCC *)
            if not (msvcMode ()) && f.fbitfield = Some 0 then sofar else
-             max sofar (alignOfField f)) 1 fields
+             max sofar (bytesAlignOfField ~standard_or_gcc f)) 1 fields
     (* These are some error cases *)
-    | TFun _ when not (msvcMode ()) -> alignof_fun ()
-    | TFun _ -> raise (SizeOfError ("Undefined sizeof on a function.", t))
-    | TVoid  ->
-      if sizeof_void () > 0 then
-        sizeof_void ()
-      else
-        raise (SizeOfError ("Undefined sizeof(void).", t))
+    | TFun _ when Alignof.func () > 0 ->
+      Alignof.func ()
+    | TFun _ -> raise (SizeOfError ("Undefined alignof on a function.", t))
+    | TVoid  when Alignof.void () > 0 ->
+      Alignof.void ()
+    | TVoid -> raise (SizeOfError ("Undefined alignof(void).", t))
   in
   process_aligned_attribute ~may_reduce:true
     (fun fmt -> !pp_typ_ref fmt t)
@@ -3215,27 +3246,22 @@ let rec bytesAlignOf t =
    Note that is not the case for the aligned attribute, which behaves
    differently when put into a struct, or in each of its fields.
 *)
-and alignOfField (fi: fieldinfo) =
+and bytesAlignOfField ~standard_or_gcc (fi: fieldinfo) =
   let fieldIsPacked =
     Ast_attributes.(contains "packed" fi.fattr || contains "packed" fi.fcomp.cattr)
   in
-  if fieldIsPacked then begin
-    if Ast_attributes.contains "aligned" fi.fattr then
-      (* field is packed and aligned => process alignment *)
-      let field_alignment = process_aligned_attribute ~may_reduce:true
-          (fun fmt -> Format.fprintf fmt "field %s" fi.fname)
-          fi.fattr
-          (fun () -> bytesAlignOf fi.ftype)
-      in
-      field_alignment
-    else
-      (* packed and without minimum alignment => align on 1 *)
-      1
-  end else
-    process_aligned_attribute ~may_reduce:false
-      (fun fmt -> Format.fprintf fmt "field %s" fi.fname)
-      fi.fattr
-      (fun () -> bytesAlignOf fi.ftype)
+  if fieldIsPacked && not @@ Ast_attributes.contains "aligned" fi.fattr then 1
+  else
+    let aligned = process_aligned_attribute ~may_reduce:fieldIsPacked
+        (fun fmt -> Format.fprintf fmt "field %s" fi.fname)
+        fi.fattr
+        (fun () -> bytesAlignOf ~standard_or_gcc fi.ftype)
+    in
+    let alignas = match foldAlignasToInt fi.falignas with
+      | None -> 0
+      | Some v -> v
+    in
+    max alignas aligned
 
 and intOfAttrparam (a:attrparam) : int option =
   let rec doit a : int =
@@ -3261,8 +3287,7 @@ and intOfAttrparam (a:attrparam) : int option =
     | ASizeOf(t) ->
       let bs = bitsSizeOf t in
       bs / 8
-    | AAlignOf(t) ->
-      bytesAlignOf t
+    | AAlignOf(t, i) -> bytesAlignOf ~standard_or_gcc:i t
     | _ -> raise (SizeOfError ("Cannot convert an attribute to int.", Cil_const.voidType))
   in
   (* Use ignoreAlignmentAttrs here to prevent stack overflow if a buggy
@@ -3314,7 +3339,7 @@ and process_aligned_attribute (pp:Format.formatter->unit) ~may_reduce attrs defa
     if rest <> [] then
       Kernel.warning ~current:true "ignoring duplicate align attributes on %t"
         pp;
-    Machine.alignof_aligned ()
+    Machine.Alignof.aligned ()
   | at::_ ->
     Kernel.warning ~current:true "alignment attribute \"%a\" not understood on %t"
       !pp_attribute_ref at pp;
@@ -3332,7 +3357,7 @@ and offsetOfFieldAcc ~last ~(fi: fieldinfo) ~(sofar: offsetAcc) : offsetAcc =
 and offsetOfFieldAcc_GCC last (fi: fieldinfo) (sofar: offsetAcc) : offsetAcc =
   (* field type *)
   let ftype = Ast_types.unroll fi.ftype in
-  let ftypeAlign = 8 * alignOfField fi in
+  let ftypeAlign = 8 * bytesAlignOfField ~standard_or_gcc:`Standard fi in
   let ftypeBits = (if last then bitsSizeOfEmptyArray else bitsSizeOf) ftype in
   match ftype, fi.fbitfield with
   (* A width of 0 means that we must end the current packing. It seems that
@@ -3379,7 +3404,7 @@ and offsetOfFieldAcc_MSVC last (fi: fieldinfo)
     (sofar: offsetAcc) : offsetAcc =
   (* field type *)
   let ftype = Ast_types.unroll fi.ftype in
-  let ftypeAlign = 8 * alignOfField fi in
+  let ftypeAlign = 8 * bytesAlignOfField ~standard_or_gcc:`Standard fi in
   let ftypeBits = (if last then bitsSizeOfEmptyArray else bitsSizeOf) ftype in
   match ftype.tnode, fi.fbitfield, sofar.oaPrevBitPack with
   (* Ignore zero-width bitfields that come after non-bitfields *)
@@ -3479,12 +3504,12 @@ and bitsSizeOfEmptyArray typ =
 and bitsSizeOf t =
   match t.tnode with
   | TInt ik            -> 8 * (bytesSizeOfInt ik)
-  | TFloat FDouble     -> 8 * Machine.sizeof_double ()
-  | TFloat FLongDouble -> 8 * Machine.sizeof_longdouble ()
-  | TFloat _           -> 8 * Machine.sizeof_float ()
+  | TFloat FDouble     -> 8 * Machine.Sizeof.double ()
+  | TFloat FLongDouble -> 8 * Machine.Sizeof.longdouble ()
+  | TFloat _           -> 8 * Machine.Sizeof.float ()
   | TEnum ei           -> bitsSizeOf (Cil_const.mk_tint ei.ekind)
-  | TPtr _             -> 8 * Machine.sizeof_ptr ()
-  | TBuiltin_va_list   -> 8 * Machine.sizeof_ptr ()
+  | TPtr _             -> 8 * Machine.Sizeof.ptr ()
+  | TBuiltin_va_list   -> 8 * Machine.Sizeof.ptr ()
   | TNamed t           -> bitsSizeOf t.ttype
   | TComp ({cfields=None} as comp) ->
     raise
@@ -3520,7 +3545,7 @@ and bitsSizeOf t =
             * is 32 and is not padded  *)
            t, 32
          else
-           t, addTrailing lastoff.oaFirstFree (8 * bytesAlignOf t))
+           t, addTrailing lastoff.oaFirstFree (8 * bytesAlignOf ~standard_or_gcc:`Standard t))
 
   | TComp comp -> (* Union *)
     find_sizeof t
@@ -3541,7 +3566,7 @@ and bitsSizeOf t =
          (* Note: we treat None above *)
          let max = List.fold_left fold 0 (Option.get comp.cfields) in
          (* Add trailing by simulating adding an extra field *)
-         t, addTrailing max (8 * bytesAlignOf t))
+         t, addTrailing max (8 * bytesAlignOf ~standard_or_gcc:`Standard t))
 
   | TArray(bt, Some len) ->
     find_sizeof t
@@ -3566,16 +3591,10 @@ and bitsSizeOf t =
            | _ ->
              raise (SizeOfError ("Array with non-constant length.", norm_typ))
          end)
-  | TVoid ->
-    if Machine.sizeof_void () >= 0 then
-      8 * Machine.sizeof_void ()
-    else
-      raise (SizeOfError ("Undefined sizeof(void).", t))
-  | TFun _ ->
-    if Machine.sizeof_fun () >= 0 then
-      8 * Machine.sizeof_fun ()
-    else
-      raise (SizeOfError ("Undefined sizeof on a function.", t))
+  | TVoid when Machine.Sizeof.void () > 0 -> 8 * Machine.Sizeof.void ()
+  | TVoid -> raise (SizeOfError ("Undefined sizeof(void).", t))
+  | TFun _ when Machine.Sizeof.func () > 0 -> 8 * Machine.Sizeof.func ()
+  | TFun _  -> raise (SizeOfError ("Undefined sizeof on a function.", t))
 
   | TArray (_, None) ->
     find_sizeof t
@@ -3704,15 +3723,13 @@ and constFold (machdep: bool) (e: exp) : exp =
     end
   | SizeOfE e when machdep ->
     constFold machdep (new_exp ~loc:e.eloc (SizeOf (typeOf e)))
-  | AlignOf t when machdep ->
+  | AlignOf (t, standard_or_gcc) when machdep ->
     begin
-      try kinteger ~loc (Machine.sizeof_kind ()) (bytesAlignOf t)
+      try kinteger ~loc (Machine.sizeof_kind ()) (bytesAlignOf ~standard_or_gcc t)
       with SizeOfError _ -> e
     end
-  | AlignOfE e when machdep ->
-    (* The alignment of an expression is not always the alignment of its
-     * type. I know that for strings this is not true *)
-    constFold machdep (new_exp ~loc:e.eloc (AlignOf (typeOf e)))
+  | AlignOfE (e, i) when machdep ->
+    constFold machdep (new_exp ~loc:e.eloc (AlignOf (typeOf e, i)))
   | AlignOfE _ | AlignOf _ | SizeOfE _ | SizeOf _ ->
     e (* Depends on machdep. Do not evaluate in this case*)
 
@@ -3976,6 +3993,17 @@ let bitsSizeOfBitfield typlv =
   | t -> bitsSizeOf t
 
 let () = constfoldtoint := constFoldToInt ~machdep:true
+
+let bytesAlignOf t =
+  bytesAlignOf ~standard_or_gcc:`Standard t
+
+let bytesAlignOfField f =
+  bytesAlignOfField ~standard_or_gcc:`Standard f
+
+let bytesAlignOfVarinfo vi =
+  match foldAlignasToInt vi.valignas with
+  | None -> bytesAlignOf vi.vtype
+  | Some align -> align
 
 let intTypeIncluded kind1 kind2 =
   let bitsize1 = bitsSizeOfInt kind1 in
@@ -4245,8 +4273,8 @@ let makeFormalVar fdec ?(ghost=fdec.svar.vghost) ?(where = "$") ?loc name typ : 
 
 (* Make a global variable. Your responsibility to make sure that the name
  * is unique *)
-let makeGlobalVar ?source ?temp ?referenced ?ghost ?loc name typ =
-  makeVarinfo ?source ?temp ?referenced ?ghost ?loc true false name typ
+let makeGlobalVar ?source ?temp ?referenced ?ghost ?alignas ?loc name typ =
+  makeVarinfo ?source ?temp ?referenced ?ghost ?alignas ?loc true false name typ
 
 let create_string_literal =
   let module StrLitCounter =
@@ -6462,6 +6490,10 @@ and free_vars_predicate bound_vars p = match p.pred_content with
   | Pvalid (_,t) | Pvalid_read (_,t) | Pobject_pointer (_, t) | Pvalid_function t
   | Pinitialized (_,t) | Pdangling (_,t) ->
     free_vars_term bound_vars t
+  | Paligned(t, n) ->
+    Logic_var.Set.union
+      (free_vars_term bound_vars t)
+      (free_vars_term bound_vars n)
   | Pseparated seps ->
     List.fold_left
       (fun free_vars tset ->

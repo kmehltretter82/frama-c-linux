@@ -22,7 +22,9 @@ int main(void)
   spongeState *state = malloc(sizeof(spongeState));
   __e_acsl_store_block((void *)(& state),8UL);
   __e_acsl_full_init((void *)(& state));
+  /*@ assert Eva: pointer_alignment: \aligned(state,alignof(spongeState)); */
   __e_acsl_initialize((void *)(& state->bitsInQueue),sizeof(unsigned int));
+  /*@ assert Eva: pointer_alignment: \aligned(state,alignof(spongeState)); */
   state->bitsInQueue = (unsigned int)16;
   {
     int __gen_e_acsl_valid_read;
@@ -30,10 +32,14 @@ int main(void)
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
       {.values = (void *)0};
+    /*@ assert Eva: pointer_alignment: \aligned(state,alignof(spongeState));
+    */
     __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)(& state->bitsInQueue),
                                                   sizeof(unsigned int),
                                                   (void *)(& state->bitsInQueue),
                                                   (void *)0);
+    /*@ assert Eva: pointer_alignment: \aligned(state,alignof(spongeState));
+    */
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,
                                  "&state->bitsInQueue",
                                  (void *)(& state->bitsInQueue));
@@ -49,10 +55,14 @@ int main(void)
     __gen_e_acsl_assert_data_2.name = "mem_access";
     __e_acsl_assert(__gen_e_acsl_valid_read,& __gen_e_acsl_assert_data_2);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
+    /*@ assert Eva: pointer_alignment: \aligned(state,alignof(spongeState));
+    */
     __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& state->dataQueue[
                                                     state->bitsInQueue / 8U]),
                                                     sizeof(unsigned char __attribute__((
                                                     __aligned__(32)))));
+    /*@ assert Eva: pointer_alignment: \aligned(state,alignof(spongeState));
+    */
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,
                                  "&state->dataQueue[state->bitsInQueue / 8]",
                                  (void *)(& state->dataQueue[state->bitsInQueue / 8U]));
@@ -74,6 +84,7 @@ int main(void)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
   }
   /*@ assert !\initialized(&state->dataQueue[state->bitsInQueue / 8]); */ ;
+  /*@ assert Eva: pointer_alignment: \aligned(state,alignof(spongeState)); */
   free((void *)state);
   __retres = 0;
   __e_acsl_delete_block((void *)(& state));

@@ -28,6 +28,7 @@ type alarm =
       exp (* index *)
       * exp option (* None = lower bound is zero; Some up = upper bound *)
   | Invalid_pointer of exp
+  | Unaligned_pointer of exp * typ
   | Invalid_shift of exp * int option (* strict upper bound, if any *)
   | Pointer_comparison of
       exp option (* [None] when implicit comparison to 0 *)
@@ -53,7 +54,7 @@ type alarm =
 
 (* If you add one constructor to this type, make sure to add a dummy value
    in the 'reprs' value below, and increase 'nb_alarms' *)
-let nb_alarm_constructors = 17
+let nb_alarm_constructors = 18
 
 module D =
   Datatype.Make_with_collections
@@ -68,6 +69,7 @@ module D =
         [ Division_by_zero e;
           Memory_access (lv, For_reading);
           Index_out_of_bound (e, None);
+          Unaligned_pointer (e, Cil_const.voidPtrType);
           Invalid_pointer e;
           Invalid_shift (e, None);
           Pointer_comparison (None, e);
@@ -88,20 +90,21 @@ module D =
         | Division_by_zero _ -> 0
         | Memory_access _ -> 1
         | Index_out_of_bound _ -> 2
-        | Invalid_pointer _ -> 3
-        | Invalid_shift _ -> 4
-        | Pointer_comparison _ -> 5
-        | Overflow _ -> 6
-        | Not_separated _ -> 7
-        | Overlap _ -> 8
-        | Uninitialized _ -> 9
-        | Is_nan_or_infinite _ -> 10
-        | Is_nan _ -> 11
-        | Float_to_int _ -> 12
-        | Differing_blocks _ -> 13
-        | Dangling _ -> 14
-        | Function_pointer _ -> 15
-        | Invalid_bool _ -> 16
+        | Unaligned_pointer _ -> 3
+        | Invalid_pointer _ -> 4
+        | Invalid_shift _ -> 5
+        | Pointer_comparison _ -> 6
+        | Overflow _ -> 7
+        | Not_separated _ -> 8
+        | Overlap _ -> 9
+        | Uninitialized _ -> 10
+        | Is_nan_or_infinite _ -> 11
+        | Is_nan _ -> 12
+        | Float_to_int _ -> 13
+        | Differing_blocks _ -> 14
+        | Dangling _ -> 15
+        | Function_pointer _ -> 16
+        | Invalid_bool _ -> 17
 
       let () = (* Lightweight checks *)
         for i = 0 to nb_alarm_constructors - 1 do
@@ -123,6 +126,9 @@ module D =
           let n = Exp.compare e11 e21 in
           if n = 0 then Option.compare Exp.compare e12 e22 else n
         | Invalid_pointer e1, Invalid_pointer e2 -> Exp.compare e1 e2
+        | Unaligned_pointer (e1, t1), Unaligned_pointer (e2, t2) ->
+          let n = Typ.compare t1 t2 in
+          if n = 0 then Exp.compare e1 e2 else n
         | Invalid_shift(e1, n1), Invalid_shift(e2, n2) ->
           let n = Exp.compare e1 e2 in
           if n = 0 then Option.compare Datatype.Int.compare n1 n2 else n
@@ -163,7 +169,7 @@ module D =
           else Option.compare (Extlib.list_compare Exp.compare) l1 l2
         | Invalid_bool lv1, Invalid_bool lv2 -> Lval.compare lv1 lv2
         | _, (Division_by_zero _ | Memory_access _ |
-              Index_out_of_bound _ | Invalid_pointer _ |
+              Index_out_of_bound _ | Invalid_pointer _ | Unaligned_pointer _ |
               Invalid_shift _ | Pointer_comparison _ |
               Overflow _ | Not_separated _ | Overlap _ | Uninitialized _ |
               Dangling _ | Is_nan_or_infinite _ | Is_nan _ | Float_to_int _ |
@@ -188,6 +194,8 @@ module D =
             (nb a,
              Exp.hash e1,
              match e2 with None -> 0 | Some e -> 17 + Exp.hash e)
+        | Unaligned_pointer (e, t) ->
+          Hashtbl.hash (nb a, Exp.hash e, Typ.hash t)
         | Invalid_pointer e -> Hashtbl.hash (nb a, Exp.hash e)
         | Invalid_shift(e, n) -> Hashtbl.hash (nb a, Exp.hash e, n)
         | Pointer_comparison(e1, e2) ->
@@ -230,6 +238,10 @@ module D =
             (match e2 with None -> ">=" | Some _ -> "<")
             Printer.pp_exp
             (match e2 with None -> Cil.zero ~loc:e1.eloc | Some e -> e)
+        | Unaligned_pointer (e, t) ->
+          Format.fprintf fmt "Unaligned_pointer(@[%a@],@ %a)"
+            Exp.pretty e
+            Typ.pretty t
         | Invalid_pointer e ->
           Format.fprintf fmt "Invalid_pointer(@[%a@])" Exp.pretty e
         | Invalid_shift(e, n) ->
@@ -365,6 +377,7 @@ let get_name = function
   | Division_by_zero _ -> "division_by_zero"
   | Memory_access _ -> "mem_access"
   | Index_out_of_bound _ -> "index_bound"
+  | Unaligned_pointer _ -> "pointer_alignment"
   | Invalid_pointer _ -> "pointer_value"
   | Invalid_shift _ -> "shift"
   | Pointer_comparison _ -> "ptr_comparison"
@@ -388,6 +401,7 @@ let get_description = function
   | Division_by_zero _ -> "Integer division by zero"
   | Memory_access _ -> "Invalid pointer dereferencing"
   | Index_out_of_bound _ -> "Array access out of bounds"
+  | Unaligned_pointer _ -> "Unaligned pointer computation"
   | Invalid_pointer _ -> "Invalid pointer computation"
   | Invalid_shift _ -> "Invalid shift"
   | Pointer_comparison _ -> "Invalid pointer comparison"
@@ -475,6 +489,17 @@ let create_predicate ?(loc=Location.unknown) alarm =
        | Some e2 ->
          let t2 = Logic_utils.expr_to_term ~coerce:true e2 in
          Logic_const.prel ~loc (Rlt, t1, t2))
+
+    | Unaligned_pointer (e, typ) ->
+      let e =
+        if not @@ Ast_types.is_ptr @@ Cil.typeOf e
+        then Cil.mkCast ~check:false ~newt:Cil_const.voidPtrType e
+        else e
+      in
+      let loc = best_loc ~loc e.eloc in
+      let t = Logic_utils.expr_to_term e in
+      let align = Logic_const.talignof ~loc typ in
+      Logic_const.paligned ~loc (t, align)
 
     | Invalid_pointer e ->
       let loc = best_loc ~loc e.eloc in

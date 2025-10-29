@@ -24,7 +24,10 @@ let make_behavior_allocation loc ptr_type size =
   let assumes = [ is_allocable ~loc size ] in
   let assigns = generate_global_assigns loc ptr_type size in
   let alloc   = allocates_result ~loc ptr_type in
-  let ensures = [ Normal, fresh_result ~loc ptr_type size ] in
+  let ensures = [
+    Normal, fresh_result ~loc ptr_type size ;
+    Normal, aligned_result ~loc ptr_type
+  ] in
   make_behavior ~name:"allocation" ~assumes ~assigns ~alloc ~ensures ()
 
 let make_behavior_no_allocation loc ptr_type size =

@@ -79,15 +79,22 @@ let unsupported key =
   let msg f k = Format.fprintf f "%s is currently unsupported by Frama-C." k in
   add key (fun loc -> Kernel.abort ~source:(fst loc) "%a" msg key)
 
-let warning_C11 key builder =
-  let warning () = Kernel.(warning ~wkey:wkey_c11 "%s is a C11 keyword" key) in
-  add key (fun loc -> warning () ; builder loc)
-
-let thread_keyword () =
+let compiler (name, is_machdep) key builder =
   let wkey = Kernel.wkey_conditional_feature in
-  let s = "__thread is a GCC extension, use a GCC-based machdep to enable it" in
-  let warning () = Kernel.warning ~wkey "%s" s ; IDENT "__thread" in
-  add "__thread" (fun loc -> if Machine.gccMode () then THREAD loc else warning ())
+  let warning loc =
+    Kernel.warning ~wkey ~source:(fst loc)
+      "%s is a %s extension, use a %s-based machdep to enable it."
+        key name name ;
+    IDENT key
+  in
+  add key (fun loc -> if is_machdep then builder loc else warning loc)
+
+let gcc key builder = compiler ("GCC", Machine.gccMode ()) key builder
+let msvc key builder = compiler ("MSVC", Machine.msvcMode ()) key builder
+
+let c23 key builder =
+  if Kernel.CStd.get() = Kernel.C23
+  then add key builder
 
 let filename_keyword () =
   let convert acc c = int64_of_char c :: acc in
@@ -138,13 +145,18 @@ let init_lexicon () =
   valid "for" (fun loc -> FOR loc) ;
   valid "if" (fun loc -> IF loc) ;
   valid "else" (fun _ -> ELSE) ;
+  c23 "alignas" (fun loc -> ALIGNAS loc) ;
+  valid "_Alignas" (fun loc -> ALIGNAS loc) ;
+  c23 "alignof" (fun loc -> ALIGNOF loc) ;
+  valid "_Alignof" (fun loc -> ALIGNOF loc) ;
+  valid "_Generic" (fun loc -> GENERIC loc) ;
   (*** Implementation specific keywords ***)
   valid "__signed__" (fun loc -> SIGNED loc) ;
   valid "__inline__" (fun loc -> INLINE loc) ;
   valid "inline" (fun loc -> INLINE loc) ;
   valid "__inline" (fun loc -> INLINE loc) ;
-  warning_C11 "_Noreturn" (fun loc -> NORETURN loc) ;
-  warning_C11 "_Static_assert" (fun loc -> STATIC_ASSERT loc) ;
+  valid "_Noreturn" (fun loc -> NORETURN loc) ;
+  valid "_Static_assert" (fun loc -> STATIC_ASSERT loc) ;
   valid "__attribute__" (fun loc -> ATTRIBUTE loc) ;
   valid "__attribute" (fun loc -> ATTRIBUTE loc) ;
   valid "_Nullable" (fun loc -> NOP_ATTRIBUTE loc) ;
@@ -155,18 +167,19 @@ let init_lexicon () =
   valid "__typeof__" (fun loc -> TYPEOF loc) ;
   valid "__typeof" (fun loc -> TYPEOF loc) ;
   valid "typeof" (fun loc -> TYPEOF loc) ;
-  valid "__alignof" (fun loc -> ALIGNOF loc) ;
-  valid "__alignof__" (fun loc -> ALIGNOF loc) ;
   valid "__volatile__" (fun loc -> VOLATILE loc) ;
   valid "__volatile" (fun loc -> VOLATILE loc) ;
   valid "__FUNCTION__" (fun loc -> FUNCTION__ loc) ;
   valid "__func__" (fun loc -> FUNCTION__ loc) ; (* ISO 6.4.2.2 *)
   valid "__PRETTY_FUNCTION__" (fun loc -> PRETTY_FUNCTION__ loc) ;
   valid "__label__" (fun _ -> LABEL__) ;
-  (*** weimer: GCC arcana ***)
   valid "__restrict" (fun loc -> RESTRICT loc) ;
   valid "restrict" (fun loc -> RESTRICT loc) ;
-  (**** MS VC ***)
+  valid "_Thread_local" (fun loc -> THREAD_LOCAL loc) ;
+  (*** GCC ***)
+  gcc   "__alignof__" (fun loc -> GCC_ALIGNOF loc) ;
+  gcc   "__thread" (fun loc -> THREAD loc) ;
+  (**** MSVC ***)
   valid "__int64" (fun _ -> INT64 (currentLoc ())) ;
   valid "__int32" (fun loc -> INT loc) ;
   valid "_cdecl" ( fun _ -> MSATTR ("_cdecl", currentLoc ())) ;
@@ -177,6 +190,7 @@ let init_lexicon () =
   valid "__fastcall" (fun _ -> MSATTR ("__fastcall", currentLoc ())) ;
   valid "__w64" (fun _ -> MSATTR("__w64", currentLoc ())) ;
   valid "__declspec" (fun loc -> DECLSPEC loc) ;
+  msvc  "__alignof" (fun loc -> ALIGNOF loc) ;
   (* !! we turn forceinline into inline *)
   valid "__forceinline" (fun loc -> INLINE loc) ;
   (* Some files produced by 'GCC -E' expect this type to be defined *)
@@ -184,19 +198,13 @@ let init_lexicon () =
   valid "__builtin_va_arg" (fun loc -> BUILTIN_VA_ARG loc) ;
   valid "__builtin_types_compatible_p" (fun loc -> BUILTIN_TYPES_COMPAT loc) ;
   valid "__builtin_offsetof" (fun loc -> BUILTIN_OFFSETOF loc) ;
-  warning_C11 "_Thread_local" (fun loc -> THREAD_LOCAL loc) ;
-  (* We recognize __thread for GCC machdeps *)
-  thread_keyword () ;
   filename_keyword () ;
   (* The following C11/GNU extension tokens are not yet supported, so we
    provide some helpful error messages. Usage of 'fatal' instead of 'error'
    below prevents duplicate error messages due to parsing errors. *)
-  unsupported "_Alignas" ;
-  unsupported "_Alignof" ;
   unsupported "_Complex" ;
   unsupported "_Decimal32" ;
   unsupported "_Decimal64" ;
-  warning_C11 "_Generic" (fun loc -> GENERIC loc) ;
   unsupported "_Imaginary" ;
   unsupported "__int128" ;
   unsupported "__uint128_t"

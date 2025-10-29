@@ -73,8 +73,10 @@ function buildMenu(
   attr: Ast.markerAttributesData,
 ): void {
 
+  const submenu: Dome.PopupMenuItem[] = [];
+
   function addItem(label: string, slicingRequest: slicingRequest): void {
-    menu.push({
+    submenu.push({
       label,
       onClick: () => callSlicing(slicingRequest, attr.marker)
     });
@@ -98,6 +100,8 @@ function buildMenu(
       addItem('Slice write accesses of lvalue', Slicing.sliceLvalWrites);
       break;
   }
+
+  if (submenu.length > 0) menu.push({ label: 'Slicing', submenu });
 }
 
 ASTview.registerMarkerMenuExtender(buildMenu);

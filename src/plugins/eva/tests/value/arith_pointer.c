@@ -1,5 +1,5 @@
 /* run.config*
-   STDOPT: +"-ulevel 22" +"-then -eva-no-warn-pointer-subtraction"
+   STDOPT: +"-ulevel 22 -no-warn-unaligned-pointer" +"-then -eva-no-warn-pointer-subtraction"
 */
 
 

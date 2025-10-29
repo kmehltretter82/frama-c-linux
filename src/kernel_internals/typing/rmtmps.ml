@@ -614,7 +614,7 @@ class markReferencedVisitor = object (self)
 
   method! vexpr e =
     match e.enode with
-    | SizeOf t | AlignOf t | UnOp (_, _, t) | BinOp (_, _, _, t) ->
+    | SizeOf t | AlignOf (t, _) | UnOp (_, _, t) | BinOp (_, _, _, t) ->
       Stack.push t inside_typ;
       DoChildrenPost (fun e -> ignore (Stack.pop inside_typ); e)
     | _ -> DoChildren

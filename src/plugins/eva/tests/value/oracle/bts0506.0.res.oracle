@@ -91,12 +91,24 @@
   Called from bts0506.i:33.
 [eva] using specification for function f6
 [eva] Done for function f6
+[eva:alarm] bts0506.i:33: Warning: 
+  unaligned pointer creation.
+  assert \aligned(tmp_12,alignof(int));
+  (tmp_12 from f6())
 [eva] computing for function f6 <- main2 <- main.
   Called from bts0506.i:34.
 [eva] Done for function f6
+[eva:alarm] bts0506.i:34: Warning: 
+  unaligned pointer creation.
+  assert \aligned(tmp_13,alignof(int));
+  (tmp_13 from f6())
 [eva] computing for function f6 <- main2 <- main.
   Called from bts0506.i:35.
 [eva] Done for function f6
+[eva:alarm] bts0506.i:35: Warning: 
+  unaligned pointer creation.
+  assert \aligned(tmp_14,alignof(int));
+  (tmp_14 from f6())
 [kernel:annot:missing-spec] bts0506.i:37: Warning: 
   Neither code nor specification for function f7,
    generating default assigns. See -generated-spec-* options for more info
@@ -107,6 +119,10 @@
 [eva] computing for function f7 <- main2 <- main.
   Called from bts0506.i:38.
 [eva] Done for function f7
+[eva:alarm] bts0506.i:38: Warning: 
+  unaligned pointer creation.
+  assert \aligned(tmp_16,alignof(int));
+  (tmp_16 from f7())
 [eva] Recording results for main2
 [eva] Done for function main2
 [eva] Recording results for main
@@ -128,11 +144,11 @@
   r10 ∈ [-3.40282346639e+38 .. 3.40282346639e+38]
   r11 ∈ [-3.40282346639e+38 .. 3.40282346639e+38]
   r12 ∈ [-1.79769313486e+308 .. 1.79769313486e+308]
-  r13 ∈ [--..--]
-  r14 ∈ [--..--]
-  r15 ∈ [--..--]
+  r13 ∈ [0..4294967292],0%4
+  r14 ∈ [0..4294967292],0%4
+  r15 ∈ [0..4294967292],0%4
   r16 ∈ [--..--]
-  r17 ∈ [--..--]
+  r17 ∈ [0..4294967292],0%4
 [eva:final-states] Values at end of function main:
   x ∈ {43}
 [from] Computing for function f
@@ -274,14 +290,18 @@ void main2(void)
   /*@ assert Eva: is_nan_or_infinite: \is_finite(tmp_11); */
   double r12 = tmp_11;
   tmp_12 = f6();
+  /*@ assert Eva: pointer_alignment: \aligned(tmp_12,alignof(int)); */
   void *r13 = (void *)tmp_12;
   tmp_13 = f6();
+  /*@ assert Eva: pointer_alignment: \aligned(tmp_13,alignof(int)); */
   int *r14 = tmp_13;
   tmp_14 = f6();
+  /*@ assert Eva: pointer_alignment: \aligned(tmp_14,alignof(int)); */
   char *r15 = (char *)tmp_14;
   tmp_15 = f7();
   void *r16 = tmp_15;
   tmp_16 = f7();
+  /*@ assert Eva: pointer_alignment: \aligned(tmp_16,alignof(int)); */
   int *r17 = (int *)tmp_16;
   return;
 }

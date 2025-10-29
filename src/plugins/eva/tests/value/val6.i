@@ -1,5 +1,5 @@
 /* run.config*
-   
+
    STDOPT: #"-main f -absolute-valid-range 0x1-0xFFFFF"
    STDOPT: #"-main f1 -absolute-valid-range 0x1-0xFFFFF"
 */
@@ -12,8 +12,8 @@ int f() {
   c = &b;
   x = (int)c;
   y = (char**)x;
-  *((char**)0x12) = &b;
-  **((char**)0x12)='a';
+  *((char**)0x14) = &b;
+  **((char**)0x14)='a';
   return 0;
 }
 

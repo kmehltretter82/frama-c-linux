@@ -268,6 +268,12 @@ val is_object : typ -> bool
 (** True if the argument is a struct. *)
 val is_struct : typ -> bool
 
+(** True if the argument is a type that directly (modulo name) contains a
+    bitfield.
+    @since 32.0-Germanium
+*)
+val has_bitfield : typ -> bool
+
 (** True if the argument is a union type. *)
 val is_union : typ -> bool
 

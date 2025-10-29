@@ -130,7 +130,7 @@ model_8(l1->next,ll1) ==> model_8(l1,Cons(l1->element,ll1));
 case nil: \valid(P);
 } */
 
-/* inductive model_10{L}(list* root, List<int>logic_list) {
+/*@ inductive model_10{L}(list* root, List<int>logic_list) {
 case nil: model_10(\null,Nil);
 case cons{L}: \forall list* l1,List<int>ll1; \valid{L}(l1) ==>
 model_10(l1->next,ll1) ==> model_10(l1,Cons(l1->element,ll1));

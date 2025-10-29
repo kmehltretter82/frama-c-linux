@@ -34,10 +34,16 @@
 [eva:partition] FRAMAC_SHARE/libc/wchar.c:103: starting to merge loop iterations
 [eva:partition] FRAMAC_SHARE/libc/wchar.c:127: starting to merge loop iterations
 [eva:partition] FRAMAC_SHARE/libc/wchar.c:185: starting to merge loop iterations
+[eva:alarm] FRAMAC_SHARE/libc/wchar.c:197: Warning: 
+  unaligned pointer creation. assert \aligned(*((int **)*arg),alignof(int));
 [eva] computing for function Frama_C_interval <- __fc_v_wscanf <- vwscanf <- 
                           caller_stub_for_vwscanf <- main.
   Called from FRAMAC_SHARE/libc/wchar.c:197.
 [eva] Done for function Frama_C_interval
+[eva:alarm] FRAMAC_SHARE/libc/wchar.c:197: Warning: 
+  unaligned pointer creation.
+  assert \aligned(tmp_0,alignof(int));
+  (tmp_0 from vararg)
 [eva:alarm] FRAMAC_SHARE/libc/wchar.c:197: Warning: 
   out of bounds write. assert \valid(tmp_0);
                        (tmp_0 from vararg)
@@ -60,6 +66,9 @@
 [eva] Done for function Frama_C_char_interval
 [eva:alarm] FRAMAC_SHARE/libc/wchar.c:203: Warning: 
   out of bounds read. assert \valid_read(arg);
+[eva:alarm] FRAMAC_SHARE/libc/wchar.c:203: Warning: 
+  unaligned pointer creation.
+  assert \aligned(*((short **)*arg),alignof(short));
 [eva] computing for function Frama_C_short_interval <- __fc_v_wscanf <- vwscanf <- 
                           caller_stub_for_vwscanf <- main.
   Called from FRAMAC_SHARE/libc/wchar.c:203.
@@ -68,10 +77,16 @@
   function Frama_C_short_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_short_interval
 [eva:alarm] FRAMAC_SHARE/libc/wchar.c:203: Warning: 
+  unaligned pointer creation.
+  assert \aligned(tmp_2_0,alignof(short));
+  (tmp_2_0 from vararg)
+[eva:alarm] FRAMAC_SHARE/libc/wchar.c:203: Warning: 
   out of bounds write. assert \valid(tmp_2_0);
                        (tmp_2_0 from vararg)
 [eva:alarm] FRAMAC_SHARE/libc/wchar.c:206: Warning: 
   out of bounds read. assert \valid_read(arg);
+[eva:alarm] FRAMAC_SHARE/libc/wchar.c:206: Warning: 
+  unaligned pointer creation. assert \aligned(*((long **)*arg),alignof(long));
 [eva] computing for function Frama_C_long_interval <- __fc_v_wscanf <- vwscanf <- 
                           caller_stub_for_vwscanf <- main.
   Called from FRAMAC_SHARE/libc/wchar.c:206.
@@ -80,10 +95,17 @@
   function Frama_C_long_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_long_interval
 [eva:alarm] FRAMAC_SHARE/libc/wchar.c:206: Warning: 
+  unaligned pointer creation.
+  assert \aligned(tmp_3,alignof(long));
+  (tmp_3 from vararg)
+[eva:alarm] FRAMAC_SHARE/libc/wchar.c:206: Warning: 
   out of bounds write. assert \valid(tmp_3);
                        (tmp_3 from vararg)
 [eva:alarm] FRAMAC_SHARE/libc/wchar.c:210: Warning: 
   out of bounds read. assert \valid_read(arg);
+[eva:alarm] FRAMAC_SHARE/libc/wchar.c:210: Warning: 
+  unaligned pointer creation.
+  assert \aligned(*((long long **)*arg),alignof(long long));
 [eva] computing for function Frama_C_long_long_interval <- __fc_v_wscanf <- 
                           vwscanf <- caller_stub_for_vwscanf <- main.
   Called from FRAMAC_SHARE/libc/wchar.c:211.
@@ -92,10 +114,17 @@
   function Frama_C_long_long_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_long_long_interval
 [eva:alarm] FRAMAC_SHARE/libc/wchar.c:211: Warning: 
+  unaligned pointer creation.
+  assert \aligned(tmp_4,alignof(long long));
+  (tmp_4 from vararg)
+[eva:alarm] FRAMAC_SHARE/libc/wchar.c:211: Warning: 
   out of bounds write. assert \valid(tmp_4);
                        (tmp_4 from vararg)
 [eva:alarm] FRAMAC_SHARE/libc/wchar.c:214: Warning: 
   out of bounds read. assert \valid_read(arg);
+[eva:alarm] FRAMAC_SHARE/libc/wchar.c:214: Warning: 
+  unaligned pointer creation.
+  assert \aligned(*((intmax_t **)*arg),alignof(intmax_t));
 [eva] computing for function Frama_C_intmax_t_interval <- __fc_v_wscanf <- 
                           vwscanf <- caller_stub_for_vwscanf <- main.
   Called from FRAMAC_SHARE/libc/wchar.c:215.
@@ -104,10 +133,17 @@
   function Frama_C_intmax_t_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_intmax_t_interval
 [eva:alarm] FRAMAC_SHARE/libc/wchar.c:215: Warning: 
+  unaligned pointer creation.
+  assert \aligned(tmp_5,alignof(intmax_t));
+  (tmp_5 from vararg)
+[eva:alarm] FRAMAC_SHARE/libc/wchar.c:215: Warning: 
   out of bounds write. assert \valid(tmp_5);
                        (tmp_5 from vararg)
 [eva:alarm] FRAMAC_SHARE/libc/wchar.c:218: Warning: 
   out of bounds read. assert \valid_read(arg);
+[eva:alarm] FRAMAC_SHARE/libc/wchar.c:218: Warning: 
+  unaligned pointer creation.
+  assert \aligned(*((size_t **)*arg),alignof(size_t));
 [eva] computing for function Frama_C_size_t_interval <- __fc_v_wscanf <- 
                           vwscanf <- caller_stub_for_vwscanf <- main.
   Called from FRAMAC_SHARE/libc/wchar.c:218.
@@ -116,10 +152,17 @@
   function Frama_C_size_t_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_size_t_interval
 [eva:alarm] FRAMAC_SHARE/libc/wchar.c:218: Warning: 
+  unaligned pointer creation.
+  assert \aligned(tmp_6,alignof(size_t));
+  (tmp_6 from vararg)
+[eva:alarm] FRAMAC_SHARE/libc/wchar.c:218: Warning: 
   out of bounds write. assert \valid(tmp_6);
                        (tmp_6 from vararg)
 [eva:alarm] FRAMAC_SHARE/libc/wchar.c:221: Warning: 
   out of bounds read. assert \valid_read(arg);
+[eva:alarm] FRAMAC_SHARE/libc/wchar.c:221: Warning: 
+  unaligned pointer creation.
+  assert \aligned(*((ptrdiff_t **)*arg),alignof(ptrdiff_t));
 [eva] computing for function Frama_C_ptrdiff_t_interval <- __fc_v_wscanf <- 
                           vwscanf <- caller_stub_for_vwscanf <- main.
   Called from FRAMAC_SHARE/libc/wchar.c:222.
@@ -128,10 +171,17 @@
   function Frama_C_ptrdiff_t_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_ptrdiff_t_interval
 [eva:alarm] FRAMAC_SHARE/libc/wchar.c:222: Warning: 
+  unaligned pointer creation.
+  assert \aligned(tmp_7,alignof(ptrdiff_t));
+  (tmp_7 from vararg)
+[eva:alarm] FRAMAC_SHARE/libc/wchar.c:222: Warning: 
   out of bounds write. assert \valid(tmp_7);
                        (tmp_7 from vararg)
 [eva:alarm] FRAMAC_SHARE/libc/wchar.c:232: Warning: 
   out of bounds read. assert \valid_read(arg);
+[eva:alarm] FRAMAC_SHARE/libc/wchar.c:232: Warning: 
+  unaligned pointer creation.
+  assert \aligned(*((unsigned int **)*arg),alignof(unsigned int));
 [eva] computing for function Frama_C_unsigned_int_interval <- __fc_v_wscanf <- 
                           vwscanf <- caller_stub_for_vwscanf <- main.
   Called from FRAMAC_SHARE/libc/wchar.c:233.
@@ -139,6 +189,10 @@
 [eva] FRAMAC_SHARE/libc/wchar.c:233: 
   function Frama_C_unsigned_int_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_unsigned_int_interval
+[eva:alarm] FRAMAC_SHARE/libc/wchar.c:233: Warning: 
+  unaligned pointer creation.
+  assert \aligned(tmp_8,alignof(unsigned int));
+  (tmp_8 from vararg)
 [eva:alarm] FRAMAC_SHARE/libc/wchar.c:233: Warning: 
   out of bounds write. assert \valid(tmp_8);
                        (tmp_8 from vararg)
@@ -153,6 +207,9 @@
 [eva] Done for function Frama_C_unsigned_char_interval
 [eva:alarm] FRAMAC_SHARE/libc/wchar.c:240: Warning: 
   out of bounds read. assert \valid_read(arg);
+[eva:alarm] FRAMAC_SHARE/libc/wchar.c:240: Warning: 
+  unaligned pointer creation.
+  assert \aligned(*((unsigned short **)*arg),alignof(unsigned short));
 [eva] computing for function Frama_C_unsigned_short_interval <- __fc_v_wscanf <- 
                           vwscanf <- caller_stub_for_vwscanf <- main.
   Called from FRAMAC_SHARE/libc/wchar.c:241.
@@ -161,10 +218,17 @@
   function Frama_C_unsigned_short_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_unsigned_short_interval
 [eva:alarm] FRAMAC_SHARE/libc/wchar.c:241: Warning: 
+  unaligned pointer creation.
+  assert \aligned(tmp_10,alignof(unsigned short));
+  (tmp_10 from vararg)
+[eva:alarm] FRAMAC_SHARE/libc/wchar.c:241: Warning: 
   out of bounds write. assert \valid(tmp_10);
                        (tmp_10 from vararg)
 [eva:alarm] FRAMAC_SHARE/libc/wchar.c:244: Warning: 
   out of bounds read. assert \valid_read(arg);
+[eva:alarm] FRAMAC_SHARE/libc/wchar.c:244: Warning: 
+  unaligned pointer creation.
+  assert \aligned(*((unsigned long **)*arg),alignof(unsigned long));
 [eva] computing for function Frama_C_unsigned_long_interval <- __fc_v_wscanf <- 
                           vwscanf <- caller_stub_for_vwscanf <- main.
   Called from FRAMAC_SHARE/libc/wchar.c:245.
@@ -173,10 +237,17 @@
   function Frama_C_unsigned_long_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_unsigned_long_interval
 [eva:alarm] FRAMAC_SHARE/libc/wchar.c:245: Warning: 
+  unaligned pointer creation.
+  assert \aligned(tmp_11,alignof(unsigned long));
+  (tmp_11 from vararg)
+[eva:alarm] FRAMAC_SHARE/libc/wchar.c:245: Warning: 
   out of bounds write. assert \valid(tmp_11);
                        (tmp_11 from vararg)
 [eva:alarm] FRAMAC_SHARE/libc/wchar.c:249: Warning: 
   out of bounds read. assert \valid_read(arg);
+[eva:alarm] FRAMAC_SHARE/libc/wchar.c:249: Warning: 
+  unaligned pointer creation.
+  assert \aligned(*((unsigned long long **)*arg),alignof(unsigned long long));
 [eva] computing for function Frama_C_unsigned_long_long_interval <- 
                           __fc_v_wscanf <- vwscanf <- 
                           caller_stub_for_vwscanf <- main.
@@ -186,10 +257,17 @@
   function Frama_C_unsigned_long_long_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_unsigned_long_long_interval
 [eva:alarm] FRAMAC_SHARE/libc/wchar.c:250: Warning: 
+  unaligned pointer creation.
+  assert \aligned(tmp_12,alignof(unsigned long long));
+  (tmp_12 from vararg)
+[eva:alarm] FRAMAC_SHARE/libc/wchar.c:250: Warning: 
   out of bounds write. assert \valid(tmp_12);
                        (tmp_12 from vararg)
 [eva:alarm] FRAMAC_SHARE/libc/wchar.c:253: Warning: 
   out of bounds read. assert \valid_read(arg);
+[eva:alarm] FRAMAC_SHARE/libc/wchar.c:253: Warning: 
+  unaligned pointer creation.
+  assert \aligned(*((uintmax_t **)*arg),alignof(uintmax_t));
 [eva] computing for function Frama_C_uintmax_t_interval <- __fc_v_wscanf <- 
                           vwscanf <- caller_stub_for_vwscanf <- main.
   Called from FRAMAC_SHARE/libc/wchar.c:253.
@@ -198,10 +276,17 @@
   function Frama_C_uintmax_t_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_uintmax_t_interval
 [eva:alarm] FRAMAC_SHARE/libc/wchar.c:253: Warning: 
+  unaligned pointer creation.
+  assert \aligned(tmp_13,alignof(uintmax_t));
+  (tmp_13 from vararg)
+[eva:alarm] FRAMAC_SHARE/libc/wchar.c:253: Warning: 
   out of bounds write. assert \valid(tmp_13);
                        (tmp_13 from vararg)
 [eva:alarm] FRAMAC_SHARE/libc/wchar.c:256: Warning: 
   out of bounds read. assert \valid_read(arg);
+[eva:alarm] FRAMAC_SHARE/libc/wchar.c:256: Warning: 
+  unaligned pointer creation.
+  assert \aligned(*((size_t **)*arg),alignof(size_t));
 [eva] computing for function Frama_C_size_t_interval <- __fc_v_wscanf <- 
                           vwscanf <- caller_stub_for_vwscanf <- main.
   Called from FRAMAC_SHARE/libc/wchar.c:256.
@@ -209,10 +294,17 @@
   function Frama_C_size_t_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_size_t_interval
 [eva:alarm] FRAMAC_SHARE/libc/wchar.c:256: Warning: 
+  unaligned pointer creation.
+  assert \aligned(tmp_14,alignof(size_t));
+  (tmp_14 from vararg)
+[eva:alarm] FRAMAC_SHARE/libc/wchar.c:256: Warning: 
   out of bounds write. assert \valid(tmp_14);
                        (tmp_14 from vararg)
 [eva:alarm] FRAMAC_SHARE/libc/wchar.c:259: Warning: 
   out of bounds read. assert \valid_read(arg);
+[eva:alarm] FRAMAC_SHARE/libc/wchar.c:259: Warning: 
+  unaligned pointer creation.
+  assert \aligned(*((ptrdiff_t **)*arg),alignof(ptrdiff_t));
 [eva] computing for function Frama_C_ptrdiff_t_interval <- __fc_v_wscanf <- 
                           vwscanf <- caller_stub_for_vwscanf <- main.
   Called from FRAMAC_SHARE/libc/wchar.c:260.
@@ -220,10 +312,17 @@
   function Frama_C_ptrdiff_t_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_ptrdiff_t_interval
 [eva:alarm] FRAMAC_SHARE/libc/wchar.c:260: Warning: 
+  unaligned pointer creation.
+  assert \aligned(tmp_15,alignof(ptrdiff_t));
+  (tmp_15 from vararg)
+[eva:alarm] FRAMAC_SHARE/libc/wchar.c:260: Warning: 
   out of bounds write. assert \valid(tmp_15);
                        (tmp_15 from vararg)
 [eva:alarm] FRAMAC_SHARE/libc/wchar.c:276: Warning: 
   out of bounds read. assert \valid_read(arg);
+[eva:alarm] FRAMAC_SHARE/libc/wchar.c:276: Warning: 
+  unaligned pointer creation.
+  assert \aligned(*((double **)*arg),alignof(double));
 [eva] computing for function Frama_C_double_interval <- __fc_v_wscanf <- 
                           vwscanf <- caller_stub_for_vwscanf <- main.
   Called from FRAMAC_SHARE/libc/wchar.c:276.
@@ -232,10 +331,21 @@
   function Frama_C_double_interval, behavior finite: precondition 'order' got status valid.
 [eva] Done for function Frama_C_double_interval
 [eva:alarm] FRAMAC_SHARE/libc/wchar.c:276: Warning: 
+  unaligned pointer creation.
+  assert \aligned(tmp_16,alignof(double));
+  (tmp_16 from vararg)
+[eva:alarm] FRAMAC_SHARE/libc/wchar.c:276: Warning: 
   out of bounds write. assert \valid(tmp_16);
                        (tmp_16 from vararg)
 [eva:alarm] FRAMAC_SHARE/libc/wchar.c:282: Warning: 
   out of bounds read. assert \valid_read(arg);
+[eva:alarm] FRAMAC_SHARE/libc/wchar.c:282: Warning: 
+  unaligned pointer creation.
+  assert \aligned(*((long double **)*arg),alignof(long double));
+[eva:alarm] FRAMAC_SHARE/libc/wchar.c:282: Warning: 
+  unaligned pointer creation.
+  assert \aligned(tmp_17,alignof(long double));
+  (tmp_17 from vararg)
 [eva:alarm] FRAMAC_SHARE/libc/wchar.c:282: Warning: 
   out of bounds write. assert \valid(tmp_17);
                        (tmp_17 from vararg)
@@ -253,6 +363,9 @@
 [eva] Done for function Frama_C_char_interval
 [eva:alarm] FRAMAC_SHARE/libc/wchar.c:297: Warning: 
   out of bounds read. assert \valid_read(arg);
+[eva:alarm] FRAMAC_SHARE/libc/wchar.c:297: Warning: 
+  unaligned pointer creation.
+  assert \aligned(*((size_t **)*arg),alignof(wint_t));
 [eva] computing for function Frama_C_wint_t_interval <- __fc_v_wscanf <- 
                           vwscanf <- caller_stub_for_vwscanf <- main.
   Called from FRAMAC_SHARE/libc/wchar.c:297.
@@ -260,6 +373,10 @@
 [eva] FRAMAC_SHARE/libc/wchar.c:297: 
   function Frama_C_wint_t_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_wint_t_interval
+[eva:alarm] FRAMAC_SHARE/libc/wchar.c:297: Warning: 
+  unaligned pointer creation.
+  assert \aligned(tmp_19,alignof(wint_t));
+  (tmp_19 from vararg)
 [eva:alarm] FRAMAC_SHARE/libc/wchar.c:297: Warning: 
   out of bounds write. assert \valid(tmp_19);
                        (tmp_19 from vararg)
@@ -288,6 +405,13 @@
 [eva] Done for function Frama_C_size_t_interval
 [eva:alarm] FRAMAC_SHARE/libc/wchar.c:313: Warning: 
   out of bounds read. assert \valid_read(arg);
+[eva:alarm] FRAMAC_SHARE/libc/wchar.c:313: Warning: 
+  unaligned pointer creation.
+  assert \aligned(*((long **)*arg),alignof(wchar_t));
+[eva:alarm] FRAMAC_SHARE/libc/wchar.c:313: Warning: 
+  unaligned pointer creation.
+  assert \aligned(tmp_23,alignof(wchar_t));
+  (tmp_23 from vararg)
 [eva] computing for function Frama_C_make_unknown_wchar <- __fc_v_wscanf <- 
                           vwscanf <- caller_stub_for_vwscanf <- main.
   Called from FRAMAC_SHARE/libc/wchar.c:313.
@@ -300,6 +424,12 @@
 [eva:alarm] FRAMAC_SHARE/libc/wchar.c:324: Warning: 
   out of bounds read. assert \valid_read(arg);
 [eva:alarm] FRAMAC_SHARE/libc/wchar.c:324: Warning: 
+  unaligned pointer creation. assert \aligned(*((int **)*arg),alignof(int));
+[eva:alarm] FRAMAC_SHARE/libc/wchar.c:324: Warning: 
+  unaligned pointer creation.
+  assert \aligned(tmp_24,alignof(int));
+  (tmp_24 from vararg)
+[eva:alarm] FRAMAC_SHARE/libc/wchar.c:324: Warning: 
   out of bounds write. assert \valid(tmp_24);
                        (tmp_24 from vararg)
 [eva:alarm] FRAMAC_SHARE/libc/wchar.c:327: Warning: 
@@ -307,30 +437,71 @@
 [eva:alarm] FRAMAC_SHARE/libc/wchar.c:330: Warning: 
   out of bounds read. assert \valid_read(arg);
 [eva:alarm] FRAMAC_SHARE/libc/wchar.c:330: Warning: 
+  unaligned pointer creation.
+  assert \aligned(*((short **)*arg),alignof(short));
+[eva:alarm] FRAMAC_SHARE/libc/wchar.c:330: Warning: 
+  unaligned pointer creation.
+  assert \aligned(tmp_26,alignof(short));
+  (tmp_26 from vararg)
+[eva:alarm] FRAMAC_SHARE/libc/wchar.c:330: Warning: 
   out of bounds write. assert \valid(tmp_26);
                        (tmp_26 from vararg)
 [eva:alarm] FRAMAC_SHARE/libc/wchar.c:333: Warning: 
   out of bounds read. assert \valid_read(arg);
+[eva:alarm] FRAMAC_SHARE/libc/wchar.c:333: Warning: 
+  unaligned pointer creation. assert \aligned(*((long **)*arg),alignof(long));
+[eva:alarm] FRAMAC_SHARE/libc/wchar.c:333: Warning: 
+  unaligned pointer creation.
+  assert \aligned(tmp_27,alignof(long));
+  (tmp_27 from vararg)
 [eva:alarm] FRAMAC_SHARE/libc/wchar.c:333: Warning: 
   out of bounds write. assert \valid(tmp_27);
                        (tmp_27 from vararg)
 [eva:alarm] FRAMAC_SHARE/libc/wchar.c:337: Warning: 
   out of bounds read. assert \valid_read(arg);
 [eva:alarm] FRAMAC_SHARE/libc/wchar.c:337: Warning: 
+  unaligned pointer creation.
+  assert \aligned(*((long long **)*arg),alignof(long long));
+[eva:alarm] FRAMAC_SHARE/libc/wchar.c:337: Warning: 
+  unaligned pointer creation.
+  assert \aligned(tmp_28,alignof(long long));
+  (tmp_28 from vararg)
+[eva:alarm] FRAMAC_SHARE/libc/wchar.c:337: Warning: 
   out of bounds write. assert \valid(tmp_28);
                        (tmp_28 from vararg)
 [eva:alarm] FRAMAC_SHARE/libc/wchar.c:340: Warning: 
   out of bounds read. assert \valid_read(arg);
+[eva:alarm] FRAMAC_SHARE/libc/wchar.c:340: Warning: 
+  unaligned pointer creation.
+  assert \aligned(*((intmax_t **)*arg),alignof(intmax_t));
+[eva:alarm] FRAMAC_SHARE/libc/wchar.c:340: Warning: 
+  unaligned pointer creation.
+  assert \aligned(tmp_29,alignof(intmax_t));
+  (tmp_29 from vararg)
 [eva:alarm] FRAMAC_SHARE/libc/wchar.c:340: Warning: 
   out of bounds write. assert \valid(tmp_29);
                        (tmp_29 from vararg)
 [eva:alarm] FRAMAC_SHARE/libc/wchar.c:343: Warning: 
   out of bounds read. assert \valid_read(arg);
 [eva:alarm] FRAMAC_SHARE/libc/wchar.c:343: Warning: 
+  unaligned pointer creation.
+  assert \aligned(*((size_t **)*arg),alignof(size_t));
+[eva:alarm] FRAMAC_SHARE/libc/wchar.c:343: Warning: 
+  unaligned pointer creation.
+  assert \aligned(tmp_30,alignof(size_t));
+  (tmp_30 from vararg)
+[eva:alarm] FRAMAC_SHARE/libc/wchar.c:343: Warning: 
   out of bounds write. assert \valid(tmp_30);
                        (tmp_30 from vararg)
 [eva:alarm] FRAMAC_SHARE/libc/wchar.c:346: Warning: 
   out of bounds read. assert \valid_read(arg);
+[eva:alarm] FRAMAC_SHARE/libc/wchar.c:346: Warning: 
+  unaligned pointer creation.
+  assert \aligned(*((ptrdiff_t **)*arg),alignof(ptrdiff_t));
+[eva:alarm] FRAMAC_SHARE/libc/wchar.c:346: Warning: 
+  unaligned pointer creation.
+  assert \aligned(tmp_31,alignof(ptrdiff_t));
+  (tmp_31 from vararg)
 [eva:alarm] FRAMAC_SHARE/libc/wchar.c:346: Warning: 
   out of bounds write. assert \valid(tmp_31);
                        (tmp_31 from vararg)

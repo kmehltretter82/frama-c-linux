@@ -303,10 +303,10 @@
 %token TYPE BEHAVIOR BEHAVIORS ASSUMES COMPLETE DISJOINT
 %token TERMINATES
 %token BIFF BIMPLIES STARHAT HAT HATHAT PIPE TILDE GTGT LTLT
-%token SIZEOF LAMBDA LET
+%token ALIGNOF SIZEOF LAMBDA LET
 %token TYPEOF BSTYPE
 %token WITH CONST GHOST
-%token INITIALIZED DANGLING
+%token INITIALIZED DANGLING ALIGNED
 %token LSQUAREPIPE RSQUAREPIPE
 %token IN
 %token PI
@@ -497,6 +497,7 @@ lexpr_inner:
 }
 | INITIALIZED opt_label_1 LPAR lexpr RPAR { info $sloc (PLinitialized ($2,$4)) }
 | DANGLING opt_label_1 LPAR lexpr RPAR { info $sloc (PLdangling ($2,$4)) }
+| ALIGNED LPAR lexpr COMMA lexpr RPAR { info $sloc (PLaligned ($3,$5)) }
 | FRESH opt_label_2 LPAR lexpr COMMA lexpr RPAR { info $sloc (PLfresh ($2,$4, $6)) }
 | BASE_ADDR opt_label_1 LPAR lexpr RPAR { info $sloc (PLbase_addr ($2,$4)) }
 | BLOCK_LENGTH opt_label_1 LPAR lexpr RPAR { info $sloc (PLblock_length ($2,$4)) }
@@ -541,6 +542,7 @@ lexpr_inner:
 | AMP   lexpr_inner %prec prec_unary_op { info $sloc (PLunop (Uamp, $2)) }
 | SIZEOF LPAR lexpr RPAR { info $sloc (PLsizeofE $3) }
 | SIZEOF LPAR cast_logic_type RPAR { info $sloc (PLsizeof $3) }
+| ALIGNOF LPAR cast_logic_type RPAR { info $sloc (PLalignof $3) }
 | OLD LPAR lexpr RPAR { info $sloc (PLold $3) }
 | AT LPAR lexpr COMMA label_name RPAR { info $sloc (PLat ($3, $5)) }
 | RESULT { info $sloc PLresult }
@@ -1943,6 +1945,7 @@ bounded_var:
 ;
 
 c_keyword:
+| ALIGNOF  { "alignof" }
 | CHAR     { "char" }
 | BOOLEAN  { "boolean" }
 | BOOL     { "_Bool" }
@@ -2103,6 +2106,7 @@ bs_keyword:
 | VALID_FUNCTION { () }
 | INITIALIZED { () }
 | DANGLING { () }
+| ALIGNED { () }
 | WITH { () }
 ;
 

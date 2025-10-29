@@ -18,9 +18,9 @@
 import React from 'react';
 import { useFlipSettings } from 'dome';
 import { Badge } from 'dome/controls/icons';
-import { Label, Title } from 'dome/controls/labels';
+import { Label, IconKind } from 'dome/controls/labels';
 import { classes } from 'dome/misc/utils';
-import { Hbox } from 'dome/layout/boxes';
+import { Hbox, TitleBar, TitleBarProps } from 'dome/layout/boxes';
 import { IconButton, IconButtonProps } from 'dome/controls/buttons';
 import { Dropdown } from 'dome/dialogs';
 
@@ -70,7 +70,7 @@ const makeBadgeElt = (elt: BadgeElt, index: number): React.ReactNode => {
   }
 };
 
-const makeBadge = (elt: Badges): React.ReactNode => {
+export const makeBadge = (elt: Badges): React.ReactNode => {
   if (Array.isArray(elt))
     return elt.map(makeBadgeElt);
   return makeBadgeElt(elt, 0);
@@ -169,6 +169,8 @@ export interface ItemProps {
   icon?: string;
   /** Item label. */
   label?: string;
+  /** Item kind. (C: negative, ACSL: positive) */
+  kind?: IconKind,
   /** Item tooltip text. */
   title?: string;
   /** Badge. */
@@ -244,11 +246,13 @@ export function Item(props: ItemProps): JSX.Element {
       ref={ref}
       className={className}
       style={props.style}
+      title={props.title}
       onClick={onClick}
       onDoubleClick={onDoubleClick}
       onContextMenu={onContextMenu}
     >
-      <Label icon={props.icon} label={props.label} title={props.title} />
+      <Label icon={props.icon} label={props.label}
+             kind={props.kind} title={props.title} />
       {props.children}
       {makeBadge(props.badge)}
     </div>
@@ -259,27 +263,12 @@ export function Item(props: ItemProps): JSX.Element {
 // --- SideBar Title
 // --------------------------------------------------------------------------
 
-export interface SidebarTitleProps {
-  /** Label. */
-  label: string;
-  /** Additional CSS class. */
-  className?: string;
-  /** Other elements. */
-  children?: React.ReactNode;
+export function SidebarTitle(props: TitleBarProps): JSX.Element {
+  return (
+    <TitleBar label={props.label} className='dome-xSideBarTitle'>
+      {props.children}
+    </TitleBar>
+  );
 }
 
-/** Sidebar Title. */
-export function SidebarTitle(props: SidebarTitleProps): JSX.Element {
-  const { label, children } = props;
-  const className = classes(
-    'dome-xSideBarTitle',
-    props.className,
-  );
-  return (
-    <Hbox className={className}>
-      <Hbox><Title label={label} title={label}/></Hbox>
-      { children}
-    </Hbox>
-  );
-}
 // --------------------------------------------------------------------------

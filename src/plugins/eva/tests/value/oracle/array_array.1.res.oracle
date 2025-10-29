@@ -15,6 +15,8 @@
 [eva] array_array.c:47: Frama_C_show_each_I: {29}
 [eva:alarm] array_array.c:48: Warning: 
   accessing out of bounds index. assert i < 3;
+[eva:alarm] array_array.c:48: Warning: 
+  unaligned pointer creation. assert \aligned(v,alignof(struct S [3]));
 [eva] array_array.c:48: Warning: 
   all target addresses were invalid. This path is assumed to be dead.
 [eva] Recording results for main2

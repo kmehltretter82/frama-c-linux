@@ -102,6 +102,8 @@
   Called from spawn_h.c:70.
 [eva] Done for function exit
 [eva:alarm] spawn_h.c:82: Warning: 
+  unaligned pointer creation. assert \aligned(argv + optind,alignof(char *));
+[eva:alarm] spawn_h.c:82: Warning: 
   out of bounds read. assert \valid_read(argv + optind);
 [eva:garbled-mix:write] spawn_h.c:82: 
   Assigning imprecise value to file because of misaligned read of addresses.

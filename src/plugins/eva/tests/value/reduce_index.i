@@ -109,10 +109,10 @@ void pointer_index(void)
   int l;
   l = p[k1];
   k1 = k1;
-  p = (char*)u + 5;
+  p = (char*)u + 4;
   l = p[k2];
   k2 = k2;
-  p = (char*)u + 11;
+  p = (char*)u + 12;
   l = p[k3];
   k3 = k3;
   p = u + 3;

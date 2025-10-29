@@ -425,6 +425,12 @@ let is_union t =
   | TComp ci -> not ci.cstruct
   | _ -> false
 
+let has_bitfield t =
+  match unroll_skel t with
+  | TComp { cfields = Some l } ->
+    List.exists (fun f -> Option.is_some f.fbitfield) l
+  | _ -> false
+
 let is_struct_or_union t =
   match unroll_skel t with
   | TComp _ -> true

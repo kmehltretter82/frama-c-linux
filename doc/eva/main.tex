@@ -1472,12 +1472,45 @@ The choice between these two kinds of alarms is influenced by
 option \lstinline|-unsafe-arrays|, as described
 page \pageref{unsafe-arrays}.
 
-Note that line 6 or 8 in this example could be considered as
+Note that line 6 of this example could also be considered as
 problematic in the strictest interpretation of the standard.
-\Eva{} omits warnings for these two lines according
-to the attitude described in \ref{norme_pratique}. An option
-to warn about these lines could happen if there was demand for
-this feature.
+By default, \Eva{} does not emit alarm for this line,
+but the \lstinline|-warn-invalid-pointer| parameter enables
+alarms on such invalid pointer arithmetic.
+
+\subsubsection{Unaligned pointer}
+
+On each pointer of the analyzed program, \Eva{} checks that all the addresses
+it may point to are properly aligned according to the pointer type.
+The alignment of each C type depends on the target platform,
+defined through the \lstinline|-machdep| parameter. \lstinline|_Alignas|
+specifiers are properly taken into account.
+
+Whenever \Eva{} is unable to verify the alignment of a pointer, it emits an
+alarm.
+Such alarm uses the \acsl{} predicate \lstinline|\aligned(p, alignof(type))|
+to express that pointer \lstinline|p| must be aligned according to its
+\lstinline|type|, meaning that the address pointed to by \lstinline|p| must be
+a multiple of the alignment of \lstinline|type| in the target platform.
+The \lstinline|\aligned| predicate can also be used in standard \acsl{}
+assertions to verify more properties on pointer alignment.
+
+\csource{examples/alarms/pointer_alignment.c}
+
+In the above example, the analysis emits alignment alarms on the conversion of
+\lstinline|c| and \lstinline|c2| as a pointer to \lstinline|int|.
+On the other hand, the next two conversions are valid and no alarm is emitted.
+
+\begin{logs}
+[eva:alarm] pointer_alignment.c:5: Warning:
+  unaligned pointer creation. assert \aligned((char *)c,alignof(int));
+[eva:alarm] pointer_alignment.c:6: Warning:
+  unaligned pointer creation. assert \aligned((char *)c2,alignof(int));
+\end{logs}
+
+All alignment alarms can be disabled with the
+\lstinline|-no-warn-unaligned-pointer| parameter.
+
 
 \subsubsection{Invalid pointer arithmetic}
 
@@ -2367,21 +2400,6 @@ write to. However, the \lstinline|const| type qualifier is currently only
 handled when placed at the top-level of the type of a global variable
 or formal argument. Other \lstinline|const| locations are considered
 writable.
-
-\subsection{Alignment of memory accesses}
-
-\Eva{} currently does not check that memory accesses are
-properly aligned in memory. It assumes that non-aligned accesses have
-only a small time penalty (instead of causing an exception) and that the
-programmer is aware of this penalty and is accessing (or seems to be accessing)
-memory in a misaligned way on purpose. %% A more restrictive option
-%% would be quick to implement if someone needed it. Meanwhile,
-%% instructions to explicitly check for the alignment of some accesses
-%% can be inserted in the code following the howto at
-%% \url{http://bts.frama-c.com/dokuwiki/doku.php?id=mantis:frama-c:explicit_alignment_howto}.
-% Removed: not in open-source version
-
-%TODOBY: incomplete: many other kind of UB are not tracked
 
 \section{Loops}
 \label{boucles}
@@ -6024,19 +6042,6 @@ They are listed here for completeness.
   \end{table}
 
 \end{comment}
-
-\subsection{Memory representation}
-These builtins allow to perform queries over the current abstract memory state.
-\begin{itemize}
-\item \lstinline|Frama_C_is_base_aligned(p,n)| checks that the pointer argument
-  \lstinline|p| is aligned on \lstinline|n| bytes, assuming that
-  \lstinline|\base_addr(p)| is itself aligned according to the alignment
-  of its type (as defined by the current \lstinline+machdep+).
-\item \lstinline|Frama_C_offset(p)| returns the possible offsets of
-  \lstinline|p| with respect to its base address. That is,
-  \lstinline|Frama_C_offset(p) == \offset(p)| holds (but
-  \lstinline|Frama_C_offset(p)| can be used outside of ACSL fragments).
-\end{itemize}
 
 \subsection{State-splitting builtins}
 

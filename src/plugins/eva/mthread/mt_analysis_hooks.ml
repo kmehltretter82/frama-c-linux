@@ -341,12 +341,13 @@ let spawn_thread analysis eva_thread stack func state params parent =
 
 
 let standalone_thread th kf initial_state =
-  match kf.Cil_types.fundec with
-  | Declaration (_, f, _, _) ->
-    Mt_self.fatal "Entry point '%s' has no definition : cannot run %a."
-      f.vname
-      Thread.pretty th
-  | Definition (fundec, _) ->
+  match Function_calls.analysis_target kf Kglobal with
+  | `Builtin _ | `Spec _ ->
+    Mt_self.not_yet_implemented
+      "Using an ACSL specification or a builtin to interpret entry point %a \
+       of thread %a is not supported."
+      Kernel_function.pretty kf Thread.pretty th
+  | `Body (fundec, _) ->
     let formals = fundec.sformals in
     let eval_arg vi =
       Results.(in_cvalue_state initial_state |> eval_var vi |> as_cvalue)

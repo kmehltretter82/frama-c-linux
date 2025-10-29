@@ -501,40 +501,53 @@ function reset(): void {
 // --- Popup Menu Management
 // --------------------------------------------------------------------------
 
-interface PopupMenuItemProps {
+export interface PopupMenuItem {
   /** Item label. */
-  label: string;
-  /** Optional menu identifier. */
-  id?: string;
+  label?: string;
+  /** Menu identifier.  */
+  id?: number;
+  /** type item */
+  type: 'separator' | 'checkbox' | 'normal' | 'submenu';
   /** Displayed item, default is `true`. */
   display?: boolean;
   /** Enabled item, default is `true`. */
   enabled?: boolean;
   /** Checked item, default is `false`. */
   checked?: boolean;
+  /** submenu */
+  submenu?: PopupMenuItem[];
 }
 
-type PopupMenuItem = PopupMenuItemProps | 'separator';
+function getMenu(
+  items: PopupMenuItem[],
+  callback: (id?: number) => void,
+  level = 0
+): Menu {
+  const menu = new Menu();
+  let kid = 0;
+  items.forEach((item) => {
+    const { label, display = true, type, enabled, checked, submenu } = item;
+    if (display) {
+      const menuItem: Electron.MenuItemConstructorOptions = {
+        type, enabled, checked,
+        label: label || `#${level}-${++kid}`,
+        click: (): void => callback(item.id)
+      };
+      if (submenu) {
+        menuItem.submenu = getMenu(submenu, callback, level + 1);
+        menuItem.type = 'submenu';
+      }
+      menu.append(new MenuItem(menuItem));
+    }
+  });
+  return menu;
+}
 
 function handlePopupMenu(_: IpcMainInvokeEvent, items: PopupMenuItem[]):
-  Promise<number> {
+  Promise<number | undefined> {
   return new Promise((resolve) => {
-    const menu = new Menu();
-    let kid = 0;
-    let selected = (-1);
-    items.forEach((item, index) => {
-      if (item === 'separator')
-        menu.append(new MenuItem({ type: 'separator' }));
-      else if (item) {
-        const { display = true, enabled, checked } = item;
-        if (display) {
-          const label = item.label || `#${++kid}`;
-          const click = (): void => { selected = index; };
-          const type = checked !== undefined ? 'checkbox' : 'normal';
-          menu.append(new MenuItem({ label, enabled, type, checked, click }));
-        }
-      }
-    });
+    let selected: number | undefined = undefined;
+    const menu = getMenu(items, (value) => selected = value);
     menu.popup({ callback: () => resolve(selected) });
   });
 }

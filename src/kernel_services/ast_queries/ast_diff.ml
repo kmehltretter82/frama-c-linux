@@ -510,6 +510,8 @@ and is_same_predicate_node p p' env =
   | Pallocable(l,t), Pallocable(l',t')
   | Pfreeable(l,t), Pfreeable(l',t') ->
     is_same_logic_label l l' env && is_same_term t t' env
+  | Paligned(p, n), Paligned(p', n') ->
+    is_same_term p p' env && is_same_term n n' env
   | Pfresh(l1,l2,p,s), Pfresh(l1',l2',p',s') ->
     is_same_logic_label l1 l1' env &&
     is_same_logic_label l2 l2' env &&
@@ -519,7 +521,7 @@ and is_same_predicate_node p p' env =
   | (Pfalse | Ptrue | Papp _ | Pseparated _ | Prel _ | Pand _ | Por _ | Pxor _
     | Pimplies _ | Piff _ | Pnot _ | Pif _ | Plet _ | Pforall _ | Pexists _
     | Pat _ | Pobject_pointer _ | Pvalid_read _ | Pvalid _ | Pinitialized _
-    | Pdangling _ | Pallocable _ | Pfreeable _ | Pfresh _
+    | Pdangling _ | Paligned _ | Pallocable _ | Pfreeable _ | Pfresh _
     | Pvalid_function _), _ -> false
 
 and is_same_logic_constant c c' env =
@@ -938,8 +940,12 @@ and is_same_exp e e' env =
   | Lval lv, Lval lv' -> is_same_lval lv lv' env
   | SizeOf t, SizeOf t' -> is_same_type t t' env
   | SizeOfE e, SizeOfE e' -> is_same_exp e e' env
-  | AlignOf t, AlignOf t' -> is_same_type t t' env
-  | AlignOfE e, AlignOfE e' -> is_same_exp e e' env
+  | AlignOf (t, i), AlignOf (t', i') ->
+    Cil_types.equal_standard_or_gcc i i' &&
+    is_same_type t t' env
+  | AlignOfE (e, i), AlignOfE (e', i') ->
+    Cil_types.equal_standard_or_gcc i i' &&
+    is_same_exp e e' env
   | UnOp(op,e,t), UnOp(op',e',t') ->
     equal_unop op op' && is_same_exp e e' env && is_same_type t t' env
   | BinOp(op,e1,e2,t), BinOp(op',e1',e2',t') ->

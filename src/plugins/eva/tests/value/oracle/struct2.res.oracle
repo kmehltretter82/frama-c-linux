@@ -72,6 +72,8 @@
   out of bounds read. assert \valid_read(p3 + 2);
 [eva:alarm] struct2.i:138: Warning: 
   signed overflow. assert *((int *)0x1020) + i ≤ 2147483647;
+[eva:alarm] struct2.i:149: Warning: 
+  unaligned pointer creation. assert \aligned(*t,alignof(int));
 [eva:alarm] struct2.i:149: Warning: out of bounds write. assert \valid(*t + i);
 [eva:alarm] struct2.i:185: Warning: 
   accessing out of bounds index. assert 0 ≤ (int)(i + j);
@@ -98,9 +100,12 @@
 [scope:rm_asserts] removing 2 assertion(s)
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function f_precis:
-  NULL[rbits 32768 to 32799] ∈
-      {{ garbled mix of &{a} (origin: Merge {struct2.i:149}) }}
-      [rbits 32800 to 65543] ∈ [--..--]
+  NULL[rbits 32768 to 32799] ∈ {{ NULL + {2} ; (? *)&a }}
+      [rbits 32800 to 33151] ∈ [--..--]
+      [rbits 33152 to 33183] ∈ {2; 4160}
+      [rbits 33184 to 33407] ∈ [--..--]
+      [rbits 33408 to 33439] ∈ [2..8188],0%2
+      [rbits 33440 to 65543] ∈ [--..--]
   tab_s[0] ∈ {0}
        [1].a ∈ [--..--]
        [1]{.d[0..9]; .b; .e[0..9]; .c} ∈ {0}
@@ -158,7 +163,7 @@
   These dependencies hold at termination for the executions that terminate:
 [from] Function f_precis:
   NULL{[4096..4099]; [4144..4147]} FROM NULL[4176..4179]; i
-      {[4100..4111]; [4116..4143]; [4148..8192]}
+      {[4100..4111]; [4116..4143]; [4148..8191]}
       FROM NULL[4176..4179]; i (and SELF)
       [4112..4115] FROM NULL{[4128..4131]; [4176..4179]}; i
   tab_s[0] FROM s2
@@ -202,7 +207,7 @@
   b FROM v; i (and SELF)
 [from] ====== END OF DEPENDENCIES ======
 [inout] Out (internal) for function f_precis:
-    NULL[4096..8192]; tab_s{[0]; [1].a}; tab_s1{[0].b; [1].b}; tab_s2[0];
+    NULL[4096..8191]; tab_s{[0]; [1].a}; tab_s1{[0].b; [1].b}; tab_s2[0];
     tab_s3[0].a; tab_s4{[0].a; [1].a}; s1; s2{{.a; .d[0..1]}; .b; .c};
     s4.e[0].a; s8.b; s7; tab1[0..1]; tab2[0..1]; tab3[0..1]; tab4[0]; tab5[0];
     tab6[0..1]; p; p2; p3; p4; p5; p6; p7; q; r; s; t; a; b

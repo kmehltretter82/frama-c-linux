@@ -519,13 +519,15 @@ val compatibleTypes :
     [vreferenced] .
     The [ghost] argument defaults to [false], and corresponds to the field
     [vghost] .
+    The [alignas] argument defaults to the alignment of the provided type.
     The [loc] argument defaults to [Location.unknown], and corresponds to the field
     [vdecl] .
     The first unnamed argument specifies whether the varinfo is for a global and
     the second is for formals.
 *)
 val makeVarinfo:
-  ?source:bool -> ?temp:bool -> ?referenced:bool -> ?ghost:bool -> ?loc:Location.t -> bool -> bool
+  ?source:bool -> ?temp:bool -> ?referenced:bool -> ?ghost:bool ->
+  ?alignas:exp -> ?loc:Location.t -> bool -> bool
   -> string -> typ -> varinfo
 
 (** Make a formal variable for a function declaration. Insert it in both the
@@ -581,7 +583,7 @@ val makeTempVar: fundec -> ?insert:bool -> ?ghost:bool -> ?name:string ->
     is unique. [source] defaults to [true]. [temp] defaults to [false].
 *)
 val makeGlobalVar: ?source:bool -> ?temp:bool -> ?referenced:bool ->
-  ?ghost:bool -> ?loc:Location.t -> string -> typ -> varinfo
+  ?ghost:bool -> ?alignas:exp -> ?loc:Location.t -> string -> typ -> varinfo
 
 (** Make a shallow copy of a [varinfo] and assign a new identifier.
     If the original varinfo has an associated logic var, it is copied too and
@@ -1902,6 +1904,22 @@ val sizeOf: loc:location -> typ -> exp
     {!Machine.init}.
     @raise {!SizeOfError} when it cannot compute the alignment. *)
 val bytesAlignOf: typ -> int
+
+(** The alignment of the variable according to:
+    - its _Alignas specifier, or if unspecified,
+    - its type.
+      @raise {!SizeOfError} when it cannot compute the alignment.
+      @since 32.0-Germanium
+*)
+val bytesAlignOfVarinfo: varinfo -> int
+
+(** The alignment of the variable according to:
+    - its _Alignas specifier, or if unspecified,
+    - its type.
+      @raise {!SizeOfError} when it cannot compute the alignment.
+      @since 32.0-Germanium
+*)
+val bytesAlignOfField: fieldinfo -> int
 
 (** [intOfAttrparam a] tries to const-fold [a] into a numeric value.
     Returns [Some n] if it succeeds, [None] otherwise.

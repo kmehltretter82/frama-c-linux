@@ -696,8 +696,19 @@ let positive_cvalue = Cvalue.V.inject_int Z.one
 let negative_cvalue = Cvalue.V.inject_int Z.minus_one
 
 let is_true = function
-  | `True | `TrueReduced _ -> true
-  | `Unknown _ | `False | `Unreachable -> false
+  | `True -> true
+  | `Unknown _ | `False -> false
+
+let truth_to_status = function
+  | `True -> True
+  | `Unknown _ -> Unknown
+  | `False -> False
+
+let reduce_value_with_truth assume value =
+  match assume value with
+  | `True -> value
+  | `Unknown v -> v
+  | `False -> Cvalue.V.bottom
 
 (* Check "logic alarms" when evaluating [v1 op v2]. All operators shifts are
    defined unambiguously in ACSL. *)
@@ -1627,10 +1638,17 @@ and bind_comprehension_quantifiers env quantifiers predicate =
 and eval_let_binding ~alarm_mode env logic_info =
   match logic_info with
   | { l_labels = []; l_tparams = []; l_profile = []; l_body = LBterm term } ->
-    let var = logic_info.l_var_info in
-    let env = bind_logic_vars env [var] in
-    let var_term = Logic_const.tvar var in
-    reduce_left_by_relation ~alarm_mode env true var_term Req term
+    begin
+      let var = logic_info.l_var_info in
+      let env = bind_logic_vars env [var] in
+      let var_term = Logic_const.tvar var in
+      try reduce_left_by_relation ~alarm_mode env true var_term Req term
+      with Reduce_to_bottom ->
+        Self.warning ~current:true ~once:true
+          "ignoring \\let binding of logic variable %a evaluating to bottom"
+          Printer.pp_logic_var var;
+        env
+    end
   | _ -> unsupported "\\let binding"
 
 (* -------------------------------------------------------------------------- *)
@@ -2257,6 +2275,24 @@ and reduce_by_predicate ~alarm_mode env positive p =
 
     | _,Pvalid_function _tsets -> env (* TODO *)
 
+    | _, Paligned (t, n) -> begin
+        let align = eval_term ~alarm_mode env n in
+        let to_int v =
+          try Cvalue.V.project_ival v |> Ival.project_int |> Z.to_int_opt
+          with Cvalue.V.Not_based_on_null | Ival.Not_Singleton_Int -> None
+        in
+        match to_int align.eover with
+        | Some align when align > 0 ->
+          begin
+            let assume_aligned = Cvalue_forward.assume_aligned align in
+            let reduce _typ = reduce_value_with_truth assume_aligned in
+            try reduce_exact_location ~alarm_mode env reduce t
+            with Reduce_to_bottom -> overwrite_current_state env Model.bottom
+               | LogicEvalError _ -> env
+          end
+        | Some _ | None -> env
+      end
+
     | _,(Pinitialized (lbl_initialized,tsets)
         | Pdangling (lbl_initialized,tsets)) ->
       begin
@@ -2487,6 +2523,20 @@ and eval_predicate env pred =
             if funs = [] then False else Unknown
           else
             True
+      end
+
+    | Paligned (t, n) -> begin
+        let align = eval_term ~alarm_mode env n in
+        let to_int v =
+          try Cvalue.V.project_ival v |> Ival.project_int |> Z.to_int_opt
+          with Cvalue.V.Not_based_on_null | Ival.Not_Singleton_Int -> None
+        in
+        match to_int align.eover with
+        | Some align when align > 0 ->
+          let pointer = eval_term ~alarm_mode env t in
+          let truth = Cvalue_forward.assume_aligned align pointer.eover in
+          truth_to_status truth
+        | Some _ | None -> Unknown
       end
 
     | Pinitialized (label,tsets) | Pdangling (label,tsets) -> begin
@@ -2749,6 +2799,8 @@ and predicate_deps env pred =
     | Pvalid (_, tsets) | Pvalid_read (_, tsets)
     | Pobject_pointer (_, tsets) | Pvalid_function tsets ->
       term_deps tsets
+
+    | Paligned (t, n) -> join_logic_deps (term_deps t) (term_deps n)
 
     | Pinitialized (lbl, tsets) | Pdangling (lbl, tsets) ->
       tsets_deps lbl tsets

@@ -104,6 +104,10 @@ module type S = sig
       also considered as valid pointer values for now. *)
   val assume_pointer: t -> t truth
 
+  (** [assume_aligned modu v] assumes that the abstract value [v] represents
+      only integer or pointer values aligned to [modu]. *)
+  val assume_aligned: int -> t -> t truth
+
   (* [assume_comparable cmp v1 v2] assumes that the integer or pointer values
      [v1] and [v2] are comparable for [cmp]. Integers are always comparable.
      If one value is a pointer, then both values should be pointers, and:

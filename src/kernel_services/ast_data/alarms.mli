@@ -25,6 +25,9 @@ type alarm =
   (** [Index_out_of_bound(index, opt)]
       - [opt = None] -> lower bound is zero; Some up = upper bound *)
   | Invalid_pointer of exp
+  | Unaligned_pointer of exp * typ
+  (** [Unaligned_pointer(p, t)] The alignment of the pointer [p] is not
+      suitable for an access with type [t] *)
   | Invalid_shift of exp * int option (** strict upper bound, if any *)
   | Pointer_comparison of exp option * exp
   (** First parameter is [None] when implicit comparison to NULL pointer *)

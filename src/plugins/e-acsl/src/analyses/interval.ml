@@ -863,6 +863,9 @@ and infer_predicate ~logic_env p =
   | Pvalid_function t ->
     ignore (infer ~force:false ~logic_env t);
   | Pat(p, _) -> infer_predicate ~logic_env p
+  | Paligned (t, n) ->
+    ignore (infer ~force:false ~logic_env t);
+    ignore (infer ~force:false ~logic_env n);
   | Pfresh _ -> Error.not_yet "\\fresh"
 
 include Ival_datatype

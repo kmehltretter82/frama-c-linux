@@ -19,6 +19,10 @@ int main(void)
   int __retres;
   int a;
   struct ArrayStruct buff;
+  /*@ assert
+        rte: pointer_alignment:
+          \aligned(buff.data[i].cell[j].next,alignof(struct S));
+  */
   /*@ assert rte: index_bound: i < 10; */
   /*@ assert rte: index_bound: j < 5; */
   /*@ assert rte: mem_access: \valid_read(&(buff.data[i].cell[j].next)->val);

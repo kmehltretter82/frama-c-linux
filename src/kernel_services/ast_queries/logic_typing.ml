@@ -1409,6 +1409,7 @@ struct
       | Pinitialized (_,t) | Pdangling (_, t)
       | Pallocable(_,t) | Pfreeable(_,t)-> needs_at t
       | Pfresh (_,_,t,n) -> (needs_at t) && (needs_at n)
+      | Paligned(t, v) -> (needs_at t) && (needs_at v)
     in
     if needs_at idx then tat ~loc:idx.term_loc (idx,here_label) else idx
 
@@ -2691,6 +2692,14 @@ struct
       let t = term env t in
       normalize_update_term ctxt env loc t v toff
 
+    | PLalignof typ ->
+      let env = drop_qualifiers env in
+      (match Logic_const.unroll_ltdef (logic_type ctxt loc env typ)
+       with
+         Ctype t -> TAlignOf t,Linteger
+       | _ -> if ctxt.silent then raise Backtrack;
+         ctxt.error loc "sizeof can only handle C types")
+
     | PLsizeof typ ->
       let env = drop_qualifiers env in
       (match Logic_const.unroll_ltdef (logic_type ctxt loc env typ)
@@ -3226,7 +3235,7 @@ struct
       (Trange(t1,t2),
        Ltype(Logic_env.find_logic_type "set", [arithmetic_conversion ty1 ty2]))
     | PLvalid _ | PLvalid_read _ | PLobject_pointer _ | PLvalid_function _
-    | PLfresh _ | PLallocable _ | PLfreeable _
+    | PLfresh _ | PLallocable _ | PLfreeable _ | PLaligned _
     | PLinitialized _ | PLdangling _ | PLexists _ | PLforall _
     | PLimplies _ | PLiff _
     | PLxor _ | PLseparated _ ->
@@ -3596,6 +3605,10 @@ struct
       predicate_label_ptr ~check_non_void:true pinitialized l t
     | PLdangling (l,t) ->
       predicate_label_ptr ~check_non_void:true pdangling l t
+    | PLaligned (t, v) ->
+      let t = term_ptr ~check_non_void:false t in
+      let n = term env v in
+      paligned ~loc (t, n)
     | PLold p ->
       let lab = find_old_label loc env in
       let env = Lenv.set_current_logic_label lab env in
@@ -3656,7 +3669,7 @@ struct
     | PLcast _ | PLblock_length _ | PLbase_addr _ | PLoffset _
     | PLrepeat _ | PLlist _ | PLarrget _ | PLarrow _
     | PLdot _ | PLbinop _ | PLunop _ | PLconstant _
-    | PLnull | PLresult | PLsizeof _
+    | PLnull | PLresult | PLalignof _ | PLsizeof _
     | PLsizeofE _ | PLlambda _
     | PLupdate _ | PLinitIndex _ | PLinitField _
     | PLtypeof _ | PLtype _ -> boolean_to_predicate ctxt env p0
@@ -4209,6 +4222,376 @@ struct
     | TDsum cons -> LTsum (List.map (type_datacons loc env my_info ~context) cons)
     | TDsyn typ -> LTsyn (plain_logic_type loc env typ)
 
+  type polarity = [ `Pos | `Neg | `Both ]
+
+  let invert_polarity (p: polarity): polarity =
+    match p with
+    | `Pos -> `Neg
+    | `Neg -> `Pos
+    | `Both -> `Both
+
+  let check_var_polarity loc ~polarity ~pos_use ~neg_use v =
+    let msg, ko =
+      match polarity with
+      | `Pos -> "as positive occurrence", Cil_datatype.Logic_var.Set.mem v neg_use
+      | `Neg -> "as negative occurrence", Cil_datatype.Logic_var.Set.mem v pos_use
+      | `Both ->
+        "here",
+        (Cil_datatype.Logic_var.Set.mem v neg_use ||
+         Cil_datatype.Logic_var.Set.mem v pos_use)
+    in
+    if ko then
+      C.error loc
+        "ill-formed inductive definition: %a should not be used %s"
+        Cil_datatype.Logic_var.pretty v msg
+
+  let update_use new_v ~polarity ~pos_use ~neg_use v =
+    let open Cil_datatype.Logic_var.Set in
+    let pos_use =
+      match polarity with
+      | `Pos when mem v pos_use -> add new_v pos_use
+      | `Neg when mem v neg_use -> add new_v pos_use
+      | `Both when mem v pos_use || mem v neg_use -> add new_v pos_use
+      | `Pos | `Neg | `Both -> pos_use
+    and neg_use =
+      match polarity with
+      | `Pos when mem v neg_use -> add new_v neg_use
+      | `Neg when mem v pos_use -> add new_v neg_use
+      | `Both when mem v pos_use || mem v neg_use -> add new_v neg_use
+      | `Pos | `Neg | `Both -> neg_use
+    in
+    (pos_use, neg_use)
+
+  let rec find_occurrences_term v ~polarity ~pos_use ~neg_use t =
+    let unchanged = pos_use, neg_use in
+    let aux_list (pos_use,neg_use) t =
+      find_occurrences_term v ~polarity ~pos_use ~neg_use t
+    in
+    match t.term_node with
+    | TConst _ -> unchanged
+    | TLval tlv ->
+      find_occurrences_lval v ~polarity ~pos_use ~neg_use tlv
+    | TSizeOf _ | TSizeOfE _ -> unchanged
+    | TAlignOf _ | TAlignOfE _ -> unchanged
+    | TUnOp(Neg,t) ->
+      let polarity = invert_polarity polarity in
+      find_occurrences_term v ~polarity ~pos_use ~neg_use t
+    | TUnOp(_,t) -> find_occurrences_term v ~polarity ~pos_use ~neg_use t
+    | TBinOp(_,t1,t2) ->
+      let (pos_use, neg_use) =
+        find_occurrences_term v ~polarity ~pos_use ~neg_use t1
+      in
+      find_occurrences_term v ~polarity ~pos_use ~neg_use t2
+    | TCast(_,_,t) -> find_occurrences_term v ~polarity ~pos_use ~neg_use t
+    | TAddrOf tlv | TStartOf tlv ->
+      find_occurrences_lval v ~polarity ~pos_use ~neg_use tlv
+    | Tapp(f,_,args) ->
+      let res = update_use v ~polarity ~pos_use ~neg_use f.l_var_info in
+      List.fold_left aux_list res args
+    | Tlambda(_,t) -> find_occurrences_term v ~polarity ~pos_use ~neg_use t
+    | TDataCons(_,args) ->
+      List.fold_left aux_list unchanged args
+    | Tif(t1,t2,t3) ->
+      let (pos_use,neg_use) =
+        find_occurrences_term v ~polarity ~pos_use ~neg_use t1
+      in
+      let (pos_use, neg_use) =
+        find_occurrences_term v ~polarity ~pos_use ~neg_use t2
+      in
+      find_occurrences_term v ~polarity ~pos_use ~neg_use t3
+    | Tat(t,_) | Tbase_addr(_,t) | Toffset(_,t) | Tblock_length(_,t) ->
+      find_occurrences_term v ~polarity ~pos_use ~neg_use t
+    | Tnull -> unchanged
+    | TUpdate(t1,o,t2) ->
+      let (pos_use, neg_use) =
+        find_occurrences_term v ~polarity ~pos_use ~neg_use t1
+      in
+      let (pos_use, neg_use) =
+        find_occurrences_offset v ~polarity ~pos_use ~neg_use o
+      in
+      find_occurrences_term v ~polarity ~pos_use ~neg_use t2
+    | Ttypeof _ | Ttype _ | Tempty_set -> unchanged
+    | Tunion l | Tinter l -> List.fold_left aux_list unchanged l
+    | Tcomprehension(t,_,op) ->
+      let (pos_use, neg_use as none) =
+        find_occurrences_term v ~polarity ~pos_use ~neg_use t
+      in
+      let some p = find_occurrences_pred v ~polarity ~pos_use ~neg_use p in
+      Option.fold ~none ~some op
+    | Trange(ot1,ot2) ->
+      let aux = find_occurrences_term v ~polarity in
+      let (pos_use, neg_use as none) =
+        Option.fold ~none:unchanged ~some:(aux ~pos_use ~neg_use) ot1
+      in
+      Option.fold ~none ~some:(aux ~pos_use ~neg_use) ot2
+    | Tlet(li, t') ->
+      let (pos_use, neg_use) =
+        find_occurrences t.term_loc ~pos_use ~neg_use li
+      in
+      find_occurrences_term v ~polarity ~pos_use ~neg_use t'
+
+  and find_occurrences_pred v ~polarity ~pos_use ~neg_use p =
+    let unchanged = (pos_use, neg_use) in
+    let aux_list (pos_use, neg_use) t =
+      find_occurrences_term v ~polarity ~pos_use ~neg_use t
+    in
+    match p.pred_content with
+    | Pfalse | Ptrue -> unchanged
+    | Papp(li,_,args) ->
+      let res = update_use v ~polarity ~pos_use ~neg_use li.l_var_info in
+      List.fold_left aux_list res args
+    | Pseparated l -> List.fold_left aux_list unchanged l
+    | Prel(_,t1,t2) ->
+      let (pos_use, neg_use) =
+        find_occurrences_term v ~polarity ~pos_use ~neg_use t1
+      in
+      find_occurrences_term v ~polarity ~pos_use ~neg_use t2
+    | Pand(p1,p2) | Por (p1,p2) | Pxor(p1,p2) ->
+      let (pos_use, neg_use) =
+        find_occurrences_pred v ~polarity ~pos_use ~neg_use p1
+      in
+      find_occurrences_pred v ~polarity ~pos_use ~neg_use p2
+    | Pimplies(p1,p2) ->
+      let hyp_polarity = invert_polarity polarity in
+      let (pos_use, neg_use) =
+        find_occurrences_pred v ~polarity:hyp_polarity ~pos_use ~neg_use p1
+      in
+      find_occurrences_pred v ~polarity ~pos_use ~neg_use p2
+    | Piff (p1,p2) ->
+      let polarity = `Both in
+      let (pos_use, neg_use) =
+        find_occurrences_pred v ~polarity ~pos_use ~neg_use p1
+      in
+      find_occurrences_pred v ~polarity ~pos_use ~neg_use p2
+    | Pnot p ->
+      let polarity = invert_polarity polarity in
+      find_occurrences_pred v ~polarity ~pos_use ~neg_use p
+    | Pif (t,p1,p2) ->
+      let (pos_use, neg_use) =
+        find_occurrences_term v ~polarity ~pos_use ~neg_use t
+      in
+      let (pos_use, neg_use) =
+        find_occurrences_pred v ~polarity ~pos_use ~neg_use p1
+      in
+      find_occurrences_pred v ~polarity ~pos_use ~neg_use p2
+    | Plet (li,p') ->
+      let (pos_use, neg_use) =
+        find_occurrences p.pred_loc ~pos_use ~neg_use li
+      in
+      find_occurrences_pred v ~polarity ~pos_use ~neg_use p'
+    | Pforall (_,p) | Pexists (_,p) | Pat(p,_) ->
+      find_occurrences_pred v ~polarity ~pos_use ~neg_use p
+    | Pobject_pointer(_,t) | Pvalid_read(_,t) | Pvalid(_,t)
+    | Pvalid_function t | Pinitialized(_,t) | Pdangling(_,t)
+    | Pallocable(_,t) | Pfreeable(_,t) ->
+      find_occurrences_term v ~polarity ~pos_use ~neg_use t
+    | Pfresh(_,_,t1,t2) | Paligned(t1, t2) ->
+      let (pos_use, neg_use) =
+        find_occurrences_term v ~polarity ~pos_use ~neg_use t1
+      in
+      find_occurrences_term v ~polarity ~pos_use ~neg_use t2
+
+  and find_occurrences_lval v ~polarity ~pos_use ~neg_use (host,offset) =
+    let (pos_use, neg_use) =
+      find_occurrences_lhost v ~polarity ~pos_use ~neg_use host
+    in
+    find_occurrences_offset v ~polarity ~pos_use ~neg_use offset
+
+  and find_occurrences_lhost v ~polarity ~pos_use ~neg_use host =
+    match host with
+    | TVar v' -> update_use v ~polarity ~pos_use ~neg_use v'
+    | TResult _ -> (pos_use, neg_use)
+    | TMem t -> find_occurrences_term v ~polarity ~pos_use ~neg_use t
+
+  and find_occurrences_offset v ~polarity ~pos_use ~neg_use offset =
+    match offset with
+    | TNoOffset -> (pos_use, neg_use)
+    | TField(_,o) | TModel(_,o) ->
+      find_occurrences_offset v ~polarity ~pos_use ~neg_use o
+    | TIndex(i,o) ->
+      let (pos_use, neg_use) =
+        find_occurrences_term v ~polarity ~pos_use ~neg_use i
+      in
+      find_occurrences_offset v ~polarity ~pos_use ~neg_use o
+
+
+  and find_occurrences loc ~pos_use ~neg_use def =
+    let polarity = `Pos in
+    match def.l_body with
+    | LBnone -> (pos_use, neg_use)
+    | LBreads _ | LBinductive _ ->
+      Kernel.fatal ~source:(fst loc) "Unexpected definition in a \\let"
+    | LBterm t ->
+      find_occurrences_term def.l_var_info ~polarity ~pos_use ~neg_use t
+    | LBpred p ->
+      find_occurrences_pred def.l_var_info ~polarity ~pos_use ~neg_use p
+
+  let rec check_horn_clause_term ~polarity ~pos_use ~neg_use t =
+    match t.term_node with
+    | TConst _ -> ()
+    | TLval tlv ->
+      check_horn_clause_lval t.term_loc ~polarity ~pos_use ~neg_use tlv
+    | TSizeOf _ | TSizeOfE _ -> ()
+    | TAlignOf _ | TAlignOfE _ -> ()
+    | TUnOp(Neg,t) ->
+      let polarity = invert_polarity polarity in
+      check_horn_clause_term ~polarity ~pos_use ~neg_use t
+    | TUnOp(_,t) -> check_horn_clause_term ~polarity ~pos_use ~neg_use t
+    | TBinOp(_,t1,t2) ->
+      check_horn_clause_term ~polarity ~pos_use ~neg_use t1;
+      check_horn_clause_term ~polarity ~pos_use ~neg_use t2
+    | TCast(_,_,t) -> check_horn_clause_term ~polarity ~pos_use ~neg_use t
+    | TAddrOf tlv | TStartOf tlv ->
+      check_horn_clause_lval t.term_loc ~polarity ~pos_use ~neg_use tlv
+    | Tapp(f,_,args) ->
+      check_var_polarity t.term_loc ~polarity ~pos_use ~neg_use f.l_var_info;
+      List.iter (check_horn_clause_term ~polarity ~pos_use ~neg_use) args
+    | Tlambda(_,t) -> check_horn_clause_term ~polarity ~pos_use ~neg_use t
+    | TDataCons(_,args) ->
+      List.iter (check_horn_clause_term ~polarity ~pos_use ~neg_use) args
+    | Tif(t1,t2,t3) ->
+      check_horn_clause_term ~polarity ~pos_use ~neg_use t1;
+      check_horn_clause_term ~polarity ~pos_use ~neg_use t2;
+      check_horn_clause_term ~polarity ~pos_use ~neg_use t3
+    | Tat(t,_)
+    | Tbase_addr(_,t)
+    | Toffset(_,t)
+    | Tblock_length(_,t) -> check_horn_clause_term ~polarity ~pos_use ~neg_use t
+    | Tnull -> ()
+    | TUpdate(t1,o,t2) ->
+      check_horn_clause_term ~polarity ~pos_use ~neg_use t1;
+      check_horn_clause_offset t.term_loc ~polarity ~pos_use ~neg_use o;
+      check_horn_clause_term ~polarity ~pos_use ~neg_use t2
+    | Ttypeof _ | Ttype _ | Tempty_set -> ()
+    | Tunion l | Tinter l ->
+      List.iter (check_horn_clause_term ~polarity ~pos_use ~neg_use) l
+    | Tcomprehension(t,_,op) ->
+      check_horn_clause_term ~polarity ~pos_use ~neg_use t;
+      Option.iter (check_horn_clause_pred ~polarity ~pos_use ~neg_use) op
+    | Trange(ot1,ot2) ->
+      Option.iter (check_horn_clause_term ~polarity ~pos_use ~neg_use) ot1;
+      Option.iter (check_horn_clause_term ~polarity ~pos_use ~neg_use) ot2
+    | Tlet(li, t') ->
+      let (pos_use, neg_use) =
+        find_occurrences t.term_loc ~pos_use ~neg_use li in
+      check_horn_clause_term ~polarity ~pos_use ~neg_use t'
+
+  and check_horn_clause_pred ~polarity ~pos_use ~neg_use p =
+    match p.pred_content with
+    | Pfalse | Ptrue -> ()
+    | Papp(li,_,args) ->
+      check_var_polarity p.pred_loc ~polarity ~pos_use ~neg_use li.l_var_info;
+      List.iter (check_horn_clause_term ~polarity ~pos_use ~neg_use) args
+    | Pseparated l ->
+      List.iter (check_horn_clause_term ~polarity ~pos_use ~neg_use) l
+    | Prel(_,t1,t2) ->
+      check_horn_clause_term ~polarity ~pos_use ~neg_use t1;
+      check_horn_clause_term ~polarity ~pos_use ~neg_use t2
+    | Pand(p1,p2) ->
+      check_horn_clause_pred ~polarity ~pos_use ~neg_use p1;
+      check_horn_clause_pred ~polarity ~pos_use ~neg_use p2
+    | Por(p1,p2) ->
+      check_horn_clause_pred ~polarity ~pos_use ~neg_use p1;
+      check_horn_clause_pred ~polarity ~pos_use ~neg_use p2
+    | Pxor(p1,p2) ->
+      check_horn_clause_pred ~polarity ~pos_use ~neg_use p1;
+      check_horn_clause_pred ~polarity ~pos_use ~neg_use p2
+    | Pimplies(p1,p2) ->
+      let hyp_polarity = invert_polarity polarity in
+      check_horn_clause_pred ~polarity:hyp_polarity ~pos_use ~neg_use p1;
+      check_horn_clause_pred ~polarity ~pos_use ~neg_use p2
+    | Piff (p1,p2) ->
+      let polarity = `Both in
+      check_horn_clause_pred ~polarity ~pos_use ~neg_use p1;
+      check_horn_clause_pred ~polarity ~pos_use ~neg_use p2
+    | Pnot p ->
+      let polarity = invert_polarity polarity in
+      check_horn_clause_pred ~polarity ~pos_use ~neg_use p
+    | Pif (t,p1,p2) ->
+      check_horn_clause_term ~polarity ~pos_use ~neg_use t;
+      check_horn_clause_pred ~polarity ~pos_use ~neg_use p1;
+      check_horn_clause_pred ~polarity ~pos_use ~neg_use p2
+    | Plet (li,p') ->
+      let (pos_use, neg_use) =
+        find_occurrences p.pred_loc ~pos_use ~neg_use li
+      in
+      check_horn_clause_pred ~polarity ~pos_use ~neg_use p'
+    | Pforall (_,p) | Pexists (_,p) | Pat(p,_) ->
+      check_horn_clause_pred ~polarity ~pos_use ~neg_use p
+    | Pobject_pointer(_,t) | Pvalid_read(_,t) | Pvalid(_,t)
+    | Pvalid_function t | Pinitialized(_,t) | Pdangling(_,t)
+    | Pallocable(_,t) | Pfreeable(_,t) ->
+      check_horn_clause_term ~polarity ~pos_use ~neg_use t
+    | Pfresh(_,_,t1,t2) | Paligned(t1, t2) ->
+      check_horn_clause_term ~polarity ~pos_use ~neg_use t1;
+      check_horn_clause_term ~polarity ~pos_use ~neg_use t2
+
+  and check_horn_clause_lval loc ~polarity ~pos_use ~neg_use (host,offset) =
+    check_horn_clause_lhost loc ~polarity ~pos_use ~neg_use host;
+    check_horn_clause_offset loc ~polarity ~pos_use ~neg_use offset
+
+  and check_horn_clause_lhost loc ~polarity ~pos_use ~neg_use host =
+    match host with
+    | TVar v -> check_var_polarity loc ~polarity ~pos_use ~neg_use v
+    | TResult _ -> ()
+    | TMem t -> check_horn_clause_term ~polarity ~pos_use ~neg_use t
+
+  and check_horn_clause_offset loc ~polarity ~pos_use ~neg_use offset =
+    match offset with
+    | TNoOffset -> ()
+    | TField(_,o) | TModel(_,o) ->
+      check_horn_clause_offset loc ~polarity ~pos_use ~neg_use o
+    | TIndex(i,o) ->
+      check_horn_clause_term ~polarity ~pos_use ~neg_use i;
+      check_horn_clause_offset loc ~polarity ~pos_use ~neg_use o
+
+  let rec check_horn_clause_main ~pos_use ~neg_use pred =
+    let conclusion_not_pred () =
+      C.error pred.pred_loc
+        "ill-formed inductive declaration: conclusion must refer to defined predicate";
+    in
+    let conclusion_neg_pred p =
+      C.error pred.pred_loc
+        "ill-formed inductive declaration: %a shouldn't be used in conclusion"
+        Cil_datatype.Logic_info.pretty p
+    in
+    match pred.pred_content with
+    | Pfalse | Ptrue -> ()
+    | Papp(p,_,args) ->
+      if Cil_datatype.Logic_var.Set.mem p.l_var_info neg_use then
+        conclusion_neg_pred p;
+      if not (Cil_datatype.Logic_var.Set.mem p.l_var_info pos_use) then
+        conclusion_not_pred ();
+      List.iter (check_horn_clause_term ~polarity:`Pos ~pos_use ~neg_use) args
+    | Pseparated _ | Prel _ | Pand _ | Por _ | Pxor _ | Piff _ | Pnot _ ->
+      conclusion_not_pred ()
+    | Pimplies(p1,p2) ->
+      check_horn_clause_pred ~polarity:`Pos ~pos_use ~neg_use p1;
+      check_horn_clause_main ~pos_use ~neg_use p2
+    | Pif(t,p1,p2) ->
+      let polarity = `Pos in
+      check_horn_clause_term ~polarity ~pos_use ~neg_use t;
+      check_horn_clause_main ~pos_use ~neg_use p1;
+      check_horn_clause_main ~pos_use ~neg_use p2
+    | Plet(li, p) ->
+      let (pos_use, neg_use) =
+        find_occurrences pred.pred_loc ~pos_use ~neg_use li
+      in
+      check_horn_clause_main ~pos_use ~neg_use p
+    | Pforall (_,p) -> check_horn_clause_main ~pos_use ~neg_use p
+    | Pexists _ ->
+      C.error pred.pred_loc
+        "ill-formed inductive declaration: existential quantifier"
+    | Pat(p,_) -> check_horn_clause_main ~pos_use ~neg_use p
+    | Pobject_pointer _ | Pvalid_read _  | Pvalid _  | Pvalid_function _
+    | Pinitialized _ | Pdangling _ | Pallocable _ | Pfreeable _
+    | Pfresh _ | Paligned _ -> conclusion_not_pred ()
+
+  let check_horn_clause p case =
+    let pos_use = Cil_datatype.Logic_var.Set.singleton p in
+    let neg_use = Cil_datatype.Logic_var.Set.empty in
+    check_horn_clause_main ~pos_use ~neg_use case
+
   let rec decl ~context a =
     let open Current_loc.Operators in
     let loc = a.decl_loc in
@@ -4284,6 +4667,7 @@ struct
              Lenv.default_label := None;
              let labels,env = global_annot_env loc labels poly in
              let p = predicate env e in
+             check_horn_clause info.l_var_info p;
              let res = update_ind_case_wrt_default_label (id, labels, poly, p)
              in
              let global_default =

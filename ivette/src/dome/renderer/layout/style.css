@@ -266,6 +266,10 @@
 /* --- Form Containers                                                    --- */
 /* -------------------------------------------------------------------------- */
 
+.dome-xForm {
+    overflow-y: auto;
+}
+
 /* Main Form */
 .dome-xForm-grid:not(.message-search)
 {
@@ -308,7 +312,7 @@
 /* Block Container */
 .dome-xForm-sidebar
 {
-    padding: 4px 12px;
+    padding: 0px 12px;
     display: flex;
     flex-wrap: nowrap;
     flex-direction: column;
@@ -333,10 +337,11 @@
         margin-top: 4px;
         position:relative;
         border-radius: 4px;
+        overflow: visible; /* keep the caret visible */
         background-color: var(--background-block-form);
         padding: 2px 8px 2px 2px;
 
-        .dome-xForm-label{
+        .dome-xForm-label {
           margin-right: 15px;
           top: 0 !important; /* !important needed because of hard style */
         }
@@ -347,6 +352,11 @@
             max-width: 100%;
             align-items: center;
             margin: 2px 0;
+        }
+
+        &:has(> .dome-xForm-field .modified),
+        &:has(.dome-xForm-label.modified) {
+          box-shadow: -4px 0px 4px var(--warning);
         }
     }
 
@@ -509,6 +519,7 @@
 .dome-xForm-text-field
 {
     font-size: 10pt ;
+    color: var(--text);
     width: 180px ;
     padding-top:    1px ;
     padding-bottom: 1px ;
@@ -630,6 +641,28 @@
 
 .dome-xOverlay-contents {
     z-index: 1;
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- TitleBar                                                           --- */
+/* -------------------------------------------------------------------------- */
+
+.dome-xTitleBar {
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px;
+
+  .dome-xBoxes-hbox {
+    max-width: 100%;
+    flex-wrap: wrap;
+  }
+}
+
+.dome-xFormTitle {
+  border-bottom: solid 2px var(--border-discrete);
+  background-color: var(--background);
+  margin-bottom: 5px;
 }
 
 /* -------------------------------------------------------------------------- */

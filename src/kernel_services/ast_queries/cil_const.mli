@@ -220,7 +220,7 @@ val mkCompInfo: bool ->      (* whether it is a struct or a union *)
   string -> (* name of the composite type; cannot be empty *)
   ?norig:string -> (* original name of the composite type, empty when anonymous *)
   (compinfo ->
-   (string * typ * int option * attributes * location) list option) ->
+   (string * typ * int option * exp option * attributes * location) list option) ->
   (* a function that when given a forward
      representation of the structure type constructs the type of
      the fields. The function can ignore this argument if not

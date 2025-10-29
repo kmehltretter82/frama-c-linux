@@ -135,6 +135,9 @@ and childrenSpecElem (vis: cabsVisitor) (se: spec_elem) : spec_elem =
   | SpecType ts ->
     let ts' = visitCabsTypeSpecifier vis ts in
     if ts' != ts then SpecType ts' else se
+  | SpecAlignas e ->
+    let e' = visitCabsExpression vis e in
+    if e' != e then SpecAlignas e' else se
 
 and visitCabsSpecifier (vis: cabsVisitor) (s: specifier) : specifier =
   doVisit vis vis#vspec childrenSpec s
@@ -415,14 +418,14 @@ and childrenExpression vis e =
     let dt' = visitCabsDeclType vis false dt in
     if s' != s || dt' != dt then
       { e with expr_node = TYPE_SIZEOF (s' ,dt') } else e
-  | EXPR_ALIGNOF (e1) ->
+  | EXPR_ALIGNOF (e1, i) ->
     let e1' = ve e1 in
-    if e1' != e1 then { e with expr_node = EXPR_ALIGNOF e1'} else e
-  | TYPE_ALIGNOF (s, dt) ->
+    if e1' != e1 then { e with expr_node = EXPR_ALIGNOF (e1', i)} else e
+  | TYPE_ALIGNOF (s, dt, i) ->
     let s' = visitCabsSpecifier vis s in
     let dt' = visitCabsDeclType vis false dt in
     if s' != s || dt' != dt then
-      { e with expr_node = TYPE_ALIGNOF (s' ,dt')}
+      { e with expr_node = TYPE_ALIGNOF (s' ,dt', i)}
     else e
   | INDEX (e1, e2) ->
     let e1' = ve e1 in

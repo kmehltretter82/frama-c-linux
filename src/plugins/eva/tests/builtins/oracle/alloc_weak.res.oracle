@@ -30,7 +30,11 @@
 [eva] alloc_weak.c:14: Call to builtin memcpy
 [eva] Recording results for copy
 [eva] Done for function copy
+[eva:alarm] alloc_weak.c:29: Warning: 
+  unaligned pointer creation. assert \aligned(p,alignof(int));
 [eva:alarm] alloc_weak.c:29: Warning: out of bounds write. assert \valid(p);
+[eva:alarm] alloc_weak.c:30: Warning: 
+  unaligned pointer creation. assert \aligned(p,alignof(int));
 [eva:alarm] alloc_weak.c:30: Warning: 
   accessing uninitialized left-value. assert \initialized(p);
 [eva] Recording results for main1
@@ -114,6 +118,7 @@
 [eva] Done for function convergence_issue
 [eva] Recording results for main
 [eva] Done for function main
+[scope:rm_asserts] removing 1 assertion(s)
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function convergence_issue:
   __fc_heap_status ∈ [--..--]
@@ -948,7 +953,7 @@
   __fc_heap_status ∈ [--..--]
   __fc_errno ∈ [--..--]
   t[0..1] ∈ {{ &__malloc_w_main1_l23[0] }}
-  p ∈ {{ &__malloc_w_main1_l23 + [0..124] }}
+  p ∈ {{ &__malloc_w_main1_l23 + [0..124],0%4 }}
   n ∈ {4}
   r ∈ [--..--]
   __malloc_w_main1_l23[0..31] ∈ [--..--] or UNINITIALIZED

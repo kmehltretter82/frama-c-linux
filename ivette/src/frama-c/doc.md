@@ -147,3 +147,33 @@ The list of projects is shown below, and these actions are available:
 * [icon-duplicate]: duplicate the project.
 * [icon-save]: save the project onto a save file.
 * [icon-trash]: delete the project; confirmation will be requested.
+
+## Frama-C Parameters {#framac-parameters}
+
+All frama-c parameters can be modified from Ivette via the _Edit_ -> _Parameters_
+menu or the _Ctrl+P_ shortcut.
+This opens a modal window listing all available Frama-C plug-ins and their
+parameters.
+
+[icon-warning] When closing the modal window, any local change that has not been
+applied to Frama-C is lost.
+
+[icon-warning] Applying the changes modifies the Frama-C settings but does not
+restart any analysis.
+
+The parameters modal window is divided into three columns:
+* 1: a list of available plugins
+* 2: a left form with parameters of the Frama-C kernel (Ctrl+click in the plug-in list to change)
+* 3: a right form: click in the plug-in list to change the selected plug-in
+
+In the list of plug-ins:
+* [led-warning] signals local changes which have not been applied yet (and will be lost if the window is closed).
+* [led-active] indicates parameters which have already been modified for this Frama-C session.
+
+In each plug-in form:
+* Orange titles or fields signal local modifications which have not been applied yet.
+* Blue titles or fields indicate parameters which have already been modified for this Frama-C session.
+
+Buttons:
+* [icon-reload]: reset field or form (without applying modification to Frama-C).
+* [icon-push]: apply local modifications of field or form to Frama-C.

@@ -182,6 +182,9 @@ val wkey_int_conversion: warn_category
 
 val wkey_merge_conversion: warn_category
 
+val wkey_alignof_bitfield: warn_category
+(** @since 32.0-Germanium *)
+
 val wkey_initializer_overrides: warn_category
 
 val wkey_cert_exp_46: warn_category
@@ -595,6 +598,13 @@ val normalization_parameters: unit -> Typed_parameter.t list
     changing one will reset the AST entirely.contents
 *)
 
+type iso_c = C11 | C17 | C23
+
+module CStd: Parameter_sig.S with type t = iso_c
+(** ISO C version to consider.
+    @since 32.0-Germanium
+*)
+
 module JsonCompilationDatabase: Parameter_sig.Filepath
 [@@ ocaml.deprecated "Use CompilationDb instead"]
 (** Deprecated; use "-compilation-db" instead *)
@@ -717,6 +727,11 @@ module InvalidBool: Parameter_sig.Bool
 
 module InvalidPointer: Parameter_sig.Bool
 (** Behavior of option "-warn-invalid-pointer" *)
+
+module UnalignedPointer: Parameter_sig.Bool
+(** Behavior of option "-warn-unaligned-pointer"
+    @since 32.0-Germanium
+*)
 
 module AbsoluteValidRange: Parameter_sig.String
 (** Behavior of option "-absolute-valid-range" *)

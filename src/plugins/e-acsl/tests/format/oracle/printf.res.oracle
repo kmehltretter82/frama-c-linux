@@ -78,21 +78,21 @@
   E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/sys/wait.h:71: Warning: 
   E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:685: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:739: Warning: 
   E-ACSL construct `terminates clause' is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:685: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:739: Warning: 
   E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:688: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:742: Warning: 
   E-ACSL construct `abnormal termination case in behavior'
   is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:671: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:725: Warning: 
   E-ACSL construct `terminates clause' is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:671: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:725: Warning: 
   E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:674: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:728: Warning: 
   E-ACSL construct `abnormal termination case in behavior'
   is not yet supported.
   Ignoring annotation.
@@ -141,3 +141,5 @@
   signed overflow. assert testno + 1 <= 2147483647;
 [eva:alarm] printf.c:548: Warning: 
   accessing uninitialized left-value. assert \initialized(&s2);
+[eva:alarm] printf.c:593: Warning: 
+  unaligned pointer creation. assert \aligned(pstr,alignof(int));

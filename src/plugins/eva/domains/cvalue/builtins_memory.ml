@@ -570,6 +570,9 @@ let () = register_builtin ~replace:"memset" "Frama_C_memset" frama_c_memset
 (*                  is_base_aligned, offset, split, ungarbled                 *)
 (* -------------------------------------------------------------------------- *)
 
+let is_aligned_by base alignment =
+  Z.is_zero (Z.erem (Z.of_int (Base.alignof base)) alignment)
+
 let frama_C_is_base_aligned _state = function
   | [_, x; _, y] ->
     let result =
@@ -577,7 +580,7 @@ let frama_C_is_base_aligned _state = function
       | Some si ->
         let aligned =
           Location_Bytes.for_all
-            (fun b _o -> List.for_all (Base.is_aligned_by b) si)
+            (fun b _o -> List.for_all (is_aligned_by b) si)
             x
         in
         if aligned then Cvalue.V.singleton_one else Cvalue.V.zero_or_one

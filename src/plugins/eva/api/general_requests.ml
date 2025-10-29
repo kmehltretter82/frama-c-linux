@@ -630,10 +630,12 @@ module AlarmCategory = struct
     let repr =
       let e = List.hd Cil_datatype.Exp.reprs in
       let lv = List.hd Cil_datatype.Lval.reprs in
+      let typ = List.hd Cil_datatype.Typ.reprs in
       function
       | Summary.Division_by_zero -> Alarms.Division_by_zero e
       | Memory_access -> Memory_access (lv, For_reading)
       | Index_out_of_bound-> Index_out_of_bound (e, None)
+      | Unaligned_pointer -> Unaligned_pointer (e, typ)
       | Invalid_shift -> Invalid_shift (e, None)
       | Overflow -> Overflow (Signed, e, Z.one, Lower_bound)
       | Uninitialized -> Uninitialized lv
@@ -657,6 +659,7 @@ module AlarmCategory = struct
     let division_by_zero = register Division_by_zero
     let memory_access = register Memory_access
     let index_out_of_bound = register Index_out_of_bound
+    let unaligned_pointer = register Unaligned_pointer
     let invalid_shift = register Invalid_shift
     let overflow = register Overflow
     let uninitialized = register Uninitialized
@@ -670,6 +673,7 @@ module AlarmCategory = struct
           | Summary.Division_by_zero -> division_by_zero
           | Memory_access -> memory_access
           | Index_out_of_bound -> index_out_of_bound
+          | Unaligned_pointer -> unaligned_pointer
           | Invalid_shift -> invalid_shift
           | Overflow -> overflow
           | Uninitialized -> uninitialized

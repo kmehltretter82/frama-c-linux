@@ -26,6 +26,9 @@ const D = new Debug('State');
 // --- State utilities
 // --------------------------------------------------------------------------
 
+/** Alias for React.useState returned */
+export type RState<A> = [A, React.Dispatch<React.SetStateAction<A>>]
+
 /** Alias to `[state,setState]` returned values */
 export type State<A> = [A, (newValue: A) => void];
 

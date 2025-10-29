@@ -68,19 +68,19 @@ let c_int ikind =
   | IChar -> if Machine.char_is_unsigned () then UInt8 else SInt8
   | ISChar -> SInt8
   | IUChar -> UInt8
-  | IInt -> make_c_int true (Machine.sizeof_int ())
-  | IUInt -> make_c_int false (Machine.sizeof_int ())
-  | IShort -> make_c_int true (Machine.sizeof_short ())
-  | IUShort -> make_c_int false (Machine.sizeof_short ())
-  | ILong -> make_c_int true (Machine.sizeof_long ())
-  | IULong -> make_c_int false (Machine.sizeof_long ())
-  | ILongLong -> make_c_int true (Machine.sizeof_longlong ())
-  | IULongLong -> make_c_int false (Machine.sizeof_longlong ())
+  | IInt -> make_c_int true (Machine.Sizeof.int ())
+  | IUInt -> make_c_int false (Machine.Sizeof.int ())
+  | IShort -> make_c_int true (Machine.Sizeof.short ())
+  | IUShort -> make_c_int false (Machine.Sizeof.short ())
+  | ILong -> make_c_int true (Machine.Sizeof.long ())
+  | IULong -> make_c_int false (Machine.Sizeof.long ())
+  | ILongLong -> make_c_int true (Machine.Sizeof.longlong ())
+  | IULongLong -> make_c_int false (Machine.Sizeof.longlong ())
 
 let c_bool () = c_int IBool
 let c_char () = c_int IChar
 
-let p_bytes () = Machine.sizeof_ptr ()
+let p_bytes () = Machine.Sizeof.ptr ()
 let p_bits () = 8 * p_bytes ()
 
 let c_ptr () = make_c_int false (p_bytes ())
@@ -110,9 +110,9 @@ let make_c_float = function
 
 let c_float fkind =
   match fkind with
-  | FFloat -> make_c_float (Machine.sizeof_float ())
-  | FDouble -> make_c_float (Machine.sizeof_double ())
-  | FLongDouble -> make_c_float (Machine.sizeof_longdouble ())
+  | FFloat -> make_c_float (Machine.Sizeof.float ())
+  | FDouble -> make_c_float (Machine.Sizeof.double ())
+  | FLongDouble -> make_c_float (Machine.Sizeof.longdouble ())
 
 let equal_float f1 f2 = f_bits f1 = f_bits f2
 

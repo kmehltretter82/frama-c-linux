@@ -358,7 +358,39 @@ int __gen_e_acsl_pthread_create(pthread_t * restrict thread,
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,"arg",arg);
     if (arg == (void *)0) __gen_e_acsl_or_2 = 1;
     else {
+      int __gen_e_acsl_aligned;
       int __gen_e_acsl_valid_2;
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
+        {.values = (void *)0};
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
+        {.values = (void *)0};
+      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_6,
+                                     "alignof(char)",0,_Alignof(char));
+      __e_acsl_assert_copy_values(& __gen_e_acsl_assert_data_5,
+                                  & __gen_e_acsl_assert_data_6);
+      /*@ assert E_ACSL: alignof(char) != 0; */
+      {
+        __gen_e_acsl_assert_data_6.blocking = 1;
+        __gen_e_acsl_assert_data_6.kind = "RTE";
+        __gen_e_acsl_assert_data_6.pred_txt = "alignof(char) != 0";
+        __gen_e_acsl_assert_data_6.file = "FRAMAC_SHARE/libc/pthread.h";
+        __gen_e_acsl_assert_data_6.fct = "pthread_create";
+        __gen_e_acsl_assert_data_6.line = 350;
+        __gen_e_acsl_assert_data_6.name = "denominator not zero";
+        __e_acsl_assert(_Alignof(char) != 0UL,& __gen_e_acsl_assert_data_6);
+        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
+      }
+      __gen_e_acsl_aligned = __e_acsl_aligned(arg,_Alignof(char));
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_5,"arg",arg);
+      __gen_e_acsl_assert_data_5.blocking = 1;
+      __gen_e_acsl_assert_data_5.kind = "RTE";
+      __gen_e_acsl_assert_data_5.pred_txt = "\\aligned(arg,alignof(char))";
+      __gen_e_acsl_assert_data_5.file = "FRAMAC_SHARE/libc/pthread.h";
+      __gen_e_acsl_assert_data_5.fct = "pthread_create";
+      __gen_e_acsl_assert_data_5.line = 350;
+      __gen_e_acsl_assert_data_5.name = "pointer_alignment";
+      __e_acsl_assert(__gen_e_acsl_aligned,& __gen_e_acsl_assert_data_5);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
       __gen_e_acsl_valid_2 = __e_acsl_valid(arg,sizeof(char),arg,
                                             (void *)(& arg));
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,"arg",arg);
@@ -385,19 +417,19 @@ int __gen_e_acsl_pthread_create(pthread_t * restrict thread,
     int __gen_e_acsl_or_3;
     int __gen_e_acsl_or_4;
     int __gen_e_acsl_or_5;
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_7 =
       {.values = (void *)0};
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,"\\result",0,
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_7,"\\result",0,
                                  __retres);
     if (__retres == 0) {
       int __gen_e_acsl_initialized;
       __gen_e_acsl_initialized = __e_acsl_initialized((void *)__gen_e_acsl_at,
                                                       sizeof(pthread_t));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_5,
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_7,
                                    "\\old(thread)",(void *)__gen_e_acsl_at);
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_5,
+      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_7,
                                      "sizeof(pthread_t)",0,sizeof(pthread_t));
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_7,
                                    "\\initialized(\\old(thread))",0,
                                    __gen_e_acsl_initialized);
       __gen_e_acsl_and = __gen_e_acsl_initialized;
@@ -405,31 +437,31 @@ int __gen_e_acsl_pthread_create(pthread_t * restrict thread,
     else __gen_e_acsl_and = 0;
     if (__gen_e_acsl_and) __gen_e_acsl_or_3 = 1;
     else {
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,"\\result",0,
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_7,"\\result",0,
                                    __retres);
       __gen_e_acsl_or_3 = __retres == 11;
     }
     if (__gen_e_acsl_or_3) __gen_e_acsl_or_4 = 1;
     else {
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,"\\result",0,
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_7,"\\result",0,
                                    __retres);
       __gen_e_acsl_or_4 = __retres == 22;
     }
     if (__gen_e_acsl_or_4) __gen_e_acsl_or_5 = 1;
     else {
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,"\\result",0,
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_7,"\\result",0,
                                    __retres);
       __gen_e_acsl_or_5 = __retres == 1;
     }
-    __gen_e_acsl_assert_data_5.blocking = 1;
-    __gen_e_acsl_assert_data_5.kind = "Postcondition";
-    __gen_e_acsl_assert_data_5.pred_txt = "(\\result == 0 && \\initialized(\\old(thread))) || \\result == 11 ||\n\\result == 22 || \\result == 1";
-    __gen_e_acsl_assert_data_5.file = "FRAMAC_SHARE/libc/pthread.h";
-    __gen_e_acsl_assert_data_5.fct = "pthread_create";
-    __gen_e_acsl_assert_data_5.line = 354;
-    __gen_e_acsl_assert_data_5.name = "initialization/success_or_error";
-    __e_acsl_assert(__gen_e_acsl_or_5,& __gen_e_acsl_assert_data_5);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
+    __gen_e_acsl_assert_data_7.blocking = 1;
+    __gen_e_acsl_assert_data_7.kind = "Postcondition";
+    __gen_e_acsl_assert_data_7.pred_txt = "(\\result == 0 && \\initialized(\\old(thread))) || \\result == 11 ||\n\\result == 22 || \\result == 1";
+    __gen_e_acsl_assert_data_7.file = "FRAMAC_SHARE/libc/pthread.h";
+    __gen_e_acsl_assert_data_7.fct = "pthread_create";
+    __gen_e_acsl_assert_data_7.line = 354;
+    __gen_e_acsl_assert_data_7.name = "initialization/success_or_error";
+    __e_acsl_assert(__gen_e_acsl_or_5,& __gen_e_acsl_assert_data_7);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
     __e_acsl_delete_block((void *)(& arg));
     __e_acsl_delete_block((void *)(& start_routine));
     __e_acsl_delete_block((void *)(& attr));

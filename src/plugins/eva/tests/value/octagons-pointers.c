@@ -1,5 +1,5 @@
 /* run.config*
-   STDOPT: +"-deterministic -eva-domains equality,octagon -eva-octagon-through-calls -eva-msg-key=d-octagon,-d-cvalue -eva-oracle-depth 10"
+   STDOPT: +"-deterministic -no-warn-unaligned-pointer -eva-domains equality,octagon -eva-octagon-through-calls -eva-msg-key=d-octagon,-d-cvalue -eva-oracle-depth 10"
 */
 
 #include <stdint.h>

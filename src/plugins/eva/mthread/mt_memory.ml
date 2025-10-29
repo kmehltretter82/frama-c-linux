@@ -105,7 +105,7 @@ let location_of_pointer (p : Types.pointer) =
 
 let read_int_pointer p state =
   let p = location_of_pointer p in
-  let p = location_with_size p (Machine.sizeof_int ()) in
+  let p = location_with_size p (Machine.Sizeof.int ()) in
   Cvalue.Model.find state p
 
 (* TODO: restore warnings *)
@@ -118,7 +118,7 @@ let read_slice ~p ~sbytes state =
   | `Value offs -> offs
 
 let write_int_pointer p i state =
-  let sbytes = Machine.sizeof_int ()
+  let sbytes = Machine.Sizeof.int ()
   and value = Location_Bytes.inject Base.null (Ival.of_int i) in
   let pointer = location_of_pointer p in
   let p = location_with_size pointer sbytes in
@@ -127,7 +127,7 @@ let write_int_pointer p i state =
   Cvalue.Model.add_binding ~exact:true state p value
 
 let replace_value_at_int_pointer p ~before ~after state =
-  let sbytes = Machine.sizeof_int () in
+  let sbytes = Machine.Sizeof.int () in
   let value_after = Location_Bytes.inject Base.null (Ival.of_int after) in
   let value_before = Location_Bytes.inject Base.null (Ival.of_int before) in
   let pointer = location_of_pointer p in

@@ -1,3 +1,7 @@
+/* run.config*
+   STDOPT: +"-no-warn-unaligned-pointer"
+*/
+
 int f (int a, int b){
   int w;
   struct t1 { int x; int y;} v1,v2;
@@ -31,7 +35,7 @@ int less_simple (int a, int b){
   return v1.x;
 }
 
-  int w; 
+  int w;
 struct t1 { int x; int y;} v1;
  struct t1 v2;
   struct t2 { int x; int y;} v3;
@@ -46,10 +50,10 @@ int main (int a, int b){
   v1 = v2;
   v1.x = a+b;
   w =  v1.x;
-    if (a) 
+    if (a)
 {
-   
-  
+
+
     v2.x = a;
     /*  v3.x = b;
     w = w + v2.x + v3.x;*/

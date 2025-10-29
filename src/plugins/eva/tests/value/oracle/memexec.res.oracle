@@ -44,6 +44,7 @@
   Called from memexec.c:192.
 [eva] computing for function fbug <- bug <- main.
   Called from memexec.c:40.
+[eva] memexec.c:33: assertion 'rte,pointer_alignment' got status valid.
 [eva:alarm] memexec.c:33: Warning: 
   assertion 'rte,mem_access' got status invalid (stopping propagation).
 [eva] Recording results for fbug
@@ -195,6 +196,7 @@
   locals {x} escaping the scope of f9 through p
 [eva] Recording results for main
 [eva] Done for function main
+[eva] memexec.c:33: assertion 'rte,pointer_alignment' got final status valid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function f11:
   x1 ∈ {1}

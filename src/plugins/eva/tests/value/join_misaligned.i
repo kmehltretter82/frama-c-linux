@@ -1,5 +1,5 @@
 /* run.config*
-   STDOPT: #"-eva-warn-key garbled-mix -big-ints-hex 257"
+   STDOPT: #"-no-warn-unaligned-pointer -eva-warn-key garbled-mix -big-ints-hex 257"
 */
 
 int t[5]={0};

@@ -17,7 +17,9 @@ double g4(typetab *t)
 double h4(double t[2])
 {
   double __retres;
+  /*@ assert rte: pointer_alignment: \aligned(t + 0,alignof(double)); */
   /*@ assert rte: mem_access: \valid_read(t + 0); */
+  /*@ assert rte: pointer_alignment: \aligned(t + 1,alignof(double)); */
   /*@ assert rte: mem_access: \valid_read(t + 1); */
   __retres = *(t + 0) + *(t + 1);
   return __retres;
@@ -26,7 +28,9 @@ double h4(double t[2])
 double i4(double *t)
 {
   double __retres;
+  /*@ assert rte: pointer_alignment: \aligned(t + 0,alignof(double)); */
   /*@ assert rte: mem_access: \valid_read(t + 0); */
+  /*@ assert rte: pointer_alignment: \aligned(t + 1,alignof(double)); */
   /*@ assert rte: mem_access: \valid_read(t + 1); */
   __retres = *(t + 0) + *(t + 1);
   return __retres;

@@ -9,7 +9,7 @@
 
 int test1 () {
   unsigned long long u, w, *q ;
-  u = (unsigned long long) -1LL ;
+  u = (unsigned long long) -8LL ;
   q = (unsigned long long *) u;
   w = (unsigned long long) q;
   int c1 = (sizeof (q) == sizeof (u)) ;

@@ -24,6 +24,8 @@
   for assigns clause __fc_opendir[0 .. 16 - 1].
 [eva] Done for function fdopendir
 [eva:alarm] dirent_h.c:19: Warning: 
+  unaligned pointer creation. assert \aligned(d,alignof(DIR));
+[eva:alarm] dirent_h.c:19: Warning: 
   pointer comparison. assert \pointer_comparable((void *)d, (void *)0);
 [eva] computing for function fprintf_va_1 <- main.
   Called from dirent_h.c:20.
@@ -34,6 +36,8 @@
   Called from dirent_h.c:21.
 [eva] using specification for function exit
 [eva] Done for function exit
+[eva:alarm] dirent_h.c:23: Warning: 
+  unaligned pointer creation. assert \aligned(d,alignof(DIR));
 [eva] computing for function readdir <- main.
   Called from dirent_h.c:23.
 [eva] using specification for function readdir
@@ -53,6 +57,7 @@
     dirent_h.c:19: assigns clause on addresses
       (read in 2 statements, propagated through 2 statements)
       garbled mix of &{__fc_opendir}
+[scope:rm_asserts] removing 1 assertion(s)
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   __fc_errno ∈ [--..--]

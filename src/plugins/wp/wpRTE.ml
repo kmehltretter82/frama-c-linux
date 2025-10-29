@@ -83,7 +83,9 @@ let generate model kf =
   let update = ref false in
   let cint = WpContext.on_context (model,WpContext.Kf kf) Cint.current () in
   List.iter (configure ~update ~generate:true kf cint) generator ;
-  if !update then RteGen.Visit.annotate kf
+  if !update then
+    let flags = { (RteGen.Flags.default ()) with pointer_alignment = false } in
+    RteGen.Visit.annotate ~flags kf
 
 let generate_all model =
   Wp_parameters.iter_kf (generate model)
