@@ -166,7 +166,7 @@ end
 
 
 (** Analysis of a function body by iteration over its interpreted automata,
-    built by the functor [Iterator.Computer]. *)
+    built by the functor [Iterator.Make]. *)
 module type Iterator = sig
   type state
 
