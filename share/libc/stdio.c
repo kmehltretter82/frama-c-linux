@@ -526,7 +526,9 @@ int vsscanf(const char * restrict str, const char * restrict format, va_list arg
 }
 
 char __fc_tmpnam[L_tmpnam];
+#ifdef L_ctermid
 char __fc_ctermid[L_ctermid];
+#endif
 char __fc_cuserid[9];
 
 __POP_FC_STDLIB

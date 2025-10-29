@@ -37,10 +37,12 @@ __PUSH_FC_STDLIB
 #endif
 #define L_tmpnam __FC_L_tmpnam
 
+#ifdef _POSIX_C_SOURCE
 #ifndef __FC_L_ctermid
-#error machdep should have defined __FC_L_ctermid!
+#error a machdep with defined _POSIX_C_SOURCE should also define __FC_L_ctermid!
 #endif
 #define L_ctermid __FC_L_ctermid
+#endif
 
 #include "__fc_define_seek_macros.h"
 
@@ -690,6 +692,7 @@ extern int asprintf(char **strp, const char *fmt, ...);
 extern int vasprintf(char **restrict strp, const char *restrict fmt,
                      va_list ap);
 
+#ifdef L_ctermid
 __FC_EXTERN char __fc_ctermid[L_ctermid];
 
 /*@
@@ -697,6 +700,7 @@ __FC_EXTERN char __fc_ctermid[L_ctermid];
   assigns __fc_ctermid[0..] \from __fc_ctermid[0..];
 */
 extern char *ctermid(char *s);
+#endif
 
 // Note: since L_cuserid has been removed from POSIX since Issue 6,
 // we will not add it to our machdep.
