@@ -13,16 +13,10 @@ Options taking a string as argument should preferably be written
 
 ***** LIST OF AVAILABLE OPTIONS:
 
--wp-counter-examples  Ask for counter examples when supported by provers
-                    (opposite option is -wp-no-counter-examples)
--wp-probes          Activate user-defines probes (@probe) (default: yes) (set
-                    by default, opposite option is -wp-no-probes)
 -wp-session <dir>   set the plug-in session directory to <dir>
 -wp-share <dir>     set the plug-in share directory to <dir> (may be used if
                     the plug-in is not installed at the same place as
                     Frama-C)
--wp-tactic <id,...>  Describe tactic. Use '?' for listing tactic names.
-                    (preferably use -wp-tactic="id,...")
 
 *** COMPUTATION STRATEGIES
 
@@ -167,6 +161,8 @@ Options taking a string as argument should preferably be written
                     <k1>,...,<kn>. Use -wp-msg-key help to get a list of
                     available categories, and * to enable all categories
                     (preferably use -wp-msg-key="k1[,...,kn]")
+-wp-tactic <id,...>  Describe tactic. Use '?' for listing tactic names.
+                    (preferably use -wp-tactic="id,...")
 -wp-verbose <n>     level of verbosity for plug-in WP (default to 1)
 -wp-warn-key <k1[=s1][,...,kn[=sn]]>  set warning status for category <k1> to
                     <s1>,...,<kn> to <sn>. Use -wp-warn-key help to get a
@@ -181,6 +177,8 @@ Options taking a string as argument should preferably be written
 -wp-check-memory-model  Insert memory model hypotheses in function contracts
                     and check them on call. (experimental) (opposite option
                     is -wp-no-check-memory-model)
+-wp-counter-examples  Ask for counter examples when supported by provers
+                    (opposite option is -wp-no-counter-examples)
 -wp-deprecated-report-json <file.json>  Output report in json format into
                     given file.
                     If the file already exists, it is used for
@@ -197,6 +195,8 @@ Options taking a string as argument should preferably be written
                     Defaults to some temporary directory.
 -wp-print           Pretty-prints proof obligations on standard output.
                     (opposite option is -wp-no-print)
+-wp-probes          Activate user-defines probes (@probe) (default: yes) (set
+                    by default, opposite option is -wp-no-probes)
 -wp-report <report,...>  Report specification file(s) (preferably use
                     -wp-report="report,...")
 -wp-report-basename <file>  Basename of generated reports (default
@@ -318,13 +318,6 @@ Options taking a string as argument should preferably be written
                     (default: 0.5). (preferably use -wp-time-margin="n")
 -wp-timeout <t>     Set the timeout (in seconds) for provers (default: 2).
 
-*** PROVER OPTIONS
-
--wp-why3-extra-config <file,...>  Additional config files for Why3
-                    (preferably use -wp-why3-extra-config="file,...")
--wp-why3-opt <option,...>  Additional options for Why3 (preferably use
-                    -wp-why3-opt="option,...")
-
 *** QED SIMPLIFICATIONS
 
 -wp-bound-forall-unfolding <n>  Instantiate up to <n> forall-integers
@@ -365,3 +358,10 @@ Options taking a string as argument should preferably be written
                     default, opposite option is -wp-no-simplify-land-mask)
 -wp-simplify-type   Remove all `Type` constraints. (opposite option is
                     -wp-no-simplify-type)
+
+*** WHY3 OPTIONS
+
+-wp-why3-extra-config <file,...>  Additional config files for Why3
+                    (preferably use -wp-why3-extra-config="file,...")
+-wp-why3-opt <option,...>  Additional options for Why3 (preferably use
+                    -wp-why3-opt="option,...")
