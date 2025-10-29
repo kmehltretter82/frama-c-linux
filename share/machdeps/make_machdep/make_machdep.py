@@ -424,7 +424,7 @@ machdep["compiler"] = args.compiler
 machdep["cpp_arch_flags"] = args.cpp_arch_flags
 machdep["version"] = version
 
-machdep["custom_defs"] = list()
+machdep["custom_defs"] = dict()
 
 # Extract predefined macros; we're assuming a gcc-like compiler here.
 # Leave custom_defs empty if this fails.
