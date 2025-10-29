@@ -500,7 +500,7 @@ and fieldinfo = {
   mutable falignas: exp option;
   (** _Alignas specification, if specified.
       Use {!Cil.bytesAlignOfField} to get the actual alignment.
-      @since Frama-C+dev
+      @since 32.0-Germanium
   *)
 
   mutable fattr: attributes;
@@ -635,7 +635,7 @@ and varinfo = {
   mutable valignas: exp option;
   (** The alignment specification, if some is specified.
       Use {!Cil.bytesAlignOfVarinfo} to get the actual alignment.
-      @since Frama-C+dev
+      @since 32.0-Germanium
   *)
 
   mutable vglob: bool;

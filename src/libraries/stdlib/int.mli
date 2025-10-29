@@ -7,7 +7,7 @@
 (**************************************************************************)
 
 (** Extension of OCaml's {!Stdlib.Int} module.
-    @since Frama-C+dev
+    @since 32.0-Germanium
 *)
 
 include module type of Stdlib.Int

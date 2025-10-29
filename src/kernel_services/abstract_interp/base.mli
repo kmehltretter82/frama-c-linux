@@ -164,7 +164,7 @@ val bits_sizeof : t -> Int_Base.t
     represented by base [b] is known to be a multiple of [alignof b]. Returns 1
     if the alignment is unknown (for instance for void and function types on
     some machdep). [alignof Null] is zero.
-    @since Frama-C+dev *)
+    @since 32.0-Germanium *)
 val alignof : t -> int
 
 (** Access kind: read/write of k bits, or no access:

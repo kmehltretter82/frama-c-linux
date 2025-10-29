@@ -119,7 +119,7 @@ type warn_status =
 
 (**
    @since Beryllium-20090601-beta1
-   @since Frama-C+dev
+   @since 32.0-Germanium
    All formatters now interpret semantic tags for ANSI styling, as
    defined in {!Ansi_escape} module.
    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
@@ -481,13 +481,13 @@ val set_formatter : ?isatty:bool -> Format.formatter -> unit
 (** Set the formatter for log outputs. This formatter is {!Format.std_formatter}
     by default and can be changed if the log output must be redirected.
     @since Beryllium-20090901
-    @before Frama-C+dev was [set_output] and took formatter output functions as
-    arguments
+    @before 32.0-Germanium was [set_output] and took formatter output functions
+    as arguments
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 val reset_stdout : isatty:bool -> unit -> unit
 (** Reset the log formatter to [Format.std_formatter].
-    @since Frama-C+dev *)
+    @since 32.0-Germanium *)
 
 val print_on_output : (Format.formatter -> unit) -> unit
 (** Direct printing on output.

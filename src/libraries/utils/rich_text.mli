@@ -18,7 +18,7 @@
     semantic tags to html markup for instance). See {!Format} for more details
     about semantic tags.
 
-    @before Frama-C+dev the buffer functions were used to build plain strings
+    @before 32.0-Germanium the buffer functions were used to build plain strings
     instead of rich text *)
 
 type t (** Text with tags *)

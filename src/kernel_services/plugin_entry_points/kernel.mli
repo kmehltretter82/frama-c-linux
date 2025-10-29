@@ -183,7 +183,7 @@ val wkey_int_conversion: warn_category
 val wkey_merge_conversion: warn_category
 
 val wkey_alignof_bitfield: warn_category
-(** @since Frama-C+dev *)
+(** @since 32.0-Germanium *)
 
 val wkey_initializer_overrides: warn_category
 
@@ -602,7 +602,7 @@ type iso_c = C11 | C17 | C23
 
 module CStd: Parameter_sig.S with type t = iso_c
 (** ISO C version to consider.
-    @since Frama-C+dev
+    @since 32.0-Germanium
 *)
 
 module JsonCompilationDatabase: Parameter_sig.Filepath
@@ -730,7 +730,7 @@ module InvalidPointer: Parameter_sig.Bool
 
 module UnalignedPointer: Parameter_sig.Bool
 (** Behavior of option "-warn-unaligned-pointer"
-    @since Frama-C+dev
+    @since 32.0-Germanium
 *)
 
 module AbsoluteValidRange: Parameter_sig.String

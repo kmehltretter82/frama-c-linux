@@ -1909,7 +1909,7 @@ val bytesAlignOf: typ -> int
     - its _Alignas specifier, or if unspecified,
     - its type.
       @raise {!SizeOfError} when it cannot compute the alignment.
-      @since Frama-C+dev
+      @since 32.0-Germanium
 *)
 val bytesAlignOfVarinfo: varinfo -> int
 
@@ -1917,7 +1917,7 @@ val bytesAlignOfVarinfo: varinfo -> int
     - its _Alignas specifier, or if unspecified,
     - its type.
       @raise {!SizeOfError} when it cannot compute the alignment.
-      @since Frama-C+dev
+      @since 32.0-Germanium
 *)
 val bytesAlignOfField: fieldinfo -> int
 

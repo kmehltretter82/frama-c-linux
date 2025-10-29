@@ -50,7 +50,7 @@ val time_t: unit -> string
 (** {2 Types}                                                            *)
 (* ***********************************************************************)
 
-(** @since Frama-C+dev *)
+(** @since 32.0-Germanium *)
 module type SizeofInfo = sig
   val short: unit -> int
   val int: unit -> int
@@ -68,8 +68,8 @@ end
 (** {2 [sizeof] getters}                                                 *)
 (* ***********************************************************************)
 
-(** @since Frama-C+dev
-    @before Frama-C+dev These functions were at top-level and named sizeof_<type>
+(** @since 32.0-Germanium
+    @before 32.0-Germanium These functions were at top-level and named sizeof_<type>
 *)
 module Sizeof : SizeofInfo
 
@@ -77,7 +77,7 @@ module Sizeof : SizeofInfo
 (** {2 [_Alignof] and GCC [__alignof__] getters}                         *)
 (* ***********************************************************************)
 
-(** @since Frama-C+dev *)
+(** @since 32.0-Germanium *)
 module type AlignofInfo = sig
   include SizeofInfo
   val aligned: unit -> int (** might be -1 if unsupported in current machdep *)
@@ -90,12 +90,12 @@ module type AlignofInfo = sig
   *)
 end
 
-(** @since Frama-C+dev
-    @before Frama-C+dev These functions were at top-level and named alignof_<type>
+(** @since 32.0-Germanium
+    @before 32.0-Germanium These functions were at top-level and named alignof_<type>
 *)
 module Alignof : AlignofInfo
 
-(** @since Frama-C+dev *)
+(** @since 32.0-Germanium *)
 module GCCAlignof : AlignofInfo
 
 (* ***********************************************************************)
@@ -168,7 +168,7 @@ val insert_implicit_casts: unit -> bool
 
 val max_extended_alignment: unit -> int
 (** -1 if the platform does not support extended alignments
-    @since Frama-C+dev
+    @since 32.0-Germanium
 *)
 
 (* ***********************************************************************)

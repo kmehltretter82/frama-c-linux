@@ -35,7 +35,7 @@
     the [enable] or [enable_on] functions below.
 
     See {!Format.stag} for details about semantic tags.
-    @since Frama-C+dev *)
+    @since 32.0-Germanium *)
 
 (** [is_supported ()] returns whether the current terminal supports ansi
     escape sequence, i.e. if it exports a [TERM] environnement
