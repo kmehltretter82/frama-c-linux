@@ -191,7 +191,7 @@ module Make () =
 struct
   open TopBottom.Operators
 
-  module A = (val Analysis.current_analyzer ())
+  module A = (val Engine.current_analyzer ())
 
   module EvalTypes =
   struct

@@ -75,7 +75,7 @@ let clear_caches () =
   Assigns.Memory.clear_caches ()
 
 module type S = sig
-  module Analysis : Analysis.Engine
+  module Analysis : Engine_sig.S_with_results
 
   type ('env, 'expr, 'v) evaluation_functions = {
     eval_and_warn: 'env -> 'expr -> 'v * bool (* alarm *) * bool (* red *);
@@ -122,7 +122,7 @@ module type S = sig
 end
 
 
-module Make (X: Analysis.Engine) = struct
+module Make (X: Engine_sig.S_with_results) = struct
 
   module Analysis = X
 

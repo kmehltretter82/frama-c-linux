@@ -7,7 +7,7 @@
 (**************************************************************************)
 
 let concurrent_writes shared_bases =
-  let module Analyzer = (val Analysis.current_analyzer ()) in
+  let module Analyzer = (val Engine.current_analyzer ()) in
   match Analyzer.Dom.get Mt_domain.Domain.key with
   (* Domain disabled, no information about writes *)
   | None -> Position.Local.Set.empty
@@ -51,7 +51,7 @@ let shared_bases analysis_state =
   | Set zones ->  zones
 
 let add_last_analysis analysis_state =
-  let module Analyzer = (val Analysis.current_analyzer ()) in
+  let module Analyzer = (val Engine.current_analyzer ()) in
   let bases = shared_bases analysis_state in
   let writes = concurrent_writes bases in
   let thread = analysis_state.curr_thread.th_eva_thread in
