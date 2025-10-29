@@ -739,14 +739,6 @@ module Detect = Action
     end)
 let () = on_reset Detect.clear
 
-module Tactics = String_list
-    (struct
-      let option_name = "-wp-tactic"
-      let arg_name = "id,..."
-      let help = "Describe tactic. Use '?' for listing tactic names."
-    end)
-let () = on_reset Tactics.clear
-
 let () = Parameter_customize.set_group wp_prover
 module Library =
   Filepath_list
@@ -885,7 +877,7 @@ module ProofTrace =
 (* ---  Prover Options                                                  --- *)
 (* ------------------------------------------------------------------------ *)
 
-let wp_prover_options = add_group "Prover Options"
+let wp_prover_options = add_group "Why3 Options"
 
 let () = Parameter_customize.set_group wp_prover
 module Auto = String_list
@@ -1068,6 +1060,7 @@ module OutputDir =
                 Defaults to some temporary directory."
   end)
 
+let () = Parameter_customize.set_group wp_po
 module Probes =
   True
     (struct
@@ -1075,6 +1068,7 @@ module Probes =
       let help = "Activate user-defines probes (@probe) (default: yes)"
     end)
 
+let () = Parameter_customize.set_group wp_po
 module CounterExamples =
   False
     (struct
@@ -1199,6 +1193,21 @@ let print_generated ?header file =
             Format.pp_print_string fmt s;
             Format.pp_print_newline fmt ())
     end
+
+(* -------------------------------------------------------------------------- *)
+(* --- Output Messages                                                    --- *)
+(* -------------------------------------------------------------------------- *)
+
+
+let () = Parameter_customize.set_group messages
+module Tactics = String_list
+    (struct
+      let option_name = "-wp-tactic"
+      let arg_name = "id,..."
+      let help = "Describe tactic. Use '?' for listing tactic names."
+    end)
+let () = on_reset Tactics.clear
+
 
 (* -------------------------------------------------------------------------- *)
 (* --- Debugging                                                          --- *)
