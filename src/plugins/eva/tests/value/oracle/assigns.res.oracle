@@ -60,6 +60,9 @@
 [eva:alarm] assigns.i:52: Warning: 
   pointer downcast. assert (unsigned int)(&t3) ≤ 2147483647;
 [eva:alarm] assigns.i:52: Warning: 
+  unaligned pointer creation.
+  assert \aligned((void *)((int)(2 * (int)(&t3))),alignof(int));
+[eva:alarm] assigns.i:52: Warning: 
   signed overflow. assert -2147483648 ≤ 2 * (int)(&t3);
 [eva:alarm] assigns.i:52: Warning: 
   signed overflow. assert 2 * (int)(&t3) ≤ 2147483647;
@@ -69,6 +72,8 @@
   Called from assigns.i:52.
 [eva] using specification for function h
 [eva] Done for function h
+[eva:alarm] assigns.i:54: Warning: 
+  unaligned pointer creation. assert \aligned(&T[9],alignof(int));
 [eva] computing for function j <- main1 <- main.
   Called from assigns.i:54.
 [eva] using specification for function j
@@ -137,6 +142,8 @@
   no 'assigns \result \from ...' clause specified for function ff2_bis
 [eva] Done for function ff2_bis
 [eva:alarm] assigns.i:84: Warning: 
+  unaligned pointer creation. assert \aligned(p,alignof(int));
+[eva:alarm] assigns.i:84: Warning: 
   pointer comparison. assert \pointer_comparable((void *)p, (void *)(&x));
 [eva] Recording results for main2
 [eva] Done for function main2
@@ -180,7 +187,7 @@
   y2 ∈ [--..--]
   y3 ∈ [--..--]
   l ∈ [--..--]
-  p ∈ [--..--]
+  p ∈ [0..4294967292],0%4
   q ∈ {0}
   __retres ∈ {1}
 [eva:final-states] Values at end of function main4:
@@ -944,9 +951,14 @@ void main1(void)
   /*@ assert Eva: signed_overflow: 2 * (int)(&T) ≤ 2147483647; */
   g(2 * (int)(& T));
   /*@ assert Eva: pointer_downcast: (unsigned int)(&t3) ≤ 2147483647; */
+  /*@ assert
+        Eva: pointer_alignment:
+          \aligned((void *)((int)(2 * (int)(&t3))),alignof(int));
+  */
   /*@ assert Eva: signed_overflow: -2147483648 ≤ 2 * (int)(&t3); */
   /*@ assert Eva: signed_overflow: 2 * (int)(&t3) ≤ 2147483647; */
   h((int *)(2 * (int)(& t3)));
+  /*@ assert Eva: pointer_alignment: \aligned(&T[9],alignof(int)); */
   j((int *)(& T[9]));
   assigns_post(18);
   return;
@@ -985,6 +997,7 @@ int main2(void)
   ff5();
   int *p = ff2();
   int *q = ff2_bis();
+  /*@ assert Eva: pointer_alignment: \aligned(p,alignof(int)); */
   /*@ assert
         Eva: ptr_comparison: \pointer_comparable((void *)p, (void *)(&x));
   */

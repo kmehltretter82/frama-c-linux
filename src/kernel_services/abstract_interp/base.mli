@@ -76,10 +76,6 @@ module Validity: Datatype.S with type t = validity
     a leading ampersand if it is a variable *)
 val pretty_addr : Format.formatter -> t -> unit
 
-val typeof : t -> Cil_types.typ option
-(** Type of the memory block that starts from the given base. Useful to give to
-    the function {!Bit_utils.pretty_bits}, typically. *)
-
 
 (** {2 Validity} *)
 
@@ -155,9 +151,21 @@ val max_valid_absolute_address: unit -> Int.t
 (** Bounds for option absolute-valid-range *)
 
 
-(** {2 Size of a base} *)
+(** {2 Type, size and alignment of a base} *)
 
+(** Type of the memory block that starts from the given base. Useful to give to
+    the function {!Bit_utils.pretty_bits}, typically. *)
+val typeof : t -> Cil_types.typ option
+
+(** Size in bits of the base. *)
 val bits_sizeof : t -> Int_Base.t
+
+(** Minimum alignment (in bytes) of the base: the address of a variable
+    represented by base [b] is known to be a multiple of [alignof b]. Returns 1
+    if the alignment is unknown (for instance for void and function types on
+    some machdep). [alignof Null] is zero.
+    @since Frama-C+dev *)
+val alignof : t -> int
 
 (** Access kind: read/write of k bits, or no access:
     - Object_pointer: the pointer must point into or just beyond the base ("one
@@ -191,7 +199,6 @@ val is_weak : t -> bool
     Only possible for {!Allocated} bases. *)
 
 val id : t -> int
-val is_aligned_by : t -> Int.t -> bool
 
 
 (** {2 Registering bases}

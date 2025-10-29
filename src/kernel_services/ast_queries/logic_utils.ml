@@ -553,8 +553,18 @@ let rec expr_to_term ?(coerce=false) e =
       end
     | SizeOf t -> TSizeOf t, ctyp
     | SizeOfE e -> TSizeOf (Cil.typeOf e), ctyp
-    | AlignOf typ -> TAlignOf typ, ctyp
-    | AlignOfE e -> TAlignOf (Cil.typeOf e), ctyp
+    | AlignOf (typ, `Standard) -> TAlignOf typ, ctyp
+    | AlignOfE (e, `Standard) -> TAlignOf (Cil.typeOf e), ctyp
+    | AlignOf (_, `GCC) ->
+      begin match Cil.constFoldToInt e with
+        | Some value -> TConst (Integer (value, None)), Linteger
+        | None -> Kernel.fatal ""
+      end
+    | AlignOfE (_, `GCC) ->
+      begin match Cil.constFoldToInt e with
+        | Some value -> TConst (Integer (value, None)), Linteger
+        | None -> Kernel.fatal ""
+      end
     | Lval lv -> TLval (lval_to_term_lval lv), ctyp
     | CastE (ty,e) ->
       let coerce = Ast_types.is_integral (Cil.typeOf e) in
@@ -842,8 +852,10 @@ let rec is_same_attrparam p1 p2 =
     is_same_string s1 s2 && is_same_list is_same_attrparam p1 p2
   | ASizeOf t1, ASizeOf t2 -> is_same_c_type t1 t2
   | ASizeOfE p1, ASizeOfE p2 -> is_same_attrparam p1 p2
-  | AAlignOf t1, AAlignOf t2 -> is_same_c_type t1 t2
-  | AAlignOfE p1, AAlignOfE p2 -> is_same_attrparam p1 p2
+  | AAlignOf (t1, i1), AAlignOf (t2, i2) ->
+    is_same_c_type t1 t2 && Cil_types.equal_standard_or_gcc i1 i2
+  | AAlignOfE (p1, i1), AAlignOfE (p2, i2) ->
+    is_same_attrparam p1 p2 && Cil_types.equal_standard_or_gcc i1 i2
   | AUnOp(u1,p1), AUnOp(u2,p2) ->
     is_same_c_unop u1 u2 && is_same_attrparam p1 p2
   | ABinOp(b1,l1,r1), ABinOp(b2,l2,r2) ->
@@ -1119,6 +1131,8 @@ and is_same_predicate_node p1 p2 =
     is_same_term t1 t2
   | Pdangling (l1,t1), Pdangling (l2,t2) ->
     is_same_logic_label l1 l2 && is_same_term t1 t2
+  | Paligned (l1,n1), Paligned (l2,n2) ->
+    is_same_term l1 l2 && is_same_term n1 n2
   | Pfresh (l1,m1,t1,n1), Pfresh (l2,m2,t2,n2) ->
     is_same_logic_label l1 l2 && is_same_logic_label m1 m2 &&
     is_same_term t1 t2 && is_same_term n1 n2
@@ -1128,7 +1142,7 @@ and is_same_predicate_node p1 p2 =
   | (Pfalse | Ptrue | Papp _ | Prel _ | Pand _ | Por _ | Pimplies _
     | Piff _ | Pnot _ | Pif _ | Plet _ | Pforall _ | Pexists _
     | Pat _ | Pvalid _ | Pvalid_read _ | Pobject_pointer _ | Pvalid_function _
-    | Pinitialized _ | Pdangling _
+    | Pinitialized _ | Pdangling _ | Paligned _
     | Pfresh _ | Pallocable _ | Pfreeable _ | Pxor _ | Pseparated _
     ), _ -> false
 
@@ -1417,6 +1431,7 @@ and is_same_lexpr l1 l2 =
     is_same_pl_type t1 t2 && is_same_lexpr e1 e2
   | PLrange(l1,h1), PLrange(l2,h2) ->
     is_same_opt is_same_lexpr l1 l2 && is_same_opt is_same_lexpr h1 h2
+  | PLalignof t1, PLalignof t2 -> is_same_pl_type t1 t2
   | PLsizeof t1, PLsizeof t2 -> is_same_pl_type t1 t2
   | PLsizeofE e1,PLsizeofE e2 | PLtypeof e1,PLtypeof e2-> is_same_lexpr e1 e2
   | PLupdate(b1,p1,r1), PLupdate(b2,p2,r2) ->
@@ -1455,6 +1470,8 @@ and is_same_lexpr l1 l2 =
     is_same_lexpr e1 e2
   | PLdangling (l1,e1), PLdangling (l2,e2) ->
     l1=l2 && is_same_lexpr e1 e2
+  | PLaligned (l1,n1), PLaligned (l2,n2) ->
+    is_same_lexpr l1 l2 && is_same_lexpr n1 n2
   | PLseparated l1, PLseparated l2 ->
     is_same_list is_same_lexpr l1 l2
   | PLif(c1,t1,e1), PLif(c2,t2,e2) ->
@@ -1470,13 +1487,13 @@ and is_same_lexpr l1 l2 =
     | PLold _ | PLat _
     | PLbase_addr _ | PLblock_length _ | PLoffset _
     | PLresult | PLnull | PLcast _
-    | PLrange _ | PLsizeof _ | PLsizeofE _ | PLtypeof _
+    | PLrange _ | PLalignof _ | PLsizeof _ | PLsizeofE _ | PLtypeof _
     | PLupdate _ | PLinitIndex _ | PLtype _ | PLfalse
     | PLtrue | PLinitField _ | PLrel _ | PLand _ | PLor _ | PLxor _
     | PLimplies _ | PLiff _ | PLnot _ | PLif _ | PLforall _
     | PLexists _ | PLvalid _ | PLvalid_read _
     | PLobject_pointer _ | PLvalid_function _
-    | PLfreeable _ | PLallocable _
+    | PLfreeable _ | PLallocable _ | PLaligned _
     | PLinitialized _ | PLdangling _ | PLseparated _ | PLfresh _ | PLnamed _
     | PLcomprehension _ | PLunion _ | PLinter _
     | PLset _ | PLempty
@@ -1703,6 +1720,9 @@ and hash_predicate (acc,depth,tot) p =
           (acc + 259 + hash_label l1 + hash_label l2, depth - 1, tot - 2) t1
       in
       hash_term (acc, depth-1, tot) t2
+    | Paligned (l, n) ->
+      let (acc,tot) = hash_term (acc + 263, depth - 1, tot - 1) l in
+      hash_term (acc,depth - 1, tot) n
   end
 
 let hash_term t =
@@ -1986,6 +2006,10 @@ and compare_predicate_node p1 p2 =
   | Pdangling (l1,t1), Pdangling (l2,t2) ->
     let res = compare_logic_label l1 l2 in
     if res = 0 then compare_term t1 t2 else res
+  | Paligned (t1,n1), Paligned (t2,n2) ->
+    let res = compare_term t1 t2 in
+    if res = 0 then compare_term n1 n2
+    else res
   | Pallocable _, _ -> 1
   | _, Pallocable _ -> -1
   | Pfreeable _, _ -> 1
@@ -2000,6 +2024,8 @@ and compare_predicate_node p1 p2 =
   | _, Pinitialized _ -> -1
   | Pdangling _, _ -> 1
   | _, Pdangling _ -> -1
+  | Paligned _, _ -> 1
+  | _, Paligned _ -> -1
   | Pvalid_function t1, Pvalid_function t2 ->
     compare_term t1 t2
   | Pvalid_function _, _ -> 1

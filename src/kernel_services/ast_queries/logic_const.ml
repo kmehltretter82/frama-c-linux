@@ -303,6 +303,9 @@ let tcast ?loc t ct =
 let tlogic_coerce ?loc t lt =
   term ?loc (TCast (true, lt, t)) lt
 
+let talignof ?loc ct =
+  term ?loc (TAlignOf ct) Linteger
+
 let tvar ?loc lv =
   term ?loc (TLval(TVar lv,TNoOffset)) lv.lv_type
 
@@ -441,9 +444,11 @@ let pinitialized ?loc (l,p) =
 let pdangling ?loc (l,p) =
   unnamed ?loc (Pdangling (l,p))
 
-let pseparated  ?loc seps =
+let pseparated ?loc seps =
   unnamed ?loc (Pseparated seps)
 
+let paligned ?loc (p, n) =
+  unnamed ?loc (Paligned(p, n))
 
 (* Deprecated *)
 

@@ -320,7 +320,8 @@ let type_to_expr_for_builtin ~loc ~builtin specifier decl_type =
 %token<Cabs.cabsloc> THREAD THREAD_LOCAL
 %token<Cabs.cabsloc> GHOST
 
-%token<Cabs.cabsloc> SIZEOF ALIGNOF GENERIC
+%token<Cabs.cabsloc> SIZEOF ALIGNOF ALIGNAS GENERIC
+%token<Cabs.cabsloc> GCC_ALIGNOF
 
 %token EQ PLUS_EQ MINUS_EQ STAR_EQ SLASH_EQ PERCENT_EQ
 %token AND_EQ PIPE_EQ CIRC_EQ INF_INF_EQ SUP_SUP_EQ
@@ -588,9 +589,13 @@ unary_expression:   /*(* 6.5.3 *)*/
 | SIZEOF unary_expression      { make_expr $sloc (EXPR_SIZEOF $2) }
 | SIZEOF LPAREN type_name RPAREN
     { let b, d = $3 in make_expr $sloc (TYPE_SIZEOF (b, d)) }
-| ALIGNOF unary_expression     { make_expr $sloc (EXPR_ALIGNOF $2) }
+| ALIGNOF unary_expression     { make_expr $sloc (EXPR_ALIGNOF($2, `Standard)) }
 | ALIGNOF LPAREN type_name RPAREN
-    {let b, d = $3 in make_expr $sloc (TYPE_ALIGNOF (b, d)) }
+    {let b, d = $3 in make_expr $sloc (TYPE_ALIGNOF (b, d, `Standard)) }
+| GCC_ALIGNOF unary_expression     { make_expr $sloc (EXPR_ALIGNOF($2, `GCC)) }
+| GCC_ALIGNOF LPAREN type_name RPAREN
+    {let b, d = $3 in make_expr $sloc (TYPE_ALIGNOF (b, d, `GCC)) }
+
 | PLUS cast_expression         { make_expr $sloc (UNARY (PLUS, $2)) }
 | MINUS cast_expression        { make_expr $sloc (UNARY (MINUS, $2)) }
 | STAR cast_expression         { make_expr $sloc (UNARY (MEMOF, $2)) }
@@ -1128,6 +1133,14 @@ decl_spec_wo_type_nor_attr: /* ISO 6.7 */
 // ISO 6.7.4
 | INLINE   { SpecInline, $1 }
 | NORETURN { SpecAttr (("noreturn",[])), $1 }
+| ALIGNAS LPAREN conditional_expression RPAREN {
+    SpecAlignas($3), $1
+  }
+| ALIGNAS LPAREN type_name RPAREN {
+    let b, d = $3 in
+    SpecAlignas(make_expr $sloc (TYPE_ALIGNOF(b, d, `Standard))), $1
+  }
+
 // ISO 6.7.3
 | cvspec   { $1 }
 ;
@@ -1703,11 +1716,21 @@ unary_attr:
     let b, d = $3 in
     make_expr $sloc (TYPE_SIZEOF (b, d))
   }
-| ALIGNOF unary_expression        {make_expr $sloc (EXPR_ALIGNOF $2) }
+| ALIGNOF unary_expression        {
+  make_expr $sloc (EXPR_ALIGNOF($2, `Standard))
+  }
 | ALIGNOF LPAREN type_name RPAREN {
     let b, d = $3 in
-    make_expr $sloc (TYPE_ALIGNOF (b, d))
+    make_expr $sloc (TYPE_ALIGNOF (b, d, `Standard))
   }
+| GCC_ALIGNOF unary_expression        {
+  make_expr $sloc (EXPR_ALIGNOF($2, `GCC))
+  }
+| GCC_ALIGNOF LPAREN type_name RPAREN {
+    let b, d = $3 in
+    make_expr $sloc (TYPE_ALIGNOF (b, d, `GCC))
+  }
+
 | PLUS cast_attr   { make_expr $sloc (UNARY (PLUS, $2)) }
 | MINUS cast_attr  { make_expr $sloc (UNARY (MINUS, $2)) }
 | STAR cast_attr   { make_expr $sloc (UNARY (MEMOF, $2)) }

@@ -204,6 +204,8 @@
   Analysis of function escaping_local is thus incomplete and its soundness
   relies on the written specification.
 [eva] using specification for function escaping_local
+[eva:alarm] recursion.c:282: Warning: 
+  unaligned pointer creation. assert \aligned(p,alignof(int));
 [eva:alarm] recursion.c:282: Warning: out of bounds write. assert \valid(p);
 [eva] recursion.c:283: Frama_C_show_each_1: {5}
 [eva:locals-escaping] recursion.c:281: Warning: 
@@ -215,6 +217,8 @@
   Analysis of function escaping_formal is thus incomplete and its soundness
   relies on the written specification.
 [eva] using specification for function escaping_formal
+[eva:alarm] recursion.c:297: Warning: 
+  unaligned pointer creation. assert \aligned(p,alignof(int));
 [eva:alarm] recursion.c:297: Warning: out of bounds write. assert \valid(p);
 [eva] recursion.c:298: Frama_C_show_each_1: {5}
 [eva:locals-escaping] recursion.c:415: Warning: 
@@ -229,6 +233,8 @@
 [eva:garbled-mix:assigns] recursion.c:311: 
   The specification of function escaping_stack
   has generated a garbled mix of addresses for assigns clause p.
+[eva:alarm] recursion.c:313: Warning: 
+  unaligned pointer creation. assert \aligned(p,alignof(int));
 [eva:alarm] recursion.c:313: Warning: out of bounds write. assert \valid(p);
 [eva] recursion.c:314: Frama_C_show_each_1_2: {5}
 [eva:locals-escaping] recursion.c:312: Warning: 

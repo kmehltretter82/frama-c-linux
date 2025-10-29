@@ -35,7 +35,7 @@ void vaex(int eval, const char *fmt, ...) {
 }
 
 int main() {
-  int a = 1, *p = 2;
+  int a = 1, *p = 4;
   warn(0);
   warn(0, a);
   warnx("%d", a);

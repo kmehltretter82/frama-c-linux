@@ -85,7 +85,7 @@ and loc_to_exp ?result {term_node = lnode ; term_type = ltype; term_loc = loc} =
   | TSizeOfE lexp ->
     List.map (fun x -> new_exp ~loc (SizeOfE x)) (loc_to_exp ?result lexp)
   | TAlignOfE lexp ->
-    List.map (fun x -> new_exp ~loc (AlignOfE x)) (loc_to_exp ?result lexp)
+    List.map (fun x -> new_exp ~loc (AlignOfE(x, `Standard))) (loc_to_exp ?result lexp)
   | TUnOp (unop, lexp) ->
     List.map
       (fun x -> new_exp ~loc (UnOp (unop, x, logic_type_to_typ ltype)))
@@ -102,7 +102,7 @@ and loc_to_exp ?result {term_node = lnode ; term_type = ltype; term_loc = loc} =
   | TCast (false, Ctype typ, lexp) ->
     List.map
       (fun x -> new_exp ~loc (CastE (typ, x))) (loc_to_exp ?result lexp)
-  | TAlignOf typ -> [new_exp ~loc (AlignOf typ)]
+  | TAlignOf typ -> [new_exp ~loc (AlignOf (typ, `Standard))]
   | TSizeOf typ -> [new_exp ~loc (SizeOf typ)]
   | Trange (Some low, Some high) ->
     let low = singleton (loc_to_exp ?result) low in

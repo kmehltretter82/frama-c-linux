@@ -25,21 +25,6 @@ val is_computed: ?project:Project.t -> unit -> bool
 (** Whether current project has set its machine description. *)
 
 (* ***********************************************************************)
-(** {2 Sizeof getters}                                                   *)
-(* ***********************************************************************)
-
-val sizeof_short: unit -> int
-val sizeof_int: unit -> int
-val sizeof_long: unit -> int
-val sizeof_longlong: unit -> int
-val sizeof_ptr: unit -> int
-val sizeof_float: unit -> int
-val sizeof_double: unit -> int
-val sizeof_longdouble: unit -> int
-val sizeof_void: unit -> int
-val sizeof_fun: unit -> int
-
-(* ***********************************************************************)
 (** {2 Names getters}                                                    *)
 (* ***********************************************************************)
 
@@ -62,20 +47,56 @@ val sig_atomic_t: unit -> string
 val time_t: unit -> string
 
 (* ***********************************************************************)
-(** {2 Alignof getters}                                                  *)
+(** {2 Types}                                                            *)
 (* ***********************************************************************)
 
-val alignof_short: unit -> int
-val alignof_int: unit -> int
-val alignof_long: unit -> int
-val alignof_longlong: unit -> int
-val alignof_ptr: unit -> int
-val alignof_float: unit -> int
-val alignof_double: unit -> int
-val alignof_longdouble: unit -> int
-val alignof_str: unit -> int
-val alignof_aligned: unit -> int
-val alignof_fun: unit -> int
+(** @since Frama-C+dev *)
+module type SizeofInfo = sig
+  val short: unit -> int
+  val int: unit -> int
+  val long: unit -> int
+  val longlong: unit -> int
+  val ptr: unit -> int
+  val float: unit -> int
+  val double: unit -> int
+  val longdouble: unit -> int
+  val void: unit -> int (** might be -1 if unsupported in current machdep *)
+  val func: unit -> int (** might be -1 if unsupported in current machdep *)
+end
+
+(* ***********************************************************************)
+(** {2 [sizeof] getters}                                                 *)
+(* ***********************************************************************)
+
+(** @since Frama-C+dev
+    @before Frama-C+dev These functions were at top-level and named sizeof_<type>
+*)
+module Sizeof : SizeofInfo
+
+(* ***********************************************************************)
+(** {2 [_Alignof] and GCC [__alignof__] getters}                         *)
+(* ***********************************************************************)
+
+(** @since Frama-C+dev *)
+module type AlignofInfo = sig
+  include SizeofInfo
+  val aligned: unit -> int (** might be -1 if unsupported in current machdep *)
+  val max: unit -> int
+  (** alignment for max_align_t. Note that:
+      - it might not be the maximal alignment supported by the machine.
+        For this, use {!max_extended_alignment}.
+      - if the machdep does not define it, the call warns (once) and it is
+        computed as the maximum of the known alignment values.
+  *)
+end
+
+(** @since Frama-C+dev
+    @before Frama-C+dev These functions were at top-level and named alignof_<type>
+*)
+module Alignof : AlignofInfo
+
+(** @since Frama-C+dev *)
+module GCCAlignof : AlignofInfo
 
 (* ***********************************************************************)
 (** {2 Typ/kind getters}                                                 *)
@@ -145,6 +166,11 @@ val lower_constants: unit -> bool
 
 val insert_implicit_casts: unit -> bool
 
+val max_extended_alignment: unit -> int
+(** -1 if the platform does not support extended alignments
+    @since Frama-C+dev
+*)
+
 (* ***********************************************************************)
 (** {2 Compiler }                                                        *)
 (* ***********************************************************************)
@@ -192,3 +218,72 @@ val init: initLogicBuiltins:(unit -> unit) -> Machdep.mach -> unit
 val init_builtins_ref: (unit -> unit) ref
 [@@alert machine_init_builtins_ref
     "This function can only be called by Cil_builtins"]
+
+(* ***********************************************************************)
+(** {2 Deprecated functions}                                             *)
+(* ***********************************************************************)
+
+val sizeof_short: unit -> int
+[@@ deprecated "Use Sizeof.short instead"]
+[@@ migrate { repl = Rel.Sizeof.short}]
+val sizeof_int: unit -> int
+[@@ deprecated "Use Sizeof.int instead"]
+[@@ migrate { repl = Rel.Sizeof.int}]
+val sizeof_long: unit -> int
+[@@ deprecated "Use Sizeof.long instead"]
+[@@ migrate { repl = Rel.Sizeof.long}]
+val sizeof_longlong: unit -> int
+[@@ deprecated "Use Sizeof.longlong instead"]
+[@@ migrate { repl = Rel.Sizeof.longlong}]
+val sizeof_ptr: unit -> int
+[@@ deprecated "Use Sizeof.ptr instead"]
+[@@ migrate { repl = Rel.Sizeof.ptr}]
+val sizeof_float: unit -> int
+[@@ deprecated "Use Sizeof.float instead"]
+[@@ migrate { repl = Rel.Sizeof.float}]
+val sizeof_double: unit -> int
+[@@ deprecated "Use Sizeof.double instead"]
+[@@ migrate { repl = Rel.Sizeof.double}]
+val sizeof_longdouble: unit -> int
+[@@ deprecated "Use Sizeof.longdouble instead"]
+[@@ migrate { repl = Rel.Sizeof.longdouble}]
+val sizeof_void: unit -> int
+[@@ deprecated "Use Sizeof.void instead"]
+[@@ migrate { repl = Rel.Sizeof.void}]
+val sizeof_fun: unit -> int
+[@@ deprecated "Use Sizeof.func instead"]
+[@@ migrate { repl = Rel.Sizeof.func}]
+
+val alignof_short: unit -> int
+[@@ deprecated "Use Alignof.short instead"]
+[@@ migrate { repl = Rel.Alignof.short}]
+val alignof_int: unit -> int
+[@@ deprecated "Use Alignof.int instead"]
+[@@ migrate { repl = Rel.Alignof.int}]
+val alignof_long: unit -> int
+[@@ deprecated "Use Alignof.long instead"]
+[@@ migrate { repl = Rel.Alignof.long}]
+val alignof_longlong: unit -> int
+[@@ deprecated "Use Alignof.longlong instead"]
+[@@ migrate { repl = Rel.Alignof.longlong}]
+val alignof_ptr: unit -> int
+[@@ deprecated "Use Alignof.ptr instead"]
+[@@ migrate { repl = Rel.Alignof.ptr}]
+val alignof_float: unit -> int
+[@@ deprecated "Use Alignof.float instead"]
+[@@ migrate { repl = Rel.Alignof.float}]
+val alignof_double: unit -> int
+[@@ deprecated "Use Alignof.double instead"]
+[@@ migrate { repl = Rel.Alignof.double}]
+val alignof_longdouble: unit -> int
+[@@ deprecated "Use Alignof.longdouble instead"]
+[@@ migrate { repl = Rel.Alignof.longdouble}]
+val alignof_void: unit -> int
+[@@ deprecated "Use Alignof.void instead"]
+[@@ migrate { repl = Rel.Alignof.void}]
+val alignof_fun: unit -> int
+[@@ deprecated "Use Alignof.func instead"]
+[@@ migrate { repl = Rel.Alignof.func}]
+val alignof_aligned: unit -> int
+[@@ deprecated "Use Alignof.aligned instead"]
+[@@ migrate { repl = Rel.Alignof.aligned}]

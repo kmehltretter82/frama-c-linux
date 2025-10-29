@@ -870,6 +870,10 @@ struct
 
     | Pinitialized(label, t) -> initialized env label t
 
+    | Paligned (_t, _n) ->
+      Warning.error
+        "\\aligned not yet implemented"
+
     | Pvalid_function _t ->
       Warning.error
         "\\valid_function not yet implemented@\n\

@@ -397,8 +397,8 @@ let rec term_to_exp t res =
   | TLval tlval -> new_exp ~loc (Lval (tlval_to_lval tlval res))
   | TSizeOf ty -> new_exp ~loc (SizeOf ty)
   | TSizeOfE t -> new_exp ~loc (SizeOfE(term_to_exp t res))
-  | TAlignOf ty -> new_exp ~loc (AlignOf ty)
-  | TAlignOfE t -> new_exp ~loc (AlignOfE (term_to_exp t res))
+  | TAlignOf ty -> new_exp ~loc (AlignOf (ty, `Standard))
+  | TAlignOfE t -> new_exp ~loc (AlignOfE (term_to_exp t res, `Standard))
   | TUnOp (unop, t) ->
     new_exp ~loc (UnOp (unop, term_to_exp t res, Cil_const.intType))
   | TBinOp (binop, t1, t2)->

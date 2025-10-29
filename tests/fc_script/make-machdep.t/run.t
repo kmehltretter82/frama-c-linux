@@ -7,9 +7,10 @@
   alignof_long: 8
   alignof_longdouble: 16
   alignof_longlong: 8
+  alignof_max_align_t: 16
   alignof_ptr: 8
   alignof_short: 2
-  alignof_str: 1
+  alignof_void: 1
   bufsiz: '8192'
   char_is_unsigned: false
   compiler: clang
@@ -153,6 +154,7 @@
   little_endian: true
   machdep_name: anonymous_machdep
   max_align_t: long double
+  max_extended_alignment: 4294967296
   mb_cur_max: ((size_t)16)
   nsig: (64 + 1)
   path_max: '4096'

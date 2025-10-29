@@ -44,12 +44,12 @@ let getParenthLevel e =
   | PLbinop (_,(Bmul|Bdiv|Bmod),_) -> 40
   | PLunop ((Uamp|Uminus|Ubw_not),_) | PLcast _ | PLnot _ -> 30
   | PLunop (Ustar,_) | PLdot _ | PLarrow _ | PLarrget _
-  | PLsizeof _ | PLsizeofE _ -> 20
+  | PLalignof _ | PLsizeof _ | PLsizeofE _ -> 20
   | PLapp _ | PLold _ | PLat _
   | PLoffset _ | PLbase_addr _ | PLblock_length _
   | PLupdate _  | PLinitField _ | PLinitIndex _
   | PLvalid _ | PLvalid_read _ | PLobject_pointer _ | PLvalid_function _
-  | PLinitialized _ | PLdangling _
+  | PLinitialized _ | PLdangling _ | PLaligned _
   | PLallocable _ | PLfreeable _ | PLfresh _
   | PLseparated _ | PLunion _ | PLinter _ -> 10
   | PLvar _ | PLconstant _ | PLresult | PLnull | PLtypeof _ | PLtype _
@@ -192,6 +192,7 @@ and print_lexpr_level n fmt e =
     | PLrange(e1,e2) ->
       fprintf fmt "%a@;..@;%a"
         (pp_opt print_lexpr) e1 (pp_opt print_lexpr) e2
+    | PLalignof t -> fprintf fmt "alignof(@;@[%a@]@;)" (print_logic_type None) t
     | PLsizeof t -> fprintf fmt "sizeof(@;@[%a@]@;)" (print_logic_type None) t
     | PLsizeofE e -> fprintf fmt "sizeof(@;@[%a@]@;)" print_lexpr_plain e
     | PLupdate(e1,path,e2) ->
@@ -240,6 +241,8 @@ and print_lexpr_level n fmt e =
     | PLdangling (l,e) ->
       fprintf fmt "\\dangling%a(@;@[%a@]@;)"
         print_label_1 l print_lexpr_plain e
+    | PLaligned (e1,e2) ->
+      fprintf fmt "\\aligned(@;@[%a@],@[%a@]@;)" print_lexpr_plain e1 print_lexpr_plain e2
     | PLseparated l ->
       fprintf fmt "\\separated(@;@[%a@]@;)"
         (pp_list ~sep:",@ " print_lexpr_plain) l

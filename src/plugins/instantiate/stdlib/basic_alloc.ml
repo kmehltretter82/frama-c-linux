@@ -120,3 +120,9 @@ let null_result ?loc typ =
   let tnull = term ?loc Tnull (Ctype typ) in
   let p = prel ?loc (Req, tresult, tnull) in
   new_predicate { p with pred_name = [ "null_result" ] }
+
+let aligned_result ?loc typ =
+  let tresult = tresult ?loc typ in
+  let max_align = Machine.Alignof.max () in
+  let p = paligned ?loc (tresult, tinteger ?loc max_align) in
+  new_predicate { p with pred_name = [ "aligned_result" ] }

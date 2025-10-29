@@ -6,9 +6,10 @@ alignof_int: 4
 alignof_long: 8
 alignof_longdouble: 16
 alignof_longlong: 8
+alignof_max_align_t: 16
 alignof_ptr: 8
 alignof_short: 2
-alignof_str: 1
+alignof_void: 1
 bufsiz: '8192'
 char_is_unsigned: false
 compiler: gcc
@@ -532,6 +533,18 @@ errno:
     exfull: '54'
 filename_max: '4096'
 fopen_max: '16'
+gcc_alignof_aligned: 16
+gcc_alignof_double: 8
+gcc_alignof_float: 4
+gcc_alignof_fun: 1
+gcc_alignof_int: 4
+gcc_alignof_long: 8
+gcc_alignof_longdouble: 16
+gcc_alignof_longlong: 8
+gcc_alignof_max_align_t: 16
+gcc_alignof_ptr: 8
+gcc_alignof_short: 2
+gcc_alignof_void: 1
 has__builtin_va_list: true
 host_name_max: '64'
 int_fast16_t: long
@@ -544,6 +557,7 @@ l_tmpnam: '20'
 little_endian: true
 machdep_name: machdep_gcc_x86_64
 max_align_t: long double
+max_extended_alignment: 268435456
 mb_cur_max: ((size_t) 16 )
 nsig: (64 + 1)
 path_max: '4096'

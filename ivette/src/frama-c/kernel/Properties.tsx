@@ -108,6 +108,7 @@ const DEFAULTS: { [key: string]: IFilterContent } = {
   'alarms.bool_value': newFilter(true, "_Bool values"),
   'alarms.mem_access': newFilter(true, "Memory accesses"),
   'alarms.index_bound': newFilter(true, "Index bounds"),
+  'alarms.pointer_alignment': newFilter(true, "Pointers alignment"),
   'alarms.initialization': newFilter(true, "Initializations"),
   'alarms.dangling_pointer': newFilter(true, "Dangling pointers"),
   'alarms.pointer_value': newFilter(true, "Pointer values"),
@@ -251,6 +252,7 @@ function filterAlarm(alarm: string | undefined): boolean {
     case 'division_by_zero': return filter('alarms.division_by_zero');
     case 'mem_access': return filter('alarms.mem_access');
     case 'index_bound': return filter('alarms.index_bound');
+    case 'pointer_alignment': return filter('alarms.pointer_alignment');
     case 'pointer_value': return filter('alarms.pointer_value');
     case 'shift': return filter('alarms.shift');
     case 'ptr_comparison': return filter('alarms.ptr_comparison');

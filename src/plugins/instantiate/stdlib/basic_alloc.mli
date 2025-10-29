@@ -21,3 +21,4 @@ val allocates_result: ?loc:location -> typ -> allocation
 
 val fresh_result: ?loc:location -> typ -> term -> identified_predicate
 val null_result: ?loc:location -> typ -> identified_predicate
+val aligned_result: ?loc:location -> typ -> identified_predicate

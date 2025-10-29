@@ -342,7 +342,7 @@ let generate_exn_enum exns =
 let generate_exn_union e exns =
   let loc = Cil_datatype.Location.unknown in
   let create_union_fields _ =
-    let add_one_field t acc = (get_type_tag t, t, None, [], loc) :: acc in
+    let add_one_field t acc = (get_type_tag t, t, None, None, [], loc) :: acc in
     Some (Cil_datatype.Typ.Set.fold add_one_field exns [])
   in
   let union_name = "__fc_exn_union" in
@@ -351,11 +351,11 @@ let generate_exn_union e exns =
       false union_name ~norig:union_name create_union_fields []
   in
   let create_struct_fields _ =
-    let uncaught = (exn_uncaught_name, Cil_const.intType, None, [], loc) in
-    let kind = (exn_kind_name, Cil_const.mk_tenum e, None, [], loc) in
+    let uncaught = (exn_uncaught_name, Cil_const.intType, None, None, [], loc) in
+    let kind = (exn_kind_name, Cil_const.mk_tenum e, None, None, [], loc) in
     let obj =
       (exn_obj_name,
-       Cil_const.mk_tcomp exn_kind_union, None, [], loc)
+       Cil_const.mk_tcomp exn_kind_union, None, None, [], loc)
     in
     Some [uncaught; kind; obj]
   in

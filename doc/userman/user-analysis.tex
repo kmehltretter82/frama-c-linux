@@ -161,13 +161,13 @@ regardless of the value of the option.)
   For instance, no error is detected by default in the following example, as
   the dereferencing is correct. However, if option
   \texttt{-warn-invalid-pointer} is enabled, an error is detected at line 4.
-  \begin{ccode}
-    int x;
-    int *p = &x;
-    p++;  // valid
-    p++;  // undefined behavior
-    *(p-2) = 1;
-  \end{ccode}
+\begin{ccode}
+int x;
+int *p = &x;
+p++;  // valid
+p++;  // undefined behavior
+*(p-2) = 1;
+\end{ccode}
 
   \begin{important}
     Currently, the option is disabled by default. The rationale for this is the
@@ -202,15 +202,25 @@ Here, the \texttt{x} might be incremented by \texttt{g} before or after the
 call to \texttt{f}, but since the two write accesses occur in different
 functions, \texttt{-unspecified-access} does not detect that.
 
+\item \optiondef{-}{warn-unaligned-pointer} may be used to check that the code
+  does not create pointers whose alignment is not suitable for the type of the
+  object that it points to. This option is set by default. In the following
+  example, analyzers report by default an error on the second line. Disabling
+  the option removes this verification.
+\begin{ccode}
+char c[5];
+int* p = (int*) &c[1];
+\end{ccode}
+
 \item \optiondef{-}{warn-pointer-downcast} may be used to check that the code
   does not downcast a pointer to an integer type. This option is set by default.
   In the following example, analyzers report by default an error on the third
   line. Disabling the option removes this verification.
-  \begin{ccode}
-    int x;
-    uintptr_t addr = &x;
-    int a = &x;
-  \end{ccode}
+\begin{ccode}
+int x;
+uintptr_t addr = &x;
+int a = &x;
+\end{ccode}
 
 \item \optiondef{-}{warn-signed-downcast} may be used to check that the analyzed
   code does not downcast an integer to a signed integer type. This option is

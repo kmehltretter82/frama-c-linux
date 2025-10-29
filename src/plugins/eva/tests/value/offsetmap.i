@@ -1,7 +1,7 @@
 /* run.config*
-   STDOPT: #"-eva-ilevel 8"
-   STDOPT: #"-eva-ilevel 2"
-   STDOPT: #"-eva-warn-copy-indeterminate=-f,-g"
+   STDOPT: #"-eva-ilevel 8 -no-warn-unaligned-pointer"
+   STDOPT: #"-eva-ilevel 2 -no-warn-unaligned-pointer"
+   STDOPT: #"-eva-warn-copy-indeterminate=-f,-g -no-warn-unaligned-pointer"
 */
 
 int TT[10]={1,2,3};

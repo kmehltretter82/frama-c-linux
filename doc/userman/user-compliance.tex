@@ -66,8 +66,6 @@ would like them be to supported.
   \endhead
   \endfoot
   \label{tab:unsupported-c11-features}%
-  \verb|_Alignas| / \verb|_Alignof| & Currently not supported by the \FramaC
-  kernel. Also, ACSL does not currently include alignment-related predicates. \\
   \verb|_Atomic| & Currently unsupported (ignored) by the Frama-C kernel. \\
   Unicode & \verb|u/U| character constants, \verb|u8/u/U| string literals, and
   \verb|\u| escape sequences are currently unsupported by the lexer.
@@ -116,8 +114,9 @@ cases, we simply refer to the related section in the ISO C standard.
   \texttt{-unspecified-access} & Enables reporting of some instances of UB {\em CC.35}. \\
   \texttt{-warn-invalid-bool} & Toggles reporting of UB {\em CC.12} when applied to values of type \texttt{\_Bool}. \\
   \texttt{-warn-invalid-pointer} & Toggles reporting of UBs {\em CC.46} and {\em CC.62}. \\
+  \texttt{-warn-unaligned-pointer} & Toggles reporting of UBs {\em CC.24}. \\
   \texttt{-warn-left-shift-negative} & Toggles reporting of UB {\em CC.52}. \\
-  \texttt{-warn-pointer-downcast} & Toggles reporting of UB {\em CC.24}. \\
+  \texttt{-warn-pointer-downcast} & Toggles reporting of UB {\em CC.23}. \\
   \texttt{-warn-right-shift-negative} & Toggles reporting of the IDB mentioned in C11 \S 6.5.7.5. \\
   \texttt{-warn-signed-downcast} & Toggles reporting of UB {\em CC.36} for signed types, when converting from a wider to a narrower type. \\
   \texttt{-warn-signed-overflow} & Toggles reporting of UB {\em CC.36} for operations on signed types (except when converting from a wider to a narrower type). \\
@@ -152,14 +151,15 @@ emitted by the Eva plugin and C undefined behaviors.
   index\_bound & {\em CC.49} & \\
   initialization & {\em CC.11}, {\em CC.21}, {\em CC.180} & \\
   mem\_access & {\em CC.33}, {\em CC.43}, {\em CC.47}, {\em CC.62}, {\em CC.64}, {\em CC.176} (among others) & Alignment issues are currently not reported by Frama-C. \\
-  overflow & {\em CC.24}, {\em CC.36}, {\em CC.50} &
+  overflow & {\em CC.23}, {\em CC.36}, {\em CC.50} &
   This category comprises the following RTEs:
   \texttt{signed\_overflow}, \texttt{unsigned\_overflow},
   \texttt{signed\_downcast} and \texttt{unsigned\_downcast}
   (mostly related to {\em CC.36}), and
-  \texttt{pointer\_downcast} (related to {\em CC.24}).
+  \texttt{pointer\_downcast} (related to {\em CC.23}).
   For {\em CC.50}, see {\em Note about \texttt{ptrdiff\_t}}. \\
   overlap & {\em CC.54} & {\em CC.100} is handled by \FramaC's libc ACSL specifications. \\
+  pointer\_alignment & {\em CC.24} & \\
   pointer\_value & {\em CC.46}, {\em CC.62} & \\
   ptr\_comparison & {\em CC.53} & \\
   separation & & Related to ACSL memory separation hypotheses. \\

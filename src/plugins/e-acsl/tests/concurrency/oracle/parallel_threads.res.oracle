@@ -8,12 +8,12 @@
   if there are memory-related annotations.
 [e-acsl] FRAMAC_SHARE/libc/unistd.h:1295: Warning: 
   E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:685: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:739: Warning: 
   E-ACSL construct `terminates clause' is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:685: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:739: Warning: 
   E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:688: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:742: Warning: 
   E-ACSL construct `abnormal termination case in behavior'
   is not yet supported.
   Ignoring annotation.
@@ -49,6 +49,8 @@
   E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
 [eva:alarm] FRAMAC_SHARE/libc/pthread.h:449: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] FRAMAC_SHARE/libc/pthread.h:350: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] FRAMAC_SHARE/libc/pthread.h:354: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.

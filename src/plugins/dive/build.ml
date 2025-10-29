@@ -60,7 +60,8 @@ struct
   let in_alarm = function
     | Alarms.Division_by_zero e | Index_out_of_bound (e, _) | Invalid_shift (e,_)
     | Overflow (_,e,_,_) | Float_to_int (e,_,_) | Is_nan_or_infinite (e,_)
-    | Is_nan (e,_) | Function_pointer (e,_) | Invalid_pointer e ->
+    | Is_nan (e,_) | Function_pointer (e,_) | Invalid_pointer e
+    | Unaligned_pointer (e, _) ->
       in_exp e
     | Pointer_comparison (opt_e1,e2) ->
       Option.fold ~none:[] ~some:in_exp opt_e1 @ in_exp e2

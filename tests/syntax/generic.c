@@ -1,6 +1,5 @@
 /* run.config
    EXIT: 1
-   STDOPT: #"-kernel-warn-key=c11=abort"
    STDOPT: #"-cpp-extra-args=-DNONE"
    STDOPT: #"-cpp-extra-args=-DTOO_MANY_DEFAULTS"
    STDOPT: #"-cpp-extra-args=-DTOO_MANY_COMPATIBLE"

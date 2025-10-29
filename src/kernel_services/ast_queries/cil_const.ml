@@ -114,8 +114,8 @@ let mkCompInfo
        * representation of the structure type constructs the type of
        * the fields. The function can ignore this argument if not
        * constructing a recursive type.  *)
-    (mkfspec: compinfo -> (string * typ * int option * attributes *
-                           location) list option)
+    (mkfspec: compinfo -> (string * typ * int option * exp option *
+                           attributes * location) list option)
     (a: attributes) : compinfo =
 
   (* make a new name for anonymous structs *)
@@ -133,13 +133,14 @@ let mkCompInfo
     }
   in
   let flds =
-    Option.map (List.mapi (fun forder (fn, ft, fb, fa, fl) ->
+    Option.map (List.mapi (fun forder (fn, ft, fb, fal, fa, fl) ->
         { fcomp = comp;
           forder;
           ftype = ft;
           forig_name = fn;
           fname = fn;
           fbitfield = fb;
+          falignas = fal;
           fattr = fa;
           floc = fl;
           faddrof = false;

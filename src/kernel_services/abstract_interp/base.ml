@@ -143,6 +143,18 @@ let bits_sizeof v =
     Bit_utils.sizeof_vid v
   | CLogic_Var (_, ty, _) -> Bit_utils.sizeof ty
 
+let alignof base =
+  try
+    match base with
+    | Null -> 0 (* Address of null is 0. *)
+    | CLogic_Var (_, typ, _) -> Cil.bytesAlignOf typ
+    | Var (vi, _) | Allocated (vi, _, _) -> Cil.bytesAlignOfVarinfo vi
+  with Cil.SizeOfError (msg, _) ->
+    (* Any address is possible: no alignment constraint. *)
+    Kernel.warning ~once:true
+      "Unknown alignment of base %a: %s" pretty base msg;
+    1
+
 let dep_absolute = [Kernel.AbsoluteValidRange.self]
 
 module MinValidAbsoluteAddress =
@@ -321,19 +333,6 @@ let is_function base =
     Ast_types.is_fun v.vtype
 
 let equal v w = (id v) = (id w)
-
-let is_aligned_by b alignment =
-  if Int.is_zero alignment
-  then false
-  else
-    try
-      match b with
-      | Var (v,_) | Allocated(v,_,_) ->
-        Int.is_zero (Int.e_rem (Int.of_int (Cil.bytesAlignOf v.vtype)) alignment)
-      | CLogic_Var (_, ty, _) ->
-        Int.is_zero (Int.e_rem (Int.of_int (Cil.bytesAlignOf ty)) alignment)
-      | Null -> true
-    with Cil.SizeOfError _ -> false
 
 let is_any_formal_or_local v =
   match v with

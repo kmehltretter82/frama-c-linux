@@ -138,6 +138,14 @@ type termination_kind = Normal | Exits | Breaks | Continues | Returns
 [@@deriving eq]
 
 (* ************************************************************************* *)
+(** {3 C implementation} *)
+(* ************************************************************************* *)
+
+type standard_or_gcc =
+  [ `Standard | `GCC ]
+[@@deriving eq,ord]
+
+(* ************************************************************************* *)
 (** {2 Root of the AST} *)
 (* ************************************************************************* *)
 
@@ -380,8 +388,8 @@ and attrparam =
 
   | ASizeOf of typ                       (** A way to talk about types *)
   | ASizeOfE of attrparam
-  | AAlignOf of typ
-  | AAlignOfE of attrparam
+  | AAlignOf of typ * standard_or_gcc
+  | AAlignOfE of attrparam * standard_or_gcc
   | AUnOp of unop * attrparam
   | ABinOp of binop * attrparam * attrparam
   | ADot of attrparam * string           (** a.foo **)
@@ -488,6 +496,12 @@ and fieldinfo = {
       bitfield must be 0 or a positive integer smaller or equal to the width of
       the integer type. A field of width 0 is used in C to control the alignment
       of fields. *)
+
+  mutable falignas: exp option;
+  (** _Alignas specification, if specified.
+      Use {!Cil.bytesAlignOfField} to get the actual alignment.
+      @since Frama-C+dev
+  *)
 
   mutable fattr: attributes;
   (** The attributes for this field (not for its type) *)
@@ -618,6 +632,12 @@ and varinfo = {
   mutable vstorage: storage;
   (** The storage-class *)
 
+  mutable valignas: exp option;
+  (** The alignment specification, if some is specified.
+      Use {!Cil.bytesAlignOfVarinfo} to get the actual alignment.
+      @since Frama-C+dev
+  *)
+
   mutable vglob: bool;
   (** True if this is a global variable*)
 
@@ -743,11 +763,15 @@ and exp_node =
 
   | SizeOfE    of exp (** sizeof(<expression>) *)
 
-  | AlignOf    of typ
-  (** This corresponds to the GCC __alignof_. Has [size_t] type which depends on
-      machine configuration (cf. {!Machine}). *)
+  | AlignOf    of typ * standard_or_gcc
+  (** - [`Standard]: _Alignof
+      - [`GCC]: __alignof__
 
-  | AlignOfE   of exp
+      Has [size_t] type which depends on machine configuration (cf. {!Machine}).
+  *)
+
+  | AlignOfE   of exp * standard_or_gcc
+  (** GCC accepts expressions in _Alignof and __alignof__. *)
 
   | UnOp       of unop * exp * typ
   (** Unary operation. Includes the type of the result. *)
@@ -1554,38 +1578,69 @@ and quantifiers = logic_var list
 
 (** predicates *)
 and predicate_node =
-  | Pfalse (** always-false predicate. *)
-  | Ptrue (** always-true predicate. *)
+  | Pfalse
+  (** [\false] always-false predicate. *)
+  | Ptrue
+  (** [\true] always-true predicate. *)
   | Papp of logic_info * logic_label list * term list
-  (** application of a predicate. *)
+  (** [named{l1, ...}(t1, ...)] application of a predicate. *)
   | Pseparated of term list
-  | Prel of relation * term * term (** comparison of two terms. *)
-  | Pand of predicate * predicate (** conjunction *)
-  | Por of predicate * predicate  (** disjunction. *)
-  | Pxor of predicate * predicate (** logical xor. *)
-  | Pimplies of predicate * predicate (** implication. *)
-  | Piff of predicate * predicate (** equivalence. *)
-  | Pnot of predicate                   (** negation. *)
-  | Pif of term * predicate * predicate  (** conditional *)
-  | Plet of logic_info * predicate (** definition of a local variable *)
-  | Pforall of quantifiers * predicate (** universal quantification. *)
-  | Pexists of quantifiers * predicate (** existential quantification. *)
+  (** [\separated(t1, t2, ...)] pointers to separated locations *)
+  | Prel of relation * term * term
+  (** [a < b, a <= b, a == b, a != b, a >= b, a > b] comparison of two terms. *)
+  | Pand of predicate * predicate
+  (** [p1 && p2] conjunction *)
+  | Por of predicate * predicate
+  (** [p1 || p2] disjunction. *)
+  | Pxor of predicate * predicate
+  (** [p1 ^^ p2] logical xor. *)
+  | Pimplies of predicate * predicate
+  (** [p1 ==> p2] implication. *)
+  | Piff of predicate * predicate
+  (** [p1 <==> p2] equivalence. *)
+  | Pnot of predicate
+  (** [!p] negation. *)
+  | Pif of term * predicate * predicate
+  (** [c ? p1 : p2] conditional *)
+  | Plet of logic_info * predicate
+  (** [\let x = <value> ; p] definition of a local variable *)
+  | Pforall of quantifiers * predicate
+  (** [\forall t1 v1, ... ; p] universal quantification. *)
+  | Pexists of quantifiers * predicate
+  (** [\exists t1 v1, ... ; p] existential quantification. *)
   | Pat of predicate * logic_label
-  (** predicate refers to a particular program point. *)
+  (** [\at(p, L)] predicate [p] refers to a particular program point [L]. *)
   | Pobject_pointer of logic_label * term
-  (** the given locations can be pointed to. *)
-  | Pvalid_read of logic_label * term   (** the given locations are valid for reading. *)
-  | Pvalid of logic_label * term   (** the given locations are valid. *)
+  (** [\object_pointer{L}(ts)]
+      the given locations [ts] can be pointed to at [L]. *)
+  | Pvalid_read of logic_label * term
+  (** [\valid_read{L}(ts)]
+      the given locations [ts] are valid for reading at [L]. *)
+  | Pvalid of logic_label * term
+  (** [\valid{L}(ts)]
+      the given locations [ts] are valid at [L]. *)
   | Pvalid_function of term
-  (** the pointed function has a type compatible with the one of pointer. *)
-  | Pinitialized of logic_label * term   (** the given locations are initialized. *)
-  | Pdangling of logic_label * term (** the given locations contain dangling
-                                        addresses. *)
-  | Pallocable of logic_label * term   (** the given locations can be allocated. *)
-  | Pfreeable of logic_label * term   (** the given locations can be free. *)
+  (** [\valid_function(f)]
+      the pointed function has a type compatible with the one of pointer. *)
+  | Pinitialized of logic_label * term
+  (** [\initialized{L}(ts)]
+      the given locations [ts] are initialized at [L]. *)
+  | Pdangling of logic_label * term
+  (** [\dangling{L}(ts)]
+      the given locations [ts] contain dangling addresses at [L]. *)
+  | Paligned of term * term
+  (** [\aligned(p, v)]
+      [p] is a pointer aligned modulo [v]. *)
+  | Pallocable of logic_label * term
+  (** [\allocable{L}(ts)]
+      the given locations [ts] can be allocated at [L]. *)
+  | Pfreeable of logic_label * term
+  (** [\freeable{L}(ts)]
+      the given locations [ts] can be freed as [L]. *)
   | Pfresh of logic_label * logic_label * term * term
-  (** \fresh(pointer, n)
-      A memory block of n bytes is newly allocated to the pointer.*)
+  (** [\fresh{L1, L2}(pointer, n)]
+      From [L1] to [L2], a new memory block of [n] bytes has been allocated to
+      the [pointer]. *)
 
 (** predicate with an unique identifier.  Use {!Logic_const.new_predicate} to
     create fresh predicates *)

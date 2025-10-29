@@ -288,6 +288,34 @@ let rec predicate_content_to_exp_old ?(inplace=false) ?name ~loc ~adata ~env ~kf
     in
     let adata = Assert.register_pred ~loc env p e adata in
     e, adata, env
+  | Paligned (ptr, align) ->
+    let (align_e, adata), env =
+      Env.with_params_and_result ~rte:false ~env (fun env ->
+          let ctx = C_integer (Machine.sizeof_kind ()) in
+          let align_e, align_rte, adata, env =
+            Translate_terms.denominator_zero_guard ~loc ~ctx ~adata ~kf ~env ~name:"aligned" align
+          in
+          let env = Env.add_stmt env align_rte in
+          (align_e, adata), env
+        )
+    in
+    let (ptr_e, adata), env =
+      Env.with_params_and_result ~rte:false ~env (fun env ->
+          let ptr_e, adata, env = Translate_terms.to_exp ~adata kf env ptr in
+          (ptr_e, adata), env
+        )
+    in
+    let e, env =
+      Memory_translate.call
+        ~loc
+        kf
+        "aligned"
+        Cil_const.intType
+        env
+        [ptr_e; align_e]
+    in
+    let adata = Assert.register_pred ~loc env p e adata in
+    e, adata, env
   | Pinitialized(BuiltinLabel Here, t) ->
     begin
       match Memory_tracking.SpecialPointers.pointer_of_term t with

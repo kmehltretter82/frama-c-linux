@@ -1,5 +1,5 @@
 /* run.config*
-   STDOPT: #"-eva-plevel 40 -big-ints-hex 0x55"
+   STDOPT: #"-eva-plevel 40 -big-ints-hex 0x55 -no-warn-unaligned-pointer"
 */
 
 int t[0xFFFF];
@@ -11,7 +11,7 @@ void main() {
   //@ assert 0 <= i1 <= 0x20;
   int i2 = i;
   //@ assert 0 <= i2 <= 0x40;
-  
+
   t[0x100 + i1] = 1;
 
   t[0x200 + i2] = 2;

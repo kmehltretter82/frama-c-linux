@@ -49,7 +49,7 @@ void main1(void)
     f((char*)&t[i].f2);
 
   g(2 * (int)(&T) );
-  h((int*)(2 * (int)(&t3)));
+  h((int*)(2 * (int)(&t3))); // false alignment alarm because of a garbled mix
 
   j((int*)(T+9));
 

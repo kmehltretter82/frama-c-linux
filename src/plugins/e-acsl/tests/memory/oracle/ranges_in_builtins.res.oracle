@@ -10,9 +10,17 @@
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] ranges_in_builtins.c:9: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] ranges_in_builtins.c:53: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] ranges_in_builtins.c:62: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] ranges_in_builtins.c:65: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] ranges_in_builtins.c:65: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] ranges_in_builtins.c:65: Warning: assertion got status unknown.
+[eva:alarm] ranges_in_builtins.c:74: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] ranges_in_builtins.c:74: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] ranges_in_builtins.c:78: Warning: 

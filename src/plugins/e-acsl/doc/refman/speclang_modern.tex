@@ -196,7 +196,7 @@ The semantics of all the below predicates are undefined:
 \end{example}
 
 Furthermore, \C-like operators \lstinline|&&|, \lstinline+||+, and
-\lstinline|_ ? _ : _| are lazy like in \C: their right members are evaluated 
+\lstinline|_ ? _ : _| are lazy like in \C: their right members are evaluated
 only if required. Thus the amount of undefinedness is limited. Consequently,
 predicate \lstinline|p ==> q| is also lazy since it is equivalent
 to \lstinline+!p || q+. It is also the case for guarded quantifications since
@@ -397,7 +397,7 @@ are two differences with \acsl:
   requested constraints for guards are the very same than the ones for
   quantifications.
 \end{itemize}
-  
+
 \begin{figure}[htbp]
   \fbox{\begin{minipage}{0.97\textwidth}
       \input{loc_modern.bnf}
@@ -986,6 +986,38 @@ deallocations.
 \end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{\notimplemented{Dangling pointers}}
+\label{sec:dangling}
+\nodiff
+
+\difficultwhy{\notimplemented{\lstinline|\\dangling|}}{the implementation of a
+  memory model}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Well-typed pointers}
+\label{sec:typedpointers}
+\absentwhy{it would require the implementation of a \C type system at runtime}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Initialization and undefined values}
+\label{sec:initialized}
+\nodiff
+
+\difficultwhy{\lstinline|\\initialized|}{the implementation of a memory model}
+
+\ifthenelse{\boolean{PrintImplementationRq}}{%
+  \begin{notimplementedenv}
+    The \framac plug-in \eacsl does not support labels as arguments of
+    \lstinline|\\initialized|.
+  \end{notimplementedenv}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -1127,38 +1159,6 @@ Figure~\ref{fig:gram:volatile} summarizes the grammar for volatile constructs.
   \caption{Grammar for volatile constructs}
 \label{fig:gram:volatile}
 \end{figure}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\section{Initialization and undefined values}
-\label{sec:initialized}
-\nodiff
-
-\difficultwhy{\lstinline|\\initialized|}{the implementation of a memory model}
-
-\ifthenelse{\boolean{PrintImplementationRq}}{%
-  \begin{notimplementedenv}
-    The \framac plug-in \eacsl does not support labels as arguments of
-    \lstinline|\\initialized|.
-  \end{notimplementedenv}
-}
-
-\section{\notimplemented{Dangling pointers}}
-\label{sec:dangling}
-\nodiff
-
-\difficultwhy{\notimplemented{\lstinline|\\dangling|}}{the implementation of a
-  memory model}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\section{Well-typed pointers}
-\label{sec:typedpointers}
-\absentwhy{it would require the implementation of a \C type system at runtime}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

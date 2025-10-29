@@ -6,11 +6,11 @@
 /*                                                                        */
 /**************************************************************************/
 
-// Non-ISO, Non-POSIX; header provided only for improved compatibility with
-// non-portable code.
+#if __STDC_VERSION__ < 202311L
 
 #ifndef __FC_STDALIGN_H
 #define __FC_STDALIGN_H
+
 #include "features.h"
 __PUSH_FC_STDLIB
 __BEGIN_DECLS
@@ -18,6 +18,11 @@ __BEGIN_DECLS
 #define alignas _Alignas
 #define alignof _Alignof
 
+#define __alignas_is_defined 1
+#define __alignof_is_defined 1
+
 __END_DECLS
 __POP_FC_STDLIB
+#endif
+
 #endif

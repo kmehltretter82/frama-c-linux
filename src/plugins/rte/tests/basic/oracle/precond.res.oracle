@@ -53,6 +53,9 @@ int g(int *p, int i)
   int __retres;
   if (i >= 1) {
     /*@ assert rte: signed_overflow: -2147483648 ≤ i - 1; */
+    /*@ assert
+          rte: pointer_alignment: \aligned(p + (int)(i - 1),alignof(int));
+    */
     /*@ assert rte: mem_access: \valid_read(p + (int)(i - 1)); */
     __retres = *(p + (i - 1));
     goto return_label;
@@ -68,6 +71,7 @@ int g(int *p, int i)
 int h(int *p)
 {
   int __retres;
+  /*@ assert rte: pointer_alignment: \aligned(p + 3,alignof(int)); */
   /*@ assert rte: mem_access: \valid_read(p + 3); */
   __retres = *(p + 3);
   return __retres;
@@ -80,6 +84,8 @@ cell *set(cell *p, int v)
   cell *__retres;
   /*@ assert rte: mem_access: \valid(&p->val); */
   p->val = v;
+  /*@ assert rte: pointer_alignment: \aligned(p->next,alignof(struct cell));
+  */
   /*@ assert rte: mem_access: \valid_read(&p->next); */
   __retres = p->next;
   return __retres;
@@ -90,6 +96,8 @@ cell *set(cell *p, int v)
 int next_val(cell cIn)
 {
   int __retres;
+  /*@ assert rte: pointer_alignment: \aligned(cIn.next,alignof(struct cell));
+  */
   /*@ assert rte: mem_access: \valid_read(&(cIn.next)->val); */
   __retres = (cIn.next)->val;
   return __retres;
@@ -99,6 +107,7 @@ int next_val(cell cIn)
 cell *top_set(top *ptop, int v)
 {
   cell *tmp;
+  /*@ assert rte: pointer_alignment: \aligned(ptop->next,alignof(cell)); */
   /*@ assert rte: mem_access: \valid_read(&ptop->next); */
   tmp = set(ptop->next,v);
   return tmp;
@@ -108,6 +117,7 @@ cell *top_set(top *ptop, int v)
 int top_next(top tIn)
 {
   int tmp;
+  /*@ assert rte: pointer_alignment: \aligned(tIn.next,alignof(cell)); */
   /*@ assert rte: mem_access: \valid_read(tIn.next); */
   tmp = next_val(*(tIn.next));
   return tmp;
@@ -120,6 +130,10 @@ int top_next(top tIn)
 cell *tabtop_set(top **tab_top, int i, int v)
 {
   cell *tmp;
+  /*@ assert rte: pointer_alignment: \aligned(tab_top,alignof(top *)); */
+  /*@ assert rte: pointer_alignment: \aligned(*(tab_top + i),alignof(top));
+  */
+  /*@ assert rte: pointer_alignment: \aligned(tab_top + i,alignof(top *)); */
   /*@ assert rte: mem_access: \valid_read(tab_top + i); */
   tmp = top_set(*(tab_top + i),v);
   return tmp;
@@ -155,9 +169,12 @@ int main(void)
   w = g(& tab[k],l);
   r = tab;
   rr = & r;
+  /*@ assert rte: pointer_alignment: \aligned(r,alignof(int)); */
   w = g(r + 2,0);
   w = h(tab);
+  /*@ assert rte: pointer_alignment: \aligned(r,alignof(int)); */
   w = h(r);
+  /*@ assert rte: pointer_alignment: \aligned(*rr,alignof(int)); */
   /*@ assert rte: mem_access: \valid_read(rr); */
   w = h(*rr);
   pc = & c;
@@ -166,40 +183,63 @@ int main(void)
   set(& c,10);
   set(& c,20);
   V = (void *)(& c);
+  /*@ assert rte: pointer_alignment: \aligned(V,alignof(cell)); */
   set((cell *)V,20);
   next_val(c);
   /*@ assert rte: mem_access: \valid_read(pc); */
   next_val(*pc);
+  /*@ assert rte: pointer_alignment: \aligned(V,alignof(cell)); */
   /*@ assert rte: mem_access: \valid_read((cell *)V); */
   next_val(*((cell *)V));
   T.pred = & c;
   T.next = & c;
   tabT[0] = T;
   tabT[1] = T;
+  /*@ assert rte: pointer_alignment: \aligned(T.pred,alignof(cell)); */
   set(T.pred,10);
+  /*@ assert rte: pointer_alignment: \aligned(tabT[1].next,alignof(cell)); */
   set(tabT[1].next,20);
+  /*@ assert rte: pointer_alignment: \aligned(T.next,alignof(cell)); */
   /*@ assert rte: mem_access: \valid_read(T.next); */
   next_val(*(T.next));
+  /*@ assert rte: pointer_alignment: \aligned(tabT[0].pred,alignof(cell)); */
   /*@ assert rte: mem_access: \valid_read(tabT[0].pred); */
   next_val(*(tabT[0].pred));
+  /*@ assert rte: pointer_alignment: \aligned(ptabT[2],alignof(top)); */
+  /*@ assert
+        rte: pointer_alignment: \aligned((ptabT[2])->pred,alignof(cell));
+  */
   /*@ assert rte: mem_access: \valid_read(&(ptabT[2])->pred); */
   set((ptabT[2])->pred,15);
+  /*@ assert rte: pointer_alignment: \aligned(tabT[1].pred,alignof(cell)); */
   set(tabT[1].pred,10);
+  /*@ assert rte: pointer_alignment: \aligned(ptabT[1],alignof(top)); */
+  /*@ assert
+        rte: pointer_alignment: \aligned((ptabT[1])->next,alignof(cell));
+  */
   /*@ assert rte: mem_access: \valid_read(&(ptabT[1])->next); */
   /*@ assert rte: mem_access: \valid_read((ptabT[1])->next); */
   next_val(*((ptabT[1])->next));
   top_set(& T,3);
   top_set(& tabT[1],2);
+  /*@ assert rte: pointer_alignment: \aligned(ptabT[1],alignof(top)); */
   top_set(ptabT[1],4);
+  /*@ assert rte: pointer_alignment: \aligned(c.next,alignof(struct cell));
+  */
+  /*@ assert rte: pointer_alignment: \aligned(c.next,alignof(top)); */
   top_set((top *)c.next,5);
   top_next(T);
+  /*@ assert rte: pointer_alignment: \aligned(ptabT[0],alignof(top)); */
   /*@ assert rte: mem_access: \valid_read(ptabT[0]); */
   top_next(*(ptabT[0]));
   tabtop_set(ptabT,2,10);
   pptop = ptabT;
   tabtop_set(pptop,2,15);
   tabtop_set(ptabT,1,20);
+  /*@ assert rte: pointer_alignment: \aligned(pc->next,alignof(struct cell));
+  */
   /*@ assert rte: mem_access: \valid_read(&pc->next); */
+  /*@ assert rte: pointer_alignment: \aligned(pc->next,alignof(top *)); */
   tabtop_set((top **)pc->next,1,10);
   return z;
 }

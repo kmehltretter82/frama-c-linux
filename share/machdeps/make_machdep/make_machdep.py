@@ -180,7 +180,7 @@ compilation_command = [args.compiler]
 for flag in args.cpp_arch_flags + args.compiler_flags:
     compilation_command = compilation_command + flag.split(" ")
 
-source_files = [
+standard_source_files = [
     # sanity_check is juste here to ensure that the given compiler
     # and flags are coherent. It must be kept at the top of the list.
     ("sanity_check.c", "none"),
@@ -202,9 +202,10 @@ source_files = [
     ("alignof_float.c", "number"),
     ("alignof_double.c", "number"),
     ("alignof_longdouble.c", "number"),
+    ("alignof_void.c", "number"),
     ("alignof_fun.c", "number"),
-    ("alignof_str.c", "number"),
     ("alignof_aligned.c", "number"),
+    ("alignof_max_align_t.c", "number"),
     ("size_t.c", "type"),
     ("ssize_t.c", "type"),
     ("wchar_t.c", "type"),
@@ -236,6 +237,26 @@ source_files = [
     ("errno.c", "macrolist"),
 ]
 
+gcc_alignof_source_files = [
+    ("gcc_alignof_short.c", "number"),
+    ("gcc_alignof_int.c", "number"),
+    ("gcc_alignof_long.c", "number"),
+    ("gcc_alignof_longlong.c", "number"),
+    ("gcc_alignof_ptr.c", "number"),
+    ("gcc_alignof_float.c", "number"),
+    ("gcc_alignof_double.c", "number"),
+    ("gcc_alignof_longdouble.c", "number"),
+    ("gcc_alignof_void.c", "number"),
+    ("gcc_alignof_fun.c", "number"),
+    ("gcc_alignof_aligned.c", "number"),
+    ("gcc_alignof_max_align_t.c", "number"),
+]
+
+if args.compiler == "gcc":
+    source_files = standard_source_files + gcc_alignof_source_files
+else:
+    source_files = standard_source_files
+
 
 def find_value(name, typ, output):
     if typ == "bool":
@@ -265,6 +286,7 @@ def find_value(name, typ, output):
     else:
         logging.warning(f"unexpected type '{typ}' for field '{name}', skipping")
         return
+
     if name in machdep:
         msg = re.compile(name + " is " + expected)
         res = re.search(msg, output)
@@ -374,6 +396,30 @@ if not version_lines:
 else:
     version = version_output.stdout.splitlines()[0]
 
+
+# Special case for determining whether extended alignments are supported, and,
+# if yes what is the maximal value allowed. We assume that it does not depend
+# on the exact compilation context.
+def test_possible_alignas(align_test):
+    f = my_path / "max_extended_alignment.c"
+    cmd = compilation_command + [f"-DALIGN_TEST={align_test}", str(f)]
+    if args.verbose:
+        print(f"[INFO] running command: {' '.join(cmd)}")
+    proc = subprocess.run(cmd, capture_output=True)
+    Path(f).with_suffix(".o").unlink(missing_ok=True)
+    return proc.returncode == 0
+
+
+align_test = 1
+if machdep["alignof_max_align_t"] is not None:
+    align_test = 2 * machdep["alignof_max_align_t"]
+
+machdep["max_extended_alignment"] = -1
+
+while test_possible_alignas(align_test):
+    machdep["max_extended_alignment"] = align_test
+    align_test = 2 * align_test
+
 machdep["compiler"] = args.compiler
 machdep["cpp_arch_flags"] = args.cpp_arch_flags
 machdep["version"] = version
@@ -413,6 +459,13 @@ elif args.dest_file:
     machdep["machdep_name"] = Path(args.dest_file.name).stem
 else:
     machdep["machdep_name"] = "anonymous_machdep"
+
+
+def is_optional(field):
+    return "optional" in schema[field] and schema[field]["optional"]
+
+
+machdep = {f: v for [f, v] in machdep.items() if not (is_optional(f) and v is None)}
 
 missing_fields = [f for [f, v] in machdep.items() if v is None]
 

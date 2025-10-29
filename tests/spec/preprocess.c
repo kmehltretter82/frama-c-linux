@@ -28,3 +28,6 @@ int main() {
   /*@ assert backslash_string: "\\"[0] == '\\'; */
   return 0;
 }
+
+const long v = __STDC_VERSION__;
+//@ predicate test_std_version(integer x) = x == __STDC_VERSION__ && x == v;

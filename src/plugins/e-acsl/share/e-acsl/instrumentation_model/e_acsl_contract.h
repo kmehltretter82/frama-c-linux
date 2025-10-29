@@ -65,7 +65,7 @@ typedef struct contract_t {
 /*@ allocates \result;
   @ assigns __fc_heap_status \from __fc_heap_status;
   @ assigns \result \from &__fc_eacsl_contract_base, indirect:size;
-  @ ensures \valid(\result); */
+  @ ensures \valid(\result) && \aligned(\result, alignof(contract_t)); */
 contract_t *contract_init(size_t size) __attribute__((FC_BUILTIN));
 
 /*! \brief Cleanup the structure `c` previously allocated by

@@ -26,16 +26,6 @@ class annot_visitor kf flags on_alarm = object (self)
   method private mark_to_skip exp = skip_set <- Exp.Set.add exp skip_set
   method private must_skip exp = Exp.Set.mem exp skip_set
 
-  method private mark_to_skip_initialized lv =
-    skip_initialized_set <- Lval.Set.add lv skip_initialized_set
-
-  method private must_skip_initialized lv =
-    (* Will return true only once per mark_to_skip_initialized
-       for the same lval *)
-    let r = Lval.Set.mem lv skip_initialized_set in
-    if r then skip_initialized_set <- Lval.Set.remove lv skip_initialized_set;
-    r
-
   method private do_initialized () =
     Kernel_function.Set.mem kf flags.Flags.initialized
     && not (Generator.Initialized.is_computed kf)
@@ -86,6 +76,9 @@ class annot_visitor kf flags on_alarm = object (self)
   method private do_pointer_call () =
     flags.Flags.pointer_call && not (Generator.Pointer_call.is_computed kf)
 
+  method private do_pointer_alignment () =
+    flags.Flags.pointer_alignment && not (Generator.Pointer_alignment.is_computed kf)
+
   method private do_pointer_value () =
     flags.Flags.pointer_value && not (Generator.Pointer_value.is_computed kf)
 
@@ -126,29 +119,54 @@ class annot_visitor kf flags on_alarm = object (self)
       Cil.ChangeDoChildrenPost (s', fun _ -> s)
     | _ -> Cil.DoChildren
 
-  method private treat_call ret_opt =
-    match ret_opt, self#do_mem_access () with
-    | None, _ | Some _, false -> ()
-    | Some ret, true ->
-      Options.debug "lval %a: validity of potential mem access checked\n"
-        Printer.pp_lval ret;
-      self#generate_assertion
-        (Rte.lval_assertion ~read_only:Alarms.For_writing) ret
-
-
-  method private check_assigned dest =
+  method private check_mem_access ~kind dest =
     if self#do_mem_access () then begin
       Options.debug "lval %a: validity of potential mem access checked\n"
         Printer.pp_lval dest;
-      self#generate_assertion
-        (Rte.lval_assertion ~read_only:Alarms.For_writing)
-        dest
-    end;
-    Cil.DoChildren
+      self#generate_assertion (Rte.lval_assertion ~read_only:kind) dest
+    end
+
+  method private check_aligned ptr typ =
+    if self#do_pointer_alignment () then begin
+      Options.debug "exp %a: validity of potential unaligned_pointer checked\n"
+        Printer.pp_exp ptr;
+      self#generate_assertion Rte.pointer_alignment (ptr, typ)
+    end
+
+  method private mark_to_skip_initialized lv =
+    skip_initialized_set <- Lval.Set.add lv skip_initialized_set
+
+  method private must_skip_initialized lv =
+    (* Will return true only once per mark_to_skip_initialized
+       for the same lval *)
+    let r = Lval.Set.mem lv skip_initialized_set in
+    if r then skip_initialized_set <- Lval.Set.remove lv skip_initialized_set;
+    r
+
+  method private check_initialized lval =
+    if self#do_initialized () && not (self#must_skip_initialized lval)
+    then begin
+      Options.debug "lval %a: initialization of potential mem access checked"
+        Printer.pp_lval lval ;
+      self#generate_assertion Rte.lval_initialized_assertion lval
+    end
+
+
+  method private check_aligned_access lval =
+    match lval with
+    | Mem e, _ -> self#check_aligned e (Cil.typeOf e)
+    | _ -> ()
+
+  method private check_pointer_value ptr =
+    if self#do_pointer_value ()
+    then self#generate_assertion Rte.pointer_value ptr
 
   (* assigned left values are checked for valid access *)
   method! vinst = function
-    | Set (lval,_,_) -> self#check_assigned lval
+    | Set (lval,_,_) ->
+      self#check_aligned_access lval ;
+      self#check_mem_access ~kind:Alarms.For_writing lval ;
+      Cil.DoChildren
     | Call (ret_opt,func,argl,_) ->
       (* Do not emit alarms on Eva builtins such as Frama_C_show_each, that should
          have no effect on analyses. *)
@@ -173,7 +191,8 @@ class annot_visitor kf flags on_alarm = object (self)
       if is_builtin
       then Cil.SkipChildren
       else begin
-        self#treat_call ret_opt;
+        Option.iter self#check_aligned_access ret_opt ;
+        Option.iter (self#check_mem_access ~kind:Alarms.For_writing) ret_opt ;
         (* Alarm if the call is through a pointer. Done in DoChildrenPost to get a
            more pleasant ordering of annotations. *)
         let do_ptr () =
@@ -185,11 +204,13 @@ class annot_visitor kf flags on_alarm = object (self)
         Cil.DoChildrenPost (fun res -> do_ptr (); res)
       end
     | Local_init (v,ConsInit(f,args,kind),loc) ->
-      let do_call lv _e _args _loc = self#treat_call lv in
+      let do_call lv _e _args _loc =
+        Option.iter (self#check_mem_access ~kind:Alarms.For_writing) lv in
       Cil.treat_constructor_as_func do_call v f args kind loc;
       Cil.DoChildren
     | Local_init (v,AssignInit (SingleInit _),_) ->
-      self#check_assigned (Cil.var v)
+      self#check_mem_access ~kind:Alarms.For_writing (Cil.var v) ;
+      Cil.DoChildren
     | Local_init (_,AssignInit _,_)
     | Asm _ | Skip _ | Code_annot _ -> Cil.DoChildren
 
@@ -258,8 +279,8 @@ class annot_visitor kf flags on_alarm = object (self)
              self#generate_assertion Rte.finite_float_assertion (fkind,exp)
            | _ -> ())
 
-        | BinOp((PlusPI | MinusPI), _, _, _) when self#do_pointer_value () ->
-          self#generate_assertion Rte.pointer_value exp
+        | BinOp((PlusPI | MinusPI), _, _, _)  ->
+          self#check_pointer_value exp
 
         | UnOp(Neg, exp, ty) ->
           (* Note: if unary minus on unsigned integer is to be understood as
@@ -276,34 +297,38 @@ class annot_visitor kf flags on_alarm = object (self)
 
         | Lval lval ->
           (match Ast_types.unroll_node (Cil.typeOfLval lval) with
-           | TPtr _ when self#do_pointer_value () ->
-             self#generate_assertion Rte.pointer_value exp
+           | TPtr _ ->
+             (* Note: here we are forced to make these checks because we do not
+                control strict aliasing violation, thus a pointer might be
+                crafted with indirect operations like copying bytes. Even if at
+                some point we support strict aliasing violation checks, there is
+                certainly code out there that use -fno-strict-aliasing and that
+                would disable the warning. Consequently, these checks would
+                remain mandatory when the warning is disabled. *)
+             self#check_pointer_value exp ;
+             self#check_aligned exp (Cil.typeOf exp) ;
            | TInt IBool when self#do_bool_value () ->
+             (* The same remark applies here. *)
              self#generate_assertion Rte.bool_value lval
            | _ -> ());
-          (* left values are checked for valid access *)
-          if self#do_mem_access () then begin
-            Options.debug
-              "exp %a is an lval: validity of potential mem access checked"
-              Printer.pp_exp exp;
-            self#generate_assertion
-              (Rte.lval_assertion ~read_only:Alarms.For_reading) lval
-          end;
-          if self#do_initialized ()
-          && not (self#must_skip_initialized lval) then begin
-            Options.debug
-              "exp %a is an lval: initialization of potential mem access checked"
-              Printer.pp_exp exp;
-            self#generate_assertion
-              Rte.lval_initialized_assertion lval
-          end ;
+          self#check_aligned_access lval ;
+          self#check_mem_access ~kind:Alarms.For_reading lval ;
+          self#check_initialized lval
+
         | CastE (ty, e) ->
           (match Ast_types.unroll_node ty,  Ast_types.unroll_node (Cil.typeOf e) with
            (* to , from *)
            | TInt _, TPtr _ when self#do_pointer_downcast () ->
              self#generate_assertion Rte.downcast_assertion (ty, e)
-           | TPtr _, TInt _ when self#do_pointer_value () ->
-             self#generate_assertion Rte.pointer_value exp
+
+           | TPtr _, TInt _ ->
+             (* keep cast here, else, we do not have a pointer anymore to
+                emit the alarm. *)
+             self#check_pointer_value exp ;
+             self#check_aligned exp ty
+
+           | TPtr _, TPtr _ ->
+             self#check_aligned e ty
 
            | TInt kind, TInt _ ->
              let signed = Cil.isSigned kind in
@@ -331,8 +356,7 @@ class annot_visitor kf flags on_alarm = object (self)
               self#generate_assertion Rte.finite_float_assertion (fkind,exp)
           end
         | StartOf _ | AddrOf _ ->
-          if self#do_pointer_value ()
-          then self#generate_assertion Rte.pointer_value exp
+          self#check_pointer_value exp
         | UnOp _
         | Const _
         | BinOp _ -> ()

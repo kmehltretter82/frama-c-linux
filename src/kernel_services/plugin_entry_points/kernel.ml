@@ -168,6 +168,7 @@ let () = set_warn_status wkey_large_array Log.Werror
 
 let wkey_conditional_feature =
   register_warn_category "parser:conditional-feature"
+let () = set_warn_status wkey_conditional_feature Log.Wabort
 
 let wkey_drop_unused = register_warn_category "linker:drop-conflicting-unused"
 
@@ -190,6 +191,10 @@ let wkey_int_conversion =
 
 let wkey_merge_conversion =
   register_warn_category "typing:merge-conversion"
+
+let wkey_alignof_bitfield =
+  register_warn_category "typing:alignof-bitfield"
+    ~help:"warning related to use of alignof on bitfield storage"
 
 let wkey_initializer_overrides =
   register_warn_category "typing:initializer-overrides"
@@ -1296,6 +1301,22 @@ module Orig_name =
     let help = "prints a message each time a variable is renamed"
   end)
 
+type iso_c = C11 | C17 | C23
+
+let () = Parameter_customize.set_group parsing
+let () = Parameter_customize.do_not_reset_on_copy ()
+module CStd =
+  P.Enum
+    (struct
+      type t = iso_c
+      let default = C11
+      let option_name = "-std"
+      let help =
+        "Configures the ISO standard to use. Note that your preprocessor must \
+         support it, else it will lead to preprocessing failure."
+      let values = [ C11, "c11" ; C17, "c17" ; C23, "c23" ]
+    end)
+
 let () = Parameter_customize.set_group parsing
 let () = Parameter_customize.do_not_reset_on_copy ()
 module JsonCompilationDatabase =
@@ -1910,6 +1931,16 @@ module InvalidPointer =
       let module_name = "InvalidPointer"
       let option_name = "-warn-invalid-pointer"
       let help = "generate alarms when invalid pointers are created."
+    end)
+
+let () = Parameter_customize.set_group analysis_options
+let () = Parameter_customize.do_not_reset_on_copy ()
+module UnalignedPointer =
+  True
+    (struct
+      let module_name = "UnalignedPointer"
+      let option_name = "-warn-unaligned-pointer"
+      let help = "generate alarms when unaligned pointers are created."
     end)
 
 (* ************************************************************************* *)

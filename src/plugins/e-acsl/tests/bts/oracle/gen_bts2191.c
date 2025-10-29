@@ -60,7 +60,41 @@ int main(int argc, char **argv)
                                  "\\initialized(&_G[0].str)",0,
                                  __gen_e_acsl_initialized);
     if (__gen_e_acsl_initialized) {
+      int __gen_e_acsl_aligned;
       int __gen_e_acsl_valid_read;
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+        {.values = (void *)0};
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
+        {.values = (void *)0};
+      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_3,
+                                     "alignof(char)",0,_Alignof(char));
+      __e_acsl_assert_copy_values(& __gen_e_acsl_assert_data_2,
+                                  & __gen_e_acsl_assert_data_3);
+      /*@ assert E_ACSL: alignof(char) != 0; */
+      {
+        __gen_e_acsl_assert_data_3.blocking = 1;
+        __gen_e_acsl_assert_data_3.kind = "RTE";
+        __gen_e_acsl_assert_data_3.pred_txt = "alignof(char) != 0";
+        __gen_e_acsl_assert_data_3.file = "bts2191.c";
+        __gen_e_acsl_assert_data_3.fct = "main";
+        __gen_e_acsl_assert_data_3.line = 14;
+        __gen_e_acsl_assert_data_3.name = "denominator not zero";
+        __e_acsl_assert(_Alignof(char) != 0UL,& __gen_e_acsl_assert_data_3);
+        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
+      }
+      __gen_e_acsl_aligned = __e_acsl_aligned((void *)_G[0].str,
+                                              _Alignof(char));
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"_G[0].str",
+                                   (void *)_G[0].str);
+      __gen_e_acsl_assert_data_2.blocking = 1;
+      __gen_e_acsl_assert_data_2.kind = "RTE";
+      __gen_e_acsl_assert_data_2.pred_txt = "\\aligned(_G[0].str,alignof(char))";
+      __gen_e_acsl_assert_data_2.file = "bts2191.c";
+      __gen_e_acsl_assert_data_2.fct = "main";
+      __gen_e_acsl_assert_data_2.line = 14;
+      __gen_e_acsl_assert_data_2.name = "pointer_alignment";
+      __e_acsl_assert(__gen_e_acsl_aligned,& __gen_e_acsl_assert_data_2);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
       __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)_G[0].str,
                                                     sizeof(char),
                                                     (void *)_G[0].str,

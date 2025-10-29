@@ -185,6 +185,9 @@ val pinitialized: ?loc:location -> logic_label * term -> predicate
 (** \dangling *)
 val pdangling: ?loc:location -> logic_label * term -> predicate
 
+(** \aligned *)
+val paligned: ?loc:location -> term * term -> predicate
+
 (** \at *)
 val pat: ?loc:location -> predicate * logic_label -> predicate
 
@@ -327,6 +330,9 @@ val tcast: ?loc:Location.t -> term -> typ -> term
 
 (** coercion to the given logic type *)
 val tlogic_coerce: ?loc:Location.t -> term -> logic_type -> term
+
+(** [alignof(t)] *)
+val talignof: ?loc:Location.t -> typ -> term
 
 (** [true] if the term is \result (potentially enclosed in \at)*)
 val is_result: term -> bool

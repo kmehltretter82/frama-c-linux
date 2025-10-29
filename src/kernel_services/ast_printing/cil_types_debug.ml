@@ -87,6 +87,9 @@ and pp_assigns fmt = function
   | Writes(from_list) ->
     Format.fprintf fmt "Writes(%a)" (pp_list pp_from) from_list
 
+and s_impl = function
+  | `Standard -> "`Standard"
+  | `GCC -> "`GCC"
 
 and pp_file fmt file = Format.fprintf fmt "{fileName=%a;globals=%a;globinit=%a;globinitcalled=%a}"
     Filepath.pretty_abs file.fileName (pp_list pp_global) file.globals (pp_option pp_fundec) file.globinit pp_bool file.globinitcalled
@@ -166,8 +169,8 @@ and pp_attrparam fmt = function
   | ACons(string,attrparam_list) -> Format.fprintf fmt "ACons(%a,%a)"  pp_string string  (pp_list pp_attrparam) attrparam_list
   | ASizeOf(typ) -> Format.fprintf fmt "ASizeOf(%a)"  pp_typ typ
   | ASizeOfE(attrparam) -> Format.fprintf fmt "ASizeOfE(%a)"  pp_attrparam attrparam
-  | AAlignOf(typ) -> Format.fprintf fmt "AAlignOf(%a)"  pp_typ typ
-  | AAlignOfE(attrparam) -> Format.fprintf fmt "AAlignOfE(%a)"  pp_attrparam attrparam
+  | AAlignOf(typ, i) -> Format.fprintf fmt "AAlignOf(%a, %s)"  pp_typ typ (s_impl i)
+  | AAlignOfE(attrparam, i) -> Format.fprintf fmt "AAlignOfE(%a, %s)"  pp_attrparam attrparam (s_impl i)
   | AUnOp(unop,attrparam) -> Format.fprintf fmt "AUnOp(%a,%a)"  pp_unop unop  pp_attrparam attrparam
   | ABinOp(binop,attrparam1,attrparam2) -> Format.fprintf fmt "ABinOp(%a,%a,%a)"  pp_binop binop  pp_attrparam attrparam1  pp_attrparam attrparam2
   | ADot(attrparam,string) -> Format.fprintf fmt "ADot(%a,%a)"  pp_attrparam attrparam  pp_string string
@@ -387,8 +390,8 @@ and pp_exp_node fmt = function
   | Lval(lval) -> Format.fprintf fmt "Lval(%a)"        pp_lval lval
   | SizeOf(typ) -> Format.fprintf fmt "SizeOf(%a)"      pp_typ typ
   | SizeOfE(exp) -> Format.fprintf fmt "SizeOfE(%a)"     pp_exp exp
-  | AlignOf(typ) -> Format.fprintf fmt "AlignOf(%a)"     pp_typ typ
-  | AlignOfE(exp) -> Format.fprintf fmt "AlignOfE(%a)"    pp_exp exp
+  | AlignOf(typ, i) -> Format.fprintf fmt "AlignOf(%a, %s)"     pp_typ typ (s_impl i)
+  | AlignOfE(exp, i) -> Format.fprintf fmt "AlignOfE(%a, %s)"    pp_exp exp (s_impl i)
   | UnOp(unop,exp,typ) -> Format.fprintf fmt "UnOp(%a,%a,%a)"        pp_unop unop  pp_exp exp  pp_typ typ
   | BinOp(binop,exp1,exp2,typ) ->
     Format.fprintf fmt "BinOp(%a,%a,%a,%a)"       pp_binop binop  pp_exp exp1  pp_exp exp2  pp_typ typ
@@ -860,6 +863,8 @@ and pp_predicate_node fmt = function
     Format.fprintf fmt "Pinitialized(%a,%a)"  pp_logic_label logic_label  pp_term term
   | Pdangling(logic_label,term) ->
     Format.fprintf fmt "Pdangling(%a,%a)"  pp_logic_label logic_label  pp_term term
+  | Paligned(term1,term2) ->
+    Format.fprintf fmt "Paligned(%a,%a)"  pp_term term1  pp_term term2
   | Pallocable(logic_label,term) ->
     Format.fprintf fmt "Pallocable(%a,%a)"  pp_logic_label logic_label  pp_term term
   | Pfreeable(logic_label,term) ->

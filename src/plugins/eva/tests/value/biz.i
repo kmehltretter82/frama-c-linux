@@ -1,6 +1,6 @@
 /* run.config*
-  
-  STDOPT: #"-main f2"
+
+  STDOPT: #"-main f2 -no-warn-unaligned-pointer"
 */
 
 int *p, *q, G = 0;

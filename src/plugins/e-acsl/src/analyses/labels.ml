@@ -454,6 +454,9 @@ end = struct
       do_term ?error env t2
     | Papp (_, [], targs) | Pseparated (targs) ->
       do_list do_term ?error env targs
+    | Paligned(ptr, n) ->
+      let error = do_term ?error env ptr in
+      do_term ?error env n
     | Papp (_, labels, targs) ->
       let error = not_yet "predicate with labels" in
       do_labeled_app ?error env labels targs

@@ -28,11 +28,15 @@
 [kernel:variadic] printf_wrong_pointers.c:18: 
   Translating call to printf to a call to the specialized version printf_va_5.
 [eva] Analyzing a complete application starting at main
+[eva:alarm] printf_wrong_pointers.c:14: Warning: 
+  unaligned pointer creation. assert \aligned(&tt,alignof(int));
 [eva] using specification for function printf
 [eva:alarm] printf_wrong_pointers.c:14: Warning: 
   function printf_va_1: precondition \valid(param0) got status invalid.
 [eva:alarm] printf_wrong_pointers.c:16: Warning: 
   function printf_va_3: precondition \valid(param0) got status invalid.
+[eva:alarm] printf_wrong_pointers.c:18: Warning: 
+  unaligned pointer creation. assert \aligned(string,alignof(wchar_t));
 [eva:alarm] printf_wrong_pointers.c:18: Warning: 
   function printf_va_5: precondition valid_read_wstring(param0) got status invalid.
 [eva] ====== VALUES COMPUTED ======
@@ -134,11 +138,15 @@ int main(void)
   wchar_t *wstring = (wchar_t *)L"bar";
   int volatile nondet = 0;
   switch (nondet) {
-    case 0: printf("%n",(int *)(& tt)); /* printf_va_1 */
+    case 0:
+    /*@ assert Eva: pointer_alignment: \aligned(&tt,alignof(int)); */
+    printf("%n",(int *)(& tt)); /* printf_va_1 */
     case 1: printf("%n",(int *)(& ui)); /* printf_va_2 */
     case 2: printf("%hhn",(signed char *)string); /* printf_va_3 */
     case 3: printf("%s",(char *)wstring); /* printf_va_4 */
-    case 4: printf("%ls",(wchar_t *)string); /* printf_va_5 */
+    case 4:
+    /*@ assert Eva: pointer_alignment: \aligned(string,alignof(wchar_t)); */
+    printf("%ls",(wchar_t *)string); /* printf_va_5 */
   }
   __retres = 0;
   return __retres;

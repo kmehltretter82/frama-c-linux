@@ -106,4 +106,8 @@ int eacsl_object_pointer(void *ptr, size_t size, void *ptr_base,
          || eacsl_valid(ptr - size, size, ptr_base, addrof_base);
 }
 
+int eacsl_aligned(void *ptr, size_t alignment) {
+  return (ptr == NULL) || ((uintptr_t)ptr % alignment == 0);
+}
+
 /* }}} */

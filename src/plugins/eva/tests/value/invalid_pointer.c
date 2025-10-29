@@ -1,6 +1,6 @@
 /* run.config*
   STDOPT: +"-warn-invalid-pointer -absolute-valid-range=10-30"
-  STDOPT: +"-no-warn-invalid-pointer -absolute-valid-range=10-30"
+  STDOPT: +"-no-warn-invalid-pointer -no-warn-unaligned-pointer -absolute-valid-range=10-30"
 */
 
 #include "__fc_builtin.h"
@@ -64,13 +64,13 @@ void int_conversion () {
     p = (int *) 42; // Outside -absolute-valid-range: red alarm.
   }
   x = Frama_C_interval(15, 25);
-  p = (int *) x; // Inside -absolute-valid-range: no alarms.
+  p = (int *) x; // Inside -absolute-valid-range but possibly misaligned.
   x = Frama_C_interval(100, 500);
   if (undet) {
     p = (int *) x; // Outside -absolute-valid-range: red alarm.
   }
   x = Frama_C_interval(15, 100);
-  p = (int *) x;     // Unknown alarm. [x] should be reduced to [15..31].
+  p = (int *) x;     // Unknown alarm. [x] should be reduced to [15..31]0%4.
   p = (int *) undet; // Unknown alarm. [p] should be have value in [0..31].
 }
 

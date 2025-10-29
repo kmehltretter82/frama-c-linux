@@ -29,7 +29,7 @@ let array_of_idt = function
 let pointer_of_id ((idt, offset): raw_id) : pointer =
   assert (offset > 0);
   let array = array_of_idt idt
-  and offset = (offset - 1) * (Machine.sizeof_int ())
+  and offset = (offset - 1) * (Machine.Sizeof.int ())
   (* Let us not lose the first cell of the array *)
   in
   array, offset

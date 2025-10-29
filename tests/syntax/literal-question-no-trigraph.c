@@ -1,6 +1,7 @@
 /* run.config
-   STDOPT: #"-cpp-extra-args=-Wno-trigraphs"
-   STDOPT: #"-cpp-extra-args='-trigraphs -Wno-trigraphs'"
+   ENABLED_IF: (<> %{system} macosx)
+   STDOPT: #"-std=c23 -cpp-extra-args='-Wno-trigraphs'"
+   STDOPT: #"-std=c23 -cpp-extra-args='-Wno-trigraphs -trigraphs'"
 */
 int main() {
   char *s1 = "??";

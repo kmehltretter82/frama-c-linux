@@ -1409,6 +1409,7 @@ struct
       | Pinitialized (_,t) | Pdangling (_, t)
       | Pallocable(_,t) | Pfreeable(_,t)-> needs_at t
       | Pfresh (_,_,t,n) -> (needs_at t) && (needs_at n)
+      | Paligned(t, v) -> (needs_at t) && (needs_at v)
     in
     if needs_at idx then tat ~loc:idx.term_loc (idx,here_label) else idx
 
@@ -2691,6 +2692,14 @@ struct
       let t = term env t in
       normalize_update_term ctxt env loc t v toff
 
+    | PLalignof typ ->
+      let env = drop_qualifiers env in
+      (match Logic_const.unroll_ltdef (logic_type ctxt loc env typ)
+       with
+         Ctype t -> TAlignOf t,Linteger
+       | _ -> if ctxt.silent then raise Backtrack;
+         ctxt.error loc "sizeof can only handle C types")
+
     | PLsizeof typ ->
       let env = drop_qualifiers env in
       (match Logic_const.unroll_ltdef (logic_type ctxt loc env typ)
@@ -3226,7 +3235,7 @@ struct
       (Trange(t1,t2),
        Ltype(Logic_env.find_logic_type "set", [arithmetic_conversion ty1 ty2]))
     | PLvalid _ | PLvalid_read _ | PLobject_pointer _ | PLvalid_function _
-    | PLfresh _ | PLallocable _ | PLfreeable _
+    | PLfresh _ | PLallocable _ | PLfreeable _ | PLaligned _
     | PLinitialized _ | PLdangling _ | PLexists _ | PLforall _
     | PLimplies _ | PLiff _
     | PLxor _ | PLseparated _ ->
@@ -3596,6 +3605,10 @@ struct
       predicate_label_ptr ~check_non_void:true pinitialized l t
     | PLdangling (l,t) ->
       predicate_label_ptr ~check_non_void:true pdangling l t
+    | PLaligned (t, v) ->
+      let t = term_ptr ~check_non_void:false t in
+      let n = term env v in
+      paligned ~loc (t, n)
     | PLold p ->
       let lab = find_old_label loc env in
       let env = Lenv.set_current_logic_label lab env in
@@ -3656,7 +3669,7 @@ struct
     | PLcast _ | PLblock_length _ | PLbase_addr _ | PLoffset _
     | PLrepeat _ | PLlist _ | PLarrget _ | PLarrow _
     | PLdot _ | PLbinop _ | PLunop _ | PLconstant _
-    | PLnull | PLresult | PLsizeof _
+    | PLnull | PLresult | PLalignof _ | PLsizeof _
     | PLsizeofE _ | PLlambda _
     | PLupdate _ | PLinitIndex _ | PLinitField _
     | PLtypeof _ | PLtype _ -> boolean_to_predicate ctxt env p0
@@ -4372,7 +4385,7 @@ struct
     | Pvalid_function t | Pinitialized(_,t) | Pdangling(_,t)
     | Pallocable(_,t) | Pfreeable(_,t) ->
       find_occurrences_term v ~polarity ~pos_use ~neg_use t
-    | Pfresh(_,_,t1,t2) ->
+    | Pfresh(_,_,t1,t2) | Paligned(t1, t2) ->
       let (pos_use, neg_use) =
         find_occurrences_term v ~polarity ~pos_use ~neg_use t1
       in
@@ -4509,7 +4522,7 @@ struct
     | Pvalid_function t | Pinitialized(_,t) | Pdangling(_,t)
     | Pallocable(_,t) | Pfreeable(_,t) ->
       check_horn_clause_term ~polarity ~pos_use ~neg_use t
-    | Pfresh(_,_,t1,t2) ->
+    | Pfresh(_,_,t1,t2) | Paligned(t1, t2) ->
       check_horn_clause_term ~polarity ~pos_use ~neg_use t1;
       check_horn_clause_term ~polarity ~pos_use ~neg_use t2
 
@@ -4572,7 +4585,7 @@ struct
     | Pat(p,_) -> check_horn_clause_main ~pos_use ~neg_use p
     | Pobject_pointer _ | Pvalid_read _  | Pvalid _  | Pvalid_function _
     | Pinitialized _ | Pdangling _ | Pallocable _ | Pfreeable _
-    | Pfresh _ -> conclusion_not_pred ()
+    | Pfresh _ | Paligned _ -> conclusion_not_pred ()
 
   let check_horn_clause p case =
     let pos_use = Cil_datatype.Logic_var.Set.singleton p in

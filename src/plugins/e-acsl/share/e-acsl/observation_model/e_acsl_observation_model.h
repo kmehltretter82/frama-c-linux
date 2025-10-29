@@ -61,6 +61,7 @@
 #define eacsl_block_length   export_alias(block_length)
 #define eacsl_valid_read     export_alias(valid_read)
 #define eacsl_valid          export_alias(valid)
+#define eacsl_aligned        export_alias(aligned)
 #define eacsl_object_pointer export_alias(object_pointer)
 #define eacsl_initialized    export_alias(initialized)
 #define eacsl_freeable       export_alias(freeable)
@@ -302,6 +303,24 @@ int eacsl_freeable(void *ptr) __attribute__((FC_BUILTIN));
   @ */
 int eacsl_valid(void *ptr, size_t size, void *base, void *addrof_base)
     __attribute__((FC_BUILTIN));
+
+/*@ requires alignment > 0;
+  @ assigns \result \from ptr, alignment;
+  @ behavior null:
+  @   assumes ptr == \null;
+  @   ensures \result == 1;
+  @ behavior divisible:
+  @   assumes ptr != \null;
+  @   assumes (uintptr_t)ptr % alignment == 0;
+  @   ensures \result == 1;
+  @ behavior indivisible:
+  @   assumes ptr != \null;
+  @   assumes (uintptr_t)ptr % alignment != 0;
+  @   ensures \result == 0;
+  @ complete behaviors;
+  @ disjoint behaviors;
+  @ */
+int eacsl_aligned(void *ptr, size_t alignment) __attribute__((FC_BUILTIN));
 
 /*@ assigns \result \from *(((char*)ptr)+(-size..size-1)), ptr, size;
   @ behavior valid:

@@ -330,7 +330,7 @@
   Called from assigns_from.i:259.
 [eva] using specification for function get_valid_pointer
 [eva] Done for function get_valid_pointer
-[eva] assigns_from.i:260: Frama_C_show_each_valid: {{ &g ; &h + [0..396] }}
+[eva] assigns_from.i:260: Frama_C_show_each_valid: {{ &g ; &h + [0..396],0%4 }}
 [eva] computing for function get_function_pointer <- main19 <- main.
   Called from assigns_from.i:262.
 [eva] using specification for function get_function_pointer
