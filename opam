@@ -153,12 +153,6 @@ depends: [
   "ppx_deriving_yojson"
   "ppx_deriving_yaml" { >= "0.2.0" }
   "ppx_inline_test"
-
-  # GTK3 disabled on macOS (segfaults), and made optional on Windows
-  # (due to complex situation with Cygwin + MinGW).
-  "lablgtk3" { >= "3.1.0" & os!="macos" & os-family!="windows" }
-  "lablgtk3-sourceview3" { os!="macos" & os-family!="windows" }
-  "conf-gtksourceview3" { os!="macos" & os-family!="windows" }
 ]
 
 # Note: do not put particular versions here, if some version is *incompatible*,
@@ -166,9 +160,6 @@ depends: [
 depopts: [
   "apron"
   "zmq"
-  "lablgtk3" { os-family="windows" }
-  "lablgtk3-sourceview3" { os-family="windows" }
-  "conf-gtksourceview3" { os-family="windows" }
 ]
 
 conflicts: [

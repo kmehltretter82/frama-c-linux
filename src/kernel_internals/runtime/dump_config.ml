@@ -37,11 +37,6 @@ let dump_to_json () =
     "version_and_codename", `String System_config.Version.id_and_codename ;
     "major_version", `Int System_config.Version.major ;
     "minor_version", `Int System_config.Version.minor ;
-    "is_gui", `Bool System_config.is_gui ;
-    (* "lablgtk", `String System_config.lablgtk ;
-     * "ocamlc", `String System_config.ocamlc ;
-     * "ocamlopt", `String System_config.ocamlopt ;
-     * "ocaml_wflags", `String System_config.ocaml_wflags ; *)
     "datadir", `String (Filepath.to_string_abs System_config.Share.main) ;
     "datadirs",
     list string (Filepath.to_string_list System_config.Share.dirs) ;

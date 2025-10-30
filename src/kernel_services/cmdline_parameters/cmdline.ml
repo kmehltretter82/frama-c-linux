@@ -75,13 +75,6 @@ let last_project_created_by_copy = ref (fun () -> assert false)
 let long_plugin_name s =
   if s = Log.kernel_label_name then "Frama-C" else "Plug-in " ^ s
 
-let additional_info () =
-  if System_config.is_gui then
-    "\nReverting to previous state.\n\
-     Check the Console tab for additional information."
-  else
-    ""
-
 let get_backtrace () =
   (* Get the backtrace before potentially destroying it in the handler below *)
   let bt = Printexc.get_backtrace () in
@@ -120,15 +113,14 @@ let protect = function
      | "", t | t, "" -> Printf.sprintf "%s (%s)" error t
      | f, x -> Printf.sprintf "%s (%s %S)" error f x)
   | Log.AbortError p ->
-    Printf.sprintf "%s aborted: invalid user input.%s"
-      (long_plugin_name p) (additional_info ())
+    Printf.sprintf "%s aborted: invalid user input."
+      (long_plugin_name p)
   | Log.AbortFatal p ->
     let bt = get_backtrace () in
     Printf.sprintf
-      "%s\n%s aborted: internal error.%s\n%s"
+      "%s\n%s aborted: internal error.\n%s"
       bt
       (long_plugin_name p)
-      (additional_info ())
       request_crash_report
   | Log.FeatureRequest(s, p, m) ->
     let name = long_plugin_name p in
@@ -137,11 +129,11 @@ let protect = function
       | Some loc -> Format.fprintf fmt "%a: " Filepath.pp_pos loc
     in
     Format.asprintf
-      "%a%s aborted: unimplemented feature.%s\n\
+      "%a%s aborted: unimplemented feature.\n\
        You may send a feature request at \
        https://git.frama-c.com/pub/frama-c/issues with:\n\
        '[%s] %s'."
-      pp_oloc s name (additional_info ()) name m
+      pp_oloc s name name m
   | e ->
     let bt = get_backtrace () in
     Printf.sprintf

@@ -114,6 +114,3 @@ module User_dirs : sig
   val state: unit -> Filepath.t
   (** Where Frama-C should read/write state files *)
 end
-
-val is_gui: bool
-(** Is the Frama-C GUI running? *)

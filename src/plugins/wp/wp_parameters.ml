@@ -33,7 +33,7 @@ let has_dkey (k:category) = is_debug_key_enabled k
 
 let server = ref false
 let () = Server.Main.once (fun () -> server := true)
-let is_interactive () = System_config.is_gui || !server
+let is_interactive () = !server
 
 (* ------------------------------------------------------------------------ *)
 (* ---  WP Generation                                                   --- *)

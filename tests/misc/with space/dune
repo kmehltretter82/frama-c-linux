@@ -2,6 +2,6 @@
   (name "module")
   (modules "module")
   (modes plugin)
-  (libraries frama-c.init.cmdline frama-c.boot frama-c.kernel )
+  (libraries frama-c.init frama-c.boot frama-c.kernel )
   (flags :standard -w -9-32-6-34 -open Frama_c_kernel)
 )

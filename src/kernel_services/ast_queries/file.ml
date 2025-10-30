@@ -1939,7 +1939,7 @@ let init_from_cmdline () =
     Project.set_current prj2;
   end;
   let files = Kernel.Files.get () in
-  if files = [] && not System_config.is_gui then Kernel.warning "no input file.";
+  if files = [] then Kernel.warning "no input file.";
   let files = List.map (fun f -> from_filename f) files in
   try
     init_from_c_files files;
