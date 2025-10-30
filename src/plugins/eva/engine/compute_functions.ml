@@ -78,10 +78,8 @@ module Make (Engine: Engine_sig.S) = struct
 
   (* Interprets a [call] in the state [state] by analyzing
      the body of the called function. *)
-  let compute_using_body fundec ~save_results call state =
-    let result = Engine.Iterator.compute ~save_results call.callstack state in
-    Summary.FunctionStats.recompute @@ Globals.Functions.get fundec.svar ;
-    result
+  let compute_using_body ~save_results call state =
+    Engine.Iterator.compute ~save_results call.callstack state
 
   (* Interprets a [call] at callsite [kinstr] in the state [state] by using the
      specification of the called function. *)
@@ -115,10 +113,8 @@ module Make (Engine: Engine_sig.S) = struct
         Position.pretty_loc pos;
     let compute, kind =
       match target with
-      | `Body (fundec, save_results) ->
-        compute_using_body fundec ~save_results, `Body
-      | `Spec funspec ->
-        compute_using_spec funspec, `Spec
+      | `Body (_, save_results) -> compute_using_body ~save_results, `Body
+      | `Spec funspec -> compute_using_spec funspec, `Spec
     in
     apply_call_hooks call state kind;
     let resulting_states, cacheable = compute call state in

@@ -211,6 +211,15 @@ module FunctionStats = struct
         let size = 17
       end)
 
+  (* Recompute statistics about a function after each analysis of its body. *)
+  let () =
+    let aux _callstack kf _state results =
+      match results with
+      | `Body _ -> replace kf (compute_fun_stats kf)
+      | `Builtin _ | `Spec _ | `Reuse _ -> ()
+    in
+    Cvalue_callbacks.register_call_results_hook aux
+
   let recompute kf = replace kf (compute_fun_stats kf)
   let recompute_all () = iter (fun kf _ -> recompute kf)
 end
