@@ -22,6 +22,8 @@ Open Source Release <next-release>
 Open Source Release 32.0 (Germanium)
 ###############################################################################
 
+-   Kernel    [2025-10-30] -variadic-translation produces compilable code even
+              in presence of -no-frama-c-stdlib. Fixes #@1608
 -   Kernel    [2025-10-29] New machdep for macOS ARM
 -   Kernel    [2025-10-29] New option -std (defaults to c11) for selecting ISO C
               standard, no more warnings when using C11 features
