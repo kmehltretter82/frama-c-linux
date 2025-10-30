@@ -111,6 +111,18 @@ let warn_no_specification ~source kf =
      specification is not available."
     Kernel_function.pretty kf
 
+let warn_no_default_behavior ~source kf =
+  Self.warning ~wkey:Self.wkey_builtins_missing_spec ~source ~once:true
+    "The builtin for function %a will not be used, as its specification \
+     has no default behavior."
+    Kernel_function.pretty kf
+
+let warn_no_assigns ~source kf =
+  Self.warning ~wkey:Self.wkey_missing_assigns ~source ~once:true
+    "The builtin for function %a will not be used, as its specification has
+     no assigns clause."
+    Kernel_function.pretty kf
+
 let warn_user_specification ~source kf =
   Self.warning ~wkey:Self.wkey_builtins_missing_spec ~source ~once:true
     "No Frama-C libc specification found for function %a, for which a \
@@ -128,7 +140,9 @@ let is_frama_c_builtin kf =
   let vi = Kernel_function.get_vi kf in
   Ast_info.start_with_frama_c vi.vname || Cil_builtins.has_fc_builtin_attr vi
 
-(* Returns the specification of a builtin, used to evaluate preconditions
+type spec = Spec of Cil_types.spec | NoSpec | NoAssigns | NoDefaultBehavior
+
+(* Returns the specification of a builtin, required to evaluate preconditions
    and to transfer the states of other domains. *)
 let find_builtin_specification kf =
   (* Functions for which a builtin is used should have a specification, except
@@ -137,8 +151,9 @@ let find_builtin_specification kf =
   if is_frama_c_builtin kf
   then Populate_spec.populate_funspec kf [`Assigns];
   let spec = Annotations.funspec kf in
-  (* The specification can be empty if [kf] has a body but no specification. *)
-  if spec.spec_behavior <> [] then Some spec else None
+  match Cil.find_default_behavior spec with
+  | None -> if spec.spec_behavior = [] then NoSpec else NoDefaultBehavior
+  | Some bhv -> if bhv.b_assigns = WritesAny then NoAssigns else Spec spec
 
 (* Returns [true] if the function [kf] is incompatible with the expected type
    for a given builtin, which therefore cannot be applied. *)
@@ -165,8 +180,10 @@ let prepare_builtin kf (name, builtin, cacheable, expected_typ) =
   then warn_incompatible_type ~source name kf
   else
     match find_builtin_specification kf with
-    | None -> warn_no_specification ~source kf
-    | Some spec ->
+    | NoSpec -> warn_no_specification ~source kf
+    | NoDefaultBehavior -> warn_no_default_behavior ~source kf
+    | NoAssigns -> warn_no_assigns ~source kf
+    | Spec spec ->
       BuiltinsOverride.add kf;
       Hashtbl.replace builtins_table kf (name, builtin, cacheable, spec)
 

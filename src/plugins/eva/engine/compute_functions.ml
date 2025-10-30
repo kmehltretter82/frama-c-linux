@@ -42,17 +42,7 @@ let options_ok () =
   check Parameters.SplitReturnFunction.get;
   check Parameters.BuiltinsOverrides.get;
   check Parameters.SlevelFunction.get;
-  check Parameters.EqualityCallFunction.get;
-  let check_assigns kf =
-    if need_assigns kf then
-      Self.warning ~wkey:Self.wkey_missing_assigns
-        "@[No assigns specified for function '%a', for which a builtin will be \
-         used. Potential unsoundness.@]"
-        Kernel_function.pretty kf
-  in
-  Parameters.BuiltinsOverrides.iter (fun (kf, _) -> check_assigns kf)
-
-(* Parameters.UsePrototype.iter (fun kf -> check_assigns kf) *)
+  check Parameters.EqualityCallFunction.get
 
 let plugins_ok () =
   if not (Plugin.is_present "inout") then
