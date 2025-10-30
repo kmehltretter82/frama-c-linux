@@ -91,11 +91,6 @@ let pre_analysis () =
   Cvalue_callbacks.apply_at_start_hooks ();
   Origin.clear ()
 
-let post_analysis_cleanup ~aborted =
-  if not aborted then
-    (* Keep memexec results for users that want to resume the analysis *)
-    Mem_exec.cleanup_results ()
-
 let post_analysis () =
   (* Garbled mix must be dumped here -- at least before the call to
      mark_green_and_red -- because fresh ones are created when re-evaluating
@@ -111,7 +106,7 @@ let post_analysis () =
      this analysis. *)
   Eval_annots.mark_green_and_red ();
   Eva_dynamic.RteGen.mark_generated_rte ();
-  post_analysis_cleanup ~aborted:false;
+  Mem_exec.cleanup_results ();
   (* Remove redundant alarms *)
   if Parameters.RmAssert.get () then Eva_dynamic.Scope.rm_asserts ();
   (* The above functions may have changed the status of alarms. *)
@@ -430,8 +425,7 @@ module Make (Engine: Engine_sig.S) = struct
     in
     let cleanup () =
       Engine.Dom.Store.mark_as_computed ();
-      Self.(ComputationState.set Aborted);
-      post_analysis_cleanup ~aborted:true
+      Self.(ComputationState.set Aborted)
     in
     Eva_utils.protect compute ~cleanup
 
@@ -441,9 +435,7 @@ module Make (Engine: Engine_sig.S) = struct
       (if lib_entry then "n in" else " ")
       Kernel_function.pretty kf;
     let initial_state =
-      Eva_utils.protect
-        (fun () -> Engine.Initialization.initial_state_with_formals ~lib_entry kf)
-        ~cleanup:(fun () -> post_analysis_cleanup ~aborted:true)
+      Engine.Initialization.initial_state_with_formals ~lib_entry kf
     in
     match initial_state with
     | `Bottom ->
