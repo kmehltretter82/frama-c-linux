@@ -64,6 +64,7 @@ let generate_specs () =
   Parameters.UsePrototype.iter aux
 
 let pre_analysis () =
+  Parameters.configure_precision ();
   Iterator.signal_reset ();
   floats_ok ();
   options_ok ();
@@ -76,7 +77,9 @@ let pre_analysis () =
   clear_caches ();
   Eva_utils.DegenerationPoints.clear ();
   Cvalue_callbacks.apply_at_start_hooks ();
-  Origin.clear ()
+  Origin.clear ();
+  if not (Kernel.AuditCheck.is_empty ()) then
+    Eva_audit.check_configuration (Kernel.AuditCheck.get ())
 
 (* ----- Post-analysis cleanup ---------------------------------------------- *)
 
@@ -180,29 +183,23 @@ let compute_from_init_state (type t) (engine: t engine) kf (init_state: t) =
   Eva_utils.protect compute ~cleanup
 
 let compute_from_entry_point (module Engine: Engine_sig.S) kf ~lib_entry =
-  pre_analysis ();
   Self.feedback "Analyzing a%scomplete application starting at %a"
     (if lib_entry then "n in" else " ")
     Kernel_function.pretty kf;
-  let initial_state =
-    Engine.Initialization.initial_state_with_formals ~lib_entry kf
-  in
-  match initial_state with
+  match Engine.Initialization.initial_state_with_formals ~lib_entry kf with
   | `Bottom ->
     Engine.Dom.Store.mark_as_computed ();
     Self.(ComputationState.set Aborted);
     Self.result "Eva not started because globals \
                  initialization is not computable.";
     Eval_annots.mark_invalid_initializers ()
-  | `Value init_state ->
-    compute_from_init_state (module Engine) kf init_state
+  | `Value initial_state ->
+    compute_from_init_state (module Engine) kf initial_state
 
 (* Builds the analyzer if needed, and run the analysis. *)
 let force_compute () =
   Ast.compute ();
-  Parameters.configure_precision ();
-  if not (Kernel.AuditCheck.is_empty ()) then
-    Eva_audit.check_configuration (Kernel.AuditCheck.get ());
+  pre_analysis ();
   let kf, lib_entry = Globals.entry_point () in
   Engine.reset_analyzer ();
   (* The new analyzer can be accessed through hooks *)
