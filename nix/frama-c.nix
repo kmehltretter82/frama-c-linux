@@ -11,7 +11,7 @@
 , gitignoreSource
 , makeWrapper
 , nix-gitignore
-, wrapGAppsHook
+, wrapGAppsHook3
 , writeText
 # Generic
 , findlib
@@ -70,7 +70,7 @@ stdenvNoCC.mkDerivation rec {
 
   nativeBuildInputs = [
     which
-    wrapGAppsHook
+    wrapGAppsHook3
   ];
 
   buildInputs = [
