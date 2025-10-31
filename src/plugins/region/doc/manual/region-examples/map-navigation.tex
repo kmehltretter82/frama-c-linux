@@ -1,17 +1,48 @@
+\section{Navigation in the region map}
+\label{sec-region-navigation}
+
+For each function, the \Region plugin generates a single \emph{region map}:
+an overapproximation of a
+map dispatching memory locations into regions using alias and shape analysis.
+A region map is defined as a graph (acyclic when no pointer is
+involved) whose paths start with program variables represented as labels.
+\begin{table}[h!]
+\begin{center}
+\begin{tabular}{|m{2cm}|m{10cm}|}
+\hline
+    \centering Region label & Meaning
+\\
+\hline
+{\centering{\includegraphics[width=2cm]{"images/example-region-label.png"}}}
+&
+A region label (not a region) representing the program variable \texttt{s}.
+\\
+\hline
+\end{tabular}
+\end{center}
+\vspace{-15px}
+\caption{Example of a region label}
+\label{table-region-navigation-label}
+\vspace{-10px}
+\end{table}
+
+\subsection{Region definition}
+
 In any region map, each region is carcterized by (at least) its size,
 its content, and the memory accesses.
 Memory access kinds are: read \texttt{R}, write \texttt{W}, shift
 \texttt{S}, and initialization \texttt{I}. Each access is paired with a C type
 that defines the size of all memory locations included in the region.
 
-\subsection{Primitive regions}
+\subsubsection{Primitive regions}
 
 Shown in Table \ref{table-region-navigation-primitive}, primitive regions
 are defined as region which only include accesses paired with primitive
 C types, which are represented as
 \texttt{i} for \texttt{int}, \texttt{s} for \texttt{short},
 \texttt{d} for \texttt{double}, \texttt{f} for \texttt{float},
- \texttt{b} for \texttt{bool}.
+ \texttt{b} for \texttt{bool}, and lastly \texttt{x} for multiple
+ heterogenous accesses.
 
 \begin{table}[h!]
 \begin{center}
@@ -22,7 +53,7 @@ C types, which are represented as
 \hline
     {\centering{\includegraphics[height=1.1cm]{"images/example-primitive-read.png"}}}
 &
-    Primitive region with read access of \texttt{int}
+    Primitive region with read access(es) of \texttt{int}
 
     (gray for only primitive read with a unique type).
 \\
@@ -36,15 +67,16 @@ C types, which are represented as
 \hline
     {\centering{\includegraphics[height=1.1cm]{"images/example-primitive-write.png"}}}
 &
-    Primitive region with write access of \texttt{int}.
+    Primitive region with write access(es) of \texttt{int}.
 
     (pink for only primitive write with a unique type)
 \\
 \hline
     {\centering{\includegraphics[height=1.4cm]{"images/example-garbled-with-more-details.png"}}}
 &
-    Primitive region with heterogenous access:
-    an \texttt{int} and a \texttt{float}.
+    Primitive region with heterogenous accesses:
+
+    a 32-bits \texttt{int} and a 32-bits \texttt{float}.
 
     (red for heterogenous accesses)
 \\
@@ -54,10 +86,11 @@ C types, which are represented as
 \vspace{-15px}
 \caption{Example of primitive regions}
 \label{table-region-navigation-primitive}
+\vspace{-15px}
 \end{table}
 
 \pagebreak
-\subsection{Pointer regions}
+\subsubsection{Pointer regions}
 
 Shown in Table \ref{table-region-navigation-pointer},
 pointer regions are regions whose accesses are of C type pointer.
@@ -102,9 +135,10 @@ in Table \ref{table-region-navigation-arcs}.
 \vspace{-15px}
 \caption{Example of pointer regions}
 \label{table-region-navigation-pointer}
+\vspace{-15px}
 \end{table}
 
-\subsection{Compound regions}
+\subsubsection{Compound regions}
 
 Shown in Table \ref{table-region-navigation-compound},
 compound regions are accessed with a \texttt{struct} C type.
@@ -136,6 +170,7 @@ fields of the structure, see Section \ref{sec-region-shape-analysis}.
 \vspace{-15px}
 \caption{Example of a compound region}
 \label{table-region-navigation-compound}
+\vspace{-15px}
 \end{table}
 
 
@@ -179,4 +214,5 @@ included in the right region addresses.
 \vspace{-15px}
 \caption{Examples of region arcs}
 \label{table-region-navigation-arcs}
+\vspace{-15px}
 \end{table}

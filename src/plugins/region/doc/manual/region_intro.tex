@@ -3,3 +3,12 @@
 
 This document describes the \FramaC/\Region plug-in that creates a map
 dispatching each memory location into regions, modularly for each \C function.
+
+
+The \Region plug-in is distributed with the \FramaC platform.
+It is a dynamically loaded plug-in, distributed with the kernel since the
+\textsf{Gallium} release of \FramaC{}.
+
+One can run the \Region analysis on any C code file with the command line:
+
+\texttt{\$> frama-c -region [files.c]}
