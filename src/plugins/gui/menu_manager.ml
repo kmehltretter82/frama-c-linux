@@ -228,8 +228,8 @@ class menu_manager ?packing (_:Gtk_helper.host) =
       in
       let add_menu_separator =
         fun () ->
-          if !menu_pos > 0 || (!menu_pos = -1 && container#children <> []) then
-            ignore (GMenu.separator_item ~packing:container_packing ())
+        if !menu_pos > 0 || (!menu_pos = -1 && container#children <> []) then
+          ignore (GMenu.separator_item ~packing:container_packing ())
       in
       let add_item_menu stock_opt label callback sensitive =
         let item = match stock_opt, callback with

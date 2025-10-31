@@ -2040,18 +2040,18 @@ class cil_printer () = object (self)
       in
       let name' =
         fun fmt ->
-          let attr = t.tattr <> [] in
-          fprintf fmt "*%a%a%a"
-            printAttributes t.tattr
-            palignas attr
-            pname (attr || alignas <> None)
+        let attr = t.tattr <> [] in
+        fprintf fmt "*%a%a%a"
+          printAttributes t.tattr
+          palignas attr
+          pname (attr || alignas <> None)
       in
       let name'' =
         fun fmt ->
-          (* Put the parenthesis *)
-          match paren with
-          | Some p -> fprintf fmt "%t%t)" p name'
-          | None -> fprintf fmt "%t" name'
+        (* Put the parenthesis *)
+        match paren with
+        | Some p -> fprintf fmt "%t%t)" p name'
+        | None -> fprintf fmt "%t" name'
       in
       self#typ (Some name'') fmt bt'
 

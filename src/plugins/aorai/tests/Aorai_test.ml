@@ -51,91 +51,91 @@ let is_suffix suf str =
 let extend () =
   let myrun =
     fun f ->
-      let my_project = Project.create "Reparsing" in
-      let wp_compute_kf kf =
-        let vcs = Wp.VC.generate_kf kf in
-        Wp.VC.command vcs;
-        Bag.iter
-          (fun vc ->
-             if not (Wp.VC.is_passed vc) then
-               P.warning "Could not prove %a in automaton function %a"
-                 Property.pretty (Wp.VC.get_property vc)
-                 Kernel_function.pretty kf)
-          vcs
+    let my_project = Project.create "Reparsing" in
+    let wp_compute_kf kf =
+      let vcs = Wp.VC.generate_kf kf in
+      Wp.VC.command vcs;
+      Bag.iter
+        (fun vc ->
+           if not (Wp.VC.is_passed vc) then
+             P.warning "Could not prove %a in automaton function %a"
+               Property.pretty (Wp.VC.get_property vc)
+               Kernel_function.pretty kf)
+        vcs
+    in
+    let check_auto_func kf =
+      let name = Kernel_function.get_name kf in
+      if Kernel_function.is_definition kf &&
+         (is_suffix "_pre_func" name || is_suffix "_post_func" name)
+      then
+        wp_compute_kf kf
+    in
+    f ();
+    let tmpdir = Filename.get_temp_dir_name () in
+    let tmpdir =
+      match Filename.chop_suffix_opt ~suffix:"/" tmpdir with
+      | None -> tmpdir
+      | Some dir -> dir
+    in
+    let tmpfile =
+      tmpdir ^ "/aorai_" ^
+      Filename.(
+        chop_extension (basename (Filepath.to_string_abs (List.hd (Kernel.Files.get()))))) ^
+      "_" ^ (TestID.get ()) ^ ".i"
+    in
+    let tmpfile = Filepath.of_string tmpfile in
+    let () =
+      Extlib.safe_at_exit
+        (fun () ->
+           if Debug.get () >= 1 || not !ok then
+             result "Keeping temp file %a" Filepath.pretty tmpfile
+           else Filesystem.remove_file tmpfile)
+    in
+    let () =
+      let open Filesystem.Operators in
+      let$ fmt = Filesystem.with_formatter_exn tmpfile in
+      let aorai_prj =
+        Project.find_all "aorai"
+        |> Project.pick_most_recently_created
       in
-      let check_auto_func kf =
-        let name = Kernel_function.get_name kf in
-        if Kernel_function.is_definition kf &&
-           (is_suffix "_pre_func" name || is_suffix "_post_func" name)
-        then
-          wp_compute_kf kf
-      in
-      f ();
-      let tmpdir = Filename.get_temp_dir_name () in
-      let tmpdir =
-        match Filename.chop_suffix_opt ~suffix:"/" tmpdir with
-        | None -> tmpdir
-        | Some dir -> dir
-      in
-      let tmpfile =
-        tmpdir ^ "/aorai_" ^
-        Filename.(
-          chop_extension (basename (Filepath.to_string_abs (List.hd (Kernel.Files.get()))))) ^
-        "_" ^ (TestID.get ()) ^ ".i"
-      in
-      let tmpfile = Filepath.of_string tmpfile in
-      let () =
-        Extlib.safe_at_exit
-          (fun () ->
-             if Debug.get () >= 1 || not !ok then
-               result "Keeping temp file %a" Filepath.pretty tmpfile
-             else Filesystem.remove_file tmpfile)
-      in
-      let () =
-        let open Filesystem.Operators in
-        let$ fmt = Filesystem.with_formatter_exn tmpfile in
-        let aorai_prj =
-          Project.find_all "aorai"
-          |> Project.pick_most_recently_created
-        in
-        Project.on aorai_prj Kernel.PrintLibc.on ();
-        File.pretty_ast ~prj:aorai_prj ~fmt ();
-      in
-      let selection =
-        List.fold_left
-          (fun selection state ->
-             State_selection.union
-               (State_selection.with_codependencies state) selection)
-          State_selection.empty
-          [ InternalWpShare.self; ProveAuxSpec.self;
-            Wp.Wp_parameters.CacheEnv.self;
-            Wp.Wp_parameters.Verbose.self;
-          ]
-      in
-      Project.copy ~selection my_project;
-      Project.set_current my_project;
-      Kernel.SymbolicPath.add
-        (Filepath.of_string (Filename.get_temp_dir_name ()),
-         "TMPDIR");
-      Files.append_after [ tmpfile ];
-      Kernel.LogicalOperators.on ();
-      Constfold.off ();
-      Ast.compute();
-      if ProveAuxSpec.get () then begin
-        if InternalWpShare.is_set() then
-          Wp.Wp_parameters.Share.set (InternalWpShare.get());
-        Wp.Wp_parameters.Let.off();
-        Wp.Wp_parameters.SplitBranch.on();
-        Wp.Wp_parameters.SplitConj.on();
-        Wp.Wp_parameters.SplitMax.set 32;
-        Wp.Wp_parameters.Model.As_string.set "+real";
-        if not (Wp.Wp_parameters.Verbose.is_set()) then
-          Wp.Wp_parameters.Verbose.set 0;
-        Globals.Functions.iter check_auto_func;
-      end else begin
-        File.pretty_ast ();
-      end;
-      ok:=true (* no error, we can erase the file *)
+      Project.on aorai_prj Kernel.PrintLibc.on ();
+      File.pretty_ast ~prj:aorai_prj ~fmt ();
+    in
+    let selection =
+      List.fold_left
+        (fun selection state ->
+           State_selection.union
+             (State_selection.with_codependencies state) selection)
+        State_selection.empty
+        [ InternalWpShare.self; ProveAuxSpec.self;
+          Wp.Wp_parameters.CacheEnv.self;
+          Wp.Wp_parameters.Verbose.self;
+        ]
+    in
+    Project.copy ~selection my_project;
+    Project.set_current my_project;
+    Kernel.SymbolicPath.add
+      (Filepath.of_string (Filename.get_temp_dir_name ()),
+       "TMPDIR");
+    Files.append_after [ tmpfile ];
+    Kernel.LogicalOperators.on ();
+    Constfold.off ();
+    Ast.compute();
+    if ProveAuxSpec.get () then begin
+      if InternalWpShare.is_set() then
+        Wp.Wp_parameters.Share.set (InternalWpShare.get());
+      Wp.Wp_parameters.Let.off();
+      Wp.Wp_parameters.SplitBranch.on();
+      Wp.Wp_parameters.SplitConj.on();
+      Wp.Wp_parameters.SplitMax.set 32;
+      Wp.Wp_parameters.Model.As_string.set "+real";
+      if not (Wp.Wp_parameters.Verbose.is_set()) then
+        Wp.Wp_parameters.Verbose.set 0;
+      Globals.Functions.iter check_auto_func;
+    end else begin
+      File.pretty_ast ();
+    end;
+    ok:=true (* no error, we can erase the file *)
   in
   Boot.set_toplevel myrun
 

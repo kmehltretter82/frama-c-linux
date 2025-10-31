@@ -183,10 +183,10 @@ let translate_variadics (file : file) =
         let vf = Table.find classification f in
         let cover_failure f =
           fun ~builder args ->
-            try
-              f ~builder args
-            with Standard.Translate_call_exn callee ->
-              Standard.fallback_fun_call ~callee ~builder env vf args
+          try
+            f ~builder args
+          with Standard.Translate_call_exn callee ->
+            Standard.fallback_fun_call ~callee ~builder env vf args
         in
         match vf.vf_class with
         | Overload o -> cover_failure (Standard.overloaded_call o vf)

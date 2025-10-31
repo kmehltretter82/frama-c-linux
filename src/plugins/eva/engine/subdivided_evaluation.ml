@@ -321,19 +321,19 @@ module Hypotheses = struct
     let rec split:
       type l. (Z.t, l) llist -> l subvalues -> l subvalues list =
       fun sizes subvalues ->
-        match sizes, subvalues with
-        | Nil, Nil -> [ Nil ]
-        | Cons (size, tl_size), Cons (v, tl) ->
-          let append =
-            try
-              let v1, v2 = subdivide size v in
-              fun acc tl -> Cons (v1, tl) :: Cons (v2, tl) :: acc
-            (* Other subvalues could be split; keep this initial value. *)
-            with Abstract_interp.Can_not_subdiv ->
-            fun acc tl -> Cons (v, tl) :: acc
-          in
-          let list = split tl_size tl in
-          List.fold_left append [] list
+      match sizes, subvalues with
+      | Nil, Nil -> [ Nil ]
+      | Cons (size, tl_size), Cons (v, tl) ->
+        let append =
+          try
+            let v1, v2 = subdivide size v in
+            fun acc tl -> Cons (v1, tl) :: Cons (v2, tl) :: acc
+          (* Other subvalues could be split; keep this initial value. *)
+          with Abstract_interp.Can_not_subdiv ->
+          fun acc tl -> Cons (v, tl) :: acc
+        in
+        let list = split tl_size tl in
+        List.fold_left append [] list
     in
     let list = split sizes subvalues in
     (* If the final list contains only one element, no value has been split. *)
