@@ -32,7 +32,7 @@ let mk_overload env names =
 
 let mk_aggregator env fun_name a_pos pname a_type =
   match find_function env fun_name with
-  | None -> Misc
+  | None -> Unknown
   | Some vi ->
     try
       (* Get the list of arguments *)
@@ -85,7 +85,7 @@ let mk_format_fun vi f_kind f_buffer ~format_pos =
         vi.vname
         n_expected_args
         n_actual_args;
-      Misc
+      Unknown
     end
   else
     FormatFun { f_kind ; f_buffer ; f_format_pos = format_pos }
