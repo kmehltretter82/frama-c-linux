@@ -670,7 +670,7 @@ __UINT16_T __atomic_fetch_nand_2(__UINT16_T* ptr, __UINT16_T val, int model);
     requires initialization: \initialized(ptr);
     assigns \result, *ptr \from *ptr, val, indirect: model;
 */
-__UINT32_T __atomic_fetch_add_4(__UINT32_T* ptr, __UINT32_T val, int model);
+__UINT32_T __atomic_fetch_add_4(volatile __UINT32_T* ptr, __UINT32_T val, int model);
 
 /*@ requires validity: \valid(ptr);
     requires initialization: \initialized(ptr);
@@ -738,6 +738,8 @@ __UINT64_T __atomic_fetch_or_8(__UINT64_T* ptr, __UINT64_T val, int model);
 */
 __UINT64_T __atomic_fetch_nand_8(__UINT64_T* ptr, __UINT64_T val, int model);
 
+#if !defined(__clang__)
+
 /*@ requires validity: \valid((char*)ptr);
     assigns \result \from *((char*)ptr);
     assigns *((char*)ptr) \from \nothing;
@@ -749,6 +751,8 @@ BOOL __atomic_test_and_set(void* ptr, int model);
 */
 void __atomic_clear(BOOL* ptr, int model);
 
+#endif
+
 /*@ assigns \nothing; */
 void __atomic_thread_fence(int model);
 
@@ -756,10 +760,10 @@ void __atomic_thread_fence(int model);
 void __atomic_signal_fence(int model);
 
 /*@ assigns \result \from indirect: size, indirect: ptr; */
-BOOL __atomic_always_lock_free(__SIZE_T size, void* ptr);
+BOOL __atomic_always_lock_free(__SIZE_T size, const volatile void* ptr);
 
 /*@ assigns \result \from indirect: size, indirect: ptr; */
-BOOL __atomic_is_lock_free(__SIZE_T size, void* ptr);
+BOOL __atomic_is_lock_free(__SIZE_T size, const volatile void* ptr);
 
 // According to the GCC docs
 // (https://gcc.gnu.org/onlinedocs/gcc/_005f_005fsync-Builtins.html),
