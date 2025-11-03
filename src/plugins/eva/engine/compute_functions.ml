@@ -61,7 +61,7 @@ module Make (Engine: Engine_sig.S) = struct
       Populate_spec.populate_funspec call.kf [`Assigns];
       let spec = Annotations.funspec call.kf in
       if not (Eva_utils.skip_specifications call.kf) &&
-         Eval_annots.has_requires spec
+         List.exists (fun b -> b.b_requires <> []) spec.spec_behavior
       then begin
         let ab = Logic.create init_state call.kf in
         let kinstr = Callstack.top_callsite call.callstack in
