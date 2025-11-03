@@ -163,7 +163,6 @@ depends: [
 # use the field 'conflicts'.
 depopts: [
   "apron"
-  "mlmpfr"
   "zmq"
   "lablgtk3" { os-family="windows" }
   "lablgtk3-sourceview3" { os-family="windows" }
